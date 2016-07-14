@@ -48,7 +48,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "mafVMEGroup.h"
 #include "mafMatrixPipe.h"
 
-#include "vtkMAFVolumeResample.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkDirectory.h"
 #include "vtkWindowLevelLookupTable.h"
@@ -256,9 +255,6 @@ mafOp(label)
 	m_DicomDirectoryABSFileName = "";
 	m_DicomReaderModality = -1;
 
-	m_HighBit = 0;
-	m_RescaleIntercept = 0;
-
 	m_BuildStepValue = 0;
 	m_OutputType = 0;
 	m_RadioButton = 0;
@@ -287,19 +283,11 @@ mafOp(label)
 
 	m_VolumeName = "";
 
-	m_VolumeSide=LEFT_SIDE;
-
 	m_DicomModalityListBox = NULL;
 
 	m_DicomInteractor = NULL;
 
 	m_CurrentSlice = VTK_INT_MAX;
-
-	m_ResampleFlag = FALSE;
-
-	m_DiscardPosition = FALSE;
-
-	m_RescaleTo16Bit = FALSE;
 
 	m_ApplyRotation = false;
 
@@ -316,8 +304,7 @@ mafOp(label)
 
 	m_SkipAllNoPosition=false;
 
-	m_Showspacing = 0;
-
+	m_ShowOrientationPosition = 0;
 }
 //----------------------------------------------------------------------------
 mafOpImporterDicomOffis::~mafOpImporterDicomOffis()
@@ -335,20 +322,12 @@ mafOpImporterDicomOffis::~mafOpImporterDicomOffis()
 mafOp *mafOpImporterDicomOffis::Copy()
 {
 	mafOpImporterDicomOffis *importer = new mafOpImporterDicomOffis(m_Label);
-	importer->m_ResampleFlag = m_ResampleFlag;
-	importer->m_DicomDirectoryABSFileName = m_DicomDirectoryABSFileName;
-	importer->m_DiscardPosition = m_DiscardPosition;
-	importer->m_RescaleTo16Bit = m_RescaleTo16Bit;
-
 	return importer;
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::OpRun()
 {
 	m_BuildStepValue = ((mafGUIDicomSettings*)GetSetting())->GetBuildStep();
-	m_DiscardPosition = ((mafGUIDicomSettings*)GetSetting())->EnableDiscardPosition();
-	m_ResampleFlag = ((mafGUIDicomSettings*)GetSetting())->EnableResampleVolume();
-	m_RescaleTo16Bit = ((mafGUIDicomSettings*)GetSetting())->EnableRescaleTo16Bit();
 
 	CreateGui();
 	CreateSliceVTKPipeline();
@@ -420,25 +399,7 @@ int mafOpImporterDicomOffis::RunWizard()
 							m_ApplyRotation = true;
 					}
 				}
-
-				//rescale to 16 bit all the rest of the dataset
-				if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
-				{
-					int i=0, size = m_SelectedSeriesSlicesList->size();
-
-					mafProgressBarHelper progressHelper(m_Listener);
-					progressHelper.SetTextMode(m_TestMode);
-					progressHelper.InitProgressBar("Conversion to Unsigned Short: please wait...");
-
-					for(int slice_num=0;slice_num<size;slice_num++)
-					{
-						RescaleTo16Bit(m_SelectedSeriesSlicesList->Item(slice_num)->GetData()->GetVTKImageData());
-
-						progressHelper.UpdateProgressBar(slice_num * 100 / (double)size);	
-					}
-					progressHelper.CloseProgressBar();
-				}
-
+				
 				if(m_DicomReaderModality != mafGUIDicomSettings::ID_CMRI_MODALITY)
 					result = BuildOutputVMEGrayVolumeFromDicom();
 				else
@@ -530,37 +491,22 @@ void mafOpImporterDicomOffis::Destroy()
 	if(m_LoadPage)
 	{
 		m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
-		if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
-		{
-			m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_TextActor);
-		}
+		m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_TextActor);
 	}
 
 	if(m_CropPage)
 	{
 		m_CropPage->GetRWI()->m_RenFront->RemoveActor(m_CropActor);  
-		if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
-		{
-			m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_TextActor);
-		}
 	}
 
 	if(m_BuildPage)
 	{
 		m_BuildPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
-		if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
-		{
-			m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_TextActor);
-		}
 	}
 
 	if(m_ReferenceSystemPage)
 	{
 		m_ReferenceSystemPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
-		if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
-		{
-			m_BuildPage->GetRWI()->m_RenFront->RemoveActor(m_TextActor);
-		}
 	}
 
 	vtkDEL(m_SliceTexture);
@@ -679,22 +625,6 @@ int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicom()
 		tag_Surgeon.SetName("SURGEON_NAME");
 		tag_Surgeon.SetValue(m_SurgeonName.GetCStr());
 		image->GetTagArray()->SetTag(tag_Surgeon);
-
-		if(!this->m_TestMode)
-		{
-			if(((mafGUIDicomSettings*)GetSetting())->EnableChangeSide())
-			{
-				mafTagItem tagSide;
-				tagSide.SetName("VOLUME_SIDE");
-				if(m_VolumeSide==LEFT_SIDE)
-					tagSide.SetValue("LEFT");
-				else if(m_VolumeSide==RIGHT_SIDE)
-					tagSide.SetValue("RIGHT");
-				else if(m_VolumeSide==NON_VALID_SIDE)
-					tagSide.SetValue("NON_VALID_SIDE");
-				image->GetTagArray()->SetTag(tagSide);
-			}
-		}
 
 		m_ImagesGroup->AddChild(image);
 		s_count++;
@@ -867,21 +797,6 @@ int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 			tag_Surgeon.SetValue(m_SurgeonName.GetCStr());
 			m_ImagesGroup->GetChild(targetVolumeSliceId)->GetTagArray()->SetTag(tag_Surgeon);
 
-			if(!this->m_TestMode)
-			{
-				if(((mafGUIDicomSettings*)GetSetting())->EnableChangeSide())
-				{
-					mafTagItem tagSide;
-					tagSide.SetName("VOLUME_SIDE");
-					if(m_VolumeSide==LEFT_SIDE)
-						tagSide.SetValue("LEFT");
-					else if(m_VolumeSide==RIGHT_SIDE)
-						tagSide.SetValue("RIGHT");
-					else if(m_VolumeSide==NON_VALID_SIDE)
-						tagSide.SetValue("NON_VALID_SIDE");
-					m_ImagesGroup->GetChild(targetVolumeSliceId)->GetTagArray()->SetTag(tagSide);
-				}
-			}
 			targetVolumeSliceId++;
 			progressCounter++;
 		}
@@ -1245,11 +1160,7 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 		m_Volume->SetAbsMatrix(boxPose->GetMatrix());
 	//}
 
-	if(m_ResampleFlag == TRUE)
-	{
-		ResampleVolume();
-	}
-
+	
 	ImportDicomTags(); 
 	//Copy inside the first VME item of m_Volume the CT volume and Dicom's tags
 	m_Volume->GetTagArray()->DeepCopy(m_TagArray);
@@ -1263,22 +1174,6 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	tag_Surgeon.SetName("SURGEON_NAME");
 	tag_Surgeon.SetValue(m_SurgeonName.GetCStr());
 	m_Volume->GetTagArray()->SetTag(tag_Surgeon);
-
-	if(!this->m_TestMode)
-	{
-		if(((mafGUIDicomSettings*)GetSetting())->EnableChangeSide())
-		{
-			mafTagItem tagSide;
-			tagSide.SetName("VOLUME_SIDE");
-			if(m_VolumeSide==LEFT_SIDE)
-				tagSide.SetValue("LEFT");
-			else if(m_VolumeSide==RIGHT_SIDE)
-				tagSide.SetValue("RIGHT");
-			else if(m_VolumeSide==NON_VALID_SIDE)
-				tagSide.SetValue("NON_VALID_SIDE");
-			m_Volume->GetTagArray()->SetTag(tagSide);
-		}
-	}
 
 	m_Volume->SetName(m_VolumeName);  
 
@@ -1622,11 +1517,6 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 		m_Volume->SetDataByDetaching(rg_out,tsDouble);
 		m_Volume->Update();
 
-		if(m_ResampleFlag == TRUE)
-		{
-			ResampleVolume();
-		}
-
 		if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true  && m_ApplyRotation)
 		{
 
@@ -1681,22 +1571,6 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 	tag_Surgeon.SetValue(m_SurgeonName.GetCStr());
 	m_Volume->GetTagArray()->SetTag(tag_Surgeon);
 
-	if(!this->m_TestMode)
-	{
-		if(((mafGUIDicomSettings*)GetSetting())->EnableChangeSide())
-		{
-			mafTagItem tagSide;
-			tagSide.SetName("VOLUME_SIDE");
-			if(m_VolumeSide==LEFT_SIDE)
-				tagSide.SetValue("LEFT");
-			else if(m_VolumeSide==RIGHT_SIDE)
-				tagSide.SetValue("RIGHT");
-			else if(m_VolumeSide==NON_VALID_SIDE)
-				tagSide.SetValue("NON_VALID_SIDE");
-			m_Volume->GetTagArray()->SetTag(tagSide);
-		}
-	}
-
 	m_Volume->SetName(m_VolumeName);
 
 	if(m_Volume != NULL)
@@ -1715,22 +1589,11 @@ void mafOpImporterDicomOffis::CreateLoadPage()
 	m_LoadGuiLeft = new mafGUI(this);
 	m_LoadGuiUnderLeft = new mafGUI(this);
 	m_LoadGuiUnderCenter = new mafGUI(this);
-	m_Showspacing = 0;
 	m_LoadGuiCenter = new mafGUI(this);
-	if(((mafGUIDicomSettings*)GetSetting())->GetShowAdvancedOptionSorting() == TRUE)
-	{
-		wxString choices[3] = {_("X"),_("Y"),_("Z")};
-		m_LoadGuiCenter->Radio(ID_SORT_AXIS,_("Sort type:"),&m_SortAxes,3,choices);
-		m_LoadGuiCenter->Bool(ID_SHOW_SP, "Uniform spacing", &m_Showspacing, 1, _("Uniform spacing"));
-		m_LoadGuiCenter->Enable(ID_SHOW_SP,false);
-		m_LoadGuiCenter->Label("");
-	}
+	m_LoadGuiCenter->Bool(ID_SHOW_TEXT, "Show position info", &m_ShowOrientationPosition, 1, _("Shows position and orientation"));
 
 	m_StudyListbox  = m_LoadGuiUnderLeft->ListBox(ID_STUDY_SELECT,_("study"),80,"",wxLB_HSCROLL,190);
-	//	m_StudyListctrl = m_LoadGuiUnderLeft->ListCtrl(ID_STUDY_SELECT,_("study"),80,"",wxLC_LIST|wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING,190);
 
-	//  m_SeriesListbox  = m_LoadGuiUnderCenter->ListBox(ID_SERIES_SELECT,_("series"),80,"",wxLB_HSCROLL|wxLB_SORT,190);
-	//	m_SeriesListctrl = m_LoadGuiUnderCenter->ListCtrl(ID_SERIES_SELECT,_("series"),80,"",wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING,190);
 	m_SeriesListctrl = m_LoadGuiUnderCenter->ListCtrl(ID_SERIES_SELECT,_("series"),80,"",wxLC_SMALL_ICON|wxLC_SINGLE_SEL,190);
 
 	m_LoadGuiLeft->FitGui();
@@ -1743,10 +1606,8 @@ void mafOpImporterDicomOffis::CreateLoadPage()
 
 	m_LoadPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_LoadPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
-	if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
-	{
-		m_LoadPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
-	}
+	m_LoadPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
+
 }
 
 int wxCALLBACK _myCompareFunction(long item1, long item2, long WXUNUSED(sortData))
@@ -1770,12 +1631,6 @@ void mafOpImporterDicomOffis::CreateCropPage()
 	m_CropGuiLeft = new mafGUI(this);
 	m_CropGuiCenter = new mafGUI(this);
 
-	if(((mafGUIDicomSettings*)GetSetting())->EnableChangeSide())
-	{
-		wxString sideChoices[3] = {_("non-valid"),_("Left"),_("Right")};
-		m_CropGuiCenter->Combo(ID_VOLUME_SIDE,_("volume side"),&m_VolumeSide,3,sideChoices);
-	}
-
 	m_CropGuiLeft->FitGui();
 	m_CropGuiCenter->FitGui();
 	m_CropPage->AddGuiLowerLeft(m_CropGuiLeft);
@@ -1784,10 +1639,6 @@ void mafOpImporterDicomOffis::CreateCropPage()
 	m_CropPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_CropPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
 	m_CropPage->GetRWI()->m_RenFront->AddActor(m_CropActor);
-	if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
-	{
-		m_CropPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
-	}
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateBuildPage()
@@ -1851,10 +1702,6 @@ void mafOpImporterDicomOffis::CreateBuildPage()
 
 	m_BuildPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_BuildPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
-	if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
-	{
-		m_BuildPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
-	}
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateReferenceSystemPage()
@@ -1882,10 +1729,6 @@ void mafOpImporterDicomOffis::CreateReferenceSystemPage()
 
 	m_ReferenceSystemPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_ReferenceSystemPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
-	if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
-	{
-		m_ReferenceSystemPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
-	}
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::GuiUpdate()
@@ -2148,14 +1991,6 @@ void mafOpImporterDicomOffis::ReadDicom()
 		}
 	}
 
-	if(spaceisuniform) {
-		m_Showspacing = 1;
-	}
-	else 
-	{
-        m_Showspacing = 0;
-	}
-
 	if (!this->m_TestMode)
 	{
 	    GuiUpdate();
@@ -2237,171 +2072,139 @@ void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
-		switch(e->GetId())
+		switch (e->GetId())
 		{
-		case ID_SORT_AXIS:
-			{
-				if (m_DicomReaderModality != mafGUIDicomSettings::ID_CMRI_MODALITY)
-				{
-					switch (m_SortAxes)
-					{
-					case 0:
-						m_SelectedSeriesSlicesList->Sort(CompareX);
-						break;
-					case 1:
-						m_SelectedSeriesSlicesList->Sort(CompareY);
-						break;
-					case 2:
-						m_SelectedSeriesSlicesList->Sort(CompareZ);
-						break;
-					}
-				}
-
-				// reset the current slice number to view the first slice
-				m_CurrentSlice = 0;
-				m_CurrentTime = 0;
-				m_CropFlag = false;
-				int currImageId = GetSliceIDInSeries(m_CurrentTime, m_CurrentSlice);
-
-				if(!this->m_TestMode)
-				{
-					if (currImageId != -1) 
-					{
-						// show the selected slice
-						GenerateSliceTexture(currImageId);
-						ShowSlice();
-						CameraReset();
-						CreateSliders();
-						CameraUpdate();
-					}
-				}
-			}
-			break;
 		case ID_RANGE_MODIFIED:
-			{
-				//ZCrop slider
-				OnRangeModified();
-			}
-			break;
+		{
+			//ZCrop slider
+			OnRangeModified();
+		}
+		break;
 		case mafGUIWizard::MED_WIZARD_CHANGE_PAGE:
-			{
-				OnWizardChangePage(e);
-			}
-			break;
+		{
+			OnWizardChangePage(e);
+		}
+		break;
 		case mafGUIWizard::MED_WIZARD_CHANGED_PAGE:
-			{
-				/* This is a ack, beacouse that "genius" of wx  send the change event 
-				before page show, so we need to duplicate the code here in order to 
-				manage the camera update */
-				m_Wizard->GetCurrentPage()->Show();
-				m_Wizard->GetCurrentPage()->SetFocus();
-				m_Wizard->GetCurrentPage()->Update();
-				CameraReset();
-			}
-			break;
+		{
+			/* This is a ack, beacouse that "genius" of wx  send the change event
+			before page show, so we need to duplicate the code here in order to
+			manage the camera update */
+			m_Wizard->GetCurrentPage()->Show();
+			m_Wizard->GetCurrentPage()->SetFocus();
+			m_Wizard->GetCurrentPage()->Update();
+			CameraReset();
+		}
+		break;
 		case ID_UNDO_CROP:
-			{
-				OnUndoCrop();
-			}
-			break;
+		{
+			OnUndoCrop();
+		}
+		break;
 		case ID_STUDY_SELECT:
-			{
-				OnStudySelect();
-			}
-			break;
+		{
+			OnStudySelect();
+		}
+		break;
 		case ID_SERIES_SELECT:
-			{
-				OnSeriesSelect();
-			}
-			break;
+		{
+			OnSeriesSelect();
+		}
+		break;
+		case ID_SHOW_TEXT:
+		{
+			m_TextActor->SetVisibility(m_ShowOrientationPosition);
+			m_LoadPage->GetRWI()->CameraUpdate();
+		}
+		break;
 		case MOUSE_DOWN:
-			{
-				OnMouseDown(e);
-			}
-			break;
+		{
+			OnMouseDown(e);
+		}
+		break;
 		case MOUSE_MOVE:  //resize gizmo
-			{
-				OnMouseMove(e);
+		{
+			OnMouseMove(e);
 
-			}
-			break;
+		}
+		break;
 		case MOUSE_UP:  //block gizmo
-			{
-				OnMouseUp();
+		{
+			OnMouseUp();
 
-			}
-			break; 
+		}
+		break;
 		case ID_SCAN_SLICE:
-			{
-				OnScanSlice();
-			}
-			break;
+		{
+			OnScanSlice();
+		}
+		break;
 		case ID_SCAN_TIME:
-			{
-				// show the current slice
-				OnScanTime();
-			}
-			break;
+		{
+			// show the current slice
+			OnScanTime();
+		}
+		break;
 		case ID_CROP:
-			{     
-				Crop();
-			}
-			break;
+		{
+			Crop();
+		}
+		break;
 		case ID_VME_TYPE:
+		{
+			OnVmeTypeSelected();
+			if (m_Wizard->GetCurrentPage() == m_BuildPage && m_OutputType == mafGUIDicomSettings::ID_IMAGE)//Check the type to determine the next step
 			{
-				OnVmeTypeSelected();
-				if (m_Wizard->GetCurrentPage()==m_BuildPage && m_OutputType == mafGUIDicomSettings::ID_IMAGE)//Check the type to determine the next step
-				{
-					m_Wizard->SetButtonString("Reference >");
-					m_ReferenceSystemPage->UpdateActor();
-					m_Wizard->Update();
-				}
-				else
-				{
-					m_Wizard->SetButtonString("Finish");
-					m_Wizard->Update();
-				}
-			}
-			break;
-		case ID_RS_SELECT:
-			{
-				OnReferenceSystemSelected();
-			}
-			break;
-		case ID_RS_SWAP:
-			{
-				OnSwapReferenceSystemSelected();
-			}
-			break;
-		case ID_RS_APPLYTOALL:
-			{
-				if(m_ApplyToAllReferenceSystem)
-				{
-					m_SwapAllReferenceSystem = m_SwapReferenceSystem;
-					m_GlobalReferenceSystem = m_SelectedReferenceSystem;
-				}
-			}
-			// BEWARE NO BRAK!!! break;
-		case ID_RS_SWAPALL:
-			{
-				if(m_SwapAllReferenceSystem || m_ApplyToAllReferenceSystem)
-				{
-					m_ReferenceSystemGuiUnderLeft->Enable(ID_RS_SWAP,false);
-				}
-				else
-				{
-					m_ReferenceSystemGuiUnderLeft->Enable(ID_RS_SWAP,true);
-				}
-				UpdateReferenceSystemVariables();
-				m_ReferenceSystemGuiUnderLeft->Update();
-				m_ReferenceSystemPage->Update();
+				m_Wizard->SetButtonString("Reference >");
 				m_ReferenceSystemPage->UpdateActor();
+				m_Wizard->Update();
 			}
-			break;
-		default:
+			else
 			{
-				mafEventMacro(*e);
+				m_Wizard->SetButtonString("Finish");
+				m_Wizard->Update();
 			}
+		}
+		break;
+		case ID_RS_SELECT:
+		{
+			OnReferenceSystemSelected();
+		}
+		break;
+		case ID_RS_SWAP:
+		{
+			OnSwapReferenceSystemSelected();
+		}
+		break;
+		case ID_RS_APPLYTOALL:
+		{
+			if (m_ApplyToAllReferenceSystem)
+			{
+				m_SwapAllReferenceSystem = m_SwapReferenceSystem;
+				m_GlobalReferenceSystem = m_SelectedReferenceSystem;
+			}
+		}
+		// BEWARE NO BRAK!!! break;
+		case ID_RS_SWAPALL:
+		{
+			if (m_SwapAllReferenceSystem || m_ApplyToAllReferenceSystem)
+			{
+				m_ReferenceSystemGuiUnderLeft->Enable(ID_RS_SWAP, false);
+			}
+			else
+			{
+				m_ReferenceSystemGuiUnderLeft->Enable(ID_RS_SWAP, true);
+			}
+			UpdateReferenceSystemVariables();
+			m_ReferenceSystemGuiUnderLeft->Update();
+			m_ReferenceSystemPage->Update();
+			m_ReferenceSystemPage->UpdateActor();
+		}
+		break;
+		default:
+		{
+			mafEventMacro(*e);
+		}
 		}
 	}
 }
@@ -2652,6 +2455,7 @@ void mafOpImporterDicomOffis::CreateSliceVTKPipeline()
 	m_TextActor->GetProperty()->SetColor(0.8,0,0);
 	m_TextActor->SetMapper(m_TextMapper);
 	m_TextActor->SetPosition(3,3);  
+	m_TextActor->VisibilityOff();
 	m_TextMapper->Modified();
 
 	vtkNEW(m_CropPlane);
@@ -3174,31 +2978,12 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 	double dcmImagePositionPatient_old[3] = {0.0,0.0,0.0};
 	bool enableToRead = true; //true for test mode
 	bool errorOccurred = false;
-	double lastDistance = 0;
 	mafString lastFileName = "";
-
-	double percentageTolerance = 0;
-	double scalarTolerance = 0;
-	bool enableScalarTolerance = false;
-	bool enablePercentageTolerance = false;
-
-	if(!this->m_TestMode)
-	{
-		enableScalarTolerance = ((mafGUIDicomSettings*)GetSetting())->EnableScalarTolerance() != FALSE;
-		enablePercentageTolerance = ((mafGUIDicomSettings*)GetSetting())->EnablePercentageTolerance() != FALSE;
-
-		if (enableScalarTolerance)
-			scalarTolerance = ((mafGUIDicomSettings*)GetSetting())->GetScalarTolerance();
-
-		if (enablePercentageTolerance)
-			percentageTolerance = ((mafGUIDicomSettings*)GetSetting())->GetPercentageTolerance();
-	}
 
 	m_DicomReaderModality = -1;
 	DcmFileFormat dicomImg;   
 
-	time_t start,end;
-
+	
 	for (int i=0; i < m_DICOMDirectoryReader->GetNumberOfFiles(); i++) {
 
 		//It works only on windows platform
@@ -3223,11 +3008,7 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 			}
 		}
 
-
-		time(&start);
-
-		//int nfiles = m_DICOMDirectoryReader->GetNumberOfFiles();
-
+		
 		if ((strcmp(m_DICOMDirectoryReader->GetFile(i),".") == 0) ||\
 			(strcmp(m_DICOMDirectoryReader->GetFile(i),"..") == 0)) 
 		{
@@ -3380,32 +3161,16 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 			double dcmPixelSpacing[3];
 			dcmPixelSpacing[2] = 1;
 
-
 			GetDicomSpacing(dicomDataset, dcmPixelSpacing);
 
 
 			double dcmRescaleSlope;
 			if(dicomDataset->findAndGetFloat64(DCM_RescaleSlope,dcmRescaleSlope).bad())
-			{
-				//Unable to get element: DCM_RescaleSlope[0];
 				dcmRescaleSlope = 1;
-			} 
 
-			long dcmHighBit; 
 			double dcmRescaleIntercept;
-			if(dicomDataset->findAndGetLongInt(DCM_HighBit,dcmHighBit).bad())
-			{
-				//Unable to get element: DCM_RescaleIntercept[0];
-				dcmHighBit = 0;
-			} 
-			m_HighBit = dcmHighBit;
-
 			if(dicomDataset->findAndGetFloat64(DCM_RescaleIntercept,dcmRescaleIntercept).bad())
-			{
-				//Unable to get element: DCM_RescaleIntercept[0];
 				dcmRescaleIntercept = 0;
-			}
-			m_RescaleIntercept = dcmRescaleIntercept;
 
 			vtkMAFSmartPointer<vtkImageData> dicomSliceVTKImageData;
 			dicomSliceVTKImageData->SetDimensions(dcmRows, dcmColumns,1);
@@ -3424,12 +3189,7 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 			dicomDataset->findAndGetLongInt(DCM_SmallestImagePixelValue, dcmSmallestImagePixelValue);
 			dicomDataset->findAndGetLongInt(DCM_LargestImagePixelValue, dcmLargestImagePixelValue);
 
-			// These two lines were used for DP vertical app:
-			// removed to fix bug http://bugzilla.hpc.cineca.it/show_bug.cgi?id=2079
-			//if (dcmSmallestImagePixelValue == dcmLargestImagePixelValue)
-			//  dcmRescaleIntercept = 0;
-
-      const char *dcmModality = "?";
+	    const char *dcmModality = "?";
 			dicomDataset->findAndGetString(DCM_Modality,dcmModality);
 
       long rappresentationMax;
@@ -3469,8 +3229,6 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
       {
         paddingValue = 0;
       }
-      
-
 
 			if (val_long==16) 
 			{ 
@@ -3824,28 +3582,6 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
 
-					if  (sliceNum > 1)
-					{
-						double distancePercentage = ((lastDistance - (fabs(lastZPos - dcmImagePositionPatient[2])))*100)/lastDistance;
-
-						// Check if slices are under tolerance distance
-						if ((enableScalarTolerance && (fabs(lastZPos - dcmImagePositionPatient[2]) < scalarTolerance)) || (enablePercentageTolerance) && (distancePercentage > percentageTolerance))
-						{
-							wxLogMessage(wxString::Format("Warning: file <%s> and <%s> are under distance tolerance.",currentSliceABSFileName.GetCStr(),lastFileName.GetCStr()));
-							int answer = wxMessageBox(wxString::Format("Found 2 slices under distance tolerance. Please check the log area for details. Continue?"),"Warning!!", wxYES_NO, NULL);
-							if (answer == wxNO)
-							{
-								progressHelper->CloseProgressBar();
-								return false;
-							}
-
-						}
-						else
-						{
-							lastDistance = fabs(lastZPos - dcmImagePositionPatient[2]);
-						}           
-					}
-
 					lastZPos = dcmImagePositionPatient[2];
 
 					const char *date,*description,*patientName,*birthdate, *photometricInterpretation;
@@ -4087,19 +3823,6 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 
 		lastFileName = m_CurrentSliceABSFileName;
 
-		time(&end);
-
-		double elapsedTime = difftime(end, start);
-
-		// needed to refresh the busy info
-		//if (elapsedTime > 0.5)
-		//{
-		//	if (!m_TestMode)
-		//	{
-		//		cppDEL(busyInfo);
-		//		busyInfo = new wxBusyInfo(busyMessage);
-		//	}
-		//}
 	}
 	//end reading files 
 
@@ -4412,21 +4135,10 @@ void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 		probe->Update();
 		probe->GetOutput()->GetBounds(m_SliceBounds);
 
-		//rescale to 16 bit
-		if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
-		{
-			RescaleTo16Bit(slice->GetVTKImageData());
-		}
 		m_SliceTexture->SetInput((vtkImageData *)probe->GetOutput());
 	} 
 	else 
 	{
-		//rescale to 16 bit
-		if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
-		{
-			RescaleTo16Bit(slice->GetVTKImageData());
-		}
-
 		slice->GetVTKImageData()->GetScalarRange(range);
 		m_SliceTexture->SetInput(slice->GetVTKImageData());
 	}
@@ -4494,7 +4206,6 @@ vtkImageData* mafOpImporterDicomOffis::GetSliceImageDataFromLocalDicomFileName(m
 
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::ImportDicomTags()
-	//----------------------------------------------------------------------------
 {
 	if (m_TagArray == NULL) 
 		mafNEW(m_TagArray);
@@ -4562,183 +4273,7 @@ void mafOpImporterDicomOffis::ImportDicomTags()
 	dicomImg.clear();
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::ResampleVolume()
-	//----------------------------------------------------------------------------
-{
-	double m_VolumePosition[3],m_VolumeOrientation[3], m_VolumeSpacing[3];
-	m_VolumeSpacing[0] = m_VolumeSpacing[1] = m_VolumeSpacing[2] = VTK_DOUBLE_MAX;
-
-	m_VolumePosition[0]    = m_VolumePosition[1]    = m_VolumePosition[2]    = 0;
-	m_VolumeOrientation[0] = m_VolumeOrientation[1] = m_VolumeOrientation[2] = 0;
-
-	mafVMEVolumeGray *tmpVmeVolumeGray;
-	mafNEW(tmpVmeVolumeGray);
-
-	mafSmartPointer<mafTransform> box_pose;
-	box_pose->SetOrientation(m_VolumeOrientation);
-	box_pose->SetPosition(m_VolumePosition);
-
-	mafSmartPointer<mafTransformFrame> local_pose;
-	local_pose->SetInput(box_pose);
-
-	mafSmartPointer<mafTransformFrame> output_to_input;
-
-	// In a future version if not a "Natural" data the filter should operate in place.
-	mafString new_vme_name = "resampled_";
-	new_vme_name += m_VolumeName;
-
-	tmpVmeVolumeGray->SetMatrix(box_pose->GetMatrix());
-
-	double volumeBounds[6];
-	vtkRectilinearGrid *rgrid;
-	rgrid = vtkRectilinearGrid::SafeDownCast(m_Volume->GetVolumeOutput()->GetVTKData());
-	rgrid->Update();
-	rgrid->GetBounds(volumeBounds);
-
-	for (int xi = 1; xi < rgrid->GetXCoordinates()->GetNumberOfTuples (); xi++)
-	{
-		double spcx = rgrid->GetXCoordinates()->GetTuple1(xi)-rgrid->GetXCoordinates()->GetTuple1(xi-1);
-		if (m_VolumeSpacing[0] > spcx)
-			m_VolumeSpacing[0] = spcx;
-	}
-
-	for (int yi = 1; yi < rgrid->GetYCoordinates()->GetNumberOfTuples (); yi++)
-	{
-		double spcy = rgrid->GetYCoordinates()->GetTuple1(yi)-rgrid->GetYCoordinates()->GetTuple1(yi-1);
-		if (m_VolumeSpacing[1] > spcy)
-			m_VolumeSpacing[1] = spcy;
-	}
-
-	for (int zi = 1; zi < rgrid->GetZCoordinates()->GetNumberOfTuples (); zi++)
-	{
-		double spcz = rgrid->GetZCoordinates()->GetTuple1(zi)-rgrid->GetZCoordinates()->GetTuple1(zi-1);
-		if (m_VolumeSpacing[2] > spcz)
-			m_VolumeSpacing[2] = spcz;
-	}
-
-	int output_extent[6];
-	output_extent[0] = 0;
-	output_extent[1] = (volumeBounds[1] - volumeBounds[0]) / m_VolumeSpacing[0];
-	output_extent[2] = 0;
-	output_extent[3] = (volumeBounds[3] - volumeBounds[2]) / m_VolumeSpacing[1];
-	output_extent[4] = 0;
-	output_extent[5] = (volumeBounds[5] - volumeBounds[4]) / m_VolumeSpacing[2];
-
-	double w,l,sr[2];
-	for (int i = 0; i < m_Volume->GetDataVector()->GetNumberOfItems(); i++)
-	{
-		if (mafVMEItemVTK *input_item = mafVMEItemVTK::SafeDownCast(m_Volume->GetDataVector()->GetItemByIndex(i)))
-		{
-			if (vtkDataSet *input_data = input_item->GetData())
-			{
-				// the resample filter
-				vtkMAFSmartPointer<vtkMAFVolumeResample> resampler;
-				double m_ZeroPadValue = 0.;
-				resampler->SetZeroValue(m_ZeroPadValue);
-
-				// Set the target be vme's parent frame. And Input frame to the root. I've to 
-				// set at each iteration since I'm using the SetMatrix, which doesn't support
-				// transform pipelines.
-				mafSmartPointer<mafMatrix> output_parent_abs_pose;
-				m_Input->GetOutput()->GetAbsMatrix(*output_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
-				local_pose->SetInputFrame(output_parent_abs_pose);
-
-				mafSmartPointer<mafMatrix> input_parent_abs_pose;
-				m_Input->GetOutput()->GetAbsMatrix(*input_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
-				local_pose->SetTargetFrame(input_parent_abs_pose);
-				local_pose->Update();
-
-				mafSmartPointer<mafMatrix> output_abs_pose;
-				m_Volume->GetOutput()->GetAbsMatrix(*output_abs_pose.GetPointer(),input_item->GetTimeStamp());
-				output_to_input->SetInputFrame(box_pose->GetMatrixPointer());
-
-				mafSmartPointer<mafMatrix> input_abs_pose;
-				m_Input->GetOutput()->GetAbsMatrix(*input_abs_pose.GetPointer(),input_item->GetTimeStamp());
-				output_to_input->SetTargetFrame(input_abs_pose);
-				output_to_input->Update();
-
-				double origin[3];
-				origin[0] = volumeBounds[0];
-				origin[1] = volumeBounds[2];
-				origin[2] = volumeBounds[4];
-
-				output_to_input->TransformPoint(origin,origin);
-				resampler->SetVolumeOrigin(origin[0],origin[1],origin[2]);
-				vtkMatrix4x4 *mat = output_to_input->GetMatrix().GetVTKMatrix();
-
-				// extract versors
-				double x_axis[3],y_axis[3];
-
-				mafMatrix::GetVersor(0,mat,x_axis);
-				mafMatrix::GetVersor(1,mat,y_axis);
-
-				resampler->SetVolumeAxisX(x_axis);
-				resampler->SetVolumeAxisY(y_axis);
-
-				vtkMAFSmartPointer<vtkStructuredPoints> outputSPData;
-				outputSPData->SetSpacing(m_VolumeSpacing);
-				// TODO: here I probably should allow a data type casting... i.e. a GUI widget
-				outputSPData->SetScalarType(input_data->GetPointData()->GetScalars()->GetDataType());
-				outputSPData->SetExtent(output_extent);
-				outputSPData->SetUpdateExtent(output_extent);
-
-				input_data->GetScalarRange(sr);
-
-				w = sr[1] - sr[0];
-				l = (sr[1] + sr[0]) * 0.5;
-
-				resampler->SetWindow(w);
-				resampler->SetLevel(l);
-				resampler->SetInput(input_data);
-				resampler->SetOutput(outputSPData);
-				resampler->AutoSpacingOff();
-				resampler->Update();
-
-				outputSPData->SetSource(NULL);
-				if(m_DiscardPosition == TRUE)
-				{
-					outputSPData->SetOrigin(0,0,0);
-				}
-				else
-				{
-					outputSPData->SetOrigin(volumeBounds[0],volumeBounds[2],volumeBounds[4]);
-				}
-				tmpVmeVolumeGray->SetDataByDetaching(outputSPData, input_item->GetTimeStamp());
-				tmpVmeVolumeGray->Update();
-			}
-		}
-	}
-	m_Volume->DeepCopy(tmpVmeVolumeGray);
-	m_Volume->Update();
-
-	mafDEL(tmpVmeVolumeGray);
-}
-//----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::RescaleTo16Bit(vtkImageData *dataSet)
-	//----------------------------------------------------------------------------
-{
-	if(dataSet->GetScalarType() == VTK_UNSIGNED_SHORT) return;
-
-	int i=0, size = dataSet->GetNumberOfPoints();
-	vtkMAFSmartPointer<vtkUnsignedShortArray> newScalars;
-	for(;i<size;i++)
-	{
-		double value = dataSet->GetPointData()->GetScalars()->GetTuple1(i);
-		value = (value - m_RescaleIntercept) * ((double)VTK_UNSIGNED_SHORT_MAX) / (4095.);
-    if (value < -1024)
-    {
-      value = -1024.0;
-    }
-		newScalars->InsertNextTuple1(value);
-	}
-	dataSet->GetPointData()->SetScalars(newScalars);
-	dataSet->SetScalarTypeToUnsignedShort();
-	dataSet->Update();
-
-}
-//----------------------------------------------------------------------------
 int CompareX(const mafDicomSlice **arg1,const mafDicomSlice **arg2)
-	//----------------------------------------------------------------------------
 {
 	// compare the x coordinate of both arguments
 	// return:

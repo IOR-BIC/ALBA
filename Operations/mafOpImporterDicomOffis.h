@@ -104,12 +104,7 @@ public:
 
 	/** Get dicom slice vtkImageData from its local file name */
 	vtkImageData* GetSliceImageDataFromLocalDicomFileName(mafString sliceName);
-
-	/** Apply only to BuildVolume and BuildVolumeCineMRI: 
-	Set if output will be imagedata (by resampling) or original rectilinear grid (default) */
-	void SetResampleFlag(int enable){m_ResampleFlag = enable;}
-	int GetResampleFlag(){return m_ResampleFlag;};
-
+	
 	/** Build a volume from the list of dicom files. */
 	int BuildOutputVMEGrayVolumeFromDicom();
 
@@ -151,9 +146,8 @@ protected:
 		ID_SCAN_TIME,
 		ID_SCAN_SLICE,
 		ID_VOLUME_NAME,
-		ID_VOLUME_SIDE,
 		ID_VME_TYPE,
-		ID_SORT_AXIS,
+		ID_SHOW_TEXT,
 		ID_SHOW_SP,
 		ID_RS_SELECT,
 		ID_RS_SWAP,
@@ -260,13 +254,7 @@ protected:
 
 	/** Delete all istances of used objects. */
 	void Destroy();
-
-	/** function that resample volume with rectilinear grid output. */
-	void ResampleVolume();
-
-	/** Rescale to 16 Bit */
-	void RescaleTo16Bit(vtkImageData *dataSet);
-
+		
 	/** Reference system page is shown only if image is the vme output type */
 	void UpdateReferenceSystemPageConnection();
 
@@ -320,12 +308,8 @@ protected:
 	mafString m_PatientPosition;
 	mafString m_VolumeName;
 
-	int m_Showspacing;
-
 	int				m_BuildStepValue;
 	int				m_DicomReaderModality; ///<Type DICOM Read from file
-	long		  m_HighBit; ///<High bit DICOM Read from file
-	double	  m_RescaleIntercept; ///<Rescale Intercept DICOM Read from file
 	int				m_SortAxes;
 	int				m_NumberOfTimeFrames;
 
@@ -348,8 +332,7 @@ protected:
 	std::map<std::vector<mafString>,bool> m_SeriesIDContainsRotationsMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to boolean map 
 
 	wxString  m_CurrentSliceABSFileName;
-	int				m_VolumeSide;
-
+	
 	int				 m_NumberOfStudies; ///<Number of study present in the DICOM directory
 	int				 m_NumberOfSlices;
 	wxListBox	*m_StudyListbox;
@@ -384,14 +367,13 @@ protected:
 	bool m_ConstantRotation;
 	bool m_mem_is_almost_full;
 
-	int m_ResampleFlag;
-	int m_DiscardPosition;
-	int m_RescaleTo16Bit;
 	int m_SelectedReferenceSystem;  ///< Specify the reference system (xy xz yx)
 	int m_SwapReferenceSystem;      ///< Specify the if the reference system is swapped or not (e.g xy to yx)
 	int m_SwapAllReferenceSystem;   ///< Specify the if the reference system is swapped or not (e.g xy to yx)
 	int m_ApplyToAllReferenceSystem;///< Specify if the current refernce system is applyed to all images
 	int m_GlobalReferenceSystem;    ///< Global reference system if apply to all is selected
+
+	int m_ShowOrientationPosition;
 
 	mafVMEImage				*m_Image;
 	mafVMEVolumeGray	*m_Volume;

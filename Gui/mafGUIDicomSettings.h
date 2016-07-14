@@ -36,10 +36,7 @@ class mafGUICheckListBox;
   - time bar enable
   - number of slice enable
   - step 
-  - side
   - conversion units
-  - discard position (origin)
-  - resample volume
   - rescale to 16Bit
 */
 class MAF_EXPORT mafGUIDicomSettings : public mafGUISettings
@@ -57,20 +54,10 @@ public:
 		ID_TYPE_DICOM,
     ID_VME_TYPE,
 		ID_STEP,
-    ID_SIDE,
     ID_CONVERT_UNITS,
-    ID_DISCARD_ORIGIN,
-    ID_RESAMPLE_VOLUME,
-    ID_RESCALE_TO_16_BIT,
     ID_AUTO_VME_TYPE,
     ID_SETTING_VME_TYPE,
-    ID_ENABLE_POS_INFO,
-    ID_SCALAR_DISTANCE_TOLERANCE,
-    ID_SCALAR_TOLERANCE,
-    ID_PERCENTAGE_DISTANCE_TOLERANCE,
-    ID_PERCENTAGE_TOLERANCE,
     ID_OUTPUT_NAME,
-    ID_SHOW_ADVANCED_OPTION_SORTING,
     ID_NAME_COMPOSITOR,
 		ID_DCM_POSITION_PATIENT_CHOICE
 	};
@@ -141,29 +128,7 @@ public:
 
   /** Retrieve the build step. */
   int GetBuildStep(){return m_Step;};
-  /** Retrieve if the flag of changing side is enabled */
-  int EnableChangeSide(){return m_EnableChangeSide;};
-  /** Enable discarding origin. */
-  int EnableDiscardPosition(){return m_EnableDiscardPosition;};
-  /** Enable resampling volume. */
-  int EnableResampleVolume(){return m_EnableResampleVolume;};
-  /** Enable rescaling to 16 bit. */
-  int EnableRescaleTo16Bit(){return m_EnableRescaleTo16Bit;};
-  /** Enable visualize position. */
-  int EnableVisualizationPosition(){return m_VisualizePosition;};
-  /** Enable scalar tolerance. */
-  int EnableScalarTolerance(){return m_ScalarTolerance;};
-  /** GReturn scalar tolerance. */
-  double GetScalarTolerance(){return m_ScalarDistanceTolerance;};
-  /** Enable percentage tolerance. */
-  int EnablePercentageTolerance(){return m_PercentageTolerance;};
-  /** Get percentage tolerance. */
-  double GetPercentageTolerance(){return m_PercentageDistanceTolerance;};
-  /** Get m_ShowAdvancedOptionOfSorting */
-  int GetShowAdvancedOptionSorting(){return m_ShowAdvancedOptionOfSorting;};
-  /** return if default dicom folder should be used */
-
-
+  
   /** Retrive auto VME type flag. */
   int AutoVMEType(){return m_AutoVMEType;};
   /** Retrive VME type. */
@@ -211,19 +176,9 @@ protected:
   int m_OutputType;
 
 	int m_Step;
-  int m_EnableChangeSide;
-  int m_EnableDiscardPosition;
-  int m_EnableResampleVolume;
-  int m_EnableRescaleTo16Bit;
-  int m_ScalarTolerance;
-  int m_PercentageTolerance;
   int m_AutoVMEType;
-  int m_VisualizePosition;
   int m_OutputNameType;
-  int m_ShowAdvancedOptionOfSorting;
   wxString m_LastDicomDir;
-  double m_ScalarDistanceTolerance;
-  double m_PercentageDistanceTolerance;
   int m_DCM_ImagePositionPatientchoice;
 
   friend class mafGUIDicomSettingsTest;
