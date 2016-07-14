@@ -33,7 +33,6 @@ class mafGUICheckListBox;
   Class that contain specific variables regard DICOM, that can be changed from Application Settings, in GUI.
   - Dictionary path
   - DICOM type
-  - automatic crop position
   - time bar enable
   - number of slice enable
   - step 
@@ -57,9 +56,6 @@ public:
 		ID_DICTONARY = MINID,
 		ID_TYPE_DICOM,
     ID_VME_TYPE,
-		ID_AUTO_POS_CROP,
-		ID_ENALBLE_TIME_BAR,
-		ID_ENALBLE_NUMBER_OF_SLICE,
 		ID_STEP,
     ID_SIDE,
     ID_CONVERT_UNITS,
@@ -68,7 +64,6 @@ public:
     ID_RESCALE_TO_16_BIT,
     ID_AUTO_VME_TYPE,
     ID_SETTING_VME_TYPE,
-    ID_Z_CROP,
     ID_ENABLE_POS_INFO,
     ID_SCALAR_DISTANCE_TOLERANCE,
     ID_SCALAR_TOLERANCE,
@@ -76,10 +71,8 @@ public:
     ID_PERCENTAGE_TOLERANCE,
     ID_OUTPUT_NAME,
     ID_SHOW_ADVANCED_OPTION_SORTING,
-    ID_DICOM_FOLDER,
-    ID_USE_DEFAULT_DICOM_FOLDER,
     ID_NAME_COMPOSITOR,
-	ID_DCM_POSITION_PATIENT_CHOICE
+		ID_DCM_POSITION_PATIENT_CHOICE
 	};
   
   /** Type VMEs*/
@@ -146,12 +139,6 @@ public:
   /** Retrieve Dictionary path name. */
 	mafString GetDictionary(){return "";}; // Left for backward compatibility. Always return the empty string
 
-  /** Retrieve Automatic Crop Position Flag. */
-	int AutoCropPosition(){return m_AutoCropPos;};
-  /** Retrieve if is enabled the flag for setting the number of timestamps */
-	int EnableNumberOfTime(){return m_EnableNumberOfTime;};
-  /** Retrieve if is enabled the the flag for setting the number of slices */
-	int EnableNumberOfSlice(){return m_EnableNumberOfSlice;};
   /** Retrieve the build step. */
   int GetBuildStep(){return m_Step;};
   /** Retrieve if the flag of changing side is enabled */
@@ -164,8 +151,6 @@ public:
   int EnableRescaleTo16Bit(){return m_EnableRescaleTo16Bit;};
   /** Enable visualize position. */
   int EnableVisualizationPosition(){return m_VisualizePosition;};
-  /** EnableZ-direction crop. */
-  int EnableZCrop(){return m_EnableZCrop;};
   /** Enable scalar tolerance. */
   int EnableScalarTolerance(){return m_ScalarTolerance;};
   /** GReturn scalar tolerance. */
@@ -177,10 +162,6 @@ public:
   /** Get m_ShowAdvancedOptionOfSorting */
   int GetShowAdvancedOptionSorting(){return m_ShowAdvancedOptionOfSorting;};
   /** return if default dicom folder should be used */
-  int GetUseDefaultDicomFolder(){return m_UseDefaultDicomFolder;};
-  /** return if default dicom folder should be used */
-  mafString GetDefaultDicomFolder(){return m_DicomFolder;};
-
 
 
   /** Retrive auto VME type flag. */
@@ -229,24 +210,18 @@ protected:
 
   int m_OutputType;
 
-	int m_AutoCropPos;
-	int m_EnableNumberOfTime;
-	int m_EnableNumberOfSlice;
 	int m_Step;
   int m_EnableChangeSide;
   int m_EnableDiscardPosition;
   int m_EnableResampleVolume;
   int m_EnableRescaleTo16Bit;
-  int m_EnableZCrop;
   int m_ScalarTolerance;
   int m_PercentageTolerance;
   int m_AutoVMEType;
   int m_VisualizePosition;
   int m_OutputNameType;
   int m_ShowAdvancedOptionOfSorting;
-  int m_UseDefaultDicomFolder;
   wxString m_LastDicomDir;
-  mafString m_DicomFolder;
   double m_ScalarDistanceTolerance;
   double m_PercentageDistanceTolerance;
   int m_DCM_ImagePositionPatientchoice;

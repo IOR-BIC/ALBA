@@ -155,18 +155,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 WX_DECLARE_LIST(mafDicomSlice, medDicomSeriesSliceList);
 
-void mafOpImporterDicomOffis::PrintDicomList(medDicomSeriesSliceList *dicomList)
-{
-	std::ostringstream stringStream;
-
-	for (int i = 0; i < dicomList->GetCount(); i++) 
-	{
-		stringStream << "i: " << i << "  absFilName: "  << \
-			dicomList->Item(i)->GetData()->GetSliceABSFileName() << std::endl;    
-	}
-
-	mafLogMessage(stringStream.str().c_str());
-}
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpImporterDicomOffis);
 //----------------------------------------------------------------------------
@@ -176,7 +164,6 @@ mafCxxTypeMacro(mafOpImporterDicomOffis);
 //----------------------------------------------------------------------------
 #define FIRST_SELECTION 0
 #define START_PROGRESS_BAR 0
-
 
 enum VOLUME_SIDE
 {
@@ -208,10 +195,10 @@ int CompareTriggerTime(const mafDicomSlice **arg1,const mafDicomSlice **arg2);
 int CompareImageNumber(const mafDicomSlice **arg1,const mafDicomSlice **arg2);
 
 WX_DEFINE_LIST(medDicomSeriesSliceList);
+
 //----------------------------------------------------------------------------
 mafOpImporterDicomOffis::mafOpImporterDicomOffis(wxString label):
 mafOp(label)
-	//----------------------------------------------------------------------------
 {
 	m_OpType = OPTYPE_IMPORTER;
 	m_Canundo = true;
@@ -288,7 +275,6 @@ mafOp(label)
 	m_CropExecuted = false;
 
 	m_ConstantRotation = true;
-	m_ZCrop = true;
 	m_SideToBeDragged = 0; 
 	m_mem_is_almost_full = false;
 
@@ -335,7 +321,6 @@ mafOp(label)
 }
 //----------------------------------------------------------------------------
 mafOpImporterDicomOffis::~mafOpImporterDicomOffis()
-	//----------------------------------------------------------------------------
 {
 	vtkDEL(m_SliceActor);
 
@@ -348,7 +333,6 @@ mafOpImporterDicomOffis::~mafOpImporterDicomOffis()
 }
 //----------------------------------------------------------------------------
 mafOp *mafOpImporterDicomOffis::Copy()
-	//----------------------------------------------------------------------------
 {
 	mafOpImporterDicomOffis *importer = new mafOpImporterDicomOffis(m_Label);
 	importer->m_ResampleFlag = m_ResampleFlag;
@@ -360,7 +344,6 @@ mafOp *mafOpImporterDicomOffis::Copy()
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::OpRun()
-	//----------------------------------------------------------------------------
 {
 	m_BuildStepValue = ((mafGUIDicomSettings*)GetSetting())->GetBuildStep();
 	m_DiscardPosition = ((mafGUIDicomSettings*)GetSetting())->EnableDiscardPosition();
@@ -389,87 +372,33 @@ void mafOpImporterDicomOffis::OpRun()
 
 	bool result = false;
 	bool firstTime = true;
-	do 
+	
+	wxString lastDicomDir = ((mafGUIDicomSettings*)GetSetting())->GetLastDicomDir();
+		
+	if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
+		lastDicomDir = mafGetLastUserFolder().c_str();		
+			
+	wxDirDialog dialog(m_Wizard->GetParent(),"", lastDicomDir,wxRESIZE_BORDER, m_Wizard->GetPosition());
+	dialog.SetReturnCode(wxID_OK);
+	int ret_code = dialog.ShowModal();
+
+	if (ret_code == wxID_OK)
 	{
-		if (m_DicomDirectoryABSFileName == "")
-		{	
-			bool useDefaultFolder = false;
-			wxString lastDicomDir = "";
-			if (((mafGUIDicomSettings*)GetSetting())->GetUseDefaultDicomFolder() == TRUE && ((mafGUIDicomSettings*)GetSetting())->GetDefaultDicomFolder() != "UNEDFINED_DicomFolder")
-			{
+		wxString path = dialog.GetPath();
+		((mafGUIDicomSettings*)GetSetting())->SetLastDicomDir(path);
+		m_DicomDirectoryABSFileName = path.c_str();
+		GuiUpdate();
 
-				lastDicomDir = ((mafGUIDicomSettings*)GetSetting())->GetDefaultDicomFolder().GetCStr();
-
-				//Check if default folder exist
-				if (::wxDirExists(lastDicomDir))
-				{
-					useDefaultFolder = true;
-				}
-
-			}
-			else if (((mafGUIDicomSettings*)GetSetting())->GetLastDicomDir() != "UNEDFINED_m_LastDicomDir")
-			{
-				lastDicomDir = ((mafGUIDicomSettings*)GetSetting())->GetLastDicomDir();
-			}
-			else if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
-			{
-				lastDicomDir = mafGetLastUserFolder().c_str();		
-			};
-
-			//User should choice a folder
-			if (!useDefaultFolder)
-			{
-				wxDirDialog dialog(m_Wizard->GetParent(),"", lastDicomDir,wxRESIZE_BORDER, m_Wizard->GetPosition());
-				dialog.SetReturnCode(wxID_OK);
-				int ret_code = dialog.ShowModal();
-
-
-				if (ret_code == wxID_OK)
-				{
-					wxString path = dialog.GetPath();
-					((mafGUIDicomSettings*)GetSetting())->SetLastDicomDir(path);
-					m_DicomDirectoryABSFileName = path.c_str();
-					GuiUpdate();
-					result = OpenDir();
-					if (!result)
-					{
-						OpStop(OP_RUN_CANCEL);
-						return;
-					}
-				}
-				else
-				{
-					OpStop(OP_RUN_CANCEL);
-					return;
-				}
-			}
-			else//Importer use the default folder
-			{
-				m_DicomDirectoryABSFileName = lastDicomDir.c_str();
-				GuiUpdate();
-				result = OpenDir();
-				if (!result)
-				{
-					OpStop(OP_RUN_CANCEL);
-					return;
-				}
-			}
-
+		if (OpenDir())
+		{
+			int wizardResult = RunWizard();
+			OpStop(wizardResult);
 		}
 		else
-		{
-			GuiUpdate();
-			result = OpenDir();
-			if (result == false)
-			{
-				m_DicomDirectoryABSFileName = "";
-			}
-		}
-	} while(!result);
-
-
-	int wizardResult = RunWizard();
-	OpStop(wizardResult);
+			OpStop(OP_RUN_CANCEL);
+	}
+	else
+		OpStop(OP_RUN_CANCEL);
 }
 //----------------------------------------------------------------------------
 int mafOpImporterDicomOffis::RunWizard()
@@ -1797,14 +1726,6 @@ void mafOpImporterDicomOffis::CreateLoadPage()
 		m_LoadGuiCenter->Label("");
 	}
 
-	m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_CurrentSlice,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
-	m_SliceScannerLoadPage->SetPageSize(1);
-	if(((mafGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
-	{
-		m_TimeScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
-		m_TimeScannerLoadPage->SetPageSize(1);
-	}
-
 	m_StudyListbox  = m_LoadGuiUnderLeft->ListBox(ID_STUDY_SELECT,_("study"),80,"",wxLB_HSCROLL,190);
 	//	m_StudyListctrl = m_LoadGuiUnderLeft->ListCtrl(ID_STUDY_SELECT,_("study"),80,"",wxLC_LIST|wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING,190);
 
@@ -1844,19 +1765,10 @@ int wxCALLBACK _myCompareFunction(long item1, long item2, long WXUNUSED(sortData
 void mafOpImporterDicomOffis::CreateCropPage()
 	//----------------------------------------------------------------------------
 {
-	m_ZCrop = ((mafGUIDicomSettings*)GetSetting())->EnableZCrop() != FALSE;
-	m_CropPage = new mafGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,m_ZCrop);
+	m_CropPage = new mafGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,true);
 	m_CropPage->SetListener(this);
 	m_CropGuiLeft = new mafGUI(this);
 	m_CropGuiCenter = new mafGUI(this);
-
-	m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
-	m_SliceScannerCropPage->SetPageSize(1);
-	if(((mafGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
-	{
-		m_TimeScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
-		m_TimeScannerCropPage->SetPageSize(1);
-	}
 
 	if(((mafGUIDicomSettings*)GetSetting())->EnableChangeSide())
 	{
@@ -1885,12 +1797,6 @@ void mafOpImporterDicomOffis::CreateBuildPage()
 	m_BuildGuiLeft = new mafGUI(this);
 	m_BuildGuiUnderLeft = new mafGUI(this);
 	m_BuildGuiCenter = new mafGUI(this);
-
-	m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
-	m_SliceScannerBuildPage->SetPageSize(1);
-
-	m_TimeScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
-	m_TimeScannerBuildPage->SetPageSize(1);
 
 	m_BuildGuiCenter->Divider();
 	if(((mafGUIDicomSettings*)GetSetting())->AutoVMEType())
@@ -1958,12 +1864,6 @@ void mafOpImporterDicomOffis::CreateReferenceSystemPage()
 	m_ReferenceSystemGuiLeft = new mafGUI(this);
 	m_ReferenceSystemGuiUnderLeft = new mafGUI(this);
 	//m_ReferenceSystemGuiCenter = new mafGUI(this);
-
-	m_SliceScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
-	m_SliceScannerReferenceSystemPage->SetPageSize(1);
-
-	m_TimeScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
-	m_TimeScannerReferenceSystemPage->SetPageSize(1);
 
 	wxString choices[3];
 	choices[0] = _T("XY");
@@ -2044,17 +1944,6 @@ bool mafOpImporterDicomOffis::OpenDir()
 
 			OnEvent(&mafEvent(this, ID_STUDY_SELECT));
 
-			if(((mafGUIDicomSettings*)GetSetting())->AutoCropPosition())
-			{
-				AutoPositionCropPlane();
-			}
-			else
-			{
-				m_CropPlane->SetOrigin(0.0,0.0,0.0);
-				m_CropPlane->SetPoint1(m_SliceBounds[1]-m_SliceBounds[0],0.0,0.0);
-				m_CropPlane->SetPoint2(0.0,m_SliceBounds[3]-m_SliceBounds[2],0.0);
-				m_CropPage->GetRWI()->CameraReset();
-			}
 			m_BoxCorrect=true;
 			m_LoadPage->GetRWI()->CameraReset();
 
@@ -2283,7 +2172,7 @@ void mafOpImporterDicomOffis::ReadDicom()
 
 	//Set bounds of ZCrop slider widget
 	m_ZCropBounds[1] = m_NumberOfSlices-1;
-	if (!this->m_TestMode && m_ZCrop)
+	if (!this->m_TestMode)
 	{
 		m_CropPage->SetZCropBounds(0, m_ZCropBounds[1]);
 	}
@@ -2303,7 +2192,7 @@ void mafOpImporterDicomOffis::ReadDicom()
 			GenerateSliceTexture(currImageId);
 			ShowSlice();
 			CameraReset();
-			ResetSliders();
+			CreateSliders();
 			CameraUpdate();
 		}
 	}
@@ -2382,16 +2271,10 @@ void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 						GenerateSliceTexture(currImageId);
 						ShowSlice();
 						CameraReset();
-						ResetSliders();
+						CreateSliders();
 						CameraUpdate();
 					}
 				}
-			}
-			break;
-		case ID_VOLUME_SIDE:
-			{
-				if(((mafGUIDicomSettings*)GetSetting())->AutoCropPosition())
-					AutoPositionCropPlane();
 			}
 			break;
 		case ID_RANGE_MODIFIED:
@@ -2524,7 +2407,6 @@ void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::OnUndoCrop()
-	//----------------------------------------------------------------------------
 {
 	m_CropFlag = false;
 	int currImageId = GetSliceIDInSeries(m_CurrentTime, m_CurrentSlice);
@@ -2555,7 +2437,6 @@ void mafOpImporterDicomOffis::OnUndoCrop()
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::Crop()
-	//----------------------------------------------------------------------------
 {
 	if( !m_BoxCorrect )
 	{
@@ -2695,45 +2576,7 @@ void mafOpImporterDicomOffis::Crop()
 	}
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::AutoPositionCropPlane()
-	//----------------------------------------------------------------------------
-{
-	int currImageId = GetSliceIDInSeries(m_CurrentTime, m_CurrentSlice);
-
-	m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetVTKImageData()->Update();
-	m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetVTKImageData()->GetBounds(m_SliceBounds);
-
-	double diffY,diffX;
-	diffY=m_SliceBounds[3]-m_SliceBounds[2];
-	diffX=m_SliceBounds[1]-m_SliceBounds[0];
-
-	if(m_VolumeSide==RIGHT_SIDE)
-	{
-		m_CropPlane->SetOrigin(0.0,diffY/4,0.0);
-		m_CropPlane->SetPoint1(diffX/2,diffY/4,0.0);
-		m_CropPlane->SetPoint2(0.0,(diffY/4)*3,0.0);
-		m_CropPlane->Update();
-	}
-	else if(m_VolumeSide==LEFT_SIDE)
-	{
-		m_CropPlane->SetOrigin(diffX/2,diffY/4,0.0);
-		m_CropPlane->SetPoint1(diffX,diffY/4,0.0);
-		m_CropPlane->SetPoint2(diffX/2,(diffY/4)*3,0.0);
-		m_CropPlane->Update();
-	}
-	else if (m_VolumeSide==NON_VALID_SIDE)
-	{
-		m_CropPlane->SetOrigin(0.0,0.0,0.0);
-		m_CropPlane->SetPoint1(m_SliceBounds[1]-m_SliceBounds[0],0.0,0.0);
-		m_CropPlane->SetPoint2(0.0,m_SliceBounds[3]-m_SliceBounds[2],0.0);
-		m_CropPage->GetRWI()->CameraReset();
-	}
-
-	m_CropPage->GetRWI()->CameraReset();
-}
-//----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CameraUpdate()
-	//----------------------------------------------------------------------------
 {
 	if(m_Wizard->GetCurrentPage() == m_LoadPage)
 	{
@@ -2754,7 +2597,6 @@ void mafOpImporterDicomOffis::CameraUpdate()
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CameraReset()
-	//----------------------------------------------------------------------------
 {
 	m_LoadPage->UpdateWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
 	m_LoadPage->GetRWI()->CameraReset();
@@ -2766,7 +2608,6 @@ void mafOpImporterDicomOffis::CameraReset()
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::EnableSliceSlider(bool enable)
-	//----------------------------------------------------------------------------
 {
 	m_LoadGuiLeft->Enable(ID_SCAN_SLICE,enable);
 	m_BuildGuiLeft->Enable(ID_SCAN_SLICE,enable);
@@ -2775,19 +2616,14 @@ void mafOpImporterDicomOffis::EnableSliceSlider(bool enable)
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::EnableTimeSlider(bool enable)
-	//----------------------------------------------------------------------------
 {
-	if(((mafGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
-	{
-		m_LoadGuiLeft->Enable(ID_SCAN_TIME,enable);
-		m_BuildGuiLeft->Enable(ID_SCAN_TIME,enable);
-		m_ReferenceSystemGuiLeft->Enable(ID_SCAN_TIME,enable);
-		m_CropGuiLeft->Enable(ID_SCAN_TIME,enable);
-	}
+	m_LoadGuiLeft->Enable(ID_SCAN_TIME,enable);
+	m_BuildGuiLeft->Enable(ID_SCAN_TIME,enable);
+	m_ReferenceSystemGuiLeft->Enable(ID_SCAN_TIME,enable);
+	m_CropGuiLeft->Enable(ID_SCAN_TIME,enable);
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateSliceVTKPipeline()
-	//----------------------------------------------------------------------------
 {
 	vtkNEW(m_DICOMDirectoryReader);
 
@@ -2841,7 +2677,6 @@ void mafOpImporterDicomOffis::CreateSliceVTKPipeline()
 
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::FillStudyListBox(mafString studyUID)
-	//----------------------------------------------------------------------------
 {
 	bool newStudy = true;
 	int studyCounter = m_StudyListbox->GetCount();
@@ -2875,7 +2710,6 @@ void mafOpImporterDicomOffis::FillStudyListBox(mafString studyUID)
 
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::UpdateStudyListBox()
-	//----------------------------------------------------------------------------
 {
 	for (int n = 0; n < m_StudyListbox->GetCount(); n++)
 		//	for (int n = 0; n < m_StudyListctrl->GetItemCount(); n++)
@@ -4352,7 +4186,7 @@ void mafOpImporterDicomOffis::ResetStructure()
 	mafYield();
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::ResetSliders()
+void mafOpImporterDicomOffis::CreateSliders()
 	//----------------------------------------------------------------------------
 {
 	if(m_LoadGuiLeft)
@@ -4360,14 +4194,15 @@ void mafOpImporterDicomOffis::ResetSliders()
 		m_LoadPage->RemoveGuiLowerLeft(m_LoadGuiLeft);
 		delete m_LoadGuiLeft;
 		m_LoadGuiLeft = new mafGUI(this);
-		m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
+		m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",true);
 		m_SliceScannerLoadPage->SetPageSize(1);
-		if(((mafGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+		
+		if (m_NumberOfTimeFrames > 0)
 		{
-			m_TimeScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,max(m_NumberOfTimeFrames - 1,0));
+			m_TimeScannerLoadPage = m_LoadGuiLeft->Slider(ID_SCAN_TIME, _("time "), &m_CurrentTime, 0, max(m_NumberOfTimeFrames - 1, 0));
 			m_TimeScannerLoadPage->SetPageSize(1);
-			m_LoadGuiLeft->Enable(ID_SCAN_TIME,(m_NumberOfTimeFrames>0));
 		}
+		
 		m_LoadPage->AddGuiLowerLeft(m_LoadGuiLeft);
 	}
 
@@ -4376,31 +4211,34 @@ void mafOpImporterDicomOffis::ResetSliders()
 		m_CropPage->RemoveGuiLowerLeft(m_CropGuiLeft);
 		delete m_CropGuiLeft;
 		m_CropGuiLeft = new mafGUI(this);
-		m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
+		m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",true);
 		m_SliceScannerCropPage->SetPageSize(1);
-		if(((mafGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+
+		if (m_NumberOfTimeFrames > 0)
 		{
-			m_TimeScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,max(m_NumberOfTimeFrames - 1,0));
+			m_TimeScannerCropPage = m_CropGuiLeft->Slider(ID_SCAN_TIME, _("time "), &m_CurrentTime, 0, max(m_NumberOfTimeFrames - 1, 0));
 			m_TimeScannerCropPage->SetPageSize(1);
-			m_CropGuiLeft->Enable(ID_SCAN_TIME,(m_NumberOfTimeFrames>0));
 		}
+
 		m_CropPage->AddGuiLowerLeft(m_CropGuiLeft);
 	}
 
 
 	if(m_BuildGuiLeft)
 	{
+
 		m_BuildPage->RemoveGuiLowerLeft(m_BuildGuiLeft);
 		delete m_BuildGuiLeft;
 		m_BuildGuiLeft = new mafGUI(this);
-		m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
+		m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",true);
 		m_SliceScannerBuildPage->SetPageSize(1);
-		if(((mafGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+		
+		if (m_NumberOfTimeFrames > 0)
 		{
-			m_TimeScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,max(m_NumberOfTimeFrames - 1,0));
+			m_TimeScannerBuildPage = m_BuildGuiLeft->Slider(ID_SCAN_TIME, _("time "), &m_CurrentTime, 0, max(m_NumberOfTimeFrames - 1, 0));
 			m_TimeScannerBuildPage->SetPageSize(1);
-			m_BuildGuiLeft->Enable(ID_SCAN_TIME,(m_NumberOfTimeFrames>0));
 		}
+		
 		m_BuildPage->AddGuiLowerLeft(m_BuildGuiLeft);
 	}
 
@@ -4409,14 +4247,15 @@ void mafOpImporterDicomOffis::ResetSliders()
 		m_ReferenceSystemPage->RemoveGuiLowerLeft(m_ReferenceSystemGuiLeft);
 		delete m_ReferenceSystemGuiLeft;
 		m_ReferenceSystemGuiLeft = new mafGUI(this);
-		m_SliceScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
+		m_SliceScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",true);
 		m_SliceScannerReferenceSystemPage->SetPageSize(1);
-		if(((mafGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+
+		if (m_NumberOfTimeFrames > 0)
 		{
-			m_TimeScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,max(m_NumberOfTimeFrames - 1,0));
+			m_TimeScannerReferenceSystemPage = m_ReferenceSystemGuiLeft->Slider(ID_SCAN_TIME, _("time "), &m_CurrentTime, 0, max(m_NumberOfTimeFrames - 1, 0));
 			m_TimeScannerReferenceSystemPage->SetPageSize(1);
-			m_ReferenceSystemGuiLeft->Enable(ID_SCAN_TIME,(m_NumberOfTimeFrames>0));
 		}
+
 		m_ReferenceSystemPage->AddGuiLowerLeft(m_ReferenceSystemGuiLeft);
 	}
 }
@@ -5165,18 +5004,6 @@ void mafOpImporterDicomOffis::OnSeriesSelect()
 	m_TotalDicomSubRange[0]=m_TotalDicomRange[0];
 	m_TotalDicomSubRange[1]=m_TotalDicomRange[1];
 	CameraReset();
-
-	if(((mafGUIDicomSettings*)GetSetting())->AutoCropPosition())
-	{
-		AutoPositionCropPlane();
-	}
-	else
-	{
-		m_CropPlane->SetOrigin(0.0,0.0,0.0);
-		m_CropPlane->SetPoint1(m_SliceBounds[1]-m_SliceBounds[0],0.0,0.0);
-		m_CropPlane->SetPoint2(0.0,m_SliceBounds[3]-m_SliceBounds[2],0.0);
-		m_CropPage->GetRWI()->CameraReset();
-	}
 }
 
 void mafOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
@@ -5184,28 +5011,22 @@ void mafOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 
 	if(m_Wizard->GetCurrentPage()==m_LoadPage)//From Load page to Crop Page
 	{
-		//get the current windowing in order to maintain subrange thought the 
-		//wizard pages 
+		//get the current windowing in order to maintain subrange thought the wizard pages 
 		m_LoadPage->GetWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
 
-		if(m_NumberOfStudies<1)
-		{
-			m_Wizard->EnableChangePageOff();
-			wxMessageBox(_("No study found!"));
-			return;
-		}
-		else
-		{
-			m_Wizard->SetButtonString("Build >");
-			m_Wizard->EnableChangePageOn();
-			m_CropPage->UpdateActor();
-		}
+		m_CropPlane->SetOrigin(0.0, 0.0, 0.0);
+		m_CropPlane->SetPoint1(m_SliceBounds[1] - m_SliceBounds[0], 0.0, 0.0);
+		m_CropPlane->SetPoint2(0.0, m_SliceBounds[3] - m_SliceBounds[2], 0.0);
+		m_CropPage->GetRWI()->CameraReset();
+		
+		m_Wizard->SetButtonString("Build >");
+		m_Wizard->EnableChangePageOn();
+		m_CropPage->UpdateActor();
 	}
 
 	if (m_Wizard->GetCurrentPage()==m_CropPage)//From Crop page to build page
 	{
-		//get the current windowing in order to maintain subrange thought the 
-		//wizard pages 
+		//get the current windowing in order to maintain subrange thought the wizard pages 
 		m_CropPage->GetWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
 		if (e->GetBool())
 		{
@@ -5252,8 +5073,7 @@ void mafOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 	//From build page to crop page
 	if (m_Wizard->GetCurrentPage()==m_BuildPage && (!e->GetBool()))
 	{
-		//get the current windowing in order to maintain subrange thought the 
-		//wizard pages 
+		//get the current windowing in order to maintain subrange thought the wizard pages 
 		m_BuildPage->GetWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
 
 		OnUndoCrop();

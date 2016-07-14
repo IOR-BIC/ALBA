@@ -130,10 +130,7 @@ public:
 
 	/** method allows to handle events from other objects*/
 	virtual void OnEvent(mafEventBase *maf_event);
-
-	/** Print the dicom list to the log area */
-	void PrintDicomList(medDicomSeriesSliceList *dicomList);
-
+		
 protected:
 
 	enum DICOM_IMPORTER_GUI_ID
@@ -201,7 +198,7 @@ protected:
 	void GetDicomRange(double *range);
 
 	/** Reset the slider that allow to scan the slices. */
-	void ResetSliders();
+	void CreateSliders();
 
 	/** Build the list of dicom filer recognized. */
 	bool BuildDicomFileList(const char *dicomDirABSPath);
@@ -254,10 +251,7 @@ protected:
 
 	/** On wizard start. */
 	virtual int RunWizard();
-
-	/** Auto position of the crop plane in way of Volume side. */
-	void AutoPositionCropPlane();
-
+		
 	/** Performe crop of dicom data. */
 	void Crop();
 
@@ -388,7 +382,6 @@ protected:
 	bool m_CropExecuted; //<<<To check if a crop as been executed
 	bool m_ApplyRotation; //<<< true il current series contains rotated slices
 	bool m_ConstantRotation;
-	bool m_ZCrop;
 	bool m_mem_is_almost_full;
 
 	int m_ResampleFlag;

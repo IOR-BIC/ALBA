@@ -47,15 +47,11 @@ mafGUISettings(Listener, label)
   m_CheckOnOffVmeType[0] = m_CheckOnOffVmeType[2] = TRUE;
   m_CheckOnOffVmeType[1] = FALSE;
 
-	m_AutoCropPos = FALSE;
-	m_EnableNumberOfSlice = TRUE;
-	m_EnableNumberOfTime = TRUE; 
   m_EnableChangeSide = FALSE;
   m_EnableDiscardPosition = FALSE;
   m_EnableResampleVolume = FALSE;
   m_EnableRescaleTo16Bit = FALSE;
   m_VisualizePosition = FALSE;
-  m_EnableZCrop =  TRUE;
   m_AutoVMEType = FALSE;
   m_PercentageTolerance = FALSE;
   m_ScalarTolerance = FALSE;
@@ -66,9 +62,7 @@ mafGUISettings(Listener, label)
   m_Step = ID_1X;
   m_OutputNameType = TRADITIONAL;
   m_ShowAdvancedOptionOfSorting = TRUE;
-  m_DicomFolder = "UNEDFINED_DicomFolder";
-  m_UseDefaultDicomFolder = FALSE;
-
+  
   m_DCM_ImagePositionPatientchoice = 0;
 
   m_Config->SetPath("Importer Dicom"); // Regiser key path Added by Losi 15.11.2009
@@ -84,17 +78,11 @@ void mafGUIDicomSettings::CreateGui()
 //----------------------------------------------------------------------------
 {
 	m_Gui = new mafGUI(this);
-  m_Gui->Bool(ID_USE_DEFAULT_DICOM_FOLDER,_("Use Default DICOM Folder"),&m_UseDefaultDicomFolder,1);
-  m_Gui->DirOpen(ID_DICOM_FOLDER,_("Folder"),&m_DicomFolder,_("Folder where are placed DICOM files"));
-	// m_Gui->FileOpen(ID_DICTONARY,_("Dictionary"),&m_Dictionary); Remove dictionary selection (Losi 25.11.2009)
-	m_Gui->Bool(ID_AUTO_POS_CROP,_("Auto Crop"),&m_AutoCropPos,1);
-  m_Gui->Bool(ID_ENALBLE_TIME_BAR,_("Enable Time Bar"),&m_EnableNumberOfTime,1);
-	m_Gui->Bool(ID_ENALBLE_NUMBER_OF_SLICE,_("Enable Number of Slice"),&m_EnableNumberOfSlice,1);
-  m_Gui->Bool(ID_SIDE,_("Enable Change Side"),&m_EnableChangeSide,1);
+  
+	m_Gui->Bool(ID_SIDE,_("Enable Change Side"),&m_EnableChangeSide,1);
   m_Gui->Bool(ID_DISCARD_ORIGIN,_("Enable Discard Origin"),&m_EnableDiscardPosition,1);
   m_Gui->Bool(ID_RESAMPLE_VOLUME,_("Enable Resample Volume"),&m_EnableResampleVolume,1);
   m_Gui->Bool(ID_RESCALE_TO_16_BIT,_("Enable Rescaling to 16 Bit"),&m_EnableRescaleTo16Bit,1);
-  m_Gui->Bool(ID_Z_CROP,_("Enable Z-direction Crop"),&m_EnableZCrop,1);
   m_Gui->Bool(ID_SHOW_ADVANCED_OPTION_SORTING,_("Show adv setting of sorting"),&m_ShowAdvancedOptionOfSorting,1);
   m_Gui->Bool(ID_ENABLE_POS_INFO,_("Visualize Position and Orientation"),&m_VisualizePosition,1);
 
@@ -155,7 +143,6 @@ void mafGUIDicomSettings::CreateGui()
   m_Gui->Divider(1);
 
 	m_Gui->Update();
-  m_Gui->Enable(ID_DICOM_FOLDER,(m_UseDefaultDicomFolder==TRUE));
   m_Gui->Enable(ID_VME_TYPE,!(m_AutoVMEType==TRUE));
   m_Gui->Enable(ID_SETTING_VME_TYPE,(m_AutoVMEType==TRUE));
   m_Gui->Enable(ID_SCALAR_TOLERANCE,(m_ScalarTolerance==TRUE));
@@ -168,7 +155,6 @@ void mafGUIDicomSettings::EnableItems()
 	//m_Gui->Enable(ID_DICTONARY,true); Remove dictionary selection (Losi 25.11.2009)
   if (m_Gui)
   {
-    m_Gui->Enable(ID_DICOM_FOLDER,(m_UseDefaultDicomFolder==TRUE));
 	  m_Gui->Enable(ID_VME_TYPE,!(m_AutoVMEType==TRUE));
     m_Gui->Enable(ID_SETTING_VME_TYPE,(m_AutoVMEType==TRUE));
 	  m_Gui->Enable(ID_SCALAR_TOLERANCE,(m_ScalarTolerance==TRUE));
@@ -182,23 +168,6 @@ void mafGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 {
 	switch(maf_event->GetId())
 	{
-//  Remove dictionary selection (Losi 25.11.2009)
-// 	case ID_DICTONARY:
-// 		{
-// 			m_Config->Write("DicomDictionary",m_Dictionary.GetCStr());
-// 		}
-// 		break;
-  case ID_USE_DEFAULT_DICOM_FOLDER:
-    {
-      m_Config->Write("UseDefaultDicomFolder",m_UseDefaultDicomFolder);
-      EnableItems();
-    }
-    break;
-  case ID_DICOM_FOLDER:
-    {
-      m_Config->Write("DicomFolder",m_DicomFolder.GetCStr());
-    }
-    break;
   case ID_SHOW_ADVANCED_OPTION_SORTING:
     {
       m_Config->Write("ShowAdvancedOptionOfSorting",m_ShowAdvancedOptionOfSorting);
@@ -249,28 +218,12 @@ void mafGUIDicomSettings::OnEvent(mafEventBase *maf_event)
   //    m_Config->Write("NameCompositorSeries",m_NameCompositorList->IsItemChecked(ID_SERIES));
     }
     break;
-	case ID_AUTO_POS_CROP:
-		{
-			m_Config->Write("AutoCropPos",m_AutoCropPos);
-      EnableItems();
-		}
-		break;
-  case ID_AUTO_VME_TYPE:
+	case ID_AUTO_VME_TYPE:
     {
       m_Config->Write("AutoVMEType",m_AutoVMEType);
     }
     break;
-	case ID_ENALBLE_NUMBER_OF_SLICE:
-		{
-			m_Config->Write("EnableNumberOfSlice",m_EnableNumberOfSlice);
-		}
-		break;
-	case ID_ENALBLE_TIME_BAR:
-		{
-			m_Config->Write("EnableTimeBar",m_EnableNumberOfTime);
-		}
-		break;
-  case ID_STEP:
+	case ID_STEP:
     {
       m_Config->Write("StepOfBuild",m_Step);
     }
@@ -293,11 +246,6 @@ void mafGUIDicomSettings::OnEvent(mafEventBase *maf_event)
   case ID_RESCALE_TO_16_BIT:
     {
       m_Config->Write("EnableRescaleTo16Bit",m_EnableRescaleTo16Bit);
-    }
-    break;
-  case ID_Z_CROP:
-    {
-      m_Config->Write("EnableZCrop",m_EnableZCrop);
     }
     break;
   case ID_ENABLE_POS_INFO:
@@ -362,349 +310,155 @@ void mafGUIDicomSettings::InitializeSettings()
 	double double_item;
 
   if(m_Config->Read("OutputNameFormat", &long_item))
-  {
     m_OutputNameType=long_item;
-  }
   else
-  {
     m_Config->Write("OutputNameFormat",m_OutputNameType);
-  }
 
 	if(m_Config->Read("EnableSide", &long_item))
-	{
 		m_EnableChangeSide=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableSide",m_EnableChangeSide);
-	}
 
 	if(m_Config->Read("EnableDiscardPosition", &long_item))
-	{
 		m_EnableDiscardPosition=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableDiscardPosition",m_EnableDiscardPosition);
-	}
 
 	if(m_Config->Read("EnableResampleVolume", &long_item))
-	{
 		m_EnableResampleVolume=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableResampleVolume",m_EnableResampleVolume);
-	}
 
 	if(m_Config->Read("EnableRescaleTo16Bit", &long_item))
-	{
 		m_EnableRescaleTo16Bit=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableRescaleTo16Bit",m_EnableRescaleTo16Bit);
-	}
 
 	if(m_Config->Read("EnableVisualizationPosition", &long_item))
-	{
 		m_VisualizePosition=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableVisualizationPosition",m_VisualizePosition);
-	}
-
-	if(m_Config->Read("EnableZCrop", &long_item))
-	{
-		m_EnableZCrop=long_item;
-	}
-	else
-	{
-		m_Config->Write("EnableZCrop",m_EnableZCrop);
-	}
-
-
+		
 	if(m_Config->Read("StepOfBuild", &long_item))
-	{
 		m_Step=long_item;
-	}
 	else
-	{
 		m_Config->Write("StepOfBuild",m_Step);
-	}
 
 	if(m_Config->Read("LastDicomDir", &string_item))
-	{
 		m_LastDicomDir=string_item.c_str();
-	}
 	else
-	{
 		m_Config->Write("LastDicomDir",m_LastDicomDir.c_str());
-	}
 
 	if(m_Config->Read("EnableReadCT", &long_item))
-	{
 		m_CheckOnOff[0]=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableReadCT",m_CheckOnOff[0]);
-	}
 
 	if(m_Config->Read("EnableReadSC", &long_item))
-	{
 		m_CheckOnOff[1]=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableReadSC",m_CheckOnOff[1]);
-	}
 
 	if(m_Config->Read("EnableReadMI", &long_item))
-	{
 		m_CheckOnOff[2]=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableReadMI",m_CheckOnOff[2]);
-	}
 
 	if(m_Config->Read("EnableReadXA", &long_item))
-	{
 		m_CheckOnOff[3]=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableReadXA",m_CheckOnOff[3]);
-	}
 
 	if(m_Config->Read("EnableReadOT", &long_item))
-	{
 		m_CheckOnOff[4]=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableReadOT",m_CheckOnOff[4]);
-	}
 
 	if(m_Config->Read("EnableReadCR", &long_item))
-	{
 		m_CheckOnOff[5]=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableReadCR",m_CheckOnOff[5]);
-	}
 
   if(m_Config->Read("EnableReadDX", &long_item))
-  {
     m_CheckOnOff[6]=long_item;
-  }
   else
-  {
     m_Config->Write("EnableReadDX",m_CheckOnOff[6]);
-  }
 
 	if(m_Config->Read("EnableReadRF", &long_item))
-	{
 		m_CheckOnOff[7]=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableReadRF",m_CheckOnOff[7]);
-	}
 
   if(m_Config->Read("EnableTypeVolume", &long_item))
-	{
 		m_CheckOnOffVmeType[0]=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableTypeVolume",m_CheckOnOffVmeType[0]);
-	}
-
   
   if(m_Config->Read("EnableTypeImage", &long_item))
-	{
 		m_CheckOnOffVmeType[2]=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableTypeImage",m_CheckOnOffVmeType[2]);
-	}
-
-	if(m_Config->Read("AutoCropPos", &long_item))
-	{
-		m_AutoCropPos=long_item;
-	}
-	else
-	{
-		m_Config->Write("AutoCropPos",m_AutoCropPos);
-	}
-
+		
 	if(m_Config->Read("AutoVMEType", &long_item))
-	{
 		m_AutoVMEType=long_item;
-	}
 	else
-	{
 		m_Config->Write("AutoVMEType",m_AutoVMEType);
-	}
 
 	if(m_Config->Read("VMEType", &long_item))
-	{
 		m_OutputType=long_item;
-	}
 	else
-	{
 		m_Config->Write("VMEType",m_OutputType);
-	}
-
-	if(m_Config->Read("EnableTimeBar", &long_item))
-	{
-		m_EnableNumberOfTime=long_item;
-	}
-	else
-	{
-		m_Config->Write("EnableTimeBar",m_EnableNumberOfTime);
-	}
-
-	if(m_Config->Read("EnableNumberOfSlice", &long_item))
-	{
-		m_EnableNumberOfSlice=long_item;
-	}
-	else
-	{
-		m_Config->Write("EnableNumberOfSlice",m_EnableNumberOfSlice);
-	}
 
 	if(m_Config->Read("EnableScalarDistance", &long_item))
-	{
 		m_ScalarTolerance=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnableScalarDistance",m_ScalarTolerance);
-	}
 
 	if(m_Config->Read("ScalarDistance", &double_item))
-	{
 		m_ScalarDistanceTolerance=double_item;
-	}
 	else
-	{
 		m_Config->Write("ScalarDistance",m_ScalarDistanceTolerance);
-	}
 
 	if(m_Config->Read("EnablePercentageDistance", &long_item))
-	{
 		m_PercentageTolerance=long_item;
-	}
 	else
-	{
 		m_Config->Write("EnablePercentageDistance",m_PercentageTolerance);
-	}
 
 	if(m_Config->Read("PercentageDistance", &double_item))
-	{
 		m_PercentageDistanceTolerance=double_item;
-	}
 	else
-	{
 		m_Config->Write("PercentageDistance",m_PercentageDistanceTolerance);
-	}
 
   if(m_Config->Read("ShowAdvancedOptionOfSorting", &long_item))
-  {
     m_ShowAdvancedOptionOfSorting=long_item;
-  }
   else
-  {
     m_Config->Write("ShowAdvancedOptionOfSorting",m_ShowAdvancedOptionOfSorting);
-  }
-
-  if(m_Config->Read("DicomFolder", &string_item))
-  {
-    m_DicomFolder=string_item;
-  }
-  else
-  {
-    m_Config->Write("DicomFolder",m_DicomFolder.GetCStr());
-  }
-
-  if(m_Config->Read("UseDefaultDicomFolder", &long_item))
-  {
-    m_UseDefaultDicomFolder=long_item;
-  }
-  else
-  {
-    m_Config->Write("UseDefaultDicomFolder",m_UseDefaultDicomFolder);
-  }
 
   if(m_Config->Read("DCM_ImagePositionPatientchoice", &long_item))
-  {
 	  m_DCM_ImagePositionPatientchoice=long_item;
-  }
   else
-  {
-	  m_Config->Write("DCM_ImagePositionPatientchoice",m_UseDefaultDicomFolder);
-  }
-
-
-//   if(m_Config->Read("NameCompositorPatientName", &long_item))
-//   {
-//     m_UseDefaultDicomFolder=long_item;
-//   }
-//   else
-//   {
-//     m_Config->Write("NameCompositorPatientName",m_UseDefaultDicomFolder);
-//   }
+	  m_Config->Write("DCM_ImagePositionPatientchoice", m_DCM_ImagePositionPatientchoice);
 
   if(m_Config->Read("NameCompositorPatientName", &long_item))
-  {
     m_CheckNameCompositor[ID_PATIENT_NAME] = long_item;
-  }
   else
-  {
     m_Config->Write("NameCompositorPatientName",m_CheckNameCompositor[ID_PATIENT_NAME]);
-  }
 
   if(m_Config->Read("NameCompositorDescription", &long_item))
-  {
     m_CheckNameCompositor[ID_DESCRIPTION] = long_item;
-  }
   else
-  {
     m_Config->Write("NameCompositorDescription",m_CheckNameCompositor[ID_DESCRIPTION]);
-  }
 
   if(m_Config->Read("NameCompositorBirthdate", &long_item))
-  {
     m_CheckNameCompositor[ID_BIRTHDATE] = long_item;
-  }
   else
-  {
     m_Config->Write("NameCompositorBirthdate",m_CheckNameCompositor[ID_BIRTHDATE]);
-  }
 
   if(m_Config->Read("NameCompositorNumSlices", &long_item))
-  {
     m_CheckNameCompositor[ID_NUM_SLICES] = long_item;
-  }
   else
-  {
     m_Config->Write("NameCompositorNumSlices",m_CheckNameCompositor[ID_NUM_SLICES]);
-  }
 
-  //if(m_Config->Read("NameCompositorSeries", &long_item))
-  //{
-  //  m_CheckNameCompositor[ID_SERIES] = long_item;
-  //}
-  //else
-  //{
-  //  m_Config->Write("NameCompositorSeries",m_CheckNameCompositor[ID_SERIES]);
-  //}
 	m_Config->Flush();
 }
 //----------------------------------------------------------------------------
