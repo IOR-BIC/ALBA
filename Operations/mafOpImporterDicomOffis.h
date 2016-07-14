@@ -40,7 +40,6 @@ class mafTagArray;
 class mafVMEImage;
 class mafVMEVolumeGray;
 class mafGUICheckListBox;
-class mafVMEMesh;
 class vtkDirectory;
 class vtkLookupTable;
 class vtkPlaneSource;
@@ -62,7 +61,7 @@ class medDicomSeriesSliceList;
 //----------------------------------------------------------------------------
 /** 
 Perform DICOM importer.
-From a DICOM dataset return a VME Volume, a VME Image or a VME Mesh.
+From a DICOM dataset return a VME Volume or a VME Image.
 */
 class MAF_EXPORT mafOpImporterDicomOffis : public mafOp
 {
@@ -116,13 +115,7 @@ public:
 
 	/** Build a volume from the list of CineMRI files. */
 	int BuildOutputVMEGrayVolumeFromDicomCineMRI();
-
-	/** Build a mesh from the list of dicom files. */
-	int BuildOutputVMEMeshFromDicom();
-
-	/** Build a mesh from the list of CineMRI files. */
-	int BuildOutputVMEMeshFromDicomCineMRI();
-
+		
 	/** Build images starting from the list of dicom files. */
 	int BuildOutputVMEImagesFromDicom();
 
@@ -277,9 +270,6 @@ protected:
 	/** function that resample volume with rectilinear grid output. */
 	void ResampleVolume();
 
-	/** Extract a rotated polydata from original dicom image. */
-	vtkPolyData * ExtractPolyData(int ts, int silceId);
-
 	/** Rescale to 16 Bit */
 	void RescaleTo16Bit(vtkImageData *dataSet);
 
@@ -311,7 +301,6 @@ protected:
 	mafGUIWizardPageNew	*m_CropPage;
 	mafGUIWizardPageNew	*m_BuildPage;
 	mafGUIWizardPageNew	*m_ReferenceSystemPage; ///< Wizard step to choose reference system
-	mafVMEMesh        *m_Mesh;
 	mafVMEGroup       *m_ImagesGroup;
 
 	mafGUI	*m_LoadGuiLeft;

@@ -86,7 +86,6 @@ public:
 	enum VME_TYPE
 	{
 		ID_VOLUME = 0,
-		ID_MESH,
 		ID_IMAGE,
 	};
 
@@ -226,7 +225,7 @@ protected:
 
   int m_CheckNameCompositor[5];
 	int m_CheckOnOff[8];
-  int m_CheckOnOffVmeType[3];
+  int m_CheckOnOffVmeType[2];
 
   int m_OutputType;
 

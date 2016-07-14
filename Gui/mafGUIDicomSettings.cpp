@@ -113,14 +113,13 @@ void mafGUIDicomSettings::CreateGui()
   m_Gui->Divider();
   
   m_Gui->Bool(ID_AUTO_VME_TYPE,_("Auto VME Type"),&m_AutoVMEType,1);
-  wxString typeArray[3] = {_("Volume"),_("Mesh"),_("Image")};
-  m_Gui->Radio(ID_SETTING_VME_TYPE, "VME output", &m_OutputType, 3, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+  wxString typeArray[3] = {_("Volume"),_("Image")};
+  m_Gui->Radio(ID_SETTING_VME_TYPE, "VME output", &m_OutputType, 2, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
 
   m_Gui->Divider();
 
   m_DicomVmeTypeListBox=m_Gui->CheckList(ID_VME_TYPE,_("VME Type"));
 	m_DicomVmeTypeListBox->AddItem(ID_VOLUME,_("Volume"),m_CheckOnOffVmeType[0] != 0);
-	m_DicomVmeTypeListBox->AddItem(ID_MESH,_("Mesh"),m_CheckOnOffVmeType[1] != 0);
 	m_DicomVmeTypeListBox->AddItem(ID_IMAGE,_("Image"),m_CheckOnOffVmeType[2] != 0);
 
   m_Gui->Divider();
@@ -229,11 +228,9 @@ void mafGUIDicomSettings::OnEvent(mafEventBase *maf_event)
   case ID_VME_TYPE:
 		{
       m_CheckOnOffVmeType[ID_VOLUME] = m_DicomVmeTypeListBox->IsItemChecked(ID_VOLUME);
-      m_CheckOnOffVmeType[ID_MESH] = m_DicomVmeTypeListBox->IsItemChecked(ID_MESH);
       m_CheckOnOffVmeType[ID_IMAGE] = m_DicomVmeTypeListBox->IsItemChecked(ID_IMAGE);
 
       m_Config->Write("EnableTypeVolume",m_DicomVmeTypeListBox->IsItemChecked(ID_VOLUME));
-			m_Config->Write("EnableTypeMesh",m_DicomVmeTypeListBox->IsItemChecked(ID_MESH));
 			m_Config->Write("EnableTypeImage",m_DicomVmeTypeListBox->IsItemChecked(ID_IMAGE));
 		}
 		break;
@@ -527,15 +524,7 @@ void mafGUIDicomSettings::InitializeSettings()
 		m_Config->Write("EnableTypeVolume",m_CheckOnOffVmeType[0]);
 	}
 
-  if(m_Config->Read("EnableTypeMesh", &long_item))
-	{
-		m_CheckOnOffVmeType[1]=long_item;
-	}
-	else
-	{
-		m_Config->Write("EnableTypeMesh",m_CheckOnOffVmeType[1]);
-	}
-
+  
   if(m_Config->Read("EnableTypeImage", &long_item))
 	{
 		m_CheckOnOffVmeType[2]=long_item;
@@ -768,11 +757,6 @@ void mafGUIDicomSettings::SetEnableToRead(char* type,bool enable)
     m_CheckOnOffVmeType[ID_VOLUME] = enable;
     m_Config->Write("EnableTypeVolume",m_CheckOnOffVmeType[ID_VOLUME]);
   }
-  if (strcmp( type, "MESH" ) == 0)
-  {	
-    m_CheckOnOffVmeType[ID_MESH] = enable;
-    m_Config->Write("EnableTypeMesh",m_CheckOnOffVmeType[ID_MESH]);
-  }
   if (strcmp( type, "IMAGE" ) == 0)
   {	
     m_CheckOnOffVmeType[ID_IMAGE] = enable;
@@ -824,10 +808,6 @@ bool mafGUIDicomSettings::EnableToRead(char* type)
 	  {	
 	    return true;
 	  }
-    if (strcmp( type, "MESH" ) == 0 && (m_DicomVmeTypeListBox->IsItemChecked(ID_MESH)))
-	  {	
-	    return true;
-	  }
     if (strcmp( type, "IMAGE" ) == 0 && (m_DicomVmeTypeListBox->IsItemChecked(ID_IMAGE)))
 	  {	
 	    return true;
@@ -871,10 +851,6 @@ bool mafGUIDicomSettings::EnableToRead(char* type)
 		}
     
     if (strcmp( type, "VOLUME" ) == 0 && m_CheckOnOffVmeType[ID_VOLUME])
-    {	
-      return true;
-    }
-    if (strcmp( type, "MESH" ) == 0 && m_CheckOnOffVmeType[ID_MESH])
     {	
       return true;
     }

@@ -45,7 +45,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "mafTransform.h"
 #include "mafTransformFrame.h"
 #include "mafSmartPointer.h"
-#include "mafVMEMesh.h"
 #include "mafVMEGroup.h"
 #include "mafMatrixPipe.h"
 
@@ -73,9 +72,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkImageClip.h"
 #include "vtkImageDataGeometryFilter.h"
 #include "vtkTransformPolyDataFilter.h"
-#include "vtkUnstructuredGrid.h"
 #include "vtkAppendPolyData.h" 
-#include "vtkHexahedron.h"
 #include "vtkFloatArray.h"
 #include "vtkCellData.h"
 #include "vtkIdTypeArray.h"
@@ -196,6 +193,13 @@ enum DICOM_IMPORTER_MODALITY
 	GIZMO_DONE
 };
 
+enum
+{
+	TYPE_VOLUME = 0,
+	TYPE_IMAGE = 1,
+};
+
+
 /** methods used to sort medDICOMListElement based on custom criteria */
 int CompareX(const mafDicomSlice **arg1,const mafDicomSlice **arg2);
 int CompareY(const mafDicomSlice **arg1,const mafDicomSlice **arg2);
@@ -228,7 +232,6 @@ mafOp(label)
 	m_CropPage = NULL;
 	m_BuildPage = NULL;
 	m_ReferenceSystemPage = NULL;
-	m_Mesh = NULL;
 	m_ImagesGroup = NULL;
 
 	m_BuildGuiLeft = NULL;
@@ -338,7 +341,6 @@ mafOpImporterDicomOffis::~mafOpImporterDicomOffis()
 
 	mafDEL(m_TagArray);
 	mafDEL(m_Image);
-	mafDEL(m_Mesh);
 	mafDEL(m_Volume);
 
 	m_ImagesGroup = NULL;
@@ -473,35 +475,20 @@ void mafOpImporterDicomOffis::OpRun()
 int mafOpImporterDicomOffis::RunWizard()
 	//----------------------------------------------------------------------------
 {
-	enum
-	{
-		VOLUME = 0,
-		MESH = 1,
-		IMAGE = 2,
-		NUMBER_OF_OUTPUTS,
-	};
-
+	
 	if(m_Wizard->Run())
 	{
 		int result;
 		switch (m_OutputType)
 		{
-		case VOLUME: 
+		case TYPE_VOLUME: 
 			{
 
 				if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID])
 				{
 					if(!this->m_TestMode)
 					{
-						//int answer = wxMessageBox( "Dicom dataset contains rotated images - Apply rotation?", "Warning", wxYES_NO, NULL);
-						//if (answer == wxNO)
-						//{
-						//	m_ApplyRotation = false;
-						//}
-						//else if (answer == wxYES)
-						//{
 							m_ApplyRotation = true;
-						//}
 					}
 				}
 
@@ -530,17 +517,7 @@ int mafOpImporterDicomOffis::RunWizard()
 
 				break;
 			}
-		case MESH:
-			{
-
-
-				if(m_DicomReaderModality != mafGUIDicomSettings::ID_CMRI_MODALITY)
-					result = BuildOutputVMEMeshFromDicom();
-				else
-					result = BuildOutputVMEMeshFromDicomCineMRI();
-				break;
-			}
-		case IMAGE:
+		case TYPE_IMAGE:
 			{
 				if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID])
 				{
@@ -1800,304 +1777,6 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 	return OP_RUN_OK;
 }
 
-//----------------------------------------------------------------------------
-int mafOpImporterDicomOffis::BuildOutputVMEMeshFromDicom()
-	//----------------------------------------------------------------------------
-{
-	int step;
-
-	if(m_BuildStepValue == 0)
-		step = 1;
-	else if (m_BuildStepValue == 1)
-		step = m_BuildStepValue << 1;
-	else
-		step = m_BuildStepValue + 1;
-
-	int dim[3];
-	m_SliceTexture->GetInput()->GetDimensions(dim);
-	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
-
-	mafProgressBarHelper progressHelper(m_Listener);
-	progressHelper.SetTextMode(m_TestMode);
-	progressHelper.InitProgressBar("Building mesh: please wait...");
-		
-	mafNEW(m_Mesh);
-	vtkCellArray *Cells = vtkCellArray::New();
-	vtkUnstructuredGrid *grid = vtkUnstructuredGrid::New();
-	vtkPoints *points = vtkPoints::New();
-	vtkFloatArray *newScalars = vtkFloatArray::New();
-	int pointsCounter = 0;
-	int scalarCounter = 0;
-	vtkPolyData *poly1;
-
-	for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
-	{
-		poly1 = ExtractPolyData(0,sourceVolumeSliceId);
-		poly1->Update();
-
-		for(int n = 0; n < poly1->GetNumberOfPoints(); n++)
-		{
-			points->InsertPoint(pointsCounter, poly1->GetPoint(n));
-			pointsCounter++;
-		}
-		for(int x=0;x<poly1->GetPointData()->GetNumberOfTuples();x++)
-		{
-			newScalars->InsertValue(scalarCounter, poly1->GetPointData()->GetScalars()->GetTuple1(x));
-			scalarCounter++;
-		}
-	}
-
-	grid->SetPoints(points);
-	grid->GetPointData()->SetScalars(newScalars);
-	grid->GetPointData()->GetScalars()->SetName(m_SliceTexture->GetInput()->GetPointData()->GetScalars()->GetName());
-	grid->Update();
-
-	int counter= 0;
-	int total = dim[0]*dim[1];
-	int sourceVolumeSliceId = m_ZCropBounds[0]; // ac fixed compilation error: vs2005
-
-	for ( ; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
-	{ 
-		progressHelper.UpdateProgressBar(sourceVolumeSliceId * 100 / m_NumberOfSlices);
-		
-		if (sourceVolumeSliceId+1>=m_NumberOfSlices)// compilation error: vs2005: sourceVolumeSliceId defined in the for loop
-			break;
-		int lineCounter = 1;
-		for(int n = 0; n < poly1->GetNumberOfPoints()-dim[0]-1; n++)
-		{
-			if (n == lineCounter*dim[0] )
-			{
-				lineCounter++;
-			}
-			vtkHexahedron *hexahedron = vtkHexahedron::New();
-
-			if (n == (lineCounter-1)*dim[0]+(dim[0]-1) && n != 0) //on the edge
-			{
-				continue;
-			}
-			hexahedron->GetPointIds()->SetId(0,counter*(total)+n);
-			hexahedron->GetPointIds()->SetId(1,counter*(total)+n+1);
-			hexahedron->GetPointIds()->SetId(2,counter*(total)+n+dim[0]+1);
-			hexahedron->GetPointIds()->SetId(3,counter*(total)+n+dim[0]);
-			hexahedron->GetPointIds()->SetId(4,((counter+1)*(total)+n));
-			hexahedron->GetPointIds()->SetId(5,((counter+1)*(total)+n+1));
-			hexahedron->GetPointIds()->SetId(6,((counter+1)*(total)+n+dim[0]+1));
-			hexahedron->GetPointIds()->SetId(7,((counter+1)*(total)+n+dim[0]));
-
-			Cells->InsertNextCell(hexahedron->GetPointIds());
-			grid->Update();
-			hexahedron->Delete();
-		}
-		counter++;
-	}
-
-	grid->SetCells(VTK_HEXAHEDRON,Cells);  
-
-
-	int currImageId = GetSliceIDInSeries(0, sourceVolumeSliceId);
-	mafDicomSlice *element0;
-	element0 = (mafDicomSlice *)m_SelectedSeriesSlicesList->Item(currImageId)->GetData();
-	mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetDcmTriggerTime());
-	m_Mesh->SetData(grid, 0);
-	points->Delete();
-	grid->Delete();
-
-	m_Mesh->SetName(m_VolumeName);
-
-	m_Output = m_Mesh;
-	return OP_RUN_OK;
-}
-//----------------------------------------------------------------------------
-int mafOpImporterDicomOffis::BuildOutputVMEMeshFromDicomCineMRI()
-	//----------------------------------------------------------------------------
-{
-	int step;
-
-	if(m_BuildStepValue == 0)
-		step = 1;
-	else if (m_BuildStepValue == 1)
-		step = m_BuildStepValue << 1;
-	else
-		step = m_BuildStepValue + 1;
-
-	int dim[3];
-	m_SliceTexture->GetInput()->GetDimensions(dim);
-	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
-
-
-
-	mafProgressBarHelper progressHelper(m_Listener);
-	progressHelper.SetTextMode(m_TestMode);
-	progressHelper.InitProgressBar("Building mesh: please wait...");
-
-	mafNEW(m_Mesh);
-
-	int totalNumberOfImages = (m_ZCropBounds[1]+1)*m_NumberOfTimeFrames;
-	int progressCounter = 0;
-	for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
-	{
-		vtkCellArray *Cells = vtkCellArray::New();
-		vtkUnstructuredGrid *grid = vtkUnstructuredGrid::New();
-		vtkPoints *points = vtkPoints::New();
-		vtkFloatArray *newScalars = vtkFloatArray::New();
-		int pointsCounter = 0;
-		int scalarCounter = 0;
-		vtkPolyData *poly1;
-
-		for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
-		{
-			poly1 = ExtractPolyData(ts,sourceVolumeSliceId);
-			poly1->Update();
-
-			for(int n = 0; n < poly1->GetNumberOfPoints(); n++)
-			{
-				points->InsertPoint(pointsCounter, poly1->GetPoint(n));
-				pointsCounter++;
-			}
-			for(int x=0;x<poly1->GetPointData()->GetNumberOfTuples();x++)
-			{
-				newScalars->InsertValue(scalarCounter, poly1->GetPointData()->GetScalars()->GetTuple1(x));
-				scalarCounter++;
-			}
-		}
-
-		grid->SetPoints(points);
-		grid->GetPointData()->SetScalars(newScalars);
-		grid->GetPointData()->GetScalars()->SetName(m_SliceTexture->GetInput()->GetPointData()->GetScalars()->GetName());
-		grid->Update();
-
-		int counter= 0;
-		int total = dim[0]*dim[1];
-		int sourceVolumeSliceId = m_ZCropBounds[0];// ac: compilation error (vs2005)
-		for (; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
-		{ 
-			progressHelper.UpdateProgressBar(progressCounter * 100 / totalNumberOfImages);
-
-			if (sourceVolumeSliceId+1>=m_NumberOfSlices)// ac: compilation error (vs2005): sourceVolumeSliceId defined in the for loop
-				break;
-			int lineCounter = 1;
-			for(int n = 0; n < poly1->GetNumberOfPoints()-dim[0]-1; n++)
-			{
-				if (n == lineCounter*dim[0] )
-				{
-					lineCounter++;
-				}
-				vtkHexahedron *hexahedron = vtkHexahedron::New();
-
-				if (n == (lineCounter-1)*dim[0]+(dim[0]-1) && n != 0) //on the edge
-				{
-					continue;
-				}
-				hexahedron->GetPointIds()->SetId(0,counter*(total)+n);
-				hexahedron->GetPointIds()->SetId(1,counter*(total)+n+1);
-				hexahedron->GetPointIds()->SetId(2,counter*(total)+n+dim[0]+1);
-				hexahedron->GetPointIds()->SetId(3,counter*(total)+n+dim[0]);
-				hexahedron->GetPointIds()->SetId(4,((counter+1)*(total)+n));
-				hexahedron->GetPointIds()->SetId(5,((counter+1)*(total)+n+1));
-				hexahedron->GetPointIds()->SetId(6,((counter+1)*(total)+n+dim[0]+1));
-				hexahedron->GetPointIds()->SetId(7,((counter+1)*(total)+n+dim[0]));
-
-				Cells->InsertNextCell(hexahedron->GetPointIds());
-				grid->Update();
-				hexahedron->Delete();
-			}
-			counter++;
-			progressCounter++;
-		}
-		grid->SetCells(VTK_HEXAHEDRON,Cells);  
-
-
-		int currImageId = GetSliceIDInSeries(ts, sourceVolumeSliceId);
-		mafDicomSlice *element0;
-		element0 = (mafDicomSlice *)m_SelectedSeriesSlicesList->Item(currImageId)->GetData();
-		mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetDcmTriggerTime());
-		m_Mesh->SetData(grid, tsDouble);
-		points->Delete();
-		grid->Delete();
-	}
-
-	m_Mesh->SetName(m_VolumeName);
-
-	m_Output = m_Mesh;
-	return OP_RUN_OK;
-}
-
-//----------------------------------------------------------------------------
-vtkPolyData* mafOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
-	//----------------------------------------------------------------------------
-{
-	// show the current slice
-	int currImageId = GetSliceIDInSeries(ts, silceId);
-	if (currImageId != -1) 
-	{
-		// update v_texture ivar
-		GenerateSliceTexture(currImageId);
-	}
-
-	vtkMAFSmartPointer<vtkImageData> imageData;
-	imageData = m_SliceTexture->GetInput();
-
-	for(int x=0;x<imageData->GetPointData()->GetNumberOfTuples();x++)
-	{
-		double i = imageData->GetPointData()->GetScalars()->GetTuple1(x);
-	}
-
-	vtkMatrix4x4 *mat = vtkMatrix4x4::New();
-	mat->Identity();
-
-	if (m_ApplyRotation)
-	{
-		double orientation[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
-		m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetDcmImageOrientationPatient(orientation);
-
-		//transform direction cosines to be used to set vtkMatrix
-		/*
-		[ orientation[0] orientation[3] dst_nrm_dircos_x  0 ] 
-		[ orientation[1] orientation[4] dst_nrm_dircos_y  0 ]
-		[ orientation[2] orientation[5] dst_nrm_dircos_z  0 ]
-		[ 0                 0                 0           1 ]*/
-
-		double dst_nrm_dircos_x = orientation[1] * orientation[5] - orientation[2] * orientation[4]; 
-		double dst_nrm_dircos_y = orientation[2] * orientation[3] - orientation[0] * orientation[5];
-		double dst_nrm_dircos_z = orientation[0] * orientation[4] - orientation[1] * orientation[3]; 
-
-		vtkMatrix4x4 *mat = vtkMatrix4x4::New();
-		mat->Identity();
-
-		mat->SetElement(0,0,orientation[0]);
-		mat->SetElement(1,0,orientation[1]);
-		mat->SetElement(2,0,orientation[2]);
-		mat->SetElement(3,0,0);
-		mat->SetElement(0,1,orientation[3]);
-		mat->SetElement(1,1,orientation[4]);
-		mat->SetElement(2,1,orientation[5]);
-		mat->SetElement(3,1,0);
-		mat->SetElement(0,2,dst_nrm_dircos_x);
-		mat->SetElement(1,2,dst_nrm_dircos_y);
-		mat->SetElement(2,2,dst_nrm_dircos_z);
-		mat->SetElement(3,2,0);
-		mat->SetElement(3,3,1);
-	}
-
-	vtkTransform *trans = vtkTransform::New();
-	trans->SetMatrix(mat);
-
-	vtkImageDataGeometryFilter *surface = vtkImageDataGeometryFilter::New();
-	surface->SetInput(imageData);
-	surface->Update();
-
-	vtkTransformPolyDataFilter *TranslateFilter = vtkTransformPolyDataFilter::New();
-	TranslateFilter->SetTransform(trans);
-	TranslateFilter->SetInput(surface->GetOutput());
-
-	TranslateFilter->Update();
-
-	mat->Delete();
-	trans->Delete();
-	vtkDEL(surface);
-
-	return TranslateFilter->GetOutput();
-}
 
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateLoadPage()
@@ -2221,49 +1900,24 @@ void mafOpImporterDicomOffis::CreateBuildPage()
 		// Handles various types of Vme selected in the DICOM Advanced Settings:
 		// If the user launch an event by changing the radio button the right value is adjusted later on. (Brazzale, 27.07.2010)
 		bool type_volume = ((mafGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
-		bool type_mesh = ((mafGUIDicomSettings*)GetSetting())->EnableToRead("MESH");
 		bool type_image = ((mafGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
-		wxString typeArrayVolumeMeshImage[3] = {_("Volume"),_("Mesh"),_("Image")};    
-		wxString typeArrayImageVolume[2] = {_("Image"),_("Volume")};
-		wxString typeArrayMeshImage[2] = {_("Mesh"),_("Image")};
-		if ((type_volume && type_mesh && type_image) || (!type_volume && !type_mesh && !type_image))
+		wxString typeArrayVolumeImage[2] = { _("Volume"),_("Image")};
+		if ((type_volume && type_image) || (!type_volume && !type_image))
 		{
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 3, typeArrayVolumeMeshImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArrayVolumeImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
 		}
-		else if (type_volume && !type_mesh && !type_image)
+		else if (type_volume && !type_image)
 		{
 			m_OutputType = 0;
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 1, typeArrayVolumeMeshImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 1, typeArrayVolumeImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
 			m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
 		}
-		else if (!type_volume && type_mesh && !type_image)
+		else if (!type_volume &&  type_image)
 		{
 			m_OutputType = 1;
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 1, typeArrayMeshImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-			m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
-		} 
-		else if (!type_volume && !type_mesh && type_image)
-		{
-			m_OutputType = 2;
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 1, typeArrayImageVolume, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 1, typeArrayVolumeImage+1, 1, ""/*, wxRA_SPECIFY_ROWS*/);
 			m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
 		}
-		else if (type_volume && type_mesh && !type_image)
-		{
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArrayVolumeMeshImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-		}    
-		else if (type_volume && !type_mesh && type_image)
-		{
-			m_RadioButton=1;
-			m_OutputType = 2;
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 2, typeArrayImageVolume, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-		}             
-		else if (!type_volume && type_mesh && type_image)
-		{
-			m_OutputType = 1;
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 2, typeArrayMeshImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-		}
-
 	}
 
 	if(((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::TRADITIONAL)
@@ -5344,27 +4998,8 @@ int CompareImageNumber(const mafDicomSlice **arg1,const mafDicomSlice **arg2)
 
 void mafOpImporterDicomOffis::OnVmeTypeSelected()
 {
-	// Adjust radio button value to match the right case. (Brazzale, 27.07.2010)
-	bool type_volume = ((mafGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
-	bool type_mesh = ((mafGUIDicomSettings*)GetSetting())->EnableToRead("MESH");
-	bool type_image = ((mafGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
-
-	if(!((mafGUIDicomSettings*)GetSetting())->AutoVMEType())
-	{
-		if (type_volume && !type_mesh && type_image)
-		{
-			if (m_RadioButton==0)
-				m_OutputType = 2;
-			else
-				m_OutputType = 0;
-		}
-		else if (!type_volume && type_mesh && type_image)
-		{
-			m_OutputType = m_RadioButton+1;
-		}
-	}
-
-	// if vmw type is image connect the reference system page
+	m_OutputType = m_RadioButton;
+	
 	UpdateReferenceSystemPageConnection();
 }
 
