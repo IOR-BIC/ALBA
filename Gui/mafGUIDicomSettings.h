@@ -52,8 +52,7 @@ public:
 	{
 		ID_DICTONARY = MINID,
 		ID_TYPE_DICOM,
-    ID_VME_TYPE,
-		ID_STEP,
+    ID_STEP,
     ID_CONVERT_UNITS,
     ID_AUTO_VME_TYPE,
     ID_SETTING_VME_TYPE,
@@ -62,29 +61,6 @@ public:
 		ID_DCM_POSITION_PATIENT_CHOICE
 	};
   
-  /** Type VMEs*/
-	enum VME_TYPE
-	{
-		ID_VOLUME = 0,
-		ID_IMAGE,
-	};
-
-  /** Modality IDs*/
-	enum DICOM_MODALITY
-	{
-		ID_CT_MODALITY = 0,
-		ID_SC_MODALITY,
-		ID_MRI_MODALITY,
-		ID_XA_MODALITY,
-    ID_OT_MODALITY,
-    ID_CR_MODALITY,
-    ID_DX_MODALITY,
-		ID_RF_MODALITY,
-
-		//CMRI Is used for time varying MRI, this id is used in mafOpImporterDicomOffis but is not stored anywhere 
-		//If you need to add more modality add these before this one.
-		ID_CMRI_MODALITY,
-	};
 
   /** Step IDs*/
 	enum DICOM_STEP
@@ -129,26 +105,20 @@ public:
   /** Retrieve the build step. */
   int GetBuildStep(){return m_Step;};
   
-  /** Retrive auto VME type flag. */
+  /** Retrieve auto VME type flag. */
   int AutoVMEType(){return m_AutoVMEType;};
-  /** Retrive VME type. */
+  /** Retrieve VME type. */
   int GetVMEType(){return m_OutputType;};
-
-
-	/** Return if a particular type of Dicom or Vme is Enabled to be read */
-	bool EnableToRead(char* type);
-
-  /** Enable/disable a particular type of Dicom or Vme to be read */
-  void SetEnableToRead(char *type,bool enable);
-
-  /** Helper function to store and retrieve the last dicom dir opened */
+	  
+  /** Helper function to store and retrieve the last Dicom dir opened */
+	/** Helper function to store and retrieve the last dicom dir opened */
   void SetLastDicomDir(wxString lastDicomDir);;
   wxString GetLastDicomDir() {return m_LastDicomDir;};
 
   /** Return the type of output name format */
   int GetOutputNameFormat(){return m_OutputNameType;};
 
-  /** Return if an element of custom name chack list is checked */
+  /** Return if an element of custom name check list is checked */
   int GetEnabledCustomName(int type);
 
   /** Return the DCM_ImagePositionPatient choice */
@@ -166,13 +136,10 @@ protected:
 
 	// mafString m_Dictionary;
 	mafGUICheckListBox *m_DicomModalityListBox;
-  mafGUICheckListBox *m_DicomVmeTypeListBox;
   mafGUICheckListBox *m_NameCompositorList;
 
   int m_CheckNameCompositor[5];
-	int m_CheckOnOff[8];
-  int m_CheckOnOffVmeType[2];
-
+	
   int m_OutputType;
 
 	int m_Step;

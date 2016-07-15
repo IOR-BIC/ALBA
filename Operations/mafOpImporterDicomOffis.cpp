@@ -162,14 +162,7 @@ mafCxxTypeMacro(mafOpImporterDicomOffis);
 // constants :
 //----------------------------------------------------------------------------
 #define FIRST_SELECTION 0
-#define START_PROGRESS_BAR 0
 
-enum VOLUME_SIDE
-{
-	NON_VALID_SIDE = 0,
-	LEFT_SIDE,
-	RIGHT_SIDE,
-};
 enum DICOM_IMPORTER_MODALITY
 {
 	CROP_SELECTED,
@@ -178,11 +171,15 @@ enum DICOM_IMPORTER_MODALITY
 	GIZMO_RESIZING,
 	GIZMO_DONE
 };
-
 enum
 {
 	TYPE_VOLUME = 0,
 	TYPE_IMAGE = 1,
+};
+enum
+{
+	STANDARD_MODALITY,
+	CINEMATIC_MODALITY
 };
 
 
@@ -190,7 +187,6 @@ enum
 int CompareX(const mafDicomSlice **arg1,const mafDicomSlice **arg2);
 int CompareY(const mafDicomSlice **arg1,const mafDicomSlice **arg2);
 int CompareZ(const mafDicomSlice **arg1,const mafDicomSlice **arg2);
-int CompareTriggerTime(const mafDicomSlice **arg1,const mafDicomSlice **arg2);
 int CompareImageNumber(const mafDicomSlice **arg1,const mafDicomSlice **arg2);
 
 WX_DEFINE_LIST(medDicomSeriesSliceList);
@@ -253,11 +249,10 @@ mafOp(label)
 	m_SelectedSeriesSlicesList = NULL;
 
 	m_DicomDirectoryABSFileName = "";
-	m_DicomReaderModality = -1;
+	m_DicomReaderModality = STANDARD_MODALITY;
 
 	m_BuildStepValue = 0;
-	m_OutputType = 0;
-	m_RadioButton = 0;
+	m_OutputType = TYPE_VOLUME;
 
 	m_SliceScannerBuildPage = NULL;
 	m_SliceScannerReferenceSystemPage = NULL;
@@ -400,7 +395,7 @@ int mafOpImporterDicomOffis::RunWizard()
 					}
 				}
 				
-				if(m_DicomReaderModality != mafGUIDicomSettings::ID_CMRI_MODALITY)
+				if(m_DicomReaderModality == STANDARD_MODALITY)
 					result = BuildOutputVMEGrayVolumeFromDicom();
 				else
 					result = BuildOutputVMEGrayVolumeFromDicomCineMRI();
@@ -413,20 +408,12 @@ int mafOpImporterDicomOffis::RunWizard()
 				{
 					if(!this->m_TestMode)
 					{
-						//int answer = wxMessageBox( "Dicom dataset contains rotated images - Apply rotation?", "Warning", wxYES_NO, NULL);
-						//if (answer == wxNO)
-						//{
-						//	m_ApplyRotation = false;
-						//}
-						//else if (answer == wxYES)
-						//{
 							m_ApplyRotation = true;
-						//}
 					}
 				}
 
 
-				if(m_DicomReaderModality != mafGUIDicomSettings::ID_CMRI_MODALITY)
+				if(m_DicomReaderModality == STANDARD_MODALITY)
 					result = BuildOutputVMEImagesFromDicom();
 				else
 					result = BuildOutputVMEImagesFromDicomCineMRI();
@@ -1654,27 +1641,8 @@ void mafOpImporterDicomOffis::CreateBuildPage()
 		m_OutputType = ((mafGUIDicomSettings*)GetSetting())->GetVMEType(); 
 	else
 	{
-		// Handles various types of Vme selected in the DICOM Advanced Settings:
-		// If the user launch an event by changing the radio button the right value is adjusted later on. (Brazzale, 27.07.2010)
-		bool type_volume = ((mafGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
-		bool type_image = ((mafGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
 		wxString typeArrayVolumeImage[2] = { _("Volume"),_("Image")};
-		if ((type_volume && type_image) || (!type_volume && !type_image))
-		{
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArrayVolumeImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-		}
-		else if (type_volume && !type_image)
-		{
-			m_OutputType = 0;
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 1, typeArrayVolumeImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-			m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
-		}
-		else if (!type_volume &&  type_image)
-		{
-			m_OutputType = 1;
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 1, typeArrayVolumeImage+1, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-			m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
-		}
+		m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArrayVolumeImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
 	}
 
 	if(((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::TRADITIONAL)
@@ -1943,13 +1911,7 @@ void mafOpImporterDicomOffis::ReadDicom()
 
 	delete[] sliceToSkip;
 
-	// REFACTOR TODO:
-	// this is needed in order for regression test data:
-	// \Medical_Parabuild\Testing\unittestData\DicomUnpacker\TestDicomUnpacker\
-	// to work
-	// but it is braking CineMRI p09 p20 and SE10 CineMRI reading so i set it to
-	// enable for modality other than cine MRI
-	if (m_DicomReaderModality != mafGUIDicomSettings::ID_CMRI_MODALITY)
+	if (m_DicomReaderModality == STANDARD_MODALITY)
 	{
 		switch (m_SortAxes)
 		{
@@ -1997,22 +1959,19 @@ void mafOpImporterDicomOffis::ReadDicom()
 	}
 
 
-	m_NumberOfTimeFrames = ((mafDicomSlice *)m_SelectedSeriesSlicesList->\
-		Item(0)->GetData())->GetDcmCardiacNumberOfImages();
+	m_NumberOfTimeFrames = ((mafDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData())->GetDcmCardiacNumberOfImages();
 
-	if(m_DicomReaderModality == mafGUIDicomSettings::ID_CMRI_MODALITY) //If cMRI
-		m_NumberOfSlices = m_SelectedSeriesSlicesList->GetCount() / m_NumberOfTimeFrames;
-	else
-		m_NumberOfSlices = m_SelectedSeriesSlicesList->GetCount();
-
+	m_NumberOfSlices = m_SelectedSeriesSlicesList->GetCount();
+	if(m_DicomReaderModality == CINEMATIC_MODALITY) //If cMRI
+		m_NumberOfSlices /= m_NumberOfTimeFrames;
+	
 	//Set bounds of ZCrop slider widget
 	m_ZCropBounds[1] = m_NumberOfSlices-1;
 	if (!this->m_TestMode)
 	{
 		m_CropPage->SetZCropBounds(0, m_ZCropBounds[1]);
 	}
-
-
+	
 	// reset the current slice number to view the first slice
 	m_CurrentSlice = 0;
 	m_CurrentTime = 0;
@@ -2153,17 +2112,6 @@ void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 		case ID_VME_TYPE:
 		{
 			OnVmeTypeSelected();
-			if (m_Wizard->GetCurrentPage() == m_BuildPage && m_OutputType == mafGUIDicomSettings::ID_IMAGE)//Check the type to determine the next step
-			{
-				m_Wizard->SetButtonString("Reference >");
-				m_ReferenceSystemPage->UpdateActor();
-				m_Wizard->Update();
-			}
-			else
-			{
-				m_Wizard->SetButtonString("Finish");
-				m_Wizard->Update();
-			}
 		}
 		break;
 		case ID_RS_SELECT:
@@ -2976,11 +2924,9 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 	double dcmImageOrientationPatient[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
 	double dcmImagePositionPatient[3] = {0.0,0.0,0.0};
 	double dcmImagePositionPatient_old[3] = {0.0,0.0,0.0};
-	bool enableToRead = true; //true for test mode
 	bool errorOccurred = false;
 	mafString lastFileName = "";
 
-	m_DicomReaderModality = -1;
 	DcmFileFormat dicomImg;   
 
 	
@@ -3440,16 +3386,12 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 			bool seriesExist = false;
 			int seriesCounter = 0;
 
-			if (!this->m_TestMode)
-			{
-				enableToRead = ((mafGUIDicomSettings*)GetSetting())->EnableToRead((char*)dcmModality);
-			}
-
+			
 			//------------------------
 			// (Start) Not MR handling
 			// REFACTORING TODO: Refactor toward strategy when regression will be available
 			//------------------------
-			if (enableToRead && strcmp((char *)dcmModality, "MR" ) != 0)
+			if (strcmp((char *)dcmModality, "MR" ) != 0)
 			{
 				wxString stringMode = dcmModality;
 				if(stringMode.Find("SCOUT") != -1)
@@ -3483,8 +3425,7 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					// the study is not present into the listbox, so need to create new
 					// list of files related to the new studyID
 					medDicomSeriesSliceList *dicomSeries = new medDicomSeriesSliceList;
-					m_DicomReaderModality=-1;
-
+					
 					if(useDefaultPos)
 					{
 						dcmImagePositionPatient[0] = 0.0;
@@ -3617,7 +3558,7 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 			// (Start) Cine (MR) handling
 			// REFACTORING TODO: Refactor toward strategy when regression will be available
 			//------------------------
-			else if ( enableToRead && strcmp( (char *)dcmModality, "MR" ) == 0)
+			else if (strcmp( (char *)dcmModality, "MR" ) == 0)
 			{
 				// MR and CineMRHandling
 				seriesExist = false;
@@ -3650,8 +3591,6 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					// list of files related to the new studyID
 					medDicomSeriesSliceList *dicomSeries = new medDicomSeriesSliceList;
 
-					m_DicomReaderModality=-1;
-
 					if(useDefaultPos)
 					{
 						dcmImagePositionPatient[0] = 0.0;
@@ -3672,39 +3611,6 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages,dcmCardiacNumberOfImages);
 					dicomDataset->findAndGetFloat64(DCM_TriggerTime,dcmTriggerTime);
 					lastZPos = dcmImagePositionPatient[2];
-
-					if(dcmCardiacNumberOfImages>1)
-					{
-						if (m_DicomReaderModality==-1)
-						{  
-							m_DicomReaderModality=mafGUIDicomSettings::ID_CMRI_MODALITY;              
-						}
-						else if(m_DicomReaderModality!=mafGUIDicomSettings::ID_CMRI_MODALITY)
-						{
-							if(!this->m_TestMode)
-							{
-								//cppDEL(busyInfo);
-								wxString msg = _("cMRI damaged !");
-								wxMessageBox(msg,"Confirm", wxOK , NULL);								
-							}
-							return false;
-						}
-					}
-					else
-					{
-						if (m_DicomReaderModality==-1)
-							m_DicomReaderModality=mafGUIDicomSettings::ID_MRI_MODALITY;
-						else if(m_DicomReaderModality!=mafGUIDicomSettings::ID_MRI_MODALITY)
-						{
-							if(!this->m_TestMode)
-							{
-								//cppDEL(busyInfo);
-								wxString msg = _("cMRI damaged !");
-								wxMessageBox(msg,"Confirm", wxOK , NULL);
-							}
-							return false;                
-						}
-					}
 
 					const char *date,*description,*patientName,*birthdate, *photometricInterpretation;
 					FindAndGetDicomStrings(dicomDataset, birthdate, date, description, patientName, photometricInterpretation);
@@ -3902,7 +3808,7 @@ void mafOpImporterDicomOffis::ResetStructure()
 	m_CurrentSlice		= 0;
 	m_NumberOfTimeFrames = 0;
 	m_CurrentTime				= 0; 
-	m_DicomReaderModality			= -1;
+	m_DicomReaderModality	= STANDARD_MODALITY;
 
 	m_CropFlag				= false;
 
@@ -3986,19 +3892,17 @@ void mafOpImporterDicomOffis::CreateSliders()
 int mafOpImporterDicomOffis::GetSliceIDInSeries(int timeId, int heigthId)
 	//----------------------------------------------------------------------------
 {
-	if (m_DicomReaderModality != mafGUIDicomSettings::ID_CMRI_MODALITY)
+	if (m_DicomReaderModality == STANDARD_MODALITY)
 		return heigthId;
 
 	if (this->m_TestMode)
 	{
 		m_SelectedSeriesID = m_SeriesIDToSlicesListMap.begin()->first;
 	}
-	m_SelectedSeriesSlicesList = m_SeriesIDToSlicesListMap\
-		[m_SelectedSeriesID];
+	m_SelectedSeriesSlicesList = m_SeriesIDToSlicesListMap[m_SelectedSeriesID];
 
 	mafDicomSlice *firstDicomListElement;
-	firstDicomListElement = (mafDicomSlice *)m_SelectedSeriesSlicesList->\
-		Item(0)->GetData();
+	firstDicomListElement = (mafDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData();
 	int timeFrames =  firstDicomListElement->GetDcmCardiacNumberOfImages();
 
 	int dicomFilesNumber = m_SelectedSeriesSlicesList->GetCount();
@@ -4338,21 +4242,6 @@ int CompareZ(const mafDicomSlice **arg1,const mafDicomSlice **arg2)
 	else
 		return 0;
 }
-//----------------------------------------------------------------------------
-int CompareTriggerTime(const mafDicomSlice **arg1,const mafDicomSlice **arg2)
-	//----------------------------------------------------------------------------
-{
-	// compare the trigger time of both arguments
-	// return:
-	float t1 = (*(mafDicomSlice **)arg1)->GetDcmTriggerTime();
-	float t2 = (*(mafDicomSlice **)arg2)->GetDcmTriggerTime();;
-	if (t1 > t2)
-		return 1;
-	if (t1 < t2)
-		return -1;
-	else
-		return 0;
-}
 
 //----------------------------------------------------------------------------
 int CompareImageNumber(const mafDicomSlice **arg1,const mafDicomSlice **arg2)
@@ -4372,8 +4261,6 @@ int CompareImageNumber(const mafDicomSlice **arg1,const mafDicomSlice **arg2)
 
 void mafOpImporterDicomOffis::OnVmeTypeSelected()
 {
-	m_OutputType = m_RadioButton;
-	
 	UpdateReferenceSystemPageConnection();
 }
 
@@ -4471,35 +4358,16 @@ void mafOpImporterDicomOffis::OnSeriesSelect()
 		if ( item == -1 )
 			break;
 	}
-	////---------------------------------------------------------------
-	//mafString *st = (mafString *)m_StudyListctrl->GetItemData(myitem);
-
 	m_SelectedSeriesID.at(0) = st->GetCStr();
 
-	//  string selected from the listbox
-	//	wxString seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
-
-	//  string selected from the listctrl
 	wxString seriesName = m_SeriesListctrl->GetItemText(myitem);
 
-	mafString tmp;
-
-
 	if(((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::TRADITIONAL)
-	{
-		tmp = seriesName.SubString(0, seriesName.find_last_of("x")-1);
-	}
-	//else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::DESCRIPTION_DATE)
+		m_SelectedSeriesID.at(2) = seriesName.SubString(0, seriesName.find_last_of("x")-1);
 	else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::DESCRIPTION_NUMSLICES)
-	{
-		//tmp = seriesName;
-		tmp = seriesName.SubString(0, seriesName.find_last_of("x")-1);
-	}
+		m_SelectedSeriesID.at(2) = seriesName.SubString(0, seriesName.find_last_of("x")-1);
 	else
-	{
-		tmp = seriesName.SubString(0, seriesName.find_first_of("x")-1);
-	}
-	m_SelectedSeriesID.at(2) = tmp;
+		m_SelectedSeriesID.at(2) = seriesName.SubString(0, seriesName.find_first_of("x")-1);
 
 	std::map<std::vector<mafString>,medDicomSeriesSliceList*>::iterator it;
 	for ( it=m_SeriesIDToSlicesListMap.begin() ; it != m_SeriesIDToSlicesListMap.end(); it++ )
@@ -4525,10 +4393,10 @@ void mafOpImporterDicomOffis::OnSeriesSelect()
 		element0 = (mafDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData();
 
 		int numberOfImages =  element0->GetDcmCardiacNumberOfImages();
-		m_DicomReaderModality=-1;
+		m_DicomReaderModality=STANDARD_MODALITY;
 		if(numberOfImages>1)
 		{
-			m_DicomReaderModality=mafGUIDicomSettings::ID_CMRI_MODALITY;
+			m_DicomReaderModality=CINEMATIC_MODALITY;
 			EnableTimeSlider(true);
 		}
 	}
@@ -4581,12 +4449,11 @@ void mafOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 				m_BuildPage->AddGuiLowerUnderLeft(m_BuildGuiCenter);
 				m_BuildPage->Update();
 				GuiUpdate();
-				OnVmeTypeSelected();
 			}
 			else
-				m_OutputType = 2;
+				m_OutputType = TYPE_IMAGE;
 
-			if (/*m_Wizard->GetCurrentPage()==m_BuildPage &&*/ m_OutputType == mafGUIDicomSettings::ID_IMAGE)//Check the type to determine the next step
+			if (/*m_Wizard->GetCurrentPage()==m_BuildPage &&*/ m_OutputType == 1)//Check the type to determine the next step
 			{
 				m_Wizard->SetButtonString("Reference >");
 				m_ReferenceSystemPage->UpdateActor();
@@ -5059,38 +4926,13 @@ void mafOpImporterDicomOffis::OnScanTime()
 bool mafOpImporterDicomOffis::IsRotated( double dcmImageOrientationPatient[6] )
 {
 	// check if the dataset is rotated: => different from 1. 0. 0. 0. 1. 0.
-	/* FROM David Clunie's note
-	2.2.2 Orientation of DICOM images
-	Another question that is frequently asked in comp.protocols.dicom is how to determine which side of an image is which 
-	(e.g. left, right) and so on. The short answer is that for projection radiographs this is specified explicitly using 
-	the Patient Orientation attribute, and for cross-sectional images it needs to be derived from the Image Orientation (Patient)
-	direction cosines. In the standard these are explained as follows:
-
-	"C.7.6.1.1.1 Patient Orientation. The Patient Orientation (0020,0020) relative to the image plane shall be specified by two values 
-	that designate the anatomical direction of the positive row axis (left to right) and the positive column axis (top to bottom).
-	The first entry is the direction of the rows, given by the direction of the last pixel in the first row from the first pixel
-	in that row. The second entry is the direction of the columns, given by the direction of the last pixel in the first column from 
-	the first pixel in that column. Anatomical direction shall be designated by the capital letters: A (anterior), P (posterior),
-	R (right), L (left), H (head), F (foot). Each value of the orientation attribute shall contain at least one of these characters.
-	If refinements in the orientation descriptions are to be specified, then they shall be designated by one or two additional letters
-	in each value. Within each value, the letters shall be ordered with the principal orientation designated in the first character." 
-	"C.7.6.2.1.1 Image Position And Image Orientation. The Image Position (0020,0032) specifies the x, y, and z coordinates of the upper 
-	left hand corner of the image; it is the center of the first voxel transmitted. Image Orientation (0020,0037) specifies the direction 
-	cosines of the first row and the first column with respect to the patient. These Attributes shall be provide as a pair. Row value for 
-	the x, y, and z axes respectively followed by the Column value for the x, y, and z axes respectively. The direction of the axes is 
-	defined fully by the patient's orientation. The x-axis is increasing to the left hand side of the patient. The y-axis is increasing 
-	to the posterior side of the patient. The z-axis is increasing toward the head of the patient. The patient based coordinate system 
-	is a right handed system, i.e. the vector cross product of a unit vector along the positive x-axis and a unit vector along the 
-	positive y-axis is equal to a unit vector along the positive z-axis." */
-
-	return !( \
-		fabs(dcmImageOrientationPatient[0] - 1.0) < 0.0001 && \
-		fabs(dcmImageOrientationPatient[4] - dcmImageOrientationPatient[0]) < 0.0001 &&\
-		fabs(dcmImageOrientationPatient[1] - 0.0) < 0.0001 &&\
-		fabs(dcmImageOrientationPatient[1] - dcmImageOrientationPatient[2]) < 0.0001 &&\
-		fabs(dcmImageOrientationPatient[1] - dcmImageOrientationPatient[3]) < 0.0001 &&\
-		fabs(dcmImageOrientationPatient[1] - dcmImageOrientationPatient[5]) < 0.0001 \
-		);
+	
+	return !( fabs(dcmImageOrientationPatient[0] - 1.0) < 0.0001 && 
+						fabs(dcmImageOrientationPatient[1])				< 0.0001 &&
+						fabs(dcmImageOrientationPatient[2])				< 0.0001 &&
+						fabs(dcmImageOrientationPatient[3])				< 0.0001 &&
+						fabs(dcmImageOrientationPatient[4] - 1.0) < 0.0001 &&
+						fabs(dcmImageOrientationPatient[5])				< 0.0001 );
 }
 
 void mafDicomSlice::SetVTKImageData( vtkImageData *data )
@@ -5141,7 +4983,7 @@ void mafDicomSlice::GetOrientation( vtkMatrix4x4 * matrix )
 
 void mafOpImporterDicomOffis::UpdateReferenceSystemPageConnection()
 {
-	if(m_OutputType == mafGUIDicomSettings::ID_IMAGE)
+	if(m_OutputType == TYPE_IMAGE)
 	{
 		m_BuildPage->SetNextPage(m_ReferenceSystemPage);
 	}

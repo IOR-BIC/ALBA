@@ -299,7 +299,6 @@ protected:
 
 	mafGUI  *m_LoadGuiUnderCenter;
 
-	int       m_RadioButton;
 	int       m_OutputType;
 	mafString	m_DicomDirectoryABSFileName;
 	mafString m_PatientName;
