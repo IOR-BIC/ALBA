@@ -113,7 +113,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "dcmtk/ofstd/ofstdinc.h"
 #include "mafDicomCardiacMRIHelper.h"
 #include "vnl/vnl_vector.h"
-#include "time.h"
 #include "vtkImageReslice.h"
 #include "mafProgressBarHelper.h"
 
@@ -197,12 +196,8 @@ mafOp(label)
 	m_Wizard = NULL;
 	m_LoadPage = NULL;
 	m_CropPage = NULL;
-	m_BuildPage = NULL;
-	m_ReferenceSystemPage = NULL;
 	m_ImagesGroup = NULL;
 
-	m_BuildGuiLeft = NULL;
-	m_ReferenceSystemGuiLeft = NULL;
 	m_CropGuiLeft = NULL;
 	m_LoadGuiLeft = NULL;
 	m_LoadGuiUnderLeft = NULL;
@@ -211,8 +206,6 @@ mafOp(label)
 
 	m_TimeScannerLoadPage = NULL;
 	m_TimeScannerCropPage = NULL;
-	m_TimeScannerBuildPage = NULL;
-	m_TimeScannerReferenceSystemPage = NULL;
 
 	m_DICOMDirectoryReader = NULL;
 	m_SliceLookupTable = NULL;
@@ -236,11 +229,8 @@ mafOp(label)
 	m_DicomDirectoryABSFileName = "";
 	m_DicomReaderModality = STANDARD_MODALITY;
 
-	m_BuildStepValue = 0;
 	m_OutputType = TYPE_VOLUME;
 
-	m_SliceScannerBuildPage = NULL;
-	m_SliceScannerReferenceSystemPage = NULL;
 	m_SliceScannerCropPage = NULL;
 	m_SliceScannerLoadPage = NULL;
 
@@ -248,11 +238,9 @@ mafOp(label)
 
 	m_BoxCorrect = false;
 	m_CropFlag = false;
-	m_CropExecuted = false;
 
 	m_ConstantRotation = true;
 	m_SideToBeDragged = 0; 
-	m_mem_is_almost_full = false;
 
 	m_GizmoStatus = GIZMO_NOT_EXIST;
 
@@ -270,13 +258,7 @@ mafOp(label)
 	m_CurrentSlice = VTK_INT_MAX;
 
 	m_ApplyRotation = false;
-
-	m_SelectedReferenceSystem = mafDicomSlice::ID_RS_XY;
-	m_GlobalReferenceSystem = mafDicomSlice::ID_RS_XY;
-	m_SwapReferenceSystem = FALSE;
-	m_SwapAllReferenceSystem = FALSE;
-	m_ApplyToAllReferenceSystem = FALSE;
-
+		
 	m_TotalDicomRange[0]=0;
 	m_TotalDicomRange[1]=1;
 
@@ -307,8 +289,6 @@ mafOp *mafOpImporterDicomOffis::Copy()
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::OpRun()
 {
-	m_BuildStepValue = ((mafGUIDicomSettings*)GetSetting())->GetBuildStep();
-
 	CreateGui();
 	CreateSliceVTKPipeline();
 
@@ -317,21 +297,14 @@ void mafOpImporterDicomOffis::OpRun()
 
 	CreateLoadPage();
 	CreateCropPage();
-	CreateBuildPage();
-	CreateReferenceSystemPage();
 	m_Wizard->SetButtonString("Crop >");
 	EnableSliceSlider(false);
 	EnableTimeSlider(false);
 
 	//Create a chain between pages
 	m_LoadPage->SetNextPage(m_CropPage);
-	m_CropPage->SetNextPage(m_BuildPage);
-	UpdateReferenceSystemPageConnection();
 	m_Wizard->SetFirstPage(m_LoadPage);
 
-	bool result = false;
-	bool firstTime = true;
-	
 	wxString lastDicomDir = ((mafGUIDicomSettings*)GetSetting())->GetLastDicomDir();
 		
 	if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
@@ -366,6 +339,17 @@ int mafOpImporterDicomOffis::RunWizard()
 	
 	if(m_Wizard->Run())
 	{
+		Crop();
+
+		if (m_ZCropBounds[0] > m_CurrentSlice || m_CurrentSlice > m_ZCropBounds[1])
+		{
+			m_CurrentSlice = m_ZCropBounds[0];
+		}
+		//if only 1 slice, disable radio widget and create a VMEImage
+		if (m_ZCropBounds[1] + 1 - m_ZCropBounds[0] == 1)
+			m_OutputType = TYPE_IMAGE;
+
+
 		int result;
 		switch (m_OutputType)
 		{
@@ -385,10 +369,6 @@ int mafOpImporterDicomOffis::RunWizard()
 					result = BuildOutputVMEImagesFromDicom();
 				else
 					result = BuildOutputVMEImagesFromDicomCineMRI();
-
-				// if output is an image
-				ApplyReferenceSystem();
-
 				break;
 			}
 		}
@@ -454,16 +434,6 @@ void mafOpImporterDicomOffis::Destroy()
 		m_CropPage->GetRWI()->m_RenFront->RemoveActor(m_CropActor);  
 	}
 
-	if(m_BuildPage)
-	{
-		m_BuildPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
-	}
-
-	if(m_ReferenceSystemPage)
-	{
-		m_ReferenceSystemPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
-	}
-
 	vtkDEL(m_SliceTexture);
 	vtkDEL(m_DICOMDirectoryReader);
 	vtkDEL(m_SliceLookupTable);
@@ -486,15 +456,8 @@ void mafOpImporterDicomOffis::Destroy()
 		cppDEL(m_LoadGuiUnderCenter);
 		cppDEL(m_CropGuiLeft);
 		cppDEL(m_CropGuiCenter);
-		cppDEL(m_BuildGuiLeft); 
-		cppDEL(m_BuildGuiUnderLeft);
-		cppDEL(m_BuildGuiCenter);
-		cppDEL(m_ReferenceSystemGuiLeft); 
-		cppDEL(m_ReferenceSystemGuiUnderLeft);
 		cppDEL(m_LoadPage);
 		cppDEL(m_CropPage);
-		cppDEL(m_BuildPage);
-		cppDEL(m_ReferenceSystemPage);
 		cppDEL(m_Wizard);
 	}
 }
@@ -503,14 +466,7 @@ void mafOpImporterDicomOffis::Destroy()
 int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicom()
 	//----------------------------------------------------------------------------
 {
-	int step;
-
-	if(m_BuildStepValue == 0)
-		step = 1;
-	else if (m_BuildStepValue == 1)
-		step = m_BuildStepValue << 1;
-	else
-		step = m_BuildStepValue + 1;
+	int step= ((mafGUIDicomSettings*)GetSetting())->GetBuildStep() + 1;
 
 	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
 	int n_slices = cropInterval / step;
@@ -598,14 +554,7 @@ int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicom()
 int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 	//----------------------------------------------------------------------------
 {
-	int step;
-
-	if(m_BuildStepValue == 0)
-		step = 1;
-	else if (m_BuildStepValue == 1)
-		step = m_BuildStepValue << 1;
-	else
-		step = m_BuildStepValue + 1;
+	int step = ((mafGUIDicomSettings*)GetSetting())->GetBuildStep() + 1;
 
 	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
 	int n_slices = cropInterval / step;
@@ -809,13 +758,7 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	// x dimension
 	dim_img_check[0] = atoi(bufx);
 
-	int step;
-	if(m_BuildStepValue == 0)
-		step = 1;
-	else if (m_BuildStepValue == 1)
-		step = m_BuildStepValue << 1;
-	else
-		step = m_BuildStepValue + 1;
+	int step = ((mafGUIDicomSettings*)GetSetting())->GetBuildStep() + 1;
 
 	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
 
@@ -1032,10 +975,7 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	}
 	m_Volume->SetDataByDetaching(rg_out,0);
 
-	//if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true && m_ApplyRotation)
-	//{
-
-		double orientation[6] = {1.0,0.0,0.0,0.0,1.0,0.0};
+		double orientation[6];
 		m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData()->GetDcmImageOrientationPatient(orientation);
 
 		//transform direction cosines to be used to set vtkMatrix
@@ -1100,13 +1040,7 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 	//----------------------------------------------------------------------------
 {
-	int step;
-	if(m_BuildStepValue == 0)
-		step = 1;
-	else if (m_BuildStepValue == 1)
-		step = m_BuildStepValue << 1;
-	else
-		step = m_BuildStepValue + 1;
+	int step = ((mafGUIDicomSettings*)GetSetting())->GetBuildStep() + 1;
 
 	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
 	int n_slices = cropInterval / step;
@@ -1495,18 +1429,16 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateLoadPage()
-	//----------------------------------------------------------------------------
 {
 	m_LoadPage = new mafGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
 	m_LoadGuiLeft = new mafGUI(this);
 	m_LoadGuiUnderLeft = new mafGUI(this);
 	m_LoadGuiUnderCenter = new mafGUI(this);
 	m_LoadGuiCenter = new mafGUI(this);
-	m_LoadGuiCenter->Bool(ID_SHOW_TEXT, "Show position info", &m_ShowOrientationPosition, 1, _("Shows position and orientation"));
 
-	m_StudyListbox  = m_LoadGuiUnderLeft->ListBox(ID_STUDY_SELECT,_("study"),80,"",wxLB_HSCROLL,190);
+	m_StudyListbox  = m_LoadGuiUnderLeft->ListBox(ID_STUDY_SELECT,_("Study"),80,"",wxLB_HSCROLL,190);
 
-	m_SeriesListctrl = m_LoadGuiUnderCenter->ListCtrl(ID_SERIES_SELECT,_("series"),80,"",wxLC_SMALL_ICON|wxLC_SINGLE_SEL,190);
+	m_SeriesListctrl = m_LoadGuiUnderCenter->ListCtrl(ID_SERIES_SELECT,_("Series"),80,"",wxLC_SMALL_ICON|wxLC_SINGLE_SEL,190);
 
 	m_LoadGuiLeft->FitGui();
 	m_LoadGuiUnderLeft->FitGui();
@@ -1536,7 +1468,6 @@ int wxCALLBACK _myCompareFunction(long item1, long item2, long WXUNUSED(sortData
 
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateCropPage()
-	//----------------------------------------------------------------------------
 {
 	m_CropPage = new mafGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,true);
 	m_CropPage->SetListener(this);
@@ -1552,84 +1483,19 @@ void mafOpImporterDicomOffis::CreateCropPage()
 	m_CropPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
 	m_CropPage->GetRWI()->m_RenFront->AddActor(m_CropActor);
 }
-//----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::CreateBuildPage()
-	//----------------------------------------------------------------------------
-{
-	m_BuildPage = new mafGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
-	m_BuildGuiLeft = new mafGUI(this);
-	m_BuildGuiUnderLeft = new mafGUI(this);
-	m_BuildGuiCenter = new mafGUI(this);
 
-	m_BuildGuiCenter->Divider();
-	if(((mafGUIDicomSettings*)GetSetting())->AutoVMEType())
-		m_OutputType = ((mafGUIDicomSettings*)GetSetting())->GetVMEType(); 
-	else
-	{
-		wxString typeArrayVolumeImage[2] = { _("Volume"),_("Image")};
-		m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArrayVolumeImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-	}
-
-	m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VMEName);
-
-	m_BuildGuiLeft->FitGui();
-	m_BuildGuiUnderLeft->FitGui();
-	m_BuildPage->AddGuiLowerLeft(m_BuildGuiLeft);
-	m_BuildPage->AddGuiLowerCenter(m_BuildGuiUnderLeft);
-
-	m_BuildPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
-	m_BuildPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
-}
-//----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::CreateReferenceSystemPage()
-	//----------------------------------------------------------------------------
-{
-	m_ReferenceSystemPage = new mafGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
-	m_ReferenceSystemGuiLeft = new mafGUI(this);
-	m_ReferenceSystemGuiUnderLeft = new mafGUI(this);
-	//m_ReferenceSystemGuiCenter = new mafGUI(this);
-
-	wxString choices[3];
-	choices[0] = _T("XY");
-	choices[1] = _T("XZ");
-	choices[2] = _T("YZ");
-	//m_ReferenceSystemGuiCenter->Radio(ID_RS_SELECT,"Ref.Sys.",&m_SelectedReferenceSystem,3,choices,1,"Select reference system\nfor image position and orientation.");
-	//m_ReferenceSystemGuiCenter->Divider();
-	m_ReferenceSystemGuiUnderLeft->Radio(ID_RS_SELECT,"ref.sys.",&m_SelectedReferenceSystem,3,choices,1,"Select reference system for image position and orientation.");
-	m_ReferenceSystemGuiUnderLeft->Bool(ID_RS_SWAP,"swap",&m_SwapReferenceSystem,1,"specify if the reference system is swapped or not (e.g. xy to yx)");
-	m_ReferenceSystemGuiUnderLeft->Bool(ID_RS_SWAPALL,"swap all",&m_SwapAllReferenceSystem,1,"specify if the reference system is swapped or not (e.g. xy to yx)");
-	m_ReferenceSystemGuiUnderLeft->Bool(ID_RS_APPLYTOALL,"apply to all",&m_ApplyToAllReferenceSystem,1,"specify if the current reference system is applied to all images");
-	m_ReferenceSystemGuiLeft->FitGui();
-	m_ReferenceSystemGuiUnderLeft->FitGui();
-	m_ReferenceSystemPage->AddGuiLowerLeft(m_ReferenceSystemGuiLeft);
-	m_ReferenceSystemPage->AddGuiLowerCenter(m_ReferenceSystemGuiUnderLeft);
-
-	m_ReferenceSystemPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
-	m_ReferenceSystemPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
-}
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::GuiUpdate()
-	//----------------------------------------------------------------------------
 {
 	m_LoadGuiLeft->Update();
 	m_LoadGuiUnderLeft->Update();
+	m_LoadGuiCenter->Update();
 
 	m_CropGuiLeft->Update();
 	m_CropGuiCenter->Update();
-
-	m_BuildGuiLeft->Update();
-	m_BuildGuiUnderLeft->Update();
-	m_BuildGuiCenter->Update();
-
-	m_ReferenceSystemGuiLeft->Update();
-	m_ReferenceSystemGuiUnderLeft->Update();
-	//m_ReferenceSystemGuiCenter->Update();
-
-	m_LoadGuiCenter->Update();
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateGui()
-	//----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
@@ -1675,7 +1541,6 @@ bool mafOpImporterDicomOffis::OpenDir()
 
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::ReadDicom() 
-	//----------------------------------------------------------------------------
 {
 	if (this->m_TestMode)
 	{
@@ -1942,126 +1807,84 @@ void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 	{
 		switch (e->GetId())
 		{
-		case ID_RANGE_MODIFIED:
-		{
-			//ZCrop slider
-			OnRangeModified();
-		}
-		break;
-		case mafGUIWizard::MED_WIZARD_CHANGE_PAGE:
-		{
-			OnWizardChangePage(e);
-		}
-		break;
-		case mafGUIWizard::MED_WIZARD_CHANGED_PAGE:
-		{
-			/* This is a ack, beacouse that "genius" of wx  send the change event
-			before page show, so we need to duplicate the code here in order to
-			manage the camera update */
-			m_Wizard->GetCurrentPage()->Show();
-			m_Wizard->GetCurrentPage()->SetFocus();
-			m_Wizard->GetCurrentPage()->Update();
-			CameraReset();
-		}
-		break;
-		case ID_UNDO_CROP:
-		{
-			OnUndoCrop();
-		}
-		break;
-		case ID_STUDY_SELECT:
-		{
-			OnStudySelect();
-		}
-		break;
-		case ID_SERIES_SELECT:
-		{
-			OnSeriesSelect();
-		}
-		break;
-		case ID_SHOW_TEXT:
-		{
-			m_TextActor->SetVisibility(m_ShowOrientationPosition);
-			m_LoadPage->GetRWI()->CameraUpdate();
-		}
-		break;
-		case MOUSE_DOWN:
-		{
-			OnMouseDown(e);
-		}
-		break;
-		case MOUSE_MOVE:  //resize gizmo
-		{
-			OnMouseMove(e);
-
-		}
-		break;
-		case MOUSE_UP:  //block gizmo
-		{
-			OnMouseUp();
-
-		}
-		break;
-		case ID_SCAN_SLICE:
-		{
-			OnScanSlice();
-		}
-		break;
-		case ID_SCAN_TIME:
-		{
-			// show the current slice
-			OnScanTime();
-		}
-		break;
-		case ID_CROP:
-		{
-			Crop();
-		}
-		break;
-		case ID_VME_TYPE:
-		{
-			OnVmeTypeSelected();
-		}
-		break;
-		case ID_RS_SELECT:
-		{
-			OnReferenceSystemSelected();
-		}
-		break;
-		case ID_RS_SWAP:
-		{
-			OnSwapReferenceSystemSelected();
-		}
-		break;
-		case ID_RS_APPLYTOALL:
-		{
-			if (m_ApplyToAllReferenceSystem)
+			case ID_RANGE_MODIFIED:
 			{
-				m_SwapAllReferenceSystem = m_SwapReferenceSystem;
-				m_GlobalReferenceSystem = m_SelectedReferenceSystem;
+				//ZCrop slider
+				OnRangeModified();
 			}
-		}
-		// BEWARE NO BRAK!!! break;
-		case ID_RS_SWAPALL:
-		{
-			if (m_SwapAllReferenceSystem || m_ApplyToAllReferenceSystem)
+			break;
+			case mafGUIWizard::MED_WIZARD_CHANGE_PAGE:
 			{
-				m_ReferenceSystemGuiUnderLeft->Enable(ID_RS_SWAP, false);
+				OnWizardChangePage(e);
 			}
-			else
+			break;
+			case mafGUIWizard::MED_WIZARD_CHANGED_PAGE:
 			{
-				m_ReferenceSystemGuiUnderLeft->Enable(ID_RS_SWAP, true);
+				/* This is a ack, beacouse that "genius" of wx  send the change event
+				before page show, so we need to duplicate the code here in order to
+				manage the camera update */
+				m_Wizard->GetCurrentPage()->Show();
+				m_Wizard->GetCurrentPage()->SetFocus();
+				m_Wizard->GetCurrentPage()->Update();
+				CameraReset();
 			}
-			UpdateReferenceSystemVariables();
-			m_ReferenceSystemGuiUnderLeft->Update();
-			m_ReferenceSystemPage->Update();
-			m_ReferenceSystemPage->UpdateActor();
-		}
-		break;
-		default:
-		{
-			mafEventMacro(*e);
-		}
+			break;
+			case ID_UNDO_CROP:
+			{
+				OnUndoCrop();
+			}
+			break;
+			case ID_STUDY_SELECT:
+			{
+				OnStudySelect();
+			}
+			break;
+			case ID_SERIES_SELECT:
+			{
+				OnSeriesSelect();
+			}
+			break;
+			case ID_SHOW_TEXT:
+			{
+				m_TextActor->SetVisibility(m_ShowOrientationPosition);
+				m_LoadPage->GetRWI()->CameraUpdate();
+			}
+			break;
+			case MOUSE_DOWN:
+			{
+				OnMouseDown(e);
+			}
+			break;
+			case MOUSE_MOVE:  //resize gizmo
+			{
+				OnMouseMove(e);
+			}
+			break;
+			case MOUSE_UP:  //block gizmo
+			{
+				OnMouseUp();
+			}
+			break;
+			case ID_SCAN_SLICE:
+			{
+				OnScanSlice();
+			}
+			break;
+			case ID_SCAN_TIME:
+			{
+				// show the current slice
+				OnScanTime();
+			}
+			break;
+			case ID_CROP:
+			{
+				Crop();
+			}
+			break;
+			default:
+			{
+				mafEventMacro(*e);
+			}
 		}
 	}
 }
@@ -2088,12 +1911,7 @@ void mafOpImporterDicomOffis::OnUndoCrop()
 	m_LoadPage->GetRWI()->CameraUpdate();
 	m_CropPage->GetRWI()->CameraReset(boundsCamera);
 	m_CropPage->GetRWI()->CameraUpdate();
-	m_BuildPage->GetRWI()->CameraReset(boundsCamera);
-	m_BuildPage->GetRWI()->CameraUpdate();
-	m_ReferenceSystemPage->GetRWI()->CameraReset(boundsCamera);
-	m_ReferenceSystemPage->GetRWI()->CameraUpdate();
 	m_CropActor->VisibilityOn();
-	m_CropExecuted=false;
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::Crop()
@@ -2112,8 +1930,7 @@ void mafOpImporterDicomOffis::Crop()
 		ShowSlice();
 	}
 	m_CropActor->VisibilityOff();
-	m_CropExecuted=true;
-
+	
 	double diffx,diffy,boundsCamera[6];
 	diffx=m_SliceBounds[1]-m_SliceBounds[0];
 	diffy=m_SliceBounds[3]-m_SliceBounds[2];
@@ -2129,10 +1946,6 @@ void mafOpImporterDicomOffis::Crop()
 	m_CropPage->GetRWI()->CameraUpdate();
 	m_LoadPage->GetRWI()->CameraReset(boundsCamera);
 	m_LoadPage->GetRWI()->CameraUpdate();
-	m_BuildPage->GetRWI()->CameraReset(boundsCamera);
-	m_BuildPage->GetRWI()->CameraUpdate();
-	m_ReferenceSystemPage->GetRWI()->CameraReset(boundsCamera);
-	m_ReferenceSystemPage->GetRWI()->CameraUpdate();
 
 	//Modify name
 	double spacing[3];
@@ -2171,18 +1984,12 @@ void mafOpImporterDicomOffis::CameraUpdate()
 	if(m_Wizard->GetCurrentPage() == m_LoadPage)
 	{
 		m_LoadPage->UpdateActor();
+		m_LoadPage->GetRWI()->CameraUpdate();
 	}
 	else if(m_Wizard->GetCurrentPage() == m_CropPage)
 	{
 		m_CropPage->UpdateActor();
-	}
-	else if(m_Wizard->GetCurrentPage() == m_BuildPage)
-	{
-		m_BuildPage->UpdateActor();
-	}
-	else if(m_Wizard->GetCurrentPage() == m_ReferenceSystemPage)
-	{
-		m_ReferenceSystemPage->UpdateActor();
+		m_CropPage->GetRWI()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
@@ -2192,24 +1999,17 @@ void mafOpImporterDicomOffis::CameraReset()
 	m_LoadPage->GetRWI()->CameraReset();
 	m_CropPage->UpdateWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
 	m_CropPage->GetRWI()->CameraReset();
-	m_BuildPage->UpdateWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
-	m_BuildPage->GetRWI()->CameraReset();
-	m_ReferenceSystemPage->GetRWI()->CameraReset();
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::EnableSliceSlider(bool enable)
 {
 	m_LoadGuiLeft->Enable(ID_SCAN_SLICE,enable);
-	m_BuildGuiLeft->Enable(ID_SCAN_SLICE,enable);
 	m_CropGuiLeft->Enable(ID_SCAN_SLICE,enable);
-	m_ReferenceSystemGuiLeft->Enable(ID_SCAN_SLICE,enable);
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::EnableTimeSlider(bool enable)
 {
 	m_LoadGuiLeft->Enable(ID_SCAN_TIME,enable);
-	m_BuildGuiLeft->Enable(ID_SCAN_TIME,enable);
-	m_ReferenceSystemGuiLeft->Enable(ID_SCAN_TIME,enable);
 	m_CropGuiLeft->Enable(ID_SCAN_TIME,enable);
 }
 //----------------------------------------------------------------------------
@@ -2697,33 +2497,9 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 
 	
 	for (int i=0; i < m_DICOMDirectoryReader->GetNumberOfFiles(); i++) {
-				
-
-		//It works only on windows platform
-		MEMORYSTATUSEX memInfo;
-		memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-		GlobalMemoryStatusEx(&memInfo);
-		DWORDLONG totalVirtualMem = memInfo.ullTotalPageFile;
-		DWORDLONG physMemUsed = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
-
-		if(!this->m_TestMode)
-		{
-			if(physMemUsed > 0.6*memInfo.ullTotalPhys && !(m_mem_is_almost_full==true) ) {
-				int answer = wxMessageBox( "The allocated memory is the 60% of the physical memory! Do you want to continue?", "Warning", wxYES_NO, NULL);
-				if (answer == wxNO)
-				{
-					return true;
-				}
-				else if (answer == wxYES)
-				{
-					m_mem_is_almost_full=true;
-				}
-			}
-		}
 
 		
-		if ((strcmp(m_DICOMDirectoryReader->GetFile(i),".") == 0) ||\
-			(strcmp(m_DICOMDirectoryReader->GetFile(i),"..") == 0)) 
+		if ((strcmp(m_DICOMDirectoryReader->GetFile(i),".") == 0) || (strcmp(m_DICOMDirectoryReader->GetFile(i),"..") == 0)) 
 		{
 			// skip non dicom files
 			continue;
@@ -3541,6 +3317,8 @@ void mafOpImporterDicomOffis::CreateSliders()
 		delete m_LoadGuiLeft;
 		m_LoadGuiLeft = new mafGUI(this);
 		m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",true);
+		m_LoadGuiLeft->Bool(ID_SHOW_TEXT, "Show position info", &m_ShowOrientationPosition, 1, _("Shows position and orientation"));
+
 		m_SliceScannerLoadPage->SetPageSize(1);
 		
 		if (m_NumberOfTimeFrames > 0)
@@ -3567,42 +3345,6 @@ void mafOpImporterDicomOffis::CreateSliders()
 		}
 
 		m_CropPage->AddGuiLowerLeft(m_CropGuiLeft);
-	}
-
-
-	if(m_BuildGuiLeft)
-	{
-
-		m_BuildPage->RemoveGuiLowerLeft(m_BuildGuiLeft);
-		delete m_BuildGuiLeft;
-		m_BuildGuiLeft = new mafGUI(this);
-		m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",true);
-		m_SliceScannerBuildPage->SetPageSize(1);
-		
-		if (m_NumberOfTimeFrames > 0)
-		{
-			m_TimeScannerBuildPage = m_BuildGuiLeft->Slider(ID_SCAN_TIME, _("time "), &m_CurrentTime, 0, max(m_NumberOfTimeFrames - 1, 0));
-			m_TimeScannerBuildPage->SetPageSize(1);
-		}
-		
-		m_BuildPage->AddGuiLowerLeft(m_BuildGuiLeft);
-	}
-
-	if(m_ReferenceSystemGuiLeft)
-	{
-		m_ReferenceSystemPage->RemoveGuiLowerLeft(m_ReferenceSystemGuiLeft);
-		delete m_ReferenceSystemGuiLeft;
-		m_ReferenceSystemGuiLeft = new mafGUI(this);
-		m_SliceScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",true);
-		m_SliceScannerReferenceSystemPage->SetPageSize(1);
-
-		if (m_NumberOfTimeFrames > 0)
-		{
-			m_TimeScannerReferenceSystemPage = m_ReferenceSystemGuiLeft->Slider(ID_SCAN_TIME, _("time "), &m_CurrentTime, 0, max(m_NumberOfTimeFrames - 1, 0));
-			m_TimeScannerReferenceSystemPage->SetPageSize(1);
-		}
-
-		m_ReferenceSystemPage->AddGuiLowerLeft(m_ReferenceSystemGuiLeft);
 	}
 }
 //----------------------------------------------------------------------------
@@ -3653,7 +3395,6 @@ int mafOpImporterDicomOffis::GetSliceIDInSeries(int timeId, int heigthId)
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
-	//----------------------------------------------------------------------------
 {
 	// Description:
 	// read the slice number 'slice_num' and generate the texture
@@ -3783,7 +3524,6 @@ void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::ShowSlice()
-	//----------------------------------------------------------------------------
 {	
 	double diffx,diffy;
 	diffx=m_SliceBounds[1]-m_SliceBounds[0];
@@ -3796,7 +3536,6 @@ void mafOpImporterDicomOffis::ShowSlice()
 }
 //----------------------------------------------------------------------------
 vtkImageData* mafOpImporterDicomOffis::GetSliceImageDataFromLocalDicomFileName(mafString sliceName)
-	//----------------------------------------------------------------------------
 {
 	assert(m_SelectedSeriesSlicesList);
 
@@ -3962,7 +3701,6 @@ int CompareZ(const mafDicomSlice **arg1,const mafDicomSlice **arg2)
 
 //----------------------------------------------------------------------------
 int CompareImageNumber(const mafDicomSlice **arg1,const mafDicomSlice **arg2)
-	//----------------------------------------------------------------------------
 {
 	// compare the trigger time of both arguments
 	// return:
@@ -3976,55 +3714,10 @@ int CompareImageNumber(const mafDicomSlice **arg1,const mafDicomSlice **arg2)
 		return 0;
 }
 
-void mafOpImporterDicomOffis::OnVmeTypeSelected()
-{
-	UpdateReferenceSystemPageConnection();
-}
-
-void mafOpImporterDicomOffis::OnReferenceSystemSelected()
-{
-	if(!m_ApplyToAllReferenceSystem)
-	{
-		((mafDicomSlice *)m_SelectedSeriesSlicesList->Item(m_CurrentSlice)->GetData())->SetReferenceSystem(m_SelectedReferenceSystem);
-
-	}
-	else
-	{
-		m_GlobalReferenceSystem = m_SelectedReferenceSystem;
-	}
-
-}
-void mafOpImporterDicomOffis::OnSwapReferenceSystemSelected()
-{
-	if(!m_ApplyToAllReferenceSystem)
-	{
-		((mafDicomSlice *)m_SelectedSeriesSlicesList->Item(m_CurrentSlice)->GetData())->SetSwapReferenceSystem(m_SwapReferenceSystem);
-	}
-	else// if(m_ApplyToAllReferenceSystem)
-	{
-		m_SwapAllReferenceSystem = m_SwapReferenceSystem;
-		m_ReferenceSystemGuiUnderLeft->Update();
-		m_ReferenceSystemPage->Update();
-		m_ReferenceSystemPage->UpdateActor();
-	}
-}
-
+//----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::OnStudySelect()
 {
 	mafString *st = (mafString *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
-
-	////---------------------------------------------------------------
-	//long item = -1;
-	//long myitem = 0;
-	//for ( ;; )
-	//{
-	//	myitem = item;
-	//	item = m_StudyListctrl->GetNextItem(item,wxLIST_NEXT_ALL,wxLIST_STATE_SELECTED);
-	//	if ( item == -1 )
-	//		break;
-	//}
-	////---------------------------------------------------------------
-	//mafString *st = (mafString *)m_StudyListctrl->GetItemData(myitem);
 
 	m_SelectedSeriesID.at(0) = st->GetCStr();
 	if (m_SelectedSeriesID.at(0).Compare(m_StudyListbox->GetString(m_StudyListbox->GetSelection())) != 0)
@@ -4037,6 +3730,7 @@ void mafOpImporterDicomOffis::OnStudySelect()
 	}
 }
 
+//----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::GetDicomRange(double *range)
 {
 	double sliceRange[2];
@@ -4061,11 +3755,11 @@ void mafOpImporterDicomOffis::GetDicomRange(double *range)
 
 }
 
+//----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::OnSeriesSelect()
 {
 	mafString *st = (mafString *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
 
-	////---------------------------------------------------------------
 	long item = -1;
 	long myitem = 0;
 	for ( ;; )
@@ -4094,12 +3788,10 @@ void mafOpImporterDicomOffis::OnSeriesSelect()
 		}
 	}
 
+	m_SelectedSeriesSlicesList = m_SeriesIDToSlicesListMap[m_SelectedSeriesID];
+
 	if(!this->m_TestMode)
 	{
-		m_BuildGuiLeft->Update();
-		EnableSliceSlider(true);
-
-		m_SelectedSeriesSlicesList = m_SeriesIDToSlicesListMap[m_SelectedSeriesID];
 
 		mafDicomSlice *element0;
 		element0 = (mafDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData();
@@ -4111,6 +3803,32 @@ void mafOpImporterDicomOffis::OnSeriesSelect()
 			m_DicomReaderModality=CINEMATIC_MODALITY;
 			EnableTimeSlider(true);
 		}
+
+		int numberOfSlices = m_SelectedSeriesSlicesList->size();
+
+		EnableSliceSlider(numberOfSlices > 1);
+
+		m_LoadPage->RemoveGuiLowerCenter(m_LoadGuiCenter);
+		m_LoadGuiCenter = new mafGUI(this);
+		m_LoadGuiCenter->Divider();
+				
+		if (numberOfSlices > 1 && !((mafGUIDicomSettings*)GetSetting())->AutoVMEType())
+		{
+			wxString typeArrayVolumeImage[2] = { _("Volume"),_("Image") };
+			m_LoadGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArrayVolumeImage, 1, "");
+		}
+		else if (numberOfSlices == 1 || ((mafGUIDicomSettings*)GetSetting())->GetVMEType()==TYPE_IMAGE)
+		{
+			m_LoadGuiCenter->Label("Output type: Image");
+			m_OutputType = TYPE_IMAGE;
+		}
+		else
+		{
+			m_LoadGuiCenter->Label("Output type: Volume");
+			m_OutputType = TYPE_VOLUME;
+		}
+
+		m_LoadPage->AddGuiLowerCenter(m_LoadGuiCenter);
 	}
 	ReadDicom();
 
@@ -4124,7 +3842,7 @@ void mafOpImporterDicomOffis::OnSeriesSelect()
 void mafOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 {
 
-	if(m_Wizard->GetCurrentPage()==m_LoadPage)//From Load page to Crop Page
+	if(m_Wizard->GetCurrentPage()==m_LoadPage)//From Load page
 	{
 		//get the current windowing in order to maintain subrange thought the wizard pages 
 		m_LoadPage->GetWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
@@ -4132,160 +3850,144 @@ void mafOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 		m_CropPlane->SetOrigin(0.0, 0.0, 0.0);
 		m_CropPlane->SetPoint1(m_SliceBounds[1] - m_SliceBounds[0], 0.0, 0.0);
 		m_CropPlane->SetPoint2(0.0, m_SliceBounds[3] - m_SliceBounds[2], 0.0);
-		m_CropPage->GetRWI()->CameraReset();
 		
-		m_Wizard->SetButtonString("Build >");
 		m_Wizard->EnableChangePageOn();
-		m_CropPage->UpdateActor();
 	}
 
-	if (m_Wizard->GetCurrentPage()==m_CropPage)//From Crop page to build page
+	if (m_Wizard->GetCurrentPage() == m_CropPage)//From Crop page to build page
 	{
 		//get the current windowing in order to maintain subrange thought the wizard pages 
-		m_CropPage->GetWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
-		if (e->GetBool())
-		{
-			if(m_CropPage)
-				Crop();
-
-			m_BuildPage->UpdateActor();
-
-			if(m_ZCropBounds[0] > m_CurrentSlice || m_CurrentSlice > m_ZCropBounds[1])
-			{
-				m_CurrentSlice = m_ZCropBounds[0];
-			}
-			m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
-			//if only 1 slice, disable radio widget and create a VMEImage
-			if (m_ZCropBounds[1]+1 - m_ZCropBounds[0] >1 )
-			{
-				m_BuildPage->AddGuiLowerUnderLeft(m_BuildGuiCenter);
-				m_BuildPage->Update();
-				GuiUpdate();
-			}
-			else
-				m_OutputType = TYPE_IMAGE;
-
-			if (/*m_Wizard->GetCurrentPage()==m_BuildPage &&*/ m_OutputType == 1)//Check the type to determine the next step
-			{
-				m_Wizard->SetButtonString("Reference >");
-				m_ReferenceSystemPage->UpdateActor();
-				m_Wizard->Update();
-			}
-			else
-			{
-				m_Wizard->SetButtonString("Finish");
-				m_Wizard->Update();
-			}
-		} 
-		else
-		{
-			m_Wizard->SetButtonString("Crop >"); 
-			m_LoadPage->UpdateActor();
-		}
-	}
-
-	//From build page to crop page
-	if (m_Wizard->GetCurrentPage()==m_BuildPage && (!e->GetBool()))
-	{
-		//get the current windowing in order to maintain subrange thought the wizard pages 
-		m_BuildPage->GetWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
-
-		OnUndoCrop();
-		m_Wizard->SetButtonString("Build >");
-		m_BuildPage->RemoveGuiLowerUnderLeft(m_BuildGuiCenter);
-		m_CropPage->UpdateActor();
-	}
-
-	if (m_Wizard->GetCurrentPage()==m_CropPage)//From Crop page to any other
-	{
+		m_CropPage->GetWindowing(m_TotalDicomRange, m_TotalDicomSubRange);
 		m_CropActor->VisibilityOff();
 	}
-	else
-	{
-		if(!m_CropExecuted)
-			m_CropActor->VisibilityOn();
-		else
-			m_CropActor->VisibilityOff();
-	}
-
-	if (m_Wizard->GetCurrentPage()==m_BuildPage && e->GetBool())//From build page to reference system page
-	{
-		//m_Wizard->SetButtonString("Reference >");
-		m_ReferenceSystemPage->UpdateActor();
-		m_ReferenceSystemPage->GetRWI()->CameraReset();
-	}
-	if (m_Wizard->GetCurrentPage()==m_ReferenceSystemPage && (!e->GetBool()))//From reference system page to build page
-	{
-		m_Wizard->SetButtonString("Reference >");
-		m_BuildPage->UpdateActor();
-		m_BuildPage->GetRWI()->CameraReset();
-	}
+	
+	CameraReset();
 
 	GuiUpdate();
 }
 
 void mafOpImporterDicomOffis::OnMouseDown( mafEvent * e )
 {
-	if(m_CropExecuted==false)
+	if (m_Wizard->GetCurrentPage() == m_CropPage)
 	{
-		if (m_Wizard->GetCurrentPage()==m_CropPage)
+		//long handle_id = e->GetArg();
+		double pos[3];
+		vtkPoints *p = (vtkPoints *)e->GetVtkObj();
+		p->GetPoint(0, pos);
+
+		//calcola altezza rettangolo
+		double b[6];
+		m_CropPlane->GetOutput()->GetBounds(b);
+		double dx = (b[1] - b[0]) / 5;
+		double dy = (b[3] - b[2]) / 5;
+
+		double O[3], P1[3], P2[3];
+		//Modified by Matteo 21/07/2006
+		//Caso di default P1 in alto a SX e P2 in basso a DX
+		m_CropPlane->GetOrigin(O);
+		m_CropPlane->GetPoint1(P1);
+		m_CropPlane->GetPoint2(P2);
+		//Se non siamo nel caso di default modifichiamo in modo da ritornare in quel caso
+		if (P2[0] < P1[0] && P2[1] < P1[1])//Caso P1 in basso a DX e P2 in alto a SX
 		{
-			//long handle_id = e->GetArg();
-			double pos[3];
-			vtkPoints *p = (vtkPoints *)e->GetVtkObj();
-			p->GetPoint(0,pos);
+			O[0] = P2[0];
+			O[1] = P1[1];
+			double tempx = P1[0];
+			double tempy = P1[1];
+			P1[0] = P2[0];
+			P1[1] = P2[1];
+			P2[0] = tempx;
+			P2[1] = tempy;
+			m_CropPlane->SetOrigin(O);
+			m_CropPlane->SetPoint1(P1);
+			m_CropPlane->SetPoint2(P2);
+		}
+		else if (P1[0]<P2[0] && P1[1]>P2[1])//Caso P1 in basso a SX e P2 in alto a DX
+		{
+			O[0] = P1[0];
+			O[1] = P1[1];
+			double tempy = P1[1];
+			P1[1] = P2[1];
+			P2[1] = tempy;
+			m_CropPlane->SetOrigin(O);
+			m_CropPlane->SetPoint1(P1);
+			m_CropPlane->SetPoint2(P2);
+		}
+		else if (P1[0] > P2[0] && P1[1] < P2[1])//Caso P1 in alto a DX e P2 in basso a SX
+		{
+			O[0] = P2[0];
+			O[1] = P2[1];
+			double tempx = P1[0];
+			P1[0] = P2[0];
+			P2[0] = tempx;
+			m_CropPlane->SetOrigin(O);
+			m_CropPlane->SetPoint1(P1);
+			m_CropPlane->SetPoint2(P2);
+		}
+		//End Matteo
+		if (m_GizmoStatus == GIZMO_NOT_EXIST)
+		{
+			m_GizmoStatus = GIZMO_RESIZING;
+			m_CropActor->VisibilityOn();
 
-			//calcola altezza rettangolo
-			double b[6];
-			m_CropPlane->GetOutput()->GetBounds(b);
-			double dx = (b[1] - b[0]) / 5;
-			double dy = (b[3] - b[2]) / 5;
+			pos[2] = 0;
+			m_CropPlane->SetOrigin(pos);
+			m_CropPlane->SetPoint1(pos[0], pos[1], pos[2]);
+			m_CropPlane->SetPoint2(pos[0], pos[1], pos[2]);
+		}
+		else if (m_GizmoStatus == GIZMO_DONE)
+		{
+			//	  8------------1----------2--->x
+			//		|												|
+			//		7												3
+			//		|												|
+			//		6------------5----------4
+			//		|
+			//	  v y
 
-			double O[3], P1[3], P2[3];
-			//Modified by Matteo 21/07/2006
-			//Caso di default P1 in alto a SX e P2 in basso a DX
-			m_CropPlane->GetOrigin(O);
-			m_CropPlane->GetPoint1(P1);
-			m_CropPlane->GetPoint2(P2);
-			//Se non siamo nel caso di default modifichiamo in modo da ritornare in quel caso
-			if(P2[0]<P1[0] && P2[1]<P1[1])//Caso P1 in basso a DX e P2 in alto a SX
+			if (P1[0] + dx / 2 <= pos[0] && pos[0] <= P2[0] - dx / 2 &&
+				P1[1] - dy / 2 <= pos[1] && pos[1] <= P1[1] + dy / 2)
 			{
-				O[0] = P2[0];
-				O[1] = P1[1];
-				double tempx=P1[0];
-				double tempy=P1[1];
-				P1[0] = P2[0];
-				P1[1] = P2[1];
-				P2[0] = tempx;
-				P2[1] = tempy;
-				m_CropPlane->SetOrigin(O);
-				m_CropPlane->SetPoint1(P1);
-				m_CropPlane->SetPoint2(P2);
+				m_SideToBeDragged = 1;
 			}
-			else if(P1[0]<P2[0] && P1[1]>P2[1])//Caso P1 in basso a SX e P2 in alto a DX
+			else if (P2[0] - dx / 2 <= pos[0] && pos[0] <= P2[0] + dx / 2 &&
+				P1[1] - dy / 2 <= pos[1] && pos[1] <= P1[1] + dy / 2)
 			{
-				O[0] = P1[0];
-				O[1] = P1[1];
-				double tempy=P1[1];
-				P1[1] = P2[1];
-				P2[1] = tempy;
-				m_CropPlane->SetOrigin(O);
-				m_CropPlane->SetPoint1(P1);
-				m_CropPlane->SetPoint2(P2);
+				m_SideToBeDragged = 2;
 			}
-			else if(P1[0]>P2[0] && P1[1]<P2[1])//Caso P1 in alto a DX e P2 in basso a SX
+			else if (P2[0] - dx / 2 <= pos[0] && pos[0] <= P2[0] + dx / 2 &&
+				P2[1] - dy / 2 >= pos[1] && pos[1] >= P1[1] + dy / 2)
 			{
-				O[0] = P2[0];
-				O[1] = P2[1];
-				double tempx=P1[0];
-				P1[0] = P2[0];
-				P2[0] = tempx;
-				m_CropPlane->SetOrigin(O);
-				m_CropPlane->SetPoint1(P1);
-				m_CropPlane->SetPoint2(P2);
+				m_SideToBeDragged = 3;
 			}
-			//End Matteo
-			if (m_GizmoStatus == GIZMO_NOT_EXIST)
+			else if (P2[0] - dx / 2 <= pos[0] && pos[0] <= P2[0] + dx / 2 &&
+				P2[1] - dy / 2 <= pos[1] && pos[1] <= P2[1] + dy / 2)
+			{
+				m_SideToBeDragged = 4;
+			}
+			else if (P1[0] + dx / 2 <= pos[0] && pos[0] <= P2[0] - dx / 2 &&
+				P2[1] - dy / 2 <= pos[1] && pos[1] <= P2[1] + dy / 2)
+			{
+				m_SideToBeDragged = 5;
+			}
+			else if (P1[0] - dx / 2 <= pos[0] && pos[0] <= P1[0] + dx / 2 &&
+				P2[1] - dy / 2 <= pos[1] && pos[1] <= P2[1] + dy / 2)
+			{
+				m_SideToBeDragged = 6;
+			}
+			else if (P1[0] - dx / 2 <= pos[0] && pos[0] <= P1[0] + dx / 2 &&
+				P2[1] - dy / 2 >= pos[1] && pos[1] >= P1[1] + dy / 2)
+			{
+				m_SideToBeDragged = 7;
+			}
+			else if (P1[0] - dx / 2 <= pos[0] && pos[0] <= P1[0] + dx / 2 &&
+				P1[1] - dy / 2 <= pos[1] && pos[1] <= P1[1] + dy / 2)
+			{
+				m_SideToBeDragged = 8;
+			}
+			else
+				//hai pickato in un punto che non corrisponde a nessun lato
+				// => crea un nuovo gizmo
 			{
 				m_GizmoStatus = GIZMO_RESIZING;
 				m_CropActor->VisibilityOn();
@@ -4294,151 +3996,75 @@ void mafOpImporterDicomOffis::OnMouseDown( mafEvent * e )
 				m_CropPlane->SetOrigin(pos);
 				m_CropPlane->SetPoint1(pos[0], pos[1], pos[2]);
 				m_CropPlane->SetPoint2(pos[0], pos[1], pos[2]);
+				m_CropPlane->SetXResolution(10);
 			}
-			else if (m_GizmoStatus == GIZMO_DONE)
-			{
-				//	  8------------1----------2--->x
-				//		|												|
-				//		7												3
-				//		|												|
-				//		6------------5----------4
-				//		|
-				//	  v y
-
-				if (P1[0] + dx/2 <= pos[0] &&  pos[0] <= P2[0] - dx/2 &&
-					P1[1] - dy/2 <= pos[1] && pos[1] <= P1[1] + dy/2)
-				{
-					m_SideToBeDragged = 1;
-				}
-				else if (P2[0] - dx/2 <= pos[0] && pos[0] <= P2[0] + dx/2 &&
-					P1[1] - dy/2 <= pos[1] && pos[1] <= P1[1] + dy/2)
-				{
-					m_SideToBeDragged = 2;
-				}
-				else if (P2[0] - dx/2 <= pos[0] && pos[0] <= P2[0] + dx/2 &&
-					P2[1] - dy/2 >= pos[1] && pos[1] >= P1[1] + dy/2)
-				{
-					m_SideToBeDragged = 3;
-				}
-				else if (P2[0] - dx/2 <= pos[0] && pos[0] <= P2[0] + dx/2 &&
-					P2[1] - dy/2 <= pos[1] && pos[1] <= P2[1] + dy/2)
-				{
-					m_SideToBeDragged = 4;
-				}
-				else if (P1[0] + dx/2 <= pos[0] && pos[0] <= P2[0] - dx/2 &&
-					P2[1] - dy/2 <= pos[1] && pos[1] <= P2[1] + dy/2)
-				{
-					m_SideToBeDragged = 5;
-				}
-				else if (P1[0] - dx/2 <= pos[0] && pos[0] <= P1[0] + dx/2 &&
-					P2[1] - dy/2 <= pos[1] && pos[1] <= P2[1] +dy/2)
-				{
-					m_SideToBeDragged = 6;
-				}
-				else if (P1[0] - dx/2 <= pos[0] && pos[0] <= P1[0] + dx/2 &&
-					P2[1] - dy/2 >= pos[1] && pos[1] >= P1[1] + dy/2)
-				{
-					m_SideToBeDragged = 7;
-				}
-				else if (P1[0] - dx/2 <= pos[0] && pos[0] <= P1[0] + dx/2 &&
-					P1[1] - dy/2 <= pos[1] && pos[1] <= P1[1] + dy/2)
-				{
-					m_SideToBeDragged = 8;
-				}	
-				else
-					//hai pickato in un punto che non corrisponde a nessun lato
-					// => crea un nuovo gizmo
-				{
-					m_GizmoStatus = GIZMO_RESIZING;
-					m_CropActor->VisibilityOn();
-
-					pos[2] = 0;
-					m_CropPlane->SetOrigin(pos);
-					m_CropPlane->SetPoint1(pos[0], pos[1], pos[2]);
-					m_CropPlane->SetPoint2(pos[0], pos[1], pos[2]);
-					m_CropPlane->SetXResolution(10);
-				}
-			}
-			m_CropPage->UpdateActor();
-			m_CropPage->GetRWI()->CameraUpdate();
 		}
+		CameraUpdate();
 	}
-
-	if (m_Wizard->GetCurrentPage()==m_LoadPage)
-	{
-		m_LoadPage->UpdateActor();
-		m_LoadPage->GetRWI()->CameraUpdate();
-	}
-	else if (m_Wizard->GetCurrentPage()==m_BuildPage)
-	{
-		m_BuildPage->UpdateActor();
-		m_BuildPage->GetRWI()->CameraUpdate();
-	}
+	
 }
 
 void mafOpImporterDicomOffis::OnMouseMove( mafEvent * e )
 {
-	if(m_CropExecuted==false)
+	if (m_Wizard->GetCurrentPage() == m_CropPage)
 	{
-		if (m_Wizard->GetCurrentPage()==m_CropPage)
+		double pos[3], oldO[3], oldP1[3], oldP2[3];
+		vtkPoints *p = (vtkPoints *)e->GetVtkObj();
+		p->GetPoint(0, pos);
+
+		m_CropPlane->GetOrigin(oldO);
+		m_CropPlane->GetPoint1(oldP1);
+		m_CropPlane->GetPoint2(oldP2);
+
+		if (m_GizmoStatus == GIZMO_RESIZING)
 		{
-			double pos[3], oldO[3], oldP1[3], oldP2[3];
-			vtkPoints *p = (vtkPoints *)e->GetVtkObj();
-			p->GetPoint(0,pos);
-
-			m_CropPlane->GetOrigin(oldO);
-			m_CropPlane->GetPoint1(oldP1);
-			m_CropPlane->GetPoint2(oldP2);
-
-			if (m_GizmoStatus == GIZMO_RESIZING)
+			m_CropPlane->SetPoint1(oldO[0], pos[1], oldP1[2]);
+			m_CropPlane->SetPoint2(pos[0], oldO[1], oldP1[2]);
+		}
+		else if (m_GizmoStatus == GIZMO_DONE)
+		{
+			if (m_SideToBeDragged == 0)
 			{
-				m_CropPlane->SetPoint1(oldO[0], pos[1], oldP1[2]);
-				m_CropPlane->SetPoint2(pos[0], oldO[1], oldP1[2]);
 			}
-			else if (m_GizmoStatus == GIZMO_DONE)
+			else if (m_SideToBeDragged == 1)
+				m_CropPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
+			else if (m_SideToBeDragged == 2)
 			{
-				if (m_SideToBeDragged == 0)
-				{
-				}
-				else if (m_SideToBeDragged == 1)
-					m_CropPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
-				else if (m_SideToBeDragged == 2)
-				{
-					m_CropPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
-					m_CropPlane->SetPoint2(pos[0], oldP2[1], oldP2[2]);
-				}
-				else if (m_SideToBeDragged == 3)
-					m_CropPlane->SetPoint2(pos[0], oldP2[1], oldP2[2]);
-				else if (m_SideToBeDragged == 4)
-				{
-					m_CropPlane->SetOrigin(oldO[0], pos[1], oldO[2]);
-					m_CropPlane->SetPoint2(pos[0], pos[1], oldP2[2]);
-				}
-				else if (m_SideToBeDragged == 5)
-				{
-					m_CropPlane->SetOrigin(oldO[0], pos[1], oldO[2]);
-					m_CropPlane->SetPoint2(oldP2[0], pos[1], oldP2[2]);
-				}
-				else if (m_SideToBeDragged == 6)
-				{
-					m_CropPlane->SetOrigin(pos[0], pos[1], oldO[2]);
-					m_CropPlane->SetPoint1(pos[0], oldP1[1], oldP2[2]);
-					m_CropPlane->SetPoint2(oldP2[0], pos[1], oldP2[2]);
-				}
-				else if (m_SideToBeDragged == 7)
-				{
-					m_CropPlane->SetOrigin(pos[0], oldO[1], oldO[2]);
-					m_CropPlane->SetPoint1(pos[0], oldP1[1], oldP1[2]);
-				}
-				else if (m_SideToBeDragged == 8)
-				{
-					m_CropPlane->SetOrigin(pos[0], oldO[1], oldO[2]);
-					m_CropPlane->SetPoint1(pos[0], pos[1], oldP1[2]);
-				}
+				m_CropPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
+				m_CropPlane->SetPoint2(pos[0], oldP2[1], oldP2[2]);
 			}
-			m_CropPage->GetRWI()->CameraUpdate();
+			else if (m_SideToBeDragged == 3)
+				m_CropPlane->SetPoint2(pos[0], oldP2[1], oldP2[2]);
+			else if (m_SideToBeDragged == 4)
+			{
+				m_CropPlane->SetOrigin(oldO[0], pos[1], oldO[2]);
+				m_CropPlane->SetPoint2(pos[0], pos[1], oldP2[2]);
+			}
+			else if (m_SideToBeDragged == 5)
+			{
+				m_CropPlane->SetOrigin(oldO[0], pos[1], oldO[2]);
+				m_CropPlane->SetPoint2(oldP2[0], pos[1], oldP2[2]);
+			}
+			else if (m_SideToBeDragged == 6)
+			{
+				m_CropPlane->SetOrigin(pos[0], pos[1], oldO[2]);
+				m_CropPlane->SetPoint1(pos[0], oldP1[1], oldP2[2]);
+				m_CropPlane->SetPoint2(oldP2[0], pos[1], oldP2[2]);
+			}
+			else if (m_SideToBeDragged == 7)
+			{
+				m_CropPlane->SetOrigin(pos[0], oldO[1], oldO[2]);
+				m_CropPlane->SetPoint1(pos[0], oldP1[1], oldP1[2]);
+			}
+			else if (m_SideToBeDragged == 8)
+			{
+				m_CropPlane->SetOrigin(pos[0], oldO[1], oldO[2]);
+				m_CropPlane->SetPoint1(pos[0], pos[1], oldP1[2]);
+			}
+			CameraUpdate();
 		}
 	}
+	
 }
 
 void mafOpImporterDicomOffis::OnRangeModified()
@@ -4453,14 +4079,9 @@ void mafOpImporterDicomOffis::OnRangeModified()
 	fractpart = modf (minMax[1] , &intpart);
 	fractpart >= 0.5 ?  m_ZCropBounds[1] = ceil(minMax[1]) : m_ZCropBounds[1] = floor(minMax[1]);
 
-	m_SliceScannerBuildPage->SetRange(m_ZCropBounds[0], m_ZCropBounds[1]);
-	m_SliceScannerReferenceSystemPage->SetRange(m_ZCropBounds[0], m_ZCropBounds[1]);
-
 	if(m_ZCropBounds[0] > m_CurrentSlice || m_CurrentSlice > m_ZCropBounds[1])
 	{
 		m_CurrentSlice = m_ZCropBounds[0];
-		m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
-		m_SliceScannerReferenceSystemPage->SetValue(m_CurrentSlice);
 		// show the current slice
 		int currImageId = GetSliceIDInSeries(m_CurrentTime, m_CurrentSlice);
 		if (currImageId != -1) 
@@ -4473,40 +4094,33 @@ void mafOpImporterDicomOffis::OnRangeModified()
 		m_SliceScannerLoadPage->Update();
 		m_SliceScannerCropPage->SetValue(m_CurrentSlice);
 		m_SliceScannerCropPage->Update();
-		m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
-		m_SliceScannerBuildPage->Update();
-		m_SliceScannerReferenceSystemPage->SetValue(m_CurrentSlice);
-		m_SliceScannerReferenceSystemPage->Update();
 	}
 	GuiUpdate();
 }
 
 void mafOpImporterDicomOffis::OnMouseUp()
 {
-	if(m_CropExecuted==false)
+	if (m_Wizard->GetCurrentPage() == m_CropPage)
 	{
-		if (m_Wizard->GetCurrentPage()==m_CropPage)
-		{
-			if (m_GizmoStatus == GIZMO_RESIZING)
-				m_GizmoStatus = 	GIZMO_DONE;
-			else if (m_GizmoStatus == GIZMO_DONE)
-				m_SideToBeDragged = 0;
+		if (m_GizmoStatus == GIZMO_RESIZING)
+			m_GizmoStatus = GIZMO_DONE;
+		else if (m_GizmoStatus == GIZMO_DONE)
+			m_SideToBeDragged = 0;
 
-			double p1[3], p2[3], origin[3];
-			m_CropPlane->GetPoint1(p1);
-			m_CropPlane->GetPoint2(p2);
-			m_CropPlane->GetOrigin(origin);
+		double p1[3], p2[3], origin[3];
+		m_CropPlane->GetPoint1(p1);
+		m_CropPlane->GetPoint2(p2);
+		m_CropPlane->GetOrigin(origin);
 
-			if( (p1[0] == p2[0] && p1[1] == p2[1] && p1[2] == p2[2])  ||
+		if ((p1[0] == p2[0] && p1[1] == p2[1] && p1[2] == p2[2]) ||
 				(p1[0] == origin[0] && p1[1] == origin[1] && p1[2] == origin[2]) ||
 				(p2[0] == origin[0] && p2[1] == origin[1] && p2[2] == origin[2])
-				)
-			{
-				m_BoxCorrect = false;
-			}
-			else
-				m_BoxCorrect = true;   
+			)
+		{
+			m_BoxCorrect = false;
 		}
+		else
+			m_BoxCorrect = true;
 	}
 }
 
@@ -4530,10 +4144,7 @@ void mafOpImporterDicomOffis::OnScanSlice()
 	m_SliceScannerLoadPage->Update();
 	m_SliceScannerCropPage->SetValue(m_CurrentSlice);
 	m_SliceScannerCropPage->Update();
-	m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
-	m_SliceScannerBuildPage->Update();
-	m_SliceScannerReferenceSystemPage->SetValue(m_CurrentSlice);
-	m_SliceScannerReferenceSystemPage->Update();
+
 	// windows 7 64 bit / nvidia graphic card patch: otherwise scan slice will not work
 	// as expected and slices will be black while scanning until mouse dowin
 	// is performed in view
@@ -4548,43 +4159,9 @@ void mafOpImporterDicomOffis::OnScanSlice()
 		m_CropPage->UpdateActor();
 		m_CropPage->GetRWI()->CameraUpdate();
 	}
-	else if (m_Wizard->GetCurrentPage()==m_BuildPage)
-	{
-		m_BuildPage->UpdateActor();
-		m_BuildPage->GetRWI()->CameraUpdate();
-	}
-	else if (m_Wizard->GetCurrentPage()==m_ReferenceSystemPage)
-	{
-		UpdateReferenceSystemVariables();
-		m_ReferenceSystemGuiUnderLeft->Update();
-		m_ReferenceSystemPage->Update();
-		m_ReferenceSystemPage->UpdateActor();
-		m_ReferenceSystemPage->GetRWI()->CameraUpdate();
-	}
-	//</patch>
 	GuiUpdate();
 }
 
-void mafOpImporterDicomOffis::UpdateReferenceSystemVariables()
-{
-	if(!m_ApplyToAllReferenceSystem)
-	{
-		m_SelectedReferenceSystem = ((mafDicomSlice *)m_SelectedSeriesSlicesList->Item(m_CurrentSlice)->GetData())->GetReferenceSystem();
-		if(!m_SwapAllReferenceSystem)
-		{
-			m_SwapReferenceSystem = ((mafDicomSlice *)m_SelectedSeriesSlicesList->Item(m_CurrentSlice)->GetData())->GetSwapReferenceSystem();
-		}
-		else
-		{
-			m_SwapReferenceSystem = m_SwapAllReferenceSystem;
-		}
-	}
-	else
-	{
-		m_SelectedReferenceSystem = m_GlobalReferenceSystem;
-		m_SwapReferenceSystem = m_SwapAllReferenceSystem;
-	}
-}
 
 void mafOpImporterDicomOffis::OnScanTime()
 {
@@ -4599,10 +4176,6 @@ void mafOpImporterDicomOffis::OnScanTime()
 	m_TimeScannerLoadPage->Update();
 	m_TimeScannerCropPage->SetValue(m_CurrentTime);
 	m_TimeScannerCropPage->Update();
-	m_TimeScannerBuildPage->SetValue(m_CurrentTime);
-	m_TimeScannerBuildPage->Update();
-	m_TimeScannerReferenceSystemPage->SetValue(m_CurrentTime);
-	m_TimeScannerReferenceSystemPage->Update();
 
 	GuiUpdate();
 
@@ -4620,17 +4193,6 @@ void mafOpImporterDicomOffis::OnScanTime()
 		m_CropPage->UpdateActor();
 		m_CropPage->GetRWI()->CameraUpdate();
 	}
-	else if (m_Wizard->GetCurrentPage()==m_BuildPage)
-	{
-		m_BuildPage->UpdateActor();
-		m_BuildPage->GetRWI()->CameraUpdate();
-	}
-	else if (m_Wizard->GetCurrentPage()==m_ReferenceSystemPage)
-	{
-		m_ReferenceSystemPage->UpdateActor();
-		m_ReferenceSystemPage->GetRWI()->CameraUpdate();
-	}
-
 	// </patch>
 
 }
@@ -4691,157 +4253,4 @@ void mafDicomSlice::GetOrientation( vtkMatrix4x4 * matrix )
 	matrix->SetElement(2,2,Vz2);
 	matrix->SetElement(3,2,0);
 	matrix->SetElement(3,3,1);
-}
-
-void mafOpImporterDicomOffis::UpdateReferenceSystemPageConnection()
-{
-	if(m_OutputType == TYPE_IMAGE)
-	{
-		m_BuildPage->SetNextPage(m_ReferenceSystemPage);
-	}
-	else
-	{
-		m_BuildPage->SetNext(NULL);
-		m_ReferenceSystemPage->SetPrev(NULL);
-	}
-}
-
-void mafOpImporterDicomOffis::ApplyReferenceSystem()
-{
-	// Apply reference system to dicom slices
-
-	// Operate on patient position
-
-	// This step will be executed after output build
-	// So it apply only transform on the images mafMatrix!
-
-	// create the transform matrix
-
-	/**
-	// 
-	// xy->xy
-	// no transform
-	vtkTransform *xy2xy = vtkTransform::New();
-	if(!m_SwapReferenceSystem)
-	{
-	//No transform
-	}
-	else
-	{
-	xy2xy->RotateY(180);
-	xy2xy->RotateZ(90);
-	}
-	xy2xy->Update();
-
-	//xy->xz
-	vtkTransform *xy2xz = vtkTransform::New();
-
-	if(!m_SwapReferenceSystem)
-	{
-	xy2xz->RotateX(90);
-	}
-	else
-	{
-	xy2xz->RotateX(-90);
-	xy2xz->RotateZ(-90);
-	}
-	xy2xz->Update();
-
-	//xy->yz
-	vtkTransform *xy2yz = vtkTransform::New();
-	if(!m_SwapReferenceSystem)
-	{
-	//xy2yz->RotateWXYZ(-90,0,1,1);
-	xy2yz->RotateY(90);
-	xy2yz->RotateZ(90);
-	}
-	else
-	{
-	xy2yz->RotateY(-90);
-	}
-	xy2yz->Update();
-	*/
-
-	for(int s = 0; s < m_SelectedSeriesSlicesList->size(); s++)
-	{
-		mafDicomSlice* currSlice =  (mafDicomSlice*)(m_SelectedSeriesSlicesList->Item(s)->GetData());
-
-		// Get the reference system
-		int refSys;
-		if(!m_ApplyToAllReferenceSystem)
-		{
-			refSys = currSlice->GetReferenceSystem();
-		}
-		else
-		{
-			refSys = m_GlobalReferenceSystem;
-		}
-
-		// Get the swap variable
-		int swap = currSlice->GetSwapReferenceSystem() || m_SwapAllReferenceSystem;
-
-		mafVMEImage* image = mafVMEImage::SafeDownCast(m_ImagesGroup->GetChild(s));
-		if((refSys != mafDicomSlice::ID_RS_XY || swap) && (image != NULL))
-		{
-			mafTimeStamp dcmTriggerTime = (mafTimeStamp)(currSlice->GetDcmTriggerTime());
-
-			vtkTransform *dummyTransform = vtkTransform::New();
-			switch(refSys)
-			{
-			case mafDicomSlice::ID_RS_XY:
-				{
-					// Flip Y with Z
-					//dummyTransform->DeepCopy(xy2xy);
-					if(swap)
-					{
-						dummyTransform->RotateY(180);
-						dummyTransform->RotateZ(90);
-					}
-
-				}break;
-			case mafDicomSlice::ID_RS_XZ:
-				{
-					// Flip Y with Z
-					//dummyTransform->DeepCopy(xy2xz);
-					if(!swap)
-					{
-						dummyTransform->RotateX(90);
-					}
-					else
-					{
-						dummyTransform->RotateX(-90);
-						dummyTransform->RotateZ(-90);
-					}
-				}break;
-			case mafDicomSlice::ID_RS_YZ:
-				{
-					// Flip X with Y
-					//dummyTransform->DeepCopy(xy2yz);
-					if(!swap)
-					{
-						//xy2yz->RotateWXYZ(-90,0,1,1);
-						dummyTransform->RotateY(90);
-						dummyTransform->RotateZ(90);
-					}
-					else
-					{
-						dummyTransform->RotateY(-90);
-					}
-				}break;
-			}
-			dummyTransform->Update();
-			dummyTransform->PreMultiply();
-			dummyTransform->Concatenate(image->GetMatrixPipe()->GetMatrix().GetVTKMatrix());
-			dummyTransform->Update();
-
-			mafSmartPointer<mafTransform> boxPose;
-			boxPose->SetMatrix(dummyTransform->GetMatrix());
-			boxPose->Update();
-
-			image->SetAbsMatrix(boxPose->GetMatrix());
-			image->Update();
-
-			dummyTransform->Delete();
-		}
-	}
 }

@@ -135,8 +135,6 @@ protected:
 		ID_SERIES_SELECT,
 		ID_CROP,
 		ID_UNDO_CROP,
-		ID_BUILD_STEP,
-		ID_BUILD_BUTTON,
 		ID_RS_STEP,
 		ID_RS_BUTTON,
 		ID_CANCEL,
@@ -149,10 +147,6 @@ protected:
 		ID_VME_TYPE,
 		ID_SHOW_TEXT,
 		ID_SHOW_SP,
-		ID_RS_SELECT,
-		ID_RS_SWAP,
-		ID_RS_SWAPALL,
-		ID_RS_APPLYTOALL,
 	};
 
 	/** OnEvent helper functions */
@@ -165,25 +159,12 @@ protected:
 	void OnWizardChangePage( mafEvent * e );
 	void OnSeriesSelect();
 	void OnStudySelect();
-	void OnVmeTypeSelected();
-	void OnReferenceSystemSelected();
-	void OnSwapReferenceSystemSelected();
-	void UpdateReferenceSystemVariables();
-
+	
 	/** Create load page and his GUI for the wizard. */
 	void CreateLoadPage();
 
 	/** Create crop page and   his GUI for the wizard. */
 	void CreateCropPage();
-
-	/** Create build page and his GUI for the wizard. */
-	void CreateBuildPage();
-
-	/** Create reference system page and his GUI for the wizard.\n
-	This page is shown only if VME image is created as output\n
-	This page allow to select reference system (xy, xz or yz) for the
-	selected images */
-	void CreateReferenceSystemPage();
 
 	/** Reset the list of files and all the structures that own images information. */
 	void ResetStructure();
@@ -257,12 +238,6 @@ protected:
 	/** Delete all istances of used objects. */
 	void Destroy();
 		
-	/** Reference system page is shown only if image is the vme output type */
-	void UpdateReferenceSystemPageConnection();
-
-	/** Apply transform according to the specified reference system */
-	void ApplyReferenceSystem();
-
 	vtkDirectory			*m_DICOMDirectoryReader; 
 	vtkLookupTable	*m_SliceLookupTable;
 	vtkPlaneSource		*m_SlicePlane;
@@ -283,22 +258,13 @@ protected:
 	mafGUIWizard			*m_Wizard;
 	mafGUIWizardPageNew	*m_LoadPage;
 	mafGUIWizardPageNew	*m_CropPage;
-	mafGUIWizardPageNew	*m_BuildPage;
-	mafGUIWizardPageNew	*m_ReferenceSystemPage; ///< Wizard step to choose reference system
 	mafVMEGroup       *m_ImagesGroup;
 
 	mafGUI	*m_LoadGuiLeft;
 	mafGUI	*m_LoadGuiUnderLeft;
 	mafGUI	*m_CropGuiLeft;
 	mafGUI	*m_CropGuiCenter;
-	mafGUI *m_LoadGuiCenter;
-	mafGUI	*m_BuildGuiLeft;      ///< Left gui for RS step
-	mafGUI	*m_BuildGuiUnderLeft; ///< Underleft gui for RS step
-	mafGUI	*m_BuildGuiCenter;    ///< Center gui for RS step
-	mafGUI	*m_ReferenceSystemGuiLeft;
-	mafGUI	*m_ReferenceSystemGuiUnderLeft;
-	//mafGUI	*m_ReferenceSystemGuiCenter;
-
+	mafGUI	*m_LoadGuiCenter;
 	mafGUI  *m_LoadGuiUnderCenter;
 
 	int       m_OutputType;
@@ -309,7 +275,6 @@ protected:
 	mafString m_PatientPosition;
 	mafString m_VMEName;
 
-	int				m_BuildStepValue;
 	int				m_DicomReaderModality; ///<Type DICOM Read from file
 	int				m_SortAxes;
 	int				m_NumberOfTimeFrames;
@@ -345,15 +310,11 @@ protected:
 	int						m_CurrentSlice;
 	wxSlider		 *m_SliceScannerLoadPage;
 	wxSlider		 *m_SliceScannerCropPage;
-	wxSlider		 *m_SliceScannerBuildPage;
-	wxSlider		 *m_SliceScannerReferenceSystemPage; ///< Slice slider for RS page
-
+	
 	int						m_CurrentTime;
 	wxSlider		 *m_TimeScannerLoadPage;
 	wxSlider		 *m_TimeScannerCropPage;
-	wxSlider		 *m_TimeScannerBuildPage;
-	wxSlider		 *m_TimeScannerReferenceSystemPage; ///< Time slider for RS page
-
+	
 	mafTagArray	*m_TagArray;
 
 	double	m_SliceBounds[6];
@@ -363,17 +324,9 @@ protected:
 
 	bool m_BoxCorrect;
 	bool m_CropFlag;
-	bool m_CropExecuted; //<<<To check if a crop as been executed
 	bool m_ApplyRotation; //<<< true il current series contains rotated slices
 	bool m_ConstantRotation;
-	bool m_mem_is_almost_full;
-
-	int m_SelectedReferenceSystem;  ///< Specify the reference system (xy xz yx)
-	int m_SwapReferenceSystem;      ///< Specify the if the reference system is swapped or not (e.g xy to yx)
-	int m_SwapAllReferenceSystem;   ///< Specify the if the reference system is swapped or not (e.g xy to yx)
-	int m_ApplyToAllReferenceSystem;///< Specify if the current refernce system is applyed to all images
-	int m_GlobalReferenceSystem;    ///< Global reference system if apply to all is selected
-
+	
 	int m_ShowOrientationPosition;
 
 	mafVMEImage				*m_Image;
@@ -401,14 +354,7 @@ http://www.cmake.org/pipermail/insight-users/2005-September/014711.html
 class MAF_EXPORT mafDicomSlice
 {
 public:
-	/** Enumerate reference system modalities */
-	enum ID_REFERENCE_SYSTEM
-	{
-		ID_RS_XY = 0,
-		ID_RS_XZ,
-		ID_RS_YZ,
-	};
-
+	
 	/** constructor */
 	mafDicomSlice() 
 	{
@@ -433,14 +379,12 @@ public:
 		m_DcmTriggerTime = -1.0;
 		m_DcmCardiacNumberOfImages = -1;
 		m_Data = NULL;
-		m_ReferenceSystem = ID_RS_XY;
-		SetSwapReferenceSystem(FALSE);
 	};
 
 	/** overloaded constructor */
 	mafDicomSlice(mafString sliceABSFilename,double dcmImagePositionPatient[3], double dcmImageOrientationPatient[6],\
 		vtkImageData *data , mafString description , mafString date , mafString patientName , mafString patientBirthdate ,int dcmInstanceNumber=-1, int dcmCardiacNumberOfImages=-1,\
-		double dcmTtriggerTime=-1.0, int referenceSystem = ID_RS_XY)  
+		double dcmTtriggerTime=-1.0)  
 	{
 		m_PatientBirthdate = patientBirthdate;
 		m_PatientName = patientName;
@@ -471,9 +415,6 @@ public:
 		{
 			m_Data = NULL;
 		}
-
-		SetReferenceSystem(referenceSystem);
-		SetSwapReferenceSystem(FALSE);
 	};
 
 	/** destructor */
@@ -572,53 +513,6 @@ public:
 	/** return the date */
 	mafString GetDate(){return m_Date;};
 
-	/** Set the information about the selected reference system (xy, xz, yx). see ID_REFERENCE_SYSTEM enum */
-	bool SetReferenceSystem(int referenceSystem)
-	{
-		if(referenceSystem>= ID_RS_XY && referenceSystem <= ID_RS_YZ)
-		{
-			m_ReferenceSystem = referenceSystem;
-			return true;
-		}
-		else
-		{
-			CheckReferenceSystem();
-		}
-		return false;
-	};
-
-	/** Get the information about the selected reference system (xy, xz, yx). see ID_REFERENCE_SYSTEM enum */
-	int GetReferenceSystem()
-	{
-		CheckReferenceSystem();
-		return m_ReferenceSystem;
-	};
-
-	/** Utility function to check reference system integrity */
-	void CheckReferenceSystem()
-	{
-		if(!(m_ReferenceSystem>= ID_RS_XY && m_ReferenceSystem <= ID_RS_YZ)) // Initialization (m_ReferenceSystem have an invalid value)
-		{
-			m_ReferenceSystem = ID_RS_XY;
-		} // Otherwise keep the old value
-	};
-
-	/** Set if reference system is swapped */
-	void SetSwapReferenceSystem(int swap)
-	{
-		if(swap != FALSE)
-		{
-			swap = TRUE;
-		}
-		m_SwapReferenceSystem = swap;
-	};
-
-	/** Set if reference system is swapped */
-	int GetSwapReferenceSystem()
-	{
-		return m_SwapReferenceSystem;
-	};
-
 	/** Get the DCM modality */
 	mafString GetDcmModality(){return m_DcmModality;};
 
@@ -649,8 +543,5 @@ protected:
 	int m_DcmCardiacNumberOfImages;
 
 	vtkImageData *m_Data;
-
-	int m_ReferenceSystem;  ///< Store information about the selected reference system (xy, xz, yx). see ID_REFERENCE_SYSTEM enum
-	int m_SwapReferenceSystem;
 };
 #endif

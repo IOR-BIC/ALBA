@@ -274,6 +274,14 @@ void mafGUIWizardPageNew::RemoveGuiLowerUnderLeft(mafGUI *gui)
   m_GuiLowerUnderLeft->Update();
 }
 
+//----------------------------------------------------------------------------
+void mafGUIWizardPageNew::RemoveGuiLowerCenter(mafGUI *gui)
+{
+	m_GuiLowerCenter->Remove(gui);
+	m_GuiLowerCenter->FitGui();
+	m_GuiLowerCenter->Update();
+}
+
 //--------------------------------------------------------------------------------
 void mafGUIWizardPageNew::SetNextPage(mafGUIWizardPageNew *nextPage)
 //--------------------------------------------------------------------------------
