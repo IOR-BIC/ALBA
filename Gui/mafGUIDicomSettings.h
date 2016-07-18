@@ -56,9 +56,7 @@ public:
     ID_CONVERT_UNITS,
     ID_AUTO_VME_TYPE,
     ID_SETTING_VME_TYPE,
-    ID_OUTPUT_NAME,
-    ID_NAME_COMPOSITOR,
-		ID_DCM_POSITION_PATIENT_CHOICE
+    ID_DCM_POSITION_PATIENT_CHOICE
 	};
   
 
@@ -78,22 +76,13 @@ public:
     mm2m,
   };
 
-  enum OUTPUT_NAME_FORMAT
-  {
-    TRADITIONAL = 0,
- //   DESCRIPTION_DATE,
-    DESCRIPTION_NUMSLICES,
-    CUSTOM,
-  };
-
   enum NAME_COMPOSITOR
   {
-//    ID_SERIES = 0,
-	ID_DESCRIPTION = 0,
+   	ID_DESCRIPTION,
     ID_PATIENT_NAME,
     ID_BIRTHDATE,
     ID_NUM_SLICES,
-	ID_SERIES
+		ID_SERIES
   };
 
 	/** Answer to the messages coming from interface. */
@@ -114,12 +103,9 @@ public:
 	/** Helper function to store and retrieve the last dicom dir opened */
   void SetLastDicomDir(wxString lastDicomDir);;
   wxString GetLastDicomDir() {return m_LastDicomDir;};
-
-  /** Return the type of output name format */
-  int GetOutputNameFormat(){return m_OutputNameType;};
-
+	
   /** Return if an element of custom name check list is checked */
-  int GetEnabledCustomName(int type);
+  int GetEnabledCustomName(enum NAME_COMPOSITOR type);
 
   /** Return the DCM_ImagePositionPatient choice */
   int GetDCMImagePositionPatientExceptionHandling(){return m_DCM_ImagePositionPatientchoice;};
@@ -136,15 +122,13 @@ protected:
 
 	// mafString m_Dictionary;
 	mafGUICheckListBox *m_DicomModalityListBox;
-  mafGUICheckListBox *m_NameCompositorList;
-
+  
   int m_CheckNameCompositor[5];
 	
   int m_OutputType;
 
 	int m_Step;
   int m_AutoVMEType;
-  int m_OutputNameType;
   wxString m_LastDicomDir;
   int m_DCM_ImagePositionPatientchoice;
 

@@ -249,6 +249,8 @@ protected:
 	/** Performe crop of dicom data. */
 	void Crop();
 
+	void SetVMEName(mafDicomSlice * currentSliceData);
+
 	/** Performe Undo crop of dicom data. */
 	void OnUndoCrop();
 
@@ -305,7 +307,7 @@ protected:
 	mafString m_SurgeonName;
 	mafString	m_Identifier;
 	mafString m_PatientPosition;
-	mafString m_VolumeName;
+	mafString m_VMEName;
 
 	int				m_BuildStepValue;
 	int				m_DicomReaderModality; ///<Type DICOM Read from file
@@ -410,10 +412,10 @@ public:
 	/** constructor */
 	mafDicomSlice() 
 	{
-		m_PatientBirthdate = '###';
-		m_PatientName = '###';
-		m_Description = "###";
-		m_Date = "###";
+		m_PatientBirthdate = "";
+		m_PatientName = "";
+		m_Description = "";
+		m_Date = "";
 		m_SliceABSFileName = "";
 		m_DcmImagePositionPatient[0] = -9999;
 		m_DcmImagePositionPatient[1] = -9999;

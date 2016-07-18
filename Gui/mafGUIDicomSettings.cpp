@@ -46,7 +46,6 @@ mafGUISettings(Listener, label)
   m_OutputType = 0;
   m_LastDicomDir = "UNEDFINED_m_LastDicomDir";
   m_Step = ID_1X;
-  m_OutputNameType = TRADITIONAL;
   
   m_DCM_ImagePositionPatientchoice = 0;
 
@@ -67,7 +66,6 @@ void mafGUIDicomSettings::CreateGui()
 	wxString typeArray[3] = { _("Volume"),_("Image") };
   wxString DCM_IMGchoices[2]={_("Skip All"),_("Set Default position")};
 	wxString SkipChoices[4] = { _("Load All"),_("load one in two"),_("load one in trhee"),_("load one in four") };
-	wxString outputNameTypeChoices[3] = { _("Traditional format"),_("Format : 'description_numslices'"),_("Custom") };
 	
   m_Gui->Label("Dicom image position patient exception handling");
   m_Gui->Combo(ID_DCM_POSITION_PATIENT_CHOICE,_("        "),&m_DCM_ImagePositionPatientchoice,2,DCM_IMGchoices);
@@ -77,14 +75,7 @@ void mafGUIDicomSettings::CreateGui()
   m_Gui->Divider(1);
 	m_Gui->Combo(ID_STEP,_("Skip Slices:"),&m_Step,4,SkipChoices);
 	m_Gui->Divider(1);
-  m_Gui->Radio(ID_OUTPUT_NAME,_("Output name"),&m_OutputNameType,3,outputNameTypeChoices);
-  m_NameCompositorList = m_Gui->CheckList(ID_NAME_COMPOSITOR,"");
-  m_NameCompositorList->AddItem(ID_DESCRIPTION,_("Description"),m_CheckNameCompositor[ID_DESCRIPTION]);
-  m_NameCompositorList->AddItem(ID_PATIENT_NAME,_("Patient Name"),m_CheckNameCompositor[ID_PATIENT_NAME]);
-  m_NameCompositorList->AddItem(ID_BIRTHDATE,_("Birthdate"),m_CheckNameCompositor[ID_BIRTHDATE]);
-  m_NameCompositorList->AddItem(ID_NUM_SLICES,_("Num. Slices"),m_CheckNameCompositor[ID_NUM_SLICES]);
-  m_Gui->Divider(1);
-
+  
 	EnableItems();
 }
 //----------------------------------------------------------------------------
@@ -94,9 +85,6 @@ void mafGUIDicomSettings::EnableItems()
   if (m_Gui)
   {
     m_Gui->Enable(ID_SETTING_VME_TYPE,(m_AutoVMEType==TRUE));
-		if(m_NameCompositorList)
-			m_NameCompositorList->Enable(m_OutputNameType == CUSTOM);
-
 	  m_Gui->Update();
   }
 }
@@ -106,18 +94,6 @@ void mafGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 {
 	switch (maf_event->GetId())
 	{
-		case ID_NAME_COMPOSITOR:
-		{
-			m_CheckNameCompositor[ID_PATIENT_NAME] = m_NameCompositorList->IsItemChecked(ID_PATIENT_NAME);
-			m_CheckNameCompositor[ID_DESCRIPTION] = m_NameCompositorList->IsItemChecked(ID_DESCRIPTION);
-			m_CheckNameCompositor[ID_BIRTHDATE] = m_NameCompositorList->IsItemChecked(ID_BIRTHDATE);
-			m_CheckNameCompositor[ID_NUM_SLICES] = m_NameCompositorList->IsItemChecked(ID_NUM_SLICES);
-			m_Config->Write("NameCompositorPatientName", m_NameCompositorList->IsItemChecked(ID_PATIENT_NAME));
-			m_Config->Write("NameCompositorDescription", m_NameCompositorList->IsItemChecked(ID_DESCRIPTION));
-			m_Config->Write("NameCompositorBirthdate", m_NameCompositorList->IsItemChecked(ID_BIRTHDATE));
-			m_Config->Write("NameCompositorNumSlices", m_NameCompositorList->IsItemChecked(ID_NUM_SLICES));
-		}
-		break;
 		case ID_AUTO_VME_TYPE:
 		{
 			m_Config->Write("AutoVMEType", m_AutoVMEType);
@@ -131,11 +107,6 @@ void mafGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 		case ID_SETTING_VME_TYPE:
 		{
 			m_Config->Write("VMEType", m_OutputType);
-		}
-		break;
-		case ID_OUTPUT_NAME:
-		{
-			m_Config->Write("OutputNameFormat", m_OutputNameType);
 		}
 		break;
 		case ID_DCM_POSITION_PATIENT_CHOICE:
@@ -157,11 +128,6 @@ void mafGUIDicomSettings::InitializeSettings()
 	wxString string_item;
 	long long_item;
 	double double_item;
-
-  if(m_Config->Read("OutputNameFormat", &long_item))
-    m_OutputNameType=long_item;
-  else
-    m_Config->Write("OutputNameFormat",m_OutputNameType);
 
 	if(m_Config->Read("StepOfBuild", &long_item))
 		m_Step=long_item;
@@ -219,7 +185,7 @@ void mafGUIDicomSettings::SetLastDicomDir( wxString lastDicomDir )
 
 }
 
-int mafGUIDicomSettings::GetEnabledCustomName( int type )
+int mafGUIDicomSettings::GetEnabledCustomName(enum NAME_COMPOSITOR type)
 {
   if (type >= ID_DESCRIPTION && type<=ID_NUM_SLICES)
   {
