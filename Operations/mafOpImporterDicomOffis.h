@@ -134,9 +134,6 @@ protected:
 		ID_STUDY_SELECT,
 		ID_SERIES_SELECT,
 		ID_CROP,
-		ID_UNDO_CROP,
-		ID_RS_STEP,
-		ID_RS_BUTTON,
 		ID_CANCEL,
 		ID_PATIENT_NAME,
 		ID_PATIENT_ID,
@@ -231,10 +228,7 @@ protected:
 	void Crop();
 
 	void SetVMEName(mafDicomSlice * currentSliceData);
-
-	/** Performe Undo crop of dicom data. */
-	void OnUndoCrop();
-
+		
 	/** Delete all istances of used objects. */
 	void Destroy();
 		
@@ -271,7 +265,6 @@ protected:
 	mafString	m_DicomDirectoryABSFileName;
 	mafString m_PatientName;
 	mafString m_SurgeonName;
-	mafString	m_Identifier;
 	mafString m_PatientPosition;
 	mafString m_VMEName;
 
