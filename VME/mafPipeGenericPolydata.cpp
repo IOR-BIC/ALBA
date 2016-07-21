@@ -141,6 +141,8 @@ void mafPipeGenericPolydata::ExecutePipe()
 	m_ObjectMaterial = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
 
   m_PointCellArraySeparation = dataSet->GetPointData()->GetNumberOfArrays();
+	if (dataSet->GetPointData()->GetNormals())
+		m_PointCellArraySeparation--;
   m_NumberOfArrays = m_PointCellArraySeparation + dataSet->GetCellData()->GetNumberOfArrays();
  
 
@@ -577,7 +579,7 @@ void mafPipeGenericPolydata::UpdateActiveScalarsInVMEDataVectorItems()
   m_Vme->GetOutput()->GetVTKData()->Update();
   m_Vme->Update();
   
-	if(((mafVMEGeneric *)m_Vme)->GetDataVector())
+	if(mafVMEGeneric::SafeDownCast(m_Vme) && ((mafVMEGeneric *)m_Vme)->GetDataVector())
 	{
 		for (mafDataVector::Iterator it = ((mafVMEGeneric *)m_Vme)->GetDataVector()->Begin(); it != ((mafVMEGeneric *)m_Vme)->GetDataVector()->End(); it++)
 		{
@@ -673,29 +675,35 @@ void mafPipeGenericPolydata::UpdateVisualizationWithNewSelectedScalars()
 void mafPipeGenericPolydata::CreateFieldDataControlArrays()
 {
   //String array allocation
-  int numPointScalars = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetNumberOfArrays();
-  int numCellScalars = m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetNumberOfArrays();
+	vtkPointData * pointData = m_Vme->GetOutput()->GetVTKData()->GetPointData();
+	vtkCellData * cellData = m_Vme->GetOutput()->GetVTKData()->GetCellData();
 
+  int numPointScalars = pointData->GetNumberOfArrays();
+	int numCellScalars = cellData->GetNumberOfArrays();
+
+	if (pointData->GetNormals())
+		numPointScalars--;
+	
   wxString *tempScalarsPointsName=new wxString[numPointScalars + numCellScalars];
   int count=0;
 
   int pointArrayNumber;
   for(pointArrayNumber = 0;pointArrayNumber<numPointScalars;pointArrayNumber++)
   {
-		const char *arrayName=m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetArrayName(pointArrayNumber);
+		const char *arrayName=pointData->GetArrayName(pointArrayNumber);
     if(arrayName && strcmp(arrayName,"")!=0)
     {
       count++;
-      tempScalarsPointsName[count-1]=m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetArrayName(pointArrayNumber);
+      tempScalarsPointsName[count-1]=pointData->GetArrayName(pointArrayNumber);
     }
   }
   for(int cellArrayNumber=0;cellArrayNumber<numCellScalars;cellArrayNumber++)
   {
-		const char *arrayName=m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetArrayName(cellArrayNumber);
+		const char *arrayName=cellData->GetArrayName(cellArrayNumber);
     if(arrayName && strcmp(arrayName,"")!=0)
     {
       count++;
-      tempScalarsPointsName[count-1]=m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetArrayName(cellArrayNumber);
+      tempScalarsPointsName[count-1]=cellData->GetArrayName(cellArrayNumber);
     }
   }
 
