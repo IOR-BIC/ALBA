@@ -46,6 +46,7 @@ SET(PROJECT_SRCS
 	vtkHoleConnectivityTest.h vtkHoleConnectivityTest.cpp
 	vtkDicomUnPackerTest.h vtkDicomUnPackerTest.cpp
 	vtkTriangleQualityRatioTest.h vtkTriangleQualityRatioTest.cpp
+	vtkMAFTubeFilterTest.h vtkMAFTubeFilterTest.cpp
 	vtkMaskPolyDataFilterTest.h vtkMaskPolyDataFilterTest.cpp
 	vtkMAFExtrudeToCircleTest.h vtkMAFExtrudeToCircleTest.cpp
 	vtkMAFPastValuesListTest.h vtkMAFPastValuesListTest.cpp
