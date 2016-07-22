@@ -59,9 +59,9 @@ void vtkMAFAbstractPointsSource::Execute()
     newVerts->InsertCellPoint(newPoints->InsertNextPoint(points->GetPoint(i)));
   }
     
-   //
-   // Update ourselves and release memory
-   //
+	//
+	// Update ourselves and release memory
+	//
 	if(NumberOfPoints>0)
 		output->SetPoints(newPoints);
 	newPoints->Delete();
