@@ -109,6 +109,7 @@
 #include "vtkMAFImageFillHolesRemoveIslandsTest.h"
 #include "vtkMAFRayCastCleanerTest.h"
 #include "vtkMAFLineStripSourceTest.h"
+#include "vtkMAFTubeFilterTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -220,7 +221,7 @@ int
 	runner.addTest(vtkMAFImageFillHolesRemoveIslandsTest::suite());
 	runner.addTest(vtkMAFRayCastCleanerTest::suite());
 	runner.addTest(vtkMAFLineStripSourceTest::suite());
-
+	runner.addTest(vtkMAFTubeFilterTest::suite());
 
 	runner.run( controller );
 
