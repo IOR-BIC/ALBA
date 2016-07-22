@@ -68,6 +68,7 @@
 #include "vtkMAFFillingHoleTest.h"
 #include "vtkMAFFixTopologyTest.h"
 #include "vtkWeightedLandmarkTransformTest.h"
+#include "vtkMAFLandmarkCloudOutlineCornerFilterTest.h"
 #include "EdgeTest.h"
 #include "TriangleTest.h"
 #include "CoredPointIndexTest.h"
@@ -178,6 +179,7 @@ int
 	runner.addTest(vtkMAFFillingHoleTest::suite());
 	runner.addTest(vtkMAFFixTopologyTest::suite());
 	runner.addTest(vtkWeightedLandmarkTransformTest::suite());
+	runner.addTest(vtkMAFLandmarkCloudOutlineCornerFilterTest::suite());
 	runner.addTest(EdgeTest::suite());
 	runner.addTest(TriangleTest::suite());
 	runner.addTest(CoredPointIndexTest::suite());

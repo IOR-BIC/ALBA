@@ -61,6 +61,7 @@ SET(PROJECT_SRCS
 	vtkMAFMeshCutter_BESTest.h vtkMAFMeshCutter_BESTest.cpp
 	vtkMAFFillingHoleTest.h vtkMAFFillingHoleTest.cpp
 	vtkMAFFixTopologyTest.h vtkMAFFixTopologyTest.cpp
+	vtkMAFLandmarkCloudOutlineCornerFilterTest.h vtkMAFLandmarkCloudOutlineCornerFilterTest.cpp
 	vtkWeightedLandmarkTransformTest.h vtkWeightedLandmarkTransformTest.cpp
 	EdgeTest.h EdgeTest.cpp
 	TriangleTest.h TriangleTest.cpp
