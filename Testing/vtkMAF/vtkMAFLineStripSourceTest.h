@@ -32,11 +32,16 @@ class vtkMAFLineStripSourceTest : public mafTest
 {
 	CPPUNIT_TEST_SUITE(vtkMAFLineStripSourceTest);
 	CPPUNIT_TEST(TestDynamicAllocation);
-
+	CPPUNIT_TEST(TestPoints);
+	CPPUNIT_TEST(TestClassName);
+	CPPUNIT_TEST(TestCells);
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
 	void TestDynamicAllocation();
+	void TestPoints();
+	void TestClassName();
+	void TestCells();
 };
 
 #endif
