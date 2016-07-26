@@ -63,8 +63,8 @@ void mafGUIDicomSettings::CreateGui()
 {
 	m_Gui = new mafGUI(this);
 
-	wxString typeArray[3] = { _("Volume"),_("Image") };
-  wxString DCM_IMGchoices[2]={_("Skip All"),_("Set Default position")};
+	wxString DCM_IMGchoices[2]={_("Skip All"),_("Set Default position")};
+	wxString typeArray[3] = { _("Volume"),_("Images") };
 	wxString SkipChoices[4] = { _("Load All"),_("load one in two"),_("load one in trhee"),_("load one in four") };
 	
   m_Gui->Label("Dicom image position patient exception handling");

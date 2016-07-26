@@ -54,7 +54,11 @@ class mafProgressBarHelper;
 class DcmDataset;
 
 class mafDicomSlice;
-class medDicomSeriesSliceList;
+class mafDicomSeries;
+class mafGUIDicomSettings;
+class mafDicomStudyList;
+class mafDicomStudy;
+
 
 //----------------------------------------------------------------------------
 // mafOpImporterDicomOffis :
@@ -95,16 +99,10 @@ public:
 	/** Set the abs file name of the directory containing DICOM slices to import */
 	void SetDicomDirectoryABSFileName(const char *dirName){m_DicomDirectoryABSFileName = dirName;};
 	const char *GetDicomDirectoryABSFileName() const {return m_DicomDirectoryABSFileName.GetCStr();};
-
-	/** Read Dicom file */
-	void ReadDicom();
-
+		
 	/** Create the vtkTexture for slice_num dicom slice: this will be written to m_SliceTexture ivar*/
 	void GenerateSliceTexture(int imageID);
-
-	/** Get dicom slice vtkImageData from its local file name */
-	vtkImageData* GetSliceImageDataFromLocalDicomFileName(mafString sliceName);
-	
+		
 	/** Build a volume from the list of dicom files. */
 	int BuildOutputVMEGrayVolumeFromDicom();
 
@@ -162,29 +160,28 @@ protected:
 
 	/** Create crop page and   his GUI for the wizard. */
 	void CreateCropPage();
-
-	/** Reset the list of files and all the structures that own images information. */
-	void ResetStructure();
-
+		
 	/** gets the range of the dicom by walking thought the slices */
 	void GetDicomRange(double *range);
 
 	/** Reset the slider that allow to scan the slices. */
 	void CreateSliders();
 
-	/** Build the list of dicom filer recognized. */
-	bool BuildDicomFileList(const char *dicomDirABSPath);
+	/** Load Dicom in forlder */
+	bool LoadDicomFromDir(const char *dicomDirABSPath);
+
+	/** Build the list of files in folder and subfolders */
+	vector<wxString> BuildFileListRecursive(wxString path);
+
 
 	/** Read the list of dicom files recognized. */
-	bool ReadDicomFileList(mafString& currentSliceABSDirName, mafProgressBarHelper *progressHelper);
+	mafDicomSlice *ReadDicomSlice(mafString fileName);
 
-	void FindAndGetDicomStrings(DcmDataset * dicomDataset, const char *&birthdate, const char *&date, const char *&description, const char *&patientName, const char *&photometricInterpretation);
+	vtkImageData *CreateImageData(DcmDataset * dicomDataset, double * dcmImagePositionPatient);
 
 	void GetDicomSpacing(DcmDataset * dicomDataset, double * dcmPixelSpacing);
 
-	/** Check if dicom dataset contains rotations */
-	bool IsRotated( double dcmImageOrientationPatient[6] );
-
+	
 	/** Return the slice number from the heightId and sliceId*/
 	int GetSliceIDInSeries(int heightId, int timeId);
 
@@ -192,11 +189,8 @@ protected:
 	void ShowSlice();
 
 	/** Fill Study listbox. */
-	void FillStudyListBox(mafString studyUID);
-
-	/** Update Study listbox. */
-	void UpdateStudyListBox();
-
+	void FillStudyListBox();
+		
 	/** Fill Series listbox. */
 	void FillSeriesListBox();
 
@@ -205,12 +199,6 @@ protected:
 
 	/** Perform gui update in several wizard pages */
 	void GuiUpdate();
-
-	/** Enable slice slider. */
-	void EnableSliceSlider(bool enable);
-
-	/** Enable time slider. */
-	void EnableTimeSlider(bool enable);
 
 	/** Update camera. */
 	void CameraUpdate();
@@ -229,11 +217,7 @@ protected:
 
 	void SetVMEName(mafDicomSlice * currentSliceData);
 		
-	/** Delete all istances of used objects. */
-	void Destroy();
-		
-	vtkDirectory			*m_DICOMDirectoryReader; 
-	vtkLookupTable	*m_SliceLookupTable;
+	vtkLookupTable		*m_SliceLookupTable;
 	vtkPlaneSource		*m_SlicePlane;
 	vtkPolyDataMapper	*m_SliceMapper;
 	vtkTexture				*m_SliceTexture;
@@ -245,7 +229,6 @@ protected:
 	// text stuff
 	vtkActor2D    *m_TextActor;
 	vtkTextMapper	*m_TextMapper;
-	wxString m_Text;
 
 	mafInteractorDICOMImporter *m_DicomInteractor;
 
@@ -270,35 +253,20 @@ protected:
 
 	int				m_DicomReaderModality; ///<Type DICOM Read from file
 	int				m_SortAxes;
-	int				m_NumberOfTimeFrames;
-
+	
 	int m_SkipAllNoPosition;
 
 	std::map <mafString,int> m_dcm_dim;
 
-	medDicomSeriesSliceList	*m_SelectedSeriesSlicesList; ///< Selected study slices list
-
-	std::vector<mafString> m_SelectedSeriesID; ///< Selected StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector
-
-	std::map<std::vector<mafString>,medDicomSeriesSliceList*> m_SeriesIDToSlicesListMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to slices list map 
-
-	std::map<std::vector<mafString>,int> m_SeriesIDstringToSeriesIDint;
-
-	std::map<std::vector<mafString>,std::map<mafString,int>> m_SeriesIDstringToSeriesDimensionMap;
-
-	std::map<std::vector<mafString>,mafDicomCardiacMRIHelper*> m_SeriesIDToCardiacMRIHelperMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to slices list map 
-
-	std::map<std::vector<mafString>,bool> m_SeriesIDContainsRotationsMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to boolean map 
-
-	wxString  m_CurrentSliceABSFileName;
+	mafDicomStudyList *m_StudyList;
+	mafDicomSeries	*m_SelectedSeries; ///< Selected series slices list
 	
-	int				 m_NumberOfStudies; ///<Number of study present in the DICOM directory
-	int				 m_NumberOfSlices;
-	wxListBox	*m_StudyListbox;
-	//	wxListCtrl  *m_StudyListctrl;
-	//	wxListBox	*m_SeriesListbox;
-	wxListCtrl  *m_SeriesListctrl;
+	mafGUIDicomSettings* GetSetting();
 
+	wxListBox	*m_StudyListbox;
+	wxListBox *m_SeriesListbox;
+	int m_SelectedStudy;
+	
 	int           m_ZCropBounds[2];
 	int						m_CurrentSlice;
 	wxSlider		 *m_SliceScannerLoadPage;
@@ -317,7 +285,6 @@ protected:
 
 	bool m_BoxCorrect;
 	bool m_CropFlag;
-	bool m_ApplyRotation; //<<< true il current series contains rotated slices
 	bool m_ConstantRotation;
 	
 	int m_ShowOrientationPosition;
@@ -333,118 +300,180 @@ protected:
 
 	/** destructor */
 	~mafOpImporterDicomOffis();
-
 };
 
+
+//----------------------------------------------------------------------------
+// mafDicomStudyList:
+//----------------------------------------------------------------------------
+
+class mafDicomStudyList
+{
+public:
+	void AddSlice(mafDicomSlice *slice);
+
+	mafDicomStudy *GetStudy(int num);
+
+	int GetStudiesNum() { return m_Studies.size(); }
+
+	int GetSeriesTotalNum();
+protected:
+	vector<mafDicomStudy *> m_Studies;
+};
+
+//----------------------------------------------------------------------------
+// mafDicomStudy:
+//----------------------------------------------------------------------------
+
+class mafDicomStudy
+{
+public:
+
+	mafDicomStudy(mafString studyID) { m_StudyID = studyID; } 
+
+	void AddSlice(mafDicomSlice *slice);
+	
+	/** Returns StudyID */
+	mafString GetStudyID() const { return m_StudyID; }
+
+	int GetSeriesNum() { return m_Series.size(); }
+
+	mafDicomSeries *GetSeries(int id) { return m_Series[id]; }
+
+	void RemoveSeries(int seriesID);
+
+protected:
+	mafString m_StudyID;
+	vector<mafDicomSeries *> m_Series;
+};
+
+//----------------------------------------------------------------------------
+// mafDicomSeries:
+//----------------------------------------------------------------------------
+
+class mafDicomSeries
+{
+public:
+
+	mafDicomSeries(mafString seriesID) { m_SeriesID = seriesID; m_CardiacHelper = NULL; m_IsRotated = false; m_CardiacImagesNum = 1; }
+
+	~mafDicomSeries() { cppDEL(m_CardiacHelper); }
+
+	void AddSlice(mafDicomSlice *slice);
+
+	mafDicomSlice *GetSlice(int id) { return m_Slices[id]; }
+
+	int GetSlicesNum() { return m_Slices.size(); }
+
+	/** Check if dicom dataset contains rotations */
+	bool IsRotated(const double dcmImageOrientationPatient[6]);
+
+	/** Returns IsRotated */
+	bool IsRotated() const { return m_IsRotated; }
+	
+	/** Sets IsRotated */
+	void SetRotated(bool isRotated) { m_IsRotated = isRotated; }
+	
+	/** Returns Slices */
+	std::vector<mafDicomSlice *> GetSlices() const { return m_Slices; }
+
+	/** Sets Slices */
+	void SetSlices(std::vector<mafDicomSlice *> slices) { m_Slices = slices; }
+	
+	/** Returns CardiacHelper */
+	mafDicomCardiacMRIHelper * GetCardiacHelper() const { return m_CardiacHelper; }
+
+	/** Sets CardiacHelper */
+	void SetCardiacHelper(mafDicomCardiacMRIHelper * cardiacHelper) { m_CardiacHelper = cardiacHelper; }
+	
+	/** Returns SerieID */
+	mafString GetSerieID() const { return m_SeriesID; }
+
+	const int *GetDimensions() { return m_Dimensions; }
+
+	/** Returns FramesNum */
+	int GetCardiacImagesNum() const { return m_CardiacImagesNum; }
+
+	/** Sort slices internally */
+	void SortSlices();
+		
+protected:
+
+	vector<mafDicomSlice *> m_Slices;
+	mafDicomCardiacMRIHelper *m_CardiacHelper;
+	int m_Dimensions[3];
+	mafString m_SeriesID;
+	bool m_IsRotated;
+	int m_CardiacImagesNum;
+};
+
+
+//----------------------------------------------------------------------------
+// mafDicomSlice:
+//----------------------------------------------------------------------------
 /**
 class name: mafDicomSlice
 Holds information on a single dicom slice
-
-We are using Image Position (Patient) (0020,0032) dicom tag to set dicom slice position. 
-See here for the motivation behind this decision:
-http://www.cmake.org/pipermail/insight-users/2005-September/014711.html
 */
 class MAF_EXPORT mafDicomSlice
 {
 public:
-	
-	/** constructor */
-	mafDicomSlice() 
-	{
-		m_PatientBirthdate = "";
-		m_PatientName = "";
-		m_Description = "";
-		m_Date = "";
-		m_SliceABSFileName = "";
-		m_DcmImagePositionPatient[0] = -9999;
-		m_DcmImagePositionPatient[1] = -9999;
-		m_DcmImagePositionPatient[2] = -9999;
-		m_DcmImagePositionPatientOriginal[0] = m_DcmImagePositionPatient[0];
-		m_DcmImagePositionPatientOriginal[1] = m_DcmImagePositionPatient[1];
-		m_DcmImagePositionPatientOriginal[2] = m_DcmImagePositionPatient[2];
-		m_DcmImageOrientationPatient[0] = 0.0;
-		m_DcmImageOrientationPatient[1] = 0.0; 
-		m_DcmImageOrientationPatient[2] = 0.0; 
-		m_DcmImageOrientationPatient[3] = 0.0; 
-		m_DcmImageOrientationPatient[4] = 0.0; 
-		m_DcmImageOrientationPatient[5] = 0.0; 
-		m_DcmInstanceNumber = -1;
-		m_DcmTriggerTime = -1.0;
-		m_DcmCardiacNumberOfImages = -1;
-		m_Data = NULL;
-	};
 
-	/** overloaded constructor */
-	mafDicomSlice(mafString sliceABSFilename,double dcmImagePositionPatient[3], double dcmImageOrientationPatient[6],\
-		vtkImageData *data , mafString description , mafString date , mafString patientName , mafString patientBirthdate ,int dcmInstanceNumber=-1, int dcmCardiacNumberOfImages=-1,\
-		double dcmTtriggerTime=-1.0)  
+	/** Constructor */
+	mafDicomSlice(mafString sliceABSFilename, double dcmImagePositionPatient[3], double dcmImageOrientationPatient[6], \
+		vtkImageData *data, mafString description, mafString date, mafString patientName, mafString patientBirthdate, int dcmInstanceNumber = -1, int dcmCardiacNumberOfImages = -1, \
+		double dcmTtriggerTime = -1.0)
 	{
 		m_PatientBirthdate = patientBirthdate;
 		m_PatientName = patientName;
 		m_Description = description;
 		m_Date = date;
 		m_SliceABSFileName = sliceABSFilename;
-		m_DcmImagePositionPatient[0] = dcmImagePositionPatient[0];
-		m_DcmImagePositionPatient[1] = dcmImagePositionPatient[1];
-		m_DcmImagePositionPatient[2] = dcmImagePositionPatient[2];
-		m_DcmImagePositionPatientOriginal[0] = m_DcmImagePositionPatient[0];
-		m_DcmImagePositionPatientOriginal[1] = m_DcmImagePositionPatient[1];
-		m_DcmImagePositionPatientOriginal[2] = m_DcmImagePositionPatient[2];
-		m_DcmImageOrientationPatient[0] = dcmImageOrientationPatient[0];
-		m_DcmImageOrientationPatient[1] = dcmImageOrientationPatient[1];
-		m_DcmImageOrientationPatient[2] = dcmImageOrientationPatient[2];
-		m_DcmImageOrientationPatient[3] = dcmImageOrientationPatient[3];
-		m_DcmImageOrientationPatient[4] = dcmImageOrientationPatient[4];
-		m_DcmImageOrientationPatient[5] = dcmImageOrientationPatient[5];
 		m_DcmInstanceNumber = dcmInstanceNumber;
 		m_DcmCardiacNumberOfImages = dcmCardiacNumberOfImages;
 		m_DcmTriggerTime = dcmTtriggerTime;
-		if (data != NULL)
-		{
-			vtkNEW(m_Data);
-			m_Data->DeepCopy(data);
-		}
-		else
-		{
-			m_Data = NULL;
-		}
+		m_Data = data;
+		SetDcmImagePositionPatient(dcmImagePositionPatient);
+		SetDcmImagePositionPatientOriginal(dcmImagePositionPatient);
+		SetDcmImageOrientationPatient(dcmImageOrientationPatient);
+		CalculateUnrotatedPos();
 	};
 
 	/** destructor */
-	~mafDicomSlice() {vtkDEL(m_Data);};
+	~mafDicomSlice() { vtkDEL(m_Data); };
 
 	/** Return patient birthday */
-	mafString GetPatientBirthday(){return m_PatientBirthdate;};
+	mafString GetPatientBirthday() { return m_PatientBirthdate; };
 
 	/** Return patient name */
-	mafString GetPatientName(){return m_PatientName;};
+	mafString GetPatientName() { return m_PatientName; };
 
-	/** Return the filename of the corresponding dicom slice. */
-	const char *GetSliceABSFileName() const {return m_SliceABSFileName.GetCStr();};
+	/** Return the filename of the corresponding Dicom slice. */
+	const char *GetSliceABSFileName() const { return m_SliceABSFileName.GetCStr(); };
 
-	/** Set the filename of the corresponding dicom slice. */
-	void SetSliceABSFileName(char *fileName){m_SliceABSFileName = fileName;};
+	/** Set the filename of the corresponding Dicom slice. */
+	void SetSliceABSFileName(char *fileName) { m_SliceABSFileName = fileName; };
 
-	/** Return the image number of the dicom slice*/
-	int GetDcmInstanceNumber() const {return m_DcmInstanceNumber;};
+	/** Return the image number of the Dicom slice*/
+	int GetDcmInstanceNumber() const { return m_DcmInstanceNumber; };
 
-	/** Set the image number of the dicom slice*/
-	void SetDcmInstanceNumber(int number){m_DcmInstanceNumber = number;};
+	/** Set the image number of the Dicom slice*/
+	void SetDcmInstanceNumber(int number) { m_DcmInstanceNumber = number; };
 
-	/** Return the number of cardiac timeframes*/
-	int GetDcmCardiacNumberOfImages() const {return m_DcmCardiacNumberOfImages;};
+	/** Return the number of cardiac time frames*/
+	int GetDcmCardiacNumberOfImages() const { return m_DcmCardiacNumberOfImages; };
 
-	/** Set the number of cardiac timeframes*/
-	void SetDcmCardiacNumberOfImages(int number){m_DcmCardiacNumberOfImages = number;};
+	/** Set the number of cardiac time frames*/
+	void SetDcmCardiacNumberOfImages(int number) { m_DcmCardiacNumberOfImages = number; };
 
-	/** Return the trigger time of the dicom slice*/
-	double GetDcmTriggerTime() const {return m_DcmTriggerTime;};
+	/** Return the trigger time of the Dicom slice*/
+	double GetDcmTriggerTime() const { return m_DcmTriggerTime; };
 
-	/** Set the trigger time of the dicom slice*/
-	void SetDcmTriggerTime(double time){m_DcmTriggerTime = time;};
+	/** Set the trigger time of the Dicom slice*/
+	void SetDcmTriggerTime(double time) { m_DcmTriggerTime = time; };
 
 	/** Retrieve image data*/
-	vtkImageData* GetVTKImageData(){return m_Data;};
+	vtkImageData* GetVTKImageData() { return m_Data; };
 
 	/** Set vtkImageData */
 	void SetVTKImageData(vtkImageData *data);
@@ -452,65 +481,80 @@ public:
 	/** Set the DcmImagePositionPatient tag for the slice */
 	void SetDcmImagePositionPatient(double dcmImagePositionPatient[3])
 	{
-		m_DcmImagePositionPatient[0]=dcmImagePositionPatient[0];
-		m_DcmImagePositionPatient[1]=dcmImagePositionPatient[1];
-		m_DcmImagePositionPatient[2]=dcmImagePositionPatient[2];
+		m_DcmImagePositionPatient[0] = dcmImagePositionPatient[0];
+		m_DcmImagePositionPatient[1] = dcmImagePositionPatient[1];
+		m_DcmImagePositionPatient[2] = dcmImagePositionPatient[2];
 	};
 
 	/** Get the DcmImagePositionPatient tag for the slice */
 	void GetDcmImagePositionPatient(double dcmImagePositionPatient[3])
 	{
-		dcmImagePositionPatient[0]=m_DcmImagePositionPatient[0];
-		dcmImagePositionPatient[1]=m_DcmImagePositionPatient[1];
-		dcmImagePositionPatient[2]=m_DcmImagePositionPatient[2];
+		dcmImagePositionPatient[0] = m_DcmImagePositionPatient[0];
+		dcmImagePositionPatient[1] = m_DcmImagePositionPatient[1];
+		dcmImagePositionPatient[2] = m_DcmImagePositionPatient[2];
+	};
+
+	/** Get the DcmImagePositionPatient tag for the slice */
+	const double *GetDcmImagePositionPatient() {return m_DcmImagePositionPatient;};
+
+	/** Set the DcmImagePositionPatient tag for the slice */
+	void SetDcmImagePositionPatientOriginal(double dcmImagePositionPatient[3])
+	{
+		m_DcmImagePositionPatientOriginal[0] = dcmImagePositionPatient[0];
+		m_DcmImagePositionPatientOriginal[1] = dcmImagePositionPatient[1];
+		m_DcmImagePositionPatientOriginal[2] = dcmImagePositionPatient[2];
 	};
 
 	/** Get the DcmImagePositionPatient tag original for the slice */
 	void GetDcmImagePositionPatientOriginal(double dcmImagePositionPatient[3])
 	{
-		dcmImagePositionPatient[0]=m_DcmImagePositionPatientOriginal[0];
-		dcmImagePositionPatient[1]=m_DcmImagePositionPatientOriginal[1];
-		dcmImagePositionPatient[2]=m_DcmImagePositionPatientOriginal[2];
+		dcmImagePositionPatient[0] = m_DcmImagePositionPatientOriginal[0];
+		dcmImagePositionPatient[1] = m_DcmImagePositionPatientOriginal[1];
+		dcmImagePositionPatient[2] = m_DcmImagePositionPatientOriginal[2];
 	};
 
+	/** Get the DcmImagePositionPatient tag for the slice */
+	const double *GetDcmImagePositionPatientOriginal() { return m_DcmImagePositionPatientOriginal; };
 
 	/** Set the DcmImageOrientationPatient tag for the slice*/
 	void SetDcmImageOrientationPatient(double dcmImageOrientationPatient[6])
 	{
-		m_DcmImageOrientationPatient[0]=dcmImageOrientationPatient[0];
-		m_DcmImageOrientationPatient[1]=dcmImageOrientationPatient[1]; 
-		m_DcmImageOrientationPatient[2]=dcmImageOrientationPatient[2]; 
-		m_DcmImageOrientationPatient[3]=dcmImageOrientationPatient[3]; 
-		m_DcmImageOrientationPatient[4]=dcmImageOrientationPatient[4]; 
-		m_DcmImageOrientationPatient[5]=dcmImageOrientationPatient[5]; 
+		m_DcmImageOrientationPatient[0] = dcmImageOrientationPatient[0];
+		m_DcmImageOrientationPatient[1] = dcmImageOrientationPatient[1];
+		m_DcmImageOrientationPatient[2] = dcmImageOrientationPatient[2];
+		m_DcmImageOrientationPatient[3] = dcmImageOrientationPatient[3];
+		m_DcmImageOrientationPatient[4] = dcmImageOrientationPatient[4];
+		m_DcmImageOrientationPatient[5] = dcmImageOrientationPatient[5];
 	};
 
 	/** Get the DcmImageOrientationPatient tag for the slice*/
 	void GetDcmImageOrientationPatient(double dcmImageOrientationPatient[6])
 	{
-		dcmImageOrientationPatient[0]= m_DcmImageOrientationPatient[0];
-		dcmImageOrientationPatient[1]= m_DcmImageOrientationPatient[1];
-		dcmImageOrientationPatient[2]= m_DcmImageOrientationPatient[2];
-		dcmImageOrientationPatient[3]= m_DcmImageOrientationPatient[3];
-		dcmImageOrientationPatient[4]= m_DcmImageOrientationPatient[4];
-		dcmImageOrientationPatient[5]= m_DcmImageOrientationPatient[5];
+		dcmImageOrientationPatient[0] = m_DcmImageOrientationPatient[0];
+		dcmImageOrientationPatient[1] = m_DcmImageOrientationPatient[1];
+		dcmImageOrientationPatient[2] = m_DcmImageOrientationPatient[2];
+		dcmImageOrientationPatient[3] = m_DcmImageOrientationPatient[3];
+		dcmImageOrientationPatient[4] = m_DcmImageOrientationPatient[4];
+		dcmImageOrientationPatient[5] = m_DcmImageOrientationPatient[5];
 	};
 
-	/** 
-	Write dicom slice orientation on matrix*/
-	void GetOrientation( vtkMatrix4x4 * matrix );
+	/** Get the DcmImageOrientationPatient tag for the slice*/
+	const double *GetDcmImageOrientationPatient() { return m_DcmImageOrientationPatient; }
 
+	/** Return the position unrotated */
+	const double *GetUnrotatedPos() { return m_UnrotatedPos; }
+	
 	/** return the description */
-	mafString GetDescription(){return m_Description;};
+	mafString GetDescription() { return m_Description; };
 
 	/** return the date */
-	mafString GetDate(){return m_Date;};
+	mafString GetDate() { return m_Date; };
 
 	/** Get the DCM modality */
-	mafString GetDcmModality(){return m_DcmModality;};
+	mafString GetDcmModality() { return m_DcmModality; };
 
 	/** Set the DCM modality */
-	void SetDcmModality(mafString dcmModality){m_DcmModality=dcmModality;};
+	void SetDcmModality(mafString dcmModality) { m_DcmModality = dcmModality; };
 
 
 	/** Returns PhotometricInterpretation */
@@ -519,7 +563,25 @@ public:
 	/** Sets PhotometricInterpretation */
 	void SetPhotometricInterpretation(mafString photometricInterpretation) { m_PhotometricInterpretation = photometricInterpretation; }
 
+
+	/** Returns SeriesID */
+	mafString GetSeriesID() const { return m_SeriesID; }
+
+	/** Sets SeriesID */
+	void SetSeriesID(mafString seriesID) { m_SeriesID = seriesID; }
+
+
+	/** Returns StudyID */
+	mafString GetStudyID() const { return m_StudyID; }
+
+	/** Sets StudyID */
+	void SetStudyID(mafString studyID) { m_StudyID = studyID; }
+
 protected:
+	
+	void CalculateUnrotatedPos();
+
+	double m_UnrotatedPos[3];
 	double m_DcmImagePositionPatient[3];
 	double m_DcmImagePositionPatientOriginal[3];
 	double m_DcmImageOrientationPatient[6];
@@ -530,11 +592,14 @@ protected:
 	mafString m_PatientBirthdate;
 	mafString m_DcmModality;
 	mafString m_PhotometricInterpretation;
+	mafString m_SeriesID;
+	mafString m_StudyID;
 
 	double m_DcmTriggerTime;
 	int m_DcmInstanceNumber;
 	int m_DcmCardiacNumberOfImages;
 
-	vtkImageData *m_Data;
+	vtkImageData *m_Data;	
 };
+
 #endif

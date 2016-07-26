@@ -76,6 +76,12 @@ public:
     mm2m,
   };
 
+	enum POSITION_EXEPTION_HANDLING
+	{
+		SKIP_ALL,
+		APPLY_DEFAULT_POSITION
+	};
+
   enum NAME_COMPOSITOR
   {
    	ID_DESCRIPTION,
