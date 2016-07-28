@@ -14,7 +14,6 @@
 
 =========================================================================*/
 
-
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
@@ -30,16 +29,10 @@
 #include "mafSceneNode.h"
 #include "mafVMESurface.h"
 #include "mmaMaterial.h"
-
 #include "mafVMERoot.h"
-#include "vtkMAFAssembly.h"
 
+#include "vtkMAFAssembly.h"
 #include "vtkMapper.h"
-#include "vtkJPEGWriter.h"
-#include "vtkJPEGReader.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkImageMathematics.h"
-#include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkDataSetReader.h"
 #include "vtkPolyData.h"
@@ -47,8 +40,6 @@
 #include "vtkDoubleArray.h"
 
 // render window stuff
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkCubeSource.h"
 #include "vtkCylinderSource.h"
@@ -73,7 +64,6 @@ enum TESTS_PIPE_SURFACE
   VTK_PROPERTY_TEST,
   NUMBER_OF_TEST_CLASSIC,
 };
-
 
 //----------------------------------------------------------------------------
 void mafPipeSurfaceTexturedTest::TestFixture()
@@ -111,8 +101,7 @@ void mafPipeSurfaceTexturedTest::TestPipeTextureExecution()
   m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 
   ///////////// end render stuff /////////////////////////
-
-
+	
   ////// Create VME (import vtkData) ////////////////////
 	vtkJPEGReader *ImporterImage;
 	vtkNEW(ImporterImage);
@@ -132,23 +121,20 @@ void mafPipeSurfaceTexturedTest::TestPipeTextureExecution()
   cylinder->SetResolution(64);
   cylinder->Update();
   cylinder->GetOutput()->Update();
-
-
+	
   vtkSphereSource *sphere = vtkSphereSource::New();
   sphere->SetThetaResolution(64);
   sphere->SetPhiResolution(64);
   sphere->Update();
   sphere->GetOutput()->Update();
-
-  
+	  
   surface->SetData((vtkPolyData*)cube->GetOutput(),0.0);
   surface->GetOutput()->Update();
   surface->GetMaterial();
   surface->GetMaterial()->m_MaterialType = mmaMaterial::USE_TEXTURE;
 	surface->GetMaterial()->SetMaterialTexture((vtkImageData*)ImporterImage->GetOutput());
   surface->Update();
-
-  
+	  
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
   sceneNode = new mafSceneNode(NULL,NULL,surface, NULL);
@@ -210,7 +196,8 @@ void mafPipeSurfaceTexturedTest::TestPipeTextureExecution()
 
     m_RenderWindow->Render();
 	  printf("\n Visualizzazione: %s \n", strings[i]);
-    CompareImages(i);
+
+		COMPARE_IMAGES("TestPipeTextureExecution", i);
   }
 
   vtkDEL(actorList);
@@ -238,8 +225,7 @@ void mafPipeSurfaceTexturedTest::TestPipeClassicExecution()
 	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 
 	///////////// end render stuff /////////////////////////
-
-
+	
 	////// Create VME (import vtkData) ////////////////////
 	vtkDataSetReader *Importer;
 	vtkNEW(Importer);
@@ -307,7 +293,8 @@ void mafPipeSurfaceTexturedTest::TestPipeClassicExecution()
 
 		m_RenderWindow->Render();
 		printf("\n Visualizzazione: %s \n", strings[i-SCALAR_TEST]);
-		CompareImages(i);
+
+		COMPARE_IMAGES("TestPipeClassicExecution", i);
 
 		if(i == SCALAR_TEST)
 		{
@@ -328,117 +315,7 @@ void mafPipeSurfaceTexturedTest::TestPipeClassicExecution()
 	mafDEL(surface);
 	vtkDEL(Importer);
 }
-//----------------------------------------------------------------------------
-void mafPipeSurfaceTexturedTest::CompareImages(int scalarIndex)
-//----------------------------------------------------------------------------
-{
-  char *file = __FILE__;
-  std::string name(file);
-  int slashIndex =  name.find_last_of('\\');
 
-  name = name.substr(slashIndex+1);
-
-  int pointIndex =  name.find_last_of('.');
-  name = name.substr(0, pointIndex);
-
-  mafString controlOriginFile=MAF_DATA_ROOT;
-  controlOriginFile<<"/Test_PipeSurfaceTextured/";
-  controlOriginFile<<name.c_str();
-  controlOriginFile<<"_";
-  controlOriginFile<<"image";
-  controlOriginFile<<scalarIndex;
-  controlOriginFile<<".jpg";
-
-  fstream controlStream;
-  controlStream.open(controlOriginFile.GetCStr()); 
-
-  // visualization control
-	m_RenderWindow->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i;
-  vtkNEW(w2i);
-  w2i->SetInput(m_RenderWindow);
-  //w2i->SetMagnification(magnification);
-  w2i->Update();
-	m_RenderWindow->OffScreenRenderingOff();
-
-  //write comparing image
-  vtkJPEGWriter *w;
-  vtkNEW(w);
-  w->SetInput(w2i->GetOutput());
-  mafString imageFile=MAF_DATA_ROOT;
-
-  if(!controlStream)
-  {
-    imageFile<<"/Test_PipeSurfaceTextured/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"image";
-  }
-  else
-  {
-    imageFile<<"/Test_PipeSurfaceTextured/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"comp";
-  }
-  
-  imageFile<<scalarIndex;
-  imageFile<<".jpg";
-  w->SetFileName(imageFile.GetCStr());
-  w->Write();
-
-  if(!controlStream)
-  {
-    controlStream.close();
-    vtkDEL(w);
-    vtkDEL(w2i);
-    return;
-  }
-  controlStream.close();
-
-  //read original Image
-  vtkJPEGReader *rO;
-  vtkNEW(rO);
-  mafString imageFileOrig=MAF_DATA_ROOT;
-  imageFileOrig<<"/Test_PipeSurfaceTextured/";
-  imageFileOrig<<name.c_str();
-  imageFileOrig<<"_";
-  imageFileOrig<<"image";
-  imageFileOrig<<scalarIndex;
-  imageFileOrig<<".jpg";
-  rO->SetFileName(imageFileOrig.GetCStr());
-  rO->Update();
-
-  vtkImageData *imDataOrig = rO->GetOutput();
-
-  //read compared image
-  vtkJPEGReader *rC;
-  vtkNEW(rC);
-  rC->SetFileName(imageFile.GetCStr());
-  rC->Update();
-
-  vtkImageData *imDataComp = rC->GetOutput();
-
-
-  vtkImageMathematics *imageMath = vtkImageMathematics::New();
-  imageMath->SetInput1(imDataOrig);
-  imageMath->SetInput2(imDataComp);
-  imageMath->SetOperationToSubtract();
-  imageMath->Update();
-
-  double srR[2] = {-1,1};
-  imageMath->GetOutput()->GetPointData()->GetScalars()->GetRange(srR);
-
-  CPPUNIT_ASSERT(srR[0] == 0.0 && srR[1] == 0.0);
-
-  // end visualization control
-  vtkDEL(imageMath);
-  vtkDEL(rC);
-  vtkDEL(rO);
-
-  vtkDEL(w);
-  vtkDEL(w2i);
-}
 //----------------------------------------------------------------------------
 vtkProp *mafPipeSurfaceTexturedTest::SelectActorToControl(vtkPropCollection *propList, int index)
 //----------------------------------------------------------------------------

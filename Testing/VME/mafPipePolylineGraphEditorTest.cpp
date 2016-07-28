@@ -26,20 +26,13 @@
 #include "mafPipePolylineGraphEditorTest.h"
 #include "mafPipePolylineGraphEditor.h"
 #include "mafVMEPolylineEditor.h"
-
 #include "mmaMaterial.h"
 #include "mafSceneNode.h"
-
 #include "mafVMERoot.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
 #include "vtkMapper.h"
-#include "vtkJPEGWriter.h"
-#include "vtkJPEGReader.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkImageMathematics.h"
-#include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkDataSetReader.h"
 #include "vtkPolyData.h"
@@ -51,8 +44,6 @@
 #include "vtkSphereSource.h"
 
 // render window stuff
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
 
@@ -65,8 +56,6 @@ enum TESTS_PIPE_POLYLINE_GRAPH_EDITOR
   CUT_TEST,
   NUMBER_OF_TEST,
 };
-
-
 
 //----------------------------------------------------------------------------
 void mafPipePolylineGraphEditorTest::TestFixture()
@@ -81,6 +70,13 @@ void mafPipePolylineGraphEditorTest::BeforeTest()
   vtkNEW(m_Renderer);
   vtkNEW(m_RenderWindow);
   vtkNEW(m_RenderWindowInteractor);
+
+	m_Renderer->SetBackground(0.1, 0.1, 0.1);
+	m_RenderWindow->AddRenderer(m_Renderer);
+	m_RenderWindow->SetSize(320, 240);
+	m_RenderWindow->SetPosition(400, 0);
+
+	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
 //----------------------------------------------------------------------------
 void mafPipePolylineGraphEditorTest::AfterTest()
@@ -95,18 +91,6 @@ void mafPipePolylineGraphEditorTest::AfterTest()
 void mafPipePolylineGraphEditorTest::TestPipeExecution()
 //----------------------------------------------------------------------------
 {
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(320, 240);
-  m_RenderWindow->SetPosition(400,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
-
-
   ////// Create VME ////////////////////
 
   CreateExamplePolydata();
@@ -180,18 +164,15 @@ void mafPipePolylineGraphEditorTest::TestPipeExecution()
 
         actor = actorList->GetNextProp();
       }
-
     }
     else if(i == SELECT_TEST)
     {
-
       vtkMAFSmartPointer<vtkDoubleArray> scalars;
       scalars->SetName("SCALARS");
 
       int nPoints = m_Polydata->GetNumberOfPoints();
       for (int i=0;i<nPoints;i++)
       {
-
         if (i == 0)//Select the 0th point
         {
           scalars->InsertNextTuple1((double)1.0);
@@ -200,7 +181,6 @@ void mafPipePolylineGraphEditorTest::TestPipeExecution()
         {
           scalars->InsertNextTuple1((double)0.0);
         }
-
       }
 
       m_Polydata->GetPointData()->AddArray(scalars);
@@ -229,11 +209,9 @@ void mafPipePolylineGraphEditorTest::TestPipeExecution()
 
         actor = actorList->GetNextProp();
       }
-
     }
     else if(i == CUT_TEST)
     {
-
       vtkMAFSmartPointer<vtkDoubleArray> scalars;
       scalars->SetName("SCALARS");
 
@@ -270,7 +248,6 @@ void mafPipePolylineGraphEditorTest::TestPipeExecution()
 
         actor = actorList->GetNextProp();
       }
-
     }
 
     vtkActor *surfaceActor;
@@ -280,127 +257,14 @@ void mafPipePolylineGraphEditorTest::TestPipeExecution()
     m_Renderer->ResetCamera();
     m_RenderWindow->Render();
     printf("\n Visualizzazione: %s \n", strings[i]);
-    CompareImages(i);
 
+		COMPARE_IMAGES("TestPipeExecution", i);
   }
-
-
+	
   vtkDEL(actorList);
-
   delete sceneNode;
 }
-//----------------------------------------------------------------------------
-void mafPipePolylineGraphEditorTest::CompareImages(int scalarIndex)
-//----------------------------------------------------------------------------
-{
-  char *file = __FILE__;
-  std::string name(file);
-  int slashIndex =  name.find_last_of('\\');
 
-  name = name.substr(slashIndex+1);
-
-  int pointIndex =  name.find_last_of('.');
-  name = name.substr(0, pointIndex);
-
-  mafString controlOriginFile=MAF_DATA_ROOT;
-  controlOriginFile<<"/Test_PipePolylineGraphEditor/";
-  controlOriginFile<<name.c_str();
-  controlOriginFile<<"_";
-  controlOriginFile<<"image";
-  controlOriginFile<<scalarIndex;
-  controlOriginFile<<".jpg";
-
-  fstream controlStream;
-  controlStream.open(controlOriginFile.GetCStr()); 
-
-  // visualization control
-  m_RenderWindow->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i;
-  vtkNEW(w2i);
-  w2i->SetInput(m_RenderWindow);
-  //w2i->SetMagnification(magnification);
-  w2i->Update();
-  m_RenderWindow->OffScreenRenderingOff();
-
-  //write comparing image
-  vtkJPEGWriter *w;
-  vtkNEW(w);
-  w->SetInput(w2i->GetOutput());
-  mafString imageFile=MAF_DATA_ROOT;
-
-  if(!controlStream)
-  {
-    imageFile<<"/Test_PipePolylineGraphEditor/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"image";
-  }
-  else
-  {
-    imageFile<<"/Test_PipePolylineGraphEditor/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"comp";
-  }
-
-  imageFile<<scalarIndex;
-  imageFile<<".jpg";
-  w->SetFileName(imageFile.GetCStr());
-  w->Write();
-
-  if(!controlStream)
-  {
-    controlStream.close();
-    vtkDEL(w);
-    vtkDEL(w2i);
-
-    return;
-  }
-  controlStream.close();
-
-  //read original Image
-  vtkJPEGReader *rO;
-  vtkNEW(rO);
-  mafString imageFileOrig=MAF_DATA_ROOT;
-  imageFileOrig<<"/Test_PipePolylineGraphEditor/";
-  imageFileOrig<<name.c_str();
-  imageFileOrig<<"_";
-  imageFileOrig<<"image";
-  imageFileOrig<<scalarIndex;
-  imageFileOrig<<".jpg";
-  rO->SetFileName(imageFileOrig.GetCStr());
-  rO->Update();
-
-  vtkImageData *imDataOrig = rO->GetOutput();
-
-  //read compared image
-  vtkJPEGReader *rC;
-  vtkNEW(rC);
-  rC->SetFileName(imageFile.GetCStr());
-  rC->Update();
-
-  vtkImageData *imDataComp = rC->GetOutput();
-
-
-  vtkImageMathematics *imageMath = vtkImageMathematics::New();
-  imageMath->SetInput1(imDataOrig);
-  imageMath->SetInput2(imDataComp);
-  imageMath->SetOperationToSubtract();
-  imageMath->Update();
-
-  double srR[2] = {-1,1};
-  imageMath->GetOutput()->GetPointData()->GetScalars()->GetRange(srR);
-
-  CPPUNIT_ASSERT(srR[0] == 0.0 && srR[1] == 0.0);
-
-  // end visualization control
-  vtkDEL(imageMath);
-  vtkDEL(rC);
-  vtkDEL(rO);
-
-  vtkDEL(w);
-  vtkDEL(w2i);
-}
 //----------------------------------------------------------------------------
 vtkProp *mafPipePolylineGraphEditorTest::SelectActorToControl(vtkPropCollection *propList, int index)
 //----------------------------------------------------------------------------
@@ -438,69 +302,68 @@ vtkProp *mafPipePolylineGraphEditorTest::SelectActorToControl(vtkPropCollection 
 void mafPipePolylineGraphEditorTest::CreateExamplePolydata()
 //------------------------------------------------------------------------------
 {
-  vtkPoints *points = vtkPoints::New() ;
-  vtkCellArray *lines = vtkCellArray::New() ;
+	vtkPoints *points = vtkPoints::New();
+	vtkCellArray *lines = vtkCellArray::New();
 
-  int i ;
+	int i;
 
-  // coordinates of vertices
-  static double vertices[22][3] ={
-    {0,0,0},
-    {1,2,0},
-    {2,4,0},
-    {2,1,0},
-    {3,1,0},
-    {3,0,0},
+	// coordinates of vertices
+	static double vertices[22][3] = {
+		{0,0,0},
+		{1,2,0},
+		{2,4,0},
+		{2,1,0},
+		{3,1,0},
+		{3,0,0},
 
-    {3,2,0},
-    {4,1,0},
-    {5,2,0},
-    {6,1,0},
-    {7,2,0},
-    {8,1,0},
-    {9,2,0},
+		{3,2,0},
+		{4,1,0},
+		{5,2,0},
+		{6,1,0},
+		{7,2,0},
+		{8,1,0},
+		{9,2,0},
 
-    {7,4,0},
-    {9,6,0},
-    {10,8,0},
-    {13,10,0},
-    {14,12,0},
+		{7,4,0},
+		{9,6,0},
+		{10,8,0},
+		{13,10,0},
+		{14,12,0},
 
-    {11,9,0},
-    {12,8,0},
-    {13,8,0},
-    {16,10,0}
-  } ;
+		{11,9,0},
+		{12,8,0},
+		{13,8,0},
+		{16,10,0}
+	};
 
-  // indices of simple lines and polylines
-  static vtkIdType lineids[7][10] = {
-    {0,1},
-    {1,2},
-    {3,4},
-    {3,5},
-    {1, 3, 6, 7, 8, 9, 10, 11, 12},
-    {10, 13, 14, 15, 16, 17},
-    {15, 18, 19, 20, 21}
-  };
+	// indices of simple lines and polylines
+	static vtkIdType lineids[7][10] = {
+		{0,1},
+		{1,2},
+		{3,4},
+		{3,5},
+		{1, 3, 6, 7, 8, 9, 10, 11, 12},
+		{10, 13, 14, 15, 16, 17},
+		{15, 18, 19, 20, 21}
+	};
 
-  // insert points
-  for (i = 0 ;  i < 22 ;  i++)
-    points->InsertNextPoint(vertices[i]) ;
+	// insert points
+	for (i = 0; i < 22; i++)
+		points->InsertNextPoint(vertices[i]);
 
-  // insert lines and polylines
-  lines->InsertNextCell(2, lineids[0]) ;
-  lines->InsertNextCell(2, lineids[1]) ;
-  lines->InsertNextCell(2, lineids[2]) ;
-  lines->InsertNextCell(2, lineids[3]) ;
-  lines->InsertNextCell(9, lineids[4]) ;
-  lines->InsertNextCell(6, lineids[5]) ;
-  lines->InsertNextCell(5, lineids[6]) ;
+	// insert lines and polylines
+	lines->InsertNextCell(2, lineids[0]);
+	lines->InsertNextCell(2, lineids[1]);
+	lines->InsertNextCell(2, lineids[2]);
+	lines->InsertNextCell(2, lineids[3]);
+	lines->InsertNextCell(9, lineids[4]);
+	lines->InsertNextCell(6, lineids[5]);
+	lines->InsertNextCell(5, lineids[6]);
 
-  // put points and cells in polydata
-  m_Polydata->SetPoints(points) ;
-  m_Polydata->SetLines(lines) ;
+	// put points and cells in polydata
+	m_Polydata->SetPoints(points);
+	m_Polydata->SetLines(lines);
 
-  points->Delete() ;
-  lines->Delete() ;
-
+	points->Delete();
+	lines->Delete();
 }

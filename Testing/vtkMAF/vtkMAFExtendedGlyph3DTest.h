@@ -20,8 +20,6 @@
 #include "mafTest.h"
 
 class vtkPolyData;
-class vtkRenderWindow;
-class vtkRenderer;
 
 class vtkMAFExtendedGlyph3DTest : public mafTest
 {
@@ -52,11 +50,8 @@ public:
 protected:
 
   void CreatePointsSet();
-  void CreateRenWindow();
-  void DeleteRenWindow();
-  void CompareImages();
 
-  void TestFixture();
+	void TestFixture();
 
   void TestStaticAllocation();
   void TestDynamicAllocation();
@@ -73,12 +68,6 @@ protected:
 
   vtkPolyData *m_Points;
   int m_TestNumber;
-
-  vtkRenderer *m_Renderer;
-  vtkRenderWindow *m_RenWin;
-
-  static std::string ConvertInt(int number);
-
 };
 
 #endif

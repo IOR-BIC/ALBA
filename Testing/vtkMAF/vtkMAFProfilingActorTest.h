@@ -22,10 +22,9 @@
 //------------------------------------------------------------------------------
 // Forward Declaration:
 //------------------------------------------------------------------------------
-class vtkRenderWindow;
+
 class vtkImageData;
 class vtkMAFProfilingActor;
-class vtkRenderer;
 
 /**
   Class Name: vtkMAFProfilingActorTest.
@@ -34,6 +33,11 @@ class vtkRenderer;
 class vtkMAFProfilingActorTest : public mafTest
 {
   public:
+		// Executed before each test
+		void BeforeTest();
+
+		// Executed after each test
+		void AfterTest();
 
     /** Test suite begin. */
     CPPUNIT_TEST_SUITE( vtkMAFProfilingActorTest );
@@ -62,13 +66,6 @@ class vtkMAFProfilingActorTest : public mafTest
     void TestRenderTranslucentGeometry();
     /** Test PrintSelf.*/
     void TestPrintSelf();
-
-    /** Render data in vtk render window.*/
-    void PrepareToRender(vtkRenderer *renderer, vtkRenderWindow *renderWindow);
-    /** After saving images from render window, compare them in order to find difference between test sessions. */
-    void CompareImages(vtkRenderWindow * renwin, int indexTest);
-    /** Convert an int to std::string */
-    static std::string ConvertInt(int number);
 };
 
 #endif

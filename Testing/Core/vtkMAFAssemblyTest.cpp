@@ -29,19 +29,11 @@
 #include "vtkActor.h"
 #include "vtkVolume.h"
 #include "vtkProp3DCollection.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 #include "vtkCamera.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkSphereSource.h"
 #include "vtkProperty.h"
 #include "vtkTimerLog.h"
-#include "vtkImageData.h"
-#include "vtkImageMathematics.h"
-#include "vtkJPEGReader.h"
-#include "vtkJPEGWriter.h"
-#include "vtkPointData.h"
-#include "vtkWindowToImageFilter.h"
 #include "vtkAssemblyPath.h"
 #include "vtkAssemblyNode.h"
 #include "vtkCubeSource.h"
@@ -265,7 +257,8 @@ void vtkMAFAssemblyTest::RenderOpaqueGeometryTest()
 
   CPPUNIT_ASSERT(assembly->RenderOpaqueGeometry((vtkViewport*)renderer) == 1);
   render_window->Render();
-  CompareImages(render_window, 1);
+
+	COMPARE_IMAGES("RenderOpaqueGeometryTest");
 
   assembly->ReleaseGraphicsResources(render_window);
   assembly->RemovePart(sphere1);
@@ -348,7 +341,8 @@ void vtkMAFAssemblyTest::RenderTranslucentGeometry()
 
   CPPUNIT_ASSERT(assembly->RenderTranslucentGeometry((vtkViewport*)renderer) == 1);
   render_window->Render();
-  CompareImages(render_window, 1);
+
+	COMPARE_IMAGES("RenderTranslucentGeometry");
 
 	assembly->ReleaseGraphicsResources(render_window);
   assembly->RemovePart(sphere1);
@@ -619,126 +613,4 @@ void vtkMAFAssemblyTest::PrepareToRender(vtkRenderer *renderer, vtkRenderWindow 
   render_window->AddRenderer(renderer);
   render_window->SetSize(640, 480);
   render_window->SetPosition(100,0);
-}
-//----------------------------------------------------------------------------
-void vtkMAFAssemblyTest::CompareImages(vtkRenderWindow * renwin, int indexTest)
-//----------------------------------------------------------------------------
-{
-  printf("Comparing images...\n");
-  char *file = __FILE__;
-  std::string name(file);
-  std::string path(file);
-  int slashIndex =  name.find_last_of('\\');
-
-
-  name = name.substr(slashIndex+1);
-  path = path.substr(0,slashIndex);
-
-  int pointIndex =  name.find_last_of('.');
-
-  name = name.substr(0, pointIndex);
-
-
-  mafString controlOriginFile;
-  controlOriginFile<<path.c_str();
-  controlOriginFile<<"\\";
-  controlOriginFile<<name.c_str();
-  controlOriginFile<<"_";
-  controlOriginFile<<"image";
-  controlOriginFile<<indexTest;
-  controlOriginFile<<".jpg";
-
-  fstream controlStream;
-  controlStream.open(controlOriginFile.GetCStr()); 
-
-  // visualization control
-  renwin->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i;
-  vtkNEW(w2i);
-  w2i->SetInput(renwin);
-  //w2i->SetMagnification(magnification);
-  w2i->Update();
-  renwin->OffScreenRenderingOff();
-
-  //write comparing image
-  vtkJPEGWriter *w;
-  vtkNEW(w);
-  w->SetInput(w2i->GetOutput());
-  mafString imageFile="";
-
-  if(!controlStream)
-  {
-    imageFile<<path.c_str();
-    imageFile<<"\\";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"image";
-  }
-  else
-  {
-    imageFile<<path.c_str();
-    imageFile<<"\\";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"comp";
-  }
-
-  imageFile<<indexTest;
-  imageFile<<".jpg";
-  w->SetFileName(imageFile.GetCStr());
-  w->Write();
-
-  if(!controlStream)
-  {
-    controlStream.close();
-    vtkDEL(w);
-    vtkDEL(w2i);
-    return;
-  }
-  controlStream.close();
-
-  //read original Image
-  vtkJPEGReader *rO;
-  vtkNEW(rO);
-  mafString imageFileOrig="";
-  imageFileOrig<<path.c_str();
-  imageFileOrig<<"\\";
-  imageFileOrig<<name.c_str();
-  imageFileOrig<<"_";
-  imageFileOrig<<"image";
-  imageFileOrig<<indexTest;
-  imageFileOrig<<".jpg";
-  rO->SetFileName(imageFileOrig.GetCStr());
-  rO->Update();
-
-  vtkImageData *imDataOrig = rO->GetOutput();
-
-  //read compared image
-  vtkJPEGReader *rC;
-  vtkNEW(rC);
-  rC->SetFileName(imageFile.GetCStr());
-  rC->Update();
-
-  vtkImageData *imDataComp = rC->GetOutput();
-
-
-  vtkImageMathematics *imageMath = vtkImageMathematics::New();
-  imageMath->SetInput1(imDataOrig);
-  imageMath->SetInput2(imDataComp);
-  imageMath->SetOperationToSubtract();
-  imageMath->Update();
-
-  double srR[2] = {-1,1};
-  imageMath->GetOutput()->GetPointData()->GetScalars()->GetRange(srR);
-
-  CPPUNIT_ASSERT(srR[0] == 0.0 && srR[1] == 0.0);
-  //CPPUNIT_ASSERT(ComparingImagesDetailed(imDataOrig,imDataComp));
-
-  // end visualization control
-  vtkDEL(rO);
-  vtkDEL(rC);
-  vtkDEL(imageMath);
-
-  vtkDEL(w);
-  vtkDEL(w2i);
 }

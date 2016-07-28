@@ -59,11 +59,6 @@ protected:
   void TestRemovePoint();
   void TestAddPoint();
   void TestRender();
-
-  void CompareImages(mafString test_name);
-
-  vtkRenderer *m_Renderer;
-  vtkRenderWindow *m_RenderWindow;
 };
 
 #endif
