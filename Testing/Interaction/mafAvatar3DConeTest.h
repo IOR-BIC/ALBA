@@ -19,9 +19,6 @@
 
 #include "mafTest.h"
 
-class vtkRenderer;
-class vtkRenderWindow;
-
 class mafAvatar3DConeTest : public mafTest
 {
   public:
@@ -44,10 +41,6 @@ class mafAvatar3DConeTest : public mafTest
     void TestFixture();
     void TestConstructorDestructor();
     void TestPick();
-    void CompareImages();
-
-    vtkRenderer *m_Renderer;
-    vtkRenderWindow *m_RenderWindow;
 };
 
 #endif

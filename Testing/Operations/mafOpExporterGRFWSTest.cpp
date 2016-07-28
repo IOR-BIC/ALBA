@@ -65,8 +65,8 @@ void mafOpExporterGRFWSTest::TestWrite()
 {
 	mafOpExporterGRFWS *Exporter = new mafOpExporterGRFWS("Exporter");
 	Exporter->TestModeOn();
-	mafString filename=MAF_DATA_ROOT;
-  filename << "/Test_ExporterGRFWS/test_GRF.csv";
+	mafString filename = GET_TEST_DATA_DIR();
+  filename << "/test_GRF.csv";
   Exporter->SetFileName(filename.GetCStr());
   
   mafVMEGroup* group;

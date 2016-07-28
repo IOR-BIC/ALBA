@@ -34,12 +34,8 @@
 
 #include "vtkDataSetReader.h"
 #include "vtkFloatArray.h"
-#include "vtkImageData.h"
 #include "vtkPointData.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-
 #include "vtkMAFSmartPointer.h"
 
 #include <iostream>
@@ -50,6 +46,25 @@
 void mafPipeTensorFieldSurfaceTest::TestFixture()
 //----------------------------------------------------------------------------
 {
+}
+//----------------------------------------------------------------------------
+void mafPipeTensorFieldSurfaceTest::BeforeTest()
+//----------------------------------------------------------------------------
+{
+	vtkNEW(m_Renderer);
+	vtkNEW(m_RenderWindow);
+	vtkNEW(m_RenderWindowInteractor);
+
+	m_RenderWindow->SetSize(640, 480);
+	m_RenderWindow->SetPosition(200, 0);
+}
+//----------------------------------------------------------------------------
+void mafPipeTensorFieldSurfaceTest::AfterTest()
+//----------------------------------------------------------------------------
+{
+	vtkDEL(m_Renderer);
+	vtkDEL(m_RenderWindow);
+	vtkDEL(m_RenderWindowInteractor);
 }
 
 //----------------------------------------------------------------------------
@@ -66,13 +81,8 @@ void mafPipeTensorFieldSurfaceTest::TestCreate()
   vtkNEW(frontRenderer);
   frontRenderer->SetBackground(0.1, 0.1, 0.1);
 
-  vtkRenderWindow *renderWindow = vtkRenderWindow::New();
-  renderWindow->AddRenderer(frontRenderer);
-  renderWindow->SetSize(640, 480);
-  renderWindow->SetPosition(200,0);
-
-  vtkRenderWindowInteractor *renderWindowInteractor = vtkRenderWindowInteractor::New();
-  renderWindowInteractor->SetRenderWindow(renderWindow);
+	m_RenderWindow->AddRenderer(frontRenderer);
+	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 
   //////////////////////////////////////////////////////////////////////////
 
@@ -115,19 +125,16 @@ void mafPipeTensorFieldSurfaceTest::TestCreate()
   /////////// Pipe Instance and Creation ///////////
   mafPipeTensorFieldSurface *pipe = new mafPipeTensorFieldSurface;
   pipe->Create(sceneNode);
+	
+  m_RenderWindow->Render();
 
-
-  //renderWindow->Render();
-  //CompareImages(0);
+	COMPARE_IMAGES("TestCreate");
 
   delete sceneNode;
   delete(rootscenenode);
 
-  vtkDEL(renderWindowInteractor);
-  vtkDEL(renderWindow);
   vtkDEL(frontRenderer);
-
-
+	
   volume->ReparentTo(NULL);
   mafDEL(volume);
 

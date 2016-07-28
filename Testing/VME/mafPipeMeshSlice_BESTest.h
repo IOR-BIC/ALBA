@@ -20,8 +20,6 @@
 #include "mafTest.h"
 
 class vtkPolyData;
-class vtkRenderer;
-class vtkRenderWindow;
 class vtkRenderWindowInteractor;
 class vtkProp;
 class vtkPropCollection;
@@ -54,15 +52,7 @@ protected:
   void TestPipeExecution_UseVTKProperty();
   void TestPipeExecution_Thickness_PickActor();
 
-
-  vtkRenderer *m_Renderer;
-  vtkRenderWindow *m_RenderWindow;
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
-
-  /**Compare a list of already saved images (control images) with renderized image from render window
-     @scalarIndex: index X of the image. Original Image is imageX.jpg, created imaged is compX.jpg
-  */
-  void CompareImages(int scalarIndex = 0);
 
   /**Compare Mapper scalarange with controlled values */
   void ProceduralControl(double controlRangeMapper[2] , vtkProp *propToControl);

@@ -14,7 +14,6 @@
 
 =========================================================================*/
 
-
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
@@ -29,26 +28,15 @@
 
 #include "mafSceneNode.h"
 #include "mafVMEVolumeGray.h"
-
-
 #include "mafVMERoot.h"
-#include "vtkMAFAssembly.h"
 
+#include "vtkMAFAssembly.h"
 #include "vtkMapper.h"
-#include "vtkJPEGWriter.h"
-#include "vtkJPEGReader.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkImageMathematics.h"
-#include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkDataSetReader.h"
 
-
 // render window stuff
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-
 
 #include <iostream>
 
@@ -66,8 +54,6 @@ enum TESTS_PIPE_SURFACE
   NUMBER_OF_TEST,
 };
 
-
-
 //----------------------------------------------------------------------------
 void mafPipeVolumeDRRTest::TestFixture()
 //----------------------------------------------------------------------------
@@ -80,6 +66,13 @@ void mafPipeVolumeDRRTest::BeforeTest()
   vtkNEW(m_Renderer);
   vtkNEW(m_RenderWindow);
   vtkNEW(m_RenderWindowInteractor);
+
+	m_Renderer->SetBackground(0.1, 0.1, 0.1);
+	m_RenderWindow->AddRenderer(m_Renderer);
+	m_RenderWindow->SetSize(320, 240);
+	m_RenderWindow->SetPosition(400, 0);
+
+	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeDRRTest::AfterTest()
@@ -93,19 +86,6 @@ void mafPipeVolumeDRRTest::AfterTest()
 void mafPipeVolumeDRRTest::TestPipeExecution()
 //----------------------------------------------------------------------------
 {
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(320, 240);
-  m_RenderWindow->SetPosition(400,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
-
-
-  ////// Create VME (import vtkData) ////////////////////
   ////// Create VME (import vtkData) ////////////////////
   vtkDataSetReader *Importer;
   vtkNEW(Importer);
@@ -163,7 +143,6 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
 
         actor = actorList->GetNextProp();
       }
-
     }
     else if(i == COLOR_TEST)
     {
@@ -178,7 +157,6 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
 
         actor = actorList->GetNextProp();
       }
-
     }
     else if(i == EXPOSURE_TEST)
     {
@@ -194,7 +172,6 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
 
         actor = actorList->GetNextProp();
       }
-
     }
     else if(i == GAMMA_TEST)
     {
@@ -209,7 +186,6 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
 
         actor = actorList->GetNextProp();
       }
-
     }
     else if(i == CAMERA_ANGLE_TEST)
     {
@@ -224,7 +200,6 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
 
         actor = actorList->GetNextProp();
       }
-
     }
     else if(i == CAMERA_POSITION_TEST)
     {
@@ -240,7 +215,6 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
 
         actor = actorList->GetNextProp();
       }
-
     }
     else if(i == CAMERA_FOCUS_TEST)
     {
@@ -256,7 +230,6 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
 
         actor = actorList->GetNextProp();
       }
-
     }
     else if(i == CAMERA_ROLL_TEST)
     {
@@ -272,7 +245,6 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
 
         actor = actorList->GetNextProp();
       }
-
     }
     else if(i == RESAMPLE_FACTOR_TEST)
     {
@@ -287,7 +259,6 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
 
         actor = actorList->GetNextProp();
       }
-
     }
     
     vtkVolume *volumeActor;
@@ -296,7 +267,8 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
 
     m_RenderWindow->Render();
     printf("\n Visualizzazione: %s \n", strings[i]);
-    CompareImages(i);
+
+		COMPARE_IMAGES("TestPipeExecution", i);
 
     if(i == COLOR_TEST)
     {
@@ -331,14 +303,8 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
     {
       pipeDRR->SetResampleFactor(1.);
     }
-
-
   }
-
-
-
 	
-
   vtkDEL(actorList);
 
   delete sceneNode;
@@ -346,118 +312,7 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
   mafDEL(volume);
   vtkDEL(Importer);
 }
-//----------------------------------------------------------------------------
-void mafPipeVolumeDRRTest::CompareImages(int scalarIndex)
-//----------------------------------------------------------------------------
-{
-  char *file = __FILE__;
-  std::string name(file);
-  int slashIndex =  name.find_last_of('\\');
 
-  name = name.substr(slashIndex+1);
-
-  int pointIndex =  name.find_last_of('.');
-  name = name.substr(0, pointIndex);
-
-  mafString controlOriginFile=MAF_DATA_ROOT;
-  controlOriginFile<<"/Test_PipeVolumeDRR/";
-  controlOriginFile<<name.c_str();
-  controlOriginFile<<"_";
-  controlOriginFile<<"image";
-  controlOriginFile<<scalarIndex;
-  controlOriginFile<<".jpg";
-
-  fstream controlStream;
-  controlStream.open(controlOriginFile.GetCStr()); 
-
-  // visualization control
-	m_RenderWindow->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i;
-  vtkNEW(w2i);
-  w2i->SetInput(m_RenderWindow);
-  //w2i->SetMagnification(magnification);
-  w2i->Update();
-	m_RenderWindow->OffScreenRenderingOff();
-
-  //write comparing image
-  vtkJPEGWriter *w;
-  vtkNEW(w);
-  w->SetInput(w2i->GetOutput());
-  mafString imageFile=MAF_DATA_ROOT;
-
-  if(!controlStream)
-  {
-    imageFile<<"/Test_PipeVolumeDRR/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"image";
-  }
-  else
-  {
-    imageFile<<"/Test_PipeVolumeDRR/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"comp";
-  }
-  
-  imageFile<<scalarIndex;
-  imageFile<<".jpg";
-  w->SetFileName(imageFile.GetCStr());
-  w->Write();
-
-  if(!controlStream)
-  {
-    controlStream.close();
-    vtkDEL(w);
-    vtkDEL(w2i);
-
-    return;
-  }
-  controlStream.close();
-
-  //read original Image
-  vtkJPEGReader *rO;
-  vtkNEW(rO);
-  mafString imageFileOrig=MAF_DATA_ROOT;
-  imageFileOrig<<"/Test_PipeVolumeDRR/";
-  imageFileOrig<<name.c_str();
-  imageFileOrig<<"_";
-  imageFileOrig<<"image";
-  imageFileOrig<<scalarIndex;
-  imageFileOrig<<".jpg";
-  rO->SetFileName(imageFileOrig.GetCStr());
-  rO->Update();
-
-  vtkImageData *imDataOrig = rO->GetOutput();
-
-  //read compared image
-  vtkJPEGReader *rC;
-  vtkNEW(rC);
-  rC->SetFileName(imageFile.GetCStr());
-  rC->Update();
-
-  vtkImageData *imDataComp = rC->GetOutput();
-
-
-  vtkImageMathematics *imageMath = vtkImageMathematics::New();
-  imageMath->SetInput1(imDataOrig);
-  imageMath->SetInput2(imDataComp);
-  imageMath->SetOperationToSubtract();
-  imageMath->Update();
-
-  double srR[2] = {-1,1};
-  imageMath->GetOutput()->GetPointData()->GetScalars()->GetRange(srR);
-
-  CPPUNIT_ASSERT(srR[0] == 0.0 && srR[1] == 0.0);
-
-  // end visualization control
-  vtkDEL(imageMath);
-  vtkDEL(rC);
-  vtkDEL(rO);
-
-  vtkDEL(w);
-  vtkDEL(w2i);
-}
 //----------------------------------------------------------------------------
 vtkProp *mafPipeVolumeDRRTest::SelectActorToControl(vtkPropCollection *propList, int index)
 //----------------------------------------------------------------------------

@@ -21,8 +21,6 @@
 
 #include "vtkDataSet.h"
 #include "vtkTransform.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
 class mafVisualPipeSlicerSliceTest : public mafTest
@@ -49,14 +47,7 @@ protected:
   Please verify if this is the case with your compiler and in case try to solve the problem.
   */
 
-  vtkRenderer *m_Renderer;
-  vtkRenderWindow *m_RenderWindow;
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
-
-  /**Compare a list of already saved images (control images) with renderized image from render window
-  @scalarIndex: index X of the image. Original Image is imageX.jpg, created imaged is compX.jpg
-  */
-  void CompareImages(int scalarIndex = 0);
 
   /** Select The Actor that will be controlled*/
   vtkProp *SelectActorToControl(vtkPropCollection* propList, int index);

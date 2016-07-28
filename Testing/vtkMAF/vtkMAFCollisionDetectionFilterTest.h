@@ -20,8 +20,6 @@
 #include "mafTest.h"
 
 class vtkActor;
-class vtkRenderer;
-class vtkRenderWindow;
 class vtkRenderWindowInteractor;
 class vtkProperty;
 
@@ -45,15 +43,11 @@ protected:
   void TestDynamicAllocation();
   void Test();
   void TestChangingMatrix();
-  void CompareImages(int index , wxString folder);
 
   void Visualize(vtkActor *actor);
   void AddPolydataToVisualize(vtkPolyData *data, vtkProperty *property = NULL);
 
-  vtkRenderer *m_Renderer;
-  vtkRenderWindow *m_RenderWindow;
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
-
 };
 
 #endif

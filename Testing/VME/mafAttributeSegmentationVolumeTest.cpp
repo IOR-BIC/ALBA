@@ -98,8 +98,8 @@ void mafAttributeSegmentationVolumeTest::TestSetAutomaticSegmentationGlobalThres
   volume->ReparentTo(storage->GetRoot());
   mafSmartPointer<mafAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
-  mafString fileName = MAF_DATA_ROOT;
-  fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
+  mafString fileName = GET_TEST_DATA_DIR();
+  fileName << "/SavedMSF.msf";
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////
   //Default value

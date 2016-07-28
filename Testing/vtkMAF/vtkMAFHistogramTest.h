@@ -22,7 +22,7 @@
 //------------------------------------------------------------------------------
 // Forward Declaration:
 //------------------------------------------------------------------------------
-class vtkRenderWindow;
+
 class vtkImageData;
 
 /**
@@ -32,16 +32,11 @@ class vtkImageData;
 class vtkMAFHistogramTest : public mafTest
 {
   public:
-    /** Test IDs*/
-    enum ID_TEST_LIST
-    {
-      ID_HISTOGRAM_POINT_REPRESENTATION_TEST = 0,
-      ID_HISTOGRAM_LINE_REPRESENTATION_TEST,
-      ID_HISTOGRAM_BAR_REPRESENTATION_TEST,
-      ID_HISTOGRAM_LOGARITMIC_PROPERTIES_TEST,
-      ID_HISTOGRAM_SCALE_COLOR_PROPERTIES,
-      ID_HISTOGRAM_GET_ATTRIBUTES_AND_UPDATE_LINES,
-    };
+		// Executed before each test
+		void BeforeTest();
+
+		// Executed after each test
+		void AfterTest();
 
     /** Test suite begin. */
     CPPUNIT_TEST_SUITE( vtkMAFHistogramTest );
@@ -84,13 +79,7 @@ class vtkMAFHistogramTest : public mafTest
     void TestPrintSelf();
 
     /** Render data in vtk render window.*/
-    void RenderData(vtkActor2D *actor );
-    /** After saving images from render window, compare them in order to find difference between test sessions. */
-    void CompareImages(vtkRenderWindow * renwin);
-    /** Convert an int to std::string */
-    static std::string ConvertInt(int number);
-
-    int m_TestNumber;
+		void RenderData(vtkActor2D *actor, char* testName);
 };
 
 #endif

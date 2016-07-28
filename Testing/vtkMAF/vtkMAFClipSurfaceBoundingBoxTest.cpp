@@ -24,19 +24,11 @@
 #include "vtkPlaneSource.h"
 
 #include "vtkPolyDataMapper.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkActor.h"
 #include "vtkActorCollection.h"
 #include "vtkCamera.h"
-
-#include "vtkWindowToImageFilter.h"
-#include "vtkImageMathematics.h"
-#include "vtkImageData.h"
-#include "vtkJPEGWriter.h"
-#include "vtkJPEGReader.h"
 #include "vtkPointData.h"
 #include "vtkTimerLog.h"
 
@@ -56,6 +48,15 @@ std::string vtkMAFClipSurfaceBoundingBoxTest::ConvertInt(int number)
 void vtkMAFClipSurfaceBoundingBoxTest::BeforeTest()
 //--------------------------------------------------
 {
+	vtkNEW(m_Renderer);
+	vtkNEW(m_RenderWindow);
+
+	m_RenderWindow->AddRenderer(m_Renderer);
+	m_RenderWindow->SetSize(640, 480);
+	m_RenderWindow->SetPosition(100, 0);
+
+	m_Renderer->SetBackground(0.0, 0.0, 0.0);
+
   m_SphereInput = vtkSphereSource::New();
   m_PlaneMask = vtkPlaneSource::New();
 }
@@ -64,6 +65,9 @@ void vtkMAFClipSurfaceBoundingBoxTest::BeforeTest()
 void vtkMAFClipSurfaceBoundingBoxTest::AfterTest()
 //--------------------------------------------------
 {
+	vtkDEL(m_Renderer);
+	vtkDEL(m_RenderWindow);
+
   m_SphereInput->Delete();
   m_PlaneMask->Delete();
 }
@@ -165,148 +169,21 @@ void vtkMAFClipSurfaceBoundingBoxTest::TestExecution(int clipInside)
 void vtkMAFClipSurfaceBoundingBoxTest::RenderData(vtkActorCollection *actorCollection)
 //------------------------------------------------------------
 {
-  vtkMAFSmartPointer<vtkRenderer> renderer;
-  renderer->SetBackground(0.0, 0.0, 0.0);
-
-  vtkCamera *camera = renderer->GetActiveCamera();
+  vtkCamera *camera = m_Renderer->GetActiveCamera();
   camera->SetPosition(20.0,3.0,20.0);
   camera->Modified();
 
-  vtkMAFSmartPointer<vtkRenderWindow> renderWindow;
-  renderWindow->AddRenderer(renderer);
-  renderWindow->SetSize(640, 480);
-  renderWindow->SetPosition(100,0);
-
   vtkMAFSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
-  renderWindowInteractor->SetRenderWindow(renderWindow);
+  renderWindowInteractor->SetRenderWindow(m_RenderWindow);
 
   actorCollection->InitTraversal();
   for (vtkProp *actor = actorCollection->GetNextProp(); actor != NULL; actor = actorCollection->GetNextProp()) 
   {
-    renderer->AddActor(actor);  
+    m_Renderer->AddActor(actor);  
   }
 
-  renderWindow->Render();
-
-  //renderWindowInteractor->Start();
-  CompareImages(renderWindow);
+  m_RenderWindow->Render();
+	COMPARE_IMAGES("RenderData", m_TestNumber);
 
   vtkTimerLog::CleanupLog();
-}
-//----------------------------------------------------------------------------
-void vtkMAFClipSurfaceBoundingBoxTest::CompareImages(vtkRenderWindow * renwin)
-//----------------------------------------------------------------------------
-{
-  char *file = __FILE__;
-  std::string name(file);
-  std::string path(file);
-  int slashIndex =  name.find_last_of('\\');
-
-
-  name = name.substr(slashIndex+1);
-  path = path.substr(0,slashIndex);
-
-  int pointIndex =  name.find_last_of('.');
-
-  name = name.substr(0, pointIndex);
-
-
-  std::string controlOriginFile;
-  controlOriginFile+=(path.c_str());
-  controlOriginFile+=("\\");
-  controlOriginFile+=(name.c_str());
-  controlOriginFile+=("_");
-  controlOriginFile+=("image");
-  controlOriginFile+=vtkMAFClipSurfaceBoundingBoxTest::ConvertInt(m_TestNumber).c_str();
-  controlOriginFile+=(".jpg");
-
-  fstream controlStream;
-  controlStream.open(controlOriginFile.c_str()); 
-
-  // visualization control
-  renwin->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
-  w2i->SetInput(renwin);
-  //w2i->SetMagnification(magnification);
-  w2i->Update();
-  renwin->OffScreenRenderingOff();
-
-  //write comparing image
-  vtkJPEGWriter *w = vtkJPEGWriter::New();
-  w->SetInput(w2i->GetOutput());
-  std::string imageFile="";
-
-  if(!controlStream)
-  {
-    imageFile+=(path.c_str());
-    imageFile+=("\\");
-    imageFile+=(name.c_str());
-    imageFile+=("_");
-    imageFile+=("image");
-  }
-  else
-  {
-    imageFile+=(path.c_str());
-    imageFile+=("\\");
-    imageFile+=(name.c_str());
-    imageFile+=("_");
-    imageFile+=("comp");
-  }
-
-  imageFile+=vtkMAFClipSurfaceBoundingBoxTest::ConvertInt(m_TestNumber).c_str();
-  imageFile+=(".jpg");
-  w->SetFileName(imageFile.c_str());
-  w->Write();
-
-  if(!controlStream)
-  {
-    controlStream.close();
-    w->Delete();
-    w2i->Delete();
-    return;
-  }
-  controlStream.close();
-
-  //read original Image
-  vtkJPEGReader *rO = vtkJPEGReader::New();
-  std::string imageFileOrig="";
-  imageFileOrig+=(path.c_str());
-  imageFileOrig+=("\\");
-  imageFileOrig+=(name.c_str());
-  imageFileOrig+=("_");
-  imageFileOrig+=("image");
-  imageFileOrig+=vtkMAFClipSurfaceBoundingBoxTest::ConvertInt(m_TestNumber).c_str();
-  imageFileOrig+=(".jpg");
-  rO->SetFileName(imageFileOrig.c_str());
-  rO->Update();
-
-  vtkImageData *imDataOrig = rO->GetOutput();
-
-  //read compared image
-  vtkJPEGReader *rC = vtkJPEGReader::New();
-  rC->SetFileName(imageFile.c_str());
-  rC->Update();
-
-  vtkImageData *imDataComp = rC->GetOutput();
-
-
-  vtkImageMathematics *imageMath = vtkImageMathematics::New();
-  imageMath->SetInput1(imDataOrig);
-  imageMath->SetInput2(imDataComp);
-  imageMath->SetOperationToSubtract();
-  imageMath->Update();
-
-  double srR[2] = {-1,1};
-  imageMath->GetOutput()->GetPointData()->GetScalars()->GetRange(srR);
-
-  CPPUNIT_ASSERT(srR[0] == 0.0 && srR[1] == 0.0);
-  //CPPUNIT_ASSERT(ComparingImagesDetailed(imDataOrig,imDataComp));
-
-  // end visualization control
-  rO->Delete();
-  rC->Delete();
-  imageMath->Delete();
-
-  w->Delete();
-  w2i->Delete();
 }

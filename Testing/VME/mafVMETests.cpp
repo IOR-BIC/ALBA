@@ -155,7 +155,6 @@
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
 
-
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafClientData);
 //-------------------------------------------------------------------------
@@ -163,7 +162,6 @@ mafCxxTypeMacro(mafClientData);
 //Main Test Executor
 int	main( int argc, char* argv[] )
 {
-
 	// Create the event manager and test controller
 	CPPUNIT_NS::TestResult controller;
 

@@ -20,8 +20,6 @@
 #include "mafTest.h"
 
 class vtkPolyData;
-class vtkRenderer;
-class vtkRenderWindow;
 class vtkRenderWindowInteractor;
 class vtkProp;
 class vtkPropCollection;
@@ -46,14 +44,6 @@ protected:
 
   /** Test the pipe execution */
   void TestPipeExecution();
-
-  vtkRenderer *m_Renderer;
-  vtkRenderWindow *m_RenderWindow;
-
-  /**Compare a list of already saved images (control images) with renderized image from render window
-  @scalarIndex: index X of the image. Original Image is imageX.jpg, created imaged is compX.jpg
-  */
-  void CompareImages();
 };
 
 #endif

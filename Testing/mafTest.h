@@ -19,7 +19,17 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestResult.h>
+
 #include "mafIncludeWX.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
+#include "vtkImageData.h"
+#include "vtkPointData.h"
+#include "mafString.h"
+
+class mafString;
+class vtkImageData;
+class vtkPointData;
 
 // Helper class used to build a fake application needed by the wxConfig
 // to store settings into the registry with the same name of the application
@@ -32,13 +42,18 @@ public:
 	int  OnExit();
 	bool Yield(bool onlyIfNeeded = false);
 };
+
 DECLARE_APP(TestApp)
 
+#define COMPARE_IMAGES(imageName, ...) CompareImage(getTestNamer__().getFixtureName().c_str(), imageName, ##__VA_ARGS__)
+#define GET_TEST_DATA_DIR() GetTestDataDir(getTestNamer__().getFixtureName().c_str())
 
 class mafTest : public CPPUNIT_NS::TestFixture
 {
 public: 
-  /** CPPUNIT fixture: executed before each test, prepares an application for test runs
+	mafTest();
+  
+	/** CPPUNIT fixture: executed before each test, prepares an application for test runs
 			DO NOT OVERLOAD THIS METHOD, use BeforeTest instead */
   void setUp();
 
@@ -53,7 +68,15 @@ public:
 	virtual void AfterTest() {};
 
 protected:
-  TestApp *m_App;
+	void CompareImage(mafString suiteName, mafString imageName, int index = -1);
+	
+	mafString GetTestDataDir(mafString suiteName);
+
+	TestApp *m_App;
+	vtkRenderer *m_Renderer;
+	vtkRenderWindow *m_RenderWindow;
+
+	mafString m_WorkingDir;
 };
 
 #endif
