@@ -14,7 +14,6 @@
 
 =========================================================================*/
 
-
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
@@ -39,20 +38,13 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
-
-#include "vtkJPEGWriter.h"
-#include "vtkJPEGReader.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkImageMathematics.h"
 #include "vtkCamera.h"
 #include "vtkProp3DCollection.h"
 
 #include <iostream>
 #include <fstream>
-
 
 //----------------------------------------------------------------------------
 void mafPipeTensorFieldSliceTest::TestFixture()
@@ -82,221 +74,106 @@ void mafPipeTensorFieldSliceTest::AfterTest()
 void mafPipeTensorFieldSliceTest::TestCreate()
 //----------------------------------------------------------------------------
 {
-  mafVMEStorage *storage = mafVMEStorage::New();
-  storage->GetRoot()->SetName("root");
-  storage->GetRoot()->Initialize();
+	mafVMEStorage *storage = mafVMEStorage::New();
+	storage->GetRoot()->SetName("root");
+	storage->GetRoot()->Initialize();
 
-  ///////////////// render stuff /////////////////////////
+	///////////////// render stuff /////////////////////////
 
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
+	m_Renderer->SetBackground(0.1, 0.1, 0.1);
 
-  vtkCamera *cam = m_Renderer->GetActiveCamera();
+	vtkCamera *cam = m_Renderer->GetActiveCamera();
 
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(200,0);
+	m_RenderWindow->AddRenderer(m_Renderer);
+	m_RenderWindow->SetSize(640, 480);
+	m_RenderWindow->SetPosition(200, 0);
 
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 
-  //////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
 
-  mafVMEVolumeGray *volume;
-  mafNEW(volume);
-  volume->ReparentTo(storage->GetRoot());
+	mafVMEVolumeGray *volume;
+	mafNEW(volume);
+	volume->ReparentTo(storage->GetRoot());
 
-  vtkMAFSmartPointer<vtkFloatArray> scalarArray;
-  scalarArray->SetName("Scalar");
-  
-  vtkMAFSmartPointer<vtkFloatArray> vectorArray;
-  vectorArray->SetNumberOfComponents(3);
-  vectorArray->SetName("Vector");
-  
+	vtkMAFSmartPointer<vtkFloatArray> scalarArray;
+	scalarArray->SetName("Scalar");
 
-  vtkMAFSmartPointer<vtkFloatArray> tensorArray;
-  tensorArray->SetNumberOfComponents(9);
-  tensorArray->SetName("velocity");
+	vtkMAFSmartPointer<vtkFloatArray> vectorArray;
+	vectorArray->SetNumberOfComponents(3);
+	vectorArray->SetName("Vector");
 
 
-  int x,y,z;
-  x = y = z = 10;
-  vtkMAFSmartPointer<vtkStructuredPoints> image;
-  double origin[3] = {0.0,0.0, -45.};
-  image->SetOrigin(origin);
-  image->SetDimensions(x,y,z);
-  image->SetSpacing(10.,10.,10.);
+	vtkMAFSmartPointer<vtkFloatArray> tensorArray;
+	tensorArray->SetNumberOfComponents(9);
+	tensorArray->SetName("velocity");
 
-  int i = 0, size = x*y*z;
-  for(;i<size;i++){
-    scalarArray->InsertNextTuple1(1.0);
-    vectorArray->InsertNextTuple3(1.0,2.0,3.0);
-    tensorArray->InsertNextTuple9((float)rand()/(float)RAND_MAX,(float)rand()/(float)RAND_MAX,(float)rand()/(float)RAND_MAX,(float)rand()/(float)RAND_MAX,(float)rand()/(float)RAND_MAX,(float)rand()/(float)RAND_MAX,(float)rand()/(float)RAND_MAX,(float)rand()/(float)RAND_MAX,(float)rand()/(float)RAND_MAX);
-  }
-  
-  image->GetPointData()->AddArray(vectorArray);
-  image->GetPointData()->AddArray(tensorArray);
+	int x, y, z;
+	x = y = z = 10;
+	vtkMAFSmartPointer<vtkStructuredPoints> image;
+	double origin[3] = { 0.0,0.0, -45. };
+	image->SetOrigin(origin);
+	image->SetDimensions(x, y, z);
+	image->SetSpacing(10., 10., 10.);
 
-  image->GetPointData()->SetScalars(scalarArray);
-  image->GetPointData()->GetTensors("velocity")->Modified();
-  image->GetPointData()->Update();
+	int i = 0, size = x*y*z;
+	for (; i < size; i++) {
+		scalarArray->InsertNextTuple1(1.0);
+		vectorArray->InsertNextTuple3(1.0, 2.0, 3.0);
+		tensorArray->InsertNextTuple9((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX);
+	}
 
-  image->GetPointData()->SetActiveTensors("velocity");
+	image->GetPointData()->AddArray(vectorArray);
+	image->GetPointData()->AddArray(tensorArray);
 
-  image->Update();
+	image->GetPointData()->SetScalars(scalarArray);
+	image->GetPointData()->GetTensors("velocity")->Modified();
+	image->GetPointData()->Update();
 
-  double bb[6];
-  image->GetBounds(bb);
+	image->GetPointData()->SetActiveTensors("velocity");
 
-  volume->SetDataByReference(image, 0.);
-  volume->Update();
-  
+	image->Update();
 
-  //Assembly will be create when instancing mafSceneNode
-  mafSceneNode *rootscenenode = new mafSceneNode(NULL, NULL, storage->GetRoot(), NULL, NULL);
-  mafSceneNode *sceneNode = new mafSceneNode(NULL,rootscenenode,volume, m_Renderer);
+	double bb[6];
+	image->GetBounds(bb);
 
-  /////////// Pipe Instance and Creation ///////////
-  mafPipeTensorFieldSlice *pipe = new mafPipeTensorFieldSlice;
-  pipe->Create(sceneNode);
+	volume->SetDataByReference(image, 0.);
+	volume->Update();
 
-  double focalPoint[3] = {45.,45.,0.};
-  double position[3] = {45.,45.,100.};
-  
-  cam->SetFocalPoint(focalPoint);
-  cam->SetPosition(position);
+	//Assembly will be create when instancing mafSceneNode
+	mafSceneNode *rootscenenode = new mafSceneNode(NULL, NULL, storage->GetRoot(), NULL, NULL);
+	mafSceneNode *sceneNode = new mafSceneNode(NULL, rootscenenode, volume, m_Renderer);
 
-  ////////// ACTORS List ///////////////
-  vtkProp3DCollection *actorList = pipe->GetAssemblyFront()->GetParts();
+	/////////// Pipe Instance and Creation ///////////
+	mafPipeTensorFieldSlice *pipe = new mafPipeTensorFieldSlice;
+	pipe->Create(sceneNode);
 
-  actorList->InitTraversal();
-  vtkProp *actor = actorList->GetNextProp();
-  while(actor)
-  {   
-    m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
+	double focalPoint[3] = { 45.,45.,0. };
+	double position[3] = { 45.,45.,100. };
 
-    actor = actorList->GetNextProp();
-  }
+	cam->SetFocalPoint(focalPoint);
+	cam->SetPosition(position);
 
-   CompareImages(0);
+	////////// ACTORS List ///////////////
+	vtkProp3DCollection *actorList = pipe->GetAssemblyFront()->GetParts();
 
-  delete sceneNode;
-  delete(rootscenenode);
+	actorList->InitTraversal();
+	vtkProp *actor = actorList->GetNextProp();
+	while (actor)
+	{
+		m_Renderer->AddActor(actor);
+		m_RenderWindow->Render();
 
-  volume->ReparentTo(NULL);
-  mafDEL(volume);
+		actor = actorList->GetNextProp();
+	}
 
-  mafDEL(storage);
+	COMPARE_IMAGES("TestCreate", 0);
 
-}
+	delete sceneNode;
+	delete(rootscenenode);
 
-//----------------------------------------------------------------------------
-void mafPipeTensorFieldSliceTest::CompareImages(int testIndex)
-//----------------------------------------------------------------------------
-{
-  char *file = __FILE__;
-  std::string name(file);
-  int slashIndex =  name.find_last_of('\\');
+	volume->ReparentTo(NULL);
+	mafDEL(volume);
 
-  name = name.substr(slashIndex+1);
-
-  int pointIndex =  name.find_last_of('.');
-  name = name.substr(0, pointIndex);
-
-  mafString controlOriginFile=MAF_DATA_ROOT;
-  controlOriginFile<<"/Test_PipeTensorFieldSlice/";
-  controlOriginFile<<name.c_str();
-  controlOriginFile<<"_";
-  controlOriginFile<<"image";
-  controlOriginFile<<testIndex;
-  controlOriginFile<<".jpg";
-
-  fstream controlStream;
-  controlStream.open(controlOriginFile.GetCStr()); 
-
-  // visualization control
-  m_RenderWindow->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i;
-  vtkNEW(w2i);
-  w2i->SetInput(m_RenderWindow);
-  //w2i->SetMagnification(magnification);
-  w2i->Update();
-  m_RenderWindow->OffScreenRenderingOff();
-
-  //write comparing image
-  vtkJPEGWriter *w;
-  vtkNEW(w);
-  w->SetInput(w2i->GetOutput());
-  mafString imageFile=MAF_DATA_ROOT;
-
-  if(!controlStream)
-  {
-    imageFile<<"/Test_PipeTensorFieldSlice/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"image";
-  }
-  else
-  {
-    imageFile<<"/Test_PipeTensorFieldSlice/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"comp";
-  }
-
-  imageFile<<testIndex;
-  imageFile<<".jpg";
-  w->SetFileName(imageFile.GetCStr());
-  w->Write();
-
-  if(!controlStream)
-  {
-    controlStream.close();
-    vtkDEL(w);
-    vtkDEL(w2i);
-    return;
-  }
-  controlStream.close();
-
-  //read original Image
-  vtkJPEGReader *rO;
-  vtkNEW(rO);
-  mafString imageFileOrig=MAF_DATA_ROOT;
-  imageFileOrig<<"/Test_PipeTensorFieldSlice/";
-  imageFileOrig<<name.c_str();
-  imageFileOrig<<"_";
-  imageFileOrig<<"image";
-  imageFileOrig<<testIndex;
-  imageFileOrig<<".jpg";
-  rO->SetFileName(imageFileOrig.GetCStr());
-  rO->Update();
-
-  vtkImageData *imDataOrig = rO->GetOutput();
-
-  //read compared image
-  vtkJPEGReader *rC;
-  vtkNEW(rC);
-  rC->SetFileName(imageFile.GetCStr());
-  rC->Update();
-
-  vtkImageData *imDataComp = rC->GetOutput();
-
-
-  vtkImageMathematics *imageMath = vtkImageMathematics::New();
-  imageMath->SetInput1(imDataOrig);
-  imageMath->SetInput2(imDataComp);
-  imageMath->SetOperationToSubtract();
-  imageMath->Update();
-
-  double srR[2] = {-1,1};
-  imageMath->GetOutput()->GetPointData()->GetScalars()->GetRange(srR);
-
-  CPPUNIT_ASSERT(srR[0] == 0.0 && srR[1] == 0.0);
-
-  // end visualization control
-  vtkDEL(imageMath);
-  vtkDEL(rC);
-  vtkDEL(rO);
-
-  vtkDEL(w);
-  vtkDEL(w2i);
+	mafDEL(storage);
 }

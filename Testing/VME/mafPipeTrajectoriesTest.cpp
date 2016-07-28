@@ -14,7 +14,6 @@
 
 =========================================================================*/
 
-
 #include "mafDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
@@ -31,16 +30,10 @@
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "mmaMaterial.h"
-
 #include "mafVMERoot.h"
-#include "vtkMAFAssembly.h"
 
+#include "vtkMAFAssembly.h"
 #include "vtkMapper.h"
-#include "vtkJPEGWriter.h"
-#include "vtkJPEGReader.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkImageMathematics.h"
-#include "vtkImageData.h"
 #include "vtkCellArray.h"
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
@@ -50,13 +43,9 @@
 #include "vtkMAFSmartPointer.h"
 
 // render window stuff
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
-
 #include <iostream>
-
 
 //----------------------------------------------------------------------------
 void mafPipeTrajectoriesTest::TestFixture()
@@ -70,6 +59,13 @@ void mafPipeTrajectoriesTest::BeforeTest()
   vtkNEW(m_Renderer);
   vtkNEW(m_RenderWindow);
   vtkNEW(m_RenderWindowInteractor);
+
+	m_Renderer->SetBackground(0.1, 0.1, 0.1);
+	m_RenderWindow->AddRenderer(m_Renderer);
+	m_RenderWindow->SetSize(600, 600);
+	m_RenderWindow->SetPosition(0, 0);
+
+	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
 //----------------------------------------------------------------------------
 void mafPipeTrajectoriesTest::AfterTest()
@@ -83,17 +79,6 @@ void mafPipeTrajectoriesTest::AfterTest()
 void mafPipeTrajectoriesTest::TestPipeExecution()
 //----------------------------------------------------------------------------
 {
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(600, 600);
-  m_RenderWindow->SetPosition(0,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-  ///////////// end render stuff /////////////////////////
-
-
   ////// Create VME ////////////////////
   mafSmartPointer<mafVMELandmarkCloud> cloud;
 	
@@ -116,6 +101,7 @@ void mafPipeTrajectoriesTest::TestPipeExecution()
 
     cloud->SetLandmark("first",x,y,z, i);
   }
+
   cloud->Update();
   cloud->TestModeOn();
 
@@ -152,123 +138,13 @@ void mafPipeTrajectoriesTest::TestPipeExecution()
   CPPUNIT_ASSERT(cloudActor != NULL);
 
   m_RenderWindow->Render();
-  CompareImages(0);
 
-  vtkDEL(actorList);
+	COMPARE_IMAGES("TestPipeExecution", 0);
 
+	vtkDEL(actorList);
   delete sceneNode;
 }
-//----------------------------------------------------------------------------
-void mafPipeTrajectoriesTest::CompareImages(int testIndex)
-//----------------------------------------------------------------------------
-{
-  char *file = __FILE__;
-  std::string name(file);
-  int slashIndex =  name.find_last_of('\\');
 
-  name = name.substr(slashIndex+1);
-
-  int pointIndex =  name.find_last_of('.');
-  name = name.substr(0, pointIndex);
-
-  mafString controlOriginFile=MAF_DATA_ROOT;
-  controlOriginFile<<"/Test_PipeTrajectories/";
-  controlOriginFile<<name.c_str();
-  controlOriginFile<<"_";
-  controlOriginFile<<"image";
-  controlOriginFile<<testIndex;
-  controlOriginFile<<".jpg";
-
-  fstream controlStream;
-  controlStream.open(controlOriginFile.GetCStr()); 
-
-  // visualization control
-  m_RenderWindow->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i;
-  vtkNEW(w2i);
-  w2i->SetInput(m_RenderWindow);
-  //w2i->SetMagnification(magnification);
-  w2i->Update();
-  m_RenderWindow->OffScreenRenderingOff();
-
-  //write comparing image
-  vtkJPEGWriter *w;
-  vtkNEW(w);
-  w->SetInput(w2i->GetOutput());
-  mafString imageFile=MAF_DATA_ROOT;
-
-  if(!controlStream)
-  {
-    imageFile<<"/Test_PipeTrajectories/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"image";
-  }
-  else
-  {
-    imageFile<<"/Test_PipeTrajectories/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"comp";
-  }
-
-  imageFile<<testIndex;
-  imageFile<<".jpg";
-  w->SetFileName(imageFile.GetCStr());
-  w->Write();
-
-  if(!controlStream)
-  {
-    controlStream.close();
-    vtkDEL(w);
-    vtkDEL(w2i);
-    return;
-  }
-  controlStream.close();
-
-  //read original Image
-  vtkJPEGReader *rO;
-  vtkNEW(rO);
-  mafString imageFileOrig=MAF_DATA_ROOT;
-  imageFileOrig<<"/Test_PipeTrajectories/";
-  imageFileOrig<<name.c_str();
-  imageFileOrig<<"_";
-  imageFileOrig<<"image";
-  imageFileOrig<<testIndex;
-  imageFileOrig<<".jpg";
-  rO->SetFileName(imageFileOrig.GetCStr());
-  rO->Update();
-
-  vtkImageData *imDataOrig = rO->GetOutput();
-
-  //read compared image
-  vtkJPEGReader *rC;
-  vtkNEW(rC);
-  rC->SetFileName(imageFile.GetCStr());
-  rC->Update();
-
-  vtkImageData *imDataComp = rC->GetOutput();
-
-
-  vtkImageMathematics *imageMath = vtkImageMathematics::New();
-  imageMath->SetInput1(imDataOrig);
-  imageMath->SetInput2(imDataComp);
-  imageMath->SetOperationToSubtract();
-  imageMath->Update();
-
-  double srR[2] = {-1,1};
-  imageMath->GetOutput()->GetPointData()->GetScalars()->GetRange(srR);
-
-  CPPUNIT_ASSERT(srR[0] == 0.0 && srR[1] == 0.0);
-
-  // end visualization control
-  vtkDEL(imageMath);
-  vtkDEL(rC);
-  vtkDEL(rO);
-
-  vtkDEL(w);
-  vtkDEL(w2i);
-}
 //----------------------------------------------------------------------------
 vtkProp *mafPipeTrajectoriesTest::SelectActorToControl(vtkPropCollection *propList, int index)
 //----------------------------------------------------------------------------

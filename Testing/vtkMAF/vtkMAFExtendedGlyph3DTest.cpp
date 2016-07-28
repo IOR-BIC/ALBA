@@ -28,17 +28,11 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
 #include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 #include "vtkCamera.h"
 #include "vtkMath.h"
 #include "vtkDoubleArray.h"
 #include "vtkPointData.h"
 #include "vtkTimerLog.h"
-#include "vtkImageMathematics.h"
-#include "vtkImageData.h"
-#include "vtkJPEGReader.h"
-#include "vtkJPEGWriter.h"
-#include "vtkWindowToImageFilter.h"
 #include "vtkArrowSource.h"
 
 #include <string>
@@ -54,16 +48,25 @@ static int TestNumber = 0;
 void vtkMAFExtendedGlyph3DTest::BeforeTest()
 //-----------------------------------------------------------
 {
-  TestNumber++;
+	// create windows
+	vtkNEW(m_Renderer);
+	vtkNEW(m_RenderWindow);
+	m_RenderWindow->AddRenderer(m_Renderer);
+
+	// prepare for rendering
+	m_Renderer->SetBackground(0.05f, 0.05f, 0.05f);
+	m_RenderWindow->SetSize(1024, 768);
+
+	TestNumber++;
 
   CreatePointsSet();
-  CreateRenWindow();
 }
 //-----------------------------------------------------------
 void vtkMAFExtendedGlyph3DTest::AfterTest()
 //-----------------------------------------------------------
 {
-  DeleteRenWindow();
+	vtkDEL(m_Renderer);
+	vtkDEL(m_RenderWindow);
 
   m_Points->Delete();
 
@@ -74,133 +77,7 @@ void vtkMAFExtendedGlyph3DTest::TestFixture()
 //-----------------------------------------------------------
 {
 }
-//--------------------------------------------------
-std::string vtkMAFExtendedGlyph3DTest::ConvertInt(int number)
-//--------------------------------------------------
-{
-  std::stringstream stringStream;
-  stringStream << number;//add number to the stream
-  return stringStream.str();//return a string with the contents of the stream
-}
-//----------------------------------------------------------------------------
-void vtkMAFExtendedGlyph3DTest::CompareImages()
-//----------------------------------------------------------------------------
-{
-//   char *file = __FILE__;
-//   std::string name(file);
-//   std::string path(file);
-//   int slashIndex =  name.find_last_of('\\');
-// 
-// 
-//   name = name.substr(slashIndex+1);
-//   path = path.substr(0,slashIndex);
-// 
-//   int pointIndex =  name.find_last_of('.');
-// 
-//   name = name.substr(0, pointIndex);
 
-  std::string path = MAF_DATA_ROOT;
-  std::string name = "vtkMAFExtendedGlyph3DTest";
-
-  std::string controlOriginFile;
-  controlOriginFile+=(path.c_str());
-  controlOriginFile+=("\\");
-  controlOriginFile+=(name.c_str());
-  controlOriginFile+=("_");
-  controlOriginFile+=("image");
-  controlOriginFile+=vtkMAFExtendedGlyph3DTest::ConvertInt(m_TestNumber).c_str();
-  controlOriginFile+=(".jpg");
-
-  fstream controlStream;
-  controlStream.open(controlOriginFile.c_str()); 
-
-  // visualization control
-  m_RenWin->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
-  w2i->SetInput(m_RenWin);
-  //w2i->SetMagnification(magnification);
-  w2i->Update();
-  m_RenWin->OffScreenRenderingOff();
-
-  //write comparing image
-  vtkJPEGWriter *w = vtkJPEGWriter::New();
-  w->SetInput(w2i->GetOutput());
-  std::string imageFile="";
-
-  if(!controlStream)
-  {
-    imageFile+=(path.c_str());
-    imageFile+=("\\");
-    imageFile+=(name.c_str());
-    imageFile+=("_");
-    imageFile+=("image");
-  }
-  else
-  {
-    imageFile+=(path.c_str());
-    imageFile+=("\\");
-    imageFile+=(name.c_str());
-    imageFile+=("_");
-    imageFile+=("comp");
-  }
-
-  imageFile+=vtkMAFExtendedGlyph3DTest::ConvertInt(m_TestNumber).c_str();
-  imageFile+=(".jpg");
-  w->SetFileName(imageFile.c_str());
-  w->Write();
-
-  if(!controlStream)
-  {
-    controlStream.close();
-    w->Delete();
-    w2i->Delete();
-    return;
-  }
-  controlStream.close();
-
-  //read original Image
-  vtkJPEGReader *rO = vtkJPEGReader::New();
-  std::string imageFileOrig="";
-  imageFileOrig+=(path.c_str());
-  imageFileOrig+=("\\");
-  imageFileOrig+=(name.c_str());
-  imageFileOrig+=("_");
-  imageFileOrig+=("image");
-  imageFileOrig+=vtkMAFExtendedGlyph3DTest::ConvertInt(m_TestNumber).c_str();
-  imageFileOrig+=(".jpg");
-  rO->SetFileName(imageFileOrig.c_str());
-  rO->Update();
-
-  vtkImageData *imDataOrig = rO->GetOutput();
-
-  //read compared image
-  vtkJPEGReader *rC = vtkJPEGReader::New();
-  rC->SetFileName(imageFile.c_str());
-  rC->Update();
-
-  vtkImageData *imDataComp = rC->GetOutput();
-
-
-  vtkImageMathematics *imageMath = vtkImageMathematics::New();
-  imageMath->SetInput1(imDataOrig);
-  imageMath->SetInput2(imDataComp);
-  imageMath->SetOperationToSubtract();
-  imageMath->Update();
-
-  double srR[2] = {-1,1};
-  imageMath->GetOutput()->GetPointData()->GetScalars()->GetRange(srR);
-
-  CPPUNIT_ASSERT(srR[0] == 0.0 && srR[1] == 0.0);
-  //CPPUNIT_ASSERT(ComparingImagesDetailed(imDataOrig,imDataComp));
-
-  // end visualization control
-  rO->Delete();
-  rC->Delete();
-  imageMath->Delete();
-
-  w->Delete();
-  w2i->Delete();
-}
 //----------------------------------------------------------------------------
 void vtkMAFExtendedGlyph3DTest::TestStaticAllocation()
 //----------------------------------------------------------------------------
@@ -254,27 +131,7 @@ void vtkMAFExtendedGlyph3DTest::CreatePointsSet()
   pts->Delete();
 
 }
-//----------------------------------------------------------------------------
-void vtkMAFExtendedGlyph3DTest::DeleteRenWindow()
-//----------------------------------------------------------------------------
-{
-  m_RenWin->Delete();
-  m_Renderer->Delete();
-}
-//----------------------------------------------------------------------------
-void vtkMAFExtendedGlyph3DTest::CreateRenWindow()
-//----------------------------------------------------------------------------
-{
-  // create windows
-  m_Renderer = vtkRenderer::New();
-  m_RenWin= vtkRenderWindow::New();
-  m_RenWin->AddRenderer( m_Renderer );
 
-  // prepare for rendering
-  m_Renderer->SetBackground(0.05f, 0.05f, 0.05f);
-  m_RenWin->SetSize(1024, 768); 
-
-}
 //----------------------------------------------------------------------------
 void vtkMAFExtendedGlyph3DTest::TestSetSource()
 //----------------------------------------------------------------------------
@@ -333,29 +190,28 @@ void vtkMAFExtendedGlyph3DTest::TestSetScaling()
 
   m_Renderer->AddActor(actor);
   m_Renderer->ResetCamera(filter->GetOutput()->GetBounds());
-  m_RenWin->Render();
+  m_RenderWindow->Render();
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
-  CompareImages();
+	COMPARE_IMAGES("TestSetScaling", m_TestNumber);
 
   filter->ScalingOn();
   filter->Update();
 
   CPPUNIT_ASSERT( filter->GetScaling() == TRUE );
 
-  m_RenWin->Render();
+	m_RenderWindow->Render();
 
   TestNumber++;
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
-  CompareImages();
+	COMPARE_IMAGES("TestSetScaling", m_TestNumber);
 
-  actor->Delete();
+	actor->Delete();
   mapper->Delete();
 
   filter->Delete();
   sphere->Delete();
   scalars->Delete();
-
 }
 //----------------------------------------------------------------------------
 void vtkMAFExtendedGlyph3DTest::TestSetScaleFactor()
@@ -391,10 +247,10 @@ void vtkMAFExtendedGlyph3DTest::TestSetScaleFactor()
 
   m_Renderer->AddActor(actor);
   m_Renderer->ResetCamera(filter->GetOutput()->GetBounds());
-  m_RenWin->Render();
+	m_RenderWindow->Render();
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
-  CompareImages();
+	COMPARE_IMAGES("TestSetScaleFactor", m_TestNumber);
 
   actor->Delete();
   mapper->Delete();
@@ -402,7 +258,6 @@ void vtkMAFExtendedGlyph3DTest::TestSetScaleFactor()
   filter->Delete();
   sphere->Delete();
   scalars->Delete();
-
 }
 //----------------------------------------------------------------------------
 void vtkMAFExtendedGlyph3DTest::TestSetRange()
@@ -433,7 +288,6 @@ void vtkMAFExtendedGlyph3DTest::TestSetRange()
   filter->Delete();
   sphere->Delete();
   scalars->Delete();
-
 }
 //----------------------------------------------------------------------------
 void vtkMAFExtendedGlyph3DTest::TestSetGeneratePointIds()
@@ -455,7 +309,6 @@ void vtkMAFExtendedGlyph3DTest::TestSetGeneratePointIds()
 
   filter->Delete();
   sphere->Delete();
-
 }
 //----------------------------------------------------------------------------
 void vtkMAFExtendedGlyph3DTest::TestSetPointIdsName()
@@ -478,7 +331,6 @@ void vtkMAFExtendedGlyph3DTest::TestSetPointIdsName()
 
   filter->Delete();
   sphere->Delete();
-
 }
 //----------------------------------------------------------------------------
 void vtkMAFExtendedGlyph3DTest::TestSetScalarVisibility()
@@ -517,10 +369,10 @@ void vtkMAFExtendedGlyph3DTest::TestSetScalarVisibility()
 
   m_Renderer->AddActor(actor);
   m_Renderer->ResetCamera(filter->GetOutput()->GetBounds());
-  m_RenWin->Render();
+	m_RenderWindow->Render();
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
-  CompareImages();
+ 	COMPARE_IMAGES("TestSetScalarVisibility", m_TestNumber);
 
   actor->Delete();
   mapper->Delete();
@@ -528,7 +380,6 @@ void vtkMAFExtendedGlyph3DTest::TestSetScalarVisibility()
   filter->Delete();
   sphere->Delete();
   scalars->Delete();
-
 }
 //----------------------------------------------------------------------------
 void vtkMAFExtendedGlyph3DTest::TestSetOrient()
@@ -568,10 +419,10 @@ void vtkMAFExtendedGlyph3DTest::TestSetOrient()
 
   m_Renderer->AddActor(actor);
   m_Renderer->ResetCamera(filter->GetOutput()->GetBounds());
-  m_RenWin->Render();
+	m_RenderWindow->Render();
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
-  CompareImages();
+	COMPARE_IMAGES("TestSetOrient", m_TestNumber);
 
   actor->Delete();
   mapper->Delete();
@@ -579,7 +430,6 @@ void vtkMAFExtendedGlyph3DTest::TestSetOrient()
   filter->Delete();
   arrow->Delete();
   normals->Delete();
-
 }
 //----------------------------------------------------------------------------
 void vtkMAFExtendedGlyph3DTest::TestSetClamping()
@@ -624,10 +474,10 @@ void vtkMAFExtendedGlyph3DTest::TestSetClamping()
 
   m_Renderer->AddActor(actor);
   m_Renderer->ResetCamera(filter->GetOutput()->GetBounds());
-  m_RenWin->Render();
+	m_RenderWindow->Render();
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
-  CompareImages();
+	COMPARE_IMAGES("TestSetClamping", m_TestNumber);
 
   filter->SetRange(12.0,20.0);
 
@@ -638,11 +488,11 @@ void vtkMAFExtendedGlyph3DTest::TestSetClamping()
   CPPUNIT_ASSERT( filter->GetOutput()->GetScalarRange()[0] >= 0.0 );
   CPPUNIT_ASSERT( filter->GetOutput()->GetScalarRange()[1] <= 1.0 );
 
-  m_RenWin->Render();
+  m_RenderWindow->Render();
 
   TestNumber++;
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
-  CompareImages();
+	COMPARE_IMAGES("TestSetClamping", m_TestNumber);
 
   actor->Delete();
   mapper->Delete();
@@ -650,5 +500,4 @@ void vtkMAFExtendedGlyph3DTest::TestSetClamping()
   filter->Delete();
   sphere->Delete();
   scalars->Delete();
-
 }

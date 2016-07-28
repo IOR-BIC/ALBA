@@ -22,7 +22,7 @@
 //------------------------------------------------------------------------------
 // Forward Declaration:
 //------------------------------------------------------------------------------
-class vtkRenderWindow;
+
 class vtkImageData;
 class vtkActor2D;
 
@@ -33,22 +33,11 @@ class vtkActor2D;
 class vtkMAFRulerActor2DTest : public mafTest
 {
   public:
-    /** Test IDs*/
-    enum ID_TEST_LIST
-    {
-      ID_SET_COLOR_TEST = 0,
-      ID_SET_LABEL_SCALE_VISIBILITY_TEST,
-      ID_SET_LABEL_AXES_VISIBILITY_TEST,
-      ID_SET_AXES_VISIBILITY_TEST,
-      ID_SET_TICK_VISIBILITY_TEST,
-      ID_SET_LEGEND_TEST,
-      ID_SET_GET_SCALE_FACTOR_TEST,
-      ID_USE_GLOBAL_AXES_TEST,
-      ID_SET_INVERSE_TICKS_TEST,
-      ID_SET_ATTACH_POSITION_TEST,
-      ID_CHANGE_RULER_MARGINS_AND_LENGHTS_TEST,
-      ID_SET_TEXT_TEST,
-    };
+		// Executed before each test
+		void BeforeTest();
+
+		// Executed after each test
+		void AfterTest();
 
     /** Test suite begin. */
     CPPUNIT_TEST_SUITE( vtkMAFRulerActor2DTest );
@@ -102,14 +91,9 @@ public:
   void TestSetText();
   /** Call PrintSelf in order to print information in console output.*/
   void TestPrintSelf();
-  /** Render data in vtk render window.*/
-  void RenderData(vtkActor2D *actor );
-  /** After saving images from render window, compare them in order to find difference between test sessions. */
-  void CompareImages(vtkRenderWindow * renwin);
-  
-  static std::string ConvertInt(int number);
 
-  int m_TestNumber;
+	/** Render data in vtk render window.*/
+	void RenderData(vtkActor2D *actor, char* testName);
 };
 
 #endif

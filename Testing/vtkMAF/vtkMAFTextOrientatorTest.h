@@ -22,7 +22,6 @@
 //------------------------------------------------------------------------------
 // Forward Declaration:
 //------------------------------------------------------------------------------
-class vtkRenderWindow;
 class vtkMAFTextOrientator;
 class vtkActor2D;
 //------------------------------------------------------------------------------
@@ -31,15 +30,11 @@ class vtkActor2D;
 class vtkMAFTextOrientatorTest : public mafTest
 {
   public:
-    enum ID_TEST_LIST
-    {
-      ID_TEXT_TEST = 0,
-      ID_SINGLE_VISIBILITY_TEST,
-      ID_TEXT_COLOR_TEST,
-      ID_BACKGROUND_COLOR_TEST,
-      ID_BACKGROUND_VISIBILITY_TEST,
-      ID_SCALE_TEST
-    };
+		// Executed before each test
+		void BeforeTest();
+
+		// Executed after each test
+		void AfterTest();
 
     CPPUNIT_TEST_SUITE( vtkMAFTextOrientatorTest );
     CPPUNIT_TEST( TestFixture );
@@ -66,13 +61,7 @@ class vtkMAFTextOrientatorTest : public mafTest
 
     //accessories
     void SetText(vtkMAFTextOrientator *actor);
-    void RenderData(vtkActor2D *actor );
-
-    void CompareImages(vtkRenderWindow * renwin);
-
-    static std::string ConvertInt(int number);
-    
-    int m_TestNumber;
+    void RenderData(vtkActor2D *actor, char* testName);
 };
 
 #endif

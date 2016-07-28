@@ -17,8 +17,6 @@
 #ifndef __CPP_UNIT_mafCoreTests_H__
 #define __CPP_UNIT_mafCoreTests_H__
 
-
-
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
@@ -39,6 +37,5 @@ public:
 	virtual void DeepCopy(const mafAttribute *a) {Superclass::DeepCopy(a); m_Prop3D=((mafClientData *)a)->m_Prop3D;}
 	virtual bool Equals(const mafAttribute *a) const {return Superclass::Equals(a)&&m_Prop3D==((mafClientData *)a)->m_Prop3D;}
 };
-
 
 #endif

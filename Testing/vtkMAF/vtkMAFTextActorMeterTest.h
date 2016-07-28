@@ -22,7 +22,6 @@
 //------------------------------------------------------------------------------
 // Forward Declaration:
 //------------------------------------------------------------------------------
-class vtkRenderWindow;
 class vtkMAFTextActorMeter;
 
 //------------------------------------------------------------------------------
@@ -31,12 +30,11 @@ class vtkMAFTextActorMeter;
 class vtkMAFTextActorMeterTest : public mafTest
 {
   public:
-    enum ID_TEST_LIST
-    {
-      ID_TEXT_TEST_POS1 = 0,
-      ID_TEXT_TEST_POS2,
-      ID_TEXT_COLOR_TEST,
-    };
+		// Executed before each test
+		void BeforeTest();
+
+		// Executed after each test
+		void AfterTest();
 
     CPPUNIT_TEST_SUITE( vtkMAFTextActorMeterTest );
     CPPUNIT_TEST( TestFixture );
@@ -62,14 +60,9 @@ class vtkMAFTextActorMeterTest : public mafTest
 
     //accessories
     void SetText(vtkMAFTextActorMeter *actor, const char *text, double position[3]);
-    void RenderData(vtkActor2D *actor );
+    void RenderData(vtkActor2D *actor, char* testName);
 
-    void CompareImages(vtkRenderWindow * renwin);
-
-    static std::string ConvertInt(int number);
     static std::string ConvertDouble(double number);
-    
-    int m_TestNumber;
 };
 
 #endif

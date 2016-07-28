@@ -4,11 +4,6 @@ IF (CPPUNIT_FOUND)
   #MESSAGE("Found Cppunit library")
   INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})
   LINK_LIBRARIES(${CPPUNIT_LIBRARIES})
-  
-  OPTION(BUILD_TEST_EXAMPLES "Enable building of TEST_EXAMPLES classes" OFF)
-  IF (BUILD_TEST_EXAMPLES)
-    SUBDIRS(Examples)
-  ENDIF (BUILD_TEST_EXAMPLES)
 
 ELSE (CPPUNIT_FOUND)
   MESSAGE("Cppunit library not found! Please fill the corresponding cache entries")

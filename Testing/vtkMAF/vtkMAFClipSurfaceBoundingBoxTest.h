@@ -75,15 +75,12 @@ class vtkMAFClipSurfaceBoundingBoxTest : public mafTest
 
     /** Render data in vtk render window.*/
     void RenderData(vtkActorCollection *actor );
-    /** After saving images from render window, compare them in order to find difference between test sessions. */
-    void CompareImages(vtkRenderWindow * renwin);
     /** Test execution with parametrized clip inside*/
     void TestExecution(int clipInside);
     /** Convert an int to std::string */
     static std::string ConvertInt(int number);
 
     int m_TestNumber;
-
 };
 
 #endif

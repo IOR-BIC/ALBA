@@ -22,7 +22,6 @@
 //------------------------------------------------------------------------------
 // Forward Declaration:
 //------------------------------------------------------------------------------
-class vtkRenderWindow;
 class vtkActor;
 
 //------------------------------------------------------------------------------
@@ -31,6 +30,11 @@ class vtkActor;
 class vtkMAFImageFillHolesRemoveIslandsTest : public mafTest
 {
   public:
+		// Executed before each test
+		void BeforeTest();
+
+		// Executed after each test
+		void AfterTest();
 
     CPPUNIT_TEST_SUITE( vtkMAFImageFillHolesRemoveIslandsTest );
     CPPUNIT_TEST( TestFixture );
@@ -49,10 +53,10 @@ class vtkMAFImageFillHolesRemoveIslandsTest : public mafTest
     
     //accessories
     void RenderData(vtkActor *actor );
-    void CompareImages(vtkRenderWindow * renwin);
     void TestAlgorithm();
 
     int m_Algorithm;
+		char* m_TestName;
 };
 
 #endif
