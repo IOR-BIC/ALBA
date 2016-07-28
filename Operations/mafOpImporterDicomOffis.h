@@ -95,14 +95,14 @@ public:
 
 	/** Create the dialog interface for the importer. */
 	virtual void CreateGui();
-
-	/** Set the abs file name of the directory containing DICOM slices to import */
-	void SetDicomDirectoryABSFileName(const char *dirName){m_DicomDirectoryABSFileName = dirName;};
-	const char *GetDicomDirectoryABSFileName() const {return m_DicomDirectoryABSFileName.GetCStr();};
 		
 	/** Create the vtkTexture for slice_num dicom slice: this will be written to m_SliceTexture ivar*/
 	void GenerateSliceTexture(int imageID);
-		
+
+	void Crop(vtkImageData *slice);
+
+	void CalculateCropExtent();
+			
 	/** Build a volume from the list of dicom files. */
 	int BuildOutputVMEGrayVolumeFromDicom();
 
@@ -119,7 +119,7 @@ public:
 	virtual void CreateSliceVTKPipeline();
 
 	/** Open dir containing Dicom images. */
-	bool OpenDir();
+	bool OpenDir(const char *dirPath);
 
 	/** method allows to handle events from other objects*/
 	virtual void OnEvent(mafEventBase *maf_event);
@@ -131,7 +131,6 @@ protected:
 		ID_FIRST = mafGUIWizard::ID_LAST,
 		ID_STUDY_SELECT,
 		ID_SERIES_SELECT,
-		ID_CROP,
 		ID_CANCEL,
 		ID_PATIENT_NAME,
 		ID_PATIENT_ID,
@@ -145,8 +144,7 @@ protected:
 	};
 
 	/** OnEvent helper functions */
-	void OnScanTime();
-	void OnScanSlice();
+	void OnChangeSlice();
 	void OnRangeModified();
 	void OnMouseDown( mafEvent * e );
 	void OnMouseMove( mafEvent * e );
@@ -172,21 +170,19 @@ protected:
 
 	/** Build the list of files in folder and subfolders */
 	vector<wxString> BuildFileListRecursive(wxString path);
-
-
+	
 	/** Read the list of dicom files recognized. */
 	mafDicomSlice *ReadDicomSlice(mafString fileName);
 
 	vtkImageData *CreateImageData(DcmDataset * dicomDataset, double * dcmImagePositionPatient);
 
 	void GetDicomSpacing(DcmDataset * dicomDataset, double * dcmPixelSpacing);
-
-	
+		
 	/** Return the slice number from the heightId and sliceId*/
 	int GetSliceIDInSeries(int heightId, int timeId);
 
 	/** Show the slice slice_num. */
-	void ShowSlice();
+	void SetPlaneDims();
 
 	/** Fill Study listbox. */
 	void FillStudyListBox();
@@ -212,10 +208,8 @@ protected:
 	/** On wizard start. */
 	virtual int RunWizard();
 		
-	/** Performe crop of dicom data. */
-	void Crop();
-
-	void SetVMEName(mafDicomSlice * currentSliceData);
+	
+	void SetVMEName();
 		
 	vtkLookupTable		*m_SliceLookupTable;
 	vtkPlaneSource		*m_SlicePlane;
@@ -245,18 +239,12 @@ protected:
 	mafGUI  *m_LoadGuiUnderCenter;
 
 	int       m_OutputType;
-	mafString	m_DicomDirectoryABSFileName;
-	mafString m_PatientName;
-	mafString m_SurgeonName;
-	mafString m_PatientPosition;
 	mafString m_VMEName;
 
 	int				m_DicomReaderModality; ///<Type DICOM Read from file
 	int				m_SortAxes;
 	
 	int m_SkipAllNoPosition;
-
-	std::map <mafString,int> m_dcm_dim;
 
 	mafDicomStudyList *m_StudyList;
 	mafDicomSeries	*m_SelectedSeries; ///< Selected series slices list
@@ -280,11 +268,12 @@ protected:
 
 	double	m_SliceBounds[6];
 
+	bool m_CropEnabled;
+	int m_CropExtent[6];
+
 	int	m_GizmoStatus;
 	int	m_SideToBeDragged;
 
-	bool m_BoxCorrect;
-	bool m_CropFlag;
 	bool m_ConstantRotation;
 	
 	int m_ShowOrientationPosition;
