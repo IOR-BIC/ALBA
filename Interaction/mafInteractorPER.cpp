@@ -312,7 +312,9 @@ void mafInteractorPER::OnMouseWheel(mafEventInteraction *e)
 		
 		ren->ResetCameraClippingRange();
 
-		InvokeEvent(CAMERA_UPDATE, MCH_UP, view);
+		if (view)
+			view->CameraUpdate();
+
 		cam->OrthogonalizeViewUp();		
 	}
 }
