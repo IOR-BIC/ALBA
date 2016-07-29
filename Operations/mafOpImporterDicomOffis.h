@@ -421,15 +421,15 @@ public:
 		m_DcmInstanceNumber = dcmInstanceNumber;
 		m_DcmCardiacNumberOfImages = dcmCardiacNumberOfImages;
 		m_DcmTriggerTime = dcmTtriggerTime;
-		m_Data = data;
+		m_ImageData = data;
 		SetDcmImagePositionPatient(dcmImagePositionPatient);
 		SetDcmImagePositionPatientOriginal(dcmImagePositionPatient);
 		SetDcmImageOrientationPatient(dcmImageOrientationPatient);
-		CalculateUnrotatedPos();
+		CalculateUnrotatedOrigin();
 	};
 
 	/** destructor */
-	~mafDicomSlice() { vtkDEL(m_Data); };
+	~mafDicomSlice() { vtkDEL(m_ImageData); };
 
 	/** Return patient birthday */
 	mafString GetPatientBirthday() { return m_PatientBirthdate; };
@@ -462,7 +462,7 @@ public:
 	void SetDcmTriggerTime(double time) { m_DcmTriggerTime = time; };
 
 	/** Retrieve image data*/
-	vtkImageData* GetVTKImageData() { return m_Data; };
+	vtkImageData* GetVTKImageData() { return m_ImageData; };
 
 	/** Set vtkImageData */
 	void SetVTKImageData(vtkImageData *data);
@@ -531,7 +531,7 @@ public:
 	const double *GetDcmImageOrientationPatient() { return m_DcmImageOrientationPatient; }
 
 	/** Return the position unrotated */
-	const double *GetUnrotatedPos() { return m_UnrotatedPos; }
+	double *GetUnrotatedOrigin() { return m_UnrotatedOrigin; }
 	
 	/** return the description */
 	mafString GetDescription() { return m_Description; };
@@ -567,10 +567,10 @@ public:
 	void SetStudyID(mafString studyID) { m_StudyID = studyID; }
 
 protected:
-	
-	void CalculateUnrotatedPos();
 
-	double m_UnrotatedPos[3];
+	void CalculateUnrotatedOrigin();
+
+	double m_UnrotatedOrigin[3];
 	double m_DcmImagePositionPatient[3];
 	double m_DcmImagePositionPatientOriginal[3];
 	double m_DcmImageOrientationPatient[6];
@@ -588,7 +588,7 @@ protected:
 	int m_DcmInstanceNumber;
 	int m_DcmCardiacNumberOfImages;
 
-	vtkImageData *m_Data;	
+	vtkImageData *m_ImageData;	
 };
 
 #endif

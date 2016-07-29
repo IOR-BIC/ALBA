@@ -275,24 +275,22 @@ int mafOpImporterDicomOffis::RunWizard()
 		int result;
 		switch (m_OutputType)
 		{
-		case TYPE_VOLUME: 
+			case TYPE_VOLUME:
 			{
-
-				if(m_DicomReaderModality == STANDARD_MODALITY)
+				if (m_DicomReaderModality == STANDARD_MODALITY)
 					result = BuildOutputVMEGrayVolumeFromDicom();
 				else
 					result = BuildOutputVMEGrayVolumeFromDicomCineMRI();
-
-				break;
 			}
-		case TYPE_IMAGE:
+			break;
+			case TYPE_IMAGE:
 			{
-				if(m_DicomReaderModality == STANDARD_MODALITY)
+				if (m_DicomReaderModality == STANDARD_MODALITY)
 					result = BuildOutputVMEImagesFromDicom();
 				else
 					result = BuildOutputVMEImagesFromDicomCineMRI();
-				break;
 			}
+			break;
 		}
 		return result;
 	}
@@ -379,18 +377,16 @@ int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicom()
 
 	for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
 	{
-
 		vtkImageData *image = m_SelectedSeries->GetSlice(count)->GetVTKImageData();
 		Crop(image);
 
-		mafSmartPointer<mafVMEImage> vmeImage;
 		mafString name;
 		name.Printf("%s_%d", m_VMEName.GetCStr(), count);
-		
+
+		mafSmartPointer<mafVMEImage> vmeImage;
 		vmeImage->SetName(name);
 		vmeImage->SetData(image,0);
 		vmeImage->GetTagArray()->DeepCopy(m_TagArray);
-				
 		vmeImage->GetMaterial()->m_ColorLut->DeepCopy(m_SliceTexture->GetLookupTable());
 		
 		m_ImagesGroup->AddChild(vmeImage);
@@ -469,7 +465,6 @@ int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 			if (isRotated)
 			{
 				mafDicomSlice* slice = m_SelectedSeries->GetSlice(currImageId);
-
 				mafMatrix sliceOrientationMatrix;
 				sliceOrientationMatrix.SetFromDirectionCosines(slice->GetDcmImageOrientationPatient());
 
@@ -547,20 +542,17 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	n_slices -= numSliceToSkip;
 	vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
 	accumulate->SetNumberOfSlices(n_slices);
-	accumulate->BuildVolumeOnAxes(m_SortAxes);
-
-	double orientation[6];
-	firstSlice->GetDcmImageOrientationPatient(orientation);
 
 	for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
 	{
 		if (sliceToSkip[count-m_ZCropBounds[0]])
 			continue;
 
-		vtkImageData *image = m_SelectedSeries->GetSlice(count)->GetVTKImageData();
+		mafDicomSlice * slice = m_SelectedSeries->GetSlice(count);
+		vtkImageData *image = slice->GetVTKImageData();
 		Crop(image);
 
-		accumulate->SetSlice(s_count,image, orientation);
+		accumulate->SetSlice(s_count, image, slice->GetUnrotatedOrigin());
 		s_count++;
 
 		progressHelper.UpdateProgressBar(count * 100 / (m_ZCropBounds[1]+1));
@@ -580,7 +572,7 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 
 	//Setting orientation matrix
 	mafMatrix orientationMatrix;
-	orientationMatrix.SetFromDirectionCosines(orientation);
+	orientationMatrix.SetFromDirectionCosines(firstSlice->GetDcmImageOrientationPatient());
 	m_Volume->SetAbsMatrix(orientationMatrix);
 		
 	//Copy inside the first VME item of m_Volume the CT volume and Dicom's tags
@@ -715,7 +707,6 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 		vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulator;
 
 		// always build the volume on z-axis
-		accumulator->BuildVolumeOnAxes(m_SortAxes);
 		accumulator->SetNumberOfSlices(cardiacImageNum - numSliceToSkip);
 
 		int i = 0;
@@ -1696,7 +1687,7 @@ void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 	m_SliceTexture->SetInput(slice->GetVTKImageData());
 	m_SliceTexture->Modified();
 		
-	//Invert grayscale for Photometric Interpretation MONOCHROME1
+	//Invert gray scale for Photometric Interpretation MONOCHROME1
 	if(wxString(slice->GetPhotometricInterpretation().GetCStr()).Contains("MONOCHROME1"))
 		lutPreset(20,m_SliceLookupTable);
 	else
@@ -2325,7 +2316,7 @@ bool mafDicomSeries::IsRotated(const double dcmImageOrientationPatient[6])
 //----------------------------------------------------------------------------
 bool SortSliceCompareFunction(mafDicomSlice *i, mafDicomSlice *j) 
 { 
-	return (i->GetUnrotatedPos()[2]<j->GetUnrotatedPos()[2]); 
+	return (i->GetUnrotatedOrigin()[2] < j->GetUnrotatedOrigin()[2]);
 }
 //----------------------------------------------------------------------------
 void mafDicomSeries::SortSlices()
@@ -2337,20 +2328,22 @@ void mafDicomSeries::SortSlices()
 //----------------------------------------------------------------------------
 void mafDicomSlice::SetVTKImageData(vtkImageData *data)
 {
-	vtkDEL(m_Data);
-	m_Data = vtkImageData::New();
-	m_Data->DeepCopy(data);
+	vtkDEL(m_ImageData);
+	m_ImageData = vtkImageData::New();
+	m_ImageData->DeepCopy(data);
 }
 //----------------------------------------------------------------------------
-void mafDicomSlice::CalculateUnrotatedPos()
+void mafDicomSlice::CalculateUnrotatedOrigin()
 {
-	double rotPos[4] = { m_DcmImagePositionPatient[0], m_DcmImagePositionPatient[1], m_DcmImagePositionPatient[2], 1.0 };
+	double *origin = m_ImageData->GetOrigin();
+	double rotPos[4] = { origin[0], origin[1], origin[2], 1.0 };
 
 	mafMatrix matr;
 	matr.SetFromDirectionCosines(m_DcmImageOrientationPatient);
+	matr.Invert();
 
-	double *unRotPos = matr.GetVTKMatrix()->MultiplyDoublePoint(rotPos);
-	m_UnrotatedPos[0] = unRotPos[0];
-	m_UnrotatedPos[1] = unRotPos[1];
-	m_UnrotatedPos[2] = unRotPos[2];
+	double *unRotOrigin = matr.GetVTKMatrix()->MultiplyDoublePoint(rotPos);
+	m_UnrotatedOrigin[0] = unRotOrigin[0];
+	m_UnrotatedOrigin[1] = unRotOrigin[1];
+	m_UnrotatedOrigin[2] = unRotOrigin[2];
 }

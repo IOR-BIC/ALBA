@@ -66,28 +66,13 @@ public:
 	static vtkMAFRGSliceAccumulate *New();
 
   /**
-  Add Slice to RectilinearGrid*/
-  void AddSlice(vtkImageData *);
-  void AddSlice(vtkStructuredPoints * slice)
-  {
-	  AddSlice((vtkImageData *)slice);
-  }
-   
-  /**
   Set the slice into the RectilinearGrid*/
-  void SetSlice(int ,vtkImageData *, double* orientation);
-  void SetSlice(int slice_num, vtkStructuredPoints * slice, double* orientation)
+  void SetSlice(int slice_num,vtkImageData *slice, double* unRotatedOrigin);
+  void SetSlice(int slice_num, vtkStructuredPoints * slice,double* unRotatedOrigin)
   {
-	  SetSlice(slice_num, (vtkImageData *)slice, orientation);
+	  SetSlice(slice_num, (vtkImageData *)slice, unRotatedOrigin);
   }
-  
-  /**
-  Set the building axes for the volume*/
-	void BuildVolumeOnAxes(int axes) {BuildingAxes = axes;};
-	void BuildVolumeOnAxesX() {BuildingAxes = 0;};
-	void BuildVolumeOnAxesY() {BuildingAxes = 1;};
-	void BuildVolumeOnAxesZ() {BuildingAxes = 2;};
-
+ 
   /**
   Dimensions of rectilinearGrid*/
   vtkSetVector3Macro(Dimensions, int);
@@ -102,6 +87,11 @@ public:
   vtkSetVector3Macro(Origin, double);
   vtkGetVector3Macro(Origin, double);
 
+	/** */
+	vtkSetVector6Macro(InputExtent, int);
+	vtkGetVector6Macro(InputExtent, int);
+
+
   /**
   Get the number of slices in RegtilinearGrid*/
   vtkSetMacro(NumberOfSlices, int);
@@ -111,6 +101,7 @@ public:
   vtkSetMacro(DataType, int);
   vtkGetMacro(DataType, int);
 
+
   vtkRectilinearGrid* GetOutput(){return Slices;};
 
 protected:
@@ -119,9 +110,8 @@ protected:
   int Dimensions[3];
   double Spacing[3];
   double Origin[3];
-  double m_rotationmatrix[3][3];
+	int InputExtent[6];
   int DataType;
-	int BuildingAxes;
 
 	vtkMAFRGSliceAccumulate();
   ~vtkMAFRGSliceAccumulate();
