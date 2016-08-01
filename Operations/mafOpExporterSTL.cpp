@@ -52,8 +52,6 @@ mafOp(label)
 
 	m_Binary        = 1;
 	m_ABSMatrixFlag = 1;
-
-	m_FileDir = mafGetLastUserFolder().c_str();
 }
 //----------------------------------------------------------------------------
 mafOpExporterSTL::~mafOpExporterSTL()

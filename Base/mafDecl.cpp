@@ -84,12 +84,9 @@ std::string mafGetOpenFile(const char *initial, const char * wild, const char * 
 }
 
 //----------------------------------------------------------------------------
-void mafGetOpenMultiFiles(const char * initial, const char * wild, std::vector<std::string> &files, const char * title, wxWindow *parent)
+void mafGetOpenMultiFiles(const char * path, const char * wild, std::vector<std::string> &files, const char * title, wxWindow *parent)
 //----------------------------------------------------------------------------
-{
-  wxString path, name, ext;
-  wxSplitPath(initial,&path,&name,&ext);
-  if(name != "" && ext != "") name = wxString::Format("%s.%s",name.c_str(),ext.c_str());
+{  
   wxString wildcard = wild;
   wildcard += "|All Files (*.*)|*.*";
  
@@ -102,6 +99,12 @@ void mafGetOpenMultiFiles(const char * initial, const char * wild, std::vector<s
 	(result == wxID_OK) ? dialog.GetPaths(wxfiles) : wxfiles.Empty();
 	for (int i=0;i<wxfiles.GetCount();i++)
 	  files.push_back(wxfiles[i].c_str());
+	if (wxfiles.GetCount() > 0)
+	{
+		wxString newPath, name, ext;
+		wxSplitPath(wxfiles[0], &newPath, &name, &ext);
+		mafSetLastUserFolder(newPath);
+	}
 }
 //----------------------------------------------------------------------------
 std::string mafGetSaveFile(const char * initial, const char * wild, const char * title, wxWindow *parent)
@@ -181,10 +184,17 @@ void mafSetLastUserFolder(mafString folder)
     wxString appName = wxApp::GetInstance()->GetAppName();
     wxConfig *config = new wxConfig(appName);
 
-    wxString path, name, ext;
-    wxSplitPath(folder,&path,&name,&ext);
+		if (!wxDirExists(folder))
+		{
+			wxString path, name, ext;
+			wxSplitPath(folder, &path, &name, &ext);
+			if (wxDirExists(path))
+				folder = path;
+			else
+				return;
+		}
 
-    config->Write("LastUserFolder", path);
+    config->Write("LastUserFolder", folder);
     delete config;
   }
 }
