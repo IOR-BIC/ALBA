@@ -85,7 +85,6 @@ protected:
 
   std::vector<mafVMESurface*> m_ImportedSTLs;
   std::vector<mafString>	    m_Files;
-	mafString	                  m_FileDir;
   std::vector<int>            m_Swaps;
 };
 #endif

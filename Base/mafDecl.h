@@ -461,7 +461,7 @@ MAF_EXPORT std::string  mafGetDirName(const char * initial, const char * title =
 MAF_EXPORT std::string  mafGetOpenFile(const char * initial, const char * wildcard, const char * title = "Open File", wxWindow *parent = NULL);
 
 /** show the File Open Dialog Box for multiple file selection */
-MAF_EXPORT void mafGetOpenMultiFiles(const char * initial, const char * wildcard, std::vector<std::string> &files, const char * title = "Open Files", wxWindow *parent = NULL);
+MAF_EXPORT void mafGetOpenMultiFiles(const char * path, const char * wildcard, std::vector<std::string> &files, const char * title = "Open Files", wxWindow *parent = NULL);
 
 /** show the File Save Dialog Box */
 MAF_EXPORT std::string  mafGetSaveFile(const char * initial, const char * wildcard, const char * title = "Save File", wxWindow *parent = NULL);

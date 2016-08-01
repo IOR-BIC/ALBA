@@ -51,7 +51,6 @@ mafOp(label)
   m_Canundo = true;
   m_Files.clear();
   m_Swaps.clear();
-  m_FileDir = mafGetLastUserFolder().c_str();
 }
 //----------------------------------------------------------------------------
 mafOpImporterSTL::~mafOpImporterSTL()
@@ -78,6 +77,8 @@ mafOp* mafOpImporterSTL::Copy()
 void mafOpImporterSTL::OpRun()   
 //----------------------------------------------------------------------------
 {
+	mafString	fileDir = mafGetLastUserFolder().c_str();
+
   if (!m_TestMode && m_Files.size() == 0)
   {
     mafString wildc = "Stereo Litography (*.stl)|*.stl";
@@ -85,7 +86,7 @@ void mafOpImporterSTL::OpRun()
     mafString f;
 
     m_Files.clear();
-    mafGetOpenMultiFiles(m_FileDir.GetCStr(),wildc.GetCStr(), files);
+    mafGetOpenMultiFiles(fileDir.GetCStr(),wildc.GetCStr(), files);
     for(unsigned i = 0; i < files.size(); i++)
     {
       f = files[i].c_str();
