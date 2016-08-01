@@ -96,7 +96,6 @@ SET(PROJECT_SRCS
 	mafOpMML3Test.h mafOpMML3Test.cpp
 	mafOpExtractGeometryTest.h mafOpExtractGeometryTest.cpp
 	mafOpImporterDicomOffisTest.h mafOpImporterDicomOffisTest.cpp
-	mafDicomCardiacMRIHelperTest.h mafDicomCardiacMRIHelperTest.cpp
 	itkRawMotionImporterUtilityTest.h itkRawMotionImporterUtilityTest.cpp
 	mafOpMakeVMETimevaryingTest.h mafOpMakeVMETimevaryingTest.cpp
 	mafOpEqualizeHistogramTest.h mafOpEqualizeHistogramTest.cpp

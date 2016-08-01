@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <algorithm>
 
-#include "wx/listimpl.cpp"
 #include "wx/busyinfo.h"
 #include "wx/listctrl.h"
 #include "wx/dir.h"
@@ -35,12 +34,10 @@ PURPOSE.  See the above copyright notice for more information.
 #include "mafDeviceButtonsPadMouse.h"
 #include "mafInteractorDICOMImporter.h"
 #include "mafTagArray.h"
-#include "mafRWI.h"
 #include "mafVMEImage.h"
 #include "mafVMEVolumeGray.h"
 #include "mafGUICheckListBox.h"
 #include "mafGUIDicomSettings.h"
-#include "mafGUIButton.h"
 #include "mafGUISettingsAdvanced.h"
 #include "mafVMEItemVTK.h"
 #include "mafDataVector.h"
@@ -48,7 +45,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "mafTransformFrame.h"
 #include "mafSmartPointer.h"
 #include "mafVMEGroup.h"
-#include "mafDicomCardiacMRIHelper.h"
 #include "mmaMaterial.h"
 #include "mafGUILutPreset.h"
 #include "vtkImageReslice.h"
@@ -73,8 +69,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkProperty2D.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkUnsignedShortArray.h"
-#include "vtkMath.h"
-#include "vtkImageFlip.h"
 #include "vtkPointData.h"
 
 #include "dcmtk/config/osconfig.h"    /* make sure OS specific configuration is included first */
@@ -91,7 +85,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "dcmtk/dcmdata/dcrledrg.h"
 #include "dcmtk/ofstd/ofstdinc.h"
 #include "vnl/vnl_vector.h"
-#include "vtkProbeFilter.h"
 
 
 //----------------------------------------------------------------------------
@@ -263,20 +256,10 @@ int mafOpImporterDicomOffis::RunWizard()
 		switch (m_OutputType)
 		{
 			case TYPE_VOLUME:
-			{
-				if (m_DicomReaderModality == STANDARD_MODALITY)
-					result = BuildOutputVMEGrayVolumeFromDicom();
-				else
-					result = BuildOutputVMEGrayVolumeFromDicomCineMRI();
-			}
+					result = BuildVMEVolumeGrayOutput();
 			break;
 			case TYPE_IMAGE:
-			{
-				if (m_DicomReaderModality == STANDARD_MODALITY)
-					result = BuildOutputVMEImagesFromDicom();
-				else
-					result = BuildOutputVMEImagesFromDicomCineMRI();
-			}
+					result = BuildVMEImagesOutput();
 			break;
 		}
 		return result;
@@ -332,279 +315,95 @@ void mafOpImporterDicomOffis::OpStop(int result)
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicom()
+int mafOpImporterDicomOffis::BuildVMEImagesOutput()
 {
-	int step= GetSetting()->GetBuildStep() + 1;
+	int nFrames = m_SelectedSeries->GetCardiacImagesNum()+1;
 
+	int step = GetSetting()->GetBuildStep() + 1;
 	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
-	int n_slices = cropInterval / step;
-
-	if(cropInterval % step != 0)
-	{
-		n_slices+=1;
-	}
-
+	
 	mafProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Building images: please wait...");
 
-	int count,s_count;
 	mafNEW(m_ImagesGroup);
 
 	m_ImagesGroup->SetName(wxString::Format("%s images",m_VMEName));
 	m_ImagesGroup->ReparentTo(m_Input);
 
-	for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
+	int parsedSlices = 0;
+
+	for (int i = m_ZCropBounds[0]; i < m_ZCropBounds[1]+1; i += step)
 	{
-		vtkImageData *image = m_SelectedSeries->GetSlice(count)->GetVTKImageData();
-		Crop(image);
-
+		
 		mafString name;
-		name.Printf("%s_%d", m_VMEName.GetCStr(), count);
-
+		name.Printf("%s s:%d", m_VMEName.GetCStr(), i);
 		mafSmartPointer<mafVMEImage> vmeImage;
 		vmeImage->SetName(name);
-		vmeImage->SetData(image,0);
 		vmeImage->GetTagArray()->DeepCopy(m_TagArray);
 		vmeImage->GetMaterial()->m_ColorLut->DeepCopy(m_SliceTexture->GetLookupTable());
-		
-		m_ImagesGroup->AddChild(vmeImage);
-		s_count++;
 
-		progressHelper.UpdateProgressBar(count * 100 / m_SelectedSeries->GetSlicesNum());
-	}
-
-	m_Output = m_ImagesGroup;
-
-	return OP_RUN_OK;
-}
-//----------------------------------------------------------------------------
-int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
-{
-	int step = GetSetting()->GetBuildStep() + 1;
-
-	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
-	int n_slices = cropInterval / step;
-
-	if(cropInterval % step != 0)
-	{
-		n_slices+=1;
-	}
-
-	mafProgressBarHelper progressHelper(m_Listener);
-	progressHelper.SetTextMode(m_TestMode);
-	progressHelper.InitProgressBar("Building images: please wait...");
-
-	mafNEW(m_ImagesGroup);
-
-	bool isRotated = m_SelectedSeries->IsRotated();
-	int cardiacImageNum = m_SelectedSeries->GetCardiacImagesNum();
-	
-	m_ImagesGroup->SetName(wxString::Format("%s images",m_VMEName));
-	m_ImagesGroup->ReparentTo(m_Input);
-
-	//create all the animated images
-	for (int i = m_ZCropBounds[0]; i < m_ZCropBounds[1]+1;i += step)
-	{
-		mafSmartPointer<mafVMEImage> image;
-		mafString name;
-		name.Printf("%s_%d_%d", m_VMEName.GetCStr(), i, cardiacImageNum);
-		image->SetName(name);
-		m_ImagesGroup->AddChild(image);
-	}
-
-	int totalNumberOfImages = (m_ZCropBounds[1]+1)*cardiacImageNum;
-	int progressCounter = 0;
-
-	// for every timestamp
-	for (int ts = 0; ts < cardiacImageNum; ts++)
-	{
-		progressHelper.UpdateProgressBar(ts * 100 / cardiacImageNum);
-
-		// get the time stamp from the dicom tag;
-		// timestamp is in ms
-		int tsImageId = GetSliceIDInSeries(ts, 0);
-
-		double dcmTriggerTime = m_SelectedSeries->GetSlice(tsImageId)->GetDcmTriggerTime();
-		
-		for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
+		for (int t = 0; t < nFrames; t++)
 		{
-			progressHelper.UpdateProgressBar(progressCounter * 100 / totalNumberOfImages);
+			int sliceID = GetSliceIDInSeries(t, i);
+			mafDicomSlice * currentSlice = m_SelectedSeries->GetSlice(sliceID);
+			mafTimeStamp triggerTime = currentSlice->GetDcmTriggerTime();
 
-			//Get Slice Id
-			int currImageId = GetSliceIDInSeries(ts, sourceVolumeSliceId);
-			
- 			vtkImageData *image = m_SelectedSeries->GetSlice(currImageId)->GetVTKImageData();
- 			Crop(image);
- 						
-			mafVMEImage *vmeImage = mafVMEImage::SafeDownCast(m_ImagesGroup->GetChild(targetVolumeSliceId));
+			vtkImageData *image = currentSlice->GetVTKImageData();
+			Crop(image);
+			image->SetOrigin(currentSlice->GetUnrotatedOrigin());
 
-			vmeImage->SetData(image,dcmTriggerTime);
-
-			if (isRotated)
-			{
-				mafDicomSlice* slice = m_SelectedSeries->GetSlice(currImageId);
-				mafMatrix sliceOrientationMatrix;
-				sliceOrientationMatrix.SetFromDirectionCosines(slice->GetDcmImageOrientationPatient());
-
-				double sliceVtkDataCenter[3];
-				slice->GetVTKImageData()->GetCenter(sliceVtkDataCenter);
-
-				vtkTransform *tr = vtkTransform::New();
-				tr->PostMultiply();
-				tr->Translate(-sliceVtkDataCenter[0], -sliceVtkDataCenter[1],-sliceVtkDataCenter[2]);
-				tr->Concatenate(sliceOrientationMatrix.GetVTKMatrix());
-				tr->Update();
-								
-				vmeImage->SetAbsMatrix(tr->GetMatrix(),dcmTriggerTime);
-				tr->Delete();
-			}
-
-			m_ImagesGroup->GetChild(targetVolumeSliceId)->GetTagArray()->DeepCopy(m_TagArray);
-
-			targetVolumeSliceId++;
-			progressCounter++;
+			vmeImage->SetData(image, triggerTime);
 		}
+		
+		//Setting orientation matrix
+		mafDicomSlice *sliceAtZeroTime = m_SelectedSeries->GetSlice(GetSliceIDInSeries(0, i));
+		mafMatrix orientationMatrix;
+		orientationMatrix.SetFromDirectionCosines(sliceAtZeroTime->GetDcmImageOrientationPatient());
+		vmeImage->SetAbsMatrix(orientationMatrix);
+
+		m_ImagesGroup->AddChild(vmeImage);
+
+		progressHelper.UpdateProgressBar(i * 100 / m_SelectedSeries->GetSlicesNum());
 	}
 
 	m_Output = m_ImagesGroup;
 
 	return OP_RUN_OK;
 }
+
 //----------------------------------------------------------------------------
-int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
+int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 {
 	mafDicomSlice* firstSlice = m_SelectedSeries->GetSlice(0);
 	bool skipDifferntDims = false;
 	
+	int nFrames = m_SelectedSeries->GetCardiacImagesNum()+1;
+	int totalNumberOfImages = ((m_ZCropBounds[1]-m_ZCropBounds[0]) + 1)*nFrames;
+
 	int step = GetSetting()->GetBuildStep() + 1;
 	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
-	int n_slices = (cropInterval/ step);
-
+	
+	int SlicesPerFrame = (cropInterval / step);
 	if(cropInterval % step != 0)
-		n_slices+=1;
+		SlicesPerFrame+=1;
 	 
-	int count,s_count;
-	int numSliceToSkip = 0;
-	bool *sliceToSkip = new bool[n_slices];
-	memset(sliceToSkip, 0, sizeof(bool)*n_slices);
+	int *nSliceToSkipAtFrame = new int[nFrames];
+	memset(nSliceToSkipAtFrame, 0, sizeof(int)*nFrames);
+
+	bool *sliceToSkip = new bool[m_SelectedSeries->GetSlicesNum()];
+	memset(sliceToSkip, 0, sizeof(bool)*m_SelectedSeries->GetSlicesNum());
 
 	int dim_img_check[3],dim_img[3];
 	firstSlice->GetVTKImageData()->GetDimensions(dim_img_check);
 
-	for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
-	{  
-			vtkImageData *image = m_SelectedSeries->GetSlice(count)->GetVTKImageData();
+	for(int t=0; t<nFrames; t++)
+		for (int i = m_ZCropBounds[0]; i < m_ZCropBounds[1] + 1; i += step)
+		{
+			int sliceID = GetSliceIDInSeries(t, i);
+			vtkImageData *image = m_SelectedSeries->GetSlice(i)->GetVTKImageData();
 			image->Update();
 			image->GetDimensions(dim_img);
-			if ((dim_img[0] != dim_img_check[0]) && (dim_img[1] != dim_img_check[1])) 
-				{
-					if (!skipDifferntDims)
-					{
-						int result = wxMessageBox(_("Some slices have different dimension! They will be skipped! Do you want to continue?"), "", wxOK | wxCENTRE | wxCANCEL);
-						if (result == wxCANCEL)
-							return OP_RUN_CANCEL;
-						else
-							skipDifferntDims = true;
-					}
-					    					
-					mafLogMessage("SLICE SKIPPED: %d",count);
-					numSliceToSkip++;
-					sliceToSkip[count] = true;
-				}
-	}
-		
-	mafProgressBarHelper progressHelper(m_Listener);
-	progressHelper.SetTextMode(m_TestMode);
-	progressHelper.InitProgressBar("Building volume: please wait...");
-
-	n_slices -= numSliceToSkip;
-	vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
-	accumulate->SetNumberOfSlices(n_slices);
-
-	for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
-	{
-		if (sliceToSkip[count-m_ZCropBounds[0]])
-			continue;
-
-		mafDicomSlice * slice = m_SelectedSeries->GetSlice(count);
-		vtkImageData *image = slice->GetVTKImageData();
-		Crop(image);
-
-		accumulate->SetSlice(s_count, image, slice->GetUnrotatedOrigin());
-		s_count++;
-
-		progressHelper.UpdateProgressBar(count * 100 / (m_ZCropBounds[1]+1));
-	}
-
-	delete []sliceToSkip;
-
-	mafNEW(m_Volume);
-
-	accumulate->Update();
-
-	vtkRectilinearGrid *rg_out;
-	rg_out=accumulate->GetOutput();
-	rg_out->Update();
-
-	m_Volume->SetDataByDetaching(rg_out,0);
-
-	//Setting orientation matrix
-	mafMatrix orientationMatrix;
-	orientationMatrix.SetFromDirectionCosines(firstSlice->GetDcmImageOrientationPatient());
-	m_Volume->SetAbsMatrix(orientationMatrix);
-		
-	//Copy inside the first VME item of m_Volume the CT volume and Dicom's tags
-	m_Volume->GetTagArray()->DeepCopy(m_TagArray);
-	
-	m_Volume->SetName(m_VMEName);  
-
-	m_Output = m_Volume;
-
-	return OP_RUN_OK;
-}
-
-//----------------------------------------------------------------------------
-int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
-{
-	mafDicomSlice* firstSlice = m_SelectedSeries->GetSlice(0);
-	bool skipDifferntDims = false;
-
-	int step = GetSetting()->GetBuildStep() + 1;
-	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
-	int n_slices = cropInterval / step;
-	
-	if(cropInterval % step != 0)
-		n_slices+=1;
-
-	mafProgressBarHelper progressHelper(m_Listener);
-	progressHelper.SetTextMode(m_TestMode);
-	progressHelper.InitProgressBar("Building volume: please wait...");
-
-	// create the time varying vme
-	mafNEW(m_Volume);
-	int currImageId = 0;
-	int cardiacImageNum = m_SelectedSeries->GetCardiacImagesNum();
-	int totalNumberOfImages = (m_ZCropBounds[1]+1)*cardiacImageNum;
-	int progressCounter = 0;
-
-	int numSliceToSkip = 0;
-	bool *sliceToSkip = new bool[n_slices];
-	memset(sliceToSkip, 0, sizeof(bool)*n_slices);
-
-	int dim_img_check[3], dim_img[3];
-	firstSlice->GetVTKImageData()->GetDimensions(dim_img_check);
-
-	for (int ts = 0; ts < cardiacImageNum; ts++)
-	{
-		for (int sourceVolumeSliceId = m_ZCropBounds[0]; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
-		{
-			// show the current slice
-			currImageId = GetSliceIDInSeries(ts, sourceVolumeSliceId);
-					
-			vtkImageData *image = m_SelectedSeries->GetSlice(currImageId)->GetVTKImageData();
-			image->GetDimensions(dim_img);
-
 			if ((dim_img[0] != dim_img_check[0]) && (dim_img[1] != dim_img_check[1]))
 			{
 				if (!skipDifferntDims)
@@ -616,137 +415,69 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 						skipDifferntDims = true;
 				}
 
-				mafLogMessage("SLICE SKIPPED: %d", currImageId);
-				numSliceToSkip++;
-				sliceToSkip[currImageId] = true;
+				mafLogMessage("SLICE SKIPPED: %d", i);
+				nSliceToSkipAtFrame[t]++;
+				sliceToSkip[sliceID] = true;
 			}
 		}
-	}
+			
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("Building volume: please wait...");
 
+	mafNEW(m_Volume);
 
-	for (int ts = 0; ts < cardiacImageNum; ts++)
+	int parsedSlices = 0;
+
+	for (int t = 0; t < nFrames; t++)
 	{
-		// BEWARE:
-		// the following data structure was added in order to fix bug :
-		// http://bugzilla.hpc.cineca.it/show_bug.cgi?id=2088
-		//
-		// Regression test data for this bug is POLITECNICO and SA Cardiac MRI Dicom
-		//
-		// There is a nasty bug in some of our pipes that is preventing volumes with 
-		// Z axis order different from increasing to work while standard vtk filters have
-		// no problems at all with this issue: we successfully visualized this kind of
-		// volumes with ParaView.
-		//
-		// For example if you have Z axes coordinate in your rectilinear grid like:
-		// 8  5  3  1
-		// some pipes will fail (for sure the mafPipeVolumeSlice_BES ).
-		// This data structure is used to feed the slice accumulator with the right increasing 
-		// z ordering ie:
-		// 1 3 5 8
-		std::vector<vtkImageData *> imageDataVector;
+		int firstSliceAtTimeID = GetSliceIDInSeries(t, 0);
+		mafTimeStamp triggerTime = m_SelectedSeries->GetSlice(firstSliceAtTimeID)->GetDcmTriggerTime();
 
-		// get the time stamp from the dicom tag;
-		// timestamp is in ms
-		int probeHeigthId = 0;    
-		int tsImageId = GetSliceIDInSeries(ts, probeHeigthId);
-	
-		
-		mafTimeStamp tsDouble=m_SelectedSeries->GetSlice(tsImageId)->GetDcmTriggerTime();
-
-		double oldPosTrasformed = -1.0;
-		double oldOrigin[3];
-
-		for (int sourceVolumeSliceId = m_ZCropBounds[0]; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
+		vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
+		accumulate->SetNumberOfSlices(SlicesPerFrame-nSliceToSkipAtFrame[t]);
+		for (int i = m_ZCropBounds[0], s_id=0; i < m_ZCropBounds[1] + 1; i += step)
 		{
-			progressHelper.UpdateProgressBar(progressCounter * 100 / totalNumberOfImages);
+			int sliceID = GetSliceIDInSeries(t, i);
+			parsedSlices++;
 
-			// show the current slice
-			currImageId = GetSliceIDInSeries(ts, sourceVolumeSliceId);
+			if (sliceToSkip[sliceID])
+				continue;
 
-			vtkImageData *imageData = m_SelectedSeries->GetSlice(currImageId)->GetVTKImageData();
-			Crop(imageData);
+			mafDicomSlice * slice = m_SelectedSeries->GetSlice(sliceID);
+			vtkImageData *image = slice->GetVTKImageData();
+			Crop(image);
 
-			imageDataVector.push_back(imageData);
+			accumulate->SetSlice(s_id, image, slice->GetUnrotatedOrigin());
+			s_id++;
 
-			progressCounter++;
+			progressHelper.UpdateProgressBar(parsedSlices * 100 / totalNumberOfImages);
 		}
+		accumulate->Update();
 
-		std::map<double , int> zToIDMap;
-
-		for (int i = 0 ; i < imageDataVector.size() ; i++)
-		{
-			double origin[3] = {-999,-999,-999};
-			imageDataVector[i]->GetOrigin(origin);
-
-			double zOrigin = origin[2];
-			zToIDMap[zOrigin] = i;
-		}
-
-		// Build item at timestamp ts    
-		vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulator;
-
-		// always build the volume on z-axis
-		accumulator->SetNumberOfSlices(cardiacImageNum - numSliceToSkip);
-
-		int i = 0;
-		int j = 0;
-
-		for( map<double,int>::iterator currentMapElement=zToIDMap.begin(); currentMapElement!=zToIDMap.end(); ++currentMapElement,++j)
-		{
-			if (sliceToSkip[j])
-			{
-				break;
-			}
-			double id = currentMapElement->second;
-			double z = currentMapElement->first;
-
-			double orientation[6];
-			m_SelectedSeries->GetSlice(m_ZCropBounds[0])->GetDcmImageOrientationPatient(orientation);
-			accumulator->SetSlice(i, imageDataVector[currentMapElement->second],orientation);
-			i++;
-		}
-
-		accumulator->Update();
-
-		vtkMAFSmartPointer<vtkRectilinearGrid> rg_out;
-		rg_out->DeepCopy(accumulator->GetOutput());
+		vtkRectilinearGrid *rg_out;
+		rg_out = accumulate->GetOutput();
 		rg_out->Update();
 
-		m_Volume->SetDataByDetaching(rg_out,tsDouble);
-		m_Volume->Update();
-
-		if (m_SelectedSeries->IsRotated())
-		{
-
-			mafDicomSlice* slice = m_SelectedSeries->GetSlice(m_ZCropBounds[0]);
-
-			mafMatrix mat;
-			mat.SetFromDirectionCosines(slice->GetDcmImageOrientationPatient());
-
-			mafSmartPointer<mafTransform> boxPose;
-			boxPose->SetMatrix(mat);
-
-			double pos[3];
-			slice->GetDcmImagePositionPatient(pos);
-
-			boxPose->SetPosition(pos);
-			boxPose->Update();
-
-			m_Volume->SetAbsMatrix(boxPose->GetMatrix(),tsDouble);
-		}
-
+		m_Volume->SetDataByDetaching(rg_out, triggerTime);
 	}
 
-	delete []sliceToSkip;
-
-	// update m_tag_array ivar
+	delete[]nSliceToSkipAtFrame;
+	delete[]sliceToSkip;
+	
+	//Setting orientation matrix
+	mafMatrix orientationMatrix;
+	orientationMatrix.SetFromDirectionCosines(firstSlice->GetDcmImageOrientationPatient());
+	m_Volume->SetAbsMatrix(orientationMatrix);
+		
+	//Copy Dicom's tags inside the VME 
 	m_Volume->GetTagArray()->DeepCopy(m_TagArray);
-	m_Volume->SetName(m_VMEName);
-
+	m_Volume->SetName(m_VMEName);  
 	m_Output = m_Volume;
 
 	return OP_RUN_OK;
 }
+
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateLoadPage()
 {
@@ -1038,233 +769,7 @@ bool mafOpImporterDicomOffis::LoadDicomFromDir(const char *dicomDirABSPath)
 		return false;
 	}
 
-
 	mafLogMessage("Found %d Dicom series", m_StudyList->GetSeriesTotalNum());
-
-	//---------------------------------------
-	// Cardiac MRI Handling
-	//---------------------------------------
-
-	// foreach series
-	for (int i = 0; i < m_StudyList->GetStudiesNum(); i++)
-	{
-		mafDicomStudy * study = m_StudyList->GetStudy(i);
-		std::vector<int> seriesToDelete;
-
-		for (int j = 0; j < study->GetSeriesNum(); j++)
-		{
-			mafDicomSeries *currentSeries = study->GetSeries(j);
-			assert(currentSeries);
-
-			// check if the first slice is cineMRI
-			mafDicomSlice* firstSlice = NULL;
-			firstSlice = currentSeries->GetSlice(0);
-			assert(firstSlice);
-
-			bool isCardiacMRI = (firstSlice->GetDcmCardiacNumberOfImages() > 1);
-
-			if (isCardiacMRI)
-			{
-				vector<string> absFileNames;
-				for (int i = 0; i < currentSeries->GetSlicesNum(); i++)
-				{
-					mafDicomSlice* slice = NULL;
-					slice = currentSeries->GetSlice(i);
-					assert(slice);
-					absFileNames.push_back(slice->GetSliceABSFileName());
-				}
-
-				// create a cardiac mri helper for the series and initialize it
-				mafDicomCardiacMRIHelper *currentHelper = new mafDicomCardiacMRIHelper();
-				currentHelper->SetListener(this);
-				currentHelper->SetModeToInputDicomSlicesABSFileNamesVector();
-				currentHelper->SetInputDicomSlicesABSFileNamesVector(absFileNames);
-
-				if (currentHelper->ParseDicomDirectory() != MAF_OK)
-				{
-					seriesToDelete.push_back(j);
-					continue;
-				}
-
-				currentSeries->SetCardiacHelper(currentHelper);
-
-				vnl_matrix<double> rotateFlag = currentHelper->GetRotateFlagIdPlaneMatrix();
-
-				bool skipRotateFlagCorrection = false;
-				if (rotateFlag.rows() == 0 && rotateFlag.columns() == 0)
-				{
-					skipRotateFlagCorrection = true;
-				}
-
-				vnl_matrix<double> flipLeftRightFlag = currentHelper->GetFlipLeftRightFlagIdPlaneMatrix();
-
-				bool skipFlipLeftRightFlagCorrection = false;
-				if (flipLeftRightFlag.rows() == 0 && flipLeftRightFlag.columns() == 0)
-				{
-					skipFlipLeftRightFlagCorrection = true;
-				}
-
-				vnl_matrix<double> flipUpDownFlag = currentHelper->GetFlipUpDownFlagIdPlaneMatrix();
-
-				bool skipFlipUpDownFlagCorrection = false;
-				if (flipUpDownFlag.rows() == 0 && flipUpDownFlag.columns() == 0)
-				{
-					skipFlipUpDownFlagCorrection = true;
-				}
-
-				bool skipCorrection = skipRotateFlagCorrection && skipFlipLeftRightFlagCorrection && skipFlipUpDownFlagCorrection;
-
-				if (!skipCorrection)
-				{
-					vnl_matrix<double> fileNumberForPlaneIFrameJIdPlaneMatrix = currentHelper->GetFileNumberForPlaneIFrameJIdPlaneMatrix();
-
-					vnl_matrix<double> newPositionSingleFrameIdPlaneMatrix = currentHelper->GetNewPositionSingleFrameIdPlaneMatrix();
-					vnl_matrix<double> newXVersorsSingleFrameIdPlaneMatrix = currentHelper->GetNewXVersorsSingleFrameIdPlaneMatrix();
-					vnl_matrix<double> newYVersorsSingleFrameIdPlaneMatrix = currentHelper->GetNewYVersorsSingleFrameIdPlaneMatrix();
-
-					// for the current series
-					assert(currentSeries);
-
-					// for each slice
-					int numSlicesInSeries = currentSeries->GetSlicesNum();
-
-					// get the first slice in series
-					mafDicomSlice* firstSlice = NULL;
-					firstSlice = currentSeries->GetSlice(0);
-					assert(firstSlice);
-
-					int cardiacTimeFrames = -1;
-					cardiacTimeFrames = firstSlice->GetDcmCardiacNumberOfImages();
-					assert(cardiacTimeFrames > 1);
-
-					int planesPerFrame = -1;
-					planesPerFrame = numSlicesInSeries / cardiacTimeFrames;
-
-					progressHelper.InitProgressBar("Applying Cardiac MRI correction, please wait...");
-
-					for (int timeID = 0; timeID < cardiacTimeFrames; timeID++)
-					{
-						for (int planeID = 0; planeID < planesPerFrame; planeID++)
-						{
-							progressHelper.UpdateProgressBar((timeID) * 100 / ((double)(cardiacTimeFrames)));
-
-							int itemID = fileNumberForPlaneIFrameJIdPlaneMatrix(planeID, timeID);
-
-							mafDicomSlice* currentSlice = NULL;
-							currentSlice = currentSeries->GetSlice(itemID);
-							assert(currentSlice);
-
-							// correction in place
-							vtkImageData *imageData = NULL;
-							imageData = currentSlice->GetVTKImageData();
-							assert(imageData);
-
-							double center[3] = { -9999,-9999,-9999 };
-							imageData->GetCenter(center);
-
-							double bounds[6] = { -9999,-9999,-9999,-9999,-9999,-9999 };
-							imageData->GetBounds(bounds);
-
-							vtkTransform *tr = vtkTransform::New();
-							tr->PostMultiply();
-							tr->Translate(-center[0], -center[1], -center[2]);
-
-							tr->RotateZ(rotateFlag(planeID, 0));
-
-							tr->Translate(center);
-
-							vtkImageReslice *rs = vtkImageReslice::New();
-							rs->SetInput(imageData);
-							rs->SetResliceTransform(tr);
-							rs->SetInterpolationModeToLinear();
-							rs->Update();
-
-							bool flipUpDownCurrent = (flipUpDownFlag(planeID, 0) == 1 ? true : false);
-							bool flipLeftRightCurrent = (flipLeftRightFlag(planeID, 0) == 1 ? true : false);
-
-							vtkImageFlip *flipLR = NULL;
-
-							vtkImageFlip *flipUD = NULL;
-
-							vtkImageData *flipLROutput = NULL;
-
-							if (flipLeftRightCurrent)
-							{
-								flipLR = vtkImageFlip::New();
-								flipLR->SetInput(rs->GetOutput());
-
-								// validated against p20 regression test data
-								// (it's the same axis as the p09 test data but  it shouldn't since it's flip left to right...)
-								flipLR->SetFilteredAxes(1);
-								flipLR->Update();
-
-								flipLROutput = flipLR->GetOutput();
-
-							}
-							else
-							{
-								flipLROutput = rs->GetOutput();
-							}
-
-							vtkImageData *flipUDOutput = NULL;
-
-							if (flipUpDownCurrent)
-							{
-								flipUD = vtkImageFlip::New();
-								flipUD->SetInput(flipLROutput);
-
-								// validated against p09 regression test data
-								// (it's the same axis as the p20 test data bu  it shouldn't since it's flip up/down...)
-								flipUD->SetFilteredAxes(1);
-								flipUD->Update();
-								flipUDOutput = flipUD->GetOutput();
-							}
-							else
-							{
-								flipUDOutput = flipLROutput;
-							}
-
-
-							vtkImageData *outputBuffer = vtkImageData::New();
-							outputBuffer->DeepCopy(flipUDOutput);
-
-							currentSlice->SetVTKImageData(outputBuffer);
-
-							vtkDEL(flipUD);
-							vtkDEL(flipLR);
-
-							tr->Delete();
-							rs->Delete();
-							outputBuffer->Delete();
-
-							vnl_vector<double> p = newPositionSingleFrameIdPlaneMatrix.get_row(planeID);
-							assert(p.size() == 3);
-							double p3[3] = { p(0),p(1),p(2) };
-							currentSlice->SetDcmImagePositionPatient(p3);
-
-							vnl_vector<double> xv = newXVersorsSingleFrameIdPlaneMatrix.get_row(planeID);
-							assert(xv.size() == 3);
-
-							vnl_vector<double> yv = newYVersorsSingleFrameIdPlaneMatrix.get_row(planeID);
-							assert(yv.size() == 3);
-
-							double orientation[6] = { xv(0),xv(1),xv(2),yv(0),yv(1),yv(2) };
-							currentSlice->SetDcmImageOrientationPatient(orientation);
-
-							currentSlice->GetVTKImageData()->SetOrigin(0, 0, bounds[4]);
-
-						}
-					}
-				}
-			}
-		}
-
-		for (int s = 0; s < seriesToDelete.size(); s++)
-		{
-			mafLogMessage("ERROR during Cardiac Series reading series");
-			study->RemoveSeries(s);
-		}
-	}
 
 	return true;
 }
@@ -1280,8 +785,6 @@ std::vector<wxString> mafOpImporterDicomOffis::BuildFileListRecursive(wxString p
 	if (!dir.Open(path))
 		return fileList;
 
-	
-		
 	//Reading subdirectory list and call function recursive
 	dir.GetAllFiles(path, &childFolders, wxEmptyString, wxDIR_DIRS);
 	for (int i = 0; i < childFolders.size(); i++)
@@ -1578,32 +1081,10 @@ int mafOpImporterDicomOffis::GetSliceIDInSeries(int timeId, int heigthId)
 
 	int dicomFilesNumber = m_SelectedSeries->GetSlicesNum();
 
-	int numSlicesPerTS;
-
-	if (dicomFilesNumber >= timeFrames)
-	{
-		numSlicesPerTS = dicomFilesNumber / timeFrames;
-	} 
-	else
-	{
-		numSlicesPerTS = timeFrames / dicomFilesNumber;
-	}
-
-	int maxHeigthId = numSlicesPerTS - 1; 
-	int maxTimeId = timeFrames - 1; 
-
-	if (heigthId < 0 || heigthId > maxHeigthId || timeId < 0 || timeId > maxTimeId )
-	{
-		return -1;
-	}
-
-	mafDicomCardiacMRIHelper *helper = NULL;
-	helper = m_SelectedSeries->GetCardiacHelper();
-	mafLogMessage("%d",__LINE__);
-	assert(helper);
-
-	vnl_matrix<double> planeIFrameJFileNumberMatrix = helper->GetFileNumberForPlaneIFrameJIdPlaneMatrix();
-	return (planeIFrameJFileNumberMatrix(heigthId, timeId)); 
+	int numSlicesPerTS = dicomFilesNumber / timeFrames;
+	
+	return timeId*numSlicesPerTS + heigthId;
+	
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
@@ -1655,7 +1136,7 @@ void mafOpImporterDicomOffis::Crop(vtkImageData *slice)
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CalculateCropExtent()
 {
-	double spacing[3], inverseSpacing[3], crop_bounds[6], sliceBound[6], sliceOrigin[3];
+	double spacing[3], crop_bounds[6], sliceOrigin[3];
 	int sliceExtent[6];
 
 	vtkImageData* slice = m_SelectedSeries->GetSlice(0)->GetVTKImageData();
@@ -1823,7 +1304,7 @@ void mafOpImporterDicomOffis::OnSeriesSelect()
 
 			if (numberOfSlices > 1 && !GetSetting()->AutoVMEType())
 			{
-				wxString typeArrayVolumeImage[2] = { _("Volume"),_("Image") };
+				wxString typeArrayVolumeImage[2] = { _("Volume"),_("Images") };
 				m_LoadGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArrayVolumeImage, 1, "");
 			}
 			else if (numberOfSlices == 1 || GetSetting()->GetVMEType() == TYPE_IMAGE)
@@ -2039,7 +1520,13 @@ bool mafDicomSeries::IsRotated(const double dcmImageOrientationPatient[6])
 //----------------------------------------------------------------------------
 bool SortSliceCompareFunction(mafDicomSlice *i, mafDicomSlice *j) 
 { 
-	return (i->GetUnrotatedOrigin()[2] < j->GetUnrotatedOrigin()[2]);
+	//Sort by time and by unrotated Z-value
+	if (i->GetDcmTriggerTime() < j->GetDcmTriggerTime())
+		return true;
+	else if (i->GetDcmTriggerTime() < j->GetDcmTriggerTime())
+		return false;
+	else
+		return (i->GetUnrotatedOrigin()[2] < j->GetUnrotatedOrigin()[2]);
 }
 //----------------------------------------------------------------------------
 void mafDicomSeries::SortSlices()

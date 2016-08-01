@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "mafOp.h"
 #include "vtkImageData.h"
 #include <map>
-#include "mafDicomCardiacMRIHelper.h"
+#include <vector>
 #include "mafGUIWizard.h"
 #include "vtkMatrix4x4.h"
 
@@ -101,16 +101,10 @@ public:
 	void CalculateCropExtent();
 			
 	/** Build a volume from the list of dicom files. */
-	int BuildOutputVMEGrayVolumeFromDicom();
-
-	/** Build a volume from the list of CineMRI files. */
-	int BuildOutputVMEGrayVolumeFromDicomCineMRI();
+	int BuildVMEVolumeGrayOutput();
 		
 	/** Build images starting from the list of dicom files. */
-	int BuildOutputVMEImagesFromDicom();
-
-	/** Build images starting from the list of CineMRI files. */
-	int BuildOutputVMEImagesFromDicomCineMRI();
+	int BuildVMEImagesOutput();
 
 	/** Create the pipeline to read the images. */
 	virtual void CreateSliceVTKPipeline();
@@ -163,7 +157,7 @@ protected:
 	bool LoadDicomFromDir(const char *dicomDirABSPath);
 
 	/** Build the list of files in folder and subfolders */
-	vector<wxString> BuildFileListRecursive(wxString path);
+	std::vector<wxString> BuildFileListRecursive(wxString path);
 	
 	/** Read the list of dicom files recognized. */
 	mafDicomSlice *ReadDicomSlice(mafString fileName);
@@ -295,7 +289,7 @@ public:
 
 	int GetSeriesTotalNum();
 protected:
-	vector<mafDicomStudy *> m_Studies;
+	std::vector<mafDicomStudy *> m_Studies;
 };
 
 //----------------------------------------------------------------------------
@@ -321,7 +315,7 @@ public:
 
 protected:
 	mafString m_StudyID;
-	vector<mafDicomSeries *> m_Series;
+	std::vector<mafDicomSeries *> m_Series;
 };
 
 //----------------------------------------------------------------------------
@@ -332,9 +326,9 @@ class mafDicomSeries
 {
 public:
 
-	mafDicomSeries(mafString seriesID) { m_SeriesID = seriesID; m_CardiacHelper = NULL; m_IsRotated = false; m_CardiacImagesNum = 1; }
+	mafDicomSeries(mafString seriesID) { m_SeriesID = seriesID;  m_IsRotated = false; m_CardiacImagesNum = 0; }
 
-	~mafDicomSeries() { cppDEL(m_CardiacHelper); }
+	~mafDicomSeries() {}
 
 	void AddSlice(mafDicomSlice *slice);
 
@@ -357,12 +351,6 @@ public:
 	/** Sets Slices */
 	void SetSlices(std::vector<mafDicomSlice *> slices) { m_Slices = slices; }
 	
-	/** Returns CardiacHelper */
-	mafDicomCardiacMRIHelper * GetCardiacHelper() const { return m_CardiacHelper; }
-
-	/** Sets CardiacHelper */
-	void SetCardiacHelper(mafDicomCardiacMRIHelper * cardiacHelper) { m_CardiacHelper = cardiacHelper; }
-	
 	/** Returns SerieID */
 	mafString GetSerieID() const { return m_SeriesID; }
 
@@ -376,8 +364,7 @@ public:
 		
 protected:
 
-	vector<mafDicomSlice *> m_Slices;
-	mafDicomCardiacMRIHelper *m_CardiacHelper;
+	std::vector<mafDicomSlice *> m_Slices;
 	int m_Dimensions[3];
 	mafString m_SeriesID;
 	bool m_IsRotated;
