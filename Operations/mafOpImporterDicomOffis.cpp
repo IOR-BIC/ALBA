@@ -101,11 +101,6 @@ mafCxxTypeMacro(mafOpImporterDicomOffis);
 //----------------------------------------------------------------------------
 // constants :
 //----------------------------------------------------------------------------
-enum DICOM_IMPORTER_MODALITY
-{
-	GIZMO_RESIZING,
-	GIZMO_DONE
-};
 enum
 {
 	TYPE_VOLUME,
@@ -150,9 +145,6 @@ mafOp(label)
 	m_SliceMapper = NULL;
 	m_SliceTexture = NULL;
 	m_SliceActor = NULL;
-	m_SliceActorInCropPage = NULL;
-	m_CropPlane = NULL;
-	m_CropActor = NULL;
 	m_TextActor=NULL;
 	m_TextMapper=NULL;
 
@@ -166,10 +158,7 @@ mafOp(label)
 	m_StudyList = NULL;
 		
 	m_ConstantRotation = true;
-	m_SideToBeDragged = 0; 
-
-	m_GizmoStatus = GIZMO_DONE;
-
+	
 	m_Image = NULL;
 	m_Volume = NULL;
 
@@ -218,20 +207,10 @@ mafOp *mafOpImporterDicomOffis::Copy()
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::OpRun()
 {
-	CreateGui();
-	CreateSliceVTKPipeline();
-
 	m_Wizard = new mafGUIWizard(_("DICOM Importer"));
 	m_Wizard->SetListener(this);
-
-	CreateLoadPage();
-	CreateCropPage();
 	m_Wizard->SetButtonString("Crop >");
-	
-	//Create a chain between pages
-	m_LoadPage->SetNextPage(m_CropPage);
-	m_Wizard->SetFirstPage(m_LoadPage);
-
+		
 	wxString lastDicomDir = GetSetting()->GetLastDicomDir();
 		
 	if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
@@ -243,6 +222,14 @@ void mafOpImporterDicomOffis::OpRun()
 
 	if (ret_code == wxID_OK)
 	{
+		CreateSliceVTKPipeline(); 
+		
+		CreateLoadPage();
+		CreateCropPage();
+		m_LoadPage->SetNextPage(m_CropPage);
+		m_Wizard->SetFirstPage(m_LoadPage);
+				
+
 		wxString path = dialog.GetPath();
 		GetSetting()->SetLastDicomDir(path);
 		GuiUpdate();
@@ -318,19 +305,11 @@ void mafOpImporterDicomOffis::OpStop(int result)
 		m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_TextActor);
 	}
 
-	if (m_CropPage)
-	{
-		m_CropPage->GetRWI()->m_RenFront->RemoveActor(m_CropActor);
-	}
-
 	vtkDEL(m_SliceTexture);
 	vtkDEL(m_SliceLookupTable);
 	vtkDEL(m_SlicePlane);
 	vtkDEL(m_SliceMapper);
 	vtkDEL(m_SliceActor);
-	vtkDEL(m_CropPlane);
-	vtkDEL(m_CropActor);
-
 	vtkDEL(m_TextMapper);
 	vtkDEL(m_TextActor);
 
@@ -809,7 +788,7 @@ void mafOpImporterDicomOffis::CreateCropPage()
 
 	m_CropPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_CropPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
-	m_CropPage->GetRWI()->m_RenFront->AddActor(m_CropActor);
+	m_DicomInteractor->SetRWI(m_CropPage->GetRWI());
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::GuiUpdate()
@@ -817,13 +796,8 @@ void mafOpImporterDicomOffis::GuiUpdate()
 	m_LoadGuiLeft->Update();
 	m_LoadGuiUnderLeft->Update();
 	m_LoadGuiCenter->Update();
-
 	m_CropGuiLeft->Update();
 	m_CropGuiCenter->Update();
-}
-//----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::CreateGui()
-{
 }
 //----------------------------------------------------------------------------
 bool mafOpImporterDicomOffis::OpenDir(const char *dirPath)
@@ -897,21 +871,6 @@ void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 			{
 				m_TextActor->SetVisibility(m_ShowOrientationPosition);
 				m_LoadPage->GetRWI()->CameraUpdate();
-			}
-			break;
-			case MOUSE_DOWN:
-			{
-				OnMouseDown(e);
-			}
-			break;
-			case MOUSE_MOVE:  //resize gizmo
-			{
-				OnMouseMove(e);
-			}
-			break;
-			case MOUSE_UP:  //block gizmo
-			{
-				OnMouseUp();
 			}
 			break;
 			case ID_SCAN_TIME:
@@ -992,19 +951,6 @@ void mafOpImporterDicomOffis::CreateSliceVTKPipeline()
 	m_TextActor->SetPosition(3,3);  
 	m_TextActor->VisibilityOff();
 	m_TextMapper->Modified();
-
-	vtkNEW(m_CropPlane);
-
-	vtkMAFSmartPointer<vtkOutlineFilter>	of;
-	of->SetInput(((vtkDataSet *)(m_CropPlane->GetOutput())));
-
-	vtkMAFSmartPointer<vtkPolyDataMapper> pdm;
-	pdm->SetInput(of->GetOutput());
-
-	vtkNEW(m_CropActor);
-	m_CropActor->GetProperty()->SetColor(0.8,0,0);
-	m_CropActor->VisibilityOff();
-	m_CropActor->SetMapper(pdm);
 
 	if(!this->m_TestMode)
 	{
@@ -1679,10 +1625,6 @@ void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 	m_TextMapper->SetInput(text.GetCStr());
 	m_TextMapper->Modified();
 
-	// AACC 26-10-2010: Hack to make it work with ATI RADEON Driver
-	m_CropActor->GetMapper()->Modified();
-	// End of hack
-
 	slice->GetVTKImageData()->GetScalarRange(range);
 	m_SliceTexture->SetInput(slice->GetVTKImageData());
 	m_SliceTexture->Modified();
@@ -1720,7 +1662,7 @@ void mafOpImporterDicomOffis::CalculateCropExtent()
 	slice->GetExtent(sliceExtent);
 	slice->GetOrigin(sliceOrigin);
 	slice->GetSpacing(spacing);
-	m_CropPlane->GetOutput()->GetBounds(crop_bounds);
+	m_DicomInteractor->GetPlaneBounds(crop_bounds);
 
 	//Align cropBounds to current grid
 	m_CropExtent[0] = round(crop_bounds[0] / spacing[0]);
@@ -1728,13 +1670,7 @@ void mafOpImporterDicomOffis::CalculateCropExtent()
 	m_CropExtent[2] = round(crop_bounds[2] / spacing[1]);
 	m_CropExtent[3] = round(crop_bounds[3] / spacing[1]);
 	m_CropExtent[4] = m_CropExtent[5] = 0;
-
-	//TODO Remove this control when the crop selector was updated
-	m_CropExtent[0] = max(m_CropExtent[0], sliceExtent[0]);
-	m_CropExtent[1] = min(m_CropExtent[1], sliceExtent[1]);
-	m_CropExtent[2] = max(m_CropExtent[2], sliceExtent[2]);
-	m_CropExtent[3] = min(m_CropExtent[3], sliceExtent[3]);
-
+		
 	//Enable/disable Crop
 	m_CropEnabled = false;
 	for (int i = 0; i < 4; i++)
@@ -1931,206 +1867,20 @@ void mafOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 		//get the current windowing in order to maintain subrange thought the wizard pages 
 		m_LoadPage->GetWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
 
-		m_CropPlane->SetOrigin(0.0, 0.0, 0.0);
-		m_CropPlane->SetPoint1(m_SliceBounds[1] - m_SliceBounds[0], 0.0, 0.0);
-		m_CropPlane->SetPoint2(0.0, m_SliceBounds[3] - m_SliceBounds[2], 0.0);
-
-		m_CropActor->VisibilityOn();
+		m_DicomInteractor->SetSliceBounds(m_SliceBounds);
+		m_DicomInteractor->PlaneVisibilityOn();
 	}
 
 	if (m_Wizard->GetCurrentPage() == m_CropPage)//From Crop page to build page
 	{
 		//get the current windowing in order to maintain subrange thought the wizard pages 
 		m_CropPage->GetWindowing(m_TotalDicomRange, m_TotalDicomSubRange);
-		m_CropActor->VisibilityOff();
+		m_DicomInteractor->PlaneVisibilityOff();
 		m_Wizard->SetButtonString("Crop >");
 	}
 	
 	CameraReset();
 	GuiUpdate();
-}
-//----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::OnMouseDown( mafEvent * e )
-{
-	if (m_Wizard->GetCurrentPage() == m_CropPage)
-	{
-		//long handle_id = e->GetArg();
-		double pos[3];
-		vtkPoints *p = (vtkPoints *)e->GetVtkObj();
-		p->GetPoint(0, pos);
-
-		//calcola altezza rettangolo
-		double b[6];
-		m_CropPlane->GetOutput()->GetBounds(b);
-		double dx = (b[1] - b[0]) / 5;
-		double dy = (b[3] - b[2]) / 5;
-
-		double O[3], P1[3], P2[3];
-		//Caso di default P1 in alto a SX e P2 in basso a DX
-		m_CropPlane->GetOrigin(O);
-		m_CropPlane->GetPoint1(P1);
-		m_CropPlane->GetPoint2(P2);
-		//Se non siamo nel caso di default modifichiamo in modo da ritornare in quel caso
-		if (P2[0] < P1[0] && P2[1] < P1[1])//Caso P1 in basso a DX e P2 in alto a SX
-		{
-			O[0] = P2[0];
-			O[1] = P1[1];
-			double tempx = P1[0];
-			double tempy = P1[1];
-			P1[0] = P2[0];
-			P1[1] = P2[1];
-			P2[0] = tempx;
-			P2[1] = tempy;
-		}
-		else if (P1[0]<P2[0] && P1[1]>P2[1])//Caso P1 in basso a SX e P2 in alto a DX
-		{
-			O[0] = P1[0];
-			O[1] = P1[1];
-			double tempy = P1[1];
-			P1[1] = P2[1];
-			P2[1] = tempy;
-		}
-		else if (P1[0] > P2[0] && P1[1] < P2[1])//Caso P1 in alto a DX e P2 in basso a SX
-		{
-			O[0] = P2[0];
-			O[1] = P2[1];
-			double tempx = P1[0];
-			P1[0] = P2[0];
-			P2[0] = tempx;
-		}
-		m_CropPlane->SetOrigin(O);
-		m_CropPlane->SetPoint1(P1);
-		m_CropPlane->SetPoint2(P2);
-
-
-		//	  8------------1----------2--->x
-		//		|												|
-		//		7												3
-		//		|												|
-		//		6------------5----------4
-		//		|
-		//	  v y
-
-		if (P1[0] + dx / 2 <= pos[0] && pos[0] <= P2[0] - dx / 2 &&
-			P1[1] - dy / 2 <= pos[1] && pos[1] <= P1[1] + dy / 2)
-		{
-			m_SideToBeDragged = 1;
-		}
-		else if (P2[0] - dx / 2 <= pos[0] && pos[0] <= P2[0] + dx / 2 &&
-			P1[1] - dy / 2 <= pos[1] && pos[1] <= P1[1] + dy / 2)
-		{
-			m_SideToBeDragged = 2;
-		}
-		else if (P2[0] - dx / 2 <= pos[0] && pos[0] <= P2[0] + dx / 2 &&
-			P2[1] - dy / 2 >= pos[1] && pos[1] >= P1[1] + dy / 2)
-		{
-			m_SideToBeDragged = 3;
-		}
-		else if (P2[0] - dx / 2 <= pos[0] && pos[0] <= P2[0] + dx / 2 &&
-			P2[1] - dy / 2 <= pos[1] && pos[1] <= P2[1] + dy / 2)
-		{
-			m_SideToBeDragged = 4;
-		}
-		else if (P1[0] + dx / 2 <= pos[0] && pos[0] <= P2[0] - dx / 2 &&
-			P2[1] - dy / 2 <= pos[1] && pos[1] <= P2[1] + dy / 2)
-		{
-			m_SideToBeDragged = 5;
-		}
-		else if (P1[0] - dx / 2 <= pos[0] && pos[0] <= P1[0] + dx / 2 &&
-			P2[1] - dy / 2 <= pos[1] && pos[1] <= P2[1] + dy / 2)
-		{
-			m_SideToBeDragged = 6;
-		}
-		else if (P1[0] - dx / 2 <= pos[0] && pos[0] <= P1[0] + dx / 2 &&
-			P2[1] - dy / 2 >= pos[1] && pos[1] >= P1[1] + dy / 2)
-		{
-			m_SideToBeDragged = 7;
-		}
-		else if (P1[0] - dx / 2 <= pos[0] && pos[0] <= P1[0] + dx / 2 &&
-			P1[1] - dy / 2 <= pos[1] && pos[1] <= P1[1] + dy / 2)
-		{
-			m_SideToBeDragged = 8;
-		}
-		else
-			//hai pickato in un punto che non corrisponde a nessun lato
-			// => crea un nuovo gizmo
-		{
-			m_GizmoStatus = GIZMO_RESIZING;
-			m_CropActor->VisibilityOn();
-
-			pos[2] = 0;
-			m_CropPlane->SetOrigin(pos);
-			m_CropPlane->SetPoint1(pos[0], pos[1], pos[2]);
-			m_CropPlane->SetPoint2(pos[0], pos[1], pos[2]);
-			m_CropPlane->SetXResolution(10);
-		}
-
-		CameraUpdate();
-	}
-	
-}
-//----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::OnMouseMove( mafEvent * e )
-{
-	if (m_Wizard->GetCurrentPage() == m_CropPage)
-	{
-		double pos[3], oldO[3], oldP1[3], oldP2[3];
-		vtkPoints *p = (vtkPoints *)e->GetVtkObj();
-		p->GetPoint(0, pos);
-
-		m_CropPlane->GetOrigin(oldO);
-		m_CropPlane->GetPoint1(oldP1);
-		m_CropPlane->GetPoint2(oldP2);
-
-		if (m_GizmoStatus == GIZMO_RESIZING)
-		{
-			m_CropPlane->SetPoint1(oldO[0], pos[1], oldP1[2]);
-			m_CropPlane->SetPoint2(pos[0], oldO[1], oldP1[2]);
-		}
-		else if (m_GizmoStatus == GIZMO_DONE)
-		{
-			if (m_SideToBeDragged == 0)
-			{
-			}
-			else if (m_SideToBeDragged == 1)
-				m_CropPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
-			else if (m_SideToBeDragged == 2)
-			{
-				m_CropPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
-				m_CropPlane->SetPoint2(pos[0], oldP2[1], oldP2[2]);
-			}
-			else if (m_SideToBeDragged == 3)
-				m_CropPlane->SetPoint2(pos[0], oldP2[1], oldP2[2]);
-			else if (m_SideToBeDragged == 4)
-			{
-				m_CropPlane->SetOrigin(oldO[0], pos[1], oldO[2]);
-				m_CropPlane->SetPoint2(pos[0], pos[1], oldP2[2]);
-			}
-			else if (m_SideToBeDragged == 5)
-			{
-				m_CropPlane->SetOrigin(oldO[0], pos[1], oldO[2]);
-				m_CropPlane->SetPoint2(oldP2[0], pos[1], oldP2[2]);
-			}
-			else if (m_SideToBeDragged == 6)
-			{
-				m_CropPlane->SetOrigin(pos[0], pos[1], oldO[2]);
-				m_CropPlane->SetPoint1(pos[0], oldP1[1], oldP2[2]);
-				m_CropPlane->SetPoint2(oldP2[0], pos[1], oldP2[2]);
-			}
-			else if (m_SideToBeDragged == 7)
-			{
-				m_CropPlane->SetOrigin(pos[0], oldO[1], oldO[2]);
-				m_CropPlane->SetPoint1(pos[0], oldP1[1], oldP1[2]);
-			}
-			else if (m_SideToBeDragged == 8)
-			{
-				m_CropPlane->SetOrigin(pos[0], oldO[1], oldO[2]);
-				m_CropPlane->SetPoint1(pos[0], pos[1], oldP1[2]);
-			}
-		}
-		CameraUpdate();
-	}
-	
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::OnRangeModified()
@@ -2157,33 +1907,6 @@ void mafOpImporterDicomOffis::OnRangeModified()
 		m_SliceScannerCropPage->Update();
 	}
 	GuiUpdate();
-}
-//----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::OnMouseUp()
-{
-	if (m_Wizard->GetCurrentPage() == m_CropPage)
-	{
-		if (m_GizmoStatus == GIZMO_RESIZING)
-			m_GizmoStatus = GIZMO_DONE;
-		else if (m_GizmoStatus == GIZMO_DONE)
-			m_SideToBeDragged = 0;
-
-		double p1[3], p2[3], origin[3];
-		m_CropPlane->GetPoint1(p1);
-		m_CropPlane->GetPoint2(p2);
-		m_CropPlane->GetOrigin(origin);
-
-//   TODO CHECK
-// 		if ((p1[0] == p2[0] && p1[1] == p2[1] && p1[2] == p2[2]) ||
-// 				(p1[0] == origin[0] && p1[1] == origin[1] && p1[2] == origin[2]) ||
-// 				(p2[0] == origin[0] && p2[1] == origin[1] && p2[2] == origin[2])
-// 			)
-// 		{
-// 			m_BoxCorrect = false;
-// 		}
-// 		else
-// 			m_BoxCorrect = true;
-	}
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::OnChangeSlice()

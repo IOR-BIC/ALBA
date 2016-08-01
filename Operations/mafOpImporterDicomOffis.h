@@ -92,10 +92,7 @@ public:
 
 	/** Makes the undo for the operation. */
 	void OpUndo(){};
-
-	/** Create the dialog interface for the importer. */
-	virtual void CreateGui();
-		
+			
 	/** Create the vtkTexture for slice_num dicom slice: this will be written to m_SliceTexture ivar*/
 	void GenerateSliceTexture(int imageID);
 
@@ -146,9 +143,6 @@ protected:
 	/** OnEvent helper functions */
 	void OnChangeSlice();
 	void OnRangeModified();
-	void OnMouseDown( mafEvent * e );
-	void OnMouseMove( mafEvent * e );
-	void OnMouseUp();
 	void OnWizardChangePage( mafEvent * e );
 	void OnSeriesSelect();
 	void OnStudySelect();
@@ -216,10 +210,7 @@ protected:
 	vtkPolyDataMapper	*m_SliceMapper;
 	vtkTexture				*m_SliceTexture;
 	vtkActor					*m_SliceActor;
-	vtkPlaneSource		*m_CropPlane;
-	vtkActor					*m_CropActor;
-	vtkActor					*m_SliceActorInCropPage;
-
+	
 	// text stuff
 	vtkActor2D    *m_TextActor;
 	vtkTextMapper	*m_TextMapper;
@@ -270,9 +261,6 @@ protected:
 
 	bool m_CropEnabled;
 	int m_CropExtent[6];
-
-	int	m_GizmoStatus;
-	int	m_SideToBeDragged;
 
 	bool m_ConstantRotation;
 	
