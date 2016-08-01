@@ -84,25 +84,16 @@ PURPOSE.  See the above copyright notice for more information.
 #include "dcmtk/dcmjpeg/djdecode.h."
 #include "dcmtk/dcmdata/dcrledrg.h"
 #include "dcmtk/ofstd/ofstdinc.h"
-#include "vnl/vnl_vector.h"
-
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpImporterDicomOffis);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 // constants :
-//----------------------------------------------------------------------------
 enum
 {
 	TYPE_VOLUME,
 	TYPE_IMAGE,
-};
-enum
-{
-	STANDARD_MODALITY,
-	CINEMATIC_MODALITY
 };
 
 //----------------------------------------------------------------------------
@@ -111,18 +102,10 @@ mafOp(label)
 {
 	m_OpType = OPTYPE_IMPORTER;
 	m_Canundo = true;
-
-	for (int i = 0; i < 6; i++) 
-		m_SliceBounds[i] = 0;
-
-	m_ZCropBounds[0] = 0;
-	m_ZCropBounds[1] = 0;
-
+	//Gui stuff
 	m_Wizard = NULL;
 	m_LoadPage = NULL;
 	m_CropPage = NULL;
-	m_ImagesGroup = NULL;
-
 	m_CropGuiLeft = NULL;
 	m_LoadGuiLeft = NULL;
 	m_LoadGuiUnderLeft = NULL;
@@ -132,7 +115,9 @@ mafOp(label)
 	m_SliceScannerLoadPage = NULL;
 	m_TimeScannerLoadPage = NULL;
 	m_TimeScannerCropPage = NULL;
-
+	m_StudyListbox = NULL;
+	m_SeriesListbox = NULL;
+	//vtk stuff
 	m_SliceLookupTable = NULL;
 	m_SlicePlane = NULL;
 	m_SliceMapper = NULL;
@@ -140,41 +125,26 @@ mafOp(label)
 	m_SliceActor = NULL;
 	m_TextActor=NULL;
 	m_TextMapper=NULL;
-
-	m_StudyListbox = NULL;
-	m_SeriesListbox = NULL;
-	
-	m_DicomReaderModality = STANDARD_MODALITY;
-	m_OutputType = TYPE_VOLUME;
-	
+	//other pointers
+	m_DicomInteractor = NULL;
 	m_TagArray = NULL;
 	m_StudyList = NULL;
-		
+	m_SelectedSeries = NULL;
+	//variables
+	m_OutputType = TYPE_VOLUME;
 	m_ConstantRotation = true;
-	
-	m_Image = NULL;
-	m_Volume = NULL;
-
 	m_SortAxes = 2;
-
 	m_VMEName = "";
-
-	m_DicomModalityListBox = NULL;
-
-	m_DicomInteractor = NULL;
-
 	m_CurrentSlice = VTK_INT_MAX;
-
 	m_TotalDicomRange[0]=0;
 	m_TotalDicomRange[1]=1;
-
 	m_CurrentImageID = 0;
-
-	m_SkipAllNoPosition=false;
-
 	m_ShowOrientationPosition = 0;
 	m_SelectedStudy = -1;
-	m_SelectedSeries = NULL;
+	m_ZCropBounds[0] = 0;
+	m_ZCropBounds[1] = 0;
+	for (int i = 0; i < 6; i++)
+		m_SliceBounds[i] = 0;
 }
 //----------------------------------------------------------------------------
 mafGUIDicomSettings* mafOpImporterDicomOffis::GetSetting()
@@ -185,11 +155,7 @@ mafGUIDicomSettings* mafOpImporterDicomOffis::GetSetting()
 mafOpImporterDicomOffis::~mafOpImporterDicomOffis()
 {
 	vtkDEL(m_SliceActor);
-
-	mafDEL(m_Image);
-	mafDEL(m_Volume);
-
-	m_ImagesGroup = NULL;
+	mafDEL(m_Output);
 }
 //----------------------------------------------------------------------------
 mafOp *mafOpImporterDicomOffis::Copy()
@@ -221,7 +187,6 @@ void mafOpImporterDicomOffis::OpRun()
 		CreateCropPage();
 		m_LoadPage->SetNextPage(m_CropPage);
 		m_Wizard->SetFirstPage(m_LoadPage);
-				
 
 		wxString path = dialog.GetPath();
 		GetSetting()->SetLastDicomDir(path);
@@ -317,7 +282,8 @@ void mafOpImporterDicomOffis::OpStop(int result)
 //----------------------------------------------------------------------------
 int mafOpImporterDicomOffis::BuildVMEImagesOutput()
 {
-	int nFrames = m_SelectedSeries->GetCardiacImagesNum()+1;
+	mafVMEGroup       *imagesGroupOuput;
+	int nFrames = m_SelectedSeries->GetCardiacImagesNum();
 
 	int step = GetSetting()->GetBuildStep() + 1;
 	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
@@ -326,16 +292,15 @@ int mafOpImporterDicomOffis::BuildVMEImagesOutput()
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Building images: please wait...");
 
-	mafNEW(m_ImagesGroup);
+	mafNEW(imagesGroupOuput);
 
-	m_ImagesGroup->SetName(wxString::Format("%s images",m_VMEName));
-	m_ImagesGroup->ReparentTo(m_Input);
+	imagesGroupOuput->SetName(wxString::Format("%s images",m_VMEName));
+	imagesGroupOuput->ReparentTo(m_Input);
 
 	int parsedSlices = 0;
 
 	for (int i = m_ZCropBounds[0]; i < m_ZCropBounds[1]+1; i += step)
 	{
-		
 		mafString name;
 		name.Printf("%s s:%d", m_VMEName.GetCStr(), i);
 		mafSmartPointer<mafVMEImage> vmeImage;
@@ -362,12 +327,12 @@ int mafOpImporterDicomOffis::BuildVMEImagesOutput()
 		orientationMatrix.SetFromDirectionCosines(sliceAtZeroTime->GetDcmImageOrientationPatient());
 		vmeImage->SetAbsMatrix(orientationMatrix);
 
-		m_ImagesGroup->AddChild(vmeImage);
+		imagesGroupOuput->AddChild(vmeImage);
 
 		progressHelper.UpdateProgressBar(i * 100 / m_SelectedSeries->GetSlicesNum());
 	}
 
-	m_Output = m_ImagesGroup;
+	m_Output = imagesGroupOuput;
 
 	return OP_RUN_OK;
 }
@@ -375,10 +340,11 @@ int mafOpImporterDicomOffis::BuildVMEImagesOutput()
 //----------------------------------------------------------------------------
 int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 {
+	mafVMEVolumeGray	*VolumeOut;
 	mafDicomSlice* firstSlice = m_SelectedSeries->GetSlice(0);
 	bool skipDifferntDims = false;
 	
-	int nFrames = m_SelectedSeries->GetCardiacImagesNum()+1;
+	int nFrames = m_SelectedSeries->GetCardiacImagesNum();
 	int totalNumberOfImages = ((m_ZCropBounds[1]-m_ZCropBounds[0]) + 1)*nFrames;
 
 	int step = GetSetting()->GetBuildStep() + 1;
@@ -425,7 +391,7 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Building volume: please wait...");
 
-	mafNEW(m_Volume);
+	mafNEW(VolumeOut);
 
 	int parsedSlices = 0;
 
@@ -459,7 +425,7 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 		rg_out = accumulate->GetOutput();
 		rg_out->Update();
 
-		m_Volume->SetDataByDetaching(rg_out, triggerTime);
+		VolumeOut->SetDataByDetaching(rg_out, triggerTime);
 	}
 
 	delete[]nSliceToSkipAtFrame;
@@ -468,12 +434,12 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 	//Setting orientation matrix
 	mafMatrix orientationMatrix;
 	orientationMatrix.SetFromDirectionCosines(firstSlice->GetDcmImageOrientationPatient());
-	m_Volume->SetAbsMatrix(orientationMatrix);
+	VolumeOut->SetAbsMatrix(orientationMatrix);
 		
 	//Copy Dicom's tags inside the VME 
-	m_Volume->GetTagArray()->DeepCopy(m_TagArray);
-	m_Volume->SetName(m_VMEName);  
-	m_Output = m_Volume;
+	VolumeOut->GetTagArray()->DeepCopy(m_TagArray);
+	VolumeOut->SetName(m_VMEName);  
+	m_Output = VolumeOut;
 
 	return OP_RUN_OK;
 }
@@ -551,9 +517,7 @@ bool mafOpImporterDicomOffis::OpenDir(const char *dirPath)
 			FillStudyListBox();
 			m_StudyListbox->SetSelection(0);
 			OnStudySelect();
-
 			m_LoadPage->GetRWI()->CameraReset();
-
 			return true;
 		}
 	}
@@ -716,7 +680,7 @@ void mafOpImporterDicomOffis::FillSeriesListBox()
 		const int *dim=series->GetDimensions();
 		int framesNum = series->GetCardiacImagesNum();
 		
-		if (framesNum > 0)
+		if (framesNum > 1)
 			seriesName.Printf("Series %dx%dx%d f%d", dim[0], dim[1], framesNum / series->GetSlicesNum(), framesNum);
 		else
 			seriesName.Printf("Series %dx%dx%d", dim[0], dim[1], series->GetSlicesNum());
@@ -774,39 +738,6 @@ bool mafOpImporterDicomOffis::LoadDicomFromDir(const char *dicomDirABSPath)
 	return true;
 }
 //----------------------------------------------------------------------------
-std::vector<wxString> mafOpImporterDicomOffis::BuildFileListRecursive(wxString path)
-{
-	std::vector<wxString> fileList;
-	wxDir dir;
-	wxArrayString childFolders;
-	wxArrayString childFiles;
-
-	//cannot open dir return empty file list
-	if (!dir.Open(path))
-		return fileList;
-
-	//Reading subdirectory list and call function recursive
-	dir.GetAllFiles(path, &childFolders, wxEmptyString, wxDIR_DIRS);
-	for (int i = 0; i < childFolders.size(); i++)
-	{
-		std::vector<wxString> recursiveList = BuildFileListRecursive(path + "\\" + childFolders[i]);
-		fileList.reserve(fileList.size() + recursiveList.size()); // preallocate memory
-		fileList.insert(fileList.end(), recursiveList.begin(), recursiveList.end());
-	}
-
-	//Reading file list and add the files to the file list
-	dir.GetAllFiles(path, &childFiles, wxEmptyString, wxDIR_FILES | wxDIR_DIRS);
-	fileList.reserve(fileList.size() + childFiles.size());
-	for (int i = 0; i < childFiles.size(); i++)
-	{
-		wxString tmp = childFiles[i];
-		fileList.push_back(path + "\\" + childFiles[i]);
-		wxString tmp2 = fileList[i];
-	}
-	
-	return fileList;
-}
-//----------------------------------------------------------------------------
 mafDicomSlice *mafOpImporterDicomOffis::ReadDicomSlice(mafString fileName)
 {
 	double lastZPos = 0;
@@ -852,9 +783,6 @@ mafDicomSlice *mafOpImporterDicomOffis::ReadDicomSlice(mafString fileName)
 	dicomDataset->findAndGetString(DCM_SeriesInstanceUID, dcmSeriesInstanceUID);
 		
 	//Try to read image position patient form Dicom
-	// We are using Image Position(Patient) (0020, 0032) Dicom tag to set Dicom slice position.
-	// See here for the motivation behind this decision:
-	// http://www.cmake.org/pipermail/insight-users/2005-September/014711.html
 	if (dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient, dcmImagePositionPatient[0], 0).bad())
 	{
 		if (GetSetting()->GetDCMImagePositionPatientExceptionHandling() == mafGUIDicomSettings::APPLY_DEFAULT_POSITION)
@@ -880,9 +808,10 @@ mafDicomSlice *mafOpImporterDicomOffis::ReadDicomSlice(mafString fileName)
 	
 	//Read Cine MR related stuff
 	dicomDataset->findAndGetLongInt(DCM_InstanceNumber,dcmInstanceNumber);
-	dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages,dcmCardiacNumberOfImages);
 	dicomDataset->findAndGetFloat64(DCM_TriggerTime,dcmTriggerTime);
-
+	if (dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages, dcmCardiacNumberOfImages).bad())
+		dcmCardiacNumberOfImages = 1;
+	
 	//Read slice 
 	dicomDataset->findAndGetString(DCM_PatientsBirthDate, birthdate);
 	dicomDataset->findAndGetString(DCM_StudyDate, date);
@@ -1072,19 +1001,13 @@ void mafOpImporterDicomOffis::CreateSliders()
 //----------------------------------------------------------------------------
 int mafOpImporterDicomOffis::GetSliceIDInSeries(int timeId, int heigthId)
 {
-	if (m_DicomReaderModality == STANDARD_MODALITY)
-		return heigthId;
-		
 	mafDicomSlice *firstDicomListElement;
 	firstDicomListElement = (mafDicomSlice *)m_SelectedSeries->GetSlice(0);
-	int timeFrames =  firstDicomListElement->GetDcmCardiacNumberOfImages();
+	int timeFrames =  firstDicomListElement->GetDcmCardiacNumberOfImages()+1;
 
 	int dicomFilesNumber = m_SelectedSeries->GetSlicesNum();
-
 	int numSlicesPerTS = dicomFilesNumber / timeFrames;
-	
 	return timeId*numSlicesPerTS + heigthId;
-	
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
@@ -1278,21 +1201,13 @@ void mafOpImporterDicomOffis::OnSeriesSelect()
 		if (!m_TestMode)
 			busyCursor = new wxBusyCursor();
 
-
 		selectedSeries->SortSlices();
-
 		m_SelectedSeries = selectedSeries;
 		int numberOfSlices = m_SelectedSeries->GetSlicesNum();
 		
 		//Reset Z Bounds
 		m_ZCropBounds[0] = 0;
 		m_ZCropBounds[1] = numberOfSlices - 1;
-
-		//Set Reader Modality
-		if (m_SelectedSeries->GetCardiacImagesNum() != 0)
-			m_DicomReaderModality = CINEMATIC_MODALITY;
-		else
-			m_DicomReaderModality = STANDARD_MODALITY;
 				
 		if (!this->m_TestMode)
 		{
@@ -1375,17 +1290,7 @@ void mafOpImporterDicomOffis::OnRangeModified()
 	if(m_ZCropBounds[0] > m_CurrentSlice || m_CurrentSlice > m_ZCropBounds[1])
 	{
 		m_CurrentSlice = m_ZCropBounds[0];
-		// show the current slice
-		int currImageId = GetSliceIDInSeries(m_CurrentTime, m_CurrentSlice);
-		if (currImageId != -1) 
-		{
-			GenerateSliceTexture(currImageId);
-			CameraUpdate();
-		}
-		m_SliceScannerLoadPage->SetValue(m_CurrentSlice);
-		m_SliceScannerLoadPage->Update();
-		m_SliceScannerCropPage->SetValue(m_CurrentSlice);
-		m_SliceScannerCropPage->Update();
+		OnChangeSlice();
 	}
 	GuiUpdate();
 }
@@ -1414,6 +1319,12 @@ void mafOpImporterDicomOffis::OnChangeSlice()
 }
 
 /////////////////////////////mafDicomStudyList////////////////////////////////
+//----------------------------------------------------------------------------
+mafDicomStudyList::~mafDicomStudyList()
+{
+	for (int i = 0; i < m_Studies.size(); i++)
+		cppDEL(m_Studies[i]);
+}
 //----------------------------------------------------------------------------
 void mafDicomStudyList::AddSlice(mafDicomSlice *slice)
 {
@@ -1453,6 +1364,12 @@ int mafDicomStudyList::GetSeriesTotalNum()
 
 ///////////////////////////////mafDicomStudy//////////////////////////////////
 //----------------------------------------------------------------------------
+mafDicomStudy::~mafDicomStudy()
+{
+	for (int i = 0; i < m_Series.size(); i++)
+		cppDEL(m_Series[i]);
+}
+//----------------------------------------------------------------------------
 void mafDicomStudy::AddSlice(mafDicomSlice *slice)
 {
 	mafDicomSeries *series = NULL;
@@ -1474,18 +1391,17 @@ void mafDicomStudy::AddSlice(mafDicomSlice *slice)
 
 	series->AddSlice(slice);
 }
-//----------------------------------------------------------------------------
-void mafDicomStudy::RemoveSeries(int seriesID)
-{
-	cppDEL(m_Series[seriesID]);
-	m_Series.erase(m_Series.begin() + seriesID);
-}
 
 ///////////////////////////////mafDicomSeries//////////////////////////////////
 //----------------------------------------------------------------------------
+mafDicomSeries::~mafDicomSeries()
+{
+	for (int i = 0; i < m_Slices.size(); i++)
+		cppDEL(m_Slices[i]);
+}
+//----------------------------------------------------------------------------
 void mafDicomSeries::AddSlice(mafDicomSlice *slice)
 {
-
 	if (m_Slices.size() == 0)
 	{
 		slice->GetVTKImageData()->GetDimensions(m_Dimensions);
@@ -1535,13 +1451,6 @@ void mafDicomSeries::SortSlices()
 }
 
 /////////////////////////////mafDicomSlice////////////////////////////////
-//----------------------------------------------------------------------------
-void mafDicomSlice::SetVTKImageData(vtkImageData *data)
-{
-	vtkDEL(m_ImageData);
-	m_ImageData = vtkImageData::New();
-	m_ImageData->DeepCopy(data);
-}
 //----------------------------------------------------------------------------
 void mafDicomSlice::CalculateUnrotatedOrigin()
 {

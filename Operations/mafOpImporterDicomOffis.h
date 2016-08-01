@@ -49,7 +49,6 @@ class vtkActor;
 class vtkActor2D;
 class vtkPolyData;
 class vtkTextMapper;
-class mafVMEGroup;
 class mafProgressBarHelper;
 class DcmDataset;
 
@@ -156,9 +155,6 @@ protected:
 	/** Load Dicom in forlder */
 	bool LoadDicomFromDir(const char *dicomDirABSPath);
 
-	/** Build the list of files in folder and subfolders */
-	std::vector<wxString> BuildFileListRecursive(wxString path);
-	
 	/** Read the list of dicom files recognized. */
 	mafDicomSlice *ReadDicomSlice(mafString fileName);
 
@@ -214,8 +210,7 @@ protected:
 	mafGUIWizard			*m_Wizard;
 	mafGUIWizardPageNew	*m_LoadPage;
 	mafGUIWizardPageNew	*m_CropPage;
-	mafVMEGroup       *m_ImagesGroup;
-
+	
 	mafGUI	*m_LoadGuiLeft;
 	mafGUI	*m_LoadGuiUnderLeft;
 	mafGUI	*m_CropGuiLeft;
@@ -226,11 +221,8 @@ protected:
 	int       m_OutputType;
 	mafString m_VMEName;
 
-	int				m_DicomReaderModality; ///<Type DICOM Read from file
 	int				m_SortAxes;
 	
-	int m_SkipAllNoPosition;
-
 	mafDicomStudyList *m_StudyList;
 	mafDicomSeries	*m_SelectedSeries; ///< Selected series slices list
 	
@@ -259,11 +251,6 @@ protected:
 	bool m_ConstantRotation;
 	
 	int m_ShowOrientationPosition;
-
-	mafVMEImage				*m_Image;
-	mafVMEVolumeGray	*m_Volume;
-
-	mafGUICheckListBox *m_DicomModalityListBox;
 	int m_CurrentImageID;
 
 	double m_TotalDicomRange[2]; ///< contains the scalar range og the full dicom
@@ -281,6 +268,8 @@ protected:
 class mafDicomStudyList
 {
 public:
+	~mafDicomStudyList();
+
 	void AddSlice(mafDicomSlice *slice);
 
 	mafDicomStudy *GetStudy(int num);
@@ -302,6 +291,8 @@ public:
 
 	mafDicomStudy(mafString studyID) { m_StudyID = studyID; } 
 
+	~mafDicomStudy();
+
 	void AddSlice(mafDicomSlice *slice);
 	
 	/** Returns StudyID */
@@ -310,8 +301,6 @@ public:
 	int GetSeriesNum() { return m_Series.size(); }
 
 	mafDicomSeries *GetSeries(int id) { return m_Series[id]; }
-
-	void RemoveSeries(int seriesID);
 
 protected:
 	mafString m_StudyID;
@@ -328,7 +317,7 @@ public:
 
 	mafDicomSeries(mafString seriesID) { m_SeriesID = seriesID;  m_IsRotated = false; m_CardiacImagesNum = 0; }
 
-	~mafDicomSeries() {}
+	~mafDicomSeries();
 
 	void AddSlice(mafDicomSlice *slice);
 
@@ -438,9 +427,6 @@ public:
 
 	/** Retrieve image data*/
 	vtkImageData* GetVTKImageData() { return m_ImageData; };
-
-	/** Set vtkImageData */
-	void SetVTKImageData(vtkImageData *data);
 
 	/** Set the DcmImagePositionPatient tag for the slice */
 	void SetDcmImagePositionPatient(double dcmImagePositionPatient[3])
