@@ -82,7 +82,7 @@
 #include "mmiVTKPickerTest.h"
 #include "mmiSelectPointTest.h"
 #include "mmiInfoImageTest.h"
-#include "mafInteractorDICOMImporterTest.h"
+//#include "mafInteractorDICOMImporterTest.h"
 #include "medInteractor2DDistanceTest.h"
 #include "medInteractor2DAngleTest.h"
 #include "medInteractor2DIndicatorTest.h"
@@ -182,7 +182,7 @@ int
 	runner.addTest(mmiVTKPickerTest::suite());
 	runner.addTest(mmiSelectPointTest::suite());
 	runner.addTest(mmiInfoImageTest::suite());
-	runner.addTest(mafInteractorDICOMImporterTest::suite());
+	//runner.addTest(mafInteractorDICOMImporterTest::suite());
 	runner.addTest(medInteractor2DDistanceTest::suite());
 	runner.addTest(medInteractor2DAngleTest::suite());
 	runner.addTest(medInteractor2DIndicatorTest::suite());
