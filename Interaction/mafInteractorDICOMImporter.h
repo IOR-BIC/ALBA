@@ -28,6 +28,10 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class vtkCamera;
+class vtkPlaneSource;
+class vtkActor;
+class mafRWI;
+class mafRWIBase;
 
 /** Implements mouse move of the camera in the scene and notify the listener with world coordinates
 on left mouse pick , left mouse move and left mouse up.
@@ -67,15 +71,41 @@ public:
   /** redefined to send the picking world coordinates also */
   virtual void OnLeftButtonDown(mafEventInteraction *e);
 
-  /** redefined to send the picking world coordinates also */
+	virtual void SetRenderer(vtkRenderer *ren);
+
+	void SetRWI(mafRWI *rwi);
+	
+	void CalculateSideDragged(double * pos);
+
+	virtual void OnEvent(mafEventBase *event);
+
+	/** redefined to send the picking world coordinates also */
   virtual void OnLeftButtonUp();
+
+	void GetPlaneBounds(double *bounds);
+
+	void SetSliceBounds(double *bounds);
+	
+	void PlaneVisibilityOn();
+
+	void PlaneVisibilityOff();;
 
 protected:
   mafInteractorDICOMImporter();
   virtual ~mafInteractorDICOMImporter();
 
-  /** Compute the world point corresponding to the mouse position and send it to the listener */
-  void SendCropPosition(int event_id);
+	void SetPlaneFromSliceSize();
+
+
+	vtkPlaneSource		*m_CropPlane;
+	vtkActor					*m_CropActor;
+	int	m_GizmoStatus;
+	bool m_PlaneVisibility;
+	int	m_SideToBeDragged;
+	double m_SliceSize[2];
+	double m_Delta;
+	mafRWIBase *m_RWIbase;
+	int m_CurrentArrow;
   
 private:
   mafInteractorDICOMImporter(const mafInteractorDICOMImporter&);  // Not implemented.

@@ -27,7 +27,7 @@
 #include "mafGUISettingsStorageTest.h"
 #include "mafAttachCameraTest.h"
 #include "mafGUISettingsAdvancedTest.h"
-#include "mafGUIDicomSettingsTest.h"
+//#include "mafGUIDicomSettingsTest.h"
 #include "mafGUIWizardTest.h"
 #include "mafGUIWizardPageTest.h"
 #include "mafGUILandmarkTest.h"
@@ -62,7 +62,7 @@ int main( int argc, char* argv[] )
 	runner.addTest(mafGUISettingsStorageTest::suite());
 	runner.addTest(mafAttachCameraTest::suite());
 	runner.addTest(mafGUISettingsAdvancedTest::suite());
-	runner.addTest(mafGUIDicomSettingsTest::suite());
+	//runner.addTest(mafGUIDicomSettingsTest::suite());
 	runner.addTest(mafGUIWizardPageTest::suite());
 	runner.addTest(mafGUILandmarkTest::suite());
 	runner.addTest(mafGUIWizardPageNewTest::suite());

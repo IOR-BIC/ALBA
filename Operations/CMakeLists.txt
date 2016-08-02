@@ -157,9 +157,7 @@ ENDIF (MAF_USE_VTK)
 IF (MAF_USE_OFFIS)
 SET(PROJECT_SRCS ${PROJECT_SRCS}
     mafOpImporterDicomOffis.cpp	mafOpImporterDicomOffis.h
-  
-    mafDicomCardiacMRIHelper.cpp	mafDicomCardiacMRIHelper.h
-   )
+    )
 ENDIF (MAF_USE_OFFIS)
 
 IF (MAF_USE_ITK)
