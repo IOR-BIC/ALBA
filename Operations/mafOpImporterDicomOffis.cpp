@@ -113,8 +113,6 @@ mafOp(label)
 	m_LoadGuiCenter = NULL;
 	m_SliceScannerCropPage = NULL;
 	m_SliceScannerLoadPage = NULL;
-	m_TimeScannerLoadPage = NULL;
-	m_TimeScannerCropPage = NULL;
 	m_StudyListbox = NULL;
 	m_SeriesListbox = NULL;
 	//vtk stuff
@@ -133,7 +131,7 @@ mafOp(label)
 	//variables
 	m_OutputType = TYPE_VOLUME;
 	m_ConstantRotation = true;
-	m_SortAxes = 2;
+	m_DescrInName = m_SizeInName = m_PatientNameInName = true;
 	m_VMEName = "";
 	m_CurrentSlice = VTK_INT_MAX;
 	m_TotalDicomRange[0]=0;
@@ -353,39 +351,6 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 	int SlicesPerFrame = (cropInterval / step);
 	if(cropInterval % step != 0)
 		SlicesPerFrame+=1;
-	 
-	int *nSliceToSkipAtFrame = new int[nFrames];
-	memset(nSliceToSkipAtFrame, 0, sizeof(int)*nFrames);
-
-	bool *sliceToSkip = new bool[m_SelectedSeries->GetSlicesNum()];
-	memset(sliceToSkip, 0, sizeof(bool)*m_SelectedSeries->GetSlicesNum());
-
-	int dim_img_check[3],dim_img[3];
-	firstSlice->GetVTKImageData()->GetDimensions(dim_img_check);
-
-	for(int t=0; t<nFrames; t++)
-		for (int i = m_ZCropBounds[0]; i < m_ZCropBounds[1] + 1; i += step)
-		{
-			int sliceID = GetSliceIDInSeries(t, i);
-			vtkImageData *image = m_SelectedSeries->GetSlice(i)->GetVTKImageData();
-			image->Update();
-			image->GetDimensions(dim_img);
-			if ((dim_img[0] != dim_img_check[0]) && (dim_img[1] != dim_img_check[1]))
-			{
-				if (!skipDifferntDims)
-				{
-					int result = wxMessageBox(_("Some slices have different dimension! They will be skipped! Do you want to continue?"), "", wxOK | wxCENTRE | wxCANCEL);
-					if (result == wxCANCEL)
-						return OP_RUN_CANCEL;
-					else
-						skipDifferntDims = true;
-				}
-
-				mafLogMessage("SLICE SKIPPED: %d", i);
-				nSliceToSkipAtFrame[t]++;
-				sliceToSkip[sliceID] = true;
-			}
-		}
 			
 	mafProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
@@ -401,21 +366,17 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 		mafTimeStamp triggerTime = m_SelectedSeries->GetSlice(firstSliceAtTimeID)->GetDcmTriggerTime();
 
 		vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
-		accumulate->SetNumberOfSlices(SlicesPerFrame-nSliceToSkipAtFrame[t]);
+		accumulate->SetNumberOfSlices(SlicesPerFrame);
 		for (int i = m_ZCropBounds[0], s_id=0; i < m_ZCropBounds[1] + 1; i += step)
 		{
 			int sliceID = GetSliceIDInSeries(t, i);
 			parsedSlices++;
 
-			if (sliceToSkip[sliceID])
-				continue;
-
 			mafDicomSlice * slice = m_SelectedSeries->GetSlice(sliceID);
 			vtkImageData *image = slice->GetVTKImageData();
 			Crop(image);
 
-			accumulate->SetSlice(s_id, image, slice->GetUnrotatedOrigin());
-			s_id++;
+			accumulate->SetSlice(i-m_ZCropBounds[0], image, slice->GetUnrotatedOrigin());
 
 			progressHelper.UpdateProgressBar(parsedSlices * 100 / totalNumberOfImages);
 		}
@@ -428,9 +389,6 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 		VolumeOut->SetDataByDetaching(rg_out, triggerTime);
 	}
 
-	delete[]nSliceToSkipAtFrame;
-	delete[]sliceToSkip;
-	
 	//Setting orientation matrix
 	mafMatrix orientationMatrix;
 	orientationMatrix.SetFromDirectionCosines(firstSlice->GetDcmImageOrientationPatient());
@@ -443,7 +401,6 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 
 	return OP_RUN_OK;
 }
-
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateLoadPage()
 {
@@ -531,18 +488,12 @@ void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 		switch (e->GetId())
 		{
 			case ID_RANGE_MODIFIED:
-			{
-				//ZCrop slider
 				OnRangeModified();
-			}
 			break;
 			case mafGUIWizard::MED_WIZARD_CHANGE_PAGE:
-			{
 				OnWizardChangePage(e);
-			}
 			break;
 			case mafGUIWizard::MED_WIZARD_CHANGED_PAGE:
-			{
 				/* This is a ack, because that "genius" of wx  send the change event
 				before page show, so we need to duplicate the code here in order to
 				manage the camera update */
@@ -550,34 +501,26 @@ void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 				m_Wizard->GetCurrentPage()->SetFocus();
 				m_Wizard->GetCurrentPage()->Update();
 				CameraReset();
-			}
 			break;
 			case ID_STUDY_SELECT:
-			{
 				OnStudySelect();
-			}
 			break;
 			case ID_SERIES_SELECT:
-			{
 				OnSeriesSelect();
-			}
 			break;
 			case ID_SHOW_TEXT:
-			{
 				m_TextActor->SetVisibility(m_ShowOrientationPosition);
 				m_LoadPage->GetRWI()->CameraUpdate();
-			}
 			break;
 			case ID_SCAN_TIME:
 			case ID_SCAN_SLICE:
-			{
 				OnChangeSlice();
-			}
+			break;
+			case ID_UPDATE_NAME:
+				SetVMEName();
 			break;
 			default:
-			{
 				mafEventMacro(*e);
-			}
 		}
 	}
 }
@@ -586,16 +529,31 @@ void mafOpImporterDicomOffis::SetVMEName()
 {
 	mafDicomSlice * sliceData = m_SelectedSeries->GetSlice(0);
 	m_VMEName = sliceData->GetDcmModality();
-	if (sliceData->GetDescription() != "")
+	if (sliceData->GetDescription() != "" && m_DescrInName)
 	{
 		m_VMEName += " ";
 		m_VMEName += sliceData->GetDescription();
 	}
-	if (sliceData->GetPatientName() != "")
+	if (sliceData->GetPatientName() != "" && m_PatientNameInName)
 	{
+		mafString patientName = sliceData->GetPatientName();
+		patientName.Replace('^', ' ');
 		m_VMEName += " ";
-		m_VMEName += sliceData->GetPatientName();
+		m_VMEName += patientName;
 	}
+	if (m_SizeInName)
+	{
+		mafString size;
+		int *dims=sliceData->GetVTKImageData()->GetDimensions();
+		if (sliceData->GetDcmCardiacNumberOfImages() > 1)
+			size.Printf(" %dx%dx%d f:%d", dims[0], dims[1], m_SelectedSeries->GetSlicesNum(), sliceData->GetDcmCardiacNumberOfImages());
+		else
+			size.Printf(" %dx%dx%d", dims[0], dims[1], m_SelectedSeries->GetSlicesNum());
+		m_VMEName += size;
+	}
+
+	if(m_CropGuiCenter)
+		m_CropGuiCenter->Update();
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CameraUpdate()
@@ -605,7 +563,7 @@ void mafOpImporterDicomOffis::CameraUpdate()
 		m_LoadPage->UpdateActor();
 		m_LoadPage->GetRWI()->CameraUpdate();
 	}
-	else if(m_Wizard->GetCurrentPage() == m_CropPage)
+	else
 	{
 		m_CropPage->UpdateActor();
 		m_CropPage->GetRWI()->CameraUpdate();
@@ -614,10 +572,16 @@ void mafOpImporterDicomOffis::CameraUpdate()
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CameraReset()
 {
-	m_LoadPage->UpdateWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
-	m_LoadPage->GetRWI()->CameraReset();
-	m_CropPage->UpdateWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
-	m_CropPage->GetRWI()->CameraReset();
+	if (m_Wizard->GetCurrentPage() == m_LoadPage)
+	{
+		m_LoadPage->UpdateWindowing(m_TotalDicomRange, m_TotalDicomSubRange);
+		m_LoadPage->GetRWI()->CameraReset();
+	}
+	else
+	{
+		m_CropPage->UpdateWindowing(m_TotalDicomRange, m_TotalDicomSubRange);
+		m_CropPage->GetRWI()->CameraReset();
+	}
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateSliceVTKPipeline()
@@ -971,13 +935,11 @@ void mafOpImporterDicomOffis::CreateSliders()
 		delete m_LoadGuiLeft;
 		m_LoadGuiLeft = new mafGUI(this);
 		m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("Slice #"),&m_CurrentSlice,0, numOfSlices -1,"",true);
-		m_LoadGuiLeft->Bool(ID_SHOW_TEXT, "Show position info", &m_ShowOrientationPosition, 1, _("Shows position and orientation"));
 		m_LoadGuiLeft->Enable(ID_SCAN_SLICE, numOfSlices > 1);
-		if (cardiacImageNum > 0)
-		{
-			m_TimeScannerLoadPage = m_LoadGuiLeft->Slider(ID_SCAN_TIME, _("Time "), &m_CurrentTime, 0, cardiacImageNum);
-			m_LoadGuiLeft->Enable(ID_SCAN_TIME, cardiacImageNum > 1);
-		}
+		if (cardiacImageNum > 1)
+			m_LoadGuiLeft->Slider(ID_SCAN_TIME, _("Time "), &m_CurrentTime, 0, cardiacImageNum);
+		m_LoadGuiLeft->Label("");
+		m_LoadGuiLeft->Bool(ID_SHOW_TEXT, "Show position info", &m_ShowOrientationPosition, 1, _("Shows position and orientation"));
 		m_LoadPage->AddGuiLowerLeft(m_LoadGuiLeft);
 		m_LoadPage->Update();
 	}
@@ -989,11 +951,8 @@ void mafOpImporterDicomOffis::CreateSliders()
 		m_CropGuiLeft = new mafGUI(this);
 		m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("Slice #"),&m_CurrentSlice,0, numOfSlices -1,"",true);
 		m_CropGuiLeft->Enable(ID_SCAN_SLICE, numOfSlices > 1);
-		if (cardiacImageNum > 0)
-		{
-			m_TimeScannerCropPage = m_CropGuiLeft->Slider(ID_SCAN_TIME, _("Time "), &m_CurrentTime, 0, cardiacImageNum);
-			m_CropGuiLeft->Enable(ID_SCAN_TIME, cardiacImageNum > 1);
-		}
+		if (cardiacImageNum > 1)
+			m_CropGuiLeft->Slider(ID_SCAN_TIME, _("Time "), &m_CurrentTime, 0, cardiacImageNum);
 		m_CropPage->AddGuiLowerLeft(m_CropGuiLeft);
 		m_CropPage->Update();
 	}
@@ -1265,6 +1224,27 @@ void mafOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 
 		m_DicomInteractor->SetSliceBounds(m_SliceBounds);
 		m_DicomInteractor->PlaneVisibilityOn();
+
+		m_CropPage->RemoveGuiLowerCenter(m_CropGuiCenter);
+		m_CropGuiCenter = new mafGUI(this);
+		m_CropGuiCenter->Divider();
+
+		m_CropGuiCenter->Label("Name:", true);
+
+		mafDicomSlice * sliceData = m_SelectedSeries->GetSlice(0);
+
+		if (sliceData->GetDescription() != "")
+			m_CropGuiCenter->Bool(ID_UPDATE_NAME, "Description", &m_DescrInName,1);
+		if (sliceData->GetPatientName() != "")
+			m_CropGuiCenter->Bool(ID_UPDATE_NAME, "Patient Name", &m_PatientNameInName,1);
+		m_CropGuiCenter->Bool(ID_UPDATE_NAME, "Image Size", &m_SizeInName,1);
+
+		m_CropGuiCenter->Label("Result:");
+		m_CropGuiCenter->Label(&m_VMEName);
+
+		m_CropPage->AddGuiLowerCenter(m_CropGuiCenter);
+		m_CropPage->Update();
+		SetVMEName();
 	}
 
 	if (m_Wizard->GetCurrentPage() == m_CropPage)//From Crop page to build page
@@ -1322,7 +1302,7 @@ void mafOpImporterDicomOffis::OnChangeSlice()
 //----------------------------------------------------------------------------
 mafDicomStudyList::~mafDicomStudyList()
 {
-	for (int i = 0; i < m_Studies.size(); i++)
+		for (int i = 0; i < m_Studies.size(); i++)
 		cppDEL(m_Studies[i]);
 }
 //----------------------------------------------------------------------------
@@ -1411,9 +1391,8 @@ void mafDicomSeries::AddSlice(mafDicomSlice *slice)
 	{
 		int *dim = slice->GetVTKImageData()->GetDimensions();
 		
-		//Check dimension accepts rotated images
-		if (((dim[0] != m_Dimensions[0]) && (dim[0] != m_Dimensions[1])) ||
-			  ((dim[1] != m_Dimensions[1]) && (dim[1] != m_Dimensions[0])))
+		//Check dimension
+		if ( (dim[0] != m_Dimensions[0]) && (dim[1] != m_Dimensions[1]) )
 		{
 			mafLogMessage("Image :%s\nhave different size than other images in the same series and will be skipped", slice->GetSliceABSFileName());
 			return;

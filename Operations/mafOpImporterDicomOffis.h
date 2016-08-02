@@ -122,15 +122,11 @@ protected:
 		ID_STUDY_SELECT,
 		ID_SERIES_SELECT,
 		ID_CANCEL,
-		ID_PATIENT_NAME,
-		ID_PATIENT_ID,
-		ID_SURGEON_NAME,
 		ID_SCAN_TIME,
 		ID_SCAN_SLICE,
-		ID_VOLUME_NAME,
 		ID_VME_TYPE,
 		ID_SHOW_TEXT,
-		ID_SHOW_SP,
+		ID_UPDATE_NAME
 	};
 
 	/** OnEvent helper functions */
@@ -219,10 +215,11 @@ protected:
 	mafGUI  *m_LoadGuiUnderCenter;
 
 	int       m_OutputType;
+	int			m_DescrInName;
+	int			m_PatientNameInName;
+	int			m_SizeInName;
 	mafString m_VMEName;
 
-	int				m_SortAxes;
-	
 	mafDicomStudyList *m_StudyList;
 	mafDicomSeries	*m_SelectedSeries; ///< Selected series slices list
 	
@@ -238,13 +235,10 @@ protected:
 	wxSlider		 *m_SliceScannerCropPage;
 	
 	int						m_CurrentTime;
-	wxSlider		 *m_TimeScannerLoadPage;
-	wxSlider		 *m_TimeScannerCropPage;
 	
 	mafTagArray	*m_TagArray;
 
 	double	m_SliceBounds[6];
-
 	bool m_CropEnabled;
 	int m_CropExtent[6];
 
@@ -252,6 +246,8 @@ protected:
 	
 	int m_ShowOrientationPosition;
 	int m_CurrentImageID;
+
+	
 
 	double m_TotalDicomRange[2]; ///< contains the scalar range og the full dicom
 	double m_TotalDicomSubRange[2]; ///< contains the scalar range og the full dicom

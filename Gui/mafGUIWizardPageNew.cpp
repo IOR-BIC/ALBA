@@ -122,7 +122,8 @@ mafGUIWizardPageNew::mafGUIWizardPageNew(mafGUIWizard *wizardParent,long style, 
     m_GuiLowerUnderCenter->Reparent(this);
 
 		m_GUISizer->Add(m_GuiLowerLeft,0,wxEXPAND);
-    m_GUISizer->Add(m_GuiLowerCenter,0,wxEXPAND);
+		m_GUISizer->AddSpacer(82);
+		m_GUISizer->Add(m_GuiLowerCenter, 0, wxEXPAND);
 
     m_GUIUnderSizer->Add(m_GuiLowerUnderLeft,1,wxALL);
     m_GUIUnderSizer->Add(m_GuiLowerUnderCenter,1,wxALL);
