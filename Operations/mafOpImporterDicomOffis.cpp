@@ -111,6 +111,7 @@ mafOp(label)
 	m_LoadGuiUnderLeft = NULL;
 	m_CropGuiCenter = NULL;
 	m_LoadGuiCenter = NULL;
+	m_LoadGuiUnderCenter = NULL;
 	m_SliceScannerCropPage = NULL;
 	m_SliceScannerLoadPage = NULL;
 	m_StudyListbox = NULL;
@@ -297,6 +298,7 @@ int mafOpImporterDicomOffis::BuildVMEImagesOutput()
 
 	int parsedSlices = 0;
 
+	//Loop foreach slice
 	for (int i = m_ZCropBounds[0]; i < m_ZCropBounds[1]+1; i += step)
 	{
 		mafString name;
@@ -306,6 +308,7 @@ int mafOpImporterDicomOffis::BuildVMEImagesOutput()
 		vmeImage->GetTagArray()->DeepCopy(m_TagArray);
 		vmeImage->GetMaterial()->m_ColorLut->DeepCopy(m_SliceTexture->GetLookupTable());
 
+		//loop foreach time
 		for (int t = 0; t < nFrames; t++)
 		{
 			int sliceID = GetSliceIDInSeries(t, i);
@@ -316,6 +319,7 @@ int mafOpImporterDicomOffis::BuildVMEImagesOutput()
 			Crop(image);
 			image->SetOrigin(currentSlice->GetUnrotatedOrigin());
 
+			//Set data at specific time
 			vmeImage->SetData(image, triggerTime);
 		}
 		
@@ -360,6 +364,7 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 
 	int parsedSlices = 0;
 
+	//Loop foreach time 
 	for (int t = 0; t < nFrames; t++)
 	{
 		int firstSliceAtTimeID = GetSliceIDInSeries(t, 0);
@@ -367,6 +372,8 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 
 		vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
 		accumulate->SetNumberOfSlices(SlicesPerFrame);
+
+		//Loop foreach slice
 		for (int i = m_ZCropBounds[0], s_id=0; i < m_ZCropBounds[1] + 1; i += step)
 		{
 			int sliceID = GetSliceIDInSeries(t, i);
@@ -386,6 +393,7 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 		rg_out = accumulate->GetOutput();
 		rg_out->Update();
 
+		//Set data at specific time
 		VolumeOut->SetDataByDetaching(rg_out, triggerTime);
 	}
 
@@ -469,14 +477,10 @@ bool mafOpImporterDicomOffis::OpenDir(const char *dirPath)
 
 	if(!this->m_TestMode)
 	{
-		if(m_StudyList->GetStudiesNum()>0)
-		{
-			FillStudyListBox();
-			m_StudyListbox->SetSelection(0);
-			OnStudySelect();
-			m_LoadPage->GetRWI()->CameraReset();
-			return true;
-		}
+		FillStudyListBox();
+		OnStudySelect();
+		CameraReset();
+		return true;
 	}
 	return false;
 }
@@ -587,16 +591,13 @@ void mafOpImporterDicomOffis::CameraReset()
 void mafOpImporterDicomOffis::CreateSliceVTKPipeline()
 {
 	vtkNEW(m_SliceLookupTable);
-
 	vtkNEW(m_SliceTexture);
-	m_SliceTexture->InterpolateOn();
-
 	vtkNEW(m_SlicePlane);
-
 	vtkNEW(m_SliceMapper);
-	m_SliceMapper->SetInput(m_SlicePlane->GetOutput());
-
 	vtkNEW(m_SliceActor);
+
+	m_SliceTexture->InterpolateOn();
+	m_SliceMapper->SetInput(m_SlicePlane->GetOutput());
 	m_SliceActor->SetMapper(m_SliceMapper);
 	m_SliceActor->SetTexture(m_SliceTexture); 
 	
@@ -611,12 +612,10 @@ void mafOpImporterDicomOffis::CreateSliceVTKPipeline()
 	m_TextActor->VisibilityOff();
 	m_TextMapper->Modified();
 
-	if(!this->m_TestMode)
-	{
-		mafNEW(m_DicomInteractor);
-		m_DicomInteractor->SetListener(this);
-		m_Mouse->AddObserver(m_DicomInteractor, MCH_INPUT);
-	}
+	// interactor
+	mafNEW(m_DicomInteractor);
+	m_DicomInteractor->SetListener(this);
+	m_Mouse->AddObserver(m_DicomInteractor, MCH_INPUT);
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::FillStudyListBox()
@@ -627,6 +626,7 @@ void mafOpImporterDicomOffis::FillStudyListBox()
 		studyName.Printf("Study %d", n);
 		m_StudyListbox->Append(studyName.GetCStr());
 	}
+	m_StudyListbox->SetSelection(0);
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::FillSeriesListBox()
@@ -699,7 +699,7 @@ bool mafOpImporterDicomOffis::LoadDicomFromDir(const char *dicomDirABSPath)
 
 	mafLogMessage("Found %d Dicom series", m_StudyList->GetSeriesTotalNum());
 
-	return true;
+	return m_StudyList->GetStudiesNum()>0;
 }
 //----------------------------------------------------------------------------
 mafDicomSlice *mafOpImporterDicomOffis::ReadDicomSlice(mafString fileName)
@@ -785,6 +785,11 @@ mafDicomSlice *mafOpImporterDicomOffis::ReadDicomSlice(mafString fileName)
 
 	//Read image data
 	vtkImageData *dicomSliceVTKImageData = CreateImageData(dicomDataset, dcmImagePositionPatient);
+	if(dicomSliceVTKImageData == NULL)
+	{
+		mafLogMessage("Cannot read Dicom Image on %s\nSkip Slice.", fileName.GetCStr());
+		return NULL;
+	}
 			
 	//Create Slice
 	mafDicomSlice *newSlice = new mafDicomSlice(fileName, dcmImagePositionPatient, dcmImageOrientationPatient, dicomSliceVTKImageData, description, date, patientName, birthdate, dcmInstanceNumber, dcmCardiacNumberOfImages, dcmTriggerTime);
@@ -813,6 +818,9 @@ vtkImageData * mafOpImporterDicomOffis::CreateImageData(DcmDataset * dicomDatase
 	dicomDataset->findAndGetLongInt(DCM_Rows, dcmRows);
 	dicomDataset->findAndGetLongInt(DCM_Columns, dcmColumns);
 	nPixel = dcmRows*dcmColumns;
+
+	if (nPixel == 0)
+		return NULL;
 
 	//Getting pixel type
 	dicomDataset->findAndGetLongInt(DCM_PixelRepresentation, dcmPixelRepresentation);

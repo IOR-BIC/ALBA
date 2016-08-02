@@ -92,17 +92,19 @@ public:
 	/** Makes the undo for the operation. */
 	void OpUndo(){};
 			
-	/** Create the vtkTexture for slice_num dicom slice: this will be written to m_SliceTexture ivar*/
+	/** Create the vtkTexture for slice_num Dicom slice: this will be written to m_SliceTexture*/
 	void GenerateSliceTexture(int imageID);
 
+	/** Crops the image data  input depending on calculated crop extent*/
 	void Crop(vtkImageData *slice);
 
+	/** Calculate crop Extent depending on interactor data */
 	void CalculateCropExtent();
 			
-	/** Build a volume from the list of dicom files. */
+	/** Build a volume from the list of Dicom files. */
 	int BuildVMEVolumeGrayOutput();
 		
-	/** Build images starting from the list of dicom files. */
+	/** Build images starting from the list of Dicom files. */
 	int BuildVMEImagesOutput();
 
 	/** Create the pipeline to read the images. */
@@ -142,18 +144,19 @@ protected:
 	/** Create crop page and   his GUI for the wizard. */
 	void CreateCropPage();
 		
-	/** gets the range of the dicom by walking thought the slices */
+	/** gets the range of the Dicom by walking thought the slices */
 	void GetDicomRange(double *range);
 
 	/** Reset the slider that allow to scan the slices. */
 	void CreateSliders();
 
-	/** Load Dicom in forlder */
+	/** Load Dicom in folder */
 	bool LoadDicomFromDir(const char *dicomDirABSPath);
 
 	/** Read the list of dicom files recognized. */
 	mafDicomSlice *ReadDicomSlice(mafString fileName);
 
+	/** Crate the image data by read information from the dicom dataset */
 	vtkImageData *CreateImageData(DcmDataset * dicomDataset, double * dcmImagePositionPatient);
 
 	void GetDicomSpacing(DcmDataset * dicomDataset, double * dcmPixelSpacing);
@@ -187,8 +190,8 @@ protected:
 
 	/** On wizard start. */
 	virtual int RunWizard();
-		
 	
+	/** Sets the VME name*/
 	void SetVMEName();
 		
 	vtkLookupTable		*m_SliceLookupTable;
@@ -223,6 +226,7 @@ protected:
 	mafDicomStudyList *m_StudyList;
 	mafDicomSeries	*m_SelectedSeries; ///< Selected series slices list
 	
+	/**Get dicom settings*/
 	mafGUIDicomSettings* GetSetting();
 
 	wxListBox	*m_StudyListbox;
@@ -266,12 +270,16 @@ class mafDicomStudyList
 public:
 	~mafDicomStudyList();
 
+	/** Add a slice, if necessary creates a new study/series*/
 	void AddSlice(mafDicomSlice *slice);
 
+	/** Get the num-th study*/
 	mafDicomStudy *GetStudy(int num);
 
+	/** Returns the number of studies*/
 	int GetStudiesNum() { return m_Studies.size(); }
 
+	/** Returns the total number of series*/
 	int GetSeriesTotalNum();
 protected:
 	std::vector<mafDicomStudy *> m_Studies;
@@ -289,13 +297,16 @@ public:
 
 	~mafDicomStudy();
 
+	/** Add a slice, if necessary creates a new series */
 	void AddSlice(mafDicomSlice *slice);
 	
 	/** Returns StudyID */
 	mafString GetStudyID() const { return m_StudyID; }
 
+	/** Returns the number of series */
 	int GetSeriesNum() { return m_Series.size(); }
 
+	/** Gets the id-th series */
 	mafDicomSeries *GetSeries(int id) { return m_Series[id]; }
 
 protected:
@@ -315,13 +326,16 @@ public:
 
 	~mafDicomSeries();
 
+	/** Add a slice */
 	void AddSlice(mafDicomSlice *slice);
 
+	/** Gets the id-th slice */
 	mafDicomSlice *GetSlice(int id) { return m_Slices[id]; }
 
+	/** Returns the number of series */
 	int GetSlicesNum() { return m_Slices.size(); }
 
-	/** Check if dicom dataset contains rotations */
+	/** Check if Dicom dataset contains rotations */
 	bool IsRotated(const double dcmImageOrientationPatient[6]);
 
 	/** Returns IsRotated */
@@ -330,7 +344,7 @@ public:
 	/** Sets IsRotated */
 	void SetRotated(bool isRotated) { m_IsRotated = isRotated; }
 	
-	/** Returns Slices */
+	/** Returns Slices vector */
 	std::vector<mafDicomSlice *> GetSlices() const { return m_Slices; }
 
 	/** Sets Slices */
@@ -339,6 +353,7 @@ public:
 	/** Returns SerieID */
 	mafString GetSerieID() const { return m_SeriesID; }
 
+	/** Return the slices dims */
 	const int *GetDimensions() { return m_Dimensions; }
 
 	/** Returns FramesNum */
@@ -403,25 +418,25 @@ public:
 	/** Set the filename of the corresponding Dicom slice. */
 	void SetSliceABSFileName(char *fileName) { m_SliceABSFileName = fileName; };
 
-	/** Return the image number of the Dicom slice*/
+	/** Return the image number of the Dicom slice */
 	int GetDcmInstanceNumber() const { return m_DcmInstanceNumber; };
 
-	/** Set the image number of the Dicom slice*/
+	/** Set the image number of the Dicom slice */
 	void SetDcmInstanceNumber(int number) { m_DcmInstanceNumber = number; };
 
-	/** Return the number of cardiac time frames*/
+	/** Return the number of cardiac time frames */
 	int GetDcmCardiacNumberOfImages() const { return m_DcmCardiacNumberOfImages; };
 
-	/** Set the number of cardiac time frames*/
+	/** Set the number of cardiac time frames */
 	void SetDcmCardiacNumberOfImages(int number) { m_DcmCardiacNumberOfImages = number; };
 
-	/** Return the trigger time of the Dicom slice*/
+	/** Return the trigger time of the Dicom slice */
 	double GetDcmTriggerTime() const { return m_DcmTriggerTime; };
 
 	/** Set the trigger time of the Dicom slice*/
 	void SetDcmTriggerTime(double time) { m_DcmTriggerTime = time; };
 
-	/** Retrieve image data*/
+	/** Retrieve image data */
 	vtkImageData* GetVTKImageData() { return m_ImageData; };
 
 	/** Set the DcmImagePositionPatient tag for the slice */
@@ -462,7 +477,7 @@ public:
 	/** Get the DcmImagePositionPatient tag for the slice */
 	const double *GetDcmImagePositionPatientOriginal() { return m_DcmImagePositionPatientOriginal; };
 
-	/** Set the DcmImageOrientationPatient tag for the slice*/
+	/** Set the DcmImageOrientationPatient tag for the slice */
 	void SetDcmImageOrientationPatient(double dcmImageOrientationPatient[6])
 	{
 		m_DcmImageOrientationPatient[0] = dcmImageOrientationPatient[0];
@@ -473,7 +488,7 @@ public:
 		m_DcmImageOrientationPatient[5] = dcmImageOrientationPatient[5];
 	};
 
-	/** Get the DcmImageOrientationPatient tag for the slice*/
+	/** Get the DcmImageOrientationPatient tag for the slice */
 	void GetDcmImageOrientationPatient(double dcmImageOrientationPatient[6])
 	{
 		dcmImageOrientationPatient[0] = m_DcmImageOrientationPatient[0];
@@ -484,10 +499,13 @@ public:
 		dcmImageOrientationPatient[5] = m_DcmImageOrientationPatient[5];
 	};
 
-	/** Get the DcmImageOrientationPatient tag for the slice*/
+	/** Get the DcmImageOrientationPatient tag for the slice */
 	const double *GetDcmImageOrientationPatient() { return m_DcmImageOrientationPatient; }
 
-	/** Return the position unrotated */
+	/** Return the position unrotated. 
+	The origin is set to the output to this value,
+	when the rotation matrix is applied the origin will be placed on the "right origin",
+	unrotated origin is used also to sort slices depending on unrotated Z value */
 	double *GetUnrotatedOrigin() { return m_UnrotatedOrigin; }
 	
 	/** return the description */
@@ -525,6 +543,7 @@ public:
 
 protected:
 
+	/** Calculate the unrotated origin */
 	void CalculateUnrotatedOrigin();
 
 	double m_UnrotatedOrigin[3];
