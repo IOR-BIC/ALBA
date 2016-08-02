@@ -184,6 +184,8 @@ public:
     The in[4] and out[4] can be the same array. */
   static void PointMultiply(const double Elements[16], 
                             const double in[4], double out[4]);
+	
+	void SetFromDirectionCosines(const double orientation[6]);
 protected:
   mafTimeStamp m_TimeStamp;
 

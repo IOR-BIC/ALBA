@@ -518,3 +518,34 @@ void mafMatrix::PointMultiply(const double Elements[16],
   mafMatrix::Transpose(Elements,newElements);
   mafMatrix::MultiplyPoint(newElements,in,result);
 }
+
+//----------------------------------------------------------------------------
+void mafMatrix::SetFromDirectionCosines(const double orientation[6])
+{
+	//transform direction cosines to be used to set vtkMatrix
+	/*
+	[ orientation[0] orientation[3] dst_nrm_dircos_x  0 ]
+	[ orientation[1] orientation[4] dst_nrm_dircos_y  0 ]
+	[ orientation[2] orientation[5] dst_nrm_dircos_z  0 ]
+	[ 0                 0                 0           1 ]*/
+
+	double dst_nrm_dircos_x = orientation[1] * orientation[5] - orientation[2] * orientation[4];
+	double dst_nrm_dircos_y = orientation[2] * orientation[3] - orientation[0] * orientation[5];
+	double dst_nrm_dircos_z = orientation[0] * orientation[4] - orientation[1] * orientation[3];
+
+	m_VTKMatrix->Identity();
+
+	m_VTKMatrix->SetElement(0, 0, orientation[0]);
+	m_VTKMatrix->SetElement(1, 0, orientation[1]);
+	m_VTKMatrix->SetElement(2, 0, orientation[2]);
+	m_VTKMatrix->SetElement(3, 0, 0);
+	m_VTKMatrix->SetElement(0, 1, orientation[3]);
+	m_VTKMatrix->SetElement(1, 1, orientation[4]);
+	m_VTKMatrix->SetElement(2, 1, orientation[5]);
+	m_VTKMatrix->SetElement(3, 1, 0);
+	m_VTKMatrix->SetElement(0, 2, dst_nrm_dircos_x);
+	m_VTKMatrix->SetElement(1, 2, dst_nrm_dircos_y);
+	m_VTKMatrix->SetElement(2, 2, dst_nrm_dircos_z);
+	m_VTKMatrix->SetElement(3, 2, 0);
+	m_VTKMatrix->SetElement(3, 3, 1);	
+}

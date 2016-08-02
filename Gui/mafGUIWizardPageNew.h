@@ -90,6 +90,9 @@ public:
   /** Remove in wizard gui, another gui under lower left position. */
   void RemoveGuiLowerUnderLeft(mafGUI *gui);
 
+	/** Remove in wizard gui, another gui in lower center position. */
+	void RemoveGuiLowerCenter(mafGUI *gui);
+
 	/** Create a chain between this page ad nextPage. */
 	void SetNextPage(mafGUIWizardPageNew *nextPage);
 
