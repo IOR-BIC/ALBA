@@ -54,6 +54,55 @@ public:
   
   CPPUNIT_TEST(TestSetTreeTime);
   //CPPUNIT_TEST(TestSetVisualMode);
+
+	CPPUNIT_TEST(TestSetName);
+	CPPUNIT_TEST(TestEquals);
+	CPPUNIT_TEST(TestGetAttribute);
+	CPPUNIT_TEST(TestDependsOnLinkedNode);
+	CPPUNIT_TEST(TestCanCopy);
+	CPPUNIT_TEST(TestDeepCopy);
+	CPPUNIT_TEST(TestMakeCopy);
+	CPPUNIT_TEST(TestReparentTo);
+	CPPUNIT_TEST(TestGetParent);
+	CPPUNIT_TEST(TestGetRoot);
+	CPPUNIT_TEST(TestGetTagArray);
+	CPPUNIT_TEST(TestIsInTree);
+	CPPUNIT_TEST(TestIsAChild);
+	CPPUNIT_TEST(TestIsValid);
+	CPPUNIT_TEST(TestIsVisible);
+	CPPUNIT_TEST(TestGetNumberOfChildren);
+	CPPUNIT_TEST(TestIsEmpty);
+	CPPUNIT_TEST(TestSetAttribute);
+	CPPUNIT_TEST(TestRemoveAttribute);
+	CPPUNIT_TEST(TestRemoveAllAttributes);
+	CPPUNIT_TEST(TestCleanTree);
+	CPPUNIT_TEST(TestNewIterator);
+	CPPUNIT_TEST(TestCanReparentTo);
+	CPPUNIT_TEST(TestGetChildren);
+	CPPUNIT_TEST(TestGetFirstChild);
+	CPPUNIT_TEST(TestGetLastChild);
+	CPPUNIT_TEST(TestAddChild);
+	CPPUNIT_TEST(TestGetChild);
+	CPPUNIT_TEST(TestCompareTree);
+	CPPUNIT_TEST(TestCopyTree);
+	CPPUNIT_TEST(TestFindInTreeById);
+	CPPUNIT_TEST(TestFindInTreeByName);
+	CPPUNIT_TEST(TestFindInTreeByTag);
+	CPPUNIT_TEST(TestFindNodeIdx);
+	CPPUNIT_TEST(TestRemoveChild);
+	CPPUNIT_TEST(TestRemoveAllChildren);
+	CPPUNIT_TEST(TestImport);
+	CPPUNIT_TEST(TestBuildAndDestroyATree);
+	CPPUNIT_TEST(TestGetByPath);
+
+	CPPUNIT_TEST(TestGetLink);
+	CPPUNIT_TEST(TestSetLink);
+	CPPUNIT_TEST(TestMandatoryLink);
+	CPPUNIT_TEST(TestGetNumberOfLinks);
+	CPPUNIT_TEST(TestRemoveLink);
+	CPPUNIT_TEST(TestRemoveAllLinks);
+	CPPUNIT_TEST(TestDependencies);
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -66,25 +115,62 @@ private:
   void TestShallowCopy();
   void TestIsAnimated();
   void TestIsDataAvailable();
-
   void TestSetAbsMatrix();
   void TestSetAbsPose();
   void TestApplyAbsMatrix();
-
   void TestSetBehavior();
   void TestSetCrypting();
-
   void TestSetParent();
-
   void TestSetMatrix();
   void TestSetPose();
   void TestApplyMatrix();
-
   void TestSetTimeStamp();
   void TestSetTreeTime();
-
   void TestSetVisualMode();
+	void TestAddChild();
+	void TestCanCopy();
+	void TestCleanTree();
+	void TestCompareTree();
+	void TestCopyTree();
+	void TestDependsOnLinkedNode();
+	void TestFindInTreeById();
+	void TestFindInTreeByName();
+	void TestFindInTreeByTag();
+	void TestFindNodeIdx();
+	void TestGetAttribute();
+	void TestGetChild();
+	void TestGetChildren();
+	void TestGetFirstChild();
+	void TestGetLastChild();
+	void TestGetNumberOfChildren();
+	void TestGetParent();
+	void TestGetRoot();
+	void TestGetTagArray();
+	void TestImport();
+	void TestIsAChild();
+	void TestIsEmpty();
+	void TestIsInTree();
+	void TestIsValid();
+	void TestIsVisible();
+	void TestMakeCopy();
+	void TestNewIterator();
+	void TestRemoveAllAttributes();
+	void TestRemoveAllChildren();
+	void TestRemoveAttribute();
+	void TestRemoveChild();
+	void TestReparentTo();
+	void TestSetAttribute();
+	void TestSetName();
+	void TestBuildAndDestroyATree();
+	void TestGetByPath();
 
+	void TestSetLink();
+	void TestGetLink();
+	void TestMandatoryLink();
+	void TestDependencies();
+	void TestGetNumberOfLinks();
+	void TestRemoveLink();
+	void TestRemoveAllLinks();
   bool result;
 };
 
