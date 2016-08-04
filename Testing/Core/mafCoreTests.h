@@ -25,6 +25,7 @@
 #include "mafDefines.h"
 #include "mafVME.h"
 #include "mafOp.h"
+#include "mafTransform.h"
 
 
 //-------------------------------------------------------------------------
@@ -36,22 +37,16 @@ public:
 	mafTypeMacro(mafVMEHelper, mafVME);
 	void SetId(mafID id) { m_Id = id; };
 
-	virtual void SetMatrix(const mafMatrix &mat) {};
-	virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes) {};
+	void SetMatrix(const mafMatrix &mat) { m_Transform->SetMatrix(mat); Modified(); };
+	void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes) { kframes.clear(); };
+protected:
+	mafVMEHelper();
+	virtual ~mafVMEHelper() { mafDEL(m_Transform); };
+
+	mafTransform *m_Transform;
 
 };
 
-//-------------------------------------------------------------------------
-/** class for testing re-parenting. */
-class mafVMEBHelper: public mafVME
-	//-------------------------------------------------------------------------
-{
-public:
-	mafTypeMacro(mafVMEBHelper,mafVME);
-
-	virtual void SetMatrix(const mafMatrix &mat) {};
-	virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes) {};
-};
 
 //----------------------------------------------------------------------------
 class DummyObserver : public mafObserver

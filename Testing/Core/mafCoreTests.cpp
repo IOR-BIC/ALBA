@@ -87,12 +87,15 @@
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEHelper);
 
+//----------------------------------------------------------------------------
+mafVMEHelper::mafVMEHelper()
+{
+	mafNEW(m_Transform);
+	mafVMEOutputNULL *output = mafVMEOutputNULL::New();
+	output->SetTransform(m_Transform);
+	SetOutput(output);
+}
 
-//-------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------
-mafCxxTypeMacro(mafVMEBHelper)
-//-------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void DummyObserver::OnEvent(mafEventBase *maf_event)
@@ -151,83 +154,81 @@ bool RemoveDir(const char *dirName)
 
 //Main Test Executor
 int
-	main( int argc, char* argv[] )
+main(int argc, char* argv[])
 {
-
 	// Create the event manager and test controller
 	CPPUNIT_NS::TestResult controller;
 
 	// Add a listener that collects test result
 	CPPUNIT_NS::TestResultCollector result;
-	controller.addListener( &result );        
+	controller.addListener(&result);
 
 	// Add a listener that print dots as test run.
 	CPPUNIT_NS::BriefTestProgressListener progress;
-	controller.addListener( &progress );      
+	controller.addListener(&progress);
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
 
 	//this test must be run first because manages factories
-	runner.addTest( mafCoreFactoryTest::suite());
+	runner.addTest(mafCoreFactoryTest::suite());
+	runner.addTest(vtkMAFAssemblyTest::suite());
+	runner.addTest(mafAbsMatrixPipeTest::suite());
+	runner.addTest(mmaVolumeMaterialTest::suite());
+	runner.addTest(mmaMaterialTest::suite());
+	runner.addTest(mmaApplicationLayoutTest::suite());
+	runner.addTest(mafVMEStorageTest::suite());
+	runner.addTest(mafVMEStorageTest2::suite());
+	runner.addTest(mafVMETest::suite());
+	runner.addTest(mafVMERootTest::suite());
+	runner.addTest(mafVMEOutputTest::suite());
+	runner.addTest(mafVMEOutputNULLTest::suite());
+	runner.addTest(mafVMEManagerTest::suite());
+	runner.addTest(mafViewVTKTest::suite());
+	runner.addTest(mafViewPlotTest::suite());
+	runner.addTest(mafViewManagerTest::suite());
+	runner.addTest(mafViewHTMLTest::suite());
+	runner.addTest(mafUserTest::suite());
+	runner.addTest(mafTimeMapTest::suite());
+	runner.addTest(mafTimeMapScalarTest::suite());
+	runner.addTest(mafTagItemTest::suite());
+	runner.addTest(mafTagArrayTest::suite());
+	runner.addTest(mafSceneNodeTest::suite());
+	runner.addTest(mafSceneGraphTest::suite());
+	runner.addTest(mafRootTest::suite());
+	runner.addTest(mafPipeTest::suite());
+	runner.addTest(mafPipeFactoryTest::suite());
+	runner.addTest(mafPipeBoxTest::suite());
+	runner.addTest(mafOpTest::suite());
+	runner.addTest(mafOpStackTest::suite());
+	runner.addTest(mafOpSelectTest::suite());
+	runner.addTest(mafOpPasteTest::suite());
+	runner.addTest(mafOpManagerTest::suite());
+	runner.addTest(mafOpEditTest::suite());
+	runner.addTest(mafOpCutTest::suite());
+	runner.addTest(mafOpContextStackTest::suite());
+	runner.addTest(mafOpCopyTest::suite());
+	runner.addTest(mafVMETest::suite());
+	runner.addTest(mafVMEManagerTest::suite());
+	runner.addTest(mafVMEIteratorTest::suite());
+	runner.addTest(mafVMEFactoryTest::suite());
+	runner.addTest(mafMatrixPipeTest::suite());
+	runner.addTest(mafLODActorTest::suite());
+	runner.addTest(mafGUITreeContextualMenuTest::suite());
+	runner.addTest(mafExpirationDateTest::suite());
+	runner.addTest(mafEventIOTest::suite());
+	runner.addTest(mafDataPipeTest::suite());
+	runner.addTest(mafAxesTest::suite());
+	runner.addTest(mafAttributeTraceabilityTest::suite());
+	runner.addTest(mafAttributeTest::suite());
+	runner.addTest(mafViewPlotTest::suite());
+	runner.addTest(mafProgressBarHelperTest::suite());
 
-	runner.addTest( vtkMAFAssemblyTest::suite());
-	runner.addTest( mafAbsMatrixPipeTest::suite());
-	runner.addTest( mmaVolumeMaterialTest::suite());
-	runner.addTest( mmaMaterialTest::suite());
-	runner.addTest( mmaApplicationLayoutTest::suite());
-	runner.addTest( mafVMEStorageTest::suite());
-	runner.addTest( mafVMEStorageTest2::suite());
-	runner.addTest( mafVMETest::suite());
-	runner.addTest( mafVMERootTest::suite());
-	runner.addTest( mafVMEOutputTest::suite());
-	runner.addTest( mafVMEOutputNULLTest::suite());
-	runner.addTest( mafVMEManagerTest::suite());
-	runner.addTest( mafViewVTKTest::suite());
-	runner.addTest( mafViewPlotTest::suite());
-  runner.addTest( mafViewManagerTest::suite());
-	runner.addTest( mafViewHTMLTest::suite());
-	runner.addTest( mafUserTest::suite());
-	runner.addTest( mafTimeMapTest::suite());
-  runner.addTest( mafTimeMapScalarTest::suite());
-  runner.addTest( mafTagItemTest::suite());
-	runner.addTest( mafTagArrayTest::suite());
-	runner.addTest( mafSceneNodeTest::suite());
-	runner.addTest( mafSceneGraphTest::suite());
-	runner.addTest( mafRootTest::suite());
-	runner.addTest( mafPipeTest::suite());
-	runner.addTest( mafPipeFactoryTest::suite());
-	runner.addTest( mafPipeBoxTest::suite());
-	runner.addTest( mafOpTest::suite());
-	runner.addTest( mafOpStackTest::suite());
-	runner.addTest( mafOpSelectTest::suite());
-	runner.addTest( mafOpPasteTest::suite());
-	runner.addTest( mafOpManagerTest::suite() );
-	runner.addTest( mafOpEditTest::suite());
-  runner.addTest( mafOpCutTest::suite());
-	runner.addTest( mafOpContextStackTest::suite());
-	runner.addTest( mafOpCopyTest::suite());
-  runner.addTest( mafVMETest::suite());
-	runner.addTest( mafVMEManagerTest::suite() );
-	runner.addTest( mafVMEIteratorTest::suite());
-  runner.addTest( mafVMEFactoryTest::suite());
-  runner.addTest( mafMatrixPipeTest::suite());
-	runner.addTest( mafLODActorTest::suite());
-  runner.addTest( mafGUITreeContextualMenuTest::suite());
-  runner.addTest( mafExpirationDateTest::suite());
-	runner.addTest( mafEventIOTest::suite());
-	runner.addTest( mafDataPipeTest::suite());
-	runner.addTest( mafAxesTest::suite());
-  runner.addTest( mafAttributeTraceabilityTest::suite());
-	runner.addTest( mafAttributeTest::suite());
-	runner.addTest( mafViewPlotTest::suite());
-	runner.addTest( mafProgressBarHelperTest::suite());
-	
-	runner.run( controller );
+	runner.run(controller);
 
 	// Print test in a compiler compatible format.
-	CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
-	outputter.write(); 
+	CPPUNIT_NS::CompilerOutputter outputter(&result, CPPUNIT_NS::stdCOut());
+	outputter.write();
 
 	return result.wasSuccessful() ? 0 : 1;
 }
