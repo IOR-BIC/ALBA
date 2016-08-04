@@ -59,16 +59,11 @@ vtkMAFRGSliceAccumulate::vtkMAFRGSliceAccumulate()
   this->Slices = NULL;
   this->NumberOfSlices = 0;
   this->Allocated = 0;
-	this->BuildingAxes = 2;
   SetDimensions(1,1,1);
   SetSpacing(1,1,1);
   SetDataType(VTK_UNSIGNED_CHAR);
   SetOrigin(0,0,0);
   Slices=vtkRectilinearGrid::New();
-  m_rotationmatrix[0][0] = 1.; m_rotationmatrix[0][1] = 0.; m_rotationmatrix[0][2] = 0.;
-  m_rotationmatrix[1][0] = 0.; m_rotationmatrix[1][1] = 1.; m_rotationmatrix[1][2] = 0.;
-  m_rotationmatrix[2][0] = 0.; m_rotationmatrix[2][1] = 0.; m_rotationmatrix[2][2] = 1.;
-  //SetSlices(vtkRectilinearGrid::New());
 }
 //--------------------------------------------------------------------------------------
 vtkMAFRGSliceAccumulate::~vtkMAFRGSliceAccumulate()
@@ -76,151 +71,28 @@ vtkMAFRGSliceAccumulate::~vtkMAFRGSliceAccumulate()
 {
   SetSlices(NULL);
 }
-//--------------------------------------------------------------------------------------
-void vtkMAFRGSliceAccumulate::AddSlice(vtkImageData * slice)
-//--------------------------------------------------------------------------------------
-{
-	double origin[3];
-	double spacing[3];
-	int dimensions[3];
-	int scalar_type = slice->GetPointData()->GetScalars()->GetDataType();
-
-	vtkDoubleArray *vz;
-	
-	slice->GetOrigin(origin);
-	slice->GetDimensions(dimensions);
-	slice->GetSpacing(spacing);
-
-	if (!this->Allocated)
-	{
-		this->SetSpacing(spacing[0], spacing[1], 1);
-		this->SetDimensions(dimensions);
-		this->SetOrigin(origin);
-		this->SetDataType(slice->GetPointData()->GetScalars()->GetDataType());
-
-		this->NumberOfSlices = 1;
-		this->Allocate();
-
-		this->Slices->GetPointData()->SetScalars(slice->GetPointData()->GetScalars());
-		//((vtkFloatArray *)this->Slices->GetZCoordinates())->SetValue(0, origin[2]);
-		((vtkDoubleArray *)this->Slices->GetZCoordinates())->SetValue(0, origin[this->BuildingAxes]);
-	} else {
-    
-
-    for(int i=0;i<dimensions[0]*dimensions[1];i++)
-    {
-      ((vtkDoubleArray *)Slices->GetPointData()->GetScalars())->InsertNextTuple1(0.0);
-    }
-
-		vz=(vtkDoubleArray *)this->Slices->GetZCoordinates();
-		
-		int start;
-		void *out_dataPointer		= (vtkDoubleArray *)this->Slices->GetPointData()->GetScalars()->GetVoidPointer(0);
-		void *input_dataPointer = (vtkDoubleArray *)slice->GetPointData()->GetScalars()->GetVoidPointer(0);
-		int numscalars = slice->GetPointData()->GetScalars()->GetNumberOfTuples();
-		start = numscalars * this->NumberOfSlices;
-
-		switch (scalar_type) 
-		{
-			case VTK_CHAR:
-				out_dataPointer = ((char *)out_dataPointer) + start;
-				memmove((char *)out_dataPointer,(char *)input_dataPointer, sizeof(char) * numscalars);
-			break;
-			case VTK_UNSIGNED_CHAR:
-				out_dataPointer = ((unsigned char *)out_dataPointer) + start;
-				memmove((unsigned char *)out_dataPointer,(unsigned char *)input_dataPointer, sizeof(unsigned char) * numscalars);
-			break;
-			case VTK_SHORT:
-				out_dataPointer = ((short *)out_dataPointer) + start;
-				memmove((short *)out_dataPointer,(short *)input_dataPointer, sizeof(short) * numscalars);
-			break;
-			case VTK_UNSIGNED_SHORT:
-				out_dataPointer = ((unsigned short *)out_dataPointer) + start;
-				memmove((unsigned short *)out_dataPointer,(unsigned short *)input_dataPointer, sizeof(unsigned short) * numscalars);
-			break;
-			case VTK_FLOAT:
-				out_dataPointer = ((float *)out_dataPointer) + start;
-				memmove((float *)out_dataPointer,(float *)input_dataPointer, sizeof(float) * numscalars);
-			break;
-			default:
-				vtkErrorMacro(<< "Only 8/16 bit integers and 32 bit floats are supported.");
-		}
-		
-		this->Slices->SetDimensions(dimensions[0], dimensions[1], ++this->NumberOfSlices);
-		//vz->InsertValue(this->NumberOfSlices - 1, origin[2]);
-		vz->InsertValue(this->NumberOfSlices - 1, origin[this->BuildingAxes]);
-	}
-
-	this->Modified();
-}
-//--------------------------------------------------------------------------------------
-void vtkMAFRGSliceAccumulate::SetSlice(int slice_num,vtkImageData * slice, double* orientation)
+void vtkMAFRGSliceAccumulate::SetSlice(int slice_num,vtkImageData * slice,double *unRotatedOrigin)
 //--------------------------------------------------------------------------------------
 {
 	int dimensions[3];
-	double origin[3];
-	double spacing[3];
 	int scalar_type = slice->GetPointData()->GetScalars()->GetDataType();
 
-	// rounding
-	for(int i=0; i<6; i++) 
-	{
-		if( orientation[i] > 0.5) 
-		{
-			orientation[i] = 1.;
-		}
-		else if (orientation[i] < -0.5) 
-		{
-	        orientation[i] = -1.;
-		}
-		else 
-		{
-			orientation[i] = 0.;
-		}
-	}
-
-	double dst_nrm_dircos[3];
-	dst_nrm_dircos[0] = orientation[1] * orientation[5] - orientation[2] * orientation[4]; 
-	dst_nrm_dircos[1] = orientation[2] * orientation[3] - orientation[0] * orientation[5];
-	dst_nrm_dircos[2] = orientation[0] * orientation[4] - orientation[1] * orientation[3];
-
-
-	m_rotationmatrix[0][0] = orientation[0];
-	m_rotationmatrix[1][0] = orientation[1];
-	m_rotationmatrix[2][0] = orientation[2];
-
-	m_rotationmatrix[0][1] = orientation[3];
-	m_rotationmatrix[1][1] = orientation[4];
-	m_rotationmatrix[2][1] = orientation[5];
-
-	m_rotationmatrix[0][2] = dst_nrm_dircos[0];
-	m_rotationmatrix[1][2] = dst_nrm_dircos[1];
-	m_rotationmatrix[2][2] = dst_nrm_dircos[2];
-
-
-	bool buildingdirinorout = true;
-	
-	if(orientation[BuildingAxes] + orientation[3+BuildingAxes] + dst_nrm_dircos[BuildingAxes] < 0 ) 
-	{
-		buildingdirinorout = false;
-	}
-
-	
 	slice->GetDimensions(dimensions);
-	slice->GetOrigin(origin);
-	slice->GetSpacing(spacing);
+
 	
 	if (slice_num >=0 && slice_num < this->NumberOfSlices)
 	{
 		if (!this->Allocated)
 		{
+			int extent[6];
+			double spacing[3];
+			slice->GetSpacing(spacing);
+			slice->GetExtent(extent);
+			this->SetInputExtent(extent);
 			this->SetSpacing(spacing[0], spacing[1], 1); 
 			this->SetDimensions(dimensions);
-			
-			this->SetOrigin(origin);
-			
+			this->SetOrigin(unRotatedOrigin);
 			this->SetDataType(scalar_type);
-			
 			this->Allocate();
 		}
 		if (dimensions[0] != Dimensions[0] || dimensions[1] != Dimensions[1])
@@ -228,35 +100,16 @@ void vtkMAFRGSliceAccumulate::SetSlice(int slice_num,vtkImageData * slice, doubl
 			vtkErrorMacro("Bad dimensions of input slice");
 			return;
 		}
-		//((vtkFloatArray *)this->Slices->GetZCoordinates())->SetValue(slice_num, origin[2]);
 
-		if(buildingdirinorout) 
-		{
-			((vtkDoubleArray *)this->Slices->GetZCoordinates())->SetValue(slice_num, origin[this->BuildingAxes]);
-			
-		} 
-		else 
-		{
-			((vtkDoubleArray *)this->Slices->GetZCoordinates())->SetValue(this->NumberOfSlices - 1 -slice_num, -origin[this->BuildingAxes]);
-		}
-		
-
-
+		((vtkDoubleArray *)this->Slices->GetZCoordinates())->SetValue(slice_num, unRotatedOrigin[2]);
+					
 		int start;
 		void *out_dataPointer		= (vtkDoubleArray *)this->Slices->GetPointData()->GetScalars()->GetVoidPointer(0);
 		void *input_dataPointer = (vtkDoubleArray *)slice->GetPointData()->GetScalars()->GetVoidPointer(0);
 		int numscalars = slice->GetPointData()->GetScalars()->GetNumberOfTuples();
 		
-		if(buildingdirinorout) 
-		{
-          start = numscalars * slice_num;
-		}
-		else 
-		{
-	      start = numscalars*(this->NumberOfSlices - 1 -slice_num);
-		}
+    start = numscalars * slice_num;
 		
-
 		switch (scalar_type) 
 		{
 			case VTK_CHAR:
@@ -309,135 +162,14 @@ void vtkMAFRGSliceAccumulate::Allocate()
 	vy->SetNumberOfValues(Dimensions[1]);
 	vz->SetNumberOfValues(Dimensions[2]);
 
-	double origin[2] = {0., 0.};
-
-	if(BuildingAxes == 0) 
-	{
-	  // x-axis
-      // y' = a x + b y
-      if(m_rotationmatrix[1][0] == 1 ) 
-	  {
-		  origin[0] = Origin[1];
-	  }
-	  else if(m_rotationmatrix[1][0] == -1 ) 
-	  {
-		  origin[0] = -Origin[1];
-	  }
-	  else if(m_rotationmatrix[1][1] == 1)
-	  {
-		  origin[0] = Origin[2];
-	  }
-	  else //m_rotationmatrix[1][1] == -1 
-	  {
-		  origin[0] = -Origin[2];
-	  }
-
-	  // y-axis
-	  // z' = a x + b y
-	  if(m_rotationmatrix[2][0] == 1 ) 
-	  {
-		  origin[1] = Origin[1];
-	  }
-	  else if(m_rotationmatrix[2][0] == -1 ) 
-	  {
-		  origin[1] = -Origin[1];
-	  }
-	  else if(m_rotationmatrix[2][1] == 1)
-	  {
-		  origin[1] = Origin[2];
-	  }
-	  else //m_rotationmatrix[2][1] == -1 
-	  {
-		  origin[1] = -Origin[2];
-	  }
-	}
-	else if(BuildingAxes == 1) 
-	{
-		// x-axis
-		// x' = a x + b y
-		if(m_rotationmatrix[0][0] == 1 ) 
-		{
-			origin[0] = Origin[0];
-		}
-		else if(m_rotationmatrix[0][0] == -1 ) 
-		{
-			origin[0] = -Origin[0];
-		}
-		else if(m_rotationmatrix[0][1] == 1)
-		{
-			origin[0] = Origin[2];
-		}
-		else //m_rotationmatrix[0][1] == -1 
-		{
-			origin[0] = -Origin[2];
-		}
-
-		// z-axis
-		// z' = a x + b y
-		if(m_rotationmatrix[2][0] == 1 ) 
-		{
-			origin[1] = Origin[0];
-		}
-		else if(m_rotationmatrix[2][0] == -1 ) 
-		{
-			origin[1] = -Origin[0];
-		}
-		else if(m_rotationmatrix[2][1] == 1)
-		{
-			origin[1] = Origin[2];
-		}
-		else //m_rotationmatrix[2][1] == -1 
-		{
-			origin[1] = -Origin[2];
-		}
-	}
-	else  // BuildingAxes==2
-	{
-		// x-axis
-		// x' = a x + b y
-		if(m_rotationmatrix[0][0] == 1 ) 
-		{
-			origin[0] = Origin[0];
-		}
-		else if(m_rotationmatrix[0][0] == -1 ) 
-		{
-			origin[0] = -Origin[0];
-		}
-		else if(m_rotationmatrix[0][1] == 1)
-		{
-			origin[0] = Origin[1];
-		}
-		else //m_rotationmatrix[0][1] == -1 
-		{
-			origin[0] = -Origin[1];
-		}
-
-		// y-axis
-		// y' = a x + b y
-		if(m_rotationmatrix[1][0] == 1 ) 
-		{
-			origin[1] = Origin[0];
-		}
-		else if(m_rotationmatrix[1][0] == -1 ) 
-		{
-			origin[1] = -Origin[0];
-		}
-		else if(m_rotationmatrix[1][1] == 1)
-		{
-			origin[1] = Origin[1];
-		}
-		else //m_rotationmatrix[1][1] == -1 
-		{
-			origin[1] = -Origin[1];
-		}
-	}
-
+	int xStart = InputExtent[0];
+	int yStart = InputExtent[2];
 
 	for (int ix = 0; ix < Dimensions[0]; ix++) {
-		vx->SetValue(ix, origin[0] + ((double)ix)*Spacing[0]);
+		vx->SetValue(ix, Origin[0] + ((double)(ix + xStart))*Spacing[0]);
 	}
-	   for (int iy = 0; iy < Dimensions[1]; iy++) {
-		vy->SetValue(iy, origin[1] + ((double)iy)*Spacing[1]);
+	for (int iy = 0; iy < Dimensions[1]; iy++) {
+		vy->SetValue(iy, Origin[1] + ((double)(iy + yStart))*Spacing[1]);
 	}
 	for (int iz = 0; iz < Dimensions[2]; iz++) {
 		vz->SetValue(iz, 0.);

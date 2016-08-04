@@ -107,8 +107,7 @@
 #include "mafOpSplitSurfaceTest.h"
 #include "mafOpMML3Test.h"
 #include "mafOpExtractGeometryTest.h"
-#include "mafOpImporterDicomOffisTest.h"
-#include "mafDicomCardiacMRIHelperTest.h"
+//#include "mafOpImporterDicomOffisTest.h"
 #include "itkRawMotionImporterUtilityTest.h"
 #include "mafOpMakeVMETimevaryingTest.h"
 #include "mafOpEqualizeHistogramTest.h"
@@ -123,7 +122,7 @@
 #include "mafOpExporterAnalogWSTest.h"
 #include "mafOpExporterGRFWSTest.h"
 #include "mafOpExporterLandmarkWSTest.h"
-#include "mafDicomSliceTest.h"
+//#include "mafDicomSliceTest.h"
 #include "mafOpImporterC3DTest.h"
 #include "mafOpImporterMotionDataTest.h"
 #include "mafOpFillHolesTest.h"
@@ -287,8 +286,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpSplitSurfaceTest::suite());
 	runner.addTest(mafOpMML3Test::suite());
 	runner.addTest(mafOpExtractGeometryTest::suite());
-	runner.addTest(mafOpImporterDicomOffisTest::suite());
-	runner.addTest(mafDicomCardiacMRIHelperTest::suite());
+	//runner.addTest(mafOpImporterDicomOffisTest::suite());
 	runner.addTest(mafItkRawMotionImporterUtilityTest::suite());
 	runner.addTest(mafOpMakeVMETimevaryingTest::suite());
 	runner.addTest(mafOpEqualizeHistogramTest::suite());
@@ -304,7 +302,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpExporterAnalogWSTest::suite());
 	runner.addTest(mafOpExporterGRFWSTest::suite());
 	runner.addTest(mafOpExporterLandmarkWSTest::suite());
-	runner.addTest(mafDicomSliceTest::suite());
+	//runner.addTest(mafDicomSliceTest::suite());
 	runner.addTest(mafOpImporterC3DTest::suite());
 	runner.addTest(mafOpImporterMotionDataTest::suite());
 	runner.addTest(mafOpFillHolesTest::suite());
