@@ -115,7 +115,7 @@ public:
   virtual bool IsAnimated();
   
   /** return an xpm-icon that can be used to represent this node */
-  //static char ** GetIcon();
+  static char ** GetIcon();
 
   /**Get/Set the kind of measure  performed: distance between points (POINT) or
   distance between a point and a line. */
