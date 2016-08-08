@@ -111,7 +111,7 @@ mafDevice *mafDeviceManager::AddDevice(const char *type, bool persistent)
 
     
     mafInteractionFactory *iFactory = mafInteractionFactory::GetInstance();
-    const char *dev_name=iFactory->GetDeviceDescription(type);
+    const char *dev_name=iFactory->GetDeviceTypeName(type);
     assert(dev_name);
 
     mafString base_name=dev_name;

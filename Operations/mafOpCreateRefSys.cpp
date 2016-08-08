@@ -72,7 +72,7 @@ void mafOpCreateRefSys::OpRun()
 //----------------------------------------------------------------------------
 {
   mafNEW(m_RefSys);
-  m_RefSys->SetName("RefSys");
+  m_RefSys->SetName("Reference System");
   m_Output = m_RefSys;
   mafEventMacro(mafEvent(this,OP_RUN_OK));
 }

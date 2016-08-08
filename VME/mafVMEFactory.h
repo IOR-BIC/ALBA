@@ -28,8 +28,8 @@ class mafVME;
 
 
 /** to be used internally for plugging default nodes --- calls a member function directly */
-#define mafPlugVMEMacro(vme_type,descr) \
-  RegisterNewVME(vme_type::GetStaticTypeName(), descr, vme_type::NewObject); \
+#define mafPlugVMEMacro(vme_type,typeName) \
+  RegisterNewVME(vme_type::GetStaticTypeName(), typeName, vme_type::NewObject); \
   if (mafPictureFactory::GetPicsInitialized()) \
   mafPictureFactory::GetPictureFactory()->AddVmePic(vme_type::GetStaticTypeName(),vme_type::GetIcon());
 
@@ -55,7 +55,7 @@ public:
 
 	/**
 	This function can be used by Application code to register new Objects's to the mflCoreFactory */
-	void RegisterNewVME(const char* node_name, const char* description, mafCreateObjectFunction createFunction);
+	void RegisterNewVME(const char* node_name, const char* typeName, mafCreateObjectFunction createFunction);
 
 	/** return list of names for nodes plugged into this factory */
 	static std::vector<std::string> &GetNodeNames();// {return m_NodeNames;}
@@ -87,20 +87,20 @@ template <class T>
 class mafPlugVME
 {
 public:
-	mafPlugVME(const char *description);
+	mafPlugVME(const char *typeName);
 
 };
 
 //------------------------------------------------------------------------------
 /** Plug a new Node class into the Node factory.*/
 template <class T>
-mafPlugVME<T>::mafPlugVME(const char *description)
+mafPlugVME<T>::mafPlugVME(const char *typeName)
 //------------------------------------------------------------------------------
 {
 	mafVMEFactory *factory = mafVMEFactory::GetInstance();
 	if (factory)
 	{
-		factory->RegisterNewVME(T::GetStaticTypeName(), description, T::NewObject);
+		factory->RegisterNewVME(T::GetStaticTypeName(), typeName, T::NewObject);
 		// here plug node's icon inside picture factory
 		if (mafPictureFactory::GetPicsInitialized())
 			mafPictureFactory::GetPictureFactory()->AddVmePic(T::GetStaticTypeName(), T::GetIcon());
@@ -112,11 +112,11 @@ template <class T>
 class mafPlugAttribute
 {
 public:
-	mafPlugAttribute(const char *description) \
+	mafPlugAttribute(const char *typeName) \
 	{ \
 		mafVMEFactory *factory = mafVMEFactory::GetInstance(); \
 		if (factory) \
-			factory->RegisterNewObject(T::GetStaticTypeName(), description, T::NewObject); \
+			factory->RegisterNewObject(T::GetStaticTypeName(), typeName, T::NewObject); \
 	}
 };
 
