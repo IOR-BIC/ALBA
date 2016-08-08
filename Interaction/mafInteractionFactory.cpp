@@ -136,7 +136,7 @@ void mafInteractionFactory::RegisterNewAvatar(const char* node_name, const char*
 }
 
 //------------------------------------------------------------------------------
-const char *mafInteractionFactory::GetDeviceDescription(const char *device_name)
+const char *mafInteractionFactory::GetDeviceTypeName(const char *device_name)
 //------------------------------------------------------------------------------
 {
   // check if that device exists
@@ -145,7 +145,7 @@ const char *mafInteractionFactory::GetDeviceDescription(const char *device_name)
     mmuOverRideMap::iterator pos = m_OverrideMap->find(device_name);
     if ( pos != m_OverrideMap->end() )
     {
-      return (*pos).second.m_Description.c_str();
+      return (*pos).second.m_TypeName.c_str();
     }
   }
   
@@ -162,7 +162,7 @@ const char *mafInteractionFactory::GetAvatarDescription(const char *avatar_name)
     mmuOverRideMap::iterator pos = m_OverrideMap->find(avatar_name);
     if ( pos != m_OverrideMap->end() )
     {
-      return (*pos).second.m_Description.c_str();
+      return (*pos).second.m_TypeName.c_str();
     }
   }
 

@@ -426,7 +426,7 @@ void mafInteractionFactoryTest::TestGetDeviceDescription()
 
   mafDevice *device = mafInteractionFactory::CreateDeviceInstance("mafDeviceCustom");
 
-  const char *description = interaction_factory->GetDeviceDescription("mafDeviceCustom");
+  const char *description = interaction_factory->GetDeviceTypeName("mafDeviceCustom");
   CPPUNIT_ASSERT(stricmp(description, "a custom device") == 0);
 
   // cleanup factory products

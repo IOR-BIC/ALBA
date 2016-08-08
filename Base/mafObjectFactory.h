@@ -26,8 +26,8 @@
 #include <string>
 
 /** to be used internally for plugging default objects --- calls a member function directly */
-#define mafPlugObjectMacro(node_type,descr) \
-  RegisterNewObject(node_type::GetStaticTypeName(), descr, node_type::NewObject);
+#define mafPlugObjectMacro(node_type,typeName) \
+  RegisterNewObject(node_type::GetStaticTypeName(), typeName, node_type::NewObject);
 
 typedef mafObject* (*mafCreateObjectFunction)();
 
@@ -100,8 +100,8 @@ public:
   /** Return a list of the names of classes that override classes. */
   virtual std::list<std::string> GetClassOverrideWithNames();
 
-  /** Return a list of descriptions for class overrides. */
-  virtual std::list<std::string> GetClassOverrideDescriptions();
+  /** Return a list of typeName for class overrides. */
+  virtual std::list<std::string> GetClassOverrideTypeNames();
 
   /** Return a list of enable flags. */
   virtual std::list<bool> GetEnableFlags();
@@ -124,18 +124,18 @@ public:
   /** This returns the path to a dynamically loaded factory. */
   const char* GetLibraryPath();
 
-	/** Returns the Object Description */
-	std::string GetObjectDescription(const char* classname);
+	/** Returns the Object Type Name */
+	std::string GetObjectTypeName(const char* classname);
 
 
   /**
     This function can be used by Application code to register new Objects's to the mafCoreFactory */
-  void RegisterNewObject(const char* ObjectName, const char* description, mafCreateObjectFunction createFunction,mafReferenceCounted *args=NULL);
+  void RegisterNewObject(const char* ObjectName, const char* typeName, mafCreateObjectFunction createFunction,mafReferenceCounted *args=NULL);
 
   /** Register object creation information with the factory. */
   void RegisterOverride(const char* classOverride,
       const char* overrideClassName,
-      const char* description,
+      const char* typeName,
       bool enableFlag,
       mafCreateObjectFunction createFunction,
       mafReferenceCounted *args=NULL);
@@ -147,7 +147,7 @@ public:
     Internal implementation class for mafObjectFactory. */
   struct mmuOverrideInformation
   {
-    std::string m_Description;
+    std::string m_TypeName;
     std::string m_OverrideWithName;
     bool m_EnabledFlag;
     mafCreateObjectFunction m_CreateObject;

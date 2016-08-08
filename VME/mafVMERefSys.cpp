@@ -348,24 +348,24 @@ mafGUI* mafVMERefSys::CreateGui()
   m_Gui->SetListener(this);
   m_Gui->Divider();
 
-  m_Gui->Double(ID_SCALE_FACTOR,_("scale"),&m_ScaleFactor);
+  m_Gui->Double(ID_SCALE_FACTOR,_("Scale"),&m_ScaleFactor);
   m_Gui->Divider();
 
 	wxString choises[3]={"Normal (free to move)","Select Origin","Select Plane"};
 	m_Gui->Radio(ID_RADIO,"",&m_Modality,3,choises);
 
 	mafVME *origin_vme = GetOriginVME();
-  m_OriginVmeName = origin_vme ? origin_vme->GetName() : _("none");
-  m_Gui->Button(ID_REF_SYS_ORIGIN,&m_OriginVmeName,_("Origin"), _("Select the vme originABSPosition for the ref sys"));
+  m_OriginVmeName = origin_vme ? origin_vme->GetName() : _("None");
+  m_Gui->Button(ID_REF_SYS_ORIGIN,&m_OriginVmeName,_("Origin"), _("Select the vme origin ABS position for the reference system"));
 	m_Gui->Enable(ID_REF_SYS_ORIGIN,origin_vme!=NULL);
 
   mafVME *point1_vme = GetPoint1VME();
-  m_Point1VmeName = point1_vme ? point1_vme->GetName() : _("none");
+  m_Point1VmeName = point1_vme ? point1_vme->GetName() : _("None");
   m_Gui->Button(ID_POINT1,&m_Point1VmeName,_("Point 1"), _("Select the Point 1"));
 	m_Gui->Enable(ID_POINT1,point1_vme!=NULL);
 
   mafVME *point2_vme = GetPoint2VME();
-  m_Point2VmeName = point2_vme ? point2_vme->GetName() : _("none");
+  m_Point2VmeName = point2_vme ? point2_vme->GetName() : _("None");
   m_Gui->Button(ID_POINT2,&m_Point2VmeName,_("Point 2"), _("Select the Point 2"));
 	m_Gui->Enable(ID_POINT2,point2_vme!=NULL);
 	

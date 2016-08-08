@@ -664,7 +664,7 @@ public:
 
 protected:
   mafVME(); // to be allocated with New()
-  virtual ~mafVME(); // to be deleted with Delete()
+	virtual ~mafVME(); // to be deleted with Delete()
 
 
 	/** internally used to set the node ID */
@@ -712,6 +712,9 @@ protected:
 
   /** Set the matrix pipe object, i.e. the source of the output matrix. */
   int SetMatrixPipe(mafMatrixPipe *pipe);
+
+	/** Returns typename (human readable) from vme type (class name)*/
+	mafString GetTypeNameFromType(mafString typeName);
 
   /** Set the abs matrix pipe object, i.e. the source of the output abs matrix. */
   void SetAbsMatrixPipe(mafAbsMatrixPipe *pipe);

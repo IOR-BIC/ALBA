@@ -353,7 +353,7 @@ protected:
   void UpdateMeasureUnit();
 
   /** Enable/Disable menu items when an operation start/end running. */
-  void EnableMenuAndToolbar(bool enable);
+  virtual void EnableMenuAndToolbar(bool enable);
 
   /** Called after FileOpen or Save operation */
   virtual void UpdateFrameTitle();
