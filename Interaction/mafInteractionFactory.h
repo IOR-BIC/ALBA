@@ -70,7 +70,7 @@ public:
   int GetNumberOfDevices();
   
   /** return the comment field of the device object plugged in the factory */
-  const char *GetDeviceDescription(const char *device_name);
+  const char *GetDeviceTypeName(const char *device_name);
   
   /** create an instance of the node give its type name */
   static mafAvatar *CreateAvatarInstance(const char *type_name);

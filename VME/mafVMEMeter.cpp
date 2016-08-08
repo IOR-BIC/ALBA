@@ -553,12 +553,11 @@ void mafVMEMeter::Print(std::ostream& os, const int tabs)
   m.Print(os,indent.GetNextIndent());
 }
 //-------------------------------------------------------------------------
-//char** mafVMEMeter::GetIcon() 
-//-------------------------------------------------------------------------
-//{
-//  #include "mafVMEMeter.xpm"
-//  return mafVMEMeter_xpm;
-//}
+char** mafVMEMeter::GetIcon() 
+{
+ #include "mafVMEMeter.xpm"
+ return mafVMEMeter_xpm;
+}
 //-------------------------------------------------------------------------
 mmaMeter *mafVMEMeter::GetMeterAttributes()
 //-------------------------------------------------------------------------

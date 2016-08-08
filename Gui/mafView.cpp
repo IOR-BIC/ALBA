@@ -141,23 +141,11 @@ mafGUI* mafView::CreateGui()
   buildHelpGui.SetId(GET_BUILD_HELP_GUI);
   mafEventMacro(buildHelpGui);
 
-	char viewTypeName[100];
-	int typeNamePos = 0;
-	for (int i = 7; i < type_name.GetSize(); i++)
-	{
-		if (type_name[i] >= 'A' && type_name[i] <= 'Z')
-		{
-			viewTypeName[typeNamePos] = ' ';
-			typeNamePos++;
-		}
-		viewTypeName[typeNamePos] = type_name[i];
-		typeNamePos++;
-	}
-
+	
 	if (buildHelpGui.GetArg() == true)
-		m_Gui->ButtonAndHelp(ID_PRINT_INFO, ID_HELP, viewTypeName, "Print view debug information");
+		m_Gui->ButtonAndHelp(ID_PRINT_INFO, ID_HELP, m_Label, "Print view debug information");
 	else
-		m_Gui->Button(ID_PRINT_INFO, viewTypeName, "", "Print view debug information");
+		m_Gui->Button(ID_PRINT_INFO, m_Label, "", "Print view debug information");
 
 	m_Gui->Divider(1);
 
