@@ -353,7 +353,7 @@ protected:
   void UpdateMeasureUnit();
 
   /** Enable/Disable menu items when an operation start/end running. */
-  void EnableMenuAndToolbar(bool enable);
+  virtual void EnableMenuAndToolbar();
 
   /** Called after FileOpen or Save operation */
   virtual void UpdateFrameTitle();
@@ -414,6 +414,7 @@ protected:
   mafWizardManager *m_WizardManager;
   bool m_UseWizardManager;
   bool m_WizardRunning;
+	bool m_RunningOperation;
   wxGauge *m_WizardGauge;
   wxStaticText* m_WizardLabel;
   bool m_CancelledBeforeOpStarting;

@@ -29,23 +29,13 @@
 
 #include "mafSceneNode.h"
 #include "mafVMEMesh.h"
-
 #include "mafOpImporterVTK.h"
-
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 #include "vtkMAFAssembly.h"
 
-
-#include "vtkMapper.h"
-#include "vtkJPEGWriter.h"
-#include "vtkJPEGReader.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkImageMathematics.h"
-#include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "mmaMaterial.h"
-
 
 // render window stuff
 #include "vtkRenderer.h"
@@ -54,6 +44,8 @@
 
 #include <iostream>
 #include <fstream>
+#include "vtkActor.h"
+#include "vtkMapper.h"
 
 enum PIPE_MESH_ACTORS
   {
@@ -75,6 +67,14 @@ void mafPipeMeshSlice_BESTest::BeforeTest()
   vtkNEW(m_Renderer);
   vtkNEW(m_RenderWindow);
   vtkNEW(m_RenderWindowInteractor);
+
+	m_Renderer->SetBackground(0.1, 0.1, 0.1);
+
+	m_RenderWindow->AddRenderer(m_Renderer);
+	m_RenderWindow->SetSize(320, 240);
+	m_RenderWindow->SetPosition(400, 0);
+
+	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshSlice_BESTest::AfterTest()
@@ -100,23 +100,6 @@ enum ID_TEST
 void mafPipeMeshSlice_BESTest::TestPipeExecution()
 //----------------------------------------------------------------------------
 {
-
-  ///////////////// render stuff /////////////////////////
-  
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(320, 240);
-  m_RenderWindow->SetPosition(400,0);
-
-  
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
-
-
-
   ////// Create VME (import vtkData) ////////////////////
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
@@ -228,7 +211,8 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution()
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
 		printf("\n Visualization: %s \n", strings[arrayIndex]);
-    CompareImages(ID_TEST_PIPEEXECUTION+arrayIndex);
+
+		COMPARE_IMAGES("TestPipeExecution", ID_TEST_PIPEEXECUTION + arrayIndex);
   }
 
   vtkDEL(actorList);
@@ -242,23 +226,6 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution()
 void mafPipeMeshSlice_BESTest::TestPipeExecution_Wireframe()
 //----------------------------------------------------------------------------
 {
-
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(320, 240);
-  m_RenderWindow->SetPosition(400,0);
-
-
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
-
-
-
   ////// Create VME (import vtkData) ////////////////////
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
@@ -372,7 +339,8 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Wireframe()
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
     printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
-    CompareImages(ID_TEST_PIPEEXECUTION_WIREFRAME+arrayIndex);
+
+		COMPARE_IMAGES("TestPipeExecution_Wireframe", ID_TEST_PIPEEXECUTION_WIREFRAME + arrayIndex);
   }
 
   vtkDEL(actorList);
@@ -387,23 +355,6 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Wireframe()
 void mafPipeMeshSlice_BESTest::TestPipeExecution_WiredActorVisibility()
 //----------------------------------------------------------------------------
 {
-
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(320, 240);
-  m_RenderWindow->SetPosition(400,0);
-
-
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
-
-
-
   ////// Create VME (import vtkData) ////////////////////
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
@@ -420,8 +371,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_WiredActorVisibility()
   mesh->GetMaterial();
   mesh->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
   mesh->Update();
-
-
+	
   double center[3];
   mesh->GetOutput()->GetVTKData()->GetCenter(center);
 
@@ -518,7 +468,8 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_WiredActorVisibility()
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
     printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
-    CompareImages(ID_TEST_PIPEEXECUTION_WIRED_ACTOR_VISIBILITY+arrayIndex);
+
+		COMPARE_IMAGES("TestPipeExecution_WiredActorVisibility", ID_TEST_PIPEEXECUTION_WIRED_ACTOR_VISIBILITY + arrayIndex);
   }
 
   vtkDEL(actorList);
@@ -533,23 +484,6 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_WiredActorVisibility()
 void mafPipeMeshSlice_BESTest::TestPipeExecution_FlipNormal()
 //----------------------------------------------------------------------------
 {
-
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(320, 240);
-  m_RenderWindow->SetPosition(400,0);
-
-
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
-
-
-
   ////// Create VME (import vtkData) ////////////////////
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
@@ -566,8 +500,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_FlipNormal()
   mesh->GetMaterial();
   mesh->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
   mesh->Update();
-
-
+	
   double center[3];
   mesh->GetOutput()->GetVTKData()->GetCenter(center);
 
@@ -664,7 +597,8 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_FlipNormal()
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
     printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
-    CompareImages(ID_TEST_PIPEEXECUTION_FLIP_NORMAL+arrayIndex);
+
+    COMPARE_IMAGES("TestPipeExecution_FlipNormal", ID_TEST_PIPEEXECUTION_FLIP_NORMAL+arrayIndex);
   }
 
   vtkDEL(actorList);
@@ -679,23 +613,6 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_FlipNormal()
 void mafPipeMeshSlice_BESTest::TestPipeExecution_UseVTKProperty()
 //----------------------------------------------------------------------------
 {
-
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(320, 240);
-  m_RenderWindow->SetPosition(400,0);
-
-
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
-
-
-
   ////// Create VME (import vtkData) ////////////////////
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
@@ -712,15 +629,13 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_UseVTKProperty()
   mesh->GetMaterial();
   mesh->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
   mesh->Update();
-
-
+	
 	//Setting standard material to avoid random color selection
 	mesh->GetMaterial()->m_Diffuse[0]=0.3;
 	mesh->GetMaterial()->m_Diffuse[1]=0.6;
 	mesh->GetMaterial()->m_Diffuse[2]=0.9;
 	mesh->GetMaterial()->UpdateProp();
-
-
+	
   double center[3];
   mesh->GetOutput()->GetVTKData()->GetCenter(center);
 
@@ -817,7 +732,8 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_UseVTKProperty()
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
     printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
-    CompareImages(ID_TEST_PIPEEXECUTION_USE_VTK_PROPERTY+arrayIndex);
+
+		COMPARE_IMAGES("TestPipeExecution_UseVTKProperty", ID_TEST_PIPEEXECUTION_USE_VTK_PROPERTY + arrayIndex);
   }
 
   vtkDEL(actorList);
@@ -826,29 +742,11 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_UseVTKProperty()
 
   cppDEL(Importer);
   mafDEL(storage);
-
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshSlice_BESTest::TestPipeExecution_Thickness_PickActor()
 //----------------------------------------------------------------------------
 {
-
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(320, 240);
-  m_RenderWindow->SetPosition(400,0);
-
-
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
-
-
-
   ////// Create VME (import vtkData) ////////////////////
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
@@ -865,8 +763,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Thickness_PickActor()
   mesh->GetMaterial();
   mesh->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
   mesh->Update();
-
-
+	
   double center[3];
   mesh->GetOutput()->GetVTKData()->GetCenter(center);
 
@@ -968,7 +865,8 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Thickness_PickActor()
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
     printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
-    CompareImages(ID_TEST_PIPEEXECUTION_THICKNESS+arrayIndex);
+
+		COMPARE_IMAGES("TestPipeExecution_Thickness_PickActor", ID_TEST_PIPEEXECUTION_THICKNESS + arrayIndex);
   }
 
   vtkDEL(actorList);
@@ -978,130 +876,16 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Thickness_PickActor()
   cppDEL(Importer);
   mafDEL(storage);
 }
-//----------------------------------------------------------------------------
-void mafPipeMeshSlice_BESTest::CompareImages(int scalarIndex)
-//----------------------------------------------------------------------------
-{
-  char *file = __FILE__;
-  std::string name(file);
-  int slashIndex =  name.find_last_of('\\');
 
-  name = name.substr(slashIndex+1);
-
-  int pointIndex =  name.find_last_of('.');
-
-  name = name.substr(0, pointIndex);
-
-
-  mafString controlOriginFile=MAF_DATA_ROOT;
-  controlOriginFile<<"/FEM/pipemesh/";
-  controlOriginFile<<name.c_str();
-  controlOriginFile<<"_";
-  controlOriginFile<<"image";
-  controlOriginFile<<scalarIndex;
-  controlOriginFile<<".jpg";
-
-  fstream controlStream;
-  controlStream.open(controlOriginFile.GetCStr()); 
-
-  // visualization control
-  m_RenderWindow->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i;
-  vtkNEW(w2i);
-  w2i->SetInput(m_RenderWindow);
-  //w2i->SetMagnification(magnification);
-  w2i->Update();
-  m_RenderWindow->OffScreenRenderingOff();
-
-  //write comparing image
-  vtkJPEGWriter *w;
-  vtkNEW(w);
-  w->SetInput(w2i->GetOutput());
-  mafString imageFile=MAF_DATA_ROOT;
-
-  if(!controlStream)
-  {
-    imageFile<<"/FEM/pipemesh/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"image";
-  }
-  else
-  {
-    imageFile<<"/FEM/pipemesh/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"comp";
-  }
-
-  imageFile<<scalarIndex;
-  imageFile<<".jpg";
-  w->SetFileName(imageFile.GetCStr());
-  w->Write();
-
-  if(!controlStream)
-  {
-    controlStream.close();
-    vtkDEL(w);
-    vtkDEL(w2i);
-    return;
-  }
-  controlStream.close();
-
-  //read original Image
-  vtkJPEGReader *rO;
-  vtkNEW(rO);
-  mafString imageFileOrig=MAF_DATA_ROOT;
-  imageFileOrig<<"/FEM/pipemesh/";
-  imageFileOrig<<name.c_str();
-  imageFileOrig<<"_";
-  imageFileOrig<<"image";
-  imageFileOrig<<scalarIndex;
-  imageFileOrig<<".jpg";
-  rO->SetFileName(imageFileOrig.GetCStr());
-  rO->Update();
-
-  vtkImageData *imDataOrig = rO->GetOutput();
-
-  //read compared image
-  vtkJPEGReader *rC;
-  vtkNEW(rC);
-  rC->SetFileName(imageFile.GetCStr());
-  rC->Update();
-
-  vtkImageData *imDataComp = rC->GetOutput();
-
-
-  vtkImageMathematics *imageMath = vtkImageMathematics::New();
-  imageMath->SetInput1(imDataOrig);
-  imageMath->SetInput2(imDataComp);
-  imageMath->SetOperationToSubtract();
-  imageMath->Update();
-
-  double srR[2] = {-1,1};
-  imageMath->GetOutput()->GetPointData()->GetScalars()->GetRange(srR);
-
-  CPPUNIT_ASSERT(srR[0] == 0.0 && srR[1] == 0.0);
-
-  // end visualization control
-  vtkDEL(rO);
-  vtkDEL(rC);
-  vtkDEL(imageMath);
-
-  vtkDEL(w);
-  vtkDEL(w2i);
-}
 //----------------------------------------------------------------------------
 void mafPipeMeshSlice_BESTest::ProceduralControl(double controlRangeMapper[2],vtkProp *propToControl)
 //----------------------------------------------------------------------------
 {
   //procedural control
-
   double sr[2];
   ((vtkActor* )propToControl)->GetMapper()->GetScalarRange(sr);
   CPPUNIT_ASSERT(sr[0] == controlRangeMapper[0] && sr[1] == controlRangeMapper[1] || 1);
   //end procedural control
-
 }
 //----------------------------------------------------------------------------
 vtkProp *mafPipeMeshSlice_BESTest::SelectActorToControl(vtkPropCollection *propList, int index)

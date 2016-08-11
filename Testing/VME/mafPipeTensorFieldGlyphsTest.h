@@ -19,8 +19,6 @@
 
 #include "mafTest.h"
 
-class vtkRenderWindow;
-class vtkRenderer;
 class vtkRenderWindowInteractor;
 
 class mafPipeTensorFieldGlyphsTest : public mafTest
@@ -38,15 +36,10 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
 protected:
-  /**Compare an already saved image (control image) with renderized image from render window
-  */
-  void CompareImage();
 
   void TestFixture();
   void TestCreate();
 
-  vtkRenderer *m_Renderer;
-  vtkRenderWindow *m_RenderWindow;
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
 };
 

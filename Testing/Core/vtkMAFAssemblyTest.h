@@ -19,9 +19,6 @@
 
 #include "mafTest.h"
 
-class vtkRenderer;
-class vtkRenderWindow;
-
 class vtkMAFAssemblyTest : public mafTest
 {
 public:
@@ -65,10 +62,6 @@ protected:
   void BuildPathsTest(); //?
 
   void PrepareToRender(vtkRenderer *renderer, vtkRenderWindow *render_window);
-  void CompareImages(vtkRenderWindow * renwin, int indexTest);
 };
-
-
-
 
 #endif // #ifndef __CPP_UNIT_vtkMAFAssemblyTest_H__

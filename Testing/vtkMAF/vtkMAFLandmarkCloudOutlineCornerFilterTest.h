@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafAvatar3DConeTest
- Authors: Alberto Losi
+ Module: vtkMAFLandmarkCloudOutlineCornerFilterTest
+ Authors: Nicola Vanella
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -14,33 +14,25 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_mafAvatar3DConeTest_H__
-#define __CPP_UNIT_mafAvatar3DConeTest_H__
+#ifndef __CPP_UNIT_vtkMAFLandmarkCloudOutlineCornerFilterTEST_H__
+#define __CPP_UNIT_vtkMAFLandmarkCloudOutlineCornerFilterTEST_H__
 
 #include "mafTest.h"
 
-class mafAvatar3DConeTest : public mafTest
+class vtkMAFLandmarkCloudOutlineCornerFilterTest : public mafTest
 {
   public:
-  
-    /** Executed before each test */
-    void BeforeTest();
 
-    /** Executed after each test */
-    void AfterTest();
-
-    CPPUNIT_TEST_SUITE( mafAvatar3DConeTest );
-    
-    CPPUNIT_TEST(TestFixture);
-    CPPUNIT_TEST(TestConstructorDestructor);   
-    CPPUNIT_TEST(TestPick);
-
+    CPPUNIT_TEST_SUITE(vtkMAFLandmarkCloudOutlineCornerFilterTest);
+    CPPUNIT_TEST(TestInput);
+    CPPUNIT_TEST(TestGetSet);
+    CPPUNIT_TEST(TestBounds);
     CPPUNIT_TEST_SUITE_END();
-    
+
   protected:
-    void TestFixture();
-    void TestConstructorDestructor();
-    void TestPick();
+    void TestInput();
+    void TestGetSet();
+    void TestBounds();    
 };
 
 #endif

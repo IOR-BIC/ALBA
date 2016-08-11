@@ -68,6 +68,7 @@
 #include "vtkMAFFillingHoleTest.h"
 #include "vtkMAFFixTopologyTest.h"
 #include "vtkWeightedLandmarkTransformTest.h"
+#include "vtkMAFLandmarkCloudOutlineCornerFilterTest.h"
 #include "EdgeTest.h"
 #include "TriangleTest.h"
 #include "CoredPointIndexTest.h"
@@ -108,6 +109,7 @@
 #include "vtkMAFImageFillHolesRemoveIslandsTest.h"
 #include "vtkMAFRayCastCleanerTest.h"
 #include "vtkMAFLineStripSourceTest.h"
+#include "vtkMAFTubeFilterTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -178,6 +180,7 @@ int
 	runner.addTest(vtkMAFFillingHoleTest::suite());
 	runner.addTest(vtkMAFFixTopologyTest::suite());
 	runner.addTest(vtkWeightedLandmarkTransformTest::suite());
+	runner.addTest(vtkMAFLandmarkCloudOutlineCornerFilterTest::suite());
 	runner.addTest(EdgeTest::suite());
 	runner.addTest(TriangleTest::suite());
 	runner.addTest(CoredPointIndexTest::suite());
@@ -218,14 +221,13 @@ int
 	runner.addTest(vtkMAFImageFillHolesRemoveIslandsTest::suite());
 	runner.addTest(vtkMAFRayCastCleanerTest::suite());
 	runner.addTest(vtkMAFLineStripSourceTest::suite());
-
+	runner.addTest(vtkMAFTubeFilterTest::suite());
 
 	runner.run( controller );
 
 	// Print test in a compiler compatible format.
 	CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
 	outputter.write(); 
-
 	return result.wasSuccessful() ? 0 : 1;
 }
 

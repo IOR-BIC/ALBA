@@ -14,7 +14,6 @@
 
 =========================================================================*/
 
-
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
@@ -30,26 +29,15 @@
 #include "vtkXRayVolumeMapper.h"
 #include "vtkVolume.h"
 #include "vtkVolumeProperty.h"
-
-
 #include "vtkMapper.h"
-#include "vtkJPEGWriter.h"
-#include "vtkJPEGReader.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkImageMathematics.h"
-#include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkDataSetReader.h"
 #include "mafString.h"
 
 // render window stuff
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
-
 #include <iostream>
-
 
 //----------------------------------------------------------------------------
 void vtkXRayVolumeMapperTest::TestFixture()
@@ -63,6 +51,13 @@ void vtkXRayVolumeMapperTest::BeforeTest()
   vtkNEW(m_Renderer);
   vtkNEW(m_RenderWindow);
   vtkNEW(m_RenderWindowInteractor);
+
+	m_Renderer->SetBackground(0.1, 0.1, 0.1);
+	m_RenderWindow->AddRenderer(m_Renderer);
+	m_RenderWindow->SetSize(320, 240);
+	m_RenderWindow->SetPosition(400, 0);
+
+	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
 //----------------------------------------------------------------------------
 void vtkXRayVolumeMapperTest::AfterTest()
@@ -76,18 +71,6 @@ void vtkXRayVolumeMapperTest::AfterTest()
 void vtkXRayVolumeMapperTest::TestPipeExecution()
 //----------------------------------------------------------------------------
 {
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(320, 240);
-  m_RenderWindow->SetPosition(400,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
-
-
   ////// import vtkData ////////////////////
   vtkDataSetReader *Importer;
   vtkNEW(Importer);
@@ -101,8 +84,7 @@ void vtkXRayVolumeMapperTest::TestPipeExecution()
   //volumeProperty->SetColor(m_ColorTransferFunction);
   volumeProperty->SetInterpolationTypeToLinear();
 
-
-  vtkXRayVolumeMapper *volumeMapper;
+	  vtkXRayVolumeMapper *volumeMapper;
   vtkNEW(volumeMapper);
   volumeMapper->SetInput(vtkImageData::SafeDownCast(Importer->GetOutput()));
 
@@ -117,7 +99,8 @@ void vtkXRayVolumeMapperTest::TestPipeExecution()
 
   m_Renderer->AddVolume(volume);
   m_RenderWindow->Render();
-  CompareImages(ID_TEST_PIPE_EXECUTION);
+
+	COMPARE_IMAGES("TestPipeExecution");
 
   vtkDEL(volumeProperty);
   vtkDEL(volume);
@@ -136,25 +119,12 @@ void vtkXRayVolumeMapperTest::Test_SetInput_GetInput()
 	volumeMapper->SetInput(image);
 	CPPUNIT_ASSERT(image == volumeMapper->GetInput());
 	vtkDEL(image);
-	vtkDEL(volumeMapper);
-	
+	vtkDEL(volumeMapper);	
 }
 //----------------------------------------------------------------------------
 void vtkXRayVolumeMapperTest::TestReduceColorReduction()
 //----------------------------------------------------------------------------
 {
-	///////////////// render stuff /////////////////////////
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400,0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-	///////////// end render stuff /////////////////////////
-
-
 	////// import vtkData ////////////////////
 	vtkDataSetReader *Importer;
 	vtkNEW(Importer);
@@ -167,8 +137,7 @@ void vtkXRayVolumeMapperTest::TestReduceColorReduction()
 	vtkNEW(volumeProperty);  
 	//volumeProperty->SetColor(m_ColorTransferFunction);
 	volumeProperty->SetInterpolationTypeToLinear();
-
-
+	
 	vtkXRayVolumeMapper *volumeMapper;
 	vtkNEW(volumeMapper);
 	volumeMapper->SetInput(vtkImageData::SafeDownCast(Importer->GetOutput()));
@@ -187,8 +156,9 @@ void vtkXRayVolumeMapperTest::TestReduceColorReduction()
 
 	m_Renderer->AddVolume(volume);
 	m_RenderWindow->Render();
-	CompareImages(ID_TEST_REDUCE_COLOR_REDUCTION);
 
+	COMPARE_IMAGES("TestReduceColorReduction");
+	
 	vtkDEL(volumeProperty);
 	vtkDEL(volume);
 	vtkDEL(volumeMapper);
@@ -198,18 +168,6 @@ void vtkXRayVolumeMapperTest::TestReduceColorReduction()
 void vtkXRayVolumeMapperTest::TestExposureCorrection()
 //----------------------------------------------------------------------------
 {
-	///////////////// render stuff /////////////////////////
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400,0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-	///////////// end render stuff /////////////////////////
-
-
 	////// import vtkData ////////////////////
 	vtkDataSetReader *Importer;
 	vtkNEW(Importer);
@@ -222,8 +180,7 @@ void vtkXRayVolumeMapperTest::TestExposureCorrection()
 	vtkNEW(volumeProperty);  
 	//volumeProperty->SetColor(m_ColorTransferFunction);
 	volumeProperty->SetInterpolationTypeToLinear();
-
-
+	
 	vtkXRayVolumeMapper *volumeMapper;
 	vtkNEW(volumeMapper);
 	volumeMapper->SetInput(vtkImageData::SafeDownCast(Importer->GetOutput()));
@@ -245,7 +202,8 @@ void vtkXRayVolumeMapperTest::TestExposureCorrection()
 
 	m_Renderer->AddVolume(volume);
 	m_RenderWindow->Render();
-	CompareImages(ID_TEST_EXPOSURE_CORRECTION);
+	
+	COMPARE_IMAGES("TestExposureCorrection");
 
 	vtkDEL(volumeProperty);
 	vtkDEL(volume);
@@ -257,18 +215,6 @@ void vtkXRayVolumeMapperTest::TestExposureCorrection()
 void vtkXRayVolumeMapperTest::TestGamma()
 //----------------------------------------------------------------------------
 {
-	///////////////// render stuff /////////////////////////
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400,0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-	///////////// end render stuff /////////////////////////
-
-
 	////// import vtkData ////////////////////
 	vtkDataSetReader *Importer;
 	vtkNEW(Importer);
@@ -281,8 +227,7 @@ void vtkXRayVolumeMapperTest::TestGamma()
 	vtkNEW(volumeProperty);  
 	//volumeProperty->SetColor(m_ColorTransferFunction);
 	volumeProperty->SetInterpolationTypeToLinear();
-
-
+	
 	vtkXRayVolumeMapper *volumeMapper;
 	vtkNEW(volumeMapper);
 	volumeMapper->SetInput(vtkImageData::SafeDownCast(Importer->GetOutput()));
@@ -301,7 +246,8 @@ void vtkXRayVolumeMapperTest::TestGamma()
 
 	m_Renderer->AddVolume(volume);
 	m_RenderWindow->Render();
-	CompareImages(ID_TEST_GAMMA);
+
+	COMPARE_IMAGES("TestGamma");
 
 	vtkDEL(volumeProperty);
 	vtkDEL(volume);
@@ -312,18 +258,6 @@ void vtkXRayVolumeMapperTest::TestGamma()
 void vtkXRayVolumeMapperTest::TestPerspectiveCorrection()
 //----------------------------------------------------------------------------
 {
-	///////////////// render stuff /////////////////////////
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400,0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-	///////////// end render stuff /////////////////////////
-
-
 	////// import vtkData ////////////////////
 	vtkDataSetReader *Importer;
 	vtkNEW(Importer);
@@ -336,13 +270,11 @@ void vtkXRayVolumeMapperTest::TestPerspectiveCorrection()
 	vtkNEW(volumeProperty);  
 	//volumeProperty->SetColor(m_ColorTransferFunction);
 	volumeProperty->SetInterpolationTypeToLinear();
-
-
+	
 	vtkXRayVolumeMapper *volumeMapper;
 	vtkNEW(volumeMapper);
 	volumeMapper->SetInput(vtkImageData::SafeDownCast(Importer->GetOutput()));
-
-
+	
 	volumeMapper->PerspectiveCorrectionOn();
 	CPPUNIT_ASSERT(volumeMapper->GetPerspectiveCorrection() == TRUE);
 
@@ -357,7 +289,8 @@ void vtkXRayVolumeMapperTest::TestPerspectiveCorrection()
 
 	m_Renderer->AddVolume(volume);
 	m_RenderWindow->Render();
-	CompareImages(ID_TEST_PERSPECTIVE_CORRECTION);
+
+	COMPARE_IMAGES("TestPerspectiveCorrection");
 
 	vtkDEL(volumeProperty);
 	vtkDEL(volume);
@@ -368,18 +301,6 @@ void vtkXRayVolumeMapperTest::TestPerspectiveCorrection()
 void vtkXRayVolumeMapperTest::TestColor()
 //----------------------------------------------------------------------------
 {
-	///////////////// render stuff /////////////////////////
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400,0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-	///////////// end render stuff /////////////////////////
-
-
 	////// import vtkData ////////////////////
 	vtkDataSetReader *Importer;
 	vtkNEW(Importer);
@@ -392,8 +313,7 @@ void vtkXRayVolumeMapperTest::TestColor()
 	vtkNEW(volumeProperty);  
 	//volumeProperty->SetColor(m_ColorTransferFunction);
 	volumeProperty->SetInterpolationTypeToLinear();
-
-
+	
 	vtkXRayVolumeMapper *volumeMapper;
 	vtkNEW(volumeMapper);
 	volumeMapper->SetInput(vtkImageData::SafeDownCast(Importer->GetOutput()));
@@ -412,7 +332,8 @@ void vtkXRayVolumeMapperTest::TestColor()
 
 	m_Renderer->AddVolume(volume);
 	m_RenderWindow->Render();
-	CompareImages(ID_TEST_COLOR);
+
+	COMPARE_IMAGES("TestColor");
 
 	vtkDEL(volumeProperty);
 	vtkDEL(volume);
@@ -423,18 +344,6 @@ void vtkXRayVolumeMapperTest::TestColor()
 void vtkXRayVolumeMapperTest::TestEnableAutoLOD()
 //----------------------------------------------------------------------------
 {
-	///////////////// render stuff /////////////////////////
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400,0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-	///////////// end render stuff /////////////////////////
-
-
 	////// import vtkData ////////////////////
 	vtkDataSetReader *Importer;
 	vtkNEW(Importer);
@@ -447,8 +356,7 @@ void vtkXRayVolumeMapperTest::TestEnableAutoLOD()
 	vtkNEW(volumeProperty);  
 	//volumeProperty->SetColor(m_ColorTransferFunction);
 	volumeProperty->SetInterpolationTypeToLinear();
-
-
+	
 	vtkXRayVolumeMapper *volumeMapper;
 	vtkNEW(volumeMapper);
 	volumeMapper->SetInput(vtkImageData::SafeDownCast(Importer->GetOutput()));
@@ -467,7 +375,8 @@ void vtkXRayVolumeMapperTest::TestEnableAutoLOD()
 
 	m_Renderer->AddVolume(volume);
 	m_RenderWindow->Render();
-	CompareImages(ID_TEST_ENABLE_AUTOLOAD);
+
+	COMPARE_IMAGES("TestEnableAutoLOD");
 
 	vtkDEL(volumeProperty);
 	vtkDEL(volume);
@@ -478,18 +387,6 @@ void vtkXRayVolumeMapperTest::TestEnableAutoLOD()
 void vtkXRayVolumeMapperTest::TestDataValid()
 //----------------------------------------------------------------------------
 {
-	///////////////// render stuff /////////////////////////
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400,0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-	///////////// end render stuff /////////////////////////
-
-
 	////// import vtkData ////////////////////
 	vtkDataSetReader *Importer;
 	vtkNEW(Importer);
@@ -502,8 +399,7 @@ void vtkXRayVolumeMapperTest::TestDataValid()
 	vtkNEW(volumeProperty);  
 	//volumeProperty->SetColor(m_ColorTransferFunction);
 	volumeProperty->SetInterpolationTypeToLinear();
-
-
+	
 	vtkXRayVolumeMapper *volumeMapper;
 	vtkNEW(volumeMapper);
 	volumeMapper->SetInput(vtkImageData::SafeDownCast(Importer->GetOutput()));
@@ -520,7 +416,6 @@ void vtkXRayVolumeMapperTest::TestDataValid()
 	m_Renderer->AddVolume(volume);
 	m_RenderWindow->Render();
 	
-
 	CPPUNIT_ASSERT(volumeMapper->IsDataValid());
 
 	vtkDEL(volumeProperty);
@@ -532,18 +427,6 @@ void vtkXRayVolumeMapperTest::TestDataValid()
 void vtkXRayVolumeMapperTest::TestTextureMemoryAndPercentage()
 //----------------------------------------------------------------------------
 {
-	///////////////// render stuff /////////////////////////
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400,0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-	///////////// end render stuff /////////////////////////
-
-
 	////// import vtkData ////////////////////
 	vtkDataSetReader *Importer;
 	vtkNEW(Importer);
@@ -582,118 +465,7 @@ void vtkXRayVolumeMapperTest::TestTextureMemoryAndPercentage()
 	vtkDEL(volumeMapper);
 	vtkDEL(Importer);
 }
-//----------------------------------------------------------------------------
-void vtkXRayVolumeMapperTest::CompareImages(int scalarIndex)
-//----------------------------------------------------------------------------
-{
-  char *file = __FILE__;
-  std::string name(file);
-  int slashIndex =  name.find_last_of('\\');
 
-  name = name.substr(slashIndex+1);
-
-  int pointIndex =  name.find_last_of('.');
-  name = name.substr(0, pointIndex);
-
-  mafString controlOriginFile=MAF_DATA_ROOT;
-  controlOriginFile<<"/Test_vtkXRayVolumeMapper/";
-  controlOriginFile<<name.c_str();
-  controlOriginFile<<"_";
-  controlOriginFile<<"image";
-  controlOriginFile<<scalarIndex;
-  controlOriginFile<<".jpg";
-
-  fstream controlStream;
-  controlStream.open(controlOriginFile.GetCStr()); 
-
-  // visualization control
-	m_RenderWindow->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i;
-  vtkNEW(w2i);
-  w2i->SetInput(m_RenderWindow);
-  //w2i->SetMagnification(magnification);
-  w2i->Update();
-	m_RenderWindow->OffScreenRenderingOff();
-
-  //write comparing image
-  vtkJPEGWriter *w;
-  vtkNEW(w);
-  w->SetInput(w2i->GetOutput());
-  mafString imageFile=MAF_DATA_ROOT;
-
-  if(!controlStream)
-  {
-    imageFile<<"/Test_vtkXRayVolumeMapper/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"image";
-  }
-  else
-  {
-    imageFile<<"/Test_vtkXRayVolumeMapper/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"comp";
-  }
-  
-  imageFile<<scalarIndex;
-  imageFile<<".jpg";
-  w->SetFileName(imageFile.GetCStr());
-  w->Write();
-
-  if(!controlStream)
-  {
-    controlStream.close();
-    vtkDEL(w);
-    vtkDEL(w2i);
-
-    return;
-  }
-  controlStream.close();
-
-  //read original Image
-  vtkJPEGReader *rO;
-  vtkNEW(rO);
-  mafString imageFileOrig=MAF_DATA_ROOT;
-  imageFileOrig<<"/Test_vtkXRayVolumeMapper/";
-  imageFileOrig<<name.c_str();
-  imageFileOrig<<"_";
-  imageFileOrig<<"image";
-  imageFileOrig<<scalarIndex;
-  imageFileOrig<<".jpg";
-  rO->SetFileName(imageFileOrig.GetCStr());
-  rO->Update();
-
-  vtkImageData *imDataOrig = rO->GetOutput();
-
-  //read compared image
-  vtkJPEGReader *rC;
-  vtkNEW(rC);
-  rC->SetFileName(imageFile.GetCStr());
-  rC->Update();
-
-  vtkImageData *imDataComp = rC->GetOutput();
-
-
-  vtkImageMathematics *imageMath = vtkImageMathematics::New();
-  imageMath->SetInput1(imDataOrig);
-  imageMath->SetInput2(imDataComp);
-  imageMath->SetOperationToSubtract();
-  imageMath->Update();
-
-  double srR[2] = {-1,1};
-  imageMath->GetOutput()->GetPointData()->GetScalars()->GetRange(srR);
-
-  CPPUNIT_ASSERT(srR[0] == 0.0 && srR[1] == 0.0);
-
-  // end visualization control
-  vtkDEL(imageMath);
-  vtkDEL(rC);
-  vtkDEL(rO);
-
-  vtkDEL(w);
-  vtkDEL(w2i);
-}
 //----------------------------------------------------------------------------
 vtkProp *vtkXRayVolumeMapperTest::SelectActorToControl(vtkPropCollection *propList, int index)
 //----------------------------------------------------------------------------

@@ -62,8 +62,8 @@ void mafOpExporterAnalogWSTest::TestWrite()
 {
 	mafOpExporterAnalogWS *Exporter = new mafOpExporterAnalogWS("Exporter");
 	Exporter->TestModeOn();
-	mafString filename=MAF_DATA_ROOT;
-  filename<<"/Test_ExporterAnalogWS/test_Analog.csv";
+	mafString filename= GET_TEST_DATA_DIR();
+  filename<<"/test_Analog.csv";
 	Exporter->SetFileName(filename.GetCStr());
   
   vnl_vector<double> v_time;

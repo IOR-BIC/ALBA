@@ -297,7 +297,6 @@ void mafInteractorPER::OnMouseWheel(mafEventInteraction *e)
 	if (mouse)
 	{
 		vtkRenderer *ren = mouse->GetRenderer();
-		mafView *view = mouse->GetView();
 
 		if (!ren) return; // no renderer no fly to!
 
@@ -311,9 +310,7 @@ void mafInteractorPER::OnMouseWheel(mafEventInteraction *e)
 		cam->Zoom(zoom);
 		
 		ren->ResetCameraClippingRange();
-
-		InvokeEvent(CAMERA_UPDATE, MCH_UP, view);
-		cam->OrthogonalizeViewUp();		
+		ren->GetRenderWindow()->Render();
 	}
 }
 

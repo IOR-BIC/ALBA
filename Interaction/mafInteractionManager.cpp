@@ -914,7 +914,7 @@ int mafInteractionManager::DeviceChooser(wxString &dev_name,wxString &dev_type)
 
     for (int id=0;id<iFactory->GetNumberOfDevices();id++)
     {
-      devices[id]=iFactory->GetDeviceDescription(iFactory->GetDeviceName(id));
+      devices[id]=iFactory->GetDeviceTypeName(iFactory->GetDeviceName(id));
     }
 
     //wxSingleChoiceDialog chooser(m_Dialog,"select a device","Device Chooser",iFactory->GetNumberOfDevices(),devices);
@@ -928,7 +928,7 @@ int mafInteractionManager::DeviceChooser(wxString &dev_name,wxString &dev_type)
       if (index>=0)
       {
         dev_type = iFactory->GetDeviceName(index);
-        dev_name = iFactory->GetDeviceDescription(dev_type);
+        dev_name = iFactory->GetDeviceTypeName(dev_type);
       }
     }
   

@@ -135,54 +135,54 @@ mafVMEFactory::mafVMEFactory()
   mafPlugObjectMacro(mmaApplicationLayout,"Applycation layout attributes");
   mafPlugObjectMacro(mafAttributeTraceability,"Trial event attributes");
   
-  mafPlugVMEMacro(mafVMERoot,"root for VME tree");
-  mafPlugVMEMacro(mafVMEExternalData,"VME used for referencing MAF external data.");
-  mafPlugVMEMacro(mafVMEGroup,"VME used for composing assemblies");
-  mafPlugVMEMacro(mafVMEGeneric,"Generic VME storing VTK datasets");
-  mafPlugVMEMacro(mafVMEImage,"Generic VME storing vtkImageData datasets");
-  mafPlugVMEMacro(mafVMEMesh,"Generic VME storing vtkUnstructuredGrid datasets");
-  mafPlugVMEMacro(mafVMESurface,"Generic VME storing vtkPolyData surfaces datasets");
-  mafPlugVMEMacro(mafVMESurfaceParametric,"Generic VME storing vtkPolyData parametric surfaces");
-  mafPlugVMEMacro(mafVMEVolumeGray,"Generic VME storing vtk volume datasets with one scalar component");
-  mafPlugVMEMacro(mafVMEVolumeRGB,"Generic VME storing vtk volume datasets with 3 RGB scalar components");
-  mafPlugVMEMacro(mafVMEPolyline,"Generic VME storing polyline datasets");
-  mafPlugVMEMacro(mafVMEPolylineSpline,"Generic VME outputting a spline");
-  mafPlugVMEMacro(mafVMEMeter,"Generic VME generating meter");
-  mafPlugVMEMacro(mafVMEInfoText,"Generic VME for text information in gui");
-  mafPlugVMEMacro(mafVMELandmark,"VME representing a marker");
-  mafPlugVMEMacro(mafVMELandmarkCloud,"VME representing a cloud of mafVMELandmark");
-  mafPlugVMEMacro(mafVMEProber,"VME representing a prober");
+  mafPlugVMEMacro(mafVMERoot,"Root");
+  mafPlugVMEMacro(mafVMEExternalData,"External data.");
+  mafPlugVMEMacro(mafVMEGroup,"Group");
+  mafPlugVMEMacro(mafVMEGeneric,"Generic");
+  mafPlugVMEMacro(mafVMEImage,"Image");
+  mafPlugVMEMacro(mafVMEMesh,"Mesh");
+  mafPlugVMEMacro(mafVMESurface,"Surface");
+  mafPlugVMEMacro(mafVMESurfaceParametric,"Parametric Surface");
+  mafPlugVMEMacro(mafVMEVolumeGray,"Volume");
+  mafPlugVMEMacro(mafVMEVolumeRGB,"Volume RGB");
+  mafPlugVMEMacro(mafVMEPolyline,"Polyline");
+  mafPlugVMEMacro(mafVMEPolylineSpline,"Spline");
+	mafPlugVMEMacro(mafVMEMeter, "Meter");
+  mafPlugVMEMacro(mafVMEInfoText,"Text");
+  mafPlugVMEMacro(mafVMELandmark,"Landmark");
+  mafPlugVMEMacro(mafVMELandmarkCloud,"Landmark Cloud");
+  mafPlugVMEMacro(mafVMEProber,"Prober");
   //mafPlugVMEMacro(mafVMEGizmo,"VME representing a tool");
-  mafPlugVMEMacro(mafVMEPointSet,"VME representing a set of points");
-  mafPlugVMEMacro(mafVMERefSys,"VME representing a reference system");
-  mafPlugVMEMacro(mafVMEScalar,"VME representing time varying scalar values");
+  mafPlugVMEMacro(mafVMEPointSet,"Point set");
+  mafPlugVMEMacro(mafVMERefSys,"Reference System");
+  mafPlugVMEMacro(mafVMEScalar,"Scalar");
 #ifdef MAF_USE_ITK
-  mafPlugVMEMacro(mafVMEScalarMatrix,"VME representing time varying scalar values");
+  mafPlugVMEMacro(mafVMEScalarMatrix,"Scalar Matrix");
 #endif
-  mafPlugVMEMacro(mafVMESlicer,"VME representing a slice of a volume");
-  mafPlugVMEMacro(mafVMEVector,"VME representing aa applyed vector");
+  mafPlugVMEMacro(mafVMESlicer,"Slicer");
+  mafPlugVMEMacro(mafVMEVector,"Vector");
 
 
   //mafPlugObjectMacro(mmaObject,"Object attributes");
   mafPlugObjectMacro(mafAttributeSegmentationVolume,"Segmentation Volume attributes");
 
-  mafPlugVMEMacro(mafVMEWrappedMeter,"Generalized VME Meter with wrapping geometry");
-  mafPlugVMEMacro(mafVMEPolylineGraph,"VME for Graph and Polyline");
-  mafPlugVMEMacro(mafVMEPolylineEditor,"VME for Editing Graph and Polyline");
-  mafPlugVMEMacro(mafVMESurfaceEditor,"VME for Editing Surface");
-  mafPlugVMEMacro(mafVMELabeledVolume,"VME representing a label put on a volume");
+  mafPlugVMEMacro(mafVMEWrappedMeter,"Wrapped Meter");
+  mafPlugVMEMacro(mafVMEPolylineGraph,"Polyline Graph");
+  mafPlugVMEMacro(mafVMEPolylineEditor,"Polyline Editor");
+  mafPlugVMEMacro(mafVMESurfaceEditor,"Surface Editor");
+  mafPlugVMEMacro(mafVMELabeledVolume,"Labeled Volume");
   mafPlugVMEMacro(mafVMEMaps, "VME representing density-distace surface scalars");
-  mafPlugVMEMacro(mafVMESegmentationVolume, "VME for Segmented Volume");
+  mafPlugVMEMacro(mafVMESegmentationVolume, "Segmented Volume");
 
 #ifdef MAF_USE_ITK
-  mafPlugVMEMacro(mafVMERawMotionData,"VME that is a group for RawMotionData");
-  mafPlugVMEMacro(mafVMEAnalog,"VME rapresenting EMG scalar data");
-  mafPlugVMEMacro(mafVMEStent,"VME representing stent structure");
+  mafPlugVMEMacro(mafVMERawMotionData,"Raw Motion Data");
+  mafPlugVMEMacro(mafVMEAnalog,"EMG scalar data");
+  mafPlugVMEMacro(mafVMEStent,"Stent");
 #endif
   //mafPlugVMEMacro(mafVMEthing,"VME representing a thing");
 
   //TODO: to be committed down
-  mafPlugVMEMacro(mafVMEVolumeLarge, "VME storing large volume datasets with one scalar component");
+  mafPlugVMEMacro(mafVMEVolumeLarge, "Volume Large");
 }
 
 //------------------------------------------------------------------------------
@@ -203,7 +203,7 @@ mafVME *mafVMEFactory::CreateVMEInstance(const char *type_name)
   return mafVME::SafeDownCast(Superclass::CreateInstance(type_name));
 }
 //------------------------------------------------------------------------------
-void mafVMEFactory::RegisterNewVME(const char* node_name, const char* description, mafCreateObjectFunction createFunction)
+void mafVMEFactory::RegisterNewVME(const char* node_name, const char* typeName, mafCreateObjectFunction createFunction)
 {
 	std::vector<std::string, std::allocator<std::string> >::const_iterator it = std::find(GetNodeNames().begin(), GetNodeNames().end(), std::string(node_name));
 	if (it != GetNodeNames().end())
@@ -211,7 +211,7 @@ void mafVMEFactory::RegisterNewVME(const char* node_name, const char* descriptio
 		return;
 	}
 	GetNodeNames().push_back(node_name);
-	RegisterNewObject(node_name, description, createFunction);
+	RegisterNewObject(node_name, typeName, createFunction);
 }
 //------------------------------------------------------------------------------
 mafVMEFactory* mafVMEFactory::GetInstance()

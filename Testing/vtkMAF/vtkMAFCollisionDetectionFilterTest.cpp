@@ -28,8 +28,6 @@
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkSphereSource.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
@@ -40,11 +38,6 @@
 #include "vtkPolyDataWriter.h"
 #include "vtkProperty.h"
 #include "vtkTransform.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkImageData.h"
-#include "vtkImageMathematics.h"
-#include "vtkJPEGReader.h"
-#include "vtkJPEGWriter.h"
 #include "vtkPointData.h"
 #include "vtkPolyDataWriter.h"
 #include "vtkDoubleArray.h"
@@ -55,6 +48,30 @@
 #include <time.h>
 
 static int index = 0;
+
+//-------------------------------------------------------------------------
+void vtkMAFCollisionDetectionFilterTest::BeforeTest()
+//-------------------------------------------------------------------------
+{
+	vtkNEW(m_Renderer);
+	vtkNEW(m_RenderWindow);
+	vtkNEW(m_RenderWindowInteractor);
+
+	m_Renderer->SetBackground(0.1, 0.1, 0.1);
+	m_RenderWindow->AddRenderer(m_Renderer);
+	m_RenderWindow->SetSize(320, 240);
+	m_RenderWindow->SetPosition(600, 0);
+	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+}
+//-------------------------------------------------------------------------
+void vtkMAFCollisionDetectionFilterTest::AfterTest()
+//-------------------------------------------------------------------------
+{
+	m_Renderer->RemoveAllProps();
+	vtkDEL(m_Renderer);
+	vtkDEL(m_RenderWindow);
+	vtkDEL(m_RenderWindowInteractor);
+}
 
 //-------------------------------------------------------------------------
 void vtkMAFCollisionDetectionFilterTest::TestDynamicAllocation()
@@ -144,32 +161,11 @@ void vtkMAFCollisionDetectionFilterTest::Test()
   {
     m_Renderer->GetActiveCamera()->Azimuth(-(180.0/steps));
     m_RenderWindow->Render();
-    CompareImages(index,"Test_vtkMAFCollisionDetectionFilter");
+		COMPARE_IMAGES("Test", index);
     index++;
   }
 }
-//-------------------------------------------------------------------------
-void vtkMAFCollisionDetectionFilterTest::BeforeTest()
-//-------------------------------------------------------------------------
-{
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(320, 240);
-  m_RenderWindow->SetPosition(600,0);
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-}
-//-------------------------------------------------------------------------
-void vtkMAFCollisionDetectionFilterTest::AfterTest()
-//-------------------------------------------------------------------------
-{
-  m_Renderer->RemoveAllProps();
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
-}
+
 //-------------------------------------------------------------------------
 void vtkMAFCollisionDetectionFilterTest::Visualize( vtkActor *actor )
 //-------------------------------------------------------------------------
@@ -240,7 +236,7 @@ void vtkMAFCollisionDetectionFilterTest::TestChangingMatrix()
   {
     m_Renderer->GetActiveCamera()->Azimuth(-(180.0/steps));
     m_RenderWindow->Render();
-    CompareImages(index,"Test_vtkMAFCollisionDetectionFilter");
+		COMPARE_IMAGES("TestChangingMatrix", index);
     index++;
   }
 
@@ -266,112 +262,10 @@ void vtkMAFCollisionDetectionFilterTest::TestChangingMatrix()
     {
       m_Renderer->GetActiveCamera()->Azimuth(-(180.0/steps));
       m_RenderWindow->Render();
-      CompareImages(index,"Test_vtkMAFCollisionDetectionFilter");
+			COMPARE_IMAGES("TestChangingMatrix", index);
       index++;
     }
 
     m3->Delete();
   }
-
-}
-//----------------------------------------------------------------------------
-void vtkMAFCollisionDetectionFilterTest::CompareImages(int index , wxString folder)
-//----------------------------------------------------------------------------
-{
-  char *file = __FILE__;
-  std::string name(file);
-  int slashIndex =  name.find_last_of('\\');
-
-  name = name.substr(slashIndex+1);
-
-  int pointIndex =  name.find_last_of('.');
-  name = name.substr(0, pointIndex);
-
-  wxString controlOriginFile=MAF_DATA_ROOT;
-  controlOriginFile << "/";
-  controlOriginFile << folder;
-  controlOriginFile << "/";
-  controlOriginFile << name.c_str();
-  controlOriginFile << "_image";
-  controlOriginFile << index;
-  controlOriginFile << ".jpg";
-
-  fstream controlStream;
-  controlStream.open(controlOriginFile.c_str()); 
-
-  // visualization control
-  m_RenderWindow->OffScreenRenderingOn();
-  vtkMAFSmartPointer<vtkWindowToImageFilter> w2i;
-  w2i->SetInput(m_RenderWindow);
-  //w2i->SetMagnification(magnification);
-  w2i->Update();
-  m_RenderWindow->OffScreenRenderingOff();
-
-  //write comparing image
-  vtkMAFSmartPointer<vtkJPEGWriter> w;
-  w->SetInput(w2i->GetOutput());
-  wxString imageFile=MAF_DATA_ROOT;
-
-  if(!controlStream)
-  {
-    imageFile << "/";
-    imageFile << folder;
-    imageFile << "/";
-    imageFile << name.c_str();
-    imageFile << "_image";
-  }
-  else
-  {
-    imageFile<<"/";
-    imageFile << folder;
-    imageFile << "/";
-    imageFile<<name.c_str();
-    imageFile<<"_comp";
-  }
-
-  imageFile << index;
-  imageFile << ".jpg";
-  w->SetFileName(imageFile.c_str());
-  w->Write();
-
-  if(!controlStream)
-  {
-    controlStream.close();
-
-    return;
-  }
-  controlStream.close();
-
-  //read original Image
-  vtkMAFSmartPointer<vtkJPEGReader> rO;
-  wxString imageFileOrig=MAF_DATA_ROOT;
-  imageFileOrig << "/";
-  imageFileOrig << folder;
-  imageFileOrig << "/";
-  imageFileOrig << name.c_str();
-  imageFileOrig << "_image";
-  imageFileOrig << index;
-  imageFileOrig << ".jpg";
-  rO->SetFileName(imageFileOrig.c_str());
-  rO->Update();
-
-  vtkImageData *imDataOrig = rO->GetOutput();
-
-  //read compared image
-  vtkMAFSmartPointer<vtkJPEGReader> rC;
-  rC->SetFileName(imageFile.c_str());
-  rC->Update();
-
-  vtkImageData *imDataComp = rC->GetOutput();
-
-  vtkMAFSmartPointer<vtkImageMathematics> imageMath;
-  imageMath->SetInput1(imDataOrig);
-  imageMath->SetInput2(imDataComp);
-  imageMath->SetOperationToSubtract();
-  imageMath->Update();
-
-  double srR[2] = {-1,1};
-  imageMath->GetOutput()->GetPointData()->GetScalars()->GetRange(srR);
-
-  CPPUNIT_ASSERT(srR[0] == 0.0 && srR[1] == 0.0);
 }

@@ -20,8 +20,6 @@
 #include "mafTest.h"
 
 class vtkPolyData;
-class vtkRenderer;
-class vtkRenderWindow;
 class vtkRenderWindowInteractor;
 class vtkProp;
 class vtkPropCollection;
@@ -45,15 +43,8 @@ protected:
   void TestFixture();
 	void TestPipeRGBImageExecution();
 	void TestPipeGrayImageExecution();
-	
-  vtkRenderer *m_Renderer;
-  vtkRenderWindow *m_RenderWindow;
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
 
-  /**Compare a list of already saved images (control images) with renderized image from render window
-     @scalarIndex: index X of the image. Original Image is imageX.jpg, created imaged is compX.jpg
-  */
-  void CompareImages(int scalarIndex = 0);
+  vtkRenderWindowInteractor *m_RenderWindowInteractor;
 
   /** Select The Actor that will be controlled*/
   vtkProp *SelectActorToControl(vtkPropCollection* propList, int index);
