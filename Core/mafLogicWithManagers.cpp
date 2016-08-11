@@ -1637,8 +1637,7 @@ void mafLogicWithManagers::OnQuit()
     }
     else 
     {
-      int answer = wxMessageBox(_("quit program ?"), _("Confirm"), wxYES_NO | wxICON_QUESTION , m_Win);
-      m_Quitting = answer == wxYES;
+      m_Quitting = true;
     }
     if(!m_Quitting) 
       return;
