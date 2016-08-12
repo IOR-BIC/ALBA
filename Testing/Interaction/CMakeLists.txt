@@ -69,7 +69,7 @@ SET(PROJECT_SRCS
 	mmiVTKPickerTest.h mmiVTKPickerTest.cpp
 	mmiSelectPointTest.h mmiSelectPointTest.cpp
 	mmiInfoImageTest.h mmiInfoImageTest.cpp
-	#mafInteractorDICOMImporterTest.h mafInteractorDICOMImporterTest.cpp
+	mafInteractorDICOMImporterTest.h mafInteractorDICOMImporterTest.cpp
 	medInteractor2DDistanceTest.h medInteractor2DDistanceTest.cpp
 	medInteractor2DAngleTest.h medInteractor2DAngleTest.cpp
 	medInteractor2DIndicatorTest.h medInteractor2DIndicatorTest.cpp

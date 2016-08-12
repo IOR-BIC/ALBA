@@ -37,7 +37,7 @@ SET(PROJECT_SRCS
 	mafGUISettingsStorageTest.h mafGUISettingsStorageTest.cpp
 	mafAttachCameraTest.h mafAttachCameraTest.cpp
 	mafGUISettingsAdvancedTest.h mafGUISettingsAdvancedTest.cpp
-	#mafGUIDicomSettingsTest.h mafGUIDicomSettingsTest.cpp
+	mafGUIDicomSettingsTest.h mafGUIDicomSettingsTest.cpp
 	mafGUIWizardTest.h mafGUIWizardTest.cpp
 	mafGUIWizardPageTest.h mafGUIWizardPageTest.cpp
 	mafGUILandmarkTest.h mafGUILandmarkTest.cpp

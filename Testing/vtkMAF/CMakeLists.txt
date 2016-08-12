@@ -33,7 +33,7 @@ SET(PROJECT_SRCS
 	vtkMAFProjectSPTest.h vtkMAFProjectSPTest.cpp
 	vtkMAFProjectRGTest.h vtkMAFProjectRGTest.cpp
 	vtkMAFClipSurfaceBoundingBoxTest.h vtkMAFClipSurfaceBoundingBoxTest.cpp
-	#vtkMAFRGSliceAccumulateTest.h vtkMAFRGSliceAccumulateTest.cpp
+	vtkMAFRGSliceAccumulateTest.h vtkMAFRGSliceAccumulateTest.cpp
 	vtkMAFRectilinearGridToRectilinearGridFilterTest.h vtkMAFRectilinearGridToRectilinearGridFilterTest.cpp
 	vtkMAFDummyRectilinearGridToRectilinearGridFilter.h vtkMAFDummyRectilinearGridToRectilinearGridFilter.cpp
 	vtkMAFProfilingActorTest.h vtkMAFProfilingActorTest.cpp

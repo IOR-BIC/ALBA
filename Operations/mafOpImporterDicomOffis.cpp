@@ -96,6 +96,8 @@ enum
 	TYPE_IMAGE,
 };
 
+#define EPSILON 1e-7
+
 //----------------------------------------------------------------------------
 mafOpImporterDicomOffis::mafOpImporterDicomOffis(wxString label):
 mafOp(label)
@@ -138,6 +140,7 @@ mafOp(label)
 	m_TotalDicomRange[0]=0;
 	m_TotalDicomRange[1]=1;
 	m_CurrentImageID = 0;
+	m_CurrentTime = 0;
 	m_ShowOrientationPosition = 0;
 	m_SelectedStudy = -1;
 	m_ZCropBounds[0] = 0;
@@ -792,7 +795,7 @@ mafDicomSlice *mafOpImporterDicomOffis::ReadDicomSlice(mafString fileName)
 	}
 			
 	//Create Slice
-	mafDicomSlice *newSlice = new mafDicomSlice(fileName, dcmImagePositionPatient, dcmImageOrientationPatient, dicomSliceVTKImageData, description, date, patientName, birthdate, dcmInstanceNumber, dcmCardiacNumberOfImages, dcmTriggerTime);
+	mafDicomSlice *newSlice = new mafDicomSlice(fileName, dcmImageOrientationPatient, dicomSliceVTKImageData, description, date, patientName, birthdate, dcmInstanceNumber, dcmCardiacNumberOfImages, dcmTriggerTime);
 	newSlice->SetDcmModality(dcmModality);
 	newSlice->SetPhotometricInterpretation(photometricInterpretation);
 	newSlice->SetSeriesID(dcmSeriesInstanceUID);
@@ -970,7 +973,7 @@ int mafOpImporterDicomOffis::GetSliceIDInSeries(int timeId, int heigthId)
 {
 	mafDicomSlice *firstDicomListElement;
 	firstDicomListElement = (mafDicomSlice *)m_SelectedSeries->GetSlice(0);
-	int timeFrames =  firstDicomListElement->GetDcmCardiacNumberOfImages()+1;
+	int timeFrames =  firstDicomListElement->GetDcmCardiacNumberOfImages();
 
 	int dicomFilesNumber = m_SelectedSeries->GetSlicesNum();
 	int numSlicesPerTS = dicomFilesNumber / timeFrames;
@@ -1416,9 +1419,9 @@ void mafDicomSeries::AddSlice(mafDicomSlice *slice)
 bool mafDicomSeries::IsRotated(const double dcmImageOrientationPatient[6])
 {
 	// check if the dataset is rotated: => different from 1. 0. 0. 0. 1. 0.
-	return !( fabs(dcmImageOrientationPatient[0] - 1.0) < 0.0001 && fabs(dcmImageOrientationPatient[1]) < 0.0001 &&
-						fabs(dcmImageOrientationPatient[2])				< 0.0001 && fabs(dcmImageOrientationPatient[3]) < 0.0001 &&
-						fabs(dcmImageOrientationPatient[4] - 1.0) < 0.0001 &&	fabs(dcmImageOrientationPatient[5]) < 0.0001 );
+	return !( fabs(dcmImageOrientationPatient[0] - 1.0) < EPSILON && fabs(dcmImageOrientationPatient[1]) < EPSILON &&
+						fabs(dcmImageOrientationPatient[2])				< EPSILON && fabs(dcmImageOrientationPatient[3]) < EPSILON &&
+						fabs(dcmImageOrientationPatient[4] - 1.0) < EPSILON && fabs(dcmImageOrientationPatient[5]) < EPSILON);
 }
 //----------------------------------------------------------------------------
 bool SortSliceCompareFunction(mafDicomSlice *i, mafDicomSlice *j) 

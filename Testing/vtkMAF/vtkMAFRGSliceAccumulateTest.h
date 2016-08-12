@@ -26,7 +26,6 @@ public:
   CPPUNIT_TEST_SUITE( vtkMAFRGSliceAccumulateTest );
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestDynamicAllocation );
-  CPPUNIT_TEST( TestAddSlice );
   CPPUNIT_TEST( TestSetSlice );
   CPPUNIT_TEST_SUITE_END();
 
