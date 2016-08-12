@@ -30,46 +30,16 @@ public:
 
   CPPUNIT_TEST_SUITE( mafGUIDicomSettingsTest );
   CPPUNIT_TEST( TestDynamicAllocation );
-  CPPUNIT_TEST( TestGetDictionary );
-  CPPUNIT_TEST( TestAutoCropPosition );
-  CPPUNIT_TEST( TestEnableNumberOfTime );
-  CPPUNIT_TEST( TestEnableNumberOfSlice );
   CPPUNIT_TEST( TestGetBuildStep );
-  CPPUNIT_TEST( TestEnableChangeSide );
-  CPPUNIT_TEST( TestEnableDiscardPosition );
-  CPPUNIT_TEST( TestEnableResampleVolume );
-  CPPUNIT_TEST( TestEnableRescaleTo16Bit );
-  CPPUNIT_TEST( TestEnableVisualizationPosition );
-  CPPUNIT_TEST( TestEnableZCrop );
-  CPPUNIT_TEST( TestEnableScalarTolerance );
-  CPPUNIT_TEST( TestGetScalarTolerance );
-  CPPUNIT_TEST( TestEnablePercentageTolerance );
-  CPPUNIT_TEST( TestGetPercentageTolerance );
   CPPUNIT_TEST( TestAutoVMEType );
   CPPUNIT_TEST( TestGetVMEType );
-  CPPUNIT_TEST( TestEnableToRead );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestDynamicAllocation();
-  void TestGetDictionary();
-  void TestAutoCropPosition();
-  void TestEnableNumberOfTime();
-  void TestEnableNumberOfSlice();
   void TestGetBuildStep();
-  void TestEnableChangeSide();
-  void TestEnableDiscardPosition();
-  void TestEnableResampleVolume();
-  void TestEnableRescaleTo16Bit();
-  void TestEnableVisualizationPosition();
-  void TestEnableZCrop();
-  void TestEnableScalarTolerance();
-  void TestGetScalarTolerance();
-  void TestEnablePercentageTolerance();
-  void TestGetPercentageTolerance();
   void TestAutoVMEType();
   void TestGetVMEType();
-  void TestEnableToRead();
 
   bool m_Result;
 };
