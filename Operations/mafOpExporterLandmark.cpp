@@ -228,7 +228,7 @@ void mafOpExporterLandmark::ExportLandmark(mafVMELandmarkCloud* cloud)
         lmName = cloud->GetLandmarkName(j);
         //cloud->GetLandmarkPosition(j, pos, t);
         cloud->GetLandmark(j)->GetOutput()->GetAbsPose(pos,ori,t);
-        f_Out << lmName << ",\t" << pos[0] << ",\t" << pos[1] << ",\t" << pos[2] <<",\n";
+        f_Out << lmName << ",\t" << pos[0] << ",\t" << pos[1] << ",\t" << pos[2] <<"\n";
       }
     }
 
