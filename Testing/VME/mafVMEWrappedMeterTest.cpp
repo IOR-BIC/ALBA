@@ -192,6 +192,7 @@ void mafVMEWrappedMeterTest::TestWithGenericLandmark()
 	mafString filename=MAF_DATA_ROOT;
 	filename<<"/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
+	importer->SetTypeSeparation(3);
 	importer->Read();
 	mafVMELandmarkCloud *cloud=(mafVMELandmarkCloud *)importer->GetOutput();
 	cloud->GetLandmark(0)->Update();
@@ -247,6 +248,7 @@ void mafVMEWrappedMeterTest::TestWithGenericLandmarkWithMiddlePoints()
 	mafString filename=MAF_DATA_ROOT;
 	filename<<"/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
+	importer->SetTypeSeparation(3);
 	importer->Read();
 	mafVMELandmarkCloud *cloud=(mafVMELandmarkCloud *)importer->GetOutput();
 	cloud->GetLandmark(0)->Update();
