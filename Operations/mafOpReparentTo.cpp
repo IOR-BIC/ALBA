@@ -31,6 +31,7 @@
 #include "mafSmartPointer.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafAbsMatrixPipe.h"
+#include "mafView.h"
 
 #include "vtkPolyData.h"
 #include "vtkTransform.h"
@@ -117,13 +118,18 @@ void mafOpReparentTo::OpDo()
 {
 	m_OldParent = m_Input->GetParent();
 
+	mafEvent e(this, VIEW_SELECTED);
+	mafEventMacro(e);
+	int showed = e.GetView() && e.GetView()->IsVmeShowed(m_Input);
+	
 	int reparentOK=ReparentTo(m_Input, m_TargetVme, m_OldParent);
 
   if (reparentOK == MAF_OK)
   {
 		mafEventMacro(mafEvent(this, VME_SELECT, m_Input));
-		
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+
+		if(showed)
+	    mafEventMacro(mafEvent(this,VME_SHOW, m_Input, true));
   }
   else
   {
