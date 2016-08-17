@@ -146,11 +146,15 @@ void mafOpExporterLandmarkTest::TestOnLandmarkImporter()
 	mafOpImporterLandmark *importer=new mafOpImporterLandmark("importer");
 	importer->TestModeOn();
 
+	//Import Data
 	mafString filename=MAF_DATA_ROOT;
 	filename<<"/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
+	importer->SetTypeSeparation(3);
 	importer->Read();
 	mafVMELandmarkCloud *node=(mafVMELandmarkCloud *)importer->GetOutput();
+	int numberOfLandmarks = node->GetNumberOfLandmarks();
+
 
 	//Initialize exporter
 	mafOpExporterLandmark *exporter=new mafOpExporterLandmark("test exporter");
@@ -161,69 +165,33 @@ void mafOpExporterLandmarkTest::TestOnLandmarkImporter()
 	exporter->SetFileName(fileExp);
 	exporter->ExportLandmark();
 
+	//Re-import Exported data
+	mafOpImporterLandmark *importer2 = new mafOpImporterLandmark("importer");
+	importer2->TestModeOn();
+	importer2->SetFileName(fileExp);
+	importer2->Read();
+	mafVMELandmarkCloud *node2 = (mafVMELandmarkCloud *)importer2->GetOutput();
+
 	int result = MAF_OK;
-	std::vector<double *> coord;
-	int numberOfLandmarks = ((mafVMELandmarkCloud *)node)->GetNumberOfLandmarks();
+
+	double original[3], exported[3];
 
 	for(int j=0 ; j < numberOfLandmarks; j++)
 	{
-		mafVMELandmark *landmark = ((mafVMELandmark *)((mafVMELandmarkCloud *)node)->GetLandmark(j));
-		double *xyz = new double[3];
-		double rot[3];
-		landmark->GetOutput()->GetPose(xyz , rot , 0);
-		coord.push_back(xyz);
-		coord[coord.size()-1][0] = xyz[0];
-		coord[coord.size()-1][1] = xyz[1];
-		coord[coord.size()-1][2] = xyz[2];
-	}
+		node->GetLandmarkPosition(j, original);
+		node2->GetLandmarkPosition(j, exported);
 
-	char text[10] = "";
-	char name[10];
-
-	double pos1;
-	double pos2;
-	double pos3;
-
-	std::fstream control(fileExp);
-
-	for(int i =0 ; i< 1; i++)
-	{
-		//first line
-		control.getline(text, 10);
-		if(i != 0)
-			control.getline(text, 10);
-
-		for(int j=0 ; j < numberOfLandmarks; j++)  // limited to the the first three landmarks
+		if (fabs(original[0] - exported[0]) > 0.01 || fabs(original[1] - exported[1]) > 0.01 || fabs(original[1] - exported[1]) > 0.01 )
 		{
-			control >> name;
-			control >> pos1;
-			control >> pos2;
-			control >> pos3;
-
-			double dx = coord[i*numberOfLandmarks+j][0];
-			double dy = coord[i*numberOfLandmarks+j][1];
-			double dz = coord[i*numberOfLandmarks+j][2];
-			if(fabs(dx - pos1)<0.01 && fabs(dy - pos2)<0.01 && fabs(dz - pos3)<0.01);
-			else
-			{
-				result = -1;
-			} 
+			result = MAF_ERROR;
 		}
 	}
+
 	CPPUNIT_ASSERT(result == MAF_OK);
-
-	for(int i=0; i< coord.size(); i++)
-	{
-		delete coord[i];
-	}
-
-	control.close();
-	coord.clear();
 
 	delete exporter;
 	delete importer;
-	exporter = NULL;
-	importer = NULL;
+	delete importer2;
 }
 
 //------------------------------------------------------------------------
@@ -238,6 +206,7 @@ void mafOpExporterLandmarkTest::TestMultipleExports()
 
 	mafString filename=MAF_DATA_ROOT;
 	filename<<"/RAW_MAL/cloud_to_be_imported";
+	importer->SetTypeSeparation(3);
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
 	mafVMELandmarkCloud *node=(mafVMELandmarkCloud *)importer->GetOutput();
@@ -250,7 +219,9 @@ void mafOpExporterLandmarkTest::TestMultipleExports()
 	mafString filename2=MAF_DATA_ROOT;
 	filename2<<"/RAW_MAL/cloud_NOT_TAGGED";
 	importer2->SetFileName(filename2.GetCStr());
-	importer2->ReadWithoutTag();
+	importer2->SetTypeSeparation(1);
+	importer2->SetOnlyCoordinates(true);
+	importer2->Read();
 	mafVMELandmarkCloud *node2=(mafVMELandmarkCloud *)importer2->GetOutput();
   node2->SetName("cloud_NOT_TAGGED");
   
@@ -279,73 +250,39 @@ void mafOpExporterLandmarkTest::TestMultipleExports()
   exporter->SetDirName(fileExp);
 	exporter->OpRun();
   
-  // Test second LC
+  // Test only for second LMC
 	fileExp=MAF_DATA_ROOT;
 	fileExp<<"/RAW_MAL/LC_SET_";
   fileExp<<node2->GetName();
   fileExp<<".txt";
 
+	//Re-import Exported data
+	mafOpImporterLandmark *importer3 = new mafOpImporterLandmark("importer");
+	importer3->TestModeOn();
+	importer3->SetFileName(fileExp);
+	importer3->Read();
+	mafVMELandmarkCloud *node4 = (mafVMELandmarkCloud *)importer3->GetOutput();
+	int numberOfLandmarks = node4->GetNumberOfLandmarks();
 
 	int result = MAF_OK;
-	std::vector<double *> coord;
-	int numberOfLandmarks = ((mafVMELandmarkCloud *)node2)->GetNumberOfLandmarks();
 
-	for(int j=0 ; j < numberOfLandmarks; j++)
+	double original[3], exported[3];
+
+	for (int j = 0; j < numberOfLandmarks; j++)
 	{
-		mafVMELandmark *landmark = ((mafVMELandmark *)((mafVMELandmarkCloud *)node2)->GetLandmark(j));
-		double *xyz = new double[3];
-		double rot[3];
-		landmark->GetOutput()->GetPose(xyz , rot , 0);
-		coord.push_back(xyz);
-		coord[coord.size()-1][0] = xyz[0];
-		coord[coord.size()-1][1] = xyz[1];
-		coord[coord.size()-1][2] = xyz[2];
-	}
+		node2->GetLandmarkPosition(j, original);
+		node4->GetLandmarkPosition(j, exported);
 
-	char text[10] = "";
-	char name[10];
-
-	double pos1;
-	double pos2;
-	double pos3;
-
-	std::fstream control(fileExp);
-
-	for(int i =0 ; i< 1; i++)
-	{
-		//first line
-		control.getline(text, 10);
-		if(i != 0)
-			control.getline(text, 10);
-
-		for(int j=0 ; j < numberOfLandmarks; j++)  // limited to the the first three landmarks
+		if (fabs(original[0] - exported[0]) > 0.01 || fabs(original[1] - exported[1]) > 0.01 || fabs(original[1] - exported[1]) > 0.01)
 		{
-			control >> name;
-			control >> pos1;
-			control >> pos2;
-			control >> pos3;
-
-			double dx = coord[i*numberOfLandmarks+j][0];
-			double dy = coord[i*numberOfLandmarks+j][1];
-			double dz = coord[i*numberOfLandmarks+j][2];
-			if(fabs(dx - pos1)<0.01 && fabs(dy - pos2)<0.01 && fabs(dz - pos3)<0.01);
-			else
-			{
-				result = -1;
-			} 
+			result = MAF_ERROR;
 		}
 	}
+
 	CPPUNIT_ASSERT(result == MAF_OK);
 
-	for(int i=0; i< coord.size(); i++)
-	{
-		delete coord[i];
-	}
-
-	control.close();
-	coord.clear();
-
-  // Test third LC
+	
+  // Test existence of third LC
   fileExp=MAF_DATA_ROOT;
 	fileExp<<"/RAW_MAL/LC_SET_";
   fileExp<<node3->GetName();
@@ -362,8 +299,7 @@ void mafOpExporterLandmarkTest::TestMultipleExports()
   mafDEL(node3);
   mafDEL(group2);
   mafDEL(group);
+	delete importer;
   delete importer2;
-  importer2 = NULL;
-  delete importer;
-  importer = NULL;
+	delete importer3;
 }

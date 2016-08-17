@@ -151,7 +151,7 @@ bool mafVMELandmark::CanReparentTo(mafVME *parent)
 {
   if (mafVMELandmarkCloud *vlmc = mafVMELandmarkCloud::SafeDownCast(parent))
   {  
-    if ( vlmc->FindLandmarkIndex(this->GetName())<0  )
+    if ( vlmc->GetLandmarkIndex(this->GetName())<0  )
       return true;
   }
   else if (parent == NULL)
@@ -167,7 +167,7 @@ void mafVMELandmark::SetName(const char *name)
 {
 	mafVMELandmarkCloud *parent = mafVMELandmarkCloud::SafeDownCast(this->GetParent());
 	
-	if (!m_Name.Equals(name) && parent && parent->FindLandmarkIndex(name) >= 0)
+	if (!m_Name.Equals(name) && parent && parent->GetLandmarkIndex(name) >= 0)
 	{
 		mafWarningMessageMacro("There is already a landmatk with this name in the cloud\nOld name will be restored");
 		Superclass::SetName(GetName());

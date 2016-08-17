@@ -65,7 +65,10 @@ std::string mafGetOpenFile(const char *initial, const char * wild, const char * 
 //----------------------------------------------------------------------------
 {
   wxString path, name, ext;
-  wxSplitPath(initial,&path,&name,&ext);
+	if (wxDirExists(initial))
+		path = initial;
+	else
+	  wxSplitPath(initial,&path,&name,&ext);
 
   if(name != "" && ext != "") name = wxString::Format("%s.%s",name.c_str(),ext.c_str());
 
