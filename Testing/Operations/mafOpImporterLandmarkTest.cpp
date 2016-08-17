@@ -45,13 +45,14 @@ void mafOpImporterLandmarkTest::Test()
 	mafString filename=MAF_DATA_ROOT;
   filename<<"/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
+	importer->SetTypeSeparation(3);
 	importer->Read();
 	mafVMELandmarkCloud *node=(mafVMELandmarkCloud *)importer->GetOutput();
 
   CPPUNIT_ASSERT(node->GetNumberOfLandmarks() == 38);
 
-  double xyz[3], rot[3];
-  node->GetLandmark(19)->GetOutput()->GetPose(xyz,rot,0);
+  double xyz[3];
+	node->GetLandmarkPosition(19, xyz);
 
   
   double x = -21.5165;	
@@ -73,6 +74,7 @@ void mafOpImporterLandmarkTest::TestTimeVariant()
 	mafString filename=MAF_DATA_ROOT;
   filename<<"/RAW_MAL/Export.txt";
 	importer->SetFileName(filename.GetCStr());
+	importer->SetTypeSeparation(3);
 	importer->Read();
 	mafVMELandmarkCloud *node=(mafVMELandmarkCloud *)importer->GetOutput();
 
@@ -105,7 +107,9 @@ void mafOpImporterLandmarkTest::TestUnTag()
 	mafString filename=MAF_DATA_ROOT;
   filename<<"/RAW_MAL/cloud_NOT_TAGGED";
 	importer->SetFileName(filename.GetCStr());
-	importer->ReadWithoutTag();
+	importer->SetTypeSeparation(1);
+	importer->SetOnlyCoordinates(true);
+	importer->Read();
 	mafVMELandmarkCloud *node=(mafVMELandmarkCloud *)importer->GetOutput();
 
   CPPUNIT_ASSERT(node->GetNumberOfLandmarks() == 30);

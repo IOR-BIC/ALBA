@@ -214,7 +214,7 @@ void mafOpExporterLandmark::ExportLandmark(mafVMELandmarkCloud* cloud)
     mafString lmName = "";
     double pos[3] = {0.0,0.0,0.0};
     double ori[3] = {0.0,0.0,0.0};
-    double t;
+    double t=0;
     for (unsigned int i = 0; i < timeStamps.size(); i++)
     {
 			if (timeStamps.size() > 1)

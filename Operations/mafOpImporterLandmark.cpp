@@ -48,7 +48,7 @@ mafOpImporterLandmark::mafOpImporterLandmark(wxString label) : mafOp(label)
   m_TypeSeparation = 0;
 	
 	m_VmeCloud		= NULL;
-	m_CoordOnly = false;
+	m_OnlyCoordinates = false;
 }
 //----------------------------------------------------------------------------
 mafOpImporterLandmark::~mafOpImporterLandmark( ) 
@@ -64,7 +64,7 @@ mafOp* mafOpImporterLandmark::Copy()
 	cp->m_Listener = m_Listener;
 	cp->m_Next = NULL;
 
-	cp->m_CoordOnly = m_CoordOnly;
+	cp->m_OnlyCoordinates = m_OnlyCoordinates;
 	cp->m_VmeCloud = m_VmeCloud;
   cp->m_TypeSeparation = m_TypeSeparation;
 	return cp;
@@ -90,7 +90,7 @@ void mafOpImporterLandmark::OpRun()
 			wxString choices[4] = { _("Comma"),_("Space"),_("Semicolon"),_("Tab") };
       m_Gui->Radio(ID_TYPE_SEPARATION,"Separator",&m_TypeSeparation,4,choices,1,"");   
       m_Gui->Divider();
-      m_Gui->Bool(ID_TYPE_FILE,"Coordinates only",&m_CoordOnly,true,"Check if the format is \"x y z\"");
+      m_Gui->Bool(ID_TYPE_FILE,"Coordinates only",&m_OnlyCoordinates,true,"Check if the format is \"x y z\"");
 			m_Gui->Divider();
 			m_Gui->Label("");
 			m_Gui->Divider(1);
@@ -256,7 +256,7 @@ void mafOpImporterLandmark::ConvertLine(char *line, int count, char separator, w
 {
 	wxString str = wxString(line);
 
-	if (m_CoordOnly)
+	if (m_OnlyCoordinates)
 	{
 		name = "LM ";
 		name << count;
