@@ -122,7 +122,7 @@
 #include "mafOpExporterAnalogWSTest.h"
 #include "mafOpExporterGRFWSTest.h"
 #include "mafOpExporterLandmarkWSTest.h"
-//#include "mafDicomSliceTest.h"
+#include "mafDicomClassesTest.h"
 #include "mafOpImporterC3DTest.h"
 #include "mafOpImporterMotionDataTest.h"
 #include "mafOpFillHolesTest.h"
@@ -302,7 +302,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpExporterAnalogWSTest::suite());
 	runner.addTest(mafOpExporterGRFWSTest::suite());
 	runner.addTest(mafOpExporterLandmarkWSTest::suite());
-	//runner.addTest(mafDicomSliceTest::suite());
+	runner.addTest(mafDicomClassesTest::suite());
 	runner.addTest(mafOpImporterC3DTest::suite());
 	runner.addTest(mafOpImporterMotionDataTest::suite());
 	runner.addTest(mafOpFillHolesTest::suite());
