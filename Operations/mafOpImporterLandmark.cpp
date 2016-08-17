@@ -41,57 +41,45 @@
 const bool DEBUG_MODE = true;
 
 //----------------------------------------------------------------------------
-mafOpImporterLandmark::mafOpImporterLandmark(wxString label) :
-mafOp(label)
-//----------------------------------------------------------------------------
+mafOpImporterLandmark::mafOpImporterLandmark(wxString label) : mafOp(label)
 {
 	m_OpType	= OPTYPE_IMPORTER;
 	m_Canundo	= false;
-	m_File		= "";
-	m_FileDir = mafGetLastUserFolder().c_str();
   m_TypeSeparation = 0;
-  m_EnableString = 0;
-  m_StringSeparation = mafString("");
 	
 	m_VmeCloud		= NULL;
-	m_TagFileFlag = false;
+	m_CoordOnly = false;
 }
 //----------------------------------------------------------------------------
 mafOpImporterLandmark::~mafOpImporterLandmark( ) 
-//----------------------------------------------------------------------------
 {
   mafDEL(m_VmeCloud);
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpImporterLandmark::Copy()   
-/** restituisce una copia di se stesso, serve per metterlo nell'undo stack */
-//----------------------------------------------------------------------------
 {
-	//non devo incrementare l'id counter --- vfc le operazioni sono gia inserite nei menu;
 	mafOpImporterLandmark *cp = new mafOpImporterLandmark(m_Label);
 	cp->m_Canundo = m_Canundo;
 	cp->m_OpType = m_OpType;
 	cp->m_Listener = m_Listener;
 	cp->m_Next = NULL;
 
-	cp->m_File = m_File;
+	cp->m_CoordOnly = m_CoordOnly;
 	cp->m_VmeCloud = m_VmeCloud;
   cp->m_TypeSeparation = m_TypeSeparation;
-  cp->m_EnableString = m_EnableString;
-  cp->m_StringSeparation = m_StringSeparation;
 	return cp;
 }
 //----------------------------------------------------------------------------
 void mafOpImporterLandmark::OpRun()   
-//----------------------------------------------------------------------------
 {
-  
-	int result = OP_RUN_CANCEL;
+	wxString fileDir;
+	
 	m_File = "";
 	wxString pgd_wildc	= "Landmark (*.*)|*.*";
-	
-  
-	mafString f = mafGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
+
+	fileDir = mafGetLastUserFolder().c_str();
+	  
+	mafString f = mafGetOpenFile(fileDir,pgd_wildc).c_str(); 
 	if(f != "")
 	{
 	  m_File = f;
@@ -99,85 +87,48 @@ void mafOpImporterLandmark::OpRun()
     if (!m_TestMode)
     {
       m_Gui = new mafGUI(this);
-      wxString choices[2] =  {_("Space"),_("Comma")};
-      m_Gui->Radio(ID_TYPE_SEPARATION,"Separation",&m_TypeSeparation,2,choices,1,"");   
-      m_Gui->Bool(ID_ENABLE_STRING,"Other chars",&m_EnableString,1);
+			wxString choices[4] = { _("Comma"),_("Space"),_("Semicolon"),_("Tab") };
+      m_Gui->Radio(ID_TYPE_SEPARATION,"Separator",&m_TypeSeparation,4,choices,1,"");   
       m_Gui->Divider();
-      m_Gui->String(ID_STRING_SEPARATION,"",&m_StringSeparation,"Insert here the right char for separation");
-      m_Gui->Divider();
-      m_Gui->Bool(ID_TYPE_FILE,"Tagged file",&m_TagFileFlag,0,"Check if the format is NAME x y z");
-      m_Gui->Divider();
+      m_Gui->Bool(ID_TYPE_FILE,"Coordinates only",&m_CoordOnly,true,"Check if the format is \"x y z\"");
+			m_Gui->Divider();
+			m_Gui->Label("");
+			m_Gui->Divider(1);
       m_Gui->OkCancel();
-      m_Gui->Enable(ID_ENABLE_STRING,!m_TagFileFlag);
-      m_Gui->Enable(ID_TYPE_SEPARATION,!m_TagFileFlag && !m_EnableString);
-      m_Gui->Enable(ID_STRING_SEPARATION,!m_TagFileFlag && m_EnableString);
-	    m_Gui->Update();
       ShowGui();
     }
 	}
   else
   {
-    mafEventMacro(mafEvent(this,result));
+    mafEventMacro(mafEvent(this, OP_RUN_CANCEL));
   }
 
 }
 //----------------------------------------------------------------------------
 void mafOpImporterLandmark::	OnEvent(mafEventBase *maf_event) 
-//----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
-    switch(e->GetId())
-    {
-      case wxOK:
-        OpStop(OP_RUN_OK);
-      break;
-      case wxCANCEL:
-        OpStop(OP_RUN_CANCEL);
-      break;
-      case ID_TYPE_FILE:
-        {  
-          if (m_TagFileFlag)
-          {
-            m_TypeSeparation = 0;
-            m_EnableString = 0;
-          }
-          if (!m_TestMode)
-          {
-            m_Gui->Enable(ID_ENABLE_STRING,!m_TagFileFlag);
-            m_Gui->Enable(ID_TYPE_SEPARATION,!m_TagFileFlag && !m_EnableString);
-            m_Gui->Enable(ID_STRING_SEPARATION,!m_TagFileFlag && m_EnableString);
-	          m_Gui->Update();
-          }
-        }
-      break;
-      case ID_ENABLE_STRING:
-        {
-          if (!m_TestMode)
-          {
-            m_Gui->Enable(ID_STRING_SEPARATION,!m_TagFileFlag && m_EnableString);
-            m_Gui->Enable(ID_TYPE_SEPARATION,!m_TagFileFlag && !m_EnableString);
-	          m_Gui->Update();
-          }
-        }
-      break;
-      default:
-        mafEventMacro(*e);
-    }
+		switch (e->GetId())
+		{
+			case wxOK:
+				OpStop(OP_RUN_OK);
+				break;
+			case wxCANCEL:
+				OpStop(OP_RUN_CANCEL);
+				break;
+			case ID_TYPE_FILE:
+			case ID_TYPE_SEPARATION:
+				break;
+			default:
+				mafEventMacro(*e);
+		}
   }
 }
 //----------------------------------------------------------------------------
 void mafOpImporterLandmark::OpDo()   
-//----------------------------------------------------------------------------
 {
-	
-	//modified by Stefano. 18-9-2003
-	wxBusyInfo wait("Please wait, working...");
-
-  if(m_TagFileFlag == false)
-	  ReadWithoutTag();
-  else
-    Read();
+  Read();
 
   wxString path, name, ext;
   wxSplitPath(m_File.c_str(),&path,&name,&ext);
@@ -187,113 +138,110 @@ void mafOpImporterLandmark::OpDo()
 	tag_Nature.SetName("VME_NATURE");
 	tag_Nature.SetValue("NATURAL");
 
-	m_VmeCloud->GetTagArray()->SetTag(tag_Nature); //m_Vme->GetTagArray()->AddTag(tag_Nature);
+	m_VmeCloud->GetTagArray()->SetTag(tag_Nature);
   
 	mafEventMacro(mafEvent(this,VME_ADD,m_VmeCloud));
 }
 //----------------------------------------------------------------------------
 void mafOpImporterLandmark::OpStop(int result)
-//----------------------------------------------------------------------------
 {
 	HideGui();
 	mafEventMacro(mafEvent(this,result));
 }
-/*
-//----------------------------------------------------------------------------
-void mafOpImporterLandmark::OpUndo()   
-
-//----------------------------------------------------------------------------
-{
-	assert(m_Vme);
-	mafEventMacro(mafEvent(this,VME_REMOVE,m_Vme));
-	//m_Vme->Delete(); remove vme from the tree will kill it - we have not referenced it
-	m_Vme = NULL;
-}
-*/
 //----------------------------------------------------------------------------
 void mafOpImporterLandmark::Read()   
-//----------------------------------------------------------------------------
 {
   // need the number of landmarks for the progress bar
   std::ifstream  landmarkNumberPromptFileStream(m_File);
   int numberOfLines = 0;
-  char tmp[200];
+	char line[512], separator;
+	double x = 0, y = 0, z = 0, t = 0;
+	long counter = 0, linesReaded = 0;
+	wxString name;
+
   while(!landmarkNumberPromptFileStream.fail())
   {
-    landmarkNumberPromptFileStream.getline(tmp,200);
-    numberOfLines += 1;
+    landmarkNumberPromptFileStream.getline(line,512);
+    numberOfLines++;
   }
   landmarkNumberPromptFileStream.close();
 
-  if (DEBUG_MODE)
-  {
-    std::ostringstream stringStream;
-    stringStream << "Reading " << numberOfLines << " lines in landmark file" << std::endl;
-    mafLogMessage(stringStream.str().c_str());
-  }
 
 	mafNEW(m_VmeCloud);
-
   if (m_TestMode == true)
   {
 	  m_VmeCloud->TestModeOn();
   }
 
   std::ifstream  landmarkFileStream(m_File);
-  char name[20];
-  char time[6] = "0";
-  char tx[20];
-  char ty[20];
-  char tz[20];
-
-  double x = 0;
-  double y = 0;
-  double z = 0;
-  double t = 0;
-
-  if (!m_TestMode)
-  {
-    wxBusyInfo wait("Reading landmark cloud");
-  }
-
-	mafProgressBarHelper progressHelper(m_Listener);
+ 
+  mafProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
-	progressHelper.InitProgressBar();
-
-  long counter = 0;
+	progressHelper.InitProgressBar("Reading Landmark Cloud");
+	
+	switch (m_TypeSeparation) //_("Comma"),_("Space"),_("Semicolon"),_("Tab")
+	{
+		case 0:
+			separator = ',';
+			break;
+		case 1:
+			separator = ' ';
+			break;
+		case 2:
+			separator = ';';
+		case 3:
+			separator = '\t';
+			break;
+	}
+  
 
   while(!landmarkFileStream.fail())
   {
-    landmarkFileStream >> name;
-    if(name[0] == '#' || mafString(name) == "") 
+		landmarkFileStream.getline(line, 512);
+
+    if(line[0] == '#' || mafString(line) == "") 
     {
-      //jump the comment or the blank line
-      landmarkFileStream.getline(name,20);
+			//skip comments and empty lines
+			linesReaded++;
       continue;
     }
-    else if(mafString(name) == "Time")
+    else if(strncmp(line, "Time",4)==0)
     {
-      landmarkFileStream >> time;
+			char *time = line + 5;
+			t = atof(time);
       counter = 0;
+			linesReaded++;
       continue;
     }
     else
-    {
-      landmarkFileStream >> tx;
-      landmarkFileStream >> ty;
-      landmarkFileStream >> tz;
-      x = atof(tx);
-      y = atof(ty);
-      z = atof(tz);
-      t = atof(time);
-      if(mafString(time) == "0")
-        m_VmeCloud->AppendLandmark(x, y, z, name);
-      m_VmeCloud->SetLandmark(counter,x,y,z,t);
-      if(x == -9999 && y == -9999 && z == -9999 )
-        m_VmeCloud->SetLandmarkVisibility(counter, 0, t);
-      counter++;
+		{      
+			ConvertLine(line, counter, separator, name, x, y, z);
+     
+			if (m_VmeCloud->GetLandmarkIndex(name.c_str()) == -1)
+			{
+				//New Landmark
+				m_VmeCloud->AppendLandmark(x, y, z, name);
+				if (t != 0)
+				{
+					//this landmark is present only 
+					int idx = m_VmeCloud->GetLandmarkIndex(name);
+					m_VmeCloud->SetLandmarkVisibility(idx, false, 0);
+				}
 
-      progressHelper.UpdateProgressBar(counter * 100 / numberOfLines);
+			}
+			else
+			{
+				//Set an existing landmark
+				m_VmeCloud->SetLandmark(name, x, y, z, t);
+			}
+
+			bool visibility = (x == -9999 && y == -9999 && z == -9999);
+			m_VmeCloud->SetLandmarkVisibility(counter, visibility, t);
+      
+			counter++;
+			linesReaded++;
+
+      progressHelper.UpdateProgressBar(linesReaded * 100 / numberOfLines);
     }
   }
   m_VmeCloud->Modified();
@@ -303,112 +251,28 @@ void mafOpImporterLandmark::Read()
 
   m_Output = m_VmeCloud;
 }
-//----------------------------------------------------------------------------
-void mafOpImporterLandmark::ReadWithoutTag()   
-//----------------------------------------------------------------------------
+
+void mafOpImporterLandmark::ConvertLine(char *line, int count, char separator, wxString &name, double &x, double &y, double &z)
 {
-  mafNEW(m_VmeCloud);
-  
-  if (m_TestMode == true)
-  {
-	  m_VmeCloud->TestModeOn();
-  }
+	wxString str = wxString(line);
 
-  // need the number of landmarks for the progress bar
-  std::ifstream  landmarkNumberPromptFileStream(m_File);
-  int numberOfLines = 0;
-  char tmp[200];
-  while(!landmarkNumberPromptFileStream.fail())
-  {
-    landmarkNumberPromptFileStream.getline(tmp,200);
-    numberOfLines += 1;
-  }
-  landmarkNumberPromptFileStream.close();
+	if (m_CoordOnly)
+	{
+		name = "LM ";
+		name << count;
+	}
+	else
+	{
+		name = str.BeforeFirst(separator);
+		str = str.After(separator);
+	}
 
-  if (DEBUG_MODE)
-  {
-    std::ostringstream stringStream;
-    stringStream << "Reading " << numberOfLines - 1  << " landmarks" << std::endl;
-    mafLogMessage(stringStream.str().c_str());
-  }
+	wxString xStr = str.BeforeFirst(separator);
+	str = str.AfterFirst(separator);
+	wxString yStr = str.BeforeFirst(separator);
+	wxString zStr = str.AfterFirst(separator);
 
-  // end  number of lm check
-
-  std::ifstream  landmarkFileStream(m_File);
-
-  double x = 0;
-  double y = 0;
-  double z = 0;
-
-//  char tx[20];
-//  char ty[20];
-//  char tz[20];
-  
-  long counter = 0; 
-
-  bool exception = FALSE;
-  
-  // select right type of character separation
-  wxChar separation_char;
-  if (!m_EnableString)
-  {
-    switch (m_TypeSeparation)
-    {
-    case 0:
-        separation_char = ' ';
-        break;
-    case 1:
-        separation_char = ',';
-        break;
-    }
-  }
-  else
-  {
-    separation_char = m_StringSeparation[0];
-  }
-
-  if (!m_TestMode)
-  {
-    wxBusyInfo wait("Reading landmark cloud");
-  }
-
-	mafProgressBarHelper progressHelper(m_Listener);
-	progressHelper.SetTextMode(m_TestMode);
-	progressHelper.InitProgressBar();
-
-  while(!landmarkFileStream.fail())
-  {
-    landmarkFileStream.getline(tmp,200);
-    if(mafString(tmp) == "") 
-    {
-      // jump the blank line
-      landmarkFileStream.getline(tmp,200);
-      continue;
-    }
-    wxString s = wxString(tmp);
-    wxString t1 = s.BeforeFirst(separation_char);
-    wxString t2 = s.AfterFirst(separation_char);
-    wxString t3 = t2.BeforeFirst(separation_char);
-    wxString t4 = t2.AfterFirst(separation_char);
-
-    t1.ToDouble(&x);
-    t3.ToDouble(&y);
-    t4.ToDouble(&z);
-
-    // todo: optimize this append
-    m_VmeCloud->AppendLandmark(x, y, z, mafString(counter));
-    if(x == -9999 && y == -9999 && z == -9999 )
-      m_VmeCloud->SetLandmarkVisibility(counter, 0, 0);
-    
-    counter++;
-
-    progressHelper.UpdateProgressBar(counter * 100 / numberOfLines);
-  }
-
-  m_VmeCloud->Modified();
-  m_VmeCloud->ReparentTo(m_Input);
-
-  landmarkFileStream.close();
-
-  m_Output = m_VmeCloud;
+	xStr.ToDouble(&x);
+	yStr.ToDouble(&y);
+	zStr.ToDouble(&z);
 }

@@ -76,13 +76,9 @@ public:
   */
   void Read();
 
-  /** Read the file.
-  the format of the file admits some speficics.
-  The line with landmark pose can be with any type of char separation (provided it has been selected by the user)
-  */
-  void ReadWithoutTag();
+	void ConvertLine(char *line, int count, char separator, wxString &name, double &x, double &y, double &z);
 
-  /** Set the filename for the file to import */
+	/** Set the filename for the file to import */
   void SetFileName(const char *file_name){m_File = file_name;};
 
 
@@ -95,19 +91,15 @@ protected:
   {
     ID_TYPE_FILE = MINID,
     ID_TYPE_SEPARATION,
-    ID_ENABLE_STRING,
-    ID_STRING_SEPARATION,
     MINID,
   };
 
   int m_TypeSeparation;
-  int m_EnableString;
-  mafString m_StringSeparation;
+  
 
-  wxString m_FileDir;
-	wxString m_File;
 	mafVMELandmarkCloud  *m_VmeCloud;
-  int m_TagFileFlag;
+	wxString m_File;
+  int m_CoordOnly;
 
 };
 #endif

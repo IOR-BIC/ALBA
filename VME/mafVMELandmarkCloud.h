@@ -87,14 +87,14 @@ public:
   
   /** Set/Get a landmark. In case the specified idx is invalid return MAF_ERROR*/
   int SetLandmark(int idx,double x,double y,double z,mafTimeStamp t=0);
-	int SetLandmark(const char *name, double x, double y, double z, mafTimeStamp t = 0) { return this->SetLandmark(this->FindLandmarkIndex(name), x, y, z, t); }
+	int SetLandmark(const char *name, double x, double y, double z, mafTimeStamp t = 0) { return this->SetLandmark(this->GetLandmarkIndex(name), x, y, z, t); }
 	int SetLandmark(mafVMELandmark *lm, double x, double y, double z, mafTimeStamp t = 0) { return this->SetLandmark(this->GetLandmarkIndex(lm), x, y, z, t); }
 
 	//int SetLandmarkForTimeFrame(int idx,double x,double y,double z,unsigned long tid,mafTimeStamp t);
   int GetLandmark(int idx, double &x,double &y,double &z,mafTimeStamp t=0);
-  int GetLandmark(const char *name, double &x,double &y,double &z,mafTimeStamp t=0) {return this->GetLandmark(this->FindLandmarkIndex(name),x,y,z,t);} 
+  int GetLandmark(const char *name, double &x,double &y,double &z,mafTimeStamp t=0) {return this->GetLandmark(this->GetLandmarkIndex(name),x,y,z,t);} 
   int GetLandmark(int idx, double xyz[3],mafTimeStamp t=0);
-  int GetLandmark(const char *name, double xyz[3],mafTimeStamp t=0) {return this->GetLandmark(this->FindLandmarkIndex(name), xyz,t);}
+  int GetLandmark(const char *name, double xyz[3],mafTimeStamp t=0) {return this->GetLandmark(this->GetLandmarkIndex(name), xyz,t);}
 
   /** Find the index of a landmark given its name.*/
   mafVMELandmark *GetLandmark(const char *name);
@@ -105,12 +105,14 @@ public:
 	/** Get index for specified LM*/
 	int GetLandmarkIndex(mafVMELandmark *lm);
 
+	/** Find the index of a landmark given its name*/
+	int GetLandmarkIndex(const char *name);
+
+
   /** Return the position of the landmark number 'idx' at the timestamp t.*/
   void GetLandmarkPosition(int idx, double pos[3], mafTimeStamp t=-1);
 
-  /** Find the index of a landmark given its name*/
-  int FindLandmarkIndex(const char *name);
-
+  
   /** Remove a landmark. In case the id is invalid return MAF_ERROR
   BEWARE: landmark is removed from all the VME-items*/
   int RemoveLandmark(int idx);
@@ -153,9 +155,9 @@ public:
   for the visibility at that time. On the other hand, if visibility is defined
   for some time a position is implicitly defined for that time stamp.*/
   virtual int SetLandmarkVisibility(int idx,bool a,mafTimeStamp t=0);
-  int SetLandmarkVisibility(const char *name,bool a,mafTimeStamp t=0) {return this->SetLandmarkVisibility(this->FindLandmarkIndex(name),a,t);}
+  int SetLandmarkVisibility(const char *name,bool a,mafTimeStamp t=0) {return this->SetLandmarkVisibility(this->GetLandmarkIndex(name),a,t);}
   virtual bool GetLandmarkVisibility(int idx,mafTimeStamp t=0);
-  bool GetLandmarkVisibility(const char *name,mafTimeStamp t=0) {return this->GetLandmarkVisibility(this->FindLandmarkIndex(name),t);}
+  bool GetLandmarkVisibility(const char *name,mafTimeStamp t=0) {return this->GetLandmarkVisibility(this->GetLandmarkIndex(name),t);}
 
   /**
   Set/Get the default visibility attribute. When default visibility is set to true, the creation 
