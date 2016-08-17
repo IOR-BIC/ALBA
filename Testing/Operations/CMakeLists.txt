@@ -110,7 +110,7 @@ SET(PROJECT_SRCS
 	mafOpExporterAnalogWSTest.h mafOpExporterAnalogWSTest.cpp
 	mafOpExporterGRFWSTest.h mafOpExporterGRFWSTest.cpp
 	mafOpExporterLandmarkWSTest.h mafOpExporterLandmarkWSTest.cpp
-	#mafDicomSliceTest.h mafDicomSliceTest.cpp
+	mafDicomClassesTest.h mafDicomClassesTest.cpp
 	mafOpImporterC3DTest.h mafOpImporterC3DTest.cpp
 	mafOpImporterMotionDataTest.h mafOpImporterMotionDataTest.cpp
 	mafOpFillHolesTest.h mafOpFillHolesTest.cpp
