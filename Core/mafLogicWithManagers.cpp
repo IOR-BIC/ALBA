@@ -1837,12 +1837,27 @@ void mafLogicWithManagers::ShowLandmark(mafVMELandmark * lm, bool visibility)
 	if (!lmParent)
 		return;
 	
+	mafPipe *lmPipe = NULL;
 	//show of lm shows also the lmc
 	//hide of last lm hides also the lmc
 	if (visibility || (!visibility && lmParent->GetLandmarkShowNumber() == 0))
 	{
-		mafPipe* lmPipe = m_ViewManager->GetSelectedView() ? m_ViewManager->GetSelectedView()->GetNodePipe(lmParent) : NULL;
-		
+		mafView * selectedView = m_ViewManager->GetSelectedView();
+		if (mafViewCompound *compView = mafViewCompound::SafeDownCast(selectedView))
+		{
+			for (int i = 0; i < compView->GetNumberOfSubView(); i++)
+			{
+				lmPipe = compView->GetSubView(i)->GetNodePipe(lmParent);
+				if(lmPipe)
+					break;
+			}
+		}
+		else if(selectedView)
+		{
+			lmPipe = selectedView->GetNodePipe(lmParent);
+		}
+
+				
 		//if the lmc is not show and we want to show a lm we show only this landmark
 		if (!lmPipe && visibility)
 			lmParent->ShowAllLandmarks(false);

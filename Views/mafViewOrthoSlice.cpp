@@ -494,7 +494,6 @@ void mafViewOrthoSlice::PackageView()
       m_Views[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurface",MUTEX);
 			m_Views[v]->PlugVisualPipe("medVMEMuscleWrapper", "mafPipeSurface",MUTEX);
     }
-		
   }
   PlugChildView(m_Views[PERSPECTIVE_VIEW]);
   PlugChildView(m_Views[ZN_VIEW]);
