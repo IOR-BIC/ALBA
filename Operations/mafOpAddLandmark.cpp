@@ -223,6 +223,8 @@ void mafOpAddLandmark::OpRun()
 	// Set Landmarks color 
 	SetMaterialRGBA(material, 1.0, 0.1, 0.1, 0.8);
 
+	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+
 	LoadLandmarksFromVME();
 
 	if (!GetTestMode())
