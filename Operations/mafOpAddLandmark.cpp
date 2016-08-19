@@ -379,8 +379,8 @@ void mafOpAddLandmark::OnEvent(mafEventBase *maf_event)
 			case VME_PICKED:
 			{
 				pts = vtkPoints::SafeDownCast(e->GetVtkObj());
-
-				if (pts)
+				mafVME *pickedVME = e->GetVme();
+				if (pts && pickedVME!=m_Cloud)
 				{
 					pts->GetPoint(0, m_LandmarkPosition);
 

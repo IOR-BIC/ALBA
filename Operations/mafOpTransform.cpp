@@ -54,6 +54,8 @@
 
 #include "mmaMaterial.h"
 
+#define EPSILON 1e-9
+
 //----------------------------------------------------------------------------
 // widget id's
 enum TRANSFORMTEXTENTRIES_ID
@@ -298,7 +300,7 @@ void mafOpTransform::CreateGui()
 	//---------------------------------
 
 	m_Gui->Label("Choose Ref sys", true);
-	wxString available_sysRef[6] = { "Absolute", "VME base ref sys", "VME local centroid", "Relative", "Relative centroid", "Arbitrary" };
+	wxString available_sysRef[6] = { "Absolute", "VME base Reference System", "VME local centroid", "Relative", "Relative centroid", "Arbitrary" };
 	m_Gui->Combo(ID_SELECT_REF_SYS_COMBO, "", &m_RefSystemMode, 6, available_sysRef);
 
 	m_Gui->Label("Ref sys:", &m_RefSysVMEName, false);
@@ -642,7 +644,7 @@ void mafOpTransform::OnEventTransformTextEntries(mafEventBase *maf_event)
 	tran->SetPosition(m_Position);
 
 	// Premultiply to ref sys abs matrix
-	tran->Concatenate(m_RefSysVME->GetOutput()->GetAbsTransform(), POST_MULTIPLY);
+	tran->Concatenate(m_RefSysVME->GetOutput()->GetAbsTransform(), PRE_MULTIPLY);
 
 	mafMatrix absPose;
 	absPose = tran->GetMatrix();
@@ -687,20 +689,6 @@ void mafOpTransform::UpdateTransformTextEntries()
 	mafTransform::GetOrientation(mflTr->GetMatrix(), m_Orientation);
 	mafTransform::GetScale(mflTr->GetMatrix(), m_Scaling);
 	
-	//Avoid "-0" show on GUI
-	for (int i = 0; i < 3; i++)
-	{
-		char tmp[100];
-
-		sprintf_s(tmp, "%f", m_Position[i]);
-		if (!strcmp(tmp, "-0.000000"))
-			m_Position[i] = 0.0;
-
-		sprintf_s(tmp, "%f", m_Orientation[i]);
-		if (!strcmp(tmp, "-0.000000"))
-			m_Orientation[i] = 0.0;
-	}
-
 	mafDEL(mflTr);
 
 	if (m_RefSystemMode == REF_BASE)
@@ -708,11 +696,23 @@ void mafOpTransform::UpdateTransformTextEntries()
 		double oldOrientation[3];
 		m_LocalRefSysVME->GetOutput()->GetAbsPose(m_OriginRefSysPosition, oldOrientation, m_CurrentTime);
 	}
-
-	// Update Origin position
-	double originOrientation[3];
-	m_RefSysVME->GetOutput()->GetAbsPose(m_OriginRefSysPosition, originOrientation, m_CurrentTime);
-
+	else
+	{
+		// Update Origin position
+		double originOrientation[3];
+		m_RefSysVME->GetOutput()->GetAbsPose(m_OriginRefSysPosition, originOrientation, m_CurrentTime);
+	}
+	
+	//round values near 0 on GUI
+	for (int i = 0; i < 3; i++)
+	{
+		if (fabs(m_Position[i]) < EPSILON)
+			m_Position[i] = 0.0;
+		if (fabs(m_Orientation[i]) < EPSILON)
+			m_Orientation[i] = 0.0;
+		if (fabs(m_OriginRefSysPosition[i]) < EPSILON)
+			m_OriginRefSysPosition[i] = 0.0;
+	}
 	if (!m_TestMode)
 	{
 		assert(m_Gui);
