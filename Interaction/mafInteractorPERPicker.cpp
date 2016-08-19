@@ -109,7 +109,7 @@ void mafInteractorPERPicker::OnButtonDown(mafEventInteraction *e)
     }
   }
   // Forward the start event to the right behavior
-  if(picked_vme)
+  if(picked_vme && !picked_vme->IsA("mafVMEGizmo"))
   {
 		double mouse_pos[2];
 		e->Get2DPosition(mouse_pos);
@@ -117,6 +117,14 @@ void mafInteractorPERPicker::OnButtonDown(mafEventInteraction *e)
 		//SendPickingInformation(v, NULL, VME_PICKED, &world_pose, false);
 		SendPickingInformation(mouse->GetView(), mouse_pos);
   }
+	else if (picked_bh)
+	{
+		// if a vme with a behavior has been picked... 
+		picked_bh->SetVME(picked_vme);   // set the VME (Marco: to be removed, the operation should set the VME to the interactor!) 
+		picked_bh->SetProp(picked_prop); // set the prop (Marco: to be removed, no access to the vtkProp!!!) 
+		picked_bh->OnEvent(e); // forward the start event to picked behavior
+	}
+
   // if I don't picked a VME or I picked but I cannot select, move the camera.
   else if (tracker && m_CameraBehavior&&(!m_CameraBehavior->IsInteracting()))
   {
@@ -178,6 +186,7 @@ void mafInteractorPERPicker::SendPickingInformation(mafView *v, double *mouse_po
 				mafEvent pick_event(this, msg_id, p);
 				pick_event.SetDouble(scalar_value);
 				pick_event.SetArg(pid);
+				pick_event.SetVme(pickedVME);
 				mafEventMacro(pick_event);
 				p->Delete();
 			}
