@@ -235,7 +235,7 @@ void mafOpImporterLandmark::Read()
 				m_VmeCloud->SetLandmark(name, x, y, z, t);
 			}
 
-			bool visibility = (x == -9999 && y == -9999 && z == -9999);
+			bool visibility = !(x == -9999 && y == -9999 && z == -9999);
 			m_VmeCloud->SetLandmarkVisibility(counter, visibility, t);
       
 			counter++;
