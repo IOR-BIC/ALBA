@@ -137,12 +137,14 @@ void mafViewOrthoSlice::VmeShow(mafVME *vme, bool show)
       pos=i;
 
   // if i want to show a vme that is not in list i add it to the list
-  if (show && pos == -1)
-    m_VMElist.push_back(vme);
-  // else if i want to un-show a vme i remove it only if is in the list
-  else if (!show && pos>=0)
-    m_VMElist.erase(m_VMElist.begin()+pos);
-  
+	if (show && pos == -1)
+		m_VMElist.push_back(vme);
+	// else if i want to un-show a vme i remove it only if is in the list
+	else if (!show && pos >= 0)
+		m_VMElist.erase(m_VMElist.begin() + pos);
+	// else the show status is unchanged just return
+	else
+		return;
 
 
   // Enable perspective View for every VME
@@ -166,7 +168,7 @@ void mafViewOrthoSlice::VmeShow(mafVME *vme, bool show)
       // Create Ortho Stuff
       CreateOrthoslicesAndGizmos(vme);
       
-      // Definig radius of polylines at the equivalent side of the medium voxel
+      // Defining radius of polylines at the equivalent side of the medium voxel
       double bounds[6], edges[3], vol, nPoints;
       vtkDataSet *volOutput;
       volOutput=vme->GetOutput()->GetVTKData();
@@ -494,7 +496,6 @@ void mafViewOrthoSlice::PackageView()
       m_Views[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurface",MUTEX);
 			m_Views[v]->PlugVisualPipe("medVMEMuscleWrapper", "mafPipeSurface",MUTEX);
     }
-		
   }
   PlugChildView(m_Views[PERSPECTIVE_VIEW]);
   PlugChildView(m_Views[ZN_VIEW]);

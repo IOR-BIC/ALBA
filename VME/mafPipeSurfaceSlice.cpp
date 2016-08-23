@@ -130,16 +130,25 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
   }
   else if(m_Vme->GetOutput()->IsMAFType(mafVMEOutputPointSet))
   {
-    if (m_Vme->IsMAFType(mafVMELandmarkCloud))
+		mafVMELandmarkCloud *lmc = mafVMELandmarkCloud::SafeDownCast(m_Vme);
+		if (!lmc)
+		{
+			mafVMELandmark *lm = mafVMELandmark::SafeDownCast(m_Vme);
+			if(lm)
+				lmc = mafVMELandmarkCloud::SafeDownCast(lm->GetParent());
+		}
+
+    if (lmc)
     {
-      mafVMEOutputLandmarkCloud *landmark_cloud_output = mafVMEOutputLandmarkCloud::SafeDownCast(m_Vme->GetOutput());
+			mafVMEOutputPointSet *landmark_cloud_output = mafVMEOutputPointSet::SafeDownCast(m_Vme->GetOutput());
       assert(landmark_cloud_output);
       landmark_cloud_output->Update();
-      
+
+			      
       vtkNEW(m_SphereSource);
-      m_SphereSource->SetRadius(((mafVMELandmarkCloud *)m_Vme)->GetRadius());
-      m_SphereSource->SetThetaResolution(((mafVMELandmarkCloud *)m_Vme)->GetSphereResolution());
-      m_SphereSource->SetPhiResolution(((mafVMELandmarkCloud *)m_Vme)->GetSphereResolution());
+      m_SphereSource->SetRadius(lmc->GetRadius());
+      m_SphereSource->SetThetaResolution(lmc->GetSphereResolution());
+      m_SphereSource->SetPhiResolution(lmc->GetSphereResolution());
       m_SphereSource->Update();
 
       glyph->SetSource(m_SphereSource->GetOutput());

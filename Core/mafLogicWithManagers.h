@@ -237,8 +237,12 @@ protected:
   virtual void CreateMenu();
   /** create a new storage object */
   virtual void CreateStorage(mafEvent *e);
-  /** Redefined to add Print buttons */
-  virtual void CreateToolbar();
+  
+	/** This method creates and add the Toolbar, for specific app toolbar override the CreateToolBar method*/
+	void CreateAndPlugToolbar();
+
+	/**This method creates the toolbar, override this method for specific app toolbars*/
+	virtual void CreateToolbar();
 
 	/** Virtual method to create the side bar.*/
 	virtual void CreateControlPanel();

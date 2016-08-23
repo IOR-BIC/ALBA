@@ -223,6 +223,8 @@ void mafOpAddLandmark::OpRun()
 	// Set Landmarks color 
 	SetMaterialRGBA(material, 1.0, 0.1, 0.1, 0.8);
 
+	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+
 	LoadLandmarksFromVME();
 
 	if (!GetTestMode())
@@ -377,8 +379,8 @@ void mafOpAddLandmark::OnEvent(mafEventBase *maf_event)
 			case VME_PICKED:
 			{
 				pts = vtkPoints::SafeDownCast(e->GetVtkObj());
-
-				if (pts)
+				mafVME *pickedVME = e->GetVme();
+				if (pts && pickedVME!=m_Cloud)
 				{
 					pts->GetPoint(0, m_LandmarkPosition);
 

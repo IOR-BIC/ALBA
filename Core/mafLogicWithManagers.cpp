@@ -370,7 +370,7 @@ void mafLogicWithManagers::FillMenus()
 void mafLogicWithManagers::CreateToolBarsAndPanels()
 {
 
-	if(m_PlugToolbar) CreateToolbar();
+	if(m_PlugToolbar) CreateAndPlugToolbar();
 	if(m_PlugTimebar) CreateTimeBar(); //SIL. 23-may-2006 : 
 	if(m_PlugLogPanel)	CreateLogPanel();	
 	else this->CreateNullLog();
@@ -1837,12 +1837,27 @@ void mafLogicWithManagers::ShowLandmark(mafVMELandmark * lm, bool visibility)
 	if (!lmParent)
 		return;
 	
+	mafPipe *lmPipe = NULL;
 	//show of lm shows also the lmc
 	//hide of last lm hides also the lmc
 	if (visibility || (!visibility && lmParent->GetLandmarkShowNumber() == 0))
 	{
-		mafPipe* lmPipe = m_ViewManager->GetSelectedView() ? m_ViewManager->GetSelectedView()->GetNodePipe(lmParent) : NULL;
-		
+		mafView * selectedView = m_ViewManager->GetSelectedView();
+		if (mafViewCompound *compView = mafViewCompound::SafeDownCast(selectedView))
+		{
+			for (int i = 0; i < compView->GetNumberOfSubView(); i++)
+			{
+				lmPipe = compView->GetSubView(i)->GetNodePipe(lmParent);
+				if(lmPipe)
+					break;
+			}
+		}
+		else if(selectedView)
+		{
+			lmPipe = selectedView->GetNodePipe(lmParent);
+		}
+
+				
 		//if the lmc is not show and we want to show a lm we show only this landmark
 		if (!lmPipe && visibility)
 			lmParent->ShowAllLandmarks(false);
@@ -2488,6 +2503,32 @@ void mafLogicWithManagers::CreateLogPanel()
 	mafLogMessage(_("Welcome"));
 }
 
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::CreateAndPlugToolbar()
+{
+	CreateToolbar();
+
+	m_ToolBar->Realize();
+
+	//SIL. 23-may-2006 : 
+	m_Win->AddDockPane(m_ToolBar, wxPaneInfo()
+		.Name("toolbar")
+		.Caption(wxT("Toolbar"))
+		.Top()
+		.Layer(2)
+		.ToolbarPane()
+		.LeftDockable(false)
+		.RightDockable(false)
+		.Floatable(false)
+		.Movable(false)
+		.Gripper(false)
+	);
+
+}
+
+
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::CreateToolbar()
 {
@@ -2525,21 +2566,7 @@ void mafLogicWithManagers::CreateToolbar()
 	EnableItem(MENU_FILE_PRINT, false);
 	EnableItem(MENU_FILE_PRINT_PREVIEW, false);
 
-	m_ToolBar->Realize();
 
-	//SIL. 23-may-2006 : 
-	m_Win->AddDockPane(m_ToolBar,  wxPaneInfo()
-		.Name("toolbar")
-		.Caption(wxT("Toolbar"))
-		.Top()
-		.Layer(2)
-		.ToolbarPane()
-		.LeftDockable(false)
-		.RightDockable(false)
-		.Floatable(false)
-		.Movable(false)
-		.Gripper(false)
-		);
 
 }
 
