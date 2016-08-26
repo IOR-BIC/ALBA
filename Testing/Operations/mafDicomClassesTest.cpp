@@ -39,18 +39,18 @@
 #define D_DcmDate "1-1-2000"
 #define D_DcmPatientName "Name"
 #define D_DcmBirthDate "1-1-1900"
-#define D_DcmCardiacNumberOfImages 1
 #define D_DcmTriggerTime 1
 #define D_DcmStudyID "Id-Study-1"
 #define D_DcmSeriesID "Id-Series-1"
 #define D_Position { 0.0, 1.0, 2.0 }
-#define D_NewPosition { 4.0, 5.0, 6.0}
+#define D_NewPosition { 0.0, 2.0, 1.0 }
 #define D_Orientation { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0 }
 #define D_NewOrientation { 0.0, 1.0, 0.0, 1.0, 0.0, 0.0 }
 #define D_NewNum 7
 
+///////////////////////////////mafDicomSlice//////////////////////////////////
 //----------------------------------------------------------------------------
-mafDicomSlice * mafDicomClassesTest::CreateBaseSlice()
+mafDicomSlice * mafDicomClassesTest::CreateBaseSlice(double *pos)
 {
 	vtkMAFSmartPointer<vtkImageReader> reader;
 	mafString fileName = MAF_DATA_ROOT;
@@ -64,7 +64,11 @@ mafDicomSlice * mafDicomClassesTest::CreateBaseSlice()
 	vtkImageData *imData;
 	vtkNEW(imData);
 	imData->DeepCopy(reader->GetOutput());
-	imData->SetOrigin(patientPos);
+
+	if(pos!=NULL)
+		imData->SetOrigin(pos);
+	else
+		imData->SetOrigin(patientPos);
 
 		
 	double patientOri[6] = D_Orientation;
@@ -195,8 +199,7 @@ void mafDicomClassesTest::TestSliceGetDcmImageOrientationPatient()
 	CPPUNIT_ASSERT(testOri[3] == patientNewOri[3]);
 	CPPUNIT_ASSERT(testOri[4] == patientNewOri[4]);
 	CPPUNIT_ASSERT(testOri[5] == patientNewOri[5]);
-
-
+	
   cppDEL(sliceDicom);
 }
 
@@ -300,59 +303,153 @@ void mafDicomClassesTest::TestSliceGetStudyID()
 	cppDEL(sliceDicom);
 }
 
-/*
-//-----------------------------------------------------------
-void mafDicomClassesTest::TestSliceGetDcmImageOrientationPatientMatrix()
-//-----------------------------------------------------------
+///////////////////////////////mafDicomSeries//////////////////////////////////
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestSeriesDynamicAllocation()
 {
-  double patientPos[3] = {0.0,1.0,2.0};
-  double patientOri[6] = {0.0,1.0,2.0,3.0,4.0,5.0};
-
-  //Using the default constructor
-  mafDicomSlice *sliceDicom = new mafDicomSlice();
-
-  sliceDicom->SetDcmImageOrientationPatient(patientOri);
-
-  double testOri[6];
-  vtkMAFSmartPointer<vtkMatrix4x4> matrix;
-  double Vx0,Vx1,Vx2,Vy0,Vy1,Vy2;
-  sliceDicom->GetOrientation(matrix);
-
-  Vx0 = matrix->GetElement(0,0);
-  Vx1 = matrix->GetElement(1,0);
-  Vx2 = matrix->GetElement(2,0);
-  Vy0 = matrix->GetElement(0,1);
-  Vy1 = matrix->GetElement(1,1);
-  Vy2 = matrix->GetElement(2,1);
-
-  CPPUNIT_ASSERT(Vx0 == patientOri[0]);
-  CPPUNIT_ASSERT(Vx1 == patientOri[1]);
-  CPPUNIT_ASSERT(Vx2 == patientOri[2]);
-  CPPUNIT_ASSERT(Vy0 == patientOri[3]);
-  CPPUNIT_ASSERT(Vy1 == patientOri[4]);
-  CPPUNIT_ASSERT(Vy2 == patientOri[5]);
-
-  cppDEL(sliceDicom);
-
-  //Using the initialization constructor
-  sliceDicom = new mafDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","","","",D_DcmInstanceNumber,D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
-
-  sliceDicom->GetOrientation(matrix);
-
-  Vx0 = matrix->GetElement(0,0);
-  Vx1 = matrix->GetElement(1,0);
-  Vx2 = matrix->GetElement(2,0);
-  Vy0 = matrix->GetElement(0,1);
-  Vy1 = matrix->GetElement(1,1);
-  Vy2 = matrix->GetElement(2,1);
-
-  CPPUNIT_ASSERT(Vx0 == patientOri[0]);
-  CPPUNIT_ASSERT(Vx1 == patientOri[1]);
-  CPPUNIT_ASSERT(Vx2 == patientOri[2]);
-  CPPUNIT_ASSERT(Vy0 == patientOri[3]);
-  CPPUNIT_ASSERT(Vy1 == patientOri[4]);
-  CPPUNIT_ASSERT(Vy2 == patientOri[5]);
-
-  cppDEL(sliceDicom);
+	mafDicomSeries *series = new mafDicomSeries(D_DcmSeriesID);
+	
+	cppDEL(series);
 }
-*/
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestSeriesAddSlice()
+{
+	mafDicomSlice *sliceDicom = CreateBaseSlice();
+
+	mafDicomSeries *series = new mafDicomSeries(D_DcmSeriesID);
+
+	series->AddSlice(sliceDicom);
+
+	CPPUNIT_ASSERT(series->GetSlicesNum() == 1);
+	CPPUNIT_ASSERT(series->GetSlice(0) == sliceDicom);
+	
+	cppDEL(series);
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestSeriesGetSlicesNum()
+{
+	mafDicomSlice *sliceDicom = CreateBaseSlice();
+	mafDicomSlice *sliceDicom2 = CreateBaseSlice();
+
+	mafDicomSeries *series = new mafDicomSeries(D_DcmSeriesID);
+
+	series->AddSlice(sliceDicom);
+	CPPUNIT_ASSERT(series->GetSlicesNum() == 1);
+
+	series->AddSlice(sliceDicom2);
+	CPPUNIT_ASSERT(series->GetSlicesNum() == 2);
+	
+	cppDEL(series);
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestSeriesIsRotated()
+{
+	//Using the default constructor
+	mafDicomSlice *sliceDicom = CreateBaseSlice();
+	mafDicomSlice *sliceDicom2 = CreateBaseSlice();
+	double patientNewOri[6] = D_NewOrientation;
+	sliceDicom2->SetDcmImageOrientationPatient(patientNewOri);
+
+	mafDicomSeries *series = new mafDicomSeries(D_DcmSeriesID);
+
+	series->AddSlice(sliceDicom);
+	CPPUNIT_ASSERT(series->IsRotated() == false);
+
+	series->AddSlice(sliceDicom2);
+	CPPUNIT_ASSERT(series->IsRotated() == true);
+
+	cppDEL(series);
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestSeriesGetSlices()
+{
+	//Using the default constructor
+	mafDicomSlice *sliceDicom = CreateBaseSlice();
+	mafDicomSlice *sliceDicom2 = CreateBaseSlice();
+	
+	mafDicomSeries *series = new mafDicomSeries(D_DcmSeriesID);
+	series->AddSlice(sliceDicom);
+	series->AddSlice(sliceDicom2);
+
+	std::vector<mafDicomSlice *> slices = series->GetSlices();
+
+	CPPUNIT_ASSERT(slices.size() == 2);
+	CPPUNIT_ASSERT(slices[0] == sliceDicom);
+	CPPUNIT_ASSERT(slices[1] == sliceDicom2);
+
+	cppDEL(series);
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestSeriesGetSerieID()
+{
+	mafDicomSeries *series = new mafDicomSeries(D_DcmSeriesID);
+	
+	CPPUNIT_ASSERT(series->GetSerieID() == D_DcmSeriesID);
+
+	cppDEL(series);
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestSeriesGetDimensions()
+{
+	//Using the default constructor
+	mafDicomSlice *sliceDicom = CreateBaseSlice();
+
+	mafDicomSeries *series = new mafDicomSeries(D_DcmSeriesID);
+	series->AddSlice(sliceDicom);
+
+	const int *dims=series->GetDimensions();
+
+	CPPUNIT_ASSERT(dims[0] == 1);
+	CPPUNIT_ASSERT(dims[1] == 1);
+
+	cppDEL(series);
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestSeriesGetCardiacImagesNum()
+{
+	mafDicomSlice *sliceDicom = CreateBaseSlice();
+
+	mafDicomSeries *series = new mafDicomSeries(D_DcmSeriesID);
+	series->AddSlice(sliceDicom);
+
+	CPPUNIT_ASSERT(series->GetCardiacImagesNum() == D_DcmCardiacNumberOfImages);
+
+	cppDEL(series);
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestSeriesSortSlices()
+{
+	double newPos[3] = D_NewPosition;
+	mafDicomSlice *sliceDicom = CreateBaseSlice();
+	mafDicomSlice *sliceDicom2 = CreateBaseSlice(newPos);
+
+	mafDicomSeries *series = new mafDicomSeries(D_DcmSeriesID);
+	series->AddSlice(sliceDicom);
+	series->AddSlice(sliceDicom2);
+
+	series->SortSlices();
+
+	CPPUNIT_ASSERT(series->GetSlice(0) == sliceDicom2);
+	CPPUNIT_ASSERT(series->GetSlice(1) == sliceDicom);
+
+	//Test sort slice with a different orientation.
+	double patientNewOri[6] = D_NewOrientation;
+	sliceDicom->SetDcmImageOrientationPatient(patientNewOri);
+	sliceDicom2->SetDcmImageOrientationPatient(patientNewOri);
+
+	series->SortSlices();
+
+	CPPUNIT_ASSERT(series->GetSlice(0) == sliceDicom);
+	CPPUNIT_ASSERT(series->GetSlice(1) == sliceDicom2);
+	
+	cppDEL(series);
+}
+

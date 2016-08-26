@@ -44,10 +44,21 @@ public:
 	CPPUNIT_TEST(TestSliceGetSeriesID);
 	CPPUNIT_TEST(TestSliceGetStudyID);
 
+	CPPUNIT_TEST(TestSeriesDynamicAllocation);
+	CPPUNIT_TEST(TestSeriesAddSlice);
+	CPPUNIT_TEST(TestSeriesGetSlicesNum);
+	CPPUNIT_TEST(TestSeriesIsRotated);
+	CPPUNIT_TEST(TestSeriesGetSlices);
+	CPPUNIT_TEST(TestSeriesGetSerieID);
+	CPPUNIT_TEST(TestSeriesGetDimensions);
+	CPPUNIT_TEST(TestSeriesGetCardiacImagesNum);
+	CPPUNIT_TEST(TestSeriesSortSlices);
+
+
   CPPUNIT_TEST_SUITE_END();
 
 protected:
-	mafDicomSlice *CreateBaseSlice();
+	mafDicomSlice *CreateBaseSlice(double *pos=NULL);
 
 	void TestSliceDynamicAllocation();
 	void TestSliceGetPatientBirthday();
@@ -65,6 +76,16 @@ protected:
 	void TestSliceGetPhotometricInterpretation();
 	void TestSliceGetSeriesID();
 	void TestSliceGetStudyID();
+	
+	void TestSeriesDynamicAllocation();
+	void TestSeriesAddSlice();
+	void TestSeriesGetSlicesNum();
+	void TestSeriesIsRotated();
+	void TestSeriesGetSlices();
+	void TestSeriesGetSerieID();
+	void TestSeriesGetDimensions();
+	void TestSeriesGetCardiacImagesNum();
+	void TestSeriesSortSlices();
 
 };
 
