@@ -370,7 +370,7 @@ void mafLogicWithManagers::FillMenus()
 void mafLogicWithManagers::CreateToolBarsAndPanels()
 {
 
-	if(m_PlugToolbar) CreateToolbar();
+	if(m_PlugToolbar) CreateAndPlugToolbar();
 	if(m_PlugTimebar) CreateTimeBar(); //SIL. 23-may-2006 : 
 	if(m_PlugLogPanel)	CreateLogPanel();	
 	else this->CreateNullLog();
@@ -2503,6 +2503,32 @@ void mafLogicWithManagers::CreateLogPanel()
 	mafLogMessage(_("Welcome"));
 }
 
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::CreateAndPlugToolbar()
+{
+	CreateToolbar();
+
+	m_ToolBar->Realize();
+
+	//SIL. 23-may-2006 : 
+	m_Win->AddDockPane(m_ToolBar, wxPaneInfo()
+		.Name("toolbar")
+		.Caption(wxT("Toolbar"))
+		.Top()
+		.Layer(2)
+		.ToolbarPane()
+		.LeftDockable(false)
+		.RightDockable(false)
+		.Floatable(false)
+		.Movable(false)
+		.Gripper(false)
+	);
+
+}
+
+
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::CreateToolbar()
 {
@@ -2540,21 +2566,7 @@ void mafLogicWithManagers::CreateToolbar()
 	EnableItem(MENU_FILE_PRINT, false);
 	EnableItem(MENU_FILE_PRINT_PREVIEW, false);
 
-	m_ToolBar->Realize();
 
-	//SIL. 23-may-2006 : 
-	m_Win->AddDockPane(m_ToolBar,  wxPaneInfo()
-		.Name("toolbar")
-		.Caption(wxT("Toolbar"))
-		.Top()
-		.Layer(2)
-		.ToolbarPane()
-		.LeftDockable(false)
-		.RightDockable(false)
-		.Floatable(false)
-		.Movable(false)
-		.Gripper(false)
-		);
 
 }
 

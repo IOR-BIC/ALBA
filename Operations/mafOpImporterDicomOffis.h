@@ -335,21 +335,12 @@ public:
 	/** Returns the number of series */
 	int GetSlicesNum() { return m_Slices.size(); }
 
-	/** Check if Dicom dataset contains rotations */
-	bool IsRotated(const double dcmImageOrientationPatient[6]);
-
 	/** Returns IsRotated */
 	bool IsRotated() const { return m_IsRotated; }
-	
-	/** Sets IsRotated */
-	void SetRotated(bool isRotated) { m_IsRotated = isRotated; }
 	
 	/** Returns Slices vector */
 	std::vector<mafDicomSlice *> GetSlices() const { return m_Slices; }
 
-	/** Sets Slices */
-	void SetSlices(std::vector<mafDicomSlice *> slices) { m_Slices = slices; }
-	
 	/** Returns SerieID */
 	mafString GetSerieID() const { return m_SeriesID; }
 
@@ -363,6 +354,9 @@ public:
 	void SortSlices();
 		
 protected:
+
+	/** Check if Dicom dataset contains rotations */
+	bool IsRotated(const double dcmImageOrientationPatient[6]);
 
 	std::vector<mafDicomSlice *> m_Slices;
 	int m_Dimensions[3];

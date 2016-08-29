@@ -713,7 +713,8 @@ mafDicomSlice *mafOpImporterDicomOffis::ReadDicomSlice(mafString fileName)
 	const char *dcmModality, *dcmStudyInstanceUID, *dcmSeriesInstanceUID, *dcmScanOptions;
 	const char *date, *description, *patientName, *birthdate, *photometricInterpretation;
 	double dcmTriggerTime = -1.0;
-	double dcmImageOrientationPatient[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
+	double defaulOrienatation[6] = { 1.0,0.0,0.0,0.0,1.0,1.0 };
+	double dcmImageOrientationPatient[6];
 	double dcmImagePositionPatient[3] = {0.0,0.0,0.0};
 	DcmFileFormat dicomImg;   
 	
@@ -771,7 +772,9 @@ mafDicomSlice *mafOpImporterDicomOffis::ReadDicomSlice(mafString fileName)
 
 	//Read Image Orientation Patient
 	for (int i = 0; i < 6; i++)
-		dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient, dcmImageOrientationPatient[i], i);
+		if (dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient, dcmImageOrientationPatient[i], i).bad())
+			dcmImageOrientationPatient[i] = defaulOrienatation[i];
+
 	
 	//Read Cine MR related stuff
 	dicomDataset->findAndGetLongInt(DCM_InstanceNumber,dcmInstanceNumber);
