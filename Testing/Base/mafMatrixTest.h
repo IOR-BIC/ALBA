@@ -44,6 +44,7 @@ public:
   CPPUNIT_TEST(TestMultiplyPoint);
   CPPUNIT_TEST(TestMultiply4x4);
   CPPUNIT_TEST(TestPointMultiply);
+	CPPUNIT_TEST(SetFromDirectionCosinesTest);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -65,6 +66,7 @@ private:
   void TestMultiplyPoint();
   void TestMultiply4x4();
   void TestPointMultiply();
+	void SetFromDirectionCosinesTest();
 };
 
 

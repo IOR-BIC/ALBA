@@ -360,3 +360,38 @@ void mafMatrixTest::TestPointMultiply()
   CPPUNIT_ASSERT(mafEquals(out_point[2],7.5));
   CPPUNIT_ASSERT(mafEquals(out_point[3],3.0));
 }
+
+//-----------------------------------------------------------
+void mafMatrixTest::SetFromDirectionCosinesTest()
+{
+	double patientOri[6] = {0.0,1.0,2.0,3.0,4.0,5.0};
+
+	double dircos_x = patientOri[1] * patientOri[5] - patientOri[2] * patientOri[4];
+	double dircos_y = patientOri[2] * patientOri[3] - patientOri[0] * patientOri[5];
+	double dircos_z = patientOri[0] * patientOri[4] - patientOri[1] * patientOri[3];
+
+	mafMatrix matrix;
+	matrix.SetFromDirectionCosines(patientOri);
+
+	double Vx0, Vx1, Vx2, Vy0, Vy1, Vy2, Vz0, Vz1, Vz2;
+
+	Vx0 = matrix.GetElement(0, 0);
+	Vx1 = matrix.GetElement(1, 0);
+	Vx2 = matrix.GetElement(2, 0);
+	Vy0 = matrix.GetElement(0, 1);
+	Vy1 = matrix.GetElement(1, 1);
+	Vy2 = matrix.GetElement(2, 1);
+	Vz0 = matrix.GetElement(0, 2);
+	Vz1 = matrix.GetElement(1, 2);
+	Vz2 = matrix.GetElement(2, 2);
+
+	CPPUNIT_ASSERT(Vx0 == patientOri[0]);
+	CPPUNIT_ASSERT(Vx1 == patientOri[1]);
+	CPPUNIT_ASSERT(Vx2 == patientOri[2]);
+	CPPUNIT_ASSERT(Vy0 == patientOri[3]);
+	CPPUNIT_ASSERT(Vy1 == patientOri[4]);
+	CPPUNIT_ASSERT(Vy2 == patientOri[5]);
+	CPPUNIT_ASSERT(Vz0 == dircos_x);
+	CPPUNIT_ASSERT(Vz1 == dircos_y);
+	CPPUNIT_ASSERT(Vz2 == dircos_z);
+}
