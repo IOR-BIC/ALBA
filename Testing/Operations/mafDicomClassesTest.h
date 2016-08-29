@@ -54,7 +54,18 @@ public:
 	CPPUNIT_TEST(TestSeriesGetCardiacImagesNum);
 	CPPUNIT_TEST(TestSeriesSortSlices);
 
+	CPPUNIT_TEST(TestStudyDynamicAllocation); 
+	CPPUNIT_TEST(TestStudyAddSlice);
+	CPPUNIT_TEST(TestStudyGetStudyID);
+	CPPUNIT_TEST(TestStudyGetSeriesNum);
+	CPPUNIT_TEST(TestStudyGetSeries);
 
+	CPPUNIT_TEST(TestStudyListDynamicAllocation);
+	CPPUNIT_TEST(TestStudyListAddSlice);
+	CPPUNIT_TEST(TestStudyListGetStudy);
+	CPPUNIT_TEST(TestStudyListGetStudiesNum);
+	CPPUNIT_TEST(TestStudyListGetSeriesTotalNum);
+	
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -86,7 +97,19 @@ protected:
 	void TestSeriesGetDimensions();
 	void TestSeriesGetCardiacImagesNum();
 	void TestSeriesSortSlices();
+	
+	void TestStudyDynamicAllocation();
+	void TestStudyAddSlice();
+	void TestStudyGetStudyID();
+	void TestStudyGetSeriesNum();
+	void TestStudyGetSeries();
 
+	void TestStudyListDynamicAllocation();
+	void TestStudyListAddSlice();
+	void TestStudyListGetStudy();
+	void TestStudyListGetStudiesNum();
+	void TestStudyListGetSeriesTotalNum();
+	
 };
 
 

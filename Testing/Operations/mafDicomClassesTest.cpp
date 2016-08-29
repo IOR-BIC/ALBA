@@ -39,9 +39,10 @@
 #define D_DcmDate "1-1-2000"
 #define D_DcmPatientName "Name"
 #define D_DcmBirthDate "1-1-1900"
-#define D_DcmTriggerTime 1
 #define D_DcmStudyID "Id-Study-1"
+#define D_NewDcmStudyID "Id-Study-2"
 #define D_DcmSeriesID "Id-Series-1"
+#define D_NewDcmSeriesID "Id-Series-2"
 #define D_Position { 0.0, 1.0, 2.0 }
 #define D_NewPosition { 0.0, 2.0, 1.0 }
 #define D_Orientation { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0 }
@@ -451,5 +452,188 @@ void mafDicomClassesTest::TestSeriesSortSlices()
 	CPPUNIT_ASSERT(series->GetSlice(1) == sliceDicom2);
 	
 	cppDEL(series);
+}
+
+///////////////////////////////mafDicomStudy//////////////////////////////////
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestStudyDynamicAllocation()
+{
+	mafDicomStudy *study = new mafDicomStudy(D_DcmStudyID);
+	cppDEL(study);
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestStudyAddSlice()
+{
+	mafDicomSlice *sliceDicom = CreateBaseSlice();
+	mafDicomSlice *sliceDicom2 = CreateBaseSlice();
+	mafDicomSlice *sliceDicom3 = CreateBaseSlice();
+
+	sliceDicom2->SetSeriesID(D_NewDcmSeriesID);
+
+	mafDicomStudy *study = new mafDicomStudy(D_DcmStudyID);
+
+	study->AddSlice(sliceDicom);
+	CPPUNIT_ASSERT(study->GetSeriesNum() == 1);
+	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlicesNum() == 1);
+	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlice(0) == sliceDicom);
+
+	study->AddSlice(sliceDicom2);
+	CPPUNIT_ASSERT(study->GetSeriesNum() == 2);
+	CPPUNIT_ASSERT(study->GetSeries(1)->GetSlicesNum() == 1);
+	CPPUNIT_ASSERT(study->GetSeries(1)->GetSlice(0) == sliceDicom2);
+
+	study->AddSlice(sliceDicom3);
+	CPPUNIT_ASSERT(study->GetSeriesNum() == 2);
+	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlicesNum() == 2);
+	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlice(1) == sliceDicom3);
+
+	cppDEL(study);
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestStudyGetStudyID()
+{
+	mafDicomStudy *study = new mafDicomStudy(D_DcmStudyID);
+	
+	CPPUNIT_ASSERT(study->GetStudyID() == D_DcmStudyID);
+	
+	cppDEL(study);
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestStudyGetSeriesNum()
+{
+	double newPos[3] = D_NewPosition;
+	mafDicomSlice *sliceDicom = CreateBaseSlice();
+	mafDicomSlice *sliceDicom2 = CreateBaseSlice();
+	mafDicomSlice *sliceDicom3 = CreateBaseSlice();
+
+	sliceDicom2->SetSeriesID(D_NewDcmSeriesID);
+	mafDicomStudy *study = new mafDicomStudy(D_DcmStudyID);
+
+	study->AddSlice(sliceDicom);
+	CPPUNIT_ASSERT(study->GetSeriesNum() == 1);
+	study->AddSlice(sliceDicom2);
+	CPPUNIT_ASSERT(study->GetSeriesNum() == 2);
+	study->AddSlice(sliceDicom3);
+	CPPUNIT_ASSERT(study->GetSeriesNum() == 2);
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestStudyGetSeries()
+{
+	double newPos[3] = D_NewPosition;
+	mafDicomSlice *sliceDicom = CreateBaseSlice();
+	mafDicomSlice *sliceDicom2 = CreateBaseSlice();
+	mafDicomSlice *sliceDicom3 = CreateBaseSlice();
+
+	sliceDicom2->SetSeriesID(D_NewDcmSeriesID);
+	mafDicomStudy *study = new mafDicomStudy(D_DcmStudyID);
+
+	study->AddSlice(sliceDicom);
+	study->AddSlice(sliceDicom2);
+	study->AddSlice(sliceDicom3);
+	
+	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlicesNum() == 2);
+	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlice(0) == sliceDicom);
+	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlice(1) == sliceDicom3);
+	CPPUNIT_ASSERT(study->GetSeries(1)->GetSlicesNum() == 1);
+	CPPUNIT_ASSERT(study->GetSeries(1)->GetSlice(0) == sliceDicom2);
+
+	cppDEL(study);
+}
+
+/////////////////////////////mafDicomStudyList////////////////////////////////
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestStudyListDynamicAllocation()
+{
+	mafDicomStudyList *studyList = new mafDicomStudyList();
+	cppDEL(studyList);
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestStudyListAddSlice()
+{
+	mafDicomSlice *sliceDicom = CreateBaseSlice();
+	mafDicomSlice *sliceDicom2 = CreateBaseSlice();
+	mafDicomSlice *sliceDicom3 = CreateBaseSlice();
+	sliceDicom2->SetSeriesID(D_NewDcmSeriesID);
+	sliceDicom3->SetStudyID(D_NewDcmStudyID);
+	
+	mafDicomStudyList *studyList = new mafDicomStudyList();
+
+	studyList->AddSlice(sliceDicom);
+	CPPUNIT_ASSERT(studyList->GetStudiesNum() == 1);
+	CPPUNIT_ASSERT(studyList->GetSeriesTotalNum() == 1);
+	
+	studyList->AddSlice(sliceDicom2);
+	CPPUNIT_ASSERT(studyList->GetStudiesNum() == 1);
+	CPPUNIT_ASSERT(studyList->GetSeriesTotalNum() == 2);
+
+	studyList->AddSlice(sliceDicom3);
+	CPPUNIT_ASSERT(studyList->GetStudiesNum() == 2);
+	CPPUNIT_ASSERT(studyList->GetSeriesTotalNum() == 3);
+	
+	cppDEL(studyList);
+
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestStudyListGetStudy()
+{
+	mafDicomSlice *sliceDicom = CreateBaseSlice();
+	mafDicomSlice *sliceDicom2 = CreateBaseSlice();
+	mafDicomSlice *sliceDicom3 = CreateBaseSlice();
+	sliceDicom2->SetSeriesID(D_NewDcmSeriesID);
+	sliceDicom3->SetStudyID(D_NewDcmStudyID);
+
+	mafDicomStudyList *studyList = new mafDicomStudyList();
+	studyList->AddSlice(sliceDicom);
+	studyList->AddSlice(sliceDicom2);
+	studyList->AddSlice(sliceDicom3);
+
+	CPPUNIT_ASSERT(studyList->GetStudiesNum() == 2);
+	CPPUNIT_ASSERT(studyList->GetStudy(0)->GetSeriesNum() == 2);
+	CPPUNIT_ASSERT(studyList->GetStudy(0)->GetSeries(0)->GetSlice(0) == sliceDicom);
+	CPPUNIT_ASSERT(studyList->GetStudy(0)->GetSeries(1)->GetSlice(0) == sliceDicom2);
+	CPPUNIT_ASSERT(studyList->GetStudy(1)->GetSeries(0)->GetSlice(0) == sliceDicom3);
+	
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestStudyListGetStudiesNum()
+{
+	mafDicomSlice *sliceDicom = CreateBaseSlice();
+	mafDicomSlice *sliceDicom2 = CreateBaseSlice();
+	mafDicomSlice *sliceDicom3 = CreateBaseSlice();
+	sliceDicom2->SetSeriesID(D_NewDcmSeriesID);
+	sliceDicom3->SetStudyID(D_NewDcmStudyID);
+
+	mafDicomStudyList *studyList = new mafDicomStudyList();
+	studyList->AddSlice(sliceDicom);
+	CPPUNIT_ASSERT(studyList->GetStudiesNum() == 1);
+	studyList->AddSlice(sliceDicom2);
+	CPPUNIT_ASSERT(studyList->GetStudiesNum() == 1);
+	studyList->AddSlice(sliceDicom3);
+	CPPUNIT_ASSERT(studyList->GetStudiesNum() == 2);
+}
+
+//----------------------------------------------------------------------------
+void mafDicomClassesTest::TestStudyListGetSeriesTotalNum()
+{
+	mafDicomSlice *sliceDicom = CreateBaseSlice();
+	mafDicomSlice *sliceDicom2 = CreateBaseSlice();
+	mafDicomSlice *sliceDicom3 = CreateBaseSlice();
+	sliceDicom2->SetSeriesID(D_NewDcmSeriesID);
+	sliceDicom3->SetStudyID(D_NewDcmStudyID);
+
+	mafDicomStudyList *studyList = new mafDicomStudyList();
+	studyList->AddSlice(sliceDicom);
+	CPPUNIT_ASSERT(studyList->GetSeriesTotalNum() == 1);
+	studyList->AddSlice(sliceDicom2);
+	CPPUNIT_ASSERT(studyList->GetSeriesTotalNum() == 2);
+	studyList->AddSlice(sliceDicom3);
+	CPPUNIT_ASSERT(studyList->GetSeriesTotalNum() == 3);
 }
 
