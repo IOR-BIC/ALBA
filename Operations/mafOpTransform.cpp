@@ -76,11 +76,14 @@ enum REF_SYS
 {
 	REF_ABSOLUTE = 0,
 	REF_BASE,
+	REF_INPUT,
 	REF_CENTER,
 	REF_RELATIVE,
 	REF_RELATIVE_CENTER,
 	REF_ARBITRARY,
 };
+
+mafVME *GLO_TransformInput;
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpTransform);
@@ -108,6 +111,7 @@ mafOpTransform::mafOpTransform(const wxString &label)
 	m_Scaling[0] = m_Scaling[1] = m_Scaling[2] = 1;
 
 	m_OriginRefSysPosition[0] = m_OriginRefSysPosition[1] = m_OriginRefSysPosition[2] = 0;
+	m_OriginRefSysOrientation[0] = m_OriginRefSysOrientation[1] = m_OriginRefSysOrientation[2] = 0;
 
 	m_GizmoTranslate = NULL;
 	m_GizmoRotate = NULL;
@@ -152,6 +156,8 @@ void mafOpTransform::OpRun()
 //----------------------------------------------------------------------------
 {
 	assert(m_Input);
+
+	GLO_TransformInput = m_Input;
 
 	m_CurrentTime = m_Input->GetTimeStamp();
 	m_NewAbsMatrix = *m_Input->GetOutput()->GetAbsMatrix();
@@ -299,9 +305,9 @@ void mafOpTransform::CreateGui()
 	// Choose active sys Ref
 	//---------------------------------
 
-	m_Gui->Label("Choose Ref sys", true);
-	wxString available_sysRef[6] = { "Absolute", "VME base Reference System", "VME local centroid", "Relative", "Relative centroid", "Arbitrary" };
-	m_Gui->Combo(ID_SELECT_REF_SYS_COMBO, "", &m_RefSystemMode, 6, available_sysRef);
+	m_Gui->Label("Choose Reference System", true);
+	wxString available_sysRef[7] = { "Absolute", "VME base Reference System","VME Reference System", "VME local centroid", "Relative", "Relative centroid", "Arbitrary" };
+	m_Gui->Combo(ID_SELECT_REF_SYS_COMBO, "", &m_RefSystemMode, 7, available_sysRef);
 
 	m_Gui->Label("Ref sys:", &m_RefSysVMEName, false);
 
@@ -314,11 +320,14 @@ void mafOpTransform::CreateGui()
 	// Text Ref sys Origin
 	//---------------------------------
 
-	m_Gui->Label("Ref sys Origin", true);
+	m_Gui->Label("Reference System", true);
 
-	m_Gui->Double(ID_SET_ARBITRARY_REF_SYS, "X", &m_OriginRefSysPosition[0]);
-	m_Gui->Double(ID_SET_ARBITRARY_REF_SYS, "Y", &m_OriginRefSysPosition[1]);
-	m_Gui->Double(ID_SET_ARBITRARY_REF_SYS, "Z", &m_OriginRefSysPosition[2]);
+	m_Gui->Double(ID_SET_ARBITRARY_REF_SYS, "X Pos", &m_OriginRefSysPosition[0]);
+	m_Gui->Double(ID_SET_ARBITRARY_REF_SYS, "Y Pos", &m_OriginRefSysPosition[1]);
+	m_Gui->Double(ID_SET_ARBITRARY_REF_SYS, "Z Pos", &m_OriginRefSysPosition[2]);
+	m_Gui->Double(ID_SET_ARBITRARY_REF_SYS, "X Rot", &m_OriginRefSysOrientation[0]);
+	m_Gui->Double(ID_SET_ARBITRARY_REF_SYS, "Y Rot", &m_OriginRefSysOrientation[1]);
+	m_Gui->Double(ID_SET_ARBITRARY_REF_SYS, "Z Rot", &m_OriginRefSysOrientation[2]);
 	m_Gui->Enable(ID_SET_ARBITRARY_REF_SYS, false);
 
 	//---------------------------------
@@ -368,6 +377,14 @@ void mafOpTransform::OnEvent(mafEventBase *maf_event)
 	case ID_TEXT_SCALE:
 	{
 		OnEventTransformTextEntries(maf_event);
+		if (m_RefSystemMode == REF_INPUT)
+		{
+			SetRefSysVME(m_Input);
+		}
+		else if (m_RefSystemMode == REF_CENTER)
+		{
+			UpdateAndSetLocalCentroidRefSys();
+		}
 		UpdateTransformTextEntries();
 		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 	}
@@ -401,7 +418,7 @@ void mafOpTransform::OnEvent(mafEventBase *maf_event)
 			m_Position[0] += (m_OriginRefSysPosition[0] - oldPosition[0]);
 			m_Position[1] += (m_OriginRefSysPosition[1] - oldPosition[1]);
 			m_Position[2] += (m_OriginRefSysPosition[2] - oldPosition[2]);
-
+			
 			OnEventTransformTextEntries(maf_event);
 
 			SelectRefSys();
@@ -411,7 +428,7 @@ void mafOpTransform::OnEvent(mafEventBase *maf_event)
 		}
 		else if (m_RefSystemMode == REF_ARBITRARY)
 		{
-			m_ArbitraryRefSysVME->SetAbsPose(m_OriginRefSysPosition[0], m_OriginRefSysPosition[1], m_OriginRefSysPosition[2], 0, 0, 0, m_CurrentTime);
+			m_ArbitraryRefSysVME->SetAbsPose(m_OriginRefSysPosition[0], m_OriginRefSysPosition[1], m_OriginRefSysPosition[2], m_OriginRefSysOrientation[0], m_OriginRefSysOrientation[1], m_OriginRefSysOrientation[2], m_CurrentTime);
 			SetRefSysVME(m_ArbitraryRefSysVME);
 			UpdateTransformTextEntries();
 			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
@@ -463,60 +480,65 @@ void mafOpTransform::SelectRefSys()
 {
 	switch (m_RefSystemMode)
 	{
-	case REF_ABSOLUTE:
-	{
-		SetRefSysVME(m_Input->GetRoot());
-	}
-	break;
+		case REF_ABSOLUTE:
+		{
+			SetRefSysVME(m_Input->GetRoot());
+			m_RefSysVMEName = "Absolute";
+		}
+		break;
+		case REF_BASE:
+		{
+			SetRefSysVME(m_LocalRefSysVME);
+			m_RefSysVMEName = "VME Base";
+		}
+		break;
+		case REF_INPUT:
+		{
+			SetRefSysVME(m_Input);
+			m_RefSysVMEName = "VME";
+		}
+		break;
+		case REF_CENTER:
+		{
+			UpdateAndSetLocalCentroidRefSys();
 
-	case REF_BASE:
-	{
-		SetRefSysVME(m_LocalRefSysVME);
-	}
-	break;
+			m_RefSysVMEName = "VME Centroid";
+		}
+		break;
+		case REF_RELATIVE:
+		{
+			if (m_RelativeRefSysVME == NULL)
+				ChooseRelativeRefSys();
+			else
+				SetRefSysVME(m_RelativeRefSysVME);
+			m_RefSysVMEName = m_RelativeRefSysVME->GetName();
+		}
+		break;
+		case REF_RELATIVE_CENTER:
+		{
+			if (m_RelativeRefSysVME == NULL)
+				ChooseRelativeRefSys();
+			else
+				SetRefSysVME(m_RelativeRefSysVME);
 
-	case REF_CENTER:
-	{
-		// Calculate centroid of VME using bounds 
-		double bounds[6];
-		m_TransformVME->GetOutput()->GetVMEBounds(bounds);
-		m_LocalCenterRefSysVME->SetAbsPose((bounds[0] + bounds[1]) / 2.0, (bounds[2] + bounds[3]) / 2.0, (bounds[4] + bounds[5]) / 2.0, 0, 0, 0, m_CurrentTime);
-		SetRefSysVME(m_LocalCenterRefSysVME);
-	}
-	break;
+			m_LocalRefSysVME->SetAbsMatrix(m_OldAbsMatrix, m_CurrentTime);
 
-	case REF_RELATIVE:
-	{
-		if (m_RelativeRefSysVME == NULL)
-			ChooseRelativeRefSys();
-		else
-			SetRefSysVME(m_RelativeRefSysVME);
-	}
-	break;
+			// Calculate centroid of VME using bounds 
+			double bounds[6];
+			m_RelativeRefSysVME->GetOutput()->GetVMEBounds(bounds);
+			m_RelativeCenterRefSysVME->SetAbsPose((bounds[0] + bounds[1]) / 2.0, (bounds[2] + bounds[3]) / 2.0, (bounds[4] + bounds[5]) / 2.0, 0, 0, 0, m_CurrentTime);
 
-	case REF_RELATIVE_CENTER:
-	{
-		if (m_RelativeRefSysVME == NULL)
-			ChooseRelativeRefSys();
-		else
-			SetRefSysVME(m_RelativeRefSysVME);
+			SetRefSysVME(m_RelativeCenterRefSysVME);
 
-		m_LocalRefSysVME->SetAbsMatrix(m_OldAbsMatrix, m_CurrentTime);
-
-		// Calculate centroid of VME using bounds 
-		double bounds[6];
-		m_RelativeRefSysVME->GetOutput()->GetVMEBounds(bounds);
-		m_RelativeCenterRefSysVME->SetAbsPose((bounds[0] + bounds[1]) / 2.0, (bounds[2] + bounds[3]) / 2.0, (bounds[4] + bounds[5]) / 2.0, 0, 0, 0, m_CurrentTime);
-
-		SetRefSysVME(m_RelativeCenterRefSysVME);
-	}
-	break;
-
-	case REF_ARBITRARY:
-	{
-		SetRefSysVME(m_ArbitraryRefSysVME);
-	}
-	break;
+			m_RefSysVMEName.Printf("Centroid of %s", m_RelativeRefSysVME->GetName());
+		}
+		break;
+		case REF_ARBITRARY:
+		{
+			SetRefSysVME(m_ArbitraryRefSysVME);
+			m_RefSysVMEName = "Arbitrary";
+		}
+		break;
 	}
 
 	if (!m_TestMode)
@@ -528,12 +550,23 @@ void mafOpTransform::SelectRefSys()
 }
 
 //----------------------------------------------------------------------------
+void mafOpTransform::UpdateAndSetLocalCentroidRefSys()
+{
+	// Calculate centroid of VME using bounds 
+	double bounds[6];
+	m_TransformVME->GetOutput()->GetVMEBounds(bounds);
+	m_LocalCenterRefSysVME->SetAbsPose((bounds[0] + bounds[1]) / 2.0, (bounds[2] + bounds[3]) / 2.0, (bounds[4] + bounds[5]) / 2.0, 0, 0, 0, m_CurrentTime);
+	SetRefSysVME(m_LocalCenterRefSysVME);
+}
+
+//----------------------------------------------------------------------------
 void mafOpTransform::ChooseRelativeRefSys()
 //----------------------------------------------------------------------------
 {
 	mafString s;
-	s << "Choose VME ref sys";
+	s << "Choose VME Reference System";
 	mafEvent e(this, VME_CHOOSE, &s);
+	e.SetArg((long)&AcceptRefSys);
 	mafEventMacro(e);
 
 	SetRefSysVME(e.GetVme());
@@ -554,8 +587,7 @@ void mafOpTransform::RefSysVmeChanged()
 	}
 
 	// Update Origin position
-	double originOrientation[3];
-	m_RefSysVME->GetOutput()->GetAbsPose(m_OriginRefSysPosition, originOrientation, m_CurrentTime);
+	m_RefSysVME->GetOutput()->GetAbsPose(m_OriginRefSysPosition, m_OriginRefSysOrientation, m_CurrentTime);
 }
 
 //----------------------------------------------------------------------------
@@ -583,8 +615,7 @@ void mafOpTransform::OnEventTransformGizmo(mafEventBase *maf_event)
 
 			SetRefSysVME(m_RelativeCenterRefSysVME);
 		}
-
-		if (m_RefSystemMode == REF_CENTER)
+		else if (m_RefSystemMode == REF_CENTER)
 		{
 			double bounds[6];
 			m_TransformVME->GetOutput()->GetVMEBounds(bounds);
@@ -643,8 +674,8 @@ void mafOpTransform::OnEventTransformTextEntries(mafEventBase *maf_event)
 	tran->RotateZ(m_Orientation[2], POST_MULTIPLY);
 	tran->SetPosition(m_Position);
 
-	// Premultiply to ref sys abs matrix
-	tran->Concatenate(m_RefSysVME->GetOutput()->GetAbsTransform(), PRE_MULTIPLY);
+	// Postmultiply to ref sys abs matrix
+	tran->Concatenate(m_RefSysVME->GetOutput()->GetAbsTransform(), POST_MULTIPLY);
 
 	mafMatrix absPose;
 	absPose = tran->GetMatrix();
@@ -693,14 +724,11 @@ void mafOpTransform::UpdateTransformTextEntries()
 
 	if (m_RefSystemMode == REF_BASE)
 	{
-		double oldOrientation[3];
-		m_LocalRefSysVME->GetOutput()->GetAbsPose(m_OriginRefSysPosition, oldOrientation, m_CurrentTime);
+		m_LocalRefSysVME->GetOutput()->GetAbsPose(m_OriginRefSysPosition, m_OriginRefSysOrientation, m_CurrentTime);
 	}
 	else
 	{
-		// Update Origin position
-		double originOrientation[3];
-		m_RefSysVME->GetOutput()->GetAbsPose(m_OriginRefSysPosition, originOrientation, m_CurrentTime);
+		m_RefSysVME->GetOutput()->GetAbsPose(m_OriginRefSysPosition, m_OriginRefSysOrientation, m_CurrentTime);
 	}
 	
 	//round values near 0 on GUI
@@ -712,6 +740,8 @@ void mafOpTransform::UpdateTransformTextEntries()
 			m_Orientation[i] = 0.0;
 		if (fabs(m_OriginRefSysPosition[i]) < EPSILON)
 			m_OriginRefSysPosition[i] = 0.0;
+		if (fabs(m_OriginRefSysOrientation[i]) < EPSILON)
+			m_OriginRefSysOrientation[i] = 0.0;
 	}
 	if (!m_TestMode)
 	{
@@ -720,4 +750,9 @@ void mafOpTransform::UpdateTransformTextEntries()
 	}
 }
 
+//----------------------------------------------------------------------------
+bool mafOpTransform::AcceptRefSys(mafVME *node)
+{
+	return node != GLO_TransformInput;
+}
 
