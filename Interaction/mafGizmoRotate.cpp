@@ -181,6 +181,7 @@ void mafGizmoRotate::OnEventGizmoComponents(mafEventBase *maf_event)
           {
             SetAbsPose(GetAbsPose());
           }
+					this->Highlight(NONE);
         }
 
         // forward event to the listener ie the operation
@@ -233,26 +234,11 @@ void mafGizmoRotate::OnEventGizmoGui(mafEventBase *maf_event)
 void mafGizmoRotate::Highlight (int component) 
 //----------------------------------------------------------------------------
 {
-  if (X_AXIS <= component && component < NUM_COMPONENTS)
+  for (int i = 0; i < NUM_COMPONENTS; i++)
   {
-    for (int i = 0; i < NUM_COMPONENTS; i++)
-    {
-      if (i != component)
-      {
-        m_GRCircle[i]->Highlight(false);
-        m_GRFan[i]->Show(false);
-      }
-      m_GRCircle[component]->Highlight(true);
-      m_GRFan[component]->Show(true);
-    }
-  }
-  else if (component == NONE)
-  {
-    for (int i = 0; i < NUM_COMPONENTS; i++)
-    {
-        m_GRCircle[i]->Highlight(false);
-        m_GRFan[i]->Show(false);
-    }
+		bool hilight = (i == component);
+    m_GRCircle[i]->Highlight(hilight);
+    m_GRFan[i]->Show(hilight);
   }
 }
 

@@ -75,9 +75,15 @@ protected:
 	void OpStop(int result);
 
 	void SelectRefSys();
+
+	void UpdateAndSetLocalCentroidRefSys();
+
 	void ChooseRelativeRefSys();
 
 	void UpdateTransformTextEntries();
+
+	/** Accept All VME excluding current */
+	static bool AcceptRefSys(mafVME *node);
 
 	// Plugged objects
 	mafGizmoTranslate           *m_GizmoTranslate;
@@ -99,6 +105,7 @@ protected:
 	double m_Scaling[3];
 
 	double m_OriginRefSysPosition[3];
+	double m_OriginRefSysOrientation[3];
 
 	// Override superclass
 	void RefSysVmeChanged();
