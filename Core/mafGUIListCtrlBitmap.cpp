@@ -63,7 +63,8 @@ mafGUIListCtrlBitmap::~mafGUIListCtrlBitmap()
 void mafGUIListCtrlBitmap::Reset()
 //----------------------------------------------------------------------------
 {
-  m_Images->RemoveAll();
+	if(m_Images)
+		m_Images->RemoveAll();
   m_List->ClearAll();
   m_List->SetImageList(m_Images,wxIMAGE_LIST_SMALL);
   m_List->SetImageList(m_Images,wxIMAGE_LIST_NORMAL);
