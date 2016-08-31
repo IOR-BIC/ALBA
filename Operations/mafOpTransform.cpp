@@ -623,6 +623,10 @@ void mafOpTransform::OnEventTransformGizmo(mafEventBase *maf_event)
 
 			SetRefSysVME(m_LocalCenterRefSysVME);
 		}
+		else if (m_RefSystemMode == REF_INPUT)
+		{
+			SetRefSysVME(m_Input);
+		}
 	}
 
 	m_NewAbsMatrix = *(m_RefSysVME->GetOutput()->GetAbsMatrix());
