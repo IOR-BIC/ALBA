@@ -59,14 +59,10 @@ public:
   /** Show in modal configuration the material editor. */
 	bool ShowChooserDialog(mafVME *vme, bool remember_last_material = false);
 
+	mmaMaterial *GetMaterial(int id);
+
   void OnEvent(mafEventBase *maf_event);
-	
-  /** Get the material tag from vme and if it is not present, create it. */
-  void LoadLibraryFromVme(mafVME *vme);
-
-  /** Store the material library into the vme as a tag. */
-  void StoreLibraryToVme (mafVME *vme);
-
+	  
   /** Create the default material library. */
   void CreateDefaultLibrary();
 
