@@ -170,7 +170,7 @@ void mafViewImageCompound::VmeShow(mafVME *vme, bool show)
 	{
 		m_CurrentImage=mafVMEImage::SafeDownCast(vme);
 		mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(vme);
-		m_ColorLUT = pipe->GetLUT();
+		m_ColorLUT = pipe ? pipe->GetLUT() : NULL;
 		UpdateWindowing(show && pipe && pipe->IsGrayImage());
 	}
 	
@@ -192,15 +192,16 @@ void mafViewImageCompound::UpdateWindowing(bool enable)
 {
 	if(enable && m_CurrentImage)
 	{
-		EnableWidgets(enable);
-		
 		double sr[2];
+		m_CurrentImage->GetOutput()->GetVTKData()->GetScalarRange(sr);
 		m_ColorLUT->SetRange(sr);
       
     m_LutWidget->SetLut(m_ColorLUT);
 		m_LutWidget->Enable(true);
 		m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
 		m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+
+		EnableWidgets(enable);
 	}
 	else
 	{
