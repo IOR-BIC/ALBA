@@ -347,26 +347,24 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 {
 	mafVMEVolumeGray	*VolumeOut;
 	mafDicomSlice* firstSlice = m_SelectedSeries->GetSlice(0);
-	bool skipDifferntDims = false;
 	
 	int nFrames = m_SelectedSeries->GetCardiacImagesNum();
-	int totalNumberOfImages = ((m_ZCropBounds[1]-m_ZCropBounds[0]) + 1)*nFrames;
-
 	int step = GetSetting()->GetBuildStep() + 1;
 	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
-	
 	int SlicesPerFrame = (cropInterval / step);
+	
 	if(cropInterval % step != 0)
 		SlicesPerFrame+=1;
-			
+
+	int totalNumberOfImages = SlicesPerFrame*nFrames;
+	int parsedSlices = 0;
+
 	mafProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Building volume: please wait...");
 
 	mafNEW(VolumeOut);
-
-	int parsedSlices = 0;
-
+	
 	//Loop foreach time 
 	for (int t = 0; t < nFrames; t++)
 	{
@@ -376,6 +374,7 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 		vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
 		accumulate->SetNumberOfSlices(SlicesPerFrame);
 
+		int accumSliceN = 0;
 		//Loop foreach slice
 		for (int i = m_ZCropBounds[0], s_id=0; i < m_ZCropBounds[1] + 1; i += step)
 		{
@@ -386,9 +385,10 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 			vtkImageData *image = slice->GetVTKImageData();
 			Crop(image);
 
-			accumulate->SetSlice(i-m_ZCropBounds[0], image, slice->GetUnrotatedOrigin());
+			accumulate->SetSlice(accumSliceN, image, slice->GetUnrotatedOrigin());
 
 			progressHelper.UpdateProgressBar(parsedSlices * 100 / totalNumberOfImages);
+			accumSliceN++;
 		}
 		accumulate->Update();
 
