@@ -75,6 +75,11 @@ mafGUIMaterialChooser::mafGUIMaterialChooser(wxString dialog_title)
 	m_Gui					    = NULL;
 	m_ListCtrlMaterial= NULL;
 	m_RWI					    = NULL;
+	m_Sphere					= NULL;
+	m_Property				= NULL;
+	m_Mapper					= NULL;
+	m_Actor						= NULL;
+	
 
   m_Filename = mafGetAppDataDirectory().c_str();
   m_Filename += "/mat_library.xml";
@@ -90,9 +95,6 @@ mafGUIMaterialChooser::mafGUIMaterialChooser(wxString dialog_title)
 	m_SpecularPower     = 70; 
   m_Opacity           = 1;
   m_Wire              = 0;
-	
-	CreateGUI();
-	CreatePipe();
 }
 //----------------------------------------------------------------------------
 mafGUIMaterialChooser::~mafGUIMaterialChooser()
@@ -101,7 +103,9 @@ mafGUIMaterialChooser::~mafGUIMaterialChooser()
   mafDEL(m_ChoosedMaterial); //BES: 31.3.2009 - fixed memory leak
 
   ClearList();
-  m_RWI->m_RenFront->RemoveActor(m_Actor);
+	
+	if(m_RWI)
+		m_RWI->m_RenFront->RemoveActor(m_Actor);
 
 	vtkDEL(m_Sphere);
 	vtkDEL(m_Property);
@@ -114,8 +118,14 @@ mafGUIMaterialChooser::~mafGUIMaterialChooser()
 bool mafGUIMaterialChooser::ShowChooserDialog(mafVME *vme, bool remember_last_material)
 //----------------------------------------------------------------------------
 {
-	LoadLibraryFromFile();
+	if (m_Gui == NULL)
+	{
+		CreateGUI();
+		CreatePipe();
+	}
 
+	LoadLibraryFromFile();
+	
   if(m_List.empty())
 	{
     wxBusyInfo wait("Creating material library: Please wait");
@@ -136,6 +146,15 @@ bool mafGUIMaterialChooser::ShowChooserDialog(mafVME *vme, bool remember_last_ma
   m_VmeMaterial	= NULL;
   return res;
 }
+
+//----------------------------------------------------------------------------
+mmaMaterial* mafGUIMaterialChooser::GetMaterial(int id)
+{
+	if (m_List.empty())
+		CreateDefaultLibrary();
+	return m_List[id];
+}
+
 //----------------------------------------------------------------------------
 // constant :
 //----------------------------------------------------------------------------
@@ -511,7 +530,8 @@ void mafGUIMaterialChooser::ClearList()
     delete m_List[i];
   }
   m_List.clear();
-	this->m_ListCtrlMaterial->Reset();
+	if(m_ListCtrlMaterial)
+		m_ListCtrlMaterial->Reset();
 }
 //----------------------------------------------------------------------------
 void mafGUIMaterialChooser::SelectMaterial(mmaMaterial *m)
@@ -599,83 +619,13 @@ void mafGUIMaterialChooser::AddMaterial()
 	SelectMaterial(mat);
 }
 //----------------------------------------------------------------------------
-void mafGUIMaterialChooser::LoadLibraryFromVme(mafVME *vme)
-//----------------------------------------------------------------------------
-{
-  assert(vme);
-	
-//	if(vme->GetTagArray()->FindTag("material1") == -1)
-//	{
-		CreateDefaultLibrary();
-//  }  
-/*	else
-	{
-    ClearList();
-		
-		int counter = 1;
-    char tagname[100];
-    while(1)
-		{
-			sprintf(tagname,"material%d",counter);
-			if(vme->GetTagArray()->FindTag(tagname) == -1) break;
-
-			mmaMaterial *n = mmaMaterial::New();
-      n->LoadFromTag( vme->GetTagArray()->GetTag(tagname) );
-
-			// insert mat in the list
-			mmaMaterial *last;
-			if(!m_List)
-				m_List = n;
-			else
-				last->m_next = n;
-			last = n;
-
-			// insert mat in the tree
-			this->m_ListCtrlMaterial->AddItem((long)n,n->m_MaterialName,n->MakeIcon());	
-
-      counter++;
-		}	
-	} */
-}
-//----------------------------------------------------------------------------
-void mafGUIMaterialChooser::StoreLibraryToVme(mafVME *vme)
-//----------------------------------------------------------------------------
-{
-	if(vme == NULL) 
-    return;
-	if(!m_List.empty()) 
-    return;
-/*
-	int counter =1;
-  char tagname[100];
-
-	for( mmaMaterial *n=m_List; n; n=n->m_next)
-	{			
-    vtkTagItem ti;
-		sprintf(tagname,"material%d",counter++);
-		ti.SetName(tagname);
-		ti.SetValue(1.0);
-		ti.SetNumberOfComponents(20);
-  
-		n->StoreToTag(&ti);
-  
-		vme->GetTagArray()->AddTag(ti);	
-	} 
-	//a previous Storing Operation may have created 
-	//more material tags - these must be removed
-	while(1)
-	{
-		sprintf(tagname,"material%d",counter++);
-	  if(vme->GetTagArray()->FindTag(tagname) == -1) break; 
-    vme->GetTagArray()->DeleteTag(tagname); 	  
-	} */
-}
-//----------------------------------------------------------------------------
 void mafGUIMaterialChooser::CreateDefaultLibrary()
 //----------------------------------------------------------------------------
 {
   ClearList();
-	m_ListCtrlMaterial->Reset();
+
+	if(m_ListCtrlMaterial)
+		m_ListCtrlMaterial->Reset();
 
   char *mat_lib[] = {
 	"0.10  0.25  0.00  0.00  0.75  0.96  0.29  0.29  0.18  1.00  0.50  0.50  80.00  1.00 2 Muscle",
@@ -749,7 +699,8 @@ void mafGUIMaterialChooser::CreateDefaultLibrary()
     m_List.push_back(mat);
 
 		// insert mat in the tree
-		m_ListCtrlMaterial->AddItem((long)mat,mat->m_MaterialName.GetCStr(),mat->MakeIcon());
+		if(m_ListCtrlMaterial)
+			m_ListCtrlMaterial->AddItem((long)mat,mat->m_MaterialName.GetCStr(),mat->MakeIcon());
   }
 }
 //------------------------------------------------------------------------------
