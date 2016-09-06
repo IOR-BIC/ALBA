@@ -290,7 +290,8 @@ void mafInteractorDICOMImporter::OnLeftButtonDown(mafEventInteraction *e)
 void mafInteractorDICOMImporter::SetRenderer(vtkRenderer *ren)
 {
 	m_Renderer = ren;
-	ren->AddActor(m_CropActor);
+	if(ren)
+		ren->AddActor(m_CropActor);
 }
 
 //----------------------------------------------------------------------------
