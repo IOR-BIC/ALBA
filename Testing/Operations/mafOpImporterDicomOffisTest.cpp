@@ -89,19 +89,6 @@ void mafOpImporterDicomOffisTest::TestAccept()
   mafDEL(importer);
 }
 //-----------------------------------------------------------
-void mafOpImporterDicomOffisTest::TestSetDirName() 
-//-----------------------------------------------------------
-{
-  mafOpImporterDicomOffis *importer=new mafOpImporterDicomOffis();
-  char *dirName={"dir name"};
-  importer->SetDicomDirectoryABSFileName(dirName);
-
-  CPPUNIT_ASSERT(strcmp(importer->GetDicomDirectoryABSFileName(),dirName)==0);
-  
-  mafDEL(importer);
-}
-
-//-----------------------------------------------------------
 void mafOpImporterDicomOffisTest::TestCreateVolume() 
 //-----------------------------------------------------------
 {
@@ -120,12 +107,11 @@ void mafOpImporterDicomOffisTest::TestCreateVolume()
       importer->TestModeOn();
 	
 	    wxString dicomPath = dirName + dicomDir;
-	    importer->SetDicomDirectoryABSFileName(dicomPath.c_str());
 	    importer->CreateSliceVTKPipeline();
-	    importer->OpenDir();
-	    importer->ReadDicom();
-	    importer->GenerateSliceTexture(0);
-	    importer->BuildOutputVMEGrayVolumeFromDicom();
+	    importer->OpenDir(dicomPath.c_str());
+	    importer->ImportDicomTags();
+			importer->CalculateCropExtent();
+	    importer->BuildVMEVolumeGrayOutput();
 	
 	    mafVME *VME=importer->GetOutput();
 	    VME->Update();
@@ -191,14 +177,12 @@ void mafOpImporterDicomOffisTest::TestCompareDicomImage()
 	    mafOpImporterDicomOffis *importer=new mafOpImporterDicomOffis();
 	    importer->TestModeOn();
 	    
-	    importer->SetDicomDirectoryABSFileName(dicomPath.c_str());
 	    importer->CreateSliceVTKPipeline();
-	    importer->OpenDir();
-	    importer->ReadDicom();
+	    importer->OpenDir(dicomPath.c_str());
 	    importer->GenerateSliceTexture(0);
 	
 	    wxSplitPath(txtFilePath, &path, &short_name, &ext);
-	    vtkMAFSmartPointer<vtkImageData> imageImported = importer->GetSliceImageDataFromLocalDicomFileName(short_name);
+	    vtkImageData  *imageImported = importer->GetSliceInCurrentSeries(0);
 	   
 	    wxFileInputStream inputFile( txtFilePath );
 	    wxTextInputStream text( inputFile );

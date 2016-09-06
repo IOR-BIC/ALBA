@@ -28,7 +28,6 @@ public:
   CPPUNIT_TEST_SUITE( mafOpImporterDicomOffisTest );
     CPPUNIT_TEST( TestDynamicAllocation );
     CPPUNIT_TEST( TestAccept );
-    CPPUNIT_TEST( TestSetDirName );
     CPPUNIT_TEST( TestCreateVolume );
     CPPUNIT_TEST( TestCompareDicomImage );
   CPPUNIT_TEST_SUITE_END();
@@ -36,8 +35,7 @@ public:
 protected:
   void TestDynamicAllocation();
   void TestAccept();
-  void TestSetDirName();
-  void TestCompareDicomImage();
+	void TestCompareDicomImage();
   void TestCreateVolume();
 
 };
