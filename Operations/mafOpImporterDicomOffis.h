@@ -113,6 +113,12 @@ public:
 	/** Open dir containing Dicom images. */
 	bool OpenDir(const char *dirPath);
 
+	/** Get slice Image data*/
+	vtkImageData *GetSliceInCurrentSeries(int id);
+
+	/** Import dicom tags into vme tags. */
+	void ImportDicomTags();
+
 	/** method allows to handle events from other objects*/
 	virtual void OnEvent(mafEventBase *maf_event);
 		
@@ -135,7 +141,7 @@ protected:
 	void OnChangeSlice();
 	void OnRangeModified();
 	void OnWizardChangePage( mafEvent * e );
-	void OnSeriesSelect();
+	void SelectSeries(mafDicomSeries * selectedSeries);
 	void OnStudySelect();
 	
 	/** Create load page and his GUI for the wizard. */
@@ -172,10 +178,7 @@ protected:
 		
 	/** Fill Series listbox. */
 	void FillSeriesListBox();
-
-	/** Import dicom tags into vme tags. */
-	void ImportDicomTags();
-
+		
 	/** Perform gui update in several wizard pages */
 	void GuiUpdate();
 

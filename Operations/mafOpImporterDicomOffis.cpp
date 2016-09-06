@@ -347,26 +347,24 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 {
 	mafVMEVolumeGray	*VolumeOut;
 	mafDicomSlice* firstSlice = m_SelectedSeries->GetSlice(0);
-	bool skipDifferntDims = false;
 	
 	int nFrames = m_SelectedSeries->GetCardiacImagesNum();
-	int totalNumberOfImages = ((m_ZCropBounds[1]-m_ZCropBounds[0]) + 1)*nFrames;
-
-	int step = GetSetting()->GetBuildStep() + 1;
+	int step = m_TestMode ? 1 : GetSetting()->GetBuildStep() + 1;
 	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
-	
 	int SlicesPerFrame = (cropInterval / step);
+	
 	if(cropInterval % step != 0)
 		SlicesPerFrame+=1;
-			
+
+	int totalNumberOfImages = SlicesPerFrame*nFrames;
+	int parsedSlices = 0;
+
 	mafProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Building volume: please wait...");
 
 	mafNEW(VolumeOut);
-
-	int parsedSlices = 0;
-
+	
 	//Loop foreach time 
 	for (int t = 0; t < nFrames; t++)
 	{
@@ -376,6 +374,7 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 		vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
 		accumulate->SetNumberOfSlices(SlicesPerFrame);
 
+		int accumSliceN = 0;
 		//Loop foreach slice
 		for (int i = m_ZCropBounds[0], s_id=0; i < m_ZCropBounds[1] + 1; i += step)
 		{
@@ -386,9 +385,10 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 			vtkImageData *image = slice->GetVTKImageData();
 			Crop(image);
 
-			accumulate->SetSlice(i-m_ZCropBounds[0], image, slice->GetUnrotatedOrigin());
+			accumulate->SetSlice(accumSliceN, image, slice->GetUnrotatedOrigin());
 
 			progressHelper.UpdateProgressBar(parsedSlices * 100 / totalNumberOfImages);
+			accumSliceN++;
 		}
 		accumulate->Update();
 
@@ -481,12 +481,21 @@ bool mafOpImporterDicomOffis::OpenDir(const char *dirPath)
 	if(!this->m_TestMode)
 	{
 		FillStudyListBox();
-		OnStudySelect();
 		CameraReset();
-		return true;
+		OnStudySelect();
 	}
-	return false;
+	else 
+		SelectSeries(m_StudyList->GetStudy(0)->GetSeries(0));
+
+	return true;
 }
+
+//----------------------------------------------------------------------------
+vtkImageData * mafOpImporterDicomOffis::GetSliceInCurrentSeries(int id)
+{
+	return	m_SelectedSeries->GetSlice(id)->GetVTKImageData();
+}
+
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event) 
 {
@@ -513,7 +522,7 @@ void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 				OnStudySelect();
 			break;
 			case ID_SERIES_SELECT:
-				OnSeriesSelect();
+				SelectSeries(m_StudyList->GetStudy(m_SelectedStudy)->GetSeries(m_SeriesListbox->GetSelection()));
 			break;
 			case ID_SHOW_TEXT:
 				m_TextActor->SetVisibility(m_ShowOrientationPosition);
@@ -579,12 +588,12 @@ void mafOpImporterDicomOffis::CameraUpdate()
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CameraReset()
 {
-	if (m_Wizard->GetCurrentPage() == m_LoadPage)
+	if (m_LoadPage && m_Wizard->GetCurrentPage() == m_LoadPage)
 	{
 		m_LoadPage->UpdateWindowing(m_TotalDicomRange, m_TotalDicomSubRange);
 		m_LoadPage->GetRWI()->CameraReset();
 	}
-	else
+	else if(m_CropPage)
 	{
 		m_CropPage->UpdateWindowing(m_TotalDicomRange, m_TotalDicomSubRange);
 		m_CropPage->GetRWI()->CameraReset();
@@ -616,9 +625,12 @@ void mafOpImporterDicomOffis::CreateSliceVTKPipeline()
 	m_TextMapper->Modified();
 
 	// interactor
-	mafNEW(m_DicomInteractor);
-	m_DicomInteractor->SetListener(this);
-	m_Mouse->AddObserver(m_DicomInteractor, MCH_INPUT);
+	if (m_Mouse)
+	{
+		mafNEW(m_DicomInteractor);
+		m_DicomInteractor->SetListener(this);
+		m_Mouse->AddObserver(m_DicomInteractor, MCH_INPUT);
+	}
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::FillStudyListBox()
@@ -1039,7 +1051,11 @@ void mafOpImporterDicomOffis::CalculateCropExtent()
 	slice->GetExtent(sliceExtent);
 	slice->GetOrigin(sliceOrigin);
 	slice->GetSpacing(spacing);
-	m_DicomInteractor->GetPlaneBounds(crop_bounds);
+
+	if (m_DicomInteractor)
+		m_DicomInteractor->GetPlaneBounds(crop_bounds);
+	else
+		slice->GetBounds(crop_bounds);
 
 	//Align cropBounds to current grid
 	m_CropExtent[0] = round(crop_bounds[0] / spacing[0]);
@@ -1138,7 +1154,7 @@ void mafOpImporterDicomOffis::OnStudySelect()
 		m_SelectedStudy = m_StudyListbox->GetSelection();
 		FillSeriesListBox();
 		m_SeriesListbox->Select(0);
-		OnSeriesSelect();
+		SelectSeries(m_StudyList->GetStudy(m_SelectedStudy)->GetSeries(0));
 	}
 }
 //----------------------------------------------------------------------------
@@ -1164,10 +1180,8 @@ void mafOpImporterDicomOffis::GetDicomRange(double *range)
 	}
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::OnSeriesSelect()
+void mafOpImporterDicomOffis::SelectSeries(mafDicomSeries * selectedSeries)
 {
-	mafDicomSeries * selectedSeries = m_StudyList->GetStudy(m_SelectedStudy)->GetSeries(m_SeriesListbox->GetSelection());
-		
 	if (m_SelectedSeries != selectedSeries)
 	{
 		wxBusyCursor *busyCursor = NULL;
