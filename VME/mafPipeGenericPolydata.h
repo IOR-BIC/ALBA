@@ -20,18 +20,14 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "mafPipe.h"
+#include "mafPipeWithScalar.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-class mmaMaterial;
-class vtkDataSetMapper;
-class vtkActor;
+
 class mafAxes;
-class vtkLookupTable;
 class mafGUIMaterialButton;
-class mafGUILutSwatch;
 class vtkMAFPolyDataNormals;
 class vtkPolyData;
 class vtkDataSet;
@@ -39,7 +35,7 @@ class vtkDataSet;
 //----------------------------------------------------------------------------
 // mafPipeGenericPolydata :
 //----------------------------------------------------------------------------
-class MAF_EXPORT mafPipeGenericPolydata : public mafPipe
+class MAF_EXPORT mafPipeGenericPolydata : public mafPipeWithScalar
 {
 public:
 	//mafTypeMacro(mafPipeGenericPolydata,mafPipe);
@@ -59,22 +55,16 @@ public:
 	/** IDs for the GUI */
 	enum PIPE_SURFACE_WIDGET_ID
 	{
-		ID_LAST = mafPipe::ID_LAST,
-    ID_WIREFRAME,
-		ID_NORMALS_TYPE,
+		ID_WIREFRAME = mafPipeWithScalar::ID_LAST,
+    ID_NORMALS_TYPE,
     ID_EDGE_VISIBILITY,
 		ID_BORDER_CHANGE,
     ID_SCALARS,
     ID_LUT,
     ID_SCALAR_MAP_ACTIVE,
     ID_USE_VTK_PROPERTY,
+		ID_LAST,
 	};
-
-  enum PIPE_SURFACE_TYPE_SCALARS
-  {
-    POINT_TYPE = 0,
-    CELL_TYPE,
-  };
 
   /** Get assembly front/back */
   virtual vtkMAFAssembly *GetAssemblyFront(){return m_AssemblyFront;};
@@ -82,7 +72,7 @@ public:
 	
   /** Core of the pipe */
   virtual void ExecutePipe();
-  
+
   /** Add/RemoveTo Assembly Front/back */
   virtual void AddActorsToAssembly(vtkMAFAssembly *assembly);
   virtual void RemoveActorsFromAssembly(vtkMAFAssembly *assembly);
@@ -102,25 +92,9 @@ public:
   /** Set the actor border visible or not*/
   void SetEdgesVisibilityOn();
   void SetEdgesVisibilityOff();
-
-  /** Set/Get Active Scalar */
-  void SetActiveScalar(int index){m_ScalarIndex = index;};
-  int GetScalarIndex(){return m_ScalarIndex;};
-
-  /** Get Number of Scalars */
-  int GetNumberOfArrays(){return m_NumberOfArrays;};
-
-  /** Set scalar map active, so you can see scalar associated to points or cells*/
-  void SetScalarMapActive(int value){m_ScalarMapActive = value;};
   
   /** Set VTK Property to visualize the material of vme*/
   void SetUseVTKProperty(int value){m_UseVTKProperty = value;};
-
-  /** Set the lookup table */
-	void SetLookupTable(vtkLookupTable *table);
-  
-  /** Gets the lookup table*/
-	vtkLookupTable *GetLookupTable(){return m_Table;};
 
 	/**Return the thickness of the border*/	
 	double GetThickness();
@@ -130,44 +104,27 @@ public:
 
 protected:
 
-	mmaMaterial             *m_ObjectMaterial;
-	vtkDataSetMapper        *m_Mapper;
   vtkDataSetMapper        *m_MapperWired;
-	vtkActor                *m_Actor;
   vtkActor                *m_ActorWired;
 	vtkActor                *m_OutlineActor;
 	vtkMAFPolyDataNormals   *m_NormalsFilter;
 	mafAxes                 *m_Axes;
-  vtkLookupTable          *m_Table;
 	vtkPolyData							*m_InputAsPolydata;
 
 	mafGUILutSwatch *m_LutSwatch;
 
 	virtual vtkPolyData* GetInputAsPolyData() = 0;
-
-  void CreateFieldDataControlArrays();
 	
   void UpdateProperty(bool fromTag = false);
-	
-  /** Update data value to selected scalar */
-  void UpdateActiveScalarsInVMEDataVectorItems();
-  
-  /** Update the visualization with changed scalar*/
-  void UpdateVisualizationWithNewSelectedScalars();
 
   wxString                *m_ScalarsInComboBoxNames;
   wxString                *m_ScalarsVTKName;
 
   mafGUIMaterialButton       *m_MaterialButton;
 
-  int                      m_PointCellArraySeparation;
-  int                      m_ScalarIndex;
-  int                      m_NumberOfArrays;
-  int                      m_ActiveScalarType;
   int                      m_Wireframe;
 	int											 m_ShowCellsNormals;
   int                      m_BorderElementsWiredActor;
-  int                      m_ScalarMapActive;
   int                      m_UseVTKProperty;
 	double				           m_Border;
 
