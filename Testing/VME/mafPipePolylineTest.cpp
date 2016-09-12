@@ -117,18 +117,6 @@ void mafPipePolylineTest::TestPipeExecution()
 
 	////////// ACTORS List ///////////////
 	vtkPropCollection *actorList = vtkPropCollection::New();
-// 	pipePolyline->GetAssemblyFront()->GetActors(actorList);
-// 
-// 	actorList->InitTraversal();
-// 
-// 	vtkProp *actor = actorList->GetNextProp();
-// 	while (actor)
-// 	{
-// 		m_Renderer->AddActor(actor);
-// 		m_RenderWindow->Render();
-// 
-// 		actor = actorList->GetNextProp();
-// 	}
 
 	for (int i = 0; i < NUMBER_OF_TEST; i++)
 	{
@@ -142,7 +130,7 @@ void mafPipePolylineTest::TestPipeExecution()
 		break;
 		case TEST_POLYLINE:
 		{
-			pipePolyline->SetRepresentation(mafPipePolyline::POLYLINE);
+			pipePolyline->SetRepresentation(mafPipePolyline::LINES);
 			pipePolyline->OnEvent(&mafEvent(this, mafPipePolyline::ID_POLYLINE_REPRESENTATION));
 		}
 		break;
@@ -156,7 +144,7 @@ void mafPipePolylineTest::TestPipeExecution()
 		{
 			pipePolyline->SetSplineMode(FALSE);
 			pipePolyline->OnEvent(&mafEvent(this, mafPipePolyline::ID_SPLINE));
-			pipePolyline->SetRepresentation(mafPipePolyline::TUBE);
+			pipePolyline->SetRepresentation(mafPipePolyline::TUBES);
 			pipePolyline->OnEvent(&mafEvent(this, mafPipePolyline::ID_POLYLINE_REPRESENTATION));
 		}
 		break;
@@ -182,7 +170,7 @@ void mafPipePolylineTest::TestPipeExecution()
 		break;
 		case TEST_GLYPH:
 		{
-			pipePolyline->SetRepresentation(mafPipePolyline::GLYPH);
+			pipePolyline->SetRepresentation(mafPipePolyline::SPHERES);
 			pipePolyline->OnEvent(&mafEvent(this, mafPipePolyline::ID_POLYLINE_REPRESENTATION));
 		}
 		break;
@@ -192,14 +180,6 @@ void mafPipePolylineTest::TestPipeExecution()
 			pipePolyline->SetGlyphResolution(5.0);
 			pipePolyline->OnEvent(&mafEvent(this, mafPipePolyline::ID_SPHERE_RADIUS));
 			pipePolyline->OnEvent(&mafEvent(this, mafPipePolyline::ID_SPHERE_RESOLUTION));
-		}
-		break;
-		case TEST_GLYPH_UNCONNECTED:
-		{
-			pipePolyline->SetSplineMode(FALSE);
-			pipePolyline->OnEvent(&mafEvent(this, mafPipePolyline::ID_SPLINE));
-			pipePolyline->SetRepresentation(mafPipePolyline::GLYPH_UNCONNECTED);
-			pipePolyline->OnEvent(&mafEvent(this, mafPipePolyline::ID_POLYLINE_REPRESENTATION));
 		}
 		break;
 		case TEST_GLYPH_SPLINE_MODE:
@@ -228,8 +208,7 @@ void mafPipePolylineTest::TestPipeExecution()
 			actor = actorList->GetNextProp();
 		}
 
-		// TODO Enable CompareImages after fixing of mafPipePolyline 
-		//COMPARE_IMAGES("TestPipeExecution", i);
+		COMPARE_IMAGES("TestPipeExecution", i);
 	}
 
 	vtkDEL(actorList);
