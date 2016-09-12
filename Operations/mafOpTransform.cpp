@@ -53,6 +53,7 @@
 #include "vtkOutlineCornerFilter.h"
 
 #include "mmaMaterial.h"
+#include "vtkMAFLandmarkCloudOutlineCornerFilter.h"
 
 #define EPSILON 1e-9
 
@@ -171,13 +172,22 @@ void mafOpTransform::OpRun()
 	// Create aux transform VME
 	mafNEW(m_TransformVME);
 
-	vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInput(m_Input->GetOutput()->GetVTKData());
-	corner->Update();
-
+	if (m_Input->IsA("mafVMELandmark"))
+	{
+		vtkMAFSmartPointer<vtkMAFLandmarkCloudOutlineCornerFilter> corner;
+		corner->SetInput(m_Input->GetOutput()->GetVTKData());
+		corner->Update();
+		m_TransformVME->SetData(corner->GetOutput(), m_CurrentTime);
+	}
+	else
+	{
+		vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
+		corner->SetInput(m_Input->GetOutput()->GetVTKData());
+		corner->Update();
+		m_TransformVME->SetData(corner->GetOutput(), m_CurrentTime);
+	}
 	// Set default gray color
 	m_TransformVME->SetAbsMatrix(m_NewAbsMatrix, m_CurrentTime);
-	m_TransformVME->SetData(corner->GetOutput(), m_CurrentTime);
 	m_TransformVME->SetName("gizmoVme");
 
 	m_TransformVME->GetMaterial()->m_Diffuse[0] = 1.0;
