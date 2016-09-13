@@ -61,7 +61,6 @@ public:
 		ID_BORDER_CHANGE,
     ID_SCALARS,
     ID_LUT,
-    ID_SCALAR_MAP_ACTIVE,
     ID_USE_VTK_PROPERTY,
 		ID_LAST,
 	};

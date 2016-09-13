@@ -192,11 +192,6 @@ void mafPipeWithScalar::OnEvent(mafEventBase *maf_event)
 	
 					UpdateActiveScalarsInVMEDataVectorItems();
 
-// 					if(m_Wireframe == 0) 
-// 						SetWireframeOff();
-// 					else
-// 						SetWireframeOn();
-
           mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         }
         break;
