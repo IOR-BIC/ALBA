@@ -184,7 +184,7 @@ void mafPipeSurfaceTest::TestPipeExecution()
     CPPUNIT_ASSERT(surfaceActor != NULL);
 
     m_RenderWindow->Render();
-	  printf("\n Visualizzazione: %s \n", strings[i]);
+	  printf("\n Visualization: %s \n", strings[i]);
 
 		COMPARE_IMAGES("TestPipeExecution", i);
 
