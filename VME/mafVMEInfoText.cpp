@@ -314,6 +314,6 @@ const char *mafVMEInfoText::GetPosText(int index)
 char** mafVMEInfoText::GetIcon() 
 //-------------------------------------------------------------------------
 {
-#include "mafVMELandmark.xpm"
-  return mafVMELandmark_xpm;
+#include "mafVMEText.xpm"
+  return mafVMEText_xpm;
 }
