@@ -635,6 +635,7 @@ void mafOpRegisterClusters::OpRun()
 	wxString name = wxString::Format("%s registered on %s",source->GetName(), target->GetName());
 	mafNEW(m_Registered);
 	m_Registered->DeepCopy(source);
+	m_Registered->CopyLandmarks(source);
 	m_Registered->SetName(name);
 	mafEventMacro(mafEvent(this, VME_ADD, m_Registered));
 	m_Registered->ReparentTo(m_Result);
