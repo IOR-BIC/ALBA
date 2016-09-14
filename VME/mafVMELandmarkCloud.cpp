@@ -113,6 +113,24 @@ int mafVMELandmarkCloud::DeepCopy(mafVME *a)
   return MAF_ERROR;
 }
 
+//----------------------------------------------------------------------------
+void mafVMELandmarkCloud::CopyLandmarks(mafVMELandmarkCloud *lmc)
+{
+	if (lmc == NULL)
+		return;
+
+	int lmNum = lmc->GetNumberOfLandmarks();
+	for (int i = 0; i < lmNum; i++)
+	{
+		mafVMELandmark *lm;
+		mafNEW(lm);
+		lm->DeepCopy(lmc->GetLandmark(i));
+		lm->ReparentTo(this);
+		mafDEL(lm);
+	}
+
+}
+
 //-------------------------------------------------------------------------
 bool mafVMELandmarkCloud::Equals(mafVME *vme)
 {
