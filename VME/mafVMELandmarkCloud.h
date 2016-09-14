@@ -66,6 +66,9 @@ public:
   /** Copy the contents of another landmarkcloud into this one. */
   virtual int DeepCopy(mafVME *a);
 
+	/** Copy landmarks form a specified landmark cloud */
+	void CopyLandmarks(mafVMELandmarkCloud *lmc);
+
   /** Compare with another landmarkcloud. */
   virtual bool Equals(mafVME *vme);
 
