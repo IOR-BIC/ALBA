@@ -48,6 +48,7 @@
 #include "mafRoot.h"
 #include "wx\tokenzr.h"
 #include "mafVMELandmarkCloud.h"
+#include "mafVMEFactory.h"
 
 //-------------------------------------------------------------------------
 mafCxxAbstractTypeMacro(mafVME)
@@ -78,6 +79,7 @@ mafVME::mafVME()
 
   m_VisualMode = DEFAULT_VISUAL_MODE;
 }
+
 
 //-------------------------------------------------------------------------
 mafVME::~mafVME()
@@ -988,36 +990,22 @@ mafGUI *mafVME::CreateGui()
 	m_Gui = new mafGUI(this);
 	m_Gui->SetListener(this);
 
-	mafString type_name = GetTypeName();
+	mafString type = GetTypeName();
+	mafString typeName = GetTypeNameFromType(type);
 	mafEvent buildHelpGui;
 	buildHelpGui.SetSender(this);
-	buildHelpGui.SetString(&type_name);
+	buildHelpGui.SetString(&type);
 	buildHelpGui.SetId(GET_BUILD_HELP_GUI);
 	ForwardUpEvent(buildHelpGui);
 
-	char vmeTypeName[100];
-	int typeNamePos=0;
-	for (int i = 6; i < type_name.GetSize(); i++)
-	{
-		if (type_name[i] >= 'A' && type_name[i] <= 'Z')
-		{
-			vmeTypeName[typeNamePos] = ' ';
-			typeNamePos++;
-		}
-		vmeTypeName[typeNamePos] = type_name[i];
-		typeNamePos++;
-	}
-
+	
 	if (buildHelpGui.GetArg() == true)
-		m_Gui->ButtonAndHelp(ID_PRINT_INFO, ID_HELP, vmeTypeName, "Print node debug information");
+		m_Gui->ButtonAndHelp(ID_PRINT_INFO, ID_HELP, typeName, "Print node debug information");
 	else
-		m_Gui->Button(ID_PRINT_INFO, vmeTypeName, "", "Print node debug information");
+		m_Gui->Button(ID_PRINT_INFO, typeName, "", "Print node debug information");
 
 	m_Gui->Divider(1);
-
 	m_Gui->String(ID_NAME, "name :", &m_GuiName);
-
-	
 	m_Gui->Divider();
 
   mafString anim_text;
@@ -2017,9 +2005,16 @@ void mafVME::NodeOnEvent(mafEventBase *e)
 	}
 }
 
+//----------------------------------------------------------------------------
+mafString mafVME::GetTypeNameFromType(mafString typeName)
+{
+	mafVMEFactory *vmeFactory = mafVMEFactory::GetInstance();
+	std::string name = vmeFactory->GetObjectTypeName(typeName);
+	return name.c_str();
+}
+
 //-------------------------------------------------------------------------
 void mafVME::Print(std::ostream& os, const int tabs)// const
-																										//-------------------------------------------------------------------------
 {
 	mafIndent indent(tabs);
 	mafIndent next_indent(indent.GetNextIndent());

@@ -225,7 +225,7 @@ bool mafOpRegisterClusters::Accept(mafVME* node)
 	if (source == NULL)
 		return;	//fatal error
 
-	int index = source->FindLandmarkIndex(sourceName);
+	int index = source->GetLandmarkIndex(sourceName);
 	if (index >= 0) {
 		SetSourceWeight(index, weight);
 	}
@@ -324,7 +324,7 @@ void mafOpRegisterClusters::CreateMatches()
 	mafVMELandmarkCloud* source = GetSource();
 	if (source != NULL)
 	{
-		int sourceIndex = source->FindLandmarkIndex(sourceName);
+		int sourceIndex = source->GetLandmarkIndex(sourceName);
 		if (sourceIndex >= 0)
 		{
 			m_Matches[sourceIndex].RemoveAllAcceptableTargetNames();
@@ -348,7 +348,7 @@ void mafOpRegisterClusters::CreateMatches()
 	mafVMELandmarkCloud* source = GetSource();
 	if (source != NULL)
 	{
-		int sourceIndex = source->FindLandmarkIndex(sourceName);
+		int sourceIndex = source->GetLandmarkIndex(sourceName);
 		if (sourceIndex >= 0) {			
 			m_Matches[sourceIndex].AddAcceptableTargetName(targetName);
 		}

@@ -93,10 +93,7 @@ public:
 
 	/** Answer to the messages coming from interface. */
 	void OnEvent(mafEventBase *maf_event);
-
-  /** Retrieve Dictionary path name. */
-	mafString GetDictionary(){return "";}; // Left for backward compatibility. Always return the empty string
-
+	  
   /** Retrieve the build step. */
   int GetBuildStep(){return m_Step;};
   

@@ -153,7 +153,7 @@ mafGUI* mafViewImageCompound::CreateGui()
 void mafViewImageCompound::PackageView()
 //-------------------------------------------------------------------------
 {
-	m_ViewImage = new mafViewImage("View Image",CAMERA_FRONT,false,false,false);
+	m_ViewImage = new mafViewImage("View Image",CAMERA_CT,false,false,false);
 	m_ViewImage->PlugVisualPipe("mafVMEVolumeGray","mafPipeBox",NON_VISIBLE);
   m_ViewImage->PlugVisualPipe("mafVMESurface","mafPipeSurface",NON_VISIBLE);
 	
@@ -170,6 +170,7 @@ void mafViewImageCompound::VmeShow(mafVME *vme, bool show)
 	{
 		m_CurrentImage=mafVMEImage::SafeDownCast(vme);
 		mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(vme);
+		m_ColorLUT = pipe ? pipe->GetLUT() : NULL;
 		UpdateWindowing(show && pipe && pipe->IsGrayImage());
 	}
 	
@@ -191,19 +192,16 @@ void mafViewImageCompound::UpdateWindowing(bool enable)
 {
 	if(enable && m_CurrentImage)
 	{
-		EnableWidgets(enable);
-		
 		double sr[2];
 		m_CurrentImage->GetOutput()->GetVTKData()->GetScalarRange(sr);
-
-    m_ColorLUT = ((mafPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(m_CurrentImage))->GetLUT();;
-
-    m_ColorLUT->SetRange(sr);
+		m_ColorLUT->SetRange(sr);
       
     m_LutWidget->SetLut(m_ColorLUT);
 		m_LutWidget->Enable(true);
 		m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
 		m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+
+		EnableWidgets(enable);
 	}
 	else
 	{
@@ -220,6 +218,7 @@ void mafViewImageCompound::VmeRemove(mafVME *vme)
 	if (m_CurrentImage == vme)
 	{
 		m_CurrentImage = NULL;
+		m_ColorLUT = NULL;
 		UpdateWindowing(false);
 	}
 

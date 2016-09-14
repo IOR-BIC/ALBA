@@ -151,7 +151,7 @@ void mafVMELandmarkCloudTest::FindLandmarkIndexTest()
 
   //FindLandmarkIndex
   bool result = false;
-  result = mafEquals(cloud2->FindLandmarkIndex(name),0);
+  result = mafEquals(cloud2->GetLandmarkIndex(name),0);
   CPPUNIT_ASSERT(result);
 }
 

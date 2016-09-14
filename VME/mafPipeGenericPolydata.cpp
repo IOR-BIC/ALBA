@@ -53,33 +53,23 @@
 
 //----------------------------------------------------------------------------
 mafPipeGenericPolydata::mafPipeGenericPolydata()
-:mafPipe()
+:mafPipeWithScalar()
 {
-	m_Mapper          = NULL;
-	m_Actor           = NULL;
+	m_Mapper					= NULL;
+	m_Actor						= NULL;
 	m_OutlineActor    = NULL;
 	m_Gui             = NULL;
   
 	m_ShowCellsNormals = 0;
   m_Wireframe = 0;
-  m_ScalarIndex = 0;
-  m_NumberOfArrays = 0;
-  m_Table						= NULL;
-
-  m_ActiveScalarType = POINT_TYPE;
-  m_PointCellArraySeparation = 0;
-
-	m_ScalarsInComboBoxNames = NULL;
-	m_ScalarsVTKName = NULL;
-  m_MaterialButton = NULL;
-
+  
+  m_MaterialButton	= NULL;
 	m_ActorWired			= NULL;
 	m_MapperWired			= NULL;
 	m_Axes						= NULL;
 	m_InputAsPolydata = NULL;
 	m_NormalsFilter   = NULL;
 
-  m_ScalarMapActive = 0;
   m_UseVTKProperty  = 1;
 
   m_BorderElementsWiredActor = false;
@@ -89,8 +79,7 @@ mafPipeGenericPolydata::mafPipeGenericPolydata()
 mafPipeGenericPolydata::~mafPipeGenericPolydata()
 {
 	RemoveActorsFromAssembly(m_AssemblyFront);
-
-	vtkDEL(m_Table);
+	
 	vtkDEL(m_Mapper);
 	vtkDEL(m_Actor);
 	vtkDEL(m_ActorWired);
@@ -99,9 +88,6 @@ mafPipeGenericPolydata::~mafPipeGenericPolydata()
 	cppDEL(m_Axes);
 	cppDEL(m_MaterialButton);
 	cppDEL(m_NormalsFilter);
-
-	delete[] m_ScalarsInComboBoxNames;
-	delete[] m_ScalarsVTKName;
 }
 //----------------------------------------------------------------------------
 void mafPipeGenericPolydata::Create(mafSceneNode *n)
@@ -128,7 +114,6 @@ void mafPipeGenericPolydata::ExecutePipe()
   m_Vme->Update();
   m_Vme->GetOutput()->GetVTKData()->Update();
 
-  CreateFieldDataControlArrays();
 
 	mafVMEOutput *vmeOutput = m_Vme->GetOutput();
 	assert(vmeOutput);
@@ -137,64 +122,11 @@ void mafPipeGenericPolydata::ExecutePipe()
 	assert(dataSet);
 	dataSet->Update();
 
-
-	m_ObjectMaterial = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
-
-  m_PointCellArraySeparation = dataSet->GetPointData()->GetNumberOfArrays();
-	if (dataSet->GetPointData()->GetNormals())
-		m_PointCellArraySeparation--;
-  m_NumberOfArrays = m_PointCellArraySeparation + dataSet->GetCellData()->GetNumberOfArrays();
- 
-
-  // point type scalars
-	vtkDataArray *scalars = dataSet->GetPointData()->GetScalars();
-
-  double sr[2] = {0,1};
-  if(scalars)
-  {
-    scalars->Modified();
-    scalars->GetRange(sr);
-    m_ActiveScalarType = POINT_TYPE;
-  }
-  else
-  {
-    scalars = dataSet->GetCellData()->GetScalars();
-    if(scalars)
-    {
-      scalars->Modified();
-      scalars->GetRange(sr);
-      m_ActiveScalarType = CELL_TYPE;
-    }
-  }
-
-  vtkNEW(m_Table);
-  lutPreset(4,m_Table);
-  m_Table->Build();
-  m_Table->DeepCopy(m_ObjectMaterial->m_ColorLut);
-	
-  m_Table->SetValueRange(sr);
-  m_Table->SetHueRange(0.667, 0.0);
-  m_Table->SetTableRange(sr);
-  m_Table->Build();
-  
-  m_ObjectMaterial->m_ColorLut->DeepCopy(m_Table);
-  m_ObjectMaterial->m_ColorLut->Build();
-
 	vtkNEW(m_Mapper);
-  m_Mapper->ImmediateModeRenderingOn();
-  m_Mapper->SetLookupTable(m_Table);
-	m_Mapper->SetScalarRange(sr);
-
-	if(m_ActiveScalarType == POINT_TYPE)
-    m_Mapper->SetScalarModeToUsePointData();
-  if(m_ActiveScalarType == CELL_TYPE)
-    m_Mapper->SetScalarModeToUseCellData();
-
-  if(m_ScalarMapActive)
-	  m_Mapper->ScalarVisibilityOn();
-  else
-    m_Mapper->ScalarVisibilityOff();
-
+	m_Mapper->ImmediateModeRenderingOn();
+	
+	ManageScalarOnExecutePipe(dataSet);
+	
 	vtkPolyData *polyData=GetInputAsPolyData();
 
 	vtkNEW(m_NormalsFilter);
@@ -319,14 +251,7 @@ mafGUI *mafPipeGenericPolydata::CreateGui()
   m_Gui->AddGui(m_MaterialButton->GetGui());
   m_MaterialButton->Enable(m_UseVTKProperty != 0);
 
-  m_Gui->Divider(2);
-	m_Gui->Bool(ID_SCALAR_MAP_ACTIVE,_("Enable scalar field mapping"), &m_ScalarMapActive, 1);
-	m_Gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsInComboBoxNames);	
-  m_LutSwatch=m_Gui->Lut(ID_LUT,"Lut",m_Table);
-
-  m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
-  m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
-	m_Gui->Enable(ID_SCALAR_MAP_ACTIVE,m_NumberOfArrays>0);
+	CreateScalarsGui(m_Gui);
   
   m_Gui->Divider();
   m_Gui->Label("");
@@ -371,48 +296,14 @@ void mafPipeGenericPolydata::OnEvent(mafEventBase *maf_event)
             SetEdgesVisibilityOn();
         }
         break;
-      case ID_SCALARS:
-        {
-          if(m_ScalarIndex < m_PointCellArraySeparation)
-          {
-            m_ActiveScalarType = POINT_TYPE;
-          }
-          else 
-          {
-            m_ActiveScalarType = CELL_TYPE;
-          }
-          UpdateActiveScalarsInVMEDataVectorItems();
-          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-        }
-        break;
-      case ID_LUT:
-        {
-          double sr[2];
-          m_Table->GetTableRange(sr);
-          m_Mapper->SetScalarRange(sr);
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-        }
-        break;
       case ID_SCALAR_MAP_ACTIVE:
         {
-					m_Mapper->SetScalarVisibility(m_ScalarMapActive);
-				
-					if(m_Gui)
-					{
-						m_Gui->Enable(ID_SCALAR_MAP_ACTIVE,m_NumberOfArrays>0);
-						m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
-						m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
-						m_Gui->Update();
-					}
-	
-					UpdateActiveScalarsInVMEDataVectorItems();
+					mafPipeWithScalar::OnEvent(e);
 
 					if(m_Wireframe == 0) 
 						SetWireframeOff();
 					else
 						SetWireframeOn();
-
-          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         }
         break;
       case ID_USE_VTK_PROPERTY:
@@ -470,7 +361,7 @@ void mafPipeGenericPolydata::OnEvent(mafEventBase *maf_event)
 				}
 				break;
 			default:
-				mafEventMacro(*e);
+				mafPipeWithScalar::OnEvent(e);
 				break;
 		}
 	}
@@ -557,189 +448,6 @@ void mafPipeGenericPolydata::SetEdgesVisibilityOff()
   m_ActorWired->SetVisibility(0);
   m_ActorWired->Modified();
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-}
-//----------------------------------------------------------------------------
-void mafPipeGenericPolydata::UpdateActiveScalarsInVMEDataVectorItems()
-{
-  
-  m_Vme->GetOutput()->GetVTKData()->Update();
-  m_Vme->Update();
-  
-  if(m_ActiveScalarType == POINT_TYPE)
-  {
-    m_Vme->GetOutput()->GetVTKData()->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
-    m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->Modified();
-  }
-  else if(m_ActiveScalarType == CELL_TYPE)
-  {
-    m_Vme->GetOutput()->GetVTKData()->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
-    m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars()->Modified();
-  }
-  m_Vme->Modified();
-  m_Vme->GetOutput()->GetVTKData()->Update();
-  m_Vme->Update();
-  
-	if(mafVMEGeneric::SafeDownCast(m_Vme) && ((mafVMEGeneric *)m_Vme)->GetDataVector())
-	{
-		for (mafDataVector::Iterator it = ((mafVMEGeneric *)m_Vme)->GetDataVector()->Begin(); it != ((mafVMEGeneric *)m_Vme)->GetDataVector()->End(); it++)
-		{
-			mafVMEItemVTK *item = mafVMEItemVTK::SafeDownCast(it->second);
-			assert(item);
-
-			vtkDataSet *outputVTK = vtkDataSet::SafeDownCast(item->GetData());
-			if(outputVTK)
-			{
-				if(m_ActiveScalarType == POINT_TYPE)
-				{
-					wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].c_str();
-					vtkDataArray *scalarsArray = outputVTK->GetPointData()->GetArray(scalarsToActivate);
-
-					if (scalarsArray == NULL)
-					{
-						std::ostringstream stringStream;
-						stringStream << scalarsToActivate.c_str() << " POINT_DATA array does not exist for timestamp " \
-							<< item->GetTimeStamp() << " . Skipping SetActiveScalars for this timestamp" << std::endl;
-						mafLogMessage(stringStream.str().c_str());
-						continue;
-					}
-
-					outputVTK->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
-					outputVTK->GetPointData()->GetScalars()->Modified();
-				}
-				else if(m_ActiveScalarType == CELL_TYPE)
-				{
-					wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].c_str();
-					vtkDataArray *scalarsArray = outputVTK->GetCellData()->GetArray(scalarsToActivate);
-        
-					if (scalarsArray == NULL)
-					{
-						std::ostringstream stringStream;
-						stringStream << scalarsToActivate.c_str() << "  CELL_DATA array does not exist for timestamp " \
-						<< item->GetTimeStamp() << " . Skipping SetActiveScalars for this timestamp" << std::endl;
-						mafLogMessage(stringStream.str().c_str());
-						continue;
-					}
-        
-
-					outputVTK->GetCellData()->SetActiveScalars(scalarsToActivate.c_str());
-					outputVTK->GetCellData()->GetScalars()->Modified();
-				}
-				outputVTK->Modified();
-				outputVTK->Update();
-      
-			}
-		}
-	}
-  m_Vme->Modified();
-  m_Vme->Update();
-  
-  UpdateVisualizationWithNewSelectedScalars();
-  
-}
-//----------------------------------------------------------------------------
-void mafPipeGenericPolydata::UpdateVisualizationWithNewSelectedScalars()
-{
-  vtkDataSet *data = vtkDataSet::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
-  data->Update();
-  double sr[2];
-  if(m_ActiveScalarType == POINT_TYPE)
-    data->GetPointData()->GetScalars()->GetRange(sr);
-  else if(m_ActiveScalarType == CELL_TYPE)
-    data->GetCellData()->GetScalars()->GetRange(sr);
-
-  m_Table->SetTableRange(sr);
-  m_Table->SetValueRange(sr);
-  m_Table->SetHueRange(0.667, 0.0);
-  
-  m_ObjectMaterial->m_ColorLut->DeepCopy(m_Table);
-  m_ObjectMaterial->UpdateFromLut();
-
-
-  if(m_ActiveScalarType == POINT_TYPE)
-    m_Mapper->SetScalarModeToUsePointData();
-  if(m_ActiveScalarType == CELL_TYPE)
-    m_Mapper->SetScalarModeToUseCellData();
-
-  m_Mapper->SetLookupTable(m_Table);
-  m_Mapper->SetScalarRange(sr);
-  m_Mapper->Update();
-
-  m_Actor->Modified();
-
-  UpdateProperty();
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-
-}
-
-//----------------------------------------------------------------------------
-void mafPipeGenericPolydata::CreateFieldDataControlArrays()
-{
-  //String array allocation
-	vtkPointData * pointData = m_Vme->GetOutput()->GetVTKData()->GetPointData();
-	vtkCellData * cellData = m_Vme->GetOutput()->GetVTKData()->GetCellData();
-
-  int numPointScalars = pointData->GetNumberOfArrays();
-	int numCellScalars = cellData->GetNumberOfArrays();
-
-	if (pointData->GetNormals())
-		numPointScalars--;
-	
-  wxString *tempScalarsPointsName=new wxString[numPointScalars + numCellScalars];
-  int count=0;
-
-  int pointArrayNumber;
-  for(pointArrayNumber = 0;pointArrayNumber<numPointScalars;pointArrayNumber++)
-  {
-		const char *arrayName=pointData->GetArrayName(pointArrayNumber);
-    if(arrayName && strcmp(arrayName,"")!=0)
-    {
-      count++;
-      tempScalarsPointsName[count-1]=pointData->GetArrayName(pointArrayNumber);
-    }
-  }
-  for(int cellArrayNumber=0;cellArrayNumber<numCellScalars;cellArrayNumber++)
-  {
-		const char *arrayName=cellData->GetArrayName(cellArrayNumber);
-    if(arrayName && strcmp(arrayName,"")!=0)
-    {
-      count++;
-      tempScalarsPointsName[count-1]=cellData->GetArrayName(cellArrayNumber);
-    }
-  }
-
-  m_ScalarsInComboBoxNames = new wxString[count];
-  m_ScalarsVTKName = new wxString[count];
-
-  for(int j=0;j<count;j++)
-  {
-    m_ScalarsVTKName[j]=tempScalarsPointsName[j];
-    if(j<pointArrayNumber)
-      m_ScalarsInComboBoxNames[j]="[POINT] " + tempScalarsPointsName[j];
-    else
-      m_ScalarsInComboBoxNames[j]="[CELL] " + tempScalarsPointsName[j];
-  }
-
-  m_PointCellArraySeparation = pointArrayNumber;
-
-  delete []tempScalarsPointsName;
-
-}
-
-//----------------------------------------------------------------------------
-void mafPipeGenericPolydata::SetLookupTable(vtkLookupTable *table)
-{
-	if(m_Table==NULL || table==NULL ) return;
-
-	int n = table->GetNumberOfTableValues();
-	if(n>256) n=256;
-	m_Table->SetNumberOfTableValues(n);
-	m_Table->SetRange(table->GetRange());
-	for(int i=0; i<n; i++)
-	{
-		double *rgba;
-		rgba = table->GetTableValue(i);
-		m_Table->SetTableValue(i,rgba[0],rgba[1],rgba[2],rgba[3]);
-	}
 }
 
 //----------------------------------------------------------------------------

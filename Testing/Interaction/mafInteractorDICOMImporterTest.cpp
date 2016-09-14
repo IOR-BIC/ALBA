@@ -70,8 +70,9 @@ void mafInteractorDICOMImporterTest::TestOnLeftButtonDown()
 {
   mafInteractorDICOMImporter *dicomImporterInteractor = mafInteractorDICOMImporter::New();
   
+	mafEventInteraction e;
   // smoke test (should not crash)
-  dicomImporterInteractor->OnLeftButtonDown(NULL);
+  dicomImporterInteractor->OnLeftButtonDown(&e);
   dicomImporterInteractor->Delete();
 }
 

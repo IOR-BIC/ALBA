@@ -36,15 +36,17 @@ class name: mafOpImporterLandmark
 this class provides the landmark importing written in the following format:
 1) a line with initial # is a comment
 2) Before a sequence of landmark it can be a line with "Time XXX" where XXX is a number current of timestep
-     After the list of landmark is finished for that time, a new line with Time XXY or similar will follow.
-     If there's not time, the cloud is considered time-INVARIANT
-3) the line with landmark data are:
-     nameOfLandmark x y z
+	After the list of landmark is finished for that time, a new line with Time XXY or similar will follow.
+	If there's not time, the cloud is considered time-INVARIANT
+3) if m_OnlyCoordinates is true the line with landmark data are:
+	nameOfLandmark x y z
+	else
+	x y z
 */
 class MAF_EXPORT mafOpImporterLandmark : public mafOp
 {
 public:
-  /** object cosntructor */
+  /** object constructor */
 	mafOpImporterLandmark(wxString label);
   /** object destructor */
 	~mafOpImporterLandmark();
@@ -65,29 +67,28 @@ public:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop	(int result);
 
-  /** Read the file.
-  the format of the file admits some speficics.
-  1) a line with initial # is a comment
-  2) Before a sequence of landmark it can be a line with "Time XXX" where XXX is a number current of timestep
-     After the list of landmark is finished for that time, a new line with Time XXY or similar will follow.
-     If there's not time, the cloud is considered time-INVARIANT
-  3) the line with landmark data are:
-     nameOfLandmark x y z
-  */
+  /** Read the file  */ 
   void Read();
 
-  /** Read the file.
-  the format of the file admits some speficics.
-  The line with landmark pose can be with any type of char separation (provided it has been selected by the user)
-  */
-  void ReadWithoutTag();
+	/** Converts the line */
+	void ConvertLine(char *line, int count, char separator, wxString &name, double &x, double &y, double &z);
 
-  /** Set the filename for the file to import */
+	/** Set the filename for the file to import */
   void SetFileName(const char *file_name){m_File = file_name;};
+	
 
+	/** Returns OnlyCoordinates mode */
+	int GetOnlyCoordinates() const { return m_OnlyCoordinates; }
 
-	/** Makes the undo for the operation. */
-	//void OpUndo();                       // gia' implementata in mafOp
+	/** Sets OnlyCoordinates mode */
+	void SetOnlyCoordinates(int onlyCoordinates) { m_OnlyCoordinates = onlyCoordinates; }
+		
+
+	/** Returns TypeSeparation */
+	int GetTypeSeparation() const { return m_TypeSeparation; }
+
+	/** Sets TypeSeparation values are 0 = comma, 1 = space, 2 = semicolon, 3 = tab */
+	void SetTypeSeparation(int typeSeparation) { m_TypeSeparation = typeSeparation; }
 
 protected:
   
@@ -95,19 +96,13 @@ protected:
   {
     ID_TYPE_FILE = MINID,
     ID_TYPE_SEPARATION,
-    ID_ENABLE_STRING,
-    ID_STRING_SEPARATION,
     MINID,
   };
 
   int m_TypeSeparation;
-  int m_EnableString;
-  mafString m_StringSeparation;
-
-  wxString m_FileDir;
+  mafVMELandmarkCloud  *m_VmeCloud;
 	wxString m_File;
-	mafVMELandmarkCloud  *m_VmeCloud;
-  int m_TagFileFlag;
+  int m_OnlyCoordinates;
 
 };
 #endif

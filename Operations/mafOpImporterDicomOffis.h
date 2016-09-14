@@ -113,6 +113,12 @@ public:
 	/** Open dir containing Dicom images. */
 	bool OpenDir(const char *dirPath);
 
+	/** Get slice Image data*/
+	vtkImageData *GetSliceInCurrentSeries(int id);
+
+	/** Import dicom tags into vme tags. */
+	void ImportDicomTags();
+
 	/** method allows to handle events from other objects*/
 	virtual void OnEvent(mafEventBase *maf_event);
 		
@@ -135,7 +141,7 @@ protected:
 	void OnChangeSlice();
 	void OnRangeModified();
 	void OnWizardChangePage( mafEvent * e );
-	void OnSeriesSelect();
+	void SelectSeries(mafDicomSeries * selectedSeries);
 	void OnStudySelect();
 	
 	/** Create load page and his GUI for the wizard. */
@@ -172,10 +178,7 @@ protected:
 		
 	/** Fill Series listbox. */
 	void FillSeriesListBox();
-
-	/** Import dicom tags into vme tags. */
-	void ImportDicomTags();
-
+		
 	/** Perform gui update in several wizard pages */
 	void GuiUpdate();
 
@@ -335,21 +338,12 @@ public:
 	/** Returns the number of series */
 	int GetSlicesNum() { return m_Slices.size(); }
 
-	/** Check if Dicom dataset contains rotations */
-	bool IsRotated(const double dcmImageOrientationPatient[6]);
-
 	/** Returns IsRotated */
 	bool IsRotated() const { return m_IsRotated; }
-	
-	/** Sets IsRotated */
-	void SetRotated(bool isRotated) { m_IsRotated = isRotated; }
 	
 	/** Returns Slices vector */
 	std::vector<mafDicomSlice *> GetSlices() const { return m_Slices; }
 
-	/** Sets Slices */
-	void SetSlices(std::vector<mafDicomSlice *> slices) { m_Slices = slices; }
-	
 	/** Returns SerieID */
 	mafString GetSerieID() const { return m_SeriesID; }
 
@@ -363,6 +357,9 @@ public:
 	void SortSlices();
 		
 protected:
+
+	/** Check if Dicom dataset contains rotations */
+	bool IsRotated(const double dcmImageOrientationPatient[6]);
 
 	std::vector<mafDicomSlice *> m_Slices;
 	int m_Dimensions[3];
@@ -384,9 +381,8 @@ class MAF_EXPORT mafDicomSlice
 public:
 
 	/** Constructor */
-	mafDicomSlice(mafString sliceABSFilename, double dcmImagePositionPatient[3], double dcmImageOrientationPatient[6], \
-		vtkImageData *data, mafString description, mafString date, mafString patientName, mafString patientBirthdate, int dcmInstanceNumber = -1, int dcmCardiacNumberOfImages = -1, \
-		double dcmTtriggerTime = -1.0)
+	mafDicomSlice(mafString sliceABSFilename, double dcmImageOrientationPatient[6], vtkImageData *data, mafString description, mafString date,
+								mafString patientName, mafString patientBirthdate, int dcmInstanceNumber = -1, int dcmCardiacNumberOfImages = -1, double dcmTtriggerTime = -1.0)
 	{
 		m_PatientBirthdate = patientBirthdate;
 		m_PatientName = patientName;
@@ -397,10 +393,7 @@ public:
 		m_DcmCardiacNumberOfImages = dcmCardiacNumberOfImages;
 		m_DcmTriggerTime = dcmTtriggerTime;
 		m_ImageData = data;
-		SetDcmImagePositionPatient(dcmImagePositionPatient);
-		SetDcmImagePositionPatientOriginal(dcmImagePositionPatient);
 		SetDcmImageOrientationPatient(dcmImageOrientationPatient);
-		CalculateUnrotatedOrigin();
 	};
 
 	/** destructor */
@@ -439,44 +432,6 @@ public:
 	/** Retrieve image data */
 	vtkImageData* GetVTKImageData() { return m_ImageData; };
 
-	/** Set the DcmImagePositionPatient tag for the slice */
-	void SetDcmImagePositionPatient(double dcmImagePositionPatient[3])
-	{
-		m_DcmImagePositionPatient[0] = dcmImagePositionPatient[0];
-		m_DcmImagePositionPatient[1] = dcmImagePositionPatient[1];
-		m_DcmImagePositionPatient[2] = dcmImagePositionPatient[2];
-	};
-
-	/** Get the DcmImagePositionPatient tag for the slice */
-	void GetDcmImagePositionPatient(double dcmImagePositionPatient[3])
-	{
-		dcmImagePositionPatient[0] = m_DcmImagePositionPatient[0];
-		dcmImagePositionPatient[1] = m_DcmImagePositionPatient[1];
-		dcmImagePositionPatient[2] = m_DcmImagePositionPatient[2];
-	};
-
-	/** Get the DcmImagePositionPatient tag for the slice */
-	const double *GetDcmImagePositionPatient() {return m_DcmImagePositionPatient;};
-
-	/** Set the DcmImagePositionPatient tag for the slice */
-	void SetDcmImagePositionPatientOriginal(double dcmImagePositionPatient[3])
-	{
-		m_DcmImagePositionPatientOriginal[0] = dcmImagePositionPatient[0];
-		m_DcmImagePositionPatientOriginal[1] = dcmImagePositionPatient[1];
-		m_DcmImagePositionPatientOriginal[2] = dcmImagePositionPatient[2];
-	};
-
-	/** Get the DcmImagePositionPatient tag original for the slice */
-	void GetDcmImagePositionPatientOriginal(double dcmImagePositionPatient[3])
-	{
-		dcmImagePositionPatient[0] = m_DcmImagePositionPatientOriginal[0];
-		dcmImagePositionPatient[1] = m_DcmImagePositionPatientOriginal[1];
-		dcmImagePositionPatient[2] = m_DcmImagePositionPatientOriginal[2];
-	};
-
-	/** Get the DcmImagePositionPatient tag for the slice */
-	const double *GetDcmImagePositionPatientOriginal() { return m_DcmImagePositionPatientOriginal; };
-
 	/** Set the DcmImageOrientationPatient tag for the slice */
 	void SetDcmImageOrientationPatient(double dcmImageOrientationPatient[6])
 	{
@@ -486,6 +441,7 @@ public:
 		m_DcmImageOrientationPatient[3] = dcmImageOrientationPatient[3];
 		m_DcmImageOrientationPatient[4] = dcmImageOrientationPatient[4];
 		m_DcmImageOrientationPatient[5] = dcmImageOrientationPatient[5];
+		CalculateUnrotatedOrigin();
 	};
 
 	/** Get the DcmImageOrientationPatient tag for the slice */
@@ -547,8 +503,6 @@ protected:
 	void CalculateUnrotatedOrigin();
 
 	double m_UnrotatedOrigin[3];
-	double m_DcmImagePositionPatient[3];
-	double m_DcmImagePositionPatientOriginal[3];
 	double m_DcmImageOrientationPatient[6];
 	mafString m_SliceABSFileName;
 	mafString m_Description;

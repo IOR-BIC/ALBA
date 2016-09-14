@@ -70,14 +70,23 @@ protected:
 	virtual void CreateGui();
 
 	void OnEventTransformGizmo(mafEventBase *maf_event);
-	void OnEventTransformTextEntries(mafEventBase *maf_event);
+
+	void UpdateReferenceSystem();
+
+	void OnEventPoseTextEntries(mafEventBase *maf_event);
 
 	void OpStop(int result);
 
 	void SelectRefSys();
+
 	void ChooseRelativeRefSys();
 
 	void UpdateTransformTextEntries();
+
+	void OnEventTransformText();
+
+	/** Accept All VME excluding current */
+	static bool AcceptRefSys(mafVME *node);
 
 	// Plugged objects
 	mafGizmoTranslate           *m_GizmoTranslate;
@@ -94,16 +103,19 @@ protected:
 	mafVMEPolyline *m_RelativeCenterRefSysVME;
 	mafVMEPolyline *m_ArbitraryRefSysVME;
 
+	double m_TransformEntries[3];
 	double m_Position[3];
 	double m_Orientation[3];
 	double m_Scaling[3];
 
 	double m_OriginRefSysPosition[3];
+	double m_OriginRefSysOrientation[3];
 
 	// Override superclass
 	void RefSysVmeChanged();
 
 	/** Postmultiply event matrix to vme abs matrix; also update Redo ivar m_NewAbsMatrix */;
-	virtual void PostMultiplyEventMatrix(mafEventBase *maf_event);
+	virtual void PostMultiplyMatrix(mafMatrix *matrix);
+	
 };
 #endif

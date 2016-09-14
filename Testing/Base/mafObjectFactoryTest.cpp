@@ -222,7 +222,7 @@ void mafObjectFactoryTest::TestRegisterOverride()
   }
 
   std::list<std::string> listClassOverrideDescription;
-  listClassOverrideDescription=factory->GetClassOverrideDescriptions();
+  listClassOverrideDescription=factory->GetClassOverrideTypeNames();
   for ( std::list<std::string>::iterator i = listClassOverrideDescription.begin(); i != listClassOverrideDescription.end(); ++i )
   {
     std::string st=(*i);

@@ -51,7 +51,7 @@ bool operator==(const mafObjectFactory::mmuOverrideInformation& rhs,
     const mafObjectFactory::mmuOverrideInformation& lhs)
 //------------------------------------------------------------------------------
 {
-  return (rhs.m_Description == lhs.m_Description
+  return (rhs.m_TypeName == lhs.m_TypeName
     && rhs.m_OverrideWithName == lhs.m_OverrideWithName);
 }
 
@@ -62,7 +62,7 @@ bool operator<(const mafObjectFactory::mmuOverrideInformation& rhs,
     const mafObjectFactory::mmuOverrideInformation& lhs)
 //------------------------------------------------------------------------------
 {
-  return (rhs.m_Description < lhs.m_Description
+  return (rhs.m_TypeName < lhs.m_TypeName
     && rhs.m_OverrideWithName < lhs.m_OverrideWithName);
 }
 
@@ -423,14 +423,14 @@ void mafObjectFactory::UnRegisterAllFactories()
 //------------------------------------------------------------------------------
 void mafObjectFactory::RegisterOverride(const char* classOverride,
                    const char* subclass,
-                   const char* description,
+                   const char* typeName,
                    bool enableFlag,
                    mafCreateObjectFunction createFunction,
                    mafReferenceCounted *args)
 //------------------------------------------------------------------------------
 {
   mafObjectFactory::mmuOverrideInformation info;
-  info.m_Description = description;
+  info.m_TypeName = typeName;
   info.m_OverrideWithName = subclass;
   info.m_EnabledFlag = enableFlag;
   info.m_CreateObject = createFunction;
@@ -439,10 +439,10 @@ void mafObjectFactory::RegisterOverride(const char* classOverride,
 }
 
 //------------------------------------------------------------------------------
-void mafObjectFactory::RegisterNewObject(const char* ObjectName, const char* description, mafCreateObjectFunction createFunction,mafReferenceCounted *args)
+void mafObjectFactory::RegisterNewObject(const char* ObjectName, const char* typeName, mafCreateObjectFunction createFunction,mafReferenceCounted *args)
 //------------------------------------------------------------------------------
 {
-  this->RegisterOverride(ObjectName,ObjectName,description,true,createFunction,args);
+  this->RegisterOverride(ObjectName,ObjectName, typeName,true,createFunction,args);
 }
 
 //------------------------------------------------------------------------------
@@ -459,12 +459,12 @@ mafObject *mafObjectFactory::CreateObject(const char* classname)
 
 
 //------------------------------------------------------------------------------
-std::string mafObjectFactory::GetObjectDescription(const char* classname)
+std::string mafObjectFactory::GetObjectTypeName(const char* classname)
 {
 	mmuOverRideMap::iterator pos = m_OverrideMap->find(classname);
 	if (pos != m_OverrideMap->end())
 	{
-		return (*pos).second.m_Description;
+		return (*pos).second.m_TypeName;
 	}
 	return NULL;
 }
@@ -557,15 +557,15 @@ std::list<std::string> mafObjectFactory::GetClassOverrideWithNames()
 
 
 //------------------------------------------------------------------------------
-// Return a list of descriptions for class overrides
-std::list<std::string> mafObjectFactory::GetClassOverrideDescriptions()
+// Return a list of typeNames for class overrides
+std::list<std::string> mafObjectFactory::GetClassOverrideTypeNames()
 //------------------------------------------------------------------------------
 { 
   std::list<std::string> ret;
   for ( mmuOverRideMap::iterator i = m_OverrideMap->begin();
       i != m_OverrideMap->end(); ++i )
   {
-    ret.push_back((*i).second.m_Description);
+    ret.push_back((*i).second.m_TypeName);
   }
   return ret;
 }

@@ -263,7 +263,7 @@ int mafVMELandmarkCloud::SetNumberOfLandmarks(int num)
 //----------------------------------------------------------------------------
 int mafVMELandmarkCloud::AppendLandmark(double x, double y, double z, const char *name)
 {
-	if (FindLandmarkIndex(name) >= 0)
+	if (GetLandmarkIndex(name) >= 0)
 	{
 		mafErrorMacro("Cannot add new landmark \"" << name << "\": a landmark with the same name already exists!!!");
 		return -1;
@@ -315,7 +315,7 @@ int mafVMELandmarkCloud::SetLandmarkToPolydata(int idx, double x, double y, doub
 }
 
 //-------------------------------------------------------------------------
-int mafVMELandmarkCloud::FindLandmarkIndex(const char *name)
+int mafVMELandmarkCloud::GetLandmarkIndex(const char *name)
 {
   int numberOfLandmarks = GetNumberOfLandmarks();
 

@@ -101,7 +101,7 @@ void mafViewHTML::Create()
 
   m_Rwi = new mafRWI(m_Win,ONE_LAYER);
   m_Rwi->SetListener(this);//SIL. 16-6-2004: 
-  m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);
+  m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack,m_Rwi->m_AlwaysVisibleRenderer);
 	m_Sg->SetListener(this);
   m_Rwi->m_Sg = m_Sg;
 }

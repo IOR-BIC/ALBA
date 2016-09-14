@@ -179,6 +179,8 @@ SET(PROJECT_SRCS
   
   mafPipeRayCast.cpp
   mafPipeRayCast.h
+	
+	mafPipeWithScalar.cpp mafPipeWithScalar.h
 )
 
 IF (MAF_USE_CRYPTO)

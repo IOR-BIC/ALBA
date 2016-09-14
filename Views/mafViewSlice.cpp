@@ -447,25 +447,37 @@ int mafViewSlice::GetNodeStatus(mafVME *vme)
 //-------------------------------------------------------------------------
 {
   mafSceneNode *n = NULL;
-  if (m_Sg != NULL)
-  {
-    n = m_Sg->Vme2Node(vme);
-     if (vme->GetOutput()->IsA("mafVMEOutputVolume") || 
-         vme->IsMAFType(mafVMESlicer))
-    {
-      if (n != NULL)
-      {
-      	n->SetMutex(true);
-      }
-    }
-    else if (vme->IsMAFType(mafVMEImage))
-    {
+
+	mafVMELandmark *lm = mafVMELandmark::SafeDownCast(vme);
+	if (lm)
+	{
+		mafVMELandmarkCloud *lmc = mafVMELandmarkCloud::SafeDownCast(lm->GetParent());
+		if (lmc)
+		{
+			if ((m_Sg->GetNodeStatus(lmc) == NODE_VISIBLE_ON) && lmc->IsLandmarkShow(lm))
+				return NODE_VISIBLE_ON;
+		}
+	}
+
+	if (m_Sg != NULL)
+	{
+		n = m_Sg->Vme2Node(vme);
+		if (vme->GetOutput()->IsA("mafVMEOutputVolume") || vme->IsMAFType(mafVMESlicer))
+		{
+			if (n != NULL)
+			{
+				n->SetMutex(true);
+			}
+		}
+		else if (vme->IsMAFType(mafVMEImage))
+		{
 			if (n != NULL)
 			{
 				n->SetPipeCreatable(false);
 			}
-    }
-  }
+		}
+	}
+
 
   return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
 }

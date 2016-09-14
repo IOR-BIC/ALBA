@@ -169,7 +169,7 @@ void mafOpImporterLandmarkWS::Read()
   for (int i=0;i<numland;i++)
   {
     lm_name = stringVec.at(i);
-    index = m_VmeCloud->FindLandmarkIndex(lm_name);
+    index = m_VmeCloud->GetLandmarkIndex(lm_name);
     if (index == -1)
     {
       lm_idx.push_back(m_VmeCloud->AppendLandmark(lm_name));

@@ -88,7 +88,7 @@ void mafViewRX::Create()
   m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
 
-  m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);
+  m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack,m_Rwi->m_AlwaysVisibleRenderer);
   m_Sg->SetListener(this);
   m_Rwi->m_Sg = m_Sg;
 
@@ -266,6 +266,18 @@ int mafViewRX::GetNodeStatus(mafVME *vme)
 //-------------------------------------------------------------------------
 {
   mafSceneNode *n = NULL;
+	
+	mafVMELandmark *lm = mafVMELandmark::SafeDownCast(vme);
+	if (lm)
+	{
+		mafVMELandmarkCloud *lmc = mafVMELandmarkCloud::SafeDownCast(lm->GetParent());
+		if (lmc)
+		{
+			if ((m_Sg->GetNodeStatus(lmc) == NODE_VISIBLE_ON) && lmc->IsLandmarkShow(lm))
+				return NODE_VISIBLE_ON;
+		}
+	}
+	
   if (m_Sg != NULL)
   {
     if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
@@ -348,8 +360,8 @@ void mafViewRX::GetLutRange(double minMax[2])
   mafString pipe_name = pipe->GetTypeName();
   if (pipe_name.Equals("mafPipeVolumeProjected"))
   {
-    mafPipeVolumeProjected *pipe = (mafPipeVolumeProjected *)pipe;
-    pipe->GetLutRange(minMax); 
+    mafPipeVolumeProjected *volpipe = (mafPipeVolumeProjected *)pipe;
+    volpipe->GetLutRange(minMax); 
   }
 }
 
