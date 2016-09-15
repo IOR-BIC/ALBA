@@ -481,8 +481,8 @@ bool mafOpImporterDicomOffis::OpenDir(const char *dirPath)
 	if(!this->m_TestMode)
 	{
 		FillStudyListBox();
-		CameraReset();
 		OnStudySelect();
+		CameraReset();
 	}
 	else 
 		SelectSeries(m_StudyList->GetStudy(0)->GetSeries(0));
