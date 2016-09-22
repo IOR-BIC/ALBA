@@ -120,7 +120,8 @@ void mafOpImporterVTK::OpRun()
         mafMessage(_("Unsupported file format"), _("I/O Error"), wxICON_ERROR );
     }
 	}
-	mafEventMacro(mafEvent(this,result));
+
+	OpStop(result);
 }
 //----------------------------------------------------------------------------
 int mafOpImporterVTK::ImportVTK()
@@ -232,4 +233,10 @@ int mafOpImporterVTK::ImportVTK()
 		return MAF_ERROR;
 	}
 	return MAF_OK;
+}
+
+//----------------------------------------------------------------------------
+void mafOpImporterVTK::OpStop(int result)
+{
+				mafEventMacro(mafEvent(this, result));
 }

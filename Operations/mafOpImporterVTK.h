@@ -58,6 +58,9 @@ public:
 	/** Builds operation's interface. */
   void OpRun();
 
+		/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
+		virtual void OpStop(int result);
+
 	/** Import vtk data, return MAF_OK on success. */
   virtual int ImportVTK();
 
