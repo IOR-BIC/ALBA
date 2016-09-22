@@ -422,7 +422,8 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
   mafVME *linked_vme = m_MeterVME->GetStartVME();
   mafSmartPointer<mafTransform> TmpTransform;
   
-	linked_vme->GetOutput()->GetAbsPose(pos,rot);
+		if(linked_vme)
+						linked_vme->GetOutput()->GetAbsPose(pos,rot);
 
 	m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
 
