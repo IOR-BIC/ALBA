@@ -4,10 +4,6 @@ SUBDIRS(exVMEMan)
 SUBDIRS(exViewVTK)
 SUBDIRS(MedicalApp)
 
-IF (EXISTS ${MAF_SOURCE_DIR}/Examples/exRuler)
-  SUBDIRS(exRuler)
-ENDIF (EXISTS ${MAF_SOURCE_DIR}/Examples/exRuler)
-
 IF (EXISTS ${MAF_SOURCE_DIR}/Examples/exHistogram)
   SUBDIRS(exHistogram)
 ENDIF (EXISTS ${MAF_SOURCE_DIR}/Examples/exHistogram)
