@@ -53,35 +53,34 @@ Camera must be in ParallelProjection and aligned with world axis
 
 //-----------------------------------------------------------------------------
 class MAF_EXPORT vtkMAFSimpleRulerActor2D : public vtkActor2D
-//-----------------------------------------------------------------------------
 {
- public:
-  vtkTypeRevisionMacro(vtkMAFSimpleRulerActor2D,vtkActor2D);
-  void PrintSelf(ostream& os, vtkIndent indent);
-  static	vtkMAFSimpleRulerActor2D *New();
+public:
+	vtkTypeRevisionMacro(vtkMAFSimpleRulerActor2D, vtkActor2D);
+	void PrintSelf(ostream& os, vtkIndent indent);
+	static	vtkMAFSimpleRulerActor2D *New();
 
-	void SetColor(double r,double g,double b);
-  void SetLabelScaleVisibility(bool visibility = true) {ScaleLabelVisibility = visibility;};
-  void SetLabelAxesVisibility(bool visibility = true) {AxesLabelVisibility = visibility;};
-  void SetAxesVisibility(bool visibility = true) {AxesVisibility = visibility;};
-  void SetTickVisibility(bool visibility = true) {TickVisibility = visibility;};
-  void SetScaleFactor(double factor);
-  double GetScaleFactor() {return ScaleFactor;};
-  void SetLegend(const char *legend);
+	void SetColor(double r, double g, double b);
+	void SetLabelScaleVisibility(bool visibility = true) { ScaleLabelVisibility = visibility; };
+	void SetLabelAxesVisibility(bool visibility = true) { AxesLabelVisibility = visibility; };
+	void SetAxesVisibility(bool visibility = true) { AxesVisibility = visibility; };
+	void SetTickVisibility(bool visibility = true) { TickVisibility = visibility; };
+	void SetScaleFactor(double factor);
+	double GetScaleFactor() { return ScaleFactor; };
+	void SetLegend(const char *legend);
 
-  /** Draw the ruler at the center of the screen. */
-  void CenterAxesOnScreen(bool center = true);
+	/** Draw the ruler at the center of the screen. */
+	void CenterAxesOnScreen(bool center = true);
 
-  int	 RenderOverlay(vtkViewport *viewport);
-  int	 RenderOpaqueGeometry(vtkViewport *viewport);      
-  int	 RenderTranslucentGeometry(vtkViewport *viewport)  {return 0;};
-  void AdjustClippingRange(vtkViewport *viewport)        {};
+	int	 RenderOverlay(vtkViewport *viewport);
+	int	 RenderOpaqueGeometry(vtkViewport *viewport);
+	int	 RenderTranslucentGeometry(vtkViewport *viewport) { return 0; };
+	void AdjustClippingRange(vtkViewport *viewport) {};
 
-  void UseGlobalAxes(bool globalAxes) {GlobalAxes = globalAxes; Modified();};
-  void UseGlobalAxesOff() {GlobalAxes = false; Modified();};
-  void UseGlobalAxesOn() {GlobalAxes = true; Modified();};
+	void UseGlobalAxes(bool globalAxes) { GlobalAxes = globalAxes; Modified(); };
+	void UseGlobalAxesOff() { GlobalAxes = false; Modified(); };
+	void UseGlobalAxesOn() { GlobalAxes = true; Modified(); };
 
-  void SetInverseTicks(bool inverseTicks){InverseTicks = inverseTicks;};
+	void SetInverseTicks(bool inverseTicks) { InverseTicks = inverseTicks; };
 
 	void SetAttachPositionFlag(bool value);
 	void SetAttachPosition(double position[3]);
@@ -89,62 +88,67 @@ class MAF_EXPORT vtkMAFSimpleRulerActor2D : public vtkActor2D
 	void ChangeRulerMarginsAndLengths(int marginArg, int shortTickLenArg, int midTickLenArg, int longTickLenArg, int xOffSetArg, int yOffSetArg);
 
 protected:
-										vtkMAFSimpleRulerActor2D();
-									 ~vtkMAFSimpleRulerActor2D();
+	vtkMAFSimpleRulerActor2D();
+	~vtkMAFSimpleRulerActor2D();
 
-					 void			RulerCreate();
-           void			RulerUpdate(vtkCamera *camera, vtkRenderer *ren);
-             int		Round(double val);
-          double		GetTickSpacing(double val);
-          double    GetLongTickSpacing(double val);
-            bool    CheckProjectionPlane(vtkCamera *cam);
-            bool    IsMultiple(double val, double multiplier);
+	void			RulerCreate();
+	void			RulerUpdate(vtkCamera *camera, vtkRenderer *ren);
+	void CreateFixedTick();
+	int		Round(double val);
+	double		GetTickSpacing(double val);
+	double    GetLongTickSpacing(double val);
+	bool    CheckProjectionPlane(vtkCamera *cam);
+	bool    IsMultiple(double val, double multiplier);
 
-  vtkPoints        *Points;
-  vtkActor2D			 *Axis;  
-  vtkActor2D			 *Tick;  
-  vtkTextActor     *ScaleLabel; 
-  vtkTextActor     *HorizontalAxesLabel;
-  vtkTextActor     *VerticalAxesLabel;
+	vtkPoints									*Points;
+	vtkPoints									*FixedTickPoints;
+	vtkActor2D								*Axis;
+	vtkActor2D								*Tick;
+	vtkActor2D								*FixedTickActor;
+	vtkTextActor						*ScaleLabel;
+	vtkTextActor						*HorizontalAxesLabel;
+	vtkTextActor						*VerticalAxesLabel;
+	vtkTextActor						*FixedTickLabel;
 
-  int RwWidth;
-  int RwHeight;
-  int ShortTickLen;
-  int LongTickLen;
-  double DesiredTickSpacing;
+	int RwWidth;
+	int RwHeight;
+	int ShortTickLen;
+	int LongTickLen;
+	double DesiredTickSpacing;
 
 	int XOffSet;
 	int YOffSet;
 
-  int Margin;
-  int Ntick;
-  int XIndex;
-  int YIndex;
-  
-  bool   GlobalAxes;
-  bool   CenterAxes;
-  bool   ScaleLabelVisibility;
-  bool   AxesLabelVisibility;
-  bool   AxesVisibility;
-  bool   TickVisibility;
-  bool   InverseTicks;
-  double ScaleFactor;
-  char  *Legend;
+	int Margin;
+	int Ntick;
+	int XIndex;
+	int YIndex;
+
+	bool   GlobalAxes;
+	bool   CenterAxes;
+	bool   ScaleLabelVisibility;
+	bool   AxesLabelVisibility;
+	bool   AxesVisibility;
+	bool   TickVisibility;
+	bool   FixedTickVisibility;
+	bool   InverseTicks;
+	double ScaleFactor;
+	char  *Legend;
 
 	int    Position[3];
 	double PositionDisplay[3];
 	double PositionWorld[3];
 	bool   AttachPositionFlag;
 
-  inline void   DecomposeValue(double val, int *sign, double *mantissa, int *exponent);
-  inline double RicomposeValue(int sign, double mantissa, int exponent);
-  inline double NearestTick(double val, double TickSpacing);
+	inline void   DecomposeValue(double val, int *sign, double *mantissa, int *exponent);
+	inline double RicomposeValue(int sign, double mantissa, int exponent);
+	inline double NearestTick(double val, double TickSpacing);
 
 private:
-  // hide the two parameter Render() method from the user and the compiler.
-  virtual void Render(vtkRenderer *, vtkMapper *) {};
+	// hide the two parameter Render() method from the user and the compiler.
+	virtual void Render(vtkRenderer *, vtkMapper *) {};
 private:
-  vtkMAFSimpleRulerActor2D(const vtkMAFSimpleRulerActor2D&);  	// Not implemented.
-  void operator=(const vtkMAFSimpleRulerActor2D&);  // Not implemented.
+	vtkMAFSimpleRulerActor2D(const vtkMAFSimpleRulerActor2D&);  	// Not implemented.
+	void operator=(const vtkMAFSimpleRulerActor2D&);  // Not implemented.
 };
 #endif
