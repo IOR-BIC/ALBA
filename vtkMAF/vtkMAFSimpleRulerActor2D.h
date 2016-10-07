@@ -85,6 +85,8 @@ public:
 	void SetAttachPositionFlag(bool value);
 	void SetAttachPosition(double position[3]);
 
+	void ShowFixedTick(bool show) { FixedTickVisibility = show; };
+
 	void ChangeRulerMarginsAndLengths(int marginArg, int shortTickLenArg, int midTickLenArg, int longTickLenArg, int xOffSetArg, int yOffSetArg);
 
 protected:
