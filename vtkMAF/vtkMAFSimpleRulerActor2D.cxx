@@ -721,7 +721,7 @@ void vtkMAFSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
 
 		if (pos2X / (RwWidth / 2) > 1)
 		{
-			pos2X /= 10.0;
+			pos2X = pos1X + (fixedSpacing *(10.0 / abs(worldTickSpacingX))/10.0);
 			FixedTickLabel->SetInput("1 mm");
 		}
 
