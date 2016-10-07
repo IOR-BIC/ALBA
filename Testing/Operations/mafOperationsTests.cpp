@@ -107,7 +107,7 @@
 #include "mafOpSplitSurfaceTest.h"
 #include "mafOpMML3Test.h"
 #include "mafOpExtractGeometryTest.h"
-//#include "mafOpImporterDicomOffisTest.h"
+#include "mafOpImporterDicomOffisTest.h"
 #include "itkRawMotionImporterUtilityTest.h"
 #include "mafOpMakeVMETimevaryingTest.h"
 #include "mafOpEqualizeHistogramTest.h"
@@ -286,7 +286,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpSplitSurfaceTest::suite());
 	runner.addTest(mafOpMML3Test::suite());
 	runner.addTest(mafOpExtractGeometryTest::suite());
-	//runner.addTest(mafOpImporterDicomOffisTest::suite());
+	runner.addTest(mafOpImporterDicomOffisTest::suite());
 	runner.addTest(mafItkRawMotionImporterUtilityTest::suite());
 	runner.addTest(mafOpMakeVMETimevaryingTest::suite());
 	runner.addTest(mafOpEqualizeHistogramTest::suite());
