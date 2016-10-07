@@ -214,6 +214,18 @@ void vtkMAFSimpleRulerActor2DTest::TestChangeRulerMarginsAndLengths()
 }
 
 //------------------------------------------------------------------------------
+void vtkMAFSimpleRulerActor2DTest::TestFixedTick()
+{
+	vtkMAFSimpleRulerActor2D *actor;
+	actor = vtkMAFSimpleRulerActor2D::New();
+	actor->ShowFixedTick(true);
+
+	RenderData(actor, "TestFixedTick");
+
+	actor->Delete();
+}
+
+//------------------------------------------------------------------------------
 void vtkMAFSimpleRulerActor2DTest::TestPrintSelf()
 //------------------------------------------------------------------------------
 {

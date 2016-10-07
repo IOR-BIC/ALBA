@@ -69,6 +69,8 @@ class vtkMAFSimpleRulerActor2DTest : public mafTest
     CPPUNIT_TEST( TestSetAttachPosition );
     /** Test ChangeRulerMarginsAndLengths. */
     CPPUNIT_TEST( TestChangeRulerMarginsAndLengths );
+		/** Test ShowFixedTick. */
+		CPPUNIT_TEST(TestFixedTick);
     /** Test PrintSelf. */
     CPPUNIT_TEST( TestPrintSelf );
     /** Test suite end. */
@@ -90,6 +92,7 @@ protected:
   void TestSetInverseTicks();
   void TestSetAttachPosition();
   void TestChangeRulerMarginsAndLengths();
+	void TestFixedTick();
 
   /** Call PrintSelf in order to print information in console output.*/
   void TestPrintSelf();

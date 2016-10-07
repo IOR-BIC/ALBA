@@ -58,7 +58,7 @@ vtkMAFSimpleRulerActor2D::vtkMAFSimpleRulerActor2D()
   AxesLabelVisibility   = true;
   AxesVisibility        = true;
   TickVisibility        = true;
-	FixedTickVisibility   = true;
+	FixedTickVisibility   = false;
   CenterAxes            = true;
   GlobalAxes            = true;
 
