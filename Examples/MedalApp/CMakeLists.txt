@@ -1,8 +1,8 @@
-PROJECT (exMedical)
+PROJECT (MedalApp)
 
 SET(PROJECT_SRCS 
-	exMedicalApp.cpp
-	exMedicalApp.h
+	MedalApp.cpp
+	MedalApp.h
 	mafOpInteractionOp.cpp
 	mafOpInteractionOp.h
 	exWizardSample.cpp
