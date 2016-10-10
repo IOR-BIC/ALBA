@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mmoCreateVmeSurface
- Authors: Silvano Imboden
+ Module: MedalApp
+ Authors: Matteo Giacomoni - Daniele Giunchi - Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -13,34 +13,24 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __mmoCreateVmeSurface_H__
-#define __mmoCreateVmeSurface_H__
+#ifndef __MedalApp_H__
+#define __MedalApp_H__
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafOp.h"
-#include "mafVME.h"
-//----------------------------------------------------------------------------
-// Forward Refs:
-//----------------------------------------------------------------------------
-class mafVMESurface;
+#include "mafLogicWithManagers.h" 
+
 // ============================================================================
-class mmoCreateVmeSurface : public mafOp
+class MedalApp : public wxApp
 // ============================================================================
 {
 public:
-                mmoCreateVmeSurface(wxString label = "CreateVmeSurface");
-               ~mmoCreateVmeSurface();
-	virtual void OnEvent(mafEventBase *event);
-  mafOp* Copy();
-  mafTypeMacro(mmoCreateVmeSurface, mafOp);
-
-  bool Accept(mafNode* vme) {return vme && vme->IsMAFType(mafVME);};
-  void OpRun();
-  void OpDo();
-  void OpUndo();
-
+  bool OnInit();
+  int  OnExit();
 protected:
-  mafVMESurface  *m_vme; 
+  mafLogicWithManagers *m_Logic;
+
+	void OnFatalException();
 };
-#endif // __mmoCreateVmeSurface_H__
+DECLARE_APP(MedalApp)
+#endif //__exMedicalApp_H__
