@@ -52,6 +52,7 @@ const bool DEBUG_MODE = false;
 
 #include <wx/busyinfo.h>
 #include "mafProgressBarHelper.h"
+#include "vtkMath.h"
 //------------------------------------------------------------------------------
 // local defines
 
@@ -535,10 +536,28 @@ void mafVMELandmarkCloud::CreateLMStructureFromDataVector()
 }
 
 //----------------------------------------------------------------------------
-mafVMELandmark * mafVMELandmarkCloud::GetNearestLandmark(double pos[3])
+mafVMELandmark * mafVMELandmarkCloud::GetNearestLandmark(double pos[3], bool SerchOnlyVisible)
 {
-	vtkPolyData *polyData = GetPolyData(m_CurrentTime);
-	int lmIndex=polyData->FindPoint(pos);
+	int lmIndex = -1;
+	int num = GetNumberOfLandmarks();
+	double dist = VTK_DOUBLE_MAX;
+	double lmPos[3];
+	
+	for (int idx = 0; idx < num; idx++)
+	{
+		mafVMELandmark *lm = GetLandmark(idx);
+
+		if (lm && (!SerchOnlyVisible || m_LMChildrenShow[idx]))
+		{
+			lm->GetPoint(lmPos);
+			double curDist=vtkMath::Distance2BetweenPoints(lmPos, pos);
+			if (curDist < dist)
+			{
+				lmIndex = idx;
+				dist = curDist;
+			}
+		}
+	}
 
 	if (lmIndex >= 0 && lmIndex < m_NumberOfLandmarks)
 		return m_LMChildren[lmIndex];
