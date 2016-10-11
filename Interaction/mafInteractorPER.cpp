@@ -371,7 +371,7 @@ void mafInteractorPER::OnButtonDown(mafEventInteraction *e)
 			{
 				double pos[3];
 				v->GetPickedPosition(pos);
-				picked_vme = (mafVME *)((mafVMELandmarkCloud *)picked_vme)->GetNearestLandmark(pos);
+				picked_vme = (mafVME *)((mafVMELandmarkCloud *)picked_vme)->GetNearestLandmark(pos, true);
 
 			}
       // Send a VME select event to Logic

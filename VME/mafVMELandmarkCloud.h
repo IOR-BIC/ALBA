@@ -210,7 +210,7 @@ public:
 	/** */
 	void CreateLMStructureFromDataVector();
 
-	mafVMELandmark *GetNearestLandmark(double pos[3]);
+	mafVMELandmark *GetNearestLandmark(double pos[3],  bool SerchOnlyVisible);
 
 protected:
   mafVMELandmarkCloud();
