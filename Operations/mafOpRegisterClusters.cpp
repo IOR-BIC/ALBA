@@ -393,7 +393,7 @@ void mafOpRegisterClusters::CreateMatches()
 		}
 
 		double targetPos[3];		
-		target->GetLandmarkPosition(j, targetPos, time);
+		target->GetLandmark(i)->GetPoint(targetPos,time);
 
 		if ((m_FilteringMode & mafOpRegisterClusters::InfiniteOrNaN) == mafOpRegisterClusters::InfiniteOrNaN) 
 		{
@@ -419,7 +419,7 @@ void mafOpRegisterClusters::CreateMatches()
 
 		//OK, target is valid
 		double sourcePos[3];
-		source->GetLandmarkPosition(i, sourcePos, time);
+		source->GetLandmark(i)->GetPoint(sourcePos, time);
 
 		sourcePoints->InsertNextPoint(sourcePos);
 		targetPoints->InsertNextPoint(targetPos);
@@ -524,46 +524,22 @@ double mafOpRegisterClusters::CalculateDeviation(vtkPoints* sourcePoints, vtkPoi
 	vtkMatrix4x4* matReg = RegisterPoints(sourcePoints, targetPoints, weights);
 	double deviation = CalculateDeviation(sourcePoints, targetPoints, matReg);
 	m_Info->SetAbsPose(deviation, 0.0, 0.0, 0.0, 0.0, 0.0, currTime);
-
-	vtkMAFSmartPointer< vtkMatrix4x4 > t_matrix;
-	t_matrix->Identity();
-
-	//post-multiply the registration matrix by the abs matrix of the target to position the
-	//registered  at the correct position in the space
-	mafMatrix *mat;
-	mafNEW(mat);
-	mat->Identity();
-
-	GetTarget()->GetOutput()->GetAbsMatrix(*mat, currTime);  //modified by Marco. 2-2-2004
-	vtkMatrix4x4::Multiply4x4(mat->GetVTKMatrix(), matReg, t_matrix);
-	mafDEL(mat);
-
+	
 	//t_matrix now contains the correct transformation matrix for the current time
 	m_Registered->SetTimeStamp(currTime); //SetCurrentTime(currTime);
 		
-	mafMatrix *temp;
-	mafNEW(temp);
-	temp->SetVTKMatrix(t_matrix);
-	temp->SetTimeStamp(currTime);
-	temp->Modified();
-
-	mafMatrix *regMatrix = m_Registered->GetOutput()->GetMatrix();
-	regMatrix->DeepCopy(temp->GetVTKMatrix());
-	m_Registered->SetMatrix(*regMatrix);
+	m_Registered->SetMatrix(matReg);
 	m_Registered->Modified();
 	m_Registered->Update();
 
 	if(m_RegisteredFollower != NULL)
 	{
 		m_RegisteredFollower->SetTimeStamp(currTime); //SetCurrentTime(currTime);
-		mafMatrix *folMatrix = m_RegisteredFollower->GetOutput()->GetMatrix();
-		folMatrix->DeepCopy(temp->GetVTKMatrix());
-		m_RegisteredFollower->SetMatrix(*regMatrix);
+		m_RegisteredFollower->SetMatrix(matReg);
 		m_RegisteredFollower->Modified();
 		m_RegisteredFollower->Update();
 	}
 
-	mafDEL(temp);
 	matReg->UnRegister(NULL);	//no longer needed
 	return true;
 }
@@ -832,22 +808,15 @@ void mafOpRegisterClusters::OpUndo()
 
 	vtkMAFSmartPointer<vtkPolyData> data;
 	mafSmartPointer<mafMatrix> matrix; //modified by Marco. 2-2-2004
-	vtkMAFSmartPointer<vtkTransform> transform;
-	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformData;
-	transformData->SetTransform(transform);
-
+	
 	if(m_MultiTime)
 	{
 		for (int tm = 0; tm < num; tm++)
 		{
 			cTime = time[tm];
 			m_Registered->SetTimeStamp(cTime); //Set current time
-			// TODO: should not be necessary any more
-			m_Registered->Update(); //>UpdateCurrentData();
+			m_Registered->Update(); 
 
-			//data = (vtkPolyData *)m_Registered->GetOutput()->GetVTKData(); //GetCurrentData();
-
-			/** Variante */
 			vtkMAFSmartPointer<vtkPoints> points;
 
 			for(int i=0; i< m_Registered->GetNumberOfLandmarks(); i++)
@@ -858,33 +827,23 @@ void mafOpRegisterClusters::OpUndo()
 			}
 			data->SetPoints(points);
 			data->Update();
-
-			// TODO: refactoring to use directly the matrix pipe
-			transform->SetMatrix(m_Registered->GetOutput()->GetMatrix()->GetVTKMatrix());  //modified by Marco. 2-2-2004
-			transformData->SetInput(data);
-			transformData->Update();
-
+						
 			matrix->Identity();
 			m_Registered->SetPose(*matrix,cTime);
 
-			/** Variante */
-			for(int i=0; i< transformData->GetOutput()->GetNumberOfPoints(); i++)
+			for(int i=0; i< data->GetNumberOfPoints(); i++)
 			{
 				double coords[3];
-				transformData->GetOutput()->GetPoint(i, coords);
+				data->GetPoint(i, coords);
 				m_Registered->SetLandmark(i, coords[0], coords[1], coords[2] , cTime);
 			}
-			//m_Registered->SetDataByDetaching(vtkPolyData::SafeDownCast(transformData->GetOutput()) ,cTime );
 		}
 	}
 	else
 	{
 		cTime = m_Registered->GetTimeStamp(); //GetCurrentTime();
-		//data = (vtkPolyData *)m_Registered->GetOutput()->GetVTKData(); //GetCurrentData();
-
-		/** Variante */
+	
 		vtkMAFSmartPointer<vtkPoints> points;
-
 		for(int i=0; i< m_Registered->GetNumberOfLandmarks(); i++)
 		{
 			double coords[3];
@@ -893,25 +852,16 @@ void mafOpRegisterClusters::OpUndo()
 		}
 		data->SetPoints(points);
 		data->Update();
-
-		//m_Registered->GetMatrix(matrix,cTime);
-
-		// TODO: refactoring to use directly the matrix pipe
-		transform->SetMatrix(m_Registered->GetOutput()->GetMatrix()->GetVTKMatrix());
-		transformData->SetInput(data);
-		transformData->Update();
-
+		
 		matrix->Identity();
-		m_Registered->SetPose(*matrix,cTime);
+		m_Registered->SetMatrix(*matrix);
 
-		/** Variante */
-		for(int i=0; i< transformData->GetOutput()->GetNumberOfPoints(); i++)
+		for(int i=0; i< data->GetNumberOfPoints(); i++)
 		{
 			double coords[3];
-			transformData->GetOutput()->GetPoint(i, coords);
+			data->GetPoint(i, coords);
 			m_Registered->SetLandmark(i, coords[0], coords[1], coords[2] , cTime);
 		}
-		//m_Registered->SetDataByDetaching((vtkPolyData *)transformData->GetOutput(), cTime);
 	}
 
 	time.clear();
