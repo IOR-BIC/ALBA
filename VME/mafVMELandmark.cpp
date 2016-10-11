@@ -283,7 +283,7 @@ int mafVMELandmark::GetPoint(double &x,double &y,double &z,mafTimeStamp t)
   t = t < 0 ? this->m_CurrentTime : t;
   
   double ori[3];
-  this->GetOutput()->GetPose(x,y,z,ori[0],ori[1],ori[2],t);
+  this->GetOutput()->GetAbsPose(x,y,z,ori[0],ori[1],ori[2],t);
   return MAF_OK;
 }
 
@@ -293,7 +293,7 @@ int mafVMELandmark::GetPoint(double xyz[3],mafTimeStamp t)
 {
   t=t<0?this->m_CurrentTime:t;
   double ori[3];
-  this->GetOutput()->GetPose(xyz,ori,t);
+  this->GetOutput()->GetAbsPose(xyz,ori,t);
   return MAF_OK;
 }
 
