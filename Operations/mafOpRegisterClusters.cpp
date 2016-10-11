@@ -54,12 +54,10 @@
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpRegisterClusters);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mafOpRegisterClusters::mafOpRegisterClusters(wxString label) :
 mafOp(label)
-	//----------------------------------------------------------------------------
 {
 	m_OpType	= OPTYPE_OP;
 	m_Canundo = true;
@@ -74,7 +72,7 @@ mafOp(label)
 	m_SourceName			="none";
 	m_TargetName			="none";
 	m_FollowerName		="none";
-	m_Apply						= 0;
+	m_Apply						= true;
 	m_MultiTime				= 0;
 	m_RegistrationMode = RIGID;
 
@@ -93,7 +91,6 @@ mafOp(label)
 
 //----------------------------------------------------------------------------
 mafOpRegisterClusters::~mafOpRegisterClusters( )
-	//----------------------------------------------------------------------------
 {	
 	mafDEL(m_Result);
 	mafDEL(m_Info);
@@ -108,7 +105,6 @@ mafOpRegisterClusters::~mafOpRegisterClusters( )
 
 //----------------------------------------------------------------------------
 mafOp* mafOpRegisterClusters::Copy()
-	//----------------------------------------------------------------------------
 {
 	return new mafOpRegisterClusters(m_Label);
 }
@@ -116,7 +112,6 @@ mafOp* mafOpRegisterClusters::Copy()
 //----------------------------------------------------------------------------
 //Accept source landmark cloud (may not be time-variant).
 bool mafOpRegisterClusters::Accept(mafVME* node)
-	//----------------------------------------------------------------------------
 {
 	if (!LMCloudAccept(node))
 		return false;
@@ -128,7 +123,6 @@ bool mafOpRegisterClusters::Accept(mafVME* node)
 //----------------------------------------------------------------------------
 //Callback for VME_CHOOSE that accepts Closed Landmarkclouds VMEs only.
 /*static*/ bool mafOpRegisterClusters::LMCloudAccept(mafVME* node)
-	//----------------------------------------------------------------------------
 {
 	return (mafVMELandmarkCloud::SafeDownCast(node));
 }
@@ -136,7 +130,6 @@ bool mafOpRegisterClusters::Accept(mafVME* node)
 //----------------------------------------------------------------------------
 //Callback for VME_CHOOSE that accepts Surface VME only.
 /*static*/ bool mafOpRegisterClusters::SurfaceAccept(mafVME* node)
-	//----------------------------------------------------------------------------
 {
 	return (mafVMESurface::SafeDownCast(node) != NULL);
 }
@@ -145,7 +138,6 @@ bool mafOpRegisterClusters::Accept(mafVME* node)
 //Set the input vme for the operation.
 //This method invalidates Weights, so specifying weights must be done after calling this method.
 /*virtual*/ void mafOpRegisterClusters::SetInput(mafVME* vme)
-	//----------------------------------------------------------------------------
 {
 	if (vme == m_Input || (vme != NULL && !Accept(vme)))
 		return;	//ignore this because it is either already specified input or it is not acceptable
@@ -167,7 +159,6 @@ bool mafOpRegisterClusters::Accept(mafVME* node)
 //----------------------------------------------------------------------------
 //Sets the target landmark cloud.
 /*virtual*/ void mafOpRegisterClusters::SetTarget(mafVMELandmarkCloud *target)
-	//----------------------------------------------------------------------------
 {
 	if (target == m_Target || (target != NULL && !LMCloudAccept(target)))
 		return;	//ignore this because it is either already specified input or it is not acceptable
@@ -188,7 +179,6 @@ bool mafOpRegisterClusters::Accept(mafVME* node)
 //the correct registration of source and target landmark clouds. Follower is deep copied into the result
 //so that it is transformed by its parent target landmark cloud.
 /*virtual*/ void mafOpRegisterClusters::SetFollower(mafVMESurface *follower)
-	//----------------------------------------------------------------------------
 {
 	if (follower == m_Follower || (follower != NULL && !SurfaceAccept(follower)))
 		return;	//ignore this because it is either already specified input or it is not acceptable
@@ -205,7 +195,6 @@ bool mafOpRegisterClusters::Accept(mafVME* node)
 //N.B. this method must be called only after SetInput or SetSource otherwise
 //weights may become lost.
 /*virtual*/ void mafOpRegisterClusters::SetSourceWeight(int index, double weight)
-	//----------------------------------------------------------------------------
 {
 	if (m_Weights == NULL) {
 		InitializeWeights();
@@ -234,7 +223,6 @@ bool mafOpRegisterClusters::Accept(mafVME* node)
 //----------------------------------------------------------------------------
 //Initializes weights.
 /*virtual*/ void mafOpRegisterClusters::InitializeWeights()
-	//----------------------------------------------------------------------------
 {
 	delete[] m_Weights;
 	m_Weights = NULL;
@@ -257,7 +245,6 @@ bool mafOpRegisterClusters::Accept(mafVME* node)
 //N.B. If m_Matches is unallocated, it is constructed first. 
 //Call DestroyMatches to release the memory allocated by this method.
 void mafOpRegisterClusters::CreateMatches()
-//----------------------------------------------------------------------------
 {
 	mafVMELandmarkCloud* source = GetSource();
 	if (source == NULL)
@@ -301,7 +288,6 @@ void mafOpRegisterClusters::CreateMatches()
 //If not specified, the correspondence is detected automatically using names of landmarks. 
 //N.B. must be called after SetInput (or SetSource) method.
 /*virtual*/ void mafOpRegisterClusters::SetMatchingLandmarks(int sourceIndex, int targetIndex)
-	//----------------------------------------------------------------------------
 {
 	if (m_Matches == NULL) 
 	{
@@ -319,7 +305,6 @@ void mafOpRegisterClusters::CreateMatches()
 //Sets explicitly the correspondence between source and target landmarks identified by names. 
 //N.B. must be called after SetInput (or SetSource) method.
 /*virtual*/ void mafOpRegisterClusters::SetMatchingLandmarks(const char* sourceName, const char* targetName)
-	//----------------------------------------------------------------------------
 {
 	mafVMELandmarkCloud* source = GetSource();
 	if (source != NULL)
@@ -343,7 +328,6 @@ void mafOpRegisterClusters::CreateMatches()
 //of such an alias: just call AddAlternativeMatching("RGT", "RGTR");
 //N.B. must be called after SetInput (or SetSource) method.	
 /*virtual*/ void mafOpRegisterClusters::AddAlternativeMatching(const char* sourceName, const char* targetName)
-	//----------------------------------------------------------------------------
 {
 	mafVMELandmarkCloud* source = GetSource();
 	if (source != NULL)
@@ -362,7 +346,6 @@ void mafOpRegisterClusters::CreateMatches()
 //N.B. Call CreateMatches prior to this method, otherwise this method fails.
 /*virtual*/ int mafOpRegisterClusters::ExtractMatchingPoints(vtkPoints* sourcePoints, 
 	vtkPoints* targetPoints, vtkDoubleArray* weights, double time)
-	//----------------------------------------------------------------------------
 {
 	sourcePoints->Reset();
 	targetPoints->Reset();
@@ -437,7 +420,6 @@ void mafOpRegisterClusters::CreateMatches()
 //Returns the transformation matrix (must be deleted by the caller). 
 /*virtual*/ vtkMatrix4x4* mafOpRegisterClusters::RegisterPoints(vtkPoints* sourcePoints, 
 	vtkPoints* targetPoints, vtkDoubleArray* weights)
-	//----------------------------------------------------------------------------
 {
 	vtkMAFSmartPointer< vtkWeightedLandmarkTransform > RegisterTransform;
 
@@ -471,7 +453,6 @@ void mafOpRegisterClusters::CreateMatches()
 //----------------------------------------------------------------------------
 //Calculates deviation between sourcePoints transformed by t_matrix and targetPoints.
 double mafOpRegisterClusters::CalculateDeviation(vtkPoints* sourcePoints, vtkPoints* targetPoints, vtkMatrix4x4* t_matrix)
-	//----------------------------------------------------------------------------
 {	
 	//calculate deviation
 	double deviation = 0.0;
@@ -511,7 +492,6 @@ double mafOpRegisterClusters::CalculateDeviation(vtkPoints* sourcePoints, vtkPoi
 //N.B. the method assumes that m_Info, m_Registered and m_RegisteredFollower (if Follower is valid) exist.
 //CreateMatches must be called prior to calling this method.
 /**virtual*/ bool mafOpRegisterClusters::RegisterSource(double currTime)
-	//----------------------------------------------------------------------------
 {
 	vtkMAFSmartPointer< vtkPoints > sourcePoints;
 	vtkMAFSmartPointer< vtkPoints > targetPoints;
@@ -546,7 +526,6 @@ double mafOpRegisterClusters::CalculateDeviation(vtkPoints* sourcePoints, vtkPoi
 
 //----------------------------------------------------------------------------
 void mafOpRegisterClusters::OpRun()
-//----------------------------------------------------------------------------
 {
 	if(!m_TestMode)
 	{
@@ -579,8 +558,7 @@ void mafOpRegisterClusters::OpRun()
 
 		m_Gui->Label(_("Apply registration matrix to landmarks"));
 		m_Gui->Bool(ID_APPLY_REGISTRATION,_("Apply"),&m_Apply,1);
-		m_Gui->Enable(ID_APPLY_REGISTRATION,false);
-
+		
 		m_Gui->OkCancel();
 
 		m_Gui->Enable(wxOK,false);
@@ -592,7 +570,6 @@ void mafOpRegisterClusters::OpRun()
 //----------------------------------------------------------------------------
 //Called from OpDo to create all VMEs for the result. 
 /*virtual*/ void mafOpRegisterClusters::CreateResultVMEs()
-	//----------------------------------------------------------------------------
 {
 	mafVMELandmarkCloud* source = GetSource();
 	mafVMELandmarkCloud* target = GetTarget();
@@ -631,7 +608,6 @@ void mafOpRegisterClusters::OpRun()
 //Called from OpUndo to destroy all VMEs of the result. 
 //This method can be called also from OpDo when the registration process fails.
 /*virtual*/ void mafOpRegisterClusters::DestroyResultVMEs()
-	//----------------------------------------------------------------------------
 {
 	if (m_Result != NULL)
 	{
@@ -654,7 +630,6 @@ void mafOpRegisterClusters::OpRun()
 
 //----------------------------------------------------------------------------
 void mafOpRegisterClusters::OpDo()
-//----------------------------------------------------------------------------
 {	
 	if(!m_TestMode)
 		wxBusyInfo wait(_("Please wait, working..."));
@@ -708,23 +683,20 @@ void mafOpRegisterClusters::OpDo()
 	}
 	else
 	{	
-		if (m_Apply != 0) {
+		if (m_Apply != 0) 
 			ApplyRegistrationMatrix();
-		}
-
-		
+				
 		//conversion from time variant landmark cloud with non time variant landmark to
 		// non variant landmark cloud with time variant landmark
-		if(m_MultiTime) {
+		if(m_MultiTime)
 			SetRegistrationMatrixForLandmarks();
-		}		
+
 	}
 
 }
 
 //----------------------------------------------------------------------------
 void mafOpRegisterClusters::OpUndo()
-	//----------------------------------------------------------------------------
 {
 	DestroyResultVMEs();
 }
@@ -733,7 +705,6 @@ void mafOpRegisterClusters::OpUndo()
 // Converts time-variant m_Registered landmark cloud containing static landmarks into
 //static landmark cloud (m_Registered) with time-variant landmarks.
 /*virtual*/ void mafOpRegisterClusters::SetRegistrationMatrixForLandmarks()
-	//----------------------------------------------------------------------------
 {
 
 	std::vector<mafTimeStamp> timeStamps;
@@ -797,7 +768,6 @@ void mafOpRegisterClusters::OpUndo()
 //----------------------------------------------------------------------------
 // Applies registration matrix. Called from OpDo, if m_Apply is non-zero.
 /*virtual*/ void mafOpRegisterClusters::ApplyRegistrationMatrix()
-	//----------------------------------------------------------------------------
 {
 	//Apply all matrix vector to the polydata so the gliphs are not deformed
 	//when affine registration is choosed
@@ -871,60 +841,57 @@ void mafOpRegisterClusters::OpUndo()
 #pragma region GUI
 //----------------------------------------------------------------------------
 void mafOpRegisterClusters::OnEvent(mafEventBase *maf_event)
-	//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
-	if(mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
-		switch(e->GetId())
+		switch (e->GetId())
 		{
-		case ID_CHOOSE:
-			OnChooseLandmarkCloud();
-			break;
+			case ID_CHOOSE:
+				OnChooseLandmarkCloud();
+				break;
 
-		case ID_CHOOSE_SURFACE:
-			OnChooseSurface();
-			break;
+			case ID_CHOOSE_SURFACE:
+				OnChooseSurface();
+				break;
 
-		case ID_REGTYPE:
-			if(m_RegistrationMode == AFFINE)
-				m_Gui->Enable(ID_APPLY_REGISTRATION, true);
-			else
-				m_Gui->Enable(ID_APPLY_REGISTRATION, false);
-			break;
+			case ID_REGTYPE:
 
-		case ID_WEIGHT:
-			OnChangeWeights();
-			break;
+				break;
 
-		case wxOK:
-			if(m_SettingsGuiFlag == false)
-				OpStop(OP_RUN_OK);
-			else
-			{
-				m_GuiSetWeights->Close();
-				m_Dialog->Close();
-				m_SettingsGuiFlag = false;
-			}
-			break;
+			case ID_WEIGHT:
+				OnChangeWeights();
+				break;
 
-		case wxCANCEL:
-			if(m_SettingsGuiFlag == false)
-				OpStop(OP_RUN_CANCEL);
-			else
-			{
-				m_GuiSetWeights->Close();
-				m_Dialog->Close();
+			case wxOK:
+				if (m_SettingsGuiFlag == false)
+					OpStop(OP_RUN_OK);
+				else
+				{
+					m_GuiSetWeights->Close();
+					m_Dialog->Close();
+					m_SettingsGuiFlag = false;
+				}
+				break;
 
-				delete[] m_Weights;
-				m_Weights = NULL;
+			case wxCANCEL:
+				if (m_SettingsGuiFlag == false)
+					OpStop(OP_RUN_CANCEL);
+				else
+				{
+					m_GuiSetWeights->Close();
+					m_Dialog->Close();
 
-				m_SettingsGuiFlag = false;
-			}
-			break;
+					delete[] m_Weights;
+					m_Weights = NULL;
 
-		default:
-			mafEventMacro(*e);
-			break;
+					m_SettingsGuiFlag = false;
+				}
+				break;
+
+			default:
+				mafEventMacro(*e);
+				break;
 		}
 	}
 }
@@ -932,7 +899,6 @@ void mafOpRegisterClusters::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 //Called when ID_CHOOSE event is raised.
 void mafOpRegisterClusters::OnChooseLandmarkCloud()
-	//----------------------------------------------------------------------------
 {
 	mafString s(_("Choose cloud"));
 	mafEvent e(this,VME_CHOOSE, &s, (long)&mafOpRegisterClusters::LMCloudAccept);
@@ -949,7 +915,6 @@ void mafOpRegisterClusters::OnChooseLandmarkCloud()
 //----------------------------------------------------------------------------
 //Called when ID_CHOOSE_SURFACE event is raised.
 void mafOpRegisterClusters::OnChooseSurface()
-	//----------------------------------------------------------------------------
 {
 	mafString s(_("Choose surface"));
 	mafEvent e(this,VME_CHOOSE, &s, (long)&mafOpRegisterClusters::SurfaceAccept);
@@ -961,7 +926,6 @@ void mafOpRegisterClusters::OnChooseSurface()
 
 //----------------------------------------------------------------------------
 void mafOpRegisterClusters::OnChooseVme(mafVME *vme)
-	//----------------------------------------------------------------------------
 {
 	if(vme == NULL) // user choose cancel - keep everything as before
 		return;
@@ -1003,7 +967,6 @@ void mafOpRegisterClusters::OnChooseVme(mafVME *vme)
 //----------------------------------------------------------------------------
 //Called when ID_WEIGHT event is raised.
 /*virtual*/ void mafOpRegisterClusters::OnChangeWeights()
-	//----------------------------------------------------------------------------
 {
 	m_SettingsGuiFlag = true;
 	int x_init,y_init;
