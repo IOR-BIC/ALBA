@@ -174,6 +174,13 @@ int mafViewCompound::GetNodeStatus(mafVME *vme)
   // should be redefined for compounded views
   return m_ChildViewList[m_DefauldChildView]->GetNodeStatus(vme);
 }
+
+//----------------------------------------------------------------------------
+bool mafViewCompound::IsVmeShowed(mafVME *vme)
+{
+	return m_ChildViewList[m_DefauldChildView]->GetNodePipe(vme) != NULL;
+}
+
 //----------------------------------------------------------------------------
 void mafViewCompound::CameraReset(mafVME *vme)
 //----------------------------------------------------------------------------
