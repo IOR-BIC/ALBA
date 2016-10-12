@@ -24,6 +24,7 @@ class mafOpTransformTest : public mafTest
   CPPUNIT_TEST_SUITE( mafOpTransformTest );
   CPPUNIT_TEST( TestDynamicAllocation );
 	CPPUNIT_TEST( TestAccept );
+	CPPUNIT_TEST( TestTransform );
   CPPUNIT_TEST( TestResetMove );
 	CPPUNIT_TEST( TestResetScale );
   CPPUNIT_TEST_SUITE_END();
@@ -31,6 +32,7 @@ class mafOpTransformTest : public mafTest
 protected:
   void TestDynamicAllocation();
   void TestAccept();
+	void TestTransform();
   void TestResetMove();
 	void TestResetScale();
 };
