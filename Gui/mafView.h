@@ -91,7 +91,7 @@ public:
   virtual void			VmeSelect(mafVME *vme, bool select)							{};
   virtual void			VmeShow(mafVME *vme, bool show)									{};
 	virtual void      VmeUpdateProperty(mafVME *vme, bool fromTag = false)		{};
-	bool							IsVmeShowed(mafVME *vme) { return GetNodePipe(vme) != NULL; };
+	virtual bool			IsVmeShowed(mafVME *vme) { return GetNodePipe(vme) != NULL; };
 
   virtual void	    VmeCreatePipe(mafVME *vme)										    {};
   virtual void	    VmeDeletePipe(mafVME *vme)										    {};
