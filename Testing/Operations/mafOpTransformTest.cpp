@@ -38,19 +38,18 @@
 #include "vtkCubeSource.h"
 #include "mafTransform.h"
 #include "vtkPolyData.h"
+#include "vtkTransform.h"
 //#include "vtkCellData.h"
 //#include "vtkPolyData.h"
 
 //-----------------------------------------------------------
 void mafOpTransformTest::TestDynamicAllocation()
-//-----------------------------------------------------------
 {
 	mafOpTransform *transform = new mafOpTransform();
   mafDEL(transform);
 }
 //-----------------------------------------------------------
 void mafOpTransformTest::TestAccept()
-//-----------------------------------------------------------
 {
   mafSmartPointer<mafVMEGroup> group;
   mafSmartPointer<mafVMEVolumeGray> volume;
@@ -76,7 +75,6 @@ void mafOpTransformTest::TestAccept()
 }
 //-----------------------------------------------------------
 void mafOpTransformTest::TestResetMove()
-//-----------------------------------------------------------
 {
   vtkMAFSmartPointer<vtkSphereSource> sphere;
   sphere->Update();
@@ -109,7 +107,6 @@ void mafOpTransformTest::TestResetMove()
 
 //-----------------------------------------------------------
 void mafOpTransformTest::TestResetScale()
-//-----------------------------------------------------------
 {
 	vtkMAFSmartPointer<vtkCubeSource> cube;
 	cube->Update();
@@ -153,4 +150,65 @@ void mafOpTransformTest::TestResetScale()
 	CPPUNIT_ASSERT(endPoint[2] == startPoint[2]);
 
 	mafDEL(transform);
+}
+
+//-----------------------------------------------------------
+void mafOpTransformTest::TestTransform()
+{
+	double value1, value2, value3;
+	value1 = 1.0;
+	value2 = 2.0;
+	value3 = 3.0;
+
+	vtkMAFSmartPointer<vtkCubeSource> cube;
+	cube->Update();
+
+	double startPoint[3];
+	cube->GetOutput()->GetPoint(0, startPoint);
+
+	mafSmartPointer<mafVMERoot> root;
+	mafSmartPointer<mafVMESurface> surfaceInput;
+	surfaceInput->ReparentTo(root);
+
+	surfaceInput->SetData(cube->GetOutput(), 0.0);
+	surfaceInput->GetOutput()->Update();
+	surfaceInput->Update();
+
+	mafOpTransform *opTransform = new mafOpTransform();
+	opTransform->TestModeOn();
+	opTransform->SetInput(surfaceInput);
+	opTransform->OpRun();
+
+	//
+	mafMatrix m;
+	mafMatrix *opM;
+
+	// Scale
+	mafTransform::Scale(m, value1, value2, value3, POST_MULTIPLY);
+	opTransform->Scale(value1, value2, value3);
+
+	opM = opTransform->GetAbsMatrix();
+
+	CPPUNIT_ASSERT(m.Equals(opM));
+
+	// Rotate
+	mafTransform::RotateX(m, value1, POST_MULTIPLY);
+	mafTransform::RotateY(m, value2, POST_MULTIPLY);
+	mafTransform::RotateZ(m, value3, POST_MULTIPLY);
+
+	opTransform->Rotate(value1, value2, value3);
+
+	opM = opTransform->GetAbsMatrix();
+
+	CPPUNIT_ASSERT(m.Equals(opM));
+
+	// Translate
+	mafTransform::Translate(m, value1, value2, value3, POST_MULTIPLY);
+	opTransform->Translate(value1, value2, value3);
+
+	opM = opTransform->GetAbsMatrix();
+	
+	CPPUNIT_ASSERT(m.Equals(opM));
+
+	mafDEL(opTransform);
 }

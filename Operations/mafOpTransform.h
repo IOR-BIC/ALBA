@@ -65,6 +65,12 @@ public:
 
 	void Reset();
 
+	void Translate(double x, double y, double z);
+	void Rotate(double x, double y, double z);
+	void Scale(double x, double y, double z);
+
+	mafMatrix* GetAbsMatrix() { return &m_NewAbsMatrix; };
+
 protected: 
 	/** Create the GUI */
 	virtual void CreateGui();
