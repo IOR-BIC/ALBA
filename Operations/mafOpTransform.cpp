@@ -767,6 +767,40 @@ void mafOpTransform::Reset()
 }
 
 //----------------------------------------------------------------------------
+void mafOpTransform::Translate(double x, double y, double z)
+{
+	m_ActiveGizmo = TR_GIZMO;
+
+	m_TransformEntries[0] = x;
+	m_TransformEntries[1] = y;
+	m_TransformEntries[2] = z;
+
+	OnEventTransformText();
+}
+//----------------------------------------------------------------------------
+void mafOpTransform::Rotate(double x, double y, double z)
+{
+	m_ActiveGizmo = ROT_GIZMO;
+
+	m_TransformEntries[0] = x;
+	m_TransformEntries[1] = y;
+	m_TransformEntries[2] = z;
+
+	OnEventTransformText();
+}
+//----------------------------------------------------------------------------
+void mafOpTransform::Scale(double x, double y, double z)
+{
+	m_ActiveGizmo = SCAL_GIZMO;
+
+	m_TransformEntries[0] = x;
+	m_TransformEntries[1] = y;
+	m_TransformEntries[2] = z;
+
+	OnEventTransformText();
+}
+
+//----------------------------------------------------------------------------
 void mafOpTransform::UpdateTransformTextEntries()
 //----------------------------------------------------------------------------
 {
