@@ -162,6 +162,8 @@ void mafVMEGenericAbstract::SetMatrix(const mafMatrix &mat)
 //-------------------------------------------------------------------------
 {
   m_MatrixVector->SetMatrix(mat);
+	//Update AbsMatrix output
+	GetOutput()->GetAbsMatrix();
   Modified();
 }
 

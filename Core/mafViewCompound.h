@@ -98,6 +98,8 @@ public:
   virtual void VmeShow(mafVME *vme, bool show);
 	virtual void VmeUpdateProperty(mafVME *vme, bool fromTag = false)		{};
 
+	virtual bool IsVmeShowed(mafVME *vme);;
+
   virtual void CameraReset(mafVME *vme = NULL);
   virtual void CameraUpdate();
 
