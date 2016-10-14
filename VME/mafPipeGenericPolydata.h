@@ -115,9 +115,6 @@ protected:
 	
   void UpdateProperty(bool fromTag = false);
 
-  wxString                *m_ScalarsInComboBoxNames;
-  wxString                *m_ScalarsVTKName;
-
   mafGUIMaterialButton       *m_MaterialButton;
 
   int                      m_Wireframe;
