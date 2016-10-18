@@ -25,7 +25,7 @@ ENDIF(COMMAND cmake_policy)
 #-----------------------------------------------------------------------------
 # This enables support for Visual Studio: Edit & Continue, OpenMP, and parallel compilation
 #-----------------------------------------------------------------------------
-IF (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+IF (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 	#Add OpenMP Support
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
 
@@ -35,7 +35,7 @@ IF (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 		SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /SAFESEH:NO")
 	ENDIF (NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 17.0)
-ENDIF (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+ENDIF (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 
 
 
@@ -97,7 +97,7 @@ ENDIF(WIN32)
 #-----------------------------------------------------------------------------
 # This enables support for Visual Studio Edit & Continue, OpenMP, and parallel compilation
 #-----------------------------------------------------------------------------
-IF (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+IF (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 	#Add OpenMP Support
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
 
@@ -106,7 +106,7 @@ IF (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 	IF (NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 17.0)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 	ENDIF (NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 17.0)
-ENDIF (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+ENDIF (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 
 
 #-----------------------------------------------------------------------------
@@ -301,70 +301,8 @@ ENDIF(WIN32)
   )
   
   #### Include directory for binary distribution of MAF
-  SET(MAF_INSTALL_INCLUDE_DIRS ${MAF_BINARY_DIR}/Include)
-  FILE(MAKE_DIRECTORY ${MAF_INSTALL_INCLUDE_DIRS})
-	
-	#NO MEDICAL REBUILD
-	#searching python executable
-	FIND_PROGRAM(PYTHON_EXECUTABLE
-        NAMES python python3.2 python3.1 python3.0 python2.7 python2.6 python2.5 
-				python2.4 python2.3 python2.2 python2.1 python2.0 python1.6 python1.5
-		PATHS
-        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\3.2\\InstallPath]
-        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\3.1\\InstallPath]
-        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\3.0\\InstallPath]
-        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.7\\InstallPath]
-        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.6\\InstallPath]
-        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.5\\InstallPath]
-				[HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.4\\InstallPath]
-        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.3\\InstallPath]
-        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.2\\InstallPath]
-        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.1\\InstallPath]
-        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.0\\InstallPath]
-        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\1.6\\InstallPath]
-        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\1.5\\InstallPath]
-        )
+  SET(MAF_INSTALL_INCLUDE_DIRS ${INCLUDE_DIRS})
   
-	#NO MEDICAL REBUILD
-	#if Python executable is not present i use the old system and i delete all the source headers
-	#in this case there is no improvement to the old system 
-	IF (NOT PYTHON_EXECUTABLE)
-		FILE(GLOB files_to_remove "${MAF_INSTALL_INCLUDE_DIRS}/*.*")
-		FOREACH(f ${files_to_remove})
-			FILE(REMOVE "${f}")
-		ENDFOREACH(f ${files_to_remove})
-  ENDIF(NOT PYTHON_EXECUTABLE)
-	
-		  
-  FOREACH(dirs ${INCLUDE_DIRS})
-    FILE(GLOB include_file_list "${dirs}/*.h")
-    FILE(GLOB template_file_list "${dirs}/*.txx")
-    FILE(GLOB icons_file_list "${dirs}/*.xpm")
-		
-    FOREACH(include_file ${include_file_list})
-			file(COPY "${include_file}" DESTINATION "${MAF_INSTALL_INCLUDE_DIRS}")
-    ENDFOREACH(include_file ${include_file_list})
-    
-    FOREACH(template_file ${template_file_list})
-			file(COPY "${template_file}" DESTINATION "${MAF_INSTALL_INCLUDE_DIRS}")
-    ENDFOREACH(template_file ${template_file_list})
-    
-    FOREACH(icons_file ${icons_file_list})
-			file(COPY "${icons_file}" DESTINATION "${MAF_INSTALL_INCLUDE_DIRS}")
-		ENDFOREACH(icons_file ${icons_file_list})
-	
-  ENDFOREACH(dirs ${MAF_INCLUDE_DIRS})
-  
-	#NO MEDICAL REBUILD
-	#if Python executable is present i delete only removed header with python script
-	IF(PYTHON_EXECUTABLE)
-		EXEC_PROGRAM("${PYTHON_EXECUTABLE}"
-			ARGS "${MAF_SOURCE_DIR}/RemoveDeletedH.py ${MAF_INSTALL_INCLUDE_DIRS} ${INCLUDE_DIRS} "
-			OUTPUT_VARIABLE py_output
-		)
-		message("${py_output}")
-	ENDIF(PYTHON_EXECUTABLE)
-
   
   CONFIGURE_FILE(
   ${MAF_SOURCE_DIR}/MAFUse.cmake.in
