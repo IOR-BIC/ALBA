@@ -25,26 +25,29 @@ public:
 
   CPPUNIT_TEST_SUITE( mafOpRegisterClustersTest );
   CPPUNIT_TEST( DynamicAllocationTest );
-  //CPPUNIT_TEST( OnEventTest );
   CPPUNIT_TEST( CopyTest );
   CPPUNIT_TEST( AcceptTest );   
   CPPUNIT_TEST( OpRunTest );
   CPPUNIT_TEST( OpDoUndoTest );
   CPPUNIT_TEST( ClosedCloudAcceptTest );
   CPPUNIT_TEST( SurfaceAcceptTest );
+	CPPUNIT_TEST( OutputTest );
+	CPPUNIT_TEST( Output2Test );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
 
     void DynamicAllocationTest();
-    //void OnEventTest(); Only GUI events. not tested
     void CopyTest();
     void AcceptTest();   
     void OpRunTest();
     void OpDoUndoTest();
     void ClosedCloudAcceptTest();
     void SurfaceAcceptTest();
+		void OutputTest();
+		void Output2Test();
 
+		bool AboutEqual(double a, double b, double epsilon = 0.001);
 };
 
 #endif
