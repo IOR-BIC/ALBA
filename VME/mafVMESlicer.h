@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class vtkMAFVolumeSlicer;
+class vtkMAFVolumeSlicer_BES;
 class vtkTransformPolyDataFilter;
 class mafVME;
 class mmaMaterial;
@@ -133,8 +133,8 @@ protected:
 
 	mafTransform*     m_CopyTransform; ///< pose matrix for the slicer plane
   mafTransform*     m_Transform; ///< pose matrix for the slicer plane
-  vtkMAFVolumeSlicer*  m_PSlicer;  ///< slicer object used to extract the cut contour
-  vtkMAFVolumeSlicer*  m_ISlicer;  ///< slicer object used to compute the slice image
+  vtkMAFVolumeSlicer_BES*  m_PSlicer;  ///< slicer object used to extract the cut contour
+  vtkMAFVolumeSlicer_BES*  m_ISlicer;  ///< slicer object used to compute the slice image
 
   vtkTransformPolyDataFilter *m_BackTransform;
   //vtkTransformPolyDataFilter *m_BackTransformParent;

@@ -43,7 +43,7 @@ class mafInteractorExtractIsosurface;
 class vtkImageData;
 class vtkTexture;
 class vtkPolyData;
-class vtkMAFVolumeSlicer;
+class vtkMAFVolumeSlicer_BES;
 class vtkMAFFixedCutter;
 class vtkPlane;
 class vtkVolume;
@@ -140,8 +140,8 @@ protected:
   vtkOutlineCornerFilter  *m_OutlineFilter;
   vtkPolyDataMapper       *m_OutlineMapper;
 
-  vtkMAFVolumeSlicer   *m_VolumeSlicer;
-  vtkMAFVolumeSlicer   *m_PolydataSlicer;
+  vtkMAFVolumeSlicer_BES   *m_VolumeSlicer;
+  vtkMAFVolumeSlicer_BES   *m_PolydataSlicer;
   vtkImageData      *m_SliceImage;
   vtkTexture        *m_SliceTexture;
   vtkPolyData       *m_Polydata;          // copy of polydata used by slicer

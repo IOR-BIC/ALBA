@@ -149,6 +149,7 @@
 #include "mafOpMML3.h"
 #include "mafOpSegmentationRegionGrowingConnectedThreshold.h"
 #include "mafOpSegmentationRegionGrowingLocalAndGlobalThreshold.h"
+#include "mafOpMergeDicomSeries.h"
 #endif
 
 #include "mafViewVTK.h"
@@ -349,6 +350,7 @@ bool MedalApp::OnInit()
 #ifdef MAF_USE_ITK
 	m_Logic->Plug(new mafOpClassicICPRegistration("Surface"),_("Register"));
 #endif
+	m_Logic->Plug(new mafOpMergeDicomSeries("Merge Dicom"), "");
 #endif
 	//------------------------------------------------------------
 

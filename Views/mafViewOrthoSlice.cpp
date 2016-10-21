@@ -414,7 +414,7 @@ mafGUI* mafViewOrthoSlice::CreateGui()
     }
   }
   m_Gui->Divider(1);
-  //m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
+  m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
   m_Gui->Bool(ID_TRILINEAR_INTERPOLATION,"Interpolation",&m_TrilinearInterpolationOn,1);
 
   m_Gui->Divider();

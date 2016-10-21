@@ -35,7 +35,7 @@ class vtkLookupTable;
 class vtkPolyDataMapper;
 class vtkActor;
 class vtkFollower;
-class vtkMAFVolumeSlicer;
+class vtkMAFVolumeSlicer_BES;
 class vtkCamera;
 class vtkMAFAssembly;
 class vtkOutlineSource;
@@ -120,8 +120,8 @@ protected:
 
   vtkMAFAssembly *m_AssemblyUsed;
 
-  vtkMAFVolumeSlicer				 *m_SlicerImage[2][3];
-  vtkMAFVolumeSlicer				 *m_SlicerPolygonal[2][3];
+  vtkMAFVolumeSlicer_BES				 *m_SlicerImage[2][3];
+  vtkMAFVolumeSlicer_BES				 *m_SlicerPolygonal[2][3];
   vtkImageData					 *m_Image[2][3];
   vtkTexture						 *m_Texture[2][3];
   vtkLookupTable         *m_ColorLUT;

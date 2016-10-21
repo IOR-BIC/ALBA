@@ -228,8 +228,6 @@ IF (MAF_USE_VTK)
   mafPipeVector.h
   mafPipeVolumeProjected.cpp
   mafPipeVolumeProjected.h
-  mafPipeVolumeSlice.cpp
-  mafPipeVolumeSlice.h
   mafVMEGeneric.cpp
   mafVMEGeneric.h
   mafVMEGizmo.cpp

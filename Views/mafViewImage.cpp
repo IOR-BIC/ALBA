@@ -25,7 +25,7 @@
 
 #include "mafGUI.h"
 #include "mafViewImage.h"
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeSlice.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafVME.h"
 #include "mafVMEVolume.h"

@@ -34,7 +34,6 @@ SET(PROJECT_SRCS
 	mafPipeGizmoTest.h mafPipeGizmoTest.cpp
 	mafPipeSurfaceTexturedTest.h mafPipeSurfaceTexturedTest.cpp
 	mafPipeScalarTest.h mafPipeScalarTest.cpp
-	mafPipeVolumeSliceTest.h mafPipeVolumeSliceTest.cpp
 	mafPipeImage3DTest.h mafPipeImage3DTest.cpp
 	mafPipeIsosurfaceTest.h mafPipeIsosurfaceTest.cpp
 	mafPipePointSetTest.h mafPipePointSetTest.cpp

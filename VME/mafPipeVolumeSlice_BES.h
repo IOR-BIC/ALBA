@@ -187,7 +187,6 @@ protected:
 
   mafVMEOutputVolume *m_VolumeOutput;
 
-//BES: 10.4.2008 - vtkVolumeSlicer was replaced by vtkMAFVolumeSlicer
   vtkMAFVolumeSlicer_BES				 *m_SlicerImage[3];
 	vtkMAFVolumeSlicer_BES				 *m_SlicerPolygonal[3];
 	vtkImageData					 *m_Image[3];

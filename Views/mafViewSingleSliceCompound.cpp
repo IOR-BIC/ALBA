@@ -35,7 +35,7 @@
 #include "mafGUILutSwatch.h"
 #include "mafVME.h"
 #include "mafVMEIterator.h"
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeVolumeSlice_BES.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafVMEVolumeGray.h"
 #include "mmaVolumeMaterial.h"
@@ -115,7 +115,7 @@ void mafViewSingleSliceCompound::PackageView()
 	m_ViewSingleSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
 	m_ViewSingleSlice->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice");
   m_ViewSingleSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
-	m_ViewSingleSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
+	m_ViewSingleSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice_BES");
 	m_ViewSingleSlice->PlugVisualPipe("mafVMEMesh","mafPipeMeshSlice");
   m_ViewSingleSlice->PlugVisualPipe("mafVMEMeter","mafPipePolylineSlice");
 

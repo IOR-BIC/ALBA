@@ -31,7 +31,7 @@
 #include "mafMatrix.h"
 #include "mafTransform.h"
 #include "mafPipeImage3D.h"
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeSlice.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipeSurface.h"
 #include "mafPipeSurfaceTextured.h"

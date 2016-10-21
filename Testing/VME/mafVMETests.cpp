@@ -46,7 +46,6 @@
 #include "mafPipeGizmoTest.h"
 #include "mafPipeSurfaceTexturedTest.h"
 #include "mafPipeScalarTest.h"
-#include "mafPipeVolumeSliceTest.h"
 #include "mafPipeImage3DTest.h"
 #include "mafPipeIsosurfaceTest.h"
 #include "mafPipePointSetTest.h"
@@ -198,7 +197,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafPipeGizmoTest::suite());
 	runner.addTest(mafPipeSurfaceTexturedTest::suite());
 	runner.addTest(mafPipeScalarTest::suite());
-	runner.addTest(mafPipeVolumeSliceTest::suite());
 	runner.addTest(mafPipeImage3DTest::suite());
 	runner.addTest(mafPipeIsosurfaceTest::suite());
 	runner.addTest(mafPipePointSetTest::suite());

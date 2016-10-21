@@ -41,7 +41,6 @@ SET(vtkMAF_SRCS
   vtkMAFTextActorMeter.cxx  vtkMAFTextActorMeter.h
   vtkMAFTransferFunction2D.cxx  vtkMAFTransferFunction2D.h
   vtkMAFVolumeResample.h  vtkMAFVolumeResample.cxx
-  vtkMAFVolumeSlicer.cxx  vtkMAFVolumeSlicer.h
   vtkMAFPolyDataToSinglePolyLine.cxx  vtkMAFPolyDataToSinglePolyLine.h
   vtkMAFTextOrientator.cxx  vtkMAFTextOrientator.h
   vtkMAFProfilingActor.cxx  vtkMAFProfilingActor.h

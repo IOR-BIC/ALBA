@@ -594,6 +594,8 @@ void mafPipeVolumeSlice_BES::SetSlice(double origin[3], float xVect[3], float yV
 	vtkMath::Normalize(m_NormalVector[m_SliceDirection]);
 	vtkMath::Cross(m_NormalVector[m_SliceDirection], m_XVector[m_SliceDirection], m_YVector[m_SliceDirection]);
 	vtkMath::Normalize(m_YVector[m_SliceDirection]);  
+
+	SetSlice(NULL, NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -601,7 +603,7 @@ void mafPipeVolumeSlice_BES::SetSlice(double origin[3], float xVect[3], float yV
 void mafPipeVolumeSlice_BES::SetSlice(double* Origin, double* Normal)
 //----------------------------------------------------------------------------
 {
-  if (Origin != NULL)
+	if (Origin != NULL)
   {
     m_Origin[0] = Origin[0];
     m_Origin[1] = Origin[1];
