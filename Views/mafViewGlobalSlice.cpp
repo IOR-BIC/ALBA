@@ -29,7 +29,7 @@
 #include "mafSceneNode.h"
 #include "mafPipeFactory.h"
 #include "mafPipe.h"
-#include "mafPipeVolumeSlice_BES.h"
+#include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipeMeshSlice.h"
 #include "mafAttachCamera.h"
@@ -81,7 +81,7 @@ mafViewGlobalSlice::mafViewGlobalSlice(wxString label, int camera_position, bool
 {
 	m_SliceOrigin[0] = m_SliceOrigin[1] = m_SliceOrigin[2] = 0.0;
 	m_IDPlane = ID_XY;
-	m_SliceMode = mafPipeVolumeSlice_BES::SLICE_ARB;
+	m_SliceMode = mafPipeVolumeSlice::SLICE_ARB;
 	m_Opacity = 1.0;
 
 	m_SliderOldOrigin = 0.0; 
@@ -286,7 +286,7 @@ void mafViewGlobalSlice::VmeSelect(mafVME *vme,bool select)
   {
     
     m_SelectedVolume = m_Sg->Vme2Node(vme);
-		mafPipeVolumeSlice_BES * volSlicePipe = (mafPipeVolumeSlice_BES *)m_SelectedVolume->GetPipe();
+		mafPipeVolumeSlice * volSlicePipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
     if (volSlicePipe)
     {
       //m_Gui->Enable(ID_LUT,true);
@@ -363,9 +363,9 @@ void mafViewGlobalSlice::VmeCreatePipe(mafVME *vme)
     if (pipe)
     {
       pipe->SetListener(this);
-      if (pipe_name.Equals("mafPipeVolumeSlice_BES"))
+      if (pipe_name.Equals("mafPipeVolumeSlice"))
       {
-        ((mafPipeVolumeSlice_BES *)pipe)->InitializeSliceParameters(m_SliceMode,applied_origin,applied_xVector,applied_yVector,true,false);
+        ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(m_SliceMode,applied_origin,applied_xVector,applied_yVector,true,false);
 			}
       else if(pipe_name.Equals("mafPipeSurfaceSlice"))
       {
@@ -392,15 +392,15 @@ void mafViewGlobalSlice::VmeCreatePipe(mafVME *vme)
       }
       pipe->Create(n);
 
-			if (pipe_name.Equals("mafPipeVolumeSlice_BES"))
+			if (pipe_name.Equals("mafPipeVolumeSlice"))
 			{
-				((mafPipeVolumeSlice_BES *)pipe)->HideSlider();
+				((mafPipeVolumeSlice *)pipe)->HideSlider();
 			}
 
 			if (m_SelectedVolume == n && m_SelectedVolume->GetVme()->GetOutput()->IsA("mafVMEOutputVolume"))
 			{
 				m_Gui->Enable(ID_OPACITY_SLIDER,true);
-				mafPipeVolumeSlice_BES * volPipe = (mafPipeVolumeSlice_BES *)m_SelectedVolume->GetPipe();
+				mafPipeVolumeSlice * volPipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
 				m_Opacity=volPipe->GetSliceOpacity();
         m_Gui->Enable(ID_TRILINEAR_INTERPOLATION_ON,true);
         volPipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
@@ -474,7 +474,7 @@ void mafViewGlobalSlice::OnEvent(mafEventBase *maf_event)
 			break;*/
 			case ID_OPACITY_SLIDER:
 			{
-				mafPipeVolumeSlice_BES* pipe = (mafPipeVolumeSlice_BES *)m_SelectedVolume->GetPipe();
+				mafPipeVolumeSlice* pipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
 				if (pipe)
 				{
 					pipe->SetSliceOpacity(m_Opacity);
@@ -485,7 +485,7 @@ void mafViewGlobalSlice::OnEvent(mafEventBase *maf_event)
       break;
       case ID_TRILINEAR_INTERPOLATION_ON:
       {
-        mafPipeVolumeSlice_BES* pipe = (mafPipeVolumeSlice_BES *)m_SelectedVolume->GetPipe();
+        mafPipeVolumeSlice* pipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
         if (pipe)
         {
           pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
@@ -686,7 +686,7 @@ void mafViewGlobalSlice::UpdateSlice()
       }
       else if (output->IsA("mafVMEOutputVolume"))
 			{
-				mafPipeVolumeSlice_BES * pipe = (mafPipeVolumeSlice_BES *)node->GetPipe();
+				mafPipeVolumeSlice * pipe = (mafPipeVolumeSlice *)node->GetPipe();
 				pipe->SetSlice(applied_origin, applied_xVector, applied_yVector);
 				pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
 				//pipe->UpdateSlice();
@@ -775,7 +775,7 @@ void mafViewGlobalSlice::SetSlice(double origin[3], float xVect[3], float yVect[
 void mafViewGlobalSlice::SetSlice(double origin[3], double dn)
 //----------------------------------------------------------------------------
 {
-	if(m_SliceMode != mafPipeVolumeSlice_BES::SLICE_ARB)
+	if(m_SliceMode != mafPipeVolumeSlice::SLICE_ARB)
   {
     m_SliceOrigin[m_SliceMode] = origin[m_SliceMode];
   }
@@ -837,7 +837,7 @@ void mafViewGlobalSlice::VmeShow(mafVME *vme, bool show)
 	Superclass::VmeShow(vme,show);
 
   mafSceneNode *sceneNode = m_Sg->Vme2Node(vme);
-	mafPipeVolumeSlice_BES * selVolPipe = (mafPipeVolumeSlice_BES *)m_SelectedVolume->GetPipe();
+	mafPipeVolumeSlice * selVolPipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
   if (sceneNode == m_SelectedVolume && selVolPipe)
   {
     //m_Gui->Enable(ID_LUT,true);

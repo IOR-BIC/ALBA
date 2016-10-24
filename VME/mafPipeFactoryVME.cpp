@@ -76,7 +76,7 @@
 #include "mafPipeMeshSlice_BES.h"
 #include "mafPipePolylineSlice_BES.h"
 #include "mafPipeSurfaceSlice_BES.h"
-#include "mafPipeVolumeSlice_BES.h"
+#include "mafPipeVolumeSlice.h"
 #include "mafPipeCompoundVolume.h"
 #include "mafPipeCompoundVolumeFixedScalars.h"
 #include "mafPipeVectorFieldGlyphs.h"
@@ -204,7 +204,7 @@ mafPipeFactoryVME::mafPipeFactoryVME()
 
 
   //BES: 16.4.2008 - these pipes are to be committed down (without _BES suffix) to openMAF in the future
-  mafPlugPipeMacro(mafPipeVolumeSlice_BES, "BES: mafPipeVolumeSlice_BES.");
+  mafPlugPipeMacro(mafPipeVolumeSlice, "BES: mafPipeVolumeSlice.");
   mafPlugPipeMacro(mafPipeSurfaceSlice_BES, "BES: mafPipeSurfaceSlice.");
   mafPlugPipeMacro(mafPipePolylineSlice_BES, "BES: mafPipePolylineSlice_BES.");
   mafPlugPipeMacro(mafPipeMeshSlice_BES, "BES: mafPipeMeshSlice_BES.");

@@ -27,7 +27,7 @@ const bool DEBUG_MODE = false;
 #include "mafGUI.h"
 #include "mafIndent.h"
 #include "mafViewSliceGlobal.h"
-#include "mafPipeVolumeSlice_BES.h"
+#include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice_BES.h"
 #include "mafPipePolylineSlice_BES.h"
 #include "mafPipeMeshSlice_BES.h"
@@ -311,7 +311,7 @@ void mafViewSliceGlobal::OnEvent(mafEventBase *maf_event)
     { 
     case ID_OPACITY_SLIDER:
       {
-          mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->GetPipe())->SetSliceOpacity(m_Opacity);
+          mafPipeVolumeSlice::SafeDownCast(m_CurrentVolume->GetPipe())->SetSliceOpacity(m_Opacity);
           mafEventMacro(mafEvent(this, CAMERA_UPDATE));
           m_OpacitySlider->SetValue(m_Opacity);
       }
@@ -509,7 +509,7 @@ void mafViewSliceGlobal::VmeShow(mafVME *vme, bool show)
       m_Gui->Enable(ID_POS_SLIDER,true);
       if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
       {
-        m_Opacity   = mafPipeVolumeSlice_BES::SafeDownCast(curVolPipe)->GetSliceOpacity();
+        m_Opacity   = mafPipeVolumeSlice::SafeDownCast(curVolPipe)->GetSliceOpacity();
         m_Gui->Enable(ID_OPACITY_SLIDER,true);
       }
       m_Gui->Update();
@@ -735,9 +735,9 @@ void mafViewSliceGlobal::SetSlice(double* Origin, double* Normal)
   for(mafSceneNode *node = m_Sg->GetNodeList(); node; node=node->GetNext())
   {
 		mafPipe * pipe = node->GetPipe();
-    if(pipe && mafPipeVolumeSlice_BES::SafeDownCast(pipe) )
+    if(pipe && mafPipeVolumeSlice::SafeDownCast(pipe) )
     {
-      mafPipeVolumeSlice_BES::SafeDownCast(pipe)->SetSlice(Origin, Normal); 
+      mafPipeVolumeSlice::SafeDownCast(pipe)->SetSlice(Origin, Normal); 
     }
   }
 

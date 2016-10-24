@@ -119,8 +119,8 @@ void mafViewGlobalSliceCompound::PackageView()
 	m_ViewGlobalSlice = new mafViewGlobalSlice("",CAMERA_OS_P);
 	m_ViewGlobalSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
   m_ViewGlobalSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
-	m_ViewGlobalSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice_BES");
-  m_ViewGlobalSlice->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice_BES");
+	m_ViewGlobalSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
+  m_ViewGlobalSlice->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice");
   m_ViewGlobalSlice->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
   m_ViewGlobalSlice->PlugVisualPipe("mafVMEAnalog", "mafPipeBox", NON_VISIBLE);
   m_ViewGlobalSlice->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice");

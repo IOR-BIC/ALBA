@@ -25,7 +25,7 @@
 
 #include "mafViewOrthoSlice.h"
 #include "mafViewSlice.h"
-#include "mafPipeVolumeSlice_BES.h"
+#include "mafPipeVolumeSlice.h"
 #include "mafGUILutSwatch.h"
 #include "mafGUILutPreset.h"
 #include "mafGUI.h"
@@ -266,7 +266,7 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
         currentVolumeMaterial->UpdateFromTables();
         for(int i=0; i<m_NumOfChildView; i++)
         {
-          mafPipeVolumeSlice_BES *p = (mafPipeVolumeSlice_BES *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
+          mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
           p->SetColorLookupTable(m_ColorLUT);
         }
         double *sr;
@@ -333,8 +333,8 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
           {
             for(int i=0; i<m_NumOfChildView; i++)
             {
-              mafPipeVolumeSlice_BES *p = NULL;
-              p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
+              mafPipeVolumeSlice *p = NULL;
+              p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
               if (p)
               {
                 p->SetEnableGPU(m_EnableGPU);
@@ -350,8 +350,8 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
           {
             for(int i=0; i<m_NumOfChildView; i++)
             {
-              mafPipeVolumeSlice_BES *p = NULL;
-              p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
+              mafPipeVolumeSlice *p = NULL;
+              p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
               if (p)
               {
                 p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
@@ -404,8 +404,8 @@ mafGUI* mafViewOrthoSlice::CreateGui()
   {
     for (int i=0; i<m_NumOfChildView; i++)
     {
-      mafPipeVolumeSlice_BES *p = NULL;
-      p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
+      mafPipeVolumeSlice *p = NULL;
+      p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
       if (p)
       {
         p->SetEnableGPU(m_EnableGPU);
@@ -473,11 +473,11 @@ void mafViewOrthoSlice::PackageView()
   for(int v=PERSPECTIVE_VIEW; v<VIEWS_NUMBER; v++)
   {
     m_Views[v] = new mafViewSlice(viewName[v], cam_pos[v],false,false,false,0,TICKs[v]);
-    m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice_BES", MUTEX);    
-    m_Views[v]->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice_BES", MUTEX);
-    m_Views[v]->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice_BES", MUTEX);   //BES: 3.11.2009
+    m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice", MUTEX);    
+    m_Views[v]->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice", MUTEX);
+    m_Views[v]->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice", MUTEX);   //BES: 3.11.2009
 		m_Views[v]->PlugVisualPipe("mafVMEImage", "mafPipeBox", NON_VISIBLE);
-    m_Views[v]->PlugVisualPipe("mafVMESegmentationVolume", "mafPipeVolumeSlice_BES", MUTEX);
+    m_Views[v]->PlugVisualPipe("mafVMESegmentationVolume", "mafPipeVolumeSlice", MUTEX);
     // plug surface slice visual pipe in not perspective views
     if (v != PERSPECTIVE_VIEW)
     {
@@ -531,8 +531,8 @@ void mafViewOrthoSlice::GizmoCreate()
 		for(gizmoId=GIZMO_XN; gizmoId<GIZMOS_NUMBER; gizmoId++) 
 		{
 			double sliceOrigin[3];
-			mafPipeVolumeSlice_BES *p = NULL;
-			p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[0]))->GetNodePipe(m_CurrentVolume));
+			mafPipeVolumeSlice *p = NULL;
+			p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[0]))->GetNodePipe(m_CurrentVolume));
       double normal[3];
 			p->GetSlice(sliceOrigin,normal);
 
@@ -740,7 +740,7 @@ void mafViewOrthoSlice::CreateOrthoslicesAndGizmos(mafVME *vme)
 	m_LutSlider->SetSubRange((long)currentVolumeMaterial->m_TableRange[0],(long)currentVolumeMaterial->m_TableRange[1]);
 	for(int i=0; i<m_NumOfChildView; i++)
 	{
-		mafPipeVolumeSlice_BES *p = (mafPipeVolumeSlice_BES *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
+		mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
     p->SetEnableGPU(m_EnableGPU);
     p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
 		p->SetColorLookupTable(m_ColorLUT);

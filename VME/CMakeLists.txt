@@ -147,21 +147,8 @@ SET(PROJECT_SRCS
   mafPipePolylineSlice_BES.h
   mafPipeSurfaceSlice_BES.cpp
   mafPipeSurfaceSlice_BES.h
-  mafPipeVolumeSlice_BES.cpp
-  mafPipeVolumeSlice_BES.h
-  
-  ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
-  # the following files has been moved to mafIO
-  #../BES_Beta/IO/mafBrickedFile.cpp    
-  #../BES_Beta/IO/mafBrickedFile.h
-  #../BES_Beta/IO/mafBrickedFileReader.cpp
-  #../BES_Beta/IO/mafBrickedFileReader.h
-  #../BES_Beta/IO/mafBrickedFileWriter.cpp
-  #../BES_Beta/IO/mafBrickedFileWriter.h
-  #../BES_Beta/IO/mafVolumeLargeReader.cpp
-  #../BES_Beta/IO/mafVolumeLargeReader.h
-  #../BES_Beta/IO/mafVolumeLargeWriter.cpp
-  #../BES_Beta/IO/mafVolumeLargeWriter.h
+  mafPipeVolumeSlice.cpp
+  mafPipeVolumeSlice.h
   mafVMEVolumeLarge.cpp
   mafVMEVolumeLarge.h
   mafVMEVolumeLargeUtils.cpp

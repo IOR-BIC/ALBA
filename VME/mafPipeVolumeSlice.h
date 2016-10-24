@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipeVolumeSlice_BES
+ Module: mafPipeVolumeSlice
  Authors: Paolo Quadrani
  
  Copyright (c) B3C
@@ -34,7 +34,7 @@ class vtkLookupTable;
 class vtkPolyDataMapper;
 class vtkActor;
 class vtkFollower;
-class vtkMAFVolumeSlicer_BES;
+class vtkMAFVolumeSlicer;
 class vtkCamera;
 class vtkMAFAssembly;
 class vtkOutlineSource;
@@ -43,21 +43,21 @@ class mafVMEOutputVolume;
 
 
 /** 
-class name: mafPipeVolumeSlice_BES
+class name: mafPipeVolumeSlice
   This visual pipe allows to represent a volume data as a slice according to the 
   position of a plane representing the cutter. The default position of the slice is the center 
   of the volume data. The visual pipe can also render 3 different slices centered in a origin point
   and oriented along 3 different axes.
 */
-class MAF_EXPORT mafPipeVolumeSlice_BES : public mafPipeSlice
+class MAF_EXPORT mafPipeVolumeSlice : public mafPipeSlice
 {
 public:
   /** RTTI Macro */
-  mafTypeMacro(mafPipeVolumeSlice_BES,mafPipeSlice);
+  mafTypeMacro(mafPipeVolumeSlice,mafPipeSlice);
   /** Constructor */
-	  mafPipeVolumeSlice_BES();
+	  mafPipeVolumeSlice();
   /** Destructor */
-  virtual ~mafPipeVolumeSlice_BES();
+  virtual ~mafPipeVolumeSlice();
 	
   /** process events coming from Gui */
   virtual void OnEvent(mafEventBase *maf_event);
@@ -138,7 +138,7 @@ public:
 	void ShowSlider();
 
   /* Added by Losi 12.02.2009
-  This methods are added to allow views access m_EnableGPU member of mafPipeVolumeSlice_BES:
+  This methods are added to allow views access m_EnableGPU member of mafPipeVolumeSlice:
   This is done in order to change the location of the enable GPU flag check box from the visual props panel to the view panel.
   An alternative, and less invasive, way to do this is to implement a GetGUI method. But this method generate duplicate check boxes in compound views.
   */
@@ -187,8 +187,8 @@ protected:
 
   mafVMEOutputVolume *m_VolumeOutput;
 
-  vtkMAFVolumeSlicer_BES				 *m_SlicerImage[3];
-	vtkMAFVolumeSlicer_BES				 *m_SlicerPolygonal[3];
+  vtkMAFVolumeSlicer				 *m_SlicerImage[3];
+	vtkMAFVolumeSlicer				 *m_SlicerPolygonal[3];
 	vtkImageData					 *m_Image[3];
 	vtkTexture						 *m_Texture[3];
   vtkLookupTable         *m_ColorLUT;

@@ -49,7 +49,7 @@
 #include "vtkProperty.h"
 
 #include "vtkMAFContourVolumeMapper.h"
-#include "vtkMAFVolumeSlicer_BES.h"
+#include "vtkMAFVolumeSlicer.h"
 
 #include "vtkMAFContourVolumeMapperTest.h"
 
@@ -137,7 +137,7 @@ void vtkMAFContourVolumeMapperTest::TestRectilinearGrid()
   oactor->SetUserMatrix(volume->GetMatrix());
   oactor->Delete();
 
-  vtkMAFVolumeSlicer_BES *slicer = NULL, *pslicer = NULL;
+  vtkMAFVolumeSlicer *slicer = NULL, *pslicer = NULL;
 
   mapper->SetEnableContourAnalysis(CleanModel);
 
@@ -259,7 +259,7 @@ void vtkMAFContourVolumeMapperTest::TestImageData()
   oactor->SetUserMatrix(volume->GetMatrix());
   oactor->Delete();
 
-  vtkMAFVolumeSlicer_BES *slicer = NULL, *pslicer = NULL;
+  vtkMAFVolumeSlicer *slicer = NULL, *pslicer = NULL;
 
   mapper->SetEnableContourAnalysis(CleanModel);
 

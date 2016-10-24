@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "mafMatrix.h"
 #include "mafTransform.h"
 #include "mafPipeImage3D.h"
-#include "mafPipeVolumeSlice_BES.h"
+#include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipeSurface.h"
 #include "mafPipeSurfaceTextured.h"

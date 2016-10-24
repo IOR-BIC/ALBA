@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: vtkMAFVolumeSlicer_BES
+ Module: vtkMAFVolumeSlicer
  Authors: Alexander Savenko, Josef Kohout
  
  Copyright (c) B3C
@@ -13,7 +13,7 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMAFVolumeSlicer_BES - a filter for creating slices from structured volume data (rectilinear grid or structured points)
+// .NAME vtkMAFVolumeSlicer - a filter for creating slices from structured volume data (rectilinear grid or structured points)
 //
 // .SECTION Description
 // Inputs of the filter are:
@@ -45,16 +45,16 @@ class vtkLinearTransform;
 #ifdef _WIN32
 //RELEASE NOTE: BES - 4.4.2008 - if you include <wx/string.h> (included by GPUOGL.h) here,
 //VS 2008 C++ compiler will produce an incorrect code (compiler BUG), 
-//when GetPlaneOrigin() is called from mafPipeVolumeSlice_BES, function GetPlaneOrigin(double data[3])
+//when GetPlaneOrigin() is called from mafPipeVolumeSlice, function GetPlaneOrigin(double data[3])
 //is called instead of it
 class mafGPUOGL;
 #endif
 
 
-class MAF_EXPORT vtkMAFVolumeSlicer_BES : public vtkDataSetToDataSetFilter {
+class MAF_EXPORT vtkMAFVolumeSlicer : public vtkDataSetToDataSetFilter {
 public:
-  static vtkMAFVolumeSlicer_BES *New();
-  vtkTypeRevisionMacro(vtkMAFVolumeSlicer_BES, vtkDataSetToDataSetFilter);
+  static vtkMAFVolumeSlicer *New();
+  vtkTypeRevisionMacro(vtkMAFVolumeSlicer, vtkDataSetToDataSetFilter);
 
 #pragma region Attributes
   /**
@@ -72,8 +72,8 @@ public:
   void SetPlaneAxisY(float axis[3]);
   vtkGetVectorMacro(PlaneAxisY, float, 3);
 
-#pragma message("vtkMAFVolumeSlicer_BES::GetWindow, vtkMAFVolumeSlicer_BES::SetWindow are meaningless - THEY SHOULD BE REMOVED ")
-#pragma message("vtkMAFVolumeSlicer_BES::GetLevel, vtkMAFVolumeSlicer_BES::SetLevel are meaningless - THEY SHOULD BE REMOVED ")
+#pragma message("vtkMAFVolumeSlicer::GetWindow, vtkMAFVolumeSlicer::SetWindow are meaningless - THEY SHOULD BE REMOVED ")
+#pragma message("vtkMAFVolumeSlicer::GetLevel, vtkMAFVolumeSlicer::SetLevel are meaningless - THEY SHOULD BE REMOVED ")
 
   /**
   Set / Get the Window for color modulation. The formula for modulation is 
@@ -138,8 +138,8 @@ public:
   void SetSliceTransform(vtkLinearTransform *trans);
 
 protected:
-  vtkMAFVolumeSlicer_BES();
-  ~vtkMAFVolumeSlicer_BES();
+  vtkMAFVolumeSlicer();
+  ~vtkMAFVolumeSlicer();
 
   /** Return this object's modified time. */  
   /*virtual*/ unsigned long int GetMTime();
@@ -270,7 +270,7 @@ protected:
 #endif  
 
 private:
-  vtkMAFVolumeSlicer_BES(const vtkMAFVolumeSlicer_BES&);  // Not implemented.
-  void operator=(const vtkMAFVolumeSlicer_BES&);  // Not implemented.
+  vtkMAFVolumeSlicer(const vtkMAFVolumeSlicer&);  // Not implemented.
+  void operator=(const vtkMAFVolumeSlicer&);  // Not implemented.
 };
 #endif

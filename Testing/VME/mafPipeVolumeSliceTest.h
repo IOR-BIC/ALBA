@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipeVolumeSlice_BESTest
+ Module: mafPipeVolumeSliceTest
  Authors: Eleonora Mambrini
  
  Copyright (c) B3C
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_mafPipeVolumeSlice_BESTest_H__
-#define __CPP_UNIT_mafPipeVolumeSlice_BESTest_H__
+#ifndef __CPP_UNIT_mafPipeVolumeSliceTest_H__
+#define __CPP_UNIT_mafPipeVolumeSliceTest_H__
 
 #include "mafTest.h"
 
@@ -24,7 +24,7 @@ class vtkRenderWindowInteractor;
 class vtkProp;
 class vtkPropCollection;
 
-class mafPipeVolumeSlice_BESTest : public mafTest
+class mafPipeVolumeSliceTest : public mafTest
 {
 public: 
   // Executed before each test
@@ -33,7 +33,7 @@ public:
   // Executed after each test
   void AfterTest();
 
-  CPPUNIT_TEST_SUITE( mafPipeVolumeSlice_BESTest );
+  CPPUNIT_TEST_SUITE( mafPipeVolumeSliceTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestPipeExecution );
   CPPUNIT_TEST( TestPipeExecution_SetSliceOpacity );

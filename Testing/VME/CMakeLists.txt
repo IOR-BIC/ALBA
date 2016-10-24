@@ -92,7 +92,7 @@ SET(PROJECT_SRCS
 	mafVMEPolylineEditorTest.h mafVMEPolylineEditorTest.cpp
 	mafPipeMeshSlice_BESTest.h mafPipeMeshSlice_BESTest.cpp
 	mafPipeSurfaceSlice_BESTest.h mafPipeSurfaceSlice_BESTest.cpp
-	mafPipeVolumeSlice_BESTest.h mafPipeVolumeSlice_BESTest.cpp
+	mafPipeVolumeSliceTest.h mafPipeVolumeSliceTest.cpp
 	mafVMEMapsTest.h mafVMEMapsTest.cpp
 	mafPipeTrajectoriesTest.h mafPipeTrajectoriesTest.cpp
 	mafPipeSliceTest.h mafPipeSliceTest.cpp

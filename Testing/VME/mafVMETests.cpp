@@ -104,7 +104,7 @@
 #include "mafVMEPolylineEditorTest.h"
 #include "mafPipeMeshSlice_BESTest.h"
 #include "mafPipeSurfaceSlice_BESTest.h"
-#include "mafPipeVolumeSlice_BESTest.h"
+#include "mafPipeVolumeSliceTest.h"
 #include "mafVMEMapsTest.h"
 #include "mafPipeTrajectoriesTest.h"
 #include "mafPipeSliceTest.h"
@@ -255,7 +255,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafVMEPolylineEditorTest::suite());
 	runner.addTest(mafPipeMeshSlice_BESTest::suite());
 	runner.addTest(mafPipeSurfaceSlice_BESTest::suite());
-	runner.addTest(mafPipeVolumeSlice_BESTest::suite());
+	runner.addTest(mafPipeVolumeSliceTest::suite());
 	runner.addTest(mafVMEMapsTest::suite());
 	runner.addTest(mafPipeTrajectoriesTest::suite());
 	runner.addTest(mafPipeSliceTest::suite());

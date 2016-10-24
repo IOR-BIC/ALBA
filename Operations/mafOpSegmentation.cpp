@@ -53,7 +53,7 @@
 #include "mafVMEImage.h"
 #include "mafGUILutSlider.h"
 #include "mafVMESurface.h"
-#include "mafPipeVolumeSlice_BES.h"
+#include "mafPipeVolumeSlice.h"
 
 #include "mmaVolumeMaterial.h"
 #include "mmaMaterial.h"

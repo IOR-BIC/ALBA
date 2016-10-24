@@ -67,7 +67,7 @@
 #include "vtkPlane.h"
 #include "vtkImageData.h"
 #include "vtkTexture.h"
-#include "vtkMAFVolumeSlicer_BES.h"
+#include "vtkMAFVolumeSlicer.h"
 #include "vtkSmartPointer.h"
 #include "vtkLookupTable.h"
 #include "vtkVolume.h"
@@ -491,8 +491,8 @@ void mafOpExtractIsosurface::CreateSlicePipeline()
   m_SliceYVect[1] = 1.0;
   m_SliceYVect[2] = 0.0;
 
-  m_PolydataSlicer = vtkMAFVolumeSlicer_BES::New();
-  m_VolumeSlicer	= vtkMAFVolumeSlicer_BES::New();
+  m_PolydataSlicer = vtkMAFVolumeSlicer::New();
+  m_VolumeSlicer	= vtkMAFVolumeSlicer::New();
   m_VolumeSlicer->SetPlaneOrigin(m_SliceOrigin);
   m_PolydataSlicer->SetPlaneOrigin(m_VolumeSlicer->GetPlaneOrigin());
   m_VolumeSlicer->SetPlaneAxisX(m_SliceXVect);

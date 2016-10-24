@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipeVolumeSlice_BES
+ Module: mafPipeVolumeSlice
  Authors: Paolo Quadrani
  
  Copyright (c) B3C
@@ -23,7 +23,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafPipeVolumeSlice_BES.h"
+#include "mafPipeVolumeSlice.h"
 #include "mafDecl.h"
 #include "mafGUI.h"
 #include "mafSceneNode.h"
@@ -50,7 +50,7 @@
 #include "vtkOutlineCornerFilter.h"
 #include "vtkStructuredPoints.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkMAFVolumeSlicer_BES.h"
+#include "vtkMAFVolumeSlicer.h"
 #include "vtkProperty.h"
 #include "vtkDataSet.h"
 #include "vtkRenderer.h"
@@ -60,13 +60,13 @@
 #include "vtkFloatArray.h"
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mafPipeVolumeSlice_BES);
+mafCxxTypeMacro(mafPipeVolumeSlice);
 //----------------------------------------------------------------------------
 
 #include "mafMemDbg.h"
 
 //----------------------------------------------------------------------------
-mafPipeVolumeSlice_BES::mafPipeVolumeSlice_BES()
+mafPipeVolumeSlice::mafPipeVolumeSlice()
 :mafPipeSlice()
 //----------------------------------------------------------------------------
 { 
@@ -129,7 +129,7 @@ mafPipeVolumeSlice_BES::mafPipeVolumeSlice_BES()
   m_TrilinearInterpolationOn = TRUE;
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds/* =false */, bool interpolate/* =true */)
+void mafPipeVolumeSlice::InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds/* =false */, bool interpolate/* =true */)
 //----------------------------------------------------------------------------
 {
   m_SliceDirection= direction;
@@ -138,7 +138,7 @@ void mafPipeVolumeSlice_BES::InitializeSliceParameters(int direction, bool show_
   m_Interpolate = interpolate;
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::InitializeSliceParameters(int direction, double slice_origin[3], bool show_vol_bbox,bool show_bounds/* =false */, bool interpolate/* =true */)
+void mafPipeVolumeSlice::InitializeSliceParameters(int direction, double slice_origin[3], bool show_vol_bbox,bool show_bounds/* =false */, bool interpolate/* =true */)
 //----------------------------------------------------------------------------
 {
   m_SliceParametersInitialized = true;
@@ -152,7 +152,7 @@ void mafPipeVolumeSlice_BES::InitializeSliceParameters(int direction, double sli
   m_Origin[2] = slice_origin[2];
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::InitializeSliceParameters(int direction, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox,bool show_bounds/* =false */, bool interpolate/* =true */)
+void mafPipeVolumeSlice::InitializeSliceParameters(int direction, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox,bool show_bounds/* =false */, bool interpolate/* =true */)
 //----------------------------------------------------------------------------
 {
   m_SliceParametersInitialized = true;
@@ -187,7 +187,7 @@ void mafPipeVolumeSlice_BES::InitializeSliceParameters(int direction, double sli
   }
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::Create(mafSceneNode *n)
+void mafPipeVolumeSlice::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
   Superclass::Create(n); // Always call this to initialize m_Vme, m_AssemblyFront, ... vars
@@ -317,7 +317,7 @@ void mafPipeVolumeSlice_BES::Create(mafSceneNode *n)
   }
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::CreateTICKs()
+void mafPipeVolumeSlice::CreateTICKs()
 //----------------------------------------------------------------------------
 {
 	//---- TICKs creation --------------------------
@@ -424,7 +424,7 @@ void mafPipeVolumeSlice_BES::CreateTICKs()
 
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::CreateSlice(int direction)
+void mafPipeVolumeSlice::CreateSlice(int direction)
 //----------------------------------------------------------------------------
 {
 	double xspc = 0.33, yspc = 0.33, zspc = 1.0;
@@ -496,7 +496,7 @@ void mafPipeVolumeSlice_BES::CreateSlice(int direction)
 	m_AssemblyUsed->AddPart(m_SliceActor[direction]);
 }
 //----------------------------------------------------------------------------
-mafPipeVolumeSlice_BES::~mafPipeVolumeSlice_BES()
+mafPipeVolumeSlice::~mafPipeVolumeSlice()
 //----------------------------------------------------------------------------
 {
   m_Vme->GetEventSource()->RemoveObserver(this);
@@ -537,7 +537,7 @@ mafPipeVolumeSlice_BES::~mafPipeVolumeSlice_BES()
   vtkDEL(m_GhostActor);
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::SetLutRange(double low, double high)
+void mafPipeVolumeSlice::SetLutRange(double low, double high)
 //----------------------------------------------------------------------------
 {
   mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
@@ -560,7 +560,7 @@ void mafPipeVolumeSlice_BES::SetLutRange(double low, double high)
 	}*/
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::GetLutRange(double range[2])
+void mafPipeVolumeSlice::GetLutRange(double range[2])
 //----------------------------------------------------------------------------
 {
   mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
@@ -573,7 +573,7 @@ void mafPipeVolumeSlice_BES::GetLutRange(double range[2])
 }
 
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::SetSlice(double origin[3], float xVect[3], float yVect[3])
+void mafPipeVolumeSlice::SetSlice(double origin[3], float xVect[3], float yVect[3])
 //----------------------------------------------------------------------------
 {
   m_Origin[0] = origin[0];
@@ -600,7 +600,7 @@ void mafPipeVolumeSlice_BES::SetSlice(double origin[3], float xVect[3], float yV
 
 //----------------------------------------------------------------------------
 //Set the origin and normal of the slice
-void mafPipeVolumeSlice_BES::SetSlice(double* Origin, double* Normal)
+void mafPipeVolumeSlice::SetSlice(double* Origin, double* Normal)
 //----------------------------------------------------------------------------
 {
 	if (Origin != NULL)
@@ -658,7 +658,7 @@ void mafPipeVolumeSlice_BES::SetSlice(double* Origin, double* Normal)
 //----------------------------------------------------------------------------
 //Get the slice origin coordinates and normal.
 //Both, Origin and Normal may be NULL, if the value is not to be retrieved.
-/*virtual*/ void mafPipeVolumeSlice_BES::GetSlice(double *Origin, double *Normal)
+/*virtual*/ void mafPipeVolumeSlice::GetSlice(double *Origin, double *Normal)
 //----------------------------------------------------------------------------
 {
   if (Origin != NULL)
@@ -677,7 +677,7 @@ void mafPipeVolumeSlice_BES::SetSlice(double* Origin, double* Normal)
 }
 
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::SetSliceOpacity(double opacity)
+void mafPipeVolumeSlice::SetSliceOpacity(double opacity)
 //----------------------------------------------------------------------------
 {
   m_SliceOpacity = opacity;
@@ -689,13 +689,13 @@ void mafPipeVolumeSlice_BES::SetSliceOpacity(double opacity)
   }
 }
 //----------------------------------------------------------------------------
-float mafPipeVolumeSlice_BES::GetSliceOpacity()
+float mafPipeVolumeSlice::GetSliceOpacity()
 //----------------------------------------------------------------------------
 {
   return m_SliceOpacity;
 }
 //----------------------------------------------------------------------------
-mafGUI *mafPipeVolumeSlice_BES::CreateGui()
+mafGUI *mafPipeVolumeSlice::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
@@ -726,7 +726,7 @@ mafGUI *mafPipeVolumeSlice_BES::CreateGui()
   return m_Gui;
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::OnEvent(mafEventBase *maf_event)
+void mafPipeVolumeSlice::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
  {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -776,7 +776,7 @@ void mafPipeVolumeSlice_BES::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::SetColorLookupTable(vtkLookupTable *lut)
+void mafPipeVolumeSlice::SetColorLookupTable(vtkLookupTable *lut)
 //----------------------------------------------------------------------------
 {
   int i;
@@ -798,7 +798,7 @@ void mafPipeVolumeSlice_BES::SetColorLookupTable(vtkLookupTable *lut)
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::Select(bool sel)
+void mafPipeVolumeSlice::Select(bool sel)
 //----------------------------------------------------------------------------
 {
 	m_Selected = sel;
@@ -806,19 +806,19 @@ void mafPipeVolumeSlice_BES::Select(bool sel)
 	m_VolumeBoxActor->SetVisibility(sel);
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::HideSlider()
+void mafPipeVolumeSlice::HideSlider()
 //----------------------------------------------------------------------------
 {
 	m_ShowSlider=false;
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::ShowSlider()
+void mafPipeVolumeSlice::ShowSlider()
 //----------------------------------------------------------------------------
 {
 	m_ShowSlider=true;
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::ShowTICKsOn()
+void mafPipeVolumeSlice::ShowTICKsOn()
 //----------------------------------------------------------------------------
 {
 	m_ShowTICKs=true;
@@ -826,7 +826,7 @@ void mafPipeVolumeSlice_BES::ShowTICKsOn()
 		m_TickActor->SetVisibility(m_ShowTICKs);
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::ShowTICKsOff()
+void mafPipeVolumeSlice::ShowTICKsOff()
 //----------------------------------------------------------------------------
 {
 	m_ShowTICKs=false;
@@ -836,7 +836,7 @@ void mafPipeVolumeSlice_BES::ShowTICKsOff()
 
 //------------------------------------------------------------------------
 //Updates VTK slicers. It also sets GPUEnabled flag. 
-void mafPipeVolumeSlice_BES::UpdateSlice()
+void mafPipeVolumeSlice::UpdateSlice()
 //------------------------------------------------------------------------
 {
   for (int i = 0; i < 3; i++)
@@ -858,7 +858,7 @@ void mafPipeVolumeSlice_BES::UpdateSlice()
 }
 
 //------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::SetEnableGPU(int enable)
+void mafPipeVolumeSlice::SetEnableGPU(int enable)
 //------------------------------------------------------------------------
 {
   m_EnableGPU = enable;
@@ -866,7 +866,7 @@ void mafPipeVolumeSlice_BES::SetEnableGPU(int enable)
 };
 
 //------------------------------------------------------------------------
-int mafPipeVolumeSlice_BES::GetEnableGPU()
+int mafPipeVolumeSlice::GetEnableGPU()
 //------------------------------------------------------------------------
 {
   return m_EnableGPU;

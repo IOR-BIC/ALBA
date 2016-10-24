@@ -41,7 +41,7 @@
 #include "vtkMath.h"
 #include "vtkImageData.h"
 #include "vtkPolyData.h"
-#include "vtkMAFVolumeSlicer_BES.h"
+#include "vtkMAFVolumeSlicer.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkLinearTransform.h"
 #include "vtkPointData.h"

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: vtkMAFVolumeSlicer_BES
+ Module: vtkMAFVolumeSlicer
  Authors: Alexander Savenko, Josef Kohout (major change)
  
  Copyright (c) B3C
@@ -20,7 +20,7 @@
 #include "GPU_OGL.h"
 #endif
 
-#include "vtkMAFVolumeSlicer_BES.h"
+#include "vtkMAFVolumeSlicer.h"
 #include "vtkObjectFactory.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkCellArray.h"
@@ -31,8 +31,8 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeSlicer_BES, "$Revision: 1.1.2.9 $");
-vtkStandardNewMacro(vtkMAFVolumeSlicer_BES);
+vtkCxxRevisionMacro(vtkMAFVolumeSlicer, "$Revision: 1.1.2.9 $");
+vtkStandardNewMacro(vtkMAFVolumeSlicer);
 
 #include "mafMemDbg.h"
 
@@ -48,7 +48,7 @@ static const int SamplingTableSize = 64000;
 
 //----------------------------------------------------------------------------
 // Constructor sets default values
-vtkMAFVolumeSlicer_BES::vtkMAFVolumeSlicer_BES() 
+vtkMAFVolumeSlicer::vtkMAFVolumeSlicer() 
 //----------------------------------------------------------------------------
 {
   PlaneOrigin[0] = PlaneOrigin[1] = PlaneOrigin[2] = 0.f;
@@ -89,7 +89,7 @@ vtkMAFVolumeSlicer_BES::vtkMAFVolumeSlicer_BES()
   m_TriLinearInterpolationOn = true;
 }
 //----------------------------------------------------------------------------
-vtkMAFVolumeSlicer_BES::~vtkMAFVolumeSlicer_BES() 
+vtkMAFVolumeSlicer::~vtkMAFVolumeSlicer() 
 //----------------------------------------------------------------------------
 {
   for (int i = 0; i < 3; i++)
@@ -113,7 +113,7 @@ vtkMAFVolumeSlicer_BES::~vtkMAFVolumeSlicer_BES()
 #endif
 }
 //----------------------------------------------------------------------------
-void vtkMAFVolumeSlicer_BES::SetPlaneAxisX(float axis[3]) 
+void vtkMAFVolumeSlicer::SetPlaneAxisX(float axis[3]) 
 //----------------------------------------------------------------------------
 {
   if (vtkMath::Norm(axis) < 1.e-5f)
@@ -131,7 +131,7 @@ void vtkMAFVolumeSlicer_BES::SetPlaneAxisX(float axis[3])
   this->Modified();
 }
 //----------------------------------------------------------------------------
-void vtkMAFVolumeSlicer_BES::SetPlaneAxisY(float axis[3]) 
+void vtkMAFVolumeSlicer::SetPlaneAxisY(float axis[3]) 
 //----------------------------------------------------------------------------
 {
   if (vtkMath::Norm(axis) < 1.e-5f)
@@ -153,7 +153,7 @@ void vtkMAFVolumeSlicer_BES::SetPlaneAxisY(float axis[3])
   this->Modified();
 }
 //----------------------------------------------------------------------------
-void vtkMAFVolumeSlicer_BES::SetPlaneOrigin(double origin[3])
+void vtkMAFVolumeSlicer::SetPlaneOrigin(double origin[3])
 //----------------------------------------------------------------------------
 {
   memcpy(PlaneOrigin, origin, sizeof(PlaneOrigin));
@@ -168,7 +168,7 @@ void vtkMAFVolumeSlicer_BES::SetPlaneOrigin(double origin[3])
   this->Modified();
 }
 //----------------------------------------------------------------------------
-void vtkMAFVolumeSlicer_BES::SetPlaneOrigin(double x, double y, double z)
+void vtkMAFVolumeSlicer::SetPlaneOrigin(double x, double y, double z)
 //----------------------------------------------------------------------------
 {
   double plane_origin[3];
@@ -180,7 +180,7 @@ void vtkMAFVolumeSlicer_BES::SetPlaneOrigin(double x, double y, double z)
 
 //----------------------------------------------------------------------------
 //Return this object's modified time.
-/*virtual*/unsigned long int vtkMAFVolumeSlicer_BES::GetMTime() 
+/*virtual*/unsigned long int vtkMAFVolumeSlicer::GetMTime() 
 //----------------------------------------------------------------------------
 {
   unsigned long int time = Superclass::GetMTime();
@@ -191,7 +191,7 @@ void vtkMAFVolumeSlicer_BES::SetPlaneOrigin(double x, double y, double z)
 
 //----------------------------------------------------------------------------
 //By default copy the output update extent to the input.
-void vtkMAFVolumeSlicer_BES::ComputeInputUpdateExtents(vtkDataObject *output) 
+void vtkMAFVolumeSlicer::ComputeInputUpdateExtents(vtkDataObject *output) 
 //----------------------------------------------------------------------------
 {
   vtkDataObject *input = this->GetInput();
@@ -201,7 +201,7 @@ void vtkMAFVolumeSlicer_BES::ComputeInputUpdateExtents(vtkDataObject *output)
 //----------------------------------------------------------------------------
 //By default, UpdateInformation calls this method to copy information
 //unmodified from the input to the output.
-/*virtual*/ void vtkMAFVolumeSlicer_BES::ExecuteInformation() 
+/*virtual*/ void vtkMAFVolumeSlicer::ExecuteInformation() 
 //----------------------------------------------------------------------------
 {
   vtkDataSet* input;
@@ -256,7 +256,7 @@ void vtkMAFVolumeSlicer_BES::ComputeInputUpdateExtents(vtkDataObject *output)
     vtkRectilinearGrid* gridData = vtkRectilinearGrid::SafeDownCast(input);
     if (gridData == NULL)
     {
-      vtkDebugMacro("Invalid input for vtkMAFVolumeSlicer_BES");      
+      vtkDebugMacro("Invalid input for vtkMAFVolumeSlicer");      
       return;
     }
 
@@ -397,7 +397,7 @@ void vtkMAFVolumeSlicer_BES::ComputeInputUpdateExtents(vtkDataObject *output)
 //BES: 15.12.2008 - when using mafOpCrop in mafViewOrthoSlice, the input
 //dimensions change between ExecuteInformation and ExecuteData 
 //This routine is supposed to be called from ExecuteData and it fixes this problem
-void vtkMAFVolumeSlicer_BES::ExecuteDataHotFix(vtkDataObject *outputData)
+void vtkMAFVolumeSlicer::ExecuteDataHotFix(vtkDataObject *outputData)
 //------------------------------------------------------------------------
 {
   vtkDataSet* input = this->GetInput(); 
@@ -432,14 +432,14 @@ void vtkMAFVolumeSlicer_BES::ExecuteDataHotFix(vtkDataObject *outputData)
     output->SetExtent(extent);
 
     LastPreprocessedInput = NULL; //to force PrepareVolume to reexecute
-    vtkMAFVolumeSlicer_BES::ExecuteInformation();                  
+    vtkMAFVolumeSlicer::ExecuteInformation();                  
   }
 }
 
 //----------------------------------------------------------------------------
 //This method is the one that should be used by subclasses, right now the 
 //default implementation is to call the backwards compatibility method
-/*virtual*/ void vtkMAFVolumeSlicer_BES::ExecuteData(vtkDataObject *outputData) 
+/*virtual*/ void vtkMAFVolumeSlicer::ExecuteData(vtkDataObject *outputData) 
 //----------------------------------------------------------------------------
 {
   //BES: 15.12.2008 - when using mafOpCrop in mafViewOrthoSlice, the input
@@ -456,7 +456,7 @@ void vtkMAFVolumeSlicer_BES::ExecuteDataHotFix(vtkDataObject *outputData)
 
 //----------------------------------------------------------------------------
 // Create geometry for the slice
-/*virtual*/ void vtkMAFVolumeSlicer_BES::ExecuteData(vtkPolyData *output) 
+/*virtual*/ void vtkMAFVolumeSlicer::ExecuteData(vtkPolyData *output) 
 //----------------------------------------------------------------------------
 {
   output->Reset();
@@ -682,7 +682,7 @@ void vtkMAFVolumeSlicer_BES::ExecuteDataHotFix(vtkDataObject *outputData)
 
 //----------------------------------------------------------------------------
 //Create texture for the slice.
-/*virtual*/ void vtkMAFVolumeSlicer_BES::ExecuteData(vtkImageData *outputObject) 
+/*virtual*/ void vtkMAFVolumeSlicer::ExecuteData(vtkImageData *outputObject) 
 //----------------------------------------------------------------------------
 {
   int extent[6];
@@ -728,7 +728,7 @@ void vtkMAFVolumeSlicer_BES::ExecuteDataHotFix(vtkDataObject *outputData)
     this->CreateImage((const double*)inputPointer, outputObject); break;
   
   default:
-    vtkErrorMacro(<< "vtkMAFVolumeSlicer_BES: Scalar type is not supported");
+    vtkErrorMacro(<< "vtkMAFVolumeSlicer: Scalar type is not supported");
     return;
   }
 }
@@ -738,7 +738,7 @@ void vtkMAFVolumeSlicer_BES::ExecuteDataHotFix(vtkDataObject *outputData)
 //This routine is called from ExecuteInformation to compute coordinates of voxels in the volume
 //and to detect the bounding box - both used in ExecuteData. It also computes normal for the cutting 
 //plane. NB: if input has not changed since the last call, the coordinates are not recalculated. 
-/*virtual*/ void vtkMAFVolumeSlicer_BES::PrepareVolume(vtkDataSet* input, vtkImageData* output) 
+/*virtual*/ void vtkMAFVolumeSlicer::PrepareVolume(vtkDataSet* input, vtkImageData* output) 
 //----------------------------------------------------------------------------
 {
   if (LastPreprocessedInput == input && PreprocessingTime > input->GetMTime() && 
@@ -765,7 +765,7 @@ void vtkMAFVolumeSlicer_BES::ExecuteDataHotFix(vtkDataObject *outputData)
 //Gets the GL data type (to be used for mafGPU_OGL) for the given VTK data type
 //Returns -1, if the given data type has no equivalent in OpenGL
 //------------------------------------------------------------------------
-unsigned int vtkMAFVolumeSlicer_BES::GetGLDataType(int nVTKdata_type)
+unsigned int vtkMAFVolumeSlicer::GetGLDataType(int nVTKdata_type)
 {
   //see vtkSystemIncludes.h
   //#define VTK_VOID            0
@@ -801,7 +801,7 @@ unsigned int vtkMAFVolumeSlicer_BES::GetGLDataType(int nVTKdata_type)
 //Prepares internal data structure for the regular grid data.
 //This routine is called from ExecuteData to prepare data structures used in further computation.
 //NB: if data structures prepared in previous call are still valid, they will be used.
-/*virtual*/ void vtkMAFVolumeSlicer_BES::PrepareVolume(vtkImageData* input, vtkImageData* output)
+/*virtual*/ void vtkMAFVolumeSlicer::PrepareVolume(vtkImageData* input, vtkImageData* output)
 //------------------------------------------------------------------------
 {  
 #ifdef _WIN32
@@ -924,7 +924,7 @@ unsigned int vtkMAFVolumeSlicer_BES::GetGLDataType(int nVTKdata_type)
 //Prepares internal data structure for the rectilinear grid data.
 //This routine is called from ExecuteData to prepare data structures used in further computation.
 //NB: if data structures prepared in previous call are still valid, they will be used.
-/*virtual*/ void vtkMAFVolumeSlicer_BES::PrepareVolume(vtkRectilinearGrid* input, vtkImageData* output)
+/*virtual*/ void vtkMAFVolumeSlicer::PrepareVolume(vtkRectilinearGrid* input, vtkImageData* output)
 //------------------------------------------------------------------------
 {  
   //rectilinear grid
@@ -978,7 +978,7 @@ unsigned int vtkMAFVolumeSlicer_BES::GetGLDataType(int nVTKdata_type)
 //------------------------------------------------------------------------
 //Creates sampling table for the given coordinates 
 //NB. coordinates must be zero aligned (i.e., the first coordinate must be 0,0,0)*/
-void vtkMAFVolumeSlicer_BES::CreateSamplingTable(float* voxelcoords[3])
+void vtkMAFVolumeSlicer::CreateSamplingTable(float* voxelcoords[3])
 //------------------------------------------------------------------------
 {
   //coefficient storing number of samples / volume size => samples per one mm
@@ -1042,7 +1042,7 @@ void vtkMAFVolumeSlicer_BES::CreateSamplingTable(float* voxelcoords[3])
 //----------------------------------------------------------------------------
 //Slices voxels from input producing image in output.
 template<typename InputDataType> 
-void vtkMAFVolumeSlicer_BES::CreateImage(const InputDataType *inputPointer, vtkImageData *outputObject) 
+void vtkMAFVolumeSlicer::CreateImage(const InputDataType *inputPointer, vtkImageData *outputObject) 
 //----------------------------------------------------------------------------
 {
   vtkDataArray* pScalars = outputObject->GetPointData()->GetScalars();
@@ -1096,7 +1096,7 @@ void vtkMAFVolumeSlicer_BES::CreateImage(const InputDataType *inputPointer, vtkI
     break;
 
   default:
-    vtkErrorMacro(<< "vtkMAFVolumeSlicer_BES: Scalar type is not supported");
+    vtkErrorMacro(<< "vtkMAFVolumeSlicer: Scalar type is not supported");
     return;
   }    
 }
@@ -1104,7 +1104,7 @@ void vtkMAFVolumeSlicer_BES::CreateImage(const InputDataType *inputPointer, vtkI
 //----------------------------------------------------------------------------
 //Slices voxels from input producing image in output.
 template<typename InputDataType, typename OutputDataType> 
-void vtkMAFVolumeSlicer_BES::CreateImage(const InputDataType *input, OutputDataType *output, vtkImageData *outputObject) 
+void vtkMAFVolumeSlicer::CreateImage(const InputDataType *input, OutputDataType *output, vtkImageData *outputObject) 
 //----------------------------------------------------------------------------
 {
   // prepare data for sampling  
@@ -1210,7 +1210,7 @@ void vtkMAFVolumeSlicer_BES::CreateImage(const InputDataType *input, OutputDataT
 //and GlobalPlaneAxisY and to cover area of size*spacing mm. Actually, this routine computes intersection of
 //the line going through the given point and having vector GlobalPlaneAxisY with the line going through
 //the origin of texture and having vector GlobalPlaneAxisY. The computed times are stored in ts.
-void vtkMAFVolumeSlicer_BES::CalculateTextureCoordinates(const float point[3], const int size[2], const double spacing[2], float ts[2]) 
+void vtkMAFVolumeSlicer::CalculateTextureCoordinates(const float point[3], const int size[2], const double spacing[2], float ts[2]) 
 //----------------------------------------------------------------------------
 { 
   //BES: 28.3.2008 - Completely rewritten - BUG fix
@@ -1252,7 +1252,7 @@ void vtkMAFVolumeSlicer_BES::CalculateTextureCoordinates(const float point[3], c
 
 
 //----------------------------------------------------------------------------
-void vtkMAFVolumeSlicer_BES::SetSliceTransform(vtkLinearTransform *trans)
+void vtkMAFVolumeSlicer::SetSliceTransform(vtkLinearTransform *trans)
 //----------------------------------------------------------------------------
 {
   TransformSlice = trans;
@@ -1263,7 +1263,7 @@ void vtkMAFVolumeSlicer_BES::SetSliceTransform(vtkLinearTransform *trans)
 //----------------------------------------------------------------------------
 //Creates GPU provider, shaders, etc. 
 //Returns false, if GPU provider could not be created
-bool vtkMAFVolumeSlicer_BES::CreateGPUProvider()
+bool vtkMAFVolumeSlicer::CreateGPUProvider()
 //----------------------------------------------------------------------------
 {
   if (m_pGPUProvider != NULL)
@@ -1320,7 +1320,7 @@ bool vtkMAFVolumeSlicer_BES::CreateGPUProvider()
 //----------------------------------------------------------------------------
 //Slices voxels from input producing image in output using GPU.
 template<typename OutputDataType> 
-void vtkMAFVolumeSlicer_BES::CreateImageGPU(OutputDataType* output, vtkImageData *outputObject)
+void vtkMAFVolumeSlicer::CreateImageGPU(OutputDataType* output, vtkImageData *outputObject)
 //----------------------------------------------------------------------------
 {
   // prepare data for sampling  
@@ -1385,7 +1385,7 @@ void vtkMAFVolumeSlicer_BES::CreateImageGPU(OutputDataType* output, vtkImageData
 }
 #endif
 //----------------------------------------------------------------------------
-void vtkMAFVolumeSlicer_BES::SetGPUEnabled(int enable)
+void vtkMAFVolumeSlicer::SetGPUEnabled(int enable)
 //----------------------------------------------------------------------------
 {
   GPUEnabled = enable;
