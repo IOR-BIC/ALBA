@@ -475,7 +475,6 @@ void mafViewOrthoSlice::PackageView()
     m_Views[v] = new mafViewSlice(viewName[v], cam_pos[v],false,false,false,0,TICKs[v]);
     m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice", MUTEX);    
     m_Views[v]->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice", MUTEX);
-    m_Views[v]->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice", MUTEX);   //BES: 3.11.2009
 		m_Views[v]->PlugVisualPipe("mafVMEImage", "mafPipeBox", NON_VISIBLE);
     m_Views[v]->PlugVisualPipe("mafVMESegmentationVolume", "mafPipeVolumeSlice", MUTEX);
     // plug surface slice visual pipe in not perspective views

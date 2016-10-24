@@ -139,8 +139,6 @@ SET(PROJECT_SRCS
   mafPipeSlice.h
   ############################
   
-  mafGizmoROI_BES.cpp
-  mafGizmoROI_BES.h
   mafPipeMeshSlice_BES.cpp
   mafPipeMeshSlice_BES.h
   mafPipePolylineSlice_BES.cpp
@@ -149,10 +147,6 @@ SET(PROJECT_SRCS
   mafPipeSurfaceSlice_BES.h
   mafPipeVolumeSlice.cpp
   mafPipeVolumeSlice.h
-  mafVMEVolumeLarge.cpp
-  mafVMEVolumeLarge.h
-  mafVMEVolumeLargeUtils.cpp
-  mafVMEVolumeLargeUtils.h  
   ###############################################################
 
   mafPipeVolumeSliceBlend.cpp

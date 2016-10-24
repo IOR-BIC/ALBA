@@ -63,14 +63,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkDoubleArray.h"
 
-#ifdef VME_VOLUME_LARGE
-#include "mafVolumeLargeWriter.h"
-#include "vtkMAFLargeImageReader.h"
-#include "vtkMAFLargeImageData.h"
-#include "vtkMAFLargeDataSetCallback.h"
-#include "vtkMAFFileDataProvider.h"
-#include "vtkMAFMultiFileDataProvider.h"
-#endif // VME_VOLUME_LARGE
+
 
 #include "mafMemDbg.h"
 #include "mafDbg.h"
@@ -86,9 +79,6 @@ mafOpImporterRAWImages::mafOpImporterRAWImages(wxString label) : mafOp(label)
   m_OpType					= OPTYPE_IMPORTER;
   m_Canundo					= true;
   m_RawDirectory		= mafGetLastUserFolder().c_str();
-#ifdef VME_VOLUME_LARGE
-  m_OutputFileName = m_RawDirectory;
-#endif // VME_VOLUME_LARGE
   m_VtkRawDirectory	= NULL;
   m_Output					= NULL;
 
@@ -140,15 +130,11 @@ mafOpImporterRAWImages::mafOpImporterRAWImages(wxString label) : mafOp(label)
   m_GizmoStatus = GIZMO_NOT_EXIST;
   m_SideToBeDragged = 0;
   m_UseLookupTable = 1; //use lookup table (on by the default)
-#ifdef VME_VOLUME_LARGE
-  m_MemLimit = 16;	//memory limit in MB, default is 16 MB
-#endif // VME_VOLUME_LARGE
+
 
   m_VolumeGray = NULL;
   m_VolumeRGB = NULL;
-#ifdef VME_VOLUME_LARGE
-  m_VolumeLarge = NULL;
-#endif	
+
 }
 //----------------------------------------------------------------------------
 mafOpImporterRAWImages::~mafOpImporterRAWImages()
@@ -156,9 +142,6 @@ mafOpImporterRAWImages::~mafOpImporterRAWImages()
 {
   mafDEL(m_VolumeGray);
   mafDEL(m_VolumeRGB);
-#ifdef VME_VOLUME_LARGE
-  mafDEL(m_VolumeLarge);
-#endif	
 }
 //----------------------------------------------------------------------------
 mafOp *mafOpImporterRAWImages::Copy()
@@ -301,27 +284,6 @@ void mafOpImporterRAWImages::CreateGui()
     m_Gui->Integer(ID_SPACING,_("file spc.:"),&m_FileSpacing,1, MAXINT, _("set the spacing between the slices in the files name"));
     m_Gui->Divider(0);
 
-#ifdef VME_VOLUME_LARGE
-#ifdef __WIN32__
-    MEMORYSTATUSEX ms; 
-    ms.dwLength = sizeof(ms);
-    GlobalMemoryStatusEx(&ms);
-
-    int nMaxMem = ms.ullTotalPhys / (1024*1024);	//available memory
-#else
-    int nMaxMem = 2048;	//some constant
-#endif
-
-    nMaxMem /= 4;		//keep 75% free
-
-    m_Gui->Label(_("memory limit [MB]: "));
-    m_Gui->Slider(ID_MEMLIMIT, "", &m_MemLimit, 1, nMaxMem, 
-      _("if the data to be loaded is larger than the specified memory limit,"
-      "it will be loaded as VolumeLarge VME"));
-
-    m_Gui->Divider(0);
-#endif // VME_VOLUME_LARGE
-
     m_Gui->Label(_("Crop Dim."),true);
     m_Gui->Label(_("DimX:"), &m_DimXCrop);
     m_Gui->Label(_("DimY:"), &m_DimYCrop);
@@ -369,10 +331,7 @@ void mafOpImporterRAWImages::CreateGui()
     //v_sizer->Add(m_Rwi->m_RwiBase,1, wxEXPAND);
     v_sizer->Add(slice_sizer, 0, wxEXPAND);
 
-    /*wxBoxSizer *h_sizer = new wxBoxSizer(wxHORIZONTAL);
-    h_sizer->Add(v_sizer, 1, wxEXPAND);
-    h_sizer->Add(m_Gui,   0, wxLEFT, 5);*/
-
+  
     m_Dialog->GetGui()->AddGui(m_Gui);
     m_Dialog->GetRWI()->SetSize(0,0,380,275);
     m_Dialog->m_RwiSizer->Add(v_sizer, 0, wxEXPAND);
@@ -411,13 +370,6 @@ void mafOpImporterRAWImages::CreateGui()
 
   OpStop(res);
 
-#ifdef VME_VOLUME_LARGE
-  if (res == OP_RUN_OK && IsVolumeLarge())
-  {
-    //save the VME data, it should not prompt for saving
-    mafEventMacro( mafEvent(this, MENU_FILE_SAVE));
-  }
-#endif // VME_VOLUME_LARGE
   return;
 }
 //----------------------------------------------------------------------------
@@ -456,9 +408,6 @@ void mafOpImporterRAWImages::OpStop(int result)
   vtkDEL(m_GizmoActor);
   vtkDEL(m_VtkRawDirectory);
   cppDEL(m_Dialog);
-
-  //m_VolumeGray = NULL;
-  //m_VolumeRGB = NULL;
 
   if(!this->m_TestMode)
     mafEventMacro(mafEvent(this,result));
@@ -802,19 +751,12 @@ void mafOpImporterRAWImages::OnEvent(mafEventBase *maf_event)
       m_Gui->Update();
       break;
     case wxOK:
-#ifdef VME_VOLUME_LARGE
-      if (VolumeLargeCheck())				
-      {
-#endif // VME_VOLUME_LARGE
         if(!ControlFilenameList())
         {
           wxMessageBox("Control numerical order of raw files");
           return;
         }
         m_Dialog->EndModal(wxID_OK);
-#ifdef VME_VOLUME_LARGE
-      }
-#endif // VME_VOLUME_LARGE
       break;
     case wxCANCEL:
       m_Dialog->EndModal(wxID_CANCEL);
@@ -826,104 +768,6 @@ void mafOpImporterRAWImages::OnEvent(mafEventBase *maf_event)
   }
 }
 
-#ifdef VME_VOLUME_LARGE
-//returns true, if the volume to be imported is too large
-//and should be processed as VMEVolumeLarge
-bool mafOpImporterRAWImages::IsVolumeLarge()
-{  
-  int VOI[6];  
-  VOI[4] = 0; VOI[5] = m_Dimension[2] - 1;
-
-  if (this->m_CropMode == 0)
-  {    
-    VOI[0] = 0; VOI[1] = m_Dimension[0] - 1;
-    VOI[2] = 0; VOI[3] = m_Dimension[1] - 1;
-  }
-  else
-  {
-    VOI[0] = m_ROI_2D[0]; VOI[1] = m_ROI_2D[1];
-    VOI[2] = m_ROI_2D[2]; VOI[3] = m_ROI_2D[3];
-  }  
-
-  return mafVMEVolumeLargeUtils::IsVolumeLarge(VOI,
-    GetVTKDataType(), m_Bit != 3 ? 1 : 3, m_MemLimit);
-}
-
-//if the volume (or VOI) is large, it displays a warning that the volume 
-//to be imported is large and returns true, if the operation should continue,
-//false otherwise (user canceled the import)
-bool mafOpImporterRAWImages::VolumeLargeCheck()
-{ 
-  int VOI[6];  
-  VOI[4] = 0; VOI[5] = m_Dimension[2] - 1;
-
-  if (this->m_CropMode == 0)
-  {    
-    VOI[0] = 0; VOI[1] = m_Dimension[0] - 1;
-    VOI[2] = 0; VOI[3] = m_Dimension[1] - 1;
-  }
-  else
-  {
-    VOI[0] = m_ROI_2D[0]; VOI[1] = m_ROI_2D[1];
-    VOI[2] = m_ROI_2D[2]; VOI[3] = m_ROI_2D[3];
-  }
-
-  mafString szStr;
-  int nResult = mafVMEVolumeLargeUtils::VolumeLargeCheck(this, m_Listener,
-    VOI, GetVTKDataType(), m_Bit != 3 ? 1 : 3, m_MemLimit, szStr);
-
-  if (nResult == 0)
-    return false;
-  else if (nResult == 2)
-  {    
-    m_OutputFileName = szStr;  
-    m_OutputFileName += wxFILE_SEP_PATH + wxString::Format("%s_%X", m_Prefix, (int)time(NULL));   
-  }
-  return true;
-}
-
-//------------------------------------------------------------------------
-//Configure the data provider of the given reader
-//if bNonInterleaved is set to true, the underlaying physical medium is supposed
-//to keep the data in non-interleaved mode, i.e., RRRRR...R, GGGG...G, B....B
-/*virtual*/ void mafOpImporterRAWImages::SetDataLayout(vtkMAFLargeImageReader* r, 
-                                                           bool bNonInterleaved)
-                                                           //------------------------------------------------------------------------
-{
-  vtkMAFLargeImageData* img = r->GetOutput();
-  vtkMAFMultiFileDataProvider* fp = 
-    vtkMAFMultiFileDataProvider::SafeDownCast(img->GetPointDataProvider());
-
-  if (fp == NULL)
-  {
-    //provider not specified or incompatible (invalid)
-    fp = vtkMAFMultiFileDataProvider::New();
-    img->SetPointDataProvider(fp);
-    fp->Delete(); //decrease references
-  }  
-
-  vtkMAFDataArrayLayout* pDAL = fp->GetScalarsLayout();
-  if (pDAL == NULL)
-  {
-    //missing scalars
-    vtkMAFDataArrayDescriptor* pDAD = vtkMAFDataArrayDescriptor::New();        
-    fp->SetScalarsDescriptor(pDAD);
-    pDAD->Delete(); //decrease references
-
-    pDAL = fp->GetScalarsLayout();
-  }
-
-  if (!bNonInterleaved)
-    pDAL->SetNonInterleaved(0);
-  else
-  {
-    pDAL->SetNonInterleaved(1);
-    pDAL->SetNonInterleavedSize(m_Dimension[0]*m_Dimension[1]*
-      vtkMAFDataArrayDescriptor::GetDataTypeSize(r->GetDataScalarType()));
-    /**r->GetNumberOfScalarComponents()*/
-  }
-}
-#endif // VME_VOLUME_LARGE
 
 //----------------------------------------------------------------------------
 void mafOpImporterRAWImages::	UpdateReader() 
@@ -984,17 +828,7 @@ void mafOpImporterRAWImages::	UpdateReader()
   m_Plane->SetPoint1(m_Dimension[0],0,0);
   m_Plane->SetPoint2(0,m_Dimension[1],0);
 
-#ifdef VME_VOLUME_LARGE
-  //Set interleaved or non-interleaved mode
-  SetDataLayout(m_Reader, m_RgbType != 0);
 
-  m_Reader->SetMemoryLimit(m_MemLimit * 1024);  
-  m_Reader->Update();
-
-  double range[2];
-  m_Reader->GetOutput()->GetSnapshot()->GetScalarRange(range);
-  m_Texture->SetInput((vtkImageData*)m_Reader->GetOutput()->GetSnapshot());
-#else
   if(m_RgbType)
   {
     // convert non interleaved images into interleaved images.
@@ -1036,7 +870,6 @@ void mafOpImporterRAWImages::	UpdateReader()
   m_Reader->Update();
   double range[2];
   m_Reader->GetOutput()->GetScalarRange(range);
-#endif
 
   m_LookupTable->SetTableRange(range);
   m_LookupTable->SetWindow(range[1] - range[0]);
@@ -1049,12 +882,7 @@ bool mafOpImporterRAWImages::Import()
 {
   wxString prefix = m_RawDirectory + "\\" + m_Prefix;
   wxString pattern = m_Pattern + m_Extension;
-
-#ifdef VME_VOLUME_LARGE
-  vtkMAFSmartPointer< vtkMAFLargeImageReader > r;
-#else
   vtkMAFSmartPointer< vtkImageReader > r;
-#endif //VME_VOLUME_LARGE
   r->SetFilePrefix(prefix);
   r->SetFilePattern(pattern.c_str());
 
@@ -1067,22 +895,14 @@ bool mafOpImporterRAWImages::Import()
     r->SetDataByteOrderToBigEndian();
     break;
   case 3:
-#ifndef VME_VOLUME_LARGE //LargeReader support non-interleaved mode
-    if(m_RgbType == 0)
-#endif
+
       r->SetNumberOfScalarComponents(3);
     break;
   }
 
   r->SetFileNameSliceOffset(m_Offset);
   r->SetFileNameSliceSpacing(m_FileSpacing);
-#ifdef VME_VOLUME_LARGE
-  r->SetDataExtent(0, m_Dimension[0] - 1, 0, m_Dimension[1] - 1, 0, m_NumberSlices - 1);
-  if(this->m_CropMode)
-    r->SetDataVOI(m_ROI_2D[0], m_ROI_2D[1], m_ROI_2D[2], m_ROI_2D[3], 0, m_Dimension[2] - 1);
-  else
-    r->SetDataVOI(0, m_Dimension[0] - 1, 0, m_Dimension[1] - 1, 0, m_Dimension[2] - 1);
-#else
+
   if(m_RgbType == 0)
   {
     r->SetDataExtent(0, m_Dimension[0] - 1, 0, m_Dimension[1] - 1, 0, m_NumberSlices - 1);
@@ -1096,23 +916,11 @@ bool mafOpImporterRAWImages::Import()
     r->SetDataExtent(0, m_Dimension[0] - 1, 0, (m_Dimension[1]*3) - 1, 0, m_NumberSlices - 1);
     r->SetDataVOI(0, m_Dimension[0] - 1, 0, (m_Dimension[1]*3) - 1, 0, m_Dimension[2] - 1);
   }
-#endif //VME_VOLUME_LARGE
+
   r->SetDataSpacing(m_Spacing);
   r->SetHeaderSize(m_Header);
   r->SetFileDimensionality(2);
   r->SetDataOrigin(0, 0, m_Offset);
-
-#ifdef VME_VOLUME_LARGE
-  //Set interleaved or non-interleaved mode
-  SetDataLayout(r, m_RgbType != 0);
-
-  bool bLarge = IsVolumeLarge();
-  if (bLarge)  
-    r->SetMemoryLimit(1);	//some sampling (but fast)  
-  else  
-    r->SetMemoryLimit(m_MemLimit * 1024);    
-#endif //VME_VOLUME_LARGE
-
   r->Update();
 
   wxString slice_name = m_RawDirectory;
@@ -1143,12 +951,6 @@ bool mafOpImporterRAWImages::Import()
     f_in.close();
   }
 
-
-#ifdef VME_VOLUME_LARGE
-  if (!bLarge)
-  {
-    convert->SetInput((vtkImageData*)r->GetOutput()->GetSnapshot());    
-#else
   if(m_RgbType)
   {
     // convert non interleaved images into interleaved images.
@@ -1179,7 +981,7 @@ bool mafOpImporterRAWImages::Import()
   {
     convert->SetInput(r->GetOutput());
   }
-#endif // VME_VOLUME_LARGE
+
   convert->Update();
 
   ///////////////////////////////////////////////////////////////////////
@@ -1259,58 +1061,6 @@ bool mafOpImporterRAWImages::Import()
       return false;
     }
   }
-#ifdef VME_VOLUME_LARGE
-} //if (!bLarge)
-  else
-  {
-    //the volume is large
-    mafVolumeLargeWriter wr;
-    wr.SetInputDataSet(r->GetOutput());
-    wr.SetInputZCoordinates(ZDoubleArray);   //is NULL for regular girds
-    wr.SetOutputFileName(m_OutputFileName);
-    wr.SetListener(this->m_Listener);
-    vtkDEL(ZDoubleArray);                    //no longer needed
-
-    if (wr.Update())
-    {
-      int VOI[6];
-      r->GetDataVOI(VOI);
-      for (int i = 0; i < 6; i += 2) 
-      {
-        VOI[i + 1] -= VOI[i];
-        VOI[i] = 0;
-      }
-
-      mafVolumeLargeReader* rd = new mafVolumeLargeReader();
-      rd->SetFileName(m_OutputFileName);
-      rd->SetMemoryLimit(m_MemLimit * 1024);
-      rd->SetVOI(VOI);
-      rd->Update();
-
-      mafNEW(m_VolumeLarge);
-      m_VolumeLarge->SetFileName(this->m_RawDirectory);
-      if (m_VolumeLarge->SetLargeData(rd) == MAF_OK)
-        m_Output = m_VolumeLarge;
-
-      if(!this->m_TestMode)
-      {
-        wxString szTotalSize = wxString::Format("%d", 
-          (int)(rd->GetLevelFilesSize() / (1024*1024)));
-        int nLen = (int)szTotalSize.Len();
-        while (nLen > 3)
-        {
-          nLen -= 3;
-          szTotalSize.insert(nLen, ' ');
-        }
-
-        wxMessageBox(wxString::Format(
-          _("An optimised volume file with the total size\n"
-          "%s MB was successfuly constructed."					
-          ), szTotalSize), _("Information"), wxOK | wxICON_INFORMATION);
-      }       
-    } //if (wr.Update())      
-   }
-#endif //VME_VOLUME_LARGE
    if(!m_Output) return false;	
 
    mafTagItem tag_Nature;
@@ -1411,11 +1161,7 @@ bool mafOpImporterRAWImages::ControlFilenameList()
     wxDir::GetAllFiles(m_RawDirectory.GetCStr(), &SkinFiles, FileSpec, flags);
   }
 
-  //wxMessageBox(wxString::Format("%d",SkinFiles.GetCount()));
-
-  //BES: 10.7.2008 - the following code was replaced because the original version
-  //does not take various user specified patterns into account 
-#ifndef VME_VOLUME_LARGE
+  
   wxString numbers = m_Pattern.AfterLast('%');
   numbers = numbers.Mid(0,numbers.Length()-1);
 
@@ -1448,46 +1194,7 @@ bool mafOpImporterRAWImages::ControlFilenameList()
       break;
     }
   }
-#else
-  vtkMAFLargeImageReader* r = vtkMAFLargeImageReader::New();
-  r->SetFilePrefix(prefix);
-  r->SetFilePattern(pattern.c_str());
-  r->SetFileNameSliceOffset(m_Offset);
-  r->SetFileNameSliceSpacing(m_FileSpacing); 
-
-  int nFiles = (int)SkinFiles.GetCount();  
-  for (int i = 0; i < nFiles; i++)
-  {
-    r->ComputeInternalFileName(i);
-    const char * filename = r->GetInternalFileName();
-
-    bool bFound = false;
-    for (int j = 0; j < nFiles; j++)
-    {      
-      if(SkinFiles[j].CmpNoCase(filename) == 0)
-      {
-        bFound = true;
-        break;
-      }
-    }
-
-    if (!bFound)
-    {
-      result = false;
-      break;  //some file is missing
-    }
-  }
-
-  r->Delete();
-#endif // VME_VOLUME_LARGE
 
   return result;
 }
 
-#ifdef VME_VOLUME_LARGE
-//Sets the output file (with bricks)
-void mafOpImporterRAWImages::SetOutputFile(const char* szOutputFile)
-{
-  m_OutputFileName = szOutputFile;
-}
-#endif // VME_VOLUME_LARGE

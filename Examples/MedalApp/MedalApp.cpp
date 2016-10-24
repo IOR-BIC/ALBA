@@ -69,8 +69,6 @@
 #include "mafOpImporterLandmarkWS.h"
 #include "mafOpImporterRAWImages.h"
 #include "mafOpImporterC3D.h"
-#include "mafOpImporterBBF.h"
-#include "mafOpImporterRAWVolume_BES.h"
 #include "medOpImporterVTK.h"
 #include "mafOpImporterAnsysCDBFile.h"
 #include "mafOpImporterAnsysInputFile.h"
@@ -262,8 +260,6 @@ bool MedalApp::OnInit()
 	m_Logic->Plug(new mafOpImporterGRFWS("GRF"));
 #endif
 	m_Logic->Plug(new mafOpImporterRAWImages("RAW Images"));
-	m_Logic->Plug(new mafOpImporterBBF());
-	m_Logic->Plug(new mafOpImporterRAWVolume_BES());
 #endif
 	//------------------------------------------------------------
 

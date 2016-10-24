@@ -81,7 +81,6 @@
 #include "mafVMEStent.h"
 #endif
 
-#include "mafVMEVolumeLarge.h"
 
 #include "mafIndent.h"
 #include <string>
@@ -179,10 +178,7 @@ mafVMEFactory::mafVMEFactory()
   mafPlugVMEMacro(mafVMEAnalog,"EMG scalar data");
   mafPlugVMEMacro(mafVMEStent,"Stent");
 #endif
-  //mafPlugVMEMacro(mafVMEthing,"VME representing a thing");
 
-  //TODO: to be committed down
-  mafPlugVMEMacro(mafVMEVolumeLarge, "Volume Large");
 }
 
 //------------------------------------------------------------------------------

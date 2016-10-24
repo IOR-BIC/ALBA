@@ -797,7 +797,6 @@ void mafViewRXCT::PackageView()
     m_ViewsRX[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeProjected",MUTEX);
     m_ViewsRX[v]->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeProjected",MUTEX);
     m_ViewsRX[v]->PlugVisualPipe("mafVMESlicer", "mafVisualPipeSlicerSlice",MUTEX);
-    m_ViewsRX[v]->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeProjected",MUTEX);
     m_ViewsRX[v]->PlugVisualPipe("mafVMESegmentationVolume", "mafPipeVolumeProjected",MUTEX);
     
     PlugChildView(m_ViewsRX[v]);
@@ -816,7 +815,6 @@ void mafViewRXCT::PackageView()
   vs->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEMeter", "mafPipePolylineSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEWrappedMeter", "mafPipePolylineSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice",MUTEX);
   vs->PlugVisualPipe("mafVMESegmentationVolume", "mafPipeVolumeSlice",MUTEX);
  
   m_ViewCTCompound->PlugChildView(vs);
