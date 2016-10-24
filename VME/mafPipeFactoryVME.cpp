@@ -34,7 +34,6 @@
 #include "mafPipePolylineSlice.h"
 #include "mafPipeSurfaceTextured.h"
 
-#include "mafPipeVolumeSlice.h"
 #include "mafPipeVolumeProjected.h"
 #include "mafPipeMeter.h"
 #include "mafPipeGizmo.h"
@@ -74,13 +73,10 @@
 
 #include "mafPipePolylineGraphEditor.h"
 
-//TODO: commit down to openMAF
 #include "mafPipeMeshSlice_BES.h"
 #include "mafPipePolylineSlice_BES.h"
 #include "mafPipeSurfaceSlice_BES.h"
-#include "mafPipeVolumeSlice_BES.h"
-///////
-
+#include "mafPipeVolumeSlice.h"
 #include "mafPipeCompoundVolume.h"
 #include "mafPipeCompoundVolumeFixedScalars.h"
 #include "mafPipeVectorFieldGlyphs.h"
@@ -148,7 +144,6 @@ mafPipeFactoryVME::mafPipeFactoryVME()
 	mafPlugPipeMacro(mafPipePolylineSlice,"Pipe for render vtk polyline as an arbitrary slice");
   mafPlugPipeMacro(mafPipeGizmo,"Pipe to render gizmos");
   mafPlugPipeMacro(mafPipeMeter,"Pipe for mafVMEMeter");
-  mafPlugPipeMacro(mafPipeVolumeSlice,"Pipe for render vtk volumes as an arbitrary slice");
   mafPlugPipeMacro(mafPipeVolumeProjected,"Pipe for render vtk volumes as a projected image along X,Y or Z axes");
   mafPlugPipeMacro(mafPipePointSet,"Pipe for render vtk pointset");
   mafPlugPipeMacro(mafPipePolyline,"Pipe for render polylines");
@@ -209,7 +204,7 @@ mafPipeFactoryVME::mafPipeFactoryVME()
 
 
   //BES: 16.4.2008 - these pipes are to be committed down (without _BES suffix) to openMAF in the future
-  mafPlugPipeMacro(mafPipeVolumeSlice_BES, "BES: mafPipeVolumeSlice_BES.");
+  mafPlugPipeMacro(mafPipeVolumeSlice, "BES: mafPipeVolumeSlice.");
   mafPlugPipeMacro(mafPipeSurfaceSlice_BES, "BES: mafPipeSurfaceSlice.");
   mafPlugPipeMacro(mafPipePolylineSlice_BES, "BES: mafPipePolylineSlice_BES.");
   mafPlugPipeMacro(mafPipeMeshSlice_BES, "BES: mafPipeMeshSlice_BES.");

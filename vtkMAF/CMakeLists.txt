@@ -41,7 +41,6 @@ SET(vtkMAF_SRCS
   vtkMAFTextActorMeter.cxx  vtkMAFTextActorMeter.h
   vtkMAFTransferFunction2D.cxx  vtkMAFTransferFunction2D.h
   vtkMAFVolumeResample.h  vtkMAFVolumeResample.cxx
-  vtkMAFVolumeSlicer.cxx  vtkMAFVolumeSlicer.h
   vtkMAFPolyDataToSinglePolyLine.cxx  vtkMAFPolyDataToSinglePolyLine.h
   vtkMAFTextOrientator.cxx  vtkMAFTextOrientator.h
   vtkMAFProfilingActor.cxx  vtkMAFProfilingActor.h
@@ -74,27 +73,19 @@ SET(vtkMAF_SRCS
   vtkHoleConnectivity.cxx  vtkHoleConnectivity.h
   vtkPatchLine.h  vtkPatchLine.cpp
   
-  ############# VolumeLarge Files ########
-  vtkMAFDataArrayDescriptor.cxx   vtkMAFDataArrayDescriptor.h
-  vtkMAFFileDataProvider.cxx  vtkMAFFileDataProvider.h
-  vtkMAFLargeImageData.cxx  vtkMAFLargeImageData.h
-  vtkMAFLargeImageReader.cxx  vtkMAFLargeImageReader.h
-  vtkMAFLargeImageSource.cxx  vtkMAFLargeImageSource.h
+
   vtkMAFAbstractPointsSource.cpp vtkMAFAbstractPointsSource.h
   vtkMAFLineStripSource.cpp vtkMAFLineStripSource.h
-  vtkMAFFile.cxx  vtkMAFFile.h	
-  vtkMAFDataArrayLayout.cpp  vtkMAFDataArrayLayout.h
-  vtkMAFMultiFileDataProvider.cpp  vtkMAFMultiFileDataProvider.h
-  vtkMAFIdType64.h
-  vtkMAFLargeDataProvider.cxx  vtkMAFLargeDataProvider.h
-  vtkMAFLargeDataSet.cxx  vtkMAFLargeDataSet.h
-  vtkMAFLargeDataSetCallback.cxx  vtkMAFLargeDataSetCallback.h
-  ###############################################################
+
+
+	vtkMAFDataArrayDescriptor.cxx   vtkMAFDataArrayDescriptor.h
+	vtkMAFFile.cxx  vtkMAFFile.h	
+	vtkMAFIdType64.h
   
   #####################################################
   vtkMAFVolumeRayCastMapper.cxx  vtkMAFVolumeRayCastMapper.h
   vtkMAFVolumeTextureMapper2D.cxx  vtkMAFVolumeTextureMapper2D.h
-  vtkMAFVolumeSlicer_BES.cxx  vtkMAFVolumeSlicer_BES.h
+  vtkMAFVolumeSlicer.cxx  vtkMAFVolumeSlicer.h
   vtkMAFMeshCutter_BES.cxx   vtkMAFMeshCutter_BES.h  	
   ###############################################
   

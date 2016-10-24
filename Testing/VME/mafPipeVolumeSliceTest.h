@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafPipeVolumeSliceTest
- Authors: Matteo Giacomoni
+ Authors: Eleonora Mambrini
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -36,11 +36,21 @@ public:
   CPPUNIT_TEST_SUITE( mafPipeVolumeSliceTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestPipeExecution );
+  CPPUNIT_TEST( TestPipeExecution_SetSliceOpacity );
+  CPPUNIT_TEST( TestPipeExecution_SetLutRange );
+  CPPUNIT_TEST( TestPipeExecution_SetColorLookupTable );
+  CPPUNIT_TEST( TestPipeExecution_TicksOnOff );
+
+
   CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();
   void TestPipeExecution();
+  void TestPipeExecution_SetSliceOpacity();
+  void TestPipeExecution_SetLutRange();
+  void TestPipeExecution_SetColorLookupTable();
+  void TestPipeExecution_TicksOnOff();
 
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
 };

@@ -35,7 +35,7 @@
 #include "mafGUILutSwatch.h"
 #include "mafVME.h"
 #include "mafVMEIterator.h"
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeSlice.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafVMEVolumeGray.h"
 #include "mmaVolumeMaterial.h"

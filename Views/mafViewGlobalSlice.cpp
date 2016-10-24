@@ -81,7 +81,7 @@ mafViewGlobalSlice::mafViewGlobalSlice(wxString label, int camera_position, bool
 {
 	m_SliceOrigin[0] = m_SliceOrigin[1] = m_SliceOrigin[2] = 0.0;
 	m_IDPlane = ID_XY;
-	m_SliceMode = SLICE_ARB;
+	m_SliceMode = mafPipeVolumeSlice::SLICE_ARB;
 	m_Opacity = 1.0;
 
 	m_SliderOldOrigin = 0.0; 
@@ -689,6 +689,7 @@ void mafViewGlobalSlice::UpdateSlice()
 				mafPipeVolumeSlice * pipe = (mafPipeVolumeSlice *)node->GetPipe();
 				pipe->SetSlice(applied_origin, applied_xVector, applied_yVector);
 				pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+				//pipe->UpdateSlice();
 			}
 			transform->Delete();
 			transform = NULL;
@@ -774,7 +775,7 @@ void mafViewGlobalSlice::SetSlice(double origin[3], float xVect[3], float yVect[
 void mafViewGlobalSlice::SetSlice(double origin[3], double dn)
 //----------------------------------------------------------------------------
 {
-	if(m_SliceMode != SLICE_ARB)
+	if(m_SliceMode != mafPipeVolumeSlice::SLICE_ARB)
   {
     m_SliceOrigin[m_SliceMode] = origin[m_SliceMode];
   }

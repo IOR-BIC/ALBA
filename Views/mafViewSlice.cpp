@@ -27,7 +27,7 @@ const bool DEBUG_MODE = false;
 #include "mafGUI.h"
 #include "mafIndent.h"
 #include "mafViewSlice.h"
-#include "mafPipeVolumeSlice_BES.h"
+#include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice_BES.h"
 #include "mafPipePolylineSlice_BES.h"
 #include "mafPipeMeshSlice_BES.h"
@@ -192,32 +192,32 @@ void mafViewSlice::UpdateText(int ID)
     switch(m_CameraPositionId)
     {
     case CAMERA_OS_X:
-      slice_mode = mafPipeVolumeSlice_BES::SLICE_X;
+      slice_mode = mafPipeVolumeSlice::SLICE_X;
       break;
     case CAMERA_OS_Y:
-      slice_mode = mafPipeVolumeSlice_BES::SLICE_Y;
+      slice_mode = mafPipeVolumeSlice::SLICE_Y;
       break;
     case CAMERA_OS_P:
-      slice_mode = mafPipeVolumeSlice_BES::SLICE_ORTHO;
+      slice_mode = mafPipeVolumeSlice::SLICE_ORTHO;
       break;
     case CAMERA_PERSPECTIVE:
-      slice_mode = mafPipeVolumeSlice_BES::SLICE_ARB;
+      slice_mode = mafPipeVolumeSlice::SLICE_ARB;
       break;
 		case CAMERA_ARB:
-			slice_mode = mafPipeVolumeSlice_BES::SLICE_ARB;
+			slice_mode = mafPipeVolumeSlice::SLICE_ARB;
 			break;
     default:
-      slice_mode = mafPipeVolumeSlice_BES::SLICE_Z;
+      slice_mode = mafPipeVolumeSlice::SLICE_Z;
     }
     //set the init coordinates value
-    if(slice_mode == mafPipeVolumeSlice_BES::SLICE_X)
+    if(slice_mode == mafPipeVolumeSlice::SLICE_X)
       m_Text = "X = ";
-    else if(slice_mode == mafPipeVolumeSlice_BES::SLICE_Y)
+    else if(slice_mode == mafPipeVolumeSlice::SLICE_Y)
       m_Text = "Y = ";
-    else if(slice_mode == mafPipeVolumeSlice_BES::SLICE_Z)
+    else if(slice_mode == mafPipeVolumeSlice::SLICE_Z)
       m_Text = "Z = ";
 
-    if((slice_mode != mafPipeVolumeSlice_BES::SLICE_ORTHO) && (slice_mode != mafPipeVolumeSlice_BES::SLICE_ARB))
+    if((slice_mode != mafPipeVolumeSlice::SLICE_ORTHO) && (slice_mode != mafPipeVolumeSlice::SLICE_ARB))
       m_Text += wxString::Format("%.1f",m_Slice[slice_mode]);
 
     m_TextMapper->SetInput(m_Text.c_str());
@@ -289,7 +289,7 @@ void mafViewSlice::VmeCreatePipe(mafVME *vme)
     if (pipe != NULL)
     {
       pipe->SetListener(this);
-      if (pipe->IsA("mafPipeVolumeSlice_BES"))  //BES: 3.4.2009 - changed to support inheritance
+      if (pipe->IsA("mafPipeVolumeSlice"))  //BES: 3.4.2009 - changed to support inheritance
       {
         m_CurrentVolume = n;
 
@@ -302,36 +302,36 @@ void mafViewSlice::VmeCreatePipe(mafVME *vme)
         switch(m_CameraPositionId)
         {
         case CAMERA_OS_X:
-          slice_mode = mafPipeVolumeSlice_BES::SLICE_X;
+          slice_mode = mafPipeVolumeSlice::SLICE_X;
           break;
         case CAMERA_OS_Y:
-          slice_mode = mafPipeVolumeSlice_BES::SLICE_Y;
+          slice_mode = mafPipeVolumeSlice::SLICE_Y;
           break;
         case CAMERA_OS_P:
-          slice_mode = mafPipeVolumeSlice_BES::SLICE_ORTHO;
+          slice_mode = mafPipeVolumeSlice::SLICE_ORTHO;
           break;
         case CAMERA_PERSPECTIVE:
-          slice_mode = mafPipeVolumeSlice_BES::SLICE_ARB;
+          slice_mode = mafPipeVolumeSlice::SLICE_ARB;
           break;
         default:
-          slice_mode = mafPipeVolumeSlice_BES::SLICE_Z;
+          slice_mode = mafPipeVolumeSlice::SLICE_Z;
         }
         if (m_SliceInitialized)
         {
-          ((mafPipeVolumeSlice_BES *)pipe)->InitializeSliceParameters(slice_mode, m_Slice, false,false,m_TextureInterpolate);
-          ((mafPipeVolumeSlice_BES *)pipe)->SetNormal(m_SliceNormal);
+          ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(slice_mode, m_Slice, false,false,m_TextureInterpolate);
+          ((mafPipeVolumeSlice *)pipe)->SetNormal(m_SliceNormal);
         }
         else
         {
-          ((mafPipeVolumeSlice_BES *)pipe)->InitializeSliceParameters(slice_mode,false,false,m_TextureInterpolate);
+          ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(slice_mode,false,false,m_TextureInterpolate);
         }
 
         if(m_ShowVolumeTICKs)
-          ((mafPipeVolumeSlice_BES *)pipe)->ShowTICKsOn();
+          ((mafPipeVolumeSlice *)pipe)->ShowTICKsOn();
         else
-          ((mafPipeVolumeSlice_BES *)pipe)->ShowTICKsOff();
-        ((mafPipeVolumeSlice_BES *)pipe)->SetEnableGPU(m_EnableGPU);
-        ((mafPipeVolumeSlice_BES *)pipe)->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+          ((mafPipeVolumeSlice *)pipe)->ShowTICKsOff();
+        ((mafPipeVolumeSlice *)pipe)->SetEnableGPU(m_EnableGPU);
+        ((mafPipeVolumeSlice *)pipe)->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
         UpdateText();
       }
       else 
@@ -494,8 +494,8 @@ mafGUI *mafViewSlice::CreateGui()
   // Added by Losi 11.25.2009
   if (m_CurrentVolume)
   {
-    mafPipeVolumeSlice_BES *p = NULL;
-    p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume->GetVme())); // m_CurrentVolume->m_Pipe is better?
+    mafPipeVolumeSlice *p = NULL;
+    p = mafPipeVolumeSlice::SafeDownCast(this->GetNodePipe(m_CurrentVolume->GetVme())); // m_CurrentVolume->m_Pipe is better?
     if (p) // Is this required?
     {
       p->SetEnableGPU(m_EnableGPU);
@@ -522,8 +522,8 @@ void mafViewSlice::OnEvent(mafEventBase *maf_event)
         {
           if (m_CurrentVolume)
           {
-            mafPipeVolumeSlice_BES *p = NULL;
-            p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume->GetVme()));
+            mafPipeVolumeSlice *p = NULL;
+            p = mafPipeVolumeSlice::SafeDownCast(this->GetNodePipe(m_CurrentVolume->GetVme()));
             if(p)
             {
               p->SetEnableGPU(m_EnableGPU);
@@ -536,8 +536,8 @@ void mafViewSlice::OnEvent(mafEventBase *maf_event)
         {
           if (m_CurrentVolume)
           {
-            mafPipeVolumeSlice_BES *p = NULL;
-            p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume->GetVme()));
+            mafPipeVolumeSlice *p = NULL;
+            p = mafPipeVolumeSlice::SafeDownCast(this->GetNodePipe(m_CurrentVolume->GetVme()));
             if(p)
             {
               p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
@@ -559,7 +559,7 @@ void mafViewSlice::SetLutRange(double low_val, double high_val)
   if(!m_CurrentVolume) 
     return;
   
-  mafPipeVolumeSlice_BES *pipe = mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->GetPipe());
+  mafPipeVolumeSlice *pipe = mafPipeVolumeSlice::SafeDownCast(m_CurrentVolume->GetPipe());
   if (pipe != NULL) {    
     pipe->SetLutRange(low_val, high_val); 
   }
