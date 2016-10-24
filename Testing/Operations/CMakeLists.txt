@@ -103,9 +103,7 @@ SET(PROJECT_SRCS
 	mafOpFlipNormalsTest.h mafOpFlipNormalsTest.cpp
 	mafOpSmoothSurfaceCellsTest.h mafOpSmoothSurfaceCellsTest.cpp
 	mafOpMeshQualityTest.h mafOpMeshQualityTest.cpp
-	mafOpImporterBBFTest.h mafOpImporterBBFTest.cpp
 	mafOpCropDeformableROITest.h mafOpCropDeformableROITest.cpp
-	mafOpImporterRAWVolume_BESTest.h mafOpImporterRAWVolume_BESTest.cpp
 	mafOpMoveTest.h mafOpMoveTest.cpp
 	mafOpExporterAnalogWSTest.h mafOpExporterAnalogWSTest.cpp
 	mafOpExporterGRFWSTest.h mafOpExporterGRFWSTest.cpp
