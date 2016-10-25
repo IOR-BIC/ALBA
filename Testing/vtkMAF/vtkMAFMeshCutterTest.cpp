@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: vtkMAFMeshCutter_BESTest
+ Module: vtkMAFMeshCutterTest
  Authors: Nigel McFarlane, Roberto Mucci
  
  Copyright (c) B3C
@@ -44,8 +44,8 @@
 #include "vtkCellData.h"
 #include "vtkCell.h"
 
-#include "vtkMAFMeshCutter_BES.h"
-#include "vtkMAFMeshCutter_BESTest.h"
+#include "vtkMAFMeshCutter.h"
+#include "vtkMAFMeshCutterTest.h"
 
 #include "mafConfigure.h"
 
@@ -56,14 +56,14 @@
 static const bool renderingOn = false ;  // switch interactive rendering on
 
 
-void vtkMAFMeshCutter_BESTest::TestFixture()
+void vtkMAFMeshCutterTest::TestFixture()
 {
 }
 
 
 //------------------------------------------------------------------------------
 // return true if v = (1-lambda)*v0 + lambda*v1, within tolerance ftol
-bool vtkMAFMeshCutter_BESTest::ColinearVectors(double *v, double *v0, double *v1, double lambda, double ftol)
+bool vtkMAFMeshCutterTest::ColinearVectors(double *v, double *v0, double *v1, double lambda, double ftol)
 //------------------------------------------------------------------------------
 {
   int i ;
@@ -82,7 +82,7 @@ bool vtkMAFMeshCutter_BESTest::ColinearVectors(double *v, double *v0, double *v1
 
 //------------------------------------------------------------------------------
 // return true if point is in the plane within tolerance ftol
-bool vtkMAFMeshCutter_BESTest::PointInPlane(double *v, double *origin, double *norm, double ftol)
+bool vtkMAFMeshCutterTest::PointInPlane(double *v, double *origin, double *norm, double ftol)
 //------------------------------------------------------------------------------
 {
   int i ;
@@ -97,7 +97,7 @@ bool vtkMAFMeshCutter_BESTest::PointInPlane(double *v, double *origin, double *n
 
 //------------------------------------------------------------------------------
 // return true if points are equal within tolerance ftol
-bool vtkMAFMeshCutter_BESTest::PointsEqual(double *v0, double *v1, double ftol)
+bool vtkMAFMeshCutterTest::PointsEqual(double *v0, double *v1, double ftol)
 //------------------------------------------------------------------------------
 {
   int i ;
@@ -113,7 +113,7 @@ bool vtkMAFMeshCutter_BESTest::PointsEqual(double *v0, double *v1, double ftol)
 
 //------------------------------------------------------------------------------
 // render the input and output data
-void vtkMAFMeshCutter_BESTest::RenderPointScalars(vtkUnstructuredGrid *UG, vtkPolyData *polydata)
+void vtkMAFMeshCutterTest::RenderPointScalars(vtkUnstructuredGrid *UG, vtkPolyData *polydata)
 //------------------------------------------------------------------------------
 {
   // Create a Renderer, a RenderWindow and a RenderWindowInteractor
@@ -214,7 +214,7 @@ void vtkMAFMeshCutter_BESTest::RenderPointScalars(vtkUnstructuredGrid *UG, vtkPo
 
 //------------------------------------------------------------------------------
 // render the input and output data
-void vtkMAFMeshCutter_BESTest::RenderCellScalars(vtkUnstructuredGrid *UG, vtkPolyData *polydata)
+void vtkMAFMeshCutterTest::RenderCellScalars(vtkUnstructuredGrid *UG, vtkPolyData *polydata)
 //------------------------------------------------------------------------------
 {
   // Create a Renderer, a RenderWindow and a RenderWindowInteractor
@@ -314,7 +314,7 @@ void vtkMAFMeshCutter_BESTest::RenderCellScalars(vtkUnstructuredGrid *UG, vtkPol
 
 //------------------------------------------------------------------------------
 // Test that the scalars were copied correctly
-void vtkMAFMeshCutter_BESTest::ScalarTest(vtkMAFMeshCutter_BES *MeshCutter, vtkUnstructuredGrid *UG, vtkPolyData *polydata) 
+void vtkMAFMeshCutterTest::ScalarTest(vtkMAFMeshCutter *MeshCutter, vtkUnstructuredGrid *UG, vtkPolyData *polydata) 
 //------------------------------------------------------------------------------
 {
   int i, j, k ;
@@ -425,7 +425,7 @@ void vtkMAFMeshCutter_BESTest::ScalarTest(vtkMAFMeshCutter_BES *MeshCutter, vtkU
 // Test filter with hex8 data (two cube cells)
 // Basic slice through centre of both cubes
 // The plane cuts the edges {0,2}, {3,8}, {1,10}, {11,4}, {7,5} and {6,9}
-void vtkMAFMeshCutter_BESTest::TestGetOutputHex8() 
+void vtkMAFMeshCutterTest::TestGetOutputHex8() 
 //------------------------------------------------------------------------------
 {
   // set filename
@@ -446,7 +446,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter_BES *MeshCutter = vtkMAFMeshCutter_BES::New();
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
   MeshCutter->SetCutFunction(P);
   MeshCutter->SetInput(reader->GetOutput());
 
@@ -526,7 +526,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8()
 // Test filter with hex8 data (two cube cells)
 // Vertical slice through one cube
 // The plane cuts the edges {0,1}, {3,11}, {4,8}, {2,10}
-void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_VerticalCut1() 
+void vtkMAFMeshCutterTest::TestGetOutputHex8_VerticalCut1() 
 //------------------------------------------------------------------------------
 {
   // set filename
@@ -547,7 +547,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_VerticalCut1()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter_BES *MeshCutter = vtkMAFMeshCutter_BES::New();
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
   MeshCutter->SetCutFunction(P);
   MeshCutter->SetInput(reader->GetOutput());
 
@@ -627,7 +627,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_VerticalCut1()
 // Test filter with hex8 data (two cube cells)
 // Vertical slice through one cube
 // The plane cuts the edges {4,9}, {5,10}, {6,11}, {7,9}
-void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_VerticalCut2() 
+void vtkMAFMeshCutterTest::TestGetOutputHex8_VerticalCut2() 
 //------------------------------------------------------------------------------
 {
   // set filename
@@ -648,7 +648,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_VerticalCut2()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter_BES *MeshCutter = vtkMAFMeshCutter_BES::New();
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
   MeshCutter->SetCutFunction(P);
   MeshCutter->SetInput(reader->GetOutput());
 
@@ -728,7 +728,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_VerticalCut2()
 //------------------------------------------------------------------------------
 // Test filter when cutting plane contains the faces of the cubes
 // The plane contains the faces {1,7,6,11} and {0,1,11,3}
-void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_FaceInPlane() 
+void vtkMAFMeshCutterTest::TestGetOutputHex8_FaceInPlane() 
 //------------------------------------------------------------------------------
 {
   // set filename
@@ -749,7 +749,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_FaceInPlane()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter_BES *MeshCutter = vtkMAFMeshCutter_BES::New();
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
   MeshCutter->SetCutFunction(P);
   MeshCutter->SetInput(reader->GetOutput());
 
@@ -829,7 +829,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_FaceInPlane()
 //------------------------------------------------------------------------------
 // Test filter when plane includes an edge.
 // The plane contains the edge {0,3} and cuts the edges {2,10} and {4,8}
-void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_IncludesEdge1() 
+void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesEdge1() 
 //------------------------------------------------------------------------------
 {
   // set filename
@@ -850,7 +850,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_IncludesEdge1()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter_BES *MeshCutter = vtkMAFMeshCutter_BES::New();
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
   MeshCutter->SetCutFunction(P);
   MeshCutter->SetInput(reader->GetOutput());
 
@@ -937,7 +937,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_IncludesEdge1()
 //------------------------------------------------------------------------------
 // Test filter when plane includes an edge.
 // The plane contains the edge {0,3} and cuts the edges {4,11}, {1,10}, {4,9} and {5,10}
-void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_IncludesEdge2() 
+void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesEdge2() 
 //------------------------------------------------------------------------------
 {
   // set filename
@@ -958,7 +958,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_IncludesEdge2()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter_BES *MeshCutter = vtkMAFMeshCutter_BES::New();
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
   MeshCutter->SetCutFunction(P);
   MeshCutter->SetInput(reader->GetOutput());
 
@@ -1045,7 +1045,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_IncludesEdge2()
 //------------------------------------------------------------------------------
 // Test filter when cutting plane includes a corner of the cube
 // The plane cuts the corner point 0, and the edges {8,3}, {8,4}, {10, 1}, {10, 4} and {10, 5}
-void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_IncludesCorner() 
+void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesCorner() 
 //------------------------------------------------------------------------------
 {
   // set filename
@@ -1066,7 +1066,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_IncludesCorner()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter_BES *MeshCutter = vtkMAFMeshCutter_BES::New();
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
   MeshCutter->SetCutFunction(P);
   MeshCutter->SetInput(reader->GetOutput());
 
@@ -1151,7 +1151,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_IncludesCorner()
 //------------------------------------------------------------------------------
 // Test filter when cutting plane contains only one edge
 // The plane contains the edge {0,3}
-void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_EdgeOnly() 
+void vtkMAFMeshCutterTest::TestGetOutputHex8_EdgeOnly() 
 //------------------------------------------------------------------------------
 {
   // set filename
@@ -1172,7 +1172,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_EdgeOnly()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter_BES *MeshCutter = vtkMAFMeshCutter_BES::New();
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
   MeshCutter->SetCutFunction(P);
   MeshCutter->SetInput(reader->GetOutput());
 
@@ -1202,7 +1202,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_EdgeOnly()
 //------------------------------------------------------------------------------
 // Test filter when cutting plane contains only one corner
 // The plane contains the corner 0
-void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_CornerOnly() 
+void vtkMAFMeshCutterTest::TestGetOutputHex8_CornerOnly() 
 //------------------------------------------------------------------------------
 {
   // set filename
@@ -1223,7 +1223,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_CornerOnly()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter_BES *MeshCutter = vtkMAFMeshCutter_BES::New();
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
   MeshCutter->SetCutFunction(P);
   MeshCutter->SetInput(reader->GetOutput());
 
@@ -1253,7 +1253,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_CornerOnly()
 
 //------------------------------------------------------------------------------
 // Test filter with test4 data (two tetrahedra)
-void vtkMAFMeshCutter_BESTest::TestGetOutputTet4() 
+void vtkMAFMeshCutterTest::TestGetOutputTet4() 
 //------------------------------------------------------------------------------
 {
   // set filename
@@ -1274,7 +1274,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputTet4()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter_BES *MeshCutter = vtkMAFMeshCutter_BES::New();
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
   MeshCutter->SetCutFunction(P);
   MeshCutter->SetInput(reader->GetOutput());
 
@@ -1350,7 +1350,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputTet4()
 //------------------------------------------------------------------------------
 // Test that the cutter updates and executes properly when the cutting function changes
 // It runs the tests GetOutputHex8_VerticalCut1() and GetOutputHex8_VerticalCut2() in series
-void vtkMAFMeshCutter_BESTest::TestUpdateChangeCutFunction() 
+void vtkMAFMeshCutterTest::TestUpdateChangeCutFunction() 
 //------------------------------------------------------------------------------
 {
   //----------------------------------------------------------------------------
@@ -1377,7 +1377,7 @@ void vtkMAFMeshCutter_BESTest::TestUpdateChangeCutFunction()
   P->SetNormal(pnorm1) ;
   P->SetOrigin(porigin1);
 
-  vtkMAFMeshCutter_BES *MeshCutter = vtkMAFMeshCutter_BES::New();
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
   MeshCutter->SetCutFunction(P);
   MeshCutter->SetInput(reader->GetOutput());
 
@@ -1528,7 +1528,7 @@ void vtkMAFMeshCutter_BESTest::TestUpdateChangeCutFunction()
 //------------------------------------------------------------------------------
 // Test that the cutter updates and executes properly when the input changes
 // It runs the tests GetOutputHex8 and GetOutputTet4 in series
-void vtkMAFMeshCutter_BESTest::TestUpdateChangeInput() 
+void vtkMAFMeshCutterTest::TestUpdateChangeInput() 
 //------------------------------------------------------------------------------
 {
   //----------------------------------------------------------------------------
@@ -1555,7 +1555,7 @@ void vtkMAFMeshCutter_BESTest::TestUpdateChangeInput()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter_BES *MeshCutter = vtkMAFMeshCutter_BES::New();
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
   MeshCutter->SetCutFunction(P);
   MeshCutter->SetInput(reader->GetOutput());
 

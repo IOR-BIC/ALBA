@@ -59,7 +59,7 @@ const int BOUND_1=1;
 #include "mafGUILutSlider.h"
 #include "mafGUILutSwatch.h"
 #include "mafPipeMesh.h"
-#include "mafPipeMeshSlice_BES.h"
+#include "mafPipeMeshSlice.h"
 #include "mafPipePolylineGraphEditor.h"
 
 #include "vtkTransform.h"
@@ -599,7 +599,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateZNormalView(mafEventB
 					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
 
 					mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
-					mafPipeMeshSlice_BES *PipeSliceViewMesh = mafPipeMeshSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
 					if(PipeArbitraryViewMesh && PipeSliceViewMesh)
 					{
 						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated,NULL);
@@ -707,7 +707,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateZNormalView(mafEventBase
 					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
 
 					mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
-					mafPipeMeshSlice_BES *PipeSliceViewMesh = mafPipeMeshSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
 					if(PipeSliceViewMesh)
 					{
 						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated,normal);
@@ -813,7 +813,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateYNormalView(mafEventBase
 					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
 
 					mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
-					mafPipeMeshSlice_BES *PipeSliceViewMesh = mafPipeMeshSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
 					if(PipeSliceViewMesh)
 					{
 						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated,normal);
@@ -923,7 +923,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateYNormalView(mafEventB
 					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
 
 					mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
-					mafPipeMeshSlice_BES *PipeSliceViewMesh = mafPipeMeshSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
 					if(PipeArbitraryViewMesh && PipeSliceViewMesh)
 					{
 						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated,NULL);
@@ -1030,7 +1030,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateXNormalView(mafEventBase
 					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
 
 					mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
-					mafPipeMeshSlice_BES *PipeSliceViewMesh = mafPipeMeshSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
 					if(PipeSliceViewMesh)
 					{
 						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated,normal);
@@ -1136,7 +1136,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateXNormalView(mafEventB
 					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
 
 					mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
-					mafPipeMeshSlice_BES *PipeSliceViewMesh = mafPipeMeshSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
 					if(PipeArbitraryViewMesh && PipeSliceViewMesh)
 					{
 						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated,NULL);
@@ -1940,7 +1940,7 @@ void mafViewArbitraryOrthoSlice::ShowMafVMEMesh(mafVME *vme)
 		((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
 		mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(vme));
-		mafPipeMeshSlice_BES *PipeSliceViewMesh = mafPipeMeshSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(vme));
+		mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(vme));
 
 		double surfaceOriginTranslated[3];
 
@@ -2133,7 +2133,7 @@ void mafViewArbitraryOrthoSlice::OnResetSurfaceAndLandmark(mafVME *vme)
 void mafViewArbitraryOrthoSlice::OnResetMafVMEMesh(mafVME *vme)
 {
 	mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(vme));
-	mafPipeMeshSlice_BES *PipeSliceViewMesh = mafPipeMeshSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(vme));
+	mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(vme));
 	if(PipeSliceViewMesh && PipeArbitraryViewMesh)
 	{
 		double normal[3];

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: vtkMAFMeshCutter_BES
+ Module: vtkMAFMeshCutter
  Authors: Nigel McFarlane
  
  Copyright (c) B3C
@@ -38,12 +38,12 @@ class vtkMatrix4x4;
 
 /** 
 
- class name: vtkMAFMeshCutter_BES
+ class name: vtkMAFMeshCutter
 vtk filter which cuts a finite element mesh (unstructured grid) with a plane.
 This is very similar to vtkCutter().
 
 Differences from vtkCutter():
-1) vtkMAFMeshCutter_BES() returns polygons which correspond to the mesh cells, eg a slice
+1) vtkMAFMeshCutter() returns polygons which correspond to the mesh cells, eg a slice
 through the center of a cube might return a square.  In vtkCutter() this would
 be subdivided into triangles.
 2) Public methods have been provided to map the output points and cells back to the input mesh.
@@ -58,13 +58,13 @@ edges cut by the plane, although their endpoints are.
 3) No cells of lower order than triangles are created.
 Therefore if the plane cuts exactly through an isolated edge or vertex, the output
 polydata will contain the points, but no cell will be created.*/
-class MAF_EXPORT vtkMAFMeshCutter_BES : public vtkUnstructuredGridToPolyDataFilter
+class MAF_EXPORT vtkMAFMeshCutter : public vtkUnstructuredGridToPolyDataFilter
 {
 public:
   /** RTTI macro*/
-  vtkTypeRevisionMacro(vtkMAFMeshCutter_BES,vtkUnstructuredGridToPolyDataFilter);
+  vtkTypeRevisionMacro(vtkMAFMeshCutter,vtkUnstructuredGridToPolyDataFilter);
   /** return object instance */
-  static vtkMAFMeshCutter_BES *New() ;
+  static vtkMAFMeshCutter *New() ;
   /** print object information */
   void PrintSelf(ostream& os, vtkIndent indent);                                ///< print self
 
@@ -107,9 +107,9 @@ public:
 
 protected:
   /** constructor */
-  vtkMAFMeshCutter_BES() ;   
+  vtkMAFMeshCutter() ;   
   /** destructor */                                                           
-  ~vtkMAFMeshCutter_BES() ;                                                             
+  ~vtkMAFMeshCutter() ;                                                             
 
   /** execute method */
   void Execute();
@@ -287,7 +287,7 @@ protected:
 // Add set of id's to the edge mapping table
 // This is a POINT_TO_EDGE mapping
 // This maps output point idout to input edge (id0,id1) 
-inline void vtkMAFMeshCutter_BES::AddMapping(vtkIdType idout, const Edge& edge, double lambda)
+inline void vtkMAFMeshCutter::AddMapping(vtkIdType idout, const Edge& edge, double lambda)
 //------------------------------------------------------------------------------
 {
   EdgeMappingType em = {idout, edge.id0, edge.id1, lambda, POINT_TO_EDGE} ;
@@ -300,7 +300,7 @@ inline void vtkMAFMeshCutter_BES::AddMapping(vtkIdType idout, const Edge& edge, 
 // Add set of id's to the edge mapping table
 // this is a POINT_TO_POINT mapping
 // This maps output point idout to single input point id0
-inline void vtkMAFMeshCutter_BES::AddMapping(vtkIdType idout, vtkIdType id0, double lambda)
+inline void vtkMAFMeshCutter::AddMapping(vtkIdType idout, vtkIdType id0, double lambda)
 //------------------------------------------------------------------------------
 {  
   EdgeMappingType em = {idout, id0, undefinedId, lambda, POINT_TO_POINT} ;
@@ -311,7 +311,7 @@ inline void vtkMAFMeshCutter_BES::AddMapping(vtkIdType idout, vtkIdType id0, dou
 
 //------------------------------------------------------------------------
 //computes a unique key for the given edge
-inline unsigned long long vtkMAFMeshCutter_BES::GetEdgeKey(vtkIdType id0, vtkIdType id1) const
+inline unsigned long long vtkMAFMeshCutter::GetEdgeKey(vtkIdType id0, vtkIdType id1) const
 //------------------------------------------------------------------------
 {
   unsigned long long key;
@@ -329,7 +329,7 @@ inline unsigned long long vtkMAFMeshCutter_BES::GetEdgeKey(vtkIdType id0, vtkIdT
 //------------------------------------------------------------------------------
 // Find the input edge (id0,id1) corresponding to the output point idout
 // This returns true if the output point is in the table
-inline bool vtkMAFMeshCutter_BES::GetInputEdgeCutByPoint(vtkIdType idout, vtkIdType *id0, vtkIdType *id1, double *lambda) const
+inline bool vtkMAFMeshCutter::GetInputEdgeCutByPoint(vtkIdType idout, vtkIdType *id0, vtkIdType *id1, double *lambda) const
 //------------------------------------------------------------------------------
 {
   //RELEASE NOTE: as AddMapping is called in a pair with InsertNextPoint in the current version,
@@ -350,7 +350,7 @@ inline bool vtkMAFMeshCutter_BES::GetInputEdgeCutByPoint(vtkIdType idout, vtkIdT
 //------------------------------------------------------------------------------
 // Find the single input point id0 corresponding to the output point idout
 // This returns true if the the input point is in the table
-inline bool vtkMAFMeshCutter_BES::GetInputPointCutByPoint(vtkIdType idout, vtkIdType *id0) const
+inline bool vtkMAFMeshCutter::GetInputPointCutByPoint(vtkIdType idout, vtkIdType *id0) const
 //------------------------------------------------------------------------------
 {
   //RELEASE NOTE: as AddMapping is called in a pair with InsertNextPoint in the current version,
@@ -369,7 +369,7 @@ inline bool vtkMAFMeshCutter_BES::GetInputPointCutByPoint(vtkIdType idout, vtkId
 
 //------------------------------------------------------------------------------
 // Get the input cell corresponding to the output cell
-inline vtkIdType vtkMAFMeshCutter_BES::GetInputCellCutByOutputCell(vtkIdType idout)
+inline vtkIdType vtkMAFMeshCutter::GetInputCellCutByOutputCell(vtkIdType idout)
 //------------------------------------------------------------------------------
 {  
   assert(idout >= 0 && idout < (int)CellMapping.size());
@@ -382,7 +382,7 @@ inline vtkIdType vtkMAFMeshCutter_BES::GetInputCellCutByOutputCell(vtkIdType ido
 // Plane is defined by origin and normal.
 // Returns type of intersection.
 // lambda returns fractional distance of interpolated point along edge (0 <= lambda <= 1).
-inline int vtkMAFMeshCutter_BES::GetIntersectionOfEdgeWithPlane(const Edge& edge, double *coords, double *lambda) const
+inline int vtkMAFMeshCutter::GetIntersectionOfEdgeWithPlane(const Edge& edge, double *coords, double *lambda) const
 //------------------------------------------------------------------------------
 {
   return GetIntersectionOfLineWithPlane(&PointsCoords[3*edge.id0], 
@@ -394,7 +394,7 @@ inline int vtkMAFMeshCutter_BES::GetIntersectionOfEdgeWithPlane(const Edge& edge
 // Interpolate two scalar tuples
 // tupout = (1-lambda)*tup0 + lambda*tup1
 // If the data type is not float or double, we add 0.5 to ensure correct rounding when it is converted back to int.
-inline void vtkMAFMeshCutter_BES::InterpolateScalars(double *tup0, double *tup1, double *tupout, double lambda, int ncomponents, int dattype)
+inline void vtkMAFMeshCutter::InterpolateScalars(double *tup0, double *tup1, double *tupout, double lambda, int ncomponents, int dattype)
 //------------------------------------------------------------------------------
 { 
   for (int j = 0 ;  j < ncomponents ;  j++)

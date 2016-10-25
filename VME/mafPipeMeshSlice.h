@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipeMeshSlice_BES
+ Module: mafPipeMeshSlice
  Authors: Daniele Giunchi
  
  Copyright (c) B3C
@@ -35,31 +35,31 @@ class vtkProperty;
 class mafAxes;
 class vtkLookupTable;
 class mafGUIMaterialButton;
-class vtkMAFMeshCutter_BES;
+class vtkMAFMeshCutter;
 class vtkPlane;
 class vtkPolyDataNormals;
 class mafGUILutSwatch;
 
 //----------------------------------------------------------------------------
-// mafPipeMeshSlice_BES :
+// mafPipeMeshSlice :
 //----------------------------------------------------------------------------
 
 // TODO: REFACTOR THIS (Note by Stefano) 
 // This class need some cleanup: there are really too many Update methods in cpp file...
 /**
-  class name : mafPipeMeshSlice_BES
+  class name : mafPipeMeshSlice
   Pipe for sliceing a mesh, modified by University of Bedfordshire.
 */
-class MAF_EXPORT mafPipeMeshSlice_BES : public mafPipeSlice
+class MAF_EXPORT mafPipeMeshSlice : public mafPipeSlice
 {
 public:
   /** RTTI macro*/
-	mafTypeMacro(mafPipeMeshSlice_BES,mafPipeSlice);
+	mafTypeMacro(mafPipeMeshSlice,mafPipeSlice);
 
   /** constructor */
-	mafPipeMeshSlice_BES();
+	mafPipeMeshSlice();
   /** destructor */
-	virtual     ~mafPipeMeshSlice_BES();
+	virtual     ~mafPipeMeshSlice();
 
 	/** process events coming from gui */
 	virtual void OnEvent(mafEventBase *maf_event);
@@ -167,7 +167,7 @@ protected:
   vtkActor                *m_ActorWired;
   
   vtkPlane				        *m_Plane;
-  vtkMAFMeshCutter_BES		    *m_Cutter;
+  vtkMAFMeshCutter		    *m_Cutter;
   vtkPolyDataNormals *m_NormalFilter;
 
 	mafGUILutSwatch *m_LutSwatch;

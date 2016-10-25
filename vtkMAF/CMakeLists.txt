@@ -85,7 +85,7 @@ SET(vtkMAF_SRCS
   vtkMAFVolumeRayCastMapper.cxx  vtkMAFVolumeRayCastMapper.h
   vtkMAFVolumeTextureMapper2D.cxx  vtkMAFVolumeTextureMapper2D.h
   vtkMAFVolumeSlicer.cxx  vtkMAFVolumeSlicer.h
-  vtkMAFMeshCutter_BES.cxx   vtkMAFMeshCutter_BES.h  	
+  vtkMAFMeshCutter.cxx   vtkMAFMeshCutter.h  	
   ###############################################
   
   ###############################################

@@ -52,7 +52,7 @@
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkCamera.h"
-#include "mafPipeMeshSlice_BES.h"
+#include "mafPipeMeshSlice.h"
 #include "mafTransform.h"
 
 //----------------------------------------------------------------------------
@@ -154,8 +154,8 @@ void mafViewOrthoSlice::VmeShow(mafVME *vme, bool show)
  	  for(int j=1; j<m_NumOfChildView; j++) 
 		{
       m_ChildViewList[j]->VmeShow(vme, show);
-			if(show && j==YN_VIEW && mafPipeMeshSlice_BES::SafeDownCast(m_ChildViewList[j]->GetNodePipe(vme)))
-				mafPipeMeshSlice_BES::SafeDownCast(m_ChildViewList[j]->GetNodePipe(vme))->SetFlipNormalOff();
+			if(show && j==YN_VIEW && mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(vme)))
+				mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(vme))->SetFlipNormalOff();
 		}
   
 	if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
@@ -190,8 +190,8 @@ void mafViewOrthoSlice::VmeShow(mafVME *vme, bool show)
       for(int j=1; j<m_NumOfChildView; j++)
       {
         m_ChildViewList[j]->VmeShow(m_VMElist[i], show);
-				if(show && j==YN_VIEW && mafPipeMeshSlice_BES::SafeDownCast(m_ChildViewList[j]->GetNodePipe(m_VMElist[i])))
-					 mafPipeMeshSlice_BES::SafeDownCast(m_ChildViewList[j]->GetNodePipe(m_VMElist[i]))->SetFlipNormalOff();
+				if(show && j==YN_VIEW && mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(m_VMElist[i])))
+					 mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(m_VMElist[i]))->SetFlipNormalOff();
         ApplyViewSettings(m_VMElist[i]);
       }
 	}
@@ -482,7 +482,7 @@ void mafViewOrthoSlice::PackageView()
     {
       m_Views[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
       m_Views[v]->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice",MUTEX);
-      m_Views[v]->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice_BES");
+      m_Views[v]->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
       m_Views[v]->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice",MUTEX);
       m_Views[v]->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice",MUTEX);
       m_Views[v]->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice");

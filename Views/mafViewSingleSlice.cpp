@@ -44,7 +44,7 @@
 #include "mafGUIFloatSlider.h"
 #include "mafVMEIterator.h"
 #include "mafVMEGizmo.h"
-#include "mafPipeMeshSlice_BES.h"
+#include "mafPipeMeshSlice.h"
 #include "mafGUI.h"
 
 #include "vtkDataSet.h"
@@ -322,7 +322,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
 		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_Slice);
 				((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
       }
-			else if(pipe_name.Equals("mafPipeMeshSlice_BES"))
+			else if(pipe_name.Equals("mafPipeMeshSlice"))
 			{
 				double normal[3];
 				switch(m_CameraPositionId)
@@ -354,7 +354,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
 					normal[2] = 1;
 				}
 
-				((mafPipeMeshSlice_BES *)pipe)->SetSlice(m_Slice, normal);
+				((mafPipeMeshSlice *)pipe)->SetSlice(m_Slice, normal);
 			}
 			else if(pipe_name.Equals("mafPipePolylineSlice"))
 			{

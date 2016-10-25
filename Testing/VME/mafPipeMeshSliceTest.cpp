@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipeMeshSlice_BESTest
+ Module: mafPipeMeshSliceTest
  Authors: Daniele Giunchi
  
  Copyright (c) B3C
@@ -24,8 +24,8 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "mafPipeMeshSlice_BESTest.h"
-#include "mafPipeMeshSlice_BES.h"
+#include "mafPipeMeshSliceTest.h"
+#include "mafPipeMeshSlice.h"
 
 #include "mafSceneNode.h"
 #include "mafVMEMesh.h"
@@ -56,12 +56,12 @@ enum PIPE_MESH_ACTORS
   };
 
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BESTest::TestFixture()
+void mafPipeMeshSliceTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BESTest::BeforeTest()
+void mafPipeMeshSliceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -77,7 +77,7 @@ void mafPipeMeshSlice_BESTest::BeforeTest()
 	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BESTest::AfterTest()
+void mafPipeMeshSliceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_RenderWindowInteractor);
@@ -97,7 +97,7 @@ enum ID_TEST
 };
 
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BESTest::TestPipeExecution()
+void mafPipeMeshSliceTest::TestPipeExecution()
 //----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
@@ -126,7 +126,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution()
   sceneNode = new mafSceneNode(NULL,NULL,mesh, NULL);
 
   /////////// Pipe Instance and Creation ///////////
-  mafPipeMeshSlice_BES *pipeMeshSlice = new mafPipeMeshSlice_BES;
+  mafPipeMeshSlice *pipeMeshSlice = new mafPipeMeshSlice;
   pipeMeshSlice->SetScalarMapActive(1);
   double origin[3], normal[3];
 
@@ -202,7 +202,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution()
       break;
     }
     pipeMeshSlice->SetActiveScalar(arrayIndex);
-    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice_BES::ID_SCALARS));
+    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice::ID_SCALARS));
 
     vtkActor *meshActor;
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
@@ -223,7 +223,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution()
   mafDEL(storage);
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BESTest::TestPipeExecution_Wireframe()
+void mafPipeMeshSliceTest::TestPipeExecution_Wireframe()
 //----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
@@ -252,7 +252,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Wireframe()
   sceneNode = new mafSceneNode(NULL,NULL,mesh, NULL);
 
   /////////// Pipe Instance and Creation ///////////
-  mafPipeMeshSlice_BES *pipeMeshSlice = new mafPipeMeshSlice_BES;
+  mafPipeMeshSlice *pipeMeshSlice = new mafPipeMeshSlice;
   pipeMeshSlice->SetScalarMapActive(1);
   double origin[3], normal[3];
 
@@ -330,7 +330,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Wireframe()
       break;
     }
     pipeMeshSlice->SetActiveScalar(arrayIndex);
-    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice_BES::ID_SCALARS));
+    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice::ID_SCALARS));
 
     vtkActor *meshActor;
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
@@ -352,7 +352,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Wireframe()
 
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BESTest::TestPipeExecution_WiredActorVisibility()
+void mafPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
 //----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
@@ -380,7 +380,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_WiredActorVisibility()
   sceneNode = new mafSceneNode(NULL,NULL,mesh, NULL);
 
   /////////// Pipe Instance and Creation ///////////
-  mafPipeMeshSlice_BES *pipeMeshSlice = new mafPipeMeshSlice_BES;
+  mafPipeMeshSlice *pipeMeshSlice = new mafPipeMeshSlice;
   pipeMeshSlice->SetScalarMapActive(1);
   double origin[3], normal[3];
 
@@ -459,7 +459,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_WiredActorVisibility()
       break;
     }
     pipeMeshSlice->SetActiveScalar(arrayIndex);
-    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice_BES::ID_SCALARS));
+    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice::ID_SCALARS));
 
     vtkActor *meshActor;
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
@@ -481,7 +481,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_WiredActorVisibility()
 
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BESTest::TestPipeExecution_FlipNormal()
+void mafPipeMeshSliceTest::TestPipeExecution_FlipNormal()
 //----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
@@ -509,7 +509,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_FlipNormal()
   sceneNode = new mafSceneNode(NULL,NULL,mesh, NULL);
 
   /////////// Pipe Instance and Creation ///////////
-  mafPipeMeshSlice_BES *pipeMeshSlice = new mafPipeMeshSlice_BES;
+  mafPipeMeshSlice *pipeMeshSlice = new mafPipeMeshSlice;
   pipeMeshSlice->SetScalarMapActive(1);
 
   double origin[3], normal[3];
@@ -588,7 +588,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_FlipNormal()
       break;
     }
     pipeMeshSlice->SetActiveScalar(arrayIndex);
-    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice_BES::ID_SCALARS));
+    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice::ID_SCALARS));
 
     vtkActor *meshActor;
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
@@ -610,7 +610,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_FlipNormal()
 
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BESTest::TestPipeExecution_UseVTKProperty()
+void mafPipeMeshSliceTest::TestPipeExecution_UseVTKProperty()
 //----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
@@ -644,7 +644,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_UseVTKProperty()
   sceneNode = new mafSceneNode(NULL,NULL,mesh, NULL);
 
   /////////// Pipe Instance and Creation ///////////
-  mafPipeMeshSlice_BES *pipeMeshSlice = new mafPipeMeshSlice_BES;
+  mafPipeMeshSlice *pipeMeshSlice = new mafPipeMeshSlice;
   pipeMeshSlice->SetScalarMapActive(0);
   
   double origin[3], normal[3];
@@ -723,7 +723,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_UseVTKProperty()
       break;
     }
     pipeMeshSlice->SetActiveScalar(arrayIndex);
-    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice_BES::ID_SCALARS));
+    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice::ID_SCALARS));
 
     vtkActor *meshActor;
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
@@ -744,7 +744,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_UseVTKProperty()
   mafDEL(storage);
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BESTest::TestPipeExecution_Thickness_PickActor()
+void mafPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
 //----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
@@ -772,7 +772,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Thickness_PickActor()
   sceneNode = new mafSceneNode(NULL,NULL,mesh, NULL);
 
   /////////// Pipe Instance and Creation ///////////
-  mafPipeMeshSlice_BES *pipeMeshSlice = new mafPipeMeshSlice_BES;
+  mafPipeMeshSlice *pipeMeshSlice = new mafPipeMeshSlice;
   pipeMeshSlice->SetScalarMapActive(1);
   
   double origin[3], normal[3];
@@ -855,7 +855,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Thickness_PickActor()
       break;
     }
     pipeMeshSlice->SetActiveScalar(arrayIndex);
-    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice_BES::ID_SCALARS));
+    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice::ID_SCALARS));
 
     vtkActor *meshActor;
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
@@ -878,7 +878,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Thickness_PickActor()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BESTest::ProceduralControl(double controlRangeMapper[2],vtkProp *propToControl)
+void mafPipeMeshSliceTest::ProceduralControl(double controlRangeMapper[2],vtkProp *propToControl)
 //----------------------------------------------------------------------------
 {
   //procedural control
@@ -888,7 +888,7 @@ void mafPipeMeshSlice_BESTest::ProceduralControl(double controlRangeMapper[2],vt
   //end procedural control
 }
 //----------------------------------------------------------------------------
-vtkProp *mafPipeMeshSlice_BESTest::SelectActorToControl(vtkPropCollection *propList, int index)
+vtkProp *mafPipeMeshSliceTest::SelectActorToControl(vtkPropCollection *propList, int index)
 //----------------------------------------------------------------------------
 {
   propList->InitTraversal();

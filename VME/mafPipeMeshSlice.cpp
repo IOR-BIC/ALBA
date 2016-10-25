@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipeMeshSlice_BES
+ Module: mafPipeMeshSlice
  Authors: Daniele Giunchi
  
  Copyright (c) B3C
@@ -23,7 +23,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafPipeMeshSlice_BES.h"
+#include "mafPipeMeshSlice.h"
 #include "mafSceneNode.h"
 #include "mafGUI.h"
 #include "mafGUIMaterialButton.h"
@@ -41,7 +41,7 @@
 #include "mafVMEMesh.h"
 #include "mafParabolicMeshToLinearMeshFilter.h"
 #include "mafGUIMaterialButton.h"
-#include "vtkMAFMeshCutter_BES.h"
+#include "vtkMAFMeshCutter.h"
 
 #include "mafVMEItemVTK.h"
 
@@ -70,13 +70,13 @@
 const bool DEBUG_MODE = true;
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mafPipeMeshSlice_BES);
+mafCxxTypeMacro(mafPipeMeshSlice);
 //----------------------------------------------------------------------------
 
 #include "mafMemDbg.h"
 
 //----------------------------------------------------------------------------
-mafPipeMeshSlice_BES::mafPipeMeshSlice_BES()
+mafPipeMeshSlice::mafPipeMeshSlice()
 :mafPipeSlice()
 //----------------------------------------------------------------------------
 {
@@ -110,7 +110,7 @@ mafPipeMeshSlice_BES::mafPipeMeshSlice_BES()
   m_Border = 1;
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::Create(mafSceneNode *n)
+void mafPipeMeshSlice::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
 	Superclass::Create(n);
@@ -136,7 +136,7 @@ void mafPipeMeshSlice_BES::Create(mafSceneNode *n)
 	  m_Axes = new mafAxes(m_RenFront, m_Vme);*/
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::ExecutePipe()
+void mafPipeMeshSlice::ExecutePipe()
 //----------------------------------------------------------------------------
 {
   m_Vme->Update();
@@ -192,7 +192,7 @@ void mafPipeMeshSlice_BES::ExecutePipe()
   m_NumberOfArrays = m_PointCellArraySeparation + data->GetCellData()->GetNumberOfArrays();
 
   m_Plane = vtkPlane::New();
-  m_Cutter = vtkMAFMeshCutter_BES::New();
+  m_Cutter = vtkMAFMeshCutter::New();
 
   m_Plane->SetOrigin(m_Origin);
   m_Plane->SetNormal(m_Normal);
@@ -295,7 +295,7 @@ void mafPipeMeshSlice_BES::ExecutePipe()
   m_VTKTransform->Delete();
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::AddActorsToAssembly(vtkMAFAssembly *assembly)
+void mafPipeMeshSlice::AddActorsToAssembly(vtkMAFAssembly *assembly)
 //----------------------------------------------------------------------------
 {
   assembly->AddPart(m_Actor);
@@ -303,7 +303,7 @@ void mafPipeMeshSlice_BES::AddActorsToAssembly(vtkMAFAssembly *assembly)
 	assembly->AddPart(m_OutlineActor);	
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::RemoveActorsFromAssembly(vtkMAFAssembly *assembly)
+void mafPipeMeshSlice::RemoveActorsFromAssembly(vtkMAFAssembly *assembly)
 //----------------------------------------------------------------------------
 {
 	assembly->RemovePart(m_Actor);
@@ -311,7 +311,7 @@ void mafPipeMeshSlice_BES::RemoveActorsFromAssembly(vtkMAFAssembly *assembly)
 	assembly->RemovePart(m_OutlineActor);
 }
 //----------------------------------------------------------------------------
-mafPipeMeshSlice_BES::~mafPipeMeshSlice_BES()
+mafPipeMeshSlice::~mafPipeMeshSlice()
 //----------------------------------------------------------------------------
 {
 	m_Vme->GetEventSource()->RemoveObserver(this);
@@ -340,7 +340,7 @@ mafPipeMeshSlice_BES::~mafPipeMeshSlice_BES()
   delete m_MaterialButton;
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::Select(bool sel)
+void mafPipeMeshSlice::Select(bool sel)
 //----------------------------------------------------------------------------
 {
 	m_Selected = sel;
@@ -350,12 +350,12 @@ void mafPipeMeshSlice_BES::Select(bool sel)
 	}
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::UpdateProperty(bool fromTag)
+void mafPipeMeshSlice::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-mafGUI *mafPipeMeshSlice_BES::CreateGui()
+mafGUI *mafPipeMeshSlice::CreateGui()
 //----------------------------------------------------------------------------
 {
 	  m_Gui = new mafGUI(this);
@@ -390,7 +390,7 @@ mafGUI *mafPipeMeshSlice_BES::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::OnEvent(mafEventBase *maf_event)
+void mafPipeMeshSlice::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -531,7 +531,7 @@ void mafPipeMeshSlice_BES::OnEvent(mafEventBase *maf_event)
 }
 
 //----------------------------------------------------------------------------
-/*virtual*/ void mafPipeMeshSlice_BES::SetSlice(double *Origin, double *Normal)
+/*virtual*/ void mafPipeMeshSlice::SetSlice(double *Origin, double *Normal)
 //----------------------------------------------------------------------------
 {
   if (Origin != NULL)
@@ -577,13 +577,13 @@ void mafPipeMeshSlice_BES::OnEvent(mafEventBase *maf_event)
 }
 
 //----------------------------------------------------------------------------
-double mafPipeMeshSlice_BES::GetThickness()
+double mafPipeMeshSlice::GetThickness()
 //----------------------------------------------------------------------------
 {
 	return m_Border;
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::SetThickness(double thickness)
+void mafPipeMeshSlice::SetThickness(double thickness)
 //----------------------------------------------------------------------------
 {
 	m_Border=thickness;
@@ -592,7 +592,7 @@ void mafPipeMeshSlice_BES::SetThickness(double thickness)
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::SetActorPicking(int enable)
+void mafPipeMeshSlice::SetActorPicking(int enable)
 //----------------------------------------------------------------------------
 {
 	m_Actor->SetPickable(enable);
@@ -600,7 +600,7 @@ void mafPipeMeshSlice_BES::SetActorPicking(int enable)
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::SetWireframeOn()
+void mafPipeMeshSlice::SetWireframeOn()
 //----------------------------------------------------------------------------
 {
 	m_Wireframe=true;
@@ -618,7 +618,7 @@ void mafPipeMeshSlice_BES::SetWireframeOn()
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::SetWireframeOff()
+void mafPipeMeshSlice::SetWireframeOff()
 //----------------------------------------------------------------------------
 {
 	m_Wireframe=false;
@@ -636,7 +636,7 @@ void mafPipeMeshSlice_BES::SetWireframeOff()
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::SetWiredActorVisibilityOn()
+void mafPipeMeshSlice::SetWiredActorVisibilityOn()
 //----------------------------------------------------------------------------
 {
 	m_BorderElementsWiredActor=1;
@@ -645,7 +645,7 @@ void mafPipeMeshSlice_BES::SetWiredActorVisibilityOn()
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::SetWiredActorVisibilityOff()
+void mafPipeMeshSlice::SetWiredActorVisibilityOff()
 //----------------------------------------------------------------------------
 {
 	m_BorderElementsWiredActor=0;
@@ -654,21 +654,21 @@ void mafPipeMeshSlice_BES::SetWiredActorVisibilityOff()
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::SetFlipNormalOn()
+void mafPipeMeshSlice::SetFlipNormalOn()
 //----------------------------------------------------------------------------
 {
   m_NormalFilter->FlipNormalsOn();
   m_NormalFilter->Update();
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::SetFlipNormalOff()
+void mafPipeMeshSlice::SetFlipNormalOff()
 //----------------------------------------------------------------------------
 {
   m_NormalFilter->FlipNormalsOff();
   m_NormalFilter->Update();
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::UpdateScalars()
+void mafPipeMeshSlice::UpdateScalars()
 //----------------------------------------------------------------------------
 {
   m_Vme->GetOutput()->GetVTKData()->Update();
@@ -679,7 +679,7 @@ void mafPipeMeshSlice_BES::UpdateScalars()
  
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::UpdateLUTAndMapperFromNewActiveScalars()
+void mafPipeMeshSlice::UpdateLUTAndMapperFromNewActiveScalars()
 //----------------------------------------------------------------------------
 {
   vtkUnstructuredGrid *data = vtkUnstructuredGrid::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
@@ -729,7 +729,7 @@ void mafPipeMeshSlice_BES::UpdateLUTAndMapperFromNewActiveScalars()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::CreateFieldDataControlArrays()
+void mafPipeMeshSlice::CreateFieldDataControlArrays()
 //----------------------------------------------------------------------------
 {
   //String array allocation
@@ -775,7 +775,7 @@ void mafPipeMeshSlice_BES::CreateFieldDataControlArrays()
 
 }
 
-void mafPipeMeshSlice_BES::UpdateVtkPolyDataNormalFilterActiveScalar()
+void mafPipeMeshSlice::UpdateVtkPolyDataNormalFilterActiveScalar()
 {
 
   vtkUnstructuredGrid *data = vtkUnstructuredGrid::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
@@ -835,7 +835,7 @@ void mafPipeMeshSlice_BES::UpdateVtkPolyDataNormalFilterActiveScalar()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BES::SetLookupTable(vtkLookupTable *table)
+void mafPipeMeshSlice::SetLookupTable(vtkLookupTable *table)
 //----------------------------------------------------------------------------
 {
 	if(m_Table==NULL || table==NULL ) return;

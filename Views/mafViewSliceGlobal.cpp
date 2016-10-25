@@ -30,11 +30,11 @@ const bool DEBUG_MODE = false;
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice_BES.h"
 #include "mafPipePolylineSlice_BES.h"
-#include "mafPipeMeshSlice_BES.h"
+#include "mafPipeMeshSlice.h"
 
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipePolylineSlice.h"
-#include "mafPipeMeshSlice_BES.h"
+#include "mafPipeMeshSlice.h"
 
 #include "mafVMEVolumeGray.h"
 #include "mafVMELandmarkCloud.h"

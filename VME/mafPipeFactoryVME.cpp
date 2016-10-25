@@ -72,7 +72,7 @@
 
 #include "mafPipePolylineGraphEditor.h"
 
-#include "mafPipeMeshSlice_BES.h"
+#include "mafPipeMeshSlice.h"
 #include "mafPipePolylineSlice_BES.h"
 #include "mafPipeSurfaceSlice_BES.h"
 #include "mafPipeVolumeSlice.h"
@@ -205,7 +205,7 @@ mafPipeFactoryVME::mafPipeFactoryVME()
   mafPlugPipeMacro(mafPipeVolumeSlice, "BES: mafPipeVolumeSlice.");
   mafPlugPipeMacro(mafPipeSurfaceSlice_BES, "BES: mafPipeSurfaceSlice.");
   mafPlugPipeMacro(mafPipePolylineSlice_BES, "BES: mafPipePolylineSlice_BES.");
-  mafPlugPipeMacro(mafPipeMeshSlice_BES, "BES: mafPipeMeshSlice_BES.");
+  mafPlugPipeMacro(mafPipeMeshSlice, "BES: mafPipeMeshSlice.");
 
   mafPlugPipeMacro(mafPipeVolumeSliceNotInterpolated, "Pipe for not interpolated and not resampled volume visualization");   
 

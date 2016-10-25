@@ -63,7 +63,7 @@
 #include "vtkMAFVolumeTextureMapper2DTest.h"
 #include "vtkMAFDataArrayDescriptorTest.h"
 #include "vtkMAFErythrocyteSourceTest.h"
-#include "vtkMAFMeshCutter_BESTest.h"
+#include "vtkMAFMeshCutterTest.h"
 #include "vtkMAFFillingHoleTest.h"
 #include "vtkMAFFixTopologyTest.h"
 #include "vtkWeightedLandmarkTransformTest.h"
@@ -174,7 +174,7 @@ int
 	runner.addTest(vtkMAFVolumeTextureMapper2DTest::suite());
 	runner.addTest(vtkMAFDataArrayDescriptorTest::suite());
 	runner.addTest(vtkMAFErythrocyteSourceTest::suite());
-	runner.addTest(vtkMAFMeshCutter_BESTest::suite());
+	runner.addTest(vtkMAFMeshCutterTest::suite());
 	runner.addTest(vtkMAFFillingHoleTest::suite());
 	runner.addTest(vtkMAFFixTopologyTest::suite());
 	runner.addTest(vtkWeightedLandmarkTransformTest::suite());

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: vtkMAFMeshCutter_BESTest
+ Module: vtkMAFMeshCutterTest
  Authors: Nigel McFarlane, Roberto Mucci
  
  Copyright (c) B3C
@@ -14,23 +14,23 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_vtkMAFMeshCutter_BEStest_H__
+#ifndef __CPP_UNIT_vtkMAFMeshCuttertest_H__
 #define __CPP_UNIT_vtkMAFMeshCuttert_BESest_H__
 
 #include "mafTest.h"
 
 class vtkUnstructuredGrid;
-class vtkMAFMeshCutter_BES;
+class vtkMAFMeshCutter;
 
 
 //------------------------------------------------------------------------------
-// Test class for vtkMAFMeshCutter_BES
+// Test class for vtkMAFMeshCutter
 //------------------------------------------------------------------------------
-class vtkMAFMeshCutter_BESTest : public mafTest
+class vtkMAFMeshCutterTest : public mafTest
 {
   public:
 
-    CPPUNIT_TEST_SUITE( vtkMAFMeshCutter_BESTest );
+    CPPUNIT_TEST_SUITE( vtkMAFMeshCutterTest );
     CPPUNIT_TEST( TestFixture );
     CPPUNIT_TEST( TestGetOutputHex8 );
     CPPUNIT_TEST( TestGetOutputHex8_VerticalCut1 );
@@ -77,7 +77,7 @@ class vtkMAFMeshCutter_BESTest : public mafTest
     void RenderCellScalars(vtkUnstructuredGrid *UG, vtkPolyData *polydata) ;
 
     // test the interpolation of scalars
-    void ScalarTest(vtkMAFMeshCutter_BES *MMC, vtkUnstructuredGrid *UG, vtkPolyData *polydata) ;
+    void ScalarTest(vtkMAFMeshCutter *MMC, vtkUnstructuredGrid *UG, vtkPolyData *polydata) ;
 };
 
 #endif

@@ -28,7 +28,7 @@
 #include "mafGUI.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipePolylineSlice.h"
-#include "mafPipeMeshSlice_BES.h"
+#include "mafPipeMeshSlice.h"
 #include "mafVME.h"
 #include "mafVMEVolume.h"
 #include "mafVMESlicer.h"

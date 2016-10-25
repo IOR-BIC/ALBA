@@ -137,8 +137,8 @@ SET(PROJECT_SRCS
   mafPipeSlice.h
   ############################
   
-  mafPipeMeshSlice_BES.cpp
-  mafPipeMeshSlice_BES.h
+  mafPipeMeshSlice.cpp
+  mafPipeMeshSlice.h
   mafPipePolylineSlice_BES.cpp
   mafPipePolylineSlice_BES.h
   mafPipeSurfaceSlice_BES.cpp

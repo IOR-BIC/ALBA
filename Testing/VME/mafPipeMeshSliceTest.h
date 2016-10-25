@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipeMeshSlice_BESTest
+ Module: mafPipeMeshSliceTest
  Authors: Daniele Giunchi
  
  Copyright (c) B3C
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_mafPipeMeshSlice_BESTest_H__
-#define __CPP_UNIT_mafPipeMeshSlice_BESTest_H__
+#ifndef __CPP_UNIT_mafPipeMeshSliceTest_H__
+#define __CPP_UNIT_mafPipeMeshSliceTest_H__
 
 #include "mafTest.h"
 
@@ -24,7 +24,7 @@ class vtkRenderWindowInteractor;
 class vtkProp;
 class vtkPropCollection;
 
-class mafPipeMeshSlice_BESTest : public mafTest
+class mafPipeMeshSliceTest : public mafTest
 {
   public: 
   // Executed before each test
@@ -33,7 +33,7 @@ class mafPipeMeshSlice_BESTest : public mafTest
   // Executed after each test
   void AfterTest();
 
-	CPPUNIT_TEST_SUITE( mafPipeMeshSlice_BESTest );
+	CPPUNIT_TEST_SUITE( mafPipeMeshSliceTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
 	CPPUNIT_TEST( TestPipeExecution );
   CPPUNIT_TEST( TestPipeExecution_Wireframe );

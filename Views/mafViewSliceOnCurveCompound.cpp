@@ -796,7 +796,7 @@ void mafViewSliceOnCurveCompound::SetSlicePosition(double abscisa, vtkIdType bra
     if (SLICE_VIEW < vws.size())
     {	
       mafViewVTK* vs = ((mafViewVTK*)vws[SLICE_VIEW]);
-      vs->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice_BES");
+      vs->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
     }
   }
 }

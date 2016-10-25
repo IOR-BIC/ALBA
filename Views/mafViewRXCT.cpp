@@ -811,7 +811,7 @@ void mafViewRXCT::PackageView()
   vs->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice",MUTEX);
   vs->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice",MUTEX);
   vs->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice_BES",MUTEX);
+  vs->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice",MUTEX);
   vs->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEMeter", "mafPipePolylineSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEWrappedMeter", "mafPipePolylineSlice",MUTEX);

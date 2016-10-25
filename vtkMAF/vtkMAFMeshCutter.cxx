@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: vtkMAFMeshCutter_BES
+ Module: vtkMAFMeshCutter
  Authors: Nigel McFarlane
  
  Copyright (c) B3C
@@ -14,7 +14,7 @@
 
 =========================================================================*/
 
-#include "vtkMAFMeshCutter_BES.h"
+#include "vtkMAFMeshCutter.h"
 #include "vtkObjectFactory.h"
 #include "vtkPoints.h"
 #include "vtkPointData.h"
@@ -42,14 +42,14 @@
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMAFMeshCutter_BES, "$Revision: 1.1.2.3 $");
-vtkStandardNewMacro(vtkMAFMeshCutter_BES);
+vtkCxxRevisionMacro(vtkMAFMeshCutter, "$Revision: 1.1.2.3 $");
+vtkStandardNewMacro(vtkMAFMeshCutter);
 //------------------------------------------------------------------------------
 #include "mafMemDbg.h"
 
 //------------------------------------------------------------------------------
 // Constructor
-vtkMAFMeshCutter_BES::vtkMAFMeshCutter_BES()
+vtkMAFMeshCutter::vtkMAFMeshCutter()
 //------------------------------------------------------------------------------
 {
   CutFunction = NULL ;
@@ -70,7 +70,7 @@ vtkMAFMeshCutter_BES::vtkMAFMeshCutter_BES()
 
 //------------------------------------------------------------------------------
 // Destructor
-vtkMAFMeshCutter_BES::~vtkMAFMeshCutter_BES()
+vtkMAFMeshCutter::~vtkMAFMeshCutter()
 //------------------------------------------------------------------------------
 {
   UnstructGrid->Delete() ;
@@ -89,7 +89,7 @@ vtkMAFMeshCutter_BES::~vtkMAFMeshCutter_BES()
 //------------------------------------------------------------------------------
 // Overload standard modified time function. If cut function is modified,
 // then this object is modified as well.
-unsigned long vtkMAFMeshCutter_BES::GetMTime()
+unsigned long vtkMAFMeshCutter::GetMTime()
 //------------------------------------------------------------------------------
 {
   unsigned long mTime = this->vtkUnstructuredGridToPolyDataFilter::GetMTime();
@@ -106,7 +106,7 @@ unsigned long vtkMAFMeshCutter_BES::GetMTime()
 
 //------------------------------------------------------------------------------
 // Execute method
-void vtkMAFMeshCutter_BES::Execute()
+void vtkMAFMeshCutter::Execute()
 //------------------------------------------------------------------------------
 {
   vtkUnstructuredGrid* input = this->GetInput();
@@ -168,7 +168,7 @@ void vtkMAFMeshCutter_BES::Execute()
 
 //------------------------------------------------------------------------------
 // Set cutting plane
-void vtkMAFMeshCutter_BES::SetCutFunction(vtkPlane *P)
+void vtkMAFMeshCutter::SetCutFunction(vtkPlane *P)
 //------------------------------------------------------------------------------
 {
   CutFunction = P ;
@@ -176,7 +176,7 @@ void vtkMAFMeshCutter_BES::SetCutFunction(vtkPlane *P)
 
 //------------------------------------------------------------------------------
 // Set cutting plane
-vtkPlane* vtkMAFMeshCutter_BES::GetCutFunction()
+vtkPlane* vtkMAFMeshCutter::GetCutFunction()
 //------------------------------------------------------------------------------
 {
   return CutFunction ;
@@ -185,7 +185,7 @@ vtkPlane* vtkMAFMeshCutter_BES::GetCutFunction()
 //------------------------------------------------------------------------------
 // Find the output point idout corresponding to the input edge (id0,id1)
 // This returns true if the the input edge is in the table
-bool vtkMAFMeshCutter_BES::GetOutputPointWhichCutsEdge(vtkIdType id0, vtkIdType id1, vtkIdType *idout, double *lambda) const
+bool vtkMAFMeshCutter::GetOutputPointWhichCutsEdge(vtkIdType id0, vtkIdType id1, vtkIdType *idout, double *lambda) const
 //------------------------------------------------------------------------------
 {
   unsigned long long key = GetEdgeKey(id0, id1);
@@ -203,7 +203,7 @@ bool vtkMAFMeshCutter_BES::GetOutputPointWhichCutsEdge(vtkIdType id0, vtkIdType 
 //------------------------------------------------------------------------------
 // Find the output point idout corresponding to the single input point id0
 // This returns true if the the input point is in the table
-bool vtkMAFMeshCutter_BES::GetOutputPointWhichCutsPoint(vtkIdType id0, vtkIdType *idout) const
+bool vtkMAFMeshCutter::GetOutputPointWhichCutsPoint(vtkIdType id0, vtkIdType *idout) const
 //------------------------------------------------------------------------------
 {    
   unsigned long long key = id0;
@@ -220,7 +220,7 @@ bool vtkMAFMeshCutter_BES::GetOutputPointWhichCutsPoint(vtkIdType id0, vtkIdType
 //------------------------------------------------------------------------------
 // Get the output cell corresponding to the input cell
 // returns true if the input id was found
-bool vtkMAFMeshCutter_BES::GetOutputCellWhichCutsInputCell(vtkIdType idin, vtkIdType *idout)
+bool vtkMAFMeshCutter::GetOutputCellWhichCutsInputCell(vtkIdType idin, vtkIdType *idout)
 //------------------------------------------------------------------------------
 {
   //BES: this function is not used - it is not optimized
@@ -244,7 +244,7 @@ bool vtkMAFMeshCutter_BES::GetOutputCellWhichCutsInputCell(vtkIdType idin, vtkId
 // Plane is defined by origin and normal.
 // Returns type of intersection.
 // lambda returns fractional distance of interpolated point along edge (0 <= lambda <= 1).
-int vtkMAFMeshCutter_BES::GetIntersectionOfLineWithPlane(const double *p0, const double *p1, const double *origin, const double *norm, double *coords, double *lambda) const
+int vtkMAFMeshCutter::GetIntersectionOfLineWithPlane(const double *p0, const double *p1, const double *origin, const double *norm, double *coords, double *lambda) const
 //------------------------------------------------------------------------------
 {
   int i ;
@@ -289,7 +289,7 @@ int vtkMAFMeshCutter_BES::GetIntersectionOfLineWithPlane(const double *p0, const
 
 //-----------------------------------------------------------------------------
 // Get list of cells which are adjoined to point
-void vtkMAFMeshCutter_BES::GetCellNeighboursOfPoint(vtkIdType idpt, vtkIdList *idlist) const 
+void vtkMAFMeshCutter::GetCellNeighboursOfPoint(vtkIdType idpt, vtkIdList *idlist) const 
 //-----------------------------------------------------------------------------
 {
   // get cell neighbours of point
@@ -302,7 +302,7 @@ void vtkMAFMeshCutter_BES::GetCellNeighboursOfPoint(vtkIdType idpt, vtkIdList *i
 
 //-----------------------------------------------------------------------------
 // Get list of cells which are adjoined to edge
-void vtkMAFMeshCutter_BES::GetCellNeighboursOfEdge(const Edge& edge, vtkIdList *idlist) const
+void vtkMAFMeshCutter::GetCellNeighboursOfEdge(const Edge& edge, vtkIdList *idlist) const
 //-----------------------------------------------------------------------------
 {
   Idlist0->Reset();
@@ -345,7 +345,7 @@ void vtkMAFMeshCutter_BES::GetCellNeighboursOfEdge(const Edge& edge, vtkIdList *
 //------------------------------------------------------------------------
 //computes the intersection of the given plane with the mesh bounding box
 //returns coordinates of the first intersection in pts, returns false, if the bounding box is not intersected
-bool vtkMAFMeshCutter_BES::GetIntersectionOfBoundsWithPlane(const double *origin, 
+bool vtkMAFMeshCutter::GetIntersectionOfBoundsWithPlane(const double *origin, 
                                                             const double *norm, double* pts)
 //------------------------------------------------------------------------
 {
@@ -395,7 +395,7 @@ bool vtkMAFMeshCutter_BES::GetIntersectionOfBoundsWithPlane(const double *origin
 //------------------------------------------------------------------------
 //gets the first cell intersected by the current plane
 //the search starts with cells sharing the given point
-vtkIdType vtkMAFMeshCutter_BES::GetFirstIntersectedCell(vtkIdType ptId)
+vtkIdType vtkMAFMeshCutter::GetFirstIntersectedCell(vtkIdType ptId)
 //------------------------------------------------------------------------
 {
   double* origin = CutTranformedOrigin;
@@ -483,7 +483,7 @@ vtkIdType vtkMAFMeshCutter_BES::GetFirstIntersectedCell(vtkIdType ptId)
 // Find where the edges cross the plane and create polydata points
 // It creates the table EdgeMapping which maps output points to the input mesh.
 // It also creates IntersectedCells, which is a list of the input cells which were intersected.
-void vtkMAFMeshCutter_BES::FindPointsInPlane()
+void vtkMAFMeshCutter::FindPointsInPlane()
 //------------------------------------------------------------------------------
 {
   double* origin = CutTranformedOrigin;
@@ -645,7 +645,7 @@ void vtkMAFMeshCutter_BES::FindPointsInPlane()
 
 //------------------------------------------------------------------------------
 // Get the list of input cells which are attached to the output point
-void vtkMAFMeshCutter_BES::GetInputCellsOnOutputPoint(vtkIdType idout, vtkIdList *cellids) const
+void vtkMAFMeshCutter::GetInputCellsOnOutputPoint(vtkIdType idout, vtkIdList *cellids) const
 //------------------------------------------------------------------------------
 {
   vtkIdType id0, id1 ;
@@ -668,7 +668,7 @@ void vtkMAFMeshCutter_BES::GetInputCellsOnOutputPoint(vtkIdType idout, vtkIdList
 // Create and fill table of cells, PointsInCells.
 // There is an entry for every input cell.
 // Entry i is the list of output points in input cell i.
-void vtkMAFMeshCutter_BES::AssignPointsToCells()
+void vtkMAFMeshCutter::AssignPointsToCells()
 //------------------------------------------------------------------------------
 {
   int i, j ;
@@ -697,7 +697,7 @@ void vtkMAFMeshCutter_BES::AssignPointsToCells()
 //------------------------------------------------------------------------------
 // Are all the point ids members of this face
 // Undefined id's are ignored, eg if the list is {1, 3, -1} and the face is {1, 3, 10, 11}, the result is true
-bool vtkMAFMeshCutter_BES::AllIdsInFace(vtkCell *face, vtkIdList *idlist)
+bool vtkMAFMeshCutter::AllIdsInFace(vtkCell *face, vtkIdList *idlist)
 //------------------------------------------------------------------------------
 {
   int i, j ;
@@ -725,7 +725,7 @@ bool vtkMAFMeshCutter_BES::AllIdsInFace(vtkCell *face, vtkIdList *idlist)
 //------------------------------------------------------------------------------
 // Find a face containing all id's in the list
 // Undefined id's are ignored, ie the result can still be true if some of the id's are undefined
-bool vtkMAFMeshCutter_BES::FindFaceContainingAllIds(vtkCell *cell, vtkIdList *idlist, vtkIdType *faceid)
+bool vtkMAFMeshCutter::FindFaceContainingAllIds(vtkCell *cell, vtkIdList *idlist, vtkIdType *faceid)
 //------------------------------------------------------------------------------
 {
   int nf = cell->GetNumberOfFaces();
@@ -745,7 +745,7 @@ bool vtkMAFMeshCutter_BES::FindFaceContainingAllIds(vtkCell *cell, vtkIdList *id
 // Construct the polygonal slice through the cell
 // This involves putting the intersection points associated with this cell in the correct order to form a polygon.
 // NB If the cell is cut by fewer than 3 points, no polygon is created.
-bool vtkMAFMeshCutter_BES::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList *polygon)
+bool vtkMAFMeshCutter::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList *polygon)
 //------------------------------------------------------------------------------
 {
   int i, j ;
@@ -926,7 +926,7 @@ bool vtkMAFMeshCutter_BES::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList
 
 //------------------------------------------------------------------------------
 // calculate the normal of the output polygon, given the list of point id's
-void vtkMAFMeshCutter_BES::CalculatePolygonNormal(vtkIdList *idlist, double *norm)
+void vtkMAFMeshCutter::CalculatePolygonNormal(vtkIdList *idlist, double *norm)
 //------------------------------------------------------------------------------
 {
   int i, j ;
@@ -976,7 +976,7 @@ void vtkMAFMeshCutter_BES::CalculatePolygonNormal(vtkIdList *idlist, double *nor
 
 //------------------------------------------------------------------------------
 // Transfer the scalars by interpolation from input to output
-void vtkMAFMeshCutter_BES::TransferScalars()
+void vtkMAFMeshCutter::TransferScalars()
 //------------------------------------------------------------------------------
 {
   int i, j ;
@@ -1059,7 +1059,7 @@ void vtkMAFMeshCutter_BES::TransferScalars()
 
 //------------------------------------------------------------------------------
 // Initialize the cutter
-void vtkMAFMeshCutter_BES::Initialize()
+void vtkMAFMeshCutter::Initialize()
 //------------------------------------------------------------------------------
 {
   EdgeMapping.clear();
@@ -1077,7 +1077,7 @@ void vtkMAFMeshCutter_BES::Initialize()
 //------------------------------------------------------------------------------
 // Create the polydata slice
 // There must have been a call to UnstructGrid->BuildLinks() for this to work
-void vtkMAFMeshCutter_BES::CreateSlice()
+void vtkMAFMeshCutter::CreateSlice()
 //------------------------------------------------------------------------------
 {
   int i ;
@@ -1120,7 +1120,7 @@ void vtkMAFMeshCutter_BES::CreateSlice()
 
 //------------------------------------------------------------------------------
 // print self
-void vtkMAFMeshCutter_BES::PrintSelf(ostream& os, vtkIndent indent)
+void vtkMAFMeshCutter::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 {
   int i, j, ni ;
@@ -1178,7 +1178,7 @@ void vtkMAFMeshCutter_BES::PrintSelf(ostream& os, vtkIndent indent)
 
 }
 
-void vtkMAFMeshCutter_BES::ToRotationMatrix(vtkMatrix4x4 *matrix)
+void vtkMAFMeshCutter::ToRotationMatrix(vtkMatrix4x4 *matrix)
 {
 	//remove translation components
 	matrix->SetElement(0,3,0);
@@ -1186,7 +1186,7 @@ void vtkMAFMeshCutter_BES::ToRotationMatrix(vtkMatrix4x4 *matrix)
 	matrix->SetElement(2,3,0);
 }
 
-void vtkMAFMeshCutter_BES::CalculateLocalCutCoord()
+void vtkMAFMeshCutter::CalculateLocalCutCoord()
 {
 	//Getting Mesh coordinates
 	vtkLinearTransform *trans=vtkLinearTransform::SafeDownCast(CutFunction->GetTransform());

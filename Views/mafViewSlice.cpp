@@ -30,7 +30,7 @@ const bool DEBUG_MODE = false;
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice_BES.h"
 #include "mafPipePolylineSlice_BES.h"
-#include "mafPipeMeshSlice_BES.h"
+#include "mafPipeMeshSlice.h"
 
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipePolylineSlice.h"
@@ -356,7 +356,7 @@ void mafViewSlice::VmeCreatePipe(mafVME *vme)
             else
               ((mafPipePolylineGraphEditor *)pipe)->SetModalitySlice();				
           }
-          else if(pipe->IsA("mafPipeMeshSlice_BES"))  {
+          else if(pipe->IsA("mafPipeMeshSlice"))  {
             m_CurrentMesh.push_back(n);        
           }
 
@@ -371,7 +371,7 @@ void mafViewSlice::VmeCreatePipe(mafVME *vme)
         else
         {
           //BES: 12.6.2009 - TODO: this code should be removed when
-          //mafPipeSurfaceSlice_BES, mafPipePolylineSlice_BES and mafPipeMeshSlice_BES
+          //mafPipeSurfaceSlice_BES, mafPipePolylineSlice_BES and mafPipeMeshSlice
           //are committed down and instead of it, the code above should work (after _BES suffices are stripped)
 
           if(pipe_name.Equals("mafPipeSurfaceSlice"))
