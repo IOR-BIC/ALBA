@@ -34,7 +34,7 @@ const bool DEBUG_MODE = false;
 
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipePolylineSlice.h"
-#include "mafPipeMeshSlice.h"
+#include "mafPipeMeshSlice_BES.h"
 
 #include "mafVMEVolumeGray.h"
 #include "mafVMELandmarkCloud.h"
@@ -816,15 +816,6 @@ void mafViewSliceGlobal::SetSlice(double* Origin, double* Normal)
       mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curMeshPipe);
       if (pipe != NULL){
         pipe->SetSlice(coord, normal); 
-      }
-      else
-      {
-        mafPipeMeshSlice* pipe = mafPipeMeshSlice::SafeDownCast(curMeshPipe);
-        if (pipe != NULL) 
-        {
-          pipe->SetSlice(coord); 
-          pipe->SetNormal(normal); 
-        }
       }
     }   
   }

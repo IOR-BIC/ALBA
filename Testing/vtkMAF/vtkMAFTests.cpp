@@ -25,7 +25,6 @@
 
 #include "vtkMAFContourVolumeMapperTest.h"
 #include "vtkMAFRemoveCellsFilterTest.h"
-#include "vtkMAFMeshCutterTest.h"
 #include "vtkMAFPolyDataToSinglePolyLineTest.h"
 #include "vtkMAFTextOrientatorTest.h"
 #include "vtkMAFGlobalAxisCoordinateTest.h"
@@ -138,7 +137,6 @@ int
 
 	runner.addTest(vtkMAFContourVolumeMapperTest::suite());
 	runner.addTest(vtkMAFRemoveCellsFilterTest::suite());
-	runner.addTest(vtkMAFMeshCutterTest::suite());
 	runner.addTest(vtkMAFPolyDataToSinglePolyLineTest::suite());
 	runner.addTest(vtkMAFTextOrientatorTest::suite());
 	runner.addTest(vtkMAFGlobalAxisCoordinateTest::suite());

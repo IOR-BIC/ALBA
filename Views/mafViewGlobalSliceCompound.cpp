@@ -121,7 +121,7 @@ void mafViewGlobalSliceCompound::PackageView()
   m_ViewGlobalSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
 	m_ViewGlobalSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
   m_ViewGlobalSlice->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice");
-  m_ViewGlobalSlice->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
+  m_ViewGlobalSlice->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice_BES");
   m_ViewGlobalSlice->PlugVisualPipe("mafVMEAnalog", "mafPipeBox", NON_VISIBLE);
   m_ViewGlobalSlice->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice");
   m_ViewGlobalSlice->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice");

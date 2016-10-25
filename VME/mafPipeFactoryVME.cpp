@@ -47,7 +47,6 @@
 #include "mafPipeImage3D.h"
 #include "mafPipeVector.h"
 #include "mafPipeMesh.h"
-#include "mafPipeMeshSlice.h"
 #include "mafPipeScalar.h"
 #include "mafVisualPipeVolumeRayCasting.h"
 
@@ -155,7 +154,6 @@ mafPipeFactoryVME::mafPipeFactoryVME()
 #endif
   mafPlugPipeMacro(mafPipeImage3D,"Pipe for render images");
 	mafPlugPipeMacro(mafPipeMesh,"Pipe for render Mesh");
-	mafPlugPipeMacro(mafPipeMeshSlice,"Pipe for render a slice of a Mesh");
   mafPlugPipeMacro(mafPipeScalar,"Pipe for render scalar data");
   mafPlugPipeMacro(mafVisualPipeVolumeRayCasting,"Pipe for render volume data with Ray Cast method.");
 

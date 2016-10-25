@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: vtkMAFMeshCutter_BESTest
- Authors: Roberto Mucci
+ Authors: Nigel McFarlane, Roberto Mucci
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or

@@ -116,7 +116,7 @@ void mafViewSingleSliceCompound::PackageView()
 	m_ViewSingleSlice->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice");
   m_ViewSingleSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
 	m_ViewSingleSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
-	m_ViewSingleSlice->PlugVisualPipe("mafVMEMesh","mafPipeMeshSlice");
+	m_ViewSingleSlice->PlugVisualPipe("mafVMEMesh","mafPipeMeshSlice_BES");
   m_ViewSingleSlice->PlugVisualPipe("mafVMEMeter","mafPipePolylineSlice");
 
 	PlugChildView(m_ViewSingleSlice);

@@ -34,7 +34,6 @@ const bool DEBUG_MODE = false;
 
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipePolylineSlice.h"
-#include "mafPipeMeshSlice.h"
 
 #include "mafVME.h"
 #include "mafVMEVolume.h"
@@ -398,17 +397,6 @@ void mafViewSlice::VmeCreatePipe(mafVME *vme)
             MultiplyPointByInputVolumeABSMatrix(positionSlice);
             ((mafPipePolylineSlice *)pipe)->SetSlice(positionSlice);
             ((mafPipePolylineSlice *)pipe)->SetNormal(m_SliceNormal);
-          }          
-          else if(pipe_name.Equals("mafPipeMeshSlice"))
-          {
-            m_CurrentMesh.push_back(n);
-            double positionSlice[3];
-            positionSlice[0] = m_Slice[0];
-            positionSlice[1] = m_Slice[1];
-            positionSlice[2] = m_Slice[2];
-            MultiplyPointByInputVolumeABSMatrix(positionSlice);
-            ((mafPipeMeshSlice *)pipe)->SetSlice(positionSlice);
-            ((mafPipeMeshSlice *)pipe)->SetNormal(m_SliceNormal);
           }
         }
       } //end else [it is not volume slicing]                     
@@ -665,23 +653,10 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
 
   for(int i = 0; i < m_CurrentMesh.size();i++)
   {
-		mafPipe * curMeshPipe = m_CurrentMesh.at(i)->GetPipe();
+		mafPipeSlice * curMeshPipe = mafPipeSlice::SafeDownCast(m_CurrentMesh.at(i)->GetPipe());
     if (curMeshPipe)
     {
-      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curMeshPipe);
-      if (pipe != NULL){
-        pipe->SetSlice(coord, m_SliceNormal); 
-      }
-      else
-      {
-        //BES: 12.6.2009 - TODO: this branch should be removed when mafPipeSurfaceSlice_BES committed down
-        mafPipeMeshSlice* pipe = mafPipeMeshSlice::SafeDownCast(curMeshPipe);
-        if (pipe != NULL) 
-        {
-          pipe->SetSlice(coord); 
-          pipe->SetNormal(m_SliceNormal); 
-        }
-      }
+			curMeshPipe->SetSlice(coord, m_SliceNormal);
     }   
   }
 

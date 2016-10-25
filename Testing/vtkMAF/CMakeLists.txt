@@ -19,7 +19,6 @@ SET(PROJECT_SRCS
 	vtkMAFTests.h vtkMAFTests.cpp
 	vtkMAFContourVolumeMapperTest.h vtkMAFContourVolumeMapperTest.cpp
 	vtkMAFRemoveCellsFilterTest.h vtkMAFRemoveCellsFilterTest.cpp
-	vtkMAFMeshCutterTest.h vtkMAFMeshCutterTest.cpp
 	vtkMAFPolyDataToSinglePolyLineTest.h vtkMAFPolyDataToSinglePolyLineTest.cpp
 	vtkMAFTextOrientatorTest.h vtkMAFTextOrientatorTest.cpp
 	vtkMAFGlobalAxisCoordinateTest.h vtkMAFGlobalAxisCoordinateTest.cpp

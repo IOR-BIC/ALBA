@@ -23,7 +23,6 @@ SET(PROJECT_SRCS
 	mafVMEPolylineSplineTest.h mafVMEPolylineSplineTest.cpp
 	mafVMEMeshTest.h mafVMEMeshTest.cpp
 	mafPipeMeshTest.h mafPipeMeshTest.cpp
-	mafPipeMeshSliceTest.h mafPipeMeshSliceTest.cpp
 	mafVMELandmarkTest.h mafVMELandmarkTest.cpp
 	mafVMELandmarkCloudTest.h mafVMELandmarkCloudTest.cpp
 	mafMatrixVectorTest.h mafMatrixVectorTest.cpp

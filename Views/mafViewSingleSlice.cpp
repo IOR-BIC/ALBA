@@ -44,7 +44,7 @@
 #include "mafGUIFloatSlider.h"
 #include "mafVMEIterator.h"
 #include "mafVMEGizmo.h"
-#include "mafPipeMeshSlice.h"
+#include "mafPipeMeshSlice_BES.h"
 #include "mafGUI.h"
 
 #include "vtkDataSet.h"
@@ -322,7 +322,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
 		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_Slice);
 				((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
       }
-			else if(pipe_name.Equals("mafPipeMeshSlice"))
+			else if(pipe_name.Equals("mafPipeMeshSlice_BES"))
 			{
 				double normal[3];
 				switch(m_CameraPositionId)
@@ -354,8 +354,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
 					normal[2] = 1;
 				}
 
-				((mafPipeMeshSlice *)pipe)->SetSlice(m_Slice);
-				((mafPipeMeshSlice *)pipe)->SetNormal(normal);
+				((mafPipeMeshSlice_BES *)pipe)->SetSlice(m_Slice, normal);
 			}
 			else if(pipe_name.Equals("mafPipePolylineSlice"))
 			{
@@ -517,6 +516,8 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 				mafVMEIterator *iter = m_CurrentVolume->GetVme()->GetRoot()->NewIterator();
 				for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 				{
+
+					//TODO: Remove this on clean bes files
 					if(node->IsA("mafVMESurface"))
 					{
 						mafPipeSurfaceSlice *p= mafPipeSurfaceSlice::SafeDownCast(this->GetNodePipe(node));
@@ -529,12 +530,11 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 						if(p)
 							((mafPipePolylineSlice *)p)->SetSlice(m_OriginVolume);
 					}
-					if(node->IsA("mafVMEMesh"))
-					{
-						mafPipeMeshSlice *p= mafPipeMeshSlice::SafeDownCast(this->GetNodePipe(node));
-						if(p)
-							((mafPipeMeshSlice *)p)->SetSlice(m_OriginVolume);
-					}
+
+					mafPipeSlice *pipeSlice = mafPipeSlice::SafeDownCast(this->GetNodePipe(node));
+					if(pipeSlice)
+							pipeSlice->SetSlice(m_OriginVolume,NULL);
+					
 				}
         iter->Delete();
 			}

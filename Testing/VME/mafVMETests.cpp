@@ -35,7 +35,6 @@
 #include "mafVMEPolylineSplineTest.h"
 #include "mafVMEMeshTest.h"
 #include "mafPipeMeshTest.h"
-#include "mafPipeMeshSliceTest.h"
 #include "mafVMELandmarkTest.h"
 #include "mafVMELandmarkCloudTest.h"
 #include "mafMatrixVectorTest.h"
@@ -183,7 +182,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafVMEPolylineSplineTest::suite());
 	runner.addTest(mafVMEMeshTest::suite());
 	runner.addTest(mafPipeMeshTest::suite());
-	runner.addTest(mafPipeMeshSliceTest::suite());
 	runner.addTest(mafVMELandmarkTest::suite());
 	runner.addTest(mafVMELandmarkCloudTest::suite());
 	runner.addTest(mafMatrixVectorTest::suite());

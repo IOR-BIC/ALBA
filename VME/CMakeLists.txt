@@ -38,8 +38,6 @@ SET(PROJECT_SRCS
   mafPipeMesh.cpp mafPipeMesh.h
 	mafPipeSurface.cpp mafPipeSurface.h
 	mafPipeRefSys.cpp mafPipeRefSys.h
-  mafPipeMeshSlice.cpp
-  mafPipeMeshSlice.h
   mafPipeScalar.cpp
   mafPipeScalar.h
   mafVisualPipeVolumeRayCasting.cpp
