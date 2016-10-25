@@ -387,8 +387,7 @@ void mafViewGlobalSlice::VmeCreatePipe(mafVME *vme)
         positionSlice[0] = m_SliceOrigin[0];
         positionSlice[1] = m_SliceOrigin[1];
         positionSlice[2] = m_SliceOrigin[2];
-        ((mafPipeMeshSlice *)pipe)->SetSlice(positionSlice);
-        ((mafPipeMeshSlice *)pipe)->SetNormal(DoubleNormal);
+        ((mafPipeMeshSlice *)pipe)->SetSlice(positionSlice, DoubleNormal);
       }
       pipe->Create(n);
 
@@ -677,12 +676,11 @@ void mafViewGlobalSlice::UpdateSlice()
       if(vme->IsA("mafVMEMesh"))
       {
 				mafPipeMeshSlice * pipe = (mafPipeMeshSlice *)node->GetPipe();
-        pipe->SetSlice(m_SliceOrigin);
         double DoubleNormal[3];
         DoubleNormal[0]=(double)m_SliceNormal[0];
         DoubleNormal[1]=(double)m_SliceNormal[1];
         DoubleNormal[2]=(double)m_SliceNormal[2];
-        pipe->SetNormal(DoubleNormal);
+				pipe->SetSlice(m_SliceOrigin, DoubleNormal);
       }
       else if (output->IsA("mafVMEOutputVolume"))
 			{

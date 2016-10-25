@@ -35,7 +35,6 @@
 #include "mafVMEPolylineSplineTest.h"
 #include "mafVMEMeshTest.h"
 #include "mafPipeMeshTest.h"
-#include "mafPipeMeshSliceTest.h"
 #include "mafVMELandmarkTest.h"
 #include "mafVMELandmarkCloudTest.h"
 #include "mafMatrixVectorTest.h"
@@ -101,7 +100,7 @@
 #include "mafVMESurfaceEditorTest.h"
 #include "mafPipePolylineGraphEditorTest.h"
 #include "mafVMEPolylineEditorTest.h"
-#include "mafPipeMeshSlice_BESTest.h"
+#include "mafPipeMeshSliceTest.h"
 #include "mafPipeSurfaceSlice_BESTest.h"
 #include "mafPipeVolumeSliceTest.h"
 #include "mafVMEMapsTest.h"
@@ -183,7 +182,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafVMEPolylineSplineTest::suite());
 	runner.addTest(mafVMEMeshTest::suite());
 	runner.addTest(mafPipeMeshTest::suite());
-	runner.addTest(mafPipeMeshSliceTest::suite());
 	runner.addTest(mafVMELandmarkTest::suite());
 	runner.addTest(mafVMELandmarkCloudTest::suite());
 	runner.addTest(mafMatrixVectorTest::suite());
@@ -249,7 +247,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafVMESurfaceEditorTest::suite());
 	runner.addTest(mafPipePolylineGraphEditorTest::suite());
 	runner.addTest(mafVMEPolylineEditorTest::suite());
-	runner.addTest(mafPipeMeshSlice_BESTest::suite());
+	runner.addTest(mafPipeMeshSliceTest::suite());
 	runner.addTest(mafPipeSurfaceSlice_BESTest::suite());
 	runner.addTest(mafPipeVolumeSliceTest::suite());
 	runner.addTest(mafVMEMapsTest::suite());

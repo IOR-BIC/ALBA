@@ -36,11 +36,21 @@ class mafPipeMeshSliceTest : public mafTest
 	CPPUNIT_TEST_SUITE( mafPipeMeshSliceTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
 	CPPUNIT_TEST( TestPipeExecution );
+  CPPUNIT_TEST( TestPipeExecution_Wireframe );
+  CPPUNIT_TEST( TestPipeExecution_WiredActorVisibility );
+  CPPUNIT_TEST( TestPipeExecution_FlipNormal );
+  CPPUNIT_TEST( TestPipeExecution_UseVTKProperty );
+  CPPUNIT_TEST( TestPipeExecution_Thickness_PickActor );
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();
 	void TestPipeExecution();
+  void TestPipeExecution_Wireframe();
+  void TestPipeExecution_WiredActorVisibility();
+  void TestPipeExecution_FlipNormal();
+  void TestPipeExecution_UseVTKProperty();
+  void TestPipeExecution_Thickness_PickActor();
 
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
 

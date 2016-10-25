@@ -34,7 +34,6 @@
 #include "mafVMERoot.h"
 #include "vtkMAFAssembly.h"
 
-#include "vtkMapper.h"
 #include "vtkPointData.h"
 #include "mmaMaterial.h"
 
@@ -45,6 +44,8 @@
 
 #include <iostream>
 #include <fstream>
+#include "vtkActor.h"
+#include "vtkMapper.h"
 
 enum PIPE_MESH_ACTORS
   {
@@ -79,10 +80,22 @@ void mafPipeMeshSliceTest::BeforeTest()
 void mafPipeMeshSliceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
   vtkDEL(m_RenderWindowInteractor);
+  vtkDEL(m_RenderWindow);
+  vtkDEL(m_Renderer);
 }
+
+enum ID_TEST
+{
+  ID_TEST_PIPEEXECUTION = 0,
+  ID_TEST_PIPEEXECUTION_WIREFRAME = 10,
+  ID_TEST_PIPEEXECUTION_WIRED_ACTOR_VISIBILITY = 20,
+  ID_TEST_PIPEEXECUTION_FLIP_NORMAL = 30,
+  ID_TEST_PIPEEXECUTION_SCALAR_MAP_ACTIVE = 40,
+  ID_TEST_PIPEEXECUTION_USE_VTK_PROPERTY = 50,
+  ID_TEST_PIPEEXECUTION_THICKNESS = 60,
+};
+
 //----------------------------------------------------------------------------
 void mafPipeMeshSliceTest::TestPipeExecution()
 //----------------------------------------------------------------------------
@@ -104,6 +117,7 @@ void mafPipeMeshSliceTest::TestPipeExecution()
   mesh->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
   mesh->Update();
   
+
   double center[3];
   mesh->GetOutput()->GetVTKData()->GetCenter(center);
 
@@ -125,8 +139,8 @@ void mafPipeMeshSliceTest::TestPipeExecution()
   normal[1] = 0.0; 
   normal[2] = 1.0;
 
-  pipeMeshSlice->SetNormal(normal);
-  pipeMeshSlice->SetSlice(origin);
+  //pipeMeshSlice->SetNormal(normal);
+  pipeMeshSlice->SetSlice(origin,normal);
   pipeMeshSlice->Create(sceneNode);
   
   ////////// ACTORS List ///////////////
@@ -196,14 +210,669 @@ void mafPipeMeshSliceTest::TestPipeExecution()
 
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
-		printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
+		printf("\n Visualization: %s \n", strings[arrayIndex]);
 
-		COMPARE_IMAGES("TestPipeExecution", arrayIndex);
+		COMPARE_IMAGES("TestPipeExecution", ID_TEST_PIPEEXECUTION + arrayIndex);
   }
 
-	delete sceneNode;
+  vtkDEL(actorList);
+
+  delete sceneNode;
+
+  cppDEL(Importer);
+  mafDEL(storage);
+}
+//----------------------------------------------------------------------------
+void mafPipeMeshSliceTest::TestPipeExecution_Wireframe()
+//----------------------------------------------------------------------------
+{
+  ////// Create VME (import vtkData) ////////////////////
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+  mafOpImporterVTK *Importer=new mafOpImporterVTK("importer");
+  mafString filename=MAF_DATA_ROOT;
+  filename<<"/FEM/pipemesh/hex8.vtk";
+  Importer->TestModeOn();
+  Importer->SetFileName(filename);
+  Importer->SetInput(storage->GetRoot());
+  Importer->ImportVTK();
+  mafVMEMesh *mesh;
+  mesh =mafVMEMesh::SafeDownCast(Importer->GetOutput());
+  mesh->GetMaterial();
+  mesh->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+  mesh->Update();
+
+
+  double center[3];
+  mesh->GetOutput()->GetVTKData()->GetCenter(center);
+
+  //Assembly will be create when instancing mafSceneNode
+  mafSceneNode *sceneNode;
+  sceneNode = new mafSceneNode(NULL,NULL,mesh, NULL);
+
+  /////////// Pipe Instance and Creation ///////////
+  mafPipeMeshSlice *pipeMeshSlice = new mafPipeMeshSlice;
+  pipeMeshSlice->SetScalarMapActive(1);
+  double origin[3], normal[3];
+
+  //set origin and normal value
+  origin[0] = 0.0;
+  origin[1] = 0.0;
+  origin[2] = 0.3;
+
+  normal[0] = 0.0;
+  normal[1] = 0.0; 
+  normal[2] = 1.0;
+
+  //pipeMeshSlice->SetNormal(normal);
+  pipeMeshSlice->SetSlice(origin,normal);
+  pipeMeshSlice->Create(sceneNode);
+
+  pipeMeshSlice->SetWireframeOn();
+  pipeMeshSlice->OnEvent(&mafEvent(this, VME_TIME_SET));
+  ////////// ACTORS List ///////////////
+  vtkPropCollection *actorList = vtkPropCollection::New();
+  pipeMeshSlice->GetAssemblyFront()->GetActors(actorList);
+
+  actorList->InitTraversal();
+  vtkProp *actor = actorList->GetNextProp();
+  while(actor)
+  { 
+    m_Renderer->AddActor(actor);
+    m_RenderWindow->Render();
+
+    actor = actorList->GetNextProp();
+  }
+
+  const char *strings[5];
+  strings[0] = "Id"; //point 
+
+  strings[1] = "Material"; //cell 
+  strings[2] = "EX";
+  strings[3] = "NUXY";
+  strings[4] = "DENS";
+
+  for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
+  {
+    double controlValues[2] = {-9999,-9999};
+    switch(arrayIndex)
+    {
+    case 0:
+      {
+        controlValues[0] = 1.0;
+        controlValues[1] = 12.0;
+      }
+      break;
+    case 1:
+      {
+        controlValues[0] = 2.0; 
+        controlValues[1] = 3.0;
+      }
+      break;
+    case 2:
+      {
+        controlValues[0] = 1000.0;
+        controlValues[1] = 200000.0;
+      }
+      break;
+    case 3:
+      {
+        controlValues[0] = 0.33;
+        controlValues[1] =  0.39 ;
+      }
+      break;
+    case 4:
+      {
+        controlValues[0] = 0.107;
+        controlValues[1] = 1.07;
+      }
+      break;
+    }
+    pipeMeshSlice->SetActiveScalar(arrayIndex);
+    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice::ID_SCALARS));
+
+    vtkActor *meshActor;
+    meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
+    CPPUNIT_ASSERT(meshActor != NULL);
+
+    ProceduralControl(controlValues, meshActor);
+    m_RenderWindow->Render();
+    printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
+
+		COMPARE_IMAGES("TestPipeExecution_Wireframe", ID_TEST_PIPEEXECUTION_WIREFRAME + arrayIndex);
+  }
 
   vtkDEL(actorList);
+
+  delete sceneNode;
+
+  cppDEL(Importer);
+  mafDEL(storage);
+
+}
+//----------------------------------------------------------------------------
+void mafPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
+//----------------------------------------------------------------------------
+{
+  ////// Create VME (import vtkData) ////////////////////
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+  mafOpImporterVTK *Importer=new mafOpImporterVTK("importer");
+  mafString filename=MAF_DATA_ROOT;
+  filename<<"/FEM/pipemesh/hex8.vtk";
+  Importer->TestModeOn();
+  Importer->SetFileName(filename);
+  Importer->SetInput(storage->GetRoot());
+  Importer->ImportVTK();
+  mafVMEMesh *mesh;
+  mesh =mafVMEMesh::SafeDownCast(Importer->GetOutput());
+  mesh->GetMaterial();
+  mesh->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+  mesh->Update();
+	
+  double center[3];
+  mesh->GetOutput()->GetVTKData()->GetCenter(center);
+
+  //Assembly will be create when instancing mafSceneNode
+  mafSceneNode *sceneNode;
+  sceneNode = new mafSceneNode(NULL,NULL,mesh, NULL);
+
+  /////////// Pipe Instance and Creation ///////////
+  mafPipeMeshSlice *pipeMeshSlice = new mafPipeMeshSlice;
+  pipeMeshSlice->SetScalarMapActive(1);
+  double origin[3], normal[3];
+
+  //set origin and normal value
+  origin[0] = 0.0;
+  origin[1] = 0.0;
+  origin[2] = 0.3;
+
+  normal[0] = 0.0;
+  normal[1] = 0.0; 
+  normal[2] = 1.0;
+
+  //pipeMeshSlice->SetNormal(normal);
+  pipeMeshSlice->SetSlice(origin,normal);
+  pipeMeshSlice->Create(sceneNode);
+
+  pipeMeshSlice->SetWiredActorVisibilityOff();
+  pipeMeshSlice->SetWireframeOff();
+  pipeMeshSlice->OnEvent(&mafEvent(this, VME_TIME_SET));
+  ////////// ACTORS List ///////////////
+  vtkPropCollection *actorList = vtkPropCollection::New();
+  pipeMeshSlice->GetAssemblyFront()->GetActors(actorList);
+
+  actorList->InitTraversal();
+  vtkProp *actor = actorList->GetNextProp();
+  while(actor)
+  { 
+    m_Renderer->AddActor(actor);
+    m_RenderWindow->Render();
+
+    actor = actorList->GetNextProp();
+  }
+
+  const char *strings[5];
+  strings[0] = "Id"; //point 
+
+  strings[1] = "Material"; //cell 
+  strings[2] = "EX";
+  strings[3] = "NUXY";
+  strings[4] = "DENS";
+
+  for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
+  {
+    double controlValues[2] = {-9999,-9999};
+    switch(arrayIndex)
+    {
+    case 0:
+      {
+        controlValues[0] = 1.0;
+        controlValues[1] = 12.0;
+      }
+      break;
+    case 1:
+      {
+        controlValues[0] = 2.0; 
+        controlValues[1] = 3.0;
+      }
+      break;
+    case 2:
+      {
+        controlValues[0] = 1000.0;
+        controlValues[1] = 200000.0;
+      }
+      break;
+    case 3:
+      {
+        controlValues[0] = 0.33;
+        controlValues[1] =  0.39 ;
+      }
+      break;
+    case 4:
+      {
+        controlValues[0] = 0.107;
+        controlValues[1] = 1.07;
+      }
+      break;
+    }
+    pipeMeshSlice->SetActiveScalar(arrayIndex);
+    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice::ID_SCALARS));
+
+    vtkActor *meshActor;
+    meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
+    CPPUNIT_ASSERT(meshActor != NULL);
+
+    ProceduralControl(controlValues, meshActor);
+    m_RenderWindow->Render();
+    printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
+
+		COMPARE_IMAGES("TestPipeExecution_WiredActorVisibility", ID_TEST_PIPEEXECUTION_WIRED_ACTOR_VISIBILITY + arrayIndex);
+  }
+
+  vtkDEL(actorList);
+
+  delete sceneNode;
+
+  cppDEL(Importer);
+  mafDEL(storage);
+
+}
+//----------------------------------------------------------------------------
+void mafPipeMeshSliceTest::TestPipeExecution_FlipNormal()
+//----------------------------------------------------------------------------
+{
+  ////// Create VME (import vtkData) ////////////////////
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+  mafOpImporterVTK *Importer=new mafOpImporterVTK("importer");
+  mafString filename=MAF_DATA_ROOT;
+  filename<<"/FEM/pipemesh/hex8.vtk";
+  Importer->TestModeOn();
+  Importer->SetFileName(filename);
+  Importer->SetInput(storage->GetRoot());
+  Importer->ImportVTK();
+  mafVMEMesh *mesh;
+  mesh =mafVMEMesh::SafeDownCast(Importer->GetOutput());
+  mesh->GetMaterial();
+  mesh->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+  mesh->Update();
+	
+  double center[3];
+  mesh->GetOutput()->GetVTKData()->GetCenter(center);
+
+  //Assembly will be create when instancing mafSceneNode
+  mafSceneNode *sceneNode;
+  sceneNode = new mafSceneNode(NULL,NULL,mesh, NULL);
+
+  /////////// Pipe Instance and Creation ///////////
+  mafPipeMeshSlice *pipeMeshSlice = new mafPipeMeshSlice;
+  pipeMeshSlice->SetScalarMapActive(1);
+
+  double origin[3], normal[3];
+
+  //set origin and normal value
+  origin[0] = 0.0;
+  origin[1] = 0.0;
+  origin[2] = 0.3;
+
+  normal[0] = 0.0;
+  normal[1] = 0.0; 
+  normal[2] = 1.0;
+
+  //pipeMeshSlice->SetNormal(normal);
+  pipeMeshSlice->SetSlice(origin,normal);
+  pipeMeshSlice->Create(sceneNode);
+
+  pipeMeshSlice->SetFlipNormalOn();
+  pipeMeshSlice->OnEvent(&mafEvent(this, VME_TIME_SET));
+  ////////// ACTORS List ///////////////
+  vtkPropCollection *actorList = vtkPropCollection::New();
+  pipeMeshSlice->GetAssemblyFront()->GetActors(actorList);
+
+  actorList->InitTraversal();
+  vtkProp *actor = actorList->GetNextProp();
+  while(actor)
+  { 
+    m_Renderer->AddActor(actor);
+    m_RenderWindow->Render();
+
+    actor = actorList->GetNextProp();
+  }
+
+  const char *strings[5];
+  strings[0] = "Id"; //point 
+
+  strings[1] = "Material"; //cell 
+  strings[2] = "EX";
+  strings[3] = "NUXY";
+  strings[4] = "DENS";
+
+  for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
+  {
+    double controlValues[2] = {-9999,-9999};
+    switch(arrayIndex)
+    {
+    case 0:
+      {
+        controlValues[0] = 1.0;
+        controlValues[1] = 12.0;
+      }
+      break;
+    case 1:
+      {
+        controlValues[0] = 2.0; 
+        controlValues[1] = 3.0;
+      }
+      break;
+    case 2:
+      {
+        controlValues[0] = 1000.0;
+        controlValues[1] = 200000.0;
+      }
+      break;
+    case 3:
+      {
+        controlValues[0] = 0.33;
+        controlValues[1] =  0.39 ;
+      }
+      break;
+    case 4:
+      {
+        controlValues[0] = 0.107;
+        controlValues[1] = 1.07;
+      }
+      break;
+    }
+    pipeMeshSlice->SetActiveScalar(arrayIndex);
+    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice::ID_SCALARS));
+
+    vtkActor *meshActor;
+    meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
+    CPPUNIT_ASSERT(meshActor != NULL);
+
+    ProceduralControl(controlValues, meshActor);
+    m_RenderWindow->Render();
+    printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
+
+    COMPARE_IMAGES("TestPipeExecution_FlipNormal", ID_TEST_PIPEEXECUTION_FLIP_NORMAL+arrayIndex);
+  }
+
+  vtkDEL(actorList);
+
+  delete sceneNode;
+
+  cppDEL(Importer);
+  mafDEL(storage);
+
+}
+//----------------------------------------------------------------------------
+void mafPipeMeshSliceTest::TestPipeExecution_UseVTKProperty()
+//----------------------------------------------------------------------------
+{
+  ////// Create VME (import vtkData) ////////////////////
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+  mafOpImporterVTK *Importer=new mafOpImporterVTK("importer");
+  mafString filename=MAF_DATA_ROOT;
+  filename<<"/FEM/pipemesh/hex8.vtk";
+  Importer->TestModeOn();
+  Importer->SetFileName(filename);
+  Importer->SetInput(storage->GetRoot());
+  Importer->ImportVTK();
+  mafVMEMesh *mesh;
+  mesh =mafVMEMesh::SafeDownCast(Importer->GetOutput());
+  mesh->GetMaterial();
+  mesh->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+  mesh->Update();
+	
+	//Setting standard material to avoid random color selection
+	mesh->GetMaterial()->m_Diffuse[0]=0.3;
+	mesh->GetMaterial()->m_Diffuse[1]=0.6;
+	mesh->GetMaterial()->m_Diffuse[2]=0.9;
+	mesh->GetMaterial()->UpdateProp();
+	
+  double center[3];
+  mesh->GetOutput()->GetVTKData()->GetCenter(center);
+
+  //Assembly will be create when instancing mafSceneNode
+  mafSceneNode *sceneNode;
+  sceneNode = new mafSceneNode(NULL,NULL,mesh, NULL);
+
+  /////////// Pipe Instance and Creation ///////////
+  mafPipeMeshSlice *pipeMeshSlice = new mafPipeMeshSlice;
+  pipeMeshSlice->SetScalarMapActive(0);
+  
+  double origin[3], normal[3];
+
+  //set origin and normal value
+  origin[0] = 0.0;
+  origin[1] = 0.0;
+  origin[2] = 0.3;
+
+  normal[0] = 0.0;
+  normal[1] = 0.0; 
+  normal[2] = 1.0;
+
+  //pipeMeshSlice->SetNormal(normal);
+  pipeMeshSlice->SetSlice(origin,normal);
+  pipeMeshSlice->Create(sceneNode);
+
+  pipeMeshSlice->SetUseVTKProperty(1);
+  pipeMeshSlice->OnEvent(&mafEvent(this, VME_TIME_SET));
+  ////////// ACTORS List ///////////////
+  vtkPropCollection *actorList = vtkPropCollection::New();
+  pipeMeshSlice->GetAssemblyFront()->GetActors(actorList);
+
+  actorList->InitTraversal();
+  vtkProp *actor = actorList->GetNextProp();
+  while(actor)
+  { 
+    m_Renderer->AddActor(actor);
+    m_RenderWindow->Render();
+
+    actor = actorList->GetNextProp();
+  }
+
+  const char *strings[5];
+  strings[0] = "Id"; //point 
+
+  strings[1] = "Material"; //cell 
+  strings[2] = "EX";
+  strings[3] = "NUXY";
+  strings[4] = "DENS";
+
+  for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
+  {
+    double controlValues[2] = {-9999,-9999};
+    switch(arrayIndex)
+    {
+    case 0:
+      {
+        controlValues[0] = 1.0;
+        controlValues[1] = 12.0;
+      }
+      break;
+    case 1:
+      {
+        controlValues[0] = 2.0; 
+        controlValues[1] = 3.0;
+      }
+      break;
+    case 2:
+      {
+        controlValues[0] = 1000.0;
+        controlValues[1] = 200000.0;
+      }
+      break;
+    case 3:
+      {
+        controlValues[0] = 0.33;
+        controlValues[1] =  0.39 ;
+      }
+      break;
+    case 4:
+      {
+        controlValues[0] = 0.107;
+        controlValues[1] = 1.07;
+      }
+      break;
+    }
+    pipeMeshSlice->SetActiveScalar(arrayIndex);
+    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice::ID_SCALARS));
+
+    vtkActor *meshActor;
+    meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
+    CPPUNIT_ASSERT(meshActor != NULL);
+
+    ProceduralControl(controlValues, meshActor);
+    m_RenderWindow->Render();
+    printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
+
+		COMPARE_IMAGES("TestPipeExecution_UseVTKProperty", ID_TEST_PIPEEXECUTION_USE_VTK_PROPERTY + arrayIndex);
+  }
+
+  vtkDEL(actorList);
+
+  delete sceneNode;
+
+  cppDEL(Importer);
+  mafDEL(storage);
+}
+//----------------------------------------------------------------------------
+void mafPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
+//----------------------------------------------------------------------------
+{
+  ////// Create VME (import vtkData) ////////////////////
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+  mafOpImporterVTK *Importer=new mafOpImporterVTK("importer");
+  mafString filename=MAF_DATA_ROOT;
+  filename<<"/FEM/pipemesh/hex8.vtk";
+  Importer->TestModeOn();
+  Importer->SetFileName(filename);
+  Importer->SetInput(storage->GetRoot());
+  Importer->ImportVTK();
+  mafVMEMesh *mesh;
+  mesh =mafVMEMesh::SafeDownCast(Importer->GetOutput());
+  mesh->GetMaterial();
+  mesh->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+  mesh->Update();
+	
+  double center[3];
+  mesh->GetOutput()->GetVTKData()->GetCenter(center);
+
+  //Assembly will be create when instancing mafSceneNode
+  mafSceneNode *sceneNode;
+  sceneNode = new mafSceneNode(NULL,NULL,mesh, NULL);
+
+  /////////// Pipe Instance and Creation ///////////
+  mafPipeMeshSlice *pipeMeshSlice = new mafPipeMeshSlice;
+  pipeMeshSlice->SetScalarMapActive(1);
+  
+  double origin[3], normal[3];
+
+  //set origin and normal value
+  origin[0] = 0.0;
+  origin[1] = 0.0;
+  origin[2] = 0.3;
+
+  normal[0] = 0.0;
+  normal[1] = 0.0; 
+  normal[2] = 1.0;
+
+  //pipeMeshSlice->SetNormal(normal);
+  pipeMeshSlice->SetSlice(origin,normal);
+  pipeMeshSlice->Create(sceneNode);
+
+  pipeMeshSlice->SetThickness(3.0);
+  pipeMeshSlice->SetWireframeOn();
+  pipeMeshSlice->SetWiredActorVisibilityOn();
+  pipeMeshSlice->SetActorPicking(false);
+  pipeMeshSlice->OnEvent(&mafEvent(this, VME_TIME_SET));
+
+  ////////// ACTORS List ///////////////
+  vtkPropCollection *actorList = vtkPropCollection::New();
+  pipeMeshSlice->GetAssemblyFront()->GetActors(actorList);
+
+  actorList->InitTraversal();
+  vtkProp *actor = actorList->GetNextProp();
+  while(actor)
+  { 
+    m_Renderer->AddActor(actor);
+    m_RenderWindow->Render();
+
+    actor = actorList->GetNextProp();
+  }
+
+  const char *strings[5];
+  strings[0] = "Id"; //point 
+
+  strings[1] = "Material"; //cell 
+  strings[2] = "EX";
+  strings[3] = "NUXY";
+  strings[4] = "DENS";
+
+  for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
+  {
+    double controlValues[2] = {-9999,-9999};
+    switch(arrayIndex)
+    {
+    case 0:
+      {
+        controlValues[0] = 1.0;
+        controlValues[1] = 12.0;
+      }
+      break;
+    case 1:
+      {
+        controlValues[0] = 2.0; 
+        controlValues[1] = 3.0;
+      }
+      break;
+    case 2:
+      {
+        controlValues[0] = 1000.0;
+        controlValues[1] = 200000.0;
+      }
+      break;
+    case 3:
+      {
+        controlValues[0] = 0.33;
+        controlValues[1] =  0.39 ;
+      }
+      break;
+    case 4:
+      {
+        controlValues[0] = 0.107;
+        controlValues[1] = 1.07;
+      }
+      break;
+    }
+    pipeMeshSlice->SetActiveScalar(arrayIndex);
+    pipeMeshSlice->OnEvent(&mafEvent(this, mafPipeMeshSlice::ID_SCALARS));
+
+    vtkActor *meshActor;
+    meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
+    CPPUNIT_ASSERT(meshActor != NULL);
+    CPPUNIT_ASSERT(meshActor->GetPickable() == FALSE);
+
+    ProceduralControl(controlValues, meshActor);
+    m_RenderWindow->Render();
+    printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
+
+		COMPARE_IMAGES("TestPipeExecution_Thickness_PickActor", ID_TEST_PIPEEXECUTION_THICKNESS + arrayIndex);
+  }
+
+  vtkDEL(actorList);
+
+  delete sceneNode;
+
   cppDEL(Importer);
   mafDEL(storage);
 }
@@ -213,12 +882,10 @@ void mafPipeMeshSliceTest::ProceduralControl(double controlRangeMapper[2],vtkPro
 //----------------------------------------------------------------------------
 {
   //procedural control
-
   double sr[2];
   ((vtkActor* )propToControl)->GetMapper()->GetScalarRange(sr);
   CPPUNIT_ASSERT(sr[0] == controlRangeMapper[0] && sr[1] == controlRangeMapper[1] || 1);
   //end procedural control
-
 }
 //----------------------------------------------------------------------------
 vtkProp *mafPipeMeshSliceTest::SelectActorToControl(vtkPropCollection *propList, int index)

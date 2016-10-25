@@ -19,7 +19,6 @@ SET(PROJECT_SRCS
 	vtkMAFTests.h vtkMAFTests.cpp
 	vtkMAFContourVolumeMapperTest.h vtkMAFContourVolumeMapperTest.cpp
 	vtkMAFRemoveCellsFilterTest.h vtkMAFRemoveCellsFilterTest.cpp
-	vtkMAFMeshCutterTest.h vtkMAFMeshCutterTest.cpp
 	vtkMAFPolyDataToSinglePolyLineTest.h vtkMAFPolyDataToSinglePolyLineTest.cpp
 	vtkMAFTextOrientatorTest.h vtkMAFTextOrientatorTest.cpp
 	vtkMAFGlobalAxisCoordinateTest.h vtkMAFGlobalAxisCoordinateTest.cpp
@@ -59,7 +58,7 @@ SET(PROJECT_SRCS
 	vtkMAFVolumeTextureMapper2DTest.h vtkMAFVolumeTextureMapper2DTest.cpp
 	vtkMAFDataArrayDescriptorTest.h vtkMAFDataArrayDescriptorTest.cpp
 	vtkMAFErythrocyteSourceTest.h vtkMAFErythrocyteSourceTest.cpp
-	vtkMAFMeshCutter_BESTest.h vtkMAFMeshCutter_BESTest.cpp
+	vtkMAFMeshCutterTest.h vtkMAFMeshCutterTest.cpp
 	vtkMAFFillingHoleTest.h vtkMAFFillingHoleTest.cpp
 	vtkMAFFixTopologyTest.h vtkMAFFixTopologyTest.cpp
 	vtkMAFLandmarkCloudOutlineCornerFilterTest.h vtkMAFLandmarkCloudOutlineCornerFilterTest.cpp

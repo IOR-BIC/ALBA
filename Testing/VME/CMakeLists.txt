@@ -23,7 +23,6 @@ SET(PROJECT_SRCS
 	mafVMEPolylineSplineTest.h mafVMEPolylineSplineTest.cpp
 	mafVMEMeshTest.h mafVMEMeshTest.cpp
 	mafPipeMeshTest.h mafPipeMeshTest.cpp
-	mafPipeMeshSliceTest.h mafPipeMeshSliceTest.cpp
 	mafVMELandmarkTest.h mafVMELandmarkTest.cpp
 	mafVMELandmarkCloudTest.h mafVMELandmarkCloudTest.cpp
 	mafMatrixVectorTest.h mafMatrixVectorTest.cpp
@@ -89,7 +88,7 @@ SET(PROJECT_SRCS
 	mafVMESurfaceEditorTest.h mafVMESurfaceEditorTest.cpp
 	mafPipePolylineGraphEditorTest.h mafPipePolylineGraphEditorTest.cpp
 	mafVMEPolylineEditorTest.h mafVMEPolylineEditorTest.cpp
-	mafPipeMeshSlice_BESTest.h mafPipeMeshSlice_BESTest.cpp
+	mafPipeMeshSliceTest.h mafPipeMeshSliceTest.cpp
 	mafPipeSurfaceSlice_BESTest.h mafPipeSurfaceSlice_BESTest.cpp
 	mafPipeVolumeSliceTest.h mafPipeVolumeSliceTest.cpp
 	mafVMEMapsTest.h mafVMEMapsTest.cpp

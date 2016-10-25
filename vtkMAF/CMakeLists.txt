@@ -29,7 +29,6 @@ SET(vtkMAF_SRCS
   vtkMAFLocalAxisCoordinate.cxx  vtkMAFLocalAxisCoordinate.h
   vtkMAFAdaptiveVolumeMapper.cxx  vtkMAFAdaptiveVolumeMapper.h
   vtkMAFImageMapToWidgetColors.cxx  vtkMAFImageMapToWidgetColors.h
-  vtkMAFMeshCutter.cxx  vtkMAFMeshCutter.h
   vtkMAFPolyDataSingleSourceShortestPath.cxx  vtkMAFPolyDataSingleSourceShortestPath.h
   vtkMAFProjectRG.cxx  vtkMAFProjectRG.h
   vtkMAFProjectSP.cxx  vtkMAFProjectSP.h
@@ -86,7 +85,7 @@ SET(vtkMAF_SRCS
   vtkMAFVolumeRayCastMapper.cxx  vtkMAFVolumeRayCastMapper.h
   vtkMAFVolumeTextureMapper2D.cxx  vtkMAFVolumeTextureMapper2D.h
   vtkMAFVolumeSlicer.cxx  vtkMAFVolumeSlicer.h
-  vtkMAFMeshCutter_BES.cxx   vtkMAFMeshCutter_BES.h  	
+  vtkMAFMeshCutter.cxx   vtkMAFMeshCutter.h  	
   ###############################################
   
   ###############################################

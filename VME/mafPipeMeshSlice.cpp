@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafPipeMeshSlice
- Authors: Daniele Giunchi , Stefano Perticoni, Gianluigi Crimi
+ Authors: Daniele Giunchi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -31,6 +31,7 @@
 #include "mafAxes.h"
 #include "mmaMaterial.h"
 #include "mafGUILutPreset.h"
+#include "mafTransformBase.h"
 #include "mafVMEOutputMesh.h"
 #include "mafEventSource.h"
 #include "mafAbsMatrixPipe.h"
@@ -72,9 +73,11 @@ const bool DEBUG_MODE = true;
 mafCxxTypeMacro(mafPipeMeshSlice);
 //----------------------------------------------------------------------------
 
+#include "mafMemDbg.h"
+
 //----------------------------------------------------------------------------
 mafPipeMeshSlice::mafPipeMeshSlice()
-:mafPipe()
+:mafPipeSlice()
 //----------------------------------------------------------------------------
 {
 	m_Mapper          = NULL;
@@ -86,6 +89,7 @@ mafPipeMeshSlice::mafPipeMeshSlice()
 	m_Gui             = NULL;
   m_Plane           = NULL;
   m_Cutter          = NULL;
+  m_MaterialButton  = NULL;
 
   m_Wireframe = 0;
   m_ScalarIndex = 0;
@@ -102,15 +106,7 @@ mafPipeMeshSlice::mafPipeMeshSlice()
   m_UseVTKProperty  = 1;
 
   m_BorderElementsWiredActor = 1;
-  
-  m_Origin[0] = 0;
-  m_Origin[1] = 0;
-  m_Origin[2] = 0;
-
-  m_Normal[0] = 0;
-  m_Normal[1] = 0;
-  m_Normal[2] = 1;
-  
+    
   m_Border = 1;
 }
 //----------------------------------------------------------------------------
@@ -273,10 +269,6 @@ void mafPipeMeshSlice::ExecutePipe()
 	if(m_Wireframe)
 		SetWiredActorVisibilityOff();
 
-
-  //m_Actor->GetProperty()->SetLineWidth (1);
-  
-
   // selection highlight
   m_OutlineBox = vtkOutlineCornerFilter::New();
   m_OutlineBox->SetInput(data);  
@@ -344,6 +336,8 @@ mafPipeMeshSlice::~mafPipeMeshSlice()
 
   delete []m_ScalarsName;
   delete []m_ScalarsVTKName;
+
+  delete m_MaterialButton;
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshSlice::Select(bool sel)
@@ -393,8 +387,8 @@ mafGUI *mafPipeMeshSlice::CreateGui()
 		m_Gui->Label("");
 		m_Gui->Update();
 		return m_Gui;
-
 }
+
 //----------------------------------------------------------------------------
 void mafPipeMeshSlice::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -535,16 +529,28 @@ void mafPipeMeshSlice::OnEvent(mafEventBase *maf_event)
     UpdateProperty();
   }
 }
+
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice::SetSlice(double *Origin)
+/*virtual*/ void mafPipeMeshSlice::SetSlice(double *Origin, double *Normal)
 //----------------------------------------------------------------------------
 {
-	m_Origin[0] = Origin[0];
-	m_Origin[1] = Origin[1];
-	m_Origin[2] = Origin[2];
+  if (Origin != NULL)
+  {
+    m_Origin[0] = Origin[0];
+    m_Origin[1] = Origin[1];
+    m_Origin[2] = Origin[2];
+  }
+
+  if (Normal != NULL)
+  {
+    m_Normal[0] = Normal[0];
+    m_Normal[1] = Normal[1];
+    m_Normal[2] = Normal[2];
+  }
 	
 	if(m_Plane && m_Cutter)
 	{
+    m_Plane->SetNormal(m_Normal);
 		m_Plane->SetOrigin(m_Origin);
 		m_Cutter->SetCutFunction(m_Plane);
 		m_Cutter->Update();
@@ -569,23 +575,7 @@ void mafPipeMeshSlice::SetSlice(double *Origin)
     mafLogMessage(stringStream.str().c_str());
   }
 }
-//----------------------------------------------------------------------------
-void mafPipeMeshSlice::SetNormal(double *Normal)
-//----------------------------------------------------------------------------
-{
-	m_Normal[0] = Normal[0];
-	m_Normal[1] = Normal[1];
-	m_Normal[2] = Normal[2];
-	
 
-	if(m_Plane && m_Cutter)
-	{
-		m_Plane->SetNormal(m_Normal);
-		m_Cutter->SetCutFunction(m_Plane);
-		m_Cutter->Update();
-    m_NormalFilter->Update();
-	}
-}
 //----------------------------------------------------------------------------
 double mafPipeMeshSlice::GetThickness()
 //----------------------------------------------------------------------------
@@ -683,7 +673,7 @@ void mafPipeMeshSlice::UpdateScalars()
 {
   m_Vme->GetOutput()->GetVTKData()->Update();
   m_Vme->Update();
-
+  
   UpdateVtkPolyDataNormalFilterActiveScalar();
   UpdateLUTAndMapperFromNewActiveScalars();
  
@@ -709,7 +699,7 @@ void mafPipeMeshSlice::UpdateLUTAndMapperFromNewActiveScalars()
       stringStream << "Scalar Range: [" << sr[0] << " , " << sr[1] << "]"  << std::endl;
       mafLogMessage(stringStream.str().c_str());
     }
-  
+
   m_Table->SetTableRange(sr);
 
   if(m_ActiveScalarType == POINT_TYPE)
@@ -718,7 +708,7 @@ void mafPipeMeshSlice::UpdateLUTAndMapperFromNewActiveScalars()
     m_Mapper->SetScalarModeToUseCellData();
 
   m_Mapper->SetInput(m_NormalFilter->GetOutput());
-  m_Mapper->SetLookupTable(m_Table);  
+  m_Mapper->SetLookupTable(m_Table);
   m_Mapper->UseLookupTableScalarRangeOn();
   if (DEBUG_MODE)
     {
@@ -785,10 +775,12 @@ void mafPipeMeshSlice::CreateFieldDataControlArrays()
 
 }
 
-//----------------------------------------------------------------------------
 void mafPipeMeshSlice::UpdateVtkPolyDataNormalFilterActiveScalar()
-//----------------------------------------------------------------------------
 {
+
+  vtkUnstructuredGrid *data = vtkUnstructuredGrid::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
+  data->Update();
+
   m_NormalFilter->Update();
 
   vtkPolyData *pd = m_NormalFilter->GetOutput();
@@ -796,6 +788,9 @@ void mafPipeMeshSlice::UpdateVtkPolyDataNormalFilterActiveScalar()
   if(m_ActiveScalarType == POINT_TYPE)
   {
     mafString activeScalarName = m_ScalarsVTKName[m_ScalarIndex].c_str();
+    data->GetPointData()->SetActiveScalars(activeScalarName.GetCStr());
+    data->Update();
+
     int res = pd->GetPointData()->SetActiveScalars(activeScalarName.GetCStr());
     
     if (res == -1)
@@ -815,6 +810,9 @@ void mafPipeMeshSlice::UpdateVtkPolyDataNormalFilterActiveScalar()
   else if(m_ActiveScalarType == CELL_TYPE)
   {
     mafString activeScalarName = m_ScalarsVTKName[m_ScalarIndex].c_str();
+	data->GetPointData()->SetActiveScalars(activeScalarName.GetCStr());
+    data->Update();
+
     int res = pd->GetCellData()->SetActiveScalars(activeScalarName.GetCStr());
 
     if (res == -1)
