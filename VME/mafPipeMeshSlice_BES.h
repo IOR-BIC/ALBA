@@ -38,6 +38,7 @@ class mafGUIMaterialButton;
 class vtkMAFMeshCutter_BES;
 class vtkPlane;
 class vtkPolyDataNormals;
+class mafGUILutSwatch;
 
 //----------------------------------------------------------------------------
 // mafPipeMeshSlice_BES :
@@ -78,7 +79,7 @@ public:
     ID_LUT,
     ID_SCALAR_MAP_ACTIVE,
     ID_USE_VTK_PROPERTY,
-    ID_LAST,  //BES: 3.4.2009 - ID_LAST must be really last
+    ID_LAST,  
 	};
 
   /** scalars type based on topology */
@@ -145,6 +146,12 @@ public:
   Both, Origin and Normal may be NULL, if the current value is to be preserved. */
   /*virtual*/ void SetSlice(double* Origin, double* Normal);  
 
+ /** Set the lookup table */
+	void SetLookupTable(vtkLookupTable *table);
+  
+  /** Gets the lookup table*/
+	vtkLookupTable *GetLookupTable(){return m_Table;};
+
 protected:
 	mmaMaterial             *m_MeshMaterial;
 	vtkPolyDataMapper        *m_Mapper;
@@ -162,6 +169,8 @@ protected:
   vtkPlane				        *m_Plane;
   vtkMAFMeshCutter_BES		    *m_Cutter;
   vtkPolyDataNormals *m_NormalFilter;
+
+	mafGUILutSwatch *m_LutSwatch;
   
   /** create controls checking the field arrays of the data */
   void CreateFieldDataControlArrays();
@@ -191,6 +200,7 @@ protected:
   double				           m_Border;
 
   int m_RenderingDisplayListFlag; 
+
 
   /** allow the creation of the gui */
 	virtual mafGUI  *CreateGui();

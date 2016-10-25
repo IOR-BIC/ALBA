@@ -34,6 +34,7 @@
 //---------------------------------------------
 class vtkIdList;
 class vtkCell;
+class vtkMatrix4x4;
 
 /** 
 
@@ -211,6 +212,13 @@ protected:
   /** do the whole thing */
   void CreateSlice() ;
 
+	/** Uses transform matrix to calculate the local cutting coord*/
+	void CalculateLocalCutCoord();
+
+	/** Modify input matrix to kept only rotational parts*/
+	void ToRotationMatrix(vtkMatrix4x4 *matrix);
+
+
   /** computes the intersection of the given plane with the mesh bounding box
   returns coordinates of the first intersection in pts, returns false, if the bounding box is not intersected*/
   bool GetIntersectionOfBoundsWithPlane(const double *origin, const double *norm, double* pts);
@@ -252,6 +260,12 @@ protected:
 
   // cutting function
   vtkPlane *CutFunction ;
+
+	//Cutting Transformed Normal
+	double CutTranformedNormal[4];
+
+	//Cutting Transformed Origin
+	double CutTranformedOrigin[4];
 
   // input and output
   vtkUnstructuredGrid *UnstructGrid ;

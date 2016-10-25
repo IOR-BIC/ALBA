@@ -27,8 +27,13 @@
 #include "vtkPolyData.h"
 #include "vtkIdType.h"
 #include "vtkIdList.h"
+#include "vtkMatrix4x4.h"
 
 #include <ostream>
+#include "mafDefines.h"
+#include "vtkMAFToLinearTransform.h"
+#include "vtkTransform.h"
+
 
 #if _MSC_VER >= 1400
 #include <intrin.h>
@@ -41,12 +46,6 @@ vtkCxxRevisionMacro(vtkMAFMeshCutter_BES, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMAFMeshCutter_BES);
 //------------------------------------------------------------------------------
 #include "mafMemDbg.h"
-
-////#define __PROFILING__
-//#include <atlbase.h>
-//#include <BSGenLib.h>
-//
-//__PROFILING_DECLARE_DEFAULT_PROFILER(false);
 
 //------------------------------------------------------------------------------
 // Constructor
@@ -399,8 +398,8 @@ bool vtkMAFMeshCutter_BES::GetIntersectionOfBoundsWithPlane(const double *origin
 vtkIdType vtkMAFMeshCutter_BES::GetFirstIntersectedCell(vtkIdType ptId)
 //------------------------------------------------------------------------
 {
-  double* origin = CutFunction->GetOrigin();
-  double* normal = CutFunction->GetNormal();
+  double* origin = CutTranformedOrigin;
+  double* normal = CutTranformedNormal;
 
   vtkIdList* cellIds = vtkIdList::New();
   cellIds->Allocate(8);  
@@ -487,8 +486,8 @@ vtkIdType vtkMAFMeshCutter_BES::GetFirstIntersectedCell(vtkIdType ptId)
 void vtkMAFMeshCutter_BES::FindPointsInPlane()
 //------------------------------------------------------------------------------
 {
-  double* origin = CutFunction->GetOrigin();
-  double* normal = CutFunction->GetNormal();
+  double* origin = CutTranformedOrigin;
+  double* normal = CutTranformedNormal;
 
   //we need to check every cell in the worst case 
   //so prepare a stack capable to hold ids of every cell
@@ -905,10 +904,9 @@ bool vtkMAFMeshCutter_BES::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList
   }
 
   // find the normal and compare it with the normal of the cutting plane
-  double normply[3], normpln[3] ;
+  double normply[3];
   CalculatePolygonNormal(polygon, normply) ;
-  CutFunction->GetNormal(normpln) ;
-  double dotprod = normply[0]*normpln[0] + normply[1]*normpln[1] + normply[2]*normpln[2] ;
+  double dotprod = normply[0]*CutTranformedNormal[0] + normply[1]*CutTranformedNormal[1] + normply[2]*CutTranformedNormal[2] ;
 
   if (dotprod < 0.0)
   {
@@ -1086,6 +1084,9 @@ void vtkMAFMeshCutter_BES::CreateSlice()
   vtkIdList *polygon = vtkIdList::New() ;
   vtkCellArray *cells = vtkCellArray::New() ;
 
+	//update local cut coordinates
+	CalculateLocalCutCoord();
+
   FindPointsInPlane() ;           // this finds the points where the mesh intersects the plane
 
   AssignPointsToCells() ;         // this lists the intersection points for each mesh cell
@@ -1126,8 +1127,8 @@ void vtkMAFMeshCutter_BES::PrintSelf(ostream& os, vtkIndent indent)
 
   // print cutting plane
   os << indent << "cutting plane..." << std::endl ;
-  double *po = CutFunction->GetOrigin() ;
-  double *pn = CutFunction->GetNormal() ;
+  double *po = CutTranformedOrigin ;
+  double *pn = CutTranformedNormal ;
   os << indent << "origin: " << po[0] << " " << po[1] << " " << po[2] << std::endl ;
   os << indent << "normal: " << pn[0] << " " << pn[1] << " " << pn[2] << std::endl ;
   os << indent << std::endl ;
@@ -1175,4 +1176,47 @@ void vtkMAFMeshCutter_BES::PrintSelf(ostream& os, vtkIndent indent)
   os << "polydata..." << std::endl ;
   Polydata->PrintSelf(os, indent) ;
 
+}
+
+void vtkMAFMeshCutter_BES::ToRotationMatrix(vtkMatrix4x4 *matrix)
+{
+	//remove translation components
+	matrix->SetElement(0,3,0);
+	matrix->SetElement(1,3,0);
+	matrix->SetElement(2,3,0);
+}
+
+void vtkMAFMeshCutter_BES::CalculateLocalCutCoord()
+{
+	//Getting Mesh coordinates
+	vtkLinearTransform *trans=vtkLinearTransform::SafeDownCast(CutFunction->GetTransform());
+	if(trans)
+	{
+		double origin[4],normal[4];
+		vtkMatrix4x4 *inverse;
+		vtkNEW(inverse);
+		//Getting slicing transform matrix
+		trans->GetMatrix(inverse);
+		//Inverting matrix to obtain slice to mesh transform matrix
+		inverse->Invert();
+
+		//vtkMatrix4x4 MultiplyPoint requires a 4d vector with last element set to 1
+		origin[3]=normal[3]=1;
+		CutFunction->GetNormal(normal);
+		CutFunction->GetOrigin(origin);
+
+		//Getting mesh local origin
+		inverse->MultiplyPoint(origin,CutTranformedOrigin);
+
+		//Isolate rotation matrix
+		ToRotationMatrix(inverse);
+		//Using rotation matrix to calculate mesh local normal
+		inverse->MultiplyPoint(normal,CutTranformedNormal);
+	}
+	else
+	{
+		//No Transform found -> copy origin and normal
+		CutFunction->GetNormal(CutTranformedNormal);
+		CutFunction->GetOrigin(CutTranformedOrigin);
+	}
 }
