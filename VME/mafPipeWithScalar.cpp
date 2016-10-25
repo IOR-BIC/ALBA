@@ -1,4 +1,4 @@
-/*=========================================================================
+ /*=========================================================================
 
  Program: MAF2
  Module: mafPipeWithScalar
@@ -215,12 +215,12 @@ void mafPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
   m_Vme->GetOutput()->GetVTKData()->Update();
   m_Vme->Update();
   
-  if(m_ActiveScalarType == POINT_TYPE)
+  if(m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0)
   {
     m_Vme->GetOutput()->GetVTKData()->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
     m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->Modified();
   }
-  else if(m_ActiveScalarType == CELL_TYPE)
+  else if(m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays-m_PointCellArraySeparation >0) )
   {
     m_Vme->GetOutput()->GetVTKData()->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
     m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars()->Modified();
@@ -290,10 +290,10 @@ void mafPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 {
   vtkDataSet *data = vtkDataSet::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
   data->Update();
-  double sr[2];
-  if(m_ActiveScalarType == POINT_TYPE)
+  double sr[2]={0,1};
+  if(m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0)
     data->GetPointData()->GetScalars()->GetRange(sr);
-  else if(m_ActiveScalarType == CELL_TYPE)
+  else if(m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation >0))
     data->GetCellData()->GetScalars()->GetRange(sr);
 
   m_Table->SetTableRange(sr);
