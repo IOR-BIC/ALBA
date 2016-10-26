@@ -42,9 +42,9 @@
 #include "mafIndent.h"
 #include "mafGizmoSlice.h"
 #include "mafVMEGizmo.h"
-#include "mafPipeSurfaceSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
 #include "mafVisualPipeSlicerSlice.h"
-#include "mafPipePolylineSlice_BES.h"
+#include "mafPipePolylineSlice.h"
 #include "mafPipePolyline.h"
 #include "mafDeviceButtonsPadMouse.h"
 
@@ -480,15 +480,15 @@ void mafViewOrthoSlice::PackageView()
     // plug surface slice visual pipe in not perspective views
     if (v != PERSPECTIVE_VIEW)
     {
-      m_Views[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice_BES",MUTEX);
-      m_Views[v]->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice_BES",MUTEX);
+      m_Views[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
+      m_Views[v]->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice",MUTEX);
       m_Views[v]->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
-      m_Views[v]->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice_BES",MUTEX);
-      m_Views[v]->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice_BES",MUTEX);
-      m_Views[v]->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice_BES");
-      m_Views[v]->PlugVisualPipe("mafVMEPolylineSpline", "mafPipePolylineSlice_BES");
+      m_Views[v]->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice",MUTEX);
+      m_Views[v]->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice",MUTEX);
+      m_Views[v]->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice");
+      m_Views[v]->PlugVisualPipe("mafVMEPolylineSpline", "mafPipePolylineSlice");
       m_Views[v]->PlugVisualPipe("mafVMEMeter", "mafPipePolyline");
-			m_Views[v]->PlugVisualPipe("medVMEMuscleWrapper", "mafPipeSurfaceSlice_BES",MUTEX);
+			m_Views[v]->PlugVisualPipe("medVMEMuscleWrapper", "mafPipeSurfaceSlice",MUTEX);
     }
     else
     {
@@ -664,15 +664,15 @@ void mafViewOrthoSlice::OnEventSetThickness()
 		mafVME *node=this->GetSceneGraph()->GetSelectedVme();
 		mafSceneNode *SN = this->GetSceneGraph()->Vme2Node(node);
 
-		if(mafPipeSurfaceSlice_BES *pipe = mafPipeSurfaceSlice_BES::SafeDownCast(m_ChildViewList[CHILD_XN_VIEW]->GetNodePipe(node)))
+		if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_XN_VIEW]->GetNodePipe(node)))
 		{
 			pipe->SetThickness(m_Border);
 		}
-		if(mafPipeSurfaceSlice_BES *pipe = mafPipeSurfaceSlice_BES::SafeDownCast(m_ChildViewList[CHILD_YN_VIEW]->GetNodePipe(node)))
+		if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_YN_VIEW]->GetNodePipe(node)))
 		{
 			pipe->SetThickness(m_Border);
 		}
-		if(mafPipeSurfaceSlice_BES *pipe = mafPipeSurfaceSlice_BES::SafeDownCast(m_ChildViewList[CHILD_ZN_VIEW]->GetNodePipe(node)))
+		if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_ZN_VIEW]->GetNodePipe(node)))
 		{
 			pipe->SetThickness(m_Border);
 		}
@@ -800,15 +800,15 @@ void mafViewOrthoSlice::SetThicknessForAllSurfaceSlices(mafVME *root)
 	{
 		if (node->GetOutput()->IsA("mafVMEOutputSurface")) //if(node->IsA("mafVMESurface"))
 		{
-			if(mafPipeSurfaceSlice_BES *pipe = mafPipeSurfaceSlice_BES::SafeDownCast(m_ChildViewList[CHILD_XN_VIEW]->GetNodePipe(node)))
+			if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_XN_VIEW]->GetNodePipe(node)))
 			{
 				pipe->SetThickness(m_Border);
 			}
-			if(mafPipeSurfaceSlice_BES *pipe = mafPipeSurfaceSlice_BES::SafeDownCast(m_ChildViewList[CHILD_YN_VIEW]->GetNodePipe(node)))
+			if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_YN_VIEW]->GetNodePipe(node)))
 			{
 				pipe->SetThickness(m_Border);
 			}
-			if(mafPipeSurfaceSlice_BES *pipe = mafPipeSurfaceSlice_BES::SafeDownCast(m_ChildViewList[CHILD_ZN_VIEW]->GetNodePipe(node)))
+			if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_ZN_VIEW]->GetNodePipe(node)))
 			{
 				pipe->SetThickness(m_Border);
 			}
@@ -852,7 +852,7 @@ void mafViewOrthoSlice::ApplyViewSettings(mafVME *vme)
   {
     for (int i=CHILD_ZN_VIEW;i<=CHILD_YN_VIEW;i++)
     {
-      mafPipePolylineSlice_BES *pipeSlice = mafPipePolylineSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[i]))->GetNodePipe(vme));
+      mafPipePolylineSlice *pipeSlice = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[i]))->GetNodePipe(vme));
       if(pipeSlice) 
       {
         if(!vme->IsA("mafVMEMeter"))

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipePolylineSlice_BES
+ Module: mafPipePolylineSlice
  Authors: Daniele Giunchi
  
  Copyright (c) B3C
@@ -23,7 +23,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafPipePolylineSlice_BES.h"
+#include "mafPipePolylineSlice.h"
 #include "mafSceneNode.h"
 #include "mafGUI.h"
 #include "mafAxes.h"
@@ -64,11 +64,11 @@
 #include <vector>
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mafPipePolylineSlice_BES);
+mafCxxTypeMacro(mafPipePolylineSlice);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafPipePolylineSlice_BES::mafPipePolylineSlice_BES()
+mafPipePolylineSlice::mafPipePolylineSlice()
 :mafPipeSlice()
 //----------------------------------------------------------------------------
 {
@@ -107,7 +107,7 @@ mafPipePolylineSlice_BES::mafPipePolylineSlice_BES()
   m_AppendPolyData = NULL;
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BES::Create(mafSceneNode *n)
+void mafPipePolylineSlice::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
   Superclass::Create(n);
@@ -251,7 +251,7 @@ void mafPipePolylineSlice_BES::Create(mafSceneNode *n)
   //CreateGui();
 }
 //----------------------------------------------------------------------------
-mafPipePolylineSlice_BES::~mafPipePolylineSlice_BES()
+mafPipePolylineSlice::~mafPipePolylineSlice()
 //----------------------------------------------------------------------------
 {
   m_Vme->GetEventSource()->RemoveObserver(this);
@@ -280,7 +280,7 @@ mafPipePolylineSlice_BES::~mafPipePolylineSlice_BES()
   //@@@ if(m_use_axes) wxDEL(m_axes);  
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BES::Select(bool sel)
+void mafPipePolylineSlice::Select(bool sel)
 //----------------------------------------------------------------------------
 {
   m_Selected = sel;
@@ -291,7 +291,7 @@ void mafPipePolylineSlice_BES::Select(bool sel)
   }
 }
 //----------------------------------------------------------------------------
-mafGUI *mafPipePolylineSlice_BES::CreateGui()
+mafGUI *mafPipePolylineSlice::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
@@ -303,7 +303,7 @@ mafGUI *mafPipePolylineSlice_BES::CreateGui()
   return m_Gui;
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BES::OnEvent(mafEventBase *maf_event)
+void mafPipePolylineSlice::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -350,7 +350,7 @@ void mafPipePolylineSlice_BES::OnEvent(mafEventBase *maf_event)
 }
 
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BES::SetSlice(double *Origin, double *Normal)
+void mafPipePolylineSlice::SetSlice(double *Origin, double *Normal)
 //----------------------------------------------------------------------------
 {
   if (Origin != NULL)
@@ -383,13 +383,13 @@ void mafPipePolylineSlice_BES::SetSlice(double *Origin, double *Normal)
 
 
 //----------------------------------------------------------------------------
-double mafPipePolylineSlice_BES::GetThickness()
+double mafPipePolylineSlice::GetThickness()
 //----------------------------------------------------------------------------
 {
   return m_Border;
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BES::SetThickness(double thickness)
+void mafPipePolylineSlice::SetThickness(double thickness)
 //----------------------------------------------------------------------------
 {
   m_Border=thickness;
@@ -403,13 +403,13 @@ void mafPipePolylineSlice_BES::SetThickness(double thickness)
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-double mafPipePolylineSlice_BES::GetRadius()
+double mafPipePolylineSlice::GetRadius()
 //----------------------------------------------------------------------------
 {
   return m_Radius;
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BES::SetRadius(double radius)
+void mafPipePolylineSlice::SetRadius(double radius)
 //----------------------------------------------------------------------------
 {
   m_Radius=radius;
@@ -423,7 +423,7 @@ void mafPipePolylineSlice_BES::SetRadius(double radius)
   }
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BES::UpdateProperty()
+void mafPipePolylineSlice::UpdateProperty()
 //----------------------------------------------------------------------------
 {
   mafVMEOutputPolyline *out_polyline = mafVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
@@ -479,7 +479,7 @@ void mafPipePolylineSlice_BES::UpdateProperty()
   
 }
 //----------------------------------------------------------------------------
-vtkPolyData *mafPipePolylineSlice_BES::SplineProcess(vtkPolyData *polyData)
+vtkPolyData *mafPipePolylineSlice::SplineProcess(vtkPolyData *polyData)
 //----------------------------------------------------------------------------
 {
   //cleaned point list
@@ -557,7 +557,7 @@ vtkPolyData *mafPipePolylineSlice_BES::SplineProcess(vtkPolyData *polyData)
   return m_PolyFilteredLine;
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BES::ShowActorOn()
+void mafPipePolylineSlice::ShowActorOn()
 //----------------------------------------------------------------------------
 {
   if(m_Actor != NULL)
@@ -566,7 +566,7 @@ void mafPipePolylineSlice_BES::ShowActorOn()
   }
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BES::ShowActorOff()
+void mafPipePolylineSlice::ShowActorOff()
 //----------------------------------------------------------------------------
 {
   if(m_Actor != NULL)
@@ -575,7 +575,7 @@ void mafPipePolylineSlice_BES::ShowActorOff()
   }
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BES::SetROI(double bounds[6])
+void mafPipePolylineSlice::SetROI(double bounds[6])
 //----------------------------------------------------------------------------
 {
   m_ROI[0] = bounds[0];
@@ -586,7 +586,7 @@ void mafPipePolylineSlice_BES::SetROI(double bounds[6])
   m_ROI[5] = bounds[5];
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BES::SetMaximumROI()
+void mafPipePolylineSlice::SetMaximumROI()
 //----------------------------------------------------------------------------
 {
   if(m_PolyData)
@@ -605,7 +605,7 @@ void mafPipePolylineSlice_BES::SetMaximumROI()
   }
 }
 //----------------------------------------------------------------------------
-vtkPolyData *mafPipePolylineSlice_BES::ExecuteROI(vtkPolyData *polydata)
+vtkPolyData *mafPipePolylineSlice::ExecuteROI(vtkPolyData *polydata)
 //----------------------------------------------------------------------------
 {
   vtkMAFSmartPointer<vtkCubeSource> cube;
@@ -648,7 +648,7 @@ vtkPolyData *mafPipePolylineSlice_BES::ExecuteROI(vtkPolyData *polydata)
   return resultPolyData;
 }
 //----------------------------------------------------------------------------
-vtkPolyData *mafPipePolylineSlice_BES::RegionsCapping(vtkPolyData* inputBorder)
+vtkPolyData *mafPipePolylineSlice::RegionsCapping(vtkPolyData* inputBorder)
 //----------------------------------------------------------------------------
 {
   m_AppendPolyData->RemoveAllInputs();
@@ -699,7 +699,7 @@ vtkPolyData *mafPipePolylineSlice_BES::RegionsCapping(vtkPolyData* inputBorder)
   return m_AppendPolyData->GetOutput();
 }
 //----------------------------------------------------------------------------
-vtkPolyData *mafPipePolylineSlice_BES::CappingFilter(vtkPolyData* inputBorder)
+vtkPolyData *mafPipePolylineSlice::CappingFilter(vtkPolyData* inputBorder)
 //----------------------------------------------------------------------------
 {
   int i, iCell;
@@ -751,7 +751,7 @@ vtkPolyData *mafPipePolylineSlice_BES::CappingFilter(vtkPolyData* inputBorder)
   return output;
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BES::SetActorPicking(int enable)
+void mafPipePolylineSlice::SetActorPicking(int enable)
 //----------------------------------------------------------------------------
 {
   m_Actor->SetPickable(enable);

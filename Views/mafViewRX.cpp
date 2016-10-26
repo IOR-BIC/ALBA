@@ -37,7 +37,7 @@ const bool DEBUG_MODE = false;
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "mafVMESlicer.h"
-#include "mafPipeSurfaceSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
 #include "mafVisualPipeSlicerSlice.h"
 #include "mafVMEVolumeGray.h"
 #include "mafAbsMatrixPipe.h"
@@ -128,7 +128,7 @@ void mafViewRX::VmeCreatePipe(mafVME *vme)
           CameraUpdate();
         }
       }
-      else if(pipe_name.Equals("mafPipeSurfaceSlice_BES"))
+      else if(pipe_name.Equals("mafPipeSurfaceSlice"))
       {
         double normal[3];
         switch(m_CameraPositionId)
@@ -162,7 +162,7 @@ void mafViewRX::VmeCreatePipe(mafVME *vme)
         positionSlice[0] = (b[1]+b[0])/2;
         positionSlice[1] = (b[3]+b[2])/2;
         positionSlice[2] = (b[5]+b[4])/2;
-        ((mafPipeSurfaceSlice_BES *)pipe)->SetSlice(positionSlice, normal);
+        ((mafPipeSurfaceSlice *)pipe)->SetSlice(positionSlice, normal);
       }
       else if(pipe_name.Equals("mafVisualPipeSlicerSlice"))
       {
@@ -322,7 +322,7 @@ void mafViewRX::VmeShow(mafVME *vme, bool show)
   {
     pipeSlicer->SetThickness(3);
   }
-  mafPipeSurfaceSlice_BES *pipe = mafPipeSurfaceSlice_BES ::SafeDownCast(SN->m_Pipe);
+  mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice ::SafeDownCast(SN->m_Pipe);
   if(pipe)
   {
     pipe->SetThickness(3);

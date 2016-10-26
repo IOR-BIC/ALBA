@@ -28,12 +28,12 @@ const bool DEBUG_MODE = false;
 #include "mafIndent.h"
 #include "mafViewSliceGlobal.h"
 #include "mafPipeVolumeSlice.h"
-#include "mafPipeSurfaceSlice_BES.h"
-#include "mafPipePolylineSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
+#include "mafPipePolylineSlice.h"
 #include "mafPipeMeshSlice.h"
 
-#include "mafPipeSurfaceSlice_BES.h"
-#include "mafPipePolylineSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
+#include "mafPipePolylineSlice.h"
 #include "mafPipeMeshSlice.h"
 
 #include "mafVMEVolumeGray.h"

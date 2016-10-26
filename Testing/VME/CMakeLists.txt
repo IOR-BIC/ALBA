@@ -87,12 +87,12 @@ SET(PROJECT_SRCS
 	mafPipePolylineGraphEditorTest.h mafPipePolylineGraphEditorTest.cpp
 	mafVMEPolylineEditorTest.h mafVMEPolylineEditorTest.cpp
 	mafPipeMeshSliceTest.h mafPipeMeshSliceTest.cpp
-	mafPipeSurfaceSlice_BESTest.h mafPipeSurfaceSlice_BESTest.cpp
+	mafPipeSurfaceSliceTest.h mafPipeSurfaceSliceTest.cpp
 	mafPipeVolumeSliceTest.h mafPipeVolumeSliceTest.cpp
 	mafVMEMapsTest.h mafVMEMapsTest.cpp
 	mafPipeTrajectoriesTest.h mafPipeTrajectoriesTest.cpp
 	mafPipeSliceTest.h mafPipeSliceTest.cpp
-	mafPipePolylineSlice_BESTest.h mafPipePolylineSlice_BESTest.cpp
+	mafPipePolylineSliceTest.h mafPipePolylineSliceTest.cpp
 	mafPipeWrappedMeterTest.h mafPipeWrappedMeterTest.cpp
 	mafVMEOutputWrappedMeterTest.h mafVMEOutputWrappedMeterTest.cpp
 	mafPipeDensityDistanceTest.h mafPipeDensityDistanceTest.cpp

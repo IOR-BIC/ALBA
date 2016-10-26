@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipePolylineSlice_BES
+ Module: mafPipePolylineSlice
  Authors: Daniele Giunchi
  
  Copyright (c) B3C
@@ -41,19 +41,19 @@ class vtkClipPolyData;
 class vtkAppendPolyData;
 
 /**
-  class name: mafPipePolylineSlice_BES.
+  class name: mafPipePolylineSlice.
   Pipe which manage the visualisation of the section of a polyline.
 */
-class MAF_EXPORT mafPipePolylineSlice_BES : public mafPipeSlice
+class MAF_EXPORT mafPipePolylineSlice : public mafPipeSlice
 {
 public:
   /** RTTI Macro*/
-  mafTypeMacro(mafPipePolylineSlice_BES,mafPipeSlice);
+  mafTypeMacro(mafPipePolylineSlice,mafPipeSlice);
 
   /** Constructor. */
-               mafPipePolylineSlice_BES();
+               mafPipePolylineSlice();
   /** Destructor. */
-  virtual     ~mafPipePolylineSlice_BES ();
+  virtual     ~mafPipePolylineSlice ();
 
   /**Return the thickness of the border*/	
   double GetThickness();

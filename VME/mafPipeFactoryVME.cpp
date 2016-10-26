@@ -71,8 +71,8 @@
 #include "mafPipePolylineGraphEditor.h"
 
 #include "mafPipeMeshSlice.h"
-#include "mafPipePolylineSlice_BES.h"
-#include "mafPipeSurfaceSlice_BES.h"
+#include "mafPipePolylineSlice.h"
+#include "mafPipeSurfaceSlice.h"
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeCompoundVolume.h"
 #include "mafPipeCompoundVolumeFixedScalars.h"
@@ -196,11 +196,9 @@ mafPipeFactoryVME::mafPipeFactoryVME()
   mafPlugPipeMacro(mafPipeVolumeSliceBlend, "Pipe for rendering volume with 2 slices with opacity.");
   mafPlugPipeMacro(mafVisualPipeCollisionDetection, "Pipe for visualization of collision between 2 surfaces.");
 
-
-  //BES: 16.4.2008 - these pipes are to be committed down (without _BES suffix) to openMAF in the future
   mafPlugPipeMacro(mafPipeVolumeSlice, "BES: mafPipeVolumeSlice.");
-  mafPlugPipeMacro(mafPipeSurfaceSlice_BES, "BES: mafPipeSurfaceSlice.");
-  mafPlugPipeMacro(mafPipePolylineSlice_BES, "BES: mafPipePolylineSlice_BES.");
+  mafPlugPipeMacro(mafPipeSurfaceSlice, "BES: mafPipeSurfaceSlice.");
+  mafPlugPipeMacro(mafPipePolylineSlice, "BES: mafPipePolylineSlice.");
   mafPlugPipeMacro(mafPipeMeshSlice, "BES: mafPipeMeshSlice.");
 
   mafPlugPipeMacro(mafPipeVolumeSliceNotInterpolated, "Pipe for not interpolated and not resampled volume visualization");   

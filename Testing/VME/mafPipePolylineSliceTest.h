@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipeSurfaceSlice_BES_BESTest
- Authors: Eleonora Mambrini
+ Module: mafPipePolylineSliceTest
+ Authors: Roberto Mucci
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_mafPipeSurfaceSlice_BESTest_H__
-#define __CPP_UNIT_mafPipeSurfaceSlice_BESTest_H__
+#ifndef __CPP_UNIT_mafPipePolylineSliceTest_H__
+#define __CPP_UNIT_mafPipePolylineSliceTest_H__
 
 #include "mafTest.h"
 
@@ -24,7 +24,7 @@ class vtkRenderWindowInteractor;
 class vtkProp;
 class vtkPropCollection;
 
-class mafPipeSurfaceSlice_BESTest : public mafTest
+class mafPipePolylineSliceTest : public mafTest
 {
 public: 
   // Executed before each test
@@ -33,25 +33,14 @@ public:
   // Executed after each test
   void AfterTest();
 
-  CPPUNIT_TEST_SUITE( mafPipeSurfaceSlice_BESTest );
+  CPPUNIT_TEST_SUITE( mafPipePolylineSliceTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
-  CPPUNIT_TEST( TestSurfacePipeCreation );
-  CPPUNIT_TEST( TestSetGetThickness );
-  CPPUNIT_TEST( TestSurfacePipeExecution );
-  CPPUNIT_TEST( TestCloudPipeExecution );
- 
+  CPPUNIT_TEST( TestPipeExecution );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();
-  /** Test the pipe with a mafVMESurface as input */
-  void TestSurfacePipeExecution();
-  /** Test the pipe with a mafVMELandamarkCloud as input */
-  void TestCloudPipeExecution();
-  /** Test pipe creation. */
-  void TestSurfacePipeCreation();
-  /** Test Set and Get methods for thickness attribute. */
-  void TestSetGetThickness();
+  void TestPipeExecution();
 
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
 

@@ -26,8 +26,8 @@
 #include "mafDecl.h"
 #include "mafIndent.h"
 #include "mafGUI.h"
-#include "mafPipeSurfaceSlice_BES.h"
-#include "mafPipePolylineSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
+#include "mafPipePolylineSlice.h"
 #include "mafPipeMeshSlice.h"
 #include "mafVME.h"
 #include "mafVMEVolume.h"
@@ -538,9 +538,9 @@ void mafViewSliceBlend::SetNormal(double normal[3])
       if(curSurfPipe)
       {
         mafString pipe_name = curSurfPipe->GetTypeName();
-        if (pipe_name.Equals("mafPipeSurfaceSlice_BES"))
+        if (pipe_name.Equals("mafPipeSurfaceSlice"))
         {
-          mafPipeSurfaceSlice_BES *pipe = (mafPipeSurfaceSlice_BES *)curSurfPipe;
+          mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)curSurfPipe;
           pipe->SetNormal(normal); 
         }
       }

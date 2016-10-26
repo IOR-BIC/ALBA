@@ -32,7 +32,7 @@
 #include "mafTransform.h"
 #include "mafPipeImage3D.h"
 #include "mafPipeSlice.h"
-#include "mafPipeSurfaceSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
 #include "mafPipeSurface.h"
 #include "mafPipeSurfaceTextured.h"
 #include "mafVMEVolumeGray.h"
@@ -130,14 +130,14 @@ void mafViewSlicer::PackageView()
 //----------------------------------------------------------------------------
 {
 	m_ViewArbitrary = new mafViewVTK("",CAMERA_PERSPECTIVE);
-	//m_ViewArbitrary->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice_BES");
+	//m_ViewArbitrary->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
 	m_ViewArbitrary->PlugVisualPipe("mafVMESurface","mafPipeSurfaceTextured");
 	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
   m_ViewArbitrary->PlugVisualPipe("mafVMELabeledVolume", "mafPipeBox", MUTEX);
 	
   m_ViewSlice = new mafViewVTK("",CAMERA_CT);
-	m_ViewSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice_BES");
-  m_ViewSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice_BES");
+	m_ViewSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
+  m_ViewSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo", NON_VISIBLE);
 	m_ViewSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
 	
@@ -353,7 +353,7 @@ void mafViewSlicer::CameraUpdate()
     {
       if(Inode->IsA("mafVMESurface") || Inode->IsA("mafVMESurfaceParametric"))
       {
-        mafPipeSurfaceSlice_BES *PipeSliceViewSurface = mafPipeSurfaceSlice_BES::SafeDownCast(((mafViewVTK *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(Inode));
+        mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewVTK *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(Inode));
         if(PipeSliceViewSurface)
         {
           double center[3], surfaceOriginTranslated[3];

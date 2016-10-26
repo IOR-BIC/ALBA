@@ -28,8 +28,8 @@
 // .SECTION See Also
 // vtkProbeFilter, vtkPlaneSource
 
-#ifndef __vtkMAFVolumeSlicer_BES_h
-#define __vtkMAFVolumeSlicer_BES_h
+#ifndef __vtkMAFVolumeSlicer_h
+#define __vtkMAFVolumeSlicer_h
 
 #include "mafConfigure.h"
 #include "vtkDataSetToDataSetFilter.h"

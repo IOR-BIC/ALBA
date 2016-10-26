@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipeSurfaceSlice_BESTest
+ Module: mafPipeSurfaceSliceTest
  Authors: Eleonora Mambrini, Matteo Giacomoni, Gianluigi Crimi
  
  Copyright (c) B3C
@@ -23,11 +23,11 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "mafPipeSurfaceSlice_BESTest.h"
+#include "mafPipeSurfaceSliceTest.h"
 
 #include "mafSceneNode.h"
 #include "mafVMERoot.h"
-#include "mafPipeSurfaceSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
 #include "mafVMESurface.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
@@ -49,12 +49,12 @@
 #define NUM_OF_CENTERS 3
 
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSlice_BESTest::TestFixture()
+void mafPipeSurfaceSliceTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSlice_BESTest::BeforeTest()
+void mafPipeSurfaceSliceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -70,7 +70,7 @@ void mafPipeSurfaceSlice_BESTest::BeforeTest()
 	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSlice_BESTest::AfterTest()
+void mafPipeSurfaceSliceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);
@@ -78,7 +78,7 @@ void mafPipeSurfaceSlice_BESTest::AfterTest()
   vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSlice_BESTest::TestCloudPipeExecution()
+void mafPipeSurfaceSliceTest::TestCloudPipeExecution()
 //----------------------------------------------------------------------------
 {
   mafSmartPointer<mafVMELandmark> first;
@@ -111,7 +111,7 @@ void mafPipeSurfaceSlice_BESTest::TestCloudPipeExecution()
   sceneNode = new mafSceneNode(NULL,NULL,ldm, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
-  mafPipeSurfaceSlice_BES *pipeSlice = new mafPipeSurfaceSlice_BES;
+  mafPipeSurfaceSlice *pipeSlice = new mafPipeSurfaceSlice;
   pipeSlice->Create(sceneNode);
 
   ////////// ACTORS List ///////////////
@@ -159,7 +159,7 @@ void mafPipeSurfaceSlice_BESTest::TestCloudPipeExecution()
   delete sceneNode;
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSlice_BESTest::TestSurfacePipeExecution()
+void mafPipeSurfaceSliceTest::TestSurfacePipeExecution()
 //----------------------------------------------------------------------------
 {
 	
@@ -185,7 +185,7 @@ void mafPipeSurfaceSlice_BESTest::TestSurfacePipeExecution()
   sceneNode = new mafSceneNode(NULL,NULL,surface, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
-  mafPipeSurfaceSlice_BES *pipeSlice = new mafPipeSurfaceSlice_BES;
+  mafPipeSurfaceSlice *pipeSlice = new mafPipeSurfaceSlice;
   pipeSlice->Create(sceneNode);
 
   ////////// ACTORS List ///////////////
@@ -235,7 +235,7 @@ void mafPipeSurfaceSlice_BESTest::TestSurfacePipeExecution()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSlice_BESTest::TestSurfacePipeCreation()
+void mafPipeSurfaceSliceTest::TestSurfacePipeCreation()
 //----------------------------------------------------------------------------
 {
   ///////////////// render stuff /////////////////////////
@@ -272,7 +272,7 @@ void mafPipeSurfaceSlice_BESTest::TestSurfacePipeCreation()
   sceneNode = new mafSceneNode(NULL,NULL,surface, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
-  mafPipeSurfaceSlice_BES *pipeSlice = new mafPipeSurfaceSlice_BES;
+  mafPipeSurfaceSlice *pipeSlice = new mafPipeSurfaceSlice;
   pipeSlice->Create(sceneNode);
 
   CPPUNIT_ASSERT(pipeSlice);
@@ -281,7 +281,7 @@ void mafPipeSurfaceSlice_BESTest::TestSurfacePipeCreation()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSlice_BESTest::TestSetGetThickness()
+void mafPipeSurfaceSliceTest::TestSetGetThickness()
 //----------------------------------------------------------------------------
 {
   ///////////////// render stuff /////////////////////////
@@ -318,7 +318,7 @@ void mafPipeSurfaceSlice_BESTest::TestSetGetThickness()
   sceneNode = new mafSceneNode(NULL,NULL,surface, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
-  mafPipeSurfaceSlice_BES *pipeSlice = new mafPipeSurfaceSlice_BES;
+  mafPipeSurfaceSlice *pipeSlice = new mafPipeSurfaceSlice;
   pipeSlice->Create(sceneNode);
 
   ////////// ACTORS List ///////////////

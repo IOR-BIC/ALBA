@@ -99,12 +99,12 @@
 #include "mafPipePolylineGraphEditorTest.h"
 #include "mafVMEPolylineEditorTest.h"
 #include "mafPipeMeshSliceTest.h"
-#include "mafPipeSurfaceSlice_BESTest.h"
+#include "mafPipeSurfaceSliceTest.h"
 #include "mafPipeVolumeSliceTest.h"
 #include "mafVMEMapsTest.h"
 #include "mafPipeTrajectoriesTest.h"
 #include "mafPipeSliceTest.h"
-#include "mafPipePolylineSlice_BESTest.h"
+#include "mafPipePolylineSliceTest.h"
 #include "mafPipeWrappedMeterTest.h"
 #include "mafVMEOutputWrappedMeterTest.h"
 #include "mafPipeDensityDistanceTest.h"
@@ -244,12 +244,12 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafPipePolylineGraphEditorTest::suite());
 	runner.addTest(mafVMEPolylineEditorTest::suite());
 	runner.addTest(mafPipeMeshSliceTest::suite());
-	runner.addTest(mafPipeSurfaceSlice_BESTest::suite());
+	runner.addTest(mafPipeSurfaceSliceTest::suite());
 	runner.addTest(mafPipeVolumeSliceTest::suite());
 	runner.addTest(mafVMEMapsTest::suite());
 	runner.addTest(mafPipeTrajectoriesTest::suite());
 	runner.addTest(mafPipeSliceTest::suite());
-	runner.addTest(mafPipePolylineSlice_BESTest::suite());
+	runner.addTest(mafPipePolylineSliceTest::suite());
 	runner.addTest(mafPipeWrappedMeterTest::suite());
 	runner.addTest(mafVMEOutputWrappedMeterTest::suite());
 	runner.addTest(mafPipeDensityDistanceTest::suite());

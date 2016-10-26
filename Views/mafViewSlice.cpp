@@ -28,12 +28,12 @@ const bool DEBUG_MODE = false;
 #include "mafIndent.h"
 #include "mafViewSlice.h"
 #include "mafPipeVolumeSlice.h"
-#include "mafPipeSurfaceSlice_BES.h"
-#include "mafPipePolylineSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
+#include "mafPipePolylineSlice.h"
 #include "mafPipeMeshSlice.h"
 
-#include "mafPipeSurfaceSlice_BES.h"
-#include "mafPipePolylineSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
+#include "mafPipePolylineSlice.h"
 
 #include "mafVME.h"
 #include "mafVMEVolume.h"
@@ -341,10 +341,10 @@ void mafViewSlice::VmeCreatePipe(mafVME *vme)
         { 
           //it is slicing pipe
           //initialize supported slicing pipes
-          if(pipe->IsA("mafPipeSurfaceSlice_BES")){
+          if(pipe->IsA("mafPipeSurfaceSlice")){
             m_CurrentSurface.push_back(n);        
           }
-          else if(pipe->IsA("mafPipePolylineSlice_BES")){
+          else if(pipe->IsA("mafPipePolylineSlice")){
             m_CurrentPolyline.push_back(n);        
           }
           else if(pipe->IsA("mafPipePolylineGraphEditor"))

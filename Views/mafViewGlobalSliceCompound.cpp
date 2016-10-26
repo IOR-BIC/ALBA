@@ -36,7 +36,7 @@
 #include "mafVME.h"
 #include "mafVMEIterator.h"
 #include "mafPipeSlice.h"
-#include "mafPipeSurfaceSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
 #include "mafVMEVolumeGray.h"
 #include "mmaVolumeMaterial.h"
 #include "mafGUIFloatSlider.h"
@@ -117,14 +117,14 @@ void mafViewGlobalSliceCompound::PackageView()
 //-------------------------------------------------------------------------
 {
 	m_ViewGlobalSlice = new mafViewGlobalSlice("",CAMERA_OS_P);
-	m_ViewGlobalSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice_BES");
-  m_ViewGlobalSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice_BES");
+	m_ViewGlobalSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
+  m_ViewGlobalSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
 	m_ViewGlobalSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
   m_ViewGlobalSlice->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice");
   m_ViewGlobalSlice->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
   m_ViewGlobalSlice->PlugVisualPipe("mafVMEAnalog", "mafPipeBox", NON_VISIBLE);
-  m_ViewGlobalSlice->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice_BES");
-  m_ViewGlobalSlice->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice_BES");
+  m_ViewGlobalSlice->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice");
+  m_ViewGlobalSlice->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice");
 	
 	PlugChildView(m_ViewGlobalSlice);
 }

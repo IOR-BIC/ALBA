@@ -36,7 +36,7 @@
 #include "mafVME.h"
 #include "mafVMEIterator.h"
 #include "mafPipeVolumeSlice.h"
-#include "mafPipeSurfaceSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
 #include "mafVMEVolumeGray.h"
 #include "mmaVolumeMaterial.h"
 #include "mafGUIFloatSlider.h"
@@ -112,12 +112,12 @@ void mafViewSingleSliceCompound::PackageView()
 //-------------------------------------------------------------------------
 {
 	m_ViewSingleSlice = new mafViewSingleSlice("",CAMERA_CT);
-	m_ViewSingleSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice_BES");
-	m_ViewSingleSlice->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice_BES");
-  m_ViewSingleSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice_BES");
+	m_ViewSingleSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
+	m_ViewSingleSlice->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice");
+  m_ViewSingleSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
 	m_ViewSingleSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
 	m_ViewSingleSlice->PlugVisualPipe("mafVMEMesh","mafPipeMeshSlice");
-  m_ViewSingleSlice->PlugVisualPipe("mafVMEMeter","mafPipePolylineSlice_BES");
+  m_ViewSingleSlice->PlugVisualPipe("mafVMEMeter","mafPipePolylineSlice");
 
 	PlugChildView(m_ViewSingleSlice);
 }

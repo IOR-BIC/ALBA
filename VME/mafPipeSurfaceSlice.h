@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipeSurfaceSlice_BES
+ Module: mafPipeSurfaceSlice
  Authors: Silvano Imboden,Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) B3C
@@ -40,21 +40,21 @@ class vtkSphereSource;
 class vtkMAFToLinearTransform;
 
 /** 
-  class name: mafPipeSurfaceSlice_BES 
+  class name: mafPipeSurfaceSlice 
   Visual pipe that allow to visualize a surface polydata sliced according to 
   a slicing plain. The result effect is the contour of the surface cut by the plain.
 */
-class MAF_EXPORT mafPipeSurfaceSlice_BES : public mafPipeSlice
+class MAF_EXPORT mafPipeSurfaceSlice : public mafPipeSlice
 {
 public:
   /** RTTI Macro */
-  mafTypeMacro(mafPipeSurfaceSlice_BES,mafPipeSlice);
+  mafTypeMacro(mafPipeSurfaceSlice,mafPipeSlice);
 
   /** Constructor. */
-  mafPipeSurfaceSlice_BES();
+  mafPipeSurfaceSlice();
 
   /** Destructor. */
-  virtual     ~mafPipeSurfaceSlice_BES ();
+  virtual     ~mafPipeSurfaceSlice ();
 
   /**Return the thickness of the border*/	
   double GetThickness();

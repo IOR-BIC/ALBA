@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipePolylineSlice_BESTest
+ Module: mafPipePolylineSliceTest
  Authors: Roberto Mucci
  
  Copyright (c) B3C
@@ -24,11 +24,11 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "mafPipePolylineSlice_BESTest.h"
+#include "mafPipePolylineSliceTest.h"
 
 #include "mafSceneNode.h"
 #include "mafVMERoot.h"
-#include "mafPipePolylineSlice_BES.h"
+#include "mafPipePolylineSlice.h"
 #include "mafVMEPolyline.h"
 #include "mmaMaterial.h"
 #include "vtkMAFAssembly.h"
@@ -55,12 +55,12 @@ enum TESTS_PIPE_SURFACE
 };
 
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BESTest::TestFixture()
+void mafPipePolylineSliceTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BESTest::BeforeTest()
+void mafPipePolylineSliceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -76,7 +76,7 @@ void mafPipePolylineSlice_BESTest::BeforeTest()
 	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BESTest::AfterTest()
+void mafPipePolylineSliceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);
@@ -84,7 +84,7 @@ void mafPipePolylineSlice_BESTest::AfterTest()
   vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineSlice_BESTest::TestPipeExecution()
+void mafPipePolylineSliceTest::TestPipeExecution()
 //----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
@@ -111,7 +111,7 @@ void mafPipePolylineSlice_BESTest::TestPipeExecution()
   sceneNode = new mafSceneNode(NULL,NULL,polyline, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
-  mafPipePolylineSlice_BES *pipePolylineSlice = new mafPipePolylineSlice_BES;
+  mafPipePolylineSlice *pipePolylineSlice = new mafPipePolylineSlice;
   pipePolylineSlice->Create(sceneNode);
   
   ////////// ACTORS List ///////////////

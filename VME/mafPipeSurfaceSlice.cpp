@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipeSurfaceSlice_BES
+ Module: mafPipeSurfaceSlice
  Authors: Silvano Imboden, Paolo Quadrani, Gianluigi Crimi 
  
  Copyright (c) B3C
@@ -23,7 +23,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafPipeSurfaceSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
 #include "mafSceneNode.h"
 #include "mafVMESurface.h"
 #include "mmaMaterial.h"
@@ -62,11 +62,11 @@
 #include <vector>
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mafPipeSurfaceSlice_BES);
+mafCxxTypeMacro(mafPipeSurfaceSlice);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafPipeSurfaceSlice_BES::mafPipeSurfaceSlice_BES()
+mafPipeSurfaceSlice::mafPipeSurfaceSlice()
 :mafPipeSlice()
 //----------------------------------------------------------------------------
 {
@@ -90,7 +90,7 @@ mafPipeSurfaceSlice_BES::mafPipeSurfaceSlice_BES()
 	m_VTKTransform = NULL;
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSlice_BES::Create(mafSceneNode *n/*, bool use_axes*/)
+void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
 //----------------------------------------------------------------------------
 {
   Superclass::Create(n);
@@ -275,7 +275,7 @@ void mafPipeSurfaceSlice_BES::Create(mafSceneNode *n/*, bool use_axes*/)
   m_Axes->SetVisibility(0);
 }
 //----------------------------------------------------------------------------
-mafPipeSurfaceSlice_BES::~mafPipeSurfaceSlice_BES()
+mafPipeSurfaceSlice::~mafPipeSurfaceSlice()
 //----------------------------------------------------------------------------
 {
   m_Vme->GetEventSource()->RemoveObserver(this);
@@ -294,7 +294,7 @@ mafPipeSurfaceSlice_BES::~mafPipeSurfaceSlice_BES()
 	//@@@ if(m_use_axes) wxDEL(m_axes);  
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSlice_BES::Select(bool sel)
+void mafPipeSurfaceSlice::Select(bool sel)
 //----------------------------------------------------------------------------
 {
 	m_Selected = sel;
@@ -304,7 +304,7 @@ void mafPipeSurfaceSlice_BES::Select(bool sel)
 	}
 }
 //----------------------------------------------------------------------------
-mafGUI *mafPipeSurfaceSlice_BES::CreateGui()
+mafGUI *mafPipeSurfaceSlice::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
@@ -314,7 +314,7 @@ mafGUI *mafPipeSurfaceSlice_BES::CreateGui()
 	return m_Gui;
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSlice_BES::OnEvent(mafEventBase *maf_event)
+void mafPipeSurfaceSlice::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -355,7 +355,7 @@ void mafPipeSurfaceSlice_BES::OnEvent(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSlice_BES::GenerateTextureMapCoordinate()
+void mafPipeSurfaceSlice::GenerateTextureMapCoordinate()
 //----------------------------------------------------------------------------
 {
   mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
@@ -390,7 +390,7 @@ void mafPipeSurfaceSlice_BES::GenerateTextureMapCoordinate()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSlice_BES::SetSlice(double *Origin, double *Normal)
+void mafPipeSurfaceSlice::SetSlice(double *Origin, double *Normal)
 //----------------------------------------------------------------------------
 {
   if (Origin != NULL)
@@ -417,13 +417,13 @@ void mafPipeSurfaceSlice_BES::SetSlice(double *Origin, double *Normal)
 }
 
 //----------------------------------------------------------------------------
-double mafPipeSurfaceSlice_BES::GetThickness()
+double mafPipeSurfaceSlice::GetThickness()
 //----------------------------------------------------------------------------
 {
 	return m_Border;
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSlice_BES::SetThickness(double thickness)
+void mafPipeSurfaceSlice::SetThickness(double thickness)
 //----------------------------------------------------------------------------
 {
 	m_Border=thickness;

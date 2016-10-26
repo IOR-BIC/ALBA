@@ -25,8 +25,8 @@
 
 #include "mafViewSingleSlice.h"
 #include "mafPipeVolumeSlice.h"
-#include "mafPipeSurfaceSlice_BES.h"
-#include "mafPipePolylineSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
+#include "mafPipePolylineSlice.h"
 #include "mafVME.h"
 #include "mafVMEVolume.h"
 #include "mafVMEVolumeGray.h"
@@ -286,7 +286,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
         }
         UpdateText();
       }
-      else if(pipe_name.Equals("mafPipeSurfaceSlice_BES"))
+      else if(pipe_name.Equals("mafPipeSurfaceSlice"))
       {
         double normal[3];
 				switch(m_CameraPositionId)
@@ -319,7 +319,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
 				}
 
 		    m_CurrentSurface.push_back(n);
-		    ((mafPipeSurfaceSlice_BES *)pipe)->SetSlice(m_Slice,normal);
+		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_Slice,normal);
       }
 			else if(pipe_name.Equals("mafPipeMeshSlice"))
 			{
@@ -355,7 +355,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
 
 				((mafPipeMeshSlice *)pipe)->SetSlice(m_Slice, normal);
 			}
-			else if(pipe_name.Equals("mafPipePolylineSlice_BES"))
+			else if(pipe_name.Equals("mafPipePolylineSlice"))
 			{
 				double normal[3];
 				switch(m_CameraPositionId)
@@ -388,7 +388,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
 				}
 
 				m_CurrentPolyline.push_back(n);
-				((mafPipePolylineSlice_BES *)pipe)->SetSlice(m_Slice,normal);
+				((mafPipePolylineSlice *)pipe)->SetSlice(m_Slice,normal);
 			}
 			pipe->Create(n);
 
@@ -624,9 +624,9 @@ void mafViewSingleSlice::SetSlice(double origin[3])
   {
 		mafPipe * pipe = m_CurrentSurface.at(i)->GetPipe();
     pipe_name = pipe->GetTypeName();
-    if (pipe_name.Equals("mafPipeSurfaceSlice_BES"))
+    if (pipe_name.Equals("mafPipeSurfaceSlice"))
     {
-      mafPipeSurfaceSlice_BES *pipe = (mafPipeSurfaceSlice_BES *)m_CurrentSurface[i]->GetPipe();
+      mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->GetPipe();
       pipe->SetSlice(origin,NULL); 
     }
   }
@@ -637,9 +637,9 @@ void mafViewSingleSlice::SetSlice(double origin[3])
 	{
 		mafPipe * pipe = m_CurrentPolyline.at(i)->GetPipe();
 		pipe_name = pipe->GetTypeName();
-		if (pipe_name.Equals("mafPipePolylineSlice_BES"))
+		if (pipe_name.Equals("mafPipePolylineSlice"))
 		{
-			mafPipePolylineSlice_BES *pipe = (mafPipePolylineSlice_BES *)pipe;
+			mafPipePolylineSlice *pipe = (mafPipePolylineSlice *)pipe;
 			pipe->SetSlice(origin,NULL); 
 		}
 	}
