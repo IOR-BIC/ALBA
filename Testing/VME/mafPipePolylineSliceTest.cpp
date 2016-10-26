@@ -31,18 +31,19 @@
 #include "mafPipePolylineSlice.h"
 #include "mafVMEPolyline.h"
 #include "mmaMaterial.h"
-
 #include "vtkMAFAssembly.h"
+
 #include "vtkMAFSmartPointer.h"
+
 #include "vtkMapper.h"
 #include "vtkPointData.h"
 #include "vtkDataSetReader.h"
 #include "vtkPolyData.h"
 
 // render window stuff
-
 #include "vtkRenderWindowInteractor.h"
 #include "vtkCamera.h"
+
 #include <iostream>
 
 enum TESTS_PIPE_SURFACE
@@ -89,7 +90,7 @@ void mafPipePolylineSliceTest::TestPipeExecution()
   ////// Create VME (import vtkData) ////////////////////
   vtkMAFSmartPointer<vtkDataSetReader> importer;
   mafString filename=MAF_DATA_ROOT;
-  filename<<"/Test_PipePolylineSlice/poly.vtk";
+  filename<<"/Test_PipePolylineSlice_BES/polydata.vtk";
   importer->SetFileName(filename);
   importer->Update();
   mafSmartPointer<mafVMEPolyline> polyline;
@@ -119,14 +120,13 @@ void mafPipePolylineSliceTest::TestPipeExecution()
 
   double slice[3];
   slice[0] = slice[1] = slice[2] = 0.0;
-  pipePolylineSlice->SetSlice(slice);
-
+  
   double normal[3];
   normal[0] = 0;
   normal[1] = 0;
   normal[2] = 1;
-  pipePolylineSlice->SetNormal(normal);
-	
+  pipePolylineSlice->SetSlice(slice, normal);
+
   for(int i=0;i<NUMBER_OF_TEST;i++)
   {
     if(i == TEST_RADIUS)
@@ -147,7 +147,7 @@ void mafPipePolylineSliceTest::TestPipeExecution()
 
 			COMPARE_IMAGES("TestPipeExecution", i);
 
-      m_Renderer->RemoveAllProps();
+			m_Renderer->RemoveAllProps();
     }
     else if(i == TEST_THICKNESS)
     {
@@ -167,7 +167,7 @@ void mafPipePolylineSliceTest::TestPipeExecution()
 
 			COMPARE_IMAGES("TestPipeExecution", i);
 
-			m_Renderer->RemoveAllProps();
+      m_Renderer->RemoveAllProps();
     }
     else if(i == TEST_SPLINE)
     {
@@ -188,7 +188,7 @@ void mafPipePolylineSliceTest::TestPipeExecution()
 
 			COMPARE_IMAGES("TestPipeExecution", i);
 
-			m_Renderer->RemoveAllProps();
+      m_Renderer->RemoveAllProps();
     }
   }
 

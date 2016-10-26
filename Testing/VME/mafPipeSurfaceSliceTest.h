@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafPipeSurfaceSliceTest
- Authors: Matteo Giacomoni
+ Authors: Eleonora Mambrini
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -35,19 +35,23 @@ public:
 
   CPPUNIT_TEST_SUITE( mafPipeSurfaceSliceTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
+  CPPUNIT_TEST( TestSurfacePipeCreation );
+  CPPUNIT_TEST( TestSetGetThickness );
   CPPUNIT_TEST( TestSurfacePipeExecution );
-  CPPUNIT_TEST( TestCloudClosePipeExecution );
-  CPPUNIT_TEST( TestCloudOpenPipeExecution );
+  CPPUNIT_TEST( TestCloudPipeExecution );
+ 
   CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();
   /** Test the pipe with a mafVMESurface as input */
   void TestSurfacePipeExecution();
-  /** Test the pipe with a close mafVMELandamarkCloud as input */
-  void TestCloudClosePipeExecution();
-  /** Test the pipe with a open mafVMELandamarkCloud as input */
-  void TestCloudOpenPipeExecution();
+  /** Test the pipe with a mafVMELandamarkCloud as input */
+  void TestCloudPipeExecution();
+  /** Test pipe creation. */
+  void TestSurfacePipeCreation();
+  /** Test Set and Get methods for thickness attribute. */
+  void TestSetGetThickness();
 
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
 

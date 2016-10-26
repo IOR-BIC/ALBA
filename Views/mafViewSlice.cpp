@@ -28,8 +28,8 @@ const bool DEBUG_MODE = false;
 #include "mafIndent.h"
 #include "mafViewSlice.h"
 #include "mafPipeVolumeSlice.h"
-#include "mafPipeSurfaceSlice_BES.h"
-#include "mafPipePolylineSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
+#include "mafPipePolylineSlice.h"
 #include "mafPipeMeshSlice.h"
 
 #include "mafPipeSurfaceSlice.h"
@@ -341,10 +341,10 @@ void mafViewSlice::VmeCreatePipe(mafVME *vme)
         { 
           //it is slicing pipe
           //initialize supported slicing pipes
-          if(pipe->IsA("mafPipeSurfaceSlice_BES")){
+          if(pipe->IsA("mafPipeSurfaceSlice")){
             m_CurrentSurface.push_back(n);        
           }
-          else if(pipe->IsA("mafPipePolylineSlice_BES")){
+          else if(pipe->IsA("mafPipePolylineSlice")){
             m_CurrentPolyline.push_back(n);        
           }
           else if(pipe->IsA("mafPipePolylineGraphEditor"))
@@ -367,37 +367,6 @@ void mafViewSlice::VmeCreatePipe(mafVME *vme)
           positionSlice[2] = m_Slice[2];
           MultiplyPointByInputVolumeABSMatrix(positionSlice);
           spipe->SetSlice(positionSlice, m_SliceNormal);
-        }
-        else
-        {
-          //BES: 12.6.2009 - TODO: this code should be removed when
-          //mafPipeSurfaceSlice_BES, mafPipePolylineSlice_BES and mafPipeMeshSlice
-          //are committed down and instead of it, the code above should work (after _BES suffices are stripped)
-
-          if(pipe_name.Equals("mafPipeSurfaceSlice"))
-          {
-            m_CurrentSurface.push_back(n);
-
-            double positionSlice[3];
-            positionSlice[0] = m_Slice[0];
-            positionSlice[1] = m_Slice[1];
-            positionSlice[2] = m_Slice[2];
-            MultiplyPointByInputVolumeABSMatrix(positionSlice);
-            ((mafPipeSurfaceSlice *)pipe)->SetSlice(positionSlice);
-            ((mafPipeSurfaceSlice *)pipe)->SetNormal(m_SliceNormal);
-
-          }
-          else if(pipe_name.Equals("mafPipePolylineSlice"))
-          {
-            m_CurrentPolyline.push_back(n);
-            double positionSlice[3];
-            positionSlice[0] = m_Slice[0];
-            positionSlice[1] = m_Slice[1];
-            positionSlice[2] = m_Slice[2];
-            MultiplyPointByInputVolumeABSMatrix(positionSlice);
-            ((mafPipePolylineSlice *)pipe)->SetSlice(positionSlice);
-            ((mafPipePolylineSlice *)pipe)->SetNormal(m_SliceNormal);
-          }
         }
       } //end else [it is not volume slicing]                     
 
@@ -596,68 +565,30 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
 
   for(int i = 0; i < m_CurrentSurface.size(); i++)
   {
-		mafPipe * curSurfPipe = m_CurrentSurface.at(i)->GetPipe();
-    if (curSurfPipe)
-    {
-      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curSurfPipe);
-      if (pipe != NULL){
-        pipe->SetSlice(coord, m_SliceNormal); 
-      }
-      else
-      {
-        //BES: 12.6.2009 - TODO: this branch should be removed when mafPipeSurfaceSlice_BES committed down
-        mafPipeSurfaceSlice* pipe = mafPipeSurfaceSlice::SafeDownCast(curSurfPipe);
-        if (pipe != NULL) 
-        {
-          pipe->SetSlice(coord); 
-          pipe->SetNormal(m_SliceNormal); 
-        }
-      }
-    }
+		mafPipeSlice * pipe = mafPipeSlice::SafeDownCast(m_CurrentSurface.at(i)->GetPipe());
+    if (pipe)
+      pipe->SetSlice(coord, m_SliceNormal); 
   }	
-
 
   for(int i = 0;i < m_CurrentPolyline.size();i++)
   {
-		mafPipe * curPolylinePipe = m_CurrentPolyline.at(i)->GetPipe();
-    if(curPolylinePipe)
-    {
-      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curPolylinePipe);
-      if (pipe != NULL){
-        pipe->SetSlice(coord, m_SliceNormal); 
-      }
-      else
-      {
-        //BES: 12.6.2009 - TODO: this branch should be removed when mafPipeSurfaceSlice_BES committed down
-        mafPipePolylineSlice* pipe = mafPipePolylineSlice::SafeDownCast(curPolylinePipe);
-        if (pipe != NULL) 
-        {
-          pipe->SetSlice(coord); 
-          pipe->SetNormal(m_SliceNormal); 
-        }
-      }
-    }
+		mafPipeSlice * pipe = mafPipeSlice::SafeDownCast(m_CurrentPolyline.at(i)->GetPipe());
+    if(pipe)
+			pipe->SetSlice(coord, m_SliceNormal); 
   }	
 
 	for(int i = 0; i < m_CurrentPolylineGraphEditor.size();i++)
 	{
-		mafPipe * curPGEpipe = m_CurrentPolylineGraphEditor.at(i)->GetPipe();
-    if (curPGEpipe)
-    {
-      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curPGEpipe);
-      if (pipe != NULL){
+		mafPipeSlice * pipe = mafPipeSlice::SafeDownCast(m_CurrentPolylineGraphEditor.at(i)->GetPipe());
+    if (pipe)
         pipe->SetSlice(coord, m_SliceNormal); 
-      }
-    }   
 	}
 
   for(int i = 0; i < m_CurrentMesh.size();i++)
   {
-		mafPipeSlice * curMeshPipe = mafPipeSlice::SafeDownCast(m_CurrentMesh.at(i)->GetPipe());
-    if (curMeshPipe)
-    {
-			curMeshPipe->SetSlice(coord, m_SliceNormal);
-    }   
+		mafPipeSlice * pipe = mafPipeSlice::SafeDownCast(m_CurrentMesh.at(i)->GetPipe());
+    if (pipe)
+			pipe->SetSlice(coord, m_SliceNormal);
   }
 
   // update text

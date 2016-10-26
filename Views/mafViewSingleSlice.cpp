@@ -319,8 +319,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
 				}
 
 		    m_CurrentSurface.push_back(n);
-		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_Slice);
-				((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
+		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_Slice,normal);
       }
 			else if(pipe_name.Equals("mafPipeMeshSlice"))
 			{
@@ -389,8 +388,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
 				}
 
 				m_CurrentPolyline.push_back(n);
-				((mafPipePolylineSlice *)pipe)->SetSlice(m_Slice);
-				((mafPipePolylineSlice *)pipe)->SetNormal(normal);
+				((mafPipePolylineSlice *)pipe)->SetSlice(m_Slice,normal);
 			}
 			pipe->Create(n);
 
@@ -516,25 +514,9 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 				mafVMEIterator *iter = m_CurrentVolume->GetVme()->GetRoot()->NewIterator();
 				for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 				{
-
-					//TODO: Remove this on clean bes files
-					if(node->IsA("mafVMESurface"))
-					{
-						mafPipeSurfaceSlice *p= mafPipeSurfaceSlice::SafeDownCast(this->GetNodePipe(node));
-						if(p)
-							((mafPipeSurfaceSlice *)p)->SetSlice(m_OriginVolume);
-					}
-					if(node->IsA("mafVMEPolyline"))
-					{
-						mafPipePolylineSlice *p= mafPipePolylineSlice::SafeDownCast(this->GetNodePipe(node));
-						if(p)
-							((mafPipePolylineSlice *)p)->SetSlice(m_OriginVolume);
-					}
-
 					mafPipeSlice *pipeSlice = mafPipeSlice::SafeDownCast(this->GetNodePipe(node));
 					if(pipeSlice)
 							pipeSlice->SetSlice(m_OriginVolume,NULL);
-					
 				}
         iter->Delete();
 			}
@@ -645,7 +627,7 @@ void mafViewSingleSlice::SetSlice(double origin[3])
     if (pipe_name.Equals("mafPipeSurfaceSlice"))
     {
       mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->GetPipe();
-      pipe->SetSlice(origin); 
+      pipe->SetSlice(origin,NULL); 
     }
   }
 
@@ -658,7 +640,7 @@ void mafViewSingleSlice::SetSlice(double origin[3])
 		if (pipe_name.Equals("mafPipePolylineSlice"))
 		{
 			mafPipePolylineSlice *pipe = (mafPipePolylineSlice *)pipe;
-			pipe->SetSlice(origin); 
+			pipe->SetSlice(origin,NULL); 
 		}
 	}
   // update text

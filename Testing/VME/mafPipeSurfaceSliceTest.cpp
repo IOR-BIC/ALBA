@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafPipeSurfaceSliceTest
- Authors: Matteo Giacomoni
+ Authors: Eleonora Mambrini, Matteo Giacomoni, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -78,7 +78,7 @@ void mafPipeSurfaceSliceTest::AfterTest()
   vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSliceTest::TestCloudClosePipeExecution()
+void mafPipeSurfaceSliceTest::TestCloudPipeExecution()
 //----------------------------------------------------------------------------
 {
   mafSmartPointer<mafVMELandmark> first;
@@ -95,7 +95,7 @@ void mafPipeSurfaceSliceTest::TestCloudClosePipeExecution()
 	first->ReparentTo(ldm);
 	second->ReparentTo(ldm);
 	third->ReparentTo(ldm);
-	ldm->GetMaterial();
+  ldm->GetMaterial();
   ldm->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
 	ldm->ShowAllLandmarks();
 
@@ -135,7 +135,7 @@ void mafPipeSurfaceSliceTest::TestCloudClosePipeExecution()
   double origins[3][NUM_OF_CENTERS] = {{0.0,0.0,0.0},{5.0,5.0,-5.0},{0.0,0.0,5.0}};
   for(int i=3;i<3+NUM_OF_CENTERS;i++)
   {
-    pipeSlice->SetSlice(origins[i-3]);
+    pipeSlice->SetSlice(origins[i-3], NULL);
 
     pipeSlice->GetAssemblyFront()->GetActors(actorList);
     actorList->InitTraversal();
@@ -159,84 +159,10 @@ void mafPipeSurfaceSliceTest::TestCloudClosePipeExecution()
   delete sceneNode;
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceSliceTest::TestCloudOpenPipeExecution()
-//----------------------------------------------------------------------------
-{
-  mafSmartPointer<mafVMELandmarkCloud> ldm;
-  ldm->TestModeOn();
-  ldm->AppendLandmark(0.0,0.0,0.0,"first");
-  ldm->AppendLandmark(1.0,0.0,0.0,"second");
-  ldm->AppendLandmark(0.0,0.0,5.0,"third");
-  ldm->GetMaterial();
-  ldm->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
-
-  ldm->GetOutput()->GetVTKData()->Update();
-  ldm->GetOutput()->Update();
-  ldm->Update();
-
-  ldm->GetOutput()->Update();
-  ldm->Update();
-
-  double bounds[6];
-  ldm->GetOutput()->GetBounds(bounds);
-
-  //Assembly will be create when instancing mafSceneNode
-  mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,ldm, m_Renderer);
-
-  /////////// Pipe Instance and Creation ///////////
-  mafPipeSurfaceSlice *pipeSlice = new mafPipeSurfaceSlice;
-  pipeSlice->Create(sceneNode);
-
-  ////////// ACTORS List ///////////////
-  vtkPropCollection *actorList = vtkPropCollection::New();
-  pipeSlice->GetAssemblyFront()->GetActors(actorList);
-
-  actorList->InitTraversal();
-
-  vtkProp *actor = actorList->GetNextProp();
-  while(actor)
-  {   
-    m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
-    actor = actorList->GetNextProp();
-  }
-
-  m_Renderer->ResetCamera(bounds);
-  m_RenderWindow->Render();
-
-  double origins[3][NUM_OF_CENTERS] = {{0.0,0.0,0.0},{5.0,5.0,-5.0},{0.0,0.0,5.0}};
-  for(int i=6;i<6+NUM_OF_CENTERS;i++)
-  {
-    pipeSlice->SetSlice(origins[i-6]);
-
-    pipeSlice->GetAssemblyFront()->GetActors(actorList);
-    actorList->InitTraversal();
-    vtkProp *actor = actorList->GetNextProp();
-
-    while(actor)
-    {   
-      m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
-      actor = actorList->GetNextProp();
-    }
-
-    m_Renderer->ResetCamera(bounds);
-    m_RenderWindow->Render();
-
-		COMPARE_IMAGES("TestCloudOpenPipeExecution", i);
-  }
-	
-  vtkDEL(actorList);
-  delete sceneNode;
-}
-//----------------------------------------------------------------------------
 void mafPipeSurfaceSliceTest::TestSurfacePipeExecution()
 //----------------------------------------------------------------------------
 {
-
+	
   ////// Create VME ////////////////////
 
   vtkMAFSmartPointer<vtkSphereSource> sphere;
@@ -276,14 +202,14 @@ void mafPipeSurfaceSliceTest::TestSurfacePipeExecution()
 
     actor = actorList->GetNextProp();
   }
-  
+
   m_Renderer->ResetCamera(bounds);
   m_RenderWindow->Render();
 
   double origins[3][NUM_OF_CENTERS] = {0.0,0.0,0.0,0.0,0.0,7.0,0.0,0.0,-3.0};
   for(int i=0;i<NUM_OF_CENTERS;i++)
   {
-    pipeSlice->SetSlice(origins[i]);
+    pipeSlice->SetSlice(origins[i], NULL);
 
     pipeSlice->GetAssemblyFront()->GetActors(actorList);
     actorList->InitTraversal();
@@ -304,5 +230,123 @@ void mafPipeSurfaceSliceTest::TestSurfacePipeExecution()
   }
 
   vtkDEL(actorList);
+
+  delete sceneNode;
+}
+
+//----------------------------------------------------------------------------
+void mafPipeSurfaceSliceTest::TestSurfacePipeCreation()
+//----------------------------------------------------------------------------
+{
+  ///////////////// render stuff /////////////////////////
+
+  m_Renderer->SetBackground(0.1, 0.1, 0.1);
+
+  m_RenderWindow->AddRenderer(m_Renderer);
+  m_RenderWindow->SetSize(640, 480);
+  m_RenderWindow->SetPosition(400,0);
+
+  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+
+  ///////////// end render stuff /////////////////////////
+	
+  ////// Create VME ////////////////////
+
+  vtkMAFSmartPointer<vtkSphereSource> sphere;
+  sphere->SetRadius(8.0);
+  sphere->Update();
+
+  double bounds[6];
+  sphere->GetOutput()->GetBounds(bounds);
+
+  mafSmartPointer<mafVMESurface> surface;
+  surface->SetData(sphere->GetOutput(),0.0);
+  surface->GetOutput()->GetVTKData()->Update();
+  surface->GetOutput()->Update();
+  surface->GetMaterial();
+  surface->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+  surface->Update();
+
+  //Assembly will be create when instancing mafSceneNode
+  mafSceneNode *sceneNode;
+  sceneNode = new mafSceneNode(NULL,NULL,surface, m_Renderer);
+
+  /////////// Pipe Instance and Creation ///////////
+  mafPipeSurfaceSlice *pipeSlice = new mafPipeSurfaceSlice;
+  pipeSlice->Create(sceneNode);
+
+  CPPUNIT_ASSERT(pipeSlice);
+
+  delete sceneNode;
+}
+
+//----------------------------------------------------------------------------
+void mafPipeSurfaceSliceTest::TestSetGetThickness()
+//----------------------------------------------------------------------------
+{
+  ///////////////// render stuff /////////////////////////
+
+  m_Renderer->SetBackground(0.1, 0.1, 0.1);
+
+  m_RenderWindow->AddRenderer(m_Renderer);
+  m_RenderWindow->SetSize(640, 480);
+  m_RenderWindow->SetPosition(400,0);
+
+  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+
+  ///////////// end render stuff /////////////////////////
+	
+  ////// Create VME ////////////////////
+
+  vtkMAFSmartPointer<vtkSphereSource> sphere;
+  sphere->SetRadius(8.0);
+  sphere->Update();
+
+  double bounds[6];
+  sphere->GetOutput()->GetBounds(bounds);
+
+  mafSmartPointer<mafVMESurface> surface;
+  surface->SetData(sphere->GetOutput(),0.0);
+  surface->GetOutput()->GetVTKData()->Update();
+  surface->GetOutput()->Update();
+  surface->GetMaterial();
+  surface->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+  surface->Update();
+
+  //Assembly will be create when instancing mafSceneNode
+  mafSceneNode *sceneNode;
+  sceneNode = new mafSceneNode(NULL,NULL,surface, m_Renderer);
+
+  /////////// Pipe Instance and Creation ///////////
+  mafPipeSurfaceSlice *pipeSlice = new mafPipeSurfaceSlice;
+  pipeSlice->Create(sceneNode);
+
+  ////////// ACTORS List ///////////////
+  vtkPropCollection *actorList = vtkPropCollection::New();
+  pipeSlice->GetAssemblyFront()->GetActors(actorList);
+
+  actorList->InitTraversal();
+
+  vtkProp *actor = actorList->GetNextProp();
+  while(actor)
+  {   
+    m_Renderer->AddActor(actor);
+    m_RenderWindow->Render();
+
+    actor = actorList->GetNextProp();
+  }
+
+  m_Renderer->ResetCamera(bounds);
+  m_RenderWindow->Render();
+
+  double thickness = 1.0;
+  pipeSlice->SetThickness(thickness);
+
+  double result_thickness = pipeSlice->GetThickness();
+
+  CPPUNIT_ASSERT(result_thickness == thickness);
+
+  vtkDEL(actorList);
+
   delete sceneNode;
 }

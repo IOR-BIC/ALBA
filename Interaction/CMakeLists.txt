@@ -174,12 +174,7 @@ SET(PROJECT_SRCS
   mafDeviceButtonsPadMouseDialog.cpp
   mafGUITransformSliders.cpp
   mafGUITransformSliders.h
-  
-  ##### Introduced with VolumeLarge - to be committed down ###
-  # mafGizmoROI_BES.cpp
-  # mafGizmoROI_BES.h  
-  ############################################################
-
+    
   mafGizmoCrossRotateTranslate.cpp
   mafGizmoCrossRotateTranslate.h
 	  

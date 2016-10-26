@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_vtkMAFMeshCuttertest_H__
-#define __CPP_UNIT_vtkMAFMeshCuttert_BESest_H__
+#ifndef __CPP_UNIT_vtkMAFMeshCutterTest_H__
+#define __CPP_UNIT_vtkMAFMeshCutterTest_H__
 
 #include "mafTest.h"
 

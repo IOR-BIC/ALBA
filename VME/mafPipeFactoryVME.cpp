@@ -30,8 +30,6 @@
 
 #include "mafPipe.h"
 #include "mafPipeSurface.h"
-#include "mafPipeSurfaceSlice.h"
-#include "mafPipePolylineSlice.h"
 #include "mafPipeSurfaceTextured.h"
 
 #include "mafPipeVolumeProjected.h"
@@ -73,8 +71,8 @@
 #include "mafPipePolylineGraphEditor.h"
 
 #include "mafPipeMeshSlice.h"
-#include "mafPipePolylineSlice_BES.h"
-#include "mafPipeSurfaceSlice_BES.h"
+#include "mafPipePolylineSlice.h"
+#include "mafPipeSurfaceSlice.h"
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeCompoundVolume.h"
 #include "mafPipeCompoundVolumeFixedScalars.h"
@@ -138,9 +136,7 @@ mafPipeFactoryVME::mafPipeFactoryVME()
   //
   mafPlugPipeMacro(mafPipeSurface,"Pipe to render vtk polydata as surface rendering");
 	mafPlugPipeMacro(mafPipeRefSys,"Pipe for VME RefSys");
-  mafPlugPipeMacro(mafPipeSurfaceSlice,"Pipe for render vtk surface as an arbitrary slice");
   mafPlugPipeMacro(mafPipeSurfaceTextured,"Pipe for render vtk polydata as textured surface rendering");
-	mafPlugPipeMacro(mafPipePolylineSlice,"Pipe for render vtk polyline as an arbitrary slice");
   mafPlugPipeMacro(mafPipeGizmo,"Pipe to render gizmos");
   mafPlugPipeMacro(mafPipeMeter,"Pipe for mafVMEMeter");
   mafPlugPipeMacro(mafPipeVolumeProjected,"Pipe for render vtk volumes as a projected image along X,Y or Z axes");
@@ -200,11 +196,9 @@ mafPipeFactoryVME::mafPipeFactoryVME()
   mafPlugPipeMacro(mafPipeVolumeSliceBlend, "Pipe for rendering volume with 2 slices with opacity.");
   mafPlugPipeMacro(mafVisualPipeCollisionDetection, "Pipe for visualization of collision between 2 surfaces.");
 
-
-  //BES: 16.4.2008 - these pipes are to be committed down (without _BES suffix) to openMAF in the future
   mafPlugPipeMacro(mafPipeVolumeSlice, "BES: mafPipeVolumeSlice.");
-  mafPlugPipeMacro(mafPipeSurfaceSlice_BES, "BES: mafPipeSurfaceSlice.");
-  mafPlugPipeMacro(mafPipePolylineSlice_BES, "BES: mafPipePolylineSlice_BES.");
+  mafPlugPipeMacro(mafPipeSurfaceSlice, "BES: mafPipeSurfaceSlice.");
+  mafPlugPipeMacro(mafPipePolylineSlice, "BES: mafPipePolylineSlice.");
   mafPlugPipeMacro(mafPipeMeshSlice, "BES: mafPipeMeshSlice.");
 
   mafPlugPipeMacro(mafPipeVolumeSliceNotInterpolated, "Pipe for not interpolated and not resampled volume visualization");   

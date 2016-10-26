@@ -370,12 +370,11 @@ void mafViewGlobalSlice::VmeCreatePipe(mafVME *vme)
       else if(pipe_name.Equals("mafPipeSurfaceSlice"))
       {
 				((mafPipeSurfaceSlice *)pipe)->ShowBoxSelectionOn();
-        ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_SliceOrigin);
 				double DoubleNormal[3];
 				DoubleNormal[0]=(double)m_SliceNormal[0];
 				DoubleNormal[1]=(double)m_SliceNormal[1];
 				DoubleNormal[2]=(double)m_SliceNormal[2];
-				((mafPipeSurfaceSlice *)pipe)->SetNormal(DoubleNormal);
+				((mafPipeSurfaceSlice *)pipe)->SetSlice(m_SliceOrigin, DoubleNormal);
 			}
       else if(pipe_name.Equals("mafPipeMeshSlice"))
       {
@@ -666,12 +665,12 @@ void mafViewGlobalSlice::UpdateSlice()
 		  if(vme->IsA("mafVMESurface")||vme->IsA("mafVMESurfaceParametric")||vme->IsA("mafVMELandmarkCloud")||vme->IsA("mafVMELandmark"))
 		  {
 				mafPipeSurfaceSlice * pipe = (mafPipeSurfaceSlice *)node->GetPipe();
-        pipe->SetSlice(m_SliceOrigin);
+        
 				double DoubleNormal[3];
 				DoubleNormal[0]=(double)m_SliceNormal[0];
 				DoubleNormal[1]=(double)m_SliceNormal[1];
 				DoubleNormal[2]=(double)m_SliceNormal[2];
-				pipe->SetNormal(DoubleNormal);
+				pipe->SetSlice(m_SliceOrigin,DoubleNormal);
       }
       if(vme->IsA("mafVMEMesh"))
       {

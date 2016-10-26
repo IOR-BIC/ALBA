@@ -34,7 +34,6 @@ See the COPYINGS file for license details
 // forward references :
 //----------------------------------------------------------------------------
 class mafGUIFloatSlider;
-class mafViewSlice_BES;
 class mafVMEVolume;
 class vtkActor2D;
 class vtkTextMapper;

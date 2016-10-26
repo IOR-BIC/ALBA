@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafPipeSurfaceSlice
- Authors: Silvano Imboden - Paolo Quadrani
+ Authors: Silvano Imboden,Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -14,13 +14,14 @@
 
 =========================================================================*/
 
-#ifndef __mafPipeSurfaceSlice_H__
-#define __mafPipeSurfaceSlice_H__
+#ifndef __mafPipeSurfaceSlice_H__B
+#define __mafPipeSurfaceSlice_H__B
 
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "mafPipe.h"
+#include "mafDefines.h"
+#include "mafPipeSlice.h"
 #include "mafVMEImage.h"
 
 //----------------------------------------------------------------------------
@@ -38,17 +39,21 @@ class vtkPlane;
 class vtkSphereSource;
 class vtkMAFToLinearTransform;
 
-//----------------------------------------------------------------------------
-// mafPipeSurfaceSlice :
-//----------------------------------------------------------------------------
-/** Visual pipe that allow to visualize a surface polydata sliced according to 
-a slicing plain. The result effect is the contour of the surface cut by the plain.*/
-class MAF_EXPORT mafPipeSurfaceSlice : public mafPipe
+/** 
+  class name: mafPipeSurfaceSlice 
+  Visual pipe that allow to visualize a surface polydata sliced according to 
+  a slicing plain. The result effect is the contour of the surface cut by the plain.
+*/
+class MAF_EXPORT mafPipeSurfaceSlice : public mafPipeSlice
 {
 public:
-  mafTypeMacro(mafPipeSurfaceSlice,mafPipe);
+  /** RTTI Macro */
+  mafTypeMacro(mafPipeSurfaceSlice,mafPipeSlice);
 
-               mafPipeSurfaceSlice();
+  /** Constructor. */
+  mafPipeSurfaceSlice();
+
+  /** Destructor. */
   virtual     ~mafPipeSurfaceSlice ();
 
   /**Return the thickness of the border*/	
@@ -66,19 +71,14 @@ public:
   /** Manage the actor selection by showing the corner box around the actor when the corresponding VME is selected.*/
   virtual void Select(bool select); 
 
-  /** Set the origin of the slice*/
-  void SetSlice(double *Origin);
+  /** Set the origin and normal of the slice.
+  Both, Origin and Normal may be NULL, if the current value is to be preserved. */
+  /*virtual*/ void SetSlice(double* Origin, double* Normal);  
 
-  /** Set the normal of the slice*/
-	void SetNormal(double *Normal);
-
-  /** Create visual-pipe for closed cloud or single landmark */
-  void CreateClosedCloudPipe();
-
-  /** Remove visual-pipe for closed cloud */
-  void RemoveClosedCloudPipe();
-
+  /** Show bounding box when selection is on. */
 	void ShowBoxSelectionOn(){m_ShowSelection=true;};
+
+  /** Hide bounding box when selection is off. */
 	void ShowBoxSelectionOff(){m_ShowSelection=false;};
 
   /** IDs for the GUI */
@@ -93,8 +93,9 @@ public:
   };
 
   //bool ImageAccept(mafVME*node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
-
+  /** creation of gui */
   virtual mafGUI  *CreateGui();
+
 protected:
   vtkTexture              *m_Texture;
   vtkPolyDataMapper	      *m_Mapper;
@@ -111,8 +112,6 @@ protected:
 
 	bool	m_ShowSelection;
 
-  double	m_Origin[3];
-  double	m_Normal[3];
 
   int m_ScalarVisibility;
   int m_RenderingDisplayListFlag;
@@ -122,9 +121,8 @@ protected:
 
 //@@@  bool                    m_use_axes; //SIL. 22-5-2003 added line - 
 
-  /** 
-  Generate texture coordinate for polydata according to the mapping mode*/
+  /**  Generate texture coordinate for polydata according to the mapping mode*/
   void GenerateTextureMapCoordinate();
 
 };  
-#endif // __mafPipeSurfaceSlice_H__
+#endif // __mafPipeSurfaceSlice_H__B

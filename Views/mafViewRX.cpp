@@ -162,9 +162,7 @@ void mafViewRX::VmeCreatePipe(mafVME *vme)
         positionSlice[0] = (b[1]+b[0])/2;
         positionSlice[1] = (b[3]+b[2])/2;
         positionSlice[2] = (b[5]+b[4])/2;
-        ((mafPipeSurfaceSlice *)pipe)->SetSlice(positionSlice);
-        ((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
-
+        ((mafPipeSurfaceSlice *)pipe)->SetSlice(positionSlice, normal);
       }
       else if(pipe_name.Equals("mafVisualPipeSlicerSlice"))
       {
