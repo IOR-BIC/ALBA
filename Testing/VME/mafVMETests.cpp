@@ -69,7 +69,6 @@
 #include "mafCryptTest.h"
 #include "mafPipePolylineTest.h"
 #include "mafMatrixInterpolatorTest.h"
-#include "mafPipeSurfaceSliceTest.h"
 #include "mafVMEGenericTest.h"
 #include "mafPipeLandmarkCloudTest.h"
 #include "mafVMEOutputVTKTest.h"
@@ -80,7 +79,6 @@
 #include "mafPipeMeterTest.h"
 #include "mafPipeVolumeProjectedTest.h"
 #include "mafVMEItemTest.h"
-#include "mafPipePolylineSliceTest.h"
 #include "mafVMERefSysTest.h"
 #include "mafVMEProberTest.h"
 #include "mafVMEMeterTest.h"
@@ -216,7 +214,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafCryptTest::suite());
 	runner.addTest(mafPipePolylineTest::suite());
 	runner.addTest(mafMatrixInterpolatorTest::suite());
-	runner.addTest(mafPipeSurfaceSliceTest::suite());
 	runner.addTest(mafVMEGenericTest::suite());
 	runner.addTest(mafPipeLandmarkCloudTest::suite());
 	runner.addTest(mafVMEOutputVTKTest::suite());
@@ -227,7 +224,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafPipeMeterTest::suite());
 	runner.addTest(mafPipeVolumeProjectedTest::suite());
 	runner.addTest(mafVMEItemTest::suite());
-	runner.addTest(mafPipePolylineSliceTest::suite());
 	runner.addTest(mafVMERefSysTest::suite());
 	runner.addTest(mafVMEProberTest::suite());
 	runner.addTest(mafVMEMeterTest::suite());

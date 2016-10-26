@@ -30,8 +30,6 @@
 
 #include "mafPipe.h"
 #include "mafPipeSurface.h"
-#include "mafPipeSurfaceSlice.h"
-#include "mafPipePolylineSlice.h"
 #include "mafPipeSurfaceTextured.h"
 
 #include "mafPipeVolumeProjected.h"
@@ -138,9 +136,7 @@ mafPipeFactoryVME::mafPipeFactoryVME()
   //
   mafPlugPipeMacro(mafPipeSurface,"Pipe to render vtk polydata as surface rendering");
 	mafPlugPipeMacro(mafPipeRefSys,"Pipe for VME RefSys");
-  mafPlugPipeMacro(mafPipeSurfaceSlice,"Pipe for render vtk surface as an arbitrary slice");
   mafPlugPipeMacro(mafPipeSurfaceTextured,"Pipe for render vtk polydata as textured surface rendering");
-	mafPlugPipeMacro(mafPipePolylineSlice,"Pipe for render vtk polyline as an arbitrary slice");
   mafPlugPipeMacro(mafPipeGizmo,"Pipe to render gizmos");
   mafPlugPipeMacro(mafPipeMeter,"Pipe for mafVMEMeter");
   mafPlugPipeMacro(mafPipeVolumeProjected,"Pipe for render vtk volumes as a projected image along X,Y or Z axes");

@@ -28,7 +28,7 @@
 #include "mafViewRX.h"
 #include "mafViewSlice.h"
 #include "mafPipeVolumeSlice.h"
-#include "mafPipeSurfaceSlice.h"
+#include "mafPipeSurfaceSlice_BES.h"
 #include "mafVMEIterator.h"
 #include "mafGUILutPreset.h"
 #include "mafGUI.h"
@@ -315,7 +315,7 @@ void mafViewRXCT::VmeShow(mafVME *vme, bool show)
         m_Gui->Enable(ID_ADJUST_SLICES,true);
         if (p)
         {
-          double old_thickness=((mafPipeSurfaceSlice *)p)->GetThickness();
+          double old_thickness=((mafPipeSurfaceSlice_BES *)p)->GetThickness();
           m_Border=old_thickness;
           m_Gui->Update();
         }
@@ -497,7 +497,7 @@ void mafViewRXCT::OnEventSetThickness()
     mafVME *node=this->GetSceneGraph()->GetSelectedVme();
     mafSceneNode *SN = this->GetSceneGraph()->Vme2Node(node);
     mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(0))->GetNodePipe(node);
-    ((mafPipeSurfaceSlice *)p)->SetThickness(m_Border);
+    ((mafPipeSurfaceSlice_BES *)p)->SetThickness(m_Border);
 
     if(mafVisualPipeSlicerSlice *pipe = mafVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[RX_FRONT_VIEW]->GetNodePipe(node)))
     {
@@ -806,15 +806,15 @@ void mafViewRXCT::PackageView()
   mafViewSlice *vs = new mafViewSlice("Slice view", CAMERA_CT);
   vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice",MUTEX);
   vs->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice",MUTEX);
+  vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice_BES",MUTEX);
+  vs->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice_BES",MUTEX);
+  vs->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice_BES",MUTEX);
+  vs->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice_BES",MUTEX);
+  vs->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice_BES",MUTEX);
   vs->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMEMeter", "mafPipePolylineSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMEWrappedMeter", "mafPipePolylineSlice",MUTEX);
+  vs->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceSlice_BES",MUTEX);
+  vs->PlugVisualPipe("mafVMEMeter", "mafPipePolylineSlice_BES",MUTEX);
+  vs->PlugVisualPipe("mafVMEWrappedMeter", "mafPipePolylineSlice_BES",MUTEX);
   vs->PlugVisualPipe("mafVMESegmentationVolume", "mafPipeVolumeSlice",MUTEX);
  
   m_ViewCTCompound->PlugChildView(vs);
@@ -964,7 +964,7 @@ void mafViewRXCT::SetThicknessForAllSurfaceSlices(mafVME *root)
     {
       mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(node);
       if(p)
-        ((mafPipeSurfaceSlice *)p)->SetThickness(m_Border);
+        ((mafPipeSurfaceSlice_BES *)p)->SetThickness(m_Border);
     }
   }
   iter->Delete();

@@ -57,7 +57,6 @@ SET(PROJECT_SRCS
 	mafCryptTest.h mafCryptTest.cpp
 	mafPipePolylineTest.h mafPipePolylineTest.cpp
 	mafMatrixInterpolatorTest.h mafMatrixInterpolatorTest.cpp
-	mafPipeSurfaceSliceTest.h mafPipeSurfaceSliceTest.cpp
 	mafVMEGenericTest.h mafVMEGenericTest.cpp
 	mafPipeLandmarkCloudTest.h mafPipeLandmarkCloudTest.cpp
 	mafVMEOutputVTKTest.h mafVMEOutputVTKTest.cpp
@@ -68,7 +67,6 @@ SET(PROJECT_SRCS
 	mafPipeMeterTest.h mafPipeMeterTest.cpp
 	mafPipeVolumeProjectedTest.h mafPipeVolumeProjectedTest.cpp
 	mafVMEItemTest.h mafVMEItemTest.cpp
-	mafPipePolylineSliceTest.h mafPipePolylineSliceTest.cpp
 	mafVMERefSysTest.h mafVMERefSysTest.cpp
 	mafVMEProberTest.h mafVMEProberTest.cpp
 	mafVMEMeterTest.h mafVMEMeterTest.cpp

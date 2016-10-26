@@ -28,7 +28,7 @@
 #include "mafViewRX.h"
 #include "mafViewSlice.h"
 #include "mafPipeSlice.h"
-#include "mafPipeSurfaceSlice.h"
+#include "mafPipeSurfaceSlice_BES.h"
 #include "mafVMEIterator.h"
 #include "mafGUILutPreset.h"
 #include "mafGUI.h"

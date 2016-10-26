@@ -3788,7 +3788,7 @@ void mafOpSegmentation::InitializeViewSlice()
   m_View->PlugVisualPipe("mafVMEVolumeGray","mafPipeVolumeSliceNotInterpolated");
   m_View->PlugVisualPipe("mafVMESegmentationVolume","mafPipeVolumeSliceNotInterpolated");
   m_View->PlugVisualPipe("mafVMEImage","mafPipeImage3D");
-  m_View->PlugVisualPipe("mafVMESurface","mafPipeSurfaceSlice");
+  m_View->PlugVisualPipe("mafVMESurface","mafPipeSurfaceSlice_BES");
  
   dataSet->GetPoint((0,0,0),m_SliceOrigin);
 //  m_View->InitializeSlice(m_SliceOrigin);

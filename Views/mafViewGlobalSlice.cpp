@@ -30,7 +30,7 @@
 #include "mafPipeFactory.h"
 #include "mafPipe.h"
 #include "mafPipeVolumeSlice.h"
-#include "mafPipeSurfaceSlice.h"
+#include "mafPipeSurfaceSlice_BES.h"
 #include "mafPipeMeshSlice.h"
 #include "mafAttachCamera.h"
 #include "mafGUI.h"
@@ -367,15 +367,14 @@ void mafViewGlobalSlice::VmeCreatePipe(mafVME *vme)
       {
         ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(m_SliceMode,applied_origin,applied_xVector,applied_yVector,true,false);
 			}
-      else if(pipe_name.Equals("mafPipeSurfaceSlice"))
+      else if(pipe_name.Equals("mafPipeSurfaceSlice_BES"))
       {
-				((mafPipeSurfaceSlice *)pipe)->ShowBoxSelectionOn();
-        ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_SliceOrigin);
+				((mafPipeSurfaceSlice_BES *)pipe)->ShowBoxSelectionOn();
 				double DoubleNormal[3];
 				DoubleNormal[0]=(double)m_SliceNormal[0];
 				DoubleNormal[1]=(double)m_SliceNormal[1];
 				DoubleNormal[2]=(double)m_SliceNormal[2];
-				((mafPipeSurfaceSlice *)pipe)->SetNormal(DoubleNormal);
+				((mafPipeSurfaceSlice_BES *)pipe)->SetSlice(m_SliceOrigin, DoubleNormal);
 			}
       else if(pipe_name.Equals("mafPipeMeshSlice"))
       {
@@ -665,13 +664,13 @@ void mafViewGlobalSlice::UpdateSlice()
 
 		  if(vme->IsA("mafVMESurface")||vme->IsA("mafVMESurfaceParametric")||vme->IsA("mafVMELandmarkCloud")||vme->IsA("mafVMELandmark"))
 		  {
-				mafPipeSurfaceSlice * pipe = (mafPipeSurfaceSlice *)node->GetPipe();
-        pipe->SetSlice(m_SliceOrigin);
+				mafPipeSurfaceSlice_BES * pipe = (mafPipeSurfaceSlice_BES *)node->GetPipe();
+        
 				double DoubleNormal[3];
 				DoubleNormal[0]=(double)m_SliceNormal[0];
 				DoubleNormal[1]=(double)m_SliceNormal[1];
 				DoubleNormal[2]=(double)m_SliceNormal[2];
-				pipe->SetNormal(DoubleNormal);
+				pipe->SetSlice(m_SliceOrigin,DoubleNormal);
       }
       if(vme->IsA("mafVMEMesh"))
       {

@@ -36,7 +36,7 @@
 #include "mafVMEIterator.h"
 #include "mafPipeImage3D.h"
 #include "mafPipeSlice.h"
-#include "mafPipeSurfaceSlice.h"
+#include "mafPipeSurfaceSlice_BES.h"
 #include "mafVMEVolumeGray.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
