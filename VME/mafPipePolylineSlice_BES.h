@@ -134,6 +134,9 @@ public:
   /** set region of interests as maximum */
   void SetMaximumROI();
 
+  /**Set if actor is pickable */
+  void SetActorPicking(int enable);
+
 protected:
   /** cap the regions*/
   vtkPolyData *RegionsCapping(vtkPolyData* inputCutters);
@@ -153,7 +156,7 @@ protected:
   mafAxes                 *m_Axes;
   vtkPlane				        *m_Plane;
   vtkMAFFixedCutter		      *m_Cutter;
-  vtkPolyData             *m_PolySpline;
+  vtkPolyData             *m_PolyFilteredLine;
   vtkMAFPolyDataToSinglePolyLine *m_PolydataToPolylineFilter;
   vtkMAFToLinearTransform *m_VTKTransform;
   double				           m_Border;

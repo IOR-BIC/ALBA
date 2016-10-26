@@ -120,7 +120,7 @@ void mafPipePolylineSlice_BES::Create(mafSceneNode *n)
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
   m_Axes            = NULL;
-  m_PolySpline      = NULL;
+  m_PolyFilteredLine= NULL;
 
   m_Vme->GetEventSource()->AddObserver(this);
 
@@ -140,21 +140,20 @@ void mafPipePolylineSlice_BES::Create(mafSceneNode *n)
 
   //////////////////////////////////
   vtkNEW(m_Tube);
-  m_Tube->UseDefaultNormalOn();
+  m_Tube->UseDefaultNormalOff();
   m_Tube->SetInput(m_PolydataToPolylineFilter->GetOutput());
   m_Tube->SetRadius(m_Radius);
   m_Tube->SetCapping(1);
   m_Tube->SetNumberOfSides(16);
   m_Tube->Update();
-
   //data = m_Tube->GetOutput();
   //////////////////////////////////
 
-  m_Plane	= vtkPlane::New();
-  m_Cutter = vtkMAFFixedCutter::New();
+	m_Plane	= vtkPlane::New();
+	m_Cutter = vtkMAFFixedCutter::New();
 
-  m_Plane->SetOrigin(m_Origin);
-  m_Plane->SetNormal(m_Normal);
+	m_Plane->SetOrigin(m_Origin);
+	m_Plane->SetNormal(m_Normal);
   vtkNEW(m_VTKTransform);
   m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
   m_Plane->SetTransform(m_VTKTransform);
@@ -212,7 +211,11 @@ void mafPipePolylineSlice_BES::Create(mafSceneNode *n)
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_Mapper);
 
+  if(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()!=NULL)
+  {
   m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()->m_Diffuse);
+  }
+  
   m_Actor->GetProperty()->SetLineWidth (1);
   m_AssemblyFront->AddPart(m_Actor);
 
@@ -272,8 +275,7 @@ mafPipePolylineSlice_BES::~mafPipePolylineSlice_BES()
   vtkDEL(m_Plane);
   vtkDEL(m_VTKTransform);
   vtkDEL(m_Tube);
-  vtkDEL(m_PolydataToPolylineFilter);
-  vtkDEL(m_PolySpline);
+  vtkDEL(m_PolyFilteredLine);
   cppDEL(m_Axes);
   //@@@ if(m_use_axes) wxDEL(m_axes);  
 }
@@ -365,7 +367,8 @@ void mafPipePolylineSlice_BES::SetSlice(double *Origin, double *Normal)
     m_Normal[2] = Normal[2];
   }
 
-  if (m_Plane != NULL && m_Cutter != NULL)
+
+	if(m_Plane && m_Cutter)
   {
     m_Plane->SetNormal(m_Normal);
     m_Plane->SetOrigin(m_Origin);
@@ -393,7 +396,8 @@ void mafPipePolylineSlice_BES::SetThickness(double thickness)
   m_Actor->GetProperty()->SetLineWidth(m_Border);
   m_Actor->GetProperty()->SetPointSize(m_Border);
 
-  m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()->m_Diffuse);
+  if (((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()!=NULL)
+  	m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()->m_Diffuse);
 
   m_Actor->Modified();
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -413,10 +417,10 @@ void mafPipePolylineSlice_BES::SetRadius(double radius)
   {
     m_Tube->SetRadius(m_Radius);
     m_Tube->Update();
-    m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()->m_Diffuse);
+    if (((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()!=NULL)
+    	m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()->m_Diffuse);
     m_Actor->Modified();
   }
-  //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void mafPipePolylineSlice_BES::UpdateProperty()
@@ -463,68 +467,94 @@ void mafPipePolylineSlice_BES::UpdateProperty()
 
   m_Mapper->Update();
 
+  if(m_Actor)
+  {
+    if(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()!=NULL)
+    {
+      m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()->m_Diffuse);
+    }
+
+    m_Actor->Modified();
+  }
+  
 }
 //----------------------------------------------------------------------------
 vtkPolyData *mafPipePolylineSlice_BES::SplineProcess(vtkPolyData *polyData)
 //----------------------------------------------------------------------------
 {
   //cleaned point list
-  vtkMAFSmartPointer<vtkPoints> pts;
-  vtkMAFSmartPointer<vtkPoints> ptsSplined;
+  vtkPoints *pts;
 
-  vtkNEW(m_PolySpline);
+  if (m_PolyFilteredLine==NULL)
+    vtkNEW(m_PolyFilteredLine);
 
-  pts->DeepCopy(polyData->GetPoints());
-
-  vtkMAFSmartPointer<vtkCardinalSpline> splineX;
-  vtkMAFSmartPointer<vtkCardinalSpline> splineY;
-  vtkMAFSmartPointer<vtkCardinalSpline> splineZ;
-
-
-
-  for(int i=0 ; i<pts->GetNumberOfPoints(); i++)
-  {
-    //mafLogMessage(wxString::Format(_("old %d : %f %f %f"), i, pts->GetPoint(i)[0],pts->GetPoint(i)[1],pts->GetPoint(i)[2] ));
-    splineX->AddPoint(i, pts->GetPoint(i)[0]);
-    splineY->AddPoint(i, pts->GetPoint(i)[1]);
-    splineZ->AddPoint(i, pts->GetPoint(i)[2]);
-  }
-
-  for(int i=0 ; i<(pts->GetNumberOfPoints() * m_SplineCoefficient); i++)
-  {		 
-    double t;
-    t = ( pts->GetNumberOfPoints() - 1.0 ) / ( pts->GetNumberOfPoints()*m_SplineCoefficient - 1.0 ) * i;
-    ptsSplined->InsertPoint(i , splineX->Evaluate(t), splineY->Evaluate(t), splineZ->Evaluate(t));
-
-  }
-
-
-  m_PolySpline->SetPoints(ptsSplined);
-  m_PolySpline->Update();
-
-  //order
-  //cell 
   vtkCellArray *cellArray;
   vtkNEW(cellArray);
-  int pointId[2];
 
-  for(int i = 0; i< m_PolySpline->GetNumberOfPoints();i++)
+  m_PolyFilteredLine->DeepCopy(polyData);
+
+  vtkCellArray *lines=polyData->GetLines();
+  vtkIdType *linePoints;
+  double oldPoint[3],currPoint[3];
+  vtkIdType linePointsNum;
+  int evaluedPoints=0;
+  int cellID=0;
+  polyData->Update();
+  pts=polyData->GetPoints();
+  vtkPointData *pointData=polyData->GetPointData();
+  int nArray=pointData->GetNumberOfArrays();
+
+
+  //generating one branch for each branch (cell) of input polyline
+  for(int lin=0;lin<polyData->GetNumberOfLines();lin++)
   {
-    if (i > 0)
-    {             
-      pointId[0] = i - 1;
-      pointId[1] = i;
-      cellArray->InsertNextCell(2 , pointId);  
+
+    int branchStart=evaluedPoints;
+    int cellSize=1; //is 1 for the first point
+
+    lines->GetCell(cellID,linePointsNum,linePoints);
+    cellID+=linePointsNum+1;
+
+    pts->GetPoint(linePoints[0],oldPoint);
+    for(int i=1; i<linePointsNum; i++)
+  {		 
+      pts->GetPoint(linePoints[i],currPoint);
+      //adding points only if is not the same of the previsous;
+      if (currPoint[0]!=oldPoint[0] || currPoint[1]!=oldPoint[1] || currPoint[2]!=oldPoint[2]) 
+        cellSize++;
+      else 
+        double tmp=0;
+      pts->GetPoint(linePoints[i],oldPoint);
+  }
+
+    if (cellSize>1)
+    {
+      cellArray->InsertNextCell(cellSize);
+      cellArray->InsertCellPoint(linePoints[0]);
+
+      pts->GetPoint(linePoints[0],oldPoint);
+      for(int i=1; i<linePointsNum; i++)
+      {
+        pts->GetPoint(linePoints[i],currPoint);
+        //adding points only if is not the same of the previsous;
+        if (currPoint[0]!=oldPoint[0] || currPoint[1]!=oldPoint[1] || currPoint[2]!=oldPoint[2]) 
+          cellArray->InsertCellPoint(linePoints[i]);
+
+        pts->GetPoint(linePoints[i],oldPoint);
+      }
     }
   }
 
-  m_PolySpline->SetLines(cellArray);
-  m_PolySpline->Modified();
-  m_PolySpline->Update();
+  m_PolyFilteredLine->SetPoints(polyData->GetPoints());
+  m_PolyFilteredLine->Update();
+
+  m_PolyFilteredLine->SetLines(cellArray);
+  m_PolyFilteredLine->Modified();
+  m_PolyFilteredLine->Update();
 
   vtkDEL(cellArray);
 
-  return m_PolySpline;
+  return m_PolyFilteredLine;
 }
 //----------------------------------------------------------------------------
 void mafPipePolylineSlice_BES::ShowActorOn()
@@ -719,4 +749,11 @@ vtkPolyData *mafPipePolylineSlice_BES::CappingFilter(vtkPolyData* inputBorder)
   output->Update();
 
   return output;
+}
+//----------------------------------------------------------------------------
+void mafPipePolylineSlice_BES::SetActorPicking(int enable)
+//----------------------------------------------------------------------------
+{
+  m_Actor->SetPickable(enable);
+  m_Actor->Modified();
 }

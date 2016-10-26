@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafPipeSurfaceSlice_BES
- Authors: Silvano Imboden - Paolo Quadrani
+ Authors: Silvano Imboden,Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -74,12 +74,6 @@ public:
   /** Set the origin and normal of the slice.
   Both, Origin and Normal may be NULL, if the current value is to be preserved. */
   /*virtual*/ void SetSlice(double* Origin, double* Normal);  
-
-  /** Create visual-pipe for closed cloud or single landmark */
-  void CreateClosedCloudPipe();
-
-  /** Remove visual-pipe for closed cloud */
-  void RemoveClosedCloudPipe();
 
   /** Show bounding box when selection is on. */
 	void ShowBoxSelectionOn(){m_ShowSelection=true;};

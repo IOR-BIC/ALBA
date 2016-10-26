@@ -72,6 +72,7 @@
 #include "medOpImporterVTK.h"
 #include "mafOpImporterAnsysCDBFile.h"
 #include "mafOpImporterAnsysInputFile.h"
+#include "mafOpCreateVolume.h"
 #endif
 #ifndef _DEBUG
 //EXPORTERS
@@ -289,7 +290,8 @@ bool MedalApp::OnInit()
 	m_Logic->Plug(new mafOpVolumeMeasure("Volume"),"Measure");
 	m_Logic->Plug(new mafOpMeshQuality("Mesh Quality"),"Measure");
 
-	m_Logic->Plug(new mafOpAddLandmark("Add Landmark"),_("Create"));
+	m_Logic->Plug(new mafOpCreateVolume("Create Volume"), _("Create"));
+	m_Logic->Plug(new mafOpAddLandmark("Add Landmark"), _("Create"));
 	m_Logic->Plug(new mafOpCreateGroup("Group"),_("Create"));
 	m_Logic->Plug(new mafOpCreateMeter("Meter"),_("Create"));
 	m_Logic->Plug(new mafOpCreateRefSys("RefSys"),_("Create"));
