@@ -100,7 +100,7 @@ void mafPipeVolumeSliceTest::TestPipeExecution()
   vtkStructuredPointsReader *importer;
   vtkNEW(importer);
   mafString filename1=MAF_DATA_ROOT;
-  filename1<<"/Test_PipeVolumeSlice_BES/VolumeSP.vtk";
+  filename1<<"/Test_PipeVolumeSlice/VolumeSP.vtk";
   importer->SetFileName(filename1.GetCStr());
   importer->Update();
 
@@ -209,7 +209,7 @@ void mafPipeVolumeSliceTest::TestPipeExecution_SetSliceOpacity()
   vtkStructuredPointsReader *importer;
   vtkNEW(importer);
   mafString filename1=MAF_DATA_ROOT;
-  filename1<<"/Test_PipeVolumeSlice_BES/VolumeSP.vtk";
+  filename1<<"/Test_PipeVolumeSlice/VolumeSP.vtk";
   importer->SetFileName(filename1.GetCStr());
   importer->Update();
 
@@ -326,7 +326,7 @@ void mafPipeVolumeSliceTest::TestPipeExecution_SetLutRange()
   vtkStructuredPointsReader *importer;
   vtkNEW(importer);
   mafString filename1=MAF_DATA_ROOT;
-  filename1<<"/Test_PipeVolumeSlice_BES/VolumeSP.vtk";
+  filename1<<"/Test_PipeVolumeSlice/VolumeSP.vtk";
   importer->SetFileName(filename1.GetCStr());
   importer->Update();
 
@@ -444,7 +444,7 @@ void mafPipeVolumeSliceTest::TestPipeExecution_SetColorLookupTable()
   vtkStructuredPointsReader *importer;
   vtkNEW(importer);
   mafString filename1=MAF_DATA_ROOT;
-  filename1<<"/Test_PipeVolumeSlice_BES/VolumeSP.vtk";
+  filename1<<"/Test_PipeVolumeSlice/VolumeSP.vtk";
   importer->SetFileName(filename1.GetCStr());
   importer->Update();
 
@@ -559,7 +559,7 @@ void mafPipeVolumeSliceTest::TestPipeExecution_TicksOnOff()
   vtkStructuredPointsReader *importer;
   vtkNEW(importer);
   mafString filename1=MAF_DATA_ROOT;
-  filename1<<"/Test_PipeVolumeSlice_BES/VolumeSP.vtk";
+  filename1<<"/Test_PipeVolumeSlice/VolumeSP.vtk";
   importer->SetFileName(filename1.GetCStr());
   importer->Update();
 
