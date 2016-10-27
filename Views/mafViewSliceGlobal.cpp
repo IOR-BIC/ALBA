@@ -28,10 +28,9 @@ const bool DEBUG_MODE = false;
 #include "mafIndent.h"
 #include "mafViewSliceGlobal.h"
 #include "mafPipeVolumeSlice.h"
-#include "mafPipeVolumeSlice_BES.h"
-#include "mafPipeSurfaceSlice_BES.h"
-#include "mafPipePolylineSlice_BES.h"
-#include "mafPipeMeshSlice_BES.h"
+#include "mafPipeSurfaceSlice.h"
+#include "mafPipePolylineSlice.h"
+#include "mafPipeMeshSlice.h"
 
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipePolylineSlice.h"
@@ -312,18 +311,9 @@ void mafViewSliceGlobal::OnEvent(mafEventBase *maf_event)
     { 
     case ID_OPACITY_SLIDER:
       {
-        if ( mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->GetPipe()) )
-        {
-          mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->GetPipe())->SetSliceOpacity(m_Opacity);
-          mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-          m_OpacitySlider->SetValue(m_Opacity);
-        }
-        else if ( mafPipeVolumeSlice::SafeDownCast(m_CurrentVolume->GetPipe()) )
-        {
           mafPipeVolumeSlice::SafeDownCast(m_CurrentVolume->GetPipe())->SetSliceOpacity(m_Opacity);
           mafEventMacro(mafEvent(this, CAMERA_UPDATE));
           m_OpacitySlider->SetValue(m_Opacity);
-        }
       }
       break;
     case ID_POS_SLIDER:
@@ -519,10 +509,7 @@ void mafViewSliceGlobal::VmeShow(mafVME *vme, bool show)
       m_Gui->Enable(ID_POS_SLIDER,true);
       if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
       {
-        if(mafPipeVolumeSlice::SafeDownCast(curVolPipe))
-          m_Opacity   = ((mafPipeVolumeSlice *)curVolPipe)->GetSliceOpacity();
-        if(mafPipeVolumeSlice_BES::SafeDownCast(curVolPipe))
-          m_Opacity   = mafPipeVolumeSlice_BES::SafeDownCast(curVolPipe)->GetSliceOpacity();
+        m_Opacity   = mafPipeVolumeSlice::SafeDownCast(curVolPipe)->GetSliceOpacity();
         m_Gui->Enable(ID_OPACITY_SLIDER,true);
       }
       m_Gui->Update();
@@ -748,12 +735,9 @@ void mafViewSliceGlobal::SetSlice(double* Origin, double* Normal)
   for(mafSceneNode *node = m_Sg->GetNodeList(); node; node=node->GetNext())
   {
 		mafPipe * pipe = node->GetPipe();
-    if(pipe && (mafPipeVolumeSlice::SafeDownCast(pipe) || (mafPipeVolumeSlice_BES::SafeDownCast(pipe))))
+    if(pipe && mafPipeVolumeSlice::SafeDownCast(pipe) )
     {
-      if(mafPipeVolumeSlice::SafeDownCast(pipe))
-        mafPipeVolumeSlice::SafeDownCast(pipe)->SetSlice(Origin); 
-      else if(mafPipeVolumeSlice_BES::SafeDownCast(pipe))
-        mafPipeVolumeSlice_BES::SafeDownCast(pipe)->SetSlice(Origin, Normal); 
+      mafPipeVolumeSlice::SafeDownCast(pipe)->SetSlice(Origin, Normal); 
     }
   }
 
@@ -778,15 +762,6 @@ void mafViewSliceGlobal::SetSlice(double* Origin, double* Normal)
       if (pipe != NULL){
         pipe->SetSlice(coord, normal); 
       }
-      else
-      {
-        mafPipeSurfaceSlice* pipe = mafPipeSurfaceSlice::SafeDownCast(curSurfPipe);
-        if (pipe != NULL) 
-        {
-          pipe->SetSlice(coord); 
-          pipe->SetNormal(normal); 
-        }
-      }
     }
   }	
 
@@ -799,15 +774,6 @@ void mafViewSliceGlobal::SetSlice(double* Origin, double* Normal)
       mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curPolylinePipe);
       if (pipe != NULL){
         pipe->SetSlice(coord, normal); 
-      }
-      else
-      {
-        mafPipePolylineSlice* pipe = mafPipePolylineSlice::SafeDownCast(curPolylinePipe);
-        if (pipe != NULL) 
-        {
-          pipe->SetSlice(coord); 
-          pipe->SetNormal(normal); 
-        }
       }
     }
   }	
@@ -832,15 +798,6 @@ void mafViewSliceGlobal::SetSlice(double* Origin, double* Normal)
       mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curMeshPipe);
       if (pipe != NULL){
         pipe->SetSlice(coord, normal); 
-      }
-      else
-      {
-        mafPipeMeshSlice* pipe = mafPipeMeshSlice::SafeDownCast(curMeshPipe);
-        if (pipe != NULL) 
-        {
-          pipe->SetSlice(coord); 
-          pipe->SetNormal(normal); 
-        }
       }
     }   
   }

@@ -115,9 +115,7 @@
 #include "mafOpFlipNormalsTest.h"
 #include "mafOpSmoothSurfaceCellsTest.h"
 #include "mafOpMeshQualityTest.h"
-#include "mafOpImporterBBFTest.h"
 #include "mafOpCropDeformableROITest.h"
-#include "mafOpImporterRAWVolume_BESTest.h"
 #include "mafOpMoveTest.h"
 #include "mafOpExporterAnalogWSTest.h"
 #include "mafOpExporterGRFWSTest.h"
@@ -138,7 +136,7 @@
 #include "mafOpImporterAnsysCDBFileTest.h"
 #include "mafOpImporterAnsysInputFileTest.h"
 #include "mafOpExporterAnsysCDBFileTest.h"
-#include "mafOpExporterAnsysInputFileTest.h"
+#include "mafOpExporterAnsysInputFileTest.h" 
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -294,9 +292,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpFlipNormalsTest::suite());
 	runner.addTest(mafOpSmoothSurfaceCellsTest::suite());
 	runner.addTest(mafOpMeshQualityTest::suite());
-	runner.addTest(mafOpImporterBBFTest::suite());
 	runner.addTest(mafOpCropDeformableROITest::suite());
-	runner.addTest(mafOpImporterRAWVolume_BESTest::suite());
 	runner.addTest(mafOpMoveTest::suite());
 	runner.addTest(mafOpTransformTest::suite());
 	runner.addTest(mafOpExporterAnalogWSTest::suite());

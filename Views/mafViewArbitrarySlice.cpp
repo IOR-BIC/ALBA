@@ -302,8 +302,7 @@ void mafViewArbitrarySlice::VmeShow(mafVME *vme, bool show)
 				surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
 				surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
 
-				PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
-				PipeSliceViewSurface->SetNormal(normal);
+				PipeSliceViewSurface->SetSlice(surfaceOriginTranslated,normal);
 			}
 		}
 		else if(vme->IsA("mafVMEPolylineEditor"))
@@ -346,8 +345,7 @@ void mafViewArbitrarySlice::VmeShow(mafVME *vme, bool show)
 				surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
 				surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
 
-				PipeSliceViewMesh->SetSlice(surfaceOriginTranslated);
-				PipeSliceViewMesh->SetNormal(normal);
+				PipeSliceViewMesh->SetSlice(surfaceOriginTranslated, normal);
 				PipeSliceViewMesh->SetFlipNormalOff();
 			}
 		}
@@ -480,7 +478,7 @@ void mafViewArbitrarySlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 					mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
 					if(PipeSliceViewSurface)
 					{
-						PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
+						PipeSliceViewSurface->SetSlice(surfaceOriginTranslated,NULL);
 					}
 				}
 				if(node->IsA("mafVMEMesh"))
@@ -496,7 +494,7 @@ void mafViewArbitrarySlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
 					if(PipeArbitraryViewMesh && PipeSliceViewMesh)
 					{
-						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated);
+						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated,NULL);
 					}
 				}
 			}
@@ -567,10 +565,7 @@ void mafViewArbitrarySlice::OnEventGizmoRotate(mafEventBase *maf_event)
 					mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
 					if(PipeSliceViewSurface)
 					{
-
-						PipeSliceViewSurface->SetNormal(normal);
-
-						PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
+						PipeSliceViewSurface->SetSlice(surfaceOriginTranslated, normal);
 					}
 				}
 				if(node->IsA("mafVMEMesh"))
@@ -586,10 +581,7 @@ void mafViewArbitrarySlice::OnEventGizmoRotate(mafEventBase *maf_event)
 					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
 					if(PipeSliceViewMesh)
 					{
-
-						PipeSliceViewMesh->SetNormal(normal);
-
-						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated);
+						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated, normal);
 					}
 				}
 			}
@@ -695,14 +687,13 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 						{
 							double normal[3];
 							((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-							PipeSliceViewSurface->SetNormal(normal);
 
 							double surfaceOriginTranslated[3];
 							surfaceOriginTranslated[0] = m_SliceCenterSurfaceReset[0] + normal[0] * 0.1;
 							surfaceOriginTranslated[1] = m_SliceCenterSurfaceReset[1] + normal[1] * 0.1;
 							surfaceOriginTranslated[2] = m_SliceCenterSurfaceReset[2] + normal[2] * 0.1;
 
-							PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
+							PipeSliceViewSurface->SetSlice(surfaceOriginTranslated, normal);
 						}
 					}
 					if(node->IsA("mafVMEMesh"))
@@ -713,14 +704,13 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 						{
 							double normal[3];
 							((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-							PipeSliceViewMesh->SetNormal(normal);
-
+							
 							double surfaceOriginTranslated[3];
 							surfaceOriginTranslated[0] = m_SliceCenterSurfaceReset[0] + normal[0] * 0.1;
 							surfaceOriginTranslated[1] = m_SliceCenterSurfaceReset[1] + normal[1] * 0.1;
 							surfaceOriginTranslated[2] = m_SliceCenterSurfaceReset[2] + normal[2] * 0.1;
 
-							PipeSliceViewMesh->SetSlice(surfaceOriginTranslated);
+							PipeSliceViewMesh->SetSlice(surfaceOriginTranslated,normal);
 						}
 					}
 				}

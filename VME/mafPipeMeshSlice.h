@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafPipeMeshSlice
- Authors: Daniele Giunchi , Stefano Perticoni, Gianluigi Crimi
+ Authors: Daniele Giunchi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -14,13 +14,14 @@
 
 =========================================================================*/
 
-#ifndef __mafPipeMeshSlice_H__
-#define __mafPipeMeshSlice_H__
+#ifndef __mafPipeMeshSlice_H__B
+#define __mafPipeMeshSlice_H__B
 
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "mafPipe.h"
+#include "mafDefines.h"
+#include "mafPipeSlice.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -45,34 +46,43 @@ class mafGUILutSwatch;
 
 // TODO: REFACTOR THIS (Note by Stefano) 
 // This class need some cleanup: there are really too many Update methods in cpp file...
-
-class MAF_EXPORT mafPipeMeshSlice : public mafPipe
+/**
+  class name : mafPipeMeshSlice
+  Pipe for sliceing a mesh, modified by University of Bedfordshire.
+*/
+class MAF_EXPORT mafPipeMeshSlice : public mafPipeSlice
 {
 public:
-	mafTypeMacro(mafPipeMeshSlice,mafPipe);
+  /** RTTI macro*/
+	mafTypeMacro(mafPipeMeshSlice,mafPipeSlice);
 
+  /** constructor */
 	mafPipeMeshSlice();
+  /** destructor */
 	virtual     ~mafPipeMeshSlice();
 
 	/** process events coming from gui */
 	virtual void OnEvent(mafEventBase *maf_event);
 
+  /** creation of the pipe */
 	virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
+  /** called when a vme is selected by user */
 	virtual void Select(bool select); 
 
 	/** IDs for the GUI */
 	enum PIPE_MESH_WIDGET_ID
 	{
-		ID_LAST = Superclass::ID_LAST,
-    ID_WIREFRAME,
+		ID_WIREFRAME = Superclass::ID_LAST,
     ID_WIRED_ACTOR_VISIBILITY,
     ID_BORDER_CHANGE,
     ID_SCALARS,
     ID_LUT,
     ID_SCALAR_MAP_ACTIVE,
     ID_USE_VTK_PROPERTY,
+    ID_LAST,  
 	};
 
+  /** scalars type based on topology */
   enum PIPE_MESH_TYPE_SCALARS
   {
     POINT_TYPE = 0,
@@ -81,35 +91,41 @@ public:
 
   
   
-  /** Get assembly front/back */
+  /** Get assembly front */
   virtual vtkMAFAssembly *GetAssemblyFront(){return m_AssemblyFront;};
+  /** Get assembly back */
   virtual vtkMAFAssembly *GetAssemblyBack(){return m_AssemblyBack;};
 
 	
   /** Core of the pipe */
   virtual void ExecutePipe();
   
-  /** Add/RemoveTo Assembly Front/back */
+  /** Add/RemoveTo Assembly Front */
   virtual void AddActorsToAssembly(vtkMAFAssembly *assembly);
+  /** Add/RemoveTo Assembly back */
   virtual void RemoveActorsFromAssembly(vtkMAFAssembly *assembly);
   
   /** Set the actor picking*/
 	void SetActorPicking(int enable = true);
 
-  /** Set the actor wireframe*/
+  /** Set the actor wireframe to on*/
   void SetWireframeOn();
+  /** Set the actor wireframe to off*/
   void SetWireframeOff();
 
-  /** Set the actor border visible or not*/
+  /** Set the actor border visible */
   void SetWiredActorVisibilityOn();
+  /** Set the actor border not visible */
   void SetWiredActorVisibilityOff();
 
-  /** Set the flip of normal filter*/
+  /** Set the flip of normal filter to on*/
   void SetFlipNormalOn();
+  /** Set the flip of normal filter to off*/
   void SetFlipNormalOff();
 
-  /** Set/Get Active Scalar */
+  /** Set Active Scalar */
   void SetActiveScalar(int index){m_ScalarIndex = index;};
+  /** Get Active Scalar */
   int GetScalarIndex(){return m_ScalarIndex;};
 
   /** Get Number of Scalars */
@@ -126,13 +142,11 @@ public:
   /**Set the thickness value*/
   void SetThickness(double thickness);
   
-   /** Set the origin of the slice*/
-  void SetSlice(double *Origin);
+  /** Set the origin and normal of the slice.
+  Both, Origin and Normal may be NULL, if the current value is to be preserved. */
+  /*virtual*/ void SetSlice(double* Origin, double* Normal);  
 
-  /** Set the normal of the slice*/
-	void SetNormal(double *Normal);
-
-  /** Set the lookup table */
+ /** Set the lookup table */
 	void SetLookupTable(vtkLookupTable *table);
   
   /** Gets the lookup table*/
@@ -158,12 +172,14 @@ protected:
 
 	mafGUILutSwatch *m_LutSwatch;
   
-
+  /** create controls checking the field arrays of the data */
   void CreateFieldDataControlArrays();
+  /** Update Properties of actor */
 	void UpdateProperty(bool fromTag = false);
 	/**Update data value to selected scalar */
   void UpdateScalars();
 
+  /** Update the normal filter with changed scalar*/
   void UpdateVtkPolyDataNormalFilterActiveScalar();
   /** Update the visualization with changed scalar*/
   void UpdateLUTAndMapperFromNewActiveScalars();
@@ -183,11 +199,10 @@ protected:
   int                      m_UseVTKProperty;
   double				           m_Border;
 
-  int m_RenderingDisplayListFlag;
-  
-  double	m_Origin[3];
-  double	m_Normal[3];
+  int m_RenderingDisplayListFlag; 
 
+
+  /** allow the creation of the gui */
 	virtual mafGUI  *CreateGui();
 };  
-#endif // __mafPipeMeshSlice_H__
+#endif // __mafPipeMeshSlice_H__B

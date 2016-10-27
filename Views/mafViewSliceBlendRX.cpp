@@ -24,7 +24,7 @@
 #include "mafViewSliceBlendRX.h"
 #include "mafViewRX.h"
 #include "mafViewSlice.h"
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeSlice.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafGUILutPreset.h"
 #include "mafGUI.h"

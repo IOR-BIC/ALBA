@@ -118,6 +118,7 @@ mafView *mafViewSingleSlice::Copy(mafObserver *Listener, bool lightCopyEnabled)
 void mafViewSingleSlice::Create()
 //----------------------------------------------------------------------------
 {
+
   if(m_LightCopyEnabled) return;
 
   RWI_LAYERS num_layers = TWO_LAYER;
@@ -172,29 +173,29 @@ void mafViewSingleSlice::UpdateText(int ID)
     switch(m_CameraPositionId)
     {
     case CAMERA_OS_X:
-      slice_mode = SLICE_X;
+      slice_mode = mafPipeVolumeSlice::SLICE_X;
       break;
     case CAMERA_OS_Y:
-      slice_mode = SLICE_Y;
+      slice_mode = mafPipeVolumeSlice::SLICE_Y;
       break;
     case CAMERA_OS_P:
-      slice_mode = SLICE_ORTHO;
+      slice_mode = mafPipeVolumeSlice::SLICE_ORTHO;
       break;
     case CAMERA_PERSPECTIVE:
-      slice_mode = SLICE_ARB;
+      slice_mode = mafPipeVolumeSlice::SLICE_ARB;
       break;
     default:
-      slice_mode = SLICE_Z;
+      slice_mode = mafPipeVolumeSlice::SLICE_Z;
     }
     //set the init coordinates value
-    if(slice_mode == SLICE_X)
+    if(slice_mode == mafPipeVolumeSlice::SLICE_X)
       m_Text = "X: ";
-    else if(slice_mode == SLICE_Y)
+    else if(slice_mode == mafPipeVolumeSlice::SLICE_Y)
       m_Text = "Y: ";
-    else if(slice_mode == SLICE_Z)
+    else if(slice_mode == mafPipeVolumeSlice::SLICE_Z)
       m_Text = "Z: ";
 
-    if((slice_mode != SLICE_ORTHO) && (slice_mode != SLICE_ARB))
+    if((slice_mode != mafPipeVolumeSlice::SLICE_ORTHO) && (slice_mode != mafPipeVolumeSlice::SLICE_ARB))
       m_Text += wxString::Format("%.1f",m_Slice[slice_mode]);
 
     m_TextMapper->SetInput(m_Text.c_str());
@@ -256,23 +257,23 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
         switch(m_CameraPositionId)
         {
           case CAMERA_OS_X:
-            slice_mode = SLICE_X;
+            slice_mode = mafPipeVolumeSlice::SLICE_X;
             v1[0] = 0;v1[1] = 1;v1[2] = 0;
 						v2[0] = 0;v2[1] = 0;v2[2] = 1;
 					break;
           case CAMERA_OS_Y:
-            slice_mode = SLICE_Y;
+            slice_mode = mafPipeVolumeSlice::SLICE_Y;
 						v1[0] = 0;v1[1] = 0;v1[2] = 1;
 						v2[0] = 1;v2[1] = 0;v2[2] = 0;
           break;
           case CAMERA_OS_P:
-            slice_mode = SLICE_ORTHO;
+            slice_mode = mafPipeVolumeSlice::SLICE_ORTHO;
           break;
           case CAMERA_PERSPECTIVE:
-            slice_mode = SLICE_ARB;
+            slice_mode = mafPipeVolumeSlice::SLICE_ARB;
           break;
           default:
-            slice_mode = SLICE_Z;
+            slice_mode = mafPipeVolumeSlice::SLICE_Z;
         }
         if (m_SliceInitialized)
         {
@@ -318,8 +319,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
 				}
 
 		    m_CurrentSurface.push_back(n);
-		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_Slice);
-				((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
+		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_Slice,normal);
       }
 			else if(pipe_name.Equals("mafPipeMeshSlice"))
 			{
@@ -353,8 +353,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
 					normal[2] = 1;
 				}
 
-				((mafPipeMeshSlice *)pipe)->SetSlice(m_Slice);
-				((mafPipeMeshSlice *)pipe)->SetNormal(normal);
+				((mafPipeMeshSlice *)pipe)->SetSlice(m_Slice, normal);
 			}
 			else if(pipe_name.Equals("mafPipePolylineSlice"))
 			{
@@ -389,8 +388,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
 				}
 
 				m_CurrentPolyline.push_back(n);
-				((mafPipePolylineSlice *)pipe)->SetSlice(m_Slice);
-				((mafPipePolylineSlice *)pipe)->SetNormal(normal);
+				((mafPipePolylineSlice *)pipe)->SetSlice(m_Slice,normal);
 			}
 			pipe->Create(n);
 
@@ -489,7 +487,7 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 				if (m_CurrentVolume)
 				{
 					mafPipeVolumeSlice * pipe = (mafPipeVolumeSlice *)m_CurrentVolume->GetPipe();
-					pipe->GetSliceOrigin(m_OriginVolume);
+					pipe->GetOrigin(m_OriginVolume);
 					if(m_PlaneSelect == XY)
 					{
 						m_OriginVolume[2] = m_Position;
@@ -506,7 +504,7 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
             m_Slice[1] = m_Position;
 					}
 					
-					pipe->SetSlice(m_OriginVolume);
+					pipe->SetOrigin(m_OriginVolume);
           
           this->UpdateText();
           CameraUpdate();
@@ -516,24 +514,9 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 				mafVMEIterator *iter = m_CurrentVolume->GetVme()->GetRoot()->NewIterator();
 				for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 				{
-					if(node->IsA("mafVMESurface"))
-					{
-						mafPipeSurfaceSlice *p= mafPipeSurfaceSlice::SafeDownCast(this->GetNodePipe(node));
-						if(p)
-							((mafPipeSurfaceSlice *)p)->SetSlice(m_OriginVolume);
-					}
-					if(node->IsA("mafVMEPolyline"))
-					{
-						mafPipePolylineSlice *p= mafPipePolylineSlice::SafeDownCast(this->GetNodePipe(node));
-						if(p)
-							((mafPipePolylineSlice *)p)->SetSlice(m_OriginVolume);
-					}
-					if(node->IsA("mafVMEMesh"))
-					{
-						mafPipeMeshSlice *p= mafPipeMeshSlice::SafeDownCast(this->GetNodePipe(node));
-						if(p)
-							((mafPipeMeshSlice *)p)->SetSlice(m_OriginVolume);
-					}
+					mafPipeSlice *pipeSlice = mafPipeSlice::SafeDownCast(this->GetNodePipe(node));
+					if(pipeSlice)
+							pipeSlice->SetSlice(m_OriginVolume,NULL);
 				}
         iter->Delete();
 			}
@@ -627,7 +610,7 @@ void mafViewSingleSlice::SetSlice(double origin[3])
 		if (pipe_name.Equals("mafPipeVolumeSlice"))
 		{
 			mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)pipe;
-			pipe->SetSlice(origin); 
+			pipe->SetOrigin(origin); 
 
 			// update text
 			this->UpdateText();
@@ -644,7 +627,7 @@ void mafViewSingleSlice::SetSlice(double origin[3])
     if (pipe_name.Equals("mafPipeSurfaceSlice"))
     {
       mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->GetPipe();
-      pipe->SetSlice(origin); 
+      pipe->SetSlice(origin,NULL); 
     }
   }
 
@@ -657,7 +640,7 @@ void mafViewSingleSlice::SetSlice(double origin[3])
 		if (pipe_name.Equals("mafPipePolylineSlice"))
 		{
 			mafPipePolylineSlice *pipe = (mafPipePolylineSlice *)pipe;
-			pipe->SetSlice(origin); 
+			pipe->SetSlice(origin,NULL); 
 		}
 	}
   // update text
@@ -776,7 +759,7 @@ void mafViewSingleSlice::VmeShow(mafVME *vme, bool show)
   {
     if (show)
     {
-			((mafPipeVolumeSlice *)m_CurrentVolume->GetPipe())->GetSliceOrigin(m_OriginVolume);
+			((mafPipeVolumeSlice *)m_CurrentVolume->GetPipe())->GetOrigin(m_OriginVolume);
       double b[6];
 			m_CurrentVolume->GetVme()->GetOutput()->GetBounds(b);
 

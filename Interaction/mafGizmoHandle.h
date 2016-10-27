@@ -262,7 +262,6 @@ protected:
 
   /** friend test */
   friend class mafGizmoROITest;
-  friend class mafGizmoROI_BESTest;
   friend class mafGizmoHandleTest;
 
 };

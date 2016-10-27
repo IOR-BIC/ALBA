@@ -165,14 +165,17 @@ void mafVMESlicerTest::TestBug2454And2524Regression()
 
 	renWin->Render();
 
-	double bb[6] = {-1,-1,-1,-1,-1,-1};
-	slicerActor->GetBounds(bb);
+	double bb[6] ;
 
-	CPPUNIT_ASSERT(bb[0] == 1);
-	CPPUNIT_ASSERT(bb[1] == -1);
-	CPPUNIT_ASSERT(bb[2] == 1);
-	CPPUNIT_ASSERT(bb[3] == -1);
-	CPPUNIT_ASSERT(bb[4] == 1);
-	CPPUNIT_ASSERT(bb[5] == -1);
+	//expected results
+	double bbRes[6] = { -123.52912139892578, 123.52999877929688, -123.52999877929688, 123.52912139892578, -2.8610257274408468e-08,-2.8610202207346447e-08 };
+
+	slicerActor->GetBounds(bb);
+	CPPUNIT_ASSERT(bb[0] == bbRes[0]);
+	CPPUNIT_ASSERT(bb[1] == bbRes[1]);
+	CPPUNIT_ASSERT(bb[2] == bbRes[2]);
+	CPPUNIT_ASSERT(bb[3] == bbRes[3]);
+	CPPUNIT_ASSERT(bb[4] == bbRes[4]);
+	CPPUNIT_ASSERT(bb[5] == bbRes[5]);
 
 }

@@ -32,14 +32,10 @@ SET(PROJECT_SRCS
   mafVMEInfoText.h
   mafMSFImporter.cpp
   mafMSFImporter.h
-  mafPipePolylineSlice.cpp
-  mafPipePolylineSlice.h
-	mafPipeGenericPolydata.cpp mafPipeGenericPolydata.h
+  mafPipeGenericPolydata.cpp mafPipeGenericPolydata.h
   mafPipeMesh.cpp mafPipeMesh.h
 	mafPipeSurface.cpp mafPipeSurface.h
 	mafPipeRefSys.cpp mafPipeRefSys.h
-  mafPipeMeshSlice.cpp
-  mafPipeMeshSlice.h
   mafPipeScalar.cpp
   mafPipeScalar.h
   mafVisualPipeVolumeRayCasting.cpp
@@ -139,33 +135,14 @@ SET(PROJECT_SRCS
   mafPipeSlice.h
   ############################
   
-  mafGizmoROI_BES.cpp
-  mafGizmoROI_BES.h
-  mafPipeMeshSlice_BES.cpp
-  mafPipeMeshSlice_BES.h
-  mafPipePolylineSlice_BES.cpp
-  mafPipePolylineSlice_BES.h
-  mafPipeSurfaceSlice_BES.cpp
-  mafPipeSurfaceSlice_BES.h
-  mafPipeVolumeSlice_BES.cpp
-  mafPipeVolumeSlice_BES.h
-  
-  ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
-  # the following files has been moved to mafIO
-  #../BES_Beta/IO/mafBrickedFile.cpp    
-  #../BES_Beta/IO/mafBrickedFile.h
-  #../BES_Beta/IO/mafBrickedFileReader.cpp
-  #../BES_Beta/IO/mafBrickedFileReader.h
-  #../BES_Beta/IO/mafBrickedFileWriter.cpp
-  #../BES_Beta/IO/mafBrickedFileWriter.h
-  #../BES_Beta/IO/mafVolumeLargeReader.cpp
-  #../BES_Beta/IO/mafVolumeLargeReader.h
-  #../BES_Beta/IO/mafVolumeLargeWriter.cpp
-  #../BES_Beta/IO/mafVolumeLargeWriter.h
-  mafVMEVolumeLarge.cpp
-  mafVMEVolumeLarge.h
-  mafVMEVolumeLargeUtils.cpp
-  mafVMEVolumeLargeUtils.h  
+  mafPipeMeshSlice.cpp
+  mafPipeMeshSlice.h
+  mafPipePolylineSlice.cpp
+  mafPipePolylineSlice.h
+  mafPipeSurfaceSlice.cpp
+  mafPipeSurfaceSlice.h
+  mafPipeVolumeSlice.cpp
+  mafPipeVolumeSlice.h
   ###############################################################
 
   mafPipeVolumeSliceBlend.cpp
@@ -220,16 +197,12 @@ IF (MAF_USE_VTK)
   mafPipePointSet.h
   mafPipePolyline.cpp
   mafPipePolyline.h
-  mafPipeSurfaceSlice.cpp
-  mafPipeSurfaceSlice.h
   mafPipeSurfaceTextured.cpp
   mafPipeSurfaceTextured.h
   mafPipeVector.cpp
   mafPipeVector.h
   mafPipeVolumeProjected.cpp
   mafPipeVolumeProjected.h
-  mafPipeVolumeSlice.cpp
-  mafPipeVolumeSlice.h
   mafVMEGeneric.cpp
   mafVMEGeneric.h
   mafVMEGizmo.cpp

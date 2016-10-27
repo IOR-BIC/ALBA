@@ -177,19 +177,19 @@ void mafViewSliceBlend::VmeCreatePipe(mafVME *vme)
         switch(m_CameraPositionId)
         {
         case CAMERA_OS_X:
-          slice_mode = SLICE_X;
+          slice_mode = mafPipeVolumeSlice::SLICE_X;
           break;
         case CAMERA_OS_Y:
-          slice_mode = SLICE_Y;
+          slice_mode = mafPipeVolumeSlice::SLICE_Y;
           break;
         case CAMERA_OS_P:
-          slice_mode = SLICE_ORTHO;
+          slice_mode = mafPipeVolumeSlice::SLICE_ORTHO;
           break;
         case CAMERA_PERSPECTIVE:
-          slice_mode = SLICE_ARB;
+          slice_mode = mafPipeVolumeSlice::SLICE_ARB;
           break;
         default:
-          slice_mode = SLICE_Z;
+          slice_mode = mafPipeVolumeSlice::SLICE_Z;
         }
         //check if slices are initialized
         if (m_SliceInitialized)

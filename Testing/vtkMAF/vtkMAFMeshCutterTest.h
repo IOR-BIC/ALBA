@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: vtkMAFMeshCutterTest
- Authors: Nigel McFarlane
+ Authors: Nigel McFarlane, Roberto Mucci
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -14,13 +14,14 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_vtkMAFMeshCuttertest_H__
-#define __CPP_UNIT_vtkMAFMeshCuttertest_H__
+#ifndef __CPP_UNIT_vtkMAFMeshCutterTest_H__
+#define __CPP_UNIT_vtkMAFMeshCutterTest_H__
 
 #include "mafTest.h"
 
-class vtkMAFMeshCutter;
 class vtkUnstructuredGrid;
+class vtkMAFMeshCutter;
+
 
 //------------------------------------------------------------------------------
 // Test class for vtkMAFMeshCutter

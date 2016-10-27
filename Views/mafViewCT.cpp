@@ -25,7 +25,6 @@
 
 #include "mafViewCT.h"
 #include "mafViewSlice.h"
-#include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafGUI.h"
 #include "mafGUILutSlider.h"
@@ -184,11 +183,6 @@ void mafViewCT::PackageView()
 {
 	m_ViewCTCompound = new mafViewCompound("CT view",2,5);
 	mafViewSlice *vs = new mafViewSlice("Slice view", CAMERA_PERSPECTIVE);
-	/*m_Vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice",MUTEX);
-	m_Vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
-	m_Vs->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice",MUTEX);
-	m_Vs->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice",MUTEX);
-	m_Vs->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice",MUTEX);*/
 	m_ViewCTCompound->PlugChildView(vs);
 	PlugChildView(m_ViewCTCompound);
 }

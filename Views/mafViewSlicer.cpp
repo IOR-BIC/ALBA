@@ -31,7 +31,7 @@
 #include "mafMatrix.h"
 #include "mafTransform.h"
 #include "mafPipeImage3D.h"
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeSlice.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipeSurface.h"
 #include "mafPipeSurfaceTextured.h"
@@ -371,8 +371,7 @@ void mafViewSlicer::CameraUpdate()
           surfaceOriginTranslated[1] = center[1] + normal[1] * 0.1;
           surfaceOriginTranslated[2] = center[2] + normal[2] * 0.1;
 
-          PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
-          PipeSliceViewSurface->SetNormal(normal);
+          PipeSliceViewSurface->SetSlice(surfaceOriginTranslated,normal);
         }
       }
     }

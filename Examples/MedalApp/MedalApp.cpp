@@ -69,11 +69,10 @@
 #include "mafOpImporterLandmarkWS.h"
 #include "mafOpImporterRAWImages.h"
 #include "mafOpImporterC3D.h"
-#include "mafOpImporterBBF.h"
-#include "mafOpImporterRAWVolume_BES.h"
 #include "medOpImporterVTK.h"
 #include "mafOpImporterAnsysCDBFile.h"
 #include "mafOpImporterAnsysInputFile.h"
+#include "mafOpCreateVolume.h"
 #endif
 #ifndef _DEBUG
 //EXPORTERS
@@ -149,6 +148,7 @@
 #include "mafOpMML3.h"
 #include "mafOpSegmentationRegionGrowingConnectedThreshold.h"
 #include "mafOpSegmentationRegionGrowingLocalAndGlobalThreshold.h"
+#include "mafOpMergeDicomSeries.h"
 #endif
 
 #include "mafViewVTK.h"
@@ -261,8 +261,6 @@ bool MedalApp::OnInit()
 	m_Logic->Plug(new mafOpImporterGRFWS("GRF"));
 #endif
 	m_Logic->Plug(new mafOpImporterRAWImages("RAW Images"));
-	m_Logic->Plug(new mafOpImporterBBF());
-	m_Logic->Plug(new mafOpImporterRAWVolume_BES());
 #endif
 	//------------------------------------------------------------
 
@@ -292,7 +290,8 @@ bool MedalApp::OnInit()
 	m_Logic->Plug(new mafOpVolumeMeasure("Volume"),"Measure");
 	m_Logic->Plug(new mafOpMeshQuality("Mesh Quality"),"Measure");
 
-	m_Logic->Plug(new mafOpAddLandmark("Add Landmark"),_("Create"));
+	m_Logic->Plug(new mafOpCreateVolume("Create Volume"), _("Create"));
+	m_Logic->Plug(new mafOpAddLandmark("Add Landmark"), _("Create"));
 	m_Logic->Plug(new mafOpCreateGroup("Group"),_("Create"));
 	m_Logic->Plug(new mafOpCreateMeter("Meter"),_("Create"));
 	m_Logic->Plug(new mafOpCreateRefSys("RefSys"),_("Create"));
@@ -349,6 +348,7 @@ bool MedalApp::OnInit()
 #ifdef MAF_USE_ITK
 	m_Logic->Plug(new mafOpClassicICPRegistration("Surface"),_("Register"));
 #endif
+	m_Logic->Plug(new mafOpMergeDicomSeries("Merge Dicom"), "");
 #endif
 	//------------------------------------------------------------
 

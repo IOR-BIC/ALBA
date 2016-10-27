@@ -26,12 +26,6 @@
 
 #include "vtkObject.h"
 
-#define VME_VOLUME_LARGE
-#ifdef VME_VOLUME_LARGE
-#include "vtkMAFIdType64.h"
-#include "mafVMEVolumeLarge.h"
-#include "mafVMEVolumeLargeUtils.h"
-#endif
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -219,9 +213,7 @@ protected:
 
   mafVMEVolumeGray  *m_VolumeGray;
   mafVMEVolumeRGB   *m_VolumeRGB;
-#ifdef VME_VOLUME_LARGE
-  mafVMEVolumeLarge* m_VolumeLarge;
-#endif // VME_VOLUME_LARGE
+
 
   mafString m_DimXCrop;
   mafString m_DimYCrop;

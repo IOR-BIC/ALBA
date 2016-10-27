@@ -128,59 +128,7 @@ void mafPipeFactoryVMETest::TestGetInstance_Initialize()
   const std::vector<std::string> pipes = pipe_factory->GetPipeNames();
   int s = pipes.size();
   CPPUNIT_ASSERT(s != 0);//must be a positive number (it sums all the maf pipes and the registered pipes in medical)
-
-  //enum ID_NUMBER_OF_VME_PIPE
-  //{
-  //  ID_TOTAL_NUMBER = 53,
-  //};
-
-  //CPPUNIT_ASSERT(s == ID_TOTAL_NUMBER); 
-
-  //char *pipeName[ID_TOTAL_NUMBER];
-  //pipeName[0] = "mafPipeSurface";
-  //pipeName[1] = "mafPipeSurfaceSlice";
-  //pipeName[2] = "mafPipeSurfaceTextured";
-  //pipeName[3] = "mafPipePolylineSlice";
-  //pipeName[4] = "mafPipeGizmo";
-  //pipeName[5] = "mafPipeMeter";
-  //pipeName[6] = "mafPipeVolumeSlice";
-  //pipeName[7] = "mafPipeVolumeProjected";
-  //pipeName[8] = "mafPipePointSet";
-  //pipeName[9] = "mafPipePolyline";
-  //pipeName[10] = "mafPipeVector";
-  //pipeName[11] = "mafPipeLandmarkCloud";
-  //pipeName[12] = "mafPipeIsosurface";
-  //pipeName[13] = "mafPipeIsosurfaceGPU";
-  //pipeName[14] = "mafPipeImage3D";
-  //pipeName[15] = "mafPipeMesh";
-  //pipeName[16] = "mafPipeMeshSlice";
-  //pipeName[17] = "mafPipeScalar";
-  //pipeName[18] = "mafVisualPipeVolumeRayCasting";
-  //pipeName[19] = "mafPipeScalarMatrix";
-  //pipeName[20] = "mafPipeBox"; //default pipe plugged by superclass
-
-  //bool found;
-  //for (int i=0;i<pipes.size();i++)
-  //{
-		//std::string controlPipeName;
-		//controlPipeName = pipes[i];
-  //  found = false;
-  //  for(int j=0; j<21; j++)
-  //  {
-  //    if (controlPipeName==pipeName[j])
-  //    {
-  //      found = true;
-  //    }
-  //  }
-
-  //  if(found == false)
-  //  {
-  //    break;
-  //  }
-  //  
-  //}
-  
-	//CPPUNIT_ASSERT(found);
+	  
 
 	found=false;
 	for (int i=0;i<pipes.size();i++)

@@ -110,7 +110,5 @@ protected:
   /** test friends */
   friend class mafGizmoBoundingBoxTest;
   friend class mafGizmoROITest;
-  friend class mafGizmoROI_BESTest;
-
 };
 #endif

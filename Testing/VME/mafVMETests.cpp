@@ -35,7 +35,6 @@
 #include "mafVMEPolylineSplineTest.h"
 #include "mafVMEMeshTest.h"
 #include "mafPipeMeshTest.h"
-#include "mafPipeMeshSliceTest.h"
 #include "mafVMELandmarkTest.h"
 #include "mafVMELandmarkCloudTest.h"
 #include "mafMatrixVectorTest.h"
@@ -46,7 +45,6 @@
 #include "mafPipeGizmoTest.h"
 #include "mafPipeSurfaceTexturedTest.h"
 #include "mafPipeScalarTest.h"
-#include "mafPipeVolumeSliceTest.h"
 #include "mafPipeImage3DTest.h"
 #include "mafPipeIsosurfaceTest.h"
 #include "mafPipePointSetTest.h"
@@ -71,7 +69,6 @@
 #include "mafCryptTest.h"
 #include "mafPipePolylineTest.h"
 #include "mafMatrixInterpolatorTest.h"
-#include "mafPipeSurfaceSliceTest.h"
 #include "mafVMEGenericTest.h"
 #include "mafPipeLandmarkCloudTest.h"
 #include "mafVMEOutputVTKTest.h"
@@ -82,7 +79,6 @@
 #include "mafPipeMeterTest.h"
 #include "mafPipeVolumeProjectedTest.h"
 #include "mafVMEItemTest.h"
-#include "mafPipePolylineSliceTest.h"
 #include "mafVMERefSysTest.h"
 #include "mafVMEProberTest.h"
 #include "mafVMEMeterTest.h"
@@ -91,7 +87,6 @@
 #include "mafVisualPipeVolumeRayCastingTest.h"
 #include "mafVMESlicerTest.h"
 #include "mafVMERawMotionDataTest.h"
-#include "mafGizmoROI_BESTest.h"
 #include "mafPolylineGraphTest.h"
 #include "mafVMEWrappedMeterTest.h"
 #include "mafVMELabeledVolumeTest.h"
@@ -103,13 +98,13 @@
 #include "mafVMESurfaceEditorTest.h"
 #include "mafPipePolylineGraphEditorTest.h"
 #include "mafVMEPolylineEditorTest.h"
-#include "mafPipeMeshSlice_BESTest.h"
-#include "mafPipeSurfaceSlice_BESTest.h"
-#include "mafPipeVolumeSlice_BESTest.h"
+#include "mafPipeMeshSliceTest.h"
+#include "mafPipeSurfaceSliceTest.h"
+#include "mafPipeVolumeSliceTest.h"
 #include "mafVMEMapsTest.h"
 #include "mafPipeTrajectoriesTest.h"
 #include "mafPipeSliceTest.h"
-#include "mafPipePolylineSlice_BESTest.h"
+#include "mafPipePolylineSliceTest.h"
 #include "mafPipeWrappedMeterTest.h"
 #include "mafVMEOutputWrappedMeterTest.h"
 #include "mafPipeDensityDistanceTest.h"
@@ -137,11 +132,9 @@
 #include "mafPipeCompoundVolumeMIPTest.h"
 #include "mafPipeCompoundVolumeDRRTest.h"
 #include "mafPipeCompoundVolumeIsosurfaceTest.h"
-#include "mafVMEVolumeLargeUtilsTest.h"
 #include "mafPolylineGraphVertexTest.h"
 #include "mafPolylineGraphEdgeTest.h"
 #include "mafPolylineGraphBranchTest.h"
-#include "mafVMEVolumeLargeTest.h"
 #include "mafDataPipeCustomSegmentationVolumeTest.h"
 #include "mafPipeRayCastTest.h"
 #include "VMEGenericPoseTest.h"
@@ -187,7 +180,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafVMEPolylineSplineTest::suite());
 	runner.addTest(mafVMEMeshTest::suite());
 	runner.addTest(mafPipeMeshTest::suite());
-	runner.addTest(mafPipeMeshSliceTest::suite());
 	runner.addTest(mafVMELandmarkTest::suite());
 	runner.addTest(mafVMELandmarkCloudTest::suite());
 	runner.addTest(mafMatrixVectorTest::suite());
@@ -198,7 +190,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafPipeGizmoTest::suite());
 	runner.addTest(mafPipeSurfaceTexturedTest::suite());
 	runner.addTest(mafPipeScalarTest::suite());
-	runner.addTest(mafPipeVolumeSliceTest::suite());
 	runner.addTest(mafPipeImage3DTest::suite());
 	runner.addTest(mafPipeIsosurfaceTest::suite());
 	runner.addTest(mafPipePointSetTest::suite());
@@ -223,7 +214,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafCryptTest::suite());
 	runner.addTest(mafPipePolylineTest::suite());
 	runner.addTest(mafMatrixInterpolatorTest::suite());
-	runner.addTest(mafPipeSurfaceSliceTest::suite());
 	runner.addTest(mafVMEGenericTest::suite());
 	runner.addTest(mafPipeLandmarkCloudTest::suite());
 	runner.addTest(mafVMEOutputVTKTest::suite());
@@ -234,7 +224,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafPipeMeterTest::suite());
 	runner.addTest(mafPipeVolumeProjectedTest::suite());
 	runner.addTest(mafVMEItemTest::suite());
-	runner.addTest(mafPipePolylineSliceTest::suite());
 	runner.addTest(mafVMERefSysTest::suite());
 	runner.addTest(mafVMEProberTest::suite());
 	runner.addTest(mafVMEMeterTest::suite());
@@ -243,7 +232,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafVisualPipeVolumeRayCastingTest::suite());
 	runner.addTest(mafVMESlicerTest::suite());
 	runner.addTest(mafVMERawMotionDataTest::suite());
-	runner.addTest(mafGizmoROI_BESTest::suite());
 	runner.addTest(mafPolylineGraphTest::suite());
 	runner.addTest(mafVMEWrappedMeterTest::suite());
 	runner.addTest(mafVMELabeledVolumeTest::suite());
@@ -255,13 +243,13 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafVMESurfaceEditorTest::suite());
 	runner.addTest(mafPipePolylineGraphEditorTest::suite());
 	runner.addTest(mafVMEPolylineEditorTest::suite());
-	runner.addTest(mafPipeMeshSlice_BESTest::suite());
-	runner.addTest(mafPipeSurfaceSlice_BESTest::suite());
-	runner.addTest(mafPipeVolumeSlice_BESTest::suite());
+	runner.addTest(mafPipeMeshSliceTest::suite());
+	runner.addTest(mafPipeSurfaceSliceTest::suite());
+	runner.addTest(mafPipeVolumeSliceTest::suite());
 	runner.addTest(mafVMEMapsTest::suite());
 	runner.addTest(mafPipeTrajectoriesTest::suite());
 	runner.addTest(mafPipeSliceTest::suite());
-	runner.addTest(mafPipePolylineSlice_BESTest::suite());
+	runner.addTest(mafPipePolylineSliceTest::suite());
 	runner.addTest(mafPipeWrappedMeterTest::suite());
 	runner.addTest(mafVMEOutputWrappedMeterTest::suite());
 	runner.addTest(mafPipeDensityDistanceTest::suite());
@@ -289,11 +277,9 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafPipeCompoundVolumeMIPTest::suite());
 	runner.addTest(mafPipeCompoundVolumeDRRTest::suite());
 	runner.addTest(mafPipeCompoundVolumeIsosurfaceTest::suite());
-	runner.addTest(mafVMEVolumeLargeUtilsTest::suite());
 	runner.addTest(mafPolylineGraphVertexTest::suite());
 	runner.addTest(mafPolylineGraphEdgeTest::suite());
 	runner.addTest(mafPolylineGraphBranchTest::suite());
-	runner.addTest(mafVMEVolumeLargeTest::suite());
 	runner.addTest(mafDataPipeCustomSegmentationVolumeTest::suite());
 	runner.addTest(mafPipeRayCastTest::suite());
 	runner.addTest(VMEGenericPoseTest::suite());

@@ -23,7 +23,6 @@ SET(PROJECT_SRCS
 	mafVMEPolylineSplineTest.h mafVMEPolylineSplineTest.cpp
 	mafVMEMeshTest.h mafVMEMeshTest.cpp
 	mafPipeMeshTest.h mafPipeMeshTest.cpp
-	mafPipeMeshSliceTest.h mafPipeMeshSliceTest.cpp
 	mafVMELandmarkTest.h mafVMELandmarkTest.cpp
 	mafVMELandmarkCloudTest.h mafVMELandmarkCloudTest.cpp
 	mafMatrixVectorTest.h mafMatrixVectorTest.cpp
@@ -34,7 +33,6 @@ SET(PROJECT_SRCS
 	mafPipeGizmoTest.h mafPipeGizmoTest.cpp
 	mafPipeSurfaceTexturedTest.h mafPipeSurfaceTexturedTest.cpp
 	mafPipeScalarTest.h mafPipeScalarTest.cpp
-	mafPipeVolumeSliceTest.h mafPipeVolumeSliceTest.cpp
 	mafPipeImage3DTest.h mafPipeImage3DTest.cpp
 	mafPipeIsosurfaceTest.h mafPipeIsosurfaceTest.cpp
 	mafPipePointSetTest.h mafPipePointSetTest.cpp
@@ -59,7 +57,6 @@ SET(PROJECT_SRCS
 	mafCryptTest.h mafCryptTest.cpp
 	mafPipePolylineTest.h mafPipePolylineTest.cpp
 	mafMatrixInterpolatorTest.h mafMatrixInterpolatorTest.cpp
-	mafPipeSurfaceSliceTest.h mafPipeSurfaceSliceTest.cpp
 	mafVMEGenericTest.h mafVMEGenericTest.cpp
 	mafPipeLandmarkCloudTest.h mafPipeLandmarkCloudTest.cpp
 	mafVMEOutputVTKTest.h mafVMEOutputVTKTest.cpp
@@ -70,7 +67,6 @@ SET(PROJECT_SRCS
 	mafPipeMeterTest.h mafPipeMeterTest.cpp
 	mafPipeVolumeProjectedTest.h mafPipeVolumeProjectedTest.cpp
 	mafVMEItemTest.h mafVMEItemTest.cpp
-	mafPipePolylineSliceTest.h mafPipePolylineSliceTest.cpp
 	mafVMERefSysTest.h mafVMERefSysTest.cpp
 	mafVMEProberTest.h mafVMEProberTest.cpp
 	mafVMEMeterTest.h mafVMEMeterTest.cpp
@@ -79,7 +75,6 @@ SET(PROJECT_SRCS
 	mafVisualPipeVolumeRayCastingTest.h mafVisualPipeVolumeRayCastingTest.cpp
 	mafVMESlicerTest.h mafVMESlicerTest.cpp
 	mafVMERawMotionDataTest.h mafVMERawMotionDataTest.cpp
-	mafGizmoROI_BESTest.h mafGizmoROI_BESTest.cpp
 	mafPolylineGraphTest.h mafPolylineGraphTest.cpp
 	mafVMEWrappedMeterTest.h mafVMEWrappedMeterTest.cpp
 	mafVMELabeledVolumeTest.h mafVMELabeledVolumeTest.cpp
@@ -91,13 +86,13 @@ SET(PROJECT_SRCS
 	mafVMESurfaceEditorTest.h mafVMESurfaceEditorTest.cpp
 	mafPipePolylineGraphEditorTest.h mafPipePolylineGraphEditorTest.cpp
 	mafVMEPolylineEditorTest.h mafVMEPolylineEditorTest.cpp
-	mafPipeMeshSlice_BESTest.h mafPipeMeshSlice_BESTest.cpp
-	mafPipeSurfaceSlice_BESTest.h mafPipeSurfaceSlice_BESTest.cpp
-	mafPipeVolumeSlice_BESTest.h mafPipeVolumeSlice_BESTest.cpp
+	mafPipeMeshSliceTest.h mafPipeMeshSliceTest.cpp
+	mafPipeSurfaceSliceTest.h mafPipeSurfaceSliceTest.cpp
+	mafPipeVolumeSliceTest.h mafPipeVolumeSliceTest.cpp
 	mafVMEMapsTest.h mafVMEMapsTest.cpp
 	mafPipeTrajectoriesTest.h mafPipeTrajectoriesTest.cpp
 	mafPipeSliceTest.h mafPipeSliceTest.cpp
-	mafPipePolylineSlice_BESTest.h mafPipePolylineSlice_BESTest.cpp
+	mafPipePolylineSliceTest.h mafPipePolylineSliceTest.cpp
 	mafPipeWrappedMeterTest.h mafPipeWrappedMeterTest.cpp
 	mafVMEOutputWrappedMeterTest.h mafVMEOutputWrappedMeterTest.cpp
 	mafPipeDensityDistanceTest.h mafPipeDensityDistanceTest.cpp
@@ -125,11 +120,9 @@ SET(PROJECT_SRCS
 	mafPipeCompoundVolumeMIPTest.h mafPipeCompoundVolumeMIPTest.cpp
 	mafPipeCompoundVolumeDRRTest.h mafPipeCompoundVolumeDRRTest.cpp
 	mafPipeCompoundVolumeIsosurfaceTest.h mafPipeCompoundVolumeIsosurfaceTest.cpp
-	mafVMEVolumeLargeUtilsTest.h mafVMEVolumeLargeUtilsTest.cpp
 	mafPolylineGraphVertexTest.h mafPolylineGraphVertexTest.cpp
 	mafPolylineGraphEdgeTest.h mafPolylineGraphEdgeTest.cpp
 	mafPolylineGraphBranchTest.h mafPolylineGraphBranchTest.cpp
-	mafVMEVolumeLargeTest.h mafVMEVolumeLargeTest.cpp
 	mafDataPipeCustomSegmentationVolumeTest.h mafDataPipeCustomSegmentationVolumeTest.cpp
 	mafPipeRayCastTest.h mafPipeRayCastTest.cpp
 	VMEGenericPoseTest.h VMEGenericPoseTest.cpp

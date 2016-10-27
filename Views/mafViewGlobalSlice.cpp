@@ -81,7 +81,7 @@ mafViewGlobalSlice::mafViewGlobalSlice(wxString label, int camera_position, bool
 {
 	m_SliceOrigin[0] = m_SliceOrigin[1] = m_SliceOrigin[2] = 0.0;
 	m_IDPlane = ID_XY;
-	m_SliceMode = SLICE_ARB;
+	m_SliceMode = mafPipeVolumeSlice::SLICE_ARB;
 	m_Opacity = 1.0;
 
 	m_SliderOldOrigin = 0.0; 
@@ -370,12 +370,11 @@ void mafViewGlobalSlice::VmeCreatePipe(mafVME *vme)
       else if(pipe_name.Equals("mafPipeSurfaceSlice"))
       {
 				((mafPipeSurfaceSlice *)pipe)->ShowBoxSelectionOn();
-        ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_SliceOrigin);
 				double DoubleNormal[3];
 				DoubleNormal[0]=(double)m_SliceNormal[0];
 				DoubleNormal[1]=(double)m_SliceNormal[1];
 				DoubleNormal[2]=(double)m_SliceNormal[2];
-				((mafPipeSurfaceSlice *)pipe)->SetNormal(DoubleNormal);
+				((mafPipeSurfaceSlice *)pipe)->SetSlice(m_SliceOrigin, DoubleNormal);
 			}
       else if(pipe_name.Equals("mafPipeMeshSlice"))
       {
@@ -387,8 +386,7 @@ void mafViewGlobalSlice::VmeCreatePipe(mafVME *vme)
         positionSlice[0] = m_SliceOrigin[0];
         positionSlice[1] = m_SliceOrigin[1];
         positionSlice[2] = m_SliceOrigin[2];
-        ((mafPipeMeshSlice *)pipe)->SetSlice(positionSlice);
-        ((mafPipeMeshSlice *)pipe)->SetNormal(DoubleNormal);
+        ((mafPipeMeshSlice *)pipe)->SetSlice(positionSlice, DoubleNormal);
       }
       pipe->Create(n);
 
@@ -667,28 +665,28 @@ void mafViewGlobalSlice::UpdateSlice()
 		  if(vme->IsA("mafVMESurface")||vme->IsA("mafVMESurfaceParametric")||vme->IsA("mafVMELandmarkCloud")||vme->IsA("mafVMELandmark"))
 		  {
 				mafPipeSurfaceSlice * pipe = (mafPipeSurfaceSlice *)node->GetPipe();
-        pipe->SetSlice(m_SliceOrigin);
+        
 				double DoubleNormal[3];
 				DoubleNormal[0]=(double)m_SliceNormal[0];
 				DoubleNormal[1]=(double)m_SliceNormal[1];
 				DoubleNormal[2]=(double)m_SliceNormal[2];
-				pipe->SetNormal(DoubleNormal);
+				pipe->SetSlice(m_SliceOrigin,DoubleNormal);
       }
       if(vme->IsA("mafVMEMesh"))
       {
 				mafPipeMeshSlice * pipe = (mafPipeMeshSlice *)node->GetPipe();
-        pipe->SetSlice(m_SliceOrigin);
         double DoubleNormal[3];
         DoubleNormal[0]=(double)m_SliceNormal[0];
         DoubleNormal[1]=(double)m_SliceNormal[1];
         DoubleNormal[2]=(double)m_SliceNormal[2];
-        pipe->SetNormal(DoubleNormal);
+				pipe->SetSlice(m_SliceOrigin, DoubleNormal);
       }
       else if (output->IsA("mafVMEOutputVolume"))
 			{
 				mafPipeVolumeSlice * pipe = (mafPipeVolumeSlice *)node->GetPipe();
 				pipe->SetSlice(applied_origin, applied_xVector, applied_yVector);
 				pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+				//pipe->UpdateSlice();
 			}
 			transform->Delete();
 			transform = NULL;
@@ -774,7 +772,7 @@ void mafViewGlobalSlice::SetSlice(double origin[3], float xVect[3], float yVect[
 void mafViewGlobalSlice::SetSlice(double origin[3], double dn)
 //----------------------------------------------------------------------------
 {
-	if(m_SliceMode != SLICE_ARB)
+	if(m_SliceMode != mafPipeVolumeSlice::SLICE_ARB)
   {
     m_SliceOrigin[m_SliceMode] = origin[m_SliceMode];
   }

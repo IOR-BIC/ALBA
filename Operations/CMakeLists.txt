@@ -135,12 +135,6 @@ IF (MAF_USE_VTK)
   
 	mafOpMakeVMETimevarying.cpp  mafOpMakeVMETimevarying.h
 	mafOpSegmentationRegionGrowingConnectedThreshold.cpp  mafOpSegmentationRegionGrowingConnectedThreshold.h
-  
-	#### VolumeLarge - TO BE COMMITTED DOWN    ####
-	mafOpImporterBBF.cpp  mafOpImporterBBF.h
-	mafOpImporterRAWVolume_BES.cpp	mafOpImporterRAWVolume_BES.h  
-	###############################################
-	
 	mafOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp	mafOpSegmentationRegionGrowingLocalAndGlobalThreshold.h
 	  
 	mafOpEqualizeHistogram.cpp  mafOpEqualizeHistogram.h

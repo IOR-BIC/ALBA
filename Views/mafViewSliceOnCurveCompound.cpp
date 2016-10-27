@@ -62,7 +62,7 @@ See the COPYINGS file for license details
 
 #include "mafVMEGizmo.h"
 
-#include "mafPipeVolumeSlice_BES.h"
+#include "mafPipeVolumeSlice.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewSliceOnCurveCompound);
@@ -371,8 +371,8 @@ mafGUI* mafViewSliceOnCurveCompound::CreateGui()
   // Added by Losi 11.25.2009
   if (m_CurrentVolume)
   {
-    mafPipeVolumeSlice_BES *p = NULL;
-    p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+    mafPipeVolumeSlice *p = NULL;
+    p = mafPipeVolumeSlice::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
     if (p) // Is this required?
     {
       p->SetEnableGPU(m_EnableGPU);
@@ -492,8 +492,8 @@ void mafViewSliceOnCurveCompound::OnEvent(mafEventBase *maf_event)
       {
         if (m_CurrentVolume)
         {
-          mafPipeVolumeSlice_BES *p = NULL;
-          p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+          mafPipeVolumeSlice *p = NULL;
+          p = mafPipeVolumeSlice::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
           if(p)
           {
             p->SetEnableGPU(m_EnableGPU);
@@ -759,18 +759,16 @@ void mafViewSliceOnCurveCompound::SetSlicePosition(double abscisa, vtkIdType bra
       v->PlugVisualPipe("mafVMEVolumeGray", GetVolumePipesDesc()[m_VolumePipeConfiguration].szClassName, MUTEX);	
       v->PlugVisualPipe("mafVMELabeledVolume", GetVolumePipesDesc()[m_VolumePipeConfiguration].szClassName, MUTEX);
       v->PlugVisualPipe("mafVMEVolumeRGB", GetVolumePipesDesc()[m_VolumePipeConfiguration].szClassName, MUTEX);
-      v->PlugVisualPipe("mafVMEVolumeLarge", GetVolumePipesDesc()[m_VolumePipeConfiguration].szClassName, MUTEX);
     }
 
-    if (SLICE_VIEW < vws.size())
-    {	
-        mafViewVTK* vs = ((mafViewVTK*)vws[SLICE_VIEW]);
+		if (SLICE_VIEW < vws.size())
+		{
+			mafViewVTK* vs = ((mafViewVTK*)vws[SLICE_VIEW]);
 
-        vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice_BES", MUTEX);
-        vs->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice_BES", MUTEX);
-        vs->PlugVisualPipe("mafVMEVolumeRGB", "mafPipeVolumeSlice_BES", MUTEX);
-        vs->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice_BES", MUTEX);
-    }
+			vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice", MUTEX);
+			vs->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice", MUTEX);
+			vs->PlugVisualPipe("mafVMEVolumeRGB", "mafPipeVolumeSlice", MUTEX);
+		}
   }
 }
 
@@ -783,8 +781,8 @@ void mafViewSliceOnCurveCompound::SetSlicePosition(double abscisa, vtkIdType bra
     if (SLICE_VIEW < vws.size())
     {	
       mafViewVTK* vs = ((mafViewVTK*)vws[SLICE_VIEW]);
-      vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice_BES");
-      vs->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice_BES");
+      vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
+      vs->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
     }
   }
 }
@@ -798,7 +796,7 @@ void mafViewSliceOnCurveCompound::SetSlicePosition(double abscisa, vtkIdType bra
     if (SLICE_VIEW < vws.size())
     {	
       mafViewVTK* vs = ((mafViewVTK*)vws[SLICE_VIEW]);
-      vs->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice_BES");
+      vs->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
     }
   }
 }

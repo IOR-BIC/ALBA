@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: vtkMAFMeshCutter
- Authors: Nigel McFarlane, Gianluigi Crimi
+ Authors: Nigel McFarlane
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -23,17 +23,23 @@
 //---------------------------------------------
 #include "vtkUnstructuredGridToPolyDataFilter.h"
 #include "mafConfigure.h"
+#include "assert.h"
 #include <vector>
+#include <map>
+
+#include "vtkPlane.h"
 
 //---------------------------------------------
 // class forward:
 //---------------------------------------------
-class vtkPlane;
 class vtkIdList;
 class vtkCell;
 class vtkMatrix4x4;
 
-/** vtkMAFMeshCutter - vtk filter which cuts a finite element mesh (unstructured grid) with a plane.
+/** 
+
+ class name: vtkMAFMeshCutter
+vtk filter which cuts a finite element mesh (unstructured grid) with a plane.
 This is very similar to vtkCutter().
 
 Differences from vtkCutter():
@@ -55,16 +61,21 @@ polydata will contain the points, but no cell will be created.*/
 class MAF_EXPORT vtkMAFMeshCutter : public vtkUnstructuredGridToPolyDataFilter
 {
 public:
+  /** RTTI macro*/
   vtkTypeRevisionMacro(vtkMAFMeshCutter,vtkUnstructuredGridToPolyDataFilter);
+  /** return object instance */
   static vtkMAFMeshCutter *New() ;
+  /** print object information */
   void PrintSelf(ostream& os, vtkIndent indent);                                ///< print self
 
    /** Overload standard modified time function. If cut function is modified,
   then this object is modified as well. */
   unsigned long GetMTime();
 
-  void SetCutFunction(vtkPlane *P) ;                                            ///< Set the cutting plane (but does not register the object)
-  vtkPlane* GetCutFunction() ;                                                  ///< Get the cutting plane
+  /** Set the cutting plane (but does not register the object) */
+  void SetCutFunction(vtkPlane *P) ;
+  /** Get the cutting plane */
+  vtkPlane* GetCutFunction();
 
   /** Get the output point idout corresponding to the input edge (id0,id1). 
   Lambda returns the fractional distance between id0 and id1. 
@@ -78,13 +89,13 @@ public:
 
   /** Get the input edge (id0,id1) corresponding to the point idout. 
   Lambda returns the fractional distance between id0 and id1. */
-  bool GetInputEdgeCutByPoint(vtkIdType idout, vtkIdType *id0, vtkIdType *id1, double *lambda) const ;
+  inline bool GetInputEdgeCutByPoint(vtkIdType idout, vtkIdType *id0, vtkIdType *id1, double *lambda) const ;
 
   /** Get the single input point id0 corresponding to the point idout. */
-  bool GetInputPointCutByPoint(vtkIdType idout, vtkIdType *id0) const ;
+  inline bool GetInputPointCutByPoint(vtkIdType idout, vtkIdType *id0) const ;
 
   /** Get the input cell corresponding to the output cell. */
-  vtkIdType GetInputCellCutByOutputCell(vtkIdType idout) ;
+  inline vtkIdType GetInputCellCutByOutputCell(vtkIdType idout) ;
 
   /** Get the output cell corresponding to the input cell.
   Returns true if the input id was found. */
@@ -95,16 +106,19 @@ public:
   void Initialize() ;
 
 protected:
-  vtkMAFMeshCutter() ;                                                              ///< constructor
-  ~vtkMAFMeshCutter() ;                                                             ///< destructor
+  /** constructor */
+  vtkMAFMeshCutter() ;   
+  /** destructor */                                                           
+  ~vtkMAFMeshCutter() ;                                                             
 
-  void Execute();                                                               ///< execute method
+  /** execute method */
+  void Execute();
 
 
   // edge described by id's of endpoints
   typedef struct{
     vtkIdType id0 ;   // id's of endpoints
-    vtkIdType id1 ;
+    vtkIdType id1 ;    
   } Edge ;
 
   /** type of intersection made by cutting line with plane */
@@ -123,18 +137,26 @@ protected:
     POINT_TO_POINT
   } ;
 
-  // constant for undefined id's
+  /**constant for undefined id's*/
   static const vtkIdType undefinedId = -1 ;
+
+  /** Computes a unique key for the given edge */
+  inline unsigned long long GetEdgeKey(const Edge& edge) const {
+    return GetEdgeKey(edge.id0, edge.id1);
+  }
+
+  /** computes a unique key for the given edge */
+  inline unsigned long long GetEdgeKey(vtkIdType id0, vtkIdType id1) const;
 
   /** Add set of id's to the edge mapping table.
   This is a POINT_TO_EDGE mapping
   This maps output point idout to input edge */
-  void AddMapping(vtkIdType idout, const Edge& edge, double lambda) ;
+  inline void AddMapping(vtkIdType idout, const Edge& edge, double lambda) ;
 
   /** Add set of id's to the edge mapping table.
   This is a POINT_TO_POINT mapping
   This maps output point idout to single input point id0 */
-  void AddMapping(vtkIdType idout, vtkIdType id0, double lambda) ;
+  inline void AddMapping(vtkIdType idout, vtkIdType id0, double lambda) ;
 
   /** Get intersection of line with plane
   Line is defined by coords of endpoints (p0, p1).
@@ -147,7 +169,7 @@ protected:
   /** Get intersection of edge with plane
   Returns intersection type (see enum)
   lambda returns fractional distance of interpolated point along edge (0 <= lambda <= 1). */
-  int GetIntersectionOfEdgeWithPlane(const Edge& edge, double *coords, double *lambda) const ;
+  inline int GetIntersectionOfEdgeWithPlane(const Edge& edge, double *coords, double *lambda) const ;
 
   /** Get list of cells which are adjoined to point */
   void GetCellNeighboursOfPoint(vtkIdType idpt, vtkIdList *list) const ;
@@ -182,13 +204,10 @@ protected:
 
   /** Interpolate two scalar tuples
   tupout = (1-lambda)*tup0 + lambda*tup1 */
-  void InterpolateScalars(double *tup0, double *tup1, double *tupout, double lambda, int ncomponents, int dattype) ;
+  inline void InterpolateScalars(double *tup0, double *tup1, double *tupout, double lambda, int ncomponents, int dattype) ;
 
   /** transfer the scalars by interpolation from input to output */
-  void TransferScalars() ;
-
-  /** initialize the cutter */
-  //void Initialize() ;
+  void TransferScalars() ;  
 
   /** do the whole thing */
   void CreateSlice() ;
@@ -200,6 +219,14 @@ protected:
 	void ToRotationMatrix(vtkMatrix4x4 *matrix);
 
 
+  /** computes the intersection of the given plane with the mesh bounding box
+  returns coordinates of the first intersection in pts, returns false, if the bounding box is not intersected*/
+  bool GetIntersectionOfBoundsWithPlane(const double *origin, const double *norm, double* pts);
+
+  /** gets the first cell intersected by the current plane
+  the search starts with cells sharing the given point*/
+  vtkIdType GetFirstIntersectedCell(vtkIdType ptId);
+
   // This table maps each output point to the input points or point which created it.
   // if mtype = POINT_TO_POINT this maps the point idout to the intersected point id0
   // if   "   = POINT_TO_EDGE   "   "     "    "   idout  "  "  intersected edge (id0,id1)
@@ -209,8 +236,12 @@ protected:
     vtkIdType id1 ;     
     double lambda ;      // fractional distance of interpolated point along edge
     mapping_type mtype ; // mapping is point-to-edge or point-to-point
-  } EdgeMapping ;
-  std::vector<EdgeMapping> EdgeMappings ;
+  } EdgeMappingType ;
+  std::vector<EdgeMappingType> EdgeMapping ;
+  
+  typedef std::map<unsigned long long, int> InvEdgeMappingType;
+  InvEdgeMappingType InvEdgeMapping;    //<maps edges keys to index of edge in EdgeMapping
+  
 
   // This is a list of the input cells which have been touched by the plane.
   // NB this includes some grazing incidence cells which do not create any output polygons,
@@ -219,13 +250,13 @@ protected:
 
   // This is a list of the output point id's in EVERY input cell, including all the empty ones.
   // It is a list of lists.
-  typedef std::vector<vtkIdType> IdList;
-  std::vector<IdList> PointsInCells ;
+  //typedef std::vector<vtkIdType> IdList;
+  std::vector<vtkIdType>* PointsInCells ;
 
   // This is a mapping from the output cells to the input cells: 
-  // cellid_in = m_cellMapping[cellid_out]
+  // cellid_in = CellMapping[cellid_out]
   // It is set in CreateSlice()
-  std::vector<vtkIdType> CellMapping ;
+  std::vector<vtkIdType>CellMapping ;
 
   // cutting function
   vtkPlane *CutFunction ;
@@ -239,6 +270,140 @@ protected:
   // input and output
   vtkUnstructuredGrid *UnstructGrid ;
   vtkPolyData *Polydata ;
+
+  //points coordinates (to speed up the processing)
+  double* PointsCoords;       //<data of points (in doubles)  
+  bool BReleasePointsCoords;  //<false if the array m_PointsData may not be released
+
+  vtkUnstructuredGrid* LastInput;     //<stored last processed input
+  unsigned long LastInputTimeStamp;   //<timestamp for last input
+
+  vtkIdList* Idlist0;   //<GetCellNeighboursOfEdge list
+  vtkIdList* Idlist1;   //<GetCellNeighboursOfEdge list
+  vtkIdList* Ptlist;    //<ConstructCellSlicePolygon list
 } ;
 
+//------------------------------------------------------------------------------
+// Add set of id's to the edge mapping table
+// This is a POINT_TO_EDGE mapping
+// This maps output point idout to input edge (id0,id1) 
+inline void vtkMAFMeshCutter::AddMapping(vtkIdType idout, const Edge& edge, double lambda)
+//------------------------------------------------------------------------------
+{
+  EdgeMappingType em = {idout, edge.id0, edge.id1, lambda, POINT_TO_EDGE} ;
+  EdgeMapping.push_back(em);
+
+  InvEdgeMapping.insert(InvEdgeMappingType::value_type(GetEdgeKey(edge), EdgeMapping.size() - 1));
+}
+
+//------------------------------------------------------------------------------
+// Add set of id's to the edge mapping table
+// this is a POINT_TO_POINT mapping
+// This maps output point idout to single input point id0
+inline void vtkMAFMeshCutter::AddMapping(vtkIdType idout, vtkIdType id0, double lambda)
+//------------------------------------------------------------------------------
+{  
+  EdgeMappingType em = {idout, id0, undefinedId, lambda, POINT_TO_POINT} ;
+  EdgeMapping.push_back(em) ;
+  
+  InvEdgeMapping.insert(InvEdgeMappingType::value_type(id0, EdgeMapping.size() - 1));
+}
+
+//------------------------------------------------------------------------
+//computes a unique key for the given edge
+inline unsigned long long vtkMAFMeshCutter::GetEdgeKey(vtkIdType id0, vtkIdType id1) const
+//------------------------------------------------------------------------
+{
+  unsigned long long key;
+  unsigned long* pkey = (unsigned long*)&key;
+  if (id0 < id1) {
+    pkey[0] = id0; pkey[1] = id1;
+  }
+  else {
+    pkey[0] = id1; pkey[1] = id0;
+  }
+
+  return key;
+}
+
+//------------------------------------------------------------------------------
+// Find the input edge (id0,id1) corresponding to the output point idout
+// This returns true if the output point is in the table
+inline bool vtkMAFMeshCutter::GetInputEdgeCutByPoint(vtkIdType idout, vtkIdType *id0, vtkIdType *id1, double *lambda) const
+//------------------------------------------------------------------------------
+{
+  //RELEASE NOTE: as AddMapping is called in a pair with InsertNextPoint in the current version,
+  //idout is the index into EdgeMapping, thus we do not need search for it
+  assert(idout >= 0 && idout < (int)EdgeMapping.size());
+  const EdgeMappingType& edge = EdgeMapping[idout];
+  if (edge.mtype != POINT_TO_EDGE)
+    return false;
+
+  assert(edge.idout == idout);
+
+  *id0 = edge.id0 ;
+  *id1 = edge.id1 ;
+  *lambda = edge.lambda ;
+  return true;
+}
+
+//------------------------------------------------------------------------------
+// Find the single input point id0 corresponding to the output point idout
+// This returns true if the the input point is in the table
+inline bool vtkMAFMeshCutter::GetInputPointCutByPoint(vtkIdType idout, vtkIdType *id0) const
+//------------------------------------------------------------------------------
+{
+  //RELEASE NOTE: as AddMapping is called in a pair with InsertNextPoint in the current version,
+  //idout is the index into EdgeMapping, thus we do not need search for it
+  assert(idout >= 0 && idout < (int)EdgeMapping.size());
+  const EdgeMappingType& edge = EdgeMapping[idout];
+  if (edge.mtype != POINT_TO_POINT)
+    return false;
+
+  assert(edge.idout == idout);
+
+  *id0 = edge.id0 ;  
+  return true;  
+}
+
+
+//------------------------------------------------------------------------------
+// Get the input cell corresponding to the output cell
+inline vtkIdType vtkMAFMeshCutter::GetInputCellCutByOutputCell(vtkIdType idout)
+//------------------------------------------------------------------------------
+{  
+  assert(idout >= 0 && idout < (int)CellMapping.size());
+  return CellMapping[idout] ;
+}
+
+//------------------------------------------------------------------------------
+// Get intersection of edge with plane
+// Edge is defined by id's of endpoints (id0, id1).
+// Plane is defined by origin and normal.
+// Returns type of intersection.
+// lambda returns fractional distance of interpolated point along edge (0 <= lambda <= 1).
+inline int vtkMAFMeshCutter::GetIntersectionOfEdgeWithPlane(const Edge& edge, double *coords, double *lambda) const
+//------------------------------------------------------------------------------
+{
+  return GetIntersectionOfLineWithPlane(&PointsCoords[3*edge.id0], 
+    &PointsCoords[3*edge.id1], CutFunction->GetOrigin(), 
+    CutFunction->GetNormal(), coords, lambda) ;
+}
+
+//------------------------------------------------------------------------------
+// Interpolate two scalar tuples
+// tupout = (1-lambda)*tup0 + lambda*tup1
+// If the data type is not float or double, we add 0.5 to ensure correct rounding when it is converted back to int.
+inline void vtkMAFMeshCutter::InterpolateScalars(double *tup0, double *tup1, double *tupout, double lambda, int ncomponents, int dattype)
+//------------------------------------------------------------------------------
+{ 
+  for (int j = 0 ;  j < ncomponents ;  j++)
+    tupout[j] = (1.0 - lambda)*tup0[j] + lambda*tup1[j] ;
+
+  if (dattype != VTK_FLOAT && dattype != VTK_DOUBLE){
+    // the real data type of the scalars is integer, so add 0.5 to ensure correct rounding when they are put back into the polydata
+    for (int j = 0 ;  j < ncomponents ;  j++)
+      tupout[j] += 0.5 ;
+  }
+}
 #endif

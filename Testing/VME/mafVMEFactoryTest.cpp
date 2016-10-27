@@ -109,7 +109,7 @@ void mafVMEFactoryTest::Initialize_CreateVMEInstance()
 
   std::vector<std::string> vmes = vme_factory->GetNodeNames();
   int s1 = vmes.size();
-  CPPUNIT_ASSERT(s1 == 35); //24 VMES are registered in constructor actually, 
+  CPPUNIT_ASSERT(s1 == 34); //34 VMES are registered in constructor actually, 
                             //please modify also the test when (un)plugged inside maf and update this number
            
   // test factory contents
@@ -117,7 +117,7 @@ void mafVMEFactoryTest::Initialize_CreateVMEInstance()
   mafPlugVME<mafVMECustom>("a custom vme"); // plug a vme in the main node factory again
   vmes = vme_factory->GetNodeNames();
   s1 = vmes.size();
-  CPPUNIT_ASSERT(s1 == 35);
+  CPPUNIT_ASSERT(s1 == 34);
 
   found=false;
   for (int i=0;i<vmes.size();i++)
