@@ -107,13 +107,13 @@ mafString inputELISTFileName /*= "ELIST.lis"*/, mafString inputMPLISTFileName /*
   }
 
   CPPUNIT_ASSERT(reader->Read() == MAF_OK);
-
   CPPUNIT_ASSERT(reader->GetOutput() != NULL);
 
   vtkUnstructuredGrid* data = reader->GetOutput()->GetUnstructuredGridOutput()->GetUnstructuredGridData();
   data->Update();
   
-  SaveUnstructuredGridToFile(dirPrefix, outputFileName, data);
+	mafString outputDir = GET_TEST_DATA_DIR();
+  SaveUnstructuredGridToFile(outputDir, outputFileName, data);
 }
 
 void mafVMEMeshAnsysTextExporterTest::SaveUnstructuredGridToFile(mafString &dirPrefix, mafString &fileName, vtkUnstructuredGrid *data)
@@ -206,7 +206,8 @@ void mafVMEMeshAnsysTextExporterTest::ReadAndDisplay( mafString &dirPrefix, int 
 
   if (writeToDisk)
   {
-    SaveUnstructuredGridToFile(dirPrefix, mafString("vtkUnstructuredGrid.vtk"), data);
+		mafString outputDir = GET_TEST_DATA_DIR();
+    SaveUnstructuredGridToFile(outputDir, mafString("vtkUnstructuredGrid.vtk"), data);
   }
 
   if (dataType == POINT_DATA)
@@ -333,7 +334,7 @@ int mafVMEMeshAnsysTextExporterTest::GetRowsNumber(vtkUnstructuredGrid *inputUGr
 }
 void mafVMEMeshAnsysTextExporterTest::TestTetra10TrivialMeshExport()
 {
-  mafString dirPrefix = MAF_DATA_ROOT;
+	mafString dirPrefix = MAF_DATA_ROOT;
   dirPrefix << "/FEM/ANSYS/tet10/";
 
   mafVMEMeshAnsysTextImporter *reader = new mafVMEMeshAnsysTextImporter;
@@ -351,12 +352,12 @@ void mafVMEMeshAnsysTextExporterTest::TestTetra10TrivialMeshExport()
   CPPUNIT_ASSERT(numCells == 2);
 
   // create text exporter
-
-  mafString outputNodesFileName = dirPrefix;
-  outputNodesFileName.Append("NLISTNoMaterialsWritten.txt");
+	wxString outputDir = GET_TEST_DATA_DIR();
+  mafString outputNodesFileName = outputDir;
+	outputNodesFileName << "/NLISTNoMaterialsWritten.txt";
   
-  mafString outputElementsFileName = dirPrefix;
-  outputElementsFileName.Append("ELISTNoMaterialsWritten.txt");
+  mafString outputElementsFileName = outputDir;
+	outputElementsFileName << "/ELISTNoMaterialsWritten.txt";
 
   mafVMEMeshAnsysTextExporter *exporter = new mafVMEMeshAnsysTextExporter;
   exporter->SetInput(ugrid);
@@ -372,13 +373,13 @@ void mafVMEMeshAnsysTextExporterTest::TestTetra10TrivialMeshExport()
   CPPUNIT_ASSERT(numPoints == 14);
   CPPUNIT_ASSERT(numCells == 2);
 
-  outputNodesFileName = dirPrefix;
+  outputNodesFileName = outputDir;
   outputNodesFileName.Append("NLISTMaterialsWritten.txt");
 
-  outputElementsFileName = dirPrefix;
+  outputElementsFileName = outputDir;
   outputElementsFileName.Append("ELISTMaterialsWritten.txt");
 
-  mafString outputMaterialsFileName = dirPrefix;
+  mafString outputMaterialsFileName = outputDir;
   outputMaterialsFileName.Append("MPLISTNoMaterialsWritten.txt");
 
   exporter->SetInput(ugrid);
@@ -395,344 +396,341 @@ void mafVMEMeshAnsysTextExporterTest::TestTetra10TrivialMeshExport()
 void mafVMEMeshAnsysTextExporterTest::TestTetra10NodesIdJumpingMaterialsIdJumpingMaterialsGroupingNoTimevarExport()
 {
 
-  mafString dirPrefix = MAF_DATA_ROOT;
-  dirPrefix << "/FEM/ANSYS/tet10/Tetra10NodesIdJumpingMaterialsIdJumpingMaterialsGroupingNoTimevar/";
+	mafString dirPrefix = MAF_DATA_ROOT;
+	dirPrefix << "/FEM/ANSYS/tet10/Tetra10NodesIdJumpingMaterialsIdJumpingMaterialsGroupingNoTimevar/";
 
-  mafVMEMeshAnsysTextImporter *reader = new mafVMEMeshAnsysTextImporter;
-  this->Read(reader, dirPrefix, false, true, mafString("tet10NoMaterials.vtk"));
+	mafVMEMeshAnsysTextImporter *reader = new mafVMEMeshAnsysTextImporter;
+	this->Read(reader, dirPrefix, false, true, mafString("tet10NoMaterials.vtk"));
 
-  vtkUnstructuredGrid *ugrid = reader->GetOutput()->GetUnstructuredGridOutput()->GetUnstructuredGridData();
-  int numPoints = ugrid->GetNumberOfPoints();
-  int numCells = ugrid->GetNumberOfCells();
+	vtkUnstructuredGrid *ugrid = reader->GetOutput()->GetUnstructuredGridOutput()->GetUnstructuredGridData();
+	int numPoints = ugrid->GetNumberOfPoints();
+	int numCells = ugrid->GetNumberOfCells();
 
-  cout << "number of points: " << numPoints << std::endl;
-  cout << "number of cells: " << numCells << std::endl;
+	cout << "number of points: " << numPoints << std::endl;
+	cout << "number of cells: " << numCells << std::endl;
 
-  // mesh without materials
-  CPPUNIT_ASSERT(numPoints == 86);
-  CPPUNIT_ASSERT(numCells == 17);
+	// mesh without materials
+	CPPUNIT_ASSERT(numPoints == 86);
+	CPPUNIT_ASSERT(numCells == 17);
 
-  // create text exporter
+	// create text exporter
+	wxString outputDir = GET_TEST_DATA_DIR();
+	mafString outputNodesFileName = outputDir;
+	outputNodesFileName << "/NLISTNoMaterialsWritten.txt";
 
-  mafString outputNodesFileName = dirPrefix;
-  outputNodesFileName.Append("NLISTNoMaterialsWritten.txt");
+	mafString outputElementsFileName = outputDir;
+	outputElementsFileName << "/ELISTNoMaterialsWritten.txt";
 
-  mafString outputElementsFileName = dirPrefix;
-  outputElementsFileName.Append("ELISTNoMaterialsWritten.txt");
+	mafVMEMeshAnsysTextExporter *exporter = new mafVMEMeshAnsysTextExporter;
+	exporter->SetInput(ugrid);
+	exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
+	exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
+	exporter->Write();
 
-  mafVMEMeshAnsysTextExporter *exporter = new mafVMEMeshAnsysTextExporter;
-  exporter->SetInput(ugrid);
-  exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
-  exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
-  exporter->Write();
+	// mesh with materials
+	this->Read(reader, dirPrefix, true, true, mafString("tet10WithMaterials.vtk"));
+	numPoints = ugrid->GetNumberOfPoints();
+	numCells = ugrid->GetNumberOfCells();
 
-  // mesh with materials
-  this->Read(reader, dirPrefix, true, true, mafString("tet10WithMaterials.vtk"));
-  numPoints = ugrid->GetNumberOfPoints();
-  numCells = ugrid->GetNumberOfCells();
+	CPPUNIT_ASSERT(numPoints == 86);
+	CPPUNIT_ASSERT(numCells == 17);
 
-  CPPUNIT_ASSERT(numPoints == 86);
-  CPPUNIT_ASSERT(numCells == 17);
+	outputNodesFileName = outputDir;
+	outputNodesFileName.Append("NLISTMaterialsWritten.txt");
 
-  outputNodesFileName = dirPrefix;
-  outputNodesFileName.Append("NLISTMaterialsWritten.txt");
+	outputElementsFileName = outputDir;
+	outputElementsFileName.Append("ELISTMaterialsWritten.txt");
 
-  outputElementsFileName = dirPrefix;
-  outputElementsFileName.Append("ELISTMaterialsWritten.txt");
+	mafString outputMaterialsFileName = outputDir;
+	outputMaterialsFileName.Append("MPLISTNoMaterialsWritten.txt");
 
-  mafString outputMaterialsFileName = dirPrefix;
-  outputMaterialsFileName.Append("MPLISTNoMaterialsWritten.txt");
+	exporter->SetInput(ugrid);
+	exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
+	exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
+	exporter->Write();
 
-  exporter->SetInput(ugrid);
-  exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
-  exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
-  exporter->Write();
-
-  // cleanup
-  delete exporter;
-  delete reader;
-
+	// cleanup
+	delete exporter;
+	delete reader;
 }
 
 void mafVMEMeshAnsysTextExporterTest::TestBonemattedTetra10ElementsIdJumpingMaterialsIdJumpingMaterialsGroupingNoTimevarExport()
 {
+	mafString dirPrefix = MAF_DATA_ROOT;
+	dirPrefix << "/FEM/ANSYS/tet10/bonemattedMeshTetra10ANSYS_ELEMENT_IDJumpingAnsysExportTest/WithMaterials/";
 
-  mafString dirPrefix = MAF_DATA_ROOT;
-  dirPrefix << "/FEM/ANSYS/tet10/bonemattedMeshTetra10ANSYS_ELEMENT_IDJumpingAnsysExportTest/WithMaterials/";
+	CPPUNIT_ASSERT(wxDirExists(dirPrefix.GetCStr()));
 
-  CPPUNIT_ASSERT(wxDirExists(dirPrefix.GetCStr()));
+	mafString fileName = dirPrefix;
+	fileName.Append("BonemattedMeshWithMaterials.vtk");
 
-  mafString fileName = dirPrefix;
-  fileName.Append("BonemattedMeshWithMaterials.vtk");
+	CPPUNIT_ASSERT(wxFileExists(fileName.GetCStr()));
 
-  CPPUNIT_ASSERT(wxFileExists(fileName.GetCStr()));
+	vtkMAFSmartPointer<vtkUnstructuredGridReader> ugr;
+	ugr->SetFileName(fileName.GetCStr());
+	ugr->Update();
 
-  vtkMAFSmartPointer<vtkUnstructuredGridReader> ugr;
-  ugr->SetFileName(fileName.GetCStr());
-  ugr->Update();
+	vtkUnstructuredGrid *ugrid = ugr->GetOutput();
 
-  vtkUnstructuredGrid *ugrid = ugr->GetOutput();
+	int numPoints = ugrid->GetNumberOfPoints();
+	int numCells = ugrid->GetNumberOfCells();
 
-  int numPoints = ugrid->GetNumberOfPoints();
-  int numCells = ugrid->GetNumberOfCells();
+	cout << "number of points: " << numPoints << std::endl;
+	cout << "number of cells: " << numCells << std::endl;
 
-  cout << "number of points: " << numPoints << std::endl;
-  cout << "number of cells: " << numCells << std::endl;
+	CPPUNIT_ASSERT(numPoints == 57);
+	CPPUNIT_ASSERT(numCells == 15);
 
-  CPPUNIT_ASSERT(numPoints == 57);
-  CPPUNIT_ASSERT(numCells == 15);
+	wxString outputDir = GET_TEST_DATA_DIR();
+	mafString outputNodesFileName = outputDir;
+	outputNodesFileName << "/NLISTMeshWithMaterialsWritten.txt";
 
-  mafString outputNodesFileName = dirPrefix;
-  outputNodesFileName.Append("NLISTMeshWithMaterialsWritten.txt");
+	mafString outputElementsFileName = outputDir;
+	outputElementsFileName << "/ELISTMeshWithMaterialsWritten.txt";
 
-  mafString outputElementsFileName = dirPrefix;
-  outputElementsFileName.Append("ELISTMeshWithMaterialsWritten.txt");
+	mafString outputMaterialsFileName = outputDir;
+	outputMaterialsFileName << "/MPLISTMeshWithMaterialsWritten.txt";
 
-  mafString outputMaterialsFileName = dirPrefix;
-  outputMaterialsFileName.Append("MPLISTMeshWithMaterialsWritten.txt");
+	mafVMEMeshAnsysTextExporter *exporter = new mafVMEMeshAnsysTextExporter;
+	exporter->SetInput(ugrid);
+	exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
+	exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
+	exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
+	exporter->Write();
 
-  mafVMEMeshAnsysTextExporter *exporter = new mafVMEMeshAnsysTextExporter;
-  exporter->SetInput(ugrid);
-  exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
-  exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
-  exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
-  exporter->Write();
-
-  // cleanup
-  delete exporter;
-
+	// cleanup
+	delete exporter;
 }
 
 void mafVMEMeshAnsysTextExporterTest::TestBonemattedTetra10ElementsIdJumpingMaterialsIdJumpingMaterialsGroupingNoTimevarExportWithAppliedPose()
 {
+	mafString dirPrefix = MAF_DATA_ROOT;
+	dirPrefix << "/FEM/ANSYS/tet10/bonemattedMeshTetra10ANSYS_ELEMENT_IDJumpingAnsysExportTest/WithMaterials/";
 
-  mafString dirPrefix = MAF_DATA_ROOT;
-  dirPrefix << "/FEM/ANSYS/tet10/bonemattedMeshTetra10ANSYS_ELEMENT_IDJumpingAnsysExportTest/WithMaterials/";
+	CPPUNIT_ASSERT(wxDirExists(dirPrefix.GetCStr()));
 
-  CPPUNIT_ASSERT(wxDirExists(dirPrefix.GetCStr()));
+	mafString fileName = dirPrefix;
+	fileName.Append("BonemattedMeshWithMaterials.vtk");
 
-  mafString fileName = dirPrefix;
-  fileName.Append("BonemattedMeshWithMaterials.vtk");
+	CPPUNIT_ASSERT(wxFileExists(fileName.GetCStr()));
 
-  CPPUNIT_ASSERT(wxFileExists(fileName.GetCStr()));
+	vtkMAFSmartPointer<vtkUnstructuredGridReader> ugr;
+	ugr->SetFileName(fileName.GetCStr());
+	ugr->Update();
 
-  vtkMAFSmartPointer<vtkUnstructuredGridReader> ugr;
-  ugr->SetFileName(fileName.GetCStr());
-  ugr->Update();
+	vtkUnstructuredGrid *ugrid = ugr->GetOutput();
 
-  vtkUnstructuredGrid *ugrid = ugr->GetOutput();
-  
-  int numPoints = ugrid->GetNumberOfPoints();
-  int numCells = ugrid->GetNumberOfCells();
+	int numPoints = ugrid->GetNumberOfPoints();
+	int numCells = ugrid->GetNumberOfCells();
 
-  cout << "number of points: " << numPoints << std::endl;
-  cout << "number of cells: " << numCells << std::endl;
+	cout << "number of points: " << numPoints << std::endl;
+	cout << "number of cells: " << numCells << std::endl;
 
-  CPPUNIT_ASSERT(numPoints == 57);
-  CPPUNIT_ASSERT(numCells == 15);
+	CPPUNIT_ASSERT(numPoints == 57);
+	CPPUNIT_ASSERT(numCells == 15);
 
-  mafString outputNodesFileName = dirPrefix;
-  outputNodesFileName.Append("NLISTWithAppliedPoseMeshWithMaterialsWritten.txt");
+	wxString outputDir = GET_TEST_DATA_DIR();
+	mafString outputNodesFileName = outputDir;
+	outputNodesFileName << "/NLISTWithAppliedPoseMeshWithMaterialsWritten.txt";
 
-  mafString outputElementsFileName = dirPrefix;
-  outputElementsFileName.Append("ELISTWithAppliedPoseMeshWithMaterialsWritten.txt");
+	mafString outputElementsFileName = outputDir;
+	outputElementsFileName << "/ELISTWithAppliedPoseMeshWithMaterialsWritten.txt";
 
-  mafString outputMaterialsFileName = dirPrefix;
-  outputMaterialsFileName.Append("MPLISTWithAppliedPoseMeshWithMaterialsWritten.txt");
+	mafString outputMaterialsFileName = outputDir;
+	outputMaterialsFileName << "/MPLISTWithAppliedPoseMeshWithMaterialsWritten.txt";
 
-  vtkMAFSmartPointer<vtkMatrix4x4> mat;
-  mat->SetElement(0,3,10);
-  mat->SetElement(1,3,20);
-  mat->SetElement(2,3,30);
+	vtkMAFSmartPointer<vtkMatrix4x4> mat;
+	mat->SetElement(0, 3, 10);
+	mat->SetElement(1, 3, 20);
+	mat->SetElement(2, 3, 30);
 
-  mafVMEMeshAnsysTextExporter *exporter = new mafVMEMeshAnsysTextExporter;
-  exporter->SetInput(ugrid);
-  exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
-  exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
-  exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
-  exporter->ApplyMatrixOn();
-  exporter->SetMatrix(mat);
-  exporter->Write();
+	mafVMEMeshAnsysTextExporter *exporter = new mafVMEMeshAnsysTextExporter;
+	exporter->SetInput(ugrid);
+	exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
+	exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
+	exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
+	exporter->ApplyMatrixOn();
+	exporter->SetMatrix(mat);
+	exporter->Write();
 
-  // cleanup
-  delete exporter;
-
+	// cleanup
+	delete exporter;
 }
 
 void mafVMEMeshAnsysTextExporterTest::TestBonemattedTetra10ElementsIdJumpingNoMaterialsNoTimeVarExport()
 {
+	mafString dirPrefix = MAF_DATA_ROOT;
+	dirPrefix << "/FEM/ANSYS/tet10/bonemattedMeshTetra10ANSYS_ELEMENT_IDJumpingAnsysExportTest/NoMaterials/";
 
-  mafString dirPrefix = MAF_DATA_ROOT;
-  dirPrefix << "/FEM/ANSYS/tet10/bonemattedMeshTetra10ANSYS_ELEMENT_IDJumpingAnsysExportTest/NoMaterials/";
+	CPPUNIT_ASSERT(wxDirExists(dirPrefix.GetCStr()));
 
-  CPPUNIT_ASSERT(wxDirExists(dirPrefix.GetCStr()));
+	mafString fileName = dirPrefix;
+	fileName.Append("BonemattedMeshNoMaterials.vtk");
 
-  mafString fileName = dirPrefix;
-  fileName.Append("BonemattedMeshNoMaterials.vtk");
+	CPPUNIT_ASSERT(wxFileExists(fileName.GetCStr()));
 
-  CPPUNIT_ASSERT(wxFileExists(fileName.GetCStr()));
+	vtkMAFSmartPointer<vtkUnstructuredGridReader> ugr;
+	ugr->SetFileName(fileName.GetCStr());
+	ugr->Update();
 
-  vtkMAFSmartPointer<vtkUnstructuredGridReader> ugr;
-  ugr->SetFileName(fileName.GetCStr());
-  ugr->Update();
+	vtkUnstructuredGrid *ugrid = ugr->GetOutput();
 
-  vtkUnstructuredGrid *ugrid = ugr->GetOutput();
+	int numPoints = ugrid->GetNumberOfPoints();
+	int numCells = ugrid->GetNumberOfCells();
 
-  int numPoints = ugrid->GetNumberOfPoints();
-  int numCells = ugrid->GetNumberOfCells();
+	cout << "number of points: " << numPoints << std::endl;
+	cout << "number of cells: " << numCells << std::endl;
 
-  cout << "number of points: " << numPoints << std::endl;
-  cout << "number of cells: " << numCells << std::endl;
+	CPPUNIT_ASSERT(numPoints == 57);
+	CPPUNIT_ASSERT(numCells == 15);
 
-  CPPUNIT_ASSERT(numPoints == 57);
-  CPPUNIT_ASSERT(numCells == 15);
+	wxString outputDir = GET_TEST_DATA_DIR();
+	mafString outputNodesFileName = outputDir;
+	outputNodesFileName << "/NLISTMeshWithMaterialsWritten.txt";
 
-  mafString outputNodesFileName = dirPrefix;
-  outputNodesFileName.Append("NLISTMeshWithMaterialsWritten.txt");
+	mafString outputElementsFileName = outputDir;
+	outputElementsFileName << "/ELISTMeshWithMaterialsWritten.txt";
 
-  mafString outputElementsFileName = dirPrefix;
-  outputElementsFileName.Append("ELISTMeshWithMaterialsWritten.txt");
+	mafString outputMaterialsFileName = outputDir;
+	outputMaterialsFileName << "/MPLISTMeshWithMaterialsWritten.txt";
 
-  mafString outputMaterialsFileName = dirPrefix;
-  outputMaterialsFileName.Append("MPLISTMeshWithMaterialsWritten.txt");
+	mafVMEMeshAnsysTextExporter *exporter = new mafVMEMeshAnsysTextExporter;
+	exporter->SetInput(ugrid);
+	exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
+	exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
+	exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
+	exporter->Write();
 
-  mafVMEMeshAnsysTextExporter *exporter = new mafVMEMeshAnsysTextExporter;
-  exporter->SetInput(ugrid);
-  exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
-  exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
-  exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
-  exporter->Write();
-
-  // cleanup
-  delete exporter;
-
+	// cleanup
+	delete exporter;
 }
 
 void mafVMEMeshAnsysTextExporterTest::TestExportTetra10VtkWithoutAnsysInformation()
 {
-  mafString dirPrefix = MAF_DATA_ROOT;
-  dirPrefix << "/FEM/ANSYS/tet10/";
+	mafString dirPrefix = MAF_DATA_ROOT;
+	dirPrefix << "/FEM/ANSYS/tet10/";
 
-  CPPUNIT_ASSERT(wxDirExists(dirPrefix.GetCStr()));
+	CPPUNIT_ASSERT(wxDirExists(dirPrefix.GetCStr()));
 
-  mafString fileName = dirPrefix;
-  fileName.Append("vtkTetra10WithoutAnsysInformations.vtk");
+	mafString fileName = dirPrefix;
+	fileName.Append("vtkTetra10WithoutAnsysInformations.vtk");
 
-  CPPUNIT_ASSERT(wxFileExists(fileName.GetCStr()));
+	CPPUNIT_ASSERT(wxFileExists(fileName.GetCStr()));
 
-  vtkMAFSmartPointer<vtkUnstructuredGridReader> ugr;
-  ugr->SetFileName(fileName.GetCStr());
-  ugr->Update();
+	vtkMAFSmartPointer<vtkUnstructuredGridReader> ugr;
+	ugr->SetFileName(fileName.GetCStr());
+	ugr->Update();
 
-  vtkUnstructuredGrid *ugrid = ugr->GetOutput();
+	vtkUnstructuredGrid *ugrid = ugr->GetOutput();
 
-  int numPoints = ugrid->GetNumberOfPoints();
-  int numCells = ugrid->GetNumberOfCells();
+	int numPoints = ugrid->GetNumberOfPoints();
+	int numCells = ugrid->GetNumberOfCells();
 
-  cout << "number of points: " << numPoints << std::endl;
-  cout << "number of cells: " << numCells << std::endl;
+	cout << "number of points: " << numPoints << std::endl;
+	cout << "number of cells: " << numCells << std::endl;
 
-  CPPUNIT_ASSERT(numPoints == 14);
-  CPPUNIT_ASSERT(numCells == 2);
+	CPPUNIT_ASSERT(numPoints == 14);
+	CPPUNIT_ASSERT(numCells == 2);
 
-  mafString outputNodesFileName = dirPrefix;
-  outputNodesFileName.Append("NLISTvtkTetra10WithoutAnsysInformations.txt");
+	mafString outputDir = GET_TEST_DATA_DIR();
+	mafString outputNodesFileName = outputDir;
+	outputNodesFileName << "/NLISTvtkTetra10WithoutAnsysInformations.txt";
 
-  mafString outputElementsFileName = dirPrefix;
-  outputElementsFileName.Append("ELISTvtkTetra10WithoutAnsysInformations.txt");
+	mafString outputElementsFileName = outputDir;
+	outputElementsFileName << "/ELISTvtkTetra10WithoutAnsysInformations.txt";
 
-  mafString outputMaterialsFileName = dirPrefix;
-  outputMaterialsFileName.Append("MPLISTvtkTetra10WithoutAnsysInformations.txt");
+	mafString outputMaterialsFileName = outputDir;
+	outputMaterialsFileName << "/MPLISTvtkTetra10WithoutAnsysInformations.txt";
 
-  mafVMEMeshAnsysTextExporter *exporter = new mafVMEMeshAnsysTextExporter;
-  exporter->SetInput(ugrid);
-  exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
-  exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
-  exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
-  exporter->Write();
+	mafVMEMeshAnsysTextExporter *exporter = new mafVMEMeshAnsysTextExporter;
+	exporter->SetInput(ugrid);
+	exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
+	exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
+	exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
+	exporter->Write();
 
-  // cleanup
-  delete exporter;
-  
-  mafVMEMeshAnsysTextImporter *importer = new mafVMEMeshAnsysTextImporter;
-  this->Read(importer, dirPrefix, false, true, mafString("ImportedVTKTetra10WithoutAnsysInformations.vtk"),
-    "NLISTvtkTetra10WithoutAnsysInformations.txt", "ELISTvtkTetra10WithoutAnsysInformations.txt" );
+	// cleanup
+	delete exporter;
 
-  ugrid = importer->GetOutput()->GetUnstructuredGridOutput()->GetUnstructuredGridData();
-  numPoints = ugrid->GetNumberOfPoints();
-  numCells = ugrid->GetNumberOfCells();
+	mafVMEMeshAnsysTextImporter *importer = new mafVMEMeshAnsysTextImporter;
+	this->Read(importer, outputDir, false, true, mafString("/ImportedVTKTetra10WithoutAnsysInformations.vtk"),
+		"/NLISTvtkTetra10WithoutAnsysInformations.txt", "/ELISTvtkTetra10WithoutAnsysInformations.txt");
 
-  cout << "number of points: " << numPoints << std::endl;
-  cout << "number of cells: " << numCells << std::endl;
+	ugrid = importer->GetOutput()->GetUnstructuredGridOutput()->GetUnstructuredGridData();
+	numPoints = ugrid->GetNumberOfPoints();
+	numCells = ugrid->GetNumberOfCells();
 
-  // mesh without materials
-  CPPUNIT_ASSERT(numPoints == 14);
-  CPPUNIT_ASSERT(numCells == 2);
+	cout << "number of points: " << numPoints << std::endl;
+	cout << "number of cells: " << numCells << std::endl;
 
-  delete importer;
+	// mesh without materials
+	CPPUNIT_ASSERT(numPoints == 14);
+	CPPUNIT_ASSERT(numCells == 2);
 
+	delete importer;
 }
 
 void mafVMEMeshAnsysTextExporterTest::TestExportTetra4VtkWithoutAnsysInformation()
 {
-  mafString dirPrefix = MAF_DATA_ROOT;
-  dirPrefix << "/FEM/ANSYS/tet4/";
+	mafString dirPrefix = MAF_DATA_ROOT;
+	dirPrefix << "/FEM/ANSYS/tet4/";
 
-  CPPUNIT_ASSERT(wxDirExists(dirPrefix.GetCStr()));
+	CPPUNIT_ASSERT(wxDirExists(dirPrefix.GetCStr()));
 
-  mafString fileName = dirPrefix;
-  fileName.Append("vtkTetra4WithoutAnsysInformations.vtk");
+	mafString fileName = dirPrefix;
+	fileName.Append("vtkTetra4WithoutAnsysInformations.vtk");
 
-  CPPUNIT_ASSERT(wxFileExists(fileName.GetCStr()));
+	CPPUNIT_ASSERT(wxFileExists(fileName.GetCStr()));
 
-  vtkMAFSmartPointer<vtkUnstructuredGridReader> ugr;
-  ugr->SetFileName(fileName.GetCStr());
-  ugr->Update();
+	vtkMAFSmartPointer<vtkUnstructuredGridReader> ugr;
+	ugr->SetFileName(fileName.GetCStr());
+	ugr->Update();
 
-  vtkUnstructuredGrid *ugrid = ugr->GetOutput();
+	vtkUnstructuredGrid *ugrid = ugr->GetOutput();
 
-  int numPoints = ugrid->GetNumberOfPoints();
-  int numCells = ugrid->GetNumberOfCells();
+	int numPoints = ugrid->GetNumberOfPoints();
+	int numCells = ugrid->GetNumberOfCells();
 
-  cout << "number of points: " << numPoints << std::endl;
-  cout << "number of cells: " << numCells << std::endl;
+	cout << "number of points: " << numPoints << std::endl;
+	cout << "number of cells: " << numCells << std::endl;
 
-  CPPUNIT_ASSERT(numPoints == 5);
-  CPPUNIT_ASSERT(numCells == 2);
+	CPPUNIT_ASSERT(numPoints == 5);
+	CPPUNIT_ASSERT(numCells == 2);
 
-  mafString outputNodesFileName = dirPrefix;
-  outputNodesFileName.Append("NLISTvtkTetra4WithoutAnsysInformations.txt");
+	mafString outputDir = GET_TEST_DATA_DIR();
+	mafString outputNodesFileName = outputDir;
+	outputNodesFileName << "/NLISTvtkTetra4WithoutAnsysInformations.txt";
 
-  mafString outputElementsFileName = dirPrefix;
-  outputElementsFileName.Append("ELISTvtkTetra4WithoutAnsysInformations.txt");
+	mafString outputElementsFileName = outputDir;
+	outputElementsFileName << "/ELISTvtkTetra4WithoutAnsysInformations.txt";
 
-  mafString outputMaterialsFileName = dirPrefix;
-  outputMaterialsFileName.Append("MPLISTvtkTetra4WithoutAnsysInformations.txt");
+	mafString outputMaterialsFileName = outputDir;
+	outputMaterialsFileName << "/MPLISTvtkTetra4WithoutAnsysInformations.txt";
 
-  mafVMEMeshAnsysTextExporter *exporter = new mafVMEMeshAnsysTextExporter;
-  exporter->SetInput(ugrid);
-  exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
-  exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
-  exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
-  exporter->Write();
+	mafVMEMeshAnsysTextExporter *exporter = new mafVMEMeshAnsysTextExporter;
+	exporter->SetInput(ugrid);
+	exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
+	exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
+	exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
+	exporter->Write();
 
-  // cleanup
-  delete exporter;
-  
-  mafVMEMeshAnsysTextImporter *importer = new mafVMEMeshAnsysTextImporter;
-  this->Read(importer, dirPrefix, false, true, mafString("ImportedVTKTetra4WithoutAnsysInformations.vtk"),
-  "NLISTvtkTetra4WithoutAnsysInformations.txt", "ELISTvtkTetra4WithoutAnsysInformations.txt" );
+	// cleanup
+	delete exporter;
 
-  ugrid = importer->GetOutput()->GetUnstructuredGridOutput()->GetUnstructuredGridData();
-  numPoints = ugrid->GetNumberOfPoints();
-  numCells = ugrid->GetNumberOfCells();
+	mafVMEMeshAnsysTextImporter *importer = new mafVMEMeshAnsysTextImporter;
+	this->Read(importer, outputDir, false, true, mafString("/ImportedVTKTetra4WithoutAnsysInformations.vtk"),
+		"/NLISTvtkTetra4WithoutAnsysInformations.txt", "/ELISTvtkTetra4WithoutAnsysInformations.txt");
 
-  cout << "number of points: " << numPoints << std::endl;
-  cout << "number of cells: " << numCells << std::endl;
+	ugrid = importer->GetOutput()->GetUnstructuredGridOutput()->GetUnstructuredGridData();
+	numPoints = ugrid->GetNumberOfPoints();
+	numCells = ugrid->GetNumberOfCells();
 
-  // mesh without materials
-  CPPUNIT_ASSERT(numPoints == 5);
-  CPPUNIT_ASSERT(numCells == 2);
-  
-  delete importer;
+	cout << "number of points: " << numPoints << std::endl;
+	cout << "number of cells: " << numCells << std::endl;
+
+	// mesh without materials
+	CPPUNIT_ASSERT(numPoints == 5);
+	CPPUNIT_ASSERT(numCells == 2);
+
+	delete importer;
 }

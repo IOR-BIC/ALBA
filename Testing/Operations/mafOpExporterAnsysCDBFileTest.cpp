@@ -81,9 +81,9 @@ void mafOpExporterAnsysCDBFileTest::Check_CDBFile(mafString fileName)
   exporter->TestModeOn();
 
   filePath="";
-  filePath << MAF_DATA_ROOT << "/mafOpExporterAnsysCDBFileTest/";
+  filePath << GET_TEST_DATA_DIR();
 
-  exporter->SetOutputFileName((filePath << "exported_" << fileName).GetCStr());
+  exporter->SetOutputFileName((filePath << "/exported_" << fileName).GetCStr());
   exporter->SetInput(importedData);
   int result = exporter->Write();
 
@@ -108,92 +108,92 @@ void mafOpExporterAnsysCDBFileTest::CompareCDBFilesData(mafString fileName)
 	mafVMEStorage *storage = mafVMEStorage::New();
 	mafVME *root = (mafVME *)storage->GetRoot();
 
-  mafString filePath= MAF_DATA_ROOT;
-  filePath<<"/mafOpExporterAnsysCDBFileTest/";
+	mafString filePath = MAF_DATA_ROOT;
+	filePath << "/mafOpExporterAnsysCDBFileTest/";
 
-  // Import
-  mafOpImporterAnsysCDBFile *importer = new mafOpImporterAnsysCDBFile("importer");
-  importer->TestModeOn();
-  importer->SetFileName((filePath << fileName).GetCStr());
+	// Import
+	mafOpImporterAnsysCDBFile *importer = new mafOpImporterAnsysCDBFile("importer");
+	importer->TestModeOn();
+	importer->SetFileName((filePath << fileName).GetCStr());
 	importer->SetInput(root);
-  importer->Import();
+	importer->Import();
 
-  mafVMEMesh *importedData = mafVMEMesh::SafeDownCast(importer->GetInput()->GetFirstChild());
+	mafVMEMesh *importedData = mafVMEMesh::SafeDownCast(importer->GetInput()->GetFirstChild());
 
-  CPPUNIT_ASSERT(importedData != NULL);
+	CPPUNIT_ASSERT(importedData != NULL);
 
-  importedData->TestModeOn();
-  importedData->Update();
+	importedData->TestModeOn();
+	importedData->Update();
 
-  // Export
-  mafOpExporterAnsysCDBFile *exporter = new mafOpExporterAnsysCDBFile();
-  exporter->TestModeOn();
+	// Export
+	mafOpExporterAnsysCDBFile *exporter = new mafOpExporterAnsysCDBFile();
+	exporter->TestModeOn();
 
-  filePath="";
-  filePath << MAF_DATA_ROOT << "/mafOpExporterAnsysCDBFileTest/";
+	filePath = "";
+	filePath << GET_TEST_DATA_DIR();
 
-  exporter->SetOutputFileName((filePath << "exported2_" << fileName).GetCStr());
-  exporter->SetInput(importedData);
-  int result = exporter->Write();
+	exporter->SetOutputFileName((filePath << "/exported2_" << fileName).GetCStr());
+	exporter->SetInput(importedData);
+	int result = exporter->Write();
 
-  CPPUNIT_ASSERT(result == MAF_OK);
+	CPPUNIT_ASSERT(result == MAF_OK);
 
-  // Import
-  importer->SetFileName(filePath.GetCStr());
-  importer->Import();
+	// Import
+	importer->SetFileName(filePath.GetCStr());
+	importer->Import();
 
-  mafVMEMesh *importedData2 = mafVMEMesh::SafeDownCast(importer->GetInput()->GetFirstChild());
+	mafVMEMesh *importedData2 = mafVMEMesh::SafeDownCast(importer->GetInput()->GetFirstChild());
 
-  CPPUNIT_ASSERT(importedData2 != NULL);
+	CPPUNIT_ASSERT(importedData2 != NULL);
 
-  //////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
 
-  importedData->GetUnstructuredGridOutput()->Update();
-  vtkUnstructuredGrid *inputUGrid = importedData->GetUnstructuredGridOutput()->GetUnstructuredGridData();
-  inputUGrid->Update();
+	importedData->GetUnstructuredGridOutput()->Update();
+	vtkUnstructuredGrid *inputUGrid = importedData->GetUnstructuredGridOutput()->GetUnstructuredGridData();
+	inputUGrid->Update();
 
-  // Nodes
-  vtkIntArray *nodesIDArray = importedData->GetNodesIDArray();
+	// Nodes
+	vtkIntArray *nodesIDArray = importedData->GetNodesIDArray();
 
-  int numPoints = inputUGrid->GetNumberOfPoints();
+	int numPoints = inputUGrid->GetNumberOfPoints();
 
-  // Materials
-  vtkDataArray *materialsIDArray = NULL;
+	// Materials
+	vtkDataArray *materialsIDArray = NULL;
 
-  // try field data
-  materialsIDArray = importedData->GetMaterialsIDArray();
+	// try field data
+	materialsIDArray = importedData->GetMaterialsIDArray();
 
-  int numberOfMaterials = materialsIDArray->GetNumberOfTuples();
+	int numberOfMaterials = materialsIDArray->GetNumberOfTuples();
 
-  // Elements
-  int numberOfElements = inputUGrid->GetNumberOfCells();
+	// Elements
+	int numberOfElements = inputUGrid->GetNumberOfCells();
 
-  //
-  importedData2->GetUnstructuredGridOutput()->Update();
-  vtkUnstructuredGrid *inputUGrid2 = importedData2->GetUnstructuredGridOutput()->GetUnstructuredGridData();
-  inputUGrid2->Update();
+	//
+	importedData2->GetUnstructuredGridOutput()->Update();
+	vtkUnstructuredGrid *inputUGrid2 = importedData2->GetUnstructuredGridOutput()->GetUnstructuredGridData();
+	inputUGrid2->Update();
 
-  // Nodes
-  vtkIntArray *nodesIDArray2 = importedData2->GetNodesIDArray();
+	// Nodes
+	vtkIntArray *nodesIDArray2 = importedData2->GetNodesIDArray();
 
-  int numPoints2 = inputUGrid2->GetNumberOfPoints();
+	int numPoints2 = inputUGrid2->GetNumberOfPoints();
 
-  // Materials
-  vtkDataArray *materialsIDArray2 = NULL;
+	// Materials
+	vtkDataArray *materialsIDArray2 = NULL;
 
-  // try field data
-  materialsIDArray2 = importedData2->GetMaterialsIDArray();
+	// try field data
+	materialsIDArray2 = importedData2->GetMaterialsIDArray();
 
-  int numberOfMaterials2 = materialsIDArray2->GetNumberOfTuples();
+	int numberOfMaterials2 = materialsIDArray2->GetNumberOfTuples();
 
-  // Elements
-  int numberOfElements2 = inputUGrid2->GetNumberOfCells();
+	// Elements
+	int numberOfElements2 = inputUGrid2->GetNumberOfCells();
 
-  CPPUNIT_ASSERT(numPoints == numPoints2);
-  CPPUNIT_ASSERT(numberOfMaterials == numberOfMaterials2);
-  CPPUNIT_ASSERT(numberOfElements == numberOfElements2);
-  
-  cppDEL(importer);
-  cppDEL(exporter);
+	CPPUNIT_ASSERT(numPoints == numPoints2);
+	CPPUNIT_ASSERT(numberOfMaterials == numberOfMaterials2);
+	CPPUNIT_ASSERT(numberOfElements == numberOfElements2);
+
+	cppDEL(importer);
+	cppDEL(exporter);
 	mafDEL(storage);
 }

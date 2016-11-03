@@ -75,9 +75,9 @@ void mafOpExporterAnsysInputFileTest::Check_INPFile(mafString fileName)
   exporter->TestModeOn();
 
   filePath="";
-  filePath << MAF_DATA_ROOT << "/mafOpExporterAnsysInputFileTest/";
+  filePath << GET_TEST_DATA_DIR();
 
-  exporter->SetOutputFileName((filePath << "exported_" << fileName).GetCStr());
+  exporter->SetOutputFileName((filePath << "/exported_" << fileName).GetCStr());
   exporter->SetInput(importedData);
   int result = exporter->Write();
 
@@ -124,9 +124,9 @@ void mafOpExporterAnsysInputFileTest::CompareINPFilesData(mafString fileName)
   exporter->TestModeOn();
 
   filePath="";
-  filePath << MAF_DATA_ROOT << "/mafOpExporterAnsysInputFileTest/";
+  filePath << GET_TEST_DATA_DIR();
 
-  exporter->SetOutputFileName((filePath << "exported2_" << fileName).GetCStr());
+  exporter->SetOutputFileName((filePath << "/exported2_" << fileName).GetCStr());
   exporter->SetInput(importedData);
   int result = exporter->Write();
 

@@ -76,11 +76,13 @@ void mafOpExporterRAWTest::Test()
 	mafOpExporterRAW *exporter=new mafOpExporterRAW("exporter raw");
 	exporter->TestModeOn();
 	exporter->SetInput(vmeVolumeGrayImported);
-	mafString FilenameExporter=MAF_DATA_ROOT;
-  FilenameExporter<<"/RAW_Volume/ExportTest1.raw";
+	
+	mafString FilenameExporter = GET_TEST_DATA_DIR();
+  FilenameExporter<<"/ExportTest1.raw";
 	exporter->SetFileName(FilenameExporter);
-	mafString filenameZ=MAF_DATA_ROOT;
-  filenameZ<<"/RAW_Volume/ExportZTest1.txt";
+	
+	mafString filenameZ = GET_TEST_DATA_DIR();
+  filenameZ<<"/ExportZTest1.txt";
 	exporter->SetFileZ(filenameZ);
 	exporter->SaveVolume();
 
@@ -200,11 +202,13 @@ void mafOpExporterRAWTest::TestRG()
 	mafOpExporterRAW *exporter=new mafOpExporterRAW("exporter raw");
 	exporter->TestModeOn();
 	exporter->SetInput(vmeVolumeGrayImported);
-	mafString FilenameExporter=MAF_DATA_ROOT;
-  FilenameExporter<<"/RAW_Volume/ExportTest2.raw";
+	
+	mafString FilenameExporter = GET_TEST_DATA_DIR();
+	FilenameExporter << "/ExportTest2.raw";
 	exporter->SetFileName(FilenameExporter);
-	mafString filenameZ=MAF_DATA_ROOT;
-  filenameZ<<"/RAW_Volume/ExportZTest2.txt";
+	
+	mafString filenameZ = GET_TEST_DATA_DIR();
+  filenameZ<<"/ExportZTest2.txt";
 	exporter->SetFileZ(filenameZ);
 	exporter->SaveVolume();
 

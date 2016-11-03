@@ -98,7 +98,6 @@
 #include "mafOpExporterMetersTest.h"
 #include "mafOpSubdivideTest.h"
 #include "mafOpCreateSurfaceTest.h"
-#include "medOpVolumeResampleTest.h"
 #include "mafOpSegmentationRegionGrowingConnectedThresholdTest.h"
 #include "mafOpScaleDatasetTest.h"
 #include "mafOpCreateLabeledVolumeTest.h"
@@ -275,7 +274,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpExporterMetersTest::suite());
 	runner.addTest(mafOpSubdivideTest::suite());
 	runner.addTest(mafOpCreateSurfaceTest::suite());
-	runner.addTest(medOpVolumeResampleTest::suite());
 	runner.addTest(mafOpSegmentationRegionGrowingConnectedThresholdTest::suite());
 	runner.addTest(mafOpScaleDatasetTest::suite());
 	runner.addTest(mafOpCreateLabeledVolumeTest::suite());
