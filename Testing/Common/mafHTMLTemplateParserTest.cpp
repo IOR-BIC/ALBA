@@ -29,160 +29,155 @@
 
 //----------------------------------------------------------------------------
 void mafHTMLTemplateParserTest::TestConstructorDestuctor()
-//----------------------------------------------------------------------------
 {
-  mafHTMLTemplateParser *testBlock;
+	mafHTMLTemplateParser *testBlock;
 
-  testBlock = new mafHTMLTemplateParser();
+	testBlock = new mafHTMLTemplateParser();
 
-  cppDEL(testBlock);
+	cppDEL(testBlock);
 }
 
 //----------------------------------------------------------------------------
 void mafHTMLTemplateParserTest::TestSetWriteTemplateFile()
-//----------------------------------------------------------------------------
 {
-  mafHTMLTemplateParser *testBlock;
-  wxString root=MAF_DATA_ROOT;
-  wxString OutputFileString, OutputString;
-  wxString RightString="MAF TEMPLATE OUTPUT TEST";
-  int cmpValue;
+	mafHTMLTemplateParser *testBlock;
+	wxString root = MAF_DATA_ROOT;
+	wxString OutputFileString, OutputString;
+	wxString RightString = "MAF TEMPLATE OUTPUT TEST";
+	int cmpValue;
 
-  testBlock = new mafHTMLTemplateParser();
+	testBlock = new mafHTMLTemplateParser();
 
-  testBlock->SetTemplateFromFile(root+"\\Test_HTMLTemplateParser\\TestTemplate.html");
-  testBlock->Parse();
-  testBlock->WriteOutputFile(root+"\\Test_HTMLTemplateParser\\TestResult.html");
-  OutputFileString=testBlock->GetOutputString();
+	testBlock->SetTemplateFromFile(root + "\\Test_HTMLTemplateParser\\TestTemplate.html");
+	testBlock->Parse();
 
-  //Use mafHTMLTemplateParser for reading from the output of the test :-)
-  mafHTMLTemplateParser *readerBlock;
+	mafString outputDir = GET_TEST_DATA_DIR();
+	testBlock->WriteOutputFile(outputDir + "\\TestResult.html");
+	OutputFileString = testBlock->GetOutputString();
 
-  readerBlock = new mafHTMLTemplateParser();
+	//Use mafHTMLTemplateParser for reading from the output of the test :-)
+	mafHTMLTemplateParser *readerBlock;
 
-  //this reader is reading from the output file
-  readerBlock->SetTemplateFromFile(root+"\\Test_HTMLTemplateParser\\TestResult.html");
-  readerBlock->Parse();
-  OutputString=readerBlock->GetOutputString();
-  
+	readerBlock = new mafHTMLTemplateParser();
 
-  //testing template reading
-  cmpValue=RightString.Cmp(OutputFileString);
-  CPPUNIT_ASSERT(cmpValue==0);
-  
-  //testing template writing
-  cmpValue=OutputString.Cmp(OutputFileString);
-  CPPUNIT_ASSERT(cmpValue==0);
+	//this reader is reading from the output file
+	readerBlock->SetTemplateFromFile(outputDir + "\\TestResult.html");
+	readerBlock->Parse();
+	OutputString = readerBlock->GetOutputString();
 
-  cppDEL(readerBlock);
-  cppDEL(testBlock);
+	//testing template reading
+	cmpValue = RightString.Cmp(OutputFileString);
+	CPPUNIT_ASSERT(cmpValue == 0);
+
+	//testing template writing
+	cmpValue = OutputString.Cmp(OutputFileString);
+	CPPUNIT_ASSERT(cmpValue == 0);
+
+	cppDEL(readerBlock);
+	cppDEL(testBlock);
 }
 
 //----------------------------------------------------------------------------
 void mafHTMLTemplateParserTest::TestSetGetTemplateString()
-//----------------------------------------------------------------------------
 {
-  wxString RightString="MAF TEMPLATE STRING TEST";
-  mafHTMLTemplateParser *testBlock;
-  wxString OutputString;
-  int cmpValue;
+	wxString RightString = "MAF TEMPLATE STRING TEST";
+	mafHTMLTemplateParser *testBlock;
+	wxString OutputString;
+	int cmpValue;
 
+	testBlock = new mafHTMLTemplateParser();
 
-  testBlock = new mafHTMLTemplateParser();
+	testBlock->SetTemplateFromString(RightString);
+	testBlock->Parse();
+	OutputString = testBlock->GetOutputString();
 
-  testBlock->SetTemplateFromString(RightString);
-  testBlock->Parse();
-  OutputString=testBlock->GetOutputString();
+	//testing template reading
+	cmpValue = RightString.Cmp(OutputString);
+	CPPUNIT_ASSERT(cmpValue == 0);
 
-  //testing template reading
-  cmpValue=RightString.Cmp(OutputString);
-  CPPUNIT_ASSERT(cmpValue==0);
-  
-  cppDEL(testBlock);
+	cppDEL(testBlock);
 }
 
 //----------------------------------------------------------------------------
 void mafHTMLTemplateParserTest::TestParse()
-//----------------------------------------------------------------------------
 {
-  mafHTMLTemplateParser *testBlock;
-  wxString OutputString;
-  int cmpValue;
+	mafHTMLTemplateParser *testBlock;
+	wxString OutputString;
+	int cmpValue;
 
+	//Variable Substitution test
+	wxString Template = "Output: [MAFVariable Pippo]";
+	wxString VariableString = "My name is Pippo";
+	wxString rightOutput = "Output: My name is Pippo";
+	testBlock = new mafHTMLTemplateParser();
+	testBlock->SetTemplateFromString(Template);
+	testBlock->AddVar("Pippo", "My name is Pippo");
+	testBlock->Parse();
+	OutputString = testBlock->GetOutputString();
+	cmpValue = rightOutput.Cmp(OutputString);
+	CPPUNIT_ASSERT(cmpValue == 0);
+	cppDEL(testBlock);
 
-  //Variable Substitution test
-  wxString Template="Output: [MAFVariable Pippo]";
-  wxString VariableString="My name is Pippo";
-  wxString rightOutput="Output: My name is Pippo";
-  testBlock = new mafHTMLTemplateParser();
-  testBlock->SetTemplateFromString(Template);
-  testBlock->AddVar("Pippo", "My name is Pippo");
-  testBlock->Parse();
-  OutputString=testBlock->GetOutputString();
-  cmpValue=rightOutput.Cmp(OutputString);
-  CPPUNIT_ASSERT(cmpValue==0);
-  cppDEL(testBlock);
+	//If Substitution test (true)
+	Template = "Output: [MAFIf condition] true [MAFElse condition] false [/MAFIf condition]";
+	rightOutput = "Output:  true ";
+	testBlock = new mafHTMLTemplateParser();
+	testBlock->SetTemplateFromString(Template);
+	testBlock->AddBlock("condition", maf_HTML_TEMPLATE_IF);
+	testBlock->GetBlock("condition")->SetIfCondition(true);
+	testBlock->Parse();
+	OutputString = testBlock->GetOutputString();
+	cmpValue = rightOutput.Cmp(OutputString);
+	CPPUNIT_ASSERT(cmpValue == 0);
+	cppDEL(testBlock);
 
+	//If Substitution test (false)
+	rightOutput = "Output:  false ";
+	testBlock = new mafHTMLTemplateParser();
+	testBlock->SetTemplateFromString(Template);
+	testBlock->AddBlock("condition", maf_HTML_TEMPLATE_IF);
+	testBlock->GetBlock("condition")->SetIfCondition(false);
+	testBlock->Parse();
+	OutputString = testBlock->GetOutputString();
+	cmpValue = rightOutput.Cmp(OutputString);
+	CPPUNIT_ASSERT(cmpValue == 0);
+	cppDEL(testBlock);
 
-  //If Substitution test (true)
-  Template="Output: [MAFIf condition] true [MAFElse condition] false [/MAFIf condition]";
-  rightOutput="Output:  true ";
-  testBlock = new mafHTMLTemplateParser();
-  testBlock->SetTemplateFromString(Template);
-  testBlock->AddBlock("condition",maf_HTML_TEMPLATE_IF);
-  testBlock->GetBlock("condition")->SetIfCondition(true);
-  testBlock->Parse();
-  OutputString=testBlock->GetOutputString();
-  cmpValue=rightOutput.Cmp(OutputString);
-  CPPUNIT_ASSERT(cmpValue==0);
-  cppDEL(testBlock);
+	//Loop Substitution test 
+	Template = "Output: [MAFLoop counter] [MAFVariable count] [/MAFLoop counter]";
+	rightOutput = "Output:  0  1  2  3  4 ";
+	testBlock = new mafHTMLTemplateParser();
+	testBlock->SetTemplateFromString(Template);
+	testBlock->AddBlock("counter", maf_HTML_TEMPLATE_LOOP);
+	testBlock->GetBlock("counter")->SetNLoops(5);
+	for (int i = 0; i < testBlock->GetBlock("counter")->GetNLoops(); i++)
+		testBlock->GetBlock("counter")->PushVar("count", i);
 
-  //If Substitution test (false)
-  rightOutput="Output:  false ";
-  testBlock = new mafHTMLTemplateParser();
-  testBlock->SetTemplateFromString(Template);
-  testBlock->AddBlock("condition",maf_HTML_TEMPLATE_IF);
-  testBlock->GetBlock("condition")->SetIfCondition(false);
-  testBlock->Parse();
-  OutputString=testBlock->GetOutputString();
-  cmpValue=rightOutput.Cmp(OutputString);
-  CPPUNIT_ASSERT(cmpValue==0);
-  cppDEL(testBlock);
+	testBlock->Parse();
+	OutputString = testBlock->GetOutputString();
+	cmpValue = rightOutput.Cmp(OutputString);
+	CPPUNIT_ASSERT(cmpValue == 0);
+	cppDEL(testBlock);
 
-  //Loop Substitution test 
-  Template="Output: [MAFLoop counter] [MAFVariable count] [/MAFLoop counter]";
-  rightOutput="Output:  0  1  2  3  4 ";
-  testBlock = new mafHTMLTemplateParser();
-  testBlock->SetTemplateFromString(Template);
-  testBlock->AddBlock("counter",maf_HTML_TEMPLATE_LOOP);
-  testBlock->GetBlock("counter")->SetNLoops(5);
-  for (int i=0;i<testBlock->GetBlock("counter")->GetNLoops();i++)
-    testBlock->GetBlock("counter")->PushVar("count",i);
+	//Complex Substitution test
+	Template = "Output: [MAFLoop counter] [MAFVariable count] is [MAFIf oddEven]Odd[MAFElse oddEven]Even[/MAFIf oddEven] - [/MAFLoop counter]";
+	rightOutput = "Output:  1 is Odd -  2 is Even -  3 is Odd -  4 is Even -  5 is Odd - ";
+	testBlock = new mafHTMLTemplateParser();
+	testBlock->SetTemplateFromString(Template);
+	testBlock->AddBlock("counter", maf_HTML_TEMPLATE_LOOP);
+	testBlock->GetBlock("counter")->SetNLoops(5);
 
-  testBlock->Parse();
-  OutputString=testBlock->GetOutputString();
-  cmpValue=rightOutput.Cmp(OutputString);
-  CPPUNIT_ASSERT(cmpValue==0);
-  cppDEL(testBlock);
+	for (int i = 0; i < testBlock->GetBlock("counter")->GetNLoops(); i++)
+	{
+		testBlock->GetBlock("counter")->PushBlock("oddEven", maf_HTML_TEMPLATE_IF);
+		testBlock->GetBlock("counter")->PushVar("count", i + 1);
+		testBlock->GetBlock("counter")->GetNthBlock("oddEven")->SetIfCondition((i + 1) % 2);
+	}
 
-  //Complex Substitution test
-  Template="Output: [MAFLoop counter] [MAFVariable count] is [MAFIf oddEven]Odd[MAFElse oddEven]Even[/MAFIf oddEven] - [/MAFLoop counter]";
-  rightOutput="Output:  1 is Odd -  2 is Even -  3 is Odd -  4 is Even -  5 is Odd - " ;
-  testBlock = new mafHTMLTemplateParser();
-  testBlock->SetTemplateFromString(Template);
-  testBlock->AddBlock("counter",maf_HTML_TEMPLATE_LOOP);
-  testBlock->GetBlock("counter")->SetNLoops(5);
-  for (int i=0;i<testBlock->GetBlock("counter")->GetNLoops();i++)
-  {
-    testBlock->GetBlock("counter")->PushBlock("oddEven",maf_HTML_TEMPLATE_IF);
-    testBlock->GetBlock("counter")->PushVar("count",i+1);
-    testBlock->GetBlock("counter")->GetNthBlock("oddEven")->SetIfCondition((i+1)%2);
-  }
-  testBlock->Parse();
-  OutputString=testBlock->GetOutputString();
-  cmpValue=rightOutput.Cmp(OutputString);
-  CPPUNIT_ASSERT(cmpValue==0);
-  cppDEL(testBlock);
-
+	testBlock->Parse();
+	OutputString = testBlock->GetOutputString();
+	cmpValue = rightOutput.Cmp(OutputString);
+	CPPUNIT_ASSERT(cmpValue == 0);
+	cppDEL(testBlock);
 }
 
