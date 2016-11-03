@@ -159,8 +159,8 @@ void vtkMAFVolumeResampleTest::WriteVTKDatasetToFile( vtkDataSet * outputVolumeV
   writer->SetInput(outputVolumeVTKData);
 
   string fullPathOutputFilename;
-  fullPathOutputFilename.append(MAF_DATA_ROOT);
-  fullPathOutputFilename.append("/Test_VolumeResample/");
+  fullPathOutputFilename.append(GET_TEST_DATA_DIR());
+  fullPathOutputFilename.append("//");
   fullPathOutputFilename.append(outputFilename);
   cout << fullPathOutputFilename;
 
