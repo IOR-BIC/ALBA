@@ -73,9 +73,6 @@ private:
   void Read( mafVMEMeshAnsysTextImporter *reader, mafString &dirPrefix, bool readMaterials /*= false*/, bool writeToDisk /*= false*/, mafString &outputFileName );
 
   int  GetRowsNumber(vtkUnstructuredGrid *inputUGrid);
-
-  vtkFileOutputWindow               *m_Log;
-
 };
 
 #endif

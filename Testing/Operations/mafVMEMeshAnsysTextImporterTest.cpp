@@ -53,16 +53,12 @@ void mafVMEMeshAnsysTextImporterTest::TestFixture()
 
 void mafVMEMeshAnsysTextImporterTest::BeforeTest()
 {
-  // single test case log
-  m_Log = vtkFileOutputWindow::New();
-  m_Log->SetInstance(m_Log);
-  m_Log->SetFileName("test.log");
-  m_Log->AppendOn();   
+ 
 }
 
 void mafVMEMeshAnsysTextImporterTest::AfterTest()
 {
-  m_Log->Delete();
+
 }
 
 void mafVMEMeshAnsysTextImporterTest::TestConstructor()
@@ -109,7 +105,8 @@ void mafVMEMeshAnsysTextImporterTest::Read(mafVMEMeshAnsysTextImporter* reader, 
   vtkUnstructuredGrid* data = reader->GetOutput()->GetUnstructuredGridOutput()->GetUnstructuredGridData();
   data->Update();
   
-  SaveUnstructuredGridToFile(dirPrefix, outputFileName, data);
+	mafString outputDir = GET_TEST_DATA_DIR();
+  SaveUnstructuredGridToFile(outputDir, outputFileName, data);
 }
 
 void mafVMEMeshAnsysTextImporterTest::SaveUnstructuredGridToFile(mafString &dirPrefix, mafString &fileName, vtkUnstructuredGrid *data)
@@ -202,7 +199,8 @@ void mafVMEMeshAnsysTextImporterTest::ReadAndDisplay( mafString &dirPrefix, int 
 
   if (writeToDisk)
   {
-    SaveUnstructuredGridToFile(dirPrefix, mafString("vtkUnstructuredGrid.vtk"), data);
+		mafString outputDir = GET_TEST_DATA_DIR();
+    SaveUnstructuredGridToFile(outputDir, mafString("vtkUnstructuredGrid.vtk"), data);
   }
 
   if (dataType == POINT_DATA)
@@ -238,7 +236,6 @@ void mafVMEMeshAnsysTextImporterTest::ReadAndDisplay( mafString &dirPrefix, int 
 
 void mafVMEMeshAnsysTextImporterTest::RenderData(  vtkUnstructuredGrid *data, int dataType)
 {
-
   //----------------------------
   // lookup table stuff
   //----------------------------
@@ -319,7 +316,6 @@ void mafVMEMeshAnsysTextImporterTest::RenderData(  vtkUnstructuredGrid *data, in
   // renderWindowInteractor->Start();
 }
   
-
 void mafVMEMeshAnsysTextImporterTest::TestTetra4()
 {
   mafString dirPrefix = MAF_DATA_ROOT;
@@ -349,7 +345,6 @@ void mafVMEMeshAnsysTextImporterTest::TestTetra10()
   ReadAndDisplay(dirPrefix, POINT_DATA, true);
   // DISPLAY NOT WORKING!!! in vtk 4.4
   ReadAndDisplay(dirPrefix, CELL_DATA, true,true);
-
 }
 
 void mafVMEMeshAnsysTextImporterTest::TestTetra10NodesIdJumpingMaterialsIdJumpingMaterialsGroupingNoTimevar()

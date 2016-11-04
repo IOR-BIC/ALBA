@@ -25,20 +25,23 @@ class mafPipeVectorFieldGlyphsTest : public mafTest
 {
 public: 
 
+	// Executed before each test
+	void BeforeTest();
+
+	// Executed after each test
+	void AfterTest();
+
   CPPUNIT_TEST_SUITE( mafPipeVectorFieldGlyphsTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestCreate );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
-  /**Compare an already saved image (control image) with renderized image from render window
-  */
-  void CompareImage();
 
   void TestFixture();
   void TestCreate();
 
-  vtkRenderWindow *m_RenderWindow;
+	vtkRenderWindowInteractor *m_RenderWindowInteractor;
 };
 
 #endif

@@ -53,7 +53,6 @@ void mafOpExporterMetersTest::TestFixture()
   delete op;
 }
 
-
 //------------------------------------------------------------------------
 void mafOpExporterMetersTest::TestOnMetersImporter()
 //------------------------------------------------------------------------
@@ -61,8 +60,7 @@ void mafOpExporterMetersTest::TestOnMetersImporter()
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
-
-
+	
   //create landmarks and relative landmark cloud
   mafOpImporterLandmark *importer=new mafOpImporterLandmark("importer");
   importer->TestModeOn();
@@ -156,8 +154,8 @@ void mafOpExporterMetersTest::TestOnMetersImporter()
   //Inizialize exporter
   mafOpExporterMeters *exporter=new mafOpExporterMeters("test exporter");
   exporter->SetInput(wrappedMeterManual);
-  mafString fileExp=MAF_DATA_ROOT;
-  fileExp<<"/RAW_MAL/ExportMeters.txt";
+	mafString fileExp = GET_TEST_DATA_DIR();
+  fileExp<<"//ExportMeters.txt";
   exporter->TestModeOn();
   exporter->SetFileName(fileExp);
   exporter->Export();

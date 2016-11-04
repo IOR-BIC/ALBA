@@ -98,7 +98,6 @@
 #include "mafOpExporterMetersTest.h"
 #include "mafOpSubdivideTest.h"
 #include "mafOpCreateSurfaceTest.h"
-#include "medOpVolumeResampleTest.h"
 #include "mafOpSegmentationRegionGrowingConnectedThresholdTest.h"
 #include "mafOpScaleDatasetTest.h"
 #include "mafOpCreateLabeledVolumeTest.h"
@@ -143,6 +142,8 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
+#include "vtkFileOutputWindow.h"
+#include "vtkMAFSmartPointer.h"
 
 // Visual Leak Detector
 //#include <vld.h>
@@ -185,6 +186,12 @@ void DummyObserver::OnEvent(mafEventBase *maf_event)
 //Main Test Executor
 int	main( int argc, char* argv[] )
 {
+	// Create log of VTK error messages
+	vtkMAFSmartPointer<vtkFileOutputWindow> log;
+	vtkFileOutputWindow::SetInstance(log);
+	mafString logPath = wxGetWorkingDirectory();
+	logPath << "\\VTKTest.log";
+	log->SetFileName(logPath);
 
 	// Create the event manager and test controller
 	CPPUNIT_NS::TestResult controller;
@@ -275,7 +282,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpExporterMetersTest::suite());
 	runner.addTest(mafOpSubdivideTest::suite());
 	runner.addTest(mafOpCreateSurfaceTest::suite());
-	runner.addTest(medOpVolumeResampleTest::suite());
 	runner.addTest(mafOpSegmentationRegionGrowingConnectedThresholdTest::suite());
 	runner.addTest(mafOpScaleDatasetTest::suite());
 	runner.addTest(mafOpCreateLabeledVolumeTest::suite());

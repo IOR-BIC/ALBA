@@ -190,8 +190,8 @@ void mafOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithm()
 
   //Write the result of the itk filter
   RealWriterType::Pointer writer = RealWriterType::New();
-  mafString fileNameOut = MAF_DATA_ROOT;
-  fileNameOut<<"/VTK_Volumes/Segmentation.vtk";
+	mafString fileNameOut = GET_TEST_DATA_DIR();
+  fileNameOut<<"/Segmentation.vtk";
   writer->SetFileName( fileNameOut.GetCStr() );
   writer->SetInput(connectedThreshold->GetOutput());
 
@@ -282,5 +282,4 @@ void mafOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithmRG()
   CompareImageData(imFile,imOP);
 
   mafDEL(op);
-
 }
