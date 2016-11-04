@@ -52,6 +52,23 @@
 
 
 //----------------------------------------------------------------------------
+void mafPipeVectorFieldGlyphsTest::BeforeTest()
+//----------------------------------------------------------------------------
+{
+	vtkNEW(m_Renderer);
+	vtkNEW(m_RenderWindow);
+	vtkNEW(m_RenderWindowInteractor);
+}
+//----------------------------------------------------------------------------
+void mafPipeVectorFieldGlyphsTest::AfterTest()
+//----------------------------------------------------------------------------
+{
+	vtkDEL(m_Renderer);
+	vtkDEL(m_RenderWindow);
+	vtkDEL(m_RenderWindowInteractor);
+}
+
+//----------------------------------------------------------------------------
 void mafPipeVectorFieldGlyphsTest::TestFixture()
 //----------------------------------------------------------------------------
 {
@@ -61,210 +78,96 @@ void mafPipeVectorFieldGlyphsTest::TestFixture()
 void mafPipeVectorFieldGlyphsTest::TestCreate()
 //----------------------------------------------------------------------------
 {
-  mafVMEStorage *storage = mafVMEStorage::New();
-  storage->GetRoot()->SetName("root");
-  storage->GetRoot()->Initialize();
+	mafVMEStorage *storage = mafVMEStorage::New();
+	storage->GetRoot()->SetName("root");
+	storage->GetRoot()->Initialize();
 
-  ///////////////// render stuff /////////////////////////
-  vtkRenderer *frontRenderer;
-  vtkNEW(frontRenderer);
-  frontRenderer->SetBackground(0.1, 0.1, 0.1);
-  m_RenderWindow = vtkRenderWindow::New();
-  m_RenderWindow->AddRenderer(frontRenderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(200,0);
+	///////////////// render stuff /////////////////////////
 
-  vtkRenderWindowInteractor *renderWindowInteractor = vtkRenderWindowInteractor::New();
-  renderWindowInteractor->SetRenderWindow(m_RenderWindow);
-  //////////////////////////////////////////////////////////////////////////
+	m_Renderer->SetBackground(0.1, 0.1, 0.1);
 
-  mafVMEVolumeGray *testVolume;
-  mafNEW(testVolume);
-  testVolume->ReparentTo(storage->GetRoot());
+	m_RenderWindow->AddRenderer(m_Renderer);
+	m_RenderWindow->SetSize(640, 480);
+	m_RenderWindow->SetPosition(200, 0);
 
-  int volumeDimensions[3];
-  volumeDimensions[0] = 5;
-  volumeDimensions[1] = 5;
-  volumeDimensions[2] = 5;
+	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 
-  vtkMAFSmartPointer<vtkImageData> imageData;
-  imageData->SetDimensions(volumeDimensions[0],volumeDimensions[1],volumeDimensions[2]);
-  imageData->SetSpacing(1.,1.,1.);
+	///////////// end render stuff /////////////////////////
 
-  vtkMAFSmartPointer<vtkFloatArray> scalarArray;
-  scalarArray->SetNumberOfComponents(1);
-  scalarArray->SetName("Scalar");
-  
-  vtkMAFSmartPointer<vtkFloatArray> vectorArray;
-  vectorArray->SetNumberOfComponents(3);
-  vectorArray->SetNumberOfTuples(volumeDimensions[0]*volumeDimensions[1]*volumeDimensions[2]);
-  vectorArray->SetName("Vector");
+	mafVMEVolumeGray *testVolume;
+	mafNEW(testVolume);
+	testVolume->ReparentTo(storage->GetRoot());
 
-  for(int i=0;i< volumeDimensions[0]*volumeDimensions[1]*volumeDimensions[2];i++)
-  {
-    scalarArray->InsertNextTuple1(i%3);
-    vectorArray->SetTuple3(i, i, i, i);
-  }
+	int volumeDimensions[3];
+	volumeDimensions[0] = 5;
+	volumeDimensions[1] = 5;
+	volumeDimensions[2] = 5;
 
-  imageData->GetPointData()->SetScalars(scalarArray);
-  imageData->GetPointData()->SetActiveScalars("Scalar");
+	vtkMAFSmartPointer<vtkImageData> imageData;
+	imageData->SetDimensions(volumeDimensions[0], volumeDimensions[1], volumeDimensions[2]);
+	imageData->SetSpacing(1., 1., 1.);
 
-  
-  testVolume->SetData(imageData, 0.);
-  testVolume->Update();
+	vtkMAFSmartPointer<vtkFloatArray> scalarArray;
+	scalarArray->SetNumberOfComponents(1);
+	scalarArray->SetName("Scalar");
 
-  mafVMEOutput *output = testVolume->GetOutput();
-  output->Update();
-  vtkPointData *pointData = output->GetVTKData()->GetPointData();
-  pointData->Update();
+	vtkMAFSmartPointer<vtkFloatArray> vectorArray;
+	vectorArray->SetNumberOfComponents(3);
+	vectorArray->SetNumberOfTuples(volumeDimensions[0] * volumeDimensions[1] * volumeDimensions[2]);
+	vectorArray->SetName("Vector");
 
-  pointData->AddArray(vectorArray);
-  pointData->SetActiveVectors("Vector");
+	for (int i = 0; i < volumeDimensions[0] * volumeDimensions[1] * volumeDimensions[2]; i++)
+	{
+		scalarArray->InsertNextTuple1(i % 3);
+		vectorArray->SetTuple3(i, i, i, i);
+	}
 
-  //Assembly will be create when instancing mafSceneNode
-  mafSceneNode *rootscenenode = new mafSceneNode(NULL, NULL, storage->GetRoot(), NULL, NULL);
-  mafSceneNode *sceneNode = new mafSceneNode(NULL,rootscenenode,testVolume, frontRenderer);
-
-  /////////// Pipe Instance and Creation ///////////
-  mafPipeVectorFieldGlyphs *pipe = new mafPipeVectorFieldGlyphs;
-  pipe->Create(sceneNode);
-  pipe->m_RenFront = frontRenderer;
-
-  vtkPropCollection *actorList = vtkPropCollection::New();
-  pipe->GetAssemblyFront()->GetActors(actorList);
-
-  actorList->InitTraversal();
-  vtkProp *actor = actorList->GetNextProp();
-  while(actor)
-  {   
-    frontRenderer->AddActor(actor);
-    m_RenderWindow->Render();
-
-    actor = actorList->GetNextProp();
-  }
-
-  m_RenderWindow->Render();
-  CompareImage();
-
-  vtkDEL(actorList);
-
-  delete sceneNode;
-  delete(rootscenenode);
-
-  vtkDEL(renderWindowInteractor);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(frontRenderer);
+	imageData->GetPointData()->SetScalars(scalarArray);
+	imageData->GetPointData()->SetActiveScalars("Scalar");
 
 
-  testVolume->ReparentTo(NULL);
-  mafDEL(testVolume);
-  mafDEL(storage);
-}
+	testVolume->SetData(imageData, 0.);
+	testVolume->Update();
 
-//----------------------------------------------------------------------------
-void mafPipeVectorFieldGlyphsTest::CompareImage()
-//----------------------------------------------------------------------------
-{
-  char *file = __FILE__;
-  std::string name(file);
-  int slashIndex =  name.find_last_of('\\');
+	mafVMEOutput *output = testVolume->GetOutput();
+	output->Update();
+	vtkPointData *pointData = output->GetVTKData()->GetPointData();
+	pointData->Update();
 
-  name = name.substr(slashIndex+1);
+	pointData->AddArray(vectorArray);
+	pointData->SetActiveVectors("Vector");
 
-  int pointIndex =  name.find_last_of('.');
-  name = name.substr(0, pointIndex);
+	//Assembly will be create when instancing mafSceneNode
+	mafSceneNode *rootscenenode = new mafSceneNode(NULL, NULL, storage->GetRoot(), NULL, NULL);
+	mafSceneNode *sceneNode = new mafSceneNode(NULL, rootscenenode, testVolume, m_Renderer);
 
-  mafString controlOriginFile=MAF_DATA_ROOT;
-  controlOriginFile<<"/Test_PipeVectorFieldGlyphs/";
-  controlOriginFile<<name.c_str();
-  controlOriginFile<<"_";
-  controlOriginFile<<"image.jpg";
+	/////////// Pipe Instance and Creation ///////////
+	mafPipeVectorFieldGlyphs *pipe = new mafPipeVectorFieldGlyphs;
+	pipe->Create(sceneNode);
+	pipe->m_RenFront = m_Renderer;
 
-  fstream controlStream;
-  controlStream.open(controlOriginFile.GetCStr()); 
+	vtkPropCollection *actorList = vtkPropCollection::New();
+	pipe->GetAssemblyFront()->GetActors(actorList);
 
-  // visualization control
-  m_RenderWindow->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i;
-  vtkNEW(w2i);
-  w2i->SetInput(m_RenderWindow);
-  //w2i->SetMagnification(magnification);
-  w2i->Update();
-  m_RenderWindow->OffScreenRenderingOff();
+	actorList->InitTraversal();
+	vtkProp *actor = actorList->GetNextProp();
+	while (actor)
+	{
+		m_Renderer->AddActor(actor);
+		m_RenderWindow->Render();
 
-  //write comparing image
-  vtkJPEGWriter *w;
-  vtkNEW(w);
-  w->SetInput(w2i->GetOutput());
-  mafString imageFile=MAF_DATA_ROOT;
+		actor = actorList->GetNextProp();
+	}
 
-  if(!controlStream)
-  {
-    imageFile<<"/Test_PipeVectorFieldGlyphs/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"image";
-  }
-  else
-  {
-    imageFile<<"/Test_PipeVectorFieldGlyphs/";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"comp";
-  }
+	m_RenderWindow->Render();
+	COMPARE_IMAGES("image");
 
-  imageFile<<".jpg";
-  w->SetFileName(imageFile.GetCStr());
-  w->Write();
+	vtkDEL(actorList);
 
-  if(!controlStream)
-  {
-    controlStream.close();
-    vtkDEL(w);
-    vtkDEL(w2i);
-    return;
-  }
-  controlStream.close();
+	delete sceneNode;
+	delete(rootscenenode);
 
-  //read original Image
-  vtkJPEGReader *rO;
-  vtkNEW(rO);
-  mafString imageFileOrig=MAF_DATA_ROOT;
-  imageFileOrig<<"/Test_PipeVectorFieldGlyphs/";
-  imageFileOrig<<name.c_str();
-  imageFileOrig<<"_";
-  imageFileOrig<<"image";
-  imageFileOrig<<".jpg";
-  rO->SetFileName(imageFileOrig.GetCStr());
-  rO->Update();
-
-  vtkImageData *imDataOrig = rO->GetOutput();
-
-  //read compared image
-  vtkJPEGReader *rC;
-  vtkNEW(rC);
-  rC->SetFileName(imageFile.GetCStr());
-  rC->Update();
-
-  vtkImageData *imDataComp = rC->GetOutput();
-
-
-  vtkImageMathematics *imageMath = vtkImageMathematics::New();
-  imageMath->SetInput1(imDataOrig);
-  imageMath->SetInput2(imDataComp);
-  imageMath->SetOperationToSubtract();
-  imageMath->Update();
-
-  double srR[2] = {-1,1};
-  imageMath->GetOutput()->GetPointData()->GetScalars()->GetRange(srR);
-
-  CPPUNIT_ASSERT(srR[0] == 0.0 && srR[1] == 0.0);
-
-  // end visualization control
-  vtkDEL(imageMath);
-  vtkDEL(rC);
-  vtkDEL(rO);
-
-  vtkDEL(w);
-  vtkDEL(w2i);
+	testVolume->ReparentTo(NULL);
+	mafDEL(testVolume);
+	mafDEL(storage);
 }
