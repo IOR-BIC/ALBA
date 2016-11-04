@@ -313,8 +313,8 @@ void mafVMEItemVTKTest::TestInternalStoreData()
 
   item->SetData(vtkDataSet::SafeDownCast(sphere->GetOutput()));
 
-  mafString filename = MAF_DATA_ROOT;
-  filename<<"/ItemVTK/item.vtk";
+  mafString filename = GET_TEST_DATA_DIR();
+  filename<<"/item.vtk";
   result = item->StoreData(filename.GetCStr()) == MAF_OK;
 
   TEST_RESULT;
@@ -368,8 +368,9 @@ void mafVMEItemVTKTest::TestStoreToArchive()
 
   mafString filename = MAF_DATA_ROOT;
   filename<<"/ItemVTK/item.vtk";
-  mafString filenameZip = MAF_DATA_ROOT;
-  filenameZip<<"/ItemVTK/item.zvtk";
+
+  mafString filenameZip = GET_TEST_DATA_DIR();
+  filenameZip<<"/item.zvtk";
   
   mafString workDir = MAF_DATA_ROOT;
   workDir<<"/ItemVTK";

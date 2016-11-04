@@ -274,11 +274,7 @@ void mafVMEImageTest::CreateVMETestTree()
   m_VmeRoot = mafVMERoot::New();
  // mafSmartPointer<mafVMERoot> m_VmeRoot;
 
-  vtkMAFSmartPointer<vtkFileOutputWindow> log;
-  log->SetInstance(log);
-  log->SetFileName("testMSF.log"); // log of VTK error messages
-
-  // plug the custom attribute in the Node Factory
+ // plug the custom attribute in the Node Factory
   mafPlugAttribute<mafClientData>("Simple attribute for attaching actors to VMEs");
 
   vtkMAFSmartPointer<vtkAxes> axes;

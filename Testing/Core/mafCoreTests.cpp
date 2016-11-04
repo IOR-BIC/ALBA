@@ -83,6 +83,7 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
+#include "vtkFileOutputWindow.h"
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEHelper);
@@ -156,6 +157,13 @@ bool RemoveDir(const char *dirName)
 int
 main(int argc, char* argv[])
 {
+	// Create log of VTK error messages
+	vtkMAFSmartPointer<vtkFileOutputWindow> log;
+	vtkFileOutputWindow::SetInstance(log);
+	mafString logPath = wxGetWorkingDirectory();
+	logPath << "\\VTKTest.log";
+	log->SetFileName(logPath);
+
 	// Create the event manager and test controller
 	CPPUNIT_NS::TestResult controller;
 

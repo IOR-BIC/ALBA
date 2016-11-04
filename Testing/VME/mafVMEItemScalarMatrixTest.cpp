@@ -274,8 +274,8 @@ void mafVMEItemScalarMatrixTest::TestInternalStoreData()
 
   itemw->SetData(data);
 
-  mafString filename = MAF_DATA_ROOT;
-  filename << "/ItemScalarMatrix/item.sca";
+  mafString filename = GET_TEST_DATA_DIR();
+  filename << "/item.sca";
 
   CPPUNIT_ASSERT(itemw->StoreData(filename.GetCStr()) == MAF_OK);
 
@@ -310,8 +310,8 @@ void mafVMEItemScalarMatrixTest::TestStoreToArchive()
 
   mafString filename = MAF_DATA_ROOT;
   filename << "/ItemScalarMatrix/item.sca";
-  mafString filenamez = MAF_DATA_ROOT;
-  filenamez << "/ItemScalarMatrix/item.zsca";
+  mafString filenamez = GET_TEST_DATA_DIR();
+  filenamez << "/item.zsca";
   
   mafString workdir = MAF_DATA_ROOT;
   workdir << "/ItemScalarMatrix";

@@ -76,11 +76,12 @@ void mafOpExporterSTLTest::Test()
 	//Initialize exporter
 	mafOpExporterSTL *exporter1 = new mafOpExporterSTL("test exporter");
 	exporter1->SetInput(surface_input);
-	mafString filename=MAF_DATA_ROOT;
-  filename<<"/STL/Export.stl";
+	mafString filename = GET_TEST_DATA_DIR();
+  filename<<"/Export.stl";
 	exporter1->SetFileName(filename);
 	exporter1->ExportAsBynaryOff();
 	exporter1->ExportSurface();
+	
 	//Import the file to check
 	mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
@@ -93,6 +94,7 @@ void mafOpExporterSTLTest::Test()
   std::vector<mafVMESurface*> importedSTL;
   importer1->GetImportedSTL(importedSTL);
   mafVMESurface *node = importedSTL[0];
+	
 	//Test
 	CPPUNIT_ASSERT(node->IsA("mafVMESurface"));
 	vtkDataSet *surface_output = node->GetOutput()->GetVTKData();
@@ -102,15 +104,17 @@ void mafOpExporterSTLTest::Test()
 	double b2[6];
 	surface_input->GetOutput()->GetVTKData()->GetBounds(b2);
 	CPPUNIT_ASSERT(b1[0]==b2[0]&&b1[1]==b2[1]&&b1[2]==b2[2]);
+	
 	//Binary Case
 	//Initialize exporter
 	mafOpExporterSTL *exporter2 = new mafOpExporterSTL("test exporter");
 	exporter2->SetInput(surface_input);
-	mafString filename_binary=MAF_DATA_ROOT;
-  filename_binary<<"/STL/Export_Binary.stl";
+	mafString filename_binary = GET_TEST_DATA_DIR();
+  filename_binary<<"/Export_Binary.stl";
 	exporter2->SetFileName(filename_binary);
 	exporter2->ExportAsBynaryOn();
 	exporter2->ExportSurface();
+	
 	//Import the file to check
 	mafOpImporterSTL *importer2 = new mafOpImporterSTL("importer");
 	importer2->TestModeOn();
@@ -118,6 +122,7 @@ void mafOpExporterSTLTest::Test()
 	importer2->OpRun();
 	importer2->GetImportedSTL(importedSTL);
   node = importedSTL[0];
+	
 	//Test
 	CPPUNIT_ASSERT(node->IsA("mafVMESurface"));
 	surface_output = node->GetOutput()->GetVTKData();

@@ -42,90 +42,86 @@ void mafOpExporterLandmarkWSTest::TestOnLandmarkImporter()
 	int returnValue = -1;
 
 	// Import input file
-  mafOpImporterLandmark *importer=new mafOpImporterLandmark("importer");
+	mafOpImporterLandmark *importer = new mafOpImporterLandmark("importer");
 	importer->TestModeOn();
 
-	mafString filename=MAF_DATA_ROOT;
-	filename<<"/RAW_MAL/cloud_to_be_imported";
+	mafString filename = MAF_DATA_ROOT;
+	filename << "/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
-	mafVMELandmarkCloud *node=(mafVMELandmarkCloud *)importer->GetOutput();
+	mafVMELandmarkCloud *node = (mafVMELandmarkCloud *)importer->GetOutput();
 
 	// Initialize and execute exporter
-	mafOpExporterLandmarkWS *exporter=new mafOpExporterLandmarkWS("test exporter");
+	mafOpExporterLandmarkWS *exporter = new mafOpExporterLandmarkWS("test exporter");
 	exporter->SetInput(node);
-	mafString fileExp=MAF_DATA_ROOT;
-	fileExp<<"/RAW_MAL/ExportWS.csv";
+	mafString fileExp = GET_TEST_DATA_DIR();
+	fileExp << "/ExportWS.csv";
 	exporter->TestModeOn();
 	exporter->SetFileName(fileExp);
 	exporter->Write();
 
-  // Import output file
-  mafOpImporterLandmarkWS *importerWS=new mafOpImporterLandmarkWS("importer");
+	// Import output file
+	mafOpImporterLandmarkWS *importerWS = new mafOpImporterLandmarkWS("importer");
 	importerWS->TestModeOn();
 
-	filename=MAF_DATA_ROOT;
-	filename<<"/RAW_MAL/ExportWS.csv";
-	importerWS->SetFileName(filename.GetCStr());
+	importerWS->SetFileName(fileExp.GetCStr());
 	importerWS->Read();
-	mafVMELandmarkCloud *node_WS=(mafVMELandmarkCloud *)importerWS->GetOutput();
-
-
+	mafVMELandmarkCloud *node_WS = (mafVMELandmarkCloud *)importerWS->GetOutput();
 
 	int result = MAF_OK;
 	std::vector<double *> coord;
 	std::vector<double *> coord_WS;
-	
-  int numberOfLandmarks = ((mafVMELandmarkCloud *)node)->GetNumberOfLandmarks();
-	for(int j=0 ; j < numberOfLandmarks; j++)
+
+	int numberOfLandmarks = ((mafVMELandmarkCloud *)node)->GetNumberOfLandmarks();
+	for (int j = 0; j < numberOfLandmarks; j++)
 	{
 		mafVMELandmark *landmark = ((mafVMELandmarkCloud *)node)->GetLandmark(j);
 		double *xyz = new double[3];
 		double rot[3];
-		landmark->GetOutput()->GetPose(xyz , rot , 0);
+		landmark->GetOutput()->GetPose(xyz, rot, 0);
 		coord.push_back(xyz);
 	}
 
-  numberOfLandmarks = ((mafVMELandmarkCloud *)node_WS)->GetNumberOfLandmarks();
-  for(int j=0 ; j < numberOfLandmarks; j++)
+	numberOfLandmarks = ((mafVMELandmarkCloud *)node_WS)->GetNumberOfLandmarks();
+	for (int j = 0; j < numberOfLandmarks; j++)
 	{
 		mafVMELandmark *landmark = ((mafVMELandmark *)((mafVMELandmarkCloud *)node_WS)->GetLandmark(j));
 		double *xyz = new double[3];
 		double rot[3];
-		landmark->GetOutput()->GetPose(xyz , rot , 0);
+		landmark->GetOutput()->GetPose(xyz, rot, 0);
 		coord_WS.push_back(xyz);
 	}
 
-  CPPUNIT_ASSERT(coord.size()==coord_WS.size());
-  
-  for (int i=0; i<coord.size();i++)
-  {
-    if (abs(coord[i][0]-coord_WS[i][0])>0.05)
-      result = 1;
-    if (abs(coord[i][1]-coord_WS[i][1])>0.05)
-      result = 1;
-    if (abs(coord[i][2]-coord_WS[i][2])>0.05)
-      result = 1;
-  }
-	
+	CPPUNIT_ASSERT(coord.size() == coord_WS.size());
+
+	for (int i = 0; i < coord.size(); i++)
+	{
+		if (abs(coord[i][0] - coord_WS[i][0]) > 0.05)
+			result = 1;
+		if (abs(coord[i][1] - coord_WS[i][1]) > 0.05)
+			result = 1;
+		if (abs(coord[i][2] - coord_WS[i][2]) > 0.05)
+			result = 1;
+	}
+
 	CPPUNIT_ASSERT(result == MAF_OK);
 
-	for(int i=0; i< coord.size(); i++)
+	for (int i = 0; i < coord.size(); i++)
 	{
 		delete coord[i];
 	}
-  for(int i=0; i< coord_WS.size(); i++)
+	for (int i = 0; i < coord_WS.size(); i++)
 	{
 		delete coord_WS[i];
 	}
 
 	coord.clear();
-  coord_WS.clear();
+	coord_WS.clear();
 
 	delete exporter;
 	delete importer;
-  delete importerWS;
+	delete importerWS;
 	exporter = NULL;
 	importer = NULL;
-  importerWS = NULL;
+	importerWS = NULL;
 }

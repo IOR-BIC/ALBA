@@ -55,20 +55,19 @@ void mafOpExporterMeshTest::TestExporterMesh()
   mafString vtkFileName = dirPrefix;
   vtkFileName << "hex8.vtk";
 
-  mafString outPrefix = MAF_DATA_ROOT;
-  outPrefix << "/FEM/ANSYS/hex8/";
+  mafString outPrefix = GET_TEST_DATA_DIR();
 
   mafString fileName = outPrefix;
-  fileName << "testMeshExporter.lis";
+  fileName << "/testMeshExporter.lis";
 
   mafString nodesFileName = outPrefix;
-  nodesFileName << "testMeshExporter_NODES.lis";
+  nodesFileName << "/testMeshExporter_NODES.lis";
 
   mafString elementsFileName = outPrefix;
-  elementsFileName << "testMeshExporter_ELEMENTS.lis";
+  elementsFileName << "/testMeshExporter_ELEMENTS.lis";
 
   mafString materialsFileName = outPrefix;
-  materialsFileName << "testMeshExporter_MATERIALS.lis";
+  materialsFileName << "/testMeshExporter_MATERIALS.lis";
 
   // Import a hex8 VTK file which will be used for testing the Operation
   mafOpImporterVTK* importerVTK = new mafOpImporterVTK();
@@ -105,8 +104,9 @@ void mafOpExporterMeshTest::TestExporterMesh()
   wxString file;
   wxString original;
   file.append(nodesFileName.GetCStr());
-  original.append(outPrefix.GetCStr());
-  original.append("NLIST.lis");
+  original = MAF_DATA_ROOT;
+	original << "/FEM/ANSYS/hex8/NLIST.lis";
+
   wxFileInputStream inputFile( file );
   wxFileInputStream originalFile( original );
   wxTextInputStream text1( inputFile );

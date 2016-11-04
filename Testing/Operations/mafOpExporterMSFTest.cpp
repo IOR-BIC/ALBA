@@ -102,14 +102,10 @@ void mafOpExporterMSFTest::TestExportMSF1()
 
   //To restore it is necessary use "\\" instead "/"
   wxString msfFileNameIn = MAF_DATA_ROOT;
-  msfFileNameIn<<"\\Test_ExporterMSF\\MSF_TEST\\MSF_TEST.msf";
+	msfFileNameIn << "/Test_ExporterMSF/MSF_TEST/MSF_TEST.msf";
 
-  msfFileNameIn.Replace("/","\\");
-
-  wxString msfFileNameOut = MAF_DATA_ROOT;
-  msfFileNameOut<<"\\Test_ExporterMSF\\MSF_TEST_OUT.msf";
-
-  msfFileNameOut.Replace("/","\\");
+  wxString msfFileNameOut = GET_TEST_DATA_DIR();
+	msfFileNameOut << "/MSF_TEST_OUT.msf";
 
   //Restore the input MSF
   storageExport->SetURL(msfFileNameIn.c_str());
@@ -132,10 +128,9 @@ void mafOpExporterMSFTest::TestExportMSF1()
   storageImport->GetRoot()->Initialize();
 
   //Restore the MSF exported
-  msfFileNameOut = MAF_DATA_ROOT;
-  msfFileNameOut<<"\\Test_ExporterMSF\\MSF_TEST_OUT\\MSF_TEST_OUT.msf";
+  msfFileNameOut = GET_TEST_DATA_DIR();
+	msfFileNameOut << "/MSF_TEST_OUT/MSF_TEST_OUT.msf";
 
-  msfFileNameOut.Replace("/","\\");
   storageImport->SetURL(msfFileNameOut.c_str());
   CPPUNIT_ASSERT ( storageImport->Restore() == MAF_OK );
 
@@ -191,14 +186,10 @@ void mafOpExporterMSFTest::TestExportMSF2()
 
   //To restore it is necessary use "\\" instead "/"
   wxString msfFileNameIn = MAF_DATA_ROOT;
-  msfFileNameIn<<"\\Test_ExporterMSF\\MSF_TEST\\MSF_TEST.msf";
+  msfFileNameIn<<"/Test_ExporterMSF/MSF_TEST/MSF_TEST.msf";
 
-  msfFileNameIn.Replace("/","\\");
-
-  wxString msfFileNameOut = MAF_DATA_ROOT;
-  msfFileNameOut<<"\\Test_ExporterMSF\\MSF_TEST_OUT.msf";
-
-  msfFileNameOut.Replace("/","\\");
+  wxString msfFileNameOut = GET_TEST_DATA_DIR();;
+	msfFileNameOut << "/MSF_TEST_OUT.msf";
 
   //Restore the input MSF
   storageExport->SetURL(msfFileNameIn.c_str());
@@ -221,10 +212,9 @@ void mafOpExporterMSFTest::TestExportMSF2()
   storageImport->GetRoot()->Initialize();
 
   //Restore the MSF exported
-  msfFileNameOut = MAF_DATA_ROOT;
-  msfFileNameOut<<"\\Test_ExporterMSF\\MSF_TEST_OUT\\MSF_TEST_OUT.msf";
+  msfFileNameOut = GET_TEST_DATA_DIR();
+  msfFileNameOut<<"/MSF_TEST_OUT/MSF_TEST_OUT.msf";
 
-  msfFileNameOut.Replace("/","\\");
   storageImport->SetURL(msfFileNameOut.c_str());
   CPPUNIT_ASSERT ( storageImport->Restore() == MAF_OK );
 
@@ -246,8 +236,7 @@ void mafOpExporterMSFTest::TestExportMSF2()
   mafVME *slicerExported = volume->GetChild(0);
   slicerExported->Update();
   CPPUNIT_ASSERT( slicerExported->GetOutput()->GetAbsMatrix()->Equals(slicer->GetOutput()->GetAbsMatrix()) );
-
-
+	
   mafDEL(op);
   mafDEL(storageExport);
   mafDEL(storageImport);

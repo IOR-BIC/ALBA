@@ -194,7 +194,7 @@ void mafTest::CompareImage(mafString suiteName, mafString imageName, int index)
 mafString mafTest::GetTestDataDir(mafString suiteName)
 {
 	wxString testDataFolder = m_WorkingDir;
-	testDataFolder += "//" + suiteName;
+	testDataFolder += "\\" + suiteName;
 
 	if (!wxDirExists(testDataFolder))
 	{
