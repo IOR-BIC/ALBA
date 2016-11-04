@@ -53,16 +53,12 @@ void mafVMEMeshAnsysTextImporterTest::TestFixture()
 
 void mafVMEMeshAnsysTextImporterTest::BeforeTest()
 {
-  // single test case log
-  m_Log = vtkFileOutputWindow::New();
-  m_Log->SetInstance(m_Log);
-  m_Log->SetFileName("test.log");
-  m_Log->AppendOn();   
+ 
 }
 
 void mafVMEMeshAnsysTextImporterTest::AfterTest()
 {
-  m_Log->Delete();
+
 }
 
 void mafVMEMeshAnsysTextImporterTest::TestConstructor()

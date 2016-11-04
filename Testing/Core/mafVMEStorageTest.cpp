@@ -297,10 +297,6 @@ void mafVMEStorageTest::TestSaveAs()
 void mafVMEStorageTest::CreateVMETestTree()
 //----------------------------------------------------------------------------
 {
-  vtkMAFSmartPointer<vtkFileOutputWindow> log;
-  log->SetInstance(log);
-  log->SetFileName("testMSF.log"); // log of VTK error messages
-
   // plug the custom attribute in the Node Factory
   mafPlugAttribute<mafClientData>("Simple attribute for attaching actors to VMEs");
 
@@ -393,6 +389,7 @@ void mafVMEStorageTest::CreateVMETestTree()
   trans.RotateZ(90,POST_MULTIPLY);
   trans.Translate(-.75,0,0,POST_MULTIPLY);
   vmorph->SetPose(trans.GetMatrix(),0); // set pose at time 0
+
 }
 
 //----------------------------------------------------------------------------
