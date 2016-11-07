@@ -831,26 +831,30 @@ void mafViewGlobalSlice::CameraUpdate()
 void mafViewGlobalSlice::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
-	Superclass::VmeShow(vme,show);
+	Superclass::VmeShow(vme, show);
 
-  mafSceneNode *sceneNode = m_Sg->Vme2Node(vme);
-	mafPipeVolumeSlice * selVolPipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
-  if (sceneNode == m_SelectedVolume && selVolPipe)
-  {
-    //m_Gui->Enable(ID_LUT,true);
-    m_Gui->Enable(ID_POS_SLIDER,true);
-    if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
-    {
-      m_Opacity   = selVolPipe->GetSliceOpacity();
-      selVolPipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
-      m_Gui->Enable(ID_OPACITY_SLIDER,true);
-      m_Gui->Enable(ID_TRILINEAR_INTERPOLATION_ON,true);
-    }
-    m_Gui->Update();
-  }
-  else if (sceneNode == m_SelectedVolume)
-  {
-    m_Gui->Enable(ID_POS_SLIDER,false);
-    m_Gui->Update();
-  }
+	mafSceneNode *sceneNode = m_Sg->Vme2Node(vme);
+
+	if (m_SelectedVolume != NULL)
+	{
+		mafPipeVolumeSlice * selVolPipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
+		if (sceneNode == m_SelectedVolume && selVolPipe)
+		{
+			//m_Gui->Enable(ID_LUT,true);
+			m_Gui->Enable(ID_POS_SLIDER, true);
+			if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
+			{
+				m_Opacity = selVolPipe->GetSliceOpacity();
+				selVolPipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+				m_Gui->Enable(ID_OPACITY_SLIDER, true);
+				m_Gui->Enable(ID_TRILINEAR_INTERPOLATION_ON, true);
+			}
+		}
+		else if (sceneNode == m_SelectedVolume)
+		{
+			m_Gui->Enable(ID_POS_SLIDER, false);
+		}
+
+		m_Gui->Update();
+	}
 }
