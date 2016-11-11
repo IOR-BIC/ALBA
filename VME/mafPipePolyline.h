@@ -68,7 +68,7 @@ public:
 
   /** create the pipeline. */
 	virtual void Create(mafSceneNode *n);
-  /** when vme is selected, it can be catch the event in select funztion. */
+  /** when vme is selected, it can be catch the event in select function. */
 	virtual void Select(bool select); 
 
 	/** Set the visual representation of the polyline.

@@ -68,7 +68,6 @@
 #include "vtkSplineFilter.h"
 #include "vtkPolyDataMapper.h"
 
-
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipePolyline);
 //----------------------------------------------------------------------------
@@ -76,7 +75,6 @@ mafCxxTypeMacro(mafPipePolyline);
 //----------------------------------------------------------------------------
 mafPipePolyline::mafPipePolyline()
 :mafPipeWithScalar()
-//----------------------------------------------------------------------------
 {
 	m_Representation  = -1; // line by default
 	m_TubeRadius      = 1.0;
@@ -96,14 +94,13 @@ mafPipePolyline::mafPipePolyline()
 	m_OutlineProperty = NULL;
 	m_OutlineActor    = NULL;
 	m_AppendPolyData  = NULL;
-	m_SplineFilter = NULL;
+	m_SplineFilter		= NULL;
 	
   m_SplineMode      = -1;
 	m_SplineBias = m_SplineContinuty = m_SplineTension = 0;
 }
 //----------------------------------------------------------------------------
 void mafPipePolyline::Create(mafSceneNode *n)
-//----------------------------------------------------------------------------
 {
 	Superclass::Create(n);
 
@@ -120,10 +117,10 @@ void mafPipePolyline::Create(mafSceneNode *n)
 
 	InitializeFromTag();
 
-  double sr[2] = {0,1};
-  vtkDataArray *scalarArray = data->GetPointData()->GetScalars();
-  if(scalarArray)
-    scalarArray->GetRange(sr);
+	double sr[2] = { 0,1 };
+	vtkDataArray *scalarArray = data->GetPointData()->GetScalars();
+	if (scalarArray)
+		scalarArray->GetRange(sr);
 
 	vtkNEW(m_Sphere);
 	m_Sphere->SetRadius(m_SphereRadius);
@@ -133,8 +130,8 @@ void mafPipePolyline::Create(mafSceneNode *n)
 	vtkNEW(m_Glyph);
 	m_Glyph->SetInput(data);
 	m_Glyph->SetSource(m_Sphere->GetOutput());
-  m_Glyph->SetScaleModeToDataScalingOff();
-  m_Glyph->SetRange(sr);
+	m_Glyph->SetScaleModeToDataScalingOff();
+	m_Glyph->SetRange(sr);
 
 	vtkMAFSmartPointer<vtkKochanekSpline> spline;
 	vtkNEW(m_SplineFilter);
@@ -143,7 +140,7 @@ void mafPipePolyline::Create(mafSceneNode *n)
 	m_SplineFilter->SetInput(data);
 	m_SplineFilter->SetSpline(spline);
 	m_SplineFilter->Update();
-	
+
 	vtkNEW(m_Tube);
 	m_Tube->UseDefaultNormalOff();
 	m_Tube->SetInput(data);
@@ -153,8 +150,8 @@ void mafPipePolyline::Create(mafSceneNode *n)
 
 	vtkNEW(m_Mapper);
 	m_AppendPolyData = vtkAppendPolyData::New();
-	
-	if(m_Vme->IsAnimated())
+
+	if (m_Vme->IsAnimated())
 		m_Mapper->ImmediateModeRenderingOn();
 	else
 		m_Mapper->ImmediateModeRenderingOff();
@@ -163,41 +160,40 @@ void mafPipePolyline::Create(mafSceneNode *n)
 
 	ManageScalarOnExecutePipe(data);
 
-
 	m_Actor = vtkActor::New();
 	m_Actor->SetMapper(m_Mapper);
 
-  if(m_ObjectMaterial)
-  {
-    if (m_ObjectMaterial->m_MaterialType == mmaMaterial::USE_LOOKUPTABLE)
-    {
-      /*m_UseVTKProperty = 0;
-      m_UseLookupTable = 1;*/
-      m_Mapper->SetScalarModeToUsePointData();
-      m_Mapper->ScalarVisibilityOn();
+	if (m_ObjectMaterial)
+	{
+		if (m_ObjectMaterial->m_MaterialType == mmaMaterial::USE_LOOKUPTABLE)
+		{
+			/*m_UseVTKProperty = 0;
+			m_UseLookupTable = 1;*/
+			m_Mapper->SetScalarModeToUsePointData();
+			m_Mapper->ScalarVisibilityOn();
 			SetLookupTableToMapper();
-      m_Mapper->SetScalarRange(sr);
-    }
-    if (m_ObjectMaterial->m_MaterialType == mmaMaterial::USE_VTK_PROPERTY)
-    {
-      /*m_UseVTKProperty = 1;
-      m_UseLookupTable = 0;*/
-      m_Actor->SetProperty(m_ObjectMaterial->m_Prop);
-    }
-  }
-  m_Mapper->Modified();
+			m_Mapper->SetScalarRange(sr);
+		}
+		if (m_ObjectMaterial->m_MaterialType == mmaMaterial::USE_VTK_PROPERTY)
+		{
+			/*m_UseVTKProperty = 1;
+			m_UseLookupTable = 0;*/
+			m_Actor->SetProperty(m_ObjectMaterial->m_Prop);
+		}
+	}
+	m_Mapper->Modified();
 
 	m_AssemblyFront->AddPart(m_Actor);
 
 	// selection highlight
 	m_OutlineBox = vtkOutlineCornerFilter::New();
-	m_OutlineBox->SetInput(data);  
+	m_OutlineBox->SetInput(data);
 
 	m_OutlineMapper = vtkPolyDataMapper::New();
 	m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
 
 	m_OutlineProperty = vtkProperty::New();
-	m_OutlineProperty->SetColor(1,1,1);
+	m_OutlineProperty->SetColor(1, 1, 1);
 	m_OutlineProperty->SetAmbient(1);
 	m_OutlineProperty->SetRepresentationToWireframe();
 	m_OutlineProperty->SetInterpolationToFlat();
@@ -207,14 +203,13 @@ void mafPipePolyline::Create(mafSceneNode *n)
 	m_OutlineActor->VisibilityOff();
 	m_OutlineActor->PickableOff();
 	m_OutlineActor->SetProperty(m_OutlineProperty);
-	  
-  m_AssemblyFront->AddPart(m_OutlineActor);
+
+	m_AssemblyFront->AddPart(m_OutlineActor);
 
 	UpdateProperty();
 }
 //----------------------------------------------------------------------------
 mafPipePolyline::~mafPipePolyline()
-//----------------------------------------------------------------------------
 {
 	m_Vme->GetEventSource()->RemoveObserver(this);
 
@@ -235,22 +230,21 @@ mafPipePolyline::~mafPipePolyline()
 }
 //----------------------------------------------------------------------------
 void mafPipePolyline::Select(bool sel)
-//----------------------------------------------------------------------------
 {
 	m_Selected = sel;
-	if(m_Actor && m_Actor->GetVisibility()) 
+	if (m_Actor && m_Actor->GetVisibility())
 	{
 		m_OutlineActor->SetVisibility(sel);
 	}
 }
 //----------------------------------------------------------------------------
 mafGUI *mafPipePolyline::CreateGui()
-//----------------------------------------------------------------------------
-{
-	const wxString representation_string[] = {_("Lines"), _("Tubes"), _("Spheres")};
+{	
 	m_Gui = new mafGUI(this);
+
 	//m_Gui->Combo(ID_SCALAR,"",&m_Scalar,numberOfArrays,m_ScalarsName);
-  m_Gui->Combo(ID_POLYLINE_REPRESENTATION,"",&m_Representation,3,representation_string);
+	const wxString representation_string[] = { _("Lines"), _("Tubes"), _("Spheres") };
+	m_Gui->Combo(ID_POLYLINE_REPRESENTATION,"",&m_Representation,3,representation_string);
 	m_Gui->Bool(ID_SHOW_SPHERES, _("Show Spheres"), &m_ShowSpheres,true);
 	m_Gui->Bool(ID_SPLINE, _("Spline"), &m_SplineMode,true);
 
@@ -259,18 +253,22 @@ mafGUI *mafPipePolyline::CreateGui()
 	m_Gui->Double(ID_TUBE_RADIUS,_("Radius"),&m_TubeRadius,0);
 	m_Gui->Double(ID_TUBE_RESOLUTION,_("Resolution"),&m_TubeResolution,0);
 	m_Gui->Bool(ID_TUBE_CAPPING,_("Capping"),&m_Capping,true);
+	
 	m_Gui->Divider(2);
 	m_Gui->Label(_("Spheres:"));
 	m_Gui->Bool(ID_SCALAR_DIMENSION,_("Scalar dim."),&m_ScalarDim,0,_("Check to scale the sphere radius proportional to the selected scalars"));
 	m_Gui->Double(ID_SPHERE_RADIUS,_("Radius"),&m_SphereRadius,0);
 	m_Gui->Double(ID_SPHERE_RESOLUTION,_("Resolution"),&m_SphereResolution,0);
+	
 	m_Gui->Divider(2);
 	m_Gui->Label(_("Spline:"));
 	m_Gui->FloatSlider(ID_SPLINE_PARAMETERS, "Bias", &m_SplineBias, -1, 1);
 	m_Gui->FloatSlider(ID_SPLINE_PARAMETERS, "Continuity", &m_SplineContinuty, -1, 1);
 	m_Gui->FloatSlider(ID_SPLINE_PARAMETERS, "Tension", &m_SplineTension, -1, 1);
 	m_Gui->Divider(2);
+
 	EnableDisableGui();
+
 	m_Gui->Divider();
   m_MaterialButton = new mafGUIMaterialButton(m_Vme,this);
   m_Gui->AddGui(m_MaterialButton->GetGui());
@@ -291,100 +289,99 @@ void mafPipePolyline::EnableDisableGui()
 		m_Gui->Enable(ID_SHOW_SPHERES, m_Representation != SPHERES);
 		m_Gui->Enable(ID_SPLINE, m_Representation != SPHERES);
 		m_Gui->Enable(ID_TUBE_RESOLUTION, m_Representation == TUBES);
-		m_Gui->Enable(ID_SCALAR_DIMENSION, m_ShowSpheres);
-		m_Gui->Enable(ID_SPHERE_RADIUS, m_ShowSpheres);
-		m_Gui->Enable(ID_SPHERE_RESOLUTION, m_ShowSpheres);
+		m_Gui->Enable(ID_SCALAR_DIMENSION, m_ShowSpheres || m_Representation == SPHERES);
+		m_Gui->Enable(ID_SPHERE_RADIUS, m_ShowSpheres || m_Representation == SPHERES);
+		m_Gui->Enable(ID_SPHERE_RESOLUTION, m_ShowSpheres || m_Representation == SPHERES);
 		m_Gui->Enable(ID_SPLINE_PARAMETERS, m_SplineMode);
 	}
 }
 
 //----------------------------------------------------------------------------
 void mafPipePolyline::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
-		switch(e->GetId())
+		switch (e->GetId())
 		{
-		  case ID_POLYLINE_REPRESENTATION:
-			{
-				SetRepresentation(m_Representation);
-			}
+		case ID_POLYLINE_REPRESENTATION:
+		{
+			SetRepresentation(m_Representation);
+		}
+		break;
+		case ID_TUBE_RADIUS:
+		{
+			m_Tube->SetRadius(m_TubeRadius);
+			mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_RADIUS");
+			item->SetValue(m_TubeRadius);
+			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		}
+		break;
+		case ID_SHOW_SPHERES:
+		{
+			SetShowSphere(m_ShowSpheres);
+		}
+		break;
+		case ID_TUBE_CAPPING:
+		{
+			m_Tube->SetCapping(m_Capping);
+			mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_CAPPING");
+			item->SetValue(m_Capping);
+			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		}
+		break;
+		case ID_TUBE_RESOLUTION:
+		{
+			m_Tube->SetNumberOfSides(m_TubeResolution);
+			mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_RESOLUTION");
+			item->SetValue(m_TubeResolution);
+			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		}
+		break;
+		case ID_SPHERE_RADIUS:
+		{
+			m_Sphere->SetRadius(m_SphereRadius);
+			mafTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RADIUS");
+			item->SetValue(m_SphereRadius);
+			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		}
+		break;
+		case ID_SPHERE_RESOLUTION:
+		{
+			m_Sphere->SetPhiResolution(m_SphereResolution);
+			m_Sphere->SetThetaResolution(m_SphereResolution);
+			mafTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RESOLUTION");
+			item->SetValue(m_SphereResolution);
+			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		}
+		break;
+		case ID_SCALAR_DIMENSION:
+			UpdateProperty();
+			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 			break;
-		  case ID_TUBE_RADIUS:
-			{
-				m_Tube->SetRadius(m_TubeRadius);
-				mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_RADIUS");
-				item->SetValue(m_TubeRadius);
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-			}
-			break;
-			case ID_SHOW_SPHERES:
-			{
-				SetShowSphere(m_ShowSpheres);
-			}
-			break;
-		  case ID_TUBE_CAPPING:
-			{
-				m_Tube->SetCapping(m_Capping);
-				mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_CAPPING");
-				item->SetValue(m_Capping);
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-			}
-			break;
-		  case ID_TUBE_RESOLUTION:
-			{
-				m_Tube->SetNumberOfSides(m_TubeResolution);
-				mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_RESOLUTION");
-				item->SetValue(m_TubeResolution);
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-			}
-			break;
-		  case ID_SPHERE_RADIUS:
-			{
-				m_Sphere->SetRadius(m_SphereRadius);
-				mafTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RADIUS");
-				item->SetValue(m_SphereRadius);
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-			}
-			break;
-		  case ID_SPHERE_RESOLUTION:
-			{
-				m_Sphere->SetPhiResolution(m_SphereResolution);
-				m_Sphere->SetThetaResolution(m_SphereResolution);
-				mafTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RESOLUTION");
-				item->SetValue(m_SphereResolution);
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-			}
-			break;
-		  case ID_SCALAR_DIMENSION:
-			  UpdateProperty();
-			  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-			break;
-      case ID_SPLINE:
-      {
-        mafTagItem *item = m_Vme->GetTagArray()->GetTag("SPLINE_MODE");
-        item->SetValue(m_SplineMode);
-        UpdateProperty();
-				EnableDisableGui();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));        
-      }
-			break;
-			case ID_SPLINE_PARAMETERS:
-			{
-				vtkKochanekSpline *spline=(vtkKochanekSpline *)m_SplineFilter->GetSpline();
-				spline->SetDefaultBias(m_SplineBias);
-				spline->SetDefaultTension(m_SplineTension);
-				spline->SetDefaultContinuity(m_SplineContinuty);
-				m_SplineFilter->SetSpline(spline);
-				m_SplineFilter->Modified();
-				m_SplineFilter->Update();
-				UpdateProperty();
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-			}
-			break;
-		  default:
-			  Superclass::OnEvent(e);
+		case ID_SPLINE:
+		{
+			mafTagItem *item = m_Vme->GetTagArray()->GetTag("SPLINE_MODE");
+			item->SetValue(m_SplineMode);
+			UpdateProperty();
+			EnableDisableGui();
+			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		}
+		break;
+		case ID_SPLINE_PARAMETERS:
+		{
+			vtkKochanekSpline *spline = (vtkKochanekSpline *)m_SplineFilter->GetSpline();
+			spline->SetDefaultBias(m_SplineBias);
+			spline->SetDefaultTension(m_SplineTension);
+			spline->SetDefaultContinuity(m_SplineContinuty);
+			m_SplineFilter->SetSpline(spline);
+			m_SplineFilter->Modified();
+			m_SplineFilter->Update();
+			UpdateProperty();
+			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		}
+		break;
+		default:
+			Superclass::OnEvent(e);
 			break;
 		}
 	}
@@ -393,58 +390,56 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 		UpdateActiveScalarsInVMEDataVectorItems();
 		UpdateProperty();
 	}
-  else if (maf_event->GetSender() == m_Vme)
-  {
-    if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
-    {
+	else if (maf_event->GetSender() == m_Vme)
+	{
+		if (maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
+		{
 			UpdateActiveScalarsInVMEDataVectorItems();
 			UpdateProperty();
-    }
-  }
-  
+		}
+	}
 }
 //----------------------------------------------------------------------------
 void mafPipePolyline::UpdateProperty(bool fromTag)
-//----------------------------------------------------------------------------
 {
-  if(!m_Vme)
-    return;
+	if (!m_Vme)
+		return;
 
 	mafVMEOutputPolyline *out_polyline = mafVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
 	out_polyline->Update();
 	vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
-  data->Update();
+	data->Update();
 
-  if(data->GetNumberOfPoints() <= 0) return;
+	if (data->GetNumberOfPoints() <= 0) return;
 	data->Modified();
 	data->Update();
 
-  if(m_Mapper)
-  {
+	if (m_Mapper)
+	{
 		m_AppendPolyData->RemoveAllInputs();
 
 		if (m_SplineMode == true)
 			data = m_SplineFilter->GetOutput();
 
-	  if (m_Representation == TUBES)
-	  {
-      m_Tube->SetInput(data);
+		if (m_Representation == TUBES)
+		{
+			m_Tube->SetInput(data);
 			m_AppendPolyData->AddInput(m_Tube->GetOutput());
-	  }
-		
+		}
+
 		if (m_Representation == LINES)
 		{
 			m_AppendPolyData->AddInput(data);
 		}
-		
-	  if (m_ShowSpheres)
-	  {
-      m_Glyph->Update();
-		  m_Glyph->Modified();
-		 
-      m_AppendPolyData->AddInput(m_Glyph->GetOutput());
-	  }
-  }
+
+		if (m_ShowSpheres)
+		{
+			m_Glyph->Update();
+			m_Glyph->Modified();
+
+			m_AppendPolyData->AddInput(m_Glyph->GetOutput());
+		}
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -462,7 +457,6 @@ void mafPipePolyline::ExecutePipe()
 
 //----------------------------------------------------------------------------
 void mafPipePolyline::InitializeFromTag()
-//----------------------------------------------------------------------------
 {
 	mafTagItem *item = NULL;
 	if (!m_Vme->GetTagArray()->IsTagPresent("REPRESENTATION"))
@@ -488,7 +482,6 @@ void mafPipePolyline::InitializeFromTag()
 		cppDEL(item);
 	}
 	
-
 	if (!m_Vme->GetTagArray()->IsTagPresent("SPHERE_RADIUS"))
 	{
 		item = new mafTagItem();
@@ -562,11 +555,10 @@ void mafPipePolyline::InitializeFromTag()
 void mafPipePolyline::SetRepresentation(int representation)
 {
 	m_Representation = representation;
-	if (m_Representation == SPHERES)
-		SetShowSphere(true);
+	
 	EnableDisableGui();
 	UpdateProperty();
-	
+
 	mafTagItem *item = m_Vme->GetTagArray()->GetTag("REPRESENTATION");
 	item->SetValue(m_Representation);
 
@@ -584,7 +576,6 @@ void mafPipePolyline::SetShowSphere(bool show)
 
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
-
 //----------------------------------------------------------------------------
 void mafPipePolyline::SetRadius(double radius)
 //----------------------------------------------------------------------------
@@ -610,7 +601,6 @@ void mafPipePolyline::SetColor(double color[3])
 		m_Actor->Modified();
 	}
 }
-
 //----------------------------------------------------------------------------
 void mafPipePolyline::SetOpacity(double opacity)
 //----------------------------------------------------------------------------
