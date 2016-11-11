@@ -171,6 +171,7 @@ void mafPipePolylineTest::TestPipeExecution()
 		case TEST_GLYPH:
 		{
 			pipePolyline->SetRepresentation(mafPipePolyline::SPHERES);
+			pipePolyline->SetShowSphere(true);
 			pipePolyline->OnEvent(&mafEvent(this, mafPipePolyline::ID_POLYLINE_REPRESENTATION));
 		}
 		break;
