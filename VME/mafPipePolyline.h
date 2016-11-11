@@ -103,6 +103,8 @@ public:
   /**Set Opacity of the actors */
   void SetOpacity(double value);
 
+	void SetShowSphere(bool show);
+
   /**Set if actor is pickable */
   void SetActorPicking(int enable);
 
@@ -186,8 +188,5 @@ protected:
 	virtual mafGUI  *CreateGui();
 
 	void EnableDisableGui();
-
-private:
-	void SetShowSphere(bool show);
 };
 #endif // __mafPipePolyline_H__
