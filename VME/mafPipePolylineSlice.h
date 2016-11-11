@@ -26,23 +26,33 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-class vtkOutlineCornerFilter;
-class vtkPolyDataMapper;
-class vtkActor;
-class vtkProperty;
+
+class mmaMaterial;
+class mafGUIMaterialButton;
 class mafAxes;
+class vtkActor;
 class vtkMAFFixedCutter;
 class vtkPlane;
-class vtkMAFTubeFilter;
 class vtkPolyData;
 class vtkMAFPolyDataToSinglePolyLine;
 class vtkMAFToLinearTransform;
 class vtkClipPolyData;
+class vtkOutlineCornerFilter;
+class vtkPolyDataMapper;
+class vtkActor;
+class vtkProperty;
+class vtkMAFTubeFilter;
+class vtkGlyph3D;
+class vtkSphereSource;
 class vtkAppendPolyData;
+class vtkColorTransferFunction;
+class vtkPolyData;
+class vtkCaptionActor2D;
+class vtkSplineFilter;
 
 /**
   class name: mafPipePolylineSlice.
-  Pipe which manage the visualisation of the section of a polyline.
+  Pipe which manage the visualization of the section of a polyline.
 */
 class MAF_EXPORT mafPipePolylineSlice : public mafPipeSlice
 {
@@ -51,33 +61,54 @@ public:
   mafTypeMacro(mafPipePolylineSlice,mafPipeSlice);
 
   /** Constructor. */
-               mafPipePolylineSlice();
+  mafPipePolylineSlice();
+
   /** Destructor. */
-  virtual     ~mafPipePolylineSlice ();
+  virtual ~mafPipePolylineSlice ();
+
+	/** Pipe creation */
+	virtual void Create(mafSceneNode *n /*,bool use_axes = true*/); //Can't add parameters - is Virtual
+
+  /** called if vme is selected  */
+	virtual void Select(bool select);
+	
+	/** process events coming from gui */
+	virtual void OnEvent(mafEventBase *maf_event);
 
   /**Return the thickness of the border*/	
-  double GetThickness();
+	double GetThickness() { return m_Border; };
 
   /**Set the thickness value*/
   void SetThickness(double thickness); 
 
   /**Return the radius of the tube*/	
-  double GetRadius();
+	double GetRadius() { return m_TubeRadius; };
 
   /**Set the radius value of the tube*/
-  void SetRadius(double radius); 
+	void SetRadius(double radius) { m_TubeRadius = radius; };
 
-  /** process events coming from gui */
-  virtual void OnEvent(mafEventBase *maf_event);
+	/**Set Opacity of the actors */
+	void SetOpacity(double value);
 
-  /** Pipe creation */
-  virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
-  /** called if vme is selected  */
-  virtual void Select(bool select); 
-  
+	/** Set color of the polyline */
+	void SetColor(double color[3]);
+
   /** Set the origin and normal of the slice.
   Both, Origin and Normal may be NULL, if the current value is to be preserved. */
   /*virtual*/ void SetSlice(double* Origin, double* Normal);  
+
+	/** Set the visual representation of the polyline.
+	Acceptable values are 0 (POLYLINE), 1 (TUBE) or 2 (SPHERE GLYPHED).*/
+	void SetRepresentation(int representation);
+
+	/** Set the polyline representation as simple polyline.*/
+	void SetRepresentationToPolyline() { SetRepresentation(LINES); };
+
+	/** Set the polyline representation as tube.*/
+	void SetRepresentationToTube() { SetRepresentation(TUBES); };
+
+	/** Set the polyline representation as sphere glyphed polyline.*/
+	void SetRepresentationToGlyph() { SetRepresentation(SPHERES); };
 
   /** Set spline mode of the polyline */
   void SetSplineMode(int flag){m_SplineMode = flag;};
@@ -99,12 +130,8 @@ public:
   /** Set fill variable of the polyline to OFF*/
   void FillOff(){SetFill(0);UpdateProperty();};
 
-  /** Function that retrieve a spline polyline when  input is a polyline */ 
-  vtkPolyData *SplineProcess(vtkPolyData *polyData);
-
   /** Show actor of sliced polyline*/
   void ShowActorOn();
-
   /** Hide actor of sliced polyline*/
   void ShowActorOff();
 
@@ -117,66 +144,117 @@ public:
     ID_TEXTURE_MAPPING_MODE,
     ID_BORDER_CHANGE,
     ID_RADIUS_CHANGE,
-    ID_SPLINE,
     ID_FILL,
-    ID_LAST,
+		ID_POLYLINE_REPRESENTATION,
+		ID_TUBE_RADIUS,
+		ID_TUBE_RESOLUTION,
+		ID_TUBE_CAPPING,
+		ID_SPHERE_RADIUS,
+		ID_SPHERE_RESOLUTION,
+		ID_SCALAR_DIMENSION,
+		ID_SCALAR,
+		ID_SHOW_SPHERES,
+		ID_SPLINE,
+		ID_SPLINE_PARAMETERS,
+		ID_LAST
   };
 
+	enum POLYLINE_REPRESENTATION
+	{
+		LINES = 0,
+		TUBES,
+		SPHERES,
+	};
+
   /** gui creation */
-  virtual mafGUI  *CreateGui();
-  /** update all properties of the pipe */
+  virtual mafGUI *CreateGui();
+  
+	/** update all properties of the pipe */
   void UpdateProperty();
 
-  /** enable the check on a region of interest */
-  void ROIEnable(bool enable){m_RoiEnable = enable;}
-  /** define a region of interest  in which the section is visible */
-  void SetROI(double bounds[6]);
-  /** set region of interests as maximum */
-  void SetMaximumROI();
+	/** Core of the pipe */
+	////virtual void ExecutePipe();
+
+	/** Set Tube Capping */
+	void SetTubeCapping(int capping) { m_Capping = capping; };
+	/** Set/Get Tube Capping */
+	int GetTubeCapping() { return m_Capping; };
+
+	/** Set Tube Resolution */
+	void SetTubeResolution(double resolution);
+	/** Get Tube Resolution */
+	double GetTubeResolution() { return m_TubeResolution; };
+
+	/** Set Glyph Resolution */
+	void SetSphereResolution(double resolution);
+	/** Get Glyph Resolution */
+	double GetGlyphResolution() { return m_SphereResolution; };
 
   /**Set if actor is pickable */
   void SetActorPicking(int enable);
+
+	void ShowSpheres(bool show) { m_ShowSpheres = show; };
+
+	void SetSphereRadius(double radius) { m_SphereRadius = radius; };
 
 protected:
   /** cap the regions*/
   vtkPolyData *RegionsCapping(vtkPolyData* inputCutters);
   /** apply a capping filter  */
   vtkPolyData *CappingFilter(vtkPolyData* inputBorder);
-  /** execute filter which apply region of interest*/
-  vtkPolyData *ExecuteROI(vtkPolyData *polydata);
 
-  vtkPolyDataMapper	      *m_Mapper;
-  vtkActor                *m_Actor;
-	vtkMAFTubeFilter           *m_Tube;
-	vtkMAFTubeFilter           *m_TubeRadial;
-  vtkOutlineCornerFilter  *m_OutlineBox;
-  vtkPolyDataMapper       *m_OutlineMapper;
-  vtkProperty             *m_OutlineProperty;
-  vtkActor                *m_OutlineActor;
-  mafAxes                 *m_Axes;
-  vtkPlane				        *m_Plane;
-  vtkMAFFixedCutter		      *m_Cutter;
-  vtkPolyData             *m_PolyFilteredLine;
-  vtkMAFPolyDataToSinglePolyLine *m_PolydataToPolylineFilter;
-  vtkMAFToLinearTransform *m_VTKTransform;
-  double				           m_Border;
-  double                   m_Radius;
-  int                      m_SplineMode;
-  int                      m_Fill;
+  vtkPolyDataMapper								*m_Mapper;
+  vtkActor												*m_Actor;
+  vtkPlane												*m_Plane;
+  vtkMAFFixedCutter								*m_Cutter;
+  vtkPolyData											*m_PolyFilteredLine;
+  vtkMAFPolyDataToSinglePolyLine	*m_PolydataToPolylineFilter;
+  vtkMAFToLinearTransform					*m_VTKTransform;
+	vtkSphereSource									*m_Sphere;
+	vtkGlyph3D											*m_Glyph;
+	vtkMAFTubeFilter								*m_Tube;
+	vtkOutlineCornerFilter					*m_OutlineBox;
+	vtkPolyDataMapper								*m_OutlineMapper;
+	vtkProperty											*m_OutlineProperty;
+	vtkActor												*m_OutlineActor;
+	vtkAppendPolyData								*m_AppendPolyData;
+	vtkAppendPolyData								*m_CappingPolyData;
+	vtkSplineFilter									*m_SplineFilter;
+	  
+	vtkClipPolyData									*m_ClipPolyData;
+	vtkClipPolyData									*m_ClipPolyDataUp;
+	vtkClipPolyData									*m_ClipPolyDataDown;
 
-  vtkClipPolyData          *m_ClipPolyData;
-  vtkClipPolyData          *m_ClipPolyDataUp;
-  vtkClipPolyData          *m_ClipPolyDataDown;
-  double  m_SplineCoefficient;
+	vtkPolyData											*m_PolyData;
 
-  vtkPolyData *m_PolyData;
-  vtkAppendPolyData * m_AppendPolyData;
+	mafAxes													*m_Axes;
+	mafGUIMaterialButton						*m_MaterialButton;
 
-  int m_ScalarVisibility;
-  int m_RenderingDisplayListFlag;
+	double	m_Border;
+  int			m_Fill;
 
-  int m_RoiEnable;
-  double  m_ROI[6];
-  
+	double	m_Opacity;
+
+	int			m_ScalarVisibility;
+
+	int			m_ScalarDim;
+	int			m_Representation;
+	int			m_Capping;
+	int			m_SplineMode;
+	int			m_ShowSpheres;
+
+	double	m_TubeRadius;
+	double	m_SphereRadius;
+	double	m_TubeResolution;
+	double	m_SphereResolution;
+
+	double	m_SplineBias;
+	double	m_SplineContinuty;
+	double	m_SplineTension;
+
+	/** Initialize representation, capping, radius and resolution variables.*/
+	void InitializeFromTag();
+
+	void EnableDisableGui();
 };  
 #endif // __mafPipePolylineSlice_H__B
