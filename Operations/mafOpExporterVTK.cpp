@@ -111,7 +111,7 @@ void mafOpExporterVTK::OpRun()
 	m_Gui->Bool(ID_VTK_BINARY_FILE,"binary",&m_Binary,0);
 	m_Gui->Label("absolute matrix",true);
 	m_Gui->Bool(ID_ABS_MATRIX,"apply",&m_ABSMatrixFlag,0);
-	if (m_Input->IsA("mafVMESurface") || m_Input->IsA("mafVMEPointSet") || m_Input->IsA("mafVMEGroup")||m_Input->IsA("mafVMEMesh"))
+	if (m_Input->IsA("mafVMESurface") || m_Input->IsA("mafVMEPointSet") || m_Input->IsA("mafVMEGroup")||m_Input->IsA("mafVMEMesh")||m_Input->IsA("mafVMEPolyline"))
 		m_Gui->Enable(ID_ABS_MATRIX,true);
 	else
 		m_Gui->Enable(ID_ABS_MATRIX,false);
