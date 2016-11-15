@@ -34,6 +34,12 @@ IF (WIN32)
 	CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/app.ico ${PROJECT_BINARY_DIR}/app.ico COPYONLY)
   ADD_EXECUTABLE(${PROJECT_NAME} WIN32 ${PROJECT_SRCS} ${PROJECT_BINARY_DIR}/app.rc)
   
+    # automatic values from parabuild created temporary environment variable
+  SET(BUILD_NUMBER $ENV{BUILD_NUMBER} CACHE INTERNAL "build number")
+  
+  # create the main version variable:
+  SET(APP_VERSION "Build_${BUILD_NUMBER}" CACHE INTERNAL "big version identifier concatenating other identifier")
+  
   # config installer file
   # set the installer directory variable
   SET(APP_INSTALLER_DIR ${PROJECT_SOURCE_DIR}/Installer)
