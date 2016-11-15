@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: MedalApp
+ Module: ExampleApp
  Authors: Matteo Giacomoni - Daniele Giunchi - Gianluigi Crimi
  
  Copyright (c) B3C
@@ -21,7 +21,7 @@
 #include "mafLogicWithManagers.h" 
 
 // ============================================================================
-class MedalApp : public wxApp
+class ExampleApp : public wxApp
 // ============================================================================
 {
 public:
@@ -32,5 +32,5 @@ protected:
 
 	void OnFatalException();
 };
-DECLARE_APP(MedalApp)
+DECLARE_APP(ExampleApp)
 #endif //__exMedicalApp_H__
