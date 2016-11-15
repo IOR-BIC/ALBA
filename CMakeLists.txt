@@ -115,7 +115,7 @@ ENDIF (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 #Remove temporarily the BUILD_SHARED_LIBS because it is not possible to switch the compilation to dynamic.
 #SET(BUILD_SHARED_LIBS 0)
 # OPTION(BUILD_SHARED_LIBS "Build with shared libraries." OFF )
-OPTION(BUILD_MEDAL_APP "Build Medal App." ON )
+OPTION(BUILD_EXAMPLE_APP "Build Example App." ON )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
 OPTION(MAF_BUILD_MAFDLL "Build mafDLL.dll." OFF)
 OPTION(MAF_QA "Generate QA" OFF)
@@ -313,9 +313,9 @@ ENDIF(WIN32)
   #-----------------------------------------------------------------------------
   # Build examples too ?
   #-----------------------------------------------------------------------------
-  IF (BUILD_MEDAL_APP AND MAF_CAN_BUILD)
+  IF (BUILD_EXAMPLE_APP AND MAF_CAN_BUILD)
     SUBDIRS(Examples)
-  ENDIF (BUILD_MEDAL_APP AND MAF_CAN_BUILD)
+  ENDIF (BUILD_EXAMPLE_APP AND MAF_CAN_BUILD)
   
   #-----------------------------------------------------------------------------
   # QA stuff

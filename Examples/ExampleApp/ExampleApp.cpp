@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: MedalApp
+ Module: ExampleApp
  Authors: Matteo Giacomoni - Daniele Giunchi - Gianluigi Crimi
  
  Copyright (c) B3C
@@ -25,7 +25,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "MedalApp.h"
+#include "ExampleApp.h"
 #include "mafDecl.h"
 
 #include "mafVMEFactory.h"
@@ -190,10 +190,10 @@
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
-IMPLEMENT_APP(MedalApp)
+IMPLEMENT_APP(ExampleApp)
 
 //--------------------------------------------------------------------------------
-bool MedalApp::OnInit()
+bool ExampleApp::OnInit()
 //--------------------------------------------------------------------------------
 {
   mafPictureFactory::GetPictureFactory()->Initialize();	
@@ -216,7 +216,7 @@ bool MedalApp::OnInit()
 
 	m_Logic = new mafLogicWithManagers();
   
-	m_Logic->GetTopWin()->SetTitle("Medal App");
+	m_Logic->GetTopWin()->SetTitle("ExampleApp");
 
 	//m_Logic->PlugTimebar(false);
 	//m_Logic->PlugMenu(false);
@@ -523,14 +523,14 @@ bool MedalApp::OnInit()
 	return TRUE;
 }
 //--------------------------------------------------------------------------------
-int MedalApp::OnExit()
+int ExampleApp::OnExit()
 //--------------------------------------------------------------------------------
 {
 	cppDEL(m_Logic);
 	return 0;
 }
 //--------------------------------------------------------------------------------
-void MedalApp::OnFatalException()
+void ExampleApp::OnFatalException()
 //--------------------------------------------------------------------------------
 {
 	m_Logic->HandleException();
