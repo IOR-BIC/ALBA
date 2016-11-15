@@ -1,8 +1,8 @@
-PROJECT (MedalApp)
+PROJECT (ExampleApp)
 
 SET(PROJECT_SRCS 
-	MedalApp.cpp
-	MedalApp.h
+	ExampleApp.cpp
+	ExampleApp.h
 	mafOpInteractionOp.cpp
 	mafOpInteractionOp.h
 	exWizardSample.cpp
@@ -33,6 +33,24 @@ IF (WIN32)
 	CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/app.rc.in ${PROJECT_BINARY_DIR}/app.rc @ONLY)
 	CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/app.ico ${PROJECT_BINARY_DIR}/app.ico COPYONLY)
   ADD_EXECUTABLE(${PROJECT_NAME} WIN32 ${PROJECT_SRCS} ${PROJECT_BINARY_DIR}/app.rc)
+  
+  # config installer file
+  # set the installer directory variable
+  SET(APP_INSTALLER_DIR ${PROJECT_SOURCE_DIR}/Installer)
+  # convert it to Windows format
+  STRING (REPLACE "/" "\\" APP_INSTALLER_DIR_WIN ${APP_INSTALLER_DIR} )
+  # MESSAGE("variable APP_INSTALLER_DIR_WIN = " ${APP_INSTALLER_DIR_WIN})
+  
+  # installer executable will be written to this directory
+  SET(INSTALLER_EXECUTABLE_OUTPUT_DIR ${EXECUTABLE_OUTPUT_PATH} CACHE PATH "the installer executable will be written to this directory ")
+  # convert it to Windows format  
+  STRING (REPLACE "/" "\\" APP_INSTALLER_EXECUTABLE_OUTPUT_DIR_WIN ${INSTALLER_EXECUTABLE_OUTPUT_DIR})
+  SET(APP_INSTALLER_EXECUTABLE_OUTPUT_DIR_WIN ${APP_INSTALLER_EXECUTABLE_OUTPUT_DIR_WIN} CACHE INTERNAL "get the executable  from this directory")
+  # MESSAGE("variable APP_INSTALLER_EXECUTABLE_OUTPUT_DIR_WIN = " ${APP_INSTALLER_EXECUTABLE_OUTPUT_DIR_WIN})
+  
+  CONFIGURE_FILE(${APP_INSTALLER_DIR}/AppInstallerScript.nsi.in  ${EXECUTABLE_OUTPUT_PATH}/Release/AppInstallerScript.nsi @ONLY)
+  CONFIGURE_FILE(${MAF_BINARY_DIR}/INSTALLER/EnumUsersReg.nsh  ${EXECUTABLE_OUTPUT_PATH}/Release/EnumUsersReg.nsh @ONLY)
+  CONFIGURE_FILE(${MAF_BINARY_DIR}/INSTALLER/InstallerCommon.nsh  ${EXECUTABLE_OUTPUT_PATH}/Release/InstallerCommon.nsh @ONLY)
 ELSE (WIN32)
   ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS} )
 ENDIF (WIN32)

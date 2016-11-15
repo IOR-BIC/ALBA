@@ -1,4 +1,4 @@
 
-IF (EXISTS ${MAF_SOURCE_DIR}/Examples/MedalApp)
-  SUBDIRS(MedalApp)
-ENDIF (EXISTS ${MAF_SOURCE_DIR}/Examples/MedalApp)
+IF (EXISTS ${MAF_SOURCE_DIR}/Examples/ExampleApp)
+  SUBDIRS(ExampleApp)
+ENDIF (EXISTS ${MAF_SOURCE_DIR}/Examples/ExampleApp)
