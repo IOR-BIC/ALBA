@@ -1,0 +1,11 @@
+29a30,33
+> #ifndef MIN 
+> 	#define MIN( x, y ) ( (x) < (y) ? (x) : (y) )
+> #endif
+> 
+33d36
+< 
+389c392
+<       alignedStart = std::min<int>((alignedStart+alignedStep)%packetSize, innerSize);
+---
+>       alignedStart = MIN((alignedStart+alignedStep)%packetSize, innerSize);

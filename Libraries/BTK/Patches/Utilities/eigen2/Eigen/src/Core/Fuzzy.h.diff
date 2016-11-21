@@ -1,0 +1,17 @@
+28a29,32
+> #ifndef MIN 
+> 	#define MIN( x, y ) ( (x) < (y) ? (x) : (y) )
+> #endif
+> 
+57c61
+<   return (nested - otherNested).cwise().abs2().sum() <= prec * prec * std::min(nested.cwise().abs2().sum(), otherNested.cwise().abs2().sum());
+---
+>   return (nested - otherNested).cwise().abs2().sum() <= prec * prec * MIN(nested.cwise().abs2().sum(), otherNested.cwise().abs2().sum());
+181c185
+<     return((self - other).squaredNorm() <= std::min(self.squaredNorm(), other.squaredNorm()) * prec * prec);
+---
+>     return((self - other).squaredNorm() <= MIN(self.squaredNorm(), other.squaredNorm()) * prec * prec);
+207c211
+<           > std::min(nested.col(i).squaredNorm(), otherNested.col(i).squaredNorm()) * prec * prec)
+---
+>           > MIN(nested.col(i).squaredNorm(), otherNested.col(i).squaredNorm()) * prec * prec)
