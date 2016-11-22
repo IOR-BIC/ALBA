@@ -22,6 +22,8 @@ MACRO(MFL_SUBPROJECT SUBPROJECT_NAME SUBPROJECT_DIR)
       SET (${SUBPROJECT_NAME}_CONFIG_FOUND 1)
       # execute subproject configuration
       INCLUDE (${SUBPROJECT_SOURCE_DIR}/Configure.cmake)
+		ELSE (EXISTS ${MFL_SOURCE_DIR}/${SUBPROJECT_DIR}/Configure.cmake)
+			MESSAGE ("Configuring subproject ${SUBPROJECT_NAME} ERROR")
     ENDIF (EXISTS ${MFL_SOURCE_DIR}/${SUBPROJECT_DIR}/Configure.cmake)
   ELSE (NOT CONFIGURE_ERROR)
     MESSAGE ("Not configuring ${SUBPROJECT_NAME} due to previuos errors")

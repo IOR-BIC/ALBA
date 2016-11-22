@@ -37,11 +37,7 @@ ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 6")
 
 # options for Offis and BTK from MAF2Medical
 OPTION(MAF_USE_OFFIS "Find and Link the Offis library." ON)
-IF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10 Win64")
-  OPTION(MAF_USE_BTK "Find and Link the BTK library." ON)
-ELSE (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10 Win64")
-  SET(MAF_USE_BTK OFF)
-ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10 Win64")
+OPTION(MAF_USE_BTK "Find and Link the BTK library." ON)
 
 #
 # configure CMake modules for MFL

@@ -1,0 +1,12 @@
+69c69
+< typedef __int8            int8_t;
+---
+> //typedef __int8            int8_t;
+90c90
+< typedef int16_t   int_fast16_t;
+---
+> //typedef int16_t   int_fast16_t;
+94c94
+< typedef uint16_t  uint_fast16_t;
+---
+> //typedef uint16_t  uint_fast16_t;

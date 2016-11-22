@@ -1,0 +1,21 @@
+27a28,31
+> #ifndef MIN 
+> 	#define MIN( x, y ) ( (x) < (y) ? (x) : (y) )
+> #endif
+> 
+43c47
+<   T q = std::min(_x, _y);
+---
+>   T q = MIN(_x, _y);
+129c133
+<   return ei_abs(a - b) <= std::min(ei_abs(a), ei_abs(b)) * prec;
+---
+>   return ei_abs(a - b) <= MIN(ei_abs(a), ei_abs(b)) * prec;
+177c181
+<   return ei_abs(a - b) <= std::min(ei_abs(a), ei_abs(b)) * prec;
+---
+>   return ei_abs(a - b) <= MIN(ei_abs(a), ei_abs(b)) * prec;
+288c292
+<   return ei_abs(a - b) <= std::min(ei_abs(a), ei_abs(b)) * prec;
+---
+>   return ei_abs(a - b) <= MIN(ei_abs(a), ei_abs(b)) * prec;

@@ -1,0 +1,40 @@
+27a28,34
+> #ifndef MIN 
+> 	#define MIN( x, y ) ( (x) < (y) ? (x) : (y) )
+> #endif
+> #ifndef MAX 
+> 	#define MAX( x, y ) ( (x) > (y) ? (x) : (y) )
+> #endif
+> 
+94c101
+<   const int l2BlockSizeAligned = (1 + std::max(l2BlockSize,l2BlockCols)/PacketSize)*PacketSize;
+---
+>   const int l2BlockSizeAligned = (1 + MAX(l2BlockSize,l2BlockCols)/PacketSize)*PacketSize;
+105c112
+<     const int l2blockRowEnd = std::min(l2i+l2BlockRows, rows);
+---
+>     const int l2blockRowEnd = MIN(l2i+l2BlockRows, rows);
+116c123
+<       const int l2blockSizeEnd = std::min(l2k+l2BlockSize, size);
+---
+>       const int l2blockSizeEnd = MIN(l2k+l2BlockSize, size);
+121c128
+<         // const int blockRows = std::min(i+MaxBlockRows, rows) - i;
+---
+>         // const int blockRows = MIN(i+MaxBlockRows, rows) - i;
+163c170
+<       int l2blockColEnd = std::min(l2j+l2BlockCols, cols);
+---
+>       int l2blockColEnd = MIN(l2j+l2BlockCols, cols);
+168c175
+<         int l2blockSizeEnd = std::min(l2k+l2BlockSize, size);
+---
+>         int l2blockSizeEnd = MIN(l2k+l2BlockSize, size);
+413c420
+<       skipColumns = std::min(skipColumns,rhs.size());
+---
+>       skipColumns = MIN(skipColumns,rhs.size());
+602c609
+<       skipRows = std::min(skipRows,res.size());
+---
+>       skipRows = MIN(skipRows,res.size());
