@@ -3567,7 +3567,7 @@ void mafViewArbitraryOrthoSlice::AddVMEToMSFTree(mafVMESurface *vme)
 {
 	assert(vme != NULL);
 	vme->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
-	mafEventMacro(mafEvent(this, VME_ADD, vme));
+	GetLogicManager()->VmeAdd(vme);
 	assert(vme);
 }
 

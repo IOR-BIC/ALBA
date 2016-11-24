@@ -576,13 +576,13 @@ void mafOpRegisterClusters::OpRun()
 
 	mafNEW(m_Result);	
 	m_Result->SetName(wxString::Format("%s registered into %s", source->GetName(), m_Target->GetName()));
-	mafEventMacro(mafEvent(this, VME_ADD, m_Result));
+	GetLogicManager()->VmeAdd(m_Result);
 		
 	mafNEW(m_Info);	
 	m_Info->SetName(wxString::Format("Info for registration %s into %s",source->GetName(), target->GetName()));
 	m_Info->SetPosLabel("Registration residual: ", 0);
 	m_Info->SetPosShow(true, 0);
-	mafEventMacro(mafEvent(this, VME_ADD, m_Info));
+	GetLogicManager()->VmeAdd(m_Info);
 	m_Info->ReparentTo(m_Result);
 
 	wxString name = wxString::Format("%s registered on %s",source->GetName(), target->GetName());
@@ -590,7 +590,7 @@ void mafOpRegisterClusters::OpRun()
 	m_Registered->DeepCopy(source);
 	m_Registered->CopyLandmarks(source);
 	m_Registered->SetName(name);
-	mafEventMacro(mafEvent(this, VME_ADD, m_Registered));
+	GetLogicManager()->VmeAdd(m_Registered);
 	m_Registered->ReparentTo(m_Result);
 
 	if (m_Follower != NULL)
@@ -599,7 +599,7 @@ void mafOpRegisterClusters::OpRun()
 		m_RegisteredFollower->DeepCopy(m_Follower);		
 		m_RegisteredFollower->SetName(name);
 		wxString name = wxString::Format("%s registered on %s",m_Follower->GetName(), target->GetName());
-		mafEventMacro(mafEvent(this, VME_ADD, m_RegisteredFollower));
+		GetLogicManager()->VmeAdd(m_RegisteredFollower);
 		m_RegisteredFollower->ReparentTo(m_Result);
 	}
 }
@@ -611,19 +611,19 @@ void mafOpRegisterClusters::OpRun()
 {
 	if (m_Result != NULL)
 	{
-		mafEventMacro(mafEvent(this, VME_REMOVE, m_Info));
+		GetLogicManager()->VmeRemove(m_Info);
 		mafDEL(m_Info);
 
-		mafEventMacro(mafEvent(this, VME_REMOVE, m_Registered));
+		GetLogicManager()->VmeRemove(m_Registered);
 		mafDEL(m_Registered);
 
 		if (m_RegisteredFollower != NULL)
 		{
-			mafEventMacro(mafEvent(this, VME_REMOVE, m_RegisteredFollower));
+			GetLogicManager()->VmeRemove(m_RegisteredFollower);
 			mafDEL(m_RegisteredFollower);
 		}
 
-		mafEventMacro(mafEvent(this, VME_REMOVE, m_Result));
+		GetLogicManager()->VmeRemove(m_Result);
 		mafDEL(m_Result);
 	}
 }
@@ -713,7 +713,7 @@ void mafOpRegisterClusters::OpUndo()
 
 	mafVMELandmarkCloud *landmarkCloudWithTimeVariantLandmarks;
 	mafNEW(landmarkCloudWithTimeVariantLandmarks);
-	mafEventMacro(mafEvent(this, VME_ADD, landmarkCloudWithTimeVariantLandmarks));
+	GetLogicManager()->VmeAdd(landmarkCloudWithTimeVariantLandmarks);
 	landmarkCloudWithTimeVariantLandmarks->ReparentTo(m_Result);
 
 	landmarkCloudWithTimeVariantLandmarks->SetName(m_Registered->GetName());
@@ -731,7 +731,7 @@ void mafOpRegisterClusters::OpUndo()
 			if(landmark == NULL)
 			{
 				mafNEW(landmark);
-				mafEventMacro(mafEvent(this, VME_ADD,landmark));
+				GetLogicManager()->VmeAdd(landmark);
 				landmark->SetName(m_Registered->GetLandmark(i)->GetName());
 				landmark->ReparentTo(landmarkCloudWithTimeVariantLandmarks);
 				//BES: 30.3.2011 - now landmark can be released, since it is already ReparentTo => memory leak fix
@@ -758,7 +758,7 @@ void mafOpRegisterClusters::OpUndo()
 
 	landmarkCloudWithTimeVariantLandmarks->Update();
 
-	mafEventMacro(mafEvent(this, VME_REMOVE, m_Registered));
+	GetLogicManager()->VmeRemove(m_Registered);
 	mafDEL(m_Registered);
 
 	m_Registered = landmarkCloudWithTimeVariantLandmarks;	

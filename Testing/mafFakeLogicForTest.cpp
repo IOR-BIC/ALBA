@@ -26,11 +26,7 @@ void mafFakeLogicForTest::VmeShow(mafVME *vme, bool visibility){}
 //-------------------------------------------------------------------------
 void mafFakeLogicForTest::VmeAdd(mafVME *vme){}
 //-------------------------------------------------------------------------
-void mafFakeLogicForTest::VmeAdded(mafVME *vme){}
-//-------------------------------------------------------------------------
 void mafFakeLogicForTest::VmeRemove(mafVME *vme){}
-//-------------------------------------------------------------------------
-void mafFakeLogicForTest::VmeRemoving(mafVME *vme){}
 //-------------------------------------------------------------------------
 void mafFakeLogicForTest::VmeVisualModeChanged(mafVME * vme){}
 

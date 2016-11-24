@@ -98,5 +98,5 @@ void mafOpCreateRefSys::OpDo()
 		mafEventMacro(mafEvent(this,VME_SHOW,m_RefSys,true));
   }
   else
-    mafEventMacro(mafEvent(this, VME_ADD, m_RefSys));
+    GetLogicManager()->VmeAdd(m_RefSys);
 }

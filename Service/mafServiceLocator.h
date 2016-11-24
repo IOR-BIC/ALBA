@@ -22,9 +22,8 @@ class mafAbsLogicManager;
 class mafServiceLocator
 {
 public:
-	 static mafAbsLogicManager* GetLogicManager();
-	 static void SetLogicManager(mafAbsLogicManager* logic);
 
-  protected:
+	static mafAbsLogicManager* GetLogicManager();
+	static void SetLogicManager(mafAbsLogicManager* logic);
 };
 #endif

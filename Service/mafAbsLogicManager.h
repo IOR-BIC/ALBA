@@ -17,7 +17,7 @@
 #ifndef _mafAbsLogicManager_H
 #define _mafAbsLogicManager_H
 
-#include "mafVME.h"
+class mafVME;
 
 class mafAbsLogicManager
 {
@@ -32,11 +32,11 @@ public:
 
 	virtual void VmeAdd(mafVME *vme) = 0;
 
-	virtual void VmeAdded(mafVME *vme) = 0;
+	//virtual void VmeAdded(mafVME *vme) = 0;
 
 	virtual void VmeRemove(mafVME *vme) = 0;
 
-	virtual void VmeRemoving(mafVME *vme) = 0;
+	//virtual void VmeRemoving(mafVME *vme) = 0;
 
 	virtual void VmeVisualModeChanged(mafVME * vme) = 0;
 

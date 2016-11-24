@@ -149,7 +149,7 @@ void mafOpMakeVMETimevarying::OpDo()
 void mafOpMakeVMETimevarying::OpUndo()
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,VME_REMOVE,m_Output));
+  GetLogicManager()->VmeRemove(m_Output);
   mafDEL(m_Output);
 }
 //----------------------------------------------------------------------------
@@ -693,7 +693,7 @@ void mafOpMakeVMETimevarying::Execute()
   m_VMETimevarying->GetMatrixPipe()->Update();
   m_VMETimevarying->GetDataPipe()->Update();
 
-  mafEventMacro(mafEvent(this,VME_ADD,m_VMETimevarying));
+  GetLogicManager()->VmeAdd(m_VMETimevarying);
 
   m_Output = m_VMETimevarying;
 

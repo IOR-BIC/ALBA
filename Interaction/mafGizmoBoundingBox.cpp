@@ -85,7 +85,7 @@ mafGizmoBoundingBox::~mafGizmoBoundingBox()
 {
   m_BoxGizmo->SetBehavior(NULL);
   	
-  mafEventMacro(mafEvent(this, VME_REMOVE, m_BoxGizmo));  
+  GetLogicManager()->VmeRemove(m_BoxGizmo);
   m_BoxOutline->Delete();
 }
 

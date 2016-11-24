@@ -261,7 +261,7 @@ void mafOpAddLandmark::OpUndo()
 {
 	if (m_CloudCreatedFlag)
 	{
-		mafEventMacro(mafEvent(this, VME_REMOVE, m_Cloud));
+		GetLogicManager()->VmeRemove(m_Cloud);
 	}
 	else
 	{
@@ -274,7 +274,7 @@ void mafOpAddLandmark::RestoreLandmarkVect(std::vector<mafVMELandmark*> &landmar
 {
 	while (m_Cloud->GetNumberOfLandmarks())
 	{
-		mafEventMacro(mafEvent(this, VME_REMOVE, m_Cloud->GetLandmark(0)));
+		GetLogicManager()->VmeRemove(m_Cloud->GetLandmark(0));
 	}
 
 	for (int i = 0; i < landmarkVect.size(); i++)
@@ -637,7 +637,7 @@ void mafOpAddLandmark::RemoveLandmark()
 		{
 			DeselectLandmark();
 
-			mafEventMacro(mafEvent(this, VME_REMOVE, item));
+			GetLogicManager()->VmeRemove(item);
 
 			m_LocalLandmarkNameVect.erase(m_LocalLandmarkNameVect.begin() + itemToRemove);
 

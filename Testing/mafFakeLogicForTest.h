@@ -35,11 +35,7 @@ protected:
 
 	virtual void VmeAdd(mafVME *vme);
 
-	virtual void VmeAdded(mafVME *vme);
-
 	virtual void VmeRemove(mafVME *vme);
-
-	virtual void VmeRemoving(mafVME *vme);
 
 	virtual void VmeVisualModeChanged(mafVME * vme);
 

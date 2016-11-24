@@ -508,7 +508,7 @@ void mafOpClipSurface::OpStop(int result)
   if(m_ImplicitPlaneGizmo)
   {
     m_ImplicitPlaneGizmo->SetBehavior(NULL);
-    mafEventMacro(mafEvent(this, VME_REMOVE, m_ImplicitPlaneGizmo));
+    GetLogicManager()->VmeRemove(m_ImplicitPlaneGizmo);
   }
   mafDEL(m_ImplicitPlaneGizmo);
 	vtkDEL(m_Gizmo);

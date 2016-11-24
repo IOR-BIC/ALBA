@@ -897,15 +897,15 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpUndo()
 {
   if (m_VolumeOutputRegionGrowing)
   {
-    mafEventMacro(mafEvent(this, VME_REMOVE, m_VolumeOutputRegionGrowing));
+    GetLogicManager()->VmeRemove(m_VolumeOutputRegionGrowing);
   }
   if (m_VolumeOutputMorpho)
   {
-    mafEventMacro(mafEvent(this, VME_REMOVE, m_VolumeOutputMorpho));
+    GetLogicManager()->VmeRemove(m_VolumeOutputMorpho);
   }
   if (m_SurfaceOutput)
   {
-    mafEventMacro(mafEvent(this, VME_REMOVE, m_SurfaceOutput));
+    GetLogicManager()->VmeRemove(m_SurfaceOutput);
   }
 
   if (m_VolumeOutputMorpho == NULL && m_VolumeOutputRegionGrowing == NULL && m_SurfaceOutput == NULL)

@@ -639,7 +639,7 @@ void mafOpInteractiveClipSurface::OpStop(int result)
   if(m_ImplicitPlaneVMEGizmo)
   {
     m_ImplicitPlaneVMEGizmo->SetBehavior(NULL);
-    mafEventMacro(mafEvent(this, VME_REMOVE, m_ImplicitPlaneVMEGizmo));
+    GetLogicManager()->VmeRemove(m_ImplicitPlaneVMEGizmo);
   }
 
   if(m_GizmoTranslate)

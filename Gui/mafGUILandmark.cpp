@@ -130,13 +130,13 @@ mafGUILandmark::~mafGUILandmark()
     {
       mafVME *lm = m_LMCloud->GetChild(i);
       mafEventMacro(mafEvent(this, VME_SHOW, lm, false));
-      mafEventMacro(mafEvent(this, VME_REMOVE, lm));
+      GetLogicManager()->VmeRemove(lm);
       mafDEL(lm);
 
     }
 
     mafEventMacro(mafEvent(this, VME_SHOW, m_LMCloud, false));
-    mafEventMacro(mafEvent(this, VME_REMOVE, m_LMCloud));
+    GetLogicManager()->VmeRemove(m_LMCloud);
     mafDEL(m_LMCloud);
   }
 } 
@@ -325,7 +325,7 @@ void mafGUILandmark::OnVmePicked(mafEvent& e)
     Force vme data creation since this is required by mafPipePointSet
     */
 //    mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,m_LMCloud));
-		mafEventMacro(mafEvent(this,VME_ADD,m_LMCloud));
+		GetLogicManager()->VmeAdd(m_LMCloud);
 		mafEventMacro(mafEvent(this,VME_SHOW,m_LMCloud,true)); 
     
   }
@@ -346,7 +346,7 @@ void mafGUILandmark::OnVmePicked(mafEvent& e)
     m_Landmark->SetAbsPose(absPosition[0],absPosition[1],absPosition[2],0,0,0);
     
     //mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,m_Landmark));
-	  mafEventMacro(mafEvent(this,VME_ADD,m_Landmark));
+		GetLogicManager()->VmeAdd(m_Landmark);
     mafEventMacro(mafEvent(this,VME_SHOW,m_Landmark,true)); 
 	  mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
 
@@ -557,7 +557,7 @@ void mafGUILandmark::SpawnLandmark()
   m_Landmark->SetPose(position[0],position[1],position[2],rot[0], rot[1], rot[2],-1);
   
   //mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,m_Landmark));
-	mafEventMacro(mafEvent(this,VME_ADD,m_Landmark));
+	GetLogicManager()->VmeAdd(m_Landmark);
   mafEventMacro(mafEvent(this,VME_SHOW,m_Landmark,true)); 
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
   
