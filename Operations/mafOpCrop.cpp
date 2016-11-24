@@ -308,8 +308,7 @@ void mafOpCrop::OpDo()
 	((mafVMEVolume*)m_Input)->Update();
 	
     // bug# 2628: gizmos do not update after cropping (workaround code)
-	mafEventMacro(mafEvent(this,VME_SHOW,m_Input,false));
-	mafEventMacro(mafEvent(this,VME_SHOW,m_Input,true));
+	GetLogicManager()->VmeVisualModeChanged(m_Input);
 	///////
 
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
@@ -327,8 +326,7 @@ void mafOpCrop::OpUndo()
 	((mafVMEVolume*)m_Input)->Update();
 
 	// bug# 2628: gizmos do not update after cropping (workaround code)
-	mafEventMacro(mafEvent(this,VME_SHOW,m_Input,false));
-	mafEventMacro(mafEvent(this,VME_SHOW,m_Input,true));
+	GetLogicManager()->VmeVisualModeChanged(m_Input);
 	///////
 
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));

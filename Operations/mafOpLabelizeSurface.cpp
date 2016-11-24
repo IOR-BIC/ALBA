@@ -643,8 +643,7 @@ void mafOpLabelizeSurface::OpDo()
 		mafVMESurface::SafeDownCast(m_Input)->GetSurfaceOutput()->SetMaterial(mat);
 		mafVMESurface::SafeDownCast(m_Input)->GetSurfaceOutput()->Update();
 		mafVMESurface::SafeDownCast(m_Input)->GetOutput()->Update();
-		mafEventMacro(mafEvent(this,VME_SHOW,m_Input,false));
-		mafEventMacro(mafEvent(this,VME_SHOW,m_Input,true));
+		GetLogicManager()->VmeVisualModeChanged(m_Input);
 		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 	}
 }

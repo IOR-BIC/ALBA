@@ -243,8 +243,7 @@ void mafGeometryEditorPolylineGraph::OnEvent(mafEventBase *maf_event)
 
 					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
 
-					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineEditor,false));
-					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineEditor,true));
+					GetLogicManager()->VmeVisualModeChanged(m_VMEPolylineEditor);
 
 					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
@@ -466,8 +465,7 @@ void mafGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
           SelectPoint(vertexCoord);
           if(!m_TestMode)
           {
-            mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
-            mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,true));
+						GetLogicManager()->VmeVisualModeChanged(m_VMEPolylineSelection);
           }
         }
         MovePoint(vertexCoord);
@@ -488,8 +486,7 @@ void mafGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 
 				if(!m_TestMode)
 				{
-					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
-					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,true));
+					GetLogicManager()->VmeVisualModeChanged(m_VMEPolylineSelection);
 				}
 
 				m_Gui->Enable(ID_BUTTON_POINT_DELETE,m_Action==ID_POINT_ACTION && m_SelectedPoint!=UNDEFINED_POINT_ID);
@@ -505,8 +502,7 @@ void mafGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 
         if(!m_TestMode)
         {
-          mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
-          mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,true));
+					GetLogicManager()->VmeVisualModeChanged(m_VMEPolylineSelection);
         }
 
 				//m_Picker->EnableContinuousPicking(true);
@@ -977,8 +973,7 @@ void mafGeometryEditorPolylineGraph::SelectBranch(double position[3])
 
 	m_SelectedBranch = m_CurrentBranch;
   
-	mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
-	mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,true));
+	GetLogicManager()->VmeVisualModeChanged(m_VMEPolylineSelection);
 }
 //----------------------------------------------------------------------------
 int mafGeometryEditorPolylineGraph::AddBranch(double position[3])
