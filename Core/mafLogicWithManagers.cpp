@@ -68,7 +68,6 @@
 #include "mafGUIApplicationSettings.h"
 #include "mafGUISettingsStorage.h"
 #include "mafGUISettingsTimeBar.h"
-#include "mafRemoteLogic.h"
 #include "mafGUISettingsDialog.h"
 #ifdef WIN32
   #include "mafDeviceClientMAF.h"
@@ -90,6 +89,7 @@
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "mafHelpManager.h"
+#include "mafServiceLocator.h"
 
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
@@ -142,8 +142,6 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
   m_ViewManager = NULL;
   m_OpManager   = NULL;
   m_InteractionManager = NULL;
-  m_RemoteLogic = NULL;
-
   m_ImportMenu  = NULL; 
   m_ExportMenu  = NULL; 
   m_OpMenu      = NULL;
@@ -192,7 +190,6 @@ mafLogicWithManagers::~mafLogicWithManagers()
 void mafLogicWithManagers::Configure()
 //----------------------------------------------------------------------------
 {
-
 	if(m_PlugTimebar)
 		m_TimeBarSettings = new mafGUISettingsTimeBar(this);
 
@@ -243,18 +240,6 @@ void mafLogicWithManagers::Configure()
 		//m_HelpManager->SetListener(this);
 	}
   
-// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-  if (m_UseInteractionManager && m_UseViewManager && m_UseOpManager)
-  {
-#ifdef __WIN32__
-    m_RemoteLogic = new mafRemoteLogic(this, m_ViewManager, m_OpManager);
-
-    m_RemoteLogic->SetClientUnit(m_InteractionManager->GetClientDevice());
-#endif
-
-  }
-#endif
 
   // Fill the SettingsDialog
   m_SettingsDialog->AddPage( m_ApplicationSettings->GetGui(), m_ApplicationSettings->GetLabel());
@@ -740,24 +725,18 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				break;
 			case VME_SHOW:
 				VmeShow(e->GetVme(), e->GetBool());
-				if (m_RemoteLogic && (e->GetSender() != m_RemoteLogic) && m_RemoteLogic->IsSocketConnected())
-				{
-					m_RemoteLogic->VmeShow(e->GetVme(), e->GetBool());
-				}
 				break;
 			case VME_MODIFIED:
 				VmeModified(e->GetVme());
-				if (!m_PlugTimebar && e->GetVme()->IsAnimated())
-					m_Win->ShowDockPane("timebar", !m_Win->DockPaneIsShown("timebar"));
 				break;
-			case VME_ADD:
-				VmeAdd(e->GetVme());
+// 			case VME_ADD:
+// 				VmeAdd(e->GetVme());
 				break;
 			case VME_ADDED:
 				VmeAdded(e->GetVme());
 				break;
-			case VME_REMOVE:
-				VmeRemove(e->GetVme());
+// 			case VME_REMOVE:
+// 				VmeRemove(e->GetVme());
 				break;
 			case VME_REMOVING:
 				VmeRemoving(e->GetVme());
@@ -793,13 +772,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			case VME_CHOOSE_MATERIAL:
 				VmeChooseMaterial(e->GetVme(), e->GetBool());
 				break;
-			case VME_VISUAL_MODE_CHANGED:
-			{
-				mafVME *vme = e->GetVme();
-				VmeShow(vme, false);
-				VmeShow(vme, true);
-			}
-			break;
 			case UPDATE_PROPERTY:
 				VmeUpdateProperties(e->GetVme(), e->GetBool());
 				break;
@@ -815,12 +787,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				if (m_OpManager)
 				{
 					m_OpManager->OpRun(e->GetArg());
-					if (/*m_OpManager->GetRunningOperation() && */m_RemoteLogic && m_RemoteLogic->IsSocketConnected() && !m_OpManager->m_FromRemote)
-					{
-						mafEvent re(this, mafOpManager::RUN_OPERATION_EVENT, e->GetArg());
-						re.SetChannel(REMOTE_COMMAND_CHANNEL);
-						m_RemoteLogic->OnEvent(&re);
-					}
 				}
 				break;
 			case PARSE_STRING:
@@ -945,10 +911,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			}
 			break;
 			case VIEW_MAXIMIZE:
-				if (m_RemoteLogic && m_RemoteLogic->IsSocketConnected() && !m_ViewManager->m_FromRemote)
-				{
-					m_RemoteLogic->RemoteMessage(*e->GetString());
-				}
 				break;
 			case VIEW_SELECTED:
 				e->SetBool(m_ViewManager->GetSelectedView() != NULL);
@@ -972,7 +934,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			}
 			break;
 			case CAMERA_RESET:
-				if (m_ViewManager) m_ViewManager->CameraReset();
+				CameraReset();
 				break;
 			case CAMERA_FIT:
 				if (m_ViewManager) m_ViewManager->CameraReset(true);
@@ -1051,14 +1013,8 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 #endif
 				break;
 			case CAMERA_UPDATE:
-				if (m_ViewManager) m_ViewManager->CameraUpdate();
-				// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-		//PERFORMANCE WARNING : if view manager exist this will cause another camera update!!
-		// An else could be added to reduce CAMERA_UPDATE by a 2 factor. This has been done for the HipOp vertical App showing
-		// big performance improvement in composite views creation.
-				if (m_InteractionManager) m_InteractionManager->CameraUpdate(e->GetView());
-#endif
+				CameraUpdate();
+
 				break;
 			case CAMERA_SYNCHRONOUS_UPDATE:
 				m_ViewManager->CameraUpdate();
@@ -1118,24 +1074,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			case COLLABORATE_ENABLE:
 			{
 				bool collaborate = e->GetBool();
-				if (collaborate)
-				{
-					m_RemoteLogic->SetRemoteMouse(m_InteractionManager->GetRemoteMouseDevice());
-					m_Mouse->AddObserver(m_RemoteLogic, REMOTE_COMMAND_CHANNEL);
-					if (m_RemoteLogic->IsSocketConnected())  //check again, because if no server is present
-					{                                       //no synchronization is necessary
-						m_RemoteLogic->SynchronizeApplication();
-					}
-				}
-				else
-				{
-					if (m_RemoteLogic != NULL)
-					{
-						m_RemoteLogic->SetRemoteMouse(NULL);
-						m_RemoteLogic->Disconnect();
-						m_Mouse->RemoveObserver(m_RemoteLogic);
-					}
-				}
+
 				m_ViewManager->Collaborate(collaborate);
 				m_OpManager->Collaborate(collaborate);
 				m_Mouse->Collaborate(collaborate);
@@ -1200,7 +1139,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 
 					m_VMEManager->SetDirName(dirName);
 					this->OnFileSaveAs();
-					this->OnEvent((mafEventBase*)&mafEvent(this, CAMERA_UPDATE));
+					CameraUpdate();
 					msfFilename = m_VMEManager->GetFileName();
 				}
 
@@ -1243,8 +1182,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 					command = command + name + "." + ext;
 					wxExecute(command);
 					wxSetWorkingDirectory(oldWD);
-
-
 				}
 				else
 				{
@@ -1473,6 +1410,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 		} // end switch case
   } // end if SafeDowncast
 }
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnFileNew()
 //----------------------------------------------------------------------------
@@ -1649,7 +1587,6 @@ void mafLogicWithManagers::OnQuit()
   mafGUIMDIChild::OnQuit(); 
   m_Win->OnQuit(); 
 
-  cppDEL(m_RemoteLogic);
   cppDEL(m_VMEManager);
   cppDEL(m_MaterialChooser);
 	cppDEL(m_HelpManager);
@@ -1686,53 +1623,62 @@ void mafLogicWithManagers::VmeDoubleClicked(mafEvent &e)
   }
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
-//----------------------------------------------------------------------------
+void mafLogicWithManagers::VmeSelect(mafVME *vme)
 {
-  mafVME *node = NULL;
+	if (vme != NULL && m_OpManager)
+		m_OpManager->OpSelect(vme);
 
-	if(m_PlugControlPanel && (e.GetSender() == this->m_SideBar->GetTree()))
-    node = (mafVME*)e.GetArg();//sender == tree => the node is in e.arg
-  else
-    node = e.GetVme();          //sender == PER  => the node is in e.node  
-
-  if(node == NULL)
-  {
-    //node can be selected by its ID
-    if(m_VMEManager)
-    {
-		  long vme_id = e.GetArg();
-		  mafVMERoot *root = this->m_VMEManager->GetRoot();
-		  if (root)
-		  {
-			  node = root->FindInTreeById(vme_id);
-			  e.SetVme(node);
-      }
-    }
-  }
-  if(node != NULL && m_OpManager)
-    m_OpManager->OpSelect(node);
-    
-// currently mafInteraction is strictly dependent on VTK (marco)
+	// currently mafInteraction is strictly dependent on VTK (marco)
 #ifdef MAF_USE_VTK
-  if (m_InteractionManager)
-    m_InteractionManager->VmeSelected(node);
+	if (m_InteractionManager)
+		m_InteractionManager->VmeSelected(vme);
 #endif
 
-  if(m_RemoteLogic && (e.GetSender() != m_RemoteLogic) && m_RemoteLogic->IsSocketConnected())
-  {
-    m_RemoteLogic->VmeSelected(node);
-  }
+	EnableMenuAndToolbar();
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
+{
+	mafVME *node = NULL;
+
+	if (m_PlugControlPanel && (e.GetSender() == this->m_SideBar->GetTree()))
+		node = (mafVME*)e.GetArg();//sender == tree => the node is in e.arg
+	else
+		node = e.GetVme();          //sender == PER  => the node is in e.node  
+
+	if (node == NULL)
+	{
+		//node can be selected by its ID
+		if (m_VMEManager)
+		{
+			long vme_id = e.GetArg();
+			mafVMERoot *root = this->m_VMEManager->GetRoot();
+			if (root)
+			{
+				node = root->FindInTreeById(vme_id);
+				e.SetVme(node);
+			}
+		}
+	}
+
+	if (node != NULL && m_OpManager)
+		m_OpManager->OpSelect(node);
+
+	// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
+	if (m_InteractionManager)
+		m_InteractionManager->VmeSelected(node);
+#endif
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeSelected(mafVME *vme)
-//----------------------------------------------------------------------------
 {
-  //if a wizard manager was plugged we tell it about vme selection
-  if(m_WizardManager) 
-  {
-    m_WizardManager->VmeSelected(vme);
-  }
+	//if a wizard manager was plugged we tell it about vme selection
+	if (m_WizardManager)
+	{
+		m_WizardManager->VmeSelected(vme);
+	}
+
 	if (m_ViewManager)
 	{
 		if (m_SelectedLandmark)
@@ -1751,19 +1697,18 @@ void mafLogicWithManagers::VmeSelected(mafVME *vme)
 
 		m_ViewManager->VmeSelect(vme);
 	}
-  if(m_OpManager)	m_OpManager->VmeSelected(vme);
-	if(m_SideBar) 
+
+	if (m_OpManager)	m_OpManager->VmeSelected(vme);
+	if (m_SideBar)
 	{
 		m_SideBar->VmeSelected(vme);
 		m_SideBar->GetTree()->SetFocus();
 	}
-	
 }
 
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::SelectLandmark(mafVMELandmark *lm, bool select)
 {
-
 	if(!select)
 		for (mafView * view = m_ViewManager->GetList(); view; view = view->m_Next)
 			view->VmeShow(lm, false);
@@ -1781,29 +1726,6 @@ void mafLogicWithManagers::SelectLandmark(mafVMELandmark *lm, bool select)
 	}
 }
 
-//----------------------------------------------------------------------------
-void mafLogicWithManagers::VmeShow(mafVME *vme, bool visibility)
-//----------------------------------------------------------------------------
-{
-	if (m_ViewManager)
-	{
-		mafVMELandmarkCloud *lmc = mafVMELandmarkCloud::SafeDownCast(vme);
-		mafVMELandmark *lm = mafVMELandmark::SafeDownCast(vme);
-		if (lmc)
-		{
-			ShowLandmarkCloud(lmc,visibility);
-		}
-		else if (lm)
-		{
-			ShowLandmark(lm,visibility);
-		}
-		else
-			m_ViewManager->VmeShow(vme, visibility);
-	}
-
-	ShowInSideBar(vme,visibility);
-
-}
 
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::ShowLandmarkCloud(mafVMELandmarkCloud * lmc, bool visibility)
@@ -1880,21 +1802,49 @@ void mafLogicWithManagers::ShowLandmark(mafVMELandmark * lm, bool visibility)
 }
 
 //----------------------------------------------------------------------------
+void mafLogicWithManagers::VmeShow(mafVME *vme, bool visibility)
+{
+	if (m_ViewManager)
+	{
+		mafVMELandmarkCloud *lmc = mafVMELandmarkCloud::SafeDownCast(vme);
+		mafVMELandmark *lm = mafVMELandmark::SafeDownCast(vme);
+		if (lmc)
+		{
+			ShowLandmarkCloud(lmc, visibility);
+		}
+		else if (lm)
+		{
+			ShowLandmark(lm, visibility);
+		}
+		else
+			m_ViewManager->VmeShow(vme, visibility);
+	}
+
+	ShowInSideBar(vme, visibility);
+}
+
+//----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeModified(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  if(m_PlugTimebar) UpdateTimeBounds();
-  bool vme_in_tree = vme->IsVisible();
-  if(m_SideBar && vme_in_tree)
-    m_SideBar->VmeModified(vme);
-	if(m_VMEManager) m_VMEManager->MSFModified(true);
+	if (m_PlugTimebar) UpdateTimeBounds();
+	bool vme_in_tree = vme->IsVisible();
+
+	if (m_SideBar && vme_in_tree)
+		m_SideBar->VmeModified(vme);
+
+	if (m_VMEManager)
+		m_VMEManager->MSFModified(true);
 
 	//if a wizard manager was plugged we tell it about vme selection
-	if(m_WizardManager) 
-	{
+	if (m_WizardManager)
 		m_WizardManager->VmeModified(vme);
-	}
-	if(m_OpManager)   m_OpManager->VmeModified(vme);
+
+	if (m_OpManager)
+		m_OpManager->VmeModified(vme);
+
+	if (!m_PlugTimebar && vme->IsAnimated())
+		m_Win->ShowDockPane("timebar", !m_Win->DockPaneIsShown("timebar"));
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeAdd(mafVME *vme)
@@ -1924,8 +1874,10 @@ void mafLogicWithManagers::VmeRemove(mafVME *vme)
 {
   if(m_VMEManager)
     m_VMEManager->VmeRemove(vme);
+
   if(m_PlugTimebar)
     UpdateTimeBounds();
+
   if (m_ViewManager)
     m_ViewManager->CameraUpdate();
 
@@ -1944,6 +1896,16 @@ void mafLogicWithManagers::VmeRemoving(mafVME *vme)
 	if(m_ViewManager)
     m_ViewManager->VmeRemove(vme);
 }
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::VmeVisualModeChanged(mafVME * vme)
+{
+	if (vme)
+	{
+		VmeShow(vme, false);
+		VmeShow(vme, true);
+	}
+}
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OpRunStarting()
 //----------------------------------------------------------------------------
@@ -2047,19 +2009,32 @@ void mafLogicWithManagers::ViewSelect()
   }
 }
 //----------------------------------------------------------------------------
+void mafLogicWithManagers::CameraUpdate()
+{
+	if (m_ViewManager)
+		m_ViewManager->CameraUpdate();
+
+#ifdef MAF_USE_VTK
+	//PERFORMANCE WARNING : if view manager exist this will cause another camera update!!
+	// An else could be added to reduce CAMERA_UPDATE by a 2 factor. This has been done for the HipOp vertical App showing
+	// big performance improvement in composite views creation.
+	if (m_InteractionManager)
+		m_InteractionManager->CameraUpdate(m_ViewManager->GetSelectedView());
+#endif
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::CameraReset()
+{
+	if (m_ViewManager) 
+		m_ViewManager->CameraReset();
+}
+//----------------------------------------------------------------------------
 void mafLogicWithManagers::ViewCreated(mafView *v)
 //----------------------------------------------------------------------------
 {
   // removed temporarily support for external Views
   if(v) 
   {
-    if(m_RemoteLogic && m_RemoteLogic->IsSocketConnected() && !m_ViewManager->m_FromRemote)
-    {
-      mafEvent ev(this,VIEW_CREATE,v);
-      ev.SetChannel(REMOTE_COMMAND_CHANNEL);
-      m_RemoteLogic->OnEvent(&ev);
-    }
-
     if (GetExternalViewFlag())
     {
       // external views

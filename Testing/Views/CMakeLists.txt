@@ -3,7 +3,7 @@ PROJECT (mafViews_TEST)
 IF(MAF_BUILD_MAFDLL)
   LINK_LIBRARIES(mafViews)
 ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafTests GPUAPI mafVME mafCommon mafViews mafInteraction)
+  LINK_LIBRARIES(mafTests GPUAPI mafVME mafCommon mafViews mafInteraction mafService)
 ENDIF(MAF_BUILD_MAFDLL)
 
 #-----------------------------------------------------------------------------

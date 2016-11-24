@@ -27,6 +27,7 @@
 #include "mafVMEManager.h"
 #include "mafGUIMDIFrame.h"
 #include "mafSideBar.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // forward reference
@@ -39,7 +40,6 @@ class mafVMELandmark;
 class mafVMELandmarkCloud;
 class mafInteractionManager;
 class mafPrintSupport;
-class mafRemoteLogic;
 class mafDeviceButtonsPadMouse;
 class mafGUISettingsDialog;
 class mafGUISettings;
@@ -104,7 +104,7 @@ in sub classes also create the manager
 5- Init: Calls FileOpen or FileNew
 	
 */
-class MAF_EXPORT mafLogicWithManagers: public mafObserver
+class MAF_EXPORT mafLogicWithManagers: public mafObserver, public mafAbsLogicManager
 {
 public:
                mafLogicWithManagers(mafGUIMDIFrame *mdiFrame=NULL);
@@ -292,6 +292,8 @@ protected:
 
   /** Respond to a VME_SELECT evt. Instantiate the 'Select' operation. */
 	virtual void VmeSelect(mafEvent &e);
+	/** Respond to a VME_SELECT evt. Update the selection on the tree and view representation. */
+	virtual void VmeSelect(mafVME *vme);
   /** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
 	virtual void VmeSelected(mafVME *vme);
 
@@ -314,6 +316,7 @@ protected:
 
 	/** Respond to a VME_Modified evt.*/
 	virtual void VmeModified(mafVME *vme);
+
   /** Respond to a VME_ADD evt. Add a new vme to the tree. */
 	virtual void VmeAdd(mafVME *vme);
   /** Respond to a VME_ADDED evt. propagate evt. to SideBar,ViewManager,ecc.. */
@@ -322,6 +325,9 @@ protected:
 	virtual void VmeRemove(mafVME *vme);
   /** Respond to a VME_REMOVING evt. propagate evt. to SideBar,ViewManager,ecc.. */
 	virtual void VmeRemoving(mafVME *vme);
+	
+	virtual void VmeVisualModeChanged(mafVME * vme);
+
 	/** Respond to a VME_CHOOSE evt. Build a dialog containing the vme tree and return the vme choosed from the user. */
 	virtual std::vector<mafVME*> VmeChoose(long vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, mafString title = "Choose Node", bool multiSelect = false, mafVME *vme=NULL);
 
@@ -352,6 +358,10 @@ protected:
 	virtual void ViewCreated(mafView *v);
 	/** Select a view and update the display list for the tree. */
 	virtual void ViewSelect();
+
+	virtual void CameraUpdate();
+
+	virtual void CameraReset();
 
   /** Called when user change the measure unit from menù Options.*/
   void UpdateMeasureUnit();
@@ -385,7 +395,6 @@ protected:
   mafOpManager           *m_OpManager;
   mafInteractionManager  *m_InteractionManager;
 	mafHelpManager				 *m_HelpManager;
-  mafRemoteLogic         *m_RemoteLogic;
 
 	mafVMELandmark				 *m_SelectedLandmark;
   
