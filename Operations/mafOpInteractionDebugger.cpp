@@ -403,7 +403,7 @@ void mafOpInteractionDebugger::AddMEDGizmoDebuggerToTree()
   assert(constraint != NULL);
   
   // Create the output vtk data...
-  mafEventMacro(mafEvent(this,VME_SHOW,constraint,true));
+  GetLogicManager()->VmeShow(constraint, true);
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
   // build constrained gizmo
@@ -433,7 +433,7 @@ void mafOpInteractionDebugger::OnChooseConstrainVme( mafVME *vme )
   m_Constrain = vme;
   assert(m_Constrain);
 
-  mafEventMacro(mafEvent(this,VME_SHOW, m_Constrain, true));
+  GetLogicManager()->VmeShow(m_Constrain, true);
 
   m_GizmoDebugger->SetGizmoLength(2);
   m_GizmoDebugger->SetConstraintPolylineGraph(mafVMEPolylineGraph::SafeDownCast(m_Constrain));

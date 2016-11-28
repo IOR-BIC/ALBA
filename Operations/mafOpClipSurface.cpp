@@ -752,7 +752,7 @@ void mafOpClipSurface::ShowClipPlane(bool show)
 
       m_ImplicitPlaneGizmo->SetAbsMatrix(mat);
 
-      mafEventMacro(mafEvent(this,VME_SHOW,m_ImplicitPlaneGizmo,true));
+      GetLogicManager()->VmeShow(m_ImplicitPlaneGizmo, true);
     }
     mmaMaterial *material = m_ImplicitPlaneGizmo->GetMaterial();
     material->m_Prop->SetOpacity(0.5);

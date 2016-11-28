@@ -77,7 +77,7 @@ mafGizmoBoundingBox::mafGizmoBoundingBox(mafVME *input, mafObserver *listener,ma
   this->Show(false);
 
   // ask the manager to create the pipeline
-  mafEventMacro(mafEvent(this,VME_SHOW,m_BoxGizmo,true));
+  GetLogicManager()->VmeShow(m_BoxGizmo, true);
 }
 //----------------------------------------------------------------------------
 mafGizmoBoundingBox::~mafGizmoBoundingBox() 

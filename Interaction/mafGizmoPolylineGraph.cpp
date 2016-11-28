@@ -375,7 +375,7 @@ void mafGizmoPolylineGraph::DestroyVMEGizmo()
 //----------------------------------------------------------------------------
 {
   assert(m_VmeGizmo);
-  mafEventMacro(mafEvent(this,VME_SHOW,m_VmeGizmo,show));  
+  GetLogicManager()->VmeShow(m_VmeGizmo, show);
 }
 
 //------------------------------------------------------------------------

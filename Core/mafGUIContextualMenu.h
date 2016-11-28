@@ -17,6 +17,9 @@
 #ifndef __mafGUIContextualMenu_H__
 #define __mafGUIContextualMenu_H__
 
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
+
 //----------------------------------------------------------------------------
 // forward references;
 //----------------------------------------------------------------------------
@@ -28,7 +31,7 @@ class mafObserver;
   class name: mafGUIContextualMenu
   Class that handle menu' opened with right button click of the mouse over the view.
 */
-class MAF_EXPORT mafGUIContextualMenu : public wxMenu
+class MAF_EXPORT mafGUIContextualMenu : public wxMenu, public mafServiceClient
 {
 public:
   /** constructor  */

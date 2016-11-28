@@ -749,7 +749,7 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(mafEventBase
         m_VolumeOutputRegionGrowing->ReparentTo(m_VolumeInput);
         m_VolumeOutputRegionGrowing->Update();
 
-        mafEventMacro(mafEvent(this,VME_SHOW,m_VolumeOutputRegionGrowing,true));
+        GetLogicManager()->VmeShow(m_VolumeOutputRegionGrowing, true);
 
         if (m_SegmentedImage != NULL)
         {
@@ -806,7 +806,7 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(mafEventBase
         	m_SurfaceOutput->ReparentTo(m_VolumeInput);
         	m_SurfaceOutput->Update();
   
-        	mafEventMacro(mafEvent(this,VME_SHOW,m_VolumeOutputMorpho,true));
+        	GetLogicManager()->VmeShow(m_VolumeOutputMorpho, true);
           m_Gui->Enable(wxOK,true);
         }
 

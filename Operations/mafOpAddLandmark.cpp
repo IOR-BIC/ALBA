@@ -182,8 +182,8 @@ void mafOpAddLandmark::OpRun()
 			m_CloudCreatedFlag = true;
 		}
 
-		mafEventMacro(mafEvent(this, VME_SHOW, m_Cloud, true));
-		mafEventMacro(mafEvent(this, VME_SHOW, m_PickedVme, true));
+		GetLogicManager()->VmeShow(m_Cloud, true);
+		GetLogicManager()->VmeShow(m_PickedVme, true);
 
 		// Customize m_PickedVme behavior
 		m_LandmarkPicker = mafInteractorPERPicker::New();
@@ -249,7 +249,7 @@ void mafOpAddLandmark::OpDo()
 		}
 		else
 		{
-			mafEventMacro(mafEvent(this, VME_SHOW, m_Cloud, true));
+			GetLogicManager()->VmeShow(m_Cloud, true);
 			RestoreLandmarkVect(m_LandmarkRedoVect);
 		}
 	}
@@ -284,7 +284,7 @@ void mafOpAddLandmark::RestoreLandmarkVect(std::vector<mafVMELandmark*> &landmar
 		newLandmark->DeepCopy(landmarkVect[i]);
 		newLandmark->ReparentTo(m_Cloud);
 
-		mafEventMacro(mafEvent(this, VME_SHOW, newLandmark, true));
+		GetLogicManager()->VmeShow(newLandmark, true);
 	}
 
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
@@ -590,7 +590,7 @@ void mafOpAddLandmark::AddLandmark(double pos[3])
 
 	landmark->Update();
 
-  mafEventMacro(mafEvent(this,VME_SHOW,landmark.GetPointer(),true));
+  GetLogicManager()->VmeShow(landmark.GetPointer(), true);
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
   if (m_Gui && !GetTestMode())
@@ -656,8 +656,8 @@ void mafOpAddLandmark::SelectLandmark(mafString selection)
 {
 	if (m_CurrentLandmark)
 	{
-		mafEventMacro(mafEvent(this, VME_SHOW, m_CurrentLandmark, true));
-		mafEventMacro(mafEvent(this, VME_SHOW, m_SelectedLandmarkCloud->GetLandmark(0), false));
+		GetLogicManager()->VmeShow(m_CurrentLandmark, true);
+		GetLogicManager()->VmeShow(m_SelectedLandmarkCloud->GetLandmark(0), false);
 
 		m_CurrentLandmark = NULL;
 	}
@@ -711,8 +711,8 @@ void mafOpAddLandmark::SelectLandmark(mafString selection)
 		m_SelectedLandmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
 		m_SelectedLandmark->Update();
 
-		mafEventMacro(mafEvent(this, VME_SHOW, m_CurrentLandmark, false));
-		mafEventMacro(mafEvent(this, VME_SHOW, m_SelectedLandmarkCloud->GetLandmark(0), true));
+		GetLogicManager()->VmeShow(m_CurrentLandmark, false);
+		GetLogicManager()->VmeShow(m_SelectedLandmarkCloud->GetLandmark(0), false);
 
 		mafVME::mafVMESet dependenciesVMEs = landmark->GetDependenciesVMEs();
 
@@ -738,8 +738,8 @@ void mafOpAddLandmark::DeselectLandmark()
 {
 	if (m_CurrentLandmark)
 	{
-		mafEventMacro(mafEvent(this, VME_SHOW, m_CurrentLandmark, true));
-		mafEventMacro(mafEvent(this, VME_SHOW, m_SelectedLandmarkCloud->GetLandmark(0), false));
+		GetLogicManager()->VmeShow(m_CurrentLandmark, true);
+		GetLogicManager()->VmeShow(m_SelectedLandmarkCloud->GetLandmark(0), true);
 		m_CurrentLandmark = NULL;
 	}
 
@@ -1144,8 +1144,8 @@ void mafOpAddLandmark::ShowLandmarkGroup()
 {
 	if (m_CurrentLandmark)
 	{
-		mafEventMacro(mafEvent(this, VME_SHOW, m_CurrentLandmark, true));
-		mafEventMacro(mafEvent(this, VME_SHOW, m_SelectedLandmarkCloud->GetLandmark(0), false));
+		GetLogicManager()->VmeShow(m_CurrentLandmark, true);
+		GetLogicManager()->VmeShow(m_SelectedLandmarkCloud->GetLandmark(0), true);
 		m_CurrentLandmark = NULL;
 	}
 

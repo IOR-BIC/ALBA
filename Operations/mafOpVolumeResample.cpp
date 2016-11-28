@@ -221,7 +221,7 @@ void mafOpVolumeResample::CreateGizmoCube()
   m_ResampleBoxVme->GetMaterial()->m_Diffuse[2] = 0;
   m_ResampleBoxVme->GetMaterial()->UpdateProp();
   m_ResampleBoxVme->ReparentTo(m_Input->GetRoot());
-	mafEventMacro(mafEvent(this,VME_SHOW,m_ResampleBoxVme,true));
+	GetLogicManager()->VmeShow(m_ResampleBoxVme, true);
   
   UpdateGizmoData();
   AutoSpacing();

@@ -15,20 +15,49 @@
 =========================================================================*/
 
 #include "mafFakeLogicForTest.h"
+#include "mafVME.h"
+
+//-------------------------------------------------------------------------
+mafFakeLogicForTest::mafFakeLogicForTest()
+{
+	
+}
+
+//-------------------------------------------------------------------------
+mafFakeLogicForTest::~mafFakeLogicForTest()
+{
+	ClearCalls();
+}
 
 // VME ////////////////////////////////////////////////////////////////////
 //-------------------------------------------------------------------------
-void mafFakeLogicForTest::VmeSelect(mafVME *vme){}
+void mafFakeLogicForTest::VmeSelect(mafVME *vme)
+{
+	AddCall(mafFakeLogicForTest::VME_SELECT, vme);
+}
 //-------------------------------------------------------------------------
 void mafFakeLogicForTest::VmeSelected(mafVME *vme){}
 //-------------------------------------------------------------------------
-void mafFakeLogicForTest::VmeShow(mafVME *vme, bool visibility){}
+void mafFakeLogicForTest::VmeShow(mafVME *vme, bool visibility)
+{
+	AddCall(mafFakeLogicForTest::VME_SHOW, vme);
+}
 //-------------------------------------------------------------------------
-void mafFakeLogicForTest::VmeAdd(mafVME *vme){}
+void mafFakeLogicForTest::VmeAdd(mafVME *vme)
+{
+	AddCall(mafFakeLogicForTest::VME_ADD, vme);
+}
 //-------------------------------------------------------------------------
-void mafFakeLogicForTest::VmeRemove(mafVME *vme){}
+void mafFakeLogicForTest::VmeRemove(mafVME *vme)
+{
+	AddCall(mafFakeLogicForTest::VME_REMOVE, vme);
+	vme->ReparentTo(NULL);
+}
 //-------------------------------------------------------------------------
-void mafFakeLogicForTest::VmeVisualModeChanged(mafVME * vme){}
+void mafFakeLogicForTest::VmeVisualModeChanged(mafVME * vme)
+{
+	AddCall(mafFakeLogicForTest::VME_VISUAL_MODE_CHANGED, vme);
+}
 
 // Camera /////////////////////////////////////////////////////////////////
 //-------------------------------------------------------------------------
@@ -36,3 +65,27 @@ void mafFakeLogicForTest::CameraUpdate(){}
 //-------------------------------------------------------------------------
 void mafFakeLogicForTest::CameraReset(){}
 
+
+// UTILS /////////////////////////////////////////////////////////////////
+
+//-------------------------------------------------------------------------
+void mafFakeLogicForTest::ClearCalls()
+{
+	m_Calls.clear();
+}
+
+//-------------------------------------------------------------------------
+mafFakeLogicForTest::calls mafFakeLogicForTest::GetCall(int callNum)
+{
+	return m_Calls[callNum];
+}
+
+//-------------------------------------------------------------------------
+void mafFakeLogicForTest::AddCall(testFunctions func, mafVME* vme)
+{
+	calls call;
+	call.testFunction = func;
+	call.vme = vme;
+
+	m_Calls.push_back(call);
+}

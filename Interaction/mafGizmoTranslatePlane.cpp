@@ -428,7 +428,7 @@ void mafGizmoTranslatePlane::Show(bool show)
 //----------------------------------------------------------------------------
 {
   for (int i = 0; i < 3; i++)
-		mafEventMacro(mafEvent(this,VME_SHOW,m_Gizmo[i],show));
+		GetLogicManager()->VmeShow(m_Gizmo[i], show);
 }
 //----------------------------------------------------------------------------
 void mafGizmoTranslatePlane::ShowSquare(bool show)

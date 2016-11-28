@@ -160,7 +160,7 @@ void mafOpSegmentationRegionGrowingConnectedThreshold::OpDo()
   if(m_Output)
   {
     m_Output->ReparentTo(m_ResampleInput);
-    mafEventMacro(mafEvent(this,VME_SHOW,m_Output,true));
+    GetLogicManager()->VmeShow(m_Output, true);
     mafEventMacro(mafEvent(this, CAMERA_UPDATE));
   }
 }
@@ -193,7 +193,7 @@ void mafOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
 {  
   if (result==OP_RUN_OK)
   {
-    mafEventMacro(mafEvent(this,VME_SHOW,m_Sphere,false));
+    GetLogicManager()->VmeShow(m_Sphere, false);
     m_Sphere->ReparentTo(NULL);
 
 		m_ResampleInput->SetBehavior(m_OldBehavior);
@@ -206,7 +206,7 @@ void mafOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
   { 
     if(m_Sphere!=NULL )
     {
-      mafEventMacro(mafEvent(this,VME_SHOW,m_Sphere,false));
+      GetLogicManager()->VmeShow(m_Sphere, false);
       m_Sphere->ReparentTo(NULL);
   
 			m_ResampleInput->SetBehavior(m_OldBehavior);
@@ -215,10 +215,10 @@ void mafOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
     
     if(m_ResampleInput!=NULL && m_ResampleInput!=m_Input)
     {
-      mafEventMacro(mafEvent(this,VME_SHOW,m_ResampleInput,false)); 
+      GetLogicManager()->VmeShow(m_ResampleInput, false);
       mafEventMacro(mafEvent(this,VME_SELECT,m_ResampleInput,false)); 
       mafEventMacro(mafEvent(this, VME_SELECT, m_Input, true));
-      mafEventMacro(mafEvent(this,VME_SHOW,m_Input,true)); 
+      GetLogicManager()->VmeShow(m_Input, true);
       m_ResampleInput->ReparentTo(NULL);
       m_ResampleInput->Update();
     }
@@ -406,7 +406,7 @@ void mafOpSegmentationRegionGrowingConnectedThreshold::OnEvent(mafEventBase *maf
           m_Sphere->SetData(m_SphereVTK->GetOutput(),0.0);
           m_Sphere->Update();
 
-          mafEventMacro(mafEvent(this,VME_SHOW,m_Sphere,true));
+          GetLogicManager()->VmeShow(m_Sphere, true);
           mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
           vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
@@ -513,7 +513,7 @@ int mafOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
     m_ResampleInput->Update();
 
     // show volume resampled
-    mafEventMacro(mafEvent(this, VME_SHOW, m_ResampleInput, true));
+    GetLogicManager()->VmeShow(m_ResampleInput, true);
     mafEventMacro(mafEvent(this, VME_SELECT, m_ResampleInput, true));
     mafEventMacro(mafEvent(this, CAMERA_UPDATE));
      

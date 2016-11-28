@@ -129,13 +129,13 @@ mafGUILandmark::~mafGUILandmark()
     for (int i = 0; i < m_LMCloud->GetNumberOfLandmarks(); i++)
     {
       mafVME *lm = m_LMCloud->GetChild(i);
-      mafEventMacro(mafEvent(this, VME_SHOW, lm, false));
+      GetLogicManager()->VmeShow(lm, false);
       GetLogicManager()->VmeRemove(lm);
       mafDEL(lm);
 
     }
 
-    mafEventMacro(mafEvent(this, VME_SHOW, m_LMCloud, false));
+    GetLogicManager()->VmeShow(m_LMCloud, false);
     GetLogicManager()->VmeRemove(m_LMCloud);
     mafDEL(m_LMCloud);
   }
@@ -326,7 +326,7 @@ void mafGUILandmark::OnVmePicked(mafEvent& e)
     */
 //    mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,m_LMCloud));
 		GetLogicManager()->VmeAdd(m_LMCloud);
-		mafEventMacro(mafEvent(this,VME_SHOW,m_LMCloud,true)); 
+		GetLogicManager()->VmeShow(m_LMCloud, true);
     
   }
 
@@ -347,7 +347,7 @@ void mafGUILandmark::OnVmePicked(mafEvent& e)
     
     //mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,m_Landmark));
 		GetLogicManager()->VmeAdd(m_Landmark);
-    mafEventMacro(mafEvent(this,VME_SHOW,m_Landmark,true)); 
+    GetLogicManager()->VmeShow(m_Landmark, true);
 	  mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
 
     CreateTranslateISACompositor(); 
@@ -361,7 +361,7 @@ void mafGUILandmark::OnVmePicked(mafEvent& e)
   else
   {
     m_Landmark->SetAbsPose(absPosition[0],absPosition[1],absPosition[2],0,0,0);
-    mafEventMacro(mafEvent(this,VME_SHOW,m_Landmark,true)); 
+    GetLogicManager()->VmeShow(m_Landmark, true);
   }
    
   // notify listener
@@ -558,7 +558,7 @@ void mafGUILandmark::SpawnLandmark()
   
   //mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,m_Landmark));
 	GetLogicManager()->VmeAdd(m_Landmark);
-  mafEventMacro(mafEvent(this,VME_SHOW,m_Landmark,true)); 
+  GetLogicManager()->VmeShow(m_Landmark, true);
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
   
   AttachInteractor(m_Landmark, m_IsaCompositor);

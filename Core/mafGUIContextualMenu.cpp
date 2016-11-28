@@ -186,7 +186,7 @@ void mafGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
         } 
         if(pipe_created && mutex) 
           m_ViewActive->VmeDeletePipe(vme);
-        mafEventMacro(mafEvent(this, VME_SHOW, vme, false));
+        GetLogicManager()->VmeShow(vme, false);
 			}
 		}
 		break;

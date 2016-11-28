@@ -133,7 +133,7 @@ bool mafOpLabelizeSurface::Accept(mafVME*node)
 void mafOpLabelizeSurface::OpRun()   
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,VME_SHOW,m_Input,false));
+	GetLogicManager()->VmeShow(m_Input, false);
 
 	mafNEW(m_VmeEditor);
 	vtkMAFSmartPointer<vtkPolyData> inputOriginalPolydata;
@@ -186,7 +186,7 @@ void mafOpLabelizeSurface::OpRun()
 	m_VmeEditor->Modified();
 	m_VmeEditor->Update();
 
-	mafEventMacro(mafEvent(this,VME_SHOW,m_VmeEditor,true));
+	GetLogicManager()->VmeShow(m_VmeEditor, true);
 
 	vtkPolyData *initialData;
 	vtkNEW(initialData);
@@ -384,7 +384,7 @@ void mafOpLabelizeSurface::ShowClipPlane(bool show)
 
 			m_ImplicitPlaneGizmo->SetAbsMatrix(mat);
 
-			mafEventMacro(mafEvent(this,VME_SHOW,m_ImplicitPlaneGizmo,true));
+			GetLogicManager()->VmeShow(m_ImplicitPlaneGizmo, true);
 		}
 		mmaMaterial *material = m_ImplicitPlaneGizmo->GetMaterial();
 		material->m_Prop->SetOpacity(0.5);
@@ -594,7 +594,7 @@ void mafOpLabelizeSurface::UpdateISARefSys()
 void mafOpLabelizeSurface::OpStop(int result)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,VME_SHOW,m_VmeEditor,false));
+	GetLogicManager()->VmeShow(m_VmeEditor, false);
 	m_VmeEditor->ReparentTo(NULL);
 
 	if(m_ImplicitPlaneGizmo)
@@ -624,7 +624,7 @@ void mafOpLabelizeSurface::OpStop(int result)
 	cppDEL(m_GizmoRotate);
 	cppDEL(m_GizmoScale);
 
-	mafEventMacro(mafEvent(this,VME_SHOW,m_Input,true));
+	GetLogicManager()->VmeShow(m_Input, true);
 
 	if(!m_TestMode)
 		HideGui();

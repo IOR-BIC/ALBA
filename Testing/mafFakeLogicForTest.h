@@ -18,13 +18,30 @@
 #define _mafFakeLogicForTest_H
 
 #include "mafAbsLogicManager.h"
+#include <vector>
 
 class mafFakeLogicForTest : public mafAbsLogicManager
 {
+
 public:
 
+	enum testFunctions
+	{
+		VME_SELECT,
+		VME_ADD,
+		VME_REMOVE,
+		VME_SHOW,
+		VME_VISUAL_MODE_CHANGED,
+	};
 
-protected:
+	struct calls
+	{
+		testFunctions testFunction;
+		mafVME *vme;
+	};
+	
+	mafFakeLogicForTest();
+	~mafFakeLogicForTest();
 
 	// VME
 	virtual void VmeSelect(mafVME *vme);
@@ -43,5 +60,14 @@ protected:
 	virtual void CameraUpdate();
 
 	virtual void CameraReset();
+
+	void ClearCalls();
+
+	calls GetCall(int callNum);
+	
+	void AddCall(testFunctions func, mafVME* vme);
+protected:
+	
+	std::vector<calls> m_Calls;
 };
 #endif

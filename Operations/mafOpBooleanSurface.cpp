@@ -150,7 +150,7 @@ void mafOpBooleanSurface::OpRun()
 
   m_ResultVME->ReparentTo(m_Input->GetRoot());
 
-  mafEventMacro(mafEvent(this,VME_SHOW,m_ResultVME,true));
+  GetLogicManager()->VmeShow(m_ResultVME, true);
 
 	m_FirstOperatorVME = m_ResultVME;
 	vtkPolyData *initialData;
@@ -596,7 +596,7 @@ void mafOpBooleanSurface::ShowClipPlane(bool show)
 			m_ImplicitPlaneGizmo->Modified();
 			m_ImplicitPlaneGizmo->Update();
 
-			mafEventMacro(mafEvent(this,VME_SHOW,m_ImplicitPlaneGizmo,true));
+			GetLogicManager()->VmeShow(m_ImplicitPlaneGizmo, true);
 		/*}
 		else
 		{

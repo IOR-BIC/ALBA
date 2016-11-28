@@ -797,11 +797,11 @@ void mafViewSingleSlice::VmeShow(mafVME *vme, bool show)
 				{
 					if(Inode->IsA("mafVMESurface"))
 					{
-						mafEventMacro(mafEvent(this,VME_SHOW,Inode,false));
+						GetLogicManager()->VmeShow(Inode, false);
 					}
 					if(Inode->IsA("mafVMEPolyline"))
 					{
-						mafEventMacro(mafEvent(this,VME_SHOW,Inode,false));
+						GetLogicManager()->VmeShow(Inode, false);
 					}
 				}
 			}

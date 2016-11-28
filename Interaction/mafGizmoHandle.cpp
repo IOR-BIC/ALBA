@@ -116,9 +116,9 @@ mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener /* = NULL */
   this->Show(false);
 
   // ask the manager to create the pipeline
-  mafEventMacro(mafEvent(this,VME_SHOW,m_BoxGizmo,true));
+  GetLogicManager()->VmeShow(m_BoxGizmo, true);
 
-  mafEventMacro(mafEvent(this,VME_SHOW,m_ShadingPlaneGizmo,m_ShowShadingPlane));
+  GetLogicManager()->VmeShow(m_ShadingPlaneGizmo, m_ShowShadingPlane);
   
   //-----------------
   // create isa stuff

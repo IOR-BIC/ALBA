@@ -391,7 +391,7 @@ void mafGizmoCrossRotateAxis::SetColor(double colR, double colG, double colB)
 void mafGizmoCrossRotateAxis::Show(bool show)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,VME_SHOW,m_GizmoCross,show));
+	GetLogicManager()->VmeShow(m_GizmoCross, show);
 }
 //----------------------------------------------------------------------------
 void mafGizmoCrossRotateAxis::SetAbsPose(mafMatrix *absPose)
@@ -575,7 +575,7 @@ void mafGizmoCrossRotateAxis::CreateFeedbackGizmoPipeline()
 
 void mafGizmoCrossRotateAxis::ShowTranslationFeedbackArrows(bool show)
 {
-	mafEventMacro(mafEvent(this,VME_SHOW,m_RotationFeedbackGizmo,show));
+	GetLogicManager()->VmeShow(m_RotationFeedbackGizmo, show);
 }
 
 //----------------------------------------------------------------------------

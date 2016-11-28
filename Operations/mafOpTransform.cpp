@@ -392,7 +392,7 @@ void mafOpTransform::OnEvent(mafEventBase *maf_event)
 
 	case ID_FLAG_GIZMO_UPDATE: // Show Transform VME
 	{
-		mafEventMacro(mafEvent(this, VME_SHOW, m_TransformVME, m_UpdateAfterRelease));
+		GetLogicManager()->VmeShow(m_TransformVME, m_UpdateAfterRelease);
 	}
 	break;
 

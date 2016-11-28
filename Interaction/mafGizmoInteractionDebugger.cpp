@@ -192,7 +192,7 @@ void mafGizmoInteractionDebugger::Show(bool show)
 //----------------------------------------------------------------------------
 {
   assert(m_VmeGizmo);
-  mafEventMacro(mafEvent(this,VME_SHOW,m_VmeGizmo,show));  
+  GetLogicManager()->VmeShow(m_VmeGizmo, show);
 }
 
 void mafGizmoInteractionDebugger::SetCurvilinearAbscissa( vtkIdType branchId, double s )

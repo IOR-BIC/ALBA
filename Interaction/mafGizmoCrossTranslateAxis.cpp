@@ -442,14 +442,14 @@ void mafGizmoCrossTranslateAxis::SetColor(double cylR, double cylG, double cylB)
 void mafGizmoCrossTranslateAxis::Show(bool show)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,VME_SHOW,m_TranslationCylinderGizmo,show));
+	GetLogicManager()->VmeShow(m_TranslationCylinderGizmo, show);
 }
 
 //----------------------------------------------------------------------------
 void mafGizmoCrossTranslateAxis::ShowTranslationFeedbackArrows(bool show)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,VME_SHOW,m_TranslationFeedbackGizmo,show));
+	GetLogicManager()->VmeShow(m_TranslationFeedbackGizmo, show);
 }
 
 //----------------------------------------------------------------------------
