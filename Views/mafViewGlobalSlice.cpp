@@ -407,7 +407,7 @@ void mafViewGlobalSlice::VmeCreatePipe(mafVME *vme)
 
       if (m_NumberOfVisibleVme == 1)
       {
-        mafEventMacro(mafEvent(this,CAMERA_RESET));
+				GetLogicManager()->CameraReset();
       }
       else
       {

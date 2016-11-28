@@ -36,6 +36,8 @@
 #include "mafDataPipe.h"
 #include "mafMatrixPipe.h"
 #include "mafAbsMatrixPipe.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -141,7 +143,7 @@ template class MAF_EXPORT mafAutoPointer<mafAbsMatrixPipe>;
   - fix the VME_TIME_SET issuing and propagation
   - implement Update() function
   */
-class MAF_EXPORT mafVME : public mafReferenceCounted, public mafStorable, public mafObserver, public mafTimeStamped
+class MAF_EXPORT mafVME : public mafReferenceCounted, public mafStorable, public mafObserver, public mafTimeStamped, public mafServiceClient
 {
 public:
   

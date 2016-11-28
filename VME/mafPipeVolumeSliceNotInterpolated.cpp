@@ -150,7 +150,7 @@ void mafPipeVolumeSliceNotInterpolated::OnEvent(mafEventBase * event)
         m_Gui->Update();
         // set the origin and update slicer pipeline
         SetSlice();
-        mafEventMacro(mafEvent(this,CAMERA_RESET));
+        GetLogicManager()->CameraReset();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       } break;
     case ID_SLICE:
