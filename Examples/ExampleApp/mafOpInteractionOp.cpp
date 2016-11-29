@@ -189,7 +189,7 @@ void mafOpInteractionOp::OnEvent(mafEventBase *e)
     mafEvent *event=mafEvent::SafeDownCast(e);
     assert(event);
     m_Gizmo->ApplyMatrix(*(event->GetMatrix()),POST_MULTIPLY);
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }    
   break;
 	default:

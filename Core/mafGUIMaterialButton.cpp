@@ -116,7 +116,7 @@ void mafGUIMaterialButton::OnEvent(mafEventBase *maf_event)
         mafEventMacro(mafEvent(this,VME_CHOOSE_MATERIAL,m_Vme));
         m_MaterialLabel->SetLabel(m_Material->m_MaterialName.GetCStr());
         UpdateMaterialIcon();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       default:
         e->Log();

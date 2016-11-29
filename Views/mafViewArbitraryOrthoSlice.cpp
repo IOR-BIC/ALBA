@@ -669,7 +669,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateZNormalView(mafEventBase
 			m_ChildViewList[X_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
 			m_ChildViewList[Y_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
 
-			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 
 			//update the normal of the cutter plane of the surface
 			mafVME *root=m_CurrentVolume->GetRoot();
@@ -830,17 +830,15 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateYNormalView(mafEventBase
 					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
 
 					PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);          
-					//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 				}
 			}
-
-
+			
 			UpdateXView2DActors();
 			UpdateZView2DActors();
 
 			ChildViewsCameraUpdate();
 
-			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 		}
 		break;
 
@@ -983,7 +981,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateXNormalView(mafEventBase
 			m_ChildViewList[Y_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
 			m_ChildViewList[Z_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
 
-			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 
 			//update the normal of the cutter plane of the surface
 			mafVME *root=m_CurrentVolume->GetRoot();
@@ -2091,8 +2089,7 @@ void mafViewArbitraryOrthoSlice::OnLUTChooser()
 		m_SlicerY->GetMaterial()->m_ColorLut->DeepCopy(m_ColorLUT);
 		m_SlicerY->GetMaterial()->m_ColorLut->Modified();
 
-		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-
+		GetLogicManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
@@ -3805,7 +3802,7 @@ void mafViewArbitraryOrthoSlice::HideAllCutPlanes()
 	ShowYCutPlanes(false);
 	ShowZCutPlanes(false);
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnID_CHOOSE_DIR()
@@ -3953,7 +3950,7 @@ void mafViewArbitraryOrthoSlice::SaveSlicesTextureToFile(int choosedExportAxis)
 			assert(textureToWriteOnDisk);
 			writer->SetInput(textureToWriteOnDisk);
 
-			mafEventMacro(mafEvent(this,CAMERA_UPDATE));				
+			GetLogicManager()->CameraUpdate();
 		}
 		else if (m_EnableThickness[choosedExportAxis] == true) // use rx projection
 		{
@@ -3962,7 +3959,7 @@ void mafViewArbitraryOrthoSlice::SaveSlicesTextureToFile(int choosedExportAxis)
 			writer->SetInput(textureToWriteOnDisk);
 			textureToWriteOnDisk->Delete();
 
-			mafEventMacro(mafEvent(this,CAMERA_UPDATE));				
+			GetLogicManager()->CameraUpdate();
 		}
 
 		// write it
@@ -4253,7 +4250,7 @@ void mafViewArbitraryOrthoSlice::UpdateSlicersLUT()
 	surfaceOutputSlicerZ->Update();
 	surfaceOutputSlicerZ->GetMaterial()->m_ColorLut->SetTableRange(low,hi);
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ThicknessComboAssignment( int axis )
@@ -4550,7 +4547,7 @@ void mafViewArbitraryOrthoSlice::SaveSlicesFromRenderWindowToFile(int chooseExpo
 			assert(textureToWriteOnDisk);
 			writer->SetInput(textureToWriteOnDisk);
 
-			mafEventMacro(mafEvent(this,CAMERA_UPDATE));				
+			GetLogicManager()->CameraUpdate();
 		}
 		else if (m_EnableThickness[chooseExportAxis] == true)
 		{
@@ -4559,7 +4556,7 @@ void mafViewArbitraryOrthoSlice::SaveSlicesFromRenderWindowToFile(int chooseExpo
 			writer->SetInput(textureToWriteOnDisk);
 			textureToWriteOnDisk->Delete();
 
-			mafEventMacro(mafEvent(this,CAMERA_UPDATE));				
+			GetLogicManager()->CameraUpdate();
 		}
 
 		// write it
@@ -4819,8 +4816,7 @@ void mafViewArbitraryOrthoSlice::HideRulerVMEVector(vector<mafVMESurface *> &rul
 	captionActorVector.clear();
 	rulerVector.clear();
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowCaptionActor(vtkCaptionActor2D *actor, 

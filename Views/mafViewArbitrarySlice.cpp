@@ -545,7 +545,7 @@ void mafViewArbitrarySlice::OnEventGizmoRotate(mafEventBase *maf_event)
 			// gizmo does not set vme pose  since they cannot scale
 			PostMultiplyEventMatrix(maf_event);
 
-			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 
 			//update the normal of the cutter plane of the surface
 			mafVME *root=m_CurrentVolume->GetRoot();
@@ -653,7 +653,7 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 					double low, hi;
 					m_LutSlider->GetSubRange(&low,&hi);
 					m_ColorLUT->SetTableRange(low,hi);
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 				}
 			}
 			break;
@@ -673,7 +673,7 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 				m_GizmoTranslate->SetAbsPose(m_MatrixReset);
 				m_Slicer->SetAbsMatrix(*m_MatrixReset);
 				//update because I need to refresh the normal of the camera
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 				//update the normal of the cutter plane of the surface
 				mafVME *root=m_CurrentVolume->GetRoot();
 				mafVMEIterator *iter = root->NewIterator();
@@ -743,7 +743,7 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 				if (m_Slicer)
 				{
 					m_Slicer->SetTrilinearInterpolation(m_TrilinearInterpolationOn == TRUE);
-					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 				}
 			}
 			break;

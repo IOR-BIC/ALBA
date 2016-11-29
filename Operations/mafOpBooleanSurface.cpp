@@ -207,7 +207,7 @@ void mafOpBooleanSurface::OnEvent(mafEventBase *maf_event)
 		case ID_CLIP:
 			{
 				Clip();
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case ID_CHOOSE_UNION:
@@ -220,7 +220,7 @@ void mafOpBooleanSurface::OnEvent(mafEventBase *maf_event)
           return;
         }
 				Union();
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case ID_CHOOSE_INTERSECTION:
@@ -234,7 +234,7 @@ void mafOpBooleanSurface::OnEvent(mafEventBase *maf_event)
         }
 				Intersection();
 
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case ID_CHOOSE_DIFFERENCE:
@@ -247,21 +247,21 @@ void mafOpBooleanSurface::OnEvent(mafEventBase *maf_event)
           return;
         }
 				Difference();
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case ID_CLIP_INSIDE:
 			if(m_Arrow) 
 			{
 				m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case ID_UNDO:
 			{
 				Undo();
 				ShowClipPlane(m_Modality != MODE_SURFACE);
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case ID_MODALITY:
@@ -276,7 +276,7 @@ void mafOpBooleanSurface::OnEvent(mafEventBase *maf_event)
 
 				m_Gui->Update();
 				ShowClipPlane(m_Modality == MODE_IMPLICIT_FUNCTION);
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case ID_TRANSFORM:
@@ -295,7 +295,7 @@ void mafOpBooleanSurface::OnEvent(mafEventBase *maf_event)
 				m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
 				UpdateISARefSys();
 
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case wxOK:

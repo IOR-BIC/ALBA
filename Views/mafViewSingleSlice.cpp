@@ -398,7 +398,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
       }
       else
       {
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
     }
     else

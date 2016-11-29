@@ -269,7 +269,7 @@ void mafOpVolumeResample::GizmoDelete()
 	GetLogicManager()->VmeRemove(m_ResampleBoxVme);
   vtkDEL(m_ResampleBox);
   mafDEL(m_ResampleBoxVme);
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 mafOp *mafOpVolumeResample::Copy()
@@ -285,7 +285,8 @@ void mafOpVolumeResample::OpRun()
 	CreateGizmoCube();
 	if(!this->m_TestMode)
 		CreateGui();
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpVolumeResample::OpDo()
@@ -537,7 +538,7 @@ void mafOpVolumeResample::OnEvent(mafEventBase *maf_event)
       case ID_VOLUME_DIR_Y:
       case ID_VOLUME_DIR_Z:
         UpdateGizmoData();
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 				break;
       case ID_VOLUME_SPACING:
       break;
@@ -545,19 +546,19 @@ void mafOpVolumeResample::OnEvent(mafEventBase *maf_event)
         SetBoundsToVMEBounds();
         UpdateGizmoData();
         UpdateGui();
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_VOLUME_4DBOUNDS:
         SetBoundsToVME4DBounds();
         UpdateGizmoData();
         UpdateGui();
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_VOLUME_VMELOCALBOUNDS:
         SetBoundsToVMELocalBounds();
         UpdateGizmoData();
         UpdateGui();
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_VOLUME_AUTOSPACING:
         AutoSpacing();
@@ -583,7 +584,7 @@ void mafOpVolumeResample::OnEvent(mafEventBase *maf_event)
       p->GetPoint(0,pos);
       UpdateGizmo(handle_id, pos);
       UpdateGui();
-      mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+      GetLogicManager()->CameraUpdate();
 
       }
       break;

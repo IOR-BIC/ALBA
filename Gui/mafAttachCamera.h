@@ -23,6 +23,8 @@
 #include "mafEvent.h"
 #include "mafObserver.h"
 #include <ostream>
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 using namespace std;
 
@@ -44,7 +46,7 @@ This tool has to be updated by calling UpdateCameraMatrix() during CameraUpdate 
 @sa mafViewVTK for an example on how to use it, mafRWI
 
 */
-class MAF_EXPORT mafAttachCamera : public mafObserver
+class MAF_EXPORT mafAttachCamera : public mafObserver, public mafServiceClient
 {
 public:
 

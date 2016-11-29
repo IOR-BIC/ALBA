@@ -218,7 +218,7 @@ void mafViewSlicer::VmeShow(mafVME *vme, bool show)
 	if (ActivateWindowing(vme))
 		UpdateWindowing(show, vme);
 
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 
 	//EnableWidgets(m_CurrentVolume != NULL);
 }
@@ -235,7 +235,6 @@ void mafViewSlicer::OnEvent(mafEventBase *maf_event)
     // if no one can handle this event send it to the operation listener
     Superclass::OnEvent(maf_event); 
   }	
-	//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void mafViewSlicer::OnEventThis(mafEventBase *maf_event)
@@ -252,7 +251,7 @@ void mafViewSlicer::OnEventThis(mafEventBase *maf_event)
           double low, hi;
           m_LutSlider->GetSubRange(&low,&hi);
           m_ColorLUT->SetTableRange(low,hi);
-          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
         }
       }
       break;

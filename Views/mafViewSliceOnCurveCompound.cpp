@@ -220,7 +220,7 @@ void mafViewSliceOnCurveCompound::VmeShow(mafVME *vme, bool show)
 	if (ActivateWindowing(vme))
 		UpdateWindowing(show, vme);
 
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //------------------------------------------------------------------------

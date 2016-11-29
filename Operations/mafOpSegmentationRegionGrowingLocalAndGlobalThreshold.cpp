@@ -859,7 +859,7 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpStop(int result)
 	    m_SurfaceOutput->ReparentTo(NULL);
 	  }
 
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 
   if (m_Gui)
@@ -889,7 +889,7 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpDo()
   {
     return;
   }
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpUndo()
@@ -912,5 +912,5 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpUndo()
   {
     return;
   }
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }

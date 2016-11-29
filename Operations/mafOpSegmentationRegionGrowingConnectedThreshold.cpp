@@ -161,7 +161,7 @@ void mafOpSegmentationRegionGrowingConnectedThreshold::OpDo()
   {
     m_Output->ReparentTo(m_ResampleInput);
     GetLogicManager()->VmeShow(m_Output, true);
-    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -389,7 +389,7 @@ void mafOpSegmentationRegionGrowingConnectedThreshold::OnEvent(mafEventBase *maf
         m_Sphere->SetData(m_SphereVTK->GetOutput(),0.0);
         m_Sphere->Update();
 
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case VME_PICKED:
@@ -407,7 +407,7 @@ void mafOpSegmentationRegionGrowingConnectedThreshold::OnEvent(mafEventBase *maf
           m_Sphere->Update();
 
           GetLogicManager()->VmeShow(m_Sphere, true);
-          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 
           vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
           sp->Update();
@@ -515,7 +515,7 @@ int mafOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
     // show volume resampled
     GetLogicManager()->VmeShow(m_ResampleInput, true);
     mafEventMacro(mafEvent(this, VME_SELECT, m_ResampleInput, true));
-    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
      
     if(!m_TestMode)
     {

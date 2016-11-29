@@ -326,5 +326,5 @@ void mafGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 		}
 		break;
 	}
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }

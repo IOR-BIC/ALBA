@@ -349,7 +349,7 @@ void mafAnimate::FlyTo()
       camera->SetViewUp(fly[6],fly[7],fly[8]);
       camera->SetParallelScale(fly[9]);
 
-      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
     }
   }
   else
@@ -358,149 +358,9 @@ void mafAnimate::FlyTo()
     camera->SetPosition(fly1[3],fly1[4],fly1[5]);
     camera->SetViewUp(fly1[6],fly1[7],fly1[8]);
     camera->SetParallelScale(fly1[9]);
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
-  m_Renderer->ResetCameraClippingRange();
+	GetLogicManager()->CameraUpdate();
 }
-/*
-//----------------------------------------------------------------------------
-void mafAnimate::FlyTo()
-//----------------------------------------------------------------------------
-{
-	assert(m_Tags && m_Renderer && m_PositionList);
-	m_SelectedPosition = m_PositionList->GetStringSelection();
-	wxString flyto_tagName = "FLY_TO_" + m_SelectedPosition;
-	mafTagItem *item = m_Tags->GetTag(flyto_tagName.c_str());
-  if(item == NULL)
-    item = m_Tags->GetTag(m_SelectedPosition.c_str()); // support old style
-	
-  vtkCamera *camera = m_Renderer->GetActiveCamera();
-
-	double fly[10];
-	fly[0] = item->GetComponentAsDouble(0);
-	fly[1] = item->GetComponentAsDouble(1);
-	fly[2] = item->GetComponentAsDouble(2);
-	fly[3] = item->GetComponentAsDouble(3);
-	fly[4] = item->GetComponentAsDouble(4);
-	fly[5] = item->GetComponentAsDouble(5);
-	fly[6] = item->GetComponentAsDouble(6);
-	fly[7] = item->GetComponentAsDouble(7);
-	fly[8] = item->GetComponentAsDouble(8);
-  if (item->GetNumberOfComponents() == 10)
-  {
-    fly[9] = item->GetComponentAsDouble(9);
-  }
-  else
-  {
-    fly[9] = camera->GetParallelScale();
-  }
-
-	int i, numSteps = 20;
-	int rate = 15;
-	double flyFrom[3],camFrom[3],viewUpFrom[3], parScaleFrom; 
-	double dx_fp, dy_fp, dz_fp, distance_fp, delta_fp;
-	double dx_pos, dy_pos, dz_pos, distance_pos, delta_pos;
-	double dx_vup, dy_vup, dz_vup, distance_vup, delta_vup;
-  double distance_ps, delta_par_scale;
-
-	if(m_InterpolateFlag)
-	{
-		m_Renderer->GetRenderWindow()->SetDesiredUpdateRate(rate);
-		camera->GetFocalPoint(flyFrom);
-		camera->GetPosition(camFrom);
-		camera->GetViewUp(viewUpFrom);
-    parScaleFrom = camera->GetParallelScale();
-
-		dx_fp = fly[0] - flyFrom[0];
-		dy_fp = fly[1] - flyFrom[1];
-		dz_fp = fly[2] - flyFrom[2];
-		distance_fp = sqrt(dx_fp * dx_fp + dy_fp * dy_fp + dz_fp * dz_fp); 
-    if (mafEquals(distance_fp, 0.0))
-    {
-      dx_fp = 0.0;
-      dy_fp = 0.0;
-      dz_fp = 0.0;
-    }
-    else
-    {
-      dx_fp = dx_fp / distance_fp;
-      dy_fp = dy_fp / distance_fp;
-      dz_fp = dz_fp / distance_fp;
-    }
-		delta_fp = distance_fp / numSteps;
-		dx_pos = fly[3] - camFrom[0];
-		dy_pos = fly[4] - camFrom[1];
-		dz_pos = fly[5] - camFrom[2];
-		distance_pos = sqrt(dx_pos * dx_pos + dy_pos * dy_pos + dz_pos * dz_pos); 
-
-    if (mafEquals(distance_pos, 0.0))
-    {
-      dx_pos = 0.0;
-      dy_pos = 0.0;
-      dz_pos = 0.0;
-    }
-    else
-    {
-      dx_pos = dx_pos / distance_pos;
-      dy_pos = dy_pos / distance_pos;
-      dz_pos = dz_pos / distance_pos;
-    }
-		delta_pos = distance_pos / numSteps;
-		dx_vup = fly[6] - viewUpFrom[0];
-		dy_vup = fly[7] - viewUpFrom[1];
-		dz_vup = fly[8] - viewUpFrom[2];
-		distance_vup = sqrt(dx_vup * dx_vup + dy_vup * dy_vup + dz_vup * dz_vup); 
-
-    if (mafEquals(distance_vup, 0.0))
-    {
-      dx_vup = 0.0;
-      dy_vup = 0.0;
-      dz_vup = 0.0;
-    }
-    else
-    {
-      dx_vup = dx_vup / distance_vup;
-      dy_vup = dy_vup / distance_vup;
-      dz_vup = dz_vup / distance_vup;
-    }
-		delta_vup = distance_vup / numSteps;
-
-    distance_ps = fly[9] - parScaleFrom;
-    delta_par_scale = distance_ps / numSteps;
-    for (i = 1; i <= numSteps; i++)
-		{
-			double focalX = flyFrom[0] + dx_fp * i * delta_fp;
-			double focalY = flyFrom[1] + dy_fp * i * delta_fp;
-			double focalZ = flyFrom[2] + dz_fp * i * delta_fp;
-
-      double posX = camFrom[0] + dx_pos * i * delta_pos;
-			double posY = camFrom[1] + dy_pos * i * delta_pos;
-			double posZ = camFrom[2] + dz_pos * i * delta_pos;
-
-      double vx = viewUpFrom[0] + dx_vup * i * delta_vup;
-			double vy = viewUpFrom[1] + dy_vup * i * delta_vup;
-			double vz = viewUpFrom[2] + dz_vup * i * delta_vup;
-
-      double ps = parScaleFrom + i * delta_par_scale;
-
-      camera->SetFocalPoint(focalX, focalY, focalZ);
-			camera->SetPosition(posX, posY, posZ); 
-			camera->SetViewUp(vx, vy, vz);
-      camera->SetParallelScale(ps);
-			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-		}
-	}
-	else
-	{
-		camera->SetFocalPoint(fly[0],fly[1],fly[2]);
-		camera->SetPosition(fly[3],fly[4],fly[5]);
-		camera->SetViewUp(fly[6],fly[7],fly[8]);
-    camera->SetParallelScale(fly[9]);
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-	}
-  m_Renderer->ResetCameraClippingRange();
-}
-*/
 //----------------------------------------------------------------------------
 void mafAnimate::StoreViewPoint()
 //----------------------------------------------------------------------------

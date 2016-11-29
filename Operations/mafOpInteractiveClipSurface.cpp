@@ -201,7 +201,7 @@ void mafOpInteractiveClipSurface::OpRun()
     CreateGui();
     ShowGui();
 
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
   // Added facility for test case
   else
@@ -317,7 +317,7 @@ void mafOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 			if(m_Arrow) 
 			{
 				m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case ID_CLIP_BY:
@@ -330,7 +330,7 @@ void mafOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 			m_Gui->Update();
 			ShowClipPlane(m_ClipModality != mafOpInteractiveClipSurface::MODE_SURFACE);
 			ChangeGizmo();
-      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 			break;
 		case ID_PLANE_WIDTH:
 		case ID_PLANE_HEIGHT:
@@ -341,14 +341,14 @@ void mafOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 					m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
 					m_PlaneSource->SetOrigin(-m_PlaneWidth/2,-m_PlaneHeight/2, 0);
 					m_PlaneSource->Update();
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 				}
 			}
 			break;
 		case ID_CHOOSE_GIZMO:
 			{
 				ChangeGizmo();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case ID_USE_GIZMO:
@@ -363,13 +363,13 @@ void mafOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 				{
 					wxMessageBox("Error while clipping surface!!", "Clipping Error");
 				}
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case ID_UNDO:
 			{
 				Undo();
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case wxOK:
@@ -401,7 +401,7 @@ void mafOpInteractiveClipSurface::OnUseGizmo()
 	m_Gui->Enable(ID_CHOOSE_CONSTRAINT_VME, m_UseGizmo?false:true);
 	m_CASH->EnableWidgets(!m_UseGizmo && m_ConstrainmafVMEPolylineGraph ? true : false);
 
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -503,7 +503,7 @@ void mafOpInteractiveClipSurface::OnEventGizmoScale(mafEventBase *maf_event)
 	{
 	case ID_TRANSFORM:
 		{ 
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 		}
 		break;
 
@@ -533,7 +533,7 @@ void mafOpInteractiveClipSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 							m_ClipInside= m_ClipInside ? 0 : 1;
 							m_Gui->Update();
 							m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
-							mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+							GetLogicManager()->CameraUpdate();
 						}
 					}
 				}
@@ -542,7 +542,7 @@ void mafOpInteractiveClipSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 					if(e->GetArg()==mafInteractorGenericMouse::MOUSE_DOWN)
 					{
 						Clip();
-						mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+						GetLogicManager()->CameraUpdate();
 					}
 				}
 				else
@@ -557,7 +557,7 @@ void mafOpInteractiveClipSurface::OnEventGizmoPlane(mafEventBase *maf_event)
               mafLogMessage(stringStream.str().c_str());
             }
 
-					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 				}
 			}
 			break;
@@ -689,7 +689,7 @@ void mafOpInteractiveClipSurface::OpDo()
 
 	((mafVMESurface *)m_Input)->SetData(transform_output->GetOutput(),m_Input->GetTimeStamp());
 	
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpInteractiveClipSurface::OpUndo()
@@ -697,7 +697,7 @@ void mafOpInteractiveClipSurface::OpUndo()
 {
   ((mafVMESurface *)m_Input)->SetData(m_OldSurface,m_Input->GetTimeStamp());
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 int mafOpInteractiveClipSurface::Clip()
@@ -833,7 +833,7 @@ void mafOpInteractiveClipSurface::PostMultiplyEventMatrix(mafEventBase *maf_even
 			// update matrix for OpDo()
 			//m_NewAbsMatrix = absPose;
 		} 
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 
 		// clean up
 		tr->Delete();
@@ -1018,7 +1018,7 @@ void mafOpInteractiveClipSurface::OnChooseConstrainVme( mafVME *vme )
   m_CASH->SetConstraintPolylineGraph(mafVMEPolylineGraph::SafeDownCast(m_ConstrainmafVMEPolylineGraph));
   m_CASH->SetCurvilinearAbscissa(m_ActiveBranchId, 0.0);
   m_CASH->EnableWidgets(true)  ;
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 void mafOpInteractiveClipSurface::GuiEnable()

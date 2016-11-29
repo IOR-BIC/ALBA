@@ -20,6 +20,9 @@
 #include "mafDefines.h"
 #include "mafEvent.h"
 #include "vtkLookupTable.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
+
 //----------------------------------------------------------------------------
 /** mafGUILutSwatch : widget representing a LUT, usually used to call the LutEditor.
 @sa mafGUILutEditor
@@ -28,7 +31,7 @@ class vtkDataSet;
 class mmaVolumeMaterial;
 class mafGUI;
 
-class MAF_EXPORT mafGUILutHistogramSwatch: public wxPanel
+class MAF_EXPORT mafGUILutHistogramSwatch: public wxPanel, public mafServiceClient
 {
 public:
   /** constructor. */

@@ -250,7 +250,7 @@ void mafOpSplitSurface::OnEventThis(mafEventBase *maf_event)
 			if(m_Arrow) 
 			{
 				m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case ID_CLIP_BY:
@@ -273,7 +273,7 @@ void mafOpSplitSurface::OnEventThis(mafEventBase *maf_event)
 					m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
 					m_PlaneSource->SetOrigin(-m_PlaneWidth/2,-m_PlaneHeight/2, 0);
 					m_PlaneSource->Update();
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 				}
 			}
 			break;
@@ -304,7 +304,7 @@ void mafOpSplitSurface::OnEventThis(mafEventBase *maf_event)
 				else
 					OpStop(OP_RUN_OK);
 
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case wxCANCEL:
@@ -401,7 +401,7 @@ void mafOpSplitSurface::OnEventGizmoScale(mafEventBase *maf_event)
 	{
 	case ID_TRANSFORM:
 		{ 
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 		}
 		break;
 
@@ -435,7 +435,7 @@ void mafOpSplitSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 				m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
 				UpdateISARefSys();
 
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 				currTr->Delete();
 			}
 			break;
@@ -503,7 +503,7 @@ void mafOpSplitSurface::ChangeGizmo()
 		m_GizmoRotate->Show(false);
 		m_GizmoScale->Show(false);
 	}
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpSplitSurface::OpStop(int result)
@@ -554,7 +554,7 @@ void mafOpSplitSurface::OpDo()
 
 		m_ClippedVME->ReparentTo(m_Input->GetParent());
 	}
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpSplitSurface::OpUndo()
@@ -566,7 +566,7 @@ void mafOpSplitSurface::OpUndo()
 		m_ClippedVME->ReparentTo(NULL);
 		mafDEL(m_ClippedVME);
 	}
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 int mafOpSplitSurface::Clip()
@@ -683,7 +683,7 @@ void mafOpSplitSurface::PostMultiplyEventMatrix(mafEventBase *maf_event)
 			// update matrix for OpDo()
 			//m_NewAbsMatrix = absPose;
 		} 
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 
 		// clean up
 		tr->Delete();
@@ -774,7 +774,7 @@ void mafOpSplitSurface::ShowClipPlane(bool show)
     }
   }
 
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpSplitSurface::AttachInteraction()

@@ -834,7 +834,7 @@ void mafPipeDensityDistance::UpdatePipeline()
 
     m_Actor->Modified();
 
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -855,7 +855,7 @@ void mafPipeDensityDistance::EnableMAPSFilterOff()
   m_Mapper->SetInput(m_Normals->GetOutput());
   m_Mapper->Update();
   m_EnableMAPSFilter=false;
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafPipeDensityDistance::EnableMAPSFilterOn()
@@ -864,7 +864,7 @@ void mafPipeDensityDistance::EnableMAPSFilterOn()
   m_Mapper->SetInput((vtkPolyData*)m_DistanceFilter->GetOutput());
   m_Mapper->Update();
   m_EnableMAPSFilter=true;
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafPipeDensityDistance::EnableMAPSFilter(bool enable)

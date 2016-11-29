@@ -233,7 +233,7 @@ void mafOpTransform::OpUndo()
 {
 	m_Input->SetAbsMatrix(m_OldAbsMatrix);
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -246,7 +246,7 @@ void mafOpTransform::OpStop(int result)
 		m_GizmoRotate->Show(false);
 		m_GizmoScale->Show(false);
 
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 		mafEventMacro(mafEvent(this, OP_HIDE_GUI, (wxWindow *)m_Gui->GetParent()));
 	}
 
@@ -386,7 +386,7 @@ void mafOpTransform::OnEvent(mafEventBase *maf_event)
 			m_TransformEntries[0] = m_TransformEntries[1] = m_TransformEntries[2] = 0.0;
 
 		m_Gui->Update();
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 	}
 	break;
 
@@ -399,7 +399,7 @@ void mafOpTransform::OnEvent(mafEventBase *maf_event)
 	case ID_TRANSFORM: // Transform by gizmo
 	{
 		OnEventTransformGizmo(maf_event);
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 	}
 	break;
 
@@ -408,7 +408,7 @@ void mafOpTransform::OnEvent(mafEventBase *maf_event)
 		OnEventTransformText();
 		UpdateReferenceSystem();
 		UpdateTransformTextEntries();
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 	}
 	break;
 
@@ -419,7 +419,7 @@ void mafOpTransform::OnEvent(mafEventBase *maf_event)
 		OnEventPoseTextEntries(maf_event);
 		UpdateReferenceSystem();
 		UpdateTransformTextEntries();
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 	}
 	break;
 
@@ -427,7 +427,7 @@ void mafOpTransform::OnEvent(mafEventBase *maf_event)
 	{
 		SelectRefSys();
 		UpdateTransformTextEntries();
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 	}
 	break;
 
@@ -436,7 +436,7 @@ void mafOpTransform::OnEvent(mafEventBase *maf_event)
 		ChooseRelativeRefSys();
 		SelectRefSys();
 		UpdateTransformTextEntries();
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 	}
 	break;
 	
@@ -458,14 +458,14 @@ void mafOpTransform::OnEvent(mafEventBase *maf_event)
 			SelectRefSys();
 
 			UpdateTransformTextEntries();
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 		}
 		else if (m_RefSystemMode == REF_ARBITRARY)
 		{
 			m_ArbitraryRefSysVME->SetAbsPose(m_OriginRefSysPosition[0], m_OriginRefSysPosition[1], m_OriginRefSysPosition[2], m_OriginRefSysOrientation[0], m_OriginRefSysOrientation[1], m_OriginRefSysOrientation[2], m_CurrentTime);
 			SetRefSysVME(m_ArbitraryRefSysVME);
 			UpdateTransformTextEntries();
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 		}
 	}
 	break;
@@ -474,7 +474,7 @@ void mafOpTransform::OnEvent(mafEventBase *maf_event)
 	{
 		Reset();
 		UpdateTransformTextEntries();
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 	}
 	break;
 
@@ -685,7 +685,7 @@ void mafOpTransform::PostMultiplyMatrix(mafMatrix *matrix)
 	// update matrix for OpDo()
 	m_NewAbsMatrix = absPose;
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 
 	// clean up
 	tr->Delete();

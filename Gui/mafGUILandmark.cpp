@@ -192,7 +192,7 @@ void mafGUILandmark::OnEvent(mafEventBase *maf_event)
         m_Landmark->SetAbsMatrix(mat);
         SetGuiAbsPosition(mat.GetVTKMatrix(), -1);
 
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));        
+        GetLogicManager()->CameraUpdate();
 
         // forward transform events to listener operation (notify)
         e->SetSender(this);
@@ -348,7 +348,7 @@ void mafGUILandmark::OnVmePicked(mafEvent& e)
     //mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,m_Landmark));
 		GetLogicManager()->VmeAdd(m_Landmark);
     GetLogicManager()->VmeShow(m_Landmark, true);
-	  mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
+		GetLogicManager()->CameraUpdate();
 
     CreateTranslateISACompositor(); 
 
@@ -367,7 +367,7 @@ void mafGUILandmark::OnVmePicked(mafEvent& e)
   // notify listener
   e.SetSender(this);
   mafEventMacro(e);
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
+	GetLogicManager()->CameraUpdate();
 }
 
  
@@ -559,7 +559,7 @@ void mafGUILandmark::SpawnLandmark()
   //mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,m_Landmark));
 	GetLogicManager()->VmeAdd(m_Landmark);
   GetLogicManager()->VmeShow(m_Landmark, true);
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
+	GetLogicManager()->CameraUpdate();
   
   AttachInteractor(m_Landmark, m_IsaCompositor);
 
@@ -611,7 +611,7 @@ void mafGUILandmark::TextEntriesChanged()
   
   this->SetGuiAbsPosition(m_Landmark->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
  
-   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

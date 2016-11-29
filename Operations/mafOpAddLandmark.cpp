@@ -223,7 +223,7 @@ void mafOpAddLandmark::OpRun()
 	// Set Landmarks color 
 	SetMaterialRGBA(material, 1.0, 0.1, 0.1, 0.8);
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 
 	LoadLandmarksFromVME();
 
@@ -280,14 +280,14 @@ void mafOpAddLandmark::RestoreLandmarkVect(std::vector<mafVMELandmark*> &landmar
 	for (int i = 0; i < landmarkVect.size(); i++)
 	{
 		mafSmartPointer<mafVMELandmark> newLandmark;
-		
+
 		newLandmark->DeepCopy(landmarkVect[i]);
 		newLandmark->ReparentTo(m_Cloud);
 
 		GetLogicManager()->VmeShow(newLandmark, true);
 	}
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -415,7 +415,7 @@ void mafOpAddLandmark::OnEvent(mafEventBase *maf_event)
 				}
 
 				m_Gui->Update();
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 
@@ -461,7 +461,7 @@ void mafOpAddLandmark::OnEvent(mafEventBase *maf_event)
 					m_SelectedLandmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
 				}
 
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 
 				if (m_Gui && !GetTestMode())
 				{
@@ -591,7 +591,7 @@ void mafOpAddLandmark::AddLandmark(double pos[3])
 	landmark->Update();
 
   GetLogicManager()->VmeShow(landmark.GetPointer(), true);
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 
   if (m_Gui && !GetTestMode())
   {
@@ -647,7 +647,7 @@ void mafOpAddLandmark::RemoveLandmark()
 				SelectLandmark("Add_New_Landmark");
 			}
 
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 		}
 	}
 }
@@ -731,7 +731,7 @@ void mafOpAddLandmark::SelectLandmark(mafString selection)
 		m_Gui->Update();
 	}
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpAddLandmark::DeselectLandmark()
@@ -749,7 +749,7 @@ void mafOpAddLandmark::DeselectLandmark()
 		m_Dict->DeselectItem(m_SelectedLandmarkName);
 	}
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 
 	m_HasSelection = false;
 }

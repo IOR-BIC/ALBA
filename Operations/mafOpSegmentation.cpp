@@ -558,7 +558,7 @@ void mafOpSegmentation::OpUndo()
 //     m_SegmentatedVolume->ReparentTo(NULL);
 //     mafDEL(m_SegmentatedVolume);
 //   }
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::RemoveVMEs()
@@ -2769,7 +2769,6 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
           m_ColorLUT->SetTableRange(low,hi);
           m_View->SetLut(m_Input,m_ColorLUT);
           m_View->CameraUpdate();
-          //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         }
         else if(e->GetSender() == m_AutomaticRangeSlider)
         {

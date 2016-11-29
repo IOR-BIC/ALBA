@@ -261,7 +261,7 @@ void mafPipeVolumeMIP::OnEvent(mafEventBase *maf_event)
         m_VolumeMapper->SetMinimumImageSampleDistance(1/m_ResampleFactor);
 
         m_Volume->Update();
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     default:
@@ -282,7 +282,7 @@ void mafPipeVolumeMIP::SetResampleFactor(double value)
     m_VolumeMapper->SetMinimumImageSampleDistance(1/m_ResampleFactor);
 
     m_Volume->Update();
-    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -307,7 +307,7 @@ void mafPipeVolumeMIP::UpdateMIPFromLUT()
       m_OpacityTransferFunction->AddPoint(p, (double)v/(double)tv);
     }
     m_OpacityTransferFunction->Update();
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 
 }

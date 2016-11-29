@@ -361,7 +361,7 @@ void mafGizmoPolylineGraph::DestroyVMEGizmo()
 //------------------------------------------------------------------------
 {
   m_CurvilinearAbscissaHelper->MoveOnSkeleton(e);
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));      
+	GetLogicManager()->CameraUpdate();
 
   // forward isa transform events to the listener op
   // instanciating the gizmo; the sender is changed to "this" so that the operation can check for

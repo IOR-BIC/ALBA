@@ -312,7 +312,7 @@ void mafViewSliceGlobal::OnEvent(mafEventBase *maf_event)
     case ID_OPACITY_SLIDER:
       {
           mafPipeVolumeSlice::SafeDownCast(m_CurrentVolume->GetPipe())->SetSliceOpacity(m_Opacity);
-          mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
           m_OpacitySlider->SetValue(m_Opacity);
       }
       break;

@@ -212,7 +212,7 @@ void mafOpMakeVMETimevarying::CreateGui()
   //--------------------------//
 
 	ShowGui();
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpMakeVMETimevarying::OnEvent(mafEventBase *maf_event)

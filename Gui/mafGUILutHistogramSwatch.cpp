@@ -244,7 +244,7 @@ void mafGUILutHistogramSwatch::OnMouseMotion(wxMouseEvent &event)
         //for highlighting on the views
         m_Lut->SetTableValue(i,newcol);
         m_Material->UpdateFromTables();
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+        GetLogicManager()->CameraUpdate();
         m_LastHighlighted=i;
         m_Highlighted=true;
       }
@@ -257,7 +257,7 @@ void mafGUILutHistogramSwatch::OnMouseMotion(wxMouseEvent &event)
     m_Material->ApplyGammaCorrection(4);
     m_Material->UpdateProp();
     m_Highlighted=0;
-    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -267,7 +267,7 @@ void mafGUILutHistogramSwatch::OnSize(wxSizeEvent &event)
   m_Material->ApplyGammaCorrection(4);
   m_Material->UpdateProp();
   m_Highlighted=0;
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
   Refresh();
 }
 //----------------------------------------------------------------------------

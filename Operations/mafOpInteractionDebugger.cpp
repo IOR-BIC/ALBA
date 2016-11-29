@@ -137,7 +137,7 @@ void mafOpInteractionDebugger::OnEvent(mafEventBase *maf_event)
       {
         m_ActiveBranchId = 0;
         m_GizmoDebugger->SetCurvilinearAbscissa(m_ActiveBranchId, 0.0);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
       case ID_CHOOSE:
@@ -404,7 +404,7 @@ void mafOpInteractionDebugger::AddMEDGizmoDebuggerToTree()
   
   // Create the output vtk data...
   GetLogicManager()->VmeShow(constraint, true);
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 
   // build constrained gizmo
   m_GizmoDebugger = new mafGizmoInteractionDebugger(vmeRoot, this, "test gizmo path");
@@ -424,8 +424,7 @@ void mafOpInteractionDebugger::AddMEDGizmoDebuggerToTree()
   m_GizmoDebugger->SetCurvilinearAbscissa(m_ActiveBranchId, 0.0);
   m_GizmoDebugger->Show(true);
   
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-
+	GetLogicManager()->CameraUpdate();
 }
 
 void mafOpInteractionDebugger::OnChooseConstrainVme( mafVME *vme )
@@ -440,7 +439,7 @@ void mafOpInteractionDebugger::OnChooseConstrainVme( mafVME *vme )
   m_GizmoDebugger->SetCurvilinearAbscissa(m_ActiveBranchId, 0.0);
   m_GizmoDebugger->Show(true);
   
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 void mafOpInteractionDebugger::BuildGraph1( vtkPolyData *inputPolyData )

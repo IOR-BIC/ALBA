@@ -154,7 +154,7 @@ void mafOpFilterVolume::OpDo()
   if (m_ResultImageData)
   {
     ((mafVMEVolumeGray *)m_Input)->SetData(m_ResultImageData,m_Input->GetTimeStamp());
-    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -164,7 +164,7 @@ void mafOpFilterVolume::OpUndo()
   if (m_OriginalImageData)
   {
     ((mafVMEVolumeGray *)m_Input)->SetData(m_OriginalImageData,m_Input->GetTimeStamp());
-    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -250,7 +250,7 @@ void mafOpFilterVolume::OnSmooth()
   if (m_ApplyDirectlyOnInput)
   {
     ((mafVMEVolumeGray *)m_Input)->SetData(smoothFilter->GetOutput(),m_Input->GetTimeStamp());
-    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
   else
     m_ResultImageData->DeepCopy(smoothFilter->GetOutput());
@@ -292,7 +292,7 @@ void mafOpFilterVolume::OnMedian()
   if (m_ApplyDirectlyOnInput)
   {
     ((mafVMEVolumeGray *)m_Input)->SetData(medianFilter->GetOutput(),m_Input->GetTimeStamp());
-    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
   else
     m_ResultImageData->DeepCopy(medianFilter->GetOutput());
@@ -325,7 +325,7 @@ void mafOpFilterVolume::OnPreview()
 	m_PreviewResultFlag   = false;
 	m_ClearInterfaceFlag	= true;
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpFilterVolume::OnClear()
@@ -358,5 +358,5 @@ void mafOpFilterVolume::OnClear()
 	m_PreviewResultFlag = false;
 	m_ClearInterfaceFlag= false;
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }

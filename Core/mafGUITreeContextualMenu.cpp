@@ -331,7 +331,7 @@ void mafGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 	}
 
   if(m_ViewActive != NULL)
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafGUITreeContextualMenu::CryptSubTree(bool crypt)

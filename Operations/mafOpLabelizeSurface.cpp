@@ -408,7 +408,7 @@ void mafOpLabelizeSurface::ShowClipPlane(bool show)
 		}
 	}
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpLabelizeSurface::OnEvent(mafEventBase *maf_event)
@@ -446,7 +446,7 @@ void mafOpLabelizeSurface::OnEventThis(mafEventBase *maf_event)
 		case ID_UNDO:
 			{
 				Undo();
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case ID_PLANE_WIDTH:
@@ -505,7 +505,7 @@ void mafOpLabelizeSurface::SetPlaneDimension()
 		m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
 		m_PlaneSource->SetOrigin(-m_PlaneWidth/2,-m_PlaneHeight/2, 0);
 		m_PlaneSource->Update();
-		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
@@ -527,7 +527,7 @@ void mafOpLabelizeSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 							m_LabelInside= m_LabelInside ? 0 : 1;
 							m_Gui->Update();
 							m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
-							mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+							GetLogicManager()->CameraUpdate();
 						}
 					}
 				}
@@ -536,7 +536,7 @@ void mafOpLabelizeSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 					if(e->GetArg()==mafInteractorGenericMouse::MOUSE_DOWN)
 					{
 						Labelize();
-						mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+						GetLogicManager()->CameraUpdate();
 					}
 				}
 				else
@@ -555,7 +555,7 @@ void mafOpLabelizeSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 					m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
 					UpdateISARefSys();
 
-					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 					currTr->Delete();
 				}
 			}
@@ -644,7 +644,7 @@ void mafOpLabelizeSurface::OpDo()
 		mafVMESurface::SafeDownCast(m_Input)->GetSurfaceOutput()->Update();
 		mafVMESurface::SafeDownCast(m_Input)->GetOutput()->Update();
 		GetLogicManager()->VmeVisualModeChanged(m_Input);
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
@@ -652,7 +652,7 @@ void mafOpLabelizeSurface::OpUndo()
 //----------------------------------------------------------------------------
 {
 	mafVMESurface::SafeDownCast(m_Input)->SetData(m_OriginalPolydata,((mafVMESurface*)m_Input)->GetTimeStamp());
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpLabelizeSurface::Labelize()
@@ -770,7 +770,7 @@ void mafOpLabelizeSurface::ChangeGizmo()
 			break;
 		}
 	}
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpLabelizeSurface::PostMultiplyEventMatrix(mafEventBase *maf_event)
@@ -798,7 +798,7 @@ void mafOpLabelizeSurface::PostMultiplyEventMatrix(mafEventBase *maf_event)
 			// update matrix for OpDo()
 			//m_NewAbsMatrix = absPose;
 		} 
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 
 		// clean up
 		tr->Delete();
@@ -852,7 +852,7 @@ void mafOpLabelizeSurface::OnEventGizmoScale(mafEventBase *maf_event)
 	{
 	case ID_TRANSFORM:
 		{ 
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 		}
 		break;
 
