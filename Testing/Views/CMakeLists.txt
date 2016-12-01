@@ -31,6 +31,7 @@ SET(PROJECT_SRCS
 	mafViewSliceOnCurveTest.h mafViewSliceOnCurveTest.cpp
 	mafViewSliceGlobalTest.h mafViewSliceGlobalTest.cpp
 	mafViewCompoundWindowingTest.h mafViewCompoundWindowingTest.cpp
+	mafViewIsosurfaceCompoundTest.h mafViewIsosurfaceCompoundTest.cpp
 )
 
 ADD_EXECUTABLE(mafViewsTests ${PROJECT_SRCS})
