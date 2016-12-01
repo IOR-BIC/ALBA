@@ -185,7 +185,8 @@
 #include "mafViewVTKCompound.h"
 #include "mafViewPlot.h"
 #include "mafViewHTML.h"
-
+#include "mafViewIsosurfaceCompound.h"
+#include "mafOpImporterMSF.h"
 #endif
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -243,6 +244,7 @@ bool ExampleApp::OnInit()
 	m_Logic->Plug(new mafOpImporterVRML("VRML"));
 	m_Logic->Plug(new mafOpImporterVTK("VTK"));
 	m_Logic->Plug(new medOpImporterVTK("VTK (MED)"));
+	m_Logic->Plug(new mafOpImporterMSF("MSF"));
 	m_Logic->Plug(new mafOpImporterMSF1x("MSF 1.x"));
 	m_Logic->Plug(new mafOpImporterMesh("Mesh"));
 	m_Logic->Plug(new mafOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
@@ -389,6 +391,11 @@ bool ExampleApp::OnInit()
 	mafViewVTK *viso = new mafViewVTK("Isosurface (mafViewVTK)");
 	viso->PlugVisualPipe("mafVMEVolumeGray", "mafPipeIsosurface",MUTEX);
 	m_Logic->Plug(viso);
+
+	//View Isosurface Compound
+	mafViewIsosurfaceCompound *visoc = new mafViewIsosurfaceCompound("Isosurface Compound (mafViewIsosurfaceCompound)");
+	visoc->PackageView();
+	m_Logic->Plug(visoc);
 
  	//View RXCT
 	mafViewRXCT *vrxct=new mafViewRXCT("RX-CT (mafViewRXCT)");
