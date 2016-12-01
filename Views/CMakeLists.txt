@@ -57,6 +57,8 @@ SET(PROJECT_SRCS
   mafViewSliceNotInterpolated.h
   mafViewSliceNotInterpolatedCompound.cpp
   mafViewSliceNotInterpolatedCompound.h
+  mafViewIsosurfaceCompound.cpp
+  mafViewIsosurfaceCompound.h
 )
 
 # List libraries that are needed by this project.

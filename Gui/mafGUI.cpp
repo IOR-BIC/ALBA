@@ -1023,6 +1023,65 @@ mafGUIFloatSlider *mafGUI::FloatSlider(int id,wxString label,double *var,double 
 	return sli;
 }
 //----------------------------------------------------------------------------
+mafGUIFloatSlider *mafGUI::FloatExpandedSlider(int id, wxString label, double *var, double min, double max, wxSize size, wxString tooltip, bool textBoxEnable) //<*> Si puo Chiamare Slider lo stesso 
+{
+	wxTextCtrl     *text = NULL;
+	mafGUIFloatSlider *sli = NULL;
+	wxStaticText   *lab = NULL;
+
+	int w_id_text;
+	int w_id_sli;
+	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+
+	if (label == "")
+	{
+		int text_w = EW * 0.8;
+		int slider_w = FW - text_w;
+		w_id_text = GetWidgetId(id);
+		text = new wxTextCtrl(this, w_id_text, "", dp, wxSize(text_w, LH), m_EntryStyle/*|wxTE_READONLY*/);
+		text->SetFont(m_Font);
+		text->Enable(textBoxEnable);
+		w_id_sli = GetWidgetId(id);
+		sli = new mafGUIFloatSlider(this, w_id_sli, *var, min, max, dp, size);
+		if (m_UseBackgroundColor)
+			sli->SetBackgroundColour(m_BackgroundColor);
+		text->SetValidator(mafGUIValidator(this, w_id_text, text, var, sli, min, max));
+		sli->SetValidator(mafGUIValidator(this, w_id_sli, sli, var, text));
+		sizer->Add(text, 0);
+		sizer->Add(sli, wxEXPAND);
+	}
+	else
+	{
+		int text_w = EW * 0.8;
+		int slider_w = DW - text_w;
+		lab = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
+		if (m_UseBackgroundColor)
+			lab->SetBackgroundColour(m_BackgroundColor);
+		lab->SetFont(m_Font);
+		w_id_text = GetWidgetId(id);
+		text = new wxTextCtrl(this, w_id_text, "", dp, wxSize(text_w, LH), m_EntryStyle/*|wxTE_READONLY*/);
+		text->SetFont(m_Font);
+		text->Enable(textBoxEnable);
+		w_id_sli = GetWidgetId(id);
+		sli = new mafGUIFloatSlider(this, w_id_sli, *var, min, max, dp, size);
+		if (m_UseBackgroundColor)
+			sli->SetBackgroundColour(m_BackgroundColor);
+
+		text->SetValidator(mafGUIValidator(this, w_id_text, text, var, sli, min, max));
+		sli->SetValidator(mafGUIValidator(this, w_id_sli, sli, var, text));
+		sizer->Add(lab, 0, wxRIGHT, LM);
+		sizer->Add(text, 0);
+		sizer->Add(sli, wxEXPAND);
+	}
+
+	Add(sizer, 0, wxEXPAND, M);
+
+	if (tooltip != "")
+		text->SetToolTip(tooltip);
+
+	return sli;
+}
+//----------------------------------------------------------------------------
 mafGUIFloatSlider *mafGUI::FloatSlider(int id,double *var, double min, double max, wxString minLab, wxString maxLab, wxSize size, wxString tooltip, bool textBoxEnable) //<*> Si puo Chiamare Slider lo stesso 
 //----------------------------------------------------------------------------                                            //<*> verificare se le entry erano abilitate o no
 {
