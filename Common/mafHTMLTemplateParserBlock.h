@@ -26,7 +26,6 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-
 enum HTMLBLOCK_TYPES
 {
   maf_HTML_TEMPLATE_MAIN,
@@ -43,7 +42,7 @@ maf_HTML_SUBSTITUTION_BLOCK_ARRAY,
 maf_HTML_SUBSTITUTION_FORWARD_UP,
 };
 
-
+class mafView;
 class wxString;
 
 /**
@@ -78,7 +77,9 @@ public:
   void AddVar(wxString name, int varValue);
   /** Add the variable specified in the name string to the list of variables */
   void AddVar(wxString name, wxString varValue);
-  
+	/** Add the variable specified in the name string to the list of variables */
+	void AddImageVar(wxString name, mafView *view, wxString imagePath = "");
+
   /** Push the variable specified in the name string to the list of variables */
   void PushVar(wxString name, double varValue);
   /** Push the variable specified in the name string to the list of variables */
@@ -121,7 +122,7 @@ public:
 
   /** Set the number of loops for the "if" blocks*/
   int GetNLoops();
-
+	
 protected:
   /** Return the position of the variable in the Variable Table.
      Returns -1 if variable is not found */
@@ -171,6 +172,8 @@ protected:
   /** Sets the father for the block */
   void SetFather(mafHTMLTemplateParserBlock *father);
     
+	wxString CalculateImageRTF(mafView *view, wxString imagePath);
+
   //VARIABLES
   mafHTMLTemplateParserBlock *m_Father;
 
