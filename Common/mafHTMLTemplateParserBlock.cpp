@@ -24,6 +24,9 @@
 //----------------------------------------------------------------------------
 
 #include "mafHTMLTemplateParserBlock.h"
+#include "mafView.h"
+#include "mafRWIBase.h"
+#include "mafDecl.h"
 
 //----------------------------------------------------------------------------
 mafHTMLTemplateParserBlock::mafHTMLTemplateParserBlock(int blockType, wxString name)
@@ -116,6 +119,17 @@ void mafHTMLTemplateParserBlock::AddVar( wxString name, wxString varValue )
     m_Variables.push_back(varValue);
   }
 }
+
+//----------------------------------------------------------------------------
+void mafHTMLTemplateParserBlock::AddImageVar(wxString name, mafView *view, wxString imagePath)
+//----------------------------------------------------------------------------
+{
+	if (view)
+		AddVar(name, CalculateImageRTF(view, imagePath)); //RTF image generation
+
+	//TODO AddImageVar for HTML Template
+}
+
 
 //----------------------------------------------------------------------------
 void mafHTMLTemplateParserBlock::PushVar( wxString name, double varValue )
@@ -1002,4 +1016,71 @@ int mafHTMLTemplateParserBlock::GetNLoops()
   }
   
   return m_LoopsNumber;
+}
+
+//----------------------------------------------------------------------------
+wxString mafHTMLTemplateParserBlock::CalculateImageRTF(mafView *view, wxString imagePath)
+{
+	int widthGoal = 8640;
+	int heightGoal = 4680;
+
+	if (imagePath == "")
+	{
+		// Write Image
+		wxString logPath = mafGetAppDataDirectory().c_str();
+		imagePath = logPath + "\\imm.jpg";
+
+		view->CameraUpdate();
+		view->GetRWI()->Update();
+		view->GetRWI()->SaveImage(imagePath);
+
+		int width = view->GetRWI()->m_Width;
+		int height = view->GetRWI()->m_Height;
+
+		int newWidthGoal = (heightGoal / height) * width;
+
+		if (newWidthGoal > widthGoal)
+		{
+			heightGoal = (widthGoal / width) * height;
+		}
+		else
+		{
+			widthGoal = newWidthGoal;
+		}
+	}
+
+	// Read Image
+	wxString imageStr = "", byteStr = "";
+
+	FILE *imageFile;
+
+	imageFile = fopen(imagePath, "rb");
+
+	if (imageFile == NULL) {/*ERROR*/ }
+
+	BYTE bytebuf;
+
+	int nread = 1;
+	int lineCounter = 0;
+
+	while (nread)
+	{
+		nread = fread(&bytebuf, sizeof(BYTE), 1, imageFile);
+		if (nread > 0)
+		{
+			byteStr.Printf("%02x", bytebuf);
+			lineCounter++;
+			imageStr += byteStr;
+			if (lineCounter == 80)
+			{
+				imageStr += "\n";
+				lineCounter = 0;
+			}
+		}
+	}
+
+	wxString mpic;
+	mpic.Printf("\n\\qc{\\pict\\jpegblip\\picwgoal%d\\pichgoal%d\\bin\n%s\n}", widthGoal, heightGoal, imageStr);
+
+	return mpic;
 }
