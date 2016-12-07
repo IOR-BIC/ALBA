@@ -141,13 +141,15 @@ mafView *mafViewRXCT::Copy(mafObserver *Listener, bool lightCopyEnabled)
 void mafViewRXCT::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
+	bool isVmeShowed = m_ChildViewList[0]->IsVmeShowed(vme);
+
   for(int i=0; i<CT_COMPOUND_VIEW; i++)
     m_ChildViewList[i]->VmeShow(vme, show);
 
   //if (node->IsMAFType(mafVMEVolume))
   if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
   {
-    if (show)
+    if (show && !isVmeShowed)
     {
       double center[3],b[CT_CHILD_VIEWS_NUMBER],step;
     
@@ -282,7 +284,7 @@ void mafViewRXCT::VmeShow(mafVME *vme, bool show)
       iter->Delete();
       //END cycle for remove old surface and redraw the rigth slice
     }
-    else
+    else if (!show)
     {
       m_ChildViewList[CT_COMPOUND_VIEW]->VmeShow(vme, show);
       m_CurrentVolume = NULL;
