@@ -93,6 +93,8 @@ public:
 	/** Makes the undo for the operation. */
 	void OpUndo();
 
+	void SetCloudName(mafString name);
+
   /** Add landmark to the cloud */
   void AddLandmark(double pos[3]);
 	
@@ -114,6 +116,8 @@ public:
   void SetLandmarkName(mafString name){m_LandmarkName = name;};
 
 	void EnableAddMode(bool mode) { m_AddModeActive = mode; };
+
+	void EnableShowAllMode(bool mode) { m_ShowAllMode = mode; };
 
 protected:
 	/** Create the AddLandmarks interface. */
@@ -164,9 +168,11 @@ protected:
 	bool					m_FirstOpDo;
 	bool					m_DictionaryLoaded;
 
+	mafString			m_CloudName;
 	mafString			m_LandmarkName;
 	mafString			m_SelectedLandmarkName;
 
+	bool					m_ShowAllMode;
 	int						m_LandmarkNameCount;
 	int						m_ShowMode;
 	wxComboBox		*m_ShowComboBox;
