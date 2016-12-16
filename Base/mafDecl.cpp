@@ -110,7 +110,7 @@ void mafGetOpenMultiFiles(const char * path, const char * wild, std::vector<std:
 	}
 }
 //----------------------------------------------------------------------------
-std::string mafGetSaveFile(const char * initial, const char * wild, const char * title, wxWindow *parent)
+std::string mafGetSaveFile(const char * initial, const char * wild, const char * title, wxWindow *parent, bool warnOverWrite)
 //----------------------------------------------------------------------------
 {
   wxString path, name, ext;
@@ -119,9 +119,15 @@ std::string mafGetSaveFile(const char * initial, const char * wild, const char *
   wxString wildcard = wild;
   wxString defaultname = "newMAFfile";
   wildcard += "|All Files (*.*)|*.*";
-  //wxFileDialog dialog(parent,title, path, name, wildcard, wxSAVE|wxOVERWRITE_PROMPT|wxHIDE_READONLY);
-  wxFileDialog dialog(parent,title, initial, defaultname, wildcard, wxSAVE|wxOVERWRITE_PROMPT|wxHIDE_READONLY);
-  dialog.SetReturnCode(wxID_OK);
+  
+	long style = wxSAVE | wxHIDE_READONLY;
+
+	if (warnOverWrite)
+		style = style | wxOVERWRITE_PROMPT;
+	
+	wxFileDialog dialog(parent,title, initial, defaultname, wildcard, style);
+	
+	dialog.SetReturnCode(wxID_OK);
 	int result = dialog.ShowModal();
   mafYield(); // wait for the dialog to disappear
 
