@@ -38,7 +38,9 @@ protected:
     an object in the scene, and in case forward all the following 
     events to its behavior. if the user pointed to the background
     forward events to the camera interactor.*/
-  virtual void OnButtonDown (mafEventInteraction *e);  
+  virtual void OnLeftButtonUp(mafEventInteraction *e);
+
+	virtual void OnMove(mafEventInteraction *e);
     
 	void SendPickingInformation(mafView *v, double *mouse_pos = NULL, int msg_id = VME_PICKED, mafMatrix *tracker_pos = NULL, bool mouse_flag = true);
 
@@ -46,6 +48,7 @@ private:
   mafInteractorPERPicker(const mafInteractorPERPicker&);  // Not implemented.
   void operator=(const mafInteractorPERPicker&);  // Not implemented.
 
+	bool m_MovedAfterMouseDown;
   /** test friend */
   friend class mafInteractorPERPickerTest;
 };

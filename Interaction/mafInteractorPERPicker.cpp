@@ -51,7 +51,9 @@ mafCxxTypeMacro(mafInteractorPERPicker)
 mafInteractorPERPicker::mafInteractorPERPicker() :
 	mafInteractorPER()
 //------------------------------------------------------------------------------
-{}
+{
+	m_MovedAfterMouseDown = false;
+}
 
 //------------------------------------------------------------------------------
 mafInteractorPERPicker::~mafInteractorPERPicker()
@@ -59,84 +61,67 @@ mafInteractorPERPicker::~mafInteractorPERPicker()
 {}
 
 //----------------------------------------------------------------------------
-void mafInteractorPERPicker::OnButtonDown(mafEventInteraction *e)
+void mafInteractorPERPicker::OnLeftButtonUp(mafEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-  mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
-
-  mafView       *v = NULL;
-  mafVME        *picked_vme  = NULL;
-  vtkProp3D     *picked_prop = NULL;
-  mafInteractor *picked_bh   = NULL;
-  mafMatrix     point_pose;
-  double        pos_2d[2];
-
-  mafDeviceButtonsPadMouse   *mouse   = mafDeviceButtonsPadMouse::SafeDownCast(device);
-  mafDeviceButtonsPadTracker *tracker = mafDeviceButtonsPadTracker::SafeDownCast(device);
-
-  if (tracker)
-  {
-    point_pose = *e->GetMatrix();
-    mafAvatar *avatar = tracker->GetAvatar();
-    if (avatar)
-    {
-      v = avatar->GetView();
-    }
-  }
-  else if (mouse)
-  {
-    e->Get2DPosition(pos_2d);
-    point_pose.Identity();
-    point_pose.SetElement(0,3,pos_2d[0]);
-    point_pose.SetElement(1,3,pos_2d[1]);
-    v = mouse->GetView();
-  }
-
-  if(v && v->FindPokedVme(device, point_pose, picked_prop, picked_vme, picked_bh))
-  {
-    SetPickedVME(device, picked_vme);
-    // if a VME is picked its pointer is written in PickedVME
-    int but_down_id = e->GetId();
-    if (but_down_id == mafDeviceButtonsPadMouse::GetMouseDClickId() && !picked_vme->IsA("mafVMEGizmo"))
-    {
-      // Send event to inform Logic that a double click event is rised on a VME
-      InvokeEvent(VME_DCLICKED,MCH_UP,picked_vme);
-    }
-    else if(m_CanSelect && !picked_vme->IsA("mafVMEGizmo"))
-    {
-      // Send a VME select event to Logic
-      InvokeEvent(VME_SELECT,MCH_UP,picked_vme);
-    }
-  }
-  // Forward the start event to the right behavior
-  if(picked_vme && !picked_vme->IsA("mafVMEGizmo"))
-  {
-		double mouse_pos[2];
-		e->Get2DPosition(mouse_pos);
-
-		//SendPickingInformation(v, NULL, VME_PICKED, &world_pose, false);
-		SendPickingInformation(mouse->GetView(), mouse_pos);
-  }
-	else if (picked_bh)
+	if (m_DraggingLeft && !m_MovedAfterMouseDown)
 	{
-		// if a vme with a behavior has been picked... 
-		picked_bh->SetVME(picked_vme);   // set the VME (Marco: to be removed, the operation should set the VME to the interactor!) 
-		picked_bh->SetProp(picked_prop); // set the prop (Marco: to be removed, no access to the vtkProp!!!) 
-		picked_bh->OnEvent(e); // forward the start event to picked behavior
+		mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
+
+		mafView       *v = NULL;
+		mafVME        *picked_vme = NULL;
+		vtkProp3D     *picked_prop = NULL;
+		mafInteractor *picked_bh = NULL;
+		mafMatrix     point_pose;
+		double        pos_2d[2];
+
+		mafDeviceButtonsPadMouse   *mouse = mafDeviceButtonsPadMouse::SafeDownCast(device);
+		mafDeviceButtonsPadTracker *tracker = mafDeviceButtonsPadTracker::SafeDownCast(device);
+
+		if (tracker)
+		{
+			point_pose = *e->GetMatrix();
+			mafAvatar *avatar = tracker->GetAvatar();
+			if (avatar)
+			{
+				v = avatar->GetView();
+			}
+		}
+		else if (mouse)
+		{
+			e->Get2DPosition(pos_2d);
+			point_pose.Identity();
+			point_pose.SetElement(0, 3, pos_2d[0]);
+			point_pose.SetElement(1, 3, pos_2d[1]);
+			v = mouse->GetView();
+		}
+
+		if (v)
+			v->FindPokedVme(device, point_pose, picked_prop, picked_vme, picked_bh);
+		
+		// Forward the start event to the right behavior
+		if (picked_vme && !picked_vme->IsA("mafVMEGizmo"))
+		{
+			double mouse_pos[2];
+			e->Get2DPosition(mouse_pos);
+
+			//SendPickingInformation(v, NULL, VME_PICKED, &world_pose, false);
+			SendPickingInformation(mouse->GetView(), mouse_pos);
+		}
 	}
 
-  // if I don't picked a VME or I picked but I cannot select, move the camera.
-  else if (tracker && m_CameraBehavior&&(!m_CameraBehavior->IsInteracting()))
-  {
-    // if the camera behavior is free...
-    m_CameraBehavior->OnEvent(e); // forward to the camera behavior
-  }
-  // if I don't picked a VME or I picked but I cannot select, move the camera.
-  else if (mouse && m_CameraMouseBehavior&&(!m_CameraMouseBehavior->IsInteracting()))
-  {
-    // if the camera behavior is free...
-    m_CameraMouseBehavior->OnEvent(e); // forward to the camera behavior
-  }
+	m_MovedAfterMouseDown = false;
+
+	Superclass::OnButtonUp(e);
+
+}
+
+//----------------------------------------------------------------------------
+void mafInteractorPERPicker::OnMove(mafEventInteraction *e)
+{
+	if (m_DraggingLeft)
+		m_MovedAfterMouseDown = true;
+	Superclass::OnMove(e);
 }
 
 //----------------------------------------------------------------------------
