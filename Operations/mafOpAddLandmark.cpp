@@ -87,6 +87,7 @@ mafOp(label)
 	m_LandmarkName = "";
 	m_SelectedLandmarkName = "Add_New_Landmark";
 	m_LandmarkNameCount = 1;
+	m_Radius = -1;
 
 	m_RemoveMessage = "";
 
@@ -598,6 +599,12 @@ void mafOpAddLandmark::AddLandmark(double pos[3])
 		landmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
 	else
 		landmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0, 0);
+
+	if (m_Radius > 0)
+	{
+		landmark->SetRadius(m_Radius);
+		m_SelectedLandmarkCloud->SetRadius(m_Radius);
+	}
 
 	landmark->Update();
 

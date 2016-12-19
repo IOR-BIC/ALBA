@@ -119,6 +119,8 @@ public:
 
 	void EnableShowAllMode(bool mode) { m_ShowAllMode = mode; };
 
+	void SetLandmarkRadius(double radius) { m_Radius = radius; }
+
 protected:
 	/** Create the AddLandmarks interface. */
 	virtual void CreateGui();
@@ -182,9 +184,9 @@ protected:
   mafInteractorPERPicker	*m_LandmarkPicker;
   mafInteractor       *m_OldBehavior;
 
-	double							 m_LandmarkPosition[3];
-	double m_OldColorCloud[4];
-
+	double								m_LandmarkPosition[3];
+	double								m_OldColorCloud[4];
+	double								m_Radius;
   mafGUINamedPanel		*m_GuiPanel;
   mafGUIDictionaryWidget *m_Dict;
 
