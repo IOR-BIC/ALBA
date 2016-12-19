@@ -240,6 +240,9 @@ public:
   /** Float slider widget.*/
   mafGUIFloatSlider *FloatSlider(int id, wxString label, double *var,double min, double max, wxSize size = wxDefaultSize, wxString tooltip = "", bool textBoxEnable = true);
 
+	/** Float Expanded slider widget.*/
+	mafGUIFloatSlider *FloatExpandedSlider(int id, wxString label, double *var, double min, double max, wxSize size = wxDefaultSize, wxString tooltip = "", bool textBoxEnable = true);
+
   /** Float slider widget.*/
   mafGUIFloatSlider *FloatSlider(int id, double *var, double min, double max, wxString minLab, wxString maxLab, wxSize size = wxDefaultSize, wxString tooltip = "", bool textBoxEnable = true);
 

@@ -43,6 +43,7 @@
 #include "mafViewSliceOnCurveTest.h"
 #include "mafViewSliceGlobalTest.h"
 #include "mafViewCompoundWindowingTest.h"
+#include "mafViewIsosurfaceCompoundTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -51,6 +52,7 @@
 #include <cppunit/TestRunner.h>
 #include "vtkFileOutputWindow.h"
 #include "vtkMAFSmartPointer.h"
+
 
 
 //Main Test Executor
@@ -97,6 +99,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafViewSliceOnCurveTest::suite());
 	runner.addTest(mafViewSliceGlobalTest::suite());
 	runner.addTest(mafViewCompoundWindowingTest::suite());
+	runner.addTest(mafViewIsosurfaceCompoundTest::suite());
 	
 	runner.run( controller );
 

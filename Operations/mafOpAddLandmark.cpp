@@ -83,13 +83,16 @@ mafOp(label)
 	m_SelectedLandmarkCloud = NULL;
 	m_Dict = NULL;
 
+	m_CloudName = "New landmark cloud";
 	m_LandmarkName = "";
 	m_SelectedLandmarkName = "Add_New_Landmark";
 	m_LandmarkNameCount = 1;
+	m_Radius = -1;
 
 	m_RemoveMessage = "";
 
 	m_ShowMode = 0;
+	m_ShowAllMode = true;
 
 	m_AddModeActive = true;
 	m_CloudCreatedFlag = false;
@@ -169,7 +172,7 @@ void mafOpAddLandmark::OpRun()
 				m_Cloud->TestModeOn();
 			}
 
-			m_Cloud->SetName(_("New landmark cloud"));
+			m_Cloud->SetName(m_CloudName);
 
 			vtkDataSet * vtkData = m_PickedVme->GetOutput()->GetVTKData();
 			if (vtkData)
@@ -267,6 +270,15 @@ void mafOpAddLandmark::OpUndo()
 	{
 		RestoreLandmarkVect(m_LandmarkUndoVetc);
 	}
+}
+
+//----------------------------------------------------------------------------
+void mafOpAddLandmark::SetCloudName(mafString name)
+{
+	m_CloudName = name;
+
+	if(m_Cloud)
+		m_Cloud->SetName(name);
 }
 
 //----------------------------------------------------------------------------
@@ -587,6 +599,12 @@ void mafOpAddLandmark::AddLandmark(double pos[3])
 		landmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
 	else
 		landmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0, 0);
+
+	if (m_Radius > 0)
+	{
+		landmark->SetRadius(m_Radius);
+		m_SelectedLandmarkCloud->SetRadius(m_Radius);
+	}
 
 	landmark->Update();
 
@@ -1202,7 +1220,7 @@ void mafOpAddLandmark::ShowLandmarkGroup()
 //---------------------------------------------------------------------------
 void mafOpAddLandmark::CheckEnableOkCondition()
 {
-	if (m_ShowMode == 0)
+	if (m_ShowMode == 0 && m_ShowAllMode)
 	{
 		m_Gui->Enable(wxOK, true);
 	}
@@ -1210,14 +1228,15 @@ void mafOpAddLandmark::CheckEnableOkCondition()
 	{
 		bool res = true;
 
-		for (int i = 0; i < m_LandmarkNameVect[m_ShowMode].size(); i++)
-		{
-			if (!this->m_Cloud->FindInTreeByName(m_LandmarkNameVect[m_ShowMode][i]))
+		if(m_LandmarkNameVect.size()>0)
+			for (int i = 0; i < m_LandmarkNameVect[m_ShowMode].size(); i++)
 			{
-				res = false;
-				break;
+				if (!this->m_Cloud->FindInTreeByName(m_LandmarkNameVect[m_ShowMode][i]))
+				{
+					res = false;
+					break;
+				}
 			}
-		}
 
 		m_Gui->Enable(wxOK, res);
 	}
