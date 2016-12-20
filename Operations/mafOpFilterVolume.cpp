@@ -34,6 +34,11 @@
 #include "vtkImageData.h"
 #include "vtkImageGaussianSmooth.h"
 #include "vtkImageMedian3D.h"
+#include "vtkDataSet.h"
+#include "vtkStructuredPoints.h"
+#include "vtkPointData.h"
+#include "vtkDataArray.h"
+#include "vtkRectilinearGrid.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpFilterVolume);
@@ -62,7 +67,7 @@ mafOpFilterVolume::mafOpFilterVolume(const wxString &label)
 
   m_KernelSize[0] = m_KernelSize[1] = m_KernelSize[2] = 1;
 
-  m_ApplyDirectlyOnInput = 0;
+  m_ApplyDirectlyOnInput = true;
 }
 //----------------------------------------------------------------------------
 mafOpFilterVolume::~mafOpFilterVolume()
@@ -89,10 +94,14 @@ mafOp *mafOpFilterVolume::Copy()
 enum FILTER_SURFACE_ID
 {
 	ID_SMOOTH = MINID,
-  ID_STANDARD_DEVIATION,
-  ID_RADIUS_FACTOR,
-  ID_MEDIAN,
-  ID_KERNEL_SIZE,
+	ID_STANDARD_DEVIATION,
+	ID_RADIUS_FACTOR,
+	ID_MEDIAN,
+	ID_KERNEL_SIZE,
+	ID_REPLACE_MIN,
+	ID_REPLACE_MAX,
+	ID_REPLACE_VALUE,
+	ID_REPLACE,
 	ID_PREVIEW,
 	ID_RESET_ALL,
   ID_APPLY_ON_INPUT,
@@ -101,7 +110,9 @@ enum FILTER_SURFACE_ID
 void mafOpFilterVolume::OpRun()   
 //----------------------------------------------------------------------------
 { 
+	m_Input->GetOutput()->Update();
   m_InputData = (vtkImageData*)m_Input->GetOutput()->GetVTKData();
+	m_InputData->Update();
   if (!m_ApplyDirectlyOnInput)
   {
 	  vtkNEW(m_ResultImageData);
@@ -124,21 +135,35 @@ void mafOpFilterVolume::CreateGui()
   // interface:
   m_Gui = new mafGUI(this);
 
-  m_Gui->Bool(ID_APPLY_ON_INPUT,_("apply on input"),&m_ApplyDirectlyOnInput,0,_("Check this flag for big volumes to save memory"));
+	
+  m_Gui->Bool(ID_APPLY_ON_INPUT,_("Apply on input"),&m_ApplyDirectlyOnInput,0,_("Check this flag for big volumes to save memory"));
   m_Gui->Label("");
-  m_Gui->Label(_("smooth"),true);
-  m_Gui->Vector(ID_STANDARD_DEVIATION,_("sd: "),m_StandardDeviation,0.1,100,2,_("standard deviation for smooth filter"));
-  m_Gui->Vector(ID_RADIUS_FACTOR,_("radius: "),m_SmoothRadius,1,10,2,_("radius for smooth filter"));
-  m_Gui->Button(ID_SMOOTH,_("apply smooth"));
+  m_Gui->Label(_("Smooth"),true);
+  m_Gui->Vector(ID_STANDARD_DEVIATION,_("Sd: "),m_StandardDeviation,0.1,100,2,_("standard deviation for smooth filter"));
+  m_Gui->Vector(ID_RADIUS_FACTOR,_("Radius: "),m_SmoothRadius,1,10,2,_("radius for smooth filter"));
+  m_Gui->Button(ID_SMOOTH,_("Apply smooth"));
 
   m_Gui->Label("");
-  m_Gui->Label(_("median"),true);
-  m_Gui->Vector(ID_KERNEL_SIZE,_("kernel: "),m_KernelSize,1,10,_("size of kernel"));
-  m_Gui->Button(ID_MEDIAN,_("apply median"));
+  m_Gui->Label(_("Median"),true);
+  m_Gui->Vector(ID_KERNEL_SIZE,_("Kernel: "),m_KernelSize,1,10,_("Size of kernel"));
+  m_Gui->Button(ID_MEDIAN,_("Apply median"));
+	
+	
+	double *dataRange = m_InputData->GetScalarRange();
+	m_ReplaceRange[0] = dataRange[0];
+	m_ReplaceRange[1] = dataRange[1];
+	m_ReplaceValue = 0;
 
+	m_Gui->Label("Replace values",true);
+
+	m_Gui->FloatSlider(ID_REPLACE_MIN, _("From: "), &m_ReplaceRange[0], dataRange[0],dataRange[1]);
+	m_Gui->FloatSlider(ID_REPLACE_MAX, _("To: "), &m_ReplaceRange[1], dataRange[0], dataRange[1]);
+	m_Gui->Double(ID_REPLACE_VALUE, _("Value: "), &m_ReplaceValue);
+	m_Gui->Button(ID_REPLACE, _("Apply replace"));
+	
   m_Gui->Divider(2);
-  m_Gui->Button(ID_PREVIEW,_("preview"));
-  m_Gui->Button(ID_RESET_ALL,_("clear"));
+  m_Gui->Button(ID_PREVIEW,_("Preview"));
+  m_Gui->Button(ID_RESET_ALL,_("Clear"));
   m_Gui->OkCancel();
   m_Gui->Enable(wxOK,false);
 
@@ -198,6 +223,23 @@ void mafOpFilterVolume::OnEvent(mafEventBase *maf_event)
       case ID_MEDIAN:
         OnMedian();
       break;
+			case ID_REPLACE_MIN:
+			{
+				m_ReplaceRange[1] = MAX(m_ReplaceRange[0], m_ReplaceRange[1]);
+				m_Gui->Update();
+			}
+			break;
+			case ID_REPLACE_MAX:
+			{
+				m_ReplaceRange[0] = MIN(m_ReplaceRange[0], m_ReplaceRange[1]);
+				m_Gui->Update();
+			}
+			break;
+			case ID_REPLACE:
+			{
+				OnReplace();
+			}
+			break;
       case ID_PREVIEW:
         OnPreview(); 
       break;
@@ -359,4 +401,83 @@ void mafOpFilterVolume::OnClear()
 	m_ClearInterfaceFlag= false;
 
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+}
+
+//----------------------------------------------------------------------------
+void mafOpFilterVolume::OnReplace()
+{
+	vtkImageData *inputData;
+	if (m_ApplyDirectlyOnInput)
+		inputData = m_InputData;
+	else
+		inputData = m_ResultImageData;
+
+	vtkDataArray *inputScalars = inputData->GetPointData()->GetScalars();
+	vtkDataArray *outputScalars;
+
+	vtkMAFSmartPointer<vtkRectilinearGrid> outputDataRG;
+	vtkMAFSmartPointer<vtkStructuredPoints> outputDataSP;
+
+	if (inputData->IsA("vtkRectilinearGrid"))
+	{
+		outputDataRG->DeepCopy(inputData);
+		outputScalars = outputDataRG->GetPointData()->GetScalars();
+	}
+	else
+	{
+		outputDataSP->DeepCopy(inputData);
+		outputScalars = outputDataSP->GetPointData()->GetScalars();
+	}
+
+	int nTuples=outputScalars->GetNumberOfTuples();
+
+	for (int i = 0; i < nTuples; i++)
+	{
+		double value;
+		inputScalars->GetTuple(i, &value);
+
+		if (value != 0)
+			value++;
+
+		if (value >= m_ReplaceRange[0] && value <= m_ReplaceRange[1])
+			outputScalars->SetTuple(i, &m_ReplaceValue);
+	}
+
+	if (inputData->IsA("vtkRectilinearGrid"))
+	{
+		outputDataRG->GetPointData()->SetScalars(outputScalars);
+		outputDataRG->Update();
+
+		if (m_ApplyDirectlyOnInput)
+		{
+			((mafVMEVolumeGray *)m_Input)->SetData(outputDataRG, m_Input->GetTimeStamp());
+			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		}
+		else
+			m_ResultImageData->DeepCopy(outputDataRG);
+	}
+	else
+	{
+		outputDataSP->GetPointData()->SetScalars(outputScalars);
+		outputDataSP->Update();
+
+		if (m_ApplyDirectlyOnInput)
+		{
+			((mafVMEVolumeGray *)m_Input)->SetData(outputDataSP, m_Input->GetTimeStamp());
+			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		}
+		else
+			m_ResultImageData->DeepCopy(outputDataSP);
+	}
+
+
+	m_PreviewResultFlag = !m_ApplyDirectlyOnInput;
+
+	if (!m_TestMode)
+	{
+		m_Gui->Enable(ID_PREVIEW, m_PreviewResultFlag);
+		m_Gui->Enable(ID_RESET_ALL, m_PreviewResultFlag);
+		m_Gui->Enable(wxOK, true);
+		m_Gui->Enable(wxCANCEL, m_PreviewResultFlag);
+	}
 }
