@@ -77,6 +77,7 @@ mafOp(label)
 	m_LandmarkRedoVect.clear();
 	m_LandmarkNameVect.clear();
 	m_LocalLandmarkNameVect.clear();
+	m_AllItemsNameVect.clear();
 
 	m_CurrentLandmark = NULL;
 	m_SelectedLandmark = NULL;
@@ -108,6 +109,7 @@ mafOpAddLandmark::~mafOpAddLandmark()
 {
 	m_LandmarkNameVect.clear();
 	m_LocalLandmarkNameVect.clear();
+	m_AllItemsNameVect.clear();
 
 	for (int i=0; i< m_LandmarkUndoVetc.size(); i++)
 	{
@@ -965,7 +967,6 @@ int mafOpAddLandmark::LoadLandmarksDefinitions(wxString fileName)
 	m_LandmarkNameVect[0].clear();
 
 	StringVector groupNameVect;
-	std::set<wxString> allItems;
 
 	//Open the file xml
 	try
@@ -1047,7 +1048,7 @@ int mafOpAddLandmark::LoadLandmarksDefinitions(wxString fileName)
 					if (CheckNodeElement(typeNode, "Landmark"))
 					{ 
 						newVect.push_back(typeNode->getTextContent());
-						allItems.insert(typeNode->getTextContent());
+						PushUniqueItem(typeNode->getTextContent());
 					}
 				}
 
@@ -1077,8 +1078,8 @@ int mafOpAddLandmark::LoadLandmarksDefinitions(wxString fileName)
 	mafLogMessage(_("Configuration file Loaded"));
 
 	// Create All Items Vect
-	for (std::set<wxString>::const_iterator it = allItems.begin(); it != allItems.end(); ++it)
-		m_LandmarkNameVect[0].push_back(*it);
+	for (int i = 0; i < m_AllItemsNameVect.size(); i++)
+		m_LandmarkNameVect[0].push_back(m_AllItemsNameVect[i]);
 	
 	if (!m_TestMode)
 	{
@@ -1098,7 +1099,6 @@ int mafOpAddLandmark::LoadLandmarksDefinitions(wxString fileName)
 	}
 
 	groupNameVect.clear();
-	allItems.clear();
 
 	return MAF_OK;
 }
@@ -1173,26 +1173,20 @@ void mafOpAddLandmark::ShowLandmarkGroup()
 	{
 		if (m_ShowMode == 0)
 		{
-			// Create all items List - Local items + Dictionary (if loaded)
-			std::set<wxString> allItems;
-
 			for (int i = 0; i < m_LocalLandmarkNameVect.size(); i++)
-			{
-				allItems.insert(m_LocalLandmarkNameVect[i]);
+			{				
+				PushUniqueItem(m_LocalLandmarkNameVect[i]);
 			}
 
 			if (m_LandmarkNameVect.size() > 0)
 				for (int i = 0; i < m_LandmarkNameVect[0].size(); i++)
 				{
-					allItems.insert(m_LandmarkNameVect[0][i]);
+					PushUniqueItem(m_LandmarkNameVect[0][i]);
 				}
 
-			std::vector<wxString> output(allItems.size());
-			std::copy(allItems.begin(), allItems.end(), output.begin());
+			if (m_AllItemsNameVect.size() > 0) firstSelection = m_AllItemsNameVect[0];
 
-			if (output.size() > 0) firstSelection = output[0];
-
-			m_Dict->InitDictionary(&output);
+			m_Dict->InitDictionary(&m_AllItemsNameVect);
 		}
 		else
 		{
@@ -1240,4 +1234,16 @@ void mafOpAddLandmark::CheckEnableOkCondition()
 
 		m_Gui->Enable(wxOK, res);
 	}
+}
+
+//---------------------------------------------------------------------------
+void mafOpAddLandmark::PushUniqueItem(wxString item)
+{
+	for (int i=0; i<m_AllItemsNameVect.size(); i++)
+	{
+		if (item == m_AllItemsNameVect[i])
+			return;
+	}
+
+	m_AllItemsNameVect.push_back(item);
 }

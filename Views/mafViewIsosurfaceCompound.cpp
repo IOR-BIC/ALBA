@@ -84,6 +84,7 @@ void mafViewIsosurfaceCompound::CreateGuiView()
 	double range[2] = { VTK_DOUBLE_MIN, VTK_DOUBLE_MAX };
 	m_SliderContourIso = m_GuiView->FloatExpandedSlider(ID_CONTOUR_VALUE_ISO, "ISO", &m_ContourValueIso, range[0], range[1]);
 
+	m_GuiView->Enable(ID_CONTOUR_VALUE_ISO, false);
 	m_GuiView->Reparent(m_Win);
 }
 
@@ -143,6 +144,7 @@ void mafViewIsosurfaceCompound::VmeShow(mafVME *vme, bool show)
 			m_ContourValueIso = pipe->GetContourValue();
 
 			m_SliderContourIso->SetRange(sr[0], sr[1], m_ContourValueIso);
+			m_GuiView->Enable(ID_CONTOUR_VALUE_ISO, true);
 			m_Gui->Update();
 		}
 	}
