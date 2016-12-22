@@ -1206,6 +1206,7 @@ void mafOpImporterDicomOffis::SelectSeries(mafDicomSeries * selectedSeries)
 
 			if (numberOfSlices > 1 && !GetSetting()->AutoVMEType())
 			{
+				m_OutputType = 0;
 				wxString typeArrayVolumeImage[2] = { _("Volume"),_("Images") };
 				m_LoadGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArrayVolumeImage, 1, "");
 			}

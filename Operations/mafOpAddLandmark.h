@@ -148,6 +148,8 @@ protected:
 
 	void CheckEnableOkCondition();
 
+	void PushUniqueItem(wxString item);
+
 	int m_AddToCurrentTime;
 
   mafVMELandmarkCloud	*m_Cloud;
@@ -161,7 +163,8 @@ protected:
 	std::vector<mafVMELandmark *> m_LandmarkRedoVect;
 
 	std::vector<StringVector> m_LandmarkNameVect;
-	StringVector m_LocalLandmarkNameVect;
+	StringVector							m_LocalLandmarkNameVect;
+	StringVector							m_AllItemsNameVect;
 
 	bool					m_CloudCreatedFlag;
 	bool					m_AddModeActive;
