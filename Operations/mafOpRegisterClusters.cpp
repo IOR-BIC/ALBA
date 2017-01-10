@@ -376,7 +376,7 @@ void mafOpRegisterClusters::CreateMatches()
 		}
 
 		double targetPos[3];		
-		target->GetLandmark(i)->GetPoint(targetPos,time);
+		target->GetLandmark(j)->GetPoint(targetPos,time);
 
 		if ((m_FilteringMode & mafOpRegisterClusters::InfiniteOrNaN) == mafOpRegisterClusters::InfiniteOrNaN) 
 		{
