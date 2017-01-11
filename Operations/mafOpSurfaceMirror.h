@@ -73,8 +73,8 @@ protected:
 
   vtkMAFPolyDataMirror *m_MirrorFilter;
 
-	vtkPolyData	*m_OutputPolydata;
-	vtkPolyData	*m_InputPolydata;
+	vtkPolyData	*m_OutputImafeData;
+	vtkPolyData	*m_InputImageData;
 
 	
 
