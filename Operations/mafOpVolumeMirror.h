@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafOpSurfaceMirror
- Authors: Paolo Quadrani - porting  Daniele Giunchi
+ Module: mafOpVolumeMirror
+ Authors: Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __mafOpSurfaceMirror_H__
-#define __mafOpSurfaceMirror_H__
+#ifndef __mafOpVolumeMirror_H__
+#define __mafOpVolumeMirror_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -26,31 +26,30 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class vtkPolyData;
-class mafEvent;
-class vtkMAFPolyDataMirror;
+class vtkImageData;
+class vtkImageFlip;
 
 //----------------------------------------------------------------------------
-// mafOpSurfaceMirror :
+// mafOpVolumeMirror :
 //----------------------------------------------------------------------------
 /** 
-class name: mafOpSurfaceMirror
+class name: mafOpVolumeMirror
 Operation which permits to create a copy of the surface which is "mirrored" respect  xy,yz or xz plane.
 */
-class MAF_EXPORT mafOpSurfaceMirror: public mafOp
+class MAF_EXPORT mafOpVolumeMirror: public mafOp
 {
 public:
   /** constructor */
-	mafOpSurfaceMirror(wxString label = "Surface Mirror");
+	mafOpVolumeMirror(wxString label = "Volume Mirror");
   /** destructor */
-	~mafOpSurfaceMirror();
+	~mafOpVolumeMirror();
   /** handle events which becomes from other classes */
 	virtual void OnEvent(mafEventBase *maf_event);
   /** return the copy of the object */
 	mafOp* Copy();
 
   /** RTTI Macro */
-	mafTypeMacro(mafOpSurfaceMirror, mafOp);
+	mafTypeMacro(mafOpVolumeMirror, mafOp);
 
 	/** Return true for the acceptable vme type. */
 	bool Accept(mafVME* node);   
@@ -71,10 +70,9 @@ protected:
 	/** Makes the Preview for the mirror. */
 	void Preview();  
 
-  vtkMAFPolyDataMirror *m_MirrorFilter;
-
-	vtkPolyData	*m_OutputPolydata;
-	vtkPolyData	*m_InputPolydata;
+	
+	vtkImageData	*m_OutputImageData;
+	vtkImageData	*m_InputImageData;
 
 	
 
