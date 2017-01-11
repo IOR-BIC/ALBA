@@ -113,16 +113,6 @@ int mafVMEVolume::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   assert(data);
   if (data->IsA("vtkImageData")||data->IsA("vtkRectilinearGrid")||data->IsA("vtkUnstructuredGrid"))
   {
-    mafVMEItem *item = GetDataVector()->GetItem(t);
-    if (item != NULL)
-    {
-      mafString dt = item->GetDataType();
-      if (!dt.Equals(data->GetClassName()))
-      {
-        mafLogMessage("Warning!! Trying to set different volume data type.");
-        return MAF_ERROR;
-      }
-    }
     return Superclass::SetData(data,t,mode);
   }
   

@@ -50,8 +50,8 @@ mafOp(label)
 	m_Canundo			 		= true;
 	m_InputPreserving = false; //Natural_preserving
 	
-	m_OutputPolydata = NULL;
-	m_InputPolydata		= NULL;
+	m_OutputImafeData = NULL;
+	m_InputImageData		= NULL;
   m_MirrorFilter     = NULL;
 
   m_MirrorX      = 1;
@@ -63,8 +63,8 @@ mafOp(label)
 mafOpSurfaceMirror::~mafOpSurfaceMirror( ) 
 //----------------------------------------------------------------------------
 {
-	vtkDEL(m_InputPolydata);
-	vtkDEL(m_OutputPolydata);
+	vtkDEL(m_InputImageData);
+	vtkDEL(m_OutputImafeData);
 	vtkDEL(m_MirrorFilter);
 }
 //----------------------------------------------------------------------------
@@ -115,11 +115,11 @@ void mafOpSurfaceMirror::OpRun()
 //----------------------------------------------------------------------------
 {  
     
-	vtkNEW(m_InputPolydata);
-	m_InputPolydata->DeepCopy((vtkPolyData*)((mafVMESurface *)m_Input)->GetOutput()->GetVTKData());
+	vtkNEW(m_InputImageData);
+	m_InputImageData->DeepCopy((vtkPolyData*)((mafVMESurface *)m_Input)->GetOutput()->GetVTKData());
 	
-	vtkNEW(m_OutputPolydata);
-	m_OutputPolydata->DeepCopy((vtkPolyData*)((mafVMESurface *)m_Input)->GetOutput()->GetVTKData());
+	vtkNEW(m_OutputImafeData);
+	m_OutputImafeData->DeepCopy((vtkPolyData*)((mafVMESurface *)m_Input)->GetOutput()->GetVTKData());
 	
 
 	if(!m_TestMode)
@@ -142,7 +142,7 @@ void mafOpSurfaceMirror::OpRun()
 	}
 
   m_MirrorFilter = vtkMAFPolyDataMirror::New();
-  m_MirrorFilter->SetInput(m_InputPolydata);
+  m_MirrorFilter->SetInput(m_InputImageData);
 
   Preview();
 }
@@ -150,18 +150,18 @@ void mafOpSurfaceMirror::OpRun()
 void mafOpSurfaceMirror::OpDo()
 //----------------------------------------------------------------------------
 {
-  assert(m_OutputPolydata);
+  assert(m_OutputImafeData);
 
-	((mafVMESurface *)m_Input)->SetData(m_OutputPolydata,m_Input->GetTimeStamp());
+	((mafVMESurface *)m_Input)->SetData(m_OutputImafeData,m_Input->GetTimeStamp());
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void mafOpSurfaceMirror::OpUndo()
 //----------------------------------------------------------------------------
 {
-  assert(m_InputPolydata);
+  assert(m_InputImageData);
 
-	((mafVMESurface *)m_Input)->SetData(m_InputPolydata,m_Input->GetTimeStamp());
+	((mafVMESurface *)m_Input)->SetData(m_InputImageData,m_Input->GetTimeStamp());
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
@@ -220,9 +220,9 @@ void mafOpSurfaceMirror::Preview()
   m_MirrorFilter->Update();
   
 
-  m_OutputPolydata->DeepCopy(m_MirrorFilter->GetOutput());
-  m_OutputPolydata->Update();
-  ((mafVMESurface *)m_Input)->SetData(m_OutputPolydata,m_Input->GetTimeStamp());
+  m_OutputImafeData->DeepCopy(m_MirrorFilter->GetOutput());
+  m_OutputImafeData->Update();
+  ((mafVMESurface *)m_Input)->SetData(m_OutputImafeData,m_Input->GetTimeStamp());
 
 
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
