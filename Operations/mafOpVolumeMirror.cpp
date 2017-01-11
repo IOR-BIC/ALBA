@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafOpSurfaceMirror
- Authors: Paolo Quadrani - porting  Daniele Giunchi
+ Module: mafOpVolumeMirror
+ Authors: Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -22,27 +22,26 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafOpSurfaceMirror.h"
+#include "mafOpVolumeMirror.h"
 #include <wx/busyinfo.h>
 
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafGUI.h"
-
-
 #include "mafVME.h"
-#include "mafVMESurface.h"
-#include "mafVMELandmarkCloud.h"
-
-#include "vtkPolyData.h"
-#include "vtkMAFPolyDataMirror.h"
-
-//----------------------------------------------------------------------------
-mafCxxTypeMacro(mafOpSurfaceMirror);
-//----------------------------------------------------------------------------
+#include "mafVMEVolumeGray.h"
+#include "vtkImageData.h"
+#include "vtkImageFlip.h"
+#include "vtkPointData.h"
+#include "vtkDataSetWriter.h"
+#include "vtkMAFSmartPointer.h"
 
 //----------------------------------------------------------------------------
-mafOpSurfaceMirror::mafOpSurfaceMirror(wxString label) :
+mafCxxTypeMacro(mafOpVolumeMirror);
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+mafOpVolumeMirror::mafOpVolumeMirror(wxString label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -50,28 +49,26 @@ mafOp(label)
 	m_Canundo			 		= true;
 	m_InputPreserving = false; //Natural_preserving
 	
-	m_OutputPolydata = NULL;
-	m_InputPolydata		= NULL;
-  m_MirrorFilter     = NULL;
-
+	m_OutputImageData = NULL;
+	m_InputImageData		= NULL;
+  
   m_MirrorX      = 1;
   m_MirrorY      = 0;
   m_MirrorZ      = 0;
   m_FlipNormals = 0;
 }
 //----------------------------------------------------------------------------
-mafOpSurfaceMirror::~mafOpSurfaceMirror( ) 
+mafOpVolumeMirror::~mafOpVolumeMirror( ) 
 //----------------------------------------------------------------------------
 {
-	vtkDEL(m_InputPolydata);
-	vtkDEL(m_OutputPolydata);
-	vtkDEL(m_MirrorFilter);
+	vtkDEL(m_InputImageData);
+	vtkDEL(m_OutputImageData);
 }
 //----------------------------------------------------------------------------
-mafOp* mafOpSurfaceMirror::Copy()   
+mafOp* mafOpVolumeMirror::Copy()   
 //----------------------------------------------------------------------------
 {
-  mafOpSurfaceMirror *cp = new mafOpSurfaceMirror(m_Label);
+  mafOpVolumeMirror *cp = new mafOpVolumeMirror(m_Label);
   cp->m_Canundo		= m_Canundo;
   cp->m_OpType		= m_OpType;
   cp->m_Listener	= m_Listener;
@@ -79,27 +76,9 @@ mafOp* mafOpSurfaceMirror::Copy()
   return cp;
 }
 //----------------------------------------------------------------------------
-bool mafOpSurfaceMirror::Accept(mafVME* node)   
+bool mafOpVolumeMirror::Accept(mafVME* node)   
 //----------------------------------------------------------------------------
-{ return  ( 
-		      node
-					
-					&& 
-					(
-							node->IsMAFType(mafVMESurface) 
-							/*
-							|| 
-							( 
-								 vme->IsA("mflVMELandmarkCloud") 
-								 && 
-								 !((mflVMELandmarkCloud*)vme)->IsOpen()
-							) 
-							*/
-					)
-					//&& node->GetNumberOfItems()==1
-					//&& node->GetItem(0)
-					//&& node->GetItem(0)->GetData() 	
-					);
+{ return  ( node && node->IsMAFType(mafVMEVolumeGray) && node->GetOutput()->GetVTKData()->IsA("vtkImageData")	);
 };   
 //----------------------------------------------------------------------------
 enum SURFACE_MIRROR_ID
@@ -111,15 +90,15 @@ enum SURFACE_MIRROR_ID
 	ID_FLIPNORMALS,
 };
 //----------------------------------------------------------------------------
-void mafOpSurfaceMirror::OpRun()   
+void mafOpVolumeMirror::OpRun()   
 //----------------------------------------------------------------------------
 {  
     
-	vtkNEW(m_InputPolydata);
-	m_InputPolydata->DeepCopy((vtkPolyData*)((mafVMESurface *)m_Input)->GetOutput()->GetVTKData());
+	vtkNEW(m_InputImageData);
+	m_InputImageData->DeepCopy((vtkImageData*)((mafVMEVolumeGray *)m_Input)->GetOutput()->GetVTKData());
 	
-	vtkNEW(m_OutputPolydata);
-	m_OutputPolydata->DeepCopy((vtkPolyData*)((mafVMESurface *)m_Input)->GetOutput()->GetVTKData());
+	vtkNEW(m_OutputImageData);
+	m_OutputImageData->DeepCopy((vtkImageData*)((mafVMEVolumeGray *)m_Input)->GetOutput()->GetVTKData());
 	
 
 	if(!m_TestMode)
@@ -134,38 +113,35 @@ void mafOpSurfaceMirror::OpRun()
 		m_Gui->Bool(ID_MIRRORX,"mirror x coords", &m_MirrorX, 1);
 		m_Gui->Bool(ID_MIRRORY,"mirror y coords", &m_MirrorY, 1);
 		m_Gui->Bool(ID_MIRRORZ,"mirror z coords", &m_MirrorZ, 1);
-		//m_Gui->Bool(ID_FLIPNORMALS,"flip normals",&m_FlipNormals,1);
+
 		m_Gui->Label("");
 		m_Gui->OkCancel();
 
 		ShowGui();
 	}
 
-  m_MirrorFilter = vtkMAFPolyDataMirror::New();
-  m_MirrorFilter->SetInput(m_InputPolydata);
-
   Preview();
 }
 //----------------------------------------------------------------------------
-void mafOpSurfaceMirror::OpDo()
+void mafOpVolumeMirror::OpDo()
 //----------------------------------------------------------------------------
 {
-  assert(m_OutputPolydata);
+  assert(m_OutputImageData);
 
-	((mafVMESurface *)m_Input)->SetData(m_OutputPolydata,m_Input->GetTimeStamp());
+	((mafVMEVolumeGray *)m_Input)->SetData(m_OutputImageData,m_Input->GetTimeStamp());
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafOpSurfaceMirror::OpUndo()
+void mafOpVolumeMirror::OpUndo()
 //----------------------------------------------------------------------------
 {
-  assert(m_InputPolydata);
+  assert(m_InputImageData);
 
-	((mafVMESurface *)m_Input)->SetData(m_InputPolydata,m_Input->GetTimeStamp());
+	((mafVMEVolumeGray *)m_Input)->SetData(m_InputImageData,m_Input->GetTimeStamp());
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafOpSurfaceMirror::OnEvent(mafEventBase *maf_event)
+void mafOpVolumeMirror::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -191,7 +167,7 @@ void mafOpSurfaceMirror::OnEvent(mafEventBase *maf_event)
 	}  
 }
 //----------------------------------------------------------------------------
-void mafOpSurfaceMirror::OpStop(int result)
+void mafOpVolumeMirror::OpStop(int result)
 //----------------------------------------------------------------------------
 {
   if(result == OP_RUN_CANCEL) OpUndo();
@@ -204,7 +180,7 @@ void mafOpSurfaceMirror::OpStop(int result)
 	mafEventMacro(mafEvent(this,result));        
 }
 //----------------------------------------------------------------------------
-void mafOpSurfaceMirror::Preview()  
+void mafOpVolumeMirror::Preview()  
 //----------------------------------------------------------------------------
 {
 	wxBusyCursor *wait=NULL;
@@ -212,18 +188,41 @@ void mafOpSurfaceMirror::Preview()
 	{
 		wait=new wxBusyCursor();
 	}
+	
+	//creating a copy of the input
+  m_OutputImageData->DeepCopy(m_InputImageData);
+	vtkDataArray *inScalars = m_InputImageData->GetPointData()->GetScalars();
+	vtkDataArray *outScalars = m_OutputImageData->GetPointData()->GetScalars();
 
-  m_MirrorFilter->SetMirrorXCoordinate(m_MirrorX);
-  m_MirrorFilter->SetMirrorYCoordinate(m_MirrorY);
-  m_MirrorFilter->SetMirrorZCoordinate(m_MirrorZ);
-  //m_MirrorFilter->SetFlipNormals(m_FlipNormals);
-  m_MirrorFilter->Update();
-  
+	int outX, outY, outZ;
+	int *dims = m_InputImageData->GetDimensions();
 
-  m_OutputPolydata->DeepCopy(m_MirrorFilter->GetOutput());
-  m_OutputPolydata->Update();
-  ((mafVMESurface *)m_Input)->SetData(m_OutputPolydata,m_Input->GetTimeStamp());
+	//invert out values if m_Mirror is selected
+	outX = m_MirrorX ? dims[0] - 1 : 0;
+	for (int inX = 0; inX < dims[0]; inX++)
+	{
+		outY = m_MirrorY ? dims[1] - 1 : 0;
+		for (int inY = 0; inY < dims[1]; inY++)
+		{
+			outZ = m_MirrorZ ? dims[2] - 1 : 0;
+			for (int inZ = 0; inZ < dims[2]; inZ++)
+			{
+				//assign
+				int inP = inX + inY*dims[0] + inZ*dims[0] * dims[1];
+				int outP = outX + outY*dims[0] + outZ*dims[0] * dims[1];
+				outScalars->SetTuple1(outP, inScalars->GetTuple1(inP));
+				
+				m_MirrorZ ? outZ-- : outZ++;
+			}
+			m_MirrorY ? outY-- : outY++;
+		}
+		m_MirrorX ? outX-- : outX++;
+	}
+	outScalars->Modified();
 
+	m_OutputImageData->Update();
+	
+  ((mafVMEVolumeGray *)m_Input)->SetData(m_OutputImageData,m_Input->GetTimeStamp());
 
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 
