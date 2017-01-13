@@ -18,10 +18,6 @@
 	;Add here extra files
 !macroend
 
-!macro AddConfigPath
-	;Add here Config path and extra files
-!macroend
-
 !insertmacro CreateInstaller
 
 Section -Post 
