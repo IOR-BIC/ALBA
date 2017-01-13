@@ -139,6 +139,7 @@
 #include "mafOpSmoothSurface.h"
 #include "mafOpTriangulateSurface.h"
 #include "mafOpSurfaceMirror.h"
+#include "mafOpVolumeMirror.h"
 #include "mafOpSubdivide.h"
 #include "mafOpFillHoles.h"
 #include "mafOpMeshDeformation.h"
@@ -337,8 +338,9 @@ bool ExampleApp::OnInit()
 	m_Logic->Plug(new mafOpSmoothSurface(),_("Modify"));
 	m_Logic->Plug(new mafOpCleanSurface(),_("Modify"));
 	m_Logic->Plug(new mafOpTriangulateSurface(),_("Modify"));
-	m_Logic->Plug(new mafOpSurfaceMirror(),_("Modify"));
-	m_Logic->Plug(new mafOpSubdivide(),_("Modify"));
+	m_Logic->Plug(new mafOpSurfaceMirror(), _("Modify"));
+	m_Logic->Plug(new mafOpVolumeMirror(), _("Modify"));
+	m_Logic->Plug(new mafOpSubdivide(), _("Modify"));
 	m_Logic->Plug(new mafOpFillHoles(),_("Modify"));
 	m_Logic->Plug(new mafOpMeshDeformation(),_("Modify"));
 	m_Logic->Plug(new mafOpMakeVMETimevarying(),_("Modify"));

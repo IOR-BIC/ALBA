@@ -99,9 +99,8 @@ void mafVMEVolumeGrayTest::TestSetData()
 
   rectilinearGrid->GetPointData()->SetScalars(scalars);
   returnValue = vmeVolumeGray->SetData(rectilinearGrid, 0);
-  // This SetData should produce a MAF_ERROR; you can not set
-  // different data type to a mafVMEVolume when created and initialized.
-  CPPUNIT_ASSERT(returnValue == MAF_ERROR);
+  
+	CPPUNIT_ASSERT(returnValue == MAF_OK);
 
   // destroy vme
   mafDEL(vmeVolumeGray);
