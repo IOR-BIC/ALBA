@@ -7,6 +7,8 @@ SET(PROJECT_SRCS
 	mafOpInteractionOp.h
 	exWizardSample.cpp
 	exWizardSample.h
+	exAppUtils.cpp
+	exAppUtils.h
 )
 
 IF (NOT EXECUTABLE_OUTPUT_PATH)
