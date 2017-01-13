@@ -66,6 +66,24 @@
 !macroend
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; defineifexist - Check if file exist in compile time
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  
+!macro !defineifexist _VAR_NAME _FILE_NAME
+	!tempfile _TEMPFILE
+	!ifdef NSIS_WIN32_MAKENSIS
+		; Windows - cmd.exe
+		!system 'if exist "${_FILE_NAME}" echo !define ${_VAR_NAME} > "${_TEMPFILE}"'
+	!else
+		; Posix - sh
+		!system 'if [ -e "${_FILE_NAME}" ]; then echo "!define ${_VAR_NAME}" > "${_TEMPFILE}"; fi'
+	!endif
+	!include '${_TEMPFILE}'
+	!delfile '${_TEMPFILE}'
+	!undef _TEMPFILE
+!macroend
+!define !defineifexist "!insertmacro !defineifexist"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Check If VS2015 Redistributable Package Is Already Installed
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;    
 Function CheckIfVS2015RedistributablePackageIsAlreadyInstalled
@@ -216,11 +234,6 @@ FunctionEnd
 		CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\Bin\${PRODUCT_EXE_NAME}"
 		CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
 		CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall.lnk" "$INSTDIR\uninst.exe"
-			  
-		CreateDirectory "$INSTDIR\Splash"
-		SetOutPath "$INSTDIR\Splash"
-		File "${PRODUCT_INSTALLER_DIR_WIN}\${PRODUCT_NAME}Splash.bmp"
-		File "${PRODUCT_INSTALLER_DIR_WIN}\${PRODUCT_NAME}About.bmp"
 		
 		;Create Manual path	 		
 		!ifdef PRODUCT_MANUAL_DIR
@@ -229,18 +242,31 @@ FunctionEnd
 			File /r /x /nonfatal "${PRODUCT_MANUAL_DIR}\*.*"
 		!endif
  			  
-		!insertmacro AddConfigPath ;Optional	  
+		${!defineifexist} CONFIG_EXIST "${PRODUCT_INSTALLER_DIR_WIN}\Config"
+		!ifdef CONFIG_EXIST
+		!insertmacro AddConfigPath ;Optional	
+		!endif	  
 
 		; vme uploader downloader stuff: for the moment this is dependent on C:\LTM\Bonemat\Installer...
-		; should we create another variable and put it in cmake GUI?  
-						   
+		; should we create another variable and put it in cmake GUI? 
+										 
 		SetOutPath "$INSTDIR\bin"
-			  
+							
 		Call CheckIfVS2015RedistributablePackageIsAlreadyInstalled
+	
 	SectionEnd
 
 !macroend
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Create AddConfigPath
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+!macro AddConfigPath
+		CreateDirectory "$INSTDIR\Config"
+		SetOutPath "$INSTDIR\Config"
+		File /r /x /nonfatal "${PRODUCT_INSTALLER_DIR_WIN}\Config\*.*"	
+!macroend
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Create Uninstaller
