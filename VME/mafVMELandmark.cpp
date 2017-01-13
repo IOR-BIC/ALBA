@@ -251,8 +251,8 @@ void mafVMELandmark::SetAbsMatrix(const mafMatrix &matrix)
 	mafVMELandmarkCloud *parentCloud = mafVMELandmarkCloud::SafeDownCast(m_Parent);
 	if (parentCloud)
 	{
-		double pose[3];
-		GetPoint(pose);
+		double pose[3],rPose[3];
+		GetOutput()->GetPose(pose, rPose);
 		parentCloud->SetLandmark(this, pose[0], pose[1], pose[2], m_CurrentTime);
 	}
 	

@@ -96,6 +96,9 @@ protected:
 
   int m_KernelSize[3];
 
+	double m_ReplaceRange[2];
+	double m_ReplaceValue;
+
   int m_ApplyDirectlyOnInput; ///< For big volume data, torn on this flag to save memory and apply filters directly to the input data.
 
   /** Smooth the surface. */
@@ -110,7 +113,12 @@ protected:
 	/** Clear all the surface applied filtering. */
 	void OnClear();
 
+	/** Replaces values inside range with defined value*/
+	void OnReplace();
+
   /** friend test class */
   friend class mafOpFilterVolumeTest;
+private:
+	
 };
 #endif
