@@ -19,6 +19,8 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafObserver.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -73,7 +75,7 @@ mafView doesn't have a Scenegraph, nor knowledge about VTK /sa mafViewVTK.
 mafView can be the base class for composed Views.
 
 */
-class MAF_EXPORT mafView: public mafObserver, public mafObject
+class MAF_EXPORT mafView: public mafObserver, public mafServiceClient, public mafObject
 {
 public:
   mafView(const wxString &label = "View");

@@ -23,6 +23,8 @@
 #include "mafDefines.h"
 #include "mafVME.h"
 #include "mafEvent.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -46,7 +48,7 @@ class mafVMELandmarkCloud;
   - Code cleaning and improve documentation
 */
 
-class MAF_EXPORT mafGUILandmark : public mafObserver
+class MAF_EXPORT mafGUILandmark : public mafObserver, public mafServiceClient
 {
 public:
   /** constructor */

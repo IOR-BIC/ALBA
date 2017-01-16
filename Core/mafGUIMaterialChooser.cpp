@@ -444,7 +444,7 @@ void mafGUIMaterialChooser::OnEvent(mafEventBase *maf_event)
         assert(m_VmeMaterial);
         m_VmeMaterial->DeepCopy(m_ChoosedMaterial);
         m_VmeMaterial->m_Prop->DeepCopy(m_Property);
-        m_Vme->ForwardUpEvent(&mafEvent(m_Vme,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       //case wxCANCEL:
       case ID_CANCEL:

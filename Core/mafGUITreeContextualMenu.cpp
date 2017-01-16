@@ -289,7 +289,7 @@ void mafGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 			if (!show) text = "Hide";
 			m_DisplaySubMenu->FindItem(RMENU_SHOW_VME)->SetText(text);
 
-			mafEventMacro(mafEvent(this, VME_SHOW, m_VmeActive, show));
+			GetLogicManager()->VmeShow(m_VmeActive, show);
     }
 		break;
 		case RMENU_SHOW_SUBTREE:
@@ -331,7 +331,7 @@ void mafGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 	}
 
   if(m_ViewActive != NULL)
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafGUITreeContextualMenu::CryptSubTree(bool crypt)

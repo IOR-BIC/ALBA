@@ -49,6 +49,8 @@
 #include <cppunit/TestRunner.h>
 #include "vtkFileOutputWindow.h"
 #include "vtkMAFSmartPointer.h"
+#include "mafFakeLogicForTest.h"
+#include "mafServiceLocator.h"
 
 
 //Main Test Executor
@@ -72,6 +74,9 @@ main(int argc, char* argv[])
 	// Add a listener that print dots as test run.
 	CPPUNIT_NS::BriefTestProgressListener progress;
 	controller.addListener(&progress);
+
+	mafFakeLogicForTest *logic = new mafFakeLogicForTest();
+	mafServiceLocator::SetLogicManager(logic);
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
@@ -99,6 +104,8 @@ main(int argc, char* argv[])
 	// Print test in a compiler compatible format.
 	CPPUNIT_NS::CompilerOutputter outputter(&result, CPPUNIT_NS::stdCOut());
 	outputter.write();
+
+	cppDEL(logic);
 
 	return result.wasSuccessful() ? 0 : 1;
 }

@@ -23,6 +23,8 @@
 #include "mafObject.h"
 #include "mafObserver.h"
 #include "mafEvent.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -44,7 +46,7 @@ class mafGUI;
   creates actors that will be rendered in a render view.
   It can handle a GUI, which events can be catched by OnEvent.
 */
-class MAF_EXPORT mafPipe : public mafObject, public mafObserver
+class MAF_EXPORT mafPipe : public mafObject, public mafObserver, public mafServiceClient
 {
 public:
   mafTypeMacro(mafPipe,mafObject);

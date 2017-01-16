@@ -119,40 +119,38 @@ void mafTextKit::CreateGui()
 void mafTextKit::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
-    switch(e->GetId())
-    {
-      case ID_NLINE_TEXT_IN_VIEW:
-      {
-        mafGUIDialog dlg("Edit text",mafCLOSEWINDOW|mafRESIZABLE|mafOK|mafCANCEL);
-        wxTextCtrl *text = new wxTextCtrl(&dlg,-1,wxString(m_TextInView.GetCStr()),wxDefaultPosition,wxSize(200,200),wxTE_MULTILINE);
-        dlg.Add(text,1);
-        int answer = dlg.ShowModal();
-        wxString s = text->GetValue();
-        m_TextInView = s.c_str();
-        m_TextMapper->SetInput(m_TextInView.GetCStr());
-      }
-      break;
-      case ID_TEXT_IN_VIEW:
-        m_TextMapper->SetInput(m_TextInView.GetCStr());
-      break;
-      case ID_SHOW_TEXT:
-        m_TextActor->SetVisibility(m_ShowText);
-      break;
-      case ID_TEXT_COLOR:
-        SetTextColor(m_TextColor.Red(),m_TextColor.Green(),m_TextColor.Blue());
-        break;
-      case ID_TEXT_ALIGN:
-        SetTextAlignment(m_TextAlign);
-      break;
-      case ID_TEXT_SIZE:
-        SetTextSize(m_TextSize);
-      break;
-      
-
-    }
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		switch (e->GetId())
+		{
+		case ID_NLINE_TEXT_IN_VIEW:
+		{
+			mafGUIDialog dlg("Edit text", mafCLOSEWINDOW | mafRESIZABLE | mafOK | mafCANCEL);
+			wxTextCtrl *text = new wxTextCtrl(&dlg, -1, wxString(m_TextInView.GetCStr()), wxDefaultPosition, wxSize(200, 200), wxTE_MULTILINE);
+			dlg.Add(text, 1);
+			int answer = dlg.ShowModal();
+			wxString s = text->GetValue();
+			m_TextInView = s.c_str();
+			m_TextMapper->SetInput(m_TextInView.GetCStr());
+		}
+		break;
+		case ID_TEXT_IN_VIEW:
+			m_TextMapper->SetInput(m_TextInView.GetCStr());
+			break;
+		case ID_SHOW_TEXT:
+			m_TextActor->SetVisibility(m_ShowText);
+			break;
+		case ID_TEXT_COLOR:
+			SetTextColor(m_TextColor.Red(), m_TextColor.Green(), m_TextColor.Blue());
+			break;
+		case ID_TEXT_ALIGN:
+			SetTextAlignment(m_TextAlign);
+			break;
+		case ID_TEXT_SIZE:
+			SetTextSize(m_TextSize);
+			break;
+		}
+		GetLogicManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------

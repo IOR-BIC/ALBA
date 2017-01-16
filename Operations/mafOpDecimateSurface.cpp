@@ -146,14 +146,14 @@ void mafOpDecimateSurface::OpDo()
 //----------------------------------------------------------------------------
 {
 	((mafVMESurface *)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpDecimateSurface::OpUndo()
 //----------------------------------------------------------------------------
 {
   ((mafVMESurface *)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpDecimateSurface::OnEvent(mafEventBase *maf_event)
@@ -174,8 +174,7 @@ void mafOpDecimateSurface::OnEvent(mafEventBase *maf_event)
             surface->GetMaterial()->m_Prop->SetRepresentationToSurface();
 
           mafEventMacro(mafEvent(this,UPDATE_PROPERTY,m_Input, true));
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-
+					GetLogicManager()->CameraUpdate();
         }
       break;
       case ID_DECIMATE:
@@ -269,7 +268,7 @@ void mafOpDecimateSurface::OnPreview()
 	m_ClearInterfaceFlag	= true;
 
 	if(!m_TestMode)
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpDecimateSurface::OnClear()  
@@ -302,5 +301,5 @@ void mafOpDecimateSurface::OnClear()
   
   m_Gui->Update();
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }

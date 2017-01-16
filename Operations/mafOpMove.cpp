@@ -169,13 +169,13 @@ void mafOpMove::OnEvent(mafEventBase *maf_event)
   else if (maf_event->GetSender() == this->m_GuiSaveRestorePose) // from save/restore gui
   {
     OnEventGuiSaveRestorePose(maf_event); 
-		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
-  else if (maf_event->GetSender() == this->m_GuiTransformTextEntries)
-  {
-    OnEventGuiTransformTextEntries(maf_event);
-		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-  }
+	else if (maf_event->GetSender() == this->m_GuiTransformTextEntries)
+	{
+		OnEventGuiTransformTextEntries(maf_event);
+		GetLogicManager()->CameraUpdate();
+	}
   else
   {
     // if no one can handle this event send it to the operation listener
@@ -200,7 +200,7 @@ void mafOpMove::OpUndo()
 //----------------------------------------------------------------------------
 {  
 	m_Input->SetAbsMatrix(m_OldAbsMatrix);
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpMove::OpStop(int result)
@@ -219,7 +219,7 @@ void mafOpMove::OpStop(int result)
 
     m_GuiTransformMouse->DetachInteractorFromVme();
 
-	  mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
+		GetLogicManager()->CameraUpdate();
 
     // HideGui seems not to work  with plugged guis :(; using it generate a SetFocusToChild
     // error when operation tab is selected after the operation has ended
@@ -270,7 +270,7 @@ void mafOpMove::OnEventThis(mafEventBase *maf_event)
           m_GizmoRotate->Show(true && e.GetBool());
         }
       }
-      mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
     }
     break;
     
@@ -296,7 +296,7 @@ void mafOpMove::OnEventThis(mafEventBase *maf_event)
         m_GizmoTranslate->Show(false);
         m_GizmoRotate->Show(false);
       }
-      mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
     }
     break;
 
@@ -618,7 +618,7 @@ void mafOpMove::Reset()
   {
     m_GuiTransformTextEntries->Reset();
     SetRefSysVME(m_Input); 
-    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 }
 

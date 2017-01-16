@@ -426,7 +426,6 @@ void mafGizmoPath::CreateVMEGizmo()
 
   // ask the manager to create the pipelines
   // this his giving problems... amounted for the moment
-  // mafEventMacro(mafEvent(this,VME_SHOW,m_VmeGizmoPath,true));
   
 }
 

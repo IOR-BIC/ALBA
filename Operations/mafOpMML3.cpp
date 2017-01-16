@@ -1453,7 +1453,7 @@ void mafOpMML3::OnRegistrationOK()
   RegisteredMusclesVME = mafVMEGroup::New();
   RegisteredMusclesVME->SetName("registered muscles");
   PatientSectionVME->AddChild(RegisteredMusclesVME);
-  mafEventMacro(mafEvent(this, VME_ADD, RegisteredMusclesVME));
+  GetLogicManager()->VmeAdd(RegisteredMusclesVME);
   }
 
   // is there a groupVME under the "registered muscles" groupVME with name identical to
@@ -1464,7 +1464,7 @@ void mafOpMML3::OnRegistrationOK()
   OurMuscleVME = mafVMEGroup::New();
   OurMuscleVME->SetName(m_Surface_name);
   RegisteredMusclesVME->AddChild(OurMuscleVME);
-  mafEventMacro(mafEvent(this, VME_ADD, OurMuscleVME));
+  GetLogicManager()->VmeAdd(OurMuscleVME);
   }
 
   // no children?
@@ -1494,7 +1494,7 @@ void mafOpMML3::OnRegistrationOK()
 
   // add to tree (save now)
   //OurMuscleVME->AddChild(vme);
-  mafEventMacro(mafEvent(this, VME_ADD, vme));
+  GetLogicManager()->VmeAdd(vme);
 }
 
 

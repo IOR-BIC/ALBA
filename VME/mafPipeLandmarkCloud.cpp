@@ -170,12 +170,12 @@ void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
           data->GetScalarRange(range);
           m_CloudMapper->SetScalarRange(range);
         }
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
       case ID_RENDERING_DISPLAY_LIST:
         m_CloudMapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       default:
         mafEventMacro(*e);
@@ -189,7 +189,7 @@ void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
 			double radius = m_Cloud->GetRadius();
       m_SphereSource->SetRadius(radius);
 			m_CloundCornerFilter->SetCloudRadius(radius);
-      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      GetLogicManager()->CameraUpdate();
     }
   }
   else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUD_SPHERE_RES)
@@ -198,7 +198,7 @@ void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
     {
       m_SphereSource->SetThetaResolution(m_Cloud->GetSphereResolution());
       m_SphereSource->SetPhiResolution(m_Cloud->GetSphereResolution());
-      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
     }
   }
   

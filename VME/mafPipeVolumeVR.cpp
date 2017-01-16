@@ -374,7 +374,7 @@ void mafPipeVolumeVR::OnEvent(mafEventBase *maf_event)
           m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
 
         m_ResampleFilter->Update();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     }

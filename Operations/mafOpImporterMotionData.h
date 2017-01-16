@@ -158,7 +158,7 @@ public:
     // Must register in order to preserve output for do/undo operation (since it is a smart pointer)
     m_Output = m_Vme;
     m_Vme->Register(m_Output);
-    mafEventMacro(mafEvent(this,VME_ADD,m_Vme));
+    GetLogicManager()->VmeAdd(m_Vme);
   }
   //----------------------------------------------------------------------------
   /** Set file name. */

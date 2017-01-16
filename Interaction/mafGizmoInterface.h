@@ -23,6 +23,8 @@
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafObserver.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -40,7 +42,7 @@ class mafMatrix;
  
   @todo
 */
-class MAF_EXPORT mafGizmoInterface : public mafObserver 
+class MAF_EXPORT mafGizmoInterface : public mafObserver, public mafServiceClient 
 {
 public:
 	

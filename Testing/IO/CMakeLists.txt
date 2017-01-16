@@ -10,14 +10,14 @@ ENDIF (MAF_BUILD_MAFDLL)
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------
 SET(PROJECT_SRCS 
-	mafIOTests.cpp mafIOTests.h
-  mafStorableTest.cpp mafStorableTest.h
-	mafStorageTest.cpp mafStorageTest.h
-	mmuDOMTreeErrorReporterTest.h mmuDOMTreeErrorReporterTest.cpp
-	mafXMLStringTest.h mafXMLStringTest.cpp
-	mmuXMLDOMTest.cpp mmuXMLDOMTest.h
-	mmuXMLDOMElementTest.cpp mmuXMLDOMElementTest.h
-	mafCurlUtilityTest.cpp mafCurlUtilityTest.h
+	mafIOTests.cpp 					mafIOTests.h
+  mafStorableTest.cpp 				mafStorableTest.h
+	mafStorageTest.cpp 				mafStorageTest.h
+	mmuDOMTreeErrorReporterTest.cpp	mmuDOMTreeErrorReporterTest.h
+	mafXMLStringTest.cpp 			mafXMLStringTest.h
+	mmuXMLDOMTest.cpp 				mmuXMLDOMTest.h
+	mmuXMLDOMElementTest.cpp 		mmuXMLDOMElementTest.h
+	mafCurlUtilityTest.cpp 			mafCurlUtilityTest.h
 )
 
 ADD_EXECUTABLE(mafIOTests ${PROJECT_SRCS})

@@ -18,6 +18,8 @@
 #define __mafAnimate_H__
 
 #include "mafObserver.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 class mafVME;
 class mafTagArray;
@@ -33,7 +35,7 @@ class mafGUIMovieCtrl;
 This component allow to manage camera animation into a view.
 mafAnimate allow to store and retrieve a particular point of view.
 */
-class mafAnimate : public mafObserver
+class mafAnimate : public mafObserver, public mafServiceClient
 {
 public:
 

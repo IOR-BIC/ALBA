@@ -122,7 +122,7 @@ void mafOpVolumeUnion::OpRun()
 	if(!m_TestMode)
 	{
 		CreateGui();
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------

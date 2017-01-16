@@ -37,6 +37,8 @@
 #include "mafVMEVolumeGray.h"
 
 #include <vector>
+#include "mafServiceLocator.h"
+#include "mafFakeLogicForTest.h"
 
 //----------------------------------------------------------------------------
 void mafOpCutTest::TestFixture()
@@ -71,19 +73,25 @@ void mafOpCutTest::TestOpDo()
   groupChild->Modified();
   groupChild->Update();
 
-  DummyObserver *observer = new DummyObserver();
+	CPPUNIT_ASSERT(groupParent->GetNumberOfChildren() == 1);
+
+	DummyObserver *observer = new DummyObserver();
+	mafFakeLogicForTest *logic = (mafFakeLogicForTest*)mafServiceLocator::GetLogicManager();
+	logic->ClearCalls();
 
   m_OpCut->SetInput(groupChild);
   m_OpCut->SetListener(observer);
   m_OpCut->OpDo();
 
-  CPPUNIT_ASSERT(observer->GetEvent(0)->GetSender()==m_OpCut);
-  CPPUNIT_ASSERT(observer->GetEvent(0)->GetVme()==groupChild);
-  CPPUNIT_ASSERT(observer->GetEvent(0)->GetId()==VME_REMOVE);
+  CPPUNIT_ASSERT(groupParent->GetNumberOfChildren() == 0);
+	CPPUNIT_ASSERT(logic->GetCall(0).vme == groupChild);
+	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_REMOVE);
 
-  CPPUNIT_ASSERT(observer->GetEvent(1)->GetSender()==m_OpCut);
-  CPPUNIT_ASSERT(observer->GetEvent(1)->GetVme()==groupParent);
-  CPPUNIT_ASSERT(observer->GetEvent(1)->GetId()==VME_SELECTED);
+	CPPUNIT_ASSERT(observer->GetEvent(0)->GetSender()==m_OpCut);
+	CPPUNIT_ASSERT(observer->GetEvent(0)->GetVme()==groupParent); 
+	CPPUNIT_ASSERT(observer->GetEvent(0)->GetId()==VME_SELECTED); 
+// 	CPPUNIT_ASSERT(logic->GetCall(1).vme == groupParent);
+// 	CPPUNIT_ASSERTlogic->GetCall(1).testFunction == mafFakeLogicForTest::VME_SELECTED);
 
   m_OpCut->ClipboardClear();
 
@@ -143,18 +151,21 @@ void mafOpCutTest::TestOpDoVMETimeVarying()
   surfaceTimeVarying->Update();
 
   DummyObserver *observer = new DummyObserver();
+	mafFakeLogicForTest *logic = (mafFakeLogicForTest*)mafServiceLocator::GetLogicManager();
+	logic->ClearCalls();
 
   m_OpCut->SetInput(surfaceTimeVarying);
   m_OpCut->SetListener(observer);
   m_OpCut->OpDo();
 
-  CPPUNIT_ASSERT(observer->GetEvent(0)->GetSender()==m_OpCut);
-  CPPUNIT_ASSERT(observer->GetEvent(0)->GetVme()==surfaceTimeVarying);
-  CPPUNIT_ASSERT(observer->GetEvent(0)->GetId()==VME_REMOVE);
+	CPPUNIT_ASSERT(logic->GetCall(0).vme == surfaceTimeVarying);
+	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_REMOVE);
 
-  CPPUNIT_ASSERT(observer->GetEvent(1)->GetSender()==m_OpCut);
-  CPPUNIT_ASSERT(observer->GetEvent(1)->GetVme()==storage.GetRoot());
-  CPPUNIT_ASSERT(observer->GetEvent(1)->GetId()==VME_SELECTED);
+  CPPUNIT_ASSERT(observer->GetEvent(0)->GetSender()==m_OpCut);
+  CPPUNIT_ASSERT(observer->GetEvent(0)->GetVme()==storage.GetRoot());
+  CPPUNIT_ASSERT(observer->GetEvent(0)->GetId()==VME_SELECTED);
+	// 	CPPUNIT_ASSERT(logic->GetCall(1).vme == groupParent);
+	// 	CPPUNIT_ASSERTlogic->GetCall(1).testFunction == mafFakeLogicForTest::VME_SELECTED);
 
   delete observer;
 

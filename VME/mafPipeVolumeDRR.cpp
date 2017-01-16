@@ -230,14 +230,7 @@ mafGUI *mafPipeVolumeDRR::CreateGui()
 	m_Gui->FloatSlider(ID_EXPOSURE_CORRECTION_L,	"Min", &this->m_ExposureCorrection[0], -1.f, 1.f);
 	m_Gui->FloatSlider(ID_EXPOSURE_CORRECTION_H,	"Max", &this->m_ExposureCorrection[1], -1.f, 1.f);
 	m_Gui->FloatSlider(ID_GAMMA,	"Gamma", &this->m_Gamma, 0.1f, 3.f);
-/*
-	this->m_Gui->Divider(0);
-	this->m_Gui->Label("Image settings:", true);
-	m_Gui->Color(ID_IMAGE_COLOR, "Color", &this->m_ImageColor);
-	m_Gui->FloatSlider(ID_IMAGE_ANGLE, "View angle", &m_ImageAngle, 0.5, 45.0);
-	m_Gui->FloatSlider(ID_IMAGE_OFFSET_X, "Offset X", &(m_Offset[0]), -1.0, 1.0);
-	m_Gui->FloatSlider(ID_IMAGE_OFFSET_Y, "Offset Y", &(m_Offset[1]), -1.0, 1.0);
-*/
+
 	this->m_Gui->Divider(0);
 	this->m_Gui->Label("Camera settings:", true);
 	vtkCamera *camera = this->m_Sg->m_RenFront->GetActiveCamera();
@@ -272,29 +265,21 @@ void mafPipeVolumeDRR::OnEvent(mafEventBase *maf_event)
     {
       case ID_LUT_CHOOSER:
       break;
-
-			/////
-			/*case ID_EXPORT:
-				this->ExportData();
-				return;
-				break;*/
-
 			case ID_VOLUME_COLOR:
 				vtkXRayVolumeMapper::SetColor(this->m_VolumeColor.Red() / 255.f, this->m_VolumeColor.Green() / 255.f, this->m_VolumeColor.Blue() / 255.f);
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-				mafEventMacro(mafEvent(this,MOUSE_MOVE));
+				GetLogicManager()->CameraUpdate();
 				break;
 			case ID_EXPOSURE_CORRECTION_L:
 			case ID_EXPOSURE_CORRECTION_H:
 				if (!vtkXRayVolumeMapper::SetExposureCorrection(this->m_ExposureCorrection))
 					vtkXRayVolumeMapper::GetExposureCorrection(this->m_ExposureCorrection);
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 				break;
 
 			case ID_GAMMA:
 				if (!vtkXRayVolumeMapper::SetGamma(this->m_Gamma))
 					this->m_Gamma = vtkXRayVolumeMapper::GetGamma();
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 				break;
 
 			case ID_RESAMPLE_FACTOR:
@@ -303,53 +288,24 @@ void mafPipeVolumeDRR::OnEvent(mafEventBase *maf_event)
 						m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
 
 					m_ResampleFilter->Update();
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 				}
-				break;
-			case ID_IMAGE_COLOR:
-			case ID_IMAGE_ANGLE:
-			case ID_IMAGE_OFFSET_X:
-			/*case ID_IMAGE_OFFSET_Y:
-				// update pipes
-				for (node = this->m_Sg->m_list; node != NULL; node = node->m_next) {
-					mafVME *vme = node->m_vme;
-					if (vme->GetClassName() != "mafVMEImage" || node->m_Pipe == NULL)
-						continue;
-					//mafPipeImageBackground *pipe = (mafPipeImageBackground *)node->m_Pipe;
-					if (e.GetId() == ID_IMAGE_ANGLE)
-						pipe->SetAngle(this->m_ImageAngle);
-					else if (e.GetId() == ID_IMAGE_COLOR)
-						pipe->SetColor(this->m_ImageColor);
-					else
-						pipe->SetOffset(this->m_offset[0], this->m_offset[1]);
-				}
-				this->CameraUpdate();
-				break;
-      */
-			case CAMERA_UPDATE:
-			case CAMERA_RESET:
-			case CAMERA_FIT:
-			case MOUSE_MOVE:
-				this->m_CameraAngle = camera->GetViewAngle();
-				camera->GetPosition(this->m_CameraPosition);
-				camera->GetFocalPoint(this->m_CameraFocus);
-				this->m_CameraRoll = camera->GetRoll();
 				break;
 			case ID_CAMERA_ANGLE:
 				camera->SetViewAngle(this->m_CameraAngle);
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 				break;
 			case ID_CAMERA_POSITION:
 				camera->SetPosition(this->m_CameraPosition);
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 				break;
 			case ID_CAMERA_FOCUS:
 				camera->SetFocalPoint(this->m_CameraFocus);
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 				break;
 			case ID_CAMERA_ROLL:
 				camera->SetRoll(this->m_CameraRoll);
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 				break;
 			default:
 				mafEventMacro(*e);

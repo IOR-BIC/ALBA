@@ -118,7 +118,7 @@ void mafOpCropDeformableROI::OpDo()
 void mafOpCropDeformableROI::OpUndo()
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,VME_REMOVE,m_ResultVme));
+	GetLogicManager()->VmeRemove(m_ResultVme);
 }
 //----------------------------------------------------------------------------
 void mafOpCropDeformableROI::OnEvent(mafEventBase *maf_event)

@@ -123,7 +123,7 @@ void mafOpCreateEditSkeleton::OpDo()
 		mafVMEPolylineGraph::SafeDownCast(m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
 	}
 	
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpCreateEditSkeleton::OpUndo()

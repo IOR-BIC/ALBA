@@ -117,7 +117,7 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
         }
       break;
     }
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 	}
   else
   {

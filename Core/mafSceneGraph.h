@@ -21,6 +21,8 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafObserver.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -34,7 +36,7 @@ class vtkRenderer;
 //----------------------------------------------------------------------------
 // mafSceneGraph :
 //----------------------------------------------------------------------------
-class MAF_EXPORT mafSceneGraph  /*: public mafObserver*/
+class MAF_EXPORT mafSceneGraph : public mafServiceClient  /*, public mafObserver*/
 {
 public:
 								mafSceneGraph(mafView	*view, vtkRenderer *ren1, vtkRenderer *ren2=NULL, vtkRenderer *ren3 = NULL);
