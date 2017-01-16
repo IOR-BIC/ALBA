@@ -7,11 +7,7 @@ PROJECT(mafViews)
 # Set your list of sources here.
 SET(PROJECT_SRCS
   
-<<<<<<< .mine
   mafViewArbitrarySlice.cpp				mafViewArbitrarySlice.h
-=======
-  mafViewArbitrarySlice.cpp  				mafViewArbitrarySlice.h
->>>>>>> .theirs
   mafViewOrthoSlice.cpp  					mafViewOrthoSlice.h
   mafViewRX.cpp  									mafViewRX.h
   mafViewRXCT.cpp  								mafViewRXCT.h
