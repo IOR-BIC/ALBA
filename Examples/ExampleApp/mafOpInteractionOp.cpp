@@ -82,7 +82,7 @@ void mafOpInteractionOp::OpRun()
   m_Gizmo->SetData(sphere->GetOutput());
   
   // add the VME Gizmo to the VME tree
-  mafEventMacro( mafEvent( this, VME_ADD, m_Gizmo ) );
+  GetLogicManager()->VmeAdd(m_Gizmo);
 
 
 
@@ -165,7 +165,7 @@ void mafOpInteractionOp::OpStop(int result)
   
 
   // REMOVE VME-GIZMO FROM THE TREE
-  mafEventMacro( mafEvent( this, VME_REMOVE, m_Gizmo ) );
+	GetLogicManager()->VmeRemove(m_Gizmo);
   vtkDEL(m_Gizmo);
 
   mafEventMacro(mafEvent(this,result));
@@ -189,7 +189,7 @@ void mafOpInteractionOp::OnEvent(mafEventBase *e)
     mafEvent *event=mafEvent::SafeDownCast(e);
     assert(event);
     m_Gizmo->ApplyMatrix(*(event->GetMatrix()),POST_MULTIPLY);
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }    
   break;
 	default:

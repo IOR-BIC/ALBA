@@ -375,7 +375,7 @@ void mafOpFreezeVME::OpRun()
 void mafOpFreezeVME::OpDo()   
 	//----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate(); GetLogicManager()->CameraUpdate();
 }
 
 

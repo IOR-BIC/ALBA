@@ -128,7 +128,7 @@ void mafPipeScalar::OnEvent(mafEventBase *maf_event)
       case ID_RADIUS:
       break;
     }
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------

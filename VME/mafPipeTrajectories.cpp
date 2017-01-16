@@ -191,7 +191,7 @@ void mafPipeTrajectories::OnEvent(mafEventBase *maf_event)
     {
       case ID_INTERVAL:
         UpdateProperty();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
         break;
       default:
         mafEventMacro(*e);

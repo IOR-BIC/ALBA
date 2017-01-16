@@ -113,7 +113,7 @@ void mafViewCT::VmeShow(mafVME *vme, bool show)
 	for(int i=0; i<this->GetNumberOfSubView(); i++)
 		m_ChildViewList[i]->VmeShow(vme, show);
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewCT::VmeRemove(mafVME *vme)
@@ -122,7 +122,7 @@ void mafViewCT::VmeRemove(mafVME *vme)
 	for(int i=0; i<this->GetNumberOfSubView(); i++)
 		m_ChildViewList[i]->VmeRemove(vme);
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewCT::OnEvent(mafEventBase *maf_event)

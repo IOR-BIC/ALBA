@@ -601,7 +601,7 @@ void mafPipeGraph::OnEvent(mafEventBase *maf_event)
         m_PlotActor->RemoveAllInputs();
         UpdateGraph();
         CreateLegend();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_FIT_PLOT:
@@ -611,7 +611,7 @@ void mafPipeGraph::OnEvent(mafEventBase *maf_event)
         m_PlotActor->RemoveAllInputs();
         UpdateGraph();
         CreateLegend();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_SIGNALS_COLOR:
@@ -623,7 +623,7 @@ void mafPipeGraph::OnEvent(mafEventBase *maf_event)
         m_PlotActor->RemoveAllInputs();
         UpdateGraph();
         CreateLegend();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_DRAW:
@@ -631,7 +631,7 @@ void mafPipeGraph::OnEvent(mafEventBase *maf_event)
         m_PlotActor->RemoveAllInputs();
         UpdateGraph();
         CreateLegend();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_LEGEND:
@@ -649,27 +649,27 @@ void mafPipeGraph::OnEvent(mafEventBase *maf_event)
           } 
           break;
         }
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_ITEM_NAME:
       {
         ChangeItemName();
         CreateLegend();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_AXIS_NAME_X:
         m_PlotActor->SetXTitle(m_TitileX);
         m_PlotTimeLineActor->SetXTitle(m_TitileX);
         ChangeAxisTitle();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
     case ID_AXIS_NAME_Y:
         m_PlotActor->SetYTitle(m_TitileY);
         m_PlotTimeLineActor->SetYTitle(m_TitileY);
         ChangeAxisTitle();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
     case ID_CHECK_BOX:
       {

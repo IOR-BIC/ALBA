@@ -118,7 +118,7 @@ void mafOp::OpDo()
   if (m_Output)
   {
     m_Output->ReparentTo(m_Input);
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -127,8 +127,8 @@ void mafOp::OpUndo()
 {
   if (m_Output)
   {
-    mafEventMacro(mafEvent(this, VME_REMOVE, m_Output));
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+    GetLogicManager()->VmeRemove(m_Output);
+		GetLogicManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------

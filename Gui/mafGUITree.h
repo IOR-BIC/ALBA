@@ -26,6 +26,8 @@
 #include "mafEvent.h"
 #include "mafObserver.h"
 #include "mafGUINamedPanel.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // const :
@@ -91,7 +93,7 @@ Deleting an item destroy all the sub-items,leaving the m_NodeTable inconsistent.
 To correctly implement the operation, DeleteNode must call itself recursively on the 
 item subtree, then Delete the item and remove the corresponding m_NodeTable entry. 
 */
-class MAF_EXPORT mafGUITree: public mafGUINamedPanel
+class MAF_EXPORT mafGUITree: public mafGUINamedPanel, public mafServiceClient
 {
 public:
                  mafGUITree (wxWindow* parent, wxWindowID id=-1, bool CloseButton = false, bool HideTitle = false); 

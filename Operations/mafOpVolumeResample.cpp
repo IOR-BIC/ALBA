@@ -221,7 +221,7 @@ void mafOpVolumeResample::CreateGizmoCube()
   m_ResampleBoxVme->GetMaterial()->m_Diffuse[2] = 0;
   m_ResampleBoxVme->GetMaterial()->UpdateProp();
   m_ResampleBoxVme->ReparentTo(m_Input->GetRoot());
-	mafEventMacro(mafEvent(this,VME_SHOW,m_ResampleBoxVme,true));
+	GetLogicManager()->VmeShow(m_ResampleBoxVme, true);
   
   UpdateGizmoData();
   AutoSpacing();
@@ -266,10 +266,10 @@ void mafOpVolumeResample::GizmoDelete()
 //----------------------------------------------------------------------------
 {	
 	//add the gizmo to the views
-	mafEventMacro(mafEvent(this, VME_REMOVE, m_ResampleBoxVme));
+	GetLogicManager()->VmeRemove(m_ResampleBoxVme);
   vtkDEL(m_ResampleBox);
   mafDEL(m_ResampleBoxVme);
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 mafOp *mafOpVolumeResample::Copy()
@@ -285,7 +285,8 @@ void mafOpVolumeResample::OpRun()
 	CreateGizmoCube();
 	if(!this->m_TestMode)
 		CreateGui();
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpVolumeResample::OpDo()
@@ -426,7 +427,7 @@ void mafOpVolumeResample::OpUndo()
 //----------------------------------------------------------------------------
 {   
 	assert(m_ResampledVme);
-	mafEventMacro(mafEvent(this,VME_REMOVE,m_ResampledVme));
+	GetLogicManager()->VmeRemove(m_ResampledVme);
 }
 //----------------------------------------------------------------------------
 // Constants :
@@ -537,7 +538,7 @@ void mafOpVolumeResample::OnEvent(mafEventBase *maf_event)
       case ID_VOLUME_DIR_Y:
       case ID_VOLUME_DIR_Z:
         UpdateGizmoData();
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 				break;
       case ID_VOLUME_SPACING:
       break;
@@ -545,19 +546,19 @@ void mafOpVolumeResample::OnEvent(mafEventBase *maf_event)
         SetBoundsToVMEBounds();
         UpdateGizmoData();
         UpdateGui();
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_VOLUME_4DBOUNDS:
         SetBoundsToVME4DBounds();
         UpdateGizmoData();
         UpdateGui();
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_VOLUME_VMELOCALBOUNDS:
         SetBoundsToVMELocalBounds();
         UpdateGizmoData();
         UpdateGui();
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_VOLUME_AUTOSPACING:
         AutoSpacing();
@@ -583,7 +584,7 @@ void mafOpVolumeResample::OnEvent(mafEventBase *maf_event)
       p->GetPoint(0,pos);
       UpdateGizmo(handle_id, pos);
       UpdateGui();
-      mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+      GetLogicManager()->CameraUpdate();
 
       }
       break;

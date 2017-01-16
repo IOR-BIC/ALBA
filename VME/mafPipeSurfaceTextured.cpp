@@ -376,110 +376,110 @@ mafGUI *mafPipeSurfaceTextured::CreateGui()
 void mafPipeSurfaceTextured::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    switch(e->GetId()) 
-    {
-      case ID_SCALAR_VISIBILITY:
-      {
-        m_Mapper->SetScalarVisibility(m_ScalarVisibility);
-        if (m_ScalarVisibility)
-        {
-          vtkPolyData *data = (vtkPolyData *)m_Vme->GetOutput()->GetVTKData();
-          assert(data);
-          double range[2];
-          data->GetScalarRange(range);
-          m_Mapper->SetScalarRange(range);
-        }
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-      }
-    	break;
-      case ID_LUT:
-        m_SurfaceMaterial->UpdateFromLut();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-      break;
-      case ID_ENABLE_LOD:
-        m_Actor->SetEnableHighThreshold(m_EnableActorLOD);
-        m_OutlineActor->SetEnableHighThreshold(m_EnableActorLOD);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-      break;
-      case ID_USE_VTK_PROPERTY:
-        if (m_UseVTKProperty != 0)
-        {
-          m_Actor->SetProperty(m_SurfaceMaterial->m_Prop);
-        }
-        else
-        {
-          m_Actor->SetProperty(NULL);
-        }
-		if (m_MaterialButton != NULL)
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	{
+		switch (e->GetId())
 		{
-		  m_MaterialButton->Enable(m_UseVTKProperty != 0);
+		case ID_SCALAR_VISIBILITY:
+		{
+			m_Mapper->SetScalarVisibility(m_ScalarVisibility);
+			if (m_ScalarVisibility)
+			{
+				vtkPolyData *data = (vtkPolyData *)m_Vme->GetOutput()->GetVTKData();
+				assert(data);
+				double range[2];
+				data->GetScalarRange(range);
+				m_Mapper->SetScalarRange(range);
+			}
+			GetLogicManager()->CameraUpdate();
 		}
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-      break;
-      case ID_USE_LOOKUP_TABLE:
-        m_Gui->Enable(ID_LUT,m_UseLookupTable != 0);
-      break;
-      case ID_USE_TEXTURE:
-        if (m_UseTexture)
-        {
-          m_Actor->SetTexture(m_Texture);
-        }
-        else
-        {
-          m_Actor->SetTexture(NULL);
-        }
-        m_Gui->Enable(ID_CHOOSE_TEXTURE,m_UseTexture != 0);
-        m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,m_UseTexture != 0);
-        m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE && m_UseTexture != 0);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-      break;
-      case ID_CHOOSE_TEXTURE:
-      {
-        mafString title = "Choose texture";
-        e->SetId(VME_CHOOSE);
-        e->SetArg((long)&mafPipeSurfaceTextured::ImageAccept);
-        e->SetString(&title);
-        mafEventMacro(*e);
-        mafVME *n = e->GetVme();
-        if (n != NULL)
-        {
-          vtkImageData *image = vtkImageData::SafeDownCast(n->GetOutput()->GetVTKData());
-          m_Gui->Enable(ID_USE_TEXTURE,image != NULL);
-          if (image)
-          {
-            image->Update();
-            m_SurfaceMaterial->SetMaterialTexture(n->GetId());
-            m_SurfaceMaterial->m_MaterialType = mmaMaterial::USE_TEXTURE;
-            m_Texture->SetInput(image);
-            m_Actor->SetTexture(m_Texture);
-            mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-            m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,true);
-          }
-        }
-      }
-      break;
-      case ID_TEXTURE_MAPPING_MODE:
-        GenerateTextureMapCoordinate();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-      break;
-      case ID_RENDERING_DISPLAY_LIST:
-        m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-      break;
-      default:
-        mafEventMacro(*e);
-      break;
-    }
-  }
-  else if (maf_event->GetSender() == m_Vme)
-  {
-    if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
-    {
-      UpdateProperty();
-    }
-  }
+		break;
+		case ID_LUT:
+			m_SurfaceMaterial->UpdateFromLut();
+			GetLogicManager()->CameraUpdate();
+			break;
+		case ID_ENABLE_LOD:
+			m_Actor->SetEnableHighThreshold(m_EnableActorLOD);
+			m_OutlineActor->SetEnableHighThreshold(m_EnableActorLOD);
+			GetLogicManager()->CameraUpdate();
+			break;
+		case ID_USE_VTK_PROPERTY:
+			if (m_UseVTKProperty != 0)
+			{
+				m_Actor->SetProperty(m_SurfaceMaterial->m_Prop);
+			}
+			else
+			{
+				m_Actor->SetProperty(NULL);
+			}
+			if (m_MaterialButton != NULL)
+			{
+				m_MaterialButton->Enable(m_UseVTKProperty != 0);
+			}
+			GetLogicManager()->CameraUpdate();
+			break;
+		case ID_USE_LOOKUP_TABLE:
+			m_Gui->Enable(ID_LUT, m_UseLookupTable != 0);
+			break;
+		case ID_USE_TEXTURE:
+			if (m_UseTexture)
+			{
+				m_Actor->SetTexture(m_Texture);
+			}
+			else
+			{
+				m_Actor->SetTexture(NULL);
+			}
+			m_Gui->Enable(ID_CHOOSE_TEXTURE, m_UseTexture != 0);
+			m_Gui->Enable(ID_TEXTURE_MAPPING_MODE, m_UseTexture != 0);
+			m_Gui->Enable(ID_TEXTURE_MAPPING_MODE, m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE && m_UseTexture != 0);
+			GetLogicManager()->CameraUpdate();
+			break;
+		case ID_CHOOSE_TEXTURE:
+		{
+			mafString title = "Choose texture";
+			e->SetId(VME_CHOOSE);
+			e->SetArg((long)&mafPipeSurfaceTextured::ImageAccept);
+			e->SetString(&title);
+			mafEventMacro(*e);
+			mafVME *n = e->GetVme();
+			if (n != NULL)
+			{
+				vtkImageData *image = vtkImageData::SafeDownCast(n->GetOutput()->GetVTKData());
+				m_Gui->Enable(ID_USE_TEXTURE, image != NULL);
+				if (image)
+				{
+					image->Update();
+					m_SurfaceMaterial->SetMaterialTexture(n->GetId());
+					m_SurfaceMaterial->m_MaterialType = mmaMaterial::USE_TEXTURE;
+					m_Texture->SetInput(image);
+					m_Actor->SetTexture(m_Texture);
+					GetLogicManager()->CameraUpdate();
+					m_Gui->Enable(ID_TEXTURE_MAPPING_MODE, true);
+				}
+			}
+		}
+		break;
+		case ID_TEXTURE_MAPPING_MODE:
+			GenerateTextureMapCoordinate();
+			GetLogicManager()->CameraUpdate();
+			break;
+		case ID_RENDERING_DISPLAY_LIST:
+			m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
+			GetLogicManager()->CameraUpdate();
+			break;
+		default:
+			mafEventMacro(*e);
+			break;
+		}
+	}
+	else if (maf_event->GetSender() == m_Vme)
+	{
+		if (maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
+		{
+			UpdateProperty();
+		}
+	}
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceTextured::GenerateTextureMapCoordinate()
@@ -529,5 +529,5 @@ void mafPipeSurfaceTextured::SetActorPicking(int enable)
 {
 	m_Actor->SetPickable(enable);
   m_Actor->Modified();
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }

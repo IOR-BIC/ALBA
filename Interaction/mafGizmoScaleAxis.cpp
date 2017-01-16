@@ -480,8 +480,8 @@ void mafGizmoScaleAxis::Show(bool show)
 //----------------------------------------------------------------------------
 {
   m_Show = show;
-  mafEventMacro(mafEvent(this,VME_SHOW,m_CylGizmo,show));
-  mafEventMacro(mafEvent(this,VME_SHOW,m_CubeGizmo,show));
+  GetLogicManager()->VmeShow(m_CylGizmo, show);
+  GetLogicManager()->VmeShow(m_CubeGizmo, show);
 }
 
 //----------------------------------------------------------------------------

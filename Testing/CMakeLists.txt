@@ -15,14 +15,14 @@ DBG_MESSAGE("Configuring project mafTESTS")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  mafTest.cpp mafTest.h
+  mafTest.cpp 				mafTest.h
+  mafFakeLogicForTest.cpp 	mafFakeLogicForTest.h
 	)
 	
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
-
-  
+ 
 OPTION(BUILD_BASE_TESTING "Enable building of testing for BASE classes" OFF)
 IF (BUILD_BASE_TESTING)
   SUBDIRS(Base)

@@ -296,7 +296,7 @@ void mafPipeComputeWrapping::OnEvent(mafEventBase *maf_event)
         m_WrappedMeterVME->ForwardUpEvent(*e);
       break;
     }
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
   else if (maf_event->GetSender() == m_WrappedMeterVME)
   {

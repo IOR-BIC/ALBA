@@ -55,6 +55,8 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkDataSetMapper.h"
 #include "vtkProperty.h"
+#include "mafFakeLogicForTest.h"
+#include "mafServiceLocator.h"
 
 
 void mafGizmoRotateFanTest::BeforeTest()
@@ -182,19 +184,16 @@ void mafGizmoRotateFanTest::TestFixture()
 
 void mafGizmoRotateFanTest::TestShow()
 {
-  mockListener *mockList = new mockListener();
+	mafFakeLogicForTest *logic = (mafFakeLogicForTest*)mafServiceLocator::GetLogicManager();
+	logic->ClearCalls();
 
   mafGizmoRotateFan *gizmoRotateFan = new mafGizmoRotateFan(m_GizmoInputSurface);
-  gizmoRotateFan->SetListener(mockList);
 
   gizmoRotateFan->Show(true);
 
-  mafID evId = mockList->GetEvent()->GetId();
-
-  CPPUNIT_ASSERT( evId == VME_SHOW );
+	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_SHOW);
 
   cppDEL(gizmoRotateFan);
-  cppDEL(mockList);
 }
 
 void mafGizmoRotateFanTest::RenderData( vtkDataSet *data )

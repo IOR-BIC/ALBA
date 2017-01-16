@@ -95,7 +95,7 @@ void mafViewCompoundWindowing::OnEvent(mafEventBase *maf_event)
 					double low, hi;
 					m_LutSlider->GetSubRange(&low,&hi);
 					m_ColorLUT->SetTableRange(low,hi);
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 				}
 			}
 			break;
@@ -121,7 +121,7 @@ void mafViewCompoundWindowing::VmeShow(mafVME *vme, bool show)
 	if(ActivateWindowing(vme))
 		UpdateWindowing(show, vme);
   
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewCompoundWindowing::EnableWidgets(bool enable)

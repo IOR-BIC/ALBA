@@ -9,140 +9,127 @@ PROJECT(vtkMAF)
 # vtkMAF_SRCS variable.
 SET(vtkMAF_SRCS
 
-  vtkMAFOrientationMarkerWidget.h  vtkMAFOrientationMarkerWidget.cpp  
-  vtkMAFAnnotatedCubeActor.h  vtkMAFAnnotatedCubeActor.cpp  
-  vtkMAFGlobalAxesHeadActor.h  vtkMAFGlobalAxesHeadActor.cpp
+  vtkMAFOrientationMarkerWidget.h  						vtkMAFOrientationMarkerWidget.cpp  
+  vtkMAFAnnotatedCubeActor.h  							vtkMAFAnnotatedCubeActor.cpp  
+  vtkMAFGlobalAxesHeadActor.h  							vtkMAFGlobalAxesHeadActor.cpp
   
-  vtkMAFCellsFilter.cxx  vtkMAFCellsFilter.h  
-  vtkMAFRemoveCellsFilter.cxx  vtkMAFRemoveCellsFilter.h
-  vtkMAFClipSurfaceBoundingBox.cxx  vtkMAFClipSurfaceBoundingBox.h
-  vtkMAFContourVolumeMapper.cxx  vtkMAFContourVolumeMapper.h
-  vtkMAFContourVolumeMapperAdv.cxx  vtkMAFContourVolumeMapperAdv.h
-  vtkMAFDistanceFilter.cxx  vtkMAFDistanceFilter.h
-  vtkMAFDOFMatrix.cxx  vtkMAFDOFMatrix.h
-  vtkMAFExtendedGlyph3D.cxx  vtkMAFExtendedGlyph3D.h
-  vtkMAFFixedCutter.cxx  vtkMAFFixedCutter.h
-  vtkMAFGlobalAxisCoordinate.cxx  vtkMAFGlobalAxisCoordinate.h
-  vtkMAFGridActor.cxx  vtkMAFGridActor.h
-  vtkMAFHistogram.cxx  vtkMAFHistogram.h
-  vtkMAFImplicitPolyData.cxx  vtkMAFImplicitPolyData.h
-  vtkMAFLocalAxisCoordinate.cxx  vtkMAFLocalAxisCoordinate.h
-  vtkMAFAdaptiveVolumeMapper.cxx  vtkMAFAdaptiveVolumeMapper.h
-  vtkMAFImageMapToWidgetColors.cxx  vtkMAFImageMapToWidgetColors.h
-  vtkMAFPolyDataSingleSourceShortestPath.cxx  vtkMAFPolyDataSingleSourceShortestPath.h
-  vtkMAFProjectRG.cxx  vtkMAFProjectRG.h
-  vtkMAFProjectSP.cxx  vtkMAFProjectSP.h
-  vtkMAFRayCast3DPicker.cxx  vtkMAFRayCast3DPicker.h
-  vtkMAFRectilinearGridToRectilinearGridFilter.cxx  vtkMAFRectilinearGridToRectilinearGridFilter.h
-  vtkMAFRGSliceAccumulate.cxx  vtkMAFRGSliceAccumulate.h
-  vtkMAFRulerActor2D.cxx  vtkMAFRulerActor2D.h
-  vtkMAFSimpleRulerActor2D.cxx  vtkMAFSimpleRulerActor2D.h
-  vtkMAFTextActorMeter.cxx  vtkMAFTextActorMeter.h
-  vtkMAFTransferFunction2D.cxx  vtkMAFTransferFunction2D.h
-  vtkMAFVolumeResample.h  vtkMAFVolumeResample.cxx
-  vtkMAFPolyDataToSinglePolyLine.cxx  vtkMAFPolyDataToSinglePolyLine.h
-  vtkMAFTextOrientator.cxx  vtkMAFTextOrientator.h
-  vtkMAFProfilingActor.cxx  vtkMAFProfilingActor.h
-  vtkMAFXYPlotActor.cxx  vtkMAFXYPlotActor.h
-  vtkMAFPolyDataNormals.cxx  vtkMAFPolyDataNormals.h
-  ####################### from vtkMAF
-  vtkDicomUnPacker.cxx  vtkDicomUnPacker.h
-  vtkImageUnPacker.cxx  vtkImageUnPacker.h
-  vtkPackedImage.cxx  vtkPackedImage.h
-  vtkXRayVolumeMapper.cxx  vtkXRayVolumeMapper.h
-  vtkWeightedLandmarkTransform.cxx  vtkWeightedLandmarkTransform.h
-  vtkTriangleQualityRatio.cxx  vtkTriangleQualityRatio.h
-  vtkMAFCellLocator.cxx  vtkMAFCellLocator.h
-  vtkMAFAddScalarsFilter.cxx  vtkMAFAddScalarsFilter.h
-  vtkMAFExtrudeToCircle.cxx  vtkMAFExtrudeToCircle.h
-  vtkMAFFillingHole.cxx  vtkMAFFillingHole.h
-  vtkMAFFixTopology.cxx  vtkMAFFixTopology.h
-  vtkMAFImageUnsharpFilter.cxx  vtkMAFImageUnsharpFilter.h
-  vtkMAFMatrixVectorMath.h  vtkMAFMatrixVectorMath.cxx
-  vtkMAFPoissonSurfaceReconstruction.cxx  vtkMAFPoissonSurfaceReconstruction.h
-  vtkMAFPolyDataMirror.cxx  vtkMAFPolyDataMirror.h
-  vtkMAFPolyDataNavigator.h  vtkMAFPolyDataNavigator.cxx
-  vtkMAFRegionGrowingLocalGlobalThreshold.cxx  vtkMAFRegionGrowingLocalGlobalThreshold.h
-  vtkMAFHalfTubeRemoval.cxx  vtkMAFHalfTubeRemoval.h
-  vtkMAFInteractorStyleEnableRotation.cxx  vtkMAFInteractorStyleEnableRotation.h
-  vtkMAFSubdividePolylines.cxx  vtkMAFSubdividePolylines.h
-  vtkMAFLandmarkCloudPolydataFilter.cxx  vtkMAFLandmarkCloudPolydataFilter.h
-  vtkBox.cxx  vtkBox.h
-  vtkMaskPolyDataFilter.cxx  vtkMaskPolyDataFilter.h
-  vtkHoleConnectivity.cxx  vtkHoleConnectivity.h
-  vtkPatchLine.h  vtkPatchLine.cpp
+  vtkMAFCellsFilter.cxx  								vtkMAFCellsFilter.h  
+  vtkMAFRemoveCellsFilter.cxx  							vtkMAFRemoveCellsFilter.h
+  vtkMAFClipSurfaceBoundingBox.cxx  					vtkMAFClipSurfaceBoundingBox.h
+  vtkMAFContourVolumeMapper.cxx  						vtkMAFContourVolumeMapper.h
+  vtkMAFContourVolumeMapperAdv.cxx  					vtkMAFContourVolumeMapperAdv.h
+  vtkMAFDistanceFilter.cxx  							vtkMAFDistanceFilter.h
+  vtkMAFDOFMatrix.cxx  									vtkMAFDOFMatrix.h
+  vtkMAFExtendedGlyph3D.cxx  							vtkMAFExtendedGlyph3D.h
+  vtkMAFFixedCutter.cxx  								vtkMAFFixedCutter.h
+  vtkMAFGlobalAxisCoordinate.cxx  						vtkMAFGlobalAxisCoordinate.h
+  vtkMAFGridActor.cxx  									vtkMAFGridActor.h
+  vtkMAFHistogram.cxx  									vtkMAFHistogram.h
+  vtkMAFImplicitPolyData.cxx  							vtkMAFImplicitPolyData.h
+  vtkMAFLocalAxisCoordinate.cxx  						vtkMAFLocalAxisCoordinate.h
+  vtkMAFAdaptiveVolumeMapper.cxx  						vtkMAFAdaptiveVolumeMapper.h
+  vtkMAFImageMapToWidgetColors.cxx  					vtkMAFImageMapToWidgetColors.h
+  vtkMAFPolyDataSingleSourceShortestPath.cxx  			vtkMAFPolyDataSingleSourceShortestPath.h
+  vtkMAFProjectRG.cxx  									vtkMAFProjectRG.h
+  vtkMAFProjectSP.cxx  									vtkMAFProjectSP.h
+  vtkMAFRayCast3DPicker.cxx  							vtkMAFRayCast3DPicker.h
+  vtkMAFRectilinearGridToRectilinearGridFilter.cxx  	vtkMAFRectilinearGridToRectilinearGridFilter.h
+  vtkMAFRGSliceAccumulate.cxx  							vtkMAFRGSliceAccumulate.h
+  vtkMAFRulerActor2D.cxx  								vtkMAFRulerActor2D.h
+  vtkMAFSimpleRulerActor2D.cxx  						vtkMAFSimpleRulerActor2D.h
+  vtkMAFTextActorMeter.cxx  							vtkMAFTextActorMeter.h
+  vtkMAFTransferFunction2D.cxx  						vtkMAFTransferFunction2D.h
+  vtkMAFVolumeResample.h  								vtkMAFVolumeResample.cxx
+  vtkMAFPolyDataToSinglePolyLine.cxx  					vtkMAFPolyDataToSinglePolyLine.h
+  vtkMAFTextOrientator.cxx  							vtkMAFTextOrientator.h
+  vtkMAFProfilingActor.cxx  							vtkMAFProfilingActor.h
+  vtkMAFXYPlotActor.cxx  								vtkMAFXYPlotActor.h
+  vtkMAFPolyDataNormals.cxx  							vtkMAFPolyDataNormals.h
+  ##from vtkMAF
+  vtkDicomUnPacker.cxx  								vtkDicomUnPacker.h
+  vtkImageUnPacker.cxx  								vtkImageUnPacker.h
+  vtkPackedImage.cxx  									vtkPackedImage.h
+  vtkXRayVolumeMapper.cxx    							vtkXRayVolumeMapper.h
+  vtkWeightedLandmarkTransform.cxx    					vtkWeightedLandmarkTransform.h
+  vtkTriangleQualityRatio.cxx  							vtkTriangleQualityRatio.h
+  vtkMAFCellLocator.cxx  								vtkMAFCellLocator.h
+  vtkMAFAddScalarsFilter.cxx  							vtkMAFAddScalarsFilter.h
+  vtkMAFExtrudeToCircle.cxx  							vtkMAFExtrudeToCircle.h
+  vtkMAFFillingHole.cxx  								vtkMAFFillingHole.h
+  vtkMAFFixTopology.cxx  								vtkMAFFixTopology.h
+  vtkMAFImageUnsharpFilter.cxx  						vtkMAFImageUnsharpFilter.h
+  vtkMAFMatrixVectorMath.h  							vtkMAFMatrixVectorMath.cxx
+  vtkMAFPoissonSurfaceReconstruction.cxx  				vtkMAFPoissonSurfaceReconstruction.h
+  vtkMAFPolyDataMirror.cxx  							vtkMAFPolyDataMirror.h
+  vtkMAFPolyDataNavigator.h  							vtkMAFPolyDataNavigator.cxx
+  vtkMAFRegionGrowingLocalGlobalThreshold.cxx  			vtkMAFRegionGrowingLocalGlobalThreshold.h
+  vtkMAFHalfTubeRemoval.cxx  							vtkMAFHalfTubeRemoval.h
+  vtkMAFInteractorStyleEnableRotation.cxx  				vtkMAFInteractorStyleEnableRotation.h
+  vtkMAFSubdividePolylines.cxx  						vtkMAFSubdividePolylines.h
+  vtkMAFLandmarkCloudPolydataFilter.cxx  				vtkMAFLandmarkCloudPolydataFilter.h
+  vtkBox.cxx  											vtkBox.h
+  vtkMaskPolyDataFilter.cxx  							vtkMaskPolyDataFilter.h
+  vtkHoleConnectivity.cxx  								vtkHoleConnectivity.h
+  vtkPatchLine.h  										vtkPatchLine.cpp
   
+  vtkMAFAbstractPointsSource.cpp 						vtkMAFAbstractPointsSource.h
+  vtkMAFLineStripSource.cpp 							vtkMAFLineStripSource.h
 
-  vtkMAFAbstractPointsSource.cpp vtkMAFAbstractPointsSource.h
-  vtkMAFLineStripSource.cpp vtkMAFLineStripSource.h
-
-
-	vtkMAFDataArrayDescriptor.cxx   vtkMAFDataArrayDescriptor.h
-	vtkMAFFile.cxx  vtkMAFFile.h	
-	vtkMAFIdType64.h
+  vtkMAFDataArrayDescriptor.cxx  						vtkMAFDataArrayDescriptor.h
+  vtkMAFFile.cxx  										vtkMAFFile.h	
+  vtkMAFIdType64.h
   
-  #####################################################
-  vtkMAFVolumeRayCastMapper.cxx  vtkMAFVolumeRayCastMapper.h
-  vtkMAFVolumeTextureMapper2D.cxx  vtkMAFVolumeTextureMapper2D.h
-  vtkMAFVolumeSlicer.cxx  vtkMAFVolumeSlicer.h
-  vtkMAFMeshCutter.cxx   vtkMAFMeshCutter.h  	
+  ###############################################
+  vtkMAFVolumeRayCastMapper.cxx  						vtkMAFVolumeRayCastMapper.h
+  vtkMAFVolumeTextureMapper2D.cxx  						vtkMAFVolumeTextureMapper2D.h
+  vtkMAFVolumeSlicer.cxx  								vtkMAFVolumeSlicer.h
+  vtkMAFMeshCutter.cxx   								vtkMAFMeshCutter.h  	
   ###############################################
   
   ###############################################
-  vtkMAFPolyDataDeformation.cpp  vtkMAFPolyDataDeformation.h
-  vtkMAFPolyDataDeformation_M1.cpp  vtkMAFPolyDataDeformation_M1.h
-  vtkMAFPolyDataDeformation_M2.cpp  vtkMAFPolyDataDeformation_M2.h  
+  vtkMAFPolyDataDeformation.cpp  						vtkMAFPolyDataDeformation.h
+  vtkMAFPolyDataDeformation_M1.cpp  					vtkMAFPolyDataDeformation_M1.h
+  vtkMAFPolyDataDeformation_M2.cpp  					vtkMAFPolyDataDeformation_M2.h  
   ###############################################
       
-  vtkMAFErythrocyteSource.cpp  vtkMAFErythrocyteSource.h
+  vtkMAFErythrocyteSource.cpp  							vtkMAFErythrocyteSource.h  
+  vtkMAFImageFillHolesRemoveIslands.cxx  				vtkMAFImageFillHolesRemoveIslands.h  
+  vtkMAFVolumeSlicerNotInterpolated.cxx  				vtkMAFVolumeSlicerNotInterpolated.h
+  vtkMAFBinaryImageFloodFill.cxx  						vtkMAFBinaryImageFloodFill.h
   
-  vtkMAFImageFillHolesRemoveIslands.cxx  vtkMAFImageFillHolesRemoveIslands.h
+  ##vtkbioeng####################################
+  vtkMAFCollisionDetectionFilter.cxx  					vtkMAFCollisionDetectionFilter.h  
+  vtkMAFRayCastCleaner.cpp  							vtkMAFRayCastCleaner.h  
+  vtkMAFVolumeToClosedSmoothSurface.cxx  				vtkMAFVolumeToClosedSmoothSurface.h
   
-  vtkMAFVolumeSlicerNotInterpolated.cxx  vtkMAFVolumeSlicerNotInterpolated.h
-
-  vtkMAFBinaryImageFloodFill.cxx  vtkMAFBinaryImageFloodFill.h
-  
-  ######vtkbioeng################################
-  vtkMAFCollisionDetectionFilter.cxx  vtkMAFCollisionDetectionFilter.h
-  
-  vtkMAFRayCastCleaner.cpp  vtkMAFRayCastCleaner.h
-  
-  vtkMAFVolumeToClosedSmoothSurface.cxx  vtkMAFVolumeToClosedSmoothSurface.h
-  
-  ################################
-  vtkBoundingBox.cxx  vtkBoundingBox.h
-  vtkMAFPastValuesList.cpp  vtkMAFPastValuesList.h
-  vtkMAFStentModelSource.cpp  vtkMAFStentModelSource.h
+  ###############################################
+  vtkBoundingBox.cxx  									vtkBoundingBox.h
+  vtkMAFPastValuesList.cpp  							vtkMAFPastValuesList.h
+  vtkMAFStentModelSource.cpp  							vtkMAFStentModelSource.h
   vtkMAFDeformableSimplexMeshFilter.h
   vtkMAFDeformableSimplexMeshFilter_Impl.h
 	
-  vtkMAFTubeFilter.cxx vtkMAFTubeFilter.h
+  vtkMAFTubeFilter.cxx 									vtkMAFTubeFilter.h
 	
-  vtkMAFLandmarkCloudOutlineCornerFilter.cxx vtkMAFLandmarkCloudOutlineCornerFilter.h
+  vtkMAFLandmarkCloudOutlineCornerFilter.cxx 			vtkMAFLandmarkCloudOutlineCornerFilter.h
 )
 
 IF(WIN32)
 SET(vtkMAF_SRCS
 	${vtkMAF_SRCS}
-  vtkMAFContourVolumeMapperGPU.cxx  vtkMAFContourVolumeMapperGPU.h
+  vtkMAFContourVolumeMapperGPU.cxx  					vtkMAFContourVolumeMapperGPU.h
   )
 ENDIF(WIN32)
 
 IF (MAF_USE_ITK)
 SET(vtkMAF_SRCS  ${vtkMAF_SRCS}
-  mafClassicICPRegistration.cxx  mafClassicICPRegistration.h
+  mafClassicICPRegistration.cxx  						mafClassicICPRegistration.h
   mafICPUtility.h
 )
 ENDIF (MAF_USE_ITK)
 
 # List the kits from VTK that are needed by this project.
-SET(vtkMAF_LIBS
-  vtkCommon
-  vtkRendering
-  vtkFiltering
-  vtkGraphics
-  vtkHybrid
-)
+SET(vtkMAF_LIBS vtkCommon  vtkRendering  vtkFiltering  vtkGraphics  vtkHybrid)
 
 IF(WIN32)
 SET(vtkMAF_LIBS
@@ -299,3 +286,5 @@ IF(VTK_FOUND)
   #  ENDIF (BUILD_vtkMAF_TESTING)
   #ENDIF (BUILD_TESTING)
 ENDIF(VTK_FOUND)
+
+ADD_DEPENDENCIES(${PROJECT_NAME} mafService)

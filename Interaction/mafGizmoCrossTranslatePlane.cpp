@@ -465,7 +465,7 @@ void mafGizmoCrossTranslatePlane::Show(bool show)
 {
 	// show gizmo components by issuing events
 	for (int i = 0; i < NUM_GIZMO_PARTS; i++)
-		mafEventMacro(mafEvent(this,VME_SHOW,m_Gizmo[i],show));
+		GetLogicManager()->VmeShow(m_Gizmo[i], show);
 }
 
 //----------------------------------------------------------------------------
@@ -637,5 +637,5 @@ void mafGizmoCrossTranslatePlane::CreateFeedbackGizmoPipeline()
 void mafGizmoCrossTranslatePlane::ShowTranslationFeedbackArrows(bool show)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,VME_SHOW,m_TranslationFeedbackGizmo,show));
+	GetLogicManager()->VmeShow(m_TranslationFeedbackGizmo, show);
 }

@@ -119,7 +119,7 @@ void mafViewImageCompound::OnEvent(mafEventBase *maf_event)
 					double low, hi;
 					m_LutSlider->GetSubRange(&low,&hi);
 					m_ColorLUT->SetTableRange(low,hi);
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 				}
 			}
 			break;
@@ -174,7 +174,7 @@ void mafViewImageCompound::VmeShow(mafVME *vme, bool show)
 		UpdateWindowing(show && pipe && pipe->IsGrayImage());
 	}
 	
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewImageCompound::EnableWidgets(bool enable)

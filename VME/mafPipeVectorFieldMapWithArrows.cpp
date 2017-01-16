@@ -394,7 +394,7 @@ void mafPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
           
           m_Gui->Update();
           UpdateVTKPipe(); 
-          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
           return;
         }
       break;
@@ -426,7 +426,7 @@ void mafPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
 
           m_Gui->Update();
           UpdateVTKPipe(); 
-          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
           return;
         }
       break;
@@ -446,14 +446,14 @@ void mafPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
             m_EdLength->Enable(true);
           }
           UpdateVTKPipe(); 
-          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
           return;
         }
       break;
       default:
         {
           UpdateVTKPipe(); 
-          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
           return;
         }
       }

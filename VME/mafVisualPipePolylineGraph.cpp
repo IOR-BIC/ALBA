@@ -575,7 +575,7 @@ void mafVisualPipePolylineGraph::OnEvent(mafEventBase *maf_event)
     case ID_SHOW_BRANCH_ID:
       {
         m_ActorBranchId->SetVisibility(m_ShowBranchId==TRUE);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_TUBE_RADIUS:
@@ -583,7 +583,7 @@ void mafVisualPipePolylineGraph::OnEvent(mafEventBase *maf_event)
         m_Tube->SetRadius(m_TubeRadius);
         mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_RADIUS");
         item->SetValue(m_TubeRadius);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_TUBE_CAPPING:
@@ -591,7 +591,7 @@ void mafVisualPipePolylineGraph::OnEvent(mafEventBase *maf_event)
         m_Tube->SetCapping(m_Capping);
         mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_CAPPING");
         item->SetValue(m_Capping);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_TUBE_RESOLUTION:
@@ -599,7 +599,7 @@ void mafVisualPipePolylineGraph::OnEvent(mafEventBase *maf_event)
         m_Tube->SetNumberOfSides(m_TubeResolution);
         mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_RESOLUTION");
         item->SetValue(m_TubeResolution);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_SPHERE_RADIUS:
@@ -607,7 +607,7 @@ void mafVisualPipePolylineGraph::OnEvent(mafEventBase *maf_event)
         m_Sphere->SetRadius(m_SphereRadius);
         mafTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RADIUS");
         item->SetValue(m_SphereRadius);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_SPHERE_RESOLUTION:
@@ -616,7 +616,7 @@ void mafVisualPipePolylineGraph::OnEvent(mafEventBase *maf_event)
         m_Sphere->SetThetaResolution(m_SphereResolution);
         mafTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RESOLUTION");
         item->SetValue(m_SphereResolution);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_POLYLINE_REPRESENTATION:
@@ -624,13 +624,13 @@ void mafVisualPipePolylineGraph::OnEvent(mafEventBase *maf_event)
         SetRepresentation(m_Representation);
         mafTagItem *item = m_Vme->GetTagArray()->GetTag("REPRESENTATION");
         item->SetValue(m_Representation);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_SCALAR_DIMENSION:
       {
         UpdateProperty();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_SCALARS:
@@ -644,7 +644,7 @@ void mafVisualPipePolylineGraph::OnEvent(mafEventBase *maf_event)
           m_ActiveScalarType = CELL_TYPE;
         }
         UpdateScalars();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_LUT:
@@ -653,7 +653,7 @@ void mafVisualPipePolylineGraph::OnEvent(mafEventBase *maf_event)
         //m_Table->GetTableRange(sr);
         m_Mapper->SetScalarRange(sr);
       }
-      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
       break;
     default:
       mafEventMacro(*e);
@@ -673,7 +673,7 @@ void mafVisualPipePolylineGraph::SetActorPicking(int enable)
 {
   m_Actor->SetPickable(enable);
   m_Actor->Modified();
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafVisualPipePolylineGraph::UpdateScalars()

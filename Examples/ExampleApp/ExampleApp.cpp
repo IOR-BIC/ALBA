@@ -37,6 +37,7 @@
 #include "mafVMESurface.h"
 #include "mafPipeFactoryVME.h"
 
+#include "mafServiceLocator.h"
 
 //Comment this line to disable wizard sample
 #define USE_WIZARD
@@ -217,6 +218,7 @@ bool ExampleApp::OnInit()
 	assert(result==MAF_OK);
 
 	m_Logic = new mafLogicWithManagers();
+	mafServiceLocator::SetLogicManager(m_Logic);
   
 	m_Logic->GetTopWin()->SetTitle("ExampleApp");
 

@@ -22,7 +22,10 @@
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
 #include "mafObserver.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 #include "mafPolylineGraph.h"
+
 #include "vtkSystemIncludes.h"
 
 //----------------------------------------------------------------------------
@@ -49,7 +52,7 @@ class vtkPolyData;
   It creates ISA, can add, insert, remove, move point in the polyline graph,
   it can also add, remove branch in which points are.
 */
-class MAF_EXPORT mafGeometryEditorPolylineGraph: public mafObserver 
+class MAF_EXPORT mafGeometryEditorPolylineGraph: public mafObserver, public mafServiceClient 
 {
 public:
   /** contructor*/

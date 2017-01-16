@@ -513,9 +513,6 @@ void mafVMESurfaceParametric::InternalUpdate()
     }
     break;
 	}
-
-  /*mafEvent ev(this,CAMERA_UPDATE);
-  this->ForwardUpEvent(&ev);*/
 }
 //-----------------------------------------------------------------------
 int mafVMESurfaceParametric::InternalStore(mafStorageElement *parent)

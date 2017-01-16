@@ -53,6 +53,8 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkDataSetMapper.h"
+#include "mafServiceLocator.h"
+#include "mafFakeLogicForTest.h"
 
 
 void mafGizmoScaleIsotropicTest::BeforeTest()
@@ -159,21 +161,16 @@ void mafGizmoScaleIsotropicTest::TestSetInput()
 
 void mafGizmoScaleIsotropicTest::TestShow()
 {
-  mockListener *mockList = new mockListener();
+	mafFakeLogicForTest *logic = (mafFakeLogicForTest*)mafServiceLocator::GetLogicManager();
+	logic->ClearCalls();
 
   mafGizmoScaleIsotropic *gizmoScaleIsotropic = new mafGizmoScaleIsotropic(m_GizmoInputSurface);
-  gizmoScaleIsotropic->SetListener(mockList);
  
   gizmoScaleIsotropic->Show(true);
   
-  mafEventBase *ev = mockList->GetEvent();
-  int evId = 0;
-  evId = ev->GetId();
-
-  CPPUNIT_ASSERT( evId == VME_SHOW );
-  
+	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_SHOW);
+		  
   cppDEL(gizmoScaleIsotropic);
-  cppDEL(mockList);
 }
 
 void mafGizmoScaleIsotropicTest::TestSetGetAbsPose()

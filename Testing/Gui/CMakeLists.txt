@@ -4,7 +4,7 @@ PROJECT (Gui_TEST)
 IF(MAF_BUILD_MAFDLL)
   LINK_LIBRARIES(mafDLL)
 ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafTests mafCore mafVME mafGui)
+  LINK_LIBRARIES(mafTests mafCore mafVME mafGui mafService)
 ENDIF (MAF_BUILD_MAFDLL)
 
 #SUBDIRS(Minimal)
@@ -33,15 +33,15 @@ ENDIF (MAF_BUILD_MAFDLL)
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------
 SET(PROJECT_SRCS 
-	mafGuiTests.h mafGuiTests.cpp
-	mafGUISettingsStorageTest.h mafGUISettingsStorageTest.cpp
-	mafAttachCameraTest.h mafAttachCameraTest.cpp
-	mafGUISettingsAdvancedTest.h mafGUISettingsAdvancedTest.cpp
-	mafGUIDicomSettingsTest.h mafGUIDicomSettingsTest.cpp
-	mafGUIWizardTest.h mafGUIWizardTest.cpp
-	mafGUIWizardPageTest.h mafGUIWizardPageTest.cpp
-	mafGUILandmarkTest.h mafGUILandmarkTest.cpp
-	mafGUIWizardPageNewTest.h mafGUIWizardPageNewTest.cpp
+	mafGuiTests.h 					mafGuiTests.cpp
+	mafGUISettingsStorageTest.h 	mafGUISettingsStorageTest.cpp
+	mafAttachCameraTest.h 			mafAttachCameraTest.cpp
+	mafGUISettingsAdvancedTest.h 	mafGUISettingsAdvancedTest.cpp
+	mafGUIDicomSettingsTest.h 		mafGUIDicomSettingsTest.cpp
+	mafGUIWizardTest.h 				mafGUIWizardTest.cpp
+	mafGUIWizardPageTest.h 			mafGUIWizardPageTest.cpp
+	mafGUILandmarkTest.h 			mafGUILandmarkTest.cpp
+	mafGUIWizardPageNewTest.h 		mafGUIWizardPageNewTest.cpp
 )
 
 ADD_EXECUTABLE(mafGuiTests ${PROJECT_SRCS})

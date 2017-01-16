@@ -280,7 +280,7 @@ Select the vme parent
 			LoadChild(m_SelectionVme);
 		//////////////////////////////////////////////////////////////////////////
 
-		mafEventMacro(mafEvent(this, VME_REMOVE, m_Selection));
+		GetLogicManager()->VmeRemove(m_Selection);
 		mafEventMacro(mafEvent(this, VME_SELECTED, glo_SelectionParent));
 
 		glo_SelectionParent.GetPointer()->GetOutput()->Update();
@@ -497,6 +497,6 @@ The copy in the clipboard will be automatically deleted
 	if (m_Pasted)
 	{
 		SetClipboard(m_PastedVme);
-		mafEventMacro(mafEvent(this, VME_REMOVE, m_PastedVme));
+		GetLogicManager()->VmeRemove(m_PastedVme);
 	}
 }

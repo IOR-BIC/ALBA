@@ -334,7 +334,7 @@ void mafGizmoROI::OnEventGizmoComponents(mafEventBase *maf_event)
         else if (arg == mafInteractorGenericMouse::MOUSE_UP)
         {
         }
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
         // forward isa transform events to the listener op
         mafEventMacro(*e);
       }

@@ -88,7 +88,7 @@ void mafOpCreateSurface::OpDo()
 	if (m_Output)
 	{
 		m_Output->ReparentTo(m_Input);
-		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------

@@ -422,7 +422,7 @@ int mafVMEManager::MSFOpen(mafString filename)
   NotifyAdd(root_node); // add the storage root (the tree) with events notification
 
 	mafEventMacro(mafEvent(this,VME_SELECTED, root_node)); // raise notification events (to logic)
-  mafEventMacro(mafEvent(this,CAMERA_RESET)); 
+  mafEventMacro(mafEvent(this,CAMERA_RESET));
   
 	if (m_TmpDir != "")
 	{

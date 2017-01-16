@@ -315,7 +315,7 @@ void mafGizmoRotateCircle::SetColor(double colR, double colG, double colB)
 void mafGizmoRotateCircle::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,VME_SHOW,m_GizmoCircle,show));
+  GetLogicManager()->VmeShow(m_GizmoCircle, show);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateCircle::SetAbsPose(mafMatrix *absPose)

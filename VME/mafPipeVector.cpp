@@ -321,7 +321,7 @@ void mafPipeVector::OnEvent(mafEventBase *maf_event)
           m_Actor->SetProperty(NULL);
         }
         m_MaterialButton->Enable(m_UseVTKProperty != 0);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_USE_ARROW:
         if (m_UseArrow == FALSE)
@@ -335,7 +335,7 @@ void mafPipeVector::OnEvent(mafEventBase *maf_event)
           m_Apd->AddInput(m_ArrowTip->GetOutput());
           m_Apd->Update();
         }
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_USE_SPHERE:
         if (m_UseSphere == FALSE)
@@ -349,7 +349,7 @@ void mafPipeVector::OnEvent(mafEventBase *maf_event)
           m_Apd->AddInput(m_Sphere->GetOutput());
           m_Apd->Update();
         }
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_USE_BUNCH:
         if (m_UseBunch == TRUE)
@@ -365,17 +365,17 @@ void mafPipeVector::OnEvent(mafEventBase *maf_event)
           m_Bunch->RemoveAllInputs();
         }
         EnableWidget();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_INTERVAL:
         m_Bunch->RemoveAllInputs();
         AllVector();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_STEP:
         m_Bunch->RemoveAllInputs();
         AllVector();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_ALL_BUNCH:
         if (m_AllBunch == TRUE)
@@ -392,7 +392,7 @@ void mafPipeVector::OnEvent(mafEventBase *maf_event)
           m_Bunch->RemoveAllInputs();
         }
         EnableWidget();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       default:
         mafEventMacro(*e);

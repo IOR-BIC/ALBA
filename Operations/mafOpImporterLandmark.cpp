@@ -140,7 +140,7 @@ void mafOpImporterLandmark::OpDo()
 
 	m_VmeCloud->GetTagArray()->SetTag(tag_Nature);
   
-	mafEventMacro(mafEvent(this,VME_ADD,m_VmeCloud));
+	GetLogicManager()->VmeAdd(m_VmeCloud);
 }
 //----------------------------------------------------------------------------
 void mafOpImporterLandmark::OpStop(int result)

@@ -447,7 +447,7 @@ void mafVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
     output0->Update();
     m_Mapper->SetInput(output0);
     m_Mapper->Update();
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------

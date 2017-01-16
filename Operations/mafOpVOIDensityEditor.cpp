@@ -245,7 +245,7 @@ void mafOpVOIDensityEditor::EditVolumeScalars()
 
   m_Input->GetOutput()->Update();
   mafEventMacro(mafEvent(this, VME_MODIFIED, m_Input));
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -277,6 +277,6 @@ void mafOpVOIDensityEditor::OpUndo()
     }
     ((mafVMEVolumeGray *)m_Input)->Update();
     vtkDEL(m_OldData);
-    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 }
