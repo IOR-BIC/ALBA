@@ -171,12 +171,12 @@ void mafOpMAFTransform::OnEvent(mafEventBase *maf_event)
   else if (maf_event->GetSender() == this->m_GuiSaveRestorePose) // from save/restore gui
   {
     OnEventGuiSaveRestorePose(maf_event); 
-		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
   else if (maf_event->GetSender() == this->m_GuiTransformTextEntries)
   {
     OnEventGuiTransformTextEntries(maf_event);
-		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
   else
   {
@@ -198,7 +198,7 @@ void mafOpMAFTransform::OpUndo()
 	m_Input->SetAbsMatrix(m_OldAbsMatrix);
   m_Input->GetOutput()->Update();
 
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpMAFTransform::OpStop(int result)
@@ -275,7 +275,7 @@ void mafOpMAFTransform::OnEventThis(mafEventBase *maf_event)
           m_GizmoScale->Show(true && e.GetBool());
         }
       }
-      mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
     }
     break;
     
@@ -302,7 +302,7 @@ void mafOpMAFTransform::OnEventThis(mafEventBase *maf_event)
         m_GizmoScale->SetRefSys(m_RefSysVME);
         m_GizmoScale->Show(true && e.GetBool());
       }
-      mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
     }
     break;
 
@@ -449,7 +449,7 @@ void mafOpMAFTransform::OnEventGizmoScale(mafEventBase *maf_event)
       {
 	      // update gui 
 	      m_GuiTransformTextEntries->SetAbsPose(&m_NewAbsMatrix);
-	      mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
 	  }
     break;
@@ -681,7 +681,7 @@ void mafOpMAFTransform::Reset()
     SetRefSysVME(m_Input); 
   }
   m_NewAbsMatrix = m_OldAbsMatrix;
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

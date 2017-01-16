@@ -132,7 +132,7 @@ void mafViewHTML::VmeShow  (mafVME *vme, bool show)
   if(show)
   {
     for(mafSceneNode *node = m_Sg->GetNodeList(); node; node=node->GetNext())
-      mafEventMacro(mafEvent(this,VME_SHOW,node->GetVme(),false));    
+      GetLogicManager()->VmeShow(node->GetVme(), false);
   }
   else
     m_Html->SetPage("");

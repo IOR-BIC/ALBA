@@ -129,7 +129,7 @@ void mafOpReparentTo::OpDo()
 		mafEventMacro(mafEvent(this, VME_SELECT, m_Input));
 
 		if(showed)
-	    mafEventMacro(mafEvent(this,VME_SHOW, m_Input, true));
+	    GetLogicManager()->VmeShow(m_Input, true);
   }
   else
   {

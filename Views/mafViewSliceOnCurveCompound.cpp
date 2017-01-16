@@ -220,7 +220,7 @@ void mafViewSliceOnCurveCompound::VmeShow(mafVME *vme, bool show)
 	if (ActivateWindowing(vme))
 		UpdateWindowing(show, vme);
 
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //------------------------------------------------------------------------
@@ -246,7 +246,7 @@ void mafViewSliceOnCurveCompound::HideSameVMEs(mafView *view, mafVME *vme)
     {
       if (pScNode->GetPipe() != NULL && otherVME != vme)
       {            
-        mafEventMacro(mafEvent(this, VME_SHOW, otherVME, false));
+        GetLogicManager()->VmeShow(otherVME, false);
       }
     }
 

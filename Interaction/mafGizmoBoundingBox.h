@@ -23,6 +23,8 @@
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafObserver.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 #include "mafVMEGizmo.h"
 
 //----------------------------------------------------------------------------
@@ -48,7 +50,7 @@ class mafMatrix;
    Bounding box gizmo for highlighting a region of interest.
    @sa mafGizmoROI               
 */
-class MAF_EXPORT mafGizmoBoundingBox: public mafObserver 
+class MAF_EXPORT mafGizmoBoundingBox: public mafObserver, public mafServiceClient 
 {
 public:
            mafGizmoBoundingBox(mafVME *input, mafObserver *listener = NULL,mafVME* parent=NULL);

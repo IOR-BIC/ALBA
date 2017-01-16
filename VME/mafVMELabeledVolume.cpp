@@ -417,8 +417,7 @@ void mafVMELabeledVolume::GenerateLabeledVolume()
     labelMaterial->m_ColorLut->SetTableRange(scalarRange);
     labelMaterial->UpdateFromTables();
 
-    mafEvent e(this,CAMERA_UPDATE);
-    ForwardUpEvent(&e);
+    ForwardUpEvent(&mafEvent(this, CAMERA_UPDATE));
   }
 }
 

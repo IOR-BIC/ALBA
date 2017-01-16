@@ -22,6 +22,8 @@
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
 #include "vtkIdList.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // Forward declarations:
@@ -33,7 +35,7 @@ class mafVMEPolylineGraph;
 
 /** Decorate input vme with curvilinear abscissa interface for mafVMEPolylineGraph 
  constrained interaction */
-class MAF_EXPORT mafCurvilinearAbscissaOnSkeletonHelper : mafObserver
+class MAF_EXPORT mafCurvilinearAbscissaOnSkeletonHelper : mafObserver, public mafServiceClient
 {
 public:
 

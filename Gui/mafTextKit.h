@@ -22,6 +22,8 @@
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafObserver.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -38,7 +40,7 @@ class vtkTextMapper;
 mafTextKit is tool to visualize text into a given mafRWI.
 \sa mafRWI
 */
-class MAF_EXPORT mafTextKit : public mafObserver
+class MAF_EXPORT mafTextKit : public mafObserver, public mafServiceClient
 {
 public:
 	mafTextKit(wxWindow* parent, vtkRenderer *renderer, mafObserver *Listener = NULL);

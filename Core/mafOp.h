@@ -22,6 +22,8 @@
 #include "mafEvent.h"
 #include "mafObserver.h"
 #include "mafObject.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -48,7 +50,7 @@ enum OPERATIONS_TYPE_ID
 //----------------------------------------------------------------------------
 /**
 */
-class MAF_EXPORT mafOp: public mafObserver, public mafObject
+class MAF_EXPORT mafOp: public mafObserver, public mafObject, public mafServiceClient
 {
 public:
 	enum MAFOP_ID

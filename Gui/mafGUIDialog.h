@@ -22,6 +22,9 @@
 #include "mafEvent.h"
 #include "mafObserver.h"
 #include "mafGUI.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
+
 //----------------------------------------------------------------------------
 // Const:
 //----------------------------------------------------------------------------
@@ -69,7 +72,7 @@ Example:
 
 @sa mafGUIDialogPreview
 */
-class MAF_EXPORT mafGUIDialog : public wxDialog, public mafObserver  
+class MAF_EXPORT mafGUIDialog : public wxDialog, public mafObserver, public mafServiceClient  
 {
 public:
 	mafGUIDialog (const wxString& title,	long style = mafCLOSEWINDOW | mafRESIZABLE | mafCLOSE);

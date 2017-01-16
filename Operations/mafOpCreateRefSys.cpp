@@ -95,8 +95,8 @@ void mafOpCreateRefSys::OpDo()
 		double mainDiagonal = sqrt(diffX*diffX + diffY*diffY + diffZ*diffZ);
 		m_RefSys->SetScaleFactor(mainDiagonal/3.0);
 
-		mafEventMacro(mafEvent(this,VME_SHOW,m_RefSys,true));
+		GetLogicManager()->VmeShow(m_RefSys, true);
   }
   else
-    mafEventMacro(mafEvent(this, VME_ADD, m_RefSys));
+    GetLogicManager()->VmeAdd(m_RefSys);
 }

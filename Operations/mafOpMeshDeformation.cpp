@@ -210,7 +210,7 @@ void mafOpMeshDeformation::OpDo()
     }
   }
   
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -239,7 +239,7 @@ void mafOpMeshDeformation::OpUndo()
     }
   }
 
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

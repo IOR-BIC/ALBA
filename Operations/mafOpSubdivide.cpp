@@ -151,7 +151,7 @@ void mafOpSubdivide::OnEvent(mafEventBase *maf_event)
     {	
       case ID_PREVIEW:
         {
-          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
         }
       break;
       case ID_NUMBER_OF_SUBDIVISION:

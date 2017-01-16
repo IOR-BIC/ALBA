@@ -969,7 +969,7 @@ void mafOpImporterC3D::OpDo()
 	for (unsigned i = 0; i < m_intData.size(); i++)
 	{
 		m_intData[i].m_VmeGroup->ReparentTo(m_Input);
-		mafEventMacro(mafEvent(this, VME_ADD, m_intData[i].m_VmeGroup));
+		GetLogicManager()->VmeAdd(m_intData[i].m_VmeGroup);
 	}
 }
 //----------------------------------------------------------------------------
@@ -978,7 +978,7 @@ void mafOpImporterC3D::OpUndo()
 {
 	for (unsigned i = 0; i < m_intData.size(); i++)
 	{
-		mafEventMacro(mafEvent(this, VME_REMOVE, m_intData[i].m_VmeGroup));
+		GetLogicManager()->VmeRemove(m_intData[i].m_VmeGroup);
 	}
 }
 

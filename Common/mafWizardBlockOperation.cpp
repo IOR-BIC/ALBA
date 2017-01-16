@@ -198,14 +198,14 @@ void mafWizardBlockOperation::ExcutionBegin()
   {
     //Showing input vme to ensure visualization in the operation
     if (m_AutoShowSelectedVME)
-      mafEventMacro(mafEvent(this,VME_SHOW,m_SelectedVME,true));
+			GetLogicManager()->VmeShow(m_SelectedVME, true);
 
     for(int i=0;i<m_VmeShow.size();i++)
     {
       //detecting all other vme starting on selected vme and show it
       mafVME *toShow=m_SelectedVME->GetByPath(m_VmeShow[i].c_str());
       if (toShow != NULL)
-        mafEventMacro(mafEvent(this,VME_SHOW,toShow,true));
+        GetLogicManager()->VmeShow(toShow, true);
     }
   }
   
@@ -229,7 +229,7 @@ void mafWizardBlockOperation::ExcutionEnd()
   for(int i=0;i<m_VmeHide.size();i++)
   {
     mafVME *toHide=m_SelectedVME->GetByPath(m_VmeHide[i]);
-    mafEventMacro(mafEvent(this,VME_SHOW,toHide,false));
+    GetLogicManager()->VmeShow(toHide, false);
   }
 
   if(m_viewhastobedeleted) 

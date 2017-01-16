@@ -365,7 +365,7 @@ void mafGizmoCrossRotateFan::SetColor(double colR, double colG, double colB)
 void mafGizmoCrossRotateFan::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,VME_SHOW,m_Gizmo,show));
+  GetLogicManager()->VmeShow(m_Gizmo, show);
 }
 //----------------------------------------------------------------------------
 double mafGizmoCrossRotateFan::PointPickedToStartTheta(double xp, double yp, double zp)

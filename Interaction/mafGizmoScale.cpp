@@ -454,24 +454,6 @@ void mafGizmoScale::Show(bool show)
 	}
 
 	m_GSIsotropic->Show(show);
-
-	// Gizmo scale text entry is not keyable to not confuse the user;
-	/*
-
-	// if auxiliary ref sys is different from vme its scaling cannot be changed
-	// so gui must not be keyable. Otherwise set gui keyability to show.
-
-	if (RefSysVME == InputVME)
-	{
-	m_GuiGizmoScale->EnableWidgets(show);
-	}
-	else
-	{
-	m_GuiGizmoScale->EnableWidgets(false);
-	}
-	*/
-	// update the camera
-	//  mafEventMacro(mafEvent(this, CAMERA_UPDATE));   // Paolo 20-07-2005
 }
 //----------------------------------------------------------------------------  
 void mafGizmoScale::Show(bool showX, bool showY, bool showZ, bool showIso)

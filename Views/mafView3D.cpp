@@ -233,7 +233,6 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 					{
 						if(!(m_Choose == ID_PIPE_ISO))
 						{
-							//mafEventMacro(mafEvent(this,VME_SHOW,m_CurrentSurface,false));
 							VmeShow(m_CurrentSurface,false);
 						}
 						CameraUpdate();

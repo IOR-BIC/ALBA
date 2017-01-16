@@ -708,7 +708,7 @@ void mafPipeVectorFieldGlyphs::OnEvent(mafEventBase *maf_event)
         
       UpdateVTKPipe(); 
     
-      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
       return;
     }     
   }

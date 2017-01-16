@@ -153,7 +153,7 @@ void mafOpSurfaceMirror::OpDo()
   assert(m_OutputPolydata);
 
 	((mafVMESurface *)m_Input)->SetData(m_OutputPolydata,m_Input->GetTimeStamp());
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpSurfaceMirror::OpUndo()
@@ -162,7 +162,7 @@ void mafOpSurfaceMirror::OpUndo()
   assert(m_InputPolydata);
 
 	((mafVMESurface *)m_Input)->SetData(m_InputPolydata,m_Input->GetTimeStamp());
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpSurfaceMirror::OnEvent(mafEventBase *maf_event)
@@ -224,8 +224,7 @@ void mafOpSurfaceMirror::Preview()
   m_OutputPolydata->Update();
   ((mafVMESurface *)m_Input)->SetData(m_OutputPolydata,m_Input->GetTimeStamp());
 
-
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 
 	if (wait)
 		delete wait;

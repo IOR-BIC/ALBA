@@ -167,7 +167,7 @@ void mafPipeWithScalar::OnEvent(mafEventBase *maf_event)
             m_ActiveScalarType = CELL_TYPE;
           }
           UpdateActiveScalarsInVMEDataVectorItems();
-          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
         }
         break;
       case ID_LUT:
@@ -175,7 +175,7 @@ void mafPipeWithScalar::OnEvent(mafEventBase *maf_event)
           double sr[2];
           m_Table->GetTableRange(sr);
           m_Mapper->SetScalarRange(sr);
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
         }
         break;
       case ID_SCALAR_MAP_ACTIVE:
@@ -192,7 +192,7 @@ void mafPipeWithScalar::OnEvent(mafEventBase *maf_event)
 	
 					UpdateActiveScalarsInVMEDataVectorItems();
 
-          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+          GetLogicManager()->CameraUpdate();
         }
         break;
 
@@ -316,7 +316,7 @@ void mafPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
   m_Actor->Modified();
 
   UpdateProperty();
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

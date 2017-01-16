@@ -176,7 +176,7 @@ void mafOpExtrusionHoles::OpDo()
 	if(m_ResultPolydata)
 		((mafVMESurface*)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpExtrusionHoles::OpUndo()
@@ -185,7 +185,7 @@ void mafOpExtrusionHoles::OpUndo()
 	if(m_OriginalPolydata)
 		((mafVMESurface*)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpExtrusionHoles::OnEvent(mafEventBase *maf_event)

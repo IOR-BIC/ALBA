@@ -371,7 +371,7 @@ void mafGUILutHistogramEditor::UpdateVolumeLut(bool reset)
     m_LutSwatch->Modified();
 
   //Forward event to update other views
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -379,5 +379,5 @@ void mafGUILutHistogramEditor::OnSize(wxSizeEvent &event)
 //----------------------------------------------------------------------------
 {
   mafGUIDialog::OnSize(event);
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }

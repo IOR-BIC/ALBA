@@ -246,7 +246,7 @@ void mafOpClipSurface::OnEventThis(mafEventBase *maf_event)
 			if(m_Arrow) 
 			{
 				m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case ID_CLIP_BY:
@@ -269,7 +269,7 @@ void mafOpClipSurface::OnEventThis(mafEventBase *maf_event)
 					m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
 					m_PlaneSource->SetOrigin(-m_PlaneWidth/2,-m_PlaneHeight/2, 0);
 					m_PlaneSource->Update();
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 				}
 			}
 			break;
@@ -300,7 +300,7 @@ void mafOpClipSurface::OnEventThis(mafEventBase *maf_event)
 				else
 					OpStop(OP_RUN_OK);
 
-				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case wxCANCEL:
@@ -397,7 +397,7 @@ void mafOpClipSurface::OnEventGizmoScale(mafEventBase *maf_event)
 	{
 	case ID_TRANSFORM:
 		{ 
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 		}
 		break;
 
@@ -431,7 +431,7 @@ void mafOpClipSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 				m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
 				UpdateISARefSys();
 
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 				currTr->Delete();
 			}
 			break;
@@ -471,15 +471,15 @@ void mafOpClipSurface::OnEvent(mafEventBase *maf_event)
 void mafOpClipSurface::ChangeGizmo()
 //----------------------------------------------------------------------------
 {
-	if(m_ClipModality==mafOpClipSurface::MODE_IMPLICIT_FUNCTION)
+	if (m_ClipModality == mafOpClipSurface::MODE_IMPLICIT_FUNCTION)
 	{
-		m_GizmoTranslate->Show(m_GizmoType==GIZMO_TRANSLATE && m_UseGizmo);
-		m_GizmoRotate->Show(m_GizmoType==GIZMO_ROTATE && m_UseGizmo);
-		m_GizmoScale->Show(m_GizmoType==GIZMO_SCALE && m_UseGizmo,m_GizmoType==GIZMO_SCALE && m_UseGizmo,false,m_GizmoType==GIZMO_SCALE && m_UseGizmo);
-		
-		if(m_UseGizmo)
+		m_GizmoTranslate->Show(m_GizmoType == GIZMO_TRANSLATE && m_UseGizmo);
+		m_GizmoRotate->Show(m_GizmoType == GIZMO_ROTATE && m_UseGizmo);
+		m_GizmoScale->Show(m_GizmoType == GIZMO_SCALE && m_UseGizmo, m_GizmoType == GIZMO_SCALE && m_UseGizmo, false, m_GizmoType == GIZMO_SCALE && m_UseGizmo);
+
+		if (m_UseGizmo)
 		{
-			switch(m_GizmoType)
+			switch (m_GizmoType)
 			{
 			case GIZMO_TRANSLATE:
 				m_GizmoTranslate->SetRefSys(m_ImplicitPlaneGizmo);
@@ -499,7 +499,7 @@ void mafOpClipSurface::ChangeGizmo()
 		m_GizmoRotate->Show(false);
 		m_GizmoScale->Show(false);
 	}
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpClipSurface::OpStop(int result)
@@ -508,7 +508,7 @@ void mafOpClipSurface::OpStop(int result)
   if(m_ImplicitPlaneGizmo)
   {
     m_ImplicitPlaneGizmo->SetBehavior(NULL);
-    mafEventMacro(mafEvent(this, VME_REMOVE, m_ImplicitPlaneGizmo));
+    GetLogicManager()->VmeRemove(m_ImplicitPlaneGizmo);
   }
   mafDEL(m_ImplicitPlaneGizmo);
 	vtkDEL(m_Gizmo);
@@ -550,7 +550,7 @@ void mafOpClipSurface::OpDo()
 
 		m_ClippedVME->ReparentTo(m_Input->GetParent());
 	}
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpClipSurface::OpUndo()
@@ -562,7 +562,7 @@ void mafOpClipSurface::OpUndo()
 		m_ClippedVME->ReparentTo(NULL);
 		mafDEL(m_ClippedVME);
 	}
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 int mafOpClipSurface::Clip()
@@ -685,7 +685,7 @@ void mafOpClipSurface::PostMultiplyEventMatrix(mafEventBase *maf_event)
 			// update matrix for OpDo()
 			//m_NewAbsMatrix = absPose;
 		} 
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 
 		// clean up
 		tr->Delete();
@@ -752,7 +752,7 @@ void mafOpClipSurface::ShowClipPlane(bool show)
 
       m_ImplicitPlaneGizmo->SetAbsMatrix(mat);
 
-      mafEventMacro(mafEvent(this,VME_SHOW,m_ImplicitPlaneGizmo,true));
+      GetLogicManager()->VmeShow(m_ImplicitPlaneGizmo, true);
     }
     mmaMaterial *material = m_ImplicitPlaneGizmo->GetMaterial();
     material->m_Prop->SetOpacity(0.5);
@@ -776,7 +776,7 @@ void mafOpClipSurface::ShowClipPlane(bool show)
     }
   }
 
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpClipSurface::AttachInteraction()

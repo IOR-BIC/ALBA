@@ -17,6 +17,9 @@
 #ifndef __mafGUITreeContextualMenu_H__
 #define __mafGUITreeContextualMenu_H__
 
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
+
 //----------------------------------------------------------------------------
 // forward references;
 //----------------------------------------------------------------------------
@@ -63,7 +66,7 @@ enum TREE_CONTEXTUAL_MENU_ID
 /** Used to create and manage contextual menu' for tree widget used in side bar
 @sa mafGUIContextualMenu
 */
-class MAF_EXPORT mafGUITreeContextualMenu : public wxMenu
+class MAF_EXPORT mafGUITreeContextualMenu : public wxMenu, public mafServiceClient
 {
 
 public:

@@ -407,7 +407,7 @@ void mafViewGlobalSlice::VmeCreatePipe(mafVME *vme)
 
       if (m_NumberOfVisibleVme == 1)
       {
-        mafEventMacro(mafEvent(this,CAMERA_RESET));
+				GetLogicManager()->CameraReset();
       }
       else
       {
@@ -476,7 +476,7 @@ void mafViewGlobalSlice::OnEvent(mafEventBase *maf_event)
 				if (pipe)
 				{
 					pipe->SetSliceOpacity(m_Opacity);
-					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 					m_OpacitySlider->SetValue(m_Opacity);
 				}
 			}
@@ -487,7 +487,7 @@ void mafViewGlobalSlice::OnEvent(mafEventBase *maf_event)
         if (pipe)
         {
           pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
-          mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
         }
       }
 			break;
@@ -698,7 +698,7 @@ void mafViewGlobalSlice::UpdateSlice()
 	UpdatePlane();
 	UpdateText();
   
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewGlobalSlice::UpdatePlane()

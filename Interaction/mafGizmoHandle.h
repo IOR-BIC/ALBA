@@ -23,6 +23,8 @@
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafObserver.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 #include "mafMatrix.h"
 
 //----------------------------------------------------------------------------
@@ -85,7 +87,7 @@ class vtkPlaneSource;
   @sa mafGizmoROI mafOpCrop 
 */
 
-class MAF_EXPORT mafGizmoHandle: public mafObserver 
+class MAF_EXPORT mafGizmoHandle: public mafObserver, public mafServiceClient
 {
 public:
 

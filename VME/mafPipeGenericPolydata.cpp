@@ -328,14 +328,14 @@ void mafPipeGenericPolydata::OnEvent(mafEventBase *maf_event)
 						m_MaterialButton->UpdateMaterialIcon();
 						m_Gui->Update();
 					}
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 				}
 				break;
 			case ID_BORDER_CHANGE:
 				{
 					m_Actor->GetProperty()->SetLineWidth(m_Border);
 					m_Actor->Modified();
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 
 					m_MaterialButton->UpdateMaterialIcon();
 					m_MaterialButton->GetGui()->Update();
@@ -376,7 +376,7 @@ void mafPipeGenericPolydata::SetActorPicking(int enable)
 {
 	m_Actor->SetPickable(enable);
 	m_Actor->Modified();
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafPipeGenericPolydata::SetWireframeOn()
@@ -393,7 +393,7 @@ void mafPipeGenericPolydata::SetWireframeOn()
 		m_Gui->Enable(ID_EDGE_VISIBILITY,false);
 		m_Gui->Update();
 	}
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafPipeGenericPolydata::SetWireframeOff()
@@ -410,7 +410,7 @@ void mafPipeGenericPolydata::SetWireframeOff()
 		m_Gui->Enable(ID_EDGE_VISIBILITY,true);
 		m_Gui->Update();
 	}
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -420,7 +420,7 @@ void mafPipeGenericPolydata::SetNormalsTypeToPoints()
 	m_NormalsFilter->ComputeCellNormalsOff();
 	m_NormalsFilter->ComputePointNormalsOn();
 	m_NormalsFilter->Update();
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -430,7 +430,7 @@ void mafPipeGenericPolydata::SetNormalsTypeToCells()
 	m_NormalsFilter->ComputeCellNormalsOn();
 	m_NormalsFilter->ComputePointNormalsOff();
 	m_NormalsFilter->Update();
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -439,7 +439,7 @@ void mafPipeGenericPolydata::SetEdgesVisibilityOn()
 	m_BorderElementsWiredActor=1;
   m_ActorWired->SetVisibility(1);
   m_ActorWired->Modified();
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafPipeGenericPolydata::SetEdgesVisibilityOff()
@@ -447,7 +447,7 @@ void mafPipeGenericPolydata::SetEdgesVisibilityOff()
 	m_BorderElementsWiredActor=0;
   m_ActorWired->SetVisibility(0);
   m_ActorWired->Modified();
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -461,6 +461,6 @@ void mafPipeGenericPolydata::SetThickness(double thickness)
 	m_Border=thickness;
 	m_Actor->GetProperty()->SetLineWidth(m_Border);
 	m_Actor->Modified();
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
