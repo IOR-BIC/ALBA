@@ -59,8 +59,6 @@ mafDeviceButtonsPadMouse::mafDeviceButtonsPadMouse()
   m_SelectedRWI     = NULL;
   
   m_UpdateRwiInOnMoveFlag = false;
-  m_CollaborateStatus     = false;
-  m_FromRemote            = false;
   m_ButtonPressed         = false;
 }
 
@@ -105,19 +103,6 @@ void mafDeviceButtonsPadMouse::OnEvent(mafEventBase *event)
     m_SelectedRWI = (mafRWIBase *)event->GetSender();
     e->SetSender(this);
     InvokeEvent(e,MCH_INPUT);
-    if (m_CollaborateStatus)
-    {
-      double disp[2];
-      e->Get2DPosition(disp);
-      DisplayToNormalizedDisplay(disp);
-      mafEventInteraction remoteEv;
-      remoteEv.SetSender(this);
-      remoteEv.SetId(id);
-      remoteEv.SetButton(e->GetButton());
-      remoteEv.Set2DPosition(disp);
-      remoteEv.SetModifiers(e->GetModifiers());
-      InvokeEvent(remoteEv,REMOTE_COMMAND_CHANNEL);
-    }
   }
   else if (id == GetButtonUpId())
   {
@@ -125,19 +110,6 @@ void mafDeviceButtonsPadMouse::OnEvent(mafEventBase *event)
     e->Get2DPosition(m_LastPosition);
     e->SetSender(this);
     InvokeEvent(e,MCH_INPUT);
-    if (m_CollaborateStatus)
-    {
-      double disp[2];
-      e->Get2DPosition(disp);
-      DisplayToNormalizedDisplay(disp);
-      mafEventInteraction remoteEv;
-      remoteEv.SetSender(this);
-      remoteEv.SetId(GetButtonUpId());
-      remoteEv.SetButton(e->GetButton());
-      remoteEv.Set2DPosition(disp);
-      remoteEv.SetModifiers(e->GetModifiers());
-      InvokeEvent(remoteEv,REMOTE_COMMAND_CHANNEL);
-    }
   }
   else if (id == VIEW_SELECT)
   {
@@ -167,21 +139,6 @@ void mafDeviceButtonsPadMouse::SetLastPosition(double x,double y,unsigned long m
   m_LastPosition[0] = x;
   m_LastPosition[1] = y;
   
-  if (m_CollaborateStatus && m_SelectedRWI && !m_FromRemote && m_ButtonPressed)
-  {
-    double disp[2];
-    disp[0] = (double)x;
-    disp[1] = (double)y;
-    DisplayToNormalizedDisplay(disp);
-    mafEventInteraction remoteEv;
-    remoteEv.SetSender(this);
-    remoteEv.SetId(GetMouse2DMoveId());
-    remoteEv.SetModifiers(modifiers);
-    remoteEv.Set2DPosition(disp);
-    InvokeEvent(remoteEv,REMOTE_COMMAND_CHANNEL);
-  }
-  m_FromRemote = false;
-
   // create a new event with last position
   mafEventInteraction e(this,GetMouse2DMoveId(),x,y);
   e.SetModifiers(modifiers);

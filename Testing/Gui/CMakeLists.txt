@@ -34,7 +34,6 @@ ENDIF (MAF_BUILD_MAFDLL)
 #-----------------------------------------------------------------------------
 SET(PROJECT_SRCS 
 	mafGuiTests.h 					mafGuiTests.cpp
-	mafGUISettingsStorageTest.h 	mafGUISettingsStorageTest.cpp
 	mafAttachCameraTest.h 			mafAttachCameraTest.cpp
 	mafGUISettingsAdvancedTest.h 	mafGUISettingsAdvancedTest.cpp
 	mafGUIDicomSettingsTest.h 		mafGUIDicomSettingsTest.cpp

@@ -50,7 +50,6 @@ class mafGUITimeBar;
 class mafWXLog;
 class mafVTKLog;
 class mafGUIApplicationSettings;
-class mafGUISettingsStorage;
 class mafGUISettingsTimeBar;
 class mafHelpManager;
 
@@ -271,12 +270,6 @@ protected:
 	By default (file_to_open = NULL) it ask the user to choose a file to open,
 	otherwise it open the given one.*/
 	virtual void OnFileOpen(const char *file_to_open = NULL);
-	/** FILE UPLOAD evt. handler
-	By default (remote_file = NULL) AND the entire msf is uploaded and only the remote directory is asked to the user,
-	otherwise given parameters are managed to upload the file correctly. 'upload_flag' can be:
-	UPLOAD_SELECTED_VME, UPLOAD_SUBTREE or UPLOAD_TREE (default) and the corresponding compressed:
-	UPLOAD_COMPRESSED_VME, UPLOAD_COMPRESSED_SUBTREE, UPLOAD_COMPRESSED_TREE.*/
-	virtual void OnFileUpload(const char *remote_file, unsigned int upload_flag = UPLOAD_TREE);
 	/** FILE HISTORY evt. handler */
 	virtual void OnFileHistory(int menuId);
 	/** FILE SAVE evt. handler */
@@ -444,7 +437,6 @@ protected:
 	mafWXLog          *m_Logger;
 	mafVTKLog         *m_VtkLog;
 	mafGUIApplicationSettings *m_ApplicationSettings;
-	mafGUISettingsStorage  *m_StorageSettings;
 	mafGUISettingsTimeBar  *m_TimeBarSettings;
 
 	bool m_Quitting;    ///< Variable that allows to determine if the application is Quitting or not.

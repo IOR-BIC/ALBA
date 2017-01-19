@@ -124,11 +124,11 @@ void mafWizardBlock::ExcutionBegin()
 void mafWizardBlock::ExcutionEnd()
 //----------------------------------------------------------------------------
 {
-  //Setting back the select vme to the input on user abort
-  if (!m_Success)
-     mafEventMacro(mafEvent(this,VME_SELECT,m_InputVME));
-  //Stopping execution
-  m_Running=false;
+	//Setting back the select vme to the input on user abort
+	if (!m_Success)
+		GetLogicManager()->VmeSelect(m_InputVME);
+	//Stopping execution
+	m_Running = false;
 }
 
 //----------------------------------------------------------------------------

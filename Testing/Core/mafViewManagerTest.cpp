@@ -706,31 +706,6 @@ void mafViewManagerTest::SetMouseTest()
   delete frame;
   mafDEL(mouse);
 }
-//----------------------------------------------------------------------------
-void mafViewManagerTest::CollaborateTest()
-//----------------------------------------------------------------------------
-{
-  mafViewDummy *tempView = new mafViewDummy();
-  m_Manager->ViewAdd(tempView, false); // add this view to the template array
-
-  // Create some views
-  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
-  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
-
-  m_Manager->Collaborate(true);
-
-  CPPUNIT_ASSERT(m_Manager->m_CollaborateStatus == true);
-
-  // Must delete all to remove leaks
-  wxFrame *frame = view1->GetFrame();
-  frame->Show(false);
-  frame->Close(true);
-  delete frame;
-  frame = view2->GetFrame();
-  frame->Show(false);
-  frame->Close(true);
-  delete frame;
-}
 
 //----------------------------------------------------------------------------
 void mafViewManagerTest::GetFromListTest()

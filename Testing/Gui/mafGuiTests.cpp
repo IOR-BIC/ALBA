@@ -24,7 +24,6 @@
 
 
 #include "mafGuiTests.h"
-#include "mafGUISettingsStorageTest.h"
 #include "mafAttachCameraTest.h"
 #include "mafGUISettingsAdvancedTest.h"
 #include "mafGUIDicomSettingsTest.h"
@@ -67,7 +66,6 @@ int main( int argc, char* argv[] )
 	CPPUNIT_NS::TestRunner runner;
 
 	runner.addTest(mafGUIWizardTest::suite());
-	runner.addTest(mafGUISettingsStorageTest::suite());
 	runner.addTest(mafAttachCameraTest::suite());
 	runner.addTest(mafGUISettingsAdvancedTest::suite());
 	runner.addTest(mafGUIDicomSettingsTest::suite());

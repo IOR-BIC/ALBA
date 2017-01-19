@@ -359,29 +359,7 @@ void mafOpManagerTest::TestGetOperationById()
   CPPUNIT_ASSERT( m_OpManager->GetOperationById(id1) == op1 );
   CPPUNIT_ASSERT( m_OpManager->GetOperationById(id2) == op2 );
 }
-//------------------------------------------------------------------------------
-void mafOpManagerTest::TestCollaborate()
-//------------------------------------------------------------------------------
-{
-  mafSmartPointer<mafVMEDummy> vme1;
-  mafOpDummy *op1 = new mafOpDummy();
-  m_OpManager->OpAdd(op1);
 
-  mafSmartPointer<mafVMEDummy> vme2;
-  mafOpDummy *op2 = new mafOpDummy();
-  m_OpManager->OpAdd(op2);
-
-  m_OpManager->Collaborate(false);
-
-  // Check the collaborate status
-  CPPUNIT_ASSERT( op1->GetCollaborateStatus() == false );
-  CPPUNIT_ASSERT( op2->GetCollaborateStatus() == false );
-
-  m_OpManager->Collaborate(true);
-
-  CPPUNIT_ASSERT( op1->GetCollaborateStatus() == true );
-  CPPUNIT_ASSERT( op2->GetCollaborateStatus() == true );
-}
 //------------------------------------------------------------------------------
 void mafOpManagerTest::TestSetMafUser()
 //------------------------------------------------------------------------------

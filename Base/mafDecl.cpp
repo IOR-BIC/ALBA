@@ -27,9 +27,6 @@
 #include "wx\config.h"
 #include "mafColor.h"
 
-MAF_ID_IMP(REMOTE_COMMAND_CHANNEL)
-
-
 // int MAFExpertMode = TRUE;
 
 static bool yelding;
@@ -207,25 +204,7 @@ void mafSetLastUserFolder(mafString folder)
     delete config;
   }
 }
-//----------------------------------------------------------------------------
-bool IsRemote(mafString filename, mafString &protocol_used)
-//----------------------------------------------------------------------------
-{
-  bool is_remote = false;
-  wxURI data_uri(wxT(filename.GetCStr()));
-  if(data_uri.HasScheme())
-    protocol_used = data_uri.GetScheme().c_str();
-  else
-    is_remote = false; //try to treat it as a local file!!
 
-  if (!protocol_used.IsEmpty())
-  {
-    is_remote = protocol_used.Equals("http")  ||
-                protocol_used.Equals("ftp")   ||
-                protocol_used.Equals("https");
-  }
-  return is_remote;
-}
 //----------------------------------------------------------------------------
 float RoundValue(float f_in, int decimal_digits)
 //----------------------------------------------------------------------------
@@ -351,7 +330,6 @@ std::string  mafIdString(int id)
      case MENU_FILE_OPEN:       s="MENU_FILE_OPEN"; break; 
      case MENU_FILE_SAVE:       s="MENU_FILE_SAVE"; break; 
      case MENU_FILE_SAVEAS:     s="MENU_FILE_SAVEAS"; break;
-     case MENU_FILE_UPLOAD:     s="MENU_FILE_UPLOAD"; break;
      case MENU_FILE_MERGE:      s="MENU_FILE_MERGE"; break; 
      case MENU_FILE_PRINT:      s="MENU_FILE_PRINT"; break;
      case MENU_FILE_PRINT_PREVIEW:s="MENU_FILE_PRINT_PREVIEW"; break;
@@ -380,8 +358,6 @@ std::string  mafIdString(int id)
      case MENU_VIEW_TIMEBAR:	  s="MENU_VIEW_TIMEBAR"; break; 
      case MENU_OPTION_APPLICATION_SETTINGS: s = "MENU_OPTION_APPLICATION_SETTINGS"; break;
      case MENU_OPTION_MEASURE_UNIT_SETTINGS: s = "MENU_OPTION_MEASURE_UNIT_SETTINGS"; break;
-     case COLLABORATE_ENABLE:   s = "COLLABORATE_ENABLE"; break;
-     case SEND_VIEW_LAYOUT:     s = "SEND_VIEW_LAYOUT"; break;
      case SASH_END:	            s="SASH_END"; break; 
      case MENU_LAYOUT_START:	  s="MENU_LAYOUT_START"; break; 
      case LAYOUT_ONE:	          s="LAYOUT_ONE"; break; 
@@ -481,7 +457,6 @@ std::string  mafIdString(int id)
      case OP_SHOW_GUI:	        s="OP_SHOW_GUI"; break; 
      case OP_HIDE_GUI:	        s="OP_HIDE_GUI"; break; 
      case OP_FORCE_STOP:	      s="OP_FORCE_STOP"; break; 
-     case REMOTE_PARAMETER:     s="REMOTE_PARAMETER"; break; 
 
      case EVT_END:	            s="EVT_END"; break; 
      case MENU_END:	            s="MENU_END"; break; 

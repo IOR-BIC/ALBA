@@ -93,14 +93,6 @@ public:
   void DisplayToNormalizedDisplay(double display[2]);
   void NormalizedDisplayToDisplay(double normalized[2]);
 
-  /** Turn On/Off the collaboration status. */
-  void Collaborate(bool status) {m_CollaborateStatus = status;};
-  
-  /** Get the collaboration status*/
-  bool GetCollaborate() {return m_CollaborateStatus;};
-
-  bool m_FromRemote;  ///< Flag used from RemoteLogic to avoid loop
-
 protected:
   mafDeviceButtonsPadMouse();
   virtual ~mafDeviceButtonsPadMouse();
@@ -110,7 +102,6 @@ protected:
 
   double      m_LastPosition[2];///< stores the last position
   bool        m_UpdateRwiInOnMoveFlag; ///< If this flag true the m_SelectedRWI is updated in when the mouse move inside the view (used in compounded views)
-  bool        m_CollaborateStatus;
   bool        m_ButtonPressed;
 
   mafView    *m_SelectedView;   ///< store the selected view to perform the mouse picking

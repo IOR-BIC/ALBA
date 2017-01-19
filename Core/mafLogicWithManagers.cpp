@@ -48,7 +48,6 @@
   #include "mafDeviceManager.h"
   #include "mafAction.h"
   #include "mafDeviceButtonsPadMouse.h"
-  #include "mafDeviceClientMAF.h"
   #include "mafInteractorPER.h"
   #include "mafGUITreeContextualMenu.h"
   #include "mafGUIContextualMenu.h"
@@ -57,7 +56,6 @@
 
 #include "mafSideBar.h"
 #include "mafUser.h"
-#include "mafGUIDialogRemoteFile.h"
 #include "mafGUIDialogFindVme.h"
 #include "mafGUIMDIFrame.h"
 #include "mafGUIMDIChild.h"
@@ -66,18 +64,13 @@
 #include "mafGUIMaterialChooser.h"
 #include "mafGUIViewFrame.h"
 #include "mafGUIApplicationSettings.h"
-#include "mafGUISettingsStorage.h"
 #include "mafGUISettingsTimeBar.h"
 #include "mafGUISettingsDialog.h"
-#ifdef WIN32
-  #include "mafDeviceClientMAF.h"
-#endif
-#include "mmdRemoteFileManager.h"
+
 #include "mmaApplicationLayout.h"
 #include "mafEventSource.h"
 #include "mafDataVector.h"
 #include "mafVMEStorage.h"
-#include "mafRemoteStorage.h"
 #include "mafWizardManager.h"
 #include "mafRWIBase.h"
 #include <wx/dir.h>
@@ -106,7 +99,6 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 
 	m_ChildFrameStyle = wxCAPTION | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER; //wxTHICK_FRAME; // Default style
 	m_ApplicationSettings = new mafGUIApplicationSettings(this);
-	m_StorageSettings = new mafGUISettingsStorage(this);
 	m_TimeBarSettings = NULL;
 
 	m_ToolBar = NULL;
@@ -181,7 +173,6 @@ mafLogicWithManagers::~mafLogicWithManagers()
   cppDEL(m_PrintSupport);
   cppDEL(m_SettingsDialog);
 	cppDEL(m_ApplicationSettings);
-	cppDEL(m_StorageSettings);
 	cppDEL(m_TimeBarSettings);
 }
 
@@ -241,11 +232,6 @@ void mafLogicWithManagers::Configure()
 	if (m_UseVMEManager)
 	{
 		m_VMEManager = new mafVMEManager();
-		m_VMEManager->SetHost(m_StorageSettings->GetRemoteHostName());
-		m_VMEManager->SetRemotePort(m_StorageSettings->GetRemotePort());
-		m_VMEManager->SetUser(m_StorageSettings->GetUserName());
-		m_VMEManager->SetPassword(m_StorageSettings->GetPassword());
-		m_VMEManager->SetLocalCacheFolder(m_StorageSettings->GetCacheFolder());
 		m_VMEManager->SetListener(this);
 		m_VMEManager->SetFileExtension(m_Extension);
 		//m_VMEManager->SetSingleBinaryFile(m_StorageSettings->GetSingleFileStatus()!= 0);
@@ -257,8 +243,7 @@ void mafLogicWithManagers::Configure()
 	{
 		m_InteractionManager = new mafInteractionManager();
 		m_InteractionManager->SetListener(this);
-		mafPlugDevice<mmdRemoteFileManager>("mmdRemoteFileManager");
-
+		
 		m_Mouse = m_InteractionManager->GetMouseDevice();
 		//SIL m_InteractionManager->GetClientDevice()->AddObserver(this, MCH_INPUT);
 	}
@@ -287,10 +272,6 @@ void mafLogicWithManagers::Configure()
 
 	// Fill the SettingsDialog
 	m_SettingsDialog->AddPage(m_ApplicationSettings->GetGui(), m_ApplicationSettings->GetLabel());
-
-	//Storage Settings disabled from GUI
-	if (m_ShowStorageSettings)
-		m_SettingsDialog->AddPage(m_StorageSettings->GetGui(), m_StorageSettings->GetLabel());
 
 	if (m_ShowInteractionSettings && m_InteractionManager)
 		//m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
@@ -558,37 +539,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			case MENU_FILE_SAVEAS:
 				OnFileSaveAs();
 				break;
-			case MENU_FILE_UPLOAD:
-			{
-				/*  Re-think about it!!
-				wxString remote_path = "";
-				wxString remote_file = "";
-				bool valid_dir = false;
-				wxString msg = _("Insert remote directory on remote host: ") + m_StorageSettings->GetRemoteHostName();
-				do
-				{
-					remote_path = wxGetTextFromUser(msg,_("Remote directory choose"),"/mafstorage/pub/");
-					if (!remote_path.IsEmpty())
-					{
-						remote_file = m_StorageSettings->GetRemoteHostName();
-						remote_file << remote_path;
-					}
-					else
-						return;
-					wxString dir_check = remote_file[remote_file.Length()-1];
-					valid_dir = dir_check.IsSameAs("/") || dir_check.IsSameAs("\\");
-					if (!valid_dir)
-					{
-						wxMessageBox(_("Not valid path!! It should ends with '/'"), _("Warning"));
-					}
-				} while(!valid_dir);
-
-				// for now upload the entire msf
-				remote_file += wxFileNameFromPath(m_VMEManager->GetFileName());
-				OnFileUpload(remote_file.c_str());
-				*/
-			}
-			break;
 			case MENU_FILE_PRINT:
 				if (m_ViewManager && m_PrintSupport)
 					m_PrintSupport->OnPrint(m_ViewManager->GetSelectedView());
@@ -971,15 +921,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			case CREATE_STORAGE:
 				CreateStorage(e);
 				break;
-			case COLLABORATE_ENABLE:
-			{
-				bool collaborate = e->GetBool();
-
-				m_ViewManager->Collaborate(collaborate);
-				m_OpManager->Collaborate(collaborate);
-				m_Mouse->Collaborate(collaborate);
-			}
-			break;
 			case ABOUT_APPLICATION:
 			{
 				// trap the ABOUT_APPLICATION event and shows the about window with the application infos
@@ -1325,17 +1266,6 @@ void mafLogicWithManagers::OnFileNew()
 	m_Win->SetTitle(wxString(m_AppTitle.GetCStr()));
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::OnFileUpload(const char *remote_file, unsigned int upload_flag)
-{
-  if (remote_file == NULL)
-  {
-    wxMessageBox(_("remote filename not valid!!"), _("Warning"));
-    return;
-  }
-
-  wxMessageBox(_("Not implemented: think about it!!"), _("Warning"));
-}
-//----------------------------------------------------------------------------
 void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
 {
 	if (m_VMEManager)
@@ -1343,41 +1273,18 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
 		if (m_VMEManager->AskConfirmAndSave())
 		{
 			wxString file;
-			if (m_StorageSettings->GetStorageType() == mafGUISettingsStorage::HTTP)
+
+			wxString wildc = _("MAF Storage Format file (*." + m_Extension + ")|*." + m_Extension + "|Compressed file (*.z" + m_Extension + ")|*.z" + m_Extension + "");
+			if (file_to_open != NULL)
 			{
-				if (file_to_open != NULL)
-				{
-					file = file_to_open;
-				}
-				else
-				{
-					mafGUIDialogRemoteFile remoteFile;
-					remoteFile.ShowModal();
-					file = remoteFile.GetFile().GetCStr();
-					mafString protocol;
-					if (IsRemote(file.c_str(), protocol))
-					{
-						m_VMEManager->SetHost(remoteFile.GetHost());
-						m_VMEManager->SetRemotePort(remoteFile.GetPort());//
-						m_VMEManager->SetUser(remoteFile.GetUser());
-						m_VMEManager->SetPassword(remoteFile.GetPassword());
-					}
-				}
+				file = file_to_open;
 			}
 			else
 			{
-				wxString wildc = _("MAF Storage Format file (*." + m_Extension + ")|*." + m_Extension + "|Compressed file (*.z" + m_Extension + ")|*.z" + m_Extension + "");
-				if (file_to_open != NULL)
-				{
-					file = file_to_open;
-				}
-				else
-				{
-					wxString lastFolder = mafGetLastUserFolder().c_str();
-					file = mafGetOpenFile(lastFolder, wildc).c_str();
-				}
+				wxString lastFolder = mafGetLastUserFolder().c_str();
+				file = mafGetOpenFile(lastFolder, wildc).c_str();
 			}
-
+			
 			if (file.IsEmpty() && m_WizardManager && m_WizardRunning)
 				m_WizardManager->WizardContinue(false);
 			else if (file.IsEmpty())
@@ -1407,7 +1314,7 @@ void mafLogicWithManagers::OnFileSave()
 {
   if(m_VMEManager)
   {
-	  mafString save_default_folder = m_StorageSettings->GetDefaultSaveFolder();
+		mafString save_default_folder = mafGetLastUserFolder().c_str();
 	  save_default_folder.ParsePathName();
 	  m_VMEManager->SetDirName(save_default_folder);
 	  int saved=m_VMEManager->MSFSave();
@@ -1422,7 +1329,7 @@ void mafLogicWithManagers::OnFileSaveAs()
 {
   if(m_VMEManager) 
   {
-	  mafString save_default_folder = m_StorageSettings->GetDefaultSaveFolder();
+	  mafString save_default_folder = mafGetLastUserFolder().c_str();
 	  save_default_folder.ParsePathName();
 	  m_VMEManager->SetDirName(save_default_folder);
 	  int saved=m_VMEManager->MSFSaveAs();
@@ -1432,7 +1339,6 @@ void mafLogicWithManagers::OnFileSaveAs()
 	  UpdateFrameTitle();
   }
 }
-
 
 // VME ///////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
@@ -1878,7 +1784,6 @@ void mafLogicWithManagers::ViewContextualMenu(bool vme_menu)
 	cppDEL(contextMenu);
 }
 
-
 // CAMERA ////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::CameraUpdate()
@@ -2039,10 +1944,7 @@ void mafLogicWithManagers::CreateMenu()
 	mafGUI::AddMenuItem(file_menu, MENU_FILE_OPEN, _("&Open   \tCtrl+O"), FILE_OPEN_xpm);
 	mafGUI::AddMenuItem(file_menu, MENU_FILE_SAVE, _("&Save  \tCtrl+S"), FILE_SAVE_xpm);
 	file_menu->Append(MENU_FILE_SAVEAS, _("Save &As  \tCtrl+Shift+S"));
-	if (m_StorageSettings->UseRemoteStorage())
-	{
-		//file_menu->Append(MENU_FILE_UPLOAD, _("&Upload"));
-	}
+
 	m_ImportMenu = new wxMenu;
 	file_menu->AppendSeparator();
 	file_menu->Append(0, _("Import"), m_ImportMenu);
@@ -2194,7 +2096,6 @@ void mafLogicWithManagers::CreateAndPlugToolbar()
 		.Movable(false)
 		.Gripper(false)
 	);
-
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::CreateTimeBar()
@@ -2225,7 +2126,6 @@ void mafLogicWithManagers::CreateTimeBar()
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::CreateControlPanel()
 {
-	{
 		m_SideBar = new mafSideBar(m_Win, MENU_VIEW_SIDEBAR, this, m_SidebarStyle);
 		m_Win->AddDockPane(m_SideBar->m_Notebook, wxPaneInfo()
 			.Name("sidebar")
@@ -2236,7 +2136,6 @@ void mafLogicWithManagers::CreateControlPanel()
 			.TopDockable(false)
 			.BottomDockable(false)
 		);
-	}
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::FillMenus()
@@ -2470,7 +2369,6 @@ void mafLogicWithManagers::StoreLayout()
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::RestoreLayout()
 {
-
 	mafXMLStorage *xmlStorage = mafXMLStorage::New();
 	xmlStorage->SetFileType("MLY");
 	xmlStorage->SetVersion("2.0");
@@ -2598,50 +2496,18 @@ void mafLogicWithManagers::ImportExternalFile(mafString &filename)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::CreateStorage(mafEvent *e)
 {
-	if (m_StorageSettings->UseRemoteStorage())
+	mafVMEStorage *storage;
+	storage = (mafVMEStorage *)e->GetMafObject();
+	if (storage)
 	{
-		mafString cache_folder = m_StorageSettings->GetCacheFolder();
-		if (!wxDirExists(cache_folder.GetCStr()))
-		{
-			wxMkdir(cache_folder.GetCStr());
-		}
-		mafRemoteStorage *storage;
-		storage = (mafRemoteStorage *)e->GetMafObject();
-		if (storage)
-		{
-			m_VMEManager->NotifyRemove(storage->GetRoot());
-			storage->Delete();
-		}
-		storage = mafRemoteStorage::New();
-		storage->SetTmpFolder(cache_folder.GetCStr());
-
-		//set default values for remote connection
-		storage->SetHostName(m_StorageSettings->GetRemoteHostName());
-		storage->SetRemotePort(m_StorageSettings->GetRemotePort());
-		storage->SetUsername(m_StorageSettings->GetUserName());
-		storage->SetPassword(m_StorageSettings->GetPassword());
-
-		storage->GetRoot()->SetName("Root");
-		storage->SetListener(m_VMEManager);
-		storage->Initialize();
-		storage->GetRoot()->Initialize();
-		e->SetMafObject(storage);
+		m_VMEManager->NotifyRemove(storage->GetRoot());
+		storage->Delete();
 	}
-	else
-	{
-		mafVMEStorage *storage;
-		storage = (mafVMEStorage *)e->GetMafObject();
-		if (storage)
-		{
-			m_VMEManager->NotifyRemove(storage->GetRoot());
-			storage->Delete();
-		}
-		storage = mafVMEStorage::New();
-		storage->GetRoot()->SetName("Root");
-		storage->SetListener(m_VMEManager);
-		storage->GetRoot()->Initialize();
-		e->SetMafObject(storage);
-	}
+	storage = mafVMEStorage::New();
+	storage->GetRoot()->SetName("Root");
+	storage->SetListener(m_VMEManager);
+	storage->GetRoot()->Initialize();
+	e->SetMafObject(storage);
 }
 
 //----------------------------------------------------------------------------

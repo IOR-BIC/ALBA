@@ -179,7 +179,7 @@ void mafWizardBlockOperation::ExcutionBegin()
   {
     //forward up vme selection event 
     //for view/logic/operation update
-    mafEventMacro(mafEvent(this,VME_SELECT,m_SelectedVME));
+		GetLogicManager()->VmeSelect(m_SelectedVME);
   }
   else 
   {

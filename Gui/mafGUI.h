@@ -306,9 +306,6 @@ public:
 
   int* GetMAFWidgetId();
 
-  /** Turn On/Off the collaboration status. */
-  void Collaborate(bool status) {m_CollaborateStatus = status;};
-
   void GetWidgetValue(long widget_id, WidgetDataType &widget_data);
 
   void SetWidgetValue(int id, WidgetDataType &widget_data);
@@ -352,8 +349,6 @@ protected:
   void OnCheckListBox (wxCommandEvent &event);
 	void OnRadioButton	(wxCommandEvent &event);
   void OnMouseWheel   (wxMouseEvent &event);
-
-  bool m_CollaborateStatus;  ///< Flag set to know if the application is in collaborative mode or no.
 
 DECLARE_EVENT_TABLE()
 };
