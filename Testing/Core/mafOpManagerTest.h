@@ -57,7 +57,6 @@ public:
   CPPUNIT_TEST( TestStopCurrentOperation );
   CPPUNIT_TEST( TestGetRunningOperation );
   CPPUNIT_TEST( TestGetOperationById );
-  CPPUNIT_TEST( TestCollaborate );
   CPPUNIT_TEST( TestSetMafUser );
   
   CPPUNIT_TEST_SUITE_END();
@@ -80,11 +79,9 @@ private:
   void TestStopCurrentOperation();
   void TestGetRunningOperation();
   void TestGetOperationById();
-  void TestCollaborate();
   void TestSetMafUser();
 
   mafOpManager *m_OpManager;
-
 };
 
 

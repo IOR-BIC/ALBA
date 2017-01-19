@@ -27,7 +27,6 @@
 
 #include "mafAttachCameraTest.h"
 #include "mafDecl.h"
-#include "mafGUISettingsStorage.h"
 #include "mafAttachCamera.h"
 #include "mafVMESurface.h"
 #include "mafVMERoot.h"

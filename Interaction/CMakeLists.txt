@@ -57,7 +57,6 @@ SET(PROJECT_SRCS
   mafRefSys.cpp  							mafRefSys.h  
   mafDeviceButtonsPad.cpp  					mafDeviceButtonsPad.h
   mafDeviceButtonsPadMouse.cpp  			mafDeviceButtonsPadMouse.h
-  mafDeviceButtonsPadMouseRemote.cpp  		mafDeviceButtonsPadMouseRemote.h
   mafDeviceButtonsPadTracker.cpp  			mafDeviceButtonsPadTracker.h  
   mafInteractor2DAngle.cpp  				mafInteractor2DAngle.h
   mafInteractor2DDistance.cpp  				mafInteractor2DDistance.h
@@ -99,11 +98,7 @@ SET(PROJECT_SRCS
   mafGizmoCrossTranslatePlane.cpp  			mafGizmoCrossTranslatePlane.h
 )
 
-## SIL == removed under Linux - since it requires mafDrivers - which seems to be Win32 only
-SET(PROJECT_SRCS
-  ${PROJECT_SRCS}
-  mafDeviceClientMAF.cpp					mafDeviceClientMAF.h
-  )
+
 
 
 IF (MAF_USE_P5_GLOVE)

@@ -88,13 +88,11 @@ mafOpManager::mafOpManager()
 //----------------------------------------------------------------------------
 {
   m_Listener	     = NULL;
-  m_RemoteListener = NULL;
   m_RunningOp      = NULL;
 	m_Selected	     = NULL;
   m_NaturalNode    = NULL;
   m_User           = NULL;
   m_Warn           = true;
-  m_FromRemote     = false;
 
   m_OpParameters = NULL;
   
@@ -112,8 +110,6 @@ mafOpManager::mafOpManager()
 
 	m_ToolBar = NULL;
 	m_MenuBar = NULL;
-
-  m_CollaborateStatus = false;
 
   m_NumOfAccelerators = 0;
   m_NumOp = 0;
@@ -175,23 +171,6 @@ void mafOpManager::OnEvent(mafEventBase *maf_event)
         o = (mafOp*) e->GetSender();
         assert(o == m_Context.Caller());
         OpRunCancel(o);
-      break;
-      case REMOTE_PARAMETER:
-        if(m_CollaborateStatus && m_RemoteListener)
-        {
-          // Send the event to synchronize the remote application in case of collaboration modality
-          long w_id = e->GetArg();
-          WidgetDataType w_data;
-          w_data.dValue  = 0.0;
-          w_data.fValue  = 0.0;
-          w_data.iValue  = 0;
-          w_data.sValue  = "";
-          w_data.dType = NULL_DATA;
-          m_RunningOp->GetGui()->GetWidgetValue(w_id, w_data);
-          mafEvent ev(this,OPERATION_INTERFACE_EVENT,w_data,w_id);
-          ev.SetChannel(REMOTE_COMMAND_CHANNEL);
-          m_RemoteListener->OnEvent(&ev);
-        }
       break;
       default:
         mafEventMacro(*e);
@@ -588,7 +567,7 @@ void mafOpManager::OpRun(mafOp *op, void *op_param)
   m_RunningOp->SetListener(this);
 	m_RunningOp->SetInput(m_Selected);
   m_RunningOp->SetMouse(m_Mouse);
-  m_RunningOp->Collaborate(m_CollaborateStatus);
+
   if (op_param != NULL)
   {
     m_RunningOp->SetParameters(op_param);
@@ -1063,15 +1042,7 @@ void mafOpManager::SetMouse(mafDeviceButtonsPadMouse *mouse)
 {
   m_Mouse = mouse;
 }
-//----------------------------------------------------------------------------
-void mafOpManager::Collaborate(bool status)
-//----------------------------------------------------------------------------
-{
-  m_CollaborateStatus = status;
 
-  for(int index = 0; index < m_NumOp; index++)
-    m_OpList[index]->Collaborate(status);
-}
 //----------------------------------------------------------------------------
 void mafOpManager::RefreshMenu()
 //----------------------------------------------------------------------------

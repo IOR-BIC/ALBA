@@ -32,9 +32,6 @@
 #include "mafAvatar3DConeTest.h"
 #include "mafAvatarTest.h"
 #include "mafDeviceButtonsPadMouseDialogTest.h"
-#include "mafDeviceButtonsPadMouseRemoteTest.h"
-#include "mafDeviceButtonsPadMouseTest.h"
-#include "mafDeviceButtonsPadTest.h"
 #include "mafDeviceClientMAFTest.h"
 #include "mafDeviceManagerTest.h"
 #include "mafDeviceSetTest.h"
@@ -85,7 +82,6 @@
 #include "mmiVTKPickerTest.h"
 #include "mmiSelectPointTest.h"
 #include "mmiInfoImageTest.h"
-//#include "mafInteractorDICOMImporterTest.h"
 #include "medInteractor2DDistanceTest.h"
 #include "medInteractor2DAngleTest.h"
 #include "medInteractor2DIndicatorTest.h"
@@ -157,7 +153,6 @@ int
 	runner.addTest(mafGizmoInterfaceTest::suite());
 	runner.addTest(mafInteractorConstraintTest::suite());
 	runner.addTest(mafRefSysTest::suite());
-	runner.addTest(mafDeviceButtonsPadTest::suite());
 	runner.addTest(mafDeviceSetTest::suite());
 	runner.addTest(mafGUIGizmoTranslateTest::suite());
 	runner.addTest(mafGUIGizmoRotateTest::suite());
@@ -171,15 +166,12 @@ int
 	runner.addTest(mafGUISaveRestorePoseTest::suite());
 	runner.addTest(mafAgentEventQueueTest::suite());
 	runner.addTest(mafAgentThreadedTest::suite());
-	runner.addTest(mafDeviceButtonsPadMouseTest::suite());
 	runner.addTest(mafInteractorPERTest::suite());
 	runner.addTest(mafDeviceTest::suite());
 	runner.addTest(mafGizmoScaleAxisTest::suite());
 	runner.addTest(mafGizmoScaleTest::suite());
-	runner.addTest(mafDeviceClientMAFTest::suite());
 	runner.addTest(mafInteractorExtractIsosurfaceTest::suite());
 	runner.addTest(mafInteractorTest::suite());
-	runner.addTest(mafDeviceButtonsPadMouseRemoteTest::suite());
 	runner.addTest(mafInteractor6DOFCameraMoveTest::suite());
 	runner.addTest(mafAvatar2DTest::suite());
 	runner.addTest(mafAvatarTest::suite());

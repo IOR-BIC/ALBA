@@ -30,7 +30,6 @@ SET(PROJECT_SRCS
 	mafGizmoInterfaceTest.h mafGizmoInterfaceTest.cpp
 	mafInteractorConstraintTest.h mafInteractorConstraintTest.cpp
 	mafRefSysTest.h mafRefSysTest.cpp
-	mafDeviceButtonsPadTest.h mafDeviceButtonsPadTest.cpp
 	mafDeviceSetTest.h mafDeviceSetTest.cpp
 	mafGUIGizmoTranslateTest.h mafGUIGizmoTranslateTest.cpp
 	mafGUIGizmoRotateTest.h mafGUIGizmoRotateTest.cpp
@@ -44,15 +43,13 @@ SET(PROJECT_SRCS
 	mafGUISaveRestorePoseTest.h mafGUISaveRestorePoseTest.cpp
 	mafAgentEventQueueTest.h mafAgentEventQueueTest.cpp
 	mafAgentThreadedTest.h mafAgentThreadedTest.cpp
-	mafDeviceButtonsPadMouseTest.h mafDeviceButtonsPadMouseTest.cpp
 	mafInteractorPERTest.h mafInteractorPERTest.cpp
 	mafDeviceTest.h mafDeviceTest.cpp
 	mafGizmoScaleAxisTest.h mafGizmoScaleAxisTest.cpp
 	mafGizmoScaleTest.h mafGizmoScaleTest.cpp
-	mafDeviceClientMAFTest.h mafDeviceClientMAFTest.cpp
+	#mafDeviceClientMAFTest.h mafDeviceClientMAFTest.cpp
 	mafInteractorExtractIsosurfaceTest.h mafInteractorExtractIsosurfaceTest.cpp
 	mafInteractorTest.h mafInteractorTest.cpp
-	mafDeviceButtonsPadMouseRemoteTest.h mafDeviceButtonsPadMouseRemoteTest.cpp
 	mafInteractor6DOFCameraMoveTest.h mafInteractor6DOFCameraMoveTest.cpp
 	mafAvatar2DTest.h mafAvatar2DTest.cpp
 	mafAvatarTest.h mafAvatarTest.cpp 
