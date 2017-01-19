@@ -56,7 +56,6 @@ public:
   CPPUNIT_TEST(TestIsCompatible);
   CPPUNIT_TEST(TestGetActions);
   CPPUNIT_TEST(TestSetGetMouse);
-  CPPUNIT_TEST(TestCollaborate);
   CPPUNIT_TEST(TestTestModeOn);
   CPPUNIT_TEST(TestTestModeOff);
   CPPUNIT_TEST(TestSetGetCanundo);
@@ -85,7 +84,6 @@ private:
   void TestIsCompatible();
   void TestGetActions();
   void TestSetGetMouse();
-  void TestCollaborate();
   void TestTestModeOn();
   void TestTestModeOff();
   void TestSetGetCanundo();

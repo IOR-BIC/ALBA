@@ -16,7 +16,6 @@ SET(PROJECT_SRCS
   mafTransferFunction2DInteractors.cpp
   
   mafGUISettings.cpp  mafGUISettings.h
-  mafGUISettingsStorage.cpp  mafGUISettingsStorage.h
   mafGUISettingsTimeBar.cpp  mafGUISettingsTimeBar.h
   
   ##### Example of SRB List Dialog requires OPENSSL #####
@@ -82,13 +81,6 @@ SET(PROJECT_SRCS
   mafGUILutHistogramSwatch.cpp  	mafGUILutHistogramSwatch.h
   mafGUILutHistogramEditor.cpp  	mafGUILutHistogramEditor.h
 )
-
-IF (MAF_USE_CURL)
-	SET(PROJECT_SRCS
-	${PROJECT_SRCS}
-	mafGUIDialogRemoteFile.cpp		mafGUIDialogRemoteFile.h
-	)
-ENDIF (MAF_USE_CURL)
 
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS

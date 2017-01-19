@@ -60,7 +60,6 @@ public:
 	         mafOpManager();
 	virtual ~mafOpManager(); 
 	virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-  virtual void SetRemoteListener(mafObserver *Listener) {m_RemoteListener = Listener;};
 	virtual void OnEvent(mafEventBase *maf_event);
 
   /** Event IDs used in collaborative modality.*/
@@ -108,9 +107,6 @@ public:
 	/** Execute the select operation. */
   virtual void OpSelect(mafVME* v);
 
-	/** Execute the transform operation. */
-	//virtual void OpTransform(vtkMatrix4x4* new_matrix,vtkMatrix4x4* old_matrix);
-
 	/** Set the flag for warning the user if the operation is undoable. */
   virtual void WarningIfCantUndo (bool warn) {m_Warn = warn;};
 
@@ -146,13 +142,7 @@ public:
   /** 
   Initialize the action for the mouse device. */
   void SetMouse(mafDeviceButtonsPadMouse *mouse);
-
-
-  /** Turn On/Off the collaboration status. */
-  void Collaborate(bool status);
-
-  bool m_FromRemote; ///< Flag used to check if a command comes from local or remote application.
-
+	
   /** Called by logic to refresh the operation's menù items.*/
   void RefreshMenu();
 
@@ -221,10 +211,7 @@ protected:
   wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menù
 	wxToolBar         *m_ToolBar; ///< Pointer to the application's Toolbal
 
-  bool m_CollaborateStatus;  ///< Flag set to know if the application is in collaborative mode or no.
-
   mafObserver       *m_Listener;
-  mafObserver       *m_RemoteListener; ///< Listener used to send messages to remote applications
 
   /** test friend */
   friend class mafOpManagerTest;

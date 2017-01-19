@@ -56,8 +56,6 @@
 #include "mafAction.h"
 #include "mafDeviceSet.h"
 #include "mafDeviceButtonsPadMouse.h"
-#include "mafDeviceButtonsPadMouseRemote.h"
-#include "mafDeviceClientMAF.h"
   
 #include "mafVME.h"
 #include "mafVMEGizmo.h"
@@ -135,14 +133,6 @@ mafInteractionManager::mafInteractionManager()
   //mafAction *mouse_action = m_StaticEventRouter->AddAction("Mouse"); // action for RWIs output
   //mouse_action->BindDevice(mouse_device); // bind mouse to mouse action
   pointing_action->BindDevice(mouse_device); // bind mouse to point&manipulate action
-
-  mafPlugDevice<mafDeviceClientMAF>("Client MAF");
-  m_ClientDevice = (mafDeviceClientMAF *)m_DeviceManager->AddDevice("mafDeviceClientMAF",true);
-
-  mafPlugDevice<mafDeviceButtonsPadMouseRemote>("RemoteMouse");
-  mafDeviceButtonsPadMouseRemote *remote_mouse_device = (mafDeviceButtonsPadMouseRemote *)m_DeviceManager->AddDevice("mafDeviceButtonsPadMouseRemote", true); // add as persistent device
-  assert(remote_mouse_device);
-  pointing_action->BindDevice(remote_mouse_device); // bind mouse to point&manipulate action
 }
 
 //------------------------------------------------------------------------------
@@ -250,18 +240,6 @@ mafDeviceButtonsPadMouse *mafInteractionManager::GetMouseDevice()
   return mafDeviceButtonsPadMouse::SafeDownCast(m_DeviceManager->GetDevice("Mouse"));
 }
 
-//------------------------------------------------------------------------------
-mafDeviceButtonsPadMouseRemote *mafInteractionManager::GetRemoteMouseDevice()
-//------------------------------------------------------------------------------
-{
-  return mafDeviceButtonsPadMouseRemote::SafeDownCast(m_DeviceManager->GetDevice("RemoteMouse"));
-}
-//------------------------------------------------------------------------------
-mafDeviceClientMAF *mafInteractionManager::GetClientDevice()
-//------------------------------------------------------------------------------
-{
-  return m_ClientDevice;
-}
 //------------------------------------------------------------------------------
 int mafInteractionManager::BindAction(const char *action,mafInteractor *agent)
 //------------------------------------------------------------------------------

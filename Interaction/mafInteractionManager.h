@@ -43,7 +43,6 @@ class mafDevice;
 class mafDeviceManager;
 class mafDeviceSet;
 class mafDeviceButtonsPadMouse;
-class mafDeviceButtonsPadMouseRemote;
 class mafGUIInteractionSettings;
 class vtkRenderer;
 class vtkRendererWindow;
@@ -60,7 +59,6 @@ class mafGUITree;
 class mafGUICheckListBox;
 class mafGUIHolder;
 class mafGUINamedPanel;
-class mafDeviceClientMAF;
 
 #ifdef MAF_EXPORTS
 #include "mafDllMacros.h"
@@ -101,12 +99,6 @@ public:
 
   /** return the mouse device */
   mafDeviceButtonsPadMouse *GetMouseDevice();
-
-  /** return the remote mouse device */
-  mafDeviceButtonsPadMouseRemote *GetRemoteMouseDevice();
-
-  /** return the ClientMAF device */
-  mafDeviceClientMAF *GetClientDevice();
 
   /** return the mouse action, an action to which mouse is bound by default */
   //mafAction *GetMouseAction();
@@ -266,9 +258,7 @@ protected:
   mafDeviceManager*       m_DeviceManager; 
   mafInteractorPER*                 m_PositionalEventRouter;
   mafInteractorSER*                 m_StaticEventRouter;
-  
-  mafDeviceClientMAF           *m_ClientDevice;
-  
+ 
   mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
   std::list<mafAutoPointer<mafInteractorPER> >  m_PERList; ///< the interactor devoted to Positional Event Routing
 

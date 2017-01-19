@@ -144,8 +144,6 @@ mafGUIPanel(mafGetFrame(),-1,dp,wxDefaultSize,wxNO_BORDER | wxCLIP_CHILDREN | wx
    m_WidgetTableID.clear();
 
 	 this->Show(false);
-
-   m_CollaborateStatus = false;
 }
 //----------------------------------------------------------------------------
 mafGUI::~mafGUI()
@@ -208,17 +206,15 @@ make it protected, and make mafGUIValidator friend
 */
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    int id = e->GetId();
-    if(m_CollaborateStatus)
-      mafEventMacro(mafEvent(this,REMOTE_PARAMETER, (long)id));
-    if(id >= MINID && id <MAXID)
-      id = GetModuleId(id);
-    e->SetSender(this);
-    e->SetId(id);
-    mafEventMacro(*e);
-  }
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	{
+		int id = e->GetId();
+		if (id >= MINID && id < MAXID)
+			id = GetModuleId(id);
+		e->SetSender(this);
+		e->SetId(id);
+		mafEventMacro(*e);
+	}
 }
 //----------------------------------------------------------------------------
 void mafGUI::AddGui(mafGUI*  gui, int option, int flag, int border)

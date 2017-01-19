@@ -75,9 +75,6 @@ public:
 	/** Save the msf tree with different filename. */
   int MSFSaveAs();
 
-  /** Upload MAF data to the remote host with the given 'remote_file' filename.*/
-  void Upload(mafString local_file, mafString remote_file);
-  
 	/** Return true if the tree has been modifyed. */
   bool MSFIsModified() {return m_Modified;};
   
@@ -135,21 +132,6 @@ public:
 	/** Set the flag for bak file generation on saving MSF file. */
 	void MakeBakFileOnSave(bool bakfile = true) {m_MakeBakFile = bakfile;}
 	  
-  /** Set the host-name for the remote host.*/
-  void SetHost(mafString host) {m_Host = host;};
-
-  /** Set the user-name for the remote host.*/
-  void SetUser(mafString user) {m_User = user;};
-
-  /** Set the password for the remote host.*/
-  void SetPassword(mafString pwd) {m_Pwd = pwd;};
-
-  /** Set the port for the remote host.*/
-  void SetRemotePort(int port) {m_Port = port;};
-
-  /** Set the local cache folder in which will be downloaded remote files.*/
-  void SetLocalCacheFolder(mafString cache_folder);
-
   /** Remove temporary directory used for compressed msf files.*/
   void RemoveTempDirectory();
 
@@ -182,12 +164,7 @@ protected:
   mafString           m_ZipFile;          ///< File name of compressed archive in which save the data associated to the tree.
   mafString           m_TmpDir;           ///< Temporary directory for zmsf extraction
   mafString           m_file_extension;   ///< File extension
-
-  mafString           m_Host;             ///< Host name for remote storage
-  mafString           m_User;             ///< User name for remote storage
-  mafString           m_Pwd;              ///< Password for remote storage
-  int                 m_Port;             ///< Port number for remote storage
-  
+	 
   bool                m_LoadingFlag;      ///< used when an MSF is being loaded
   bool                m_Crypting;         ///< used to enable the Encryption for the MSF
   bool                m_SingleBinaryFile; ///< used to store binary files associated to time varying VMEs as multiple files or not.

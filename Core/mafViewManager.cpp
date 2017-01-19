@@ -59,15 +59,13 @@ mafViewManager::mafViewManager()
 
   m_ViewList          = NULL;
   m_Listener          = NULL;
-  m_RemoteListener    = NULL;
   m_SelectedVme       = NULL;
   m_SelectedView      = NULL;
 	m_RootVme           = NULL;
   m_ViewBeingCreated  = NULL; 
   m_TemplateNum       = 0;
-  m_CollaborateStatus = false;
-  m_FromRemote        = false;
   m_IdInvisibleMenuList.clear();
+
   for(int i=0; i<MAXVIEW; i++) 
     m_ViewTemplate[i] = NULL;
 
@@ -131,14 +129,6 @@ void mafViewManager::OnEvent(mafEventBase *maf_event)
 
         if(notifylogic)
           mafEventMacro(mafEvent(this,VIEW_SELECT,(long)e->GetSender())); // forward the view selection event to logic
-
-        if(m_CollaborateStatus && m_RemoteListener && !m_FromRemote)
-        {
-          // Send the event to synchronize the remote application in case of collaboration modality
-          mafEvent ev(this,VIEW_SELECTED,view);
-          ev.SetChannel(REMOTE_COMMAND_CHANNEL);
-          m_RemoteListener->OnEvent(&ev);
-        }
       }
       break;
       default:
@@ -433,14 +423,6 @@ void mafViewManager::ViewInsert(mafView *view)
 void mafViewManager::ViewDelete(mafView *view)
 //----------------------------------------------------------------------------
 {
-  if(m_CollaborateStatus && m_RemoteListener && !m_FromRemote)
-  {
-    // Send the event to synchronize the remote application in case of collaboration modality
-    mafEvent e(this,VIEW_DELETE,view);
-    e.SetChannel(REMOTE_COMMAND_CHANNEL);
-    m_RemoteListener->OnEvent(&e);
-  }
-
   if(m_SelectedView)
   {
     if(m_SelectedRWI)
