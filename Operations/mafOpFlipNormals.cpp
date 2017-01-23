@@ -178,14 +178,14 @@ void mafOpFlipNormals::OpDo()
 //----------------------------------------------------------------------------
 {
 	((mafVMESurface *)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpFlipNormals::OpUndo()
 //----------------------------------------------------------------------------
 {
 	((mafVMESurface *)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 // widget ID's

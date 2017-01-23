@@ -116,9 +116,9 @@ mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener /* = NULL */
   this->Show(false);
 
   // ask the manager to create the pipeline
-  mafEventMacro(mafEvent(this,VME_SHOW,m_BoxGizmo,true));
+  GetLogicManager()->VmeShow(m_BoxGizmo, true);
 
-  mafEventMacro(mafEvent(this,VME_SHOW,m_ShadingPlaneGizmo,m_ShowShadingPlane));
+  GetLogicManager()->VmeShow(m_ShadingPlaneGizmo, m_ShowShadingPlane);
   
   //-----------------
   // create isa stuff
@@ -183,8 +183,8 @@ mafGizmoHandle::~mafGizmoHandle()
 	
   mafDEL(m_IsaComp);	//m_IsaGen is released automatically
 
-  mafEventMacro(mafEvent(this, VME_REMOVE, m_BoxGizmo)); //m_BoxGizmo is released
-  mafEventMacro(mafEvent(this, VME_REMOVE, m_ShadingPlaneGizmo)); //m_ShadingPlaneGizmo is released
+  GetLogicManager()->VmeRemove(m_BoxGizmo); //m_BoxGizmo is released
+  GetLogicManager()->VmeRemove(m_ShadingPlaneGizmo); //m_ShadingPlaneGizmo is released
 
   vtkDEL(m_Cube);
 }

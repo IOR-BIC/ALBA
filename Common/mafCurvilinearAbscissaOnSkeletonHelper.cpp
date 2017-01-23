@@ -471,7 +471,7 @@ int mafCurvilinearAbscissaOnSkeletonHelper::SetCurvilinearAbscissa( vtkIdType br
     m_Gui->Update();
   }
 
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
   return MAF_OK;
 }
 

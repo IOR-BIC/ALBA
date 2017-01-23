@@ -96,7 +96,6 @@ MENU_FILE_START,
   MENU_FILE_OPEN,
   MENU_FILE_SAVE,
   MENU_FILE_SAVEAS,
-  MENU_FILE_UPLOAD,
   MENU_FILE_MERGE,
   MENU_FILE_PRINT,
   MENU_FILE_PRINT_PREVIEW,
@@ -150,10 +149,7 @@ GUI_HELP_START,
   GET_BUILD_HELP_GUI, // sent from op, views or vme's to know if we are building the help gui in the application
   OPEN_HELP_PAGE, // sent from an op, a view or a vme to open the corresponding help page
 GUI_HELP_END,
-COLLABORATION_EVENT_BEGIN,
-  COLLABORATE_ENABLE,
-  SEND_VIEW_LAYOUT,
-COLLABORATION_EVENT_END,
+
 EVT_START,
   UPDATE_UI,           // update menu and toolbar widgets
 	UPDATE_PROPERTY,     // update vme property widgets
@@ -259,8 +255,6 @@ EVT_START,
   OP_SHOW_GUI,
   OP_HIDE_GUI,
   OP_FORCE_STOP,
-
-  REMOTE_PARAMETER,
 
   ITEM_SELECTED, //used by mafGUIListCtrl and Dictionary
 
@@ -438,8 +432,6 @@ enum MED_MENU_EVENT_ID
 // global functions
 //----------------------------------------------------------------------------
 
-MAF_ID_GLOBAL(REMOTE_COMMAND_CHANNEL)
-
 /** 
   return the application frame window.
   to be used as parent of panels to be shown later. */    
@@ -465,10 +457,6 @@ MAF_EXPORT void mafGetOpenMultiFiles(const char * path, const char * wildcard, s
 
 /** show the File Save Dialog Box */
 MAF_EXPORT std::string  mafGetSaveFile(const char * initial, const char * wildcard, const char * title = "Save File", wxWindow *parent = NULL, bool warnOverWrite=true);
-
-/** return true if the filename use a protocol like ftp, http or https.
-  Write into 'protocol_used' parameter the protocol used by the file.*/
-MAF_EXPORT bool IsRemote(mafString filename, mafString &protocol_used);
 
 /** return a random wxColour from a palette of 16 */
 MAF_EXPORT wxColour  mafRandomColor();

@@ -54,7 +54,6 @@ mafOp::mafOp(const wxString &label)
   m_SettingPanel = NULL;
   m_Compatibility     = 0xFFFF;
   m_InputPreserving = true;
-  m_CollaborateStatus = false;
   m_TestMode = false;
 }
 //----------------------------------------------------------------------------
@@ -74,7 +73,6 @@ mafOp::mafOp()
   m_Mouse     = NULL;
 	m_Compatibility     = 0xFFFF;
   m_InputPreserving = true;
-  m_CollaborateStatus = false;
   m_SettingPanel = NULL;
 }
 //----------------------------------------------------------------------------
@@ -118,7 +116,7 @@ void mafOp::OpDo()
   if (m_Output)
   {
     m_Output->ReparentTo(m_Input);
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -127,8 +125,8 @@ void mafOp::OpUndo()
 {
   if (m_Output)
   {
-    mafEventMacro(mafEvent(this, VME_REMOVE, m_Output));
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+    GetLogicManager()->VmeRemove(m_Output);
+		GetLogicManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -150,26 +148,6 @@ bool mafOp::IsCompatible(long state)
   return (m_Compatibility & state) != 0;
 }
 
-/*
-//----------------------------------------------------------------------------
-bool mafOp::IsImporter()   
-//----------------------------------------------------------------------------
-{
-  return m_OpType == OPTYPE_IMPORTER;
-}
-//----------------------------------------------------------------------------
-bool mafOp::IsExporter()   
-//----------------------------------------------------------------------------
-{
-  return m_OpType == OPTYPE_EXPORTER;
-}
-//----------------------------------------------------------------------------
-bool mafOp::IsOp()   
-//----------------------------------------------------------------------------
-{
-  return m_OpType == OPTYPE_OP;
-}
-*/
 //----------------------------------------------------------------------------
 int mafOp::GetType()
 //----------------------------------------------------------------------------
@@ -181,7 +159,7 @@ void mafOp::ShowGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui); 
-  m_Gui->Collaborate(m_CollaborateStatus);
+
   m_Guih = new mafGUIHolder(mafGetFrame(),-1);
 	wxBoxSizer * topSizer = m_Guih->GetTopSizer();
 	wxPanel * topPanel = m_Guih->GetTopPanel();
@@ -256,10 +234,4 @@ void mafOp::OpStop(int result)
 {
   HideGui();
   mafEventMacro(mafEvent(this,result));        
-}
-//----------------------------------------------------------------------------
-void mafOp::Collaborate(bool status)
-//----------------------------------------------------------------------------
-{
-  m_CollaborateStatus = status; 
 }

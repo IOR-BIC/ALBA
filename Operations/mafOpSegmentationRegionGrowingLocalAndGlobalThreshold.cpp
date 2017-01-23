@@ -749,7 +749,7 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(mafEventBase
         m_VolumeOutputRegionGrowing->ReparentTo(m_VolumeInput);
         m_VolumeOutputRegionGrowing->Update();
 
-        mafEventMacro(mafEvent(this,VME_SHOW,m_VolumeOutputRegionGrowing,true));
+        GetLogicManager()->VmeShow(m_VolumeOutputRegionGrowing, true);
 
         if (m_SegmentedImage != NULL)
         {
@@ -806,7 +806,7 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(mafEventBase
         	m_SurfaceOutput->ReparentTo(m_VolumeInput);
         	m_SurfaceOutput->Update();
   
-        	mafEventMacro(mafEvent(this,VME_SHOW,m_VolumeOutputMorpho,true));
+        	GetLogicManager()->VmeShow(m_VolumeOutputMorpho, true);
           m_Gui->Enable(wxOK,true);
         }
 
@@ -859,7 +859,7 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpStop(int result)
 	    m_SurfaceOutput->ReparentTo(NULL);
 	  }
 
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
 
   if (m_Gui)
@@ -889,7 +889,7 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpDo()
   {
     return;
   }
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpUndo()
@@ -897,20 +897,20 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpUndo()
 {
   if (m_VolumeOutputRegionGrowing)
   {
-    mafEventMacro(mafEvent(this, VME_REMOVE, m_VolumeOutputRegionGrowing));
+    GetLogicManager()->VmeRemove(m_VolumeOutputRegionGrowing);
   }
   if (m_VolumeOutputMorpho)
   {
-    mafEventMacro(mafEvent(this, VME_REMOVE, m_VolumeOutputMorpho));
+    GetLogicManager()->VmeRemove(m_VolumeOutputMorpho);
   }
   if (m_SurfaceOutput)
   {
-    mafEventMacro(mafEvent(this, VME_REMOVE, m_SurfaceOutput));
+    GetLogicManager()->VmeRemove(m_SurfaceOutput);
   }
 
   if (m_VolumeOutputMorpho == NULL && m_VolumeOutputRegionGrowing == NULL && m_SurfaceOutput == NULL)
   {
     return;
   }
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }

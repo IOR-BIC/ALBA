@@ -24,65 +24,64 @@
 
 #include "mafInteractionTests.h"
 
-#include "mafGizmoPathTest.h"
-#include "mafGizmoPathRulerTest.h"
-#include "mafInteractorSelectCellTest.h"
-#include "mafGizmoTranslateAxisTest.h"
-#include "mafGizmoTranslatePlaneTest.h"
-#include "mafGizmoBoundingBoxTest.h"
-#include "mafGizmoScaleIsotropicTest.h"
-#include "mafGizmoRotateFanTest.h"
-#include "mafGizmoROITest.h"
-#include "mafGizmoHandleTest.h"
+#include "mafActionTest.h"
+#include "mafAgentEventQueueTest.h"
 #include "mafAgentTest.h"
-#include "mafGizmoRotateCircleTest.h"
-#include "mafGizmoTranslateTest.h"
-#include "mafGizmoRotateTest.h"
-#include "mafGizmoSliceTest.h"
-#include "mafGizmoInteractionDebuggerTest.h"
-#include "mafGizmoInterfaceTest.h"
-#include "mafInteractorConstraintTest.h"
-#include "mafRefSysTest.h"
-#include "mafDeviceButtonsPadTest.h"
+#include "mafAgentThreadedTest.h"
+#include "mafAvatar2DTest.h"
+#include "mafAvatar3DConeTest.h"
+#include "mafAvatarTest.h"
+#include "mafDeviceButtonsPadMouseDialogTest.h"
+#include "mafDeviceClientMAFTest.h"
+#include "mafDeviceManagerTest.h"
 #include "mafDeviceSetTest.h"
-#include "mafGUIGizmoTranslateTest.h"
+#include "mafDeviceTest.h"
+#include "mafEventInteractionTest.h"
+#include "mafFakeLogicForTest.h"
+#include "mafGUIGizmoInterfaceTest.h"
 #include "mafGUIGizmoRotateTest.h"
 #include "mafGUIGizmoScaleTest.h"
-#include "mafEventInteractionTest.h"
-#include "mafDeviceManagerTest.h"
-#include "mafInteractionFactoryTest.h"
-#include "mafGUITransformTextEntriesTest.h"
-#include "mafInteractorCompositorMouseTest.h"
-#include "mafActionTest.h"
+#include "mafGUIGizmoTranslateTest.h"
 #include "mafGUISaveRestorePoseTest.h"
-#include "mafAgentEventQueueTest.h"
-#include "mafAgentThreadedTest.h"
-#include "mafDeviceButtonsPadMouseTest.h"
-#include "mafInteractorPERTest.h"
-#include "mafDeviceTest.h"
-#include "mafGizmoScaleAxisTest.h"
-#include "mafGizmoScaleTest.h"
-#include "mafDeviceClientMAFTest.h"
-#include "mafInteractorExtractIsosurfaceTest.h"
-#include "mafInteractorTest.h"
-#include "mafDeviceButtonsPadMouseRemoteTest.h"
-#include "mafInteractor6DOFCameraMoveTest.h"
-#include "mafAvatar2DTest.h"
-#include "mafAvatarTest.h"
-#include "mafInteractorSERTest.h"
-#include "mafInteractor6DOFTest.h"
-#include "mafInteractorGeneric6DOFTest.h"
-#include "mafGUIGizmoInterfaceTest.h"
 #include "mafGUITransformInterfaceTest.h"
-#include "mafAvatar3DConeTest.h"
 #include "mafGUITransformMouseTest.h"
-#include "mafGizmoPolylineGraphTest.h"
-#include "mafDeviceButtonsPadMouseDialogTest.h"
 #include "mafGUITransformSlidersTest.h"
+#include "mafGUITransformTextEntriesTest.h"
+#include "mafGizmoBoundingBoxTest.h"
+#include "mafGizmoHandleTest.h"
+#include "mafGizmoInteractionDebuggerTest.h"
+#include "mafGizmoInterfaceTest.h"
+#include "mafGizmoPathRulerTest.h"
+#include "mafGizmoPathTest.h"
+#include "mafGizmoPolylineGraphTest.h"
+#include "mafGizmoROITest.h"
+#include "mafGizmoRotateCircleTest.h"
+#include "mafGizmoRotateFanTest.h"
+#include "mafGizmoRotateTest.h"
+#include "mafGizmoScaleAxisTest.h"
+#include "mafGizmoScaleIsotropicTest.h"
+#include "mafGizmoScaleTest.h"
+#include "mafGizmoSliceTest.h"
+#include "mafGizmoTranslateAxisTest.h"
+#include "mafGizmoTranslatePlaneTest.h"
+#include "mafGizmoTranslateTest.h"
+#include "mafInteractionFactoryTest.h"
+#include "mafInteractor6DOFCameraMoveTest.h"
+#include "mafInteractor6DOFTest.h"
+#include "mafInteractorCompositorMouseTest.h"
+#include "mafInteractorConstraintTest.h"
+#include "mafInteractorExtractIsosurfaceTest.h"
+#include "mafInteractorGeneric6DOFTest.h"
+#include "mafInteractorPERTest.h"
+#include "mafInteractorSERTest.h"
+#include "mafInteractorSelectCellTest.h"
+#include "mafInteractorTest.h"
+#include "mafRefSysTest.h"
+#include "mafServiceLocator.h"
+
 #include "mmiVTKPickerTest.h"
 #include "mmiSelectPointTest.h"
 #include "mmiInfoImageTest.h"
-//#include "mafInteractorDICOMImporterTest.h"
 #include "medInteractor2DDistanceTest.h"
 #include "medInteractor2DAngleTest.h"
 #include "medInteractor2DIndicatorTest.h"
@@ -93,6 +92,7 @@
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
 #include "vtkFileOutputWindow.h"
+
 
 
 void	DummyObserver::OnEvent(mafEventBase *maf_event)
@@ -128,17 +128,20 @@ int
 	CPPUNIT_NS::BriefTestProgressListener progress;
 	controller.addListener( &progress );      
 
+	mafFakeLogicForTest *logic = new mafFakeLogicForTest();
+	mafServiceLocator::SetLogicManager(logic);
+
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
 
-	runner.addTest(mafGizmoRotateFanTest::suite());
+	runner.addTest(mafGizmoRotateFanTest::suite()); // Fix
 	runner.addTest(mafGizmoPathTest::suite());
 	runner.addTest(mafGizmoPathRulerTest::suite());
 	runner.addTest(mafInteractorSelectCellTest::suite());
 	runner.addTest(mafGizmoTranslateAxisTest::suite());
 	runner.addTest(mafGizmoTranslatePlaneTest::suite());
 	runner.addTest(mafGizmoBoundingBoxTest::suite());
-	runner.addTest(mafGizmoScaleIsotropicTest::suite());
+	runner.addTest(mafGizmoScaleIsotropicTest::suite()); // Fix
 	runner.addTest(mafGizmoROITest::suite());
 	runner.addTest(mafGizmoHandleTest::suite());
 	runner.addTest(mafAgentTest::suite());
@@ -150,7 +153,6 @@ int
 	runner.addTest(mafGizmoInterfaceTest::suite());
 	runner.addTest(mafInteractorConstraintTest::suite());
 	runner.addTest(mafRefSysTest::suite());
-	runner.addTest(mafDeviceButtonsPadTest::suite());
 	runner.addTest(mafDeviceSetTest::suite());
 	runner.addTest(mafGUIGizmoTranslateTest::suite());
 	runner.addTest(mafGUIGizmoRotateTest::suite());
@@ -164,15 +166,12 @@ int
 	runner.addTest(mafGUISaveRestorePoseTest::suite());
 	runner.addTest(mafAgentEventQueueTest::suite());
 	runner.addTest(mafAgentThreadedTest::suite());
-	runner.addTest(mafDeviceButtonsPadMouseTest::suite());
 	runner.addTest(mafInteractorPERTest::suite());
 	runner.addTest(mafDeviceTest::suite());
 	runner.addTest(mafGizmoScaleAxisTest::suite());
 	runner.addTest(mafGizmoScaleTest::suite());
-	runner.addTest(mafDeviceClientMAFTest::suite());
 	runner.addTest(mafInteractorExtractIsosurfaceTest::suite());
 	runner.addTest(mafInteractorTest::suite());
-	runner.addTest(mafDeviceButtonsPadMouseRemoteTest::suite());
 	runner.addTest(mafInteractor6DOFCameraMoveTest::suite());
 	runner.addTest(mafAvatar2DTest::suite());
 	runner.addTest(mafAvatarTest::suite());
@@ -199,6 +198,8 @@ int
 	// Print test in a compiler compatible format.
 	CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
 	outputter.write(); 
+
+	cppDEL(logic);
 
 	return result.wasSuccessful() ? 0 : 1;
 }

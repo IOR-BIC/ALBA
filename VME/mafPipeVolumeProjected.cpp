@@ -376,5 +376,5 @@ void mafPipeVolumeProjected::SetActorPicking(int enable)
 {
   m_RXActor->SetPickable(enable);
   m_RXActor->Modified();
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }

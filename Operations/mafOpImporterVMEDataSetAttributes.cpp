@@ -250,8 +250,7 @@ void mafOpImporterVMEDataSetAttributes::OnEvent(mafEventBase *maf_event)
       //referred to bug 933
       if (m_Output != NULL)
       {
-        mafEventMacro(mafEvent(this,VME_SHOW, m_Output, false));
-        mafEventMacro(mafEvent(this,VME_SHOW, m_Output, true));
+				GetLogicManager()->VmeVisualModeChanged(m_Output);
       }
       //END WORKAROUND CODE 
 

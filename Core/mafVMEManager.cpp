@@ -38,8 +38,6 @@
 #include "mafDecl.h"
 #include "mafVME.h"
 #include "mafVMEStorage.h"
-#include "mafRemoteStorage.h"
-#include "mmdRemoteFileManager.h"
 #include "mafVMEGenericAbstract.h"
 #include "mafDataVector.h"
 
@@ -163,16 +161,7 @@ void mafVMEManager::SetApplicationStamp(std::vector<mafString> appstamp)
     m_AppStamp.push_back(appstamp.at(i));
   }
 }
-//----------------------------------------------------------------------------
-void mafVMEManager::SetLocalCacheFolder(mafString cache_folder)
-//----------------------------------------------------------------------------
-{
-  if (m_Storage)
-  {
-    // Set the local cache directory
-    m_Storage->SetTmpFolder(cache_folder.GetCStr());
-  }
-}
+
 //----------------------------------------------------------------------------
 void mafVMEManager::RemoveTempDirectory()
 //----------------------------------------------------------------------------
@@ -268,12 +257,9 @@ int mafVMEManager::MSFOpen(mafString filename)
     disableAll = new wxWindowDisabler();
     wait_cursor = new wxBusyCursor();
   }
-  
-  mafString protocol = "";
-  bool remote_file = IsRemote(filename, protocol); // check if the specified path refers to a remote location
-  
+   
   // open a local msf
-  if(!remote_file && !wxFileExists(filename.GetCStr()))
+  if(!wxFileExists(filename.GetCStr()))
 	{
 		mafString msg;
     msg = _("File ");
@@ -298,35 +284,12 @@ int mafVMEManager::MSFOpen(mafString filename)
   MSFNew(false); // insert and select the root - reset m_MSFFile - delete the old storage and create a new one
   
   mafString unixname = filename;
-  if (remote_file)
-  {
-    // set parameters for remote storage according to the remote file.
-    ((mafRemoteStorage *)m_Storage)->SetHostName(m_Host);
-    ((mafRemoteStorage *)m_Storage)->SetRemotePort(m_Port);
-    ((mafRemoteStorage *)m_Storage)->SetUsername(m_User);
-    ((mafRemoteStorage *)m_Storage)->SetPassword(m_Pwd);
-  }
   
   wxString path, name, ext;
   wxSplitPath(filename.GetCStr(),&path,&name,&ext);
   //if(ext == "zmsf")
   if(ext.IsSameAs("z" + m_file_extension,true)) 
   {
-    if (remote_file) // download remote zmsf
-    {
-      // Download the file if it is not present into the cache
-      // we are using the remote storage!!
-      mafString local_filename, remote_filename;
-      remote_filename = filename;
-      local_filename = m_Storage->GetTmpFolder();
-      local_filename += "\\";
-      local_filename += name;
-   //   local_filename += ".zmsf";
-	  local_filename += ".z";
-	  local_filename += m_file_extension;
-      ((mafRemoteStorage *)m_Storage)->GetRemoteFileManager()->DownloadRemoteFile(remote_filename, local_filename); // download the remote file in the download cache
-      filename = local_filename;
-    }
     unixname = ZIPOpen(filename); // open the zmsf archive and extract it to the temporary directory
     if(unixname.IsEmpty())
     {
@@ -422,7 +385,7 @@ int mafVMEManager::MSFOpen(mafString filename)
   NotifyAdd(root_node); // add the storage root (the tree) with events notification
 
 	mafEventMacro(mafEvent(this,VME_SELECTED, root_node)); // raise notification events (to logic)
-  mafEventMacro(mafEvent(this,CAMERA_RESET)); 
+  mafEventMacro(mafEvent(this,CAMERA_RESET));
   
 	if (m_TmpDir != "")
 	{
@@ -747,44 +710,7 @@ int mafVMEManager::MSFSaveAs()
   
   return retValue;
 }
-//----------------------------------------------------------------------------
-void mafVMEManager::Upload(mafString local_file, mafString remote_file)
-//----------------------------------------------------------------------------
-{
-  if (m_Storage == NULL)
-  {
-    mafMessage(_("Some problem occourred, MAF storage is NULL!!"), _("Warning"));
-    return;
-  }
-  mafRemoteStorage *storage = (mafRemoteStorage *)m_Storage;
-  if (storage->GetRemoteFileManager()->UploadLocalFile(local_file, remote_file) != MAF_OK) // Upload the local file to the remote repository
-  {
 
-  }
-  /*
-  if (upload_flag == UPLOAD_TREE)
-  {
-    wxString local_dir = wxPathOnly(m_MSFFile);
-    wxString remote_dir = remote_file.GetCStr();
-    remote_dir = wxPathOnly(remote_dir);
-    wxString upload_file;
-
-    wxArrayString files;
-    wxDir::GetAllFiles(local_dir,&files); // get all files in the temporary directory
-
-    wxString path, short_name, ext, local_file;
-    for (size_t i = 0; i < files.GetCount(); i++) 
-    {
-      local_file = files.Item(i);
-      wxSplitPath(local_file.c_str(), &path, &short_name, &ext);
-      upload_file = remote_dir + "/" + short_name + "." + ext;
-      if (storage->UploadLocalFile(local_file, upload_file) != MAF_OK) // Upload the local file to the remote repository
-      {
-        break;
-      }
-    }
-  }*/
-}
 //----------------------------------------------------------------------------
 void mafVMEManager::VmeAdd(mafVME *vme)
 //----------------------------------------------------------------------------

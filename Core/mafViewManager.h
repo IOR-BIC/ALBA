@@ -49,7 +49,6 @@ public:
   mafViewManager();
  ~mafViewManager(); 
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-  void SetRemoteListener(mafObserver *Listener) {m_RemoteListener = Listener;};
   virtual void OnEvent(mafEventBase *maf_event);
 
   /** Fill the main menù with plugged views. */
@@ -136,11 +135,6 @@ public:
   /** Initialize the action for the mouse device.*/
   void SetMouse(mafDeviceButtonsPadMouse *mouse);
 
-  /** Turn On/Off the collaboration status.*/
-  void Collaborate(bool status) {m_CollaborateStatus = status;};
-
-  bool m_FromRemote;  ///< Flag used from RemoteLogic to avoid loop
-
 protected:
   mafDeviceButtonsPadMouse      *m_Mouse;
   mafView       *m_ViewList;  // created view list
@@ -149,7 +143,6 @@ protected:
   int            m_TemplateNum;       // number of template
 
   mafObserver   *m_Listener;
-  mafObserver   *m_RemoteListener;
   mafVMERoot    *m_RootVme;
   mafVME       *m_SelectedVme;
   mafView       *m_SelectedView;
@@ -158,8 +151,6 @@ protected:
   mafView       *m_ViewMatrixID[MAXVIEW][MAXVIEW];  ///< Matrix to access views directly by (id, multiplicity)
 
   std::vector<long> m_IdInvisibleMenuList; ///< List of views that are no visible into the 'View' menu item.
-
-  bool m_CollaborateStatus;
 
   /** test friend */
   friend class mafViewManagerTest;

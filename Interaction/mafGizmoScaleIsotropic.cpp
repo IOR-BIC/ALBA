@@ -209,7 +209,7 @@ void mafGizmoScaleIsotropic::SetColor(double colR, double colG, double colB)
 void mafGizmoScaleIsotropic::Show(bool show)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,VME_SHOW,m_CubeGizmo,show));
+	GetLogicManager()->VmeShow(m_CubeGizmo, show);
 }
 
 //----------------------------------------------------------------------------

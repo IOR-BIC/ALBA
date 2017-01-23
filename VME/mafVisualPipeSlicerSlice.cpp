@@ -330,7 +330,7 @@ void mafVisualPipeSlicerSlice::OnEvent(mafEventBase *maf_event)
 			  m_Actor1->Modified();
         m_Actor2->GetProperty()->SetLineWidth(m_Border);
         m_Actor2->Modified();
-			  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 		  }
 	  break;
       default:
@@ -430,5 +430,5 @@ void mafVisualPipeSlicerSlice::SetThickness(double thickness)
   m_Actor1->Modified();
   m_Actor2->GetProperty()->SetLineWidth(m_Border);
   m_Actor2->Modified();
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }

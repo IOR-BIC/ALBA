@@ -77,5 +77,5 @@ void mafOpCreateGroup::OpDo()
   if (!m_Input->IsMAFType(mafVMERoot))
     m_Group->ReparentTo(m_Input);
   else
-    mafEventMacro(mafEvent(this, VME_ADD, m_Group));
+    GetLogicManager()->VmeAdd(m_Group);
 }

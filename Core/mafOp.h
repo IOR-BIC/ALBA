@@ -22,6 +22,8 @@
 #include "mafEvent.h"
 #include "mafObserver.h"
 #include "mafObject.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -48,7 +50,7 @@ enum OPERATIONS_TYPE_ID
 //----------------------------------------------------------------------------
 /**
 */
-class MAF_EXPORT mafOp: public mafObserver, public mafObject
+class MAF_EXPORT mafOp: public mafObserver, public mafObject, public mafServiceClient
 {
 public:
 	enum MAFOP_ID
@@ -137,12 +139,6 @@ public:
   void SetMouse(mafDeviceButtonsPadMouse *mouse);
   mafDeviceButtonsPadMouse *GetMouse(){return m_Mouse;};
 
-  /** Turn On/Off the collaboration status. */
-  void Collaborate(bool status);
-
-  /** Return the collaborate status */
-  bool GetCollaborateStatus(){return m_CollaborateStatus;};
-
   /** Turn On m_TestMode flag. 
   The m_TestMode flag is used to exclude the execution of splash screen or wxBusyInfo that conflicts with test machine.*/
   void TestModeOn() {m_TestMode = true;};
@@ -178,7 +174,6 @@ protected:
 	bool						m_InputPreserving; ///< Flag to say if the operation change the input data (m_InputPreserving = false) or not.
 	mafObserver    *m_Listener;
   mafDeviceButtonsPadMouse       *m_Mouse;
-  bool            m_CollaborateStatus;
   mafGUISettings *m_SettingPanel;
   bool            m_TestMode; ///< Flag used with cppunitTest: put this flag at true when executing tests to avoid busy-info or splash screen to be created, default is false.
 };

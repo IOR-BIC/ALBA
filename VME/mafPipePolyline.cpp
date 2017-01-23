@@ -313,7 +313,7 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 			m_Tube->SetRadius(m_TubeRadius);
 			mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_RADIUS");
 			item->SetValue(m_TubeRadius);
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 		}
 		break;
 		case ID_SHOW_SPHERES:
@@ -326,7 +326,7 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 			m_Tube->SetCapping(m_Capping);
 			mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_CAPPING");
 			item->SetValue(m_Capping);
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 		}
 		break;
 		case ID_TUBE_RESOLUTION:
@@ -334,7 +334,7 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 			m_Tube->SetNumberOfSides(m_TubeResolution);
 			mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_RESOLUTION");
 			item->SetValue(m_TubeResolution);
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 		}
 		break;
 		case ID_SPHERE_RADIUS:
@@ -342,7 +342,7 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 			m_Sphere->SetRadius(m_SphereRadius);
 			mafTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RADIUS");
 			item->SetValue(m_SphereRadius);
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 		}
 		break;
 		case ID_SPHERE_RESOLUTION:
@@ -351,12 +351,12 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 			m_Sphere->SetThetaResolution(m_SphereResolution);
 			mafTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RESOLUTION");
 			item->SetValue(m_SphereResolution);
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 		}
 		break;
 		case ID_SCALAR_DIMENSION:
 			UpdateProperty();
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 			break;
 		case ID_SPLINE:
 		{
@@ -364,7 +364,7 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 			item->SetValue(m_SplineMode);
 			UpdateProperty();
 			EnableDisableGui();
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 		}
 		break;
 		case ID_SPLINE_PARAMETERS:
@@ -377,7 +377,7 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 			m_SplineFilter->Modified();
 			m_SplineFilter->Update();
 			UpdateProperty();
-			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 		}
 		break;
 		default:
@@ -562,7 +562,7 @@ void mafPipePolyline::SetRepresentation(int representation)
 	mafTagItem *item = m_Vme->GetTagArray()->GetTag("REPRESENTATION");
 	item->SetValue(m_Representation);
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafPipePolyline::SetShowSphere(bool show)
@@ -574,7 +574,7 @@ void mafPipePolyline::SetShowSphere(bool show)
 	mafTagItem *item = m_Vme->GetTagArray()->GetTag("SHOW_SPHERES");
 	item->SetValue(m_ShowSpheres);
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafPipePolyline::SetRadius(double radius)
@@ -589,7 +589,7 @@ void mafPipePolyline::SetRadius(double radius)
   item = m_Vme->GetTagArray()->GetTag("TUBE_RADIUS");
   item->SetValue(m_TubeRadius);
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafPipePolyline::SetColor(double color[3])

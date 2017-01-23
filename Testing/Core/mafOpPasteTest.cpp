@@ -31,6 +31,8 @@
 #include "mafEvent.h"
 
 #include <vector>
+#include "mafServiceLocator.h"
+#include "mafFakeLogicForTest.h"
 
 
 //----------------------------------------------------------------------------
@@ -98,6 +100,8 @@ void mafOpPasteTest::TestOpUndo()
   mafNEW(groupChild);
 
   DummyObserver *observer = new DummyObserver();
+	mafFakeLogicForTest *logic = (mafFakeLogicForTest*)mafServiceLocator::GetLogicManager();
+	logic->ClearCalls();
 
   m_OpPaste->SetListener(observer);
   m_OpPaste->SetInput(groupParent);
@@ -107,9 +111,12 @@ void mafOpPasteTest::TestOpUndo()
   m_OpPaste->OpUndo();
 
   CPPUNIT_ASSERT(m_OpPaste->GetClipboard() == groupChild);
-  CPPUNIT_ASSERT(observer->GetEvent(0)->GetSender()==m_OpPaste);
-  CPPUNIT_ASSERT(observer->GetEvent(0)->GetVme()==groupChild);
-  CPPUNIT_ASSERT(observer->GetEvent(0)->GetId()==VME_REMOVE);
+//   CPPUNIT_ASSERT(observer->GetEvent(0)->GetSender()==m_OpPaste);
+//   CPPUNIT_ASSERT(observer->GetEvent(0)->GetVme()==groupChild);
+//   CPPUNIT_ASSERT(observer->GetEvent(0)->GetId()==VME_REMOVE);
+
+	CPPUNIT_ASSERT(logic->GetCall(0).vme == groupChild);
+	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_REMOVE);
 
   delete observer;
   mafDEL(groupChild);

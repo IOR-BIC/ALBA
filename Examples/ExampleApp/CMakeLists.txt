@@ -7,6 +7,8 @@ SET(PROJECT_SRCS
 	mafOpInteractionOp.h
 	exWizardSample.cpp
 	exWizardSample.h
+	exAppUtils.cpp
+	exAppUtils.h
 )
 
 IF (NOT EXECUTABLE_OUTPUT_PATH)
@@ -64,11 +66,11 @@ ENDIF (WIN32)
 
 IF(MAF_BUILD_MAFDLL)
   SET(PROJECT_LIBS
-  mafOperations mafGui mafViews mafVME mafInteraction mafCommon
+  mafOperations mafGui mafViews mafVME mafInteraction mafCommon mafService
 )
 ELSE(MAF_BUILD_MAFDLL)
   SET(PROJECT_LIBS
-  mafOperations mafGui mafViews mafVME mafInteraction mafCommon vtkMAF GPUAPI
+  mafOperations mafGui mafViews mafVME mafInteraction mafCommon mafService vtkMAF GPUAPI
 )
 ENDIF(MAF_BUILD_MAFDLL)
 

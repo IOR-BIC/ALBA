@@ -129,14 +129,14 @@ void mafOpCleanSurface::OpDo()
 //----------------------------------------------------------------------------
 {
 	((mafVMESurface *)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpCleanSurface::OpUndo()
 //----------------------------------------------------------------------------
 {
 	((mafVMESurface *)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpCleanSurface::OnEvent(mafEventBase *maf_event)
@@ -222,7 +222,7 @@ void mafOpCleanSurface::OnPreview()
 	m_PreviewResultFlag   = false;
 	m_ClearInterfaceFlag	= true;
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpCleanSurface::OnClear()  
@@ -245,5 +245,5 @@ void mafOpCleanSurface::OnClear()
 	m_PreviewResultFlag = false;
 	m_ClearInterfaceFlag= false;
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }

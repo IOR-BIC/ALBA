@@ -53,12 +53,6 @@ public:
   CPPUNIT_TEST( GetStorageTest );
   CPPUNIT_TEST( MakeBakFileOnSaveTest );
   CPPUNIT_TEST( SetDirNameTest );
-  CPPUNIT_TEST( SetHostTest );
-  CPPUNIT_TEST( SetUserTest );
-  CPPUNIT_TEST( SetPasswordTest ); 
-  CPPUNIT_TEST( SetRemotePortTest );
-  CPPUNIT_TEST( SetLocalCacheFolderTest );
-  CPPUNIT_TEST( RemoveTempDirectoryTest );
   CPPUNIT_TEST( SetSingleBinaryFileTest );
 
   CPPUNIT_TEST_SUITE_END();
@@ -82,12 +76,6 @@ private:
   void GetStorageTest();
   void MakeBakFileOnSaveTest();
   void SetDirNameTest();
-  void SetLocalCacheFolderTest();
-  void SetHostTest();
-  void SetUserTest();
-  void SetPasswordTest();
-  void SetRemotePortTest();
-  void RemoveTempDirectoryTest();
   void SetSingleBinaryFileTest();
 
   void OnEvent(mafEventBase *maf_event); // This method trap the events coming from the vme manager

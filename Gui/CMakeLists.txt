@@ -8,23 +8,15 @@ MESSAGE(STATUS "Configuring project ${PROJECT_NAME}")
 CONFIGURE_FILE("${MAF_SOURCE_DIR}/Gui/manifest.in" "${MAF_BINARY_DIR}/Gui/manifest.in" COPYONLY)
 
 SET(PROJECT_SRCS
-  mafEvent.cpp
-  mafEvent.h
-  mafGUIDialogFindVme.cpp
-  mafGUIDialogFindVme.h
-  mafGUIDialogLogin.cpp
-  mafGUIDialogLogin.h
+  mafEvent.cpp  mafEvent.h
+  mafGUIDialogFindVme.cpp  mafGUIDialogFindVme.h
+  mafGUIDialogLogin.cpp  mafGUIDialogLogin.h
   
-  mafGUIDialogTransferFunction2D.cpp
-  mafGUIDialogTransferFunction2D.h
+  mafGUIDialogTransferFunction2D.cpp  mafGUIDialogTransferFunction2D.h
   mafTransferFunction2DInteractors.cpp
   
-  mafGUISettings.cpp
-  mafGUISettings.h
-  mafGUISettingsStorage.cpp
-  mafGUISettingsStorage.h
-  mafGUISettingsTimeBar.cpp
-  mafGUISettingsTimeBar.h
+  mafGUISettings.cpp  mafGUISettings.h
+  mafGUISettingsTimeBar.cpp  mafGUISettingsTimeBar.h
   
   ##### Example of SRB List Dialog requires OPENSSL #####
 	#mafGUISRBBrowse.cpp
@@ -38,174 +30,91 @@ SET(PROJECT_SRCS
 	#./SrbStorageWS/stdsoap2.cpp
 	#./SrbStorageWS/stdsoap2.h
 	#------------------------------------
-  mafPics.cpp
-  mafPics.h
-  mafWXLog.cpp
-  mafWXLog.h
-  mafGUIApplicationSettings.cpp
-  mafGUIApplicationSettings.h
-  mafGUIButton.cpp
-  mafGUIButton.h
-  mafGUICheckListBox.cpp
-  mafGUICheckListBox.h
-  mafGUICheckTree.cpp
-  mafGUICheckTree.h
-  mafGUIColorSwatch.cpp
-  mafGUIColorSwatch.h
-  mafGUIColorWidget.cpp
-  mafGUIColorWidget.h
-  mafGUICrossSplitter.cpp
-  mafGUICrossSplitter.h
-  mafGUIDialog.cpp
-  mafGUIDialog.h
-  mafGUIDockManager.cpp
-  mafGUIDockManager.h
-  mafGUIFileHistory.cpp
-  mafGUIFileHistory.h
-  mafGUIFlagSplitter.cpp
-  mafGUIFlagSplitter.h
-  mafGUIFloatSlider.cpp
-  mafGUIFloatSlider.h
-  mafGUIFrame.cpp
-  mafGUIFrame.h
-  mafGUI.cpp
-  mafGUI.h
-  mafGUIHolder.cpp
-  mafGUIHolder.h
-  mafGUILab.cpp
-  mafGUILab.h
-  mafGUIListBox.cpp
-  mafGUIListBox.h
-  mafGUIListCtrl.cpp
-  mafGUIListCtrl.h
-  mafGUIMovieCtrl.cpp
-  mafGUIMovieCtrl.h
-  mafGUIMDIChild.cpp
-  mafGUIMDIChild.h
-  mafGUIMDIFrame.cpp
-  mafGUIMDIFrame.h
-  mafGUIMutexPanel.cpp
-  mafGUIMutexPanel.h
-  mafGUINamedPanel.cpp
-  mafGUINamedPanel.h
-  mafGUIPanel.cpp
-  mafGUIPanel.h
-  mafGUIPanelStack.cpp
-  mafGUIPanelStack.h
-  mafGUIPicButton.cpp
-  mafGUIPicButton.h
-  mafGUIRangeSlider.cpp
-  mafGUIRangeSlider.h
-  mafGUIRollOut.cpp
-  mafGUIRollOut.h
-  mafGUISashPanel.h
-  mafGUISashPanel.cpp
-  mafGUIScrolledPanel.cpp
-  mafGUIScrolledPanel.h
-  mafGUISettingsDialog.cpp
-  mafGUISettingsDialog.h
-  mafGUISplittedPanel.cpp
-  mafGUISplittedPanel.h
-  mafGUITimeBar.cpp
-  mafGUITimeBar.h
-  mafGUITree.cpp
-  mafGUITree.h
-  mafGUIValidator.cpp
-  mafGUIValidator.h
-  mafGUIViewFrame.cpp
-  mafGUIViewFrame.h
-  mafGUIViewWin.cpp
-  mafGUIViewWin.h
-  mafGUICrossIncremental.cpp
-  mafGUICrossIncremental.h
-  mafGUIComboBox.cpp
-  mafGUIComboBox.h
-  mafGUILandmark.cpp
-  mafGUILandmark.h
-  mafGUIWizard.cpp
-  mafGUIWizard.h
-  mafGUIWizardPage.cpp
-  mafGUIWizardPage.h
-  mafGUIWizardPageNew.cpp
-  mafGUIWizardPageNew.h
-  mafGUIDicomSettings.cpp
-  mafGUIDicomSettings.h
-  mafGUISettingsAdvanced.cpp
-  mafGUISettingsAdvanced.h
-  mafGUIDynamicVP.cpp
-  mafGUIDynamicVP.h
-  mafGUILutHistogramSwatch.cpp
-  mafGUILutHistogramSwatch.h
-  mafGUILutHistogramEditor.cpp
-  mafGUILutHistogramEditor.h
+  mafPics.cpp  						mafPics.h
+  mafWXLog.cpp  					mafWXLog.h
+  mafGUIApplicationSettings.cpp  	mafGUIApplicationSettings.h
+  mafGUIButton.cpp  				mafGUIButton.h
+  mafGUICheckListBox.cpp  			mafGUICheckListBox.h
+  mafGUICheckTree.cpp  				mafGUICheckTree.h
+  mafGUIColorSwatch.cpp  			mafGUIColorSwatch.h
+  mafGUIColorWidget.cpp  			mafGUIColorWidget.h
+  mafGUICrossSplitter.cpp  			mafGUICrossSplitter.h
+  mafGUIDialog.cpp  				mafGUIDialog.h
+  mafGUIDockManager.cpp  			mafGUIDockManager.h
+  mafGUIFileHistory.cpp  			mafGUIFileHistory.h
+  mafGUIFlagSplitter.cpp  			mafGUIFlagSplitter.h
+  mafGUIFloatSlider.cpp  			mafGUIFloatSlider.h
+  mafGUIFrame.cpp  					mafGUIFrame.h
+  mafGUI.cpp  						mafGUI.h
+  mafGUIHolder.cpp  				mafGUIHolder.h
+  mafGUILab.cpp  					mafGUILab.h
+  mafGUIListBox.cpp  				mafGUIListBox.h
+  mafGUIListCtrl.cpp  				mafGUIListCtrl.h
+  mafGUIMovieCtrl.cpp  				mafGUIMovieCtrl.h
+  mafGUIMDIChild.cpp  				mafGUIMDIChild.h
+  mafGUIMDIFrame.cpp  				mafGUIMDIFrame.h
+  mafGUIMutexPanel.cpp  			mafGUIMutexPanel.h
+  mafGUINamedPanel.cpp  			mafGUINamedPanel.h
+  mafGUIPanel.cpp  					mafGUIPanel.h
+  mafGUIPanelStack.cpp  			mafGUIPanelStack.h
+  mafGUIPicButton.cpp  				mafGUIPicButton.h
+  mafGUIRangeSlider.cpp  			mafGUIRangeSlider.h
+  mafGUIRollOut.cpp  				mafGUIRollOut.h
+  mafGUISashPanel.h  				mafGUISashPanel.cpp
+  mafGUIScrolledPanel.cpp  			mafGUIScrolledPanel.h
+  mafGUISettingsDialog.cpp  		mafGUISettingsDialog.h
+  mafGUISplittedPanel.cpp  			mafGUISplittedPanel.h
+  mafGUITimeBar.cpp  				mafGUITimeBar.h
+  mafGUITree.cpp  					mafGUITree.h
+  mafGUIValidator.cpp  				mafGUIValidator.h
+  mafGUIViewFrame.cpp  				mafGUIViewFrame.h
+  mafGUIViewWin.cpp  				mafGUIViewWin.h
+  mafGUICrossIncremental.cpp  		mafGUICrossIncremental.h
+  mafGUIComboBox.cpp  				mafGUIComboBox.h
+  mafGUILandmark.cpp  				mafGUILandmark.h
+  mafGUIWizard.cpp  				mafGUIWizard.h
+  mafGUIWizardPage.cpp  			mafGUIWizardPage.h
+  mafGUIWizardPageNew.cpp  			mafGUIWizardPageNew.h
+  mafGUIDicomSettings.cpp  			mafGUIDicomSettings.h
+  mafGUISettingsAdvanced.cpp  		mafGUISettingsAdvanced.h
+  mafGUIDynamicVP.cpp  				mafGUIDynamicVP.h
+  mafGUILutHistogramSwatch.cpp  	mafGUILutHistogramSwatch.h
+  mafGUILutHistogramEditor.cpp  	mafGUILutHistogramEditor.h
 )
-
-IF (MAF_USE_CURL)
-	SET(PROJECT_SRCS
-	${PROJECT_SRCS}
-	mafGUIDialogRemoteFile.cpp
-	mafGUIDialogRemoteFile.h
-	)
-ENDIF (MAF_USE_CURL)
 
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS
   ${PROJECT_SRCS}
-  mafLightKit.cpp
-  mafLightKit.h
-
-  mafGUIDialogPreview.cpp
-  mafGUIDialogPreview.h
-
-  mafGUIDictionaryWidget.cpp
-  mafGUIDictionaryWidget.h
-
-  mafAnimate.cpp
-  mafAnimate.h
-  mafAttachCamera.cpp
-  mafAttachCamera.h
-
-  mafSideBar.cpp
-  mafSideBar.h
-  mafTextKit.cpp
-  mafTextKit.h
-  mafVTKLog.cpp
-  mafVTKLog.h
+  mafLightKit.cpp					  mafLightKit.h
+  mafGUIDialogPreview.cpp			  mafGUIDialogPreview.h
+  mafGUIDictionaryWidget.cpp		  mafGUIDictionaryWidget.h
+  mafAnimate.cpp					  mafAnimate.h
+  mafAttachCamera.cpp				  mafAttachCamera.h
+  mafSideBar.cpp					  mafSideBar.h
+  mafTextKit.cpp					  mafTextKit.h
+  mafVTKLog.cpp						  mafVTKLog.h
 
   # depends on mafAssembly -> mafRWIBase
-  mafView.cpp
-  mafView.h
+  mafView.cpp						  mafView.h
 
   # these depends on vtkLookupTable
-  mafColor.cpp
-  mafColor.h
-  mafGUILutEditor.cpp
-  mafGUILutEditor.h
-  mafGUILutPreset.cpp
-  mafGUILutPreset.h
-  mafGUILutSlider.cpp
-  mafGUILutSlider.h
-  mafGUILutSwatch.cpp
-  mafGUILutSwatch.h
-  mafGUILutWidget.cpp
-  mafGUILutWidget.h
-
-  mafGUIHistogramWidget.cpp
-  mafGUIHistogramWidget.h
+  mafColor.cpp						  mafColor.h
+  mafGUILutEditor.cpp				  mafGUILutEditor.h
+  mafGUILutPreset.cpp				  mafGUILutPreset.h
+  mafGUILutSlider.cpp				  mafGUILutSlider.h
+  mafGUILutSwatch.cpp				  mafGUILutSwatch.h
+  mafGUILutWidget.cpp				  mafGUILutWidget.h
+  mafGUIHistogramWidget.cpp			  mafGUIHistogramWidget.h
   )
 ENDIF (MAF_USE_VTK)
 
 IF (WITH_OPENSSL)
 
-
 ENDIF(WITH_OPENSSL)
 
 
-
 # List the kits from VTK that are needed by this project.
-SET(PROJECT_LIBS
-  mafBase
-)
+SET(PROJECT_LIBS mafBase)
 
 #........................................................
 #solo la vtkCommon e' linkata per default
@@ -251,3 +160,5 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS} GPUAPI)
 
 #--------------------------------------------------------
 #SUBDIRS(examples)
+
+ADD_DEPENDENCIES(${PROJECT_NAME} mafService)

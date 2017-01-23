@@ -23,59 +23,63 @@
 //----------------------------------------------------------------------------
 
 #include "mafCoreTests.h"
-#include "mafViewVTKTest.h"
-#include "mafViewHTMLTest.h"
+
+#include "mafAbsMatrixPipeTest.h"
 #include "mafAttributeTest.h"
-#include "mafTagItemTest.h"
-#include "mafTagArrayTest.h"
-#include "mafVMETest.h"
-#include "mafTimeMapTest.h"
-#include "mafVMEFactoryTest.h"
-#include "mmaApplicationLayoutTest.h"
-#include "mafVMETest.h"
-#include "mafOpTest.h"
-#include "mafEventIOTest.h"
-#include "mafUserTest.h"
-#include "mafLODActorTest.h"
-#include "mafTimeMapScalarTest.h"
-#include "mafOpSelectTest.h"
-#include "mafRootTest.h"
-#include "mafVMERootTest.h"
-#include "mafOpCutTest.h"
-#include "mafOpCopyTest.h"
-#include "mafOpPasteTest.h"
-#include "mafOpEditTest.h"
-#include "mafOpContextStackTest.h"
-#include "mafVMEIteratorTest.h"
-#include "mafPipeTest.h"
-#include "mafMatrixPipeTest.h"
-#include "mafPipeBoxTest.h"
-#include "mafVMEOutputTest.h"
-#include "mafDataPipeTest.h"
-#include "mafPipeFactoryTest.h"
-#include "mmaMaterialTest.h"
-#include "mmaVolumeMaterialTest.h"
-#include "mafSceneNodeTest.h"
-#include "mafSceneGraphTest.h"
-#include "mafVMEOutputNULLTest.h"
-#include "mafVMEStorageTest.h"
-#include "mafVMEStorageTest2.h"
-#include "mafGUITreeContextualMenuTest.h"
 #include "mafAttributeTraceabilityTest.h"
 #include "mafAxesTest.h"
 #include "mafCoreFactoryTest.h"
-#include "mafOpStackTest.h"
+#include "mafDataPipeTest.h"
+#include "mafEventIOTest.h"
 #include "mafExpirationDateTest.h"
-#include "mafVMEManagerTest.h"
+#include "mafFakeLogicForTest.h"
+#include "mafGUITreeContextualMenuTest.h"
+#include "mafLODActorTest.h"
+#include "mafMatrixPipeTest.h"
+#include "mafOpContextStackTest.h"
+#include "mafOpCopyTest.h"
+#include "mafOpCutTest.h"
+#include "mafOpEditTest.h"
 #include "mafOpManagerTest.h"
-#include "mafViewManagerTest.h"
-#include "mafVMEManagerTest.h"
-#include "mafAbsMatrixPipeTest.h"
-#include "vtkMAFAssemblyTest.h"
-#include "mafViewPlotTest.h"
+#include "mafOpPasteTest.h"
+#include "mafOpSelectTest.h"
+#include "mafOpStackTest.h"
+#include "mafOpTest.h"
+#include "mafPipeBoxTest.h"
+#include "mafPipeFactoryTest.h"
+#include "mafPipeTest.h"
 #include "mafProgressBarHelperTest.h"
+#include "mafRootTest.h"
+#include "mafSceneGraphTest.h"
+#include "mafSceneNodeTest.h"
+#include "mafServiceLocator.h"
+#include "mafTagArrayTest.h"
+#include "mafTagItemTest.h"
+#include "mafTimeMapScalarTest.h"
+#include "mafTimeMapTest.h"
+#include "mafUserTest.h"
+#include "mafVMEFactoryTest.h"
+#include "mafVMEIteratorTest.h"
+#include "mafVMEManagerTest.h"
+#include "mafVMEManagerTest.h"
+#include "mafVMEOutputNULLTest.h"
+#include "mafVMEOutputTest.h"
+#include "mafVMERootTest.h"
+#include "mafVMEStorageTest.h"
+#include "mafVMEStorageTest2.h"
+#include "mafVMETest.h"
+#include "mafVMETest.h"
+#include "mafViewHTMLTest.h"
+#include "mafViewManagerTest.h"
+#include "mafViewPlotTest.h"
+#include "mafViewVTKTest.h"
+#include "mmaApplicationLayoutTest.h"
+#include "mmaMaterialTest.h"
+#include "mmaVolumeMaterialTest.h"
+
 #include "TimeSetTest.h"
 #include "VMEPoseTest.h"
+
 #include <wx/dir.h>
 
 #include <cppunit/BriefTestProgressListener.h>
@@ -83,7 +87,9 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
+
 #include "vtkFileOutputWindow.h"
+#include "vtkMAFAssemblyTest.h"
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEHelper);
@@ -108,6 +114,7 @@ void DummyObserver::OnEvent(mafEventBase *maf_event)
 		m_ListEvent.push_back(eventToCopy);
 	}
 }
+
 //----------------------------------------------------------------------------
 DummyObserver::~DummyObserver()
 //----------------------------------------------------------------------------
@@ -178,6 +185,9 @@ main(int argc, char* argv[])
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
 
+	mafFakeLogicForTest *logic = new mafFakeLogicForTest();
+	mafServiceLocator::SetLogicManager(logic);
+
 	//this test must be run first because manages factories
 	runner.addTest(mafCoreFactoryTest::suite());
 	runner.addTest(vtkMAFAssemblyTest::suite());
@@ -237,6 +247,8 @@ main(int argc, char* argv[])
 	// Print test in a compiler compatible format.
 	CPPUNIT_NS::CompilerOutputter outputter(&result, CPPUNIT_NS::stdCOut());
 	outputter.write();
+
+	cppDEL(logic);
 
 	return result.wasSuccessful() ? 0 : 1;
 }

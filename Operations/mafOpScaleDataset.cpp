@@ -129,7 +129,7 @@ void mafOpScaleDataset::OnEvent(mafEventBase *maf_event)
   else if (maf_event->GetSender() == this->m_GuiSaveRestorePose) // from save/restore gui
   {
     OnEventGuiSaveRestorePose(maf_event); 
-		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
   }
   else
   {
@@ -148,7 +148,7 @@ void mafOpScaleDataset::OpUndo()
 //----------------------------------------------------------------------------
 {  
 	m_Input->SetAbsMatrix(m_OldAbsMatrix);
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpScaleDataset::OpStop(int result)
@@ -218,7 +218,7 @@ void mafOpScaleDataset::OnEventGizmoScale(mafEventBase *maf_event)
     case ID_TRANSFORM:
   	{ 
       m_NewAbsMatrix = *m_Input->GetOutput()->GetAbsMatrix();
-      mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 	  }
     break;
 
@@ -299,8 +299,7 @@ void mafOpScaleDataset::CreateGui()
 	m_GizmoScale->SetRefSys(m_RefSysVME);
 	m_GizmoScale->Show(true);
 
-
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -309,7 +308,7 @@ void mafOpScaleDataset::Reset()
 {
   m_Input->SetAbsMatrix(m_OldAbsMatrix);  
   SetRefSysVME(m_Input); 
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

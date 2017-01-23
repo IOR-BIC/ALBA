@@ -22,6 +22,8 @@
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafObserver.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 #define MAX_NUM_LIGHT 10
 
@@ -38,7 +40,7 @@ class mafGUI;
 //----------------------------------------------------------------------------
 /**
 */
-class MAF_EXPORT mafLightKit : public mafObserver
+class MAF_EXPORT mafLightKit : public mafObserver, public mafServiceClient
 {
 public:
 	mafLightKit(wxWindow* parent, vtkRenderer *r, mafObserver *Listener = NULL);

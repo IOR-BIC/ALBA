@@ -22,6 +22,8 @@
 //----------------------------------------------------------------------------
 #include "mafObserver.h"
 #include "mafEvent.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -37,7 +39,7 @@ class mafGUI;
 /**
 This component allow to manage surface materials.
 */
-class MAF_EXPORT mafGUIMaterialButton : public mafObserver
+class MAF_EXPORT mafGUIMaterialButton : public mafObserver, public mafServiceClient
 {
 public:
 	mafGUIMaterialButton(mafVME *vme, mafObserver *listener = NULL);

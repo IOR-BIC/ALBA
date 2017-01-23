@@ -158,7 +158,7 @@ void mafOpFillHoles::OpDo()
   ((mafVMESurface*)m_Input)->SetData(m_VTKResult[m_VTKResult.size()-1],m_Input->GetTimeStamp());
   ((mafVMESurface*)m_Input)->Modified();
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpFillHoles::OpUndo()
@@ -167,7 +167,7 @@ void mafOpFillHoles::OpUndo()
 	((mafVMESurface*)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
 	((mafVMESurface*)m_Input)->Modified();
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafOpFillHoles::OnEvent(mafEventBase *maf_event)

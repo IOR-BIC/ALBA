@@ -417,14 +417,14 @@ void mafOpImporterRAWImages::OpDo()
 //----------------------------------------------------------------------------
 {
   assert(m_Output);
-  mafEventMacro(mafEvent(this,VME_ADD,m_Output)); 		  
+  GetLogicManager()->VmeAdd(m_Output);
 }
 //----------------------------------------------------------------------------
 void mafOpImporterRAWImages::OpUndo()
 //----------------------------------------------------------------------------
 {
   assert(m_Output);
-  mafEventMacro(mafEvent(this,VME_REMOVE,m_Output));
+  GetLogicManager()->VmeRemove(m_Output);
 }
 //----------------------------------------------------------------------------
 void mafOpImporterRAWImages::EnableWidgets(bool enable)

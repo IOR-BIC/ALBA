@@ -35,16 +35,8 @@ SET (DRIVERS_SRCS
   itcom.h
   serial.h
   timer.h
-  wsock.c
-  wsock.h
 )
 ENDIF (WIN32)
-
-SET (DRIVERS_SRCS
-  ${DRIVERS_SRCS}
-  ClientUnit.cpp
-  ClientUnit.h  
-  )
 
 IF (WIN32)
 SET (DRIVERS_SRCS
@@ -78,9 +70,6 @@ IF (MAF_USE_WIIMOTE)
   hidpi.h
   hidsdi.h
   hidusage.h
-  #LEDPlayer.h
-  #LEDPlayer.cpp
-  #Resource.h
   setupapi.h
   Utils.h
   Wiimote.h

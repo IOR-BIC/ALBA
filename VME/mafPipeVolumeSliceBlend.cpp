@@ -203,7 +203,6 @@ void mafPipeVolumeSliceBlend::Create(mafSceneNode *n)
   m_Vme->GetOutput()->GetVTKData()->GetScalarRange(sr);
   m_ColorLUT->SetTableRange(sr[0], sr[1]);
   material->UpdateFromTables();
-  //mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 
   if(m_SliceDirection == mafPipeVolumeSlice::SLICE_ARB)
     m_SliceDirection = mafPipeVolumeSlice::SLICE_Z;
@@ -570,14 +569,14 @@ void mafPipeVolumeSliceBlend::OnEvent(mafEventBase *maf_event)
       {
         mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
         material->UpdateFromTables();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     case ID_OPACITY_SLIDER:
       {
         //Event to modify the opacity of the slice at top
         SetSliceOpacity(m_SliceOpacity);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       }
       break;
     default:
@@ -618,7 +617,6 @@ void mafPipeVolumeSliceBlend::SetColorLookupTable(vtkLookupTable *lut)
         m_Texture[j][i]->SetLookupTable(m_CustomColorLUT);
     }
   }
-  //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSliceBlend::Select(bool sel)

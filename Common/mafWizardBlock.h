@@ -22,6 +22,8 @@
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
 #include "mafEvent.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // forward reference
@@ -31,7 +33,7 @@
   Class Name: mafWizardBlock.
   Class for the base wizard block, each block on a wizard must extend this block
 */
-class MAF_EXPORT mafWizardBlock 
+class MAF_EXPORT mafWizardBlock: public mafServiceClient 
 {
 public:
 

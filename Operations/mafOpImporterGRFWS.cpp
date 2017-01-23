@@ -84,9 +84,9 @@ void mafOpImporterGRFWS::OpUndo()
 //----------------------------------------------------------------------------
 {   
   if(m_PlatformLeft != NULL)
-    mafEventMacro(mafEvent(this,VME_REMOVE,m_PlatformLeft));
+    GetLogicManager()->VmeRemove(m_PlatformLeft);
   if(m_PlatformRight != NULL)
-    mafEventMacro(mafEvent(this,VME_REMOVE,m_PlatformRight));
+    GetLogicManager()->VmeRemove(m_PlatformRight);
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpImporterGRFWS::Copy()   

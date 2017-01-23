@@ -239,7 +239,7 @@ void medOpVolumeResample::CreateGizmos()
 		m_GizmoRotate->SetRefSys(m_Input);
 		m_GizmoRotate->SetAbsPose(m_CenterVolumeRefSysMatrix);
 		m_GizmoRotate->Show(false);
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
@@ -350,7 +350,7 @@ void medOpVolumeResample::GizmoDelete()
     cppDEL(m_GizmoROI);
   }	
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 mafOp *medOpVolumeResample::Copy()
@@ -380,7 +380,7 @@ void medOpVolumeResample::OpRun()
 	if(!this->m_TestMode)
 		CreateGui();
 	UpdateGui();
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void medOpVolumeResample::OpDo()
@@ -535,7 +535,7 @@ void medOpVolumeResample::OpUndo()
 //----------------------------------------------------------------------------
 {   
 	assert(m_ResampledVme);
-	mafEventMacro(mafEvent(this,VME_REMOVE,m_ResampledVme));
+	GetLogicManager()->VmeRemove(m_ResampledVme);
 }
 //----------------------------------------------------------------------------
 // Constants :
@@ -721,7 +721,7 @@ void medOpVolumeResample::CreateGui()
 
 	ShowGui();
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void medOpVolumeResample::OnEvent(mafEventBase *maf_event)
@@ -796,14 +796,14 @@ void medOpVolumeResample::OnEventThis(mafEventBase *maf_event)
 		case ID_SHOW_HANDLE:
 			{
 				m_GizmoROI->ShowHandles(m_ShowHandle != 0);
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		case ID_SHOW_GIZMO_TRANSFORM:
 			{
 				m_GizmoRotate->Show(m_ShowGizmoTransform&&(m_GizmoChoose==ID_GIZMO_ROTATE));
 				m_GizmoTranslate->Show(m_ShowGizmoTransform&&(m_GizmoChoose==ID_GIZMO_TRANSLATE));
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 			case ID_VOLUME_ORIENTATION:
@@ -812,7 +812,7 @@ void medOpVolumeResample::OnEventThis(mafEventBase *maf_event)
 
 					UpdateGizmoData(e);
 
-					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 				}
 				break;
 			case ID_VOLUME_ORIGIN:
@@ -830,7 +830,7 @@ void medOpVolumeResample::OnEventThis(mafEventBase *maf_event)
 
 					UpdateGizmoData(e);
 
-					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 				}
 				break;
       case ID_VOLUME_DIR_X:		
@@ -849,7 +849,7 @@ void medOpVolumeResample::OnEventThis(mafEventBase *maf_event)
 					m_VolumeBounds[5] = inputVolumeBBCentre[2] + (m_MaxBoundZ/2);
 					m_GizmoROI->SetBounds(m_VolumeBounds);
 
-					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 				}
 				break;
       case ID_VOLUME_SPACING:
@@ -858,19 +858,19 @@ void medOpVolumeResample::OnEventThis(mafEventBase *maf_event)
         SetBoundsToVMEBounds();
         //UpdateGizmoData();
         UpdateGui();
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_VOLUME_4DBOUNDS:
         SetBoundsToVME4DBounds();
         //UpdateGizmoData();
         UpdateGui();
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_VOLUME_VMELOCALBOUNDS:
         SetBoundsToVMELocalBounds();
         //UpdateGizmoData();
         UpdateGui();
-        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       break;
       case ID_VOLUME_AUTOSPACING:
         AutoSpacing();
@@ -901,7 +901,7 @@ void medOpVolumeResample::OnEventThis(mafEventBase *maf_event)
       p->GetPoint(0,pos);
       UpdateGizmo(handle_id, pos);
       UpdateGui();
-      mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+      GetLogicManager()->CameraUpdate();
 
       }
       break;
@@ -929,7 +929,7 @@ void medOpVolumeResample::OnEventThis(mafEventBase *maf_event)
 						m_GizmoRotate->Show(m_ShowGizmoTransform&&(m_GizmoChoose==ID_GIZMO_ROTATE));
 					}
 
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 				}
 				break;
       default:
@@ -1056,7 +1056,7 @@ void medOpVolumeResample::PostMultiplyEventMatrix(mafEventBase *maf_event)
 
 		m_VMEDummy->SetAbsMatrix(*newAbsMatrBox);
 
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------

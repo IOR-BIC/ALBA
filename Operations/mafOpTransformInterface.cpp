@@ -105,7 +105,7 @@ void mafOpTransformInterface::PostMultiplyEventMatrix(mafEventBase *maf_event)
       // update matrix for OpDo()
       m_NewAbsMatrix = absPose;
     } 
-    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		GetLogicManager()->CameraUpdate();
 
     // clean up
     tr->Delete();
@@ -286,7 +286,7 @@ void mafOpTransformInterface::OpDo()
   
   m_Input->GetOutput()->Update();
 
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -299,6 +299,6 @@ void mafOpTransformInterface::SetRefSysVME(mafVME* refSysVME)
 
   m_RefSysVME = refSysVME;
   RefSysVmeChanged();
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 
 }

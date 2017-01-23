@@ -167,11 +167,11 @@ mafGeometryEditorPolylineGraph::~mafGeometryEditorPolylineGraph()
 void mafGeometryEditorPolylineGraph::Show(bool show)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineEditor,show));
+	GetLogicManager()->VmeShow(m_VMEPolylineEditor, show);
 	if(show==false)
-		mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,show));
+		GetLogicManager()->VmeShow(m_VMEPolylineSelection, show);
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafGeometryEditorPolylineGraph::OnEvent(mafEventBase *maf_event)
@@ -190,7 +190,7 @@ void mafGeometryEditorPolylineGraph::OnEvent(mafEventBase *maf_event)
           vtkMAFSmartPointer<vtkPolyData> poly_new;
           m_PolylineGraph->CopyToPolydata(poly_new);
           UpdateVMEEditorData(poly_new);
-          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
         }
       break;
 			case ID_ACTION:
@@ -223,9 +223,9 @@ void mafGeometryEditorPolylineGraph::OnEvent(mafEventBase *maf_event)
 						m_SelectedPoint = UNDEFINED_POINT_ID;
 						
 						if(!m_TestMode)
-							mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
+							GetLogicManager()->VmeShow(m_VMEPolylineSelection, false);
 
-						mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+						GetLogicManager()->CameraUpdate();
 					}
 					else
 						mafLogMessage("It's impossible to delete a point of degree > 2");
@@ -241,12 +241,11 @@ void mafGeometryEditorPolylineGraph::OnEvent(mafEventBase *maf_event)
 					m_PolylineGraph->CopyToPolydata(poly_new);
 					UpdateVMEEditorData(poly_new);
 
-					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
+					GetLogicManager()->VmeShow(m_VMEPolylineSelection, false);
 
-					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineEditor,false));
-					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineEditor,true));
+					GetLogicManager()->VmeVisualModeChanged(m_VMEPolylineEditor);
 
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					GetLogicManager()->CameraUpdate();
 
 				}
 		default:
@@ -449,7 +448,7 @@ void mafGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 				AddNewVertex(pos);
 
 				if(!m_TestMode)
-					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
+					GetLogicManager()->VmeShow(m_VMEPolylineSelection, false);
 			}
 			else if(m_PointTool==ID_MOVE_POINT)
 			{
@@ -466,8 +465,7 @@ void mafGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
           SelectPoint(vertexCoord);
           if(!m_TestMode)
           {
-            mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
-            mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,true));
+						GetLogicManager()->VmeVisualModeChanged(m_VMEPolylineSelection);
           }
         }
         MovePoint(vertexCoord);
@@ -488,8 +486,7 @@ void mafGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 
 				if(!m_TestMode)
 				{
-					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
-					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,true));
+					GetLogicManager()->VmeVisualModeChanged(m_VMEPolylineSelection);
 				}
 
 				m_Gui->Enable(ID_BUTTON_POINT_DELETE,m_Action==ID_POINT_ACTION && m_SelectedPoint!=UNDEFINED_POINT_ID);
@@ -505,8 +502,7 @@ void mafGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 
         if(!m_TestMode)
         {
-          mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
-          mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,true));
+					GetLogicManager()->VmeVisualModeChanged(m_VMEPolylineSelection);
         }
 
 				//m_Picker->EnableContinuousPicking(true);
@@ -557,7 +553,7 @@ void mafGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 						m_Gui->Update();
 
 						if(!m_TestMode)
-							mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
+							GetLogicManager()->VmeShow(m_VMEPolylineSelection, false);
 					}
 					else
 					{
@@ -567,7 +563,7 @@ void mafGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 			}
 		}
 	}
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 	//mafLogMessage(wxString::Format("current branch %d di %d",m_CurrentBranch,m_PolylineGraph->GetNumberOfBranches()));
 }
 //----------------------------------------------------------------------------
@@ -977,8 +973,7 @@ void mafGeometryEditorPolylineGraph::SelectBranch(double position[3])
 
 	m_SelectedBranch = m_CurrentBranch;
   
-	mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
-	mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,true));
+	GetLogicManager()->VmeVisualModeChanged(m_VMEPolylineSelection);
 }
 //----------------------------------------------------------------------------
 int mafGeometryEditorPolylineGraph::AddBranch(double position[3])

@@ -8,137 +8,76 @@ DBG_MESSAGE("Configuring project mafCore")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  mafAbsMatrixPipe.cpp
-  mafAbsMatrixPipe.h
-  mafAttribute.cpp
-  mafAttribute.h
-  mafAttributeTraceability.cpp
-  mafAttributeTraceability.h
-  mafCoreFactory.cpp
-  mafCoreFactory.h
-  mafDataPipe.cpp
-  mafDataPipe.h
+  mafAbsMatrixPipe.cpp  		mafAbsMatrixPipe.h
+  mafAttribute.cpp  			mafAttribute.h
+  mafAttributeTraceability.cpp  mafAttributeTraceability.h
+  mafCoreFactory.cpp  			mafCoreFactory.h
+  mafDataPipe.cpp  				mafDataPipe.h
   mafExpiration.h
-  mafExpirationDate.cpp
-  mafExpirationDate.h
-  mafEventIO.cpp
-  mafEventIO.h
-  mafMatrixPipe.cpp
-  mafMatrixPipe.h
-  mafVMEIterator.cpp
-  mafVMEIterator.h
-  mafOp.cpp
-  mafOp.h
-  mafOpContextStack.cpp
-  mafOpContextStack.h
-  mafOpManager.cpp
-  mafOpManager.h
-  mafOpSelect.cpp
-  mafOpSelect.h
-  mafOpStack.cpp
-  mafOpStack.h
-  mafPrintSupport.cpp
-  mafPrintSupport.h
-  mmdRemoteFileManager.cpp
-  mmdRemoteFileManager.h
-  mafRemoteLogic.cpp
-  mafRemoteLogic.h
-  mafRemoteStorage.cpp
-  mafRemoteStorage.h
-  mafRoot.cpp
-  mafRoot.h
-  mafTagArray.cpp
-  mafTagArray.h
-  mafTagItem.cpp
-  mafTagItem.h
+  mafExpirationDate.cpp  		mafExpirationDate.h
+  mafEventIO.cpp  				mafEventIO.h
+  mafMatrixPipe.cpp  			mafMatrixPipe.h
+  mafVMEIterator.cpp  			mafVMEIterator.h
+  mafOp.cpp  mafOp.h
+  mafOpContextStack.cpp  		mafOpContextStack.h
+  mafOpManager.cpp  			mafOpManager.h
+  mafOpSelect.cpp  				mafOpSelect.h
+  mafOpStack.cpp  				mafOpStack.h
+  mafPrintSupport.cpp  			mafPrintSupport.h
+  mafRoot.cpp  					mafRoot.h
+  mafTagArray.cpp  				mafTagArray.h
+  mafTagItem.cpp  				mafTagItem.h
   mafTimeMap.h
   mafTimeMapScalar.h
-  mafUser.cpp
-  mafUser.h
-  mafVME.cpp
-  mafVME.h
-  mafVMEManager.cpp
-  mafVMEManager.h
-  mafVMEOutput.cpp
-  mafVMEOutput.h
-  mafVMEOutputNULL.cpp
-  mafVMEOutputNULL.h
-  mafVMERoot.cpp
-  mafVMERoot.h
-  mafVMEStorage.cpp
-  mafVMEStorage.h
-  mmaApplicationLayout.cpp
-  mmaApplicationLayout.h
-  mafGUIListCtrlBitmap.cpp
-  mafGUIListCtrlBitmap.h
-  mafGUIVMEChooser.cpp
-  mafGUIVMEChooser.h
-  mafGUIVMEChooserTree.cpp
-  mafGUIVMEChooserTree.h
-  mmuTimeSet.cpp
-  mmuTimeSet.h
-	mafProgressBarHelper.cpp mafProgressBarHelper.h
+  mafUser.cpp  					mafUser.h
+  mafVME.cpp  					mafVME.h
+  mafVMEManager.cpp  			mafVMEManager.h
+  mafVMEOutput.cpp  			mafVMEOutput.h
+  mafVMEOutputNULL.cpp  		mafVMEOutputNULL.h
+  mafVMERoot.cpp  				mafVMERoot.h
+  mafVMEStorage.cpp  			mafVMEStorage.h
+  mmaApplicationLayout.cpp  	mmaApplicationLayout.h
+  mafGUIListCtrlBitmap.cpp  	mafGUIListCtrlBitmap.h
+  mafGUIVMEChooser.cpp  		mafGUIVMEChooser.h
+  mafGUIVMEChooserTree.cpp  	mafGUIVMEChooserTree.h
+  mmuTimeSet.cpp  				mmuTimeSet.h
+  mafProgressBarHelper.cpp 		mafProgressBarHelper.h
 )
 
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS
   ${PROJECT_SRCS}
-  mafAxes.cpp
-  mafAxes.h
-  mafLODActor.cpp
-  mafLODActor.h
-  mafLogicWithManagers.cpp
-  mafLogicWithManagers.h
-  mafPipe.cpp
-  mafPipe.h
-  mafPipeBox.cpp
-  mafPipeBox.h
-  mafPipeFactory.cpp
-  mafPipeFactory.h
-  mafRWI.cpp
-  mafRWI.h
-  mafRWIBase.cpp
-  mafRWIBase.h
-  mafSceneGraph.cpp
-  mafSceneGraph.h
-  mafSceneNode.cpp
-  mafSceneNode.h
-  mafViewCompound.cpp
-  mafViewCompound.h
-  mafViewHTML.cpp
-  mafViewHTML.h
-  mafViewManager.cpp
-  mafViewManager.h
-  mafViewPlot.cpp
-  mafViewPlot.h
-  mafViewVTK.cpp
-  mafViewVTK.h
-  mmaMaterial.cpp
-  mmaMaterial.h
-  mmaVolumeMaterial.cpp
-  mmaVolumeMaterial.h
-  mafGUIContextualMenu.cpp
-  mafGUIContextualMenu.h
-  mafGUIMaterialButton.cpp
-  mafGUIMaterialButton.h
-  mafGUIMaterialChooser.cpp
-  mafGUIMaterialChooser.h
-  mafGUITreeContextualMenu.cpp
-  mafGUITreeContextualMenu.h
-  vtkMAFAssembly.cpp
-  vtkMAFAssembly.h
+  mafAxes.cpp  					mafAxes.h
+  mafLODActor.cpp  				mafLODActor.h
+  mafLogicWithManagers.cpp  	mafLogicWithManagers.h
+  mafPipe.cpp  					mafPipe.h
+  mafPipeBox.cpp  				mafPipeBox.h
+  mafPipeFactory.cpp  			mafPipeFactory.h
+  mafRWI.cpp  					mafRWI.h
+  mafRWIBase.cpp  				mafRWIBase.h
+  mafSceneGraph.cpp  			mafSceneGraph.h
+  mafSceneNode.cpp  			mafSceneNode.h
+  mafViewCompound.cpp  			mafViewCompound.h
+  mafViewHTML.cpp  				mafViewHTML.h
+  mafViewManager.cpp  			mafViewManager.h
+  mafViewPlot.cpp  				mafViewPlot.h
+  mafViewVTK.cpp  				mafViewVTK.h
+  mmaMaterial.cpp  				mmaMaterial.h
+  mmaVolumeMaterial.cpp  		mmaVolumeMaterial.h
+  mafGUIContextualMenu.cpp  	mafGUIContextualMenu.h
+  mafGUIMaterialButton.cpp  	mafGUIMaterialButton.h
+  mafGUIMaterialChooser.cpp  	mafGUIMaterialChooser.h
+  mafGUITreeContextualMenu.cpp  mafGUITreeContextualMenu.h
+  vtkMAFAssembly.cpp  vtkMAFAssembly.h
   )
 ENDIF (MAF_USE_VTK)
 
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS mafBase mafIO mafGui mafInteraction mafOperations curl)
 
-
 IF (MAF_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)
 ENDIF (MAF_USE_VTK)
-
-
 
 # ------------------------------------
 # Find GTK include Dirs 
@@ -170,3 +109,5 @@ ENDIF (MAF_USE_CRYPTO)
 IF (MAF_USE_CURL)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_CURL_LIBRARY)
 ENDIF (MAF_USE_CURL)
+
+ADD_DEPENDENCIES(${PROJECT_NAME} mafService)

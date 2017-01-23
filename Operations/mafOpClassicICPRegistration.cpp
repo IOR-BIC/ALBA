@@ -232,7 +232,7 @@ void mafOpClassicICPRegistration::OpDo()
 
   m_Registered->SetAbsMatrix(*mat);
   
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+	GetLogicManager()->CameraUpdate();
 
   // modified by Stefano 7-11-2004 (beg)
   // registration error feedback to user

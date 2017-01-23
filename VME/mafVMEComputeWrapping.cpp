@@ -5521,7 +5521,7 @@ void medVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
 				//InternalUpdate();
 
 				InternalUpdate();
-				ForwardUpEvent(&mafEvent(this,CAMERA_RESET));
+				GetLogicManager()->CameraReset();
 				ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
 
 				m_Gui->Update();

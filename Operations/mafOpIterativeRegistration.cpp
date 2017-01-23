@@ -262,7 +262,7 @@ void mafOpIterativeRegistration::OnRegister(mafEventBase *maf_event)
   m_GuiLandmark[SOURCE]->SetGUIStatusToPick();
   m_GuiLandmark[TARGET]->SpawnLMOn();
   m_GuiLandmark[TARGET]->SetGUIStatusToPick();    
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE)); 
+	GetLogicManager()->CameraUpdate();
 }
 
 void mafOpIterativeRegistration::OnEventThis(mafEventBase *maf_event)

@@ -140,7 +140,7 @@ void mafPipeVolumeSliceNotInterpolated::OnEvent(mafEventBase * event)
     case ID_LUT:
       {
         SetLut(m_VolumeLUT);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       } break;
     case ID_AXIS:
       {
@@ -150,14 +150,14 @@ void mafPipeVolumeSliceNotInterpolated::OnEvent(mafEventBase * event)
         m_Gui->Update();
         // set the origin and update slicer pipeline
         SetSlice();
-        mafEventMacro(mafEvent(this,CAMERA_RESET));
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        GetLogicManager()->CameraReset();
+				GetLogicManager()->CameraUpdate();
       } break;
     case ID_SLICE:
       {
         // set the origin and update slicer pipeline
         SetSlice();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				GetLogicManager()->CameraUpdate();
       } break;
     default:
       {

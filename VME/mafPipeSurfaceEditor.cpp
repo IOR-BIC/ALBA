@@ -160,7 +160,7 @@ void mafPipeSurfaceEditor::OnEvent(mafEventBase *maf_event)
 			//m_Mapper->SetLookupTable(m_LUT);
 			m_Mapper->SetScalarRange(range);
 			m_Mapper->Update();
-			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+			GetLogicManager()->CameraUpdate();
 		}
 	}
 }
