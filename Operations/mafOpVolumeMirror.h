@@ -63,19 +63,35 @@ public:
 	/** Makes the undo for the operation. */
   void OpUndo();
 
+
+	/** Returns MirrorX */
+	int GetMirrorX() const { return m_MirrorX; }
+
+	/** Sets MirrorX */
+	void SetMirrorX(int mirrorX) { m_MirrorX = mirrorX; }
+	
+	/** Returns MirrorY */
+	int GetMirrorY() const { return m_MirrorY; }
+
+	/** Sets MirrorY */
+	void SetMirrorY(int mirrorY) { m_MirrorY = mirrorY; }
+	
+	/** Returns MirrorZ */
+	int GetMirrorZ() const { return m_MirrorZ; }
+
+	/** Sets MirrorZ */
+	void SetMirrorZ(int mirrorZ) { m_MirrorZ = mirrorZ; }
+
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);
 
 	/** Makes the Preview for the mirror. */
 	void Preview();  
-
 	
 	vtkImageData	*m_OutputImageData;
 	vtkImageData	*m_InputImageData;
-
 	
-
 	int		m_MirrorX;
 	int		m_MirrorY;
 	int		m_MirrorZ;
