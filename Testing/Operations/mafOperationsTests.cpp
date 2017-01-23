@@ -125,6 +125,7 @@
 #include "mafOpSplitSurfaceTest.h"
 #include "mafOpSubdivideTest.h"
 #include "mafOpSurfaceMirrorTest.h"
+#include "mafOpVolumeMirrorTest.h"
 #include "mafOpTransformInterfaceTest.h"
 #include "mafOpTransformTest.h"
 #include "mafOpTriangulateSurfaceTest.h"
@@ -287,6 +288,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpSmoothSurfaceTest::suite());
 	runner.addTest(mafOpTriangulateSurfaceTest::suite());
 	runner.addTest(mafOpSurfaceMirrorTest::suite());
+	runner.addTest(mafOpVolumeMirrorTest::suite());
 	runner.addTest(medOpImporterVTKTest::suite());
 	runner.addTest(mafOpExporterMetersTest::suite());
 	runner.addTest(mafOpSubdivideTest::suite());
