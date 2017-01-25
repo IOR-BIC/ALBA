@@ -389,7 +389,6 @@ std::string  mafIdString(int id)
      case VME_SELECTED:	        s="VME_SELECTED"; break;
      case VME_DCLICKED:         s="VME_DCLICKED"; break;
      case VME_TRANSFORM:	      s="VME_TRANSFORM"; break; 
-     case VME_MODIFIED:	        s="VME_MODIFIED"; break; 
      case VME_CHOOSE:						s="VME_CHOOSE"; break; 
      case VME_REF_SYS_CHOOSED:  s="VME_REF_SYS_CHOOSED"; break;
      case VME_FEM_DATA_CHOOSED: s="VME_FEM_DATA_CHOOSED"; break;

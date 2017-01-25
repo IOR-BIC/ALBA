@@ -705,8 +705,8 @@ void mafVME::SetCrypting(int crypting)
   }
 
   Modified();
-  mafEvent ev(this,VME_MODIFIED,this);
-  ForwardUpEvent(ev);
+
+	GetLogicManager()->VmeModified(this);
 }
 
 //-------------------------------------------------------------------------
@@ -1127,8 +1127,8 @@ void mafVME::SetName(const char *name)
 {
 	m_GuiName=m_Name=name; // force string copy
 	Modified();
-	mafEvent ev(this, VME_MODIFIED, this);
-	ForwardUpEvent(ev);
+
+	GetLogicManager()->VmeModified(this);
 }
 
 //-------------------------------------------------------------------------

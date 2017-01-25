@@ -167,7 +167,6 @@ EVT_START,
   VME_DCLICKED,  // from mafInteractorPER issued to infor logic that a double click has been done on a VME.
   VME_SELECTED,  // from mafOpSelect
   VME_TRANSFORM, // from mafISV to mafLogic
-  VME_MODIFIED,  // from a generic mafOp to mafLogic (to be removed Marco)
   VME_CHOOSE,    // from a mafOp to receive more operands
   VME_PICKED,    // used sent to the listener a vtkPoint positioned at the picked position
   VME_PICKING,   // same as above, but send point position in continuous configuration (at each mouse motion)

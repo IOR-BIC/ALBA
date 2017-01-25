@@ -31,6 +31,8 @@
 #include "mafGUIWizardPageTest.h"
 #include "mafGUILandmarkTest.h"
 #include "mafGUIWizardPageNewTest.h"
+#include "mafFakeLogicForTest.h"
+#include "mafServiceLocator.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -39,7 +41,6 @@
 #include <cppunit/TestRunner.h>
 #include "vtkFileOutputWindow.h"
 #include "vtkMAFSmartPointer.h"
-
 
 //Main Test Executor
 int main( int argc, char* argv[] )
@@ -61,7 +62,10 @@ int main( int argc, char* argv[] )
 	// Add a listener that print dots as test run.
 	CPPUNIT_NS::BriefTestProgressListener progress;
 	controller.addListener( &progress );      
-
+	
+	mafFakeLogicForTest *logic = new mafFakeLogicForTest();
+	mafServiceLocator::SetLogicManager(logic);
+	
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
 
@@ -78,6 +82,8 @@ int main( int argc, char* argv[] )
 	// Print test in a compiler compatible format.
 	CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
 	outputter.write(); 
+
+	cppDEL(logic);
 
 	return result.wasSuccessful() ? 0 : 1;
 }

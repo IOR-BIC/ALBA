@@ -190,7 +190,8 @@ void mafOpApplyTrajectory::OpUndo()
   }
 
   oldVme->Modified();
-  mafEventMacro(mafEvent(this, VME_MODIFIED, m_Input));
+ 
+	GetLogicManager()->VmeModified(m_Input);
 	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
@@ -312,7 +313,7 @@ int mafOpApplyTrajectory::Read()
 
   } while (!inputFile.Eof());
 
-  mafEventMacro(mafEvent(this, VME_MODIFIED, m_Input));
+  GetLogicManager()->VmeModified(m_Input);
 	GetLogicManager()->CameraUpdate();
 
   return MAF_OK;
@@ -345,7 +346,7 @@ int mafOpApplyTrajectory::ApplyTrajectoriesFromVME()
     m_Input->SetAbsMatrix(boxPose, time);
   }
 
-  mafEventMacro(mafEvent(this, VME_MODIFIED, m_Input));
+  GetLogicManager()->VmeModified(m_Input);
 	GetLogicManager()->CameraUpdate();
   return MAF_OK;
 }

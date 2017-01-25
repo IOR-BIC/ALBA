@@ -307,7 +307,7 @@ protected:
 	/* Called from VmeShow to show landmarks*/
 	void ShowLandmark(mafVMELandmark * lm, bool visibility);
 
-	/** Respond to a VME_Modified evt.*/
+	/** Respond to a vme Modified evt.*/
 	virtual void VmeModified(mafVME *vme);
 
 	/** Add a new vme to the tree. */

@@ -54,6 +54,12 @@ void mafFakeLogicForTest::VmeRemove(mafVME *vme)
 	vme->ReparentTo(NULL);
 }
 //-------------------------------------------------------------------------
+void mafFakeLogicForTest::VmeModified(mafVME* vme)
+{
+	AddCall(mafFakeLogicForTest::VME_MODIFIED, vme);
+}
+
+//-------------------------------------------------------------------------
 void mafFakeLogicForTest::VmeVisualModeChanged(mafVME * vme)
 {
 	AddCall(mafFakeLogicForTest::VME_VISUAL_MODE_CHANGED, vme);

@@ -244,7 +244,8 @@ void mafOpVOIDensityEditor::EditVolumeScalars()
   }
 
   m_Input->GetOutput()->Update();
-  mafEventMacro(mafEvent(this, VME_MODIFIED, m_Input));
+  
+	GetLogicManager()->VmeModified(m_Input);
 	GetLogicManager()->CameraUpdate();
 }
 
