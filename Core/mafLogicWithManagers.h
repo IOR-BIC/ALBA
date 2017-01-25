@@ -295,7 +295,7 @@ protected:
 
 	/** Respond to a VME_DCLICKED evt. Manage the 'Double click' on Selected VME. */
 	virtual void VmeDoubleClicked(mafEvent &e);
-	/** Respond to a VME_SHOW evt. Show/Hide the vme. */
+	/** Show/Hide the vme. */
 	virtual void VmeShow(mafVME *vme, bool visibility);
 
 	/** Called from VmeShow to show a LM cloud */

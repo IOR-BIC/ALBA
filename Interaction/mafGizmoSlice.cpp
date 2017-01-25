@@ -602,7 +602,6 @@ void mafGizmoSlice::Show(bool show)
 
   // can not use this since it's too slow... this requires destroying and creating
   // the pipeline each time...
-  // mafEventMacro(mafEvent(this,VME_SHOW,m_VmeGizmo,show));
   
   // ... instead I am using vtk opacity to speed up the render
   double opacity = show ? 1 : 0;

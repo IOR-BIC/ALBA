@@ -168,7 +168,6 @@ EVT_START,
   VME_SELECT,    // from mafGUITree or mafISV - run mafOpSelect
   VME_DCLICKED,  // from mafInteractorPER issued to infor logic that a double click has been done on a VME.
   VME_SELECTED,  // from mafOpSelect
-  VME_SHOW,      // from a vme property panel
   VME_TRANSFORM, // from mafISV to mafLogic
   VME_MODIFIED,  // from a generic mafOp to mafLogic (to be removed Marco)
   VME_CHOOSE,    // from a mafOp to receive more operands

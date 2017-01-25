@@ -573,9 +573,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			case VME_DCLICKED:
 				VmeDoubleClicked(*e);
 				break;
-			case VME_SHOW:
-				VmeShow(e->GetVme(), e->GetBool());
-				break;
 			case VME_MODIFIED:
 				VmeModified(e->GetVme());
 				break;

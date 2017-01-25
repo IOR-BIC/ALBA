@@ -547,10 +547,11 @@ void mafOpManager::OpRun(mafOp *op, void *op_param)
       synthetic_vme->SetName(synthetic_name);
       ti = synthetic_vme->GetTagArray()->GetTag("VME_NATURE");
       ti->SetValue("SYNTHETIC");
-      mafEventMacro(mafEvent(this,VME_SHOW,m_Selected,false));
+
+			GetLogicManager()->VmeShow(m_Selected, false);
       m_NaturalNode = m_Selected;
       OpSelect(synthetic_vme);
-      mafEventMacro(mafEvent(this,VME_SHOW,synthetic_vme,true));
+			GetLogicManager()->VmeShow(synthetic_vme, true);
     }
     else
     {
@@ -692,7 +693,7 @@ void mafOpManager::OpRunCancel(mafOp *op)
   {
     m_Selected->ReparentTo(NULL);
     OpSelect(m_NaturalNode);
-    mafEventMacro(mafEvent(this,VME_SHOW,m_NaturalNode,true));
+		GetLogicManager()->VmeShow(m_NaturalNode, true);
     m_NaturalNode = NULL;
   }
 

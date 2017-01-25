@@ -56,6 +56,8 @@
 #include "vtkDataSetMapper.h"
 #include "vtkLineSource.h"
 #include "vtkPlaneSource.h"
+#include "mafServiceLocator.h"
+#include "mafFakeLogicForTest.h"
 
 void mafGizmoTranslatePlaneTest::BeforeTest()
 {
@@ -226,7 +228,10 @@ void mafGizmoTranslatePlaneTest::TestShow()
  
   gizmoTranslatePlane->Show(true);
   
-  CPPUNIT_ASSERT(listener->GetEvent()->GetId() == VME_SHOW);
+	mafFakeLogicForTest *logic = (mafFakeLogicForTest*)mafServiceLocator::GetLogicManager();
+	logic->ClearCalls();
+	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_SHOW);
+
   CPPUNIT_ASSERT(listener->GetEvent()->GetSender() == gizmoTranslatePlane);
 
   cppDEL(gizmoTranslatePlane);

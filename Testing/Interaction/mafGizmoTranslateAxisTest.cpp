@@ -54,6 +54,8 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkDataSetMapper.h"
+#include "mafServiceLocator.h"
+#include "mafFakeLogicForTest.h"
 
 
 
@@ -236,7 +238,10 @@ void mafGizmoTranslateAxisTest::TestShow()
  
   gizmoTranslateAxis->Show(true);
   
-  CPPUNIT_ASSERT(listener->GetEvent()->GetId() == VME_SHOW);
+	mafFakeLogicForTest *logic = (mafFakeLogicForTest*)mafServiceLocator::GetLogicManager();
+	logic->ClearCalls();
+	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_SHOW);
+
   CPPUNIT_ASSERT(listener->GetEvent()->GetSender() == gizmoTranslateAxis);
 
   cppDEL(gizmoTranslateAxis);

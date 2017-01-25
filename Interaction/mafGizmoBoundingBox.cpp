@@ -126,7 +126,7 @@ void mafGizmoBoundingBox::SetColor(double colR, double colG, double colB)
 void mafGizmoBoundingBox::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  // use VTK opacity instead of VME_SHOW to speed up the render
+  // use VTK opacity instead of vme show to speed up the render
   float opacity = show ? 1 : 0;
   m_BoxGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
 }
