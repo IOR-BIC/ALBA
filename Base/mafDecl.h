@@ -161,7 +161,6 @@ EVT_START,
   PROGRESSBAR_SET_VALUE, 
   PROGRESSBAR_SET_TEXT, 
   // events about vme
-  VME_ADD,       // from a generic mafOp to mafLogic  (to be removed Marco)
   VME_ADDED,     // from mafVmeManager to mafLogic (to be removed Marco)
   VME_REMOVE,    // from a generic mafOp to mafLogic (to be removed Marco)
   VME_REMOVING,  // from mafVmeManager to mafLogic 

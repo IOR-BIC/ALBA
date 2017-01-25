@@ -310,7 +310,7 @@ protected:
 	/** Respond to a VME_Modified evt.*/
 	virtual void VmeModified(mafVME *vme);
 
-	/** Respond to a VME_ADD evt. Add a new vme to the tree. */
+	/** Add a new vme to the tree. */
 	virtual void VmeAdd(mafVME *vme);
 	/** Respond to a VME_ADDED evt. propagate evt. to SideBar,ViewManager,ecc.. */
 	virtual void VmeAdded(mafVME *vme);

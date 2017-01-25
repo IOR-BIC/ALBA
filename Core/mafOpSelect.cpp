@@ -340,7 +340,6 @@ void mafOpCut::OpUndo()
 //----------------------------------------------------------------------------
 /**
 Move the vme in the Clipboard under it's old parent
-send a VME_ADD
 Restore the Clipboard
 Restore the Selection
 */
@@ -464,7 +463,7 @@ of Paste is a little different than usual.
 Paste make a copy of the object on the clipboard,
 but place in the scene the original and keep the copy in the clipboard.
 
-Them a VME_ADD is sent, selection is not changed
+Them a vme is added, selection is not changed
 */
 {
 	m_PastedVme = GetClipboard();

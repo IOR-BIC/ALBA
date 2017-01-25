@@ -383,7 +383,6 @@ std::string  mafIdString(int id)
      case UPDATE_UI:	          s="UPDATE_UI"; break; 
      case UPDATE_PROPERTY:      s="UPDATE_PROPERTY"; break; 
 
-     case VME_ADD:	            s="VME_ADD"; break; 
      case VME_ADDED:	          s="VME_ADDED"; break; 
      case VME_REMOVE:	          s="VME_REMOVE"; break; 
      case VME_REMOVING:	        s="VME_REMOVING"; break; 
