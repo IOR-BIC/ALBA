@@ -248,7 +248,6 @@ void mafOpCut::OpDo()
 //----------------------------------------------------------------------------
 /**
 backup the clipboard
-Send a VME_REMOVE for the selected vme
 Move (doesn't make a copy) the selected vme (and it's subtree) in the Clipboard
 Select the vme parent
 */

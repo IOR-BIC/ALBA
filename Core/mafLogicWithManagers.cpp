@@ -579,9 +579,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			case VME_ADDED:
 				VmeAdded(e->GetVme());
 				break;
- 			case VME_REMOVE:
-// 				VmeRemove(e->GetVme());
-				break;
 			case VME_REMOVING:
 				VmeRemoving(e->GetVme());
 				break;

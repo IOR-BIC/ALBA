@@ -314,7 +314,7 @@ protected:
 	virtual void VmeAdd(mafVME *vme);
 	/** Respond to a VME_ADDED evt. propagate evt. to SideBar,ViewManager,ecc.. */
 	virtual void VmeAdded(mafVME *vme);
-	/** Respond to a VME_REMOVE evt. Remove a vme from the tree. */
+	/** Remove a vme from the tree. */
 	virtual void VmeRemove(mafVME *vme);
 	/** Respond to a VME_REMOVING evt. propagate evt. to SideBar,ViewManager,ecc.. */
 	virtual void VmeRemoving(mafVME *vme);

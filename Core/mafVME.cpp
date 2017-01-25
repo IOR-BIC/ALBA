@@ -1027,8 +1027,9 @@ void mafVME::SetVisualMode(int mode)
   if (m_VisualMode != mode)
   {
     m_VisualMode = mode;
-    mafEvent updateModalityEvent(this, VME_VISUAL_MODE_CHANGED, this);
-    NodeOnEvent(&updateModalityEvent);
+// 		mafEvent updateModalityEvent(this, VME_VISUAL_MODE_CHANGED, this);
+// 		NodeOnEvent(&updateModalityEvent);
+		GetLogicManager()->VmeVisualModeChanged(this);
   }
 }
 

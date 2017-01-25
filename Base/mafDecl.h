@@ -172,7 +172,6 @@ EVT_START,
   VME_CHOOSE,    // from a mafOp to receive more operands
   VME_PICKED,    // used sent to the listener a vtkPoint positioned at the picked position
   VME_PICKING,   // same as above, but send point position in continuous configuration (at each mouse motion)
-  VME_VISUAL_MODE_CHANGED, // event sent from the VME when someone change its visual mode
   VME_CHOOSE_MATERIAL,
   VME_CHOOSE_TRANSFER_FUNCTION,
   VME_CHOOSE_FEM_PROPERTY,

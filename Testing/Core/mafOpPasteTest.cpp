@@ -113,7 +113,6 @@ void mafOpPasteTest::TestOpUndo()
   CPPUNIT_ASSERT(m_OpPaste->GetClipboard() == groupChild);
 //   CPPUNIT_ASSERT(observer->GetEvent(0)->GetSender()==m_OpPaste);
 //   CPPUNIT_ASSERT(observer->GetEvent(0)->GetVme()==groupChild);
-//   CPPUNIT_ASSERT(observer->GetEvent(0)->GetId()==VME_REMOVE);
 
 	CPPUNIT_ASSERT(logic->GetCall(0).vme == groupChild);
 	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_REMOVE);
