@@ -162,7 +162,6 @@ EVT_START,
   PROGRESSBAR_SET_TEXT, 
   // events about vme
   VME_ADDED,     // from mafVmeManager to mafLogic (to be removed Marco)
-  VME_REMOVE,    // from a generic mafOp to mafLogic (to be removed Marco)
   VME_REMOVING,  // from mafVmeManager to mafLogic 
   VME_SELECT,    // from mafGUITree or mafISV - run mafOpSelect
   VME_DCLICKED,  // from mafInteractorPER issued to infor logic that a double click has been done on a VME.
