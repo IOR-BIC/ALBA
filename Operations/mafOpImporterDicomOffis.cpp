@@ -791,7 +791,7 @@ mafDicomSlice *mafOpImporterDicomOffis::ReadDicomSlice(mafString fileName)
 	//Read Cine MR related stuff
 	dicomDataset->findAndGetLongInt(DCM_InstanceNumber,dcmInstanceNumber);
 	dicomDataset->findAndGetFloat64(DCM_TriggerTime,dcmTriggerTime);
-	if (dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages, dcmCardiacNumberOfImages).bad())
+	if (dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages, dcmCardiacNumberOfImages).bad() || dcmCardiacNumberOfImages < 1)
 		dcmCardiacNumberOfImages = 1;
 	
 	//Read slice 
