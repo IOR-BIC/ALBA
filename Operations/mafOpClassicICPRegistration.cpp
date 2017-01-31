@@ -42,6 +42,7 @@
 #include "vtkTransform.h"
 #include "mafVMERoot.h"
 #include "mafClassicICPRegistration.h"
+#include "vtkTransformPolyDataFilter.h"
 
 //----------------------------------------------------------------------------
 mafOpClassicICPRegistration::mafOpClassicICPRegistration(wxString label) :
@@ -174,17 +175,31 @@ void mafOpClassicICPRegistration::OpDo()
 	m_Input->GetOutput()->Update();
   
 
-	mafSmartPointer<mafMatrix> icp_matrix;  
+	mafSmartPointer<mafMatrix> icp_matrix;
 	mafSmartPointer<mafMatrix> final_matrix;
-  mafSmartPointer<mafMatrix> target_matrix;
-  m_Target->GetOutput()->GetAbsMatrix(*target_matrix,m_Target->GetTimeStamp());
+
+	vtkMAFSmartPointer<vtkTransform> inputTra,targetTra;
+	vtkMAFSmartPointer<vtkTransformPolyDataFilter> inputTraFilter,targetTraFilter;
+	
+	mafMatrix *inputMatr = m_Input->GetOutput()->GetAbsMatrix();
+	inputTra->SetMatrix(inputMatr->GetVTKMatrix());
+	inputTraFilter->SetInput((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
+	inputTraFilter->SetTransform(inputTra);
+	inputTraFilter->Update();
+	
+	mafMatrix *targetMatr = m_Target->GetOutput()->GetAbsMatrix();
+	targetTra->SetMatrix(targetMatr->GetVTKMatrix());
+	targetTraFilter->SetInput((vtkPolyData *)m_Target->GetOutput()->GetVTKData());
+	targetTraFilter->SetTransform(targetTra);
+	targetTraFilter->Update();
+
 	
 
 	vtkMAFSmartPointer<mafClassicICPRegistration> icp; //to be deleted 
 	//mafProgressMacro(icp,"classic ICP - registering");
 	icp->SetConvergence(m_Convergence);
-	icp->SetSource(m_Input->GetOutput()->GetVTKData());
-	icp->SetTarget(m_Target->GetOutput()->GetVTKData());
+	icp->SetSource(inputTraFilter->GetOutput());
+	icp->SetTarget(targetTraFilter->GetOutput());
 	icp->SetResultsFileName(m_ReportFilename.GetCStr());
 	icp->SaveResultsOn();
 	icp->Update();
@@ -194,7 +209,7 @@ void mafOpClassicICPRegistration::OpDo()
    //modified by Stefano 7-11-2004
   double error = icp->GetRegistrationError();
 
-	target_matrix->Multiply4x4(*target_matrix, *icp_matrix, *final_matrix);
+	mafMatrix::Multiply4x4(*icp_matrix, *inputMatr, *final_matrix);
 
   wxString name = wxString::Format(_("%s registered on %s"),m_Input->GetName(), m_Target->GetName());
 
@@ -211,31 +226,13 @@ void mafOpClassicICPRegistration::OpDo()
      m_Registered->Update();
    }
   m_Registered->SetName(name);
-	m_Registered->ReparentTo(m_Target->GetParent());
-	m_Registered->SetMatrix(*final_matrix);
+	m_Registered->ReparentTo(m_Input);
+	m_Registered->SetAbsMatrix(*final_matrix);
 
 	m_Output = m_Registered;
 
-	m_Registered->ReparentTo(m_Input);
-
-  mafVME *sourceVME = m_Input;
-
-  vtkMAFSmartPointer<vtkTransform> sourceABSPoseInverseTr;
-  sourceABSPoseInverseTr->PostMultiply();
-  sourceABSPoseInverseTr->SetMatrix((sourceVME->GetAbsMatrixPipe()->GetMatrix()).GetVTKMatrix());
-  sourceABSPoseInverseTr->Inverse();
-  sourceABSPoseInverseTr->PreMultiply();
-  sourceABSPoseInverseTr->Concatenate((m_Registered->GetAbsMatrixPipe()->GetMatrix()).GetVTKMatrix());
-  
-  mafSmartPointer<mafMatrix> mat;
-  mat->SetVTKMatrix(sourceABSPoseInverseTr->GetMatrix());
-
-  m_Registered->SetAbsMatrix(*mat);
-  
 	GetLogicManager()->CameraUpdate();
 
-  // modified by Stefano 7-11-2004 (beg)
-  // registration error feedback to user
   wxString regString;
   regString = _("Registration done!");
   regString << '\n';
