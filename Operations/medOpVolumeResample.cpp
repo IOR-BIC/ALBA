@@ -522,8 +522,7 @@ void medOpVolumeResample::Resample()
       }
     }
   }
-	mafMatrix identity;
-	m_ResampledVme->SetMatrix(identity);
+	m_ResampledVme->SetAbsMatrix(*m_Input->GetOutput()->GetAbsMatrix());
 	m_Output = m_ResampledVme;
 
   std::ostringstream stringStream;
