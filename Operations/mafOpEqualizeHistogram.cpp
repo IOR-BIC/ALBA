@@ -29,7 +29,7 @@
 #include "mafGUIDialog.h"
 #include "mafGUIHistogramWidget.h"
 #include "mafVMEVolumeGray.h"
-#include "medOpVolumeResample.h"
+#include "mafOpVolumeResample.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFHistogram.h"
@@ -121,7 +121,7 @@ void mafOpEqualizeHistogram::OpRun()
       return;
     }
     wxBusyInfo wait_info1("Resampling...");
-    medOpVolumeResample *op = new medOpVolumeResample();
+    mafOpVolumeResample *op = new mafOpVolumeResample();
     op->SetInput(m_VolumeInput);
     op->TestModeOn();
     op->OpRun();

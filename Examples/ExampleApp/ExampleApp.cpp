@@ -104,7 +104,7 @@
 #include "mafOpFilterSurface.h"
 #include "mafOpFilterVolume.h"
 #include "mafOpMAFTransform.h"
-#include "medOpVolumeResample.h"
+#include "mafOpVolumeResample.h"
 #include "mafOpDecimateSurface.h"
 #include "mafOpConnectivitySurface.h"
 #include "mafOpBooleanSurface.h"
@@ -322,7 +322,7 @@ bool ExampleApp::OnInit()
 	m_Logic->Plug(new mafOpEditNormals("Edit Normals"),_("Modify"));
 	m_Logic->Plug(new mafOpEditMetadata("Metadata Editor"),_("Modify"));
 	m_Logic->Plug(new mafOpMAFTransform("Transform"),_("Modify"));
-	m_Logic->Plug(new medOpVolumeResample("Resample Volume"),_("Modify"));
+	m_Logic->Plug(new mafOpVolumeResample("Resample Volume"),_("Modify"));
 	m_Logic->Plug(new mafOpCrop("Crop Volume"),_("Modify"));
 	m_Logic->Plug(new mafOpBooleanSurface("Boolean Surface"),_("Modify"));
 	m_Logic->Plug(new mafOpMML("MML"),_("Modify"));

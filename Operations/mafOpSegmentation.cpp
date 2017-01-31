@@ -99,7 +99,7 @@
 #include "mafInteractorPERBrushFeedback.h"
 #include "mafVMEItemVTK.h"
 #include "mafTransformFrame.h"
-#include "medOpVolumeResample.h"
+#include "mafOpVolumeResample.h"
 #include "mafViewSliceNotInterpolated.h"
 #include "mafTagItem.h"
 #include "mafVME.h"

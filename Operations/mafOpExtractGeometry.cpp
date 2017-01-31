@@ -35,7 +35,7 @@
 #include "mafVMESurface.h"
 #include "mafVMEVolumeGray.h"
 
-#include "medOpVolumeResample.h"
+#include "mafOpVolumeResample.h"
 
 #include "vtkStructuredPoints.h"
 #include "vtkCleanPolyData.h"
@@ -279,7 +279,7 @@ void mafOpExtractGeometry::CreateResampleGui()
   m_ResampleGui->Label( _("Resample volume"), true );
   m_ResampleGui->Label( _("Volume Spacing") ,false );
 
-  medOpVolumeResample *op = new medOpVolumeResample();
+  mafOpVolumeResample *op = new mafOpVolumeResample();
   op->SetInput(m_VolumeInput);
   op->TestModeOn();
   op->AutoSpacing();
@@ -715,7 +715,7 @@ int mafOpExtractGeometry::Resample()
   }
   
   wxBusyInfo wait_info1("Resampling...");
-  medOpVolumeResample *op = new medOpVolumeResample();
+  mafOpVolumeResample *op = new mafOpVolumeResample();
   op->SetInput(m_VolumeInput);
   op->TestModeOn();
   op->OpRun();

@@ -44,7 +44,7 @@
 #include "itkConnectedThresholdImageFilter.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkImageToStructuredPoints.h"
-#include "medOpVolumeResample.h"
+#include "mafOpVolumeResample.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkMAFVolumeToClosedSmoothSurface.h"
 
@@ -482,14 +482,14 @@ int mafOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
     wxBusyInfo *info;
     wxBusyCursor *wait;
 
-    m_Resample=new medOpVolumeResample();
+    m_Resample=new mafOpVolumeResample();
     m_Resample->SetInput(m_Input);
     m_Resample->TestModeOn();
     m_Resample->AutoSpacing();
     m_Resample->GetSpacing(m_VolumeSpacing);
       
     m_Input->GetOutput()->GetVMELocalBounds(m_VolumeBounds);
-    m_Resample->SetBounds(m_VolumeBounds,medOpVolumeResample::CUSTOMBOUNDS);
+    m_Resample->SetBounds(m_VolumeBounds,mafOpVolumeResample::CUSTOMBOUNDS);
           
     if (!CheckSpacing())
     {
