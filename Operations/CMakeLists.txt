@@ -48,7 +48,6 @@ IF (MAF_USE_VTK)
 	mafOpImporterSTL.cpp	  		  		mafOpImporterSTL.h
 	mafOpTransformInterface.cpp	    	mafOpTransformInterface.h
 	mafOpValidateTree.cpp	    				mafOpValidateTree.h
-	mafOpVolumeResample.cpp	    			mafOpVolumeResample.h
 	mafOpVOIDensity.cpp	    					mafOpVOIDensity.h
 	mafOpVOIDensityEditor.cpp		    	mafOpVOIDensityEditor.h
 	mafOpImporterVRML.cpp	  		  		mafOpImporterVRML.h
@@ -99,7 +98,7 @@ IF (MAF_USE_VTK)
 	mafOpCropDeformableROI.cpp	mafOpCropDeformableROI.h
 	mafOpFlipNormals.cpp		mafOpFlipNormals.h
 	mafOpExtrusionHoles.cpp		mafOpExtrusionHoles.h
-	medOpVolumeResample.cpp		medOpVolumeResample.h
+	mafOpVolumeResample.cpp		mafOpVolumeResample.h
 	mafOpSplitSurface.cpp		mafOpSplitSurface.h
 	mafOpInteractiveClipSurface.cpp	mafOpInteractiveClipSurface.h
 	mafOpCreateEditSkeleton.cpp	mafOpCreateEditSkeleton.h

@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafOpVolumeResampleTest
- Authors: Matteo Giacomoni
+ Authors: Stefano Perticoni
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -25,338 +25,166 @@
 
 #include <cppunit/config/SourcePrefix.h>
 #include "mafOpVolumeResampleTest.h"
+
 #include "mafOpVolumeResample.h"
+// log facilities
+typedef mafOpVolumeResample movr;
 
 #include "mafString.h"
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 #include "mafVMEVolumeGray.h"
-#include "mafOpImporterVTK.h"
+#include "medOpImporterVTK.h"
 
 #include "mafSmartPointer.h"
-#include "vtkMAFSmartPointer.h"
+#include "mafAbsMatrixPipe.h"
 
+#include "vtkMAFSmartPointer.h"
 #include "vtkDataSet.h"
 #include "vtkStructuredPoints.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkDataSetWriter.h"
+#include "vtkTransform.h"
+#include "vtkDataArray.h"
 
-enum BOUNDS
-{
-	ID_VME4DBOUNDS = 0,
-	ID_VMELOCALBOUNDS,
-	ID_VMEBOUNDS,
-	ID_PERSONALBOUNDS,
-};
+using namespace std;
 
-//----------------------------------------------------------------------------
-void mafOpVolumeResampleTest::TestBase()
-//----------------------------------------------------------------------------
+
+void mafOpVolumeResampleTest::TestSetBounds()
 {
-	//Inizialize Storage
-	mafVMEStorage *storage = mafVMEStorage::New();
+  const char *inFileName = "volumeRG_dim_10_10_10_bounds_m5_5_m5_5_m5_5.vtk";
+
+  const char *outVTKFileName = "resampled_volumeRG_dim_10_10_10_bounds_m5_5_m5_5_m5_5.vtk";
+
+  TestResampleInternal(inFileName,  outVTKFileName );
+  
+}
+
+void mafOpVolumeResampleTest::TestResample()
+{
+  const char * inFileName= "volumeRG_dim_10_10_10_bounds_1_10_1_10_1_10.vtk";
+
+  const char * outVTKFileName= "resampled_volumeRG_dim_10_10_10_bounds_1_10_1_10_1_10.vtk";
+
+  TestResampleInternal(inFileName,  outVTKFileName );
+
+}
+
+
+void mafOpVolumeResampleTest::TestResampleInternal( const char *inFileName, const char *outVTKFileName )
+{
+  mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
-	//Import volume
-	mafOpImporterVTK *importerVTK=new mafOpImporterVTK("importerVTK");
-	importerVTK->TestModeOn();
-  importerVTK->SetInput(storage->GetRoot());
-	mafString filename=MAF_DATA_ROOT;
-	filename<<"/Test_VolumeResample/volume.vtk";
-	importerVTK->SetFileName(filename);
-	importerVTK->OpRun();
-	mafVMEVolumeGray *Volume = mafVMEVolumeGray::SafeDownCast(importerVTK->GetOutput());
-	Volume->ReparentTo(storage->GetRoot());
-	//Check if the input volume is a VMEVolumeGray
-	CPPUNIT_ASSERT(Volume!=NULL);
-	//Inizialize the operation
-	mafOpVolumeResample *VolumeResample=new mafOpVolumeResample("Volume Resample");
-	VolumeResample->SetInput(Volume);
-	VolumeResample->TestModeOn();
-	//VolumeResample->OpRun();
-	double Spacing[3],NewSpacing[3];
-	Spacing[0] = 1;
-	Spacing[1] = 1.5;
-	Spacing[2] = 2;
-	double Bounds[6],NewBounds[6];
-	Bounds[0]=0.0;
-	Bounds[1]=4.0;
-	Bounds[2]=1.0;
-	Bounds[3]=7.0;
-	Bounds[4]=3.5;
-	Bounds[5]=7.5;
-	VolumeResample->SetSpacing(Spacing);
-	VolumeResample->SetBounds(Bounds,ID_PERSONALBOUNDS);
-	VolumeResample->Resample();
-	//Check output 
-	mafVME *Output = VolumeResample->GetOutput();
-	vtkStructuredPoints *VTKData=vtkStructuredPoints::SafeDownCast(Output->GetOutput()->GetVTKData());
-	VTKData->UpdateData();
-	//Check if the output volume is a vtkStructuredPoints
-	CPPUNIT_ASSERT(VTKData!=NULL);
-	//Check spacing
-	VTKData->GetSpacing(NewSpacing);
-	CPPUNIT_ASSERT(NewSpacing[0]==Spacing[0] && NewSpacing[1]==Spacing[1] && NewSpacing[2]==Spacing[2]);
-	//Check bounds
-	VTKData->GetBounds(NewBounds);
-	CPPUNIT_ASSERT(NewBounds[0]==Bounds[0] && NewBounds[1]==Bounds[1] && NewBounds[2]==Bounds[2]);
-	CPPUNIT_ASSERT(NewBounds[3]==Bounds[3] && NewBounds[4]==Bounds[4] && NewBounds[5]==Bounds[5]);
 
-	VTKData = NULL;
-	Output = NULL;
-	Volume = NULL;
-	mafDEL(VolumeResample);
-	mafDEL(importerVTK);
-	mafDEL(storage); 
+  medOpImporterVTK *importerVTK=new medOpImporterVTK("importerVTK");
+  importerVTK->TestModeOn();
+  importerVTK->SetInput(storage->GetRoot());
+
+  mafString absPathFilename=MAF_DATA_ROOT;
+  absPathFilename<<"/Test_VolumeResample/";
+  absPathFilename.Append(inFileName);
+  importerVTK->SetFileName(absPathFilename);
+  importerVTK->OpRun();
+
+  mafVMEVolumeGray *inputVolume = mafVMEVolumeGray::SafeDownCast(importerVTK->GetOutput());
+  inputVolume->ReparentTo(storage->GetRoot());
+  CPPUNIT_ASSERT(inputVolume!=NULL);
+
+  mafOpVolumeResample *opVolumeResample=new mafOpVolumeResample("Volume Resample");
+  opVolumeResample->SetInput(inputVolume);
+  opVolumeResample->TestModeOn();
+
+  vtkDataSet *inputDataSet = inputVolume->GetOutput()->GetVTKData();
+  inputDataSet->Update();
+
+  double outputSpacing[3];
+  double inputDataOrigin[3];
+
+  vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(inputDataSet);
+
+  outputSpacing[0] = rg->GetXCoordinates()->GetComponent(1,0)-rg->GetXCoordinates()->GetComponent(0,0);
+  outputSpacing[1] = rg->GetYCoordinates()->GetComponent(1,0)-rg->GetYCoordinates()->GetComponent(0,0);
+  outputSpacing[2] = rg->GetZCoordinates()->GetComponent(1,0)-rg->GetZCoordinates()->GetComponent(0,0);
+
+  movr::PrintDouble3(cout, outputSpacing, "Input RG estimated spacing");
+
+  inputDataOrigin[0] = rg->GetXCoordinates()->GetComponent(0,0);
+  inputDataOrigin[1] = rg->GetYCoordinates()->GetComponent(0,0);
+  inputDataOrigin[2] = rg->GetZCoordinates()->GetComponent(0,0);
+
+  movr::PrintDouble3(cout, inputDataOrigin, "Input RG origin");
+
+  opVolumeResample->SetSpacing(outputSpacing);
+  
+  double outputBounds[6];
+  inputVolume->GetOutput()->GetVMEBounds(outputBounds);
+  opVolumeResample->SetBounds(outputBounds,mafOpVolumeResample::CUSTOMBOUNDS);
+
+  opVolumeResample->Resample();
+
+  mafVME *Output = opVolumeResample->GetOutput();
+  Output->GetOutput()->GetVTKData()->Update();
+  vtkStructuredPoints *outputVTKData=vtkStructuredPoints::SafeDownCast(Output->GetOutput()->GetVTKData());
+
+  CPPUNIT_ASSERT(outputVTKData!=NULL);
+
+  double checkSpacing[3] = {0,0,0};
+  outputVTKData->GetSpacing(checkSpacing);
+
+  CPPUNIT_ASSERT(checkSpacing[0]==outputSpacing[0] && checkSpacing[1]==outputSpacing[1] && checkSpacing[2]==outputSpacing[2]);
+
+  double checkBounds[6];
+  outputVTKData->GetBounds(checkBounds);
+  
+  CPPUNIT_ASSERT(checkBounds[0]==outputBounds[0] && checkBounds[1]==outputBounds[1] && checkBounds[2]==outputBounds[2]);
+  CPPUNIT_ASSERT(checkBounds[3]==outputBounds[3] && checkBounds[4]==outputBounds[4] && checkBounds[5]==outputBounds[5]);
+
+  WriteVTKDatasetToFile(outputVTKData, outVTKFileName);
+
+  outputVTKData = NULL;
+  Output = NULL;
+  inputVolume = NULL;
+  mafDEL(opVolumeResample);
+  mafDEL(importerVTK);
+  mafDEL(storage); 
+
 }
-//----------------------------------------------------------------------------
-void mafOpVolumeResampleTest::TestVMELocalBounds()
-//----------------------------------------------------------------------------
+
+void mafOpVolumeResampleTest::WriteVTKDatasetToFile( vtkDataSet * outputVolumeVTKData, const char *outputFilename )
 {
-	//Inizialize Storage
-	mafVMEStorage *storage = mafVMEStorage::New();
-  storage->GetRoot()->SetName("root");
-  storage->GetRoot()->Initialize();
-	//Import volume
-	mafOpImporterVTK *importerVTK=new mafOpImporterVTK("importerVTK");
-	importerVTK->TestModeOn();
-  importerVTK->SetInput(storage->GetRoot());
-	mafString filename=MAF_DATA_ROOT;
-	filename<<"/Test_VolumeResample/volume.vtk";
-	importerVTK->SetFileName(filename);
-	importerVTK->OpRun();
-	mafVMEVolumeGray *Volume = mafVMEVolumeGray::SafeDownCast(importerVTK->GetOutput());
-	//Check if the input volume is a VMEVolumeGray
-	CPPUNIT_ASSERT(Volume!=NULL);
-	Volume->ReparentTo(storage->GetRoot());
-	//Inizialize the operation
-	mafOpVolumeResample *VolumeResample=new mafOpVolumeResample("Volume Resample");
-	VolumeResample->SetInput(Volume);
-	VolumeResample->TestModeOn();
-	VolumeResample->OpRun();
-	double Spacing[3],NewSpacing[3];
-	Spacing[0] = 1;
-	Spacing[1] = 1.5;
-	Spacing[2] = 2;
-	double Bounds[6],NewBounds[6];
-	Volume->GetOutput()->GetVMELocalBounds(Bounds);
-	VolumeResample->SetSpacing(Spacing);
-	VolumeResample->SetBounds(Bounds,ID_VMELOCALBOUNDS);
-	VolumeResample->Resample();
-	//Check output
-	mafVME *Output = VolumeResample->GetOutput();
-	vtkStructuredPoints *VTKData=vtkStructuredPoints::SafeDownCast(Output->GetOutput()->GetVTKData());
-	VTKData->UpdateData();
-	//Check if the output volume is a vtkStructuredPoints
-	CPPUNIT_ASSERT(VTKData!=NULL);
-	//Check spacing
-	VTKData->GetSpacing(NewSpacing);
-	CPPUNIT_ASSERT(NewSpacing[0]==Spacing[0] && NewSpacing[1]==Spacing[1] && NewSpacing[2]==Spacing[2]);
-	//Check bounds
-	VTKData->GetBounds(NewBounds);
-	CPPUNIT_ASSERT(NewBounds[0]-Spacing[0]<Bounds[0] && NewBounds[0]+Spacing[0]>Bounds[0]);
-	CPPUNIT_ASSERT(NewBounds[1]-Spacing[0]<Bounds[1] && NewBounds[1]+Spacing[0]>Bounds[1]);
-	CPPUNIT_ASSERT(NewBounds[2]-Spacing[1]<Bounds[2] && NewBounds[2]+Spacing[1]>Bounds[2]);
-	CPPUNIT_ASSERT(NewBounds[3]-Spacing[1]<Bounds[3] && NewBounds[3]+Spacing[1]>Bounds[3]);
-	CPPUNIT_ASSERT(NewBounds[4]-Spacing[2]<Bounds[4] && NewBounds[4]+Spacing[2]>Bounds[4]);
-	CPPUNIT_ASSERT(NewBounds[5]-Spacing[2]<Bounds[5] && NewBounds[5]+Spacing[2]>Bounds[5]);
+  vtkDataSetWriter *writer = vtkDataSetWriter::New();
+  writer->SetInput(outputVolumeVTKData);
 
-	VTKData = NULL;
-	Output = NULL;
-	Volume = NULL;
-	cppDEL(importerVTK);
-	cppDEL(VolumeResample);
-	mafDEL(storage);
+  string fullPathOutputFilename;
+  fullPathOutputFilename.append(MAF_DATA_ROOT);
+  fullPathOutputFilename.append("/Test_VolumeResample/");
+  fullPathOutputFilename.append(outputFilename);
+
+  cout << fullPathOutputFilename;
+
+  writer->SetFileName(fullPathOutputFilename.c_str());
+  writer->SetFileTypeToASCII();
+  writer->Write();
+
+  vtkDEL(writer);
 }
-//----------------------------------------------------------------------------
-void mafOpVolumeResampleTest::TestVME4DBounds()
-//----------------------------------------------------------------------------
+
+void mafOpVolumeResampleTest::TestSetGetSpacing()
 {
-	//Inizialize Storage
-	mafVMEStorage *storage = mafVMEStorage::New();
-  storage->GetRoot()->SetName("root");
-  storage->GetRoot()->Initialize();
-	//Import volume
-	mafOpImporterVTK *importerVTK=new mafOpImporterVTK("importerVTK");
-	importerVTK->TestModeOn();
-  importerVTK->SetInput(storage->GetRoot());
-	mafString filename=MAF_DATA_ROOT;
-	filename<<"/Test_VolumeResample/volume.vtk";
-	importerVTK->SetFileName(filename);
-	importerVTK->OpRun();
-	mafVMEVolumeGray *Volume = mafVMEVolumeGray::SafeDownCast(importerVTK->GetOutput());
-	//Check if the input volume is a VMEVolumeGray
-	CPPUNIT_ASSERT(Volume!=NULL);
-	Volume->ReparentTo(storage->GetRoot());
-	//Inizialize the operation
-	mafOpVolumeResample *VolumeResample=new mafOpVolumeResample("Volume Resample");
-	VolumeResample->SetInput(Volume);
-	VolumeResample->TestModeOn();
-	VolumeResample->OpRun();
-	double Spacing[3],NewSpacing[3];
-	Spacing[0] = 1;
-	Spacing[1] = 1.5;
-	Spacing[2] = 2;
-	double Bounds[6],NewBounds[6];
-	Volume->GetOutput()->GetVME4DBounds(Bounds);
-	double dims[3];
-  dims[0] = Bounds[1] - Bounds[0];
-  dims[1] = Bounds[3] - Bounds[2];
-  dims[2] = Bounds[5] - Bounds[4];
+  mafOpVolumeResample *opVolumeResample=new mafOpVolumeResample("Volume Resample");
+  opVolumeResample->TestModeOn();
+  
+  double spacing[3] = {1,2,3};
+  opVolumeResample->SetSpacing(spacing);
 
-  Bounds[0] = -dims[0] / 2.0;
-  Bounds[1] =  dims[0] / 2.0;
-  Bounds[2] = -dims[1] / 2.0;
-  Bounds[3] =  dims[1] / 2.0;
-  Bounds[4] = -dims[2] / 2.0;
-  Bounds[5] =  dims[2] / 2.0;
-	VolumeResample->SetSpacing(Spacing);
-	VolumeResample->SetBounds(Bounds,ID_VME4DBOUNDS);
-	VolumeResample->Resample();
-	//Check output
-	mafVME *Output = VolumeResample->GetOutput();
-	vtkStructuredPoints *VTKData=vtkStructuredPoints::SafeDownCast(Output->GetOutput()->GetVTKData());
-	VTKData->UpdateData();
-	//Check if the output volume is a vtkStructuredPoints
-	CPPUNIT_ASSERT(VTKData!=NULL);
-	//Check spacing
-	VTKData->GetSpacing(NewSpacing);
-	CPPUNIT_ASSERT(NewSpacing[0]==Spacing[0] && NewSpacing[1]==Spacing[1] && NewSpacing[2]==Spacing[2]);
-	//Check bounds
-	VTKData->GetBounds(NewBounds);
-	CPPUNIT_ASSERT(NewBounds[0]-Spacing[0]<Bounds[0] && NewBounds[0]+Spacing[0]>Bounds[0]);
-	CPPUNIT_ASSERT(NewBounds[1]-Spacing[0]<Bounds[1] && NewBounds[1]+Spacing[0]>Bounds[1]);
-	CPPUNIT_ASSERT(NewBounds[2]-Spacing[1]<Bounds[2] && NewBounds[2]+Spacing[1]>Bounds[2]);
-	CPPUNIT_ASSERT(NewBounds[3]-Spacing[1]<Bounds[3] && NewBounds[3]+Spacing[1]>Bounds[3]);
-	CPPUNIT_ASSERT(NewBounds[4]-Spacing[2]<Bounds[4] && NewBounds[4]+Spacing[2]>Bounds[4]);
-	CPPUNIT_ASSERT(NewBounds[5]-Spacing[2]<Bounds[5] && NewBounds[5]+Spacing[2]>Bounds[5]);
+  double checkSpacing[3] = {1,2,3};
+  opVolumeResample->GetSpacing(checkSpacing);
+  
+  CPPUNIT_ASSERT(checkSpacing[0] = spacing[0]);
+  CPPUNIT_ASSERT(checkSpacing[1] = spacing[1]);
+  CPPUNIT_ASSERT(checkSpacing[2] = spacing[2]);
 
-	VTKData = NULL;
-	Output = NULL;
-	Volume = NULL;
-	cppDEL(importerVTK);
-	cppDEL(VolumeResample);
-	mafDEL(storage);
+  cppDEL(opVolumeResample);
 }
-//----------------------------------------------------------------------------
-void mafOpVolumeResampleTest::TestVMEBounds()
-//----------------------------------------------------------------------------
-{
-	//Inizialize Storage
-	mafVMEStorage *storage = mafVMEStorage::New();
-  storage->GetRoot()->SetName("root");
-  storage->GetRoot()->Initialize();
-	//Import volume
-	mafOpImporterVTK *importerVTK=new mafOpImporterVTK("importerVTK");
-	importerVTK->TestModeOn();
-  importerVTK->SetInput(storage->GetRoot());
-	mafString filename=MAF_DATA_ROOT;
-	filename<<"/Test_VolumeResample/volume.vtk";
-	importerVTK->SetFileName(filename);
-	importerVTK->OpRun();
-	mafVMEVolumeGray *Volume = mafVMEVolumeGray::SafeDownCast(importerVTK->GetOutput());
-	//Check if the input volume is a VMEVolumeGray
-	CPPUNIT_ASSERT(Volume!=NULL);
-	Volume->ReparentTo(storage->GetRoot());
-	//Inizialize the operation
-	mafOpVolumeResample *VolumeResample=new mafOpVolumeResample("Volume Resample");
-	VolumeResample->SetInput(Volume);
-	VolumeResample->TestModeOn();
-	VolumeResample->OpRun();
-	double Spacing[3],NewSpacing[3];
-	Spacing[0] = 1;
-	Spacing[1] = 1.5;
-	Spacing[2] = 2;
-	double Bounds[6],NewBounds[6];
-	Volume->GetOutput()->GetVMEBounds(Bounds);
-	double dims[3];
-  dims[0] = Bounds[1] - Bounds[0];
-  dims[1] = Bounds[3] - Bounds[2];
-  dims[2] = Bounds[5] - Bounds[4];
 
-  Bounds[0] = -dims[0] / 2.0;
-  Bounds[1] =  dims[0] / 2.0;
-  Bounds[2] = -dims[1] / 2.0;
-  Bounds[3] =  dims[1] / 2.0;
-  Bounds[4] = -dims[2] / 2.0;
-  Bounds[5] =  dims[2] / 2.0;
-	VolumeResample->SetSpacing(Spacing);
-	VolumeResample->SetBounds(Bounds,ID_VMEBOUNDS);
-	VolumeResample->Resample();
-	//Check output
-	mafVME *Output = VolumeResample->GetOutput();
-	vtkStructuredPoints *VTKData=vtkStructuredPoints::SafeDownCast(Output->GetOutput()->GetVTKData());
-	VTKData->UpdateData();
-	//Check if the output volume is a vtkStructuredPoints
-	CPPUNIT_ASSERT(VTKData!=NULL);
-	//Check spacing
-	VTKData->GetSpacing(NewSpacing);
-	CPPUNIT_ASSERT(NewSpacing[0]==Spacing[0] && NewSpacing[1]==Spacing[1] && NewSpacing[2]==Spacing[2]);
-	//Check bounds
-	VTKData->GetBounds(NewBounds);
-	CPPUNIT_ASSERT(NewBounds[0]-Spacing[0]<Bounds[0] && NewBounds[0]+Spacing[0]>Bounds[0]);
-	CPPUNIT_ASSERT(NewBounds[1]-Spacing[0]<Bounds[1] && NewBounds[1]+Spacing[0]>Bounds[1]);
-	CPPUNIT_ASSERT(NewBounds[2]-Spacing[1]<Bounds[2] && NewBounds[2]+Spacing[1]>Bounds[2]);
-	CPPUNIT_ASSERT(NewBounds[3]-Spacing[1]<Bounds[3] && NewBounds[3]+Spacing[1]>Bounds[3]);
-	CPPUNIT_ASSERT(NewBounds[4]-Spacing[2]<Bounds[4] && NewBounds[4]+Spacing[2]>Bounds[4]);
-	CPPUNIT_ASSERT(NewBounds[5]-Spacing[2]<Bounds[5] && NewBounds[5]+Spacing[2]>Bounds[5]);
-
-	VTKData = NULL;
-	Output = NULL;
-	Volume = NULL;
-	cppDEL(importerVTK);
-	cppDEL(VolumeResample);
-	mafDEL(storage);
-}
-//----------------------------------------------------------------------------
-void mafOpVolumeResampleTest::TestScalarRange()
-//----------------------------------------------------------------------------
-{
-	//Inizialize Storage
-	mafVMEStorage *storage = mafVMEStorage::New();
-  storage->GetRoot()->SetName("root");
-  storage->GetRoot()->Initialize();
-	//Import volume
-	mafOpImporterVTK *importerVTK=new mafOpImporterVTK("importerVTK");
-	importerVTK->TestModeOn();
-  importerVTK->SetInput(storage->GetRoot());
-	mafString filename=MAF_DATA_ROOT;
-	filename<<"/Test_VolumeResample/volumeRG.vtk";
-	importerVTK->SetFileName(filename);
-	importerVTK->OpRun();
-	mafVMEVolumeGray *Volume = mafVMEVolumeGray::SafeDownCast(importerVTK->GetOutput());
-	//Check if the input volume is a VMEVolumeGray
-	CPPUNIT_ASSERT(Volume!=NULL);
-	Volume->ReparentTo(storage->GetRoot());
-	//Inizialize the operation
-	mafOpVolumeResample *VolumeResample=new mafOpVolumeResample("Volume Resample");
-	VolumeResample->SetInput(Volume);
-	VolumeResample->TestModeOn();
-	VolumeResample->OpRun();
-	double NewScalarRange[2],ScalarRange[2];
-	Volume->Update();
-	Volume->GetOutput()->GetVTKData()->GetScalarRange(ScalarRange);
-	double Spacing[3];
-	Spacing[0] = 1;
-	Spacing[1] = 1;
-	Spacing[2] = 1;
-	double Bounds[6];
-	Volume->GetOutput()->GetVTKData()->GetBounds(Bounds);
-	VolumeResample->SetSpacing(Spacing);
-	VolumeResample->SetBounds(Bounds,ID_PERSONALBOUNDS);
-	VolumeResample->Resample();
-	//Check output
-	mafVME *Output = VolumeResample->GetOutput();
-	vtkStructuredPoints *VTKData=vtkStructuredPoints::SafeDownCast(Output->GetOutput()->GetVTKData());
-	VTKData->UpdateData();
-	//Check if the output volume is a vtkStructuredPoints
-	CPPUNIT_ASSERT(VTKData!=NULL);
-	//Check scalar range
-	VTKData->GetScalarRange(NewScalarRange);
-	CPPUNIT_ASSERT(NewScalarRange[0]==ScalarRange[0] && NewScalarRange[1]==ScalarRange[1]);
-
-	VTKData = NULL;
-	Output = NULL;
-	Volume = NULL;
-	cppDEL(importerVTK);
-	cppDEL(VolumeResample);
-	mafDEL(storage);
-}

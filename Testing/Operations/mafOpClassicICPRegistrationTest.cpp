@@ -96,7 +96,7 @@ void mafOpClassicICPRegistrationTest::TestOpDo()
   medOpImporterVTK *importer2=new medOpImporterVTK("importerVTK");
   importer2->TestModeOn();
   mafString fileName2=MAF_DATA_ROOT;
-  fileName2<<"/VTK_Volumes/volume.vtk";
+  fileName2<<"/VTK_Surfaces/surface.vtk";
   importer2->SetFileName(fileName2);
   importer2->ImportVTK();
   

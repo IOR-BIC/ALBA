@@ -37,7 +37,7 @@
 #include "vtkDataSet.h"
 #include "vtkDataArray.h"
 
-#include "medOpVolumeResample.h"
+#include "mafOpVolumeResample.h"
 #include "medOpImporterVTK.h"
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
@@ -57,7 +57,7 @@ public:
   mafVMEVolumeGray *GetVolumeOutput();
 
 protected:
-  medOpVolumeResample *op;
+  mafOpVolumeResample *op;
 
 };
 
@@ -70,7 +70,7 @@ OpEqualizeHistogramDerivedTestClass::OpEqualizeHistogramDerivedTestClass(const w
 mafOpEqualizeHistogram(label)
 //---------------------------------------------------------------------------*/
 {
-  op = new medOpVolumeResample();
+  op = new mafOpVolumeResample();
 }
 
 //----------------------------------------------------------------------------
@@ -129,7 +129,7 @@ void OpEqualizeHistogramDerivedTestClass::ExecuteOpRun()
 
   double outputBounds[6];
   m_VolumeInput->GetOutput()->GetVMEBounds(outputBounds);
-  op->SetBounds(outputBounds,medOpVolumeResample::CUSTOMBOUNDS);
+  op->SetBounds(outputBounds,mafOpVolumeResample::CUSTOMBOUNDS);
 
   op->Resample();
 

@@ -514,8 +514,12 @@ double mafOpRegisterClusters::CalculateDeviation(vtkPoints* sourcePoints, vtkPoi
 
 	if(m_RegisteredFollower != NULL)
 	{
+		mafMatrix followerMtr, regFollowerMtr;
+		m_Follower->GetOutput()->GetAbsMatrix(followerMtr,currTime);
+		mafMatrix::Multiply4x4(matReg, followerMtr, regFollowerMtr);
+
 		m_RegisteredFollower->SetTimeStamp(currTime); //SetCurrentTime(currTime);
-		m_RegisteredFollower->SetMatrix(matReg);
+		m_RegisteredFollower->SetAbsMatrix(regFollowerMtr,currTime);
 		m_RegisteredFollower->Modified();
 		m_RegisteredFollower->Update();
 	}

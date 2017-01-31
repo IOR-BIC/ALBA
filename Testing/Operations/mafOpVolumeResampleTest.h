@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafOpVolumeResampleTest
- Authors: Matteo Giacomoni
+ Authors: Stefano Perticoni
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -14,27 +14,30 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_MMOVOLUMERESAMPLETEST_H__
-#define __CPP_UNIT_MMOVOLUMERESAMPLETEST_H__
+#ifndef __CPP_UNIT_mafOpVolumeResampleTest_H__
+#define __CPP_UNIT_mafOpVolumeResampleTest_H__
 
 #include "mafTest.h"
+#include "vtkDataSet.h"
+#include "vtkTransform.h"
 
 class mafOpVolumeResampleTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( mafOpVolumeResampleTest );
-  CPPUNIT_TEST( TestBase );
-	CPPUNIT_TEST( TestVMELocalBounds );
-	CPPUNIT_TEST( TestVME4DBounds );
-	CPPUNIT_TEST( TestVMEBounds );
-	CPPUNIT_TEST( TestScalarRange );
+  CPPUNIT_TEST( TestSetBounds);
+  CPPUNIT_TEST( TestSetGetSpacing);
+  CPPUNIT_TEST( TestResample);
   CPPUNIT_TEST_SUITE_END();
 
   protected:
-    void TestBase();
-		void TestVMELocalBounds();
-		void TestVME4DBounds();
-		void TestVMEBounds();
-		void TestScalarRange();
+    void TestSetBounds();
+    void TestResample();
+    void TestSetGetSpacing();
+
+  private:
+    void WriteVTKDatasetToFile( vtkDataSet * outputVolumeVTKData, const char *outputFilename = "outDataset.vtk" );
+    void TestResampleInternal( const char *inFileName, const char *outVTKFileName );
+
 };
 
 #endif
