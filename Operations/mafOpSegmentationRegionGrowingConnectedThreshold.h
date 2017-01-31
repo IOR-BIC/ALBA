@@ -31,7 +31,7 @@ class mafInteractorPicker;
 class mafInteractor;
 class mafVMESurface;
 class mafVMEVolumeGray;
-class medOpVolumeResample;
+class mafOpVolumeResample;
 class vtkSphereSource;
 
 //----------------------------------------------------------------------------
@@ -134,7 +134,7 @@ protected:
   vtkSphereSource *m_SphereVTK;
 
   mafString m_SeedScalarValue;
-  medOpVolumeResample *m_Resample;
+  mafOpVolumeResample *m_Resample;
 
   mafVMEVolumeGray *m_ResampleInput;
   double m_VolumeSpacing[3];

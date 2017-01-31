@@ -22,7 +22,6 @@ SET(PROJECT_SRCS
 	mafOpExporterRAWTest.h mafOpExporterRAWTest.cpp
 	mafOpCreateGroupTest.h mafOpCreateGroupTest.cpp
 	mafOpReparentToTest.h mafOpReparentToTest.cpp
-	mafOpVolumeResampleTest.h mafOpVolumeResampleTest.cpp
 	mafOpDecimateSurfaceTest.h mafOpDecimateSurfaceTest.cpp
 	mafOpConnectivitySurfaceTest.h mafOpConnectivitySurfaceTest.cpp
 	mafOpRemoveCellsTest.h mafOpRemoveCellsTest.cpp
@@ -87,7 +86,7 @@ SET(PROJECT_SRCS
 	mafOpExporterMetersTest.h mafOpExporterMetersTest.cpp
 	mafOpSubdivideTest.h mafOpSubdivideTest.cpp
 	mafOpCreateSurfaceTest.h mafOpCreateSurfaceTest.cpp
-	medOpVolumeResampleTest.h medOpVolumeResampleTest.cpp
+	mafOpVolumeResampleTest.h mafOpVolumeResampleTest.cpp
 	mafOpSegmentationRegionGrowingConnectedThresholdTest.h mafOpSegmentationRegionGrowingConnectedThresholdTest.cpp
 	mafOpScaleDatasetTest.h mafOpScaleDatasetTest.cpp
 	mafOpCreateLabeledVolumeTest.h mafOpCreateLabeledVolumeTest.cpp

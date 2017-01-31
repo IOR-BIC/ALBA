@@ -33,7 +33,7 @@
 #include "mafGUILutSlider.h"
 #include "mafGUIHistogramWidget.h"
 #include "mafGUIDialog.h"
-#include "medOpVolumeResample.h"
+#include "mafOpVolumeResample.h"
 #include "mafDeviceButtonsPad.h"
 #include "mafEventInteraction.h"
 
@@ -166,7 +166,7 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
       return;
     }
     wxBusyInfo wait_info1("Resampling...");
-    medOpVolumeResample *op = new medOpVolumeResample();
+    mafOpVolumeResample *op = new mafOpVolumeResample();
     op->SetInput(m_VolumeInput);
     op->TestModeOn();
     op->OpRun();

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: medOpVolumeResampleTest
+ Module: mafOpVolumeResampleTest
  Authors: Stefano Perticoni
  
  Copyright (c) B3C
@@ -14,16 +14,16 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_medOpVolumeResampleTest_H__
-#define __CPP_UNIT_medOpVolumeResampleTest_H__
+#ifndef __CPP_UNIT_mafOpVolumeResampleTest_H__
+#define __CPP_UNIT_mafOpVolumeResampleTest_H__
 
 #include "mafTest.h"
 #include "vtkDataSet.h"
 #include "vtkTransform.h"
 
-class medOpVolumeResampleTest : public mafTest
+class mafOpVolumeResampleTest : public mafTest
 {
-  CPPUNIT_TEST_SUITE( medOpVolumeResampleTest );
+  CPPUNIT_TEST_SUITE( mafOpVolumeResampleTest );
   CPPUNIT_TEST( TestSetBounds);
   CPPUNIT_TEST( TestSetGetSpacing);
   CPPUNIT_TEST( TestResample);

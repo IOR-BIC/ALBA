@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: medOpVolumeResample
+ Module: mafOpVolumeResample
  Authors: Marco Petrone
  
  Copyright (c) B3C
@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "medOpVolumeResample.h"
+#include "mafOpVolumeResample.h"
 
 #include "mafEvent.h"
 #include "mafGUI.h"
@@ -69,11 +69,11 @@
 using namespace std;
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(medOpVolumeResample);
+mafCxxTypeMacro(mafOpVolumeResample);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-medOpVolumeResample::medOpVolumeResample(const wxString &label /* =  */,bool showShadingPlane /* = false */) : mafOp(label)
+mafOpVolumeResample::mafOpVolumeResample(const wxString &label /* =  */,bool showShadingPlane /* = false */) : mafOp(label)
 //----------------------------------------------------------------------------
 {
 	m_OpType	= OPTYPE_OP;
@@ -118,7 +118,7 @@ medOpVolumeResample::medOpVolumeResample(const wxString &label /* =  */,bool sho
   m_CenterVolumeRefSysMatrix = NULL;
 }
 //----------------------------------------------------------------------------
-medOpVolumeResample::~medOpVolumeResample()
+mafOpVolumeResample::~mafOpVolumeResample()
 //----------------------------------------------------------------------------
 {
   GizmoDelete();
@@ -132,7 +132,7 @@ medOpVolumeResample::~medOpVolumeResample()
 	mafDEL(m_ResampledVme);
 }
 //----------------------------------------------------------------------------
-bool medOpVolumeResample::Accept(mafVME* vme) 
+bool mafOpVolumeResample::Accept(mafVME* vme) 
 //----------------------------------------------------------------------------
 {
 	mafEvent e(this,VIEW_SELECTED);
@@ -140,7 +140,7 @@ bool medOpVolumeResample::Accept(mafVME* vme)
   return (vme && vme->IsMAFType(mafVMEVolumeGray));
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::InternalUpdateBounds(double bounds[6], bool center)
+void mafOpVolumeResample::InternalUpdateBounds(double bounds[6], bool center)
 //----------------------------------------------------------------------------
 {
   if (center)
@@ -177,7 +177,7 @@ void medOpVolumeResample::InternalUpdateBounds(double bounds[6], bool center)
 	m_MaxBoundZ = m_VolumeBounds[5] - m_VolumeBounds[4];
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::CreateGizmos()
+void mafOpVolumeResample::CreateGizmos()
 //----------------------------------------------------------------------------
 {
   mafEvent e(this,VIEW_SELECTED);
@@ -243,7 +243,7 @@ void medOpVolumeResample::CreateGizmos()
 	}
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::AutoSpacing()
+void mafOpVolumeResample::AutoSpacing()
 //----------------------------------------------------------------------------
 {
   vtkDataSet *vme_data = m_Input->GetOutput()->GetVTKData();
@@ -281,7 +281,7 @@ void medOpVolumeResample::AutoSpacing()
   }
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::UpdateGui()
+void mafOpVolumeResample::UpdateGui()
 //----------------------------------------------------------------------------
 {
 	m_MaxBoundX = m_VolumeBounds[1] - m_VolumeBounds[0];
@@ -296,7 +296,7 @@ void medOpVolumeResample::UpdateGui()
 		m_Gui->Update();
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::SetBoundsToVMEBounds()
+void mafOpVolumeResample::SetBoundsToVMEBounds()
 //----------------------------------------------------------------------------
 {
   double bounds[6];
@@ -306,7 +306,7 @@ void medOpVolumeResample::SetBoundsToVMEBounds()
   m_VolumeOrientation[0] = m_VolumeOrientation[1] = m_VolumeOrientation[2] = 0;
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::SetBoundsToVME4DBounds()
+void mafOpVolumeResample::SetBoundsToVME4DBounds()
 //----------------------------------------------------------------------------
 {
   double bounds[6];
@@ -316,7 +316,7 @@ void medOpVolumeResample::SetBoundsToVME4DBounds()
   m_VolumeOrientation[0] = m_VolumeOrientation[1] = m_VolumeOrientation[2] = 0;
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::SetBoundsToVMELocalBounds()
+void mafOpVolumeResample::SetBoundsToVMELocalBounds()
 //----------------------------------------------------------------------------
 {
   double bounds[6];
@@ -329,7 +329,7 @@ void medOpVolumeResample::SetBoundsToVMELocalBounds()
 	m_ROIPosition[0] = m_ROIPosition[1] = m_ROIPosition[2] = 0;
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::GizmoDelete()
+void mafOpVolumeResample::GizmoDelete()
 //----------------------------------------------------------------------------
 {	
   if (m_GizmoTranslate)
@@ -353,13 +353,13 @@ void medOpVolumeResample::GizmoDelete()
 	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
-mafOp *medOpVolumeResample::Copy()
+mafOp *mafOpVolumeResample::Copy()
 //----------------------------------------------------------------------------
 {
-	return new medOpVolumeResample(m_Label,m_ShowShadingPlane);
+	return new mafOpVolumeResample(m_Label,m_ShowShadingPlane);
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::InizializeVMEDummy()   
+void mafOpVolumeResample::InizializeVMEDummy()   
 //----------------------------------------------------------------------------
 {
 	mafNEW(m_VMEDummy);
@@ -372,7 +372,7 @@ void medOpVolumeResample::InizializeVMEDummy()
   m_VMEDummy->SetName("Dummy");
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::OpRun()   
+void mafOpVolumeResample::OpRun()   
 //----------------------------------------------------------------------------
 {
 	InizializeVMEDummy();
@@ -383,13 +383,13 @@ void medOpVolumeResample::OpRun()
 	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::OpDo()
+void mafOpVolumeResample::OpDo()
 //----------------------------------------------------------------------------
 {
 	m_ResampledVme->ReparentTo(m_Input->GetParent());
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::Resample()
+void mafOpVolumeResample::Resample()
 //----------------------------------------------------------------------------
 {
   mafSmartPointer<mafTransform> resamplingBoxPose;
@@ -530,7 +530,7 @@ void medOpVolumeResample::Resample()
   mafLogMessage(stringStream.str().c_str(), "Output Volume");
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::OpUndo()
+void mafOpVolumeResample::OpUndo()
 //----------------------------------------------------------------------------
 {   
 	assert(m_ResampledVme);
@@ -565,7 +565,7 @@ enum GIZMOS
 	ID_GIZMO_ROTATE,
 };
 //----------------------------------------------------------------------------
-void medOpVolumeResample::UpdateGizmoData(mafEvent *e)
+void mafOpVolumeResample::UpdateGizmoData(mafEvent *e)
 //----------------------------------------------------------------------------
 {
 	switch(e->GetId())
@@ -651,7 +651,7 @@ void medOpVolumeResample::UpdateGizmoData(mafEvent *e)
 	}
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::CreateGui() 
+void mafOpVolumeResample::CreateGui() 
 //----------------------------------------------------------------------------
 {
 	m_Gui = new mafGUI(this);
@@ -723,7 +723,7 @@ void medOpVolumeResample::CreateGui()
 	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::OnEvent(mafEventBase *maf_event)
+void mafOpVolumeResample::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
 	if (maf_event->GetSender() == this->m_Gui)
@@ -766,7 +766,7 @@ void medOpVolumeResample::OnEvent(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::OnEventGizmoROI(mafEventBase *maf_event) 
+void mafOpVolumeResample::OnEventGizmoROI(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -785,7 +785,7 @@ void medOpVolumeResample::OnEventGizmoROI(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::OnEventThis(mafEventBase *maf_event) 
+void mafOpVolumeResample::OnEventThis(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -938,7 +938,7 @@ void medOpVolumeResample::OnEventThis(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-bool medOpVolumeResample::CheckSpacing()
+bool mafOpVolumeResample::CheckSpacing()
 //----------------------------------------------------------------------------
 {
   if ((m_VolumeSpacing[0]/(m_VolumeBounds[1] - m_VolumeBounds[0]))*100 < SPACING_PERCENTAGE_BOUNDS)
@@ -957,7 +957,7 @@ bool medOpVolumeResample::CheckSpacing()
   return true;
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::OnEventGizmoTranslate(mafEventBase *maf_event)
+void mafOpVolumeResample::OnEventGizmoTranslate(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
 	switch(maf_event->GetId())
@@ -977,7 +977,7 @@ void medOpVolumeResample::OnEventGizmoTranslate(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::OnEventGizmoRotate(mafEventBase *maf_event)
+void mafOpVolumeResample::OnEventGizmoRotate(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
 	switch(maf_event->GetId())
@@ -997,7 +997,7 @@ void medOpVolumeResample::OnEventGizmoRotate(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::PostMultiplyEventMatrix(mafEventBase *maf_event)
+void mafOpVolumeResample::PostMultiplyEventMatrix(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -1059,7 +1059,7 @@ void medOpVolumeResample::PostMultiplyEventMatrix(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::SetSpacing(double spacing[3]) 
+void mafOpVolumeResample::SetSpacing(double spacing[3]) 
 //----------------------------------------------------------------------------
 {
 	m_VolumeSpacing[0] = spacing[0];
@@ -1067,7 +1067,7 @@ void medOpVolumeResample::SetSpacing(double spacing[3])
 	m_VolumeSpacing[2] = spacing[2];
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::GetSpacing( double spacing[3] )
+void mafOpVolumeResample::GetSpacing( double spacing[3] )
 //----------------------------------------------------------------------------
 {
   spacing[0] = m_VolumeSpacing[0];
@@ -1075,7 +1075,7 @@ void medOpVolumeResample::GetSpacing( double spacing[3] )
   spacing[2] = m_VolumeSpacing[2];
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::SetBounds(double bounds[6],int type) 
+void mafOpVolumeResample::SetBounds(double bounds[6],int type) 
 //----------------------------------------------------------------------------
 {
   switch (type)
@@ -1100,14 +1100,14 @@ void medOpVolumeResample::SetBounds(double bounds[6],int type)
   }
 }
 
-void medOpVolumeResample::SetROIOrientation(double ROIOrientation[3]) 
+void mafOpVolumeResample::SetROIOrientation(double ROIOrientation[3]) 
 {
   m_ROIOrientation[0] = ROIOrientation[0];
   m_ROIOrientation[1] = ROIOrientation[1];
   m_ROIOrientation[2] = ROIOrientation[2];
 }
 
-void medOpVolumeResample::SetVolumePosition(double  volumePosition[3]) 
+void mafOpVolumeResample::SetVolumePosition(double  volumePosition[3]) 
 {
   m_VolumePosition[0] = volumePosition[0];
   m_VolumePosition[1] = volumePosition[1];
@@ -1115,7 +1115,7 @@ void medOpVolumeResample::SetVolumePosition(double  volumePosition[3])
 }
 
 //----------------------------------------------------------------------------
-void medOpVolumeResample::ShiftCenterResampled() 
+void mafOpVolumeResample::ShiftCenterResampled() 
 //----------------------------------------------------------------------------
 {
 
@@ -1154,7 +1154,7 @@ void medOpVolumeResample::ShiftCenterResampled()
 	m_NewVolumePosition[2] = difference[2] + m_VolumePosition[2];
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::OpStop(int result)
+void mafOpVolumeResample::OpStop(int result)
 //----------------------------------------------------------------------------
 {
 	if (!m_TestMode)
@@ -1165,11 +1165,11 @@ void medOpVolumeResample::OpStop(int result)
 }
 
 //----------------------------------------------------------------------------
-void medOpVolumeResample::PrintSelf(ostream& os)
+void mafOpVolumeResample::PrintSelf(ostream& os)
 //----------------------------------------------------------------------------
 {
   os << "-------------------------------------------------------" << std::endl;
-  os << "medOpVolumeResample PrintSelf:" << std::endl;
+  os << "mafOpVolumeResample PrintSelf:" << std::endl;
 
   PrintVolume(os, m_Input, "Input Volume");
   
@@ -1267,7 +1267,7 @@ void medOpVolumeResample::PrintSelf(ostream& os)
 }
 
 
-void medOpVolumeResample::PrintDouble6( ostream& os, double array[6], const char *logMessage /*= NULL */ )
+void mafOpVolumeResample::PrintDouble6( ostream& os, double array[6], const char *logMessage /*= NULL */ )
 {
 
   if (logMessage) os << logMessage << std::endl;
@@ -1277,20 +1277,20 @@ void medOpVolumeResample::PrintDouble6( ostream& os, double array[6], const char
   os << std::endl;
 }
 
-void medOpVolumeResample::PrintDouble3( ostream& os, double array[3], const char *logMessage /*= NULL*/ )
+void mafOpVolumeResample::PrintDouble3( ostream& os, double array[3], const char *logMessage /*= NULL*/ )
 {
   if (logMessage) os << logMessage << " [" << array[0] << " , " << array[1] << " , " << array[2] << " ]" << std::endl;
   os << std::endl;
 }
 
 
-void medOpVolumeResample::PrintInt3( ostream& os, int array[3], const char *logMessage /*= NULL*/ )
+void mafOpVolumeResample::PrintInt3( ostream& os, int array[3], const char *logMessage /*= NULL*/ )
 {
   if (logMessage) os << logMessage << " [" << array[0] << " , " << array[1] << " , " << array[2] << " ]" << std::endl;
   os << std::endl;
 }
 
-void medOpVolumeResample::PrintVolume( ostream& os , mafVME *volume , const char *logMessage /*= NULL*/ )
+void mafOpVolumeResample::PrintVolume( ostream& os , mafVME *volume , const char *logMessage /*= NULL*/ )
 {
   mafVMEVolumeGray *input = mafVMEVolumeGray::SafeDownCast(volume);
   input->GetOutput()->GetVTKData()->Update();
@@ -1335,21 +1335,21 @@ void medOpVolumeResample::PrintVolume( ostream& os , mafVME *volume , const char
   
 }
 
-void medOpVolumeResample::SetNewVolumePosition( double newVolumePosition[3] )
+void mafOpVolumeResample::SetNewVolumePosition( double newVolumePosition[3] )
 {
   m_NewVolumePosition[0] = newVolumePosition[0];
   m_NewVolumePosition[1] = newVolumePosition[1];
   m_NewVolumePosition[2] = newVolumePosition[2];
 }
 
-void medOpVolumeResample::SetMaxBounds( double maxBound[3] )
+void mafOpVolumeResample::SetMaxBounds( double maxBound[3] )
 {
   m_MaxBoundX = maxBound[0];
   m_MaxBoundY = maxBound[1];
   m_MaxBoundZ = maxBound[2];
 }
 
-void medOpVolumeResample::SetROIPosition( double roiPosition[3] )
+void mafOpVolumeResample::SetROIPosition( double roiPosition[3] )
 {
   m_ROIPosition[0] = roiPosition[0];
   m_ROIPosition[1] = roiPosition[1];

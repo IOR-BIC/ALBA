@@ -133,7 +133,6 @@
 #include "mafOpVOIDensityTest.h"
 #include "mafOpValidateTreeTest.h"
 #include "mafOpVolumeMeasureTest.h"
-#include "mafOpVolumeResampleTest.h"
 #include "mafServiceLocator.h"
 #include "mafVMEDataSetAttributesImporterTest.h"
 #include "mafVMEMeshAnsysTextExporterTest.h"
@@ -228,7 +227,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpExporterRAWTest::suite());
 	runner.addTest(mafOpCreateGroupTest::suite());
 	runner.addTest(mafOpReparentToTest::suite());
-	runner.addTest(mafOpVolumeResampleTest::suite());
 	runner.addTest(mafOpDecimateSurfaceTest::suite());
 	runner.addTest(mafOpConnectivitySurfaceTest::suite());
 	runner.addTest(mafOpRemoveCellsTest::suite());

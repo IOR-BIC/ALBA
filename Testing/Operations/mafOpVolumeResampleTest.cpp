@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: medOpVolumeResampleTest
+ Module: mafOpVolumeResampleTest
  Authors: Stefano Perticoni
  
  Copyright (c) B3C
@@ -24,11 +24,11 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "medOpVolumeResampleTest.h"
+#include "mafOpVolumeResampleTest.h"
 
-#include "medOpVolumeResample.h"
+#include "mafOpVolumeResample.h"
 // log facilities
-typedef medOpVolumeResample movr;
+typedef mafOpVolumeResample movr;
 
 #include "mafString.h"
 #include "mafVMEStorage.h"
@@ -50,7 +50,7 @@ typedef medOpVolumeResample movr;
 using namespace std;
 
 
-void medOpVolumeResampleTest::TestSetBounds()
+void mafOpVolumeResampleTest::TestSetBounds()
 {
   const char *inFileName = "volumeRG_dim_10_10_10_bounds_m5_5_m5_5_m5_5.vtk";
 
@@ -60,7 +60,7 @@ void medOpVolumeResampleTest::TestSetBounds()
   
 }
 
-void medOpVolumeResampleTest::TestResample()
+void mafOpVolumeResampleTest::TestResample()
 {
   const char * inFileName= "volumeRG_dim_10_10_10_bounds_1_10_1_10_1_10.vtk";
 
@@ -71,7 +71,7 @@ void medOpVolumeResampleTest::TestResample()
 }
 
 
-void medOpVolumeResampleTest::TestResampleInternal( const char *inFileName, const char *outVTKFileName )
+void mafOpVolumeResampleTest::TestResampleInternal( const char *inFileName, const char *outVTKFileName )
 {
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
@@ -91,7 +91,7 @@ void medOpVolumeResampleTest::TestResampleInternal( const char *inFileName, cons
   inputVolume->ReparentTo(storage->GetRoot());
   CPPUNIT_ASSERT(inputVolume!=NULL);
 
-  medOpVolumeResample *opVolumeResample=new medOpVolumeResample("Volume Resample");
+  mafOpVolumeResample *opVolumeResample=new mafOpVolumeResample("Volume Resample");
   opVolumeResample->SetInput(inputVolume);
   opVolumeResample->TestModeOn();
 
@@ -119,7 +119,7 @@ void medOpVolumeResampleTest::TestResampleInternal( const char *inFileName, cons
   
   double outputBounds[6];
   inputVolume->GetOutput()->GetVMEBounds(outputBounds);
-  opVolumeResample->SetBounds(outputBounds,medOpVolumeResample::CUSTOMBOUNDS);
+  opVolumeResample->SetBounds(outputBounds,mafOpVolumeResample::CUSTOMBOUNDS);
 
   opVolumeResample->Resample();
 
@@ -151,7 +151,7 @@ void medOpVolumeResampleTest::TestResampleInternal( const char *inFileName, cons
 
 }
 
-void medOpVolumeResampleTest::WriteVTKDatasetToFile( vtkDataSet * outputVolumeVTKData, const char *outputFilename )
+void mafOpVolumeResampleTest::WriteVTKDatasetToFile( vtkDataSet * outputVolumeVTKData, const char *outputFilename )
 {
   vtkDataSetWriter *writer = vtkDataSetWriter::New();
   writer->SetInput(outputVolumeVTKData);
@@ -170,9 +170,9 @@ void medOpVolumeResampleTest::WriteVTKDatasetToFile( vtkDataSet * outputVolumeVT
   vtkDEL(writer);
 }
 
-void medOpVolumeResampleTest::TestSetGetSpacing()
+void mafOpVolumeResampleTest::TestSetGetSpacing()
 {
-  medOpVolumeResample *opVolumeResample=new medOpVolumeResample("Volume Resample");
+  mafOpVolumeResample *opVolumeResample=new mafOpVolumeResample("Volume Resample");
   opVolumeResample->TestModeOn();
   
   double spacing[3] = {1,2,3};

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: medOpVolumeResample
+ Module: mafOpVolumeResample
  Authors: Marco Petrone
  
  Copyright (c) B3C
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __medOpVolumeResample_H__
-#define __medOpVolumeResample_H__
+#ifndef __mafOpVolumeResample_H__
+#define __mafOpVolumeResample_H__
 
 using namespace std;
 //----------------------------------------------------------------------------
@@ -39,15 +39,15 @@ class mafGizmoROI;
 class mafVMESurface;
 
 //----------------------------------------------------------------------------
-class MAF_EXPORT medOpVolumeResample: public mafOp
+class MAF_EXPORT mafOpVolumeResample: public mafOp
 {
 public:
              
-            	 medOpVolumeResample(const wxString &label = "VolumeResample",bool showShadingPlane = false);
-	virtual     ~medOpVolumeResample();
+            	 mafOpVolumeResample(const wxString &label = "VolumeResample",bool showShadingPlane = false);
+	virtual     ~mafOpVolumeResample();
 	virtual void OnEvent(mafEventBase *maf_event);
 	
-  mafTypeMacro(medOpVolumeResample, mafOp);
+  mafTypeMacro(mafOpVolumeResample, mafOp);
 
   mafOp* Copy();
 
@@ -176,6 +176,6 @@ protected:
   static void PrintDouble3(ostream& os, double array[3], const char *logMessage = NULL);
   static void PrintInt3(ostream& os, int array[3], const char *logMessage = NULL);
 
-  friend class medOpVolumeResampleTest;
+  friend class mafOpVolumeResampleTest;
 };
 #endif
