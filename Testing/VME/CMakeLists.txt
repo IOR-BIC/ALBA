@@ -3,7 +3,7 @@ PROJECT (mafVME_TEST)
 IF(MAF_BUILD_MAFDLL)
   LINK_LIBRARIES(mafDLL)
 ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafTests mafVME mafDataPipes GPUAPI vtkRendering vtkGraphics mafService) # mafCommon mafOperations)
+  LINK_LIBRARIES(mafTests mafVME mafVisualPipes mafDataPipes GPUAPI vtkRendering vtkGraphics mafService) # mafCommon mafOperations)
 ENDIF (MAF_BUILD_MAFDLL)
  
 #-----------------------------------------------------------------------------
@@ -22,20 +22,12 @@ SET(PROJECT_SRCS
 	mafVMEPolylineTest.h mafVMEPolylineTest.cpp
 	mafVMEPolylineSplineTest.h mafVMEPolylineSplineTest.cpp
 	mafVMEMeshTest.h mafVMEMeshTest.cpp
-	mafPipeMeshTest.h mafPipeMeshTest.cpp
 	mafVMELandmarkTest.h mafVMELandmarkTest.cpp
 	mafVMELandmarkCloudTest.h mafVMELandmarkCloudTest.cpp
 	mafMatrixVectorTest.h mafMatrixVectorTest.cpp
 	mafVMEFactoryTest.h mafVMEFactoryTest.cpp
 	mafDataVectorTest.h mafDataVectorTest.cpp
 	mafVMEItemVTKTest.h mafVMEItemVTKTest.cpp
-	mafPipeSurfaceTest.h mafPipeSurfaceTest.cpp
-	mafPipeGizmoTest.h mafPipeGizmoTest.cpp
-	mafPipeSurfaceTexturedTest.h mafPipeSurfaceTexturedTest.cpp
-	mafPipeScalarTest.h mafPipeScalarTest.cpp
-	mafPipeImage3DTest.h mafPipeImage3DTest.cpp
-	mafPipeIsosurfaceTest.h mafPipeIsosurfaceTest.cpp
-	mafPipePointSetTest.h mafPipePointSetTest.cpp
 	mafVMEImageTest.h mafVMEImageTest.cpp
 	mafVMEVolumeRGBTest.h mafVMEVolumeRGBTest.cpp
 	mafVMEInfoTextTest.h mafVMEInfoTextTest.cpp
@@ -43,7 +35,6 @@ SET(PROJECT_SRCS
 	mafVMEOutputMeterTest.h mafVMEOutputMeterTest.cpp
 	mafVMEPointSetTest.h mafVMEPointSetTest.cpp
 	mafVMEVectorTest.h mafVMEVectorTest.cpp
-	mafPipeFactoryVMETest.h mafPipeFactoryVMETest.cpp
 	mafVMEOutputPolylineTest.h mafVMEOutputPolylineTest.cpp
 	mafVMEOutputSurfaceTest.h mafVMEOutputSurfaceTest.cpp
 	mafVMEOutputPointSetTest.h mafVMEOutputPointSetTest.cpp
@@ -51,80 +42,40 @@ SET(PROJECT_SRCS
 	mafVMEOutputLandmarkCloudTest.h mafVMEOutputLandmarkCloudTest.cpp
 	mafVMEOutputScalarMatrixTest.h mafVMEOutputScalarMatrixTest.cpp
 	mafVMEOutputMeshTest.h mafVMEOutputMeshTest.cpp
-	mafPipeIsosurfaceGPUTest.h mafPipeIsosurfaceGPUTest.cpp
 	mafVMEOutputImageTest.h mafVMEOutputImageTest.cpp
 	mafVMEOutputVolumeTest.h mafVMEOutputVolumeTest.cpp
 	mafCryptTest.h mafCryptTest.cpp
-	mafPipePolylineTest.h mafPipePolylineTest.cpp
 	mafMatrixInterpolatorTest.h mafMatrixInterpolatorTest.cpp
 	mafVMEGenericTest.h mafVMEGenericTest.cpp
-	mafPipeLandmarkCloudTest.h mafPipeLandmarkCloudTest.cpp
 	mafVMEOutputVTKTest.h mafVMEOutputVTKTest.cpp
 	mafVMEItemScalarMatrixTest.h mafVMEItemScalarMatrixTest.cpp
 	mafScalarVectorTest.h mafScalarVectorTest.cpp
-	mafPipeVectorTest.h mafPipeVectorTest.cpp
 	mafVMEGenericAbstractTest.h mafVMEGenericAbstractTest.cpp
-	mafPipeMeterTest.h mafPipeMeterTest.cpp
-	mafPipeVolumeProjectedTest.h mafPipeVolumeProjectedTest.cpp
 	mafVMEItemTest.h mafVMEItemTest.cpp
 	mafVMERefSysTest.h mafVMERefSysTest.cpp
 	mafVMEProberTest.h mafVMEProberTest.cpp
 	mafVMEMeterTest.h mafVMEMeterTest.cpp
 	mafMSFImporterTest.h mafMSFImporterTest.cpp
-	mafPipeScalarMatrixTest.h mafPipeScalarMatrixTest.cpp
-	mafVisualPipeVolumeRayCastingTest.h mafVisualPipeVolumeRayCastingTest.cpp
 	mafVMESlicerTest.h mafVMESlicerTest.cpp
 	mafVMERawMotionDataTest.h mafVMERawMotionDataTest.cpp
 	mafPolylineGraphTest.h mafPolylineGraphTest.cpp
 	mafVMEWrappedMeterTest.h mafVMEWrappedMeterTest.cpp
 	mafVMELabeledVolumeTest.h mafVMELabeledVolumeTest.cpp
-	mafPipeVolumeMIPTest.h mafPipeVolumeMIPTest.cpp
-	mafPipeVolumeDRRTest.h mafPipeVolumeDRRTest.cpp
 	mafVMEAnalogTest.h mafVMEAnalogTest.cpp
 	mafVMEOutputSurfaceEditorTest.h mafVMEOutputSurfaceEditorTest.cpp
 	mafVMEOutputPolylineEditorTest.h mafVMEOutputPolylineEditorTest.cpp
 	mafVMESurfaceEditorTest.h mafVMESurfaceEditorTest.cpp
-	mafPipePolylineGraphEditorTest.h mafPipePolylineGraphEditorTest.cpp
 	mafVMEPolylineEditorTest.h mafVMEPolylineEditorTest.cpp
-	mafPipeMeshSliceTest.h mafPipeMeshSliceTest.cpp
-	mafPipeSurfaceSliceTest.h mafPipeSurfaceSliceTest.cpp
-	mafPipeVolumeSliceTest.h mafPipeVolumeSliceTest.cpp
 	mafVMEMapsTest.h mafVMEMapsTest.cpp
-	mafPipeTrajectoriesTest.h mafPipeTrajectoriesTest.cpp
-	mafPipeSliceTest.h mafPipeSliceTest.cpp
-	mafPipePolylineSliceTest.h mafPipePolylineSliceTest.cpp
-	mafPipeWrappedMeterTest.h mafPipeWrappedMeterTest.cpp
 	mafVMEOutputWrappedMeterTest.h mafVMEOutputWrappedMeterTest.cpp
-	mafPipeDensityDistanceTest.h mafPipeDensityDistanceTest.cpp
 	mafVMEPolylineGraphTest.h mafVMEPolylineGraphTest.cpp
-	mafPipeGraphTest.h mafPipeGraphTest.cpp
 	mafVMESegmentationVolumeTest.h mafVMESegmentationVolumeTest.cpp
-	mafPipeCompoundTest.h mafPipeCompoundTest.cpp
-	mafPipeCompoundVolumeTest.h mafPipeCompoundVolumeTest.cpp
-	mafPipeCompoundVolumefixedScalarsTest.h mafPipeCompoundVolumeFixedScalarsTest.cpp
-	mafVisualPipePolylineGraphTest.h mafVisualPipePolylineGraphTest.cpp
-	mafPipeSurfaceEditorTest.h mafPipeSurfaceEditorTest.cpp
-	mafPipeTensorFieldSurfaceTest.h mafPipeTensorFieldSurfaceTest.cpp
-	mafPipeVectorFieldSurfaceTest.h mafPipeVectorFieldSurfaceTest.cpp
-	mafPipeVectorFieldGlyphsTest.h mafPipeVectorFieldGlyphsTest.cpp
-	mafPipeVectorFieldMapWithArrowsTest.h mafPipeVectorFieldMapWithArrowsTest.cpp
 	mafAttributeSegmentationVolumeTest.h mafAttributeSegmentationVolumeTest.cpp
-	mafPipeTensorFieldSliceTest.h mafPipeTensorFieldSliceTest.cpp
-	mafPipeVectorFieldSliceTest.h mafPipeVectorFieldSliceTest.cpp
-	mafPipeTensorFieldGlyphsTest.h mafPipeTensorFieldGlyphsTest.cpp
 	mafVMEOutputComputeWrappingTest.h mafVMEOutputComputeWrappingTest.cpp
-	mafPipeTensorFieldTest.h mafPipeTensorFieldTest.cpp
-	mafPipeVectorFieldTest.h mafPipeVectorFieldTest.cpp
-	mafVisualPipeSlicerSliceTest.h mafVisualPipeSlicerSliceTest.cpp
-	mafPipeCompoundVolumeVRTest.h mafPipeCompoundVolumeVRTest.cpp
-	mafPipeCompoundVolumeMIPTest.h mafPipeCompoundVolumeMIPTest.cpp
-	mafPipeCompoundVolumeDRRTest.h mafPipeCompoundVolumeDRRTest.cpp
-	mafPipeCompoundVolumeIsosurfaceTest.h mafPipeCompoundVolumeIsosurfaceTest.cpp
 	mafPolylineGraphVertexTest.h mafPolylineGraphVertexTest.cpp
 	mafPolylineGraphEdgeTest.h mafPolylineGraphEdgeTest.cpp
 	mafPolylineGraphBranchTest.h mafPolylineGraphBranchTest.cpp
 	mafDataPipeCustomSegmentationVolumeTest.h mafDataPipeCustomSegmentationVolumeTest.cpp
-	mafPipeRayCastTest.h mafPipeRayCastTest.cpp
 	VMEGenericPoseTest.h VMEGenericPoseTest.cpp
 	VMEGenericBoundsTest.h VMEGenericBoundsTest.cpp
 	CustomDataPipeTest.h CustomDataPipeTest.cpp
