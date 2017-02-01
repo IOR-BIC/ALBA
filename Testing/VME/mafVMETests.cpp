@@ -32,52 +32,6 @@
 #include "mafMSFImporterTest.h"
 #include "mafMatrixInterpolatorTest.h"
 #include "mafMatrixVectorTest.h"
-#include "mafPipeCompoundTest.h"
-#include "mafPipeCompoundVolumeDRRTest.h"
-#include "mafPipeCompoundVolumeIsosurfaceTest.h"
-#include "mafPipeCompoundVolumeMIPTest.h"
-#include "mafPipeCompoundVolumeTest.h"
-#include "mafPipeCompoundVolumeVRTest.h"
-#include "mafPipeCompoundVolumefixedScalarsTest.h"
-#include "mafPipeDensityDistanceTest.h"
-#include "mafPipeFactoryVMETest.h"
-#include "mafPipeGizmoTest.h"
-#include "mafPipeGraphTest.h"
-#include "mafPipeImage3DTest.h"
-#include "mafPipeIsosurfaceGPUTest.h"
-#include "mafPipeIsosurfaceTest.h"
-#include "mafPipeLandmarkCloudTest.h"
-#include "mafPipeMeshSliceTest.h"
-#include "mafPipeMeshTest.h"
-#include "mafPipeMeterTest.h"
-#include "mafPipePointSetTest.h"
-#include "mafPipePolylineGraphEditorTest.h"
-#include "mafPipePolylineSliceTest.h"
-#include "mafPipePolylineTest.h"
-#include "mafPipeRayCastTest.h"
-#include "mafPipeScalarMatrixTest.h"
-#include "mafPipeScalarTest.h"
-#include "mafPipeSliceTest.h"
-#include "mafPipeSurfaceEditorTest.h"
-#include "mafPipeSurfaceSliceTest.h"
-#include "mafPipeSurfaceTest.h"
-#include "mafPipeSurfaceTexturedTest.h"
-#include "mafPipeTensorFieldGlyphsTest.h"
-#include "mafPipeTensorFieldSliceTest.h"
-#include "mafPipeTensorFieldSurfaceTest.h"
-#include "mafPipeTensorFieldTest.h"
-#include "mafPipeTrajectoriesTest.h"
-#include "mafPipeVectorFieldGlyphsTest.h"
-#include "mafPipeVectorFieldMapWithArrowsTest.h"
-#include "mafPipeVectorFieldSliceTest.h"
-#include "mafPipeVectorFieldSurfaceTest.h"
-#include "mafPipeVectorFieldTest.h"
-#include "mafPipeVectorTest.h"
-#include "mafPipeVolumeDRRTest.h"
-#include "mafPipeVolumeMIPTest.h"
-#include "mafPipeVolumeProjectedTest.h"
-#include "mafPipeVolumeSliceTest.h"
-#include "mafPipeWrappedMeterTest.h"
 #include "mafPolylineGraphBranchTest.h"
 #include "mafPolylineGraphEdgeTest.h"
 #include "mafPolylineGraphTest.h"
@@ -137,9 +91,6 @@
 #include "mafVMEVolumeGrayTest.h"
 #include "mafVMEVolumeRGBTest.h"
 #include "mafVMEWrappedMeterTest.h"
-#include "mafVisualPipePolylineGraphTest.h"
-#include "mafVisualPipeSlicerSliceTest.h"
-#include "mafVisualPipeVolumeRayCastingTest.h"
 #include "mmaMeterTest.h"
 
 #include "VMEGenericBoundsTest.h"
@@ -195,20 +146,12 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafVMEPolylineTest::suite());
 	runner.addTest(mafVMEPolylineSplineTest::suite());
 	runner.addTest(mafVMEMeshTest::suite());
-	runner.addTest(mafPipeMeshTest::suite());
 	runner.addTest(mafVMELandmarkTest::suite());
 	runner.addTest(mafVMELandmarkCloudTest::suite());
 	runner.addTest(mafMatrixVectorTest::suite());
 	runner.addTest(mafVMEFactoryTest::suite());
 	runner.addTest(mafDataVectorTest::suite());
 	runner.addTest(mafVMEItemVTKTest::suite());
-	runner.addTest(mafPipeSurfaceTest::suite());
-	runner.addTest(mafPipeGizmoTest::suite());
-	runner.addTest(mafPipeSurfaceTexturedTest::suite());
-	runner.addTest(mafPipeScalarTest::suite());
-	runner.addTest(mafPipeImage3DTest::suite());
-	runner.addTest(mafPipeIsosurfaceTest::suite());
-	runner.addTest(mafPipePointSetTest::suite());
 	runner.addTest(mafVMEImageTest::suite());
 	runner.addTest(mafVMEVolumeRGBTest::suite());
 	runner.addTest(mafVMEInfoTextTest::suite());
@@ -216,7 +159,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafVMEOutputMeterTest::suite());
 	runner.addTest(mafVMEPointSetTest::suite());
 	runner.addTest(mafVMEVectorTest::suite());
-	runner.addTest(mafPipeFactoryVMETest::suite());
 	runner.addTest(mafVMEOutputPolylineTest::suite());
 	runner.addTest(mafVMEOutputSurfaceTest::suite());
 	runner.addTest(mafVMEOutputPointSetTest::suite());
@@ -224,80 +166,40 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafVMEOutputLandmarkCloudTest::suite());
 	runner.addTest(mafVMEOutputScalarMatrixTest::suite());
 	runner.addTest(mafVMEOutputMeshTest::suite());
-	runner.addTest(mafPipeIsosurfaceGPUTest::suite());
 	runner.addTest(mafVMEOutputImageTest::suite());
 	runner.addTest(mafVMEOutputVolumeTest::suite());
 	runner.addTest(mafCryptTest::suite());
-	runner.addTest(mafPipePolylineTest::suite());
 	runner.addTest(mafMatrixInterpolatorTest::suite());
 	runner.addTest(mafVMEGenericTest::suite());
-	runner.addTest(mafPipeLandmarkCloudTest::suite());
 	runner.addTest(mafVMEOutputVTKTest::suite());
 	runner.addTest(mafVMEItemScalarMatrixTest::suite());
 	runner.addTest(mafScalarVectorTest::suite());
-	runner.addTest(mafPipeVectorTest::suite());
 	runner.addTest(mafVMEGenericAbstractTest::suite());
-	runner.addTest(mafPipeMeterTest::suite());
-	runner.addTest(mafPipeVolumeProjectedTest::suite());
 	runner.addTest(mafVMEItemTest::suite());
 	runner.addTest(mafVMERefSysTest::suite());
 	runner.addTest(mafVMEProberTest::suite());
 	runner.addTest(mafVMEMeterTest::suite());
 	runner.addTest(mafMSFImporterTest::suite());
-	runner.addTest(mafPipeScalarMatrixTest::suite());
-	runner.addTest(mafVisualPipeVolumeRayCastingTest::suite());
 	runner.addTest(mafVMESlicerTest::suite());
 	runner.addTest(mafVMERawMotionDataTest::suite());
 	runner.addTest(mafPolylineGraphTest::suite());
 	runner.addTest(mafVMEWrappedMeterTest::suite());
 	runner.addTest(mafVMELabeledVolumeTest::suite());
-	runner.addTest(mafPipeVolumeMIPTest::suite());
-	runner.addTest(mafPipeVolumeDRRTest::suite());
 	runner.addTest(mafVMEAnalogTest::suite());
 	runner.addTest(mafVMEOutputSurfaceEditorTest::suite());
 	runner.addTest(mafVMEOutputPolylineEditorTest::suite());
 	runner.addTest(mafVMESurfaceEditorTest::suite());
-	runner.addTest(mafPipePolylineGraphEditorTest::suite());
 	runner.addTest(mafVMEPolylineEditorTest::suite());
-	runner.addTest(mafPipeMeshSliceTest::suite());
-	runner.addTest(mafPipeSurfaceSliceTest::suite());
-	runner.addTest(mafPipeVolumeSliceTest::suite());
 	runner.addTest(mafVMEMapsTest::suite());
-	runner.addTest(mafPipeTrajectoriesTest::suite());
-	runner.addTest(mafPipeSliceTest::suite());
-	runner.addTest(mafPipePolylineSliceTest::suite());
-	runner.addTest(mafPipeWrappedMeterTest::suite());
 	runner.addTest(mafVMEOutputWrappedMeterTest::suite());
-	runner.addTest(mafPipeDensityDistanceTest::suite());
 	runner.addTest(mafVMEPolylineGraphTest::suite());
-	runner.addTest(mafPipeGraphTest::suite());
 	runner.addTest(mafVMESegmentationVolumeTest::suite());
-	runner.addTest(mafPipeCompoundTest::suite());
-	runner.addTest(mafPipeCompoundVolumeTest::suite());
-	runner.addTest(mafPipeCompoundVolumeFixedScalarsTest::suite());
-	runner.addTest(mafVisualPipePolylineGraphTest::suite());
-	runner.addTest(mafPipeSurfaceEditorTest::suite());
-	runner.addTest(mafPipeTensorFieldSurfaceTest::suite());
-	runner.addTest(mafPipeVectorFieldSurfaceTest::suite());
-	runner.addTest(mafPipeVectorFieldGlyphsTest::suite());
-	runner.addTest(mafPipeVectorFieldMapWithArrowsTest::suite());
 	runner.addTest(mafAttributeSegmentationVolumeTest::suite());
-	runner.addTest(mafPipeTensorFieldSliceTest::suite());
-	runner.addTest(mafPipeVectorFieldSliceTest::suite());
-	runner.addTest(mafPipeTensorFieldGlyphsTest::suite());
 	runner.addTest(mafVMEOutputComputeWrappingTest::suite());
-	runner.addTest(mafPipeTensorFieldTest::suite());
-	runner.addTest(mafPipeVectorFieldTest::suite());
-	runner.addTest(mafVisualPipeSlicerSliceTest::suite());
-	runner.addTest(mafPipeCompoundVolumeVRTest::suite());
-	runner.addTest(mafPipeCompoundVolumeMIPTest::suite());
-	runner.addTest(mafPipeCompoundVolumeDRRTest::suite());
-	runner.addTest(mafPipeCompoundVolumeIsosurfaceTest::suite());
 	runner.addTest(mafPolylineGraphVertexTest::suite());
 	runner.addTest(mafPolylineGraphEdgeTest::suite());
 	runner.addTest(mafPolylineGraphBranchTest::suite());
 	runner.addTest(mafDataPipeCustomSegmentationVolumeTest::suite());
-	runner.addTest(mafPipeRayCastTest::suite());
 	runner.addTest(VMEGenericPoseTest::suite());
 	runner.addTest(VMEGenericBoundsTest::suite());
 	runner.addTest(CustomDataPipeTest::suite());
