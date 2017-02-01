@@ -3,7 +3,7 @@ PROJECT (mafVME_TEST)
 IF(MAF_BUILD_MAFDLL)
   LINK_LIBRARIES(mafDLL)
 ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafTests mafVME mafDataPipes GPUAPI vtkRendering vtkGraphics mafService) # mafCommon mafOperations)
+  LINK_LIBRARIES(mafTests mafVME mafVisualPipes mafDataPipes GPUAPI vtkRendering vtkGraphics mafService) # mafCommon mafOperations)
 ENDIF (MAF_BUILD_MAFDLL)
  
 #-----------------------------------------------------------------------------
