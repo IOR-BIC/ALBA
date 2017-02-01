@@ -70,7 +70,7 @@ IF(MAF_BUILD_MAFDLL)
 )
 ELSE(MAF_BUILD_MAFDLL)
   SET(PROJECT_LIBS
-  mafOperations mafGui mafViews mafVME mafInteraction mafCommon mafService vtkMAF GPUAPI
+  mafOperations mafGui mafViews mafVME mafVisualPipes mafInteraction mafCommon mafService vtkMAF GPUAPI
 )
 ENDIF(MAF_BUILD_MAFDLL)
 
