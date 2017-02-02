@@ -1369,7 +1369,7 @@ void mafLogicWithManagers::VmeModified(mafVME *vme)
 	if (m_OpManager)
 		m_OpManager->VmeModified(vme);
 
-	if (!m_PlugTimebar && vme->IsAnimated())
+	if (!m_PlugTimebar && vme != NULL && vme->IsAnimated())
 		m_Win->ShowDockPane("timebar", !m_Win->DockPaneIsShown("timebar"));
 }
 //----------------------------------------------------------------------------
