@@ -694,19 +694,19 @@ void mafVME::Update()
 void mafVME::SetCrypting(int crypting)
 //-------------------------------------------------------------------------
 {
-  if(crypting > 0)
-    m_Crypting = 1;
-  else
-    m_Crypting = 0;
+	if (m_Crypting != crypting)
+	{
+		m_Crypting = (crypting > 0) ? 1 : 0;
 
-  if (m_Gui != NULL)
-  {
-    m_Gui->Update();
-  }
+		if (m_Gui != NULL)
+		{
+			m_Gui->Update();
+		}
 
-  Modified();
+		Modified();
 
-	GetLogicManager()->VmeModified(this);
+		GetLogicManager()->VmeModified(this);
+	}
 }
 
 //-------------------------------------------------------------------------

@@ -99,7 +99,7 @@ int mafVMEGeneric::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   GetDataVector()->InsertItem(item);
 
   Modified();
-  GetLogicManager()->VmeModified(this);
+  //GetLogicManager()->VmeModified(this);
 
   return MAF_OK;
 }
