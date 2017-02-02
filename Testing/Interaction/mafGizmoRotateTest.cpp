@@ -49,6 +49,8 @@
 #include "vtkPolyData.h"
 #include "vtkAxes.h"
 #include "vtkTubeFilter.h"
+#include "mafServiceLocator.h"
+#include "mafFakeLogicForTest.h"
 
 void mafGizmoRotateTest::BeforeTest()
 {
@@ -131,7 +133,10 @@ void mafGizmoRotateTest::TestShow()
   gizmoRotate->SetListener(listener);
   gizmoRotate->Show(true);
   
-  CPPUNIT_ASSERT(listener->GetEvent()->GetId() == VME_SHOW);
+	mafFakeLogicForTest *logic = (mafFakeLogicForTest*)mafServiceLocator::GetLogicManager();
+	logic->ClearCalls();
+	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_SHOW);
+
   CPPUNIT_ASSERT(listener->GetEvent()->GetSender() == gizmoRotate);
 
   cppDEL(gizmoRotate);

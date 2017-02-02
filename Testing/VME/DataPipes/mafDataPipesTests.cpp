@@ -30,13 +30,14 @@
 #include "mafDataPipeCustomTest.h"
 #include "mafDataPipeInterpolatorScalarMatrixTest.h"
 #include "mafDataPipeCustomProberTest.h"
+#include "mafFakeLogicForTest.h"
+#include "mafServiceLocator.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
-
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMESurfaceTestClass)
@@ -58,6 +59,9 @@ int
 	CPPUNIT_NS::BriefTestProgressListener progress;
 	controller.addListener( &progress );      
 
+	mafFakeLogicForTest *logic = new mafFakeLogicForTest();
+	mafServiceLocator::SetLogicManager(logic);
+
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
 
@@ -73,6 +77,8 @@ int
 	// Print test in a compiler compatible format.
 	CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
 	outputter.write(); 
+
+	cppDEL(logic);
 
 	return result.wasSuccessful() ? 0 : 1;
 }

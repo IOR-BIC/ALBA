@@ -250,7 +250,7 @@ void mafSceneGraph::VmeShowByType(mafVME *vme,  bool show)
     }
 }
 //----------------------------------------------------------------------------
-// Scan vme subtree and send a VME_SHOW event for each Creatable/non_mutex vme found.
+// Scan vme subtree and Show for each Creatable/non_mutex vme found.
 // Changed behavior.
 // Mutex vme may be shown only is no other vme of the same type is currently shown.
 // Mutex vme may always be hidden.

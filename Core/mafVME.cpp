@@ -705,8 +705,8 @@ void mafVME::SetCrypting(int crypting)
   }
 
   Modified();
-  mafEvent ev(this,VME_MODIFIED,this);
-  ForwardUpEvent(ev);
+
+	GetLogicManager()->VmeModified(this);
 }
 
 //-------------------------------------------------------------------------
@@ -1027,8 +1027,9 @@ void mafVME::SetVisualMode(int mode)
   if (m_VisualMode != mode)
   {
     m_VisualMode = mode;
-    mafEvent updateModalityEvent(this, VME_VISUAL_MODE_CHANGED, this);
-    NodeOnEvent(&updateModalityEvent);
+// 		mafEvent updateModalityEvent(this, VME_VISUAL_MODE_CHANGED, this);
+// 		NodeOnEvent(&updateModalityEvent);
+		GetLogicManager()->VmeVisualModeChanged(this);
   }
 }
 
@@ -1126,8 +1127,8 @@ void mafVME::SetName(const char *name)
 {
 	m_GuiName=m_Name=name; // force string copy
 	Modified();
-	mafEvent ev(this, VME_MODIFIED, this);
-	ForwardUpEvent(ev);
+
+	GetLogicManager()->VmeModified(this);
 }
 
 //-------------------------------------------------------------------------

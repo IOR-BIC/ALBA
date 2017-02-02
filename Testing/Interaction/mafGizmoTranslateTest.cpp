@@ -48,6 +48,8 @@
 #include "vtkPolyData.h"
 #include "vtkAxes.h"
 #include "vtkTubeFilter.h"
+#include "mafFakeLogicForTest.h"
+#include "mafServiceLocator.h"
 
 void mafGizmoTranslateTest::BeforeTest()
 {
@@ -170,7 +172,10 @@ void mafGizmoTranslateTest::TestShow()
  
   gizmoTranslate->Show(true);
   
-  CPPUNIT_ASSERT(listener->GetEvent()->GetId() == VME_SHOW);
+	mafFakeLogicForTest *logic = (mafFakeLogicForTest*)mafServiceLocator::GetLogicManager();
+	logic->ClearCalls();
+	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_SHOW);
+
   CPPUNIT_ASSERT(listener->GetEvent()->GetSender() == gizmoTranslate);
 
   cppDEL(gizmoTranslate);

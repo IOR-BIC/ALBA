@@ -147,14 +147,6 @@ void mafOpExporterVTK::OnEvent(mafEventBase *maf_event)
       case wxCANCEL:
         OpStop(OP_RUN_CANCEL);
       break;
-      case VME_ADD:
-      {
-        //trap the VME_ADD of the mafOpCollapse and mafOpExplode to update the
-        //m_Input, then forward the message to mafDMLlogicMDI
-        this->m_Input = e->GetVme();
-        GetLogicManager()->VmeAdd(m_Input);
-      }
-      break;
 			case ID_ABS_MATRIX:
 				break;
       default:

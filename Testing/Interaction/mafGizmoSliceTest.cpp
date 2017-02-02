@@ -47,6 +47,8 @@
 #include "vtkPolyData.h"
 #include "vtkAxes.h"
 #include "vtkTubeFilter.h"
+#include "mafServiceLocator.h"
+#include "mafFakeLogicForTest.h"
 
 //----------------------------------------------------------------------------
 void mafGizmoSliceTest::BeforeTest()
@@ -111,7 +113,10 @@ void mafGizmoSliceTest::TestShow()
   gizmoSlice->SetListener(listener);
   gizmoSlice->Show(true);
   
-  CPPUNIT_ASSERT(listener->GetEvent()->GetId() == VME_SHOW);
+	mafFakeLogicForTest *logic = (mafFakeLogicForTest*)mafServiceLocator::GetLogicManager();
+	logic->ClearCalls();
+	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_SHOW);
+
   CPPUNIT_ASSERT(listener->GetEvent()->GetSender() == gizmoSlice);
 
   cppDEL(gizmoSlice);

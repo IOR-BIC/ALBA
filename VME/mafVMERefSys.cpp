@@ -475,7 +475,7 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
 				InternalUpdate();
 
 				//Workaround to update accept on move operations
-				ForwardUpEvent( mafEvent( this, VME_MODIFIED,this ) );
+				GetLogicManager()->VmeModified(this);
 				m_Gui->Update();
 			}
 			break;

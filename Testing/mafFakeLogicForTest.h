@@ -30,6 +30,7 @@ public:
 		VME_SELECT,
 		VME_ADD,
 		VME_REMOVE,
+		VME_MODIFIED,
 		VME_SHOW,
 		VME_VISUAL_MODE_CHANGED,
 	};
@@ -53,6 +54,8 @@ public:
 	virtual void VmeAdd(mafVME *vme);
 
 	virtual void VmeRemove(mafVME *vme);
+
+	virtual void VmeModified(mafVME* vme);
 
 	virtual void VmeVisualModeChanged(mafVME * vme);
 

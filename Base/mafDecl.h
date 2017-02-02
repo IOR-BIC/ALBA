@@ -161,20 +161,15 @@ EVT_START,
   PROGRESSBAR_SET_VALUE, 
   PROGRESSBAR_SET_TEXT, 
   // events about vme
-  VME_ADD,       // from a generic mafOp to mafLogic  (to be removed Marco)
   VME_ADDED,     // from mafVmeManager to mafLogic (to be removed Marco)
-  VME_REMOVE,    // from a generic mafOp to mafLogic (to be removed Marco)
   VME_REMOVING,  // from mafVmeManager to mafLogic 
   VME_SELECT,    // from mafGUITree or mafISV - run mafOpSelect
   VME_DCLICKED,  // from mafInteractorPER issued to infor logic that a double click has been done on a VME.
   VME_SELECTED,  // from mafOpSelect
-  VME_SHOW,      // from a vme property panel
   VME_TRANSFORM, // from mafISV to mafLogic
-  VME_MODIFIED,  // from a generic mafOp to mafLogic (to be removed Marco)
   VME_CHOOSE,    // from a mafOp to receive more operands
   VME_PICKED,    // used sent to the listener a vtkPoint positioned at the picked position
   VME_PICKING,   // same as above, but send point position in continuous configuration (at each mouse motion)
-  VME_VISUAL_MODE_CHANGED, // event sent from the VME when someone change its visual mode
   VME_CHOOSE_MATERIAL,
   VME_CHOOSE_TRANSFER_FUNCTION,
   VME_CHOOSE_FEM_PROPERTY,

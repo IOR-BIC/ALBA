@@ -137,8 +137,8 @@ void mafVMERoot::OnEvent(mafEventBase *maf_event)
         // Bug Fixing for the root GUI event management
         mafVME::OnEvent(maf_event);
       }
-      mafEvent ev(this,VME_MODIFIED,this);
-      mafRoot::OnRootEvent(&ev);
+
+			GetLogicManager()->VmeModified(this);
     }
     else
     {

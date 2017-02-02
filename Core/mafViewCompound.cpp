@@ -233,7 +233,7 @@ void mafViewCompound::OnEvent(mafEventBase *maf_event)
         mafVME *vme = sg->GetSelectedVme();
         if (vme)
         {
-          mafEventMacro(mafEvent(this,VME_MODIFIED,vme));
+					GetLogicManager()->VmeModified(vme);
         }
       }
     }
