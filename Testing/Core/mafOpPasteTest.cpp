@@ -61,6 +61,7 @@ void mafOpPasteTest::TestAccept()
   mafNEW(groupParent);
   mafVMEGroup *groupChild;
   mafNEW(groupChild);
+
   CPPUNIT_ASSERT(m_OpPaste->Accept(groupParent)==false);
   m_OpPaste->SetClipboard(groupChild);
   CPPUNIT_ASSERT(m_OpPaste->Accept(NULL)==false);
@@ -79,6 +80,7 @@ void mafOpPasteTest::TestOpDo()
 	mafNEW(groupChild);
 	mafVMEGroup *groupOldParent;
 	mafNEW(groupOldParent);
+
 	m_OpPaste->SetSelectionParent(groupOldParent);
 	m_OpPaste->SetInput(groupParent);
   m_OpPaste->SetClipboard(groupChild);
@@ -110,12 +112,8 @@ void mafOpPasteTest::TestOpUndo()
   m_OpPaste->OpDo();
   m_OpPaste->OpUndo();
 
-  CPPUNIT_ASSERT(m_OpPaste->GetClipboard() == groupChild);
-//   CPPUNIT_ASSERT(observer->GetEvent(0)->GetSender()==m_OpPaste);
-//   CPPUNIT_ASSERT(observer->GetEvent(0)->GetVme()==groupChild);
-
-	CPPUNIT_ASSERT(logic->GetCall(0).vme == groupChild);
-	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_REMOVE);
+	CPPUNIT_ASSERT(logic->GetCall(1).vme == groupChild);
+	CPPUNIT_ASSERT(logic->GetCall(1).testFunction == mafFakeLogicForTest::VME_REMOVE);
 
   delete observer;
   mafDEL(groupChild);
