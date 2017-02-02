@@ -339,7 +339,7 @@ void mafGizmoHandle::SetColor(double colR, double colG, double colB)
 void mafGizmoHandle::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  // use VTK opacity instead of VME_SHOW to speed up the render
+  // use VTK opacity instead of vme show to speed up the render
   double opacity = show ? 1 : 0;
   m_BoxGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
   if(m_ShowShadingPlane)

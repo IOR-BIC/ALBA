@@ -295,7 +295,7 @@ protected:
 
 	/** Respond to a VME_DCLICKED evt. Manage the 'Double click' on Selected VME. */
 	virtual void VmeDoubleClicked(mafEvent &e);
-	/** Respond to a VME_SHOW evt. Show/Hide the vme. */
+	/** Show/Hide the vme. */
 	virtual void VmeShow(mafVME *vme, bool visibility);
 
 	/** Called from VmeShow to show a LM cloud */
@@ -307,14 +307,14 @@ protected:
 	/* Called from VmeShow to show landmarks*/
 	void ShowLandmark(mafVMELandmark * lm, bool visibility);
 
-	/** Respond to a VME_Modified evt.*/
+	/** Respond to a vme Modified evt.*/
 	virtual void VmeModified(mafVME *vme);
 
-	/** Respond to a VME_ADD evt. Add a new vme to the tree. */
+	/** Add a new vme to the tree. */
 	virtual void VmeAdd(mafVME *vme);
 	/** Respond to a VME_ADDED evt. propagate evt. to SideBar,ViewManager,ecc.. */
 	virtual void VmeAdded(mafVME *vme);
-	/** Respond to a VME_REMOVE evt. Remove a vme from the tree. */
+	/** Remove a vme from the tree. */
 	virtual void VmeRemove(mafVME *vme);
 	/** Respond to a VME_REMOVING evt. propagate evt. to SideBar,ViewManager,ecc.. */
 	virtual void VmeRemoving(mafVME *vme);

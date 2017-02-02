@@ -177,11 +177,7 @@ void DummyObserver::OnEvent(mafEventBase *maf_event)
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
-		if(e->GetId() == VME_REMOVE)
-		{
-			e->GetVme()->ReparentTo(NULL);
-		}
-		else if (e->GetId() == VME_CHOOSE)
+		if (e->GetId() == VME_CHOOSE)
 		{
 			e->SetVme(m_DummyVme);
 		}

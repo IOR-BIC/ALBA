@@ -25,6 +25,8 @@
 #include "mafEvent.h"
 #include "mafObserver.h"
 #include "mafOpContextStack.h"
+#include "mafServiceClient.h"
+#include "mafAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -54,7 +56,7 @@ EXPORT_STL_VECTOR(MAF_EXPORT,mafOp*);
 // mafOpManager :
 //----------------------------------------------------------------------------
 /**  */
-class MAF_EXPORT mafOpManager: public mafObserver
+class MAF_EXPORT mafOpManager: public mafObserver, public mafServiceClient
 {
 public:
 	         mafOpManager();

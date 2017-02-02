@@ -38,6 +38,8 @@ public:
 
 	//virtual void VmeRemoving(mafVME *vme) = 0;
 
+	virtual void VmeModified(mafVME* vme) = 0;
+
 	virtual void VmeVisualModeChanged(mafVME * vme) = 0;
 
 	//Camera

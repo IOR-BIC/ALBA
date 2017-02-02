@@ -591,7 +591,8 @@ void medOp2DMeasure::OpStop(int result)
   if(root->GetTagArray()->IsTagPresent("2D_MEASURE"))
   root->GetTagArray()->DeleteTag("2D_MEASURE");
   root->GetTagArray()->SetTag(measure_item);
-  mafEventMacro(mafEvent(this,VME_MODIFIED,root));
+  
+	GetLogicManager()->VmeModified(root);
 
 	m_DistanceInteractor2D->RemoveMeter();  
 	m_AngleInteractor2D->RemoveMeter();

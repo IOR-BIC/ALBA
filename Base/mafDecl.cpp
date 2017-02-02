@@ -383,22 +383,18 @@ std::string  mafIdString(int id)
      case UPDATE_UI:	          s="UPDATE_UI"; break; 
      case UPDATE_PROPERTY:      s="UPDATE_PROPERTY"; break; 
 
-     case VME_ADD:	            s="VME_ADD"; break; 
      case VME_ADDED:	          s="VME_ADDED"; break; 
-     case VME_REMOVE:	          s="VME_REMOVE"; break; 
      case VME_REMOVING:	        s="VME_REMOVING"; break; 
      case VME_SELECT:	          s="VME_SELECT"; break; 
      case VME_SELECTED:	        s="VME_SELECTED"; break;
      case VME_DCLICKED:         s="VME_DCLICKED"; break;
-     case VME_SHOW:	            s="VME_SHOW"; break; 
      case VME_TRANSFORM:	      s="VME_TRANSFORM"; break; 
-     case VME_MODIFIED:	        s="VME_MODIFIED"; break; 
      case VME_CHOOSE:						s="VME_CHOOSE"; break; 
      case VME_REF_SYS_CHOOSED:  s="VME_REF_SYS_CHOOSED"; break;
      case VME_FEM_DATA_CHOOSED: s="VME_FEM_DATA_CHOOSED"; break;
      case VME_PICKED:	          s="VME_PICKED"; break; 
      case VME_PICKING:	        s="VME_PICKING"; break; 
-     case VME_VISUAL_MODE_CHANGED:s="VME_VISUAL_MODE_CHANGED"; break;
+
      case CREATE_STORAGE:       s="CREATE_STORAGE"; break; 
 
      case VIEW_QUIT:            s="VIEW_QUIT"; break;

@@ -199,28 +199,34 @@ void mafOpVolumeMeasure::OnEvent(mafEventBase *maf_event)
 void mafOpVolumeMeasure::OpStop(int result)
 //----------------------------------------------------------------------------
 {
-  if (result == OP_RUN_CANCEL)
-  {
-    int c = m_MeasureList->GetCount();
-    mafTagItem measure_item;
-    measure_item.SetName("VOLUME_MEASURE");
-    measure_item.SetNumberOfComponents(c);
-    for(int i = 0; i < c; i++)
-      measure_item.SetComponent(m_MeasureList->GetString(i).c_str(),i);
-    mafVME *root = m_Input->GetRoot();
-    if(root->GetTagArray()->IsTagPresent("VOLUME_MEASURE"))
-      root->GetTagArray()->DeleteTag("VOLUME_MEASURE");
-    root->GetTagArray()->SetTag(measure_item);
-    mafEventMacro(mafEvent(this,VME_MODIFIED,root));
-  }
+	if (result == OP_RUN_CANCEL)
+	{
+		int c = m_MeasureList->GetCount();
+		mafTagItem measure_item;
+		measure_item.SetName("VOLUME_MEASURE");
+		measure_item.SetNumberOfComponents(c);
 
-    vtkDEL(m_TriangleFilter);
-	  vtkDEL(m_MassProperties);
-    if(!this->m_TestMode)
-    {
-      HideGui();
-    }
-	  mafEventMacro(mafEvent(this,result));
+		for (int i = 0; i < c; i++)
+			measure_item.SetComponent(m_MeasureList->GetString(i).c_str(), i);
+
+		mafVME *root = m_Input->GetRoot();
+
+		if (root->GetTagArray()->IsTagPresent("VOLUME_MEASURE"))
+			root->GetTagArray()->DeleteTag("VOLUME_MEASURE");
+
+		root->GetTagArray()->SetTag(measure_item);
+
+		GetLogicManager()->VmeModified(root);
+	}
+
+	vtkDEL(m_TriangleFilter);
+	vtkDEL(m_MassProperties);
+	if (!this->m_TestMode)
+	{
+		HideGui();
+	}
+
+	mafEventMacro(mafEvent(this, result));
 }
 
 //----------------------------------------------------------------------------
