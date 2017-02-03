@@ -76,7 +76,7 @@ mafGizmoROI::mafGizmoROI(mafVME *input, mafObserver* listener /* = NULL  */, int
 	m_OutlineGizmo = new mafGizmoBoundingBox(input, this,parent);
 
   UpdateOutlineBounds();
-
+	UpdateGizmosLength();
 }
 //----------------------------------------------------------------------------
 mafGizmoROI::~mafGizmoROI() 
@@ -662,7 +662,7 @@ void mafGizmoROI::Reset()
 //----------------------------------------------------------------------------
 {
   double b[6];
-  m_InputVME->GetOutput()->GetBounds(b);
+	m_InputVME->GetOutput()->GetVMELocalBounds(b);
   SetBounds(b);
   UpdateGizmosLength();
 }
