@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: medInteractor2DDistanceTest
+ Module: mafInteractor2DDistanceTest
  Authors: Matteo Giacomoni
  
  Copyright (c) B3C
@@ -14,14 +14,14 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_medInteractor2DDistanceTest_H__
-#define __CPP_UNIT_medInteractor2DDistanceTest_H__
+#ifndef __CPP_UNIT_mafInteractor2DDistanceTest_H__
+#define __CPP_UNIT_mafInteractor2DDistanceTest_H__
 
 #include "mafTest.h"
 
 class mafGUIFrame;
 
-class medInteractor2DDistanceTest : public mafTest
+class mafInteractor2DDistanceTest : public mafTest
 {
 public:
 
@@ -31,7 +31,7 @@ public:
   // Executed after each test
   void AfterTest();
 
-  CPPUNIT_TEST_SUITE( medInteractor2DDistanceTest );
+  CPPUNIT_TEST_SUITE( mafInteractor2DDistanceTest );
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestStaticAllocation );
