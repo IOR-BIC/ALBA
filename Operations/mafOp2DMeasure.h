@@ -20,11 +20,6 @@
 #include "mafOp.h"
 #include "mafString.h"
 
-#ifdef MAF_EXPORTS
-#include "mafDllMacros.h"
-EXPORT_STL_VECTOR(MAF_EXPORT,int);
-#endif
-
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -56,29 +51,6 @@ public:
 	virtual void OpRun();
 
 protected:
-
-  //----------------------------------------------------------------------------
-  // Widgets ID's
-  //----------------------------------------------------------------------------
-  enum MEASURE2D_ID
-  {
-    ID_MEASURE_TYPE = MINID,
-    ID_PLOT_PROFILE,
-    ID_MANUAL_DISTANCE,
-    ID_MANUAL_ANGLE,
-    ID_MANUAL_INDICATOR,
-    ID_UNDO_MEASURE,
-
-    ID_STORE_MEASURE,
-    ID_REMOVE_MEASURE,
-    ID_MEASURE_LIST,
-
-    ID_DISTANCE_TYPE,
-    ID_ANGLE_TYPE,
-    ID_INDICATOR_TYPE,
-    MINID,
-  };
-
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);
 

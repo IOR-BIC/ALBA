@@ -115,7 +115,6 @@ IF (MAF_USE_VTK)
 	mafOpComputeInertialTensor.cpp	mafOpComputeInertialTensor.h    
 	mafOpExporterWrappedMeter.cpp	mafOpExporterWrappedMeter.h
 	mafOpLabelizeSurface.cpp  mafOpLabelizeSurface.h
-	medOp2DMeasure.cpp  medOp2DMeasure.h  
 	mafOpFreezeVME.cpp  mafOpFreezeVME.h
   
 	mafOpIterativeRegistration.cpp  mafOpIterativeRegistration.h
