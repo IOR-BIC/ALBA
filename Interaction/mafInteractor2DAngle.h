@@ -213,6 +213,7 @@ protected:
 private:
 	mafInteractor2DAngle(const mafInteractor2DAngle&);   // Not implemented.
 	void operator=(const mafInteractor2DAngle&);  // Not implemented.
+	friend class mafInteractor2DAngleTest;
 };
 #endif
 

@@ -68,7 +68,7 @@ SET(PROJECT_SRCS
 	mmiInfoImageTest.h mmiInfoImageTest.cpp
 	mafInteractorDICOMImporterTest.h mafInteractorDICOMImporterTest.cpp
 	medInteractor2DDistanceTest.h medInteractor2DDistanceTest.cpp
-	medInteractor2DAngleTest.h medInteractor2DAngleTest.cpp
+	mafInteractor2DAngleTest.h mafInteractor2DAngleTest.cpp
 	medInteractor2DIndicatorTest.h medInteractor2DIndicatorTest.cpp
 )
 
