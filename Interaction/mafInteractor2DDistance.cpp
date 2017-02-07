@@ -1167,7 +1167,7 @@ void mafInteractor2DDistance::SetColor(double r,double g,double b)
 }
 
 //----------------------------------------------------------------------------
-mafInteractor2DDistance* mafInteractor2DDistance::NewTestIstance()
+mafInteractor2DDistance* mafInteractor2DDistance::NewTestInstance()
 //----------------------------------------------------------------------------
 {
   return new mafInteractor2DDistance(true); 

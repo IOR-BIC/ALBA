@@ -82,9 +82,10 @@
 #include "mmiVTKPickerTest.h"
 #include "mmiSelectPointTest.h"
 #include "mmiInfoImageTest.h"
-#include "medInteractor2DDistanceTest.h"
-#include "medInteractor2DAngleTest.h"
-#include "medInteractor2DIndicatorTest.h"
+#include "mafInteractor2DDistanceTest.h"
+#include "mafInteractor2DAngleTest.h"
+#include "mafInteractor2DIndicatorTest.h"
+#include "mafInteractorDICOMImporterTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -134,14 +135,15 @@ int
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
 
-	runner.addTest(mafGizmoRotateFanTest::suite()); // Fix
+
+	runner.addTest(mafGizmoRotateFanTest::suite()); 
 	runner.addTest(mafGizmoPathTest::suite());
 	runner.addTest(mafGizmoPathRulerTest::suite());
 	runner.addTest(mafInteractorSelectCellTest::suite());
 	runner.addTest(mafGizmoTranslateAxisTest::suite());
 	runner.addTest(mafGizmoTranslatePlaneTest::suite());
 	runner.addTest(mafGizmoBoundingBoxTest::suite());
-	runner.addTest(mafGizmoScaleIsotropicTest::suite()); // Fix
+	runner.addTest(mafGizmoScaleIsotropicTest::suite()); 
 	runner.addTest(mafGizmoROITest::suite());
 	runner.addTest(mafGizmoHandleTest::suite());
 	runner.addTest(mafAgentTest::suite());
@@ -188,10 +190,10 @@ int
 	runner.addTest(mmiVTKPickerTest::suite());
 	runner.addTest(mmiSelectPointTest::suite());
 	runner.addTest(mmiInfoImageTest::suite());
-	//runner.addTest(mafInteractorDICOMImporterTest::suite());
-	runner.addTest(medInteractor2DDistanceTest::suite());
-	runner.addTest(medInteractor2DAngleTest::suite());
-	runner.addTest(medInteractor2DIndicatorTest::suite());
+	runner.addTest(mafInteractorDICOMImporterTest::suite());
+	runner.addTest(mafInteractor2DDistanceTest::suite());
+ 	runner.addTest(mafInteractor2DAngleTest::suite());
+ 	runner.addTest(mafInteractor2DIndicatorTest::suite());
 
 	runner.run( controller );
 

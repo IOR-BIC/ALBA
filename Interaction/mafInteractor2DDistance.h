@@ -150,7 +150,7 @@ public:
 
 protected:
 	/** Implemented a New() function for testing mode. */
-  static mafInteractor2DDistance *mafInteractor2DDistance::NewTestIstance();
+  static mafInteractor2DDistance *mafInteractor2DDistance::NewTestInstance();
 
 	mafInteractor2DDistance(bool testMode = false);
 	virtual ~mafInteractor2DDistance();

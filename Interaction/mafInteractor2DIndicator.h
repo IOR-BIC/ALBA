@@ -181,8 +181,11 @@ protected:
 	mafVME *m_ProbedVME; ///< VME probed by the m_ProbingLine
   
 private:
+
 	mafInteractor2DIndicator(const mafInteractor2DIndicator&);   // Not implemented.
 	void operator=(const mafInteractor2DIndicator&);  // Not implemented.
+
+	friend class mafInteractor2DIndicatorTest;
 };
 #endif
 

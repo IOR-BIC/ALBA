@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: medInteractor2DIndicatorTest
+ Module: mafInteractor2DIndicatorTest
  Authors: Matteo Giacomoni
  
  Copyright (c) B3C
@@ -14,18 +14,18 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_medInteractor2DIndicatorTest_H__
-#define __CPP_UNIT_medInteractor2DIndicatorTest_H__
+#ifndef __CPP_UNIT_mafInteractor2DIndicatorTest_H__
+#define __CPP_UNIT_mafInteractor2DIndicatorTest_H__
 
 #include "mafTest.h"
 
 class mafGUIFrame;
 
-class medInteractor2DIndicatorTest : public mafTest
+class mafInteractor2DIndicatorTest : public mafTest
 {
 public:
 
-	CPPUNIT_TEST_SUITE( medInteractor2DIndicatorTest );
+	CPPUNIT_TEST_SUITE( mafInteractor2DIndicatorTest );
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestStaticAllocation );

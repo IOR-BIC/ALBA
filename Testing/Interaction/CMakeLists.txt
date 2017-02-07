@@ -69,7 +69,7 @@ SET(PROJECT_SRCS
 	mafInteractorDICOMImporterTest.h mafInteractorDICOMImporterTest.cpp
 	mafInteractor2DDistanceTest.h mafInteractor2DDistanceTest.cpp
 	mafInteractor2DAngleTest.h mafInteractor2DAngleTest.cpp
-	medInteractor2DIndicatorTest.h medInteractor2DIndicatorTest.cpp
+	mafInteractor2DIndicatorTest.h mafInteractor2DIndicatorTest.cpp
 )
 
 ADD_EXECUTABLE(mafInteractionTests ${PROJECT_SRCS})

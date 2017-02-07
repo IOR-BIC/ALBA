@@ -77,7 +77,6 @@ SET(PROJECT_SRCS
   medInteractorPicker.cpp  					medInteractorPicker.h
   mafInteractorPERPicker.cpp  				mafInteractorPERPicker.h
   mafInteractorDICOMImporter.h  			mafInteractorDICOMImporter.cpp  
-  medInteractor2DIndicator.cpp  			medInteractor2DIndicator.h
   mafInteractorSegmentationPicker.cpp  		mafInteractorSegmentationPicker.h 
   mafInteractorPERScalarInformation.cpp  	mafInteractorPERScalarInformation.h
   mafInteractorPERBrushFeedback.cpp  		mafInteractorPERBrushFeedback.h
