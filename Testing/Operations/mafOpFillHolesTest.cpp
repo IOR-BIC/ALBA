@@ -26,7 +26,7 @@
 #include "mafOpFillHoles.h"
 
 #include "mafVMESurface.h"
-#include "medOpImporterVTK.h"
+#include "mafOpImporterVTK.h"
 
 #include "vtkSphereSource.h"
 #include "vtkAppendPolyData.h"
@@ -77,7 +77,7 @@ void mafOpFillHolesTest::TestAccept()
 void mafOpFillHolesTest::TestOpRun()
 //-------------------------------------------------------------------------
 {
-  medOpImporterVTK *importerVTK = new medOpImporterVTK("importerVTK");
+  mafOpImporterVTK *importerVTK = new mafOpImporterVTK("importerVTK");
   importerVTK->TestModeOn();
 
   mafString absPathFilename=MAF_DATA_ROOT;

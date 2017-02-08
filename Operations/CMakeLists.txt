@@ -124,7 +124,6 @@ IF (MAF_USE_VTK)
 	mafOpTriangulateSurface.cpp  mafOpTriangulateSurface.h
 
 	mafOpSurfaceMirror.cpp  mafOpSurfaceMirror.h  
-	medOpImporterVTK.cpp  medOpImporterVTK.h  
 	mafOpImporterVTKXML.cpp  mafOpImporterVTKXML.h  
 	mafOpExporterVTKXML.cpp  mafOpExporterVTKXML.h
 	mafOpSubdivide.cpp  mafOpSubdivide.h

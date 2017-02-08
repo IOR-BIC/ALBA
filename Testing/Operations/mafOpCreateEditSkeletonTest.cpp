@@ -24,7 +24,7 @@
 
 #include "mafOpCreateEditSkeletonTest.h"
 #include "mafOpCreateEditSkeleton.h"
-#include "medOpImporterVTK.h"
+#include "mafOpImporterVTK.h"
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 #include "mafVMEVolumeGray.h"
@@ -36,6 +36,7 @@
 
 #include <string>
 #include <assert.h>
+#include "mafVMEPolyline.h"
 
 //-----------------------------------------------------------
 void mafOpCreateEditSkeletonTest::TestDynamicAllocation() 
@@ -67,13 +68,20 @@ void mafOpCreateEditSkeletonTest::TestOpRun()
 //-----------------------------------------------------------
 {
   // import VTK  
-  medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
+  mafOpImporterVTK *importer=new mafOpImporterVTK("importerVTK");
   importer->TestModeOn();
   mafString fileName=MAF_DATA_ROOT;
   fileName<<"/PolylineGraph/PolylineGraph.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();
-  mafVMEPolylineGraph *graph=mafVMEPolylineGraph::SafeDownCast(importer->GetOutput());
+  mafVMEPolyline *polyline=mafVMEPolyline::SafeDownCast(importer->GetOutput());
+	polyline->Update();
+	polyline->GetOutput()->Update();
+
+	mafVMEPolylineGraph *graph;
+	mafNEW(graph);
+	graph->SetData((vtkPolyData*)polyline->GetOutput()->GetVTKData(), 0);
+
   graph->GetOutput()->GetVTKData()->Update();
   
   CPPUNIT_ASSERT(graph!=NULL);
@@ -117,4 +125,5 @@ void mafOpCreateEditSkeletonTest::TestOpRun()
   mafDEL(create);
   mafDEL(volume);
 	mafDEL(importer);
+	mafDEL(graph);
 }

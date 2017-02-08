@@ -38,7 +38,7 @@
 #include "vtkDataArray.h"
 
 #include "mafOpVolumeResample.h"
-#include "medOpImporterVTK.h"
+#include "mafOpImporterVTK.h"
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 
@@ -217,7 +217,7 @@ void mafOpEqualizeHistogramTest::TestOpExecute()
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
 
-  medOpImporterVTK *importerVTK=new medOpImporterVTK("importerVTK");
+  mafOpImporterVTK *importerVTK=new mafOpImporterVTK("importerVTK");
   importerVTK->TestModeOn();
   importerVTK->SetInput(storage->GetRoot());
 
@@ -275,7 +275,7 @@ void mafOpEqualizeHistogramTest::TestOpUndo()
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
 
-  medOpImporterVTK *importerVTK=new medOpImporterVTK("importerVTK");
+  mafOpImporterVTK *importerVTK=new mafOpImporterVTK("importerVTK");
   importerVTK->TestModeOn();
   importerVTK->SetInput(storage->GetRoot());
 
