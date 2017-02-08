@@ -90,14 +90,14 @@ void mafOpExporterWrappedMeterTest::meterImplement(){
 	vmeEND->SetAbsMatrix(matrix2);
 
 	//------------create meter--------------------- 
-	medVMEComputeWrapping  *wrappedMeter;
+	mafVMEComputeWrapping  *wrappedMeter;
 	mafNEW(wrappedMeter);
 
 	wrappedMeter->SetMeterLink("StartVME",vmeSTART);
 	wrappedMeter->SetMeterLink("EndVME1",vmeEND);
 	wrappedMeter->SetMeterLink("WrappedVME1",vmeSphere);
-	wrappedMeter->SetWrappedClass(medVMEComputeWrapping::NEW_METER);
-	wrappedMeter->SetWrappedMode1(medVMEComputeWrapping::SINGLE_SPHERE);
+	wrappedMeter->SetWrappedClass(mafVMEComputeWrapping::NEW_METER);
+	wrappedMeter->SetWrappedMode1(mafVMEComputeWrapping::SINGLE_SPHERE);
 
 
 	wrappedMeter->ReparentTo(storage->GetRoot());

@@ -58,7 +58,7 @@ class vtkCellArray;
 class mafGUIRollOut;
 /** medVMEComputeWrapping - 
 */
-class MAF_EXPORT medVMEComputeWrapping : public mafVME
+class MAF_EXPORT mafVMEComputeWrapping : public mafVME
 {
 
 
@@ -130,7 +130,7 @@ public:
 		ABSOLUTE_MEASURE=0,
 		RELATIVE_MEASURE
 	};
-	mafTypeMacro(medVMEComputeWrapping,mafVME);
+	mafTypeMacro(mafVMEComputeWrapping,mafVME);
 
 	enum METER_WIDGET_ID
 	{
@@ -213,7 +213,7 @@ public:
 	distance between a point and a line. */
 	int GetMeterMode();
 	void SetMeterMode(int mode);
-	void SetMeterModeToPointDistance() {this->SetMeterMode(medVMEComputeWrapping::POINT_DISTANCE);}
+	void SetMeterModeToPointDistance() {this->SetMeterMode(mafVMEComputeWrapping::POINT_DISTANCE);}
 	// void SetMeterModeToLineDistance() {this->SetMeterMode(medVMEComputeWrapping::LINE_DISTANCE);}
 	// void SetMeterModeToLineAngle() {this->SetMeterMode(medVMEComputeWrapping::LINE_ANGLE);}
 
@@ -230,8 +230,8 @@ public:
 	/** 
 	Color the meter with a range colors extracted by a LookupTable or in flat mode selected by material library. */
 	void SetMeterColorMode(int mode);
-	void SetMeterColorModeToOneColor() {this->SetMeterColorMode(medVMEComputeWrapping::ONE_COLOR);}
-	void SetMeterColorModeToRangeColor() {this->SetMeterColorMode(medVMEComputeWrapping::RANGE_COLOR);}
+	void SetMeterColorModeToOneColor() {this->SetMeterColorMode(mafVMEComputeWrapping::ONE_COLOR);}
+	void SetMeterColorModeToRangeColor() {this->SetMeterColorMode(mafVMEComputeWrapping::RANGE_COLOR);}
 
 	/** 
 	Get the color mode of the meter. */
@@ -240,8 +240,8 @@ public:
 	/** 
 	Set the measure type to absolute or relative to the initial measure. */
 	void SetMeterMeasureType(int type);
-	void SetMeterMeasureTypeToAbsolute() {this->SetMeterMeasureType(medVMEComputeWrapping::ABSOLUTE_MEASURE);}
-	void SetMeterMeasureTypeToRelative() {this->SetMeterMeasureType(medVMEComputeWrapping::RELATIVE_MEASURE);}
+	void SetMeterMeasureTypeToAbsolute() {this->SetMeterMeasureType(mafVMEComputeWrapping::ABSOLUTE_MEASURE);}
+	void SetMeterMeasureTypeToRelative() {this->SetMeterMeasureType(mafVMEComputeWrapping::RELATIVE_MEASURE);}
 
 	/** 
 	Get the measure type. */
@@ -250,8 +250,8 @@ public:
 	/** 
 	Represent the meter with a tube or as a line. */
 	void SetMeterRepresentation(int representation);
-	void SetMeterRepresentationToLine() {this->SetMeterRepresentation(medVMEComputeWrapping::LINE_REPRESENTATION);}
-	void SetMeterRepresentationToTube() {this->SetMeterRepresentation(medVMEComputeWrapping::TUBE_REPRESENTATION);}
+	void SetMeterRepresentationToLine() {this->SetMeterRepresentation(mafVMEComputeWrapping::LINE_REPRESENTATION);}
+	void SetMeterRepresentationToTube() {this->SetMeterRepresentation(mafVMEComputeWrapping::TUBE_REPRESENTATION);}
 
 	/** 
 	Get the representation mode of the meter. */
@@ -377,7 +377,7 @@ public:
 	std::vector<int> m_OrderMiddlePointsVMEList; //order list of VME ID
 
 protected:
-	medVMEComputeWrapping();
+	mafVMEComputeWrapping();
 
 //-------------------old functions begin------------------
 	/** update the output data structure */
@@ -385,7 +385,7 @@ protected:
 	
 	
 
-	virtual ~medVMEComputeWrapping();
+	virtual ~mafVMEComputeWrapping();
 	virtual int InternalStore(mafStorageElement *parent);
 	virtual int InternalRestore(mafStorageElement *node);
 
@@ -657,8 +657,8 @@ protected:
 
 	
 private:
-	medVMEComputeWrapping(const medVMEComputeWrapping&); // Not implemented
-	void operator=(const medVMEComputeWrapping&); // Not implemented
+	mafVMEComputeWrapping(const mafVMEComputeWrapping&); // Not implemented
+	void operator=(const mafVMEComputeWrapping&); // Not implemented
 
 };
 #endif

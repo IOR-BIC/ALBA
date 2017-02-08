@@ -91,7 +91,7 @@ void mafPipeComputeWrapping::Create(mafSceneNode *n/*, bool use_axes*/)
   m_Caption           = NULL;
 
   assert(m_Vme->IsA("medVMEComputeWrapping"));
-  m_WrappedMeterVME = medVMEComputeWrapping::SafeDownCast(m_Vme);
+  m_WrappedMeterVME = mafVMEComputeWrapping::SafeDownCast(m_Vme);
   m_WrappedMeterVME->GetEventSource()->AddObserver(this);
   assert(m_WrappedMeterVME->GetWrappedMeterOutput());
   m_WrappedMeterVME->GetWrappedMeterOutput()->Update();
@@ -116,7 +116,7 @@ void mafPipeComputeWrapping::Create(mafSceneNode *n/*, bool use_axes*/)
   m_Lut->Build();
 
   vtkNEW(m_DataMapper);
-  if (m_WrappedMeterVME->GetMeterRepresentation() == medVMEComputeWrapping::LINE_REPRESENTATION)
+  if (m_WrappedMeterVME->GetMeterRepresentation() == mafVMEComputeWrapping::LINE_REPRESENTATION)
     m_DataMapper->SetInput(data);
   else
   {
@@ -125,7 +125,7 @@ void mafPipeComputeWrapping::Create(mafSceneNode *n/*, bool use_axes*/)
   }
     
 	m_DataMapper->ImmediateModeRenderingOff();
-  if(m_WrappedMeterVME->GetMeterColorMode() == medVMEComputeWrapping::RANGE_COLOR)
+  if(m_WrappedMeterVME->GetMeterColorMode() == mafVMEComputeWrapping::RANGE_COLOR)
     m_DataMapper->SetLookupTable(m_Lut);
 
   vtkNEW(m_DataActor);
@@ -158,7 +158,7 @@ void mafPipeComputeWrapping::Create(mafSceneNode *n/*, bool use_axes*/)
   vtkNEW(m_Caption);
   m_Caption->SetPosition(25,10);
   m_Caption->ThreeDimensionalLeaderOff();
-  if(m_WrappedMeterVME->GetMeterColorMode() != medVMEComputeWrapping::RANGE_COLOR)
+  if(m_WrappedMeterVME->GetMeterColorMode() != mafVMEComputeWrapping::RANGE_COLOR)
   {
     double c[3];
     m_DataActor->GetProperty()->GetColor(c);
@@ -181,7 +181,7 @@ void mafPipeComputeWrapping::Create(mafSceneNode *n/*, bool use_axes*/)
  /* if(m_WrappedMeterVME->GetMeterMode() == medVMEComputeWrapping::LINE_ANGLE)
     m_Caption->SetVisibility((m_WrappedMeterVME->GetAngle() != 0) && m_WrappedMeterVME->GetMeterAttributes()->m_LabelVisibility);
   else*/
-    m_Caption->SetVisibility((m_WrappedMeterVME->GetDistance() >= 0 || m_WrappedMeterVME->GetMeterMeasureType() == medVMEComputeWrapping::RELATIVE_MEASURE) && m_WrappedMeterVME->GetMeterAttributes()->m_LabelVisibility);
+    m_Caption->SetVisibility((m_WrappedMeterVME->GetDistance() >= 0 || m_WrappedMeterVME->GetMeterMeasureType() == mafVMEComputeWrapping::RELATIVE_MEASURE) && m_WrappedMeterVME->GetMeterAttributes()->m_LabelVisibility);
   
   if(m_WrappedMeterVME->GetStartVME())
   {
@@ -248,10 +248,10 @@ mafGUI *mafPipeComputeWrapping::CreateGui()
   m_Gui->Bool(ID_GENERATE_EVENT,"gen. event",&meter_attrib->m_GenerateEvent);
   m_Gui->Double(ID_DELTA_PERCENT,"delta %",&meter_attrib->m_DeltaPercent,0);
 
-  m_MaterialButton->Enable(meter_attrib->m_ColorMode == medVMEComputeWrapping::ONE_COLOR);
-  m_Gui->Enable(ID_DISTANCE_RANGE,meter_attrib->m_ColorMode == medVMEComputeWrapping::RANGE_COLOR);
-  m_Gui->Enable(ID_TUBE_RADIUS, meter_attrib->m_Representation == medVMEComputeWrapping::TUBE_REPRESENTATION);
-  m_Gui->Enable(ID_TUBE_CAPPING, meter_attrib->m_Representation == medVMEComputeWrapping::TUBE_REPRESENTATION);
+  m_MaterialButton->Enable(meter_attrib->m_ColorMode == mafVMEComputeWrapping::ONE_COLOR);
+  m_Gui->Enable(ID_DISTANCE_RANGE,meter_attrib->m_ColorMode == mafVMEComputeWrapping::RANGE_COLOR);
+  m_Gui->Enable(ID_TUBE_RADIUS, meter_attrib->m_Representation == mafVMEComputeWrapping::TUBE_REPRESENTATION);
+  m_Gui->Enable(ID_TUBE_CAPPING, meter_attrib->m_Representation == mafVMEComputeWrapping::TUBE_REPRESENTATION);
 	m_Gui->Divider();
 
   return m_Gui;
@@ -269,13 +269,13 @@ void mafPipeComputeWrapping::OnEvent(mafEventBase *maf_event)
         UpdateProperty();
       break;
       case ID_COLOR_MODE:
-        m_Gui->Enable(ID_DISTANCE_RANGE,meter_attrib->m_ColorMode == medVMEComputeWrapping::RANGE_COLOR);
-        m_MaterialButton->Enable(meter_attrib->m_ColorMode == medVMEComputeWrapping::ONE_COLOR);
+        m_Gui->Enable(ID_DISTANCE_RANGE,meter_attrib->m_ColorMode == mafVMEComputeWrapping::RANGE_COLOR);
+        m_MaterialButton->Enable(meter_attrib->m_ColorMode == mafVMEComputeWrapping::ONE_COLOR);
         UpdateProperty();
       break;
       case ID_METER_REPRESENTATION:
-        m_Gui->Enable(ID_TUBE_RADIUS, meter_attrib->m_Representation == medVMEComputeWrapping::TUBE_REPRESENTATION);
-        m_Gui->Enable(ID_TUBE_CAPPING, meter_attrib->m_Representation == medVMEComputeWrapping::TUBE_REPRESENTATION);
+        m_Gui->Enable(ID_TUBE_RADIUS, meter_attrib->m_Representation == mafVMEComputeWrapping::TUBE_REPRESENTATION);
+        m_Gui->Enable(ID_TUBE_CAPPING, meter_attrib->m_Representation == mafVMEComputeWrapping::TUBE_REPRESENTATION);
         UpdateProperty();
       break;
       case ID_TUBE_RADIUS:
@@ -304,7 +304,7 @@ void mafPipeComputeWrapping::OnEvent(mafEventBase *maf_event)
     {
       UpdateProperty();
     }
-    else if(maf_event->GetId() == medVMEComputeWrapping::LENGTH_THRESHOLD_EVENT) 
+    else if(maf_event->GetId() == mafVMEComputeWrapping::LENGTH_THRESHOLD_EVENT) 
     {
     }
   }
@@ -337,7 +337,7 @@ void mafPipeComputeWrapping::UpdateProperty(bool fromTag)
   
 	vtkPolyData *data =vtkPolyData::SafeDownCast(m_WrappedMeterVME->GetWrappedMeterOutput()->GetVTKData());
   data->Update();
-  if (m_WrappedMeterVME->GetMeterRepresentation() == medVMEComputeWrapping::LINE_REPRESENTATION)
+  if (m_WrappedMeterVME->GetMeterRepresentation() == mafVMEComputeWrapping::LINE_REPRESENTATION)
     m_DataMapper->SetInput(data);
   else
   {
@@ -356,7 +356,7 @@ void mafPipeComputeWrapping::UpdateProperty(bool fromTag)
   double rgb[3];
   double v = m_WrappedMeterVME->GetDistance();
   int color_mode = m_WrappedMeterVME->GetMeterColorMode();
-  if(color_mode == medVMEComputeWrapping::RANGE_COLOR)
+  if(color_mode == mafVMEComputeWrapping::RANGE_COLOR)
   {
     double *range;
     m_DataMapper->SetLookupTable(m_Lut);

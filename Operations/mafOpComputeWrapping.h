@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class medVMEComputeWrapping;
+class mafVMEComputeWrapping;
 class mafGui;
 class mafEvent;
 
@@ -56,6 +56,6 @@ public:
   void OpDo();
 
 protected: 
-  medVMEComputeWrapping *m_Meter;
+  mafVMEComputeWrapping *m_Meter;
 };
 #endif

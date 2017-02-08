@@ -67,7 +67,7 @@ void mafVMEOutputComputeWrappingTest::TestGetPolylineData_Update()
 //----------------------------------------------------------------------------
 {
   //create a wrapped meter
-    medVMEComputeWrapping *vmeWrappedMeter;
+  mafVMEComputeWrapping *vmeWrappedMeter;
   mafNEW(vmeWrappedMeter);
 
   /*vtkMAFSmartPointer<vtkPoints> pts;

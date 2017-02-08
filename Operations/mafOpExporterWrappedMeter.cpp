@@ -79,7 +79,7 @@ mafOp* mafOpExporterWrappedMeter::Copy()
 bool mafOpExporterWrappedMeter::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
-  return (node && node->IsMAFType(medVMEComputeWrapping));
+  return (node && node->IsMAFType(mafVMEComputeWrapping));
 }
 //----------------------------------------------------------------------------
 // constants
@@ -209,7 +209,7 @@ void mafOpExporterWrappedMeter::ExportWrappedMeter()
 		{
 			m_CurrentVme = m_Meters[i];
 
-			if(medVMEComputeWrapping::SafeDownCast(m_CurrentVme))
+			if(mafVMEComputeWrapping::SafeDownCast(m_CurrentVme))
 			{
 				ExportWrappedMeterCoordinates(i,j);
 			}
@@ -223,7 +223,7 @@ void mafOpExporterWrappedMeter::ExportWrappedMeterCoordinates(int index, int ind
 //----------------------------------------------------------------------------
 {
 
-	medVMEComputeWrapping *vmeWrappedMeter =  medVMEComputeWrapping::SafeDownCast(m_CurrentVme);
+	mafVMEComputeWrapping *vmeWrappedMeter =  mafVMEComputeWrapping::SafeDownCast(m_CurrentVme);
 	vmeWrappedMeter->GetOutput()->GetVTKData()->Modified();
 	vmeWrappedMeter->GetOutput()->GetVTKData()->Update();
 	vmeWrappedMeter->Modified();
@@ -234,7 +234,7 @@ void mafOpExporterWrappedMeter::ExportWrappedMeterCoordinates(int index, int ind
 	if(indexTime == 0)
 	{
 		vnl_matrix<double> M;
-		size = medVMEComputeWrapping::SafeDownCast(m_CurrentVme)->GetNumberExportPoints();
+		size = mafVMEComputeWrapping::SafeDownCast(m_CurrentVme)->GetNumberExportPoints();
 		
 		int numberOfRows = m_Times.size();
 		int numberOfColumns = (2+4) *3;//(start + 4 key points + end )*3
@@ -244,7 +244,7 @@ void mafOpExporterWrappedMeter::ExportWrappedMeterCoordinates(int index, int ind
 		m_MetersCoordinatesList.push_back(M);
 	}
 	
-	if (vmeWrappedMeter->GetWrappedClass()==medVMEComputeWrapping::NEW_METER)
+	if (vmeWrappedMeter->GetWrappedClass()==mafVMEComputeWrapping::NEW_METER)
 	{
 		//origin
 		double *value = vmeWrappedMeter->GetStartPointCoordinate();
@@ -267,9 +267,9 @@ void mafOpExporterWrappedMeter::ExportWrappedMeterCoordinates(int index, int ind
 		m_MetersCoordinatesList[index].put(indexTime,3*5,value[0]);
 		m_MetersCoordinatesList[index].put(indexTime,3*5+1,value[1]);
 		m_MetersCoordinatesList[index].put(indexTime,3*5+2,value[2]);
-	}else if (vmeWrappedMeter->GetWrappedClass()==medVMEComputeWrapping::OLD_METER)
+	}else if (vmeWrappedMeter->GetWrappedClass()==mafVMEComputeWrapping::OLD_METER)
 	{
-		if (vmeWrappedMeter->GetWrappedMode2() == medVMEComputeWrapping::MANUAL_WRAP)
+		if (vmeWrappedMeter->GetWrappedMode2() == mafVMEComputeWrapping::MANUAL_WRAP)
 		{
 			for(int i=0; i<vmeWrappedMeter->GetNumberMiddlePoints();i++)
 			{
@@ -277,7 +277,7 @@ void mafOpExporterWrappedMeter::ExportWrappedMeterCoordinates(int index, int ind
 					<< vmeWrappedMeter->GetMiddlePointCoordinate(i)[1] << '\t'
 					<< vmeWrappedMeter->GetMiddlePointCoordinate(i)[2] << std::endl;
 			}
-		}else if (vmeWrappedMeter->GetWrappedMode2() == medVMEComputeWrapping::AUTOMATED_WRAP)
+		}else if (vmeWrappedMeter->GetWrappedMode2() == mafVMEComputeWrapping::AUTOMATED_WRAP)
 		{
 			m_OutputFile << vmeWrappedMeter->GetWrappedGeometryTangent1()[0] << '\t'
 				<< vmeWrappedMeter->GetWrappedGeometryTangent1()[1] << '\t'
@@ -475,7 +475,7 @@ void mafOpExporterWrappedMeter::Test()
 	
 	mafVMELandmarkCloud *cloud=(mafVMELandmarkCloud *)importer->GetOutput();
 
-	medVMEComputeWrapping *wrappedMeter;
+	mafVMEComputeWrapping *wrappedMeter;
 	mafNEW(wrappedMeter);
 
 	wrappedMeter->SetMeterLink("StartVME",cloud->GetLandmark(0));
