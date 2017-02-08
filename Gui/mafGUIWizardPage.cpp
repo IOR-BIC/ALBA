@@ -62,7 +62,7 @@ mafGUIWizardPage::mafGUIWizardPage(mafGUIWizard *wizardParent,long style /* = me
   m_GuiLowerLeft = NULL;
   m_GuiLowerCenter = NULL;
 
-	if(style & medUSERWI)
+	if(style & mafWIZARDUSERWI)
 	{
 		m_Rwi = new mafRWI(this);
 		m_Rwi->SetSize(0,0,600,600);
@@ -70,7 +70,7 @@ mafGUIWizardPage::mafGUIWizardPage(mafGUIWizard *wizardParent,long style /* = me
 		m_RwiSizer->Add(m_Rwi->m_RwiBase,1,wxEXPAND);
     m_SizerAll->Add(m_RwiSizer,1,wxEXPAND);
 	}
-	if(style & medUSEGUI)
+	if(style & mafWIZARDUSEGUI)
 	{
 		if (plugLeftGui)
 		{
@@ -108,11 +108,11 @@ mafGUIWizardPage::~mafGUIWizardPage()
 {
 	cppDEL(m_Rwi);
 
-  if(!(m_Style & medUSERWI))
+  if(!(m_Style & mafWIZARDUSERWI))
   {
     delete m_RwiSizer;
   }
-  if(!(m_Style & medUSEGUI))
+  if(!(m_Style & mafWIZARDUSEGUI))
   {
     delete m_GUISizer;
   }

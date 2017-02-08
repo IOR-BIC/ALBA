@@ -70,7 +70,6 @@
 #include "mafOpImporterLandmarkWS.h"
 #include "mafOpImporterRAWImages.h"
 #include "mafOpImporterC3D.h"
-#include "medOpImporterVTK.h"
 #include "mafOpImporterAnsysCDBFile.h"
 #include "mafOpImporterAnsysInputFile.h"
 #include "mafOpCreateVolume.h"
@@ -90,7 +89,7 @@
 #endif
 #ifndef _DEBUG
 //OPERATIONS
-#include "medOp2DMeasure.h"
+#include "mafOp2DMeasure.h"
 #include "mafOpAddLandmark.h"
 #include "mafOpClipSurface.h"
 #include "mafOpCreateGroup.h"
@@ -246,7 +245,6 @@ bool ExampleApp::OnInit()
 	m_Logic->Plug(new mafOpImporterSTL("STL"));
 	m_Logic->Plug(new mafOpImporterVRML("VRML"));
 	m_Logic->Plug(new mafOpImporterVTK("VTK"));
-	m_Logic->Plug(new medOpImporterVTK("VTK (MED)"));
 	m_Logic->Plug(new mafOpImporterMSF("MSF"));
 	m_Logic->Plug(new mafOpImporterMSF1x("MSF 1.x"));
 	m_Logic->Plug(new mafOpImporterMesh("Mesh"));
@@ -290,7 +288,7 @@ bool ExampleApp::OnInit()
 	// Operation Menu':
 	//------------------------------------------------------------
 #ifndef _DEBUG
-	m_Logic->Plug(new medOp2DMeasure("2D Measure"),"Measure");
+	m_Logic->Plug(new mafOp2DMeasure("2D Measure"),"Measure");
 	m_Logic->Plug(new mafOpVOIDensity("VOI Density"),"Measure");
 	m_Logic->Plug(new mafOpVolumeMeasure("Volume"),"Measure");
 	m_Logic->Plug(new mafOpMeshQuality("Mesh Quality"),"Measure");

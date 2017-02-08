@@ -35,8 +35,8 @@ class mafGUI;
 //----------------------------------------------------------------------------
 enum DIALOG_EXSTYLES
 {
-	medUSEGUI = 1,
-	medUSERWI = 2,
+	mafWIZARDUSEGUI = 1,
+	mafWIZARDUSERWI = 2,
 };
 
 /**
@@ -51,7 +51,7 @@ class MAF_EXPORT mafGUIWizardPage : public wxWizardPageSimple, public mafObserve
 {
 public:
   /** constructor. */
-	mafGUIWizardPage (mafGUIWizard *wizardParent,long style = medUSEGUI | medUSERWI,wxString label="",bool plugCentralGui = true,bool plugLeftGui = true,bool plugRightGui = true);
+	mafGUIWizardPage (mafGUIWizard *wizardParent,long style = mafWIZARDUSEGUI | mafWIZARDUSERWI,wxString label="",bool plugCentralGui = true,bool plugLeftGui = true,bool plugRightGui = true);
   /** destructor. */
 	virtual ~mafGUIWizardPage ();
   /** Set the Listener that will receive event-notification. */

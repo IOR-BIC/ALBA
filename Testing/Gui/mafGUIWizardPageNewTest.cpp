@@ -53,7 +53,7 @@ void mafGUIWizardPageNewTest::TestDynamicAllocation()
 //----------------------------------------------------------------------------
 {
   mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
-  mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,medUSEGUI);
+  mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,mafWIZARDUSEGUI);
 
   delete page;
   delete wizard;
@@ -63,7 +63,7 @@ void mafGUIWizardPageNewTest::TestAddGuiLowerLeft()
 //----------------------------------------------------------------------------
 {
   mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
-  mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,medUSEGUI);
+  mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,mafWIZARDUSEGUI);
 
   mafGUI *gui = new mafGUI(page);
 
@@ -81,7 +81,7 @@ void mafGUIWizardPageNewTest::TestAddGuiLowerRight()
 //----------------------------------------------------------------------------
 {
   mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
-  mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,medUSEGUI);
+  mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,mafWIZARDUSEGUI);
 
   mafGUI *gui = new mafGUI(page);
 
@@ -99,7 +99,7 @@ void mafGUIWizardPageNewTest::TestAddGuiLowerCenter()
 //----------------------------------------------------------------------------
 {
   mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
-  mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,medUSEGUI);
+  mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,mafWIZARDUSEGUI);
 
   mafGUI *gui = new mafGUI(page);
 
@@ -117,7 +117,7 @@ void mafGUIWizardPageNewTest::TestAddGuiLowerUnderLeft()
 //----------------------------------------------------------------------------
 {
     mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
-    mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,medUSEGUI);
+    mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,mafWIZARDUSEGUI);
 
     mafGUI *gui = new mafGUI(page);
 
@@ -135,7 +135,7 @@ void mafGUIWizardPageNewTest::TestAddGuiLowerUnderCenter()
 //----------------------------------------------------------------------------
 {
     mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
-    mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,medUSEGUI);
+    mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,mafWIZARDUSEGUI);
 
     mafGUI *gui = new mafGUI(page);
 
@@ -153,7 +153,7 @@ void mafGUIWizardPageNewTest::TestRemoveGuiLowerLeft()
 //----------------------------------------------------------------------------
 {
   mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
-  mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,medUSEGUI);
+  mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,mafWIZARDUSEGUI);
 
   mafGUI *gui = new mafGUI(page);
 
@@ -173,7 +173,7 @@ void mafGUIWizardPageNewTest::TestRemoveGuiLowerUnderLeft()
 //----------------------------------------------------------------------------
 {
   mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
-  mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,medUSEGUI);
+  mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,mafWIZARDUSEGUI);
 
   mafGUI *gui = new mafGUI(page);
 
@@ -193,8 +193,8 @@ void mafGUIWizardPageNewTest::TestSetNextPage()
 //----------------------------------------------------------------------------
 {
   mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
-  mafGUIWizardPageNew *page1 = new mafGUIWizardPageNew(wizard,medUSEGUI);
-  mafGUIWizardPageNew *page2 = new mafGUIWizardPageNew(wizard,medUSEGUI);
+  mafGUIWizardPageNew *page1 = new mafGUIWizardPageNew(wizard,mafWIZARDUSEGUI);
+  mafGUIWizardPageNew *page2 = new mafGUIWizardPageNew(wizard,mafWIZARDUSEGUI);
 
   page1->SetNextPage(page2);
 
@@ -210,7 +210,7 @@ void mafGUIWizardPageNewTest::TestSetGetZCropBounds()
 //----------------------------------------------------------------------------
 {
     mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
-    mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,medUSEGUI,true);
+    mafGUIWizardPageNew *page = new mafGUIWizardPageNew(wizard,mafWIZARDUSEGUI,true);
 
     mafGUI *gui = new mafGUI(page);
 
@@ -234,7 +234,7 @@ void mafGUIWizardPageNewTest::TestUpdateWindowing()
 //----------------------------------------------------------------------------
 {
     mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
-    mafGUIWizardPageNew *page1 = new mafGUIWizardPageNew(wizard,medUSEGUI);
+    mafGUIWizardPageNew *page1 = new mafGUIWizardPageNew(wizard,mafWIZARDUSEGUI);
     
     //smoke test
     page1->UpdateWindowing();
@@ -247,7 +247,7 @@ void mafGUIWizardPageNewTest::TestUpdateActor()
 //----------------------------------------------------------------------------
 {
     mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
-    mafGUIWizardPageNew *page1 = new mafGUIWizardPageNew(wizard,medUSEGUI);
+    mafGUIWizardPageNew *page1 = new mafGUIWizardPageNew(wizard,mafWIZARDUSEGUI);
 
     //smoke test
     page1->UpdateActor();

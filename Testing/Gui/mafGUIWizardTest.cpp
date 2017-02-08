@@ -61,7 +61,7 @@ void mafGUIWizardTest::TestSetFirstPage()
 {
   mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
 
-  mafGUIWizardPage *page = new mafGUIWizardPage(wizard,medUSEGUI);
+  mafGUIWizardPage *page = new mafGUIWizardPage(wizard,mafWIZARDUSEGUI);
 
   wizard->SetFirstPage(page);
 
@@ -76,7 +76,7 @@ void mafGUIWizardTest::TestEnableChangePageOn()
 {
   mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
 
-  mafGUIWizardPage *page = new mafGUIWizardPage(wizard,medUSEGUI);
+  mafGUIWizardPage *page = new mafGUIWizardPage(wizard,mafWIZARDUSEGUI);
 
   wizard->EnableChangePageOn();
 
@@ -103,7 +103,7 @@ void mafGUIWizardTest::TestRun()
 {
   mafGUIWizard *wizard = new mafGUIWizard(_("TEST"),true);
 
-  mafGUIWizardPage *page = new mafGUIWizardPage(wizard,medUSEGUI);
+  mafGUIWizardPage *page = new mafGUIWizardPage(wizard,mafWIZARDUSEGUI);
 
   wizard->SetFirstPage(page);
 

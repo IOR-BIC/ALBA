@@ -1353,24 +1353,27 @@ void mafLogicWithManagers::VmeShow(mafVME *vme, bool visibility)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeModified(mafVME *vme)
 {
-	if (m_PlugTimebar) UpdateTimeBounds();
-	bool vme_in_tree = vme->IsVisible();
+	if (m_VMEManager->GetRoot()->IsInTree(vme))
+	{
+		if (m_PlugTimebar) UpdateTimeBounds();
+		bool vme_in_tree = vme->IsVisible();
 
-	if (m_SideBar && vme_in_tree)
-		m_SideBar->VmeModified(vme);
+		if (m_SideBar && vme_in_tree)
+			m_SideBar->VmeModified(vme);
 
-	if (m_VMEManager)
-		m_VMEManager->MSFModified(true);
+		if (m_VMEManager)
+			m_VMEManager->MSFModified(true);
 
-	//if a wizard manager was plugged we tell it about vme selection
-	if (m_WizardManager)
-		m_WizardManager->VmeModified(vme);
+		//if a wizard manager was plugged we tell it about vme selection
+		if (m_WizardManager)
+			m_WizardManager->VmeModified(vme);
 
-	if (m_OpManager)
-		m_OpManager->VmeModified(vme);
+		if (m_OpManager)
+			m_OpManager->VmeModified(vme);
 
-	if (!m_PlugTimebar && vme != NULL && vme->IsAnimated())
-		m_Win->ShowDockPane("timebar", !m_Win->DockPaneIsShown("timebar"));
+		if (!m_PlugTimebar && vme != NULL && vme->IsAnimated())
+			m_Win->ShowDockPane("timebar", !m_Win->DockPaneIsShown("timebar"));
+	}
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeAdd(mafVME *vme)

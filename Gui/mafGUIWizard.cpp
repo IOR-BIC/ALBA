@@ -62,7 +62,7 @@ mafGUIWizard::~mafGUIWizard()
 void mafGUIWizard::OnWizardPageChanging(wxWizardEvent& event)
   //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,MED_WIZARD_CHANGE_PAGE,event.GetDirection()));
+  mafEventMacro(mafEvent(this,MAF_WIZARD_CHANGE_PAGE,event.GetDirection()));
 
   if(!m_EnableChangePage)
   {
@@ -73,7 +73,7 @@ void mafGUIWizard::OnWizardPageChanging(wxWizardEvent& event)
 void mafGUIWizard::OnWizardPageChange(wxWizardEvent& event)
   //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,MED_WIZARD_CHANGED_PAGE,event.GetDirection()));
+  mafEventMacro(mafEvent(this,MAF_WIZARD_CHANGED_PAGE,event.GetDirection()));
 
   if(!m_EnableChangePage)
   {

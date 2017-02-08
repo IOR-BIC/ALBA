@@ -37,8 +37,8 @@ class mafGUILutSlider;
 /** IDs for the Dialog Style */
 enum DIALOG_EXSTYLES
 {
-	medUSEGUI = 1,
-	medUSERWI = 2,
+	mafWIZARDUSEGUI = 1,
+	mafWIZARDUSERWI = 2,
 };
 
 /** IDs for the view GUI */
@@ -60,7 +60,7 @@ class MAF_EXPORT mafGUIWizardPageNew : public wxWizardPageSimple, public mafObse
 {
 public:
   /** construct. */
-	mafGUIWizardPageNew (mafGUIWizard *wizardParent,long style = medUSEGUI | medUSERWI, bool ZCrop = false, wxString label="");
+	mafGUIWizardPageNew (mafGUIWizard *wizardParent,long style = mafWIZARDUSEGUI | mafWIZARDUSERWI, bool ZCrop = false, wxString label="");
   /** destructor. */
 	virtual ~mafGUIWizardPageNew ();
   /** Set the Listener that will receive event-notification. */

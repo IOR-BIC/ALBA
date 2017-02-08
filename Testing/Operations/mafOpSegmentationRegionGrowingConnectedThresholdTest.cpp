@@ -42,7 +42,7 @@
 #include "itkImageToVTKImageFilter.h"
 #include "itkConnectedThresholdImageFilter.h"
 #include "vtkRectilinearGrid.h"
-#include "medOpImporterVTK.h"
+#include "mafOpImporterVTK.h"
 #include "mafstring.h"
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
@@ -232,7 +232,7 @@ void mafOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithmRG()
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
 
-  medOpImporterVTK *importerVTK=new medOpImporterVTK("importerVTK");
+  mafOpImporterVTK *importerVTK=new mafOpImporterVTK("importerVTK");
   importerVTK->TestModeOn();
   importerVTK->SetInput(storage->GetRoot());
 

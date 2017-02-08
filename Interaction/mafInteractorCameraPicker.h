@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: medInteractorPicker
+ Module: mafInteractorCameraPicker
  Authors: Stefano Perticoni
  
  Copyright (c) B3C
@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 
 /** 
-Class medInteractorPicker:
+Class mafInteractorCameraPicker:
 
 When attached to a vme this behavior performs the following actions:
 
@@ -37,10 +37,10 @@ CTRL + Left Mouse button => send picked vme abs coordinates to the listener
 
 @sa mafViewArbitraryOrthoSlice as an example on how to use this picker
 */
-class MAF_EXPORT medInteractorPicker : public mafInteractorCameraMove
+class MAF_EXPORT mafInteractorCameraPicker : public mafInteractorCameraMove
 {
 public:
-  mafTypeMacro(medInteractorPicker,mafInteractorCameraMove);
+  mafTypeMacro(mafInteractorCameraPicker,mafInteractorCameraMove);
 
   /** Redefined to send picking events if continuous picking is enabled */
   virtual void OnEvent(mafEventBase *event);
@@ -58,11 +58,11 @@ protected:
 
   bool m_ContinuousPickingFlag;
 
-  medInteractorPicker();
-  virtual ~medInteractorPicker();
+  mafInteractorCameraPicker();
+  virtual ~mafInteractorCameraPicker();
 
 private:
-  medInteractorPicker(const medInteractorPicker&);  // Not implemented.
-  void operator=(const medInteractorPicker&);  // Not implemented.
+  mafInteractorCameraPicker(const mafInteractorCameraPicker&);  // Not implemented.
+  void operator=(const mafInteractorCameraPicker&);  // Not implemented.
 };
 #endif 

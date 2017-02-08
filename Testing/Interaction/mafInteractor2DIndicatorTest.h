@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: medInteractor2DDistanceTest
+ Module: mafInteractor2DIndicatorTest
  Authors: Matteo Giacomoni
  
  Copyright (c) B3C
@@ -14,34 +14,27 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_medInteractor2DDistanceTest_H__
-#define __CPP_UNIT_medInteractor2DDistanceTest_H__
+#ifndef __CPP_UNIT_mafInteractor2DIndicatorTest_H__
+#define __CPP_UNIT_mafInteractor2DIndicatorTest_H__
 
 #include "mafTest.h"
 
 class mafGUIFrame;
 
-class medInteractor2DDistanceTest : public mafTest
+class mafInteractor2DIndicatorTest : public mafTest
 {
 public:
 
-  // Executed before each test
-  void BeforeTest();
-
-  // Executed after each test
-  void AfterTest();
-
-  CPPUNIT_TEST_SUITE( medInteractor2DDistanceTest );
+	CPPUNIT_TEST_SUITE( mafInteractor2DIndicatorTest );
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestStaticAllocation );
-  CPPUNIT_TEST( TestSetMeasureType );
-  CPPUNIT_TEST( TestGenerateHistogram  );
-  CPPUNIT_TEST( TestSetManualDistance1  );
-  CPPUNIT_TEST( TestSetManualDistance2  );
-  CPPUNIT_TEST( TestIsDisableUndoAndOkCancel  );
-  CPPUNIT_TEST( TestGetLastDistance  );
-  CPPUNIT_TEST( TestSetLabel  );
+  CPPUNIT_TEST( TestIsDisableUndoAndOkCancel );
+  CPPUNIT_TEST( TestUndoMeasure );
+  CPPUNIT_TEST( TestSetLabel );
+  CPPUNIT_TEST( TestGetLabel );
+  CPPUNIT_TEST( TestGetRegisterMeasure );
+  CPPUNIT_TEST( TestSizeMeasureVector );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -49,15 +42,13 @@ protected:
   void TestFixture();
   void TestDynamicAllocation();
   void TestStaticAllocation();
-  void TestSetMeasureType();
-  void TestGenerateHistogram();
-  void TestSetManualDistance1();
-  void TestSetManualDistance2();
   void TestIsDisableUndoAndOkCancel();
-  void TestGetLastDistance();
+  void TestUndoMeasure();
+  void TestRemoveMeter();
   void TestSetLabel();
-
-  mafGUIFrame *m_Win;
+  void TestGetLabel();
+  void TestGetRegisterMeasure();
+  void TestSizeMeasureVector();
 };
 
 #endif

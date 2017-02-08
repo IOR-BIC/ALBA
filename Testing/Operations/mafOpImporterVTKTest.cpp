@@ -31,6 +31,15 @@
 #include "mafString.h"
 #include "mafVME.h"
 #include "mafOpImporterVTK.h"
+#include "mafVMEPolyline.h"
+#include "vtkPolyData.h"
+#include "mafVMEVolumeGray.h"
+#include "vtkStructuredPoints.h"
+#include "vtkRectilinearGrid.h"
+#include "mafVMELandmarkCloud.h"
+#include "mafVMESurface.h"
+#include "mafVMEMesh.h"
+#include "vtkUnstructuredGrid.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
@@ -70,83 +79,160 @@ void mafOpImporterVTKTest::TestAccept()
 
   delete dummyVme;
 }
-//----------------------------------------------------------------------------
-void mafOpImporterVTKTest::TestImportVTKPolyline()
-//----------------------------------------------------------------------------
-{
-  DummyVme *dummyVme = new DummyVme();
-
-  result = m_ImporterVTK->Accept(dummyVme);
-  TEST_RESULT;
-
-  m_ImporterVTK->SetInput(dummyVme);
-  mafString Filename=MAF_DATA_ROOT;
-  Filename<<"/Test_ImporterVTK/Polyline.vtk";
-  m_ImporterVTK->SetFileName(Filename);
-  m_ImporterVTK->ImportVTK();
-
-  result = dummyVme->GetChild(0)->IsA("mafVMEPolyline");
-  TEST_RESULT;
-
-  delete dummyVme;
-}
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------
 void mafOpImporterVTKTest::TestImportVTKSurface()
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------
 {
-  DummyVme *dummyVme = new DummyVme();
+	mafString fileName = MAF_DATA_ROOT;
+	fileName << "/Surface/sphere.vtk";
+	m_ImporterVTK->SetFileName(fileName);
+	m_ImporterVTK->ImportVTK();
+	mafVMESurface *surface = mafVMESurface::SafeDownCast(m_ImporterVTK->GetOutput());
 
-  result = m_ImporterVTK->Accept(dummyVme);
-  TEST_RESULT;
+	CPPUNIT_ASSERT(surface != NULL);
+	surface->Modified();
+	surface->Update();
 
-  m_ImporterVTK->SetInput(dummyVme);
-  mafString Filename=MAF_DATA_ROOT;
-  Filename<<"/Test_ImporterVTK/Surface.vtk";
-  m_ImporterVTK->SetFileName(Filename);
-  m_ImporterVTK->ImportVTK();
+	vtkPolyData *polydata = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
 
-  result = dummyVme->GetChild(0)->IsA("mafVMESurface");
-  TEST_RESULT;
+	CPPUNIT_ASSERT(polydata != NULL);
 
-  delete dummyVme;
+	polydata->Modified();
+	polydata->Update();
+
+	CPPUNIT_ASSERT(polydata->GetNumberOfPoints() == 82);
+	CPPUNIT_ASSERT(polydata->GetNumberOfPolys() == 160);
 }
-//----------------------------------------------------------------------------
-void mafOpImporterVTKTest::TestImportVTKVolume()
-//----------------------------------------------------------------------------
-{
-  DummyVme *dummyVme = new DummyVme();
 
-  result = m_ImporterVTK->Accept(dummyVme);
-  TEST_RESULT;
-
-  m_ImporterVTK->SetInput(dummyVme);
-  mafString Filename=MAF_DATA_ROOT;
-  Filename<<"/Test_ImporterVTK/Volume.vtk";
-  m_ImporterVTK->SetFileName(Filename);
-  m_ImporterVTK->ImportVTK();
-
-  result = dummyVme->GetChild(0)->IsA("mafVMEVolume");
-  TEST_RESULT;
-
-  delete dummyVme;
-}
 //----------------------------------------------------------------------------
 void mafOpImporterVTKTest::TestImportVTKMesh()
 //----------------------------------------------------------------------------
 {
-  DummyVme *dummyVme = new DummyVme();
+	mafString fileName = MAF_DATA_ROOT;
+	fileName << "/FEM/tet4.vtk";
+	m_ImporterVTK->SetFileName(fileName);
+	m_ImporterVTK->ImportVTK();
+	mafVMEMesh *surface = mafVMEMesh::SafeDownCast(m_ImporterVTK->GetOutput());
 
-  result = m_ImporterVTK->Accept(dummyVme);
-  TEST_RESULT;
+	CPPUNIT_ASSERT(surface != NULL);
+	surface->Modified();
+	surface->Update();
 
-  m_ImporterVTK->SetInput(dummyVme);
-  mafString Filename=MAF_DATA_ROOT;
-  Filename<<"/Test_ImporterVTK/Mesh.vtk";
-  m_ImporterVTK->SetFileName(Filename);
-  m_ImporterVTK->ImportVTK();
+	vtkUnstructuredGrid *ug = vtkUnstructuredGrid::SafeDownCast(surface->GetOutput()->GetVTKData());
 
-  result = dummyVme->GetChild(0)->IsA("mafVMEMesh");
-  TEST_RESULT;
+	CPPUNIT_ASSERT(ug != NULL);
 
-  delete dummyVme;
+	ug->Modified();
+	ug->Update();
+
+	CPPUNIT_ASSERT(ug->GetNumberOfPoints() == 5);
+	CPPUNIT_ASSERT(ug->GetNumberOfCells() == 2);
+}
+
+//-----------------------------------------------------------
+void mafOpImporterVTKTest::TestSetFileName()
+{
+	char *fileName = { "file name" };
+	m_ImporterVTK->SetFileName(fileName);
+
+	CPPUNIT_ASSERT(strcmp(m_ImporterVTK->GetFileName(), fileName) == 0);
+}
+
+//-----------------------------------------------------------
+void mafOpImporterVTKTest::TestImportVTKPolyline()
+{
+	mafString fileName = MAF_DATA_ROOT;
+	fileName << "/PolylineGraph/PolylineGraph.vtk";
+	m_ImporterVTK->SetFileName(fileName);
+	m_ImporterVTK->ImportVTK();
+	mafVMEPolyline *polyline = mafVMEPolyline::SafeDownCast(m_ImporterVTK->GetOutput());
+
+	CPPUNIT_ASSERT(polyline != NULL);
+
+	polyline->Modified();
+	polyline->Update();
+
+	vtkPolyData *polyData = vtkPolyData::SafeDownCast(polyline->GetOutput()->GetVTKData());
+
+	CPPUNIT_ASSERT(polyData != NULL);
+
+	polyData->Modified();
+	polyData->Update();
+
+	CPPUNIT_ASSERT(polyData->GetNumberOfPoints() == 5);
+	CPPUNIT_ASSERT(polyData->GetNumberOfLines() == 4);
+}
+//-----------------------------------------------------------
+void mafOpImporterVTKTest::TestImportVTKVolumeSP()
+{
+	mafString fileName = MAF_DATA_ROOT;
+	fileName << "/VTK_Volumes/volume.vtk";
+	m_ImporterVTK->SetFileName(fileName);
+	m_ImporterVTK->ImportVTK();
+	mafVMEVolumeGray *volume = mafVMEVolumeGray::SafeDownCast(m_ImporterVTK->GetOutput());
+
+	CPPUNIT_ASSERT(volume != NULL);
+	volume->Modified();
+	volume->Update();
+
+	vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(volume->GetOutput()->GetVTKData());
+
+	CPPUNIT_ASSERT(sp != NULL);
+
+	sp->Modified();
+	sp->Update();
+
+	CPPUNIT_ASSERT(sp->GetNumberOfPoints() == 517440);
+	CPPUNIT_ASSERT(sp->GetNumberOfCells() == 498332);
+
+}
+//-----------------------------------------------------------
+void mafOpImporterVTKTest::TestImportVTKVolumeRG()
+{
+	mafString fileName = MAF_DATA_ROOT;
+	fileName << "/VTK_Volumes/volumeRG.vtk";
+	m_ImporterVTK->SetFileName(fileName);
+	m_ImporterVTK->ImportVTK();
+	mafVMEVolumeGray *volume = mafVMEVolumeGray::SafeDownCast(m_ImporterVTK->GetOutput());
+
+	CPPUNIT_ASSERT(volume != NULL);
+	volume->Modified();
+	volume->Update();
+
+	vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(volume->GetOutput()->GetVTKData());
+
+	CPPUNIT_ASSERT(rg != NULL);
+
+	rg->Modified();
+	rg->Update();
+
+	CPPUNIT_ASSERT(rg->GetNumberOfPoints() == 1000);
+	CPPUNIT_ASSERT(rg->GetNumberOfCells() == 729);
+}
+
+//-----------------------------------------------------------
+void mafOpImporterVTKTest::TestImportVTKPointSet()
+{
+	mafString fileName = MAF_DATA_ROOT;
+	fileName << "/PointSet/pointset.vtk";
+	m_ImporterVTK->SetFileName(fileName);
+	m_ImporterVTK->ImportVTK();
+	mafVMELandmarkCloud *lmc = mafVMELandmarkCloud::SafeDownCast(m_ImporterVTK->GetOutput());
+
+	CPPUNIT_ASSERT(lmc != NULL);
+	lmc->Modified();
+	lmc->Update();
+
+	lmc->GetOutput()->Update();
+	vtkPolyData *pts = vtkPolyData::SafeDownCast(lmc->GetOutput()->GetVTKData());
+
+	CPPUNIT_ASSERT(pts != NULL);
+
+	pts->Modified();
+	pts->Update();
+
+	CPPUNIT_ASSERT(pts->GetNumberOfPoints() == 2);
+
+	//On import the point visibility is set to false
+	CPPUNIT_ASSERT(pts->GetNumberOfCells() == 0);
 }

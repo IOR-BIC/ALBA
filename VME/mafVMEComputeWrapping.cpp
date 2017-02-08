@@ -63,14 +63,14 @@
 #include <time.h>
 //#include <vld.h>
 
-MAF_ID_IMP(medVMEComputeWrapping::LENGTH_THRESHOLD_EVENT);
+MAF_ID_IMP(mafVMEComputeWrapping::LENGTH_THRESHOLD_EVENT);
 
 //-------------------------------------------------------------------------
-mafCxxTypeMacro(medVMEComputeWrapping)
+mafCxxTypeMacro(mafVMEComputeWrapping)
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-medVMEComputeWrapping::medVMEComputeWrapping()
+mafVMEComputeWrapping::mafVMEComputeWrapping()
 //-------------------------------------------------------------------------
 {
 	m_Distance      = -1.0;
@@ -140,7 +140,7 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 
 }
 //-------------------------------------------------------------------------
-medVMEComputeWrapping::~medVMEComputeWrapping()
+mafVMEComputeWrapping::~mafVMEComputeWrapping()
 //-------------------------------------------------------------------------
 {
 	mafDEL(m_Transform);
@@ -178,12 +178,12 @@ medVMEComputeWrapping::~medVMEComputeWrapping()
 }
 
 //-------------------------------------------------------------------------
-int medVMEComputeWrapping::DeepCopy(mafVME *a)
+int mafVMEComputeWrapping::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 {
 	if (Superclass::DeepCopy(a)==MAF_OK)
 	{
-		medVMEComputeWrapping *meter = medVMEComputeWrapping::SafeDownCast(a);
+		mafVMEComputeWrapping *meter = mafVMEComputeWrapping::SafeDownCast(a);
 		m_Transform->SetMatrix(meter->m_Transform->GetMatrix());
 
 		//BES: 11.5.2012 - deep copy settings	
@@ -226,21 +226,21 @@ int medVMEComputeWrapping::DeepCopy(mafVME *a)
 }
 
 //-------------------------------------------------------------------------
-bool medVMEComputeWrapping::Equals(mafVME *vme)
+bool mafVMEComputeWrapping::Equals(mafVME *vme)
 //-------------------------------------------------------------------------
 {
 	bool ret = false;
 	if (Superclass::Equals(vme))
 	{
-		ret = m_Transform->GetMatrix() == ((medVMEComputeWrapping *)vme)->m_Transform->GetMatrix() && \
-			GetLink("StartVME") == ((medVMEComputeWrapping *)vme)->GetLink("StartVME") && \
-			GetLink("EndVME1") == ((medVMEComputeWrapping *)vme)->GetLink("EndVME1") && \
-			GetLink("EndVME2") == ((medVMEComputeWrapping *)vme)->GetLink("EndVME2");
+		ret = m_Transform->GetMatrix() == ((mafVMEComputeWrapping *)vme)->m_Transform->GetMatrix() && \
+			GetLink("StartVME") == ((mafVMEComputeWrapping *)vme)->GetLink("StartVME") && \
+			GetLink("EndVME1") == ((mafVMEComputeWrapping *)vme)->GetLink("EndVME1") && \
+			GetLink("EndVME2") == ((mafVMEComputeWrapping *)vme)->GetLink("EndVME2");
 	}
 	return ret;
 }
 //-------------------------------------------------------------------------
-int medVMEComputeWrapping::InternalInitialize()
+int mafVMEComputeWrapping::InternalInitialize()
 //-------------------------------------------------------------------------
 {
 	if (Superclass::InternalInitialize()==MAF_OK)
@@ -254,7 +254,7 @@ int medVMEComputeWrapping::InternalInitialize()
 	return MAF_ERROR;
 }
 //-------------------------------------------------------------------------
-mmaMaterial *medVMEComputeWrapping::GetMaterial()
+mmaMaterial *mafVMEComputeWrapping::GetMaterial()
 //-------------------------------------------------------------------------
 {
 	mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
@@ -266,38 +266,38 @@ mmaMaterial *medVMEComputeWrapping::GetMaterial()
 	return material;
 }
 //-------------------------------------------------------------------------
-mafVMEOutputComputeWrapping *medVMEComputeWrapping::GetWrappedMeterOutput()
+mafVMEOutputComputeWrapping *mafVMEComputeWrapping::GetWrappedMeterOutput()
 //-------------------------------------------------------------------------
 {
 	return (mafVMEOutputComputeWrapping *) GetOutput();
 }
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SetMatrix(const mafMatrix &mat)
+void mafVMEComputeWrapping::SetMatrix(const mafMatrix &mat)
 //-------------------------------------------------------------------------
 {
 	m_Transform->SetMatrix(mat);
 	Modified();
 }
 //-------------------------------------------------------------------------
-bool medVMEComputeWrapping::IsAnimated()
+bool mafVMEComputeWrapping::IsAnimated()
 //-------------------------------------------------------------------------
 {
 	return false;
 }
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
+void mafVMEComputeWrapping::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
 //-------------------------------------------------------------------------
 {
 	kframes.clear(); // no timestamps
 }
 //-----------------------------------------------------------------------
-void medVMEComputeWrapping::InternalPreUpdate()
+void mafVMEComputeWrapping::InternalPreUpdate()
 //-----------------------------------------------------------------------
 {
 	GetMeterAttributes();
 }
 //-----------------------------------------------------------------------
-void medVMEComputeWrapping::InternalUpdate()
+void mafVMEComputeWrapping::InternalUpdate()
 //-----------------------------------------------------------------------
 {
 
@@ -342,7 +342,7 @@ void medVMEComputeWrapping::InternalUpdate()
 }
 //main method
 //dispatch different cases to different methods
-void medVMEComputeWrapping::Dispatch(){
+void mafVMEComputeWrapping::Dispatch(){
 	int obbtreeFlag = 0;
 	int obbtreeFlag1 = 0;
 	int obbtreeFlag2 = 0;
@@ -519,7 +519,7 @@ WrapCylinderOnly(m_PathNum);
 }
 */
 //transform clip data which has many points
-void medVMEComputeWrapping::TransformOutputClipData(vtkPolyData *clipData){
+void mafVMEComputeWrapping::TransformOutputClipData(vtkPolyData *clipData){
 	mafTransform* transform;
 	mafNEW(transform);
 	transform->SetMatrix(GetOutput()->GetAbsTransform()->GetMatrix());
@@ -540,7 +540,7 @@ void medVMEComputeWrapping::TransformOutputClipData(vtkPolyData *clipData){
 
 }
 //transform one point
-void medVMEComputeWrapping::TransformOutputPoint( double *point){
+void mafVMEComputeWrapping::TransformOutputPoint( double *point){
 	mafTransform* transform;
 	mafNEW(transform);
 	transform->SetMatrix(GetOutput()->GetAbsTransform()->GetMatrix());
@@ -549,7 +549,7 @@ void medVMEComputeWrapping::TransformOutputPoint( double *point){
 	mafDEL(transform);
 }
 //transform polydata
-void medVMEComputeWrapping::TransformOutput(vtkPolyData *pData ){
+void mafVMEComputeWrapping::TransformOutput(vtkPolyData *pData ){
 
 	mafTransform* transform;
 	mafNEW(transform);
@@ -569,7 +569,7 @@ void medVMEComputeWrapping::TransformOutput(vtkPolyData *pData ){
 
 }
 //draw a straight line
-void medVMEComputeWrapping::DirectConnectSE(){
+void mafVMEComputeWrapping::DirectConnectSE(){
 	double d0;
 	vtkLineSource *SE;
 	vtkNEW(SE);
@@ -592,7 +592,7 @@ void medVMEComputeWrapping::DirectConnectSE(){
 //c is output,cCoord is input
 //this method is to get a minimum value
 //type 1 angleValue ,2 in one plane,3 distance,4 distanceSum 
-double medVMEComputeWrapping::GoldenSectionSearch(double low,double high,double accuracy,double *A,double *b,double *c,double *cCoord,int type){
+double mafVMEComputeWrapping::GoldenSectionSearch(double low,double high,double accuracy,double *A,double *b,double *c,double *cCoord,int type){
 	double y1,y2;
 	double r = 0.618;
 	double x1,x2;
@@ -673,7 +673,7 @@ double medVMEComputeWrapping::GoldenSectionSearch(double low,double high,double 
 	return rtn;
 }
 //distance sum of three point
-double medVMEComputeWrapping::GetDistanceSumValue(double *A,double *b ,double *c){
+double mafVMEComputeWrapping::GetDistanceSumValue(double *A,double *b ,double *c){
 
 	double dac,dcb;
 	double rtn;
@@ -685,7 +685,7 @@ double medVMEComputeWrapping::GetDistanceSumValue(double *A,double *b ,double *c
 	return rtn;
 }
 //get angle between two vector
-double medVMEComputeWrapping::GetAngleValue(double *A ,double *b,double *c){
+double mafVMEComputeWrapping::GetAngleValue(double *A ,double *b,double *c){
 	double oa[3],ob[3];
 	double doa,dob;
 	double rtn;
@@ -708,7 +708,7 @@ double medVMEComputeWrapping::GetAngleValue(double *A ,double *b,double *c){
 	return rtn;
 }
 //to test if three point in one plane
-double medVMEComputeWrapping::GetPlaneValue(double *a,double *b,double *c,double *d){
+double mafVMEComputeWrapping::GetPlaneValue(double *a,double *b,double *c,double *d){
 	double ab[3],ac[3],cd[3],normalTmp[3];
 	ab[0] = a[0]-b[0];
 	ab[1] = a[1]-b[1];
@@ -730,7 +730,7 @@ double medVMEComputeWrapping::GetPlaneValue(double *a,double *b,double *c,double
 
 }
 //all parameters use local value
-double medVMEComputeWrapping::GetDistanceValue(double *start,double *cCoord,double *end){
+double mafVMEComputeWrapping::GetDistanceValue(double *start,double *cCoord,double *end){
 
 	double curveLength,rtn;
 
@@ -744,7 +744,7 @@ double medVMEComputeWrapping::GetDistanceValue(double *start,double *cCoord,doub
 //S-T~H-G~Q-P
 //The obstacle-set Method for Representing Muscle Paths in Musculoskeletal Models
 //Author: BrIAN A.Garner and MARCUS G.Pandy
-void medVMEComputeWrapping::WrapCylinderCylinderObstacleSet(){
+void mafVMEComputeWrapping::WrapCylinderCylinderObstacleSet(){
 	double segLength1,segLength2;
 	int idx1,idx2;
 	double d1,d2;
@@ -933,7 +933,7 @@ void medVMEComputeWrapping::WrapCylinderCylinderObstacleSet(){
 	m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 	GetWrappedMeterOutput()->Update(); 
 }
-void medVMEComputeWrapping::WrapCylinderOnlyObstacleSetBasic2(double *Sg,double *Pg,int idx,bool reverseFlag,double &segLength,double *Tout,double *Qout){
+void mafVMEComputeWrapping::WrapCylinderOnlyObstacleSetBasic2(double *Sg,double *Pg,int idx,bool reverseFlag,double &segLength,double *Tout,double *Qout){
 	double P[3],S[3],Q[3],T[3];
 	//express P and S in cylinder frame
 	GetWrapLocalTransform(Pg,P,idx);
@@ -989,7 +989,7 @@ void medVMEComputeWrapping::WrapCylinderOnlyObstacleSetBasic2(double *Sg,double 
 
 }*/
 
-void medVMEComputeWrapping::WrapCylinderOnlyObstacleSet(int idx){
+void mafVMEComputeWrapping::WrapCylinderOnlyObstacleSet(int idx){
 	//P-Q~T-S
 	double P[3],S[3],Q[3],T[3];
 	double Qg[3],Tg[3];
@@ -1058,7 +1058,7 @@ void medVMEComputeWrapping::WrapCylinderOnlyObstacleSet(int idx){
 	m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 	GetWrappedMeterOutput()->Update(); 
 }
-double medVMEComputeWrapping::GetQTsegment(double R,double *Q,double *T){
+double mafVMEComputeWrapping::GetQTsegment(double R,double *Q,double *T){
 	double rtn = 0;
 	double value = 0;
 	value = (1.0 - ( (Q[0]-T[0])*(Q[0]-T[0]) + (Q[1]-T[1])*(Q[1]-T[1]) )/(2*R*R));
@@ -1074,7 +1074,7 @@ double medVMEComputeWrapping::GetQTsegment(double R,double *Q,double *T){
 /* so det = Qx*Ty-Qy*Tx
 /************************************************************************/
 
-bool medVMEComputeWrapping::WrapCondition(double *Q,double *T,bool reverseFlag){
+bool mafVMEComputeWrapping::WrapCondition(double *Q,double *T,bool reverseFlag){
 	bool rtn = true;
 	double det = Q[0]*T[1]- Q[1]*T[0];
 	int flag = 1;
@@ -1094,18 +1094,18 @@ bool medVMEComputeWrapping::WrapCondition(double *Q,double *T,bool reverseFlag){
 /* R cylinder radius
 /* rtn return point with x,y value
 /************************************************************************/
-void medVMEComputeWrapping::ComputeTangentXYQ(double *P,double R,double *rtn){
+void mafVMEComputeWrapping::ComputeTangentXYQ(double *P,double R,double *rtn){
 
 	rtn[0] = ( P[0] * R*R + R * P[1] * sqrt( P[0]*P[0] + P[1]*P[1] - R*R ))/( P[0]*P[0] + P[1]*P[1]);
 	rtn[1] = ( P[1] * R*R - R * P[0] * sqrt( P[0]*P[0] + P[1]*P[1] - R*R ))/( P[0]*P[0] + P[1]*P[1]);
 
 }
-void medVMEComputeWrapping::ComputeTangentXYT(double *S,double R, double *rtn){
+void mafVMEComputeWrapping::ComputeTangentXYT(double *S,double R, double *rtn){
 	rtn[0] = ( S[0] * R*R - R * S[1] * sqrt( S[0]*S[0] + S[1]*S[1] - R*R ))/( S[0]*S[0] + S[1]*S[1]);
 	rtn[1] = ( S[1] * R*R + R * S[0] * sqrt( S[0]*S[0] + S[1]*S[1] - R*R ))/( S[0]*S[0] + S[1]*S[1]);
 
 }
-double medVMEComputeWrapping::ComputeQTLength(double *Q,double *T,double R){
+double mafVMEComputeWrapping::ComputeQTLength(double *Q,double *T,double R){
 	double rtn = 0;
 	rtn = R * acos( 1.0 - ( (Q[0]-T[0])*(Q[0]-T[0]) + (Q[1]-T[1])*(Q[1]-T[1]) )/(2*R*R) );
 	rtn = fabs(rtn);
@@ -1114,7 +1114,7 @@ double medVMEComputeWrapping::ComputeQTLength(double *Q,double *T,double R){
 /************************************************************************/
 /* point Q and T only has x,y value                                                                     */
 /************************************************************************/
-void medVMEComputeWrapping::ComputeQz(double *P,double *S,double *Q,double *T,double QTlength){
+void mafVMEComputeWrapping::ComputeQz(double *P,double *S,double *Q,double *T,double QTlength){
 
 	double PQxy = 0;
 	double TSxy = 0;
@@ -1124,7 +1124,7 @@ void medVMEComputeWrapping::ComputeQz(double *P,double *S,double *Q,double *T,do
 	Q[2] = P[2]+ ( (S[2] - P[2])*PQxy / (PQxy + QTlength+ TSxy));
 
 }
-void medVMEComputeWrapping::ComputeTz(double *P,double *S,double *Q,double *T,double QTlength){
+void mafVMEComputeWrapping::ComputeTz(double *P,double *S,double *Q,double *T,double QTlength){
 
 	double PQxy = 0;
 	double TSxy = 0;
@@ -1138,7 +1138,7 @@ void medVMEComputeWrapping::ComputeTz(double *P,double *S,double *Q,double *T,do
 
 //suppose local end z value is smaller than local start value
 //if it doesnt ,exchange these two points.
-void medVMEComputeWrapping::WrapCylinderOnly(int step){
+void mafVMEComputeWrapping::WrapCylinderOnly(int step){
 	double viaLocal[3],startLocal[3],endLocal[3],cCoord1[3],cCoord2[3],cCoord3[3],cCoord4[3],tmpCoord[3];
 	double Zi,Zo,Zl,Zh;
 
@@ -1424,7 +1424,7 @@ void medVMEComputeWrapping::WrapCylinderOnly(int step){
 }
 
 //compute X,Y value of a coordinate,do not compute Z value
-void medVMEComputeWrapping::GetCcoordinateForCylinder(double *oCoord,double *outC1,double *outC2,int objIdx){
+void mafVMEComputeWrapping::GetCcoordinateForCylinder(double *oCoord,double *outC1,double *outC2,int objIdx){
 	double r = GetCylinderRadius(objIdx);
 	double D,Xo,Yo,Zo;
 	Xo = oCoord[0];
@@ -1439,7 +1439,7 @@ void medVMEComputeWrapping::GetCcoordinateForCylinder(double *oCoord,double *out
 
 }
 //use old method to get tangent
-void medVMEComputeWrapping::WrapSingleCylinder(double vId){
+void mafVMEComputeWrapping::WrapSingleCylinder(double vId){
 
 	vtkLineSource *SC,*CE,*SCL,*CEL;
 	vtkNEW(SC);
@@ -1500,7 +1500,7 @@ void medVMEComputeWrapping::WrapSingleCylinder(double vId){
 
 }
 //test if these three point in one plane
-double medVMEComputeWrapping::TestPlane(double *a,double *b,double *c,double *d){
+double mafVMEComputeWrapping::TestPlane(double *a,double *b,double *c,double *d){
 	double ab[3],ac[3],cd[3],normalTmp[3];
 	ab[0] = a[0]-b[0];
 	ab[1] = a[1]-b[1];
@@ -1522,12 +1522,12 @@ double medVMEComputeWrapping::TestPlane(double *a,double *b,double *c,double *d)
 
 }
 //fixed value
-double medVMEComputeWrapping::GetPi(){
+double mafVMEComputeWrapping::GetPi(){
 
 	return 3.1415926;
 }
 //sphere radius
-double medVMEComputeWrapping::GetSphereRadius(){
+double mafVMEComputeWrapping::GetSphereRadius(){
 	double rtn = 0;
 	mafVMESurfaceParametric *sphere = mafVMESurfaceParametric::SafeDownCast(GetWrappedVME1());
 	rtn = sphere->GetSphereRadius();
@@ -1535,13 +1535,13 @@ double medVMEComputeWrapping::GetSphereRadius(){
 
 }
 //cylinder radius
-double medVMEComputeWrapping::GetCylinderRadius(){
+double mafVMEComputeWrapping::GetCylinderRadius(){
 	double rtn = 0;
 	rtn = GetCylinderRadius(2);
 	return rtn;
 
 }
-double medVMEComputeWrapping::GetCylinderRadius(int objIdx){
+double mafVMEComputeWrapping::GetCylinderRadius(int objIdx){
 	double rtn = 0;
 	mafVMESurfaceParametric *cylinder ;
 	if (objIdx==1)
@@ -1559,7 +1559,7 @@ double medVMEComputeWrapping::GetCylinderRadius(int objIdx){
 }
 
 //compute C point
-bool medVMEComputeWrapping::GetCcoordinate2(double *bCoord,double *cCoord1,double *cCoord2){
+bool mafVMEComputeWrapping::GetCcoordinate2(double *bCoord,double *cCoord1,double *cCoord2){
 	double a,b,c,r;//r is radius of cylinder
 	double Yc,Xc,Zc,Yc2,Xc2,Zc2;
 	double Xb,Yb,Zb;
@@ -1608,7 +1608,7 @@ bool medVMEComputeWrapping::GetCcoordinate2(double *bCoord,double *cCoord1,doubl
 
 }
 //get point A and point B ,then Use A and start ,end point can get a plane ,so get a curve on sphere surface
-double medVMEComputeWrapping::GetFunctionValue2(double x,double filterFlag,double *filterPlaneNormal,double *endPoint,double *outAPoint,double *outBPoint,double *outMPoint,double & Rm){
+double mafVMEComputeWrapping::GetFunctionValue2(double x,double filterFlag,double *filterPlaneNormal,double *endPoint,double *outAPoint,double *outBPoint,double *outMPoint,double & Rm){
 	double rtn = 0,rtn1 = 0,rtn2 = 0,rtn3 = 0,rtn4 = 0;
 
 	//double oCoordTransform[3];
@@ -1845,7 +1845,7 @@ double medVMEComputeWrapping::GetFunctionValue2(double x,double filterFlag,doubl
 
 }
 //compute angle for point B 
-void medVMEComputeWrapping::ComputeAngleForB(double *aCoord,double *bCoord1,double *bCoord2,double *bCoord){
+void mafVMEComputeWrapping::ComputeAngleForB(double *aCoord,double *bCoord1,double *bCoord2,double *bCoord){
 	double oa[3],ba1[3],ba2[3];
 	double cosA1,cosA2;
 	oa[0] = m_StartWrapLocal[0] - aCoord[0];
@@ -1879,7 +1879,7 @@ void medVMEComputeWrapping::ComputeAngleForB(double *aCoord,double *bCoord1,doub
 	}
 }
 //get B point on the surface
-bool medVMEComputeWrapping::GetBcoordinateUpdate2(double *aCoord,double *bCoord,double *cCoord ,double *bCoord1,double *bCoord2){
+bool mafVMEComputeWrapping::GetBcoordinateUpdate2(double *aCoord,double *bCoord,double *cCoord ,double *bCoord1,double *bCoord2){
 	double blCoord[3];
 	GetLocalCenterCoord(blCoord,bCoord);
 	double Rm = GetCylinderRadius();
@@ -1902,7 +1902,7 @@ bool medVMEComputeWrapping::GetBcoordinateUpdate2(double *aCoord,double *bCoord,
 
 
 //let point on the surface
-void medVMEComputeWrapping::ProcessViaPoint(){
+void mafVMEComputeWrapping::ProcessViaPoint(){
 	double r = GetCylinderRadius();
 	double x,y,distX,distY;
 	double newX[3],newY[3];
@@ -1936,13 +1936,13 @@ void medVMEComputeWrapping::ProcessViaPoint(){
 
 }
 //only copy value of a point,do not create it
-void medVMEComputeWrapping::CopyPointValue(double *srcPoint,double *aimPoint){
+void mafVMEComputeWrapping::CopyPointValue(double *srcPoint,double *aimPoint){
 	aimPoint[0] =	srcPoint[0] ;
 	aimPoint[1] =	srcPoint[1] ;
 	aimPoint[2] =	srcPoint[2] ;
 }
 //process direction of helix
-void medVMEComputeWrapping::FormatParameterForHelix(double  tc,double  to,double  Zc,double Zo,double & c ,double & k,double & tcRtn,double & toRtn){
+void mafVMEComputeWrapping::FormatParameterForHelix(double  tc,double  to,double  Zc,double Zo,double & c ,double & k,double & tcRtn,double & toRtn){
 
 	double dif1,dif2,tmp;
 
@@ -1974,7 +1974,7 @@ void medVMEComputeWrapping::FormatParameterForHelix(double  tc,double  to,double
 	k = Zc - ( c * tcRtn );
 	k = Zo - ( c * toRtn );
 }
-double medVMEComputeWrapping::CaculateHelix2(vtkPolyData * hCurve,double *cCoord,double *vCoord,double drawFlag,int objIdx){
+double mafVMEComputeWrapping::CaculateHelix2(vtkPolyData * hCurve,double *cCoord,double *vCoord,double drawFlag,int objIdx){
 	vtkMAFSmartPointer<vtkCellArray> cells;
 	vtkPoints *pts = vtkPoints::New();
 	double Xc,Yc,Zc,Xo,Yo,Zo;
@@ -2039,14 +2039,14 @@ double medVMEComputeWrapping::CaculateHelix2(vtkPolyData * hCurve,double *cCoord
 	return rtn;
 }
 //compute helix formula and then draw curve
-double medVMEComputeWrapping::CaculateHelix2(vtkPolyData * hCurve,double *cCoord,double *vCoord,double drawFlag){
+double mafVMEComputeWrapping::CaculateHelix2(vtkPolyData * hCurve,double *cCoord,double *vCoord,double drawFlag){
 	double rtn;
 	rtn = CaculateHelix2(hCurve,cCoord,vCoord,drawFlag,2);
 	return rtn;
 
 }
 
-double medVMEComputeWrapping::ComputeHelixCost2(double tc,double to,double c,double k,double *cCoord,double *vCoord){
+double mafVMEComputeWrapping::ComputeHelixCost2(double tc,double to,double c,double k,double *cCoord,double *vCoord){
 	double firstPoint[3],lastPoint[3],firstPoint2[3],lastPoint2[3];
 	double rtnArr[4],rtn;
 	double r;
@@ -2088,7 +2088,7 @@ double medVMEComputeWrapping::ComputeHelixCost2(double tc,double to,double c,dou
 	}
 	return rtn;
 }
-double medVMEComputeWrapping::DrawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag, int objIdx){
+double mafVMEComputeWrapping::DrawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag, int objIdx){
 
 	int j=0;
 	double i = 0;
@@ -2150,14 +2150,14 @@ double medVMEComputeWrapping::DrawHelix(double tc,double to,double c,double k,vt
 
 }
 //compute points for helix
-double medVMEComputeWrapping::DrawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag){
+double mafVMEComputeWrapping::DrawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag){
 	double rtn;
 	rtn = DrawHelix(tc,to,c,k, cells,pts,drawFlag ,2);
 	return rtn;
 
 }
 //compute curve length YUxuan DingLi
-double medVMEComputeWrapping::ComputeCurveLength(double *aCoord,double *bCoord,double rm){
+double mafVMEComputeWrapping::ComputeCurveLength(double *aCoord,double *bCoord,double rm){
 	double rtn = 0;
 	double disAB2 ;
 	disAB2 = vtkMath::Distance2BetweenPoints(aCoord,bCoord);
@@ -2166,7 +2166,7 @@ double medVMEComputeWrapping::ComputeCurveLength(double *aCoord,double *bCoord,d
 
 }
 
-double medVMEComputeWrapping::ComputeDistanceOfLm3(double *start,double *cCoord,double *iCoord){
+double mafVMEComputeWrapping::ComputeDistanceOfLm3(double *start,double *cCoord,double *iCoord){
 	double rtn = 0;
 	double oc,ci;
 	oc = sqrt(vtkMath::Distance2BetweenPoints(start,cCoord));
@@ -2176,7 +2176,7 @@ double medVMEComputeWrapping::ComputeDistanceOfLm3(double *start,double *cCoord,
 }
 
 //wrap sphere
-void medVMEComputeWrapping::WrapSphereOnly(const int step,bool allowIntersectFlag){
+void mafVMEComputeWrapping::WrapSphereOnly(const int step,bool allowIntersectFlag){
 	double low,high;
 	double cylinderR;
 	double dstep,y1,rm = 0;
@@ -2323,7 +2323,7 @@ void medVMEComputeWrapping::WrapSphereOnly(const int step,bool allowIntersectFla
 
 }
 
-void medVMEComputeWrapping::GetSphereCylinderWrapAdvance(const int step){
+void mafVMEComputeWrapping::GetSphereCylinderWrapAdvance(const int step){
 
 
 	double filterFlag;
@@ -2370,7 +2370,7 @@ void medVMEComputeWrapping::GetSphereCylinderWrapAdvance(const int step){
 //we get two point,if mode is 1,use distance,if mode is 2, use same side to choose a point from these two
 //if mode is 2,need p2Global.
 //pointGlobal is return parameter.
-void medVMEComputeWrapping::GetOneSideTangentPointOnCylinder(double *startLocal,double *endLocal,int vmeIdx,int mode,double *p1Global,double *pointGlobal){
+void mafVMEComputeWrapping::GetOneSideTangentPointOnCylinder(double *startLocal,double *endLocal,int vmeIdx,int mode,double *p1Global,double *pointGlobal){
 
 
 	double Zl,Zh;//Zi,Zo,
@@ -2419,7 +2419,7 @@ void medVMEComputeWrapping::GetOneSideTangentPointOnCylinder(double *startLocal,
 }
 //--we want to get p2,because p1 and p2 is on same vme so use local value
 //-get tangent point from start ,and with the same plane of p1
-void medVMEComputeWrapping::GetOneSideTangentPointOnCylinderWithSamePlane(double *startLocal,double *endLocal,double *p1,int vmeIdx,double *p2Global)
+void mafVMEComputeWrapping::GetOneSideTangentPointOnCylinderWithSamePlane(double *startLocal,double *endLocal,double *p1,int vmeIdx,double *p2Global)
 {
 	double Zl,Zh;//Zi,Zo,
 	double cCoord2_1[3],cCoord2_2[3],cCoordGlobal1[3],cCoordGlobal2[3],p1Global[3];
@@ -2461,7 +2461,7 @@ void medVMEComputeWrapping::GetOneSideTangentPointOnCylinderWithSamePlane(double
 //then from point 2 as start point to get another tangent line of second cylinder we get point 3 .
 //from point 3 get point 2 and from point 2 get point 3 iteratively.
 //util these two point has nothing different from last one.
-void medVMEComputeWrapping::GetCylinderCylinderWrap(const int step){
+void mafVMEComputeWrapping::GetCylinderCylinderWrap(const int step){
 
 
 	double viaLocal[3],startLocal[3],endLocal[3];//,tmpCoord[3],cCoord4[3],cCoord3[3]
@@ -2698,7 +2698,7 @@ void medVMEComputeWrapping::GetCylinderCylinderWrap(const int step){
 // output point is input parameter as well,it with x and y value.
 // this method will get z value,which is the nearest point with plane
 /************************************************************************/
-double medVMEComputeWrapping::GetPointOnPlane(double zL ,double zH,double *point1,double *point2,double *point3,double *output){
+double mafVMEComputeWrapping::GetPointOnPlane(double zL ,double zH,double *point1,double *point2,double *point3,double *output){
 	int step = 100;
 	double factor = (zH -zL)/100;
 	double rtn,tmpValue,zValue;
@@ -2726,7 +2726,7 @@ double medVMEComputeWrapping::GetPointOnPlane(double zL ,double zH,double *point
 }
 //distance between point and line
 //use area formula
-double medVMEComputeWrapping::GetPointLineDistance(double *point,double *Lpoint1,double *Lpoint2){
+double mafVMEComputeWrapping::GetPointLineDistance(double *point,double *Lpoint1,double *Lpoint2){
 	/*a=sqrt£¨(x1-x2)^2+(y1-y2)^2+(z1-z2)^2£©
 	b=sqrt£¨(x2-x3)^2+(y2-y3)^2+(z2-z3)^2£©
 	c=sqrt£¨(x3-x1)^2+(y3-y1)^2+(z3-z1)^2)
@@ -2746,7 +2746,7 @@ double medVMEComputeWrapping::GetPointLineDistance(double *point,double *Lpoint1
 	return rtn;
 
 }
-void medVMEComputeWrapping::ChooseSameSidePoint(double *planePoint1,double *filterPoint,double *inputPoint1,double *inputPoint2,int cylinderIdx,double *rtnPoint){
+void mafVMEComputeWrapping::ChooseSameSidePoint(double *planePoint1,double *filterPoint,double *inputPoint1,double *inputPoint2,int cylinderIdx,double *rtnPoint){
 	double cylinderCenter[3],filterPlaneNormal[3];
 	GetGlobalCylinderCenter(cylinderCenter,cylinderIdx);
 
@@ -2795,7 +2795,7 @@ void medVMEComputeWrapping::ChooseSameSidePoint(double *planePoint1,double *filt
 
 }
 
-bool medVMEComputeWrapping::CheckNearEnough(double *firstPoint,double *secondPoint){
+bool mafVMEComputeWrapping::CheckNearEnough(double *firstPoint,double *secondPoint){
 	bool rtn = false;
 	double distance;
 	distance = (firstPoint[0]-secondPoint[0])*(firstPoint[0]-secondPoint[0]) +(firstPoint[1]-secondPoint[1])*(firstPoint[1]-secondPoint[1])+(firstPoint[2]-secondPoint[2])*(firstPoint[2]-secondPoint[2]);
@@ -2807,7 +2807,7 @@ bool medVMEComputeWrapping::CheckNearEnough(double *firstPoint,double *secondPoi
 }
 //-------------
 //viaPoint is a point on the cylinder surface
-void medVMEComputeWrapping::GetSphereCylinderWrap(const int step,double *viaPoint){
+void mafVMEComputeWrapping::GetSphereCylinderWrap(const int step,double *viaPoint){
 	//const int step = 36;
 	clock_t startTime,finishTime;
 	double totalTime;
@@ -3068,7 +3068,7 @@ void medVMEComputeWrapping::GetSphereCylinderWrap(const int step,double *viaPoin
 
 }
 
-double medVMEComputeWrapping::GetFilterFlag(double *filterPlaneNormal){
+double mafVMEComputeWrapping::GetFilterFlag(double *filterPlaneNormal){
 	double viaProjectWrapLocal[3],viaProject90WrapLocal[3];//viaPoint with sphere z coord
 	double cylinderCenterWrapLocal[3],filterVector1[3],startWrapLocal[3];
 	double rtn = 0;
@@ -3094,7 +3094,7 @@ double medVMEComputeWrapping::GetFilterFlag(double *filterPlaneNormal){
 
 }
 
-bool medVMEComputeWrapping::IsLineInterSectObject(mafVME *wrapVME,double *point1,double *point2){
+bool mafVMEComputeWrapping::IsLineInterSectObject(mafVME *wrapVME,double *point1,double *point2){
 	double startPoint[3],endPoint[3];
 
 	bool rtn = false;
@@ -3146,7 +3146,7 @@ bool medVMEComputeWrapping::IsLineInterSectObject(mafVME *wrapVME,double *point1
 
 }
 //if correct return true
-bool medVMEComputeWrapping::CheckTwoRadius(){
+bool mafVMEComputeWrapping::CheckTwoRadius(){
 	bool rtn = true;
 	double cylinderRadius ;
 	double sphereRadius;
@@ -3177,7 +3177,7 @@ bool medVMEComputeWrapping::CheckTwoRadius(){
 	return rtn;
 }
 //if correct return true
-bool medVMEComputeWrapping::CheckAlign(){
+bool mafVMEComputeWrapping::CheckAlign(){
 	bool rtn =false;
 	vtkLineSource *cAxis,*centerline;
 	vtkNEW(cAxis);
@@ -3238,7 +3238,7 @@ bool medVMEComputeWrapping::CheckAlign(){
 	return rtn;
 
 }
-int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
+int mafVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 	double startPoint[3],endPoint[3];
 	double tmpIntersect1[3],tmpIntersect2[3];
 	double d1,d2;
@@ -3518,7 +3518,7 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 }
 
 
-void medVMEComputeWrapping::Get90DegreePointOnCylinder(double *firstPoint,double *sphereCenter,double *secondPoint){
+void mafVMEComputeWrapping::Get90DegreePointOnCylinder(double *firstPoint,double *sphereCenter,double *secondPoint){
 	double Px,Py,Cx,Cy,r;
 	double A,B,C,a,b,c;
 	r = GetCylinderRadius();
@@ -3541,7 +3541,7 @@ void medVMEComputeWrapping::Get90DegreePointOnCylinder(double *firstPoint,double
 	secondPoint[2] = firstPoint[2];
 }
 
-double medVMEComputeWrapping::GetCutPlaneForCylinder(double *center,double *t1,double *t2,mafVME *wrapped_vme,vtkClipPolyData *clipData){
+double mafVMEComputeWrapping::GetCutPlaneForCylinder(double *center,double *t1,double *t2,mafVME *wrapped_vme,vtkClipPolyData *clipData){
 
 	double rtn = 0;
 
@@ -3610,7 +3610,7 @@ double medVMEComputeWrapping::GetCutPlaneForCylinder(double *center,double *t1,d
 
 
 //get ellipse
-double medVMEComputeWrapping::GetCutPlaneForCI(double *bCoord,double *cCoord,vtkClipPolyData *clipData){
+double mafVMEComputeWrapping::GetCutPlaneForCI(double *bCoord,double *cCoord,vtkClipPolyData *clipData){
 
 	double rtn = 0;
 
@@ -3677,7 +3677,7 @@ double medVMEComputeWrapping::GetCutPlaneForCI(double *bCoord,double *cCoord,vtk
 }
 
 
-double medVMEComputeWrapping::GetCutPlane2(double *aPoint,double *bPoint,double *mPoint,vtkClipPolyData *clipData){
+double mafVMEComputeWrapping::GetCutPlane2(double *aPoint,double *bPoint,double *mPoint,vtkClipPolyData *clipData){
 
 	double rtn = 0;
 	double midPoint[3];
@@ -3751,7 +3751,7 @@ double medVMEComputeWrapping::GetCutPlane2(double *aPoint,double *bPoint,double 
 
 
 //equation (14)
-double medVMEComputeWrapping::ComputeDistanceOfLm(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *rCoord,double rm){
+double mafVMEComputeWrapping::ComputeDistanceOfLm(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *rCoord,double rm){
 	//Lm = OA + ABcurve +BI
 	double OA,AB,BI,ABcurve,tmp,rtn=0,angle ;
 	//a dot b = |a|*|b|cosA
@@ -3783,7 +3783,7 @@ double medVMEComputeWrapping::ComputeDistanceOfLm(double *oCoord,double *iCoord,
 	return rtn;
 }
 //Lm = OA + ABcurve +BC + CI
-double medVMEComputeWrapping::ComputeDistanceOfLm2(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *cCoord,double rm){
+double mafVMEComputeWrapping::ComputeDistanceOfLm2(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *cCoord,double rm){
 
 	double OA,AB2,BC,CI,rtn=0 ;
 
@@ -3798,32 +3798,32 @@ double medVMEComputeWrapping::ComputeDistanceOfLm2(double *oCoord,double *iCoord
 	return rtn;
 }
 
-void medVMEComputeWrapping::GetLocalCenterCoord(double *localCoord,double *globalCoord){
+void mafVMEComputeWrapping::GetLocalCenterCoord(double *localCoord,double *globalCoord){
 	localCoord[0] = globalCoord[0] - m_SphereWrapLocal[0];
 	localCoord[1] = globalCoord[1] - m_SphereWrapLocal[1];
 	localCoord[2] = globalCoord[2] - m_SphereWrapLocal[2];
 
 }
-void medVMEComputeWrapping::GetGlobalCenterCoord(double *globalCoord,double *localCoord){
+void mafVMEComputeWrapping::GetGlobalCenterCoord(double *globalCoord,double *localCoord){
 
 	globalCoord[0] = localCoord[0] + m_SphereWrapLocal[0];
 	globalCoord[1] = localCoord[1] + m_SphereWrapLocal[1];
 	globalCoord[2] = localCoord[2] + m_SphereWrapLocal[2];
 
 }
-void medVMEComputeWrapping::GetGlobalSphereCenter(double *sphCoord){
+void mafVMEComputeWrapping::GetGlobalSphereCenter(double *sphCoord){
 	sphCoord[0] = m_WrappedVMECenter1[0];
 	sphCoord[1] = m_WrappedVMECenter1[1];
 	sphCoord[2] = m_WrappedVMECenter1[2];
 }
-void medVMEComputeWrapping::GetGlobalCylinderCenter(double *cylCoord){
+void mafVMEComputeWrapping::GetGlobalCylinderCenter(double *cylCoord){
 
 	/*cylCoord[0] = m_WrappedVMECenter2[0];
 	cylCoord[1] = m_WrappedVMECenter2[1];
 	cylCoord[2] = m_WrappedVMECenter2[2];*/
 	GetGlobalCylinderCenter(cylCoord,2);
 }
-void medVMEComputeWrapping::GetGlobalCylinderCenter(double *cylCoord,int objIdx){
+void mafVMEComputeWrapping::GetGlobalCylinderCenter(double *cylCoord,int objIdx){
 	if (objIdx == 2)
 	{
 		CopyPointValue(m_WrappedVMECenter2,cylCoord);
@@ -3836,7 +3836,7 @@ void medVMEComputeWrapping::GetGlobalCylinderCenter(double *cylCoord,int objIdx)
 // |z''|       |z-Zr |
 //from global get local
 //imat is invert matrix
-void medVMEComputeWrapping::GetLocalTransformedCoord(double *localCoord,double *globalCoord,mafMatrix3x3 *imat){
+void mafVMEComputeWrapping::GetLocalTransformedCoord(double *localCoord,double *globalCoord,mafMatrix3x3 *imat){
 	double ele0,ele1,ele2;
 	for (int i=0;i<3;i++)
 	{
@@ -3849,7 +3849,7 @@ void medVMEComputeWrapping::GetLocalTransformedCoord(double *localCoord,double *
 //|x|     |x''|  |Xr|
 //|y| = T |y''| +|Yr|
 //|z|     |z''|  |Zr|
-void medVMEComputeWrapping::GetGlobalTransformedCoord(double *localCoord,double *globalCoord,mafMatrix3x3 *mat){
+void mafVMEComputeWrapping::GetGlobalTransformedCoord(double *localCoord,double *globalCoord,mafMatrix3x3 *mat){
 	double ele0,ele1,ele2;
 	for (int i=0;i<3;i++)
 	{
@@ -3859,7 +3859,7 @@ void medVMEComputeWrapping::GetGlobalTransformedCoord(double *localCoord,double 
 		globalCoord[i] = ele0*localCoord[0] + ele1*localCoord[1] + ele2*localCoord[2] + m_SphereWrapLocal[i];
 	}
 }
-void medVMEComputeWrapping::GetTransFormMatrix(double cosA,double sinA,double cosB,double sinB,mafMatrix3x3 *mat){
+void mafVMEComputeWrapping::GetTransFormMatrix(double cosA,double sinA,double cosB,double sinB,mafMatrix3x3 *mat){
 
 	// i is row and j is column 
 	mat->SetElement(0,0,cosB);
@@ -3875,7 +3875,7 @@ void medVMEComputeWrapping::GetTransFormMatrix(double cosA,double sinA,double co
 	mat->SetElement(2,2,cosA);	
 }
 //by default objIdx means 2.it means second vme
-void medVMEComputeWrapping::GetWrapMatrix(mafMatrix &inMx,mafMatrix &inMy,int objIdx){
+void mafVMEComputeWrapping::GetWrapMatrix(mafMatrix &inMx,mafMatrix &inMy,int objIdx){
 	double axisLocal[3],cylinderCenter[3],cylinderCenterLocal[3],normal1[3];
 	double a,b,c,d;
 	double cosA,sinA;
@@ -3993,15 +3993,15 @@ void medVMEComputeWrapping::GetWrapMatrix(mafMatrix &inMx,mafMatrix &inMy,int ob
 
 	}
 }
-void medVMEComputeWrapping::GetWrapMatrix(mafMatrix &inMx,mafMatrix &inMy){
+void mafVMEComputeWrapping::GetWrapMatrix(mafMatrix &inMx,mafMatrix &inMy){
 	GetWrapMatrix(inMx,inMy,2);
 
 }
-void medVMEComputeWrapping::GetWrapLocalTransform(double *inCoord,double *outCoord){
+void mafVMEComputeWrapping::GetWrapLocalTransform(double *inCoord,double *outCoord){
 	GetWrapLocalTransform(inCoord,outCoord,2);
 }
 //transform coord from abs coord to a system defined by cylinder center and line (cylinder center and sphere center) as z axis
-void medVMEComputeWrapping::GetWrapLocalTransform(double *inCoord,double *outCoord,int objIdx){
+void mafVMEComputeWrapping::GetWrapLocalTransform(double *inCoord,double *outCoord,int objIdx){
 
 	double inCoordLocal[3],cylinderCenter[3];
 
@@ -4050,7 +4050,7 @@ void medVMEComputeWrapping::GetWrapLocalTransform(double *inCoord,double *outCoo
 
 }
 //if start or end point near cylinder surface,project it on the cylinder
-bool medVMEComputeWrapping::IsEndPonintOnCylinder(double tolerance,double *endWrapLocal){
+bool mafVMEComputeWrapping::IsEndPonintOnCylinder(double tolerance,double *endWrapLocal){
 	//double endWrapLocal[3];
 	bool rtn = false;
 	double x,y,distX,distY;
@@ -4104,7 +4104,7 @@ bool medVMEComputeWrapping::IsEndPonintOnCylinder(double tolerance,double *endWr
 	}
 	return rtn;
 }
-void medVMEComputeWrapping::GetWrapGlobalTransform(double *inCoord,double *outCoord,int objIdx){
+void mafVMEComputeWrapping::GetWrapGlobalTransform(double *inCoord,double *outCoord,int objIdx){
 
 	double cylinderCenter[3];
 	double yInCoordLocal[3],xyInCoordLocal[3];
@@ -4149,12 +4149,12 @@ void medVMEComputeWrapping::GetWrapGlobalTransform(double *inCoord,double *outCo
 		outCoord[2] = xyInCoordLocal[2] + cylinderCenter[2];
 	}
 }
-void medVMEComputeWrapping::GetWrapGlobalTransform(double *inCoord,double *outCoord){
+void mafVMEComputeWrapping::GetWrapGlobalTransform(double *inCoord,double *outCoord){
 	GetWrapGlobalTransform(inCoord,outCoord,2);
 }
 
 
-void medVMEComputeWrapping::GetWrapAngleAandB(double &cosA,double &sinA,double &cosB,double &sinB){
+void mafVMEComputeWrapping::GetWrapAngleAandB(double &cosA,double &sinA,double &cosB,double &sinB){
 	double paraA[3],paraB[3],center[3],normal1[3],normal2[3];
 	double cCcoord[3],sCcoord[3],orientation[3],sCcoord1[3],sCpcoord[3];
 	double distance;
@@ -4192,7 +4192,7 @@ void medVMEComputeWrapping::GetWrapAngleAandB(double &cosA,double &sinA,double &
 
 //these parameters as return parameters;
 //A,B means angle in fig5
-void medVMEComputeWrapping::GetAngleAandB(double & cosA,double & sinA,double & cosB,double & sinB){
+void mafVMEComputeWrapping::GetAngleAandB(double & cosA,double & sinA,double & cosB,double & sinB){
 
 	double olCoord[3],olprojectCoord[3];
 	double center[3];
@@ -4229,7 +4229,7 @@ void medVMEComputeWrapping::GetAngleAandB(double & cosA,double & sinA,double & c
 //olCoord is o'' coord point o local coordinate.
 //x is a global and unique variable
 //R is radius of sphere
-bool medVMEComputeWrapping::GetAcoordinateInLocal(double *Ap1,double *Ap2,double *olCoord,double R,double x){
+bool mafVMEComputeWrapping::GetAcoordinateInLocal(double *Ap1,double *Ap2,double *olCoord,double R,double x){
 	double A,B;
 	double sinA1 ,sinA2,cosA1,cosA2;
 
@@ -4282,7 +4282,7 @@ bool medVMEComputeWrapping::GetAcoordinateInLocal(double *Ap1,double *Ap2,double
 }
 
 //apppendix D
-void medVMEComputeWrapping::GetIntersectCircle(double *Ap,double *oCoord,double *iCoord,double *mCoord,double & Rm){
+void mafVMEComputeWrapping::GetIntersectCircle(double *Ap,double *oCoord,double *iCoord,double *mCoord,double & Rm){
 	//ux +vy +wz +t = 0;
 	double u,v,w,t,tmp ;
 	double mgCoord[3];
@@ -4306,7 +4306,7 @@ void medVMEComputeWrapping::GetIntersectCircle(double *Ap,double *oCoord,double 
 	testValue = TestPlane(Ap,oCoord,iCoord,mCoord);
 }
 
-void medVMEComputeWrapping::GetUVWT(double *Ap,double *oCoord,double *iCoord,double & u,double & v,double & w,double & t){
+void mafVMEComputeWrapping::GetUVWT(double *Ap,double *oCoord,double *iCoord,double & u,double & v,double & w,double & t){
 	double col1[3],col2[3],col3[3];
 	//-------------------u----
 	col1[0] = oCoord[1];  col2[0] = oCoord[2];  col3[0] = 1;
@@ -4332,7 +4332,7 @@ void medVMEComputeWrapping::GetUVWT(double *Ap,double *oCoord,double *iCoord,dou
 	//------------------------
 
 }
-double medVMEComputeWrapping::DetValue(double *col1,double *col2,double *col3){
+double mafVMEComputeWrapping::DetValue(double *col1,double *col2,double *col3){
 	double rtn = 0;
 	double pRtn = col1[0]*col2[1]*col3[2] + col1[1]*col2[2]*col3[0] + col2[0]*col3[1]*col1[2];
 	double nRtn = col3[0]*col2[1]*col1[2] + col3[1]*col2[2]*col1[0] + col2[0]*col1[1]*col3[2];
@@ -4340,7 +4340,7 @@ double medVMEComputeWrapping::DetValue(double *col1,double *col2,double *col3){
 	return rtn;
 }
 //appendix E
-bool medVMEComputeWrapping::GetBcoordinate(double *Ap,double *oCoord,double *iCoord,double *mCoord,double Rm,double R,double *bCoord1,double *bCoord2){
+bool mafVMEComputeWrapping::GetBcoordinate(double *Ap,double *oCoord,double *iCoord,double *mCoord,double Rm,double R,double *bCoord1,double *bCoord2){
 	// B on plane
 	//( Xb-Xr)2+(Yb-Yr)2+(Zb-Zr)2 = R2
 	//( Xb-Xi)2+(Yb-Yi)2+(Zb-Zi)2+rm2 = (Xm-Xi)2+(Ym-Yi)2+(Zm-Zi)2
@@ -4391,7 +4391,7 @@ bool medVMEComputeWrapping::GetBcoordinate(double *Ap,double *oCoord,double *iCo
 	return rtn;
 
 }
-bool medVMEComputeWrapping::GetBcoordinateUpdate(double *cCoord ,double *bCoord1,double *bCoord2){
+bool mafVMEComputeWrapping::GetBcoordinateUpdate(double *cCoord ,double *bCoord1,double *bCoord2){
 	double blCoord[3];
 	GetLocalCenterCoord(blCoord,m_BPoint);
 	double Rm = GetCylinderRadius();
@@ -4412,7 +4412,7 @@ bool medVMEComputeWrapping::GetBcoordinateUpdate(double *cCoord ,double *bCoord1
 	return rtn;
 }
 //appendix F
-bool medVMEComputeWrapping::GetCcoordinate(double *cCoord1,double *cCoord2){
+bool mafVMEComputeWrapping::GetCcoordinate(double *cCoord1,double *cCoord2){
 	double a,b,c,r;//r is radius of cylinder
 	double Yc,Xc,Zc,Yc2,Xc2,Zc2;
 	double Xb,Yb,Zb;
@@ -4458,7 +4458,7 @@ bool medVMEComputeWrapping::GetCcoordinate(double *cCoord1,double *cCoord2){
 	return rtn;
 }
 
-bool medVMEComputeWrapping::PrepareData2(){
+bool mafVMEComputeWrapping::PrepareData2(){
 	mafVME *start_vme = GetStartVME();
 	mafVME *end_vme   = GetEnd1VME();
 	mafVME *wrapped_vme = GetWrappedVME1();
@@ -4536,7 +4536,7 @@ bool medVMEComputeWrapping::PrepareData2(){
 	return rtn;
 
 }
-void medVMEComputeWrapping::GetCylinderAxis(mafVME *wrapped_vme,int objIdx){
+void mafVMEComputeWrapping::GetCylinderAxis(mafVME *wrapped_vme,int objIdx){
 
 	double x[3] = {0,0,1};
 	double pointOnAxis[3] ;
@@ -4571,7 +4571,7 @@ void medVMEComputeWrapping::GetCylinderAxis(mafVME *wrapped_vme,int objIdx){
 		CopyPointValue(pointOnAxis,m_CylinderAxis2);
 	}
 }
-int medVMEComputeWrapping::PrepareData(int wrappedFlag,double *local_start,double *local_via,double *local_wrapped_center, vtkOBBTree *locator)
+int mafVMEComputeWrapping::PrepareData(int wrappedFlag,double *local_start,double *local_via,double *local_wrapped_center, vtkOBBTree *locator)
 {
 	int obbtreeFlag = 0;
 	mafVME *start_vme = GetStartVME();
@@ -4690,7 +4690,7 @@ int medVMEComputeWrapping::PrepareData(int wrappedFlag,double *local_start,doubl
 
 }
 
-void medVMEComputeWrapping::SingleWrapAutomatedIOR(mafVME * wrapped_vme,double *local_start,double *local_end,double *local_wrapped_center,vtkOBBTree *locator){
+void mafVMEComputeWrapping::SingleWrapAutomatedIOR(mafVME * wrapped_vme,double *local_start,double *local_end,double *local_wrapped_center,vtkOBBTree *locator){
 
 	vtkMAFSmartPointer<vtkPoints> pointsIntersection1;
 	vtkMAFSmartPointer<vtkPoints> pointsIntersection2;
@@ -4740,7 +4740,7 @@ void medVMEComputeWrapping::SingleWrapAutomatedIOR(mafVME * wrapped_vme,double *
 
 }
 
-void medVMEComputeWrapping::GetTwoTangentPoint(mafVME * wrapped_vme,double *local_start,double *local_end,double *local_wrapped_center,vtkOBBTree *locator,vtkTransformPolyDataFilter *transformFirstData ,vtkPoints *pointsIntersection1,vtkPoints *pointsIntersection2){
+void mafVMEComputeWrapping::GetTwoTangentPoint(mafVME * wrapped_vme,double *local_start,double *local_end,double *local_wrapped_center,vtkOBBTree *locator,vtkTransformPolyDataFilter *transformFirstData ,vtkPoints *pointsIntersection1,vtkPoints *pointsIntersection2){
 
 	vtkMAFSmartPointer<vtkPoints> temporaryIntersection;
 	bool aligned = false;
@@ -4862,7 +4862,7 @@ void medVMEComputeWrapping::GetTwoTangentPoint(mafVME * wrapped_vme,double *loca
 
 
 //-----------------------------------------------------------------------
-int medVMEComputeWrapping::InternalStore(mafStorageElement *parent)
+int mafVMEComputeWrapping::InternalStore(mafStorageElement *parent)
 //-----------------------------------------------------------------------
 {  
 	if(m_Gui == NULL) //this for update wrapped vme lists
@@ -4912,7 +4912,7 @@ int medVMEComputeWrapping::InternalStore(mafStorageElement *parent)
 	return MAF_ERROR;
 }
 //-----------------------------------------------------------------------
-int medVMEComputeWrapping::InternalRestore(mafStorageElement *node)
+int mafVMEComputeWrapping::InternalRestore(mafStorageElement *node)
 //-----------------------------------------------------------------------
 {
 	if (Superclass::InternalRestore(node)==MAF_OK)
@@ -4937,7 +4937,7 @@ int medVMEComputeWrapping::InternalRestore(mafStorageElement *node)
 	return MAF_ERROR;
 }
 //-----------------------------------------------------------------------
-void medVMEComputeWrapping::Print(std::ostream& os, const int tabs)
+void mafVMEComputeWrapping::Print(std::ostream& os, const int tabs)
 //-----------------------------------------------------------------------
 {
 	Superclass::Print(os,tabs);
@@ -4948,7 +4948,7 @@ void medVMEComputeWrapping::Print(std::ostream& os, const int tabs)
 }
 
 //-------------------------------------------------------------------------
-mmaMeter *medVMEComputeWrapping::GetMeterAttributes()
+mmaMeter *mafVMEComputeWrapping::GetMeterAttributes()
 //-------------------------------------------------------------------------
 {
 	mmaMeter *meter_attributes = (mmaMeter *)GetAttribute("MeterAttributes");
@@ -4960,124 +4960,124 @@ mmaMeter *medVMEComputeWrapping::GetMeterAttributes()
 	return meter_attributes;
 }
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SetMeterMode(int mode)
+void mafVMEComputeWrapping::SetMeterMode(int mode)
 //-------------------------------------------------------------------------
 {
 	GetMeterAttributes()->m_MeterMode = mode;
 }
 //-------------------------------------------------------------------------
-int medVMEComputeWrapping::GetMeterMode()
+int mafVMEComputeWrapping::GetMeterMode()
 //-------------------------------------------------------------------------
 {
 	return GetMeterAttributes()->m_MeterMode;
 }
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SetDistanceRange(double min, double max)
+void mafVMEComputeWrapping::SetDistanceRange(double min, double max)
 //-------------------------------------------------------------------------
 {
 	GetMeterAttributes()->m_DistanceRange[0] = min;
 	GetMeterAttributes()->m_DistanceRange[1] = max;
 }
 //-------------------------------------------------------------------------
-double *medVMEComputeWrapping::GetDistanceRange() 
+double *mafVMEComputeWrapping::GetDistanceRange() 
 //-------------------------------------------------------------------------
 {
 	return GetMeterAttributes()->m_DistanceRange;
 }
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SetMeterColorMode(int mode)
+void mafVMEComputeWrapping::SetMeterColorMode(int mode)
 //-------------------------------------------------------------------------
 {
 	GetMeterAttributes()->m_ColorMode = mode;
 }
 //-------------------------------------------------------------------------
-int medVMEComputeWrapping::GetMeterColorMode()
+int mafVMEComputeWrapping::GetMeterColorMode()
 //-------------------------------------------------------------------------
 {
 	return GetMeterAttributes()->m_ColorMode;
 }
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SetMeterMeasureType(int type)
+void mafVMEComputeWrapping::SetMeterMeasureType(int type)
 //-------------------------------------------------------------------------
 {
 	GetMeterAttributes()->m_MeasureType = type;
 }
 //-------------------------------------------------------------------------
-int medVMEComputeWrapping::GetMeterMeasureType()
+int mafVMEComputeWrapping::GetMeterMeasureType()
 //-------------------------------------------------------------------------
 {
 	return GetMeterAttributes()->m_MeasureType;
 }
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SetMeterRepresentation(int representation)
+void mafVMEComputeWrapping::SetMeterRepresentation(int representation)
 //-------------------------------------------------------------------------
 {
 	GetMeterAttributes()->m_Representation = representation;
 }
 //-------------------------------------------------------------------------
-int medVMEComputeWrapping::GetMeterRepresentation()
+int mafVMEComputeWrapping::GetMeterRepresentation()
 //-------------------------------------------------------------------------
 {
 	return GetMeterAttributes()->m_Representation;
 }
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SetMeterCapping(int capping)
+void mafVMEComputeWrapping::SetMeterCapping(int capping)
 //-------------------------------------------------------------------------
 {
 	GetMeterAttributes()->m_Capping = capping;
 }
 //-------------------------------------------------------------------------
-int medVMEComputeWrapping::GetMeterCapping()
+int mafVMEComputeWrapping::GetMeterCapping()
 //-------------------------------------------------------------------------
 {
 	return GetMeterAttributes()->m_Capping;
 }
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SetGenerateEvent(int generate)
+void mafVMEComputeWrapping::SetGenerateEvent(int generate)
 //-------------------------------------------------------------------------
 {
 	GetMeterAttributes()->m_GenerateEvent = generate;
 }
 
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SetInitMeasure(double init_measure)
+void mafVMEComputeWrapping::SetInitMeasure(double init_measure)
 //-------------------------------------------------------------------------
 {
 	GetMeterAttributes()->m_InitMeasure = init_measure;
 }
 
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SetMeterRadius(double radius)
+void mafVMEComputeWrapping::SetMeterRadius(double radius)
 //-------------------------------------------------------------------------
 {
 	GetMeterAttributes()->m_TubeRadius = radius;
 }
 //-------------------------------------------------------------------------
-double medVMEComputeWrapping::GetMeterRadius()
+double mafVMEComputeWrapping::GetMeterRadius()
 //-------------------------------------------------------------------------
 {
 	return GetMeterAttributes()->m_TubeRadius;
 }
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SetDeltaPercent(int delta_percent)
+void mafVMEComputeWrapping::SetDeltaPercent(int delta_percent)
 //-------------------------------------------------------------------------
 {
 	GetMeterAttributes()->m_DeltaPercent = delta_percent;
 }
 
 //-------------------------------------------------------------------------
-double medVMEComputeWrapping::GetDistance()
+double mafVMEComputeWrapping::GetDistance()
 //-------------------------------------------------------------------------
 {
 	return m_Distance;
 }
 //-------------------------------------------------------------------------
-double medVMEComputeWrapping::GetAngle()
+double mafVMEComputeWrapping::GetAngle()
 //-------------------------------------------------------------------------
 {
 	return m_Angle;
 }
-mafGUI* medVMEComputeWrapping::CreateGuiForNewMeter( mafGUI *gui ){
+mafGUI* mafVMEComputeWrapping::CreateGuiForNewMeter( mafGUI *gui ){
 
 	mafID sub_id = -1;
 
@@ -5133,7 +5133,7 @@ mafGUI* medVMEComputeWrapping::CreateGuiForNewMeter( mafGUI *gui ){
 
 	return gui;
 }
-mafGUI* medVMEComputeWrapping::CreateGuiForOldMeter( mafGUI *gui ){
+mafGUI* mafVMEComputeWrapping::CreateGuiForOldMeter( mafGUI *gui ){
 
 	mafID sub_id = -1;
 
@@ -5224,7 +5224,7 @@ mafGUI* medVMEComputeWrapping::CreateGuiForOldMeter( mafGUI *gui ){
 	return gui;
 }
 
-mafGUI* medVMEComputeWrapping::CreateGui(){
+mafGUI* mafVMEComputeWrapping::CreateGui(){
 	m_Gui = NULL;
 	m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
 	m_Gui->SetListener(this);
@@ -5256,23 +5256,23 @@ mafGUI* medVMEComputeWrapping::CreateGui(){
 	return m_Gui;
 }
 
-void medVMEComputeWrapping::EventWraped(mafEvent *e){
+void mafVMEComputeWrapping::EventWraped(mafEvent *e){
 
 	mafID button_id = e->GetId();
 	mafString title = _("Choose meter vme link");
 	e->SetId(VME_CHOOSE);
 	if (button_id == ID_WRAPPED_METER_LINK1)
-		e->SetArg((long)&medVMEComputeWrapping::VMESurfaceParametricAccept);
+		e->SetArg((long)&mafVMEComputeWrapping::VMESurfaceParametricAccept);
 	else if (button_id == ID_WRAPPED_METER_LINK2)
-		e->SetArg((long)&medVMEComputeWrapping::VMESurfaceParametricAccept);
+		e->SetArg((long)&mafVMEComputeWrapping::VMESurfaceParametricAccept);
 
 	else if (button_id == ID_WRAPPED_METER_LINK)//old object
-		e->SetArg((long)&medVMEComputeWrapping::VMESurfaceParametricAccept);
+		e->SetArg((long)&mafVMEComputeWrapping::VMESurfaceParametricAccept);
 
 	else if (button_id == ID_VIA_POINT)
-		e->SetArg((long)&medVMEComputeWrapping::VMESurfaceParametricAccept);
+		e->SetArg((long)&mafVMEComputeWrapping::VMESurfaceParametricAccept);
 	else
-		e->SetArg((long)&medVMEComputeWrapping::VMEAccept);
+		e->SetArg((long)&mafVMEComputeWrapping::VMEAccept);
 	e->SetString(&title);
 
 	ForwardUpEvent(e);
@@ -5330,7 +5330,7 @@ void medVMEComputeWrapping::EventWraped(mafEvent *e){
 
 }
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
+void mafVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
 //-------------------------------------------------------------------------
 {
 
@@ -5479,7 +5479,7 @@ void medVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
 				}*/
 				mafString title = _("Choose a vme");
 				e->SetId(VME_CHOOSE);
-				e->SetArg((long)&medVMEComputeWrapping::VMEAccept);
+				e->SetArg((long)&mafVMEComputeWrapping::VMEAccept);
 				e->SetString(&title);
 				ForwardUpEvent(e);
 				mafVME *n = e->GetVme();
@@ -5617,7 +5617,7 @@ void medVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
 	}
 }
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SetMeterLink(const char *link_name, mafVME *n)
+void mafVMEComputeWrapping::SetMeterLink(const char *link_name, mafVME *n)
 //-------------------------------------------------------------------------
 {
 	SetLink(link_name, n);
@@ -5634,7 +5634,7 @@ void medVMEComputeWrapping::SetMeterLink(const char *link_name, mafVME *n)
 }
 
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::AddMidPoint(mafVME *node)
+void mafVMEComputeWrapping::AddMidPoint(mafVME *node)
 //-------------------------------------------------------------------------
 {
 	m_OrderMiddlePointsVMEList.push_back(node->GetId());
@@ -5646,7 +5646,7 @@ void medVMEComputeWrapping::AddMidPoint(mafVME *node)
 }
 
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::RemoveLink(const char *link_name)
+void mafVMEComputeWrapping::RemoveLink(const char *link_name)
 //-------------------------------------------------------------------------
 {
 	Superclass::RemoveLink(link_name);
@@ -5668,40 +5668,40 @@ void medVMEComputeWrapping::RemoveLink(const char *link_name)
 	}
 }
 //-------------------------------------------------------------------------
-mafVME *medVMEComputeWrapping::GetStartVME()
+mafVME *mafVMEComputeWrapping::GetStartVME()
 //-------------------------------------------------------------------------
 {
 	return GetLink("StartVME");
 }
 //-------------------------------------------------------------------------
-mafVME *medVMEComputeWrapping::GetEnd1VME()
+mafVME *mafVMEComputeWrapping::GetEnd1VME()
 //-------------------------------------------------------------------------
 {
 	return GetLink("EndVME1");
 }
 //-------------------------------------------------------------------------
-mafVME  *medVMEComputeWrapping::GetWrappedVME1()
+mafVME  *mafVMEComputeWrapping::GetWrappedVME1()
 //-------------------------------------------------------------------------
 {
 	return GetLink("WrappedVME1");
 }
-mafVME  *medVMEComputeWrapping::GetWrappedVME2()
+mafVME  *mafVMEComputeWrapping::GetWrappedVME2()
 //-------------------------------------------------------------------------
 {
 	return GetLink("WrappedVME2");
 }
-mafVME *medVMEComputeWrapping::GetWrappedVME()
+mafVME *mafVMEComputeWrapping::GetWrappedVME()
 //-------------------------------------------------------------------------
 {
 	return GetLink("WrappedVME");
 }
-mafVME  *medVMEComputeWrapping::GetViaPointVME()
+mafVME  *mafVMEComputeWrapping::GetViaPointVME()
 //-------------------------------------------------------------------------
 {
 	return GetLink("viaPoint");
 }
 
-std::vector<mafVME *> medVMEComputeWrapping::GetWrappedVMEList(){
+std::vector<mafVME *> mafVMEComputeWrapping::GetWrappedVMEList(){
 	//-------------------------------------------------------------------------
 	std::vector<mafVME *> wrappedVmeList;
 	mafVME * tmp = GetLink("WrappedVME1");
@@ -5713,7 +5713,7 @@ std::vector<mafVME *> medVMEComputeWrapping::GetWrappedVMEList(){
 }
 
 //-----------------------------------------------------------------------
-mafVME::mafLinksMap *medVMEComputeWrapping::GetMidPointsLinks()
+mafVME::mafLinksMap *mafVMEComputeWrapping::GetMidPointsLinks()
 //-----------------------------------------------------------------------
 {
 	//da ritornare la link maps
@@ -5721,7 +5721,7 @@ mafVME::mafLinksMap *medVMEComputeWrapping::GetMidPointsLinks()
 }
 
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::EnableManualModeWidget(mafGUI *gui,bool flag)
+void mafVMEComputeWrapping::EnableManualModeWidget(mafGUI *gui,bool flag)
 //-------------------------------------------------------------------------
 {
 	gui->Enable(ID_LISTBOX, flag);
@@ -5732,7 +5732,7 @@ void medVMEComputeWrapping::EnableManualModeWidget(mafGUI *gui,bool flag)
 }
 
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SyncronizeList()
+void mafVMEComputeWrapping::SyncronizeList()
 //-------------------------------------------------------------------------
 {
 	m_OrderMiddlePointsNameVMEList.clear();
@@ -5764,7 +5764,7 @@ void medVMEComputeWrapping::SyncronizeList()
 	}
 }
 //-------------------------------------------------------------------------
-double *medVMEComputeWrapping::GetMiddlePointCoordinate(int index)
+double *mafVMEComputeWrapping::GetMiddlePointCoordinate(int index)
 //-------------------------------------------------------------------------
 {
 	if(m_MiddlePointList.size() > 0)
@@ -5773,7 +5773,7 @@ double *medVMEComputeWrapping::GetMiddlePointCoordinate(int index)
 	return NULL;
 }
 //-------------------------------------------------------------------------
-double *medVMEComputeWrapping::GetExportPointCoordinate(int index)
+double *mafVMEComputeWrapping::GetExportPointCoordinate(int index)
 //-------------------------------------------------------------------------
 {
 	if(m_ExportPointList.size() > 0)
@@ -5782,19 +5782,19 @@ double *medVMEComputeWrapping::GetExportPointCoordinate(int index)
 	return NULL;
 }
 //-------------------------------------------------------------------------
-double *medVMEComputeWrapping::GetStartPointCoordinate()
+double *mafVMEComputeWrapping::GetStartPointCoordinate()
 //-------------------------------------------------------------------------
 {
 	return m_StartPoint;
 }
 //-------------------------------------------------------------------------
-double *medVMEComputeWrapping::GetEndPointCoordinate()
+double *mafVMEComputeWrapping::GetEndPointCoordinate()
 //-------------------------------------------------------------------------
 {
 	return m_EndPoint;
 }
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SaveInFile()
+void mafVMEComputeWrapping::SaveInFile()
 //-------------------------------------------------------------------------
 {
 	/*mafString initialFileName;
@@ -5829,26 +5829,26 @@ void medVMEComputeWrapping::SaveInFile()
 
 //------------------------------------------------------***** old method begin from mafVMEWrappedMeter (weih copy it)*****--------------------------
 //-------------------------------------------------------------------------
-double medVMEComputeWrapping::GetInitMeasure()
+double mafVMEComputeWrapping::GetInitMeasure()
 //-------------------------------------------------------------------------
 {
 	return GetMeterAttributes()->m_InitMeasure;
 }
 //-------------------------------------------------------------------------
-int medVMEComputeWrapping::GetDeltaPercent()
+int mafVMEComputeWrapping::GetDeltaPercent()
 //-------------------------------------------------------------------------
 {
 	return GetMeterAttributes()->m_DeltaPercent;
 }
 //-------------------------------------------------------------------------
-int medVMEComputeWrapping::GetGenerateEvent()
+int mafVMEComputeWrapping::GetGenerateEvent()
 //-------------------------------------------------------------------------
 {
 	return GetMeterAttributes()->m_GenerateEvent;
 }
 
 //-----------------------------------------------------------------------
-void medVMEComputeWrapping::InternalUpdateManual()//first
+void mafVMEComputeWrapping::InternalUpdateManual()//first
 //-----------------------------------------------------------------------
 {
 	//if(m_Gui == NULL) CreateGui();
@@ -5860,7 +5860,7 @@ void medVMEComputeWrapping::InternalUpdateManual()//first
 
 	double threshold = GetMeterAttributes()->m_InitMeasure * (1 + GetMeterAttributes()->m_DeltaPercent / 100.0);
 
-	if (GetMeterMode() == medVMEComputeWrapping::POINT_DISTANCE)
+	if (GetMeterMode() == mafVMEComputeWrapping::POINT_DISTANCE)
 	{
 		mafVME *start_vme = GetStartVME();
 		mafVME *end_vme   = GetEnd1VME();
@@ -5957,7 +5957,7 @@ void medVMEComputeWrapping::InternalUpdateManual()//first
 				}
 			}
 
-			if(GetMeterMeasureType() == medVMEComputeWrapping::RELATIVE_MEASURE)
+			if(GetMeterMeasureType() == mafVMEComputeWrapping::RELATIVE_MEASURE)
 				m_Distance -= GetMeterAttributes()->m_InitMeasure;
 
 			// compute start point in local coordinate system
@@ -6026,7 +6026,7 @@ void medVMEComputeWrapping::InternalUpdateManual()//first
 		m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 
 
-		if(GetMeterMeasureType() == medVMEComputeWrapping::ABSOLUTE_MEASURE && GetMeterAttributes()->m_ThresholdEvent > 0 && m_Distance >= 0 && m_Distance >= threshold)
+		if(GetMeterMeasureType() == mafVMEComputeWrapping::ABSOLUTE_MEASURE && GetMeterAttributes()->m_ThresholdEvent > 0 && m_Distance >= 0 && m_Distance >= threshold)
 			m_EventSource->InvokeEvent(this,LENGTH_THRESHOLD_EVENT);
 
 
@@ -6040,7 +6040,7 @@ void medVMEComputeWrapping::InternalUpdateManual()//first
 }
 
 //-----------------------------------------------------------------------
-void medVMEComputeWrapping::InternalUpdateAutomated()//second
+void mafVMEComputeWrapping::InternalUpdateAutomated()//second
 //-----------------------------------------------------------------------
 {
 	mafVME *start_vme = GetStartVME();
@@ -6438,7 +6438,7 @@ void medVMEComputeWrapping::InternalUpdateAutomated()//second
 		m_Distance = -1;
 }
 //-----------------------------------------------------------------------
-void medVMEComputeWrapping::InternalUpdateAutomatedIOR()//third
+void mafVMEComputeWrapping::InternalUpdateAutomatedIOR()//third
 //-----------------------------------------------------------------------
 {
 	mafVME *start_vme = GetStartVME();
@@ -6777,7 +6777,7 @@ void medVMEComputeWrapping::InternalUpdateAutomatedIOR()//third
 		m_Distance = -1;
 }
 //-----------------------------------------------------------------------
-void medVMEComputeWrapping::WrappingCore(double *init, double *center, double *end,\
+void mafVMEComputeWrapping::WrappingCore(double *init, double *center, double *end,\
 										 bool IsStart, bool controlParallel,\
 										 vtkOBBTree *locator, vtkPoints *temporaryIntersection, vtkPoints *pointsIntersection,\
 										 double *versorY, double *versorZ, int nControl)
@@ -6925,7 +6925,7 @@ void medVMEComputeWrapping::WrappingCore(double *init, double *center, double *e
 	}
 }
 //-----------------------------------------------------------------------
-void medVMEComputeWrapping::AvoidWrapping(double *local_start, double *local_end)
+void mafVMEComputeWrapping::AvoidWrapping(double *local_start, double *local_end)
 //-----------------------------------------------------------------------
 {
 	//if there is no intersection with geometry
@@ -6939,7 +6939,7 @@ void medVMEComputeWrapping::AvoidWrapping(double *local_start, double *local_end
 	GetWrappedMeterOutput()->Update();
 }
 //-------------------------------------------------------------------------
-bool medVMEComputeWrapping::MiddlePointsControl()
+bool mafVMEComputeWrapping::MiddlePointsControl()
 //-------------------------------------------------------------------------
 {
 	//mafLogMessage("LINKS");
@@ -7000,7 +7000,7 @@ bool medVMEComputeWrapping::MiddlePointsControl()
 	return true;
 }
 //-------------------------------------------------------------------------
-mafVME* medVMEComputeWrapping::IndexToMiddlePointVME(int index)
+mafVME* mafVMEComputeWrapping::IndexToMiddlePointVME(int index)
 //-------------------------------------------------------------------------
 {
 	mafString name = m_OrderMiddlePointsNameVMEList[index];

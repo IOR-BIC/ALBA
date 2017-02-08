@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: medInteractor2DAngleTest
+ Module: mafInteractor2DAngleTest
  Authors: Roberto Mucci
  
  Copyright (c) B3C
@@ -14,14 +14,14 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_medInteractor2DAngleTest_H__
-#define __CPP_UNIT_medInteractor2DAngleTest_H__
+#ifndef __CPP_UNIT_mafInteractor2DAngleTest_H__
+#define __CPP_UNIT_mafInteractor2DAngleTest_H__
 
 #include "mafTest.h"
 
 class mafGUIFrame;
 
-class medInteractor2DAngleTest : public mafTest
+class mafInteractor2DAngleTest : public mafTest
 {
 public:
 
@@ -31,7 +31,7 @@ public:
   // Executed after each test
   void AfterTest();
 
-  CPPUNIT_TEST_SUITE( medInteractor2DAngleTest );
+  CPPUNIT_TEST_SUITE( mafInteractor2DAngleTest );
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestStaticAllocation );

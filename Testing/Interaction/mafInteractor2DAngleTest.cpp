@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: medInteractor2DAngleTest
+ Module: mafInteractor2DAngleTest
  Authors: Roberto Mucci
  
  Copyright (c) B3C
@@ -21,10 +21,10 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-#include "medInteractor2DAngleTest.h"
+#include "mafInteractor2DAngleTest.h"
 #include "mafInteractionTests.h"
 
-#include "medInteractor2DAngle.h"
+#include "mafInteractor2DAngle.h"
 #include "mafGUIFrame.h"
 
 #include "vtkLineSource.h"
@@ -34,7 +34,7 @@
 #define EPSILON 0.001
 
 //-----------------------------------------------------------
-void medInteractor2DAngleTest::BeforeTest()
+void mafInteractor2DAngleTest::BeforeTest()
 //-----------------------------------------------------------
 {
   m_Win = new mafGUIFrame("testGui", wxDefaultPosition, wxSize(800, 600));
@@ -42,55 +42,61 @@ void medInteractor2DAngleTest::BeforeTest()
   wxModule::InitializeModules();
 }
 //-----------------------------------------------------------
-void medInteractor2DAngleTest::AfterTest()
+void mafInteractor2DAngleTest::AfterTest()
 //-----------------------------------------------------------
 {
   wxModule::CleanUpModules();
   delete m_Win;
 }
 //-----------------------------------------------------------
-void medInteractor2DAngleTest::TestFixture()
+void mafInteractor2DAngleTest::TestFixture()
 //-----------------------------------------------------------
 {
 
 }
 //-----------------------------------------------------------
-void medInteractor2DAngleTest::TestDynamicAllocation() 
+void mafInteractor2DAngleTest::TestDynamicAllocation() 
 //-----------------------------------------------------------
 {
-  medInteractor2DAngle *interactor = medInteractor2DAngle::NewTest();
+  mafInteractor2DAngle *interactor;
+	mafNEW(interactor); 
 
-  interactor->Delete();
+	mafDEL(interactor);
 }
 //-----------------------------------------------------------
-void medInteractor2DAngleTest::TestStaticAllocation() 
+void mafInteractor2DAngleTest::TestStaticAllocation() 
 //-----------------------------------------------------------
 {
 }
 //-----------------------------------------------------------
-void medInteractor2DAngleTest::TestSetMeasureType() 
+void mafInteractor2DAngleTest::TestSetMeasureType() 
 //-----------------------------------------------------------
 {
-  medInteractor2DAngle *interactor = medInteractor2DAngle::NewTest();
+  mafInteractor2DAngle *interactor;
+	mafNEW(interactor);
+	interactor->m_TestMode = true;
 
-  interactor->SetMeasureType(medInteractor2DAngle::ANGLE_BETWEEN_POINTS);
-  CPPUNIT_ASSERT( interactor->m_MeasureType == medInteractor2DAngle::ANGLE_BETWEEN_POINTS );
+  interactor->SetMeasureType(mafInteractor2DAngle::ANGLE_BETWEEN_POINTS);
+	CPPUNIT_ASSERT( interactor->m_MeasureType == mafInteractor2DAngle::ANGLE_BETWEEN_POINTS );
 
   interactor->SetMeasureTypeToAngleBetweenLines();
-  CPPUNIT_ASSERT( interactor->m_MeasureType == medInteractor2DAngle::ANGLE_BETWEEN_LINES );
+  CPPUNIT_ASSERT( interactor->m_MeasureType == mafInteractor2DAngle::ANGLE_BETWEEN_LINES );
 
   interactor->SetMeasureTypeToAngleBetweenPoints();
-  CPPUNIT_ASSERT( interactor->m_MeasureType == medInteractor2DAngle::ANGLE_BETWEEN_POINTS );
+  CPPUNIT_ASSERT( interactor->m_MeasureType == mafInteractor2DAngle::ANGLE_BETWEEN_POINTS );
 
-  interactor->Delete();
+	mafDEL(interactor);
 }
 
 //-----------------------------------------------------------
-void medInteractor2DAngleTest::TestSetManualDistance() 
+void mafInteractor2DAngleTest::TestSetManualDistance() 
 //-----------------------------------------------------------
 {
-  medInteractor2DAngle *interactor = medInteractor2DAngle::NewTest();
-  interactor->SetMeasureTypeToAngleBetweenPoints();
+	mafInteractor2DAngle *interactor;
+	mafNEW(interactor);
+	interactor->m_TestMode = true;
+	
+	interactor->SetMeasureTypeToAngleBetweenPoints();
 
   //////////////////////////////////////////////////////////////////////////
   vtkLineSource *line1 = vtkLineSource::New();
@@ -114,23 +120,27 @@ void medInteractor2DAngleTest::TestSetManualDistance()
   line2->Delete();
   //////////////////////////////////////////////////////////////////////////
 
-  interactor->Delete();
+	mafDEL(interactor);
 }
 //-----------------------------------------------------------
-void medInteractor2DAngleTest::TestIsDisableUndoAndOkCancel() 
+void mafInteractor2DAngleTest::TestIsDisableUndoAndOkCancel() 
 //-----------------------------------------------------------
 {
-  medInteractor2DAngle *interactor = medInteractor2DAngle::NewTest();
+	mafInteractor2DAngle *interactor;
+	mafNEW(interactor);
+	interactor->m_TestMode = true;
 
   CPPUNIT_ASSERT( interactor->IsDisableUndoAndOkCancel() == false );//Default value
 
-  interactor->Delete();
+	mafDEL(interactor);
 }
 //-----------------------------------------------------------
-void medInteractor2DAngleTest::TestGetLastAngle() 
+void mafInteractor2DAngleTest::TestGetLastAngle() 
 //-----------------------------------------------------------
 {
-  medInteractor2DAngle *interactor = medInteractor2DAngle::NewTest();
+	mafInteractor2DAngle *interactor;
+	mafNEW(interactor);
+	interactor->m_TestMode = true;
 
   CPPUNIT_ASSERT( interactor->GetLastAngle() == 0 );
 
@@ -139,5 +149,5 @@ void medInteractor2DAngleTest::TestGetLastAngle()
 
   CPPUNIT_ASSERT( interactor->GetLastAngle() == 5.0 );
 
-  interactor->Delete();
+	mafDEL(interactor);
 }

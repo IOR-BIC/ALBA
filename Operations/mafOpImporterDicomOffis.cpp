@@ -415,7 +415,7 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateLoadPage()
 {
-	m_LoadPage = new mafGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
+	m_LoadPage = new mafGUIWizardPageNew(m_Wizard,mafWIZARDUSEGUI|mafWIZARDUSERWI);
 	m_LoadGuiLeft = new mafGUI(this);
 	m_LoadGuiUnderLeft = new mafGUI(this);
 	m_LoadGuiUnderCenter = new mafGUI(this);
@@ -441,7 +441,7 @@ void mafOpImporterDicomOffis::CreateLoadPage()
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateCropPage()
 {
-	m_CropPage = new mafGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,true);
+	m_CropPage = new mafGUIWizardPageNew(m_Wizard,mafWIZARDUSEGUI|mafWIZARDUSERWI,true);
 	m_CropPage->SetListener(this);
 	m_CropGuiLeft = new mafGUI(this);
 	m_CropGuiCenter = new mafGUI(this);
@@ -506,10 +506,10 @@ void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 			case ID_RANGE_MODIFIED:
 				OnRangeModified();
 			break;
-			case mafGUIWizard::MED_WIZARD_CHANGE_PAGE:
+			case mafGUIWizard::MAF_WIZARD_CHANGE_PAGE:
 				OnWizardChangePage(e);
 			break;
-			case mafGUIWizard::MED_WIZARD_CHANGED_PAGE:
+			case mafGUIWizard::MAF_WIZARD_CHANGED_PAGE:
 				/* This is a ack, because that "genius" of wx  send the change event
 				before page show, so we need to duplicate the code here in order to
 				manage the camera update */

@@ -137,7 +137,6 @@
 #include "mafVMEDataSetAttributesImporterTest.h"
 #include "mafVMEMeshAnsysTextExporterTest.h"
 #include "mafVMEMeshAnsysTextImporterTest.h"
-#include "medOpImporterVTKTest.h"
 
 #include "itkRawMotionImporterUtilityTest.h"
 
@@ -283,7 +282,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpTriangulateSurfaceTest::suite());
 	runner.addTest(mafOpSurfaceMirrorTest::suite());
 	runner.addTest(mafOpVolumeMirrorTest::suite());
-	runner.addTest(medOpImporterVTKTest::suite());
 	runner.addTest(mafOpExporterMetersTest::suite());
 	runner.addTest(mafOpSubdivideTest::suite());
 	runner.addTest(mafOpCreateSurfaceTest::suite());

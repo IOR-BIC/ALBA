@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: medInteractor2DIndicatorTest
+ Module: mafInteractor2DDistanceTest
  Authors: Matteo Giacomoni
  
  Copyright (c) B3C
@@ -14,27 +14,34 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_medInteractor2DIndicatorTest_H__
-#define __CPP_UNIT_medInteractor2DIndicatorTest_H__
+#ifndef __CPP_UNIT_mafInteractor2DDistanceTest_H__
+#define __CPP_UNIT_mafInteractor2DDistanceTest_H__
 
 #include "mafTest.h"
 
 class mafGUIFrame;
 
-class medInteractor2DIndicatorTest : public mafTest
+class mafInteractor2DDistanceTest : public mafTest
 {
 public:
 
-	CPPUNIT_TEST_SUITE( medInteractor2DIndicatorTest );
+  // Executed before each test
+  void BeforeTest();
+
+  // Executed after each test
+  void AfterTest();
+
+  CPPUNIT_TEST_SUITE( mafInteractor2DDistanceTest );
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestStaticAllocation );
-  CPPUNIT_TEST( TestIsDisableUndoAndOkCancel );
-  CPPUNIT_TEST( TestUndoMeasure );
-  CPPUNIT_TEST( TestSetLabel );
-  CPPUNIT_TEST( TestGetLabel );
-  CPPUNIT_TEST( TestGetRegisterMeasure );
-  CPPUNIT_TEST( TestSizeMeasureVector );
+  CPPUNIT_TEST( TestSetMeasureType );
+  CPPUNIT_TEST( TestGenerateHistogram  );
+  CPPUNIT_TEST( TestSetManualDistance1  );
+  CPPUNIT_TEST( TestSetManualDistance2  );
+  CPPUNIT_TEST( TestIsDisableUndoAndOkCancel  );
+  CPPUNIT_TEST( TestGetLastDistance  );
+  CPPUNIT_TEST( TestSetLabel  );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -42,13 +49,15 @@ protected:
   void TestFixture();
   void TestDynamicAllocation();
   void TestStaticAllocation();
+  void TestSetMeasureType();
+  void TestGenerateHistogram();
+  void TestSetManualDistance1();
+  void TestSetManualDistance2();
   void TestIsDisableUndoAndOkCancel();
-  void TestUndoMeasure();
-  void TestRemoveMeter();
+  void TestGetLastDistance();
   void TestSetLabel();
-  void TestGetLabel();
-  void TestGetRegisterMeasure();
-  void TestSizeMeasureVector();
+
+  mafGUIFrame *m_Win;
 };
 
 #endif

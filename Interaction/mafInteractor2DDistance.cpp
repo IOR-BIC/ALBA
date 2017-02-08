@@ -58,9 +58,14 @@ mafCxxTypeMacro(mafInteractor2DDistance)
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafInteractor2DDistance::mafInteractor2DDistance() 
+mafInteractor2DDistance::mafInteractor2DDistance(bool testMode /* = false */) 
 //----------------------------------------------------------------------------
 {
+  m_TestMode = testMode;
+
+  m_HistogramRWI = NULL;
+  m_HistogramDialog = NULL;
+
   m_Coordinate = vtkCoordinate::New();
   m_Coordinate->SetCoordinateSystemToWorld();
 
@@ -103,21 +108,23 @@ mafInteractor2DDistance::mafInteractor2DDistance()
   tprop->SetFontSize(12);
   m_PlotActor->SetPlotColor(0,.8,.3,.3);
 
-  // Histogram dialog
-  int width = 400;
-  int height = 300;
-  int x_init,y_init;
-  x_init = mafGetFrame()->GetPosition().x;
-  y_init = mafGetFrame()->GetPosition().y;
-  m_HistogramDialog = new mafGUIDialogPreview(_("Histogram"), mafCLOSEWINDOW | mafUSERWI);
-  m_HistogramRWI = m_HistogramDialog->GetRWI();
-  m_HistogramRWI->SetListener(this);
-  m_HistogramRWI->m_RenFront->AddActor2D(m_PlotActor);
-  m_HistogramRWI->m_RenFront->SetBackground(1,1,1);
-  m_HistogramRWI->SetSize(0,0,width,height);
-  
-  m_HistogramDialog->SetSize(x_init,y_init,width,height);
-	m_HistogramDialog->Show(FALSE);
+  if (!m_TestMode)
+  { // Histogram dialog
+	  int width = 400;
+	  int height = 300;
+	  int x_init,y_init;
+	  x_init = mafGetFrame()->GetPosition().x;
+	  y_init = mafGetFrame()->GetPosition().y;
+	  m_HistogramDialog = new mafGUIDialogPreview(_("Histogram"), mafCLOSEWINDOW | mafUSERWI);
+	  m_HistogramRWI = m_HistogramDialog->GetRWI();
+	  m_HistogramRWI->SetListener(this);
+	  m_HistogramRWI->m_RenFront->AddActor2D(m_PlotActor);
+	  m_HistogramRWI->m_RenFront->SetBackground(1,1,1);
+	  m_HistogramRWI->SetSize(0,0,width,height);
+	  
+	  m_HistogramDialog->SetSize(x_init,y_init,width,height);
+		m_HistogramDialog->Show(FALSE);
+	}
 
   m_CurrentRwi = NULL;
   m_CurrentRenderer  = NULL;
@@ -162,7 +169,10 @@ mafInteractor2DDistance::~mafInteractor2DDistance()
 //----------------------------------------------------------------------------
 {
   RemoveMeter();
-  m_HistogramRWI->m_RenFront->RemoveActor(m_PlotActor);
+  if (m_HistogramRWI)
+  {
+  	m_HistogramRWI->m_RenFront->RemoveActor(m_PlotActor);
+  }
   vtkDEL(m_PlotActor);
   vtkDEL(m_ProbingLine);
   vtkDEL(m_Line);
@@ -198,12 +208,6 @@ mafInteractor2DDistance::~mafInteractor2DDistance()
   m_LineSourceVector1.clear();
   m_LineMapperVector1.clear();
   m_LineActorVector1.clear();
-
-/* CONE
-	m_ConeSourceVector.clear();
-	m_ConeMapperVector.clear();
-	m_ConeActorVector.clear();
-*/
 
   m_LineSourceVector2.clear();
   m_LineMapperVector2.clear();
@@ -845,11 +849,19 @@ void mafInteractor2DDistance::GenerateHistogram(bool generate)
   if (m_GenerateHistogram)
   {
     m_PlotActor->RemoveAllInputs();
-    m_HistogramRWI->m_RwiBase->Render();
+    if (m_HistogramRWI)
+    {
+    	m_HistogramRWI->m_RwiBase->Render();
+    }
     RemoveMeter();
     SetMeasureTypeToDistanceBetweenPoints();
+   
   }
-  m_HistogramDialog->Show(m_GenerateHistogram);
+
+  if (m_HistogramDialog)
+  {
+  	m_HistogramDialog->Show(m_GenerateHistogram);
+  }
 }
 //----------------------------------------------------------------------------
 void mafInteractor2DDistance::UndoMeasure()
@@ -982,7 +994,10 @@ void mafInteractor2DDistance::SetManualDistance(double manualDistance)
 
     mafString ds;
     ds = wxString::Format(_("%.2f") , manualDistance);
-    m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+    if (!m_TestMode)
+    {
+    	m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+    }
 
     m_Measure[m_Measure.size()-1] = manualDistance;
   }
@@ -1019,19 +1034,28 @@ void mafInteractor2DDistance::SetManualDistance(double manualDistance)
 
     mafString ds;
     ds = wxString::Format(_("%.2f") , manualDistance);
-    m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+    if (!m_TestMode)
+    {
+    	m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+    }
 
     m_Measure[m_Measure.size()-1] = manualDistance;
   }
 
-  m_CurrentRenderer->GetRenderWindow()->Render();
+  if (m_CurrentRenderer)
+  {
+  	m_CurrentRenderer->GetRenderWindow()->Render();
+  }
 }
 //----------------------------------------------------------------------------
 void mafInteractor2DDistance::SetLabel(mafString label)
 //----------------------------------------------------------------------------
 {
 	m_MeterVector[m_MeterVector.size()-1]->SetText(label);
-	m_CurrentRenderer->GetRenderWindow()->Render();
+	if (m_CurrentRenderer)
+	{
+		m_CurrentRenderer->GetRenderWindow()->Render();
+	}
 }
 //----------------------------------------------------------------------------
 void mafInteractor2DDistance::ShowOnlyLastMeasure( bool show )
@@ -1134,9 +1158,17 @@ void mafInteractor2DDistance::ShowAllMeasures( bool show )
   }
 }
 
+//----------------------------------------------------------------------------
 void mafInteractor2DDistance::SetColor(double r,double g,double b)
 {
   m_Color[0] = r;
   m_Color[1] = g;
   m_Color[2] = b;
+}
+
+//----------------------------------------------------------------------------
+mafInteractor2DDistance* mafInteractor2DDistance::NewTestInstance()
+//----------------------------------------------------------------------------
+{
+  return new mafInteractor2DDistance(true); 
 }

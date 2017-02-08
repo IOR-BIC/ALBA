@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: medInteractorPicker
+ Module: mafInteractorCameraPicker
  Authors: Stefano Perticoni
  
  Copyright (c) B3C
@@ -15,7 +15,7 @@
 =========================================================================*/
 
 #include "mafDefines.h"
-#include "medInteractorPicker.h"
+#include "mafInteractorCameraPicker.h"
 
 #include "mafView.h"
 #include "mafDeviceButtonsPadTracker.h"
@@ -44,23 +44,23 @@
 #include <assert.h>
 
 //------------------------------------------------------------------------------
-mafCxxTypeMacro(medInteractorPicker)
+mafCxxTypeMacro(mafInteractorCameraPicker)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-medInteractorPicker::medInteractorPicker()
+mafInteractorCameraPicker::mafInteractorCameraPicker()
 //------------------------------------------------------------------------------
 {
   m_ContinuousPickingFlag = false;
 }
 
 //------------------------------------------------------------------------------
-medInteractorPicker::~medInteractorPicker()
+mafInteractorCameraPicker::~mafInteractorCameraPicker()
 //------------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void medInteractorPicker::OnButtonDown(mafEventInteraction *e)
+void mafInteractorCameraPicker::OnButtonDown(mafEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   Superclass::OnButtonDown(e);
@@ -93,7 +93,7 @@ void medInteractorPicker::OnButtonDown(mafEventInteraction *e)
 }
 
 //----------------------------------------------------------------------------
-void medInteractorPicker::OnButtonUp(mafEventInteraction *e) 
+void mafInteractorCameraPicker::OnButtonUp(mafEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
   Superclass::OnButtonUp(e);
@@ -128,7 +128,7 @@ void medInteractorPicker::OnButtonUp(mafEventInteraction *e)
   }
 }
 //----------------------------------------------------------------------------
-void medInteractorPicker::SendPickingInformation(mafView *v, double *mouse_pos, int msg_id, mafMatrix *tracker_pos, bool mouse_flag)
+void mafInteractorCameraPicker::SendPickingInformation(mafView *v, double *mouse_pos, int msg_id, mafMatrix *tracker_pos, bool mouse_flag)
 //----------------------------------------------------------------------------
 {
   // Send to the listener picked point coordinate through vtkPoint and the corresponding scalar value found in that position
@@ -189,7 +189,7 @@ void medInteractorPicker::SendPickingInformation(mafView *v, double *mouse_pos, 
 }
 
 //----------------------------------------------------------------------------
-void medInteractorPicker::EnableContinuousPicking(bool enable)
+void mafInteractorCameraPicker::EnableContinuousPicking(bool enable)
 //----------------------------------------------------------------------------
 {
   // Enable/disable continuous picking in OnEvent
@@ -197,7 +197,7 @@ void medInteractorPicker::EnableContinuousPicking(bool enable)
 }
 
 //------------------------------------------------------------------------------
-void medInteractorPicker::OnEvent(mafEventBase *event)
+void mafInteractorCameraPicker::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
   Superclass::OnEvent(event);
