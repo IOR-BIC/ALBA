@@ -74,7 +74,7 @@ SET(PROJECT_SRCS
   mafInteractorPicker.cpp  					mafInteractorPicker.h
   mafInteractorSelectCell.cpp  				mafInteractorSelectCell.h
   mafInteractorSER.cpp  					mafInteractorSER.h  ######################
-  medInteractorPicker.cpp  					medInteractorPicker.h
+  mafInteractorCameraPicker.cpp  					mafInteractorCameraPicker.h
   mafInteractorPERPicker.cpp  				mafInteractorPERPicker.h
   mafInteractorDICOMImporter.h  			mafInteractorDICOMImporter.cpp  
   mafInteractorSegmentationPicker.cpp  		mafInteractorSegmentationPicker.h 

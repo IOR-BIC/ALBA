@@ -501,7 +501,7 @@ void mafViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 		{
 			pickedSliceName = m_XSlicerPicker->GetName();
 
-			medInteractorPicker *picker = m_XSlicerPicker;
+			mafInteractorCameraPicker *picker = m_XSlicerPicker;
 			MyMethod(picker, pickedPointCoordinates);
 
 		}
@@ -509,7 +509,7 @@ void mafViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 		{
 			pickedSliceName = m_YSlicerPicker->GetName();
 
-			medInteractorPicker *picker = m_YSlicerPicker;
+			mafInteractorCameraPicker *picker = m_YSlicerPicker;
 			MyMethod(picker, pickedPointCoordinates);
 
 		}
@@ -517,7 +517,7 @@ void mafViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 		{
 			pickedSliceName = m_ZSlicerPicker->GetName();
 
-			medInteractorPicker *picker = m_ZSlicerPicker;
+			mafInteractorCameraPicker *picker = m_ZSlicerPicker;
 			MyMethod(picker, pickedPointCoordinates);
 		}
 
@@ -2373,19 +2373,19 @@ void mafViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	CreateViewCameraNormalFeedbackActor(blue, Z_VIEW);
 
 	// create the pick interactor for slicer X
-	m_XSlicerPicker = medInteractorPicker::New();
+	m_XSlicerPicker = mafInteractorCameraPicker::New();
 	m_XSlicerPicker->SetListener(this);
 	m_XSlicerPicker->SetName("m_XSlicerPicker");
 	m_SlicerX->SetBehavior(m_XSlicerPicker);
 
 	// create the pick interactor for slicer X
-	m_YSlicerPicker = medInteractorPicker::New();
+	m_YSlicerPicker = mafInteractorCameraPicker::New();
 	m_YSlicerPicker->SetListener(this);
 	m_YSlicerPicker->SetName("m_YSlicerPicker");
 	m_SlicerY->SetBehavior(m_YSlicerPicker);
 
 	// create the pick interactor for slicer X
-	m_ZSlicerPicker = medInteractorPicker::New();
+	m_ZSlicerPicker = mafInteractorCameraPicker::New();
 	m_ZSlicerPicker->SetListener(this);
 	m_ZSlicerPicker->SetName("m_ZSlicerPicker");
 	m_SlicerZ->SetBehavior(m_ZSlicerPicker);
@@ -4344,7 +4344,7 @@ void mafViewArbitraryOrthoSlice::UpdateWindowing(bool enable,mafVME *vme)
 	}
 }
 //----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::MyMethod( medInteractorPicker * picker, double * pickedPointCoordinates )
+void mafViewArbitraryOrthoSlice::MyMethod( mafInteractorCameraPicker * picker, double * pickedPointCoordinates )
 {
 	mafGizmoCrossRotateTranslate *gizmo = NULL;
 

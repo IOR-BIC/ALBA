@@ -33,7 +33,7 @@
 #include "vtkLineSource.h"
 #include "mafPipeSurface.h"
 #include "mafInteractorPicker.h"
-#include "medInteractorPicker.h"
+#include "mafInteractorCameraPicker.h"
 #include "vtkCaptionActor2D.h"
 
 using namespace std;
@@ -173,7 +173,7 @@ public:
 	/** Function that handles events sent from other objects. */
 	virtual void OnEvent(mafEventBase *maf_event);
 
-	void MyMethod( medInteractorPicker * picker, double * pickedPointCoordinates );
+	void MyMethod( mafInteractorCameraPicker * picker, double * pickedPointCoordinates );
 	void OnEventGizmoCrossRTZNormalView( mafEventBase * maf_event );
 	void OnEventGizmoCrossRTYNormalView( mafEventBase * maf_event );
 
@@ -524,9 +524,9 @@ protected:
 	/** Enable debug facilities */
 	bool m_DebugMode;
 
-	medInteractorPicker *m_XSlicerPicker;
-	medInteractorPicker *m_YSlicerPicker;
-	medInteractorPicker *m_ZSlicerPicker;
+	mafInteractorCameraPicker *m_XSlicerPicker;
+	mafInteractorCameraPicker *m_YSlicerPicker;
+	mafInteractorCameraPicker *m_ZSlicerPicker;
 
 	mafString m_ThicknessText[3];
 
