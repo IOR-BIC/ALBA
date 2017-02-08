@@ -390,7 +390,7 @@ void mafGUIDynamicVP::SetName(const char* szNewName)
     //if the view associated with this pipe contains only one VME
     //and one pipe, we will need to reset camera, so it is visible
     mafView* view = m_SceneNode->GetSceneGraph()->m_View;
-    int nRefCount = medPipeRegister::RegisterPipe(pipe, view);
+    int nRefCount = mafPipeRegister::RegisterPipe(pipe, view);
     if (nRefCount == 1 && view->GetNumberOfVisibleVME() == 1)
       view->CameraReset(m_SceneNode->GetVme());    
     else
@@ -405,21 +405,21 @@ void mafGUIDynamicVP::SetName(const char* szNewName)
 /*virtual*/ void mafGUIDynamicVP::DestroyVisualPipe()
 //------------------------------------------------------------------------
 {  
-  medPipeRegister::UnregisterPipe(m_VPipe);
+  mafPipeRegister::UnregisterPipe(m_VPipe);
   cppDEL(m_VPipe); 
 }
 
 #pragma region Register of Pipes
 
 //array of registered views-pipes
-/*static*/ std::vector< mafGUIDynamicVP::medPipeRegister::VIEW_ITEM > 
-                          mafGUIDynamicVP::medPipeRegister::m_RegViews;
+/*static*/ std::vector< mafGUIDynamicVP::mafPipeRegister::VIEW_ITEM > 
+                          mafGUIDynamicVP::mafPipeRegister::m_RegViews;
 
 //------------------------------------------------------------------------
 //Registers the specified pipe with the view.
 //Returns number of pipes registered for this view.
 //N.B. duplicity check of pipes is not performed!
-/*static*/ int mafGUIDynamicVP::medPipeRegister::RegisterPipe(mafPipe* pipe, mafView* view)
+/*static*/ int mafGUIDynamicVP::mafPipeRegister::RegisterPipe(mafPipe* pipe, mafView* view)
 //------------------------------------------------------------------------
 {
   //try to find view
@@ -441,7 +441,7 @@ void mafGUIDynamicVP::SetName(const char* szNewName)
 //------------------------------------------------------------------------
 //Unregisters the specified pipe with the view (if specified).
 //Returns number of pipes registered for this view (after unregister).
-/*static*/ int mafGUIDynamicVP::medPipeRegister::UnregisterPipe(mafPipe* pipe, mafView* view)
+/*static*/ int mafGUIDynamicVP::mafPipeRegister::UnregisterPipe(mafPipe* pipe, mafView* view)
 //------------------------------------------------------------------------
 {
   int nStartIndex, nEndIndex;
@@ -472,7 +472,7 @@ void mafGUIDynamicVP::SetName(const char* szNewName)
 
 //------------------------------------------------------------------------
 //returns index of given view in m_RegViews, or -1, if not found
-/*static*/ int mafGUIDynamicVP::medPipeRegister::FindView(mafView* view)
+/*static*/ int mafGUIDynamicVP::mafPipeRegister::FindView(mafView* view)
 //------------------------------------------------------------------------
 {
   if (view != NULL)

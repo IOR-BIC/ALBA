@@ -78,10 +78,10 @@ public:
 protected:
 #pragma region Register of Pipes
   /**
-    class name: medPipeRegister
+    class name: mafPipeRegister
     This class registe the pipes. It handle a pipe vector container.
   */
-  class medPipeRegister
+  class mafPipeRegister
   {
   protected:    
     typedef struct VIEW_ITEM
