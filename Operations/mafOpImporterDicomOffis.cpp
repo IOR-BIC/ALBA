@@ -415,7 +415,7 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateLoadPage()
 {
-	m_LoadPage = new mafGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
+	m_LoadPage = new mafGUIWizardPageNew(m_Wizard,mafWIZARDUSEGUI|mafWIZARDUSERWI);
 	m_LoadGuiLeft = new mafGUI(this);
 	m_LoadGuiUnderLeft = new mafGUI(this);
 	m_LoadGuiUnderCenter = new mafGUI(this);
@@ -441,7 +441,7 @@ void mafOpImporterDicomOffis::CreateLoadPage()
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateCropPage()
 {
-	m_CropPage = new mafGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,true);
+	m_CropPage = new mafGUIWizardPageNew(m_Wizard,mafWIZARDUSEGUI|mafWIZARDUSERWI,true);
 	m_CropPage->SetListener(this);
 	m_CropGuiLeft = new mafGUI(this);
 	m_CropGuiCenter = new mafGUI(this);

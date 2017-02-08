@@ -75,7 +75,7 @@ mafGUIWizardPageNew::mafGUIWizardPageNew(mafGUIWizard *wizardParent,long style, 
   m_GuiLowerUnderLeft = NULL;
   m_GuiLowerUnderCenter = NULL;
 
-	if(style & medUSERWI)
+	if(style & mafWIZARDUSERWI)
   {
     m_Rwi = new mafRWI(this);
     m_Rwi->SetSize(0,0,512,384);
@@ -103,7 +103,7 @@ mafGUIWizardPageNew::mafGUIWizardPageNew(mafGUIWizard *wizardParent,long style, 
     m_LUTSizer->Add(m_GuiView,1, wxEXPAND);
     m_SizerAll->Add(m_LUTSizer,0,wxEXPAND|wxALL);
 	}
-	if(style & medUSEGUI)
+	if(style & mafWIZARDUSEGUI)
 	{
 		m_GuiLowerLeft = new mafGUI(this);
     m_GuiLowerLeft->FitGui();
