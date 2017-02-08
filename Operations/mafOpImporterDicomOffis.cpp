@@ -506,10 +506,10 @@ void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 			case ID_RANGE_MODIFIED:
 				OnRangeModified();
 			break;
-			case mafGUIWizard::MED_WIZARD_CHANGE_PAGE:
+			case mafGUIWizard::MAF_WIZARD_CHANGE_PAGE:
 				OnWizardChangePage(e);
 			break;
-			case mafGUIWizard::MED_WIZARD_CHANGED_PAGE:
+			case mafGUIWizard::MAF_WIZARD_CHANGED_PAGE:
 				/* This is a ack, because that "genius" of wx  send the change event
 				before page show, so we need to duplicate the code here in order to
 				manage the camera update */
