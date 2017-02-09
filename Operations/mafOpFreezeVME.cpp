@@ -338,7 +338,7 @@ void mafOpFreezeVME::OpRun()
 							OpStop(OP_RUN_OK);
 					}
 				}
-				else if(medVMEComputeWrapping *wrappedMeter = medVMEComputeWrapping::SafeDownCast(m_Input))
+				else if(mafVMEComputeWrapping *wrappedMeter = mafVMEComputeWrapping::SafeDownCast(m_Input))
 				{
 					mmaMaterial *material = wrappedMeter->GetMaterial();
 

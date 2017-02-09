@@ -34,7 +34,7 @@ typedef mafOpVolumeResample movr;
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 #include "mafVMEVolumeGray.h"
-#include "medOpImporterVTK.h"
+#include "mafOpImporterVTK.h"
 
 #include "mafSmartPointer.h"
 #include "mafAbsMatrixPipe.h"
@@ -77,7 +77,7 @@ void mafOpVolumeResampleTest::TestResampleInternal( const char *inFileName, cons
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
 
-  medOpImporterVTK *importerVTK=new medOpImporterVTK("importerVTK");
+  mafOpImporterVTK *importerVTK=new mafOpImporterVTK("importerVTK");
   importerVTK->TestModeOn();
   importerVTK->SetInput(storage->GetRoot());
 

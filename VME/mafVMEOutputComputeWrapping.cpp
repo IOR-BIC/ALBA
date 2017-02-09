@@ -53,7 +53,7 @@ mafGUI *mafVMEOutputComputeWrapping::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = mafVMEOutput::CreateGui();
 
-  medVMEComputeWrapping *wrappedMeter = (medVMEComputeWrapping *)m_VME;
+  mafVMEComputeWrapping *wrappedMeter = (mafVMEComputeWrapping *)m_VME;
   m_Distance = wrappedMeter->GetDistance();
   m_Gui->Label(_("distance: "), &m_Distance, true);
 
@@ -93,11 +93,11 @@ void mafVMEOutputComputeWrapping::Update()
   assert(m_VME);
   m_VME->Update();
 
-  medVMEComputeWrapping *wrappedMeter = (medVMEComputeWrapping *)m_VME;
+  mafVMEComputeWrapping *wrappedMeter = (mafVMEComputeWrapping *)m_VME;
 
-  if(wrappedMeter->GetMeterMode() == medVMEComputeWrapping::POINT_DISTANCE)
+  if(wrappedMeter->GetMeterMode() == mafVMEComputeWrapping::POINT_DISTANCE)
   {
-		m_Distance = ((medVMEComputeWrapping *)m_VME)->GetDistance();
+		m_Distance = ((mafVMEComputeWrapping *)m_VME)->GetDistance();
 
     double *coordinateFIRST = NULL;
     double *coordinateLAST = NULL; 

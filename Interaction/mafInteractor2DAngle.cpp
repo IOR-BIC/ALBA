@@ -60,6 +60,7 @@ mafCxxTypeMacro(mafInteractor2DAngle)
 mafInteractor2DAngle::mafInteractor2DAngle() 
 //----------------------------------------------------------------------------
 {
+  m_TestMode = false;
   m_Coordinate = vtkCoordinate::New();
   m_Coordinate->SetCoordinateSystemToWorld();
 
@@ -689,17 +690,10 @@ void mafInteractor2DAngle::SetManualAngle(double manualAngle)
 
     double dirProj[3]; // opposite direction of view plane normal
 		double viewUp[3]; // camera view UP
-		m_RendererVector[m_RendererVector.size()-1]->GetActiveCamera()->GetViewPlaneNormal(dirProj);
-/*
-		dirProj[0] = -dirProj[0];
-		dirProj[1] = -dirProj[1];
-		dirProj[2] = -dirProj[2];
-*/
-		//mafString s = wxString::Format(L"dirProjOpp: %f , %f , %f" , dirProj[0],dirProj[1],dirProj[2]);
-		//mafLogMessage(s);
-		m_RendererVector[m_RendererVector.size()-1]->GetActiveCamera()->GetViewUp(viewUp);
-		//s = wxString::Format(L"ViewUp:%f , %f , %f" , viewUp[0],viewUp[1],viewUp[2]);
-		//mafLogMessage(s);
+    if (!m_RendererVector.empty()) {
+		  m_RendererVector[m_RendererVector.size()-1]->GetActiveCamera()->GetViewPlaneNormal(dirProj);
+		  m_RendererVector[m_RendererVector.size()-1]->GetActiveCamera()->GetViewUp(viewUp);
+    }
 
 		double res[3]; //perpendicular axes
 		double *u = viewUp;
@@ -708,67 +702,6 @@ void mafInteractor2DAngle::SetManualAngle(double manualAngle)
 		res[1] = u[2] * v[0] - u[0] * v[2];
 		res[2] = u[0] * v[1] - u[1] * v[0];
 	  
-		//s = wxString::Format(L"Perp:%f , %f , %f" , res[0],res[1],res[2]);
-		//mafLogMessage(s);
-
-  
-
-/* rotation
-	double angle[3];
-	angle[0] = acos(res[0])* vtkMath::RadiansToDegrees();
-	
-	double perpResVersor[3];
-	perpResVersor[0] = 0 ;
-	perpResVersor[1] = res[2];
-	perpResVersor[2] = -res[1];
-
-	vtkLineSource *line1 = vtkLineSource::New();
-	line1->SetPoint1(dirProj);
-	line1->SetPoint2(viewUp);
-	line1->Update();
-
-	vtkTransform *tr1 = vtkTransform::New();
-	tr1->Identity();
-	tr1->RotateWXYZ(-angle[0], perpResVersor);
-	tr1->Update();
-
-	vtkTransformPolyDataFilter *TPDF_tr1 = vtkTransformPolyDataFilter::New();
-	TPDF_tr1->SetInput(line1->GetOutput());
-	TPDF_tr1->SetTransform(tr1);
-	TPDF_tr1->Update();
-
-  TPDF_tr1->GetOutput()->GetPoint(0, dirProj);
-	TPDF_tr1->GetOutput()->GetPoint(1, viewUp);
-
-  line1->SetPoint1(dirProj);
-	line1->SetPoint2(viewUp);
-	line1->Update();
-
-  angle[1] = acos(viewUp[1])* vtkMath::RadiansToDegrees();
-
-  vtkTransform *tr2 = vtkTransform::New();
-	tr2->Identity();
-  double Ox[3] = {1,0,0};
-	tr2->RotateWXYZ(-angle[1], Ox );
-	tr2->Update();
-
-  vtkTransformPolyDataFilter *TPDF_tr2 = vtkTransformPolyDataFilter::New();
-	TPDF_tr2->SetInput(line1->GetOutput());
-	TPDF_tr2->SetTransform(tr2);
-	TPDF_tr2->Update();
-
-	TPDF_tr2->GetOutput()->GetPoint(0, dirProj);
-	TPDF_tr2->GetOutput()->GetPoint(1, viewUp);
-
-  angle[2] = acos(dirProj[2])* vtkMath::RadiansToDegrees();
-
-	s = wxString::Format(L"rotX'toX:%f , rotY'toY:%f" , angle[0],angle[1]);
-  mafLogMessage(s);
-*/
-
-
-  
-  
   
 
     //redraw the  line from the first point to the new point,
@@ -786,12 +719,6 @@ void mafInteractor2DAngle::SetManualAngle(double manualAngle)
     m_LineSourceVector2[m_LineSourceVector2.size()-1]->GetPoint2(tmp4);
 		
 		double tmp5[3] = {0,0,0};
-/*
-		double temp[3];
-		temp[0] = tmp3[0]; 
-		temp[1] = tmp3[1];
-		temp[2] = tmp3[2];
-*/
 
     // projections along plane versors defined by the camera
     double tmp1P[3];
@@ -837,71 +764,7 @@ void mafInteractor2DAngle::SetManualAngle(double manualAngle)
     tmp5[0] = tmp4[0];
     tmp5[1] = tmp4[1];
     tmp5[2] = tmp4[2];
-/*
-s = wxString::Format(L"tmp1OLD:%f , %f , %f" , tmp1[0],tmp1[1],tmp1[2]);
-  mafLogMessage(s);
-s = wxString::Format(L"tmp2OLD:%f , %f , %f" , tmp2[0],tmp2[1],tmp2[2]);
-	mafLogMessage(s);
-s = wxString::Format(L"tmp3OLD:%f , %f , %f" , tmp3[0],tmp3[1],tmp3[2]);
-	mafLogMessage(s);
-s = wxString::Format(L"tmp4OLD:%f , %f , %f" , tmp4[0],tmp4[1],tmp4[2]);
-	mafLogMessage(s);
-*/
-  
 
-
-	/*
-//init
-	vtkTransform *transl_init = vtkTransform::New();
-	transl_init->Identity();
-	double antiTmp3[3];
-	antiTmp3[0] = -tmp3[0];
-	antiTmp3[1] = -tmp3[1];
-	antiTmp3[2] = -tmp3[2];
-	transl_init->Translate(antiTmp3);
-	transl_init->Update();
-
-	vtkTransform *rot_init = vtkTransform::New();
-    rot_init->Identity();
-		rot_init->RotateWXYZ(-angle[0], perpResVersor);
-		rot_init->RotateX(-angle[1]);
-    rot_init->RotateX(-angle[2]);
-	  
-		
-		rot_init->Update();
-    
-		vtkTransformPolyDataFilter *TPDFTran_init = vtkTransformPolyDataFilter::New();
-		TPDFTran_init->SetTransform(transl_init);
-		TPDFTran_init->SetInput(m_LineSourceVector1[m_LineSourceVector1.size()-1]->GetOutput());
-		TPDFTran_init->Update();
-
-		vtkTransformPolyDataFilter *TPDFRot_init = vtkTransformPolyDataFilter::New();
-		TPDFRot_init->SetTransform(rot_init);
-		TPDFRot_init->SetInput(TPDFTran_init->GetOutput());
-		TPDFRot_init->Update();
-
-		TPDFRot_init->GetOutput()->GetPoint(0, tmp1);
-		TPDFRot_init->GetOutput()->GetPoint(1, tmp2);
-
-		TPDFTran_init->SetInput(m_LineSourceVector2[m_LineSourceVector2.size()-1]->GetOutput());
-		TPDFTran_init->Update();
-
-		TPDFRot_init->SetInput(TPDFTran_init->GetOutput());
-		TPDFRot_init->Update();
-
-		TPDFRot_init->GetOutput()->GetPoint(0, tmp3);
-		TPDFRot_init->GetOutput()->GetPoint(1, tmp4);
-
-
-		s = wxString::Format(L"tmp1NEW:%f , %f , %f" , tmp1[0],tmp1[1],tmp1[2]);
-		mafLogMessage(s);
-		s = wxString::Format(L"tmp2NEW:%f , %f , %f" , tmp2[0],tmp2[1],tmp2[2]);
-		mafLogMessage(s);
-		s = wxString::Format(L"tmp3NEW:%f , %f , %f" , tmp3[0],tmp3[1],tmp3[2]);
-		mafLogMessage(s);
-		s = wxString::Format(L"tmp4NEW:%f , %f , %f" , tmp4[0],tmp4[1],tmp4[2]);
-		mafLogMessage(s);
- */   
  
 	  bool particularCase = false; 
   
@@ -1385,16 +1248,24 @@ s = wxString::Format(L"tmp4OLD:%f , %f , %f" , tmp4[0],tmp4[1],tmp4[2]);
     mafString degree = "°";
     ds = wxString::Format(_("%.2f")  , manualAngle);
     ds.Append(degree);
-    m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+    if (!m_TestMode)
+    {
+      m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+    }
     
     double tmp_pos[3];
     m_LineSourceVector2[m_LineSourceVector2.size()-1]->GetPoint2(tmp_pos);
-    m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
+    if (!m_TestMode)
+    {
+      m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
+    }
     
     m_Measure[m_Measure.size()-1] = manualAngle;   
   }
-  m_RendererVector[m_RendererVector.size()-1]->GetRenderWindow()->Render();
-  m_RendererVector[m_RendererVector.size()-1]->GetRenderWindow()->Render();
+  if (!m_RendererVector.empty()) {
+    m_RendererVector[m_RendererVector.size()-1]->GetRenderWindow()->Render();
+    m_RendererVector[m_RendererVector.size()-1]->GetRenderWindow()->Render();
+  }
 }
 //----------------------------------------------------------------------------
 void mafInteractor2DAngle::SetLabel(mafString label)

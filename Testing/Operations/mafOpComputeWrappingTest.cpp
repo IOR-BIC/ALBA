@@ -51,8 +51,8 @@ void mafOpComputeWrappingTest::TestOpRun()
   create->SetInput(volume);
   create->OpRun();
 
-  medVMEComputeWrapping *labeledvolume = NULL;
-	labeledvolume = medVMEComputeWrapping::SafeDownCast(create->GetOutput());
+  mafVMEComputeWrapping *labeledvolume = NULL;
+	labeledvolume = mafVMEComputeWrapping::SafeDownCast(create->GetOutput());
   
   CPPUNIT_ASSERT(labeledvolume != NULL);
 

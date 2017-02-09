@@ -29,7 +29,7 @@
 #include "mafVMEGroup.h"
 #include "vtkMAFSmartPointer.h"
 #include "mafSmartPointer.h"
-#include "medOpImporterVTK.h"
+#include "mafOpImporterVTK.h"
 #include "mafTagItem.h"
 #include "mafTagArray.h"
 
@@ -74,7 +74,7 @@ void mafOpComputeInertialTensorTest::TestAddAttributes()
 //-----------------------------------------------------------
 {
   // import VTK  
-  medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
+  mafOpImporterVTK *importer=new mafOpImporterVTK("importerVTK");
   importer->TestModeOn();
   mafString fileName=MAF_DATA_ROOT;
   fileName<<"/Surface/sphere.vtk";
@@ -103,7 +103,7 @@ void mafOpComputeInertialTensorTest::TestComputeInertialTensorFromDefaultValue()
 //-----------------------------------------------------------
 {
   // import VTK  
-  medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
+  mafOpImporterVTK *importer=new mafOpImporterVTK("importerVTK");
   importer->TestModeOn();
   mafString fileName=MAF_DATA_ROOT;
   fileName<<"/Surface/sphere.vtk";
@@ -155,7 +155,7 @@ void mafOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDefau
 //-----------------------------------------------------------
 {
   // import VTK  
-  medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
+  mafOpImporterVTK *importer=new mafOpImporterVTK("importerVTK");
   importer->TestModeOn();
   mafString fileName=MAF_DATA_ROOT;
   fileName<<"/Surface/sphere.vtk";
@@ -253,7 +253,7 @@ void mafOpComputeInertialTensorTest::TestOpDoUndo()
 //-----------------------------------------------------------
 { 
   // import VTK  
-  medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
+  mafOpImporterVTK *importer=new mafOpImporterVTK("importerVTK");
   importer->TestModeOn();
   mafString fileName=MAF_DATA_ROOT;
   fileName<<"/Surface/sphere.vtk";
@@ -293,7 +293,7 @@ void mafOpComputeInertialTensorTest::TestComputeInertialTensorFromDENSITYTag()
 	//-----------------------------------------------------------
 {
 	// import VTK  
-	medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
+	mafOpImporterVTK *importer=new mafOpImporterVTK("importerVTK");
 	importer->TestModeOn();
 	mafString fileName=MAF_DATA_ROOT;
 	fileName<<"/Surface/sphere.vtk";
@@ -352,7 +352,7 @@ void mafOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDENSI
 //-----------------------------------------------------------
 {
 	// import VTK  
-	medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
+	mafOpImporterVTK *importer=new mafOpImporterVTK("importerVTK");
 	importer->TestModeOn();
 	mafString fileName=MAF_DATA_ROOT;
 	fileName<<"/Surface/sphere.vtk";

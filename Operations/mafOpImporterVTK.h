@@ -68,6 +68,8 @@ public:
       This is used when the operation is executed not using user interface. */
   void SetFileName(const char *name) {m_File = name;};
 
+	/** retrieve the file name*/
+	wxString GetFileName() { return m_File; };
 protected:
   wxString m_File;
   wxString m_FileDir;

@@ -40,10 +40,15 @@ public:
   CPPUNIT_TEST(TestAccept);
   CPPUNIT_TEST(TestImportVTKPolyline);
   CPPUNIT_TEST(TestImportVTKSurface);
-  CPPUNIT_TEST(TestImportVTKVolume);
   CPPUNIT_TEST(TestImportVTKMesh);
+	CPPUNIT_TEST(TestSetFileName);
+	CPPUNIT_TEST(TestImportVTKVolumeSP);
+	CPPUNIT_TEST(TestImportVTKVolumeRG);
+	CPPUNIT_TEST(TestImportVTKPointSet);
+
 
   CPPUNIT_TEST_SUITE_END();
+
 
 private:
   void TestFixture();
@@ -53,10 +58,12 @@ private:
   void TestAccept();
   void TestImportVTKPolyline();
   void TestImportVTKSurface();
-  void TestImportVTKVolume();
   void TestImportVTKMesh();
-
-  bool result;
+	void TestSetFileName();
+	void TestImportVTKVolumeSP();
+	void TestImportVTKVolumeRG();
+	void TestImportVTKPointSet();
+	bool result;
 
   mafOpImporterVTK *m_ImporterVTK;
 };

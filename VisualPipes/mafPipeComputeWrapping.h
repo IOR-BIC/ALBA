@@ -27,7 +27,7 @@ class vtkPolyDataMapper;
 class vtkActor;
 class vtkProperty;
 class vtkMAFTubeFilter;
-class medVMEComputeWrapping;
+class mafVMEComputeWrapping;
 class vtkLookupTable;
 class vtkCaptionActor2D;
 class mafGUIMaterialButton;
@@ -76,7 +76,7 @@ public:
   vtkActor               *m_SelectionActor;
 
 protected:
-  medVMEComputeWrapping       *m_WrappedMeterVME;
+  mafVMEComputeWrapping       *m_WrappedMeterVME;
   mafGUIMaterialButton *m_MaterialButton;
 
   /** Update visual properties*/

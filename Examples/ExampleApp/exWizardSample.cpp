@@ -44,7 +44,7 @@ exWizardSample::exWizardSample( const wxString &label ):mafWizard(label)
   mafWizardBlockOperation *opBlock=new mafWizardBlockOperation("Import");
   opBlock->SetRequiredView("");
   opBlock->VmeSelect("root");
-  opBlock->SetRequiredOperation("medOpImporterVTK");
+  opBlock->SetRequiredOperation("mafOpImporterVTK");
   opBlock->SetNextBlock("opPause");
   opBlock->SetBlockProgress(25);
 

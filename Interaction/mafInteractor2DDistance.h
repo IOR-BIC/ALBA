@@ -149,7 +149,10 @@ public:
   void SetColor(double r,double g,double b);
 
 protected:
-	mafInteractor2DDistance();
+	/** Implemented a New() function for testing mode. */
+  static mafInteractor2DDistance *mafInteractor2DDistance::NewTestInstance();
+
+	mafInteractor2DDistance(bool testMode = false);
 	virtual ~mafInteractor2DDistance();
 
   /**  Process events coming from tracker */
@@ -244,5 +247,9 @@ protected:
 private:
 	mafInteractor2DDistance(const mafInteractor2DDistance&);   // Not implemented.
 	void operator=(const mafInteractor2DDistance&);  // Not implemented.
+
+  bool m_TestMode;
+
+  friend class mafInteractor2DDistanceTest;
 };
 #endif

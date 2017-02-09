@@ -82,7 +82,6 @@ SET(PROJECT_SRCS
 	mafOpTriangulateSurfaceTest.h mafOpTriangulateSurfaceTest.cpp
 	mafOpSurfaceMirrorTest.h mafOpSurfaceMirrorTest.cpp
 	mafOpVolumeMirrorTest.h mafOpVolumeMirrorTest.cpp
-	medOpImporterVTKTest.h medOpImporterVTKTest.cpp
 	mafOpExporterMetersTest.h mafOpExporterMetersTest.cpp
 	mafOpSubdivideTest.h mafOpSubdivideTest.cpp
 	mafOpCreateSurfaceTest.h mafOpCreateSurfaceTest.cpp

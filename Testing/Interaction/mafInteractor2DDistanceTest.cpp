@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: medInteractor2DDistanceTest
+ Module: mafInteractor2DDistanceTest
  Authors: Matteo Giacomoni
  
  Copyright (c) B3C
@@ -21,10 +21,10 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-#include "medInteractor2DDistanceTest.h"
+#include "mafInteractor2DDistanceTest.h"
 #include "mafInteractionTests.h"
 
-#include "medInteractor2DDistance.h"
+#include "mafInteractor2DDistance.h"
 #include "mafGUIFrame.h"
 
 #include "vtkLineSource.h"
@@ -34,7 +34,7 @@
 #define EPSILON 0.001
 
 //-----------------------------------------------------------
-void medInteractor2DDistanceTest::BeforeTest()
+void mafInteractor2DDistanceTest::BeforeTest()
 //-----------------------------------------------------------
 {
   m_Win = new mafGUIFrame("testGui", wxDefaultPosition, wxSize(800, 600));
@@ -42,53 +42,55 @@ void medInteractor2DDistanceTest::BeforeTest()
   wxModule::InitializeModules();
 }
 //-----------------------------------------------------------
-void medInteractor2DDistanceTest::AfterTest()
+void mafInteractor2DDistanceTest::AfterTest()
 //-----------------------------------------------------------
 {
   wxModule::CleanUpModules();
   delete m_Win;
 }
 //-----------------------------------------------------------
-void medInteractor2DDistanceTest::TestFixture()
+void mafInteractor2DDistanceTest::TestFixture()
 //-----------------------------------------------------------
 {
 
 }
 //-----------------------------------------------------------
-void medInteractor2DDistanceTest::TestDynamicAllocation() 
+void mafInteractor2DDistanceTest::TestDynamicAllocation() 
 //-----------------------------------------------------------
 {
-  medInteractor2DDistance *interactor = medInteractor2DDistance::NewTest();
+	mafInteractor2DDistance *interactor = mafInteractor2DDistance::NewTestInstance();
 
-  interactor->Delete();
+
+
+  mafDEL(interactor);
 }
 //-----------------------------------------------------------
-void medInteractor2DDistanceTest::TestStaticAllocation() 
+void mafInteractor2DDistanceTest::TestStaticAllocation() 
 //-----------------------------------------------------------
 {
 }
 //-----------------------------------------------------------
-void medInteractor2DDistanceTest::TestSetMeasureType() 
+void mafInteractor2DDistanceTest::TestSetMeasureType() 
 //-----------------------------------------------------------
 {
-  medInteractor2DDistance *interactor = medInteractor2DDistance::NewTest();
+	mafInteractor2DDistance *interactor = mafInteractor2DDistance::NewTestInstance();
 
-  interactor->SetMeasureType(medInteractor2DDistance::DISTANCE_BETWEEN_POINTS);
-  CPPUNIT_ASSERT( interactor->m_MeasureType == medInteractor2DDistance::DISTANCE_BETWEEN_POINTS );
+  interactor->SetMeasureType(mafInteractor2DDistance::DISTANCE_BETWEEN_POINTS);
+  CPPUNIT_ASSERT( interactor->m_MeasureType == mafInteractor2DDistance::DISTANCE_BETWEEN_POINTS );
   //////////////////////////////////////////////////////////////////////////
   interactor->SetMeasureTypeToDistanceBetweenLines();
-  CPPUNIT_ASSERT( interactor->m_MeasureType == medInteractor2DDistance::DISTANCE_BETWEEN_LINES );
+  CPPUNIT_ASSERT( interactor->m_MeasureType == mafInteractor2DDistance::DISTANCE_BETWEEN_LINES );
   //////////////////////////////////////////////////////////////////////////
   interactor->SetMeasureTypeToDistanceBetweenPoints();
-  CPPUNIT_ASSERT( interactor->m_MeasureType == medInteractor2DDistance::DISTANCE_BETWEEN_POINTS );
+  CPPUNIT_ASSERT( interactor->m_MeasureType == mafInteractor2DDistance::DISTANCE_BETWEEN_POINTS );
 
-  interactor->Delete();
+  mafDEL(interactor);
 }
 //-----------------------------------------------------------
-void medInteractor2DDistanceTest::TestGenerateHistogram() 
+void mafInteractor2DDistanceTest::TestGenerateHistogram() 
 //-----------------------------------------------------------
 {
-  medInteractor2DDistance *interactor = medInteractor2DDistance::NewTest();
+	mafInteractor2DDistance *interactor = mafInteractor2DDistance::NewTestInstance();
 
   interactor->GenerateHistogram(true);
   CPPUNIT_ASSERT( interactor->m_GenerateHistogram == true );
@@ -102,13 +104,14 @@ void medInteractor2DDistanceTest::TestGenerateHistogram()
   interactor->GenerateHistogramOff();
   CPPUNIT_ASSERT( interactor->m_GenerateHistogram == false );
 
-  interactor->Delete();
+  mafDEL(interactor);
 }
 //-----------------------------------------------------------
-void medInteractor2DDistanceTest::TestSetManualDistance1() 
+void mafInteractor2DDistanceTest::TestSetManualDistance1() 
 //-----------------------------------------------------------
 {
-  medInteractor2DDistance *interactor = medInteractor2DDistance::NewTest();
+	mafInteractor2DDistance *interactor = mafInteractor2DDistance::NewTestInstance();
+
   interactor->SetMeasureTypeToDistanceBetweenPoints();
 
   //////////////////////////////////////////////////////////////////////////
@@ -128,13 +131,14 @@ void medInteractor2DDistanceTest::TestSetManualDistance1()
   line1->Delete();
   //////////////////////////////////////////////////////////////////////////
 
-  interactor->Delete();
+  mafDEL(interactor);
 }
 //-----------------------------------------------------------
-void medInteractor2DDistanceTest::TestSetManualDistance2() 
+void mafInteractor2DDistanceTest::TestSetManualDistance2() 
 //-----------------------------------------------------------
 {
-  medInteractor2DDistance *interactor = medInteractor2DDistance::NewTest();
+	mafInteractor2DDistance *interactor = mafInteractor2DDistance::NewTestInstance();
+
   interactor->SetMeasureTypeToDistanceBetweenLines();
 
   //////////////////////////////////////////////////////////////////////////
@@ -163,23 +167,23 @@ void medInteractor2DDistanceTest::TestSetManualDistance2()
   line2->Delete();
   //////////////////////////////////////////////////////////////////////////
 
-  interactor->Delete();
+  mafDEL(interactor);
 }
 //-----------------------------------------------------------
-void medInteractor2DDistanceTest::TestIsDisableUndoAndOkCancel() 
+void mafInteractor2DDistanceTest::TestIsDisableUndoAndOkCancel() 
 //-----------------------------------------------------------
 {
-  medInteractor2DDistance *interactor = medInteractor2DDistance::NewTest();
+	mafInteractor2DDistance *interactor = mafInteractor2DDistance::NewTestInstance();
 
   CPPUNIT_ASSERT( interactor->IsDisableUndoAndOkCancel() == false );//Default value
 
-  interactor->Delete();
+  mafDEL(interactor);
 }
 //-----------------------------------------------------------
-void medInteractor2DDistanceTest::TestGetLastDistance() 
+void mafInteractor2DDistanceTest::TestGetLastDistance() 
 //-----------------------------------------------------------
 {
-  medInteractor2DDistance *interactor = medInteractor2DDistance::NewTest();
+	mafInteractor2DDistance *interactor = mafInteractor2DDistance::NewTestInstance();
 
   CPPUNIT_ASSERT( interactor->GetLastDistance() == 0 );
 
@@ -188,13 +192,13 @@ void medInteractor2DDistanceTest::TestGetLastDistance()
 
   CPPUNIT_ASSERT( interactor->GetLastDistance() == 5.0 );
 
-  interactor->Delete();
+  mafDEL(interactor);
 }
 //-----------------------------------------------------------
-void medInteractor2DDistanceTest::TestSetLabel() 
+void mafInteractor2DDistanceTest::TestSetLabel() 
 //-----------------------------------------------------------
 {
-  medInteractor2DDistance *interactor = medInteractor2DDistance::NewTest();
+	mafInteractor2DDistance *interactor = mafInteractor2DDistance::NewTestInstance();
 
   vtkMAFTextActorMeter *textActor = vtkMAFTextActorMeter::New();
   interactor->m_MeterVector.push_back(textActor);
@@ -208,5 +212,5 @@ void medInteractor2DDistanceTest::TestSetLabel()
   CPPUNIT_ASSERT( interactor->GetLabel() == "TEST2" );
 
   textActor->Delete();
-  interactor->Delete();
+  mafDEL(interactor);
 }
