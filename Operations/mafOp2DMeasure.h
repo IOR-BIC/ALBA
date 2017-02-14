@@ -35,6 +35,25 @@ class mafEvent;
 class MAF_EXPORT mafOp2DMeasure: public mafOp
 {
 public:
+	enum MEASURE2D_ID
+	{
+		ID_MEASURE_TYPE = MINID,
+		ID_PLOT_PROFILE,
+		ID_MANUAL_DISTANCE,
+		ID_MANUAL_ANGLE,
+		ID_MANUAL_INDICATOR,
+		ID_UNDO_MEASURE,
+
+		ID_STORE_MEASURE,
+		ID_REMOVE_MEASURE,
+		ID_MEASURE_LIST,
+
+		ID_DISTANCE_TYPE,
+		ID_ANGLE_TYPE,
+		ID_INDICATOR_TYPE,
+		MINID,
+	};
+
 	mafOp2DMeasure(const wxString &label = "2DMeasure");
 	~mafOp2DMeasure(); 
 	virtual void OnEvent(mafEventBase *maf_event);

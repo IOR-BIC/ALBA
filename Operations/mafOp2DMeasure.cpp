@@ -40,23 +40,7 @@
 //----------------------------------------------------------------------------
 // Widgets ID's
 //----------------------------------------------------------------------------
-enum MEASURE2D_ID
-{
-  ID_MEASURE_TYPE = MINID,
-  ID_PLOT_PROFILE,
-  ID_MANUAL_DISTANCE,
-  ID_MANUAL_ANGLE,
-  ID_MANUAL_INDICATOR,
-  ID_UNDO_MEASURE,
-	
-  ID_STORE_MEASURE,
-  ID_REMOVE_MEASURE,
-  ID_MEASURE_LIST,
 
-	ID_DISTANCE_TYPE,
-	ID_ANGLE_TYPE,
-  ID_INDICATOR_TYPE,
-};
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOp2DMeasure);
