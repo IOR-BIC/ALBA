@@ -175,7 +175,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
   
 		vtkProbeFilter *pf = vtkProbeFilter::New();
 		pf->SetInput(SP);
-		pf->SetSource(RGProjection->GetOutput());
+		pf->SetInput(RGProjection->GetOutput());
 		pf->Update();
 		((vtkImageData* )pf->GetOutput())->GetScalarRange(range);
 		RXTexture->SetInput( (vtkImageData* )pf->GetOutput() );
