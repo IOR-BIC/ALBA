@@ -25,6 +25,8 @@
 #include "vtkPointData.h"
 #include "vtkFloatArray.h"
 
+int glo_Dimension[3] = { 2,2,2 };
+
 //--------------------------------------------------
 void vtkMAFProjectSPTest::TestDynamicAllocation()
 //--------------------------------------------------
@@ -37,58 +39,19 @@ void vtkMAFProjectSPTest::TestDynamicAllocation()
 void vtkMAFProjectSPTest::TestExecutionProjectionModeToX()
 //--------------------------------------------------
 {
-  //create imageData with scalars
-  vtkMAFSmartPointer<vtkImageData> image;
-  int dimension[3] = {2,2,2};
-  double spacing[3] = {1. ,1. ,1.};
-  image->SetDimensions(dimension);
-  image->SetSpacing(spacing);
-  image->SetScalarTypeToFloat();
-
-  int i = 0;
-  int size = dimension[0] * dimension[1] * dimension[2];
-  vtkMAFSmartPointer<vtkFloatArray> array;
-  array->Allocate(8);
+	//create imageData with scalars
+	vtkImageData *image = CreateNewSPWithScalars();
   
-  for(; i < size; i++)
-  {
-    array->SetTuple1(i,i);
-  }
-  array->Modified();
-  image->GetPointData()->SetScalars(array);
-  image->Update();
-  
-  // calculate projection over three base axis
-  // the xy planes are:
-  /*
-  z = 0
-  0 1 
-  2 3
- 
-  */
-
-  /*
-  z = 1
-  4 5
-  6 7
-  */
-
-
-  
-  //the projection along x is:
-  /*
-  x proj
-  1 5
-  9 13
-  must divided by dim[0]
-  */
-
-  vtkMAFSmartPointer<vtkFloatArray> arrayControl;
-  arrayControl->InsertNextTuple1(1./dimension[0]);
-  arrayControl->InsertNextTuple1(5./dimension[0]);
-  arrayControl->InsertNextTuple1(9./dimension[0]);
-  arrayControl->InsertNextTuple1(13./dimension[0]);
-
+	//Preparing Test Control Data
+	vtkMAFSmartPointer<vtkFloatArray> arrayControl;
+	for (int z = 0; z < glo_Dimension[2]; z++)
+		for (int y = 0; y < glo_Dimension[1]; y++)
+		{
+			double acc = 0;
+			for (int x = 0; x < glo_Dimension[0]; x++)
+				acc += image->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x);
+			arrayControl->InsertNextTuple1(acc / (double)glo_Dimension[0]);
+		}
   
   //use filter
   vtkMAFSmartPointer<vtkMAFProjectSP> filter;
@@ -98,7 +61,7 @@ void vtkMAFProjectSPTest::TestExecutionProjectionModeToX()
 
   //check Control
   vtkStructuredPoints *projectedImage = filter->GetOutput();
-  for(int j=0;j<dimension[1]*dimension[2];j++)
+  for(int j=0;j<glo_Dimension[1]*glo_Dimension[2];j++)
   {
     float value1 = arrayControl->GetTuple1(j);
     float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
@@ -107,60 +70,26 @@ void vtkMAFProjectSPTest::TestExecutionProjectionModeToX()
 
   CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"X")==0);
   CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_X );
+
+	vtkDEL(image);
 }
 //--------------------------------------------------
 void vtkMAFProjectSPTest::TestExecutionProjectionModeToY()
 //--------------------------------------------------
 {
-  //create imageData with scalars
-  vtkMAFSmartPointer<vtkImageData> image;
-  int dimension[3] = {2,2,2};
-  double spacing[3] = {1. ,1. ,1.};
-  image->SetDimensions(dimension);
-  image->SetSpacing(spacing);
-  image->SetScalarTypeToFloat();
+	//create imageData with scalars
+	vtkImageData *image = CreateNewSPWithScalars();
 
-  int i = 0;
-  int size = dimension[0] * dimension[1] * dimension[2];
-  vtkMAFSmartPointer<vtkFloatArray> array;
-  array->Allocate(8);
-
-  for(; i < size; i++)
-  {
-    array->SetTuple1(i,i);
-  }
-  array->Modified();
-  image->GetPointData()->SetScalars(array);
-  image->Update();
-
-  // calculate projection over three base axis
-  // the xy planes are:
-  /*
-  z = 0
-  0 1 
-  2 3
-
-  */
-
-  /*
-  z = 1
-  4 5
-  6 7
-  */
-
-  //the projection along y is:
-  /*
-  y proj
-  2  4
-  10 12
-  must divided by dim[1]
-  */
-
-  vtkMAFSmartPointer<vtkFloatArray> arrayControl;
-  arrayControl->InsertNextTuple1(2./dimension[1]);
-  arrayControl->InsertNextTuple1(4./dimension[1]);
-  arrayControl->InsertNextTuple1(10./dimension[1]);
-  arrayControl->InsertNextTuple1(12./dimension[1]);
+	//Preparing Test Control Data
+	vtkMAFSmartPointer<vtkFloatArray> arrayControl;
+	for (int z = 0; z < glo_Dimension[2]; z++)
+		for (int x = 0; x < glo_Dimension[0]; x++)
+		{
+			double acc = 0;
+			for (int y = 0; y < glo_Dimension[1]; y++)
+				acc += image->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x);
+			arrayControl->InsertNextTuple1(acc / (double)glo_Dimension[1]);
+		}
 
   //use filter
   vtkMAFSmartPointer<vtkMAFProjectSP> filter;
@@ -170,7 +99,7 @@ void vtkMAFProjectSPTest::TestExecutionProjectionModeToY()
 
   //check Control
   vtkStructuredPoints *projectedImage = filter->GetOutput();
-  for(int j=0;j<dimension[0]*dimension[2];j++)
+  for(int j=0;j<glo_Dimension[0]*glo_Dimension[2];j++)
   {
     float value1 = arrayControl->GetTuple1(j);
     float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
@@ -178,63 +107,26 @@ void vtkMAFProjectSPTest::TestExecutionProjectionModeToY()
   }
   CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"Y")==0);
   CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_Y );
+
+	vtkDEL(image);
 }
 //--------------------------------------------------
 void vtkMAFProjectSPTest::TestExecutionProjectionModeToZ()
 //--------------------------------------------------
 {
-  //create imageData with scalars
-  vtkMAFSmartPointer<vtkImageData> image;
-  int dimension[3] = {2,2,2};
-  double spacing[3] = {1. ,1. ,1.};
-  image->SetDimensions(dimension);
-  image->SetSpacing(spacing);
-  image->SetScalarTypeToFloat();
+	//create imageData with scalars
+	vtkImageData *image = CreateNewSPWithScalars();
 
-  int i = 0;
-  int size = dimension[0] * dimension[1] * dimension[2];
-  vtkMAFSmartPointer<vtkFloatArray> array;
-  array->Allocate(8);
-
-  for(; i < size; i++)
-  {
-    array->SetTuple1(i,i);
-  }
-  array->Modified();
-  image->GetPointData()->SetScalars(array);
-  image->Update();
-
-  // calculate projection over three base axis
-  // the xy planes are:
-  /*
-  z = 0
-  0 1 
-  2 3
-
-  */
-
-  /*
-  z = 1
-  4 5
-  6 7
-  */
-
-
-  //the projection along z is:
-  /*
-  z proj
-  4  6
-  8 10
-  must divided by dim[2]
-  */
-
-  vtkMAFSmartPointer<vtkFloatArray> arrayControl;
-  arrayControl->InsertNextTuple1(4./dimension[2]);
-  arrayControl->InsertNextTuple1(6./dimension[2]);
-  arrayControl->InsertNextTuple1(8./dimension[2]);
-  arrayControl->InsertNextTuple1(10./dimension[2]);
-
-  
+	//Preparing Test Control Data
+	vtkMAFSmartPointer<vtkFloatArray> arrayControl;
+	for (int y = 0; y < glo_Dimension[1]; y++)
+		for (int x = 0; x < glo_Dimension[0]; x++)
+		{
+			double acc = 0;
+			for (int z = 0; z < glo_Dimension[2]; z++)
+				acc += image->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x);
+			arrayControl->InsertNextTuple1(acc / (double)glo_Dimension[2]);
+		}  
 
   //use filter
   vtkMAFSmartPointer<vtkMAFProjectSP> filter;
@@ -244,7 +136,7 @@ void vtkMAFProjectSPTest::TestExecutionProjectionModeToZ()
 
   //check Control
   vtkStructuredPoints *projectedImage = filter->GetOutput();
-  for(int j=0;j<dimension[0]*dimension[1];j++)
+  for(int j=0;j<glo_Dimension[0]*glo_Dimension[1];j++)
   {
     float value1 = arrayControl->GetTuple1(j);
     float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
@@ -252,15 +144,33 @@ void vtkMAFProjectSPTest::TestExecutionProjectionModeToZ()
   }
   CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"Z")==0);
   CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_Z );
+
+	vtkDEL(image);
 }
-//--------------------------------------------------
-void vtkMAFProjectSPTest::TestPrintSelf()
-//--------------------------------------------------
+
+//----------------------------------------------------------------------------
+vtkImageData * vtkMAFProjectSPTest::CreateNewSPWithScalars()
 {
-  vtkMAFSmartPointer<vtkMAFProjectSP> filter;
-  filter->SetProjectionModeToX();
-  std::cout;
-  filter->PrintSelf(cout, 2);
-  
-  
+	//create imageData with scalars
+	vtkImageData *image;
+	vtkNEW(image);
+	double spacing[3] = { 1. ,1. ,1. };
+	image->SetDimensions(glo_Dimension);
+	image->SetSpacing(spacing);
+	image->SetScalarTypeToFloat();
+
+	int i = 0;
+	int size = glo_Dimension[0] * glo_Dimension[1] * glo_Dimension[2];
+	vtkMAFSmartPointer<vtkFloatArray> array;
+	array->Allocate(size);
+
+	for (; i < size; i++)
+	{
+		array->SetTuple1(i, i);
+	}
+	array->Modified();
+	image->GetPointData()->SetScalars(array);
+	image->Update();
+
+	return image;
 }

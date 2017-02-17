@@ -112,128 +112,128 @@ void vtkMAFProjectSP::ExecuteInformation()
 void vtkMAFProjectSP::Execute()
 //=========================================================================
 {
-  int dims[3], outDims[3];
-  double origin[3], ar[3], outOrigin[3]={0.0,0.0,0.0}, outAR[3];
+	int dims[3], outDims[3];
+	double origin[3], ar[3], outOrigin[3] = { 0.0,0.0,0.0 }, outAR[3];
 
-  int i, j, k, dim, idx, newIdx;
-  int sliceSize, jOffset, kOffset;
-  float I;
+	int i, j, k, dim, idx, newIdx;
+	int sliceSize, jOffset, kOffset;
+	float I;
 
-  vtkStructuredPoints *input=(vtkStructuredPoints *)this->GetInput();
-  vtkStructuredPoints *output=(vtkStructuredPoints *)this->GetOutput();
+	vtkStructuredPoints *input = (vtkStructuredPoints *)this->GetInput();
+	vtkStructuredPoints *output = (vtkStructuredPoints *)this->GetOutput();
 
-  output->AllocateScalars();
+	output->AllocateScalars();
 
-  vtkPointData        *pd     =input->GetPointData();
-  vtkPointData        *outPD  =output->GetPointData();
-  vtkDataArray        *sc     =pd->GetScalars();
-  vtkDataArray        *outSc  =outPD->GetScalars();
+	vtkPointData        *pd = input->GetPointData();
+	vtkPointData        *outPD = output->GetPointData();
+	vtkDataArray        *sc = pd->GetScalars();
+	vtkDataArray        *outSc = outPD->GetScalars();
 
-  input->GetDimensions(dims);
-  input->GetOrigin(origin);
-  input->GetSpacing(ar);
+	input->GetDimensions(dims);
+	input->GetOrigin(origin);
+	input->GetSpacing(ar);
 
-  switch (this->ProjectionMode) {
-  case VTK_PROJECT_FROM_X:
-    outDims[0] = dims[1];
-    outDims[1] = dims[2];
-    outDims[2] = 1;    
-    outAR[0] = ar[1];
-    outAR[1] = ar[2];
-    outAR[2] = 1;
-    break;
-  case VTK_PROJECT_FROM_Y:
-    outDims[0] = dims[0];
-    outDims[1] = dims[2];
-    outDims[2] = 1;    
-    outAR[0] = ar[0];
-    outAR[1] = ar[2];
-    outAR[2] = 1;
-    break;
-  case VTK_PROJECT_FROM_Z:
-    outDims[0] = dims[0];
-    outDims[1] = dims[1];
-    outDims[2] = 1;
-    outAR[0] = ar[0];
-    outAR[1] = ar[1];
-    outAR[2] = 1;
-  }
-  
-  output->SetScalarType(input->GetScalarType());
-  output->SetNumberOfScalarComponents(input->GetNumberOfScalarComponents());
-  output->SetDimensions(outDims);
-  output->SetSpacing(outAR);
-  output->SetOrigin(outOrigin);
-  
-  vtkDebugMacro( <<"Output Dimension are " << outDims[0] << " " << outDims[1] << " " << outDims[2] );
+	switch (this->ProjectionMode) {
+		case VTK_PROJECT_FROM_X:
+			outDims[0] = dims[1];
+			outDims[1] = dims[2];
+			outDims[2] = 1;
+			outAR[0] = ar[1];
+			outAR[1] = ar[2];
+			outAR[2] = 1;
+			break;
+		case VTK_PROJECT_FROM_Y:
+			outDims[0] = dims[0];
+			outDims[1] = dims[2];
+			outDims[2] = 1;
+			outAR[0] = ar[0];
+			outAR[1] = ar[2];
+			outAR[2] = 1;
+			break;
+		case VTK_PROJECT_FROM_Z:
+			outDims[0] = dims[0];
+			outDims[1] = dims[1];
+			outDims[2] = 1;
+			outAR[0] = ar[0];
+			outAR[1] = ar[1];
+			outAR[2] = 1;
+	}
 
-  dim=2;
-  sliceSize = dims[0]*dims[1];
+	output->SetScalarType(input->GetScalarType());
+	output->SetNumberOfScalarComponents(input->GetNumberOfScalarComponents());
+	output->SetDimensions(outDims);
+	output->SetSpacing(outAR);
+	output->SetOrigin(outOrigin);
 
-  //
-  // Traverse input data and project points to output
-  //
-  newIdx = 0;
-  
-  switch (this->ProjectionMode) {
-  case VTK_PROJECT_FROM_X:
-    for ( k=0; k < dims[2]; k++ )
-      {
-	kOffset = k * sliceSize;
-	for ( j=0; j < dims[1]; j++ )
-	  {
-	    jOffset = j * dims[0];
-	    I = 0;  
-	    for ( i=dims[0]-1; i >= 0 ; i-- )	    
-	      {
-		idx = i + jOffset + kOffset;		
-		//I += sc->GetScalar(idx);						
-		I += sc->GetTuple1(idx);						
-	      }
-	    //outSc->InsertScalar(newIdx++, vtkMath2::Round(I / (double) dims[0]));		
-	    outSc->InsertTuple1(newIdx++, (I / (double) dims[0]));		
-	  }
-      }
-    break;
-  case VTK_PROJECT_FROM_Y:        
-    for ( k=0; k < dims[2]; k++ )
-      {
-	kOffset = k * sliceSize;
-	for ( i=0; i < dims[0]; i++ )
-	  {	   
-	    I = 0;
-	    for ( j=dims[1]-1; j >= 0; j--  )
-	      {
-		jOffset = j * dims[0];
-		idx = i + jOffset + kOffset;
-		//I += sc->GetScalar(idx);
-		I += sc->GetTuple1(idx);
-	      }
-	    //outSc->InsertScalar(newIdx++, vtkMath2::Round(I / (double) dims[0]));
-	    outSc->InsertTuple1(newIdx++, (I / (double) dims[0]));
-	  }
-      }
-    break;  
-  case VTK_PROJECT_FROM_Z:        
-    for ( j=0; j < dims[1]; j++ )
-      {
-	jOffset = j * dims[0];
-	for ( i=0; i < dims[0]; i++ )
-	  {	
-	    I = 0;    
-	    for ( k=dims[2]-1; k >= 0; k--  )
-	      {
-		kOffset = k * sliceSize;
-		idx = i + jOffset + kOffset;
-		//I += sc->GetScalar(idx);
-		I += sc->GetTuple1(idx);
-	      }
-	    //outSc->InsertScalar(newIdx++, vtkMath2::Round(I / (double) dims[0]));
-	    outSc->InsertTuple1(newIdx++, (I / (double) dims[0]));
-	  }
-      } 
-    break;
-  } 
+	vtkDebugMacro(<< "Output Dimension are " << outDims[0] << " " << outDims[1] << " " << outDims[2]);
+
+	dim = 2;
+	sliceSize = dims[0] * dims[1];
+
+	//
+	// Traverse input data and project points to output
+	//
+	newIdx = 0;
+
+	switch (this->ProjectionMode) {
+		case VTK_PROJECT_FROM_X:
+			for (k = 0; k < dims[2]; k++)
+			{
+				kOffset = k * sliceSize;
+				for (j = 0; j < dims[1]; j++)
+				{
+					jOffset = j * dims[0];
+					I = 0;
+					for (i = dims[0] - 1; i >= 0; i--)
+					{
+						idx = i + jOffset + kOffset;
+						//I += sc->GetScalar(idx);						
+						I += sc->GetTuple1(idx);
+					}
+					//outSc->InsertScalar(newIdx++, vtkMath2::Round(I / (double) dims[0]));		
+					outSc->InsertTuple1(newIdx++, (I / (double)dims[0]));
+				}
+			}
+			break;
+		case VTK_PROJECT_FROM_Y:
+			for (k = 0; k < dims[2]; k++)
+			{
+				kOffset = k * sliceSize;
+				for (i = 0; i < dims[0]; i++)
+				{
+					I = 0;
+					for (j = dims[1] - 1; j >= 0; j--)
+					{
+						jOffset = j * dims[0];
+						idx = i + jOffset + kOffset;
+						//I += sc->GetScalar(idx);
+						I += sc->GetTuple1(idx);
+					}
+					//outSc->InsertScalar(newIdx++, vtkMath2::Round(I / (double) dims[0]));
+					outSc->InsertTuple1(newIdx++, (I / (double)dims[1]));
+				}
+			}
+			break;
+		case VTK_PROJECT_FROM_Z:
+			for (j = 0; j < dims[1]; j++)
+			{
+				jOffset = j * dims[0];
+				for (i = 0; i < dims[0]; i++)
+				{
+					I = 0;
+					for (k = dims[2] - 1; k >= 0; k--)
+					{
+						kOffset = k * sliceSize;
+						idx = i + jOffset + kOffset;
+						//I += sc->GetScalar(idx);
+						I += sc->GetTuple1(idx);
+					}
+					//outSc->InsertScalar(newIdx++, vtkMath2::Round(I / (double) dims[0]));
+					outSc->InsertTuple1(newIdx++, (I / (double)dims[2]));
+				}
+			}
+			break;
+	}
 }
 
 

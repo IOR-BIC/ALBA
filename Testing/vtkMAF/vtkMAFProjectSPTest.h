@@ -36,8 +36,6 @@ class vtkMAFProjectSPTest : public mafTest
     CPPUNIT_TEST( TestExecutionProjectionModeToY );
     /** Test for projection on Z */
     CPPUNIT_TEST( TestExecutionProjectionModeToZ );
-    /** Test Print */
-    CPPUNIT_TEST( TestPrintSelf );
     /** End Test Suite */
     CPPUNIT_TEST_SUITE_END();
 
@@ -51,9 +49,9 @@ class vtkMAFProjectSPTest : public mafTest
     void TestExecutionProjectionModeToY();
     /** Test for projection on Z and validate the result */
     void TestExecutionProjectionModeToZ();
-    /** Test for Print information*/
-    void TestPrintSelf();
 
+		/** Create a new StructuredPoints for Testing*/
+		vtkImageData *CreateNewSPWithScalars();
 };
 
 #endif
