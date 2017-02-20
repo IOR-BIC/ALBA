@@ -148,7 +148,7 @@ void mafViewIsosurfaceCompound::VmeShow(mafVME *vme, bool show)
 			m_Gui->Update();
 		}
 	}
-
+	m_GuiView->Enable(ID_CONTOUR_VALUE_ISO, show);
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 
@@ -178,4 +178,6 @@ void mafViewIsosurfaceCompound::VmeRemove(mafVME *vme)
 		m_CurrentVolume = NULL;
 		UpdateISO();
 	}
+
+	m_GuiView->Enable(ID_CONTOUR_VALUE_ISO, false);
 }
