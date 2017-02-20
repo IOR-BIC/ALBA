@@ -22,6 +22,7 @@
 
 #include "vtkPointData.h"
 #include "vtkFloatArray.h"
+static int glo_Dimension[3] = { 2,3,4 };
 
 
 //--------------------------------------------------
@@ -36,81 +37,19 @@ void vtkMAFProjectRGTest::TestDynamicAllocation()
 void vtkMAFProjectRGTest::TestExecutionProjectionModeToX()
 //--------------------------------------------------
 {
-  //create RG with scalars
-  vtkMAFSmartPointer<vtkRectilinearGrid> rg;
-
-  vtkFloatArray *vx = vtkFloatArray::New();
-  vtkFloatArray *vy = vtkFloatArray::New();
-  vtkFloatArray *vz = vtkFloatArray::New();
-
-  int Dimension[3] = {2,2,2};
-
-  vx->SetNumberOfValues(Dimension[0]);
-  vy->SetNumberOfValues(Dimension[1]);
-  vz->SetNumberOfValues(Dimension[2]);
-
-  for (int ix = 0; ix < Dimension[0]; ix++)
-    vx->SetValue(ix, 0.+ ((double)ix));
-  for (int iy = 0; iy < Dimension[1]; iy++)
-    vy->SetValue(iy, 0.+ ((double)iy));
-  for (int iz = 0; iz < Dimension[2]; iz++)
-    vz->SetValue(iz, 0.+ ((double)iz));
-
-  rg->SetDimensions(Dimension);
-  rg->SetXCoordinates(vx);
-  rg->SetYCoordinates(vy);
-  rg->SetZCoordinates(vz);
-  
-  vx->Delete();
-  vy->Delete();
-  vz->Delete();
-  
-
-  int i = 0;
-  int size = Dimension[0] * Dimension[1] * Dimension[2];
-  vtkMAFSmartPointer<vtkFloatArray> array;
-  array->Allocate(8);
-  
-  for(; i < size; i++)
-  {
-    array->SetTuple1(i,i);
-  }
-  array->Modified();
-  rg->GetPointData()->SetScalars(array);
-  rg->Update();
-  
-  // calculate projection over three base axis
-  // the xy planes are:
-  /*
-  z = 0
-  0 1 
-  2 3
- 
-  */
-
-  /*
-  z = 1
-  4 5
-  6 7
-  */
-
-
-  
-  //the projection along x is:
-  /*
-  x proj
-  1 5
-  9 13
-  must divided by dim[0]
-  */
-
-  vtkMAFSmartPointer<vtkFloatArray> arrayControl;
-  arrayControl->InsertNextTuple1(1./Dimension[0]);
-  arrayControl->InsertNextTuple1(5./Dimension[0]);
-  arrayControl->InsertNextTuple1(9./Dimension[0]);
-  arrayControl->InsertNextTuple1(13./Dimension[0]);
-
-  
+	vtkRectilinearGrid *rg=CreateNewRGWithScalars();
+	
+	//Preparing Test Control Data
+	vtkMAFSmartPointer<vtkFloatArray> arrayControl;
+	for (int z = 0; z < glo_Dimension[2]; z++)
+		for (int y = 0; y < glo_Dimension[1]; y++)
+		{
+			double acc = 0;
+			for (int x = 0; x < glo_Dimension[0]; x++)
+				acc += rg->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0]*glo_Dimension[1] + y*glo_Dimension[0] + x);
+			arrayControl->InsertNextTuple1(acc / (double)glo_Dimension[0]);
+		}
+	 
   //use filter
   vtkMAFSmartPointer<vtkMAFProjectRG> filter;
   filter->SetInput(rg);
@@ -119,7 +58,7 @@ void vtkMAFProjectRGTest::TestExecutionProjectionModeToX()
 
   //check Control
   vtkRectilinearGrid *projectedRG = filter->GetOutput();
-  for(int j=0;j<Dimension[1]*Dimension[2];j++)
+  for(int j=0;j<glo_Dimension[1]*glo_Dimension[2];j++)
   {
     float value1 = arrayControl->GetTuple1(j);
     float value2 = projectedRG->GetPointData()->GetScalars()->GetTuple1(j);
@@ -128,82 +67,27 @@ void vtkMAFProjectRGTest::TestExecutionProjectionModeToX()
 
   CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"X")==0);
   CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_X );
+
+	vtkDEL(rg);
 }
+
+
 //--------------------------------------------------
 void vtkMAFProjectRGTest::TestExecutionProjectionModeToY()
 //--------------------------------------------------
 {
-  //create RG with scalars
-  vtkMAFSmartPointer<vtkRectilinearGrid> rg;
+	vtkRectilinearGrid *rg = CreateNewRGWithScalars();
 
-  vtkFloatArray *vx = vtkFloatArray::New();
-  vtkFloatArray *vy = vtkFloatArray::New();
-  vtkFloatArray *vz = vtkFloatArray::New();
-
-  int Dimension[3] = {2,2,2};
-
-  vx->SetNumberOfValues(Dimension[0]);
-  vy->SetNumberOfValues(Dimension[1]);
-  vz->SetNumberOfValues(Dimension[2]);
-
-  for (int ix = 0; ix < Dimension[0]; ix++)
-    vx->SetValue(ix, 0.+ ((double)ix));
-  for (int iy = 0; iy < Dimension[1]; iy++)
-    vy->SetValue(iy, 0.+ ((double)iy));
-  for (int iz = 0; iz < Dimension[2]; iz++)
-    vz->SetValue(iz, 0.+ ((double)iz));
-
-  rg->SetDimensions(Dimension);
-  rg->SetXCoordinates(vx);
-  rg->SetYCoordinates(vy);
-  rg->SetZCoordinates(vz);
-
-  vx->Delete();
-  vy->Delete();
-  vz->Delete();
-
-
-  int i = 0;
-  int size = Dimension[0] * Dimension[1] * Dimension[2];
-  vtkMAFSmartPointer<vtkFloatArray> array;
-  array->Allocate(8);
-
-  for(; i < size; i++)
-  {
-    array->SetTuple1(i,i);
-  }
-  array->Modified();
-  rg->GetPointData()->SetScalars(array);
-  rg->Update();
-
-  // calculate projection over three base axis
-  // the xy planes are:
-  /*
-  z = 0
-  0 1 
-  2 3
-
-  */
-
-  /*
-  z = 1
-  4 5
-  6 7
-  */
-
-  //the projection along y is:
-  /*
-  y proj
-  2  4
-  10 12
-  must divided by dim[1]
-  */
-
-  vtkMAFSmartPointer<vtkFloatArray> arrayControl;
-  arrayControl->InsertNextTuple1(2./Dimension[1]);
-  arrayControl->InsertNextTuple1(4./Dimension[1]);
-  arrayControl->InsertNextTuple1(10./Dimension[1]);
-  arrayControl->InsertNextTuple1(12./Dimension[1]);
+	//Preparing Test Control Data
+	vtkMAFSmartPointer<vtkFloatArray> arrayControl;
+	for (int z = 0; z < glo_Dimension[2]; z++)
+		for (int x = 0; x < glo_Dimension[0]; x++)
+		{
+			double acc = 0;
+			for (int y = 0; y < glo_Dimension[1]; y++)
+				acc += rg->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x);
+			arrayControl->InsertNextTuple1(acc / (double)glo_Dimension[1]);
+		}
 
   //use filter
   vtkMAFSmartPointer<vtkMAFProjectRG> filter;
@@ -213,7 +97,7 @@ void vtkMAFProjectRGTest::TestExecutionProjectionModeToY()
 
   //check Control
   vtkRectilinearGrid *projectedRG = filter->GetOutput();
-  for(int j=0;j<Dimension[0]*Dimension[2];j++)
+  for(int j=0;j<glo_Dimension[0]* glo_Dimension[2];j++)
   {
     float value1 = arrayControl->GetTuple1(j);
     float value2 = projectedRG->GetPointData()->GetScalars()->GetTuple1(j);
@@ -221,85 +105,25 @@ void vtkMAFProjectRGTest::TestExecutionProjectionModeToY()
   }
   CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"Y")==0);
   CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_Y );
+
+	vtkDEL(rg);
 }
 //--------------------------------------------------
 void vtkMAFProjectRGTest::TestExecutionProjectionModeToZ()
 //--------------------------------------------------
 {
-  //create RG with scalars
-  vtkMAFSmartPointer<vtkRectilinearGrid> rg;
+	vtkRectilinearGrid *rg = CreateNewRGWithScalars();
 
-  vtkFloatArray *vx = vtkFloatArray::New();
-  vtkFloatArray *vy = vtkFloatArray::New();
-  vtkFloatArray *vz = vtkFloatArray::New();
-
-  int Dimension[3] = {2,2,2};
-
-  vx->SetNumberOfValues(Dimension[0]);
-  vy->SetNumberOfValues(Dimension[1]);
-  vz->SetNumberOfValues(Dimension[2]);
-
-  for (int ix = 0; ix < Dimension[0]; ix++)
-    vx->SetValue(ix, 0.+ ((double)ix));
-  for (int iy = 0; iy < Dimension[1]; iy++)
-    vy->SetValue(iy, 0.+ ((double)iy));
-  for (int iz = 0; iz < Dimension[2]; iz++)
-    vz->SetValue(iz, 0.+ ((double)iz));
-
-  rg->SetDimensions(Dimension);
-  rg->SetXCoordinates(vx);
-  rg->SetYCoordinates(vy);
-  rg->SetZCoordinates(vz);
-
-  vx->Delete();
-  vy->Delete();
-  vz->Delete();
-
-
-  int i = 0;
-  int size = Dimension[0] * Dimension[1] * Dimension[2];
-  vtkMAFSmartPointer<vtkFloatArray> array;
-  array->Allocate(8);
-
-  for(; i < size; i++)
-  {
-    array->SetTuple1(i,i);
-  }
-  array->Modified();
-  rg->GetPointData()->SetScalars(array);
-  rg->Update();
-
-  // calculate projection over three base axis
-  // the xy planes are:
-  /*
-  z = 0
-  0 1 
-  2 3
-
-  */
-
-  /*
-  z = 1
-  4 5
-  6 7
-  */
-
-
-  //the projection along z is:
-  /*
-  z proj
-  4  6
-  8 10
-  must divided by dim[2]
-  */
-
-  vtkMAFSmartPointer<vtkFloatArray> arrayControl;
-  arrayControl->InsertNextTuple1(4./Dimension[2]);
-  arrayControl->InsertNextTuple1(6./Dimension[2]);
-  arrayControl->InsertNextTuple1(8./Dimension[2]);
-  arrayControl->InsertNextTuple1(10./Dimension[2]);
-
-  
+	//Preparing Test Control Data
+	vtkMAFSmartPointer<vtkFloatArray> arrayControl;
+	for (int y = 0; y < glo_Dimension[1]; y++)
+		for (int x = 0; x < glo_Dimension[0]; x++)
+		{
+			double acc = 0;
+			for (int z = 0; z < glo_Dimension[2]; z++)
+				acc += rg->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x);
+			arrayControl->InsertNextTuple1(acc / (double)glo_Dimension[2]);
+		}
 
   //use filter
   vtkMAFSmartPointer<vtkMAFProjectRG> filter;
@@ -309,7 +133,7 @@ void vtkMAFProjectRGTest::TestExecutionProjectionModeToZ()
 
   //check Control
   vtkRectilinearGrid *projectedRG = filter->GetOutput();
-  for(int j=0;j<Dimension[0]*Dimension[1];j++)
+  for(int j=0;j<glo_Dimension[0]* glo_Dimension[1];j++)
   {
     float value1 = arrayControl->GetTuple1(j);
     float value2 = projectedRG->GetPointData()->GetScalars()->GetTuple1(j);
@@ -317,15 +141,175 @@ void vtkMAFProjectRGTest::TestExecutionProjectionModeToZ()
   }
   CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"Z")==0);
   CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_Z );
+
+	vtkDEL(rg);
 }
+
 //--------------------------------------------------
-void vtkMAFProjectRGTest::TestPrintSelf()
+void vtkMAFProjectRGTest::TestRangeProjectionX()
 //--------------------------------------------------
 {
-  vtkMAFSmartPointer<vtkMAFProjectRG> filter;
-  filter->SetProjectionModeToX();
-  std::cout;
-  filter->PrintSelf(cout, 2);
-  
-  
+	vtkRectilinearGrid *rg = CreateNewRGWithScalars();
+	int range[2] = { 0,1 };
+
+	//Preparing Test Control Data
+	vtkMAFSmartPointer<vtkFloatArray> arrayControl;
+	for (int z = 0; z < glo_Dimension[2]; z++)
+		for (int y = 0; y < glo_Dimension[1]; y++)
+		{
+			double acc = 0;
+			for (int x = range[0]; x < range[1]; x++)
+				acc += rg->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x);
+			arrayControl->InsertNextTuple1(acc / (double)(range[1]-range[0]));
+		}
+
+	//use filter
+	vtkMAFSmartPointer<vtkMAFProjectRG> filter;
+	CPPUNIT_ASSERT(filter->GetProjectSubRange() == false);
+	filter->SetInput(rg);
+	filter->SetProjectionModeToX();
+	filter->ProjectSubRangeOn();
+	filter->SetProjectionRange(range);
+	filter->Update();
+
+	//check Control
+	vtkRectilinearGrid *projectedRG = filter->GetOutput();
+	for (int j = 0; j < glo_Dimension[1] * glo_Dimension[2]; j++)
+	{
+		float value1 = arrayControl->GetTuple1(j);
+		float value2 = projectedRG->GetPointData()->GetScalars()->GetTuple1(j);
+		CPPUNIT_ASSERT(value1 == value2);
+	}
+	CPPUNIT_ASSERT(filter->GetProjectSubRange() == true);
+
+	vtkDEL(rg);
 }
+
+
+//--------------------------------------------------
+void vtkMAFProjectRGTest::TestRangeProjectionY()
+{
+	vtkRectilinearGrid *rg = CreateNewRGWithScalars();
+	int range[2] = { 1,3 };
+	
+	//Preparing Test Control Data
+	vtkMAFSmartPointer<vtkFloatArray> arrayControl;
+	for (int z = 0; z < glo_Dimension[2]; z++)
+		for (int x = 0; x < glo_Dimension[0]; x++)
+		{
+			double acc = 0;
+			for (int y = range[0]; y < range[1]; y++)
+				acc += rg->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x);
+			arrayControl->InsertNextTuple1(acc / (double)(range[1] - range[0]));
+		}
+
+	//use filter
+	vtkMAFSmartPointer<vtkMAFProjectRG> filter;
+	CPPUNIT_ASSERT(filter->GetProjectSubRange() == false);
+	filter->SetInput(rg);
+	filter->SetProjectionModeToY();
+	filter->ProjectSubRangeOn();
+	filter->SetProjectionRange(range);
+	filter->Update();
+
+	//check Control
+	vtkRectilinearGrid *projectedRG = filter->GetOutput();
+	for (int j = 0; j < glo_Dimension[0] * glo_Dimension[2]; j++)
+	{
+		float value1 = arrayControl->GetTuple1(j);
+		float value2 = projectedRG->GetPointData()->GetScalars()->GetTuple1(j);
+		CPPUNIT_ASSERT(value1 == value2);
+	}
+	CPPUNIT_ASSERT(filter->GetProjectSubRange() == true);
+
+	vtkDEL(rg);
+}
+//--------------------------------------------------
+void vtkMAFProjectRGTest::TestRangeProjectionZ()
+//--------------------------------------------------
+{
+	vtkRectilinearGrid *rg = CreateNewRGWithScalars();
+	int range[2] = { 2,3 };
+
+	//Preparing Test Control Data
+	vtkMAFSmartPointer<vtkFloatArray> arrayControl;
+	for (int y = 0; y < glo_Dimension[1]; y++)
+		for (int x = 0; x < glo_Dimension[0]; x++)
+		{
+			double acc = 0;
+			for (int z = range[0]; z < range[1]; z++)
+				acc += rg->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x);
+			arrayControl->InsertNextTuple1(acc / (double)(range[1] - range[0]));
+		}
+
+	//use filter
+	vtkMAFSmartPointer<vtkMAFProjectRG> filter;
+	CPPUNIT_ASSERT(filter->GetProjectSubRange() == false);
+	filter->SetInput(rg);
+	filter->SetProjectionModeToZ();
+	filter->ProjectSubRangeOn();
+	filter->SetProjectionRange(range);
+	filter->Update();
+
+	//check Control
+	vtkRectilinearGrid *projectedRG = filter->GetOutput();
+	for (int j = 0; j < glo_Dimension[0] * glo_Dimension[1]; j++)
+	{
+		float value1 = arrayControl->GetTuple1(j);
+		float value2 = projectedRG->GetPointData()->GetScalars()->GetTuple1(j);
+		CPPUNIT_ASSERT(value1 == value2);
+	}
+	CPPUNIT_ASSERT(filter->GetProjectSubRange() == true);
+
+	vtkDEL(rg);
+}
+
+
+//----------------------------------------------------------------------------
+vtkRectilinearGrid *vtkMAFProjectRGTest::CreateNewRGWithScalars()
+{
+	//create RG with scalars
+	vtkRectilinearGrid *rg;
+	vtkNEW(rg);
+
+	vtkFloatArray *vx = vtkFloatArray::New();
+	vtkFloatArray *vy = vtkFloatArray::New();
+	vtkFloatArray *vz = vtkFloatArray::New();
+
+	vx->SetNumberOfValues(glo_Dimension[0]);
+	vy->SetNumberOfValues(glo_Dimension[1]);
+	vz->SetNumberOfValues(glo_Dimension[2]);
+
+	for (int ix = 0; ix < glo_Dimension[0]; ix++)
+		vx->SetValue(ix, 0. + ((double)ix));
+	for (int iy = 0; iy < glo_Dimension[1]; iy++)
+		vy->SetValue(iy, 0. + ((double)iy));
+	for (int iz = 0; iz < glo_Dimension[2]; iz++)
+		vz->SetValue(iz, 0. + ((double)iz));
+
+	rg->SetDimensions(glo_Dimension);
+	rg->SetXCoordinates(vx);
+	rg->SetYCoordinates(vy);
+	rg->SetZCoordinates(vz);
+
+	vx->Delete();
+	vy->Delete();
+	vz->Delete();
+
+
+	int i = 0;
+	int size = glo_Dimension[0] * glo_Dimension[1] * glo_Dimension[2];
+	vtkMAFSmartPointer<vtkFloatArray> array;
+	array->Allocate(size);
+
+	for (; i < size; i++)
+	{
+		array->SetTuple1(i, i);
+	}
+	array->Modified();
+	rg->GetPointData()->SetScalars(array);
+	rg->Update();
+
+	return rg;
+}
+
