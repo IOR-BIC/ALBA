@@ -1972,7 +1972,7 @@ void mafLogicWithManagers::CreateMenu()
 
 	edit_menu->AppendSeparator();
 	mafGUI::AddMenuItem(edit_menu, OP_REPARENT, _("Reparent to... \tCtrl+Shift+R"), EDIT_REPARENT_xpm);
-	mafGUI::AddMenuItem(edit_menu, MENU_EDIT_FIND_VME, _("Find VME \tCtrl+F"), EDIT_FIND_xpm);
+	mafGUI::AddMenuItem(edit_menu, MENU_EDIT_FIND_VME, _("Find VME \tCtrl+Shift+F"), EDIT_FIND_xpm);
 
 	edit_menu->AppendSeparator();
 	mafGUI::AddMenuItem(edit_menu, ID_APP_SETTINGS, _("Settings..."), EDIT_SETTINGS_xpm);
