@@ -28,15 +28,14 @@ class vtkMAFProjectSPTest : public mafTest
 
     /** Start Test Suite */
     CPPUNIT_TEST_SUITE( vtkMAFProjectSPTest );
-    /** Test for dynamic allocation */
     CPPUNIT_TEST( TestDynamicAllocation );
-    /** Test for projection on X */
     CPPUNIT_TEST( TestExecutionProjectionModeToX );
-    /** Test for projection on Y */
     CPPUNIT_TEST( TestExecutionProjectionModeToY );
-    /** Test for projection on Z */
-    CPPUNIT_TEST( TestExecutionProjectionModeToZ );
-    /** End Test Suite */
+ 		CPPUNIT_TEST( TestExecutionProjectionModeToZ );
+		CPPUNIT_TEST(TestRangeProjectionX);
+		CPPUNIT_TEST(TestRangeProjectionY);
+		CPPUNIT_TEST(TestRangeProjectionZ);
+		/** End Test Suite */
     CPPUNIT_TEST_SUITE_END();
 
   protected:
@@ -45,11 +44,16 @@ class vtkMAFProjectSPTest : public mafTest
     void TestDynamicAllocation();
     /** Test for projection on X and validate the result */
     void TestExecutionProjectionModeToX();
-    /** Test for projection on Y and validate the result */
+		/** Test for projection on Y and validate the result */
     void TestExecutionProjectionModeToY();
     /** Test for projection on Z and validate the result */
     void TestExecutionProjectionModeToZ();
-
+		/** Test for projection on X and validate the result */
+		void TestRangeProjectionX();
+		/** Test for projection on Y and validate the result */
+		void TestRangeProjectionY();
+		/** Test for projection on Z and validate the result */
+		void TestRangeProjectionZ();
 		/** Create a new StructuredPoints for Testing*/
 		vtkImageData *CreateNewSPWithScalars();
 };

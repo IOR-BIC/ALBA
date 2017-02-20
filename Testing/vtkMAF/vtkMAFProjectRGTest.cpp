@@ -145,6 +145,126 @@ void vtkMAFProjectRGTest::TestExecutionProjectionModeToZ()
 	vtkDEL(rg);
 }
 
+//--------------------------------------------------
+void vtkMAFProjectRGTest::TestRangeProjectionX()
+//--------------------------------------------------
+{
+	vtkRectilinearGrid *rg = CreateNewRGWithScalars();
+	int range[2] = { 0,1 };
+
+	//Preparing Test Control Data
+	vtkMAFSmartPointer<vtkFloatArray> arrayControl;
+	for (int z = 0; z < glo_Dimension[2]; z++)
+		for (int y = 0; y < glo_Dimension[1]; y++)
+		{
+			double acc = 0;
+			for (int x = range[0]; x < range[1]; x++)
+				acc += rg->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x);
+			arrayControl->InsertNextTuple1(acc / (double)(range[1]-range[0]));
+		}
+
+	//use filter
+	vtkMAFSmartPointer<vtkMAFProjectRG> filter;
+	CPPUNIT_ASSERT(filter->GetProjectSubRange() == false);
+	filter->SetInput(rg);
+	filter->SetProjectionModeToX();
+	filter->ProjectSubRangeOn();
+	filter->SetProjectionRange(range);
+	filter->Update();
+
+	//check Control
+	vtkRectilinearGrid *projectedRG = filter->GetOutput();
+	for (int j = 0; j < glo_Dimension[1] * glo_Dimension[2]; j++)
+	{
+		float value1 = arrayControl->GetTuple1(j);
+		float value2 = projectedRG->GetPointData()->GetScalars()->GetTuple1(j);
+		CPPUNIT_ASSERT(value1 == value2);
+	}
+	CPPUNIT_ASSERT(filter->GetProjectSubRange() == true);
+
+	vtkDEL(rg);
+}
+
+
+//--------------------------------------------------
+void vtkMAFProjectRGTest::TestRangeProjectionY()
+{
+	vtkRectilinearGrid *rg = CreateNewRGWithScalars();
+	int range[2] = { 1,3 };
+	
+	//Preparing Test Control Data
+	vtkMAFSmartPointer<vtkFloatArray> arrayControl;
+	for (int z = 0; z < glo_Dimension[2]; z++)
+		for (int x = 0; x < glo_Dimension[0]; x++)
+		{
+			double acc = 0;
+			for (int y = range[0]; y < range[1]; y++)
+				acc += rg->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x);
+			arrayControl->InsertNextTuple1(acc / (double)(range[1] - range[0]));
+		}
+
+	//use filter
+	vtkMAFSmartPointer<vtkMAFProjectRG> filter;
+	CPPUNIT_ASSERT(filter->GetProjectSubRange() == false);
+	filter->SetInput(rg);
+	filter->SetProjectionModeToY();
+	filter->ProjectSubRangeOn();
+	filter->SetProjectionRange(range);
+	filter->Update();
+
+	//check Control
+	vtkRectilinearGrid *projectedRG = filter->GetOutput();
+	for (int j = 0; j < glo_Dimension[0] * glo_Dimension[2]; j++)
+	{
+		float value1 = arrayControl->GetTuple1(j);
+		float value2 = projectedRG->GetPointData()->GetScalars()->GetTuple1(j);
+		CPPUNIT_ASSERT(value1 == value2);
+	}
+	CPPUNIT_ASSERT(filter->GetProjectSubRange() == true);
+
+	vtkDEL(rg);
+}
+//--------------------------------------------------
+void vtkMAFProjectRGTest::TestRangeProjectionZ()
+//--------------------------------------------------
+{
+	vtkRectilinearGrid *rg = CreateNewRGWithScalars();
+	int range[2] = { 2,3 };
+
+	//Preparing Test Control Data
+	vtkMAFSmartPointer<vtkFloatArray> arrayControl;
+	for (int y = 0; y < glo_Dimension[1]; y++)
+		for (int x = 0; x < glo_Dimension[0]; x++)
+		{
+			double acc = 0;
+			for (int z = range[0]; z < range[1]; z++)
+				acc += rg->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x);
+			arrayControl->InsertNextTuple1(acc / (double)(range[1] - range[0]));
+		}
+
+	//use filter
+	vtkMAFSmartPointer<vtkMAFProjectRG> filter;
+	CPPUNIT_ASSERT(filter->GetProjectSubRange() == false);
+	filter->SetInput(rg);
+	filter->SetProjectionModeToZ();
+	filter->ProjectSubRangeOn();
+	filter->SetProjectionRange(range);
+	filter->Update();
+
+	//check Control
+	vtkRectilinearGrid *projectedRG = filter->GetOutput();
+	for (int j = 0; j < glo_Dimension[0] * glo_Dimension[1]; j++)
+	{
+		float value1 = arrayControl->GetTuple1(j);
+		float value2 = projectedRG->GetPointData()->GetScalars()->GetTuple1(j);
+		CPPUNIT_ASSERT(value1 == value2);
+	}
+	CPPUNIT_ASSERT(filter->GetProjectSubRange() == true);
+
+	vtkDEL(rg);
+}
+
+
 //----------------------------------------------------------------------------
 vtkRectilinearGrid *vtkMAFProjectRGTest::CreateNewRGWithScalars()
 {

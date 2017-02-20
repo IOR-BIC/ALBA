@@ -194,15 +194,15 @@ void vtkMAFProjectRG::Execute()
 	//Set Projection Range
 	if (ProjectSubRange)
 	{
-		range[0] = MAX(ProjectionRange[ProjectionMode - 1], 0);
-		range[1] = MIN(ProjectionRange[ProjectionMode], dims[0]);
+		range[0] = MAX(ProjectionRange[0], 0);
+		range[1] = MIN(ProjectionRange[1], dims[ProjectionMode-1]);
 		rangeSize = range[1] - range[0];
 	}
 	else
 	{
 		range[0] = 0;
-		range[1] = dims[ProjectionMode - 1];
-		rangeSize = dims[ProjectionMode - 1];
+		range[1] = dims[ProjectionMode-1];
+		rangeSize = dims[ProjectionMode-1];
 	}
 
 	switch (this->ProjectionMode)
