@@ -41,23 +41,32 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkMAFProjectRG.h"
 //#include "vtkMath2.h"
 #include "vtkObjectFactory.h"
+#include "vtkStructuredPoints.h"
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
-#include "vtkStructuredPoints.h"
+
+
+#ifndef MIN 
+#define MIN( x, y ) ( (x) < (y) ? (x) : (y) )
+#endif
+#ifndef MAX 
+#define MAX( x, y ) ( (x) > (y) ? (x) : (y) )
+#endif
 
 vtkCxxRevisionMacro(vtkMAFProjectRG, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkMAFProjectRG);
 
+
+
 //=========================================================================
 vtkMAFProjectRG::vtkMAFProjectRG()
-//=========================================================================
 {
   this->ProjectionMode = VTK_PROJECT_FROM_X;
+	this->ProjectSubRange = false;
 }
 
 //=========================================================================
 void vtkMAFProjectRG::ExecuteInformation()
-//=========================================================================
 {
   vtkRectilinearGrid *input=this->GetInput();
   vtkRectilinearGrid *output=this->GetOutput();
@@ -100,18 +109,17 @@ void vtkMAFProjectRG::ExecuteInformation()
   wholeExtent[5] = outDims[2] - 1;
   
   output->SetWholeExtent( wholeExtent );
-  output->SetUpdateExtent( wholeExtent );   // cosi funziona - Silvano & Robez
+  output->SetUpdateExtent( wholeExtent );
 
   vtkDebugMacro(<<"Whole Extent is " << wholeExtent[1] << " " << wholeExtent[3] << " " << wholeExtent[5]);
 }
 
 //=========================================================================
 void vtkMAFProjectRG::Execute()
-//=========================================================================
 {
-	int i, j, k, dims[3], outDims[3], dim, idx, newIdx;
+	int x, y, z, dims[3], outDims[3], dim, idx, newIdx, range[2];
 	int sliceSize, outSize, jOffset, kOffset;
-	float I;
+	float acc, rangeSize;
 
 	vtkRectilinearGrid 	*input = (vtkRectilinearGrid *)this->GetInput();
 	vtkRectilinearGrid 	*output = (vtkRectilinearGrid *)this->GetOutput();
@@ -183,56 +191,70 @@ void vtkMAFProjectRG::Execute()
 	//
 	newIdx = 0;
 
+	//Set Projection Range
+	if (ProjectSubRange)
+	{
+		range[0] = MAX(ProjectionRange[ProjectionMode - 1], 0);
+		range[1] = MIN(ProjectionRange[ProjectionMode], dims[0]);
+		rangeSize = range[1] - range[0];
+	}
+	else
+	{
+		range[0] = 0;
+		range[1] = dims[ProjectionMode - 1];
+		rangeSize = dims[ProjectionMode - 1];
+	}
+
 	switch (this->ProjectionMode)
 	{
 		case VTK_PROJECT_FROM_X:
-			for (k = 0; k < dims[2]; k++)
+			for (z = 0; z < dims[2]; z++)
 			{
-				kOffset = k * sliceSize;
-				for (j = 0; j < dims[1]; j++)
+				kOffset = z * sliceSize;
+				for (y = 0; y < dims[1]; y++)
 				{
-					jOffset = j * dims[0];
-					I = 0;
-					for (i = 0; i < dims[0]; i++)
+					jOffset = y * dims[0];
+					acc = 0;
+					for (x = range[0]; x < range[1]; x++)
 					{
-						idx = i + jOffset + kOffset;
-						I += sc->GetTuple1(idx);
+						idx = x + jOffset + kOffset;
+						acc += sc->GetTuple1(idx);
 					}
-					outSc->InsertTuple1(newIdx++, I / (double)dims[0]);
+					outSc->InsertTuple1(newIdx++, acc / rangeSize);
 				}
 			}
 			break;
 		case VTK_PROJECT_FROM_Y:
-			for (k = 0; k < dims[2]; k++)
+			for (z = 0; z < dims[2]; z++)
 			{
-				kOffset = k * sliceSize;
-				for (i = 0; i < dims[0]; i++)
+				kOffset = z * sliceSize;
+				for (x = 0; x < dims[0]; x++)
 				{
-					I = 0;
-					for (j = 0; j < dims[1]; j++)
+					acc = 0;
+					for (y = range[0]; y < range[1]; y++)
 					{
-						jOffset = j * dims[0];
-						idx = i + jOffset + kOffset;
-						I += sc->GetTuple1(idx);
+						jOffset = y * dims[0];
+						idx = x + jOffset + kOffset;
+						acc += sc->GetTuple1(idx);
 					}
-					outSc->InsertTuple1(newIdx++, I / (double)dims[1]);
+					outSc->InsertTuple1(newIdx++, acc / rangeSize);
 				}
 			}
 			break;
 		case VTK_PROJECT_FROM_Z:
-			for (j = 0; j < dims[1]; j++)
+			for (y = 0; y < dims[1]; y++)
 			{
-				jOffset = j * dims[0];
-				for (i = 0; i < dims[0]; i++)
+				jOffset = y * dims[0];
+				for (x = 0; x < dims[0]; x++)
 				{
-					I = 0;
-					for (k = 0; k < dims[2]; k++)
+					acc = 0;
+					for (z = range[0]; z < range[1]; z++)
 					{
-						kOffset = k * sliceSize;
-						idx = i + jOffset + kOffset;
-						I += sc->GetTuple1(idx);
+						kOffset = z * sliceSize;
+						idx = x + jOffset + kOffset;
+						acc += sc->GetTuple1(idx);
 					}
-					outSc->InsertTuple1(newIdx++, I / (double)dims[2]);
+					outSc->InsertTuple1(newIdx++, acc / rangeSize);
 				}
 			}
 			break;
