@@ -36,11 +36,13 @@ public:
   CPPUNIT_TEST_SUITE( mafPipeVolumeProjectedTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestPipeExecution );
+	CPPUNIT_TEST(TestProjectionRange);
   CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();
   void TestPipeExecution();
+	void TestProjectionRange();
 
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
 
