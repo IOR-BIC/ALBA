@@ -122,6 +122,18 @@ public:
   vtkSetMacro(ProjectionMode,int);
   /** Macro for Get Projection Mode */
   vtkGetMacro(ProjectionMode,int);
+
+	/** Macro for Set Project Sub Range status */
+	vtkSetMacro(ProjectSubRange, bool);
+	/** Macro for Get Project Sub Range status*/
+	vtkGetMacro(ProjectSubRange, bool);
+	/** On/Off Macro for Project Sub Range status*/
+	vtkBooleanMacro(ProjectSubRange, bool);
+
+	/** Macro for Set Projection Range*/
+	vtkSetVector2Macro(ProjectionRange, int);
+	/** Macro for Get Projection Range*/
+	vtkGetVector2Macro(ProjectionRange, int);
     
 protected:
   /** constructor */
@@ -138,7 +150,9 @@ protected:
   /** Execute the projection and fill output scalars */
   void Execute();
 
-  int ProjectionMode;  
+  int ProjectionMode;
+	bool ProjectSubRange;
+	int ProjectionRange[2];
 };
 
 #endif //__vtkMAFProjectSP_h
