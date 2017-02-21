@@ -41,12 +41,15 @@
 
 #include <iostream>
 #include <fstream>
+#include "mafVMEOutputVolume.h"
+#include "vtkStructuredPoints.h"
 
 //----------------------------------------------------------------------------
 void mafPipeVolumeProjectedTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
+
 //----------------------------------------------------------------------------
 void mafPipeVolumeProjectedTest::BeforeTest()
 //----------------------------------------------------------------------------
@@ -80,12 +83,12 @@ void mafPipeVolumeProjectedTest::TestPipeExecution()
   vtkDataSetReader *Importer;
   vtkNEW(Importer);
   mafString filename=MAF_DATA_ROOT;
-  filename<<"/Test_PipeVolumeProjected/volumeRG.vtk";
+  filename<<"/VTK_Volumes/volume.vtk";
   Importer->SetFileName(filename);
   Importer->Update();
   mafVMEVolumeGray *volumeInput;
   mafNEW(volumeInput);
-  volumeInput->SetData((vtkRectilinearGrid*)Importer->GetOutput(),0.0);
+  volumeInput->SetData((vtkStructuredPoints*)Importer->GetOutput(),0.0);
   volumeInput->GetOutput()->GetVTKData()->Update();
   volumeInput->GetOutput()->Update();
   volumeInput->Update();
@@ -141,6 +144,86 @@ void mafPipeVolumeProjectedTest::TestPipeExecution()
   mafDEL(material);
   mafDEL(volumeInput);
   vtkDEL(Importer);
+}
+
+//----------------------------------------------------------------------------
+void mafPipeVolumeProjectedTest::TestProjectionRange()
+{
+	////// Create VME (import vtkData) ////////////////////
+	vtkDataSetReader *Importer;
+	vtkNEW(Importer);
+	mafString filename = MAF_DATA_ROOT;
+	filename << "/VTK_Volumes/volume.vtk";
+	Importer->SetFileName(filename);
+	Importer->Update();
+	mafVMEVolumeGray *volumeInput;
+	mafNEW(volumeInput);
+	volumeInput->SetData((vtkStructuredPoints*)Importer->GetOutput(), 0.0);
+	volumeInput->GetOutput()->GetVTKData()->Update();
+	volumeInput->GetOutput()->Update();
+	volumeInput->Update();
+	
+	//Creating a range valid for all sides
+	int *dims = vtkStructuredPoints::SafeDownCast(volumeInput->GetOutput()->GetVTKData())->GetDimensions();
+	int minDim = MIN(dims[0], MIN(dims[1], dims[2]));
+	int prjRange[2];
+	prjRange[0] = minDim/4;
+	prjRange[1] = prjRange[0] * 3;
+	
+
+	mmaVolumeMaterial *material;
+	mafNEW(material);
+
+	mafVMEOutputVolume::SafeDownCast(volumeInput->GetOutput())->SetMaterial(material);
+
+	//Assembly will be create when instancing mafSceneNode
+	mafSceneNode *sceneNode;
+	sceneNode = new mafSceneNode(NULL, NULL, volumeInput, m_Renderer);
+	int testNum = 0;
+	for (int camera = CAMERA_RX_FRONT; camera <= CAMERA_RX_RIGHT; camera++)
+	{
+		/////////// Pipe Instance and Creation ///////////
+		mafPipeVolumeProjected *pipeProjected = new mafPipeVolumeProjected;
+		pipeProjected->InitializeProjectParameters(camera);
+		pipeProjected->EnableRangeProjection(true);
+		pipeProjected->SetProjectionRange(prjRange);
+		pipeProjected->Create(sceneNode);
+
+		////////// ACTORS List ///////////////
+		vtkPropCollection *actorList = vtkPropCollection::New();
+		pipeProjected->GetAssemblyFront()->GetActors(actorList);
+
+		actorList->InitTraversal();
+		vtkProp *actor = actorList->GetNextProp();
+		while (actor)
+		{
+			m_Renderer->AddActor(actor);
+			m_RenderWindow->Render();
+
+			actor = actorList->GetNextProp();
+		}
+
+		vtkActor *projActor;
+		projActor = (vtkActor *)SelectActorToControl(actorList, 0);
+		CPPUNIT_ASSERT(projActor != NULL);
+
+		m_Renderer->ResetCamera();
+		m_RenderWindow->Render();
+
+		COMPARE_IMAGES("TestProjectionRange", testNum);
+
+		m_Renderer->RemoveAllProps();
+		vtkDEL(actorList);
+		sceneNode->DeletePipe();
+
+		testNum++;
+	}
+
+	delete sceneNode;
+
+	mafDEL(material);
+	mafDEL(volumeInput);
+	vtkDEL(Importer);
 }
 
 //----------------------------------------------------------------------------
