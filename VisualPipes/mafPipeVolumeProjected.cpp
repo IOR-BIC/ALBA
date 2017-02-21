@@ -61,6 +61,10 @@ mafPipeVolumeProjected::mafPipeVolumeProjected()
 {
   m_CamPosition = CAMERA_RX_FRONT;
 
+	m_SPProjFilter = NULL;
+	m_RGProjFilter = NULL;
+	m_ProjectionRange[0] = m_ProjectionRange[1] = 0;
+	m_RangeProjectionEnabled = false;
 	m_VolumeBoxActor = NULL;
 }
 //----------------------------------------------------------------------------
@@ -89,9 +93,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	vtkPlaneSource     *RXPlane       = NULL;
 	vtkPolyDataMapper  *RXPlaneMapper	= NULL;
 	vtkTexture         *RXTexture			= NULL;
-	vtkMAFProjectSP       *SPProjection	= NULL;
-	vtkMAFProjectRG       *RGProjection	= NULL;
-	
+		
   vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
   vtk_data->Update();
 
@@ -137,32 +139,34 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 
 	if (vtk_data->IsA("vtkImageData")) //BES: 4.11.2008 - vtkStructuredPoints are derived from vtkImageData
 	{
-		SPProjection = vtkMAFProjectSP::New();
-    mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,SPProjection));
-		SPProjection->SetInput(((vtkImageData *)vtk_data)); //BES: 4.11.2008
+		m_SPProjFilter = vtkMAFProjectSP::New();
+			m_SPProjFilter->SetInput(((vtkImageData *)vtk_data)); //BES: 4.11.2008
 		if (m_CamPosition == CAMERA_RX_FRONT )
-			SPProjection->SetProjectionModeToY();
+			m_SPProjFilter->SetProjectionModeToY();
 		else
-			SPProjection->SetProjectionModeToX();
-		SPProjection->Update();
-		SPProjection->GetOutput()->GetScalarRange(range);
-		RXTexture->SetInput(SPProjection->GetOutput());
-	}
+			m_SPProjFilter->SetProjectionModeToX();
+		m_SPProjFilter->SetProjectSubRange(m_RangeProjectionEnabled);
+		m_SPProjFilter->SetProjectionRange(m_ProjectionRange);
+		m_SPProjFilter->Update();
 
-  if (vtk_data->IsA("vtkRectilinearGrid"))
+		m_SPProjFilter->GetOutput()->GetScalarRange(range);
+		RXTexture->SetInput(m_SPProjFilter->GetOutput());
+	}
+	else if (vtk_data->IsA("vtkRectilinearGrid"))
 	{
-		RGProjection = vtkMAFProjectRG::New();
-    mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,RGProjection));
-		RGProjection->SetInput(vtkRectilinearGrid::SafeDownCast(vtk_data));
+		m_RGProjFilter = vtkMAFProjectRG::New();
+		m_RGProjFilter->SetInput(vtkRectilinearGrid::SafeDownCast(vtk_data));
 		vtkStructuredPoints *SP = vtkStructuredPoints::New();
 		if (m_CamPosition == CAMERA_RX_FRONT)
-			RGProjection->SetProjectionModeToY();
+			m_RGProjFilter->SetProjectionModeToY();
 		else
-			RGProjection->SetProjectionModeToX();
+			m_RGProjFilter->SetProjectionModeToX();
+		m_RGProjFilter->SetProjectSubRange(m_RangeProjectionEnabled);
+		m_RGProjFilter->SetProjectionRange(m_ProjectionRange);
+		m_RGProjFilter->Update();
 
-		RGProjection->Update();
 		double b[6];
-		RGProjection->GetOutput()->GetBounds(b);
+		m_RGProjFilter->GetOutput()->GetBounds(b);
 		double x0 = b[0];
 		double x1 = b[1];
 		double y0 = b[2];
@@ -175,7 +179,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
   
 		vtkProbeFilter *pf = vtkProbeFilter::New();
 		pf->SetInput(SP);
-		pf->SetInput(RGProjection->GetOutput());
+		pf->SetSource(m_RGProjFilter->GetOutput());
 		pf->Update();
 		((vtkImageData* )pf->GetOutput())->GetScalarRange(range);
 		RXTexture->SetInput( (vtkImageData* )pf->GetOutput() );
@@ -309,8 +313,6 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	vtkDEL(RXPlane);
 	vtkDEL(RXPlaneMapper);
 	vtkDEL(RXTexture);
-	vtkDEL(SPProjection);
-	vtkDEL(RGProjection);
 	vtkDEL(TickMapper);
 	vtkDEL(TickProperty);
 }
@@ -318,6 +320,9 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 mafPipeVolumeProjected::~mafPipeVolumeProjected()
 //----------------------------------------------------------------------------
 {
+	vtkDEL(m_SPProjFilter);
+	vtkDEL(m_RGProjFilter);
+
 	if(m_VolumeBoxActor)
     m_UsedAssembly->RemovePart(m_VolumeBoxActor);
 	m_UsedAssembly->RemovePart(m_TickActor);
@@ -356,6 +361,28 @@ void mafPipeVolumeProjected::GetLutRange(double range[2])
 {
 	m_Lut->GetTableRange(range);
 }
+
+//----------------------------------------------------------------------------
+void mafPipeVolumeProjected::EnableRangeProjection(bool enabled)
+{
+	m_RangeProjectionEnabled = enabled;
+	if (m_SPProjFilter)
+		m_SPProjFilter->SetProjectSubRange(enabled);
+	else if(m_RGProjFilter)
+		m_RGProjFilter->SetProjectSubRange(enabled);
+}
+
+//----------------------------------------------------------------------------
+void mafPipeVolumeProjected::SetProjectionRange(int range[2])
+{
+	m_ProjectionRange[0] = range[0];
+	m_ProjectionRange[1] = range[1];
+	if (m_SPProjFilter)
+		m_SPProjFilter->SetProjectionRange(range);
+	else if (m_RGProjFilter)
+		m_RGProjFilter->SetProjectionRange(range);
+}
+
 //----------------------------------------------------------------------------
 void mafPipeVolumeProjected::TickActorVisibilityOn()
 //----------------------------------------------------------------------------
