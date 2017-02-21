@@ -30,6 +30,8 @@ class vtkWindowLevelLookupTable;
 class vtkMAFAssembly;
 class vtkOutlineCornerFilter;
 class vtkPolyDataMapper;
+class vtkMAFProjectSP;
+class vtkMAFProjectRG;
 
 //----------------------------------------------------------------------------
 // mafPipeVolumeProjected :
@@ -58,6 +60,12 @@ public:
 	/** Get the range of the texture's lookup table. */
 	void GetLutRange(double range[2]);
 
+	/** Enable/Disable the projection of a subrange on the projection direction */
+	void EnableRangeProjection(bool enabled);
+
+	/** Sets the range of projection, the range is expressed like volume dims*/
+	void SetProjectionRange(int range[2]);
+
   /** Set Tick Actor Visibility */
   void TickActorVisibilityOn();
   void TickActorVisibilityOff();
@@ -74,6 +82,10 @@ protected:
 	vtkOutlineCornerFilter *m_VolumeBox;
   vtkPolyDataMapper			 *m_VolumeBoxMapper;
   vtkActor               *m_VolumeBoxActor;
+	vtkMAFProjectSP       *m_SPProjFilter;
+	vtkMAFProjectRG       *m_RGProjFilter;
+	bool m_RangeProjectionEnabled;
+	int m_ProjectionRange[2];
 
   vtkWindowLevelLookupTable *m_Lut;
   vtkMAFAssembly            *m_UsedAssembly;
