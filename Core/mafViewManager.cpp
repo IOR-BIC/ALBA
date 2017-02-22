@@ -346,6 +346,13 @@ mafView *mafViewManager::ViewCreate(int id)
   mafEventMacro(mafEvent(this,VIEW_CREATED,new_view)); // ask Logic to create the frame
 	
 	new_view->GetFrame()->Show(true); // show the view's frame
+ 	
+	//Setting size to avoid wrong graphic draw 
+	wxSize size=new_view->GetFrame()->GetSize();
+	wxSizeEvent evt(size);
+	new_view->GetFrame()->OnSize(evt);
+	new_view->GetFrame()->Fit();
+	mafYield();
 
 	return new_view;
 }
