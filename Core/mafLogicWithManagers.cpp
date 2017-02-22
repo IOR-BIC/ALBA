@@ -1332,6 +1332,9 @@ void mafLogicWithManagers::OnFileSaveAs()
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeShow(mafVME *vme, bool visibility)
 {
+	if (!vme)
+		return;
+
 	if (m_ViewManager)
 	{
 		mafVMELandmarkCloud *lmc = mafVMELandmarkCloud::SafeDownCast(vme);
@@ -1353,6 +1356,9 @@ void mafLogicWithManagers::VmeShow(mafVME *vme, bool visibility)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeModified(mafVME *vme)
 {
+	if (!vme) 
+		return;
+
 	if (m_VMEManager->GetRoot()->IsInTree(vme))
 	{
 		if (m_PlugTimebar) UpdateTimeBounds();
@@ -1378,12 +1384,17 @@ void mafLogicWithManagers::VmeModified(mafVME *vme)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeAdd(mafVME *vme)
 {
+	if (!vme) 
+		return;
 	if(m_VMEManager) 
     m_VMEManager->VmeAdd(vme);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeAdded(mafVME *vme)
 {
+	if (!vme) 
+		return;
+
   if(m_ViewManager)
     m_ViewManager->VmeAdd(vme);
 
@@ -1400,6 +1411,9 @@ void mafLogicWithManagers::VmeAdded(mafVME *vme)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemove(mafVME *vme)
 {
+	if (!vme) 
+		return;
+
   if(m_VMEManager)
     m_VMEManager->VmeRemove(vme);
 
@@ -1415,6 +1429,9 @@ void mafLogicWithManagers::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemoving(mafVME *vme)
 {
+	if (!vme) 
+		return;
+
   bool vme_in_tree = true;
   vme_in_tree = !vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") || 
     (vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") && vme->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() != 0);
