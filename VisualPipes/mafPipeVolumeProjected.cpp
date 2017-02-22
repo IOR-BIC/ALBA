@@ -365,11 +365,16 @@ void mafPipeVolumeProjected::GetLutRange(double range[2])
 //----------------------------------------------------------------------------
 void mafPipeVolumeProjected::EnableRangeProjection(bool enabled)
 {
+	if (m_RangeProjectionEnabled == enabled)
+		return;
+
 	m_RangeProjectionEnabled = enabled;
 	if (m_SPProjFilter)
 		m_SPProjFilter->SetProjectSubRange(enabled);
 	else if(m_RGProjFilter)
 		m_RGProjFilter->SetProjectSubRange(enabled);
+
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -381,6 +386,9 @@ void mafPipeVolumeProjected::SetProjectionRange(int range[2])
 		m_SPProjFilter->SetProjectionRange(range);
 	else if (m_RGProjFilter)
 		m_RGProjFilter->SetProjectionRange(range);
+
+	if(m_RangeProjectionEnabled)
+		GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -403,5 +411,6 @@ void mafPipeVolumeProjected::SetActorPicking(int enable)
 {
   m_RXActor->SetPickable(enable);
   m_RXActor->Modified();
+	
 	GetLogicManager()->CameraUpdate();
 }
