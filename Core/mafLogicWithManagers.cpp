@@ -564,7 +564,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				FindVME();
 				break;
 			case VME_SELECT:
-				VmeSelect(*e);
+				VmeSelect(e->GetVme());
 				EnableMenuAndToolbar();
 				break;
 			case VME_SELECTED:
@@ -1473,40 +1473,7 @@ void mafLogicWithManagers::VmeSelect(mafVME *vme)
 
 	EnableMenuAndToolbar();
 }
-//----------------------------------------------------------------------------
-void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
-{
-	mafVME *node = NULL;
 
-	if (m_PlugControlPanel && (e.GetSender() == this->m_SideBar->GetTree()))
-		node = (mafVME*)e.GetArg();//sender == tree => the node is in e.arg
-	else
-		node = e.GetVme();          //sender == PER  => the node is in e.node  
-
-	if (node == NULL)
-	{
-		//node can be selected by its ID
-		if (m_VMEManager)
-		{
-			long vme_id = e.GetArg();
-			mafVMERoot *root = this->m_VMEManager->GetRoot();
-			if (root)
-			{
-				node = root->FindInTreeById(vme_id);
-				e.SetVme(node);
-			}
-		}
-	}
-
-	if (node != NULL && m_OpManager)
-		m_OpManager->OpSelect(node);
-
-	// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-	if (m_InteractionManager)
-		m_InteractionManager->VmeSelected(node);
-#endif
-}
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeSelected(mafVME *vme)
 {

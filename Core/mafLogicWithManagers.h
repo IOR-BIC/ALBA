@@ -283,8 +283,6 @@ protected:
 	Example: dragging a VTK file over the application cause the application to inport it through the importer.*/
 	virtual void ImportExternalFile(mafString &filename);
 
-	/** Respond to a VME_SELECT evt. Instantiate the 'Select' operation. */
-	virtual void VmeSelect(mafEvent &e);
 	/** Respond to a VME_SELECT evt. Update the selection on the tree and view representation. */
 	virtual void VmeSelect(mafVME *vme);
 	/** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
