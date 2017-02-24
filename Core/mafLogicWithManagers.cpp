@@ -1508,6 +1508,8 @@ void mafLogicWithManagers::VmeSelected(mafVME *vme)
 		m_SideBar->VmeSelected(vme);
 		m_SideBar->GetTree()->SetFocus();
 	}
+
+	EnableMenuAndToolbar();
 }
 //----------------------------------------------------------------------------
 std::vector<mafVME*> mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, mafString title, bool multiSelect, mafVME *vme)
