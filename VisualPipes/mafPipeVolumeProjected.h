@@ -32,6 +32,7 @@ class vtkOutlineCornerFilter;
 class vtkPolyDataMapper;
 class vtkMAFProjectSP;
 class vtkMAFProjectRG;
+class vtkRectilinearGrid;
 
 //----------------------------------------------------------------------------
 // mafPipeVolumeProjected :
@@ -50,6 +51,8 @@ public:
   void InitializeProjectParameters(int cam_position);
   
   virtual void Create(mafSceneNode *n);
+
+	void GetBestSpacing(double * bestSpacing, vtkRectilinearGrid* rGrid);
 
 	/** Show-Hide the RX bounding box actor. */
   void Select     (bool select);
