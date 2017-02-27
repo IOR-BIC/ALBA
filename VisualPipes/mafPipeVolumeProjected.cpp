@@ -155,7 +155,8 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	else if (vtk_data->IsA("vtkRectilinearGrid"))
 	{
 		m_RGProjFilter = vtkMAFProjectRG::New();
-		m_RGProjFilter->SetInput(vtkRectilinearGrid::SafeDownCast(vtk_data));
+		vtkRectilinearGrid* rGrid = vtkRectilinearGrid::SafeDownCast(vtk_data);
+		m_RGProjFilter->SetInput(rGrid);
 		vtkStructuredPoints *SP = vtkStructuredPoints::New();
 		if (m_CamPosition == CAMERA_RX_FRONT)
 			m_RGProjFilter->SetProjectionModeToY();
@@ -165,17 +166,27 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 		m_RGProjFilter->SetProjectionRange(m_ProjectionRange);
 		m_RGProjFilter->Update();
 
+		double bestSpacing[3];
+		GetBestSpacing(bestSpacing, rGrid);
+		double outputSpacing[2];
+
+		if (m_CamPosition == CAMERA_RX_FRONT)
+		{
+			outputSpacing[0] = bestSpacing[0];
+			outputSpacing[1] = bestSpacing[2];
+		}
+		else
+		{
+			outputSpacing[0] = bestSpacing[1];
+			outputSpacing[1] = bestSpacing[2];
+		}
+
 		double b[6];
 		m_RGProjFilter->GetOutput()->GetBounds(b);
-		double x0 = b[0];
-		double x1 = b[1];
-		double y0 = b[2];
-		double y1 = b[3];
-		double z0 = b[4];
-		double z1 = b[5];
-		SP->SetOrigin(x0,y0,z0);
-		SP->SetDimensions(128, 128, 1);
-		SP->SetSpacing((x1-x0)/128, (y1-y0)/128, 1);
+
+		SP->SetOrigin(b[0],b[2],b[4]);
+		SP->SetDimensions(((b[1]-b[0])/outputSpacing[0])+1, ((b[3]-b[2])/outputSpacing[1])+1, 1);
+		SP->SetSpacing(outputSpacing[0], outputSpacing[1], 1);
   
 		vtkProbeFilter *pf = vtkProbeFilter::New();
 		pf->SetInput(SP);
@@ -183,6 +194,9 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 		pf->Update();
 		((vtkImageData* )pf->GetOutput())->GetScalarRange(range);
 		RXTexture->SetInput( (vtkImageData* )pf->GetOutput() );
+
+		double *tmp = SP->GetBounds();
+
 		SP->Delete();
 		pf->Delete();
 	}
@@ -316,6 +330,36 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	vtkDEL(TickMapper);
 	vtkDEL(TickProperty);
 }
+
+//----------------------------------------------------------------------------
+void mafPipeVolumeProjected::GetBestSpacing(double * bestSpacing, vtkRectilinearGrid* rGrid)
+{
+	bestSpacing[0] = VTK_DOUBLE_MAX;
+	bestSpacing[1] = VTK_DOUBLE_MAX;
+	bestSpacing[2] = VTK_DOUBLE_MAX;
+
+	for (int xi = 1; xi < rGrid->GetXCoordinates()->GetNumberOfTuples(); xi++)
+	{
+		double spcx = rGrid->GetXCoordinates()->GetTuple1(xi) - rGrid->GetXCoordinates()->GetTuple1(xi - 1);
+		if (bestSpacing[0] > spcx && spcx != 0.0)
+			bestSpacing[0] = spcx;
+	}
+
+	for (int yi = 1; yi < rGrid->GetYCoordinates()->GetNumberOfTuples(); yi++)
+	{
+		double spcy = rGrid->GetYCoordinates()->GetTuple1(yi) - rGrid->GetYCoordinates()->GetTuple1(yi - 1);
+		if (bestSpacing[1] > spcy && spcy != 0.0)
+			bestSpacing[1] = spcy;
+	}
+
+	for (int zi = 1; zi < rGrid->GetZCoordinates()->GetNumberOfTuples(); zi++)
+	{
+		double spcz = rGrid->GetZCoordinates()->GetTuple1(zi) - rGrid->GetZCoordinates()->GetTuple1(zi - 1);
+		if (bestSpacing[2] > spcz && spcz != 0.0)
+			bestSpacing[2] = spcz;
+	}
+}
+
 //----------------------------------------------------------------------------
 mafPipeVolumeProjected::~mafPipeVolumeProjected()
 //----------------------------------------------------------------------------
