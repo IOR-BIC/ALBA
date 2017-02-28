@@ -160,6 +160,7 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_ShowStorageSettings = false;
 	m_ShowInteractionSettings = false;
 	m_SelectedLandmark = NULL;
+	m_FatalExptionOccurred = false;
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers()
@@ -375,23 +376,23 @@ void mafLogicWithManagers::Plug( mafWizard *wizard, wxString menuPath /*= ""*/ )
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnQuit()
 {
-	if (m_WizardManager && m_WizardRunning)
+	if (!m_FatalExptionOccurred && m_WizardManager && m_WizardRunning)
 	{
 		wxMessageBox(_("Please exit wizard before quit."), _("Wizard running"), wxOK | wxCENTER | wxICON_STOP);
 		return;
 	}
-	if (m_OpManager && m_OpManager->Running())
+	if (!m_FatalExptionOccurred &&  m_OpManager && m_OpManager->Running())
 	{
 		wxMessageBox(_("Please exit operation before quit."), _("Operation running"), wxOK | wxCENTER | wxICON_STOP);
 		return;
 	}
 
-	if (m_OpManager && m_OpManager->Running())
+	if (!m_FatalExptionOccurred && m_OpManager && m_OpManager->Running())
 	{
 		return;
 	}
 
-	if (m_VMEManager)
+	if (!m_FatalExptionOccurred &&  m_VMEManager)
 	{
 		m_Quitting = false;
 		if (m_VMEManager->MSFIsModified())
@@ -2490,14 +2491,19 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::HandleException()
 {
-	int answare = wxMessageBox(_("Do you want to try to save the unsaved work ?"), _("Fatal Exception!!"), wxYES_NO | wxCENTER);
-	if (answare == wxYES)
+
+	if (!m_FatalExptionOccurred)
 	{
-		OnFileSaveAs();
+		m_FatalExptionOccurred = true;
 
-		if (m_OpManager->Running())
-			m_OpManager->StopCurrentOperation();
+		int answare = wxMessageBox(_("An Excpetion has occurred and this application must be closed.\nYou can make a attempt to save your work.\nDo You want to proceed?"), _("Fatal Exception!"), wxYES_NO | wxCENTER | wxICON_ERROR | wxYES_DEFAULT);
+		if (answare == wxYES)
+		{
+			OnFileSaveAs();
+
+			if (m_OpManager->Running())
+				m_OpManager->StopCurrentOperation();
+		}
 	}
-
 	OnQuit();
 }

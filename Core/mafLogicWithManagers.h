@@ -446,5 +446,6 @@ protected:
 	bool m_PlugLogPanel;  ///< Flag to plug or not the Log area into the application. Default is true.
 	bool m_ShowStorageSettings; ///<Flag to show storage setting default is false.
 	bool m_ShowInteractionSettings; ///<Flag to show storage setting default is false.
+	bool m_FatalExptionOccurred;
 };
 #endif
