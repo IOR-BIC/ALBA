@@ -524,7 +524,7 @@ bool ExampleApp::OnInit()
 	vComp->PackageView();
 	m_Logic->Plug(vComp);
 
-	//wxHandleFatalExceptions();
+	wxHandleFatalExceptions();
 
 	//m_Logic->ShowSplashScreen();
 	m_Logic->Show();
