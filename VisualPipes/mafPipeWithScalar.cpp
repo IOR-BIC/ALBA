@@ -239,7 +239,7 @@ void mafPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 			vtkDataSet *outputVTK = vtkDataSet::SafeDownCast(item->GetData());
 			if(outputVTK)
 			{
-				if(m_ActiveScalarType == POINT_TYPE)
+				if(m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0)
 				{
 					wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].c_str();
 					vtkDataArray *scalarsArray = outputVTK->GetPointData()->GetArray(scalarsToActivate);
@@ -256,7 +256,7 @@ void mafPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 					outputVTK->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
 					outputVTK->GetPointData()->GetScalars()->Modified();
 				}
-				else if(m_ActiveScalarType == CELL_TYPE)
+				else if(m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation >0))
 				{
 					wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].c_str();
 					vtkDataArray *scalarsArray = outputVTK->GetCellData()->GetArray(scalarsToActivate);

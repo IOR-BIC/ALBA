@@ -160,6 +160,7 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_ShowStorageSettings = false;
 	m_ShowInteractionSettings = false;
 	m_SelectedLandmark = NULL;
+	m_FatalExptionOccurred = false;
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers()
@@ -375,23 +376,23 @@ void mafLogicWithManagers::Plug( mafWizard *wizard, wxString menuPath /*= ""*/ )
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnQuit()
 {
-	if (m_WizardManager && m_WizardRunning)
+	if (!m_FatalExptionOccurred && m_WizardManager && m_WizardRunning)
 	{
 		wxMessageBox(_("Please exit wizard before quit."), _("Wizard running"), wxOK | wxCENTER | wxICON_STOP);
 		return;
 	}
-	if (m_OpManager && m_OpManager->Running())
+	if (!m_FatalExptionOccurred &&  m_OpManager && m_OpManager->Running())
 	{
 		wxMessageBox(_("Please exit operation before quit."), _("Operation running"), wxOK | wxCENTER | wxICON_STOP);
 		return;
 	}
 
-	if (m_OpManager && m_OpManager->Running())
+	if (!m_FatalExptionOccurred && m_OpManager && m_OpManager->Running())
 	{
 		return;
 	}
 
-	if (m_VMEManager)
+	if (!m_FatalExptionOccurred &&  m_VMEManager)
 	{
 		m_Quitting = false;
 		if (m_VMEManager->MSFIsModified())
@@ -564,7 +565,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				FindVME();
 				break;
 			case VME_SELECT:
-				VmeSelect(*e);
+				VmeSelect(e->GetVme());
 				EnableMenuAndToolbar();
 				break;
 			case VME_SELECTED:
@@ -1332,6 +1333,9 @@ void mafLogicWithManagers::OnFileSaveAs()
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeShow(mafVME *vme, bool visibility)
 {
+	if (!vme)
+		return;
+
 	if (m_ViewManager)
 	{
 		mafVMELandmarkCloud *lmc = mafVMELandmarkCloud::SafeDownCast(vme);
@@ -1353,6 +1357,9 @@ void mafLogicWithManagers::VmeShow(mafVME *vme, bool visibility)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeModified(mafVME *vme)
 {
+	if (!vme) 
+		return;
+
 	if (m_VMEManager->GetRoot()->IsInTree(vme))
 	{
 		if (m_PlugTimebar) UpdateTimeBounds();
@@ -1378,12 +1385,17 @@ void mafLogicWithManagers::VmeModified(mafVME *vme)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeAdd(mafVME *vme)
 {
+	if (!vme) 
+		return;
 	if(m_VMEManager) 
     m_VMEManager->VmeAdd(vme);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeAdded(mafVME *vme)
 {
+	if (!vme) 
+		return;
+
   if(m_ViewManager)
     m_ViewManager->VmeAdd(vme);
 
@@ -1400,6 +1412,9 @@ void mafLogicWithManagers::VmeAdded(mafVME *vme)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemove(mafVME *vme)
 {
+	if (!vme) 
+		return;
+
   if(m_VMEManager)
     m_VMEManager->VmeRemove(vme);
 
@@ -1415,6 +1430,9 @@ void mafLogicWithManagers::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemoving(mafVME *vme)
 {
+	if (!vme) 
+		return;
+
   bool vme_in_tree = true;
   vme_in_tree = !vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") || 
     (vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") && vme->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() != 0);
@@ -1456,40 +1474,7 @@ void mafLogicWithManagers::VmeSelect(mafVME *vme)
 
 	EnableMenuAndToolbar();
 }
-//----------------------------------------------------------------------------
-void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
-{
-	mafVME *node = NULL;
 
-	if (m_PlugControlPanel && (e.GetSender() == this->m_SideBar->GetTree()))
-		node = (mafVME*)e.GetArg();//sender == tree => the node is in e.arg
-	else
-		node = e.GetVme();          //sender == PER  => the node is in e.node  
-
-	if (node == NULL)
-	{
-		//node can be selected by its ID
-		if (m_VMEManager)
-		{
-			long vme_id = e.GetArg();
-			mafVMERoot *root = this->m_VMEManager->GetRoot();
-			if (root)
-			{
-				node = root->FindInTreeById(vme_id);
-				e.SetVme(node);
-			}
-		}
-	}
-
-	if (node != NULL && m_OpManager)
-		m_OpManager->OpSelect(node);
-
-	// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-	if (m_InteractionManager)
-		m_InteractionManager->VmeSelected(node);
-#endif
-}
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeSelected(mafVME *vme)
 {
@@ -1524,6 +1509,8 @@ void mafLogicWithManagers::VmeSelected(mafVME *vme)
 		m_SideBar->VmeSelected(vme);
 		m_SideBar->GetTree()->SetFocus();
 	}
+
+	EnableMenuAndToolbar();
 }
 //----------------------------------------------------------------------------
 std::vector<mafVME*> mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, mafString title, bool multiSelect, mafVME *vme)
@@ -2504,14 +2491,19 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::HandleException()
 {
-	int answare = wxMessageBox(_("Do you want to try to save the unsaved work ?"), _("Fatal Exception!!"), wxYES_NO | wxCENTER);
-	if (answare == wxYES)
+
+	if (!m_FatalExptionOccurred)
 	{
-		OnFileSaveAs();
+		m_FatalExptionOccurred = true;
 
-		if (m_OpManager->Running())
-			m_OpManager->StopCurrentOperation();
+		int answare = wxMessageBox(_("An Excpetion has occurred and this application must be closed.\nYou can make a attempt to save your work.\nDo You want to proceed?"), _("Fatal Exception!"), wxYES_NO | wxCENTER | wxICON_ERROR | wxYES_DEFAULT);
+		if (answare == wxYES)
+		{
+			OnFileSaveAs();
+
+			if (m_OpManager->Running())
+				m_OpManager->StopCurrentOperation();
+		}
 	}
-
 	OnQuit();
 }
