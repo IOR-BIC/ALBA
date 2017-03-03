@@ -213,12 +213,7 @@ public:
   /** destroy the Gui */
   void DeleteGui();
 
-  virtual double *GetSlice();
-  virtual void    SetSlice(double slice[3]);
-
-  virtual double *GetNormal();
-  virtual void    SetNormal(double normal[3]);
-
+  
   
 protected:
   /**
@@ -229,10 +224,7 @@ protected:
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same panel GUI, each CreateGUI() function should first call the superclass' one.*/
   virtual mafGUI  *CreateGui();
-
-  double m_Slice[3];
-  double m_Normal[3];
-
+	  
   bool m_LightCopyEnabled;
 };
 #endif

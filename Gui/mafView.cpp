@@ -68,11 +68,7 @@ mafView::mafView(const wxString &label)
   m_PickedVME         = NULL;
   m_PickedProp        = NULL;
   m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0.0;
-
-  //parameters
-  m_Slice[0] = m_Slice[1] = m_Slice[2] =  0.;
-  m_Normal[0] = m_Normal[1] = m_Normal[2] =  0.;
-
+	 
   m_HTMLText = "";
   m_LightCopyEnabled = false;
 }
@@ -255,36 +251,4 @@ char ** mafView::GetIcon()
 {
 #include "pic/VIEW.xpm"
 		return VIEW_xpm;
-}
-
-//-------------------------------------------------------------------------
-double *mafView::GetSlice()// const
-//-------------------------------------------------------------------------
-{
-  return m_Slice;
-}
-
-//-------------------------------------------------------------------------
-void mafView::SetSlice(double slice[3])// const
-//-------------------------------------------------------------------------
-{
-  m_Slice[0] = slice[0];
-  m_Slice[1] = slice[1];
-  m_Slice[2] = slice[2];
-}
-
-//-------------------------------------------------------------------------
-double *mafView::GetNormal()// const
-//-------------------------------------------------------------------------
-{
-  return m_Normal;
-}
-
-//-------------------------------------------------------------------------
-void mafView::SetNormal(double normal[3])// const
-//-------------------------------------------------------------------------
-{
-  m_Normal[0] = normal[0];
-  m_Normal[1] = normal[1];
-  m_Normal[2] = normal[2];
 }
