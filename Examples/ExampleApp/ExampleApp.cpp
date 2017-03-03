@@ -509,6 +509,11 @@ bool ExampleApp::OnInit()
 // 	vVTKC->PackageView();
 // 	m_Logic->Plug(vVTKC);
 
+	//View RayCast
+	mafViewVTK *vRayCast = new mafViewVTK("3D Volume Rendering");
+	vRayCast->PlugVisualPipe("mafVMEVolumeGray", "mafPipeRayCast", MUTEX);
+	m_Logic->Plug(vRayCast);
+
 	//View Plot
 	mafViewPlot *vplot = new mafViewPlot("Plot (mafViewPlot)");
 	//vplot->PackageView();
