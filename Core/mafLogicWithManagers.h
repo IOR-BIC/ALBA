@@ -183,6 +183,10 @@ public:
 	/** Manage application exception and allow to save at least the tree. */
 	virtual void HandleException();
 
+	/*About Dialog*/
+	void ShowAboutDialog();
+	wxStaticText* AddText(mafGUIDialog * dialog, wxString &text, int Width, int align);
+
 	/** Set the revision string */
 	void SetRevision(mafString revision) { m_Revision = revision; };
 
