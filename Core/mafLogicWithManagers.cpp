@@ -2511,16 +2511,30 @@ void mafLogicWithManagers::ShowAboutDialog()
 // 	wxString imgPath = imagesPath + "/HipOpCTAbout.bmp";
 
 	wxString title = "About ";
-	title += m_AppTitle.GetCStr();;
+	title += m_AppTitle.GetCStr();
+	wxString revision;
+
+	wxRegKey RegKey(wxString("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + m_AppTitle));
+	if (RegKey.Exists())
+	{
+		if (RegKey.HasValue(wxString("DisplayVersion")))
+			RegKey.QueryValue(wxString("DisplayVersion"), revision);
+		else
+			revision = "Unknown Build";
+	}
+	else
+	{
+		wxString revision = "1.0";
+	}
 
 	wxString description = m_AppTitle.GetCStr();
 	description += "\n";
-	description += _("Application ") + m_Revision;
+	description += _("Application ") + revision;
 	description += "\n© 2017 LTM";
 
 	wxString copyright = "Distributed under";
 
-	mafLogMessage(wxString::Format("%s", m_Revision.GetCStr()));
+	mafLogMessage(wxString::Format("%s", revision));
 
 	//////////////////////////////////////////////////////////////////////////
 
