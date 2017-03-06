@@ -83,6 +83,8 @@
 #include "mafVMELandmark.h"
 #include "mafHelpManager.h"
 #include "mafServiceLocator.h"
+#include "mafGUIPicButton.h"
+#include "mafGUIButton.h"
 
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
@@ -451,7 +453,6 @@ void mafLogicWithManagers::OnQuit()
 // EVENT /////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
@@ -912,12 +913,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				break;
 			case ABOUT_APPLICATION:
 			{
-				// trap the ABOUT_APPLICATION event and shows the about window with the application infos
-				wxString message = m_AppTitle.GetCStr();
-				message += _(" Application ");
-				message += m_Revision;
-				wxMessageBox(message, "About Application");
-				mafLogMessage(wxString::Format("%s", m_Revision.GetCStr()));
+				ShowAboutDialog();
 			}
 			break;
 
@@ -2506,4 +2502,117 @@ void mafLogicWithManagers::HandleException()
 		}
 	}
 	OnQuit();
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::ShowAboutDialog()
+{
+	//wxString imagesPath = mafGetAppDataDirectory().c_str();//GetConfigDirectory().c_str();
+// 	wxString imgPath = imagesPath + "/HipOpCTAbout.bmp";
+
+	wxString title = "About ";
+	title += m_AppTitle.GetCStr();;
+
+	wxString description = m_AppTitle.GetCStr();
+	description += "\n";
+	description += _("Application ") + m_Revision;
+	description += "\n© 2017 LTM";
+
+	wxString copyright = "Distributed under";
+
+	mafLogMessage(wxString::Format("%s", m_Revision.GetCStr()));
+
+	//////////////////////////////////////////////////////////////////////////
+
+	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
+	mafGUIDialog *dialog = new mafGUIDialog(title, mafCLOSEWINDOW);
+
+	// Images
+// 	mafGUIPicButton *previewImageButton;
+// 
+ 	int panelWidth = 560;
+// 
+// 	if (wxFileExists(imgPath))
+// 	{
+// 		wxImage *previewImage;
+// 		wxBitmap *previewBitmap;
+// 
+// 		// Load and show the image
+// 		previewImage = new wxImage();
+// 		previewImage->LoadFile(imgPath.c_str(), wxBITMAP_TYPE_ANY);
+// 
+// 		previewBitmap = new wxBitmap(*previewImage);
+// 		previewImageButton = new mafGUIPicButton(dialog, previewBitmap, -1);
+// 
+// 		panelWidth = previewImage->GetWidth();
+// 
+// 		mainSizer->Add(previewImageButton, 0, wxALL | wxALIGN_CENTER, 0);
+// 
+// 		delete previewBitmap;
+// 	}
+
+	// Creating the static text area
+
+	wxBoxSizer *infoTextSizer = new wxBoxSizer(wxHORIZONTAL);
+
+	int borderSize = 10;
+
+	infoTextSizer->Add(AddText(dialog, description, (panelWidth / 2) - (borderSize * 2), wxALIGN_LEFT), 0, wxALL | wxALIGN_LEFT, borderSize);
+
+	mainSizer->Add(infoTextSizer, 0, wxTOP | wxLEFT, 0);
+
+	//wxBoxSizer *licenseTextSizer = new wxBoxSizer(wxHORIZONTAL);
+
+	//licenseTextSizer->Add(AddText(dialog, copyright, 85, wxALIGN_LEFT), 0, wxALL | wxALIGN_CENTER, 0);
+
+	//mafGUIButton *licenseButton = new mafGUIButton(dialog, ID_SHOW_LICENSE_SITE, "licence", wxPoint(-1,-1), wxSize(40, 20));
+	//licenseButton->SetBackgroundStyle(wxBG_STYLE_COLOUR);
+	//licenseButton->SetForegroundColour(wxColour(0,0,255));
+	//licenseTextSizer->Add(licenseButton, 0, wxEXPAND|wxLEFT, 0);
+	//licenseButton->SetListener(this);
+
+	//mainSizer->Add(licenseTextSizer, 0, wxTOP|wxLEFT|wxRIGHT|wxEXPAND, borderSize);
+
+	// Creating buttons
+	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
+
+	//mafGUIButton *siteButton = new mafGUIButton(dialog, ID_SHOW_WEB_SITE, "Web Site", wxPoint(-1, -1));
+	wxButton *okButton = new wxButton(dialog, wxID_OK, "Ok");
+	//siteButton->SetListener(this);
+
+	int buttonWidth = 75;
+
+	//buttonSizer->Add(siteButton, 0, wxALIGN_LEFT, 0);
+
+	wxString spacing = " ";
+	mainSizer->Add(AddText(dialog, spacing, panelWidth - (buttonWidth * 2) - borderSize, wxALIGN_RIGHT), 0, wxALL | wxALIGN_LEFT, 0);
+	buttonSizer->Add(AddText(dialog, spacing, panelWidth - (buttonWidth * 2) - borderSize, wxALIGN_RIGHT), 0, wxALL | wxALIGN_LEFT, 0);
+
+	buttonSizer->Add(okButton, 0, wxALIGN_RIGHT, 0);
+
+	mainSizer->Add(buttonSizer, 0, wxALL, 5);
+
+	dialog->Add(mainSizer, 0, wxALL);
+	dialog->Fit();
+
+	// Show dialog
+	wxSize s = mafGetFrame()->GetSize();
+	wxPoint p = mafGetFrame()->GetPosition();
+	int posX = p.x + s.GetWidth() * .5 - dialog->GetSize().GetWidth() * .5;
+	int posY = p.y + s.GetHeight() * .5 - dialog->GetSize().GetHeight() * .5;
+	dialog->SetPosition(wxPoint(posX, posY));
+	dialog->ShowModal();
+}
+//----------------------------------------------------------------------------
+wxStaticText* mafLogicWithManagers::AddText(mafGUIDialog * dialog, wxString &text, int Width, int align)
+{
+	// Creating the static text area
+	wxStaticText* guiLabel = new wxStaticText(dialog, -1, text, wxPoint(-1, -1), wxSize(Width, -1), align | wxST_NO_AUTORESIZE);
+	wxFont fixedFont = guiLabel->GetFont();
+
+	// Setting font to fixed size to avoid wx non-sense 
+	fixedFont.SetFamily(wxFONTFAMILY_DECORATIVE);
+	guiLabel->SetFont(fixedFont);
+
+	return guiLabel;
 }
