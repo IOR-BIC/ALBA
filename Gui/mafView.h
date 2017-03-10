@@ -39,7 +39,6 @@ class vtkCellPicker;
 class vtkMAFRayCast3DPicker;
 class vtkAssemblyPath;
 class vtkProp3D;
-class wxColor;
 
 //----------------------------------------------------------------------------
 // const :
@@ -82,7 +81,7 @@ public:
   mafView(const wxString &label = "View");
   virtual ~mafView(); 
 
-  mafTypeMacro(mafView, mafObject);
+	mafAbstractTypeMacro(mafView, mafObject);
 
   virtual void			SetListener(mafObserver *Listener) {m_Listener = Listener;};
   virtual void			OnEvent(mafEventBase *maf_event);

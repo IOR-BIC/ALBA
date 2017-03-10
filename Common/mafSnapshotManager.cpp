@@ -148,10 +148,6 @@ void mafSnapshotManager::CreateSnapshot(mafVME *root, mafView *selectedView)
 	}
 
 	m_SnapshotsGroup = snapshotsGroup;
-
-	//m_SideBar->VmeRemove(snapshotsGroup);
-	//snapshotsGroup->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
-
 	//////////////////////////////////////////////////////////////////////////
 
 	mafViewCompound *viewCompound = mafViewCompound::SafeDownCast(selectedView);
@@ -160,28 +156,30 @@ void mafSnapshotManager::CreateSnapshot(mafVME *root, mafView *selectedView)
 
 	if (viewCompound)
 	{
+		wxColor color = viewCompound->GetBackgroundColor();
+		viewCompound->SetBackgroundColor(wxColor(255, 255, 255));
+
 		wxBitmap btmComp;
 		viewCompound->GetImage(btmComp);
 		img = btmComp.ConvertToImage();
+
+		viewCompound->SetBackgroundColor(color);
 	}
 	else if (selectedView)
 	{
-		wxColor color = selectedView->GetRWI()->GetBackgroundColour();
-
-// 		selectedView->GetRWI()->ClearBackground();
-// 		selectedView->GetRWI()->SetBackgroundStyle(wxBG_STYLE_COLOUR);
-// 		selectedView->GetRWI()->SetBackgroundColour(wxColor(255, 255, 255));
-// 		selectedView->GetRWI()->Update();
-
+		wxColor color = selectedView->GetBackgroundColor();
+		selectedView->SetBackgroundColor(wxColor(255, 255, 255));
 
 		img = selectedView->GetRWI()->GetImage()->ConvertToImage();
+
+		selectedView->SetBackgroundColor(color);
 	}
 	else
 	{
 		return;
 	}
 
-	// Snapshot name
+	// Generate Snapshot name
 	wxString imageName = "Snapshot";
  	
 	char tmp[20];
@@ -246,6 +244,12 @@ void mafSnapshotManager::ShowSnapshotPreview(mafVME *node)
 	if (m_SnapshotsGroup)
 	{
 		FillImageList();
+	}
+	else
+	{
+		m_ImagesList.clear();
+		m_ImageSelection = 0;
+		return;
 	}
 
 	if (m_ImagesList.size() <= 0) return;
@@ -394,76 +398,45 @@ void mafSnapshotManager::UpdateSelectionDialog(int selection)
 
 	m_ImageSelection = selection;
 
-// 	if (nImages > 0)
-// 	{
-		wxString imageName = m_ImagesList[m_ImageSelection];
-		wxString imgPath = m_ImagesPath + imageName + ".bmp";
+	wxString imageName = m_ImagesList[m_ImageSelection];
+	wxString imgPath = m_ImagesPath + imageName + ".bmp";
 
-		//////////////////////////////////////////////////////////////////////////
-		if (wxFileExists(imgPath) && m_Dialog)
-		{
-			char tmp[10];
-			sprintf(tmp, "[%d/%d]", selection + 1, nImages);
+	//////////////////////////////////////////////////////////////////////////
+	if (wxFileExists(imgPath) && m_Dialog)
+	{
+		char tmp[10];
+		sprintf(tmp, "[%d/%d]", selection + 1, nImages);
 
-			wxString title = "Show Snapshots - " + imageName + " " + tmp;
-			m_Dialog->SetTitle(title);
+		wxString title = "Show Snapshots - " + imageName + " " + tmp;
+		m_Dialog->SetTitle(title);
 
-			// Load and show the image
-			wxImage *previewImage;
-			previewImage = new wxImage();
-			previewImage->LoadFile(imgPath.c_str(), wxBITMAP_TYPE_ANY);
+		// Load and show the image
+		wxImage *previewImage;
+		previewImage = new wxImage();
+		previewImage->LoadFile(imgPath.c_str(), wxBITMAP_TYPE_ANY);
 
-			wxBitmap *previewBitmap;
-			previewBitmap = new wxBitmap(*previewImage);
+		wxBitmap *previewBitmap;
+		previewBitmap = new wxBitmap(*previewImage);
 
-			mafGUIPicButton *previewImageButton;
-			previewImageButton = new mafGUIPicButton(m_Dialog, previewBitmap, ID_IMAGE);
+		mafGUIPicButton *previewImageButton;
+		previewImageButton = new mafGUIPicButton(m_Dialog, previewBitmap, ID_IMAGE);
 
-			m_Dialog->RemoveChild(m_PreviewImageButton);
-			m_ImageBoxSizer->Remove(m_PreviewImageButton);
+		m_Dialog->RemoveChild(m_PreviewImageButton);
+		m_ImageBoxSizer->Remove(m_PreviewImageButton);
 
-			m_PreviewImageButton = previewImageButton;
+		m_PreviewImageButton = previewImageButton;
 
-			m_ImageBoxSizer->Clear();
-			m_ImageBoxSizer->Add(m_PreviewImageButton, 0, wxALL | wxALIGN_CENTER, 0);
-			
-			m_PreviewImageButton->Enable(false);
+		m_ImageBoxSizer->Clear();
+		m_ImageBoxSizer->Add(m_PreviewImageButton, 0, wxALL | wxALIGN_CENTER, 0);
 
-			m_Dialog->Fit();
-			m_Dialog->Update();
+		m_PreviewImageButton->Enable(false);
 
-			delete previewBitmap;
-			delete previewImage;
-		}
-//	}
-// 	else
-// 	{
-// 		wxString title = "Show Snapshots - ";
-// 			m_Dialog->SetTitle(title);
-// 
-// 			// Load and show the image
-// 
-// 			m_Dialog->RemoveChild(m_PreviewImageButton);
-// 			m_MainSizer->Remove(m_PreviewImageButton);
-// 
-// 			m_PreviewImageButton = NULL;
-// 
-// 			m_MainSizer->Clear();
-// 			m_MainSizer->Add(m_PreviewImageButton, 0, wxALL | wxALIGN_CENTER, 0);
-// 
-// 			m_PreviewImageButton->Enable(false);
-// 
-// // 			mafGUILab *lab2 = new mafGUILab(m_Dialog, ID_IMAGE, "NO SNAPSHOTS", wxPoint(DIALOG_W / 2, DIALOG_H / 2));
-// // 			lab2->Enable(false);
-// // 
-// // 			m_MainSizer->Clear();
-// // 			m_MainSizer->Add(lab2, 2, wxALL | wxALIGN_CENTER, 0);
-// 			
-// 			m_Dialog->Fit();
-// 			m_Dialog->Update();
-// 
-// 			//delete lab2;		
-// 	}
+		m_Dialog->Fit();
+		m_Dialog->Update();
+
+		delete previewBitmap;
+		delete previewImage;
+	}
 }
 
 //----------------------------------------------------------------------------

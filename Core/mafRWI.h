@@ -101,6 +101,9 @@ public:
 	/** Set the background color for the render window. */
 	void SetBackgroundColor(const wxColor &col);
 
+	/** Get the background color for the render window. */
+	wxColor GetBackgroundColor() { return m_BGColour; };
+
 	/** Set the stereo type. */
 	void SetStereo(int stereo_type);
 

@@ -34,6 +34,7 @@
 #include "wx/module.h"
 #include <iostream>
 #include "wx/app.h"
+#include "mafViewVTK.h"
 
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
@@ -72,8 +73,8 @@ void mmaApplicationLayoutTest::TestEquals()
   mafSmartPointer<mmaApplicationLayout> appLayout1;
   mafSmartPointer<mmaApplicationLayout> appLayout2;
 
-  mafView *v1 = new mafView("v1");
-  mafView *v2 = new mafView("v2");
+	mafView *v1 = new mafViewVTK("v1");
+	mafView *v2 = new mafViewVTK("v2");
   v1->SetFrame(m_Toplevel);
   v2->SetFrame(m_Toplevel);
 
@@ -90,13 +91,13 @@ void mmaApplicationLayoutTest::TestDeepCopy()
   mafSmartPointer<mmaApplicationLayout> appLayout1;
   mafSmartPointer<mmaApplicationLayout> appLayout2;
 
-  mafView *v1 = new mafView("v1");
-  mafView *v2 = new mafView("v2");
+  mafView *v1 = new mafViewVTK("v1");
+  mafView *v2 = new mafViewVTK("v2");
   v1->SetFrame(m_Toplevel);
   v2->SetFrame(m_Toplevel);
 
 
-  mafView *v3 = new mafView("v3");
+  mafView *v3 = new mafViewVTK("v3");
   v3->SetFrame(m_Toplevel);
 
   appLayout2->DeepCopy(appLayout1);

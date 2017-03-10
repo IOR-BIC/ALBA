@@ -55,6 +55,8 @@ public:
 
 	void OnEvent(mafEventBase *maf_event);
 
+	virtual void SetBackgroundColor(wxColor color);
+
     /** IDs for the GUI */
   enum VIEW_HTML_WIDGET_ID
   {
