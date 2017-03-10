@@ -112,7 +112,9 @@ public:
   virtual void CameraUpdate();
   virtual int GetCameraPosition();
 
-  virtual mafSceneGraph *GetSceneGraph()	  {return m_Sg;}; 
+	virtual void SetBackgroundColor(wxColor color);
+
+	virtual mafSceneGraph *GetSceneGraph() { return m_Sg; };
   virtual mafRWIBase    *GetRWI()           {return m_Rwi->m_RwiBase;};
 
   /** Return a pointer to the image of the renderwindow.*/

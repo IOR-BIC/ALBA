@@ -85,6 +85,14 @@
 #include "mafServiceLocator.h"
 #include "mafGUIPicButton.h"
 #include "mafGUIButton.h"
+#include "mafVMEGroup.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkDataSet.h"
+#include "mafVMEImage.h"
+#include "vtkImageData.h"
+#include "vtkPointData.h"
+#include "vtkDataSetAttributes.h"
+#include "mafSnapshotManager.h"
 
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
@@ -138,6 +146,7 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_UseOpManager = true;
 	m_UseInteractionManager = true;
 	m_UseHelpManager = true;
+	m_UseSnapshotManager = false;
 
 	m_ExternalViewFlag = false;
 
@@ -282,6 +291,11 @@ void mafLogicWithManagers::Configure()
 	{
 		m_HelpManager = new mafHelpManager();
 		//m_HelpManager->SetListener(this);
+	}
+
+	if (m_UseSnapshotManager)
+	{
+		m_SnapshotManager = new mafSnapshotManager();
 	}
 
 	// Fill the SettingsDialog
@@ -973,112 +987,15 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			break;
 			case MENU_FILE_SNAPSHOT:
 			{
-				mafString msfFilename = m_VMEManager->GetFileName();
-				if (msfFilename.IsEmpty())
-				{
-					mafString dirName = mafGetLastUserFolder().c_str();
-
-					m_VMEManager->SetDirName(dirName);
-					this->OnFileSaveAs();
-					CameraUpdate();
-					msfFilename = m_VMEManager->GetFileName();
-				}
-
-				wxString path, name, ext;
-				wxSplitPath(msfFilename.GetCStr(), &path, &name, &ext);
-				wxString imagesDirectoryName = path;
-				imagesDirectoryName += "/images";
-				if (!::wxDirExists(imagesDirectoryName))
-				{
-					::wxMkdir(imagesDirectoryName);
-				}
-
-				wxDir imagesDirectory(imagesDirectoryName);
-				wxString filename;
-				int i = 0;
-				bool cont = imagesDirectory.GetFirst(&filename);
-				while (cont)
-				{
-					i++;
-					cont = imagesDirectory.GetNext(&filename);
-				}
-
-				if (e->GetString() && !(e->GetString()->IsEmpty()))
-				{
-					mafString *imageFileName = new mafString();
-					imageFileName->Append(imagesDirectoryName.c_str());
-					imageFileName->Append("/");
-					imageFileName->Append(e->GetString()->GetCStr());
-					imageFileName->Append(wxString::Format("_%d", i));
-					imageFileName->Append(".png");
-
-					/*mafRWIBase::SafeDownCast(e->GetVtkObj())->SaveImage(imageFileName);*/
-					e->SetString(imageFileName);
-
-					wxString path, name, ext;
-					wxSplitPath(imageFileName->GetCStr(), &path, &name, &ext);
-					wxString oldWD = wxGetWorkingDirectory();
-					wxSetWorkingDirectory(path);
-					wxString command = "START  ";
-					command = command + name + "." + ext;
-					wxExecute(command);
-					wxSetWorkingDirectory(oldWD);
-				}
-				else
-				{
-					wxString imageFileName = "";
-					mafViewCompound *v = mafViewCompound::SafeDownCast(m_ViewManager->GetSelectedView());
-					if (v)
-					{
-						imageFileName = imagesDirectoryName;
-						imageFileName << "/";
-						wxString tmpImageFile;
-						tmpImageFile << v->GetLabel();
-						tmpImageFile << i;
-						tmpImageFile << ".png";
-
-						tmpImageFile.Replace(" ", "_");
-
-						imageFileName << tmpImageFile;
-
-						v->GetRWI()->SaveAllImages(imageFileName, v);
-
-						wxMessageBox(_("Snapshot saved!"));
-					}
-					else
-					{
-						mafView *v = m_ViewManager->GetSelectedView();
-
-						imageFileName = imagesDirectoryName;
-						imageFileName << "/";
-						wxString tmpImageFile;
-						tmpImageFile << v->GetLabel();
-						tmpImageFile << i;
-						tmpImageFile << ".png";
-
-						tmpImageFile.Replace(" ", "_");
-
-						imageFileName << tmpImageFile;
-
-						if (v)
-						{
-							v->GetRWI()->SaveImage(imageFileName);
-							wxMessageBox(_("Snapshot saved!"));
-						}
-					}
-
-					wxString path, name, ext;
-					wxSplitPath(imageFileName, &path, &name, &ext);
-					wxString oldWD = wxGetWorkingDirectory();
-					wxSetWorkingDirectory(path);
-					wxString command = "START  ";
-					command = command + name + "." + ext;
-					wxShell(command);
-					wxSetWorkingDirectory(oldWD);
-				}
+				if (m_SnapshotManager && m_VMEManager && m_ViewManager)
+				m_SnapshotManager->CreateSnapshot(m_VMEManager->GetRoot(), m_ViewManager->GetSelectedView());
 
 				OnEvent(&mafEvent(this, WIZARD_RUN_CONTINUE, true));
 			}
+			break;
+			case MENU_FILE_MANAGE_SNAPSHOT:
+				if(m_SnapshotManager && m_VMEManager)
+					m_SnapshotManager->ShowSnapshotPreview(m_VMEManager->GetRoot());
 			break;
 			case MENU_WIZARD:
 				//The event from the application menu
@@ -2041,6 +1958,13 @@ void mafLogicWithManagers::CreateToolbar()
 	m_ToolBar->AddTool(CAMERA_FIT, mafPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"), _("reset camera to fit selected object (ctrl+shift+f)"));
 	m_ToolBar->AddTool(CAMERA_FLYTO, mafPictureFactory::GetPictureFactory()->GetBmp("FLYTO"), _("fly to object under mouse"));
 	
+	if (m_UseSnapshotManager)
+	{
+		m_ToolBar->AddSeparator();
+		m_ToolBar->AddTool(MENU_FILE_SNAPSHOT, mafPictureFactory::GetPictureFactory()->GetBmp("CAMERA"), _("Create Snapshot"));
+		m_ToolBar->AddTool(MENU_FILE_MANAGE_SNAPSHOT, mafPictureFactory::GetPictureFactory()->GetBmp("IMAGE_PREVIEW"), _("Manage Snapshots"));
+	}
+
 	EnableItem(CAMERA_RESET, false);
 	EnableItem(CAMERA_FIT, false);
 	EnableItem(CAMERA_FLYTO, false);

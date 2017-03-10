@@ -188,6 +188,11 @@ public:
   /** Called to update all components that depends on Application Options.*/
   virtual void OptionsUpdate();
 
+	virtual void SetBackgroundColor(wxColor color);
+
+	void SetSubViewBackgroundColor(int subView, wxColor color);
+	wxColor GetSubViewBackgroundColor(int subView);
+
 protected:
   /**
   Internally used to create a new instance of the GUI. This function should be

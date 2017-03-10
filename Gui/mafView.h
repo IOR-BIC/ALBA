@@ -81,7 +81,7 @@ public:
   mafView(const wxString &label = "View");
   virtual ~mafView(); 
 
-  mafTypeMacro(mafView, mafObject);
+	mafAbstractTypeMacro(mafView, mafObject);
 
   virtual void			SetListener(mafObserver *Listener) {m_Listener = Listener;};
   virtual void			OnEvent(mafEventBase *maf_event);
@@ -181,6 +181,9 @@ public:
 	/** return an xpm-icon that can be used to represent this view */
 	virtual char ** GetIcon();
 
+	virtual wxColor GetBackgroundColor() { return m_BackgroundColor; };
+	virtual void SetBackgroundColor(wxColor color) = 0;
+
 protected:
   mafObserver   *m_Listener;
   wxString       m_Label;
@@ -200,6 +203,8 @@ protected:
 
   wxPrintData   *m_PrintData;
   mafString      m_HTMLText;
+
+	wxColor				m_BackgroundColor;
 
   /** Find the VME picked */
   bool FindPickedVme(vtkAssemblyPath *ap = NULL);
