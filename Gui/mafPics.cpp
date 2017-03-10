@@ -129,6 +129,11 @@ void mafPictureFactory::Initialize()
     #include <pic/ZOOM_SEL.xpm>
     mafADDPIC(ZOOM_SEL);
 
+		#include "pic/CAMERA.xpm"
+		mafADDPIC(CAMERA);
+		#include "pic/IMAGE_PREVIEW.xpm"
+		mafADDPIC(IMAGE_PREVIEW);
+
     // these are used by the ListCtrl
     #include <pic/NODE_YELLOW.xpm>
     mafADDPIC(NODE_YELLOW);
