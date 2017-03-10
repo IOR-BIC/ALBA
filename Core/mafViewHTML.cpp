@@ -26,22 +26,19 @@
 
 
 #include "mafViewHTML.h"
-//local include
-#include <wx/image.h>
-#include <wx/html/htmlwin.h>
-#include <wx/fs_inet.h>
 
 #include "mafDecl.h"
 #include "mafGUI.h"
 #include "mafRWI.h"
-
-//from mafSceneGraph
-#include "mafSceneNode.h"
 #include "mafSceneGraph.h"
+#include "mafSceneNode.h"
 #include "mafTagArray.h"
-
 #include "mafVME.h"
 #include "mafVMEExternalData.h"
+
+#include <wx/fs_inet.h>
+#include <wx/html/htmlwin.h>
+#include <wx/image.h>
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewHTML);
@@ -50,14 +47,12 @@ mafCxxTypeMacro(mafViewHTML);
 //----------------------------------------------------------------------------
 mafViewHTML::mafViewHTML(const wxString &label, int camera_position, bool show_axes, bool show_grid, int stereo)
 :mafView(label)
-//----------------------------------------------------------------------------
 {
   m_Html  = NULL;
   m_Url   = "http://www.cineca.it/index.html";
 }
 //----------------------------------------------------------------------------
 mafViewHTML::~mafViewHTML()
-//----------------------------------------------------------------------------
 {	
  	cppDEL(m_Html);
   wxImage::RemoveHandler("JPEGHANDLER");
@@ -66,9 +61,9 @@ mafViewHTML::~mafViewHTML()
   delete wxConfig::Set(NULL);
   */
 }
+
 //----------------------------------------------------------------------------
 mafView *mafViewHTML::Copy(mafObserver *Listener, bool lightCopyEnabled)
-//----------------------------------------------------------------------------
 {
    m_LightCopyEnabled = lightCopyEnabled;
    mafViewHTML *v = new mafViewHTML(m_Label);
@@ -79,7 +74,6 @@ mafView *mafViewHTML::Copy(mafObserver *Listener, bool lightCopyEnabled)
 }
 //----------------------------------------------------------------------------
 void mafViewHTML::Create()
-//----------------------------------------------------------------------------
 {
   wxJPEGHandler *jpegHandler = new wxJPEGHandler();
   jpegHandler->SetName("JPEGHANDLER");
@@ -96,7 +90,6 @@ void mafViewHTML::Create()
 	m_Html -> ReadCustomization(wxConfig::Get());
 	m_Html -> LoadPage("test.htm");*/
   
-
 	m_Win = m_Html;
 
   m_Rwi = new mafRWI(m_Win,ONE_LAYER);
@@ -115,7 +108,6 @@ void mafViewHTML::VmeSelect(mafVME *vme, bool select)					{ m_Sg->VmeSelect(vme,
 void mafViewHTML::VmeAdd(mafVME *vme)													{ m_Sg->VmeAdd(vme);} 
 //----------------------------------------------------------------------------
 void mafViewHTML::VmeRemove(mafVME *vme)
-//----------------------------------------------------------------------------
 {
   if(vme == m_ActiveNote)
   {
@@ -127,7 +119,6 @@ void mafViewHTML::VmeRemove(mafVME *vme)
 }
 //----------------------------------------------------------------------------
 void mafViewHTML::VmeShow  (mafVME *vme, bool show)
-//----------------------------------------------------------------------------
 { 
   if(show)
   {
@@ -141,15 +132,16 @@ void mafViewHTML::VmeShow  (mafVME *vme, bool show)
 }
 //----------------------------------------------------------------------------
 void mafViewHTML::VmeCreatePipe(mafVME *vme) 
-//----------------------------------------------------------------------------
 {
   wxString body;
   mafVME *ExternalNote = NULL;
   bool found = false;
+
   if(vme->GetTagArray()->IsTagPresent("HTML_INFO"))
     body = vme->GetTagArray()->GetTag("HTML_INFO")->GetValue();
   else
     return;
+
   for(int i = 0; i < vme->GetNumberOfChildren(); i++)
   {
     ExternalNote = vme->GetChild(i);
@@ -159,6 +151,7 @@ void mafViewHTML::VmeCreatePipe(mafVME *vme)
       break;
     }
   }
+
   if(found)
     m_Html->LoadPage(((mafVMEExternalData *)ExternalNote)->GetAbsoluteFileName().GetCStr());
   else
@@ -168,7 +161,6 @@ void mafViewHTML::VmeCreatePipe(mafVME *vme)
 }
 //----------------------------------------------------------------------------
 mafGUI *mafViewHTML::CreateGui()
-//----------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
 	m_Gui = mafView::CreateGui();
@@ -186,7 +178,6 @@ mafGUI *mafViewHTML::CreateGui()
 }
 //----------------------------------------------------------------------------
 void mafViewHTML::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
 {
   switch(maf_event->GetId())
 	{
@@ -210,7 +201,6 @@ void mafViewHTML::OnEvent(mafEventBase *maf_event)
 }
 //----------------------------------------------------------------------------
 void mafViewHTML::OnLoad()
-//----------------------------------------------------------------------------
 {
 	wxString wildc = "HTML files (*.htm;*.html)| *.htm;*.html";		//Added by Paolo 12-11-2003
 	wxString p = wxFileSelector("Open HTML document", "", "", "", wildc);	//modified by Paolo 12-11-2003
@@ -219,15 +209,22 @@ void mafViewHTML::OnLoad()
 }
 //----------------------------------------------------------------------------
 void mafViewHTML::OnForward()
-//----------------------------------------------------------------------------
 {
 	if (!m_Html->HistoryForward()) 
     wxLogMessage("mafViewHTML: - forward failed");
 }
 //----------------------------------------------------------------------------
 void mafViewHTML::OnBack()
-//----------------------------------------------------------------------------
 {
 	if (!m_Html->HistoryBack()) 
     wxLogMessage("mafViewHTML: - back failed");
+}
+
+//----------------------------------------------------------------------------
+void mafViewHTML::SetBackgroundColor(wxColor color)
+{
+	assert(m_Rwi);
+	m_BackgroundColor = color;
+	m_Rwi->SetBackgroundColor(color);
+	m_Rwi->CameraUpdate();
 }

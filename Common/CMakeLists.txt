@@ -7,28 +7,29 @@ PROJECT(mafCommon)
 # Set your list of sources here.
 SET(PROJECT_SRCS
 
-  mafItkRawMotionImporterUtility.cxx  			mafItkRawMotionImporterUtility.h  
-  mafPolylineGraph.cpp  						mafPolylineGraph.h  
+  mafItkRawMotionImporterUtility.cxx  					mafItkRawMotionImporterUtility.h  
+  mafPolylineGraph.cpp  												mafPolylineGraph.h  
   mafCurvilinearAbscissaOnSkeletonHelper.cpp  	mafCurvilinearAbscissaOnSkeletonHelper.h  
   mafRelationalDatabaseAbstractConnector.cpp  	mafRelationalDatabaseAbstractConnector.h  
-  mafResultQueryAbstractHandler.cpp  			mafResultQueryAbstractHandler.h  
+  mafResultQueryAbstractHandler.cpp							mafResultQueryAbstractHandler.h  
   mafQueryObject.h  
-  mafHTMLTemplateParser.cpp  					mafHTMLTemplateParser.h  
-  mafHTMLTemplateParserBlock.cpp  				mafHTMLTemplateParserBlock.h  
-  mafWizardBlock.cpp  							mafWizardBlock.h  
-  mafWizard.cpp  								mafWizard.h  
-  mafWizardManager.cpp  						mafWizardManager.h  
-  mafWizardBlockOperation.cpp  					mafWizardBlockOperation.h  
-  mafWizardBlockSelection.cpp  					mafWizardBlockSelection.h  
-  mafWizardBlockTypeCheck.cpp  					mafWizardBlockTypeCheck.h
-  mafWizardBlockFileExistCheck.cpp  			mafWizardBlockFileExistCheck.h  
-  mafWizardBlockVMESelection.cpp  				mafWizardBlockVMESelection.h
-  mafWizardBlockVMEFindOrSelection.cpp  		mafWizardBlockVMEFindOrSelection.h  
-  mafWizardBlockInformation.cpp  				mafWizardBlockInformation.h
-  mafWizardBlockYesNoSelection.cpp  			mafWizardBlockYesNoSelection.h  
-  mafWizardWaitOp.cpp  							mafWizardWaitOp.h  
-  mafWizardSettings.cpp  						mafWizardSettings.h  
-  mafHelpManager.cpp  							mafHelpManager.h  
+  mafHTMLTemplateParser.cpp  										mafHTMLTemplateParser.h  
+  mafHTMLTemplateParserBlock.cpp  							mafHTMLTemplateParserBlock.h  
+  mafWizardBlock.cpp  													mafWizardBlock.h  
+  mafWizard.cpp  																mafWizard.h  
+  mafWizardManager.cpp  												mafWizardManager.h  
+  mafWizardBlockOperation.cpp  									mafWizardBlockOperation.h  
+  mafWizardBlockSelection.cpp  									mafWizardBlockSelection.h  
+  mafWizardBlockTypeCheck.cpp  									mafWizardBlockTypeCheck.h
+  mafWizardBlockFileExistCheck.cpp  						mafWizardBlockFileExistCheck.h  
+  mafWizardBlockVMESelection.cpp  							mafWizardBlockVMESelection.h
+  mafWizardBlockVMEFindOrSelection.cpp  				mafWizardBlockVMEFindOrSelection.h  
+  mafWizardBlockInformation.cpp  								mafWizardBlockInformation.h
+  mafWizardBlockYesNoSelection.cpp  						mafWizardBlockYesNoSelection.h  
+  mafWizardWaitOp.cpp  													mafWizardWaitOp.h  
+  mafWizardSettings.cpp  												mafWizardSettings.h  
+  mafHelpManager.cpp  													mafHelpManager.h  
+	mafSnapshotManager.cpp  											mafSnapshotManager.h  
 )
 
 # List libraries that are needed by this project.

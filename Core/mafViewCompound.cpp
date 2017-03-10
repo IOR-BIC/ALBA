@@ -591,8 +591,34 @@ void mafViewCompound::LinkView(bool link_camera)
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::OptionsUpdate()
-//----------------------------------------------------------------------------
 {
   for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->OptionsUpdate();
+}
+
+//----------------------------------------------------------------------------
+void mafViewCompound::SetBackgroundColor(wxColor color)
+{
+	m_BackgroundColor = color;
+
+	for (int i = 0; i < m_NumOfChildView; i++)
+	{
+		m_ChildViewList[i]->SetBackgroundColor(color);
+	}
+}
+//----------------------------------------------------------------------------
+void mafViewCompound::SetSubViewBackgroundColor(int subView, wxColor color)
+{
+	if (subView >= 0 && subView < m_NumOfChildView)
+		m_ChildViewList[subView]->SetBackgroundColor(color);
+}
+//----------------------------------------------------------------------------
+wxColor mafViewCompound::GetSubViewBackgroundColor(int subView)
+{
+	wxColor color = wxColor();
+
+	if (subView >= 0 && subView < m_NumOfChildView)
+		color = m_ChildViewList[subView]->GetBackgroundColor();
+
+	return color;
 }

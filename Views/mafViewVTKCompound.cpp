@@ -69,21 +69,19 @@ mafCxxTypeMacro(mafViewVTKCompound);
 //----------------------------------------------------------------------------
 mafViewVTKCompound::mafViewVTKCompound( wxString label, int num_row, int num_col)
 : mafViewCompoundWindowing(label,num_row,num_col)
-//----------------------------------------------------------------------------
 {
   m_ViewVTK = NULL;
 }
 //----------------------------------------------------------------------------
 mafViewVTKCompound::~mafViewVTKCompound()
-//----------------------------------------------------------------------------
 {
 	/*m_ColorLUT = NULL;
 	cppDEL(m_LutWidget);
 	cppDEL(m_LutSlider);*/
 }
+
 //----------------------------------------------------------------------------
 mafView *mafViewVTKCompound::Copy(mafObserver *Listener, bool lightCopyEnabled)
-//----------------------------------------------------------------------------
 {
   m_LightCopyEnabled = lightCopyEnabled;
   mafViewVTKCompound *v = new mafViewVTKCompound(m_Label, m_ViewRowNum, m_ViewColNum);
@@ -100,7 +98,6 @@ mafView *mafViewVTKCompound::Copy(mafObserver *Listener, bool lightCopyEnabled)
 
 //-------------------------------------------------------------------------
 mafGUI* mafViewVTKCompound::CreateGui()
-//-------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
 	m_Gui = mafView::CreateGui();
@@ -114,11 +111,11 @@ mafGUI* mafViewVTKCompound::CreateGui()
 	m_Gui->Divider();
 	m_Gui->FitGui();
 	m_Gui->Update();
+
 	return m_Gui;
 }
 //-------------------------------------------------------------------------
 void mafViewVTKCompound::PackageView()
-//-------------------------------------------------------------------------
 {
   assert(m_ViewVTK);
 	PlugChildView(m_ViewVTK);
@@ -126,7 +123,6 @@ void mafViewVTKCompound::PackageView()
 
 //-------------------------------------------------------------------------
 bool mafViewVTKCompound::ActivateWindowing(mafVME *vme)
-//-------------------------------------------------------------------------
 {
   bool conditions     = false;
   
@@ -147,7 +143,6 @@ bool mafViewVTKCompound::ActivateWindowing(mafVME *vme)
 
 //-------------------------------------------------------------------------
 void mafViewVTKCompound::SetExternalView(mafViewVTK *childView)
-//-------------------------------------------------------------------------
 {
   if(m_ViewVTK == NULL) {
     m_ViewVTK = childView;
@@ -155,7 +150,6 @@ void mafViewVTKCompound::SetExternalView(mafViewVTK *childView)
 }
 //-------------------------------------------------------------------------
 void mafViewVTKCompound::CameraUpdate()
-//-------------------------------------------------------------------------
 {
   // Added patch to update scalar and vector attributes while changing timeframe with the timebar 
   // (valid only for mafPipeVectorFieldMapWithArrows).
@@ -165,8 +159,7 @@ void mafViewVTKCompound::CameraUpdate()
   for(mafSceneNode *node = sg->GetNodeList(); node; node=node->GetNext())
 	{ 
     if (node->GetVme())
-    {
-  
+    {  
       mafVME* vme = node->GetVme();
 
       assert(vme);

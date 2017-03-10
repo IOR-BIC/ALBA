@@ -232,6 +232,7 @@ bool ExampleApp::OnInit()
 #ifdef USE_WIZARD
   m_Logic->PlugWizardManager(true);
 #endif
+	m_Logic->PlugSnapshotManager(true);
 	m_Logic->Configure();
 
 	SetTopWindow(mafGetFrame());  
