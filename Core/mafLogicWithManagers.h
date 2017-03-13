@@ -109,16 +109,6 @@ public:
 	mafLogicWithManagers(mafGUIMDIFrame *mdiFrame = NULL);
 	virtual     ~mafLogicWithManagers();
 
-	enum UPLOAD_FLAGS
-	{
-		UPLOAD_SELECTED_VME = 0,
-		UPLOAD_SUBTREE,
-		UPLOAD_TREE,
-		UPLOAD_COMPRESSED_VME,
-		UPLOAD_COMPRESSED_SUBTREE,
-		UPLOAD_COMPRESSED_TREE,
-	};
-
 	/** */
 	virtual void OnEvent(mafEventBase *maf_event);
 
@@ -182,6 +172,10 @@ public:
 
 	/** Manage application exception and allow to save at least the tree. */
 	virtual void HandleException();
+
+	/*About Dialog*/
+	void ShowAboutDialog(wxString imagePath = "", bool showWebSiteBtn = false, bool showLicenseBtn= false);
+	wxStaticText* AddText(mafGUIDialog * dialog, wxString &text, int Width, int align);
 
 	/** Set the revision string */
 	void SetRevision(mafString revision) { m_Revision = revision; };
@@ -424,14 +418,17 @@ protected:
 	bool m_CancelledBeforeOpStarting;
 	wxMenu *m_WizardMenu;
 
-	long               m_ChildFrameStyle;
-	mafGUIMDIFrame       *m_Win;
+	long							m_ChildFrameStyle;
+	mafGUIMDIFrame		*m_Win;
 	wxToolBar         *m_ToolBar;
 	wxMenuBar         *m_MenuBar;
-	wxString					 m_LastSelectedPanel;
-	mafGUITimeBar      *m_TimePanel;
-	mafString					 m_AppTitle;
-	bool               m_LogToFile;
+	wxString					m_LastSelectedPanel;
+	mafGUITimeBar			*m_TimePanel;
+	mafString					m_AppTitle;
+	wxString					m_WebSiteURL;
+	wxString					m_LicenseURL;
+	wxString					m_AboutInfo;
+	bool							m_LogToFile;
 	mafWXLog          *m_Logger;
 	mafVTKLog         *m_VtkLog;
 	mafGUIApplicationSettings *m_ApplicationSettings;

@@ -121,15 +121,36 @@ void mafHTMLTemplateParserBlock::AddVar( wxString name, wxString varValue )
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserBlock::AddImageVar(wxString name, mafView *view, wxString imagePath)
+void mafHTMLTemplateParserBlock::AddImageVar(wxString name, mafView *view)
 //----------------------------------------------------------------------------
 {
-	if (view)
-		AddVar(name, CalculateImageRTF(view, imagePath)); //RTF image generation
+		AddVar(name, CalculateImageRTF(view, "")); //RTF image generation
 
 	//TODO AddImageVar for HTML Template
 }
 
+//----------------------------------------------------------------------------
+void mafHTMLTemplateParserBlock::AddImageVar(wxString name, wxString imagePath)
+//----------------------------------------------------------------------------
+{
+	AddVar(name, CalculateImageRTF(NULL, imagePath)); //RTF image generation
+
+	//TODO AddImageVar for HTML Template
+}
+
+//----------------------------------------------------------------------------
+void mafHTMLTemplateParserBlock::PushImageVar(wxString name, wxString imagePath)
+//----------------------------------------------------------------------------
+{
+	PushVar(name, CalculateImageRTF(NULL, imagePath));
+}
+
+//----------------------------------------------------------------------------
+void mafHTMLTemplateParserBlock::PushImageVar(wxString name, mafView *view)
+//----------------------------------------------------------------------------
+{
+	PushVar(name, CalculateImageRTF(view, ""));
+}
 
 //----------------------------------------------------------------------------
 void mafHTMLTemplateParserBlock::PushVar( wxString name, double varValue )
