@@ -21,7 +21,6 @@
 #include "mafOBB.h"
 #include "mafTransform.h"
 #include "mafTransformFrame.h"
-#include "mafEventSource.h"
 
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -312,7 +311,7 @@ void mafGizmoAutoscaleHelper::InternalUpdate()
 	
 	RecomputeAll();    
 
-	m_EventSource->InvokeEvent(this,MATRIX_UPDATED);
+	InvokeEvent(this,MATRIX_UPDATED);
 }
 
 //------------------------------------------------------------------------------

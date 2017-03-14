@@ -29,10 +29,8 @@
 #include "mafVMESurface.h"
 #include "mafEventBase.h"
 
-//for testing update , testing the chain of responsability
+//for testing update , testing the chain of responsibility
 #include "mafObserver.h"
-#include "mafEventSource.h"
-
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
@@ -248,17 +246,17 @@ void mafMatrixPipeTest::TestUpdate()
   mafMatrixPipe *matrixPipe;
   mafNEW(matrixPipe);
   //-----------------
-  //for testing update , testing the chain of responsability
+  //for testing update , testing the chain of responsibility
   //  
   //
   mafObserverTestClass testObserver;
-  m_SurfaceTest->GetEventSource()->AddObserver(testObserver);
+  m_SurfaceTest->AddObserver(testObserver);
 
   matrixPipe->SetVME(m_SurfaceTest);
   matrixPipe->Update();
    
   result = testObserver.Name.Equals("CATCHED");
-  m_SurfaceTest->GetEventSource()->RemoveObserver(&testObserver);
+  m_SurfaceTest->RemoveObserver(&testObserver);
 
   TEST_RESULT(result);
   //-----------------

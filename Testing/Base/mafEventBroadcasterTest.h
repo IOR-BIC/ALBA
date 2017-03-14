@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafEventSourceTest
+ Module: mafEventBroadcasterTest
  Authors: Roberto Mucci
  
  Copyright (c) B3C
@@ -14,18 +14,18 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_mafEventSourceTest_H__
-#define __CPP_UNIT_mafEventSourceTest_H__
+#ifndef __CPP_UNIT_mafEventBroadcasterTest_H__
+#define __CPP_UNIT_mafEventBroadcasterTest_H__
 
 #include "mafTest.h"
 
 /** Test for mafEventBase; Use this suite to trace memory problems */
-class mafEventSourceTest : public mafTest
+class mafEventBroadcasterTest : public mafTest
 {
 public: 
 
   // CPPUNIT test suite
-  CPPUNIT_TEST_SUITE( mafEventSourceTest );
+  CPPUNIT_TEST_SUITE( mafEventBroadcasterTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
   CPPUNIT_TEST(TestStaticAllocation);
   CPPUNIT_TEST(TestDynamicAllocation);
@@ -35,8 +35,6 @@ public:
   CPPUNIT_TEST(TestIsObserver);
   CPPUNIT_TEST(TestHasObservers);
   CPPUNIT_TEST(TestInvokeEvent);
-  CPPUNIT_TEST(TestSetData);
-  CPPUNIT_TEST(TestSetOwner);
   CPPUNIT_TEST(TestSetChannel);
   CPPUNIT_TEST_SUITE_END();
   
@@ -51,8 +49,6 @@ private:
   void TestIsObserver();
   void TestHasObservers();
   void TestInvokeEvent();
-  void TestSetData();
-  void TestSetOwner();
   void TestSetChannel();
 };
 

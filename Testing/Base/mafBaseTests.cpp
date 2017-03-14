@@ -33,7 +33,7 @@
 #include "mafDirectoryTest.h"
 #include "mafEventSenderTest.h"
 #include "mafEventBaseTest.h"
-#include "mafEventSourceTest.h"
+#include "mafEventBroadcasterTest.h"
 #include "mafObjectTest.h"
 #include "mafIndentTest.h"
 #include "mafDirectoryTest.h"
@@ -97,7 +97,7 @@ int
 	runner.addTest(mafDirectoryTest::suite());
 	runner.addTest(mafEventSenderTest::suite());
 	runner.addTest(mafEventBaseTest::suite());
-	runner.addTest(mafEventSourceTest::suite());
+	runner.addTest(mafEventBroadcasterTest::suite());
 	runner.addTest(mafObjectTest::suite());
 	runner.addTest(mafIndentTest::suite());
 	runner.addTest(mafDirectoryTest::suite());

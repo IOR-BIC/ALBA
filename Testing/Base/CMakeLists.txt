@@ -17,7 +17,7 @@ SET(PROJECT_SRCS
 	mafDirectoryTest.h 				mafDirectoryTest.cpp
 	mafEventSenderTest.h 			mafEventSenderTest.cpp
 	mafEventBaseTest.h 				mafEventBaseTest.cpp
-	mafEventSourceTest.h 			mafEventSourceTest.cpp
+	mafEventBroadcasterTest.h 	mafEventBroadcasterTest.cpp
 	mafObjectTest.h 				mafObjectTest.cpp
 	mafIndentTest.h 				mafIndentTest.cpp
 	mafDirectoryTest.h 				mafDirectoryTest.cpp

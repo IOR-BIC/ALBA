@@ -156,13 +156,7 @@ void mafTransformBaseTest::TestUpdateTime()
 	updateTime2 = t.GetUpdateTime();
 	CPPUNIT_ASSERT(updateTime1 < updateTime2);
 }
-//----------------------------------------------------------------------------
-void mafTransformBaseTest::TestGetEventSource()
-//----------------------------------------------------------------------------
-{
-  mafTransformBaseDerivedClass t =  mafTransformBaseDerivedClass();
-	CPPUNIT_ASSERT(t.GetEventSource() != NULL);
-}
+
 //----------------------------------------------------------------------------
 void mafTransformBaseTest::TestGetVTKTransform()
 //----------------------------------------------------------------------------

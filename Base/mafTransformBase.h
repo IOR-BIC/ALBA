@@ -22,11 +22,11 @@
 #include "mafMutexLock.h"
 #include "mafMatrix.h"
 #include "mafSmartPointer.h"
+#include "mafEventBroadcaster.h"
 
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------
-class mafEventSource;
 class vtkLinearTransform;
 class vtkMAFToLinearTransform;
 
@@ -43,7 +43,7 @@ template class MAF_EXPORT mafAutoPointer<mafMatrix>;
   - change SetTimeStamp to apply a Modified(), than change matrix pipes to not call it!!!
   - implement issuing of a MATRIX_UPDATED event: add an event source member
   */
-class MAF_EXPORT mafTransformBase : public mafReferenceCounted
+class MAF_EXPORT mafTransformBase : public mafReferenceCounted, public mafEventBroadcaster
 {
 public:
   mafTransformBase();
@@ -137,10 +137,6 @@ public:
 
   mafTimeStamp GetTimeStamp() {return m_TimeStamp;}
 
-  /** 
-    return the event source object: the transform can send events through this event source */
-  mafEventSource *GetEventSource() {return m_EventSource;}
-
 #ifdef MAF_USE_VTK
   /** Return a VTK transform connected to this transform */
   vtkLinearTransform *GetVTKTransform();
@@ -156,8 +152,6 @@ protected:
   mafMutexLock    m_UpdateMutex; ///< we also need to do mutex locking so updates don't collide.
 
   mafTimeStamp    m_TimeStamp;   ///< the timestamp to assign to the output matrix (default=0)
-
-  mafEventSource  *m_EventSource;
 
   #ifdef MAF_USE_VTK
   vtkMAFToLinearTransform *m_VTKTransform; ///< VTK transform used to link to VTK process objects

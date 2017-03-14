@@ -32,7 +32,6 @@ public:
   CPPUNIT_TEST(TestAllConstructors);
   CPPUNIT_TEST(TestCopy);
   CPPUNIT_TEST(TestSender);
-  CPPUNIT_TEST(TestSource);
   CPPUNIT_TEST(TestId);
   CPPUNIT_TEST(TestChannel);
   CPPUNIT_TEST(TestData);
@@ -48,7 +47,6 @@ private:
   void TestAllConstructors();
   void TestCopy();
   void TestSender();
-  void TestSource();
   void TestId();
   void TestChannel();
   void TestData();

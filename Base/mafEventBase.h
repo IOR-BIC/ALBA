@@ -23,7 +23,7 @@
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------
-class mafEventSource;
+
 
 //------------------------------------------------------------------------------
 // mafEventBase
@@ -70,14 +70,6 @@ public:
   /** return sender (invoker) of this event */
   void *GetSender();
 
-  /** 
-    set event source who generated this event. Used by
-    mafEventSource to store its pointer in the event */
-  void SetSource(mafEventSource *src);
-
-  /** return the source to the event source who generated this event */
-  mafEventSource *GetSource();
-
   /** set Id for this event */
   void SetId(mafID id);
 
@@ -107,7 +99,6 @@ public:
 
 protected:
   void            *m_Sender;
-  mafEventSource  *m_Source;
   void            *m_Data;
   mafID           m_Id;
   mafID           m_Channel;

@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafEventSource
- Authors: Marco Petrone
+ Module: mafEventBroadcaster
+ Authors: Marco Petrone, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -25,7 +25,7 @@
 
 
 
-#include "mafEventSource.h"
+#include "mafEventBroadcaster.h"
 #include "mafObserver.h"
 #include "mafObserverCallback.h"
 #include "mafEventBase.h"
@@ -45,11 +45,7 @@ public:
 };
 
 //------------------------------------------------------------------------------
-mafCxxTypeMacro(mafEventSource)
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-mafEventSource::mafEventSource(void *owner)
+mafEventBroadcaster::mafEventBroadcaster(void *owner)
 //------------------------------------------------------------------------------
 {
   m_Data  = NULL;
@@ -59,21 +55,21 @@ mafEventSource::mafEventSource(void *owner)
 }
 
 //------------------------------------------------------------------------------
-mafEventSource::~mafEventSource()
+mafEventBroadcaster::~mafEventBroadcaster()
 //------------------------------------------------------------------------------
 {
   delete m_Observers; m_Observers = NULL;
 }
 
 //------------------------------------------------------------------------------
-void mafEventSource::AddObserver(mafObserver &obj, int priority)
+void mafEventBroadcaster::AddObserver(mafObserver &obj, int priority)
 //------------------------------------------------------------------------------
 {
   AddObserver(&obj,priority);
 }
 
 //------------------------------------------------------------------------------
-void mafEventSource::AddObserver(mafObserver *obj, int priority)
+void mafEventBroadcaster::AddObserver(mafObserver *obj, int priority)
 //------------------------------------------------------------------------------
 {
   // search for first element with priority <= priority
@@ -83,7 +79,7 @@ void mafEventSource::AddObserver(mafObserver *obj, int priority)
   m_Observers->m_List.insert(it,mafObserversPairType(priority,obj));
 }
 //------------------------------------------------------------------------------
-bool mafEventSource::RemoveObserver(mafObserver *obj)
+bool mafEventBroadcaster::RemoveObserver(mafObserver *obj)
 //------------------------------------------------------------------------------
 {
   if (m_Observers->m_List.empty())
@@ -106,14 +102,14 @@ bool mafEventSource::RemoveObserver(mafObserver *obj)
 }
 
 //------------------------------------------------------------------------------
-void mafEventSource::RemoveAllObservers()
+void mafEventBroadcaster::RemoveAllObservers()
 //------------------------------------------------------------------------------
 {
   m_Observers->m_List.clear();
 }
 
 //------------------------------------------------------------------------------
-bool mafEventSource::IsObserver(mafObserver *obj)
+bool mafEventBroadcaster::IsObserver(mafObserver *obj)
 //------------------------------------------------------------------------------
 {
   if (m_Observers->m_List.empty())
@@ -127,14 +123,14 @@ bool mafEventSource::IsObserver(mafObserver *obj)
 }
 
 //------------------------------------------------------------------------------
-bool mafEventSource::HasObservers()
+bool mafEventBroadcaster::HasObservers()
 //------------------------------------------------------------------------------
 {
   return !m_Observers->m_List.empty();
 }
 
 //------------------------------------------------------------------------------
-void mafEventSource::GetObservers(std::vector<mafObserver *> &olist)
+void mafEventBroadcaster::GetObservers(std::vector<mafObserver *> &olist)
 //------------------------------------------------------------------------------
 {
   olist.clear();
@@ -147,7 +143,7 @@ void mafEventSource::GetObservers(std::vector<mafObserver *> &olist)
 }
 
 //------------------------------------------------------------------------------
-void mafEventSource::InvokeEvent(mafEventBase *e)
+void mafEventBroadcaster::InvokeEvent(mafEventBase *e)
 //------------------------------------------------------------------------------
 {
   if (m_Observers->m_List.empty())
@@ -156,8 +152,6 @@ void mafEventSource::InvokeEvent(mafEventBase *e)
   // store old channel
   mafID old_ch=(m_Channel<0)?-1:e->GetChannel();
     
-  e->SetSource(this);
-  
   mafObserversListType::iterator it;
   for (it=m_Observers->m_List.begin();it!=m_Observers->m_List.end()&&!e->GetSkipFlag();it++)
   {
@@ -180,14 +174,14 @@ void mafEventSource::InvokeEvent(mafEventBase *e)
 }
 
 //------------------------------------------------------------------------------
-void mafEventSource::InvokeEvent(mafEventBase &e)
+void mafEventBroadcaster::InvokeEvent(mafEventBase &e)
 //------------------------------------------------------------------------------
 {
   InvokeEvent(&e);
 }
 
 //------------------------------------------------------------------------------
-void mafEventSource::InvokeEvent(void *sender, mafID id, void *data)
+void mafEventBroadcaster::InvokeEvent(void *sender, mafID id, void *data)
 //------------------------------------------------------------------------------
 {
   mafEventBase e(sender,id,data);
@@ -196,35 +190,7 @@ void mafEventSource::InvokeEvent(void *sender, mafID id, void *data)
 }
 
 //------------------------------------------------------------------------------
-void *mafEventSource::GetData()
-//------------------------------------------------------------------------------
-{
-  return m_Data;
-}
-
-//------------------------------------------------------------------------------
-void mafEventSource::SetData(void *data)
-//------------------------------------------------------------------------------
-{
-  m_Data = data;
-}
-
-//------------------------------------------------------------------------------
-void mafEventSource::SetOwner(void *owner)
-//------------------------------------------------------------------------------
-{
-  m_Owner=owner;
-}
-
-//------------------------------------------------------------------------------
-void *mafEventSource::GetOwner()
-//------------------------------------------------------------------------------
-{
-  return m_Owner;
-}
-
-//------------------------------------------------------------------------------
-mafObserverCallback *mafEventSource::AddObserverCallback(void (*f)(void *sender,
+mafObserverCallback *mafEventBroadcaster::AddObserverCallback(void (*f)(void *sender,
     mafID eid, void *clientdata, void *calldata))
 //------------------------------------------------------------------------------
 {
@@ -234,13 +200,13 @@ mafObserverCallback *mafEventSource::AddObserverCallback(void (*f)(void *sender,
 }
 
 //------------------------------------------------------------------------------
-void mafEventSource::SetChannel(mafID ch)
+void mafEventBroadcaster::SetChannel(mafID ch)
 //------------------------------------------------------------------------------
 {
   m_Channel = ch;
 }
 //------------------------------------------------------------------------------
-mafID mafEventSource::GetChannel()
+mafID mafEventBroadcaster::GetChannel()
 //------------------------------------------------------------------------------
 {
   return m_Channel;

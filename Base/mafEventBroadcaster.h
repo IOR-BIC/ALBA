@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafEventSource
- Authors: Marco Petrone
+ Module: mafEventBroadcaster
+ Authors: Marco Petrone, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -13,8 +13,8 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __mafEventSource_h
-#define __mafEventSource_h
+#ifndef __mafEventBroadcaster_h
+#define __mafEventBroadcaster_h
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
@@ -30,24 +30,22 @@ class mafEventBase;
 class mafObserverCallback;
 
 //------------------------------------------------------------------------------
-// mafEventSource
+// mafEventBroadcaster
 //------------------------------------------------------------------------------
 /** Implementation of the Subject/Observer design pattern.
-  mafEventSource is a class implementing the "subject" in the Subject/Observer 
+  mafEventBroadcaster is a class implementing the "subject" in the Subject/Observer 
   design pattern. Objective of this object is to generate events to be sent to observers.
   An observer must be registered to a subject to create the communication channel 
   between the two.
   @sa mafObserver mafObserverCallback
 */
-class MAF_EXPORT mafEventSource: public mafObject
+class MAF_EXPORT mafEventBroadcaster
 {
 public:
-  mafEventSource(void *owner=NULL);
-  virtual ~mafEventSource();
-
-  mafTypeMacro(mafEventSource,mafObject);
+  mafEventBroadcaster(void *owner=NULL);
+  virtual ~mafEventBroadcaster();
  
-  mafEventSource(const mafEventSource& c) {}
+  mafEventBroadcaster(const mafEventBroadcaster& c) {}
 
   /** Register an observer of this subject */
   void AddObserver(mafObserver *obj, int priority=0);
@@ -85,21 +83,7 @@ public:
 
   /** invoke an event of this subject */
   void InvokeEvent(void *sender,mafID id=ID_NO_EVENT, void *data=NULL);
-
-  /** return pointer to client data stored in this object */
-  void *GetData();
-
-  /** set pointer to client data to be stored in this object */
-  void SetData(void *data);
-
-  /** 
-    set the owner of this object, used to create
-    a delegation pattern between the event source 
-    and the class who created it */
-  void SetOwner(void *owner);
-
-  /** return the owner class of this event source */
-  void *GetOwner();
+	 
 
   /** 
     set the channel Id assigned to this event source. If set to <0 
@@ -120,4 +104,4 @@ private:
   
 };
 
-#endif /* __mafEventSource_h */
+#endif /* __mafEventBroadcaster_h */

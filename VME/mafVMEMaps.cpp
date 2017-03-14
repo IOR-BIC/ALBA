@@ -31,7 +31,6 @@
 #include "mafVMEOutputSurface.h"
 #include "mafStorageElement.h"
 #include "mafGUILutPreset.h"
-#include "mafEventSource.h"
 #include "mafVMEVolume.h"
 #include "mafVMESurface.h"
 #include "mmaMaterial.h"

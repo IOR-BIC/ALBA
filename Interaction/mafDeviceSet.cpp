@@ -184,7 +184,7 @@ void mafDeviceSet::AddDevice(mafDevice *device)
   m_Devices.push_back(device);
   device->Register(this);
   device->SetListener(this);
-  device->PlugEventSource(this,MCH_DOWN);
+  AddObserver(device,MCH_DOWN);
   m_DevicesMutex->Unlock();
   
   InvokeEvent(DEVICE_ADDED,MCH_UP,device);

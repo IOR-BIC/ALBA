@@ -32,7 +32,6 @@
 #include "mafGUIFloatSlider.h"
 #include "mafGUILutSlider.h"
 #include "mafEventInteraction.h"
-#include "mafEventSource.h"
 #include "mafVMEIterator.h"
 
 #include "mmaVolumeMaterial.h"
@@ -777,7 +776,7 @@ void mafViewOrthoSlice::DestroyOrthoSlicesAndGizmos()
     mafLogMessage("current volume = NULL");
     return;
   }
-	m_CurrentVolume->GetEventSource()->RemoveObserver(this);
+	m_CurrentVolume->RemoveObserver(this);
 	m_CurrentVolume = NULL;
 	GizmoDelete();
 }

@@ -18,7 +18,7 @@ mafDirectory.cpp		mafDirectory.h
 mafDynamicLoader.cpp	mafDynamicLoader.h
 mafEventBase.cpp		mafEventBase.h
 mafEventSender.h
-mafEventSource.cpp		mafEventSource.h
+mafEventBroadcaster.cpp		mafEventBroadcaster.h
 mafIncludeWIN32.h
 mafIncludeWX.h
 mafIndent.cpp			mafIndent.h
