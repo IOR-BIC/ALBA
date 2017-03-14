@@ -46,7 +46,6 @@
 #include "vtkMAFToLinearTransformTest.h"
 #include "mafReferenceCountedTest.h"
 #include "mafLUTLibraryTest.h"
-#include "mafObserversListTest.h"
 #include "mafDynamicLoaderTest.h"
 #include "mafDataChecksumTest.h"
 #include "mafVect3dTest.h"
@@ -110,7 +109,6 @@ int
 	runner.addTest(vtkMAFToLinearTransformTest::suite());
 	runner.addTest(mafReferenceCountedTest::suite());
 	runner.addTest(mafLUTLibraryTest::suite());
-	runner.addTest(mafObserversListTest::suite());
 	runner.addTest(mafDynamicLoaderTest::suite());
 	runner.addTest(mafDataChecksumTest::suite());
 	runner.addTest(mafVect3dTest::suite());

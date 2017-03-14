@@ -29,70 +29,47 @@
 #include "mafObserver.h"
 #include "mafObserverCallback.h"
 #include "mafEventBase.h"
-#include <list>
 #include <utility>
 #include "assert.h"
 
 //------------------------------------------------------------------------------
-// PIMPL declarations
-//------------------------------------------------------------------------------
-typedef std::pair<int,mafObserver *> mafObserversPairType;
-typedef std::list< mafObserversPairType > mafObserversListType;
-class mafObserversList
-{
-public:
-  mafObserversListType m_List; 
-};
-
-//------------------------------------------------------------------------------
 mafEventBroadcaster::mafEventBroadcaster(void *owner)
-//------------------------------------------------------------------------------
 {
   m_Data  = NULL;
-  m_Observers   = new mafObserversList;
   m_Owner       = owner;
   m_Channel     = -1;
 }
 
 //------------------------------------------------------------------------------
 mafEventBroadcaster::~mafEventBroadcaster()
-//------------------------------------------------------------------------------
 {
-  delete m_Observers; m_Observers = NULL;
 }
 
 //------------------------------------------------------------------------------
-void mafEventBroadcaster::AddObserver(mafObserver &obj, int priority)
-//------------------------------------------------------------------------------
+void mafEventBroadcaster::AddObserver(mafObserver &obj)
 {
-  AddObserver(&obj,priority);
+  AddObserver(&obj);
 }
 
 //------------------------------------------------------------------------------
-void mafEventBroadcaster::AddObserver(mafObserver *obj, int priority)
-//------------------------------------------------------------------------------
+void mafEventBroadcaster::AddObserver(mafObserver *obj)
 {
-  // search for first element with priority <= priority
-  mafObserversListType::iterator it;
-  for (it=m_Observers->m_List.begin(); it!=m_Observers->m_List.end() && (*it).first>priority ;it++) ;
-
-  m_Observers->m_List.insert(it,mafObserversPairType(priority,obj));
+  m_Observers.push_back(obj);
 }
-//------------------------------------------------------------------------------
 bool mafEventBroadcaster::RemoveObserver(mafObserver *obj)
 //------------------------------------------------------------------------------
 {
-  if (m_Observers->m_List.empty())
+  if (m_Observers.empty())
     return false;
 
   // an observer could be present more then one time!
   bool flag = false;
-  mafObserversListType::iterator it;
-  for (it=m_Observers->m_List.begin(); it!=m_Observers->m_List.end() ;it++)
+  mafObserversList::iterator it;
+  for (it=m_Observers.begin(); it!=m_Observers.end() ;it++)
   {
-    if ((*it).second == obj)
+    if (*it == obj)
     {
-      m_Observers->m_List.erase(it);
+      m_Observers.erase(it);
       flag=true;
       break;      // Paolo 08-06-2005
     }
@@ -103,66 +80,61 @@ bool mafEventBroadcaster::RemoveObserver(mafObserver *obj)
 
 //------------------------------------------------------------------------------
 void mafEventBroadcaster::RemoveAllObservers()
-//------------------------------------------------------------------------------
 {
-  m_Observers->m_List.clear();
+  m_Observers.clear();
 }
 
 //------------------------------------------------------------------------------
 bool mafEventBroadcaster::IsObserver(mafObserver *obj)
-//------------------------------------------------------------------------------
 {
-  if (m_Observers->m_List.empty())
+  if (m_Observers.empty())
     return false;
 
-  mafObserversListType::iterator it;
-  for (it = m_Observers->m_List.begin(); it != m_Observers->m_List.end(); it++)
-    if ((*it).second == obj) return true;
+  mafObserversList::iterator it;
+  for (it = m_Observers.begin(); it != m_Observers.end(); it++)
+    if (*it == obj) return true;
 
   return false;
 }
 
 //------------------------------------------------------------------------------
 bool mafEventBroadcaster::HasObservers()
-//------------------------------------------------------------------------------
 {
-  return !m_Observers->m_List.empty();
+  return !m_Observers.empty();
 }
 
 //------------------------------------------------------------------------------
 void mafEventBroadcaster::GetObservers(std::vector<mafObserver *> &olist)
-//------------------------------------------------------------------------------
 {
   olist.clear();
-  olist.resize(m_Observers->m_List.size());
+  olist.resize(m_Observers.size());
   int i=0;
-  for (mafObserversListType::iterator it=m_Observers->m_List.begin();it!=m_Observers->m_List.end();it++,i++)
+  for (mafObserversList::iterator it=m_Observers.begin();it!=m_Observers.end();it++,i++)
   {
-    olist[i]=it->second;
+		olist[i] = *it;
   }
 }
 
 //------------------------------------------------------------------------------
 void mafEventBroadcaster::InvokeEvent(mafEventBase *e)
-//------------------------------------------------------------------------------
 {
-  if (m_Observers->m_List.empty())
+  if (m_Observers.empty())
     return;
   
   // store old channel
   mafID old_ch=(m_Channel<0)?-1:e->GetChannel();
     
-  mafObserversListType::iterator it;
-  for (it=m_Observers->m_List.begin();it!=m_Observers->m_List.end()&&!e->GetSkipFlag();it++)
+  mafObserversList::iterator it;
+  for (it=m_Observers.begin();it!=m_Observers.end()&&!e->GetSkipFlag();it++)
   {
-    // Set the event channel (if neccessary).
+    // Set the event channel (if necessary).
     // Must set it at each iteration since it could have
     // been changed by other event sources on the path
     if (m_Channel>=0&&m_Channel!=e->GetChannel())
       e->SetChannel(m_Channel);
 
     // rise an event to observers
-    mafObserver *observer=(*it).second;
+    mafObserver *observer=*it;
     observer->OnEvent(e);
   }
   
@@ -175,14 +147,12 @@ void mafEventBroadcaster::InvokeEvent(mafEventBase *e)
 
 //------------------------------------------------------------------------------
 void mafEventBroadcaster::InvokeEvent(mafEventBase &e)
-//------------------------------------------------------------------------------
 {
   InvokeEvent(&e);
 }
 
 //------------------------------------------------------------------------------
 void mafEventBroadcaster::InvokeEvent(void *sender, mafID id, void *data)
-//------------------------------------------------------------------------------
 {
   mafEventBase e(sender,id,data);
 
@@ -190,9 +160,7 @@ void mafEventBroadcaster::InvokeEvent(void *sender, mafID id, void *data)
 }
 
 //------------------------------------------------------------------------------
-mafObserverCallback *mafEventBroadcaster::AddObserverCallback(void (*f)(void *sender,
-    mafID eid, void *clientdata, void *calldata))
-//------------------------------------------------------------------------------
+mafObserverCallback *mafEventBroadcaster::AddObserverCallback(void (*f)(void *sender, mafID eid, void *clientdata, void *calldata))
 {
   mafObserverCallback *observer=new mafObserverCallback();
   AddObserver(observer);
@@ -201,13 +169,11 @@ mafObserverCallback *mafEventBroadcaster::AddObserverCallback(void (*f)(void *se
 
 //------------------------------------------------------------------------------
 void mafEventBroadcaster::SetChannel(mafID ch)
-//------------------------------------------------------------------------------
 {
   m_Channel = ch;
 }
 //------------------------------------------------------------------------------
 mafID mafEventBroadcaster::GetChannel()
-//------------------------------------------------------------------------------
 {
   return m_Channel;
 }

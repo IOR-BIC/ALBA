@@ -154,8 +154,8 @@ void mafObserverTest::TestObserver()
   third_subject.GetFooBroadcaster().InvokeEvent(&third_subject,mafSubjectTestClass::ID_MY_OWN,&third_data);
   CPPUNIT_ASSERT(first_observer.LastEvent.GetId() == mafSubjectTestClass::ID_MY_OWN);
 
-  // test multiple observers with priority
-  first_subject.GetDummyBroadcaster().AddObserver(second_observer,10); // add second high priority observer
+  // test multiple observers
+  first_subject.GetDummyBroadcaster().AddObserver(second_observer); // add second observer
   second_observer.SkipNext = true; // set the skip flag to make other observers to be skipped
   first_subject.GetDummyBroadcaster().AddObserver(third_observer); // add a third observer
 

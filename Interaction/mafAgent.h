@@ -64,7 +64,7 @@ public:
   one listener can be specified, and a broad cast using the VTK Subject/Observer is performed.
   UnPlugListener works for all channels at the same time.
   NULL listeners are ignored.*/
-  void AddObserver(mafObserver *listener,mafID channel=MCH_UP, int priority = 0);
+  void AddObserver(mafObserver *listener,mafID channel=MCH_UP);
   void RemoveObserver(mafObserver *listener);
   void RemoveAllObservers();
   
