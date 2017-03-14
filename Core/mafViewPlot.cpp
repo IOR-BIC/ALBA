@@ -24,14 +24,14 @@
 //----------------------------------------------------------------------------
 
 #include "mafViewPlot.h"
-#include <wx/dc.h>
+
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafGUI.h"
 #include "mafPipe.h"
 #include "mafPipeFactory.h"
-
-#include "mafDeviceButtonsPadMouse.h"
-
 #include "mafVME.h"
+
+#include <wx/dc.h>
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewPlot);
@@ -40,29 +40,27 @@ mafCxxTypeMacro(mafViewPlot);
 //----------------------------------------------------------------------------
 mafViewPlot::mafViewPlot(const wxString &label)
 :mafView(label)
-//----------------------------------------------------------------------------
 {
   m_Sg = NULL;
 }
 //----------------------------------------------------------------------------
 mafViewPlot::~mafViewPlot() 
-//----------------------------------------------------------------------------
 {
   m_PipeMap.clear();
   cppDEL(m_Sg);
 }
+
 //----------------------------------------------------------------------------
 void mafViewPlot::PlugVisualPipe(mafString vme_type, mafString pipe_type, long visibility)
-//----------------------------------------------------------------------------
 {
   mafVisualPipeInfo plugged_pipe;
   plugged_pipe.m_PipeName = pipe_type;
   plugged_pipe.m_Visibility = visibility;
   m_PipeMap[vme_type] = plugged_pipe;
 }
+
 //----------------------------------------------------------------------------
 mafView *mafViewPlot::Copy(mafObserver *Listener, bool lightCopyEnabled)
-//----------------------------------------------------------------------------
 {
   m_LightCopyEnabled = lightCopyEnabled;
   mafViewPlot *v = new mafViewPlot(m_Label);
@@ -74,31 +72,37 @@ mafView *mafViewPlot::Copy(mafObserver *Listener, bool lightCopyEnabled)
 }
 //----------------------------------------------------------------------------
 void mafViewPlot::Create()
-//----------------------------------------------------------------------------
 {
   m_Sg  = new mafSceneGraph(this,NULL);
   m_Sg->SetListener(this);
 }
 //----------------------------------------------------------------------------
 void mafViewPlot::SetMouse(mafDeviceButtonsPadMouse *mouse)
-//----------------------------------------------------------------------------
 {
 }
 
 //----------------------------------------------------------------------------
 void mafViewPlot::VmeAdd(mafVME *vme)
-//----------------------------------------------------------------------------
 {
   assert(m_Sg); 
   m_Sg->VmeAdd(vme);
 }
 //----------------------------------------------------------------------------
-void mafViewPlot::VmeShow(mafVME *vme, bool show)												{assert(m_Sg); m_Sg->VmeShow(vme,show);}
+void mafViewPlot::VmeShow(mafVME *vme, bool show)	
+{
+	assert(m_Sg); 
+	m_Sg->VmeShow(vme,show);
+}
+
 //----------------------------------------------------------------------------
-void mafViewPlot::VmeUpdateProperty(mafVME *vme, bool fromTag)	        {assert(m_Sg); m_Sg->VmeUpdateProperty(vme,fromTag);}
+void mafViewPlot::VmeUpdateProperty(mafVME *vme, bool fromTag)
+{
+	assert(m_Sg);
+	m_Sg->VmeUpdateProperty(vme, fromTag);
+}
+
 //----------------------------------------------------------------------------
 int  mafViewPlot::GetNodeStatus(mafVME *vme)
-//----------------------------------------------------------------------------
 {
   int status = m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
   if (!m_PipeMap.empty())
@@ -119,21 +123,18 @@ int  mafViewPlot::GetNodeStatus(mafVME *vme)
 }
 //----------------------------------------------------------------------------
 void mafViewPlot::VmeRemove(mafVME *vme)
-//----------------------------------------------------------------------------
 {
   assert(m_Sg); 
   m_Sg->VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
 void mafViewPlot::VmeSelect(mafVME *vme, bool select)
-//----------------------------------------------------------------------------
 {
   assert(m_Sg); 
   m_Sg->VmeSelect(vme,select);
 }
 //----------------------------------------------------------------------------
 mafPipe* mafViewPlot::GetNodePipe(mafVME *vme)
-//----------------------------------------------------------------------------
 {
    assert(m_Sg);
    mafSceneNode *n = m_Sg->Vme2Node(vme);
@@ -142,7 +143,6 @@ mafPipe* mafViewPlot::GetNodePipe(mafVME *vme)
 }
 //----------------------------------------------------------------------------
 void mafViewPlot::GetVisualPipeName(mafVME *vme, mafString &pipe_name)
-//----------------------------------------------------------------------------
 {
   mafString vme_type = vme->GetTypeName();
   if (!m_PipeMap.empty())
@@ -158,7 +158,6 @@ void mafViewPlot::GetVisualPipeName(mafVME *vme, mafString &pipe_name)
 }
 //----------------------------------------------------------------------------
 void mafViewPlot::VmeCreatePipe(mafVME *vme)
-//----------------------------------------------------------------------------
 {
   mafString pipe_name = "";
   GetVisualPipeName(vme, pipe_name);
@@ -185,14 +184,12 @@ void mafViewPlot::VmeCreatePipe(mafVME *vme)
 }
 //----------------------------------------------------------------------------
 void mafViewPlot::VmeDeletePipe(mafVME *vme)
-//----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
 	n->DeletePipe();
 }
 //-------------------------------------------------------------------------
 mafGUI *mafViewPlot::CreateGui()
-//-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
 	m_Gui = mafView::CreateGui();
@@ -201,7 +198,6 @@ mafGUI *mafViewPlot::CreateGui()
 }
 //----------------------------------------------------------------------------
 void mafViewPlot::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
 {
   /*if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
@@ -220,7 +216,6 @@ void mafViewPlot::OnEvent(mafEventBase *maf_event)
 }
 //----------------------------------------------------------------------------
 void mafViewPlot::Print(wxDC *dc, wxRect margins)
-//----------------------------------------------------------------------------
 {
   wxBitmap image;
   GetImage(image/*, 2*/);
@@ -228,7 +223,14 @@ void mafViewPlot::Print(wxDC *dc, wxRect margins)
 }
 //----------------------------------------------------------------------------
 void mafViewPlot::GetImage(wxBitmap &bmp, int magnification)
-//----------------------------------------------------------------------------
 {
 //  bmp = *m_Rwi->m_RwiBase->GetImage(magnification);
+}
+
+//----------------------------------------------------------------------------
+void mafViewPlot::SetBackgroundColor(wxColor color)
+{
+	m_BackgroundColor = color;
+// 	m_Rwi->SetBackgroundColor(color);
+// 	m_Rwi->CameraUpdate();
 }

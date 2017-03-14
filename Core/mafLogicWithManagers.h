@@ -52,6 +52,7 @@ class mafVTKLog;
 class mafGUIApplicationSettings;
 class mafGUISettingsTimeBar;
 class mafHelpManager;
+class mafSnapshotManager;
 
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
@@ -145,6 +146,9 @@ public:
 
 	/** Must be called before Configure */
 	void PlugWizardManager(bool b) { m_UseWizardManager = b; };
+
+	/** Must be called before Configure */
+	void PlugSnapshotManager(bool b) { m_UseSnapshotManager = b; };
 
 	/**  Plug a new wizard */
 	virtual void Plug(mafWizard *wizard, wxString menuPath = "");
@@ -380,7 +384,7 @@ protected:
 	mafOpManager           *m_OpManager;
 	mafInteractionManager  *m_InteractionManager;
 	mafHelpManager				 *m_HelpManager;
-
+	mafSnapshotManager		 *m_SnapshotManager;
 	mafVMELandmark				 *m_SelectedLandmark;
 
 	mafGUIMaterialChooser  *m_MaterialChooser;
@@ -402,6 +406,8 @@ protected:
 	bool m_UseOpManager;
 	bool m_UseInteractionManager;
 	bool m_UseHelpManager;
+	bool m_UseSnapshotManager;
+
 	mafGUISettingsDialog *m_SettingsDialog;
 
 	mafString m_Revision;

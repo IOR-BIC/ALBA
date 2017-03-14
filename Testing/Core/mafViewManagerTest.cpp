@@ -55,7 +55,9 @@ public:
 
   // The following methods are added for test mafViewManager automation
   mafVME *GetVME(mafID vmeID); // Not a mafView method!
-  mafVME *GetSelectedVME(){return m_SelectedVme;}; // Not a mafView method!
+	virtual void SetBackgroundColor(wxColor color);
+	void SetMouse(mafDeviceButtonsPadMouse *mouse);
+	mafVME *GetSelectedVME() { return m_SelectedVme; }; // Not a mafView method!
   mafVME *GetShownVME(){return m_ShownVme;}; // Not a mafView method!
   bool GetCameraReset(){return m_CameraReset;}; // Not a mafView method!
   bool GetCameraUpdate(){return m_CameraUpdate;}; // Not a mafView method!
@@ -129,6 +131,14 @@ mafVME *mafViewDummy::GetVME(mafID vmeID) // New method for test stuff
     return NULL;
   }
 }
+void mafViewDummy::SetBackgroundColor(wxColor color)
+{
+	m_BackgroundColor = color;
+}
+void mafViewDummy::SetMouse(mafDeviceButtonsPadMouse *mouse)
+{
+	
+}
 
 //----------------------------------------------------------------------------
 void mafViewManagerTest::OnEvent(mafEventBase *maf_event)
@@ -187,12 +197,12 @@ void mafViewManagerTest::TestStaticAllocation()
 void mafViewManagerTest::ViewAddTest()
 //----------------------------------------------------------------------------
 {
-  mafView* view1 = new mafView();
+  mafView* view1 = new mafViewVTK();
   m_Manager->ViewAdd(view1, false); // not visible to menu
 
 //  CPPUNIT_ASSERT(m_Manager->m_TemplateNum == 1); // check if the number of views is 1
 
-  mafView* view2 = new mafView();
+  mafView* view2 = new mafViewVTK();
   m_Manager->ViewAdd(view2, false); // not visible to menu
 
   //CPPUNIT_ASSERT(m_Manager->m_TemplateNum == 2); // check if the number of views is 2
@@ -203,12 +213,13 @@ void mafViewManagerTest::ViewAddTest()
 void mafViewManagerTest::ViewInsertTest()
 //----------------------------------------------------------------------------
 {
-  mafView* view1 = new mafView();
+  mafView* view1 = new mafViewDummy();
+
   m_Manager->ViewInsert(view1);
 
   CPPUNIT_ASSERT(m_Manager->GetList() == view1); // check if is the same as the first added view
 
-  mafView* view2 = new mafView();
+  mafView* view2 = new mafViewDummy();
   m_Manager->ViewInsert(view2); // not visible to menu
 
   CPPUNIT_ASSERT(m_Manager->GetList()->m_Next == view2); // check if is the same as the second added view
@@ -251,8 +262,8 @@ void mafViewManagerTest::ViewCreateTest()
 void mafViewManagerTest::ViewDeleteTest()
 //----------------------------------------------------------------------------
 {
-  mafView* view1 = new mafView();
-  mafView* view2 = new mafView();
+  mafView* view1 = new mafViewDummy();
+  mafView* view2 = new mafViewDummy();
 
   // Insert a view
   m_Manager->ViewInsert(view1);
@@ -297,7 +308,7 @@ void mafViewManagerTest::GetListTest()
   
   for(int i = 0; i < 6; i++)
   {
-    view[i] = new mafView();
+    view[i] = new mafViewDummy();
     m_Manager->ViewInsert(view[i]);
   }
 
@@ -334,7 +345,7 @@ void mafViewManagerTest::ViewSelectedGetSelectedViewTest()
 
   for(int i = 0; i < 6; i++)
   {
-    view[i] = new mafView();
+    view[i] = new mafViewDummy();
     m_Manager->ViewInsert(view[i]);
   }
 
@@ -712,11 +723,12 @@ void mafViewManagerTest::GetFromListTest()
 //----------------------------------------------------------------------------
 {
   // insert some views in the manager views list
-  mafView *viewA,*viewB,*viewC, *curView ;
+	mafViewDummy *viewA, *viewB, *viewC;
+	mafView *curView;
 
-  viewA = new mafView("viewA");
-  viewB = new mafView("viewB");
-  viewC = new mafView("viewC");
+  viewA = new mafViewDummy("viewA");
+  viewB = new mafViewDummy("viewB");
+  viewC = new mafViewDummy("viewC");
 
   m_Manager->ViewInsert(viewA);
   m_Manager->ViewInsert(viewB);
