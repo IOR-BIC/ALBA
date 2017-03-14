@@ -30,7 +30,6 @@ SET(PROJECT_SRCS
 	vtkMAFToLinearTransformTest.h 	vtkMAFToLinearTransformTest.cpp
 	mafReferenceCountedTest.h 		mafReferenceCountedTest.cpp
 	mafLUTLibraryTest.h 			mafLUTLibraryTest.cpp
-	mafObserversListTest.h 			mafObserversListTest.cpp
 	mafDynamicLoaderTest.h 			mafDynamicLoaderTest.cpp
 	mafDataChecksumTest.h 			mafDataChecksumTest.cpp
 	mafVect3dTest.h 				mafVect3dTest.cpp

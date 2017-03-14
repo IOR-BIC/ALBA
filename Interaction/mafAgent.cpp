@@ -110,7 +110,7 @@ void mafAgent::GetObservers(mafID channel,std::vector<mafObserver *> &olist)
       m_Channels[i]->GetObservers(olist);  
 }
 //------------------------------------------------------------------------------
-void mafAgent::AddObserver(mafObserver *listener,mafID channel, int priority)
+void mafAgent::AddObserver(mafObserver *listener,mafID channel)
 //------------------------------------------------------------------------------
 {
   assert(listener);
@@ -128,7 +128,7 @@ void mafAgent::AddObserver(mafObserver *listener,mafID channel, int priority)
   {
     if (m_Channels[i]->GetChannel()==channel)
     {
-      m_Channels[i]->AddObserver(listener,priority);
+      m_Channels[i]->AddObserver(listener);
       return;
     }
   }
@@ -139,7 +139,7 @@ void mafAgent::AddObserver(mafObserver *listener,mafID channel, int priority)
   newch->SetChannel(channel);
   m_Channels.push_back(newch);
 
-  newch->AddObserver(listener,priority);
+  newch->AddObserver(listener);
 }
 
 //------------------------------------------------------------------------------

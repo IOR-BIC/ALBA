@@ -148,7 +148,7 @@ void mafAgentTest::AfterTest()
 void mafAgentTest::TestFixture()
 {
   // just to see that the fixture has no leaks.  
-  m_Router->AddObserver(m_Sink2,MCH_TEST_CHANNEL2,-10); // test priority of serving
+  m_Router->AddObserver(m_Sink2,MCH_TEST_CHANNEL2);
   m_Router->AddObserver(m_Sink1,MCH_TEST_CHANNEL2);
 	m_Router->AddObserver(m_Sink3,MCH_TEST_CHANNEL3);
 
@@ -183,7 +183,7 @@ void mafAgentTest::TestAddRemoveObserver()
 
 void mafAgentTest::TestRemoveAllObservers()
 {
-  m_Router->AddObserver(m_Sink2,MCH_TEST_CHANNEL2,-10);
+  m_Router->AddObserver(m_Sink2,MCH_TEST_CHANNEL2);
   m_Router->AddObserver(m_Sink1,MCH_TEST_CHANNEL2);
 
   std::vector<mafObserver *> observersList;

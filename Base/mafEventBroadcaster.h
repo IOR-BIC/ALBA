@@ -20,6 +20,7 @@
 //----------------------------------------------------------------------------
 #include "mafObject.h"
 #include <vector>
+#include <list>
 
 //------------------------------------------------------------------------------
 // Forward declarations
@@ -48,10 +49,10 @@ public:
   mafEventBroadcaster(const mafEventBroadcaster& c) {}
 
   /** Register an observer of this subject */
-  void AddObserver(mafObserver *obj, int priority=0);
+  void AddObserver(mafObserver *obj);
 
   /** Register an observer of this subject */
-  void AddObserver(mafObserver &obj, int priority=0);
+  void AddObserver(mafObserver &obj);
 
   /** 
     Add as observer a callback function. This function returns  
@@ -96,8 +97,10 @@ public:
   mafID GetChannel();
 
 protected:
+	typedef std::list<mafObserver *> mafObserversList;
+
   void              *m_Data;       ///< void pointer to be used to store client data 
-  mafObserversList  *m_Observers;  ///< list of observers
+  mafObserversList  m_Observers;  ///< list of observers
   void              *m_Owner;      ///< pointer to class owning this event source
   mafID             m_Channel;     ///< a channel assigned to this event source, if <0 no channel is assigned
 private:
