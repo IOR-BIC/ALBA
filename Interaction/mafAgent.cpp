@@ -11,7 +11,7 @@ Version:   $Revision: 1.10 $
 #include "vtkObjectFactory.h"
 
 #include "mafEventBase.h"
-#include "mafEventSource.h"
+#include "mafEventBroadcaster.h"
 #include "mmuIdFactory.h"
 #include <assert.h>
 
@@ -135,7 +135,7 @@ void mafAgent::AddObserver(mafObserver *listener,mafID channel, int priority)
 
   // if no channel with the right channel Id was found
   // create a new one.
-  mafEventSource *newch =new mafEventSource();
+  mafEventBroadcaster *newch =new mafEventBroadcaster();
   newch->SetChannel(channel);
   m_Channels.push_back(newch);
 
@@ -169,81 +169,6 @@ void mafAgent::RemoveAllObservers()
     m_Channels[i]->RemoveAllObservers();
   }
 }
-
-//------------------------------------------------------------------------------
-void mafAgent::UnPlugEventSource(mafAgent *source)
-//------------------------------------------------------------------------------
-{
-  assert(source);
-  if (source)
-  {
-    source->RemoveObserver(this);
-    //this->Modified();
-  }
-}
-
-//------------------------------------------------------------------------------
-void mafAgent::PlugEventSource(mafAgent *source,mafID channel, int priority)
-//------------------------------------------------------------------------------
-{
-  assert(source);
-  source->AddObserver(this,channel,priority);
-}
-
-#ifdef MAF_USE_VTK
-//------------------------------------------------------------------------------
-void mafAgent::PlugEventSource(vtkObject *source,mafID channel, int priority)
-//------------------------------------------------------------------------------
-{
-  if (!m_EventCallbackCommand) // Alloc this object only when necessary
-  {
-    vtkNEW(m_EventCallbackCommand); // to this object is delegated the due to receive incoming callbacks
-    m_EventCallbackCommand->SetClientData(this); 
-    m_EventCallbackCommand->SetCallback(mafAgent::InternalProcessVTKEvents);
-  }
-
-  assert(source);
-  if (!source)
-  {
-    mafErrorMacro("NULL source provided, cannot Plug it.");
-  }
-
-  source->AddObserver(channel,m_EventCallbackCommand,priority); 
-}
-
-//------------------------------------------------------------------------------
-int mafAgent::PlugEventSource(vtkObject *source,void (*f)(void *), void *self, mafID channel, int priority)
-//------------------------------------------------------------------------------
-{ 
-  assert(source);
-  assert(f);
-
-  if (f==NULL)
-    return 0;
-
-  vtkMAFSmartPointer<vtkOldStyleCallbackCommand> router; // to this object is delegated the due to receive incoming callbacks
-
-  router->SetClientData(self);
-  router->SetCallback(f);
-  
-  return source->AddObserver(channel,router,priority);
-}
-
-//------------------------------------------------------------------------------
-void mafAgent::UnPlugEventSource(vtkObject *source)
-//------------------------------------------------------------------------------
-{
-  assert(source);
-  if (source)
-  {
-    source->RemoveObserver(m_EventCallbackCommand);
-  }
-  else
-  {
-    mafErrorMacro("NULL source provided, cannot UnPlug it.");
-  }
-}
-#endif // MAF_USE_VTK
 
 //------------------------------------------------------------------------------
 void mafAgent::OnEvent(mafEventBase *event)

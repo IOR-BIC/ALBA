@@ -18,7 +18,6 @@
 
 #include "mafIndent.h"
 #include "mafMatrix.h"
-#include "mafEventSource.h"
 
 //#include "vtkPoints.h" //SIL. 23-3-2005: 
 #ifdef MAF_USE_VTK
@@ -34,7 +33,6 @@ mafTransformBase::mafTransformBase()
 //----------------------------------------------------------------------------
 {
   mafNEW(m_Matrix); // dynamic allocation to allow reference counting
-  m_EventSource = new mafEventSource;
 #ifdef MAF_USE_VTK
   m_VTKTransform = NULL;
 #endif
@@ -45,7 +43,6 @@ mafTransformBase::mafTransformBase()
 mafTransformBase::~mafTransformBase()
 //----------------------------------------------------------------------------
 {
-  cppDEL(m_EventSource);
   mafDEL(m_Matrix);
 #ifdef MAF_USE_VTK
   vtkDEL(m_VTKTransform);
@@ -57,7 +54,6 @@ mafTransformBase::mafTransformBase(const mafTransformBase& copy)
 //----------------------------------------------------------------------------
 {
 	mafNEW(m_Matrix); // dynamic allocation to allow reference counting
-	m_EventSource = new mafEventSource;
 	m_TimeStamp = 0;
 
   m_Matrix->DeepCopy(copy.m_Matrix);

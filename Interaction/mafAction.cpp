@@ -58,11 +58,11 @@ void mafAction::BindDevice(mafDevice *device)
 {
   assert(device);
   
-  // the device is plugged as a source of events on the
+  // the device an observer of events on the
   // device input channel
-  PlugEventSource(device,MCH_INPUT);
+  device->AddObserver(this,MCH_INPUT);
   
-  // its also plugged as listener on the output channel
+  // this action must observe the device output channel
   AddObserver(device,MCH_OUTPUT);
 
   m_Devices.push_back(mafAutoPointer<mafDevice>(device));
@@ -74,7 +74,7 @@ void mafAction::UnBindDevice(mafDevice *device)
   assert(device);
 
   // disconnect the device from this action
-  UnPlugEventSource(device);   
+  device->RemoveObserver(this);   
   this->RemoveObserver(device);  
   
   // remove the device from the list

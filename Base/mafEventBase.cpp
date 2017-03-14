@@ -34,7 +34,7 @@ mafCxxTypeMacro(mafEventBase)
 
 //------------------------------------------------------------------------------
 mafEventBase::mafEventBase(void *sender, mafID id, void *data, mafID channel):
-m_Sender(sender),m_Source(NULL),m_Data(data),m_Id(id),m_Channel(channel),m_SkipFlag(false)
+m_Sender(sender),m_Data(data),m_Id(id),m_Channel(channel),m_SkipFlag(false)
 //------------------------------------------------------------------------------
 {
 }
@@ -50,7 +50,6 @@ void mafEventBase::DeepCopy(const mafEventBase *maf_event)
 //------------------------------------------------------------------------------
 {
   m_Sender    = maf_event->m_Sender;
-  m_Source    = maf_event->m_Source;
   m_Data      = maf_event->m_Data;
   m_Id        = maf_event->m_Id;
   m_SkipFlag  = maf_event->m_SkipFlag;
@@ -73,20 +72,6 @@ void *mafEventBase::GetSender()
 //------------------------------------------------------------------------------
 {
   return m_Sender;
-}
-
-//------------------------------------------------------------------------------
-void mafEventBase::SetSource(mafEventSource *src)
-//------------------------------------------------------------------------------
-{
-  m_Source=src;
-}
-
-//------------------------------------------------------------------------------
-mafEventSource *mafEventBase::GetSource()
-//------------------------------------------------------------------------------
-{
-  return m_Source;
 }
 
 //------------------------------------------------------------------------------

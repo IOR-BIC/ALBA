@@ -31,7 +31,6 @@
 #include "mafGUIButton.h"
 #include "mafGUIMovieCtrl.h"
 
-#include "mafEventSource.h"
 #include "mafVME.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"

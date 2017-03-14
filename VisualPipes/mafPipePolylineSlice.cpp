@@ -25,7 +25,6 @@
 
 
 #include "mafAbsMatrixPipe.h"
-#include "mafEventSource.h"
 #include "mafGUI.h"
 #include "mafGUIMaterialButton.h"
 #include "mafPipePolylineSlice.h"
@@ -127,7 +126,7 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
 	m_OutlineActor			= NULL;
 	m_PolyFilteredLine	= NULL;
 
-	m_Vme->GetEventSource()->AddObserver(this);
+	m_Vme->AddObserver(this);
 
 	InitializeFromTag();
 
@@ -258,7 +257,7 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 mafPipePolylineSlice::~mafPipePolylineSlice()
 {
-	m_Vme->GetEventSource()->RemoveObserver(this);
+	m_Vme->RemoveObserver(this);
 
 	m_AssemblyFront->RemovePart(m_Actor);
 	m_AssemblyFront->RemovePart(m_OutlineActor);

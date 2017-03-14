@@ -28,7 +28,6 @@
 #include "mafEventBaseTest.h"
 
 #include "mafReferenceCounted.h"
-#include "mafEventSource.h"
 #include "mafEventBase.h"
 
 #include <iostream>
@@ -68,7 +67,6 @@ void mafEventBaseTest::TestAllConstructors()
   CPPUNIT_ASSERT(eventA.GetId()==5);
   CPPUNIT_ASSERT(eventA.GetSender()==&testObject);
   CPPUNIT_ASSERT(eventA.GetData()==&testData);
-  CPPUNIT_ASSERT(eventA.GetSource()==NULL);
 
 
   // test copy constructor
@@ -76,7 +74,6 @@ void mafEventBaseTest::TestAllConstructors()
   CPPUNIT_ASSERT(eventB.GetId()==eventA.GetId());
   CPPUNIT_ASSERT(eventB.GetSender()==eventA.GetSender());
   CPPUNIT_ASSERT(eventB.GetData()==eventA.GetData());
-  CPPUNIT_ASSERT(eventB.GetSource()==eventA.GetSource());
 }
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestCopy()
@@ -95,7 +92,6 @@ void mafEventBaseTest::TestCopy()
   CPPUNIT_ASSERT(eventB.GetId()==eventA.GetId());
   CPPUNIT_ASSERT(eventB.GetSender()==eventA.GetSender());
   CPPUNIT_ASSERT(eventB.GetData()==eventA.GetData());
-  CPPUNIT_ASSERT(eventB.GetSource()==eventA.GetSource());
 }
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestSender()
@@ -112,19 +108,7 @@ void mafEventBaseTest::TestSender()
 
   mafDEL(testSender);
 }
-//----------------------------------------------------------------------------
-void mafEventBaseTest::TestSource()
-//----------------------------------------------------------------------------
-{
-  mafEventSource testSource;
- 
-  // test source field
-  mafEventBase eventA;
-  CPPUNIT_ASSERT(eventA.GetSource()==NULL);
-  eventA.SetSource(&testSource);
-  CPPUNIT_ASSERT(eventA.GetSource()== &testSource);
 
-}
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestId()
 //----------------------------------------------------------------------------

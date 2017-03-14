@@ -36,7 +36,6 @@
 #include "mafAbsMatrixPipe.h"
 #include "vtkMAFToLinearTransform.h"
 #include "mafVMEOutputPointSet.h"
-#include "mafEventSource.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
@@ -271,7 +270,7 @@ void mafVisualPipeSlicerSlice::Create(mafSceneNode *n/*, bool use_axes*/)
 mafVisualPipeSlicerSlice::~mafVisualPipeSlicerSlice()
 //----------------------------------------------------------------------------
 {
-  m_Vme->GetEventSource()->RemoveObserver(this);
+  m_Vme->RemoveObserver(this);
   m_AssemblyFront->RemovePart(m_Actor1);
   m_AssemblyFront->RemovePart(m_Actor2);
   m_AssemblyFront->RemovePart(m_OutlineActor);

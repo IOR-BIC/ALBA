@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafEventSourceTest
+ Module: mafEventBroadcasterTest
  Authors: Roberto Mucci
  
  Copyright (c) B3C
@@ -24,10 +24,10 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "mafEventSourceTest.h"
+#include "mafEventBroadcasterTest.h"
 
 #include "mafReferenceCounted.h"
-#include "mafEventSource.h"
+#include "mafEventBroadcaster.h"
 #include "vtkMAFSmartPointer.h"
 #include "mafEvent.h"
 
@@ -50,171 +50,171 @@ public:
 
 
 //----------------------------------------------------------------------------
-void mafEventSourceTest::TestFixture()
+void mafEventBroadcasterTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 
 //----------------------------------------------------------------------------
-void mafEventSourceTest::TestStaticAllocation()
+void mafEventBroadcasterTest::TestStaticAllocation()
 //----------------------------------------------------------------------------
 {
-  mafEventSource eventA;
+  mafEventBroadcaster eventBrc;
 }
 //----------------------------------------------------------------------------
-void mafEventSourceTest::TestDynamicAllocation()
+void mafEventBroadcasterTest::TestDynamicAllocation()
 //----------------------------------------------------------------------------
 {
-  mafEventSource *eventA = new mafEventSource();
-  cppDEL(eventA);
+  mafEventBroadcaster *eventBrc = new mafEventBroadcaster();
+  cppDEL(eventBrc);
 }
 //----------------------------------------------------------------------------
-void mafEventSourceTest::TestAddObserver()
+void mafEventBroadcasterTest::TestAddObserver()
 //----------------------------------------------------------------------------
 {
-  mafEventSource *eventA = new mafEventSource;
+  mafEventBroadcaster *eventBrc = new mafEventBroadcaster;
 
   std::vector<mafObserver *> observers;
 
   myObserver myOb;
 
   //Add an observer
-  eventA->AddObserver(&myOb);
+  eventBrc->AddObserver(&myOb);
 
-  eventA->GetObservers(observers);
+  eventBrc->GetObservers(observers);
   
   //Check if the first element oh the list of observers is the one added
   CPPUNIT_ASSERT(observers[0]==&myOb);
 
-  cppDEL(eventA);
+  cppDEL(eventBrc);
 }
 //----------------------------------------------------------------------------
-void mafEventSourceTest::TestRemoveObserver()
+void mafEventBroadcasterTest::TestRemoveObserver()
 //----------------------------------------------------------------------------
 {
-  mafEventSource *eventA = new mafEventSource();
+  mafEventBroadcaster *eventBrc = new mafEventBroadcaster();
 
   myObserver myOb;
 
   //Add an observer
-  eventA->AddObserver(&myOb);
+  eventBrc->AddObserver(&myOb);
 
-  //Check if the observers added is observer of eventA
-  bool check = eventA->IsObserver(&myOb);
+  //Check if the observers added is observer of eventBrc
+  bool check = eventBrc->IsObserver(&myOb);
 
   CPPUNIT_ASSERT(check);
 
   //Remove Observer
-  eventA->RemoveObserver(&myOb);
+  eventBrc->RemoveObserver(&myOb);
 
-  //Check if the observers added and than removed is no more an observer of eventA
-  check = eventA->IsObserver(&myOb);
+  //Check if the observers added and than removed is no more an observer of eventBrc
+  check = eventBrc->IsObserver(&myOb);
 
   CPPUNIT_ASSERT(check==false);
 
-  cppDEL(eventA);
+  cppDEL(eventBrc);
 }
 //----------------------------------------------------------------------------
-void mafEventSourceTest::TestIsObserver()
+void mafEventBroadcasterTest::TestIsObserver()
 //----------------------------------------------------------------------------
 { 
-  mafEventSource *eventA = new mafEventSource();
+  mafEventBroadcaster *eventBrc = new mafEventBroadcaster();
   std::vector<mafObserver *> observers;
 
   myObserver myOb;
   myObserver myOb2;
 
   //Add the first observer
-  eventA->AddObserver(&myOb);
+  eventBrc->AddObserver(&myOb);
 
   
-  CPPUNIT_ASSERT(eventA->IsObserver(&myOb)==true);
-  CPPUNIT_ASSERT(eventA->IsObserver(&myOb2)==false);
+  CPPUNIT_ASSERT(eventBrc->IsObserver(&myOb)==true);
+  CPPUNIT_ASSERT(eventBrc->IsObserver(&myOb2)==false);
 
-  cppDEL(eventA);
+  cppDEL(eventBrc);
 }
 //----------------------------------------------------------------------------
-void mafEventSourceTest::TestRemoveAllObservers()
+void mafEventBroadcasterTest::TestRemoveAllObservers()
 //----------------------------------------------------------------------------
 {
-  mafEventSource *eventA = new mafEventSource();
+  mafEventBroadcaster *eventBrc = new mafEventBroadcaster();
   std::vector<mafObserver *> observers;
 
   myObserver myOb;
   myObserver myOb2;
 
   //Add 2 observers
-  eventA->AddObserver(&myOb);
-  eventA->AddObserver(&myOb2);
+  eventBrc->AddObserver(&myOb);
+  eventBrc->AddObserver(&myOb2);
 
   //Check if the observers have been added
-  CPPUNIT_ASSERT(eventA->IsObserver(&myOb)==true);
-  CPPUNIT_ASSERT(eventA->IsObserver(&myOb2)==true);
+  CPPUNIT_ASSERT(eventBrc->IsObserver(&myOb)==true);
+  CPPUNIT_ASSERT(eventBrc->IsObserver(&myOb2)==true);
 
   //Remove all observers
-  eventA->RemoveAllObservers();
+  eventBrc->RemoveAllObservers();
 
-  eventA->GetObservers(observers);
+  eventBrc->GetObservers(observers);
 
   //Check if the observers have been removed
-  CPPUNIT_ASSERT(eventA->IsObserver(&myOb)==false);
-  CPPUNIT_ASSERT(eventA->IsObserver(&myOb2)==false);  
+  CPPUNIT_ASSERT(eventBrc->IsObserver(&myOb)==false);
+  CPPUNIT_ASSERT(eventBrc->IsObserver(&myOb2)==false);  
   CPPUNIT_ASSERT(observers.size()==0);
 
-  cppDEL(eventA);
+  cppDEL(eventBrc);
 }
 //----------------------------------------------------------------------------
-void mafEventSourceTest::TestHasObservers()
+void mafEventBroadcasterTest::TestHasObservers()
 //----------------------------------------------------------------------------
 {
-  mafEventSource *eventA = new mafEventSource();
+  mafEventBroadcaster *eventBrc = new mafEventBroadcaster();
 
   myObserver myOb;
 
   //Check if event has no observers
-  CPPUNIT_ASSERT(eventA->HasObservers()==false);
+  CPPUNIT_ASSERT(eventBrc->HasObservers()==false);
 
   //Add an observer
-  eventA->AddObserver(&myOb);
+  eventBrc->AddObserver(&myOb);
 
   //Check if event has observers
-  CPPUNIT_ASSERT(eventA->HasObservers()==true);
+  CPPUNIT_ASSERT(eventBrc->HasObservers()==true);
   
-  cppDEL(eventA);
+  cppDEL(eventBrc);
 }
 //----------------------------------------------------------------------------
-void mafEventSourceTest::TestInvokeEvent()
+void mafEventBroadcasterTest::TestInvokeEvent()
 //----------------------------------------------------------------------------
 {
-   mafEventSource *eventA = new mafEventSource;
+   mafEventBroadcaster *eventBrc = new mafEventBroadcaster;
    mafEventBase *eventSend = new mafEventBase();
   
 
    myObserver myOb;
 
    //Add an observer
-   eventA->AddObserver(&myOb);
+   eventBrc->AddObserver(&myOb);
 
    //Invoke OnEvent of the observer MyOb
-   eventA->InvokeEvent(eventSend);
+   eventBrc->InvokeEvent(eventSend);
 
    //m_InvokedEvent turn to true if OnEvent of myOb has been invoked
    CPPUNIT_ASSERT(myOb.m_InvokedEvent==true);
 
-   cppDEL(eventA);
+   cppDEL(eventBrc);
    cppDEL(eventSend);
 }
 //----------------------------------------------------------------------------
-void mafEventSourceTest::TestSetChannel()
+void mafEventBroadcasterTest::TestSetChannel()
 //----------------------------------------------------------------------------
 {
-  mafEventSource *eventA = new mafEventSource;
+  mafEventBroadcaster *eventBrc = new mafEventBroadcaster;
 
   mafID ch = MCH_UP;
 
-  eventA->SetChannel(ch);
+  eventBrc->SetChannel(ch);
 
-  CPPUNIT_ASSERT(eventA->GetChannel() == MCH_UP);
+  CPPUNIT_ASSERT(eventBrc->GetChannel() == MCH_UP);
 
-  cppDEL(eventA);
+  cppDEL(eventBrc);
 }

@@ -35,15 +35,12 @@ void mafEventTest::MafEventTestMainTest()
   CPPUNIT_ASSERT(event_a.GetId()==5);
   CPPUNIT_ASSERT(event_a.GetSender()==&test_object);
   CPPUNIT_ASSERT(event_a.GetData()==&test_data);
-  CPPUNIT_ASSERT(event_a.GetSource()==NULL);
-
 
   // test copy constructor
   mafEventBase event_b=event_a;
   CPPUNIT_ASSERT(event_b.GetId()==event_a.GetId());
   CPPUNIT_ASSERT(event_b.GetSender()==event_a.GetSender());
   CPPUNIT_ASSERT(event_b.GetData()==event_a.GetData());
-  CPPUNIT_ASSERT(event_b.GetSource()==event_a.GetSource());
 
   // test Set functions
   mafEventBase event_c;

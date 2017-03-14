@@ -30,7 +30,6 @@
 #include "mafDataPipeCustom.h"
 #include "mafTagArray.h"
 #include "mmaMaterial.h"
-#include "mafEventSource.h"
 
 #include "vtkPolyData.h"
 #include "vtkMAFDataPipe.h"
@@ -160,7 +159,7 @@ void mafVMEGizmo::SetTextValue(const char* text)
 //-------------------------------------------------------------------------
 {
   m_TextValue = mafString(text);
-  GetEventSource()->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+  InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 }
 //-------------------------------------------------------------------------
 const char * mafVMEGizmo::GetTextValue()
@@ -175,14 +174,14 @@ void mafVMEGizmo::SetTextPosition(double *position3D)
   m_TextPosition[0] = position3D[0];
   m_TextPosition[1] = position3D[1];
   m_TextPosition[2] = position3D[2];
-  GetEventSource()->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+  InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 }
 //-------------------------------------------------------------------------
 void mafVMEGizmo::SetTextVisibility(int visibility)
 //-------------------------------------------------------------------------
 { 
   m_TextVisibility = visibility;
-  GetEventSource()->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+  InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 }
 //-------------------------------------------------------------------------
 double *mafVMEGizmo::GetTextPosition()
@@ -204,5 +203,5 @@ void mafVMEGizmo::SetTextColour(double colour[3])
   m_TextColour[0] = colour[0];
   m_TextColour[1] = colour[1];
   m_TextColour[2] = colour[2];
-  GetEventSource()->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+  InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 }

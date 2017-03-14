@@ -68,7 +68,6 @@
 #include "mafGUISettingsDialog.h"
 
 #include "mmaApplicationLayout.h"
-#include "mafEventSource.h"
 #include "mafDataVector.h"
 #include "mafVMEStorage.h"
 #include "mafWizardManager.h"

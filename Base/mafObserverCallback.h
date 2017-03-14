@@ -27,10 +27,10 @@
 /** Concrete implementation of Observer calling a callback function.
   mafObserverCallback is a class implementing an "observer" that launches a callback
   function. It's useful for attaching as observers objects that do not inherit from mafObserver.
-  When an event is rised the callback function is called passing as argument some event content 
+  When an event is rise the callback function is called passing as argument some event content 
   plus event source Data and this class ClientData, that can be set to any value. Usually ClientData
   is used to store the (self) pointer of the class to whom the callback function belongs.
-  @sa mafEventSource mafObserver
+  @sa mafEventBroadcaster mafObserver
   @todo 
   - create a test
 */

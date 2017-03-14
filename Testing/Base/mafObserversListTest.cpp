@@ -25,7 +25,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "mafObserversListTest.h"
 
-#include "mafEventSource.cpp"
+#include "mafEventBroadcaster.cpp"
 
 
 //------------------------------------------------------------------------------

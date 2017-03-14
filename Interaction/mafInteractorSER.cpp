@@ -147,7 +147,6 @@ void mafInteractorSER::AddAction(mafAction *action, float priority)
   
   // attach the action both as a listener and an event source 
   action->AddObserver(this);
-  //action->PlugEventSource(this,MCH_CAMERA CameraUpdateChannel);
 }
 //------------------------------------------------------------------------------
 void mafInteractorSER::BindDeviceToAction(mafDevice *device,mafAction *action)

@@ -26,7 +26,6 @@
 
 
 #include "mafObserverCallback.h"
-#include "mafEventSource.h"
 #include "mafEventBase.h"
 
 //------------------------------------------------------------------------------

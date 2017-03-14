@@ -34,7 +34,6 @@ public:
 	CPPUNIT_TEST(TestTimeStamp);
 	CPPUNIT_TEST(TestModifiedTime);
 	CPPUNIT_TEST(TestUpdateTime);
-	CPPUNIT_TEST(TestGetEventSource);
 	CPPUNIT_TEST(TestGetVTKTransform);
 	CPPUNIT_TEST(TestInternalTransformPoint);
  
@@ -49,7 +48,6 @@ private:
 	void TestTimeStamp();
 	void TestModifiedTime();
 	void TestUpdateTime();
-	void TestGetEventSource();
 	void TestGetVTKTransform();
 	void TestInternalTransformPoint();
 };

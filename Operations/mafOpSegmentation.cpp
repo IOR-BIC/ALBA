@@ -29,7 +29,6 @@
 #include "mafAbsMatrixPipe.h"
 #include "mafAction.h"
 #include "mafDeviceManager.h"
-#include "mafEventSource.h"
 #include "mafGUI.h"
 #include "mafGUIButton.h"
 #include "mafGUIDialog.h"
@@ -4006,7 +4005,7 @@ void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   newImage->DeepCopy(dataset);
   newImage->Update();
   m_ManualVolumeSlice->SetData(newImage,m_ThresholdVolume->GetTimeStamp(), 2);
-  m_ManualVolumeSlice->GetEventSource()->InvokeEvent(m_ManualVolumeSlice, VME_OUTPUT_DATA_UPDATE);
+  m_ManualVolumeSlice->InvokeEvent(m_ManualVolumeSlice, VME_OUTPUT_DATA_UPDATE);
   m_ManualVolumeSlice->GetOutput()->GetVTKData()->Update();
   m_ManualVolumeSlice->GetOutput()->Update();
   m_ManualVolumeSlice->Update();

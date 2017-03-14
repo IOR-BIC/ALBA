@@ -55,9 +55,7 @@
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineSource.h"
-//#include "vtkColorTransferFunction.h"
 #include "vtkMAFVolumeRayCastMapper.h"
-#include "mafEventSource.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeVolumeMIP);

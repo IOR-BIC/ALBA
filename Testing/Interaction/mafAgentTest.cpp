@@ -150,8 +150,7 @@ void mafAgentTest::TestFixture()
   // just to see that the fixture has no leaks.  
   m_Router->AddObserver(m_Sink2,MCH_TEST_CHANNEL2,-10); // test priority of serving
   m_Router->AddObserver(m_Sink1,MCH_TEST_CHANNEL2);
-
-  m_Sink3->PlugEventSource(m_Router,MCH_TEST_CHANNEL3); // test PlugEventSource API in place of AddObserver()
+	m_Router->AddObserver(m_Sink3,MCH_TEST_CHANNEL3);
 
   m_Sink4->SetListener(m_Sink4); // test SetListener() API
 
