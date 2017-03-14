@@ -109,9 +109,6 @@ void mafObserverTest::TestObserver()
   mafSubjectTestClass second_subject("second_subject");
   mafSubjectTestClass third_subject("third_subject");
   
-  // test the owner member variable is set correctly
-  CPPUNIT_ASSERT(first_subject.GetEventDummy().GetOwner() == &first_subject);
-
   // create some observer objects
   mafObserverTestClass first_observer("first_observer");
   mafObserverTestClass second_observer("second_observer");
@@ -138,7 +135,6 @@ void mafObserverTest::TestObserver()
   first_subject.GetEventDummy().InvokeEvent(&first_subject,mafSubjectTestClass::ID_DUMMY,&first_data);
   CPPUNIT_ASSERT(first_observer.LastEvent.GetId() == mafSubjectTestClass::ID_DUMMY);
   CPPUNIT_ASSERT(first_observer.LastEvent.GetData() == &first_data);
-  CPPUNIT_ASSERT(first_observer.LastEvent.GetSender() == first_observer.LastEvent.GetSource()->GetOwner());
  
   // send an event from the second subject
   second_subject.GetEventDummy().InvokeEvent(&second_subject,mafSubjectTestClass::ID_DUMMY,&second_data);

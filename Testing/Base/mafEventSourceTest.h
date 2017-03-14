@@ -35,8 +35,6 @@ public:
   CPPUNIT_TEST(TestIsObserver);
   CPPUNIT_TEST(TestHasObservers);
   CPPUNIT_TEST(TestInvokeEvent);
-  CPPUNIT_TEST(TestSetData);
-  CPPUNIT_TEST(TestSetOwner);
   CPPUNIT_TEST(TestSetChannel);
   CPPUNIT_TEST_SUITE_END();
   
@@ -51,8 +49,6 @@ private:
   void TestIsObserver();
   void TestHasObservers();
   void TestInvokeEvent();
-  void TestSetData();
-  void TestSetOwner();
   void TestSetChannel();
 };
 

@@ -205,34 +205,6 @@ void mafEventSourceTest::TestInvokeEvent()
    cppDEL(eventSend);
 }
 //----------------------------------------------------------------------------
-void mafEventSourceTest::TestSetData()
-//----------------------------------------------------------------------------
-{
-  mafEventSource *eventA = new mafEventSource;
-
-  myObserver data;
-
-  eventA->SetData((void*)&data);
-
-  CPPUNIT_ASSERT(eventA->GetData() == &data);
-
-  cppDEL(eventA);
-}
-//----------------------------------------------------------------------------
-void mafEventSourceTest::TestSetOwner()
-//----------------------------------------------------------------------------
-{
-  mafEventSource *eventA = new mafEventSource;
-
-  myObserver  owner;  
-
-  eventA->SetOwner((void*)&owner);
-
-  CPPUNIT_ASSERT(eventA->GetOwner() == &owner);
-
-  cppDEL(eventA);
-}
-//----------------------------------------------------------------------------
 void mafEventSourceTest::TestSetChannel()
 //----------------------------------------------------------------------------
 {

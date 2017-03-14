@@ -23,11 +23,11 @@
 //------------------------------------------------------------------------------
 // mafEventSender
 //------------------------------------------------------------------------------
-/** class acting as an interface for objects using MAF hierarchical event commuication model
-  This object simply defines a SetListener/GetListener functions for connecting with a listerner
-  object to create a hierarcy of objects. This allows to send events up in the hierarchy
+/** class acting as an interface for objects using MAF hierarchical event communication model
+  This object simply defines a SetListener/GetListener functions for connecting with a listener
+  object to create a hierarchy of objects. This allows to send events up in the hierarchy
   implementing what was the original MAF event communication model: this is a unicast communication
-  model very well suited for herarchically organized objects. For sending events up in the tree 
+  model very well suited for hierarchically organized objects. For sending events up in the tree 
   the mafEventMacro() or the InvokeEvent() function can be use.
   @sa mafObserver mafObserverCallback
 */

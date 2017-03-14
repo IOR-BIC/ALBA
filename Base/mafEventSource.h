@@ -85,21 +85,7 @@ public:
 
   /** invoke an event of this subject */
   void InvokeEvent(void *sender,mafID id=ID_NO_EVENT, void *data=NULL);
-
-  /** return pointer to client data stored in this object */
-  void *GetData();
-
-  /** set pointer to client data to be stored in this object */
-  void SetData(void *data);
-
-  /** 
-    set the owner of this object, used to create
-    a delegation pattern between the event source 
-    and the class who created it */
-  void SetOwner(void *owner);
-
-  /** return the owner class of this event source */
-  void *GetOwner();
+	 
 
   /** 
     set the channel Id assigned to this event source. If set to <0 
