@@ -314,10 +314,10 @@ void mafVMEMeter::InternalUpdate()
       m_Distance = -1;
 
     GetOutput()->Update();
-    InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+    InvokeEvent(VME_OUTPUT_DATA_UPDATE);
 
     if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && GetMeterAttributes()->m_ThresholdEvent > 0 && m_Distance >= 0 && m_Distance >= threshold)
-      InvokeEvent(this,LENGTH_THRESHOLD_EVENT);
+      InvokeEvent(LENGTH_THRESHOLD_EVENT);
   }
   else if (GetMeterMode() == mafVMEMeter::LINE_DISTANCE)
   {
@@ -401,10 +401,10 @@ void mafVMEMeter::InternalUpdate()
       m_Distance = -1;
 
     GetOutput()->Update();
-    InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+    InvokeEvent(VME_OUTPUT_DATA_UPDATE);
 
     if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && GetMeterAttributes()->m_ThresholdEvent > 0 && m_Distance >= 0 && m_Distance >= threshold)
-      InvokeEvent(this, LENGTH_THRESHOLD_EVENT);
+      InvokeEvent(LENGTH_THRESHOLD_EVENT);
   }
   else if (GetMeterMode() == mafVMEMeter::LINE_ANGLE)
   {
@@ -488,10 +488,10 @@ void mafVMEMeter::InternalUpdate()
       m_Angle = 0;
 
     GetOutput()->Update();
-    InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+    InvokeEvent(VME_OUTPUT_DATA_UPDATE);
 
     if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && GetMeterAttributes()->m_ThresholdEvent > 0 && m_Angle > 0 && m_Angle >= threshold)
-      InvokeEvent(this,LENGTH_THRESHOLD_EVENT);
+      InvokeEvent(LENGTH_THRESHOLD_EVENT);
   }
 
   m_Goniometer->Update();

@@ -149,9 +149,9 @@ void mafEventBroadcaster::InvokeEvent(mafEventBase &e)
 }
 
 //------------------------------------------------------------------------------
-void mafEventBroadcaster::InvokeEvent(void *sender, mafID id, void *data)
+void mafEventBroadcaster::InvokeEvent(mafID id, void *data)
 {
-  mafEventBase e(sender,id,data);
+  mafEventBase e(this,id,data);
 
   InvokeEvent(e);
 }
@@ -173,4 +173,26 @@ void mafEventBroadcaster::SetChannel(mafID ch)
 mafID mafEventBroadcaster::GetChannel()
 {
   return m_Channel;
+}
+
+//----------------------------------------------------------------------------
+void mafEventBroadcaster::SetListener(mafObserver *o)
+{
+	RemoveAllObservers();
+	AddObserver(o);
+}
+
+//----------------------------------------------------------------------------
+mafObserver * mafEventBroadcaster::GetListener()
+{
+	if (m_Observers.size() > 0)
+		return m_Observers.front();
+	else
+		return NULL;
+}
+
+//----------------------------------------------------------------------------
+bool mafEventBroadcaster::HasListener()
+{
+	return (m_Observers.size() > 0);
 }

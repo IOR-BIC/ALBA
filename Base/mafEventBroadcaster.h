@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "mafObject.h"
+#include "mafEventSender.h"
 #include <vector>
 #include <list>
 
@@ -33,14 +33,17 @@ class mafObserverCallback;
 //------------------------------------------------------------------------------
 // mafEventBroadcaster
 //------------------------------------------------------------------------------
-/** Implementation of the Subject/Observer design pattern.
+/** This class inerith form mafEventSender and extends mafEventSender with the capacity 
+	of send events to multiple objects. 
+	Set/Get listener are overridded, when you call set listener you also remove all other 
+	observers and get listener returns the first observer on the list.
   mafEventBroadcaster is a class implementing the "subject" in the Subject/Observer 
   design pattern. Objective of this object is to generate events to be sent to observers.
   An observer must be registered to a subject to create the communication channel 
   between the two.
   @sa mafObserver mafObserverCallback
 */
-class MAF_EXPORT mafEventBroadcaster
+class MAF_EXPORT mafEventBroadcaster : public mafEventSender
 {
 public:
   mafEventBroadcaster(void *owner=NULL);
@@ -58,8 +61,7 @@ public:
     Add as observer a callback function. This function returns  
     pointer to an observer object that must be deleted by 
     consumer after having detached it from the event source */
-  mafObserverCallback *AddObserverCallback(void (*f)(void *sender,
-    mafID eid, void *clientdata, void *calldata));
+  mafObserverCallback *AddObserverCallback(void (*f)(void *sender,  mafID eid, void *clientdata, void *calldata));
 
   /** Unregister an observer. Return false if object is not an observer */
   bool RemoveObserver(mafObserver *obj);
@@ -83,9 +85,8 @@ public:
   void InvokeEvent(mafEventBase *e);
 
   /** invoke an event of this subject */
-  void InvokeEvent(void *sender,mafID id=ID_NO_EVENT, void *data=NULL);
+	void InvokeEvent(mafID id = ID_NO_EVENT, void *data = NULL);
 	 
-
   /** 
     set the channel Id assigned to this event source. If set to <0 
     no channel is assigned */
@@ -96,6 +97,14 @@ public:
     channel has been assigned */
   mafID GetChannel();
 
+	/** Removes all the observer and add o to the observer list */
+	virtual void SetListener(mafObserver *o);
+
+	/** Return the first element of observers list, NULL if the list is empty*/
+	virtual mafObserver *GetListener();
+
+	/** return true if this class has observers */
+	virtual bool HasListener();
 protected:
 	typedef std::list<mafObserver *> mafObserversList;
 
