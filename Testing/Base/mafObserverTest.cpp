@@ -46,15 +46,15 @@ class mafSubjectTestClass: public mafObject
 public:
   mafTypeMacro(mafSubjectTestClass,mafObject)
   mafSubjectTestClass(const char *name=NULL):m_DummyBroadcaster(this),m_FooBroadcaster(this),m_Name(name) {}
-  mafEventBroadcaster &GetDummyBroadcaster() {return m_DummyBroadcaster;} 
-	mafEventBroadcaster &GetFooBroadcaster() {return m_FooBroadcaster;}
+  mafEventBroadcaster *GetDummyBroadcaster() {return &m_DummyBroadcaster;} 
+	mafEventBroadcaster *GetFooBroadcaster() {return &m_FooBroadcaster;}
   mafString &GetName() {return m_Name;}
 
   /** some event Ids */
   enum my_ids {ID_MY_OWN=ID_NO_EVENT+1, ID_DUMMY, ID_FOO};
 
-  void DoSomeThing() {m_DummyBroadcaster.InvokeEvent(this);}
-  void DoSomeThingElse() {m_FooBroadcaster.InvokeEvent(this);}
+  void DoSomeThing() {m_DummyBroadcaster.InvokeEvent();}
+  void DoSomeThingElse() {m_FooBroadcaster.InvokeEvent();}
   void Print(ostream &out) {out<<m_Name<<endl;}
 
 protected:
@@ -114,12 +114,12 @@ void mafObserverTest::TestObserver()
   mafObserverTestClass third_observer("third_observer");
   
   // test multiple subject observation
-  first_subject.GetDummyBroadcaster().AddObserver(first_observer);
-  second_subject.GetDummyBroadcaster().AddObserver(first_observer);
-  third_subject.GetDummyBroadcaster().AddObserver(first_observer);
+  first_subject.GetDummyBroadcaster()->AddObserver(first_observer);
+  second_subject.GetDummyBroadcaster()->AddObserver(first_observer);
+  third_subject.GetDummyBroadcaster()->AddObserver(first_observer);
   
-  second_subject.GetFooBroadcaster().AddObserver(first_observer);
-  third_subject.GetFooBroadcaster().AddObserver(first_observer);
+  second_subject.GetFooBroadcaster()->AddObserver(first_observer);
+  third_subject.GetFooBroadcaster()->AddObserver(first_observer);
 
   // test LastEvent is not set yet
   CPPUNIT_ASSERT(first_observer.LastEvent.GetSender() == NULL);
@@ -131,36 +131,39 @@ void mafObserverTest::TestObserver()
   mafString third_data="Third Data";
   
   // send an event from the first subject
-  first_subject.GetDummyBroadcaster().InvokeEvent(&first_subject,mafSubjectTestClass::ID_DUMMY,&first_data);
+  first_subject.GetDummyBroadcaster()->InvokeEvent(mafSubjectTestClass::ID_DUMMY,&first_data);
   CPPUNIT_ASSERT(first_observer.LastEvent.GetId() == mafSubjectTestClass::ID_DUMMY);
   CPPUNIT_ASSERT(first_observer.LastEvent.GetData() == &first_data);
  
   // send an event from the second subject
-  second_subject.GetDummyBroadcaster().InvokeEvent(&second_subject,mafSubjectTestClass::ID_DUMMY,&second_data);
+  second_subject.GetDummyBroadcaster()->InvokeEvent(mafSubjectTestClass::ID_DUMMY,&second_data);
   CPPUNIT_ASSERT(first_observer.LastEvent.GetId() == mafSubjectTestClass::ID_DUMMY);
-  CPPUNIT_ASSERT(first_observer.LastEvent.GetSender() == &second_subject);
+  CPPUNIT_ASSERT(first_observer.LastEvent.GetSender() == second_subject.GetDummyBroadcaster());
   CPPUNIT_ASSERT(first_observer.LastEvent.GetData() == &second_data);
   
   // send an event from the third subject
-  third_subject.GetDummyBroadcaster().InvokeEvent(&third_subject,mafSubjectTestClass::ID_DUMMY,&third_data);
+  third_subject.GetDummyBroadcaster()->InvokeEvent(mafSubjectTestClass::ID_DUMMY,&third_data);
   CPPUNIT_ASSERT(first_observer.LastEvent.GetId() == mafSubjectTestClass::ID_DUMMY);
-  CPPUNIT_ASSERT(first_observer.LastEvent.GetSender() == &third_subject);
+  CPPUNIT_ASSERT(first_observer.LastEvent.GetSender() == third_subject.GetDummyBroadcaster());
   CPPUNIT_ASSERT(first_observer.LastEvent.GetData() == &third_data);
 
   // test multiple subjects with other events
-  second_subject.GetFooBroadcaster().InvokeEvent(&second_subject,mafSubjectTestClass::ID_FOO,&second_data);
+  second_subject.GetFooBroadcaster()->InvokeEvent(mafSubjectTestClass::ID_FOO,&second_data);
   CPPUNIT_ASSERT(first_observer.LastEvent.GetId() == mafSubjectTestClass::ID_FOO);
-  third_subject.GetFooBroadcaster().InvokeEvent(&third_subject,mafSubjectTestClass::ID_MY_OWN,&third_data);
+	CPPUNIT_ASSERT(first_observer.LastEvent.GetSender() == second_subject.GetFooBroadcaster());
+  third_subject.GetFooBroadcaster()->InvokeEvent(mafSubjectTestClass::ID_MY_OWN,&third_data);
   CPPUNIT_ASSERT(first_observer.LastEvent.GetId() == mafSubjectTestClass::ID_MY_OWN);
+	CPPUNIT_ASSERT(first_observer.LastEvent.GetSender() == third_subject.GetFooBroadcaster());
+
 
   // test multiple observers
-  first_subject.GetDummyBroadcaster().AddObserver(second_observer); // add second observer
-  first_subject.GetDummyBroadcaster().AddObserver(third_observer); // add a third observer
+  first_subject.GetDummyBroadcaster()->AddObserver(second_observer); // add second observer
+  first_subject.GetDummyBroadcaster()->AddObserver(third_observer); // add a third observer
 
-  first_subject.GetDummyBroadcaster().InvokeEvent(&first_subject,mafSubjectTestClass::ID_DUMMY,&first_data);
+  first_subject.GetDummyBroadcaster()->InvokeEvent(mafSubjectTestClass::ID_DUMMY,&first_data);
 
   CPPUNIT_ASSERT(second_observer.LastEvent.GetId() == mafSubjectTestClass::ID_DUMMY);
-  CPPUNIT_ASSERT(second_observer.LastEvent.GetSender() == &first_subject);
+  CPPUNIT_ASSERT(second_observer.LastEvent.GetSender() == first_subject.GetDummyBroadcaster());
   CPPUNIT_ASSERT(third_observer.LastEvent.GetId() == mafSubjectTestClass::ID_DUMMY);
   CPPUNIT_ASSERT(first_observer.LastEvent.GetId() == mafSubjectTestClass::ID_DUMMY);
 }

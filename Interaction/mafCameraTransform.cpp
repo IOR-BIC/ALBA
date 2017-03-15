@@ -541,7 +541,7 @@ void mafCameraTransform::InternalUpdate()
     m_OldViewMatrix->DeepCopy(camera->GetViewTransformMatrix());
   }
 
-  InvokeEvent(this,MATRIX_UPDATED);
+  InvokeEvent(MATRIX_UPDATED);
 }
 
 //------------------------------------------------------------------------------

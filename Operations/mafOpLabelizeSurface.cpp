@@ -576,7 +576,7 @@ void mafOpLabelizeSurface::Undo()
 		m_ResultPolyData.pop_back();
 		((mafVMESurface*)m_VmeEditor)->SetData((vtkPolyData*)m_ResultPolyData[m_ResultPolyData.size()-1],m_Input->GetTimeStamp());
 		
-		((mafVMESurface*)m_VmeEditor)->InvokeEvent(m_VmeEditor,VME_OUTPUT_DATA_UPDATE);
+		((mafVMESurface*)m_VmeEditor)->InvokeEvent(VME_OUTPUT_DATA_UPDATE);
 	}
 }
 //----------------------------------------------------------------------------
@@ -741,7 +741,7 @@ void mafOpLabelizeSurface::Labelize()
 	((mafVMESurface*)m_VmeEditor)->Modified();
 	((mafVMESurface*)m_VmeEditor)->Update();
 
-	((mafVMESurface*)m_VmeEditor)->InvokeEvent(m_VmeEditor,VME_OUTPUT_DATA_UPDATE);
+	((mafVMESurface*)m_VmeEditor)->InvokeEvent(VME_OUTPUT_DATA_UPDATE);
 
 	/*m_Gui->Enable(ID_UNDO,m_ResultPolyData.size()>1);
 	m_Gui->Enable(wxOK,m_ResultPolyData.size()>1);*/

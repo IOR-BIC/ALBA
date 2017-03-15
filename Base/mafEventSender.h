@@ -37,22 +37,22 @@ public:
   mafEventSender() {m_Listener = NULL;}
 
   /** Set the listener object, i.e. the object receiving events sent by this object */
-  void SetListener(mafObserver *o) {m_Listener = o;}
+  virtual void SetListener(mafObserver *o) {m_Listener = o;}
 
   /** Return the listener object, i.e. the object receiving events sent by this object */
-  mafObserver *GetListener() {return m_Listener;}
+	virtual mafObserver *GetListener() {return m_Listener;}
 
   /** return true if this class has observers */
-  bool HasListener() {return m_Listener!=NULL;}
+	virtual bool HasListener() {return m_Listener!=NULL;}
 
   /** invoke an event of this subject */
-  void InvokeEvent(mafEventBase &e) {if (m_Listener) m_Listener->OnEvent(&e);}
+	virtual void InvokeEvent(mafEventBase &e) {if (m_Listener) m_Listener->OnEvent(&e);}
 
   /** invoke an event of this subject */
-  void InvokeEvent(mafEventBase *e) {if (m_Listener) m_Listener->OnEvent(e);}
+	virtual void InvokeEvent(mafEventBase *e) {if (m_Listener) m_Listener->OnEvent(e);}
 
   /** invoke an event of this subject */
-  void InvokeEvent(mafID id=ID_NO_EVENT, void *data=NULL) {if (m_Listener) m_Listener->OnEvent(&mafEventBase(this,id,data));}
+	virtual void InvokeEvent(mafID id=ID_NO_EVENT, void *data=NULL) {if (m_Listener) m_Listener->OnEvent(&mafEventBase(this,id,data));}
 
 protected:
   mafObserver *m_Listener;  ///< object to which events issued by this object are sent

@@ -527,47 +527,47 @@ void mafVMEIterator::SetRootNode(mafVME *root)
 void mafVMEIterator::PreExecute()
 //----------------------------------------------------------------------------
 {
-  InvokeEvent(this,ID_PreTraversal,m_CurrentNode);
+  InvokeEvent(ID_PreTraversal,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed after traversing a node
 void mafVMEIterator::PostExecute()
 //----------------------------------------------------------------------------
 {
-  InvokeEvent(this,ID_PostTraversal,m_CurrentNode);
+  InvokeEvent(ID_PostTraversal,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when going down in the tree
 void mafVMEIterator::DeeperExecute(mafVME *node)
 //----------------------------------------------------------------------------
 {
-  InvokeEvent(this,ID_Deeper,m_CurrentNode);
+  InvokeEvent(ID_Deeper,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when going up in the tree
 void mafVMEIterator::UpperExecute(mafVME *node)
 //----------------------------------------------------------------------------
 {
-  InvokeEvent(this,ID_Upper,m_CurrentNode);
+  InvokeEvent(ID_Upper,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when GoToFirstNode is executed
 void mafVMEIterator::FirstExecute()
 //----------------------------------------------------------------------------
 {
-  InvokeEvent(this,ID_FirstNode,m_CurrentNode);
+  InvokeEvent(ID_FirstNode,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when last node is traversed
 void mafVMEIterator::LastExecute()
 //----------------------------------------------------------------------------
 {
-  InvokeEvent(this,ID_LastNode,m_CurrentNode);
+  InvokeEvent(ID_LastNode,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when IsDoneWithTraversal return "true"
 void mafVMEIterator::DoneExecute()
 //----------------------------------------------------------------------------
 {
-  InvokeEvent(this,ID_Done,m_CurrentNode);
+  InvokeEvent(ID_Done,m_CurrentNode);
 }
