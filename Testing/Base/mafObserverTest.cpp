@@ -70,13 +70,12 @@ class mafObserverTestClass: public mafObject, public mafObserver
 {
 public:
   mafTypeMacro(mafObserverTestClass, mafObject);
-  mafObserverTestClass(const char *name=NULL):Name(name),SkipNext(false) {}
+  mafObserverTestClass(const char *name=NULL):Name(name) {}
 
-  virtual void OnEvent(mafEventBase *event) {LastEvent=*event;if (SkipNext) event->SkipNext();};
+  virtual void OnEvent(mafEventBase *event) {LastEvent=*event;};
 
   mafString     Name;
   mafEventBase  LastEvent; // used to store last receive event contents
-  bool          SkipNext; // flag to force the object setting the skip flag in the event
 };
 
 mafCxxTypeMacro(mafObserverTestClass);
@@ -156,16 +155,12 @@ void mafObserverTest::TestObserver()
 
   // test multiple observers
   first_subject.GetDummyBroadcaster().AddObserver(second_observer); // add second observer
-  second_observer.SkipNext = true; // set the skip flag to make other observers to be skipped
   first_subject.GetDummyBroadcaster().AddObserver(third_observer); // add a third observer
 
   first_subject.GetDummyBroadcaster().InvokeEvent(&first_subject,mafSubjectTestClass::ID_DUMMY,&first_data);
 
-  // test priority and the event skipping: only second_observer should have received the ID_DUMMY event
   CPPUNIT_ASSERT(second_observer.LastEvent.GetId() == mafSubjectTestClass::ID_DUMMY);
   CPPUNIT_ASSERT(second_observer.LastEvent.GetSender() == &first_subject);
-
-  // these two should have been skipped
-  CPPUNIT_ASSERT(third_observer.LastEvent.GetId() != mafSubjectTestClass::ID_DUMMY);
-  CPPUNIT_ASSERT(first_observer.LastEvent.GetId() != mafSubjectTestClass::ID_DUMMY);
+  CPPUNIT_ASSERT(third_observer.LastEvent.GetId() == mafSubjectTestClass::ID_DUMMY);
+  CPPUNIT_ASSERT(first_observer.LastEvent.GetId() == mafSubjectTestClass::ID_DUMMY);
 }

@@ -125,7 +125,7 @@ void mafEventBroadcaster::InvokeEvent(mafEventBase *e)
   mafID old_ch=(m_Channel<0)?-1:e->GetChannel();
     
   mafObserversList::iterator it;
-  for (it=m_Observers.begin();it!=m_Observers.end()&&!e->GetSkipFlag();it++)
+  for (it=m_Observers.begin();it!=m_Observers.end();it++)
   {
     // Set the event channel (if necessary).
     // Must set it at each iteration since it could have
@@ -137,11 +137,8 @@ void mafEventBroadcaster::InvokeEvent(mafEventBase *e)
     mafObserver *observer=*it;
     observer->OnEvent(e);
   }
-  
-  // reset skip flag
-  e->SetSkipFlag(false);
 
-  // restore old channel
+	// restore old channel
   if (old_ch>0) e->SetChannel(old_ch);
 }
 

@@ -170,14 +170,10 @@ protected:
 
 public:
   mafEvent* Copy();
-
   void Log();
-  static void     SetLogMode(int logmode);
-  static int      m_LogMode;
   
 protected:
 
   void Init(void *sender, int id, long arg=0);
-  void Initialized();
 };
 #endif /* __mafEvent_h */
