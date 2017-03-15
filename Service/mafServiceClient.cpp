@@ -29,15 +29,15 @@
 //-------------------------------------------------------------------------
 mafServiceClient::mafServiceClient()
 {
-	m_logic = NULL;
+	m_Logic = NULL;
 }
 
 //-------------------------------------------------------------------------
 mafAbsLogicManager* mafServiceClient::GetLogicManager()
 {
-	if (m_logic == NULL)
-		m_logic = mafServiceLocator::GetLogicManager();
+	if (m_Logic == NULL)
+		m_Logic = mafServiceLocator::GetLogicManager();
 
-	return m_logic;
+	return m_Logic;
 }
 
