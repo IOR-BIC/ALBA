@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafEventBaseTest
- Authors: Daniele Giunchi
+ Authors: Daniele Giunchi, Crimi Gianluigi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -36,26 +36,22 @@
 
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestFixture()
-//----------------------------------------------------------------------------
 {
 }
 
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestStaticAllocation()
-//----------------------------------------------------------------------------
 {
   mafEventBase m;
 }
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestDynamicAllocation()
-//----------------------------------------------------------------------------
 {
   mafEventBase *m = new mafEventBase();
   cppDEL(m);
 }
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestAllConstructors()
-//----------------------------------------------------------------------------
 {
   typedef std::pair<int,const char *> TestType;
   TestType testData(10,"hello");
@@ -77,7 +73,6 @@ void mafEventBaseTest::TestAllConstructors()
 }
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestCopy()
-//----------------------------------------------------------------------------
 {
   typedef std::pair<int,const char *> TestType;
   TestType testData(10,"helloCopy");
@@ -95,7 +90,6 @@ void mafEventBaseTest::TestCopy()
 }
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestSender()
-//----------------------------------------------------------------------------
 {
   mafTestObject *testSender;
   mafNEW(testSender);
@@ -111,7 +105,6 @@ void mafEventBaseTest::TestSender()
 
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestId()
-//----------------------------------------------------------------------------
 {
   int id = 12345;
 
@@ -124,7 +117,6 @@ void mafEventBaseTest::TestId()
 }
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestChannel()
-//----------------------------------------------------------------------------
 {
   int channel = MCH_DOWN;
 
@@ -136,7 +128,6 @@ void mafEventBaseTest::TestChannel()
 }
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestData()
-//----------------------------------------------------------------------------
 {
   typedef std::pair<int,const char *> TestType;
   TestType testData(10,"helloData");
@@ -147,27 +138,4 @@ void mafEventBaseTest::TestData()
   eventA.SetData(&testData);
   CPPUNIT_ASSERT(eventA.GetData()== &testData);
 }
-//----------------------------------------------------------------------------
-void mafEventBaseTest::TestSkipFlag()
-//----------------------------------------------------------------------------
-{
-  bool skipFlag = true;
 
-  // test skipFlag field
-  mafEventBase eventA;
-  CPPUNIT_ASSERT(eventA.GetSkipFlag()==false);
-  eventA.SetSkipFlag(skipFlag);
-  CPPUNIT_ASSERT(eventA.GetSkipFlag()== skipFlag);
-}
-//----------------------------------------------------------------------------
-void mafEventBaseTest::TestSkipNext()
-//----------------------------------------------------------------------------
-{  
-  bool skipFlag = true;
-
-  // test skipnext 
-  mafEventBase eventA;
-  CPPUNIT_ASSERT(eventA.GetSkipFlag()==false);
-  eventA.SkipNext(); //set m_SkipFlag to true
-  CPPUNIT_ASSERT(eventA.GetSkipFlag()== skipFlag);
-}

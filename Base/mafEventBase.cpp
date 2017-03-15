@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafEventBase
- Authors: Marco Petrone
+ Authors: Marco Petrone, Crimi Gianluigi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -34,7 +34,7 @@ mafCxxTypeMacro(mafEventBase)
 
 //------------------------------------------------------------------------------
 mafEventBase::mafEventBase(void *sender, mafID id, void *data, mafID channel):
-m_Sender(sender),m_Data(data),m_Id(id),m_Channel(channel),m_SkipFlag(false)
+m_Sender(sender),m_Data(data),m_Id(id),m_Channel(channel)
 //------------------------------------------------------------------------------
 {
 }
@@ -52,7 +52,6 @@ void mafEventBase::DeepCopy(const mafEventBase *maf_event)
   m_Sender    = maf_event->m_Sender;
   m_Data      = maf_event->m_Data;
   m_Id        = maf_event->m_Id;
-  m_SkipFlag  = maf_event->m_SkipFlag;
 }
 
 //------------------------------------------------------------------------------
@@ -98,48 +97,9 @@ void mafEventBase::SetId(mafID id)
 mafID mafEventBase::GetId()
 //------------------------------------------------------------------------------
 {
-  bool *verbose = GetLogVerbose();
-  if (m_Id != UPDATE_UI && (*verbose) )
-  {
-    mafString sender_type = "Received Event. Sender: ";
-    try
-    {
-      mafObject *obj = (mafObject *)m_Sender;
-      sender_type << typeid(*obj).name();
-    }
-    catch (...)
-    {
-      sender_type = "not mafObject (";
-      sender_type << (long)m_Sender;
-      sender_type << ")";
-    }
-    mafString id_name = mafIdString(m_Id).c_str();
-    mafString msg = sender_type + "  ID: " + id_name;
-    mafLogMessage(msg);
-  }
   return m_Id;
 }
 
-//------------------------------------------------------------------------------
-bool mafEventBase::GetSkipFlag()
-//------------------------------------------------------------------------------
-{
-  return m_SkipFlag;
-}
-
-//------------------------------------------------------------------------------
-void mafEventBase::SetSkipFlag(bool flag)
-//------------------------------------------------------------------------------
-{
-  m_SkipFlag=flag;
-}
-
-//------------------------------------------------------------------------------
-void mafEventBase::SkipNext()
-//------------------------------------------------------------------------------
-{
-  m_SkipFlag=true;
-}
 
 //------------------------------------------------------------------------------
 mafID mafEventBase::GetChannel()
@@ -153,19 +113,4 @@ void mafEventBase::SetChannel(mafID channel)
 //------------------------------------------------------------------------------
 {
   m_Channel=channel;
-}
-//------------------------------------------------------------------------------
-void mafEventBase::SetLogVerbose(bool verbose /* = true */)
-//------------------------------------------------------------------------------
-{
-  bool *help = GetLogVerbose();
-
-  *help = verbose;
-}
-//------------------------------------------------------------------------------
-bool* mafEventBase::GetLogVerbose()
-//------------------------------------------------------------------------------
-{
-  static bool logVerbose = false;
-  return &logVerbose;
 }

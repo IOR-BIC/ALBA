@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafEventBase
- Authors: Marco Petrone
+ Authors: Marco Petrone, Crimi Gianluigi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -58,12 +58,6 @@ public:
 
   virtual void DeepCopy(const mafEventBase *maf_event);
 
-  /** Static function to turn On/Off the verbose logging.*/
-  static void SetLogVerbose(bool verbose = true);
-
-  /** Static function to get the verbose logging.*/
-  static bool* GetLogVerbose();
-
   /** set the sender (invoker) of this event */
   void SetSender(void *sender);
 
@@ -88,21 +82,10 @@ public:
   /** return call data, data sent by sender (event's invoker) to all observers */
   void *GetData();
 
-  /** return SkipFlag value. SkipFlag is used to make an event to be skipped by next observers */
-  bool GetSkipFlag();
-
-  /** set the skip flag. When true the event will be skipped by next observers */
-  void SetSkipFlag(bool flag);
-
-  /** force an event to be skipped by next observers */
-  void SkipNext();
-
 protected:
   void            *m_Sender;
   void            *m_Data;
   mafID           m_Id;
   mafID           m_Channel;
-  bool            m_SkipFlag;
-  // static bool     m_LogVerbose;
 };
 #endif /* __mafEventBase_h */
