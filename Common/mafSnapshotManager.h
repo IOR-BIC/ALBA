@@ -58,6 +58,9 @@ public:
 	/* Create snapshot from selected view*/
 	void CreateSnapshot(mafVME *node, mafView *selectedView);
 
+	/*Add snapshot from bitmap*/
+	void AddSnapshot(wxBitmap &bitmap, wxString name);
+
 	/*Show a Preview of Snapshots*/
 	void ShowSnapshotPreview(mafVME *node);
 
