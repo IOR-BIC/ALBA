@@ -75,30 +75,28 @@ void mafLUTLibraryTest::TestSetGetDir()
 
   // test some luts
 
-  if (DEBUG_MODE)
-  {
-    std::ostringstream stringStream;
-    lutLib->PrintLut(stringStream, m_LutGlow);
+	if (DEBUG_MODE)
+	{
+		std::ostringstream stringStream;
+		lutLib->PrintLut(stringStream, m_LutGlow);
 
-    mafLogMessage(stringStream.str().c_str());
+		mafLogMessage(stringStream.str().c_str());
 
-    std::string dirPrefix = MAF_DATA_ROOT;
-    dirPrefix  +=  "/Test_LUTStorage/";
+		std::string dirPrefix = GET_TEST_DATA_DIR() + "\\";
 
-    CPPUNIT_ASSERT(wxDirExists(dirPrefix.c_str()));
+		CPPUNIT_ASSERT(wxDirExists(dirPrefix.c_str()));
 
-    std::string fileName = dirPrefix;
-    fileName  +=  "mafLUTStorageTestLog.txt";
+		std::string fileName = dirPrefix;
+		fileName += "mafLUTStorageTestLog.txt";
 
-    std::ofstream output;
+		std::ofstream output;
 
-    output.open(fileName.c_str());
-    output << stringStream.str();
-    output.close();
+		output.open(fileName.c_str());
+		output << stringStream.str();
+		output.close();
 
-    CPPUNIT_ASSERT(wxFileExists(fileName.c_str()));
-
-  }
+		CPPUNIT_ASSERT(wxFileExists(fileName.c_str()));
+	}
 
   // store lookup table to file
   std::string dirPrefix = MAF_DATA_ROOT;
