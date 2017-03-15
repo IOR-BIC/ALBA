@@ -40,7 +40,7 @@ class mafStorage;
   tree.
   @sa  mafVME
 */
-class MAF_EXPORT mafRoot: public mafEventSender
+class MAF_EXPORT mafRoot
 {
 public:
 

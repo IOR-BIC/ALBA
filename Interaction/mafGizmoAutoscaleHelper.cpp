@@ -311,7 +311,7 @@ void mafGizmoAutoscaleHelper::InternalUpdate()
 	
 	RecomputeAll();    
 
-	InvokeEvent(this,MATRIX_UPDATED);
+	InvokeEvent(MATRIX_UPDATED);
 }
 
 //------------------------------------------------------------------------------

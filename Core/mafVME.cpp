@@ -98,7 +98,7 @@ mafVME::~mafVME()
 	RemoveAllBackLinks();
 
 	// advise observers this is being destroyed
-	InvokeEvent(this, NODE_DESTROYED);
+	InvokeEvent(NODE_DESTROYED);
 
 	// remove all the children
 	RemoveAllChildren();
@@ -296,7 +296,7 @@ int mafVME::SetParent(mafVME *parent)
 			if (old_root && (new_root != old_root))
 			{
 				ForwardUpEvent(&mafEventBase(this, NODE_DETACHED_FROM_TREE));
-				InvokeEvent(this, NODE_DETACHED_FROM_TREE);
+				InvokeEvent(NODE_DETACHED_FROM_TREE);
 			}
 
 			m_Parent = parent;
@@ -351,7 +351,7 @@ int mafVME::SetParent(mafVME *parent)
 		{
 			// send event about detachment from the tree
 			ForwardUpEvent(&mafEventBase(this, NODE_DETACHED_FROM_TREE));
-			InvokeEvent(this, NODE_DETACHED_FROM_TREE);
+			InvokeEvent(NODE_DETACHED_FROM_TREE);
 
 			m_Parent = parent;
 			Modified();
@@ -395,7 +395,7 @@ void mafVME::SetTimeStamp(mafTimeStamp t)
 	InternalSetTimeStamp(t);
 
   // TODO: consider if to add a flag to disable event issuing
-  InvokeEvent(this,VME_TIME_SET);
+  InvokeEvent(VME_TIME_SET);
 }
 
 //-------------------------------------------------------------------------
@@ -658,7 +658,7 @@ int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
       if (m_AbsMatrixPipe)
         m_AbsMatrixPipe->SetVME(this);
 
-      InvokeEvent(this,VME_MATRIX_CHANGED);
+      InvokeEvent(VME_MATRIX_CHANGED);
 
       return MAF_OK;
     }
@@ -738,7 +738,7 @@ int mafVME::SetDataPipe(mafDataPipe *dpipe)
     }
 
     // advise listeners the data pipe has changed
-    InvokeEvent(this,VME_OUTPUT_DATA_CHANGED);
+    InvokeEvent(VME_OUTPUT_DATA_CHANGED);
 
     return MAF_OK;
   }
@@ -772,7 +772,7 @@ void mafVME::OnEvent(mafEventBase *maf_event)
 					InternalSetTimeStamp(*pTS);
 				} 
 				else {	//no valid timestamp passed, so this is notification that time has been changed, notify our listeners						
-					InvokeEvent(this,VME_TIME_SET);
+					InvokeEvent(VME_TIME_SET);
 				}
 				break;
 			}			
@@ -1344,7 +1344,7 @@ int mafVME::AddChild(mafVME *node)
 		m_Children.push_back(node);
 		// send attachment event from the child node
 		node->ForwardUpEvent(&mafEventBase(node, NODE_ATTACHED_TO_TREE));
-		node->InvokeEvent(node, NODE_ATTACHED_TO_TREE);
+		node->InvokeEvent(NODE_ATTACHED_TO_TREE);
 
 		Modified();
 		return MAF_OK;
