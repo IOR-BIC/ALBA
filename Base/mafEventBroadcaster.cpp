@@ -35,8 +35,6 @@
 //------------------------------------------------------------------------------
 mafEventBroadcaster::mafEventBroadcaster(void *owner)
 {
-  m_Data  = NULL;
-  m_Owner       = owner;
   m_Channel     = -1;
 }
 
@@ -149,7 +147,7 @@ void mafEventBroadcaster::InvokeEvent(mafEventBase &e)
 }
 
 //------------------------------------------------------------------------------
-void mafEventBroadcaster::InvokeEvent(mafID id, void *data)
+void mafEventBroadcaster::InvokeEvent(void *sender, mafID id, void *data)
 {
   mafEventBase e(this,id,data);
 

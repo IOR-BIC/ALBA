@@ -34,7 +34,7 @@
 #include "mafZipUtility.h"
 #include "mmuTimeSet.h"
 #include "mafStorageElement.h"
-#include "mafStorage.h"
+#include "mafVMEStorage.h"
 #include "mafEventIO.h"
 #include "mafIndent.h"
 #include "mafVMERoot.h"
@@ -211,7 +211,7 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
   // the DataVector ID
   parent->SetAttribute("VectorID",mafString(m_VectorID));
 
-  mafStorage *storage = root->GetStorage();
+  mafVMEStorage *storage = root->GetStorage();
   assert(storage);
 
   // define base file name for data files

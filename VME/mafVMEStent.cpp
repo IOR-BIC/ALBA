@@ -222,7 +222,7 @@ void mafVMEStent::OnEvent(mafEventBase *maf_event)
         m_StentLengthModified = true ;
         //SetFixedParameterForSpecialStent();
         InternalUpdate();
-        InvokeEvent(VME_OUTPUT_DATA_UPDATE);
+        InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
         ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
         m_Gui->Update();
       }
@@ -233,7 +233,7 @@ void mafVMEStent::OnEvent(mafEventBase *maf_event)
         SetVesselSurface(m_VesselVME);
 
         InternalUpdate();
-        InvokeEvent(VME_OUTPUT_DATA_UPDATE);
+        InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
         ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
         m_Gui->Update();
       }
@@ -244,7 +244,7 @@ void mafVMEStent::OnEvent(mafEventBase *maf_event)
         SetVesselCenterLine(m_VesselVME);
 
         InternalUpdate();
-        InvokeEvent(VME_OUTPUT_DATA_UPDATE);
+        InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
         ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
         m_Gui->Update();
       }	
@@ -278,7 +278,7 @@ void mafVMEStent::Initialize()
   SetVesselCenterLine(m_CenterLineVME);
 
   InternalUpdate();
-  InvokeEvent(VME_OUTPUT_DATA_UPDATE);
+  InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
   ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
   m_Gui->Update();
 }

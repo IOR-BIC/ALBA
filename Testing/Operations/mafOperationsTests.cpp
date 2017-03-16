@@ -148,6 +148,7 @@
 
 #include "vtkFileOutputWindow.h"
 #include "vtkMAFSmartPointer.h"
+#include "mafVMEOutputNULL.h"
 
 
 // Visual Leak Detector

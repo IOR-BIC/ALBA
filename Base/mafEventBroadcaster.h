@@ -85,7 +85,7 @@ public:
   void InvokeEvent(mafEventBase *e);
 
   /** invoke an event of this subject */
-	void InvokeEvent(mafID id = ID_NO_EVENT, void *data = NULL);
+	void InvokeEvent(void *sender,mafID id = ID_NO_EVENT, void *data = NULL);
 	 
   /** 
     set the channel Id assigned to this event source. If set to <0 
@@ -108,9 +108,7 @@ public:
 protected:
 	typedef std::list<mafObserver *> mafObserversList;
 
-  void              *m_Data;       ///< void pointer to be used to store client data 
   mafObserversList  m_Observers;  ///< list of observers
-  void              *m_Owner;      ///< pointer to class owning this event source
   mafID             m_Channel;     ///< a channel assigned to this event source, if <0 no channel is assigned
 private:
   

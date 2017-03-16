@@ -210,7 +210,7 @@ void mafAgent::InvokeEvent(mafEventBase *event, mafID channel)
 
   if (channel==MCH_UP)
   {
-    mafEventSender::InvokeEvent(event); // send event to listener
+		mafEventBroadcaster::InvokeEvent(event); // send event to listener
     return;
   }
 

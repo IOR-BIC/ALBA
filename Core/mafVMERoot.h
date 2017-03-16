@@ -19,22 +19,19 @@
 // includes :
 //----------------------------------------------------------------------------
 #include "mafVME.h"
-#include "mafRoot.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
+class mafVMEStorage;
 
 /** mafVMERoot - a VME is the root of a tree of VME nodes. 
   This node is a specialized VME acting as root of the tree. It inherits
   root behavior from mafRoot and also is responsible for generating 
   Ids fore VME items added to the tree.
-  @sa mafRoot mafVME
-
-  @todo
-  - 
+  @sa mafVME
   */
-class MAF_EXPORT mafVMERoot : public mafVME, public mafRoot
+class MAF_EXPORT mafVMERoot : public mafVME
 {
 public:
   mafTypeMacro(mafVMERoot,mafVME);
@@ -78,10 +75,7 @@ public:
 
   /** return no timestamps */
   virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
-
-  /** allow only a NULL parent */
-  virtual bool CanReparentTo(mafVME *parent) {return mafRoot::CanReparentTo(parent);}
-
+	  
   void OnEvent(mafEventBase *maf_event);
 
   /** Redefined to update the gui. */
@@ -92,7 +86,32 @@ public:
 
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual mafString GetVisualPipe() {return mafString("mafPipeBox");};
+	
+	/**
+	root node cannot be reparented. Root nodes should redefine CanReparent
+	to call this function. */
+	virtual bool CanReparentTo(mafVME *parent) { return parent == NULL; }
+	
+	/**
+	Return highest NodeId assigned for this tree. Return -1 if no one has
+	been assigned yet.*/
+	mafID GetMaxNodeId() { return m_MaxNodeId; }
 
+	/** Return next available NodeId and increment the internal counter.*/
+	mafID GetNextNodeId() { return ++m_MaxNodeId; }
+
+	/**
+	Set the NodeMaxId. Beware when using this function to avoid non unique
+	Ids. */
+	void SetMaxNodeId(mafID id) { m_MaxNodeId = id; }
+	void ResetMaxNodeId() { this->SetMaxNodeId(0); }
+
+
+	/** Returns Storage */
+	mafVMEStorage * GetStorage() const;
+
+	/** Sets Storage */
+	void SetStorage(mafVMEStorage * storage);
 
 protected:
   /** allowed only dynamic allocation via New() */
@@ -102,6 +121,9 @@ protected:
   /** Create GUI for the VME */
   virtual mafGUI  *CreateGui();
 
+	virtual int StoreRoot(mafStorageElement *parent);
+	virtual int RestoreRoot(mafStorageElement *element);
+	
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
 
@@ -109,6 +131,10 @@ protected:
   mafTransform* m_Transform; ///< pose matrix for the root
 
   mafString m_ApplicationStamp;
+
+	mafID       m_MaxNodeId; ///< Counter for node Ids
+
+	mafVMEStorage *m_Storage;
 
 private:
   mafVMERoot(const mafVMERoot&); // Not implemented

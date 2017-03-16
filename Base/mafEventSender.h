@@ -52,7 +52,7 @@ public:
 	virtual void InvokeEvent(mafEventBase *e) {if (m_Listener) m_Listener->OnEvent(e);}
 
   /** invoke an event of this subject */
-	virtual void InvokeEvent(mafID id=ID_NO_EVENT, void *data=NULL) {if (m_Listener) m_Listener->OnEvent(&mafEventBase(this,id,data));}
+	virtual void InvokeEvent(void *sender, mafID id=ID_NO_EVENT, void *data=NULL) {if (m_Listener) m_Listener->OnEvent(&mafEventBase(sender,id,data));}
 
 protected:
   mafObserver *m_Listener;  ///< object to which events issued by this object are sent
