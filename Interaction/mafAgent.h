@@ -19,7 +19,7 @@
 
 #include "mafReferenceCounted.h"
 #include "mafObserver.h"
-#include "mafEventSender.h"
+#include "mafEventBroadcaster.h"
 #include "mafString.h"
 #include "mafEventBase.h"
 
@@ -46,7 +46,7 @@ class mafEventBroadcaster;
   This class support also bridging of events coming from VTK: a mafAgent can be set as observer of VTK events
   which are tunneled inside MAF events.
   @sa mafEventBase mafAgent mafAgentEventQueue mafAgentThreaded */
-class MAF_EXPORT mafAgent: public mafReferenceCounted, public mafObserver, public mafEventSender
+class MAF_EXPORT mafAgent: public mafReferenceCounted, public mafObserver, public mafEventBroadcaster
 {
 public:
   mafAbstractTypeMacro(mafAgent,mafReferenceCounted);

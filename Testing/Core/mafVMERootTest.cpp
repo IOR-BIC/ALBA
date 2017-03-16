@@ -27,31 +27,31 @@
 #include "mafVMERootTest.h"
 
 #include "mafVMERoot.h"
+#include "mafVMEStorage.h"
 #include "mafMatrix.h"
 #include "mafSmartPointer.h"
 #include "mafVMESurface.h"
 #include "mafVMEVolumeGray.h"
 #include "mafSmartPointer.h"
 #include "mafTagArray.h"
+#include "mafCoreTests.h"
+#include "mafEventIO.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
 //----------------------------------------------------------------------------
 void mafVMERootTest::TestFixture()
-//----------------------------------------------------------------------------
 {
 }
 
 //----------------------------------------------------------------------------
 void mafVMERootTest::TestDynamicAllocation()
-//----------------------------------------------------------------------------
 {
   mafSmartPointer<mafVMERoot> root;
 }
 
 //----------------------------------------------------------------------------
 void mafVMERootTest::TestEquals()
-//----------------------------------------------------------------------------
 {
   mafMatrix m1;
   m1.SetElement(0,3,3.0);
@@ -80,7 +80,6 @@ void mafVMERootTest::TestEquals()
 }
 //----------------------------------------------------------------------------
 void mafVMERootTest::TestDeepCopy()
-//----------------------------------------------------------------------------
 {
   mafMatrix m;
   m.SetElement(0,3,3.0);
@@ -98,7 +97,6 @@ void mafVMERootTest::TestDeepCopy()
 }
 //----------------------------------------------------------------------------
 void mafVMERootTest::TestGetLocalTimeStamps()
-//----------------------------------------------------------------------------
 {
   std::vector<mafTimeStamp> kframes;
 
@@ -111,7 +109,6 @@ void mafVMERootTest::TestGetLocalTimeStamps()
 }
 //----------------------------------------------------------------------------
 void mafVMERootTest::TestSetMaxItemId()
-//----------------------------------------------------------------------------
 {
   mafID id = 5;
   mafID idReturned;
@@ -126,7 +123,6 @@ void mafVMERootTest::TestSetMaxItemId()
 }
 //----------------------------------------------------------------------------
 void mafVMERootTest::TestResetMaxItemId()
-//----------------------------------------------------------------------------
 {
   mafID id = 5;
   mafID idReturned;
@@ -148,7 +144,6 @@ void mafVMERootTest::TestResetMaxItemId()
 }
 //----------------------------------------------------------------------------
 void mafVMERootTest::TestGetNextItemId()
-//----------------------------------------------------------------------------
 {
   mafID id = 5;
 
@@ -170,7 +165,6 @@ void mafVMERootTest::TestGetNextItemId()
 }
 //----------------------------------------------------------------------------
 void mafVMERootTest::TestCleanTree()
-//----------------------------------------------------------------------------
 {
   mafSmartPointer<mafVMESurface> surface;
   mafSmartPointer<mafVMEVolumeGray> volume;
@@ -198,7 +192,6 @@ void mafVMERootTest::TestCleanTree()
 }
 //----------------------------------------------------------------------------
 void mafVMERootTest::TestCanReparentTo()
-//----------------------------------------------------------------------------
 {
   mafSmartPointer<mafVMERoot> root0;
   mafSmartPointer<mafVMERoot> root1;
@@ -213,4 +206,153 @@ void mafVMERootTest::TestCanReparentTo()
   //can only reparent to NULL
   result = (canReparent);
   TEST_RESULT;
+}
+
+//----------------------------------------------------------------------------
+void mafVMERootTest::GetMaxNodeIdTest()
+{
+	mafVMERoot *r;
+	mafNEW(r);
+	//max node id must be 0
+	int id = r->GetMaxNodeId();
+	result = (id == 0);
+	TEST_RESULT(result);
+	mafDEL(r);
+}
+//----------------------------------------------------------------------------
+void mafVMERootTest::GetNextNodeIdTest()
+{
+	mafVMERoot *r;
+	mafNEW(r);
+	//max node id must be 0 , and with this method must return it incremented by 1
+	int id = r->GetNextNodeId();
+	result = (id == 1);
+
+	TEST_RESULT(result);
+	mafDEL(r);
+}
+
+//----------------------------------------------------------------------------
+void mafVMERootTest::SetMaxNodeIdTest()
+{
+	mafVMERoot *r;
+	mafNEW(r);
+	//max node id must be arbitrary 
+	r->SetMaxNodeId(10);
+	int id = r->GetMaxNodeId();
+	result = (id == 10);
+
+	TEST_RESULT(result);
+	mafDEL(r);
+}
+//----------------------------------------------------------------------------
+void mafVMERootTest::ResetMaxNodeIdTest()
+{
+	mafVMERoot *r;
+	mafNEW(r);
+	//max node id must be arbitrary
+	r->SetMaxNodeId(10);
+	int id = r->GetMaxNodeId();
+	result = (id == 10);
+
+	TEST_RESULT(result);
+
+	//but then is reset to 0
+	r->ResetMaxNodeId();
+	id = r->GetMaxNodeId();
+	result = (id == 0);
+
+	TEST_RESULT(result);
+	mafDEL(r);
+}
+//----------------------------------------------------------------------------
+void mafVMERootTest::CanReparentToTest()
+{
+	mafVMERoot *r;
+	mafNEW(r);
+	result = (true == r->CanReparentTo(NULL));
+	//root parent can not be reparented
+	TEST_RESULT(result);
+
+	mafVMEHelper *n = mafVMEHelper::New();
+	result = (false == r->CanReparentTo(n));
+
+	TEST_RESULT(result);
+
+	mafDEL(n);
+	mafDEL(r);
+}
+//----------------------------------------------------------------------------
+void mafVMERootTest::SafeDownCastTest()
+{
+	mafVMERoot *r;
+	mafNEW(r);
+	mafVMERoot *rp;
+	//valid cast
+
+	//-----------------
+	// this test is failing on vs2010 but not on vs2003 so I comment it out (more investigation is needed...)
+	//----------------- start test comment
+	// rp = (mafVMERoot *)mafRoot::SafeDownCast((mafObject *)r1);
+	// result = (rp != NULL);
+	// TEST_RESULT(result);
+	//----------------- end test comment
+
+	//bad cast
+	mafVMEHelper *n = mafVMEHelper::New();
+	rp = (mafVMERoot *)mafVMERoot::SafeDownCast((mafObject *)n);
+	result = (rp == NULL);
+
+	TEST_RESULT(result);
+	mafDEL(r);
+	mafDEL(n);
+}
+//----------------------------------------------------------------------------
+void mafVMERootTest::OnRootEventTest()
+{
+	mafVMEStorage *storage = mafVMEStorage::New();
+	storage->GetRoot()->SetName("root");
+	storage->GetRoot()->Initialize();
+
+	mafVMERoot *r1;
+	mafNEW(r1);
+	r1->SetStorage(storage);
+
+	mafEventIO *eventA = new mafEventIO();
+	eventA->SetId(NODE_GET_STORAGE);
+
+	r1->OnEvent(eventA);
+
+	//check if eventIO has storage variable correctly set
+	mafVMEStorage *s = r1->GetStorage();
+	result = (s == eventA->GetStorage());
+	TEST_RESULT(result);
+
+	mafDEL(r1);
+	cppDEL(eventA);
+	mafDEL(storage);
+}
+//----------------------------------------------------------------------------
+void mafVMERootTest::GetStorageTest()
+{
+	mafVMEStorage *storage = mafVMEStorage::New();
+	storage->GetRoot()->SetName("root");
+	storage->GetRoot()->Initialize();
+
+	mafVMERoot *r1;
+	mafNEW(r1);
+	//storage not defined
+	mafVMEStorage *s = r1->GetStorage();
+	result = (s == NULL);
+	TEST_RESULT(result);
+
+	//define storage with listener
+	r1->SetStorage(storage);
+
+	s = r1->GetStorage();
+	result = (s == storage);
+	TEST_RESULT(result);
+
+	mafDEL(r1);
+	mafDEL(storage);
 }

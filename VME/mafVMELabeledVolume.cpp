@@ -907,7 +907,7 @@ void mafVMELabeledVolume::OnEvent(mafEventBase *maf_event)
           {
             m_CheckedVector[i] = m_LabelCheckBox->IsItemChecked(i);
             GenerateLabeledVolume();
-            InvokeEvent(VME_OUTPUT_DATA_UPDATE);
+            InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
             break;
           }
         } 

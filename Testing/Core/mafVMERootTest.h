@@ -36,6 +36,16 @@ public:
   CPPUNIT_TEST(TestGetNextItemId);
   CPPUNIT_TEST(TestCleanTree);
   CPPUNIT_TEST(TestCanReparentTo);
+
+	CPPUNIT_TEST(TestDynamicAllocation);
+	CPPUNIT_TEST(GetMaxNodeIdTest);
+	CPPUNIT_TEST(GetNextNodeIdTest);
+	CPPUNIT_TEST(SetMaxNodeIdTest);
+	CPPUNIT_TEST(ResetMaxNodeIdTest);
+	CPPUNIT_TEST(CanReparentToTest);
+	CPPUNIT_TEST(SafeDownCastTest);
+	CPPUNIT_TEST(OnRootEventTest);
+	CPPUNIT_TEST(GetStorageTest);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -49,6 +59,15 @@ private:
   void TestGetNextItemId();
   void TestCleanTree();
   void TestCanReparentTo();
+
+	void GetMaxNodeIdTest();
+	void GetNextNodeIdTest();
+	void SetMaxNodeIdTest();
+	void ResetMaxNodeIdTest();
+	void CanReparentToTest();
+	void SafeDownCastTest();
+	void OnRootEventTest();
+	void GetStorageTest();
   bool result;
 };
 

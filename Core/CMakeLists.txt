@@ -24,7 +24,6 @@ SET(PROJECT_SRCS
   mafOpSelect.cpp  				mafOpSelect.h
   mafOpStack.cpp  				mafOpStack.h
   mafPrintSupport.cpp  			mafPrintSupport.h
-  mafRoot.cpp  					mafRoot.h
   mafTagArray.cpp  				mafTagArray.h
   mafTagItem.cpp  				mafTagItem.h
   mafTimeMap.h

@@ -591,7 +591,7 @@ void mafVMELandmarkCloud::SetRadius(double rad, bool force_update)
 
   m_Radius = rad;
   Modified();
-  InvokeEvent(mafVMELandmarkCloud::CLOUD_RADIUS_MODIFIED);
+  InvokeEvent(this,mafVMELandmarkCloud::CLOUD_RADIUS_MODIFIED);
 }
 
 //-------------------------------------------------------------------------
@@ -609,7 +609,7 @@ void mafVMELandmarkCloud::SetSphereResolution(int res, bool force_update)
   m_SphereResolution = res;
   Modified();
 
-  InvokeEvent(mafVMELandmarkCloud::CLOUD_SPHERE_RES);
+  InvokeEvent(this,mafVMELandmarkCloud::CLOUD_SPHERE_RES);
 }
 
 //-------------------------------------------------------------------------

@@ -41,10 +41,9 @@
 #include "mafIndent.h"
 #include "mafStorageElement.h"
 #include "mafVMEIterator.h"
-
+#include "mafVMERoot.h"
 #include <assert.h>
 #include "mafStorage.h"
-#include "mafRoot.h"
 #include "wx\tokenzr.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMEFactory.h"
@@ -98,7 +97,7 @@ mafVME::~mafVME()
 	RemoveAllBackLinks();
 
 	// advise observers this is being destroyed
-	InvokeEvent(NODE_DESTROYED);
+	InvokeEvent(this, NODE_DESTROYED);
 
 	// remove all the children
 	RemoveAllChildren();
@@ -296,13 +295,13 @@ int mafVME::SetParent(mafVME *parent)
 			if (old_root && (new_root != old_root))
 			{
 				ForwardUpEvent(&mafEventBase(this, NODE_DETACHED_FROM_TREE));
-				InvokeEvent(NODE_DETACHED_FROM_TREE);
+				InvokeEvent(this, NODE_DETACHED_FROM_TREE);
 			}
 
 			m_Parent = parent;
 
 			// if it's being attached to a new tree and this has 'mafRoot' root node, ask for a new Id
-			mafRoot *root = mafRoot::SafeDownCast(new_root);
+			mafVMERoot *root = mafVMERoot::SafeDownCast(new_root);
 
 			// if attached under a new root (i.e. a new tree
 			// with a root node of type mafRoot) ask for
@@ -351,7 +350,7 @@ int mafVME::SetParent(mafVME *parent)
 		{
 			// send event about detachment from the tree
 			ForwardUpEvent(&mafEventBase(this, NODE_DETACHED_FROM_TREE));
-			InvokeEvent(NODE_DETACHED_FROM_TREE);
+			InvokeEvent(this, NODE_DETACHED_FROM_TREE);
 
 			m_Parent = parent;
 			Modified();
@@ -395,7 +394,7 @@ void mafVME::SetTimeStamp(mafTimeStamp t)
 	InternalSetTimeStamp(t);
 
   // TODO: consider if to add a flag to disable event issuing
-  InvokeEvent(VME_TIME_SET);
+  InvokeEvent(this, VME_TIME_SET);
 }
 
 //-------------------------------------------------------------------------
@@ -658,7 +657,7 @@ int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
       if (m_AbsMatrixPipe)
         m_AbsMatrixPipe->SetVME(this);
 
-      InvokeEvent(VME_MATRIX_CHANGED);
+      InvokeEvent(this, VME_MATRIX_CHANGED);
 
       return MAF_OK;
     }
@@ -738,7 +737,7 @@ int mafVME::SetDataPipe(mafDataPipe *dpipe)
     }
 
     // advise listeners the data pipe has changed
-    InvokeEvent(VME_OUTPUT_DATA_CHANGED);
+    InvokeEvent(this, VME_OUTPUT_DATA_CHANGED);
 
     return MAF_OK;
   }
@@ -772,7 +771,7 @@ void mafVME::OnEvent(mafEventBase *maf_event)
 					InternalSetTimeStamp(*pTS);
 				} 
 				else {	//no valid timestamp passed, so this is notification that time has been changed, notify our listeners						
-					InvokeEvent(VME_TIME_SET);
+					InvokeEvent(this, VME_TIME_SET);
 				}
 				break;
 			}			
@@ -1344,7 +1343,7 @@ int mafVME::AddChild(mafVME *node)
 		m_Children.push_back(node);
 		// send attachment event from the child node
 		node->ForwardUpEvent(&mafEventBase(node, NODE_ATTACHED_TO_TREE));
-		node->InvokeEvent(NODE_ATTACHED_TO_TREE);
+		node->InvokeEvent(this, NODE_ATTACHED_TO_TREE);
 
 		Modified();
 		return MAF_OK;
@@ -2090,14 +2089,11 @@ void mafVME::UpdateId()
 	// If the node was attached under another root its Id is different from -1
 	// when it is attached to the new root it has to be updated anyway.
 	// So 'if' test below has been commented.
-	//if (this->m_Id == -1)
-	//{
-	mafRoot *root = mafRoot::SafeDownCast(GetRoot());
+	mafVMERoot *root = mafVMERoot::SafeDownCast(GetRoot());
 	if (root)
 	{
 		SetId(root->GetNextNodeId());
 	}
-	//}
 }
 
 //-------------------------------------------------------------------------

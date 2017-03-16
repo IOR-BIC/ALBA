@@ -4005,7 +4005,7 @@ void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   newImage->DeepCopy(dataset);
   newImage->Update();
   m_ManualVolumeSlice->SetData(newImage,m_ThresholdVolume->GetTimeStamp(), 2);
-  m_ManualVolumeSlice->InvokeEvent(VME_OUTPUT_DATA_UPDATE);
+  m_ManualVolumeSlice->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
   m_ManualVolumeSlice->GetOutput()->GetVTKData()->Update();
   m_ManualVolumeSlice->GetOutput()->Update();
   m_ManualVolumeSlice->Update();
