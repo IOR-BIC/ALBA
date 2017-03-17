@@ -161,7 +161,8 @@ void mafVMERoot::OnEvent(mafEventBase *maf_event)
 				}
 				break;
 			default:
-				m_Storage->OnEvent(maf_event);
+				if(m_Storage)
+					m_Storage->OnEvent(maf_event);
     };
   }
   else
