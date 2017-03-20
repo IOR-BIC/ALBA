@@ -147,10 +147,6 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_UseHelpManager = true;
 	m_UseSnapshotManager = false;
 
-	m_ExternalViewFlag = false;
-
-	m_CameraLinkingObserverFlag = false;
-
 	m_VMEManager = NULL;
 	m_ViewManager = NULL;
 	m_OpManager = NULL;
@@ -807,40 +803,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				if (m_InteractionManager) m_InteractionManager->CameraFlyToMode();  //modified by Marco. 15-9-2004 fly to with devices.
 #endif
 				break;
-			case LINK_CAMERA_TO_INTERACTOR:
-			{
-				// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-				if (m_InteractionManager == NULL || m_InteractionManager->GetPER() == NULL)
-					return;
-
-				vtkCamera *cam = vtkCamera::SafeDownCast(e->GetVtkObj());
-				bool link_camera = e->GetBool();
-				if (!link_camera)
-				{
-					if (cam)
-						m_InteractionManager->GetPER()->LinkCameraRemove(cam);
-					else
-						m_InteractionManager->GetPER()->LinkCameraRemoveAll();
-
-					if (m_CameraLinkingObserverFlag)
-					{
-						m_InteractionManager->GetPER()->GetCameraMouseInteractor()->RemoveObserver(this);
-						m_CameraLinkingObserverFlag = false;
-					}
-				}
-				else if (cam)
-				{
-					if (!m_CameraLinkingObserverFlag)
-					{
-						m_InteractionManager->GetPER()->GetCameraMouseInteractor()->AddObserver(this);
-						m_CameraLinkingObserverFlag = true;
-					}
-					m_InteractionManager->GetPER()->LinkCameraAdd(cam);
-				}
-			}
-#endif
-			break;
 			case TIME_SET:
 				TimeSet(e->GetDouble());
 				break;
@@ -1622,25 +1584,12 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
 	// removed temporarily support for external Views
 	if (v)
 	{
-		if (GetExternalViewFlag())
-		{
-			// external views
-			mafGUIViewFrame *extern_view = new mafGUIViewFrame(m_Win, -1, v->GetLabel(), wxPoint(10, 10), wxSize(800, 600)/*, wxSIMPLE_BORDER|wxMAXIMIZE*/);
-			extern_view->SetView(v);
-			extern_view->SetListener(m_ViewManager);
-			v->GetFrame()->SetWindowStyleFlag(m_ChildFrameStyle);
-			v->SetListener(extern_view);
-			v->SetFrame(extern_view);
-			extern_view->Refresh();
-		}
-		else
-		{
-			// child views
-			mafGUIMDIChild *c = new mafGUIMDIChild(m_Win, v);
-			c->SetWindowStyleFlag(m_ChildFrameStyle);
-			c->SetListener(m_ViewManager);
-			v->SetFrame(c);
-		}
+		
+		// child views
+		mafGUIMDIChild *c = new mafGUIMDIChild(m_Win, v);
+		c->SetWindowStyleFlag(m_ChildFrameStyle);
+		c->SetListener(m_ViewManager);
+		v->SetFrame(c);
 	}
 }
 //----------------------------------------------------------------------------
@@ -2356,22 +2305,6 @@ void mafLogicWithManagers::UpdateMeasureUnit()
 		v->OptionsUpdate();
 }
 
-//----------------------------------------------------------------------------
-void mafLogicWithManagers::SetExternalViewFlag(bool external)
-{
-	m_ExternalViewFlag = external;
-	wxConfig *config = new wxConfig(wxEmptyString);
-	config->Write("ExternalViewFlag", m_ExternalViewFlag);
-	cppDEL(config);
-}
-//----------------------------------------------------------------------------
-bool mafLogicWithManagers::GetExternalViewFlag()
-{
-	wxConfig *config = new wxConfig(wxEmptyString);
-	config->Read("ExternalViewFlag", &m_ExternalViewFlag, false);
-	cppDEL(config);
-	return m_ExternalViewFlag;
-}
 
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::ImportExternalFile(mafString &filename)

@@ -702,21 +702,3 @@ void mafInteractorPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
     m_FlyToFlag = false;
   }
 }
-//----------------------------------------------------------------------------
-void mafInteractorPER::LinkCameraAdd(vtkCamera *cam)
-//----------------------------------------------------------------------------
-{
-  ((mafInteractorCameraMove *)m_CameraMouseBehavior)->AddLinkedCamera(cam);
-}
-//----------------------------------------------------------------------------
-void mafInteractorPER::LinkCameraRemove(vtkCamera *cam)
-//----------------------------------------------------------------------------
-{
-  ((mafInteractorCameraMove *)m_CameraMouseBehavior)->RemoveLinkedCamera(cam);
-}
-//----------------------------------------------------------------------------
-void mafInteractorPER::LinkCameraRemoveAll()
-//----------------------------------------------------------------------------
-{
-  ((mafInteractorCameraMove *)m_CameraMouseBehavior)->RemoveAllLinkedCamera();
-}

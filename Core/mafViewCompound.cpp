@@ -241,9 +241,6 @@ void mafViewCompound::OnEvent(mafEventBase *maf_event)
     case ID_LAYOUT_CHOOSER:
       OnLayout();
     break;
-    case ID_LINK_SUBVIEW:
-      LinkView(m_LinkSubView != 0);
-    break;
     default:
       mafView::OnEvent(maf_event);
   }
@@ -262,7 +259,6 @@ mafGUI* mafViewCompound::CreateGui()
 
   m_Gui->Integer(ID_DEFAULT_CHILD_VIEW,"default child", &m_DefauldChildView, 0, m_NumOfChildView, childview_tooltip);
   m_Gui->Combo(ID_LAYOUT_CHOOSER,"layout",&m_LayoutConfiguration,4,layout_choices);
-  m_Gui->Bool(ID_LINK_SUBVIEW,"link camera",&m_LinkSubView);
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -572,23 +568,7 @@ void mafViewCompound::GetImage(wxBitmap &bmp, int magnification)
   compoundDC.SelectObject(wxNullBitmap);
   bmp = compoundImage;
 }
-//----------------------------------------------------------------------------
-void mafViewCompound::LinkView(bool link_camera)
-//----------------------------------------------------------------------------
-{
-  mafView *cv = NULL;
-  for (int i=0; i<m_NumOfChildView; i++)
-  {
-    if (cv = mafViewVTK::SafeDownCast(m_ChildViewList[i])) 
-    {
-      ((mafViewVTK *)cv)->LinkView(link_camera);
-    }
-    else if (cv = mafViewCompound::SafeDownCast(m_ChildViewList[i])) 
-    {
-      ((mafViewCompound *)cv)->LinkView(link_camera);
-    }
-  }
-}
+
 //----------------------------------------------------------------------------
 void mafViewCompound::OptionsUpdate()
 {

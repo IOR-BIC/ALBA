@@ -225,8 +225,6 @@ EVT_START,
   CAMERA_PRE_RESET,
   CAMERA_POST_RESET,
 
-  LINK_CAMERA_TO_INTERACTOR,
-
   // modified by Stefano 21-9-2004 (begin)
   CAMERA_RXFEM_XNEG, //(to be moved elsewhere Marco)
   CAMERA_RXFEM_XPOS, //(to be moved elsewhere Marco)

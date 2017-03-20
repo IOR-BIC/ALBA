@@ -495,16 +495,6 @@ mafView *mafViewManager::GetSelectedView()
 void mafViewManager::Activate(mafView *view)
 //----------------------------------------------------------------------------
 {
-  bool externalViewFlag;
-  // Determine if is an external view
-  wxConfig *config = new wxConfig(wxEmptyString);
-  config->Read("ExternalViewFlag", &externalViewFlag, false);
-  cppDEL(config);
-
-  // Set the focus to the frame of the specified view
-  if(externalViewFlag)
-    ((mafGUIViewFrame *)view->GetFrame())->SetFocus();
-  else
     ((mafGUIMDIChild *)view->GetFrame())->SetFocus();
 }
 

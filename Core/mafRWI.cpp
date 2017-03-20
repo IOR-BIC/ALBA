@@ -81,7 +81,6 @@ mafRWI::mafRWI()
 	}
 	m_Sizer = NULL;
 
-	m_LinkCamera   = 0;
 	m_GridPosition = 0;
 	m_BGColour  = wxColour(DEFAULT_BG_COLOR * 255,DEFAULT_BG_COLOR * 255,DEFAULT_BG_COLOR * 255);
 	m_GridColour= wxColour(DEFAULT_GRID_COLOR * 255,DEFAULT_GRID_COLOR * 255,DEFAULT_GRID_COLOR * 255);
@@ -122,7 +121,6 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
 	}
 	m_Sizer = NULL;
 
-	m_LinkCamera   = 0;
 	m_GridPosition = 0;
 	m_BGColour  = wxColour(DEFAULT_BG_COLOR * 255,DEFAULT_BG_COLOR * 255,DEFAULT_BG_COLOR * 255);
 	m_GridColour= wxColour(DEFAULT_GRID_COLOR * 255,DEFAULT_GRID_COLOR * 255,DEFAULT_GRID_COLOR * 255);
@@ -257,10 +255,6 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
 mafRWI::~mafRWI()
 //----------------------------------------------------------------------------
 {
-	if (m_LinkCamera != 0) 
-	{
-		LinkCamera(false);
-	}
 	if(m_Grid) m_RenFront->RemoveActor(m_Grid);
 	if(m_Grid) m_RenFront->RemoveActor2D(m_Grid->GetLabelActor());
 	vtkDEL(m_Grid);
@@ -857,7 +851,6 @@ enum RWI_WIDGET_ID
 	ID_CAMERA_POSITION,
 	ID_CAMERA_VIEW_UP,
 	ID_CAMERA_ORIENTATION,
-	ID_LINK_CAMERA,
 	ID_SHOW_ORIENTATOR,
 	ID_SHOW_PROFILING_INFORMATION,
 };
@@ -911,7 +904,6 @@ mafGUI *mafRWI::CreateGui()
 	}
 
 	m_Gui->Divider(2);
-	m_Gui->Bool(ID_LINK_CAMERA,"link camera",&m_LinkCamera,0,"Turn On/Off camera interaction synchronization");
 	m_Gui->Bool(ID_SHOW_ORIENTATOR,"orientation",&m_ShowOrientator);
 	m_Gui->Bool(ID_SHOW_PROFILING_INFORMATION,"fps",&m_ShowProfilingInformation);
 	m_Gui->Divider();
@@ -941,11 +933,6 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
 		case ID_GRID_NORMAL:
 			SetGridNormal(m_GridNormal);
 			CameraUpdate();
-			break;
-		case ID_LINK_CAMERA:
-			{
-				LinkCamera(m_LinkCamera != 0);
-			}
 			break;
 		case ID_SHOW_ORIENTATOR:
 			SetOrientatorVisibility(m_ShowOrientator!= 0);
@@ -1036,21 +1023,6 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
 	{
 		mafEventMacro(*maf_event);
 	}
-}
-//----------------------------------------------------------------------------
-void mafRWI::LinkCamera(bool linc_camera)
-//----------------------------------------------------------------------------
-{
-	m_LinkCamera = linc_camera;
-	if (m_Gui) 
-	{
-		m_Gui->Update();
-	}
-
-	mafEvent e(this,LINK_CAMERA_TO_INTERACTOR);
-	e.SetVtkObj(m_Camera);
-	e.SetBool(m_LinkCamera != 0);
-	mafEventMacro(e);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetOrientatorProperties(double rgbText[3], double rgbBackground[3], double scale)
