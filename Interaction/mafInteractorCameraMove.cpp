@@ -253,6 +253,8 @@ void mafInteractorCameraMove::Rotate()
   m_CurrentCamera->Elevation(ryf);
   m_CurrentCamera->OrthogonalizeViewUp();
 
+	InvokeEvent(this, CAMERA_MOVED);
+
   if (m_AutoResetClippingRange) ResetClippingRange();
   m_Renderer->GetRenderWindow()->Render();
 }

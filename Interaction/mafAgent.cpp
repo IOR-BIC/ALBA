@@ -195,10 +195,9 @@ void mafAgent::InternalProcessVTKEvents(vtkObject* sender, unsigned long eventid
 }
 
 //------------------------------------------------------------------------------
-void mafAgent::InvokeEvent(int id, mafID channel,void *data)
-//------------------------------------------------------------------------------
+void mafAgent::InvokeEvent(void *sender, int id, mafID channel, void *data)
 {
-  this->InvokeEvent(&mafEventBase(this,id,data,channel),channel);
+  this->InvokeEvent(&mafEventBase(sender,id,data,channel),channel);
 }
 
 //------------------------------------------------------------------------------

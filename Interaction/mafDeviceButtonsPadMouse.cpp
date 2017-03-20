@@ -93,7 +93,7 @@ void mafDeviceButtonsPadMouse::OnEvent(mafEventBase *event)
 		e->Get2DPosition(m_LastPosition);
 		m_SelectedRWI = (mafRWIBase *)event->GetSender();
 		e->SetSender(this);
-		InvokeEvent(e, MCH_INPUT);
+		InvokeEvent(e, (mafID)MCH_INPUT);
 	}
   else if (id == GetButtonDownId() || id == GetMouseDClickId())
   {
@@ -102,14 +102,14 @@ void mafDeviceButtonsPadMouse::OnEvent(mafEventBase *event)
     e->Get2DPosition(m_LastPosition);
     m_SelectedRWI = (mafRWIBase *)event->GetSender();
     e->SetSender(this);
-    InvokeEvent(e,MCH_INPUT);
+    InvokeEvent(e,(mafID)MCH_INPUT);
   }
   else if (id == GetButtonUpId())
   {
     m_ButtonPressed = false;
     e->Get2DPosition(m_LastPosition);
     e->SetSender(this);
-    InvokeEvent(e,MCH_INPUT);
+    InvokeEvent(e,(mafID)MCH_INPUT);
   }
   else if (id == VIEW_SELECT)
   {
@@ -127,7 +127,7 @@ void mafDeviceButtonsPadMouse::OnEvent(mafEventBase *event)
       unsigned char key = (unsigned char)ev->GetArg();
       mafEventInteraction ei(this,GetMouseCharEventId());
       ei.SetKey(key);
-      InvokeEvent(&ei,MCH_INPUT);
+      InvokeEvent(&ei,(mafID)MCH_INPUT);
     }
   }
 }
