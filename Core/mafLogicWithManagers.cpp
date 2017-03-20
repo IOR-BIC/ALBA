@@ -883,6 +883,10 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				if (m_InteractionManager) m_InteractionManager->PopPER();
 #endif
 				break;
+			case GET_CURRENT_PER:
+				if (m_InteractionManager)
+					e->SetMafObject(m_InteractionManager->GetPER());
+				break;
 			case DEVICE_ADD:
 				m_InteractionManager->AddDeviceToTree((mafDevice *)e->GetMafObject());
 				break;

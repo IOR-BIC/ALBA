@@ -231,9 +231,9 @@ bool mafDeviceManager::DispatchEvents()
   if (m_Dispatched)
     return false;
 
-  InvokeEvent(DISPATCH_START); // Advise dispatching is started 
+  InvokeEvent(this,DISPATCH_START); // Advise dispatching is started 
   bool ret=Superclass::DispatchEvents();
-  InvokeEvent(DISPATCH_END); // Advise dispatching is finished 
+  InvokeEvent(this,DISPATCH_END); // Advise dispatching is finished 
 
   return ret;
 }

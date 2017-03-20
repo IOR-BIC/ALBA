@@ -199,12 +199,12 @@ void mafAction::OnEvent(mafEventBase *event)
   else if (ch==MCH_INPUT && id==mafDevice::DEVICE_STARTED)
   {
     // send an event to all observers to advise about a plugged device
-    InvokeEvent(DEVICE_BIND,MCH_INPUT,(mafDevice *)event->GetSender());
+    InvokeEvent(this,DEVICE_BIND,MCH_INPUT,(mafDevice *)event->GetSender());
   }
   else if (ch==MCH_INPUT && id==mafDevice::DEVICE_STOPPED)
   {
     // send an event to all observers to advise about an unplugged device
-    InvokeEvent(DEVICE_UNPLUGGED,MCH_INPUT,(mafDevice *)event->GetSender());
+    InvokeEvent(this,DEVICE_UNPLUGGED,MCH_INPUT,(mafDevice *)event->GetSender());
   }
   else
   {

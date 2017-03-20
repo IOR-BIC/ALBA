@@ -187,7 +187,7 @@ void mafDeviceSet::AddDevice(mafDevice *device)
   AddObserver(device,MCH_DOWN);
   m_DevicesMutex->Unlock();
   
-  InvokeEvent(DEVICE_ADDED,MCH_UP,device);
+  InvokeEvent(this,DEVICE_ADDED,MCH_UP,device);
 }
 
 //------------------------------------------------------------------------------
@@ -302,7 +302,7 @@ int mafDeviceSet::RemoveDevice(mafDevice *device, bool force)
     if (device->IsPersistent()&&!force) 
       return false;
   
-    InvokeEvent(DEVICE_REMOVING,MCH_UP,device);
+    InvokeEvent(this,DEVICE_REMOVING,MCH_UP,device);
     m_DevicesMutex->Lock();
     device->Stop();
     device->RemoveObserver(this);
@@ -342,7 +342,7 @@ void mafDeviceSet::RemoveAllDevices(bool force)
       continue;
 
     device->Stop();
-    InvokeEvent(DEVICE_REMOVING,MCH_UP,device);
+    InvokeEvent(this,DEVICE_REMOVING,MCH_UP,device);
     
     device->Delete();
     *it=NULL;

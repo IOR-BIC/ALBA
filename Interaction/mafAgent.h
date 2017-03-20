@@ -123,7 +123,7 @@ protected:
   the event is broadcasted by means of the Subject/Observer on the specified channel. */
   void InvokeEvent(mafEventBase &event, mafID channel=-1);
   void InvokeEvent(mafEventBase *event, mafID channel=-1);
-  void InvokeEvent(int id, mafID channel=MCH_UP,void *data=NULL);
+  void InvokeEvent(void *sender, int id, mafID channel=MCH_UP,void *data=NULL);
 
   mafString       m_Name;
   bool            m_Initialized; // flag set true by Initialize()

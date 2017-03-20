@@ -190,6 +190,7 @@ EVT_START,
   VIEW_SAVE_IMAGE,//from mafMDIChild  to mafViewManager
   PER_PUSH,       // from an Operation to mafInteractionManager
   PER_POP,        // from an Operation to mafInteractionManager
+	GET_CURRENT_PER,
 
   CAMERA_FRONT,  // constant used in mafRWIxxx to initialize Camera pos
   CAMERA_BACK,
@@ -224,6 +225,7 @@ EVT_START,
 	CAMERA_FLYTO,
   CAMERA_PRE_RESET,
   CAMERA_POST_RESET,
+	CAMERA_MOVED, //Event invoked by mafInteractorCameraMove
 
   // modified by Stefano 21-9-2004 (begin)
   CAMERA_RXFEM_XNEG, //(to be moved elsewhere Marco)

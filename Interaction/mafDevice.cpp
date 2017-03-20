@@ -58,7 +58,7 @@ void mafDevice::SetName(const char *name)
 //------------------------------------------------------------------------------
 {
   Superclass::SetName(name);
-  InvokeEvent(DEVICE_NAME_CHANGED); // send event to device manager (up)
+  InvokeEvent(this,DEVICE_NAME_CHANGED); // send event to device manager (up)
 }
 
 //------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ int mafDevice::Start()
     return MAF_ERROR;
 
   // send an event to advise interactors this device has been started
-  InvokeEvent(DEVICE_STARTED,MCH_INPUT);
+  InvokeEvent(this,DEVICE_STARTED,MCH_INPUT);
 
   return MAF_OK;
 }
@@ -95,7 +95,7 @@ void mafDevice::Stop()
   Shutdown();
 
   // send an event to advise interactors this device has been stopped
-  InvokeEvent(DEVICE_STOPPED,MCH_INPUT);
+  InvokeEvent(this,DEVICE_STOPPED,MCH_INPUT);
 }
 
 //----------------------------------------------------------------------------
