@@ -192,46 +192,6 @@ void mafInteractorPERTest::TestSetModeToMultiButton()
   mip->Delete();
 }
 
-void mafInteractorPERTest::TestLinkCameraAdd()
-{
-  mafInteractorPER *mip = mafInteractorPER::New();
-  CPPUNIT_ASSERT(mip);
-
-  vtkCamera *dummyCamera = vtkCamera::New(); 
-  mip->LinkCameraAdd(dummyCamera);
-  dummyCamera->Delete();
-  mip->Delete();
-}
-
-void mafInteractorPERTest::TestLinkCameraRemove()
-{
-  mafInteractorPER *mip = mafInteractorPER::New();
-  CPPUNIT_ASSERT(mip);
-
-  vtkCamera *dummyCamera = vtkCamera::New(); 
-  mip->LinkCameraAdd(dummyCamera);
-  mip->LinkCameraRemove(dummyCamera);
-  dummyCamera->Delete();
-  mip->Delete();
-
-}
-
-void mafInteractorPERTest::TestLinkCameraRemoveAll()
-{
-  mafInteractorPER *mip = mafInteractorPER::New();
-  CPPUNIT_ASSERT(mip);
-
-  vtkCamera *dummyCamera = vtkCamera::New(); 
-  mip->LinkCameraAdd(dummyCamera);
-
-  vtkCamera *dummyCamera2 = vtkCamera::New(); 
-  mip->LinkCameraAdd(dummyCamera2);
-
-  mip->LinkCameraRemoveAll();
-  dummyCamera2->Delete();
-  dummyCamera->Delete();
-  mip->Delete();
-}
 
 void mafInteractorPERTest::TestGetCameraMouseInteractor()
 {

@@ -477,11 +477,6 @@ void mafViewVTK::GetImage(wxBitmap &bmp, int magnification)
 {
   bmp = *m_Rwi->m_RwiBase->GetImage(magnification);
 }
-//----------------------------------------------------------------------------
-void mafViewVTK::LinkView(bool link_camera)
-{
-  m_Rwi->LinkCamera(link_camera);
-}
 
 //-------------------------------------------------------------------------
 void mafViewVTK::Print(std::ostream& os, const int tabs)// const
