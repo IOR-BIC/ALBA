@@ -52,6 +52,9 @@ void mafEventBroadcaster::AddObserver(mafObserver &obj)
 //------------------------------------------------------------------------------
 void mafEventBroadcaster::AddObserver(mafObserver *obj)
 {
+	if (m_Observers.empty())
+		m_Listener = obj;
+
   m_Observers.push_back(obj);
 }
 bool mafEventBroadcaster::RemoveObserver(mafObserver *obj)
@@ -73,6 +76,9 @@ bool mafEventBroadcaster::RemoveObserver(mafObserver *obj)
     }
   }
 
+	if (m_Observers.empty())
+		m_Listener = NULL;
+
   return flag;
 }
 
@@ -80,6 +86,7 @@ bool mafEventBroadcaster::RemoveObserver(mafObserver *obj)
 void mafEventBroadcaster::RemoveAllObservers()
 {
   m_Observers.clear();
+	m_Listener = NULL;
 }
 
 //------------------------------------------------------------------------------
@@ -178,19 +185,4 @@ void mafEventBroadcaster::SetListener(mafObserver *o)
 {
 	RemoveAllObservers();
 	AddObserver(o);
-}
-
-//----------------------------------------------------------------------------
-mafObserver * mafEventBroadcaster::GetListener()
-{
-	if (m_Observers.size() > 0)
-		return m_Observers.front();
-	else
-		return NULL;
-}
-
-//----------------------------------------------------------------------------
-bool mafEventBroadcaster::HasListener()
-{
-	return (m_Observers.size() > 0);
 }

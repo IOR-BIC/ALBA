@@ -142,6 +142,8 @@ void mafVMERoot::OnEvent(mafEventBase *maf_event)
 
 			GetLogicManager()->VmeModified(this);
     }
+		else if(m_Storage)
+			m_Storage->OnEvent(maf_event);
   }
   else if (maf_event->GetChannel()==MCH_UP)
   {
