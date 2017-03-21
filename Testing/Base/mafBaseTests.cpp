@@ -33,7 +33,7 @@
 #include "mafDirectoryTest.h"
 #include "mafEventSenderTest.h"
 #include "mafEventBaseTest.h"
-#include "mafEventSourceTest.h"
+#include "mafEventBroadcasterTest.h"
 #include "mafObjectTest.h"
 #include "mafIndentTest.h"
 #include "mafDirectoryTest.h"
@@ -46,7 +46,6 @@
 #include "vtkMAFToLinearTransformTest.h"
 #include "mafReferenceCountedTest.h"
 #include "mafLUTLibraryTest.h"
-#include "mafObserversListTest.h"
 #include "mafDynamicLoaderTest.h"
 #include "mafDataChecksumTest.h"
 #include "mafVect3dTest.h"
@@ -97,7 +96,7 @@ int
 	runner.addTest(mafDirectoryTest::suite());
 	runner.addTest(mafEventSenderTest::suite());
 	runner.addTest(mafEventBaseTest::suite());
-	runner.addTest(mafEventSourceTest::suite());
+	runner.addTest(mafEventBroadcasterTest::suite());
 	runner.addTest(mafObjectTest::suite());
 	runner.addTest(mafIndentTest::suite());
 	runner.addTest(mafDirectoryTest::suite());
@@ -110,7 +109,6 @@ int
 	runner.addTest(vtkMAFToLinearTransformTest::suite());
 	runner.addTest(mafReferenceCountedTest::suite());
 	runner.addTest(mafLUTLibraryTest::suite());
-	runner.addTest(mafObserversListTest::suite());
 	runner.addTest(mafDynamicLoaderTest::suite());
 	runner.addTest(mafDataChecksumTest::suite());
 	runner.addTest(mafVect3dTest::suite());

@@ -122,7 +122,7 @@ void mafDeviceButtonsPad::SetButtonState(int num, bool value, unsigned long modi
 void mafDeviceButtonsPad::SendButtonEvent(mafEventInteraction *e)
 //------------------------------------------------------------------------------
 {
-  this->InvokeEvent(e,MCH_INPUT);
+  this->InvokeEvent(e,(mafID)MCH_INPUT);
 }
 
 //------------------------------------------------------------------------------

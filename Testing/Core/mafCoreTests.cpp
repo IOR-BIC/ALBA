@@ -49,7 +49,6 @@
 #include "mafPipeFactoryTest.h"
 #include "mafPipeTest.h"
 #include "mafProgressBarHelperTest.h"
-#include "mafRootTest.h"
 #include "mafSceneGraphTest.h"
 #include "mafSceneNodeTest.h"
 #include "mafServiceLocator.h"
@@ -76,7 +75,7 @@
 #include "mmaApplicationLayoutTest.h"
 #include "mmaMaterialTest.h"
 #include "mmaVolumeMaterialTest.h"
-
+#include "mafVMEOutputNULL.h"
 #include "TimeSetTest.h"
 #include "VMEPoseTest.h"
 
@@ -189,44 +188,43 @@ main(int argc, char* argv[])
 	mafServiceLocator::SetLogicManager(logic);
 
 	//this test must be run first because manages factories
-	runner.addTest(mafCoreFactoryTest::suite());
-	runner.addTest(vtkMAFAssemblyTest::suite());
-	runner.addTest(mafAbsMatrixPipeTest::suite());
-	runner.addTest(mmaVolumeMaterialTest::suite());
-	runner.addTest(mmaMaterialTest::suite());
-	runner.addTest(mmaApplicationLayoutTest::suite());
-	runner.addTest(mafVMEStorageTest::suite());
-	runner.addTest(mafVMEStorageTest2::suite());
-	runner.addTest(mafVMETest::suite());
-	runner.addTest(mafVMERootTest::suite());
-	runner.addTest(mafVMEOutputTest::suite());
-	runner.addTest(mafVMEOutputNULLTest::suite());
-	runner.addTest(mafVMEManagerTest::suite());
-	runner.addTest(mafViewVTKTest::suite());
-	runner.addTest(mafViewPlotTest::suite());
-	runner.addTest(mafViewManagerTest::suite());
-	runner.addTest(mafViewHTMLTest::suite());
-	runner.addTest(mafUserTest::suite());
-	runner.addTest(mafTimeMapTest::suite());
-	runner.addTest(mafTimeMapScalarTest::suite());
-	runner.addTest(mafTagItemTest::suite());
-	runner.addTest(mafTagArrayTest::suite());
-	runner.addTest(mafSceneNodeTest::suite());
-	runner.addTest(mafSceneGraphTest::suite());
-	runner.addTest(mafRootTest::suite());
-	runner.addTest(mafPipeTest::suite());
-	runner.addTest(mafPipeFactoryTest::suite());
-	runner.addTest(mafPipeBoxTest::suite());
-	runner.addTest(mafOpTest::suite());
-	runner.addTest(mafOpStackTest::suite());
-	runner.addTest(mafOpSelectTest::suite());
-	runner.addTest(mafOpPasteTest::suite());
-	runner.addTest(mafOpManagerTest::suite());
-	runner.addTest(mafOpEditTest::suite());
-	runner.addTest(mafOpCutTest::suite());
-	runner.addTest(mafOpContextStackTest::suite());
-	runner.addTest(mafOpCopyTest::suite());
-	runner.addTest(mafVMETest::suite());
+// 	runner.addTest(mafCoreFactoryTest::suite());
+// 	runner.addTest(vtkMAFAssemblyTest::suite());
+// 	runner.addTest(mafAbsMatrixPipeTest::suite());
+// 	runner.addTest(mmaVolumeMaterialTest::suite());
+// 	runner.addTest(mmaMaterialTest::suite());
+// 	runner.addTest(mmaApplicationLayoutTest::suite());
+// 	runner.addTest(mafVMEStorageTest::suite());
+// 	runner.addTest(mafVMEStorageTest2::suite());
+// 	runner.addTest(mafVMETest::suite());
+// 	runner.addTest(mafVMERootTest::suite());
+// 	runner.addTest(mafVMEOutputTest::suite());
+// 	runner.addTest(mafVMEOutputNULLTest::suite());
+// 	runner.addTest(mafVMEManagerTest::suite());
+// 	runner.addTest(mafViewVTKTest::suite());
+// 	runner.addTest(mafViewPlotTest::suite());
+// 	runner.addTest(mafViewManagerTest::suite());
+// 	runner.addTest(mafViewHTMLTest::suite());
+// 	runner.addTest(mafUserTest::suite());
+// 	runner.addTest(mafTimeMapTest::suite());
+// 	runner.addTest(mafTimeMapScalarTest::suite());
+// 	runner.addTest(mafTagItemTest::suite());
+// 	runner.addTest(mafTagArrayTest::suite());
+// 	runner.addTest(mafSceneNodeTest::suite());
+// 	runner.addTest(mafSceneGraphTest::suite());
+// 	runner.addTest(mafPipeTest::suite());
+// 	runner.addTest(mafPipeFactoryTest::suite());
+// 	runner.addTest(mafPipeBoxTest::suite());
+// 	runner.addTest(mafOpTest::suite());
+// 	runner.addTest(mafOpStackTest::suite());
+// 	runner.addTest(mafOpSelectTest::suite());
+// 	runner.addTest(mafOpPasteTest::suite());
+// 	runner.addTest(mafOpManagerTest::suite());
+// 	runner.addTest(mafOpEditTest::suite());
+// 	runner.addTest(mafOpCutTest::suite());
+// 	runner.addTest(mafOpContextStackTest::suite());
+// 	runner.addTest(mafOpCopyTest::suite());
+// 	runner.addTest(mafVMETest::suite());
 	runner.addTest(mafVMEManagerTest::suite());
 	runner.addTest(mafVMEIteratorTest::suite());
 	runner.addTest(mafVMEFactoryTest::suite());

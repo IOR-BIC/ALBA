@@ -130,9 +130,6 @@ public:
 	/** Update member variables and GUI elements according to vtkCamera position, focal point, view up, ...*/
 	void UpdateCameraParameters();
 
-	/** Allow to add/remove current vtkCamera to the list of vtkCamera linked together*/
-	void LinkCamera(bool linc_camera = true);
-
 	/* Reset camera clipping range using visualized actors */
   void ResetCameraClippingRange();
 
@@ -174,7 +171,6 @@ protected:
 	int               m_ShowGrid; ///< Flag used to show/hide the grid.
 	int               m_GridNormal;
 	int               m_ShowAxes;  ///< Flag used to show/hide axes in low left corner of the view
-	int               m_LinkCamera;///< Flag that enable to synchronize camera interaction to other camera
 
 	int           m_StereoType;
 	vtkMAFTextOrientator     *m_Orientator;

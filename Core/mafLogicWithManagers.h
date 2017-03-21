@@ -168,12 +168,6 @@ public:
 	void SetApplicationStamp(mafString &app_stamp);
 	void SetApplicationStamp(std::vector<mafString> app_stamp);
 
-	/** Allow to set the flag for views to by External to the main frame or to by child of parent frame. */
-	void SetExternalViewFlag(bool external = false);
-
-	/** Retrieve the value for the external view flag.*/
-	bool GetExternalViewFlag();
-
 	/** Manage application exception and allow to save at least the tree. */
 	virtual void HandleException();
 
@@ -397,9 +391,6 @@ protected:
 	wxMenu *m_RecentFileMenu;
 	wxMenu *m_OpMenu;
 	wxMenu *m_ViewMenu;
-
-	bool m_CameraLinkingObserverFlag;
-	bool m_ExternalViewFlag;
 
 	bool m_UseVMEManager;
 	bool m_UseViewManager;

@@ -304,7 +304,7 @@ void mafInteractor::OnEvent(mafEventBase *event)
         if (OnStartInteraction(e))
         {
           if (IsInteracting()) 
-            InvokeEvent(INTERACTION_STARTED);
+            InvokeEvent(this,INTERACTION_STARTED);
         }
       }
       else if (m_ButtonMode == MULTI_BUTTON_MODE && m_ButtonsCounter > 0)
@@ -326,7 +326,7 @@ void mafInteractor::OnEvent(mafEventBase *event)
       {
         if (OnStopInteraction(e))
           if (!IsInteracting()) 
-            InvokeEvent(INTERACTION_STOPPED);
+            InvokeEvent(this,INTERACTION_STOPPED);
 
       }
       else if (m_ButtonMode == MULTI_BUTTON_MODE && m_ButtonsCounter > 0)
@@ -335,7 +335,7 @@ void mafInteractor::OnEvent(mafEventBase *event)
         // the interaction we call anyway the OnStopInteraction function
         if (OnStopInteraction(e))
           if (!IsInteracting())
-            InvokeEvent(INTERACTION_STOPPED);
+            InvokeEvent(this,INTERACTION_STOPPED);
       }
     }
   }

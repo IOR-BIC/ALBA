@@ -22,7 +22,6 @@ University of Bedfordshire, UK
 #include "mmuIdFactory.h"
 #include "mafDataVector.h"
 #include "mafTagArray.h"
-#include "mafEventSource.h"
 #include "mafVMEOutputSurface.h"
 #include "mafVMEOutputPolyline.h"
 #include "mafDataPipeCustom.h"
@@ -216,24 +215,14 @@ void mafVMEStent::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
-      /*case CHANGED_STENT_TYPE:
-      {  
-      m_StentParamsModified = true ;
-      m_StentLengthModified = true ;
 
-      InternalUpdate();
-      m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
-      ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
-      m_Gui->Update();
-      }
-      break;*/
     case CHANGED_STENT_PARAM:
       {  
         m_StentParamsModified = true ;
         m_StentLengthModified = true ;
         //SetFixedParameterForSpecialStent();
         InternalUpdate();
-        m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+        InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
         ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
         m_Gui->Update();
       }
@@ -244,7 +233,7 @@ void mafVMEStent::OnEvent(mafEventBase *maf_event)
         SetVesselSurface(m_VesselVME);
 
         InternalUpdate();
-        m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+        InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
         ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
         m_Gui->Update();
       }
@@ -255,7 +244,7 @@ void mafVMEStent::OnEvent(mafEventBase *maf_event)
         SetVesselCenterLine(m_VesselVME);
 
         InternalUpdate();
-        m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+        InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
         ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
         m_Gui->Update();
       }	
@@ -289,7 +278,7 @@ void mafVMEStent::Initialize()
   SetVesselCenterLine(m_CenterLineVME);
 
   InternalUpdate();
-  m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+  InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
   ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
   m_Gui->Update();
 }

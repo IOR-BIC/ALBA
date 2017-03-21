@@ -121,7 +121,7 @@ int mafInteractor6DOF::StartInteraction(mafDeviceButtonsPadTracker *tracker,mafM
     {
       // store the current renderer: camera cannot be changed during interaction!!!
       SetRenderer(tracker->GetAvatar()->GetRenderer());
-      InvokeEvent(INTERACTION_STARTED,MCH_UP,m_StartTrackerPoseMatrix);
+      InvokeEvent(this,INTERACTION_STARTED,MCH_UP,m_StartTrackerPoseMatrix);
       return true;
     }
     // if wrong type of avatar force unlock device and stop interaction 
@@ -137,7 +137,7 @@ int mafInteractor6DOF::StopInteraction(mafDeviceButtonsPadTracker *tracker,mafMa
   if (Superclass::StopInteraction(tracker))
   {
     // ...do something
-    InvokeEvent(INTERACTION_STOPPED);
+    InvokeEvent(this,INTERACTION_STOPPED);
     return true;
   }
 

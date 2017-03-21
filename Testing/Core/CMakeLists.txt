@@ -25,7 +25,6 @@ SET(PROJECT_SRCS
 	mafLODActorTest.h mafLODActorTest.cpp
 	mafTimeMapScalarTest.h mafTimeMapScalarTest.cpp
 	mafOpSelectTest.h mafOpSelectTest.cpp
-	mafRootTest.h mafRootTest.cpp
 	mafVMERootTest.h mafVMERootTest.cpp
 	mafOpCutTest.h mafOpCutTest.cpp
 	mafOpCopyTest.h mafOpCopyTest.cpp

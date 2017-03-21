@@ -23,11 +23,11 @@
 //------------------------------------------------------------------------------
 // mafEventSender
 //------------------------------------------------------------------------------
-/** class acting as an interface for objects using MAF hierarchical event commuication model
-  This object simply defines a SetListener/GetListener functions for connecting with a listerner
-  object to create a hierarcy of objects. This allows to send events up in the hierarchy
+/** class acting as an interface for objects using MAF hierarchical event communication model
+  This object simply defines a SetListener/GetListener functions for connecting with a listener
+  object to create a hierarchy of objects. This allows to send events up in the hierarchy
   implementing what was the original MAF event communication model: this is a unicast communication
-  model very well suited for herarchically organized objects. For sending events up in the tree 
+  model very well suited for hierarchically organized objects. For sending events up in the tree 
   the mafEventMacro() or the InvokeEvent() function can be use.
   @sa mafObserver mafObserverCallback
 */
@@ -37,22 +37,22 @@ public:
   mafEventSender() {m_Listener = NULL;}
 
   /** Set the listener object, i.e. the object receiving events sent by this object */
-  void SetListener(mafObserver *o) {m_Listener = o;}
+  virtual void SetListener(mafObserver *o) {m_Listener = o;}
 
   /** Return the listener object, i.e. the object receiving events sent by this object */
-  mafObserver *GetListener() {return m_Listener;}
+	virtual mafObserver *GetListener() {return m_Listener;}
 
   /** return true if this class has observers */
-  bool HasListener() {return m_Listener!=NULL;}
+	virtual bool HasListener() {return m_Listener!=NULL;}
 
   /** invoke an event of this subject */
-  void InvokeEvent(mafEventBase &e) {if (m_Listener) m_Listener->OnEvent(&e);}
+	virtual void InvokeEvent(mafEventBase &e) {if (m_Listener) m_Listener->OnEvent(&e);}
 
   /** invoke an event of this subject */
-  void InvokeEvent(mafEventBase *e) {if (m_Listener) m_Listener->OnEvent(e);}
+	virtual void InvokeEvent(mafEventBase *e) {if (m_Listener) m_Listener->OnEvent(e);}
 
   /** invoke an event of this subject */
-  void InvokeEvent(mafID id=ID_NO_EVENT, void *data=NULL) {if (m_Listener) m_Listener->OnEvent(&mafEventBase(this,id,data));}
+	virtual void InvokeEvent(void *sender, mafID id=ID_NO_EVENT, void *data=NULL) {if (m_Listener) m_Listener->OnEvent(&mafEventBase(sender,id,data));}
 
 protected:
   mafObserver *m_Listener;  ///< object to which events issued by this object are sent

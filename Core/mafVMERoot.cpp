@@ -34,7 +34,7 @@
 #include "mafTransform.h"
 #include "mafVMEOutputNULL.h"
 #include "mafIndent.h"
-#include "mafStorage.h"
+#include "mafVMEStorage.h"
 #include "mafStorageElement.h"
 #include "mafEventIO.h"
 
@@ -46,8 +46,10 @@ mafCxxTypeMacro(mafVMERoot)
 mafVMERoot::mafVMERoot()
 //-------------------------------------------------------------------------
 {
+	m_MaxNodeId = 0;
   m_ApplicationStamp = "";
   m_MaxItemId=-1;
+	m_Storage = NULL;
   mafNEW(m_Transform);
   mafVMEOutputNULL *output=mafVMEOutputNULL::New(); // an output with no data
   output->SetTransform(m_Transform); // force my transform in the output
@@ -140,10 +142,8 @@ void mafVMERoot::OnEvent(mafEventBase *maf_event)
 
 			GetLogicManager()->VmeModified(this);
     }
-    else
-    {
-      mafRoot::OnRootEvent(maf_event);
-    }
+		else if(m_Storage)
+			m_Storage->OnEvent(maf_event);
   }
   else if (maf_event->GetChannel()==MCH_UP)
   {
@@ -155,8 +155,16 @@ void mafVMERoot::OnEvent(mafEventBase *maf_event)
           event_io->SetItemId(mafVMERoot::SafeDownCast(GetRoot())->GetNextItemId()); // retrieve and return an item ID
         }
       break;
-      default:
-        mafRoot::OnRootEvent(maf_event);
+			case NODE_GET_STORAGE : 
+				{
+					// return the storage pointer: here the hypothesis sis the root node listener is a storage.
+					mafEventIO *io_event = mafEventIO::SafeDownCast(maf_event);
+					io_event->SetStorage(GetStorage());
+				}
+				break;
+			default:
+				if(m_Storage)
+					m_Storage->OnEvent(maf_event);
     };
   }
   else
@@ -170,7 +178,6 @@ void mafVMERoot::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
   mafVME::Print(os,tabs);
-  mafRoot::Print(os,tabs);
   os << mafIndent(tabs) << "MaxItemId: " << m_MaxItemId << "\n";
 }
 //-------------------------------------------------------------------------
@@ -179,6 +186,19 @@ char** mafVMERoot::GetIcon()
 {
 #include "mafVMERoot.xpm"
   return mafVMERoot_xpm;
+}
+
+//----------------------------------------------------------------------------
+mafVMEStorage * mafVMERoot::GetStorage() const
+{
+	return m_Storage;
+}
+
+//----------------------------------------------------------------------------
+void mafVMERoot::SetStorage(mafVMEStorage * storage)
+{
+	m_Storage = storage;
+	SetListener(storage);
 }
 
 //-------------------------------------------------------------------------
@@ -244,4 +264,24 @@ mafGUI *mafVMERoot::CreateGui()
   m_Gui->String(ID_APPLICATION_STAMP, "app stamp", &m_ApplicationStamp, "Tag to associate a msf file \nto a particular application.");
   m_Gui->Divider();
 	return m_Gui;
+}
+
+//-------------------------------------------------------------------------
+int mafVMERoot::StoreRoot(mafStorageElement *parent)
+//-------------------------------------------------------------------------
+{
+	parent->SetAttribute("MaxNodeId", mafString(m_MaxNodeId));
+	return MAF_OK;
+}
+//-------------------------------------------------------------------------
+int mafVMERoot::RestoreRoot(mafStorageElement *element)
+//-------------------------------------------------------------------------
+{
+	mafID max_id;
+	if (!element->GetAttributeAsInteger("MaxNodeId", max_id))
+		return MAF_ERROR;
+
+	SetMaxNodeId(max_id);
+
+	return MAF_OK;
 }

@@ -69,7 +69,7 @@ mafVMEStorage::mafVMEStorage()
   SetFileType("MSF");
   mafNEW(m_Root); // create a root node
   m_Root->SetName("Root");
-  m_Root->SetListener(this);
+  m_Root->SetStorage(this);
   m_Root->Initialize();
   SetDocument(new mmuMSFDocument(m_Root)); // create a MSF doc and set the root node
 }
@@ -95,7 +95,7 @@ void mafVMEStorage::SetRoot(mafVMERoot *root)
   m_Root = root;
   m_Root->Register(this);
   m_Root->SetName("Root");
-  m_Root->SetListener(this);
+  m_Root->SetStorage(this);
   m_Root->Initialize();
   
   SetDocument(new mmuMSFDocument(m_Root)); // assign the new document

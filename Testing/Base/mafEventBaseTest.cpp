@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafEventBaseTest
- Authors: Daniele Giunchi
+ Authors: Daniele Giunchi, Crimi Gianluigi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -28,7 +28,6 @@
 #include "mafEventBaseTest.h"
 
 #include "mafReferenceCounted.h"
-#include "mafEventSource.h"
 #include "mafEventBase.h"
 
 #include <iostream>
@@ -37,26 +36,22 @@
 
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestFixture()
-//----------------------------------------------------------------------------
 {
 }
 
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestStaticAllocation()
-//----------------------------------------------------------------------------
 {
   mafEventBase m;
 }
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestDynamicAllocation()
-//----------------------------------------------------------------------------
 {
   mafEventBase *m = new mafEventBase();
   cppDEL(m);
 }
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestAllConstructors()
-//----------------------------------------------------------------------------
 {
   typedef std::pair<int,const char *> TestType;
   TestType testData(10,"hello");
@@ -68,7 +63,6 @@ void mafEventBaseTest::TestAllConstructors()
   CPPUNIT_ASSERT(eventA.GetId()==5);
   CPPUNIT_ASSERT(eventA.GetSender()==&testObject);
   CPPUNIT_ASSERT(eventA.GetData()==&testData);
-  CPPUNIT_ASSERT(eventA.GetSource()==NULL);
 
 
   // test copy constructor
@@ -76,11 +70,9 @@ void mafEventBaseTest::TestAllConstructors()
   CPPUNIT_ASSERT(eventB.GetId()==eventA.GetId());
   CPPUNIT_ASSERT(eventB.GetSender()==eventA.GetSender());
   CPPUNIT_ASSERT(eventB.GetData()==eventA.GetData());
-  CPPUNIT_ASSERT(eventB.GetSource()==eventA.GetSource());
 }
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestCopy()
-//----------------------------------------------------------------------------
 {
   typedef std::pair<int,const char *> TestType;
   TestType testData(10,"helloCopy");
@@ -95,11 +87,9 @@ void mafEventBaseTest::TestCopy()
   CPPUNIT_ASSERT(eventB.GetId()==eventA.GetId());
   CPPUNIT_ASSERT(eventB.GetSender()==eventA.GetSender());
   CPPUNIT_ASSERT(eventB.GetData()==eventA.GetData());
-  CPPUNIT_ASSERT(eventB.GetSource()==eventA.GetSource());
 }
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestSender()
-//----------------------------------------------------------------------------
 {
   mafTestObject *testSender;
   mafNEW(testSender);
@@ -112,22 +102,9 @@ void mafEventBaseTest::TestSender()
 
   mafDEL(testSender);
 }
-//----------------------------------------------------------------------------
-void mafEventBaseTest::TestSource()
-//----------------------------------------------------------------------------
-{
-  mafEventSource testSource;
- 
-  // test source field
-  mafEventBase eventA;
-  CPPUNIT_ASSERT(eventA.GetSource()==NULL);
-  eventA.SetSource(&testSource);
-  CPPUNIT_ASSERT(eventA.GetSource()== &testSource);
 
-}
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestId()
-//----------------------------------------------------------------------------
 {
   int id = 12345;
 
@@ -140,7 +117,6 @@ void mafEventBaseTest::TestId()
 }
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestChannel()
-//----------------------------------------------------------------------------
 {
   int channel = MCH_DOWN;
 
@@ -152,7 +128,6 @@ void mafEventBaseTest::TestChannel()
 }
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestData()
-//----------------------------------------------------------------------------
 {
   typedef std::pair<int,const char *> TestType;
   TestType testData(10,"helloData");
@@ -163,27 +138,4 @@ void mafEventBaseTest::TestData()
   eventA.SetData(&testData);
   CPPUNIT_ASSERT(eventA.GetData()== &testData);
 }
-//----------------------------------------------------------------------------
-void mafEventBaseTest::TestSkipFlag()
-//----------------------------------------------------------------------------
-{
-  bool skipFlag = true;
 
-  // test skipFlag field
-  mafEventBase eventA;
-  CPPUNIT_ASSERT(eventA.GetSkipFlag()==false);
-  eventA.SetSkipFlag(skipFlag);
-  CPPUNIT_ASSERT(eventA.GetSkipFlag()== skipFlag);
-}
-//----------------------------------------------------------------------------
-void mafEventBaseTest::TestSkipNext()
-//----------------------------------------------------------------------------
-{  
-  bool skipFlag = true;
-
-  // test skipnext 
-  mafEventBase eventA;
-  CPPUNIT_ASSERT(eventA.GetSkipFlag()==false);
-  eventA.SkipNext(); //set m_SkipFlag to true
-  CPPUNIT_ASSERT(eventA.GetSkipFlag()== skipFlag);
-}

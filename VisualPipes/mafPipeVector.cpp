@@ -32,8 +32,6 @@
 #include "mmaMaterial.h"
 #include "mafVMEVector.h"
 
-#include "mafEventSource.h"
-
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
 
@@ -99,7 +97,7 @@ void mafPipeVector::Create(mafSceneNode *n)
   m_Vector = mafVMEVector::SafeDownCast(m_Vme);
   m_Vector->GetTimeStamps(m_TimeVector);
  
-  m_Vme->GetEventSource()->AddObserver(this);
+  m_Vme->AddObserver(this);
 
   vtkNEW(m_ArrowTip);  //Create the arrow 
   m_ArrowTip->SetResolution(20);
@@ -165,7 +163,7 @@ void mafPipeVector::Create(mafSceneNode *n)
 mafPipeVector::~mafPipeVector()
 //----------------------------------------------------------------------------
 {
-  m_Vme->GetEventSource()->RemoveObserver(this);
+  m_Vme->RemoveObserver(this);
   m_AssemblyFront->RemovePart(m_Actor);
   m_AssemblyFront->RemovePart(m_ActorBunch);
   m_AssemblyFront->RemovePart(m_OutlineActor);

@@ -28,7 +28,6 @@
 #include "mafSceneNode.h"
 #include "mafDataPipe.h"
 #include "mafVMEComputeWrapping.h"
-#include "mafEventSource.h"
 #include "mmaMeter.h"
 #include "mmaMaterial.h"
 #include "mafGUIMaterialButton.h"
@@ -92,7 +91,7 @@ void mafPipeComputeWrapping::Create(mafSceneNode *n/*, bool use_axes*/)
 
   assert(m_Vme->IsA("medVMEComputeWrapping"));
   m_WrappedMeterVME = mafVMEComputeWrapping::SafeDownCast(m_Vme);
-  m_WrappedMeterVME->GetEventSource()->AddObserver(this);
+  m_WrappedMeterVME->AddObserver(this);
   assert(m_WrappedMeterVME->GetWrappedMeterOutput());
   m_WrappedMeterVME->GetWrappedMeterOutput()->Update();
   vtkPolyData *data = m_WrappedMeterVME->GetWrappedMeterOutput()->GetPolylineData();
@@ -205,7 +204,7 @@ void mafPipeComputeWrapping::Create(mafSceneNode *n/*, bool use_axes*/)
 mafPipeComputeWrapping::~mafPipeComputeWrapping()
 //----------------------------------------------------------------------------
 {
-  m_WrappedMeterVME->GetEventSource()->RemoveObserver(this);
+  m_WrappedMeterVME->RemoveObserver(this);
 
   m_AssemblyFront->RemovePart(m_DataActor);
   m_AssemblyFront->RemovePart(m_SelectionActor);

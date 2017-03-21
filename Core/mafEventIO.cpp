@@ -27,7 +27,7 @@
 
 #include "mafEventIO.h"
 #include "mafVME.h"
-#include "mafRoot.h"
+#include "mafVMERoot.h"
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafEventIO)
@@ -89,7 +89,7 @@ void mafEventIO::SetRoot(mafVME *root)
 {
   try 
   { 
-    dynamic_cast<mafRoot *>(root); // test if it's a root
+    dynamic_cast<mafVMERoot *>(root); // test if it's a root
     m_Root=root;
   } 
   catch (std::bad_cast) 

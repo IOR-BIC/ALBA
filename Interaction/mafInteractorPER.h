@@ -69,15 +69,6 @@ public:
   void SetModeToSingleButton() {m_Mode=SINGLE_BUTTON;}
   void SetModeToMultiButton() {m_Mode=MULTI_BUTTON;}
 
-  /** Add vtkCamera to linked camera vector of the mouse camera interactor.*/
-  void LinkCameraAdd(vtkCamera *cam);
-
-  /** Remove vtkCamera to linked camera vector of the mouse camera interactor.*/
-  void LinkCameraRemove(vtkCamera *cam);
-
-  /** Remove all vtkCamera to linked camera vector of the mouse camera interactor.*/
-  void LinkCameraRemoveAll();
-
   mafInteractor *GetCameraMouseInteractor() {return m_CameraMouseBehavior;};
 
   mafInteractor *GetCameraInteractor() {return m_CameraBehavior;};

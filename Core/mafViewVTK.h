@@ -157,10 +157,7 @@ public:
 
   /** Print this view.*/
   virtual void Print(wxDC *dc, wxRect margins);
-
-  /** Allow to link the camera of the view to other cameras.*/
-  virtual void LinkView(bool link_camera = true);
-
+	  
   mafRWI *m_Rwi;
 
   /** print a dump of this object */

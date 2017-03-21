@@ -29,7 +29,6 @@
 #include "mafSceneNode.h"
 #include "mafTransform.h"
 #include "mmaVolumeMaterial.h"
-#include "mafEventSource.h"
 
 #include "mafVME.h"
 #include "mafVMEOutputVolume.h"
@@ -192,7 +191,7 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 {
   Superclass::Create(n); // Always call this to initialize m_Vme, m_AssemblyFront, ... vars
 
-  m_Vme->GetEventSource()->AddObserver(this);
+  m_Vme->AddObserver(this);
 
   m_AssemblyUsed = m_AssemblyBack ? m_AssemblyBack : m_AssemblyFront;
 
@@ -499,7 +498,7 @@ void mafPipeVolumeSlice::CreateSlice(int direction)
 mafPipeVolumeSlice::~mafPipeVolumeSlice()
 //----------------------------------------------------------------------------
 {
-  m_Vme->GetEventSource()->RemoveObserver(this);
+  m_Vme->RemoveObserver(this);
 	
   if(m_VolumeBoxActor)
     m_AssemblyFront->RemovePart(m_VolumeBoxActor);

@@ -21,7 +21,7 @@
 #include "mafObject.h"
 #include "mafVME.h"
 #include "mafVector.h"
-#include "mafEventSource.h"
+#include "mafEventBroadcaster.h"
 
 template class MAF_EXPORT mafVector<mafID>;
 
@@ -36,7 +36,7 @@ template class MAF_EXPORT mafVector<mafID>;
   @sa mafVME
   */
 
-class MAF_EXPORT mafVMEIterator : public mafObject
+class MAF_EXPORT mafVMEIterator : public mafObject, public mafEventBroadcaster
 {
 public:
   mafTypeMacro(mafVMEIterator,mafObject);
@@ -122,27 +122,25 @@ protected:
   /** Find the right most leaf of the tree*/
   mafVME *FindRightMostLeaf(mafVME *node);
 
-  mafEventSource &GetEventSource() {return m_EventSource;}
-
-  /** Callback function. By default send an event through the m_EventSource source. */
+  /** Callback function. By default send ID_PreTraversal event */
   virtual void PreExecute(); 
 
-  /** Callback function. By default send an event through the m_EventSource source. */
+  /** Callback function. By default send ID_PostTraversal event */
   virtual void PostExecute();  
 
-  /** Callback function. By default send an event through the m_EventSource source. */
+  /** Callback function. By default send ID_Deeper event */
   virtual void DeeperExecute(mafVME *); 
 
-  /** Callback function. By default send an event through the m_EventSource source. */
+  /** Callback function. By default send ID_Upper event */
   virtual void UpperExecute(mafVME *);  
 
-  /** Callback function. By default send an event through the m_EventSource source. */
+  /** Callback function. By default send ID_FirstNode event */
   virtual void FirstExecute(); 
 
-  /** Callback function. By default send an event through the m_EventSource source. */
+  /** Callback function. By default send ID_LastNode event */
   virtual void LastExecute();  
 
-  /** Callback function. By default send an event through the m_EventSource source. */
+  /** Callback function. By default send an event */
   virtual void DoneExecute();  
 
   mafVMEIterator(mafVME *root=NULL);
@@ -155,8 +153,6 @@ protected:
   bool            m_IgnoreVisibleToTraverse;
 
   mafVector<mafID> m_CurrentIdx;
-
-  mafEventSource  m_EventSource; ///< Source of events issued during traverse
 
 private:
   mafVMEIterator(const mafVMEIterator&) {} // Not implemented

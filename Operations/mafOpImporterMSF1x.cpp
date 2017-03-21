@@ -28,6 +28,7 @@
 
 #include "mafVME.h"
 #include "mafVMERoot.h"
+#include "mafVMEStorage.h"
 #include "mafTagArray.h"
 #include "mafMSFImporter.h"
 

@@ -26,7 +26,6 @@
 
 
 #include "mafObserverCallback.h"
-#include "mafEventSource.h"
 #include "mafEventBase.h"
 
 //------------------------------------------------------------------------------
@@ -53,12 +52,12 @@ void mafObserverCallback::OnEvent(mafEventBase *e)
 {
   if (m_Callback)
   {
-    m_Callback(e->GetSender(), e->GetId(), this->GetClientData(), e->GetSource()->GetData());
+    m_Callback(e->GetSender(), e->GetId(), this->GetClientData());
   }
 }
 
 //------------------------------------------------------------------------------
-void mafObserverCallback::SetCallback(void (*f)(void *sender, mafID eid, void *clientdata, void *calldata))
+void mafObserverCallback::SetCallback(void (*f)(void *sender, mafID eid, void *clientdata))
 //------------------------------------------------------------------------------
 {
   m_Callback = f;

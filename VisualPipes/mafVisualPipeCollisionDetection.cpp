@@ -27,7 +27,6 @@
 #include "mafSceneNode.h"
 #include "mafGui.h"
 #include "mafVME.h"
-#include "mafEventSource.h"
 #include "mafVMEOutputSurface.h"
 
 #include "vtkMAFSmartPointer.h"
@@ -76,7 +75,7 @@ void mafVisualPipeCollisionDetection::Create(mafSceneNode *n/*, bool use_axes*/)
 
   assert(m_Vme->GetOutput()->IsMAFType(mafVMEOutputSurface));
   //To capture matrix changes events
-  m_Vme->GetEventSource()->AddObserver(this);
+  m_Vme->AddObserver(this);
   mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
   assert(surface_output);
   surface_output->Update();
@@ -168,9 +167,9 @@ mafVisualPipeCollisionDetection::~mafVisualPipeCollisionDetection()
   //Remove observers
   for (int i=0;i<m_SurfacesToCollide.size();i++)
   {
-    m_SurfacesToCollide[i]->GetEventSource()->RemoveObserver(this);
+    m_SurfacesToCollide[i]->RemoveObserver(this);
   }
-  m_Vme->GetEventSource()->RemoveObserver(this);
+  m_Vme->RemoveObserver(this);
   m_AssemblyFront->RemovePart(m_Actor);
   vtkDEL(m_Actor);
   vtkDEL(m_Mapper);
@@ -470,7 +469,7 @@ void mafVisualPipeCollisionDetection::SetSurfaceToCollide( mafVME *surface )
     for (int i=0;i<m_SurfacesToCollide.size()-1;i++)
     {
 	    //Remove observer before change surface to collide
-	    m_SurfacesToCollide[i]->GetEventSource()->RemoveObserver(this);
+	    m_SurfacesToCollide[i]->RemoveObserver(this);
 	    mafDEL(m_Matrix1[i]);
     }
     m_SurfacesToCollide.clear();
@@ -478,7 +477,7 @@ void mafVisualPipeCollisionDetection::SetSurfaceToCollide( mafVME *surface )
   }
   m_SurfacesToCollide.push_back(surface);
   //To capture matrix changes events
-  m_SurfacesToCollide[m_SurfacesToCollide.size()-1]->GetEventSource()->AddObserver(this);
+  m_SurfacesToCollide[m_SurfacesToCollide.size()-1]->AddObserver(this);
   mafMatrix *m1;
   mafNEW(m1);
   m1->DeepCopy(m_SurfacesToCollide[m_SurfacesToCollide.size()-1]->GetOutput()->GetAbsMatrix());
@@ -503,7 +502,7 @@ void mafVisualPipeCollisionDetection::AddSurfaceToCollide( mafVME *surface )
   }
   m_SurfacesToCollide.push_back(surface);
   //To capture matrix changes events
-  m_SurfacesToCollide[m_SurfacesToCollide.size()-1]->GetEventSource()->AddObserver(this);
+  m_SurfacesToCollide[m_SurfacesToCollide.size()-1]->AddObserver(this);
   mafMatrix *m1;
   mafNEW(m1);
   m1->DeepCopy(m_SurfacesToCollide[m_SurfacesToCollide.size()-1]->GetOutput()->GetAbsMatrix());
