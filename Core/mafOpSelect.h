@@ -57,6 +57,8 @@ public:
     void OpUndo();
     /** return a instance of current object. */
     mafOp* Copy();
+		/** runs operation. */
+		void OpRun();
 protected:
     mafAutoPointer<mafVME> m_OldNodeSelected;
     mafAutoPointer<mafVME> m_NewNodeSelected;
@@ -88,6 +90,8 @@ public:
     void SetClipboard(mafVME *node);
 		/** set the parent of the selection */
 		void SetSelectionParent(mafVME *parent);
+		/** runs operation. */
+		void OpRun();
 protected:
 
 	void RemoveBackLinksForTheSubTree(mafVME *vme);
@@ -112,7 +116,7 @@ public:
   bool Accept(mafVME* vme);
   /** execute the operation.  */
   void OpDo();
-				
+
 	/** undo the operation. */
   void OpUndo();
   /** return a instance of current object. */
@@ -141,7 +145,7 @@ public:
     bool Accept(mafVME* vme);
     /** execute the operation.  */
     void OpDo();
-    /** undo the operation. */
+		/** undo the operation. */
     void OpUndo();
     /** return a instance of current object. */
     mafOp* Copy();
