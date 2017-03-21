@@ -100,11 +100,6 @@ public:
 	/** Removes all the observer and add o to the observer list */
 	virtual void SetListener(mafObserver *o);
 
-	/** Return the first element of observers list, NULL if the list is empty*/
-	virtual mafObserver *GetListener();
-
-	/** return true if this class has observers */
-	virtual bool HasListener();
 protected:
 	typedef std::list<mafObserver *> mafObserversList;
 

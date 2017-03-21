@@ -252,10 +252,11 @@ void mafInteractorCameraMove::Rotate()
   m_CurrentCamera->Azimuth(rxf);
   m_CurrentCamera->Elevation(ryf);
   m_CurrentCamera->OrthogonalizeViewUp();
+		
+  if (m_AutoResetClippingRange) 
+		ResetClippingRange();
 
-	InvokeEvent(this, CAMERA_MOVED);
-
-  if (m_AutoResetClippingRange) ResetClippingRange();
+	InvokeEvent(this, CAMERA_MOVED,MCH_UP,m_CurrentCamera);
   m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
@@ -282,7 +283,10 @@ void mafInteractorCameraMove::Spin()
   m_CurrentCamera->Roll(newAngle - oldAngle);
   m_CurrentCamera->OrthogonalizeViewUp();
       
-  if (m_AutoResetClippingRange)  ResetClippingRange();
+  if (m_AutoResetClippingRange) 
+		ResetClippingRange();
+
+	InvokeEvent(this, CAMERA_MOVED,MCH_UP,m_CurrentCamera);
   m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
@@ -326,7 +330,10 @@ void mafInteractorCameraMove::Pan()
                       motionVector[1] + viewPoint[1],
                       motionVector[2] + viewPoint[2]);
       
-  if (m_AutoResetClippingRange)  ResetClippingRange();
+  if (m_AutoResetClippingRange)  
+		ResetClippingRange();
+
+	InvokeEvent(this, CAMERA_MOVED,MCH_UP,m_CurrentCamera);
   m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
@@ -346,7 +353,10 @@ void mafInteractorCameraMove::Dolly()
   else
     m_CurrentCamera->Dolly(zoomFactor);
   
-  if (m_AutoResetClippingRange)  ResetClippingRange();
+  if (m_AutoResetClippingRange)  
+		ResetClippingRange();
+
+	InvokeEvent(this, CAMERA_MOVED,MCH_UP,m_CurrentCamera);
 	m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
