@@ -7,33 +7,32 @@ PROJECT(mafViews)
 # Set your list of sources here.
 SET(PROJECT_SRCS
   
-  mafViewArbitrarySlice.cpp  				mafViewArbitrarySlice.h
+  mafViewArbitrarySlice.cpp				mafViewArbitrarySlice.h
   mafViewOrthoSlice.cpp  					mafViewOrthoSlice.h
-  mafViewRX.cpp  							mafViewRX.h
-  mafViewRXCT.cpp  							mafViewRXCT.h
-  mafViewSlice.cpp  						mafViewSlice.h
-  mafViewGlobalSlice.cpp  					mafViewGlobalSlice.h
-  mafViewGlobalSliceCompound.cpp  			mafViewGlobalSliceCompound.h
-  mafViewImage.cpp  						mafViewImage.h
-  mafViewSingleSlice.cpp  					mafViewSingleSlice.h
-  mafViewSingleSliceCompound.cpp  			mafViewSingleSliceCompound.h
+  mafViewRX.cpp  									mafViewRX.h
+  mafViewRXCT.cpp  								mafViewRXCT.h
+  mafViewSlice.cpp  							mafViewSlice.h
+  mafViewGlobalSlice.cpp  				mafViewGlobalSlice.h
+  mafViewGlobalSliceCompound.cpp	mafViewGlobalSliceCompound.h
+  mafViewImage.cpp								mafViewImage.h
+  mafViewSingleSlice.cpp					mafViewSingleSlice.h
+  mafViewSingleSliceCompound.cpp	mafViewSingleSliceCompound.h
   mafViewRXCompound.cpp  					mafViewRXCompound.h
-  mafView3D.cpp  							mafView3D.h
-  mafViewImageCompound.cpp  				mafViewImageCompound.h
-  mafViewCT.cpp  							mafViewCT.h
-  mafViewCompoundWindowing.cpp  			mafViewCompoundWindowing.h
-  mafViewVTKCompound.cpp  					mafViewVTKCompound.h
-  mafViewSlicer.cpp  						mafViewSlicer.h
-  mafViewSliceOnCurve.cpp  					mafViewSliceOnCurve.h
-  mafViewSliceOnCurveCompound.cpp  			mafViewSliceOnCurveCompound.h
-  mafViewSliceGlobal.cpp  					mafViewSliceGlobal.h
-  mafViewArbitraryOrthoSlice.cpp			mafViewArbitraryOrthoSlice.h
-  mafViewSliceBlendRX.cpp  					mafViewSliceBlendRX.h
+  mafView3D.cpp										mafView3D.h
+  mafViewImageCompound.cpp				mafViewImageCompound.h
+  mafViewCT.cpp										mafViewCT.h
+  mafViewCompoundWindowing.cpp		mafViewCompoundWindowing.h
+  mafViewVTKCompound.cpp					mafViewVTKCompound.h
+  mafViewSlicer.cpp								mafViewSlicer.h
+  mafViewSliceOnCurve.cpp					mafViewSliceOnCurve.h
+  mafViewSliceOnCurveCompound.cpp	mafViewSliceOnCurveCompound.h
+  mafViewSliceGlobal.cpp					mafViewSliceGlobal.h
+  mafViewArbitraryOrthoSlice.cpp	mafViewArbitraryOrthoSlice.h
+  mafViewSliceBlendRX.cpp  				mafViewSliceBlendRX.h
   mafViewSliceBlend.cpp  					mafViewSliceBlend.h
-  mafViewSliceNotInterpolated.cpp  			mafViewSliceNotInterpolated.h
+  mafViewSliceNotInterpolated.cpp mafViewSliceNotInterpolated.h
   mafViewSliceNotInterpolatedCompound.cpp  	mafViewSliceNotInterpolatedCompound.h
-  mafViewIsosurfaceCompound.cpp
-  mafViewIsosurfaceCompound.h
+  mafViewIsosurfaceCompound.cpp							mafViewIsosurfaceCompound.h
 )
 
 # List libraries that are needed by this project.
