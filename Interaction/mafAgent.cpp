@@ -118,7 +118,7 @@ void mafAgent::AddObserver(mafObserver *listener,mafID channel)
 
   if (channel == MCH_UP)
   {
-    SetListener(listener);
+    mafEventBroadcaster::AddObserver(listener);
     return;
   }
 
