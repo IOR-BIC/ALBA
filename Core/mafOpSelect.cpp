@@ -68,7 +68,6 @@ mafOp* mafOpSelect::Copy()
 //----------------------------------------------------------------------------
 void mafOpSelect::OpRun()
 {
-	OpDo();
 	OpStop(OP_RUN_OK);
 }
 
@@ -171,7 +170,6 @@ void mafOpEdit::SetSelectionParent(mafVME *parent)
 //----------------------------------------------------------------------------
 void mafOpEdit::OpRun()
 {
-	OpDo();
 	OpStop(OP_RUN_OK);
 }
 
