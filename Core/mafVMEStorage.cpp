@@ -78,8 +78,10 @@ mafVMEStorage::mafVMEStorage()
 mafVMEStorage::~mafVMEStorage()
 //------------------------------------------------------------------------------
 {
+	m_Root->SetStorage(NULL);
+
   cppDEL(m_Document); // delete the document object
-  mafDEL(m_Root); // delete the root
+	mafDEL(m_Root); // delete the root
 }
 
 //------------------------------------------------------------------------------

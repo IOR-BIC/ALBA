@@ -55,7 +55,8 @@ void mafEventBroadcaster::AddObserver(mafObserver *obj)
 	if (m_Observers.empty())
 		m_Listener = obj;
 
-  m_Observers.push_back(obj);
+	if(obj)
+		m_Observers.push_back(obj);
 }
 bool mafEventBroadcaster::RemoveObserver(mafObserver *obj)
 //------------------------------------------------------------------------------
@@ -156,7 +157,7 @@ void mafEventBroadcaster::InvokeEvent(mafEventBase &e)
 //------------------------------------------------------------------------------
 void mafEventBroadcaster::InvokeEvent(void *sender, mafID id, void *data)
 {
-  mafEventBase e(this,id,data);
+  mafEventBase e(sender,id,data);
 
   InvokeEvent(e);
 }
