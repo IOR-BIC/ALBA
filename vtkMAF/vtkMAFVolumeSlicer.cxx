@@ -195,7 +195,8 @@ void vtkMAFVolumeSlicer::ComputeInputUpdateExtents(vtkDataObject *output)
 //----------------------------------------------------------------------------
 {
   vtkDataObject *input = this->GetInput();
-  input->SetUpdateExtentToWholeExtent();
+	if(input)
+		input->SetUpdateExtentToWholeExtent();
 }
 
 //----------------------------------------------------------------------------
