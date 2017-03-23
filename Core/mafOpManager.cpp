@@ -334,7 +334,7 @@ void mafOpManager::OpSelect(mafVME* vme)
 	if(vme == m_Selected ) 
     return;
 	m_OpSelect->SetNewSel(vme);
-	OpExec(m_OpSelect);
+	OpRun(m_OpSelect);
   mafLogMessage("node selected: %s", vme->GetName());
 }
 //----------------------------------------------------------------------------
@@ -594,17 +594,17 @@ void mafOpManager::RunOpAddGroup()
 //----------------------------------------------------------------------------
 void mafOpManager::RunOpCut()
 {
-	OpExec(m_OpCut);
+	OpRun(m_OpCut);
 }
 //----------------------------------------------------------------------------
 void mafOpManager::RunOpCopy()
 {
-	OpExec(m_OpCopy);
+	OpRun(m_OpCopy);
 }
 //----------------------------------------------------------------------------
 void mafOpManager::RunOpPaste()
 {
-	OpExec(m_OpPaste);
+	OpRun(m_OpPaste);
 }
 //----------------------------------------------------------------------------
 void mafOpManager::RunOpDelete()
@@ -656,6 +656,8 @@ void mafOpManager::RunOpDelete()
 
 		node_to_del->ReparentTo(NULL);
 		
+		Notify(OP_RUN_TERMINATED, true);
+
 		ClearUndoStack();
     mafEventMacro(mafEvent(this, CAMERA_UPDATE));
   }
@@ -970,14 +972,8 @@ void mafOpManager::Notify(int msg, long arg)
 //----------------------------------------------------------------------------
 {
 	if(m_Context.Caller() == NULL)
-	// not a nested operation - notify logic
-		mafEventMacro(mafEvent(this,msg,m_RunningOp,arg));   //SIL. 17-9-2004: added the m_RunningOp at the event (may be NULL)
-	//else
-	// nested operation - notify caller
-		    // m_Context.Caller()->OnEvent(mafEvent(this,msg));   
-        // NO - it is dangerous - if the caller don't handle the msg,
-				// msg will be bounced and then forwarded to Logic
-				// better wait until this feature is really needed 
+		mafEventMacro(mafEvent(this,msg,m_RunningOp,arg));  
+	
 }
 //----------------------------------------------------------------------------
 bool mafOpManager::StopCurrentOperation()

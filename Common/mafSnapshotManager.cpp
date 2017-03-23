@@ -235,6 +235,83 @@ void mafSnapshotManager::CreateSnapshot(mafVME *root, mafView *selectedView)
 }
 
 //----------------------------------------------------------------------------
+void mafSnapshotManager::AddSnapshot(wxBitmap &bitmap, wxString name = "")
+{
+	if (m_SnapshotsGroup == NULL)
+	{
+		return;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
+	wxImage img;
+
+	if (&bitmap)
+	{
+		img = &bitmap.ConvertToImage();
+	}
+
+	// Generate Snapshot name
+	wxString imageName = name;
+
+	if (name == "") 
+	{
+		imageName = "Snapshot";
+
+		char tmp[20];
+		int count = 1;
+		do
+		{
+			sprintf(tmp, "%s_%d", imageName, count);
+			count++;
+		} while (m_SnapshotsGroup->FindInTreeByName(tmp) != NULL);
+
+		imageName = tmp;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
+	int NumberOfComponents = 3;
+	vtkUnsignedCharArray *buffer;
+	vtkNEW(buffer);
+	buffer->SetNumberOfComponents(NumberOfComponents);
+
+	unsigned char *p = img.GetData();
+	assert(p);
+	for (int i = 0; i < img.GetWidth() * img.GetHeight(); i++)
+	{
+		unsigned char r = *p++;
+		unsigned char g = *p++;
+		unsigned char b = *p++;
+
+		buffer->InsertNextTuple3(r, g, b);
+	}
+
+	vtkImageData *vtkimg;
+	vtkNEW(vtkimg);
+	vtkimg->SetNumberOfScalarComponents(NumberOfComponents);
+	vtkimg->SetScalarTypeToUnsignedChar();
+	vtkimg->SetDimensions(img.GetWidth(), img.GetHeight(), 1);
+	vtkimg->SetUpdateExtentToWholeExtent();
+	assert(vtkimg->GetPointData());
+	vtkimg->GetPointData()->SetScalars(buffer);
+
+	//////////////////////////////////////////////////////////////////////////	
+	mafVMEImage *image;
+	mafNEW(image);
+
+	image->SetData(vtkimg, 0);
+	image->SetName(imageName);
+	image->SetTimeStamp(0);
+	image->ReparentTo(m_SnapshotsGroup);
+
+	//////////////////////////////////////////////////////////////////////////
+	vtkDEL(buffer);
+	vtkDEL(vtkimg);
+}
+
+
+//----------------------------------------------------------------------------
 void mafSnapshotManager::ShowSnapshotPreview(mafVME *node)
 {
 	wxString imageName = "";
@@ -260,7 +337,7 @@ void mafSnapshotManager::ShowSnapshotPreview(mafVME *node)
 
 	char tmp[10];
 	sprintf(tmp, "[1/%d]", m_ImagesList.size());
-	wxString title = "Show Snapshots - " + imageName + " " + tmp;
+	wxString title = "Snapshots Manager - " + imageName + " " + tmp;
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -407,7 +484,7 @@ void mafSnapshotManager::UpdateSelectionDialog(int selection)
 		char tmp[10];
 		sprintf(tmp, "[%d/%d]", selection + 1, nImages);
 
-		wxString title = "Show Snapshots - " + imageName + " " + tmp;
+		wxString title = "Snapshots Manager - " + imageName + " " + tmp;
 		m_Dialog->SetTitle(title);
 
 		// Load and show the image

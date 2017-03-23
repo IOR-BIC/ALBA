@@ -27,6 +27,6 @@ class mafServiceClient
 		mafAbsLogicManager* GetLogicManager();
 
   protected:
-		mafAbsLogicManager* m_logic;
+		mafAbsLogicManager* m_Logic;
 };
 #endif

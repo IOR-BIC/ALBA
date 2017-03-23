@@ -70,8 +70,6 @@ mafView::mafView(const wxString &label)
 	 
   m_HTMLText = "";
   m_LightCopyEnabled = false;
-
-	m_BackgroundColor = wxColor(71, 71, 71);
 }
 //----------------------------------------------------------------------------
 mafView::~mafView()
