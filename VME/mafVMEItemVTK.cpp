@@ -337,7 +337,9 @@ int mafVMEItemVTK::InternalRestoreData()
     mafEventIO e(this,NODE_GET_STORAGE);
     mafEventMacro(e);
     mafStorage *storage = e.GetStorage();
-    assert(storage);
+    
+		if (!storage)
+			return MAF_NO_IO;
     
     int resolvedURL = MAF_OK;
     mafString filename;
