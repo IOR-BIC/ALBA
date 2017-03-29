@@ -52,8 +52,6 @@ public:
   
   virtual void Create(mafSceneNode *n);
 
-	void GetBestSpacing(double * bestSpacing, vtkRectilinearGrid* rGrid);
-
 	/** Show-Hide the RX bounding box actor. */
   void Select     (bool select);
 
@@ -85,8 +83,7 @@ protected:
 	vtkOutlineCornerFilter *m_VolumeBox;
   vtkPolyDataMapper			 *m_VolumeBoxMapper;
   vtkActor               *m_VolumeBoxActor;
-	vtkMAFProjectSP       *m_SPProjFilter;
-	vtkMAFProjectRG       *m_RGProjFilter;
+	vtkMAFProjectRG       *m_ProjectFilter;
 	bool m_RangeProjectionEnabled;
 	int m_ProjectionRange[2];
 

@@ -61,12 +61,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkMAFProjectRG_h
 #define __vtkMAFProjectRG_h
 
-#include "vtkMAFRectilinearGridToRectilinearGridFilter.h"
+#include "vtkDataSetToDataSetFilter.h"
 #include "mafConfigure.h"
 
 #define VTK_PROJECT_FROM_X 1
 #define VTK_PROJECT_FROM_Y 2
 #define VTK_PROJECT_FROM_Z 3
+
+class vtkDataArray;
 
 /**
 Class Name: vtkMAFProjectRG.
@@ -83,14 +85,12 @@ Class Name: vtkMAFProjectRG.
  Typical applications of this filter are to produce an image from a volume
  for image processing or visualization.
 */
-class MAF_EXPORT vtkMAFProjectRG : public vtkMAFRectilinearGridToRectilinearGridFilter
+class MAF_EXPORT vtkMAFProjectRG : public vtkDataSetToDataSetFilter
 {
 public:
   /** RTTI Macro */
-  vtkTypeRevisionMacro(vtkMAFProjectRG,vtkMAFRectilinearGridToRectilinearGridFilter);
-  /** Print object information */
-  void PrintSelf(ostream& os, vtkIndent indent);
-
+  vtkTypeRevisionMacro(vtkMAFProjectRG, vtkDataSetToDataSetFilter);
+  
   /** Static Function for object instantiation */
   static vtkMAFProjectRG *New();
 
@@ -116,6 +116,9 @@ public:
      return "Z";
   };
 
+	/** Updated function to avoid extent propagation */
+	virtual void PropagateUpdateExtent(vtkDataObject *output);
+
   /** Macro for Set Projection Mode */
   vtkSetMacro(ProjectionMode,int);
   /** Macro for Get Projection Mode */
@@ -137,7 +140,7 @@ protected:
   /** constructor */
   vtkMAFProjectRG();
   /** destructor */
- ~vtkMAFProjectRG(){};
+	~vtkMAFProjectRG() {};
  /** copy constructor not implemented*/
   vtkMAFProjectRG(const vtkMAFProjectRG&);
   /** assign operator not implemented*/
@@ -148,7 +151,14 @@ protected:
   /** Execute the projection and fill output scalars */
   void Execute();
 
-  int  ProjectionMode;
+	void generateOutputFromSP(vtkStructuredPoints * inputSP, int * projectedDims, vtkDataArray * projScalars);
+
+	void GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars);
+
+	/** Gets the best spacing for Rectilinear Grid probing*/
+	void GetBestSpacing(double * bestSpacing, vtkRectilinearGrid* rGrid);
+
+	int  ProjectionMode;
 	bool ProjectSubRange;
 	int  ProjectionRange[2];
 };

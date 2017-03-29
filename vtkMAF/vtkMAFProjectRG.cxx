@@ -38,102 +38,66 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 
 =========================================================================*/
+#include "mafDefines.h"
 #include "vtkMAFProjectRG.h"
-//#include "vtkMath2.h"
 #include "vtkObjectFactory.h"
 #include "vtkStructuredPoints.h"
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
-
-
-#ifndef MIN 
-#define MIN( x, y ) ( (x) < (y) ? (x) : (y) )
-#endif
-#ifndef MAX 
-#define MAX( x, y ) ( (x) > (y) ? (x) : (y) )
-#endif
+#include "vtkRectilinearGrid.h"
+#include "vtkMAFSmartPointer.h"
+#include "vtkProbeFilter.h"
+#include "vtkDataSetWriter.h"
 
 vtkCxxRevisionMacro(vtkMAFProjectRG, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkMAFProjectRG);
 
+#define AIR_LIMIT -500
 
+//----------------------------------------------------------------------------
+void vtkMAFProjectRG::PropagateUpdateExtent(vtkDataObject *output)
+{
+}
 
 //=========================================================================
 vtkMAFProjectRG::vtkMAFProjectRG()
 {
-  this->ProjectionMode = VTK_PROJECT_FROM_X;
-	this->ProjectSubRange = false;
+  ProjectionMode = VTK_PROJECT_FROM_X;
+	ProjectSubRange = false;
+	vtkSource::SetNthOutput(0, vtkStructuredPoints::New());
+	// Releasing data
+	Outputs[0]->ReleaseData();
+	Outputs[0]->Delete();
 }
 
 //=========================================================================
 void vtkMAFProjectRG::ExecuteInformation()
 {
-  vtkRectilinearGrid *input=this->GetInput();
-  vtkRectilinearGrid *output=this->GetOutput();
+	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
+	vtkStructuredPoints *inputSP = vtkStructuredPoints::SafeDownCast(GetInput());
+	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
   int dims[3], outDims[3], wholeExtent[6];
   
-  if (this->GetInput() == NULL)
-    {
-    vtkErrorMacro("Missing input");
-    return;
-    }
-  this->vtkMAFRectilinearGridToRectilinearGridFilter::ExecuteInformation();
+	if (inputSP == NULL && inputRG == NULL)
+	{
+		vtkErrorMacro("Missing input");
+		return;
+	}
 
-  input->GetWholeExtent( wholeExtent );
-  dims[0] = wholeExtent[1] - wholeExtent[0] + 1;
-  dims[1] = wholeExtent[3] - wholeExtent[2] + 1;
-  dims[2] = wholeExtent[5] - wholeExtent[4] + 1;
-  
-  switch (this->ProjectionMode) {
-  case VTK_PROJECT_FROM_X:
-    outDims[0] = dims[1];
-    outDims[1] = dims[2];
-    outDims[2] = 1;    
-    break;
-  case VTK_PROJECT_FROM_Y:
-    outDims[0] = dims[0];
-    outDims[1] = dims[2];
-    outDims[2] = 1;    
-    break;
-  case VTK_PROJECT_FROM_Z:
-    outDims[0] = dims[0];
-    outDims[1] = dims[1];
-    outDims[2] = 1;
-  }
+	if (output == NULL)
+	{
+		vtkErrorMacro("Output error");
+		return;
+	}
 
-  wholeExtent[0] = 0;
-  wholeExtent[1] = outDims[0] - 1;
-  wholeExtent[2] = 0;
-  wholeExtent[3] = outDims[1] - 1;
-  wholeExtent[4] = 0;
-  wholeExtent[5] = outDims[2] - 1;
-  
-  output->SetWholeExtent( wholeExtent );
-  output->SetUpdateExtent( wholeExtent );
+	if (inputRG)
+		inputRG->GetWholeExtent(wholeExtent);
+	else
+		inputSP->GetWholeExtent(wholeExtent);
 
-  vtkDebugMacro(<<"Whole Extent is " << wholeExtent[1] << " " << wholeExtent[3] << " " << wholeExtent[5]);
-}
-
-//=========================================================================
-void vtkMAFProjectRG::Execute()
-{
-	int x, y, z, dims[3], outDims[3], dim, idx, newIdx, range[2];
-	int sliceSize, outSize, jOffset, kOffset;
-	float acc, rangeSize;
-
-	vtkRectilinearGrid 	*input = (vtkRectilinearGrid *)this->GetInput();
-	vtkRectilinearGrid 	*output = (vtkRectilinearGrid *)this->GetOutput();
-
-	vtkDataArray 			*XCoordinates, *YCoordinates, *ZCoordinates;
-
-	vtkPointData 			*pd = input->GetPointData();
-	vtkDataArray 			*sc = pd->GetScalars();
-
-	vtkPointData 			*outPD = output->GetPointData();
-	vtkDataArray 			*outSc = pd->GetScalars()->NewInstance();
-
-	input->GetDimensions(dims);
-	dim = 2;
+	dims[0] = wholeExtent[1] - wholeExtent[0] + 1;
+	dims[1] = wholeExtent[3] - wholeExtent[2] + 1;
+	dims[2] = wholeExtent[5] - wholeExtent[4] + 1;
 
 	switch (this->ProjectionMode) {
 		case VTK_PROJECT_FROM_X:
@@ -150,42 +114,55 @@ void vtkMAFProjectRG::Execute()
 			outDims[0] = dims[0];
 			outDims[1] = dims[1];
 			outDims[2] = 1;
-			break;
 	}
 
-	outSize = outDims[0] * outDims[1];
-	output->SetDimensions(outDims);
+	wholeExtent[0] = 0;
+	wholeExtent[1] = outDims[0] - 1;
+	wholeExtent[2] = 0;
+	wholeExtent[3] = outDims[1] - 1;
+	wholeExtent[4] = 0;
+	wholeExtent[5] = outDims[2] - 1;
+  output->SetWholeExtent( wholeExtent );
+}
 
-	XCoordinates = input->GetXCoordinates()->NewInstance();
-	YCoordinates = input->GetYCoordinates()->NewInstance();
-	ZCoordinates = input->GetZCoordinates()->NewInstance();
+//=========================================================================
+void vtkMAFProjectRG::Execute()
+{
+	int x, y, z, inputDims[3], projectedDims[3], idx, newIdx, range[2];
+	int sliceSize, jOffset, kOffset;
+	float acc, rangeSize;
 
-	XCoordinates->SetNumberOfTuples(outDims[0]);
-	YCoordinates->SetNumberOfTuples(outDims[1]);
-	ZCoordinates->SetNumberOfTuples(outDims[2]);
+	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
+	vtkStructuredPoints *inputSP = vtkStructuredPoints::SafeDownCast(GetInput());
+	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
 
-	ZCoordinates->InsertComponent(0, 0, 0);
 
+	vtkPointData 			*inputPd = inputRG ? inputRG->GetPointData() : inputSP->GetPointData();
+	vtkDataArray 			*inputScalars = inputPd->GetScalars();
+
+	vtkDataArray 			*projScalars = inputPd->GetScalars()->NewInstance();
+
+	inputRG ? inputRG->GetDimensions(inputDims) : inputSP->GetDimensions(inputDims);
+		
 	switch (this->ProjectionMode) {
 		case VTK_PROJECT_FROM_X:
-			XCoordinates->DeepCopy(input->GetYCoordinates());
-			YCoordinates->DeepCopy(input->GetZCoordinates());
+			projectedDims[0] = inputDims[1];
+			projectedDims[1] = inputDims[2];
+			projectedDims[2] = 1;
 			break;
 		case VTK_PROJECT_FROM_Y:
-			XCoordinates->DeepCopy(input->GetXCoordinates());
-			YCoordinates->DeepCopy(input->GetZCoordinates());
+			projectedDims[0] = inputDims[0];
+			projectedDims[1] = inputDims[2];
+			projectedDims[2] = 1;
 			break;
 		case VTK_PROJECT_FROM_Z:
-			XCoordinates->DeepCopy(input->GetXCoordinates());
-			YCoordinates->DeepCopy(input->GetYCoordinates());
+			projectedDims[0] = inputDims[0];
+			projectedDims[1] = inputDims[1];
+			projectedDims[2] = 1;
 			break;
 	}
-
-	//outSc->SetDataType(sc->GetDataType());
-	outSc->SetNumberOfTuples(outSize);
-
-	sliceSize = dims[0] * dims[1];
-
+		projScalars->SetNumberOfTuples(projectedDims[0]*projectedDims[1]);
+		
 	//
 	// Traverse input data and project points to output
 	//
@@ -195,93 +172,211 @@ void vtkMAFProjectRG::Execute()
 	if (ProjectSubRange)
 	{
 		range[0] = MAX(ProjectionRange[0], 0);
-		range[1] = MIN(ProjectionRange[1], dims[ProjectionMode-1]);
+		range[1] = MIN(ProjectionRange[1], inputDims[ProjectionMode-1]);
 		rangeSize = range[1] - range[0];
 	}
 	else
 	{
 		range[0] = 0;
-		range[1] = dims[ProjectionMode-1];
-		rangeSize = dims[ProjectionMode-1];
+		range[1] = inputDims[ProjectionMode-1];
+		rangeSize = inputDims[ProjectionMode-1];
 	}
+
+
+	sliceSize = inputDims[0] * inputDims[1];
 
 	switch (this->ProjectionMode)
 	{
 		case VTK_PROJECT_FROM_X:
-			for (z = 0; z < dims[2]; z++)
+			for (z = 0; z < inputDims[2]; z++)
 			{
 				kOffset = z * sliceSize;
-				for (y = 0; y < dims[1]; y++)
+				for (y = 0; y < inputDims[1]; y++)
 				{
-					jOffset = y * dims[0];
+					jOffset = y * inputDims[0];
 					acc = 0;
 					for (x = range[0]; x < range[1]; x++)
 					{
 						idx = x + jOffset + kOffset;
-						acc += sc->GetTuple1(idx);
+						acc+=MAX(AIR_LIMIT,inputScalars->GetTuple1(idx));
 					}
-					outSc->InsertTuple1(newIdx++, acc / rangeSize);
+					projScalars->SetTuple1(newIdx++, acc / rangeSize);
 				}
 			}
 			break;
 		case VTK_PROJECT_FROM_Y:
-			for (z = 0; z < dims[2]; z++)
+			for (z = 0; z < inputDims[2]; z++)
 			{
 				kOffset = z * sliceSize;
-				for (x = 0; x < dims[0]; x++)
+				for (x = 0; x < inputDims[0]; x++)
 				{
 					acc = 0;
 					for (y = range[0]; y < range[1]; y++)
 					{
-						jOffset = y * dims[0];
+						jOffset = y * inputDims[0];
 						idx = x + jOffset + kOffset;
-						acc += sc->GetTuple1(idx);
+						acc+=MAX(AIR_LIMIT,inputScalars->GetTuple1(idx));
 					}
-					outSc->InsertTuple1(newIdx++, acc / rangeSize);
+					projScalars->SetTuple1(newIdx++, acc / rangeSize);
 				}
 			}
 			break;
 		case VTK_PROJECT_FROM_Z:
-			for (y = 0; y < dims[1]; y++)
+			for (y = 0; y < inputDims[1]; y++)
 			{
-				jOffset = y * dims[0];
-				for (x = 0; x < dims[0]; x++)
+				jOffset = y * inputDims[0];
+				for (x = 0; x < inputDims[0]; x++)
 				{
 					acc = 0;
 					for (z = range[0]; z < range[1]; z++)
 					{
 						kOffset = z * sliceSize;
 						idx = x + jOffset + kOffset;
-						acc += sc->GetTuple1(idx);
+						acc+=MAX(AIR_LIMIT,inputScalars->GetTuple1(idx));
 					}
-					outSc->InsertTuple1(newIdx++, acc / rangeSize);
+					projScalars->SetTuple1(newIdx++, acc / rangeSize);
 				}
 			}
 			break;
 	}
 
-	output->SetXCoordinates(XCoordinates);
-	output->SetYCoordinates(YCoordinates);
-	output->SetZCoordinates(ZCoordinates);
+	if (inputRG)
+		GenerateOutputFromRG(inputRG, projectedDims, projScalars);
+	else
+		generateOutputFromSP(inputSP, projectedDims, projScalars);
+
+	vtkDEL(projScalars);
+}
+
+//----------------------------------------------------------------------------
+void vtkMAFProjectRG::generateOutputFromSP(vtkStructuredPoints * inputSP, int * projectedDims, vtkDataArray * projScalars)
+{
+	double inputSpacing[3];
+	double outputSpacing[3];
+	vtkStructuredPoints *output = (vtkStructuredPoints *)GetOutput();
+	
+	inputSP->GetSpacing(inputSpacing);
+	switch (this->ProjectionMode) {
+		case VTK_PROJECT_FROM_X:
+			outputSpacing[0] = inputSpacing[1];
+			outputSpacing[1] = inputSpacing[2];
+			outputSpacing[2] = 1;
+			break;
+		case VTK_PROJECT_FROM_Y:
+			outputSpacing[0] = inputSpacing[0];
+			outputSpacing[1] = inputSpacing[2];
+			outputSpacing[2] = 1;
+			break;
+		case VTK_PROJECT_FROM_Z:
+			outputSpacing[0] = inputSpacing[0];
+			outputSpacing[1] = inputSpacing[1];
+			outputSpacing[2] = 1;
+	}
+
+	output->SetScalarType(inputSP->GetScalarType());
+	output->SetNumberOfScalarComponents(inputSP->GetNumberOfScalarComponents());
+	output->SetDimensions(projectedDims);
+	output->SetSpacing(outputSpacing);
+	output->GetPointData()->SetScalars(projScalars);
+}
+
+//----------------------------------------------------------------------------
+void vtkMAFProjectRG::GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars)
+{
+	//Generate temporary rectilinear grid output
+	vtkRectilinearGrid *rgOut = vtkRectilinearGrid::New();
+	vtkDataArray 			*XCoordinates, *YCoordinates, *ZCoordinates;
+	double outputSpacing[3], bounds[6], bestSpacing[3];
+	int outputDims[3];
+
+
+	rgOut->SetDimensions(projectedDims);
+
+	XCoordinates = inputRG->GetXCoordinates()->NewInstance();
+	YCoordinates = inputRG->GetYCoordinates()->NewInstance();
+	ZCoordinates = inputRG->GetZCoordinates()->NewInstance();
+
+	XCoordinates->SetNumberOfTuples(projectedDims[0]);
+	YCoordinates->SetNumberOfTuples(projectedDims[1]);
+	ZCoordinates->SetNumberOfTuples(projectedDims[2]);
+
+	ZCoordinates->InsertComponent(0, 0, 0);
+
+	switch (this->ProjectionMode) {
+		case VTK_PROJECT_FROM_X:
+			XCoordinates->DeepCopy(inputRG->GetYCoordinates());
+			YCoordinates->DeepCopy(inputRG->GetZCoordinates());
+			break;
+		case VTK_PROJECT_FROM_Y:
+			XCoordinates->DeepCopy(inputRG->GetXCoordinates());
+			YCoordinates->DeepCopy(inputRG->GetZCoordinates());
+			break;
+		case VTK_PROJECT_FROM_Z:
+			XCoordinates->DeepCopy(inputRG->GetXCoordinates());
+			YCoordinates->DeepCopy(inputRG->GetYCoordinates());
+			break;
+	}
+
+	rgOut->SetXCoordinates(XCoordinates);
+	rgOut->SetYCoordinates(YCoordinates);
+	rgOut->SetZCoordinates(ZCoordinates);
 	XCoordinates->Delete();
 	YCoordinates->Delete();
 	ZCoordinates->Delete();
 
-	outPD->SetScalars(outSc);
-	outSc->Delete();
+	rgOut->GetPointData()->SetScalars(projScalars);
+		
+	GetBestSpacing(bestSpacing, rgOut);
+
+
+	rgOut->GetBounds(bounds);
+
+	outputDims[0] = ((bounds[1] - bounds[0]) / bestSpacing[0]) + 1;
+	outputDims[1] = ((bounds[3] - bounds[2]) / bestSpacing[1]) + 1;
+	outputDims[2] = 1;
+
+	outputSpacing[0] = (bounds[1] - bounds[0]) / (double)outputDims[0];
+	outputSpacing[1] = (bounds[3] - bounds[2]) / (double)outputDims[1];
+	outputSpacing[2] = 1;
+
+	vtkStructuredPoints *SP = vtkStructuredPoints::New();
+	SP->SetDimensions(outputDims);
+	SP->SetSpacing(outputSpacing);
+	SP->SetOrigin(bounds[0], bounds[2], bounds[4]);
+
+	vtkProbeFilter *probeFilter = vtkProbeFilter::New();
+	probeFilter->SetInput(SP);
+	probeFilter->SetSource(rgOut);
+	probeFilter->Update();
+
+	GetOutput()->DeepCopy(probeFilter->GetOutput());
+
+	vtkDEL(SP);
+	vtkDEL(probeFilter);
+	vtkDEL(rgOut);
 }
 
-
 //=========================================================================
-void vtkMAFProjectRG::PrintSelf(ostream& os, vtkIndent indent)
-//=========================================================================
+void vtkMAFProjectRG::GetBestSpacing(double * bestSpacing, vtkRectilinearGrid* rGrid)
 {
-  vtkMAFRectilinearGridToRectilinearGridFilter::PrintSelf(os,indent);
+	bestSpacing[0] = VTK_DOUBLE_MAX;
+	bestSpacing[1] = VTK_DOUBLE_MAX;
+	bestSpacing[2] = VTK_DOUBLE_MAX;
 
-  os << indent << "ProjectionMode: " <<GetProjectionModeAsString() << "\n";
-  
+	for (int xi = 1; xi < rGrid->GetXCoordinates()->GetNumberOfTuples(); xi++)
+	{
+		double spcx = rGrid->GetXCoordinates()->GetTuple1(xi) - rGrid->GetXCoordinates()->GetTuple1(xi - 1);
+		if (bestSpacing[0] > spcx && spcx != 0.0)
+			bestSpacing[0] = spcx;
+	}
+
+	for (int yi = 1; yi < rGrid->GetYCoordinates()->GetNumberOfTuples(); yi++)
+	{
+		double spcy = rGrid->GetYCoordinates()->GetTuple1(yi) - rGrid->GetYCoordinates()->GetTuple1(yi - 1);
+		if (bestSpacing[1] > spcy && spcy != 0.0)
+			bestSpacing[1] = spcy;
+	}
+
+	bestSpacing[2] = 1;
 }
-
-
-
 
