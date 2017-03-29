@@ -31,7 +31,7 @@ class vtkMAFAssembly;
 class vtkOutlineCornerFilter;
 class vtkPolyDataMapper;
 class vtkMAFProjectSP;
-class vtkMAFProjectRG;
+class vtkMAFProjectVolume;
 class vtkRectilinearGrid;
 
 //----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ protected:
 	vtkOutlineCornerFilter *m_VolumeBox;
   vtkPolyDataMapper			 *m_VolumeBoxMapper;
   vtkActor               *m_VolumeBoxActor;
-	vtkMAFProjectRG       *m_ProjectFilter;
+	vtkMAFProjectVolume       *m_ProjectFilter;
 	bool m_RangeProjectionEnabled;
 	int m_ProjectionRange[2];
 

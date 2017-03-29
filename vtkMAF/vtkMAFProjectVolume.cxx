@@ -1,45 +1,21 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    $RCSfile: vtkMAFProjectRG.cxx,v $
-  Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+Program: MAF2
+Module: vtkMAFVolumeSlicer
+Authors: Gianluigi Crimi
 
+Copyright (c) B3C
+All rights reserved. See Copyright.txt or
+http://www.scsitaly.com/Copyright.htm for details.
 
-Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
-
-This software is copyrighted by Ken Martin, Will Schroeder and Bill Lorensen.
-The following terms apply to all files associated with the software unless
-explicitly disclaimed in individual files. This copyright specifically does
-not apply to the related textbook "The Visualization Toolkit" ISBN
-013199837-4 published by Prentice Hall which is covered by its own copyright.
-
-The authors hereby grant permission to use, copy, and distribute this
-software and its documentation for any purpose, provided that existing
-copyright notices are retained in all copies and that this notice is included
-verbatim in any distributions. Additionally, the authors grant permission to
-modify this software and its documentation for any purpose, provided that
-such modifications are not distributed without the explicit consent of the
-authors and that existing copyright notices are retained in all copies. Some
-of the algorithms implemented by this software are patented, observe all
-applicable patent law.
-
-IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY FOR
-DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
-OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY DERIVATIVES THEREOF,
-EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES, INCLUDING,
-BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
-"AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE
-MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
-
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
 #include "mafDefines.h"
-#include "vtkMAFProjectRG.h"
+#include "vtkMAFProjectVolume.h"
 #include "vtkObjectFactory.h"
 #include "vtkStructuredPoints.h"
 #include "vtkPointData.h"
@@ -49,18 +25,18 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkProbeFilter.h"
 #include "vtkDataSetWriter.h"
 
-vtkCxxRevisionMacro(vtkMAFProjectRG, "$Revision: 1.1 $");
-vtkStandardNewMacro(vtkMAFProjectRG);
+vtkCxxRevisionMacro(vtkMAFProjectVolume, "$Revision: 1.1 $");
+vtkStandardNewMacro(vtkMAFProjectVolume);
 
 #define AIR_LIMIT -500
 
 //----------------------------------------------------------------------------
-void vtkMAFProjectRG::PropagateUpdateExtent(vtkDataObject *output)
+void vtkMAFProjectVolume::PropagateUpdateExtent(vtkDataObject *output)
 {
 }
 
 //=========================================================================
-vtkMAFProjectRG::vtkMAFProjectRG()
+vtkMAFProjectVolume::vtkMAFProjectVolume()
 {
   ProjectionMode = VTK_PROJECT_FROM_X;
 	ProjectSubRange = false;
@@ -71,14 +47,14 @@ vtkMAFProjectRG::vtkMAFProjectRG()
 }
 
 //=========================================================================
-void vtkMAFProjectRG::ExecuteInformation()
+void vtkMAFProjectVolume::ExecuteInformation()
 {
 	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
-	vtkStructuredPoints *inputSP = vtkStructuredPoints::SafeDownCast(GetInput());
+	vtkImageData *inputID = vtkImageData::SafeDownCast(GetInput());
 	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
   int dims[3], outDims[3], wholeExtent[6];
   
-	if (inputSP == NULL && inputRG == NULL)
+	if (inputID == NULL && inputRG == NULL)
 	{
 		vtkErrorMacro("Missing input");
 		return;
@@ -93,7 +69,7 @@ void vtkMAFProjectRG::ExecuteInformation()
 	if (inputRG)
 		inputRG->GetWholeExtent(wholeExtent);
 	else
-		inputSP->GetWholeExtent(wholeExtent);
+		inputID->GetWholeExtent(wholeExtent);
 
 	dims[0] = wholeExtent[1] - wholeExtent[0] + 1;
 	dims[1] = wholeExtent[3] - wholeExtent[2] + 1;
@@ -126,23 +102,23 @@ void vtkMAFProjectRG::ExecuteInformation()
 }
 
 //=========================================================================
-void vtkMAFProjectRG::Execute()
+void vtkMAFProjectVolume::Execute()
 {
 	int x, y, z, inputDims[3], projectedDims[3], idx, newIdx, range[2];
 	int sliceSize, jOffset, kOffset;
 	float acc, rangeSize;
 
 	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
-	vtkStructuredPoints *inputSP = vtkStructuredPoints::SafeDownCast(GetInput());
+	vtkImageData *inputID = vtkImageData::SafeDownCast(GetInput());
 	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
 
 
-	vtkPointData 			*inputPd = inputRG ? inputRG->GetPointData() : inputSP->GetPointData();
+	vtkPointData 			*inputPd = inputRG ? inputRG->GetPointData() : inputID->GetPointData();
 	vtkDataArray 			*inputScalars = inputPd->GetScalars();
 
 	vtkDataArray 			*projScalars = inputPd->GetScalars()->NewInstance();
 
-	inputRG ? inputRG->GetDimensions(inputDims) : inputSP->GetDimensions(inputDims);
+	inputRG ? inputRG->GetDimensions(inputDims) : inputID->GetDimensions(inputDims);
 		
 	switch (this->ProjectionMode) {
 		case VTK_PROJECT_FROM_X:
@@ -243,17 +219,17 @@ void vtkMAFProjectRG::Execute()
 	if (inputRG)
 		GenerateOutputFromRG(inputRG, projectedDims, projScalars);
 	else
-		generateOutputFromSP(inputSP, projectedDims, projScalars);
+		GenerateOutputFromID(inputID, projectedDims, projScalars);
 
 	vtkDEL(projScalars);
 }
 
 //----------------------------------------------------------------------------
-void vtkMAFProjectRG::generateOutputFromSP(vtkStructuredPoints * inputSP, int * projectedDims, vtkDataArray * projScalars)
+void vtkMAFProjectVolume::GenerateOutputFromID(vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars)
 {
 	double inputSpacing[3];
 	double outputSpacing[3];
-	vtkStructuredPoints *output = (vtkStructuredPoints *)GetOutput();
+	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
 	
 	inputSP->GetSpacing(inputSpacing);
 	switch (this->ProjectionMode) {
@@ -281,7 +257,7 @@ void vtkMAFProjectRG::generateOutputFromSP(vtkStructuredPoints * inputSP, int * 
 }
 
 //----------------------------------------------------------------------------
-void vtkMAFProjectRG::GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars)
+void vtkMAFProjectVolume::GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars)
 {
 	//Generate temporary rectilinear grid output
 	vtkRectilinearGrid *rgOut = vtkRectilinearGrid::New();
@@ -357,7 +333,7 @@ void vtkMAFProjectRG::GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * p
 }
 
 //=========================================================================
-void vtkMAFProjectRG::GetBestSpacing(double * bestSpacing, vtkRectilinearGrid* rGrid)
+void vtkMAFProjectVolume::GetBestSpacing(double * bestSpacing, vtkRectilinearGrid* rGrid)
 {
 	bestSpacing[0] = VTK_DOUBLE_MAX;
 	bestSpacing[1] = VTK_DOUBLE_MAX;

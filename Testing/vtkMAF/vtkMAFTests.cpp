@@ -35,8 +35,7 @@
 #include "vtkMAFTextActorMeterTest.h"
 #include "vtkMAFCellsFilterTest.h"
 #include "vtkMAFGridActorTest.h"
-#include "vtkMAFProjectSPTest.h"
-#include "vtkMAFProjectRGTest.h"
+#include "vtkMAFProjectVolumeTest.h"
 #include "vtkMAFClipSurfaceBoundingBoxTest.h"
 #include "vtkMAFRGSliceAccumulateTest.h"
 #include "vtkMAFRectilinearGridToRectilinearGridFilterTest.h"
@@ -155,8 +154,7 @@ int
 	runner.addTest(vtkMAFTextActorMeterTest::suite());
 	runner.addTest(vtkMAFCellsFilterTest::suite());
 	runner.addTest(vtkMAFGridActorTest::suite());
-	runner.addTest(vtkMAFProjectSPTest::suite());
-	runner.addTest(vtkMAFProjectRGTest::suite());
+	runner.addTest(vtkMAFProjectVolumeTest::suite());
 	runner.addTest(vtkMAFClipSurfaceBoundingBoxTest::suite());
 	runner.addTest(vtkMAFRGSliceAccumulateTest::suite());
 	runner.addTest(vtkMAFRectilinearGridToRectilinearGridFilterTest::suite());

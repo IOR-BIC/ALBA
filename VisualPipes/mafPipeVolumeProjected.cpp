@@ -43,8 +43,7 @@
 #include "vtkTexture.h"
 #include "vtkProbeFilter.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkMAFProjectSP.h"
-#include "vtkMAFProjectRG.h"
+#include "vtkMAFProjectVolume.h"
 #include "vtkProperty.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
@@ -137,7 +136,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	RXTexture->SetInterpolate(1);
 	RXTexture->SetMapColorScalarsThroughLookupTable(1);
 
-	m_ProjectFilter = vtkMAFProjectRG::New();
+	m_ProjectFilter = vtkMAFProjectVolume::New();
 
 	if (vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(vtk_data))
 	{
@@ -341,7 +340,8 @@ void mafPipeVolumeProjected::EnableRangeProjection(bool enabled)
 		return;
 
 	m_RangeProjectionEnabled = enabled;
-	m_ProjectFilter->SetProjectSubRange(enabled);
+	if(m_ProjectFilter)
+		m_ProjectFilter->SetProjectSubRange(enabled);
 
 	GetLogicManager()->CameraUpdate();
 }
@@ -352,7 +352,8 @@ void mafPipeVolumeProjected::SetProjectionRange(int range[2])
 	m_ProjectionRange[0] = range[0];
 	m_ProjectionRange[1] = range[1];
 
-	m_ProjectFilter->SetProjectionRange(range);
+	if(m_ProjectFilter)
+		m_ProjectFilter->SetProjectionRange(range);
 
 	if(m_RangeProjectionEnabled)
 		GetLogicManager()->CameraUpdate();
