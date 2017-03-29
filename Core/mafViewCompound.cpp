@@ -543,9 +543,9 @@ void mafViewCompound::GetImage(wxBitmap &bmp, int magnification)
 //----------------------------------------------------------------------------
 {
   wxSize vsz = this->GetWindow()->GetSize();
-  wxBitmap compoundImage = wxBitmap(magnification*vsz.GetWidth(),magnification*vsz.GetHeight(),24);
+  bmp = wxBitmap(magnification*vsz.GetWidth(),magnification*vsz.GetHeight(),24);
   wxMemoryDC compoundDC;
-  compoundDC.SelectObject(compoundImage);
+  compoundDC.SelectObject(bmp);
   compoundDC.SetBackground(*wxWHITE_BRUSH);
   compoundDC.Clear();
   // this implement the Fixed SubViews Print
@@ -566,7 +566,6 @@ void mafViewCompound::GetImage(wxBitmap &bmp, int magnification)
   }
 
   compoundDC.SelectObject(wxNullBitmap);
-  bmp = compoundImage;
 }
 
 //----------------------------------------------------------------------------
