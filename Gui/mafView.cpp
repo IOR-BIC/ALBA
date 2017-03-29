@@ -37,7 +37,8 @@
 #include "vtkAssemblyNode.h"
 #include "vtkProp3D.h"
 
-#include <wx/print.h>
+#define DEFAULT_BG_COLOR 0.28
+
 
 //----------------------------------------------------------------------------
 mafCxxAbstractTypeMacro(mafView);
@@ -67,7 +68,9 @@ mafView::mafView(const wxString &label)
   m_PickedVME         = NULL;
   m_PickedProp        = NULL;
   m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0.0;
-	 
+
+	m_BackgroundColor = wxColour(DEFAULT_BG_COLOR * 255, DEFAULT_BG_COLOR * 255, DEFAULT_BG_COLOR * 255);
+
   m_HTMLText = "";
   m_LightCopyEnabled = false;
 }

@@ -151,6 +151,7 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_ViewManager = NULL;
 	m_OpManager = NULL;
 	m_InteractionManager = NULL;
+	m_SnapshotManager = NULL;
 	m_ImportMenu = NULL;
 	m_ExportMenu = NULL;
 	m_OpMenu = NULL;
@@ -192,6 +193,7 @@ mafLogicWithManagers::~mafLogicWithManagers()
   cppDEL(m_SettingsDialog);
 	cppDEL(m_ApplicationSettings);
 	cppDEL(m_TimeBarSettings);
+	cppDEL(m_SnapshotManager);
 }
 
 
@@ -955,6 +957,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				if (m_SnapshotManager && m_VMEManager && m_ViewManager)
 				m_SnapshotManager->CreateSnapshot(m_VMEManager->GetRoot(), m_ViewManager->GetSelectedView());
 
+				if (m_WizardManager && m_WizardRunning)
 				OnEvent(&mafEvent(this, WIZARD_RUN_CONTINUE, true));
 			}
 			break;

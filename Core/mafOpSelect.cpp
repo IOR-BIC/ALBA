@@ -34,8 +34,8 @@
 #include "vtkDataSet.h"
 #include "mafOpReparentTo.h"
 
-static mafAutoPointer<mafVME> glo_Clipboard = NULL;
-static	mafAutoPointer<mafVME> glo_SelectionParent=NULL;
+static mafVME *glo_Clipboard = NULL;
+static	mafVME *glo_SelectionParent=NULL;
 
 //////////////////
 // mafOpSelect ://
@@ -293,9 +293,9 @@ Select the vme parent
 		//////////////////////////////////////////////////////////////////////////
 
 		GetLogicManager()->VmeRemove(m_Selection);
-		mafEventMacro(mafEvent(this, VME_SELECTED, glo_SelectionParent));
+		//mafEventMacro(mafEvent(this, VME_SELECTED, glo_SelectionParent));
 
-		glo_SelectionParent.GetPointer()->GetOutput()->Update();
+		glo_SelectionParent->Update();
 
 		RemoveBackLinksForTheSubTree(m_Selection);
 	}
@@ -365,7 +365,7 @@ Restore the Selection
 
 		RestoreBackLinksForTheSubTree(m_Selection);
 
-		glo_SelectionParent.GetPointer()->GetOutput()->Update();
+		glo_SelectionParent->Update();
 
 		SetSelectionParent(m_SelectionParentBackup);
 
