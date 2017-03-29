@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2
- Module: vtkMAFProjectSPTest
- Authors: Daniele Giunchi
+ Module: vtkMAFProjectVolumeTest
+ Authors: Daniele Giunchi, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -19,15 +19,15 @@
 
 #include "mafTest.h"
 /**
-  Class Name: vtkMAFProjectSPTest.
-  Test class for vtkMAFProjectSP.
+  Class Name: vtkMAFProjectVolumeTest.
+  Test class for vtkMAFProjectVolume.
 */
-class vtkMAFProjectSPTest : public mafTest
+class vtkMAFProjectVolumeTest : public mafTest
 {
   public:
 
     /** Start Test Suite */
-    CPPUNIT_TEST_SUITE( vtkMAFProjectSPTest );
+    CPPUNIT_TEST_SUITE( vtkMAFProjectVolumeTest );
     CPPUNIT_TEST( TestDynamicAllocation );
     CPPUNIT_TEST( TestExecutionProjectionModeToX );
     CPPUNIT_TEST( TestExecutionProjectionModeToY );
