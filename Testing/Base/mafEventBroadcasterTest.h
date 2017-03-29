@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafRootTest
- Authors: Daniele Giunchi
+ Module: mafEventBroadcasterTest
+ Authors: Roberto Mucci
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -14,47 +14,42 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_mafRootTest_H__
-#define __CPP_UNIT_mafRootTest_H__
+#ifndef __CPP_UNIT_mafEventBroadcasterTest_H__
+#define __CPP_UNIT_mafEventBroadcasterTest_H__
 
 #include "mafTest.h"
 
-/** Test for mafMatrix; Use this suite to trace memory problems */
-class mafRootTest : public mafTest
+/** Test for mafEventBase; Use this suite to trace memory problems */
+class mafEventBroadcasterTest : public mafTest
 {
 public: 
 
   // CPPUNIT test suite
-  CPPUNIT_TEST_SUITE( mafRootTest );
+  CPPUNIT_TEST_SUITE( mafEventBroadcasterTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
   CPPUNIT_TEST(TestStaticAllocation);
   CPPUNIT_TEST(TestDynamicAllocation);
-  CPPUNIT_TEST(GetMaxNodeIdTest);
-  CPPUNIT_TEST(GetNextNodeIdTest);
-  CPPUNIT_TEST(SetMaxNodeIdTest);
-  CPPUNIT_TEST(ResetMaxNodeIdTest);
-  CPPUNIT_TEST(CanReparentToTest);
-  CPPUNIT_TEST(SafeDownCastTest);
-  CPPUNIT_TEST(OnRootEventTest);
-  CPPUNIT_TEST(GetStorageTest);
-  CPPUNIT_TEST(PrintTest);  
+  CPPUNIT_TEST(TestAddObserver);
+  CPPUNIT_TEST(TestRemoveObserver);
+  CPPUNIT_TEST(TestRemoveAllObservers);
+  CPPUNIT_TEST(TestIsObserver);
+  CPPUNIT_TEST(TestHasObservers);
+  CPPUNIT_TEST(TestInvokeEvent);
+  CPPUNIT_TEST(TestSetChannel);
   CPPUNIT_TEST_SUITE_END();
+  
 
 private:
   void TestFixture();
   void TestStaticAllocation();
   void TestDynamicAllocation();
-  void GetMaxNodeIdTest();
-  void GetNextNodeIdTest();
-  void SetMaxNodeIdTest();
-  void ResetMaxNodeIdTest();
-  void CanReparentToTest();
-  void SafeDownCastTest();
-  void OnRootEventTest();
-  void GetStorageTest();
-  void PrintTest();
-
-  bool result;
+  void TestAddObserver();
+  void TestRemoveObserver();
+  void TestRemoveAllObservers();
+  void TestIsObserver();
+  void TestHasObservers();
+  void TestInvokeEvent();
+  void TestSetChannel();
 };
 
 

@@ -81,7 +81,7 @@ public:
   mafView(const wxString &label = "View");
   virtual ~mafView(); 
 
-  mafTypeMacro(mafView, mafObject);
+	mafAbstractTypeMacro(mafView, mafObject);
 
   virtual void			SetListener(mafObserver *Listener) {m_Listener = Listener;};
   virtual void			OnEvent(mafEventBase *maf_event);
@@ -181,6 +181,9 @@ public:
 	/** return an xpm-icon that can be used to represent this view */
 	virtual char ** GetIcon();
 
+	virtual wxColor GetBackgroundColor() { return m_BackgroundColor; };
+	virtual void SetBackgroundColor(wxColor color) = 0;
+
 protected:
   mafObserver   *m_Listener;
   wxString       m_Label;
@@ -201,6 +204,8 @@ protected:
   wxPrintData   *m_PrintData;
   mafString      m_HTMLText;
 
+	wxColor				m_BackgroundColor;
+
   /** Find the VME picked */
   bool FindPickedVme(vtkAssemblyPath *ap = NULL);
 
@@ -213,12 +218,7 @@ public:
   /** destroy the Gui */
   void DeleteGui();
 
-  virtual double *GetSlice();
-  virtual void    SetSlice(double slice[3]);
-
-  virtual double *GetNormal();
-  virtual void    SetNormal(double normal[3]);
-
+  
   
 protected:
   /**
@@ -229,10 +229,7 @@ protected:
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same panel GUI, each CreateGUI() function should first call the superclass' one.*/
   virtual mafGUI  *CreateGui();
-
-  double m_Slice[3];
-  double m_Normal[3];
-
+	  
   bool m_LightCopyEnabled;
 };
 #endif

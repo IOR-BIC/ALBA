@@ -597,7 +597,7 @@ void mafAvatar3D::OnMove3DEvent(mafEventInteraction *e)
       // ask a rendering only if it has never rendered
       vtkRenderWindow *rw=m_Renderer->GetRenderWindow();
       if (rw&&!rw->GetNeverRendered())
-        InvokeEvent(CAMERA_UPDATE,MCH_UP,m_View);
+        InvokeEvent(this,CAMERA_UPDATE,MCH_UP,m_View);
     }
   }
 }

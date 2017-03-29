@@ -34,7 +34,6 @@
 
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
-#include "mafEventSource.h"
 
 #include "wx/busyinfo.h"
 
@@ -112,7 +111,7 @@ void mafPipeRayCast::Create(mafSceneNode *n)
 
 	assert(m_Vme->GetOutput()->IsA("mafVMEOutputVolume"));
 
-  m_Vme->GetEventSource()->AddObserver(this);
+  m_Vme->AddObserver(this);
 
   vtkDataSet *dataset = m_Vme->GetOutput()->GetVTKData();
   
@@ -163,7 +162,7 @@ mafPipeRayCast::~mafPipeRayCast()
 {
 
   //Removing pipe binding
-  m_Vme->GetEventSource()->RemoveObserver(this);
+  m_Vme->RemoveObserver(this);
 
 	m_AssemblyFront->RemovePart(m_Volume);
 	

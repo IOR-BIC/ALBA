@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafEventBaseTest
- Authors: Daniele Giunchi
+ Authors: Daniele Giunchi, Crimi Gianluigi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -32,12 +32,9 @@ public:
   CPPUNIT_TEST(TestAllConstructors);
   CPPUNIT_TEST(TestCopy);
   CPPUNIT_TEST(TestSender);
-  CPPUNIT_TEST(TestSource);
   CPPUNIT_TEST(TestId);
   CPPUNIT_TEST(TestChannel);
   CPPUNIT_TEST(TestData);
-  CPPUNIT_TEST(TestSkipFlag);
-  CPPUNIT_TEST(TestSkipNext);
   CPPUNIT_TEST_SUITE_END();
   
 
@@ -48,12 +45,9 @@ private:
   void TestAllConstructors();
   void TestCopy();
   void TestSender();
-  void TestSource();
   void TestId();
   void TestChannel();
   void TestData();
-  void TestSkipFlag();
-  void TestSkipNext();
 };
 
 #endif

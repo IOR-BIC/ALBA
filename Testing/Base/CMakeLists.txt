@@ -17,7 +17,7 @@ SET(PROJECT_SRCS
 	mafDirectoryTest.h 				mafDirectoryTest.cpp
 	mafEventSenderTest.h 			mafEventSenderTest.cpp
 	mafEventBaseTest.h 				mafEventBaseTest.cpp
-	mafEventSourceTest.h 			mafEventSourceTest.cpp
+	mafEventBroadcasterTest.h 	mafEventBroadcasterTest.cpp
 	mafObjectTest.h 				mafObjectTest.cpp
 	mafIndentTest.h 				mafIndentTest.cpp
 	mafDirectoryTest.h 				mafDirectoryTest.cpp
@@ -30,7 +30,6 @@ SET(PROJECT_SRCS
 	vtkMAFToLinearTransformTest.h 	vtkMAFToLinearTransformTest.cpp
 	mafReferenceCountedTest.h 		mafReferenceCountedTest.cpp
 	mafLUTLibraryTest.h 			mafLUTLibraryTest.cpp
-	mafObserversListTest.h 			mafObserversListTest.cpp
 	mafDynamicLoaderTest.h 			mafDynamicLoaderTest.cpp
 	mafDataChecksumTest.h 			mafDataChecksumTest.cpp
 	mafVect3dTest.h 				mafVect3dTest.cpp

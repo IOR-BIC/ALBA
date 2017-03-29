@@ -30,7 +30,6 @@
 #include "mafSceneGraph.h"
 
 #include "mafVME.h"
-#include "mafEventSource.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkTransform.h"
@@ -67,7 +66,7 @@ mafAttachCamera::~mafAttachCamera()
   vtkDEL(m_StartingMatrix);
   if (m_AttachedVme && m_AttachedVme->IsValid())
   {
-    m_AttachedVme->GetEventSource()->RemoveObserver(this);
+    m_AttachedVme->RemoveObserver(this);
   }
 
   if(m_Gui)	
@@ -144,9 +143,9 @@ void mafAttachCamera::SetVme(mafVME *node)
 {
   if (node == NULL)
   {
-    if (m_AttachedVme && m_AttachedVme->GetEventSource()->IsObserver(this))
+    if (m_AttachedVme && m_AttachedVme->IsObserver(this))
     {
-      m_AttachedVme->GetEventSource()->RemoveObserver(this);
+      m_AttachedVme->RemoveObserver(this);
     }
     vtkDEL(m_AttachedVmeMatrix);
     m_AttachedVme = NULL;
@@ -178,7 +177,7 @@ void mafAttachCamera::SetVme(mafVME *node)
     m_RenderWindow->CameraUpdate();
   }
 
-  m_AttachedVme->GetEventSource()->AddObserver(this);
+  m_AttachedVme->AddObserver(this);
 }
 //----------------------------------------------------------------------------
 void mafAttachCamera::SetStartingMatrix(mafMatrix *matrix)

@@ -112,7 +112,9 @@ public:
   virtual void CameraUpdate();
   virtual int GetCameraPosition();
 
-  virtual mafSceneGraph *GetSceneGraph()	  {return m_Sg;}; 
+	virtual void SetBackgroundColor(wxColor color);
+
+	virtual mafSceneGraph *GetSceneGraph() { return m_Sg; };
   virtual mafRWIBase    *GetRWI()           {return m_Rwi->m_RwiBase;};
 
   /** Return a pointer to the image of the renderwindow.*/
@@ -155,10 +157,7 @@ public:
 
   /** Print this view.*/
   virtual void Print(wxDC *dc, wxRect margins);
-
-  /** Allow to link the camera of the view to other cameras.*/
-  virtual void LinkView(bool link_camera = true);
-
+	  
   mafRWI *m_Rwi;
 
   /** print a dump of this object */

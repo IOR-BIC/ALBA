@@ -108,7 +108,9 @@ public:
   /** Return a pointer to the image of the plot.*/
   void GetImage(wxBitmap &bmp, int magnification = 1);
 
-  typedef std::map<mafString, mafVisualPipeInfo> mafPipeMap;
+	virtual void SetBackgroundColor(wxColor color);
+
+	typedef std::map<mafString, mafVisualPipeInfo> mafPipeMap;
 
   /** Plug a visual pipe for a particular vme. It is used also to plug custom pipe.*/
   void PlugVisualPipe(mafString vme_type, mafString pipe_type, long visibility = VISIBLE);

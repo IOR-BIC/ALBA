@@ -156,7 +156,7 @@ int mafDeviceButtonsPadTracker::InternalInitialize()
   if (m_Avatar)
   {
     m_Avatar->Initialize();
-    InvokeEvent(AVATAR_ADDED,MCH_UP,m_Avatar);
+    InvokeEvent(this,AVATAR_ADDED,MCH_UP,m_Avatar);
   }
 
   m_LastPose = 0; // initialize last pose flag
@@ -168,7 +168,7 @@ void mafDeviceButtonsPadTracker::InternalShutdown()
 {
   if (m_Avatar)
   {
-    InvokeEvent(AVATAR_REMOVED,MCH_UP,m_Avatar);
+    InvokeEvent(this,AVATAR_REMOVED,MCH_UP,m_Avatar);
     m_Avatar->Shutdown();
   }
 
@@ -183,7 +183,7 @@ void mafDeviceButtonsPadTracker::SetAvatar(mafAvatar *avatar)
   {
     if (m_Initialized)
     {
-      InvokeEvent(AVATAR_REMOVED,MCH_UP,m_Avatar);
+      InvokeEvent(this,AVATAR_REMOVED,MCH_UP,m_Avatar);
       m_Avatar->Shutdown();
     }
 
@@ -360,7 +360,7 @@ void mafDeviceButtonsPadTracker::ComputeTrackerToCanonicalTansform()
 	m_TrackerToCanonicalTransform->Scale(scale,scale,scale,POST_MULTIPLY);
   
   // inform consumers the m_CanonicalBounds has been recomputed
-  InvokeEvent(GetTrackerBoundsUpdatedId(),MCH_INPUT);
+  InvokeEvent(this,GetTrackerBoundsUpdatedId(),MCH_INPUT);
 }
 
 //------------------------------------------------------------------------------

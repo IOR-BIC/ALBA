@@ -211,7 +211,7 @@ bool mafAgentEventQueue::PushEvent(mafEventBase *event)
 void mafAgentEventQueue::RequestForDispatching()
 //------------------------------------------------------------------------------
 {
-  InvokeEvent(EVENT_DISPATCH);
+  InvokeEvent(this,EVENT_DISPATCH);
 }
 
 //------------------------------------------------------------------------------

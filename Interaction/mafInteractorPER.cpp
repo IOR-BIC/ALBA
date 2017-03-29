@@ -201,7 +201,7 @@ void mafInteractorPER::OnChar(mafEventInteraction *e)
       if (mouse)
       {
         mafView *view = mouse->GetView();
-        InvokeEvent(CAMERA_FIT,MCH_UP,view);
+        InvokeEvent(this,CAMERA_FIT,MCH_UP,view);
       }
     }
     break; 
@@ -280,7 +280,7 @@ void mafInteractorPER::OnRightButtonUp(mafEventInteraction *e)
 	if(m_ShowContextMenu && mouse)
 	{
     mafVME *vme = GetPickedVME(mouse);
-    InvokeEvent(SHOW_CONTEXTUAL_MENU,MCH_UP,vme);
+    InvokeEvent(this,SHOW_CONTEXTUAL_MENU,MCH_UP,vme);
 	}
 
   OnButtonUp(e);
@@ -363,7 +363,7 @@ void mafInteractorPER::OnButtonDown(mafEventInteraction *e)
     if (but_down_id == mafDeviceButtonsPadMouse::GetMouseDClickId() && !picked_vme->IsA("mafVMEGizmo"))
     {
       // Send event to inform Logic that a double click event is rised on a VME
-      InvokeEvent(VME_DCLICKED,MCH_UP,picked_vme);
+      InvokeEvent(this,VME_DCLICKED,MCH_UP,picked_vme);
     }
     else if(m_CanSelect && !picked_vme->IsA("mafVMEGizmo"))
     {
@@ -375,7 +375,7 @@ void mafInteractorPER::OnButtonDown(mafEventInteraction *e)
 
 			}
       // Send a VME select event to Logic
-      InvokeEvent(VME_SELECT,MCH_UP,picked_vme);
+      InvokeEvent(this,VME_SELECT,MCH_UP,picked_vme);
     }
   }
   // Forward the start event to the right behavior
@@ -638,7 +638,7 @@ void mafInteractorPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
       cam->SetPosition(p1);
       ren->ResetCameraClippingRange();
       // render at each cycle
-      InvokeEvent(CAMERA_UPDATE,MCH_UP,view);
+      InvokeEvent(this,CAMERA_UPDATE,MCH_UP,view);
 
     }
     cam->OrthogonalizeViewUp();
@@ -696,27 +696,9 @@ void mafInteractorPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
       cam->SetPosition(p1);
       ren->ResetCameraClippingRange();
       // render at each cycle
-      InvokeEvent(CAMERA_UPDATE,MCH_UP,view);
+      InvokeEvent(this,CAMERA_UPDATE,MCH_UP,view);
     }
     cam->OrthogonalizeViewUp();
     m_FlyToFlag = false;
   }
-}
-//----------------------------------------------------------------------------
-void mafInteractorPER::LinkCameraAdd(vtkCamera *cam)
-//----------------------------------------------------------------------------
-{
-  ((mafInteractorCameraMove *)m_CameraMouseBehavior)->AddLinkedCamera(cam);
-}
-//----------------------------------------------------------------------------
-void mafInteractorPER::LinkCameraRemove(vtkCamera *cam)
-//----------------------------------------------------------------------------
-{
-  ((mafInteractorCameraMove *)m_CameraMouseBehavior)->RemoveLinkedCamera(cam);
-}
-//----------------------------------------------------------------------------
-void mafInteractorPER::LinkCameraRemoveAll()
-//----------------------------------------------------------------------------
-{
-  ((mafInteractorCameraMove *)m_CameraMouseBehavior)->RemoveAllLinkedCamera();
 }

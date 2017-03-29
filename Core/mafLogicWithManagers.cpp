@@ -68,7 +68,6 @@
 #include "mafGUISettingsDialog.h"
 
 #include "mmaApplicationLayout.h"
-#include "mafEventSource.h"
 #include "mafDataVector.h"
 #include "mafVMEStorage.h"
 #include "mafWizardManager.h"
@@ -83,9 +82,26 @@
 #include "mafVMELandmark.h"
 #include "mafHelpManager.h"
 #include "mafServiceLocator.h"
+#include "mafGUIPicButton.h"
+#include "mafGUIButton.h"
+#include "mafVMEGroup.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkDataSet.h"
+#include "mafVMEImage.h"
+#include "vtkImageData.h"
+#include "vtkPointData.h"
+#include "vtkDataSetAttributes.h"
+#include "mafSnapshotManager.h"
 
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
+
+enum ABOUT_ID
+{
+	SHOW_WEB_SITE=MINID,
+	SHOW_LICENSE_SITE
+};
+
 
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
@@ -110,6 +126,10 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 
 	m_AppTitle = "";
 
+	m_WebSiteURL = "";
+	m_LicenseURL = "";
+	m_AboutInfo = "";
+
 	m_Quitting = false;
 
 	m_PlugMenu = true;
@@ -125,10 +145,7 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_UseOpManager = true;
 	m_UseInteractionManager = true;
 	m_UseHelpManager = true;
-
-	m_ExternalViewFlag = false;
-
-	m_CameraLinkingObserverFlag = false;
+	m_UseSnapshotManager = false;
 
 	m_VMEManager = NULL;
 	m_ViewManager = NULL;
@@ -160,6 +177,7 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_ShowStorageSettings = false;
 	m_ShowInteractionSettings = false;
 	m_SelectedLandmark = NULL;
+	m_FatalExptionOccurred = false;
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers()
@@ -270,6 +288,11 @@ void mafLogicWithManagers::Configure()
 		//m_HelpManager->SetListener(this);
 	}
 
+	if (m_UseSnapshotManager)
+	{
+		m_SnapshotManager = new mafSnapshotManager();
+	}
+
 	// Fill the SettingsDialog
 	m_SettingsDialog->AddPage(m_ApplicationSettings->GetGui(), m_ApplicationSettings->GetLabel());
 
@@ -375,23 +398,23 @@ void mafLogicWithManagers::Plug( mafWizard *wizard, wxString menuPath /*= ""*/ )
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnQuit()
 {
-	if (m_WizardManager && m_WizardRunning)
+	if (!m_FatalExptionOccurred && m_WizardManager && m_WizardRunning)
 	{
 		wxMessageBox(_("Please exit wizard before quit."), _("Wizard running"), wxOK | wxCENTER | wxICON_STOP);
 		return;
 	}
-	if (m_OpManager && m_OpManager->Running())
+	if (!m_FatalExptionOccurred &&  m_OpManager && m_OpManager->Running())
 	{
 		wxMessageBox(_("Please exit operation before quit."), _("Operation running"), wxOK | wxCENTER | wxICON_STOP);
 		return;
 	}
 
-	if (m_OpManager && m_OpManager->Running())
+	if (!m_FatalExptionOccurred && m_OpManager && m_OpManager->Running())
 	{
 		return;
 	}
 
-	if (m_VMEManager)
+	if (!m_FatalExptionOccurred &&  m_VMEManager)
 	{
 		m_Quitting = false;
 		if (m_VMEManager->MSFIsModified())
@@ -450,7 +473,6 @@ void mafLogicWithManagers::OnQuit()
 // EVENT /////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
@@ -489,9 +511,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				m_Win->BindToProgressBar(e->GetVtkObj());
 #endif
 				break;
-
-
-
 			case PROGRESSBAR_SET_TEXT:
 				m_Win->ProgressBarSetText(&wxString(e->GetString()->GetCStr()));
 				break;
@@ -564,7 +583,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				FindVME();
 				break;
 			case VME_SELECT:
-				VmeSelect(*e);
+				VmeSelect(e->GetVme());
 				EnableMenuAndToolbar();
 				break;
 			case VME_SELECTED:
@@ -784,40 +803,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				if (m_InteractionManager) m_InteractionManager->CameraFlyToMode();  //modified by Marco. 15-9-2004 fly to with devices.
 #endif
 				break;
-			case LINK_CAMERA_TO_INTERACTOR:
-			{
-				// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-				if (m_InteractionManager == NULL || m_InteractionManager->GetPER() == NULL)
-					return;
-
-				vtkCamera *cam = vtkCamera::SafeDownCast(e->GetVtkObj());
-				bool link_camera = e->GetBool();
-				if (!link_camera)
-				{
-					if (cam)
-						m_InteractionManager->GetPER()->LinkCameraRemove(cam);
-					else
-						m_InteractionManager->GetPER()->LinkCameraRemoveAll();
-
-					if (m_CameraLinkingObserverFlag)
-					{
-						m_InteractionManager->GetPER()->GetCameraMouseInteractor()->RemoveObserver(this);
-						m_CameraLinkingObserverFlag = false;
-					}
-				}
-				else if (cam)
-				{
-					if (!m_CameraLinkingObserverFlag)
-					{
-						m_InteractionManager->GetPER()->GetCameraMouseInteractor()->AddObserver(this);
-						m_CameraLinkingObserverFlag = true;
-					}
-					m_InteractionManager->GetPER()->LinkCameraAdd(cam);
-				}
-			}
-#endif
-			break;
 			case TIME_SET:
 				TimeSet(e->GetDouble());
 				break;
@@ -898,6 +883,10 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				if (m_InteractionManager) m_InteractionManager->PopPER();
 #endif
 				break;
+			case GET_CURRENT_PER:
+				if (m_InteractionManager)
+					e->SetMafObject(m_InteractionManager->GetPER());
+				break;
 			case DEVICE_ADD:
 				m_InteractionManager->AddDeviceToTree((mafDevice *)e->GetMafObject());
 				break;
@@ -911,22 +900,26 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				break;
 			case ABOUT_APPLICATION:
 			{
-				// trap the ABOUT_APPLICATION event and shows the about window with the application infos
-				wxString message = m_AppTitle.GetCStr();
-				message += _(" Application ");
-				message += m_Revision;
-				wxMessageBox(message, "About Application");
-				mafLogMessage(wxString::Format("%s", m_Revision.GetCStr()));
+				wxString imagesPath =  mafGetApplicationDirectory().c_str();
+				imagesPath += "\\Config\\ExampleAppAbout.bmp";
+				ShowAboutDialog("");
 			}
 			break;
-
+			case SHOW_WEB_SITE:
+			{
+				ShowWebSite(m_WebSiteURL);
+			}
+			break;
+			case SHOW_LICENSE_SITE:
+			{
+				ShowWebSite(m_LicenseURL);
+			}
+			break;
 			case HELP_HOME:
 			{
 				m_HelpManager->ShowHelp();
 			}
 			break;
-
-
 			case GET_BUILD_HELP_GUI:
 			{
 				if (e->GetString())
@@ -939,10 +932,8 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				{
 					e->SetArg(false);
 				}
-
 			}
 			break;
-
 			case OPEN_HELP_PAGE:
 			{
 				// open help for entity
@@ -961,112 +952,15 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			break;
 			case MENU_FILE_SNAPSHOT:
 			{
-				mafString msfFilename = m_VMEManager->GetFileName();
-				if (msfFilename.IsEmpty())
-				{
-					mafString dirName = mafGetLastUserFolder().c_str();
-
-					m_VMEManager->SetDirName(dirName);
-					this->OnFileSaveAs();
-					CameraUpdate();
-					msfFilename = m_VMEManager->GetFileName();
-				}
-
-				wxString path, name, ext;
-				wxSplitPath(msfFilename.GetCStr(), &path, &name, &ext);
-				wxString imagesDirectoryName = path;
-				imagesDirectoryName += "/images";
-				if (!::wxDirExists(imagesDirectoryName))
-				{
-					::wxMkdir(imagesDirectoryName);
-				}
-
-				wxDir imagesDirectory(imagesDirectoryName);
-				wxString filename;
-				int i = 0;
-				bool cont = imagesDirectory.GetFirst(&filename);
-				while (cont)
-				{
-					i++;
-					cont = imagesDirectory.GetNext(&filename);
-				}
-
-				if (e->GetString() && !(e->GetString()->IsEmpty()))
-				{
-					mafString *imageFileName = new mafString();
-					imageFileName->Append(imagesDirectoryName.c_str());
-					imageFileName->Append("/");
-					imageFileName->Append(e->GetString()->GetCStr());
-					imageFileName->Append(wxString::Format("_%d", i));
-					imageFileName->Append(".png");
-
-					/*mafRWIBase::SafeDownCast(e->GetVtkObj())->SaveImage(imageFileName);*/
-					e->SetString(imageFileName);
-
-					wxString path, name, ext;
-					wxSplitPath(imageFileName->GetCStr(), &path, &name, &ext);
-					wxString oldWD = wxGetWorkingDirectory();
-					wxSetWorkingDirectory(path);
-					wxString command = "START  ";
-					command = command + name + "." + ext;
-					wxExecute(command);
-					wxSetWorkingDirectory(oldWD);
-				}
-				else
-				{
-					wxString imageFileName = "";
-					mafViewCompound *v = mafViewCompound::SafeDownCast(m_ViewManager->GetSelectedView());
-					if (v)
-					{
-						imageFileName = imagesDirectoryName;
-						imageFileName << "/";
-						wxString tmpImageFile;
-						tmpImageFile << v->GetLabel();
-						tmpImageFile << i;
-						tmpImageFile << ".png";
-
-						tmpImageFile.Replace(" ", "_");
-
-						imageFileName << tmpImageFile;
-
-						v->GetRWI()->SaveAllImages(imageFileName, v);
-
-						wxMessageBox(_("Snapshot saved!"));
-					}
-					else
-					{
-						mafView *v = m_ViewManager->GetSelectedView();
-
-						imageFileName = imagesDirectoryName;
-						imageFileName << "/";
-						wxString tmpImageFile;
-						tmpImageFile << v->GetLabel();
-						tmpImageFile << i;
-						tmpImageFile << ".png";
-
-						tmpImageFile.Replace(" ", "_");
-
-						imageFileName << tmpImageFile;
-
-						if (v)
-						{
-							v->GetRWI()->SaveImage(imageFileName);
-							wxMessageBox(_("Snapshot saved!"));
-						}
-					}
-
-					wxString path, name, ext;
-					wxSplitPath(imageFileName, &path, &name, &ext);
-					wxString oldWD = wxGetWorkingDirectory();
-					wxSetWorkingDirectory(path);
-					wxString command = "START  ";
-					command = command + name + "." + ext;
-					wxShell(command);
-					wxSetWorkingDirectory(oldWD);
-				}
+				if (m_SnapshotManager && m_VMEManager && m_ViewManager)
+				m_SnapshotManager->CreateSnapshot(m_VMEManager->GetRoot(), m_ViewManager->GetSelectedView());
 
 				OnEvent(&mafEvent(this, WIZARD_RUN_CONTINUE, true));
 			}
+			break;
+			case MENU_FILE_MANAGE_SNAPSHOT:
+				if(m_SnapshotManager && m_VMEManager)
+					m_SnapshotManager->ShowSnapshotPreview(m_VMEManager->GetRoot());
 			break;
 			case MENU_WIZARD:
 				//The event from the application menu
@@ -1149,7 +1043,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 					m_CancelledBeforeOpStarting = false;
 					m_WizardManager->WizardContinue(false);
 				}
-
 			}
 			break;
 			case WIZARD_OP_DELETE:
@@ -1332,6 +1225,9 @@ void mafLogicWithManagers::OnFileSaveAs()
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeShow(mafVME *vme, bool visibility)
 {
+	if (!vme)
+		return;
+
 	if (m_ViewManager)
 	{
 		mafVMELandmarkCloud *lmc = mafVMELandmarkCloud::SafeDownCast(vme);
@@ -1353,6 +1249,9 @@ void mafLogicWithManagers::VmeShow(mafVME *vme, bool visibility)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeModified(mafVME *vme)
 {
+	if (!vme) 
+		return;
+
 	if (m_VMEManager->GetRoot()->IsInTree(vme))
 	{
 		if (m_PlugTimebar) UpdateTimeBounds();
@@ -1378,12 +1277,17 @@ void mafLogicWithManagers::VmeModified(mafVME *vme)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeAdd(mafVME *vme)
 {
+	if (!vme) 
+		return;
 	if(m_VMEManager) 
     m_VMEManager->VmeAdd(vme);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeAdded(mafVME *vme)
 {
+	if (!vme) 
+		return;
+
   if(m_ViewManager)
     m_ViewManager->VmeAdd(vme);
 
@@ -1400,6 +1304,9 @@ void mafLogicWithManagers::VmeAdded(mafVME *vme)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemove(mafVME *vme)
 {
+	if (!vme) 
+		return;
+
   if(m_VMEManager)
     m_VMEManager->VmeRemove(vme);
 
@@ -1415,6 +1322,9 @@ void mafLogicWithManagers::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemoving(mafVME *vme)
 {
+	if (!vme) 
+		return;
+
   bool vme_in_tree = true;
   vme_in_tree = !vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") || 
     (vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") && vme->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() != 0);
@@ -1434,7 +1344,6 @@ void mafLogicWithManagers::VmeVisualModeChanged(mafVME * vme)
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeDoubleClicked(mafEvent &e)
-//----------------------------------------------------------------------------
 {
 	mafVME *node = e.GetVme();
 	if (node)
@@ -1456,40 +1365,7 @@ void mafLogicWithManagers::VmeSelect(mafVME *vme)
 
 	EnableMenuAndToolbar();
 }
-//----------------------------------------------------------------------------
-void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
-{
-	mafVME *node = NULL;
 
-	if (m_PlugControlPanel && (e.GetSender() == this->m_SideBar->GetTree()))
-		node = (mafVME*)e.GetArg();//sender == tree => the node is in e.arg
-	else
-		node = e.GetVme();          //sender == PER  => the node is in e.node  
-
-	if (node == NULL)
-	{
-		//node can be selected by its ID
-		if (m_VMEManager)
-		{
-			long vme_id = e.GetArg();
-			mafVMERoot *root = this->m_VMEManager->GetRoot();
-			if (root)
-			{
-				node = root->FindInTreeById(vme_id);
-				e.SetVme(node);
-			}
-		}
-	}
-
-	if (node != NULL && m_OpManager)
-		m_OpManager->OpSelect(node);
-
-	// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-	if (m_InteractionManager)
-		m_InteractionManager->VmeSelected(node);
-#endif
-}
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeSelected(mafVME *vme)
 {
@@ -1524,6 +1400,8 @@ void mafLogicWithManagers::VmeSelected(mafVME *vme)
 		m_SideBar->VmeSelected(vme);
 		m_SideBar->GetTree()->SetFocus();
 	}
+
+	EnableMenuAndToolbar();
 }
 //----------------------------------------------------------------------------
 std::vector<mafVME*> mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, mafString title, bool multiSelect, mafVME *vme)
@@ -1710,25 +1588,12 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
 	// removed temporarily support for external Views
 	if (v)
 	{
-		if (GetExternalViewFlag())
-		{
-			// external views
-			mafGUIViewFrame *extern_view = new mafGUIViewFrame(m_Win, -1, v->GetLabel(), wxPoint(10, 10), wxSize(800, 600)/*, wxSIMPLE_BORDER|wxMAXIMIZE*/);
-			extern_view->SetView(v);
-			extern_view->SetListener(m_ViewManager);
-			v->GetFrame()->SetWindowStyleFlag(m_ChildFrameStyle);
-			v->SetListener(extern_view);
-			v->SetFrame(extern_view);
-			extern_view->Refresh();
-		}
-		else
-		{
-			// child views
-			mafGUIMDIChild *c = new mafGUIMDIChild(m_Win, v);
-			c->SetWindowStyleFlag(m_ChildFrameStyle);
-			c->SetListener(m_ViewManager);
-			v->SetFrame(c);
-		}
+		
+		// child views
+		mafGUIMDIChild *c = new mafGUIMDIChild(m_Win, v);
+		c->SetWindowStyleFlag(m_ChildFrameStyle);
+		c->SetListener(m_ViewManager);
+		v->SetFrame(c);
 	}
 }
 //----------------------------------------------------------------------------
@@ -1972,7 +1837,7 @@ void mafLogicWithManagers::CreateMenu()
 
 	edit_menu->AppendSeparator();
 	mafGUI::AddMenuItem(edit_menu, OP_REPARENT, _("Reparent to... \tCtrl+Shift+R"), EDIT_REPARENT_xpm);
-	mafGUI::AddMenuItem(edit_menu, MENU_EDIT_FIND_VME, _("Find VME \tCtrl+F"), EDIT_FIND_xpm);
+	mafGUI::AddMenuItem(edit_menu, MENU_EDIT_FIND_VME, _("Find VME \tCtrl+Shift+F"), EDIT_FIND_xpm);
 
 	edit_menu->AppendSeparator();
 	mafGUI::AddMenuItem(edit_menu, ID_APP_SETTINGS, _("Settings..."), EDIT_SETTINGS_xpm);
@@ -2045,6 +1910,13 @@ void mafLogicWithManagers::CreateToolbar()
 	m_ToolBar->AddTool(CAMERA_FIT, mafPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"), _("reset camera to fit selected object (ctrl+shift+f)"));
 	m_ToolBar->AddTool(CAMERA_FLYTO, mafPictureFactory::GetPictureFactory()->GetBmp("FLYTO"), _("fly to object under mouse"));
 	
+	if (m_UseSnapshotManager)
+	{
+		m_ToolBar->AddSeparator();
+		m_ToolBar->AddTool(MENU_FILE_SNAPSHOT, mafPictureFactory::GetPictureFactory()->GetBmp("CAMERA"), _("Create Snapshot"));
+		m_ToolBar->AddTool(MENU_FILE_MANAGE_SNAPSHOT, mafPictureFactory::GetPictureFactory()->GetBmp("IMAGE_PREVIEW"), _("Manage Snapshots"));
+	}
+
 	EnableItem(CAMERA_RESET, false);
 	EnableItem(CAMERA_FIT, false);
 	EnableItem(CAMERA_FLYTO, false);
@@ -2437,22 +2309,6 @@ void mafLogicWithManagers::UpdateMeasureUnit()
 		v->OptionsUpdate();
 }
 
-//----------------------------------------------------------------------------
-void mafLogicWithManagers::SetExternalViewFlag(bool external)
-{
-	m_ExternalViewFlag = external;
-	wxConfig *config = new wxConfig(wxEmptyString);
-	config->Write("ExternalViewFlag", m_ExternalViewFlag);
-	cppDEL(config);
-}
-//----------------------------------------------------------------------------
-bool mafLogicWithManagers::GetExternalViewFlag()
-{
-	wxConfig *config = new wxConfig(wxEmptyString);
-	config->Read("ExternalViewFlag", &m_ExternalViewFlag, false);
-	cppDEL(config);
-	return m_ExternalViewFlag;
-}
 
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::ImportExternalFile(mafString &filename)
@@ -2504,14 +2360,147 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::HandleException()
 {
-	int answare = wxMessageBox(_("Do you want to try to save the unsaved work ?"), _("Fatal Exception!!"), wxYES_NO | wxCENTER);
-	if (answare == wxYES)
-	{
-		OnFileSaveAs();
 
-		if (m_OpManager->Running())
-			m_OpManager->StopCurrentOperation();
+	if (!m_FatalExptionOccurred)
+	{
+		m_FatalExptionOccurred = true;
+
+		int answare = wxMessageBox(_("An Excpetion has occurred and this application must be closed.\nYou can make a attempt to save your work.\nDo You want to proceed?"), _("Fatal Exception!"), wxYES_NO | wxCENTER | wxICON_ERROR | wxYES_DEFAULT);
+		if (answare == wxYES)
+		{
+			OnFileSaveAs();
+
+			if (m_OpManager->Running())
+				m_OpManager->StopCurrentOperation();
+		}
+	}
+	OnQuit();
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::ShowAboutDialog(wxString imagePath, bool showWebSiteBtn, bool showLicenseBtn)
+{
+	wxString title = "About ";
+	title += m_AppTitle;
+	
+	wxString revision = "";
+	wxRegKey RegKey(wxString("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + m_AppTitle));
+	if (RegKey.Exists())
+	{
+		if (RegKey.HasValue(wxString("DisplayVersion")))
+			RegKey.QueryValue(wxString("DisplayVersion"), revision);
+		else
+			revision = "Unknown Build";
+
+		SetRevision(revision);
+		mafLogMessage(wxString::Format("%s", m_Revision.GetCStr()));
 	}
 
-	OnQuit();
+	wxString description = m_AppTitle.GetCStr();
+	description += "\n";
+	description += _("Application ") + m_Revision;
+	description += "\n© 2017 LTM";
+		
+	//////////////////////////////////////////////////////////////////////////
+
+	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
+	mafGUIDialog *dialog = new mafGUIDialog(title, mafCLOSEWINDOW);
+
+	// Images
+	mafGUIPicButton *previewImageButton;
+
+	int panelWidth = 560;
+
+	if (wxFileExists(imagePath))
+	{
+		wxImage *previewImage;
+		wxBitmap *previewBitmap;
+
+		// Load and show the image
+		previewImage = new wxImage();
+		previewImage->LoadFile(imagePath.c_str(), wxBITMAP_TYPE_ANY);
+
+		previewBitmap = new wxBitmap(*previewImage);
+		previewImageButton = new mafGUIPicButton(dialog, previewBitmap, -1);
+
+		panelWidth = previewImage->GetWidth();
+
+		mainSizer->Add(previewImageButton, 0, wxALL | wxALIGN_CENTER, 0);
+
+		delete previewBitmap;
+	}
+
+	// Creating the static text area
+
+	wxBoxSizer *infoTextSizer = new wxBoxSizer(wxHORIZONTAL);
+
+	int borderSize = 10;
+
+	infoTextSizer->Add(AddText(dialog, description, (panelWidth / 2) - (borderSize * 2), wxALIGN_LEFT), 0, wxALL | wxALIGN_LEFT, borderSize);
+
+	mainSizer->Add(infoTextSizer, 0, wxTOP | wxLEFT, 0);
+
+	if (showLicenseBtn)
+	{
+		wxString copyright = "Distributed under";
+
+		wxBoxSizer *licenseTextSizer = new wxBoxSizer(wxHORIZONTAL);
+
+		licenseTextSizer->Add(AddText(dialog, copyright, 85, wxALIGN_LEFT), 0, wxALL | wxALIGN_CENTER, 0);
+
+		mafGUIButton *licenseButton = new mafGUIButton(dialog, SHOW_LICENSE_SITE, "license", wxPoint(-1, -1), wxSize(40, 20));
+		licenseButton->SetBackgroundStyle(wxBG_STYLE_COLOUR);
+		licenseButton->SetForegroundColour(wxColour(0, 0, 255));
+		licenseTextSizer->Add(licenseButton, 0, wxEXPAND | wxLEFT, 0);
+		licenseButton->SetListener(this);
+
+		mainSizer->Add(licenseTextSizer, 0, wxTOP | wxLEFT | wxRIGHT | wxEXPAND, borderSize);
+	}
+
+	// Creating buttons
+	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
+
+	if (showWebSiteBtn)
+	{
+		mafGUIButton *siteButton = new mafGUIButton(dialog, SHOW_WEB_SITE, "Web Site", wxPoint(-1, -1));
+
+		siteButton->SetListener(this);
+
+		buttonSizer->Add(siteButton, 0, wxALIGN_LEFT, 0);
+	}
+
+	int buttonWidth = 75;
+
+	wxButton *okButton = new wxButton(dialog, wxID_OK, "Ok");
+
+	wxString spacing = " ";
+	mainSizer->Add(AddText(dialog, spacing, panelWidth - (buttonWidth * 2) - borderSize, wxALIGN_RIGHT), 0, wxALL | wxALIGN_LEFT, 0);
+	buttonSizer->Add(AddText(dialog, spacing, panelWidth - (buttonWidth * 2) - borderSize, wxALIGN_RIGHT), 0, wxALL | wxALIGN_LEFT, 0);
+
+	buttonSizer->Add(okButton, 0, wxALIGN_RIGHT, 0);
+	mainSizer->Add(buttonSizer, 0, wxALL, 5);
+
+	dialog->Add(mainSizer, 0, wxALL);
+	dialog->Fit();
+
+	// Show dialog
+	wxSize s = mafGetFrame()->GetSize();
+	wxPoint p = mafGetFrame()->GetPosition();
+	int posX = p.x + s.GetWidth() * .5 - dialog->GetSize().GetWidth() * .5;
+	int posY = p.y + s.GetHeight() * .5 - dialog->GetSize().GetHeight() * .5;
+	dialog->SetPosition(wxPoint(posX, posY));
+	dialog->ShowModal();
+}
+//----------------------------------------------------------------------------
+wxStaticText* mafLogicWithManagers::AddText(mafGUIDialog * dialog, wxString &text, int Width, int align)
+{
+	// Creating the static text area
+	wxStaticText* guiLabel = new wxStaticText(dialog, -1, text, wxPoint(-1, -1), wxSize(Width, -1), align | wxST_NO_AUTORESIZE);
+	wxFont fixedFont = guiLabel->GetFont();
+
+	// Setting font to fixed size to avoid wx non-sense 
+	fixedFont.SetFamily(wxFONTFAMILY_DECORATIVE);
+	guiLabel->SetFont(fixedFont);
+
+	return guiLabel;
 }

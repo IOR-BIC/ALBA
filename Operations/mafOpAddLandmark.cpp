@@ -732,7 +732,7 @@ void mafOpAddLandmark::SelectLandmark(mafString selection)
 		m_SelectedLandmark->Update();
 
 		GetLogicManager()->VmeShow(m_CurrentLandmark, false);
-		GetLogicManager()->VmeShow(m_SelectedLandmarkCloud->GetLandmark(0), false);
+		GetLogicManager()->VmeShow(m_SelectedLandmarkCloud->GetLandmark(0), true);
 
 		mafVME::mafVMESet dependenciesVMEs = landmark->GetDependenciesVMEs();
 

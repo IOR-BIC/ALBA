@@ -53,7 +53,6 @@ See the COPYINGS file for license details
 
 #include "mafGUIFloatSlider.h"
 #include "mafEventInteraction.h"
-#include "mafEventSource.h"
 #include "mafIndent.h"
 
 #include "mafVMESurface.h"

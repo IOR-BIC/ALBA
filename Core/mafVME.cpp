@@ -34,7 +34,6 @@
 #include "mafDataPipe.h"
 #include "mafEventIO.h"
 #include "mafEvent.h"
-#include "mafEventSource.h"
 #include "mafTagArray.h"
 #include "mafOBB.h"
 #include "mafTransform.h"
@@ -42,10 +41,9 @@
 #include "mafIndent.h"
 #include "mafStorageElement.h"
 #include "mafVMEIterator.h"
-
+#include "mafVMERoot.h"
 #include <assert.h>
 #include "mafStorage.h"
-#include "mafRoot.h"
 #include "wx\tokenzr.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMEFactory.h"
@@ -64,8 +62,7 @@ mafVME::mafVME()
 	m_VisibleToTraverse = true;
 	m_Id = -1; // invalid ID
 	m_Gui = NULL;
-	m_EventSource = new mafEventSource;
-	m_EventSource->SetChannel(MCH_NODE);
+	SetChannel(MCH_NODE);
 
   m_TestMode = false;
 
@@ -100,13 +97,12 @@ mafVME::~mafVME()
 	RemoveAllBackLinks();
 
 	// advise observers this is being destroyed
-	m_EventSource->InvokeEvent(this, NODE_DESTROYED);
+	InvokeEvent(this, NODE_DESTROYED);
 
 	// remove all the children
 	RemoveAllChildren();
 
 	SetParent(NULL);
-	cppDEL(m_EventSource);
 	cppDEL(m_Gui);
 }
 
@@ -128,7 +124,7 @@ int mafVME::InternalInitialize()
 			{
 				// attach linked node to this one
 				link.m_Node = node;
-				node->GetEventSource()->AddObserver(this);
+				node->AddObserver(this);
 				
 				// if this is a mandatory link we need to recreate the back link on target VME
 				if (link.m_Type == MANDATORY_LINK)
@@ -299,13 +295,13 @@ int mafVME::SetParent(mafVME *parent)
 			if (old_root && (new_root != old_root))
 			{
 				ForwardUpEvent(&mafEventBase(this, NODE_DETACHED_FROM_TREE));
-				m_EventSource->InvokeEvent(this, NODE_DETACHED_FROM_TREE);
+				InvokeEvent(this, NODE_DETACHED_FROM_TREE);
 			}
 
 			m_Parent = parent;
 
 			// if it's being attached to a new tree and this has 'mafRoot' root node, ask for a new Id
-			mafRoot *root = mafRoot::SafeDownCast(new_root);
+			mafVMERoot *root = mafVMERoot::SafeDownCast(new_root);
 
 			// if attached under a new root (i.e. a new tree
 			// with a root node of type mafRoot) ask for
@@ -354,7 +350,7 @@ int mafVME::SetParent(mafVME *parent)
 		{
 			// send event about detachment from the tree
 			ForwardUpEvent(&mafEventBase(this, NODE_DETACHED_FROM_TREE));
-			m_EventSource->InvokeEvent(this, NODE_DETACHED_FROM_TREE);
+			InvokeEvent(this, NODE_DETACHED_FROM_TREE);
 
 			m_Parent = parent;
 			Modified();
@@ -398,7 +394,7 @@ void mafVME::SetTimeStamp(mafTimeStamp t)
 	InternalSetTimeStamp(t);
 
   // TODO: consider if to add a flag to disable event issuing
-  GetEventSource()->InvokeEvent(this,VME_TIME_SET);
+  InvokeEvent(this, VME_TIME_SET);
 }
 
 //-------------------------------------------------------------------------
@@ -661,7 +657,7 @@ int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
       if (m_AbsMatrixPipe)
         m_AbsMatrixPipe->SetVME(this);
 
-      GetEventSource()->InvokeEvent(this,VME_MATRIX_CHANGED);
+      InvokeEvent(this, VME_MATRIX_CHANGED);
 
       return MAF_OK;
     }
@@ -741,7 +737,7 @@ int mafVME::SetDataPipe(mafDataPipe *dpipe)
     }
 
     // advise listeners the data pipe has changed
-    GetEventSource()->InvokeEvent(this,VME_OUTPUT_DATA_CHANGED);
+    InvokeEvent(this, VME_OUTPUT_DATA_CHANGED);
 
     return MAF_OK;
   }
@@ -775,7 +771,7 @@ void mafVME::OnEvent(mafEventBase *maf_event)
 					InternalSetTimeStamp(*pTS);
 				} 
 				else {	//no valid timestamp passed, so this is notification that time has been changed, notify our listeners						
-					GetEventSource()->InvokeEvent(this,VME_TIME_SET);
+					InvokeEvent(this, VME_TIME_SET);
 				}
 				break;
 			}			
@@ -790,27 +786,27 @@ void mafVME::OnEvent(mafEventBase *maf_event)
     {
       case VME_OUTPUT_DATA_PREUPDATE:      
         InternalPreUpdate();  // self process the event
-        GetEventSource()->InvokeEvent(maf_event); // forward event to observers
+        InvokeEvent(maf_event); // forward event to observers
       break;
       case VME_OUTPUT_DATA_UPDATE:
         InternalUpdate();   // self process the event
-        GetEventSource()->InvokeEvent(maf_event); // forward event to observers
+        InvokeEvent(maf_event); // forward event to observers
       break;
       case VME_MATRIX_UPDATE:
 			{
 				mafEventBase absEvent(this, VME_ABSMATRIX_UPDATE);
 				if (maf_event->GetSender() == m_AbsMatrixPipe)
 				{
-					GetEventSource()->InvokeEvent(&absEvent);
+					InvokeEvent(&absEvent);
 				}
 				else
         {
-					GetEventSource()->InvokeEvent(maf_event); // forward event to observers
+					InvokeEvent(maf_event); // forward event to observers
         }
 
 				for (int i = 0; i < this->GetNumberOfChildren(); i++)
 				{
-					GetChild(i)->GetEventSource()->InvokeEvent(&absEvent);
+					GetChild(i)->InvokeEvent(&absEvent);
 				}
 			}
       break;
@@ -1347,7 +1343,7 @@ int mafVME::AddChild(mafVME *node)
 		m_Children.push_back(node);
 		// send attachment event from the child node
 		node->ForwardUpEvent(&mafEventBase(node, NODE_ATTACHED_TO_TREE));
-		node->GetEventSource()->InvokeEvent(node, NODE_ATTACHED_TO_TREE);
+		node->InvokeEvent(this, NODE_ATTACHED_TO_TREE);
 
 		Modified();
 		return MAF_OK;
@@ -1672,7 +1668,7 @@ void mafVME::SetLink(const char *name, mafVME *node)
 
 		// attach as observer of the linked node to catch events
 		// of de/attachment to the tree and destroy event.
-		node->GetEventSource()->AddObserver(this);
+		node->AddObserver(this);
 	}
 	Modified();
 }
@@ -1744,7 +1740,7 @@ void mafVME::RemoveLink(const char *name)
 
 		// detach as observer from the linked node
 		if (it->second.m_Node)
-			it->second.m_Node->GetEventSource()->RemoveObserver(this);
+			it->second.m_Node->RemoveObserver(this);
 
 		m_Links.erase(it); // remove linked node from links container
 		Modified();
@@ -1762,7 +1758,7 @@ void mafVME::RemoveAllLinks()
 
 		// detach as observer from the linked node
 		if (it->second.m_Node)
-			it->second.m_Node->GetEventSource()->RemoveObserver(this);
+			it->second.m_Node->RemoveObserver(this);
 	}
 	m_Links.clear();
 	Modified();
@@ -2093,14 +2089,11 @@ void mafVME::UpdateId()
 	// If the node was attached under another root its Id is different from -1
 	// when it is attached to the new root it has to be updated anyway.
 	// So 'if' test below has been commented.
-	//if (this->m_Id == -1)
-	//{
-	mafRoot *root = mafRoot::SafeDownCast(GetRoot());
+	mafVMERoot *root = mafVMERoot::SafeDownCast(GetRoot());
 	if (root)
 	{
 		SetId(root->GetNextNodeId());
 	}
-	//}
 }
 
 //-------------------------------------------------------------------------

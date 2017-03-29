@@ -19,7 +19,7 @@
 
 #include "mafReferenceCounted.h"
 #include "mafObserver.h"
-#include "mafEventSender.h"
+#include "mafEventBroadcaster.h"
 #include "mafString.h"
 #include "mafEventBase.h"
 
@@ -33,6 +33,7 @@ EXPORT_STL_VECTOR(MAF_EXPORT,mafEventSource*);
 //----------------------------------------------------------------------------
 class vtkObject;
 class vtkCallbackCommand;
+class mafEventBroadcaster;
 
 /** An agent is a computational object with a default I/O interface.
   An agent is a computational object with a conventional events I/O interface,
@@ -45,7 +46,7 @@ class vtkCallbackCommand;
   This class support also bridging of events coming from VTK: a mafAgent can be set as observer of VTK events
   which are tunneled inside MAF events.
   @sa mafEventBase mafAgent mafAgentEventQueue mafAgentThreaded */
-class MAF_EXPORT mafAgent: public mafReferenceCounted, public mafObserver, public mafEventSender
+class MAF_EXPORT mafAgent: public mafReferenceCounted, public mafObserver, public mafEventBroadcaster
 {
 public:
   mafAbstractTypeMacro(mafAgent,mafReferenceCounted);
@@ -58,38 +59,12 @@ public:
   MAF_ID_DEC(AGENT_INITIALIZE); 
   
   /**
-  Plug in a source of events, specifying the channel ID. All the mechanism is based on Observers, 
-  and the channel ID correspond to the event ID used to convey events through observers.
-  Beware, before destroying the Listener remember to UnPlug the source since the listener
-  doesn't keep a list of the sources it is connected to. Otherwise the vtkCallbackCommand used
-  as a bridge for the events will remain alive.*/
-  virtual void PlugEventSource(mafAgent *source,mafID channel=MCH_ANY, int priority = 0);
-  virtual void UnPlugEventSource(mafAgent *source);
-  
-#ifdef MAF_USE_VTK
-  /**
-    Plug in a VTK object as source of events, specifying the VTK event ID to be observed.*/
-  virtual void PlugEventSource(vtkObject *source,mafID eventid, int priority = 0);
-  
-  /**
-  This is a commodity function to attach a callback function to a VTK event. 'source' is the vtkObject
-  to which attach the event, 'arg' is typically the pointer of the class that wants to link to the event (the 'self')
-  and 'f' is the callback function to be attached to the event.*/
-  static int PlugEventSource(vtkObject *source,void (*f)(void *), void *self, mafID eventid, int priority = 0);
-  
-  /**
-  Unplug an events source. Remember to explicitly unplug all the source before destroying the
-  listener.*/
-  virtual void UnPlugEventSource(vtkObject *source);
-#endif
-  
-  /**
   Attach/Detach this object as event source for the specified listener. If the specified channel is 
   the MCH_UP, the SetListener(listener) is called. For all other channel more then 
   one listener can be specified, and a broad cast using the VTK Subject/Observer is performed.
   UnPlugListener works for all channels at the same time.
   NULL listeners are ignored.*/
-  void AddObserver(mafObserver *listener,mafID channel=MCH_UP, int priority = 0);
+  void AddObserver(mafObserver *listener,mafID channel=MCH_UP);
   void RemoveObserver(mafObserver *listener);
   void RemoveAllObservers();
   
@@ -148,12 +123,12 @@ protected:
   the event is broadcasted by means of the Subject/Observer on the specified channel. */
   void InvokeEvent(mafEventBase &event, mafID channel=-1);
   void InvokeEvent(mafEventBase *event, mafID channel=-1);
-  void InvokeEvent(int id, mafID channel=MCH_UP,void *data=NULL);
+  void InvokeEvent(void *sender, int id, mafID channel=MCH_UP,void *data=NULL);
 
   mafString       m_Name;
   bool            m_Initialized; // flag set true by Initialize()
 
-  std::vector<mafEventSource *> m_Channels;
+  std::vector<mafEventBroadcaster *> m_Channels;
 
 #ifdef MAF_USE_VTK
   vtkCallbackCommand *m_EventCallbackCommand; ///< this object is used as connection to event sources

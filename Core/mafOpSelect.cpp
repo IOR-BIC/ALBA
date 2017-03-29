@@ -34,8 +34,8 @@
 #include "vtkDataSet.h"
 #include "mafOpReparentTo.h"
 
-static mafAutoPointer<mafVME> glo_Clipboard = NULL;
-static	mafAutoPointer<mafVME> glo_SelectionParent=NULL;
+static mafVME *glo_Clipboard = NULL;
+static	mafVME *glo_SelectionParent=NULL;
 
 //////////////////
 // mafOpSelect ://
@@ -64,6 +64,13 @@ mafOp* mafOpSelect::Copy()
   cp->m_NewNodeSelected  = m_NewNodeSelected;
   return cp;
 }
+
+//----------------------------------------------------------------------------
+void mafOpSelect::OpRun()
+{
+	OpStop(OP_RUN_OK);
+}
+
 //----------------------------------------------------------------------------
 bool mafOpSelect::Accept(mafVME* vme)     
 //----------------------------------------------------------------------------
@@ -158,6 +165,12 @@ void mafOpEdit::SetClipboard(mafVME *node)
 void mafOpEdit::SetSelectionParent(mafVME *parent)
 {
 	glo_SelectionParent = parent;
+}
+
+//----------------------------------------------------------------------------
+void mafOpEdit::OpRun()
+{
+	OpStop(OP_RUN_OK);
 }
 
 //----------------------------------------------------------------------------
@@ -280,9 +293,9 @@ Select the vme parent
 		//////////////////////////////////////////////////////////////////////////
 
 		GetLogicManager()->VmeRemove(m_Selection);
-		mafEventMacro(mafEvent(this, VME_SELECTED, glo_SelectionParent));
+		//mafEventMacro(mafEvent(this, VME_SELECTED, glo_SelectionParent));
 
-		glo_SelectionParent.GetPointer()->GetOutput()->Update();
+		glo_SelectionParent->Update();
 
 		RemoveBackLinksForTheSubTree(m_Selection);
 	}
@@ -296,6 +309,7 @@ Select the vme parent
 		m_Cutted = false;
 	}
 }
+
 //----------------------------------------------------------------------------
 void mafOpCut::LoadVTKData(mafVME *vme)
 //----------------------------------------------------------------------------
@@ -351,7 +365,7 @@ Restore the Selection
 
 		RestoreBackLinksForTheSubTree(m_Selection);
 
-		glo_SelectionParent.GetPointer()->GetOutput()->Update();
+		glo_SelectionParent->Update();
 
 		SetSelectionParent(m_SelectionParentBackup);
 
@@ -408,6 +422,8 @@ copy the selected VME and its subtree into the clipboard
   GetClipboard()->SetName(copy_name.GetCStr());
 	RemoveBackLinksForTheSubTree(GetClipboard());
 }
+
+
 //----------------------------------------------------------------------------
 void mafOpCopy::OpUndo()
 //----------------------------------------------------------------------------
@@ -484,6 +500,7 @@ Them a vme is added, selection is not changed
 		m_Pasted = false;
 	}
 }
+
 //----------------------------------------------------------------------------
 void mafOpPaste::OpUndo()                  
 //----------------------------------------------------------------------------

@@ -22,6 +22,7 @@
 #include "mafStorable.h"
 #include "mafSmartPointer.h"
 #include "mafObserver.h"
+#include "mafEventBroadcaster.h"
 #include "mafTagItem.h"
 #include "mafString.h"
 #include "mafTimeStamped.h"
@@ -45,7 +46,6 @@
 class mafMatrix;
 class mafTransform;
 class mafInteractor;
-class mafEventSource;
 class mafVMEIterator;
 class mafTagArray;
 class mafGUI;
@@ -143,7 +143,7 @@ template class MAF_EXPORT mafAutoPointer<mafAbsMatrixPipe>;
   - fix the VME_TIME_SET issuing and propagation
   - implement Update() function
   */
-class MAF_EXPORT mafVME : public mafReferenceCounted, public mafStorable, public mafObserver, public mafTimeStamped, public mafServiceClient
+class MAF_EXPORT mafVME : public mafEventBroadcaster, public mafReferenceCounted, public mafStorable, public mafObserver, public mafTimeStamped, public mafServiceClient
 {
 public:
   
@@ -343,9 +343,6 @@ public:
 
 	/** redefined to cope with tree registering */
 	virtual void UnRegister(void *o);
-
-	/** return a reference to the event source issuing events for this object */
-	mafEventSource *GetEventSource() { return m_EventSource; }
 
 	/** Precess events coming from other objects */
 	virtual void OnEvent(mafEventBase *e);
@@ -752,9 +749,6 @@ protected:
 	bool m_VisibleToTraverse;         ///< enable/disable traversing visit of this node
 	bool m_Initialized;               ///< set true by Initialize()
 	bool m_DependsOnLinkedNode;       ///< enable/disable calculation of MTime considering links
-
-	mafEventSource    *m_EventSource; ///< source of events issued by the node
-
 	bool m_TestMode; ///< Flag used with cppunitTest: put this flag at true when executing tests to avoid busy-info or splash screen to be created, default is false.
 
   mafAutoPointer<mafDataPipe>       m_DataPipe;

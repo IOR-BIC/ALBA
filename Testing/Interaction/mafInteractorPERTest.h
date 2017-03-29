@@ -36,9 +36,6 @@ class mafInteractorPERTest : public mafTest
   CPPUNIT_TEST(TestSetGetMode);
   CPPUNIT_TEST(TestSetModeToSingleButton);
   CPPUNIT_TEST(TestSetModeToMultiButton);
-  CPPUNIT_TEST(TestLinkCameraAdd);
-  CPPUNIT_TEST(TestLinkCameraRemove);
-  CPPUNIT_TEST(TestLinkCameraRemoveAll);
   CPPUNIT_TEST(TestGetCameraMouseInteractor);
   CPPUNIT_TEST(TestGetCameraInteractor);
 
@@ -58,9 +55,6 @@ class mafInteractorPERTest : public mafTest
   void TestSetGetMode();
   void TestSetModeToSingleButton();
   void TestSetModeToMultiButton();
-  void TestLinkCameraAdd();
-  void TestLinkCameraRemove();
-  void TestLinkCameraRemoveAll();
   void TestGetCameraMouseInteractor();
   void TestGetCameraInteractor();
 

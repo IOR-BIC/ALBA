@@ -35,7 +35,6 @@
 #include "mafVMEOutputPolyline.h"
 #include "mafTagItem.h"
 #include "mafTagArray.h"
-#include "mafEventSource.h"
 #include "mafDataVector.h"
 #include "mafDataPipe.h"
 #include "mafVMEItem.h"
@@ -113,7 +112,7 @@ void mafPipePolyline::Create(mafSceneNode *n)
 	data->Update();
 
 	m_ObjectMaterial = out_polyline->GetMaterial();
-	m_Vme->GetEventSource()->AddObserver(this);
+	m_Vme->AddObserver(this);
 
 	InitializeFromTag();
 
@@ -211,7 +210,7 @@ void mafPipePolyline::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 mafPipePolyline::~mafPipePolyline()
 {
-	m_Vme->GetEventSource()->RemoveObserver(this);
+	m_Vme->RemoveObserver(this);
 
 	m_AssemblyFront->RemovePart(m_Actor);
 	m_AssemblyFront->RemovePart(m_OutlineActor);

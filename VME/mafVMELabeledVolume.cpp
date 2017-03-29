@@ -32,7 +32,6 @@
 #include "mmaVolumeMaterial.h"
 #include "mafVME.h"
 #include "mafTransform.h"
-#include "mafEventSource.h"
 #include "mafGUIButton.h"
 #include "mafGUIValidator.h"
 #include "mafGUICheckListBox.h"
@@ -908,7 +907,7 @@ void mafVMELabeledVolume::OnEvent(mafEventBase *maf_event)
           {
             m_CheckedVector[i] = m_LabelCheckBox->IsItemChecked(i);
             GenerateLabeledVolume();
-            m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+            InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
             break;
           }
         } 

@@ -24,8 +24,6 @@
 //----------------------------------------------------------------------------
 
 #include "mafView.h"
-#include <wx/print.h>
-
 #include "mafIndent.h"
 #include "mafMatrix.h"
 #include "mafVME.h"
@@ -39,13 +37,14 @@
 #include "vtkAssemblyNode.h"
 #include "vtkProp3D.h"
 
+#include <wx/print.h>
+
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mafView);
+mafCxxAbstractTypeMacro(mafView);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mafView::mafView(const wxString &label)
-//----------------------------------------------------------------------------
 {
 	m_Label					= label;
   m_Name					= "";
@@ -68,23 +67,18 @@ mafView::mafView(const wxString &label)
   m_PickedVME         = NULL;
   m_PickedProp        = NULL;
   m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0.0;
-
-  //parameters
-  m_Slice[0] = m_Slice[1] = m_Slice[2] =  0.;
-  m_Normal[0] = m_Normal[1] = m_Normal[2] =  0.;
-
+	 
   m_HTMLText = "";
   m_LightCopyEnabled = false;
 }
 //----------------------------------------------------------------------------
 mafView::~mafView()
-//----------------------------------------------------------------------------
 {
   cppDEL(m_Gui);
 }
+
 //----------------------------------------------------------------------------
 void mafView::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
@@ -119,15 +113,14 @@ void mafView::OnEvent(mafEventBase *maf_event)
     mafEventMacro(*maf_event);
   }
 }
+
 //-------------------------------------------------------------------------
 void mafView::DeleteGui()
-//-------------------------------------------------------------------------
 {
   cppDEL(m_Gui);
 }
 //-------------------------------------------------------------------------
 mafGUI* mafView::CreateGui()
-//-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
   m_Gui = new mafGUI(this);
@@ -151,21 +144,19 @@ mafGUI* mafView::CreateGui()
 
   return m_Gui;
 }
+
 //-------------------------------------------------------------------------
 bool mafView::Pick(int x, int y)
-//-------------------------------------------------------------------------
 {
   return false;
 }
 //-------------------------------------------------------------------------
 bool mafView::Pick(mafMatrix &m)
-//-------------------------------------------------------------------------
 {
   return false;
 }
 //----------------------------------------------------------------------------
 void mafView::GetPickedPosition(double pos[3])
-//----------------------------------------------------------------------------
 {
   pos[0] = m_PickedPosition[0];
   pos[1] = m_PickedPosition[1];
@@ -173,7 +164,6 @@ void mafView::GetPickedPosition(double pos[3])
 }
 //----------------------------------------------------------------------------
 bool mafView::FindPickedVme(vtkAssemblyPath *ap)
-//----------------------------------------------------------------------------
 {
   vtkMAFAssembly *as = NULL;
 
@@ -201,9 +191,9 @@ bool mafView::FindPickedVme(vtkAssemblyPath *ap)
   }
   return false;
 }
+
 //----------------------------------------------------------------------------
 void mafView::PrintBitmap(wxDC *dc, wxRect margins, wxBitmap *bmp)
-//----------------------------------------------------------------------------
 {
   assert(dc);
   assert(bmp);
@@ -241,10 +231,8 @@ void mafView::PrintBitmap(wxDC *dc, wxRect margins, wxBitmap *bmp)
   dc->Clear();
   dc->Blit(0, 0, maxX, maxY, &mdc, 0, 0);
 }
-
 //-------------------------------------------------------------------------
 void mafView::Print(std::ostream& os, const int tabs)// const
-//-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);
   os << indent << "mafView" << '\t' << this << "\n";
@@ -255,36 +243,4 @@ char ** mafView::GetIcon()
 {
 #include "pic/VIEW.xpm"
 		return VIEW_xpm;
-}
-
-//-------------------------------------------------------------------------
-double *mafView::GetSlice()// const
-//-------------------------------------------------------------------------
-{
-  return m_Slice;
-}
-
-//-------------------------------------------------------------------------
-void mafView::SetSlice(double slice[3])// const
-//-------------------------------------------------------------------------
-{
-  m_Slice[0] = slice[0];
-  m_Slice[1] = slice[1];
-  m_Slice[2] = slice[2];
-}
-
-//-------------------------------------------------------------------------
-double *mafView::GetNormal()// const
-//-------------------------------------------------------------------------
-{
-  return m_Normal;
-}
-
-//-------------------------------------------------------------------------
-void mafView::SetNormal(double normal[3])// const
-//-------------------------------------------------------------------------
-{
-  m_Normal[0] = normal[0];
-  m_Normal[1] = normal[1];
-  m_Normal[2] = normal[2];
 }

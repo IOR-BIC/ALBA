@@ -30,7 +30,7 @@
   issued by subjects.
   An observer must be registered to a subject to create the communication channel 
   between the two. An observer can "observe" many subjects at the same time.
-  @sa mafEventSource mafObserverCallback
+  @sa mafEventBroadcaster mafObserverCallback
 */
 class MAF_EXPORT mafObserver
 {

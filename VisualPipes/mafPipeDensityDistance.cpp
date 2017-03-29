@@ -35,7 +35,6 @@
 #include "mafVME.h"
 #include "mafVME.h"
 #include "mafGUIValidator.h"
-#include "mafEventSource.h"
 #include "vtkMAFSmartPointer.h"
 
 #include "vtkMAFSmartPointer.h"
@@ -122,7 +121,7 @@ void mafPipeDensityDistance::Create(mafSceneNode *n/*, bool use_axes*/)
   data->Update();
   assert(data);
 
-  m_Vme->GetEventSource()->AddObserver(this);
+  m_Vme->AddObserver(this);
 
 	m_Normals->SetInput(data);
 	m_Normals->ComputePointNormalsOn();
@@ -307,7 +306,7 @@ mafPipeDensityDistance::~mafPipeDensityDistance()
 {
   m_RenFront->RemoveActor2D(m_ScalarBar);
   m_AssemblyFront->RemovePart(m_Actor);
-  m_Vme->GetEventSource()->RemoveObserver(this);
+  m_Vme->RemoveObserver(this);
 
   vtkDEL(m_Normals);
 	vtkDEL(m_Mapper);

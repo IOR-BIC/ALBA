@@ -75,11 +75,9 @@
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafInteractionManager);
-//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 mafInteractionManager::mafInteractionManager()
-//------------------------------------------------------------------------------
 {
   m_Gui = NULL;  //SIL. 07-jun-2006 : 
   m_Frame = NULL;  //SIL. 07-jun-2006 : 
@@ -112,8 +110,7 @@ mafInteractionManager::mafInteractionManager()
   mafNEW(m_StaticEventRouter);
   m_StaticEventRouter->SetName("StaticEventRouter");
   m_StaticEventRouter->SetListener(this);
-  //m_StaticEventRouter->PlugEventSource(this,CameraUpdateChannel); // propagate camera events to actions
-
+  
   // define the action for pointing and manipulating with negative priority to allow
   // static priority defined by operations to override it.
   mafAction *pointing_action = m_StaticEventRouter->AddAction("PointAndManipulate",-10);
@@ -130,14 +127,11 @@ mafInteractionManager::mafInteractionManager()
   mafPlugDevice<mafDeviceButtonsPadMouse>("Mouse");
   mafDeviceButtonsPadMouse *mouse_device = (mafDeviceButtonsPadMouse *)m_DeviceManager->AddDevice("mafDeviceButtonsPadMouse",true); // add as persistent device
   assert(mouse_device);
-  //mafAction *mouse_action = m_StaticEventRouter->AddAction("Mouse"); // action for RWIs output
-  //mouse_action->BindDevice(mouse_device); // bind mouse to mouse action
   pointing_action->BindDevice(mouse_device); // bind mouse to point&manipulate action
 }
 
 //------------------------------------------------------------------------------
 mafInteractionManager::~mafInteractionManager()
-//------------------------------------------------------------------------------
 {
   while(!m_PERList.empty())
   {
@@ -152,13 +146,10 @@ mafInteractionManager::~mafInteractionManager()
   mafDEL(m_DeviceManager);
   mafDEL(m_StaticEventRouter);
   mafDEL(m_PositionalEventRouter);
-
-  //vtkDEL(m_CurrentRenderer);
 }
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::SetPER(mafInteractorPER *per)
-//------------------------------------------------------------------------------
 {
   mafAction *pointing_action = m_StaticEventRouter->GetAction("PointAndManipulate");
   assert(pointing_action);
@@ -180,7 +171,6 @@ void mafInteractionManager::SetPER(mafInteractorPER *per)
 
 //----------------------------------------------------------------------------
 void mafInteractionManager::PushPER(mafInteractorPER *per)
-//----------------------------------------------------------------------------
 {
   mafInteractorPER *old_per=GetPER();
   m_PERList.push_back(old_per);
@@ -188,7 +178,6 @@ void mafInteractionManager::PushPER(mafInteractorPER *per)
 }
 //----------------------------------------------------------------------------
 bool mafInteractionManager::PopPER()
-//----------------------------------------------------------------------------
 {
   // retrieve and delete last item
   mafAutoPointer<mafInteractorPER> old_per=*(m_PERList.rbegin());
@@ -207,7 +196,6 @@ bool mafInteractionManager::PopPER()
 
 //----------------------------------------------------------------------------
 void mafInteractionManager::SetCurrentRenderer(vtkRenderer *ren)
-//----------------------------------------------------------------------------
 {
   if (ren)
     ren->UnRegister(NULL);
@@ -220,7 +208,6 @@ void mafInteractionManager::SetCurrentRenderer(vtkRenderer *ren)
 
 //----------------------------------------------------------------------------
 void mafInteractionManager::CameraFlyToMode()   
-//----------------------------------------------------------------------------
 {
   if(m_PositionalEventRouter)
     m_PositionalEventRouter->FlyToMode();
@@ -228,56 +215,48 @@ void mafInteractionManager::CameraFlyToMode()
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::EnableSelect(bool enable)
-//------------------------------------------------------------------------------
 {
   m_PositionalEventRouter->EnableSelect(enable);
 }
 
 //------------------------------------------------------------------------------
 mafDeviceButtonsPadMouse *mafInteractionManager::GetMouseDevice()
-//------------------------------------------------------------------------------
 {
   return mafDeviceButtonsPadMouse::SafeDownCast(m_DeviceManager->GetDevice("Mouse"));
 }
 
 //------------------------------------------------------------------------------
 int mafInteractionManager::BindAction(const char *action,mafInteractor *agent)
-//------------------------------------------------------------------------------
 {
   return m_StaticEventRouter->BindAction(action,agent);
 }
 
 //------------------------------------------------------------------------------
 int mafInteractionManager::UnBindAction(const char *action,mafInteractor *agent)
-//------------------------------------------------------------------------------
 {
   return m_StaticEventRouter->UnBindAction(action,agent);
 }
 
 //------------------------------------------------------------------------------
 mafAction *mafInteractionManager::AddAction(const char *name, float priority)
-//------------------------------------------------------------------------------
 {
   return m_StaticEventRouter->AddAction(name,priority);
 }
 
 //------------------------------------------------------------------------------
 mafAction *mafInteractionManager::GetAction(const char *name)
-//------------------------------------------------------------------------------
 {
   return m_StaticEventRouter->GetAction(name);
 }
 
 //------------------------------------------------------------------------------
 const mafInteractionManager::mmuAvatarsMap &mafInteractionManager::GetAvatars()
-//------------------------------------------------------------------------------
 {
   return m_Avatars;
 }
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::GetAvatars(mmuAvatarsVector &avatars)
-//------------------------------------------------------------------------------
 {
   avatars.clear();
   avatars.resize(m_Avatars.size());
@@ -290,7 +269,6 @@ void mafInteractionManager::GetAvatars(mmuAvatarsVector &avatars)
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::AddAvatar(mafAvatar *avatar)
-//------------------------------------------------------------------------------
 {
   m_Avatars[avatar->GetName()] = avatar;
   
@@ -304,7 +282,6 @@ void mafInteractionManager::AddAvatar(mafAvatar *avatar)
 
 //------------------------------------------------------------------------------
 int mafInteractionManager::RemoveAvatar(mafAvatar *avatar)
-//------------------------------------------------------------------------------
 {
   assert(avatar);
 
@@ -324,7 +301,6 @@ int mafInteractionManager::RemoveAvatar(mafAvatar *avatar)
 }
 //------------------------------------------------------------------------------
 mafAvatar *mafInteractionManager::GetAvatar(const char *name)
-//------------------------------------------------------------------------------
 {
   mmuAvatarsMap::iterator it=m_Avatars.find(name);  
   return (it!=m_Avatars.end())?it->second:NULL;
@@ -332,7 +308,6 @@ mafAvatar *mafInteractionManager::GetAvatar(const char *name)
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::ViewSelected(mafView *view)
-//------------------------------------------------------------------------------
 {
   mafEvent e(this,VIEW_SELECT,view);
   OnViewSelected(&e);
@@ -340,7 +315,6 @@ void mafInteractionManager::ViewSelected(mafView *view)
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::PreResetCamera(vtkRenderer *ren)
-//------------------------------------------------------------------------------
 { 
   // propagate event to all avatars...
   for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++)
@@ -351,7 +325,6 @@ void mafInteractionManager::PreResetCamera(vtkRenderer *ren)
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::PostResetCamera(vtkRenderer *ren)
-//------------------------------------------------------------------------------
 {
   // propagate event to all avatars...
   for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++)
@@ -362,7 +335,6 @@ void mafInteractionManager::PostResetCamera(vtkRenderer *ren)
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::VmeSelected(mafVME *vme)
-//------------------------------------------------------------------------------
 {
   if (vme)
     m_PositionalEventRouter->OnVmeSelected(vme);
@@ -370,7 +342,6 @@ void mafInteractionManager::VmeSelected(mafVME *vme)
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::CameraUpdate(mafView *view)
-//------------------------------------------------------------------------------
 {
   if (m_LockRenderingFlag)
   {
@@ -400,7 +371,6 @@ void mafInteractionManager::CameraUpdate(mafView *view)
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnViewSelected(mafEvent *event)
-//------------------------------------------------------------------------------
 {  
   mafView *v = event->GetView();
 	mafViewVTK *view = mafViewVTK::SafeDownCast(v); 
@@ -454,7 +424,6 @@ void mafInteractionManager::OnViewSelected(mafEvent *event)
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnDeviceAdded(mafEventBase *event)
-//------------------------------------------------------------------------------
 {
   mafDevice *device=(mafDevice *)event->GetData(); 
   mafDeviceSet *parent=(mafDeviceSet *)event->GetSender();
@@ -464,7 +433,6 @@ void mafInteractionManager::OnDeviceAdded(mafEventBase *event)
 }
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnDeviceRemoving(mafEventBase *event)
-//------------------------------------------------------------------------------
 {
   mafDevice *device=(mafDevice *)event->GetData(); 
   assert(device);
@@ -474,7 +442,6 @@ void mafInteractionManager::OnDeviceRemoving(mafEventBase *event)
 }
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnDeviceNameChanged(mafEventBase *event)
-//------------------------------------------------------------------------------
 {
   mafDevice *device=(mafDevice *)event->GetSender(); 
   assert(device);
@@ -483,7 +450,6 @@ void mafInteractionManager::OnDeviceNameChanged(mafEventBase *event)
 }
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnBindDeviceToAction(mafEvent *e)
-//------------------------------------------------------------------------------
 {
   // this event is rosed by mafAction to ask for 
   // binding of a device to an action. Device is specified by its ID.
@@ -501,25 +467,21 @@ void mafInteractionManager::OnBindDeviceToAction(mafEvent *e)
 
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnAddAvatar(mafEventBase *event)
-//------------------------------------------------------------------------------
 {
   AddAvatar((mafAvatar *)event->GetData());
 }
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnRemoveAvatar(mafEventBase *event)
-//------------------------------------------------------------------------------
 {
   RemoveAvatar((mafAvatar *)event->GetData());
 }
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnStartDispatching()
-//------------------------------------------------------------------------------
 {
   m_LockRenderingFlag = true;
 }
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnEndDispatching()
-//------------------------------------------------------------------------------
 {
   m_LockRenderingFlag = false;
 
@@ -561,7 +523,6 @@ void mafInteractionManager::OnEndDispatching()
 }
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnCameraUpdate(mafEventBase *event)
-//------------------------------------------------------------------------------
 {
   if (mafEvent *e=mafEvent::SafeDownCast(event))
   {
@@ -590,7 +551,6 @@ enum IMANAGER_WIDGET_ID
 };
 //------------------------------------------------------------------------------
 void mafInteractionManager::OnEvent(mafEventBase *event)
-//------------------------------------------------------------------------------
 {
   assert(event);
  
@@ -808,7 +768,6 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
 
 //------------------------------------------------------------------------------
 int mafInteractionManager::Store(const char *filename)
-//------------------------------------------------------------------------------
 {
   assert(filename);
   mafXMLStorage writer;
@@ -825,7 +784,6 @@ int mafInteractionManager::Store(const char *filename)
 
 //------------------------------------------------------------------------------
 int mafInteractionManager::Restore(const char *filename)
-//------------------------------------------------------------------------------
 {
   assert(filename);
   mafXMLStorage reader;
@@ -842,7 +800,6 @@ int mafInteractionManager::Restore(const char *filename)
 
 //------------------------------------------------------------------------------
 int mafInteractionManager::InternalStore(mafStorageElement *node)
-//------------------------------------------------------------------------------
 {
   // store device settings
   if (node->StoreObject("DeviceManager",m_DeviceManager)==NULL)
@@ -857,7 +814,6 @@ int mafInteractionManager::InternalStore(mafStorageElement *node)
 
 //------------------------------------------------------------------------------
 int mafInteractionManager::InternalRestore(mafStorageElement *node)
-//------------------------------------------------------------------------------
 {
   if (node->RestoreObject("DeviceManager",m_DeviceManager)!=MAF_OK)
     return MAF_ERROR;
@@ -868,19 +824,8 @@ int mafInteractionManager::InternalRestore(mafStorageElement *node)
   return MAF_OK;
 }
 
-/* removed  //SIL. 07-jun-2006 : 
-//----------------------------------------------------------------------------
-bool mafInteractionManager::ShowModal()
-//----------------------------------------------------------------------------
-{
-   //modified by Marco. 13-7-2005  return m_Dialog->ShowModal() != 0;
-  m_Frame->Show(true);
-  return true;
-}
-*/
 //----------------------------------------------------------------------------
 int mafInteractionManager::DeviceChooser(wxString &dev_name,wxString &dev_type)
-//----------------------------------------------------------------------------
 {
   mafInteractionFactory *iFactory=mafInteractionFactory::GetInstance();
   
@@ -921,7 +866,6 @@ int mafInteractionManager::DeviceChooser(wxString &dev_name,wxString &dev_type)
 
 //----------------------------------------------------------------------------
 void mafInteractionManager::UpdateBindings()
-//----------------------------------------------------------------------------
 {
   if (m_CurrentDevice)
   {
@@ -949,7 +893,6 @@ void mafInteractionManager::UpdateBindings()
 
 //----------------------------------------------------------------------------
 void mafInteractionManager::AddDeviceToTree(mafDevice *device,mafDeviceSet *parent)
-//----------------------------------------------------------------------------
 {
   assert(device);
   mafID parent_id=(parent?parent->GetID():0);
@@ -959,37 +902,18 @@ void mafInteractionManager::AddDeviceToTree(mafDevice *device,mafDeviceSet *pare
 
 //----------------------------------------------------------------------------
 void mafInteractionManager::RemoveDeviceFromTree(mafDevice *device)
-//----------------------------------------------------------------------------
 {
   assert(device);
   m_DeviceTree->DeleteNode(device->GetID());
 }
-/*
-//----------------------------------------------------------------------------
-void mafInteractionManager::UpdateDeviceList()
-//----------------------------------------------------------------------------
-{
-  for (int i=0;i<m_DeviceList->Number();i++)
-  {
-    mafDevice *device=(mafDevice *)m_DeviceList->GetClientData(i);
-    assert(device);
-    m_DeviceList->SetString(i,device->GetName());
-  }
-  
-  m_Devices->Update();
-}
-*/
 //----------------------------------------------------------------------------
 void mafInteractionManager::UpdateDevice(mafDevice *device)
-//----------------------------------------------------------------------------
 {
   assert(device);
   m_DeviceTree->SetNodeLabel(device->GetID(),device->GetName());
 }
-//SIL. 07-jun-2006 : -- heavily changed
 //----------------------------------------------------------------------------
 void mafInteractionManager::CreateGUI() 
-//----------------------------------------------------------------------------
 {
   m_Gui = new mafGUI(this);
 
@@ -1014,10 +938,8 @@ void mafInteractionManager::CreateGUI()
   m_ActionsList->SetMinSize(wxSize(250,100));
 } 
 
-//SIL. 07-jun-2006 : -- new
 //----------------------------------------------------------------------------
 mafGUI* mafInteractionManager::GetGui()
-//----------------------------------------------------------------------------
 {
   return m_Gui;
 }

@@ -52,6 +52,7 @@ class mafVTKLog;
 class mafGUIApplicationSettings;
 class mafGUISettingsTimeBar;
 class mafHelpManager;
+class mafSnapshotManager;
 
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
@@ -109,16 +110,6 @@ public:
 	mafLogicWithManagers(mafGUIMDIFrame *mdiFrame = NULL);
 	virtual     ~mafLogicWithManagers();
 
-	enum UPLOAD_FLAGS
-	{
-		UPLOAD_SELECTED_VME = 0,
-		UPLOAD_SUBTREE,
-		UPLOAD_TREE,
-		UPLOAD_COMPRESSED_VME,
-		UPLOAD_COMPRESSED_SUBTREE,
-		UPLOAD_COMPRESSED_TREE,
-	};
-
 	/** */
 	virtual void OnEvent(mafEventBase *maf_event);
 
@@ -156,6 +147,9 @@ public:
 	/** Must be called before Configure */
 	void PlugWizardManager(bool b) { m_UseWizardManager = b; };
 
+	/** Must be called before Configure */
+	void PlugSnapshotManager(bool b) { m_UseSnapshotManager = b; };
+
 	/**  Plug a new wizard */
 	virtual void Plug(mafWizard *wizard, wxString menuPath = "");
 
@@ -174,14 +168,12 @@ public:
 	void SetApplicationStamp(mafString &app_stamp);
 	void SetApplicationStamp(std::vector<mafString> app_stamp);
 
-	/** Allow to set the flag for views to by External to the main frame or to by child of parent frame. */
-	void SetExternalViewFlag(bool external = false);
-
-	/** Retrieve the value for the external view flag.*/
-	bool GetExternalViewFlag();
-
 	/** Manage application exception and allow to save at least the tree. */
 	virtual void HandleException();
+
+	/*About Dialog*/
+	void ShowAboutDialog(wxString imagePath = "", bool showWebSiteBtn = false, bool showLicenseBtn= false);
+	wxStaticText* AddText(mafGUIDialog * dialog, wxString &text, int Width, int align);
 
 	/** Set the revision string */
 	void SetRevision(mafString revision) { m_Revision = revision; };
@@ -283,8 +275,6 @@ protected:
 	Example: dragging a VTK file over the application cause the application to inport it through the importer.*/
 	virtual void ImportExternalFile(mafString &filename);
 
-	/** Respond to a VME_SELECT evt. Instantiate the 'Select' operation. */
-	virtual void VmeSelect(mafEvent &e);
 	/** Respond to a VME_SELECT evt. Update the selection on the tree and view representation. */
 	virtual void VmeSelect(mafVME *vme);
 	/** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
@@ -388,7 +378,7 @@ protected:
 	mafOpManager           *m_OpManager;
 	mafInteractionManager  *m_InteractionManager;
 	mafHelpManager				 *m_HelpManager;
-
+	mafSnapshotManager		 *m_SnapshotManager;
 	mafVMELandmark				 *m_SelectedLandmark;
 
 	mafGUIMaterialChooser  *m_MaterialChooser;
@@ -402,14 +392,13 @@ protected:
 	wxMenu *m_OpMenu;
 	wxMenu *m_ViewMenu;
 
-	bool m_CameraLinkingObserverFlag;
-	bool m_ExternalViewFlag;
-
 	bool m_UseVMEManager;
 	bool m_UseViewManager;
 	bool m_UseOpManager;
 	bool m_UseInteractionManager;
 	bool m_UseHelpManager;
+	bool m_UseSnapshotManager;
+
 	mafGUISettingsDialog *m_SettingsDialog;
 
 	mafString m_Revision;
@@ -426,14 +415,17 @@ protected:
 	bool m_CancelledBeforeOpStarting;
 	wxMenu *m_WizardMenu;
 
-	long               m_ChildFrameStyle;
-	mafGUIMDIFrame       *m_Win;
+	long							m_ChildFrameStyle;
+	mafGUIMDIFrame		*m_Win;
 	wxToolBar         *m_ToolBar;
 	wxMenuBar         *m_MenuBar;
-	wxString					 m_LastSelectedPanel;
-	mafGUITimeBar      *m_TimePanel;
-	mafString					 m_AppTitle;
-	bool               m_LogToFile;
+	wxString					m_LastSelectedPanel;
+	mafGUITimeBar			*m_TimePanel;
+	mafString					m_AppTitle;
+	wxString					m_WebSiteURL;
+	wxString					m_LicenseURL;
+	wxString					m_AboutInfo;
+	bool							m_LogToFile;
 	mafWXLog          *m_Logger;
 	mafVTKLog         *m_VtkLog;
 	mafGUIApplicationSettings *m_ApplicationSettings;
@@ -448,5 +440,6 @@ protected:
 	bool m_PlugLogPanel;  ///< Flag to plug or not the Log area into the application. Default is true.
 	bool m_ShowStorageSettings; ///<Flag to show storage setting default is false.
 	bool m_ShowInteractionSettings; ///<Flag to show storage setting default is false.
+	bool m_FatalExptionOccurred;
 };
 #endif

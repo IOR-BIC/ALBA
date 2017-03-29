@@ -33,11 +33,9 @@
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafInteractorCameraMove)
-//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 mafInteractorCameraMove::mafInteractorCameraMove()
-//------------------------------------------------------------------------------
 {
   m_MotionFactor   = 10.0;
   m_State = MOUSE_CAMERA_NONE;
@@ -48,16 +46,12 @@ mafInteractorCameraMove::mafInteractorCameraMove()
   m_MousePose[0] = m_MousePose[1] = 0;
   m_AutoResetClippingRange = true;
 }
-
 //------------------------------------------------------------------------------
 mafInteractorCameraMove::~mafInteractorCameraMove()
-//------------------------------------------------------------------------------
 {
 }
-
 //------------------------------------------------------------------------------
 void mafInteractorCameraMove::OnEvent(mafEventBase *event)
-//------------------------------------------------------------------------------
 {
   assert(event);
   assert(event->GetSender());
@@ -94,7 +88,6 @@ void mafInteractorCameraMove::OnEvent(mafEventBase *event)
 }
 //------------------------------------------------------------------------------
 int mafInteractorCameraMove::StartInteraction(mafDeviceButtonsPadMouse *mouse)
-//------------------------------------------------------------------------------
 {
   SetRenderer(mouse->GetRenderer());
   if (m_Renderer)
@@ -105,10 +98,8 @@ int mafInteractorCameraMove::StartInteraction(mafDeviceButtonsPadMouse *mouse)
 
   return false;
 }
-
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::OnButtonDown(mafEventInteraction *e)
-//----------------------------------------------------------------------------
 {
   m_ButtonPressed = e->GetButton();
   double pos[2];
@@ -135,7 +126,6 @@ void mafInteractorCameraMove::OnButtonDown(mafEventInteraction *e)
 
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::OnButtonUp(mafEventInteraction *e)
-//----------------------------------------------------------------------------
 {
   m_ButtonPressed = e->GetButton();
   
@@ -154,42 +144,28 @@ void mafInteractorCameraMove::OnButtonUp(mafEventInteraction *e)
   m_Renderer->GetRenderWindow()->SetDesiredUpdateRate(0.001);
   m_Renderer->GetRenderWindow()->Render();
 }
-
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::OnMouseMove() 
-//----------------------------------------------------------------------------
 { 
 
   if (m_Renderer)
   {
-	 m_Renderer->GetRenderWindow()->SetDesiredUpdateRate(15.0);
+		m_Renderer->GetRenderWindow()->SetDesiredUpdateRate(15.0);
   }
 
-  switch (this->m_State) 
+  switch (m_State) 
   {
     case MOUSE_CAMERA_ROTATE:
-      this->Rotate();
-    break;
-    case MOUSE_CAMERA_LINKED_ROTATE:
-      LinkedRotate();
-      return;
+      Rotate();
     break;
     case MOUSE_CAMERA_PAN:
-      this->Pan();
-    break;
-    case MOUSE_CAMERA_LINKED_PAN:
-      LinkedPan();
-      return;
+      Pan();
     break;
     case MOUSE_CAMERA_DOLLY:
-      this->Dolly();
-    break;
-    case MOUSE_CAMERA_LINKED_DOLLY:
-      LinkedDolly();
-      return;
+      Dolly();
     break;
     case MOUSE_CAMERA_SPIN:
-      this->Spin();
+      Spin();
     break;
   }
 
@@ -197,100 +173,65 @@ void mafInteractorCameraMove::OnMouseMove()
 }
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::OnLeftButtonDown(mafEventInteraction *e)
-//----------------------------------------------------------------------------
 { 
   if (e->GetModifier(MAF_SHIFT_KEY)) 
   {
     if (e->GetModifier(MAF_CTRL_KEY)) 
-      this->StartDolly();
+      StartDolly();
     else 
-      this->StartPan();
+      StartPan();
   } 
   else 
   {
     if (e->GetModifier(MAF_CTRL_KEY)) 
-      this->StartSpin();
+      StartSpin();
     else 
-      this->StartRotate();
+      StartRotate();
   }
 }
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::OnMiddleButtonDown(mafEventInteraction *e) 
-//----------------------------------------------------------------------------
 {
   StartPan();
 }
 //----------------------------------------------------------------------------
-bool mafInteractorCameraMove::CameraIsPresent()
-//----------------------------------------------------------------------------
-{
-  bool cam_is_present = false;
-  for (int c=0; c<m_LinkedCamera.size(); c++) 
-  {
-    if (m_LinkedCamera[c] == m_CurrentCamera) 
-    {
-      cam_is_present = true;
-      break;
-    }
-  }
-  return cam_is_present;
-}
-//----------------------------------------------------------------------------
 void mafInteractorCameraMove::OnRightButtonDown(mafEventInteraction *e) 
-//----------------------------------------------------------------------------
 {
   StartDolly();
 }
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::OnLeftButtonUp()
-//----------------------------------------------------------------------------
 {
-  switch (this->m_State) 
+  switch (m_State) 
   {
     case MOUSE_CAMERA_DOLLY:
-    case MOUSE_CAMERA_LINKED_DOLLY:
-      this->EndDolly();
+      EndDolly();
     break;
     case MOUSE_CAMERA_PAN:
-    case MOUSE_CAMERA_LINKED_PAN:
-      this->EndPan();
+      EndPan();
     break;
     case MOUSE_CAMERA_SPIN:
-      this->EndSpin();
+      EndSpin();
     break;
     case MOUSE_CAMERA_ROTATE:
-    case MOUSE_CAMERA_LINKED_ROTATE:
-      this->EndRotate();
+      EndRotate();
     break;
   }
 }
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::OnMiddleButtonUp()
-//----------------------------------------------------------------------------
 {
-  switch (this->m_State) 
-  {
-    case MOUSE_CAMERA_PAN:
-    case MOUSE_CAMERA_LINKED_PAN:
-      this->EndPan();
-      break;
-  }
+  if (m_State == MOUSE_CAMERA_PAN) 
+		EndPan();
 }
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::OnRightButtonUp()
-//----------------------------------------------------------------------------
 {
-  switch (this->m_State) 
-  {
-    case MOUSE_CAMERA_DOLLY:
-    case MOUSE_CAMERA_LINKED_DOLLY:
-      this->EndDolly();
-      break;
-  }
+	if (m_State == MOUSE_CAMERA_DOLLY)
+		EndDolly();
 }
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::Rotate()
-//----------------------------------------------------------------------------
 {
   if (m_Renderer == NULL)
     return;
@@ -305,19 +246,21 @@ void mafInteractorCameraMove::Rotate()
   double delta_elevation = -20.0 / size[1];
   double delta_azimuth = -20.0 / size[0];
   
-  double rxf = (double)dx * delta_azimuth * this->m_MotionFactor;
-  double ryf = (double)dy * delta_elevation * this->m_MotionFactor;
+  double rxf = (double)dx * delta_azimuth * m_MotionFactor;
+  double ryf = (double)dy * delta_elevation * m_MotionFactor;
   
   m_CurrentCamera->Azimuth(rxf);
   m_CurrentCamera->Elevation(ryf);
   m_CurrentCamera->OrthogonalizeViewUp();
+		
+  if (m_AutoResetClippingRange) 
+		ResetClippingRange();
 
-  if (m_AutoResetClippingRange) ResetClippingRange();
+	InvokeEvent(this, CAMERA_MOVED,MCH_UP,m_CurrentCamera);
   m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::Spin()
-//----------------------------------------------------------------------------
 {
   if (m_Renderer == NULL)
     return;
@@ -340,14 +283,16 @@ void mafInteractorCameraMove::Spin()
   m_CurrentCamera->Roll(newAngle - oldAngle);
   m_CurrentCamera->OrthogonalizeViewUp();
       
-  if (m_AutoResetClippingRange)  ResetClippingRange();
+  if (m_AutoResetClippingRange) 
+		ResetClippingRange();
+
+	InvokeEvent(this, CAMERA_MOVED,MCH_UP,m_CurrentCamera);
   m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::Pan()
-//----------------------------------------------------------------------------
 {
-  if (this->m_Renderer == NULL)
+  if (m_Renderer == NULL)
     return;
 
   double viewFocus[4], focalDepth, viewPoint[3];
@@ -385,12 +330,14 @@ void mafInteractorCameraMove::Pan()
                       motionVector[1] + viewPoint[1],
                       motionVector[2] + viewPoint[2]);
       
-  if (m_AutoResetClippingRange)  ResetClippingRange();
+  if (m_AutoResetClippingRange)  
+		ResetClippingRange();
+
+	InvokeEvent(this, CAMERA_MOVED,MCH_UP,m_CurrentCamera);
   m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::Dolly()
-//----------------------------------------------------------------------------
 {
   if (m_Renderer == NULL)
     return;
@@ -398,7 +345,7 @@ void mafInteractorCameraMove::Dolly()
   double *center = m_Renderer->GetCenter();
 
   int dy = m_MousePose[1] - m_LastMousePose[1];
-  double dyf = this->m_MotionFactor * (double)(dy) / (double)(center[1]);
+  double dyf = m_MotionFactor * (double)(dy) / (double)(center[1]);
   double zoomFactor = pow((double)1.1, dyf);
   
   if (m_CurrentCamera->GetParallelProjection())
@@ -406,112 +353,15 @@ void mafInteractorCameraMove::Dolly()
   else
     m_CurrentCamera->Dolly(zoomFactor);
   
-  if (m_AutoResetClippingRange)  ResetClippingRange();
+  if (m_AutoResetClippingRange)  
+		ResetClippingRange();
+
+	InvokeEvent(this, CAMERA_MOVED,MCH_UP,m_CurrentCamera);
 	m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
-void mafInteractorCameraMove::LinkedDolly()
-//----------------------------------------------------------------------------
-{
-  if (m_Renderer == NULL)
-    return;
-
-  double *center = m_Renderer->GetCenter();
-
-  int dy = m_MousePose[1] - m_LastMousePose[1];
-  double dyf = this->m_MotionFactor * (double)(dy) / (double)(center[1]);
-  double zoomFactor = pow((double)1.1, dyf);
-
-  for (int c=0; c<m_LinkedCamera.size(); c++) 
-  {
-    if (m_LinkedCamera[c]->GetParallelProjection())
-      m_LinkedCamera[c]->SetParallelScale(m_CurrentCamera->GetParallelScale()/zoomFactor);
-    else
-      m_LinkedCamera[c]->Dolly(zoomFactor);
-  }
-
-  mafEvent e(this,CAMERA_UPDATE);
-  InvokeEvent(&e, MCH_UP);
-}
-//----------------------------------------------------------------------------
-void mafInteractorCameraMove::LinkedPan()
-//----------------------------------------------------------------------------
-{
-  if (this->m_Renderer == NULL)
-    return;
-
-  double viewFocus[4], focalDepth, viewPoint[3];
-  double newPickPoint[4], oldPickPoint[4], motionVector[3];
-
-  for (int c=0; c<m_LinkedCamera.size(); c++) 
-  {
-    // Calculate the focal depth since we'll be using it a lot
-    m_LinkedCamera[c]->GetFocalPoint(viewFocus);
-    ComputeWorldToDisplay(viewFocus[0], viewFocus[1], viewFocus[2], viewFocus);
-    focalDepth = viewFocus[2];
-
-    ComputeDisplayToWorld((double)m_MousePose[0], (double)m_MousePose[1], focalDepth, newPickPoint);
-
-    // Has to recalc old mouse point since the viewport has moved,
-    // so can't move it outside the loop
-    ComputeDisplayToWorld((double)m_LastMousePose[0],(double)m_LastMousePose[1],focalDepth, oldPickPoint);
-
-    // Camera motion is reversed
-    motionVector[0] = oldPickPoint[0] - newPickPoint[0];
-    motionVector[1] = oldPickPoint[1] - newPickPoint[1];
-    motionVector[2] = oldPickPoint[2] - newPickPoint[2];
-
-    m_LinkedCamera[c]->GetFocalPoint(viewFocus);
-    m_LinkedCamera[c]->GetPosition(viewPoint);
-    m_LinkedCamera[c]->SetFocalPoint(motionVector[0] + viewFocus[0],
-                                   motionVector[1] + viewFocus[1],
-                                   motionVector[2] + viewFocus[2]);
-
-    m_LinkedCamera[c]->SetPosition(motionVector[0] + viewPoint[0],
-                                 motionVector[1] + viewPoint[1],
-                                 motionVector[2] + viewPoint[2]);
-  }
-
-  mafEvent e(this,CAMERA_UPDATE);
-  InvokeEvent(&e, MCH_UP);
-}
-//----------------------------------------------------------------------------
-void mafInteractorCameraMove::LinkedRotate()
-//----------------------------------------------------------------------------
-{
-  if (m_Renderer == NULL)
-    return;
-
-  if (m_CurrentCamera->GetParallelProjection()) return; 
-
-  int dx = m_MousePose[0] - m_LastMousePose[0];
-  int dy = m_MousePose[1] - m_LastMousePose[1];
-
-  int *size = m_Renderer->GetRenderWindow()->GetSize();
-
-  double delta_elevation = -20.0 / size[1];
-  double delta_azimuth = -20.0 / size[0];
-
-  double rxf = (double)dx * delta_azimuth * this->m_MotionFactor;
-  double ryf = (double)dy * delta_elevation * this->m_MotionFactor;
-
-  for (int c=0; c<m_LinkedCamera.size(); c++)
-  {
-    m_LinkedCamera[c]->Azimuth(rxf);
-    m_LinkedCamera[c]->Elevation(ryf);
-    m_LinkedCamera[c]->OrthogonalizeViewUp();
-  }
-
-  mafEvent e(this,CAMERA_UPDATE);
-  InvokeEvent(&e, MCH_UP);
-}
-//----------------------------------------------------------------------------
 void mafInteractorCameraMove::ResetClippingRange()
-//----------------------------------------------------------------------------
 {
-  // 20.12.2010: Modified by Simone Brazzale:
-  // Added patch in the presence of the third layer.
-
   vtkRendererCollection *rc = m_Renderer->GetRenderWindow()->GetRenderers();
   rc->InitTraversal();
 
@@ -606,174 +456,83 @@ void mafInteractorCameraMove::ResetClippingRange()
 	  }
   }
 }
-
-
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::StartRotate() 
-//----------------------------------------------------------------------------
 {
-  if (m_State != MOUSE_CAMERA_NONE) 
-  {
-    return;
-  }
-
-  int state = (m_LinkedCamera.size() != 0 && CameraIsPresent()) ? MOUSE_CAMERA_LINKED_ROTATE : MOUSE_CAMERA_ROTATE;
-  this->StartState(state);
+  if (m_State == MOUSE_CAMERA_NONE) 
+	  StartState(MOUSE_CAMERA_ROTATE);
 }
-
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::EndRotate() 
-//----------------------------------------------------------------------------
 {
-  if (m_State != MOUSE_CAMERA_ROTATE  &&
-      m_State != MOUSE_CAMERA_LINKED_ROTATE &&
-      m_State != MOUSE_CAMERA_LINKED_PAN) 
-  {
-    return;
-  }
-  this->StopState();
+  if (m_State == MOUSE_CAMERA_ROTATE ) 
+	  StopState();
 }
-
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::StartZoom() 
-//----------------------------------------------------------------------------
 {
-  if (this->m_State != MOUSE_CAMERA_NONE) 
-  {
-    return;
-  }
-  this->StartState(MOUSE_CAMERA_ZOOM);
+  if (m_State == MOUSE_CAMERA_NONE) 
+	  StartState(MOUSE_CAMERA_ZOOM);
 }
-
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::EndZoom() 
-//----------------------------------------------------------------------------
 {
-  if (this->m_State != MOUSE_CAMERA_ZOOM) 
-  {
-    return;
-  }
-  this->StopState();
+  if (m_State == MOUSE_CAMERA_ZOOM) 
+	  StopState();
 }
-
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::StartPan() 
-//----------------------------------------------------------------------------
 {
-  if (this->m_State != MOUSE_CAMERA_NONE) 
-  {
-    return;
-  }
-  int state = (m_LinkedCamera.size() != 0 && CameraIsPresent()) ? MOUSE_CAMERA_LINKED_PAN : MOUSE_CAMERA_PAN;
-  this->StartState(state);
+  if (m_State == MOUSE_CAMERA_NONE) 
+   StartState(MOUSE_CAMERA_PAN);
 }
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::EndPan() 
-//----------------------------------------------------------------------------
 {
-  if (m_State != MOUSE_CAMERA_PAN &&
-      m_State != MOUSE_CAMERA_LINKED_PAN) 
-  {
-    return;
-  }
-  this->StopState();
+  if (m_State == MOUSE_CAMERA_PAN) 
+		StopState();
 }
-
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::StartSpin() 
-//----------------------------------------------------------------------------
 {
-  if (this->m_State != MOUSE_CAMERA_NONE) 
-  {
-    return;
-  }
-  this->StartState(MOUSE_CAMERA_SPIN);
+  if (m_State == MOUSE_CAMERA_NONE) 
+	  StartState(MOUSE_CAMERA_SPIN);
 }
-
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::EndSpin() 
-//----------------------------------------------------------------------------
 {
-  if (this->m_State != MOUSE_CAMERA_SPIN) 
-  {
-    return;
-  }
-  this->StopState();
+  if (m_State == MOUSE_CAMERA_SPIN) 
+	  StopState();
 }
-
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::StartDolly() 
-//----------------------------------------------------------------------------
 {
-  if (this->m_State != MOUSE_CAMERA_NONE) 
-  {
-    return;
-  }
-  int state = (m_LinkedCamera.size() != 0 && CameraIsPresent()) ? MOUSE_CAMERA_LINKED_DOLLY : MOUSE_CAMERA_DOLLY;
-  this->StartState(state);
+  if (m_State == MOUSE_CAMERA_NONE) 
+	  StartState(MOUSE_CAMERA_DOLLY);
 }
 //----------------------------------------------------------------------------
-void mafInteractorCameraMove::EndDolly() 
-//----------------------------------------------------------------------------
+void mafInteractorCameraMove::EndDolly()
 {
-    if (m_State != MOUSE_CAMERA_DOLLY &&
-        m_State != MOUSE_CAMERA_LINKED_DOLLY)
-    {
-      return;
-    }
-    this->StopState();
+	if (m_State == MOUSE_CAMERA_DOLLY)
+		StopState();
 }
-
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::StartState(int newstate) 
-//----------------------------------------------------------------------------
 {
-  this->m_State = newstate;
+  m_State = newstate;
 }
-
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::StopState() 
-//----------------------------------------------------------------------------
 {
-  this->m_State = MOUSE_CAMERA_NONE;
-}
-
-//----------------------------------------------------------------------------
-void mafInteractorCameraMove::AddLinkedCamera(vtkCamera *cam)
-//----------------------------------------------------------------------------
-{
-  m_LinkedCamera.push_back(cam);
-}
-//----------------------------------------------------------------------------
-void mafInteractorCameraMove::RemoveLinkedCamera(vtkCamera *cam)
-//----------------------------------------------------------------------------
-{
-  for (std::vector<vtkCamera *>::iterator it = m_LinkedCamera.begin(); it != m_LinkedCamera.end(); it++) 
-  {
-    if (*it == cam) 
-    {
-      m_LinkedCamera.erase(it);
-      break;
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
-void mafInteractorCameraMove::RemoveAllLinkedCamera()
-//----------------------------------------------------------------------------
-{
-  m_LinkedCamera.clear();
+  m_State = MOUSE_CAMERA_NONE;
 }
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::AutoResetClippingRangeOff()
-//----------------------------------------------------------------------------
 {
 	m_AutoResetClippingRange = false;
 }
-
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::AutoResetClippingRangeOn()
-//----------------------------------------------------------------------------
 {
 	m_AutoResetClippingRange = true;
 }

@@ -115,7 +115,6 @@ public:
   {
     ID_DEFAULT_CHILD_VIEW = Superclass::ID_LAST,
     ID_LAYOUT_CHOOSER,
-    ID_LINK_SUBVIEW,
     ID_LAST
   };
 
@@ -182,11 +181,13 @@ public:
   Print the sub-view.*/
   virtual void Print(wxDC *dc, wxRect margins);
 
-  /** Allow to link the camera of the sub-views.*/
-  virtual void LinkView(bool link_camera = true);
-
   /** Called to update all components that depends on Application Options.*/
   virtual void OptionsUpdate();
+
+	virtual void SetBackgroundColor(wxColor color);
+
+	void SetSubViewBackgroundColor(int subView, wxColor color);
+	wxColor GetSubViewBackgroundColor(int subView);
 
 protected:
   /**

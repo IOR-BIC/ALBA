@@ -232,6 +232,7 @@ bool ExampleApp::OnInit()
 #ifdef USE_WIZARD
   m_Logic->PlugWizardManager(true);
 #endif
+	m_Logic->PlugSnapshotManager(true);
 	m_Logic->Configure();
 
 	SetTopWindow(mafGetFrame());  
@@ -509,6 +510,11 @@ bool ExampleApp::OnInit()
 // 	vVTKC->PackageView();
 // 	m_Logic->Plug(vVTKC);
 
+	//View RayCast
+	mafViewVTK *vRayCast = new mafViewVTK("3D Volume Rendering");
+	vRayCast->PlugVisualPipe("mafVMEVolumeGray", "mafPipeRayCast", MUTEX);
+	m_Logic->Plug(vRayCast);
+
 	//View Plot
 	mafViewPlot *vplot = new mafViewPlot("Plot (mafViewPlot)");
 	//vplot->PackageView();
@@ -524,7 +530,7 @@ bool ExampleApp::OnInit()
 	vComp->PackageView();
 	m_Logic->Plug(vComp);
 
-	//wxHandleFatalExceptions();
+	wxHandleFatalExceptions();
 
 	//m_Logic->ShowSplashScreen();
 	m_Logic->Show();

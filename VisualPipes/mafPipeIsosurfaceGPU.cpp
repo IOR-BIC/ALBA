@@ -35,7 +35,6 @@
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
-#include "mafEventSource.h"
 
 #include "vtkMAFAssembly.h"
 #include "vtkMAFSmartPointer.h"
@@ -77,7 +76,7 @@ void mafPipeIsosurfaceGPU::Create(mafSceneNode *n)
 
 	assert(m_Vme->GetOutput()->IsA("mafVMEOutputVolume"));
 
-  m_Vme->GetEventSource()->AddObserver(this);
+  m_Vme->AddObserver(this);
 
 	vtkDataSet *dataset = m_Vme->GetOutput()->GetVTKData();
 	dataset->Update();
@@ -129,7 +128,7 @@ void mafPipeIsosurfaceGPU::Create(mafSceneNode *n)
 mafPipeIsosurfaceGPU::~mafPipeIsosurfaceGPU()
 //----------------------------------------------------------------------------
 {
-  m_Vme->GetEventSource()->RemoveObserver(this);
+  m_Vme->RemoveObserver(this);
 
 	m_AssemblyFront->RemovePart(m_Volume);
 	

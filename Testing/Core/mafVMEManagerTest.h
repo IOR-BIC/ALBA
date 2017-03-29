@@ -35,18 +35,18 @@ public:
 
 	// CPPUNIT test suite
   CPPUNIT_TEST_SUITE( mafVMEManagerTest );
-  CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
-  CPPUNIT_TEST( TestDynamicAllocation );
-  CPPUNIT_TEST( TestStaticAllocation );
-  CPPUNIT_TEST( MSFNewTest );
-  CPPUNIT_TEST( MSFOpenTest );
-  CPPUNIT_TEST( ZIPOpenTest );
-  CPPUNIT_TEST( MSFSaveTest );
-  CPPUNIT_TEST( ZIPSaveTest );
-  CPPUNIT_TEST( VmeAddRemoveTest );
-  CPPUNIT_TEST( MSFIsModifiedTest );
-  CPPUNIT_TEST( TimeGetBoundsTest );
-  CPPUNIT_TEST( TimeSetTest );
+//   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
+//   CPPUNIT_TEST( TestDynamicAllocation );
+//   CPPUNIT_TEST( TestStaticAllocation );
+//   CPPUNIT_TEST( MSFNewTest );
+//   CPPUNIT_TEST( MSFOpenTest );
+//   CPPUNIT_TEST( ZIPOpenTest );
+//   CPPUNIT_TEST( MSFSaveTest );
+//   CPPUNIT_TEST( ZIPSaveTest );
+//   CPPUNIT_TEST( VmeAddRemoveTest );
+//   CPPUNIT_TEST( MSFIsModifiedTest );
+//   CPPUNIT_TEST( TimeGetBoundsTest );
+//   CPPUNIT_TEST( TimeSetTest );
   CPPUNIT_TEST( NotifyAddRemoveTest );
   CPPUNIT_TEST( SetGetFileNameTest );
   CPPUNIT_TEST( GetRootTest );

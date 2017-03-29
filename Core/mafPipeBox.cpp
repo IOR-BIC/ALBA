@@ -28,7 +28,6 @@
 #include "mafGUI.h"
 #include "mafVME.h"
 #include "mafAxes.h"
-#include "mafEventSource.h"
 
 #include "mafLODActor.h"
 #include "vtkMAFAssembly.h"
@@ -78,7 +77,7 @@ void mafPipeBox::Create(mafSceneNode *n/*, bool use_axes*/)
 
   m_BoundsMode = 0;
 
-	m_Vme->GetEventSource()->AddObserver(this);
+	m_Vme->AddObserver(this);
 
   double b[6];
   m_Vme->GetOutput()->Update();
@@ -132,7 +131,7 @@ void mafPipeBox::Create(mafSceneNode *n/*, bool use_axes*/)
 mafPipeBox::~mafPipeBox()
 //----------------------------------------------------------------------------
 {
-	m_Vme->GetEventSource()->RemoveObserver(this);
+	m_Vme->RemoveObserver(this);
 
   m_AssemblyFront->RemovePart(m_Actor);
   m_AssemblyFront->RemovePart(m_OutlineActor);

@@ -337,7 +337,9 @@ int mafVMEItemVTK::InternalRestoreData()
     mafEventIO e(this,NODE_GET_STORAGE);
     mafEventMacro(e);
     mafStorage *storage = e.GetStorage();
-    assert(storage);
+    
+		if (!storage)
+			return MAF_NO_IO;
     
     int resolvedURL = MAF_OK;
     mafString filename;
@@ -582,12 +584,6 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
       ReleaseOutputMemory();
 
       vtkMAFSmartPointer<vtkDataSetWriter> writer;
-      // Progressbar removed to improve vector data storage speed
-      // writer->SetProgressText("Storing data...");
-      // mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,writer));
-
-      // this is to catch possible I/O errors
-      //unsigned long tag=mflAgent::PlugEventSource(writer,mflMSFWriter::ErrorHandler,this,vtkCommand::ErrorEvent);
       writer->SetInput(data);
       writer->SetFileTypeToBinary();
       writer->SetHeader("# MAF data file - mafVMEItemVTK output\n");
