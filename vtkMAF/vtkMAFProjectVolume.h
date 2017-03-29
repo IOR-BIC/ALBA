@@ -1,47 +1,22 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    $RCSfile: vtkMAFProjectRG.h,v $
-  Language:  C++
-  Date:      $Date: 2009-07-26 08:16:39 $
-  Version:   $Revision: 1.1.2.1 $
+Program: MAF2
+Module: vtkMAFVolumeSlicer
+Authors: Gianluigi Crimi
 
+Copyright (c) B3C
+All rights reserved. See Copyright.txt or
+http://www.scsitaly.com/Copyright.htm for details.
 
-Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
-
-This software is copyrighted by Ken Martin, Will Schroeder and Bill Lorensen.
-The following terms apply to all files associated with the software unless
-explicitly disclaimed in individual files. This copyright specifically does
-not apply to the related textbook "The Visualization Toolkit" ISBN
-013199837-4 published by Prentice Hall which is covered by its own copyright.
-
-The authors hereby grant permission to use, copy, and distribute this
-software and its documentation for any purpose, provided that existing
-copyright notices are retained in all copies and that this notice is included
-verbatim in any distributions. Additionally, the authors grant permission to
-modify this software and its documentation for any purpose, provided that
-such modifications are not distributed without the explicit consent of the
-authors and that existing copyright notices are retained in all copies. Some
-of the algorithms implemented by this software are patented, observe all
-applicable patent law.
-
-IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY FOR
-DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
-OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY DERIVATIVES THEREOF,
-EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES, INCLUDING,
-BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
-"AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE
-MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
-
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMAFProjectRG - makes a voxel projection of structured points dataset along axis directions
+// .NAME vtkMAFProjectVolume - makes a voxel projection of structured points dataset along axis directions
 
 // .SECTION Description
-// vtkMAFProjectRG makes a voxel projection of structured points dataset 
+// vtkMAFProjectVolume makes a voxel projection of structured points dataset 
 // along axis directions considering opacity.  The output of
 // this filter is a structured points dataset. The filter treats input data
 // of any topological dimension (i.e., point, line, image, or volume) and 
@@ -61,16 +36,19 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkMAFProjectRG_h
 #define __vtkMAFProjectRG_h
 
-#include "vtkMAFRectilinearGridToRectilinearGridFilter.h"
+#include "vtkDataSetToDataSetFilter.h"
 #include "mafConfigure.h"
 
 #define VTK_PROJECT_FROM_X 1
 #define VTK_PROJECT_FROM_Y 2
 #define VTK_PROJECT_FROM_Z 3
 
+class vtkDataArray;
+class vtkImageData;
+
 /**
-Class Name: vtkMAFProjectRG.
- vtkMAFProjectRG makes a voxel projection of structured points dataset 
+Class Name: vtkMAFProjectVolume.
+ vtkMAFProjectVolume makes a voxel projection of structured points dataset 
  along axis directions considering opacity.  The output of
  this filter is a structured points dataset. The filter treats input data
  of any topological dimension (i.e., point, line, image, or volume) and 
@@ -83,16 +61,14 @@ Class Name: vtkMAFProjectRG.
  Typical applications of this filter are to produce an image from a volume
  for image processing or visualization.
 */
-class MAF_EXPORT vtkMAFProjectRG : public vtkMAFRectilinearGridToRectilinearGridFilter
+class MAF_EXPORT vtkMAFProjectVolume : public vtkDataSetToDataSetFilter
 {
 public:
   /** RTTI Macro */
-  vtkTypeRevisionMacro(vtkMAFProjectRG,vtkMAFRectilinearGridToRectilinearGridFilter);
-  /** Print object information */
-  void PrintSelf(ostream& os, vtkIndent indent);
-
+  vtkTypeRevisionMacro(vtkMAFProjectVolume, vtkDataSetToDataSetFilter);
+  
   /** Static Function for object instantiation */
-  static vtkMAFProjectRG *New();
+  static vtkMAFProjectVolume *New();
 
   /** Set Projection Direction to X */
   void SetProjectionModeToX()
@@ -116,6 +92,9 @@ public:
      return "Z";
   };
 
+	/** Updated function to avoid extent propagation */
+	virtual void PropagateUpdateExtent(vtkDataObject *output);
+
   /** Macro for Set Projection Mode */
   vtkSetMacro(ProjectionMode,int);
   /** Macro for Get Projection Mode */
@@ -135,20 +114,27 @@ public:
 
 protected:
   /** constructor */
-  vtkMAFProjectRG();
+  vtkMAFProjectVolume();
   /** destructor */
- ~vtkMAFProjectRG(){};
+	~vtkMAFProjectVolume() {};
  /** copy constructor not implemented*/
-  vtkMAFProjectRG(const vtkMAFProjectRG&);
+  vtkMAFProjectVolume(const vtkMAFProjectVolume&);
   /** assign operator not implemented*/
-  void operator=(const vtkMAFProjectRG&);
+  void operator=(const vtkMAFProjectVolume&);
 
   /** Update dimensions and whole extents */
   void ExecuteInformation();
   /** Execute the projection and fill output scalars */
   void Execute();
 
-  int  ProjectionMode;
+	void GenerateOutputFromID(vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars);
+
+	void GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars);
+
+	/** Gets the best spacing for Rectilinear Grid probing*/
+	void GetBestSpacing(double * bestSpacing, vtkRectilinearGrid* rGrid);
+
+	int  ProjectionMode;
 	bool ProjectSubRange;
 	int  ProjectionRange[2];
 };
