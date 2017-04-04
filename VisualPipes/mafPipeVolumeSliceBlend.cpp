@@ -27,7 +27,7 @@
 #include "mafGUI.h"
 #include "mafSceneNode.h"
 #include "mmaVolumeMaterial.h"
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeVolumeOrthoSlice.h"
 #include "mafTransformBase.h"
 #include "mafVMEVolume.h"
 #include "mafVMEOutputVolume.h"
@@ -87,7 +87,7 @@ mafPipeVolumeSliceBlend::mafPipeVolumeSliceBlend()
     m_Mapper = NULL;
     m_Actor = NULL;
     m_TickActor = NULL;
-    m_SliceDirection  = mafPipeVolumeSlice::SLICE_Z;
+    m_SliceDirection  = mafPipeVolumeOrthoSlice::SLICE_Z;
     m_SliceOpacity  = 1.0;
     m_TextureRes    = 512;
     ///Default value of X Y vectors
@@ -143,8 +143,6 @@ void mafPipeVolumeSliceBlend::InitializeSliceParameters(int direction, double sl
   m_ShowBounds = show_bounds;
 
   m_SliceDirection= direction;
-  if(m_SliceDirection == mafPipeVolumeSlice::SLICE_ARB)
-    m_SliceDirection = mafPipeVolumeSlice::SLICE_Z;
   m_ShowVolumeBox = show_vol_bbox;
 
   m_Origin[0][0] = slice_origin0[0];
@@ -155,7 +153,7 @@ void mafPipeVolumeSliceBlend::InitializeSliceParameters(int direction, double sl
   m_Origin[1][1] = slice_origin1[1];
   m_Origin[1][2] = slice_origin1[2];
 
-  if(m_SliceDirection != mafPipeVolumeSlice::SLICE_ORTHO)
+  if(m_SliceDirection != mafPipeVolumeOrthoSlice::SLICE_ORTHO)
   {
     m_XVector[m_SliceDirection][0] = slice_xVect[0];
     m_XVector[m_SliceDirection][1] = slice_xVect[1];
@@ -203,10 +201,6 @@ void mafPipeVolumeSliceBlend::Create(mafSceneNode *n)
   m_Vme->GetOutput()->GetVTKData()->GetScalarRange(sr);
   m_ColorLUT->SetTableRange(sr[0], sr[1]);
   material->UpdateFromTables();
-
-  if(m_SliceDirection == mafPipeVolumeSlice::SLICE_ARB)
-    m_SliceDirection = mafPipeVolumeSlice::SLICE_Z;
-
   if (!m_SliceParametersInitialized)
   {
     //If slices aren't initialized
@@ -219,7 +213,7 @@ void mafPipeVolumeSliceBlend::Create(mafSceneNode *n)
     m_Origin[1][2] = (b[4] + b[5])*.5;
   }
   //Define X and Y vector
-  if(m_SliceDirection == mafPipeVolumeSlice::SLICE_ORTHO)
+  if(m_SliceDirection == mafPipeVolumeOrthoSlice::SLICE_ORTHO)
   {
     // overwrite the plane vector, because the slices have to be orthogonal
     m_XVector[0][0] = 0.0001;	//modified by Paolo 29-10-2003 should be 0 !!! check into Sasha's filter
@@ -515,7 +509,7 @@ void mafPipeVolumeSliceBlend::SetSliceOpacity(double opacity)
   for (int i=0;i<3;i++)
   {
     //Implemented only for z-axis
-    if(m_SliceDirection== mafPipeVolumeSlice::SLICE_Z)
+    if(m_SliceDirection== mafPipeVolumeOrthoSlice::SLICE_Z)
     {
       //Check witch slice are at the TOP
       if(m_Origin[0][2]>m_Origin[1][2])

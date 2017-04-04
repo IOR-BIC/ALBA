@@ -1,0 +1,214 @@
+/*=========================================================================
+
+Program: MAF2
+Module: vtkMAFRGtoSPImageFilter
+Authors: Gianluigi Crimi
+
+Copyright (c) B3C
+All rights reserved. See Copyright.txt or
+http://www.scsitaly.com/Copyright.htm for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#include "mafDefines.h"
+#include "vtkMAFRGtoSPImageFilter.h"
+#include "vtkObjectFactory.h"
+#include "vtkStructuredPoints.h"
+#include "vtkPointData.h"
+#include "vtkDataArray.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkMAFSmartPointer.h"
+#include "vtkProbeFilter.h"
+#include "vtkDataSetWriter.h"
+#include "vtkMath.h"
+
+vtkCxxRevisionMacro(vtkMAFRGtoSPImageFilter, "$Revision: 1.1 $");
+vtkStandardNewMacro(vtkMAFRGtoSPImageFilter);
+
+
+//----------------------------------------------------------------------------
+void vtkMAFRGtoSPImageFilter::PropagateUpdateExtent(vtkDataObject *output)
+{
+}
+
+//=========================================================================
+vtkMAFRGtoSPImageFilter::vtkMAFRGtoSPImageFilter()
+{
+	vtkSource::SetNthOutput(0, vtkStructuredPoints::New());
+	// Releasing data
+	Outputs[0]->ReleaseData();
+	Outputs[0]->Delete();
+}
+
+//=========================================================================
+void vtkMAFRGtoSPImageFilter::ExecuteInformation()
+{
+	vtkRectilinearGrid *input = vtkRectilinearGrid::SafeDownCast(GetInput());
+	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
+  int dims[3], outDims[3], extent[6];
+	double bestSpacing[3], outputSpacing[3],bounds[6];
+  
+	if (input == NULL)
+	{
+		vtkErrorMacro("Missing input");
+		return;
+	}
+
+	if (output == NULL)
+	{
+		vtkErrorMacro("Output error");
+		return;
+	}
+	
+	input->GetDimensions(dims);
+	if (dims[2] != 1)
+	{
+		vtkErrorMacro("Wrong input type");
+		return;
+	}
+		
+	input->GetWholeExtent(extent);
+	input->GetBounds(bounds);
+	GetBestSpacing(input, bestSpacing);
+
+	outDims[0] = ((bounds[1] - bounds[0]) / bestSpacing[0]) + 1;
+	outDims[1] = ((bounds[3] - bounds[2]) / bestSpacing[1]) + 1;
+	outDims[2] = 1;
+
+	outputSpacing[0] = (bounds[1] - bounds[0]) / (double)outDims[0];
+	outputSpacing[1] = (bounds[3] - bounds[2]) / (double)outDims[1];
+	outputSpacing[2] = 1;
+
+	//output->SetDimensions(outDims);
+	output->SetSpacing(outputSpacing);
+	output->SetOrigin(bounds[0], bounds[2], bounds[4]);
+
+	
+	extent[0] = 0;
+	extent[1] = outDims[0]-1;
+	extent[2] = 0;
+	extent[3] = outDims[1]-1;
+	extent[4] = 0;
+	extent[5] = outDims[2]-1;
+  output->SetWholeExtent(extent);
+}
+
+//=========================================================================
+void vtkMAFRGtoSPImageFilter::Execute()
+{
+	int outDims[3], inDims[3], x, y,xRG,yRG, yOffset, yRGoffsetA, yRGoffsetB,newIdx;
+	double spacing[3], bounds[6], yRatioA,yRatioB,xRatioA,xRatioB,ySize, xSize, yPos, xPos, yCoordA, yCoordB, xCoordA, xCoordB, acc1, acc2, acc;
+
+	vtkRectilinearGrid *input = vtkRectilinearGrid::SafeDownCast(GetInput());
+	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
+
+	vtkPointData 			*inputPd = input->GetPointData();
+	vtkDataArray 			*inputScalars = inputPd->GetScalars();
+	vtkDataArray 			*outScalars = inputPd->GetScalars()->NewInstance();
+
+	vtkDataArray 			*xCoordinates, *yCoordinates;
+	
+	xCoordinates = input->GetXCoordinates();
+	yCoordinates = input->GetYCoordinates();
+	input->GetBounds(bounds);
+
+	output->SetExtent(output->GetWholeExtent());
+
+	output->GetDimensions(outDims);
+	input->GetDimensions(inDims);
+	output->GetSpacing(spacing);
+	
+	outScalars->SetNumberOfTuples(outDims[0]*outDims[1]);
+	newIdx = 0;
+	
+	yRG = 0;
+	yCoordA = yCoordinates->GetTuple1(yRG);
+	yCoordB = yCoordinates->GetTuple1(yRG+1);
+	yRGoffsetA = 0;
+	yRGoffsetB = inDims[0];
+	ySize = yCoordB - yCoordA;
+	for (y = 0; y < outDims[1]; y++)
+	{
+		yPos = bounds[2] + y*spacing[1];
+		
+		if (yPos >= yCoordB)
+		{
+			yRG++;
+			yCoordA = yCoordB;
+			yCoordB = yCoordinates->GetTuple1(yRG + 1);
+
+			yRGoffsetA = yRG * inDims[0];
+			yRGoffsetB = (yRG + 1) * inDims[0];
+			ySize = yCoordB - yCoordA;
+		}
+
+		yOffset = y * outDims[0];
+		
+		yRatioB = (yPos - yCoordA) / ySize;
+		yRatioA = 1.0 - yRatioB;
+
+
+		xRG = 0;
+		xCoordA = xCoordinates->GetTuple1(xRG);
+		xCoordB = xCoordinates->GetTuple1(xRG + 1);
+		xSize = xCoordB - xCoordA;
+		for (x = 0; x < outDims[0]; x++)
+		{
+			xPos = bounds[0] + x*spacing[0];
+
+			if (xPos >= xCoordB)
+			{
+				xRG++;
+				xCoordA = xCoordB;
+				xCoordB = xCoordinates->GetTuple1(xRG + 1);
+				xSize = xCoordB - xCoordA;
+			}
+
+			xRatioB = (xPos - xCoordA) / xSize;
+			xRatioA = 1.0 - xRatioB;
+
+			acc1 = inputScalars->GetTuple1(xRG + yRGoffsetA)*xRatioA;
+			acc1 += inputScalars->GetTuple1(xRG+ 1 + yRGoffsetA)*xRatioB;
+
+			acc2 = inputScalars->GetTuple1(xRG + yRGoffsetB)*xRatioA;
+			acc2 += inputScalars->GetTuple1(xRG + 1 + yRGoffsetB)*xRatioB;
+
+			acc = acc1*yRatioA + acc2*yRatioB;
+			
+			outScalars->SetTuple1(newIdx, acc);
+			newIdx++;
+		}
+	}
+
+	output->GetPointData()->SetScalars(outScalars);
+	vtkDEL(outScalars);
+}
+
+//=========================================================================
+void vtkMAFRGtoSPImageFilter::GetBestSpacing(vtkRectilinearGrid* rGrid, double * bestSpacing)
+{
+	bestSpacing[0] = VTK_DOUBLE_MAX;
+	bestSpacing[1] = VTK_DOUBLE_MAX;
+	bestSpacing[2] = VTK_DOUBLE_MAX;
+
+	for (int xi = 1; xi < rGrid->GetXCoordinates()->GetNumberOfTuples(); xi++)
+	{
+		double spcx = rGrid->GetXCoordinates()->GetTuple1(xi) - rGrid->GetXCoordinates()->GetTuple1(xi - 1);
+		if (bestSpacing[0] > spcx && spcx != 0.0)
+			bestSpacing[0] = spcx;
+	}
+
+	for (int yi = 1; yi < rGrid->GetYCoordinates()->GetNumberOfTuples(); yi++)
+	{
+		double spcy = rGrid->GetYCoordinates()->GetTuple1(yi) - rGrid->GetYCoordinates()->GetTuple1(yi - 1);
+		if (bestSpacing[1] > spcy && spcy != 0.0)
+			bestSpacing[1] = spcy;
+	}
+
+	bestSpacing[2] = 1;
+}
+

@@ -61,7 +61,7 @@ See the COPYINGS file for license details
 
 #include "mafVMEGizmo.h"
 
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeVolumeArbSlice.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewSliceOnCurveCompound);
@@ -370,8 +370,8 @@ mafGUI* mafViewSliceOnCurveCompound::CreateGui()
   // Added by Losi 11.25.2009
   if (m_CurrentVolume)
   {
-    mafPipeVolumeSlice *p = NULL;
-    p = mafPipeVolumeSlice::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+		mafPipeVolumeArbSlice *p = NULL;
+    p = mafPipeVolumeArbSlice::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
     if (p) // Is this required?
     {
       p->SetEnableGPU(m_EnableGPU);
@@ -491,8 +491,8 @@ void mafViewSliceOnCurveCompound::OnEvent(mafEventBase *maf_event)
       {
         if (m_CurrentVolume)
         {
-          mafPipeVolumeSlice *p = NULL;
-          p = mafPipeVolumeSlice::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+					mafPipeVolumeArbSlice *p = NULL;
+          p = mafPipeVolumeArbSlice::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
           if(p)
           {
             p->SetEnableGPU(m_EnableGPU);
@@ -764,9 +764,9 @@ void mafViewSliceOnCurveCompound::SetSlicePosition(double abscisa, vtkIdType bra
 		{
 			mafViewVTK* vs = ((mafViewVTK*)vws[SLICE_VIEW]);
 
-			vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice", MUTEX);
-			vs->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice", MUTEX);
-			vs->PlugVisualPipe("mafVMEVolumeRGB", "mafPipeVolumeSlice", MUTEX);
+			vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeArbSlice", MUTEX);
+			vs->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeArbSlice", MUTEX);
+			vs->PlugVisualPipe("mafVMEVolumeRGB", "mafPipeVolumeArbSlice", MUTEX);
 		}
   }
 }

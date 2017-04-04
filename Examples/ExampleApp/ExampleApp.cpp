@@ -163,7 +163,6 @@
 #include "mafViewOrthoSlice.h"
 #include "mafViewArbitrarySlice.h"
 #include "mafViewGlobalSliceCompound.h"
-#include "mafViewSingleSliceCompound.h"
 #include "mafViewImageCompound.h"
 #include "mafView3D.h"
 #include "mafViewArbitraryOrthoSlice.h"
@@ -174,7 +173,6 @@
 #include "mafViewCT.h"
 #include "mafViewGlobalSlice.h"
 #include "mafViewRX.h"
-#include "mafViewSingleSlice.h"
 #include "mafViewSlice.h"
 #include "mafViewSliceBlend.h"
 #include "mafViewSliceBlendRX.h"
@@ -415,11 +413,6 @@ bool ExampleApp::OnInit()
 	vimageC->PackageView();
 	m_Logic->Plug(vimageC);
 
-	//View Single Slice Compound
-	mafViewSingleSliceCompound *vsinglesliceC=new mafViewSingleSliceCompound("Single Slice (mafViewSingleSliceCompound)");
-	vsinglesliceC->PackageView();
-	m_Logic->Plug(vsinglesliceC);
-
 	//View 3D
 	m_Logic->Plug(new mafView3D("3D (mafView3D)"));
 
@@ -459,11 +452,6 @@ bool ExampleApp::OnInit()
 	mafViewRX *vRX = new mafViewRX("RX (mafViewRX)");
 	//vRX->PackageView();
 	m_Logic->Plug(vRX);
-
-	//View Single Slice
-	mafViewSingleSlice*vsingleslice = new mafViewSingleSlice("Single Slice (mafViewSingleSlice)");
-	//vsingleslice->PackageView();
-	m_Logic->Plug(vsingleslice);
 
 	//View Slice
 	mafViewSlice *vslice = new mafViewSlice("Slice (mafViewSlice)");
