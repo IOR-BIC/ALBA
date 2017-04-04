@@ -148,7 +148,8 @@ void vtkMAFRGtoSPImageFilter::Execute()
 
 		yOffset = y * outDims[0];
 		
-		yRatioB = (yPos - yCoordA) / ySize;
+		//Avoid problems on slicing volumes with doublied slices
+		yRatioB = (ySize!=0) ? (yPos - yCoordA) / ySize : 1;
 		yRatioA = 1.0 - yRatioB;
 
 
@@ -168,7 +169,8 @@ void vtkMAFRGtoSPImageFilter::Execute()
 				xSize = xCoordB - xCoordA;
 			}
 
-			xRatioB = (xPos - xCoordA) / xSize;
+			//Avoid problems on slicing volumes with doublied slices
+			xRatioB = (xSize!=0) ? (xPos - xCoordA) / xSize : 1;
 			xRatioA = 1.0 - xRatioB;
 
 			acc1 = inputScalars->GetTuple1(xRG + yRGoffsetA)*xRatioA;
