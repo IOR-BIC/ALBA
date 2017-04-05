@@ -19,8 +19,6 @@ SET(PROJECT_SRCS
 	mafViewGlobalSliceTest.h mafViewGlobalSliceTest.cpp
 	mafViewGlobalSliceCompoundTest.h mafViewGlobalSliceCompoundTest.cpp
 	mafViewImageTest.h mafViewImageTest.cpp
-	mafViewSingleSliceTest.h mafViewSingleSliceTest.cpp
-	mafViewSingleSliceCompoundTest.h mafViewSingleSliceCompoundTest.cpp
 	mafViewRXCompoundTest.h mafViewRXCompoundTest.cpp
 	mafView3DTest.h mafView3DTest.cpp
 	mafViewImageCompoundTest.h mafViewImageCompoundTest.cpp

@@ -31,8 +31,6 @@
 #include "mafViewGlobalSliceTest.h"
 #include "mafViewGlobalSliceCompoundTest.h"
 #include "mafViewImageTest.h"
-#include "mafViewSingleSliceTest.h"
-#include "mafViewSingleSliceCompoundTest.h"
 #include "mafViewRXCompoundTest.h"
 #include "mafView3DTest.h"
 #include "mafViewImageCompoundTest.h"
@@ -87,8 +85,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafViewGlobalSliceTest::suite());
 	runner.addTest(mafViewGlobalSliceCompoundTest::suite());
 	runner.addTest(mafViewImageTest::suite());
-	runner.addTest(mafViewSingleSliceTest::suite());
-	runner.addTest(mafViewSingleSliceCompoundTest::suite());
 	runner.addTest(mafViewRXCompoundTest::suite());
 	runner.addTest(mafView3DTest::suite());
 	runner.addTest(mafViewImageCompoundTest::suite());

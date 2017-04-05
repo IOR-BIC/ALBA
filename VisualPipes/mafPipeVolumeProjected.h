@@ -83,7 +83,7 @@ protected:
 	vtkOutlineCornerFilter *m_VolumeBox;
   vtkPolyDataMapper			 *m_VolumeBoxMapper;
   vtkActor               *m_VolumeBoxActor;
-	vtkMAFProjectVolume       *m_ProjectFilter;
+	vtkMAFProjectVolume    *m_ProjectFilter;
 	bool m_RangeProjectionEnabled;
 	int m_ProjectionRange[2];
 
