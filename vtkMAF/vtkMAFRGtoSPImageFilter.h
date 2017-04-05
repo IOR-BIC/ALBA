@@ -88,6 +88,9 @@ protected:
   /** Execute the projection and fill output scalars */
   void Execute();
 
+	template<typename DataType>
+	void FillSP(vtkRectilinearGrid * input, vtkImageData * output, DataType *inputScalars, DataType *outScalars);
+
 	/** Gets the best spacing for Rectilinear Grid probing*/
 	void GetBestSpacing(vtkRectilinearGrid* rGrid, double * bestSpacing);
 

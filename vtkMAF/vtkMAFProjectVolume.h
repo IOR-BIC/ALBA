@@ -127,12 +127,12 @@ protected:
   /** Execute the projection and fill output scalars */
   void Execute();
 
+	template<typename DataType>
+	void ProjectScalars(int * inputDims, DataType * inputScalars, DataType * projScalars);
+
 	void GenerateOutputFromID(vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars);
 
 	void GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars);
-
-	/** Gets the best spacing for Rectilinear Grid probing*/
-	void GetBestSpacing(double * bestSpacing, vtkRectilinearGrid* rGrid);
 
 	int  ProjectionMode;
 	bool ProjectSubRange;

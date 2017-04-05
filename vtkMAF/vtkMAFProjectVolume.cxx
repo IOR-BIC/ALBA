@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMAFSmartPointer.h"
 #include "vtkProbeFilter.h"
 #include "vtkDataSetWriter.h"
+#include "vtkMAFRGtoSPImageFilter.h"
 
 vtkCxxRevisionMacro(vtkMAFProjectVolume, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkMAFProjectVolume);
@@ -104,9 +105,7 @@ void vtkMAFProjectVolume::ExecuteInformation()
 //=========================================================================
 void vtkMAFProjectVolume::Execute()
 {
-	int x, y, z, inputDims[3], projectedDims[3], idx, newIdx, range[2];
-	int sliceSize, jOffset, kOffset;
-	float acc, rangeSize;
+	int inputDims[3], projectedDims[3];
 
 	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
 	vtkImageData *inputID = vtkImageData::SafeDownCast(GetInput());
@@ -115,11 +114,10 @@ void vtkMAFProjectVolume::Execute()
 
 	vtkPointData 			*inputPd = inputRG ? inputRG->GetPointData() : inputID->GetPointData();
 	vtkDataArray 			*inputScalars = inputPd->GetScalars();
-
-	vtkDataArray 			*projScalars = inputPd->GetScalars()->NewInstance();
+	vtkDataArray 			*projScalars = inputScalars->NewInstance();
 
 	inputRG ? inputRG->GetDimensions(inputDims) : inputID->GetDimensions(inputDims);
-		
+
 	switch (this->ProjectionMode) {
 		case VTK_PROJECT_FROM_X:
 			projectedDims[0] = inputDims[1];
@@ -137,29 +135,68 @@ void vtkMAFProjectVolume::Execute()
 			projectedDims[2] = 1;
 			break;
 	}
-		projScalars->SetNumberOfTuples(projectedDims[0]*projectedDims[1]);
-		
-	//
-	// Traverse input data and project points to output
-	//
-	newIdx = 0;
+	projScalars->SetNumberOfTuples(projectedDims[0] * projectedDims[1]);
+
+	void *inputPointer = inputScalars->GetVoidPointer(0);
+	void *outputPointer = projScalars->GetVoidPointer(0);
+
+	switch (inputScalars->GetDataType())
+	{
+		case VTK_CHAR:
+			ProjectScalars(inputDims, (char*)inputPointer, (char*)outputPointer);
+			break;
+		case VTK_UNSIGNED_CHAR:
+			ProjectScalars(inputDims, (unsigned char*)inputPointer, (unsigned char*)outputPointer);
+			break;
+		case VTK_SHORT:
+			ProjectScalars(inputDims, (short*)inputPointer, (short*)outputPointer);
+			break;
+		case VTK_UNSIGNED_SHORT:
+			ProjectScalars(inputDims, (unsigned short*)inputPointer, (unsigned short*)outputPointer);
+			break;
+		case VTK_FLOAT:
+			ProjectScalars(inputDims, (float*)inputPointer, (float*)outputPointer);
+			break;
+		case VTK_DOUBLE:
+			ProjectScalars(inputDims, (double*)inputPointer, (double*)outputPointer);
+		default:
+			vtkErrorMacro(<< "vtkMAFVolumeSlicer: Scalar type is not supported");
+			return;
+	}
+
+	if (inputRG)
+		GenerateOutputFromRG(inputRG, projectedDims, projScalars);
+	else
+		GenerateOutputFromID(inputID, projectedDims, projScalars);
+
+	vtkDEL(projScalars);
+}
+
+//----------------------------------------------------------------------------
+template<typename DataType>
+void vtkMAFProjectVolume::ProjectScalars(int * inputDims, DataType * inputScalars, DataType * projScalars)
+{
+	int x, y, z, idx, newIdx, range[2];
+	int sliceSize, jOffset, kOffset;
+	float acc, rangeSize;
 
 	//Set Projection Range
 	if (ProjectSubRange)
 	{
 		range[0] = MAX(ProjectionRange[0], 0);
-		range[1] = MIN(ProjectionRange[1], inputDims[ProjectionMode-1]);
+		range[1] = MIN(ProjectionRange[1], inputDims[ProjectionMode - 1]);
 		rangeSize = range[1] - range[0];
 	}
 	else
 	{
 		range[0] = 0;
-		range[1] = inputDims[ProjectionMode-1];
-		rangeSize = inputDims[ProjectionMode-1];
+		range[1] = inputDims[ProjectionMode - 1];
+		rangeSize = inputDims[ProjectionMode - 1];
 	}
 
 
 	sliceSize = inputDims[0] * inputDims[1];
+	newIdx = 0;
 
 	switch (this->ProjectionMode)
 	{
@@ -174,9 +211,10 @@ void vtkMAFProjectVolume::Execute()
 					for (x = range[0]; x < range[1]; x++)
 					{
 						idx = x + jOffset + kOffset;
-						acc+=MAX(AIR_LIMIT,inputScalars->GetTuple1(idx));
+						acc += MAX(AIR_LIMIT, inputScalars[idx]);
 					}
-					projScalars->SetTuple1(newIdx++, acc / rangeSize);
+					projScalars[newIdx] = acc / rangeSize;
+					newIdx++;
 				}
 			}
 			break;
@@ -191,9 +229,10 @@ void vtkMAFProjectVolume::Execute()
 					{
 						jOffset = y * inputDims[0];
 						idx = x + jOffset + kOffset;
-						acc+=MAX(AIR_LIMIT,inputScalars->GetTuple1(idx));
+						acc += MAX(AIR_LIMIT, inputScalars[idx]);
 					}
-					projScalars->SetTuple1(newIdx++, acc / rangeSize);
+					projScalars[newIdx] = acc / rangeSize;
+					newIdx++;
 				}
 			}
 			break;
@@ -208,20 +247,14 @@ void vtkMAFProjectVolume::Execute()
 					{
 						kOffset = z * sliceSize;
 						idx = x + jOffset + kOffset;
-						acc+=MAX(AIR_LIMIT,inputScalars->GetTuple1(idx));
+						acc += MAX(AIR_LIMIT, inputScalars[idx]);
 					}
-					projScalars->SetTuple1(newIdx++, acc / rangeSize);
+					projScalars[newIdx] = acc / rangeSize;
+					newIdx++;
 				}
 			}
 			break;
 	}
-
-	if (inputRG)
-		GenerateOutputFromRG(inputRG, projectedDims, projScalars);
-	else
-		GenerateOutputFromID(inputID, projectedDims, projScalars);
-
-	vtkDEL(projScalars);
 }
 
 //----------------------------------------------------------------------------
@@ -301,58 +334,14 @@ void vtkMAFProjectVolume::GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int
 	ZCoordinates->Delete();
 
 	rgOut->GetPointData()->SetScalars(projScalars);
-		
-	GetBestSpacing(bestSpacing, rgOut);
+	
+	
+	vtkMAFRGtoSPImageFilter *rgtosoFilter = vtkMAFRGtoSPImageFilter::New();
+	rgtosoFilter->SetInput(rgOut);
+	rgtosoFilter->Update();
+	
+	GetOutput()->DeepCopy(rgtosoFilter->GetOutput());
 
-
-	rgOut->GetBounds(bounds);
-
-	outputDims[0] = ((bounds[1] - bounds[0]) / bestSpacing[0]) + 1;
-	outputDims[1] = ((bounds[3] - bounds[2]) / bestSpacing[1]) + 1;
-	outputDims[2] = 1;
-
-	outputSpacing[0] = (bounds[1] - bounds[0]) / (double)outputDims[0];
-	outputSpacing[1] = (bounds[3] - bounds[2]) / (double)outputDims[1];
-	outputSpacing[2] = 1;
-
-	vtkStructuredPoints *SP = vtkStructuredPoints::New();
-	SP->SetDimensions(outputDims);
-	SP->SetSpacing(outputSpacing);
-	SP->SetOrigin(bounds[0], bounds[2], bounds[4]);
-
-	vtkProbeFilter *probeFilter = vtkProbeFilter::New();
-	probeFilter->SetInput(SP);
-	probeFilter->SetSource(rgOut);
-	probeFilter->Update();
-
-	GetOutput()->DeepCopy(probeFilter->GetOutput());
-
-	vtkDEL(SP);
-	vtkDEL(probeFilter);
+	vtkDEL(rgtosoFilter);
 	vtkDEL(rgOut);
 }
-
-//=========================================================================
-void vtkMAFProjectVolume::GetBestSpacing(double * bestSpacing, vtkRectilinearGrid* rGrid)
-{
-	bestSpacing[0] = VTK_DOUBLE_MAX;
-	bestSpacing[1] = VTK_DOUBLE_MAX;
-	bestSpacing[2] = VTK_DOUBLE_MAX;
-
-	for (int xi = 1; xi < rGrid->GetXCoordinates()->GetNumberOfTuples(); xi++)
-	{
-		double spcx = rGrid->GetXCoordinates()->GetTuple1(xi) - rGrid->GetXCoordinates()->GetTuple1(xi - 1);
-		if (bestSpacing[0] > spcx && spcx != 0.0)
-			bestSpacing[0] = spcx;
-	}
-
-	for (int yi = 1; yi < rGrid->GetYCoordinates()->GetNumberOfTuples(); yi++)
-	{
-		double spcy = rGrid->GetYCoordinates()->GetTuple1(yi) - rGrid->GetYCoordinates()->GetTuple1(yi - 1);
-		if (bestSpacing[1] > spcy && spcy != 0.0)
-			bestSpacing[1] = spcy;
-	}
-
-	bestSpacing[2] = 1;
-}
-

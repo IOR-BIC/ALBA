@@ -115,20 +115,14 @@ void vtkMAFVolumeOrthoSlicer::ExecuteInformation()
 //=========================================================================
 void vtkMAFVolumeOrthoSlicer::Execute()
 {
-	int x, y, z, inputDims[3], projectedDims[3], idx1, idx2, newIdx, range[2];
-	int sliceSize, jOffset1, jOffset2, kOffset1, kOffset2,plane1,plane2;
-	float acc; 
-	double ratio1, ratio2;
-
+	int inputDims[3], projectedDims[3];
 	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
 	vtkImageData *inputID = vtkImageData::SafeDownCast(GetInput());
 	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
-
-
+	
 	vtkPointData 			*inputPd = inputRG ? inputRG->GetPointData() : inputID->GetPointData();
 	vtkDataArray 			*inputScalars = inputPd->GetScalars();
-
-	vtkDataArray 			*slicedScalars = inputPd->GetScalars()->NewInstance();
+	vtkDataArray 			*slicedScalars = inputScalars->NewInstance();
 
 	inputRG ? inputRG->GetDimensions(inputDims) : inputID->GetDimensions(inputDims);
 		
@@ -151,6 +145,51 @@ void vtkMAFVolumeOrthoSlicer::Execute()
 	}
 
 	slicedScalars->SetNumberOfTuples(projectedDims[0]*projectedDims[1]);
+	void *inputPointer = inputScalars->GetVoidPointer(0);
+	void *outputPointer = slicedScalars->GetVoidPointer(0);
+
+	switch (inputScalars->GetDataType())
+	{
+		case VTK_CHAR:
+			SliceScalars(inputDims, (char*)inputPointer, (char*)outputPointer);
+			break;
+		case VTK_UNSIGNED_CHAR:
+			SliceScalars(inputDims, (unsigned char*)inputPointer, (unsigned char*)outputPointer);
+			break;
+		case VTK_SHORT:
+			SliceScalars(inputDims, (short*)inputPointer, (short*)outputPointer);
+			break;
+		case VTK_UNSIGNED_SHORT:
+			SliceScalars(inputDims, (unsigned short*)inputPointer, (unsigned short*)outputPointer);
+			break;
+		case VTK_FLOAT:
+			SliceScalars(inputDims, (float*)inputPointer, (float*)outputPointer);
+			break;
+		case VTK_DOUBLE:  //NOTE: GPU is not allowed
+			SliceScalars(inputDims, (double*)inputPointer, (double*)outputPointer);
+		default:
+			vtkErrorMacro(<< "vtkMAFVolumeSlicer: Scalar type is not supported");
+			return;
+	}
+
+	if (inputRG)
+		GenerateOutputFromRG(inputRG, projectedDims, slicedScalars);
+	else
+		GenerateOutputFromID(inputID, projectedDims, slicedScalars);
+
+	vtkDEL(slicedScalars);
+}
+
+//----------------------------------------------------------------------------
+template<typename DataType>
+void vtkMAFVolumeOrthoSlicer::SliceScalars(int *inputDims, DataType *inputScalars, DataType *slicedScalars)
+{
+	int x, y, z, idx1, idx2, newIdx, range[2];
+	int sliceSize, jOffset1, jOffset2, kOffset1, kOffset2, plane1, plane2;
+	double acc;
+	double ratio1, ratio2;
+
+
 	newIdx = 0;
 	sliceSize = inputDims[0] * inputDims[1];
 	GetSlicingInfo(&plane1, &plane2, &ratio1, &ratio2);
@@ -166,8 +205,9 @@ void vtkMAFVolumeOrthoSlicer::Execute()
 					jOffset1 = y * inputDims[0];
 					idx1 = plane1 + jOffset1 + kOffset1;
 					idx2 = plane2 + jOffset1 + kOffset1;
-					acc = inputScalars->GetTuple1(idx1)*ratio1 + inputScalars->GetTuple1(idx2)*ratio2;
-					slicedScalars->SetTuple1(newIdx++, acc);
+					acc = inputScalars[idx1]*ratio1 + inputScalars[idx2]*ratio2;
+					slicedScalars[newIdx] = acc;
+					newIdx++;
 				}
 			}
 			break;
@@ -181,8 +221,9 @@ void vtkMAFVolumeOrthoSlicer::Execute()
 				{
 					idx1 = x + jOffset1 + kOffset1;
 					idx2 = x + jOffset2 + kOffset1;
-					acc = inputScalars->GetTuple1(idx1)*ratio1 + inputScalars->GetTuple1(idx2)*ratio2;
-					slicedScalars->SetTuple1(newIdx++, acc);
+					acc = inputScalars[idx1]*ratio1 + inputScalars[idx2]*ratio2;
+					slicedScalars[newIdx] = acc;
+					newIdx++;
 				}
 			}
 			break;
@@ -196,19 +237,13 @@ void vtkMAFVolumeOrthoSlicer::Execute()
 				{
 					idx1 = x + jOffset1 + kOffset2;
 					idx2 = x + jOffset1 + kOffset2;
-					acc = inputScalars->GetTuple1(idx1)*ratio1 + inputScalars->GetTuple1(idx2)*ratio2;
-					slicedScalars->SetTuple1(newIdx++, acc);
+					acc = inputScalars[idx1]*ratio1 + inputScalars[idx2]*ratio2;
+					slicedScalars[newIdx] = acc;
+					newIdx++;
 				}
 			}
 			break;
 	}
-
-	if (inputRG)
-		GenerateOutputFromRG(inputRG, projectedDims, slicedScalars);
-	else
-		GenerateOutputFromID(inputID, projectedDims, slicedScalars);
-
-	vtkDEL(slicedScalars);
 }
 
 //----------------------------------------------------------------------------
@@ -288,8 +323,7 @@ void vtkMAFVolumeOrthoSlicer::GenerateOutputFromRG(vtkRectilinearGrid * inputRG,
 	ZCoordinates->Delete();
 
 	rgOut->GetPointData()->SetScalars(projScalars);
-		
-	GetBestSpacing(bestSpacing, rgOut);
+	
 	
 	vtkMAFRGtoSPImageFilter *rgtosoFilter = vtkMAFRGtoSPImageFilter::New();
 	rgtosoFilter->SetInput(rgOut);
@@ -299,30 +333,6 @@ void vtkMAFVolumeOrthoSlicer::GenerateOutputFromRG(vtkRectilinearGrid * inputRG,
 
 	vtkDEL(rgtosoFilter);
 	vtkDEL(rgOut);
-}
-
-//=========================================================================
-void vtkMAFVolumeOrthoSlicer::GetBestSpacing(double * bestSpacing, vtkRectilinearGrid* rGrid)
-{
-	bestSpacing[0] = VTK_DOUBLE_MAX;
-	bestSpacing[1] = VTK_DOUBLE_MAX;
-	bestSpacing[2] = VTK_DOUBLE_MAX;
-
-	for (int xi = 1; xi < rGrid->GetXCoordinates()->GetNumberOfTuples(); xi++)
-	{
-		double spcx = rGrid->GetXCoordinates()->GetTuple1(xi) - rGrid->GetXCoordinates()->GetTuple1(xi - 1);
-		if (bestSpacing[0] > spcx && spcx != 0.0)
-			bestSpacing[0] = spcx;
-	}
-
-	for (int yi = 1; yi < rGrid->GetYCoordinates()->GetNumberOfTuples(); yi++)
-	{
-		double spcy = rGrid->GetYCoordinates()->GetTuple1(yi) - rGrid->GetYCoordinates()->GetTuple1(yi - 1);
-		if (bestSpacing[1] > spcy && spcy != 0.0)
-			bestSpacing[1] = spcy;
-	}
-
-	bestSpacing[2] = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -388,14 +398,15 @@ void vtkMAFVolumeOrthoSlicer::GetSlicingInfo(int* plane1, int* plane2, double* r
 				break;
 		}
 		int nCoordinates = coordinates->GetNumberOfTuples();
+		double *coordPointer = (double *) coordinates->GetVoidPointer(0);
 		double n0, n1;
 		double l, r;
-		n1 = coordinates->GetTuple1(0);
+		n1 = coordPointer[0];
 		for (int i = 1; i < nCoordinates; i++)
 		{
 			//n0 was last n1
 			n0 = n1;
-			n1 = coordinates->GetTuple1(i);
+			n1 = coordPointer[i];
 
 			l = MIN(n0, n1);
 			r = MAX(n0, n1);

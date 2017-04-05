@@ -100,9 +100,7 @@ void vtkMAFRGtoSPImageFilter::ExecuteInformation()
 //=========================================================================
 void vtkMAFRGtoSPImageFilter::Execute()
 {
-	int outDims[3], inDims[3], x, y,xRG,yRG, yOffset, yRGoffsetA, yRGoffsetB,newIdx;
-	double spacing[3], bounds[6], yRatioA,yRatioB,xRatioA,xRatioB,ySize, xSize, yPos, xPos, yCoordA, yCoordB, xCoordA, xCoordB, acc1, acc2, acc;
-
+	int outDims[3];
 	vtkRectilinearGrid *input = vtkRectilinearGrid::SafeDownCast(GetInput());
 	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
 
@@ -110,36 +108,76 @@ void vtkMAFRGtoSPImageFilter::Execute()
 	vtkDataArray 			*inputScalars = inputPd->GetScalars();
 	vtkDataArray 			*outScalars = inputPd->GetScalars()->NewInstance();
 
-	vtkDataArray 			*xCoordinates, *yCoordinates;
-	
-	xCoordinates = input->GetXCoordinates();
-	yCoordinates = input->GetYCoordinates();
-	input->GetBounds(bounds);
-
 	output->SetExtent(output->GetWholeExtent());
 
 	output->GetDimensions(outDims);
+	outScalars->SetNumberOfTuples(outDims[0] * outDims[1]);
+
+	void *inputPointer = inputScalars->GetVoidPointer(0);
+	void *outputPointer = outScalars->GetVoidPointer(0);
+
+	switch (inputScalars->GetDataType())
+	{
+		case VTK_CHAR:
+			FillSP(input, output, (char*) inputPointer, (char*) outputPointer);
+			break;
+		case VTK_UNSIGNED_CHAR:
+			FillSP(input, output, (unsigned char*)inputPointer, (unsigned char*)outputPointer);
+			break;
+		case VTK_SHORT:
+			FillSP(input, output, (short*)inputPointer, (short*)outputPointer);
+			break;
+		case VTK_UNSIGNED_SHORT:
+			FillSP(input, output, (unsigned short*)inputPointer, (unsigned short*)outputPointer);
+			break;
+		case VTK_FLOAT:
+			FillSP(input, output, (float*)inputPointer, (float*)outputPointer);
+			break;
+		case VTK_DOUBLE:  //NOTE: GPU is not allowed
+			FillSP(input, output, (double*)inputPointer, (double*)outputPointer);
+		default:
+			vtkErrorMacro(<< "vtkMAFVolumeSlicer: Scalar type is not supported");
+			return;
+	}
+	output->GetPointData()->SetScalars(outScalars);
+	vtkDEL(outScalars);
+}
+
+//----------------------------------------------------------------------------
+template<typename DataType>
+void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * output, DataType *inputScalars, DataType *outScalars)
+{
+	int outDims[3], inDims[3], x, y, xRG, yRG, yOffset, yRGoffsetA, yRGoffsetB, newIdx;
+	double spacing[3], bounds[6], yRatioA, yRatioB, xRatioA, xRatioB, ySize, xSize, yPos, xPos, yCoordA, yCoordB, xCoordA, xCoordB, acc1, acc2, acc;
+	vtkDataArray 			*xCoordinates, *yCoordinates;
+
+	xCoordinates = input->GetXCoordinates();
+	yCoordinates = input->GetYCoordinates();
+	double *xCoordPointer = (double *)xCoordinates->GetVoidPointer(0);
+	double *yCoordPointer = (double *)yCoordinates->GetVoidPointer(0);
+
+	input->GetBounds(bounds);
+	output->GetDimensions(outDims);
 	input->GetDimensions(inDims);
 	output->GetSpacing(spacing);
-	
-	outScalars->SetNumberOfTuples(outDims[0]*outDims[1]);
+
 	newIdx = 0;
-	
+
 	yRG = 0;
-	yCoordA = yCoordinates->GetTuple1(yRG);
-	yCoordB = yCoordinates->GetTuple1(yRG+1);
+	yCoordA = yCoordPointer[yRG];
+	yCoordB = yCoordPointer[yRG + 1];
 	yRGoffsetA = 0;
 	yRGoffsetB = inDims[0];
 	ySize = yCoordB - yCoordA;
 	for (y = 0; y < outDims[1]; y++)
 	{
 		yPos = bounds[2] + y*spacing[1];
-		
+
 		if (yPos >= yCoordB)
 		{
 			yRG++;
 			yCoordA = yCoordB;
-			yCoordB = yCoordinates->GetTuple1(yRG + 1);
+			yCoordB = yCoordPointer[yRG + 1];
 
 			yRGoffsetA = yRG * inDims[0];
 			yRGoffsetB = (yRG + 1) * inDims[0];
@@ -147,15 +185,15 @@ void vtkMAFRGtoSPImageFilter::Execute()
 		}
 
 		yOffset = y * outDims[0];
-		
+
 		//Avoid problems on slicing volumes with doublied slices
-		yRatioB = (ySize!=0) ? (yPos - yCoordA) / ySize : 1;
+		yRatioB = (ySize != 0) ? (yPos - yCoordA) / ySize : 1;
 		yRatioA = 1.0 - yRatioB;
 
 
 		xRG = 0;
-		xCoordA = xCoordinates->GetTuple1(xRG);
-		xCoordB = xCoordinates->GetTuple1(xRG + 1);
+		xCoordA = xCoordPointer[xRG];
+		xCoordB = xCoordPointer[xRG + 1];
 		xSize = xCoordB - xCoordA;
 		for (x = 0; x < outDims[0]; x++)
 		{
@@ -165,29 +203,26 @@ void vtkMAFRGtoSPImageFilter::Execute()
 			{
 				xRG++;
 				xCoordA = xCoordB;
-				xCoordB = xCoordinates->GetTuple1(xRG + 1);
+				xCoordB = xCoordPointer[xRG + 1];
 				xSize = xCoordB - xCoordA;
 			}
 
-			//Avoid problems on slicing volumes with doublied slices
-			xRatioB = (xSize!=0) ? (xPos - xCoordA) / xSize : 1;
+			//Avoid problems on slicing volumes with duplicated slices
+			xRatioB = (xSize != 0) ? (xPos - xCoordA) / xSize : 1;
 			xRatioA = 1.0 - xRatioB;
 
-			acc1 = inputScalars->GetTuple1(xRG + yRGoffsetA)*xRatioA;
-			acc1 += inputScalars->GetTuple1(xRG+ 1 + yRGoffsetA)*xRatioB;
+			acc1 = inputScalars[xRG + yRGoffsetA]*xRatioA;
+			acc1 += inputScalars[xRG + 1 + yRGoffsetA]*xRatioB;
 
-			acc2 = inputScalars->GetTuple1(xRG + yRGoffsetB)*xRatioA;
-			acc2 += inputScalars->GetTuple1(xRG + 1 + yRGoffsetB)*xRatioB;
+			acc2 = inputScalars[xRG + yRGoffsetB]*xRatioA;
+			acc2 += inputScalars[xRG + 1 + yRGoffsetB]*xRatioB;
 
 			acc = acc1*yRatioA + acc2*yRatioB;
-			
-			outScalars->SetTuple1(newIdx, acc);
+
+			outScalars[newIdx]= acc;
 			newIdx++;
 		}
 	}
-
-	output->GetPointData()->SetScalars(outScalars);
-	vtkDEL(outScalars);
 }
 
 //=========================================================================
