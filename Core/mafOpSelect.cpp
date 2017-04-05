@@ -40,6 +40,9 @@ static	mafVME *glo_SelectionParent=NULL;
 //////////////////
 // mafOpSelect ://
 //////////////////
+
+mafCxxTypeMacro(mafOpSelect);
+
 //----------------------------------------------------------------------------
 mafOpSelect::mafOpSelect(wxString label) 
 //----------------------------------------------------------------------------
