@@ -65,9 +65,7 @@ vtkMAFVolumeSlicer::vtkMAFVolumeSlicer()
 
   TransformSlice = NULL;
 
-  this->Window = 1.f;
-  this->Level  = 0.5f;
-
+ 
   this->AutoSpacing = 1;    //Autospacing is enabled by the default
   this->LastGPUEnabled = this->GPUEnabled = 1;     //GPU is enabled by the default
 

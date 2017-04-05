@@ -73,7 +73,8 @@
 #include "mafPipeMeshSlice.h"
 #include "mafPipePolylineSlice.h"
 #include "mafPipeSurfaceSlice.h"
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeVolumeArbSlice.h"
+#include "mafPipeVolumeOrthoSlice.h"
 #include "mafPipeCompoundVolume.h"
 #include "mafPipeCompoundVolumeFixedScalars.h"
 #include "mafPipeVectorFieldGlyphs.h"
@@ -196,10 +197,11 @@ mafPipeFactoryVME::mafPipeFactoryVME()
   mafPlugPipeMacro(mafPipeVolumeSliceBlend, "Pipe for rendering volume with 2 slices with opacity.");
   mafPlugPipeMacro(mafVisualPipeCollisionDetection, "Pipe for visualization of collision between 2 surfaces.");
 
-  mafPlugPipeMacro(mafPipeVolumeSlice, "BES: mafPipeVolumeSlice.");
-  mafPlugPipeMacro(mafPipeSurfaceSlice, "BES: mafPipeSurfaceSlice.");
-  mafPlugPipeMacro(mafPipePolylineSlice, "BES: mafPipePolylineSlice.");
-  mafPlugPipeMacro(mafPipeMeshSlice, "BES: mafPipeMeshSlice.");
+	mafPlugPipeMacro(mafPipeVolumeArbSlice, "mafPipeVolumeArbSlice.");
+	mafPlugPipeMacro(mafPipeVolumeOrthoSlice, "mafPipeVolumeOrthoSlice.");
+	mafPlugPipeMacro(mafPipeSurfaceSlice, "mafPipeSurfaceSlice.");
+  mafPlugPipeMacro(mafPipePolylineSlice, "mafPipePolylineSlice.");
+  mafPlugPipeMacro(mafPipeMeshSlice, "mafPipeMeshSlice.");
 
   mafPlugPipeMacro(mafPipeVolumeSliceNotInterpolated, "Pipe for not interpolated and not resampled volume visualization");   
 

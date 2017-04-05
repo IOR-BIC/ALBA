@@ -97,18 +97,16 @@ void mafWizardWaitOp::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
     case wxOK:
-      {
-        //exit operation
-        HideGui();
-        mafEventMacro(mafEvent(this,OP_RUN_OK));
-      }
+		{
+			//exit operation
+			OpStop(OP_RUN_OK);
+		}
     break;
     case wxCANCEL:
-      {
-        //exit operation
-        HideGui();
-        mafEventMacro(mafEvent(this,OP_RUN_CANCEL));
-      }
+		{
+			//exit operation
+			OpStop(OP_RUN_CANCEL);
+		}
     break;
     default:
       mafEventMacro(*e);

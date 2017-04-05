@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipeVolumeSlice
+ Module: mafPipeVolumeArbSlice
  Authors: Paolo Quadrani
  
  Copyright (c) B3C
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __mafPipeVolumeSlice_H__B
-#define __mafPipeVolumeSlice_H__B
+#ifndef __mafPipeVolumeArbSlice_H__B
+#define __mafPipeVolumeArbSlice_H__B
 
 //----------------------------------------------------------------------------
 // Include:
@@ -43,21 +43,21 @@ class mafVMEOutputVolume;
 
 
 /** 
-class name: mafPipeVolumeSlice
+class name: mafPipeVolumeArbSlice
   This visual pipe allows to represent a volume data as a slice according to the 
   position of a plane representing the cutter. The default position of the slice is the center 
   of the volume data. The visual pipe can also render 3 different slices centered in a origin point
   and oriented along 3 different axes.
 */
-class MAF_EXPORT mafPipeVolumeSlice : public mafPipeSlice
+class MAF_EXPORT mafPipeVolumeArbSlice : public mafPipeSlice
 {
 public:
   /** RTTI Macro */
-  mafTypeMacro(mafPipeVolumeSlice,mafPipeSlice);
+  mafTypeMacro(mafPipeVolumeArbSlice,mafPipeSlice);
   /** Constructor */
-	  mafPipeVolumeSlice();
+	  mafPipeVolumeArbSlice();
   /** Destructor */
-  virtual ~mafPipeVolumeSlice();
+  virtual ~mafPipeVolumeArbSlice();
 	
   /** process events coming from Gui */
   virtual void OnEvent(mafEventBase *maf_event);
@@ -66,9 +66,6 @@ public:
   enum PIPE_VOLUME_SLICE_WIDGET_ID
   {
     ID_LUT_CHOOSER = Superclass::ID_LAST,
-    ID_SLICE_SLIDER_X,
-    ID_SLICE_SLIDER_Y,
-    ID_SLICE_SLIDER_Z,
 		ID_OPACITY_SLIDER,
     ID_ENABLE_GPU,
     ID_ENABLE_TRILINEAR_INTERPOLATION,
@@ -83,14 +80,15 @@ public:
     SLICE_ORTHO,
     SLICE_ARB
   };
+
   /** Initialize the slicing parameter to show the volume box and cut direction.*/
-  void InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds=false, bool interpolate=true);
+  void InitializeSliceParameters(bool show_vol_bbox, bool show_bounds=false, bool interpolate=true);
 
   /** Initialize the slicing parameter to show the volume box, cut direction and the cut origin.*/
-  void InitializeSliceParameters(int direction, double slice_origin[3], bool show_vol_bbox,bool show_bounds=false, bool interpolate=true);
+  void InitializeSliceParameters(double slice_origin[3], bool show_vol_bbox,bool show_bounds=false, bool interpolate=true);
 
   /** Initialize the slicing parameter to show the volume box, cut origin and orientation.*/
-  void InitializeSliceParameters(int direction, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox,bool show_bounds=false, bool interpolate=true);
+  void InitializeSliceParameters( double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox,bool show_bounds=false, bool interpolate=true);
   
   /** Create the VTK rendering pipeline*/
   virtual void Create(mafSceneNode *n);
@@ -132,13 +130,7 @@ public:
   /** Hide ticks in the rendering window */
 	void ShowTICKsOff();
 
-  /** Hide slider  */
-	void HideSlider();
-  /** Show slider */
-	void ShowSlider();
-
-  /* Added by Losi 12.02.2009
-  This methods are added to allow views access m_EnableGPU member of mafPipeVolumeSlice:
+  /* This methods are added to allow views access m_EnableGPU member of mafPipeVolumeArbSlice:
   This is done in order to change the location of the enable GPU flag check box from the visual props panel to the view panel.
   An alternative, and less invasive, way to do this is to implement a GetGUI method. But this method generate duplicate check boxes in compound views.
   */
@@ -160,7 +152,7 @@ public:
 
 protected:
 	/** Create the slicer pipeline. */
-	void CreateSlice(int direction);
+	void CreateSlice();
 
   /** Create all ticks */
 	void CreateTICKs();
@@ -172,30 +164,29 @@ protected:
   void UpdateSlice();
 
 protected:		
-	float		m_XVector[3][3]; ///< X Vector director of the cutting plane
-	float		m_YVector[3][3]; ///< Y Vector director of the cutting plane
-  float		m_NormalVector[3][3]; ///< Normal vectors defining the cutting plane orientation
+	float		m_XVector[3]; ///< X Vector director of the cutting plane
+	float		m_YVector[3]; ///< Y Vector director of the cutting plane
+  float		m_NormalVector[3]; ///< Normal vector defining the cutting plane orientation
   double  m_SliceOpacity; ///< Opacity of he volume slice.
 
 	int		 m_TextureRes; ///< Texture resolution used to render the volume slice
-	int		 m_SliceDirection; ///< Store the slicing direction: SLICE_X, SLICE_Y or SLICE_)
-  
+	
   int m_EnableGPU;  ///<Non-zero, if the GPU support for slicing is used (default)
 
-  mafGUIFloatSlider *m_SliceSlider[3]; ///< Sliders used to move the cutting plane along the normals
   vtkMAFAssembly *m_AssemblyUsed;
-
   mafVMEOutputVolume *m_VolumeOutput;
 
-  vtkMAFVolumeSlicer				 *m_SlicerImage[3];
-	vtkMAFVolumeSlicer				 *m_SlicerPolygonal[3];
-	vtkImageData					 *m_Image[3];
-	vtkTexture						 *m_Texture[3];
+  vtkMAFVolumeSlicer				 *m_SlicerImage;
+	vtkMAFVolumeSlicer				 *m_SlicerPolygonal;
+	vtkImageData					 *m_Image;
+	vtkTexture						 *m_Texture;
+	int		 m_SliceDirection; ///< Store the slicing direction: SLICE_X, SLICE_Y or SLICE_)
+
   vtkLookupTable         *m_ColorLUT;
   vtkLookupTable         *m_CustomColorLUT;
-  vtkPolyDataMapper			 *m_SliceMapper[3];
-	vtkPolyData						 *m_SlicePolydata[3];
-  vtkActor               *m_SliceActor[3];
+  vtkPolyDataMapper			 *m_SliceMapper;
+	vtkPolyData						 *m_SlicePolydata;
+  vtkActor               *m_SliceActor;
 	
   vtkActor               *m_VolumeBoxActor;
 	vtkActor							 *m_TickActor;
@@ -209,9 +200,8 @@ protected:
   bool                    m_SliceParametersInitialized;
   bool                    m_ShowVolumeBox;
 	bool										m_ShowBounds;
-	bool										m_ShowSlider;
 	bool										m_ShowTICKs;
   bool                    m_Interpolate;
   int m_TrilinearInterpolationOn; //<define if tri-linear interpolation is performed or not on slice's texture
 };
-#endif // __mafPipeVolumeSlice_H__B
+#endif // __mafPipeVolumeArbSlice_H__B

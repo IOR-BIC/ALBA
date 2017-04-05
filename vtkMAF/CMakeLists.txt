@@ -30,8 +30,7 @@ SET(vtkMAF_SRCS
   vtkMAFAdaptiveVolumeMapper.cxx  						vtkMAFAdaptiveVolumeMapper.h
   vtkMAFImageMapToWidgetColors.cxx  					vtkMAFImageMapToWidgetColors.h
   vtkMAFPolyDataSingleSourceShortestPath.cxx  			vtkMAFPolyDataSingleSourceShortestPath.h
-  vtkMAFProjectRG.cxx  									vtkMAFProjectRG.h
-  vtkMAFProjectSP.cxx  									vtkMAFProjectSP.h
+  vtkMAFProjectVolume.cxx  									vtkMAFProjectVolume.h
   vtkMAFRayCast3DPicker.cxx  							vtkMAFRayCast3DPicker.h
   vtkMAFRectilinearGridToRectilinearGridFilter.cxx  	vtkMAFRectilinearGridToRectilinearGridFilter.h
   vtkMAFRGSliceAccumulate.cxx  							vtkMAFRGSliceAccumulate.h
@@ -83,7 +82,9 @@ SET(vtkMAF_SRCS
   vtkMAFVolumeRayCastMapper.cxx  						vtkMAFVolumeRayCastMapper.h
   vtkMAFVolumeTextureMapper2D.cxx  						vtkMAFVolumeTextureMapper2D.h
   vtkMAFVolumeSlicer.cxx  								vtkMAFVolumeSlicer.h
+	vtkMAFVolumeOrthoSlicer.cxx 			vtkMAFVolumeOrthoSlicer.h
   vtkMAFMeshCutter.cxx   								vtkMAFMeshCutter.h  	
+	vtkMAFRGtoSPImageFilter.cxx					vtkMAFRGtoSPImageFilter.h
   ###############################################
   
   ###############################################

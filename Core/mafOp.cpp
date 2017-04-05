@@ -113,6 +113,8 @@ void mafOp::OpRun()
 void mafOp::OpDo()
 //----------------------------------------------------------------------------
 {
+	mafLogMessage("Op Do :%s", m_Label.c_str());
+
   if (m_Output)
   {
     m_Output->ReparentTo(m_Input);
@@ -232,6 +234,7 @@ void mafOp::SetMouse(mafDeviceButtonsPadMouse *mouse)
 void mafOp::OpStop(int result)
 //----------------------------------------------------------------------------
 {
+	mafLogMessage("Stopping Op :%s", m_Label.c_str());
   HideGui();
   mafEventMacro(mafEvent(this,result));        
 }

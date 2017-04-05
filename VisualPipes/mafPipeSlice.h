@@ -10,7 +10,7 @@
   See the COPYINGS file for license details 
   =========================================================================
   This is a base class for all pipes that slices some VMEs
-  (such as mafPipeMeshSlice, mafPipeVolumeSlice, etc.)
+  (such as mafPipeMeshSlice, mafPipeVolumeOrthoSlice, etc.)
   Here should go everything common to more pipes!
   =========================================================================
 */

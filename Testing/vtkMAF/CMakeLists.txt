@@ -29,8 +29,7 @@ SET(PROJECT_SRCS
 	vtkMAFTextActorMeterTest.h vtkMAFTextActorMeterTest.cpp
 	vtkMAFCellsFilterTest.h vtkMAFCellsFilterTest.cpp
 	vtkMAFGridActorTest.h vtkMAFGridActorTest.cpp
-	vtkMAFProjectSPTest.h vtkMAFProjectSPTest.cpp
-	vtkMAFProjectRGTest.h vtkMAFProjectRGTest.cpp
+	vtkMAFProjectVolumeTest.h vtkMAFProjectVolumeTest.cpp
 	vtkMAFClipSurfaceBoundingBoxTest.h vtkMAFClipSurfaceBoundingBoxTest.cpp
 	vtkMAFRGSliceAccumulateTest.h vtkMAFRGSliceAccumulateTest.cpp
 	vtkMAFRectilinearGridToRectilinearGridFilterTest.h vtkMAFRectilinearGridToRectilinearGridFilterTest.cpp

@@ -43,8 +43,7 @@
 #include "vtkTexture.h"
 #include "vtkProbeFilter.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkMAFProjectSP.h"
-#include "vtkMAFProjectRG.h"
+#include "vtkMAFProjectVolume.h"
 #include "vtkProperty.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
@@ -61,8 +60,7 @@ mafPipeVolumeProjected::mafPipeVolumeProjected()
 {
   m_CamPosition = CAMERA_RX_FRONT;
 
-	m_SPProjFilter = NULL;
-	m_RGProjFilter = NULL;
+	m_ProjectFilter = NULL;
 	m_ProjectionRange[0] = m_ProjectionRange[1] = 0;
 	m_RangeProjectionEnabled = false;
 	m_VolumeBoxActor = NULL;
@@ -100,6 +98,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
   double range[2]; // used with lut
 	double bounds[6];
   vtk_data->GetBounds(bounds);
+	
 
 	double xmin, xmax, ymin, ymax, zmin, zmax;
 	xmin = bounds[0];
@@ -137,69 +136,26 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	RXTexture->SetInterpolate(1);
 	RXTexture->SetMapColorScalarsThroughLookupTable(1);
 
-	if (vtk_data->IsA("vtkImageData")) //BES: 4.11.2008 - vtkStructuredPoints are derived from vtkImageData
+	m_ProjectFilter = vtkMAFProjectVolume::New();
+
+	if (vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(vtk_data))
 	{
-		m_SPProjFilter = vtkMAFProjectSP::New();
-			m_SPProjFilter->SetInput(((vtkImageData *)vtk_data)); //BES: 4.11.2008
-		if (m_CamPosition == CAMERA_RX_FRONT )
-			m_SPProjFilter->SetProjectionModeToY();
-		else
-			m_SPProjFilter->SetProjectionModeToX();
-		m_SPProjFilter->SetProjectSubRange(m_RangeProjectionEnabled);
-		m_SPProjFilter->SetProjectionRange(m_ProjectionRange);
-		m_SPProjFilter->Update();
-
-		m_SPProjFilter->GetOutput()->GetScalarRange(range);
-		RXTexture->SetInput(m_SPProjFilter->GetOutput());
+		int dims[3];
+		rg->GetDimensions(dims);
+		dims[0]=0;
 	}
-	else if (vtk_data->IsA("vtkRectilinearGrid"))
-	{
-		m_RGProjFilter = vtkMAFProjectRG::New();
-		vtkRectilinearGrid* rGrid = vtkRectilinearGrid::SafeDownCast(vtk_data);
-		m_RGProjFilter->SetInput(rGrid);
-		vtkStructuredPoints *SP = vtkStructuredPoints::New();
-		if (m_CamPosition == CAMERA_RX_FRONT)
-			m_RGProjFilter->SetProjectionModeToY();
-		else
-			m_RGProjFilter->SetProjectionModeToX();
-		m_RGProjFilter->SetProjectSubRange(m_RangeProjectionEnabled);
-		m_RGProjFilter->SetProjectionRange(m_ProjectionRange);
-		m_RGProjFilter->Update();
 
-		double bestSpacing[3];
-		GetBestSpacing(bestSpacing, rGrid);
-		double outputSpacing[2];
-
-		if (m_CamPosition == CAMERA_RX_FRONT)
-		{
-			outputSpacing[0] = bestSpacing[0];
-			outputSpacing[1] = bestSpacing[2];
-		}
-		else
-		{
-			outputSpacing[0] = bestSpacing[1];
-			outputSpacing[1] = bestSpacing[2];
-		}
-
-		double b[6];
-		m_RGProjFilter->GetOutput()->GetBounds(b);
-
-		SP->SetOrigin(b[0],b[2],b[4]);
-		SP->SetDimensions(((b[1]-b[0])/outputSpacing[0])+1, ((b[3]-b[2])/outputSpacing[1])+1, 1);
-		SP->SetSpacing(outputSpacing[0], outputSpacing[1], 1);
-  
-		vtkProbeFilter *pf = vtkProbeFilter::New();
-		pf->SetInput(SP);
-		pf->SetSource(m_RGProjFilter->GetOutput());
-		pf->Update();
-		((vtkImageData* )pf->GetOutput())->GetScalarRange(range);
-		RXTexture->SetInput( (vtkImageData* )pf->GetOutput() );
-
-		double *tmp = SP->GetBounds();
-
-		SP->Delete();
-		pf->Delete();
-	}
+	m_ProjectFilter->SetInput(vtk_data); 
+	if (m_CamPosition == CAMERA_RX_FRONT )
+			m_ProjectFilter->SetProjectionModeToY();
+	else
+			m_ProjectFilter->SetProjectionModeToX();
+	m_ProjectFilter->SetProjectSubRange(m_RangeProjectionEnabled);
+	m_ProjectFilter->SetProjectionRange(m_ProjectionRange);
+	m_ProjectFilter->Update();
+	
+	m_ProjectFilter->GetOutput()->GetScalarRange(range);
+	RXTexture->SetInput((vtkImageData*)m_ProjectFilter->GetOutput());
 
 	m_Lut->SetTableRange(range[0], range[1]);
 	m_Lut->SetWindow(range[1] - range[0]);
@@ -331,41 +287,12 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	vtkDEL(TickProperty);
 }
 
-//----------------------------------------------------------------------------
-void mafPipeVolumeProjected::GetBestSpacing(double * bestSpacing, vtkRectilinearGrid* rGrid)
-{
-	bestSpacing[0] = VTK_DOUBLE_MAX;
-	bestSpacing[1] = VTK_DOUBLE_MAX;
-	bestSpacing[2] = VTK_DOUBLE_MAX;
-
-	for (int xi = 1; xi < rGrid->GetXCoordinates()->GetNumberOfTuples(); xi++)
-	{
-		double spcx = rGrid->GetXCoordinates()->GetTuple1(xi) - rGrid->GetXCoordinates()->GetTuple1(xi - 1);
-		if (bestSpacing[0] > spcx && spcx != 0.0)
-			bestSpacing[0] = spcx;
-	}
-
-	for (int yi = 1; yi < rGrid->GetYCoordinates()->GetNumberOfTuples(); yi++)
-	{
-		double spcy = rGrid->GetYCoordinates()->GetTuple1(yi) - rGrid->GetYCoordinates()->GetTuple1(yi - 1);
-		if (bestSpacing[1] > spcy && spcy != 0.0)
-			bestSpacing[1] = spcy;
-	}
-
-	for (int zi = 1; zi < rGrid->GetZCoordinates()->GetNumberOfTuples(); zi++)
-	{
-		double spcz = rGrid->GetZCoordinates()->GetTuple1(zi) - rGrid->GetZCoordinates()->GetTuple1(zi - 1);
-		if (bestSpacing[2] > spcz && spcz != 0.0)
-			bestSpacing[2] = spcz;
-	}
-}
 
 //----------------------------------------------------------------------------
 mafPipeVolumeProjected::~mafPipeVolumeProjected()
 //----------------------------------------------------------------------------
 {
-	vtkDEL(m_SPProjFilter);
-	vtkDEL(m_RGProjFilter);
+	vtkDEL(m_ProjectFilter);
 
 	if(m_VolumeBoxActor)
     m_UsedAssembly->RemovePart(m_VolumeBoxActor);
@@ -413,10 +340,8 @@ void mafPipeVolumeProjected::EnableRangeProjection(bool enabled)
 		return;
 
 	m_RangeProjectionEnabled = enabled;
-	if (m_SPProjFilter)
-		m_SPProjFilter->SetProjectSubRange(enabled);
-	else if(m_RGProjFilter)
-		m_RGProjFilter->SetProjectSubRange(enabled);
+	if(m_ProjectFilter)
+		m_ProjectFilter->SetProjectSubRange(enabled);
 
 	GetLogicManager()->CameraUpdate();
 }
@@ -426,10 +351,9 @@ void mafPipeVolumeProjected::SetProjectionRange(int range[2])
 {
 	m_ProjectionRange[0] = range[0];
 	m_ProjectionRange[1] = range[1];
-	if (m_SPProjFilter)
-		m_SPProjFilter->SetProjectionRange(range);
-	else if (m_RGProjFilter)
-		m_RGProjFilter->SetProjectionRange(range);
+
+	if(m_ProjectFilter)
+		m_ProjectFilter->SetProjectionRange(range);
 
 	if(m_RangeProjectionEnabled)
 		GetLogicManager()->CameraUpdate();
