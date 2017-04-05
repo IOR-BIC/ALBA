@@ -92,6 +92,7 @@
 #include "vtkPointData.h"
 #include "vtkDataSetAttributes.h"
 #include "mafSnapshotManager.h"
+#include "mafOpSelect.h"
 
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
@@ -685,10 +686,10 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			break;
 			case OP_RUN_TERMINATED:
 			{
-				//if the operation was started from the wizard we continue the wizard execution
 				if (m_WizardManager && m_WizardRunning)
 				{
-					m_WizardManager->WizardContinue(e->GetArg());
+					if (!mafOpSelect::SafeDownCast(m_OpManager->GetRunningOperation()))
+						m_WizardManager->WizardContinue(e->GetArg());
 				}
 				//else we manage the operation end by unlock the close button and so on
 				else
@@ -1054,7 +1055,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				m_CancelledBeforeOpStarting = true;
 				UpdateFrameTitle();
 				m_OpManager->OpRun(OP_DELETE);
-				m_WizardManager->WizardContinue(true);
 			}
 			break;
 			case WIZARD_OP_NEW:

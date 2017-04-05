@@ -37,6 +37,8 @@ template class MAF_EXPORT mafAutoPointer<mafVME>;
 class MAF_EXPORT mafOpSelect: public mafOp
 {
 public:
+		mafTypeMacro(mafOpSelect, mafOp);
+
     /** Constructor. */
     mafOpSelect(wxString label=_("Select"));
     /** Destructor. */
