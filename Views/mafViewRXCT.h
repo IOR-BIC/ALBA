@@ -81,7 +81,6 @@ public:
     ID_BORDER_CHANGE,
     ID_ALL_SURFACE,
     ID_RESET_SLICES,
-    ID_ENABLE_GPU,
     ID_TRILINEAR_INTERPOLATION,
     ID_LAST
   };
@@ -180,7 +179,6 @@ protected:
   mafGUILutSwatch    *m_LutWidget;
 
   // Added by Losi 11.25.2009
-  int m_EnableGPU; ///<Non-zero, if the GPU support for slicing is used (default)
   int m_TrilinearInterpolationOn;
 };
 #endif

@@ -35,7 +35,7 @@
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "mafVMEVolumeGray.h"
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeVolumeOrthoSlice.h"
 #include "mafPipeFactory.h"
 #include "mafPipe.h"
 #include "mafRWI.h"
@@ -177,19 +177,16 @@ void mafViewSliceBlend::VmeCreatePipe(mafVME *vme)
         switch(m_CameraPositionId)
         {
         case CAMERA_OS_X:
-          slice_mode = mafPipeVolumeSlice::SLICE_X;
+          slice_mode = mafPipeVolumeOrthoSlice::SLICE_X;
           break;
         case CAMERA_OS_Y:
-          slice_mode = mafPipeVolumeSlice::SLICE_Y;
+          slice_mode = mafPipeVolumeOrthoSlice::SLICE_Y;
           break;
         case CAMERA_OS_P:
-          slice_mode = mafPipeVolumeSlice::SLICE_ORTHO;
-          break;
-        case CAMERA_PERSPECTIVE:
-          slice_mode = mafPipeVolumeSlice::SLICE_ARB;
+          slice_mode = mafPipeVolumeOrthoSlice::SLICE_ORTHO;
           break;
         default:
-          slice_mode = mafPipeVolumeSlice::SLICE_Z;
+          slice_mode = mafPipeVolumeOrthoSlice::SLICE_Z;
         }
         //check if slices are initialized
         if (m_SliceInitialized)

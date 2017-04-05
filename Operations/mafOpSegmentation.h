@@ -54,7 +54,6 @@ class mafVME;
 
 class mmiSelectPoint;
 
-class mafViewSliceGlobal;
 class mafVMESegmentationVolume;
 class mafVMESurface;
 

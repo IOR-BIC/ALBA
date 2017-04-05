@@ -52,13 +52,12 @@
 #include "mafVMEImage.h"
 #include "mafGUILutSlider.h"
 #include "mafVMESurface.h"
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeVolumeOrthoSlice.h"
 
 #include "mmaVolumeMaterial.h"
 #include "mmaMaterial.h"
 
 #include "mafDeviceButtonsPadMouseDialog.h"
-#include "mafViewSliceGlobal.h"
 #include "mafVMESegmentationVolume.h"
 
 #include "mafInteractorPERScalarInformation.h"

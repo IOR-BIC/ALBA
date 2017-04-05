@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program: MAF2
-Module: vtkMAFVolumeSlicer
+Module: vtkMAFVolumeOrthoSlicer
 Authors: Gianluigi Crimi
 
 Copyright (c) B3C
@@ -13,10 +13,10 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMAFProjectVolume - makes a voxel projection of structured points dataset along axis directions
+// .NAME vtkMAFVolumeOrthoSlicer - makes a voxel projection of structured points dataset along axis directions
 
 // .SECTION Description
-// vtkMAFProjectVolume makes a voxel projection of structured points dataset 
+// vtkMAFVolumeOrthoSlicer makes a voxel projection of structured points dataset 
 // along axis directions considering opacity.  The output of
 // this filter is a structured points dataset. The filter treats input data
 // of any topological dimension (i.e., point, line, image, or volume) and 
@@ -39,16 +39,16 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDataSetToDataSetFilter.h"
 #include "mafConfigure.h"
 
-#define VTK_PROJECT_FROM_X 1
-#define VTK_PROJECT_FROM_Y 2
-#define VTK_PROJECT_FROM_Z 3
+#define ORTHOSLICER_X_SLICE 0
+#define ORTHOSLICER_Y_SLICE 1
+#define ORTHOSLICER_Z_SLICE 2
 
 class vtkDataArray;
 class vtkImageData;
 
 /**
-Class Name: vtkMAFProjectVolume.
- vtkMAFProjectVolume makes a voxel projection of structured points dataset 
+Class Name: vtkMAFVolumeOrthoSlicer.
+ vtkMAFVolumeOrthoSlicer makes a voxel projection of structured points dataset 
  along axis directions considering opacity.  The output of
  this filter is a structured points dataset. The filter treats input data
  of any topological dimension (i.e., point, line, image, or volume) and 
@@ -61,33 +61,35 @@ Class Name: vtkMAFProjectVolume.
  Typical applications of this filter are to produce an image from a volume
  for image processing or visualization.
 */
-class MAF_EXPORT vtkMAFProjectVolume : public vtkDataSetToDataSetFilter
+class MAF_EXPORT vtkMAFVolumeOrthoSlicer : public vtkDataSetToDataSetFilter
 {
 public:
   /** RTTI Macro */
-  vtkTypeRevisionMacro(vtkMAFProjectVolume, vtkDataSetToDataSetFilter);
+  vtkTypeRevisionMacro(vtkMAFVolumeOrthoSlicer, vtkDataSetToDataSetFilter);
   
   /** Static Function for object instantiation */
-  static vtkMAFProjectVolume *New();
+  static vtkMAFVolumeOrthoSlicer *New();
+
+	void SetPlaneOrigin(double *origin);
 
   /** Set Projection Direction to X */
-  void SetProjectionModeToX()
-    {this->SetProjectionMode(VTK_PROJECT_FROM_X);};
+  void SetSlicingModeToX()
+    {this->SetSclicingMode(ORTHOSLICER_X_SLICE);};
  
   /** Set Projection Direction to Y */
-  void SetProjectionModeToY()
-    {this->SetProjectionMode(VTK_PROJECT_FROM_Y);};
+  void SetSlicingModeToY()
+    {this->SetSclicingMode(ORTHOSLICER_Y_SLICE);};
  
   /** Set Projection Direction to Z */
-  void SetProjectionModeToZ()
-    {this->SetProjectionMode(VTK_PROJECT_FROM_Z);};
+  void SetSlicingModeToZ()
+    {this->SetSclicingMode(ORTHOSLICER_Z_SLICE);};
  
   /** Retrieve the direction of projection as string */
   char *GetProjectionModeAsString(void)
   {
-     switch (this->ProjectionMode) {
-        case VTK_PROJECT_FROM_X: return "X";
-        case VTK_PROJECT_FROM_Y: return "Y";
+     switch (this->SclicingMode) {
+        case ORTHOSLICER_X_SLICE: return "X";
+        case ORTHOSLICER_Y_SLICE: return "Y";
      }
      return "Z";
   };
@@ -96,31 +98,19 @@ public:
 	virtual void PropagateUpdateExtent(vtkDataObject *output);
 
   /** Macro for Set Projection Mode */
-  vtkSetMacro(ProjectionMode,int);
+  vtkSetMacro(SclicingMode,int);
   /** Macro for Get Projection Mode */
-  vtkGetMacro(ProjectionMode,int);
-
-	/** Macro for Set Project Sub Range status */
-	vtkSetMacro(ProjectSubRange, bool);
-	/** Macro for Get Project Sub Range status*/
-	vtkGetMacro(ProjectSubRange, bool);
-	/** On/Off Macro for Project Sub Range status*/
-	vtkBooleanMacro(ProjectSubRange, bool);
-
-	/** Macro for Set Projection Range*/
-	vtkSetVector2Macro(ProjectionRange, int);
-	/** Macro for Get Projection Range*/
-	vtkGetVector2Macro(ProjectionRange, int);
+  vtkGetMacro(SclicingMode,int);
 
 protected:
   /** constructor */
-  vtkMAFProjectVolume();
+  vtkMAFVolumeOrthoSlicer();
   /** destructor */
-	~vtkMAFProjectVolume() {};
+	~vtkMAFVolumeOrthoSlicer() {};
  /** copy constructor not implemented*/
-  vtkMAFProjectVolume(const vtkMAFProjectVolume&);
+  vtkMAFVolumeOrthoSlicer(const vtkMAFVolumeOrthoSlicer&);
   /** assign operator not implemented*/
-  void operator=(const vtkMAFProjectVolume&);
+  void operator=(const vtkMAFVolumeOrthoSlicer&);
 
   /** Update dimensions and whole extents */
   void ExecuteInformation();
@@ -128,15 +118,17 @@ protected:
   void Execute();
 
 	template<typename DataType>
-	void ProjectScalars(int * inputDims, DataType * inputScalars, DataType * projScalars);
+	void SliceScalars(int * inputDims, DataType * inputScalars, DataType * slicedScalars);
 
 	void GenerateOutputFromID(vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars);
 
 	void GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars);
+		
+	int  SclicingMode;
+	double Origin[3];
 
-	int  ProjectionMode;
-	bool ProjectSubRange;
-	int  ProjectionRange[2];
+private:
+	void GetSlicingInfo(int* plane1, int* plane2, double* ratio1, double* ratio2);
 };
 
 

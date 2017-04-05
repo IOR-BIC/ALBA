@@ -33,7 +33,8 @@ SET(PROJECT_SRCS
 	mafPipePolylineGraphEditorTest.h mafPipePolylineGraphEditorTest.cpp
 	mafPipeMeshSliceTest.h mafPipeMeshSliceTest.cpp
 	mafPipeSurfaceSliceTest.h mafPipeSurfaceSliceTest.cpp
-	mafPipeVolumeSliceTest.h mafPipeVolumeSliceTest.cpp
+	#mafPipeVolumeArbSliceTest.h mafPipeVolumeArbSliceTest.cpp
+	#mafPipeVolumeOrthoSliceTest.h mafPipeVolumeOrthoSliceTest.cpp
 	mafPipeTrajectoriesTest.h mafPipeTrajectoriesTest.cpp
 	mafPipeSliceTest.h mafPipeSliceTest.cpp
 	mafPipePolylineSliceTest.h mafPipePolylineSliceTest.cpp

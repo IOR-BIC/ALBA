@@ -15,8 +15,6 @@ SET(PROJECT_SRCS
   mafViewGlobalSlice.cpp  				mafViewGlobalSlice.h
   mafViewGlobalSliceCompound.cpp	mafViewGlobalSliceCompound.h
   mafViewImage.cpp								mafViewImage.h
-  mafViewSingleSlice.cpp					mafViewSingleSlice.h
-  mafViewSingleSliceCompound.cpp	mafViewSingleSliceCompound.h
   mafViewRXCompound.cpp  					mafViewRXCompound.h
   mafView3D.cpp										mafView3D.h
   mafViewImageCompound.cpp				mafViewImageCompound.h

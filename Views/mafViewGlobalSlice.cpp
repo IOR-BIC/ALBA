@@ -29,7 +29,7 @@
 #include "mafSceneNode.h"
 #include "mafPipeFactory.h"
 #include "mafPipe.h"
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeVolumeOrthoSlice.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipeMeshSlice.h"
 #include "mafAttachCamera.h"
@@ -81,7 +81,7 @@ mafViewGlobalSlice::mafViewGlobalSlice(wxString label, int camera_position, bool
 {
 	m_SliceOrigin[0] = m_SliceOrigin[1] = m_SliceOrigin[2] = 0.0;
 	m_IDPlane = ID_XY;
-	m_SliceMode = mafPipeVolumeSlice::SLICE_ARB;
+	m_SliceMode = mafPipeVolumeOrthoSlice::SLICE_Z;
 	m_Opacity = 1.0;
 
 	m_SliderOldOrigin = 0.0; 
@@ -286,7 +286,7 @@ void mafViewGlobalSlice::VmeSelect(mafVME *vme,bool select)
   {
     
     m_SelectedVolume = m_Sg->Vme2Node(vme);
-		mafPipeVolumeSlice * volSlicePipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
+		mafPipeVolumeOrthoSlice * volSlicePipe = (mafPipeVolumeOrthoSlice *)m_SelectedVolume->GetPipe();
     if (volSlicePipe)
     {
       //m_Gui->Enable(ID_LUT,true);
@@ -295,7 +295,7 @@ void mafViewGlobalSlice::VmeSelect(mafVME *vme,bool select)
       {
         m_Opacity = volSlicePipe->GetSliceOpacity();
         m_Gui->Enable(ID_OPACITY_SLIDER,true);
-        (volSlicePipe)->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+        (volSlicePipe)->SetInterpolation(m_TrilinearInterpolationOn);
         m_Gui->Enable(ID_TRILINEAR_INTERPOLATION_ON,true);
       }
       m_Gui->Update();
@@ -346,9 +346,6 @@ void mafViewGlobalSlice::VmeCreatePipe(mafVME *vme)
 	applied_origin[0] = new_point[0];
   applied_origin[1] = new_point[1];
   applied_origin[2] = new_point[2];
-	transform->TransformNormal(m_SliceNormal,applied_normal);
-  transform->TransformNormal(m_SliceXVector, applied_xVector);
-  transform->TransformNormal(m_SliceYVector, applied_yVector);
 
   if (pipe_name != "")
   {
@@ -363,9 +360,9 @@ void mafViewGlobalSlice::VmeCreatePipe(mafVME *vme)
     if (pipe)
     {
       pipe->SetListener(this);
-      if (pipe_name.Equals("mafPipeVolumeSlice"))
+      if (pipe_name.Equals("mafPipeVolumeOrthoSlice"))
       {
-        ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(m_SliceMode,applied_origin,applied_xVector,applied_yVector,true,false);
+        ((mafPipeVolumeOrthoSlice *)pipe)->InitializeSliceParameters(m_SliceMode,applied_origin,true,false);
 			}
       else if(pipe_name.Equals("mafPipeSurfaceSlice"))
       {
@@ -390,18 +387,18 @@ void mafViewGlobalSlice::VmeCreatePipe(mafVME *vme)
       }
       pipe->Create(n);
 
-			if (pipe_name.Equals("mafPipeVolumeSlice"))
+			if (pipe_name.Equals("mafPipeVolumeOrthoSlice"))
 			{
-				((mafPipeVolumeSlice *)pipe)->HideSlider();
+				((mafPipeVolumeOrthoSlice *)pipe)->HideSlider();
 			}
 
 			if (m_SelectedVolume == n && m_SelectedVolume->GetVme()->GetOutput()->IsA("mafVMEOutputVolume"))
 			{
 				m_Gui->Enable(ID_OPACITY_SLIDER,true);
-				mafPipeVolumeSlice * volPipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
+				mafPipeVolumeOrthoSlice * volPipe = (mafPipeVolumeOrthoSlice *)m_SelectedVolume->GetPipe();
 				m_Opacity=volPipe->GetSliceOpacity();
         m_Gui->Enable(ID_TRILINEAR_INTERPOLATION_ON,true);
-        volPipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+        volPipe->SetInterpolation(m_TrilinearInterpolationOn);
 				m_Gui->Update();
 			}
 
@@ -472,7 +469,7 @@ void mafViewGlobalSlice::OnEvent(mafEventBase *maf_event)
 			break;*/
 			case ID_OPACITY_SLIDER:
 			{
-				mafPipeVolumeSlice* pipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
+				mafPipeVolumeOrthoSlice* pipe = (mafPipeVolumeOrthoSlice *)m_SelectedVolume->GetPipe();
 				if (pipe)
 				{
 					pipe->SetSliceOpacity(m_Opacity);
@@ -483,10 +480,10 @@ void mafViewGlobalSlice::OnEvent(mafEventBase *maf_event)
       break;
       case ID_TRILINEAR_INTERPOLATION_ON:
       {
-        mafPipeVolumeSlice* pipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
+				mafPipeVolumeOrthoSlice* pipe = (mafPipeVolumeOrthoSlice *)m_SelectedVolume->GetPipe();
         if (pipe)
         {
-          pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+          pipe->SetInterpolation(m_TrilinearInterpolationOn);
 					GetLogicManager()->CameraUpdate();
         }
       }
@@ -641,25 +638,9 @@ void mafViewGlobalSlice::UpdateSlice()
     {
 			double *new_point;
 			double applied_origin[3];
-			float applied_xVector[3];
-			float applied_yVector[3];
-			float applied_normal[3];
-
+		
 			mafVME *vme = node->GetVme();
-			vtkTransform *transform;
-			vtkNEW(transform);
-			transform->Identity();
-			transform->SetMatrix(vme->GetOutput()->GetMatrix()->GetVTKMatrix());
-			transform->Inverse();
-			transform->Update();
-			new_point=transform->TransformDoublePoint(m_SliceOrigin);
-			applied_origin[0] = new_point[0];
-			applied_origin[1] = new_point[1];
-			applied_origin[2] = new_point[2];
-			transform->TransformNormal(m_SliceNormal,applied_normal);
-			transform->TransformNormal(m_SliceXVector, applied_xVector);
-			transform->TransformNormal(m_SliceYVector, applied_yVector);
-
+		
 			mafVMEOutput * output = vme->GetOutput();
 
 		  if(vme->IsA("mafVMESurface")||vme->IsA("mafVMESurfaceParametric")||vme->IsA("mafVMELandmarkCloud")||vme->IsA("mafVMELandmark"))
@@ -683,13 +664,10 @@ void mafViewGlobalSlice::UpdateSlice()
       }
       else if (output->IsA("mafVMEOutputVolume"))
 			{
-				mafPipeVolumeSlice * pipe = (mafPipeVolumeSlice *)node->GetPipe();
-				pipe->SetSlice(applied_origin, applied_xVector, applied_yVector);
-				pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
-				//pipe->UpdateSlice();
+				mafPipeVolumeOrthoSlice * pipe = (mafPipeVolumeOrthoSlice *)node->GetPipe();
+				pipe->SetSlice(applied_origin,NULL);
+				pipe->SetInterpolation(m_TrilinearInterpolationOn);
 			}
-			transform->Delete();
-			transform = NULL;
     }
   }
 
@@ -772,16 +750,7 @@ void mafViewGlobalSlice::SetSlice(double origin[3], float xVect[3], float yVect[
 void mafViewGlobalSlice::SetSlice(double origin[3], double dn)
 //----------------------------------------------------------------------------
 {
-	if(m_SliceMode != mafPipeVolumeSlice::SLICE_ARB)
-  {
-    m_SliceOrigin[m_SliceMode] = origin[m_SliceMode];
-  }
-  else
-  {
-    m_SliceOrigin[0] = origin[0];
-	  m_SliceOrigin[1] = origin[1];
-	  m_SliceOrigin[2] = origin[2];
-  }
+  m_SliceOrigin[m_SliceMode] = origin[m_SliceMode];
 
 	m_Dn = dn;
 
@@ -837,7 +806,7 @@ void mafViewGlobalSlice::VmeShow(mafVME *vme, bool show)
 
 	if (m_SelectedVolume != NULL)
 	{
-		mafPipeVolumeSlice * selVolPipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
+		mafPipeVolumeOrthoSlice * selVolPipe = (mafPipeVolumeOrthoSlice *)m_SelectedVolume->GetPipe();
 		if (sceneNode == m_SelectedVolume && selVolPipe)
 		{
 			//m_Gui->Enable(ID_LUT,true);
@@ -845,7 +814,7 @@ void mafViewGlobalSlice::VmeShow(mafVME *vme, bool show)
 			if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
 			{
 				m_Opacity = selVolPipe->GetSliceOpacity();
-				selVolPipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+				selVolPipe->SetInterpolation(m_TrilinearInterpolationOn);
 				m_Gui->Enable(ID_OPACITY_SLIDER, true);
 				m_Gui->Enable(ID_TRILINEAR_INTERPOLATION_ON, true);
 			}

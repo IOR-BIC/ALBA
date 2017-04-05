@@ -91,7 +91,6 @@ public:
     ID_RESET_SLICES,
 		ID_ALL_SURFACE,
 		ID_BORDER_CHANGE,
-    ID_ENABLE_GPU,
     ID_TRILINEAR_INTERPOLATION,
     ID_LAST
   };
@@ -194,7 +193,6 @@ protected:
   bool m_CanPlugVisualPipes; ///< true if u can plug visual pipes
 
   
-  int m_EnableGPU;
   int m_TrilinearInterpolationOn;
 
   std::vector<mafVME*> m_VMElist; ///< VME List

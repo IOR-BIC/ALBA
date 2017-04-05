@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program: MAF2
-Module: vtkMAFVolumeSlicer
+Module: vtkMAFVolumeOrthoSlicer
 Authors: Gianluigi Crimi
 
 Copyright (c) B3C
@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 
 #include "mafDefines.h"
-#include "vtkMAFProjectVolume.h"
+#include "vtkMAFVolumeOrthoSlicer.h"
 #include "vtkObjectFactory.h"
 #include "vtkStructuredPoints.h"
 #include "vtkPointData.h"
@@ -24,31 +24,41 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMAFSmartPointer.h"
 #include "vtkProbeFilter.h"
 #include "vtkDataSetWriter.h"
+#include "vtkMath.h"
 #include "vtkMAFRGtoSPImageFilter.h"
 
-vtkCxxRevisionMacro(vtkMAFProjectVolume, "$Revision: 1.1 $");
-vtkStandardNewMacro(vtkMAFProjectVolume);
+vtkCxxRevisionMacro(vtkMAFVolumeOrthoSlicer, "$Revision: 1.1 $");
+vtkStandardNewMacro(vtkMAFVolumeOrthoSlicer);
 
-#define AIR_LIMIT -500
+#define EPSILON 1e-6
 
 //----------------------------------------------------------------------------
-void vtkMAFProjectVolume::PropagateUpdateExtent(vtkDataObject *output)
+void vtkMAFVolumeOrthoSlicer::SetPlaneOrigin(double *origin)
+{
+	Origin[0] = origin[0];
+	Origin[1] = origin[1];
+	Origin[2] = origin[2];
+	Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkMAFVolumeOrthoSlicer::PropagateUpdateExtent(vtkDataObject *output)
 {
 }
 
 //=========================================================================
-vtkMAFProjectVolume::vtkMAFProjectVolume()
+vtkMAFVolumeOrthoSlicer::vtkMAFVolumeOrthoSlicer()
 {
-  ProjectionMode = VTK_PROJECT_FROM_X;
-	ProjectSubRange = false;
+  SclicingMode = ORTHOSLICER_X_SLICE;
 	vtkSource::SetNthOutput(0, vtkStructuredPoints::New());
 	// Releasing data
 	Outputs[0]->ReleaseData();
 	Outputs[0]->Delete();
+	Origin[0] = Origin[1] = Origin[2] = 0;
 }
 
 //=========================================================================
-void vtkMAFProjectVolume::ExecuteInformation()
+void vtkMAFVolumeOrthoSlicer::ExecuteInformation()
 {
 	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
 	vtkImageData *inputID = vtkImageData::SafeDownCast(GetInput());
@@ -76,18 +86,18 @@ void vtkMAFProjectVolume::ExecuteInformation()
 	dims[1] = wholeExtent[3] - wholeExtent[2] + 1;
 	dims[2] = wholeExtent[5] - wholeExtent[4] + 1;
 
-	switch (this->ProjectionMode) {
-		case VTK_PROJECT_FROM_X:
+	switch (this->SclicingMode) {
+		case ORTHOSLICER_X_SLICE:
 			outDims[0] = dims[1];
 			outDims[1] = dims[2];
 			outDims[2] = 1;
 			break;
-		case VTK_PROJECT_FROM_Y:
+		case ORTHOSLICER_Y_SLICE:
 			outDims[0] = dims[0];
 			outDims[1] = dims[2];
 			outDims[2] = 1;
 			break;
-		case VTK_PROJECT_FROM_Z:
+		case ORTHOSLICER_Z_SLICE:
 			outDims[0] = dims[0];
 			outDims[1] = dims[1];
 			outDims[2] = 1;
@@ -103,153 +113,132 @@ void vtkMAFProjectVolume::ExecuteInformation()
 }
 
 //=========================================================================
-void vtkMAFProjectVolume::Execute()
+void vtkMAFVolumeOrthoSlicer::Execute()
 {
 	int inputDims[3], projectedDims[3];
-
 	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
 	vtkImageData *inputID = vtkImageData::SafeDownCast(GetInput());
 	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
-
-
+	
 	vtkPointData 			*inputPd = inputRG ? inputRG->GetPointData() : inputID->GetPointData();
 	vtkDataArray 			*inputScalars = inputPd->GetScalars();
-	vtkDataArray 			*projScalars = inputScalars->NewInstance();
+	vtkDataArray 			*slicedScalars = inputScalars->NewInstance();
 
 	inputRG ? inputRG->GetDimensions(inputDims) : inputID->GetDimensions(inputDims);
-
-	switch (this->ProjectionMode) {
-		case VTK_PROJECT_FROM_X:
+		
+	switch (this->SclicingMode) {
+		case ORTHOSLICER_X_SLICE:
 			projectedDims[0] = inputDims[1];
 			projectedDims[1] = inputDims[2];
 			projectedDims[2] = 1;
 			break;
-		case VTK_PROJECT_FROM_Y:
+		case ORTHOSLICER_Y_SLICE:
 			projectedDims[0] = inputDims[0];
 			projectedDims[1] = inputDims[2];
 			projectedDims[2] = 1;
 			break;
-		case VTK_PROJECT_FROM_Z:
+		case ORTHOSLICER_Z_SLICE:
 			projectedDims[0] = inputDims[0];
 			projectedDims[1] = inputDims[1];
 			projectedDims[2] = 1;
 			break;
 	}
-	projScalars->SetNumberOfTuples(projectedDims[0] * projectedDims[1]);
 
+	slicedScalars->SetNumberOfTuples(projectedDims[0]*projectedDims[1]);
 	void *inputPointer = inputScalars->GetVoidPointer(0);
-	void *outputPointer = projScalars->GetVoidPointer(0);
+	void *outputPointer = slicedScalars->GetVoidPointer(0);
 
 	switch (inputScalars->GetDataType())
 	{
 		case VTK_CHAR:
-			ProjectScalars(inputDims, (char*)inputPointer, (char*)outputPointer);
+			SliceScalars(inputDims, (char*)inputPointer, (char*)outputPointer);
 			break;
 		case VTK_UNSIGNED_CHAR:
-			ProjectScalars(inputDims, (unsigned char*)inputPointer, (unsigned char*)outputPointer);
+			SliceScalars(inputDims, (unsigned char*)inputPointer, (unsigned char*)outputPointer);
 			break;
 		case VTK_SHORT:
-			ProjectScalars(inputDims, (short*)inputPointer, (short*)outputPointer);
+			SliceScalars(inputDims, (short*)inputPointer, (short*)outputPointer);
 			break;
 		case VTK_UNSIGNED_SHORT:
-			ProjectScalars(inputDims, (unsigned short*)inputPointer, (unsigned short*)outputPointer);
+			SliceScalars(inputDims, (unsigned short*)inputPointer, (unsigned short*)outputPointer);
 			break;
 		case VTK_FLOAT:
-			ProjectScalars(inputDims, (float*)inputPointer, (float*)outputPointer);
+			SliceScalars(inputDims, (float*)inputPointer, (float*)outputPointer);
 			break;
-		case VTK_DOUBLE:
-			ProjectScalars(inputDims, (double*)inputPointer, (double*)outputPointer);
+		case VTK_DOUBLE:  //NOTE: GPU is not allowed
+			SliceScalars(inputDims, (double*)inputPointer, (double*)outputPointer);
 		default:
 			vtkErrorMacro(<< "vtkMAFVolumeSlicer: Scalar type is not supported");
 			return;
 	}
 
 	if (inputRG)
-		GenerateOutputFromRG(inputRG, projectedDims, projScalars);
+		GenerateOutputFromRG(inputRG, projectedDims, slicedScalars);
 	else
-		GenerateOutputFromID(inputID, projectedDims, projScalars);
+		GenerateOutputFromID(inputID, projectedDims, slicedScalars);
 
-	vtkDEL(projScalars);
+	vtkDEL(slicedScalars);
 }
 
 //----------------------------------------------------------------------------
 template<typename DataType>
-void vtkMAFProjectVolume::ProjectScalars(int * inputDims, DataType * inputScalars, DataType * projScalars)
+void vtkMAFVolumeOrthoSlicer::SliceScalars(int *inputDims, DataType *inputScalars, DataType *slicedScalars)
 {
-	int x, y, z, idx, newIdx, range[2];
-	int sliceSize, jOffset, kOffset;
-	float acc, rangeSize;
-
-	//Set Projection Range
-	if (ProjectSubRange)
-	{
-		range[0] = MAX(ProjectionRange[0], 0);
-		range[1] = MIN(ProjectionRange[1], inputDims[ProjectionMode - 1]);
-		rangeSize = range[1] - range[0];
-	}
-	else
-	{
-		range[0] = 0;
-		range[1] = inputDims[ProjectionMode - 1];
-		rangeSize = inputDims[ProjectionMode - 1];
-	}
+	int x, y, z, idx1, idx2, newIdx, range[2];
+	int sliceSize, jOffset1, jOffset2, kOffset1, kOffset2, plane1, plane2;
+	double acc;
+	double ratio1, ratio2;
 
 
-	sliceSize = inputDims[0] * inputDims[1];
 	newIdx = 0;
+	sliceSize = inputDims[0] * inputDims[1];
+	GetSlicingInfo(&plane1, &plane2, &ratio1, &ratio2);
 
-	switch (this->ProjectionMode)
+	switch (this->SclicingMode)
 	{
-		case VTK_PROJECT_FROM_X:
+		case ORTHOSLICER_X_SLICE:
 			for (z = 0; z < inputDims[2]; z++)
 			{
-				kOffset = z * sliceSize;
+				kOffset1 = z * sliceSize;
 				for (y = 0; y < inputDims[1]; y++)
 				{
-					jOffset = y * inputDims[0];
-					acc = 0;
-					for (x = range[0]; x < range[1]; x++)
-					{
-						idx = x + jOffset + kOffset;
-						acc += MAX(AIR_LIMIT, inputScalars[idx]);
-					}
-					projScalars[newIdx] = acc / rangeSize;
+					jOffset1 = y * inputDims[0];
+					idx1 = plane1 + jOffset1 + kOffset1;
+					idx2 = plane2 + jOffset1 + kOffset1;
+					acc = inputScalars[idx1]*ratio1 + inputScalars[idx2]*ratio2;
+					slicedScalars[newIdx] = acc;
 					newIdx++;
 				}
 			}
 			break;
-		case VTK_PROJECT_FROM_Y:
+		case ORTHOSLICER_Y_SLICE:
+			jOffset1 = plane1 * inputDims[0];
+			jOffset2 = plane2 * inputDims[0];
 			for (z = 0; z < inputDims[2]; z++)
 			{
-				kOffset = z * sliceSize;
+				kOffset1 = z * sliceSize;
 				for (x = 0; x < inputDims[0]; x++)
 				{
-					acc = 0;
-					for (y = range[0]; y < range[1]; y++)
-					{
-						jOffset = y * inputDims[0];
-						idx = x + jOffset + kOffset;
-						acc += MAX(AIR_LIMIT, inputScalars[idx]);
-					}
-					projScalars[newIdx] = acc / rangeSize;
+					idx1 = x + jOffset1 + kOffset1;
+					idx2 = x + jOffset2 + kOffset1;
+					acc = inputScalars[idx1]*ratio1 + inputScalars[idx2]*ratio2;
+					slicedScalars[newIdx] = acc;
 					newIdx++;
 				}
 			}
 			break;
-		case VTK_PROJECT_FROM_Z:
+		case ORTHOSLICER_Z_SLICE:
+			kOffset1 = plane1 * sliceSize;
+			kOffset2 = plane2 * sliceSize;
 			for (y = 0; y < inputDims[1]; y++)
 			{
-				jOffset = y * inputDims[0];
+				jOffset1 = y * inputDims[0];
 				for (x = 0; x < inputDims[0]; x++)
 				{
-					acc = 0;
-					for (z = range[0]; z < range[1]; z++)
-					{
-						kOffset = z * sliceSize;
-						idx = x + jOffset + kOffset;
-						acc += MAX(AIR_LIMIT, inputScalars[idx]);
-					}
-					projScalars[newIdx] = acc / rangeSize;
+					idx1 = x + jOffset1 + kOffset2;
+					idx2 = x + jOffset1 + kOffset2;
+					acc = inputScalars[idx1]*ratio1 + inputScalars[idx2]*ratio2;
+					slicedScalars[newIdx] = acc;
 					newIdx++;
 				}
 			}
@@ -258,25 +247,25 @@ void vtkMAFProjectVolume::ProjectScalars(int * inputDims, DataType * inputScalar
 }
 
 //----------------------------------------------------------------------------
-void vtkMAFProjectVolume::GenerateOutputFromID(vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars)
+void vtkMAFVolumeOrthoSlicer::GenerateOutputFromID(vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars)
 {
 	double inputSpacing[3];
 	double outputSpacing[3];
 	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
 	
 	inputSP->GetSpacing(inputSpacing);
-	switch (this->ProjectionMode) {
-		case VTK_PROJECT_FROM_X:
+	switch (this->SclicingMode) {
+		case ORTHOSLICER_X_SLICE:
 			outputSpacing[0] = inputSpacing[1];
 			outputSpacing[1] = inputSpacing[2];
 			outputSpacing[2] = 1;
 			break;
-		case VTK_PROJECT_FROM_Y:
+		case ORTHOSLICER_Y_SLICE:
 			outputSpacing[0] = inputSpacing[0];
 			outputSpacing[1] = inputSpacing[2];
 			outputSpacing[2] = 1;
 			break;
-		case VTK_PROJECT_FROM_Z:
+		case ORTHOSLICER_Z_SLICE:
 			outputSpacing[0] = inputSpacing[0];
 			outputSpacing[1] = inputSpacing[1];
 			outputSpacing[2] = 1;
@@ -290,7 +279,7 @@ void vtkMAFProjectVolume::GenerateOutputFromID(vtkImageData * inputSP, int * pro
 }
 
 //----------------------------------------------------------------------------
-void vtkMAFProjectVolume::GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars)
+void vtkMAFVolumeOrthoSlicer::GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars)
 {
 	//Generate temporary rectilinear grid output
 	vtkRectilinearGrid *rgOut = vtkRectilinearGrid::New();
@@ -311,16 +300,16 @@ void vtkMAFProjectVolume::GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int
 
 	ZCoordinates->InsertComponent(0, 0, 0);
 
-	switch (this->ProjectionMode) {
-		case VTK_PROJECT_FROM_X:
+	switch (this->SclicingMode) {
+		case ORTHOSLICER_X_SLICE:
 			XCoordinates->DeepCopy(inputRG->GetYCoordinates());
 			YCoordinates->DeepCopy(inputRG->GetZCoordinates());
 			break;
-		case VTK_PROJECT_FROM_Y:
+		case ORTHOSLICER_Y_SLICE:
 			XCoordinates->DeepCopy(inputRG->GetXCoordinates());
 			YCoordinates->DeepCopy(inputRG->GetZCoordinates());
 			break;
-		case VTK_PROJECT_FROM_Z:
+		case ORTHOSLICER_Z_SLICE:
 			XCoordinates->DeepCopy(inputRG->GetXCoordinates());
 			YCoordinates->DeepCopy(inputRG->GetYCoordinates());
 			break;
@@ -345,3 +334,96 @@ void vtkMAFProjectVolume::GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int
 	vtkDEL(rgtosoFilter);
 	vtkDEL(rgOut);
 }
+
+//----------------------------------------------------------------------------
+void vtkMAFVolumeOrthoSlicer::GetSlicingInfo(int* plane1, int* plane2, double* ratio1, double* ratio2)
+{
+	vtkImageData *inputID = vtkImageData::SafeDownCast(GetInput());
+	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
+	double bounds[6];
+
+	if (inputID)
+		inputID->GetBounds(bounds);
+	else
+		inputRG->GetBounds(bounds);
+
+	if (Origin[SclicingMode]<bounds[SclicingMode * 2])
+	{
+		*plane1 = *plane2 = 0;
+		*ratio1 = 1.0;
+		*ratio2 = 0.0;
+		return;
+	}
+	
+	if (Origin[SclicingMode] > bounds[SclicingMode * 2 + 1])
+	{
+		int dims[3];
+		if (inputID)
+			inputID->GetDimensions(dims);
+		else
+			inputRG->GetDimensions(dims);
+
+		*plane1 = *plane2 = dims[SclicingMode]-1;
+		*ratio1 = 0.0;
+		*ratio2 = 1.0;
+		return;
+	}
+
+	if (inputID)
+	{
+		double spacing[3];
+		inputID->GetSpacing(spacing);
+
+		double slicingPercentage = (Origin[SclicingMode] - bounds[SclicingMode * 2]) / spacing[SclicingMode];
+		*plane1 = floor(slicingPercentage);
+		*plane2 = ceil(slicingPercentage);
+		*ratio2 = slicingPercentage - *plane1;
+		*ratio1 = 1.0 - *ratio2;
+		return;
+	}
+	else
+	{
+		double prevPos, postPos;
+		vtkDataArray * coordinates;
+		switch (this->SclicingMode)
+		{
+			case ORTHOSLICER_X_SLICE:
+				coordinates = inputRG->GetXCoordinates();
+				break;
+			case ORTHOSLICER_Y_SLICE:
+				coordinates = inputRG->GetYCoordinates();
+				break;
+			case ORTHOSLICER_Z_SLICE:
+				coordinates = inputRG->GetZCoordinates();
+				break;
+		}
+		int nCoordinates = coordinates->GetNumberOfTuples();
+		double *coordPointer = (double *) coordinates->GetVoidPointer(0);
+		double n0, n1;
+		double l, r;
+		n1 = coordPointer[0];
+		for (int i = 1; i < nCoordinates; i++)
+		{
+			//n0 was last n1
+			n0 = n1;
+			n1 = coordPointer[i];
+
+			l = MIN(n0, n1);
+			r = MAX(n0, n1);
+
+			if ((Origin[SclicingMode] >= l && Origin[SclicingMode] <= r))
+			{
+				double spacing = r - l;
+				double slicingPercentage = (Origin[SclicingMode] - l) / spacing;
+				*plane1 = i - 1;
+				*plane2 = i;
+				*ratio2 = slicingPercentage;
+				*ratio1 = 1.0 - *ratio2;
+				return;
+			}
+		}
+	}
+}
+
+
+
