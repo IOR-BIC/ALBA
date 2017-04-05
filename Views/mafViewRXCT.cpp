@@ -383,13 +383,6 @@ void mafViewRXCT::OnEventRangeModified(mafEventBase *maf_event)
       m_LutSliders[CT_COMPOUND_VIEW]->GetSubRange(&low,&hi);
       //m_vtkLUT[CT_COMPOUND_VIEW]->SetRange(low,hi);
       m_Lut->SetRange(low,hi);
-      for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
-      {
-        mafPipeVolumeOrthoSlice *p = NULL;
-        p = mafPipeVolumeOrthoSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
-        //p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
-        p->SetColorLookupTable(m_Lut);
-      }
     }
 
     CameraUpdate();
