@@ -661,6 +661,8 @@ void mafOpManager::RunOpDelete()
 		ClearUndoStack();
     mafEventMacro(mafEvent(this, CAMERA_UPDATE));
   }
+	else
+		Notify(OP_RUN_TERMINATED, false);
 }
 //----------------------------------------------------------------------------
 void mafOpManager::RunOpReparentTo()
@@ -673,12 +675,21 @@ void mafOpManager::OpRunOk(mafOp *op)
 //----------------------------------------------------------------------------
 {	
   m_Context.Pop();
-
-  m_RunningOp = NULL;
+	
   m_NaturalNode = NULL;
+	bool opCanUndo = op->CanUndo();
+
 	OpDo(op);
   //Notify success with "arg" paramerter
   Notify(OP_RUN_TERMINATED,true);
+
+	if (!opCanUndo)
+	{
+		delete op;
+	}
+
+	m_RunningOp = NULL;
+
 	if(m_Context.Caller() == NULL) 	
     EnableOp();
 }
@@ -687,10 +698,7 @@ void mafOpManager::OpRunCancel(mafOp *op)
 //----------------------------------------------------------------------------
 {
   m_Context.Pop();
-
-	m_RunningOp = NULL;
-	delete op;
-
+		
   if (m_NaturalNode != NULL)
   {
     m_Selected->ReparentTo(NULL);
@@ -701,6 +709,9 @@ void mafOpManager::OpRunCancel(mafOp *op)
 
   //Notify cancel with "arg" paramerter
   Notify(OP_RUN_TERMINATED,false);
+
+	m_RunningOp = NULL;
+	delete op; 
 
 	if(m_Context.Caller() == NULL) 	
     EnableOp();
@@ -719,6 +730,11 @@ void mafOpManager::OpExec(mafOp *op)
 		o->SetListener(this);
 		o->SetInput(m_Selected);
 		OpDo(o);
+
+		if (!o->CanUndo())
+		{
+			delete o;
+		}
   }
 	EnableOp();
 }
@@ -754,7 +770,6 @@ void mafOpManager::OpDo(mafOp *op)
   else
   {
 	  m_Context.Undo_Clear();
-    delete op;  
   }
 }
 
