@@ -161,66 +161,73 @@ void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * 
 	input->GetDimensions(inDims);
 	output->GetSpacing(spacing);
 
-	newIdx = 0;
-
-	yRG = 0;
-	yCoordA = yCoordPointer[yRG];
-	yCoordB = yCoordPointer[yRG + 1];
-	yRGoffsetA = 0;
-	yRGoffsetB = inDims[0];
-	ySize = yCoordB - yCoordA;
-	for (y = 0; y < outDims[1]; y++)
+	if (inDims[0] == outDims[0] && inDims[1] == outDims[1] && inDims[2] == outDims[2])
 	{
-		yPos = bounds[2] + y*spacing[1];
+		memcpy(outScalars, inputScalars, sizeof(DataType)*inDims[0] * inDims[1] * inDims[2]);
+	}
+	else
+	{
+		newIdx = 0;
 
-		if (yPos >= yCoordB)
+		yRG = 0;
+		yCoordA = yCoordPointer[yRG];
+		yCoordB = yCoordPointer[yRG + 1];
+		yRGoffsetA = 0;
+		yRGoffsetB = inDims[0];
+		ySize = yCoordB - yCoordA;
+		for (y = 0; y < outDims[1]; y++)
 		{
-			yRG++;
-			yCoordA = yCoordB;
-			yCoordB = yCoordPointer[yRG + 1];
+			yPos = bounds[2] + y*spacing[1];
 
-			yRGoffsetA = yRG * inDims[0];
-			yRGoffsetB = (yRG + 1) * inDims[0];
-			ySize = yCoordB - yCoordA;
-		}
-
-		yOffset = y * outDims[0];
-
-		//Avoid problems on slicing volumes with doublied slices
-		yRatioB = (ySize != 0) ? (yPos - yCoordA) / ySize : 1;
-		yRatioA = 1.0 - yRatioB;
-
-
-		xRG = 0;
-		xCoordA = xCoordPointer[xRG];
-		xCoordB = xCoordPointer[xRG + 1];
-		xSize = xCoordB - xCoordA;
-		for (x = 0; x < outDims[0]; x++)
-		{
-			xPos = bounds[0] + x*spacing[0];
-
-			if (xPos >= xCoordB)
+			if (yPos >= yCoordB)
 			{
-				xRG++;
-				xCoordA = xCoordB;
-				xCoordB = xCoordPointer[xRG + 1];
-				xSize = xCoordB - xCoordA;
+				yRG++;
+				yCoordA = yCoordB;
+				yCoordB = yCoordPointer[yRG + 1];
+
+				yRGoffsetA = yRG * inDims[0];
+				yRGoffsetB = (yRG + 1) * inDims[0];
+				ySize = yCoordB - yCoordA;
 			}
 
-			//Avoid problems on slicing volumes with duplicated slices
-			xRatioB = (xSize != 0) ? (xPos - xCoordA) / xSize : 1;
-			xRatioA = 1.0 - xRatioB;
+			yOffset = y * outDims[0];
 
-			acc1 = inputScalars[xRG + yRGoffsetA]*xRatioA;
-			acc1 += inputScalars[xRG + 1 + yRGoffsetA]*xRatioB;
+			//Avoid problems on slicing volumes with doublied slices
+			yRatioB = (ySize != 0) ? (yPos - yCoordA) / ySize : 1;
+			yRatioA = 1.0 - yRatioB;
 
-			acc2 = inputScalars[xRG + yRGoffsetB]*xRatioA;
-			acc2 += inputScalars[xRG + 1 + yRGoffsetB]*xRatioB;
 
-			acc = acc1*yRatioA + acc2*yRatioB;
+			xRG = 0;
+			xCoordA = xCoordPointer[xRG];
+			xCoordB = xCoordPointer[xRG + 1];
+			xSize = xCoordB - xCoordA;
+			for (x = 0; x < outDims[0]; x++)
+			{
+				xPos = bounds[0] + x*spacing[0];
 
-			outScalars[newIdx]= acc;
-			newIdx++;
+				if (xPos >= xCoordB)
+				{
+					xRG++;
+					xCoordA = xCoordB;
+					xCoordB = xCoordPointer[xRG + 1];
+					xSize = xCoordB - xCoordA;
+				}
+
+				//Avoid problems on slicing volumes with duplicated slices
+				xRatioB = (xSize != 0) ? (xPos - xCoordA) / xSize : 1;
+				xRatioA = 1.0 - xRatioB;
+
+				acc1 = inputScalars[xRG + yRGoffsetA] * xRatioA;
+				acc1 += inputScalars[xRG + 1 + yRGoffsetA] * xRatioB;
+
+				acc2 = inputScalars[xRG + yRGoffsetB] * xRatioA;
+				acc2 += inputScalars[xRG + 1 + yRGoffsetB] * xRatioB;
+
+				acc = acc1*yRatioA + acc2*yRatioB;
+
+				outScalars[newIdx] = acc;
+				newIdx++;
+			}
 		}
 	}
 }
