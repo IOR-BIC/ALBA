@@ -88,9 +88,7 @@ mafSnapshotManager::mafSnapshotManager()
 //----------------------------------------------------------------------------
 mafSnapshotManager::~mafSnapshotManager()
 {
-	m_ImagesList.clear();
-
-	delete(m_Dialog);
+	m_ImagesList.clear();	
 }
 
 //----------------------------------------------------------------------------
@@ -135,23 +133,27 @@ void mafSnapshotManager::OnEvent(mafEventBase *maf_event)
 void mafSnapshotManager::CreateSnapshot(mafVME *root, mafView *selectedView)
 {
 	// Find or Create snapshots group
-	mafVMEGroup *snapshotsGroup = (mafVMEGroup *)root->FindInTreeByName("Snapshots");
-
-	if (snapshotsGroup == NULL)
+	
+	if (m_SnapshotsGroup==NULL || m_SnapshotsGroup != (mafVMEGroup *)root->FindInTreeByName("Snapshots"))
 	{
-		mafNEW(snapshotsGroup);
-		snapshotsGroup->SetName("Snapshots");
-		snapshotsGroup->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
-		snapshotsGroup->ReparentTo(root);
+		m_SnapshotsGroup = (mafVMEGroup *)root->FindInTreeByName("Snapshots");
 
+		if (m_SnapshotsGroup == NULL)
+		{
+			mafNEW(m_SnapshotsGroup);
+			m_SnapshotsGroup->SetName("Snapshots");
+			m_SnapshotsGroup->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
+			m_SnapshotsGroup->ReparentTo(root);
+			m_SnapshotsGroup->Delete();
+		}
 		m_ImagesList.clear();	
 	}
 
-	m_SnapshotsGroup = snapshotsGroup;
+	
 	//////////////////////////////////////////////////////////////////////////
 
 	mafViewCompound *viewCompound = mafViewCompound::SafeDownCast(selectedView);
-
+	
 	wxImage img;
 
 	if (viewCompound)
@@ -170,7 +172,9 @@ void mafSnapshotManager::CreateSnapshot(mafVME *root, mafView *selectedView)
 		wxColor color = selectedView->GetBackgroundColor();
 		selectedView->SetBackgroundColor(wxColor(255, 255, 255));
 
-		img = selectedView->GetRWI()->GetImage()->ConvertToImage();
+		wxBitmap* image = selectedView->GetRWI()->GetImage();
+		img = image->ConvertToImage();
+		cppDEL(image);
 
 		selectedView->SetBackgroundColor(color);
 	}
@@ -189,7 +193,7 @@ void mafSnapshotManager::CreateSnapshot(mafVME *root, mafView *selectedView)
 		sprintf(tmp, "%s_%d", imageName, count);
 		count++;
 	} 
-	while (snapshotsGroup->FindInTreeByName(tmp) != NULL);
+	while (m_SnapshotsGroup->FindInTreeByName(tmp) != NULL);
 
 	imageName = tmp;
 
@@ -227,8 +231,9 @@ void mafSnapshotManager::CreateSnapshot(mafVME *root, mafView *selectedView)
 	image->SetData(vtkimg, 0);
 	image->SetName(imageName);
 	image->SetTimeStamp(0);
-	image->ReparentTo(snapshotsGroup);
+	image->ReparentTo(m_SnapshotsGroup);
 
+	mafDEL(image);
 	//////////////////////////////////////////////////////////////////////////
 	vtkDEL(buffer);
 	vtkDEL(vtkimg);
@@ -305,11 +310,11 @@ void mafSnapshotManager::AddSnapshot(wxBitmap &bitmap, wxString name = "")
 	image->SetTimeStamp(0);
 	image->ReparentTo(m_SnapshotsGroup);
 
+	mafDEL(image);
 	//////////////////////////////////////////////////////////////////////////
 	vtkDEL(buffer);
 	vtkDEL(vtkimg);
 }
-
 
 //----------------------------------------------------------------------------
 void mafSnapshotManager::ShowSnapshotPreview(mafVME *node)
@@ -498,19 +503,21 @@ void mafSnapshotManager::UpdateSelectionDialog(int selection)
 		mafGUIPicButton *previewImageButton;
 		previewImageButton = new mafGUIPicButton(m_Dialog, previewBitmap, ID_IMAGE);
 
-		m_Dialog->RemoveChild(m_PreviewImageButton);
 		m_ImageBoxSizer->Remove(m_PreviewImageButton);
+		m_ImageBoxSizer->Clear();
+
+		if (m_PreviewImageButton)
+			delete m_PreviewImageButton;
 
 		m_PreviewImageButton = previewImageButton;
 
-		m_ImageBoxSizer->Clear();
 		m_ImageBoxSizer->Add(m_PreviewImageButton, 0, wxALL | wxALIGN_CENTER, 0);
 
 		m_PreviewImageButton->Enable(false);
 
 		m_Dialog->Fit();
 		m_Dialog->Update();
-
+				
 		delete previewBitmap;
 		delete previewImage;
 	}

@@ -92,6 +92,7 @@
 #include "vtkPointData.h"
 #include "vtkDataSetAttributes.h"
 #include "mafSnapshotManager.h"
+#include "mafOpSelect.h"
 
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
@@ -151,6 +152,7 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_ViewManager = NULL;
 	m_OpManager = NULL;
 	m_InteractionManager = NULL;
+	m_SnapshotManager = NULL;
 	m_ImportMenu = NULL;
 	m_ExportMenu = NULL;
 	m_OpMenu = NULL;
@@ -192,6 +194,7 @@ mafLogicWithManagers::~mafLogicWithManagers()
   cppDEL(m_SettingsDialog);
 	cppDEL(m_ApplicationSettings);
 	cppDEL(m_TimeBarSettings);
+	cppDEL(m_SnapshotManager);
 }
 
 
@@ -683,10 +686,10 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			break;
 			case OP_RUN_TERMINATED:
 			{
-				//if the operation was started from the wizard we continue the wizard execution
 				if (m_WizardManager && m_WizardRunning)
 				{
-					m_WizardManager->WizardContinue(e->GetArg());
+					if (!mafOpSelect::SafeDownCast(m_OpManager->GetRunningOperation()))
+						m_WizardManager->WizardContinue(e->GetArg());
 				}
 				//else we manage the operation end by unlock the close button and so on
 				else
@@ -955,6 +958,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				if (m_SnapshotManager && m_VMEManager && m_ViewManager)
 				m_SnapshotManager->CreateSnapshot(m_VMEManager->GetRoot(), m_ViewManager->GetSelectedView());
 
+				if (m_WizardManager && m_WizardRunning)
 				OnEvent(&mafEvent(this, WIZARD_RUN_CONTINUE, true));
 			}
 			break;
@@ -1051,7 +1055,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				m_CancelledBeforeOpStarting = true;
 				UpdateFrameTitle();
 				m_OpManager->OpRun(OP_DELETE);
-				m_WizardManager->WizardContinue(true);
 			}
 			break;
 			case WIZARD_OP_NEW:
