@@ -143,7 +143,7 @@ template class MAF_EXPORT mafAutoPointer<mafAbsMatrixPipe>;
   - fix the VME_TIME_SET issuing and propagation
   - implement Update() function
   */
-class MAF_EXPORT mafVME : public mafEventBroadcaster, public mafReferenceCounted, public mafStorable, public mafObserver, public mafTimeStamped, public mafServiceClient
+class MAF_EXPORT mafVME : public mafReferenceCounted, public mafEventBroadcaster, public mafStorable, public mafObserver, public mafTimeStamped, public mafServiceClient
 {
 public:
   
