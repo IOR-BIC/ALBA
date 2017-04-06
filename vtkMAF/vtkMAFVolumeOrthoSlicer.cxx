@@ -230,18 +230,23 @@ void vtkMAFVolumeOrthoSlicer::SliceScalars(int *inputDims, DataType *inputScalar
 		case ORTHOSLICER_Z_SLICE:
 			kOffset1 = plane1 * sliceSize;
 			kOffset2 = plane2 * sliceSize;
-			for (y = 0; y < inputDims[1]; y++)
-			{
-				jOffset1 = y * inputDims[0];
-				for (x = 0; x < inputDims[0]; x++)
+			if (ratio1 == 1)
+				memcpy(slicedScalars, inputScalars + kOffset1,  sizeof(DataType)*inputDims[0] * inputDims[1]);
+			else if(ratio2 ==1)
+				memcpy(slicedScalars, inputScalars + kOffset2, sizeof(DataType)*inputDims[0] * inputDims[1]);
+			else
+				for (y = 0; y < inputDims[1]; y++)
 				{
-					idx1 = x + jOffset1 + kOffset2;
-					idx2 = x + jOffset1 + kOffset2;
-					acc = inputScalars[idx1]*ratio1 + inputScalars[idx2]*ratio2;
-					slicedScalars[newIdx] = acc;
-					newIdx++;
+					jOffset1 = y * inputDims[0];
+					for (x = 0; x < inputDims[0]; x++)
+					{
+						idx1 = x + jOffset1 + kOffset1;
+						idx2 = x + jOffset1 + kOffset2;
+						acc = inputScalars[idx1]*ratio1 + inputScalars[idx2]*ratio2;
+						slicedScalars[newIdx] = acc;
+						newIdx++;
+					}
 				}
-			}
 			break;
 	}
 }
