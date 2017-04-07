@@ -817,7 +817,7 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafVME *in_node, mafVME 
 
 
 #ifdef _WIN32
-    mafString regKeyPath = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\";
+		mafString regKeyPath = "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\";
     regKeyPath.Append(appStamp.GetCStr());
 
     wxRegKey RegKey(wxString(regKeyPath.GetCStr()));
