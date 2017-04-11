@@ -152,6 +152,10 @@ SET(PROJECT_SRCS ${PROJECT_SRCS}
     )
 ENDIF (MAF_USE_OFFIS)
 
+IF(MAF_USE_BTK)
+	 SET(PROJECT_SRCS ${PROJECT_SRCS} mafOpImporterC3D.cpp			mafOpImporterC3D.h)
+ENDIF(MAF_USE_BTK)
+
 IF (MAF_USE_ITK)
   SET(PROJECT_SRCS
     ${PROJECT_SRCS}
@@ -172,7 +176,6 @@ IF (MAF_USE_ITK)
     mafOpImporterMotionData.h
     mafOpExporterLandmark.cpp		mafOpExporterLandmark.h
     mafOpClassicICPRegistration.cpp	mafOpClassicICPRegistration.h
-    mafOpImporterC3D.cpp			mafOpImporterC3D.h
     mafOpImporterGRFWS.cpp			mafOpImporterGRFWS.h
     mafOpImporterAnalogWS.cpp		mafOpImporterAnalogWS.h
     mafOpSmoothSurfaceCells.cpp		mafOpSmoothSurfaceCells.h
@@ -191,6 +194,15 @@ ENDIF (MAF_USE_VTK)
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+
+IF (MAF_USE_OFFIS)
+ ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_Offis_LIBRARY)
+ENDIF (MAF_USE_OFFIS)
+
+IF (MAF_USE_BTK)
+ ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_BTK_LIBRARY)
+ENDIF (MAF_USE_BTK)
+
 
 ADD_DEPENDENCIES(${PROJECT_NAME} mafCommon vtkMAF mafService)
 

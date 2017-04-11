@@ -688,6 +688,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			{
 				if (m_WizardManager && m_WizardRunning)
 				{
+					m_RunningOperation = false;
 					if (!mafOpSelect::SafeDownCast(m_OpManager->GetRunningOperation()))
 						m_WizardManager->WizardContinue(e->GetArg());
 				}
@@ -1758,7 +1759,7 @@ void mafLogicWithManagers::WizardRunTerminated()
 {
 	//Enabling menu, toolbars and selection by interacion manager and sidebar
 	m_WizardRunning = false;
-
+	
 	EnableMenuAndToolbar();
 	// currently mafInteraction is strictly dependent on VTK (marco)
 #ifdef MAF_USE_VTK
@@ -2387,7 +2388,7 @@ void mafLogicWithManagers::ShowAboutDialog(wxString imagePath, bool showWebSiteB
 	title += m_AppTitle;
 	
 	wxString revision = "";
-	wxRegKey RegKey(wxString("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + m_AppTitle));
+	wxRegKey RegKey(wxString("HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + m_AppTitle));
 	if (RegKey.Exists())
 	{
 		if (RegKey.HasValue(wxString("DisplayVersion")))
