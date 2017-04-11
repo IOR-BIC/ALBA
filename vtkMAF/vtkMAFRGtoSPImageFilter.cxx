@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notice for more information.
 vtkCxxRevisionMacro(vtkMAFRGtoSPImageFilter, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkMAFRGtoSPImageFilter);
 
+#define EPSILON 1e-3
 
 //----------------------------------------------------------------------------
 void vtkMAFRGtoSPImageFilter::PropagateUpdateExtent(vtkDataObject *output)
@@ -179,7 +180,7 @@ void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * 
 		{
 			yPos = bounds[2] + y*spacing[1];
 
-			if (yPos >= yCoordB)
+			while (yPos >= yCoordB)
 			{
 				yRG++;
 				yCoordA = yCoordB;
@@ -205,7 +206,7 @@ void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * 
 			{
 				xPos = bounds[0] + x*spacing[0];
 
-				if (xPos >= xCoordB)
+				while (xPos >= xCoordB)
 				{
 					xRG++;
 					xCoordA = xCoordB;
@@ -242,14 +243,14 @@ void vtkMAFRGtoSPImageFilter::GetBestSpacing(vtkRectilinearGrid* rGrid, double *
 	for (int xi = 1; xi < rGrid->GetXCoordinates()->GetNumberOfTuples(); xi++)
 	{
 		double spcx = rGrid->GetXCoordinates()->GetTuple1(xi) - rGrid->GetXCoordinates()->GetTuple1(xi - 1);
-		if (bestSpacing[0] > spcx && spcx != 0.0)
+		if (spcx > EPSILON && bestSpacing[0] > spcx && spcx != 0.0)
 			bestSpacing[0] = spcx;
 	}
 
 	for (int yi = 1; yi < rGrid->GetYCoordinates()->GetNumberOfTuples(); yi++)
 	{
 		double spcy = rGrid->GetYCoordinates()->GetTuple1(yi) - rGrid->GetYCoordinates()->GetTuple1(yi - 1);
-		if (bestSpacing[1] > spcy && spcy != 0.0)
+		if (spcy> EPSILON && bestSpacing[1] > spcy && spcy != 0.0)
 			bestSpacing[1] = spcy;
 	}
 
