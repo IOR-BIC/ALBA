@@ -93,6 +93,9 @@ bool mafAgent::HasObservers(mafID channel)
 //------------------------------------------------------------------------------
 {
   assert(channel>=0);
+	if (mafEventBroadcaster::HasObservers())
+		return true;
+
   for (int i=0;i<m_Channels.size();i++)
     if (m_Channels[i]->GetChannel() == channel)
       return m_Channels[i]->HasObservers();
@@ -105,9 +108,16 @@ void mafAgent::GetObservers(mafID channel,std::vector<mafObserver *> &olist)
 //------------------------------------------------------------------------------
 {
   olist.clear();
-  for (int i=0;i<m_Channels.size();i++)
-    if (m_Channels[i]->GetChannel() == channel)
-      m_Channels[i]->GetObservers(olist);  
+	if (channel == MCH_UP)
+	{
+		mafEventBroadcaster::GetObservers(olist);
+	}
+	else
+	{
+		for (int i = 0; i < m_Channels.size(); i++)
+			if (m_Channels[i]->GetChannel() == channel)
+				m_Channels[i]->GetObservers(olist);
+	}
 }
 //------------------------------------------------------------------------------
 void mafAgent::AddObserver(mafObserver *listener,mafID channel)
@@ -153,6 +163,8 @@ void mafAgent::RemoveObserver(mafObserver *listener)
     return;
   }
 
+	mafEventBroadcaster::RemoveObserver(listener);
+
   // remove from any channel
   for (int i=0;i<m_Channels.size();i++)
   {
@@ -164,6 +176,8 @@ void mafAgent::RemoveObserver(mafObserver *listener)
 void mafAgent::RemoveAllObservers()
 //------------------------------------------------------------------------------
 {
+	mafEventBroadcaster::RemoveAllObservers();
+
   for (int i=0;i<m_Channels.size();i++)
   {
     m_Channels[i]->RemoveAllObservers();

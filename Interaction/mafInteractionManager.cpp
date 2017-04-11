@@ -161,7 +161,15 @@ void mafInteractionManager::SetPER(mafInteractorPER *per)
     m_PositionalEventRouter->SetListener(NULL);
   }
 
+	//move camera observers from current per to new per
+	std::vector <mafObserver *> obVect;
+	m_PositionalEventRouter->GetCameraMouseInteractor()->GetObservers(MCH_UP, obVect);
+	m_PositionalEventRouter->GetCameraMouseInteractor()->RemoveAllObservers();
+
   m_PositionalEventRouter = per;
+
+	for (int i = 0; i < obVect.size(); i++)
+		m_PositionalEventRouter->GetCameraMouseInteractor()->AddObserver(obVect[i]);
 
   // bind new PER
   m_PositionalEventRouter->SetName("PositionalEventRouter");

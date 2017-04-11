@@ -450,11 +450,11 @@ void mafLogicWithManagers::OnQuit()
 	cppDEL(m_MaterialChooser);
 	cppDEL(m_HelpManager);
 
-	// currently mafInteraction is strictly dependent on VTK (marco)
+	cppDEL(m_ViewManager);
+
 #ifdef MAF_USE_VTK
 	cppDEL(m_InteractionManager);
 #endif
-	cppDEL(m_ViewManager);
 	cppDEL(m_OpManager);
 
 	// must be deleted after m_VMEManager
