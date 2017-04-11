@@ -125,7 +125,6 @@ protected:
 	double		m_SliderOrigin;
 	double		m_Opacity;
 	int				m_IDPlane;
-	int				m_SliceMode;
 	int				m_ViewIndex;
 	double		m_Dn;
 	bool			m_GlobalBoundsInitialized;

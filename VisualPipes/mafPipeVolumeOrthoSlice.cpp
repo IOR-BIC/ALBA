@@ -385,6 +385,18 @@ void mafPipeVolumeOrthoSlice::CreateSlice(int direction)
 }
 
 //----------------------------------------------------------------------------
+void mafPipeVolumeOrthoSlice::DeleteSlice(int direction)
+{
+	if (m_SliceActor[direction])
+		m_AssemblyUsed->RemovePart(m_SliceActor[direction]);
+	vtkDEL(m_Slicer[direction]);
+	vtkDEL(m_Texture[direction]);
+	vtkDEL(m_SliceMapper[direction]);
+	vtkDEL(m_SlicePlane[direction]);
+	vtkDEL(m_SliceActor[direction]);
+}
+
+//----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::UpdatePlaneOrigin(int direction)
 {
 	double p[3];
@@ -417,13 +429,7 @@ mafPipeVolumeOrthoSlice::~mafPipeVolumeOrthoSlice()
 
 	for(int i = 0; i<3; i++)
 	{
-		if(m_SliceActor[i])
-      m_AssemblyUsed->RemovePart(m_SliceActor[i]);
-		vtkDEL(m_Slicer[i]);
-		vtkDEL(m_Texture[i]);
-		vtkDEL(m_SliceMapper[i]);
-		vtkDEL(m_SlicePlane[i]);
-		vtkDEL(m_SliceActor[i]);
+		DeleteSlice(i);
 	}
 	vtkDEL(m_VolumeBoxActor);
 	vtkDEL(m_Actor);
@@ -469,6 +475,24 @@ void mafPipeVolumeOrthoSlice::SetSlice(double* Origin, double* Normal)
 		m_Origin[0] = Origin[0];
 		m_Origin[1] = Origin[1];
 		m_Origin[2] = Origin[2];
+	}
+	
+	if (Normal != NULL)
+	{
+		int newDirection;
+		if (Normal[0] == 1 && Normal[1] == 0 && Normal[2] == 0)
+			newDirection = SLICE_X;
+		else if (Normal[0] == 0 && Normal[1] == 1 && Normal[2] == 0)
+			newDirection = SLICE_Y;
+		else
+			newDirection = SLICE_Z;
+
+		if (newDirection != m_SliceDirection)
+		{
+			DeleteSlice(m_SliceDirection);
+			m_SliceDirection = newDirection;
+			CreateSlice(m_SliceDirection);
+		}
 	}
 
 	for(int i=0;i<3;i++)
