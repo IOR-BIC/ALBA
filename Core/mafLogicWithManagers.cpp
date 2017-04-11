@@ -450,11 +450,11 @@ void mafLogicWithManagers::OnQuit()
 	cppDEL(m_MaterialChooser);
 	cppDEL(m_HelpManager);
 
-	// currently mafInteraction is strictly dependent on VTK (marco)
+	cppDEL(m_ViewManager);
+
 #ifdef MAF_USE_VTK
 	cppDEL(m_InteractionManager);
 #endif
-	cppDEL(m_ViewManager);
 	cppDEL(m_OpManager);
 
 	// must be deleted after m_VMEManager
@@ -688,6 +688,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			{
 				if (m_WizardManager && m_WizardRunning)
 				{
+					m_RunningOperation = false;
 					if (!mafOpSelect::SafeDownCast(m_OpManager->GetRunningOperation()))
 						m_WizardManager->WizardContinue(e->GetArg());
 				}
@@ -1758,7 +1759,7 @@ void mafLogicWithManagers::WizardRunTerminated()
 {
 	//Enabling menu, toolbars and selection by interacion manager and sidebar
 	m_WizardRunning = false;
-
+	
 	EnableMenuAndToolbar();
 	// currently mafInteraction is strictly dependent on VTK (marco)
 #ifdef MAF_USE_VTK
