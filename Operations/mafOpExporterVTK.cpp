@@ -62,8 +62,7 @@ mafOp(label)
 	m_Binary        = 1;
 	m_ABSMatrixFlag = 0;
 
-	m_FileDir = mafGetLastUserFolder().c_str();
-  m_ForceUnsignedShortScalarOutputForStructuredPoints = FALSE;
+	m_ForceUnsignedShortScalarOutputForStructuredPoints = FALSE;
 }
 //----------------------------------------------------------------------------
 mafOpExporterVTK::~mafOpExporterVTK()
@@ -104,6 +103,9 @@ void mafOpExporterVTK::OpRun()
   bool isStructuredPoints = inputData->IsA("vtkStructuredPoints");
 
   mafString wildc = "vtk Data (*.vtk)|*.vtk";
+
+	m_FileDir = mafGetLastUserFolder().c_str();
+	m_File = m_FileDir + "\\" + m_Input->GetName() + ".vtk";
 
   m_Gui = new mafGUI(this);
   m_Gui->FileSave(ID_CHOOSE_FILENAME, _("vtk file"), &m_File, wildc);
