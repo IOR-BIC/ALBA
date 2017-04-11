@@ -144,6 +144,8 @@ protected:
 	/** Create the slicer pipeline. */
 	void CreateSlice(int direction);
 
+	void DeleteSlice(int direction);
+
 	void UpdatePlaneOrigin(int direction);
 
   /** Create all ticks */
