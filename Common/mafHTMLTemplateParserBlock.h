@@ -44,6 +44,7 @@ maf_HTML_SUBSTITUTION_FORWARD_UP,
 
 class mafView;
 class wxString;
+class vtkImageData;
 
 /**
  class name: mafHTMLTemplateParserBlock
@@ -81,10 +82,14 @@ public:
 	void AddImageVar(wxString name, wxString imagePath = "");
 	/** Add the variable specified in the name string to the list of variables */
 	void AddImageVar(wxString name, mafView *view);
+	/** Add the variable specified in the name string to the list of variables */
+	void AddImageVar(wxString name, vtkImageData *imageData);
 	/** Push the variable specified in the name string to the list of variables */
 	void PushImageVar(wxString name, wxString imagePath);
 	/** Push the variable specified in the name string to the list of variables */
 	void PushImageVar(wxString name, mafView *view);
+	/** Push the variable specified in the name string to the list of variables */
+	void PushImageVar(wxString name, vtkImageData *imageData);
 	/** Push the variable specified in the name string to the list of variables */
   void PushVar(wxString name, double varValue);
   /** Push the variable specified in the name string to the list of variables */
@@ -177,7 +182,7 @@ protected:
   /** Sets the father for the block */
   void SetFather(mafHTMLTemplateParserBlock *father);
     
-	wxString CalculateImageRTF(mafView *view, wxString imagePath);
+	wxString CalculateImageRTF(wxString imagePath, int width, int height);
 
   //VARIABLES
   mafHTMLTemplateParserBlock *m_Father;
