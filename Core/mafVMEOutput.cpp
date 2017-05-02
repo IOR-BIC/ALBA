@@ -474,9 +474,11 @@ void mafVMEOutput::GetAbsPose(double xyz[3],double rxyz[3],mafTimeStamp t) const
   mafMatrix mat;
   GetAbsMatrix(mat,t);
 
-  mafTransform::GetPosition(mat,xyz);
+	if(xyz != NULL)
+		mafTransform::GetPosition(mat,xyz);
 
-  mafTransform::GetOrientation(mat,rxyz);
+	if (rxyz != NULL)
+		mafTransform::GetOrientation(mat, rxyz);
 }
 
 //-------------------------------------------------------------------------
