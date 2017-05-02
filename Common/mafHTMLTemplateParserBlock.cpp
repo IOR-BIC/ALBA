@@ -27,6 +27,10 @@
 #include "mafView.h"
 #include "mafRWIBase.h"
 #include "mafDecl.h"
+#include "vtkImageData.h"
+#include "vtkJPEGWriter.h"
+#include "wx\mac\carbon\bitmap.h"
+#include "wx\image.h"
 
 //----------------------------------------------------------------------------
 mafHTMLTemplateParserBlock::mafHTMLTemplateParserBlock(int blockType, wxString name)
@@ -124,7 +128,18 @@ void mafHTMLTemplateParserBlock::AddVar( wxString name, wxString varValue )
 void mafHTMLTemplateParserBlock::AddImageVar(wxString name, mafView *view)
 //----------------------------------------------------------------------------
 {
-		AddVar(name, CalculateImageRTF(view, "")); //RTF image generation
+	// Write Image
+	wxString logPath = mafGetAppDataDirectory().c_str();
+	wxString imagePath = logPath + "\\imm.jpg";
+
+	view->CameraUpdate();
+	view->GetRWI()->Update();
+	view->GetRWI()->SaveImage(imagePath);
+
+	int width = view->GetRWI()->m_Width;
+	int height = view->GetRWI()->m_Height;
+
+	AddVar(name, CalculateImageRTF(imagePath, width, height)); //RTF image generation
 
 	//TODO AddImageVar for HTML Template
 }
@@ -133,7 +148,42 @@ void mafHTMLTemplateParserBlock::AddImageVar(wxString name, mafView *view)
 void mafHTMLTemplateParserBlock::AddImageVar(wxString name, wxString imagePath)
 //----------------------------------------------------------------------------
 {
-	AddVar(name, CalculateImageRTF(NULL, imagePath)); //RTF image generation
+	wxImage *previewImage;
+	previewImage = new wxImage();
+	previewImage->LoadFile(imagePath.c_str(), wxBITMAP_TYPE_ANY);
+
+	int width = previewImage->GetWidth();
+	int height = previewImage->GetHeight();
+
+	AddVar(name, CalculateImageRTF(imagePath, width, height));
+
+	delete previewImage;
+
+	//TODO AddImageVar for HTML Template
+}
+
+//----------------------------------------------------------------------------
+void mafHTMLTemplateParserBlock::AddImageVar(wxString name, vtkImageData *imageData)
+//----------------------------------------------------------------------------
+{
+	// Write Image
+	wxString logPath = mafGetAppDataDirectory().c_str();
+	wxString imagePath = logPath + "\\imm.jpg";
+
+	vtkJPEGWriter *imageJPEGWriter;
+	vtkNEW(imageJPEGWriter);
+
+	// Save image
+	imageJPEGWriter->SetInput(imageData);
+	imageJPEGWriter->SetFileName(imagePath);
+	imageJPEGWriter->Write();
+
+	vtkDEL(imageJPEGWriter);
+
+	int width = imageData->GetDimensions()[0];
+	int height = imageData->GetDimensions()[1];
+
+	AddVar(name, CalculateImageRTF(imagePath, width, height)); //RTF image generation
 
 	//TODO AddImageVar for HTML Template
 }
@@ -142,14 +192,60 @@ void mafHTMLTemplateParserBlock::AddImageVar(wxString name, wxString imagePath)
 void mafHTMLTemplateParserBlock::PushImageVar(wxString name, wxString imagePath)
 //----------------------------------------------------------------------------
 {
-	PushVar(name, CalculateImageRTF(NULL, imagePath));
+	wxImage *previewImage;
+	previewImage = new wxImage();
+	previewImage->LoadFile(imagePath.c_str(), wxBITMAP_TYPE_ANY);
+
+	int width = previewImage->GetWidth();
+	int height = previewImage->GetHeight();
+
+	PushVar(name, CalculateImageRTF(imagePath, width, height));
+
+	delete previewImage;
 }
 
 //----------------------------------------------------------------------------
 void mafHTMLTemplateParserBlock::PushImageVar(wxString name, mafView *view)
 //----------------------------------------------------------------------------
 {
-	PushVar(name, CalculateImageRTF(view, ""));
+	// Write Image
+	wxString logPath = mafGetAppDataDirectory().c_str();
+	wxString imagePath = logPath + "\\imm.jpg";
+
+	view->CameraUpdate();
+	view->GetRWI()->Update();
+	view->GetRWI()->SaveImage(imagePath);
+
+	int width = view->GetRWI()->m_Width;
+	int height = view->GetRWI()->m_Height;
+
+	PushVar(name, CalculateImageRTF(imagePath, width, height));
+}
+
+//----------------------------------------------------------------------------
+void mafHTMLTemplateParserBlock::PushImageVar(wxString name, vtkImageData *imageData)
+//----------------------------------------------------------------------------
+{
+	// Write Image
+	wxString logPath = mafGetAppDataDirectory().c_str();
+	wxString imagePath = logPath + "\\imm.jpg";
+
+	vtkJPEGWriter *imageJPEGWriter;
+	vtkNEW(imageJPEGWriter);
+
+	// Save image
+	imageJPEGWriter->SetInput(imageData);
+	imageJPEGWriter->SetFileName(imagePath);
+	imageJPEGWriter->Write();
+
+	vtkDEL(imageJPEGWriter);
+
+	int width = imageData->GetDimensions()[0];
+	int height = imageData->GetDimensions()[1];	
+	
+	PushVar(name, CalculateImageRTF(imagePath, width, height)); //RTF image generation
+
+	//TODO AddImageVar for HTML Template
 }
 
 //----------------------------------------------------------------------------
@@ -1040,36 +1136,34 @@ int mafHTMLTemplateParserBlock::GetNLoops()
 }
 
 //----------------------------------------------------------------------------
-wxString mafHTMLTemplateParserBlock::CalculateImageRTF(mafView *view, wxString imagePath)
+wxString mafHTMLTemplateParserBlock::CalculateImageRTF(wxString imagePath, int width, int height)
 {
 	int widthGoal = 8640;
-	int heightGoal = 4680;
+	int heightGoal = 12960;
 
-	if (imagePath == "")
+// 	int newWidthGoal = (heightGoal / height) * width;
+// 
+// 	if (newWidthGoal > widthGoal)
+// 	{
+// 		heightGoal = (widthGoal / width) * height;
+// 	}
+// 	else
+// 	{
+// 		widthGoal = newWidthGoal;
+// 	}
+
+	//
+	int newHeightGoal = (widthGoal / width) * height;
+
+	if (newHeightGoal > heightGoal)
 	{
-		// Write Image
-		wxString logPath = mafGetAppDataDirectory().c_str();
-		imagePath = logPath + "\\imm.jpg";
-
-		view->CameraUpdate();
-		view->GetRWI()->Update();
-		view->GetRWI()->SaveImage(imagePath);
-
-		int width = view->GetRWI()->m_Width;
-		int height = view->GetRWI()->m_Height;
-
-		int newWidthGoal = (heightGoal / height) * width;
-
-		if (newWidthGoal > widthGoal)
-		{
-			heightGoal = (widthGoal / width) * height;
-		}
-		else
-		{
-			widthGoal = newWidthGoal;
-		}
+		widthGoal = (heightGoal / height) * width;
 	}
-
+	else
+	{
+		heightGoal = newHeightGoal;
+	}
+		
 	// Read Image
 	wxString imageStr = "", byteStr = "";
 
