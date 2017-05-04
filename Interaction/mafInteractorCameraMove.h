@@ -83,7 +83,7 @@ public:
   void ResetClippingRange(); // to work with layers
 
   virtual void AutoResetClippingRangeOn();
-  virtual void AutoResetClippingRangeOff();
+	virtual void AutoResetClippingRangeOff();
 
 protected:
   mafInteractorCameraMove();
@@ -92,6 +92,8 @@ protected:
   virtual void OnButtonDown(mafEventInteraction *e);
   
   virtual void OnButtonUp(mafEventInteraction *e);
+
+	virtual void OnMouseWheel(mafEventInteraction *e);
 	  
   float         m_MotionFactor;
   int           m_State;  
