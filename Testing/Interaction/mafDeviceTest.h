@@ -44,9 +44,6 @@ class mafDeviceTest : public mafTest
   //CPPUNIT_TEST(TestStop);
   
   CPPUNIT_TEST(TestStartUp);
-  CPPUNIT_TEST(TestLock);
-  CPPUNIT_TEST(TestUnlock);
-  CPPUNIT_TEST(TestIsLocked);
   CPPUNIT_TEST(TestSetGetPersistentFlag);  
   CPPUNIT_TEST(TestIsPersistent);
   CPPUNIT_TEST(TestGetGui);
@@ -66,9 +63,6 @@ class mafDeviceTest : public mafTest
   void TestStart();
   void TestStop();
   void TestStartUp();
-  void TestLock();
-  void TestUnlock();
-  void TestIsLocked();
   void TestSetGetPersistentFlag();  
   void TestIsPersistent();
   void TestGetGui();

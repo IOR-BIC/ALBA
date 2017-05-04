@@ -143,55 +143,6 @@ void mafDeviceTest::TestStartUp()
   dummyDevice->Delete();
 }
 //----------------------------------------------------------------------------
-void mafDeviceTest::TestLock()
-{
-  mafDevice *dummyDevice = mafDevice::New();
-  CPPUNIT_ASSERT(dummyDevice);
-  
-  bool lock = dummyDevice->Lock();
-  CPPUNIT_ASSERT_EQUAL(lock, true);
-
-
-  dummyDevice->Delete();
-}
-//----------------------------------------------------------------------------
-void mafDeviceTest::TestUnlock()
-{
-  mafDevice *dummyDevice = mafDevice::New();
-  CPPUNIT_ASSERT(dummyDevice);
-  
-  bool lock = dummyDevice->Lock();
-  CPPUNIT_ASSERT_EQUAL(lock, true);
-
-  bool isLocked = dummyDevice->IsLocked();
-  CPPUNIT_ASSERT_EQUAL(isLocked, true);
-
-  dummyDevice->Unlock();
-
-  isLocked = dummyDevice->IsLocked();
-  CPPUNIT_ASSERT_EQUAL(isLocked, false);
-
-  dummyDevice->Delete();
-}
-//----------------------------------------------------------------------------
-void mafDeviceTest::TestIsLocked()
-{
-  mafDevice *dummyDevice = mafDevice::New();
-  CPPUNIT_ASSERT(dummyDevice);
-  
-  bool defaultLock = dummyDevice->IsLocked();
-  CPPUNIT_ASSERT_EQUAL(defaultLock, false);
-
-  bool returnValue = dummyDevice->Lock();
-  CPPUNIT_ASSERT_EQUAL(returnValue, true);
-  
-  dummyDevice->Unlock();
-  bool isLocked = dummyDevice->IsLocked();
-  CPPUNIT_ASSERT_EQUAL(defaultLock, false);
-
-  dummyDevice->Delete();
-}
-//----------------------------------------------------------------------------
 void mafDeviceTest::TestSetGetPersistentFlag()
 {
   mafDevice *dummyDevice = mafDevice::New();
