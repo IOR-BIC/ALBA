@@ -279,7 +279,7 @@ void mafInteractorPER::OnRightButtonUp(mafEventInteraction *e)
 
 	if(m_ShowContextMenu && mouse)
 	{
-    mafVME *vme = GetPickedVME(mouse);
+    mafVME *vme = GetPickedVME(mouse); 
     InvokeEvent(this,SHOW_CONTEXTUAL_MENU,MCH_UP,vme);
 	}
 
@@ -411,9 +411,6 @@ void mafInteractorPER::OnButtonUp(mafEventInteraction *e)
 int mafInteractorPER::StartInteraction(mafDevice *device, int button)
 //------------------------------------------------------------------------------
 {
-  if (device&&device->IsLocked())
-    return false;
-
   // Check if already interacting with the same device: it could happen the user
   // contemporary pressed another button...
   if (m_Mode == SINGLE_BUTTON)

@@ -64,7 +64,6 @@ mafInteractor::mafInteractor()
   m_Prop                = NULL;
   m_TestMode = false;
   
-  m_LockDevice            = true;
   m_DeviceIsSet           = false;
   m_IgnoreTriggerEvents   = false;
   m_InteractionFlag       = false;
@@ -83,10 +82,7 @@ mafInteractor::mafInteractor()
 mafInteractor::~mafInteractor()
 //------------------------------------------------------------------------------
 {
-  if (IsInteracting()&&m_Device&&m_LockDevice)
-    m_Device->Unlock();
-  
-  m_Device = NULL;
+	m_Device = NULL;
 }
 
 //------------------------------------------------------------------------------
@@ -145,10 +141,6 @@ int mafInteractor::StartInteraction(mafDevice *device)
   // if not already interacting start the interaction
   if (!IsInteracting())
   {
-    // if device already in use return
-    if (device&&m_LockDevice&&device->IsLocked())
-      return false;
-
     // if device != from device set from outside
     if (m_DeviceIsSet&&device!=m_Device)
       return false;
@@ -159,8 +151,6 @@ int mafInteractor::StartInteraction(mafDevice *device)
     if (device)         
     { 
       m_Device=device;// Beware there could be more then one attached as input, set which is interacting
-      if (m_LockDevice)
-        device->Lock();
     }
                        
     m_ButtonsCounter=1;
@@ -197,9 +187,6 @@ int mafInteractor::StopInteraction(mafDevice *device)
 
       if (device)
       {
-        if (m_LockDevice)
-          device->Unlock();
-
         if (!m_DeviceIsSet) // if device set from outside, do not reset
           m_Device=NULL;
       }

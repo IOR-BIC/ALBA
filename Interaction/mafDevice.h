@@ -103,18 +103,6 @@ public:
     Return false if AutoStart is OFF or initialization failed */
   virtual int StartUp() { return m_AutoStart?Start():0;}
 
-  /** Lock this device, this is used by interactors needing
-      an exclusive use of the device. This is not thread safe (!)
-      since events are serialized and thus it should be for
-      the event starting the interaction and calling the Lock.
-      Return true if the locking was successful false if 
-      another interactor has already locked the device */
-  bool Lock() {return IsLocked()?false:m_Locked=true;}
-  void Unlock() {m_Locked = false;}
- 
-  /** return true if locked */
-  bool IsLocked() {return m_Locked;}
-
   /** 
     set peristent flag: a persistent device is not stored/restored and
     neither removed when settings are loaded from disk. It's created by
