@@ -212,6 +212,10 @@ public:
 
 	static void ShowWebSite(wxString url);
 
+
+	/** Returns true if there is a Running Operation */
+	bool IsRunningOperation() const { return m_RunningOperation; }
+		
 protected:
 	//---------------------------------------------------------
 	// Description:

@@ -65,24 +65,29 @@ void mafInteractorCameraMove::OnEvent(mafEventBase *event)
     mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(GetDevice());
     
     // if the event comes from tracker which started the interaction continue...
-    if (id == mafDeviceButtonsPadMouse::GetMouse2DMoveId() && mouse)
-    {
-      if (!m_CurrentCamera)
-        return;
+		if (id == mafDeviceButtonsPadMouse::GetMouse2DMoveId() && mouse)
+		{
+			if (!m_CurrentCamera)
+				return;
 
-	    double pos2d[2];
-      e->Get2DPosition(pos2d);
-      m_MousePose[0] = (int)pos2d[0];
-      m_MousePose[1] = (int)pos2d[1];
-      
-      OnMouseMove();
+			double pos2d[2];
+			e->Get2DPosition(pos2d);
+			m_MousePose[0] = (int)pos2d[0];
+			m_MousePose[1] = (int)pos2d[1];
 
-      m_LastMousePose[0] = m_MousePose[0];
-      m_LastMousePose[1] = m_MousePose[1];
-      
-      return;
-    }
+			OnMouseMove();
+
+			m_LastMousePose[0] = m_MousePose[0];
+			m_LastMousePose[1] = m_MousePose[1];
+
+			return;
+		}
   }
+	else if (id == mafDeviceButtonsPadMouse::GetWheelId())
+	{
+		OnMouseWheel((mafEventInteraction *)event);
+		return;
+	}
     
   Superclass::OnEvent(event);
 }
@@ -535,4 +540,38 @@ void mafInteractorCameraMove::AutoResetClippingRangeOff()
 void mafInteractorCameraMove::AutoResetClippingRangeOn()
 {
 	m_AutoResetClippingRange = true;
+}
+
+void mafInteractorCameraMove::OnMouseWheel(mafEventInteraction *e)
+{
+	mafDeviceButtonsPadMouse *mouse;
+	mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
+	
+	if(device)
+		 mouse = mafDeviceButtonsPadMouse::SafeDownCast(device);
+	
+	if (mouse)
+		m_Renderer = mouse->GetRenderer();
+
+	if(m_Renderer)
+		m_CurrentCamera = m_Renderer->GetActiveCamera();
+
+	if (m_Renderer == NULL)
+		return;
+
+	double *center = m_Renderer->GetCenter();
+
+	double rotation = *(double *)e->GetData();
+	double zoomFactor = 1.0 + (rotation / 1200.0);
+
+	if (m_CurrentCamera->GetParallelProjection())
+		m_CurrentCamera->SetParallelScale(m_CurrentCamera->GetParallelScale() / zoomFactor);
+	else
+		m_CurrentCamera->Dolly(zoomFactor);
+
+	if (m_AutoResetClippingRange)
+		ResetClippingRange();
+
+	InvokeEvent(this, CAMERA_MOVED, MCH_UP, m_CurrentCamera);
+	m_Renderer->GetRenderWindow()->Render();
 }

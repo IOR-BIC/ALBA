@@ -119,7 +119,6 @@ int mafVME::InternalInitialize()
 		if (link.m_Node == NULL && link.m_NodeId >= 0)
 		{
 			mafVME *node = root->FindInTreeById(link.m_NodeId);
-			assert(node);
 			if (node)
 			{
 				// attach linked node to this one

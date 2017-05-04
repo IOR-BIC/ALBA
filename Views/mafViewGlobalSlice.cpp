@@ -205,7 +205,7 @@ void mafViewGlobalSlice::Create()
 {
   if(m_LightCopyEnabled) return; //COPY_LIGHT
 
-	PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeArbSlice", MUTEX);
+	PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeArbSlice", VISIBLE);
 
   RWI_LAYERS num_layers = TWO_LAYER;
   

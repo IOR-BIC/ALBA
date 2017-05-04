@@ -53,7 +53,6 @@ mafInteractorCompositorMouse::mafInteractorCompositorMouse()
   m_ActiveMMIGeneric = NULL;  
   m_MousePose[0] = m_MousePose[1] = m_LastMousePose[0] = m_LastMousePose[1] = 0;
   m_CurrentCamera = NULL;
-  SetLockDevice(false);
 }
 //----------------------------------------------------------------------------
 mafInteractorCompositorMouse::~mafInteractorCompositorMouse() 

@@ -279,39 +279,11 @@ void mafInteractorPER::OnRightButtonUp(mafEventInteraction *e)
 
 	if(m_ShowContextMenu && mouse)
 	{
-    mafVME *vme = GetPickedVME(mouse);
+    mafVME *vme = GetPickedVME(mouse); 
     InvokeEvent(this,SHOW_CONTEXTUAL_MENU,MCH_UP,vme);
 	}
 
   OnButtonUp(e);
-}
-
-//----------------------------------------------------------------------------
-void mafInteractorPER::OnMouseWheel(mafEventInteraction *e)
-{
-	m_ShowContextMenu = false;
-	
-	mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
-	mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(device);
-
-	if (mouse)
-	{
-		vtkRenderer *ren = mouse->GetRenderer();
-
-		if (!ren) return; // no renderer no fly to!
-
-		vtkCamera *cam = ren->GetActiveCamera();
-		
-		double rotation = *(double *)e->GetData();
-		//mafLogMessage("delta=%f", rotation);
-
-		double zoom = 1.0 + (rotation / 1200.0);
-
-		cam->Zoom(zoom);
-		
-		ren->ResetCameraClippingRange();
-		ren->GetRenderWindow()->Render();
-	}
 }
 
 //----------------------------------------------------------------------------
@@ -411,9 +383,6 @@ void mafInteractorPER::OnButtonUp(mafEventInteraction *e)
 int mafInteractorPER::StartInteraction(mafDevice *device, int button)
 //------------------------------------------------------------------------------
 {
-  if (device&&device->IsLocked())
-    return false;
-
   // Check if already interacting with the same device: it could happen the user
   // contemporary pressed another button...
   if (m_Mode == SINGLE_BUTTON)
@@ -530,9 +499,10 @@ void mafInteractorPER::OnEvent(mafEventBase *event)
     mafDevice *device = (mafDevice *)event->GetSender();
     assert(device);
 
-		if (id == mafDeviceButtonsPadMouse::GetWheelId() && !IsInteracting(device))
+		if (m_CameraBehavior && id == mafDeviceButtonsPadMouse::GetWheelId() && !IsInteracting(device))
 		{
-			OnMouseWheel((mafEventInteraction *)event);
+			m_ShowContextMenu = false;
+			m_CameraMouseBehavior->OnEvent(event);
 			return;
 		}
 

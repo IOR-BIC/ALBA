@@ -150,10 +150,7 @@ public:
   void SetButtonModeToSingleButton() {m_ButtonMode=SINGLE_BUTTON_MODE;}
   void SetButtonModeToMultiButton() {m_ButtonMode=MULTI_BUTTON_MODE;}
 
-  /** enable/disable device locking when interaction starts. Default is true! */
-  void SetLockDevice(bool flag) {m_LockDevice = flag;}
-  bool GetLockDevice() {return m_LockDevice;}
-  
+    
   /**  Process events coming from input device */
   virtual void OnEvent(mafEventBase *event);
 
@@ -199,7 +196,6 @@ protected:
 
   mafDevice     *m_Device;
 
-  bool          m_LockDevice;
   bool          m_DeviceIsSet;          ///< true if the device has been set with SetDevice by other classes  
   mafID         m_StartInteractionEvent;///< the event ID starting the interaction
   mafID         m_StopInteractionEvent; ///< the event ID starting the interaction
