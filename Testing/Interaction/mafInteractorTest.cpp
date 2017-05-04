@@ -327,20 +327,3 @@ void mafInteractorTest::TestSetGetButtonMode()
 
   mafDEL(interactor);
 }
-//----------------------------------------------------------------------------
-void mafInteractorTest::TestSetGetLockDevice()
-//----------------------------------------------------------------------------
-{
-  mafInteractorDummy *interactor;
-  mafNEW(interactor);
-
-  interactor->SetLockDevice(true);
-
-  CPPUNIT_ASSERT(interactor->GetLockDevice() == true);
-
-  interactor->SetLockDevice(false);
-
-  CPPUNIT_ASSERT(interactor->GetLockDevice() == false);
-
-  mafDEL(interactor);
-}
