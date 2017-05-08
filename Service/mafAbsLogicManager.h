@@ -46,5 +46,8 @@ public:
 	virtual void CameraUpdate() = 0;
 
 	virtual void CameraReset() = 0;
+
+	/** Returns true if there is a Running Operation */
+	virtual bool IsOperationRunning() = 0;
 };
 #endif
