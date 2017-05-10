@@ -95,3 +95,6 @@ void mafFakeLogicForTest::AddCall(testFunctions func, mafVME* vme)
 
 	m_Calls.push_back(call);
 }
+
+//----------------------------------------------------------------------------
+bool mafFakeLogicForTest::IsOperationRunning() { return false; }

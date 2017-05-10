@@ -211,10 +211,9 @@ public:
 	virtual void ShowSplashScreen(wxBitmap &splashImage);
 
 	static void ShowWebSite(wxString url);
-
-
+	
 	/** Returns true if there is a Running Operation */
-	bool IsRunningOperation() const { return m_RunningOperation; }
+	bool IsOperationRunning() { return m_RunningOperation; }
 		
 protected:
 	//---------------------------------------------------------

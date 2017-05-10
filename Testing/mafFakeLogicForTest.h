@@ -69,6 +69,9 @@ public:
 	calls GetCall(int callNum);
 	
 	void AddCall(testFunctions func, mafVME* vme);
+
+	virtual bool IsOperationRunning();
+
 protected:
 	
 	std::vector<calls> m_Calls;

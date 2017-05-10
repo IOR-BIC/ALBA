@@ -67,8 +67,8 @@
 #include "mafPipeVolumeDRRTest.h"
 #include "mafPipeVolumeMIPTest.h"
 #include "mafPipeVolumeProjectedTest.h"
-//#include "mafPipeVolumeArbSliceTest.h"
-//#include "mafPipeVolumeOrthoSliceTest.h"
+#include "mafPipeVolumeArbSliceTest.h"
+#include "mafPipeVolumeOrthoSliceTest.h"
 #include "mafPipeWrappedMeterTest.h"
 #include "mafServiceLocator.h"
 #include "mafVisualPipePolylineGraphTest.h"
@@ -136,8 +136,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafPipePolylineGraphEditorTest::suite());
 	runner.addTest(mafPipeMeshSliceTest::suite());
 	runner.addTest(mafPipeSurfaceSliceTest::suite());
-// 	runner.addTest(mafPipeVolumeOrthoSliceTest::suite());
-// 	runner.addTest(mafPipeVolumeArbSliceTest::suite());
+	runner.addTest(mafPipeVolumeOrthoSliceTest::suite());
+ 	runner.addTest(mafPipeVolumeArbSliceTest::suite());
 	runner.addTest(mafPipeTrajectoriesTest::suite());
 	runner.addTest(mafPipeSliceTest::suite());
 	runner.addTest(mafPipePolylineSliceTest::suite());
