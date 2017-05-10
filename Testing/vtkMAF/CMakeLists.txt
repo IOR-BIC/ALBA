@@ -102,6 +102,7 @@ SET(PROJECT_SRCS
 	vtkMAFImageFillHolesRemoveIslandsTest.h vtkMAFImageFillHolesRemoveIslandsTest.cpp
 	vtkMAFRayCastCleanerTest.h vtkMAFRayCastCleanerTest.cpp
 	vtkMAFLineStripSourceTest.h vtkMAFLineStripSourceTest.cpp
+	vtkMafRGtoSPImageFilterTest.h vtkMafRGtoSPImageFilterTest.cpp
 )
 
 ADD_EXECUTABLE(vtkMAFTests ${PROJECT_SRCS})
