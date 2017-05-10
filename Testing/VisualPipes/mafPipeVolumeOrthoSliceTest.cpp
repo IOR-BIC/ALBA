@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipeVolumeSliceTest
- Authors: Eleonora Mambrini
+ Module: mafPipeVolumeOrthoSliceTest
+ Authors: Eleonora Mambrini, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -23,8 +23,8 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "mafPipeVolumeSliceTest.h"
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeVolumeOrthoSliceTest.h"
+#include "mafPipeVolumeOrthoSlice.h"
 
 #include "mafSceneNode.h"
 #include "mafVMEVolumeGray.h"
@@ -53,12 +53,12 @@ enum PIPE_BOX_ACTORS
 };
 
 //----------------------------------------------------------------------------
-void mafPipeVolumeSliceTest::TestFixture()
+void mafPipeVolumeOrthoSliceTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSliceTest::BeforeTest()
+void mafPipeVolumeOrthoSliceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -74,7 +74,7 @@ void mafPipeVolumeSliceTest::BeforeTest()
 	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSliceTest::AfterTest()
+void mafPipeVolumeOrthoSliceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);
@@ -84,16 +84,17 @@ void mafPipeVolumeSliceTest::AfterTest()
 
 enum ID_TEST
 {
-  ID_TEST_PIPEEXECUTION = 0,
-  ID_TEST_PIPEEXECUTION_SLICEOPACITY = 10,
-  ID_TEST_PIPEEXECUTION_LUTRANGE = 20,
-  ID_TEST_PIPEEXECUTION_COLORLOOKUPTABLE = 30,
-  ID_TEST_PIPEEXECUTION_TICKS = 40,
-  ID_TEST_PIPEEXECUTION_SHOWSLIDER = 50,
+	ID_TEST_PIPEEXECUTION = 0,
+	ID_TEST_PIPEEXECUTION_SLICEOPACITY = 10,
+	ID_TEST_PIPEEXECUTION_LUTRANGE = 20,
+	ID_TEST_PIPEEXECUTION_COLORLOOKUPTABLE = 30,
+	ID_TEST_PIPEEXECUTION_TICKS = 40,
+	ID_TEST_PIPEEXECUTION_SHOWSLIDER = 50,
+	ID_TEST_PIPEEXECUTION_INTERPOLATION = 60,
 };
 
 //----------------------------------------------------------------------------
-void mafPipeVolumeSliceTest::TestPipeExecution()
+void mafPipeVolumeOrthoSliceTest::TestPipeExecution()
 //----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
@@ -122,10 +123,10 @@ void mafPipeVolumeSliceTest::TestPipeExecution()
 
   double zValue[3][3]={{4.0,4.0,0.0},{4.0,4.0,1.0},{4.0,4.0,2.0}};
 
-  for (int direction = mafPipeVolumeSlice::SLICE_X ; direction<=mafPipeVolumeSlice::SLICE_Z;direction++)
+  for (int direction = mafPipeVolumeOrthoSlice::SLICE_X ; direction<=mafPipeVolumeOrthoSlice::SLICE_Z;direction++)
   {
     /////////// Pipe Instance and Creation ///////////
-    mafPipeVolumeSlice *pipeSlice = new mafPipeVolumeSlice;
+    mafPipeVolumeOrthoSlice *pipeSlice = new mafPipeVolumeOrthoSlice;
     pipeSlice->InitializeSliceParameters(direction,zValue[0],true);
     pipeSlice->Create(sceneNode);
 
@@ -145,18 +146,18 @@ void mafPipeVolumeSliceTest::TestPipeExecution()
     double x,y,z,vx,vy,vz;
     switch(direction)
     {
-    case mafPipeVolumeSlice::SLICE_X:
+    case mafPipeVolumeOrthoSlice::SLICE_X:
       {
         //x=-1 ;y=0; z=0; vx=0; vy=0; vz=1;
         x=1 ;y=0; z=0; vx=0; vy=0; vz=1;
       }
       break;
-    case mafPipeVolumeSlice::SLICE_Y:
+    case mafPipeVolumeOrthoSlice::SLICE_Y:
       {
         x=0; y=-1; z=0; vx=0; vy=0; vz=1;
       }
       break;
-    case mafPipeVolumeSlice::SLICE_Z:
+    case mafPipeVolumeOrthoSlice::SLICE_Z:
       {
         //x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
         x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
@@ -202,7 +203,7 @@ void mafPipeVolumeSliceTest::TestPipeExecution()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeVolumeSliceTest::TestPipeExecution_SetSliceOpacity()
+void mafPipeVolumeOrthoSliceTest::TestPipeExecution_SetSliceOpacity()
 //----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
@@ -231,10 +232,10 @@ void mafPipeVolumeSliceTest::TestPipeExecution_SetSliceOpacity()
 
   double zValue[3][3]={{4.0,4.0,0.0},{4.0,4.0,1.0},{4.0,4.0,2.0}};
 
-  for (int direction = mafPipeVolumeSlice::SLICE_X ; direction<=mafPipeVolumeSlice::SLICE_Z;direction++)
+  for (int direction = mafPipeVolumeOrthoSlice::SLICE_X ; direction<=mafPipeVolumeOrthoSlice::SLICE_Z;direction++)
   {
     /////////// Pipe Instance and Creation ///////////
-    mafPipeVolumeSlice *pipeSlice = new mafPipeVolumeSlice;
+    mafPipeVolumeOrthoSlice *pipeSlice = new mafPipeVolumeOrthoSlice;
     pipeSlice->InitializeSliceParameters(direction,zValue[0],true);
     pipeSlice->Create(sceneNode);
 
@@ -261,18 +262,18 @@ void mafPipeVolumeSliceTest::TestPipeExecution_SetSliceOpacity()
     double x,y,z,vx,vy,vz;
     switch(direction)
     {
-    case mafPipeVolumeSlice::SLICE_X:
+    case mafPipeVolumeOrthoSlice::SLICE_X:
       {
         //x=-1 ;y=0; z=0; vx=0; vy=0; vz=1;
         x=1 ;y=0; z=0; vx=0; vy=0; vz=1;
       }
       break;
-    case mafPipeVolumeSlice::SLICE_Y:
+    case mafPipeVolumeOrthoSlice::SLICE_Y:
       {
         x=0; y=-1; z=0; vx=0; vy=0; vz=1;
       }
       break;
-    case mafPipeVolumeSlice::SLICE_Z:
+    case mafPipeVolumeOrthoSlice::SLICE_Z:
       {
         //x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
         x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
@@ -319,7 +320,7 @@ void mafPipeVolumeSliceTest::TestPipeExecution_SetSliceOpacity()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeVolumeSliceTest::TestPipeExecution_SetLutRange()
+void mafPipeVolumeOrthoSliceTest::TestPipeExecution_SetLutRange()
 //----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
@@ -348,10 +349,10 @@ void mafPipeVolumeSliceTest::TestPipeExecution_SetLutRange()
 
   double zValue[3][3]={{4.0,4.0,0.0},{4.0,4.0,1.0},{4.0,4.0,2.0}};
 
-  for (int direction = mafPipeVolumeSlice::SLICE_X ; direction<=mafPipeVolumeSlice::SLICE_Z;direction++)
+  for (int direction = mafPipeVolumeOrthoSlice::SLICE_X ; direction<=mafPipeVolumeOrthoSlice::SLICE_Z;direction++)
   {
     /////////// Pipe Instance and Creation ///////////
-    mafPipeVolumeSlice *pipeSlice = new mafPipeVolumeSlice;
+    mafPipeVolumeOrthoSlice *pipeSlice = new mafPipeVolumeOrthoSlice;
     pipeSlice->InitializeSliceParameters(direction,zValue[0],true);
     pipeSlice->Create(sceneNode);
 
@@ -380,18 +381,18 @@ void mafPipeVolumeSliceTest::TestPipeExecution_SetLutRange()
     double x,y,z,vx,vy,vz;
     switch(direction)
     {
-    case mafPipeVolumeSlice::SLICE_X:
+    case mafPipeVolumeOrthoSlice::SLICE_X:
       {
         //x=-1 ;y=0; z=0; vx=0; vy=0; vz=1;
         x=1 ;y=0; z=0; vx=0; vy=0; vz=1;
       }
       break;
-    case mafPipeVolumeSlice::SLICE_Y:
+    case mafPipeVolumeOrthoSlice::SLICE_Y:
       {
         x=0; y=-1; z=0; vx=0; vy=0; vz=1;
       }
       break;
-    case mafPipeVolumeSlice::SLICE_Z:
+    case mafPipeVolumeOrthoSlice::SLICE_Z:
       {
         //x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
         x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
@@ -437,7 +438,126 @@ void mafPipeVolumeSliceTest::TestPipeExecution_SetLutRange()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeVolumeSliceTest::TestPipeExecution_SetColorLookupTable()
+void mafPipeVolumeOrthoSliceTest::TestPipeExecution_SetInterpolation()
+{
+	////// Create VME (import vtkData) ////////////////////
+	vtkStructuredPointsReader *importer;
+	vtkNEW(importer);
+	mafString filename1 = MAF_DATA_ROOT;
+	filename1 << "/Test_PipeVolumeSlice/VolumeSP.vtk";
+	importer->SetFileName(filename1.GetCStr());
+	importer->Update();
+
+	mafVMEVolumeGray *volumeInput;
+	mafNEW(volumeInput);
+	volumeInput->SetData((vtkImageData*)importer->GetOutput(), 0.0);
+	volumeInput->GetOutput()->GetVTKData()->Update();
+	volumeInput->GetOutput()->Update();
+	volumeInput->Update();
+
+	mmaVolumeMaterial *material;
+	mafNEW(material);
+
+	mafVMEOutputVolume::SafeDownCast(volumeInput->GetOutput())->SetMaterial(material);
+
+	//Assembly will be create when instancing mafSceneNode
+	mafSceneNode *sceneNode;
+	sceneNode = new mafSceneNode(NULL, NULL, volumeInput, NULL);
+
+	double zValue[3][3] = { { 4.0,4.0,0.0 },{ 4.0,4.0,1.0 },{ 4.0,4.0,2.0 } };
+
+	for (int direction = mafPipeVolumeOrthoSlice::SLICE_X; direction <= mafPipeVolumeOrthoSlice::SLICE_Z; direction++)
+	{
+		/////////// Pipe Instance and Creation ///////////
+		mafPipeVolumeOrthoSlice *pipeSlice = new mafPipeVolumeOrthoSlice;
+		pipeSlice->InitializeSliceParameters(direction, zValue[0], true);
+		pipeSlice->Create(sceneNode);
+		pipeSlice->SetInterpolationOff();
+
+		double range[2], range_out[2];
+		range[0] = 0.2;
+		range[1] = 0.5;
+
+		pipeSlice->SetLutRange(range[0], range[1]);
+		pipeSlice->GetLutRange(range_out);
+
+		CPPUNIT_ASSERT(range[0] == range_out[0] && range[1] == range_out[1]);
+
+		////////// ACTORS List ///////////////
+		vtkPropCollection *actorList = vtkPropCollection::New();
+		pipeSlice->GetAssemblyFront()->GetActors(actorList);
+
+		actorList->InitTraversal();
+		vtkProp *actor = actorList->GetNextProp();
+		while (actor)
+		{
+			m_Renderer->AddActor(actor);
+			m_RenderWindow->Render();
+
+			actor = actorList->GetNextProp();
+		}
+		double x, y, z, vx, vy, vz;
+		switch (direction)
+		{
+			case mafPipeVolumeOrthoSlice::SLICE_X:
+			{
+				//x=-1 ;y=0; z=0; vx=0; vy=0; vz=1;
+				x = 1; y = 0; z = 0; vx = 0; vy = 0; vz = 1;
+			}
+			break;
+			case mafPipeVolumeOrthoSlice::SLICE_Y:
+			{
+				x = 0; y = -1; z = 0; vx = 0; vy = 0; vz = 1;
+			}
+			break;
+			case mafPipeVolumeOrthoSlice::SLICE_Z:
+			{
+				//x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
+				x = 0; y = 0; z = -1; vx = 0; vy = -1; vz = 0;
+			}
+			break;
+		}
+
+		m_Renderer->GetActiveCamera()->ParallelProjectionOn();
+		m_Renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
+		m_Renderer->GetActiveCamera()->SetPosition(x * 100, y * 100, z * 100);
+		m_Renderer->GetActiveCamera()->SetViewUp(vx, vy, vz);
+		m_Renderer->GetActiveCamera()->SetClippingRange(0.1, 1000);
+
+		for (int i = 0; i < 3; i++)
+		{
+			//
+			double normals[3];
+			normals[0] = 0.0;
+			normals[1] = 0.0;
+			normals[2] = 0.0;
+			pipeSlice->SetSlice(zValue[i], normals);
+
+			m_Renderer->ResetCamera();
+
+			char *strings = "Slice";
+
+			m_RenderWindow->Render();
+			printf("\n Visualization: %s \n", strings);
+
+			COMPARE_IMAGES("TestPipeExecution_SetInterpolation", ID_TEST_PIPEEXECUTION_INTERPOLATION + 3 * direction + i);
+		}
+
+		m_Renderer->RemoveAllProps();
+		vtkDEL(actorList);
+		sceneNode->DeletePipe();
+	}
+
+	delete sceneNode;
+
+	mafDEL(material);
+	mafDEL(volumeInput);
+	vtkDEL(importer);
+}
+
+
+//----------------------------------------------------------------------------
+void mafPipeVolumeOrthoSliceTest::TestPipeExecution_SetColorLookupTable()
 //----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
@@ -466,10 +586,10 @@ void mafPipeVolumeSliceTest::TestPipeExecution_SetColorLookupTable()
 
   double zValue[3][3]={{4.0,4.0,0.0},{4.0,4.0,1.0},{4.0,4.0,2.0}};
 
-  for (int direction = mafPipeVolumeSlice::SLICE_X ; direction<=mafPipeVolumeSlice::SLICE_Z;direction++)
+  for (int direction = mafPipeVolumeOrthoSlice::SLICE_X ; direction<=mafPipeVolumeOrthoSlice::SLICE_Z;direction++)
   {
     /////////// Pipe Instance and Creation ///////////
-    mafPipeVolumeSlice *pipeSlice = new mafPipeVolumeSlice;
+    mafPipeVolumeOrthoSlice *pipeSlice = new mafPipeVolumeOrthoSlice;
     pipeSlice->InitializeSliceParameters(direction,zValue[0],true);
     pipeSlice->Create(sceneNode);
 
@@ -494,18 +614,18 @@ void mafPipeVolumeSliceTest::TestPipeExecution_SetColorLookupTable()
     double x,y,z,vx,vy,vz;
     switch(direction)
     {
-    case mafPipeVolumeSlice::SLICE_X:
+    case mafPipeVolumeOrthoSlice::SLICE_X:
       {
         //x=-1 ;y=0; z=0; vx=0; vy=0; vz=1;
         x=1 ;y=0; z=0; vx=0; vy=0; vz=1;
       }
       break;
-    case mafPipeVolumeSlice::SLICE_Y:
+    case mafPipeVolumeOrthoSlice::SLICE_Y:
       {
         x=0; y=-1; z=0; vx=0; vy=0; vz=1;
       }
       break;
-    case mafPipeVolumeSlice::SLICE_Z:
+    case mafPipeVolumeOrthoSlice::SLICE_Z:
       {
         //x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
         x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
@@ -552,7 +672,7 @@ void mafPipeVolumeSliceTest::TestPipeExecution_SetColorLookupTable()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeVolumeSliceTest::TestPipeExecution_TicksOnOff()
+void mafPipeVolumeOrthoSliceTest::TestPipeExecution_TicksOnOff()
 //----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
@@ -581,12 +701,12 @@ void mafPipeVolumeSliceTest::TestPipeExecution_TicksOnOff()
 
   double zValue[3][3]={{4.0,4.0,0.0},{4.0,4.0,1.0},{4.0,4.0,2.0}};
 
-  int direction = mafPipeVolumeSlice::SLICE_X;
+  int direction = mafPipeVolumeOrthoSlice::SLICE_X;
 
   for (int showticks = 0; showticks<2; showticks++)
   {
     /////////// Pipe Instance and Creation ///////////
-    mafPipeVolumeSlice *pipeSlice = new mafPipeVolumeSlice;
+    mafPipeVolumeOrthoSlice *pipeSlice = new mafPipeVolumeOrthoSlice;
     pipeSlice->InitializeSliceParameters(direction,zValue[0],true);
     pipeSlice->Create(sceneNode);
     if(showticks)

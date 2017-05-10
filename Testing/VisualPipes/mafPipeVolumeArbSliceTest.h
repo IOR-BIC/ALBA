@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafPipeVolumeSliceTest
+ Module: mafPipeVolumeArbSliceTest
  Authors: Eleonora Mambrini
  
  Copyright (c) B3C
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_mafPipeVolumeSliceTest_H__
-#define __CPP_UNIT_mafPipeVolumeSliceTest_H__
+#ifndef __CPP_UNIT_mafPipeVolumeArbSliceTest_H__
+#define __CPP_UNIT_mafPipeVolumeArbSliceTest_H__
 
 #include "mafTest.h"
 
@@ -24,7 +24,7 @@ class vtkRenderWindowInteractor;
 class vtkProp;
 class vtkPropCollection;
 
-class mafPipeVolumeSliceTest : public mafTest
+class mafPipeVolumeArbSliceTest : public mafTest
 {
 public: 
   // Executed before each test
@@ -33,14 +33,14 @@ public:
   // Executed after each test
   void AfterTest();
 
-  CPPUNIT_TEST_SUITE( mafPipeVolumeSliceTest );
+  CPPUNIT_TEST_SUITE( mafPipeVolumeArbSliceTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestPipeExecution );
   CPPUNIT_TEST( TestPipeExecution_SetSliceOpacity );
   CPPUNIT_TEST( TestPipeExecution_SetLutRange );
   CPPUNIT_TEST( TestPipeExecution_SetColorLookupTable );
   CPPUNIT_TEST( TestPipeExecution_TicksOnOff );
-
+	CPPUNIT_TEST( TestPipeExecution_Arbitrary);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -51,6 +51,7 @@ protected:
   void TestPipeExecution_SetLutRange();
   void TestPipeExecution_SetColorLookupTable();
   void TestPipeExecution_TicksOnOff();
+	void TestPipeExecution_Arbitrary();
 
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
 };
