@@ -80,8 +80,8 @@ void vtkMAFRGtoSPImageFilter::ExecuteInformation()
 	outDims[1] = ((bounds[3] - bounds[2]) / bestSpacing[1]) + 1;
 	outDims[2] = 1;
 
-	outputSpacing[0] = (bounds[1] - bounds[0]) / (double)outDims[0];
-	outputSpacing[1] = (bounds[3] - bounds[2]) / (double)outDims[1];
+	outputSpacing[0] = (bounds[1] - bounds[0]) / (double)(outDims[0]-1);
+	outputSpacing[1] = (bounds[3] - bounds[2]) / (double)(outDims[1]-1);
 	outputSpacing[2] = 1;
 
 	//output->SetDimensions(outDims);
@@ -180,7 +180,7 @@ void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * 
 		{
 			yPos = bounds[2] + y*spacing[1];
 
-			while (yPos >= yCoordB)
+			while (yPos > yCoordB)
 			{
 				yRG++;
 				yCoordA = yCoordB;
@@ -193,7 +193,7 @@ void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * 
 
 			yOffset = y * outDims[0];
 
-			//Avoid problems on slicing volumes with doublied slices
+			//Avoid problems on slicing volumes with doubled slices
 			yRatioB = (ySize != 0) ? (yPos - yCoordA) / ySize : 1;
 			yRatioA = 1.0 - yRatioB;
 
@@ -206,7 +206,7 @@ void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * 
 			{
 				xPos = bounds[0] + x*spacing[0];
 
-				while (xPos >= xCoordB)
+				while (xPos > xCoordB)
 				{
 					xRG++;
 					xCoordA = xCoordB;
