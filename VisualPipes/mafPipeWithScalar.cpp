@@ -329,14 +329,11 @@ void mafPipeWithScalar::CreateFieldDataControlArrays()
   int numPointScalars = pointData->GetNumberOfArrays();
 	int numCellScalars = cellData->GetNumberOfArrays();
 
-	if (pointData->GetNormals())
-		numPointScalars--;
-	
   wxString *tempScalarsPointsName=new wxString[numPointScalars + numCellScalars];
   int count=0;
 
   int pointArrayNumber;
-  for(pointArrayNumber = 0;pointArrayNumber<numPointScalars;pointArrayNumber++)
+  for(pointArrayNumber = 0; pointArrayNumber<numPointScalars; pointArrayNumber++)
   {
 		const char *arrayName=pointData->GetArrayName(pointArrayNumber);
     if(arrayName && strcmp(arrayName,"")!=0)
