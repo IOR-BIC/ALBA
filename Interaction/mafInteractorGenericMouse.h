@@ -174,9 +174,9 @@ protected:
   // trackball interaction style stuff 
   //----------------------------------------------------------------------------
 
-  void TrackballRotate();
-  void TrackballTranslate();
-  void TrackballRoll();
+	virtual void TrackballRotate();
+	virtual void TrackballTranslate();
+	virtual void TrackballRoll();
 
   //----------------------------------------------------------------------------
   // snap on surface
@@ -189,13 +189,26 @@ protected:
 	//----------------------------------------------------------------------------
 	void NormalOnSurface();
 
+	//----------------------------------------------------------------------------
+	// trackball interaction style stuff 
+	//----------------------------------------------------------------------------
+
+	int m_LastX, m_LastY;
+
+	//----------------------------------------------------------------------------
+
+	int m_MousePointer2DPosition[2];
+	int m_LastMousePointer2DPosition[2];
+
+	vtkCamera *m_CurrentCamera; ///< Stores camera to which the interaction is currently assigned
+
+	double  m_LastPickPosition[3];
+
 private:
 
   mafInteractorGenericMouse(const mafInteractorGenericMouse&);  // Not implemented.
   void operator=(const mafInteractorGenericMouse&);   // Not implemented.
-
-  double  m_LastPickPosition[3]; 
-        
+	        
   // Projection Accumulator; accumulates projections of the motion
   // vector along mouse move events 
   //   
@@ -221,19 +234,6 @@ private:
   void ConcatenateToResultMatrix(const mafMatrix &matrix);
 
   bool m_ResultMatrixConcatenation;
-
-  //----------------------------------------------------------------------------
-  // trackball interaction style stuff 
-  //----------------------------------------------------------------------------
-
-  int m_LastX, m_LastY;
-
-  //----------------------------------------------------------------------------
-  
-  int m_MousePointer2DPosition[2];
-  int m_LastMousePointer2DPosition[2];
-  
-  vtkCamera *m_CurrentCamera; ///< Stores camera to which the interaction is currently assigned
 
 };
 #endif
