@@ -1,0 +1,28 @@
+# vtk DataFile Version 3.0
+vtk output
+ASCII
+DATASET STRUCTURED_POINTS
+DIMENSIONS 15 10 1
+SPACING 0.5 1 1
+ORIGIN 1 1 1
+CELL_DATA 126
+POINT_DATA 150
+SCALARS scalars short
+LOOKUP_TABLE default
+1 1 1 1 1 1 1 1 1 
+1 1 1 1 1 1 2 2 2 
+2 2 2 2 2 2 2 2 2 
+2 2 2 3 3 3 3 3 3 
+3 3 3 3 3 3 3 3 3 
+4 4 4 4 4 4 4 4 4 
+4 4 4 4 4 4 5 5 5 
+5 5 5 5 5 5 5 5 5 
+5 5 5 6 6 6 6 6 6 
+6 6 6 6 6 6 6 6 6 
+7 7 7 7 7 7 7 7 7 
+7 7 7 7 7 7 8 8 8 
+8 8 8 8 8 8 8 8 8 
+8 8 8 9 9 9 9 9 9 
+9 9 9 9 9 9 9 9 9 
+10 10 10 10 10 10 10 10 10 
+10 10 10 10 10 10 
