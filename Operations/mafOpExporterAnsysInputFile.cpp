@@ -247,15 +247,12 @@ int mafOpExporterAnsysInputFile::WriteNodesFile(FILE *file )
 //---------------------------------------------------------------------------
 int mafOpExporterAnsysInputFile::WriteMaterialsFile(FILE *file)
 {
-  mafVMEMesh *input = mafVMEMesh::SafeDownCast(m_Input);
-  assert(input);
-
-  vtkUnstructuredGrid *inputUGrid = input->GetUnstructuredGridOutput()->GetUnstructuredGridData();
+	vtkFieldData *fieldData = GetMaterialData();
 
   vtkDataArray *materialsIDArray = NULL;
 
   // try field data
-  materialsIDArray = inputUGrid->GetFieldData()->GetArray("material_id");
+  materialsIDArray = fieldData->GetArray("material_id");
 	  
   if (materialsIDArray == NULL)
   {
@@ -275,9 +272,7 @@ int mafOpExporterAnsysInputFile::WriteMaterialsFile(FILE *file)
     int numberOfMaterials = materialsIDArray->GetNumberOfTuples();
 
     // get the number of materials properties
-    int numberOfMaterialProperties = inputUGrid->GetFieldData()->GetNumberOfArrays() - 1; // 1 is the materialsIDArray
-
-    vtkFieldData *fieldData = inputUGrid->GetFieldData();
+    int numberOfMaterialProperties = fieldData->GetNumberOfArrays() - 1; // 1 is the materialsIDArray
 
     // gather material properties array names
     vcl_vector<wxString> materialProperties;

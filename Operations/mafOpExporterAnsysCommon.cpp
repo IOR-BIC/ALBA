@@ -60,8 +60,11 @@ PURPOSE.  See the above copyright notice for more information.
 #include "wx/stdpaths.h"
 
 //----------------------------------------------------------------------------
+mafCxxAbstractTypeMacro(mafOpExporterAnsysCommon);
+
+//----------------------------------------------------------------------------
 mafOpExporterAnsysCommon::mafOpExporterAnsysCommon(const wxString &label) :
-mafOp(label)
+mafOpExporterFEMCommon(label)
 {
   m_OpType  = OPTYPE_EXPORTER;
   m_Canundo = true;
@@ -87,6 +90,7 @@ bool mafOpExporterAnsysCommon::Accept(mafVME *node)
 //----------------------------------------------------------------------------
 void mafOpExporterAnsysCommon::OpRun()   
 {
+	Init();
   CreateGui();
 }
 //----------------------------------------------------------------------------
@@ -138,11 +142,21 @@ void mafOpExporterAnsysCommon::OpStop(int result)
 //----------------------------------------------------------------------------
 void mafOpExporterAnsysCommon::CreateGui()
 {
-  m_Gui = new mafGUI(this);
-  m_Gui->Label("Absolute matrix",true);
+  Superclass::CreateGui();
+
+	m_Gui->Divider(2);
+
+	m_Gui->Label("Absolute matrix",true);
   m_Gui->Bool(ID_ABS_MATRIX_TO_STL,"Apply",&m_ABSMatrixFlag,0);
+
+	m_Gui->Divider(2);
+	m_Gui->Label("");
+
   m_Gui->OkCancel();  
   m_Gui->Divider();
+
+	m_Gui->FitGui();
+	m_Gui->Update();
 
   ShowGui();
 }
@@ -163,10 +177,12 @@ void mafOpExporterAnsysCommon::Init()
     m_TotalElements += inputUGrid->GetNumberOfCells(); // Elements
 
     vtkDataArray *materialsIDArray = NULL;
-    materialsIDArray = inputUGrid->GetFieldData()->GetArray("material_id");
+    materialsIDArray = inputUGrid->GetCellData()->GetArray("EX");
 
-    if(materialsIDArray != NULL)
-      m_TotalElements += materialsIDArray->GetNumberOfTuples(); // Materials
+		if (materialsIDArray != NULL)
+		{
+			m_TotalElements += materialsIDArray->GetNumberOfTuples(); // Materials
+		}
   }
 }
 //----------------------------------------------------------------------------
@@ -274,6 +290,5 @@ ExportElement *mafOpExporterAnsysCommon::CreateExportElements(mafVMEMesh * input
 
   return exportVector;
 }
-
 
 

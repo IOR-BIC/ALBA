@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 // Include :
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
-#include "mafOp.h"
+#include "mafOpExporterFEMCommon.h"
 
 #include "vtkUnstructuredGrid.h"
 #include "vtkIntArray.h"
@@ -48,11 +48,14 @@ typedef struct ExportElementStruct
 //----------------------------------------------------------------------------
 // lhpOpExporterAnsysInputFile :
 //----------------------------------------------------------------------------
-class MAF_EXPORT mafOpExporterAnsysCommon : public mafOp
+class MAF_EXPORT mafOpExporterAnsysCommon : public mafOpExporterFEMCommon
 {
 public:
 	mafOpExporterAnsysCommon(const wxString &label = "mafOpExporterAnsysCommon");
 	~mafOpExporterAnsysCommon(); 
+
+	mafAbstractTypeMacro(mafOpExporterAnsysCommon, mafOpExporterFEMCommon);
+
 	
   /** Apply vme abs matrix to data geometry */
   void ApplyABSMatrixOn() {m_ABSMatrixFlag = 1;};
@@ -92,7 +95,7 @@ protected:
 
   ExportElement *CreateExportElements(mafVMEMesh * input, int rowsNumber, vtkUnstructuredGrid * inputUGrid, FILE * file);
 
-  static int compareElem(const void *p1, const void *p2);
+	static int compareElem(const void *p1, const void *p2);
 
 	mafProgressBarHelper *m_ProgressHelper;
 

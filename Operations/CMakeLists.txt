@@ -142,6 +142,7 @@ IF (MAF_USE_VTK)
 	mafOpExporterLandmarkWS.cpp	mafOpExporterLandmarkWS.h
 	  
 	mafOpMergeDicomSeries.cpp		mafOpMergeDicomSeries.h
+	mafOpExporterFEMCommon.cpp	mafOpExporterFEMCommon.h
   
   )
 ENDIF (MAF_USE_VTK)
