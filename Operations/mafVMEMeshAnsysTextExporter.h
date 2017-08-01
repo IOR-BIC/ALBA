@@ -40,7 +40,7 @@
   ansys-like output this component will try to generate the  missing information for
   the export, anyway the input data is not modified.
 
-  BEWARE Hybrid meshes are not upported
+  BEWARE Hybrid meshes are not supported
 
   See mafVMEMeshAnsysTextExporterTest for use cases and
   mafVMEMeshAnsysTextImporter and mafVMEMeshAnsysTextImporterTest 
@@ -82,6 +82,9 @@ public:
   void ApplyMatrixOff() {m_ApplyMatrixFlag = 0;};
   void SetApplyMatrix(int applyMatrix) {m_ApplyMatrixFlag = applyMatrix;};
 
+	void SetMaterialData(vtkFieldData *materialData) { m_MaterialData = materialData; };
+	void SetMatIdArray(vtkIdType *idArray) { m_MatIdArray = idArray; };
+
   /** Write output files; return MAF_OK if succesful, otherwise MAF_ERROR  */
   int Write();
 
@@ -96,6 +99,8 @@ protected:
 	
   void WriteMaterialsFile(vtkUnstructuredGrid *inputUGrid, const char *outputFileName);
   
+	vtkFieldData *m_MaterialData;
+	vtkIdType *m_MatIdArray;
   
   /**
   // Output file name*/

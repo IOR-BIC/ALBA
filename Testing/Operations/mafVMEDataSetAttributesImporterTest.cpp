@@ -149,9 +149,6 @@ void mafVMEDataSetAttributesImporterTest::SaveToDiskAndDisplay(mafVMEMesh *vmeMe
 		int res = -1;
 		res = data->GetCellData()->SetActiveScalars(attributeLabel);
 		assert(res != -1);
-
-		int ntuples = vmeMesh->GetMaterialsIDArray()->GetNumberOfTuples();
-		CPPUNIT_ASSERT(ntuples == data->GetNumberOfCells());
 	}
 	else
 	{

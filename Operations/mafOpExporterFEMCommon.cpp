@@ -49,6 +49,7 @@ mafOpExporterFEMCommon::mafOpExporterFEMCommon(const wxString &label) :
 mafOp(label)
 {
 	m_MaterialFieldData = NULL;
+	m_MatIdArray = NULL;
 
 	m_Egap = 50;
 
@@ -62,6 +63,7 @@ mafOp(label)
 mafOpExporterFEMCommon::~mafOpExporterFEMCommon()
 {	
 	vtkDEL(m_MaterialFieldData);
+	delete[] m_MatIdArray;
 }
 
 //----------------------------------------------------------------------------
@@ -119,7 +121,16 @@ bool mafOpExporterFEMCommon::HasMaterials()
 }
 
 //----------------------------------------------------------------------------
-void mafOpExporterFEMCommon::GenerateArraysAndFieldData(vtkIdType numElements, MaterialProp *matProps, vtkUnstructuredGrid *inputUG)
+vtkIdType * mafOpExporterFEMCommon::GetMatIdArray()
+{
+	if (m_MatIdArray == NULL)
+		GetMaterialData();
+
+	return m_MatIdArray;
+}
+
+//----------------------------------------------------------------------------
+void mafOpExporterFEMCommon::GenerateArraysAndMaterialsData(vtkIdType numElements, MaterialProp *elProps, vtkUnstructuredGrid *inputUG)
 {
 	if (!m_FrequencyFileName.IsEmpty() &&(m_Freq_fp = fopen(m_FrequencyFileName.GetCStr(), "w")) == NULL)
 	{
@@ -130,25 +141,26 @@ void mafOpExporterFEMCommon::GenerateArraysAndFieldData(vtkIdType numElements, M
 	}
 
 	std::vector <MaterialProp> materialProperties;
-	std::vector <int> frequences;
-
-	CreateBins(numElements, matProps, &materialProperties, &frequences);
+	
+	CreateBins(numElements, elProps, &materialProperties);
 
 	// FieldData materials
-	m_MaterialFieldData = GenerateMaterialsData(materialProperties);
+	m_MaterialFieldData = CreateMaterialsData(materialProperties);
 	
 	materialProperties.clear();
 }
 
 //----------------------------------------------------------------------------
-void mafOpExporterFEMCommon::CreateBins(int numElements, MaterialProp *matProps, std::vector<MaterialProp> *materialProperties, std::vector <int> *frequences)
+void mafOpExporterFEMCommon::CreateBins(int numElements, MaterialProp *elProps, std::vector<MaterialProp> *materialProperties)
 {
 	typedef std::vector<int> idVectorType;
 	idVectorType idVector;
 	double densAccumulator, nuxyAccumulator;
 
+	m_MatIdArray = new vtkIdType[numElements];
+
 	// COMPUTE MATERIALS & WRITE FREQUENCY FILE
-	qsort(matProps, numElements, sizeof(MaterialProp), compareE);
+	qsort(elProps, numElements, sizeof(MaterialProp), compareE);
 
 	mafLogMessage("-- Writing frequency file\n");
 
@@ -157,16 +169,16 @@ void mafOpExporterFEMCommon::CreateBins(int numElements, MaterialProp *matProps,
 
 	vtkIdType freq = 1;
 	vtkIdType numMats = 1;
-	materialProperties->push_back(matProps[0]);
+	materialProperties->push_back(elProps[0]);
 
-	double E = matProps[0].ex;
-	double dens = densAccumulator = matProps[0].density;
-	double nuxy = nuxyAccumulator = matProps[0].nuxy;
+	double E = elProps[0].ex;
+	double dens = densAccumulator = elProps[0].density;
+	double nuxy = nuxyAccumulator = elProps[0].nuxy;
 
 	// grouping materials according to E value
 	for (int id = 1; id < numElements; id++)
 	{
-		if (E - matProps[id].ex > m_Egap) // generate statistics for old group and create a new group
+		if (E - elProps[id].ex > m_Egap) // generate statistics for old group and create a new group
 		{
 			if (m_DensitySelection == USE_MEAN_DENSISTY)
 			{
@@ -178,22 +190,22 @@ void mafOpExporterFEMCommon::CreateBins(int numElements, MaterialProp *matProps,
 			if (m_Freq_fp != NULL)
 				fprintf(m_Freq_fp, "%f \t %f \t %d\n", dens, E, freq);
 
-			dens = densAccumulator = matProps[id].density;
-			nuxy = nuxyAccumulator = matProps[id].nuxy;
+			dens = densAccumulator = elProps[id].density;
+			nuxy = nuxyAccumulator = elProps[id].nuxy;
 
-			materialProperties->push_back(matProps[id]);
-			frequences->push_back(freq);
+			materialProperties->push_back(elProps[id]);
 
-			E = matProps[id].ex;
+			E = elProps[id].ex;
 			numMats++;
 			freq = 1;
 		}
 		else
 		{
-			densAccumulator += matProps[id].density;
-			nuxyAccumulator += matProps[id].nuxy;
+			densAccumulator += elProps[id].density;
+			nuxyAccumulator += elProps[id].nuxy;
 			freq++;
 		}
+		m_MatIdArray[elProps[id].elementID] = numMats;
 	}
 
 	if (m_DensitySelection == USE_MEAN_DENSISTY)
@@ -201,8 +213,6 @@ void mafOpExporterFEMCommon::CreateBins(int numElements, MaterialProp *matProps,
 		dens = (*materialProperties)[numMats - 1].density = densAccumulator / freq;
 		nuxy = (*materialProperties)[numMats - 1].nuxy = nuxyAccumulator / freq;
 	}
-
-	frequences->push_back(freq);
 
 	// Print statistics
 	if (m_Freq_fp != NULL)
@@ -227,7 +237,7 @@ int mafOpExporterFEMCommon::compareE(const void *p1, const void *p2)
 }
 
 //----------------------------------------------------------------------------
-vtkFieldData* mafOpExporterFEMCommon::GenerateMaterialsData(std::vector <MaterialProp>materialProperties)
+vtkFieldData* mafOpExporterFEMCommon::CreateMaterialsData(std::vector <MaterialProp>materialProperties)
 {
 	vtkIdType numMats = materialProperties.size();
 	char *vectorNames[3] = { "EX","NUXY","DENS" };
@@ -307,7 +317,7 @@ vtkFieldData *mafOpExporterFEMCommon::GetMaterialData()
 			elProps[i].ex = arrayE ? arrayE->GetTuple(i)[0] : 0;
 		}
 
-		GenerateArraysAndFieldData(numElements, elProps, inputUGrid);
+		GenerateArraysAndMaterialsData(numElements, elProps, inputUGrid);
 
 		delete[] elProps;
 	}

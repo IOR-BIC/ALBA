@@ -226,9 +226,6 @@ ExportElement *mafOpExporterAnsysCommon::CreateExportElements(mafVMEMesh * input
   // get the Nodes Id array
   vtkIntArray *nodesIDArray = input->GetNodesIDArray();
 
-  // get the MATERIAL array
-  vtkIntArray *materialArray = input->GetMaterialsIDArray();
-
   // get the TYPE array
   vtkIntArray *typeArray = input->GetElementsTypeArray();
 
@@ -242,7 +239,7 @@ ExportElement *mafOpExporterAnsysCommon::CreateExportElements(mafVMEMesh * input
   for (int rowID = 0 ; rowID < rowsNumber ; rowID++)
   {
     exportVector[rowID].elementID = elementIdArray ? elementIdArray->GetValue(rowID) : rowID+1;
-    exportVector[rowID].matID = materialArray ? materialArray->GetValue(rowID) : 1;
+    exportVector[rowID].matID = GetMatIdArray() ? GetMatIdArray()[rowID] : 1;
     exportVector[rowID].elementType = typeArray ? typeArray->GetValue(rowID) : 1;
     exportVector[rowID].elementReal = realArray ? realArray->GetValue(rowID) : 1;
     exportVector[rowID].cellID=rowID;

@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafOpExporterMesh
- Authors: Simone Brazzale
+ Authors: Simone Brazzale, Nicola Vanella
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -42,11 +42,11 @@ mafCxxTypeMacro(mafOpExporterMesh);
 
 //----------------------------------------------------------------------------
 mafOpExporterMesh::mafOpExporterMesh(const wxString &label) :
-mafOp(label)
-//----------------------------------------------------------------------------
+	mafOpExporterFEMCommon(label)
 {
   m_OpType  = OPTYPE_EXPORTER;
   m_Canundo = true;
+
   m_NodesFileName = "";
   m_ElementsFileName = "";
   m_MaterialsFileName = "";
@@ -54,70 +54,119 @@ mafOp(label)
 
 //----------------------------------------------------------------------------
 mafOpExporterMesh::~mafOpExporterMesh()
-//----------------------------------------------------------------------------
 {
 }
+
 //----------------------------------------------------------------------------
 bool mafOpExporterMesh::Accept(mafVME*node)
-//----------------------------------------------------------------------------
 {
   // Accept a mafVMEMesh as input
   return (node && node->GetOutput()->IsMAFType(mafVMEOutputMesh));;
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpExporterMesh::Copy()   
-//----------------------------------------------------------------------------
 {
   // Copy the operation
   mafOpExporterMesh *cp = new mafOpExporterMesh(m_Label);
   return cp;
 }
+
 //----------------------------------------------------------------------------
-void mafOpExporterMesh::OpRun()   
-//----------------------------------------------------------------------------
+void mafOpExporterMesh::OpRun()
 {
-  // Save the file
-  mafString wildc = "lis files (*.lis)|*.lis|All Files (*.*)|*.*";
+	CreateGui();
+}
 
-  mafString name = m_Input->GetName();
-  if (name.FindChr('\\') != -1 || name.FindChr('/') != -1 || name.FindChr(':') != -1 || 
-      name.FindChr('?')  != -1 || name.FindChr('"') != -1 || name.FindChr('<') != -1 || 
-      name.FindChr('>')  != -1 || name.FindChr('|') != -1 )
-  {
-    mafMessage("Node name contains invalid chars.\nA node name can not contain chars like \\ / : * ? \" < > |");
-    m_File = "";
-  }
-  else
-  {
-    m_FileDir << this->m_Input->GetName();
-    m_FileDir << ".lis";
-    m_File = mafGetSaveFile(m_FileDir.GetCStr(), wildc.GetCStr()).c_str();
-  }
+//----------------------------------------------------------------------------
+mafString mafOpExporterMesh::GetWildcard()
+{
+	return "lis files (*.lis)|*.lis|All Files (*.*)|*.*";
+}
 
-  // Generate the three output files
-  wxString wxstr(m_File.GetCStr());
-  wxString wxname = wxstr.Before('.');
-  wxString wxextension = wxstr.After('.');
-
-  m_NodesFileName << wxname.c_str() << "_NODES." << wxextension.c_str();
-  m_ElementsFileName << wxname.c_str() << "_ELEMENTS." << wxextension.c_str();
-  m_MaterialsFileName << wxname.c_str() << "_MATERIALS." << wxextension.c_str();
-
-  // Write to output
-  int result = Write();
-
-  if (result==MAF_OK)
-  {
-    mafEventMacro(mafEvent(this,OP_RUN_OK));
-  }
-  else
-  {
-    mafEventMacro(mafEvent(this,OP_RUN_CANCEL));
-  }
+//----------------------------------------------------------------------------
+void mafOpExporterMesh::OnEvent(mafEventBase *maf_event)
+{
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	{
+		switch (e->GetId())
+		{
+		case wxOK:
+		{
+			OnOK();
+		}
+		break;
+		case wxCANCEL:
+		{
+			this->OpStop(OP_RUN_CANCEL);
+		}
+		break;
+		default:
+			mafEventMacro(*e);
+			break;
+		}
+	}
 }
 //----------------------------------------------------------------------------
-int mafOpExporterMesh::Write()
+void mafOpExporterMesh::OnOK()
+{
+	mafString wildcard = GetWildcard();
+
+	m_FileDir = "";
+
+	m_FileDir << this->m_Input->GetName();
+	m_FileDir << ".lis";
+
+	wxString f;
+	f = mafGetSaveFile(m_FileDir, wildcard).c_str();
+	if (!f.IsEmpty())
+	{
+		m_File = f;
+	}
+
+	// Generate the three output files
+	wxString wxstr(m_File.GetCStr());
+	wxString wxname = wxstr.Before('.');
+	wxString wxextension = wxstr.After('.');
+
+	m_NodesFileName << wxname.c_str() << "_NODES." << wxextension.c_str();
+	m_ElementsFileName << wxname.c_str() << "_ELEMENTS." << wxextension.c_str();
+	m_MaterialsFileName << wxname.c_str() << "_MATERIALS." << wxextension.c_str();
+
+	// Write to output
+	int result = Write();
+
+	if (result == MAF_OK)
+	{
+		OpStop(OP_RUN_OK);
+	}
+	else
+	{
+		OpStop(OP_RUN_OK);
+	}
+}
 //----------------------------------------------------------------------------
+void mafOpExporterMesh::OpStop(int result)
+{
+	HideGui();
+	mafEventMacro(mafEvent(this, result));
+}
+
+//----------------------------------------------------------------------------
+void mafOpExporterMesh::CreateGui()
+{
+	Superclass::CreateGui();
+
+	m_Gui->OkCancel();
+	m_Gui->Divider();
+
+	m_Gui->FitGui();
+	m_Gui->Update();
+
+	ShowGui();
+}
+
+//----------------------------------------------------------------------------
+int mafOpExporterMesh::Write()
 {
   if (!m_TestMode)
   {
@@ -127,9 +176,13 @@ int mafOpExporterMesh::Write()
   // Create the writer and pass the file name
   mafVMEMeshAnsysTextExporter *writer = new mafVMEMeshAnsysTextExporter;
   writer->SetInput((vtkUnstructuredGrid*)m_Input->GetOutput()->GetVTKData());
+
   writer->SetOutputNodesFileName(m_NodesFileName.GetCStr());
   writer->SetOutputElementsFileName(m_ElementsFileName.GetCStr());
   writer->SetOutputMaterialsFileName(m_MaterialsFileName.GetCStr());
+
+	writer->SetMaterialData(GetMaterialData());
+	writer->SetMatIdArray(GetMatIdArray());
 
   // Write
 	int returnValue = writer->Write();

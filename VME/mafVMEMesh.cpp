@@ -196,18 +196,6 @@ vtkIntArray * mafVMEMesh::GetNodesIDArray(vtkUnstructuredGrid *inputUGrid)
 }
 
 //------------------------------------------------------------------------
-vtkIntArray *mafVMEMesh::GetMaterialsIDArray()
-{
-  return GetIntCellArray("Material", "material");
-}
-
-//----------------------------------------------------------------------------
-vtkIntArray * mafVMEMesh::GetMaterialsIDArray(vtkUnstructuredGrid *inputUGrid)
-{
-	 return GetIntCellArray(inputUGrid,"Material", "material");
-}
-
-//------------------------------------------------------------------------
 vtkIntArray *mafVMEMesh::GetElementsIDArray()
 {
   return GetIntCellArray("Id", "ANSYS_ELEMENT_ID");

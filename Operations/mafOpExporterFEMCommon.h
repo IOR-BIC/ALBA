@@ -74,18 +74,21 @@ public:
 		MINID,
 	};
 
+	vtkIdType * GetMatIdArray();
+
+	vtkFieldData *GetMaterialData();
+
 protected:
 
 	/** Create the dialog interface for the importer. */
 	virtual void CreateGui();
 
 	bool  HasMaterials();
-
-	vtkFieldData *GetMaterialData();
+		
 	
-	void GenerateArraysAndFieldData(vtkIdType numElements, MaterialProp *matProps, vtkUnstructuredGrid *inputUG);
-	void CreateBins(int numElements, MaterialProp *matProps, std::vector<MaterialProp> *materialProperties, std::vector <int> *frequences);
-	vtkFieldData* GenerateMaterialsData(std::vector <MaterialProp>materialProperties);
+	void GenerateArraysAndMaterialsData(vtkIdType numElements, MaterialProp *elProps, vtkUnstructuredGrid *inputUG);
+	void CreateBins(int numElements, MaterialProp *elProps, std::vector<MaterialProp> *materialProperties);
+	vtkFieldData* CreateMaterialsData(std::vector <MaterialProp>materialProperties);
 
 	/** Static function witch compares two ElementProps used for qsort in decreasing order */
 	static int compareE(const void *p1, const void *p2);
@@ -93,6 +96,7 @@ protected:
 private:
 
 	vtkFieldData *m_MaterialFieldData;
+	vtkIdType *m_MatIdArray;
 
 	double m_Egap;
 
