@@ -524,9 +524,13 @@ void mafVMEMeshAnsysTextExporterTest::TestBonemattedTetra10ElementsIdJumpingMate
 	exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
 	exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
 
-	mafVMEMeshAnsysTextImporter *reader = new mafVMEMeshAnsysTextImporter;
-	this->Read(reader, dirPrefix, true, true, mafString("BonemattedMeshWithMaterials.vtk"));
-
+ 	mafVMEMeshAnsysTextImporter *reader = new mafVMEMeshAnsysTextImporter;
+	reader->SetNodesFileName(outputNodesFileName.GetCStr());
+	reader->SetElementsFileName(outputElementsFileName.GetCStr());
+	reader->SetMaterialsFileName(outputMaterialsFileName.GetCStr());
+	reader->Read();
+// 	this->Read(reader, dirPrefix, true, true, mafString("BonemattedMeshWithMaterials.vtk"));
+// 
 	mafOpExporterFEMCommon tmpFEMop1;
 	tmpFEMop1.SetInput(reader->GetOutput());
 	exporter->SetMaterialData(tmpFEMop1.GetMaterialData());
@@ -589,7 +593,12 @@ void mafVMEMeshAnsysTextExporterTest::TestBonemattedTetra10ElementsIdJumpingMate
 	exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
 
 	mafVMEMeshAnsysTextImporter *reader = new mafVMEMeshAnsysTextImporter;
-	this->Read(reader, dirPrefix, true, true, mafString("BonemattedMeshWithMaterials.vtk"));
+	reader->SetNodesFileName(outputNodesFileName.GetCStr());
+	reader->SetElementsFileName(outputElementsFileName.GetCStr());
+	reader->SetMaterialsFileName(outputMaterialsFileName.GetCStr());
+	reader->Read();
+	// 	this->Read(reader, dirPrefix, true, true, mafString("BonemattedMeshWithMaterials.vtk"));
+	// 
 
 	mafOpExporterFEMCommon tmpFEMop1;
 	tmpFEMop1.SetInput(reader->GetOutput());
@@ -650,8 +659,12 @@ void mafVMEMeshAnsysTextExporterTest::TestBonemattedTetra10ElementsIdJumpingNoMa
 	exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
 
 	mafVMEMeshAnsysTextImporter *reader = new mafVMEMeshAnsysTextImporter;
-	this->Read(reader, dirPrefix, false, true, mafString("BonemattedMeshNoMaterials.vtk"));
-
+	reader->SetNodesFileName(outputNodesFileName.GetCStr());
+	reader->SetElementsFileName(outputElementsFileName.GetCStr());
+	reader->SetMaterialsFileName(outputMaterialsFileName.GetCStr());
+	reader->Read();
+	// 	this->Read(reader, dirPrefix, true, true, mafString("BonemattedMeshWithMaterials.vtk"));
+	// 
 	mafOpExporterFEMCommon tmpFEMop1;
 	tmpFEMop1.SetInput(reader->GetOutput());
 	exporter->SetMaterialData(tmpFEMop1.GetMaterialData());
@@ -709,8 +722,12 @@ void mafVMEMeshAnsysTextExporterTest::TestExportTetra10VtkWithoutAnsysInformatio
 	exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
 
 	mafVMEMeshAnsysTextImporter *reader = new mafVMEMeshAnsysTextImporter;
-	this->Read(reader, dirPrefix, false, true, mafString("vtkTetra10WithoutAnsysInformations.vtk"));
-
+	reader->SetNodesFileName(outputNodesFileName.GetCStr());
+	reader->SetElementsFileName(outputElementsFileName.GetCStr());
+	reader->SetMaterialsFileName(outputMaterialsFileName.GetCStr());
+	reader->Read();
+	// 	this->Read(reader, dirPrefix, true, true, mafString("BonemattedMeshWithMaterials.vtk"));
+	// 
 	mafOpExporterFEMCommon tmpFEMop1;
 	tmpFEMop1.SetInput(reader->GetOutput());
 	exporter->SetMaterialData(tmpFEMop1.GetMaterialData());
@@ -785,8 +802,12 @@ void mafVMEMeshAnsysTextExporterTest::TestExportTetra4VtkWithoutAnsysInformation
 	exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
 
 	mafVMEMeshAnsysTextImporter *reader = new mafVMEMeshAnsysTextImporter;
-	this->Read(reader, dirPrefix, false, true, mafString("vtkTetra4WithoutAnsysInformations.vtk"));
-
+	reader->SetNodesFileName(outputNodesFileName.GetCStr());
+	reader->SetElementsFileName(outputElementsFileName.GetCStr());
+	reader->SetMaterialsFileName(outputMaterialsFileName.GetCStr());
+	reader->Read();
+	// 	this->Read(reader, dirPrefix, true, true, mafString("BonemattedMeshWithMaterials.vtk"));
+	// 
 	mafOpExporterFEMCommon tmpFEMop1;
 	tmpFEMop1.SetInput(reader->GetOutput());
 	exporter->SetMaterialData(tmpFEMop1.GetMaterialData());

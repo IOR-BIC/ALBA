@@ -32,7 +32,8 @@ PURPOSE.  See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 
 // Element Properties: element ID, density, Young Module
-typedef struct {
+typedef struct
+{
 	vtkIdType elementID;
 	double ex;
 	double nuxy;
@@ -80,14 +81,15 @@ public:
 
 protected:
 
-	/** Create the dialog interface for the importer. */
+	/** Create the dialog interface for the exporter. */
 	virtual void CreateGui();
 
 	bool  HasMaterials();
-		
-	
-	void GenerateArraysAndMaterialsData(vtkIdType numElements, MaterialProp *elProps, vtkUnstructuredGrid *inputUG);
+
+	/** Creates material Bins By grouping element props, internally sorts elProps vector  and save frequency file */
 	void CreateBins(int numElements, MaterialProp *elProps, std::vector<MaterialProp> *materialProperties);
+
+	/** Generates Arrays And MaterialsData from element properties vector */
 	vtkFieldData* CreateMaterialsData(std::vector <MaterialProp>materialProperties);
 
 	/** Static function witch compares two ElementProps used for qsort in decreasing order */
@@ -95,7 +97,7 @@ protected:
 	
 private:
 
-	vtkFieldData *m_MaterialFieldData;
+	vtkFieldData *m_MaterialData;
 	vtkIdType *m_MatIdArray;
 
 	double m_Egap;
