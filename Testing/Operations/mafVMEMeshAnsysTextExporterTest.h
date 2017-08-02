@@ -21,6 +21,7 @@
 #include "mafString.h"
 #include "mafVMEMeshAnsysTextExporter.h"
 #include "mafVMEMeshAnsysTextImporter.h"
+#include "mafOpExporterFEMCommon.h"
 
 class vtkFileOutputWindow;
 class vtkUnstructuredGrid;
