@@ -194,6 +194,11 @@ int mafOpExporterAnsysCommon::compareElem(const void *p1, const void *p2)
 
   double result;
 
+	// Compare Sort Order 
+	// by elementType
+	//  else by matID
+	//        else by elementID
+
   result = a->elementType - b->elementType;  
   if (result < 0)
     return -1;
@@ -207,7 +212,15 @@ int mafOpExporterAnsysCommon::compareElem(const void *p1, const void *p2)
     else if (result > 0)
       return 1;
     else
-      return 0;
+		{
+			result = a->elementID - b->elementID;
+			if (result < 0)
+				return -1;
+			else if (result > 0)
+				return 1;
+			else
+				assert(0); //two elements have the same element ID
+		}
   }
 }
 

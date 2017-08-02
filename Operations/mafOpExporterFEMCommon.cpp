@@ -162,7 +162,7 @@ void mafOpExporterFEMCommon::CreateBins(int numElements, MaterialProp *elProps, 
 	double dens = densAccumulator = elProps[0].density;
 	double nuxy = nuxyAccumulator = elProps[0].nuxy;
 
-	//m_MatIdArray[elProps[0].elementID] = numMats;
+	m_MatIdArray[elProps[0].elementID] = numMats;
 
 	// grouping materials according to E value
 	for (int id = 1; id < numElements; id++)
