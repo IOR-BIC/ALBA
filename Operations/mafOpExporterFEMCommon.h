@@ -32,7 +32,8 @@ PURPOSE.  See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 
 // Element Properties: element ID, density, Young Module
-typedef struct {
+typedef struct
+{
 	vtkIdType elementID;
 	double ex;
 	double nuxy;
@@ -74,25 +75,30 @@ public:
 		MINID,
 	};
 
+	vtkIdType * GetMatIdArray();
+
+	vtkFieldData *GetMaterialData();
+
 protected:
 
-	/** Create the dialog interface for the importer. */
+	/** Create the dialog interface for the exporter. */
 	virtual void CreateGui();
 
 	bool  HasMaterials();
 
-	vtkFieldData *GetMaterialData();
-	
-	void GenerateArraysAndFieldData(vtkIdType numElements, MaterialProp *matProps, vtkUnstructuredGrid *inputUG);
-	void CreateBins(int numElements, MaterialProp *matProps, std::vector<MaterialProp> *materialProperties, std::vector <int> *frequences);
-	vtkFieldData* GenerateMaterialsData(std::vector <MaterialProp>materialProperties);
+	/** Creates material Bins By grouping element props, internally sorts elProps vector  and save frequency file */
+	void CreateBins(int numElements, MaterialProp *elProps, std::vector<MaterialProp> *materialProperties);
+
+	/** Generates Arrays And MaterialsData from element properties vector */
+	vtkFieldData* CreateMaterialsData(std::vector <MaterialProp>materialProperties);
 
 	/** Static function witch compares two ElementProps used for qsort in decreasing order */
 	static int compareE(const void *p1, const void *p2);
 	
 private:
 
-	vtkFieldData *m_MaterialFieldData;
+	vtkFieldData *m_MaterialData;
+	vtkIdType *m_MatIdArray;
 
 	double m_Egap;
 
