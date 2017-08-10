@@ -103,6 +103,7 @@ SET(PROJECT_SRCS
 	vtkMAFRayCastCleanerTest.h vtkMAFRayCastCleanerTest.cpp
 	vtkMAFLineStripSourceTest.h vtkMAFLineStripSourceTest.cpp
 	vtkMafRGtoSPImageFilterTest.h vtkMafRGtoSPImageFilterTest.cpp
+	vtkMAFDistanceFilterTest.h	vtkMAFDistanceFilterTest.cpp
 )
 
 ADD_EXECUTABLE(vtkMAFTests ${PROJECT_SRCS})
