@@ -109,6 +109,7 @@
 #include "vtkMAFLineStripSourceTest.h"
 #include "vtkMAFTubeFilterTest.h"
 #include "vtkMafRGtoSPImageFilterTest.h"
+#include "vtkMAFDistanceFilterTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -117,6 +118,8 @@
 #include <cppunit/TestRunner.h>
 #include "vtkFileOutputWindow.h"
 #include "vtkMAFSmartPointer.h"
+#include "mafFakeLogicForTest.h"
+#include "mafServiceLocator.h"
 
 //Main Test Executor
 int
@@ -139,6 +142,9 @@ int
 	// Add a listener that print dots as test run.
 	CPPUNIT_NS::BriefTestProgressListener progress;
 	controller.addListener( &progress );      
+
+	mafFakeLogicForTest *logic = new mafFakeLogicForTest();
+	mafServiceLocator::SetLogicManager(logic);
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
@@ -228,7 +234,7 @@ int
 	runner.addTest(vtkMAFLineStripSourceTest::suite());
 	runner.addTest(vtkMAFTubeFilterTest::suite());
 	runner.addTest(vtkMafRGtoSPImageFilterTest::suite());
-
+	runner.addTest(vtkMAFDistanceFilterTest::suite());
 	runner.run( controller );
 
 	// Print test in a compiler compatible format.
