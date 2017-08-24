@@ -400,21 +400,23 @@ void mafVMEMeshAnsysTextExporter::WriteMaterialsFile(vtkUnstructuredGrid *inputU
 
 	vtkDataArray *materialsIDArray = NULL;
 
-	// try field data
-	materialsIDArray = m_MaterialData->GetArray("material_id");
-	vtkFieldData *fieldData = m_MaterialData; 
+	if (m_MaterialData)
+	{
+		// try field data
+		materialsIDArray = m_MaterialData->GetArray("material_id");
 
-	if (materialsIDArray != NULL)
-	{
-		mafLogMessage("Found material array in field data");
-	}
-	else
-	{
-		// try scalars 
-		materialsIDArray = inputUGrid->GetCellData()->GetScalars(materialIDArrayName.c_str());
 		if (materialsIDArray != NULL)
 		{
-			mafLogMessage("Found material array as active scalar");
+			mafLogMessage("Found material array in field data");
+		}
+		else
+		{
+			// try scalars 
+			materialsIDArray = inputUGrid->GetCellData()->GetScalars(materialIDArrayName.c_str());
+			if (materialsIDArray != NULL)
+			{
+				mafLogMessage("Found material array as active scalar");
+			}
 		}
 	}
 
@@ -454,13 +456,13 @@ void mafVMEMeshAnsysTextExporter::WriteMaterialsFile(vtkUnstructuredGrid *inputU
 		int numberOfMaterials = materialsIDArray->GetNumberOfTuples();
 
 		// get the number of materials properties
-		int numberOfMaterialProperties = fieldData->GetNumberOfArrays() - 1; // 1 is the materialsIDArray
+		int numberOfMaterialProperties = m_MaterialData->GetNumberOfArrays() - 1; // 1 is the materialsIDArray
 		
 		// gather material properties array names
 		vcl_vector<vcl_string> materialProperties;
-		for (int arrayID = 0; arrayID < fieldData->GetNumberOfArrays(); arrayID++)
+		for (int arrayID = 0; arrayID < m_MaterialData->GetNumberOfArrays(); arrayID++)
 		{
-			vcl_string arrayName = fieldData->GetArray(arrayID)->GetName();
+			vcl_string arrayName = m_MaterialData->GetArray(arrayID)->GetName();
 			if (arrayName != materialIDArrayName.c_str())
 			{
 				materialProperties.push_back(arrayName);
@@ -490,7 +492,7 @@ void mafVMEMeshAnsysTextExporter::WriteMaterialsFile(vtkUnstructuredGrid *inputU
 			for (int j = 0; j < numberOfMaterialProperties; j++)
 			{
 				vcl_string arrayName = materialProperties[j];
-				vtkDataArray *array = fieldData->GetArray(arrayName.c_str());
+				vtkDataArray *array = m_MaterialData->GetArray(arrayName.c_str());
 				output << arrayName << " = " << array->GetTuple(i)[0] << std::endl;
 			}
 
