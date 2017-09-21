@@ -250,7 +250,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpEditMetadataTest::suite());
 	runner.addTest(mafOpFilterVolumeTest::suite());
 	runner.addTest(mafOpMAFTransformTest::suite());
-	runner.addTest(mafOpTransformInterfaceTest::suite());
+ 	runner.addTest(mafOpTransformInterfaceTest::suite());
 	runner.addTest(mafVMEMeshAnsysTextImporterTest::suite());
 	runner.addTest(mafVMEMeshAnsysTextExporterTest::suite());
 	runner.addTest(mafOpImporterMeshTest::suite());

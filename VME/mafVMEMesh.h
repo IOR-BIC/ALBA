@@ -56,12 +56,7 @@ public:
   vtkIntArray *GetNodesIDArray();
 	/** return the Node IDs Array*/
 	static vtkIntArray *GetNodesIDArray(vtkUnstructuredGrid *inputUGrid);
-
-	/** return the Material IDs Array*/
-	vtkIntArray *GetMaterialsIDArray();
-	/** return the Material IDs Array*/
-	static vtkIntArray *GetMaterialsIDArray(vtkUnstructuredGrid *inputUGrid);
-		
+			
   /** return the Element IDs Array*/
   vtkIntArray *GetElementsIDArray();
 	/** return the Element IDs Array*/

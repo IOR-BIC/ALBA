@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafOpExporterMesh
- Authors: Simone Brazzale
+ Authors: Simone Brazzale, Nicola Vanella
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "mafOp.h"
+#include "mafOpExporterFEMCommon.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -32,13 +32,13 @@ class mafVMEMesh;
 // mafOpExporterMesh :
 //----------------------------------------------------------------------------
 /** Export a Generic mesh */
-class MAF_EXPORT mafOpExporterMesh: public mafOp
+class MAF_EXPORT mafOpExporterMesh: public mafOpExporterFEMCommon
 {
 public:
 	mafOpExporterMesh(const wxString &label = "MeshExporter");
 	~mafOpExporterMesh(); 
 	
-  mafTypeMacro(mafOpExporterMesh, mafOp);
+  mafTypeMacro(mafOpExporterMesh, mafOpExporterFEMCommon);
 
   mafOp* Copy();
 
@@ -62,13 +62,23 @@ public:
 
   /** Builds operation's interface. */
 	void OpRun();
+	
+	virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Export the mesh*/
 	int Write();
 
 protected:
+	/** Create the dialog interface for the importer. */
+	virtual void CreateGui();
 
-  mafString	m_FileDir;
+	void OpStop(int result);
+
+	void OnOK();
+
+	mafString GetWildcard();
+  
+	wxString m_FileDir;
   mafString m_File;
 
   /** Nodes file name*/
