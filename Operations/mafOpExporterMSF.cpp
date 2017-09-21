@@ -33,6 +33,7 @@
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 #include "mafVMEIterator.h"
+#include "mafAbsLogicManager.h"
 
 #include <vector>
 
@@ -61,7 +62,12 @@ mafOpExporterMSF::~mafOpExporterMSF()
 void mafOpExporterMSF::OpRun()   
 //----------------------------------------------------------------------------
 {
-	mafString wildc = "MAF Storage Format (*.msf)|*.msf";
+	mafString wildc;
+	const char *ext = GetLogicManager()->GetMsfFileExtension();
+	
+	wildc.Printf("Project File (*.%s)|*.%s", ext, ext);
+
+
 	mafString f;
   if (m_MSFFile.IsEmpty())
   {

@@ -214,6 +214,9 @@ public:
 	
 	/** Returns true if there is a Running Operation */
 	bool IsOperationRunning() { return m_RunningOperation; }
+
+	// VME
+	virtual const char* GetMsfFileExtension() { return m_Extension.GetCStr(); }
 		
 protected:
 	//---------------------------------------------------------

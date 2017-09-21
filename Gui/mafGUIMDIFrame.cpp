@@ -29,6 +29,7 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafPics.h"
+#include "mafAbsLogicManager.h"
 
 #ifdef __WIN32__
 #include <malloc.h>
@@ -242,7 +243,13 @@ void mafGUIMDIFrame::OnDropFile(wxDropFilesEvent &event)
     file_to_open = file_list[i].c_str();
 
     wxSplitPath(file_list[i],&path, &name, &ext);
-    if (ext == "msf" || ext == "zmsf")
+
+		mafString zippedExt;
+		const char *archExt = GetLogicManager()->GetMsfFileExtension();
+		zippedExt.Printf("z%s", archExt);
+
+		//Accept msf, zmsf and specific app extensions 
+    if (ext == "msf" || ext == "zmsf" || ext == archExt || ext == zippedExt.GetCStr())
     {
       mafEventMacro(mafEvent(this,MENU_FILE_OPEN,&file_to_open));
       return;

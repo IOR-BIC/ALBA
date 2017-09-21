@@ -23,6 +23,8 @@
 #include <vector>
 
 #include "mafGUIDockManager.h"
+#include "mafServiceClient.h"
+
 
 //----------------------------------------------------------------------------
 // forward reference
@@ -40,7 +42,7 @@ class mafGUI;
   Represents the main frame of a MAF Application. On this frame  they'll be plugged  toolbars,  panels, progress bar etc...
   Closing this frame is equal to close the application.
 */
-class MAF_EXPORT mafGUIMDIFrame: public wxMDIParentFrame
+class MAF_EXPORT mafGUIMDIFrame: public wxMDIParentFrame, public mafServiceClient
 {
  public:
   /** constructor. */
@@ -57,7 +59,7 @@ class MAF_EXPORT mafGUIMDIFrame: public wxMDIParentFrame
   /** must be called @ shutdown*/
   void OnQuit();
 
-  /** add a new Dockable Pane containig the given Window.
+  /** add a new Dockable Pane containing the given Window.
      pane_info specify the Pane settings */
   void AddDockPane(wxWindow *window, wxPaneInfo& pane_info, const wxString &menu = _("&View"), const wxString &subMenu = wxEmptyString);
   

@@ -254,7 +254,7 @@ void mafLogicWithManagers::Configure()
 	{
 		m_VMEManager = new mafVMEManager();
 		m_VMEManager->SetListener(this);
-		m_VMEManager->SetFileExtension(m_Extension);
+		m_VMEManager->SetMsfFileExtension(m_Extension);
 		//m_VMEManager->SetSingleBinaryFile(m_StorageSettings->GetSingleFileStatus()!= 0);
 	}
 
@@ -1159,7 +1159,7 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
 		{
 			wxString file;
 
-			wxString wildc = _("MAF Storage Format file (*." + m_Extension + ")|*." + m_Extension + "|Compressed file (*.z" + m_Extension + ")|*.z" + m_Extension + "");
+			wxString wildc = _("Storage File (*." + m_Extension + ")|*." + m_Extension + "|Compressed file (*.z" + m_Extension + ")|*.z" + m_Extension + "");
 			if (file_to_open != NULL)
 			{
 				file = file_to_open;
