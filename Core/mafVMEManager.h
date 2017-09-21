@@ -109,7 +109,7 @@ public:
   void SetFileName (mafString &filename) {m_MSFFile = filename;};
  
   /** Set the file extension. */
-  void SetFileExtension (mafString &extension) {m_file_extension = extension;};
+  void SetMsfFileExtension (mafString &extension) {m_MsfFileExtension = extension;};
 
 	/** Get the filename of the current tree. */
   mafString &GetFileName() {return m_MSFFile;};
@@ -163,7 +163,7 @@ protected:
   mafString           m_MSFFile;          ///< File name of the data associated to the tree.
   mafString           m_ZipFile;          ///< File name of compressed archive in which save the data associated to the tree.
   mafString           m_TmpDir;           ///< Temporary directory for zmsf extraction
-  mafString           m_file_extension;   ///< File extension
+  mafString           m_MsfFileExtension;   ///< File extension
 	 
   bool                m_LoadingFlag;      ///< used when an MSF is being loaded
   bool                m_Crypting;         ///< used to enable the Encryption for the MSF
