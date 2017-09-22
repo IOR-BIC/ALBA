@@ -26,4 +26,8 @@ Section -Post
 	;Add here extra RegKey
 SectionEnd
 
+!macro RemoveExtraFiles
+	;Add here extra Files to remove
+!macroend
+
 !insertmacro CreateUninstaller 

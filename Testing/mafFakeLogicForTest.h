@@ -72,6 +72,9 @@ public:
 
 	virtual bool IsOperationRunning();
 
+
+	virtual const char* GetMsfFileExtension() override;
+
 protected:
 	
 	std::vector<calls> m_Calls;

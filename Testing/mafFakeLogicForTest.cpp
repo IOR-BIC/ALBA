@@ -98,3 +98,9 @@ void mafFakeLogicForTest::AddCall(testFunctions func, mafVME* vme)
 
 //----------------------------------------------------------------------------
 bool mafFakeLogicForTest::IsOperationRunning() { return false; }
+
+//----------------------------------------------------------------------------
+const char* mafFakeLogicForTest::GetMsfFileExtension()
+{
+	return "msf";
+}

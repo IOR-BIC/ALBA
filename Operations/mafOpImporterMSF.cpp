@@ -34,6 +34,7 @@
 #include "mafVMEGroup.h"
 #include "mafVMEGeneric.h"
 #include "mafDataVector.h"
+#include "mafAbsLogicManager.h"
 
 #include "vtkMAFSmartPointer.h"
 
@@ -73,8 +74,11 @@ void mafOpImporterMSF::OpRun()
   if (!m_TestMode)
   {
     mafString fileDir = mafGetLastUserFolder().c_str();
-    mafString wildc  = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
-    m_File = mafGetOpenFile(fileDir, wildc, _("Choose MSF file")).c_str();
+		mafString wildc;
+		const	char *ext = GetLogicManager()->GetMsfFileExtension();
+		wildc.Printf("Project File (*.%s)|*.%s", ext, ext);
+
+    m_File = mafGetOpenFile(fileDir, wildc, _("Choose Project file")).c_str();
   }
 
   int result = OP_RUN_CANCEL;
@@ -95,13 +99,17 @@ int mafOpImporterMSF::ImportMSF()
   wxString path, name, ext;
   wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
 
-  if(ext == "zmsf")
+	mafString zippedExt;
+	const char *archExt = GetLogicManager()->GetMsfFileExtension();
+	zippedExt.Printf("z%s", archExt);
+
+  if(ext == zippedExt.GetCStr())
   {
     unixname = ZIPOpen(m_File);
     if(unixname.IsEmpty())
     {
       if (!m_TestMode)
-        mafMessage(_("Bad or corrupted zmsf file!"));
+        mafMessage(_("Bad or corrupted file!"));
       return MAF_ERROR;
     }
     wxSetWorkingDirectory(m_TmpDir.GetCStr());

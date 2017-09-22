@@ -62,7 +62,7 @@ mafVMEManager::mafVMEManager()
 	m_MSFFile  = "";
 	m_ZipFile  = "";
   m_TmpDir   = "";
-  m_file_extension = "msf";
+  m_MsfFileExtension = "msf";
 
   m_SingleBinaryFile = false;
 
@@ -287,13 +287,13 @@ int mafVMEManager::MSFOpen(mafString filename)
   
   wxString path, name, ext;
   wxSplitPath(filename.GetCStr(),&path,&name,&ext);
-  //if(ext == "zmsf")
-  if(ext.IsSameAs("z" + m_file_extension,true)) 
+
+	if(ext.IsSameAs("z" + m_MsfFileExtension,true)) 
   {
     unixname = ZIPOpen(filename); // open the zmsf archive and extract it to the temporary directory
     if(unixname.IsEmpty())
     {
-    	mafMessage(_("Bad or corrupted z" + m_file_extension + " file!"));
+    	mafMessage(_("Bad or corrupted z" + m_MsfFileExtension + " file!"));
       m_Modified = false;
       m_Storage->Delete();
       m_Storage = NULL;
@@ -481,7 +481,7 @@ const char *mafVMEManager::ZIPOpen(mafString filename)
   std::ofstream out_file_stream;
 
   //if(ext == "msf")
-  if(ext.IsSameAs(m_file_extension,true)) 
+  if(ext.IsSameAs(m_MsfFileExtension,true)) 
   {
     m_MSFFile = out_file; // the file to extract is the msf
     out_file_stream.open(out_file, std::ios_base::out);
@@ -515,7 +515,7 @@ const char *mafVMEManager::ZIPOpen(mafString filename)
       complete_name = complete_name.Mid(length_header_name);
     out_file = m_TmpDir + "\\" + complete_name;
     //if(ext == "msf")
-	if(ext.IsSameAs(m_file_extension,true))
+	if(ext.IsSameAs(m_MsfFileExtension,true))
     {
       m_MSFFile = out_file; // The file to extract is an msf
       out_file_stream.open(out_file, std::ios_base::out);
@@ -537,7 +537,7 @@ const char *mafVMEManager::ZIPOpen(mafString filename)
   
   if (m_MSFFile == "") // msf file not extracted
   {
-    mafMessage(_("compressed archive is not a valid " + m_file_extension + " file!"), _("Error"));
+    mafMessage(_("compressed archive is not a valid " + m_MsfFileExtension + " file!"), _("Error"));
     return "";
   }
 
@@ -618,8 +618,8 @@ int mafVMEManager::MSFSave()
     SetSingleBinaryFile(e.GetBool()); // set the save modality for time-varying vme
     
     // ask for the new file name.
-    wxString wildc = _("MAF Storage Format file (*."+ m_file_extension +")|*."
-		              + m_file_extension +"|Compressed file (*.z"+ m_file_extension +")|*.z" + m_file_extension + "");
+    wxString wildc = _("Project file (*."+ m_MsfFileExtension +")|*."
+		              + m_MsfFileExtension +"|Compressed file (*.z"+ m_MsfFileExtension +")|*.z" + m_MsfFileExtension + "");
     mafString file = mafGetSaveFile(m_MSFDir, wildc.c_str()).c_str();
     if(file.IsEmpty())
       return MAF_ERROR;
@@ -627,19 +627,19 @@ int mafVMEManager::MSFSave()
     wxString path, name, ext, file_dir;
     wxSplitPath(file.GetCStr(),&path,&name,&ext);
 
-    if(!wxFileExists(file.GetCStr()))
+		if (!wxFileExists(file.GetCStr()))
 		{
 			file_dir = path + "/" + name;  //Put the file in a folder with the same name
-			if(!wxDirExists(file_dir))
+			if (!wxDirExists(file_dir))
 				wxMkdir(file_dir);
-      //if (ext == "zmsf")
-	  if(ext.IsSameAs("z"+m_file_extension,true))
-      {
-        m_ZipFile = file;
-        m_TmpDir = path + "/" + name;
-        //ext = "msf";
-		ext = m_file_extension;
-      }
+
+			if (ext.IsSameAs("z" + m_MsfFileExtension, true))
+			{
+				m_ZipFile = file;
+				m_TmpDir = path + "/" + name;
+				//ext = "msf";
+				ext = m_MsfFileExtension;
+			}
 			file = file_dir + "/" + name + "." + ext;
 		}
 
