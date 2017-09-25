@@ -92,7 +92,7 @@ public:
 
   /**
   Create a behavior given the activator*/
-  mafInteractorGenericMouse *CreateBehavior(MMI_ACTIVATOR activator);
+  virtual mafInteractorGenericMouse *CreateBehavior(MMI_ACTIVATOR activator);
 
   /**
   Get a behavior given the activator*/
