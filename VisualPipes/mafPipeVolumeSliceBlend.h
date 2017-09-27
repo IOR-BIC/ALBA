@@ -35,10 +35,11 @@ class vtkLookupTable;
 class vtkPolyDataMapper;
 class vtkActor;
 class vtkFollower;
-class vtkMAFVolumeSlicer;
+class vtkMAFVolumeOrthoSlicer;
 class vtkCamera;
 class vtkMAFAssembly;
 class vtkOutlineSource;
+class vtkPlaneSource;
 class mafLODActor;
 
 //----------------------------------------------------------------------------
@@ -68,7 +69,7 @@ public:
 
   void InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds=false);
   void InitializeSliceParameters(int direction, double slice_origin0[3],double slice_origin1[3], bool show_vol_bbox,bool show_bounds=false);
-  void InitializeSliceParameters(int direction, double slice_origin0[3],double slice_origin1[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox,bool show_bounds=false);
+ // void InitializeSliceParameters(int direction, double slice_origin0[3],double slice_origin1[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox,bool show_bounds=false);
   virtual void Create(mafSceneNode *n);
 
   /** Set the range to the lookup table for the slice. */
@@ -76,19 +77,13 @@ public:
 
   /** Get the range of the slice's lookup table. */
   void GetLutRange(double range[2]);
-
-  /** Set slicer parameter to generate the slice. */
-  void SetSlice(int nSlice,double origin[3], float xVect[3], float yVect[3]);
-
+	  
   /** Set slicer parameter to generate the slice. */
   void SetSlice(int nSlice, double origin[3]);
 
   /** Get slice parameters: origin and normal */
   void GetSliceOrigin(int nSlice,double origin[3]);
-
-  /** Get slice parameters: origin and normal */
-  void GetSliceNormal(double normal[3]);
-
+	  
   /** Assign a color lookup table to the slices*/
   void SetColorLookupTable(vtkLookupTable *lut);
 
@@ -110,24 +105,19 @@ protected:
   virtual mafGUI  *CreateGui();
 
   double	m_Origin[2][3];
-  float		m_Normal[3][3];
-  float		m_XVector[3][3];
-  float		m_YVector[3][3];
   double  m_SliceOpacity;
 
-  int		 m_TextureRes;
   int		 m_SliceDirection; ///< Store the slicing direction: SLICE_X, SLICE_Y or SLICE_)
 
   vtkMAFAssembly *m_AssemblyUsed;
 
-  vtkMAFVolumeSlicer				 *m_SlicerImage[2][3];
-  vtkMAFVolumeSlicer				 *m_SlicerPolygonal[2][3];
+  vtkMAFVolumeOrthoSlicer*m_Slicer[2][3];
   vtkImageData					 *m_Image[2][3];
   vtkTexture						 *m_Texture[2][3];
   vtkLookupTable         *m_ColorLUT;
   vtkLookupTable         *m_CustomColorLUT;
   vtkPolyDataMapper			 *m_SliceMapper[2][3];
-  vtkPolyData						 *m_SlicePolydata[2][3];
+	vtkPlaneSource				 *m_SlicePlane[2][3];
   vtkActor               *m_SliceActor[2][3];
 
   vtkOutlineCornerFilter *m_VolumeBox;
