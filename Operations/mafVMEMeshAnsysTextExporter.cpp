@@ -69,6 +69,9 @@ mafVMEMeshAnsysTextExporter::mafVMEMeshAnsysTextExporter()
   m_OutputMaterialsFileName = "MPLIST.txt";
   m_ApplyMatrixFlag = 0;
   m_MatrixToBeAppliedToGeometry = NULL;
+
+	m_MaterialData = NULL;
+	m_MatIdArray = NULL;
 }
 //----------------------------------------------------------------------------
 mafVMEMeshAnsysTextExporter::~mafVMEMeshAnsysTextExporter()
@@ -99,6 +102,7 @@ int mafVMEMeshAnsysTextExporter::Write()
   return MAF_OK;
 }
 
+//----------------------------------------------------------------------------
 int mafVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGrid, const char *outputFileName )
 {
   // check this is a valid nodes id field data: 
@@ -185,8 +189,7 @@ int mafVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGrid
   }
 
 	fclose(file);
-	
-  
+	  
   // clean up
   vtkDEL(inUGDeepCopy);
   vtkDEL(transform);
@@ -199,6 +202,7 @@ int mafVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGrid
 
 }
 
+//----------------------------------------------------------------------------
 int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUGrid, const char *outputFileName )
 {
   // create elements matrix 
@@ -209,7 +213,7 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
 
   int rowsNumber = cellsNumber;
 
-  // tetra 10 example
+  //  tetra 10 example
   //  offset                  |                     pointsToBeExported ID
   //  1   3   3   3   0   1      5     2     4     3    11    10    14    13    9    12
   int offset = 6;  
@@ -237,7 +241,6 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
     }
 
     elementIdArray = syntheticElementsIDArray;
-
   }
 
   // get the Ansys Nodes Id array
@@ -275,9 +278,8 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
   }
   
   // get the MATERIAL array
-  vtkIntArray *materialArray = mafVMEMesh::GetMaterialsIDArray(inputUGrid);
-
-  vtkIntArray *syntheticMaterialArray = NULL;
+	vtkIdType *materialArray = m_MatIdArray;
+  vtkIdType *syntheticMaterialArray = NULL;
 
   if (materialArray == NULL)
   {
@@ -285,13 +287,13 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
     Temporary materials id array will be created in order to export the data.");
 
     int numCells = inputUGrid->GetNumberOfCells();
-    syntheticMaterialArray = vtkIntArray::New();
+		syntheticMaterialArray = new vtkIdType[numCells];
     
     int defaultMaterialID = 1;
 
     for (int i = 0; i < numCells; i++) 
     {
-      syntheticMaterialArray->InsertNextValue(defaultMaterialID);
+      syntheticMaterialArray[i]=defaultMaterialID;
     }
 
     materialArray = syntheticMaterialArray;
@@ -343,18 +345,15 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
     realArray = syntheticRealArray;
   }
 
-
-
 	FILE *file=fopen(outputFileName,"w");
-
-	
+		
   for (int rowID = 0 ; rowID < rowsNumber ; rowID++)
   {
 		int esys = 0;// <TODO!!!!!> this seems to be always 0... to be supported in the future anyway
 		int comp = 1;// <TODO!!!!!> this seems to be always 1... to be supported in the future anyway
 
     fprintf(file, "%d ", elementIdArray->GetValue(rowID));
-		fprintf(file, "%d ", materialArray->GetValue(rowID));
+		fprintf(file, "%d ", materialArray[rowID]);
 		fprintf(file, "%d ", typeArray->GetValue(rowID));
 		fprintf(file, "%d ", realArray->GetValue(rowID));
 		fprintf(file, "%d ", esys);
@@ -380,7 +379,7 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
   vtkDEL(syntheticElementsIDArray);
   elementIdArray = NULL;
 
-  vtkDEL(syntheticMaterialArray);
+  delete[] syntheticMaterialArray;
   materialArray = NULL;
   
   vtkDEL(syntheticTypeArray);
@@ -392,122 +391,122 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
   return MAF_OK;
 }
 
-void mafVMEMeshAnsysTextExporter::WriteMaterialsFile( vtkUnstructuredGrid *inputUGrid, const char *outputFileName )
+//----------------------------------------------------------------------------
+void mafVMEMeshAnsysTextExporter::WriteMaterialsFile(vtkUnstructuredGrid *inputUGrid, const char *outputFileName)
 {
-  // check this is a valid materials field data: I am assuming that vtk field data
-  // contains only material attributes otherwise this code will not work
-  vcl_string materialIDArrayName = "material_id";
+	// check this is a valid materials field data: I am assuming that vtk field data
+	// contains only material attributes otherwise this code will not work
+	vcl_string materialIDArrayName = "material_id";
 
-  vtkDataArray *materialsIDArray = NULL;
-  
-  // try field data
-  materialsIDArray = inputUGrid->GetFieldData()->GetArray(materialIDArrayName.c_str());
+	vtkDataArray *materialsIDArray = NULL;
 
-  if (materialsIDArray != NULL)
-  {
-    mafLogMessage("Found material array in field data");
-  }
-  else
-  {
-    // try scalars 
-    materialsIDArray = inputUGrid->GetCellData()->GetScalars(materialIDArrayName.c_str());  
-    if (materialsIDArray != NULL)
-    {
-      mafLogMessage("Found material array as active scalar");
-    }
-  }
+	if (m_MaterialData)
+	{
+		// try field data
+		materialsIDArray = m_MaterialData->GetArray("material_id");
 
-  if (materialsIDArray == NULL)
-  {
-    mafLogMessage("material informations not found in vtk unstructured grid!\
+		if (materialsIDArray != NULL)
+		{
+			mafLogMessage("Found material array in field data");
+		}
+		else
+		{
+			// try scalars 
+			materialsIDArray = inputUGrid->GetCellData()->GetScalars(materialIDArrayName.c_str());
+			if (materialsIDArray != NULL)
+			{
+				mafLogMessage("Found material array as active scalar");
+			}
+		}
+	}
+
+	if (materialsIDArray == NULL)
+	{
+		mafLogMessage("material informations not found in vtk unstructured grid!\
     A fake temporary material with ID = 1 will be created in order to export the data.");
 
-    // write fake material to disk...
-    vcl_ostringstream output;
+		// write fake material to disk...
+		vcl_ostringstream output;
 
-    int fakeMaterialID = 1;
-    double fakeMaterialTemperature = 0.0000; 
-  
-    output << "MATERIAL NUMBER = " << fakeMaterialID << " EVALUATED AT TEMPERATURE OF " << \
-    fakeMaterialTemperature << std::endl;
+		int fakeMaterialID = 1;
+		double fakeMaterialTemperature = 0.0000;
 
-    
-    vcl_string fakeMaterialPropertyName = "FAKEMATERIALUSEDFOREXPORTTOWARDANSYS";
-    int fakeMaterialPropertyValue = 1;
+		output << "MATERIAL NUMBER = " << fakeMaterialID << " EVALUATED AT TEMPERATURE OF " << \
+			fakeMaterialTemperature << std::endl;
+		
+		vcl_string fakeMaterialPropertyName = "FAKEMATERIALUSEDFOREXPORTTOWARDANSYS";
+		int fakeMaterialPropertyValue = 1;
 
-    output << fakeMaterialPropertyName << " = " << fakeMaterialPropertyValue << std::endl;
-    output   << std::endl;
+		output << fakeMaterialPropertyName << " = " << fakeMaterialPropertyValue << std::endl;
+		output << std::endl;
 
-    cout << output.str();
-    
-	vcl_ofstream outputf;
-	vcl_string fileName = outputFileName;
+		cout << output.str();
 
-	outputf.open(fileName.c_str());
-	outputf << output.str();
-	outputf.close();
-  }
-  
-  else
-  {
-    
-    // get the number of materials
-    int numberOfMaterials = materialsIDArray->GetNumberOfTuples();
+		vcl_ofstream outputf;
+		vcl_string fileName = outputFileName;
 
-    // get the number of materials properties
-    int numberOfMaterialProperties = inputUGrid->GetFieldData()->GetNumberOfArrays() - 1; // 1 is the materialsIDArray
+		outputf.open(fileName.c_str());
+		outputf << output.str();
+		outputf.close();
+	}
 
-    vtkFieldData *fieldData = inputUGrid->GetFieldData();
+	else
+	{
+		// get the number of materials
+		int numberOfMaterials = materialsIDArray->GetNumberOfTuples();
 
-    // gather material properties array names
-    vcl_vector<vcl_string> materialProperties;
-    for (int arrayID = 0; arrayID < fieldData->GetNumberOfArrays(); arrayID++)
-    {
-      vcl_string arrayName = fieldData->GetArray(arrayID)->GetName();
-      if (arrayName != materialIDArrayName.c_str())
-      {
-        materialProperties.push_back(arrayName);
-      }
-    }
+		// get the number of materials properties
+		int numberOfMaterialProperties = m_MaterialData->GetNumberOfArrays() - 1; // 1 is the materialsIDArray
+		
+		// gather material properties array names
+		vcl_vector<vcl_string> materialProperties;
+		for (int arrayID = 0; arrayID < m_MaterialData->GetNumberOfArrays(); arrayID++)
+		{
+			vcl_string arrayName = m_MaterialData->GetArray(arrayID)->GetName();
+			if (arrayName != materialIDArrayName.c_str())
+			{
+				materialProperties.push_back(arrayName);
+			}
+		}
 
-    //MATERIAL NUMBER =      3 EVALUATED AT TEMPERATURE OF   0.0000    
-    //  EX   =  0.20000E+06
-    //  NUXY =  0.33000
-    //  DENS =   1.0700  
+		//MATERIAL NUMBER =      3 EVALUATED AT TEMPERATURE OF   0.0000    
+		//  EX   =  0.20000E+06
+		//  NUXY =  0.33000
+		//  DENS =   1.0700  
 
-    // write each material
-    //
-    // write elements matrix to disk...
-    vcl_ostringstream output;
-    
-    // for each material
-    for (int i = 0; i < numberOfMaterials; i++)
-    {
-      int materialID = materialsIDArray->GetTuple(i)[0];
-      double materialTemperature = 0.0000;  // not supported for the moment  
+		// write each material
+		//
+		// write elements matrix to disk...
+		vcl_ostringstream output;
 
-      output << "MATERIAL NUMBER = " << materialID << " EVALUATED AT TEMPERATURE OF " \
-       << materialTemperature << std::endl;
+		// for each material
+		for (int i = 0; i < numberOfMaterials; i++)
+		{
+			int materialID = materialsIDArray->GetTuple(i)[0];
+			double materialTemperature = 0.0000;  // not supported for the moment  
 
-      // for each property
-      for (int j = 0; j < numberOfMaterialProperties; j++)
-      {
-        vcl_string arrayName = materialProperties[j];
-        vtkDataArray *array = fieldData->GetArray(arrayName.c_str());
-        output << arrayName << " = " << array->GetTuple(i)[0] << std::endl;
-      }
+			output << "MATERIAL NUMBER = " << materialID << " EVALUATED AT TEMPERATURE OF " \
+				<< materialTemperature << std::endl;
 
-      output << std::endl;
-    }  
+			// for each property
+			for (int j = 0; j < numberOfMaterialProperties; j++)
+			{
+				vcl_string arrayName = materialProperties[j];
+				vtkDataArray *array = m_MaterialData->GetArray(arrayName.c_str());
+				output << arrayName << " = " << array->GetTuple(i)[0] << std::endl;
+			}
 
-    cout << output.str();
+			output << std::endl;
+		}
 
-	vcl_ofstream outputf;
-	vcl_string fileName = outputFileName;
-	outputf.open(fileName.c_str());
-	outputf << output.str();
-    outputf.close();
-  }  
+		cout << output.str();
+
+		vcl_ofstream outputf;
+		vcl_string fileName = outputFileName;
+		outputf.open(fileName.c_str());
+		outputf << output.str();
+		outputf.close();
+	}
 }
 
 

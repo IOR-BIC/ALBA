@@ -82,6 +82,7 @@
 #include "mafOpExporterVTK.h"
 #include "mafOpExporterLandmark.h"
 #include "mafOpExporterWrappedMeter.h"
+#include "mafOpExporterMesh.h"
 #include "mafOpExporterGRFWS.h"
 #include "mafOpExporterMeters.h"
 #include "mafOpExporterAnsysCDBFile.h"
@@ -280,6 +281,7 @@ bool ExampleApp::OnInit()
 	m_Logic->Plug(new mafOpExporterMeters());
 	m_Logic->Plug(new mafOpExporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
 	m_Logic->Plug(new mafOpExporterAnsysInputFile("Ansys Input File"), "Finite Element");
+	m_Logic->Plug(new mafOpExporterMesh("Generic Mesh"), "Finite Element");
 #endif
 	//------------------------------------------------------------
 

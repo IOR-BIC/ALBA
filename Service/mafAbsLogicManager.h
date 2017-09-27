@@ -49,5 +49,7 @@ public:
 
 	/** Returns true if there is a Running Operation */
 	virtual bool IsOperationRunning() = 0;
+
+	virtual const char* GetMsfFileExtension() = 0;
 };
 #endif

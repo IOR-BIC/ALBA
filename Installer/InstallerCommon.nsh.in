@@ -278,7 +278,9 @@ FunctionEnd
 
 		RMDir /R "$INSTDIR"    
 		RMDir /R "$SMPROGRAMS\${PRODUCT_NAME}" 
-				
+		
+		!insertmacro RemoveExtraFiles ; Optional
+		
 		SetAutoClose true
 	SectionEnd
 !macroend

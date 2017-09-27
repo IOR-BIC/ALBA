@@ -114,7 +114,7 @@ std::string mafGetSaveFile(const char * initial, const char * wild, const char *
   wxSplitPath(initial,&path,&name,&ext);
   if(name != "" && ext != "") name = wxString::Format("%s.%s",name.c_str(),ext.c_str());
   wxString wildcard = wild;
-  wxString defaultname = "newMAFfile";
+  wxString defaultname = "NewFile";
   wildcard += "|All Files (*.*)|*.*";
   
 	long style = wxSAVE | wxHIDE_READONLY;

@@ -60,8 +60,11 @@ PURPOSE.  See the above copyright notice for more information.
 #include "wx/stdpaths.h"
 
 //----------------------------------------------------------------------------
+mafCxxAbstractTypeMacro(mafOpExporterAnsysCommon);
+
+//----------------------------------------------------------------------------
 mafOpExporterAnsysCommon::mafOpExporterAnsysCommon(const wxString &label) :
-mafOp(label)
+mafOpExporterFEMCommon(label)
 {
   m_OpType  = OPTYPE_EXPORTER;
   m_Canundo = true;
@@ -87,6 +90,7 @@ bool mafOpExporterAnsysCommon::Accept(mafVME *node)
 //----------------------------------------------------------------------------
 void mafOpExporterAnsysCommon::OpRun()   
 {
+	Init();
   CreateGui();
 }
 //----------------------------------------------------------------------------
@@ -138,11 +142,21 @@ void mafOpExporterAnsysCommon::OpStop(int result)
 //----------------------------------------------------------------------------
 void mafOpExporterAnsysCommon::CreateGui()
 {
-  m_Gui = new mafGUI(this);
-  m_Gui->Label("Absolute matrix",true);
+  Superclass::CreateGui();
+
+	m_Gui->Divider(2);
+
+	m_Gui->Label("Absolute matrix",true);
   m_Gui->Bool(ID_ABS_MATRIX_TO_STL,"Apply",&m_ABSMatrixFlag,0);
+
+	m_Gui->Divider(2);
+	m_Gui->Label("");
+
   m_Gui->OkCancel();  
   m_Gui->Divider();
+
+	m_Gui->FitGui();
+	m_Gui->Update();
 
   ShowGui();
 }
@@ -163,10 +177,12 @@ void mafOpExporterAnsysCommon::Init()
     m_TotalElements += inputUGrid->GetNumberOfCells(); // Elements
 
     vtkDataArray *materialsIDArray = NULL;
-    materialsIDArray = inputUGrid->GetFieldData()->GetArray("material_id");
+    materialsIDArray = inputUGrid->GetCellData()->GetArray("EX");
 
-    if(materialsIDArray != NULL)
-      m_TotalElements += materialsIDArray->GetNumberOfTuples(); // Materials
+		if (materialsIDArray != NULL)
+		{
+			m_TotalElements += materialsIDArray->GetNumberOfTuples(); // Materials
+		}
   }
 }
 //----------------------------------------------------------------------------
@@ -177,6 +193,11 @@ int mafOpExporterAnsysCommon::compareElem(const void *p1, const void *p2)
   b = (ExportElement *)p2;
 
   double result;
+
+	// Compare Sort Order 
+	// by elementType
+	//  else by matID
+	//        else by elementID
 
   result = a->elementType - b->elementType;  
   if (result < 0)
@@ -191,7 +212,15 @@ int mafOpExporterAnsysCommon::compareElem(const void *p1, const void *p2)
     else if (result > 0)
       return 1;
     else
-      return 0;
+		{
+			result = a->elementID - b->elementID;
+			if (result < 0)
+				return -1;
+			else if (result > 0)
+				return 1;
+			else
+				assert(0); //two elements have the same element ID
+		}
   }
 }
 
@@ -210,9 +239,6 @@ ExportElement *mafOpExporterAnsysCommon::CreateExportElements(mafVMEMesh * input
   // get the Nodes Id array
   vtkIntArray *nodesIDArray = input->GetNodesIDArray();
 
-  // get the MATERIAL array
-  vtkIntArray *materialArray = input->GetMaterialsIDArray();
-
   // get the TYPE array
   vtkIntArray *typeArray = input->GetElementsTypeArray();
 
@@ -226,7 +252,7 @@ ExportElement *mafOpExporterAnsysCommon::CreateExportElements(mafVMEMesh * input
   for (int rowID = 0 ; rowID < rowsNumber ; rowID++)
   {
     exportVector[rowID].elementID = elementIdArray ? elementIdArray->GetValue(rowID) : rowID+1;
-    exportVector[rowID].matID = materialArray ? materialArray->GetValue(rowID) : 1;
+    exportVector[rowID].matID = GetMatIdArray() ? GetMatIdArray()[rowID] : 1;
     exportVector[rowID].elementType = typeArray ? typeArray->GetValue(rowID) : 1;
     exportVector[rowID].elementReal = realArray ? realArray->GetValue(rowID) : 1;
     exportVector[rowID].cellID=rowID;
@@ -274,6 +300,5 @@ ExportElement *mafOpExporterAnsysCommon::CreateExportElements(mafVMEMesh * input
 
   return exportVector;
 }
-
 
 

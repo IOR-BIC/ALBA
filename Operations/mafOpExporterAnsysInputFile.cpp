@@ -247,15 +247,12 @@ int mafOpExporterAnsysInputFile::WriteNodesFile(FILE *file )
 //---------------------------------------------------------------------------
 int mafOpExporterAnsysInputFile::WriteMaterialsFile(FILE *file)
 {
-  mafVMEMesh *input = mafVMEMesh::SafeDownCast(m_Input);
-  assert(input);
-
-  vtkUnstructuredGrid *inputUGrid = input->GetUnstructuredGridOutput()->GetUnstructuredGridData();
+	vtkFieldData *materialData = GetMaterialData();
 
   vtkDataArray *materialsIDArray = NULL;
 
   // try field data
-  materialsIDArray = inputUGrid->GetFieldData()->GetArray("material_id");
+  materialsIDArray = materialData->GetArray("material_id");
 	  
   if (materialsIDArray == NULL)
   {
@@ -275,15 +272,13 @@ int mafOpExporterAnsysInputFile::WriteMaterialsFile(FILE *file)
     int numberOfMaterials = materialsIDArray->GetNumberOfTuples();
 
     // get the number of materials properties
-    int numberOfMaterialProperties = inputUGrid->GetFieldData()->GetNumberOfArrays() - 1; // 1 is the materialsIDArray
-
-    vtkFieldData *fieldData = inputUGrid->GetFieldData();
+    int numberOfMaterialProperties = materialData->GetNumberOfArrays() - 1; // 1 is the materialsIDArray
 
     // gather material properties array names
     vcl_vector<wxString> materialProperties;
-    for (int arrayID = 0; arrayID < fieldData->GetNumberOfArrays(); arrayID++)
+    for (int arrayID = 0; arrayID < materialData->GetNumberOfArrays(); arrayID++)
     {
-      wxString arrayName = fieldData->GetArray(arrayID)->GetName();
+      wxString arrayName = materialData->GetArray(arrayID)->GetName();
       if (arrayName != "material_id")
       {
         materialProperties.push_back(arrayName);
@@ -303,7 +298,7 @@ int mafOpExporterAnsysInputFile::WriteMaterialsFile(FILE *file)
       for (int j = 0; j < numberOfMaterialProperties; j++)
       {
         wxString arrayName = materialProperties[j];
-        vtkDataArray *array = fieldData->GetArray(arrayName.c_str());
+        vtkDataArray *array = materialData->GetArray(arrayName.c_str());
 
         fprintf(file,"MP,%s,%d,             %.8lf\n",arrayName.c_str(), materialID, array->GetTuple(i)[0]);
       }

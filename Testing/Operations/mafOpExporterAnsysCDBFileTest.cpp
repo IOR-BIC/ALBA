@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkUnstructuredGrid.h"
+#include "mafOpExporterFEMCommon.h"
 
 //----------------------------------------------------------------------------------------
 void mafOpExporterAnsysCDBFileTest::TestAnsysCDBFile_FileExist()
@@ -157,14 +158,6 @@ void mafOpExporterAnsysCDBFileTest::CompareCDBFilesData(mafString fileName)
 
 	int numPoints = inputUGrid->GetNumberOfPoints();
 
-	// Materials
-	vtkDataArray *materialsIDArray = NULL;
-
-	// try field data
-	materialsIDArray = importedData->GetMaterialsIDArray();
-
-	int numberOfMaterials = materialsIDArray->GetNumberOfTuples();
-
 	// Elements
 	int numberOfElements = inputUGrid->GetNumberOfCells();
 
@@ -178,20 +171,96 @@ void mafOpExporterAnsysCDBFileTest::CompareCDBFilesData(mafString fileName)
 
 	int numPoints2 = inputUGrid2->GetNumberOfPoints();
 
-	// Materials
-	vtkDataArray *materialsIDArray2 = NULL;
-
-	// try field data
-	materialsIDArray2 = importedData2->GetMaterialsIDArray();
-
-	int numberOfMaterials2 = materialsIDArray2->GetNumberOfTuples();
-
 	// Elements
 	int numberOfElements2 = inputUGrid2->GetNumberOfCells();
 
 	CPPUNIT_ASSERT(numPoints == numPoints2);
-	CPPUNIT_ASSERT(numberOfMaterials == numberOfMaterials2);
 	CPPUNIT_ASSERT(numberOfElements == numberOfElements2);
+
+	//
+	vtkDataArray *arrayE = inputUGrid->GetCellData()->GetArray("EX");
+	vtkDataArray *arrayMaterial = inputUGrid->GetCellData()->GetArray("Material");
+	vtkDataArray *arrayPoisson = inputUGrid->GetCellData()->GetArray("NUXY");
+	vtkDataArray *arrayDens = inputUGrid->GetCellData()->GetArray("DENS");
+
+	vtkDataArray *arrayE2 = inputUGrid2->GetCellData()->GetArray("EX");
+	vtkDataArray *arrayMaterial2 = inputUGrid2->GetCellData()->GetArray("Material");
+	vtkDataArray *arrayPoisson2 = inputUGrid2->GetCellData()->GetArray("NUXY");
+	vtkDataArray *arrayDens2 = inputUGrid2->GetCellData()->GetArray("DENS");
+
+	//
+	bool existProps = (arrayE != NULL && arrayE2 != NULL);
+	CPPUNIT_ASSERT((arrayE == NULL && arrayE2 == NULL) || existProps);
+
+	bool equalProp = true;
+
+	if (existProps)
+	{
+		for (int i = 0; i < numberOfElements; i++)
+		{
+			equalProp = arrayE->GetTuple(i)[0] == arrayE2->GetTuple(i)[0];
+
+			if (!equalProp)
+				break;
+		}
+
+		CPPUNIT_ASSERT(equalProp);
+	}
+
+	//
+	existProps = (arrayMaterial != NULL && arrayMaterial2 != NULL);
+	CPPUNIT_ASSERT((arrayMaterial == NULL && arrayMaterial2 == NULL) || existProps);
+
+
+	if (existProps)
+	{
+		equalProp = true;
+		for (int i = 0; i < numberOfElements; i++)
+		{
+			equalProp = arrayMaterial->GetTuple(i)[0] == arrayMaterial2->GetTuple(i)[0];
+
+			if (!equalProp)
+				break;
+		}
+
+		CPPUNIT_ASSERT(equalProp);
+	}
+
+	//
+	existProps = (arrayPoisson != NULL && arrayPoisson2 != NULL);
+	CPPUNIT_ASSERT((arrayPoisson == NULL && arrayPoisson2 == NULL) || existProps);
+
+	if (existProps)
+	{
+		equalProp = true;
+		for (int i = 0; i < numberOfElements; i++)
+		{
+			equalProp = arrayPoisson->GetTuple(i)[0] == arrayPoisson2->GetTuple(i)[0];
+
+			if (!equalProp)
+				break;
+		}
+
+		CPPUNIT_ASSERT(equalProp);
+	}
+
+	//
+	existProps = (arrayDens != NULL && arrayDens2 != NULL);
+	CPPUNIT_ASSERT((arrayDens == NULL && arrayDens2 == NULL) || existProps);
+
+	if (existProps)
+	{
+		equalProp = true;
+		for (int i = 0; i < numberOfElements; i++)
+		{
+			equalProp = arrayDens->GetTuple(i)[0] == arrayDens2->GetTuple(i)[0];
+
+			if (!equalProp)
+				break;
+		}
+
+		CPPUNIT_ASSERT(equalProp);
+	}
 
 	cppDEL(importer);
 	cppDEL(exporter);
