@@ -372,8 +372,8 @@ void mafViewSliceBlend::SetSlice(int nSlice,double pos[3])
     mafString pipe_name = pipe->GetTypeName();
     if (pipe_name.Equals("mafPipeVolumeSliceBlend"))
     {
-      mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)pipe;
-      pipe->SetSlice(nSlice,pos);
+      mafPipeVolumeSliceBlend *pipeBlend = (mafPipeVolumeSliceBlend *)pipe;
+      pipeBlend->SetSlice(nSlice,pos);
     }
   }
 }
