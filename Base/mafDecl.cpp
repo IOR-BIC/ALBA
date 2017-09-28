@@ -136,11 +136,20 @@ std::string mafGetSaveFile(const char * initial, const char * wild, const char *
 std::string mafGetApplicationDirectory()
 //----------------------------------------------------------------------------
 {
-  static wxString app_dir = "";
 
-  wxString cd = wxGetCwd();
+	wxStandardPaths std;
+	wxString exePath = std.GetDataDir();
+	
+	//get current working directory
+	wxString cd = wxGetCwd();
+
+  static wxString app_dir;
+
+	wxSetWorkingDirectory(exePath);
   wxSetWorkingDirectory("..");
-  app_dir = wxGetCwd();
+	app_dir = wxGetCwd();
+
+	//Restore working directory
   wxSetWorkingDirectory(cd);
 
   return app_dir.c_str();
