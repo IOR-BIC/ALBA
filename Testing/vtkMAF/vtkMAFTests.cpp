@@ -127,9 +127,9 @@ int
 {
 	// Create log of VTK error messages
 	vtkMAFSmartPointer<vtkFileOutputWindow> log;
-	vtkFileOutputWindow::SetInstance(log);
+	vtkOutputWindow::SetInstance(log);
 	mafString logPath = wxGetWorkingDirectory();
-	logPath << "\\VTKTest.log";
+	logPath << "\\vtkLog.txt";
 	log->SetFileName(logPath);
 
 	// Create the event manager and test controller
@@ -240,6 +240,6 @@ int
 	// Print test in a compiler compatible format.
 	CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
 	outputter.write(); 
-	return result.wasSuccessful() ? 0 : 1;
+ 	return result.wasSuccessful() ? 0 : 1;
 }
 

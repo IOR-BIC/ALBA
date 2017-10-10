@@ -165,9 +165,9 @@ main(int argc, char* argv[])
 {
 	// Create log of VTK error messages
 	vtkMAFSmartPointer<vtkFileOutputWindow> log;
-	vtkFileOutputWindow::SetInstance(log);
+	vtkOutputWindow::SetInstance(log);
 	mafString logPath = wxGetWorkingDirectory();
-	logPath << "\\VTKTest.log";
+	logPath << "\\vtkLog.txt";
 	log->SetFileName(logPath);
 
 	// Create the event manager and test controller
