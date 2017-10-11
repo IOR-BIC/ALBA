@@ -495,30 +495,15 @@ bool ExampleApp::OnInit()
 	vslicer->PackageView();
 	m_Logic->Plug(vslicer);
 
-	//View VTK Compound
-// 	mafViewVTKCompound *vVTKC = new mafViewVTKCompound("VTK (mafViewVTKCompound)");
-// 	vVTKC->PackageView();
-// 	m_Logic->Plug(vVTKC);
-
 	//View RayCast
 	mafViewVTK *vRayCast = new mafViewVTK("3D Volume Rendering");
 	vRayCast->PlugVisualPipe("mafVMEVolumeGray", "mafPipeRayCast", MUTEX);
 	m_Logic->Plug(vRayCast);
 
-	//View Plot
-	mafViewPlot *vplot = new mafViewPlot("Plot (mafViewPlot)");
-	//vplot->PackageView();
-	m_Logic->Plug(vplot);
-
 	//View HTML
 	mafViewHTML *vHtml = new mafViewHTML("HTML (mafViewHTML)");
 	//vHtml->PackageView();
 	m_Logic->Plug(vHtml);
-
-	//View Compound
-	mafViewCompound *vComp = new mafViewCompound("Compound (mafViewCompound)");
-	vComp->PackageView();
-	m_Logic->Plug(vComp);
 
 	wxHandleFatalExceptions();
 
