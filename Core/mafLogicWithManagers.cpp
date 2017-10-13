@@ -97,12 +97,6 @@
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
 
-enum ABOUT_ID
-{
-	SHOW_WEB_SITE=MINID,
-	SHOW_LICENSE_SITE
-};
-
 
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
