@@ -164,7 +164,7 @@ int
 	runner.addTest(vtkMAFProjectVolumeTest::suite());
 	runner.addTest(vtkMAFClipSurfaceBoundingBoxTest::suite());
 	runner.addTest(vtkMAFRGSliceAccumulateTest::suite());
-	runner.addTest(vtkMAFRectilinearGridToRectilinearGridFilterTest::suite());
+	//runner.addTest(vtkMAFRectilinearGridToRectilinearGridFilterTest::suite());
 	runner.addTest(vtkMAFProfilingActorTest::suite());
 	runner.addTest(vtkMAFRulerActor2DTest::suite());
 	runner.addTest(vtkMAFSimpleRulerActor2DTest::suite());
@@ -173,7 +173,7 @@ int
 	runner.addTest(vtkMAFExtendedGlyph3DTest::suite());
 	runner.addTest(vtkMAFTransferFunction2DTest::suite());
 	runner.addTest(vtkHoleConnectivityTest::suite());
-	runner.addTest(vtkDicomUnPackerTest::suite());
+	//runner.addTest(vtkDicomUnPackerTest::suite());
 	runner.addTest(vtkTriangleQualityRatioTest::suite());
 	runner.addTest(vtkMaskPolyDataFilterTest::suite());
 	runner.addTest(vtkMAFExtrudeToCircleTest::suite());
@@ -182,7 +182,7 @@ int
 	runner.addTest(vtkMAFRegionGrowingLocalGlobalThresholdTest::suite());
 	runner.addTest(vtkImageUnPackerTest::suite());
 	runner.addTest(vtkPackedImageTest::suite());
-	runner.addTest(vtkMAFVolumeRayCastMapperTest::suite());
+	//runner.addTest(vtkMAFVolumeRayCastMapperTest::suite());
 	runner.addTest(vtkXRayVolumeMapperTest::suite());
 	runner.addTest(vtkMAFVolumeTextureMapper2DTest::suite());
 	runner.addTest(vtkMAFDataArrayDescriptorTest::suite());
