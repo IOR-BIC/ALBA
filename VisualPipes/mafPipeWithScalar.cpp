@@ -84,11 +84,7 @@ void mafPipeWithScalar::ManageScalarOnExecutePipe(vtkDataSet * dataSet)
 
 	m_ObjectMaterial = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
 
-	m_PointCellArraySeparation = dataSet->GetPointData()->GetNumberOfArrays();
-	if (dataSet->GetPointData()->GetNormals())
-		m_PointCellArraySeparation--;
 	m_NumberOfArrays = m_PointCellArraySeparation + dataSet->GetCellData()->GetNumberOfArrays();
-
 
 	// point type scalars
 	vtkDataArray *scalars = dataSet->GetPointData()->GetScalars();
@@ -336,7 +332,7 @@ void mafPipeWithScalar::CreateFieldDataControlArrays()
   for(pointArrayNumber = 0; pointArrayNumber<numPointScalars; pointArrayNumber++)
   {
 		const char *arrayName=pointData->GetArrayName(pointArrayNumber);
-    if(arrayName && strcmp(arrayName,"")!=0)
+    if(arrayName && strcmp(arrayName,"")!=0 && strcmp(arrayName, "normals") != 0)
     {
       count++;
       tempScalarsPointsName[count-1]=pointData->GetArrayName(pointArrayNumber);
