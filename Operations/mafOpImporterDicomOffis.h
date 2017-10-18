@@ -37,6 +37,7 @@ class mafInteractorDICOMImporter;
 class mafGUIWizardPageNew;
 class mafString;
 class mafTagArray;
+class mafVME;
 class mafVMEImage;
 class mafVMEVolumeGray;
 class mafGUICheckListBox;
@@ -70,7 +71,7 @@ class MAF_EXPORT mafOpImporterDicomOffis : public mafOp
 {
 public:
 	/** constructor */
-	mafOpImporterDicomOffis(wxString label = "Importer DICOM");
+	mafOpImporterDicomOffis(wxString label = "Importer DICOM", bool justOnce = false);
 	/** RTTI macro */
 	mafTypeMacro(mafOpImporterDicomOffis, mafOp);
 
@@ -78,7 +79,7 @@ public:
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafVME*node) {return true;};
+	bool Accept(mafVME*node);
 
 	/** Builds operation's interface calling CreateGui() method. */
 	virtual void OpRun();
@@ -121,7 +122,9 @@ public:
 
 	/** method allows to handle events from other objects*/
 	virtual void OnEvent(mafEventBase *maf_event);
-		
+	
+	/*Set JustOnce Import Mode*/
+	void SetJustOnceImport(bool justOnce) { m_JustOnceImport = justOnce; };
 protected:
 
 	enum DICOM_IMPORTER_GUI_ID
@@ -196,6 +199,8 @@ protected:
 	
 	/** Sets the VME name*/
 	void SetVMEName();
+
+	mafVME *FindVolumeInTree(mafVME *node);
 		
 	vtkLookupTable		*m_SliceLookupTable;
 	vtkPlaneSource		*m_SlicePlane;
@@ -254,7 +259,7 @@ protected:
 	int m_ShowOrientationPosition;
 	int m_CurrentImageID;
 
-	
+	bool m_JustOnceImport;
 
 	double m_TotalDicomRange[2]; ///< contains the scalar range og the full dicom
 	double m_TotalDicomSubRange[2]; ///< contains the scalar range og the full dicom

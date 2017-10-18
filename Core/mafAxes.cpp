@@ -126,10 +126,6 @@ mafAxes::mafAxes(vtkRenderer *ren, mafVME* vme, int axesType)
 
 		wxString headABSFileName = m_GlobalAxesHeadActor->GetHeadABSFileName().c_str();
 
-		std::ostringstream stringStream;
-		stringStream << "Head ABS file name: " << headABSFileName.c_str() << std::endl;          
-		
-		mafLogMessage(stringStream.str().c_str());
 		bool exists = wxFileExists(headABSFileName.c_str());
 		assert(exists);
 
