@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafSideBar
- Authors: Silvano Imboden, Gianluigi Crimi
+ Authors: Silvano Imboden
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -13,8 +13,8 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __mafSideBar_H__
-#define __mafSideBar_H__
+#ifndef __mafAbsSideBar_H__
+#define __mafAbsSideBar_H__
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
@@ -26,7 +26,6 @@
 #include "mafObserver.h"
 #include "mafGUICheckTree.h"
 #include "mafGUIVMEChooserTree.h"
-#include "mafAbsSideBar.h"
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
@@ -44,95 +43,61 @@ class mafGUIMDIFrame;
 //----------------------------------------------------------------------------
 /**
 */
-class MAF_EXPORT mafSideBar: public mafAbsSideBar
+class MAF_EXPORT mafAbsSideBar
 {
 public:
-	mafSideBar(mafGUIMDIFrame* parent, int id, mafObserver *Listener, long style = DOUBLE_NOTEBOOK);
-	~mafSideBar(); 
-
-  enum SIDEBAR_STYLE
-  {
-    SINGLE_NOTEBOOK,
-    DOUBLE_NOTEBOOK
-  };
-
+	
   // Description:
 	// Add a new vme into the tree.
-	void VmeAdd(mafVME *vme);
+	virtual void VmeAdd(mafVME *vme) = 0;
 
 	// Description:
 	// Remove a vme from the tree.
-	void VmeRemove(mafVME *vme);
+	virtual void VmeRemove(mafVME *vme) = 0;
 
 	// Description:
 	// Notify to the tree that a vme is modified.
-	void VmeModified(mafVME *vme);
+	virtual void VmeModified(mafVME *vme) = 0;
 
 	// Description:
 	// Notify to the tree the visibility of the vme.
-	void VmeShow(mafVME *vme, bool visibility);
+	virtual void VmeShow(mafVME *vme, bool visibility) = 0;
 
 	// Description:
 	// Notify to the tree that the vme has been selected.
-	void VmeSelected(mafVME *vme);
-		
+	virtual void VmeSelected(mafVME *vme) = 0;
+
 	// Description:
 	// Show the operation's parameters gui on the tabbed panel.
-	void OpShowGui(bool push_gui, mafGUIPanel *panel);
+	virtual void OpShowGui(bool push_gui, mafGUIPanel *panel) = 0;
 
 	// Description:
 	// Hide the view/operation's gui from the tabbed panel.
-	void OpHideGui(bool view_closed);
+	virtual void OpHideGui(bool view_closed) = 0;
 
 	// Description:
 	// Plug the view settings on the tabbed panel.
-	void ViewSelect(mafView *view);
+	virtual void ViewSelect(mafView *view) = 0;
 
 	// Description:
 	// Notify to the tree that a view has been deleted.
-	void ViewDeleted(mafView *view);
+	virtual void ViewDeleted(mafView *view) = 0;
 
 	// Description:
 	// Enable/Disable the vme selection when an operation ends/start.
-	void EnableSelect(bool enable);
+	virtual void EnableSelect(bool enable) = 0;
 
 	// Description:
 	// Switch the visibility of the panel.
-	void Show();
+	virtual void Show() = 0;
 
-	bool IsShown() {return m_Notebook->IsShown();};
-  void Show(bool show) {m_Notebook->Show(show);};
+	virtual bool IsShown() = 0;
+  virtual void Show(bool show) = 0;
 
 	/** Respond to a VME_CHOOSE evt. Build a dialog containing the vme tree and return the vme choosed from the user. */
-	std::vector<mafVME*> VmeChoose(long vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, mafString title = "Choose Node", bool multiSelect = false, mafVME *vme = NULL);
+	virtual std::vector<mafVME*> VmeChoose(long vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, mafString title = "Choose Node", bool multiSelect = false, mafVME *vme = NULL) = 0;
 
 	/** Open a Find VME dialog.*/
-	void FindVME();
-
-protected:
-  void UpdateVmePanel();  
-
-	wxNotebook        *m_Notebook;
-	wxNotebook        *m_VmeNotebook;
-	wxSplitterWindow *m_SideSplittedPanel;
-
-  mafGUIPanelStack	*m_OpPanel;
-	mafGUIHolder	*m_ViewPropertyPanel;
-  mafGUICheckTree  *m_Tree;
-
-  mafGUIHolder  *m_VmePanel;
-  mafGUIHolder  *m_VmePipePanel;
-
-  mafVME     *m_SelectedVme;
-  mafView     *m_SelectedView;
-  mafObserver *m_Listener;
-
-  mafGUI *m_AppendingGUI;
-  
-	mafGUI *m_CurrentVmeGui;
-	mafGUI *m_CurrentVmeOutputGui;
-  mafGUI *m_CurrentPipeGui;
-
-  int m_Style;
+	virtual void FindVME() = 0;
 };
 #endif

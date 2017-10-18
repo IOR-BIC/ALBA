@@ -280,7 +280,7 @@ void mafInteractorPER::OnRightButtonUp(mafEventInteraction *e)
 	if(m_ShowContextMenu && mouse)
 	{
     mafVME *vme = GetPickedVME(mouse); 
-    InvokeEvent(this,SHOW_CONTEXTUAL_MENU,MCH_UP,vme);
+    InvokeEvent(this, SHOW_VIEW_CONTEXTUAL_MENU,MCH_UP,vme);
 	}
 
   OnButtonUp(e);
