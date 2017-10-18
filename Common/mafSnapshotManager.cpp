@@ -51,6 +51,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkPointData.h"
 #include "mafRWI.h"
+#include "mafGUIDialog.h"
 
 #define DIALOG_W 800
 #define DIALOG_H 480

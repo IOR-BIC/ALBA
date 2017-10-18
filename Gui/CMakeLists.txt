@@ -90,6 +90,7 @@ IF (MAF_USE_VTK)
   mafGUIDictionaryWidget.cpp		  mafGUIDictionaryWidget.h
   mafAnimate.cpp					  mafAnimate.h
   mafAttachCamera.cpp				  mafAttachCamera.h
+	mafAbsSideBar.h
   mafSideBar.cpp					  mafSideBar.h
   mafTextKit.cpp					  mafTextKit.h
   mafVTKLog.cpp						  mafVTKLog.h

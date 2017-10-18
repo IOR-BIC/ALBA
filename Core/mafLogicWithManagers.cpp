@@ -56,7 +56,6 @@
 
 #include "mafSideBar.h"
 #include "mafUser.h"
-#include "mafGUIDialogFindVme.h"
 #include "mafGUIMDIFrame.h"
 #include "mafGUIMDIChild.h"
 #include "mafGUICheckTree.h"
@@ -93,6 +92,9 @@
 #include "vtkDataSetAttributes.h"
 #include "mafSnapshotManager.h"
 #include "mafOpSelect.h"
+#include "mafGUIVMEChooserTree.h"
+#include "mafGUI.h"
+#include "mafGUIDialog.h"
 
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
@@ -577,7 +579,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				// ###############################################################
 				// commands related to VME
 			case MENU_EDIT_FIND_VME:
-				FindVME();
+				m_SideBar->FindVME();
 				break;
 			case VME_SELECT:
 				VmeSelect(e->GetVme());
@@ -605,7 +607,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				else
 					str = "Choose Node";
 
-				std::vector<mafVME*> nodeVector = VmeChoose(e->GetArg(), REPRESENTATION_AS_TREE, str, e->GetBool(), e->GetVme());
+				std::vector<mafVME*> nodeVector = m_SideBar->VmeChoose(e->GetArg(), REPRESENTATION_AS_TREE, str, e->GetBool(), e->GetVme());
 				if (!e->GetBool())
 				{
 					if (nodeVector.size() != 0)
@@ -629,10 +631,10 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			case UPDATE_PROPERTY:
 				VmeUpdateProperties(e->GetVme(), e->GetBool());
 				break;
-			case SHOW_CONTEXTUAL_MENU:
-				if (e->GetSender() == m_SideBar->GetTree())
+			case SHOW_TREE_CONTEXTUAL_MENU:
 					TreeContextualMenu(*e);
-				else
+				break;
+			case SHOW_VIEW_CONTEXTUAL_MENU:
 					ViewContextualMenu(e->GetBool());
 				break;
 				// ###############################################################
@@ -1394,19 +1396,11 @@ void mafLogicWithManagers::VmeSelected(mafVME *vme)
 
 	if (m_OpManager)	m_OpManager->VmeSelected(vme);
 	if (m_SideBar)
-	{
 		m_SideBar->VmeSelected(vme);
-		m_SideBar->GetTree()->SetFocus();
-	}
 
 	EnableMenuAndToolbar();
 }
-//----------------------------------------------------------------------------
-std::vector<mafVME*> mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, mafString title, bool multiSelect, mafVME *vme)
-{
-	mafGUIVMEChooser vc(m_SideBar->GetTree(), title.GetCStr(), vme_accept_function, style, multiSelect, vme);
-	return vc.ShowChooserDialog();
-}
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeChooseMaterial(mafVME *vme, bool updateProperty)
 {
@@ -1428,14 +1422,7 @@ void mafLogicWithManagers::VmeUpdateProperties(mafVME *vme, bool updatePropertyF
 	this->m_ViewManager->CameraUpdate();
 	this->m_VMEManager->MSFModified(true);
 }
-//----------------------------------------------------------------------------
-void mafLogicWithManagers::FindVME()
-{
-	mafGUICheckTree *tree = m_SideBar->GetTree();
-	mafGUIDialogFindVme fd(_("Find VME"));
-	fd.SetTree(tree);
-	fd.ShowModal();
-}
+
 
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::ShowInSideBar(mafVME * vme, bool visibility)
@@ -1987,16 +1974,7 @@ void mafLogicWithManagers::CreateTimeBar()
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::CreateControlPanel()
 {
-		m_SideBar = new mafSideBar(m_Win, MENU_VIEW_SIDEBAR, this, m_SidebarStyle);
-		m_Win->AddDockPane(m_SideBar->m_Notebook, wxPaneInfo()
-			.Name("sidebar")
-			.Caption(wxT("Control Panel"))
-			.Right()
-			.Layer(2)
-			.MinSize(240, 450)
-			.TopDockable(false)
-			.BottomDockable(false)
-		);
+	m_SideBar = new mafSideBar(m_Win, MENU_VIEW_SIDEBAR, this, m_SidebarStyle);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::FillMenus()
