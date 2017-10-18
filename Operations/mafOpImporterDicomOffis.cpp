@@ -34,6 +34,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "mafDeviceButtonsPadMouse.h"
 #include "mafInteractorDICOMImporter.h"
 #include "mafTagArray.h"
+#include "mafVMERoot.h"
+#include "mafVME.h"
 #include "mafVMEImage.h"
 #include "mafVMEVolumeGray.h"
 #include "mafGUICheckListBox.h"
@@ -99,7 +101,7 @@ enum
 #define EPSILON 1e-7
 
 //----------------------------------------------------------------------------
-mafOpImporterDicomOffis::mafOpImporterDicomOffis(wxString label):
+mafOpImporterDicomOffis::mafOpImporterDicomOffis(wxString label, bool justOnce) :
 mafOp(label)
 {
 	m_OpType = OPTYPE_IMPORTER;
@@ -134,6 +136,7 @@ mafOp(label)
 	//variables
 	m_OutputType = TYPE_VOLUME;
 	m_ConstantRotation = true;
+	m_JustOnceImport = justOnce;
 	m_DescrInName = m_SizeInName = m_PatientNameInName = true;
 	m_VMEName = "";
 	m_CurrentSlice = VTK_INT_MAX;
@@ -162,8 +165,38 @@ mafOpImporterDicomOffis::~mafOpImporterDicomOffis()
 //----------------------------------------------------------------------------
 mafOp *mafOpImporterDicomOffis::Copy()
 {
-	mafOpImporterDicomOffis *importer = new mafOpImporterDicomOffis(m_Label);
+	mafOpImporterDicomOffis *importer = new mafOpImporterDicomOffis(m_Label, m_JustOnceImport);
 	return importer;
+}
+//----------------------------------------------------------------------------
+bool mafOpImporterDicomOffis::Accept(mafVME*node)
+{
+	if (m_JustOnceImport && node)
+	{
+		mafVMERoot *root = (mafVMERoot *)node->GetRoot();
+		return FindVolumeInTree(root) == NULL;
+	}
+
+	return true;
+}
+//-------------------------------------------------------------------------
+mafVME* mafOpImporterDicomOffis::FindVolumeInTree(mafVME *node)
+{
+	wxString typeName = "mafVMEVolumeGray";
+
+	if (node->GetTypeName() == typeName)
+		return node;
+
+	std::vector<mafAutoPointer<mafVME>> children;
+	children = *(node->GetChildren());
+
+	for (mafID i = 0; i < children.size(); i++)
+	{
+		if (mafVME *n = FindVolumeInTree(children[i]))
+			return n;
+	}
+
+	return NULL;
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::OpRun()
