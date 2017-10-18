@@ -108,7 +108,7 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 
 	m_Win->SetListener(this);
 
-	m_ChildFrameStyle = wxCAPTION | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER; //wxTHICK_FRAME; // Default style
+	m_ChildFrameStyle = 0; wxCAPTION | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER; //wxTHICK_FRAME; // Default style
 	m_ApplicationSettings = new mafGUIApplicationSettings(this);
 	m_TimeBarSettings = NULL;
 
@@ -2255,6 +2255,7 @@ void mafLogicWithManagers::RestoreLayout()
 		pos[1]=MAX(0,pos[1]);
 
 		wxRect rect(pos[0],pos[1],size[0],size[1]);
+		m_Win->SetMinSize(wxSize(800, 580));
 		m_Win->SetSize(rect);
 		
 		if (maximized != 0)
