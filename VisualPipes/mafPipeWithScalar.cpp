@@ -332,7 +332,7 @@ void mafPipeWithScalar::CreateFieldDataControlArrays()
   for(pointArrayNumber = 0; pointArrayNumber<numPointScalars; pointArrayNumber++)
   {
 		const char *arrayName=pointData->GetArrayName(pointArrayNumber);
-    if(arrayName && strcmp(arrayName,"")!=0 && strcmp(arrayName, "normals") != 0)
+    if(arrayName && strcmp(arrayName,"")!=0 && strcmp(arrayName, "normals") != 0 && strcmp(arrayName, "scalars") != 0)
     {
       count++;
       tempScalarsPointsName[count-1]=pointData->GetArrayName(pointArrayNumber);
