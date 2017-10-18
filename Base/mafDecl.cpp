@@ -465,7 +465,8 @@ std::string  mafIdString(int id)
      case EVT_END:	            s="EVT_END"; break; 
      case MENU_END:	            s="MENU_END"; break; 
 
-		 case SHOW_CONTEXTUAL_MENU: s="SHOW_CONTEXTUAL_MENU"; break;
+		 case SHOW_VIEW_CONTEXTUAL_MENU: s = "SHOW_VIEW_CONTEXTUAL_MENU"; break;
+		 case SHOW_TREE_CONTEXTUAL_MENU: s = "SHOW_TREE_CONTEXTUAL_MENU"; break;
 
      case OP_START:							s="OP_START"; break; 
      case OP_UNDO:							s="OP_UNDO"; break; 

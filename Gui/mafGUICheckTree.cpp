@@ -124,7 +124,7 @@ void mafGUICheckTree::ShowContextualMenu(wxMouseEvent& event)
 
   mafEvent e;
   e.SetSender(this);
-  e.SetId(SHOW_CONTEXTUAL_MENU);
+  e.SetId(SHOW_TREE_CONTEXTUAL_MENU);
   e.SetBool(vmeMenu);
   e.SetArg(m_Autosort);
   if(vmeMenu)

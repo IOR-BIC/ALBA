@@ -742,11 +742,11 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
   {
     OnCameraUpdate(e);
   }
-  else if (id == SHOW_CONTEXTUAL_MENU)
+  else if (id == SHOW_VIEW_CONTEXTUAL_MENU)
   {
     mafVME *vme = (mafVME *)event->GetData();
     bool vme_context_menu = (vme != NULL) && !vme->IsA("mafVMEGizmo");
-    mafEventMacro(mafEvent(event->GetSender(),SHOW_CONTEXTUAL_MENU, vme_context_menu));
+    mafEventMacro(mafEvent(event->GetSender(), SHOW_VIEW_CONTEXTUAL_MENU, vme_context_menu));
   }
   else if (id == mafDevice::DEVICE_NAME_CHANGED) 
   {

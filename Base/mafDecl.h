@@ -270,7 +270,9 @@ EVT_START,
   MOUSE_WHEEL, //(Used by mafGUI to send mouse wheel event to the listener) added by Losi 06/28/2012
    
   ID_TRANSFORM, //added by Stefano. 30-11-2003 
-  SHOW_CONTEXTUAL_MENU,	//Added by Paolo 16-9-2003
+	SHOW_VIEW_CONTEXTUAL_MENU,	
+	SHOW_TREE_CONTEXTUAL_MENU,	
+
 
   INTERACTOR_ADD,     //modified by Marco. 25-8-2004 bind an interactor to an action 
   INTERACTOR_REMOVE,  //modified by Marco. 25-8-2004 unbind an interactor from an action

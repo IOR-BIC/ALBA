@@ -23,7 +23,6 @@
 #include "mafGUIPanel.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mafGUIVMEChooser.h"
 #include "mafVMEManager.h"
 #include "mafGUIMDIFrame.h"
 #include "mafSideBar.h"
@@ -53,6 +52,7 @@ class mafGUIApplicationSettings;
 class mafGUISettingsTimeBar;
 class mafHelpManager;
 class mafSnapshotManager;
+class mafGUIDialog;
 
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
@@ -110,7 +110,7 @@ public:
 	mafLogicWithManagers(mafGUIMDIFrame *mdiFrame = NULL);
 	virtual     ~mafLogicWithManagers();
 
-	/** */
+	/** Events management */
 	virtual void OnEvent(mafEventBase *maf_event);
 
 	/**  Plug a new view */
@@ -166,27 +166,23 @@ public:
 	if set to OPEN_ALL_DATA let's the application to open all msf file.
 	As default the application stamp is the name of the application and it is set into the Show() method. */
 	void SetApplicationStamp(mafString &app_stamp);
-	void SetApplicationStamp(std::vector<mafString> app_stamp);
 
 	/** Manage application exception and allow to save at least the tree. */
 	virtual void HandleException();
 
-	/*About Dialog*/
+	/** About Dialog*/
 	void ShowAboutDialog(wxString imagePath = "", bool showWebSiteBtn = false, bool showLicenseBtn= false);
 	wxStaticText* AddText(mafGUIDialog * dialog, wxString &text, int Width, int align);
 
 	/** Set the revision string */
 	void SetRevision(mafString revision) { m_Revision = revision; };
 
-	/** Open a Find VME dialog.*/
-	void FindVME();
-
-	/* Set MAF Expert Mode*/
+	/** Set MAF Expert Mode*/
 	void MAFExpertModeOn() { (*GetMAFExpertMode()) = TRUE; };
 	void MAFExpertModeOff() { (*GetMAFExpertMode()) = FALSE; };
 	void SetMAFExpertMode(int value) { (*GetMAFExpertMode()) = value; };
 
-	/* Set the file extension */
+	/** Set the file extension */
 	void SetFileExtension(mafString &extension) { m_Extension = extension; };
 
 	/** Returns the pointer to the main panel of the application.*/
@@ -195,7 +191,7 @@ public:
 	/** Sets the flag to know if Toolbar should be built.*/
 	void PlugToolbar(bool plug) { m_PlugToolbar = plug; };
 	/** Sets the flag to know if Side bar should be built.*/
-	void PlugSidebar(bool plug, long style = mafSideBar::DOUBLE_NOTEBOOK) { m_PlugControlPanel = plug; m_SidebarStyle = style; };
+	void PlugSidebar(bool plug) { m_PlugControlPanel = plug; };
 	/** Sets the flag to know if Time bar should be built.*/
 	void PlugTimebar(bool plug) { m_PlugTimebar = plug; };
 	/** Sets the flag to know if Log bar should be built.*/
@@ -316,10 +312,7 @@ protected:
 	virtual void VmeRemoving(mafVME *vme);
 
 	virtual void VmeVisualModeChanged(mafVME * vme);
-
-	/** Respond to a VME_CHOOSE evt. Build a dialog containing the vme tree and return the vme choosed from the user. */
-	virtual std::vector<mafVME*> VmeChoose(long vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, mafString title = "Choose Node", bool multiSelect = false, mafVME *vme = NULL);
-
+		
 	/** Build a dialog to show all available materials. */
 	virtual void VmeChooseMaterial(mafVME *vme, bool updateProperty);
 
@@ -378,7 +371,7 @@ protected:
 
 
 
-	mafSideBar             *m_SideBar;
+	mafAbsSideBar          *m_SideBar;
 	mafVMEManager          *m_VMEManager;
 	mafViewManager         *m_ViewManager;
 	mafOpManager           *m_OpManager;

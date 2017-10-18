@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafSideBar
- Authors: Silvano Imboden
+ Authors: Silvano Imboden, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -37,9 +37,14 @@
 #include "mafVME.h"
 #include "mafVMEOutput.h"
 #include "mafVMERoot.h"
+#include "mafGUIVMEChooser.h"
+#include "mafGUIDialogFindVme.h"
+#include "mafGUIDockManager.h"
+#include "mafGUIMDIFrame.h"
+
 
 //----------------------------------------------------------------------------
-mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long style)
+mafSideBar::mafSideBar(mafGUIMDIFrame* parent, int id, mafObserver *Listener, long style)
 //----------------------------------------------------------------------------
 {
   m_SelectedVme  = NULL;
@@ -57,16 +62,16 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long sty
 	if(style == DOUBLE_NOTEBOOK)
 	{
 		m_SideSplittedPanel = new wxSplitterWindow(m_Notebook, -1, wxDefaultPosition, wxSize(-1,-1),/*wxSP_3DSASH |*/ wxSP_FULLSASH);
-		m_Tree = new mafGUICheckTree(m_SideSplittedPanel,-1,false,true);
+			m_Tree = new mafGUICheckTree(m_SideSplittedPanel,-1,false,true);
 	}
 	else
 	{
   	m_Tree = new mafGUICheckTree(m_Notebook,-1,false,true);
 	}
 
-  m_Tree->SetListener(Listener);
+		m_Tree->SetListener(Listener);
   m_Tree->SetSize(-1,300);
-  m_Tree->SetTitle(" vme hierarchy: ");
+		m_Tree->SetTitle(" vme hierarchy: ");
 	if(style == DOUBLE_NOTEBOOK)
 		m_Notebook->AddPage(m_SideSplittedPanel,_("Data tree"),true);
 	else 
@@ -102,6 +107,16 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long sty
     m_VmePanel = new mafGUIHolder(m_Notebook,-1,false,true);
     m_Notebook->AddPage(m_VmePanel ,_("VME"));
   }
+
+	parent->AddDockPane(m_Notebook, wxPaneInfo()
+		.Name("sidebar")
+		.Caption(wxT("Control Panel"))
+		.Right()
+		.Layer(2)
+		.MinSize(240, 450)
+		.TopDockable(false)
+		.BottomDockable(false)
+	);
 }
 //----------------------------------------------------------------------------
 mafSideBar::~mafSideBar() 
@@ -164,26 +179,26 @@ void mafSideBar::ViewSelect(mafView *view)
 void mafSideBar::ViewDeleted(mafView *view)
 //----------------------------------------------------------------------------
 {
-	m_Tree->ViewDeleted(view);
+		m_Tree->ViewDeleted(view);
   ViewSelect(NULL);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::EnableSelect(bool enable)
 //----------------------------------------------------------------------------
 {
-	m_Tree->EnableSelect(enable);
+		m_Tree->EnableSelect(enable);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeAdd(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-	m_Tree->VmeAdd(vme);
+		m_Tree->VmeAdd(vme);
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-	m_Tree->VmeRemove(vme);
+		m_Tree->VmeRemove(vme);
   if (vme == m_SelectedVme)
   {
     m_SelectedVme = NULL;
@@ -194,7 +209,7 @@ void mafSideBar::VmeRemove(mafVME *vme)
 void mafSideBar::VmeModified(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-	m_Tree->VmeModified(vme);
+		m_Tree->VmeModified(vme);
   UpdateVmePanel();
 }
 //----------------------------------------------------------------------------
@@ -210,14 +225,11 @@ void mafSideBar::VmeSelected(mafVME *vme)
 {
   m_SelectedVme = vme;
   UpdateVmePanel();
-  m_Tree->VmeSelected(vme);
+	m_Tree->VmeSelected(vme);
+
+	m_Tree->SetFocus();
 }
-//----------------------------------------------------------------------------
-void mafSideBar::VmePropertyRemove(mafGUI *gui)
-//----------------------------------------------------------------------------
-{
-	m_VmePanel->Remove(gui);
-}
+
 //----------------------------------------------------------------------------
 void mafSideBar::Show()
 //----------------------------------------------------------------------------
@@ -245,22 +257,18 @@ void mafSideBar::UpdateVmePanel()
 	if(m_SelectedVme)
 	{
 	  vme_gui = m_SelectedVme->GetGui();
-	
-	  if(m_SelectedVme->IsMAFType(mafVME))
+		  
+	  mafVME *v = m_SelectedVme;
+	  vme_out = v->GetOutput();
+	  if(!vme_out->IsA("mafVMEOutputNULL")) // Paolo 2005-05-05
 	  {
-	    mafVME *v = m_SelectedVme;
-	    vme_out = v->GetOutput();
-	    if(!vme_out->IsA("mafVMEOutputNULL")) // Paolo 2005-05-05
-	    {
-	      vme_out_gui = vme_out->GetGui();
-	      if (!v->IsDataAvailable())
-	        vme_out->Update();
-	    }
-	    else
-	      vme_out = NULL;
+	    vme_out_gui = vme_out->GetGui();
+	    if (!v->IsDataAvailable())
+	      vme_out->Update();
 	  }
-	
-	
+	  else
+	    vme_out = NULL;
+		
 	  if(m_SelectedView)
 	  {
 	    vme_pipe = m_SelectedView->GetNodePipe(m_SelectedVme);
@@ -305,4 +313,20 @@ void mafSideBar::UpdateVmePanel()
 		m_VmePanel->Put(m_AppendingGUI);
 	else
 		m_VmePanel->Put(new mafGUI(NULL));
+}
+
+//----------------------------------------------------------------------------
+std::vector<mafVME*> mafSideBar::VmeChoose(long vme_accept_function, long style, mafString title, bool multiSelect, mafVME *vme)
+{
+	mafGUIVMEChooser vc(m_Tree, title.GetCStr(), vme_accept_function, style, multiSelect, vme);
+	return vc.ShowChooserDialog();
+}
+
+//----------------------------------------------------------------------------
+void mafSideBar::FindVME()
+{
+	mafGUICheckTree *tree = m_Tree;
+	mafGUIDialogFindVme fd(_("Find VME"));
+	fd.SetTree(tree);
+	fd.ShowModal();
 }
