@@ -113,7 +113,6 @@ public:
   
   enum traversalMode {PreOrder=0,PostOrder};
 
-  enum events_ID {ID_PreTraversal=0,ID_PostTraversal,ID_Deeper, ID_Upper, ID_FirstNode, ID_LastNode, ID_Done};
 protected:
 
   /** Find the left most leaf of the tree*/
@@ -121,27 +120,6 @@ protected:
 
   /** Find the right most leaf of the tree*/
   mafVME *FindRightMostLeaf(mafVME *node);
-
-  /** Callback function. By default send ID_PreTraversal event */
-  virtual void PreExecute(); 
-
-  /** Callback function. By default send ID_PostTraversal event */
-  virtual void PostExecute();  
-
-  /** Callback function. By default send ID_Deeper event */
-  virtual void DeeperExecute(mafVME *); 
-
-  /** Callback function. By default send ID_Upper event */
-  virtual void UpperExecute(mafVME *);  
-
-  /** Callback function. By default send ID_FirstNode event */
-  virtual void FirstExecute(); 
-
-  /** Callback function. By default send ID_LastNode event */
-  virtual void LastExecute();  
-
-  /** Callback function. By default send an event */
-  virtual void DoneExecute();  
 
   mafVMEIterator(mafVME *root=NULL);
   virtual ~mafVMEIterator();
