@@ -36,7 +36,7 @@ template class MAF_EXPORT mafVector<mafID>;
   @sa mafVME
   */
 
-class MAF_EXPORT mafVMEIterator : public mafObject, public mafEventBroadcaster
+class MAF_EXPORT mafVMEIterator : public mafObject
 {
 public:
   mafTypeMacro(mafVMEIterator,mafObject);
