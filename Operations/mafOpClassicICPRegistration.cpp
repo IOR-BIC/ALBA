@@ -60,6 +60,7 @@ mafOp(label)
 	m_ReportFilename		= "";	
 	m_InputName					= "";
 	m_TargetName				= _("none");
+	m_CopySubTree = false;
 }
 //----------------------------------------------------------------------------
 mafOpClassicICPRegistration::~mafOpClassicICPRegistration( ) 
@@ -113,7 +114,9 @@ void mafOpClassicICPRegistration::CreateGui()
 	m_Gui->Label(&m_TargetName);
 	m_Gui->Button(ID_CHOOSE,_("choose target"));
 	m_Gui->Label("");
-	m_Gui->Double(ID_CONVERGENCE,_("conv.step"),&m_Convergence,1.0e-20,1.0e+20,10);
+	m_Gui->Bool(-1, "Copy subtree", &m_CopySubTree,true);
+	m_Gui->Label("");
+	m_Gui->Double(ID_CONVERGENCE, _("conv.step"), &m_Convergence, 1.0e-20, 1.0e+20, 10);
 	m_Gui->Label("");
 	m_Gui->FileSave(ID_FILE,_("report log"),&m_ReportFilename,wildcard);
 	m_Gui->Label("");
@@ -164,9 +167,10 @@ void mafOpClassicICPRegistration::OpStop(int result)
 void mafOpClassicICPRegistration::OpDo()
 //----------------------------------------------------------------------------
 {
+	wxBusyCursor *busyCursor = NULL;
   if (!m_TestMode)
   {
-	  wxBusyCursor wait;
+		busyCursor = new wxBusyCursor();
   }
 	
   assert( m_Target);
@@ -213,20 +217,19 @@ void mafOpClassicICPRegistration::OpDo()
 
   wxString name = wxString::Format(_("%s registered on %s"),m_Input->GetName(), m_Target->GetName());
 
-  mafNEW(m_Registered);
-
-  if(m_Input->IsMAFType(mafVMESurface))
-   {	
-     m_Registered->DeepCopy(m_Input); //not to be deleted, - delete it in the Undo or in destructor
-     m_Registered->GetOutput()->Update();
-   }
-  else
-   {
-     m_Registered->SetData((vtkPolyData*)(m_Input->GetOutput()->GetVTKData()),0.0);
-     m_Registered->Update();
-   }
+	if (m_CopySubTree)
+	{
+		m_Registered = mafVME::CopyTree(m_Input, m_Input->GetParent());
+	}
+	else
+	{
+		m_Registered = m_Input->NewInstance();
+		m_Registered->Register(this);
+		m_Registered->DeepCopy(m_Input); //not to be deleted, - delete it in the Undo or in destructor
+		m_Registered->GetOutput()->Update();
+	}
   m_Registered->SetName(name);
-	m_Registered->ReparentTo(m_Input);
+	m_Registered->ReparentTo(m_Input->GetParent());
 	m_Registered->SetAbsMatrix(*final_matrix);
 
 	m_Output = m_Registered;
@@ -242,6 +245,8 @@ void mafOpClassicICPRegistration::OpDo()
   {
     wxMessageBox(regString);
   }
+
+	cppDEL(busyCursor);
 }
 //----------------------------------------------------------------------------
 void mafOpClassicICPRegistration::OnChooseTarget()   
