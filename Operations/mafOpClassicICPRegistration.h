@@ -75,10 +75,11 @@ protected:
 	void OpStop(int result);
 
 	mafVME*					m_Target;				// m_input, inherited from mafOp, is used as source
-	mafVMESurface*					m_Registered;   // the output: a copy of m_input registered on m_target
-	mafString					m_InputName;
-	mafString					m_TargetName;
-	mafString					m_ReportFilename;
-	double						m_Convergence;
+	mafVME*					m_Registered;   // the output: a copy of m_input registered on m_target
+	mafString				m_InputName;
+	mafString				m_TargetName;
+	mafString				m_ReportFilename;
+	double					m_Convergence;
+	int							m_CopySubTree;
 };
 #endif

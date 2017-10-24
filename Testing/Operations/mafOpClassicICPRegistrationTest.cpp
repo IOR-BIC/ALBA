@@ -36,6 +36,8 @@
 
 #include <string>
 #include <assert.h>
+#include "mafVMEStorage.h"
+#include "mafVMERoot.h"
 
 //-----------------------------------------------------------
 void mafOpClassicICPRegistrationTest::TestDynamicAllocation() 
@@ -80,12 +82,19 @@ void mafOpClassicICPRegistrationTest::TestAccept()
 void mafOpClassicICPRegistrationTest::TestOpDo() 
 //-----------------------------------------------------------
 {
+	//Storage Creation
+	mafVMEStorage *storage = mafVMEStorage::New();
+	mafVMERoot *root = storage->GetRoot();
+	root->SetName("root");
+	root->GetRoot()->Initialize();
+
   // import VTK  
   mafOpImporterVTK *importer=new mafOpImporterVTK("importerVTK");
   importer->TestModeOn();
   mafString fileName=MAF_DATA_ROOT;
   fileName<<"/Surface/sphere.vtk";
   importer->SetFileName(fileName);
+	importer->SetInput(root);
   importer->ImportVTK();
   
   mafVMESurface *surface = mafVMESurface::SafeDownCast(importer->GetOutput());
@@ -98,6 +107,7 @@ void mafOpClassicICPRegistrationTest::TestOpDo()
   mafString fileName2=MAF_DATA_ROOT;
   fileName2<<"/VTK_Surfaces/surface.vtk";
   importer2->SetFileName(fileName2);
+	importer2->SetInput(root);
   importer2->ImportVTK();
   
   mafVME *vme = importer2->GetOutput();
@@ -112,11 +122,12 @@ void mafOpClassicICPRegistrationTest::TestOpDo()
   op->OpDo();
 
   // test attributes
-  CPPUNIT_ASSERT(surface->GetNumberOfChildren()==1);
-  mafVME* registered = surface->GetChild(0);
+	CPPUNIT_ASSERT(surface->GetParent()->GetNumberOfChildren() == 3);
+  mafVME* registered = surface->GetByPath("next");
   CPPUNIT_ASSERT(registered->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix()!=NULL);
 
   mafDEL(op);
   mafDEL(importer);
   mafDEL(importer2);
+	mafDEL(storage);
 }
