@@ -189,6 +189,13 @@ public:
 	void SetSubViewBackgroundColor(int subView, wxColor color);
 	wxColor GetSubViewBackgroundColor(int subView);
 
+
+	/** Returns LayoutConfiguration */
+	int GetLayoutConfiguration() const { return m_LayoutConfiguration; }
+
+	/** Sets LayoutConfiguration */
+	void SetLayoutConfiguration(int layoutConfiguration);
+
 protected:
   /**
   Internally used to create a new instance of the GUI. This function should be
@@ -200,12 +207,8 @@ protected:
   virtual mafGUI  *CreateGui();
 
   /** Arrange sub-view into the defined layout configuration.*/
-  void LayoutSubView(int width, int height);
-
-  /** 
-  Redefine this method to define a custom layout.*/
-  virtual void LayoutSubViewCustom(int width, int height) {};
-
+  virtual void LayoutSubView(int width, int height);
+	 
   int m_ViewRowNum; ///< number of rows to divide the compound view
   int m_ViewColNum; ///< number of cols to divide the compound view
   int m_NumOfPluggedChildren; ///< number of plugged children view

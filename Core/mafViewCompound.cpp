@@ -400,10 +400,6 @@ void mafViewCompound::LayoutSubView(int width, int height)
       i++;
     }
   }
-  else
-  {
-    LayoutSubViewCustom(width,height);
-  }
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::SetMouse(mafDeviceButtonsPadMouse *mouse)
@@ -600,4 +596,13 @@ wxColor mafViewCompound::GetSubViewBackgroundColor(int subView)
 		color = m_ChildViewList[subView]->GetBackgroundColor();
 
 	return color;
+}
+
+//----------------------------------------------------------------------------
+void mafViewCompound::SetLayoutConfiguration(int layoutConfiguration)
+{
+	m_LayoutConfiguration = layoutConfiguration;
+	if(m_Gui)
+		m_Gui->Update();
+	OnLayout();
 }
