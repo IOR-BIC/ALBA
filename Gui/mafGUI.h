@@ -128,20 +128,6 @@ public:
   /** Double label widget. */
   void Label(mafString label1,mafString *var, bool bold_label = false, bool bold_var = false);
 
-  //---------------------------------------------
-  /** Label widget. */
-  //void Label(mafString label,bool bold = false, bool multiline = false);
-
-  /** Label widget. */
-  //void Label(mafString *var ,bool bold = false, bool multiline = false);
-
-  /** Double label widget. */
-  //void Label(mafString label1,mafString  label2, bool bold = false);
-
-  /** Double label widget. */
-  //void Label(mafString label1,mafString *var, bool bold = false);
-  //---------------------------------------------
-
   /** String entry widget. */
   void String(int id,wxString label,wxString *var, wxString tooltip = "", bool multiline = false, bool password = false);
 
@@ -224,6 +210,12 @@ public:
 
   /** two generic Buttons widget. */
   void TwoButtons(int firstID, int secondID, const char* label1, const char* label2, int alignment = wxALL, int width = -1);
+
+	/** Double entry widget and two generic Buttons widget. */
+	void DoubleUpDown(int labelID, int firstID, int secondID, mafString label, double *var, double	min = MINDOUBLE, double max = MAXDOUBLE, int decimal_digit = -1, mafString tooltip = "", bool labelAlwaysEnable = false);
+	
+	/*Image Button widget*/
+	void ImageButton(int id, const char* label, wxBitmap bitmap, mafString tooltip);
 
 	/** two generic Buttons widget. */
 	void ButtonAndHelp(int firstID, int secondID, const char* label1, mafString tooltip = "", int alignment = wxALL, int width = -1);
