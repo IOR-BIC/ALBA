@@ -22,22 +22,13 @@
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
 #include "mafObserver.h"
-#include "wx\iconbndl.h"
-#include <set>
-#include <vector>
 
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
 
-class mafGUIButton;
-class mafGUIDialog;
-class mafGUIPicButton;
-class mafGUISettingsDialog;
-class mafVME;
 class mafVMEGroup;
-class mafVMEImage;
-class vtkImageData;
+class mafGUIImageViewer;
 
 /**
   Class Name: mafSnapshotManager.
@@ -58,43 +49,26 @@ public:
 	/* Create snapshot from selected view*/
 	void CreateSnapshot(mafVME *node, mafView *selectedView);
 
-	/*Add snapshot from bitmap*/
-	void AddSnapshot(wxBitmap &bitmap, wxString name);
-
 	/*Show a Preview of Snapshots*/
-	void ShowSnapshotPreview(mafVME *node);
+	void ShowSnapshotPreview();
 
 	/*Get Number of snapshots*/
-	int GetNSnapshots() { return m_ImagesList.size(); };
+	int GetNSnapshots();
 
 	/*Return the snapshots group*/
 	mafVMEGroup* GetSnapshotGroup() { return m_SnapshotsGroup; };
+	
+	/*Set the snapshots group*/
+	void SetSnapshotGroup(mafVMEGroup* group) { m_SnapshotsGroup = group; };
 
 protected:
 
-	void FillImageList();
-	void UpdateSelectionDialog(int selection);
-
-	int SaveVMEImage(mafVMEImage *image, wxString imageFileName, bool scale = false);
-	void SaveImageAs();
-	void DeleteImage();
+	void SelectImage();
 
 	mafVMEGroup *m_SnapshotsGroup;
-
-	std::vector<wxString> m_ImagesList;
-	
-	int m_ImageSelection;
-
-	mafGUIDialog			*m_Dialog;
-	mafGUIPicButton		*m_PreviewImageButton;
-	wxBoxSizer				*m_ImageBoxSizer;
-	mafGUIButton			*m_PrevBtn;
-	mafGUIButton			*m_NextBtn;
-
-	wxString m_ImagesPath;
+	mafGUIImageViewer *m_ImageViewer;
 
 private:
-	
   friend class mafLogicWithManagers;
 };
 #endif

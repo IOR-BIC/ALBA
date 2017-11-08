@@ -961,7 +961,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			break;
 			case MENU_FILE_MANAGE_SNAPSHOT:
 				if(m_SnapshotManager && m_VMEManager)
-					m_SnapshotManager->ShowSnapshotPreview(m_VMEManager->GetRoot());
+					m_SnapshotManager->ShowSnapshotPreview();
 			break;
 			case MENU_WIZARD:
 				//The event from the application menu

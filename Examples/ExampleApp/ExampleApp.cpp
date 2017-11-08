@@ -151,6 +151,7 @@
 #include "mafOpSegmentationRegionGrowingConnectedThreshold.h"
 #include "mafOpSegmentationRegionGrowingLocalAndGlobalThreshold.h"
 #include "mafOpMergeDicomSeries.h"
+#include "mafOpTestGui.h"
 #endif
 
 #include "mafViewVTK.h"
@@ -355,6 +356,8 @@ bool ExampleApp::OnInit()
 #endif
 	m_Logic->Plug(new mafOpMergeDicomSeries("Merge Dicom"), "");
 #endif
+
+	m_Logic->Plug(new mafOpTestGui("Test Gui"), "Testing"); // TESTING
 	//------------------------------------------------------------
 
 
