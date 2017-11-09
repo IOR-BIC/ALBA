@@ -133,6 +133,8 @@ public:
   /** Set the number of loops for the "if" blocks*/
   int GetNLoops();
 	
+	/*mode 0 = none, mode 1 = horizontal, 2 = vertical*/
+	void SetImageRTFProps(int widthGoal = 8640, int heightGoal = 12960, int mode = 1);
 protected:
   /** Return the position of the variable in the Variable Table.
      Returns -1 if variable is not found */
@@ -183,6 +185,10 @@ protected:
   void SetFather(mafHTMLTemplateParserBlock *father);
     
 	wxString CalculateImageRTF(wxString imagePath, int width, int height);
+	
+	int m_ImageRTF_WidthGoal;
+	int m_ImageRTF_HeightGoal;
+	int m_ImageRTF_Mode;
 
   //VARIABLES
   mafHTMLTemplateParserBlock *m_Father;

@@ -41,12 +41,15 @@
 #include "vtkImageData.h"
 #include "mafTagArray.h"
 #include "mafGUIImageViewer.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 //----------------------------------------------------------------------------
 mafSnapshotManager::mafSnapshotManager()
 {
 	m_SnapshotsGroup = NULL;
 	m_ImageViewer = NULL;
+
+	m_GroupName = "Snapshots";
 
 	m_ImageViewer = new mafGUIImageViewer(this);
 	m_ImageViewer->SetTitle("Snapshot Manager");
@@ -83,21 +86,7 @@ void mafSnapshotManager::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 void mafSnapshotManager::CreateSnapshot(mafVME *root, mafView *selectedView)
 {
-	// Find or Create snapshots group
-	
-	if (m_SnapshotsGroup==NULL || m_SnapshotsGroup != (mafVMEGroup *)root->FindInTreeByName("Snapshots"))
-	{
-		m_SnapshotsGroup = (mafVMEGroup *)root->FindInTreeByName("Snapshots");
-
-		if (m_SnapshotsGroup == NULL)
-		{
-			mafNEW(m_SnapshotsGroup);
-			m_SnapshotsGroup->SetName("Snapshots");
-			//m_SnapshotsGroup->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
-			m_SnapshotsGroup->ReparentTo(root);
-			m_SnapshotsGroup->Delete();
-		}
-	}
+	CreateSnapshotGroup(root);
 		
 	//////////////////////////////////////////////////////////////////////////
 
@@ -189,6 +178,25 @@ void mafSnapshotManager::CreateSnapshot(mafVME *root, mafView *selectedView)
 }
 
 //----------------------------------------------------------------------------
+void mafSnapshotManager::CreateSnapshotGroup(mafVME *root)
+{
+	// Find or Create Snapshots group
+	if (m_SnapshotsGroup == NULL || m_SnapshotsGroup != (mafVMEGroup *)root->FindInTreeByName(m_GroupName))
+	{
+		m_SnapshotsGroup = (mafVMEGroup *)root->FindInTreeByName(m_GroupName);
+
+		if (m_SnapshotsGroup == NULL)
+		{
+			mafNEW(m_SnapshotsGroup);
+			m_SnapshotsGroup->SetName(m_GroupName);
+			m_SnapshotsGroup->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
+			m_SnapshotsGroup->ReparentTo(root);
+			m_SnapshotsGroup->Delete();
+		}
+	}
+}
+
+//----------------------------------------------------------------------------
 void mafSnapshotManager::ShowSnapshotPreview()
 {
 	if (m_ImageViewer && m_SnapshotsGroup)
@@ -202,5 +210,11 @@ int mafSnapshotManager::GetNSnapshots()
 		return m_SnapshotsGroup->GetNumberOfChildren();
 	else
 		return 0;
+}
+
+//----------------------------------------------------------------------------
+void mafSnapshotManager::SetMouse(mafDeviceButtonsPadMouse *mouse)
+{
+	m_ImageViewer->SetMouse(mouse);
 }
 

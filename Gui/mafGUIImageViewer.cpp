@@ -26,26 +26,35 @@
 #include "mafGUIImageViewer.h"
 
 #include "mafDecl.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafGUI.h"
 #include "mafGUIButton.h"
 #include "mafGUIDialog.h"
 #include "mafGUILab.h"
-#include "mafGUIPicButton.h"
 #include "mafGUIValidator.h"
 #include "mafGUIWizardPageNew.h"
+#include "mafRWI.h"
 #include "mafVME.h"
 #include "mafVMEGroup.h"
 #include "mafVMEImage.h"
+
+#include "vtkActor.h"
 #include "vtkBMPWriter.h"
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
 #include "vtkImageFlip.h"
 #include "vtkJPEGWriter.h"
 #include "vtkMAFSmartPointer.h"
+#include "vtkPlaneSource.h"
 #include "vtkPointData.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkPolyDataSource.h"
 #include "vtkProbeFilter.h"
+#include "vtkRenderer.h"
 #include "vtkStructuredPoints.h"
+#include "vtkTexture.h"
 #include "vtkUnsignedCharArray.h"
+
 #include "wx\image.h"
 #include "wx\mac\carbon\bitmap.h"
 
@@ -60,7 +69,6 @@ mafGUIImageViewer::mafGUIImageViewer(mafObserver *Listener, const mafString &lab
 	m_ImagesGroup = NULL;
 
 	m_Dialog = NULL;
-	m_ImageBoxSizer = NULL;
 	m_PrevBtn = NULL;
 	m_NextBtn = NULL;
 	m_CheckBtn = NULL;
@@ -69,20 +77,35 @@ mafGUIImageViewer::mafGUIImageViewer(mafObserver *Listener, const mafString &lab
 	m_ImageSelection = 0;
 	m_ImagesList.clear();
 
-	m_ImagesPath = mafGetAppDataDirectory().c_str();
-	m_ImagesPath += "\\Preview\\";
-
 	m_TitleDialog = "Image Viewer";
 
 	m_EnableDeleteButton = false;
 	m_EnableSaveImageButton= false;
 	m_EnableImageCheckButton = false;
+	
+	m_RwiSizer = NULL;
+	m_Rwi = NULL;
+
+	m_PlaneSource = NULL;
+	m_DataMapper = NULL;
+	m_Texture = NULL;
+	m_Actor = NULL;
 }
 
 //----------------------------------------------------------------------------
 mafGUIImageViewer::~mafGUIImageViewer()
 {
 	m_ImagesList.clear();
+
+	if (m_Rwi)
+	{
+		m_Rwi->m_RenFront->RemoveActor(m_Actor);
+	}
+
+	vtkDEL(m_Texture);
+	vtkDEL(m_PlaneSource);
+	vtkDEL(m_DataMapper);
+	vtkDEL(m_Actor);
 }
 
 //----------------------------------------------------------------------------
@@ -110,7 +133,6 @@ void mafGUIImageViewer::OnEvent(mafEventBase *maf_event)
 			SaveImageAs();
 		}
 		break;
-
 // 		case ID_IMAGE_DELETE:
 // 		{
 // 			//DeleteImage();
@@ -128,13 +150,9 @@ void mafGUIImageViewer::OnEvent(mafEventBase *maf_event)
 }
 
 //----------------------------------------------------------------------------
-void mafGUIImageViewer::ShowImageDialog(mafVMEGroup *group, bool reloadList)
+void mafGUIImageViewer::ShowImageDialog(mafVMEGroup *group, int selection)
 {
-	wxString imageName = "";
-
 	m_ImagesGroup = group;
-
-	if (reloadList) Reset();
 
 	if (m_ImagesGroup)
 	{
@@ -149,9 +167,7 @@ void mafGUIImageViewer::ShowImageDialog(mafVMEGroup *group, bool reloadList)
 
 	if (m_ImagesList.size() <= 0) return;
 	//////////////////////////////////////////////////////////////////////////
-
-	imageName = m_ImagesList[0];
-	wxString imgPath = m_ImagesPath + imageName + ".bmp";
+	wxString imageName = m_ImagesList[0];
 
 	char tmp[10];
 	sprintf(tmp, "[1/%d]", m_ImagesList.size());
@@ -162,26 +178,34 @@ void mafGUIImageViewer::ShowImageDialog(mafVMEGroup *group, bool reloadList)
 	if (m_Dialog == NULL)
 	{
 		m_Dialog = new mafGUIDialog(title, mafCLOSEWINDOW);
-		m_ImageBoxSizer = new wxBoxSizer(wxVERTICAL);
-		m_ImageBoxSizer->SetMinSize(DIALOG_W, DIALOG_H);
 
 		// Images
-		if (wxFileExists(imgPath))
-		{
-			// Load and show the image
-			wxImage *previewImage;
-			previewImage = new wxImage();
-			previewImage->LoadFile(imgPath.c_str(), wxBITMAP_TYPE_ANY);
+		//////////////////////////////////////////////////////////////////////////
+		vtkNEW(m_Texture);
+		vtkNEW(m_PlaneSource);
+		vtkNEW(m_DataMapper);
+		vtkNEW(m_Actor);
 
-			wxBitmap *previewBitmap;
-			previewBitmap = new wxBitmap(*previewImage);
-			m_PreviewImageButton = new mafGUIPicButton(m_Dialog, previewBitmap, ID_IMAGE);
+		m_Texture->InterpolateOff();
+		m_DataMapper->SetInput(m_PlaneSource->GetOutput());
+		m_Actor->SetMapper(m_DataMapper);
+		m_Actor->SetTexture(m_Texture);
+		
+		m_RwiSizer = new wxBoxSizer(wxHORIZONTAL);
 
-			m_ImageBoxSizer->Add(m_PreviewImageButton, 0, wxALL | wxALIGN_CENTER, 0);
+		m_Rwi = new mafRWI(m_Dialog, ONE_LAYER);
+		m_Rwi->SetListener(this);
+		m_Rwi->SetSize(0, 0, DIALOG_W, DIALOG_H);
+		m_Rwi->Show(true);
+		m_Rwi->CameraSet(CAMERA_CT);
+		m_Rwi->CameraUpdate();
 
-			delete previewBitmap;
-			delete previewImage;
-		}
+		m_Rwi->m_RwiBase->SetMouse(m_Mouse);
+		m_Rwi->m_RenFront->AddActor(m_Actor);
+
+		m_RwiSizer->Add(m_Rwi->m_RwiBase, 1, wxEXPAND);
+
+		//////////////////////////////////////////////////////////////////////////
 
 		// Creating buttons
 		wxBoxSizer *buttonBoxSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -226,7 +250,7 @@ void mafGUIImageViewer::ShowImageDialog(mafVMEGroup *group, bool reloadList)
 			buttonBoxSizer->Add(m_CheckBtn, 0, wxALIGN_CENTER, 0);
 		}
 
-		m_Dialog->Add(m_ImageBoxSizer, 0, wxALL);
+		m_Dialog->Add(m_RwiSizer, 0, wxALL);
 		m_Dialog->Add(buttonBoxSizer, 0, wxALL, 5);
 		m_Dialog->Fit();
 
@@ -238,15 +262,12 @@ void mafGUIImageViewer::ShowImageDialog(mafVMEGroup *group, bool reloadList)
 
 		m_Dialog->SetPosition(wxPoint(posX, posY));
 	}
-	else
-	{
-		UpdateSelectionDialog(0);
-	}
 
-	if(m_CheckBtn)			
+	if (m_CheckBtn)
 		m_CheckBtn->SetValue(m_ImageCheck);
 
-	m_PrevBtn->Enable(false);
+		UpdateSelectionDialog(selection);
+
 	m_Dialog->ShowModal();
 }
 
@@ -271,37 +292,12 @@ void mafGUIImageViewer::FillImageList()
 {
 	wxString imageName = "";
 	int nImages = m_ImagesGroup->GetNumberOfChildren(false);
-
-	if (!wxDirExists(m_ImagesPath.c_str()))
-	{
-		wxMkdir(m_ImagesPath.c_str());
-	}
+	m_ImagesList.clear();
 
 	for (int i = 0; i < nImages; i++)
 	{
 		mafVMEImage *image = (mafVMEImage*)m_ImagesGroup->GetChild(i);
-
-		imageName = image->GetName();
-
-		bool newImage = true;
-
-		for (int i = 0; i < m_ImagesList.size(); i++)
-		{
-			if (m_ImagesList[i] == imageName)
-			{
-				newImage = false;
-				break;
-			}
-		}
-
-		if (newImage)
-		{
-			m_ImagesList.push_back(imageName);
-
-			wxString imageFileName = m_ImagesPath + imageName + ".bmp";
-
-			SaveVMEImage(image, imageFileName, true);
-		}
+		m_ImagesList.push_back(image->GetName());
 	}
 }
 
@@ -325,17 +321,21 @@ void mafGUIImageViewer::UpdateSelectionDialog(int selection)
 		m_NextBtn->Enable(false);
 	}
 
-	if (nImages == 0) return;
+	if (nImages == 0)
+	{
+		m_PrevBtn->Enable(false);
+		m_NextBtn->Enable(false);
+		return;
+	}
+
 	//if (m_ImageSelection == selection) return;
 	if (m_ImageSelection > nImages) return;
 
 	m_ImageSelection = selection;
-
 	wxString imageName = m_ImagesList[m_ImageSelection];
-	wxString imgPath = m_ImagesPath + imageName + ".bmp";
 
 	//////////////////////////////////////////////////////////////////////////
-	if (wxFileExists(imgPath) && m_Dialog)
+	if (m_Dialog)
 	{
 		char tmp[10];
 		sprintf(tmp, "[%d/%d]", selection + 1, nImages);
@@ -343,37 +343,31 @@ void mafGUIImageViewer::UpdateSelectionDialog(int selection)
 		wxString title = m_TitleDialog + " - " + imageName + " " + tmp;
 		m_Dialog->SetTitle(title);
 
-		// Load and show the image
-		wxImage *previewImage;
-		previewImage = new wxImage();
-		previewImage->LoadFile(imgPath.c_str(), wxBITMAP_TYPE_ANY);
+		// Load and show the image		
+		mafVMEImage*vmeImage = mafVMEImage::SafeDownCast(m_ImagesGroup->FindInTreeByName(imageName));
+		if (vmeImage)
+		{
+			m_Texture->SetInput((vtkImageData*)vmeImage->GetOutput()->GetVTKData());
+			m_Texture->Modified();
 
-		wxBitmap *previewBitmap;
-		previewBitmap = new wxBitmap(*previewImage);
+			double b[6];
+			vmeImage->GetOutput()->GetBounds(b);
 
-		mafGUIPicButton *previewImageButton;
-		previewImageButton = new mafGUIPicButton(m_Dialog, previewBitmap, ID_IMAGE);
+			m_PlaneSource->SetOrigin(0, 0, 0);
+			m_PlaneSource->SetPoint1(b[1], 0, 0);
+			m_PlaneSource->SetPoint2(0, b[3], 0);
 
-		m_ImageBoxSizer->Remove(m_PreviewImageButton);
-		m_ImageBoxSizer->Clear();
+			m_Rwi->CameraReset(vmeImage);
+			m_Rwi->CameraUpdate();
 
-		if (m_PreviewImageButton)
-			delete m_PreviewImageButton;
-
-		m_PreviewImageButton = previewImageButton;
-
-		m_ImageBoxSizer->Add(m_PreviewImageButton, 0, wxALL | wxALIGN_CENTER, 0);
-
-		m_PreviewImageButton->Enable(false);
+			m_Rwi->Show(true);
+		}
 
 		if (m_CheckBtn)
 			m_CheckBtn->SetValue(m_ImageCheck);
 
 		m_Dialog->Fit();
 		m_Dialog->Update();
-
-		delete previewBitmap;
-		delete previewImage;
 	}
 }
 
@@ -575,6 +569,12 @@ void mafGUIImageViewer::DeleteSelectedImage()
 		m_ImagesGroup->RemoveChild(node);
 
 		UpdateSelectionDialog(m_ImageSelection - 1);
+
+		if (m_ImagesGroup->GetNumberOfChildren() == 0)
+		{
+			m_Rwi->Show(false);
+			m_Dialog->SetTitle(m_TitleDialog);
+		}
 	}
 }
 //----------------------------------------------------------------------------

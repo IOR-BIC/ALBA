@@ -55,8 +55,11 @@ mafHTMLTemplateParserBlock::mafHTMLTemplateParserBlock(int blockType, wxString n
 
   m_CurrentLoop=0;
   m_LoopsNumber=-1;  
-}
 
+	m_ImageRTF_WidthGoal = 8640; // MaxValue
+	m_ImageRTF_HeightGoal = 12960; // MaxValue
+	m_ImageRTF_Mode = 1;
+}
 
 //----------------------------------------------------------------------------
 mafHTMLTemplateParserBlock::~mafHTMLTemplateParserBlock()
@@ -1138,32 +1141,38 @@ int mafHTMLTemplateParserBlock::GetNLoops()
 //----------------------------------------------------------------------------
 wxString mafHTMLTemplateParserBlock::CalculateImageRTF(wxString imagePath, int width, int height)
 {
-	int widthGoal = 8640;
-	int heightGoal = 12960;
+	int widthGoal = m_ImageRTF_WidthGoal;
+	int heightGoal = m_ImageRTF_HeightGoal;
 
-// 	int newWidthGoal = (heightGoal / height) * width;
-// 
-// 	if (newWidthGoal > widthGoal)
-// 	{
-// 		heightGoal = (widthGoal / width) * height;
-// 	}
-// 	else
-// 	{
-// 		widthGoal = newWidthGoal;
-// 	}
 
-	//
-	int newHeightGoal = (widthGoal / width) * height;
-
-	if (newHeightGoal > heightGoal)
+	if (m_ImageRTF_Mode == 2)
 	{
-		widthGoal = (heightGoal / height) * width;
+		int newWidthGoal = (heightGoal / height) * width;
+
+		if (newWidthGoal > widthGoal)
+		{
+			heightGoal = (widthGoal / width) * height;
+		}
+		else
+		{
+			widthGoal = newWidthGoal;
+		}
 	}
-	else
+
+	if (m_ImageRTF_Mode == 1)
 	{
-		heightGoal = newHeightGoal;
+		int newHeightGoal = (widthGoal / width) * height;
+
+		if (newHeightGoal > heightGoal)
+		{
+			widthGoal = (heightGoal / height) * width;
+		}
+		else
+		{
+			heightGoal = newHeightGoal;
+		}
 	}
-		
+
 	// Read Image
 	wxString imageStr = "", byteStr = "";
 
@@ -1198,4 +1207,12 @@ wxString mafHTMLTemplateParserBlock::CalculateImageRTF(wxString imagePath, int w
 	mpic.Printf("\n\\qc{\\pict\\jpegblip\\picwgoal%d\\pichgoal%d\\bin\n%s\n}", widthGoal, heightGoal, imageStr);
 
 	return mpic;
+}
+
+//----------------------------------------------------------------------------
+void mafHTMLTemplateParserBlock::SetImageRTFProps(int widthGoal, int heightGoal, int mode)
+{
+	m_ImageRTF_WidthGoal = widthGoal;
+	m_ImageRTF_HeightGoal = heightGoal;
+	m_ImageRTF_Mode = mode;
 }

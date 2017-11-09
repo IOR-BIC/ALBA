@@ -22,14 +22,18 @@
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
+class mafDeviceButtonsPadMouse;
 class mafGUIButton;
 class mafGUIDialog;
-class mafGUIPicButton;
-class mafGUISettingsDialog;
+class mafRWI;
 class mafVME;
 class mafVMEGroup;
 class mafVMEImage;
+class vtkActor;
 class vtkImageData;
+class vtkPlaneSource;
+class vtkPolyDataMapper;
+class vtkTexture;
 
 //----------------------------------------------------------------------------
 // Widgets ID's
@@ -61,8 +65,8 @@ public:
 	/** Set the listener of the events launched*/
 	void SetListener(mafObserver *Listener) { m_Listener = Listener; };
 
-	/** Show a Preview of Snapshots*/
-	void ShowImageDialog(mafVMEGroup *group, bool reloadList = false);
+	/** Show ImagePreview dialog*/
+	void ShowImageDialog(mafVMEGroup *group, int selection = 0);
 
 	void Reset();
 
@@ -84,6 +88,8 @@ public:
 	void DeleteSelectedImage();
 
 	int GetImagesNum() { return m_ImagesList.size(); };
+
+	void SetMouse(mafDeviceButtonsPadMouse *mouse) { m_Mouse = mouse; };
 protected:
 
 	void FillImageList();
@@ -101,18 +107,24 @@ protected:
 	int m_ImageCheck;
 
 	mafGUIDialog			*m_Dialog;
-	mafGUIPicButton		*m_PreviewImageButton;
-	wxBoxSizer				*m_ImageBoxSizer;
 	mafGUIButton			*m_PrevBtn;
 	mafGUIButton			*m_NextBtn;
 	wxCheckBox				*m_CheckBtn;
-
-	wxString m_ImagesPath;
-
+	
 	wxString m_TitleDialog;
-
+	
 	bool m_EnableDeleteButton;
 	bool m_EnableSaveImageButton;
 	bool m_EnableImageCheckButton;
+
+	mafDeviceButtonsPadMouse *m_Mouse;
+
+	wxBoxSizer				*m_RwiSizer;
+	mafRWI						*m_Rwi; //Render window
+
+	vtkPlaneSource		*m_PlaneSource;
+	vtkPolyDataMapper	*m_DataMapper;
+	vtkTexture				*m_Texture;
+	vtkActor					*m_Actor;
 };
 #endif

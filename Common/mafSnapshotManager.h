@@ -29,6 +29,7 @@
 
 class mafVMEGroup;
 class mafGUIImageViewer;
+class mafDeviceButtonsPadMouse;
 
 /**
   Class Name: mafSnapshotManager.
@@ -49,24 +50,31 @@ public:
 	/* Create snapshot from selected view*/
 	void CreateSnapshot(mafVME *node, mafView *selectedView);
 
-	/*Show a Preview of Snapshots*/
+	/* Find or Create Snapshots group*/
+	void CreateSnapshotGroup(mafVME *root);
+
+	/* Show a Preview of Snapshots*/
 	void ShowSnapshotPreview();
 
-	/*Get Number of snapshots*/
+	/* Get Number of snapshots*/
 	int GetNSnapshots();
 
-	/*Return the snapshots group*/
+	/* Return the snapshots group*/
 	mafVMEGroup* GetSnapshotGroup() { return m_SnapshotsGroup; };
 	
-	/*Set the snapshots group*/
+	/* Set the snapshots group*/
 	void SetSnapshotGroup(mafVMEGroup* group) { m_SnapshotsGroup = group; };
+
+	/* Set Mouse for imageViewer interaction*/
+	void SetMouse(mafDeviceButtonsPadMouse *mouse);
 
 protected:
 
 	void SelectImage();
 
-	mafVMEGroup *m_SnapshotsGroup;
-	mafGUIImageViewer *m_ImageViewer;
+	wxString			 			m_GroupName;
+	mafVMEGroup					*m_SnapshotsGroup;
+	mafGUIImageViewer		*m_ImageViewer;
 
 private:
   friend class mafLogicWithManagers;
