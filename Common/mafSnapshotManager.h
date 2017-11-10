@@ -51,7 +51,7 @@ public:
 	void CreateSnapshot(mafVME *node, mafView *selectedView);
 
 	/* Find or Create Snapshots group*/
-	void CreateSnapshotGroup(mafVME *root);
+	void FindOrCreateSnapshotGroup(mafVME *root);
 
 	/* Show a Preview of Snapshots*/
 	void ShowSnapshotPreview();

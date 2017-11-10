@@ -25,23 +25,23 @@
 #include "mafDecl.h"
 #include "mafSnapshotManager.h"
 
+#include "mafDeviceButtonsPadMouse.h"
+#include "mafGUIImageViewer.h"
 #include "mafLogicWithManagers.h"
 #include "mafRWIBase.h"
+#include "mafTagArray.h"
+#include "mafTagItem.h"
+#include "mafVME.h"
 #include "mafVMEGroup.h"
-
+#include "mafVMEImage.h"
 #include "mafView.h"
 #include "mafViewCompound.h"
 #include "mafViewManager.h"
-#include "mafVME.h"
-#include "mafTagItem.h"
-#include "vtkUnsignedCharArray.h"
-#include "mafVMEImage.h"
+
 #include "vtkDataSet.h"
-#include "vtkPointData.h"
 #include "vtkImageData.h"
-#include "mafTagArray.h"
-#include "mafGUIImageViewer.h"
-#include "mafDeviceButtonsPadMouse.h"
+#include "vtkPointData.h"
+#include "vtkUnsignedCharArray.h"
 
 //----------------------------------------------------------------------------
 mafSnapshotManager::mafSnapshotManager()
@@ -86,7 +86,7 @@ void mafSnapshotManager::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 void mafSnapshotManager::CreateSnapshot(mafVME *root, mafView *selectedView)
 {
-	CreateSnapshotGroup(root);
+	FindOrCreateSnapshotGroup(root);
 		
 	//////////////////////////////////////////////////////////////////////////
 
@@ -178,7 +178,7 @@ void mafSnapshotManager::CreateSnapshot(mafVME *root, mafView *selectedView)
 }
 
 //----------------------------------------------------------------------------
-void mafSnapshotManager::CreateSnapshotGroup(mafVME *root)
+void mafSnapshotManager::FindOrCreateSnapshotGroup(mafVME *root)
 {
 	// Find or Create Snapshots group
 	if (m_SnapshotsGroup == NULL || m_SnapshotsGroup != (mafVMEGroup *)root->FindInTreeByName(m_GroupName))

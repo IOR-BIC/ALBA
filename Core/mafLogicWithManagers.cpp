@@ -740,17 +740,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				m_InteractionManager->ViewSelected(NULL);
 #endif
 
-			if (m_ViewManager)
-			{
-				EnableItem(CAMERA_RESET, false);
-				EnableItem(CAMERA_FIT, false);
-				EnableItem(CAMERA_FLYTO, false);
-
-				EnableItem(MENU_FILE_PRINT, false);
-				EnableItem(MENU_FILE_PRINT_PREVIEW, false);
-				EnableItem(MENU_FILE_PRINT_SETUP, false);
-				EnableItem(MENU_FILE_PRINT_PAGE_SETUP, false);
-			}
+			EnableMenuAndToolbar();
 		}
 		if (m_OpManager)
 		{
@@ -766,6 +756,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				if (c != NULL)
 					c->SetAllowCloseWindow(!m_OpManager->Running());
 			}
+			EnableMenuAndToolbar();
 		}
 		break;
 		case VIEW_MAXIMIZE:
@@ -954,8 +945,9 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 		case MENU_FILE_SNAPSHOT:
 		{
 			if (m_SnapshotManager && m_VMEManager && m_ViewManager)
+			{
 				m_SnapshotManager->CreateSnapshot(m_VMEManager->GetRoot(), m_ViewManager->GetSelectedView());
-
+			}
 			if (m_WizardManager && m_WizardRunning)
 				OnEvent(&mafEvent(this, WIZARD_RUN_CONTINUE, true));
 		}
@@ -963,9 +955,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 		case MENU_FILE_MANAGE_SNAPSHOT:
 			if (m_SnapshotManager && m_VMEManager)
 			{
-				if (m_SnapshotManager->GetSnapshotGroup() == NULL)
-					m_SnapshotManager->CreateSnapshotGroup(m_VMEManager->GetRoot());
-
 				m_SnapshotManager->ShowSnapshotPreview();
 			}
 			break;
@@ -1287,6 +1276,8 @@ void mafLogicWithManagers::VmeAdd(mafVME *vme)
 		return;
 	if(m_VMEManager) 
     m_VMEManager->VmeAdd(vme);
+
+
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeAdded(mafVME *vme)
@@ -1306,6 +1297,8 @@ void mafLogicWithManagers::VmeAdded(mafVME *vme)
 
   if(m_PlugTimebar)
     UpdateTimeBounds();
+
+	EnableMenuAndToolbar();
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemove(mafVME *vme)
@@ -1338,6 +1331,8 @@ void mafLogicWithManagers::VmeRemoving(mafVME *vme)
     m_SideBar->VmeRemove(vme);
 	if(m_ViewManager)
     m_ViewManager->VmeRemove(vme);
+
+	EnableMenuAndToolbar();
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeVisualModeChanged(mafVME * vme)
@@ -1579,7 +1574,6 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
 	// removed temporarily support for external Views
 	if (v)
 	{
-		
 		// child views
 		mafGUIMDIChild *c = new mafGUIMDIChild(m_Win, v);
 		c->SetWindowStyleFlag(m_ChildFrameStyle);
@@ -1590,34 +1584,25 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::ViewSelect()
 {
-  if(m_ViewManager) 
-  {
-    mafView *view = m_ViewManager->GetSelectedView();
-    if(m_SideBar)	m_SideBar->ViewSelect(view);
+	if (m_ViewManager)
+	{
+		mafView *view = m_ViewManager->GetSelectedView();
+		if (m_SideBar)	m_SideBar->ViewSelect(view);
 
-    EnableItem(CAMERA_RESET, view!=NULL);
-    EnableItem(CAMERA_FIT,   view!=NULL);
-    EnableItem(CAMERA_FLYTO, view!=NULL);
-
-    EnableItem(MENU_FILE_PRINT, view != NULL);
-    EnableItem(MENU_FILE_PRINT_PREVIEW, view != NULL);
-    EnableItem(MENU_FILE_PRINT_SETUP, view != NULL);
-    EnableItem(MENU_FILE_PRINT_PAGE_SETUP, view != NULL);
-
-// currently mafInteraction is strictly dependent on VTK (marco)
+		// currently mafInteraction is strictly dependent on VTK (marco)
 #ifdef MAF_USE_VTK
-    if (m_InteractionManager)
-    {
-      m_InteractionManager->ViewSelected(view);
-    }
+		if (m_InteractionManager)
+		{
+			m_InteractionManager->ViewSelected(view);
+		}
 #endif
 
-    if(m_OpManager && !m_OpManager->Running()) 
-    {
-      // needed to update all the operations that will be enabled on View Creation
-      m_OpManager->VmeSelected(m_OpManager->GetSelectedVme());
-    }
-  }
+		if (m_OpManager && !m_OpManager->Running())
+		{
+			// needed to update all the operations that will be enabled on View Creation
+			m_OpManager->VmeSelected(m_OpManager->GetSelectedVme());
+		}
+	}
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::ViewContextualMenu(bool vme_menu)
@@ -2014,6 +1999,8 @@ void mafLogicWithManagers::EnableMenuAndToolbar()
 {
 	bool enable = !(m_RunningOperation || m_WizardRunning);
 
+	mafView * selectedView = m_ViewManager->GetSelectedView();
+
 	EnableItem(MENU_FILE_NEW, enable);
 	EnableItem(MENU_FILE_OPEN, enable);
 	EnableItem(MENU_FILE_SAVE, enable);
@@ -2030,13 +2017,21 @@ void mafLogicWithManagers::EnableMenuAndToolbar()
 	EnableItem(wxID_FILE8, enable);
 	EnableItem(wxID_FILE9, enable);
 
+	EnableItem(CAMERA_RESET, selectedView != NULL);
+	EnableItem(CAMERA_FIT, selectedView != NULL);
+	EnableItem(CAMERA_FLYTO, selectedView != NULL);
+
+	EnableItem(MENU_FILE_PRINT, selectedView != NULL);
+	EnableItem(MENU_FILE_PRINT_PREVIEW, selectedView != NULL);
+	EnableItem(MENU_FILE_PRINT_SETUP, selectedView != NULL);
+	EnableItem(MENU_FILE_PRINT_PAGE_SETUP, selectedView != NULL);
+
 	if (m_UseSnapshotManager)
-	{	
-// 		bool hasView = m_ViewManager->GetSelectedView() != NULL;
-// 		bool hasSnapshots = m_SnapshotManager!= NULL && m_SnapshotManager->GetNSnapshots() > 0;
-// 
-// 		EnableItem(MENU_FILE_SNAPSHOT, hasView);
-// 		EnableItem(MENU_FILE_MANAGE_SNAPSHOT, hasSnapshots);
+	{
+		m_SnapshotManager->FindOrCreateSnapshotGroup(m_VMEManager->GetRoot());
+
+		EnableItem(MENU_FILE_MANAGE_SNAPSHOT, m_SnapshotManager->GetNSnapshots());
+		EnableItem(MENU_FILE_SNAPSHOT, selectedView);
 	}
 }
 //----------------------------------------------------------------------------

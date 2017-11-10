@@ -329,7 +329,7 @@ void mafGUIImageViewer::UpdateSelectionDialog(int selection)
 	}
 
 	//if (m_ImageSelection == selection) return;
-	if (m_ImageSelection > nImages) return;
+	if (selection > nImages) return;
 
 	m_ImageSelection = selection;
 	wxString imageName = m_ImagesList[m_ImageSelection];
