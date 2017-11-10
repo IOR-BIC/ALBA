@@ -79,17 +79,17 @@ public:
   /** Add the variable specified in the name string to the list of variables */
   void AddVar(wxString name, wxString varValue);
 	/** Add the variable specified in the name string to the list of variables */
-	void AddImageVar(wxString name, wxString imagePath = "");
+	void AddImageVar(wxString name, wxString imagePath = "", wxString label = "");
 	/** Add the variable specified in the name string to the list of variables */
-	void AddImageVar(wxString name, mafView *view);
+	void AddImageVar(wxString name, mafView *view, wxString label = "");
 	/** Add the variable specified in the name string to the list of variables */
-	void AddImageVar(wxString name, vtkImageData *imageData);
+	void AddImageVar(wxString name, vtkImageData *imageData, wxString label = "");
 	/** Push the variable specified in the name string to the list of variables */
-	void PushImageVar(wxString name, wxString imagePath);
+	void PushImageVar(wxString name, wxString imagePath, wxString label = "");
 	/** Push the variable specified in the name string to the list of variables */
-	void PushImageVar(wxString name, mafView *view);
+	void PushImageVar(wxString name, mafView *view, wxString label = "");
 	/** Push the variable specified in the name string to the list of variables */
-	void PushImageVar(wxString name, vtkImageData *imageData);
+	void PushImageVar(wxString name, vtkImageData *imageData, wxString label = "");
 	/** Push the variable specified in the name string to the list of variables */
   void PushVar(wxString name, double varValue);
   /** Push the variable specified in the name string to the list of variables */

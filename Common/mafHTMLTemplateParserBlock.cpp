@@ -128,7 +128,7 @@ void mafHTMLTemplateParserBlock::AddVar( wxString name, wxString varValue )
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserBlock::AddImageVar(wxString name, mafView *view)
+void mafHTMLTemplateParserBlock::AddImageVar(wxString name, mafView *view, wxString label)
 //----------------------------------------------------------------------------
 {
 	// Write Image
@@ -142,13 +142,13 @@ void mafHTMLTemplateParserBlock::AddImageVar(wxString name, mafView *view)
 	int width = view->GetRWI()->m_Width;
 	int height = view->GetRWI()->m_Height;
 
-	AddVar(name, CalculateImageRTF(imagePath, width, height)); //RTF image generation
+	AddVar(name, CalculateImageRTF(imagePath, width, height) + label); //RTF image generation
 
 	//TODO AddImageVar for HTML Template
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserBlock::AddImageVar(wxString name, wxString imagePath)
+void mafHTMLTemplateParserBlock::AddImageVar(wxString name, wxString imagePath, wxString label)
 //----------------------------------------------------------------------------
 {
 	wxImage *previewImage;
@@ -158,7 +158,7 @@ void mafHTMLTemplateParserBlock::AddImageVar(wxString name, wxString imagePath)
 	int width = previewImage->GetWidth();
 	int height = previewImage->GetHeight();
 
-	AddVar(name, CalculateImageRTF(imagePath, width, height));
+	AddVar(name, CalculateImageRTF(imagePath, width, height) + label);
 
 	delete previewImage;
 
@@ -166,7 +166,7 @@ void mafHTMLTemplateParserBlock::AddImageVar(wxString name, wxString imagePath)
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserBlock::AddImageVar(wxString name, vtkImageData *imageData)
+void mafHTMLTemplateParserBlock::AddImageVar(wxString name, vtkImageData *imageData, wxString label)
 //----------------------------------------------------------------------------
 {
 	// Write Image
@@ -186,13 +186,13 @@ void mafHTMLTemplateParserBlock::AddImageVar(wxString name, vtkImageData *imageD
 	int width = imageData->GetDimensions()[0];
 	int height = imageData->GetDimensions()[1];
 
-	AddVar(name, CalculateImageRTF(imagePath, width, height)); //RTF image generation
+	AddVar(name, CalculateImageRTF(imagePath, width, height) + label); //RTF image generation
 
 	//TODO AddImageVar for HTML Template
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserBlock::PushImageVar(wxString name, wxString imagePath)
+void mafHTMLTemplateParserBlock::PushImageVar(wxString name, wxString imagePath, wxString label)
 //----------------------------------------------------------------------------
 {
 	wxImage *previewImage;
@@ -202,13 +202,13 @@ void mafHTMLTemplateParserBlock::PushImageVar(wxString name, wxString imagePath)
 	int width = previewImage->GetWidth();
 	int height = previewImage->GetHeight();
 
-	PushVar(name, CalculateImageRTF(imagePath, width, height));
+	PushVar(name, CalculateImageRTF(imagePath, width, height) + label);
 
 	delete previewImage;
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserBlock::PushImageVar(wxString name, mafView *view)
+void mafHTMLTemplateParserBlock::PushImageVar(wxString name, mafView *view, wxString label)
 //----------------------------------------------------------------------------
 {
 	// Write Image
@@ -222,11 +222,11 @@ void mafHTMLTemplateParserBlock::PushImageVar(wxString name, mafView *view)
 	int width = view->GetRWI()->m_Width;
 	int height = view->GetRWI()->m_Height;
 
-	PushVar(name, CalculateImageRTF(imagePath, width, height));
+	PushVar(name, CalculateImageRTF(imagePath, width, height) + label);
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserBlock::PushImageVar(wxString name, vtkImageData *imageData)
+void mafHTMLTemplateParserBlock::PushImageVar(wxString name, vtkImageData *imageData, wxString label)
 //----------------------------------------------------------------------------
 {
 	// Write Image
@@ -246,7 +246,7 @@ void mafHTMLTemplateParserBlock::PushImageVar(wxString name, vtkImageData *image
 	int width = imageData->GetDimensions()[0];
 	int height = imageData->GetDimensions()[1];	
 	
-	PushVar(name, CalculateImageRTF(imagePath, width, height)); //RTF image generation
+	PushVar(name, CalculateImageRTF(imagePath, width, height) + label); //RTF image generation
 
 	//TODO AddImageVar for HTML Template
 }
