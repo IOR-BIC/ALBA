@@ -79,17 +79,17 @@ public:
   /** Add the variable specified in the name string to the list of variables */
   void AddVar(wxString name, wxString varValue);
 	/** Add the variable specified in the name string to the list of variables */
-	void AddImageVar(wxString name, wxString imagePath = "");
+	void AddImageVar(wxString name, wxString imagePath = "", wxString label = "");
 	/** Add the variable specified in the name string to the list of variables */
-	void AddImageVar(wxString name, mafView *view);
+	void AddImageVar(wxString name, mafView *view, wxString label = "");
 	/** Add the variable specified in the name string to the list of variables */
-	void AddImageVar(wxString name, vtkImageData *imageData);
+	void AddImageVar(wxString name, vtkImageData *imageData, wxString label = "");
 	/** Push the variable specified in the name string to the list of variables */
-	void PushImageVar(wxString name, wxString imagePath);
+	void PushImageVar(wxString name, wxString imagePath, wxString label = "");
 	/** Push the variable specified in the name string to the list of variables */
-	void PushImageVar(wxString name, mafView *view);
+	void PushImageVar(wxString name, mafView *view, wxString label = "");
 	/** Push the variable specified in the name string to the list of variables */
-	void PushImageVar(wxString name, vtkImageData *imageData);
+	void PushImageVar(wxString name, vtkImageData *imageData, wxString label = "");
 	/** Push the variable specified in the name string to the list of variables */
   void PushVar(wxString name, double varValue);
   /** Push the variable specified in the name string to the list of variables */
@@ -133,6 +133,8 @@ public:
   /** Set the number of loops for the "if" blocks*/
   int GetNLoops();
 	
+	/*mode 0 = none, mode 1 = horizontal, 2 = vertical*/
+	void SetImageRTFProps(int widthGoal = 8640, int heightGoal = 12960, int mode = 1);
 protected:
   /** Return the position of the variable in the Variable Table.
      Returns -1 if variable is not found */
@@ -183,6 +185,10 @@ protected:
   void SetFather(mafHTMLTemplateParserBlock *father);
     
 	wxString CalculateImageRTF(wxString imagePath, int width, int height);
+	
+	int m_ImageRTF_WidthGoal;
+	int m_ImageRTF_HeightGoal;
+	int m_ImageRTF_Mode;
 
   //VARIABLES
   mafHTMLTemplateParserBlock *m_Father;

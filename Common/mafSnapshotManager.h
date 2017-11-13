@@ -22,22 +22,14 @@
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
 #include "mafObserver.h"
-#include "wx\iconbndl.h"
-#include <set>
-#include <vector>
 
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
 
-class mafGUIButton;
-class mafGUIDialog;
-class mafGUIPicButton;
-class mafGUISettingsDialog;
-class mafVME;
 class mafVMEGroup;
-class mafVMEImage;
-class vtkImageData;
+class mafGUIImageViewer;
+class mafDeviceButtonsPadMouse;
 
 /**
   Class Name: mafSnapshotManager.
@@ -58,43 +50,33 @@ public:
 	/* Create snapshot from selected view*/
 	void CreateSnapshot(mafVME *node, mafView *selectedView);
 
-	/*Add snapshot from bitmap*/
-	void AddSnapshot(wxBitmap &bitmap, wxString name);
+	/* Find or Create Snapshots group*/
+	void FindOrCreateSnapshotGroup(mafVME *root);
 
-	/*Show a Preview of Snapshots*/
-	void ShowSnapshotPreview(mafVME *node);
+	/* Show a Preview of Snapshots*/
+	void ShowSnapshotPreview();
 
-	/*Get Number of snapshots*/
-	int GetNSnapshots() { return m_ImagesList.size(); };
+	/* Get Number of snapshots*/
+	int GetNSnapshots();
 
-	/*Return the snapshots group*/
+	/* Return the snapshots group*/
 	mafVMEGroup* GetSnapshotGroup() { return m_SnapshotsGroup; };
+	
+	/* Set the snapshots group*/
+	void SetSnapshotGroup(mafVMEGroup* group) { m_SnapshotsGroup = group; };
+
+	/* Set Mouse for imageViewer interaction*/
+	void SetMouse(mafDeviceButtonsPadMouse *mouse);
 
 protected:
 
-	void FillImageList();
-	void UpdateSelectionDialog(int selection);
+	void SelectImage();
 
-	int SaveVMEImage(mafVMEImage *image, wxString imageFileName, bool scale = false);
-	void SaveImageAs();
-	void DeleteImage();
-
-	mafVMEGroup *m_SnapshotsGroup;
-
-	std::vector<wxString> m_ImagesList;
-	
-	int m_ImageSelection;
-
-	mafGUIDialog			*m_Dialog;
-	mafGUIPicButton		*m_PreviewImageButton;
-	wxBoxSizer				*m_ImageBoxSizer;
-	mafGUIButton			*m_PrevBtn;
-	mafGUIButton			*m_NextBtn;
-
-	wxString m_ImagesPath;
+	wxString			 			m_GroupName;
+	mafVMEGroup					*m_SnapshotsGroup;
+	mafGUIImageViewer		*m_ImageViewer;
 
 private:
-	
   friend class mafLogicWithManagers;
 };
 #endif
