@@ -605,4 +605,5 @@ void mafViewCompound::SetLayoutConfiguration(int layoutConfiguration)
 	if(m_Gui)
 		m_Gui->Update();
 	OnLayout();
+	CameraUpdate();
 }

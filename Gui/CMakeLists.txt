@@ -80,6 +80,7 @@ SET(PROJECT_SRCS
   mafGUIDynamicVP.cpp  				mafGUIDynamicVP.h
   mafGUILutHistogramSwatch.cpp  	mafGUILutHistogramSwatch.h
   mafGUILutHistogramEditor.cpp  	mafGUILutHistogramEditor.h
+	mafGUIImageViewer.cpp							mafGUIImageViewer.h
 )
 
 IF (MAF_USE_VTK)
