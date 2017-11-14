@@ -290,6 +290,13 @@ int mafVME::SetParent(mafVME *parent)
 			mafVME *old_root = (m_Parent ? m_Parent->GetRoot() : NULL);
 			mafVME *new_root = parent->GetRoot();
 						
+			// if the Node was attached to another tree, first send detaching event
+			if (old_root && (new_root != old_root))
+			{
+				ForwardUpEvent(&mafEventBase(this, NODE_DETACHED_FROM_TREE));
+				InvokeEvent(this, NODE_DETACHED_FROM_TREE);
+			}
+
 			m_Parent = parent;
 
 			// if it's being attached to a new tree and this has 'mafRoot' root node, ask for a new Id
@@ -340,6 +347,10 @@ int mafVME::SetParent(mafVME *parent)
 		// reparenting to NULL is admitted in any case
 		if (m_Parent != NULL)
 		{
+			// send event about detachment from the tree
+			ForwardUpEvent(&mafEventBase(this, NODE_DETACHED_FROM_TREE));
+			InvokeEvent(this, NODE_DETACHED_FROM_TREE);
+
 			m_Parent = parent;
 			Modified();
 		}
@@ -1365,9 +1376,7 @@ void mafVME::RemoveChild(const mafID idx, bool onlyVisible /*=false*/)
 		}
 		m_Children.erase(m_Children.begin() + idx);
 
-		// send event about detachment from the tree
-		ForwardUpEvent(&mafEventBase(this, NODE_DETACHED_FROM_TREE));
-		InvokeEvent(this, NODE_DETACHED_FROM_TREE);
+		GetLogicManager()->VmeRemoved();
 
 		Modified();
 	}
