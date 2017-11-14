@@ -289,7 +289,7 @@ int mafVME::SetParent(mafVME *parent)
 		{
 			mafVME *old_root = (m_Parent ? m_Parent->GetRoot() : NULL);
 			mafVME *new_root = parent->GetRoot();
-
+						
 			// if the Node was attached to another tree, first send detaching event
 			if (old_root && (new_root != old_root))
 			{
@@ -353,7 +353,6 @@ int mafVME::SetParent(mafVME *parent)
 
 			m_Parent = parent;
 			Modified();
-
 		}
 		return MAF_OK;
 	}
@@ -1365,6 +1364,7 @@ void mafVME::RemoveChild(const mafID idx, bool onlyVisible /*=false*/)
 	if (oldnode)
 	{
 		oldnode->Shutdown();
+
 		// when called by ReparentTo the parent is already changed
 		if (oldnode->GetParent() == this)
 		{
@@ -1375,6 +1375,9 @@ void mafVME::RemoveChild(const mafID idx, bool onlyVisible /*=false*/)
 			mafErrorMacro("Wrong Parent pointer found in child node while removing it: should point to \"" << (m_Parent ? m_Parent->GetName() : "(NULL)") << "\", instead points to " << (oldnode->GetParent() ? oldnode->GetParent()->GetName() : "(NULL)") << "\"");
 		}
 		m_Children.erase(m_Children.begin() + idx);
+
+		GetLogicManager()->VmeRemoved();
+
 		Modified();
 	}
 	else

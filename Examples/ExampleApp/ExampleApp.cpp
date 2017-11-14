@@ -355,6 +355,7 @@ bool ExampleApp::OnInit()
 #endif
 	m_Logic->Plug(new mafOpMergeDicomSeries("Merge Dicom"), "");
 #endif
+
 	//------------------------------------------------------------
 
 

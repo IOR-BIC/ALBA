@@ -290,6 +290,7 @@ void mafLogicWithManagers::Configure()
 	if (m_UseSnapshotManager)
 	{
 		m_SnapshotManager = new mafSnapshotManager();
+		m_SnapshotManager->SetMouse(m_Mouse);
 	}
 
 	// Fill the SettingsDialog
@@ -473,664 +474,658 @@ void mafLogicWithManagers::OnQuit()
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    /*if (e->GetId() == mafDataVector::SINGLE_FILE_DATA)
-    {
-      e->SetBool(m_StorageSettings->GetSingleFileStatus()!= 0);
-      return;
-    }*/
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	{
+		/*if (e->GetId() == mafDataVector::SINGLE_FILE_DATA)
+		{
+			e->SetBool(m_StorageSettings->GetSingleFileStatus()!= 0);
+			return;
+		}*/
 		switch (e->GetId())
 		{
 			//resize view
-			case TILE_WINDOW_CASCADE:
-				m_Win->Cascade();
-				break;
-			case TILE_WINDOW_HORIZONTALLY:
-				m_Win->Tile(wxHORIZONTAL);
-				break;
-			case TILE_WINDOW_VERTICALLY:
-				m_Win->Tile(wxVERTICAL);
-				break;
-				// ###############################################################
-				// commands related to the Dockable Panes
-			case MENU_VIEW_LOGBAR:
-				m_Win->ShowDockPane("logbar", !m_Win->DockPaneIsShown("logbar"));
-				break;
-			case MENU_VIEW_SIDEBAR:
-				m_Win->ShowDockPane("sidebar", !m_Win->DockPaneIsShown("sidebar"));
-				break;
-			case MENU_VIEW_TIMEBAR:
-				m_Win->ShowDockPane("timebar", !m_Win->DockPaneIsShown("timebar"));
-				break;
-				// ###############################################################
-				// commands related to the STATUSBAR
-			case BIND_TO_PROGRESSBAR:
+		case TILE_WINDOW_CASCADE:
+			m_Win->Cascade();
+			break;
+		case TILE_WINDOW_HORIZONTALLY:
+			m_Win->Tile(wxHORIZONTAL);
+			break;
+		case TILE_WINDOW_VERTICALLY:
+			m_Win->Tile(wxVERTICAL);
+			break;
+			// ###############################################################
+			// commands related to the Dockable Panes
+		case MENU_VIEW_LOGBAR:
+			m_Win->ShowDockPane("logbar", !m_Win->DockPaneIsShown("logbar"));
+			break;
+		case MENU_VIEW_SIDEBAR:
+			m_Win->ShowDockPane("sidebar", !m_Win->DockPaneIsShown("sidebar"));
+			break;
+		case MENU_VIEW_TIMEBAR:
+			m_Win->ShowDockPane("timebar", !m_Win->DockPaneIsShown("timebar"));
+			break;
+			// ###############################################################
+			// commands related to the STATUSBAR
+		case BIND_TO_PROGRESSBAR:
 #ifdef MAF_USE_VTK
-				m_Win->BindToProgressBar(e->GetVtkObj());
+			m_Win->BindToProgressBar(e->GetVtkObj());
 #endif
-				break;
-			case PROGRESSBAR_SET_TEXT:
-				m_Win->ProgressBarSetText(&wxString(e->GetString()->GetCStr()));
-				break;
-				// ###############################################################
-			case UPDATE_UI:
-				break;
-				// ###############################################################
-				// commands related to FILE MENU  
-			case MENU_FILE_NEW:
-				OnFileNew();
-				break;
-			case MENU_FILE_OPEN:
-			{
-				mafString *filename = e->GetString();
-				if (filename)
-					OnFileOpen((*filename).GetCStr());
-				else
-					OnFileOpen();
-				UpdateFrameTitle();
-			}
 			break;
-			case IMPORT_FILE:
-			{
-				mafString *filename = e->GetString();
-				if (filename)
-				{
-					ImportExternalFile(*filename);
-				}
-			}
+		case PROGRESSBAR_SET_TEXT:
+			m_Win->ProgressBarSetText(&wxString(e->GetString()->GetCStr()));
 			break;
-			case wxID_FILE1:
-			case wxID_FILE2:
-			case wxID_FILE3:
-			case wxID_FILE4:
-			case wxID_FILE5:
-			case wxID_FILE6:
-			case wxID_FILE7:
-			case wxID_FILE8:
-			case wxID_FILE9:
-				OnFileHistory(e->GetId());
-				break;
-			case MENU_FILE_SAVE:
-				OnFileSave();
-				break;
-			case MENU_FILE_SAVEAS:
-				OnFileSaveAs();
-				break;
-			case MENU_FILE_PRINT:
-				if (m_ViewManager && m_PrintSupport)
-					m_PrintSupport->OnPrint(m_ViewManager->GetSelectedView());
-				break;
-			case MENU_FILE_PRINT_PREVIEW:
-				if (m_ViewManager && m_PrintSupport)
-					m_PrintSupport->OnPrintPreview(m_ViewManager->GetSelectedView());
-				break;
-			case MENU_FILE_PRINT_SETUP:
-				if (m_PrintSupport)
-					m_PrintSupport->OnPrintSetup();
-				break;
-			case MENU_FILE_PRINT_PAGE_SETUP:
-				if (m_PrintSupport)
-					m_PrintSupport->OnPageSetup();
-				break;
-			case MENU_FILE_QUIT:
-				OnQuit();
-				break;
-				// ###############################################################
-				// commands related to VME
-			case MENU_EDIT_FIND_VME:
-				m_SideBar->FindVME();
-				break;
-			case VME_SELECT:
-				VmeSelect(e->GetVme());
-				EnableMenuAndToolbar();
-				break;
-			case VME_SELECTED:
-				VmeSelected(e->GetVme());
-				break;
-			case VME_DCLICKED:
-				VmeDoubleClicked(*e);
-				break;
-			case VME_ADDED:
-				VmeAdded(e->GetVme());
-				break;
-			case VME_REMOVING:
-				VmeRemoving(e->GetVme());
-				break;
-			case VME_CHOOSE:
+			// ###############################################################
+		case UPDATE_UI:
+			break;
+			// ###############################################################
+			// commands related to FILE MENU  
+		case MENU_FILE_NEW:
+			OnFileNew();
+			break;
+		case MENU_FILE_OPEN:
+		{
+			mafString *filename = e->GetString();
+			if (filename)
+				OnFileOpen((*filename).GetCStr());
+			else
+				OnFileOpen();
+			UpdateFrameTitle();
+		}
+		break;
+		case IMPORT_FILE:
+		{
+			mafString *filename = e->GetString();
+			if (filename)
 			{
-				mafString *s = e->GetString();
-				mafString str;
+				ImportExternalFile(*filename);
+			}
+		}
+		break;
+		case wxID_FILE1:
+		case wxID_FILE2:
+		case wxID_FILE3:
+		case wxID_FILE4:
+		case wxID_FILE5:
+		case wxID_FILE6:
+		case wxID_FILE7:
+		case wxID_FILE8:
+		case wxID_FILE9:
+			OnFileHistory(e->GetId());
+			break;
+		case MENU_FILE_SAVE:
+			OnFileSave();
+			break;
+		case MENU_FILE_SAVEAS:
+			OnFileSaveAs();
+			break;
+		case MENU_FILE_PRINT:
+			if (m_ViewManager && m_PrintSupport)
+				m_PrintSupport->OnPrint(m_ViewManager->GetSelectedView());
+			break;
+		case MENU_FILE_PRINT_PREVIEW:
+			if (m_ViewManager && m_PrintSupport)
+				m_PrintSupport->OnPrintPreview(m_ViewManager->GetSelectedView());
+			break;
+		case MENU_FILE_PRINT_SETUP:
+			if (m_PrintSupport)
+				m_PrintSupport->OnPrintSetup();
+			break;
+		case MENU_FILE_PRINT_PAGE_SETUP:
+			if (m_PrintSupport)
+				m_PrintSupport->OnPageSetup();
+			break;
+		case MENU_FILE_QUIT:
+			OnQuit();
+			break;
+			// ###############################################################
+			// commands related to VME
+		case MENU_EDIT_FIND_VME:
+			m_SideBar->FindVME();
+			break;
+		case VME_SELECT:
+			VmeSelect(e->GetVme());
+			EnableMenuAndToolbar();
+			break;
+		case VME_SELECTED:
+			VmeSelected(e->GetVme());
+			break;
+		case VME_DCLICKED:
+			VmeDoubleClicked(*e);
+			break;
+		case VME_ADDED:
+			VmeAdded(e->GetVme());
+			break;
+		case VME_REMOVING:
+			VmeRemoving(e->GetVme());
+			break;
+		case VME_CHOOSE:
+		{
+			mafString *s = e->GetString();
+			mafString str;
 
-				if (s != NULL)
-					str = *s;
-				else
-					str = "Choose Node";
+			if (s != NULL)
+				str = *s;
+			else
+				str = "Choose Node";
 
-				std::vector<mafVME*> nodeVector = m_SideBar->VmeChoose(e->GetArg(), REPRESENTATION_AS_TREE, str, e->GetBool(), e->GetVme());
-				if (!e->GetBool())
+			std::vector<mafVME*> nodeVector = m_SideBar->VmeChoose(e->GetArg(), REPRESENTATION_AS_TREE, str, e->GetBool(), e->GetVme());
+			if (!e->GetBool())
+			{
+				if (nodeVector.size() != 0)
 				{
-					if (nodeVector.size() != 0)
-					{
-						e->SetVme(nodeVector[0]);
-					}
-					else
-					{
-						e->SetVme(NULL);
-					}
+					e->SetVme(nodeVector[0]);
 				}
 				else
 				{
-					e->SetVmeVector(nodeVector);
+					e->SetVme(NULL);
 				}
 			}
-			break;
-			case VME_CHOOSE_MATERIAL:
-				VmeChooseMaterial(e->GetVme(), e->GetBool());
-				break;
-			case UPDATE_PROPERTY:
-				VmeUpdateProperties(e->GetVme(), e->GetBool());
-				break;
-			case SHOW_TREE_CONTEXTUAL_MENU:
-					TreeContextualMenu(*e);
-				break;
-			case SHOW_VIEW_CONTEXTUAL_MENU:
-					ViewContextualMenu(e->GetBool());
-				break;
-				// ###############################################################
-				// commands related to OP
-			case MENU_OP:
-				if (m_OpManager)
-				{
-					m_OpManager->OpRun(e->GetArg());
-				}
-				break;
-			case PARSE_STRING:
+			else
 			{
-				if (this->m_OpManager->Running())
-				{
-					wxMessageBox("There is an other operation running!!");
-					return;
-				}
-				int menuId, opId;
-				mafString *s = e->GetString();
-				menuId = m_MenuBar->FindMenu(_("Operations"));
-				opId = m_MenuBar->GetMenu(menuId)->FindItem(s->GetCStr());
-				m_OpManager->OpRun(opId);
+				e->SetVmeVector(nodeVector);
 			}
+		}
+		break;
+		case VME_CHOOSE_MATERIAL:
+			VmeChooseMaterial(e->GetVme(), e->GetBool());
 			break;
-			case MENU_OPTION_APPLICATION_SETTINGS:
-				if (m_OpManager)
-				{
-					m_OpManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
-				}
-				break;
-			case CLEAR_UNDO_STACK:
-				if (!m_OpManager->Running())
-				{
-					m_OpManager->ClearUndoStack();
-				}
-				break;
-			case OP_RUN_STARTING:
-			{				
-				m_CancelledBeforeOpStarting = false;
-				mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
-				if (c != NULL)
-					c->SetAllowCloseWindow(false);
-				OpRunStarting();
-			}
+		case UPDATE_PROPERTY:
+			VmeUpdateProperties(e->GetVme(), e->GetBool());
 			break;
-			case OP_RUN_TERMINATED:
-			{
-				if (m_WizardManager && m_WizardRunning)
-				{
-					m_RunningOperation = false;
-					if (!mafOpSelect::SafeDownCast(m_OpManager->GetRunningOperation()))
-						m_WizardManager->WizardContinue(e->GetArg());
-				}
-				//else we manage the operation end by unlock the close button and so on
-				else
-				{
-					mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
-					if (c != NULL)
-						c->SetAllowCloseWindow(true);
-					OpRunTerminated();
-				}
-			}
+		case SHOW_TREE_CONTEXTUAL_MENU:
+			TreeContextualMenu(*e);
 			break;
-			case OP_SHOW_GUI:
-				OpShowGui(!e->GetBool(), (mafGUIPanel*)e->GetWin());
-				break;
-			case OP_HIDE_GUI:
-				OpHideGui(e->GetBool());
-				break;
-			case OP_FORCE_STOP:
-				m_OpManager->StopCurrentOperation();
-				break;
-				// ###############################################################
-				// commands related to VIEWS
-			case VIEW_CREATE:
-				ViewCreate(e->GetArg());
-				break;
-			case VIEW_CREATED:
-				ViewCreated(e->GetView());
-				break;
-			case VIEW_RESIZE:
-			{
-				mafView *view = NULL;
-				const char *viewStr = e->GetString()->GetCStr();
-				view = m_ViewManager->GetFromList(viewStr);
-				if (view)
-				{
-					view->GetFrame()->SetSize(e->GetWidth(), e->GetHeight());
-					view->GetFrame()->SetPosition(wxPoint(e->GetX(), e->GetY()));
-				}
-			}
+		case SHOW_VIEW_CONTEXTUAL_MENU:
+			ViewContextualMenu(e->GetBool());
 			break;
-			case VIEW_DELETE:
-			{
-
-				if (m_PlugControlPanel)
-					this->m_SideBar->ViewDeleted(e->GetView());
-
-#ifdef MAF_USE_VTK
-				// currently mafInteraction is strictly dependent on VTK (marco)
-				if (m_InteractionManager)
-					m_InteractionManager->ViewSelected(NULL);
-#endif
-
-				if (m_ViewManager)
-				{
-					EnableItem(CAMERA_RESET, false);
-					EnableItem(CAMERA_FIT, false);
-					EnableItem(CAMERA_FLYTO, false);
-
-					EnableItem(MENU_FILE_PRINT, false);
-					EnableItem(MENU_FILE_PRINT_PREVIEW, false);
-					EnableItem(MENU_FILE_PRINT_SETUP, false);
-					EnableItem(MENU_FILE_PRINT_PAGE_SETUP, false);
-				}
-			}
+			// ###############################################################
+			// commands related to OP
+		case MENU_OP:
 			if (m_OpManager)
 			{
-				m_OpManager->RefreshMenu();
+				m_OpManager->OpRun(e->GetArg());
 			}
 			break;
-			case VIEW_SELECT:
+		case PARSE_STRING:
+		{
+			if (this->m_OpManager->Running())
 			{
-				ViewSelect();
-				if (m_OpManager)
-				{
-					mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
-					if (c != NULL)
-						c->SetAllowCloseWindow(!m_OpManager->Running());
-				}
+				wxMessageBox("There is an other operation running!!");
+				return;
+			}
+			int menuId, opId;
+			mafString *s = e->GetString();
+			menuId = m_MenuBar->FindMenu(_("Operations"));
+			opId = m_MenuBar->GetMenu(menuId)->FindItem(s->GetCStr());
+			m_OpManager->OpRun(opId);
+		}
+		break;
+		case MENU_OPTION_APPLICATION_SETTINGS:
+			if (m_OpManager)
+			{
+				m_OpManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
 			}
 			break;
-			case VIEW_MAXIMIZE:
-				break;
-			case VIEW_SELECTED:
-				e->SetBool(m_ViewManager->GetSelectedView() != NULL);
-				e->SetView(m_ViewManager->GetSelectedView());
-				break;
-			case VIEW_SAVE_IMAGE:
+		case CLEAR_UNDO_STACK:
+			if (!m_OpManager->Running())
 			{
-				mafViewCompound *v = mafViewCompound::SafeDownCast(m_ViewManager->GetSelectedView());
-				if (v && e->GetBool())
-				{
-					v->GetRWI()->SaveAllImages(v->GetLabel(), v);
-				}
-				else
-				{
-					mafView *v = m_ViewManager->GetSelectedView();
-					if (v)
-					{
-						v->GetRWI()->SaveImage(v->GetLabel());
-					}
-				}
+				m_OpManager->ClearUndoStack();
 			}
 			break;
-			case CAMERA_RESET:
-				CameraReset();
-				break;
-			case CAMERA_FIT:
-				if (m_ViewManager) m_ViewManager->CameraReset(true);
-				break;
-			case CAMERA_FLYTO:
-				if (m_ViewManager) m_ViewManager->CameraFlyToMode();
-				// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-				if (m_InteractionManager) m_InteractionManager->CameraFlyToMode();  //modified by Marco. 15-9-2004 fly to with devices.
-#endif
-				break;
-			case TIME_SET:
-				TimeSet(e->GetDouble());
-				break;
-				// ###############################################################
-				// commands related to interaction manager
-			case ID_APP_SETTINGS:
-				m_SettingsDialog->ShowModal();
-				break;
-			case CAMERA_PRE_RESET:
-				// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-				if (m_InteractionManager)
-				{
-					vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
-					//assert(ren);
-					m_InteractionManager->PreResetCamera(ren);
-					//mafLogMessage("CAMERA_PRE_RESET");
-				}
-#endif
-				break;
-			case CAMERA_POST_RESET:
-				// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-				if (m_InteractionManager)
-				{
-					vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
-					//assert(ren); //modified by Marco. 2-11-2004 Commented out to allow reset camera of all cameras.
-					m_InteractionManager->PostResetCamera(ren);
-					//mafLogMessage("CAMERA_POST_RESET");
-				}
-#endif
-				break;
-			case CAMERA_UPDATE:
-				CameraUpdate();
-
-				break;
-			case CAMERA_SYNCHRONOUS_UPDATE:
-				m_ViewManager->CameraUpdate();
-				break;
-			case INTERACTOR_ADD:
-				// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-				if (m_InteractionManager)
-				{
-					mafInteractor *interactor = mafInteractor::SafeDownCast(e->GetMafObject());
-					assert(interactor);
-					mafString *action_name = e->GetString();
-					m_InteractionManager->BindAction(*action_name, interactor);
-				}
-#endif
-				break;
-			case INTERACTOR_REMOVE:
-				// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-				if (m_InteractionManager)
-				{
-					mafInteractor *interactor = mafInteractor::SafeDownCast(e->GetMafObject());
-					assert(interactor);
-					mafString *action_name = e->GetString();
-					m_InteractionManager->UnBindAction(*action_name, interactor);
-				}
-#endif
-				break;
-			case PER_PUSH:
-				// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-				if (m_InteractionManager)
-				{
-					mafInteractorPER *per = mafInteractorPER::SafeDownCast(e->GetMafObject());
-					assert(per);
-					m_InteractionManager->PushPER(per);
-				}
-#endif
-				break;
-			case PER_POP:
-				// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-				if (m_InteractionManager) m_InteractionManager->PopPER();
-#endif
-				break;
-			case GET_CURRENT_PER:
-				if (m_InteractionManager)
-					e->SetMafObject(m_InteractionManager->GetPER());
-				break;
-			case DEVICE_ADD:
-				m_InteractionManager->AddDeviceToTree((mafDevice *)e->GetMafObject());
-				break;
-			case DEVICE_REMOVE:
-				m_InteractionManager->RemoveDeviceFromTree((mafDevice *)e->GetMafObject());
-				break;
-			case DEVICE_GET:
-				break;
-			case CREATE_STORAGE:
-				CreateStorage(e);
-				break;
-			case ABOUT_APPLICATION:
+		case OP_RUN_STARTING:
+		{
+			m_CancelledBeforeOpStarting = false;
+			mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
+			if (c != NULL)
+				c->SetAllowCloseWindow(false);
+			OpRunStarting();
+		}
+		break;
+		case OP_RUN_TERMINATED:
+		{
+			if (m_WizardManager && m_WizardRunning)
 			{
-				wxString imagesPath =  mafGetApplicationDirectory().c_str();
-				imagesPath += "\\Config\\ExampleAppAbout.bmp";
-				ShowAboutDialog("");
+				m_RunningOperation = false;
+				if (!mafOpSelect::SafeDownCast(m_OpManager->GetRunningOperation()))
+					m_WizardManager->WizardContinue(e->GetArg());
 			}
-			break;
-			case SHOW_WEB_SITE:
+			//else we manage the operation end by unlock the close button and so on
+			else
 			{
-				ShowWebSite(m_WebSiteURL);
-			}
-			break;
-			case SHOW_LICENSE_SITE:
-			{
-				ShowWebSite(m_LicenseURL);
-			}
-			break;
-			case HELP_HOME:
-			{
-				m_HelpManager->ShowHelp();
-			}
-			break;
-			case GET_BUILD_HELP_GUI:
-			{
-				if (e->GetString())
-				{
-					mafString typeName = e->GetString()->GetCStr();
-					bool res = m_HelpManager && m_HelpManager->HasHelpEntry(typeName);
-					e->SetArg(m_HelpManager && m_HelpManager->HasHelpEntry(typeName));
-				}
-				else
-				{
-					e->SetArg(false);
-				}
-			}
-			break;
-			case OPEN_HELP_PAGE:
-			{
-				// open help for entity
-				if (e->GetString())
-				{
-					wxString typeName = e->GetString()->GetCStr();
-					m_HelpManager->ShowHelpEntry(typeName);
-				}
-			}
-			break;
-			//-----from medLogic
-			case ID_GET_FILENAME:
-			{
-				e->SetString(&(m_VMEManager->GetFileName()));
-			}
-			break;
-			case MENU_FILE_SNAPSHOT:
-			{
-				if (m_SnapshotManager && m_VMEManager && m_ViewManager)
-				m_SnapshotManager->CreateSnapshot(m_VMEManager->GetRoot(), m_ViewManager->GetSelectedView());
-
-				if (m_WizardManager && m_WizardRunning)
-				OnEvent(&mafEvent(this, WIZARD_RUN_CONTINUE, true));
-			}
-			break;
-			case MENU_FILE_MANAGE_SNAPSHOT:
-				if(m_SnapshotManager && m_VMEManager)
-					m_SnapshotManager->ShowSnapshotPreview(m_VMEManager->GetRoot());
-			break;
-			case MENU_WIZARD:
-				//The event from the application menu
-				if (m_WizardManager)
-					m_WizardManager->WizardRun(e->GetArg());
-				break;
-			case WIZARD_RUN_STARTING:
-			{
-				//Manage start event from the wizard lock window close button
-				//and disabling toolbar
-				mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
-				if (c != NULL)
-					c->SetAllowCloseWindow(false);
-				WizardRunStarting();
-			}
-			break;
-			case WIZARD_RUN_TERMINATED:
-			{
-				//Manage end event from the wizard unlock window close button
-				//and enabling toolbar
 				mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
 				if (c != NULL)
 					c->SetAllowCloseWindow(true);
-				WizardRunTerminated();
-				UpdateFrameTitle();
+				OpRunTerminated();
 			}
+		}
+		break;
+		case OP_SHOW_GUI:
+			OpShowGui(!e->GetBool(), (mafGUIPanel*)e->GetWin());
 			break;
-			case WIZARD_RUN_CONTINUE:
+		case OP_HIDE_GUI:
+			OpHideGui(e->GetBool());
+			break;
+		case OP_FORCE_STOP:
+			m_OpManager->StopCurrentOperation();
+			break;
+			// ###############################################################
+			// commands related to VIEWS
+		case VIEW_CREATE:
+			ViewCreate(e->GetArg());
+			break;
+		case VIEW_CREATED:
+			ViewCreated(e->GetView());
+			break;
+		case VIEW_RESIZE:
+		{
+			mafView *view = NULL;
+			const char *viewStr = e->GetString()->GetCStr();
+			view = m_ViewManager->GetFromList(viewStr);
+			if (view)
 			{
-				if (m_WizardManager && m_WizardRunning)
-					m_WizardManager->WizardContinue(e->GetBool());
+				view->GetFrame()->SetSize(e->GetWidth(), e->GetHeight());
+				view->GetFrame()->SetPosition(wxPoint(e->GetX(), e->GetY()));
 			}
-			break;
-			case WIZARD_UPDATE_WINDOW_TITLE:
-			{
-				UpdateFrameTitle();
-			}
-			break;
-			case WIZARD_REQUIRED_VIEW:
-			{
-				//The wizard requires a specific view
-				//searching on open views or open a new one
-				mafView *view;
-				const char *viewStr = e->GetString()->GetCStr();
+		}
+		break;
+		case VIEW_DELETE:
+		{
 
-				view = m_ViewManager->GetFromList(viewStr);
-				if (view)
-					m_ViewManager->Activate(view);
-				else
-					m_ViewManager->ViewCreate(viewStr);
-			}
-			break;
-			case WIZARD_DELETE_VIEW:
-			{
-				mafView *view;
-				const char *viewStr = e->GetString()->GetCStr();
+			if (m_PlugControlPanel)
+				this->m_SideBar->ViewDeleted(e->GetView());
 
-				view = m_ViewManager->GetFromList(viewStr);
-				if (view)
-				{
-					mafGUIMDIChild *c = (mafGUIMDIChild *)view->GetFrame();
-					m_ViewManager->ViewDelete(view);
-					if (c != NULL)
-						c->Destroy();
-				}
-			}
-			break;
-			case WIZARD_RUN_OP:
-			{
-				//Running an op required from the wizard
-				mafString *tmp = e->GetString();
-				mafLogMessage("wiz starting :%s", tmp->GetCStr());
-				m_CancelledBeforeOpStarting = true;
-				UpdateFrameTitle();
-				m_OpManager->OpRun(*(e->GetString()));
-				//If the op is started the value of m_CancelledBeforeOpStarting 
-				//is changed by OP_RUN_STARTING event
-				if (m_CancelledBeforeOpStarting)
-				{
-					m_CancelledBeforeOpStarting = false;
-					m_WizardManager->WizardContinue(false);
-				}
-			}
-			break;
-			case WIZARD_OP_DELETE:
-			{
-				//Running an op required from the wizard
-				m_CancelledBeforeOpStarting = true;
-				UpdateFrameTitle();
-				m_OpManager->OpRun(OP_DELETE);
-			}
-			break;
-			case WIZARD_OP_NEW:
-			{
-				//Running an op required from the wizard
-				if (m_VMEManager)
-					m_VMEManager->MSFNew();
-				m_WizardManager->WizardContinue(true);
-			}
-			break;
-			case WIZARD_PAUSE:
-			{
-				UpdateFrameTitle();
-				m_OpManager->OpRun(e->GetOp());
-			}
-			break;
-			case WIZARD_RELOAD_MSF:
-			{
-				UpdateFrameTitle();
-				wxString file;
-				file = m_VMEManager->GetFileName().GetCStr();
-				if (file.IsEmpty())
-				{
-					mafLogMessage("Reload requested whitout opened MSF");
-					//continue wizard with error
-					m_WizardManager->WizardContinue(false);
-				}
-				else
-				{
-					int opened = m_VMEManager->MSFOpen(file);
-					//continue wizard after open operation
-					m_WizardManager->WizardContinue(opened != MAF_ERROR);
-				}
-			}
-			break;
-			case MENU_VIEW_TOOLBAR:
-				m_Win->ShowDockPane("wizardgauge", !m_Win->DockPaneIsShown("wizardgauge"));
-				m_Win->ShowDockPane("wizardlabel", !m_Win->DockPaneIsShown("wizardlabel"));
-				m_Win->ShowDockPane("wizardseparator", !m_Win->DockPaneIsShown("wizardseparator"));
-				m_Win->ShowDockPane("toolbar", !m_Win->DockPaneIsShown("toolbar"));
-				break;
-			case PROGRESSBAR_SHOW:
-			{
-				if (e->GetSender() == m_WizardManager)
-				{
-					m_WizardLabel->Enable();
-					m_WizardGauge->Enable();
-				}
-				else
-					m_Win->ProgressBarShow();
-			}
-			break;
-			case PROGRESSBAR_HIDE:
-			{
-				if (e->GetSender() == m_WizardManager)
-				{
-					m_WizardGauge->SetValue(0);
-					m_WizardGauge->Enable(false);
-					m_WizardLabel->Enable(false);
-				}
-				else
-					m_Win->ProgressBarHide();
-			}
-			break;
-			case PROGRESSBAR_SET_VALUE:
-			{
-				if (e->GetSender() == m_WizardManager)
-					m_WizardGauge->SetValue(e->GetArg());
-				else
-					m_Win->ProgressBarSetVal(e->GetArg());
-			}
-			break;
+#ifdef MAF_USE_VTK
+			// currently mafInteraction is strictly dependent on VTK (marco)
+			if (m_InteractionManager)
+				m_InteractionManager->ViewSelected(NULL);
+#endif
 
-			default:
-				e->Log();
-				break;
-				break;
+			EnableMenuAndToolbar();
+		}
+		if (m_OpManager)
+		{
+			m_OpManager->RefreshMenu();
+		}
+		break;
+		case VIEW_SELECT:
+		{
+			ViewSelect();
+			if (m_OpManager)
+			{
+				mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
+				if (c != NULL)
+					c->SetAllowCloseWindow(!m_OpManager->Running());
+			}
+			EnableMenuAndToolbar();
+		}
+		break;
+		case VIEW_MAXIMIZE:
+			break;
+		case VIEW_SELECTED:
+			e->SetBool(m_ViewManager->GetSelectedView() != NULL);
+			e->SetView(m_ViewManager->GetSelectedView());
+			break;
+		case VIEW_SAVE_IMAGE:
+		{
+			mafViewCompound *v = mafViewCompound::SafeDownCast(m_ViewManager->GetSelectedView());
+			if (v && e->GetBool())
+			{
+				v->GetRWI()->SaveAllImages(v->GetLabel(), v);
+			}
+			else
+			{
+				mafView *v = m_ViewManager->GetSelectedView();
+				if (v)
+				{
+					v->GetRWI()->SaveImage(v->GetLabel());
+				}
+			}
+		}
+		break;
+		case CAMERA_RESET:
+			CameraReset();
+			break;
+		case CAMERA_FIT:
+			if (m_ViewManager) m_ViewManager->CameraReset(true);
+			break;
+		case CAMERA_FLYTO:
+			if (m_ViewManager) m_ViewManager->CameraFlyToMode();
+			// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
+			if (m_InteractionManager) m_InteractionManager->CameraFlyToMode();  //modified by Marco. 15-9-2004 fly to with devices.
+#endif
+			break;
+		case TIME_SET:
+			TimeSet(e->GetDouble());
+			break;
+			// ###############################################################
+			// commands related to interaction manager
+		case ID_APP_SETTINGS:
+			m_SettingsDialog->ShowModal();
+			break;
+		case CAMERA_PRE_RESET:
+			// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
+			if (m_InteractionManager)
+			{
+				vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
+				//assert(ren);
+				m_InteractionManager->PreResetCamera(ren);
+				//mafLogMessage("CAMERA_PRE_RESET");
+			}
+#endif
+			break;
+		case CAMERA_POST_RESET:
+			// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
+			if (m_InteractionManager)
+			{
+				vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
+				//assert(ren); //modified by Marco. 2-11-2004 Commented out to allow reset camera of all cameras.
+				m_InteractionManager->PostResetCamera(ren);
+				//mafLogMessage("CAMERA_POST_RESET");
+			}
+#endif
+			break;
+		case CAMERA_UPDATE:
+			CameraUpdate();
+
+			break;
+		case CAMERA_SYNCHRONOUS_UPDATE:
+			m_ViewManager->CameraUpdate();
+			break;
+		case INTERACTOR_ADD:
+			// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
+			if (m_InteractionManager)
+			{
+				mafInteractor *interactor = mafInteractor::SafeDownCast(e->GetMafObject());
+				assert(interactor);
+				mafString *action_name = e->GetString();
+				m_InteractionManager->BindAction(*action_name, interactor);
+			}
+#endif
+			break;
+		case INTERACTOR_REMOVE:
+			// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
+			if (m_InteractionManager)
+			{
+				mafInteractor *interactor = mafInteractor::SafeDownCast(e->GetMafObject());
+				assert(interactor);
+				mafString *action_name = e->GetString();
+				m_InteractionManager->UnBindAction(*action_name, interactor);
+			}
+#endif
+			break;
+		case PER_PUSH:
+			// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
+			if (m_InteractionManager)
+			{
+				mafInteractorPER *per = mafInteractorPER::SafeDownCast(e->GetMafObject());
+				assert(per);
+				m_InteractionManager->PushPER(per);
+			}
+#endif
+			break;
+		case PER_POP:
+			// currently mafInteraction is strictly dependent on VTK (marco)
+#ifdef MAF_USE_VTK
+			if (m_InteractionManager) m_InteractionManager->PopPER();
+#endif
+			break;
+		case GET_CURRENT_PER:
+			if (m_InteractionManager)
+				e->SetMafObject(m_InteractionManager->GetPER());
+			break;
+		case DEVICE_ADD:
+			m_InteractionManager->AddDeviceToTree((mafDevice *)e->GetMafObject());
+			break;
+		case DEVICE_REMOVE:
+			m_InteractionManager->RemoveDeviceFromTree((mafDevice *)e->GetMafObject());
+			break;
+		case DEVICE_GET:
+			break;
+		case CREATE_STORAGE:
+			CreateStorage(e);
+			break;
+		case ABOUT_APPLICATION:
+		{
+			wxString imagesPath = mafGetApplicationDirectory().c_str();
+			imagesPath += "\\Config\\ExampleAppAbout.bmp";
+			ShowAboutDialog("");
+		}
+		break;
+		case SHOW_WEB_SITE:
+		{
+			ShowWebSite(m_WebSiteURL);
+		}
+		break;
+		case SHOW_LICENSE_SITE:
+		{
+			ShowWebSite(m_LicenseURL);
+		}
+		break;
+		case HELP_HOME:
+		{
+			m_HelpManager->ShowHelp();
+		}
+		break;
+		case GET_BUILD_HELP_GUI:
+		{
+			if (e->GetString())
+			{
+				mafString typeName = e->GetString()->GetCStr();
+				bool res = m_HelpManager && m_HelpManager->HasHelpEntry(typeName);
+				e->SetArg(m_HelpManager && m_HelpManager->HasHelpEntry(typeName));
+			}
+			else
+			{
+				e->SetArg(false);
+			}
+		}
+		break;
+		case OPEN_HELP_PAGE:
+		{
+			// open help for entity
+			if (e->GetString())
+			{
+				wxString typeName = e->GetString()->GetCStr();
+				m_HelpManager->ShowHelpEntry(typeName);
+			}
+		}
+		break;
+		//-----from medLogic
+		case ID_GET_FILENAME:
+		{
+			e->SetString(&(m_VMEManager->GetFileName()));
+		}
+		break;
+		case MENU_FILE_SNAPSHOT:
+		{
+			if (m_SnapshotManager && m_VMEManager && m_ViewManager)
+			{
+				m_SnapshotManager->CreateSnapshot(m_VMEManager->GetRoot(), m_ViewManager->GetSelectedView());
+			}
+			if (m_WizardManager && m_WizardRunning)
+				OnEvent(&mafEvent(this, WIZARD_RUN_CONTINUE, true));
+		}
+		break;
+		case MENU_FILE_MANAGE_SNAPSHOT:
+			if (m_SnapshotManager && m_VMEManager)
+			{
+				m_SnapshotManager->ShowSnapshotPreview();
+			}
+			break;
+		case MENU_WIZARD:
+			//The event from the application menu
+			if (m_WizardManager)
+				m_WizardManager->WizardRun(e->GetArg());
+			break;
+		case WIZARD_RUN_STARTING:
+		{
+			//Manage start event from the wizard lock window close button
+			//and disabling toolbar
+			mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
+			if (c != NULL)
+				c->SetAllowCloseWindow(false);
+			WizardRunStarting();
+		}
+		break;
+		case WIZARD_RUN_TERMINATED:
+		{
+			//Manage end event from the wizard unlock window close button
+			//and enabling toolbar
+			mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
+			if (c != NULL)
+				c->SetAllowCloseWindow(true);
+			WizardRunTerminated();
+			UpdateFrameTitle();
+		}
+		break;
+		case WIZARD_RUN_CONTINUE:
+		{
+			if (m_WizardManager && m_WizardRunning)
+				m_WizardManager->WizardContinue(e->GetBool());
+		}
+		break;
+		case WIZARD_UPDATE_WINDOW_TITLE:
+		{
+			UpdateFrameTitle();
+		}
+		break;
+		case WIZARD_REQUIRED_VIEW:
+		{
+			//The wizard requires a specific view
+			//searching on open views or open a new one
+			mafView *view;
+			const char *viewStr = e->GetString()->GetCStr();
+
+			view = m_ViewManager->GetFromList(viewStr);
+			if (view)
+				m_ViewManager->Activate(view);
+			else
+				m_ViewManager->ViewCreate(viewStr);
+		}
+		break;
+		case WIZARD_DELETE_VIEW:
+		{
+			mafView *view;
+			const char *viewStr = e->GetString()->GetCStr();
+
+			view = m_ViewManager->GetFromList(viewStr);
+			if (view)
+			{
+				mafGUIMDIChild *c = (mafGUIMDIChild *)view->GetFrame();
+				m_ViewManager->ViewDelete(view);
+				if (c != NULL)
+					c->Destroy();
+			}
+		}
+		break;
+		case WIZARD_RUN_OP:
+		{
+			//Running an op required from the wizard
+			mafString *tmp = e->GetString();
+			mafLogMessage("wiz starting :%s", tmp->GetCStr());
+			m_CancelledBeforeOpStarting = true;
+			UpdateFrameTitle();
+			m_OpManager->OpRun(*(e->GetString()));
+			//If the op is started the value of m_CancelledBeforeOpStarting 
+			//is changed by OP_RUN_STARTING event
+			if (m_CancelledBeforeOpStarting)
+			{
+				m_CancelledBeforeOpStarting = false;
+				m_WizardManager->WizardContinue(false);
+			}
+		}
+		break;
+		case WIZARD_OP_DELETE:
+		{
+			//Running an op required from the wizard
+			m_CancelledBeforeOpStarting = true;
+			UpdateFrameTitle();
+			m_OpManager->OpRun(OP_DELETE);
+		}
+		break;
+		case WIZARD_OP_NEW:
+		{
+			//Running an op required from the wizard
+			if (m_VMEManager)
+				m_VMEManager->MSFNew();
+			m_WizardManager->WizardContinue(true);
+		}
+		break;
+		case WIZARD_PAUSE:
+		{
+			UpdateFrameTitle();
+			m_OpManager->OpRun(e->GetOp());
+		}
+		break;
+		case WIZARD_RELOAD_MSF:
+		{
+			UpdateFrameTitle();
+			wxString file;
+			file = m_VMEManager->GetFileName().GetCStr();
+			if (file.IsEmpty())
+			{
+				mafLogMessage("Reload requested whitout opened MSF");
+				//continue wizard with error
+				m_WizardManager->WizardContinue(false);
+			}
+			else
+			{
+				int opened = m_VMEManager->MSFOpen(file);
+				//continue wizard after open operation
+				m_WizardManager->WizardContinue(opened != MAF_ERROR);
+			}
+		}
+		break;
+		case MENU_VIEW_TOOLBAR:
+			m_Win->ShowDockPane("wizardgauge", !m_Win->DockPaneIsShown("wizardgauge"));
+			m_Win->ShowDockPane("wizardlabel", !m_Win->DockPaneIsShown("wizardlabel"));
+			m_Win->ShowDockPane("wizardseparator", !m_Win->DockPaneIsShown("wizardseparator"));
+			m_Win->ShowDockPane("toolbar", !m_Win->DockPaneIsShown("toolbar"));
+			break;
+		case PROGRESSBAR_SHOW:
+		{
+			if (e->GetSender() == m_WizardManager)
+			{
+				m_WizardLabel->Enable();
+				m_WizardGauge->Enable();
+			}
+			else
+				m_Win->ProgressBarShow();
+		}
+		break;
+		case PROGRESSBAR_HIDE:
+		{
+			if (e->GetSender() == m_WizardManager)
+			{
+				m_WizardGauge->SetValue(0);
+				m_WizardGauge->Enable(false);
+				m_WizardLabel->Enable(false);
+			}
+			else
+				m_Win->ProgressBarHide();
+		}
+		break;
+		case PROGRESSBAR_SET_VALUE:
+		{
+			if (e->GetSender() == m_WizardManager)
+				m_WizardGauge->SetValue(e->GetArg());
+			else
+				m_Win->ProgressBarSetVal(e->GetArg());
+		}
+		break;
+
+		default:
+			e->Log();
+			break;
+			break;
 		} // end switch case
-  } // end if SafeDowncast
+	} // end if SafeDowncast
 }
 
 // FILE //////////////////////////////////////////////////////////////////////
@@ -1281,6 +1276,8 @@ void mafLogicWithManagers::VmeAdd(mafVME *vme)
 		return;
 	if(m_VMEManager) 
     m_VMEManager->VmeAdd(vme);
+
+
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeAdded(mafVME *vme)
@@ -1300,6 +1297,8 @@ void mafLogicWithManagers::VmeAdded(mafVME *vme)
 
   if(m_PlugTimebar)
     UpdateTimeBounds();
+
+	EnableMenuAndToolbar();
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemove(mafVME *vme)
@@ -1315,9 +1314,6 @@ void mafLogicWithManagers::VmeRemove(mafVME *vme)
 
   if (m_ViewManager)
     m_ViewManager->CameraUpdate();
-
-	if (m_SelectedLandmark == vme)
-		m_SelectedLandmark = NULL;
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemoving(mafVME *vme)
@@ -1332,7 +1328,17 @@ void mafLogicWithManagers::VmeRemoving(mafVME *vme)
     m_SideBar->VmeRemove(vme);
 	if(m_ViewManager)
     m_ViewManager->VmeRemove(vme);
+
+	if (m_SelectedLandmark == vme)
+		m_SelectedLandmark = NULL;
 }
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::VmeRemoved()
+{
+	EnableMenuAndToolbar();
+}
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeVisualModeChanged(mafVME * vme)
 {
@@ -1573,7 +1579,6 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
 	// removed temporarily support for external Views
 	if (v)
 	{
-		
 		// child views
 		mafGUIMDIChild *c = new mafGUIMDIChild(m_Win, v);
 		c->SetWindowStyleFlag(m_ChildFrameStyle);
@@ -1584,34 +1589,25 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::ViewSelect()
 {
-  if(m_ViewManager) 
-  {
-    mafView *view = m_ViewManager->GetSelectedView();
-    if(m_SideBar)	m_SideBar->ViewSelect(view);
+	if (m_ViewManager)
+	{
+		mafView *view = m_ViewManager->GetSelectedView();
+		if (m_SideBar)	m_SideBar->ViewSelect(view);
 
-    EnableItem(CAMERA_RESET, view!=NULL);
-    EnableItem(CAMERA_FIT,   view!=NULL);
-    EnableItem(CAMERA_FLYTO, view!=NULL);
-
-    EnableItem(MENU_FILE_PRINT, view != NULL);
-    EnableItem(MENU_FILE_PRINT_PREVIEW, view != NULL);
-    EnableItem(MENU_FILE_PRINT_SETUP, view != NULL);
-    EnableItem(MENU_FILE_PRINT_PAGE_SETUP, view != NULL);
-
-// currently mafInteraction is strictly dependent on VTK (marco)
+		// currently mafInteraction is strictly dependent on VTK (marco)
 #ifdef MAF_USE_VTK
-    if (m_InteractionManager)
-    {
-      m_InteractionManager->ViewSelected(view);
-    }
+		if (m_InteractionManager)
+		{
+			m_InteractionManager->ViewSelected(view);
+		}
 #endif
 
-    if(m_OpManager && !m_OpManager->Running()) 
-    {
-      // needed to update all the operations that will be enabled on View Creation
-      m_OpManager->VmeSelected(m_OpManager->GetSelectedVme());
-    }
-  }
+		if (m_OpManager && !m_OpManager->Running())
+		{
+			// needed to update all the operations that will be enabled on View Creation
+			m_OpManager->VmeSelected(m_OpManager->GetSelectedVme());
+		}
+	}
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::ViewContextualMenu(bool vme_menu)
@@ -2008,6 +2004,8 @@ void mafLogicWithManagers::EnableMenuAndToolbar()
 {
 	bool enable = !(m_RunningOperation || m_WizardRunning);
 
+	mafView * selectedView = m_ViewManager->GetSelectedView();
+
 	EnableItem(MENU_FILE_NEW, enable);
 	EnableItem(MENU_FILE_OPEN, enable);
 	EnableItem(MENU_FILE_SAVE, enable);
@@ -2023,6 +2021,23 @@ void mafLogicWithManagers::EnableMenuAndToolbar()
 	EnableItem(wxID_FILE7, enable);
 	EnableItem(wxID_FILE8, enable);
 	EnableItem(wxID_FILE9, enable);
+
+	EnableItem(CAMERA_RESET, selectedView != NULL);
+	EnableItem(CAMERA_FIT, selectedView != NULL);
+	EnableItem(CAMERA_FLYTO, selectedView != NULL);
+
+	EnableItem(MENU_FILE_PRINT, selectedView != NULL);
+	EnableItem(MENU_FILE_PRINT_PREVIEW, selectedView != NULL);
+	EnableItem(MENU_FILE_PRINT_SETUP, selectedView != NULL);
+	EnableItem(MENU_FILE_PRINT_PAGE_SETUP, selectedView != NULL);
+
+	if (m_UseSnapshotManager)
+	{
+		m_SnapshotManager->FindOrCreateSnapshotGroup(m_VMEManager->GetRoot());
+
+		EnableItem(MENU_FILE_MANAGE_SNAPSHOT, m_SnapshotManager->GetNSnapshots());
+		EnableItem(MENU_FILE_SNAPSHOT, selectedView);
+	}
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::EnableItem(int item, bool enable)
