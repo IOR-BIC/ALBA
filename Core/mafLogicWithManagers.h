@@ -310,6 +310,8 @@ protected:
 	virtual void VmeRemove(mafVME *vme);
 	/** Respond to a VME_REMOVING evt. propagate evt. to SideBar,ViewManager,ecc.. */
 	virtual void VmeRemoving(mafVME *vme);
+	/** called from VME after removing*/
+	virtual void VmeRemoved();
 
 	virtual void VmeVisualModeChanged(mafVME * vme);
 		

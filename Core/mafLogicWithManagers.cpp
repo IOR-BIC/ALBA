@@ -1314,9 +1314,6 @@ void mafLogicWithManagers::VmeRemove(mafVME *vme)
 
   if (m_ViewManager)
     m_ViewManager->CameraUpdate();
-
-	if (m_SelectedLandmark == vme)
-		m_SelectedLandmark = NULL;
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemoving(mafVME *vme)
@@ -1332,8 +1329,16 @@ void mafLogicWithManagers::VmeRemoving(mafVME *vme)
 	if(m_ViewManager)
     m_ViewManager->VmeRemove(vme);
 
+	if (m_SelectedLandmark == vme)
+		m_SelectedLandmark = NULL;
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::VmeRemoved()
+{
 	EnableMenuAndToolbar();
 }
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeVisualModeChanged(mafVME * vme)
 {

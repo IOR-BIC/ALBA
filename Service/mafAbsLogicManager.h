@@ -36,7 +36,7 @@ public:
 
 	virtual void VmeRemove(mafVME *vme) = 0;
 
-	//virtual void VmeRemoving(mafVME *vme) = 0;
+	virtual void VmeRemoved() = 0;
 
 	virtual void VmeModified(mafVME* vme) = 0;
 
