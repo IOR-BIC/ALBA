@@ -33,6 +33,7 @@ public:
 		VME_MODIFIED,
 		VME_SHOW,
 		VME_VISUAL_MODE_CHANGED,
+		VME_REMOVED
 	};
 
 	struct calls
@@ -74,6 +75,9 @@ public:
 
 
 	virtual const char* GetMsfFileExtension() override;
+
+
+	virtual void VmeRemoved() override;
 
 protected:
 	
