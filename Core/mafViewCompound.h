@@ -194,7 +194,7 @@ public:
 	int GetLayoutConfiguration() const { return m_LayoutConfiguration; }
 
 	/** Sets LayoutConfiguration */
-	void SetLayoutConfiguration(int layoutConfiguration);
+	virtual void SetLayoutConfiguration(int layoutConfiguration);
 
 protected:
   /**
