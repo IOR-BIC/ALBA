@@ -104,3 +104,9 @@ const char* mafFakeLogicForTest::GetMsfFileExtension()
 {
 	return "msf";
 }
+
+//----------------------------------------------------------------------------
+void mafFakeLogicForTest::VmeRemoved()
+{
+	AddCall(mafFakeLogicForTest::VME_VISUAL_MODE_CHANGED, NULL);
+}
