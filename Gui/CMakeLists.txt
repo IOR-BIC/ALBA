@@ -81,6 +81,7 @@ SET(PROJECT_SRCS
   mafGUILutHistogramSwatch.cpp  	mafGUILutHistogramSwatch.h
   mafGUILutHistogramEditor.cpp  	mafGUILutHistogramEditor.h
 	mafGUIImageViewer.cpp							mafGUIImageViewer.h
+	mafGUIAboutDialog.cpp				mafGUIAboutDialog.h
 )
 
 IF (MAF_USE_VTK)
