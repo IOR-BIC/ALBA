@@ -149,9 +149,6 @@ GUI_HELP_START,
   GET_BUILD_HELP_GUI, // sent from op, views or vme's to know if we are building the help gui in the application
   OPEN_HELP_PAGE, // sent from an op, a view or a vme to open the corresponding help page
 GUI_HELP_END,
-		
-SHOW_WEB_SITE,		//Show web site event
-SHOW_LICENSE_SITE,//Show License event
 
 EVT_START,
   UPDATE_UI,           // update menu and toolbar widgets

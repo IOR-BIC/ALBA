@@ -41,6 +41,7 @@ class mafInteractionManager;
 class mafPrintSupport;
 class mafDeviceButtonsPadMouse;
 class mafGUISettingsDialog;
+class mafGUIAboutDialog;
 class mafGUISettings;
 class mafUser;
 class mafWizardManager;
@@ -52,7 +53,6 @@ class mafGUIApplicationSettings;
 class mafGUISettingsTimeBar;
 class mafHelpManager;
 class mafSnapshotManager;
-class mafGUIDialog;
 
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
@@ -169,10 +169,6 @@ public:
 
 	/** Manage application exception and allow to save at least the tree. */
 	virtual void HandleException();
-
-	/** About Dialog*/
-	void ShowAboutDialog(wxString imagePath = "", bool showWebSiteBtn = false, bool showLicenseBtn= false);
-	wxStaticText* AddText(mafGUIDialog * dialog, wxString &text, int Width, int align);
 
 	/** Set the revision string */
 	void SetRevision(mafString revision) { m_Revision = revision; };
@@ -400,7 +396,8 @@ protected:
 	bool m_UseHelpManager;
 	bool m_UseSnapshotManager;
 
-	mafGUISettingsDialog *m_SettingsDialog;
+	mafGUISettingsDialog	*m_SettingsDialog;
+	mafGUIAboutDialog			*m_AboutDialog;
 
 	mafString m_Revision;
 	mafString m_Extension;
@@ -422,13 +419,12 @@ protected:
 	wxMenuBar         *m_MenuBar;
 	wxString					m_LastSelectedPanel;
 	mafGUITimeBar			*m_TimePanel;
-	mafString					m_AppTitle;
-	wxString					m_WebSiteURL;
-	wxString					m_LicenseURL;
-	wxString					m_AboutInfo;
+	wxString					m_AppTitle;
+
 	bool							m_LogToFile;
 	mafWXLog          *m_Logger;
 	mafVTKLog         *m_VtkLog;
+	
 	mafGUIApplicationSettings *m_ApplicationSettings;
 	mafGUISettingsTimeBar  *m_TimeBarSettings;
 
