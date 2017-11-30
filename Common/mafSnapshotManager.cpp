@@ -90,29 +90,16 @@ void mafSnapshotManager::CreateSnapshot(mafVME *root, mafView *selectedView)
 		
 	//////////////////////////////////////////////////////////////////////////
 
-	mafViewCompound *viewCompound = mafViewCompound::SafeDownCast(selectedView);
-	
 	wxImage img;
 
-	if (viewCompound)
-	{
-		wxColor color = viewCompound->GetBackgroundColor();
-		viewCompound->SetBackgroundColor(wxColor(255, 255, 255));
-
-		wxBitmap btmComp;
-		viewCompound->GetImage(btmComp);
-		img = btmComp.ConvertToImage();
-
-		viewCompound->SetBackgroundColor(color);
-	}
-	else if (selectedView)
+	if (selectedView)
 	{
 		wxColor color = selectedView->GetBackgroundColor();
 		selectedView->SetBackgroundColor(wxColor(255, 255, 255));
 
-		wxBitmap* image = selectedView->GetRWI()->GetImage();
-		img = image->ConvertToImage();
-		cppDEL(image);
+		wxBitmap btmComp;
+		selectedView->GetImage(btmComp);
+		img = btmComp.ConvertToImage();
 
 		selectedView->SetBackgroundColor(color);
 	}

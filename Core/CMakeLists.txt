@@ -23,7 +23,7 @@ SET(PROJECT_SRCS
   mafOpManager.cpp  			mafOpManager.h
   mafOpSelect.cpp  				mafOpSelect.h
   mafOpStack.cpp  				mafOpStack.h
-  mafPrintSupport.cpp  			mafPrintSupport.h
+  mafPrintManager.cpp  			mafPrintManager.h
   mafTagArray.cpp  				mafTagArray.h
   mafTagItem.cpp  				mafTagItem.h
   mafTimeMap.h

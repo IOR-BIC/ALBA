@@ -154,10 +154,7 @@ public:
 
   /** Set the mouse device to use inside the view */
   void SetMouse(mafDeviceButtonsPadMouse *mouse);
-
-  /** Print this view.*/
-  virtual void Print(wxDC *dc, wxRect margins);
-	  
+  
   mafRWI *m_Rwi;
 
   /** print a dump of this object */

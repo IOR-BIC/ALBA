@@ -38,7 +38,7 @@ class mafVME;
 class mafVMELandmark;
 class mafVMELandmarkCloud;
 class mafInteractionManager;
-class mafPrintSupport;
+class mafPrintManager;
 class mafDeviceButtonsPadMouse;
 class mafGUISettingsDialog;
 class mafGUIAboutDialog;
@@ -210,6 +210,9 @@ public:
 	// VME
 	virtual const char* GetMsfFileExtension() { return m_Extension.GetCStr(); }
 		
+
+	virtual void PrintImage(mafVMEImage *img);
+
 protected:
 	//---------------------------------------------------------
 	// Description:
@@ -379,7 +382,7 @@ protected:
 	mafVMELandmark				 *m_SelectedLandmark;
 
 	mafGUIMaterialChooser  *m_MaterialChooser;
-	mafPrintSupport     *m_PrintSupport;
+	mafPrintManager     *m_PrintSupport;
 
 	mafDeviceButtonsPadMouse            *m_Mouse;
 

@@ -168,7 +168,7 @@ void mafGizmoScaleIsotropicTest::TestShow()
  
   gizmoScaleIsotropic->Show(true);
   
-	CPPUNIT_ASSERT(logic->GetCall(1).testFunction == mafFakeLogicForTest::VME_SHOW);
+	CPPUNIT_ASSERT(logic->GetCall(1).testFunction == mafFakeLogicForTest::FKL_VME_SHOW);
 		  
   cppDEL(gizmoScaleIsotropic);
 }

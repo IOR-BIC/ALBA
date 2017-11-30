@@ -33,36 +33,36 @@ mafFakeLogicForTest::~mafFakeLogicForTest()
 //-------------------------------------------------------------------------
 void mafFakeLogicForTest::VmeSelect(mafVME *vme)
 {
-	AddCall(mafFakeLogicForTest::VME_SELECT, vme);
+	AddCall(mafFakeLogicForTest::FKL_VME_SELECT, vme);
 }
 //-------------------------------------------------------------------------
 void mafFakeLogicForTest::VmeSelected(mafVME *vme){}
 //-------------------------------------------------------------------------
 void mafFakeLogicForTest::VmeShow(mafVME *vme, bool visibility)
 {
-	AddCall(mafFakeLogicForTest::VME_SHOW, vme);
+	AddCall(mafFakeLogicForTest::FKL_VME_SHOW, vme);
 }
 //-------------------------------------------------------------------------
 void mafFakeLogicForTest::VmeAdd(mafVME *vme)
 {
-	AddCall(mafFakeLogicForTest::VME_ADD, vme);
+	AddCall(mafFakeLogicForTest::FKL_VME_ADD, vme);
 }
 //-------------------------------------------------------------------------
 void mafFakeLogicForTest::VmeRemove(mafVME *vme)
 {
-	AddCall(mafFakeLogicForTest::VME_REMOVE, vme);
+	AddCall(mafFakeLogicForTest::FKL_VME_REMOVE, vme);
 	vme->ReparentTo(NULL);
 }
 //-------------------------------------------------------------------------
 void mafFakeLogicForTest::VmeModified(mafVME* vme)
 {
-	AddCall(mafFakeLogicForTest::VME_MODIFIED, vme);
+	AddCall(mafFakeLogicForTest::FKL_VME_MODIFIED, vme);
 }
 
 //-------------------------------------------------------------------------
 void mafFakeLogicForTest::VmeVisualModeChanged(mafVME * vme)
 {
-	AddCall(mafFakeLogicForTest::VME_VISUAL_MODE_CHANGED, vme);
+	AddCall(mafFakeLogicForTest::FKL_VME_VISUAL_MODE_CHANGED, vme);
 }
 
 // Camera /////////////////////////////////////////////////////////////////
@@ -108,5 +108,11 @@ const char* mafFakeLogicForTest::GetMsfFileExtension()
 //----------------------------------------------------------------------------
 void mafFakeLogicForTest::VmeRemoved()
 {
-	AddCall(mafFakeLogicForTest::VME_VISUAL_MODE_CHANGED, NULL);
+	AddCall(mafFakeLogicForTest::FKL_VME_REMOVED, NULL);
+}
+
+//----------------------------------------------------------------------------
+void mafFakeLogicForTest::PrintImage(mafVMEImage *img)
+{
+	AddCall(mafFakeLogicForTest::FKL_PRINT_IMAGE, (mafVME*)img);
 }

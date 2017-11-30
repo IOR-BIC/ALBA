@@ -18,6 +18,7 @@
 #define _mafAbsLogicManager_H
 
 class mafVME;
+class mafVMEImage;
 
 class mafAbsLogicManager
 {
@@ -51,5 +52,7 @@ public:
 	virtual bool IsOperationRunning() = 0;
 
 	virtual const char* GetMsfFileExtension() = 0;
+
+	virtual void PrintImage(mafVMEImage *img) = 0;
 };
 #endif
