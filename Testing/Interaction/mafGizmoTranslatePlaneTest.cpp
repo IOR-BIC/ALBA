@@ -230,7 +230,7 @@ void mafGizmoTranslatePlaneTest::TestShow()
   
 	mafFakeLogicForTest *logic = (mafFakeLogicForTest*)mafServiceLocator::GetLogicManager();
 	logic->ClearCalls();
-	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_SHOW);
+	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::FKL_VME_SHOW);
 
   CPPUNIT_ASSERT(listener->GetEvent()->GetSender() == gizmoTranslatePlane);
 

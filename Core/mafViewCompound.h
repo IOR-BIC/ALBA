@@ -177,10 +177,6 @@ public:
   Return true is one of the plugged view is maximized.*/
   bool IsSubViewMaximized() {return m_SubViewMaximized != -1;};
 
-  /** 
-  Print the sub-view.*/
-  virtual void Print(wxDC *dc, wxRect margins);
-
   /** Called to update all components that depends on Application Options.*/
   virtual void OptionsUpdate();
 
@@ -194,7 +190,7 @@ public:
 	int GetLayoutConfiguration() const { return m_LayoutConfiguration; }
 
 	/** Sets LayoutConfiguration */
-	void SetLayoutConfiguration(int layoutConfiguration);
+	virtual void SetLayoutConfiguration(int layoutConfiguration);
 
 protected:
   /**

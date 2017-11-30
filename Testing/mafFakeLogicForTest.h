@@ -27,13 +27,14 @@ public:
 
 	enum testFunctions
 	{
-		VME_SELECT,
-		VME_ADD,
-		VME_REMOVE,
-		VME_MODIFIED,
-		VME_SHOW,
-		VME_VISUAL_MODE_CHANGED,
-		VME_REMOVED
+		FKL_VME_SELECT,
+		FKL_VME_ADD,
+		FKL_VME_REMOVE,
+		FKL_VME_MODIFIED,
+		FKL_VME_SHOW,
+		FKL_VME_VISUAL_MODE_CHANGED,
+		FKL_VME_REMOVED,
+		FKL_PRINT_IMAGE
 	};
 
 	struct calls
@@ -78,6 +79,9 @@ public:
 
 
 	virtual void VmeRemoved() override;
+
+
+	virtual void PrintImage(mafVMEImage *img) override;
 
 protected:
 	

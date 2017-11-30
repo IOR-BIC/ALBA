@@ -30,17 +30,18 @@ class mafView;
 //----------------------------------------------------------------------------
 // mafPrintout :
 //----------------------------------------------------------------------------
-class MAF_EXPORT mafPrintSupport
+class MAF_EXPORT mafPrintManager
 {
  public:
-  mafPrintSupport();
-  virtual ~mafPrintSupport();
+  mafPrintManager();
+  virtual ~mafPrintManager();
 
   void OnPrintPreview(mafView *v);
+	void OnPrint(mafVMEImage *img);
   void OnPrint(mafView *v);
   void OnPrintSetup();
   void OnPageSetup();
- 
+	
 protected:
   wxPrintData *m_PrintData;
   wxPageSetupData *m_PageSetupData;

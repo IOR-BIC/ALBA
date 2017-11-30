@@ -18,6 +18,7 @@
 #define __mafGUIImageViewer_H__
 
 #include "mafObserver.h"
+#include "mafServiceClient.h"
 
 //----------------------------------------------------------------------------
 // forward reference
@@ -46,13 +47,14 @@ enum ImageViewerEvents
 	ID_IMAGE_SELECT,
 	ID_IMAGE_SAVE,
 	ID_IMAGE_DELETE,
+	ID_IMAGE_PRINT,
 };
 
 /**
  class name: mafGUIImageViewer
 */
 
-class MAF_EXPORT mafGUIImageViewer : public mafObserver
+class MAF_EXPORT mafGUIImageViewer : public mafObserver, mafServiceClient
 {
 public:
 

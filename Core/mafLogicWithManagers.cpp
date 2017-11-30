@@ -35,7 +35,7 @@
 #include "mafOpManager.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
-#include "mafPrintSupport.h"
+#include "mafPrintManager.h"
 
 #ifdef MAF_USE_VTK
   #include "mafViewVTK.h"
@@ -65,6 +65,7 @@
 #include "mafGUIApplicationSettings.h"
 #include "mafGUISettingsTimeBar.h"
 #include "mafGUISettingsDialog.h"
+#include "mafGUIAboutDialog.h""
 
 #include "mmaApplicationLayout.h"
 #include "mafDataVector.h"
@@ -94,7 +95,6 @@
 #include "mafOpSelect.h"
 #include "mafGUIVMEChooserTree.h"
 #include "mafGUI.h"
-#include "mafGUIDialog.h"
 
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
@@ -122,10 +122,6 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_VtkLog = NULL;
 
 	m_AppTitle = "";
-
-	m_WebSiteURL = "";
-	m_LicenseURL = "";
-	m_AboutInfo = "";
 
 	m_Quitting = false;
 
@@ -157,12 +153,12 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 
 	m_MaterialChooser = NULL;
 
-	m_PrintSupport = new mafPrintSupport();
+	m_PrintSupport = new mafPrintManager();
 
 	m_SettingsDialog = new mafGUISettingsDialog();
+	m_AboutDialog = new mafGUIAboutDialog();
 
 	m_Revision = _("0.1");
-
 	m_Extension = "msf";
 
 	m_UseWizardManager = false;
@@ -188,6 +184,7 @@ mafLogicWithManagers::~mafLogicWithManagers()
   cppDEL(m_User);
   cppDEL(m_PrintSupport);
   cppDEL(m_SettingsDialog);
+	cppDEL(m_AboutDialog);
 	cppDEL(m_ApplicationSettings);
 	cppDEL(m_TimeBarSettings);
 	cppDEL(m_SnapshotManager);
@@ -239,6 +236,14 @@ void mafLogicWithManagers::Init(int argc, char **argv)
 			m_OpManager->OpRun(op_type, (void *)op_param.GetCStr());
 		}
 	}
+
+	// Init About Dialog
+	m_AboutDialog->SetTitle(m_AppTitle);
+	m_AboutDialog->SetRevision(m_Revision.GetCStr());
+
+	wxString imagePath = mafGetApplicationDirectory().c_str();
+	imagePath += "\\Config\\ExampleAppAbout.bmp";
+	m_AboutDialog->SetImagePath(imagePath);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Configure()
@@ -347,7 +352,7 @@ void mafLogicWithManagers::Show()
 	m_Win->Show(TRUE);
 
 	// must be after the mafLogicWithGUI::Show(); because in that method is set the m_AppTitle var
-	SetApplicationStamp(m_AppTitle);
+	SetApplicationStamp((mafString)m_AppTitle);
 }
 
 // Plug
@@ -892,19 +897,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			break;
 		case ABOUT_APPLICATION:
 		{
-			wxString imagesPath = mafGetApplicationDirectory().c_str();
-			imagesPath += "\\Config\\ExampleAppAbout.bmp";
-			ShowAboutDialog("");
-		}
-		break;
-		case SHOW_WEB_SITE:
-		{
-			ShowWebSite(m_WebSiteURL);
-		}
-		break;
-		case SHOW_LICENSE_SITE:
-		{
-			ShowWebSite(m_LicenseURL);
+			m_AboutDialog->ShowModal();
 		}
 		break;
 		case HELP_HOME:
@@ -1139,7 +1132,7 @@ void mafLogicWithManagers::OnFileNew()
 		  m_VMEManager->MSFNew();
 	  }
   }
-	m_Win->SetTitle(wxString(m_AppTitle.GetCStr()));
+	m_Win->SetTitle(m_AppTitle);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
@@ -2122,6 +2115,12 @@ void mafLogicWithManagers::ShowWebSite(wxString url)
 	wxExecute(command);
 }
 
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::PrintImage(mafVMEImage *img)
+{
+	m_PrintSupport->OnPrint(img);
+}
+
 // Log
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::CreateNullLog()
@@ -2301,7 +2300,6 @@ void mafLogicWithManagers::UpdateMeasureUnit()
 		v->OptionsUpdate();
 }
 
-
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::ImportExternalFile(mafString &filename)
 {
@@ -2367,132 +2365,4 @@ void mafLogicWithManagers::HandleException()
 		}
 	}
 	OnQuit();
-}
-
-//----------------------------------------------------------------------------
-void mafLogicWithManagers::ShowAboutDialog(wxString imagePath, bool showWebSiteBtn, bool showLicenseBtn)
-{
-	wxString title = "About ";
-	title += m_AppTitle;
-	
-	wxString revision = "";
-	wxRegKey RegKey(wxString("HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + m_AppTitle));
-	if (RegKey.Exists())
-	{
-		if (RegKey.HasValue(wxString("DisplayVersion")))
-			RegKey.QueryValue(wxString("DisplayVersion"), revision);
-		else
-			revision = "Unknown Build";
-
-		SetRevision(revision);
-		mafLogMessage(wxString::Format("%s", m_Revision.GetCStr()));
-	}
-
-	wxString description = m_AppTitle.GetCStr();
-	description += "\n";
-	description += _("Application ") + m_Revision;
-	description += "\n© 2017 LTM";
-		
-	//////////////////////////////////////////////////////////////////////////
-
-	wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
-	mafGUIDialog *dialog = new mafGUIDialog(title, mafCLOSEWINDOW);
-
-	// Images
-	mafGUIPicButton *previewImageButton;
-
-	int panelWidth = 560;
-
-	if (wxFileExists(imagePath))
-	{
-		wxImage *previewImage;
-		wxBitmap *previewBitmap;
-
-		// Load and show the image
-		previewImage = new wxImage();
-		previewImage->LoadFile(imagePath.c_str(), wxBITMAP_TYPE_ANY);
-
-		previewBitmap = new wxBitmap(*previewImage);
-		previewImageButton = new mafGUIPicButton(dialog, previewBitmap, -1);
-
-		panelWidth = previewImage->GetWidth();
-
-		mainSizer->Add(previewImageButton, 0, wxALL | wxALIGN_CENTER, 0);
-
-		delete previewBitmap;
-	}
-
-	// Creating the static text area
-
-	wxBoxSizer *infoTextSizer = new wxBoxSizer(wxHORIZONTAL);
-
-	int borderSize = 10;
-
-	infoTextSizer->Add(AddText(dialog, description, (panelWidth / 2) - (borderSize * 2), wxALIGN_LEFT), 0, wxALL | wxALIGN_LEFT, borderSize);
-
-	mainSizer->Add(infoTextSizer, 0, wxTOP | wxLEFT, 0);
-
-	if (showLicenseBtn)
-	{
-		wxString copyright = "Distributed under";
-
-		wxBoxSizer *licenseTextSizer = new wxBoxSizer(wxHORIZONTAL);
-
-		licenseTextSizer->Add(AddText(dialog, copyright, 85, wxALIGN_LEFT), 0, wxALL | wxALIGN_CENTER, 0);
-
-		mafGUIButton *licenseButton = new mafGUIButton(dialog, SHOW_LICENSE_SITE, "license", wxPoint(-1, -1), wxSize(40, 20));
-		licenseButton->SetBackgroundStyle(wxBG_STYLE_COLOUR);
-		licenseButton->SetForegroundColour(wxColour(0, 0, 255));
-		licenseTextSizer->Add(licenseButton, 0, wxEXPAND | wxLEFT, 0);
-		licenseButton->SetListener(this);
-
-		mainSizer->Add(licenseTextSizer, 0, wxTOP | wxLEFT | wxRIGHT | wxEXPAND, borderSize);
-	}
-
-	// Creating buttons
-	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
-
-	if (showWebSiteBtn)
-	{
-		mafGUIButton *siteButton = new mafGUIButton(dialog, SHOW_WEB_SITE, "Web Site", wxPoint(-1, -1));
-
-		siteButton->SetListener(this);
-
-		buttonSizer->Add(siteButton, 0, wxALIGN_LEFT, 0);
-	}
-
-	int buttonWidth = 75;
-
-	wxButton *okButton = new wxButton(dialog, wxID_OK, "Ok");
-
-	wxString spacing = " ";
-	mainSizer->Add(AddText(dialog, spacing, panelWidth - (buttonWidth * 2) - borderSize, wxALIGN_RIGHT), 0, wxALL | wxALIGN_LEFT, 0);
-	buttonSizer->Add(AddText(dialog, spacing, panelWidth - (buttonWidth * 2) - borderSize, wxALIGN_RIGHT), 0, wxALL | wxALIGN_LEFT, 0);
-
-	buttonSizer->Add(okButton, 0, wxALIGN_RIGHT, 0);
-	mainSizer->Add(buttonSizer, 0, wxALL, 5);
-
-	dialog->Add(mainSizer, 0, wxALL);
-	dialog->Fit();
-
-	// Show dialog
-	wxSize s = mafGetFrame()->GetSize();
-	wxPoint p = mafGetFrame()->GetPosition();
-	int posX = p.x + s.GetWidth() * .5 - dialog->GetSize().GetWidth() * .5;
-	int posY = p.y + s.GetHeight() * .5 - dialog->GetSize().GetHeight() * .5;
-	dialog->SetPosition(wxPoint(posX, posY));
-	dialog->ShowModal();
-}
-//----------------------------------------------------------------------------
-wxStaticText* mafLogicWithManagers::AddText(mafGUIDialog * dialog, wxString &text, int Width, int align)
-{
-	// Creating the static text area
-	wxStaticText* guiLabel = new wxStaticText(dialog, -1, text, wxPoint(-1, -1), wxSize(Width, -1), align | wxST_NO_AUTORESIZE);
-	wxFont fixedFont = guiLabel->GetFont();
-
-	// Setting font to fixed size to avoid wx non-sense 
-	fixedFont.SetFamily(wxFONTFAMILY_DECORATIVE);
-	guiLabel->SetFont(fixedFont);
-
-	return guiLabel;
 }

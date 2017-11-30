@@ -465,13 +465,7 @@ bool mafViewVTK::Pick(mafMatrix &m)
   }
   return false;
 }
-//----------------------------------------------------------------------------
-void mafViewVTK::Print(wxDC *dc, wxRect margins)
-{
-  wxBitmap image;
-  GetImage(image/*, 2*/);
-  PrintBitmap(dc, margins, &image);
-}
+
 //----------------------------------------------------------------------------
 void mafViewVTK::GetImage(wxBitmap &bmp, int magnification)
 {

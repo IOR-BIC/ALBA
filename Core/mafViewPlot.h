@@ -105,9 +105,6 @@ public:
 
   virtual mafSceneGraph *GetSceneGraph()	  {return m_Sg;}; 
 
-  /** Return a pointer to the image of the plot.*/
-  void GetImage(wxBitmap &bmp, int magnification = 1);
-
 	virtual void SetBackgroundColor(wxColor color);
 
 	typedef std::map<mafString, mafVisualPipeInfo> mafPipeMap;
@@ -119,9 +116,6 @@ public:
 
   /** Set the mouse device to use inside the view */
   void SetMouse(mafDeviceButtonsPadMouse *mouse);
-
-  /** Print this view.*/
-  virtual void Print(wxDC *dc, wxRect margins);
 
 protected:
   mafSceneGraph *m_Sg;
