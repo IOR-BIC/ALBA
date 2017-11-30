@@ -85,7 +85,7 @@ void mafOpCutTest::TestOpDo()
 
   CPPUNIT_ASSERT(groupParent->GetNumberOfChildren() == 0);
 	CPPUNIT_ASSERT(logic->GetCall(0).vme == groupChild);
-	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_REMOVE);
+	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::FKL_VME_REMOVE);
 
 	CPPUNIT_ASSERT(observer->GetEvent(0)->GetSender()==m_OpCut);
 	CPPUNIT_ASSERT(observer->GetEvent(0)->GetVme()==groupParent); 
@@ -159,7 +159,7 @@ void mafOpCutTest::TestOpDoVMETimeVarying()
   m_OpCut->OpDo();
 
 	CPPUNIT_ASSERT(logic->GetCall(0).vme == surfaceTimeVarying);
-	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::VME_REMOVE);
+	CPPUNIT_ASSERT(logic->GetCall(0).testFunction == mafFakeLogicForTest::FKL_VME_REMOVE);
 
   CPPUNIT_ASSERT(observer->GetEvent(0)->GetSender()==m_OpCut);
   CPPUNIT_ASSERT(observer->GetEvent(0)->GetVme()==storage.GetRoot());
