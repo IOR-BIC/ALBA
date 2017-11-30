@@ -38,7 +38,7 @@ class mafVME;
 class mafVMELandmark;
 class mafVMELandmarkCloud;
 class mafInteractionManager;
-class mafPrintSupport;
+class mafPrintManager;
 class mafDeviceButtonsPadMouse;
 class mafGUISettingsDialog;
 class mafGUIAboutDialog;
@@ -382,7 +382,7 @@ protected:
 	mafVMELandmark				 *m_SelectedLandmark;
 
 	mafGUIMaterialChooser  *m_MaterialChooser;
-	mafPrintSupport     *m_PrintSupport;
+	mafPrintManager     *m_PrintSupport;
 
 	mafDeviceButtonsPadMouse            *m_Mouse;
 

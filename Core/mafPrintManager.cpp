@@ -34,7 +34,7 @@
 // However, you'll also need to edit src/msw/makefile.nt.
 #define wxTEST_POSTSCRIPT_IN_MSW 0
 
-#include "mafPrintSupport.h"
+#include "mafPrintManager.h"
 
 #include <ctype.h>
 #include "wx/metafile.h"
@@ -197,7 +197,7 @@ bool mafPrintout::PrintBitmap(wxBitmap *bmp)
 //=============================== mafPrintout ===============================
 
 //----------------------------------------------------------------------------
-mafPrintSupport::mafPrintSupport()
+mafPrintManager::mafPrintManager()
 {
   m_PrintData = new wxPrintData();
   m_PageSetupData = new wxPageSetupData();
@@ -211,13 +211,13 @@ mafPrintSupport::mafPrintSupport()
   m_PageSetupData->SetMinMarginBottomRight(wxPoint(5,5));
 }
 //----------------------------------------------------------------------------
-mafPrintSupport::~mafPrintSupport()
+mafPrintManager::~mafPrintManager()
 {
   cppDEL(m_PrintData);
   cppDEL(m_PageSetupData);
 }
 //----------------------------------------------------------------------------
-void mafPrintSupport::OnPrintPreview(mafView *v)
+void mafPrintManager::OnPrintPreview(mafView *v)
 {
   if (!v)return;
 
@@ -247,7 +247,7 @@ void mafPrintSupport::OnPrintPreview(mafView *v)
   frame->Show(TRUE);
 }
 //----------------------------------------------------------------------------
-void mafPrintSupport::OnPrint(mafView *v)
+void mafPrintManager::OnPrint(mafView *v)
 {
   if (!v)return;
   
@@ -273,7 +273,7 @@ void mafPrintSupport::OnPrint(mafView *v)
 }
 
 //----------------------------------------------------------------------------
-void mafPrintSupport::OnPrint(mafVMEImage *img)
+void mafPrintManager::OnPrint(mafVMEImage *img)
 {
 	if (!img)return;
 
@@ -299,7 +299,7 @@ void mafPrintSupport::OnPrint(mafVMEImage *img)
 }
 
 //----------------------------------------------------------------------------
-void mafPrintSupport::OnPrintSetup()
+void mafPrintManager::OnPrintSetup()
 {
   wxPrintDialogData printDialogData(*m_PrintData);
   wxPrintDialog printerDialog(mafGetFrame(), & printDialogData);
@@ -310,7 +310,7 @@ void mafPrintSupport::OnPrintSetup()
   (*m_PrintData) = printerDialog.GetPrintDialogData().GetPrintData();
 }
 //----------------------------------------------------------------------------
-void mafPrintSupport::OnPageSetup()
+void mafPrintManager::OnPageSetup()
 {
   (*m_PageSetupData) = *m_PrintData;
 

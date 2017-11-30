@@ -35,7 +35,7 @@
 #include "mafOpManager.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
-#include "mafPrintSupport.h"
+#include "mafPrintManager.h"
 
 #ifdef MAF_USE_VTK
   #include "mafViewVTK.h"
@@ -153,7 +153,7 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 
 	m_MaterialChooser = NULL;
 
-	m_PrintSupport = new mafPrintSupport();
+	m_PrintSupport = new mafPrintManager();
 
 	m_SettingsDialog = new mafGUISettingsDialog();
 	m_AboutDialog = new mafGUIAboutDialog();
