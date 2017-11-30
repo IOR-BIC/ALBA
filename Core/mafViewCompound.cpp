@@ -522,19 +522,6 @@ mafVME *mafViewCompound::GetPickedVme()
   return NULL;
 }
 //----------------------------------------------------------------------------
-void mafViewCompound::Print(wxDC *dc, wxRect margins)
-//----------------------------------------------------------------------------
-{
-  if (m_NumOfPluggedChildren == 0)
-  {
-    return;
-  }
-
-  wxBitmap image;
-  GetImage(image/*, 2*/);
-  PrintBitmap(dc, margins, &image);
-}
-//----------------------------------------------------------------------------
 void mafViewCompound::GetImage(wxBitmap &bmp, int magnification)
 //----------------------------------------------------------------------------
 {
@@ -542,7 +529,7 @@ void mafViewCompound::GetImage(wxBitmap &bmp, int magnification)
   bmp = wxBitmap(magnification*vsz.GetWidth(),magnification*vsz.GetHeight(),24);
   wxMemoryDC compoundDC;
   compoundDC.SelectObject(bmp);
-  compoundDC.SetBackground(*wxWHITE_BRUSH);
+  compoundDC.SetBackground(*wxGREY_BRUSH);
   compoundDC.Clear();
   // this implement the Fixed SubViews Print
 

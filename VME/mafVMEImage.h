@@ -61,6 +61,8 @@ public:
     /** Return the suggested pipe-typename for the visualization of this vme */
     virtual mafString GetVisualPipe() {return mafString("mafPipeImage3D");};
 
+		wxBitmap GetImageAsBitmap();
+
     /** return icon */
     static char** GetIcon();
 protected:

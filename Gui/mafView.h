@@ -132,13 +132,7 @@ public:
   virtual void		  SetFrame(wxFrame* f) {m_Frame = f;};
 
   virtual void			OnSize(wxSizeEvent &size_event)	{};
-
-  /** Print this view.*/
-  virtual void Print(wxDC *dc, wxRect margins) {};
-  
-  /** Print the bitmap filling the paper size considering margins.*/
-  virtual void PrintBitmap(wxDC *dc, wxRect margins, wxBitmap *bmp);
-
+	    
   /** Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */
   virtual void SetWindowSize(int w, int h) {};
 

@@ -214,18 +214,6 @@ void mafViewPlot::OnEvent(mafEventBase *maf_event)
   }*/
   Superclass::OnEvent(maf_event);
 }
-//----------------------------------------------------------------------------
-void mafViewPlot::Print(wxDC *dc, wxRect margins)
-{
-  wxBitmap image;
-  GetImage(image/*, 2*/);
-  PrintBitmap(dc, margins, &image);
-}
-//----------------------------------------------------------------------------
-void mafViewPlot::GetImage(wxBitmap &bmp, int magnification)
-{
-//  bmp = *m_Rwi->m_RwiBase->GetImage(magnification);
-}
 
 //----------------------------------------------------------------------------
 void mafViewPlot::SetBackgroundColor(wxColor color)

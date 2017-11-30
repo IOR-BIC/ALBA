@@ -128,17 +128,18 @@ void mafGUIImageViewer::OnEvent(mafEventBase *maf_event)
 
 		}
 		break;
+		case ID_IMAGE_PRINT:
+		{
+			wxString imageName = m_ImagesList[m_ImageSelection];
+			mafVMEImage *image = (mafVMEImage*)m_ImagesGroup->FindInTreeByName(imageName);
+			GetLogicManager()->PrintImage(image);
+		}
+		break;
 		case ID_IMAGE_SAVE:
 		{
 			SaveImageAs();
 		}
 		break;
-// 		case ID_IMAGE_DELETE:
-// 		{
-// 			//DeleteImage();
-// 		}
-		break;
-
 		case ID_IMAGE:
 			break;
 
@@ -239,6 +240,14 @@ void mafGUIImageViewer::ShowImageDialog(mafVMEGroup *group, int selection)
 			saveBtn->SetListener(this);
 			buttonBoxSizer->Add(saveBtn, 0, wxALIGN_CENTER, 0);
 		}
+
+		mafGUILab *printLab = new mafGUILab(m_Dialog, -1, "  ");
+		buttonBoxSizer->Add(printLab, 0, wxALIGN_CENTER, 0);
+
+		mafGUIButton *printBtn = new mafGUIButton(m_Dialog, ID_IMAGE_PRINT, "Print...", wxPoint(-1, -1));
+		printBtn->SetListener(this);
+		buttonBoxSizer->Add(printBtn, 0, wxALIGN_CENTER, 0);
+
 
 		if (m_EnableImageCheckButton)
 		{

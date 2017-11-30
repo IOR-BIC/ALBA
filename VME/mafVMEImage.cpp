@@ -34,6 +34,10 @@
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
 #include "mmaMaterial.h"
+#include "wx\bitmap.h"
+#include "wx\image.h"
+#include "vtkPointData.h"
+#include "vtkDataArray.h"
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEImage)
 //-------------------------------------------------------------------------
@@ -87,6 +91,53 @@ int mafVMEImage::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   }
   
   return MAF_ERROR;
+}
+
+//----------------------------------------------------------------------------
+wxBitmap mafVMEImage::GetImageAsBitmap()
+{
+
+	vtkImageData *imgData= vtkImageData::SafeDownCast(GetOutput()->GetVTKData());
+	if (imgData)
+	{
+
+		int *dims = imgData->GetDimensions();
+
+		if (dims[0] > 0 && dims[1] > 0 && dims[2] == 1)
+		{
+
+			wxImage img(dims[0], dims[1]);
+			unsigned char *data = img.GetData();
+
+			vtkDataArray* scalars = imgData->GetPointData()->GetScalars();
+			int numberOfComponents = scalars->GetNumberOfComponents();
+
+			for (int i = 0; i < dims[0] * dims[1]; i++)
+			{
+				if (numberOfComponents == 3)
+				{
+					double *values;
+					values = scalars->GetTuple3(i);
+					data[i * 3] = values[0];
+					data[i * 3 + 1] = values[1];
+					data[i * 3 + 2] = values[2];
+				}
+				else
+				{
+					double value;
+					value = scalars->GetTuple1(i);
+					data[i * 3] = data[i * 3 + 1] = data[i * 3 + 2] = value;
+				}
+			}
+
+			wxBitmap bpm(img);
+
+			return bpm;
+		}
+	}
+
+	//return empty bitmap
+	return wxBitmap();
 }
 
 //-------------------------------------------------------------------------

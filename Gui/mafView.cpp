@@ -195,45 +195,6 @@ bool mafView::FindPickedVme(vtkAssemblyPath *ap)
   return false;
 }
 
-//----------------------------------------------------------------------------
-void mafView::PrintBitmap(wxDC *dc, wxRect margins, wxBitmap *bmp)
-{
-  assert(dc);
-  assert(bmp);
-  float iw = bmp->GetWidth();
-  float ih = bmp->GetHeight();
-  float maxX = iw;
-  float maxY = ih;
-
-  // Add the margin to the graphic size
-  maxX += (margins.GetLeft() + margins.GetRight());
-  maxY += (margins.GetTop() + margins.GetBottom());
-
-  // Get the size of the DC in pixels
-  int w,h;
-  dc->GetSize(&w, &h);
-
-  // Calculate a suitable scaling factor
-  float scaleX=(float)(w/maxX);
-  float scaleY=(float)(h/maxY);
-
-  // Use x or y scaling factor, whichever fits on the DC
-  float actualScale = wxMin(scaleX,scaleY);
-
-  // Calculate the position on the DC for centering the graphic
-  float posX = (float)((w - (iw*actualScale))/2.0);
-  float posY = (float)((h - (ih*actualScale))/2.0);
-
-  // Set the scale and origin
-  dc->SetUserScale(actualScale, actualScale);
-  dc->SetDeviceOrigin( (long)posX, (long)posY );
-
-  wxMemoryDC mdc; 
-  mdc.SelectObject(*bmp);
-  dc->SetBackground(*wxWHITE_BRUSH);
-  dc->Clear();
-  dc->Blit(0, 0, maxX, maxY, &mdc, 0, 0);
-}
 //-------------------------------------------------------------------------
 void mafView::Print(std::ostream& os, const int tabs)// const
 {

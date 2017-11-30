@@ -45,55 +45,76 @@
 #define __mafPrintout_H__
 
 #include "mafSceneGraph.h"
+#include "mafVMEImage.h"
 #include <wx/print.h>
 #include <wx/html/htmprint.h>
 
 //----------------------------------------------------------------------------
 // mafPrintout :
-//----------------------------------------------------------------------------
 class mafPrintout: public wxPrintout
 {
 public:
-  mafPrintout( mafView *v, wxRect margins);
-  virtual ~mafPrintout();
+	mafPrintout(mafView *view, wxRect margins);
+	mafPrintout(mafVMEImage *img, wxRect margins);
+	virtual ~mafPrintout();
   bool OnPrintPage(int page);
   bool HasPage(int page);
   //bool OnBeginDocument(int startPage, int endPage);
   void GetPageInfo(int *minPage, int *maxPage, int *selPageFrom, int *selPageTo);
 
 protected:
-  mafView *m_View;
+
+
+	bool Print(mafView *view);
+
+	bool Print(mafVMEImage *image);
+
+	/** Print the bitmap filling the paper size considering margins.*/
+	bool PrintBitmap(wxBitmap *bmp);
+
+	mafView *m_View;
+	mafVMEImage *m_Image;
   wxRect m_Margins;
 };
 #endif
 
 //----------------------------------------------------------------------------
-mafPrintout::mafPrintout(mafView *v, wxRect margins)
-: wxPrintout("Printout")
-//----------------------------------------------------------------------------
+mafPrintout::mafPrintout(mafView *view, wxRect margins) : wxPrintout("Printout")
 {
-  m_View = v;
-  m_Margins = margins;
+	m_View = view;
+	m_Image = NULL;
+	m_Margins = margins;
+}
+//----------------------------------------------------------------------------
+mafPrintout::mafPrintout(mafVMEImage *img, wxRect margins) : wxPrintout("Printout")
+{
+	m_View = NULL;
+	m_Image = img;
+	m_Margins = margins;
 }
 //----------------------------------------------------------------------------
 mafPrintout::~mafPrintout()
-//----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 bool mafPrintout::OnPrintPage(int page)
 //----------------------------------------------------------------------------
 {
-  if (m_View == NULL)  {wxMessageBox("nothing to print", "Warning");    return false;}
-  wxDC *dc = GetDC();
-  if (!dc)    {wxMessageBox("failed to retrieve Printing DC", "Warning"); return false;}
-  m_View->Print(dc, m_Margins);  
+  if (m_View == NULL && m_Image == NULL)  
+	{
+		wxMessageBox("nothing to print", "Warning");    
+		return false;
+	}
+  
+	if (m_View)
+		Print(m_View);
+	else
+		Print(m_Image);
 
   return TRUE;
 }
 //----------------------------------------------------------------------------
 void mafPrintout::GetPageInfo(int *minPage, int *maxPage, int *selPageFrom, int *selPageTo)
-//----------------------------------------------------------------------------
 {
   *minPage = 1;
   *maxPage = 1;
@@ -102,16 +123,81 @@ void mafPrintout::GetPageInfo(int *minPage, int *maxPage, int *selPageFrom, int 
 }
 //----------------------------------------------------------------------------
 bool mafPrintout::HasPage(int pageNum)
-//----------------------------------------------------------------------------
 {
   return (pageNum == 1);
 }
-//=============================== mafPrintout ===============================
 
+//----------------------------------------------------------------------------
+bool  mafPrintout::Print(mafView *view)
+{
+	wxBitmap image;
+
+	wxColor color = view->GetBackgroundColor();
+	view->SetBackgroundColor(wxColor(255, 255, 255));
+	view->GetImage(image/*, 2*/);
+	view->SetBackgroundColor(color);
+
+
+	return PrintBitmap(&image);
+}
+
+//----------------------------------------------------------------------------
+bool mafPrintout::Print(mafVMEImage *vmeImage)
+{
+	wxBitmap image = vmeImage->GetImageAsBitmap();
+	return PrintBitmap(&image);
+}
+
+//----------------------------------------------------------------------------
+bool mafPrintout::PrintBitmap(wxBitmap *bmp)
+{
+	wxDC *dc = GetDC();
+	if (!dc)
+	{
+		wxMessageBox("failed to retrieve Printing DC", "Warning");
+		return false;
+	}
+
+	assert(bmp);
+	float iw = bmp->GetWidth();
+	float ih = bmp->GetHeight();
+	float maxX = iw;
+	float maxY = ih;
+
+	// Add the margin to the graphic size
+	maxX += (m_Margins.GetLeft() + m_Margins.GetRight());
+	maxY += (m_Margins.GetTop() + m_Margins.GetBottom());
+
+	// Get the size of the DC in pixels
+	int w, h;
+	dc->GetSize(&w, &h);
+
+	// Calculate a suitable scaling factor
+	float scaleX = (float)(w / maxX);
+	float scaleY = (float)(h / maxY);
+
+	// Use x or y scaling factor, whichever fits on the DC
+	float actualScale = wxMin(scaleX, scaleY);
+
+	// Calculate the position on the DC for centering the graphic
+	float posX = (float)((w - (iw*actualScale)) / 2.0);
+	float posY = (float)((h - (ih*actualScale)) / 2.0);
+
+	// Set the scale and origin
+	dc->SetUserScale(actualScale, actualScale);
+	dc->SetDeviceOrigin((long)posX, (long)posY);
+
+	wxMemoryDC mdc;
+	mdc.SelectObject(*bmp);
+	dc->SetBackground(*wxWHITE_BRUSH);
+	dc->Clear();
+	return dc->Blit(0, 0, maxX, maxY, &mdc, 0, 0);
+}
+
+//=============================== mafPrintout ===============================
 
 //----------------------------------------------------------------------------
 mafPrintSupport::mafPrintSupport()
-//----------------------------------------------------------------------------
 {
   m_PrintData = new wxPrintData();
   m_PageSetupData = new wxPageSetupData();
@@ -126,14 +212,12 @@ mafPrintSupport::mafPrintSupport()
 }
 //----------------------------------------------------------------------------
 mafPrintSupport::~mafPrintSupport()
-//----------------------------------------------------------------------------
 {
   cppDEL(m_PrintData);
   cppDEL(m_PageSetupData);
 }
 //----------------------------------------------------------------------------
 void mafPrintSupport::OnPrintPreview(mafView *v)
-//----------------------------------------------------------------------------
 {
   if (!v)return;
 
@@ -164,7 +248,6 @@ void mafPrintSupport::OnPrintPreview(mafView *v)
 }
 //----------------------------------------------------------------------------
 void mafPrintSupport::OnPrint(mafView *v)
-//----------------------------------------------------------------------------
 {
   if (!v)return;
   
@@ -188,9 +271,35 @@ void mafPrintSupport::OnPrint(mafView *v)
     (*m_PrintData) = printer.GetPrintDialogData().GetPrintData();
   }
 }
+
+//----------------------------------------------------------------------------
+void mafPrintSupport::OnPrint(mafVMEImage *img)
+{
+	if (!img)return;
+
+	wxPrintDialogData printDialogData(*m_PrintData);
+	wxPrinter printer(&printDialogData);
+	wxPoint tl = m_PageSetupData->GetMarginTopLeft();
+	wxPoint br = m_PageSetupData->GetMarginBottomRight();
+	wxRect margins(tl, br);
+
+
+	mafPrintout printout(img, margins);
+	if (!printer.Print(mafGetFrame(), &printout, TRUE))
+	{
+		if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
+			wxMessageBox("There was a problem printing.\nPerhaps your current printer is not set correctly?", "Printing", wxOK);
+		else
+			wxMessageBox("You canceled printing", "Printing", wxOK);
+	}
+	else
+	{
+		(*m_PrintData) = printer.GetPrintDialogData().GetPrintData();
+	}
+}
+
 //----------------------------------------------------------------------------
 void mafPrintSupport::OnPrintSetup()
-//----------------------------------------------------------------------------
 {
   wxPrintDialogData printDialogData(*m_PrintData);
   wxPrintDialog printerDialog(mafGetFrame(), & printDialogData);
@@ -202,7 +311,6 @@ void mafPrintSupport::OnPrintSetup()
 }
 //----------------------------------------------------------------------------
 void mafPrintSupport::OnPageSetup()
-//----------------------------------------------------------------------------
 {
   (*m_PageSetupData) = *m_PrintData;
 
@@ -212,3 +320,4 @@ void mafPrintSupport::OnPageSetup()
   (*m_PrintData) = pageSetupDialog.GetPageSetupData().GetPrintData();
   (*m_PageSetupData) = pageSetupDialog.GetPageSetupData();
 }
+

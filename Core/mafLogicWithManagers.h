@@ -210,6 +210,9 @@ public:
 	// VME
 	virtual const char* GetMsfFileExtension() { return m_Extension.GetCStr(); }
 		
+
+	virtual void PrintImage(mafVMEImage *img);
+
 protected:
 	//---------------------------------------------------------
 	// Description:

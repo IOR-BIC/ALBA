@@ -2115,6 +2115,12 @@ void mafLogicWithManagers::ShowWebSite(wxString url)
 	wxExecute(command);
 }
 
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::PrintImage(mafVMEImage *img)
+{
+	m_PrintSupport->OnPrint(img);
+}
+
 // Log
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::CreateNullLog()
