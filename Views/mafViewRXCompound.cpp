@@ -290,7 +290,7 @@ void mafViewRXCompound::EnableWidgets(bool enable)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewRXCompound::LayoutSubViewCustom(int width, int height)
+void mafViewRXCompound::LayoutSubView(int width, int height)
 //----------------------------------------------------------------------------
 {
   // this implement the Fixed SubViews Layout

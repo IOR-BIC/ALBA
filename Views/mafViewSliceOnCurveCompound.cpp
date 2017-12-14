@@ -386,7 +386,7 @@ mafGUI* mafViewSliceOnCurveCompound::CreateGui()
 
 //------------------------------------------------------------------------
 // Redefine this method to define a custom layout.
-/*virtual*/ void mafViewSliceOnCurveCompound::LayoutSubViewCustom(int width, int height)
+/*virtual*/ void mafViewSliceOnCurveCompound::LayoutSubView(int width, int height)
 //------------------------------------------------------------------------
 {
   int border = 2;
