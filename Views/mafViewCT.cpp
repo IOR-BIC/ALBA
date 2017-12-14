@@ -191,24 +191,6 @@ void mafViewCT::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
 }
-/*//----------------------------------------------------------------------------
-void mafViewCT::LayoutSubViewCustom(int width, int height)
-//----------------------------------------------------------------------------
-{
-	// this implement the Fixed SubViews Layout
-	int border = 2;
-	int x_pos, c, i;
-
-	int step_width  = (width-border); // /3
-	i = 0;
-	for (c = 0; c < m_NumOfChildView; c++)
-	{
-		x_pos = c*(step_width + border);
-		m_ChildViewList[i]->GetWindow()->SetSize(x_pos, 0, step_width, height);
-		i++;
-	}
-	((mafViewCompound*)m_ChildViewList[i-1])->OnLayout();
-}*/
 //----------------------------------------------------------------------------
 void mafViewCT::VmeSelect(mafVME *vme, bool select)
 //----------------------------------------------------------------------------

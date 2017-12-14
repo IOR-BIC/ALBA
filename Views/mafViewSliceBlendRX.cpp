@@ -272,7 +272,7 @@ void mafViewSliceBlendRX::EnableWidgets(bool enable)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewSliceBlendRX::LayoutSubViewCustom(int width, int height)
+void mafViewSliceBlendRX::LayoutSubView(int width, int height)
 //----------------------------------------------------------------------------
 {
   // this implement the Fixed SubViews Layout

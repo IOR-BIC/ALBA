@@ -112,7 +112,7 @@ protected:
 
   /** 
   Redefine to arrange views to generate RXCT visualization.*/
-  virtual void LayoutSubViewCustom(int width, int height);
+  virtual void LayoutSubView(int width, int height);
 
   /** Create the gizmo to move the slices. */
   void GizmoCreate();
