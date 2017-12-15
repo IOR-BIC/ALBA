@@ -82,14 +82,6 @@ public:
   /** Return the RenderWindowInteractor used by mouse device */
   mafRWIBase *GetRWI();
 
-  /** Used to set the flag for updating the m_SelectedRWI during mouse motion and not only on ViewSelected event.*/
-  void SetUpdateRWIDuringMotion(bool update_on_motion) {m_UpdateRwiInOnMoveFlag = update_on_motion;};
-  void UpdateRWIDuringMotionOff() {m_UpdateRwiInOnMoveFlag = false;};
-  void UpdateRWIDuringMotionOn() {m_UpdateRwiInOnMoveFlag = true;};
-
-  /** Return the status of the m_UpdateRwiInOnMoveFlag flag.*/
-  bool IsUpdateRWIDuringMotion() {return m_UpdateRwiInOnMoveFlag;};
-
   void DisplayToNormalizedDisplay(double display[2]);
   void NormalizedDisplayToDisplay(double normalized[2]);
 
@@ -101,7 +93,6 @@ protected:
   virtual void SendButtonEvent(mafEventInteraction *event);
 
   double      m_LastPosition[2];///< stores the last position
-  bool        m_UpdateRwiInOnMoveFlag; ///< If this flag true the m_SelectedRWI is updated in when the mouse move inside the view (used in compounded views)
   bool        m_ButtonPressed;
 
   mafView    *m_SelectedView;   ///< store the selected view to perform the mouse picking
