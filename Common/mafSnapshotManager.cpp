@@ -200,8 +200,16 @@ int mafSnapshotManager::GetNSnapshots()
 }
 
 //----------------------------------------------------------------------------
+bool mafSnapshotManager::HasSnapshots(mafVME *root)
+{
+	if (m_SnapshotsGroup == NULL || m_SnapshotsGroup != (mafVMEGroup *)root->FindInTreeByName(m_GroupName))
+		m_SnapshotsGroup = (mafVMEGroup *)root->FindInTreeByName(m_GroupName);
+
+	return m_SnapshotsGroup && m_SnapshotsGroup->GetNumberOfChildren() > 0;
+}
+
+//----------------------------------------------------------------------------
 void mafSnapshotManager::SetMouse(mafDeviceButtonsPadMouse *mouse)
 {
 	m_ImageViewer->SetMouse(mouse);
 }
-
