@@ -83,9 +83,6 @@ protected:
 	same panel GUI, each CreateGUI() function should first call the superclass' one.*/
 	virtual mafGUI  *CreateGui();
 
-	/**
-	Redefine to arrange views to generate RXCT visualization.*/
-	//virtual void LayoutSubViewCustom(int width, int height);
 
 	/**
 	Enable/disable view widgets.*/

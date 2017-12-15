@@ -49,7 +49,6 @@ void mmiInfoImageTest::TestOnEvent()
   CPPUNIT_ASSERT(info);
 
   mafDeviceButtonsPadMouse *dummyDevice = mafDeviceButtonsPadMouse::New();
-  dummyDevice->UpdateRWIDuringMotionOn();
 
   mafVMESurface *dummy = mafVMESurface::New();
   info->OnVmeSelected(dummy);

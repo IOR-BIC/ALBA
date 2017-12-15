@@ -84,10 +84,8 @@ protected:
 
   /** 
   Redefine to arrange views to generate RXCT visualization.*/
-  virtual void LayoutSubViewCustom(int width, int height);
-
-  
-
+  virtual void LayoutSubView(int width, int height);
+	
   /** 
   Enable/disable view widgets.*/
   void EnableWidgets(bool enable = true);

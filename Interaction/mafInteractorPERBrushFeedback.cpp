@@ -140,36 +140,29 @@ void mafInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
 
     // Draw the brush feedback in the right position
     mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(device);
-    if (mouse)
-    {
-      if (!mouse->IsUpdateRWIDuringMotion())
-      {
-        mouse->UpdateRWIDuringMotionOn();
-      }
-      else
-      {
+		if (mouse)
+		{
 
-        int parallelView = m_Renderer->GetActiveCamera()->GetParallelProjection() != 0;
-        if (parallelView)
-        {
-          //TODO: draw a box
+			int parallelView = m_Renderer->GetActiveCamera()->GetParallelProjection() != 0;
+			if (parallelView)
+			{
+				//TODO: draw a box
 
-          double pos_2d[2];
-          mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
-          e->Get2DPosition(pos_2d);
+				double pos_2d[2];
+				mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
+				e->Get2DPosition(pos_2d);
 
-          mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 
-          if(m_EnableDrawing)
-          {
-            if(m_CurrentShape == CIRCLE_BRUSH_SHAPE)
-              DrawEllipse(pos_2d[0], pos_2d[1]);
-            else
-              DrawBox(pos_2d[0], pos_2d[1]);
-          }
-        }
-      }
-    }
+				if (m_EnableDrawing)
+				{
+					if (m_CurrentShape == CIRCLE_BRUSH_SHAPE)
+						DrawEllipse(pos_2d[0], pos_2d[1]);
+					else
+						DrawBox(pos_2d[0], pos_2d[1]);
+				}
+			}
+		}
 
     // find if this device is one of those currently interacting
     if (IsInteracting(device))

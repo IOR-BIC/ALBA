@@ -57,9 +57,7 @@ mafDeviceButtonsPadMouse::mafDeviceButtonsPadMouse()
   m_ButtonState[0]  = m_ButtonState[1] = m_ButtonState[2] = 0;
   m_SelectedView    = NULL;
   m_SelectedRWI     = NULL;
-  
-  m_UpdateRwiInOnMoveFlag = false;
-  m_ButtonPressed         = false;
+  m_ButtonPressed   = false;
 }
 
 //------------------------------------------------------------------------------
@@ -81,10 +79,7 @@ void mafDeviceButtonsPadMouse::OnEvent(mafEventBase *event)
   {
     double pos[2];
     e->Get2DPosition(pos);
-    if (m_UpdateRwiInOnMoveFlag)
-    {
-      m_SelectedRWI = (mafRWIBase *)event->GetSender();
-    }
+    m_SelectedRWI = (mafRWIBase *)event->GetSender();
     SetLastPosition(pos[0],pos[1],e->GetModifiers());
   }
 	else if (id == GetWheelId())

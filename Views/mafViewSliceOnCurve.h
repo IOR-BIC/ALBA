@@ -221,7 +221,7 @@ protected:
 	/*virtual*/ mafGUI  *CreateGui();
 
   /** Redefine this method to define a custom layout.*/
-  /*virtual*/ void LayoutSubViewCustom(int width, int height);
+  /*virtual*/ void LayoutSubView(int width, int height);
 
 	/** plugs a new volume visualization pipe */
 	virtual void PlugVolumePipe();
