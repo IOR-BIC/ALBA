@@ -187,7 +187,9 @@ mafLogicWithManagers::~mafLogicWithManagers()
 	cppDEL(m_AboutDialog);
 	cppDEL(m_ApplicationSettings);
 	cppDEL(m_TimeBarSettings);
-	cppDEL(m_SnapshotManager);
+
+	if (m_SnapshotManager)
+		cppDEL(m_SnapshotManager);
 }
 
 
@@ -938,19 +940,18 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 		case MENU_FILE_SNAPSHOT:
 		{
 			if (m_SnapshotManager && m_VMEManager && m_ViewManager)
-			{
 				m_SnapshotManager->CreateSnapshot(m_VMEManager->GetRoot(), m_ViewManager->GetSelectedView());
-			}
+
 			if (m_WizardManager && m_WizardRunning)
 				OnEvent(&mafEvent(this, WIZARD_RUN_CONTINUE, true));
 		}
 		break;
 		case MENU_FILE_MANAGE_SNAPSHOT:
+		{
 			if (m_SnapshotManager && m_VMEManager)
-			{
 				m_SnapshotManager->ShowSnapshotPreview();
-			}
-			break;
+		}
+		break;
 		case MENU_WIZARD:
 			//The event from the application menu
 			if (m_WizardManager)
@@ -1125,6 +1126,9 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnFileNew()
 {
+	if (m_OpManager)
+		m_OpManager->VmeSelected(NULL);
+
 	if(m_VMEManager)
   {
     if(m_VMEManager->AskConfirmAndSave())
@@ -1132,6 +1136,7 @@ void mafLogicWithManagers::OnFileNew()
 		  m_VMEManager->MSFNew();
 	  }
   }
+	
 	m_Win->SetTitle(m_AppTitle);
 }
 //----------------------------------------------------------------------------
@@ -2026,9 +2031,7 @@ void mafLogicWithManagers::EnableMenuAndToolbar()
 
 	if (m_UseSnapshotManager)
 	{
-		m_SnapshotManager->FindOrCreateSnapshotGroup(m_VMEManager->GetRoot());
-
-		EnableItem(MENU_FILE_MANAGE_SNAPSHOT, m_SnapshotManager->GetNSnapshots());
+		EnableItem(MENU_FILE_MANAGE_SNAPSHOT, m_SnapshotManager->HasSnapshots(m_VMEManager->GetRoot()));
 		EnableItem(MENU_FILE_SNAPSHOT, selectedView);
 	}
 }
@@ -2333,18 +2336,19 @@ void mafLogicWithManagers::ImportExternalFile(mafString &filename)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::CreateStorage(mafEvent *e)
 {
-	mafVMEStorage *storage;
-	storage = (mafVMEStorage *)e->GetMafObject();
-	if (storage)
+	mafVMEStorage *oldStorage, *newStorage;
+	oldStorage = (mafVMEStorage *)e->GetMafObject();
+	if (oldStorage)
 	{
-		m_VMEManager->NotifyRemove(storage->GetRoot());
-		storage->Delete();
+		m_VMEManager->NotifyRemove(oldStorage->GetRoot());
+		
 	}
-	storage = mafVMEStorage::New();
-	storage->GetRoot()->SetName("Root");
-	storage->SetListener(m_VMEManager);
-	storage->GetRoot()->Initialize();
-	e->SetMafObject(storage);
+	newStorage = mafVMEStorage::New();
+	newStorage->SetListener(m_VMEManager);
+	newStorage->GetRoot()->Initialize();
+	e->SetMafObject(newStorage);
+
+	mafDEL(oldStorage);
 }
 
 //----------------------------------------------------------------------------

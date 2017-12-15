@@ -394,17 +394,17 @@ void mafOpManager::EnableOp(bool CanEnable)
 	  {
 		  if(m_MenuBar->FindItem(OP_UNDO))		m_MenuBar->Enable(OP_UNDO,    !m_Context.Undo_IsEmpty());
 		  if(m_MenuBar->FindItem(OP_REDO))		m_MenuBar->Enable(OP_REDO,    !m_Context.Redo_IsEmpty());
-		  if(m_MenuBar->FindItem(OP_DELETE))	m_MenuBar->Enable(OP_DELETE,  m_OpCut->Accept(m_Selected));
-		  if(m_MenuBar->FindItem(OP_CUT))			m_MenuBar->Enable(OP_CUT,     m_OpCut->Accept(m_Selected));
-		  if(m_MenuBar->FindItem(OP_COPY))		m_MenuBar->Enable(OP_COPY,    m_OpCopy->Accept(m_Selected));
-		  if(m_MenuBar->FindItem(OP_PASTE))		m_MenuBar->Enable(OP_PASTE,   m_OpPaste->Accept(m_Selected)); 
-			if(m_MenuBar->FindItem(OP_REPARENT))		m_MenuBar->Enable(OP_REPARENT, m_OpReparent->Accept(m_Selected));
+		  if(m_MenuBar->FindItem(OP_DELETE))	m_MenuBar->Enable(OP_DELETE, m_Selected && m_OpCut->Accept(m_Selected));
+		  if(m_MenuBar->FindItem(OP_CUT))			m_MenuBar->Enable(OP_CUT, m_Selected &&  m_OpCut->Accept(m_Selected));
+		  if(m_MenuBar->FindItem(OP_COPY))		m_MenuBar->Enable(OP_COPY, m_Selected &&  m_OpCopy->Accept(m_Selected));
+		  if(m_MenuBar->FindItem(OP_PASTE))		m_MenuBar->Enable(OP_PASTE, m_Selected &&   m_OpPaste->Accept(m_Selected));
+			if(m_MenuBar->FindItem(OP_REPARENT))		m_MenuBar->Enable(OP_REPARENT, m_Selected &&  m_OpReparent->Accept(m_Selected));
 
 		  for(int i=0; i<m_NumOp; i++)
 		  {
         mafOp *o = m_OpList[i]; 
         if(m_MenuBar->FindItem(o->m_Id))
-          m_MenuBar->Enable(o->m_Id,o->Accept(m_Selected)); 
+          m_MenuBar->Enable(o->m_Id, m_Selected && o->Accept(m_Selected));
       }
 	  }
   }
