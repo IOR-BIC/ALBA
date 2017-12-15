@@ -109,45 +109,40 @@ void mmiInfoImage::OnEvent(mafEventBase *event)
     {
       // Send to status bar text containing the pixel picked position and its density value
       mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(device);
-      if (mouse)
-      {
-        if (!mouse->IsUpdateRWIDuringMotion())
-        {
-          mouse->UpdateRWIDuringMotionOn();
-        }
-        else
-        {
-          double pos[2];
-          mouse->GetLastPosition(pos);
-          mafView *v = mouse->GetView();
-          if (v)
-          {
-            mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
-            if (vc)
-            {
-              v = vc->GetSubView();
-            }
-            mafString info;
-            info = "";
-            if(v->Pick((int)pos[0], (int)pos[1]))
-            {
-              mafVME *picked_vme = v->GetPickedVme();
-              vtkDataSet *data = picked_vme->GetOutput()->GetVTKData();
-              if (data->IsA("vtkImageData") || data->IsA("vtkRectilinearGrid") && m_Renderer->GetActiveCamera()->GetParallelProjection())
-              {
-                double picked_pos[3], iso_value;
-                v->GetPickedPosition(picked_pos);
-                int pid = data->FindPoint(picked_pos);
-                vtkDataArray *scalars = data->GetPointData()->GetScalars();
-                scalars->GetTuple(pid,&iso_value);
-                info << "x = " << (int)picked_pos[0] << " y = " << (int)picked_pos[1] << " z = " << (int)picked_pos[2] << " d = " << iso_value;
-                mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&info));
-              }
-            }
-            mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&info));
-          }
-        }
-      }
+			if (mouse)
+			{
+
+				double pos[2];
+				mouse->GetLastPosition(pos);
+				mafView *v = mouse->GetView();
+				if (v)
+				{
+					mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
+					if (vc)
+					{
+						v = vc->GetSubView();
+					}
+					mafString info;
+					info = "";
+					if (v->Pick((int)pos[0], (int)pos[1]))
+					{
+						mafVME *picked_vme = v->GetPickedVme();
+						vtkDataSet *data = picked_vme->GetOutput()->GetVTKData();
+						if (data->IsA("vtkImageData") || data->IsA("vtkRectilinearGrid") && m_Renderer->GetActiveCamera()->GetParallelProjection())
+						{
+							double picked_pos[3], iso_value;
+							v->GetPickedPosition(picked_pos);
+							int pid = data->FindPoint(picked_pos);
+							vtkDataArray *scalars = data->GetPointData()->GetScalars();
+							scalars->GetTuple(pid, &iso_value);
+							info << "x = " << (int)picked_pos[0] << " y = " << (int)picked_pos[1] << " z = " << (int)picked_pos[2] << " d = " << iso_value;
+							mafEventMacro(mafEvent(this, PROGRESSBAR_SET_TEXT, &info));
+						}
+					}
+					mafEventMacro(mafEvent(this, PROGRESSBAR_SET_TEXT, &info));
+				}
+
+			}
     }
   }
   // Make the superclass to manage StartInteractionEvent
