@@ -46,7 +46,9 @@ class mafGUIMDIFrame;
 class MAF_EXPORT mafAbsSideBar
 {
 public:
-	
+	mafAbsSideBar() {};
+	virtual ~mafAbsSideBar() {};
+
   // Description:
 	// Add a new vme into the tree.
 	virtual void VmeAdd(mafVME *vme) = 0;
