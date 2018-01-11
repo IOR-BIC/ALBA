@@ -2341,7 +2341,7 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
 	if (oldStorage)
 	{
 		m_VMEManager->NotifyRemove(oldStorage->GetRoot());
-		
+		m_OpManager->VmeSelected(NULL);		
 	}
 	newStorage = mafVMEStorage::New();
 	newStorage->SetListener(m_VMEManager);
