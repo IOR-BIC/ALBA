@@ -31,6 +31,7 @@ class mafGUI;
 class mafGUIHolder;
 class mafGUIBitmaps;
 class mafGUIDialog;
+class wxImage;
 
 /** 
   class name: mafGUIAboutDialog.
@@ -63,13 +64,13 @@ public:
 protected:
 	wxStaticText* AddText(mafGUIDialog * dialog, wxString &text, int Width, int align);
 
-	mafGUIDialog *m_AboutDialog;
+	mafGUIDialog	*m_AboutDialog;
+	wxImage				*m_PreviewImage;
 
 	wxString			m_Title;
 	wxString			m_Revision;
 	wxString			m_ImagePath;
 	wxString			m_WebSiteURL;
 	wxString			m_LicenseURL;
-
 };
 #endif // _mafGUIAboutDialog_H_

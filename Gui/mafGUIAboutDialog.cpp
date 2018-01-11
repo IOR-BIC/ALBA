@@ -63,11 +63,14 @@ mafGUIAboutDialog::mafGUIAboutDialog(wxString dialog_title)
 	m_LicenseURL = "";
 
 	m_AboutDialog = NULL;
+	m_PreviewImage = NULL;
 }
 
 //----------------------------------------------------------------------------
 mafGUIAboutDialog::~mafGUIAboutDialog()
-{ }
+{ 
+	delete m_PreviewImage;
+}
 
 //----------------------------------------------------------------------------
 bool mafGUIAboutDialog::ShowModal()
@@ -151,17 +154,16 @@ void mafGUIAboutDialog::CreateDialog()
 
 		if (wxFileExists(m_ImagePath))
 		{
-			wxImage *previewImage;
 			wxBitmap *previewBitmap;
 
 			// Load and show the image
-			previewImage = new wxImage();
-			previewImage->LoadFile(m_ImagePath.c_str(), wxBITMAP_TYPE_ANY);
+			m_PreviewImage = new wxImage();
+			m_PreviewImage->LoadFile(m_ImagePath.c_str(), wxBITMAP_TYPE_ANY);
 
-			previewBitmap = new wxBitmap(*previewImage);
+			previewBitmap = new wxBitmap(*m_PreviewImage);
 			previewImageButton = new mafGUIPicButton(m_AboutDialog, previewBitmap, -1);
 
-			panelWidth = previewImage->GetWidth();
+			panelWidth = m_PreviewImage->GetWidth();
 
 			mainSizer->Add(previewImageButton, 0, wxALL | wxALIGN_CENTER, 0);
 
