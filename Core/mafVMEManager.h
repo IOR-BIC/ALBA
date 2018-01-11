@@ -55,7 +55,7 @@ public:
  
   /** Destroy all nodes (also the root), for each destroyed node the manager send 
   an event VME_REMOVING, then search the root and select it. */ 
-  void MSFNew(bool notify_root_creation = true);
+  void MSFNew();
   
 	/** Open the msf filename. */
 	int MSFOpen(mafString filename);
