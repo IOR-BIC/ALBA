@@ -186,7 +186,7 @@ void mafVMEManager::RemoveTempDirectory()
   }
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::MSFNew(bool notify_root_creation)
+void mafVMEManager::MSFNew()
 //----------------------------------------------------------------------------
 {
   if (m_Storage)
@@ -206,18 +206,15 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
   mafEventMacro(e);
   m_Storage = (mafVMEStorage *)e.GetMafObject();
   m_LoadingFlag = false;
-
-  if(notify_root_creation)
-	{
-		//Add the application stamps
-		mafTagItem tag_appstamp;
-		tag_appstamp.SetName("APP_STAMP");
-		tag_appstamp.SetValue(this->m_AppStamp.at(0).GetCStr());
-		m_Storage->GetRoot()->GetTagArray()->SetTag(tag_appstamp); // set the appstamp tag for the root
-    AddCreationDate(m_Storage->GetRoot());
-		mafEventMacro(mafEvent(this,VME_ADDED,m_Storage->GetRoot())); // raise notification events
-		mafEventMacro(mafEvent(this,VME_SELECTED,m_Storage->GetRoot()));
-	}
+	  
+	//Add the application stamps
+	mafTagItem tag_appstamp;
+	tag_appstamp.SetName("APP_STAMP");
+	tag_appstamp.SetValue(this->m_AppStamp.at(0).GetCStr());
+	m_Storage->GetRoot()->GetTagArray()->SetTag(tag_appstamp); // set the appstamp tag for the root
+  AddCreationDate(m_Storage->GetRoot());
+	mafEventMacro(mafEvent(this,VME_ADDED,m_Storage->GetRoot())); // raise notification events
+	mafEventMacro(mafEvent(this,VME_SELECTED,m_Storage->GetRoot()));
 
   m_MSFFile = ""; //next MSFSave will ask for a filename
   m_ZipFile = ""; 
@@ -281,7 +278,7 @@ int mafVMEManager::MSFOpen(mafString filename)
 		return MAF_ERROR; 
 	}
 
-  MSFNew(false); // insert and select the root - reset m_MSFFile - delete the old storage and create a new one
+  MSFNew(); // insert and select the root - reset m_MSFFile - delete the old storage and create a new one
   
   mafString unixname = filename;
   

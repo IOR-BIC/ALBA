@@ -59,6 +59,8 @@ public:
 	/* Get Number of snapshots*/
 	int GetNSnapshots();
 
+	bool HasSnapshots(mafVME *root);
+
 	/* Return the snapshots group*/
 	mafVMEGroup* GetSnapshotGroup() { return m_SnapshotsGroup; };
 	

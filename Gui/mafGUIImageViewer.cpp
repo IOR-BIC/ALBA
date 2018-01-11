@@ -130,9 +130,12 @@ void mafGUIImageViewer::OnEvent(mafEventBase *maf_event)
 		break;
 		case ID_IMAGE_PRINT:
 		{
-			wxString imageName = m_ImagesList[m_ImageSelection];
-			mafVMEImage *image = (mafVMEImage*)m_ImagesGroup->FindInTreeByName(imageName);
-			GetLogicManager()->PrintImage(image);
+			if (m_ImageSelection >= 0 && m_ImageSelection < m_ImagesList.size())
+			{
+				wxString imageName = m_ImagesList[m_ImageSelection];
+				mafVMEImage *image = (mafVMEImage*)m_ImagesGroup->FindInTreeByName(imageName);
+				GetLogicManager()->PrintImage(image);
+			}
 		}
 		break;
 		case ID_IMAGE_SAVE:
