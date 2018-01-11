@@ -172,7 +172,7 @@ void mafVMEManagerTest::MSFOpenTest()
   m_Manager->SetApplicationStamp(stamps_v);
   m_Manager->SetTestMode(true);
 
-  m_Manager->MSFNew(true);
+  m_Manager->MSFNew();
 
   mafString filename = MAF_DATA_ROOT;
   filename << "\\Test_VMEManager\\test.msf";
@@ -214,7 +214,7 @@ void mafVMEManagerTest::ZIPOpenTest()
   m_Manager->SetApplicationStamp(mafString("mafVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
-  m_Manager->MSFNew(true);
+  m_Manager->MSFNew();
 
   mafString filename = MAF_DATA_ROOT;
   filename << "\\Test_VMEManager\\test.zmsf";
@@ -284,7 +284,7 @@ void mafVMEManagerTest::MSFSaveTest()
 
   // create a new msf
 
-  m_Manager->MSFNew(false); // do not notify root creation
+  m_Manager->MSFNew(); // do not notify root creation
 
   // add some vme
   m_Manager->VmeAdd(sphere);
@@ -370,7 +370,7 @@ void mafVMEManagerTest::VmeAddRemoveTest()
   m_Manager->SetApplicationStamp(mafString("mafVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
-  m_Manager->MSFNew(false);
+  m_Manager->MSFNew();
 
   // test vme add
   mafVMESurfaceParametric *sphere;
@@ -399,7 +399,7 @@ void mafVMEManagerTest::TimeGetBoundsTest()
   m_Manager->SetApplicationStamp(mafString("mafVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
-  m_Manager->MSFNew(false);
+  m_Manager->MSFNew();
   
   double min,max;
 
@@ -505,7 +505,7 @@ void mafVMEManagerTest::GetRootTest()
 
   CPPUNIT_ASSERT(NULL == m_Manager->GetRoot());
 
-  m_Manager->MSFNew(true);
+  m_Manager->MSFNew();
 
   CPPUNIT_ASSERT(m_Manager->GetStorage()->GetRoot() == m_Manager->GetRoot());
 
@@ -522,7 +522,7 @@ void mafVMEManagerTest::GetStorageTest()
 
   CPPUNIT_ASSERT(NULL == m_Manager->GetStorage());
 
-  m_Manager->MSFNew(true);
+  m_Manager->MSFNew();
 
   // On event check on storage
   CPPUNIT_ASSERT(NULL != m_Manager->GetStorage());
@@ -550,7 +550,7 @@ void mafVMEManagerTest::MakeBakFileOnSaveTest()
 
   // create a new msf
 
-  m_Manager->MSFNew(false); // do not notify root creation
+ m_Manager->MSFNew(); // do not notify root creation
 
   // add some vme
   m_Manager->VmeAdd(sphere);
@@ -613,7 +613,7 @@ void mafVMEManagerTest::SetSingleBinaryFileTest()
   m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(mafString("mafVMEManagerTest"));
   m_Manager->SetTestMode(true);
-  m_Manager->MSFNew(true);
+  m_Manager->MSFNew();
 
   m_Manager->SetSingleBinaryFile(true);
   
