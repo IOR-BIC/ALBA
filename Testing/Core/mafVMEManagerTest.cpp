@@ -151,7 +151,7 @@ void mafVMEManagerTest::MSFNewTest()
   m_Manager->SetApplicationStamp(mafString("mafVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
-  m_Manager->MSFNew(true);
+  m_Manager->MSFNew();
   
   // OnEvent check events raised by the manager
 
