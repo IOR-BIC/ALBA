@@ -62,7 +62,7 @@ mafSnapshotManager::mafSnapshotManager()
 mafSnapshotManager::~mafSnapshotManager()
 {
 	cppDEL(m_ImageViewer);
-	mafDEL(m_SnapshotsGroup);
+	//mafDEL(m_SnapshotsGroup);
 }
 
 //----------------------------------------------------------------------------
