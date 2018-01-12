@@ -100,12 +100,20 @@ mafGUIImageViewer::~mafGUIImageViewer()
 	if (m_Rwi)
 	{
 		m_Rwi->m_RenFront->RemoveActor(m_Actor);
+		cppDEL(m_Rwi);
 	}
+
+	delete m_NextBtn;
+	delete m_PrevBtn;
+	delete m_CheckBtn;
 
 	vtkDEL(m_Texture);
 	vtkDEL(m_PlaneSource);
 	vtkDEL(m_DataMapper);
 	vtkDEL(m_Actor);
+
+	m_Dialog->DestroyChildren();
+	cppDEL(m_Dialog);
 }
 
 //----------------------------------------------------------------------------
