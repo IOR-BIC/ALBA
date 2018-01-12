@@ -112,7 +112,6 @@ mafGUIImageViewer::~mafGUIImageViewer()
 	vtkDEL(m_DataMapper);
 	vtkDEL(m_Actor);
 
-	m_Dialog->DestroyChildren();
 	cppDEL(m_Dialog);
 }
 
