@@ -2034,7 +2034,7 @@ void mafLogicWithManagers::EnableMenuAndToolbar()
 	EnableItem(MENU_FILE_PRINT_SETUP, selectedView != NULL);
 	EnableItem(MENU_FILE_PRINT_PAGE_SETUP, selectedView != NULL);
 
-	if (m_UseSnapshotManager)
+	if (m_UseSnapshotManager && m_SnapshotManager)
 	{
 		EnableItem(MENU_FILE_MANAGE_SNAPSHOT, m_SnapshotManager->HasSnapshots(m_VMEManager->GetRoot()));
 		EnableItem(MENU_FILE_SNAPSHOT, selectedView);
