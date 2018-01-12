@@ -2002,7 +2002,10 @@ void mafLogicWithManagers::EnableMenuAndToolbar()
 {
 	bool enable = !(m_RunningOperation || m_WizardRunning);
 
-	mafView * selectedView = m_ViewManager->GetSelectedView();
+	if (!m_VMEManager)
+		return;
+
+	mafView * selectedView = m_ViewManager ?m_ViewManager->GetSelectedView() : NULL; 
 
 	EnableItem(MENU_FILE_NEW, enable);
 	EnableItem(MENU_FILE_OPEN, enable);
