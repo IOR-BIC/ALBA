@@ -180,6 +180,8 @@ mafLogicWithManagers::~mafLogicWithManagers()
   if(m_WizardManager)
     delete m_WizardManager;
 
+
+
   // Managers are destruct in the OnClose
   cppDEL(m_User);
   cppDEL(m_PrintSupport);
@@ -187,9 +189,6 @@ mafLogicWithManagers::~mafLogicWithManagers()
 	cppDEL(m_AboutDialog);
 	cppDEL(m_ApplicationSettings);
 	cppDEL(m_TimeBarSettings);
-
-	if (m_SnapshotManager)
-		cppDEL(m_SnapshotManager);
 }
 
 
@@ -449,6 +448,9 @@ void mafLogicWithManagers::OnQuit()
 	mafGUIViewFrame::OnQuit();
 	mafGUIMDIChild::OnQuit();
 	m_Win->OnQuit();
+
+	if (m_SnapshotManager)
+		cppDEL(m_SnapshotManager);
 
 	cppDEL(m_VMEManager);
 	cppDEL(m_MaterialChooser);
