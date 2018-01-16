@@ -75,6 +75,7 @@ mafPipeVolumeSliceBlend::mafPipeVolumeSliceBlend()
       m_Texture[j][i]						= NULL;
       m_SliceMapper[j][i]				= NULL;
       m_SliceActor[j][i]				= NULL;
+			m_SlicePlane[j][i] = NULL;
     }
     m_SliceParametersInitialized  = false;
     m_ShowVolumeBox               = false;
@@ -290,17 +291,20 @@ mafPipeVolumeSliceBlend::~mafPipeVolumeSliceBlend()
   //Delete all pipe stuff
   for(int j=0;j<2;j++)
   {
-    for(int i = 0; i<3; i++)
-    {
-      if(m_SliceActor[j][i])
-        m_AssemblyUsed->RemovePart(m_SliceActor[j][i]);
-      vtkDEL(m_Slicer[j][i]);
-      vtkDEL(m_Image[j][i]);
-      vtkDEL(m_Texture[j][i]);
-      vtkDEL(m_SliceMapper[j][i]);
-      vtkDEL(m_SliceActor[j][i]);
-    }
+		for (int i = 0; i < 3; i++)
+		{
+			if (m_SliceActor[j][i])
+				m_AssemblyUsed->RemovePart(m_SliceActor[j][i]);
+			vtkDEL(m_Slicer[j][i]);
+			vtkDEL(m_Image[j][i]);
+			vtkDEL(m_Texture[j][i]);
+			vtkDEL(m_SliceMapper[j][i]);
+			vtkDEL(m_SliceActor[j][i]);
+			if (m_SlicePlane[j][i])
+				vtkDEL(m_SlicePlane[j][i]);
+		}
   }
+
   vtkDEL(m_VolumeBox);
   vtkDEL(m_VolumeBoxMapper);
   vtkDEL(m_VolumeBoxActor);
