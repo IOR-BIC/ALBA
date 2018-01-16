@@ -350,7 +350,6 @@ void mafPipeVolumeOrthoSlice::CreateSlice(int direction)
 	zmax = bounds[5];
 
 	//---- pipeline for the Plane --------------------------
-	m_SlicePlane[direction] = vtkPlaneSource::New();
 	switch (direction)
 	{
 		case SLICE_X:
