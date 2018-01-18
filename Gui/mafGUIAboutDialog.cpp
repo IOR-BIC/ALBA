@@ -61,6 +61,7 @@ mafGUIAboutDialog::mafGUIAboutDialog(wxString dialog_title)
 	m_ImagePath = "";	
 	m_WebSiteURL = "";
 	m_LicenseURL = "";
+	m_ExtraMessage = "";
 
 	m_AboutDialog = NULL;
 	m_PreviewImage = NULL;
@@ -116,6 +117,12 @@ void mafGUIAboutDialog::SetLicenseURL(wxString licenseURL)
 }
 
 //----------------------------------------------------------------------------
+void mafGUIAboutDialog::SetExtraMessage(wxString message)
+{
+	m_ExtraMessage = "\n" + message;
+}
+
+//----------------------------------------------------------------------------
 void mafGUIAboutDialog::CreateDialog()
 {
 	wxString title = "About ";
@@ -137,7 +144,9 @@ void mafGUIAboutDialog::CreateDialog()
 	wxString description = m_Title;
 	description += "\n";
 	description += _("Application ") + m_Revision;
-	description += "\n© 2017 LTM";
+	description += "\n© 2018 LTM";
+
+	description += m_ExtraMessage;
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -176,7 +185,7 @@ void mafGUIAboutDialog::CreateDialog()
 
 		int borderSize = 10;
 
-		infoTextSizer->Add(AddText(m_AboutDialog, description, (panelWidth / 2) - (borderSize * 2), wxALIGN_LEFT), 0, wxALL | wxALIGN_LEFT, borderSize);
+		infoTextSizer->Add(AddText(m_AboutDialog, description, panelWidth - (borderSize * 2), wxALIGN_LEFT), 0, wxALL | wxALIGN_LEFT, borderSize);
 
 		mainSizer->Add(infoTextSizer, 0, wxTOP | wxLEFT, 0);
 

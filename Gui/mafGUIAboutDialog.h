@@ -57,6 +57,7 @@ public:
 	void SetRevision(wxString revision) { m_Revision = revision; };
 	void SetWebSite(wxString webSite);
 	void SetLicenseURL(wxString licenseURL);
+	void SetExtraMessage(wxString message);
 
 	/** Show the Settings Dialog. */
 	bool ShowModal();
@@ -72,5 +73,6 @@ protected:
 	wxString			m_ImagePath;
 	wxString			m_WebSiteURL;
 	wxString			m_LicenseURL;
+	wxString			m_ExtraMessage;
 };
 #endif // _mafGUIAboutDialog_H_
