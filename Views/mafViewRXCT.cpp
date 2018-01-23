@@ -432,7 +432,7 @@ void mafViewRXCT::OnEventSortSlices()
         center[2] = b[5]-step*(currChildCTView+1);
         center[2] = center[2] > b[5] ? b[5] : center[2];
         center[2] = center[2] < b[4] ? b[4] : center[2];
-        m_GizmoSlice[currChildCTView]->CreateGizmoSliceInLocalPositionOnAxis(currChildCTView,mafGizmoSlice::GIZMO_SLICE_Z,center[2]);
+        m_GizmoSlice[currChildCTView]->UpdateGizmoSliceInLocalPositionOnAxis(currChildCTView,mafGizmoSlice::GIZMO_SLICE_Z,center[2]);
         m_Pos[currChildCTView]=center[2];
         m_Sort[currChildCTView]=currChildCTView;
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetSliceLocalOrigin(center);
@@ -460,7 +460,7 @@ void mafViewRXCT::OnEventSortSlices()
 				center[2] = b[5]-step*(currChildCTView+1);
 				center[2] = center[2] > b[5] ? b[5] : center[2];
 				center[2] = center[2] < b[4] ? b[4] : center[2];
-				m_GizmoSlice[currChildCTView]->CreateGizmoSliceInLocalPositionOnAxis(currChildCTView,mafGizmoSlice::GIZMO_SLICE_Z,center[2]);
+				m_GizmoSlice[currChildCTView]->UpdateGizmoSliceInLocalPositionOnAxis(currChildCTView,mafGizmoSlice::GIZMO_SLICE_Z,center[2]);
 				m_Pos[currChildCTView]=center[2];
 				m_Sort[currChildCTView]=currChildCTView;
 				((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetSliceLocalOrigin(center);
@@ -537,7 +537,7 @@ void mafViewRXCT::OnEventMouseMove( mafEvent *e )
       newSliceLocalOrigin[2] = oldSliceLocalOrigin[2] + delta[2];
       newSliceLocalOrigin[2] = newSliceLocalOrigin[2] > b[5] ? b[5] : newSliceLocalOrigin[2];
       newSliceLocalOrigin[2] = newSliceLocalOrigin[2] < b[4] ? b[4] : newSliceLocalOrigin[2];
-      m_GizmoSlice[currSubView]->CreateGizmoSliceInLocalPositionOnAxis(currSubView,mafGizmoSlice::GIZMO_SLICE_Z,newSliceLocalOrigin[2]);
+      m_GizmoSlice[currSubView]->UpdateGizmoSliceInLocalPositionOnAxis(currSubView,mafGizmoSlice::GIZMO_SLICE_Z,newSliceLocalOrigin[2]);
 
       m_Pos[currSubView]=newSliceLocalOrigin[2];
 
