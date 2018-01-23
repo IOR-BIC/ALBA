@@ -290,6 +290,112 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
     this->SetGizmoMovingModalityToBound();
   }
 }
+
+//----------------------------------------------------------------------------
+void mafGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int axis, double localPositionOnAxis, bool visibleCubeHandler)
+//----------------------------------------------------------------------------
+{
+	//register gizmo axis
+	m_Axis = axis;
+
+	// register id
+	m_Id = gizmoSliceId;
+
+	double localBounds[6];
+	if (vtkDataSet *VolumeVTKData = m_InputVME->GetOutput()->GetVTKData())
+	{
+		VolumeVTKData->Update();
+		VolumeVTKData->GetBounds(localBounds);
+		double wx = localBounds[1] - localBounds[0];
+		double wy = localBounds[3] - localBounds[2];
+		double wz = localBounds[5] - localBounds[4];
+
+		// position of the gizmo cube handle centre
+		double cubeHandleLocalPosition[3];
+		cubeHandleLocalPosition[0] = 0;
+		cubeHandleLocalPosition[1] = 0;
+		cubeHandleLocalPosition[2] = 0;
+
+		vtkMAFSmartPointer<vtkPlaneSource> ps;
+		ps->SetOrigin(cubeHandleLocalPosition);
+		
+		double borderCube = VolumeVTKData->GetLength() / 50;
+
+		if (visibleCubeHandler == false)
+		{
+			borderCube = 0;
+		}
+
+		double inversion = 1.;
+		if (false == m_InverseHandle)
+		{
+			cubeHandleLocalPosition[0] = localBounds[0];
+			cubeHandleLocalPosition[1] = localBounds[2];
+			cubeHandleLocalPosition[2] = localBounds[4];
+		}
+		else
+		{
+			cubeHandleLocalPosition[0] = localBounds[1];
+			cubeHandleLocalPosition[1] = localBounds[3];
+			cubeHandleLocalPosition[2] = localBounds[5];
+			inversion = -1.;
+		}
+		
+		double interval[3][2] = { { localBounds[0], localBounds[1] },{ localBounds[2], localBounds[3] },{ localBounds[4], localBounds[5] } };
+		
+		m_MouseBH->GetTranslationConstraint()->SetSnapArray(axis, m_SnapArray);
+		m_MouseBH->GetTranslationConstraint()->SetConstraintModality(axis, mafInteractorConstraint::BOUNDS);
+
+		switch (axis)
+		{
+		case GIZMO_SLICE_X:
+		{
+			cubeHandleLocalPosition[0] = localPositionOnAxis;
+			cubeHandleLocalPosition[1] -= inversion * borderCube / 2;
+			cubeHandleLocalPosition[2] -= inversion *borderCube / 2;
+			if (wy < 0.00001) wy = -10;
+			ps->SetPoint1(0, inversion * (wy + borderCube / 2), 0);
+			ps->SetPoint2(0, 0, inversion *(wz + borderCube / 2));
+			m_MouseBH->GetTranslationConstraint()->SetBounds(mafInteractorConstraint::X, interval[0]);
+		}
+		break;
+		case GIZMO_SLICE_Y:
+		{
+			cubeHandleLocalPosition[0] -= inversion *borderCube / 2;
+			cubeHandleLocalPosition[1] = localPositionOnAxis;
+			cubeHandleLocalPosition[2] -= inversion *borderCube / 2;
+			ps->SetPoint1(inversion *(wx + borderCube / 2), 0, 0);
+			ps->SetPoint2(0, 0, inversion *(wz + borderCube / 2));
+			m_MouseBH->GetTranslationConstraint()->SetBounds(mafInteractorConstraint::Y, interval[1]);
+		}
+		break;
+		case GIZMO_SLICE_Z:
+		default:
+		{
+			cubeHandleLocalPosition[0] -= inversion *borderCube / 2;
+			cubeHandleLocalPosition[1] -= inversion *borderCube / 2;
+			cubeHandleLocalPosition[2] = localPositionOnAxis;
+			ps->SetPoint1(inversion *(wx + borderCube / 2), 0, 0);
+			if (wy < 0.00001) wy = -10;
+			ps->SetPoint2(0, inversion *(wy + borderCube / 2), 0);
+			m_MouseBH->GetTranslationConstraint()->SetBounds(mafInteractorConstraint::Z, interval[2]);
+		}
+		break;
+		}
+
+		// position the gizmo 
+		mafSmartPointer<mafTransform> t;
+		t->Translate(cubeHandleLocalPosition, PRE_MULTIPLY);
+		m_VmeGizmo->SetMatrix(t->GetMatrix());
+
+		// m_GizmoHandleCenterMatrix holds the gizmo handle pose
+		mafTransform::SetPosition(*m_GizmoHandleCenterMatrix, cubeHandleLocalPosition);
+
+		// this matrix is keeped updated by the interactor with the gizmo handle position
+		m_MouseBH->SetResultMatrix(m_GizmoHandleCenterMatrix);
+	}
+}
+
 //----------------------------------------------------------------------------
 void mafGizmoSlice::SetColor(double col[3])
 //----------------------------------------------------------------------------
