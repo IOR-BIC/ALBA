@@ -287,8 +287,7 @@ void mafCryptTest::TestMafEncryptFromMemoryMafDecryptInMemory()
  mafEncryptFromMemory(stringToEncrypt.c_str(), encryptedString, passPhrase.c_str());
  mafDecryptInMemory(encryptedString.c_str(), decryptedString, passPhrase.c_str());
 
- // NOT WORKING: This is showcasing a known Crypto++ problem 
- // CPPUNIT_ASSERT_EQUAL(stringToEncrypt, decryptedString);
+ CPPUNIT_ASSERT_EQUAL(stringToEncrypt, decryptedString);
 }
 
 void mafCryptTest::TestMafDefaultEncryptFromMemoryMafDefaultDecryptInMemory()
@@ -300,6 +299,5 @@ void mafCryptTest::TestMafDefaultEncryptFromMemoryMafDefaultDecryptInMemory()
  mafDefaultEncryptFromMemory(stringToEncrypt.c_str(), encryptedString );
  mafDefaultDecryptInMemory(encryptedString.c_str(), decryptedString);
 
- // NOT WORKING: This is showcasing a known Crypto++ problem 
- // CPPUNIT_ASSERT_EQUAL(stringToEncrypt, decryptedString);
+ CPPUNIT_ASSERT_EQUAL(stringToEncrypt, decryptedString);
 }
