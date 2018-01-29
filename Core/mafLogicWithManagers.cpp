@@ -1769,6 +1769,7 @@ void mafLogicWithManagers::CreateMenu()
 #include "pic/menu/FILE_SAVE.xpm"
 #include "pic/menu/HELP_ABOUT.xpm"
 #include "pic/menu/HELP_HELP.xpm"
+#include "pic/menu/HELP_LICENCE.xpm"
 #include "pic/menu/WINDOW_CASCADE.xpm"
 #include "pic/menu/WINDOW_HORIZONTALLY.xpm"
 #include "pic/menu/WINDOW_PREV.xpm"
