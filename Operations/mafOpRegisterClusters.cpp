@@ -905,7 +905,8 @@ void mafOpRegisterClusters::OnEvent(mafEventBase *maf_event)
 void mafOpRegisterClusters::OnChooseLandmarkCloud()
 {
 	mafString s(_("Choose cloud"));
-	mafEvent e(this,VME_CHOOSE, &s, (long)&mafOpRegisterClusters::LMCloudAccept);
+	mafEvent e(this,VME_CHOOSE, &s);
+	e.SetPointer(&mafOpRegisterClusters::LMCloudAccept);
 	mafEventMacro(e);
 
 	mafVME *vme = e.GetVme();
@@ -921,7 +922,8 @@ void mafOpRegisterClusters::OnChooseLandmarkCloud()
 void mafOpRegisterClusters::OnChooseSurface()
 {
 	mafString s(_("Choose surface"));
-	mafEvent e(this,VME_CHOOSE, &s, (long)&mafOpRegisterClusters::SurfaceAccept);
+	mafEvent e(this,VME_CHOOSE, &s);
+	e.SetPointer(&mafOpRegisterClusters::SurfaceAccept);
 	mafEventMacro(e);
 
 	mafVME *vme = e.GetVme();

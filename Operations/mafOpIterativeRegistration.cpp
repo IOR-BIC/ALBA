@@ -274,7 +274,8 @@ void mafOpIterativeRegistration::OnEventThis(mafEventBase *maf_event)
     case ID_CHOOSE_TARGET:
     {
       mafString title = _("Choose target vme");
-      mafEvent e(this,VME_CHOOSE,&title,(long)&mafGUILandmark::VmeAccept);
+      mafEvent e(this,VME_CHOOSE,&title);
+			e.SetPointer(&mafGUILandmark::VmeAccept);
       mafEventMacro(e); 
       m_TargetVME = e.GetVme();
       if (m_TargetVME)

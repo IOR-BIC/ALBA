@@ -64,7 +64,7 @@ void mafWizardBlockVMESelection::ExcutionBegin()
   mafString title = m_Title.c_str();
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
-  e.SetArg((long)(&VMEAccept)); 
+  e.SetPointer(&VMEAccept); 
   // accept only Specified VME
   mafEventMacro(e);
   selVME=e.GetVme();

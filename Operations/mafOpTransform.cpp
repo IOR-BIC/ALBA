@@ -592,7 +592,7 @@ void mafOpTransform::ChooseRelativeRefSys()
 	mafString s;
 	s << "Choose VME Reference System";
 	mafEvent e(this, VME_CHOOSE, &s);
-	e.SetArg((long)&AcceptRefSys);
+	e.SetPointer(&AcceptRefSys);
 	mafEventMacro(e);
 
 	SetRefSysVME(e.GetVme());

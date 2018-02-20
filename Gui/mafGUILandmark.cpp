@@ -203,7 +203,8 @@ void mafGUILandmark::OnEvent(mafEventBase *maf_event)
     case ID_REF_SYS:
       {
         mafString title = _("Choose VME ref sys");
-        mafEvent e(this,VME_CHOOSE,&title,(long)&mafGUILandmark::VmeAccept);
+        mafEvent e(this,VME_CHOOSE,&title);  //TODO64
+				e.SetPointer(&mafGUILandmark::VmeAccept);
         mafEventMacro(e); 
         SetRefSysVME(e.GetVme());
       }

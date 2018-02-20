@@ -848,7 +848,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
   
   mafEvent ev(this, VME_CHOOSE);   
   ev.SetString(&title);
-  ev.SetArg((long)&mafOpMeshDeformation::SelectCurveVMECallback);
+  ev.SetPointer(&mafOpMeshDeformation::SelectCurveVMECallback);
 
   mafEventMacro(ev);
   return ev.GetVme();

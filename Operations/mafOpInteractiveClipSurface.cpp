@@ -289,7 +289,8 @@ void mafOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
           return;
         }
         mafString s(_("Choose Constrain"));
-        mafEvent e(this,VME_CHOOSE, &s, (long)&mafOpInteractiveClipSurface::ConstrainAccept);
+        mafEvent e(this,VME_CHOOSE, &s);
+				e.SetPointer(&mafOpInteractiveClipSurface::ConstrainAccept);
         mafEventMacro(e);
         mafVME *vme = e.GetVme();
         if(vme != NULL)
@@ -303,7 +304,7 @@ void mafOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 		case ID_CHOOSE_SURFACE:
 			{
 				mafString title = "Choose m_Clipper Surface";
-				e->SetArg((long)&mafOpInteractiveClipSurface::SurfaceAccept);
+				e->SetPointer(&mafOpInteractiveClipSurface::SurfaceAccept);
 				e->SetString(&title);
 				e->SetId(VME_CHOOSE);
 				mafEventMacro(*e);

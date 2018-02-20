@@ -143,7 +143,8 @@ void mafOpInteractionDebugger::OnEvent(mafEventBase *maf_event)
       case ID_CHOOSE:
       {
         mafString s(_("Choose Constrain"));
-        mafEvent e(this,VME_CHOOSE, &s, (long)&mafOpInteractionDebugger::ConstrainAccept);
+        mafEvent e(this,VME_CHOOSE, &s);
+				e.SetPointer(&mafOpInteractionDebugger::ConstrainAccept);
         mafEventMacro(e);
         mafVME *vme = e.GetVme();
         if(vme != NULL)
