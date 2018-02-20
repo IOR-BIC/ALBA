@@ -114,7 +114,7 @@ bool mafGUIDialogFindVme::FindNextNode(const char *text)
   {
     return false;
   }
-  return m_Tree->SelectNode((long)nodeFound);
+  return m_Tree->SelectNode((long long)nodeFound);
 }
 //----------------------------------------------------------------------------
 void mafGUIDialogFindVme::SetTree(mafGUICheckTree *tree)

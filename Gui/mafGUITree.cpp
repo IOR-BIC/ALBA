@@ -90,7 +90,7 @@ void mafGUITree::Reset()
   m_NodeRoot  = 0;
 }
 //----------------------------------------------------------------------------
-bool mafGUITree::AddNode (long node_id, long parent_id , wxString label, int icon)
+bool mafGUITree::AddNode (long long node_id, long long parent_id , wxString label, int icon)
 //----------------------------------------------------------------------------
 {
 	/*
@@ -135,7 +135,7 @@ bool mafGUITree::AddNode (long node_id, long parent_id , wxString label, int ico
   return true;
 }
 //----------------------------------------------------------------------------
-bool mafGUITree::DeleteNode(long node_id)
+bool mafGUITree::DeleteNode(long long node_id)
 //----------------------------------------------------------------------------
 {
 	/*
@@ -172,7 +172,7 @@ bool mafGUITree::DeleteNode(long node_id)
   return true;
 }
 //----------------------------------------------------------------------------
-void mafGUITree::DeleteNode2(long node_id)
+void mafGUITree::DeleteNode2(long long node_id)
 //----------------------------------------------------------------------------
 {
 	/*
@@ -197,7 +197,7 @@ void mafGUITree::DeleteNode2(long node_id)
     delete el;
 }
 //----------------------------------------------------------------------------
-bool mafGUITree::SetNodeLabel(long node_id, wxString label)
+bool mafGUITree::SetNodeLabel(long long node_id, wxString label)
 //----------------------------------------------------------------------------
 {
   if(!NodeExist(node_id))
@@ -213,7 +213,7 @@ bool mafGUITree::SetNodeLabel(long node_id, wxString label)
   return true;
 }
 //----------------------------------------------------------------------------
-wxString mafGUITree::GetNodeLabel(long node_id)
+wxString mafGUITree::GetNodeLabel(long long node_id)
 //----------------------------------------------------------------------------
 {
   if(!NodeExist(node_id))
@@ -222,7 +222,7 @@ wxString mafGUITree::GetNodeLabel(long node_id)
   return m_NodeTree->GetItemText(item);
 }
 //----------------------------------------------------------------------------
-bool mafGUITree::NodeHasChildren(long node_id)
+bool mafGUITree::NodeHasChildren(long long node_id)
 //----------------------------------------------------------------------------
 {
   if(!NodeExist(node_id))
@@ -231,7 +231,7 @@ bool mafGUITree::NodeHasChildren(long node_id)
   return m_NodeTree->ItemHasChildren(item);
 }
 //----------------------------------------------------------------------------
-long mafGUITree::GetNodeParent(long node_id)
+long long mafGUITree::GetNodeParent(long long node_id)
 //----------------------------------------------------------------------------
 {
   if( !NodeExist(node_id))
@@ -249,7 +249,7 @@ long mafGUITree::GetNodeParent(long node_id)
 }
 
 //----------------------------------------------------------------------------
-bool mafGUITree::SetNodeParent(long node_id, long parent_id )
+bool mafGUITree::SetNodeParent(long long node_id, long long parent_id )
 //----------------------------------------------------------------------------
 {
 	/*
@@ -295,7 +295,7 @@ bool mafGUITree::SetNodeParent(long node_id, long parent_id )
   return true;
 }
 //----------------------------------------------------------------------------
-void mafGUITree::SetNodeParent2(long node_id, long parent_id )
+void mafGUITree::SetNodeParent2(long long node_id, long long parent_id )
 //----------------------------------------------------------------------------
 {
 	/*
@@ -335,7 +335,7 @@ void mafGUITree::SetNodeParent2(long node_id, long parent_id )
   m_NodeTree->Delete(item);
 }
 //----------------------------------------------------------------------------
-bool mafGUITree::SetNodeIcon(long node_id, int icon)
+bool mafGUITree::SetNodeIcon(long long node_id, int icon)
 //----------------------------------------------------------------------------
 {
   icon = CheckIconId(icon);
@@ -346,14 +346,14 @@ bool mafGUITree::SetNodeIcon(long node_id, int icon)
   return true;
 }
 //----------------------------------------------------------------------------
-bool mafGUITree::NodeExist(long node_id)
+bool mafGUITree::NodeExist(long long node_id)
 //----------------------------------------------------------------------------
 {
   mafGUITreeTableElement* el = (mafGUITreeTableElement*)m_NodeTable->Get(node_id);
   return el != NULL;
 }
 //----------------------------------------------------------------------------
-wxTreeItemId mafGUITree::ItemFromNode(long node_id)
+wxTreeItemId mafGUITree::ItemFromNode(long long node_id)
 //----------------------------------------------------------------------------
 {
   mafGUITreeTableElement* el = (mafGUITreeTableElement*)m_NodeTable->Get(node_id);
@@ -361,7 +361,7 @@ wxTreeItemId mafGUITree::ItemFromNode(long node_id)
   return el->GetItem();
 }
 //----------------------------------------------------------------------------
-long mafGUITree::NodeFromItem(wxTreeItemId& item)
+long long mafGUITree::NodeFromItem(wxTreeItemId& item)
 //----------------------------------------------------------------------------
 {
   mafGUITreeItemData *nd = (mafGUITreeItemData*)m_NodeTree->GetItemData(item);
@@ -377,11 +377,11 @@ void mafGUITree::OnSelectionChanged(wxTreeEvent& event)
 
   i = event.GetItem();
   if(i.IsOk())
-    mafEventMacro(mafEvent(this, VME_SELECT, NodeFromItem(i)));
+    mafEventMacro(mafEvent(this, VME_SELECT, (mafVME *)NodeFromItem(i)));
   event.Skip();
 }
 //----------------------------------------------------------------------------
-bool mafGUITree::SelectNode(long node_id)
+bool mafGUITree::SelectNode(long long node_id)
 //----------------------------------------------------------------------------
 {
   if( !NodeExist(node_id) ) return false;
@@ -436,7 +436,7 @@ void mafGUITree::SetImageList(wxImageList *img)
   m_NodeTree->SetImageList(m_NodeImages);
 }
 //----------------------------------------------------------------------------
-int mafGUITree::GetNodeIcon(long node_id)
+int mafGUITree::GetNodeIcon(long long node_id)
 //----------------------------------------------------------------------------
 {
   if( !NodeExist(node_id) )
@@ -447,7 +447,7 @@ int mafGUITree::GetNodeIcon(long node_id)
   return m_NodeTree->GetItemImage(item);
 }
 //----------------------------------------------------------------------------
-void mafGUITree::SortChildren(long node_id)
+void mafGUITree::SortChildren(long long node_id)
 //----------------------------------------------------------------------------
 {
   if(node_id == 0)
@@ -456,7 +456,7 @@ void mafGUITree::SortChildren(long node_id)
     m_NodeTree->SortChildren(ItemFromNode(node_id));
 }
 //----------------------------------------------------------------------------
-void mafGUITree::CollapseNode(long node_id)
+void mafGUITree::CollapseNode(long long node_id)
 //----------------------------------------------------------------------------
 {
   if( !NodeExist(node_id) ) return;
@@ -466,7 +466,7 @@ void mafGUITree::CollapseNode(long node_id)
   m_NodeTree->Collapse(item);
 }
 //----------------------------------------------------------------------------
-void mafGUITree::ExpandNode(long node_id)
+void mafGUITree::ExpandNode(long long node_id)
 //----------------------------------------------------------------------------
 {
   if( !NodeExist(node_id) ) return;

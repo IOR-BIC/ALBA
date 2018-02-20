@@ -317,7 +317,7 @@ void mafGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
       CryptSubTree(false);
     break;
 		case RMENU_SORT_TREE:
-      m_NodeTree->SortChildren((long)m_NodeActive);
+      m_NodeTree->SortChildren((long long)m_NodeActive);
 		break;
 		case RMENU_AUTO_SORT:
  			m_Autosort = !m_Autosort;

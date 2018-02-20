@@ -43,7 +43,7 @@ mafGUITree allows a simplified and lot easier use of a wxWindows tree widget.
 - Parent,label and icon can be changed.
 - Delete or reparent a node affect its whole subtree.
 - mafGUITree doesn't assume anything about what the nodes represented, thus nodes objects may be everything. 
-  Nodes are referenced by a node_id of type long, so a node_id may be a numeric value or a pointer.
+  Nodes are referenced by a node_id of type long long, so a node_id may be a numeric value or a pointer.
 - mafGUITree doesn't use the wxWindows event-system: to receive event notification provide 
   a mafObserver object by calling SetListener.
 
@@ -105,34 +105,34 @@ public:
 	/** Create a new tree item with the specified parent,label and icon. 
       Set parent = 0 to create the root. 0 is not a valid node_id.
   */
-	bool AddNode(long node_id, long parent_id , wxString label, int icon = 0);
+	bool AddNode(long long node_id, long long parent_id , wxString label, int icon = 0);
   
 	/** Delete the specified node, and its subtree. */
-	bool DeleteNode(long node_id);
+	bool DeleteNode(long long node_id);
   
 	/** Set the label for the node. */
-	bool SetNodeLabel(long node_id, wxString label);
+	bool SetNodeLabel(long long node_id, wxString label);
 
   /** Get the label for the node. Add by Mucci 19/09/2007*/
-  wxString GetNodeLabel(long node_id);
+  wxString GetNodeLabel(long long node_id);
 
   /** Check if the node has children. Add by Mucci 19/09/2007*/
-  bool NodeHasChildren(long node_id);
+  bool NodeHasChildren(long long node_id);
 
   /** Return the parent id of the node. Add by Mucci 19/09/2007*/
-  long GetNodeParent(long node_id);
+	long long GetNodeParent(long long node_id);
   
 	/** Move a node, and its subtree. */
-	bool SetNodeParent(long node_id, long parent_id );
+	bool SetNodeParent(long long node_id, long long parent_id );
   
 	/** Set the icon for the node. */
-  bool SetNodeIcon(long node_id, int icon);
+  bool SetNodeIcon(long long node_id, int icon);
   
   /** Return the icon index for the node 'node_id'. */
-  int  GetNodeIcon(long node_id);
+  int  GetNodeIcon(long long node_id);
 
   /** Select the node. */
-  bool SelectNode(long node_id);
+  bool SelectNode(long long node_id);
 
   /** Set the images to be used for the nodes. 
       Must be set before adding any node. 
@@ -146,7 +146,7 @@ public:
 
   /** Sort the children of node_id. (not the subtree) 
       give node_id = 0 to specify the root. */
-  void SortChildren(long node_id =0);
+  void SortChildren(long long node_id =0);
 
   /** if autosort is on - the tree is always kept sorted */
   void SetAutoSort(bool enable) {m_Autosort=enable;};
@@ -155,26 +155,26 @@ public:
   bool GetAutoSort() {return m_Autosort;};
 
   /** collapse the children of node_id */
-  void CollapseNode(long node_id);
+  void CollapseNode(long long node_id);
 
   /** expand the children of node_id */
-  void ExpandNode(long node_id);
+  void ExpandNode(long long node_id);
 
   /** Set the Listener that will receive event-notification, the Listener can be changed any time  */
   void SetListener(mafObserver *listener)   {m_Listener=listener;}; 
 
   /** Return the node item from node id. */
-  wxTreeItemId ItemFromNode(long node_id);
+  wxTreeItemId ItemFromNode(long long node_id);
 
   /** Return node id from node item. */
-  long NodeFromItem(wxTreeItemId& item);
+	long long NodeFromItem(wxTreeItemId& item);
   
   
   void SetTreeStyle(long style) {m_NodeTree->SetWindowStyle(style);};
   long GetTreeStyle()           {return m_NodeTree->GetWindowStyle();};
 
 	/** Return true if node exist. */
-	bool NodeExist(long node_id);
+	bool NodeExist(long long node_id);
 
 protected:
   /** Private function that notify the Listener of node selection and deselection. */
@@ -184,10 +184,10 @@ protected:
   void OnSize(wxSizeEvent& event);
   
 	/** Delete recursively a node and its subtree. */
-	void DeleteNode2(long node_id);
+	void DeleteNode2(long long node_id);
   
 	/** Move a node, and its subtree. */
-  void SetNodeParent2(long node_id, long parent_id );
+  void SetNodeParent2(long long node_id, long long parent_id );
     
   /** Check that id is a valid index in the imagelist - return the (eventually clamped) value */
   int CheckIconId(int icon);
@@ -196,7 +196,7 @@ protected:
 
   bool               m_PreventNotify;
   bool               m_Autosort;
-  long               m_NodeRoot;
+	long long          m_NodeRoot;
   wxTreeCtrl        *m_NodeTree;         
   wxImageList       *m_NodeImages;       
   wxHashTable       *m_NodeTable;        
@@ -208,10 +208,10 @@ protected:
 	//----------------------------------------------------------------------------
 	class mafGUITreeItemData: public wxTreeItemData{
 	public:
-			mafGUITreeItemData(long node_id) {m_NodeId = node_id; };
-			long GetNode()                {return m_NodeId;};
+			mafGUITreeItemData(long long node_id) {m_NodeId = node_id; };
+			long long GetNode()                {return m_NodeId;};
 	protected:
-			long m_NodeId;
+			long long m_NodeId;
 	};
 	//----------------------------------------------------------------------------
 	// mafGUITreeTableElement:
