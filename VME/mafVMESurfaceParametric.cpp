@@ -258,6 +258,8 @@ void mafVMESurfaceParametric::SetMatrix(const mafMatrix &mat)
 //-------------------------------------------------------------------------
 {
 	m_Transform->SetMatrix(mat);
+	//Update AbsMatrix output
+	GetOutput()->GetAbsMatrix();
 	Modified();
 }
 //-------------------------------------------------------------------------
