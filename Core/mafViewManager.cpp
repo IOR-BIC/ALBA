@@ -128,7 +128,7 @@ void mafViewManager::OnEvent(mafEventBase *maf_event)
         ViewSelected(view/*, rwi*/);
 
         if(notifylogic)
-          mafEventMacro(mafEvent(this,VIEW_SELECT,(long)e->GetSender())); // forward the view selection event to logic
+          mafEventMacro(mafEvent(this,VIEW_SELECT)); // forward the view selection event to logic
       }
       break;
       default:
