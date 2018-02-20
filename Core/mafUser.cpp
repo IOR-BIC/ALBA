@@ -29,7 +29,6 @@
 
 #include "mafDecl.h"
 #include "mafGUIDialogLogin.h"
-#include "mafCrypt.h"
 
 #include <fstream>
 
