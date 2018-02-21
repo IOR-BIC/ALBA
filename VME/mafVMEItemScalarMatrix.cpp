@@ -30,7 +30,7 @@
 #include "mafIndent.h"
 #include "mafStorage.h"
 #include "mafStorageElement.h"
-//#include "mafCrypt.h"
+#include "mafCrypt.h"
 #include "mafTagItem.h"
 #include "mafTagArray.h"
 
