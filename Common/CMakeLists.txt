@@ -29,7 +29,8 @@ SET(PROJECT_SRCS
   mafWizardWaitOp.cpp  													mafWizardWaitOp.h  
   mafWizardSettings.cpp  												mafWizardSettings.h  
   mafHelpManager.cpp  													mafHelpManager.h  
-	mafSnapshotManager.cpp  											mafSnapshotManager.h  
+	mafSnapshotManager.cpp  											mafSnapshotManager.h
+	mafLicenceManager.cpp 												mafLicenceManager.h  
 )
 
 # List libraries that are needed by this project.
