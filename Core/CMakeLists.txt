@@ -13,8 +13,6 @@ SET(PROJECT_SRCS
   mafAttributeTraceability.cpp  mafAttributeTraceability.h
   mafCoreFactory.cpp  			mafCoreFactory.h
   mafDataPipe.cpp  				mafDataPipe.h
-  mafExpiration.h
-  mafExpirationDate.cpp  		mafExpirationDate.h
   mafEventIO.cpp  				mafEventIO.h
   mafMatrixPipe.cpp  			mafMatrixPipe.h
   mafVMEIterator.cpp  			mafVMEIterator.h

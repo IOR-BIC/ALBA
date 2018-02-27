@@ -50,7 +50,6 @@ SET(PROJECT_SRCS
 	mafAxesTest.h mafAxesTest.cpp
 	mafCoreFactoryTest.h mafCoreFactoryTest.cpp
 	mafOpStackTest.h mafOpStackTest.cpp
-	mafExpirationDateTest.h mafExpirationDateTest.cpp
 	mafOpManagerTest.h mafOpManagerTest.cpp
 	mafViewManagerTest.h mafViewManagerTest.cpp
 	mafVMEManagerTest.h mafVMEManagerTest.cpp

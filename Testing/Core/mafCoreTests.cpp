@@ -31,7 +31,6 @@
 #include "mafCoreFactoryTest.h"
 #include "mafDataPipeTest.h"
 #include "mafEventIOTest.h"
-#include "mafExpirationDateTest.h"
 #include "mafFakeLogicForTest.h"
 #include "mafGUITreeContextualMenuTest.h"
 #include "mafLODActorTest.h"
@@ -231,7 +230,6 @@ main(int argc, char* argv[])
 	runner.addTest(mafMatrixPipeTest::suite());
 	runner.addTest(mafLODActorTest::suite());
 	runner.addTest(mafGUITreeContextualMenuTest::suite());
-	runner.addTest(mafExpirationDateTest::suite());
 	runner.addTest(mafEventIOTest::suite());
 	runner.addTest(mafDataPipeTest::suite());
 	runner.addTest(mafAxesTest::suite());
