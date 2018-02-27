@@ -76,8 +76,16 @@ void mafVMEAnalog::GetTimeBounds(mafTimeStamp tbounds[2])
 //-------------------------------------------------------------------------
 {
   vnl_vector<double> timeVector = this->GetScalarOutput()->GetScalarData().get_row(0);
-  tbounds[0] = timeVector[0];
-  tbounds[1] = timeVector[timeVector.size()-1];
+	int timeVectSize = timeVector.size();
+	if (timeVectSize > 0)
+	{
+		tbounds[0] = timeVector[0];
+		tbounds[1] = timeVector[timeVectSize - 1];
+	}
+	else
+	{
+		tbounds[0] = tbounds[1] = 0;
+	}
 }
 
 //-------------------------------------------------------------------------

@@ -282,7 +282,7 @@ int mafVMEItemScalarMatrix::ReadData(mafString &filename, int resolvedURL)
 #ifdef MAF_USE_CRYPTO
       mafDefaultDecryptFileInMemory(filename, m_DecryptedFileString);
 #else
-      mafErrorMacro(_("Encrypted data not supported: MAF not linked to Crypto library."));
+      mafErrorMacro("Encrypted data not supported: MAF not linked to Crypto library.");
       return MAF_ERROR;
 #endif
     }
@@ -319,7 +319,7 @@ int mafVMEItemScalarMatrix::UpdateReader(mafString &filename)
       decrypted_raw_matrix << m_DecryptedFileString.c_str();
       data.read_ascii(decrypted_raw_matrix);
 #else
-      mafErrorMacro(_("Encrypted data not supported: MAF not linked to Crypto library."));
+      mafErrorMacro("Encrypted data not supported: MAF not linked to Crypto library.");
       return MAF_ERROR;
 #endif
     }

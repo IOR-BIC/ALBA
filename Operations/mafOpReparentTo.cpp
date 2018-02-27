@@ -89,7 +89,7 @@ void mafOpReparentTo::OpRun()
   if (m_TargetVme == NULL)
   {
     mafEvent e(this,VME_CHOOSE);
-		e.SetArg((long)&VMEAcceptForReparent);
+		e.SetPointer(&VMEAcceptForReparent);
     mafEventMacro(e);
     m_TargetVme = e.GetVme();
   }

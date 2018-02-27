@@ -66,9 +66,9 @@ mafGUIVMEChooserTree::mafGUIVMEChooserTree( wxWindow *parent, mafGUICheckTree *t
   else
     mafGUICheckTree::InitializeImageList();
 
-	if (subTree && tree->NodeExist((long)subTree) )
+	if (subTree && tree->NodeExist((long long)subTree) )
 	{
-		wxTreeItemId  item = tree->ItemFromNode((long)subTree);
+		wxTreeItemId  item = tree->ItemFromNode((long long)subTree);
 		CloneSubTree(tree, &item, (wxTreeItemId *)NULL);
 	}
 	else
@@ -237,7 +237,7 @@ void mafGUIVMEChooserTree::CloneSubTree(mafGUICheckTree *source_tree, wxTreeItem
 //----------------------------------------------------------------------------
 {
   wxString  text  = source_tree->GetTree()->GetItemText(*source_item);
-  long      node  = source_tree->NodeFromItem(*source_item);
+  long long     node  = source_tree->NodeFromItem(*source_item);
   int       image = GetVmeStatus((mafVME *)node);
 
   wxTreeItemId current_item;

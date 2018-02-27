@@ -3592,7 +3592,7 @@ void mafOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
       mafString title = mafString("Select a segmentation:");
       mafEvent e(this,VME_CHOOSE);
       e.SetString(&title);
-      e.SetArg((long)(&mafOpSegmentation::SegmentedVolumeAccept));
+      e.SetPointer(&mafOpSegmentation::SegmentedVolumeAccept);
       mafEventMacro(e);
       mafVME *vme = e.GetVme();
       mafVMEVolumeGray *newVolume = mafVMEVolumeGray::SafeDownCast(vme);

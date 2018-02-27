@@ -49,21 +49,12 @@ int mafStorage::Store()
 {
   SetErrorCode(0);
   // extract the path substring
-  mafString dir_path=m_URL;
-  int last_slash=dir_path.FindLastChr('/');
-  if (last_slash>=0)
-  { 
-    dir_path.Erase(last_slash);
-  }
-  else
-  {
-    dir_path="";
-  }
-
+  mafString dir_path= wxPathOnly(m_URL.GetCStr());
+  
   //open the directory index
   if (OpenDirectory(dir_path)==MAF_ERROR)
   {
-    mafErrorMessage("I/O Error: stored failed because path not found!");
+    mafErrorMessage("I/O Error: store failed because path not found!");
     return MAF_ERROR;
   }
 

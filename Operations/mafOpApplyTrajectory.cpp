@@ -235,7 +235,7 @@ void mafOpApplyTrajectory::OnEvent(mafEventBase *maf_event)
         mafString title = mafString("Select a VME:");
         mafEvent e(this,VME_CHOOSE);
         e.SetString(&title);
-        e.SetArg((long)(&mafOpApplyTrajectory::AcceptInputVME)) ; // accept only time-varying VME
+        e.SetPointer(&mafOpApplyTrajectory::AcceptInputVME); // accept only time-varying VME
         mafEventMacro(e);
         if (e.GetVme())
         {

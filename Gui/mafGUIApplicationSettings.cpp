@@ -24,7 +24,6 @@
 //----------------------------------------------------------------------------
 
 #include "mafGUIApplicationSettings.h"
-#include "mafCrypt.h"
 
 #include "mafDecl.h"
 #include "mafGUI.h"

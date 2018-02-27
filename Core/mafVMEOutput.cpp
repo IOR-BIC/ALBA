@@ -92,21 +92,7 @@ void mafVMEOutput::SetBounds(const mafOBB &bounds)
 void mafVMEOutput::GetLocalTimeBounds(mafTimeStamp tbounds[2]) const
 //-------------------------------------------------------------------------
 {
-  // Paolo 09-01-2008: Commented and substituted by code below.
-  /*std::vector<mafTimeStamp> tstamps;
-  m_VME->GetLocalTimeStamps(tstamps);
-  if (tstamps.size()>0)
-  {
-    tbounds[0]=tstamps[0];
-    tbounds[1]=tstamps[tstamps.size()-1];
-  }
-  else
-  {
-    // set to invalid time bounds (i.e. infinite)
-    tbounds[0]=0;
-    tbounds[1]=-1;
-  }*/
-
+  
   m_VME->GetLocalTimeBounds(tbounds);
   
 }

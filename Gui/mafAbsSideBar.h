@@ -97,7 +97,7 @@ public:
   virtual void Show(bool show) = 0;
 
 	/** Respond to a VME_CHOOSE evt. Build a dialog containing the vme tree and return the vme choosed from the user. */
-	virtual std::vector<mafVME*> VmeChoose(long vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, mafString title = "Choose Node", bool multiSelect = false, mafVME *vme = NULL) = 0;
+	virtual std::vector<mafVME*> VmeChoose(void *vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, mafString title = "Choose Node", bool multiSelect = false, mafVME *vme = NULL) = 0;
 
 	/** Open a Find VME dialog.*/
 	virtual void FindVME() = 0;

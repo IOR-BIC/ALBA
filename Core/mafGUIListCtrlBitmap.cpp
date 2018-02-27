@@ -156,7 +156,6 @@ ITEM_ICONS mafGUIListCtrlBitmap::GetItemIcon(long item_id)
   int icon = -1;
   if( li.m_mask & wxLIST_MASK_IMAGE )
      icon = li.m_image;
-  mafLogMessage("icon = %d",icon);
   mafYield();
   return (ITEM_ICONS) icon;
 }

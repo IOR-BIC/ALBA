@@ -316,7 +316,7 @@ void mafSideBar::UpdateVmePanel()
 }
 
 //----------------------------------------------------------------------------
-std::vector<mafVME*> mafSideBar::VmeChoose(long vme_accept_function, long style, mafString title, bool multiSelect, mafVME *vme)
+std::vector<mafVME*> mafSideBar::VmeChoose(void *vme_accept_function, long style, mafString title, bool multiSelect, mafVME *vme)
 {
 	mafGUIVMEChooser vc(m_Tree, title.GetCStr(), vme_accept_function, style, multiSelect, vme);
 	return vc.ShowChooserDialog();

@@ -216,21 +216,21 @@ bool mafGUICheckTree::IsIconChecked(wxTreeItemId item)
 //----------------------------------------------------------------------------
 {
   mafVME* vme = (mafVME*) (NodeFromItem(item));
-  bool checked = GetNodeIcon((long)vme) == (ClassNameToIcon(vme->GetTypeName()) + NODE_VISIBLE_ON * 2);
+  bool checked = GetNodeIcon((long long)vme) == (ClassNameToIcon(vme->GetTypeName()) + NODE_VISIBLE_ON * 2);
   return checked;
 }
 //----------------------------------------------------------------------------
 void mafGUICheckTree::VmeAdd(mafVME *vme)   
 //----------------------------------------------------------------------------
 {
-  AddNode((long)vme,(long)vme->GetParent(), vme->GetName(), 0);
+  AddNode((long long)vme,(long long)vme->GetParent(), vme->GetName(), 0);
 	VmeUpdateIcon(vme);
 }
 //----------------------------------------------------------------------------
 void mafGUICheckTree::VmeRemove(mafVME *vme)   
 //----------------------------------------------------------------------------
 {
-  this->DeleteNode((long)vme);
+  this->DeleteNode((long long)vme);
   if (m_SelectedVME == vme)
   {
     m_SelectedVME = NULL;
@@ -240,7 +240,7 @@ void mafGUICheckTree::VmeRemove(mafVME *vme)
 void mafGUICheckTree::VmeSelected(mafVME *vme)   
 //----------------------------------------------------------------------------
 {
-  this->SelectNode((long)vme);
+  this->SelectNode((long long)vme);
   m_SelectedVME = vme;
   VmeUpdateIcon(vme);
 }
@@ -248,7 +248,7 @@ void mafGUICheckTree::VmeSelected(mafVME *vme)
 void mafGUICheckTree::VmeModified(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  this->SetNodeLabel((long)vme, vme->GetName());
+  this->SetNodeLabel((long long)vme, vme->GetName());
 	VmeUpdateIcon(vme);
 }
 //----------------------------------------------------------------------------
@@ -277,7 +277,7 @@ void mafGUICheckTree::VmeUpdateIcon(mafVME *vme)
 
     dataStatus = node->IsDataAvailable() ? 0 : 1;
     icon_index = ClassNameToIcon(node->GetTypeName()) + (GetVmeStatus(node)*2) + dataStatus;
-    SetNodeIcon( (long)node, icon_index );
+    SetNodeIcon( (long long)node, icon_index );
 
     if (node->GetNumberOfLinks() != 0)
     {
@@ -292,7 +292,7 @@ void mafGUICheckTree::VmeUpdateIcon(mafVME *vme)
           {
             dataStatus = linkedVME->IsDataAvailable() ? 0 : 1;
             icon_index = ClassNameToIcon(linkedVME->GetTypeName()) + (GetVmeStatus(linkedVME)*2) + dataStatus;
-            SetNodeIcon( (long)linkedVME, icon_index );
+            SetNodeIcon( (long long)linkedVME, icon_index );
           }
         }
       }

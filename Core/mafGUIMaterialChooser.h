@@ -91,7 +91,9 @@ protected:
 	void RemoveMaterial();
 
   /** Copy choosed material on vme properties. */
-  void SelectMaterial(mmaMaterial *m);
+  void SelectMaterial(long matPos);
+
+	void SetFromMat(mmaMaterial * mat);
 
   wxDialog					*m_Dialog;
   mafGUIListCtrlBitmap	*m_ListCtrlMaterial;
