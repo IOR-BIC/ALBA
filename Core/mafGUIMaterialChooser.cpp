@@ -140,7 +140,11 @@ bool mafGUIMaterialChooser::ShowChooserDialog(mafVME *vme, bool remember_last_ma
   {
     mafDEL(m_ChoosedMaterial);// = NULL;
   }
-  SelectMaterial(m_VmeMaterial);
+
+	m_ChoosedMaterialId = -1;
+  SetFromMat(m_VmeMaterial);
+
+
 
   bool res = m_Dialog->ShowModal() != 0;
   m_VmeMaterial	= NULL;
@@ -422,7 +426,7 @@ void mafGUIMaterialChooser::OnEvent(mafEventBase *maf_event)
         m_ChoosedMaterial->m_Representation = m_Wire;
       break;
       case ITEM_SELECTED:
-        SelectMaterial( (mmaMaterial *)( e->GetArg() ) );
+        SelectMaterial( e->GetArg() );
       break;
       case ID_ADD:
         AddMaterial();
@@ -481,7 +485,7 @@ void mafGUIMaterialChooser::LoadLibraryFromFile()
 		for (int m = 0; m < m_List.size(); m++)
 		{
 			mat = m_List[m];
-			this->m_ListCtrlMaterial->AddItem((long)mat,mat->m_MaterialName.GetCStr(),mat->MakeIcon());
+			this->m_ListCtrlMaterial->AddItem(m,mat->m_MaterialName.GetCStr(),mat->MakeIcon());
 		}
 
 		mat_lib->Delete();
@@ -534,56 +538,61 @@ void mafGUIMaterialChooser::ClearList()
 		m_ListCtrlMaterial->Reset();
 }
 //----------------------------------------------------------------------------
-void mafGUIMaterialChooser::SelectMaterial(mmaMaterial *m)
+void mafGUIMaterialChooser::SelectMaterial(long matPos)
 //----------------------------------------------------------------------------
 {
-  if(m_ListCtrlMaterial->SelectItem((long)m) || m_ChoosedMaterial == NULL)
+  if(m_ListCtrlMaterial->SelectItem(matPos) || m_ChoosedMaterial == NULL)
   {
-    if(m_ChoosedMaterial == NULL)
-      mafNEW(m_ChoosedMaterial);
-    m_ChoosedMaterial->DeepCopy(m);
-		m_ChoosedMaterialId=(long) m;
-
-    //copy chose material on m_Property
-    m_Property->DeepCopy(m_ChoosedMaterial->m_Prop);
-
-    //update GUI related vars
-    double rgb[3];
-    m_Property->GetAmbientColor(rgb);
-    m_AmbientColor.Set(255*rgb[0],255*rgb[1],255*rgb[2]);		
-    m_Property->GetDiffuseColor(rgb);
-    m_DiffuseColor.Set(255*rgb[0],255*rgb[1],255*rgb[2]);		
-    m_Property->GetSpecularColor(rgb);
-    m_SpecularColor.Set(255*rgb[0],255*rgb[1],255*rgb[2]);		
-
-    m_AmbientIntensity  = m_Property->GetAmbient();
-    m_DiffuseIntensity  = m_Property->GetDiffuse();  
-    m_SpecularIntensity = m_Property->GetSpecular(); 
-    m_SpecularPower     = m_Property->GetSpecularPower();  
-    m_Opacity					  = m_Property->GetOpacity(); 
-    m_MaterialName      = m_ChoosedMaterial->m_MaterialName;
-
-    m_Wire = m_Property->GetRepresentation() == VTK_WIREFRAME;
-    if (m_Wire)
-    {
-      m_Sphere->SetThetaResolution(10);
-      m_Sphere->SetPhiResolution(3);
-      m_Property->SetRepresentationToWireframe();
-    }
-    else
-    {
-      m_Sphere->SetThetaResolution(20);
-      m_Sphere->SetPhiResolution(20);
-      m_Property->SetRepresentationToSurface();
-    } 
-
-    //enable REMOVE if m_ChoosedMaterial != NULL 
-    m_Gui->Enable(ID_REMOVE, m_ChoosedMaterial != NULL);
-    m_Gui->Update();
+		m_ChoosedMaterialId = matPos;
+		SetFromMat(m_List[matPos]);
   }
 
-//  m_ListCtrlMaterial->SelectItem((long)m_ChoosedMaterial);
 }
+
+//----------------------------------------------------------------------------
+void mafGUIMaterialChooser::SetFromMat(mmaMaterial * mat)
+{
+	if (m_ChoosedMaterial == NULL)
+		mafNEW(m_ChoosedMaterial);
+
+	m_ChoosedMaterial->DeepCopy(mat);
+	
+	//copy chose material on m_Property
+	m_Property->DeepCopy(m_ChoosedMaterial->m_Prop);
+
+	//update GUI related vars
+	double rgb[3];
+	m_Property->GetAmbientColor(rgb);
+	m_AmbientColor.Set(255 * rgb[0], 255 * rgb[1], 255 * rgb[2]);
+	m_Property->GetDiffuseColor(rgb);
+	m_DiffuseColor.Set(255 * rgb[0], 255 * rgb[1], 255 * rgb[2]);
+	m_Property->GetSpecularColor(rgb);
+	m_SpecularColor.Set(255 * rgb[0], 255 * rgb[1], 255 * rgb[2]);
+
+	m_AmbientIntensity = m_Property->GetAmbient();
+	m_DiffuseIntensity = m_Property->GetDiffuse();
+	m_SpecularIntensity = m_Property->GetSpecular();
+	m_SpecularPower = m_Property->GetSpecularPower();
+	m_Opacity = m_Property->GetOpacity();
+	m_MaterialName = m_ChoosedMaterial->m_MaterialName;
+
+	m_Wire = m_Property->GetRepresentation() == VTK_WIREFRAME;
+	if (m_Wire)
+	{
+		m_Sphere->SetThetaResolution(10);
+		m_Sphere->SetPhiResolution(3);
+		m_Property->SetRepresentationToWireframe();
+	}
+	else
+	{
+		m_Sphere->SetThetaResolution(20);
+		m_Sphere->SetPhiResolution(20);
+		m_Property->SetRepresentationToSurface();
+	}
+
+	m_Gui->Update();
+}
+
 //----------------------------------------------------------------------------
 void mafGUIMaterialChooser::AddMaterial()
 //----------------------------------------------------------------------------
@@ -597,8 +606,8 @@ void mafGUIMaterialChooser::AddMaterial()
 		{
 			m_List[i]->DeepCopy(m_ChoosedMaterial);
 			m_ChoosedMaterial->UpdateProp();
-			m_ListCtrlMaterial->SetItemIcon((long)m_List[i],m_ChoosedMaterial->MakeIcon());
-			m_ListCtrlMaterial->SelectItem((long)m_List[i]);
+			m_ListCtrlMaterial->SetItemIcon(i,m_ChoosedMaterial->MakeIcon());
+			m_ListCtrlMaterial->SelectItem(i);
 			m_ListCtrlMaterial->Update();
 			m_Gui->Update();
 			return;
@@ -608,15 +617,15 @@ void mafGUIMaterialChooser::AddMaterial()
   mmaMaterial *mat = mmaMaterial::New();
 	mat->DeepCopy(m_ChoosedMaterial);
 
-	m_ChoosedMaterialId=(long)mat;
+	m_ChoosedMaterialId = m_List.size()-1;
 
 	// insert mat in the list
   m_List.push_back(mat);
 
 	// insert mat in the tree
-	m_ListCtrlMaterial->AddItem((long)mat, mat->m_MaterialName.GetCStr(), mat->MakeIcon());	
-  m_ListCtrlMaterial->SelectItem((long)mat);
-	SelectMaterial(mat);
+	m_ListCtrlMaterial->AddItem(m_ChoosedMaterialId, mat->m_MaterialName.GetCStr(), mat->MakeIcon());
+  m_ListCtrlMaterial->SelectItem(m_ChoosedMaterialId);
+	SelectMaterial(m_ChoosedMaterialId);
 }
 //----------------------------------------------------------------------------
 void mafGUIMaterialChooser::CreateDefaultLibrary()
@@ -700,7 +709,7 @@ void mafGUIMaterialChooser::CreateDefaultLibrary()
 
 		// insert mat in the tree
 		if(m_ListCtrlMaterial)
-			m_ListCtrlMaterial->AddItem((long)mat,mat->m_MaterialName.GetCStr(),mat->MakeIcon());
+			m_ListCtrlMaterial->AddItem(i,mat->m_MaterialName.GetCStr(),mat->MakeIcon());
   }
 }
 //------------------------------------------------------------------------------

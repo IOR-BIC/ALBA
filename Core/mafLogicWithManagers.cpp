@@ -617,7 +617,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			else
 				str = "Choose Node";
 
-			std::vector<mafVME*> nodeVector = m_SideBar->VmeChoose(e->GetArg(), REPRESENTATION_AS_TREE, str, e->GetBool(), e->GetVme());
+			std::vector<mafVME*> nodeVector = m_SideBar->VmeChoose(e->GetPointer(), REPRESENTATION_AS_TREE, str, e->GetBool(), e->GetVme());
 			if (!e->GetBool())
 			{
 				if (nodeVector.size() != 0)

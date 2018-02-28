@@ -490,7 +490,7 @@ void mafPipeDensityDistance::OnEvent(mafEventBase *maf_event)
     case ID_SELECT_VOLUME:
       {
         mafString title = _("Choose Volume");
-        e->SetArg((long)&mafPipeDensityDistance::VolumeAccept);
+        e->SetPointer(&mafPipeDensityDistance::VolumeAccept);
         e->SetString(&title);
         e->SetId(VME_CHOOSE);
         mafEventMacro(*e);

@@ -1,0 +1,4 @@
+776c776
+<                                  WM_MDICREATE, 0, (LONG)(LPSTR)&mcs);
+---
+>                                  WM_MDICREATE, 0, (LPARAM)&mcs);

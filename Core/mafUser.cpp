@@ -26,10 +26,9 @@
 #include <wx/stdpaths.h>
 #include <wx/tokenzr.h>
 #include <wx/ffile.h>
-
+#include "mafCrypt.h"
 #include "mafDecl.h"
 #include "mafGUIDialogLogin.h"
-#include "mafCrypt.h"
 
 #include <fstream>
 

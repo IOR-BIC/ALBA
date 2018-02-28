@@ -270,7 +270,7 @@ void mafOpCropDeformableROI::MaskSelection()
 	e = new mafEvent();
 	mafString title = _("Choose mask");
 	e->SetId(VME_CHOOSE);
-	e->SetArg((long)&mafOpCropDeformableROI::OutputSurfaceAccept);
+	e->SetPointer(&mafOpCropDeformableROI::OutputSurfaceAccept);
 	e->SetString(&title);
 	mafEventMacro(*e);
 	m_PNode = e->GetVme();

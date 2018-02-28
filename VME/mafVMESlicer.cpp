@@ -200,7 +200,7 @@ void mafVMESlicer::OnEvent(mafEventBase *maf_event)
       {
         mafString title = _("Choose volume vme");
         e->SetId(VME_CHOOSE);
-        e->SetArg((long)&mafVMESlicer::VolumeAccept);
+        e->SetPointer(&mafVMESlicer::VolumeAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
         mafVME *n = e->GetVme();

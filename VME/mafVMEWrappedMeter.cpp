@@ -1674,64 +1674,64 @@ mafGUI* mafVMEWrappedMeter::CreateGui()
 void mafVMEWrappedMeter::OnEvent(mafEventBase *maf_event)
 //-------------------------------------------------------------------------
 {
-  // events to be sent up or down in the tree are simply forwarded
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    switch(e->GetId())
-    {
-      case ID_START_METER_LINK:
-      case ID_END1_METER_LINK:
-      case ID_WRAPPED_METER_LINK:
-      {
-        mafID button_id = e->GetId();
-        mafString title = _("Choose meter vme link");
-        e->SetId(VME_CHOOSE);
-        if (button_id == ID_WRAPPED_METER_LINK)
-		  e->SetArg((long)&mafVMEWrappedMeter::VMESurfaceParametricAccept);
-		else
-          e->SetArg((long)&mafVMEWrappedMeter::VMEAccept);
-        e->SetString(&title);
-        ForwardUpEvent(e);
-        mafVME *n = e->GetVme();
-        if (n != NULL)
-        {
-          if (button_id == ID_START_METER_LINK)
-          {
-            SetMeterLink("StartVME", n);
-            m_StartVmeName = n->GetName();
-          }
-          else if (button_id == ID_END1_METER_LINK)
-          {
-            SetMeterLink("EndVME1", n);
-            m_EndVme1Name = n->GetName();
-          }
-          else if (button_id == ID_WRAPPED_METER_LINK)
-          {
-            SetMeterLink("WrappedVME", n);
-            m_WrappedVmeName = n->GetName();
-          }
-          m_Gui->Update();
-          InternalUpdate();
-        }
-      }
-      break;
-	  case ID_METER_MODE:
-	  {
-      Modified();
-			InternalUpdate();
-      mafID button_id = e->GetId();
-      e->SetId(CAMERA_UPDATE);
-      ForwardUpEvent(e);
-	  }
-    break;
-		case ID_WRAPPED_METER_MODE:
+	// events to be sent up or down in the tree are simply forwarded
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	{
+		switch (e->GetId())
+		{
+			case ID_START_METER_LINK:
+			case ID_END1_METER_LINK:
+			case ID_WRAPPED_METER_LINK:
 			{
-				EnableManualModeWidget(m_WrappedMode ==MANUAL_WRAP);
+				mafID button_id = e->GetId();
+				mafString title = _("Choose meter vme link");
+				e->SetId(VME_CHOOSE);
+				if (button_id == ID_WRAPPED_METER_LINK)
+					e->SetPointer(&mafVMEWrappedMeter::VMESurfaceParametricAccept);
+				else
+					e->SetPointer(&mafVMEWrappedMeter::VMEAccept);
+				e->SetString(&title);
+				ForwardUpEvent(e);
+				mafVME *n = e->GetVme();
+				if (n != NULL)
+				{
+					if (button_id == ID_START_METER_LINK)
+					{
+						SetMeterLink("StartVME", n);
+						m_StartVmeName = n->GetName();
+					}
+					else if (button_id == ID_END1_METER_LINK)
+					{
+						SetMeterLink("EndVME1", n);
+						m_EndVme1Name = n->GetName();
+					}
+					else if (button_id == ID_WRAPPED_METER_LINK)
+					{
+						SetMeterLink("WrappedVME", n);
+						m_WrappedVmeName = n->GetName();
+					}
+					m_Gui->Update();
+					InternalUpdate();
+				}
+			}
+			break;
+			case ID_METER_MODE:
+			{
+				Modified();
+				InternalUpdate();
+				mafID button_id = e->GetId();
+				e->SetId(CAMERA_UPDATE);
+				ForwardUpEvent(e);
+			}
+			break;
+			case ID_WRAPPED_METER_MODE:
+			{
+				EnableManualModeWidget(m_WrappedMode == MANUAL_WRAP);
 
-        m_Gui->Enable(ID_WRAPPED_METER_LINK, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
-        m_Gui->Enable(ID_WRAPPED_SIDE, m_WrappedMode == AUTOMATED_WRAP );
-        m_Gui->Enable(ID_WRAPPED_REVERSE, m_WrappedMode == AUTOMATED_WRAP);
-        
+				m_Gui->Enable(ID_WRAPPED_METER_LINK, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
+				m_Gui->Enable(ID_WRAPPED_SIDE, m_WrappedMode == AUTOMATED_WRAP);
+				m_Gui->Enable(ID_WRAPPED_REVERSE, m_WrappedMode == AUTOMATED_WRAP);
+
 
 				Modified();
 				InternalUpdate();
@@ -1740,219 +1740,154 @@ void mafVMEWrappedMeter::OnEvent(mafEventBase *maf_event)
 				ForwardUpEvent(e);
 			}
 			break;
-    case ID_WRAPPED_SIDE:
-    case ID_WRAPPED_REVERSE:
-      InternalUpdate();
-      ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
-      break;
-    case ID_ADD_POINT:
-      {
-        /*if(m_ListBox->GetCount()!=0)
-        {
-        wxMessageBox("Current max point number is one!");
-        return;
-        }*/
-        mafString title = _("Choose a vme");
-        e->SetId(VME_CHOOSE);
-        e->SetArg((long)&mafVMEWrappedMeter::VMEAccept);
-        e->SetString(&title);
-        ForwardUpEvent(e);
-        mafVME *n = e->GetVme();
+			case ID_WRAPPED_SIDE:
+			case ID_WRAPPED_REVERSE:
+				InternalUpdate();
+				ForwardUpEvent(&mafEvent(this, CAMERA_UPDATE));
+				break;
+			case ID_ADD_POINT:
+			{
+				/*if(m_ListBox->GetCount()!=0)
+				{
+				wxMessageBox("Current max point number is one!");
+				return;
+				}*/
+				mafString title = _("Choose a vme");
+				e->SetId(VME_CHOOSE);
+				e->SetPointer(&mafVMEWrappedMeter::VMEAccept);
+				e->SetString(&title);
+				ForwardUpEvent(e);
+				mafVME *n = e->GetVme();
 
-        if (n == NULL) return;
+				if (n == NULL) return;
 
-        wxString nameProfile ="";
-        //mafString idNumber = wxString::Format(_("%d"),id);
-        nameProfile = n->GetName();
+				wxString nameProfile = "";
+				//mafString idNumber = wxString::Format(_("%d"),id);
+				nameProfile = n->GetName();
 
-        if(wxNOT_FOUND != m_ListBox->FindString(n->GetName()))
-        {
-          wxMessageBox(_("Can't introduce vme with the same name"));
-          return;
-        }
+				if (wxNOT_FOUND != m_ListBox->FindString(n->GetName()))
+				{
+					wxMessageBox(_("Can't introduce vme with the same name"));
+					return;
+				}
 
-				if(mafString(n->GetName()) == mafString("StartVME") ||
-					mafString(n->GetName()) == mafString("EndVME1")  ||
-					mafString(n->GetName()) == mafString("EndVME2")  ||
-          mafString(n->GetName()) == mafString("WrappedVME"))
+				if (mafString(n->GetName()) == mafString("StartVME") ||
+					mafString(n->GetName()) == mafString("EndVME1") ||
+					mafString(n->GetName()) == mafString("EndVME2") ||
+					mafString(n->GetName()) == mafString("WrappedVME"))
 				{
 					wxMessageBox(_("Can't introduce vme with the name of StartVME or EndVME1 or EndVME2 or WrappedVME"));
 					return;
 				}
 
-        /*for(int i=0; i<m_ListBox->GetCount();i++)
-        {
-        if(m_ProfilesNameList[i] == nameProfile)
-        {
-        wxMessageBox(L"Warning: you're introducing a profile\nwith the same name of a selected one.\n\
-        Modify it and readd it"); 
-        return;
-        }
-        }*/
 
-        /*if(m_ProfilesNameList.size() >= 2)
-        {
-        wxMessageBox(L"Warning: Supported 2 profiles"); 
-        return;
-        }*/
+				SetMeterLink(n->GetName(), n);
 
-        /*double temp = 0;
-        for(int i=0; i<m_IdListBox.size(); i++)
-        {
-        if(m_IdListBox[i] > temp) temp = m_IdListBox[i];
-        }
+				mafString t;
+				t = n->GetName();
+				m_ListBox->Append(_(t));
+				m_ListBox->SetStringSelection(_(t));
 
-        int id = temp + 1;
-        m_IdListBox.push_back(id);*/
 
-        
-        SetMeterLink(n->GetName(),n);
+				m_ListBox->Update();
+				m_Gui->Update();
+				Modified();
 
-        //nameProfile += idNumber;
-        //m_ProfilesNameList.push_back(nameProfile);
-        //        m_PolylineList.push_back(n);
+				InternalUpdate();
+				GetLogicManager()->CameraReset();
+				ForwardUpEvent(&mafEvent(this, CAMERA_UPDATE));
 
-        //int a=m_ListBox->Append(wxString::Format("%s",n->GetName()));
-        mafString t;
-        t = n->GetName();
-        //m_ListBox->Append(_(t));
-        m_ListBox->Append(_(t));
-        m_ListBox->SetStringSelection(_(t));
-
-				
-        //m_OrderedMidPoints.push_back(_(t));
-
-        
-        //m_IdList.push_back(new int(n->GetId()));
-        
-//        m_ListBox->SetClientData(m_ListBox->GetSelection(), m_IdList[m_IdList.size()-1] );
-
-        
-
-        //m_ListBox->AddItem(/*m_IdListBox[m_IdListBox.size()-1]*/0, nameProfile.GetCStr());
-        m_ListBox->Update();
-        m_Gui->Update();
-        Modified();
-        //InternalUpdate();
-
-        InternalUpdate();
-        GetLogicManager()->CameraReset();
-        ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
-
-        m_Gui->Update();
-      }
-      break;
-    case ID_REMOVE_POINT:
-      { 
-        if(m_ListBox->GetCount()!=0)
-        {
-          wxString name = m_ListBox->GetStringSelection();
-          int number = m_ListBox->GetSelection();
-
-          RemoveLink(name);
-          m_ListBox->Delete(m_ListBox->FindString(m_ListBox->GetStringSelection()));          
-          //m_OrderedMidPoints.erase(m_OrderedMidPoints.begin()+number);
-					m_OrderMiddlePointsNameVMEList.clear();
-					for(int i=0;i<m_ListBox->GetCount();i++)
-					{
-            m_OrderMiddlePointsNameVMEList.push_back(m_ListBox->GetString(i));
-					}
-
-          Modified();
-          InternalUpdate();
-          ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
-        }
-      }
-      break;
-    case ID_UP:
-      {
-        if(m_ListBox->GetCount()!=0)
-        {
-          wxString name = m_ListBox->GetStringSelection();
-          int number = m_ListBox->GetSelection();
-          if(number == 0) return;
-          //RemoveLink(name);
-
-          wxString temp;
-          temp = m_ListBox->GetStringSelection(); 
-          m_ListBox->Delete(m_ListBox->FindString(temp));
-          m_ListBox->Insert(name, number-1);
-
-          /*mafString temp2 = m_OrderedMidPoints[number-1];
-          m_OrderedMidPoints[number] = temp2;
-          m_OrderedMidPoints[number-1] = temp;*/
-
-          m_ListBox->SetStringSelection(_(name));
-//          m_ListBox->SetClientData(m_ListBox->GetSelection(), (void *) m_IdList[number]);
-
-          /*wxString message;
-          for(int i= 0 ; i< m_OrderedMidPoints.size(); i++)
-            message.Append(m_OrderedMidPoints[i].GetCStr());
-
-          wxMessageBox(message);*/
-					m_OrderMiddlePointsNameVMEList.clear();
-					for(int i=0;i<m_ListBox->GetCount();i++)
-					{
-						m_OrderMiddlePointsNameVMEList.push_back(m_ListBox->GetString(i));
-					}
-
-          Modified();
-          m_Gui->Update();
-          InternalUpdate();
-          ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
-        }
-      }
-      break;
-    case ID_DOWN:
-      {
-        if(m_ListBox->GetCount()!=0)
-        {
-          wxString name = m_ListBox->GetStringSelection();
-          int number = m_ListBox->GetSelection();
-          if(number == m_ListBox->GetCount() - 1) return;
-          //RemoveLink(name);
-
-          wxString temp;
-          temp = m_ListBox->GetStringSelection(); 
-          m_ListBox->Delete(m_ListBox->FindString(temp));
-          m_ListBox->Insert(name, number+1);
-
-          /*mafString temp2 = m_OrderedMidPoints[number+1];
-          m_OrderedMidPoints[number] = temp2;
-          m_OrderedMidPoints[number+1] = temp;*/
-
-          m_ListBox->SetStringSelection(_(name));
-
-          /*wxString message;
-          for(int i= 0 ; i< m_OrderedMidPoints.size(); i++)
-            message.Append(m_OrderedMidPoints[i].GetCStr());
-
-          wxMessageBox(message);*/
-					m_OrderMiddlePointsNameVMEList.clear();
-					for(int i=0;i<m_ListBox->GetCount();i++)
-					{
-						m_OrderMiddlePointsNameVMEList.push_back(m_ListBox->GetString(i));
-					}
-          
-          Modified();
-          InternalUpdate();
-          ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
-        }
-      }
-      break;
-		/*case ID_SAVE_FILE_BUTTON:
-			{
-        SaveInFile();
+				m_Gui->Update();
 			}
-			break;*/
-      default:
-        mafVME::OnEvent(maf_event);
-    }
-  }
-  else
-  {
-    Superclass::OnEvent(maf_event);
-  }
+			break;
+			case ID_REMOVE_POINT:
+			{
+				if (m_ListBox->GetCount() != 0)
+				{
+					wxString name = m_ListBox->GetStringSelection();
+					int number = m_ListBox->GetSelection();
+
+					RemoveLink(name);
+					m_ListBox->Delete(m_ListBox->FindString(m_ListBox->GetStringSelection()));
+					m_OrderMiddlePointsNameVMEList.clear();
+					for (int i = 0; i < m_ListBox->GetCount(); i++)
+					{
+						m_OrderMiddlePointsNameVMEList.push_back(m_ListBox->GetString(i));
+					}
+
+					Modified();
+					InternalUpdate();
+					ForwardUpEvent(&mafEvent(this, CAMERA_UPDATE));
+				}
+			}
+			break;
+			case ID_UP:
+			{
+				if (m_ListBox->GetCount() != 0)
+				{
+					wxString name = m_ListBox->GetStringSelection();
+					int number = m_ListBox->GetSelection();
+					if (number == 0) return;
+
+					wxString temp;
+					temp = m_ListBox->GetStringSelection();
+					m_ListBox->Delete(m_ListBox->FindString(temp));
+					m_ListBox->Insert(name, number - 1);
+
+
+					m_ListBox->SetStringSelection(_(name));
+
+					m_OrderMiddlePointsNameVMEList.clear();
+					for (int i = 0; i < m_ListBox->GetCount(); i++)
+					{
+						m_OrderMiddlePointsNameVMEList.push_back(m_ListBox->GetString(i));
+					}
+
+					Modified();
+					m_Gui->Update();
+					InternalUpdate();
+					ForwardUpEvent(&mafEvent(this, CAMERA_UPDATE));
+				}
+			}
+			break;
+			case ID_DOWN:
+			{
+				if (m_ListBox->GetCount() != 0)
+				{
+					wxString name = m_ListBox->GetStringSelection();
+					int number = m_ListBox->GetSelection();
+					if (number == m_ListBox->GetCount() - 1) return;
+					//RemoveLink(name);
+
+					wxString temp;
+					temp = m_ListBox->GetStringSelection();
+					m_ListBox->Delete(m_ListBox->FindString(temp));
+					m_ListBox->Insert(name, number + 1);
+
+	
+					m_ListBox->SetStringSelection(_(name));
+
+					m_OrderMiddlePointsNameVMEList.clear();
+					for (int i = 0; i < m_ListBox->GetCount(); i++)
+					{
+						m_OrderMiddlePointsNameVMEList.push_back(m_ListBox->GetString(i));
+					}
+
+					Modified();
+					InternalUpdate();
+					ForwardUpEvent(&mafEvent(this, CAMERA_UPDATE));
+				}
+			}
+			break;
+
+			default:
+				mafVME::OnEvent(maf_event);
+		}
+	}
+	else
+	{
+		Superclass::OnEvent(maf_event);
+	}
 }
 //-------------------------------------------------------------------------
 void mafVMEWrappedMeter::SetMeterLink(const char *link_name, mafVME *n)

@@ -1660,7 +1660,7 @@ void mafOpMML3::OnMuscleSelection()
   mafString title = "Select Muscle (Atlas)";
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
-  e.SetArg((long)(&mafOpMML3::AcceptVMESurface)) ; // accept only landmark vme's
+  e.SetPointer(&mafOpMML3::AcceptVMESurface) ; // accept only landmark vme's
   mafEventMacro(e);
   mafVME *vme = e.GetVme();
   if(!vme) return;
@@ -2396,7 +2396,7 @@ void mafOpMML3::OnLandmark1AtlasPatientSelection()
   mafString title = "Select Landmark 1 (Atlas)";
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
-  e.SetArg((long)(&mafOpMML3::AcceptVMELandmark)) ; // accept only landmark vme's
+  e.SetPointer(&mafOpMML3::AcceptVMELandmark) ; // accept only landmark vme's
   mafEventMacro(e);
   mafVME *vme = e.GetVme();
   if(!vme) return;
@@ -2515,7 +2515,7 @@ void mafOpMML3::OnLandmark2AtlasPatientSelection()
   mafString title = "Select Landmark 2 (Atlas)";
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
-  e.SetArg((long)(&mafOpMML3::AcceptVMELandmark)) ; // accept only landmark vme's
+  e.SetPointer(&mafOpMML3::AcceptVMELandmark) ; // accept only landmark vme's
   mafEventMacro(e);
   mafVME *vme = e.GetVme();
   if(!vme) return;
@@ -2633,7 +2633,7 @@ void mafOpMML3::OnLandmark3AtlasPatientSelection()
   mafString title = "Select Landmark 3 (Atlas)";
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
-  e.SetArg((long)(&mafOpMML3::AcceptVMELandmark)) ; // accept only landmark vme's
+  e.SetPointer(&mafOpMML3::AcceptVMELandmark) ; // accept only landmark vme's
   mafEventMacro(e);
   mafVME *vme = e.GetVme();
   if(!vme) return;
@@ -2751,7 +2751,7 @@ void mafOpMML3::OnLandmark4AtlasPatientSelection()
   mafString title = "Select Landmark 3 (Atlas)";
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
-  e.SetArg((long)(&mafOpMML3::AcceptVMELandmark)) ; // accept only landmark vme's
+  e.SetPointer(&mafOpMML3::AcceptVMELandmark) ; // accept only landmark vme's
   mafEventMacro(e);
   mafVME *vme = e.GetVme();
   if(!vme) return;
@@ -2869,7 +2869,7 @@ void mafOpMML3::OnLandmarkAxis1AtlasSelection()
   mafString title = "Select Landmark Axis1 (Atlas)";
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
-  e.SetArg((long)(&mafOpMML3::AcceptVMELandmark)) ; // accept only landmark vme's
+  e.SetPointer(&mafOpMML3::AcceptVMELandmark) ; // accept only landmark vme's
   mafEventMacro(e);
   mafVME *vme = e.GetVme();
   if(!vme) return;
@@ -2966,7 +2966,7 @@ void mafOpMML3::OnLandmarkAxis2AtlasSelection()
   mafString title = "Select Landmark Axis2 (Atlas)";
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
-  e.SetArg((long)(&mafOpMML3::AcceptVMELandmark)) ; // accept only landmark vme's
+  e.SetPointer(&mafOpMML3::AcceptVMELandmark) ; // accept only landmark vme's
   mafEventMacro(e);
   mafVME *vme = e.GetVme();
   if(!vme) return;
@@ -3063,7 +3063,7 @@ void mafOpMML3::OnLandmarkAxis3AtlasSelection()
   mafString title = "Select Landmark Axis3 (Atlas)";
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
-  e.SetArg((long)(&mafOpMML3::AcceptVMELandmark)) ; // accept only landmark vme's
+  e.SetPointer(&mafOpMML3::AcceptVMELandmark) ; // accept only landmark vme's
   mafEventMacro(e);
   mafVME *vme = e.GetVme();
   if(!vme) return;

@@ -73,7 +73,7 @@ void mafOpCreateSlicer::OpRun()
   mafString title = _("Choose VME to slice");
   mafEvent e;
   e.SetId(VME_CHOOSE);
-  e.SetArg((long)&mafOpCreateSlicer::VolumeAccept);
+  e.SetPointer(&mafOpCreateSlicer::VolumeAccept);
   e.SetString(&title);
   mafEventMacro(e);
 

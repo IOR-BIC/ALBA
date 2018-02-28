@@ -107,8 +107,15 @@ public:
   void SetMafObject(mafObject* obj)    { m_MafObject = obj;}
   void SetWidgetData(WidgetDataType &widget_data);
 
+
+	/** Returns Pointer */
+	void * GetPointer() const { return m_Pointer; }
+
+	/** Sets Pointer */
+	void SetPointer(void * pointer) { m_Pointer = pointer; }
+
 protected:
-  long             m_Arg;
+  long						 m_Arg;
   bool             m_Bool;
   double           m_Double;
   mafString       *m_MAFString;
@@ -121,6 +128,7 @@ protected:
   mafObject       *m_MafObject;
   std::vector<mafVME*> m_VmeVector;
   WidgetDataType   m_WidgetData;
+	void						*m_Pointer;
 
   int m_x;
   int m_y;

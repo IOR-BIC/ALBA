@@ -439,7 +439,7 @@ enum VOLUME_UNION_WIDGET_ID
 bool mafOpVolumeUnion::VmeChoose(mafString title,mafEvent *e)
 //----------------------------------------------------------------------------
 {
-	e->SetArg((long)&mafOpVolumeUnion::VmeUnionAccept);
+	e->SetPointer(&mafOpVolumeUnion::VmeUnionAccept);
 	e->SetString(&title);
 	e->SetId(VME_CHOOSE);
 	mafEventMacro(*e);
