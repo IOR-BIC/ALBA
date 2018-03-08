@@ -32,6 +32,12 @@
 #include <iostream>
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
+#ifdef _WIN64
+#define DLL_FILENAME "DLLTest64.dll"
+#else
+#define DLL_FILENAME "DLLTest.dll"
+#endif
+
 //----------------------------------------------------------------------------
 void mafDynamicLoaderTest::TestFixture()
 //----------------------------------------------------------------------------
@@ -55,7 +61,7 @@ void mafDynamicLoaderTest::TestOpenLibrary()
 #define MAFDYNAMICLOADER_DEFINED_TEST 1
 	LibHandle lHandle = NULL;
 	mafString dllPath = MAF_DATA_ROOT;
-	dllPath << "/Test_DynamicLoader/linkinfo.dll";
+	dllPath << "/Test_DynamicLoader/" << DLL_FILENAME;
 	lHandle = mafDynamicLoader::OpenLibrary(dllPath);
 
 	result = lHandle != NULL;
@@ -88,7 +94,7 @@ void mafDynamicLoaderTest::TestCloseLibrary()
 #define MAFDYNAMICLOADER_DEFINED_TEST 1
 	LibHandle lHandle = NULL;
 	mafString dllPath = MAF_DATA_ROOT;
-	dllPath << "/Test_DynamicLoader/linkinfo.dll";
+	dllPath << "/Test_DynamicLoader/" << DLL_FILENAME;
 	lHandle = mafDynamicLoader::OpenLibrary(dllPath);
 
 	int exit = mafDynamicLoader::CloseLibrary(lHandle);
@@ -125,11 +131,11 @@ void mafDynamicLoaderTest::TestGetSymbolAddress()
 #define MAFDYNAMICLOADER_DEFINED_TEST 1
 	LibHandle lHandle = NULL;
 	mafString dllPath = MAF_DATA_ROOT;
-	dllPath << "/Test_DynamicLoader/linkinfo.dll";
+	dllPath << "/Test_DynamicLoader/" << DLL_FILENAME;
 	lHandle = mafDynamicLoader::OpenLibrary(dllPath);
 
 	void *pointer = NULL;
-	pointer = (void *)mafDynamicLoader::GetSymbolAddress(lHandle, "GetCanonicalPathInfo");
+	pointer = (void *)mafDynamicLoader::GetSymbolAddress(lHandle, "AddNums");
 
 	result = pointer != NULL;
 	printf("\nADDRESS : %d\n", pointer);
@@ -143,6 +149,47 @@ void mafDynamicLoaderTest::TestGetSymbolAddress()
 
 #endif
 }
+
+//----------------------------------------------------------------------------
+void mafDynamicLoaderTest::TestCallFunction()
+{
+#ifdef __hpux
+#define MAFDYNAMICLOADER_DEFINED_TEST 1
+
+#endif
+
+#ifdef __APPLE__
+#define MAFDYNAMICLOADER_DEFINED_TEST 1
+
+#endif
+
+#ifdef _WIN32
+#define MAFDYNAMICLOADER_DEFINED_TEST 1
+	LibHandle lHandle = NULL;
+	mafString dllPath = MAF_DATA_ROOT;
+	dllPath << "/Test_DynamicLoader/" << DLL_FILENAME;
+	lHandle = mafDynamicLoader::OpenLibrary(dllPath);
+
+	typedef int(*SUMFUNC)(int, int);
+	SUMFUNC pointer = NULL;
+	pointer = (SUMFUNC) mafDynamicLoader::GetSymbolAddress(lHandle, "AddNums");
+
+	CPPUNIT_ASSERT(pointer != NULL);
+	
+	int res;
+	res = pointer(5, 3);
+
+	CPPUNIT_ASSERT(res == 8);
+	
+	mafDynamicLoader::CloseLibrary(lHandle);
+#endif
+
+#ifndef MAFDYNAMICLOADER_DEFINED_TEST
+#define MAFDYNAMICLOADER_DEFINED_TEST 1
+
+#endif
+}
+
 //----------------------------------------------------------------------------
 void mafDynamicLoaderTest::TestLibPrefix()
 //----------------------------------------------------------------------------
@@ -195,7 +242,6 @@ void mafDynamicLoaderTest::TestLibExtension()
   #endif
 
   #ifndef MAFDYNAMICLOADER_DEFINED_TEST
-  #define MAFDYNAMICLOADER_DEFINED_TEST 1
 	result = mafString(mafDynamicLoader::LibExtension()).Equals(".so");
 	TEST_RESULT;
 	#endif
