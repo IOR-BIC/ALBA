@@ -30,6 +30,7 @@ public:
 	CPPUNIT_TEST(TestOpenLibrary);
   CPPUNIT_TEST(TestCloseLibrary);
   CPPUNIT_TEST(TestGetSymbolAddress);
+	CPPUNIT_TEST(TestCallFunction);
   CPPUNIT_TEST(TestLibPrefix);
   CPPUNIT_TEST(TestLibExtension);
 	CPPUNIT_TEST(TestLastError);
@@ -41,6 +42,7 @@ private:
 	void TestOpenLibrary();
 	void TestCloseLibrary();
 	void TestGetSymbolAddress();
+	void TestCallFunction();
 	void TestLibPrefix();
 	void TestLibExtension();
 	void TestLastError();

@@ -147,6 +147,12 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafConfigure.h.in
 #-----------------------------------------------------------------------------
 # Installer configuration
 #-----------------------------------------------------------------------------
+if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+  set( INSTALLER_ARCH "x64" )
+else( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+  set( INSTALLER_ARCH "x86" )
+endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/EnumUsersReg.nsh ${PROJECT_BINARY_DIR}/Installer/EnumUsersReg.nsh @ONLY)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/InstallerCommon.nsh.in ${PROJECT_BINARY_DIR}/Installer/InstallerCommon.nsh @ONLY)
 			 

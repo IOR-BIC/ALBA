@@ -90,7 +90,7 @@ Function CheckIfVS2015RedistributablePackageIsAlreadyInstalled
 	;-------------------------
 	;Windows 7 64 Check
 	;-------------------------
-	${registry::Read} "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0\VC\Runtimes\x86" "Installed" $R0 $R1
+	${registry::Read} "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0\VC\Runtimes\@INSTALLER_ARCH@" "Installed" $R0 $R1
 
 	IntCmp $R0 1 registry_key_present1 registry_key_not_found1
 	registry_key_present1:		 
