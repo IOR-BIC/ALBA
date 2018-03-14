@@ -866,12 +866,12 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafVME *in_node, mafVME 
             trialEvent = "Create";
         }
 
-        if(in_node->GetRoot()->GetTagArray()->IsTagPresent("APP_STAMP"))
-          appStamp = in_node->GetRoot()->GetTagArray()->GetTag("APP_STAMP")->GetValue();
+        if(out_node->GetRoot()->GetTagArray()->IsTagPresent("APP_STAMP"))
+          appStamp = out_node->GetRoot()->GetTagArray()->GetTag("APP_STAMP")->GetValue();
 
-        if(in_node->GetTagArray()->IsTagPresent("VME_NATURE"))
+        if(out_node->GetTagArray()->IsTagPresent("VME_NATURE"))
         {
-          isNatural = in_node->GetTagArray()->GetTag("VME_NATURE")->GetValue();
+          isNatural = out_node->GetTagArray()->GetTag("VME_NATURE")->GetValue();
           if (isNatural.Compare("NATURAL") == 0 )
             isNatural = "true";
           else
