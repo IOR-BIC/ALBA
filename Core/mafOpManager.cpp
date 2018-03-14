@@ -322,6 +322,13 @@ void mafOpManager::VmeModified(mafVME* v)
 }
 
 //----------------------------------------------------------------------------
+void mafOpManager::VmeRemove(mafVME* v)
+{
+	if (m_Selected == v)
+		m_Selected = NULL;
+}
+
+//----------------------------------------------------------------------------
 mafVME* mafOpManager::GetSelectedVme()
 //----------------------------------------------------------------------------
 {
@@ -528,7 +535,7 @@ void mafOpManager::OpRun(mafOp *op, void *op_param)
 	//Code to manage operation's Input Preserving
   mafTagItem *ti = NULL;
   mafString tag_nature = "";
-  if (m_Selected->GetTagArray()->IsTagPresent("VME_NATURE"))
+  if (m_Selected && m_Selected->GetTagArray()->IsTagPresent("VME_NATURE"))
   {
     ti = m_Selected->GetTagArray()->GetTag("VME_NATURE");
     tag_nature = ti->GetValue();
@@ -743,25 +750,33 @@ void mafOpManager::OpDo(mafOp *op)
 //----------------------------------------------------------------------------
 {
   m_Context.Redo_Clear();
-  op->OpDo();
   mafVME *in_node = op->GetInput();
-  mafVME *out_node = op->GetOutput();
-
+ 
   if (in_node != NULL)
   {
-    mafLogMessage("executed operation '%s' on input data: %s",op->m_Label.c_str(), in_node->GetName());
+    mafLogMessage("executing operation '%s' on input data: %s",op->m_Label.c_str(), in_node->GetName());
   }
   else
   {
-    mafLogMessage("executed operation '%s'",op->m_Label.c_str());
+    mafLogMessage("executing operation '%s'",op->m_Label.c_str());
   }
-  if (out_node != NULL)
-  {
-    mafLogMessage("operation '%s' generate %s as output",op->m_Label.c_str(), out_node->GetName());
-  }
+ 
+	if (op->GetType() != OPTYPE_EDIT)
+		FillTraceabilityAttribute(op, in_node, NULL);
 
-  if (op->GetType() != OPTYPE_EDIT)
-      FillTraceabilityAttribute(op, in_node, out_node);
+	op->OpDo();
+
+	
+	mafVME *out_node = op->GetOutput();
+	if (out_node != NULL)
+	{
+		if (op->GetType() != OPTYPE_EDIT)
+			FillTraceabilityAttribute(op, NULL, out_node);
+
+		mafLogMessage("operation '%s' generate %s as output", op->m_Label.c_str(), out_node->GetName());
+	}
+
+
 
   if(op->CanUndo()) 
   {
@@ -815,21 +830,6 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafVME *in_node, mafVME 
     if(in_node->GetRoot()->GetTagArray()->IsTagPresent("APP_STAMP"))
       appStamp = in_node->GetRoot()->GetTagArray()->GetTag("APP_STAMP")->GetValue();
 
-
-#ifdef _WIN32
-		mafString regKeyPath = "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\";
-    regKeyPath.Append(appStamp.GetCStr());
-
-    wxRegKey RegKey(wxString(regKeyPath.GetCStr()));
-    if(RegKey.Exists())
-    {
-      RegKey.Create();
-      RegKey.QueryValue(wxString("DisplayVersion"), revision);
-    }
-    appStamp.Append(" ");
-    appStamp.Append(revision.c_str());
-#endif
-   
     if(in_node->GetTagArray()->IsTagPresent("VME_NATURE"))
     {
       isNatural = in_node->GetTagArray()->GetTag("VME_NATURE")->GetValue();

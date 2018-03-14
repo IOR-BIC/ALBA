@@ -1328,6 +1328,8 @@ void mafLogicWithManagers::VmeRemoving(mafVME *vme)
     m_SideBar->VmeRemove(vme);
 	if(m_ViewManager)
     m_ViewManager->VmeRemove(vme);
+	if (m_OpManager)
+		m_OpManager->VmeRemove(vme);
 
 	if (m_SelectedLandmark == vme)
 		m_SelectedLandmark = NULL;
