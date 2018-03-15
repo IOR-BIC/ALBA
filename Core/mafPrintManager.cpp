@@ -289,8 +289,6 @@ void mafPrintManager::OnPrint(mafVMEImage *img)
 	{
 		if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
 			wxMessageBox("There was a problem printing.\nPerhaps your current printer is not set correctly?", "Printing", wxOK);
-		else
-			wxMessageBox("You canceled printing", "Printing", wxOK);
 	}
 	else
 	{

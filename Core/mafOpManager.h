@@ -82,6 +82,9 @@ public:
 
 	/** Record the modified vme and enable the menu_entries relative to the compatible operations. */
 	virtual void VmeModified(mafVME* v);
+
+	/** Vme removed notification */
+	virtual void VmeRemove(mafVME* v);
 	
 	/** Return the selected vme. */
 	virtual mafVME* GetSelectedVme();
