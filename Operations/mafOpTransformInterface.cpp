@@ -123,43 +123,45 @@ mafOp* mafOpTransformInterface::Copy()
 void mafOpTransformInterface::OpDo()
 //----------------------------------------------------------------------------
 {
-  // decompose matrix
-  mafMatrix rotMat;
-  mafMatrix scaleMat;
-  double position[3];
-  double scaling[3] = {0,0,0};
+	// decompose matrix
+	mafMatrix rotMat;
+	mafMatrix scaleMat;
+	double position[3];
+	double scaling[3] = { 0,0,0 };
 
-  mafTransform::PolarDecomp(m_NewAbsMatrix, rotMat, scaleMat, position);
+	mafTransform::PolarDecomp(m_NewAbsMatrix, rotMat, scaleMat, position);
 
-  for (int i = 0;i < 3; i++)
-  {
-    scaling[i] = scaleMat.GetElement(i,i);
-  }
+	for (int i = 0; i < 3; i++)
+	{
+		scaling[i] = scaleMat.GetElement(i, i);
+	}
 
-  // create the roto-translation matrix to be set as vme abs pose
-  mafMatrix rotoTraslMatrix;
-  rotoTraslMatrix = rotMat;
-  mafTransform::SetPosition(rotoTraslMatrix, position);
+	// create the roto-translation matrix to be set as vme abs pose
+	mafMatrix rotoTraslMatrix;
+	rotoTraslMatrix = rotMat;
+	mafTransform::SetPosition(rotoTraslMatrix, position);
 
-  vtkMAFSmartPointer<vtkPolyData> pd;
-  vtkMAFSmartPointer<vtkUnstructuredGrid> ug;
-  vtkMAFSmartPointer<vtkRectilinearGrid> rg;
-  vtkMAFSmartPointer<vtkStructuredPoints> sp;
+	vtkMAFSmartPointer<vtkPolyData> pd;
+	vtkMAFSmartPointer<vtkUnstructuredGrid> ug;
+	vtkMAFSmartPointer<vtkRectilinearGrid> rg;
+	vtkMAFSmartPointer<vtkStructuredPoints> sp;
 
-  if (m_EnableScaling == 1 && 
-      // group has no dataset
-      !m_Input->IsA("mafVMEGroup") &&
-      //  landmarks do not scale
-      !m_Input->IsA("mafVMELandmark") && 
-      //  parametric surfaces do not scale
-      !m_Input->IsA("mafVMESurfaceParametric") &&
-      //  refSys do not scale
-      !m_Input->IsA("mafVMERefSys") &&
-      //  slicer  do not scale
-      !m_Input->IsA("mafVMESlicer") &&
-      //  slicer  do not scale
-      !m_Input->IsA("mafVMELandmarkCloud")
-     )
+	if (m_EnableScaling == 1 && 
+			!( 
+				// group has no dataset
+				m_Input->IsA("mafVMEGroup") ||
+				//  landmarks do not scale
+				m_Input->IsA("mafVMELandmark") ||
+				//  parametric surfaces do not scale
+				m_Input->IsA("mafVMESurfaceParametric") ||
+				//  refSys do not scale
+				m_Input->IsA("mafVMERefSys") ||
+				//  slicer  do not scale
+				m_Input->IsA("mafVMESlicer") ||
+				//  slicer  do not scale
+				m_Input->IsA("mafVMELandmarkCloud")
+			 )
+		 )
   {
     // apply scale to data
     
