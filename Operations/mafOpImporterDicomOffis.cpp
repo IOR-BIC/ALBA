@@ -1032,7 +1032,7 @@ void mafOpImporterDicomOffis::SetPlaneDims()
 	diffx=m_SliceBounds[1]-m_SliceBounds[0];
 	diffy=m_SliceBounds[3]-m_SliceBounds[2];
 
-	m_SlicePlane->SetOrigin(0,0,0);
+	m_SlicePlane->SetOrigin(0,0,0); 
 	m_SlicePlane->SetPoint1(diffx,0,0);
 	m_SlicePlane->SetPoint2(0,diffy,0);
 }
@@ -1080,16 +1080,16 @@ void mafOpImporterDicomOffis::ImportDicomTags()
 
 	std::string tagString;
 
-	READTAG(TAG_PatientsName, "patientsName");
-	READTAG(TAG_PatientsSex, "PatientsSex");
-	READTAG(TAG_PatientsBirthDate, "PatientsBirthDate");
-	READTAG(TAG_PatientsWeight, "PatientsWeight");
-	READTAG(TAG_PatientID, "PatientID"); 
-	READTAG(TAG_PatientsAge, "PatientsAge");
-	READTAG(TAG_InstitutionName, "InstitutionName");
-	READTAG(TAG_StudyDescription, "StudyDescription");
-	READTAG(TAG_SeriesDescription, "SeriesDescription");
-	READTAG(TAG_AcquisitionDate, "AcquisitionDate");
+	READ_AND_SET_TAGARRAY(TAG_PatientsName, "patientsName");
+	READ_AND_SET_TAGARRAY(TAG_PatientsSex, "PatientsSex");
+	READ_AND_SET_TAGARRAY(TAG_PatientsBirthDate, "PatientsBirthDate");
+	READ_AND_SET_TAGARRAY(TAG_PatientsWeight, "PatientsWeight");
+	READ_AND_SET_TAGARRAY(TAG_PatientID, "PatientID");
+	READ_AND_SET_TAGARRAY(TAG_PatientsAge, "PatientsAge");
+	READ_AND_SET_TAGARRAY(TAG_InstitutionName, "InstitutionName");
+	READ_AND_SET_TAGARRAY(TAG_StudyDescription, "StudyDescription");
+	READ_AND_SET_TAGARRAY(TAG_SeriesDescription, "SeriesDescription");
+	READ_AND_SET_TAGARRAY(TAG_AcquisitionDate, "AcquisitionDate");
 	
   m_TagArray->SetTag(mafTagItem("VME_NATURE", "NATURAL"));
 }
