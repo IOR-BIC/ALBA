@@ -58,6 +58,13 @@ class mafDicomSeries;
 class mafGUIDicomSettings;
 class mafDicomStudyList;
 class mafDicomStudy;
+namespace gdcm {
+	class DataSet;
+	class Tag;
+	class Image;
+	template<uint16_t Group, uint16_t Element,int TVR, int TVM> class Attribute;
+}
+
 
 
 //----------------------------------------------------------------------------
@@ -153,23 +160,18 @@ protected:
 	/** Create crop page and   his GUI for the wizard. */
 	void CreateCropPage();
 		
-	/** gets the range of the Dicom by walking thought the slices */
-	void GetDicomRange(double *range);
-
 	/** Reset the slider that allow to scan the slices. */
 	void CreateSliders();
 
 	/** Load Dicom in folder */
 	bool LoadDicomFromDir(const char *dicomDirABSPath);
 
-	/** Read the list of dicom files recognized. */
-	mafDicomSlice *ReadDicomSlice(mafString fileName);
+	/** Read the list of Dicom files recognized. */
+	mafDicomSlice *ReadDicomFile(mafString fileName);
 
-	/** Crate the image data by read information from the dicom dataset */
-	vtkImageData *CreateImageData(DcmDataset * dicomDataset, double * dcmImagePositionPatient);
-
-	void GetDicomSpacing(DcmDataset * dicomDataset, double * dcmPixelSpacing);
-		
+	/** Get the value of a tag inside a dicom dataset. */
+	template <uint16_t A, uint16_t B> double GetAttributeValue(gdcm::DataSet &dcmDataSet);
+			
 	/** Return the slice number from the heightId and sliceId*/
 	int GetSliceIDInSeries(int heightId, int timeId);
 
@@ -207,6 +209,7 @@ protected:
 	vtkPolyDataMapper	*m_SliceMapper;
 	vtkTexture				*m_SliceTexture;
 	vtkActor					*m_SliceActor;
+	vtkImageData			*m_CurrentSliceID;
 	
 	// text stuff
 	vtkActor2D    *m_TextActor;
@@ -261,8 +264,8 @@ protected:
 
 	bool m_JustOnceImport;
 
-	double m_TotalDicomRange[2]; ///< contains the scalar range og the full dicom
-	double m_TotalDicomSubRange[2]; ///< contains the scalar range og the full dicom
+	double m_SliceRange[2]; ///< contains the scalar range og the full dicom
+	double m_SliceSubRange[2]; ///< contains the scalar range og the full dicom
 
 	/** destructor */
 	~mafOpImporterDicomOffis();
@@ -386,23 +389,22 @@ class MAF_EXPORT mafDicomSlice
 public:
 
 	/** Constructor */
-	mafDicomSlice(mafString sliceABSFilename, double dcmImageOrientationPatient[6], vtkImageData *data, mafString description, mafString date,
-								mafString patientName, mafString patientBirthdate, int dcmInstanceNumber = -1, int dcmCardiacNumberOfImages = -1, double dcmTtriggerTime = -1.0)
+	mafDicomSlice(mafString sliceABSFilename, double dcmImageOrientationPatient[6], double dcmImagePositionPatient[3], mafString description, mafString date,
+								mafString patientName, mafString patientBirthdate, int dcmCardiacNumberOfImages = -1, double dcmTtriggerTime = -1.0)
 	{
 		m_PatientBirthdate = patientBirthdate;
 		m_PatientName = patientName;
 		m_Description = description;
 		m_Date = date;
 		m_SliceABSFileName = sliceABSFilename;
-		m_DcmInstanceNumber = dcmInstanceNumber;
-		m_DcmCardiacNumberOfImages = dcmCardiacNumberOfImages;
-		m_DcmTriggerTime = dcmTtriggerTime;
-		m_ImageData = data;
+		m_NumberOfCardiacImages = dcmCardiacNumberOfImages;
+		m_TriggerTime = dcmTtriggerTime;
 		SetDcmImageOrientationPatient(dcmImageOrientationPatient);
+		SetImagePositionPatient(dcmImagePositionPatient);
 	};
 
 	/** destructor */
-	~mafDicomSlice() { vtkDEL(m_ImageData); };
+	~mafDicomSlice() {};
 
 	/** Return patient birthday */
 	mafString GetPatientBirthday() { return m_PatientBirthdate; };
@@ -415,53 +417,47 @@ public:
 
 	/** Set the filename of the corresponding Dicom slice. */
 	void SetSliceABSFileName(char *fileName) { m_SliceABSFileName = fileName; };
-
-	/** Return the image number of the Dicom slice */
-	int GetDcmInstanceNumber() const { return m_DcmInstanceNumber; };
-
-	/** Set the image number of the Dicom slice */
-	void SetDcmInstanceNumber(int number) { m_DcmInstanceNumber = number; };
-
+		
 	/** Return the number of cardiac time frames */
-	int GetDcmCardiacNumberOfImages() const { return m_DcmCardiacNumberOfImages; };
+	int GetNumberOfCardiacImages() const { return m_NumberOfCardiacImages; };
 
 	/** Set the number of cardiac time frames */
-	void SetDcmCardiacNumberOfImages(int number) { m_DcmCardiacNumberOfImages = number; };
+	void SetNumberOfCardiacImages(int number) { m_NumberOfCardiacImages = number; };
 
 	/** Return the trigger time of the Dicom slice */
-	double GetDcmTriggerTime() const { return m_DcmTriggerTime; };
+	double GetTriggerTime() const { return m_TriggerTime; };
 
 	/** Set the trigger time of the Dicom slice*/
-	void SetDcmTriggerTime(double time) { m_DcmTriggerTime = time; };
+	void SetTriggerTime(double time) { m_TriggerTime = time; };
 
 	/** Retrieve image data */
-	vtkImageData* GetVTKImageData() { return m_ImageData; };
-
+	vtkImageData* GetNewVTKImageData();
+	
 	/** Set the DcmImageOrientationPatient tag for the slice */
 	void SetDcmImageOrientationPatient(double dcmImageOrientationPatient[6])
 	{
-		m_DcmImageOrientationPatient[0] = dcmImageOrientationPatient[0];
-		m_DcmImageOrientationPatient[1] = dcmImageOrientationPatient[1];
-		m_DcmImageOrientationPatient[2] = dcmImageOrientationPatient[2];
-		m_DcmImageOrientationPatient[3] = dcmImageOrientationPatient[3];
-		m_DcmImageOrientationPatient[4] = dcmImageOrientationPatient[4];
-		m_DcmImageOrientationPatient[5] = dcmImageOrientationPatient[5];
-		CalculateUnrotatedOrigin();
+		m_ImageOrientationPatient[0] = dcmImageOrientationPatient[0];
+		m_ImageOrientationPatient[1] = dcmImageOrientationPatient[1];
+		m_ImageOrientationPatient[2] = dcmImageOrientationPatient[2];
+		m_ImageOrientationPatient[3] = dcmImageOrientationPatient[3];
+		m_ImageOrientationPatient[4] = dcmImageOrientationPatient[4];
+		m_ImageOrientationPatient[5] = dcmImageOrientationPatient[5];
+		ComputeUnrotatedOrigin();
 	};
 
 	/** Get the DcmImageOrientationPatient tag for the slice */
 	void GetDcmImageOrientationPatient(double dcmImageOrientationPatient[6])
 	{
-		dcmImageOrientationPatient[0] = m_DcmImageOrientationPatient[0];
-		dcmImageOrientationPatient[1] = m_DcmImageOrientationPatient[1];
-		dcmImageOrientationPatient[2] = m_DcmImageOrientationPatient[2];
-		dcmImageOrientationPatient[3] = m_DcmImageOrientationPatient[3];
-		dcmImageOrientationPatient[4] = m_DcmImageOrientationPatient[4];
-		dcmImageOrientationPatient[5] = m_DcmImageOrientationPatient[5];
+		dcmImageOrientationPatient[0] = m_ImageOrientationPatient[0];
+		dcmImageOrientationPatient[1] = m_ImageOrientationPatient[1];
+		dcmImageOrientationPatient[2] = m_ImageOrientationPatient[2];
+		dcmImageOrientationPatient[3] = m_ImageOrientationPatient[3];
+		dcmImageOrientationPatient[4] = m_ImageOrientationPatient[4];
+		dcmImageOrientationPatient[5] = m_ImageOrientationPatient[5];
 	};
 
 	/** Get the DcmImageOrientationPatient tag for the slice */
-	const double *GetDcmImageOrientationPatient() { return m_DcmImageOrientationPatient; }
+	const double *GetDcmImageOrientationPatient() { return m_ImageOrientationPatient; }
 
 	/** Return the position unrotated. 
 	The origin is set to the output to this value,
@@ -475,55 +471,77 @@ public:
 	/** return the date */
 	mafString GetDate() { return m_Date; };
 
-	/** Get the DCM modality */
-	mafString GetDcmModality() { return m_DcmModality; };
+	/** Get the Modality */
+	mafString GetModality() { return m_Modality; };
 
 	/** Set the DCM modality */
-	void SetDcmModality(mafString dcmModality) { m_DcmModality = dcmModality; };
-
-
+	void SetModality(mafString dcmModality) { m_Modality = dcmModality; };
+	
 	/** Returns PhotometricInterpretation */
 	mafString GetPhotometricInterpretation() const { return m_PhotometricInterpretation; }
 
 	/** Sets PhotometricInterpretation */
 	void SetPhotometricInterpretation(mafString photometricInterpretation) { m_PhotometricInterpretation = photometricInterpretation; }
 
-
 	/** Returns SeriesID */
 	mafString GetSeriesID() const { return m_SeriesID; }
 
 	/** Sets SeriesID */
 	void SetSeriesID(mafString seriesID) { m_SeriesID = seriesID; }
-
-
+	
 	/** Returns StudyID */
 	mafString GetStudyID() const { return m_StudyID; }
 
 	/** Sets StudyID */
 	void SetStudyID(mafString studyID) { m_StudyID = studyID; }
+	
+	/** Returns ImagePositionPatient */
+	void GetImagePositionPatient(double imagePositionPatient[3]) 
+	{
+		imagePositionPatient[0] = m_ImagePositionPatient[0];
+		imagePositionPatient[1] = m_ImagePositionPatient[1];
+		imagePositionPatient[2] = m_ImagePositionPatient[2];
+
+	}
+
+	/** Sets ImagePositionPatient */
+	void SetImagePositionPatient(double imagePositionPatient[3]) {
+		m_ImagePositionPatient[0] = imagePositionPatient[0];
+		m_ImagePositionPatient[1] = imagePositionPatient[1];
+		m_ImagePositionPatient[2] = imagePositionPatient[2];
+		ComputeUnrotatedOrigin();
+	}
+	
+	/** Returns SliceSize */
+	int *GetSliceSize() { return m_SliceSize; }
+
+	/** Sets SliceSize */
+	void SetSliceSize(int *sliceSize) { m_SliceSize[0] = sliceSize[0]; m_SliceSize[1] = sliceSize[1]; }
 
 protected:
 
-	/** Calculate the unrotated origin */
-	void CalculateUnrotatedOrigin();
+	/** Compute VTK Scalar Type from Dicom image*/
+	int ComputeVTKScalarType(int scalarType);
+
+	/** Compute the unrotated origin */
+	void ComputeUnrotatedOrigin();
 
 	double m_UnrotatedOrigin[3];
-	double m_DcmImageOrientationPatient[6];
+	double m_ImagePositionPatient[3];
+	double m_ImageOrientationPatient[6];
 	mafString m_SliceABSFileName;
 	mafString m_Description;
 	mafString m_Date;
 	mafString m_PatientName;
 	mafString m_PatientBirthdate;
-	mafString m_DcmModality;
+	mafString m_Modality;
 	mafString m_PhotometricInterpretation;
 	mafString m_SeriesID;
 	mafString m_StudyID;
 
-	double m_DcmTriggerTime;
-	int m_DcmInstanceNumber;
-	int m_DcmCardiacNumberOfImages;
-
-	vtkImageData *m_ImageData;	
+	double m_TriggerTime;
+	int m_NumberOfCardiacImages;
+	int m_SliceSize[2];
 };
 
 #endif

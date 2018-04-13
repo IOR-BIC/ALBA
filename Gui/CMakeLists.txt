@@ -3,7 +3,7 @@
 #
 
 PROJECT(mafGui)
-MESSAGE(STATUS "Configuring project ${PROJECT_NAME}")
+DBG_MESSAGE("Configuring project mafCore")
 
 CONFIGURE_FILE("${MAF_SOURCE_DIR}/Gui/manifest.in" "${MAF_BINARY_DIR}/Gui/manifest.in" COPYONLY)
 
@@ -18,18 +18,6 @@ SET(PROJECT_SRCS
   mafGUISettings.cpp  mafGUISettings.h
   mafGUISettingsTimeBar.cpp  mafGUISettingsTimeBar.h
   
-  ##### Example of SRB List Dialog requires OPENSSL #####
-	#mafGUISRBBrowse.cpp
-	#mafGUISRBBrowse.h
-	#---------SRBList stub---------------
-  #./SrbStorageWS/soapC.cpp
-	#./SrbStorageWS/soapClient.cpp	
-	#./SrbStorageWS/soapSrbUploadProxy.h
-	#./SrbStorageWS/soapSrbDownloadProxy.h
-	#./SrbStorageWS/soapSrbListProxy.h
-	#./SrbStorageWS/stdsoap2.cpp
-	#./SrbStorageWS/stdsoap2.h
-	#------------------------------------
   mafPics.cpp  						mafPics.h
   mafWXLog.cpp  					mafWXLog.h
   mafGUIApplicationSettings.cpp  	mafGUIApplicationSettings.h

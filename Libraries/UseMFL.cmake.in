@@ -19,6 +19,7 @@ SET(MAF_USE_XercesC @MAF_USE_XercesC@)
 SET(MAF_USE_CURL @MAF_USE_CURL@)
 SET(MAF_USE_CRYPTO @MAF_USE_CRYPTO@)
 SET(MAF_USE_OFFIS @MAF_USE_OFFIS@)
+SET(MAF_USE_GDCM @MAF_USE_GDCM@)
 
 # path to MFL binary directory
 SET (MFL_BINARY_PATH @MFL_BINARY_DIR@)
@@ -91,6 +92,22 @@ IF (MAF_USE_WX)
 ENDIF (MAF_USE_WX)
 
 #
+# GDCM library
+#
+IF (MAF_USE_GDCM)
+  SET (GDCM_POSSIBLE_ROOT_PATHS @MFL_BINARY_DIR@/GDCM/Build @MFL_SOURCE_DIR@/GDCM/Sources)
+  FIND_FILE(GDCM_USE_FILE UseGDCM.cmake ${GDCM_POSSIBLE_ROOT_PATHS})
+  FIND_FILE(GDCM_CONF_FILE GDCMConfig.cmake ${GDCM_POSSIBLE_ROOT_PATHS})
+  FIND_PATH(GDCM_BINARY_PATH UseGDCM.cmake ${GDCM_POSSIBLE_ROOT_PATHS})
+  IF (GDCM_USE_FILE AND GDCM_CONF_FILE)
+		INCLUDE (${GDCM_CONF_FILE}) # currently only local library is supported
+		INCLUDE (${GDCM_USE_FILE}) # currently only local library is supported
+		SET(GDCM_LIBRARIES  gdcmcharls gdcmCommon gdcmDICT gdcmDSED gdcmexpat gdcmgetopt gdcmIOD gdcmjpeg12 gdcmjpeg16 gdcmjpeg8 gdcmMEXD gdcmMSFF gdcmopenjp2 gdcmzlib socketxx Rpcrt4)
+  ENDIF (GDCM_USE_FILE AND GDCM_CONF_FILE)
+ENDIF (MAF_USE_GDCM)
+
+
+#
 # ITK library
 #
 IF (MAF_USE_ITK)
@@ -128,6 +145,7 @@ IF (MAF_USE_OFFIS)
     INCLUDE (${Offis_USE_FILE}) # currently only local library is supported
   ENDIF (Offis_USE_FILE)
 ENDIF (MAF_USE_OFFIS)
+
 
 #
 # BTK library
