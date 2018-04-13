@@ -162,6 +162,12 @@ void vtkMAFVolumeOrthoSlicer::Execute()
 		case VTK_UNSIGNED_SHORT:
 			SliceScalars(inputDims, (unsigned short*)inputPointer, (unsigned short*)outputPointer);
 			break;
+		case VTK_INT:
+			SliceScalars(inputDims, (int *)inputPointer, (int *)outputPointer);
+			break;
+		case VTK_UNSIGNED_INT:
+			SliceScalars(inputDims, (unsigned int*)inputPointer, (unsigned int*)outputPointer);
+			break;
 		case VTK_FLOAT:
 			SliceScalars(inputDims, (float*)inputPointer, (float*)outputPointer);
 			break;
@@ -188,12 +194,11 @@ void vtkMAFVolumeOrthoSlicer::SliceScalars(int *inputDims, DataType *inputScalar
 	int sliceSize, jOffset1, jOffset2, kOffset1, kOffset2, plane1, plane2;
 	double acc;
 	double ratio1, ratio2;
-
-
+	
 	newIdx = 0;
 	sliceSize = inputDims[0] * inputDims[1];
 	GetSlicingInfo(&plane1, &plane2, &ratio1, &ratio2);
-
+	
 	switch (this->SclicingMode)
 	{
 		case ORTHOSLICER_X_SLICE:
@@ -330,13 +335,13 @@ void vtkMAFVolumeOrthoSlicer::GenerateOutputFromRG(vtkRectilinearGrid * inputRG,
 	rgOut->GetPointData()->SetScalars(projScalars);
 	
 	
-	vtkMAFRGtoSPImageFilter *rgtosoFilter = vtkMAFRGtoSPImageFilter::New();
-	rgtosoFilter->SetInput(rgOut);
-	rgtosoFilter->Update();
+	vtkMAFRGtoSPImageFilter *rgtospFilter = vtkMAFRGtoSPImageFilter::New();
+	rgtospFilter->SetInput(rgOut);
+	rgtospFilter->Update();
 	
-	GetOutput()->DeepCopy(rgtosoFilter->GetOutput());
+	GetOutput()->DeepCopy(rgtospFilter->GetOutput());
 
-	vtkDEL(rgtosoFilter);
+	vtkDEL(rgtospFilter);
 	vtkDEL(rgOut);
 }
 

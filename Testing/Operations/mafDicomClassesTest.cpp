@@ -53,27 +53,26 @@
 //----------------------------------------------------------------------------
 mafDicomSlice * mafDicomClassesTest::CreateBaseSlice(double *pos)
 {
-	vtkMAFSmartPointer<vtkImageReader> reader;
-	mafString fileName = MAF_DATA_ROOT;
-	fileName << "/VTK_Volumes/volume.vtk";
-	reader->SetFileName(fileName.GetCStr());
-	reader->Update();
+// 	vtkMAFSmartPointer<vtkImageReader> reader;
+// 	mafString fileName = MAF_DATA_ROOT;
+// 	fileName << "/VTK_Volumes/volume.vtk";
+// 	reader->SetFileName(fileName.GetCStr());
+// 	reader->Update();
 
 
 	//this will be deleted from slice destructor
 	double patientPos[3] = D_Position;
-	vtkImageData *imData;
-	vtkNEW(imData);
-	imData->DeepCopy(reader->GetOutput());
+// 	vtkImageData *imData;
+// 	vtkNEW(imData);
+// 	imData->DeepCopy(reader->GetOutput());
 
-	if(pos!=NULL)
-		imData->SetOrigin(pos);
-	else
-		imData->SetOrigin(patientPos);
-
-		
+	mafDicomSlice *sliceDicom;
 	double patientOri[6] = D_Orientation;
-	mafDicomSlice *sliceDicom = new mafDicomSlice(D_SliceABSFileName, patientOri, imData,D_DcmDescription,D_DcmDate, D_DcmPatientName,D_DcmBirthDate, D_DcmInstanceNumber,D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
+	if (pos != NULL)
+		sliceDicom = new mafDicomSlice(D_SliceABSFileName, patientOri, pos, D_DcmDescription,D_DcmDate, D_DcmPatientName,D_DcmBirthDate, D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
+	else 
+		sliceDicom = new mafDicomSlice(D_SliceABSFileName, patientOri, patientPos, D_DcmDescription, D_DcmDate, D_DcmPatientName, D_DcmBirthDate, D_DcmCardiacNumberOfImages, D_DcmTriggerTime);
+
 	return sliceDicom;
 }
 
@@ -119,28 +118,17 @@ void mafDicomClassesTest::TestSliceGetSliceABSFileName()
 
   cppDEL(sliceDicom);
 }
-//-----------------------------------------------------------
-void mafDicomClassesTest::TestSliceGetDcmInstanceNumber()
-{
-  mafDicomSlice *sliceDicom = CreateBaseSlice();
 
-  CPPUNIT_ASSERT(sliceDicom->GetDcmInstanceNumber() == D_DcmInstanceNumber);
-
-	sliceDicom->SetDcmInstanceNumber(D_NewNum);
-	CPPUNIT_ASSERT(sliceDicom->GetDcmInstanceNumber() == D_NewNum);
-
-  cppDEL(sliceDicom);
-}
 //-----------------------------------------------------------
 void mafDicomClassesTest::TestSliceGetDcmCardiacNumberOfImages()
 {
   //Using the default constructor
   mafDicomSlice *sliceDicom = CreateBaseSlice();
 
-  CPPUNIT_ASSERT(sliceDicom->GetDcmCardiacNumberOfImages() == D_DcmCardiacNumberOfImages);
+  CPPUNIT_ASSERT(sliceDicom->GetNumberOfCardiacImages() == D_DcmCardiacNumberOfImages);
 
-	sliceDicom->SetDcmCardiacNumberOfImages(D_NewNum);
-	CPPUNIT_ASSERT(sliceDicom->GetDcmCardiacNumberOfImages() == D_NewNum);
+	sliceDicom->SetNumberOfCardiacImages(D_NewNum);
+	CPPUNIT_ASSERT(sliceDicom->GetNumberOfCardiacImages() == D_NewNum);
 
   cppDEL(sliceDicom);
 }
@@ -150,10 +138,10 @@ void mafDicomClassesTest::TestSliceGetDcmTriggerTime()
   //Using the default constructor
   mafDicomSlice *sliceDicom = CreateBaseSlice();
   
-  CPPUNIT_ASSERT(sliceDicom->GetDcmTriggerTime() == D_DcmTriggerTime);
+  CPPUNIT_ASSERT(sliceDicom->GetTriggerTime() == D_DcmTriggerTime);
 
-	sliceDicom->SetDcmTriggerTime(D_NewNum);
-	CPPUNIT_ASSERT(sliceDicom->GetDcmTriggerTime() == D_NewNum);
+	sliceDicom->SetTriggerTime(D_NewNum);
+	CPPUNIT_ASSERT(sliceDicom->GetTriggerTime() == D_NewNum);
 
   cppDEL(sliceDicom);
 }
@@ -170,9 +158,11 @@ void mafDicomClassesTest::TestSliceGetVTKImageData()
 	//Using the default constructor
 	mafDicomSlice *sliceDicom = CreateBaseSlice();
 	
-  CPPUNIT_ASSERT(sliceDicom->GetVTKImageData()->GetNumberOfPoints() == reader->GetOutput()->GetNumberOfPoints());
-  CPPUNIT_ASSERT(sliceDicom->GetVTKImageData()->GetNumberOfCells() == reader->GetOutput()->GetNumberOfCells());
+	vtkImageData* sliceImageData = sliceDicom->GetNewVTKImageData();
+  CPPUNIT_ASSERT(sliceImageData->GetNumberOfPoints() == reader->GetOutput()->GetNumberOfPoints());
+  CPPUNIT_ASSERT(sliceImageData->GetNumberOfCells() == reader->GetOutput()->GetNumberOfCells());
 
+	vtkDEL(sliceImageData);
   cppDEL(sliceDicom);
 }
 //-----------------------------------------------------------
@@ -258,9 +248,9 @@ void mafDicomClassesTest::TestSliceGetDcmModality()
 	//Using the default constructor
 	mafDicomSlice *sliceDicom = CreateBaseSlice();
 
-	sliceDicom->SetDcmModality("Modality");
+	sliceDicom->SetModality("Modality");
 
-	CPPUNIT_ASSERT(strcmp(sliceDicom->GetDcmModality(), "Modality") == 0);
+	CPPUNIT_ASSERT(strcmp(sliceDicom->GetModality(), "Modality") == 0);
 
 	cppDEL(sliceDicom);
 }

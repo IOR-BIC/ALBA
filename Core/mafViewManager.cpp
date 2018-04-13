@@ -199,6 +199,10 @@ void mafViewManager::VmeRemove(mafVME *vme)
     m_RootVme     = NULL;
     m_SelectedVme = NULL;   // Removing the tree, selected vme must be set to NULL.
   }
+
+
+	if (m_SelectedVme == vme)
+		m_SelectedVme = NULL;
 }
 //----------------------------------------------------------------------------
 void mafViewManager::VmeModified(mafVME *vme)

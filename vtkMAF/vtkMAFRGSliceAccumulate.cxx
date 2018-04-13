@@ -42,7 +42,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkDoubleArray.h"
 #include "vtkUnsignedShortArray.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkUnsignedIntArray.h"
 #include "vtkCharArray.h"
+#include "vtkIntArray.h"
 #include "vtkShortArray.h"
 #include "vtkFloatArray.h"
 #include "vtkObjectFactory.h"
@@ -104,8 +106,8 @@ void vtkMAFRGSliceAccumulate::SetSlice(int slice_num,vtkImageData * slice,double
 		((vtkDoubleArray *)this->Slices->GetZCoordinates())->SetValue(slice_num, unRotatedOrigin[2]);
 					
 		int start;
-		void *out_dataPointer		= (vtkDoubleArray *)this->Slices->GetPointData()->GetScalars()->GetVoidPointer(0);
-		void *input_dataPointer = (vtkDoubleArray *)slice->GetPointData()->GetScalars()->GetVoidPointer(0);
+		void *out_dataPointer		= this->Slices->GetPointData()->GetScalars()->GetVoidPointer(0);
+		void *input_dataPointer = slice->GetPointData()->GetScalars()->GetVoidPointer(0);
 		int numscalars = slice->GetPointData()->GetScalars()->GetNumberOfTuples();
 		
     start = numscalars * slice_num;
@@ -113,27 +115,31 @@ void vtkMAFRGSliceAccumulate::SetSlice(int slice_num,vtkImageData * slice,double
 		switch (scalar_type) 
 		{
 			case VTK_CHAR:
-				out_dataPointer = ((char *)out_dataPointer) + start;
-				memmove((char *)out_dataPointer,(char *)input_dataPointer, sizeof(char) * numscalars);
-			break;
 			case VTK_UNSIGNED_CHAR:
-				out_dataPointer = ((unsigned char *)out_dataPointer) + start;
-				memmove((unsigned char *)out_dataPointer,(unsigned char *)input_dataPointer, sizeof(unsigned char) * numscalars);
+				out_dataPointer = ((char *)out_dataPointer) + start;
+				memmove(out_dataPointer,input_dataPointer, sizeof(char) * numscalars);
 			break;
 			case VTK_SHORT:
+			case VTK_UNSIGNED_SHORT:
 				out_dataPointer = ((short *)out_dataPointer) + start;
 				memmove((short *)out_dataPointer,(short *)input_dataPointer, sizeof(short) * numscalars);
 			break;
-			case VTK_UNSIGNED_SHORT:
-				out_dataPointer = ((unsigned short *)out_dataPointer) + start;
-				memmove((unsigned short *)out_dataPointer,(unsigned short *)input_dataPointer, sizeof(unsigned short) * numscalars);
-			break;
+			case VTK_INT:
+			case VTK_UNSIGNED_INT:
+				out_dataPointer = ((int *)out_dataPointer) + start;
+				memmove((int *)out_dataPointer, (int *)input_dataPointer, sizeof(int) * numscalars);
+			break;	
 			case VTK_FLOAT:
 				out_dataPointer = ((float *)out_dataPointer) + start;
 				memmove((float *)out_dataPointer,(float *)input_dataPointer, sizeof(float) * numscalars);
 			break;
+			case VTK_DOUBLE:
+				out_dataPointer = ((double *)out_dataPointer) + start;
+				memmove((double *)out_dataPointer, (double *)input_dataPointer, sizeof(double) * numscalars);
+		  break;
+
 			default:
-				vtkErrorMacro(<< "Only 8/16 bit integers and 32 bit floats are supported.");
+				vtkErrorMacro(<< "Only 8/16/32 bit integers and 32 bit floats are supported.");
 		}
 	} 
 	else 
@@ -168,7 +174,8 @@ void vtkMAFRGSliceAccumulate::Allocate()
 	for (int ix = 0; ix < Dimensions[0]; ix++) {
 		vx->SetValue(ix, Origin[0] + ((double)(ix + xStart))*Spacing[0]);
 	}
-	for (int iy = 0; iy < Dimensions[1]; iy++) {
+	int iy = 0;
+	for (; iy < Dimensions[1]; iy++) {
 		vy->SetValue(iy, Origin[1] + ((double)(iy + yStart))*Spacing[1]);
 	}
 	for (int iz = 0; iz < Dimensions[2]; iz++) {
@@ -178,7 +185,8 @@ void vtkMAFRGSliceAccumulate::Allocate()
 
 	vtkDataArray *data = 0;
 	int scalar_type = this->GetDataType();
-    // data array should consistent with scalar type:
+
+	// data array should consistent with scalar type:
 	switch (scalar_type) 
 		{
 			case VTK_CHAR:
@@ -190,11 +198,20 @@ void vtkMAFRGSliceAccumulate::Allocate()
 			case VTK_SHORT:
 				data = vtkShortArray::New();
 			break;
+			case VTK_INT:
+				data = vtkIntArray::New();
+			break;
+			case VTK_UNSIGNED_INT:
+				data = vtkUnsignedIntArray::New();
+			break;
 			case VTK_UNSIGNED_SHORT:
 				data = vtkUnsignedShortArray::New();
 			break;
 			case VTK_FLOAT:
 				data = vtkFloatArray::New();
+			break;
+			case VTK_DOUBLE:
+				data = vtkDoubleArray::New();
 			break;
 			default:
 				vtkErrorMacro(<< "Only 8/16 bit integers and 32 bit floats are supported.");

@@ -73,19 +73,16 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkUnsignedShortArray.h"
 #include "vtkPointData.h"
 
-#include "dcmtk/config/osconfig.h"    /* make sure OS specific configuration is included first */
-#include "dcmtk/ofstd/ofstream.h"
-#include "dcmtk/ofstd/ofstring.h"
-#include "dcmtk/dcmdata/dctk.h"
-#include "dcmtk/dcmdata/dcdebug.h"
-#include "dcmtk/dcmdata/cmdlnarg.h"
-#include "dcmtk/ofstd/ofconapp.h"
-#include "dcmtk/dcmdata/dcuid.h"       /* for dcmtk version name */
-#include "dcmtk/dcmdata/dcistrmz.h"    /* for dcmZlibExpectRFC1950Encoding */
-#include "dcmtk/dcmimgle/dcmimage.h."
-#include "dcmtk/dcmjpeg/djdecode.h."
-#include "dcmtk/dcmdata/dcrledrg.h"
-#include "dcmtk/ofstd/ofstdinc.h"
+#include "gdcmDirectoryHelper.h"
+#include "gdcmAttribute.h"
+#include "gdcmDataElement.h"
+#include "gdcmReader.h"
+#include "gdcmImageReader.h"
+#include "gdcmRescaler.h"
+
+
+#include "mafDicomTagDefines.h"
+
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpImporterDicomOffis);
@@ -128,6 +125,7 @@ mafOp(label)
 	m_SliceActor = NULL;
 	m_TextActor=NULL;
 	m_TextMapper=NULL;
+	m_CurrentSliceID = NULL;
 	//other pointers
 	m_DicomInteractor = NULL;
 	m_TagArray = NULL;
@@ -140,8 +138,8 @@ mafOp(label)
 	m_DescrInName = m_SizeInName = m_PatientNameInName = true;
 	m_VMEName = "";
 	m_CurrentSlice = VTK_INT_MAX;
-	m_TotalDicomRange[0]=0;
-	m_TotalDicomRange[1]=1;
+	m_SliceSubRange[0] = VTK_FLOAT_MIN;
+	m_SliceSubRange[0] = VTK_FLOAT_MAX;
 	m_CurrentImageID = 0;
 	m_CurrentTime = 0;
 	m_ShowOrientationPosition = 0;
@@ -233,7 +231,7 @@ void mafOpImporterDicomOffis::OpRun()
 			OpStop(wizardResult);
 		}
 		else
-			OpStop(OP_RUN_CANCEL);
+			OpStop(OP_RUN_CANCEL); 
 	}
 	else
 		OpStop(OP_RUN_CANCEL);
@@ -312,6 +310,8 @@ void mafOpImporterDicomOffis::OpStop(int result)
 		cppDEL(m_Wizard);
 	}
 
+	vtkDEL(m_CurrentSliceID);
+
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
@@ -349,14 +349,16 @@ int mafOpImporterDicomOffis::BuildVMEImagesOutput()
 		{
 			int sliceID = GetSliceIDInSeries(t, i);
 			mafDicomSlice * currentSlice = m_SelectedSeries->GetSlice(sliceID);
-			mafTimeStamp triggerTime = currentSlice->GetDcmTriggerTime();
+			mafTimeStamp triggerTime = currentSlice->GetTriggerTime();
 
-			vtkImageData *image = currentSlice->GetVTKImageData();
+			vtkImageData *image = currentSlice->GetNewVTKImageData();
 			Crop(image);
 			image->SetOrigin(currentSlice->GetUnrotatedOrigin());
 
 			//Set data at specific time
 			vmeImage->SetData(image, triggerTime);
+
+			vtkDEL(image);
 		}
 		
 		//Setting orientation matrix
@@ -402,7 +404,7 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 	for (int t = 0; t < nFrames; t++)
 	{
 		int firstSliceAtTimeID = GetSliceIDInSeries(t, 0);
-		mafTimeStamp triggerTime = m_SelectedSeries->GetSlice(firstSliceAtTimeID)->GetDcmTriggerTime();
+		mafTimeStamp triggerTime = m_SelectedSeries->GetSlice(firstSliceAtTimeID)->GetTriggerTime();
 
 		vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
 		accumulate->SetNumberOfSlices(SlicesPerFrame);
@@ -415,13 +417,15 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 			parsedSlices++;
 
 			mafDicomSlice * slice = m_SelectedSeries->GetSlice(sliceID);
-			vtkImageData *image = slice->GetVTKImageData();
+			vtkImageData *image = slice->GetNewVTKImageData();
 			Crop(image);
 
 			accumulate->SetSlice(accumSliceN, image, slice->GetUnrotatedOrigin());
 
 			progressHelper.UpdateProgressBar(parsedSlices * 100 / totalNumberOfImages);
 			accumSliceN++;
+
+			vtkDEL(image);
 		}
 		accumulate->Update();
 
@@ -526,7 +530,7 @@ bool mafOpImporterDicomOffis::OpenDir(const char *dirPath)
 //----------------------------------------------------------------------------
 vtkImageData * mafOpImporterDicomOffis::GetSliceInCurrentSeries(int id)
 {
-	return	m_SelectedSeries->GetSlice(id)->GetVTKImageData();
+	return	m_SelectedSeries->GetSlice(id)->GetNewVTKImageData();
 }
 
 //----------------------------------------------------------------------------
@@ -577,7 +581,7 @@ void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 void mafOpImporterDicomOffis::SetVMEName()
 {
 	mafDicomSlice * sliceData = m_SelectedSeries->GetSlice(0);
-	m_VMEName = sliceData->GetDcmModality();
+	m_VMEName = sliceData->GetModality();
 	if (sliceData->GetDescription() != "" && m_DescrInName)
 	{
 		m_VMEName += " ";
@@ -593,9 +597,9 @@ void mafOpImporterDicomOffis::SetVMEName()
 	if (m_SizeInName)
 	{
 		mafString size;
-		int *dims=sliceData->GetVTKImageData()->GetDimensions();
-		if (sliceData->GetDcmCardiacNumberOfImages() > 1)
-			size.Printf(" %dx%dx%d f:%d", dims[0], dims[1], m_SelectedSeries->GetSlicesNum(), sliceData->GetDcmCardiacNumberOfImages());
+		int *dims=sliceData->GetSliceSize();
+		if (sliceData->GetNumberOfCardiacImages() > 1)
+			size.Printf(" %dx%dx%d f:%d", dims[0], dims[1], m_SelectedSeries->GetSlicesNum(), sliceData->GetNumberOfCardiacImages());
 		else
 			size.Printf(" %dx%dx%d", dims[0], dims[1], m_SelectedSeries->GetSlicesNum());
 		m_VMEName += size;
@@ -609,11 +613,13 @@ void mafOpImporterDicomOffis::CameraUpdate()
 {
 	if(m_Wizard->GetCurrentPage() == m_LoadPage)
 	{
+		m_LoadPage->UpdateWindowing(m_SliceRange, m_SliceSubRange);
 		m_LoadPage->UpdateActor();
 		m_LoadPage->GetRWI()->CameraUpdate();
 	}
 	else
 	{
+		m_CropPage->UpdateWindowing(m_SliceRange, m_SliceSubRange);
 		m_CropPage->UpdateActor();
 		m_CropPage->GetRWI()->CameraUpdate();
 	}
@@ -623,12 +629,12 @@ void mafOpImporterDicomOffis::CameraReset()
 {
 	if (m_LoadPage && m_Wizard->GetCurrentPage() == m_LoadPage)
 	{
-		m_LoadPage->UpdateWindowing(m_TotalDicomRange, m_TotalDicomSubRange);
+		m_LoadPage->UpdateWindowing(m_SliceRange, m_SliceSubRange);
 		m_LoadPage->GetRWI()->CameraReset();
 	}
 	else if(m_CropPage)
 	{
-		m_CropPage->UpdateWindowing(m_TotalDicomRange, m_TotalDicomSubRange);
+		m_CropPage->UpdateWindowing(m_SliceRange, m_SliceSubRange);
 		m_CropPage->GetRWI()->CameraReset();
 	}
 }
@@ -716,22 +722,14 @@ bool mafOpImporterDicomOffis::LoadDicomFromDir(const char *dicomDirABSPath)
 
 	m_StudyList = new mafDicomStudyList();
 		
-	//Register Codecs before reading Dicom dir
-	DJDecoderRegistration::registerCodecs(); // register JPEG Codecs
-	DcmRLEDecoderRegistration::registerCodecs(OFFalse, OFFalse, OFFalse); // register RLE Codecs
-
 	for (int i = 0; i < fileNumber; i++)
 	{
-		mafDicomSlice *slice= ReadDicomSlice((allFiles[i]).c_str());
+		mafDicomSlice *slice= ReadDicomFile((allFiles[i]).c_str());
 		if (slice)
 			m_StudyList->AddSlice(slice);
 		progressHelper.UpdateProgressBar( i*100 / fileNumber);
 	}
-
-	// unregister JPEG Codecs
-	DJDecoderRegistration::cleanup(); 
-	DcmRLEDecoderRegistration::cleanup();
-
+		
 	progressHelper.CloseProgressBar();
 	
 	// start handling files
@@ -749,54 +747,74 @@ bool mafOpImporterDicomOffis::LoadDicomFromDir(const char *dicomDirABSPath)
 
 	return m_StudyList->GetStudiesNum()>0;
 }
+
+#define READTAG(t) gdcm::DirectoryHelper::GetStringValueFromTag(t,dcmDataSet)
+
 //----------------------------------------------------------------------------
-mafDicomSlice *mafOpImporterDicomOffis::ReadDicomSlice(mafString fileName)
+mafDicomSlice *mafOpImporterDicomOffis::ReadDicomFile(mafString fileName)
 {
-	double lastZPos = 0;
-	long int dcmInstanceNumber = -1;
-	long int dcmCardiacNumberOfImages = -1;
-	const char *dcmModality, *dcmStudyInstanceUID, *dcmSeriesInstanceUID, *dcmScanOptions;
-	const char *date, *description, *patientName, *birthdate, *photometricInterpretation;
-	double dcmTriggerTime = -1.0;
+	int dcmCardiacNumberOfImages = -1;
+	std::string dcmModality, dcmStudyInstanceUID, dcmSeriesInstanceUID, dcmScanOptions;
+	std::string date, description, patientName, birthdate, photometricInterpretation;
+	double dcmTriggerTime = 0;
 	double defaulOrienatation[6] = { 1.0,0.0,0.0,0.0,1.0,1.0 };
 	double dcmImageOrientationPatient[6];
 	double dcmImagePositionPatient[3] = {0.0,0.0,0.0};
-	DcmFileFormat dicomImg;   
+	int imageSize[2];
 	
 	//Load data into Offis structure
-	OFCondition status = dicomImg.loadFile(fileName);
-	if (!status.good())
+	gdcm::Reader dcmReader;
+	dcmReader.SetFileName(fileName.GetCStr());
+		
+	if (!dcmReader.CanRead())
 	{
-		mafLogMessage("File <%s> can not be opened",fileName);
+		mafLogMessage("File <%s> can not be opened and will be skipped",fileName.GetCStr());
+		return NULL;
+	}
+
+	std::set<gdcm::Tag> TagsToRead;
+	TagsToRead.insert(TAG_StudyInstanceUID);
+	TagsToRead.insert(TAG_SeriesInstanceUID);
+	TagsToRead.insert(TAG_ScanOptions);
+	TagsToRead.insert(TAG_ImagePositionPatient);
+	TagsToRead.insert(TAG_ImageOrientationPatient);
+	TagsToRead.insert(TAG_TriggerTime);
+	TagsToRead.insert(TAG_CardiacNumberOfImages);
+	TagsToRead.insert(TAG_StudyDate);
+	TagsToRead.insert(TAG_SeriesDescription);
+	TagsToRead.insert(TAG_PatientsName);
+	TagsToRead.insert(TAG_PhotometricInterpretation);
+	TagsToRead.insert(TAG_Rows);
+	TagsToRead.insert(TAG_Columns);
+
+
+	if (!dcmReader.ReadSelectedTags(TagsToRead))
+	{
+		mafLogMessage("Cannot read tags from file:<%s>, this file will be skipped", fileName.GetCStr());
 		return NULL;
 	}
 
 	//Obtain dataset information from Dicom file (loaded into memory)
-	DcmDataset *dicomDataset = dicomImg.getDataset();
+	gdcm::DataSet & dcmDataSet = dcmReader.GetFile().GetDataSet();
 
-	//Decompress data set if compressed
-	OFCondition error = dicomDataset->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
-	if (!error.good())
-	{
-		mafLogMessage("Error decoding the image <%s>",fileName);
-		return NULL;
-	}
-
-	dicomDataset->findAndGetString(DCM_ScanOptions,dcmScanOptions);
-	dicomDataset->findAndGetString(DCM_Modality, dcmModality);
-
-	if (wxString(dcmScanOptions).Find("SCOUT") != -1 || wxString(dcmModality).Find("SCOUT") != -1)
-	{
-		mafLogMessage("Error decoding the image <%s>", fileName);
-		return NULL;
-	}
+	dcmScanOptions = READTAG(TAG_ScanOptions);
+	dcmModality = READTAG(TAG_Modality);
 
 	//Read Study-Series IDs
-	dicomDataset->findAndGetString(DCM_StudyInstanceUID, dcmStudyInstanceUID);
-	dicomDataset->findAndGetString(DCM_SeriesInstanceUID, dcmSeriesInstanceUID);
-		
+	dcmStudyInstanceUID = READTAG(TAG_StudyInstanceUID);
+	dcmSeriesInstanceUID = READTAG(TAG_SeriesInstanceUID);
+	
 	//Try to read image position patient form Dicom
-	if (dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient, dcmImagePositionPatient[0], 0).bad())
+	if (dcmDataSet.FindDataElement(TAG_ImagePositionPatient))
+	{
+		gdcm::Attribute ATTRIBUTE_ImagePositionPatient at;
+		at.SetFromDataSet(dcmDataSet);
+
+		dcmImagePositionPatient[0] = at.GetValue(0);
+		dcmImagePositionPatient[1] = at.GetValue(1);
+		dcmImagePositionPatient[2] = at.GetValue(2);
+	}
+	else
 	{
 		if (GetSetting()->GetDCMImagePositionPatientExceptionHandling() == mafGUIDicomSettings::APPLY_DEFAULT_POSITION)
 		{
@@ -808,180 +826,74 @@ mafDicomSlice *mafOpImporterDicomOffis::ReadDicomSlice(mafString fileName)
 			return NULL;
 		}
 	}
+		
+	//Read Image Orientation Patient
+	if (dcmDataSet.FindDataElement(TAG_ImageOrientationPatient))
+	{
+		
+		const gdcm::DataElement& de = dcmDataSet.GetDataElement(TAG_ImageOrientationPatient);
+		gdcm::Attribute ATTRIBUTE_ImageOrientationPatient at;
+		at.SetFromDataElement(de);
+
+		for (int i = 0; i < 6; i++)
+			dcmImageOrientationPatient[i] = at.GetValue(i);
+	}
 	else
 	{
-		//Read the rest of the vector
-		dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient, dcmImagePositionPatient[1], 1);
-		dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient, dcmImagePositionPatient[2], 2);
+		for (int i = 0; i < 6; i++)
+			dcmImageOrientationPatient[i] = defaulOrienatation[i];
 	}
 
-	//Read Image Orientation Patient
-	for (int i = 0; i < 6; i++)
-		if (dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient, dcmImageOrientationPatient[i], i).bad())
-			dcmImageOrientationPatient[i] = defaulOrienatation[i];
+	//Getting Trigger Time
+	dcmTriggerTime = GetAttributeValue ATTRIBUTE_TriggerTime(dcmDataSet);
 
+	std::string cardImgNum = READTAG(TAG_CardiacNumberOfImages);
+	sscanf(cardImgNum.c_str(), "%d", &dcmCardiacNumberOfImages);
+	if (dcmCardiacNumberOfImages < 1) dcmCardiacNumberOfImages = 1;
 	
-	//Read Cine MR related stuff
-	dicomDataset->findAndGetLongInt(DCM_InstanceNumber,dcmInstanceNumber);
-	dicomDataset->findAndGetFloat64(DCM_TriggerTime,dcmTriggerTime);
-	if (dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages, dcmCardiacNumberOfImages).bad() || dcmCardiacNumberOfImages < 1)
-		dcmCardiacNumberOfImages = 1;
-	
-	//Read slice 
-	dicomDataset->findAndGetString(DCM_PatientsBirthDate, birthdate);
-	dicomDataset->findAndGetString(DCM_StudyDate, date);
-	dicomDataset->findAndGetString(DCM_SeriesDescription, description);
-	dicomDataset->findAndGetString(DCM_PatientsName, patientName);
-	dicomDataset->findAndGetString(DCM_PhotometricInterpretation, photometricInterpretation);
+	//Read Patients data strings
+	birthdate = READTAG(TAG_PatientsBirthDate);
+	date = READTAG(TAG_StudyDate);
+	description = READTAG(TAG_SeriesDescription);
+	patientName = READTAG(TAG_PatientsName);
+	photometricInterpretation = READTAG(TAG_PhotometricInterpretation);
 
-	//Read image data
-	vtkImageData *dicomSliceVTKImageData = CreateImageData(dicomDataset, dcmImagePositionPatient);
-	if(dicomSliceVTKImageData == NULL)
+	//Read the image size
+ 	imageSize[1]= GetAttributeValue ATTRIBUTE_Rows(dcmDataSet);
+ 	imageSize[0]= GetAttributeValue ATTRIBUTE_Columns(dcmDataSet);
+	if (imageSize[0] * imageSize[1] == 0)
 	{
-		mafLogMessage("Cannot read Dicom Image on %s\nSkip Slice.", fileName.GetCStr());
+		mafLogMessage("Wrong slice size on %s\nSkip Slice.", fileName.GetCStr());
 		return NULL;
 	}
-			
+	
 	//Create Slice
-	mafDicomSlice *newSlice = new mafDicomSlice(fileName, dcmImageOrientationPatient, dicomSliceVTKImageData, description, date, patientName, birthdate, dcmInstanceNumber, dcmCardiacNumberOfImages, dcmTriggerTime);
-	newSlice->SetDcmModality(dcmModality);
-	newSlice->SetPhotometricInterpretation(photometricInterpretation);
-	newSlice->SetSeriesID(dcmSeriesInstanceUID);
-	newSlice->SetStudyID(dcmStudyInstanceUID);
+	mafDicomSlice *newSlice = new mafDicomSlice(fileName, dcmImageOrientationPatient, dcmImagePositionPatient, description.c_str(), date.c_str(), patientName.c_str(), birthdate.c_str(), dcmCardiacNumberOfImages, dcmTriggerTime);
+	newSlice->SetModality(dcmModality.c_str());
+	newSlice->SetPhotometricInterpretation(photometricInterpretation.c_str());
+	newSlice->SetSeriesID(dcmSeriesInstanceUID.c_str());
+	newSlice->SetStudyID(dcmStudyInstanceUID.c_str());
+	newSlice->SetSliceSize(imageSize);
 		
 	return newSlice;
 }
 
-#define VALUE_FROM_BUFFERS(pixelRep, ucharBuf, ushortBuf, id) (pixelRep ?  (ucharBuf ? (Sint8)ucharBuf[id] : (Sint16)ushortBuf[id]) : (ucharBuf ? ucharBuf[id] : ushortBuf[id]))
-
 //----------------------------------------------------------------------------
-vtkImageData * mafOpImporterDicomOffis::CreateImageData(DcmDataset * dicomDataset, double * dcmImagePositionPatient)
+template <uint16_t A, uint16_t B> double mafOpImporterDicomOffis::GetAttributeValue(gdcm::DataSet &dcmDataSet)
 {
-	long dcmColumns, dcmRows, dcmBitPerPixel, nPixel, dcmPixelRepresentation, dcmPaddingValue;
-	double value, minValue = VTK_INT_MAX, maxValue = VTK_INT_MIN;
-	bool hasPadding;
-	double dcmRescaleSlope, dcmRescaleIntercept;
-	double dcmPixelSpacing[3];
-	const Uint16 *uShortBuffer = NULL;
-	const Uint8 *uCharBuffer = NULL;
-	
-	//getting image size
-	dicomDataset->findAndGetLongInt(DCM_Rows, dcmRows);
-	dicomDataset->findAndGetLongInt(DCM_Columns, dcmColumns);
-	nPixel = dcmRows*dcmColumns;
-
-	if (nPixel == 0)
-		return NULL;
-
-	//Getting pixel type
-	dicomDataset->findAndGetLongInt(DCM_PixelRepresentation, dcmPixelRepresentation);
-	dicomDataset->findAndGetLongInt(DCM_BitsAllocated, dcmBitPerPixel);
-
-	//getting spacing
-	GetDicomSpacing(dicomDataset, dcmPixelSpacing);
-	dcmPixelSpacing[2] = 1;
-
-	//Getting rescale factors, if the tag is not present s
-	if (dicomDataset->findAndGetFloat64(DCM_RescaleSlope, dcmRescaleSlope).bad())
-		dcmRescaleSlope = 1.0;
-	if (dicomDataset->findAndGetFloat64(DCM_RescaleIntercept, dcmRescaleIntercept).bad())
-		dcmRescaleIntercept = 0.0;
-
-	if (dicomDataset->findAndGetLongInt(DCM_PixelPaddingValue, dcmPaddingValue).bad())
-		hasPadding = false;
-	else
-		hasPadding = true;
-
-	if (dcmBitPerPixel == 16)
-		dicomDataset->findAndGetUint16Array(DCM_PixelData, uShortBuffer);
-	else
-		dicomDataset->findAndGetUint8Array(DCM_PixelData, uCharBuffer);
-				
-	//getting min and max
-	for (int i = 0; i < nPixel; i++)
+	gdcm_ns::Tag tag(A, B);
+	if (dcmDataSet.FindDataElement(tag))
 	{
-		value = VALUE_FROM_BUFFERS(dcmPixelRepresentation, uCharBuffer, uShortBuffer , i);
-		minValue = MIN(minValue, value);
-		maxValue = MAX(maxValue, value);
+		gdcm::Attribute<A, B> attr;
+		const gdcm::DataElement& de = dcmDataSet.GetDataElement(tag);
+		attr.SetFromDataElement(de);
+		return attr.GetValue();
 	}
-	//Rescaling min and max
-	minValue = minValue*dcmRescaleSlope + dcmRescaleIntercept;
-	maxValue = maxValue*dcmRescaleSlope + dcmRescaleIntercept;
-
-	//Creating ImageData
-	vtkImageData *imageData;
-	vtkNEW(imageData);
-	imageData->SetDimensions(dcmRows, dcmColumns, 1);
-	imageData->SetWholeExtent(0, dcmColumns - 1, 0, dcmRows - 1, 0, 0);
-	imageData->SetUpdateExtent(0, dcmColumns - 1, 0, dcmRows - 1, 0, 0);
-	imageData->SetExtent(imageData->GetUpdateExtent());
-	imageData->SetNumberOfScalarComponents(1);
-	imageData->SetSpacing(dcmPixelSpacing);
-	imageData->SetOrigin(dcmImagePositionPatient);
-
-	//Setting Scalars Type and name
-	if (dcmBitPerPixel == 8 && minValue >= VTK_UNSIGNED_CHAR_MIN && maxValue <= VTK_UNSIGNED_CHAR_MAX)
-		imageData->SetScalarType(VTK_UNSIGNED_CHAR);
-	else if (dcmBitPerPixel == 8 && minValue >= VTK_CHAR_MIN && maxValue <= VTK_CHAR_MAX)
-		imageData->SetScalarType(VTK_CHAR);
-	else if (minValue >= VTK_UNSIGNED_SHORT_MIN && maxValue <= VTK_UNSIGNED_SHORT_MAX)
-		imageData->SetScalarType(VTK_UNSIGNED_SHORT);
-	else if (minValue >= VTK_SHORT_MIN && maxValue <= VTK_SHORT_MAX)
-		imageData->SetScalarType(VTK_SHORT);
-	else
-		imageData->SetScalarType(VTK_FLOAT);
-
-	imageData->AllocateScalars();
-	imageData->GetPointData()->GetScalars()->SetName("Scalars");
-	
-	vtkDataArray *scalars = imageData->GetPointData()->GetScalars();
-
-
-	if (dcmBitPerPixel == 16)
-	{
-		for (int i = 0; i < nPixel; i++)
-		{
-			value = VALUE_FROM_BUFFERS(dcmPixelRepresentation,uCharBuffer,uShortBuffer, i);
-			
-			if (hasPadding && value == dcmPaddingValue)
-				value = minValue; //using min as padding value
-			else
-				value = value*dcmRescaleSlope + dcmRescaleIntercept;
-
-			scalars->SetTuple(i, &value);
-		}
-	}
-
-	imageData->Update();
-
-	return imageData;
+	else 
+		return 0;
 }
-//----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::GetDicomSpacing(DcmDataset * dicomDataset, double * dcmPixelSpacing)
-{
-	for (int i = 0; i < 2; i++)
-	{
-		//Try to get pixel spacing as spacing used on MR/CT or on calibrated CR
-		if (!dicomDataset->findAndGetFloat64(DCM_PixelSpacing, dcmPixelSpacing[i], i).bad())
-			continue;
 
-		//Try to get Nominal Scanned pixel spacing as spacing used on SC
-		if (!dicomDataset->findAndGetFloat64(DCM_NominalScannedPixelSpacing, dcmPixelSpacing[i], i).bad())
-			continue;
 
-		//Try to get Imager pixel spacing as spacing used on CR/Xray/DX calculated on front plane of the detector
-		if (!dicomDataset->findAndGetFloat64(DCM_ImagerPixelSpacing, dcmPixelSpacing[i], i).bad())
-			continue;
-
-		//Try to get Detector Element spacing, this values should not be used for set image spacing, 
-		//but if we does not have any of the previous values this is better than a default value
-		if (!dicomDataset->findAndGetFloat64(DCM_DetectorElementSpacing, dcmPixelSpacing[i], i).bad())
-			continue;
-						
-		//Unable to get element: Setting default value
-		dcmPixelSpacing[i] = 1.0;
-	}
-}
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateSliders()
 {
@@ -1021,7 +933,7 @@ int mafOpImporterDicomOffis::GetSliceIDInSeries(int timeId, int heigthId)
 {
 	mafDicomSlice *firstDicomListElement;
 	firstDicomListElement = (mafDicomSlice *)m_SelectedSeries->GetSlice(0);
-	int timeFrames =  firstDicomListElement->GetDcmCardiacNumberOfImages();
+	int timeFrames =  firstDicomListElement->GetNumberOfCardiacImages();
 
 	int dicomFilesNumber = m_SelectedSeries->GetSlicesNum();
 	int numSlicesPerTS = dicomFilesNumber / timeFrames;
@@ -1033,22 +945,30 @@ void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 	double  range[2];
 	mafString text;
 
+	vtkDEL(m_CurrentSliceID);
+
 	mafDicomSlice* slice = m_SelectedSeries->GetSlice(imageID);
 	assert(slice);
 
-	slice->GetVTKImageData()->Update();
-	slice->GetVTKImageData()->GetBounds(m_SliceBounds);
+	m_CurrentSliceID = slice->GetNewVTKImageData();
+	m_CurrentSliceID->Update();
+	m_CurrentSliceID->GetBounds(m_SliceBounds);
 	
+	//Setting ranges, range should be the range of current slice and subrange should be inside current range
+	m_CurrentSliceID->GetScalarRange(m_SliceRange);
+	m_SliceSubRange[0] = MIN(m_SliceSubRange[0], m_SliceRange[0]);
+	m_SliceSubRange[1] = MAX(m_SliceSubRange[1], m_SliceRange[1]);
+
 	double origin[3], orientation[6];
-	slice->GetVTKImageData()->GetOrigin(origin);
+	m_CurrentSliceID->GetOrigin(origin);
 	slice->GetDcmImageOrientationPatient(orientation);
 
 	text.Printf("Orientation: %f, %f, %f, %f, %f, %f \nPosition: %f, %f, %f",orientation[0], orientation[1], orientation[2], orientation[3], orientation[4], orientation[5], origin[0], origin[1], origin[2]);
 	m_TextMapper->SetInput(text.GetCStr());
 	m_TextMapper->Modified();
 
-	slice->GetVTKImageData()->GetScalarRange(range);
-	m_SliceTexture->SetInput(slice->GetVTKImageData());
+	m_CurrentSliceID->GetScalarRange(range);
+	m_SliceTexture->SetInput(m_CurrentSliceID);
 	m_SliceTexture->Modified();
 		
 	//Invert gray scale for Photometric Interpretation MONOCHROME1
@@ -1080,15 +1000,16 @@ void mafOpImporterDicomOffis::CalculateCropExtent()
 	double spacing[3], crop_bounds[6], sliceOrigin[3];
 	int sliceExtent[6];
 
-	vtkImageData* slice = m_SelectedSeries->GetSlice(0)->GetVTKImageData();
-	slice->GetExtent(sliceExtent);
-	slice->GetOrigin(sliceOrigin);
-	slice->GetSpacing(spacing);
+	m_CurrentSliceID->GetExtent(sliceExtent);
+	m_CurrentSliceID->GetSpacing(spacing);
+	m_SelectedSeries->GetSlice(0)->GetImagePositionPatient(sliceOrigin);
+
+	
 
 	if (m_DicomInteractor)
 		m_DicomInteractor->GetPlaneBounds(crop_bounds);
 	else
-		slice->GetBounds(crop_bounds);
+		m_CurrentSliceID->GetBounds(crop_bounds);
 
 	//Align cropBounds to current grid
 	m_CropExtent[0] = round(crop_bounds[0] / spacing[0]);
@@ -1115,69 +1036,62 @@ void mafOpImporterDicomOffis::SetPlaneDims()
 	m_SlicePlane->SetPoint1(diffx,0,0);
 	m_SlicePlane->SetPoint2(0,diffy,0);
 }
+
+#define READ_AND_SET_TAGARRAY(X,Y) tagString = READTAG(X); if (!tagString.empty()) m_TagArray->SetTag(mafTagItem(Y, tagString.c_str()));
+
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::ImportDicomTags()
 {
 	if (m_TagArray == NULL) 
 		mafNEW(m_TagArray);
-
 	m_TagArray->SetName("TagArray");
 
-	DcmFileFormat dicomImg;  
-	DJDecoderRegistration::registerCodecs(); // register JPEG codecs
-	DcmRLEDecoderRegistration::registerCodecs();
 	const char *sliceABSFileName = m_SelectedSeries->GetSlice(0)->GetSliceABSFileName();
-	OFCondition status = dicomImg.loadFile(sliceABSFileName);//load data into offis structure
 
-	if (!status.good()) 
+	gdcm::Reader dcmReader;
+	dcmReader.SetFileName(sliceABSFileName);
+
+	if (!dcmReader.CanRead())
 	{
-		if(!this->m_TestMode)
-		{
-			mafLogMessage(wxString::Format("File <%s> can not be opened", sliceABSFileName),"Warning!!");
-		}
+		mafLogMessage("File <%s> can not be opened and will be skipped", sliceABSFileName);
 		return;
 	}
-	DcmDataset *ds = dicomImg.getDataset();//obtain dataset information from dicom file (loaded into memory)
 
-	// decompress data set if compressed
-	ds->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
-	DJDecoderRegistration::cleanup(); // deregister JPEG codecs
-	DcmRLEDecoderRegistration::cleanup();
-	OFString string;
-	DcmStack stack;
-	DcmObject *dobject = NULL;
-	DcmElement *delem = NULL;
-	status = ds->nextObject(stack, OFTrue);
-	try
-	{
-		while (status.good())
-		{
-			dobject = stack.top();
-			if (dobject->verify().good())
-			{ 
-				DcmTag tag = dobject->getTag();
-				wxString tagName = tag.getTagName();
-
-				delem = dynamic_cast<DcmElement*>(dobject);
-				if (delem != NULL)
-				{
-					delem->getOFStringArray(string);
-
-					if (tagName.compare("PixelData") != 0)
-						m_TagArray->SetTag(mafTagItem(tagName.c_str(),string.c_str()));
-				}
-			}
-			status = ds->nextObject(stack, OFTrue);
-		}		
-	} 
-	catch (...)
-	{
-		mafLogMessage("Can not read Dicom tag.");
-	}
-		
-	m_TagArray->SetTag(mafTagItem("VME_NATURE", "NATURAL"));
+	std::set<gdcm::Tag> TagsToRead;
+	TagsToRead.insert(TAG_PatientsName);
+	TagsToRead.insert(TAG_PatientsSex);
+	TagsToRead.insert(TAG_PatientsBirthDate);
+	TagsToRead.insert(TAG_PatientsWeight);
+	TagsToRead.insert(TAG_PatientsAge);
+	TagsToRead.insert(TAG_PatientID);
+	TagsToRead.insert(TAG_InstitutionName);
+	TagsToRead.insert(TAG_StudyDescription);
+	TagsToRead.insert(TAG_SeriesDescription);
+	TagsToRead.insert(TAG_AcquisitionDate);
 	
-	dicomImg.clear();
+	if (!dcmReader.ReadSelectedTags(TagsToRead))
+	{
+		mafLogMessage("Cannot read tags from file:<%s>, this file will be skipped", sliceABSFileName);
+		return;
+	}
+
+	//Obtain dataset information from Dicom file (loaded into memory)
+	gdcm::DataSet & dcmDataSet = dcmReader.GetFile().GetDataSet();
+
+	std::string tagString;
+
+	READTAG(TAG_PatientsName, "patientsName");
+	READTAG(TAG_PatientsSex, "PatientsSex");
+	READTAG(TAG_PatientsBirthDate, "PatientsBirthDate");
+	READTAG(TAG_PatientsWeight, "PatientsWeight");
+	READTAG(TAG_PatientID, "PatientID"); 
+	READTAG(TAG_PatientsAge, "PatientsAge");
+	READTAG(TAG_InstitutionName, "InstitutionName");
+	READTAG(TAG_StudyDescription, "StudyDescription");
+	READTAG(TAG_SeriesDescription, "SeriesDescription");
+	READTAG(TAG_AcquisitionDate, "AcquisitionDate");
+	
+  m_TagArray->SetTag(mafTagItem("VME_NATURE", "NATURAL"));
 }
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::OnStudySelect()
@@ -1188,28 +1102,6 @@ void mafOpImporterDicomOffis::OnStudySelect()
 		FillSeriesListBox();
 		m_SeriesListbox->Select(0);
 		SelectSeries(m_StudyList->GetStudy(m_SelectedStudy)->GetSeries(0));
-	}
-}
-//----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::GetDicomRange(double *range)
-{
-	double sliceRange[2];
-
-	range[0]=MAXDOUBLE;
-	range[1]=MINDOUBLE;
-
-	for(int imageID=0;imageID<m_SelectedSeries->GetSlicesNum();imageID++)
-	{  
-		mafDicomSlice* slice = NULL;
-
-		slice = m_SelectedSeries->GetSlice(imageID);
-		assert(slice);
-
-		slice->GetVTKImageData()->Update();
-		slice->GetVTKImageData()->GetScalarRange(sliceRange);
-
-		if (sliceRange[0]<range[0]) range[0]=sliceRange[0];
-		if (sliceRange[1]>range[1]) range[1]=sliceRange[1];
 	}
 }
 //----------------------------------------------------------------------------
@@ -1264,10 +1156,6 @@ void mafOpImporterDicomOffis::SelectSeries(mafDicomSeries * selectedSeries)
 				m_CropPage->SetZCropBounds(m_ZCropBounds[0], m_ZCropBounds[1]);
 		}
 
-		GetDicomRange(m_TotalDicomRange);
-		m_TotalDicomSubRange[0] = m_TotalDicomRange[0];
-		m_TotalDicomSubRange[1] = m_TotalDicomRange[1];
-
 		GenerateSliceTexture(0);
 		SetPlaneDims();
 		CameraReset();
@@ -1282,7 +1170,7 @@ void mafOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 	if(m_Wizard->GetCurrentPage()==m_LoadPage)//From Load page
 	{
 		//get the current windowing in order to maintain subrange thought the wizard pages 
-		m_LoadPage->GetWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
+		m_LoadPage->GetWindowing(m_SliceRange,m_SliceSubRange);
 
 		m_DicomInteractor->SetSliceBounds(m_SliceBounds);
 		m_DicomInteractor->PlaneVisibilityOn();
@@ -1312,7 +1200,7 @@ void mafOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 	if (m_Wizard->GetCurrentPage() == m_CropPage)//From Crop page to build page
 	{
 		//get the current windowing in order to maintain subrange thought the wizard pages 
-		m_CropPage->GetWindowing(m_TotalDicomRange, m_TotalDicomSubRange);
+		m_CropPage->GetWindowing(m_SliceRange, m_SliceSubRange);
 		m_DicomInteractor->PlaneVisibilityOff();
 		m_Wizard->SetButtonString("Crop >");
 	}
@@ -1446,12 +1334,16 @@ void mafDicomSeries::AddSlice(mafDicomSlice *slice)
 {
 	if (m_Slices.size() == 0)
 	{
-		slice->GetVTKImageData()->GetDimensions(m_Dimensions);
-		m_CardiacImagesNum = slice->GetDcmCardiacNumberOfImages();
+		int *dim = slice->GetSliceSize();
+		m_Dimensions[0] = dim[0];
+		m_Dimensions[1] = dim[1];
+		m_Dimensions[2] = 1;
+
+		m_CardiacImagesNum = slice->GetNumberOfCardiacImages();
 	}
 	else
 	{
-		int *dim = slice->GetVTKImageData()->GetDimensions();
+		int *dim = slice->GetSliceSize();
 		
 		//Check dimension
 		if ( (dim[0] != m_Dimensions[0]) && (dim[1] != m_Dimensions[1]) )
@@ -1461,8 +1353,7 @@ void mafDicomSeries::AddSlice(mafDicomSlice *slice)
 		}
 	}
 	
-	if (IsRotated(slice->GetDcmImageOrientationPatient()))
-		m_IsRotated = true;
+	m_IsRotated = IsRotated(slice->GetDcmImageOrientationPatient());
 
 	m_Slices.push_back(slice);
 }
@@ -1478,9 +1369,9 @@ bool mafDicomSeries::IsRotated(const double dcmImageOrientationPatient[6])
 bool SortSliceCompareFunction(mafDicomSlice *i, mafDicomSlice *j) 
 { 
 	//Sort by time and by unrotated Z-value
-	if (i->GetDcmTriggerTime() < j->GetDcmTriggerTime())
+	if (i->GetTriggerTime() < j->GetTriggerTime())
 		return true;
-	else if (i->GetDcmTriggerTime() < j->GetDcmTriggerTime())
+	else if (i->GetTriggerTime() < j->GetTriggerTime())
 		return false;
 	else
 		return (i->GetUnrotatedOrigin()[2] < j->GetUnrotatedOrigin()[2]);
@@ -1491,15 +1382,132 @@ void mafDicomSeries::SortSlices()
 	std::sort(m_Slices.begin(), m_Slices.end(), SortSliceCompareFunction);
 }
 
+//----------------------------------------------------------------------------
+vtkImageData* mafDicomSlice::GetNewVTKImageData()
+{
+	double value, minValue = VTK_INT_MAX, maxValue = VTK_INT_MIN;
+	bool hasPadding;
+	double dcmSlope, dcmIntercept;
+	const double *dcmPixelSpacing;
+	
+	gdcm::ImageReader dcmReader;
+	dcmReader.SetFileName(m_SliceABSFileName.GetCStr());
+	if (!dcmReader.Read())
+	{
+		mafLogMessage("Failed on image reading of file: ", m_SliceABSFileName.GetCStr());
+		return NULL;
+	}
+
+	const gdcm::Image &dcmImage = dcmReader.GetImage();
+
+	//Getting spacing
+	dcmPixelSpacing = dcmImage.GetSpacing();
+
+	//Getting rescale factors 
+	const gdcm::PixelFormat &pixeltype = dcmImage.GetPixelFormat();
+	dcmIntercept = dcmImage.GetIntercept();
+	dcmSlope = dcmImage.GetSlope();
+	
+	//Creating rescaler
+	gdcm::Rescaler rescaler;
+	rescaler.SetIntercept(dcmIntercept);
+	rescaler.SetSlope(dcmSlope);
+	rescaler.SetPixelFormat(pixeltype);
+
+	//Getting scalarType
+	gdcm::PixelFormat::ScalarType dcmScalarType;
+	dcmScalarType = rescaler.ComputeInterceptSlopePixelType();
+			
+	//Creating ImageData
+	vtkImageData *imageData;
+	vtkNEW(imageData);
+	imageData->SetDimensions(m_SliceSize[0], m_SliceSize[1], 1);
+	imageData->SetWholeExtent(0, m_SliceSize[0] - 1, 0, m_SliceSize[1] - 1, 0, 0);
+	imageData->SetUpdateExtent(0, m_SliceSize[0] - 1, 0, m_SliceSize[1] - 1, 0, 0);
+	imageData->SetExtent(imageData->GetUpdateExtent());
+	imageData->SetNumberOfScalarComponents(1);
+	imageData->SetSpacing(dcmPixelSpacing[0],dcmPixelSpacing[1],dcmPixelSpacing[2]);
+	imageData->SetOrigin(m_ImagePositionPatient);
+
+	//Setting Scalars Type and creating scalars and setting their name
+	int computeVTKScalarType = ComputeVTKScalarType(dcmScalarType);
+	if (computeVTKScalarType==0)
+	{
+		mafLogMessage("Unsupported pixel scalar format: ", m_SliceABSFileName.GetCStr());
+		return NULL;
+	}
+	imageData->SetScalarType(computeVTKScalarType);
+	imageData->AllocateScalars();
+	imageData->GetPointData()->GetScalars()->SetName("Scalars");
+
+	char *scalarPointer = (char *)imageData->GetPointData()->GetScalars()->GetVoidPointer(0);
+
+	//Rescaling pixel type if required
+	if (dcmSlope != 1.0 || dcmIntercept != 0.0)
+	{
+		unsigned long len = dcmImage.GetBufferLength();
+		char * copy = new char[len];
+	
+		dcmImage.GetBuffer(copy);
+		if (!rescaler.Rescale(scalarPointer, copy, len))
+		{
+			mafLogMessage("Error Could not Rescale on file %s",m_SliceABSFileName.GetCStr());
+			delete[] copy;
+			return NULL;
+		}
+		delete[] copy;
+	}
+	else
+	{
+		dcmImage.GetBuffer(scalarPointer);
+	}
+	
+	imageData->Update();
+	return imageData;
+}
+
+//----------------------------------------------------------------------------
+int mafDicomSlice::ComputeVTKScalarType(int scalarType)
+{
+	switch (scalarType)
+	{
+		case gdcm::PixelFormat::INT8:
+			return VTK_CHAR;
+		case gdcm::PixelFormat::UINT8:
+			return VTK_UNSIGNED_CHAR;
+		case gdcm::PixelFormat::INT16:
+			return VTK_SHORT;
+		case gdcm::PixelFormat::UINT16:
+			return VTK_UNSIGNED_SHORT;
+		case gdcm::PixelFormat::INT32:
+			return VTK_INT;
+		case gdcm::PixelFormat::UINT32:
+			return VTK_UNSIGNED_INT;
+		case gdcm::PixelFormat::INT12:
+			return VTK_SHORT;
+		case gdcm::PixelFormat::UINT12:
+			return VTK_UNSIGNED_SHORT;
+		case gdcm::PixelFormat::FLOAT32:
+			return VTK_FLOAT;
+		case gdcm::PixelFormat::FLOAT64:
+			return VTK_DOUBLE;
+// 		case gdcm::PixelFormat::SINGLEBIT:
+// 			return VTK_BIT;
+		default:
+			return 0;
+	}
+}
+
+
 /////////////////////////////mafDicomSlice////////////////////////////////
 //----------------------------------------------------------------------------
-void mafDicomSlice::CalculateUnrotatedOrigin()
+void mafDicomSlice::ComputeUnrotatedOrigin()
 {
-	double *origin = m_ImageData->GetOrigin();
+	double *origin = m_ImagePositionPatient;
 	double rotPos[4] = { origin[0], origin[1], origin[2], 1.0 };
 
 	mafMatrix matr;
-	matr.SetFromDirectionCosines(m_DcmImageOrientationPatient);
+	matr.SetFromDirectionCosines(m_ImageOrientationPatient);
 	matr.Invert();
 
 	double *unRotOrigin = matr.GetVTKMatrix()->MultiplyDoublePoint(rotPos);
@@ -1507,3 +1515,4 @@ void mafDicomSlice::CalculateUnrotatedOrigin()
 	m_UnrotatedOrigin[1] = unRotOrigin[1];
 	m_UnrotatedOrigin[2] = unRotOrigin[2];
 }
+

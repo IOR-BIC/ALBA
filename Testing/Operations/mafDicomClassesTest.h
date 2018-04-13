@@ -31,7 +31,6 @@ public:
 	CPPUNIT_TEST(TestSliceGetPatientBirthday);
 	CPPUNIT_TEST(TestSliceGetPatientName);
 	CPPUNIT_TEST(TestSliceGetSliceABSFileName);
-	CPPUNIT_TEST(TestSliceGetDcmInstanceNumber);
 	CPPUNIT_TEST(TestSliceGetDcmCardiacNumberOfImages);
 	CPPUNIT_TEST(TestSliceGetDcmTriggerTime);
 	CPPUNIT_TEST(TestSliceGetVTKImageData);
@@ -75,7 +74,6 @@ protected:
 	void TestSliceGetPatientBirthday();
 	void TestSliceGetPatientName();
 	void TestSliceGetSliceABSFileName();
-  void TestSliceGetDcmInstanceNumber();
   void TestSliceGetDcmCardiacNumberOfImages();
 	void TestSliceGetDcmTriggerTime();
 	void TestSliceGetVTKImageData();

@@ -35,9 +35,10 @@ ELSE (${CMAKE_GENERATOR} STREQUAL "Visual Studio 6")
   OPTION(MAF_USE_CRYPTO "Find and Link the CRYPTO library." ON)
 ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 6")
 
-# options for Offis and BTK from MAF2Medical
-OPTION(MAF_USE_OFFIS "Find and Link the Offis library." ON)
+# options for GDCM and BTK from MAF2Medical
+OPTION(MAF_USE_GDCM "Find and Link the GDCM library." ON)
 OPTION(MAF_USE_BTK "Find and Link the BTK library." ON)
+
 
 #
 # configure CMake modules for MFL
@@ -50,6 +51,13 @@ MFL_SUBPROJECT (MFL_MODULES modules)
 IF (MAF_USE_VTK)
   MFL_SUBPROJECT(VTK VTK)
 ENDIF (MAF_USE_VTK)
+
+#
+# GDCM Library
+#
+IF (MAF_USE_GDCM)
+  MFL_SUBPROJECT(GDCM GDCM)
+ENDIF(MAF_USE_GDCM)
 
 #
 # this is to build ITK inside the MAF tree
@@ -93,12 +101,6 @@ IF (MAF_USE_CRYPTO)
   MFL_SUBPROJECT(CRYPTO CRYPTO)
 ENDIF(MAF_USE_CRYPTO)
 
-#
-# Offis Library
-#
-IF (MAF_USE_OFFIS)
-  MFL_SUBPROJECT(Offis Offis)
-ENDIF(MAF_USE_OFFIS)
 
 #
 # BTK Library
