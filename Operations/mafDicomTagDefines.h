@@ -2428,6 +2428,10 @@
 #define ATTRIBUTE_TriggerTime                    <0x0018, 0x1060>
 #define ATTRIBUTE_Rows                           <0x0028, 0x0010>
 #define ATTRIBUTE_Columns                        <0x0028, 0x0011>
+#define ATTRIBUTE_PixelSpacing                   <0x0028, 0x0030>
+#define ATTRIBUTE_NominalScannedPixelSpacing     <0x0018, 0x2010>
+#define ATTRIBUTE_ImagerPixelSpacing             <0x0018, 0x1164>
+
 
 
 #endif /* !MAF_DICOM_TAG_DEFINES_H */

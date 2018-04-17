@@ -893,7 +893,6 @@ template <uint16_t A, uint16_t B> double mafOpImporterDicomOffis::GetAttributeVa
 		return 0;
 }
 
-
 //----------------------------------------------------------------------------
 void mafOpImporterDicomOffis::CreateSliders()
 {
@@ -1383,12 +1382,52 @@ void mafDicomSeries::SortSlices()
 }
 
 //----------------------------------------------------------------------------
+void mafDicomSlice::GetDicomSpacing(gdcm::DataSet &dcmDataSet, double * dcmPixelSpacing)
+{
+	//Try to get pixel spacing as spacing used on MR/CT or on calibrated CR
+	if (dcmDataSet.FindDataElement(TAG_PixelSpacing))
+	{
+		gdcm::Attribute ATTRIBUTE_PixelSpacing at;
+		at.SetFromDataSet(dcmDataSet);
+
+		dcmPixelSpacing[0] = at.GetValue(0);
+		dcmPixelSpacing[1] = at.GetValue(1);
+		dcmPixelSpacing[2] = 1.0;
+	}
+	//Try to get Nominal Scanned pixel spacing as spacing used on SC
+	else if (dcmDataSet.FindDataElement(TAG_NominalScannedPixelSpacing))
+	{
+		gdcm::Attribute ATTRIBUTE_PixelSpacing at;
+		at.SetFromDataSet(dcmDataSet);
+
+		dcmPixelSpacing[0] = at.GetValue(0);
+		dcmPixelSpacing[1] = at.GetValue(1);
+		dcmPixelSpacing[2] = 1.0;
+	}
+	//Try to get Imager pixel spacing as spacing used on CR/Xray/DX calculated on front plane of the detector
+	else if (dcmDataSet.FindDataElement(TAG_ImagerPixelSpacing))
+	{
+		gdcm::Attribute ATTRIBUTE_PixelSpacing at;
+		at.SetFromDataSet(dcmDataSet);
+
+		dcmPixelSpacing[0] = at.GetValue(0);
+		dcmPixelSpacing[1] = at.GetValue(1);
+		dcmPixelSpacing[2] = 1.0;
+	}
+	//Unable to get element: Setting default value
+	else
+	{
+		dcmPixelSpacing[0] = dcmPixelSpacing[1] = dcmPixelSpacing[2] = 1.0;
+	}
+	
+}
+//----------------------------------------------------------------------------
 vtkImageData* mafDicomSlice::GetNewVTKImageData()
 {
 	double value, minValue = VTK_INT_MAX, maxValue = VTK_INT_MIN;
 	bool hasPadding;
 	double dcmSlope, dcmIntercept;
-	const double *dcmPixelSpacing;
+	double dcmPixelSpacing[3];
 	
 	gdcm::ImageReader dcmReader;
 	dcmReader.SetFileName(m_SliceABSFileName.GetCStr());
@@ -1401,7 +1440,7 @@ vtkImageData* mafDicomSlice::GetNewVTKImageData()
 	const gdcm::Image &dcmImage = dcmReader.GetImage();
 
 	//Getting spacing
-	dcmPixelSpacing = dcmImage.GetSpacing();
+	GetDicomSpacing(dcmReader.GetFile().GetDataSet(), dcmPixelSpacing);
 
 	//Getting rescale factors 
 	const gdcm::PixelFormat &pixeltype = dcmImage.GetPixelFormat();
