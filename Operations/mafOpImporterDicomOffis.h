@@ -171,7 +171,7 @@ protected:
 
 	/** Get the value of a tag inside a dicom dataset. */
 	template <uint16_t A, uint16_t B> double GetAttributeValue(gdcm::DataSet &dcmDataSet);
-			
+
 	/** Return the slice number from the heightId and sliceId*/
 	int GetSliceIDInSeries(int heightId, int timeId);
 
@@ -429,6 +429,9 @@ public:
 
 	/** Set the trigger time of the Dicom slice*/
 	void SetTriggerTime(double time) { m_TriggerTime = time; };
+
+	/* Gets the Dicom spacing by reading tags */
+	void GetDicomSpacing(gdcm::DataSet &dcmDataSet, double * dcmPixelSpacing);
 
 	/** Retrieve image data */
 	vtkImageData* GetNewVTKImageData();
