@@ -64,7 +64,7 @@
 #include "mafOpImporterGRFWS.h"
 #endif
 #include "mafGUIDicomSettings.h"
-#include "mafOpImporterDicomOffis.h"
+#include "mafOpImporterDicom.h"
 #include "mafOpImporterLandmark.h"
 #include "mafOpImporterLandmarkTXT.h"
 #include "mafOpImporterLandmarkWS.h"
@@ -253,7 +253,7 @@ bool ExampleApp::OnInit()
 	m_Logic->Plug(new mafOpImporterASCII("ASCII"));
 #endif
 	mafGUIDicomSettings *dicomSettings=new mafGUIDicomSettings(NULL,"DICOM");
-	m_Logic->Plug(new mafOpImporterDicomOffis("DICOM"),"DICOM Suite",true,dicomSettings);
+	m_Logic->Plug(new mafOpImporterDicom("DICOM"),"DICOM Suite",true,dicomSettings);
 	m_Logic->Plug(new mafOpImporterLandmark("Landmark"),"Landmark Suite");
 	m_Logic->Plug(new mafOpImporterLandmarkTXT("Landmark TXT"),"Landmark Suite");
 	m_Logic->Plug(new mafOpImporterLandmarkWS("Landmark WS"),"Landmark Suite");

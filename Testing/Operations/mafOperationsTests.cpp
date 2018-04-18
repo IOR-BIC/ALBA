@@ -83,7 +83,7 @@
 #include "mafOpImporterAnsysCDBFileTest.h"
 #include "mafOpImporterAnsysInputFileTest.h"
 #include "mafOpImporterC3DTest.h"
-#include "mafOpImporterDicomOffisTest.h"
+#include "mafOpImporterDicomTest.h"
 #include "mafOpImporterExternalFileTest.h"
 #include "mafOpImporterGRFWSTest.h"
 #include "mafOpImporterImageTest.h"
@@ -294,7 +294,7 @@ int	main( int argc, char* argv[] )
 // 	runner.addTest(mafOpSplitSurfaceTest::suite());
 // 	runner.addTest(mafOpMML3Test::suite());
 // 	runner.addTest(mafOpExtractGeometryTest::suite());
-	runner.addTest(mafOpImporterDicomOffisTest::suite());
+	runner.addTest(mafOpImporterDicomTest::suite());
 // 	runner.addTest(mafItkRawMotionImporterUtilityTest::suite());
 // 	runner.addTest(mafOpMakeVMETimevaryingTest::suite());
 // 	runner.addTest(mafOpEqualizeHistogramTest::suite());
