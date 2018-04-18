@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafOpImporterDicomOffisTest
+ Module: mafOpImporterDicomTest
  Authors: Roberto Mucci
  
  Copyright (c) B3C
@@ -14,18 +14,18 @@
 
 =========================================================================*/
 
-#ifndef CPP_UNIT_mafOpImporterDicomOffisTest_H
-#define CPP_UNIT_mafOpImporterDicomOffisTest_H
+#ifndef CPP_UNIT_mafOpImporterDicomTest_H
+#define CPP_UNIT_mafOpImporterDicomTest_H
 
 #include "mafTest.h"
 using namespace std;
  
-class mafOpImporterDicomOffisTest : public mafTest
+class mafOpImporterDicomTest : public mafTest
 {
 
 public:
 
-  CPPUNIT_TEST_SUITE( mafOpImporterDicomOffisTest );
+  CPPUNIT_TEST_SUITE( mafOpImporterDicomTest );
     CPPUNIT_TEST( TestDynamicAllocation );
     CPPUNIT_TEST( TestAccept );
     CPPUNIT_TEST( TestCreateVolume );

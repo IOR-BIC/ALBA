@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program: MAF2
-Module: mafOpImporterDicomOffis
+Module: mafOpImporterDicom
 Authors: Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Gianluigi Crimi
 
 Copyright (c) B3C
@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "wx/listctrl.h"
 #include "wx/dir.h"
 
-#include "mafOpImporterDicomOffis.h"
+#include "mafOpImporterDicom.h"
 #include "mafGUIWizardPageNew.h"
 #include "mafGUIValidator.h"
 #include "mafDeviceButtonsPadMouse.h"
@@ -85,7 +85,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mafOpImporterDicomOffis);
+mafCxxTypeMacro(mafOpImporterDicom);
 
 //----------------------------------------------------------------------------
 // constants :
@@ -98,7 +98,7 @@ enum
 #define EPSILON 1e-7
 
 //----------------------------------------------------------------------------
-mafOpImporterDicomOffis::mafOpImporterDicomOffis(wxString label, bool justOnce) :
+mafOpImporterDicom::mafOpImporterDicom(wxString label, bool justOnce) :
 mafOp(label)
 {
 	m_OpType = OPTYPE_IMPORTER;
@@ -150,24 +150,24 @@ mafOp(label)
 		m_SliceBounds[i] = 0;
 }
 //----------------------------------------------------------------------------
-mafGUIDicomSettings* mafOpImporterDicomOffis::GetSetting()
+mafGUIDicomSettings* mafOpImporterDicom::GetSetting()
 {
 	return (mafGUIDicomSettings*) Superclass::GetSetting();
 }
 //----------------------------------------------------------------------------
-mafOpImporterDicomOffis::~mafOpImporterDicomOffis()
+mafOpImporterDicom::~mafOpImporterDicom()
 {
 	vtkDEL(m_SliceActor);
 	mafDEL(m_Output);
 }
 //----------------------------------------------------------------------------
-mafOp *mafOpImporterDicomOffis::Copy()
+mafOp *mafOpImporterDicom::Copy()
 {
-	mafOpImporterDicomOffis *importer = new mafOpImporterDicomOffis(m_Label, m_JustOnceImport);
+	mafOpImporterDicom *importer = new mafOpImporterDicom(m_Label, m_JustOnceImport);
 	return importer;
 }
 //----------------------------------------------------------------------------
-bool mafOpImporterDicomOffis::Accept(mafVME*node)
+bool mafOpImporterDicom::Accept(mafVME*node)
 {
 	if (m_JustOnceImport && node)
 	{
@@ -178,7 +178,7 @@ bool mafOpImporterDicomOffis::Accept(mafVME*node)
 	return true;
 }
 //-------------------------------------------------------------------------
-mafVME* mafOpImporterDicomOffis::FindVolumeInTree(mafVME *node)
+mafVME* mafOpImporterDicom::FindVolumeInTree(mafVME *node)
 {
 	wxString typeName = "mafVMEVolumeGray";
 
@@ -197,7 +197,7 @@ mafVME* mafOpImporterDicomOffis::FindVolumeInTree(mafVME *node)
 	return NULL;
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::OpRun()
+void mafOpImporterDicom::OpRun()
 {
 	m_Wizard = new mafGUIWizard(_("DICOM Importer"));
 	m_Wizard->SetListener(this);
@@ -237,7 +237,7 @@ void mafOpImporterDicomOffis::OpRun()
 		OpStop(OP_RUN_CANCEL);
 }
 //----------------------------------------------------------------------------
-int mafOpImporterDicomOffis::RunWizard()
+int mafOpImporterDicom::RunWizard()
 {
 	if(m_Wizard->Run())
 	{
@@ -267,7 +267,7 @@ int mafOpImporterDicomOffis::RunWizard()
 }
 
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::OpDo()
+void mafOpImporterDicom::OpDo()
 {
 	if(m_Output != NULL)
 	{
@@ -275,7 +275,7 @@ void mafOpImporterDicomOffis::OpDo()
 	}
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::OpStop(int result)
+void mafOpImporterDicom::OpStop(int result)
 {
 	if (m_DicomInteractor)
 		m_Mouse->RemoveObserver(m_DicomInteractor);
@@ -315,7 +315,7 @@ void mafOpImporterDicomOffis::OpStop(int result)
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-int mafOpImporterDicomOffis::BuildVMEImagesOutput()
+int mafOpImporterDicom::BuildVMEImagesOutput()
 {
 	mafVMEGroup       *imagesGroupOuput;
 	int nFrames = m_SelectedSeries->GetCardiacImagesNum();
@@ -378,7 +378,7 @@ int mafOpImporterDicomOffis::BuildVMEImagesOutput()
 }
 
 //----------------------------------------------------------------------------
-int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
+int mafOpImporterDicom::BuildVMEVolumeGrayOutput()
 {
 	mafVMEVolumeGray	*VolumeOut;
 	mafDicomSlice* firstSlice = m_SelectedSeries->GetSlice(0);
@@ -450,7 +450,7 @@ int mafOpImporterDicomOffis::BuildVMEVolumeGrayOutput()
 	return OP_RUN_OK;
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::CreateLoadPage()
+void mafOpImporterDicom::CreateLoadPage()
 {
 	m_LoadPage = new mafGUIWizardPageNew(m_Wizard,mafWIZARDUSEGUI|mafWIZARDUSERWI);
 	m_LoadGuiLeft = new mafGUI(this);
@@ -476,7 +476,7 @@ void mafOpImporterDicomOffis::CreateLoadPage()
 
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::CreateCropPage()
+void mafOpImporterDicom::CreateCropPage()
 {
 	m_CropPage = new mafGUIWizardPageNew(m_Wizard,mafWIZARDUSEGUI|mafWIZARDUSERWI,true);
 	m_CropPage->SetListener(this);
@@ -493,7 +493,7 @@ void mafOpImporterDicomOffis::CreateCropPage()
 	m_DicomInteractor->SetRWI(m_CropPage->GetRWI());
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::GuiUpdate()
+void mafOpImporterDicom::GuiUpdate()
 {
 	m_LoadGuiLeft->Update();
 	m_LoadGuiUnderLeft->Update();
@@ -502,7 +502,7 @@ void mafOpImporterDicomOffis::GuiUpdate()
 	m_CropGuiCenter->Update();
 }
 //----------------------------------------------------------------------------
-bool mafOpImporterDicomOffis::OpenDir(const char *dirPath)
+bool mafOpImporterDicom::OpenDir(const char *dirPath)
 {
 	wxBusyCursor *busyCursor = NULL; 
 	if (!m_TestMode)
@@ -528,13 +528,13 @@ bool mafOpImporterDicomOffis::OpenDir(const char *dirPath)
 }
 
 //----------------------------------------------------------------------------
-vtkImageData * mafOpImporterDicomOffis::GetSliceInCurrentSeries(int id)
+vtkImageData * mafOpImporterDicom::GetSliceInCurrentSeries(int id)
 {
 	return	m_SelectedSeries->GetSlice(id)->GetNewVTKImageData();
 }
 
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event) 
+void mafOpImporterDicom::OnEvent(mafEventBase *maf_event) 
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
@@ -578,7 +578,7 @@ void mafOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::SetVMEName()
+void mafOpImporterDicom::SetVMEName()
 {
 	mafDicomSlice * sliceData = m_SelectedSeries->GetSlice(0);
 	m_VMEName = sliceData->GetModality();
@@ -609,7 +609,7 @@ void mafOpImporterDicomOffis::SetVMEName()
 		m_CropGuiCenter->Update();
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::CameraUpdate()
+void mafOpImporterDicom::CameraUpdate()
 {
 	if(m_Wizard->GetCurrentPage() == m_LoadPage)
 	{
@@ -625,7 +625,7 @@ void mafOpImporterDicomOffis::CameraUpdate()
 	}
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::CameraReset()
+void mafOpImporterDicom::CameraReset()
 {
 	if (m_LoadPage && m_Wizard->GetCurrentPage() == m_LoadPage)
 	{
@@ -639,7 +639,7 @@ void mafOpImporterDicomOffis::CameraReset()
 	}
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::CreateSliceVTKPipeline()
+void mafOpImporterDicom::CreateSliceVTKPipeline()
 {
 	vtkNEW(m_SliceLookupTable);
 	vtkNEW(m_SliceTexture);
@@ -672,7 +672,7 @@ void mafOpImporterDicomOffis::CreateSliceVTKPipeline()
 	}
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::FillStudyListBox()
+void mafOpImporterDicom::FillStudyListBox()
 {
 	mafString studyName;
 	for (int n = 0; n < m_StudyList->GetStudiesNum(); n++)
@@ -683,7 +683,7 @@ void mafOpImporterDicomOffis::FillStudyListBox()
 	m_StudyListbox->SetSelection(0);
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::FillSeriesListBox()
+void mafOpImporterDicom::FillSeriesListBox()
 {
 	int counter = 0;
 	m_SeriesListbox->Clear();
@@ -707,7 +707,7 @@ void mafOpImporterDicomOffis::FillSeriesListBox()
 	}
 }
 //----------------------------------------------------------------------------
-bool mafOpImporterDicomOffis::LoadDicomFromDir(const char *dicomDirABSPath)
+bool mafOpImporterDicom::LoadDicomFromDir(const char *dicomDirABSPath)
 {   
 	wxDir dir;
 	wxArrayString allFiles;
@@ -751,7 +751,7 @@ bool mafOpImporterDicomOffis::LoadDicomFromDir(const char *dicomDirABSPath)
 #define READTAG(t) gdcm::DirectoryHelper::GetStringValueFromTag(t,dcmDataSet)
 
 //----------------------------------------------------------------------------
-mafDicomSlice *mafOpImporterDicomOffis::ReadDicomFile(mafString fileName)
+mafDicomSlice *mafOpImporterDicom::ReadDicomFile(mafString fileName)
 {
 	int dcmCardiacNumberOfImages = -1;
 	std::string dcmModality, dcmStudyInstanceUID, dcmSeriesInstanceUID, dcmScanOptions;
@@ -762,7 +762,7 @@ mafDicomSlice *mafOpImporterDicomOffis::ReadDicomFile(mafString fileName)
 	double dcmImagePositionPatient[3] = {0.0,0.0,0.0};
 	int imageSize[2];
 	
-	//Load data into Offis structure
+	//Load selected data
 	gdcm::Reader dcmReader;
 	dcmReader.SetFileName(fileName.GetCStr());
 		
@@ -879,7 +879,7 @@ mafDicomSlice *mafOpImporterDicomOffis::ReadDicomFile(mafString fileName)
 }
 
 //----------------------------------------------------------------------------
-template <uint16_t A, uint16_t B> double mafOpImporterDicomOffis::GetAttributeValue(gdcm::DataSet &dcmDataSet)
+template <uint16_t A, uint16_t B> double mafOpImporterDicom::GetAttributeValue(gdcm::DataSet &dcmDataSet)
 {
 	gdcm_ns::Tag tag(A, B);
 	if (dcmDataSet.FindDataElement(tag))
@@ -894,7 +894,7 @@ template <uint16_t A, uint16_t B> double mafOpImporterDicomOffis::GetAttributeVa
 }
 
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::CreateSliders()
+void mafOpImporterDicom::CreateSliders()
 {
 	int numOfSlices = m_SelectedSeries->GetSlicesNum();
 	int cardiacImageNum = m_SelectedSeries->GetCardiacImagesNum();
@@ -928,7 +928,7 @@ void mafOpImporterDicomOffis::CreateSliders()
 	}
 }
 //----------------------------------------------------------------------------
-int mafOpImporterDicomOffis::GetSliceIDInSeries(int timeId, int heigthId)
+int mafOpImporterDicom::GetSliceIDInSeries(int timeId, int heigthId)
 {
 	mafDicomSlice *firstDicomListElement;
 	firstDicomListElement = (mafDicomSlice *)m_SelectedSeries->GetSlice(0);
@@ -939,7 +939,7 @@ int mafOpImporterDicomOffis::GetSliceIDInSeries(int timeId, int heigthId)
 	return timeId*numSlicesPerTS + heigthId;
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
+void mafOpImporterDicom::GenerateSliceTexture(int imageID)
 {
 	double  range[2];
 	mafString text;
@@ -984,7 +984,7 @@ void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 }
 
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::Crop(vtkImageData *slice)
+void mafOpImporterDicom::Crop(vtkImageData *slice)
 {
 	if (m_CropEnabled)
 	{
@@ -994,7 +994,7 @@ void mafOpImporterDicomOffis::Crop(vtkImageData *slice)
 }
 
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::CalculateCropExtent()
+void mafOpImporterDicom::CalculateCropExtent()
 {
 	double spacing[3], crop_bounds[6], sliceOrigin[3];
 	int sliceExtent[6];
@@ -1025,7 +1025,7 @@ void mafOpImporterDicomOffis::CalculateCropExtent()
 }
 
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::SetPlaneDims()
+void mafOpImporterDicom::SetPlaneDims()
 {	
 	double diffx,diffy;
 	diffx=m_SliceBounds[1]-m_SliceBounds[0];
@@ -1039,7 +1039,7 @@ void mafOpImporterDicomOffis::SetPlaneDims()
 #define READ_AND_SET_TAGARRAY(X,Y) tagString = READTAG(X); if (!tagString.empty()) m_TagArray->SetTag(mafTagItem(Y, tagString.c_str()));
 
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::ImportDicomTags()
+void mafOpImporterDicom::ImportDicomTags()
 {
 	if (m_TagArray == NULL) 
 		mafNEW(m_TagArray);
@@ -1093,7 +1093,7 @@ void mafOpImporterDicomOffis::ImportDicomTags()
   m_TagArray->SetTag(mafTagItem("VME_NATURE", "NATURAL"));
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::OnStudySelect()
+void mafOpImporterDicom::OnStudySelect()
 {
 	if (m_SelectedStudy != m_StudyListbox->GetSelection())
 	{
@@ -1104,7 +1104,7 @@ void mafOpImporterDicomOffis::OnStudySelect()
 	}
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::SelectSeries(mafDicomSeries * selectedSeries)
+void mafOpImporterDicom::SelectSeries(mafDicomSeries * selectedSeries)
 {
 	if (m_SelectedSeries != selectedSeries)
 	{
@@ -1163,7 +1163,7 @@ void mafOpImporterDicomOffis::SelectSeries(mafDicomSeries * selectedSeries)
 	}
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
+void mafOpImporterDicom::OnWizardChangePage( mafEvent * e )
 {
 
 	if(m_Wizard->GetCurrentPage()==m_LoadPage)//From Load page
@@ -1208,7 +1208,7 @@ void mafOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 	GuiUpdate();
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::OnRangeModified()
+void mafOpImporterDicom::OnRangeModified()
 {
 	double minMax[2];
 	m_CropPage->GetZCropBounds(minMax);
@@ -1224,7 +1224,7 @@ void mafOpImporterDicomOffis::OnRangeModified()
 	GuiUpdate();
 }
 //----------------------------------------------------------------------------
-void mafOpImporterDicomOffis::OnChangeSlice()
+void mafOpImporterDicom::OnChangeSlice()
 {
 	// show the current slice
 	int currImageId = GetSliceIDInSeries(m_CurrentTime, m_CurrentSlice);
