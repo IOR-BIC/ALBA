@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program: MAF2
-Module: mafOpImporterDicomOffis
+Module: mafOpImporterDicom
 Authors: Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Gianluigi Crimi
 
 Copyright (c) B3C
@@ -14,8 +14,8 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
-#ifndef __mafOpImporterDicomOffis_H__
-#define __mafOpImporterDicomOffis_H__
+#ifndef __mafOpImporterDicom_H__
+#define __mafOpImporterDicom_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -74,13 +74,13 @@ namespace gdcm {
 Perform DICOM importer.
 From a DICOM dataset return a VME Volume or a VME Image.
 */
-class MAF_EXPORT mafOpImporterDicomOffis : public mafOp
+class MAF_EXPORT mafOpImporterDicom : public mafOp
 {
 public:
 	/** constructor */
-	mafOpImporterDicomOffis(wxString label = "Importer DICOM", bool justOnce = false);
+	mafOpImporterDicom(wxString label = "Importer DICOM", bool justOnce = false);
 	/** RTTI macro */
-	mafTypeMacro(mafOpImporterDicomOffis, mafOp);
+	mafTypeMacro(mafOpImporterDicom, mafOp);
 
 	/** Copy. */
 	mafOp* Copy();
@@ -268,7 +268,7 @@ protected:
 	double m_SliceSubRange[2]; ///< contains the scalar range og the full dicom
 
 	/** destructor */
-	~mafOpImporterDicomOffis();
+	~mafOpImporterDicom();
 };
 
 

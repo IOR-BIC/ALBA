@@ -147,7 +147,7 @@ ENDIF (MAF_USE_VTK)
 
 IF (MAF_USE_GDCM)
 SET(PROJECT_SRCS ${PROJECT_SRCS}
-    mafOpImporterDicomOffis.cpp	mafOpImporterDicomOffis.h
+    mafOpImporterDicom.cpp	mafOpImporterDicom.h
 		mafDicomTagDefines.h
     )
 ENDIF (MAF_USE_GDCM)

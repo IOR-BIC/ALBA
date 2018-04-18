@@ -94,7 +94,7 @@ SET(PROJECT_SRCS
 	mafOpSplitSurfaceTest.h mafOpSplitSurfaceTest.cpp
 	mafOpMML3Test.h mafOpMML3Test.cpp
 	mafOpExtractGeometryTest.h mafOpExtractGeometryTest.cpp
-	mafOpImporterDicomOffisTest.h mafOpImporterDicomOffisTest.cpp
+	mafOpImporterDicomTest.h mafOpImporterDicomTest.cpp
 	itkRawMotionImporterUtilityTest.h itkRawMotionImporterUtilityTest.cpp
 	mafOpMakeVMETimevaryingTest.h mafOpMakeVMETimevaryingTest.cpp
 	mafOpEqualizeHistogramTest.h mafOpEqualizeHistogramTest.cpp

@@ -25,7 +25,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "mafDicomClassesTest.h"
 
-#include "mafOpImporterDicomOffis.h"
+#include "mafOpImporterDicom.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMatrix4x4.h"

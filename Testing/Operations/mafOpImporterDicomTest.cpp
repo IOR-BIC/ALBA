@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafOpImporterDicomOffisTest
+ Module: mafOpImporterDicomTest
  Authors: Roberto Mucci
  
  Copyright (c) B3C
@@ -29,9 +29,8 @@
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>
 
-#include "mafOpImporterDicomOffisTest.h"
-
-#include "mafOpImporterDicomOffis.h"
+#include "mafOpImporterDicomTest.h"
+#include "mafOpImporterDicom.h"
 #include "mafVMEGroup.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMEPointSet.h"
@@ -53,17 +52,17 @@
 
 
 //-----------------------------------------------------------
-void mafOpImporterDicomOffisTest::TestDynamicAllocation() 
+void mafOpImporterDicomTest::TestDynamicAllocation() 
 //-----------------------------------------------------------
 {
-  mafOpImporterDicomOffis *importer=new mafOpImporterDicomOffis();
+  mafOpImporterDicom *importer=new mafOpImporterDicom();
   mafDEL(importer);
 }
 //-----------------------------------------------------------
-void mafOpImporterDicomOffisTest::TestAccept() 
+void mafOpImporterDicomTest::TestAccept() 
 //-----------------------------------------------------------
 {
-  mafOpImporterDicomOffis *importer=new mafOpImporterDicomOffis();
+  mafOpImporterDicom *importer=new mafOpImporterDicom();
   mafVMEGroup *group;
   mafNEW(group);
   
@@ -73,7 +72,7 @@ void mafOpImporterDicomOffisTest::TestAccept()
   mafDEL(importer);
 }
 //-----------------------------------------------------------
-void mafOpImporterDicomOffisTest::TestCreateVolume() 
+void mafOpImporterDicomTest::TestCreateVolume() 
 //-----------------------------------------------------------
 {
   mafString dirName=MAF_DATA_ROOT;
@@ -87,7 +86,7 @@ void mafOpImporterDicomOffisTest::TestCreateVolume()
   {
     if (dicomDir != "CVS")
     {
-	    mafOpImporterDicomOffis *importer=new mafOpImporterDicomOffis();
+	    mafOpImporterDicom *importer=new mafOpImporterDicom();
       importer->TestModeOn();
 	
 	    wxString dicomPath = dirName + dicomDir;
@@ -127,7 +126,7 @@ void mafOpImporterDicomOffisTest::TestCreateVolume()
 }
 
 //-----------------------------------------------------------
-void mafOpImporterDicomOffisTest::TestCompareDicomImage() 
+void mafOpImporterDicomTest::TestCompareDicomImage() 
 //-----------------------------------------------------------
 {
   double pixelValue = 0;
@@ -158,7 +157,7 @@ void mafOpImporterDicomOffisTest::TestCompareDicomImage()
 	    CPPUNIT_ASSERT(files.GetCount() == 1);
 	    wxString txtFilePath = files[0];
 	
-	    mafOpImporterDicomOffis *importer=new mafOpImporterDicomOffis();
+	    mafOpImporterDicom *importer=new mafOpImporterDicom();
 	    importer->TestModeOn();
 	    
 	    importer->CreateSliceVTKPipeline();
