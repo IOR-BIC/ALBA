@@ -30,8 +30,10 @@
 #include "vtkMAFSmartPointer.h"
 #include "vtkMatrix4x4.h"
 #include "vtkImageReader.h"
+#include "vtkDataSetReader.h"
 
-#define D_SliceABSFileName "FILE_NAME"
+
+#define D_SliceABSFileName "DicomSlice.dcm"
 #define D_DcmInstanceNumber 11
 #define D_DcmCardiacNumberOfImages 18
 #define D_DcmTriggerTime 120.5
@@ -44,6 +46,7 @@
 #define D_DcmSeriesID "Id-Series-1"
 #define D_NewDcmSeriesID "Id-Series-2"
 #define D_Position { 0.0, 1.0, 2.0 }
+#define D_SliceSize { 256, 256 }
 #define D_NewPosition { 0.0, 2.0, 1.0 }
 #define D_Orientation { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0 }
 #define D_NewOrientation { 0.0, 1.0, 0.0, 1.0, 0.0, 0.0 }
@@ -53,27 +56,23 @@
 //----------------------------------------------------------------------------
 mafDicomSlice * mafDicomClassesTest::CreateBaseSlice(double *pos)
 {
-	vtkMAFSmartPointer<vtkImageReader> reader;
-	mafString fileName = MAF_DATA_ROOT;
-	fileName << "/VTK_Volumes/volume.vtk";
-	reader->SetFileName(fileName.GetCStr());
-	reader->Update();
-
-
 	//this will be deleted from slice destructor
 	double patientPos[3] = D_Position;
-	vtkImageData *imData;
-	vtkNEW(imData);
-	imData->DeepCopy(reader->GetOutput());
+	int sliceSize[2] = D_SliceSize;
 
-	if(pos!=NULL)
-		imData->SetOrigin(pos);
-	else
-		imData->SetOrigin(patientPos);
+	mafString fileName = MAF_DATA_ROOT;
+	fileName << "/Dicom/" << D_SliceABSFileName;
 
-		
+
+	mafDicomSlice *sliceDicom;
 	double patientOri[6] = D_Orientation;
-	mafDicomSlice *sliceDicom = new mafDicomSlice(D_SliceABSFileName, patientOri, imData,D_DcmDescription,D_DcmDate, D_DcmPatientName,D_DcmBirthDate, D_DcmInstanceNumber,D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
+	if (pos != NULL)
+		sliceDicom = new mafDicomSlice(fileName, patientOri, pos, D_DcmDescription,D_DcmDate, D_DcmPatientName,D_DcmBirthDate, D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
+	else 
+		sliceDicom = new mafDicomSlice(fileName, patientOri, patientPos, D_DcmDescription, D_DcmDate, D_DcmPatientName, D_DcmBirthDate, D_DcmCardiacNumberOfImages, D_DcmTriggerTime);
+
+	sliceDicom->SetSliceSize(sliceSize);
+
 	return sliceDicom;
 }
 
@@ -112,35 +111,27 @@ void mafDicomClassesTest::TestSliceGetSliceABSFileName()
 {
   mafDicomSlice *sliceDicom = CreateBaseSlice();
 
-	CPPUNIT_ASSERT(strcmp(sliceDicom->GetSliceABSFileName(),D_SliceABSFileName) == 0);
+	mafString fileName = MAF_DATA_ROOT;
+	fileName << "/Dicom/" << D_SliceABSFileName;
+
+	CPPUNIT_ASSERT(strcmp(sliceDicom->GetSliceABSFileName(), fileName.GetCStr()) == 0);
 
 	sliceDicom->SetSliceABSFileName("newName");
   CPPUNIT_ASSERT(strcmp(sliceDicom->GetSliceABSFileName(),"newName") == 0);
 
   cppDEL(sliceDicom);
 }
-//-----------------------------------------------------------
-void mafDicomClassesTest::TestSliceGetDcmInstanceNumber()
-{
-  mafDicomSlice *sliceDicom = CreateBaseSlice();
 
-  CPPUNIT_ASSERT(sliceDicom->GetDcmInstanceNumber() == D_DcmInstanceNumber);
-
-	sliceDicom->SetDcmInstanceNumber(D_NewNum);
-	CPPUNIT_ASSERT(sliceDicom->GetDcmInstanceNumber() == D_NewNum);
-
-  cppDEL(sliceDicom);
-}
 //-----------------------------------------------------------
 void mafDicomClassesTest::TestSliceGetDcmCardiacNumberOfImages()
 {
   //Using the default constructor
   mafDicomSlice *sliceDicom = CreateBaseSlice();
 
-  CPPUNIT_ASSERT(sliceDicom->GetDcmCardiacNumberOfImages() == D_DcmCardiacNumberOfImages);
+  CPPUNIT_ASSERT(sliceDicom->GetNumberOfCardiacImages() == D_DcmCardiacNumberOfImages);
 
-	sliceDicom->SetDcmCardiacNumberOfImages(D_NewNum);
-	CPPUNIT_ASSERT(sliceDicom->GetDcmCardiacNumberOfImages() == D_NewNum);
+	sliceDicom->SetNumberOfCardiacImages(D_NewNum);
+	CPPUNIT_ASSERT(sliceDicom->GetNumberOfCardiacImages() == D_NewNum);
 
   cppDEL(sliceDicom);
 }
@@ -150,29 +141,43 @@ void mafDicomClassesTest::TestSliceGetDcmTriggerTime()
   //Using the default constructor
   mafDicomSlice *sliceDicom = CreateBaseSlice();
   
-  CPPUNIT_ASSERT(sliceDicom->GetDcmTriggerTime() == D_DcmTriggerTime);
+  CPPUNIT_ASSERT(sliceDicom->GetTriggerTime() == D_DcmTriggerTime);
 
-	sliceDicom->SetDcmTriggerTime(D_NewNum);
-	CPPUNIT_ASSERT(sliceDicom->GetDcmTriggerTime() == D_NewNum);
+	sliceDicom->SetTriggerTime(D_NewNum);
+	CPPUNIT_ASSERT(sliceDicom->GetTriggerTime() == D_NewNum);
 
   cppDEL(sliceDicom);
 }
 //-----------------------------------------------------------
 void mafDicomClassesTest::TestSliceGetVTKImageData()
 {
-	//create imagedata
-	vtkMAFSmartPointer<vtkImageReader> reader;
+	//create imagedata 
+	vtkMAFSmartPointer<vtkDataSetReader> reader;
   mafString fileName=MAF_DATA_ROOT;
-  fileName<<"/VTK_Volumes/volume.vtk";
+  fileName<<"/Dicom/DicomSlice.vtk";
   reader->SetFileName(fileName.GetCStr());
   reader->Update();
-
+	
 	//Using the default constructor
 	mafDicomSlice *sliceDicom = CreateBaseSlice();
 	
-  CPPUNIT_ASSERT(sliceDicom->GetVTKImageData()->GetNumberOfPoints() == reader->GetOutput()->GetNumberOfPoints());
-  CPPUNIT_ASSERT(sliceDicom->GetVTKImageData()->GetNumberOfCells() == reader->GetOutput()->GetNumberOfCells());
+	vtkImageData* sliceImageData = sliceDicom->GetNewVTKImageData();
+	vtkImageData* readerOutput = vtkImageData::SafeDownCast(reader->GetOutput());
+	readerOutput->Update();
+	
+	double *sliceSpacing = sliceImageData->GetSpacing();
+	double *readerSpacing = readerOutput->GetSpacing();
+	CPPUNIT_ASSERT(sliceSpacing[0] == readerSpacing[0] && sliceSpacing[1] == readerSpacing[1] && sliceSpacing[2] == readerSpacing[2]);
 
+	int *sliceDims = sliceImageData->GetDimensions();
+	int *readerDims = readerOutput->GetDimensions();
+	CPPUNIT_ASSERT(sliceDims[0] == readerDims[0] && sliceDims[1] == readerDims[1] && sliceDims[2] == readerDims[2]);
+
+	double *sliceSR = sliceImageData->GetScalarRange();
+	double *readerSR = readerOutput->GetScalarRange();
+	CPPUNIT_ASSERT(sliceSR[0] == readerSR[0] && sliceSR[1] == readerSR[1]);
+
+	vtkDEL(sliceImageData);
   cppDEL(sliceDicom);
 }
 //-----------------------------------------------------------
@@ -258,9 +263,9 @@ void mafDicomClassesTest::TestSliceGetDcmModality()
 	//Using the default constructor
 	mafDicomSlice *sliceDicom = CreateBaseSlice();
 
-	sliceDicom->SetDcmModality("Modality");
+	sliceDicom->SetModality("Modality");
 
-	CPPUNIT_ASSERT(strcmp(sliceDicom->GetDcmModality(), "Modality") == 0);
+	CPPUNIT_ASSERT(strcmp(sliceDicom->GetModality(), "Modality") == 0);
 
 	cppDEL(sliceDicom);
 }
@@ -406,8 +411,8 @@ void mafDicomClassesTest::TestSeriesGetDimensions()
 
 	const int *dims=series->GetDimensions();
 
-	CPPUNIT_ASSERT(dims[0] == 1);
-	CPPUNIT_ASSERT(dims[1] == 1);
+	CPPUNIT_ASSERT(dims[0] == 256);
+	CPPUNIT_ASSERT(dims[1] == 256);
 
 	cppDEL(series);
 }

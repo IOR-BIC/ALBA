@@ -705,26 +705,33 @@ void vtkMAFVolumeSlicer::ExecuteDataHotFix(vtkDataObject *outputData)
 
   const void *inputPointer  = pScalars->GetVoidPointer(0);    
   this->PrepareVolume(input, outputObject);
-
+	 
   switch (pScalars->GetDataType()) 
   {
   case VTK_CHAR:
-    this->CreateImage((const char*)inputPointer, outputObject); break;
-
+    this->CreateImage((const char*)inputPointer, outputObject); 
+	break;
   case VTK_UNSIGNED_CHAR:
-    this->CreateImage((const unsigned char*)inputPointer, outputObject); break;
-
+    this->CreateImage((const unsigned char*)inputPointer, outputObject); 
+	break;
   case VTK_SHORT:
-    this->CreateImage((const short*)inputPointer, outputObject); break;
-
-  case VTK_UNSIGNED_SHORT:
-    this->CreateImage((const unsigned short*)inputPointer, outputObject); break;
-
-  case VTK_FLOAT:
-    this->CreateImage((const float*)inputPointer, outputObject); break;
-    
+    this->CreateImage((const short*)inputPointer, outputObject); 
+	break;
+	case VTK_UNSIGNED_SHORT:
+    this->CreateImage((const unsigned short*)inputPointer, outputObject); 
+	break;
+	case VTK_INT:
+		this->CreateImage((const int*)inputPointer, outputObject);
+	break;
+	case VTK_UNSIGNED_INT:
+		this->CreateImage((const unsigned int*)inputPointer, outputObject);
+	break;
+	case VTK_FLOAT:
+    this->CreateImage((const float*)inputPointer, outputObject); 
+	break;
   case VTK_DOUBLE:  //NOTE: GPU is not allowed
-    this->CreateImage((const double*)inputPointer, outputObject); break;
+    this->CreateImage((const double*)inputPointer, outputObject); 
+	break;
   
   default:
     vtkErrorMacro(<< "vtkMAFVolumeSlicer: Scalar type is not supported");
@@ -1081,6 +1088,22 @@ void vtkMAFVolumeSlicer::CreateImage(const InputDataType *inputPointer, vtkImage
 #endif
       this->CreateImage(inputPointer, (unsigned short*)outputPointer, outputObject);
     break;
+	case VTK_INT:
+#ifdef _WIN32
+		if (m_bGPUProcessing)
+			this->CreateImageGPU((int*)outputPointer, outputObject);
+		else
+#endif
+			this->CreateImage(inputPointer, (int*)outputPointer, outputObject);
+		break;
+	case VTK_UNSIGNED_INT:
+#ifdef _WIN32
+		if (m_bGPUProcessing)
+			this->CreateImageGPU((unsigned int*)outputPointer, outputObject);
+		else
+#endif
+			this->CreateImage(inputPointer, (unsigned int*)outputPointer, outputObject);
+		break;
   case VTK_FLOAT:
 #ifdef _WIN32
     if (m_bGPUProcessing)

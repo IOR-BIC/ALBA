@@ -6,16 +6,16 @@
 # Version:   $Revision: 1.2 $
 #
 # Description:
-# Project file for configuring and building the Offis library.
+# Project file for configuring and building the GDCM library.
 
-MESSAGE(STATUS "Configuring Offis")
-PROJECT (Offis)
+MESSAGE(STATUS "Configuring GDCM")
+PROJECT (GDCM)
 
 # place all binaries inside the same output directory
-SET (LIBRARY_OUTPUT_PATH ${Offis_BINARY_DIR}/bin/ CACHE INTERNAL 
+SET (LIBRARY_OUTPUT_PATH ${GDCM_BINARY_DIR}/bin/ CACHE INTERNAL 
    "Single output directory for building all libraries.")
 
-SET (EXECUTABLE_OUTPUT_PATH ${Offis_BINARY_DIR}/bin/ CACHE INTERNAL 
+SET (EXECUTABLE_OUTPUT_PATH ${GDCM_BINARY_DIR}/bin/ CACHE INTERNAL 
      "Single output directory for building all executables.")
 
 MARK_AS_ADVANCED (
@@ -23,8 +23,8 @@ MARK_AS_ADVANCED (
   EXECUTABLE_OUTPUT_PATH
 )
 
-INCLUDE (${Offis_SOURCE_DIR}/Configure.cmake)
+INCLUDE (${GDCM_SOURCE_DIR}/Configure.cmake)
 
 IF (CONFIGURE_ERROR)
-  MESSAGE (FATAL_ERROR "Offis: Error configuring Offis library, cannot build!")
+  MESSAGE (FATAL_ERROR "GDCM: Error configuring GDCM library, cannot build!")
 ENDIF (CONFIGURE_ERROR)

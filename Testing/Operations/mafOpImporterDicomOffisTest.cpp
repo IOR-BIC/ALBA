@@ -45,28 +45,12 @@
 
 #include <wx/dir.h>
 
-#include "dcmtk/config/osconfig.h"    /* make sure OS specific configuration is included first */
 
-#if _MSC_VER >= 1500
-#undef VS2008_ssize_t_HACK
-#endif
-
-#include "dcmtk/ofstd/ofstream.h"
-#include "dcmtk/ofstd/ofstring.h"
-#include "dcmtk/dcmdata/dctk.h"
-#include "dcmtk/dcmdata/dcdebug.h"
-#include "dcmtk/dcmdata/cmdlnarg.h"
-#include "dcmtk/ofstd/ofconapp.h"
-#include "dcmtk/dcmdata/dcuid.h"       /* for dcmtk version name */
-#include "dcmtk/dcmdata/dcistrmz.h"    /* for dcmZlibExpectRFC1950Encoding */
-#include "dcmtk/dcmimgle/dcmimage.h."
-#include "dcmtk/dcmjpeg/djdecode.h."
-#include "dcmtk/dcmdata/dcrledrg.h"
 
 #define INCLUDE_CSTDLIB
 #define INCLUDE_CSTRING
 
-#include "dcmtk/ofstd/ofstdinc.h"
+
 
 //-----------------------------------------------------------
 void mafOpImporterDicomOffisTest::TestDynamicAllocation() 

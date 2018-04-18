@@ -117,6 +117,8 @@ void vtkMAFRGtoSPImageFilter::Execute()
 	void *inputPointer = inputScalars->GetVoidPointer(0);
 	void *outputPointer = outScalars->GetVoidPointer(0);
 
+//	outputPointer = new int[outDims[0] * outDims[1]];
+
 	switch (inputScalars->GetDataType())
 	{
 		case VTK_CHAR:
@@ -130,6 +132,12 @@ void vtkMAFRGtoSPImageFilter::Execute()
 			break;
 		case VTK_UNSIGNED_SHORT:
 			FillSP(input, output, (unsigned short*)inputPointer, (unsigned short*)outputPointer);
+			break;
+		case VTK_INT:
+			FillSP(input, output, (int*)inputPointer, (int*)outputPointer);
+			break;
+		case VTK_UNSIGNED_INT:
+			FillSP(input, output, (unsigned int*)inputPointer, (unsigned int*)outputPointer);
 			break;
 		case VTK_FLOAT:
 			FillSP(input, output, (float*)inputPointer, (float*)outputPointer);
