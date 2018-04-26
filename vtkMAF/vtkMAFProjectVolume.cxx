@@ -154,6 +154,12 @@ void vtkMAFProjectVolume::Execute()
 		case VTK_UNSIGNED_SHORT:
 			ProjectScalars(inputDims, (unsigned short*)inputPointer, (unsigned short*)outputPointer);
 			break;
+		case VTK_INT:
+			ProjectScalars(inputDims, (int*)inputPointer, (int*)outputPointer);
+			break;
+		case VTK_UNSIGNED_INT:
+			ProjectScalars(inputDims, (unsigned int*)inputPointer, (unsigned int*)outputPointer);
+			break;
 		case VTK_FLOAT:
 			ProjectScalars(inputDims, (float*)inputPointer, (float*)outputPointer);
 			break;
@@ -295,9 +301,6 @@ void vtkMAFProjectVolume::GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int
 	//Generate temporary rectilinear grid output
 	vtkRectilinearGrid *rgOut = vtkRectilinearGrid::New();
 	vtkDataArray 			*XCoordinates, *YCoordinates, *ZCoordinates;
-	double outputSpacing[3], bounds[6], bestSpacing[3];
-	int outputDims[3];
-
 
 	rgOut->SetDimensions(projectedDims);
 
