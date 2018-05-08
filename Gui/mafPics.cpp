@@ -160,6 +160,9 @@ void mafPictureFactory::Initialize()
 
 		#include <pic/BUTTON_HELP.xpm>
 		mafADDPIC(BUTTON_HELP);
+
+		#include <pic/HINT_IMAGE_ICON.xpm>
+		mafADDPIC(HINT_IMAGE_ICON);
 }
 //----------------------------------------------------------------------------
 mafPictureFactory::~mafPictureFactory()
