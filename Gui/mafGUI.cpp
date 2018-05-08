@@ -49,6 +49,8 @@
 #if WIN32  
   #include <wx/msw/winundef.h> 
 #endif
+#include "wx/sizer.h"
+#include "mafPics.h"
 // end of hack
 
 //----------------------------------------------------------------------------
@@ -360,6 +362,27 @@ void mafGUI::Label(mafString label1, mafString *var, bool bold_label, bool bold_
 	sizer->Add(lab2, 0, wxEXPAND);
 
 	Add(sizer, 0, wxALL, M);
+}
+
+//----------------------------------------------------------------------------
+void mafGUI::HintBox(int id, wxString label, wxString title, bool showIcon)
+{
+	wxStaticBoxSizer *boxSizer = new wxStaticBoxSizer(wxHORIZONTAL, this, title);
+
+	if(showIcon)
+	{
+		int w_id = GetWidgetId(id);
+		wxBitmap bitmap = mafPictureFactory::GetPictureFactory()->GetBmp("HINT_IMAGE_ICON");
+		wxBitmapButton *bmpButton = new wxBitmapButton(this, w_id, bitmap, wxPoint(0, 0), wxSize(19, 20));
+		bmpButton->SetValidator(mafGUIValidator(this, w_id, bmpButton));
+
+		boxSizer->Add(bmpButton);
+		boxSizer->Add(new wxStaticText(this, NULL, " ")); // Separator
+	}
+
+	boxSizer->Add(new wxStaticText(this, NULL, label));
+
+	Add(boxSizer);
 }
 
 //----------------------------------------------------------------------------
