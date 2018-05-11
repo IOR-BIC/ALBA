@@ -771,7 +771,7 @@ void mafViewRXCT::PackageView()
   }
 
   m_ViewCTCompound = new mafViewCompound("CT view",3,2);
-  mafViewSlice *vs = new mafViewSlice("Slice view", CAMERA_CT);
+  mafViewSlice *vs = new mafViewSlice("Slice view", CAMERA_OS_Z);
   vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeOrthoSlice",MUTEX);
   vs->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeOrthoSlice",MUTEX);
   vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
