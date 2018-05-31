@@ -199,6 +199,7 @@ void mafEvent::Init(void *sender, int id, long arg)
   m_y = 0;
   m_width = 0;
   m_height = 0;
+	m_Pointer = NULL;
 #ifdef MAF_USE_WX
   m_Win    = NULL;
   m_UpdateUIEvent   = NULL;

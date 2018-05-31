@@ -128,7 +128,10 @@ public:
   /** Double label widget. */
   void Label(mafString label1,mafString *var, bool bold_label = false, bool bold_var = false);
 
-  /** String entry widget. */
+	/** Hint Box widget. */
+	void HintBox(int id, wxString label, wxString title = "Hint", bool showIcon = true);
+
+	/** String entry widget. */
   void String(int id,wxString label,wxString *var, wxString tooltip = "", bool multiline = false, bool password = false);
 
   /** String entry widget. */
