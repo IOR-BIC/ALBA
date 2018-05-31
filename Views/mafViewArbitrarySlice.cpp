@@ -71,6 +71,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPolyDataNormals.h"
 #include "vtkCamera.h"
 #include "vtkImageData.h"
+#include "mafPipeSlice.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewArbitrarySlice);
@@ -459,43 +460,21 @@ void mafViewArbitrarySlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 			matrix->Identity();
 			matrix->SetVTKMatrix(TransformReset->GetMatrix());
 
+			double surfaceOriginTranslated[3];
+			double normal[3];
+			((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+			surfaceOriginTranslated[0] = m_SliceCenterSurface[0] + normal[0] * 0.1;
+			surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
+			surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
+
 			//for each surface visualized change the center of the cut plane
 			mafVME *root=m_CurrentVolume->GetRoot();
 			mafVMEIterator *iter = root->NewIterator();
 			for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
-				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
-				{
-					double surfaceOriginTranslated[3];
-					double normal[3];
-					((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-					surfaceOriginTranslated[0] = m_SliceCenterSurface[0] + normal[0] * 0.1;
-					surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
-					surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
-
-					mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
-					mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
-					if(PipeSliceViewSurface)
-					{
-						PipeSliceViewSurface->SetSlice(surfaceOriginTranslated,NULL);
-					}
-				}
-				if(node->IsA("mafVMEMesh"))
-				{
-					double surfaceOriginTranslated[3];
-					double normal[3];
-					((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-					surfaceOriginTranslated[0] = m_SliceCenterSurface[0] + normal[0] * 0.1;
-					surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
-					surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
-
-					mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
-					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
-					if(PipeArbitraryViewMesh && PipeSliceViewMesh)
-					{
-						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated,NULL);
-					}
-				}
+				mafPipeSlice *pipeSlice = mafPipeSlice::SafeDownCast(m_ChildViewList[SLICE_VIEW]->GetNodePipe(node));
+				if (pipeSlice)
+					pipeSlice->SetSlice(surfaceOriginTranslated, NULL);
 			}
 			iter->Delete();
 			if(m_CurrentPolylineGraphEditor)
@@ -503,18 +482,8 @@ void mafViewArbitrarySlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 				//a surface is visible only if there is a volume in the view
 				if(m_CurrentVolume)
 				{
-
-					double normal[3];
-					((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-
 					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafVME*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
-
-					double surfaceOriginTranslated[3];
-
-					surfaceOriginTranslated[0] = m_SliceCenterSurface[0] + normal[0] * 0.1;
-					surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
-					surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
 
 					PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);          
 				}
