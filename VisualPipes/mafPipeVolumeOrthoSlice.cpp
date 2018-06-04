@@ -460,28 +460,31 @@ void mafPipeVolumeOrthoSlice::GetLutRange(double range[2])
 
 //----------------------------------------------------------------------------
 //Set the origin and normal of the slice
-void mafPipeVolumeOrthoSlice::SetSlice(double* Origin, double* Normal)
-//----------------------------------------------------------------------------
+void mafPipeVolumeOrthoSlice::SetSlice(double* origin, double* normal)
 {
 
 	double oldOrigin[3];
 
-	if (Origin != NULL)
+	if(origin)
+		mafLogMessage("origin: %f %f %f", origin[0], origin[1], origin[2]);
+
+
+	if (origin != NULL)
 	{
 		oldOrigin[0] = m_Origin[0];
 		oldOrigin[1] = m_Origin[1];
 		oldOrigin[2] = m_Origin[2];
-		m_Origin[0] = Origin[0];
-		m_Origin[1] = Origin[1];
-		m_Origin[2] = Origin[2];
+		m_Origin[0] = origin[0];
+		m_Origin[1] = origin[1];
+		m_Origin[2] = origin[2];
 	}
 	
-	if (Normal != NULL)
+	if (normal != NULL)
 	{
 		int newDirection;
-		if (Normal[0] == 1 && Normal[1] == 0 && Normal[2] == 0)
+		if (normal[0] == 1 && normal[1] == 0 && normal[2] == 0)
 			newDirection = SLICE_X;
-		else if (Normal[0] == 0 && Normal[1] == 1 && Normal[2] == 0)
+		else if (normal[0] == 0 && normal[1] == 1 && normal[2] == 0)
 			newDirection = SLICE_Y;
 		else
 			newDirection = SLICE_Z;
@@ -496,7 +499,7 @@ void mafPipeVolumeOrthoSlice::SetSlice(double* Origin, double* Normal)
 
 	for(int i=0;i<3;i++)
 	{
-		if(Origin && m_Origin[i]==oldOrigin[i])
+		if(origin && m_Origin[i]==oldOrigin[i])
 			continue;
 
 		if (m_Slicer[i])
@@ -512,21 +515,21 @@ void mafPipeVolumeOrthoSlice::SetSlice(double* Origin, double* Normal)
 //----------------------------------------------------------------------------
 //Get the slice origin coordinates and normal.
 //Both, Origin and Normal may be NULL, if the value is not to be retrieved.
-/*virtual*/ void mafPipeVolumeOrthoSlice::GetSlice(double *Origin, double *Normal)
+/*virtual*/ void mafPipeVolumeOrthoSlice::GetSlice(double *origin, double *normal)
 //----------------------------------------------------------------------------
 {
-  if (Origin != NULL)
+  if (origin != NULL)
   {
-    Origin[0] = m_Origin[0];
-    Origin[1] = m_Origin[1];
-    Origin[2] = m_Origin[2];
+    origin[0] = m_Origin[0];
+    origin[1] = m_Origin[1];
+    origin[2] = m_Origin[2];
   }
 
-  if (Normal != NULL)
+  if (normal != NULL)
   {
-		Normal[0] = m_SliceDirection == SLICE_X;
-    Normal[1] = m_SliceDirection == SLICE_Y;
-    Normal[2] = m_SliceDirection == SLICE_Z;
+		normal[0] = m_SliceDirection == SLICE_X;
+    normal[1] = m_SliceDirection == SLICE_Y;
+    normal[2] = m_SliceDirection == SLICE_Z;
   }  
 }
 

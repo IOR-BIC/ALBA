@@ -408,15 +408,14 @@ void vtkMAFVolumeOrthoSlicer::GetSlicingInfo(int* plane1, int* plane2, double* r
 				break;
 		}
 		int nCoordinates = coordinates->GetNumberOfTuples();
-		double *coordPointer = (double *) coordinates->GetVoidPointer(0);
 		double n0, n1;
 		double l, r;
-		n1 = coordPointer[0];
+		coordinates->GetTuple(0, &n1);
 		for (int i = 1; i < nCoordinates; i++)
 		{
 			//n0 was last n1
 			n0 = n1;
-			n1 = coordPointer[i];
+			coordinates->GetTuple(i,&n1);
 
 			l = MIN(n0, n1);
 			r = MAX(n0, n1);
