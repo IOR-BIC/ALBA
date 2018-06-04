@@ -156,14 +156,51 @@ void vtkMAFRGtoSPImageFilter::Execute()
 template<typename DataType>
 void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * output, DataType *inputScalars, DataType *outScalars)
 {
-	int outDims[3], inDims[3], x, y, xRG, yRG, yOffset, yRGoffsetA, yRGoffsetB, newIdx;
-	double spacing[3], bounds[6], yRatioA, yRatioB, xRatioA, xRatioB, ySize, xSize, yPos, xPos, yCoordA, yCoordB, xCoordA, xCoordB, acc1, acc2, acc;
 	vtkDataArray 			*xCoordinates, *yCoordinates;
 
 	xCoordinates = input->GetXCoordinates();
 	yCoordinates = input->GetYCoordinates();
-	double *xCoordPointer = (double *)xCoordinates->GetVoidPointer(0);
-	double *yCoordPointer = (double *)yCoordinates->GetVoidPointer(0);
+	void *xCoordPointer = xCoordinates->GetVoidPointer(0);
+	void *yCoordPointer = yCoordinates->GetVoidPointer(0);
+
+	switch (xCoordinates->GetDataType())
+	{
+		case VTK_CHAR:
+			FillSP(input, output, inputScalars, outScalars, (char *) xCoordPointer,(char *)yCoordPointer);
+			break;
+		case VTK_UNSIGNED_CHAR:
+			FillSP(input, output, inputScalars, outScalars, (unsigned char *)xCoordPointer, (unsigned char *)yCoordPointer);
+			break;
+		case VTK_SHORT:
+			FillSP(input, output, inputScalars, outScalars, (short *)xCoordPointer, (short *)yCoordPointer);
+			break;
+		case VTK_UNSIGNED_SHORT:
+			FillSP(input, output, inputScalars, outScalars, (unsigned short *)xCoordPointer, (unsigned short *)yCoordPointer);
+			break;
+		case VTK_INT:
+			FillSP(input, output, inputScalars, outScalars, (int *)xCoordPointer, (int *)yCoordPointer);
+			break;
+		case VTK_UNSIGNED_INT:
+			FillSP(input, output, inputScalars, outScalars, (unsigned int *)xCoordPointer, (unsigned int *)yCoordPointer);
+			break;
+		case VTK_FLOAT:
+			FillSP(input, output, inputScalars, outScalars, (float *)xCoordPointer, (float *)yCoordPointer);
+			break;
+		case VTK_DOUBLE:  
+			FillSP(input, output, inputScalars, outScalars, (double *)xCoordPointer, (double *)yCoordPointer);
+		default:
+			vtkErrorMacro(<< "vtkMAFVolumeSlicer: Scalar type is not supported");
+			return;
+	}
+
+}
+
+//----------------------------------------------------------------------------
+template<typename DataType, typename CoordDataType>
+void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * output, DataType *inputScalars, DataType *outScalars, CoordDataType *xCoord, CoordDataType *yCoord)
+{
+	int outDims[3], inDims[3], x, y, xRG, yRG, yOffset, yRGoffsetA, yRGoffsetB, newIdx;
+	double spacing[3], bounds[6], yRatioA, yRatioB, xRatioA, xRatioB, ySize, xSize, yPos, xPos, yCoordA, yCoordB, xCoordA, xCoordB, acc1, acc2, acc;
 
 	input->GetBounds(bounds);
 	output->GetDimensions(outDims);
@@ -179,8 +216,8 @@ void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * 
 		newIdx = 0;
 
 		yRG = 0;
-		yCoordA = yCoordPointer[yRG];
-		yCoordB = yCoordPointer[yRG + 1];
+		yCoordA = yCoord[yRG];
+		yCoordB = yCoord[yRG + 1];
 		yRGoffsetA = 0;
 		yRGoffsetB = inDims[0];
 		ySize = yCoordB - yCoordA;
@@ -192,7 +229,7 @@ void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * 
 			{
 				yRG++;
 				yCoordA = yCoordB;
-				yCoordB = yCoordPointer[yRG + 1];
+				yCoordB = yCoord[yRG + 1];
 
 				yRGoffsetA = yRG * inDims[0];
 				yRGoffsetB = (yRG + 1) * inDims[0];
@@ -207,8 +244,8 @@ void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * 
 
 
 			xRG = 0;
-			xCoordA = xCoordPointer[xRG];
-			xCoordB = xCoordPointer[xRG + 1];
+			xCoordA = xCoord[xRG];
+			xCoordB = xCoord[xRG + 1];
 			xSize = xCoordB - xCoordA;
 			for (x = 0; x < outDims[0]; x++)
 			{
@@ -218,7 +255,7 @@ void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * 
 				{
 					xRG++;
 					xCoordA = xCoordB;
-					xCoordB = xCoordPointer[xRG + 1];
+					xCoordB = xCoord[xRG + 1];
 					xSize = xCoordB - xCoordA;
 				}
 
@@ -239,6 +276,7 @@ void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * 
 			}
 		}
 	}
+
 }
 
 //=========================================================================
