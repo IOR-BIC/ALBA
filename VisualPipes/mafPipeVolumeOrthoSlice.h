@@ -100,11 +100,11 @@ public:
 	
 	/** Set the origin and normal of the slice.
   Both, Origin and Normal may be NULL, if the current value is to be preserved. */
-  /*virtual*/ void SetSlice(double* Origin, double* Normal);  
+  /*virtual*/ void SetSlice(double* origin, double* normal);  
 	
   /** Get the slice origin coordinates and normal.
   Both, Origin and Normal may be NULL, if the value is not to be retrieved.*/
-  /*virtual*/ void GetSlice(double* Origin, double* Normal);  
+  /*virtual*/ void GetSlice(double* origin, double* normal);  
 
   /** Assign a color lookup table to the slices*/
   void SetColorLookupTable(vtkLookupTable *lut);
