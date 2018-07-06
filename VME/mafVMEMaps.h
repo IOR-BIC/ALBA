@@ -150,7 +150,7 @@ public:
   /** Get the scalar range of the output vtkDataSet. */
   void GetScalarRange(double range[2]);
 
-private:
+protected:
 
   //mafVMEMaps();
   //virtual ~mafVMEMaps();
