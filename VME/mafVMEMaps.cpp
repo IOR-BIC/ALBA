@@ -241,85 +241,7 @@ void mafVMEMaps::Print(std::ostream& os, const int tabs)
 void mafVMEMaps::InternalPreUpdate()
 //-------------------------------------------------------------------------
 {
-  mafVME *vme = GetMappedVMELink();
-  if(!vme)
-    return;
-  vtkPolyData *data = (vtkPolyData *)vme->GetOutput()->GetVTKData();
-  data->Update();
-
-  m_Normals->SetInput(data);
-  m_Normals->ComputePointNormalsOn();
-  m_Normals->SplittingOff();
-  m_Normals->Update();
-
-  if(m_Volume==NULL)
-  {
-    SetVolume(mafVMEVolume::SafeDownCast(GetSourceVMELink()));
-  }
-
-  if (m_Volume)
-  {
-    if(m_DensityDistance == 0)
-    {
-      m_DistanceFilter->SetFilterModeToDistance();
-    }
-    if(m_DensityDistance == 1)
-    {
-      m_DistanceFilter->SetFilterModeToDensity();
-    }
-
-    vtkDataSet *datasetvol = m_Volume->GetOutput()->GetVTKData();
-    datasetvol->Update();
-    m_DistanceFilter->SetDistanceModeToScalar();
-    m_DistanceFilter->SetSource(datasetvol);
-    m_DistanceFilter->SetInput((vtkDataSet::SafeDownCast(m_Normals->GetOutput())));
-    m_DistanceFilter->SetMaxDistance(m_MaxDistance);
-    m_DistanceFilter->SetThreshold(m_FirstThreshold);
-    m_DistanceFilter->SetInputMatrix(vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
-    m_DistanceFilter->Update(); 
-
-    //GetMaterial()->m_ColorLut = CreateTable();
-
-
-    vtkPolyData *polyout;
-    vtkMAFSmartPointer<vtkFloatArray> scalars;
-
-    //m_PolyData = m_DistanceFilter->GetPolyDataOutput();
-
-    if(polyout = m_DistanceFilter->GetPolyDataOutput())
-    {
-      polyout->Update();
-
-      scalars->DeepCopy(polyout->GetPointData()->GetScalars());
-
-      scalars->SetName("Distance_density");
-      scalars->Modified();
-
-      m_PolyData->DeepCopy(data);
-      m_PolyData->GetPointData()->AddArray(scalars);
-      m_PolyData->GetPointData()->SetActiveScalars("Distance_density");
-
-      m_PolyData->Modified();
-      m_PolyData->Update();
-    }
-
-//     if(polyout)
-//     {
-//       polyout->Update();
-// 
-//       scalars->DeepCopy(polyout->GetPointData()->GetScalars());
-// 
-//       scalars->SetName("Distance_density");
-//       scalars->Modified();
-// 
-//       vtkPolyData *polydata = vtkPolyData::SafeDownCast(this->GetOutput()->GetVTKData());
-//       polydata->GetPointData()->AddArray(scalars);
-//       polydata->GetPointData()->SetActiveScalars("Distance_density");
-// 
-//       polydata->Modified();
-//       polydata->Update();
-//     }
-  }
+	UpdateFilter();
 
   mafVME *vol = GetMappedVMELink();
   m_MappedName = vol ? vol->GetName() : _("none");
@@ -334,7 +256,6 @@ void mafVMEMaps::InternalUpdate()
   {
     m_PolyData->Update();
   }
-
 }
 
 //-------------------------------------------------------------------------
@@ -342,6 +263,7 @@ void mafVMEMaps::SetVolume(mafVMEVolume *volume)
 //-------------------------------------------------------------------------
 {
   m_Volume = volume;
+	SetSourceVMELink(volume);
   if(m_Gui && m_Volume)
     m_Gui->Enable(ID_DENSITY_DISTANCE, true);
 }
@@ -404,48 +326,6 @@ mmaMaterial *mafVMEMaps::GetMaterial()
   return material;
 }
 
-// //-------------------------------------------------------------------------
-// int mafVMEMaps::SetData(vtkPolyData *data, mafTimeStamp t, int mode)
-// //-------------------------------------------------------------------------
-// {
-//   vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
-// 
-//   if(polydata)
-//   {
-//     polydata->Update();
-//     if (polydata->GetPoints() && polydata->GetVerts()->GetNumberOfCells()==0 && \
-//       (polydata->GetPolys()->GetNumberOfCells() > 0 || polydata->GetStrips()->GetNumberOfCells() > 0) && \
-//       polydata->GetLines()->GetNumberOfCells() == 0)
-//     {
-//       int res = Superclass::SetData(polydata,t,mode);
-//       if(m_PolyData==NULL)
-//         vtkNEW(m_PolyData);
-//       m_PolyData->DeepCopy(polydata);
-//       return res;
-//     }
-//   }
-//   return MAF_ERROR;
-// }
-// 
-// //-------------------------------------------------------------------------
-// int mafVMEMaps::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
-// //-------------------------------------------------------------------------
-// {
-//   assert(data);
-//   vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
-// 
-//   if (polydata) polydata->Update();
-// 
-//   if (polydata && polydata->GetPoints() && polydata->GetVerts()->GetNumberOfCells()==0 && \
-//     (polydata->GetPolys()->GetNumberOfCells() > 0 || polydata->GetStrips()->GetNumberOfCells() > 0) && \
-//     polydata->GetLines()->GetNumberOfCells() == 0)
-//   {
-//     return Superclass::SetData(data,t,mode);
-//   }
-// 
-//   mafErrorMacro("Trying to set the wrong type of data inside a VME Image :"<< (data?data->GetClassName():"NULL"));
-//   return MAF_ERROR;
-// }
 
 //-------------------------------------------------------------------------
 void mafVMEMaps::SetDensityDistance(int densityDistance)
@@ -498,7 +378,7 @@ void mafVMEMaps::SetMappedVMELink(mafVME *node)
 //-----------------------------------------------------------------------
 {
   SetLink("MappedVME", node);
-  Modified();
+	UpdateFilter();
 }
 
 //-----------------------------------------------------------------------
@@ -584,9 +464,9 @@ void mafVMEMaps::UpdateFilter()
   vtkPolyData *data = (vtkPolyData *)vme->GetOutput()->GetVTKData();
   data->Update();
 
-  //m_Normals->SetInput(data);
-  //m_Normals->ComputePointNormalsOn();
-  //m_Normals->SplittingOff();
+  m_Normals->SetInput(data);
+  m_Normals->ComputePointNormalsOn();
+  m_Normals->SplittingOff();
   m_Normals->Update();
 
   if(m_Volume==NULL)
