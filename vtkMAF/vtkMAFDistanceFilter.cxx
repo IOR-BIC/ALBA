@@ -183,9 +183,11 @@ void vtkMAFDistanceFilter::ExecuteData(vtkDataObject *outputObject) {
         case VTK_SHORT:          distance = this->TraceRay(point, normal, (const short*)DataPointer); break;
         case VTK_UNSIGNED_CHAR:  distance = this->TraceRay(point, normal, (const unsigned char*)DataPointer); break;
         case VTK_CHAR:           distance = this->TraceRay(point, normal, (const char*)DataPointer); break;
-        case VTK_FLOAT:          distance = this->TraceRay(point, normal, (const float*)DataPointer); break;
-        case VTK_DOUBLE:         distance = this->TraceRay(point, normal, (const double*)DataPointer); break;
-        }
+				case VTK_FLOAT:          distance = this->TraceRay(point, normal, (const float*)DataPointer); break;
+				case VTK_DOUBLE:         distance = this->TraceRay(point, normal, (const double*)DataPointer); break;
+				case VTK_INT:						 distance = this->TraceRay(point, normal, (const int*)DataPointer); break;
+				case VTK_UNSIGNED_INT:   distance = this->TraceRay(point, normal, (const unsigned int*)DataPointer); break;
+			}
       if (scalars)
         scalars->SetTuple1(pi, distance);
       else
@@ -217,6 +219,8 @@ void vtkMAFDistanceFilter::ExecuteData(vtkDataObject *outputObject) {
         case VTK_CHAR:           density = this->FindDensity(point, (const char*)DataPointer); break;
         case VTK_FLOAT:          density = this->FindDensity(point, (const float*)DataPointer); break;
         case VTK_DOUBLE:         density = this->FindDensity(point, (const double*)DataPointer); break;
+				case VTK_INT:						 density = this->FindDensity(point, (const int*)DataPointer); break;
+				case VTK_UNSIGNED_INT:	 density = this->FindDensity(point, (const unsigned int*)DataPointer); break;
         }
       if (scalars)
         scalars->SetTuple1(pi, density);

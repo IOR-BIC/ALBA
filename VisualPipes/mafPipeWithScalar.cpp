@@ -116,6 +116,7 @@ void mafPipeWithScalar::ManageScalarOnExecutePipe(vtkDataSet * dataSet)
 	m_Table->SetHueRange(0.667, 0.0);
 	m_Table->SetTableRange(sr);
 	m_Table->Build();
+	
 
 	m_ObjectMaterial->m_ColorLut->DeepCopy(m_Table);
 	m_ObjectMaterial->m_ColorLut->Build();
@@ -131,6 +132,8 @@ void mafPipeWithScalar::ManageScalarOnExecutePipe(vtkDataSet * dataSet)
 		m_Mapper->ScalarVisibilityOn();
 	else
 		m_Mapper->ScalarVisibilityOff();
+
+	m_Mapper->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -187,8 +190,6 @@ void mafPipeWithScalar::OnEvent(mafEventBase *maf_event)
 					}
 	
 					UpdateActiveScalarsInVMEDataVectorItems();
-
-          GetLogicManager()->CameraUpdate();
         }
         break;
 

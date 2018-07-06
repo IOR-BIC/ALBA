@@ -191,6 +191,9 @@ void mafPipeGenericPolydata::ExecutePipe()
 	m_OutlineActor->PickableOff();
 	m_OutlineActor->SetProperty(corner_props);
 
+	if (m_ScalarMapActive)
+		UpdateActiveScalarsInVMEDataVectorItems();
+
 }
 //----------------------------------------------------------------------------
 void mafPipeGenericPolydata::AddActorsToAssembly(vtkMAFAssembly *assembly)
