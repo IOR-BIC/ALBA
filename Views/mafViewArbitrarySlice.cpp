@@ -248,31 +248,8 @@ void mafViewArbitrarySlice::VmeShow(mafVME *vme, bool show)
 			m_AttachCamera->EnableAttachCamera();
 			((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset(m_Slicer);
 
-			// create the gizmos
-			m_GizmoTranslate = new mafGizmoTranslate(m_Slicer, this);
-			m_GizmoTranslate->SetInput(m_Slicer);
-			m_GizmoTranslate->SetRefSys(m_Slicer);
-			m_GizmoTranslate->SetAbsPose(m_MatrixReset);
-			m_GizmoTranslate->SetStep(X_AXIS,1.0);
-			m_GizmoTranslate->SetStep(Y_AXIS,1.0);
-			m_GizmoTranslate->SetStep(Z_AXIS,1.0);
-			m_GizmoTranslate->Show(true);
-
-			m_GizmoRotate = new mafGizmoRotate(m_Slicer, this);
-			m_GizmoRotate->SetInput(m_Slicer);
-			m_GizmoRotate->SetRefSys(m_Slicer);
-			m_GizmoRotate->SetAbsPose(m_MatrixReset);
-			m_GizmoRotate->Show(false);
-
-			m_TypeGizmo = GIZMO_TRANSLATE;
-
-			//Create the Gizmos' Gui
-			if(!m_GuiGizmos)
-				m_GuiGizmos = new mafGUI(this);
-			m_GuiGizmos->AddGui(m_GizmoTranslate->GetGui());
-			m_GuiGizmos->AddGui(m_GizmoRotate->GetGui());
-			m_GuiGizmos->Update();
-			m_Gui->AddGui(m_GuiGizmos);
+			CreateGizmos();
+			
 			m_Gui->FitGui();
 			m_Gui->Update();
 
@@ -289,7 +266,6 @@ void mafViewArbitrarySlice::VmeShow(mafVME *vme, bool show)
 			//a surface is visible only if there is a volume in the view
 			if(m_CurrentVolume)
 			{
-
 				double normal[3];
 				((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
@@ -366,17 +342,11 @@ void mafViewArbitrarySlice::VmeShow(mafVME *vme, bool show)
 			m_AttachCamera->SetVme(NULL);
 			m_Slicer->SetBehavior(NULL);
 			m_Slicer->ReparentTo(NULL);
-
-			//remove gizmos
-			m_Gui->Remove(m_GuiGizmos);
-			m_Gui->Update();
-			m_GizmoTranslate->Show(false);
-			m_GizmoRotate->Show(false);
-
+			
 			mafDEL(m_Slicer);
-			cppDEL(m_GizmoTranslate);
-			cppDEL(m_GizmoRotate);
-			cppDEL(m_GuiGizmos);
+
+			DestroyGizmos();
+
 			mafDEL(m_MatrixReset);
 
 			m_CurrentVolume = NULL;
@@ -388,7 +358,6 @@ void mafViewArbitrarySlice::VmeShow(mafVME *vme, bool show)
 			m_ColorLUT = NULL;
 			m_LutWidget->SetLut(m_ColorLUT);
 		}
-
 	}
 
 	if (ActivateWindowing(vme))
@@ -771,11 +740,11 @@ void mafViewArbitrarySlice::VmeRemove(mafVME *vme)
 	if (m_CurrentVolume && vme == m_CurrentVolume) 
 	{
 		m_AttachCamera->SetVme(NULL);
+
+		DestroyGizmos();
+
+		m_CurrentVolume->RemoveObserver(this);
 		m_CurrentVolume = NULL;
-		m_GizmoTranslate->Show(false);
-		cppDEL(m_GizmoTranslate);
-		m_GizmoRotate->Show(false);
-		cppDEL(m_GizmoRotate);
 	}
 
 	if (m_CurrentImage && vme == m_CurrentImage){
@@ -823,8 +792,7 @@ void mafViewArbitrarySlice::CameraUpdate()
 		m_AttachCamera->UpdateCameraMatrix();
 	}
 	for(int i=0; i<m_NumOfChildView; i++)
-	{
-		
+	{		
 		m_ChildViewList[i]->CameraUpdate();
 	}
 }
@@ -889,7 +857,6 @@ char ** mafViewArbitrarySlice::GetIcon()
 void mafViewArbitrarySlice::VolumeWindowing(mafVME *volume)
 	//----------------------------------------------------------------------------
 {
-
 	double sr[2];
 	vtkDataSet *data = volume->GetOutput()->GetVTKData();
 	data->Update();
@@ -900,5 +867,71 @@ void mafViewArbitrarySlice::VolumeWindowing(mafVME *volume)
 	m_LutWidget->SetLut(m_ColorLUT);
 	m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
 	m_LutSlider->SetSubRange((long)currentSurfaceMaterial->m_TableRange[0],(long)currentSurfaceMaterial->m_TableRange[1]);
+}
 
+//-------------------------------------------------------------------------
+void mafViewArbitrarySlice::CreateGizmos()
+{
+	if (m_CurrentVolume == NULL)
+	{
+		mafLogMessage("Generate - Current volume = NULL");
+		return;
+	}
+
+	mafLogMessage("Generate");
+
+	// Create the Gizmos
+	m_GizmoTranslate = new mafGizmoTranslate(m_Slicer, this);
+	m_GizmoTranslate->SetInput(m_Slicer);
+	m_GizmoTranslate->SetRefSys(m_Slicer);
+	m_GizmoTranslate->SetAbsPose(m_MatrixReset);
+	m_GizmoTranslate->SetStep(X_AXIS, 1.0);
+	m_GizmoTranslate->SetStep(Y_AXIS, 1.0);
+	m_GizmoTranslate->SetStep(Z_AXIS, 1.0);
+	m_GizmoTranslate->Show(true);
+
+	m_GizmoRotate = new mafGizmoRotate(m_Slicer, this);
+	m_GizmoRotate->SetInput(m_Slicer);
+	m_GizmoRotate->SetRefSys(m_Slicer);
+	m_GizmoRotate->SetAbsPose(m_MatrixReset);
+	m_GizmoRotate->Show(false);
+
+	m_TypeGizmo = GIZMO_TRANSLATE;
+
+	//Create the Gizmos' Gui
+	if (m_GuiGizmos == NULL)
+	{
+		m_GuiGizmos = new mafGUI(this);
+		m_Gui->AddGui(m_GuiGizmos);
+
+		m_GuiGizmos->AddGui(m_GizmoTranslate->GetGui());
+		m_GuiGizmos->AddGui(m_GizmoRotate->GetGui());
+	}
+
+	m_GuiGizmos->Update();
+}
+
+//-------------------------------------------------------------------------
+void mafViewArbitrarySlice::DestroyGizmos()
+{
+	if (m_CurrentVolume == NULL)
+	{
+		mafLogMessage("Destroy - Current volume = NULL");
+		return;
+	}
+	mafLogMessage("Destroy");
+
+	// Remove Gizmos
+	m_Gui->Remove(m_GuiGizmos);
+	m_Gui->Update();
+
+	m_GizmoTranslate->Show(false);
+	cppDEL(m_GizmoTranslate);
+
+	m_GizmoRotate->Show(false);
+	cppDEL(m_GizmoRotate);
+
+	cppDEL(m_GuiGizmos);
+
+	m_Gui->Update();
 }
