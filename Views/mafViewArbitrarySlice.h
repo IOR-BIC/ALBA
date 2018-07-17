@@ -93,6 +93,11 @@ public:
 	/** return an xpm-icon that can be used to represent this view */
 	char ** GetIcon();
 
+	/** Remove Gizmos, Observers from the volume */
+	void DestroyGizmos();
+
+	/** Generate Gizmos and pose them in the right position*/
+	void CreateGizmos();
 protected:
 
 	/** Internally used to create a new instance of the GUI. 
