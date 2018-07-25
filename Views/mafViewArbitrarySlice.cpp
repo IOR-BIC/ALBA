@@ -880,6 +880,7 @@ void mafViewArbitrarySlice::CreateGizmos()
 
 	mafLogMessage("Generate");
 
+	m_Slicer->SetUpdateVTKPropertiesFromMaterial(false);
 	// Create the Gizmos
 	m_GizmoTranslate = new mafGizmoTranslate(m_Slicer, this);
 	m_GizmoTranslate->SetInput(m_Slicer);
