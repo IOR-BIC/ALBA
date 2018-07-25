@@ -287,136 +287,88 @@ void vtkMAFVolumeResample::ComputeInputUpdateExtents(vtkDataObject *output) {
 
 
 //----------------------------------------------------------------------------
-void vtkMAFVolumeResample::ExecuteData(vtkImageData *outputObject) 
+void vtkMAFVolumeResample::ExecuteData(vtkImageData *outputObject)
 {
-  int extent[6];
-  outputObject->GetWholeExtent(extent);
-  outputObject->SetExtent(extent);
-  //outputObject->SetNumberOfScalarComponents(1);
-  outputObject->AllocateScalars();
-  
-  const void *inputPointer  = this->GetInput()->GetPointData()->GetScalars()->GetVoidPointer(0);
-  const void *outputPointer = outputObject->GetPointData()->GetScalars()->GetVoidPointer(0);
-  
-  switch (this->GetInput()->GetPointData()->GetScalars()->GetDataType()) 
-  {
-    case VTK_CHAR: //---------------------------------------------
-      switch (outputObject->GetPointData()->GetScalars()->GetDataType()) 
-      {
-        case VTK_CHAR:
-          this->CreateImage((const char*)inputPointer, (char*)outputPointer, outputObject);
-          break;
-        case VTK_UNSIGNED_CHAR:
-          this->CreateImage((const char*)inputPointer, (u_char*)outputPointer, outputObject);
-          break;
-        case VTK_SHORT:
-          this->CreateImage((const char*)inputPointer, (short*)outputPointer, outputObject);
-          break;
-        case VTK_UNSIGNED_SHORT:
-          this->CreateImage((const char*)inputPointer, (u_short*)outputPointer, outputObject);
-          break;
-        case VTK_FLOAT:
-          this->CreateImage((const char*)inputPointer, (float*)outputPointer, outputObject);
-          break;
-        default:
-          vtkErrorMacro(<< "vtkMAFVolumeResample: Scalar type is not supported");
-          return;
-      }
-      break;
-    case VTK_UNSIGNED_CHAR: //------------------------------------
-      switch (outputObject->GetPointData()->GetScalars()->GetDataType()) {
-        case VTK_CHAR:
-          this->CreateImage((const u_char*)inputPointer, (char*)outputPointer, outputObject);
-          break;
-        case VTK_UNSIGNED_CHAR:
-          this->CreateImage((const u_char*)inputPointer, (u_char*)outputPointer, outputObject);
-          break;
-        case VTK_SHORT:
-          this->CreateImage((const u_char*)inputPointer, (short*)outputPointer, outputObject);
-          break;
-        case VTK_UNSIGNED_SHORT:
-          this->CreateImage((const u_char*)inputPointer, (u_short*)outputPointer, outputObject);
-          break;
-        case VTK_FLOAT:
-          this->CreateImage((const u_char*)inputPointer, (float*)outputPointer, outputObject);
-          break;
-        default:
-          vtkErrorMacro(<< "vtkMAFVolumeResample: Scalar type is not supported");
-          return;
-        }
-      break;
-    case VTK_SHORT: //--------------------------------------------
-      switch (outputObject->GetPointData()->GetScalars()->GetDataType()) {
-        case VTK_CHAR:
-          this->CreateImage((const short*)inputPointer, (char*)outputPointer, outputObject);
-          break;
-        case VTK_UNSIGNED_CHAR:
-          this->CreateImage((const short*)inputPointer, (u_char*)outputPointer, outputObject);
-          break;
-        case VTK_SHORT:
-          this->CreateImage((const short*)inputPointer, (short*)outputPointer, outputObject);
-          break;
-        case VTK_UNSIGNED_SHORT:
-          this->CreateImage((const short*)inputPointer, (u_short*)outputPointer, outputObject);
-          break;
-        case VTK_FLOAT:
-          this->CreateImage((const short*)inputPointer, (float*)outputPointer, outputObject);
-          break;
-        default:
-          vtkErrorMacro(<< "vtkMAFVolumeResample: Scalar type is not supported");
-          return;
-      }
-      break;
-    case VTK_UNSIGNED_SHORT: //-----------------------------------
-      switch (outputObject->GetPointData()->GetScalars()->GetDataType()) 
-      {
-        case VTK_CHAR:
-          this->CreateImage((const u_short*)inputPointer, (char*)outputPointer, outputObject);
-          break;
-        case VTK_UNSIGNED_CHAR:
-          this->CreateImage((const u_short*)inputPointer, (u_char*)outputPointer, outputObject);
-          break;
-        case VTK_SHORT:
-          this->CreateImage((const u_short*)inputPointer, (short*)outputPointer, outputObject);
-          break;
-        case VTK_UNSIGNED_SHORT:
-          this->CreateImage((const u_short*)inputPointer, (u_short*)outputPointer, outputObject);
-          break;
-        case VTK_FLOAT:
-          this->CreateImage((const u_short*)inputPointer, (float*)outputPointer, outputObject);
-          break;
-        default:
-          vtkErrorMacro(<< "vtkMAFVolumeResample: Scalar type is not supported");
-          return;
-      }
-      break;
-    case VTK_FLOAT: //--------------------------------------------
-      switch (outputObject->GetPointData()->GetScalars()->GetDataType()) 
-      {
-        case VTK_CHAR:
-          this->CreateImage((const float*)inputPointer, (char*)outputPointer, outputObject);
-          break;
-        case VTK_UNSIGNED_CHAR:
-          this->CreateImage((const float*)inputPointer, (u_char*)outputPointer, outputObject);
-          break;
-        case VTK_SHORT:
-          this->CreateImage((const float*)inputPointer, (short*)outputPointer, outputObject);
-          break;
-        case VTK_UNSIGNED_SHORT:
-          this->CreateImage((const float*)inputPointer, (u_short*)outputPointer, outputObject);
-          break;
-        case VTK_FLOAT:
-          this->CreateImage((const float*)inputPointer, (float*)outputPointer, outputObject);
-          break;
-        default:
-          vtkErrorMacro(<< "vtkMAFVolumeResample: Scalar type is not supported");
-          return;
-      }
-      break;
-    default:
-      vtkErrorMacro(<< "vtkMAFVolumeResample: Scalar type is not supported");
-      return;
-  }
+	int extent[6];
+	outputObject->GetWholeExtent(extent);
+	outputObject->SetExtent(extent);
+	//outputObject->SetNumberOfScalarComponents(1);
+	outputObject->AllocateScalars();
+
+	vtkDataArray* outputScalars = outputObject->GetPointData()->GetScalars();
+	vtkDataArray* inputScalars = GetInput()->GetPointData()->GetScalars();
+
+	const void *inputPointer = inputScalars->GetVoidPointer(0);
+	switch (inputScalars->GetDataType())
+	{
+		case VTK_CHAR:
+			this->CreateImage((const char*)inputPointer, outputScalars, outputObject);
+			break;
+		case VTK_UNSIGNED_CHAR:
+			this->CreateImage((const unsigned char*)inputPointer, outputScalars, outputObject);
+			break;
+		case VTK_SHORT:
+			this->CreateImage((const short*)inputPointer, outputScalars, outputObject);
+			break;
+		case VTK_UNSIGNED_SHORT:
+			this->CreateImage((const unsigned short*)inputPointer, outputScalars, outputObject);
+			break;
+		case VTK_INT:
+			this->CreateImage((const int*)inputPointer, outputScalars, outputObject);
+			break;
+		case VTK_UNSIGNED_INT:
+			this->CreateImage((const int*)inputPointer, outputScalars, outputObject);
+			break;
+		case VTK_FLOAT:
+			this->CreateImage((const float*)inputPointer, outputScalars, outputObject);
+			break;
+		case VTK_DOUBLE:
+			this->CreateImage((const double*)inputPointer, outputScalars, outputObject);
+			break;
+
+		default:
+			vtkErrorMacro(<< "vtkMAFVolumeResample: Scalar type is not supported");
+			return;
+	}
+}
+
+
+//----------------------------------------------------------------------------
+template<typename InputDataType>
+void vtkMAFVolumeResample::CreateImage(const InputDataType *input, vtkDataArray *outputScalars, vtkImageData *outputObject)
+{
+	const void *outputPointer = outputObject->GetPointData()->GetScalars()->GetVoidPointer(0);
+	switch (outputScalars->GetDataType())
+	{
+		case VTK_CHAR:
+			this->CreateImage(input, (char*)outputPointer, outputObject);
+			break;
+		case VTK_UNSIGNED_CHAR:
+			this->CreateImage(input, (unsigned char*)outputPointer, outputObject);
+			break;
+		case VTK_SHORT:
+			this->CreateImage(input, (short*)outputPointer, outputObject);
+			break;
+		case VTK_UNSIGNED_SHORT:
+			this->CreateImage(input, (unsigned short*)outputPointer, outputObject);
+			break;
+		case VTK_INT:
+			this->CreateImage(input, (int*)outputPointer, outputObject);
+			break;
+		case VTK_UNSIGNED_INT:
+			this->CreateImage(input, (int*)outputPointer, outputObject);
+			break;
+		case VTK_FLOAT:
+			this->CreateImage(input, (float*)outputPointer, outputObject);
+			break;
+		case VTK_DOUBLE:
+			this->CreateImage(input, (double*)outputPointer, outputObject);
+			break;
+
+		default:
+			vtkErrorMacro(<< "vtkMAFVolumeResample: Scalar type is not supported");
+			return;
+	}
 }
 
 //----------------------------------------------------------------------------
