@@ -102,6 +102,8 @@ protected:
   void PrepareVolume();
   void CalculateTextureCoordinates(const double point[3], const int size[2], const double spacing[2], double ts[2]);
 
+	template<typename InputDataType> void CreateImage(const InputDataType *input, vtkDataArray *outputScalars, vtkImageData *outputObject);
+
   template<typename InputDataType, typename OutputDataType> void CreateImage(const InputDataType *input, OutputDataType *output, vtkImageData *outputObject);
 
   // plane coordinates
