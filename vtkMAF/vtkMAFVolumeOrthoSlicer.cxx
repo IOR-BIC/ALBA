@@ -173,6 +173,7 @@ void vtkMAFVolumeOrthoSlicer::Execute()
 			break;
 		case VTK_DOUBLE:  //NOTE: GPU is not allowed
 			SliceScalars(inputDims, (double*)inputPointer, (double*)outputPointer);
+			break;
 		default:
 			vtkErrorMacro(<< "vtkMAFVolumeSlicer: Scalar type is not supported");
 			return;

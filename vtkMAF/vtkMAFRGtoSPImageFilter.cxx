@@ -144,6 +144,7 @@ void vtkMAFRGtoSPImageFilter::Execute()
 			break;
 		case VTK_DOUBLE:  //NOTE: GPU is not allowed
 			FillSP(input, output, (double*)inputPointer, (double*)outputPointer);
+			break;
 		default:
 			vtkErrorMacro(<< "vtkMAFVolumeSlicer: Scalar type is not supported");
 			return;
@@ -188,6 +189,7 @@ void vtkMAFRGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData * 
 			break;
 		case VTK_DOUBLE:  
 			FillSP(input, output, inputScalars, outScalars, (double *)xCoordPointer, (double *)yCoordPointer);
+			break;
 		default:
 			vtkErrorMacro(<< "vtkMAFVolumeSlicer: Scalar type is not supported");
 			return;

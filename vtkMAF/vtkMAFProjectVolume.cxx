@@ -165,6 +165,7 @@ void vtkMAFProjectVolume::Execute()
 			break;
 		case VTK_DOUBLE:
 			ProjectScalars(inputDims, (double*)inputPointer, (double*)outputPointer);
+			break;
 		default:
 			vtkErrorMacro(<< "vtkMAFVolumeSlicer: Scalar type is not supported");
 			return;
