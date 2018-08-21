@@ -79,6 +79,8 @@ public:
 
 	vtkFieldData *GetMaterialData();
 
+	void SetDefaultFrequencyFile();
+
 protected:
 
 	/** Create the dialog interface for the exporter. */
