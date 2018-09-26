@@ -91,6 +91,7 @@ bool mafOpExporterAnsysCommon::Accept(mafVME *node)
 void mafOpExporterAnsysCommon::OpRun()   
 {
 	Init();
+	SetDefaultFrequencyFile();
   CreateGui();
 }
 //----------------------------------------------------------------------------

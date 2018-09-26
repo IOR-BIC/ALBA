@@ -78,14 +78,7 @@ void mafOpExporterFEMCommon::CreateGui()
 		// Frequency
 		m_Gui->Label("Output Frequency file: ");
 
-		wxStandardPaths std_paths;
-		wxString userPath = std_paths.GetUserDataDir();
 		mafString wildc = "Frequency File (*.*)|*.*";
-		m_FrequencyFileName = userPath;
-		m_FrequencyFileName += "\\";
-		m_FrequencyFileName += m_Input->GetName();
-		m_FrequencyFileName += "-Freq.txt";
-
 		m_Gui->FileSave(ID_FREQUENCY_FILE_NAME, "Freq file", &m_FrequencyFileName, wildc.GetCStr());
 
 		m_Gui->Label("");
@@ -100,6 +93,17 @@ void mafOpExporterFEMCommon::CreateGui()
 		m_Gui->Divider();
 		m_Gui->Label("");
 	}
+}
+
+//----------------------------------------------------------------------------
+void mafOpExporterFEMCommon::SetDefaultFrequencyFile()
+{
+	wxStandardPaths std_paths;
+	wxString userPath = std_paths.GetUserDataDir();
+	m_FrequencyFileName = userPath;
+	m_FrequencyFileName += "\\";
+	m_FrequencyFileName += m_Input->GetName();
+	m_FrequencyFileName += "-Freq.txt";
 }
 
 //----------------------------------------------------------------------------
