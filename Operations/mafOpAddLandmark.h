@@ -73,7 +73,7 @@ public:
 		ID_SHOW_GROUP,
 	};
 
-	mafOpAddLandmark(const wxString &label = "AddLandmark");
+	mafOpAddLandmark(const wxString &label = "AddLandmark  \tCtrl+A");
 	~mafOpAddLandmark(); 
 	virtual void OnEvent(mafEventBase *maf_event);
 		
