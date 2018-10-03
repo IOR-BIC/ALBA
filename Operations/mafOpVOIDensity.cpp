@@ -61,8 +61,8 @@ mafOpVOIDensity::mafOpVOIDensity(const wxString &label)
   
   m_NumberOfScalars = 0;
   m_MeanScalar      = 0.0;
-  m_MaxScalar       = -99999.0;
-  m_MinScalar       = 99999.0;
+  m_MaxScalar       = 0.0;
+  m_MinScalar       = 0.0;
   m_StandardDeviation = 0.0;
 
 	m_NumberOfScalarsString = mafString(wxString::Format("%d",m_NumberOfScalars));
@@ -217,7 +217,11 @@ void mafOpVOIDensity::ExtractVolumeScalars()
   double Point[3], InsideScalar = 0.0, SumScalars = 0.0;
   int NumberVoxels, PointId;
   
-  m_NumberOfScalars = 0;
+	// Reset parameters
+	m_NumberOfScalars = 0;
+	m_MaxScalar = -99999.0;
+	m_MinScalar = 99999.0;
+
 	vtkAbstractTransform *transform;
 	vtkPolyData *polydata;
 	m_Surface->GetOutput()->GetBounds(b);
