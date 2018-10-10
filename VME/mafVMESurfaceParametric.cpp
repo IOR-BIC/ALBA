@@ -612,6 +612,21 @@ void mafVMESurfaceParametric::SetSphereRadius(double radius)
   m_SphereRadius = radius;
   Modified();
 }
+
+//----------------------------------------------------------------------------
+void mafVMESurfaceParametric::SetCylinderRadius(double cylinderRadius)
+{
+	m_CylinderRadius = cylinderRadius;
+	Modified();
+}
+
+//----------------------------------------------------------------------------
+void mafVMESurfaceParametric::SetCylinderHeight(double cylinderHeight)
+{
+	m_CylinderHeight = cylinderHeight;
+	Modified();
+}
+
 //-------------------------------------------------------------------------
 char** mafVMESurfaceParametric::GetIcon() 
 //-------------------------------------------------------------------------
