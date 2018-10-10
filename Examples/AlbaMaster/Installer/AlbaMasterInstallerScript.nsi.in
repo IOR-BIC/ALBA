@@ -1,0 +1,33 @@
+
+!define PRODUCT_NAME "AlbaMaster"
+!define PRODUCT_PUBLISHER "BIC-IOR"
+!define PRODUCT_WEB_SITE "https://github.com/IOR-BIC"
+
+!define PRODUCT_VERSION "@APP_VERSION@"
+!define PRODUCT_EXE_NAME "${PRODUCT_NAME}.exe"
+;!define PRODUCT_MANUAL_DIR "@MANUAL_HTML_DIR@"
+
+!define PRODUCT_EXECUTABLE_OUTPUT_PATH_WIN "@APP_INSTALLER_EXECUTABLE_OUTPUT_DIR_WIN@\Release"
+!define PRODUCT_INSTALLER_DIR_WIN "@APP_INSTALLER_DIR_WIN@"
+
+!include InstallerCommon.nsh
+
+!insertmacro Init_MUI 
+
+!macro AddExtraFiles
+	;Add here extra files
+!macroend
+
+!insertmacro CreateInstaller
+
+Section -Post 
+	!insertmacro WriteRegKeys 	
+	
+	;Add here extra RegKey
+SectionEnd
+
+!macro RemoveExtraFiles
+	;Add here extra Files to remove
+!macroend
+
+!insertmacro CreateUninstaller 
