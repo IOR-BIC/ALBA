@@ -198,7 +198,7 @@ void mafSideBar::VmeAdd(mafVME *vme)
 void mafSideBar::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-		m_Tree->VmeRemove(vme);
+	m_Tree->VmeRemove(vme);
   if (vme == m_SelectedVme)
   {
     m_SelectedVme = NULL;
@@ -209,15 +209,17 @@ void mafSideBar::VmeRemove(mafVME *vme)
 void mafSideBar::VmeModified(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-		m_Tree->VmeModified(vme);
-  UpdateVmePanel();
+	m_Tree->VmeModified(vme);
+	if (vme == m_SelectedVme)
+		UpdateVmePanel();
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeShow(mafVME *vme, bool visibility)
 //----------------------------------------------------------------------------
 {
 	m_Tree->VmeShow(vme,visibility);
-  UpdateVmePanel();
+	if(vme==m_SelectedVme)
+		UpdateVmePanel();
 }
 //----------------------------------------------------------------------------
 void mafSideBar::VmeSelected(mafVME *vme)
