@@ -60,6 +60,9 @@ public:
   /** Remove temporary directory used for compressed msf files.*/
   void RemoveTempDirectory();
 
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char ** GetIcon();
+
 protected:
   mafString         m_File;
   mafString         m_TmpDir;

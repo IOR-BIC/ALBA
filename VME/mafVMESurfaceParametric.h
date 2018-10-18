@@ -60,6 +60,14 @@ public:
   /** Set the radius for the parametric sphere.*/
   void SetSphereRadius(double radius);
 
+	/** Sets CylinderRadius */
+	void SetCylinderRadius(double cylinderRadius);
+
+	/** Sets CylinderHeight */
+	void SetCylinderHeight(double cylinderHeight);
+
+
+
   /** Return the radius of the parametric sphere.*/
   double GetSphereRadius() {return m_SphereRadius;};
 

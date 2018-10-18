@@ -709,3 +709,10 @@ void mafOpMAFTransform::RefSysVmeChanged()
   assert(m_Gui);
   m_Gui->Update();
 }
+
+//----------------------------------------------------------------------------
+char ** mafOpMAFTransform::GetIcon()
+{
+#include "pic/OP_TRANSFORM.xpm"
+	return OP_TRANSFORM_xpm;
+}

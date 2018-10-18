@@ -138,6 +138,12 @@ public:
 
 	/** return an xpm-icon that can be used to represent this view */
 	virtual char ** GetIcon();
+	
+	/** Returns AllSurface */
+	int GetAllSurface() const { return m_AllSurface; }
+
+	/** Sets AllSurface */
+	void SetAllSurface(int allSurface) { m_AllSurface = allSurface; }
 
 protected:
   /**

@@ -240,3 +240,10 @@ void mafOpImporterVTK::OpStop(int result)
 {
 				mafEventMacro(mafEvent(this, result));
 }
+
+//----------------------------------------------------------------------------
+char ** mafOpImporterVTK::GetIcon()
+{
+#include "pic/IMPORT_VTK.xpm"
+	return IMPORT_VTK_xpm;
+}

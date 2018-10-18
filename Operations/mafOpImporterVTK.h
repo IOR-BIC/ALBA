@@ -70,6 +70,10 @@ public:
 
 	/** retrieve the file name*/
 	wxString GetFileName() { return m_File; };
+
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char ** GetIcon();
+
 protected:
   wxString m_File;
   wxString m_FileDir;

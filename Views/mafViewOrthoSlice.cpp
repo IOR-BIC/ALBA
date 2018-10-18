@@ -86,7 +86,7 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label)
   m_Side = 0;
 	m_Snap = 0;
 
-	m_AllSurface=0;
+	m_AllSurface=true;
 	m_Border=1;
   m_PolylineRadiusSize=1;
 

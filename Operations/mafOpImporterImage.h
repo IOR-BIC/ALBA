@@ -70,6 +70,10 @@ public:
   void SetImageZSpacing(double imageZSpacing){m_ImageZSpacing = imageZSpacing;};
 
   void ImportImage();
+
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char ** GetIcon();
+
 protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);
