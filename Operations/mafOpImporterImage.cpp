@@ -420,3 +420,10 @@ void mafOpImporterImage::SetFileName(const char *file_name)
  m_Files.push_back(file_name);
  m_NumFiles = m_Files.size();
 }
+
+//----------------------------------------------------------------------------
+char ** mafOpImporterImage::GetIcon()
+{
+#include "pic/IMPORT_IMAGE.xpm"
+	return IMPORT_IMAGE_xpm;
+}

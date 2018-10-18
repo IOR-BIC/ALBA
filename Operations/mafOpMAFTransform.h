@@ -65,6 +65,9 @@ public:
 	
   void Reset();
 
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char ** GetIcon();
+
 protected:
   /** Create the gui */
   virtual void CreateGui();

@@ -132,6 +132,10 @@ public:
 	
 	/*Set JustOnce Import Mode*/
 	void SetJustOnceImport(bool justOnce) { m_JustOnceImport = justOnce; };
+
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char ** GetIcon();
+
 protected:
 
 	enum DICOM_IMPORTER_GUI_ID

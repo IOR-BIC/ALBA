@@ -319,3 +319,10 @@ void mafOpImporterMSF::RemoveTempDirectory()
     m_TmpDir = "";
   }
 }
+
+//----------------------------------------------------------------------------
+char ** mafOpImporterMSF::GetIcon()
+{
+#include "pic/IMPORT_MSF.xpm"
+	return IMPORT_MSF_xpm;
+}

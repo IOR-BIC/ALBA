@@ -591,3 +591,10 @@ void mafOp2DMeasure::OpStop(int result)
 
 	mafEventMacro(mafEvent(this,result));
 }
+
+//----------------------------------------------------------------------------
+char ** mafOp2DMeasure::GetIcon()
+{
+#include "pic/OP_2D_MEASURES.xpm"
+	return OP_2D_MEASURES_xpm;
+}

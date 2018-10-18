@@ -248,13 +248,13 @@ void mafOpManager::FillMenu(wxMenu* import, wxMenu* mexport, wxMenu* operations)
       }
 
       if(sub_menu)
-        sub_menu->Append(o->m_Id, _(o->m_Label), _(o->m_Label));
+				mafGUI::AddMenuItem(sub_menu, o->m_Id, _(o->m_Label), o->GetIcon());
       else
         mafLogMessage(_("error in FillMenu"));
     }
     else
     {
-      m_Menu[o->GetType()]->Append(o->m_Id, _(o->m_Label), _(o->m_Label));
+			mafGUI::AddMenuItem(m_Menu[o->GetType()], o->m_Id, _(o->m_Label), o->GetIcon());
     }
     SetAccelerator(o);
   }

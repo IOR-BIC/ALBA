@@ -69,6 +69,9 @@ public:
 	/** Set the input vme for the operation. */
 	virtual void OpRun();
 
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char ** GetIcon();
+
 protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);

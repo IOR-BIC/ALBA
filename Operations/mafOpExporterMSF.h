@@ -58,6 +58,9 @@ public:
   /** Export selected subtree-tree to a .msf file*/
   int ExportMSF();
 
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char ** GetIcon();
+
   typedef struct 
   {
     int oldID;

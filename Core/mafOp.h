@@ -161,6 +161,9 @@ public:
   /** Get the reference to the operation's setting panel.*/
   mafGUISettings *GetSetting() {return m_SettingPanel;};
 
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char ** GetIcon();
+
 protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   virtual void OpStop(int result);
