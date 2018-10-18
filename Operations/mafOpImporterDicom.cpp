@@ -1247,6 +1247,13 @@ void mafOpImporterDicom::OnChangeSlice()
 	GuiUpdate();
 }
 
+//----------------------------------------------------------------------------
+char ** mafOpImporterDicom::GetIcon()
+{
+#include "pic/IMPORT_DICOM.xpm"
+	return IMPORT_DICOM_xpm;
+}
+
 /////////////////////////////mafDicomStudyList////////////////////////////////
 //----------------------------------------------------------------------------
 mafDicomStudyList::~mafDicomStudyList()

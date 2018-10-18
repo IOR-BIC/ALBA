@@ -71,6 +71,9 @@ public:
 
 	mafMatrix* GetAbsMatrix() { return &m_NewAbsMatrix; };
 
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char ** GetIcon();
+
 protected: 
 	/** Create the GUI */
 	virtual void CreateGui();

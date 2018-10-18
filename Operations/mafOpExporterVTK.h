@@ -65,6 +65,9 @@ public:
   /** vtk pipeline to save data on disk. */
   void SaveVTKData();
 
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char ** GetIcon();
+
 protected:
   mafString  m_File;
 	mafString  m_FileDir;

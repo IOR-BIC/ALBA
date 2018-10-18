@@ -852,3 +852,10 @@ bool mafOpTransform::AcceptRefSys(mafVME *node)
 	return node != GLO_TransformInput;
 }
 
+//----------------------------------------------------------------------------
+char ** mafOpTransform::GetIcon()
+{
+#include "pic/OP_TRANSFORM.xpm"
+	return OP_TRANSFORM_xpm;
+}
+

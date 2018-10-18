@@ -197,3 +197,10 @@ mafOp* mafOpExporterMSF::Copy()
   cp->m_MSFFileDir  = m_MSFFileDir;
   return cp;
 }
+
+//----------------------------------------------------------------------------
+char ** mafOpExporterMSF::GetIcon()
+{
+#include "pic/IMPORT_MSF.xpm"
+	return IMPORT_MSF_xpm;
+}

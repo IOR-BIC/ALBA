@@ -249,3 +249,10 @@ void mafOpExporterVTK::SaveVTKData()
   writer->SetFileName(m_File.GetCStr());
   writer->Write();
 }
+
+//----------------------------------------------------------------------------
+char ** mafOpExporterVTK::GetIcon()
+{
+#include "pic/IMPORT_VTK.xpm"
+	return IMPORT_VTK_xpm;
+}

@@ -238,3 +238,9 @@ void mafOp::OpStop(int result)
   HideGui();
   mafEventMacro(mafEvent(this,result));        
 }
+
+//----------------------------------------------------------------------------
+char ** mafOp::GetIcon()
+{
+	return NULL;
+}
