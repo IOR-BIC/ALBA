@@ -253,6 +253,6 @@ void mafOpExporterVTK::SaveVTKData()
 //----------------------------------------------------------------------------
 char ** mafOpExporterVTK::GetIcon()
 {
-#include "pic/IMPORT_VTK.xpm"
-	return IMPORT_VTK_xpm;
+#include "pic/MENU_IMPORT_VTK.xpm"
+	return MENU_IMPORT_VTK_xpm;
 }
