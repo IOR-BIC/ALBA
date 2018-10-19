@@ -1250,8 +1250,8 @@ void mafOpImporterDicom::OnChangeSlice()
 //----------------------------------------------------------------------------
 char ** mafOpImporterDicom::GetIcon()
 {
-#include "pic/IMPORT_DICOM.xpm"
-	return IMPORT_DICOM_xpm;
+#include "pic/MENU_IMPORT_DICOM.xpm"
+	return MENU_IMPORT_DICOM_xpm;
 }
 
 /////////////////////////////mafDicomStudyList////////////////////////////////

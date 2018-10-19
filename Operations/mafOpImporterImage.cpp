@@ -424,6 +424,6 @@ void mafOpImporterImage::SetFileName(const char *file_name)
 //----------------------------------------------------------------------------
 char ** mafOpImporterImage::GetIcon()
 {
-#include "pic/IMPORT_IMAGE.xpm"
-	return IMPORT_IMAGE_xpm;
+#include "pic/MENU_IMPORT_IMAGE.xpm"
+	return MENU_IMPORT_IMAGE_xpm;
 }

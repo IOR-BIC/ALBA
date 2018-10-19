@@ -323,6 +323,6 @@ void mafOpImporterMSF::RemoveTempDirectory()
 //----------------------------------------------------------------------------
 char ** mafOpImporterMSF::GetIcon()
 {
-#include "pic/IMPORT_MSF.xpm"
-	return IMPORT_MSF_xpm;
+#include "pic/MENU_IMPORT_MSF.xpm"
+	return MENU_IMPORT_MSF_xpm;
 }
