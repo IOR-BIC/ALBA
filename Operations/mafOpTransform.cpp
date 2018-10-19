@@ -855,7 +855,7 @@ bool mafOpTransform::AcceptRefSys(mafVME *node)
 //----------------------------------------------------------------------------
 char ** mafOpTransform::GetIcon()
 {
-#include "pic/OP_TRANSFORM.xpm"
-	return OP_TRANSFORM_xpm;
+#include "pic/MENU_OP_TRANSFORM.xpm"
+	return MENU_OP_TRANSFORM_xpm;
 }
 

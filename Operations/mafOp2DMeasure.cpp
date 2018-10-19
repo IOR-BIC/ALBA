@@ -595,6 +595,6 @@ void mafOp2DMeasure::OpStop(int result)
 //----------------------------------------------------------------------------
 char ** mafOp2DMeasure::GetIcon()
 {
-#include "pic/OP_2D_MEASURES.xpm"
-	return OP_2D_MEASURES_xpm;
+#include "pic/MENU_OP_2D_MEASURES.xpm"
+	return MENU_OP_2D_MEASURES_xpm;
 }
