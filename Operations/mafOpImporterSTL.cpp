@@ -353,3 +353,10 @@ void mafOpImporterSTL::GetImportedSTL(std::vector<mafVMESurface*> &importedSTL)
     importedSTL[i] = m_ImportedSTLs[i];
   }
 }
+
+//----------------------------------------------------------------------------
+char ** mafOpImporterSTL::GetIcon()
+{
+#include "pic/MENU_IMPORT_STL.xpm"
+	return MENU_IMPORT_STL_xpm;
+}
