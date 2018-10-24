@@ -189,3 +189,10 @@ mafOp* mafOpExporterSTL::Copy()
   cp->m_File = m_File;
   return cp;
 }
+
+//----------------------------------------------------------------------------
+char ** mafOpExporterSTL::GetIcon()
+{
+#include "pic/MENU_IMPORT_STL.xpm"
+	return MENU_IMPORT_STL_xpm;
+}
