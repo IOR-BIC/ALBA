@@ -73,6 +73,9 @@ public:
   /** Used to retrieve imported data. It is useful when the operation is executed from code.*/
   void GetImportedSTL(std::vector<mafVMESurface*> &importedSTL);
 
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char ** GetIcon();
+
 protected:
   /** Check if the STL file is binary */
   bool IsFileBinary(const char *name_file);
