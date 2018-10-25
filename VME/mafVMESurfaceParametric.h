@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafVMESurfaceParametric
- Authors: Roberto Mucci , Stefano Perticoni
+ Authors: Roberto Mucci , Stefano Perticoni, Nicola Vanella
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -40,7 +40,6 @@ public:
 
   mafTypeMacro(mafVMESurfaceParametric, mafVME);
     
-
   enum PARAMETRIC_SURFACE_TYPE_ID
   {
     PARAMETRIC_SPHERE = 0,
@@ -49,36 +48,8 @@ public:
     PARAMETRIC_CUBE,
     PARAMETRIC_PLANE,
     PARAMETRIC_ELLIPSOID,
+		PARAMETRIC_TRUNCATED_CONE,
   };
-
-  /** Set the geometry type to be generated: use PARAMETRIC_SURFACE_TYPE_ID as arg*/
-  void SetGeometryType(int parametricSurfaceTypeID);
-
-  /** Return the type of the parametric object.*/
-  int GetGeometryType(){return m_GeometryType;};
-
-  /** Set the radius for the parametric sphere.*/
-  void SetSphereRadius(double radius);
-
-	/** Sets CylinderRadius */
-	void SetCylinderRadius(double cylinderRadius);
-
-	/** Sets CylinderHeight */
-	void SetCylinderHeight(double cylinderHeight);
-
-
-
-  /** Return the radius of the parametric sphere.*/
-  double GetSphereRadius() {return m_SphereRadius;};
-
-  /** Return the radius of the parametric cylinder.*/
-  double GetCylinderRadius() {return m_CylinderRadius;};
-
-	/** Return the height of the parametric cylinder.*/
-	double GetCylinderHeight() { return m_CylinderHeight; };
-
-  /** Return the cylinder orientation axis.*/
-  int GetCylinderAxis() {return m_CylinderOrientationAxis;};
 
   /** Copy the contents of another mafVMESurfaceParametric into this one. */
   virtual int DeepCopy(mafVME *a);
@@ -117,21 +88,45 @@ public:
   interpolates on the fly according to the matrix interpolator.*/
   virtual void SetMatrix(const mafMatrix &mat);
 
+	/** Set the geometry type to be generated: use PARAMETRIC_SURFACE_TYPE_ID as arg*/
+	void SetGeometryType(int parametricSurfaceTypeID);
+
+	/** Return the type of the parametric object.*/
+	int GetGeometryType() { return m_GeometryType; };
+
+	/** Set the radius for the parametric sphere.*/
+	void SetSphereRadius(double radius);
+
+	/** Sets CylinderRadius */
+	void SetCylinderRadius(double cylinderRadius);
+
+	/** Sets CylinderHeight */
+	void SetCylinderHeight(double cylinderHeight);
+
+	/** Return the radius of the parametric sphere.*/
+	double GetSphereRadius() { return m_SphereRadius; };
+
+	/** Return the radius of the parametric cylinder.*/
+	double GetCylinderRadius() { return m_CylinderRadius; };
+
+	/** Return the height of the parametric cylinder.*/
+	double GetCylinderHeight() { return m_CylinderHeight; };
+
+	/** Return the cylinder orientation axis.*/
+	int GetCylinderAxis() { return m_CylinderOrientationAxis; };
 
 	/** Returns EllipsoidXLenght */
 	double GetEllipsoidXLenght() const { return m_EllipsoidXLenght; }
 
 	/** Sets EllipsoidXLenght */
 	void SetEllipsoidXLenght(double ellipsoidXLenght) { m_EllipsoidXLenght = ellipsoidXLenght; }
-
-
+	
 	/** Returns EllipsoidYLenght */
 	double GetEllipsoidYLenght() const { return m_EllipsoidYLenght; }
 
 	/** Sets EllipsoidYLenght */
 	void SetEllipsoidYLenght(double ellipsoidYLenght) { m_EllipsoidYLenght = ellipsoidYLenght; }
-
-
+	
 	/** Returns EllipsoidZLenght */
 	double GetEllipsoidZLenght() const { return m_EllipsoidZLenght; }
 
@@ -152,6 +147,7 @@ protected:
     CHANGE_VALUE_CUBE,
     CHANGE_VALUE_PLANE,
     CHANGE_VALUE_ELLIPSOID,
+		CHANGE_VALUE_TRUNCATED_CONE,
     ID_GEOMETRY_TYPE,
     ID_LAST
   };
@@ -176,26 +172,31 @@ protected:
 	/** update the output data structure */
 	virtual void InternalUpdate();
 
+	void CreateTruncatedCone();
+
+	void CreateEllipsoid();
+
+	void CreatePlane();
+
+	void CreateCube();
+
+	void CreateCylinder();
+
+	void CreateCone();
+
+	void CreateSphere();
+
   /** Internally used to create a new instance of the GUI.*/
   virtual mafGUI *CreateGui();
 
-  void CreateGuiPlane();
-  void EnableGuiPlane();
-
+	void AddLineToGUI(mafGUI *gui, int nLines);
+	void CreateGuiPlane();
   void CreateGuiCube();
-  void EnableGuiCube();
-
   void CreateGuiCylinder();
-  void EnableGuiCylinder();
-
   void CreateGuiCone();
-  void EnableGuiCone();
-
   void CreateGuiSphere();
-  void EnableGuiSphere();
-
   void CreateGuiEllipsoid();
-  void EnableGuiEllipsoid();
+	void CreateGuiTruncatedCone();
   
   mafGUI *m_GuiSphere;
   mafGUI *m_GuiCone;
@@ -203,37 +204,51 @@ protected:
   mafGUI *m_GuiCube;
   mafGUI *m_GuiPlane;
   mafGUI *m_GuiEllipsoid;
+	mafGUI *m_GuiTruncatedCone;
 
 	mafTransform *m_Transform; 
 	vtkPolyData  *m_PolyData;
   
   int m_GeometryType;
+
 	double m_SphereRadius;
   double m_SpherePhiRes;
   double m_SphereTheRes;
+
   double m_ConeHeight;
   double m_ConeRadius;
   int m_ConeCapping;
   double m_ConeRes;
   int m_ConeOrientationAxis;
+
   double m_CylinderHeight;
   double m_CylinderRadius;
   double m_CylinderRes;
   int m_CylinderOrientationAxis;
+
   double m_CubeXLength;
   double m_CubeYLength;
   double m_CubeZLength;
+
   double m_PlaneXRes;
   double m_PlaneYRes;
   double m_PlaneOrigin[3];
   double m_PlanePoint1[3];
   double m_PlanePoint2[3];
+
   double m_EllipsoidXLenght;
   double m_EllipsoidYLenght;
   double m_EllipsoidZLenght;
   double m_EllipsoidPhiRes;
   double m_EllipsoidTheRes;
   int m_EllipsoidOrientationAxis;
+
+	double m_TruncatedConeHeight;
+	double m_TruncatedConeUpperDiameter;
+	double m_TruncatedConeLowerDiameter;
+	double m_TruncatedConeRes;
+	int m_TruncatedConeCapping;
+	int m_TruncatedConeOrientationAxis;
   
 private:
   mafVMESurfaceParametric(const mafVMESurfaceParametric&); // Not implemented
