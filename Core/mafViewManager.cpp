@@ -215,15 +215,19 @@ void mafViewManager::VmeModified(mafVME *vme)
 void mafViewManager::VmeSelect(mafVME *vme)   
 //----------------------------------------------------------------------------
 {
-	if(vme != m_SelectedVme)
+	if (vme != m_SelectedVme)
 	{
-		if(m_SelectedVme)
-			for(mafView* v = m_ViewList; v; v=v->m_Next) 
-				v->VmeSelect(m_SelectedVme,false); //deselect the previous selected vme
+		for (mafView* v = m_ViewList; v; v = v->m_Next)
+		{
+			if (m_SelectedVme)
+				v->VmeSelect(m_SelectedVme, false); //deselect the previous selected vme
+
+			v->VmeSelect(vme, true); // select the new one in the views
+		}
+
 		m_SelectedVme = vme; // set the new selected vme
 	}
-	for(mafView* v = m_ViewList; v; v=v->m_Next) 
-    v->VmeSelect(vme,true); // select the new one in the views
+
 	CameraUpdate();
 }
 //----------------------------------------------------------------------------
