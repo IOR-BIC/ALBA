@@ -242,5 +242,6 @@ void mafOp::OpStop(int result)
 //----------------------------------------------------------------------------
 char ** mafOp::GetIcon()
 {
-	return NULL;
+#include "pic/MENU_OP_EMPTY.xpm"
+	return MENU_OP_EMPTY_xpm;
 }
