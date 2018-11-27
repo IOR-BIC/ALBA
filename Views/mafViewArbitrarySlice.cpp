@@ -168,7 +168,7 @@ void mafViewArbitrarySlice::VmeShow(mafVME *vme, bool show)
 	vme->Update();
 	if (show)
 	{
-		if(vme->GetOutput()->IsA("mafVMEOutputVolume"))
+		if(vme->GetOutput()->IsA("mafVMEOutputVolume") && vme != m_CurrentVolume)
 		{
 			double sr[2],SliceCenterVolumeReset[3];
 			mafVME *Volume=vme;
@@ -240,7 +240,7 @@ void mafViewArbitrarySlice::VmeShow(mafVME *vme, bool show)
 
 			UpdateSlicerBehavior();
 
-			//Set camera of slice viw in way that it will follow the volume
+			//Set camera of slice view in way that it will follow the volume
 			if(!m_AttachCamera)
 				m_AttachCamera=new mafAttachCamera(m_Gui,((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->m_Rwi,this);
 			m_AttachCamera->SetStartingMatrix(m_Slicer->GetOutput()->GetAbsMatrix());
