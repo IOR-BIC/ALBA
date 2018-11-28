@@ -61,13 +61,14 @@ public:
   /** Precess events coming from other objects */
   virtual void OnEvent(mafEventBase *maf_event);
   
-  /** 
-  Create the GUI on the bottom of the compounded view. */
+  /** Create the GUI on the bottom of the compounded view. */
   virtual void CreateGuiView();
 
-  /** 
-  Show/Hide VMEs into plugged sub-views*/
+  /** Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(mafVME *vme, bool show);
+
+	/** Apply mesh and surface slice settings to the pipe */
+	void ApplySliceSetting(int view, mafVME * vme);
 
   /** Remove Gizmos, Observers from the volume */
   void DestroyOrthoSlicesAndGizmos();
