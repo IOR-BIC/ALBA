@@ -146,19 +146,6 @@ mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label, bool show
 
 	m_DebugMode = false;
 
-	m_ThicknessComboAssignment[RED] = 3; //this means 1.0, the final value after initialization
-	m_ThicknessComboAssignment[GREEN] = 3; //this means 1.0, the final value after initialization
-	m_ThicknessComboAssignment[BLUE] = 3; //this means 1.0, the final value after initialization
-
-	m_EnableThickness[RED] = 0;
-	m_EnableThickness[GREEN] = 0;
-	m_EnableThickness[BLUE] = 0;
-
-	m_PathFromDialog = "";
-
-	m_EnableExportImages[RED] = 0;
-	m_EnableExportImages[GREEN] = 0;
-	m_EnableExportImages[BLUE] = 0;
 
 	m_NumberOfAxialSections[RED] = 3;
 	m_NumberOfAxialSections[GREEN] = 3;
@@ -172,9 +159,6 @@ mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label, bool show
 	m_ExportPlanesHeight[GREEN] = 20;
 	m_ExportPlanesHeight[BLUE] = 20;
 
-	m_ThicknessValue[RED] = 2;
-	m_ThicknessValue[GREEN] = 2;
-	m_ThicknessValue[BLUE] = 2;
 
 	m_InputVolume = NULL;
 	m_GizmoZView = NULL;
@@ -242,56 +226,6 @@ mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label, bool show
 	m_ZCameraViewUpForReset[0] = 0;
 	m_ZCameraViewUpForReset[1] = 0;
 	m_ZCameraViewUpForReset[2] = 0;
-
-	m_TextActorLeftXView = vtkActor2D::New();
-	m_TextMapperLeftXView = vtkTextMapper::New();
-	m_TextActorLeftXView->SetMapper(m_TextMapperLeftXView);
-
-	m_TextActorRightXView = vtkActor2D::New();
-	m_TextMapperRightXView = vtkTextMapper::New();
-	m_TextActorRightXView->SetMapper(m_TextMapperRightXView);
-
-	m_TextActorLeftYView = vtkActor2D::New();
-	m_TextMapperLeftYView = vtkTextMapper::New();
-	m_TextActorLeftYView->SetMapper(m_TextMapperLeftYView);
-
-	m_TextActorRightYView = vtkActor2D::New();
-	m_TextMapperRightYView = vtkTextMapper::New();
-	m_TextActorRightYView->SetMapper(m_TextMapperRightYView);
-
-	m_TextActorLeftZView = vtkActor2D::New();
-	m_TextMapperLeftZView = vtkTextMapper::New();
-	m_TextActorLeftZView->SetMapper(m_TextMapperLeftZView);
-
-	m_TextActorRightZView = vtkActor2D::New();
-	m_TextMapperRightZView = vtkTextMapper::New();
-	m_TextActorRightZView->SetMapper(m_TextMapperRightZView);
-
-	m_XnThicknessTextActor = vtkActor2D::New();
-	m_XnThicknessTextMapper = vtkTextMapper::New();
-	m_XnThicknessTextActor->SetMapper(m_XnThicknessTextMapper);
-
-	m_YnThicknessTextActor = vtkActor2D::New();
-	m_YnThicknessTextMapper = vtkTextMapper::New();
-	m_YnThicknessTextActor->SetMapper(m_YnThicknessTextMapper);
-
-	m_ZnThicknessTextActor = vtkActor2D::New();
-	m_ZnThicknessTextMapper = vtkTextMapper::New();
-	m_ZnThicknessTextActor->SetMapper(m_ZnThicknessTextMapper);
-
-
-	m_XnSliceHeightTextActor = vtkActor2D::New();
-	m_XnSliceHeightTextMapper = vtkTextMapper::New();
-	m_XnSliceHeightTextActor->SetMapper(m_XnSliceHeightTextMapper);
-
-	m_YnSliceHeightTextActor = vtkActor2D::New();
-	m_YnSliceHeightTextMapper = vtkTextMapper::New();
-	m_YnSliceHeightTextActor->SetMapper(m_YnSliceHeightTextMapper);
-
-	m_ZnSliceHeightTextActor = vtkActor2D::New();
-	m_ZnSliceHeightTextMapper = vtkTextMapper::New();
-	m_ZnSliceHeightTextActor->SetMapper(m_ZnSliceHeightTextMapper);
-
 }
 //----------------------------------------------------------------------------
 mafViewArbitraryOrthoSlice::~mafViewArbitraryOrthoSlice()
@@ -308,46 +242,6 @@ mafViewArbitraryOrthoSlice::~mafViewArbitraryOrthoSlice()
 	m_ColorLUT      = NULL;
 
 	cppDEL(m_GizmoZView);
-
-	// Xn 2d actors
-	vtkDEL(m_TextActorLeftXView);
-	vtkDEL(m_TextMapperLeftXView);
-
-	vtkDEL(m_TextActorRightXView);
-	vtkDEL(m_TextMapperRightXView);
-
-	vtkDEL(m_XnThicknessTextActor);
-	vtkDEL(m_XnThicknessTextMapper);
-
-	// Yn 2d actors
-	vtkDEL(m_TextActorLeftYView);
-	vtkDEL(m_TextMapperLeftYView);
-
-	vtkDEL(m_TextActorRightYView);
-	vtkDEL(m_TextMapperRightYView);
-
-	vtkDEL(m_YnThicknessTextActor);
-	vtkDEL(m_YnThicknessTextMapper);
-
-	// Zn 2d actors
-	vtkDEL(m_TextActorRightZView);
-	vtkDEL(m_TextMapperRightZView);
-
-	vtkDEL(m_TextActorLeftZView);
-	vtkDEL(m_TextMapperLeftZView);
-
-	vtkDEL(m_ZnThicknessTextActor);
-	vtkDEL(m_ZnThicknessTextMapper);
-
-	vtkDEL(m_XnSliceHeightTextActor);
-	vtkDEL(m_XnSliceHeightTextMapper);
-
-	vtkDEL(m_YnSliceHeightTextActor); 
-	vtkDEL(m_YnSliceHeightTextMapper);
-
-	vtkDEL(m_ZnSliceHeightTextActor); 
-	vtkDEL(m_ZnSliceHeightTextMapper);
-
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::PackageView()
@@ -502,7 +396,7 @@ void mafViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 			pickedSliceName = m_XSlicerPicker->GetName();
 
 			mafInteractorCameraPicker *picker = m_XSlicerPicker;
-			MyMethod(picker, pickedPointCoordinates);
+			GenerateMoveEvent(picker, pickedPointCoordinates);
 
 		}
 		else if (event->GetSender() == m_YSlicerPicker)
@@ -510,7 +404,7 @@ void mafViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 			pickedSliceName = m_YSlicerPicker->GetName();
 
 			mafInteractorCameraPicker *picker = m_YSlicerPicker;
-			MyMethod(picker, pickedPointCoordinates);
+			GenerateMoveEvent(picker, pickedPointCoordinates);
 
 		}
 		else if (event->GetSender() == m_ZSlicerPicker)
@@ -518,7 +412,7 @@ void mafViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 			pickedSliceName = m_ZSlicerPicker->GetName();
 
 			mafInteractorCameraPicker *picker = m_ZSlicerPicker;
-			MyMethod(picker, pickedPointCoordinates);
+			GenerateMoveEvent(picker, pickedPointCoordinates);
 		}
 
 		UpdateSlicersLUT();
@@ -732,9 +626,6 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateZNormalView(mafEventBase
 				}
 			}
 
-			UpdateXView2DActors();
-			UpdateYView2DActors();
-
 			//      UpdateCutPlanes();
 			ChildViewsCameraUpdate();
 
@@ -833,9 +724,6 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateYNormalView(mafEventBase
 				}
 			}
 			
-			UpdateXView2DActors();
-			UpdateZView2DActors();
-
 			ChildViewsCameraUpdate();
 
 			GetLogicManager()->CameraUpdate();
@@ -1044,9 +932,6 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateXNormalView(mafEventBase
 				}
 			}
 
-			UpdateYView2DActors();
-			UpdateZView2DActors();
-
 			//      UpdateCutPlanes();
 			ChildViewsCameraUpdate();
 		}
@@ -1188,112 +1073,6 @@ void mafViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 			}
 			break;
 
-		case ID_CHOOSE_DIR:
-			{
-				OnID_CHOOSE_DIR();
-			}
-			break;
-
-
-		case  ID_ENABLE_EXPORT_IMAGES_RED:
-			{
-				OnEventID_ENABLE_EXPORT_IMAGES(RED);
-			}
-			break;
-
-		case  ID_ENABLE_EXPORT_IMAGES_GREEN:
-			{
-				OnEventID_ENABLE_EXPORT_IMAGES(GREEN);
-			}
-			break;
-
-		case  ID_ENABLE_EXPORT_IMAGES_BLUE:
-			{
-				OnEventID_ENABLE_EXPORT_IMAGES(BLUE);
-			}
-			break;
-
-		case ID_EXPORT:
-			{
-				//SaveSlicesTextureToFile();
-				if (m_EnableExportImages[RED] == 1)
-				{
-					
-					ExportREDView();
-
-				}
-				
-				if (m_EnableExportImages[GREEN] == 1)
-				{
-					ExportGREENView();
-
-				}
-				
-				if (m_EnableExportImages[BLUE] == 1)
-				{
-					ExportBLUEView();
-
-				}
-			}
-			break;
-
-			// thickness
-
-		case ID_ENABLE_THICKNESS_RED:
-			{
-				OnEventID_ENABLE_THICKNESS(RED);
-			}
-			break;
-
-		case ID_THICKNESS_VALUE_CHANGED_RED:
-			{
-				OnEventID_THICKNESS_VALUE_CHANGED(RED);
-			}
-			break;
-
-		case ID_EXPORT_PLANES_HEIGHT_RED:
-			{
-				OnEventID_EXPORT_PLANES_HEIGHT(RED);
-			}
-			break;
-
-		case ID_ENABLE_THICKNESS_GREEN:
-			{
-				OnEventID_ENABLE_THICKNESS(GREEN);
-			}
-			break;
-
-		case ID_THICKNESS_VALUE_CHANGED_GREEN:
-			{
-				OnEventID_THICKNESS_VALUE_CHANGED(GREEN);
-			}
-			break;
-
-		case ID_EXPORT_PLANES_HEIGHT_GREEN:
-			{
-				OnEventID_EXPORT_PLANES_HEIGHT(GREEN);
-			}
-			break;
-
-		case ID_ENABLE_THICKNESS_BLUE:
-			{
-				OnEventID_ENABLE_THICKNESS(BLUE);
-			}
-			break;
-
-		case ID_THICKNESS_VALUE_CHANGED_BLUE:
-			{
-				OnEventID_THICKNESS_VALUE_CHANGED(BLUE);
-			}
-			break;
-
-		case ID_EXPORT_PLANES_HEIGHT_BLUE:
-			{
-				OnEventID_EXPORT_PLANES_HEIGHT(BLUE);
-			}
-			break;
-
-
 		case ID_RESET:
 			{
 				OnReset();
@@ -1370,115 +1149,6 @@ mafGUI* mafViewArbitraryOrthoSlice::CreateGui()
 	m_Gui->Update();
 
 
-	//-------------------------------------------------------------------
-	// RED Thickness
-	//-------------------------------------------------------------------
-
-	m_Gui->Label("");
-	m_Gui->Label("THICKNESS", true);
-	m_Gui->Divider(2);
-	m_Gui->Label("Red", true);
-	m_Gui->Bool(ID_ENABLE_THICKNESS_RED, "",&m_EnableThickness[RED]);
-
-	wxString thicknessChoices[25] = {"0.5", "1.0", "1.5",\
-		"2.0", "2.5", "3.0",\
-		"3.5", "4.0", "4.5",\
-		"5.0", "5.5", "6.0",\
-		"6.5", "7.0", "7.5",\
-		"8.0", "8.5", "9.0",\
-		"9.5", "10.0","20.0","40.0", "80.0" , "100.0" , "130.0"};
-
-	m_Gui->Label("Thickness value:");
-	m_Gui->Combo(ID_THICKNESS_VALUE_CHANGED_RED, _(""), &m_ThicknessComboAssignment[RED], 25, thicknessChoices);
-
-	//-------------------------------------------------------------------
-	// GREEN Thickness
-	//-------------------------------------------------------------------
-
-	m_Gui->Divider(2);
-	//m_Gui->Label("");
-
-	//m_Gui->Divider(2);
-	m_Gui->Label("Green", true);
-	m_Gui->Bool(ID_ENABLE_THICKNESS_GREEN, "",&m_EnableThickness[GREEN]);
-
-	m_Gui->Label("Thickness value:");
-	m_Gui->Combo(ID_THICKNESS_VALUE_CHANGED_GREEN, _(""), &m_ThicknessComboAssignment[GREEN], 25, thicknessChoices);
-
-	m_Gui->Label("");
-
-	//-------------------------------------------------------------------
-	// BLUE Thickness
-	//-------------------------------------------------------------------
-
-	m_Gui->Divider(2);
-	//m_Gui->Label("");
-
-	//m_Gui->Divider(2);
-	m_Gui->Label("Blue", true);
-	m_Gui->Bool(ID_ENABLE_THICKNESS_BLUE, "",&m_EnableThickness[BLUE]);
-
-	m_Gui->Label("Thickness value:");
-	m_Gui->Combo(ID_THICKNESS_VALUE_CHANGED_BLUE, _(""), &m_ThicknessComboAssignment[BLUE], 25, thicknessChoices);
-
-	m_Gui->Label("");
-
-	//-------------------------------------------------------------------
-	// RED Export Images
-	//-------------------------------------------------------------------
-
-	
-	m_Gui->Label("EXPORT IMAGES", true);
-	m_Gui->Divider(2);
-	m_Gui->Label("Red", true);
-	m_Gui->Bool(ID_ENABLE_EXPORT_IMAGES_RED, "",&m_EnableExportImages[RED]);
-	//  m_Gui->Label("");
-
-	m_Gui->Label("Export planes height:");
-	m_Gui->Integer(ID_EXPORT_PLANES_HEIGHT_RED,_(""),&m_ExportPlanesHeight[RED],0, 50);
-	m_Gui->Label("Axial sections:");
-	m_Gui->Integer(ID_NUMBER_OF_AXIAL_SECTIONS_RED,_(""),&m_NumberOfAxialSections[RED],0, 20);
-	m_Gui->Divider();
-
-	//-------------------------------------------------------------------
-	// GREEN Export Images
-	//-------------------------------------------------------------------
-
-	m_Gui->Divider(2);
-	m_Gui->Label("Green", true);
-
-	m_Gui->Bool(ID_ENABLE_EXPORT_IMAGES_GREEN, "",&m_EnableExportImages[GREEN]);
-	//  m_Gui->Label("");
-
-	m_Gui->Label("Export planes height:");
-	m_Gui->Integer(ID_EXPORT_PLANES_HEIGHT_GREEN,_(""),&m_ExportPlanesHeight[GREEN],0, 50);
-	m_Gui->Label("Axial sections:");
-	m_Gui->Integer(ID_NUMBER_OF_AXIAL_SECTIONS_GREEN,_(""),&m_NumberOfAxialSections[GREEN],0, 20);
-	m_Gui->Divider();
-
-	//-------------------------------------------------------------------
-	// BLUE Export Images
-	//-------------------------------------------------------------------
-
-	m_Gui->Divider(2);
-	m_Gui->Label("Blue", true);
-
-	m_Gui->Bool(ID_ENABLE_EXPORT_IMAGES_BLUE, "",&m_EnableExportImages[BLUE]);
-	//  m_Gui->Label("");
-
-	m_Gui->Label("Export planes height:");
-	m_Gui->Integer(ID_EXPORT_PLANES_HEIGHT_BLUE,_(""),&m_ExportPlanesHeight[BLUE],0, 50);
-	m_Gui->Label("Axial sections:");
-	m_Gui->Integer(ID_NUMBER_OF_AXIAL_SECTIONS_BLUE,_(""),&m_NumberOfAxialSections[BLUE],0, 20);
-	m_Gui->Divider();
-
-	//-------------------------------------------------------------------
-	// Write Images
-	//-------------------------------------------------------------------
-
-	m_Gui->Button(ID_CHOOSE_DIR,"Choose export dir");
-	m_Gui->Button(ID_EXPORT,"Write images");
-
 	// 	m_Gui->Label("");
 	// 	m_Gui->Button(ID_SHOW_RULER, "Show Ruler");
 	// 	m_Gui->Button(ID_HIDE_RULER, "Hide Ruler");
@@ -1553,18 +1223,6 @@ void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *
 			tr->Delete();
 		}
 
-		UpdateExportImagesBoundsLineActors();
-
-		if (e->GetArg() == mafInteractorGenericMouse::MOUSE_UP)
-		{
-			if (m_EnableThickness[RED])
-			{
-				// update thickness stuff on MOUSE_UP only
-				// called 3 times (WRONG!)
-				UpdateAllViewsThickness();
-			}
-		}
-
 		UpdateSlicersLUT();
 	}
 }
@@ -1608,27 +1266,6 @@ void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *m
 			// ... and update the slicer with the new abs pose
 			currentSlicer->SetAbsMatrix(absPose);
 		} 
-
-		UpdateExportImagesBoundsLineActors();
-
-		if (e->GetArg() == mafInteractorGenericMouse::MOUSE_UP)
-		{
-
-			// update thickness stuff on MOUSE_UP only
-			if (slicerAxis == X)
-			{
-				AccumulateTextures(m_SlicerX, m_ThicknessValue[slicerAxis], NULL, true);
-			}
-			else if (slicerAxis == Y)
-			{
-				AccumulateTextures(m_SlicerY, m_ThicknessValue[slicerAxis], NULL, true);
-			}
-			else if (slicerAxis == Z)
-			{
-				AccumulateTextures(m_SlicerZ, m_ThicknessValue[slicerAxis], NULL, true);
-			}
-
-		}
 
 		UpdateSlicersLUT();
 
@@ -1678,36 +1315,10 @@ void mafViewArbitraryOrthoSlice::EnableWidgets(bool enable)
 		m_Gui->Enable(ID_LUT_CHOOSER, enable);
 		m_Gui->Enable(ID_SHOW_GIZMO, enable);
 		m_Gui->FitGui();
-
-		m_Gui->Enable(ID_ENABLE_THICKNESS_RED, enable);
-		m_Gui->Enable(ID_ENABLE_EXPORT_IMAGES_RED, enable);
-
 		m_Gui->Update();
-
-		for (int color = RED; color < NUMBER_OF_COLORS; color++)
-		{
-			if (m_EnableExportImages[color])
-			{
-				EnableExportImages(true, color);
-			}
-			else
-			{
-				EnableExportImages(false, color);
-			}
-
-			if (m_EnableThickness[color])
-			{
-				EnableThicknessGUI(true, color);
-			}
-			else
-			{
-				EnableThicknessGUI(false, color);
-			}
-		}
-
 	}
-	m_LutSlider->Enable(enable);
 
+	m_LutSlider->Enable(enable);
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSlicerZBehavior()
@@ -1783,8 +1394,6 @@ void mafViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 {
 	wxBusyInfo wait("please wait");
 
-	Update2DActors();
-
 	mafViewVTK *xView = ((mafViewVTK *)(m_ChildViewList[X_VIEW])) ;
 	assert(xView);
 
@@ -1792,42 +1401,18 @@ void mafViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 
 	// fuzzy picking
 	xView->GetPicker2D()->SetTolerance(pickerTolerance);
-
-	xView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorLeftXView);
-	xView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorRightXView);
-	xView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_XnThicknessTextActor);
-	xView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_XnSliceHeightTextActor);
-
 	mafViewVTK *yView = ((mafViewVTK *)(m_ChildViewList[Y_VIEW])) ;
 	assert(yView);
 
 	// fuzzy picking
 	yView->GetPicker2D()->SetTolerance(pickerTolerance);
 
-	yView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorLeftYView);
-	yView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorRightYView);
-	yView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_YnThicknessTextActor);
-	yView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_YnSliceHeightTextActor);
-
 	mafViewVTK *zView = ((mafViewVTK *)(m_ChildViewList[Z_VIEW])) ;
 	assert(zView);
 
 	// fuzzy picking
 	zView->GetPicker2D()->SetTolerance(pickerTolerance);
-
-	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorLeftZView);
-	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorRightZView);
-	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_ZnThicknessTextActor);
-	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_ZnSliceHeightTextActor);
-
-	ShowThickness2DTextActors(false , RED);
-	ShowThickness2DTextActors(false, GREEN);
-	ShowThickness2DTextActors(false, BLUE);
-
-	ShowSliceHeight2DTextActors(false , RED);
-	ShowSliceHeight2DTextActors(false, GREEN);
-	ShowSliceHeight2DTextActors(false, BLUE);
-
+		
 	double sr[2],volumeVTKDataCenterLocalCoords[3];
 	m_CurrentVolume = vme;
 
@@ -1944,24 +1529,6 @@ void mafViewArbitraryOrthoSlice::ShowMafVMEImage( mafVME * vme )
 void mafViewArbitraryOrthoSlice::HideMafVMEVolume()
 {
 
-	mafViewVTK *xView = ((mafViewVTK *)(m_ChildViewList[X_VIEW])) ;
-	assert(xView);
-
-	xView->GetSceneGraph()->m_AlwaysVisibleRenderer->RemoveActor2D(m_TextActorLeftXView);
-	xView->GetSceneGraph()->m_AlwaysVisibleRenderer->RemoveActor2D(m_TextActorRightXView);
-
-	mafViewVTK *yView = ((mafViewVTK *)(m_ChildViewList[Y_VIEW])) ;
-	assert(yView);
-
-	yView->GetSceneGraph()->m_AlwaysVisibleRenderer->RemoveActor2D(m_TextActorLeftYView);
-	yView->GetSceneGraph()->m_AlwaysVisibleRenderer->RemoveActor2D(m_TextActorRightYView);
-
-	mafViewVTK *zView = ((mafViewVTK *)(m_ChildViewList[Z_VIEW])) ;
-	assert(zView);
-
-	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->RemoveActor2D(m_TextActorLeftZView);
-	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->RemoveActor2D(m_TextActorRightZView);
-
 	EnableWidgets(false);
 
 	m_XCameraConeVME->ReparentTo(NULL);
@@ -2039,30 +1606,16 @@ void mafViewArbitraryOrthoSlice::ShowVMESurfacesAndLandmarks(mafVME *vme)
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnReset()
 {
-	{
-		m_GizmoZView->SetAbsPose(m_SlicerZResetMatrix);
-		m_GizmoYView->SetAbsPose(m_SlicerYResetMatrix);
-		m_GizmoXView->SetAbsPose(m_SlicerXResetMatrix);
+	m_GizmoZView->SetAbsPose(m_SlicerZResetMatrix);
+	m_GizmoYView->SetAbsPose(m_SlicerYResetMatrix);
+	m_GizmoXView->SetAbsPose(m_SlicerXResetMatrix);
 
-		m_SlicerX->SetAbsMatrix(*m_SlicerXResetMatrix);
-		m_SlicerY->SetAbsMatrix(*m_SlicerYResetMatrix);
-		m_SlicerZ->SetAbsMatrix(*m_SlicerZResetMatrix);
+	m_SlicerX->SetAbsMatrix(*m_SlicerXResetMatrix);
+	m_SlicerY->SetAbsMatrix(*m_SlicerYResetMatrix);
+	m_SlicerZ->SetAbsMatrix(*m_SlicerZResetMatrix);
 
-		RestoreCameraParametersForAllSubviews();
-
-		UpdateXView2DActors();
-		UpdateYView2DActors();
-		UpdateZView2DActors();
-
-		if (m_EnableThickness[RED])
-		{
-			UpdateAllViewsThickness();
-		}
-
-		UpdateExportImagesBoundsLineActors();
-
-		UpdateSlicersLUT();
-	}
+	RestoreCameraParametersForAllSubviews();
+	UpdateSlicersLUT();
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnLUTRangeModified()
@@ -2734,282 +2287,7 @@ void mafViewArbitraryOrthoSlice::ChildViewsCameraUpdate()
 		m_ChildViewList[i]->CameraUpdate();
 	}
 }
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::GetLeftRightLettersFromCamera( double viewUp[3], double viewPlaneNormal[3], wxString &leftLetter, wxString &rightLetter)
-{
-	std::ostringstream stringStream;
 
-	double cross[3] = {0,0,0};
-	vtkMath::Cross(viewUp, viewPlaneNormal, cross);
-	stringStream << "cross: " << cross[0] << " " << cross[1] << " " << cross[2] << std::endl; 
-
-	double xn[3] = {1,0,0};
-	double yn[3] = {0,1,0};
-	double zn[3] = {0,0,1};
-
-	double xDot = vtkMath::Dot(cross, xn);
-	double yDot = vtkMath::Dot(cross, yn);
-	double zDot = vtkMath::Dot(cross, zn);
-
-	double absXDot = abs(xDot);
-	double absYDot = abs(yDot);
-	double absZDot = abs(zDot);
-
-	vector<double> v;
-	v.push_back(absXDot);
-	v.push_back(absYDot);
-	v.push_back(absZDot);
-
-	double max = *(max_element(v.begin(), v.end()));
-	stringStream << "max value: " << max << std::endl;
-
-	int maxIndex = -1;
-
-	string leftRight;
-
-	if (max == absXDot)
-	{
-		maxIndex = 0;
-		if (xDot >= 0)
-		{
-			leftRight = "R--L";
-			leftLetter = "R";
-			rightLetter = "L";
-		}
-		else
-		{
-			leftRight = "L--R";
-			leftLetter = "L";
-			rightLetter = "R";
-		}
-	}
-	else if (max == absYDot)
-	{
-		maxIndex = 1;
-		if (yDot >= 0)
-		{
-			leftRight = "A--P";
-			leftLetter = "A";
-			rightLetter = "P";
-		}
-		else
-		{
-			leftRight = "P--A";
-			leftLetter = "P";
-			rightLetter = "A";
-		}
-
-	}
-	else if (max == absZDot)
-	{
-		maxIndex = 2;
-		if (zDot >= 0)
-		{
-			leftRight = "I--S";
-			leftLetter = "I";
-			rightLetter = "S";
-		}
-		else
-		{
-			leftRight = "S--I";
-			leftLetter = "S";
-			rightLetter = "I";
-		}
-	}
-
-	stringStream << "max index: " << maxIndex << std::endl;
-	stringStream << "labels: " << leftRight.c_str() << std::endl;
-
-
-	mafLogMessage(stringStream.str().c_str());
-
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::OnLayout()
-{
-	mafViewCompound::OnLayout();
-
-	wxSize size = ((wxWindowBase*)((mafViewVTK *)(m_ChildViewList[Z_VIEW]))->GetRWI())->GetSize();
-
-	OnLayoutInternal(size);
-
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::OnLayoutInternal( wxSize &windowSize )
-{
-	int		defaultTextWidth		= 127;
-	int		defaultTextShiftX		= 20;
-	int		defaultTextFontSize	= 4;
-	double	numCharsInWindowLength				= 1.0;
-
-	int textFontSize				= 4;
-	int textShiftXLeft					= 10;
-
-	double textHeigth = 0.70 * windowSize.GetHeight();
-
-
-	numCharsInWindowLength =  (double)(windowSize.GetWidth()) / (double)(defaultTextWidth);
-	textFontSize = (int)(defaultTextFontSize * numCharsInWindowLength +0.5);
-
-	if (textFontSize < defaultTextFontSize )
-		textFontSize = defaultTextFontSize;
-
-	double textShiftXRight = windowSize.GetWidth() - textFontSize -textShiftXLeft;
-
-	// x view
-	m_TextMapperLeftXView->GetTextProperty()->SetFontSize(textFontSize);
-	m_TextActorLeftXView->SetPosition(textShiftXLeft, textHeigth);
-
-	m_TextMapperRightXView->GetTextProperty()->SetFontSize(textFontSize);
-	m_TextActorRightXView->SetPosition(textShiftXRight, textHeigth);
-
-	m_XnThicknessTextMapper->GetTextProperty()->SetFontSize(textFontSize);
-	m_XnThicknessTextActor->SetPosition(textShiftXLeft, textHeigth - textFontSize * 2);
-
-	m_XnSliceHeightTextMapper->GetTextProperty()->SetFontSize(textFontSize);
-	m_XnSliceHeightTextActor->SetPosition(textShiftXLeft, textHeigth - textFontSize * 4);
-
-	// y view
-	m_TextMapperLeftYView->GetTextProperty()->SetFontSize(textFontSize);
-	m_TextActorLeftYView->SetPosition(textShiftXLeft, textHeigth);
-
-	m_TextMapperRightYView->GetTextProperty()->SetFontSize(textFontSize);
-	m_TextActorRightYView->SetPosition(textShiftXRight, textHeigth);
-
-	m_YnThicknessTextMapper->GetTextProperty()->SetFontSize(textFontSize);
-	m_YnThicknessTextActor->SetPosition(textShiftXLeft, textHeigth  - textFontSize * 2);
-
-	m_YnSliceHeightTextMapper->GetTextProperty()->SetFontSize(textFontSize);
-	m_YnSliceHeightTextActor->SetPosition(textShiftXLeft, textHeigth - textFontSize * 4);
-
-	// z view
-	m_TextMapperLeftZView->GetTextProperty()->SetFontSize(textFontSize);
-	m_TextActorLeftZView->SetPosition(textShiftXLeft, textHeigth);
-
-	m_TextMapperRightZView->GetTextProperty()->SetFontSize(textFontSize);
-	m_TextActorRightZView->SetPosition(textShiftXRight, textHeigth);
-
-	m_ZnThicknessTextMapper->GetTextProperty()->SetFontSize(textFontSize);
-	m_ZnThicknessTextActor->SetPosition(textShiftXLeft, textHeigth - textFontSize * 2);
-
-	m_ZnSliceHeightTextMapper->GetTextProperty()->SetFontSize(textFontSize);
-	m_ZnSliceHeightTextActor->SetPosition(textShiftXLeft, textHeigth - textFontSize * 4);
-
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateZView2DActors()
-{
-	vtkCamera *zViewCamera = NULL;
-	zViewCamera = m_ChildViewList[Z_VIEW]->GetRWI()->GetCamera();
-	assert(zViewCamera);
-
-	double viewUp[3] = {0,0,0};
-	zViewCamera->GetViewUp(viewUp);
-
-	std::ostringstream stringStream;
-	stringStream << "viewUp Z: " << viewUp[0] << " " << viewUp[1] << " " << viewUp[2] << std::endl;          
-
-	double viewPlaneNormal[3] = {0,0,0};
-	zViewCamera->GetViewPlaneNormal(viewPlaneNormal);
-
-	stringStream << "viewPlaneNormal Z: " << viewPlaneNormal[0] << " " << viewPlaneNormal[1] << " " << viewPlaneNormal[2] << std::endl; 
-
-	wxString leftLetter = "UNDEFINED";
-	wxString rightLetter = "UNDEFINED";
-
-	GetLeftRightLettersFromCamera(viewUp, viewPlaneNormal, leftLetter, rightLetter);
-
-	stringStream << leftLetter.c_str() << " " << rightLetter.c_str() << std::endl;
-
-	mafLogMessage(stringStream.str().c_str());
-
-	m_TextMapperLeftZView->SetInput(leftLetter.c_str());
-	m_TextMapperRightZView->SetInput(rightLetter.c_str());
-
-	std::ostringstream thicknessStringStream;
-	thicknessStringStream << "T: " << m_ThicknessValue[BLUE];
-	m_ZnThicknessTextMapper->SetInput(thicknessStringStream.str().c_str());
-
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateXView2DActors()
-{
-	vtkCamera *xViewCamera = NULL;
-	xViewCamera = m_ChildViewList[X_VIEW]->GetRWI()->GetCamera();
-	assert(xViewCamera);
-
-	double viewUp[3] = {0,0,0};
-	xViewCamera->GetViewUp(viewUp);
-
-	std::ostringstream stringStream;
-	stringStream << "viewUp X: " << viewUp[0] << " " << viewUp[1] << " " << viewUp[2] << std::endl;          
-
-	double viewPlaneNormal[3] = {0,0,0};
-	xViewCamera->GetViewPlaneNormal(viewPlaneNormal);
-
-	stringStream << "viewPlaneNormal X: " << viewPlaneNormal[0] << " " << viewPlaneNormal[1] << " " << viewPlaneNormal[2] << std::endl; 
-
-	wxString leftLetter = "UNDEFINED";
-	wxString rightLetter = "UNDEFINED";
-
-	GetLeftRightLettersFromCamera(viewUp, viewPlaneNormal, leftLetter, rightLetter);
-
-	stringStream << leftLetter.c_str() << " " << rightLetter.c_str() << std::endl;
-
-	m_TextMapperLeftXView->SetInput(leftLetter.c_str());
-	m_TextMapperRightXView->SetInput(rightLetter.c_str());
-
-	m_XnThicknessTextMapper->SetInput(m_ThicknessText[RED].GetCStr());
-
-	std::ostringstream thicknessStringStream;
-	thicknessStringStream << "T: " << m_ThicknessValue[RED];
-	m_XnThicknessTextMapper->SetInput(thicknessStringStream.str().c_str());
-
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateYView2DActors()
-{
-	vtkCamera *yViewCamera = NULL;
-	yViewCamera = m_ChildViewList[Y_VIEW]->GetRWI()->GetCamera();
-	assert(yViewCamera);
-
-	double viewUp[3] = {0,0,0};
-	yViewCamera->GetViewUp(viewUp);
-
-	std::ostringstream stringStream;
-	stringStream << "viewUp Y: " << viewUp[0] << " " << viewUp[1] << " " << viewUp[2] << std::endl;          
-
-	double viewPlaneNormal[3] = {0,0,0};
-	yViewCamera->GetViewPlaneNormal(viewPlaneNormal);
-
-	stringStream << "viewPlaneNormal Y: " << viewPlaneNormal[0] << " " << viewPlaneNormal[1] << " " << viewPlaneNormal[2] << std::endl; 
-
-	wxString leftLetter = "UNDEFINED";
-	wxString rightLetter = "UNDEFINED";
-
-	GetLeftRightLettersFromCamera(viewUp, viewPlaneNormal, leftLetter, rightLetter);
-
-	stringStream << leftLetter.c_str() << " " << rightLetter.c_str() << std::endl;
-
-	mafLogMessage(stringStream.str().c_str());
-
-	m_TextMapperLeftYView->SetInput(leftLetter.c_str());
-	m_TextMapperRightYView->SetInput(rightLetter.c_str());
-
-	m_YnThicknessTextMapper->SetInput(m_ThicknessText[GREEN].GetCStr());
-
-	std::ostringstream thicknessStringStream;
-	thicknessStringStream << "T: " << m_ThicknessValue[GREEN];
-	m_YnThicknessTextMapper->SetInput(thicknessStringStream.str().c_str());
-
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::Update2DActors()
-{
-	UpdateXView2DActors();
-	UpdateYView2DActors();
-	UpdateZView2DActors();
-}
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::CameraUpdate()
 {
@@ -3635,16 +2913,6 @@ void mafViewArbitraryOrthoSlice::UpdateZnViewXPlanes()
 	BuildSlicingPlane(m_ViewZnSliceXBoundsVMEVector[BOUND_1], FROM_X, Z_VIEW,  -m_FeedbackLineHeight[RED]);
 }
 //----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateXCutPlanes()
-{
-	// build Yn view images export gizmos
-	if (m_ViewYnSliceXBoundsVMEVector[BOUND_0] && m_ViewZnSliceXBoundsVMEVector[BOUND_1])
-	{
-		UpdateYnViewXPlanes();
-		UpdateZnViewXPlanes();
-	}
-}
-//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowXCutPlanes( bool show )
 {
 	ShowVMESurfacesVector(m_ViewYnSliceXBoundsVMEVector, Y_VIEW, show);
@@ -3666,16 +2934,6 @@ void mafViewArbitraryOrthoSlice::UpdateZnViewYPlanes()
 	BuildSlicingPlane(m_ViewZnSliceYBoundsVMEVector[BOUND_0], FROM_Y, Z_VIEW,  m_FeedbackLineHeight[GREEN]);
 
 	BuildSlicingPlane(m_ViewZnSliceYBoundsVMEVector[BOUND_1], FROM_Y, Z_VIEW,  -m_FeedbackLineHeight[GREEN]);
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateYCutPlanes()
-{
-	// build Yn view images export gizmos
-	if (m_ViewZnSliceYBoundsVMEVector[BOUND_0] && m_ViewZnSliceYBoundsVMEVector[BOUND_1])
-	{
-		UpdateZnViewYPlanes();
-		UpdateXnViewYPlanes();
-	}
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowYCutPlanes( bool show )
@@ -3781,20 +3039,7 @@ void mafViewArbitraryOrthoSlice::BuildSliceHeightFeedbackLinesVMEs()
 	mafNEW(m_ViewZnSliceYBoundsVMEVector[BOUND_1]);
 	AddVMEToMSFTree(m_ViewZnSliceYBoundsVMEVector[BOUND_1]);
 }
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateExportImagesBoundsLineActors()
-{
-	// prevent cpu time waste :P
-	bool exportingImages = false;
-	exportingImages = m_EnableExportImages;
 
-	if (exportingImages)
-	{
-		UpdateXCutPlanes();
-		UpdateYCutPlanes();
-		UpdateZCutPlanes();
-	}
-}
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::HideAllCutPlanes()
 {
@@ -3803,248 +3048,6 @@ void mafViewArbitraryOrthoSlice::HideAllCutPlanes()
 	ShowZCutPlanes(false);
 
 	GetLogicManager()->CameraUpdate();
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::OnID_CHOOSE_DIR()
-{
-	wxDirDialog dialog(NULL);
-	dialog.SetReturnCode(wxID_OK);
-	int ret_code = dialog.ShowModal();
-	m_PathFromDialog = dialog.GetPath();
-
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::EnableExportImages( bool enable , int color )
-{
-	if (color == RED)
-	{
-		m_Gui->Enable(ID_EXPORT_PLANES_HEIGHT_RED, enable);
-		m_Gui->Enable(ID_NUMBER_OF_AXIAL_SECTIONS_RED, enable);	
-	}
-	else if (color == GREEN)
-	{
-		m_Gui->Enable(ID_EXPORT_PLANES_HEIGHT_GREEN, enable);
-		m_Gui->Enable(ID_NUMBER_OF_AXIAL_SECTIONS_GREEN, enable);	
-	}
-	else if (color == BLUE)
-	{
-		m_Gui->Enable(ID_EXPORT_PLANES_HEIGHT_BLUE, enable);
-		m_Gui->Enable(ID_NUMBER_OF_AXIAL_SECTIONS_BLUE, enable);	
-	}
-}
-
-void mafViewArbitraryOrthoSlice::EnableThicknessGUI( bool enable , int color )
-{
-	if (color == RED)
-	{
-		m_Gui->Enable(ID_THICKNESS_VALUE_CHANGED_RED, enable);
-		m_Gui->Enable(ID_ENABLE_THICKNESS_ACTORS_RED, enable);
-	}
-	else if (color == GREEN)
-	{
-		m_Gui->Enable(ID_THICKNESS_VALUE_CHANGED_GREEN, enable);
-		m_Gui->Enable(ID_ENABLE_THICKNESS_ACTORS_GREEN, enable);
-	}
-	else if (color == BLUE)
-	{
-		m_Gui->Enable(ID_THICKNESS_VALUE_CHANGED_BLUE, enable);
-		m_Gui->Enable(ID_ENABLE_THICKNESS_ACTORS_BLUE, enable);
-	}
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::OnEventID_ENABLE_EXPORT_IMAGES(int axis)
-{
-	wxBusyInfo wait("please wait");
-
-	EnableExportImages(m_EnableExportImages[axis], axis);
-
-	if (m_EnableExportImages[axis] == 0)  // disable export images
-	{
-		ShowCutPlanes(axis, false);
-	}
-	else // enable
-	{
-		m_FeedbackLineHeight[axis] = m_ExportPlanesHeight[axis];
-		UpdateExportImagesBoundsLineActors();		
-		ShowCutPlanes(axis, true);
-	}
-
-	ChildViewsCameraUpdate();
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::SaveSlicesTextureToFile(int choosedExportAxis)
-{
-
-	mafProgressBarHelper progressHelper(m_Listener);
-	progressHelper.InitProgressBar("please wait");
-
-	mafVMESlicer *currentSlicer = NULL;
-
-	if (choosedExportAxis == X)
-	{
-		currentSlicer = m_SlicerX;
-	}
-	else if (choosedExportAxis == Y)
-	{
-		currentSlicer = m_SlicerY;
-	}
-	else if (choosedExportAxis == Z)
-	{
-		currentSlicer = m_SlicerZ;
-	}
-
-	// export X slices BMP
-	double thickness = m_FeedbackLineHeight[choosedExportAxis] * 2;
-	double step = thickness / (m_NumberOfAxialSections[choosedExportAxis] - 1);
-
-	vtkMAFSmartPointer<vtkMatrix4x4> originalMatrix;
-
-	vtkMatrix4x4 *slicerMatrix = currentSlicer->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix();
-	originalMatrix->DeepCopy(slicerMatrix);
-
-	double height = -m_FeedbackLineHeight[choosedExportAxis];
-
-	double v3[3] = {height,0,0};
-
-	for (int i = 0; i < m_NumberOfAxialSections[choosedExportAxis]; i++)
-	{          
-		progressHelper.UpdateProgressBar(100 * ((double )i) / ((double) m_NumberOfAxialSections[choosedExportAxis]));
-
-		// move the slicer in the target abs pose
-		vtkMAFSmartPointer<vtkTransform> tr;
-		tr->PostMultiply();
-		tr->SetMatrix(originalMatrix);
-
-		if (currentSlicer == m_SlicerX)
-		{
-			tr->Translate(height,0,0);
-		}
-		else if (currentSlicer == m_SlicerY)
-		{
-			tr->Translate(0,height,0);
-		}
-		else if (currentSlicer == m_SlicerZ)
-		{
-			tr->Translate(0,0,height);
-		}
-
-		tr->Update();
-
-		currentSlicer->SetAbsMatrix(tr->GetMatrix());
-
-		vtkMAFSmartPointer<vtkPNGWriter> writer;
-
-		vtkImageData *textureToWriteOnDisk = NULL;
-
-		if (m_EnableThickness[choosedExportAxis] == false)  // use the slicer output
-		{
-			// update the slicer
-			currentSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
-			currentSlicer->GetSurfaceOutput()->GetVTKData()->Update();
-
-			mafVMEOutputSurface *outputSurface = mafVMEOutputSurface::SafeDownCast(currentSlicer->GetSurfaceOutput());
-			assert(outputSurface);
-
-			// get the slicer texture for exporting purposes
-			textureToWriteOnDisk = outputSurface->GetMaterial()->GetMaterialTexture();
-			assert(textureToWriteOnDisk);
-			writer->SetInput(textureToWriteOnDisk);
-
-			GetLogicManager()->CameraUpdate();
-		}
-		else if (m_EnableThickness[choosedExportAxis] == true) // use rx projection
-		{
-			textureToWriteOnDisk = vtkImageData::New();
-			AccumulateTextures(currentSlicer, m_ThicknessValue[choosedExportAxis], textureToWriteOnDisk, false );
-			writer->SetInput(textureToWriteOnDisk);
-			textureToWriteOnDisk->Delete();
-
-			GetLogicManager()->CameraUpdate();
-		}
-
-		// write it
-
-		wxString fileName = m_PathFromDialog.c_str();
-
-		if (currentSlicer == m_SlicerX)
-		{
-			fileName.append("/SlicerX_");
-		}
-		else if (currentSlicer == m_SlicerY)
-		{
-			fileName.append("/SlicerY_");
-		}
-		else if (currentSlicer == m_SlicerZ)
-		{
-			fileName.append("/SlicerZ_");
-		}
-
-		fileName << i;
-		fileName << ".png";
-		//fileName.append("vtk");
-
-		writer->SetFileName(fileName);
-		writer->Write();
-
-		height = height + step;
-	}
-
-	currentSlicer->SetAbsMatrix(mafMatrix(originalMatrix));
-
-	if (m_EnableThickness[choosedExportAxis] == true)
-	{
-		AccumulateTextures(currentSlicer, m_ThicknessValue[choosedExportAxis], NULL, true);
-	}
-
-	currentSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
-	currentSlicer->GetSurfaceOutput()->GetVTKData()->Update();
-
-	UpdateSlicersLUT();
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::OnEventID_ENABLE_THICKNESS( int color )
-{
-	assert(m_InputVolume);
-
-	vtkStructuredPoints *structuredPoints = vtkStructuredPoints::SafeDownCast(m_InputVolume->GetDataPipe()->GetVTKData());
-
-	// BEWARE: working for structured points only
-	// TODO REFACTOR THIS:
-	// can be easyly extended to rectilinear grid
-	if (structuredPoints == NULL)
-	{
-		EnableThickness(false, color);
-
-		wxMessageBox(wxString::Format(
-			_("The RX accumulation works for structured points only, \n" 
-			"in current release.\n", )));    
-
-		return;
-	}
-
-	EnableThickness(m_EnableThickness[color], color);
-	ShowThickness2DTextActors(m_EnableThickness[color], color);
-	UpdateSlicersLUT();
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateAllViewsThickness()
-{
-	wxBusyInfo wait_info("please wait");
-
-	if (m_EnableThickness[RED] == true) // prevent cpu waste
-	{
-		AccumulateTextures(m_SlicerX, m_ThicknessValue[RED], NULL, true);
-	}
-
-	if (m_EnableThickness[GREEN] == true) // prevent cpu waste
-	{
-		AccumulateTextures(m_SlicerY, m_ThicknessValue[GREEN], NULL, true);
-	}
-
-	if (m_EnableThickness[BLUE] == true) // prevent cpu waste
-	{
-		AccumulateTextures(m_SlicerZ, m_ThicknessValue[BLUE], NULL, true);
-	}
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSlicers(int axis)
@@ -4056,40 +3059,8 @@ void mafViewArbitraryOrthoSlice::UpdateSlicers(int axis)
 	slicers[axis]->GetSurfaceOutput()->GetVTKData()->Modified();
 	slicers[axis]->GetSurfaceOutput()->GetVTKData()->Update();
 }
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::OnEventID_THICKNESS_VALUE_CHANGED( int color )
-{
-	ThicknessComboAssignment(color);
-	UpdateExportImagesBoundsLineActors();
-	Update2DActors();
-	UpdateAllViewsThickness();
-	UpdateSlicersLUT();
-	ChildViewsCameraUpdate();
-}
 
-void mafViewArbitraryOrthoSlice::EnableThickness( bool enable, int color )
-{
-	EnableThicknessGUI(enable, color);
 
-	if (enable)
-	{
-		UpdateThickness(color);
-	}
-	else
-	{
-		UpdateSlicers(color);
-	}
-
-	ChildViewsCameraUpdate();
-
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::OnEventID_EXPORT_PLANES_HEIGHT( int color )
-{
-	m_FeedbackLineHeight[color] = m_ExportPlanesHeight[color];
-	UpdateExportImagesBoundsLineActors();
-	ChildViewsCameraUpdate();
-}
 //----------------------------------------------------------------------------
 mafPipeSurface * mafViewArbitraryOrthoSlice::GetPipe(int inView, mafVMESurface *inSurface)
 {
@@ -4143,15 +3114,7 @@ void mafViewArbitraryOrthoSlice::CreateViewCameraNormalFeedbackActor(double col[
 	vtkDEL(pd);
 	vtkDEL(m_Border);
 }
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::DestroyViewCameraNormalFeedbackActor(int view)
-{
 
-	//if(m_Border)
-	{
-		//((mafViewVTK*)(m_ChildViewList[view]))->m_Rwi->m_RenFront->RemoveActor(m_Border);
-	} 
-}
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::EnableSlicersPicking(bool enable)
 {
@@ -4192,42 +3155,7 @@ void mafViewArbitraryOrthoSlice::EnableSlicersPicking(bool enable)
 	pipePerspectiveViewSlicerZ->SelectionActorOff();
 
 }
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowThickness2DTextActors( bool show , int color)
-{
-	if (color == RED)
-	{
-		m_XnThicknessTextActor->SetVisibility(show);
-	}
-	else if (color == GREEN)
-	{
-		m_YnThicknessTextActor->SetVisibility(show);
-	}
-	else if (color == BLUE)
-	{
-		m_ZnThicknessTextActor->SetVisibility(show);
-	}
-	
-	ChildViewsCameraUpdate();
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowSliceHeight2DTextActors( bool show , int color)
-{
-	if (color == RED)
-	{
-		m_XnSliceHeightTextActor->SetVisibility(show);
-	}
-	else if (color == GREEN)
-	{
-		m_YnSliceHeightTextActor->SetVisibility(show);
-	}
-	else if (color == BLUE)
-	{
-		m_ZnSliceHeightTextActor->SetVisibility(show);
-	}
 
-	ChildViewsCameraUpdate();
-}
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSlicersLUT()
 {
@@ -4253,89 +3181,6 @@ void mafViewArbitraryOrthoSlice::UpdateSlicersLUT()
 	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ThicknessComboAssignment( int axis )
-{
-	switch(m_ThicknessComboAssignment[axis])
-	{
-	case 0:
-		m_ThicknessValue[axis] = 0.5;
-		break;
-	case 1:
-		m_ThicknessValue[axis] = 1.0;
-		break;
-	case 2:
-		m_ThicknessValue[axis] = 1.5;
-		break;
-	case 3:
-		m_ThicknessValue[axis] = 2.0;
-		break;
-	case 4:
-		m_ThicknessValue[axis] = 2.5;
-		break;
-	case 5:
-		m_ThicknessValue[axis] = 3.0;
-		break;
-	case 6:
-		m_ThicknessValue[axis] = 3.5;
-		break;
-	case 7:
-		m_ThicknessValue[axis] = 4.0;
-		break;
-	case 8:
-		m_ThicknessValue[axis] = 4.5;
-		break;
-	case 9:
-		m_ThicknessValue[axis] = 5.0;
-		break;
-	case 10:
-		m_ThicknessValue[axis] = 5.5;
-		break;
-	case 11:
-		m_ThicknessValue[axis] = 6.0;
-		break;
-	case 12:
-		m_ThicknessValue[axis] = 6.5;
-		break;
-	case 13:
-		m_ThicknessValue[axis] = 7.0;
-		break;
-	case 14:
-		m_ThicknessValue[axis] = 7.5;
-		break;
-	case 15:
-		m_ThicknessValue[axis] = 8.0;
-		break;
-	case 16:
-		m_ThicknessValue[axis] = 8.5;
-		break;
-	case 17:
-		m_ThicknessValue[axis] = 9.0;
-		break;
-	case 18:
-		m_ThicknessValue[axis] = 9.5;
-		break;
-	case 19:
-		m_ThicknessValue[axis] = 10.0;
-		break;
-	case 20:
-		m_ThicknessValue[axis] = 20.0;
-		break;
-	case 21:
-		m_ThicknessValue[axis] = 40.0;
-		break;
-	case 22:
-		m_ThicknessValue[axis] = 80.0;
-		break;
-	case 23:
-		m_ThicknessValue[axis] = 100.0;
-		break;
-	case 24:
-		m_ThicknessValue[axis] = 130.0;
-		break;
-
-	}
-}
-//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateWindowing(bool enable,mafVME *vme)
 {
 	if(vme->GetOutput() && vme->GetOutput()->IsA("mafVMEOutputVolume") && enable)
@@ -4344,7 +3189,7 @@ void mafViewArbitraryOrthoSlice::UpdateWindowing(bool enable,mafVME *vme)
 	}
 }
 //----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::MyMethod( mafInteractorCameraPicker * picker, double * pickedPointCoordinates )
+void mafViewArbitraryOrthoSlice::GenerateMoveEvent( mafInteractorCameraPicker * picker, double * pickedPointCoordinates )
 {
 	mafGizmoCrossRotateTranslate *gizmo = NULL;
 
@@ -4406,8 +3251,6 @@ void mafViewArbitraryOrthoSlice::MyMethod( mafInteractorCameraPicker * picker, d
 	}
 
 	gizmo->SetAbsPose(&ngm);
-
-	UpdateAllViewsThickness();
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowVMESurfacesVector( vector<mafVMESurface *> &inVector, int view, bool show )
@@ -4424,246 +3267,6 @@ void mafViewArbitraryOrthoSlice::ShowVMESurfacesVector( vector<mafVMESurface *> 
 		if (pipe) pipe->SetActorPicking(false);
 
 	}
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::SaveSlicesFromRenderWindowToFile(int chooseExportAxis)
-{
-	wxString message;
-	message = "please wait, exporting ";
-
-	if (chooseExportAxis == RED)
-	{
-		message.append("RED");
-	}
-	else if (chooseExportAxis == GREEN)
-	{
-		message.append("GREEN");
-	}
-	else if (chooseExportAxis == BLUE)
-	{
-		message.append("BLUE");
-	}
-
-	message.append(" View");
-
-	mafProgressBarHelper progressHelper(m_Listener);
-	progressHelper.InitProgressBar(message);
-
-	int viewToExport = -1;
-
-	mafVMESlicer *currentSlicer = NULL;
-
-	mafGizmoCrossRotateTranslate *crossGizmo[3] = {m_GizmoXView, m_GizmoYView, m_GizmoZView};
-
-	// hide the cross from all views before exporting
-
-
-	for (int crossGizmoId = 0; crossGizmoId < 3; crossGizmoId++) 
-	{
-		crossGizmo[crossGizmoId]->Show(false);
-	}
-
-	int guideView0 = -1;
-	int guideView1 = -1;
-
-	if (chooseExportAxis == X)
-	{
-		currentSlicer = m_SlicerX;
-		viewToExport = X_VIEW;
-		guideView0 = Y_VIEW;
-		guideView1 = Z_VIEW;
-	}
-	else if (chooseExportAxis== Y)
-	{
-		currentSlicer = m_SlicerY;
-		viewToExport = Y_VIEW;
-		guideView0 = X_VIEW;
-		guideView1 = Z_VIEW;
-	}
-	else if (chooseExportAxis== Z)
-	{
-		currentSlicer = m_SlicerZ;
-		viewToExport = Z_VIEW;
-		guideView0 = X_VIEW;
-		guideView1 = Y_VIEW;
-	}
-
-	ShowRuler(chooseExportAxis, true);
-
-	// export X slices BMP
-	double thickness = m_FeedbackLineHeight[chooseExportAxis] * 2;
-	double step = thickness / (m_NumberOfAxialSections[chooseExportAxis] - 1);
-
-	vtkMAFSmartPointer<vtkMatrix4x4> originalMatrix;
-
-	vtkMatrix4x4 *slicerMatrix = currentSlicer->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix();
-	originalMatrix->DeepCopy(slicerMatrix);
-
-	double height = -m_FeedbackLineHeight[chooseExportAxis];
-
-	double v3[3] = {height,0,0};
-
-	for (int i = 0; i < m_NumberOfAxialSections[chooseExportAxis]; i++)
-	{          
-		progressHelper.UpdateProgressBar(100 * ((double )i) / ((double) m_NumberOfAxialSections[chooseExportAxis]));
-
-		// move the slicer in the target abs pose
-		vtkMAFSmartPointer<vtkTransform> tr;
-		tr->PostMultiply();
-		tr->SetMatrix(originalMatrix);
-
-		if (currentSlicer == m_SlicerX)
-		{
-			tr->Translate(height,0,0);
-		}
-		else if (currentSlicer == m_SlicerY)
-		{
-			tr->Translate(0,height,0);
-		}
-		else if (currentSlicer == m_SlicerZ)
-		{
-			tr->Translate(0,0,height);
-		}
-
-		tr->Update();
-
-		currentSlicer->SetAbsMatrix(tr->GetMatrix());
-
-		vtkMAFSmartPointer<vtkPNGWriter> writer;
-
-		vtkImageData *textureToWriteOnDisk = NULL;
-
-		if (m_EnableThickness[chooseExportAxis] == false)
-		{
-			// update the slicer
-			currentSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
-			currentSlicer->GetSurfaceOutput()->GetVTKData()->Update();
-
-			mafVMEOutputSurface *outputSurface = mafVMEOutputSurface::SafeDownCast(currentSlicer->GetSurfaceOutput());
-			assert(outputSurface);
-
-			// get the slicer texture for exporting purposes
-			textureToWriteOnDisk = outputSurface->GetMaterial()->GetMaterialTexture();
-			assert(textureToWriteOnDisk);
-			writer->SetInput(textureToWriteOnDisk);
-
-			GetLogicManager()->CameraUpdate();
-		}
-		else if (m_EnableThickness[chooseExportAxis] == true)
-		{
-			textureToWriteOnDisk = vtkImageData::New();
-			AccumulateTextures(currentSlicer, m_ThicknessValue[chooseExportAxis], textureToWriteOnDisk, false );
-			writer->SetInput(textureToWriteOnDisk);
-			textureToWriteOnDisk->Delete();
-
-			GetLogicManager()->CameraUpdate();
-		}
-
-		// write it
-		wxString fileName = m_PathFromDialog.c_str();
-
-		if (i == 0)
-		{
-			// save guide images
-
-			wxString guide0FileName = fileName;
-			wxString guide1FileName = fileName;
-
-			if (chooseExportAxis == RED)
-			{
-				// 	guideView0 = Y_VIEW;
-				guide0FileName.append("/SlicerX_Reference_Y_View.png");	
-
-				// 	guideView1 = Z_VIEW;
-				guide1FileName.append("/SlicerX_Reference_Z_View.png");	
-
-			}
-			else if (chooseExportAxis == GREEN)
-			{
-				// 	guideView0 = X_VIEW;				
-				guide0FileName.append("/SlicerY_Reference_X_View.png");
-				
-				// 	guideView1 = Z_VIEW;
-				guide1FileName.append("/SlicerY_Reference_Z_View.png");
-			}
-			else if (chooseExportAxis == BLUE)
-			{
-				// 	guideView0 = X_VIEW;
-				guide0FileName.append("/SlicerZ_Reference_X_View.png");
-
-				// 	guideView1 = Y_VIEW;
-				guide1FileName.append("/SlicerZ_Reference_Y_View.png");
-			}
-
-			((mafViewSlice*)m_ChildViewList[guideView0])->GetRWI()->SaveImage(guide0FileName.c_str());			
-			((mafViewSlice*)m_ChildViewList[guideView1])->GetRWI()->SaveImage(guide1FileName.c_str());  
-		}
-
-		if (currentSlicer == m_SlicerX)
-		{
-			fileName.append("/SlicerX_");
-
-			wxString heightText = "H:";
-			heightText << m_FeedbackLineHeight[RED] + height;
-			m_XnSliceHeightTextMapper->SetInput(heightText);
-			ShowSliceHeight2DTextActors(true, RED);
-		}
-		else if (currentSlicer == m_SlicerY)
-		{
-			fileName.append("/SlicerY_");
-
-			// show slice heigth
-			wxString heightText = "H:";
-			heightText << m_FeedbackLineHeight[GREEN] + height;
-			m_YnSliceHeightTextMapper->SetInput(heightText);
-			ShowSliceHeight2DTextActors(true, GREEN);
-		}
-		else if (currentSlicer == m_SlicerZ)
-		{
-			
-			ShowSliceHeight2DTextActors(true, BLUE);
-
-			wxString heightText = "H:";
-			heightText << m_FeedbackLineHeight[BLUE] + height;
-			m_ZnSliceHeightTextMapper->SetInput(heightText);
-			ShowSliceHeight2DTextActors(true, BLUE);
-
-			fileName.append("/SlicerZ_");
-		}
-
-		fileName << i;
-		fileName << ".png";
-
-
-		((mafViewSlice*)m_ChildViewList[viewToExport])->GetRWI()->SaveImage(fileName.c_str());
-
-		
-		height = height + step;
-	}
-
-	ShowSliceHeight2DTextActors(false, RED);
-	ShowSliceHeight2DTextActors(false, GREEN);
-	ShowSliceHeight2DTextActors(false, BLUE);
-
-	currentSlicer->SetAbsMatrix(mafMatrix(originalMatrix));
-
-	if (m_EnableThickness[chooseExportAxis] == true)
-	{
-		AccumulateTextures(currentSlicer, m_ThicknessValue[chooseExportAxis], NULL, true);
-	}
-
-	currentSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
-	currentSlicer->GetSurfaceOutput()->GetVTKData()->Update();
-
-	ShowRuler(chooseExportAxis, false);
-
-	// reshow the cross after exporting
-	for (int crossGizmoId = 0; crossGizmoId < 3; crossGizmoId++) 
-	{
-		crossGizmo[crossGizmoId]->Show(true);
-	}
-
-	UpdateSlicersLUT();
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowRulerVMEVector(vector<mafVMESurface *> &rulerVector, 
@@ -4853,113 +3456,5 @@ void mafViewArbitraryOrthoSlice::ShowCutPlanes( int axis , bool show)
 	else if (axis == BLUE)
 	{
 		ShowZCutPlanes(show);
-	}
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateThickness( int axis)
-{
-	if (axis == RED) // prevent cpu waste
-	{
-		AccumulateTextures(m_SlicerX, m_ThicknessValue[RED], NULL, true);
-	}
-
-	if (axis == GREEN) // prevent cpu waste
-	{
-		AccumulateTextures(m_SlicerY, m_ThicknessValue[GREEN], NULL, true);
-	}
-
-	if (axis == BLUE) // prevent cpu waste
-	{
-		AccumulateTextures(m_SlicerZ, m_ThicknessValue[BLUE], NULL, true);
-	}
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ExportREDView()
-{
-	if (m_EnableExportImages[GREEN])
-	{
-		ShowYCutPlanes(false);
-	}
-
-	if (m_EnableExportImages[BLUE])
-	{
-		ShowZCutPlanes(false);
-	}
-
-	SaveSlicesFromRenderWindowToFile(RED);
-
-	if (m_EnableThickness[RED])
-	{
-		UpdateThickness(RED);
-	}
-
-	if (m_EnableExportImages[GREEN])
-	{
-		ShowYCutPlanes(true);
-	}
-
-	if (m_EnableExportImages[BLUE])
-	{
-		ShowZCutPlanes(true);
-	}
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ExportGREENView()
-{
-	if (m_EnableExportImages[RED])
-	{
-		ShowXCutPlanes(false);
-	}
-
-	if (m_EnableExportImages[BLUE])
-	{
-		ShowZCutPlanes(false);
-	}
-
-	SaveSlicesFromRenderWindowToFile(GREEN);
-
-	if (m_EnableThickness[GREEN])
-	{
-		UpdateThickness(GREEN);
-	}
-
-	if (m_EnableExportImages[RED])
-	{
-		ShowXCutPlanes(true);
-	}
-
-	if (m_EnableExportImages[BLUE])
-	{
-		ShowZCutPlanes(true);
-	}
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ExportBLUEView()
-{
-	if (m_EnableExportImages[RED])
-	{
-		ShowXCutPlanes(false);
-	}
-
-	if (m_EnableExportImages[GREEN])
-	{
-		ShowYCutPlanes(false);
-	}
-
-	SaveSlicesFromRenderWindowToFile(BLUE);
-
-	if (m_EnableThickness[BLUE])
-	{
-		UpdateThickness(BLUE);
-	}
-
-	if (m_EnableExportImages[RED])
-	{
-		ShowXCutPlanes(true);
-	}
-
-	if (m_EnableExportImages[GREEN])
-	{
-		ShowYCutPlanes(true);
 	}
 }

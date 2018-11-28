@@ -124,32 +124,7 @@ public:
 		ID_COMBO_CHOOSE_EXPORT_AXIS = Superclass::ID_LAST,
 		ID_RESET,
 		ID_SHOW_GIZMO,
-		ID_CHOOSE_DIR,
-		ID_EXPORT,
-
 		ID_UPDATE_LUT, 
-
-		ID_ENABLE_THICKNESS_RED,
-		ID_ENABLE_THICKNESS_ACTORS_RED,
-		ID_THICKNESS_VALUE_CHANGED_RED,
-		ID_NUMBER_OF_AXIAL_SECTIONS_RED,
-		ID_EXPORT_PLANES_HEIGHT_RED,
-		ID_ENABLE_EXPORT_IMAGES_RED,
-
-		ID_ENABLE_THICKNESS_GREEN,
-		ID_ENABLE_THICKNESS_ACTORS_GREEN,
-		ID_THICKNESS_VALUE_CHANGED_GREEN,
-		ID_NUMBER_OF_AXIAL_SECTIONS_GREEN,
-		ID_EXPORT_PLANES_HEIGHT_GREEN,
-		ID_ENABLE_EXPORT_IMAGES_GREEN,
-
-		ID_ENABLE_THICKNESS_BLUE,
-		ID_ENABLE_THICKNESS_ACTORS_BLUE,
-		ID_THICKNESS_VALUE_CHANGED_BLUE,
-		ID_NUMBER_OF_AXIAL_SECTIONS_BLUE,
-		ID_EXPORT_PLANES_HEIGHT_BLUE,
-		ID_ENABLE_EXPORT_IMAGES_BLUE,
-
 		ID_SHOW_RULER,
 		ID_HIDE_RULER,
 		ID_LAST,
@@ -173,7 +148,7 @@ public:
 	/** Function that handles events sent from other objects. */
 	virtual void OnEvent(mafEventBase *maf_event);
 
-	void MyMethod( mafInteractorCameraPicker * picker, double * pickedPointCoordinates );
+	void GenerateMoveEvent( mafInteractorCameraPicker * picker, double * pickedPointCoordinates );
 	void OnEventGizmoCrossRTZNormalView( mafEventBase * maf_event );
 	void OnEventGizmoCrossRTYNormalView( mafEventBase * maf_event );
 
@@ -183,49 +158,9 @@ public:
 	/** Force the updating of the camera. */
 	virtual void UpdateSubviewsCamerasToFaceSlices();
 
-	virtual void OnLayout();
-
-	void OnLayoutInternal( wxSize &windowSize );
-
-
 protected:
 
-	vtkActor2D *m_XnThicknessTextActor;
-	vtkTextMapper *m_XnThicknessTextMapper;
-
-	vtkActor2D *m_YnThicknessTextActor;
-	vtkTextMapper *m_YnThicknessTextMapper;
-
-	vtkActor2D *m_ZnThicknessTextActor;
-	vtkTextMapper *m_ZnThicknessTextMapper;
-
-	vtkActor2D *m_TextActorLeftXView;
-	vtkTextMapper *m_TextMapperLeftXView;
-
-	vtkActor2D *m_TextActorRightXView;
-	vtkTextMapper *m_TextMapperRightXView;
-
-	vtkActor2D *m_TextActorLeftYView;
-	vtkTextMapper *m_TextMapperLeftYView;
-
-	vtkActor2D *m_TextActorRightYView;
-	vtkTextMapper *m_TextMapperRightYView;
-
-	vtkActor2D *m_TextActorLeftZView;
-	vtkTextMapper *m_TextMapperLeftZView;
-
-	vtkActor2D *m_TextActorRightZView;
-	vtkTextMapper *m_TextMapperRightZView;
-
-	vtkActor2D *m_XnSliceHeightTextActor;
-	vtkTextMapper *m_XnSliceHeightTextMapper;
-
-	vtkActor2D *m_YnSliceHeightTextActor;
-	vtkTextMapper *m_YnSliceHeightTextMapper;
-
-	vtkActor2D *m_ZnSliceHeightTextActor;
-	vtkTextMapper *m_ZnSliceHeightTextMapper;
-
+	
 	bool BelongsToXNormalGizmo( mafVME * vme );
 	bool BelongsToYNormalGizmo( mafVME * vme );
 	bool BelongsToZNormalGizmo( mafVME * vme );
@@ -236,12 +171,8 @@ protected:
 	void HideMafVmeImage();
 
 	void ShowMafVMEVolume( mafVME * vme, bool show );
-
-	void ShowThickness2DTextActors( bool show , int color);
-
+		
 	void StoreCameraParametersForAllSubviews();
-
-	void Update2DActors();
 
 	void ShowSlicers( mafVME * vmeVolume, bool show );
 
@@ -254,7 +185,6 @@ protected:
 		double sliceHeight, mafVMESlicer* targetSlicer = NULL,
     vtkMatrix4x4 * outputMatrix = NULL , bool showHeightText = false, vtkCaptionActor2D *captionActor = NULL);
 
-  void ShowCaptionActorVector( vector<vtkCaptionActor2D *> textActorsVector , int view );
   void ShowCaptionActor(vtkCaptionActor2D *actor, int guestView, wxString text, double x, double y ,double z);
 
   void ShowVTKDataAsVMESurface( vtkPolyData *vmeVTKData, 
@@ -294,12 +224,7 @@ protected:
 	void EnableExportImages( bool enable , int color);
 	void OnEventThis(mafEventBase *maf_event);  
 
-	void ExportBLUEView();
-
-	void ExportGREENView();
-
-	void ExportREDView();
-
+	
 	enum {
 		X_RULER=0,
 		Y_RULER=1,
@@ -324,12 +249,7 @@ protected:
 	/** This function is called when a rotate gizmo is moved*/
 	void OnEventGizmoCrossRotateZNormalView(mafEventBase *maf_event);
 
-	/** Update export images bounds lines actors only if needed*/
-	void UpdateExportImagesBoundsLineActors();
-
-	void UpdateXView2DActors();
-	void UpdateYView2DActors();
-
+	
 	void UpdateYnViewZPlanes();
 
 	void ShowRulerVMEVector(vector<mafVMESurface *> &rulerVector, 
@@ -340,15 +260,11 @@ protected:
   vector<vtkCaptionActor2D *> &captionActorVector, 
   int guestView);
 
-	void UpdateZView2DActors();
-
+	
 	/**	This function is called when a translate gizmo is moved*/
 	void OnEventGizmoCrossTranslateZNormalView(mafEventBase *maf_event);
 
 	void PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , mafGizmoCrossRotateTranslate *targetGizmo);
-
-	/** Recalculate the RX projection for the three slicers and display it */
-	void UpdateAllViewsThickness();
 
 	/** structured points only: create rx projection for the given slicer normal and set it as slicer texture.	
 	If rxTexture is provided result of the accumulation will be deepcopied to it */
@@ -363,8 +279,6 @@ protected:
 	/** Windowing for volumes data. This function overrides superclass method.*/
 	void VolumeWindowing(mafVME *volume);
 	void OnEventGizmoCrossRotateYNormalView(mafEventBase *maf_event);
-
-	void GetLeftRightLettersFromCamera( double viewUp[3], double viewPlaneNormal[3], wxString &leftLetter, wxString &rightLetter);
 
 	void OnEventGizmoCrossRTXNormalView( mafEventBase * maf_event );
 
@@ -395,36 +309,17 @@ protected:
 	mafPipeSurface * GetPipe(int inView, mafVMESurface *inSurface);
 
 	void HideAllCutPlanes();
-	void OnID_CHOOSE_DIR();
-	void OnEventID_ENABLE_EXPORT_IMAGES(int axis);
-
 	void ShowCutPlanes( int axis , bool show);
 
-	/** Write on file the texture slice from the selected view */
-	void SaveSlicesTextureToFile(int choosedExportAxis);
 
-	/** Write on file the full render window from the selected view */
-	void SaveSlicesFromRenderWindowToFile(int chooseExportAxis);
-
-	void OnEventID_ENABLE_THICKNESS(int color);
-
-	void EnableThickness(bool enable, int color);
-
-	void EnableThicknessGUI( bool enable , int color);
-
+		
 	/** Recompute all slicers output */
 	void UpdateSlicers(int axis);
 
-	void OnEventID_THICKNESS_VALUE_CHANGED(int color);
-	void OnEventID_EXPORT_PLANES_HEIGHT(int color);
-
+	
 	void CreateViewCameraNormalFeedbackActor(double col[3], int view);
-	void DestroyViewCameraNormalFeedbackActor(int view);
-	void ThicknessComboAssignment(int axis);
 	void UpdateWindowing(bool enable,mafVME *vme);
-	void UpdateThickness( int axis);
-	void ShowSliceHeight2DTextActors( bool show , int color);
-  
+	
 	mafViewVTK *m_ViewSliceX;
 	mafViewVTK *m_ViewSliceY;
 	mafViewVTK *m_ViewSliceZ;
@@ -509,18 +404,8 @@ protected:
 	int m_FeedbackLineHeight[3];
 	int m_NumberOfAxialSections[3];
 	int m_ExportPlanesHeight[3];
-
-	int m_EnableExportImages[3];
+		
 	
-	// Enable RX like accumulation: corresponding point scalar values are added and the resulting number is divided
-	// by the number of slices 
-	int m_EnableThickness[3]; 
-
-	double m_ThicknessValue[3];
-	int m_ThicknessComboAssignment[3];
-
-	wxString m_PathFromDialog;
-
 	/** Enable debug facilities */
 	bool m_DebugMode;
 
