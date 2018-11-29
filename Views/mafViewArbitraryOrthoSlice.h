@@ -144,10 +144,6 @@ public:
 	/** Function that handles events sent from other objects. */
 	virtual void OnEvent(mafEventBase *maf_event);
 
-	void GenerateMoveEvent( mafInteractorCameraPicker * picker, double * pickedPointCoordinates );
-	void OnEventGizmoCrossRTZNormalView( mafEventBase * maf_event );
-	void OnEventGizmoCrossRTYNormalView( mafEventBase * maf_event );
-
 	/** Function that clones instance of the object. */
 	virtual mafView* Copy(mafObserver *Listener, bool lightCopyEnabled = false);
 
@@ -155,11 +151,8 @@ public:
 	virtual void UpdateSubviewsCamerasToFaceSlices();
 
 protected:
-
 	
-	bool BelongsToXNormalGizmo( mafVME * vme );
-	bool BelongsToYNormalGizmo( mafVME * vme );
-	bool BelongsToZNormalGizmo( mafVME * vme );
+	bool BelongsToNormalGizmo( mafVME * vme, int side );
 
 	void ShowVolume( mafVME * vme, bool show );
 		
@@ -185,12 +178,7 @@ protected:
 
 	void HideVolume();
 
-	/* Update slicer settings according to m_CurrentVolume*/
-	void UpdateSlicerZBehavior();
-
-	/** Enable picking on slicers */
-	void EnableSlicersPicking(bool enable);
-
+		
 	/** Internally used to create a new instance of the GUI. 
 	This function should be overridden by subclasses to create specialized GUIs. 
 	Each subclass should append its own widgets and define the enum of IDs for the widgets as 
@@ -229,13 +217,10 @@ protected:
 	void VolumeWindowing(mafVME *volume);
 	void OnEventGizmoRotate(mafEventBase *maf_event, int side);
 
-	void OnEventGizmoCrossRTXNormalView( mafEventBase * maf_event );
+	void SetSlices();
 
 	void ChildViewsCameraUpdate();
-
-	void ShowVMESurfacesVector( vector<mafVMESurface *> &inVector, int view, bool show );
-
-	
+		
 	mafPipeSurface * GetPipe(int inView, mafVMESurface *inSurface);
 			
 	/** Recompute all slicers output */
@@ -309,16 +294,9 @@ protected:
 	int m_FeedbackLineHeight[3];
 	int m_NumberOfAxialSections[3];
 		
-	
 	/** Enable debug facilities */
 	bool m_DebugMode;
-
-	mafInteractorCameraPicker *m_XSlicerPicker;
-	mafInteractorCameraPicker *m_YSlicerPicker;
-	mafInteractorCameraPicker *m_ZSlicerPicker;
-
-	mafString m_ThicknessText[3];
-
+	
 	enum {RED=0, GREEN, BLUE, NUMBER_OF_COLORS =3};
 };
 

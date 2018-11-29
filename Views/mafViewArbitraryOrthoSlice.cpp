@@ -135,17 +135,7 @@ enum AXIS_ID
 //----------------------------------------------------------------------------
 mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label) : mafViewCompoundWindowing(label, 2, 2)
 {
-
-	m_ThicknessText[RED] = "UNDEFINED_THICKNESS_RED_TEXT";
-	m_ThicknessText[GREEN] = "UNDEFINED_THICKNESS_GREEN_TEXT";
-	m_ThicknessText[BLUE] = "UNDEFINED_THICKNESS_BLUE_TEXT";
-
-	m_XSlicerPicker = NULL;
-	m_YSlicerPicker = NULL;
-	m_ZSlicerPicker = NULL;
-
 	m_DebugMode = false;
-
 
 	m_NumberOfAxialSections[RED] = 3;
 	m_NumberOfAxialSections[GREEN] = 3;
@@ -221,17 +211,6 @@ mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label) : mafView
 //----------------------------------------------------------------------------
 mafViewArbitraryOrthoSlice::~mafViewArbitraryOrthoSlice()
 {
-	mafDEL(m_XSlicerPicker);
-	mafDEL(m_XSlicerPicker);
-
-
-
-
-	m_SlicerZResetMatrix   = NULL;
-	m_CurrentVolume = NULL;
-	m_CurrentImage  = NULL;
-	m_ColorLUT      = NULL;
-
 	cppDEL(m_GizmoZView);
 }
 //----------------------------------------------------------------------------
@@ -245,7 +224,6 @@ void mafViewArbitraryOrthoSlice::PackageView()
 	CreateAndPlugSliceView(2);
 	CreateAndPlugSliceView(0);
 	CreateAndPlugSliceView(1);
-
 }
 
 //----------------------------------------------------------------------------
@@ -274,17 +252,17 @@ void mafViewArbitraryOrthoSlice::VmeShow(mafVME *vme, bool show)
 {
 	if (vme->IsA("mafVMEGizmo"))
 	{
-		if (BelongsToZNormalGizmo(vme))
+		if (BelongsToNormalGizmo(vme,Z))
 		{
 			m_ChildViewList[Z_VIEW]->VmeShow(vme, show);
 			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
 		}
-		else if (BelongsToXNormalGizmo(vme))
+		else if (BelongsToNormalGizmo(vme, X))
 		{
 			m_ChildViewList[X_VIEW]->VmeShow(vme, show);
 			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
 		}
-		else if (BelongsToYNormalGizmo(vme))
+		else if (BelongsToNormalGizmo(vme, Y))
 		{
 			m_ChildViewList[Y_VIEW]->VmeShow(vme, show);
 			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
@@ -347,72 +325,20 @@ void mafViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 	}
 	else if (maf_event->GetId() == ID_TRANSFORM)
 	{	
-		if (maf_event->GetSender() == m_GizmoZView->m_GizmoCrossRotate || maf_event->GetSender() == m_GizmoZView->m_GizmoCrossTranslate)
-		{	
-			OnEventGizmoCrossRTZNormalView(maf_event);
-		}		
-		else if (maf_event->GetSender() == m_GizmoYView->m_GizmoCrossRotate || maf_event->GetSender() == m_GizmoYView->m_GizmoCrossTranslate)
-		{
-			OnEventGizmoCrossRTYNormalView(maf_event);
-		}
-		else if (maf_event->GetSender() == m_GizmoXView->m_GizmoCrossRotate || maf_event->GetSender() == m_GizmoXView->m_GizmoCrossTranslate)
-		{
-			OnEventGizmoCrossRTXNormalView(maf_event);
-		}
+		if (maf_event->GetSender() == m_GizmoZView->m_GizmoCrossTranslate)
+			OnEventGizmoTranslate(maf_event, Z);
+		else if (maf_event->GetSender() == m_GizmoZView->m_GizmoCrossRotate) // from rotation gizmo
+			OnEventGizmoRotate(maf_event, Z);
+		else if (maf_event->GetSender() == m_GizmoYView->m_GizmoCrossTranslate)
+			OnEventGizmoTranslate(maf_event, Y);
+		else if (maf_event->GetSender() == m_GizmoYView->m_GizmoCrossRotate) // from rotation gizmo
+			OnEventGizmoRotate(maf_event, Y);
+		if (maf_event->GetSender() == m_GizmoXView->m_GizmoCrossTranslate)
+			OnEventGizmoTranslate(maf_event, X);
+		else if (maf_event->GetSender() == m_GizmoXView->m_GizmoCrossRotate) // from rotation gizmo
+			OnEventGizmoRotate(maf_event, X);
 		else
-		{
-			// if no one can handle this event send it to the operation listener
-
 			mafEventMacro(*maf_event); 
-		}	
-	}
-	else if (maf_event->GetId() == VME_PICKED)
-	{
-		// wxMessageBox("Hello!");
-
-		mafEvent *event = mafEvent::SafeDownCast(maf_event);
-		assert(event);
-
-		double pickedPointCoordinates[3];  
-		vtkPoints *pickedPoint = NULL; 
-		pickedPoint = (vtkPoints *)event->GetVtkObj();
-		pickedPoint->GetPoint(0,pickedPointCoordinates);
-
-		using namespace::std;
-
-		string pickedSliceName;
-		if (event->GetSender() == m_XSlicerPicker)
-		{
-			pickedSliceName = m_XSlicerPicker->GetName();
-
-			mafInteractorCameraPicker *picker = m_XSlicerPicker;
-			GenerateMoveEvent(picker, pickedPointCoordinates);
-
-		}
-		else if (event->GetSender() == m_YSlicerPicker)
-		{
-			pickedSliceName = m_YSlicerPicker->GetName();
-
-			mafInteractorCameraPicker *picker = m_YSlicerPicker;
-			GenerateMoveEvent(picker, pickedPointCoordinates);
-
-		}
-		else if (event->GetSender() == m_ZSlicerPicker)
-		{
-			pickedSliceName = m_ZSlicerPicker->GetName();
-
-			mafInteractorCameraPicker *picker = m_ZSlicerPicker;
-			GenerateMoveEvent(picker, pickedPointCoordinates);
-		}
-
-		UpdateSlicersLUT();
-
-		// DEBUG
-		std::ostringstream stringStream;
-		stringStream << "picked: " << pickedSliceName << std::endl;
-		stringStream << "on position: " << pickedPointCoordinates[0] << " " << pickedPointCoordinates[1] << " " << pickedPointCoordinates[2] << std::endl;
-		mafLogMessage(stringStream.str().c_str());
-
 	}
 	else
 	{
@@ -526,7 +452,6 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoRotate(mafEventBase *maf_event, int
 		}
 	}
 }
-
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::SetSlices()
 {
@@ -560,8 +485,6 @@ void mafViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 	{
 		switch(e->GetId()) 
 		{
-		case VME_PICKED:
-			wxMessageBox("pick!");		
 		break;
 		case ID_RANGE_MODIFIED:
 			OnLUTRangeModified();
@@ -600,22 +523,10 @@ mafGUI* mafViewArbitraryOrthoSlice::CreateGui()
 {
 	assert(m_Gui == NULL);
 	m_Gui = mafView::CreateGui();
-
-	//button to reset at the sta
 	m_Gui->Label("");
-	m_Gui->Label(_("CTRL + MOUSE LEFT click"),true);
-	m_Gui->Label("moves the cross on picked point");
-	m_Gui->Divider(2);
-
-	//m_Gui->Label("reset slices", true);
 	m_Gui->Button(ID_RESET,_("reset slices"),"");
-
-
 	m_Gui->Divider();
-
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
-
-	
 	m_Gui->Update();
 		
 	EnableWidgets( (m_CurrentVolume != NULL) );
@@ -648,43 +559,8 @@ void mafViewArbitraryOrthoSlice::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *maf_event)
 {  
-	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-	{
-		// for every slicer:
-
-		const int numSlicers = 3;
-		mafVMESlicer *slicers[numSlicers] = {m_SlicerX, m_SlicerY, m_SlicerZ};
-
-		long arg = e->GetArg();
-
-		for (int i = 0; i < numSlicers; i++)
-		{
-			// handle incoming transform events
-			// print matrix
-			vtkTransform *tr = vtkTransform::New();
-
-
-			tr->PostMultiply();
-			tr->SetMatrix(slicers[i]->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
-			tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
-			tr->Update();
-
-			mafMatrix absPose;
-			absPose.DeepCopy(tr->GetMatrix());
-			absPose.SetTimeStamp(slicers[i]->GetTimeStamp());
-
-			if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
-			{
-				// move vme
-				slicers[i]->SetAbsMatrix(absPose);
-			} 
-
-			// clean up
-			tr->Delete();
-		}
-
-		UpdateSlicersLUT();
-	}
+	for (int i = 0; i < 3; i++)
+		PostMultiplyEventMatrixToSlicer(maf_event, i);
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *maf_event, int slicerAxis)
@@ -696,17 +572,11 @@ void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *m
 		mafVMESlicer *currentSlicer = NULL;
 
 		if (slicerAxis == X)
-		{
 			currentSlicer = m_SlicerX;
-		}
 		else if (slicerAxis == Y)
-		{
 			currentSlicer = m_SlicerY;
-		}
 		else if (slicerAxis == Z)
-		{
 			currentSlicer = m_SlicerZ;
-		}
 
 		assert(currentSlicer != NULL);
 
@@ -726,8 +596,6 @@ void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *m
 			// ... and update the slicer with the new abs pose
 			currentSlicer->SetAbsMatrix(absPose);
 		} 
-
-		UpdateSlicersLUT();
 
 		// clean up
 		tr->Delete();
@@ -780,56 +648,6 @@ void mafViewArbitraryOrthoSlice::EnableWidgets(bool enable)
 
 	m_LutSlider->Enable(enable);
 }
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateSlicerZBehavior()
-{	
-	if(m_CurrentVolume->GetBehavior())
-	{
-		m_SlicerX->SetBehavior(m_CurrentVolume->GetBehavior());
-		m_SlicerY->SetBehavior(m_CurrentVolume->GetBehavior());
-		m_SlicerZ->SetBehavior(m_CurrentVolume->GetBehavior());
-
-		// perspective view
-		mafPipeSurfaceTextured *pipePerspectiveViewSlicerX=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerX);
-		pipePerspectiveViewSlicerX->SetActorPicking(true);
-
-		mafPipeSurfaceTextured *pipePerspectiveViewSlicerY=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerY);
-		pipePerspectiveViewSlicerY->SetActorPicking(true);
-
-		mafPipeSurfaceTextured *pipePerspectiveViewSlicerZ=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerZ);
-		pipePerspectiveViewSlicerZ->SetActorPicking(true);
-
-		EnableSlicersPicking(true);
-	}
-	else
-	{
-		m_SlicerZ->SetBehavior(NULL);
-		m_SlicerZ->SetBehavior(NULL);
-		m_SlicerZ->SetBehavior(NULL);
-
-		// perspective view
-		mafPipeSurfaceTextured *pipePerspectiveViewSlicerX=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerX);
-		pipePerspectiveViewSlicerX->SetActorPicking(false);
-
-		mafPipeSurfaceTextured *pipePerspectiveViewSlicerY=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerY);
-		pipePerspectiveViewSlicerY->SetActorPicking(false);
-
-		mafPipeSurfaceTextured *pipePerspectiveViewSlicerZ=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerZ);
-		pipePerspectiveViewSlicerZ->SetActorPicking(false);
-
-		// x view
-		mafPipeSurfaceTextured *pipeXViewSlicerX=(mafPipeSurfaceTextured *)(m_ChildViewList[X_VIEW])->GetNodePipe(m_SlicerX);
-		pipeXViewSlicerX->SetActorPicking(false);
-
-		// y view
-		mafPipeSurfaceTextured *pipeYViewSlicerY=(mafPipeSurfaceTextured *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_SlicerY);
-		pipeYViewSlicerY->SetActorPicking(false);
-
-		// z view
-		mafPipeSurfaceTextured *pipeZViewSlicerZ=(mafPipeSurfaceTextured *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_SlicerZ);
-		pipeZViewSlicerZ->SetActorPicking(false);
-	}
-};
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::VolumeWindowing(mafVME *volume)
 {
@@ -933,6 +751,7 @@ void mafViewArbitraryOrthoSlice::ShowVolume( mafVME * vme, bool show )
 	vtkDEL(transformReset);
 
 	VolumeWindowing(vme);
+	UpdateSlicersLUT();
 }
 
 //----------------------------------------------------------------------------
@@ -1028,9 +847,9 @@ void mafViewArbitraryOrthoSlice::OnLUTChooser()
 	}
 }
 //----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
+void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 {
-	EnableWidgets( (m_CurrentVolume != NULL) );
+	EnableWidgets((m_CurrentVolume != NULL));
 	// register sliced volume
 	m_InputVolume = mafVMEVolumeGray::SafeDownCast(vmeVolume);
 	assert(m_InputVolume);
@@ -1095,50 +914,21 @@ void mafViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 
 	BuildZCameraConeVME();
 
-	mafPipeSurfaceTextured *pipePerspectiveViewZ=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerZ);
+	mafPipeSurfaceTextured *pipePerspectiveViewZ = (mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerZ);
 	pipePerspectiveViewZ->SetActorPicking(false);
 	pipePerspectiveViewZ->SetEnableActorLOD(0);
 
-	mafPipeSurfaceTextured *pipeZView=(mafPipeSurfaceTextured *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_SlicerZ);
+	mafPipeSurfaceTextured *pipeZView = (mafPipeSurfaceTextured *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_SlicerZ);
 	pipeZView->SetActorPicking(false);
 	pipeZView->SetEnableActorLOD(0);
 
-	UpdateSlicerZBehavior();
-
-	const int numViews = 3;
-
-	int sliceViewsId[numViews] =
+	if (m_AttachCameraToSlicerXInXView == NULL && m_AttachCameraToSlicerYInYView == NULL &&	m_AttachCameraToSlicerZInZView == NULL)
 	{
-		X_VIEW,
-			Y_VIEW,
-			Z_VIEW
-	};
-
-	if(m_AttachCameraToSlicerXInXView == NULL &&
-		m_AttachCameraToSlicerYInYView == NULL &&
-		m_AttachCameraToSlicerZInZView == NULL)
-	{
-		m_AttachCameraToSlicerXInXView=new mafAttachCamera(m_Gui,((mafViewVTK*)m_ChildViewList[X_VIEW])->m_Rwi,this);
-		m_AttachCameraToSlicerYInYView=new mafAttachCamera(m_Gui,((mafViewVTK*)m_ChildViewList[Y_VIEW])->m_Rwi,this);
-		m_AttachCameraToSlicerZInZView=new mafAttachCamera(m_Gui,((mafViewVTK*)m_ChildViewList[Z_VIEW])->m_Rwi,this);
+		m_AttachCameraToSlicerXInXView = new mafAttachCamera(m_Gui, ((mafViewVTK*)m_ChildViewList[X_VIEW])->m_Rwi, this);
+		m_AttachCameraToSlicerYInYView = new mafAttachCamera(m_Gui, ((mafViewVTK*)m_ChildViewList[Y_VIEW])->m_Rwi, this);
+		m_AttachCameraToSlicerZInZView = new mafAttachCamera(m_Gui, ((mafViewVTK*)m_ChildViewList[Z_VIEW])->m_Rwi, this);
 	}
-
-	assert(m_AttachCameraToSlicerXInXView);
-	assert(m_AttachCameraToSlicerYInYView);
-	assert(m_AttachCameraToSlicerZInZView);
-
-	const int numCameras = 3;
-
-	mafAttachCamera *attachCameras[numCameras] = 
-	{
-		m_AttachCameraToSlicerXInXView, 
-			m_AttachCameraToSlicerYInYView, 
-			m_AttachCameraToSlicerZInZView
-	};
-
-	const int numSlicers = 3;
-	mafVMESlicer *slicers[numSlicers] = {m_SlicerX, m_SlicerY, m_SlicerZ};
-
+	
 	m_AttachCameraToSlicerXInXView->SetStartingMatrix(m_SlicerX->GetOutput()->GetAbsMatrix());
 	m_AttachCameraToSlicerXInXView->SetVme(m_SlicerZ);
 	m_AttachCameraToSlicerXInXView->EnableAttachCamera();
@@ -1202,13 +992,11 @@ void mafViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_GizmoXView->Show(true);
 
 	//Create the Gizmos' Gui
-	if(!m_GuiGizmos)
+	if (!m_GuiGizmos)
 		m_GuiGizmos = new mafGUI(this);
 
-	// m_GuiGizmos->AddGui(m_GizmoZView->m_GizmoCrossTranslate->GetGui());
-	// m_GuiGizmos->AddGui(m_GizmoZView->m_GizmoCrossRotate->GetGui());
-	m_GuiGizmos->Update();
-	if(m_Gui == NULL) CreateGui();
+		m_GuiGizmos->Update();
+	if (m_Gui == NULL) CreateGui();
 	m_Gui->AddGui(m_GuiGizmos);
 	m_Gui->FitGui();
 	m_Gui->Update();
@@ -1218,45 +1006,17 @@ void mafViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_SlicerZ->SetVisibleToTraverse(false);
 
 	UpdateSubviewsCamerasToFaceSlices();
-
 	BuildSliceHeightFeedbackLinesVMEs();
 
-	// out: slicer to use
-	mafVMESlicer *targetSlicer;
-
-	// out: slicer abs matrix for volume cut
-	vtkMatrix4x4 *outputMatrix = vtkMatrix4x4::New();
-
-	vtkDEL(outputMatrix);
-
-	double red[3] = {1,0,0};
+	
+	double red[3] = { 1,0,0 };
 	CreateViewCameraNormalFeedbackActor(red, X_VIEW);
 
-	double green[3] = {0,1,0};
+	double green[3] = { 0,1,0 };
 	CreateViewCameraNormalFeedbackActor(green, Y_VIEW);
 
-	double blue[3] = {0,0,1};
+	double blue[3] = { 0,0,1 };
 	CreateViewCameraNormalFeedbackActor(blue, Z_VIEW);
-
-	// create the pick interactor for slicer X
-	m_XSlicerPicker = mafInteractorCameraPicker::New();
-	m_XSlicerPicker->SetListener(this);
-	m_XSlicerPicker->SetName("m_XSlicerPicker");
-	m_SlicerX->SetBehavior(m_XSlicerPicker);
-
-	// create the pick interactor for slicer X
-	m_YSlicerPicker = mafInteractorCameraPicker::New();
-	m_YSlicerPicker->SetListener(this);
-	m_YSlicerPicker->SetName("m_YSlicerPicker");
-	m_SlicerY->SetBehavior(m_YSlicerPicker);
-
-	// create the pick interactor for slicer X
-	m_ZSlicerPicker = mafInteractorCameraPicker::New();
-	m_ZSlicerPicker->SetListener(this);
-	m_ZSlicerPicker->SetName("m_ZSlicerPicker");
-	m_SlicerZ->SetBehavior(m_ZSlicerPicker);
-
-	EnableSlicersPicking(true);
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::BuildXCameraConeVME()
@@ -1437,101 +1197,24 @@ void mafViewArbitraryOrthoSlice::BuildZCameraConeVME()
 	CameraReset();
 }
 //----------------------------------------------------------------------------
-bool mafViewArbitraryOrthoSlice::BelongsToZNormalGizmo( mafVME * vme )
+bool mafViewArbitraryOrthoSlice::BelongsToNormalGizmo( mafVME * vme, int side)
 {
+	char nameVect[][13] = { "m_GizmoXView", "m_GizmoYView", "m_GizmoZView" };
+	char *name=nameVect[side];
+
 	mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(vme);
 
 	mafObserver *mediator = NULL;
 	mediator = gizmo->GetMediator();
-
-	mafGizmoCrossTranslate *translate = NULL;
-	translate = dynamic_cast<mafGizmoCrossTranslate *>(mediator);
-	if (translate && translate->GetName().Equals("m_GizmoZView"))
+	
+	mafGizmoInterface *gizmoMediator = NULL;
+	gizmoMediator = dynamic_cast<mafGizmoInterface *>(mediator);
+	if (gizmoMediator && gizmoMediator->GetName().Equals(name))
 		return true;
-
-	mafGizmoCrossRotate *rotate = NULL;
-	rotate = dynamic_cast<mafGizmoCrossRotate *>(mediator);
-	if (rotate && rotate->GetName().Equals("m_GizmoZView"))
-		return true;
-
-	return false;
+	else
+		return false;
 }
-//----------------------------------------------------------------------------
-bool mafViewArbitraryOrthoSlice::BelongsToXNormalGizmo( mafVME * vme )
-{
-	mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(vme);
 
-	mafObserver *mediator = NULL;
-	mediator = gizmo->GetMediator();
-
-	mafGizmoCrossTranslate *translate = NULL;
-	translate = dynamic_cast<mafGizmoCrossTranslate *>(mediator);
-	if (translate && translate->GetName().Equals("m_GizmoXView"))
-		return true;
-
-	mafGizmoCrossRotate *rotate = NULL;
-	rotate = dynamic_cast<mafGizmoCrossRotate *>(mediator);
-	if (rotate && rotate->GetName().Equals("m_GizmoXView"))
-		return true;
-
-	return false;
-}
-//----------------------------------------------------------------------------
-bool mafViewArbitraryOrthoSlice::BelongsToYNormalGizmo( mafVME * vme )
-{
-	mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(vme);
-
-	mafObserver *mediator = NULL;
-	mediator = gizmo->GetMediator();
-
-	mafGizmoCrossTranslate *translate = NULL;
-	translate = dynamic_cast<mafGizmoCrossTranslate *>(mediator);
-	if (translate && translate->GetName().Equals("m_GizmoYView"))
-		return true;
-
-	mafGizmoCrossRotate *rotate = NULL;
-	rotate = dynamic_cast<mafGizmoCrossRotate *>(mediator);
-	if (rotate && rotate->GetName().Equals("m_GizmoYView"))
-		return true;
-
-	return false;
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRTZNormalView( mafEventBase * maf_event )
-{
-	if (maf_event->GetSender() == m_GizmoZView->m_GizmoCrossTranslate)
-	{
-		OnEventGizmoTranslate(maf_event,Z);
-	}
-	else if (maf_event->GetSender() == m_GizmoZView->m_GizmoCrossRotate) // from rotation gizmo
-	{
-		OnEventGizmoRotate(maf_event, Z);
-	}
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRTYNormalView( mafEventBase * maf_event )
-{
-	if (maf_event->GetSender() == m_GizmoYView->m_GizmoCrossTranslate)
-	{
-		OnEventGizmoTranslate(maf_event, Y);
-	}
-	else if (maf_event->GetSender() == m_GizmoYView->m_GizmoCrossRotate) // from rotation gizmo
-	{
-		OnEventGizmoRotate(maf_event,Y);
-	}
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRTXNormalView( mafEventBase * maf_event )
-{
-	if (maf_event->GetSender() == m_GizmoXView->m_GizmoCrossTranslate)
-	{
-		OnEventGizmoTranslate(maf_event, X);
-	}
-	else if (maf_event->GetSender() == m_GizmoXView->m_GizmoCrossRotate) // from rotation gizmo
-	{
-		OnEventGizmoRotate(maf_event, X);
-	}
-}
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , mafGizmoCrossRotateTranslate *targetGizmo )
 {
@@ -1804,46 +1487,6 @@ void mafViewArbitraryOrthoSlice::CreateViewCameraNormalFeedbackActor(double col[
 	vtkDEL(m_Border);
 }
 
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::EnableSlicersPicking(bool enable)
-{
-	// x view
-	mafPipeSurfaceTextured *pipeXViewSlicerX=(mafPipeSurfaceTextured *)(m_ChildViewList[X_VIEW])->GetNodePipe(m_SlicerX);
-	pipeXViewSlicerX->SetActorPicking(enable);
-	pipeXViewSlicerX->ShowAxisOff();
-	pipeXViewSlicerX->SelectionActorOff();
-
-	// y view
-	mafPipeSurfaceTextured *pipeYViewSlicerY=(mafPipeSurfaceTextured *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_SlicerY);
-	pipeYViewSlicerY->SetActorPicking(enable);
-	pipeYViewSlicerY->ShowAxisOff();
-	pipeYViewSlicerY->SelectionActorOff();
-
-	// z view
-	mafPipeSurfaceTextured *pipeZViewSlicerZ=(mafPipeSurfaceTextured *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_SlicerZ);
-	pipeZViewSlicerZ->SetActorPicking(enable);
-	pipeZViewSlicerZ->ShowAxisOff();
-	pipeZViewSlicerZ->SelectionActorOff();
-
-	// perspective X slicer
-	mafPipeSurfaceTextured *pipePerspectiveViewSlicerX=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerX);
-	pipePerspectiveViewSlicerX->SetActorPicking(false);
-	pipePerspectiveViewSlicerX->ShowAxisOff();
-	pipePerspectiveViewSlicerX->SelectionActorOff();
-
-	// perspective Y slicer
-	mafPipeSurfaceTextured *pipePerspectiveViewSlicerY=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerY);
-	pipePerspectiveViewSlicerY->SetActorPicking(false);
-	pipePerspectiveViewSlicerY->ShowAxisOff();
-	pipePerspectiveViewSlicerY->SelectionActorOff();
-
-	// perspective Z slicer
-	mafPipeSurfaceTextured *pipePerspectiveViewSlicerZ=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerZ);
-	pipePerspectiveViewSlicerZ->SetActorPicking(false);
-	pipePerspectiveViewSlicerZ->ShowAxisOff();
-	pipePerspectiveViewSlicerZ->SelectionActorOff();
-
-}
 
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSlicersLUT()
@@ -1877,84 +1520,3 @@ void mafViewArbitraryOrthoSlice::UpdateWindowing(bool enable,mafVME *vme)
 		VolumeWindowing(vme);
 	}
 }
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::GenerateMoveEvent( mafInteractorCameraPicker * picker, double * pickedPointCoordinates )
-{
-	mafGizmoCrossRotateTranslate *gizmo = NULL;
-
-	if (picker == m_XSlicerPicker)
-	{
-		gizmo = m_GizmoXView;
-	}
-	else if (picker == m_YSlicerPicker)
-	{
-		gizmo = m_GizmoYView;
-	}
-	else if (picker == m_ZSlicerPicker)
-	{
-		gizmo = m_GizmoZView;
-	}
-
-	vtkMatrix4x4 *gizmoStartMatrix = gizmo->GetAbsPose()->GetVTKMatrix();
-
-	double startPosition[3]; 
-	double endPosition[3];
-	double delta[3];
-
-	mafMatrix mat;
-	mat.DeepCopy(gizmoStartMatrix);     
-	mafTransform::GetPosition(gizmoStartMatrix, startPosition);
-
-	mafMatrix ngm;
-	ngm.DeepCopy(gizmoStartMatrix);
-
-	endPosition[0] = pickedPointCoordinates[0];
-	endPosition[1] = pickedPointCoordinates[1];
-	endPosition[2] = pickedPointCoordinates[2];
-
-	delta[0] = endPosition[0] - startPosition[0];
-	delta[1] = endPosition[1] - startPosition[1];
-	delta[2] = endPosition[2] - startPosition[2];
-
-	mafTransform::SetPosition(ngm, endPosition);
-
-	mafMatrix matrixToSend;
-	mafTransform::SetPosition(matrixToSend, delta);
-
-	mafEvent fakeEvent;
-	fakeEvent.SetId(ID_TRANSFORM);
-	fakeEvent.SetMatrix(&matrixToSend);
-	fakeEvent.SetArg(mafInteractorGenericMouse::MOUSE_MOVE);
-
-	if (picker == m_XSlicerPicker)
-	{
-		OnEventGizmoTranslate(&fakeEvent, X);
-	}
-	else if (picker == m_YSlicerPicker)
-	{
-		OnEventGizmoTranslate(&fakeEvent, Y);
-	}
-	else if (picker == m_ZSlicerPicker)
-	{
-		OnEventGizmoTranslate(&fakeEvent,Z);
-	}
-
-	gizmo->SetAbsPose(&ngm);
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowVMESurfacesVector( vector<mafVMESurface *> &inVector, int view, bool show )
-{
-	int size = inVector.size();
-
-	for (int i = 0; i < size; i++)
-	{
-		m_ChildViewList[view]->VmeShow(inVector[i], show);
-
-		mafPipeSurface *pipe = NULL;
-
-		pipe = GetPipe(view, inVector[i]);
-		if (pipe) pipe->SetActorPicking(false);
-
-	}
-}
-
