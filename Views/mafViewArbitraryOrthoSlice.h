@@ -53,13 +53,9 @@ class mafGUILutSwatch;
 class mafVMEPolylineEditor;
 class mafGizmoCrossRotateTranslate;
 
-/**
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!WORK IN PROGRESS: DO NOT USE!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-Class Name: mafViewArbitraryOrthoSlice.
 
-OrthoSlice-ArbitrarySlice mix early prototype.
+/*
+OrthoSlice-ArbitrarySlice
 
 This compound view features three volume slice planes that can be controlled
 by using three roto translation gizmos.
@@ -111,7 +107,7 @@ class MAF_EXPORT mafViewArbitraryOrthoSlice: public mafViewCompoundWindowing
 	*/
 public:
 	/** constructor*/
-	mafViewArbitraryOrthoSlice(wxString label = "View Arbitrary OrthoSlice with Windowing", bool show_ruler = false);
+	mafViewArbitraryOrthoSlice(wxString label = "View Arbitrary OrthoSlice with Windowing");
 
 	/** destructor*/
 	virtual ~mafViewArbitraryOrthoSlice(); 
@@ -125,13 +121,13 @@ public:
 		ID_RESET,
 		ID_SHOW_GIZMO,
 		ID_UPDATE_LUT, 
-		ID_SHOW_RULER,
-		ID_HIDE_RULER,
 		ID_LAST,
 	};
 
 	/** Create visual pipe and initialize them to build an OrthoSlice visualization */
 	virtual void PackageView();
+
+	void CreateAndPlugSliceView(int v);
 
 	/** Show/Hide VMEs into plugged sub-views*/
 	virtual void VmeShow(mafVME *vme, bool show);
@@ -165,12 +161,7 @@ protected:
 	bool BelongsToYNormalGizmo( mafVME * vme );
 	bool BelongsToZNormalGizmo( mafVME * vme );
 
-	void ShowVMESurfacesAndLandmarks( mafVME * vme );
-
-	void ShowMafVMEImage( mafVME * vme );
-	void HideMafVmeImage();
-
-	void ShowMafVMEVolume( mafVME * vme, bool show );
+	void ShowVolume( mafVME * vme, bool show );
 		
 	void StoreCameraParametersForAllSubviews();
 
@@ -180,13 +171,7 @@ protected:
 	void AddVMEToMSFTree(mafVMESurface *vme);
 
 	enum VIEW_DIRECTION {FROM_X = 0, FROM_Y = 1, FROM_Z = 2};
-	
-	void BuildSlicingPlane( mafVMESurface *inVME, int fromDirection, int guestView,  
-		double sliceHeight, mafVMESlicer* targetSlicer = NULL,
-    vtkMatrix4x4 * outputMatrix = NULL , bool showHeightText = false, vtkCaptionActor2D *captionActor = NULL);
-
-  void ShowCaptionActor(vtkCaptionActor2D *actor, int guestView, wxString text, double x, double y ,double z);
-
+		
   void ShowVTKDataAsVMESurface( vtkPolyData *vmeVTKData, 
 		mafVMESurface *vmeSurface, vtkMatrix4x4 *inputABSMatrix);
 
@@ -198,7 +183,7 @@ protected:
 	void BuildYCameraConeVME();
 	void BuildZCameraConeVME();
 
-	void HideMafVMEVolume();
+	void HideVolume();
 
 	void ShowMafVMEMesh(mafVME *vme);
 
@@ -221,18 +206,9 @@ protected:
 	/** Enable/disable view widgets.*/
 	void EnableWidgets(bool enable = true);
 
-	void EnableExportImages( bool enable , int color);
 	void OnEventThis(mafEventBase *maf_event);  
 
 	
-	enum {
-		X_RULER=0,
-		Y_RULER=1,
-		Z_RULER=2,
-	};
-
-	void ShowRuler( int ruler , bool show);
-
 	void OnLUTChooser();
 	void OnLUTRangeModified();
 
@@ -248,28 +224,12 @@ protected:
 
 	/** This function is called when a rotate gizmo is moved*/
 	void OnEventGizmoCrossRotateZNormalView(mafEventBase *maf_event);
-
-	
-	void UpdateYnViewZPlanes();
-
-	void ShowRulerVMEVector(vector<mafVMESurface *> &rulerVector, 
-  vector<vtkCaptionActor2D *> &captionActorVector,
-  int fromDirection, int guestView);
-
-	void HideRulerVMEVector(vector<mafVMESurface *> &rulerVector, 
-  vector<vtkCaptionActor2D *> &captionActorVector, 
-  int guestView);
-
-	
+			
 	/**	This function is called when a translate gizmo is moved*/
 	void OnEventGizmoCrossTranslateZNormalView(mafEventBase *maf_event);
 
 	void PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , mafGizmoCrossRotateTranslate *targetGizmo);
-
-	/** structured points only: create rx projection for the given slicer normal and set it as slicer texture.	
-	If rxTexture is provided result of the accumulation will be deepcopied to it */
-	void AccumulateTextures(mafVMESlicer *inSlicer, double inRXThickness , vtkImageData *outRXTexture = NULL , bool showProgressBar = false);
-
+	
 	/** Post multiply maf_event matrix to given slicer */
 	void PostMultiplyEventMatrixToSlicer(mafEventBase *maf_event, int slicerAxis);
 
@@ -289,42 +249,19 @@ protected:
 	void OnEventGizmoCrossTranslateXNormalView(mafEventBase *maf_event);
 	void OnEventGizmoCrossTranslateYNormalView(mafEventBase *maf_event);
 
-	void UpdateXnViewZPlanes();
-	void UpdateYnViewXPlanes();
-	void UpdateXnViewYPlanes();
-	void UpdateZnViewYPlanes();
-	void UpdateZnViewXPlanes();
-
-	void UpdateXCutPlanes();
-	void ShowXCutPlanes( bool show );
-
 	void ShowVMESurfacesVector( vector<mafVMESurface *> &inVector, int view, bool show );
 
-	void UpdateZCutPlanes();
-	void ShowZCutPlanes(bool show);
-
-	void UpdateYCutPlanes();
-	void ShowYCutPlanes( bool show );
-
+	
 	mafPipeSurface * GetPipe(int inView, mafVMESurface *inSurface);
-
-	void HideAllCutPlanes();
-	void ShowCutPlanes( int axis , bool show);
-
-
-		
+			
 	/** Recompute all slicers output */
 	void UpdateSlicers(int axis);
 
-	
 	void CreateViewCameraNormalFeedbackActor(double col[3], int view);
 	void UpdateWindowing(bool enable,mafVME *vme);
 	
-	mafViewVTK *m_ViewSliceX;
-	mafViewVTK *m_ViewSliceY;
-	mafViewVTK *m_ViewSliceZ;
-
-	mafViewVTK *m_ViewArbitrary;
+	mafViewVTK *m_ViewSlice[3];
+	mafViewVTK *m_View3d;
 
 	mafVME          	*m_CurrentVolume;
 	mafVME				    *m_CurrentImage;
@@ -376,34 +313,18 @@ protected:
 
 	// Xn view cut feedback gizmos
 	vector<mafVMESurface *> m_ViewXnSliceYBoundsVMEVector;
-  vector<mafVMESurface *> m_ViewXnSliceYRulerVMEVector;
-  vector<vtkCaptionActor2D *> m_ViewXnSliceYRulerTextActorsVector;
-  
 	vector<mafVMESurface *> m_ViewXnSliceZBoundsVMEVector;
-	vector<mafVMESurface *> m_ViewXnSliceZRulerVMEVector;
-  vector<vtkCaptionActor2D *> m_ViewXnSliceZRulerTextActorsVector;
 
 	// Yn view cut feedback gizmos
 	vector<mafVMESurface *> m_ViewYnSliceZBoundsVMEVector;
-  vector<mafVMESurface *> m_ViewYnSliceZRulerVMEVector;
-  vector<vtkCaptionActor2D *> m_ViewYnSliceZRulerTextActorsVector;
-
 	vector<mafVMESurface *> m_ViewYnSliceXBoundsVMEVector;
-	vector<mafVMESurface *> m_ViewYnSliceXRulerVMEVector;
-  vector<vtkCaptionActor2D *> m_ViewYnSliceXRulerTextActorsVector;
 
 	// Zn view cut feedback gizmos
 	vector<mafVMESurface *> m_ViewZnSliceXBoundsVMEVector;
-	vector<mafVMESurface *> m_ViewZnSliceXRulerVMEVector;
-  vector<vtkCaptionActor2D *> m_ViewZnSliceXRulerTextActorsVector;
-
 	vector<mafVMESurface *> m_ViewZnSliceYBoundsVMEVector;
-	vector<mafVMESurface *> m_ViewZnSliceYRulerVMEVector;
-  vector<vtkCaptionActor2D *> m_ViewZnSliceYRulerTextActorsVector;
 
 	int m_FeedbackLineHeight[3];
 	int m_NumberOfAxialSections[3];
-	int m_ExportPlanesHeight[3];
 		
 	
 	/** Enable debug facilities */

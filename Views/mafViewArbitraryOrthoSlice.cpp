@@ -133,7 +133,7 @@ enum AXIS_ID
 };
 
 //----------------------------------------------------------------------------
-mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label, bool show_ruler) : mafViewCompoundWindowing(label, 2, 2)
+mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label) : mafViewCompoundWindowing(label, 2, 2)
 {
 
 	m_ThicknessText[RED] = "UNDEFINED_THICKNESS_RED_TEXT";
@@ -155,22 +155,16 @@ mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label, bool show
 	m_FeedbackLineHeight[GREEN] = 20;
 	m_FeedbackLineHeight[BLUE] = 20;
 
-	m_ExportPlanesHeight[RED] = 20;
-	m_ExportPlanesHeight[GREEN] = 20;
-	m_ExportPlanesHeight[BLUE] = 20;
-
-
+	
 	m_InputVolume = NULL;
 	m_GizmoZView = NULL;
 	m_GizmoYView = NULL;
 	m_GizmoXView = NULL;
 
-	m_ViewArbitrary   = NULL;
+	m_View3d   = NULL;
 
-	m_ViewSliceX       = NULL;
-	m_ViewSliceY       = NULL;
-	m_ViewSliceZ       = NULL;
-
+	m_ViewSlice[0] = m_ViewSlice[1] = m_ViewSlice[2] = NULL;
+	
 	m_SlicerXResetMatrix     = NULL;
 	m_SlicerYResetMatrix     = NULL;
 	m_SlicerZResetMatrix     = NULL;
@@ -178,8 +172,7 @@ mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label, bool show
 	m_ShowGizmo = 1;
 
 	m_CurrentVolume   = NULL;
-	m_CurrentImage    = NULL;
-
+	
 	m_SlicerY = NULL;
 	m_SlicerY = NULL;
 	m_SlicerZ          = NULL;
@@ -246,25 +239,38 @@ mafViewArbitraryOrthoSlice::~mafViewArbitraryOrthoSlice()
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::PackageView()
 {
-	m_ViewArbitrary = new mafViewVTK("",CAMERA_PERSPECTIVE,true,false,0,false,mafAxes::HEAD);
-	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
-	
-	m_ViewArbitrary->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo", NON_VISIBLE);
+	m_View3d = new mafViewVTK("",CAMERA_PERSPECTIVE,true,false,0,false,mafAxes::HEAD);
+	m_View3d->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
+	m_View3d->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo", NON_VISIBLE);
+	PlugChildView(m_View3d);
 
-	m_ViewSliceX = new mafViewVTK("",CAMERA_OS_X,true,false,0,false,mafAxes::HEAD);
-	m_ViewSliceX->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
+	CreateAndPlugSliceView(2);
+	CreateAndPlugSliceView(0);
+	CreateAndPlugSliceView(1);
 
-	m_ViewSliceY = new mafViewVTK("",CAMERA_OS_Y,true,false,0,false,mafAxes::HEAD);
-	m_ViewSliceY->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
-
-	m_ViewSliceZ = new mafViewVTK("",CAMERA_OS_Z,true,false,0,false,mafAxes::HEAD);
-	m_ViewSliceZ->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
-
-	PlugChildView(m_ViewArbitrary);
-	PlugChildView(m_ViewSliceZ);
-	PlugChildView(m_ViewSliceX);
-	PlugChildView(m_ViewSliceY);
 }
+
+//----------------------------------------------------------------------------
+void mafViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
+{
+	m_ViewSlice[v] = new mafViewVTK("", CAMERA_OS_X + v, true, false, 0, false, mafAxes::HEAD);
+	m_ViewSlice[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
+
+	m_ViewSlice[v]->PlugVisualPipe("mafVMEImage", "mafPipeBox", NON_VISIBLE);
+	m_ViewSlice[v]->PlugVisualPipe("mafVMESegmentationVolume", "mafPipeVolumeOrthoSlice");
+	m_ViewSlice[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
+	m_ViewSlice[v]->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
+	m_ViewSlice[v]->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
+	m_ViewSlice[v]->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice");
+	m_ViewSlice[v]->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice");
+	m_ViewSlice[v]->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice");
+	m_ViewSlice[v]->PlugVisualPipe("mafVMEPolylineSpline", "mafPipePolylineSlice");
+	m_ViewSlice[v]->PlugVisualPipe("mafVMEMeter", "mafPipePolyline");
+	m_ViewSlice[v]->PlugVisualPipe("medVMEMuscleWrapper", "mafPipeSurfaceSlice");
+
+	PlugChildView(m_ViewSlice[v]);
+}
+
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::VmeShow(mafVME *vme, bool show)
 {
@@ -304,27 +310,13 @@ void mafViewArbitraryOrthoSlice::VmeShow(mafVME *vme, bool show)
 	{
 		if(vme->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
-			ShowMafVMEVolume(vme, show);
+			ShowVolume(vme, show);
 			StoreCameraParametersForAllSubviews();
 		}
 
-		else if(vme->IsA("mafVMESurface") || vme->IsA("mafVMESurfaceParametric") || vme->IsA("mafVMELandmark") || vme->IsA("mafVMELandmarkCloud"))
-		{
-			// ShowVMESurfacesAndLandmarks(node);
-
-		}
 		else if(vme->IsA("mafVMEPolylineEditor"))
 		{
 			ShowmafVMEPolylineEditor(vme);
-		}
-		else if(vme->IsA("mafVMEMesh"))
-		{
-			ShowMafVMEMesh(vme);
-
-		}
-		else if(vme->IsA("mafVMEImage"))
-		{	
-			ShowMafVMEImage(vme);
 		}
 	}
 	else//if show==false
@@ -336,10 +328,7 @@ void mafViewArbitraryOrthoSlice::VmeShow(mafVME *vme, bool show)
 
 		if(vme->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
-			HideMafVMEVolume();
-		}
-		else if(vme->IsA("mafVMEImage")) {
-			HideMafVmeImage();
+			HideVolume();
 		}
 	}
 
@@ -1056,53 +1045,20 @@ void mafViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 		switch(e->GetId()) 
 		{
 		case VME_PICKED:
-			{
-				wxMessageBox("pick!");		
-			}
-			break;
-
+			wxMessageBox("pick!");		
+		break;
 		case ID_RANGE_MODIFIED:
-			{
-				OnLUTRangeModified();
-			}
-			break;
+			OnLUTRangeModified();
+		break;
 		case ID_LUT_CHOOSER:
-			{
 				OnLUTChooser();
-
-			}
-			break;
-
+		break;
 		case ID_RESET:
-			{
 				OnReset();
-			}
-			break;
-
+		break;
 		case ID_UPDATE_LUT:
-			{
-				UpdateSlicersLUT();
-			}
-			break;
-
-		case  ID_SHOW_RULER:
-			{
-
-				ShowRuler(X_RULER, true);
-				ShowRuler(Y_RULER, true);
-				ShowRuler(Z_RULER, true);
-			}
-			break;
-
-		case  ID_HIDE_RULER:
-			{
-				ShowRuler(X_RULER, false);
-				ShowRuler(Y_RULER, false);
-				ShowRuler(Z_RULER, false);
-			}
-			break;
-
-
+			UpdateSlicersLUT();
+		break;
 		default:
 			mafViewCompound::OnEvent(maf_event);
 		}
@@ -1129,8 +1085,6 @@ mafGUI* mafViewArbitraryOrthoSlice::CreateGui()
 	assert(m_Gui == NULL);
 	m_Gui = mafView::CreateGui();
 
-	//	m_Gui->Divider(2);
-
 	//button to reset at the sta
 	m_Gui->Label("");
 	m_Gui->Label(_("CTRL + MOUSE LEFT click"),true);
@@ -1147,17 +1101,7 @@ mafGUI* mafViewArbitraryOrthoSlice::CreateGui()
 
 	
 	m_Gui->Update();
-
-
-	// 	m_Gui->Label("");
-	// 	m_Gui->Button(ID_SHOW_RULER, "Show Ruler");
-	// 	m_Gui->Button(ID_HIDE_RULER, "Hide Ruler");
-	// 	m_Gui->Label("");
-
-
-	// vme lut update test
-	// m_Gui->Button(ID_UPDATE_LUT, "update lut");
-
+		
 	EnableWidgets( (m_CurrentVolume != NULL) );
 	return m_Gui;
 }
@@ -1390,7 +1334,7 @@ void mafViewArbitraryOrthoSlice::VolumeWindowing(mafVME *volume)
 	m_SlicerZ->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
 }
 //----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
+void mafViewArbitraryOrthoSlice::ShowVolume( mafVME * vme, bool show )
 {
 	wxBusyInfo wait("please wait");
 
@@ -1521,12 +1465,7 @@ void mafViewArbitraryOrthoSlice::ShowMafVMEMesh(mafVME *vme)
 	}
 }
 //----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowMafVMEImage( mafVME * vme )
-{
-	m_CurrentImage = vme;
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::HideMafVMEVolume()
+void mafViewArbitraryOrthoSlice::HideVolume()
 {
 
 	EnableWidgets(false);
@@ -1574,35 +1513,7 @@ void mafViewArbitraryOrthoSlice::HideMafVMEVolume()
 	m_ColorLUT = NULL;
 	m_LutWidget->SetLut(m_ColorLUT);
 }
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::HideMafVmeImage()
-{
-	m_CurrentImage = NULL;
-	m_ColorLUT = NULL;
-	m_LutWidget->SetLut(m_ColorLUT);
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowVMESurfacesAndLandmarks(mafVME *vme)
-{
-	//a surface is visible only if there is a volume in the view
-	if(m_CurrentVolume)
-	{
 
-		double normal[3];
-		((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-
-		mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(vme));
-		mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(vme));
-
-		double surfaceOriginTranslated[3];
-
-		surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
-		surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
-		surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
-
-		PipeSliceViewSurface->SetSlice(surfaceOriginTranslated,normal);
-	}
-}
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnReset()
 {
@@ -1896,17 +1807,6 @@ void mafViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	UpdateSubviewsCamerasToFaceSlices();
 
 	BuildSliceHeightFeedbackLinesVMEs();
-
-	UpdateXnViewZPlanes();
-	UpdateYnViewZPlanes();
-
-	UpdateYnViewXPlanes();
-	UpdateZnViewXPlanes();
-
-	UpdateXnViewYPlanes();
-	UpdateZnViewYPlanes();
-
-	HideAllCutPlanes();  
 
 	// out: slicer to use
 	mafVMESlicer *targetSlicer;
@@ -2339,190 +2239,6 @@ void mafViewArbitraryOrthoSlice::RestoreCameraParametersForAllSubviews()
 }
 
 //----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, double inRXThickness , vtkImageData *outRXTexture /*= NULL */, bool showProgressBar /*= false*/ )
-{	
-
-	mafProgressBarHelper progressHelper(m_Listener);
-	
-
-	if (showProgressBar)
-		progressHelper.InitProgressBar("");
-
-	int direction = -1;
-
-	if (inSlicer == m_SlicerX)
-	{
-		direction = X;
-	}
-	else if (inSlicer == m_SlicerY)
-	{
-		direction = Y;
-	}
-	else if (inSlicer == m_SlicerZ)
-	{
-		direction = Z;
-	}
-
-	assert(m_InputVolume);
-	assert(m_InputVolume->IsA("mafVMEVolumeGray"));
-
-	vtkStructuredPoints *structuredPoints = vtkStructuredPoints::SafeDownCast(m_InputVolume->GetDataPipe()->GetVTKData());
-
-	// BEWARE: working for structured points only
-	// TODO REFACTOR THIS:
-	// can be easyly extended to rectilinear grid
-	assert(structuredPoints);
-
-	double spacing[3];
-
-	structuredPoints->GetSpacing(spacing);
-
-	double minSpacingXY = min(spacing[0], spacing[1]);
-	double minSpacingYZ = min(spacing[1], spacing[2]);
-	double minSpacing = min(minSpacingXY, minSpacingYZ);
-
-	double profileDistance = minSpacing;
-	int additionalProfileNumber = inRXThickness / profileDistance + 1;
-	additionalProfileNumber  /= 2;
-
-	std::ostringstream stringStream;
-	stringStream << "additional profiles number: " << additionalProfileNumber << std::endl;          
-	mafLogMessage(stringStream.str().c_str());
-
-	vtkMatrix4x4 *slicerAbsMatrix = inSlicer->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix();
-	assert(slicerAbsMatrix);
-
-	// copy the middle image to get original scalars
-	vtkMAFSmartPointer<vtkTransform> originalABSTransform;
-	originalABSTransform->SetMatrix(slicerAbsMatrix);
-
-	mafVMEOutputSurface *outputSurface = mafVMEOutputSurface::SafeDownCast(inSlicer->GetSurfaceOutput());
-	assert(outputSurface);
-
-	vtkImageData *slicerTexture = outputSurface->GetMaterial()->GetMaterialTexture();
-	assert(slicerTexture);
-
-	inSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
-	inSlicer->GetSurfaceOutput()->GetVTKData()->Update();
-
-	// sum the texture scalars in a new image: built from original default texture
-	vtkMAFSmartPointer<vtkImageData> scalarsAccumulationTargetTexture;
-	scalarsAccumulationTargetTexture->DeepCopy(slicerTexture);	
-
-	// add the texture up scalars
-	vtkDataArray *targetScalars = vtkUnsignedShortArray::SafeDownCast( scalarsAccumulationTargetTexture->GetPointData()->GetScalars());
-	if(targetScalars == NULL) {
-	    targetScalars = vtkShortArray::SafeDownCast( scalarsAccumulationTargetTexture->GetPointData()->GetScalars());
-	}
-	assert(targetScalars);
-
-	assert(targetScalars->GetNumberOfComponents() == 1);
-
-	const int numberOfTuples = targetScalars->GetNumberOfTuples();
-
-	std::vector<double> scalarsAccumulatorVector(numberOfTuples);
-
-	// total number of slices I'm accumulating
-	int numberOfSlicesToAccumulate = additionalProfileNumber * 2 + 1;
-	int slicesAlreadyProcessed = 0;
-
-
-	// for each profile
-	for(int profileId = -additionalProfileNumber; profileId <= additionalProfileNumber; profileId++)
-	{
-		if (showProgressBar)
-		{
-			progressHelper.UpdateProgressBar(100 * ((double )slicesAlreadyProcessed) / ((double) numberOfSlicesToAccumulate));
-		}
-
-		if (profileId == 0)
-		{
-			// this is the default deepcopied texture so it is taken into account already
-			continue;
-		}
-
-		// build the profile probe matrix
-		double currentHeight = profileId * profileDistance;
-		vtkMAFSmartPointer<vtkTransform> currentSliceMatrix;
-		currentSliceMatrix->PostMultiply();
-		currentSliceMatrix->Concatenate(originalABSTransform);
-
-		if (direction == X)
-		{
-			currentSliceMatrix->Translate(currentHeight, 0, 0);
-		}
-		else if (direction == Y)
-		{
-			currentSliceMatrix->Translate(0, currentHeight, 0);
-		}
-		else if (direction == Z)
-		{
-			currentSliceMatrix->Translate(0,0,currentHeight);
-		}
-
-		currentSliceMatrix->Update();
-
-		mafMatrix currentProfileMafMatrix;
-		currentProfileMafMatrix.SetVTKMatrix(currentSliceMatrix->GetMatrix());
-
-		inSlicer->SetAbsMatrix(currentProfileMafMatrix);
-
-		inSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
-		inSlicer->GetSurfaceOutput()->GetVTKData()->Update();
-
-		if (false)
-		{
-			std::ostringstream stringStream;
-			stringStream << "Slicer number: " << profileId  << " matrix" << std::endl;          
-			inSlicer->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix()->PrintSelf(stringStream, NULL);
-			mafLogMessage(stringStream.str().c_str());
-		}
-		// get the current slice profile texture
-
-		vtkImageData *currentTexture = inSlicer->GetSurfaceOutput()->GetMaterial()->GetMaterialTexture();
-		assert(currentTexture);
-
-		vtkDataArray *currentSliceScalars = vtkUnsignedShortArray::SafeDownCast(currentTexture->GetPointData()->GetScalars());
-		if(currentSliceScalars == NULL) {
-	    currentSliceScalars = vtkShortArray::SafeDownCast( scalarsAccumulationTargetTexture->GetPointData()->GetScalars());
-	}
-
-		// add the scalars to the target texture
-		for (int scalarId = 0; scalarId < numberOfTuples; scalarId++)
-		{
-			int valueToAdd = currentSliceScalars->GetTuple1(scalarId);
-			scalarsAccumulatorVector[scalarId] += valueToAdd;
-		}
-
-		slicesAlreadyProcessed += 1;
-		assert(slicesAlreadyProcessed <= numberOfSlicesToAccumulate);
-
-	} // for each slice
-
-	for (int scalarId = 0; scalarId < numberOfTuples; scalarId++)
-	{
-		double oldValue = scalarsAccumulatorVector[scalarId];
-		int newValue = oldValue / numberOfSlicesToAccumulate;
-		targetScalars->SetTuple1(scalarId, newValue);
-	}
-
-
-	// original texture 
-	inSlicer->SetAbsMatrix(originalABSTransform->GetMatrix());
-
-	inSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
-	inSlicer->GetSurfaceOutput()->GetVTKData()->Update(); 
-
-	// test set accumulated image to slicer 
-	slicerTexture->DeepCopy(scalarsAccumulationTargetTexture);
-
-	// if the output image data is provided deepcopy the rx texture to it
-	if (outRXTexture)
-	{
-		outRXTexture->DeepCopy(scalarsAccumulationTargetTexture);
-	}
-}
-//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowVTKDataAsVMESurface( vtkPolyData *vmeVTKData, mafVMESurface *vmeSurface, vtkMatrix4x4 *inputABSMatrix )
 {
 	assert(vmeVTKData->GetNumberOfPoints());
@@ -2543,301 +2259,6 @@ void mafViewArbitraryOrthoSlice::ShowVTKDataAsVMESurface( vtkPolyData *vmeVTKDat
 	vmeSurface->GetOutput()->GetVTKData()->Update();
 }
 //----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::BuildSlicingPlane(mafVMESurface *inVME, 
-													int fromDirection, int guestView, double sliceHeight, mafVMESlicer * outputSlicer,
-													vtkMatrix4x4 * outputMatrix , bool showHeightText, vtkCaptionActor2D *captionActor)
-{
-	mafVMESlicer *plane1SourceSlicer = NULL;
-
-	double plane2Normal[3];
-	double plane2Origin[3];
-
-	vtkMAFSmartPointer<vtkTransform> tr;
-
-	// Z direction cut feedback
-	if (fromDirection == FROM_Z && guestView == X_VIEW)
-	{
-		inVME->GetMaterial()->m_Prop->SetColor(0,0,1);
-
-		plane1SourceSlicer = m_SlicerX;
-		outputSlicer = m_SlicerZ;
-
-		// testing
-		vtkMatrix4x4 *mat = m_GizmoXView->GetAbsPose()->GetVTKMatrix();
-		assert(mat);
-
-		tr->SetMatrix(mat);
-
-		// height
-		tr->Translate(-sliceHeight,0,0);
-		tr->Update();
-
-		double pos[3];
-		tr->GetPosition(pos);
-
-		plane2Origin[0] = pos[0];
-		plane2Origin[1] = pos[1];
-		plane2Origin[2] = pos[2];
-
-		double versor[3];
-		mafMatrix::GetVersor(X, mafMatrix(mat), versor);
-
-		plane2Normal[0] = versor[0];
-		plane2Normal[1] = versor[1];
-		plane2Normal[2] = versor[2];
-	}
-	else if (fromDirection == FROM_Z && guestView == Y_VIEW)
-	{
-		inVME->GetMaterial()->m_Prop->SetColor(0,0,1);
-
-		plane1SourceSlicer = m_SlicerY;
-		outputSlicer = m_SlicerZ;
-
-		// testing
-		vtkMatrix4x4 *mat = m_GizmoXView->GetAbsPose()->GetVTKMatrix();
-		assert(mat);
-
-		vtkMAFSmartPointer<vtkTransform> tr;
-		tr->SetMatrix(mat);
-
-		// negative sliceHeight means going upper :P
-		tr->Translate(-sliceHeight,0,0);
-		tr->Update();
-
-		double pos[3];
-		tr->GetPosition(pos);
-
-		plane2Origin[0] = pos[0];
-		plane2Origin[1] = pos[1];
-		plane2Origin[2] = pos[2];
-
-		double versor[3];
-		mafMatrix::GetVersor(X, mafMatrix(mat), versor);
-
-		plane2Normal[0] = versor[0];
-		plane2Normal[1] = versor[1];
-		plane2Normal[2] = versor[2];
-	}
-
-	// Y direction cut feedback
-	if (fromDirection == FROM_Y && guestView == X_VIEW)
-	{
-		inVME->GetMaterial()->m_Prop->SetColor(0,1,0);
-
-		plane1SourceSlicer = m_SlicerX;
-		outputSlicer = m_SlicerY;
-
-		// plane Xn plane: to be changed for pose != identity
-		// cuttingplane normal from cross Zn
-		// cutting plane origin from cross center
-
-		// testing
-		vtkMatrix4x4 *mat = m_GizmoXView->GetAbsPose()->GetVTKMatrix();
-		assert(mat);
-
-		vtkMAFSmartPointer<vtkTransform> tr;
-		tr->SetMatrix(mat);
-
-		// positive sliceHeight is toward triangle camera
-		tr->Translate(0,-sliceHeight,0);
-		tr->Update();
-
-		double pos[3];
-		tr->GetPosition(pos);
-
-
-		plane2Origin[0] = pos[0];
-		plane2Origin[1] = pos[1];
-		plane2Origin[2] = pos[2];
-
-		double versor[3];
-		mafMatrix::GetVersor(Y, mafMatrix(mat), versor);
-
-		plane2Normal[0] = versor[0];
-		plane2Normal[1] = versor[1];
-		plane2Normal[2] = versor[2];
-	}
-	else if (fromDirection == FROM_Y && guestView == Z_VIEW)
-	{
-		inVME->GetMaterial()->m_Prop->SetColor(0,1,0);
-
-		plane1SourceSlicer = m_SlicerZ;
-		outputSlicer = m_SlicerY;
-
-		// testing
-		vtkMatrix4x4 *mat = m_GizmoXView->GetAbsPose()->GetVTKMatrix();
-		assert(mat);
-
-		vtkMAFSmartPointer<vtkTransform> tr;
-		tr->SetMatrix(mat);
-
-		// positive sliceHeight is toward triangle camera
-		tr->Translate(0,-sliceHeight,0);
-		tr->Update();
-
-		double pos[3];
-		tr->GetPosition(pos);
-
-		plane2Origin[0] = pos[0];
-		plane2Origin[1] = pos[1];
-		plane2Origin[2] = pos[2];
-
-		double versor[3];
-		mafMatrix::GetVersor(Y, mafMatrix(mat), versor);
-
-		plane2Normal[0] = versor[0];
-		plane2Normal[1] = versor[1];
-		plane2Normal[2] = versor[2];
-	}
-
-	// X direction cut feedback
-	if (fromDirection == FROM_X && guestView == Y_VIEW)
-	{
-		inVME->GetMaterial()->m_Prop->SetColor(1,0,0);
-
-		plane1SourceSlicer = m_SlicerY;
-		outputSlicer = m_SlicerX;
-
-		// plane Xn plane: to be changed for pose != identity
-		// cuttingplane normal from cross Zn
-		// cutting plane origin from cross center
-
-		// testing
-		vtkMatrix4x4 *mat = m_GizmoXView->GetAbsPose()->GetVTKMatrix();
-		assert(mat);
-
-		vtkMAFSmartPointer<vtkTransform> tr;
-		tr->SetMatrix(mat);
-
-		// positive sliceHeight is toward triangle camera
-		tr->Translate(0,0,sliceHeight);
-		tr->Update();
-
-		double pos[3];
-		tr->GetPosition(pos);
-
-		plane2Origin[0] = pos[0];
-		plane2Origin[1] = pos[1];
-		plane2Origin[2] = pos[2];
-
-		double versor[3];
-		mafMatrix::GetVersor(Z, mafMatrix(mat), versor);
-
-		plane2Normal[0] = versor[0];
-		plane2Normal[1] = versor[1];
-		plane2Normal[2] = versor[2];
-	}
-	else if (fromDirection == FROM_X && guestView == Z_VIEW)
-	{
-		inVME->GetMaterial()->m_Prop->SetColor(1,0,0);
-
-		plane1SourceSlicer = m_SlicerZ;
-		outputSlicer = m_SlicerX;
-
-		// testing
-		vtkMatrix4x4 *mat = m_GizmoXView->GetAbsPose()->GetVTKMatrix();
-		assert(mat);
-
-		vtkMAFSmartPointer<vtkTransform> tr;
-		tr->SetMatrix(mat);
-
-		// positive sliceHeight is toward triangle camera
-		tr->Translate(0,0,sliceHeight);
-		tr->Update();
-
-		double pos[3];
-		tr->GetPosition(pos);
-
-		plane2Origin[0] = pos[0];
-		plane2Origin[1] = pos[1];
-		plane2Origin[2] = pos[2];
-
-		double versor[3];
-		mafMatrix::GetVersor(Z, mafMatrix(mat), versor);
-
-		plane2Normal[0] = versor[0];
-		plane2Normal[1] = versor[1];
-		plane2Normal[2] = versor[2];
-	}
-
-	if (outputMatrix)
-	{
-		outputMatrix->DeepCopy(tr->GetMatrix());
-	}
-
-	vtkLinearTransform *inputABSTransform = NULL;
-	inputABSTransform = plane1SourceSlicer->GetAbsMatrixPipe()->GetVTKTransform();
-
-	assert(m_ViewXnSliceYBoundsVMEVector[BOUND_0]);
-
-	// build implicit plane for cutting
-	vtkCutter *boundsCutter = vtkCutter::New();
-
-	vtkPlane *plane2 = vtkPlane::New();
-	plane2->SetOrigin(plane2Origin);
-	plane2->SetNormal(plane2Normal);
-
-	vtkPolyData *m_Plane1PD = vtkPolyData::SafeDownCast(plane1SourceSlicer->GetSurfaceOutput()->GetVTKData());
-	assert(m_Plane1PD);
-	assert(m_Plane1PD->GetNumberOfCells() == 1);
-
-	vtkTransformPolyDataFilter *plane1TPDF = vtkTransformPolyDataFilter::New();
-	plane1TPDF->SetInput(m_Plane1PD);
-	plane1TPDF->SetTransform(inputABSTransform);
-	plane1TPDF->Update();
-
-	boundsCutter->SetInput(plane1TPDF->GetOutput());
-	boundsCutter->SetCutFunction(plane2);
-	boundsCutter->Update();
-
-	int numPoints = boundsCutter->GetOutput()->GetNumberOfPoints();
-
-	if (numPoints >= 2 )
-	{
-		//assert(numPoints == 2);
-		assert(true);
-
-		vtkPoints *points = boundsCutter->GetOutput()->GetPoints();
-
-		double p1[3];
-		points->GetPoint(0, p1);
-
-		double p2[3];
-		points->GetPoint(1, p2);
-
-		vtkLineSource *lineSource =vtkLineSource::New();
-		lineSource->SetPoint1(p1);
-		lineSource->SetPoint2(p2);
-		lineSource->Update();
-
-		vtkMAFTubeFilter *tubeFilter = vtkMAFTubeFilter::New();
-		tubeFilter->SetInput(lineSource->GetOutput());
-		tubeFilter->SetRadius(0.3); // to be adapted to input vme
-		tubeFilter->SetNumberOfSides(10);
-		tubeFilter->Update();
-
-		vtkMatrix4x4 *matrix = vtkMatrix4x4::New();
-
-		ShowVTKDataAsVMESurface(tubeFilter->GetOutput(), inVME , matrix);
-
-		if (showHeightText == true)
-		{
-			ShowCaptionActor(captionActor, guestView, captionActor->GetCaption() , (p1[0] + p2[0])/2, 
-				(p1[1] + p2[1])/2 , (p1[2] + p2[2])/2);
-		}
-
-		tubeFilter->Delete();
-		matrix->Delete();
-		lineSource->Delete();
-	}
-
-	plane1TPDF->Delete();
-	boundsCutter->Delete();
-	plane2->Delete();
-
-}
-//----------------------------------------------------------------------------
-
 void mafViewArbitraryOrthoSlice::AddVMEToMSFTree(mafVMESurface *vme)
 {
 	assert(vme != NULL);
@@ -2846,103 +2267,6 @@ void mafViewArbitraryOrthoSlice::AddVMEToMSFTree(mafVMESurface *vme)
 	assert(vme);
 }
 
-////////////// Z cut planes
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateYnViewZPlanes()
-{
-
-	assert(m_FeedbackLineHeight > 0);
-
-	assert(m_ViewYnSliceZBoundsVMEVector[BOUND_0]);
-	BuildSlicingPlane(m_ViewYnSliceZBoundsVMEVector[BOUND_0], FROM_Z, Y_VIEW,  m_FeedbackLineHeight[BLUE]);
-
-	// build ruler
-
-	// for every axial section
-
-	assert(m_ViewYnSliceZBoundsVMEVector[BOUND_1]);
-	BuildSlicingPlane(m_ViewYnSliceZBoundsVMEVector[BOUND_1], FROM_Z, Y_VIEW,  -m_FeedbackLineHeight[BLUE]);
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateXnViewZPlanes()
-{
-	assert(m_ViewXnSliceZBoundsVMEVector[BOUND_0]);
-
-	BuildSlicingPlane(m_ViewXnSliceZBoundsVMEVector[BOUND_0], FROM_Z, X_VIEW,  m_FeedbackLineHeight[BLUE]);
-
-	assert(m_ViewXnSliceZBoundsVMEVector[BOUND_1]);
-
-	BuildSlicingPlane(m_ViewXnSliceZBoundsVMEVector[BOUND_1], FROM_Z, X_VIEW,  -m_FeedbackLineHeight[BLUE]);
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateZCutPlanes()
-{
-	// build Yn view images export gizmos
-	if (m_ViewYnSliceZBoundsVMEVector[BOUND_0] && m_ViewYnSliceZBoundsVMEVector[BOUND_1])
-	{
-		UpdateYnViewZPlanes();
-		UpdateXnViewZPlanes();
-	}
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowZCutPlanes( bool show )
-{
-	ShowVMESurfacesVector(m_ViewXnSliceZBoundsVMEVector, X_VIEW, show);
-	ShowVMESurfacesVector(m_ViewYnSliceZBoundsVMEVector, Y_VIEW, show);
-	ShowVMESurfacesVector(m_ViewXnSliceZBoundsVMEVector, PERSPECTIVE_VIEW, show);
-	ShowVMESurfacesVector(m_ViewYnSliceZBoundsVMEVector, PERSPECTIVE_VIEW, show);
-}
-
-////////////// X cut planes
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateYnViewXPlanes()
-{
-	BuildSlicingPlane(m_ViewYnSliceXBoundsVMEVector[BOUND_0], FROM_X, Y_VIEW,  m_FeedbackLineHeight[RED]);
-
-	assert(m_FeedbackLineHeight > 0);
-
-	BuildSlicingPlane(m_ViewYnSliceXBoundsVMEVector[BOUND_1], FROM_X, Y_VIEW,  -m_FeedbackLineHeight[RED]);
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateZnViewXPlanes()
-{
-	BuildSlicingPlane(m_ViewZnSliceXBoundsVMEVector[BOUND_0], FROM_X, Z_VIEW,  m_FeedbackLineHeight[RED]);
-
-	assert(m_FeedbackLineHeight > 0);
-
-	BuildSlicingPlane(m_ViewZnSliceXBoundsVMEVector[BOUND_1], FROM_X, Z_VIEW,  -m_FeedbackLineHeight[RED]);
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowXCutPlanes( bool show )
-{
-	ShowVMESurfacesVector(m_ViewYnSliceXBoundsVMEVector, Y_VIEW, show);
-	ShowVMESurfacesVector(m_ViewZnSliceXBoundsVMEVector, Z_VIEW, show);
-
-	ShowVMESurfacesVector(m_ViewYnSliceXBoundsVMEVector, PERSPECTIVE_VIEW, show);
-	ShowVMESurfacesVector(m_ViewZnSliceXBoundsVMEVector, PERSPECTIVE_VIEW, show);
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateXnViewYPlanes()
-{
-	BuildSlicingPlane(m_ViewXnSliceYBoundsVMEVector[BOUND_0], FROM_Y, X_VIEW,  m_FeedbackLineHeight[GREEN]);
-
-	BuildSlicingPlane(m_ViewXnSliceYBoundsVMEVector[BOUND_1], FROM_Y, X_VIEW,  -m_FeedbackLineHeight[GREEN]);
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::UpdateZnViewYPlanes()
-{
-	BuildSlicingPlane(m_ViewZnSliceYBoundsVMEVector[BOUND_0], FROM_Y, Z_VIEW,  m_FeedbackLineHeight[GREEN]);
-
-	BuildSlicingPlane(m_ViewZnSliceYBoundsVMEVector[BOUND_1], FROM_Y, Z_VIEW,  -m_FeedbackLineHeight[GREEN]);
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowYCutPlanes( bool show )
-{
-	ShowVMESurfacesVector(m_ViewXnSliceYBoundsVMEVector, X_VIEW, show);
-	ShowVMESurfacesVector(m_ViewZnSliceYBoundsVMEVector, Z_VIEW, show);
-	ShowVMESurfacesVector(m_ViewXnSliceYBoundsVMEVector, PERSPECTIVE_VIEW, show);
-	ShowVMESurfacesVector(m_ViewZnSliceYBoundsVMEVector, PERSPECTIVE_VIEW, show);
-}
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::BuildSliceHeightFeedbackLinesVMEs()
 {
@@ -3040,15 +2364,6 @@ void mafViewArbitraryOrthoSlice::BuildSliceHeightFeedbackLinesVMEs()
 	AddVMEToMSFTree(m_ViewZnSliceYBoundsVMEVector[BOUND_1]);
 }
 
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::HideAllCutPlanes()
-{
-	ShowXCutPlanes(false);
-	ShowYCutPlanes(false);
-	ShowZCutPlanes(false);
-
-	GetLogicManager()->CameraUpdate();
-}
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSlicers(int axis)
 {
@@ -3268,193 +2583,4 @@ void mafViewArbitraryOrthoSlice::ShowVMESurfacesVector( vector<mafVMESurface *> 
 
 	}
 }
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowRulerVMEVector(vector<mafVMESurface *> &rulerVector, 
-													 vector<vtkCaptionActor2D *> &captionActorVector , int fromDirection , int guestView)
-{
-	rulerVector.clear();
 
-	int choosedExportAxis = fromDirection;
-
-	double step = 2 * m_FeedbackLineHeight[choosedExportAxis] / (m_NumberOfAxialSections[choosedExportAxis] - 1);
-
-	int color = fromDirection;
-
-	double relativeHeight = 0;
-
-	for (int idAxialSection = 0 ; idAxialSection < m_NumberOfAxialSections[color] ; idAxialSection++)
-	{
-		// build the slicing plane
-		rulerVector.push_back(NULL);
-		mafNEW(rulerVector[idAxialSection]);
-
-		AddVMEToMSFTree(rulerVector[idAxialSection]);
-
-		double height = -m_FeedbackLineHeight[color] + step*idAxialSection;
-
-		captionActorVector.push_back(NULL);
-		vtkNEW(captionActorVector[idAxialSection]);
-
-		wxString sliceRelativeHight;
-
-		relativeHeight = step * idAxialSection;
-
-		if (color == GREEN)
-		{
-			relativeHeight = 2 * m_FeedbackLineHeight[GREEN] - relativeHeight;
-			sliceRelativeHight << relativeHeight;
-		}
-		else
-		{
-			sliceRelativeHight << relativeHeight;
-		}
-		
-		captionActorVector[idAxialSection]->SetCaption(sliceRelativeHight.c_str());
-		BuildSlicingPlane(rulerVector[idAxialSection],fromDirection, guestView, height , NULL, NULL,
-			true, captionActorVector[idAxialSection]);	    
-	}
-
-	ShowVMESurfacesVector(rulerVector, guestView, true);
-
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowRuler( int ruler , bool show)
-{
-	if (ruler == X_RULER)
-	{
-		if (show == true)
-		{
-			ShowRulerVMEVector(m_ViewYnSliceXRulerVMEVector, m_ViewYnSliceXRulerTextActorsVector,
-				FROM_X, Y_VIEW);
-			
-			ShowRulerVMEVector(m_ViewZnSliceXRulerVMEVector, m_ViewZnSliceXRulerTextActorsVector,
-				FROM_X, Z_VIEW);
-			
-			ShowVMESurfacesVector(m_ViewYnSliceXRulerVMEVector, PERSPECTIVE_VIEW, true);
-			ShowVMESurfacesVector(m_ViewZnSliceXRulerVMEVector, PERSPECTIVE_VIEW, true);
-
-		}
-		else
-		{
-			HideRulerVMEVector(m_ViewYnSliceXRulerVMEVector,  m_ViewYnSliceXRulerTextActorsVector,
-				Y_VIEW);
-			HideRulerVMEVector(m_ViewZnSliceXRulerVMEVector,  m_ViewZnSliceXRulerTextActorsVector,
-				Z_VIEW);
-
-			ShowVMESurfacesVector(m_ViewYnSliceXRulerVMEVector, PERSPECTIVE_VIEW, false);
-			ShowVMESurfacesVector(m_ViewZnSliceXRulerVMEVector, PERSPECTIVE_VIEW, false);
-
-		}
-
-	}
-	else if (ruler == Y_RULER)
-	{
-		if (show == true)
-		{
-			ShowRulerVMEVector(m_ViewXnSliceYRulerVMEVector,  m_ViewXnSliceYRulerTextActorsVector,
-				FROM_Y, X_VIEW);
-			ShowRulerVMEVector(m_ViewZnSliceYRulerVMEVector, m_ViewZnSliceYRulerTextActorsVector ,
-				FROM_Y, Z_VIEW);	
-
-			ShowVMESurfacesVector(m_ViewXnSliceYRulerVMEVector, PERSPECTIVE_VIEW, true);
-			ShowVMESurfacesVector(m_ViewZnSliceYRulerVMEVector, PERSPECTIVE_VIEW, true);
-		}
-		else
-		{
-			HideRulerVMEVector(m_ViewXnSliceYRulerVMEVector, m_ViewXnSliceYRulerTextActorsVector,
-				X_VIEW);
-			HideRulerVMEVector(m_ViewZnSliceYRulerVMEVector, m_ViewZnSliceYRulerTextActorsVector,
-				Z_VIEW);	
-
-			ShowVMESurfacesVector(m_ViewXnSliceYRulerVMEVector, PERSPECTIVE_VIEW, false);
-			ShowVMESurfacesVector(m_ViewZnSliceYRulerVMEVector, PERSPECTIVE_VIEW, false);
-
-		}
-
-	}
-	else if (ruler == Z_RULER)
-	{
-		if (show == true)
-		{
-			ShowRulerVMEVector(m_ViewXnSliceZRulerVMEVector, m_ViewXnSliceZRulerTextActorsVector,
-				FROM_Z, X_VIEW);
-			ShowRulerVMEVector(m_ViewYnSliceZRulerVMEVector, m_ViewYnSliceZRulerTextActorsVector,
-				FROM_Z, Y_VIEW);
-
-			ShowVMESurfacesVector(m_ViewXnSliceYRulerVMEVector, PERSPECTIVE_VIEW, true);
-			ShowVMESurfacesVector(m_ViewYnSliceZRulerVMEVector, PERSPECTIVE_VIEW, true);
-
-		}
-		else
-		{
-			HideRulerVMEVector(m_ViewXnSliceZRulerVMEVector, m_ViewXnSliceZRulerTextActorsVector, 
-				X_VIEW);
-			HideRulerVMEVector(m_ViewYnSliceZRulerVMEVector, m_ViewYnSliceZRulerTextActorsVector, 
-				Y_VIEW);
-
-			ShowVMESurfacesVector(m_ViewXnSliceYRulerVMEVector, PERSPECTIVE_VIEW, false);
-			ShowVMESurfacesVector(m_ViewYnSliceZRulerVMEVector, PERSPECTIVE_VIEW, false);
-
-		}
-	}
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::HideRulerVMEVector(vector<mafVMESurface *> &rulerVector, 
-													 vector<vtkCaptionActor2D *> &captionActorVector , int guestView)
-{
-	ShowVMESurfacesVector(rulerVector, guestView, false);
-	int size  = rulerVector.size();
-
-	for (int i = 0; i < size; i++)
-	{
-		rulerVector[i]->ReparentTo(NULL);
-		rulerVector[i] = NULL;
-
-		vtkRenderer *currentRenderer = ((mafViewVTK*)(m_ChildViewList[guestView]))->m_Rwi->m_RenFront;
-		currentRenderer->RemoveActor2D(captionActorVector[i]);
-		captionActorVector[i]->Delete();
-
-	}
-
-	captionActorVector.clear();
-	rulerVector.clear();
-
-	GetLogicManager()->CameraUpdate();
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowCaptionActor(vtkCaptionActor2D *actor, 
-												   int guestView, wxString text, double x, double y ,double z)
-{
-	assert(actor != NULL);
-
-	actor->SetPosition(0,0);
-	actor->ThreeDimensionalLeaderOff();
-
-	actor->SetHeight(0.01);
-	actor->SetWidth(0.01);
-	actor->BorderOff();
-
-	actor->SetCaption(text.c_str());
-	actor->SetVisibility(true);
-	actor->SetAttachmentPoint(x,y,z);
-
-	vtkRenderer *currentRenderer = ((mafViewVTK*)(m_ChildViewList[guestView]))->m_Rwi->m_RenFront;
-
-	currentRenderer->AddActor2D(actor);
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowCutPlanes( int axis , bool show)
-{
-	if (axis == RED)
-	{
-		ShowXCutPlanes(show);
-	}
-	else if (axis == GREEN)
-	{
-		ShowYCutPlanes(show);
-	}
-	else if (axis == BLUE)
-	{
-		ShowZCutPlanes(show);
-	}
-}
