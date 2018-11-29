@@ -214,15 +214,8 @@ protected:
 
 	void RestoreCameraParametersForAllSubviews();
 
-	void OnResetmafVMEPolylineEditor();
-	void OnResetMafVMEMesh(mafVME *vme);
-	void OnResetSurfaceAndLandmark(mafVME *vme);
-
-	/** This function is called when a rotate gizmo is moved*/
-	void OnEventGizmoCrossRotateZNormalView(mafEventBase *maf_event);
-			
 	/**	This function is called when a translate gizmo is moved*/
-	void OnEventGizmoCrossTranslateZNormalView(mafEventBase *maf_event);
+	void OnEventGizmoTranslate(mafEventBase *maf_event, int side);
 
 	void PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , mafGizmoCrossRotateTranslate *targetGizmo);
 	
@@ -234,16 +227,11 @@ protected:
 
 	/** Windowing for volumes data. This function overrides superclass method.*/
 	void VolumeWindowing(mafVME *volume);
-	void OnEventGizmoCrossRotateYNormalView(mafEventBase *maf_event);
+	void OnEventGizmoRotate(mafEventBase *maf_event, int side);
 
 	void OnEventGizmoCrossRTXNormalView( mafEventBase * maf_event );
 
-	void OnEventGizmoCrossRotateXNormalView(mafEventBase *maf_event);
-
 	void ChildViewsCameraUpdate();
-
-	void OnEventGizmoCrossTranslateXNormalView(mafEventBase *maf_event);
-	void OnEventGizmoCrossTranslateYNormalView(mafEventBase *maf_event);
 
 	void ShowVMESurfacesVector( vector<mafVMESurface *> &inVector, int view, bool show );
 
