@@ -185,10 +185,6 @@ protected:
 
 	void HideVolume();
 
-	void ShowMafVMEMesh(mafVME *vme);
-
-	void ShowmafVMEPolylineEditor(mafVME *vme);
-
 	/* Update slicer settings according to m_CurrentVolume*/
 	void UpdateSlicerZBehavior();
 
@@ -286,7 +282,6 @@ protected:
 	int m_ShowGizmo;
 	mafGUI				*m_GuiGizmos;
 
-	mafVMEPolylineEditor *m_CurrentPolylineGraphEditor;
 	mafVMESurface *m_XCameraConeVME;
 	mafVMESurface *m_YCameraConeVME;
 	mafVMESurface *m_ZCameraConeVME;
