@@ -726,7 +726,7 @@ void mafGUI::Vector(int id, wxString label, double var[3], double minx, double m
 }
 
 //----------------------------------------------------------------------------
-void mafGUI::String(int id, wxString label, wxString* var, wxString tooltip, bool multiline, bool password)
+void mafGUI::String(int id, wxString label, wxString* var, wxString tooltip, bool multiline, bool password, bool interactive)
 {
 	int sw = LH;
 	long e_style = m_EntryStyle;
@@ -744,7 +744,7 @@ void mafGUI::String(int id, wxString label, wxString* var, wxString tooltip, boo
 		wxTextCtrl *text = NULL;
 
 		text = new wxTextCtrl(this, w_id, "", dp, wxSize(FW, sw), e_style);
-		text->SetValidator(mafGUIValidator(this, w_id, text, var));
+		text->SetValidator(mafGUIValidator(this, w_id, text, var,interactive));
 		text->SetFont(m_Font);
 		if (tooltip != "")
 			text->SetToolTip(tooltip);
@@ -760,7 +760,7 @@ void mafGUI::String(int id, wxString label, wxString* var, wxString tooltip, boo
 		int w_id = GetWidgetId(id);
 		wxTextCtrl *text = NULL;
 		text = new wxTextCtrl(this, w_id, "", dp, wxSize(DW, sw), e_style);
-		text->SetValidator(mafGUIValidator(this, w_id, text, var));
+		text->SetValidator(mafGUIValidator(this, w_id, text, var, interactive));
 		text->SetFont(m_Font);
 
 		if (tooltip != "")
@@ -773,7 +773,7 @@ void mafGUI::String(int id, wxString label, wxString* var, wxString tooltip, boo
 	}
 }
 //----------------------------------------------------------------------------
-void mafGUI::String(int id, mafString label, mafString *var, mafString tooltip, bool multiline, bool password)
+void mafGUI::String(int id, mafString label, mafString *var, mafString tooltip, bool multiline, bool password, bool interactive)
 {
 	int sw = LH;
 	long e_style = m_EntryStyle;
@@ -790,7 +790,7 @@ void mafGUI::String(int id, mafString label, mafString *var, mafString tooltip, 
 		int w_id = GetWidgetId(id);
 		wxTextCtrl  *text = NULL;
 		text = new wxTextCtrl(this, w_id, "", dp, wxSize(FW, sw), e_style);
-		text->SetValidator(mafGUIValidator(this, w_id, text, var));
+		text->SetValidator(mafGUIValidator(this, w_id, text, var, interactive));
 		text->SetFont(m_Font);
 		if (!tooltip.IsEmpty())
 			text->SetToolTip(tooltip.GetCStr());
@@ -806,7 +806,7 @@ void mafGUI::String(int id, mafString label, mafString *var, mafString tooltip, 
 		int w_id = GetWidgetId(id);
 		wxTextCtrl  *text = NULL;
 		text = new wxTextCtrl(this, w_id, "", dp, wxSize(DW, sw), e_style);
-		text->SetValidator(mafGUIValidator(this, w_id, text, var));
+		text->SetValidator(mafGUIValidator(this, w_id, text, var,interactive));
 		text->SetFont(m_Font);
 		if (!tooltip.IsEmpty())
 			text->SetToolTip(tooltip.GetCStr());

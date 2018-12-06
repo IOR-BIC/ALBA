@@ -36,8 +36,10 @@ enum VALIDATOR_MODES
 {
   VAL_WRONG =0,
   VAL_LABEL,  
-  VAL_STRING,  //TEXT
-  VAL_MAF_STRING,  //TEXT
+	VAL_STRING,  //TEXT
+	VAL_INTERACTIVE_STRING,  //TEXT
+	VAL_MAF_STRING,  //TEXT
+	VAL_MAF_INTERACTIVE_STRING,  //TEXT
   VAL_INTEGER, //TEXT 
   VAL_FLOAT,   //TEXT
 	VAL_DOUBLE,  //TEXT
@@ -64,8 +66,8 @@ class MAF_EXPORT mafGUIValidator : public wxValidator
 public:
   mafGUIValidator (mafObserver* listener,int mid,wxStaticText *win, wxString* var);   //String
   mafGUIValidator (mafObserver* listener,int mid,wxStaticText *win, mafString* var);  //String
-  mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,wxString* var);   //String
-  mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,mafString* var);  //String
+  mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win, mafString* var, bool interactive = false);  //String
+  mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,wxString* var, bool interactive = false);   //String
   mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   int*		var, int		min=-2147483647-1,			 int		max=2147483647);     //Integer
   mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   float*	var, float	min=-1.0e+38F, float	max=1.0e+38F, int dec_digits = 2);//Float
   mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   double* var, double min=-1.0e+299, double max=1.0e+299, int dec_digits = 2);//Double
@@ -97,8 +99,9 @@ public:
 //	double RoundValue(double d_in);
 
   void Init(mafObserver* listener, int mid, wxControl *win);
-  void OnChar(wxKeyEvent& event);
-  void OnKillFocus(wxFocusEvent& event);
+	void OnChar(wxKeyEvent& event);
+	void OnKeyUp(wxKeyEvent& event);
+	void OnKillFocus(wxFocusEvent& event);
   void OnScrollEvent(wxScrollEvent& event);
   void OnCommandEvent(wxCommandEvent& event);
   void OnButton(wxCommandEvent& event);
