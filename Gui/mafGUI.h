@@ -132,10 +132,10 @@ public:
 	void HintBox(int id, wxString label, wxString title = "Hint", bool showIcon = true);
 
 	/** String entry widget. */
-  void String(int id,wxString label,wxString *var, wxString tooltip = "", bool multiline = false, bool password = false);
+	void String(int id, wxString label, wxString *var, wxString tooltip = "", bool multiline = false, bool password = false, bool interactive = false);
 
   /** String entry widget. */
-  void String(int id,mafString label,mafString *var, mafString tooltip = "", bool multiline = false, bool password = false);
+  void String(int id,mafString label,mafString *var, mafString tooltip = "", bool multiline = false, bool password = false, bool interactive = false);
   
   /** Integer entry widget. */
   void Integer(int id,mafString label,int *var, int min = MININT, int max = MAXINT, mafString tooltip = "", bool labelAlwaysEnable = false);

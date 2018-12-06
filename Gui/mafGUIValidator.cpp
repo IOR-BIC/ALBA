@@ -34,8 +34,9 @@
 // mafGUIValidator
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE (mafGUIValidator, wxValidator)
-    EVT_CHAR      (mafGUIValidator::OnChar)
-    EVT_KILL_FOCUS(mafGUIValidator::OnKillFocus)
+		EVT_KEY_UP(mafGUIValidator::OnKeyUp)
+		EVT_CHAR(mafGUIValidator::OnChar)
+		EVT_KILL_FOCUS(mafGUIValidator::OnKillFocus)
     EVT_BUTTON(wxOK, mafGUIValidator::OnButton)
     EVT_BUTTON(wxCANCEL, mafGUIValidator::OnButton)
     EVT_COMMAND_RANGE(MINID,MAXID,wxEVT_COMMAND_BUTTON_CLICKED,   mafGUIValidator::OnButton)
@@ -126,10 +127,12 @@ bool mafGUIValidator::IsValid()
       if (  m_IntMin >= m_IntMax  ) return false;
     break;
     case VAL_STRING:
+		case VAL_INTERACTIVE_STRING:
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
       if ( !m_StringVar ) return false;
     break;
     case VAL_MAF_STRING:
+		case VAL_MAF_INTERACTIVE_STRING:
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
       if ( !m_MafStringVar ) return false;
     break;
@@ -256,11 +259,12 @@ mafGUIValidator::mafGUIValidator(mafObserver* listener, int mid, wxStaticText *w
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mafGUIValidator::mafGUIValidator(mafObserver* listener, int mid, wxTextCtrl *win, wxString *var) //String
+mafGUIValidator::mafGUIValidator(mafObserver* listener, int mid, wxTextCtrl *win, wxString *var, bool interactive) //String
 //----------------------------------------------------------------------------
 {
-  Init(listener,mid,win);  
-  m_Mode      = VAL_STRING;
+  Init(listener,mid,win);
+	m_Mode = (interactive) ? VAL_INTERACTIVE_STRING : VAL_STRING;
+
   m_TextCtrl  = win; 
   m_StringVar = var;
   m_WidgetData.dType  = STRING_DATA;
@@ -268,11 +272,11 @@ mafGUIValidator::mafGUIValidator(mafObserver* listener, int mid, wxTextCtrl *win
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-mafGUIValidator::mafGUIValidator(mafObserver* listener, int mid, wxTextCtrl *win,mafString* var) //String
+mafGUIValidator::mafGUIValidator(mafObserver* listener, int mid, wxTextCtrl *win, mafString* var, bool interactive) //String
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  
-  m_Mode        = VAL_MAF_STRING;
+	m_Mode = (interactive) ? VAL_MAF_INTERACTIVE_STRING : VAL_MAF_STRING;
   m_TextCtrl    = win; 
   m_MafStringVar= var;     
   m_WidgetData.dType  = STRING_DATA;
@@ -828,6 +832,7 @@ bool mafGUIValidator::TransferFromWindow(void)
 			return res;
     break;
     case VAL_STRING:
+		case VAL_INTERACTIVE_STRING:
       if (m_StringVar)  
       {
         s = m_TextCtrl->GetValue();
@@ -841,6 +846,7 @@ bool mafGUIValidator::TransferFromWindow(void)
       }
     break;
     case VAL_MAF_STRING:
+		case VAL_MAF_INTERACTIVE_STRING:
       if (m_MafStringVar)
       {
         s = m_TextCtrl->GetValue();
@@ -913,11 +919,10 @@ void mafGUIValidator::OnChar(wxKeyEvent& event)
   //Filter key for TextCtrl used for numeric input
   int keyCode = (int)event.GetKeyCode();
 
-  if ((keyCode == WXK_RETURN || keyCode == WXK_TAB) &&
+  if (((keyCode == WXK_RETURN || keyCode == WXK_TAB) &&
       (m_Mode == VAL_STRING  || m_Mode == VAL_MAF_STRING || 
        m_Mode == VAL_INTEGER || m_Mode == VAL_FLOAT || 
-       m_Mode == VAL_DOUBLE  || m_Mode == VAL_FLOAT_SLIDER_2)
-      )
+       m_Mode == VAL_DOUBLE  || m_Mode == VAL_FLOAT_SLIDER_2)))     
   {
     // Return is received only from widget with the wxTE_PROCESS_ENTER style flag enabled
     // i.e. console widget
@@ -944,6 +949,22 @@ void mafGUIValidator::OnChar(wxKeyEvent& event)
   }
   event.Skip();
 }
+
+//----------------------------------------------------------------------------
+void mafGUIValidator::OnKeyUp(wxKeyEvent& event)
+//----------------------------------------------------------------------------
+{
+	if(m_Mode == VAL_MAF_INTERACTIVE_STRING || m_Mode == VAL_INTERACTIVE_STRING)
+	{
+		// Return is received only from widget with the wxTE_PROCESS_ENTER style flag enabled
+		// i.e. console widget
+		TransferFromWindow();
+		mafEventMacro(mafEvent(m_TextCtrl, m_ModuleId));
+		return; // eat message
+	}
+	event.Skip();
+}
+
 //----------------------------------------------------------------------------
 void mafGUIValidator::OnKillFocus(wxFocusEvent& event)
 //----------------------------------------------------------------------------
