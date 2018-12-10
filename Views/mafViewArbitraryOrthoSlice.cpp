@@ -155,17 +155,13 @@ mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label) : mafView
 
 	m_ViewSlice[0] = m_ViewSlice[1] = m_ViewSlice[2] = NULL;
 	
-	m_SlicerXResetMatrix     = NULL;
-	m_SlicerYResetMatrix     = NULL;
-	m_SlicerZResetMatrix     = NULL;
+	m_SlicerResetMatrix[0] = m_SlicerResetMatrix[1] = m_SlicerResetMatrix[2] = NULL;
 
 	m_ShowGizmo = 1;
 
 	m_CurrentVolume   = NULL;
 	
-	m_SlicerY = NULL;
-	m_SlicerY = NULL;
-	m_SlicerZ          = NULL;
+	m_Slicer[0] = m_Slicer[1] = m_Slicer[2] = NULL;
 	m_GuiGizmos       = NULL;
 	m_ShowGizmo = 1;
 	m_AttachCameraToSlicerXInXView    = NULL;
@@ -567,34 +563,21 @@ void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *m
 {  
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
-		// for every slicer:
-
-		mafVMESlicer *currentSlicer = NULL;
-
-		if (slicerAxis == X)
-			currentSlicer = m_SlicerX;
-		else if (slicerAxis == Y)
-			currentSlicer = m_SlicerY;
-		else if (slicerAxis == Z)
-			currentSlicer = m_SlicerZ;
-
-		assert(currentSlicer != NULL);
-
 		// handle incoming transform event...
 		vtkTransform *tr = vtkTransform::New();
 		tr->PostMultiply();
-		tr->SetMatrix(currentSlicer->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+		tr->SetMatrix(m_Slicer[slicerAxis]->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 		tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
 		tr->Update();
 
 		mafMatrix absPose;
 		absPose.DeepCopy(tr->GetMatrix());
-		absPose.SetTimeStamp(currentSlicer->GetTimeStamp());
+		absPose.SetTimeStamp(m_Slicer[slicerAxis]->GetTimeStamp());
 
 		if (e->GetArg() == mafInteractorGenericMouse::MOUSE_MOVE)
 		{
 			// ... and update the slicer with the new abs pose
-			currentSlicer->SetAbsMatrix(absPose);
+			m_Slicer[slicerAxis]->SetAbsMatrix(absPose);
 		} 
 
 		// clean up
@@ -656,7 +639,7 @@ void mafViewArbitraryOrthoSlice::VolumeWindowing(mafVME *volume)
 	data->Update();
 	data->GetScalarRange(sr);
 
-	mmaMaterial *currentSurfaceMaterial = m_SlicerZ->GetMaterial();
+	mmaMaterial *currentSurfaceMaterial = m_Slicer[2]->GetMaterial();
 	m_ColorLUT = currentSurfaceMaterial->m_ColorLut;
 	assert(m_ColorLUT);
 	m_LutWidget->SetLut(m_ColorLUT);
@@ -664,8 +647,8 @@ void mafViewArbitraryOrthoSlice::VolumeWindowing(mafVME *volume)
 	m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
 	m_LutSlider->SetSubRange((long)currentSurfaceMaterial->m_TableRange[0],(long)currentSurfaceMaterial->m_TableRange[1]);
 
-	m_SlicerY->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
-	m_SlicerZ->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
+	m_Slicer[0]->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
+	m_Slicer[1]->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowVolume( mafVME * vme, bool show )
@@ -738,9 +721,20 @@ void mafViewArbitraryOrthoSlice::ShowVolume( mafVME * vme, bool show )
 	transformReset->RotateY(m_VolumeVTKDataABSOrientation[1]);
 	transformReset->Update();
 
-	mafNEW(m_SlicerZResetMatrix);
-	m_SlicerZResetMatrix->Identity();
-	m_SlicerZResetMatrix->SetVTKMatrix(transformReset->GetMatrix());
+
+	vtkMAFSmartPointer<vtkTransform> slicerTransform;
+	for (int i = X; i <= Z; i++)
+	{
+		slicerTransform->SetMatrix(transformReset->GetMatrix());
+		if(i==X)
+			slicerTransform->RotateY(89.999);
+		else if(i==Y)
+			slicerTransform->RotateX(90);
+		slicerTransform->Update();
+
+		mafNEW(m_SlicerResetMatrix[i]);
+		m_SlicerResetMatrix[i]->DeepCopy(slicerTransform->GetMatrix());
+	}
 
 	ShowSlicers(vme, show);
 
@@ -759,34 +753,32 @@ void mafViewArbitraryOrthoSlice::HideVolume()
 {
 
 	EnableWidgets(false);
+	for(int i=X; i<=Z; i++)
+	{
+// 		m_CameraConeVME[i]->ReparentTo(NULL);
+// 		mafDEL(m_CameraConeVME[i]);
+// 
+// 		m_CameraToSlicer[i]->SetVme(NULL);
+		m_Slicer[i]->SetBehavior(NULL);
+		m_Slicer[i]->ReparentTo(NULL);
+		mafDEL(m_Slicer[i]);
+
+// 		m_GizmoView[i]->Show(false);
+		mafDEL(m_SlicerResetMatrix[i]);
+	}
+
 
 	m_XCameraConeVME->ReparentTo(NULL);
 	mafDEL(m_XCameraConeVME);
-
 	m_AttachCameraToSlicerXInXView->SetVme(NULL);
-	m_SlicerX->SetBehavior(NULL);
-	m_SlicerX->ReparentTo(NULL);
-	mafDEL(m_SlicerX);
 
 	m_YCameraConeVME->ReparentTo(NULL);
 	mafDEL(m_YCameraConeVME);
-
 	m_AttachCameraToSlicerYInYView->SetVme(NULL);
-	m_SlicerY->SetBehavior(NULL);
-	m_SlicerY->ReparentTo(NULL);
-	mafDEL(m_SlicerY);
 
 	m_ZCameraConeVME->ReparentTo(NULL);
 	mafDEL(m_ZCameraConeVME);
-
 	m_AttachCameraToSlicerZInZView->SetVme(NULL);
-	m_SlicerZ->SetBehavior(NULL);
-	m_SlicerZ->ReparentTo(NULL);
-	mafDEL(m_SlicerZ);
-
-	//remove gizmos
-	m_Gui->Remove(m_GuiGizmos);
-	m_Gui->Update();
 
 	m_GizmoXView->Show(false);
 	m_GizmoYView->Show(false);
@@ -794,10 +786,6 @@ void mafViewArbitraryOrthoSlice::HideVolume()
 
 
 	cppDEL(m_GuiGizmos);
-
-	mafDEL(m_SlicerXResetMatrix);
-	mafDEL(m_SlicerYResetMatrix);
-	mafDEL(m_SlicerZResetMatrix);
 
 	m_CurrentVolume = NULL;
 	m_ColorLUT = NULL;
@@ -807,13 +795,15 @@ void mafViewArbitraryOrthoSlice::HideVolume()
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnReset()
 {
-	m_GizmoZView->SetAbsPose(m_SlicerZResetMatrix);
-	m_GizmoYView->SetAbsPose(m_SlicerYResetMatrix);
-	m_GizmoXView->SetAbsPose(m_SlicerXResetMatrix);
+	for (int i = X; i <= Z; i++)
+	{
+		m_Slicer[i]->SetAbsMatrix(*m_SlicerResetMatrix[i]);
+	}
 
-	m_SlicerX->SetAbsMatrix(*m_SlicerXResetMatrix);
-	m_SlicerY->SetAbsMatrix(*m_SlicerYResetMatrix);
-	m_SlicerZ->SetAbsMatrix(*m_SlicerZResetMatrix);
+	m_GizmoXView->SetAbsPose(m_SlicerResetMatrix[0]);
+	m_GizmoYView->SetAbsPose(m_SlicerResetMatrix[1]);
+	m_GizmoZView->SetAbsPose(m_SlicerResetMatrix[2]);
+
 
 	RestoreCameraParametersForAllSubviews();
 	UpdateSlicersLUT();
@@ -833,15 +823,14 @@ void mafViewArbitraryOrthoSlice::OnLUTChooser()
 {
 	double *sr;
 
-	if(m_CurrentVolume || m_CurrentImage) {
+	if(m_CurrentVolume ) {
 		sr = m_ColorLUT->GetRange();
 		m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
 
-		m_SlicerX->GetMaterial()->m_ColorLut->DeepCopy(m_ColorLUT);
-		m_SlicerX->GetMaterial()->m_ColorLut->Modified();
-
-		m_SlicerY->GetMaterial()->m_ColorLut->DeepCopy(m_ColorLUT);
-		m_SlicerY->GetMaterial()->m_ColorLut->Modified();
+		m_Slicer[X]->GetMaterial()->m_ColorLut->DeepCopy(m_ColorLUT);
+		m_Slicer[X]->GetMaterial()->m_ColorLut->Modified();
+		m_Slicer[Y]->GetMaterial()->m_ColorLut->DeepCopy(m_ColorLUT);
+		m_Slicer[Y]->GetMaterial()->m_ColorLut->Modified();
 
 		GetLogicManager()->CameraUpdate();
 	}
@@ -854,71 +843,41 @@ void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 	m_InputVolume = mafVMEVolumeGray::SafeDownCast(vmeVolume);
 	assert(m_InputVolume);
 
-	vtkMAFSmartPointer<vtkTransform> slicerXTransform;
-	slicerXTransform->SetMatrix(m_SlicerZResetMatrix->GetVTKMatrix());
-	slicerXTransform->RotateY(89.999);
-	slicerXTransform->Update();
+	char slicerNames[3][10] = { "m_SlicerX","m_SlicerY","m_SlicerZ" };
+	char gizmoNames[3][13] = { "m_GizmoXView","m_GizmoYView","m_GizmoZView" };
 
-	mafNEW(m_SlicerXResetMatrix);
-	m_SlicerXResetMatrix->Identity();
-	m_SlicerXResetMatrix->DeepCopy(slicerXTransform->GetMatrix());
+	for (int i = X; i <= Z; i++)
+	{
+		mafNEW(m_Slicer[i]);
+		m_Slicer[i]->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
+		m_Slicer[i]->SetName(slicerNames[0]);
+		m_Slicer[i]->ReparentTo(vmeVolume);
+		m_Slicer[i]->SetAbsMatrix(mafMatrix(*m_SlicerResetMatrix[i]));
+		m_Slicer[i]->SetSlicedVMELink(vmeVolume);
+		m_Slicer[i]->GetMaterial()->m_ColorLut->DeepCopy(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
+		m_Slicer[i]->Update();
+	}
 
-	mafNEW(m_SlicerX);
-	m_SlicerX->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
-	m_SlicerX->SetName("m_SlicerX");
-	m_SlicerX->ReparentTo(vmeVolume);
-	m_SlicerX->SetAbsMatrix(mafMatrix(slicerXTransform->GetMatrix()));
-	m_SlicerX->SetSlicedVMELink(vmeVolume);
-	m_SlicerX->GetMaterial()->m_ColorLut->DeepCopy(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
-	m_SlicerX->Update();
-
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_SlicerX, show);
-	m_ChildViewList[X_VIEW]->VmeShow(m_SlicerX, show);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_Slicer[0], show);
+	m_ChildViewList[X_VIEW]->VmeShow(m_Slicer[0], show);
 
 	BuildXCameraConeVME();
 
-	vtkMAFSmartPointer<vtkTransform> slicerYTransform;
-	slicerYTransform->SetMatrix(m_SlicerZResetMatrix->GetVTKMatrix());
-	slicerYTransform->RotateX(90);
-	slicerYTransform->Update();
-
-	mafNEW(m_SlicerYResetMatrix);
-	m_SlicerYResetMatrix->Identity();
-	m_SlicerYResetMatrix->DeepCopy(slicerYTransform->GetMatrix());
-
-	mafNEW(m_SlicerY);
-	m_SlicerY->SetName("m_SlicerY");
-	m_SlicerY->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
-	m_SlicerY->ReparentTo(vmeVolume);
-	m_SlicerY->SetAbsMatrix(mafMatrix(slicerYTransform->GetMatrix()));
-	m_SlicerY->SetSlicedVMELink(vmeVolume);
-	m_SlicerY->GetMaterial()->m_ColorLut->DeepCopy(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
-	m_SlicerY->Update();
-
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_SlicerY, show);
-	m_ChildViewList[Y_VIEW]->VmeShow(m_SlicerY, show);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_Slicer[1], show);
+	m_ChildViewList[Y_VIEW]->VmeShow(m_Slicer[1], show);
 
 	BuildYCameraConeVME();
 
-	mafNEW(m_SlicerZ);
-	m_SlicerZ->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
-	m_SlicerZ->SetName("m_SlicerZ");
-	m_SlicerZ->ReparentTo(vmeVolume);
-	m_SlicerZ->SetAbsMatrix(*m_SlicerZResetMatrix);
-	m_SlicerZ->SetSlicedVMELink(vmeVolume);
-	m_SlicerZ->GetMaterial()->m_ColorLut->DeepCopy(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
-	m_SlicerZ->Update();
-
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_SlicerZ, show);
-	m_ChildViewList[Z_VIEW]->VmeShow(m_SlicerZ, show);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_Slicer[2], show);
+	m_ChildViewList[Z_VIEW]->VmeShow(m_Slicer[2], show);
 
 	BuildZCameraConeVME();
 
-	mafPipeSurfaceTextured *pipePerspectiveViewZ = (mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerZ);
+	mafPipeSurfaceTextured *pipePerspectiveViewZ = (mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_Slicer[2]);
 	pipePerspectiveViewZ->SetActorPicking(false);
 	pipePerspectiveViewZ->SetEnableActorLOD(0);
 
-	mafPipeSurfaceTextured *pipeZView = (mafPipeSurfaceTextured *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_SlicerZ);
+	mafPipeSurfaceTextured *pipeZView = (mafPipeSurfaceTextured *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_Slicer[2]);
 	pipeZView->SetActorPicking(false);
 	pipeZView->SetEnableActorLOD(0);
 
@@ -929,26 +888,26 @@ void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 		m_AttachCameraToSlicerZInZView = new mafAttachCamera(m_Gui, ((mafViewVTK*)m_ChildViewList[Z_VIEW])->m_Rwi, this);
 	}
 	
-	m_AttachCameraToSlicerXInXView->SetStartingMatrix(m_SlicerX->GetOutput()->GetAbsMatrix());
-	m_AttachCameraToSlicerXInXView->SetVme(m_SlicerZ);
+	m_AttachCameraToSlicerXInXView->SetStartingMatrix(m_Slicer[0]->GetOutput()->GetAbsMatrix());
+	m_AttachCameraToSlicerXInXView->SetVme(m_Slicer[2]);
 	m_AttachCameraToSlicerXInXView->EnableAttachCamera();
 
-	m_AttachCameraToSlicerYInYView->SetStartingMatrix(m_SlicerY->GetOutput()->GetAbsMatrix());
-	m_AttachCameraToSlicerYInYView->SetVme(m_SlicerZ);
+	m_AttachCameraToSlicerYInYView->SetStartingMatrix(m_Slicer[1]->GetOutput()->GetAbsMatrix());
+	m_AttachCameraToSlicerYInYView->SetVme(m_Slicer[2]);
 	m_AttachCameraToSlicerYInYView->EnableAttachCamera();
 
-	m_AttachCameraToSlicerZInZView->SetStartingMatrix(m_SlicerZ->GetOutput()->GetAbsMatrix());
-	m_AttachCameraToSlicerZInZView->SetVme(m_SlicerZ);
+	m_AttachCameraToSlicerZInZView->SetStartingMatrix(m_Slicer[2]->GetOutput()->GetAbsMatrix());
+	m_AttachCameraToSlicerZInZView->SetVme(m_Slicer[2]);
 	m_AttachCameraToSlicerZInZView->EnableAttachCamera();
 
 	ResetCameraToSlices();
 
 	m_GizmoZView = new mafGizmoCrossRotateTranslate();
-	m_GizmoZView->Create(m_SlicerZ, this, true, mafGizmoCrossRotateTranslate::Z);
+	m_GizmoZView->Create(m_Slicer[2], this, true, mafGizmoCrossRotateTranslate::Z);
 	m_GizmoZView->SetName("m_GizmoZView");
-	m_GizmoZView->SetInput(m_SlicerZ);
-	m_GizmoZView->SetRefSys(m_SlicerZ);
-	m_GizmoZView->SetAbsPose(m_SlicerZResetMatrix);
+	m_GizmoZView->SetInput(m_Slicer[2]);
+	m_GizmoZView->SetRefSys(m_Slicer[2]);
+	m_GizmoZView->SetAbsPose(m_SlicerResetMatrix[2]);
 
 	m_GizmoZView->SetColor(mafGizmoCrossRotateTranslate::GREW, mafGizmoCrossRotateTranslate::GREEN);
 	m_GizmoZView->SetColor(mafGizmoCrossRotateTranslate::GTAEW, mafGizmoCrossRotateTranslate::GREEN);
@@ -960,11 +919,11 @@ void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 	m_GizmoZView->Show(true);
 
 	m_GizmoYView = new mafGizmoCrossRotateTranslate();
-	m_GizmoYView->Create(m_SlicerY, this, true, mafGizmoCrossRotateTranslate::Y);
+	m_GizmoYView->Create(m_Slicer[1], this, true, mafGizmoCrossRotateTranslate::Y);
 	m_GizmoYView->SetName("m_GizmoYView");
-	m_GizmoYView->SetInput(m_SlicerY);
-	m_GizmoYView->SetRefSys(m_SlicerY);
-	m_GizmoYView->SetAbsPose(m_SlicerYResetMatrix);
+	m_GizmoYView->SetInput(m_Slicer[1]);
+	m_GizmoYView->SetRefSys(m_Slicer[1]);
+	m_GizmoYView->SetAbsPose(m_SlicerResetMatrix[1]);
 
 	m_GizmoYView->SetColor(mafGizmoCrossRotateTranslate::GREW, mafGizmoCrossRotateTranslate::BLUE);
 	m_GizmoYView->SetColor(mafGizmoCrossRotateTranslate::GTAEW, mafGizmoCrossRotateTranslate::BLUE);
@@ -976,11 +935,11 @@ void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 	m_GizmoYView->Show(true);
 
 	m_GizmoXView = new mafGizmoCrossRotateTranslate();
-	m_GizmoXView->Create(m_SlicerX, this, true, mafGizmoCrossRotateTranslate::X);
+	m_GizmoXView->Create(m_Slicer[0], this, true, mafGizmoCrossRotateTranslate::X);
 	m_GizmoXView->SetName("m_GizmoXView");
-	m_GizmoXView->SetInput(m_SlicerX);
-	m_GizmoXView->SetRefSys(m_SlicerX);
-	m_GizmoXView->SetAbsPose(m_SlicerXResetMatrix);
+	m_GizmoXView->SetInput(m_Slicer[0]);
+	m_GizmoXView->SetRefSys(m_Slicer[0]);
+	m_GizmoXView->SetAbsPose(m_SlicerResetMatrix[0]);
 
 	m_GizmoXView->SetColor(mafGizmoCrossRotateTranslate::GREW, mafGizmoCrossRotateTranslate::GREEN);
 	m_GizmoXView->SetColor(mafGizmoCrossRotateTranslate::GTAEW, mafGizmoCrossRotateTranslate::GREEN);
@@ -1001,9 +960,9 @@ void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 	m_Gui->FitGui();
 	m_Gui->Update();
 
-	m_SlicerX->SetVisibleToTraverse(false);
-	m_SlicerY->SetVisibleToTraverse(false);
-	m_SlicerZ->SetVisibleToTraverse(false);
+	m_Slicer[0]->SetVisibleToTraverse(false);
+	m_Slicer[1]->SetVisibleToTraverse(false);
+	m_Slicer[2]->SetVisibleToTraverse(false);
 
 	UpdateSubviewsCamerasToFaceSlices();
 	BuildSliceHeightFeedbackLinesVMEs();
@@ -1063,10 +1022,9 @@ void mafViewArbitraryOrthoSlice::BuildXCameraConeVME()
 	m_XCameraConeVME->GetMaterial()->m_Prop->SetSpecular(0);
 	m_XCameraConeVME->GetMaterial()->m_Prop->SetOpacity(0.2);
 
-	assert(m_SlicerX);
 
 	// default slicer matrix rotation component is identity when the input volume has identity pose matrix
-	m_XCameraConeVME->ReparentTo(m_SlicerX);
+	m_XCameraConeVME->ReparentTo(m_Slicer[0]);
 
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_XCameraConeVME, true);
 
@@ -1120,8 +1078,6 @@ void mafViewArbitraryOrthoSlice::BuildYCameraConeVME()
 	m_YCameraConeVME->GetMaterial()->m_Prop->SetSpecular(0);
 	m_YCameraConeVME->GetMaterial()->m_Prop->SetOpacity(0.2);
 
-	assert(m_SlicerY);
-
 	/* default y slicer matrix
 
 	1  0  0  ...
@@ -1131,7 +1087,7 @@ void mafViewArbitraryOrthoSlice::BuildYCameraConeVME()
 
 	*/
 
-	m_YCameraConeVME->ReparentTo(m_SlicerY);
+	m_YCameraConeVME->ReparentTo(m_Slicer[1]);
 
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_YCameraConeVME, true);
 
@@ -1185,8 +1141,7 @@ void mafViewArbitraryOrthoSlice::BuildZCameraConeVME()
 	m_ZCameraConeVME->GetMaterial()->m_Prop->SetSpecular(0);
 	m_ZCameraConeVME->GetMaterial()->m_Prop->SetOpacity(0.2);
 
-	assert(m_SlicerY);
-	m_ZCameraConeVME->ReparentTo(m_SlicerZ);
+	m_ZCameraConeVME->ReparentTo(m_Slicer[2]);
 
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ZCameraConeVME, true);
 
@@ -1253,13 +1208,9 @@ void mafViewArbitraryOrthoSlice::CameraUpdate()
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ResetCameraToSlices()
 {
-	assert(m_ChildViewList[X_VIEW]);
-	assert(m_ChildViewList[Y_VIEW]);
-	assert(m_ChildViewList[Z_VIEW]);
-
-	((mafViewVTK*)m_ChildViewList[Y_VIEW])->CameraReset(m_SlicerY);
-	((mafViewVTK*)m_ChildViewList[X_VIEW])->CameraReset(m_SlicerX);
-	((mafViewVTK*)m_ChildViewList[Z_VIEW])->CameraReset(m_SlicerZ);
+	((mafViewVTK*)m_ChildViewList[Y_VIEW])->CameraReset(m_Slicer[0]);
+	((mafViewVTK*)m_ChildViewList[X_VIEW])->CameraReset(m_Slicer[1]);
+	((mafViewVTK*)m_ChildViewList[Z_VIEW])->CameraReset(m_Slicer[2]);
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::StoreCameraParametersForAllSubviews()
@@ -1424,12 +1375,10 @@ void mafViewArbitraryOrthoSlice::BuildSliceHeightFeedbackLinesVMEs()
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSlicers(int axis)
 {
-	const int numSlicers = 3;
-	mafVMESlicer *slicers[numSlicers] = {m_SlicerX, m_SlicerY, m_SlicerZ};
-
-	slicers[axis]->SetAbsMatrix(slicers[axis]->GetAbsMatrixPipe()->GetMatrix());
-	slicers[axis]->GetSurfaceOutput()->GetVTKData()->Modified();
-	slicers[axis]->GetSurfaceOutput()->GetVTKData()->Update();
+	
+	m_Slicer[axis]->SetAbsMatrix(m_Slicer[axis]->GetAbsMatrixPipe()->GetMatrix());
+	m_Slicer[axis]->GetSurfaceOutput()->GetVTKData()->Modified();
+	m_Slicer[axis]->GetSurfaceOutput()->GetVTKData()->Update();
 }
 
 
@@ -1495,20 +1444,12 @@ void mafViewArbitraryOrthoSlice::UpdateSlicersLUT()
 	m_LutSlider->GetSubRange(&low,&hi);
 	m_ColorLUT->SetTableRange(low,hi);
 
-	mafVMEOutputSurface *surfaceOutputSlicerX = mafVMEOutputSurface::SafeDownCast(m_SlicerX->GetOutput());
-	assert(surfaceOutputSlicerX);
-	surfaceOutputSlicerX->Update();
-	surfaceOutputSlicerX->GetMaterial()->m_ColorLut->SetTableRange(low,hi);
-
-	mafVMEOutputSurface *surfaceOutputSlicerY = mafVMEOutputSurface::SafeDownCast(m_SlicerY->GetOutput());
-	assert(surfaceOutputSlicerY);
-	surfaceOutputSlicerY->Update();
-	surfaceOutputSlicerY->GetMaterial()->m_ColorLut->SetTableRange(low,hi);
-
-	mafVMEOutputSurface *surfaceOutputSlicerZ = mafVMEOutputSurface::SafeDownCast(m_SlicerZ->GetOutput());
-	assert(surfaceOutputSlicerZ);
-	surfaceOutputSlicerZ->Update();
-	surfaceOutputSlicerZ->GetMaterial()->m_ColorLut->SetTableRange(low,hi);
+	for (int i = X; i <= Z; i++)
+	{
+		mafVMEOutputSurface *surfaceOutputSlicer = mafVMEOutputSurface::SafeDownCast(m_Slicer[i]->GetOutput());
+		surfaceOutputSlicer->Update();
+		surfaceOutputSlicer->GetMaterial()->m_ColorLut->SetTableRange(low, hi);
+	}
 
 	GetLogicManager()->CameraUpdate();
 }

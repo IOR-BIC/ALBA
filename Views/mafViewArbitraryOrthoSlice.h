@@ -235,14 +235,9 @@ protected:
 	mafVME          	*m_CurrentVolume;
 	mafVME				    *m_CurrentImage;
 
-	mafVMESlicer			*m_SlicerX;
-	mafVMESlicer			*m_SlicerY;
-	mafVMESlicer			*m_SlicerZ;
-
-	mafMatrix					*m_SlicerXResetMatrix;
-	mafMatrix					*m_SlicerYResetMatrix;
-	mafMatrix					*m_SlicerZResetMatrix;
-
+	mafVMESlicer			*m_Slicer[3];
+	mafMatrix					*m_SlicerResetMatrix[3];
+	
 	mafAttachCamera		*m_AttachCameraToSlicerXInXView;
 	mafAttachCamera		*m_AttachCameraToSlicerYInYView;
 	mafAttachCamera		*m_AttachCameraToSlicerZInZView;
