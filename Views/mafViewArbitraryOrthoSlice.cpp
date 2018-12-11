@@ -108,10 +108,6 @@ const int BOUND_1=1;
 
 mafCxxTypeMacro(mafViewArbitraryOrthoSlice);
 
-const int MID = 1;
-const int PID = 0;
-
-
 //----------------------------------------------------------------------------
 // constants:
 //----------------------------------------------------------------------------
@@ -125,77 +121,27 @@ enum ARBITRARY_SUBVIEW_ID
 	NUMBER_OF_SUBVIEWS = 4,
 };
 
-enum AXIS_ID
-{
-	X_AXIS = 0,
-	Y_AXIS,
-	Z_AXIS,
-};
-
-#define SideToView(a) ( (a) == X ? X_VIEW : ((a) == Y ? Y_VIEW : Z_VIEW))
+#define AsixToView(a) ( (a) == X ? X_VIEW : ((a) == Y ? Y_VIEW : Z_VIEW))
 
 //----------------------------------------------------------------------------
 mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label) : mafViewCompoundWindowing(label, 2, 2)
 {
-	m_DebugMode = false;
-
-	m_NumberOfAxialSections[RED] = 3;
-	m_NumberOfAxialSections[GREEN] = 3;
-	m_NumberOfAxialSections[BLUE] = 3;
-
-	m_FeedbackLineHeight[RED] = 20;
-	m_FeedbackLineHeight[GREEN] = 20;
-	m_FeedbackLineHeight[BLUE] = 20;
-	
 	m_InputVolume = NULL;
 	m_GizmoRT[0] = m_GizmoRT[1] = m_GizmoRT[2] = NULL;
-
 	m_View3d   = NULL;
-
 	m_ViewSlice[0] = m_ViewSlice[1] = m_ViewSlice[2] = NULL;
-	
 	m_SlicerResetMatrix[0] = m_SlicerResetMatrix[1] = m_SlicerResetMatrix[2] = NULL;
-
 	m_CurrentVolume   = NULL;
-	
 	m_Slicer[0] = m_Slicer[1] = m_Slicer[2] = NULL;
-	m_AttachCameraToSlicerXInXView    = NULL;
-	m_AttachCameraToSlicerYInYView    = NULL;
-	m_AttachCameraToSlicerZInZView    = NULL;
-
-	m_VolumeVTKDataCenterABSCoords[0] = 0.0;
-	m_VolumeVTKDataCenterABSCoords[1] = 0.0;
-	m_VolumeVTKDataCenterABSCoords[2] = 0.0;
-
-	m_VolumeVTKDataCenterABSCoordinatesReset[0] = 0.0;
-	m_VolumeVTKDataCenterABSCoordinatesReset[1] = 0.0;
-	m_VolumeVTKDataCenterABSCoordinatesReset[2] = 0.0;
-
+	m_CameraToSlicer[0] = m_CameraToSlicer[1] = m_CameraToSlicer[2] = NULL;
+	m_VolumeVTKDataCenterABSCoords[0] = m_VolumeVTKDataCenterABSCoords[1] = m_VolumeVTKDataCenterABSCoords[2] = 0.0;
+	m_VolumeVTKDataCenterABSCoordinatesReset[0] = m_VolumeVTKDataCenterABSCoordinatesReset[1] = m_VolumeVTKDataCenterABSCoordinatesReset[2] = 0.0;
 	m_CameraConeVME[0] = m_CameraConeVME[1] = m_CameraConeVME[2] = NULL;
-
-	m_XCameraPositionForReset[0] = 0;
-	m_XCameraPositionForReset[1] = 0;
-	m_XCameraPositionForReset[2] = 0;
-
-	m_YCameraPositionForReset[0] = 0;
-	m_YCameraPositionForReset[1] = 0;
-	m_YCameraPositionForReset[2] = 0;
-
-	m_ZCameraPositionForReset[0] = 0;
-	m_ZCameraPositionForReset[1] = 0;
-	m_ZCameraPositionForReset[2] = 0;
-
-	m_XCameraViewUpForReset[0] = 0;
-	m_XCameraViewUpForReset[1] = 0;
-	m_XCameraViewUpForReset[2] = 0;
-
-	m_YCameraViewUpForReset[0] = 0;
-	m_YCameraViewUpForReset[1] = 0;
-	m_YCameraViewUpForReset[2] = 0;
-
-	m_ZCameraViewUpForReset[0] = 0;
-	m_ZCameraViewUpForReset[1] = 0;
-	m_ZCameraViewUpForReset[2] = 0;
+	for (int i = X; i <= Z; i++)
+	{
+		m_CameraPositionForReset[i][0] = m_CameraPositionForReset[i][1] = m_CameraPositionForReset[i][2] = 0;
+		m_CameraViewUpForReset[i][0] = m_CameraViewUpForReset[i][1] = m_CameraViewUpForReset[i][2] = 0;
+	}
 }
 //----------------------------------------------------------------------------
 mafViewArbitraryOrthoSlice::~mafViewArbitraryOrthoSlice()
@@ -242,24 +188,14 @@ void mafViewArbitraryOrthoSlice::VmeShow(mafVME *vme, bool show)
 {
 	if (vme->IsA("mafVMEGizmo"))
 	{
-		if (BelongsToNormalGizmo(vme,Z))
+		for (int i = 0; i <= Z; i++)
 		{
-			m_ChildViewList[Z_VIEW]->VmeShow(vme, show);
-			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
-		}
-		else if (BelongsToNormalGizmo(vme, X))
-		{
-			m_ChildViewList[X_VIEW]->VmeShow(vme, show);
-			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
-		}
-		else if (BelongsToNormalGizmo(vme, Y))
-		{
-			m_ChildViewList[Y_VIEW]->VmeShow(vme, show);
-			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
-		}
-		else
-		{
-			return;
+			if (BelongsToNormalGizmo(vme, i))
+			{
+				m_ChildViewList[AsixToView(i)]->VmeShow(vme, show);
+				m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
+				break;
+			}
 		}
 	}
 	else
@@ -421,8 +357,8 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoRotate(mafEventBase *maf_event, int
 			PostMultiplyEventMatrixToSlicer(maf_event, orthoPlanes[0]);
 			PostMultiplyEventMatrixToSlicer(maf_event, orthoPlanes[1]);
 
-			m_ChildViewList[SideToView(orthoPlanes[0])]->GetRWI()->GetCamera()->ApplyTransform(tr);
-			m_ChildViewList[SideToView(orthoPlanes[1])]->GetRWI()->GetCamera()->ApplyTransform(tr);
+			m_ChildViewList[AsixToView(orthoPlanes[0])]->GetRWI()->GetCamera()->ApplyTransform(tr);
+			m_ChildViewList[AsixToView(orthoPlanes[1])]->GetRWI()->GetCamera()->ApplyTransform(tr);
 
 			SetSlices();
 		}
@@ -457,7 +393,7 @@ void mafViewArbitraryOrthoSlice::SetSlices()
 		}
 		iter->Delete();
 	}
-	ChildViewsCameraUpdate();
+	CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -565,21 +501,13 @@ void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *m
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSubviewsCamerasToFaceSlices()
 {
-	const int numCameras = 3;
-	mafAttachCamera *attachCameras[numCameras] = {m_AttachCameraToSlicerXInXView, m_AttachCameraToSlicerYInYView, m_AttachCameraToSlicerZInZView};
-
-	for (int i = 0; i < numCameras ; i++)
+	for (int i = X; i <= Z ; i++)
 	{
-		if (attachCameras[i] != NULL)
-		{
-			attachCameras[i]->UpdateCameraMatrix();
-		}
+		if (m_CameraToSlicer[i] != NULL)
+			m_CameraToSlicer[i]->UpdateCameraMatrix();
 	}
 
-	for(int i=0; i<m_NumOfChildView; i++)
-	{
-		m_ChildViewList[i]->CameraUpdate();
-	}
+	CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::CreateGuiView()
@@ -591,7 +519,7 @@ void mafViewArbitraryOrthoSlice::CreateGuiView()
 	m_LutSlider->SetListener(this);
 	m_LutSlider->SetSize(500,24);
 	m_LutSlider->SetMinSize(wxSize(500,24));
-	EnableWidgets( (m_CurrentVolume != NULL) || (m_CurrentImage!=NULL) );
+	EnableWidgets(m_CurrentVolume != NULL);
 	m_GuiView->Add(m_LutSlider);
 	m_GuiView->Reparent(m_Win);
 }
@@ -633,24 +561,14 @@ void mafViewArbitraryOrthoSlice::ShowVolume( mafVME * vme, bool show )
 {
 	wxBusyInfo wait("please wait");
 
-	mafViewVTK *xView = ((mafViewVTK *)(m_ChildViewList[X_VIEW])) ;
-	assert(xView);
-
-	double pickerTolerance = 0.03;
-
-	// fuzzy picking
-	xView->GetPicker2D()->SetTolerance(pickerTolerance);
-	mafViewVTK *yView = ((mafViewVTK *)(m_ChildViewList[Y_VIEW])) ;
-	assert(yView);
-
-	// fuzzy picking
-	yView->GetPicker2D()->SetTolerance(pickerTolerance);
-
-	mafViewVTK *zView = ((mafViewVTK *)(m_ChildViewList[Z_VIEW])) ;
-	assert(zView);
-
-	// fuzzy picking
-	zView->GetPicker2D()->SetTolerance(pickerTolerance);
+	for (int i = X; i <= Z; i++)
+	{
+		mafViewVTK *xView = ((mafViewVTK *)(m_ChildViewList[AsixToView(i)]));
+		assert(xView);
+		// fuzzy picking
+		xView->GetPicker2D()->SetTolerance(0.03);
+	}
+	
 		
 	double sr[2],volumeVTKDataCenterLocalCoords[3];
 	m_CurrentVolume = vme;
@@ -659,12 +577,9 @@ void mafViewArbitraryOrthoSlice::ShowVolume( mafVME * vme, bool show )
 
 	vtkDataSet *volumeVTKData = vme->GetOutput()->GetVTKData();
 	volumeVTKData->Update();
-
 	volumeVTKData->GetCenter(volumeVTKDataCenterLocalCoords);
-
 	volumeVTKData->GetScalarRange(sr);
-	volumeVTKData=NULL;
-
+	
 	mafTransform::GetOrientation(vme->GetAbsMatrixPipe()->GetMatrix(),m_VolumeVTKDataABSOrientation);
 
 	// Compute the center of Volume in absolute coordinates
@@ -734,20 +649,15 @@ void mafViewArbitraryOrthoSlice::HideVolume()
 	for(int i=X; i<=Z; i++)
 	{
 		m_CameraConeVME[i]->ReparentTo(NULL);
-		mafDEL(m_CameraConeVME[i]);
-// 
-// 		m_CameraToSlicer[i]->SetVme(NULL);
+		m_GizmoRT[i]->Show(false);
+
+		m_CameraToSlicer[i]->SetVme(NULL);
 		m_Slicer[i]->SetBehavior(NULL);
 		m_Slicer[i]->ReparentTo(NULL);
+		mafDEL(m_CameraConeVME[i]);
 		mafDEL(m_Slicer[i]);
-
 		mafDEL(m_SlicerResetMatrix[i]);
-		m_GizmoRT[i]->Show(false);
 	}
-
-	m_AttachCameraToSlicerXInXView->SetVme(NULL);
-	m_AttachCameraToSlicerYInYView->SetVme(NULL);
-	m_AttachCameraToSlicerZInZView->SetVme(NULL);
 
 	m_CurrentVolume = NULL;
 	m_ColorLUT = NULL;
@@ -788,19 +698,22 @@ void mafViewArbitraryOrthoSlice::OnLUTChooser()
 		m_Slicer[Y]->GetMaterial()->m_ColorLut->DeepCopy(m_ColorLUT);
 		m_Slicer[Y]->GetMaterial()->m_ColorLut->Modified();
 
-		GetLogicManager()->CameraUpdate();
+		CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 {
+	char slicerNames[3][10] = { "m_SlicerX","m_SlicerY","m_SlicerZ" };
+	char gizmoNames[3][13] = { "m_GizmoXView","m_GizmoYView","m_GizmoZView" };
+	enum mafGizmoCrossRotateTranslate::COLOR gizmoColors[3][2] = { { mafGizmoCrossRotateTranslate::GREEN, mafGizmoCrossRotateTranslate::BLUE },
+																																 { mafGizmoCrossRotateTranslate::BLUE,  mafGizmoCrossRotateTranslate::RED },
+																																 { mafGizmoCrossRotateTranslate::GREEN, mafGizmoCrossRotateTranslate::RED } };
+
 	EnableWidgets((m_CurrentVolume != NULL));
 	// register sliced volume
 	m_InputVolume = mafVMEVolumeGray::SafeDownCast(vmeVolume);
 	assert(m_InputVolume);
-
-	char slicerNames[3][10] = { "m_SlicerX","m_SlicerY","m_SlicerZ" };
-	char gizmoNames[3][13] = { "m_GizmoXView","m_GizmoYView","m_GizmoZView" };
 
 	for (int i = X; i <= Z; i++)
 	{
@@ -813,91 +726,37 @@ void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 		m_Slicer[i]->GetMaterial()->m_ColorLut->DeepCopy(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
 		m_Slicer[i]->Update();
 		m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_Slicer[i], show);
-		m_ChildViewList[SideToView(i)]->VmeShow(m_Slicer[i], show);
-		//m_Slicer[i]->SetVisibleToTraverse(false);
+		m_ChildViewList[AsixToView(i)]->VmeShow(m_Slicer[i], show);
 		BuildCameraConeVME(i);
+		m_CameraToSlicer[i] = new mafAttachCamera(m_Gui, ((mafViewVTK*)m_ChildViewList[AsixToView(i)])->m_Rwi, this);
+		m_CameraToSlicer[i]->SetStartingMatrix(m_Slicer[i]->GetOutput()->GetAbsMatrix());
+		m_CameraToSlicer[i]->SetVme(m_Slicer[Z]);
+		m_CameraToSlicer[i]->EnableAttachCamera();
+
 	}
-
-
-	mafPipeSurfaceTextured *pipePerspectiveViewZ = (mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_Slicer[2]);
-	pipePerspectiveViewZ->SetActorPicking(false);
-	pipePerspectiveViewZ->SetEnableActorLOD(0);
-
-	mafPipeSurfaceTextured *pipeZView = (mafPipeSurfaceTextured *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_Slicer[2]);
-	pipeZView->SetActorPicking(false);
-	pipeZView->SetEnableActorLOD(0);
-
-	if (m_AttachCameraToSlicerXInXView == NULL && m_AttachCameraToSlicerYInYView == NULL &&	m_AttachCameraToSlicerZInZView == NULL)
-	{
-		m_AttachCameraToSlicerXInXView = new mafAttachCamera(m_Gui, ((mafViewVTK*)m_ChildViewList[X_VIEW])->m_Rwi, this);
-		m_AttachCameraToSlicerYInYView = new mafAttachCamera(m_Gui, ((mafViewVTK*)m_ChildViewList[Y_VIEW])->m_Rwi, this);
-		m_AttachCameraToSlicerZInZView = new mafAttachCamera(m_Gui, ((mafViewVTK*)m_ChildViewList[Z_VIEW])->m_Rwi, this);
-	}
-	
-	m_AttachCameraToSlicerXInXView->SetStartingMatrix(m_Slicer[0]->GetOutput()->GetAbsMatrix());
-	m_AttachCameraToSlicerXInXView->SetVme(m_Slicer[2]);
-	m_AttachCameraToSlicerXInXView->EnableAttachCamera();
-
-	m_AttachCameraToSlicerYInYView->SetStartingMatrix(m_Slicer[1]->GetOutput()->GetAbsMatrix());
-	m_AttachCameraToSlicerYInYView->SetVme(m_Slicer[2]);
-	m_AttachCameraToSlicerYInYView->EnableAttachCamera();
-
-	m_AttachCameraToSlicerZInZView->SetStartingMatrix(m_Slicer[2]->GetOutput()->GetAbsMatrix());
-	m_AttachCameraToSlicerZInZView->SetVme(m_Slicer[2]);
-	m_AttachCameraToSlicerZInZView->EnableAttachCamera();
 
 	ResetCameraToSlices();
-
-	enum mafGizmoCrossRotateTranslate::COLOR gizmoColors[2];
+		
 	for (int i = X; i <= Z; i++)
 	{
-		if (i == X)
-		{
-			gizmoColors[0] = mafGizmoCrossRotateTranslate::GREEN;
-			gizmoColors[1] = mafGizmoCrossRotateTranslate::BLUE;
-		}
-		else if (i == Y)
-		{
-			gizmoColors[0] = mafGizmoCrossRotateTranslate::BLUE;
-			gizmoColors[1] = mafGizmoCrossRotateTranslate::RED;
-		}
-		else
-		{
-			gizmoColors[0] = mafGizmoCrossRotateTranslate::GREEN;
-			gizmoColors[1] = mafGizmoCrossRotateTranslate::RED;
-		}
 		m_GizmoRT[i] = new mafGizmoCrossRotateTranslate();
 		m_GizmoRT[i]->Create(m_Slicer[i], this, true, i);
 		m_GizmoRT[i]->SetName(gizmoNames[i]);
 		m_GizmoRT[i]->SetInput(m_Slicer[i]);
 		m_GizmoRT[i]->SetRefSys(m_Slicer[i]);
 		m_GizmoRT[i]->SetAbsPose(m_SlicerResetMatrix[i]);
-		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GREW, gizmoColors[0]);
-		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GTAEW, gizmoColors[0]);
-		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GTPEW, gizmoColors[0]);
-		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GRNS, gizmoColors[1]);
-		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GTANS, gizmoColors[1]);
-		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GTPNS, gizmoColors[1]);
+		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GREW, gizmoColors[i][0]);
+		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GTAEW, gizmoColors[i][0]);
+		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GTPEW, gizmoColors[i][0]);
+		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GRNS, gizmoColors[i][1]);
+		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GTANS, gizmoColors[i][1]);
+		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GTPNS, gizmoColors[i][1]);
 		m_GizmoRT[i]->Show(true);
-
+		m_Slicer[i]->SetVisibleToTraverse(false);
 	}
 
-	m_Slicer[0]->SetVisibleToTraverse(false);
-	m_Slicer[1]->SetVisibleToTraverse(false);
-	m_Slicer[2]->SetVisibleToTraverse(false);
-
 	UpdateSubviewsCamerasToFaceSlices();
-	//BuildSliceHeightFeedbackLinesVMEs();
-
-	
-	double red[3] = { 1,0,0 };
-	CreateViewCameraNormalFeedbackActor(red, X_VIEW);
-
-	double green[3] = { 0,1,0 };
-	CreateViewCameraNormalFeedbackActor(green, Y_VIEW);
-
-	double blue[3] = { 0,0,1 };
-	CreateViewCameraNormalFeedbackActor(blue, Z_VIEW);
+	CreateViewCameraNormalFeedbackActors();
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::BuildCameraConeVME(int side)
@@ -985,82 +844,33 @@ void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToGizmoCross( mafEventBa
 	vtkDEL(tr1);
 }
 //----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ChildViewsCameraUpdate()
-{
-	//UpdateSlicersLUT();
-
-	for(int i=0; i<m_NumOfChildView; i++)
-	{
-		m_ChildViewList[i]->CameraUpdate();
-	}
-}
-
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::CameraUpdate()
-{
-	Superclass::CameraUpdate();
-}
-//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ResetCameraToSlices()
 {
-	((mafViewVTK*)m_ChildViewList[Y_VIEW])->CameraReset(m_Slicer[0]);
-	((mafViewVTK*)m_ChildViewList[X_VIEW])->CameraReset(m_Slicer[1]);
-	((mafViewVTK*)m_ChildViewList[Z_VIEW])->CameraReset(m_Slicer[2]);
+	for(int i=0;i<=Z;i++)
+		((mafViewVTK*)m_ChildViewList[AsixToView(i)])->CameraReset(m_Slicer[i]);
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::StoreCameraParametersForAllSubviews()
 {
-	((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera()->GetPosition(m_XCameraPositionForReset);
-	((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera()->GetPosition(m_YCameraPositionForReset);
-	((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetPosition(m_ZCameraPositionForReset);
-
-	((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera()->GetFocalPoint(m_XCameraFocalPointForReset);
-	((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera()->GetFocalPoint(m_YCameraFocalPointForReset);
-	((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetFocalPoint(m_ZCameraFocalPointForReset);
-
-	((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera()->GetViewUp(m_XCameraViewUpForReset);
-	((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera()->GetViewUp(m_YCameraViewUpForReset);
-	((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewUp(m_ZCameraViewUpForReset);
+	for (int i = 0; i <= Z; i++)
+	{
+		((mafViewSlice*)m_ChildViewList[AsixToView(i)])->GetRWI()->GetCamera()->GetPosition(m_CameraPositionForReset[i]);
+		((mafViewSlice*)m_ChildViewList[AsixToView(i)])->GetRWI()->GetCamera()->GetFocalPoint(m_CameraFocalPointForReset[i]);
+		((mafViewSlice*)m_ChildViewList[AsixToView(i)])->GetRWI()->GetCamera()->GetViewUp(m_CameraViewUpForReset[i]);
+	}
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::RestoreCameraParametersForAllSubviews()
 {
-	vtkCamera *xViewCamera = ((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera();
-	xViewCamera->SetPosition(m_XCameraPositionForReset);
-	xViewCamera->SetFocalPoint(m_XCameraFocalPointForReset);
-	xViewCamera->SetViewUp(m_XCameraViewUpForReset);
-
-	vtkCamera *yViewCamera = ((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera();
-	yViewCamera->SetPosition(m_YCameraPositionForReset);
-	yViewCamera->SetFocalPoint(m_YCameraFocalPointForReset);
-	yViewCamera->SetViewUp(m_YCameraViewUpForReset);
-
-	vtkCamera *zViewCamera = ((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera();
-	zViewCamera->SetPosition(m_ZCameraPositionForReset);
-	zViewCamera->SetFocalPoint(m_ZCameraFocalPointForReset);
-	zViewCamera->SetViewUp(m_ZCameraViewUpForReset);
+	for (int i = 0; i <= Z; i++)
+	{
+		vtkCamera *xViewCamera = ((mafViewSlice*)m_ChildViewList[AsixToView(i)])->GetRWI()->GetCamera();
+		xViewCamera->SetPosition(m_CameraPositionForReset[i]);
+		xViewCamera->SetFocalPoint(m_CameraFocalPointForReset[i]);
+		xViewCamera->SetViewUp(m_CameraViewUpForReset[i]);
+	}
 }
 
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::ShowVTKDataAsVMESurface( vtkPolyData *vmeVTKData, mafVMESurface *vmeSurface, vtkMatrix4x4 *inputABSMatrix )
-{
-	assert(vmeVTKData->GetNumberOfPoints());
-
-	// DEBUG VISUALIZATION
-	vmeSurface->SetName("cutting line");
-	vmeSurface->SetData(vmeVTKData, m_CurrentVolume->GetTimeStamp());
-	vmeSurface->SetVisibleToTraverse(false);
-
-	vmeSurface->GetMaterial()->m_Prop->SetAmbient(1);
-	vmeSurface->GetMaterial()->m_Prop->SetDiffuse(0);
-	vmeSurface->GetMaterial()->m_Prop->SetSpecular(0);
-	vmeSurface->GetMaterial()->m_Prop->SetOpacity(0.4);
-
-	vmeSurface->SetAbsMatrix(inputABSMatrix);
-
-	vmeSurface->GetOutput()->GetVTKData()->Modified();
-	vmeSurface->GetOutput()->GetVTKData()->Update();
-}
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSlicers(int axis)
 {
@@ -1071,55 +881,51 @@ void mafViewArbitraryOrthoSlice::UpdateSlicers(int axis)
 //----------------------------------------------------------------------------
 mafPipeSurface * mafViewArbitraryOrthoSlice::GetPipe(int inView, mafVMESurface *inSurface)
 {
-	mafPipeSurface *pipe = (mafPipeSurface *)((m_ChildViewList[inView])->GetNodePipe(inSurface));
-	return pipe;
+	return (mafPipeSurface *)((m_ChildViewList[inView])->GetNodePipe(inSurface));
 }
 //----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::CreateViewCameraNormalFeedbackActor(double col[3], int view)
+void mafViewArbitraryOrthoSlice::CreateViewCameraNormalFeedbackActors()
 {
-	double m_BorderColor[3];
-	//  bool m_Border = false;
+	double col[3][3] = { { 1,0,0 },{ 0,1,0 },{ 0,0,1 } };
+	
+	for (int i = X; i <= Z; i++)
+	{
+		int size[2];
+		this->GetWindow()->GetSize(&size[0], &size[1]);
+		vtkSphereSource *ss = vtkSphereSource::New();
 
-	m_BorderColor[0] = col[0];
-	m_BorderColor[1] = col[1];
-	m_BorderColor[2] = col[2];
+		ss->SetRadius(size[0] / 20.0);
+		ss->SetCenter(0, 0, 0);
+		ss->SetThetaResolution(1);
+		ss->Update();
 
-	//if(m_Border) BorderDelete();
-	int size[2];
-	this->GetWindow()->GetSize(&size[0],&size[1]);
-	vtkSphereSource *ss = vtkSphereSource::New();
+		vtkCoordinate *coord = vtkCoordinate::New();
+		coord->SetCoordinateSystemToDisplay();
+		coord->SetValue(size[0] - 1, size[1] - 1, 0);
 
-	ss->SetRadius(size[0] / 20.0);
-	ss->SetCenter(0,0,0);
-	ss->SetThetaResolution(1);
-	ss->Update();
+		vtkPolyDataMapper2D *pdmd = vtkPolyDataMapper2D::New();
+		pdmd->SetInput(ss->GetOutput());
+		pdmd->SetTransformCoordinate(coord);
 
-	vtkCoordinate *coord = vtkCoordinate::New();
-	coord->SetCoordinateSystemToDisplay();
-	coord->SetValue(size[0]-1, size[1]-1, 0);
+		vtkProperty2D *pd = vtkProperty2D::New();
+		pd->SetDisplayLocationToForeground();
+		pd->SetLineWidth(4);
+		pd->SetColor(col[i]);
+		pd->SetOpacity(0.2);
 
-	vtkPolyDataMapper2D *pdmd = vtkPolyDataMapper2D::New();
-	pdmd->SetInput(ss->GetOutput());
-	pdmd->SetTransformCoordinate(coord);
+		vtkActor2D *border = vtkActor2D::New();
+		border->SetMapper(pdmd);
+		border->SetProperty(pd);
+		border->SetPosition(1, 1);
 
-	vtkProperty2D *pd = vtkProperty2D::New();
-	pd->SetDisplayLocationToForeground();
-	pd->SetLineWidth(4);
-	pd->SetColor(col[0],col[1],col[2]);
-	pd->SetOpacity(0.2);
+		((mafViewVTK*)(m_ChildViewList[AsixToView(i)]))->m_Rwi->m_RenFront->AddActor2D(border);
 
-	vtkActor2D *m_Border = vtkActor2D::New();
-	m_Border->SetMapper(pdmd);
-	m_Border->SetProperty(pd);
-	m_Border->SetPosition(1,1);
-
-	((mafViewVTK*)(m_ChildViewList[view]))->m_Rwi->m_RenFront->AddActor2D(m_Border);
-
-	vtkDEL(ss);
-	vtkDEL(coord);
-	vtkDEL(pdmd);
-	vtkDEL(pd);
-	vtkDEL(m_Border);
+		vtkDEL(ss);
+		vtkDEL(coord);
+		vtkDEL(pdmd);
+		vtkDEL(pd);
+		vtkDEL(border);
+	}
 }
 
 
@@ -1137,13 +943,11 @@ void mafViewArbitraryOrthoSlice::UpdateSlicersLUT()
 		surfaceOutputSlicer->GetMaterial()->m_ColorLut->SetTableRange(low, hi);
 	}
 
-	GetLogicManager()->CameraUpdate();
+	CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateWindowing(bool enable,mafVME *vme)
 {
 	if(vme->GetOutput() && vme->GetOutput()->IsA("mafVMEOutputVolume") && enable)
-	{
 		VolumeWindowing(vme);
-	}
 }

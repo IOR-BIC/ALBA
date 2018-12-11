@@ -138,9 +138,6 @@ public:
 	/** Create the GUI at the bottom of the compounded view. */
 	virtual void CreateGuiView();
 
-	/** Camera update */
-	void CameraUpdate();
-
 	/** Function that handles events sent from other objects. */
 	virtual void OnEvent(mafEventBase *maf_event);
 
@@ -160,9 +157,6 @@ protected:
 
 	void ShowSlicers( mafVME * vmeVolume, bool show );
 	
-  void ShowVTKDataAsVMESurface( vtkPolyData *vmeVTKData, 
-		mafVMESurface *vmeSurface, vtkMatrix4x4 *inputABSMatrix);
-
 	void ResetCameraToSlices();
 
 	/** 
@@ -212,29 +206,22 @@ protected:
 	void OnEventGizmoRotate(mafEventBase *maf_event, int side);
 
 	void SetSlices();
-
-	void ChildViewsCameraUpdate();
-		
+			
 	mafPipeSurface * GetPipe(int inView, mafVMESurface *inSurface);
 			
 	/** Recompute all slicers output */
 	void UpdateSlicers(int axis);
 
-	void CreateViewCameraNormalFeedbackActor(double col[3], int view);
+	void CreateViewCameraNormalFeedbackActors();
 	void UpdateWindowing(bool enable,mafVME *vme);
 	
 	mafViewVTK *m_ViewSlice[3];
 	mafViewVTK *m_View3d;
 
 	mafVME          	*m_CurrentVolume;
-	mafVME				    *m_CurrentImage;
-
 	mafVMESlicer			*m_Slicer[3];
 	mafMatrix					*m_SlicerResetMatrix[3];
-	
-	mafAttachCamera		*m_AttachCameraToSlicerXInXView;
-	mafAttachCamera		*m_AttachCameraToSlicerYInYView;
-	mafAttachCamera		*m_AttachCameraToSlicerZInZView;
+	mafAttachCamera		*m_CameraToSlicer[3];
 
 	double	m_VolumeVTKDataCenterABSCoords[3];
 	double	m_VolumeVTKDataCenterABSCoordinatesReset[3];
@@ -243,29 +230,15 @@ protected:
 
 	mafVMESurface *m_CameraConeVME[3];
 	
-	double m_XCameraPositionForReset[3];
-	double m_YCameraPositionForReset[3];
-	double m_ZCameraPositionForReset[3];
-
-	double m_XCameraFocalPointForReset[3];
-	double m_YCameraFocalPointForReset[3];
-	double m_ZCameraFocalPointForReset[3];
-
-	double m_XCameraViewUpForReset[3];
-	double m_YCameraViewUpForReset[3];
-	double m_ZCameraViewUpForReset[3];
+	double m_CameraPositionForReset[3][3];
+	double m_CameraFocalPointForReset[3][3];
+	double m_CameraViewUpForReset[3][3];
 
 	mafGizmoCrossRotateTranslate *m_GizmoRT[3];
 	
 	enum AXIS {X = 0, Y = 1, Z = 2};
 
 	mafVMEVolumeGray *m_InputVolume;
-
-	int m_FeedbackLineHeight[3];
-	int m_NumberOfAxialSections[3];
-		
-	/** Enable debug facilities */
-	bool m_DebugMode;
 	
 	enum {RED=0, GREEN, BLUE, NUMBER_OF_COLORS =3};
 };
