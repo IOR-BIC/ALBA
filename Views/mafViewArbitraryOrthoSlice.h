@@ -205,7 +205,8 @@ protected:
 	/**	This function is called when a translate gizmo is moved*/
 	void OnEventGizmoTranslate(mafEventBase *maf_event, int side);
 
-	void PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , mafGizmoCrossRotateTranslate *targetGizmo);
+	void GetOrthoPlanes(int side, int * orthoPlanes);
+	void PostMultiplyEventMatrixToGizmoCross(mafEventBase * inputEvent, mafGizmoCrossRotateTranslate *targetGizmo);
 	
 	/** Post multiply maf_event matrix to given slicer */
 	void PostMultiplyEventMatrixToSlicer(mafEventBase *maf_event, int slicerAxis);
@@ -247,13 +248,10 @@ protected:
 	double	m_VolumeVTKDataABSOrientation[3];
 	int			m_ComboChooseActiveGizmo;
 
-	int m_ShowGizmo;
-	mafGUI				*m_GuiGizmos;
-
 	mafVMESurface *m_XCameraConeVME;
 	mafVMESurface *m_YCameraConeVME;
 	mafVMESurface *m_ZCameraConeVME;
-
+	
 	double m_XCameraPositionForReset[3];
 	double m_YCameraPositionForReset[3];
 	double m_ZCameraPositionForReset[3];
@@ -266,10 +264,8 @@ protected:
 	double m_YCameraViewUpForReset[3];
 	double m_ZCameraViewUpForReset[3];
 
-	mafGizmoCrossRotateTranslate *m_GizmoZView;
-	mafGizmoCrossRotateTranslate *m_GizmoYView;
-	mafGizmoCrossRotateTranslate *m_GizmoXView;
-
+	mafGizmoCrossRotateTranslate *m_GizmoRT[3];
+	
 	enum AXIS {X = 0, Y = 1, Z = 2};
 
 	mafVMEVolumeGray *m_InputVolume;

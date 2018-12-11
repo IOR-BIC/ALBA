@@ -132,6 +132,8 @@ enum AXIS_ID
 	Z_AXIS,
 };
 
+#define SideToView(a) ( (a) == X ? X_VIEW : ((a) == Y ? Y_VIEW : Z_VIEW))
+
 //----------------------------------------------------------------------------
 mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label) : mafViewCompoundWindowing(label, 2, 2)
 {
@@ -144,12 +146,9 @@ mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label) : mafView
 	m_FeedbackLineHeight[RED] = 20;
 	m_FeedbackLineHeight[GREEN] = 20;
 	m_FeedbackLineHeight[BLUE] = 20;
-
 	
 	m_InputVolume = NULL;
-	m_GizmoZView = NULL;
-	m_GizmoYView = NULL;
-	m_GizmoXView = NULL;
+	m_GizmoRT[0] = m_GizmoRT[1] = m_GizmoRT[2] = NULL;
 
 	m_View3d   = NULL;
 
@@ -157,13 +156,9 @@ mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label) : mafView
 	
 	m_SlicerResetMatrix[0] = m_SlicerResetMatrix[1] = m_SlicerResetMatrix[2] = NULL;
 
-	m_ShowGizmo = 1;
-
 	m_CurrentVolume   = NULL;
 	
 	m_Slicer[0] = m_Slicer[1] = m_Slicer[2] = NULL;
-	m_GuiGizmos       = NULL;
-	m_ShowGizmo = 1;
 	m_AttachCameraToSlicerXInXView    = NULL;
 	m_AttachCameraToSlicerYInYView    = NULL;
 	m_AttachCameraToSlicerZInZView    = NULL;
@@ -207,7 +202,8 @@ mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label) : mafView
 //----------------------------------------------------------------------------
 mafViewArbitraryOrthoSlice::~mafViewArbitraryOrthoSlice()
 {
-	cppDEL(m_GizmoZView);
+	for(int i=X;i<=Z;i++)
+		cppDEL(m_GizmoRT[i]);
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::PackageView()
@@ -321,19 +317,19 @@ void mafViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 	}
 	else if (maf_event->GetId() == ID_TRANSFORM)
 	{	
-		if (maf_event->GetSender() == m_GizmoZView->m_GizmoCrossTranslate)
-			OnEventGizmoTranslate(maf_event, Z);
-		else if (maf_event->GetSender() == m_GizmoZView->m_GizmoCrossRotate) // from rotation gizmo
-			OnEventGizmoRotate(maf_event, Z);
-		else if (maf_event->GetSender() == m_GizmoYView->m_GizmoCrossTranslate)
-			OnEventGizmoTranslate(maf_event, Y);
-		else if (maf_event->GetSender() == m_GizmoYView->m_GizmoCrossRotate) // from rotation gizmo
-			OnEventGizmoRotate(maf_event, Y);
-		if (maf_event->GetSender() == m_GizmoXView->m_GizmoCrossTranslate)
-			OnEventGizmoTranslate(maf_event, X);
-		else if (maf_event->GetSender() == m_GizmoXView->m_GizmoCrossRotate) // from rotation gizmo
-			OnEventGizmoRotate(maf_event, X);
-		else
+		for (int i = X; i <= Z; i++)
+		{
+			if (maf_event->GetSender() == m_GizmoRT[i]->m_GizmoCrossTranslate)
+			{
+				OnEventGizmoTranslate(maf_event, i);
+				return;
+			}
+			else if (maf_event->GetSender() == m_GizmoRT[i]->m_GizmoCrossRotate) // from rotation gizmo
+			{
+				OnEventGizmoRotate(maf_event, i);
+				return;
+			}
+		}
 			mafEventMacro(*maf_event); 
 	}
 	else
@@ -349,23 +345,11 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoTranslate(mafEventBase *maf_event, 
 	case ID_TRANSFORM:
 		{    
 			vtkCamera *zViewCamera = ((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera();
+			int orthoPlanes[2];
+			GetOrthoPlanes(side, orthoPlanes);
 
-			if (side == X)
-			{
-				PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoYView);
-				PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoXView);
-			}
-			else if (side == Y)
-			{
-				PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoZView);
-				PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoXView);
-			}
-			else
-			{
-				PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoYView);
-				PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoXView);
-			}
-
+			PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoRT[orthoPlanes[0]]);
+			PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoRT[orthoPlanes[1]]);
 
 			// post multiplying matrices coming from the gizmo to the slicers
 			PostMultiplyEventMatrixToSlicers(maf_event);
@@ -397,6 +381,27 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoTranslate(mafEventBase *maf_event, 
 		}
 	}
 }
+
+//----------------------------------------------------------------------------
+void mafViewArbitraryOrthoSlice::GetOrthoPlanes(int side, int * orthoPlanes)
+{
+	if (side == X)
+	{
+		orthoPlanes[0] = Y;
+		orthoPlanes[1] = Z;
+	}
+	else if (side == Y)
+	{
+		orthoPlanes[0] = Z;
+		orthoPlanes[1] = X;
+	}
+	else
+	{
+		orthoPlanes[0] = Y;
+		orthoPlanes[1] = X;
+	}
+}
+
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventGizmoRotate(mafEventBase *maf_event, int side)
 {
@@ -410,33 +415,16 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoRotate(mafEventBase *maf_event, int
 			vtkMAFSmartPointer<vtkTransform> tr;
 			tr->SetMatrix(mat);
 
-			if (side == X)
-			{
-				PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoYView);
-				PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoZView);
-				PostMultiplyEventMatrixToSlicer(maf_event, Y);
-				PostMultiplyEventMatrixToSlicer(maf_event, Z);
-				m_ChildViewList[Y_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
-				m_ChildViewList[Z_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
-			}
-			else if (side == Y)
-			{
-				PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoZView);
-				PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoXView);
-				PostMultiplyEventMatrixToSlicer(maf_event, X);
-				PostMultiplyEventMatrixToSlicer(maf_event, Z);
-				m_ChildViewList[Z_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
-				m_ChildViewList[X_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
-			}
-			else
-			{
-				PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoXView);
-				PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoYView);
-				PostMultiplyEventMatrixToSlicer(maf_event, X);
-				PostMultiplyEventMatrixToSlicer(maf_event, Y);
-				m_ChildViewList[X_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
-				m_ChildViewList[Y_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
-			}
+			int orthoPlanes[2];
+			GetOrthoPlanes(side, orthoPlanes);
+
+			PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoRT[orthoPlanes[0]]);
+			PostMultiplyEventMatrixToGizmoCross(maf_event, m_GizmoRT[orthoPlanes[1]]);
+			PostMultiplyEventMatrixToSlicer(maf_event, orthoPlanes[0]);
+			PostMultiplyEventMatrixToSlicer(maf_event, orthoPlanes[1]);
+
+			m_ChildViewList[SideToView(orthoPlanes[0])]->GetRWI()->GetCamera()->ApplyTransform(tr);
+			m_ChildViewList[SideToView(orthoPlanes[1])]->GetRWI()->GetCamera()->ApplyTransform(tr);
 
 			SetSlices();
 		}
@@ -533,21 +521,13 @@ void mafViewArbitraryOrthoSlice::VmeRemove(mafVME *vme)
 {
 	if (m_CurrentVolume && vme == m_CurrentVolume) 
 	{
-		m_AttachCameraToSlicerZInZView->SetVme(NULL);
 		m_CurrentVolume = NULL;
 
-		m_GizmoZView->Show(false);
-		cppDEL(m_GizmoZView);
-
-		m_GizmoYView->Show(false);
-		cppDEL(m_GizmoYView);
-
-		m_GizmoXView->Show(false);
-		cppDEL(m_GizmoXView);
-	}
-
-	if (m_CurrentImage && vme == m_CurrentImage){
-		m_CurrentImage = NULL;
+		for (int i = X; i <= Z; i++)
+		{
+			m_GizmoRT[i]->Show(false);
+			cppDEL(m_GizmoRT[i]);
+		}
 	}
 
 	Superclass::VmeRemove(vme);
@@ -639,7 +619,7 @@ void mafViewArbitraryOrthoSlice::VolumeWindowing(mafVME *volume)
 	data->Update();
 	data->GetScalarRange(sr);
 
-	mmaMaterial *currentSurfaceMaterial = m_Slicer[2]->GetMaterial();
+	mmaMaterial *currentSurfaceMaterial = m_Slicer[Z]->GetMaterial();
 	m_ColorLUT = currentSurfaceMaterial->m_ColorLut;
 	assert(m_ColorLUT);
 	m_LutWidget->SetLut(m_ColorLUT);
@@ -647,8 +627,8 @@ void mafViewArbitraryOrthoSlice::VolumeWindowing(mafVME *volume)
 	m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
 	m_LutSlider->SetSubRange((long)currentSurfaceMaterial->m_TableRange[0],(long)currentSurfaceMaterial->m_TableRange[1]);
 
-	m_Slicer[0]->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
-	m_Slicer[1]->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
+	m_Slicer[Y]->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
+	m_Slicer[Z]->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowVolume( mafVME * vme, bool show )
@@ -765,6 +745,7 @@ void mafViewArbitraryOrthoSlice::HideVolume()
 
 // 		m_GizmoView[i]->Show(false);
 		mafDEL(m_SlicerResetMatrix[i]);
+		m_GizmoRT[SideToView(i)]->Show(false);
 	}
 
 
@@ -780,13 +761,6 @@ void mafViewArbitraryOrthoSlice::HideVolume()
 	mafDEL(m_ZCameraConeVME);
 	m_AttachCameraToSlicerZInZView->SetVme(NULL);
 
-	m_GizmoXView->Show(false);
-	m_GizmoYView->Show(false);
-	m_GizmoZView->Show(false);
-
-
-	cppDEL(m_GuiGizmos);
-
 	m_CurrentVolume = NULL;
 	m_ColorLUT = NULL;
 	m_LutWidget->SetLut(m_ColorLUT);
@@ -798,12 +772,8 @@ void mafViewArbitraryOrthoSlice::OnReset()
 	for (int i = X; i <= Z; i++)
 	{
 		m_Slicer[i]->SetAbsMatrix(*m_SlicerResetMatrix[i]);
+		m_GizmoRT[i]->SetAbsPose(m_SlicerResetMatrix[i]);
 	}
-
-	m_GizmoXView->SetAbsPose(m_SlicerResetMatrix[0]);
-	m_GizmoYView->SetAbsPose(m_SlicerResetMatrix[1]);
-	m_GizmoZView->SetAbsPose(m_SlicerResetMatrix[2]);
-
 
 	RestoreCameraParametersForAllSubviews();
 	UpdateSlicersLUT();
@@ -850,27 +820,21 @@ void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 	{
 		mafNEW(m_Slicer[i]);
 		m_Slicer[i]->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
-		m_Slicer[i]->SetName(slicerNames[0]);
+		m_Slicer[i]->SetName(slicerNames[i]);
 		m_Slicer[i]->ReparentTo(vmeVolume);
-		m_Slicer[i]->SetAbsMatrix(mafMatrix(*m_SlicerResetMatrix[i]));
+		m_Slicer[i]->SetAbsMatrix(*m_SlicerResetMatrix[i]);
 		m_Slicer[i]->SetSlicedVMELink(vmeVolume);
 		m_Slicer[i]->GetMaterial()->m_ColorLut->DeepCopy(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
 		m_Slicer[i]->Update();
+		m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_Slicer[i], show);
+		m_ChildViewList[SideToView(i)]->VmeShow(m_Slicer[i], show);
+		//m_Slicer[i]->SetVisibleToTraverse(false);
 	}
 
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_Slicer[0], show);
-	m_ChildViewList[X_VIEW]->VmeShow(m_Slicer[0], show);
+
 
 	BuildXCameraConeVME();
-
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_Slicer[1], show);
-	m_ChildViewList[Y_VIEW]->VmeShow(m_Slicer[1], show);
-
 	BuildYCameraConeVME();
-
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_Slicer[2], show);
-	m_ChildViewList[Z_VIEW]->VmeShow(m_Slicer[2], show);
-
 	BuildZCameraConeVME();
 
 	mafPipeSurfaceTextured *pipePerspectiveViewZ = (mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_Slicer[2]);
@@ -902,63 +866,39 @@ void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 
 	ResetCameraToSlices();
 
-	m_GizmoZView = new mafGizmoCrossRotateTranslate();
-	m_GizmoZView->Create(m_Slicer[2], this, true, mafGizmoCrossRotateTranslate::Z);
-	m_GizmoZView->SetName("m_GizmoZView");
-	m_GizmoZView->SetInput(m_Slicer[2]);
-	m_GizmoZView->SetRefSys(m_Slicer[2]);
-	m_GizmoZView->SetAbsPose(m_SlicerResetMatrix[2]);
+	enum mafGizmoCrossRotateTranslate::COLOR gizmoColors[2];
+	for (int i = X; i <= Z; i++)
+	{
+		if (i == X)
+		{
+			gizmoColors[0] = mafGizmoCrossRotateTranslate::GREEN;
+			gizmoColors[1] = mafGizmoCrossRotateTranslate::BLUE;
+		}
+		else if (i == Y)
+		{
+			gizmoColors[0] = mafGizmoCrossRotateTranslate::BLUE;
+			gizmoColors[1] = mafGizmoCrossRotateTranslate::RED;
+		}
+		else
+		{
+			gizmoColors[0] = mafGizmoCrossRotateTranslate::GREEN;
+			gizmoColors[1] = mafGizmoCrossRotateTranslate::RED;
+		}
+		m_GizmoRT[i] = new mafGizmoCrossRotateTranslate();
+		m_GizmoRT[i]->Create(m_Slicer[i], this, true, i);
+		m_GizmoRT[i]->SetName(gizmoNames[i]);
+		m_GizmoRT[i]->SetInput(m_Slicer[i]);
+		m_GizmoRT[i]->SetRefSys(m_Slicer[i]);
+		m_GizmoRT[i]->SetAbsPose(m_SlicerResetMatrix[i]);
+		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GREW, gizmoColors[0]);
+		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GTAEW, gizmoColors[0]);
+		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GTPEW, gizmoColors[0]);
+		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GRNS, gizmoColors[1]);
+		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GTANS, gizmoColors[1]);
+		m_GizmoRT[i]->SetColor(mafGizmoCrossRotateTranslate::GTPNS, gizmoColors[1]);
+		m_GizmoRT[i]->Show(true);
 
-	m_GizmoZView->SetColor(mafGizmoCrossRotateTranslate::GREW, mafGizmoCrossRotateTranslate::GREEN);
-	m_GizmoZView->SetColor(mafGizmoCrossRotateTranslate::GTAEW, mafGizmoCrossRotateTranslate::GREEN);
-	m_GizmoZView->SetColor(mafGizmoCrossRotateTranslate::GTPEW, mafGizmoCrossRotateTranslate::GREEN);
-	m_GizmoZView->SetColor(mafGizmoCrossRotateTranslate::GRNS, mafGizmoCrossRotateTranslate::RED);
-	m_GizmoZView->SetColor(mafGizmoCrossRotateTranslate::GTANS, mafGizmoCrossRotateTranslate::RED);
-	m_GizmoZView->SetColor(mafGizmoCrossRotateTranslate::GTPNS, mafGizmoCrossRotateTranslate::RED);
-
-	m_GizmoZView->Show(true);
-
-	m_GizmoYView = new mafGizmoCrossRotateTranslate();
-	m_GizmoYView->Create(m_Slicer[1], this, true, mafGizmoCrossRotateTranslate::Y);
-	m_GizmoYView->SetName("m_GizmoYView");
-	m_GizmoYView->SetInput(m_Slicer[1]);
-	m_GizmoYView->SetRefSys(m_Slicer[1]);
-	m_GizmoYView->SetAbsPose(m_SlicerResetMatrix[1]);
-
-	m_GizmoYView->SetColor(mafGizmoCrossRotateTranslate::GREW, mafGizmoCrossRotateTranslate::BLUE);
-	m_GizmoYView->SetColor(mafGizmoCrossRotateTranslate::GTAEW, mafGizmoCrossRotateTranslate::BLUE);
-	m_GizmoYView->SetColor(mafGizmoCrossRotateTranslate::GTPEW, mafGizmoCrossRotateTranslate::BLUE);
-	m_GizmoYView->SetColor(mafGizmoCrossRotateTranslate::GRNS, mafGizmoCrossRotateTranslate::RED);
-	m_GizmoYView->SetColor(mafGizmoCrossRotateTranslate::GTANS, mafGizmoCrossRotateTranslate::RED);
-	m_GizmoYView->SetColor(mafGizmoCrossRotateTranslate::GTPNS, mafGizmoCrossRotateTranslate::RED);
-
-	m_GizmoYView->Show(true);
-
-	m_GizmoXView = new mafGizmoCrossRotateTranslate();
-	m_GizmoXView->Create(m_Slicer[0], this, true, mafGizmoCrossRotateTranslate::X);
-	m_GizmoXView->SetName("m_GizmoXView");
-	m_GizmoXView->SetInput(m_Slicer[0]);
-	m_GizmoXView->SetRefSys(m_Slicer[0]);
-	m_GizmoXView->SetAbsPose(m_SlicerResetMatrix[0]);
-
-	m_GizmoXView->SetColor(mafGizmoCrossRotateTranslate::GREW, mafGizmoCrossRotateTranslate::GREEN);
-	m_GizmoXView->SetColor(mafGizmoCrossRotateTranslate::GTAEW, mafGizmoCrossRotateTranslate::GREEN);
-	m_GizmoXView->SetColor(mafGizmoCrossRotateTranslate::GTPEW, mafGizmoCrossRotateTranslate::GREEN);
-	m_GizmoXView->SetColor(mafGizmoCrossRotateTranslate::GRNS, mafGizmoCrossRotateTranslate::BLUE);
-	m_GizmoXView->SetColor(mafGizmoCrossRotateTranslate::GTANS, mafGizmoCrossRotateTranslate::BLUE);
-	m_GizmoXView->SetColor(mafGizmoCrossRotateTranslate::GTPNS, mafGizmoCrossRotateTranslate::BLUE);
-
-	m_GizmoXView->Show(true);
-
-	//Create the Gizmos' Gui
-	if (!m_GuiGizmos)
-		m_GuiGizmos = new mafGUI(this);
-
-		m_GuiGizmos->Update();
-	if (m_Gui == NULL) CreateGui();
-	m_Gui->AddGui(m_GuiGizmos);
-	m_Gui->FitGui();
-	m_Gui->Update();
+	}
 
 	m_Slicer[0]->SetVisibleToTraverse(false);
 	m_Slicer[1]->SetVisibleToTraverse(false);
@@ -1183,7 +1123,7 @@ void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToGizmoCross( mafEventBa
 
 	mafMatrix absPose;
 	absPose.DeepCopy(tr1->GetMatrix());
-	absPose.SetTimeStamp(m_GizmoYView->GetAbsPose()->GetTimeStamp());
+	absPose.SetTimeStamp(m_GizmoRT[1]->GetAbsPose()->GetTimeStamp());
 
 	targetGizmo->SetAbsPose(&absPose);
 
