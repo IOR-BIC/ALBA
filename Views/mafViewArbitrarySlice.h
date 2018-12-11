@@ -132,7 +132,6 @@ protected:
 	mafGizmoTranslate *m_GizmoTranslate;
 	mafGizmoRotate		*m_GizmoRotate;
 	mafVME          	*m_CurrentVolume;
-	mafVME				    *m_CurrentImage;
 	mafVMESlicer			*m_Slicer;
 	mafMatrix					*m_MatrixReset;
 	mafAttachCamera		*m_AttachCamera;
@@ -143,9 +142,7 @@ protected:
 	int			m_TypeGizmo;
 
 	mafGUI				*m_GuiGizmos;
-
-	mafVMEPolylineEditor *m_CurrentPolylineGraphEditor;
-
+		
 	int m_TrilinearInterpolationOn;
 };
 #endif
