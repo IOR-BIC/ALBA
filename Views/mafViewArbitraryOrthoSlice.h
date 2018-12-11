@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafViewArbitraryOrthoSlice
- Authors: Stefano Perticoni
+ Authors: Stefano Perticoni, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -148,6 +148,8 @@ public:
 	virtual void UpdateSubviewsCamerasToFaceSlices();
 
 protected:
+
+	enum AXIS { X = 0, Y = 1, Z = 2 };
 	
 	bool BelongsToNormalGizmo( mafVME * vme, int side );
 
@@ -226,8 +228,7 @@ protected:
 	double	m_VolumeVTKDataCenterABSCoords[3];
 	double	m_VolumeVTKDataCenterABSCoordinatesReset[3];
 	double	m_VolumeVTKDataABSOrientation[3];
-	int			m_ComboChooseActiveGizmo;
-
+	
 	mafVMESurface *m_CameraConeVME[3];
 	
 	double m_CameraPositionForReset[3][3];
@@ -235,12 +236,8 @@ protected:
 	double m_CameraViewUpForReset[3][3];
 
 	mafGizmoCrossRotateTranslate *m_GizmoRT[3];
-	
-	enum AXIS {X = 0, Y = 1, Z = 2};
-
+		
 	mafVMEVolumeGray *m_InputVolume;
-	
-	enum {RED=0, GREEN, BLUE, NUMBER_OF_COLORS =3};
 };
 
 #endif

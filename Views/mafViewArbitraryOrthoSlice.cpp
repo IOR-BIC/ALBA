@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafViewArbitraryOrthoSlice
- Authors: Stefano Perticoni
+ Authors: Stefano Perticoni, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -13,9 +13,6 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
-const int BOUND_0=0;
-const int BOUND_1=1;
 
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
@@ -34,18 +31,10 @@ const int BOUND_1=1;
 #include "mafVMESlicer.h"
 #include "mafMatrix.h"
 #include "mafTransform.h"
-#include "mafPipeImage3D.h"
 #include "mafPipeSlice.h"
-#include "mafPipeSurfaceSlice.h"
-#include "mafPipeSurface.h"
-#include "mafPipeSurfaceTextured.h"
 #include "mafVMEVolumeGray.h"
-#include "mafVMESurface.h"
-#include "mafGizmoCrossTranslate.h"
-#include "mafGizmoCrossRotate.h"
-#include "mafSceneGraph.h"
+
 #include "mafEvent.h"
-#include "mafAbsMatrixPipe.h"
 #include "mafAttachCamera.h"
 #include "mafInteractorGenericMouse.h"
 #include "mafVMESlicer.h"
@@ -53,58 +42,38 @@ const int BOUND_1=1;
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
 #include "mafVMEIterator.h"
-#include "mafGUILutPreset.h"
 #include "mafVMEOutputSurface.h"
 #include "mafAttribute.h"
 #include "mafGUILutSlider.h"
 #include "mafGUILutSwatch.h"
-#include "mafPipeMesh.h"
-#include "mafPipeMeshSlice.h"
-#include "mafPipePolylineGraphEditor.h"
 
 #include "vtkTransform.h"
 #include "vtkLookupTable.h"
 #include "vtkWindowLevelLookupTable.h"
 #include "vtkDataSet.h"
 #include "vtkMath.h"
-#include "vtkTransformPolyDataFilter.h"
 #include "vtkPolyData.h"
-#include "vtkPoints.h"
-#include "vtkPointSet.h"
-#include "vtkPointData.h"
 #include "vtkDataSetAttributes.h"
-#include "vtkPolyDataNormals.h"
 #include "vtkCamera.h"
 #include "vtkImageData.h"
 #include "vtkConeSource.h"
 #include "vtkProperty.h"
-#include "vtkTextProperty.h"
 #include "vtkRenderer.h"
 #include "vtkCellPicker.h"
 #include "mafTransformFrame.h"
 #include "mafVMEGizmo.h"
 #include "mafGizmoInterface.h"
 #include "mafDataPipe.h"
-#include <algorithm>
 #include "vtkStructuredPoints.h"
 #include "vtkDataSetWriter.h"
 #include "vtkUnsignedShortArray.h"
-#include "vtkShortArray.h"
-#include "vtkLineSource.h"
-#include "vtkMatrix4x4.h"
-#include "vtkBMPWriter.h"
 #include "mafRWIBase.h"
-#include "vtkPNGWriter.h"
 #include "wx\busyinfo.h"
 #include "vtkPlaneSource.h"
 #include "vtkPolyDataMapper2D.h"
 #include "vtkProperty2D.h"
-#include "vtkOutlineFilter.h"
 #include "vtkSphereSource.h"
 #include "vtkMAFSmartPointer.h"
-#include "vtkTextSource.h"
-#include "vtkCaptionActor2D.h"
-#include "mafProgressBarHelper.h"
 
 mafCxxTypeMacro(mafViewArbitraryOrthoSlice);
 
@@ -161,7 +130,6 @@ void mafViewArbitraryOrthoSlice::PackageView()
 	CreateAndPlugSliceView(0);
 	CreateAndPlugSliceView(1);
 }
-
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
 {
@@ -182,7 +150,6 @@ void mafViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
 
 	PlugChildView(m_ViewSlice[v]);
 }
-
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::VmeShow(mafVME *vme, bool show)
 {
@@ -315,7 +282,6 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoTranslate(mafEventBase *maf_event, 
 		}
 	}
 }
-
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::GetOrthoPlanes(int side, int * orthoPlanes)
 {
@@ -335,7 +301,6 @@ void mafViewArbitraryOrthoSlice::GetOrthoPlanes(int side, int * orthoPlanes)
 		orthoPlanes[1] = X;
 	}
 }
-
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventGizmoRotate(mafEventBase *maf_event, int side)
 {
@@ -395,7 +360,6 @@ void mafViewArbitraryOrthoSlice::SetSlices()
 	}
 	CameraUpdate();
 }
-
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 {
@@ -640,7 +604,6 @@ void mafViewArbitraryOrthoSlice::ShowVolume( mafVME * vme, bool show )
 	VolumeWindowing(vme);
 	UpdateSlicersLUT();
 }
-
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::HideVolume()
 {
@@ -663,7 +626,6 @@ void mafViewArbitraryOrthoSlice::HideVolume()
 	m_ColorLUT = NULL;
 	m_LutWidget->SetLut(m_ColorLUT);
 }
-
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnReset()
 {
@@ -804,7 +766,6 @@ void mafViewArbitraryOrthoSlice::BuildCameraConeVME(int side)
 
 	cameraConeSource->Delete();
 }
-
 //----------------------------------------------------------------------------
 bool mafViewArbitraryOrthoSlice::BelongsToNormalGizmo( mafVME * vme, int side)
 {
@@ -870,7 +831,6 @@ void mafViewArbitraryOrthoSlice::RestoreCameraParametersForAllSubviews()
 		xViewCamera->SetViewUp(m_CameraViewUpForReset[i]);
 	}
 }
-
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSlicers(int axis)
 {
@@ -927,8 +887,6 @@ void mafViewArbitraryOrthoSlice::CreateViewCameraNormalFeedbackActors()
 		vtkDEL(border);
 	}
 }
-
-
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSlicersLUT()
 {
