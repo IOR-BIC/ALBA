@@ -147,13 +147,6 @@ void mafViewOrthoSlice::VmeShow(mafVME *vme, bool show)
   // Enable perspective View for every VME
   m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
   // Disable ChildView XN, YN and ZN when no Volume is selected
-  if (m_CurrentVolume != NULL)
- 	  for(int j=1; j<m_NumOfChildView; j++) 
-		{
-      m_ChildViewList[j]->VmeShow(vme, show);
-			if(show && j==YN_VIEW && mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(vme)))
-				mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(vme))->SetFlipNormalOff();
-		}
   
 	if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
 	{
@@ -162,6 +155,7 @@ void mafViewOrthoSlice::VmeShow(mafVME *vme, bool show)
 
 		if (show)
 		{
+			m_CurrentVolume = vme;
       // Create Ortho Stuff
       CreateOrthoslicesAndGizmos(vme);
       
@@ -183,21 +177,53 @@ void mafViewOrthoSlice::VmeShow(mafVME *vme, bool show)
     }
 
     // When one volume is selected/unselected we enable/disable ChildViews for all vme selected
-    for (int i=0;i<m_VMElist.size();i++)
-      for(int j=1; j<m_NumOfChildView; j++)
-      {
-        m_ChildViewList[j]->VmeShow(m_VMElist[i], show);
-				if(show && j==YN_VIEW && mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(m_VMElist[i])))
-					 mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(m_VMElist[i]))->SetFlipNormalOff();
-        ApplyViewSettings(m_VMElist[i]);
-      }
+		for (int i = 0; i < m_VMElist.size(); i++)
+		{
+			mafVME *vme = m_VMElist[i];
+
+			for (int j = 1; j < m_NumOfChildView; j++)
+			{
+				m_ChildViewList[j]->VmeShow(vme, show);
+				if (show)
+					ApplySliceSetting(j, vme);
+
+			}
+			ApplyViewSettings(vme);
+		}
 	}
-  else if (show)
-    ApplyViewSettings(vme);
+	if (m_CurrentVolume != NULL)
+	{
+		for (int j = 1; j < m_NumOfChildView; j++)
+		{
+			m_ChildViewList[j]->VmeShow(vme, show);
+			if (show)
+				ApplySliceSetting(j, vme);
+		}
+		ApplyViewSettings(vme);
+	}
 
 	//CameraUpdate();
 	EnableWidgets(m_CurrentVolume != NULL);
 }
+
+//----------------------------------------------------------------------------
+void mafViewOrthoSlice::ApplySliceSetting(int view, mafVME * vme)
+{
+	mafPipe* nodePipe = m_ChildViewList[view]->GetNodePipe(vme);
+	mafPipeMeshSlice* meshPipe = mafPipeMeshSlice::SafeDownCast(nodePipe);
+	mafPipeSurfaceSlice* surfacePipe = mafPipeSurfaceSlice::SafeDownCast(nodePipe);
+
+	if (surfacePipe)
+		surfacePipe->SetThickness(m_Border);
+
+	if (meshPipe)
+	{
+		meshPipe->SetThickness(m_Border);
+		if (view == YN_VIEW)
+			meshPipe->SetFlipNormalOff();
+	}
+}
+
 //----------------------------------------------------------------------------
 void mafViewOrthoSlice::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
@@ -686,20 +712,8 @@ void mafViewOrthoSlice::Print(std::ostream& os, const int tabs)// const
 void mafViewOrthoSlice::CreateOrthoslicesAndGizmos(mafVME *vme)
 //-------------------------------------------------------------------------
 {
-  if (vme == NULL)
-  {
-    mafLogMessage("node = NULL");
-    return;
-  }
 
-  m_CurrentVolume = vme;
-  if (m_CurrentVolume == NULL)
-  {
-    mafLogMessage("current volume = NULL");
-    return;
-  }
-
-  double colorsX[]    = {1,0,0};
+	double colorsX[]    = {1,0,0};
   double colorsY[]    = {0,1,0};
   double colorsZ[]    = {0,0,1};
 	mmaVolumeMaterial *currentVolumeMaterial = ((mafVMEOutputVolume *)m_CurrentVolume->GetOutput())->GetMaterial();
