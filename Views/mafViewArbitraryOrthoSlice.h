@@ -159,12 +159,7 @@ protected:
 	void StoreCameraParametersForAllSubviews();
 
 	void ShowSlicers( mafVME * vmeVolume, bool show );
-
-	void BuildSliceHeightFeedbackLinesVMEs();
-	void AddVMEToMSFTree(mafVMESurface *vme);
-
-	enum VIEW_DIRECTION {FROM_X = 0, FROM_Y = 1, FROM_Z = 2};
-		
+	
   void ShowVTKDataAsVMESurface( vtkPolyData *vmeVTKData, 
 		mafVMESurface *vmeSurface, vtkMatrix4x4 *inputABSMatrix);
 
@@ -172,9 +167,7 @@ protected:
 
 	/** 
 	Create the helper cone giving feedback for camera direction*/
-	void BuildXCameraConeVME();
-	void BuildYCameraConeVME();
-	void BuildZCameraConeVME();
+	void BuildCameraConeVME(int axis);
 
 	void HideVolume();
 
@@ -248,9 +241,7 @@ protected:
 	double	m_VolumeVTKDataABSOrientation[3];
 	int			m_ComboChooseActiveGizmo;
 
-	mafVMESurface *m_XCameraConeVME;
-	mafVMESurface *m_YCameraConeVME;
-	mafVMESurface *m_ZCameraConeVME;
+	mafVMESurface *m_CameraConeVME[3];
 	
 	double m_XCameraPositionForReset[3];
 	double m_YCameraPositionForReset[3];
@@ -269,18 +260,6 @@ protected:
 	enum AXIS {X = 0, Y = 1, Z = 2};
 
 	mafVMEVolumeGray *m_InputVolume;
-
-	// Xn view cut feedback gizmos
-	vector<mafVMESurface *> m_ViewXnSliceYBoundsVMEVector;
-	vector<mafVMESurface *> m_ViewXnSliceZBoundsVMEVector;
-
-	// Yn view cut feedback gizmos
-	vector<mafVMESurface *> m_ViewYnSliceZBoundsVMEVector;
-	vector<mafVMESurface *> m_ViewYnSliceXBoundsVMEVector;
-
-	// Zn view cut feedback gizmos
-	vector<mafVMESurface *> m_ViewZnSliceXBoundsVMEVector;
-	vector<mafVMESurface *> m_ViewZnSliceYBoundsVMEVector;
 
 	int m_FeedbackLineHeight[3];
 	int m_NumberOfAxialSections[3];

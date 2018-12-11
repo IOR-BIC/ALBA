@@ -171,9 +171,7 @@ mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label) : mafView
 	m_VolumeVTKDataCenterABSCoordinatesReset[1] = 0.0;
 	m_VolumeVTKDataCenterABSCoordinatesReset[2] = 0.0;
 
-	m_XCameraConeVME = NULL;
-	m_YCameraConeVME = NULL;
-	m_ZCameraConeVME = NULL;
+	m_CameraConeVME[0] = m_CameraConeVME[1] = m_CameraConeVME[2] = NULL;
 
 	m_XCameraPositionForReset[0] = 0;
 	m_XCameraPositionForReset[1] = 0;
@@ -735,30 +733,20 @@ void mafViewArbitraryOrthoSlice::HideVolume()
 	EnableWidgets(false);
 	for(int i=X; i<=Z; i++)
 	{
-// 		m_CameraConeVME[i]->ReparentTo(NULL);
-// 		mafDEL(m_CameraConeVME[i]);
+		m_CameraConeVME[i]->ReparentTo(NULL);
+		mafDEL(m_CameraConeVME[i]);
 // 
 // 		m_CameraToSlicer[i]->SetVme(NULL);
 		m_Slicer[i]->SetBehavior(NULL);
 		m_Slicer[i]->ReparentTo(NULL);
 		mafDEL(m_Slicer[i]);
 
-// 		m_GizmoView[i]->Show(false);
 		mafDEL(m_SlicerResetMatrix[i]);
-		m_GizmoRT[SideToView(i)]->Show(false);
+		m_GizmoRT[i]->Show(false);
 	}
 
-
-	m_XCameraConeVME->ReparentTo(NULL);
-	mafDEL(m_XCameraConeVME);
 	m_AttachCameraToSlicerXInXView->SetVme(NULL);
-
-	m_YCameraConeVME->ReparentTo(NULL);
-	mafDEL(m_YCameraConeVME);
 	m_AttachCameraToSlicerYInYView->SetVme(NULL);
-
-	m_ZCameraConeVME->ReparentTo(NULL);
-	mafDEL(m_ZCameraConeVME);
 	m_AttachCameraToSlicerZInZView->SetVme(NULL);
 
 	m_CurrentVolume = NULL;
@@ -771,8 +759,8 @@ void mafViewArbitraryOrthoSlice::OnReset()
 {
 	for (int i = X; i <= Z; i++)
 	{
-		m_Slicer[i]->SetAbsMatrix(*m_SlicerResetMatrix[i]);
 		m_GizmoRT[i]->SetAbsPose(m_SlicerResetMatrix[i]);
+		m_Slicer[i]->SetAbsMatrix(*m_SlicerResetMatrix[i]);
 	}
 
 	RestoreCameraParametersForAllSubviews();
@@ -783,10 +771,8 @@ void mafViewArbitraryOrthoSlice::OnLUTRangeModified()
 {
 	mafVME *vme = GetSceneGraph()->GetSelectedVme();
 
-	if( (m_CurrentVolume || m_CurrentImage) && vme)
-	{
+	if( m_CurrentVolume && vme)
 		UpdateSlicersLUT();
-	}
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnLUTChooser()
@@ -829,13 +815,9 @@ void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 		m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_Slicer[i], show);
 		m_ChildViewList[SideToView(i)]->VmeShow(m_Slicer[i], show);
 		//m_Slicer[i]->SetVisibleToTraverse(false);
+		BuildCameraConeVME(i);
 	}
 
-
-
-	BuildXCameraConeVME();
-	BuildYCameraConeVME();
-	BuildZCameraConeVME();
 
 	mafPipeSurfaceTextured *pipePerspectiveViewZ = (mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_Slicer[2]);
 	pipePerspectiveViewZ->SetActorPicking(false);
@@ -905,7 +887,7 @@ void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 	m_Slicer[2]->SetVisibleToTraverse(false);
 
 	UpdateSubviewsCamerasToFaceSlices();
-	BuildSliceHeightFeedbackLinesVMEs();
+	//BuildSliceHeightFeedbackLinesVMEs();
 
 	
 	double red[3] = { 1,0,0 };
@@ -918,179 +900,52 @@ void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 	CreateViewCameraNormalFeedbackActor(blue, Z_VIEW);
 }
 //----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::BuildXCameraConeVME()
+void mafViewArbitraryOrthoSlice::BuildCameraConeVME(int side)
 {
-	double b[6] = {0,0,0,0,0,0};
-	assert(m_CurrentVolume);
+	char coneNames[3][12] = { "ConeXCamera","ConeYCamera","ConeZCamera" };
+	double col[3][3] = { { 1,0,0 },{ 0,1,0 },{ 0,0,1 } };
+	double b[6];
 	m_CurrentVolume->GetOutput()->GetVMELocalBounds(b);
 
-	double p1[3] = {0,0,0};
-	double p2[3] = {0,0,0};
+	double p1[3] = { b[0], b[2], b[4] };
+	double p2[3] = { b[1], b[3], b[5] };
+	double coneRadius = sqrt(vtkMath::Distance2BetweenPoints(p1, p2)) / 10.0;
 
-	p1[0] = b[0];
-	p1[1] = b[2];
-	p1[2] = b[4];
-	p2[0] = b[1];
-	p2[1] = b[3];
-	p2[2] = b[5];
+	vtkConeSource *cameraConeSource = vtkConeSource::New();
+	cameraConeSource->SetCenter(0, 0, b[(side * 2) + 1] / 2 + coneRadius / 2);
+	cameraConeSource->SetResolution(20);
+	cameraConeSource->SetDirection(0, 0, -1);
 
-	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
+	cameraConeSource->SetRadius(coneRadius);
+	cameraConeSource->SetHeight(coneRadius);
 
-	double coneRadius = d / 10;
+	cameraConeSource->CappingOn();
+	cameraConeSource->Update();
 
-	vtkConeSource *XCameraConeSource = vtkConeSource::New();
-	XCameraConeSource->SetCenter(0,0,b[1]/2 + coneRadius / 2);
-	XCameraConeSource->SetResolution(20);
-	XCameraConeSource->SetDirection(0,0,-1);
-
-	XCameraConeSource->SetRadius(coneRadius);
-	XCameraConeSource->SetHeight(coneRadius);
-
-	XCameraConeSource->CappingOn();
-	XCameraConeSource->Update();
-
-	mafNEW(m_XCameraConeVME);
+	mafNEW(m_CameraConeVME[side]);
 	// DEBUG
-	m_XCameraConeVME->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
-	m_XCameraConeVME->SetName("Cone X Camera");
-	m_XCameraConeVME->SetData(XCameraConeSource->GetOutput(), m_CurrentVolume->GetTimeStamp());
-	m_XCameraConeVME->SetVisibleToTraverse(false);
+	m_CameraConeVME[side]->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
+	m_CameraConeVME[side]->SetName(coneNames[side]);
+	m_CameraConeVME[side]->SetData(cameraConeSource->GetOutput(), m_CurrentVolume->GetTimeStamp());
+	m_CameraConeVME[side]->SetVisibleToTraverse(false);
 
-	m_XCameraConeVME->GetMaterial()->m_Prop->SetColor(1,0,0);
-	m_XCameraConeVME->GetMaterial()->m_Prop->SetAmbient(1);
-	m_XCameraConeVME->GetMaterial()->m_Prop->SetDiffuse(0);
-	m_XCameraConeVME->GetMaterial()->m_Prop->SetSpecular(0);
-	m_XCameraConeVME->GetMaterial()->m_Prop->SetOpacity(0.2);
-
+	m_CameraConeVME[side]->GetMaterial()->m_Prop->SetColor(col[side]);
+	m_CameraConeVME[side]->GetMaterial()->m_Prop->SetAmbient(1);
+	m_CameraConeVME[side]->GetMaterial()->m_Prop->SetDiffuse(0);
+	m_CameraConeVME[side]->GetMaterial()->m_Prop->SetSpecular(0);
+	m_CameraConeVME[side]->GetMaterial()->m_Prop->SetOpacity(0.2);
 
 	// default slicer matrix rotation component is identity when the input volume has identity pose matrix
-	m_XCameraConeVME->ReparentTo(m_Slicer[0]);
+	m_CameraConeVME[side]->ReparentTo(m_Slicer[side]);
 
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_XCameraConeVME, true);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_CameraConeVME[side], true);
 
-	mafPipeSurface *pipeY=(mafPipeSurface *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_XCameraConeVME);
+	mafPipeSurface *pipeY = (mafPipeSurface *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_CameraConeVME[side]);
 	pipeY->SetActorPicking(false);
 
-	XCameraConeSource->Delete();
+	cameraConeSource->Delete();
 }
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::BuildYCameraConeVME()
-{
-	double b[6] = {0,0,0,0,0,0};
-	assert(m_CurrentVolume);
-	m_CurrentVolume->GetOutput()->GetVMELocalBounds(b);
 
-	double p1[3] = {0,0,0};
-	double p2[3] = {0,0,0};
-
-	p1[0] = b[0];
-	p1[1] = b[2];
-	p1[2] = b[4];
-	p2[0] = b[1];
-	p2[1] = b[3];
-	p2[2] = b[5];
-
-	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
-
-	double coneRadius = d / 10;
-
-	vtkConeSource *YCameraConeSource = vtkConeSource::New();
-	YCameraConeSource->SetCenter(0,0,b[3]/2 + coneRadius / 2);
-	YCameraConeSource->SetResolution(20);
-	YCameraConeSource->SetDirection(0,0,-1);
-
-	YCameraConeSource->SetRadius(coneRadius);
-	YCameraConeSource->SetHeight(coneRadius);
-
-	YCameraConeSource->CappingOn();
-	YCameraConeSource->Update();
-
-	mafNEW(m_YCameraConeVME);
-	// DEBUG
-	m_YCameraConeVME->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
-	m_YCameraConeVME->SetName("m_YCameraConeVME");
-	m_YCameraConeVME->SetData(YCameraConeSource->GetOutput(), m_CurrentVolume->GetTimeStamp());
-	m_YCameraConeVME->SetVisibleToTraverse(false);
-
-	m_YCameraConeVME->GetMaterial()->m_Prop->SetColor(0,1,0);
-	m_YCameraConeVME->GetMaterial()->m_Prop->SetAmbient(1);
-	m_YCameraConeVME->GetMaterial()->m_Prop->SetDiffuse(0);
-	m_YCameraConeVME->GetMaterial()->m_Prop->SetSpecular(0);
-	m_YCameraConeVME->GetMaterial()->m_Prop->SetOpacity(0.2);
-
-	/* default y slicer matrix
-
-	1  0  0  ...
-	0  0 -1  ... => RotX(90) from identity
-	0  1  0  ...
-	........  1
-
-	*/
-
-	m_YCameraConeVME->ReparentTo(m_Slicer[1]);
-
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_YCameraConeVME, true);
-
-	mafPipeSurface *pipeX=(mafPipeSurface *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_YCameraConeVME);
-	pipeX->SetActorPicking(false);
-
-	YCameraConeSource->Delete();
-}
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::BuildZCameraConeVME()
-{
-	double b[6] = {0,0,0,0,0,0};
-	assert(m_CurrentVolume);
-	m_CurrentVolume->GetOutput()->GetVMELocalBounds(b);
-
-	double p1[3] = {0,0,0};
-	double p2[3] = {0,0,0};
-
-	p1[0] = b[0];
-	p1[1] = b[2];
-	p1[2] = b[4];
-	p2[0] = b[1];
-	p2[1] = b[3];
-	p2[2] = b[5];
-
-	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
-
-	double coneRadius = d/10;
-
-	vtkConeSource *ZCameraConeSource = vtkConeSource::New();
-	ZCameraConeSource->SetCenter(0,0,b[5]/2 + coneRadius / 2);
-	ZCameraConeSource->SetResolution(20);
-	ZCameraConeSource->SetDirection(0,0,-1);
-
-	ZCameraConeSource->SetRadius(coneRadius);
-	ZCameraConeSource->SetHeight(coneRadius);
-
-	ZCameraConeSource->CappingOn();
-	ZCameraConeSource->Update();
-
-	mafNEW(m_ZCameraConeVME);
-	// DEBUG
-	m_ZCameraConeVME->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
-	m_ZCameraConeVME->SetName("m_ZCameraConeVME");
-	m_ZCameraConeVME->SetData(ZCameraConeSource->GetOutput(), m_CurrentVolume->GetTimeStamp());
-	m_ZCameraConeVME->SetVisibleToTraverse(false);
-
-	m_ZCameraConeVME->GetMaterial()->m_Prop->SetColor(0,0,1);
-	m_ZCameraConeVME->GetMaterial()->m_Prop->SetAmbient(1);
-	m_ZCameraConeVME->GetMaterial()->m_Prop->SetDiffuse(0);
-	m_ZCameraConeVME->GetMaterial()->m_Prop->SetSpecular(0);
-	m_ZCameraConeVME->GetMaterial()->m_Prop->SetOpacity(0.2);
-
-	m_ZCameraConeVME->ReparentTo(m_Slicer[2]);
-
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ZCameraConeVME, true);
-
-	mafPipeSurface *pipeX=(mafPipeSurface *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_ZCameraConeVME);
-	pipeX->SetActorPicking(false);
-
-	ZCameraConeSource->Delete();
-	CameraReset();
-}
 //----------------------------------------------------------------------------
 bool mafViewArbitraryOrthoSlice::BelongsToNormalGizmo( mafVME * vme, int side)
 {
@@ -1207,121 +1062,12 @@ void mafViewArbitraryOrthoSlice::ShowVTKDataAsVMESurface( vtkPolyData *vmeVTKDat
 	vmeSurface->GetOutput()->GetVTKData()->Update();
 }
 //----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::AddVMEToMSFTree(mafVMESurface *vme)
-{
-	assert(vme != NULL);
-	vme->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
-	GetLogicManager()->VmeAdd(vme);
-	assert(vme);
-}
-
-//----------------------------------------------------------------------------
-void mafViewArbitraryOrthoSlice::BuildSliceHeightFeedbackLinesVMEs()
-{
-	// view Xn
-
-	/*
-
-	P      |   Zn
-	|   GC_Zn
-	--------------------
-	Xn     |   Yn
-	|	GC_Xn  |   GC_Yn     
-	---                      
-
-	Y
-	V
-	|      <X
-	----------------------
-	Z    |   Z 
-	V        V
-	|	Y>              <X   
-	---					  
-
-	*/
-
-	m_ViewXnSliceYBoundsVMEVector.push_back(NULL);
-	mafNEW(m_ViewXnSliceYBoundsVMEVector[BOUND_0]);
-	AddVMEToMSFTree(m_ViewXnSliceYBoundsVMEVector[BOUND_0]);
-
-	m_ViewXnSliceYBoundsVMEVector.push_back(NULL);
-	mafNEW(m_ViewXnSliceYBoundsVMEVector[BOUND_1]);
-	AddVMEToMSFTree(m_ViewXnSliceYBoundsVMEVector[BOUND_1]);
-
-	m_ViewXnSliceZBoundsVMEVector.push_back(NULL);
-	mafNEW(m_ViewXnSliceZBoundsVMEVector[BOUND_0]);
-	AddVMEToMSFTree(m_ViewXnSliceZBoundsVMEVector[BOUND_0]);
-
-	m_ViewXnSliceZBoundsVMEVector.push_back(NULL);
-	mafNEW(m_ViewXnSliceZBoundsVMEVector[BOUND_1]);
-	AddVMEToMSFTree(m_ViewXnSliceZBoundsVMEVector[BOUND_1]);
-	//-----------
-
-	// view Yn
-
-	/*
-
-	P      |   Zn
-	|   GC_Zn
-	--------------------
-	Xn     |   Yn
-	GC_Xn  |   GC_Yn     |
-	---
-
-	Y
-	V
-	|      <X
-	----------------------
-	Z    |   Z 
-	V        V
-	Y>              <X   | 
-	---
-
-	*/
-
-	m_ViewYnSliceZBoundsVMEVector.push_back(NULL);
-	mafNEW(m_ViewYnSliceZBoundsVMEVector[BOUND_0]);
-	AddVMEToMSFTree(m_ViewYnSliceZBoundsVMEVector[BOUND_0]);
-
-	m_ViewYnSliceZBoundsVMEVector.push_back(NULL);
-	mafNEW(m_ViewYnSliceZBoundsVMEVector[BOUND_1]);
-	AddVMEToMSFTree(m_ViewYnSliceZBoundsVMEVector[BOUND_1]);
-
-	m_ViewYnSliceXBoundsVMEVector.push_back(NULL);
-	mafNEW(m_ViewYnSliceXBoundsVMEVector[BOUND_0]);
-	AddVMEToMSFTree(m_ViewYnSliceXBoundsVMEVector[BOUND_0]);
-
-	m_ViewYnSliceXBoundsVMEVector.push_back(NULL);
-	mafNEW(m_ViewYnSliceXBoundsVMEVector[BOUND_1]);
-	AddVMEToMSFTree(m_ViewYnSliceXBoundsVMEVector[BOUND_1]);
-
-	m_ViewZnSliceXBoundsVMEVector.push_back(NULL);
-	mafNEW(m_ViewZnSliceXBoundsVMEVector[BOUND_0]);
-	AddVMEToMSFTree(m_ViewZnSliceXBoundsVMEVector[BOUND_0]);
-
-	m_ViewZnSliceXBoundsVMEVector.push_back(NULL);
-	mafNEW(m_ViewZnSliceXBoundsVMEVector[BOUND_1]);
-	AddVMEToMSFTree(m_ViewZnSliceXBoundsVMEVector[BOUND_1]);
-
-	m_ViewZnSliceYBoundsVMEVector.push_back(NULL);
-	mafNEW(m_ViewZnSliceYBoundsVMEVector[BOUND_0]);
-	AddVMEToMSFTree(m_ViewZnSliceYBoundsVMEVector[BOUND_0]);
-
-	m_ViewZnSliceYBoundsVMEVector.push_back(NULL);
-	mafNEW(m_ViewZnSliceYBoundsVMEVector[BOUND_1]);
-	AddVMEToMSFTree(m_ViewZnSliceYBoundsVMEVector[BOUND_1]);
-}
-
-//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSlicers(int axis)
 {
-	
 	m_Slicer[axis]->SetAbsMatrix(m_Slicer[axis]->GetAbsMatrixPipe()->GetMatrix());
 	m_Slicer[axis]->GetSurfaceOutput()->GetVTKData()->Modified();
 	m_Slicer[axis]->GetSurfaceOutput()->GetVTKData()->Update();
 }
-
-
 //----------------------------------------------------------------------------
 mafPipeSurface * mafViewArbitraryOrthoSlice::GetPipe(int inView, mafVMESurface *inSurface)
 {
