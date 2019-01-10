@@ -201,7 +201,10 @@ void mafOpImporterDicom::OpRun()
 {
 	m_Wizard = new mafGUIWizard(_("DICOM Importer"));
 	m_Wizard->SetListener(this);
-	m_Wizard->SetButtonString("Crop >");
+	if (!GetSetting()->GetSkipCrop())
+		m_Wizard->SetButtonString("Crop >");
+	else
+		m_Wizard->SetButtonString("Finish");
 		
 	wxString lastDicomDir = GetSetting()->GetLastDicomDir();
 		
@@ -217,8 +220,11 @@ void mafOpImporterDicom::OpRun()
 		CreateSliceVTKPipeline(); 
 		
 		CreateLoadPage();
-		CreateCropPage();
-		m_LoadPage->SetNextPage(m_CropPage);
+		if (!GetSetting()->GetSkipCrop())
+		{
+			CreateCropPage();
+			m_LoadPage->SetNextPage(m_CropPage);
+		}
 		m_Wizard->SetFirstPage(m_LoadPage);
 
 		wxString path = dialog.GetPath();
@@ -498,8 +504,11 @@ void mafOpImporterDicom::GuiUpdate()
 	m_LoadGuiLeft->Update();
 	m_LoadGuiUnderLeft->Update();
 	m_LoadGuiCenter->Update();
-	m_CropGuiLeft->Update();
-	m_CropGuiCenter->Update();
+	if (m_CropPage)
+	{
+		m_CropGuiLeft->Update();
+		m_CropGuiCenter->Update();
+	}
 }
 //----------------------------------------------------------------------------
 bool mafOpImporterDicom::OpenDir(const char *dirPath)
@@ -1002,9 +1011,7 @@ void mafOpImporterDicom::CalculateCropExtent()
 	m_CurrentSliceID->GetExtent(sliceExtent);
 	m_CurrentSliceID->GetSpacing(spacing);
 	m_SelectedSeries->GetSlice(0)->GetImagePositionPatient(sliceOrigin);
-
 	
-
 	if (m_DicomInteractor)
 		m_DicomInteractor->GetPlaneBounds(crop_bounds);
 	else
@@ -1019,9 +1026,13 @@ void mafOpImporterDicom::CalculateCropExtent()
 		
 	//Enable/disable Crop
 	m_CropEnabled = false;
-	for (int i = 0; i < 4; i++)
-		if (sliceExtent[i] != m_CropExtent[i])
-			m_CropEnabled = true;
+	if(m_CropPage)
+		for (int i = 0; i < 4; i++)
+			if (sliceExtent[i] != m_CropExtent[i])
+			{
+				m_CropEnabled = true;
+				break;
+			}
 }
 
 //----------------------------------------------------------------------------
@@ -1151,7 +1162,7 @@ void mafOpImporterDicom::SelectSeries(mafDicomSeries * selectedSeries)
 			m_LoadPage->Update();
 
 			//Set Z Bounds in Crop page
-			if (!this->m_TestMode)
+			if (!this->m_TestMode && m_CropPage)
 				m_CropPage->SetZCropBounds(m_ZCropBounds[0], m_ZCropBounds[1]);
 		}
 
@@ -1166,33 +1177,36 @@ void mafOpImporterDicom::SelectSeries(mafDicomSeries * selectedSeries)
 void mafOpImporterDicom::OnWizardChangePage( mafEvent * e )
 {
 
-	if(m_Wizard->GetCurrentPage()==m_LoadPage)//From Load page
+	if(m_Wizard->GetCurrentPage()==m_LoadPage )//From Load page
 	{
-		//get the current windowing in order to maintain subrange thought the wizard pages 
-		m_LoadPage->GetWindowing(m_SliceRange,m_SliceSubRange);
+		if (m_CropPage)
+		{
+			//get the current windowing in order to maintain subrange thought the wizard pages 
+			m_LoadPage->GetWindowing(m_SliceRange, m_SliceSubRange);
 
-		m_DicomInteractor->SetSliceBounds(m_SliceBounds);
-		m_DicomInteractor->PlaneVisibilityOn();
+			m_DicomInteractor->SetSliceBounds(m_SliceBounds);
+			m_DicomInteractor->PlaneVisibilityOn();
 
-		m_CropPage->RemoveGuiLowerCenter(m_CropGuiCenter);
-		m_CropGuiCenter = new mafGUI(this);
-		m_CropGuiCenter->Divider();
+			m_CropPage->RemoveGuiLowerCenter(m_CropGuiCenter);
+			m_CropGuiCenter = new mafGUI(this);
+			m_CropGuiCenter->Divider();
 
-		m_CropGuiCenter->Label("Name:", true);
+			m_CropGuiCenter->Label("Name:", true);
 
-		mafDicomSlice * sliceData = m_SelectedSeries->GetSlice(0);
+			mafDicomSlice * sliceData = m_SelectedSeries->GetSlice(0);
 
-		if (sliceData->GetDescription() != "")
-			m_CropGuiCenter->Bool(ID_UPDATE_NAME, "Description", &m_DescrInName,1);
-		if (sliceData->GetPatientName() != "")
-			m_CropGuiCenter->Bool(ID_UPDATE_NAME, "Patient Name", &m_PatientNameInName,1);
-		m_CropGuiCenter->Bool(ID_UPDATE_NAME, "Image Size", &m_SizeInName,1);
+			if (sliceData->GetDescription() != "")
+				m_CropGuiCenter->Bool(ID_UPDATE_NAME, "Description", &m_DescrInName, 1);
+			if (sliceData->GetPatientName() != "")
+				m_CropGuiCenter->Bool(ID_UPDATE_NAME, "Patient Name", &m_PatientNameInName, 1);
+			m_CropGuiCenter->Bool(ID_UPDATE_NAME, "Image Size", &m_SizeInName, 1);
 
-		m_CropGuiCenter->Label("Result:");
-		m_CropGuiCenter->Label(&m_VMEName);
+			m_CropGuiCenter->Label("Result:");
+			m_CropGuiCenter->Label(&m_VMEName);
 
-		m_CropPage->AddGuiLowerCenter(m_CropGuiCenter);
-		m_CropPage->Update();
+			m_CropPage->AddGuiLowerCenter(m_CropGuiCenter);
+			m_CropPage->Update();
+		}
 		SetVMEName();
 	}
 
@@ -1237,11 +1251,13 @@ void mafOpImporterDicom::OnChangeSlice()
 		m_CurrentImageID = currImageId;
 		GenerateSliceTexture(currImageId);
 	}
-
-	m_SliceScannerLoadPage->SetValue(m_CurrentSlice);
-	m_SliceScannerLoadPage->Update();
-	m_SliceScannerCropPage->SetValue(m_CurrentSlice);
-	m_SliceScannerCropPage->Update();
+	if (m_CropPage)
+	{
+		m_SliceScannerLoadPage->SetValue(m_CurrentSlice);
+		m_SliceScannerLoadPage->Update();
+		m_SliceScannerCropPage->SetValue(m_CurrentSlice);
+		m_SliceScannerCropPage->Update();
+	}
 
 	CameraUpdate();
 	GuiUpdate();
