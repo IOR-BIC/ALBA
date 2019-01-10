@@ -119,7 +119,7 @@ void mafViewImageCompound::OnEvent(mafEventBase *maf_event)
 					double low, hi;
 					m_LutSlider->GetSubRange(&low,&hi);
 					m_ColorLUT->SetTableRange(low,hi);
-					GetLogicManager()->CameraUpdate();
+					CameraUpdate();
 				}
 			}
 			break;

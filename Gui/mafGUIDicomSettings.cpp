@@ -42,7 +42,7 @@ mafGUISettings(Listener, label)
   m_CheckNameCompositor[ID_DESCRIPTION] = TRUE; 
   m_CheckNameCompositor[ID_SERIES] = TRUE;
 	  
-  m_AutoVMEType = FALSE;
+  m_AutoVMEType = m_SkipCrop = FALSE;
   m_OutputType = 0;
   m_LastDicomDir = "UNEDFINED_m_LastDicomDir";
   m_Step = ID_1X;
@@ -67,13 +67,19 @@ void mafGUIDicomSettings::CreateGui()
 	wxString typeArray[3] = { _("Volume"),_("Images") };
 	wxString SkipChoices[4] = { _("Load All"),_("load one in two"),_("load one in trhee"),_("load one in four") };
 	
-  m_Gui->Label("Dicom image position patient exception handling");
+	m_Gui->Label("Dicom Settings", true);
+	m_Gui->Label("");
+  m_Gui->Label("Image position patient exception handling");
   m_Gui->Combo(ID_DCM_POSITION_PATIENT_CHOICE,_("        "),&m_DCM_ImagePositionPatientchoice,2,DCM_IMGchoices);
   m_Gui->Divider(1);
   m_Gui->Bool(ID_AUTO_VME_TYPE,_("Auto VME Type"),&m_AutoVMEType,1);
   m_Gui->Radio(ID_SETTING_VME_TYPE, "VME output", &m_OutputType, 2, typeArray, 1, "");
   m_Gui->Divider(1);
 	m_Gui->Combo(ID_STEP,_("Skip Slices:"),&m_Step,4,SkipChoices);
+	m_Gui->Divider(1);
+	m_Gui->Label("Wizard phases:");
+	m_Gui->Bool(ID_SKIP_CROP, _("Skip Crop"), &m_SkipCrop, 1);
+
 	m_Gui->Divider(1);
   
 	EnableItems();
@@ -84,7 +90,7 @@ void mafGUIDicomSettings::EnableItems()
 {
   if (m_Gui)
   {
-    m_Gui->Enable(ID_SETTING_VME_TYPE,(m_AutoVMEType==TRUE));
+    m_Gui->Enable(ID_SETTING_VME_TYPE,(m_AutoVMEType || m_SkipCrop ));
 	  m_Gui->Update();
   }
 }
@@ -97,6 +103,11 @@ void mafGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 		case ID_AUTO_VME_TYPE:
 		{
 			m_Config->Write("AutoVMEType", m_AutoVMEType);
+		}
+		break;
+		case ID_SKIP_CROP:
+		{
+			m_Config->Write("SkipCrop", m_SkipCrop);
 		}
 		break;
 		case ID_STEP:
@@ -143,6 +154,11 @@ void mafGUIDicomSettings::InitializeSettings()
 		m_AutoVMEType=long_item;
 	else
 		m_Config->Write("AutoVMEType",m_AutoVMEType);
+
+	if (m_Config->Read("SkipCrop", &long_item))
+		m_SkipCrop = long_item;
+	else
+		m_Config->Write("SkipCrop", m_SkipCrop);
 
 	if(m_Config->Read("VMEType", &long_item))
 		m_OutputType=long_item;
