@@ -664,9 +664,11 @@ bool mafGUIValidator::TransferToWindow(void)
       m_TextCtrl->SetValue(s);
     break;
     case VAL_STRING:
+		case VAL_INTERACTIVE_STRING:
       if (m_StringVar) m_TextCtrl->SetValue(*m_StringVar);
     break;
     case VAL_MAF_STRING:
+		case VAL_MAF_INTERACTIVE_STRING:
       if (m_MafStringVar) m_TextCtrl->SetValue(wxString(m_MafStringVar->GetCStr()));
     break;
     case VAL_SLIDER:

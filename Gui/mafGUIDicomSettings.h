@@ -56,7 +56,9 @@ public:
     ID_CONVERT_UNITS,
     ID_AUTO_VME_TYPE,
     ID_SETTING_VME_TYPE,
-    ID_DCM_POSITION_PATIENT_CHOICE
+    ID_DCM_POSITION_PATIENT_CHOICE,
+		ID_SKIP_CROP,
+		ID_SKIP_NAMING
 	};
   
 
@@ -113,6 +115,13 @@ public:
   /** Return the DCM_ImagePositionPatient choice */
   int GetDCMImagePositionPatientExceptionHandling(){return m_DCM_ImagePositionPatientchoice;};
 
+
+	/** Returns SkipCrop */
+	int GetSkipCrop() const { return m_SkipCrop; }
+
+	/** Sets SkipCrop */
+	void SetSkipCrop(int skipCrop) { m_SkipCrop = skipCrop; }
+
 protected:
 	/** Create the GUI for the setting panel.*/
 	void CreateGui();
@@ -132,7 +141,8 @@ protected:
 
 	int m_Step;
   int m_AutoVMEType;
-  wxString m_LastDicomDir;
+	int m_SkipCrop;
+	wxString m_LastDicomDir;
   int m_DCM_ImagePositionPatientchoice;
 
   friend class mafGUIDicomSettingsTest;

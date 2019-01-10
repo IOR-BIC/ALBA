@@ -106,7 +106,7 @@ void mafGUISettingsDialog::OnEvent(mafEventBase *maf_event)
     {
       case VME_SELECT:
       {
-        Page *page = (Page*)(e->GetArg());
+        Page *page = (Page*)(e->GetVme());
         if(page)
           m_Guih->Put(page->ui);
       }
