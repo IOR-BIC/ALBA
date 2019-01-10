@@ -105,7 +105,7 @@ Function CheckIfVS2015RedistributablePackageIsAlreadyInstalled
 	;-------------------------
 	;Other Windows Check? (to be tested...)
 	;-------------------------
-	${registry::Read} "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86" "Installed" $R0 $R1
+	${registry::Read} "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\@INSTALLER_ARCH@" "Installed" $R0 $R1
 
 	IntCmp $R0 1 registry_key_present2 registry_key_not_found2
 	registry_key_present2:		 
@@ -117,7 +117,7 @@ Function CheckIfVS2015RedistributablePackageIsAlreadyInstalled
 		;MessageBox MB_OK "registry key not found Value=$R0"   
 		 
 		MessageBox MB_OK "\
-	Microsoft Visual C++ 2015 Redistributable Package (x86) is needed in order \
+	Microsoft Visual C++ 2015 Redistributable Package is needed in order \
 	to install this application. The installer will now install them."
 		 
 		;ExecShell "open" "https://www.microsoft.com/en-us/download/details.aspx?id=30679"
