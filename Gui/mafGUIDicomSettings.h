@@ -98,15 +98,10 @@ public:
 	  
   /** Retrieve the build step. */
   int GetBuildStep(){return m_Step;};
-  
-  /** Retrieve auto VME type flag. */
-  int AutoVMEType(){return m_AutoVMEType;};
-  /** Retrieve VME type. */
-  int GetVMEType(){return m_OutputType;};
-	  
+    
   /** Helper function to store and retrieve the last Dicom dir opened */
 	/** Helper function to store and retrieve the last dicom dir opened */
-  void SetLastDicomDir(wxString lastDicomDir);;
+  void SetLastDicomDir(wxString lastDicomDir);
   wxString GetLastDicomDir() {return m_LastDicomDir;};
 	
   /** Return if an element of custom name check list is checked */
@@ -120,7 +115,21 @@ public:
 	int GetSkipCrop() const { return m_SkipCrop; }
 
 	/** Sets SkipCrop */
-	void SetSkipCrop(int skipCrop) { m_SkipCrop = skipCrop; }
+	void SetSkipCrop(int skipCrop) { m_SkipCrop = skipCrop; m_Config->Write("SkipCrop", m_SkipCrop);}
+
+
+	/** Returns AutoVMEType */
+	int GetAutoVMEType() const { return m_AutoVMEType; }
+
+	/** Sets AutoVMEType */
+	void SetAutoVMEType(int autoVMEType) { m_AutoVMEType = autoVMEType; m_Config->Write("AutoVMEType", m_AutoVMEType);}
+
+
+	/** Returns OutputType */
+	int GetOutputType() const { return m_OutputType; }
+
+	/** Sets OutputType */
+	void SetOutputType(int outputType) { m_OutputType = outputType; m_Config->Write("VMEType", m_OutputType);}
 
 protected:
 	/** Create the GUI for the setting panel.*/

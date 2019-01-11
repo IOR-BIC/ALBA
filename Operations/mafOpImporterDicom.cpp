@@ -1139,13 +1139,13 @@ void mafOpImporterDicom::SelectSeries(mafDicomSeries * selectedSeries)
 			m_LoadGuiCenter = new mafGUI(this);
 			m_LoadGuiCenter->Divider();
 
-			if (numberOfSlices > 1 && !GetSetting()->AutoVMEType())
+			if (numberOfSlices > 1 && !GetSetting()->GetAutoVMEType())
 			{
 				m_OutputType = 0;
 				wxString typeArrayVolumeImage[2] = { _("Volume"),_("Images") };
 				m_LoadGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArrayVolumeImage, 1, "");
 			}
-			else if (numberOfSlices == 1 || GetSetting()->GetVMEType() == TYPE_IMAGE)
+			else if (numberOfSlices == 1 || GetSetting()->GetOutputType() == TYPE_IMAGE)
 			{
 				m_LoadGuiCenter->Label("Output type: Image");
 				m_LoadGuiCenter->Label("");
