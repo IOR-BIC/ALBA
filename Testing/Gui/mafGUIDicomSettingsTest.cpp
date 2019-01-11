@@ -121,7 +121,7 @@ void mafGUIDicomSettingsTest::TestAutoVMEType()
   //////////////////////////////////////////////////////////////////////////
   //Test default value
   //////////////////////////////////////////////////////////////////////////
-  int autoVMEType = settings->AutoVMEType();
+  int autoVMEType = settings->GetAutoVMEType();
   m_Result = autoVMEType == FALSE;
 
   TEST_RESULT;
@@ -130,14 +130,14 @@ void mafGUIDicomSettingsTest::TestAutoVMEType()
   //////////////////////////////////////////////////////////////////////////
   config->Write("AutoVMEType",TRUE);
   settings->InitializeSettings();
-  autoVMEType = settings->AutoVMEType();
+  autoVMEType = settings->GetAutoVMEType();
   m_Result = autoVMEType == TRUE;
 
   TEST_RESULT;
 
   config->Write("AutoVMEType",FALSE);
   settings->InitializeSettings();
-  autoVMEType = settings->AutoVMEType();
+  autoVMEType = settings->GetAutoVMEType();
   m_Result = autoVMEType == FALSE;
 
   TEST_RESULT;
@@ -176,7 +176,7 @@ void mafGUIDicomSettingsTest::TestGetVMEType()
   //////////////////////////////////////////////////////////////////////////
   //Test default value
   //////////////////////////////////////////////////////////////////////////
-  int vmeType = settings->GetVMEType();
+  int vmeType = settings->GetOutputType();
   m_Result = vmeType == 0;
 
   TEST_RESULT;
@@ -185,14 +185,14 @@ void mafGUIDicomSettingsTest::TestGetVMEType()
   //////////////////////////////////////////////////////////////////////////
   config->Write("VMEType",1);
   settings->InitializeSettings();
-  vmeType = settings->GetVMEType();
+  vmeType = settings->GetOutputType();
   m_Result = vmeType == 1;
 
   TEST_RESULT;
 
   config->Write("VMEType",2);
   settings->InitializeSettings();
-  vmeType = settings->GetVMEType();
+  vmeType = settings->GetOutputType();
   m_Result = vmeType == 2;
 
   TEST_RESULT;
