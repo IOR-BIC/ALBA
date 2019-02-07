@@ -323,7 +323,7 @@ protected:
 	/** Called when an operation starts. Disable all menu and lock the Selection */
 	virtual void OpRunStarting();
 	/** Called when an operation stops. Re-enable all menu and unlock the Selection */
-	virtual void OpRunTerminated();
+	virtual void OpRunTerminated(int runOk);
 	/** Show the gui of the running operation or the settings of the selected view. */
 	virtual void OpShowGui(bool push_gui, mafGUIPanel *panel);
 	/** Hide the setting's gui when a view is destroyed. */

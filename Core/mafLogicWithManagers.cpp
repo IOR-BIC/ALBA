@@ -704,7 +704,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
 				if (c != NULL)
 					c->SetAllowCloseWindow(true);
-				OpRunTerminated();
+				OpRunTerminated(e->GetArg());
 			}
 		}
 		break;
@@ -1539,7 +1539,7 @@ void mafLogicWithManagers::OpRunStarting()
   if(m_SideBar)    m_SideBar->EnableSelect(false);
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::OpRunTerminated()
+void mafLogicWithManagers::OpRunTerminated(int runOk)
 //----------------------------------------------------------------------------
 {
 	m_RunningOperation = false;
