@@ -1,3 +1,7 @@
+#	EnumUsersReg Script for ALBA based Applications
+#	Author: Nicola Vanella
+#	BIC-IOR 2019
+
 !ifndef ___EnumUsersReg___
 !define ___EnumUsersReg___
  
