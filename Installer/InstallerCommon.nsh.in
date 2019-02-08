@@ -1,7 +1,7 @@
 /*
-	Installer Common Script for MAF based Applications
+	Installer Common Script for ALBA based Applications
 	Author: Nicola Vanella
-	LTM-IOR 2016
+	BIC-IOR 2019
 */
 
 !ifndef ___InstallerCommon___
