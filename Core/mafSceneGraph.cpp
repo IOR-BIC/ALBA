@@ -128,6 +128,9 @@ void mafSceneGraph::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   VmeShow(vme,false);
+	
+	if (vme == m_SelectedVme)
+		m_SelectedVme = NULL;
 
   mafSceneNode *node=NULL;
 
