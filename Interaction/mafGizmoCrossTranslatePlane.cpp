@@ -162,7 +162,7 @@ mafGizmoCrossTranslatePlane::~mafGizmoCrossTranslatePlane()
 	// set gizmo behavior to NULL
 	m_Gizmo[S0]->SetBehavior(NULL);
 	m_Gizmo[S1]->SetBehavior(NULL);
-	m_Gizmo[NUM_GIZMO_PARTS]->SetBehavior(NULL);
+	//m_Gizmo[NUM_GIZMO_PARTS]->SetBehavior(NULL);
 
 	vtkDEL(m_Line[S0]);
 	vtkDEL(m_Line[S1]);
@@ -184,7 +184,7 @@ mafGizmoCrossTranslatePlane::~mafGizmoCrossTranslatePlane()
 		m_Gizmo[i]->ReparentTo(NULL);
 	}
 
-	vtkDEL(m_TranslationFeedbackGizmo);
+	//vtkDEL(m_TranslationFeedbackGizmo);
 
 	vtkDEL(m_FeedbackConeSource);
 
