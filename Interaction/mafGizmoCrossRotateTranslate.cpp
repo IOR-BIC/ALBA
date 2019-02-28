@@ -46,7 +46,8 @@ mafGizmoCrossRotateTranslate::mafGizmoCrossRotateTranslate()
 
 mafGizmoCrossRotateTranslate::~mafGizmoCrossRotateTranslate()
 {
-
+	delete m_GizmoCrossTranslate;
+	delete m_GizmoCrossRotate;
 }
 
 void mafGizmoCrossRotateTranslate::Create(mafVME *input, mafObserver* listener, bool BuildGUI, int normal)
