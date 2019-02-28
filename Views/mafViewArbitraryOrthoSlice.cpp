@@ -411,10 +411,12 @@ mafGUI* mafViewArbitraryOrthoSlice::CreateGui()
 {
 	assert(m_Gui == NULL);
 	m_Gui = mafView::CreateGui();
+
 	m_Gui->Label("");
-	m_Gui->Button(ID_RESET,_("reset slices"),"");
+	m_Gui->Button(ID_RESET,_("Reset slices"),"");
 	m_Gui->Divider();
-	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+
+	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
 	m_Gui->Update();
 		
 	EnableWidgets( (m_CurrentVolume != NULL) );
