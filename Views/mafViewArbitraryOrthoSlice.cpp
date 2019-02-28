@@ -116,7 +116,13 @@ mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label) : mafView
 mafViewArbitraryOrthoSlice::~mafViewArbitraryOrthoSlice()
 {
 	for(int i=X;i<=Z;i++)
+	{
 		cppDEL(m_GizmoRT[i]);
+		mafDEL(m_Slicer[i]);
+		mafDEL(m_SlicerResetMatrix[i]);
+		mafDEL(m_CameraConeVME[i]);
+		delete(m_CameraToSlicer[i]);
+	}
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::PackageView()
@@ -405,10 +411,12 @@ mafGUI* mafViewArbitraryOrthoSlice::CreateGui()
 {
 	assert(m_Gui == NULL);
 	m_Gui = mafView::CreateGui();
+
 	m_Gui->Label("");
-	m_Gui->Button(ID_RESET,_("reset slices"),"");
+	m_Gui->Button(ID_RESET,_("Reset slices"),"");
 	m_Gui->Divider();
-	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+
+	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
 	m_Gui->Update();
 		
 	EnableWidgets( (m_CurrentVolume != NULL) );
@@ -523,6 +531,10 @@ void mafViewArbitraryOrthoSlice::VolumeWindowing(mafVME *volume)
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowVolume( mafVME * vme, bool show )
 {
+	if (m_CurrentVolume == vme) return;
+
+	m_CurrentVolume = vme;
+
 	wxBusyInfo wait("please wait");
 
 	for (int i = X; i <= Z; i++)
@@ -535,7 +547,6 @@ void mafViewArbitraryOrthoSlice::ShowVolume( mafVME * vme, bool show )
 	
 		
 	double sr[2],volumeVTKDataCenterLocalCoords[3];
-	m_CurrentVolume = vme;
 
 	EnableWidgets(true);
 
@@ -679,7 +690,8 @@ void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 
 	for (int i = X; i <= Z; i++)
 	{
-		mafNEW(m_Slicer[i]);
+		if(m_Slicer[i]==NULL)
+			mafNEW(m_Slicer[i]);
 		m_Slicer[i]->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
 		m_Slicer[i]->SetName(slicerNames[i]);
 		m_Slicer[i]->ReparentTo(vmeVolume);
@@ -701,8 +713,12 @@ void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 		
 	for (int i = X; i <= Z; i++)
 	{
-		m_GizmoRT[i] = new mafGizmoCrossRotateTranslate();
-		m_GizmoRT[i]->Create(m_Slicer[i], this, true, i);
+		if(m_GizmoRT[i]==NULL)
+		{
+			m_GizmoRT[i] = new mafGizmoCrossRotateTranslate();
+			m_GizmoRT[i]->Create(m_Slicer[i], this, true, i);
+		}
+
 		m_GizmoRT[i]->SetName(gizmoNames[i]);
 		m_GizmoRT[i]->SetInput(m_Slicer[i]);
 		m_GizmoRT[i]->SetRefSys(m_Slicer[i]);
@@ -743,7 +759,9 @@ void mafViewArbitraryOrthoSlice::BuildCameraConeVME(int side)
 	cameraConeSource->CappingOn();
 	cameraConeSource->Update();
 
-	mafNEW(m_CameraConeVME[side]);
+	if (m_CameraConeVME[side] == NULL)
+		mafNEW(m_CameraConeVME[side]);
+
 	// DEBUG
 	m_CameraConeVME[side]->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
 	m_CameraConeVME[side]->SetName(coneNames[side]);
@@ -757,7 +775,8 @@ void mafViewArbitraryOrthoSlice::BuildCameraConeVME(int side)
 	m_CameraConeVME[side]->GetMaterial()->m_Prop->SetOpacity(0.2);
 
 	// default slicer matrix rotation component is identity when the input volume has identity pose matrix
-	m_CameraConeVME[side]->ReparentTo(m_Slicer[side]);
+	if (m_CameraConeVME[side]->GetParent() != m_Slicer[side])
+		m_CameraConeVME[side]->ReparentTo(m_Slicer[side]);
 
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_CameraConeVME[side], true);
 

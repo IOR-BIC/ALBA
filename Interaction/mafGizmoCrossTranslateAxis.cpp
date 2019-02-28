@@ -183,7 +183,7 @@ mafGizmoCrossTranslateAxis::~mafGizmoCrossTranslateAxis()
 	m_TranslationCylinderGizmo->ReparentTo(NULL);
 
 	// clean up translation feedback stuff
-	vtkDEL(m_TranslationFeedbackGizmo);
+	//vtkDEL(m_TranslationFeedbackGizmo);
 	vtkDEL(m_FeedbackConeSource);
 	vtkDEL(m_LeftUpFeedbackConeTransform);
 	vtkDEL(m_LeftDownFeedbackConeTransform);
