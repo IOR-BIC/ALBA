@@ -77,12 +77,8 @@ public:
   virtual void VmeDeletePipe(mafVME *vme);
 
   /** Set slicer parameter to generate the slice. */
-  virtual void SetSlice(double origin[3], float xVect[3], float yVect[3]);
-
-  /** Set the origin and normal of the slice 
-  Both, Origin and Normal may be NULL, if the current value is to be preserved */
-  virtual void SetSlice(double* Origin, double* Normal = NULL);
-
+  //virtual void SetSlice(double origin[3], float xVect[3], float yVect[3]);
+	 
   /** Calculate for every actor the correct slice. */
   virtual void UpdateSlice();
 

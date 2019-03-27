@@ -71,7 +71,6 @@ public:
     ID_SLICE_SLIDER_Y,
     ID_SLICE_SLIDER_Z,
 		ID_OPACITY_SLIDER,
-    ID_ENABLE_GPU,
     ID_ENABLE_TRILINEAR_INTERPOLATION,
     ID_LAST
   };
@@ -140,11 +139,19 @@ public:
   /** Set tri-linear interpolation to on */
   void SetInterpolationOn(){SetInterpolation(1);};
 
+
+	/** Returns SliceDirection */
+	int GetSliceDirection() const { return m_SliceDirection; }
+
+	/** Sets SliceDirection */
+	void SetSliceDirection(int sliceDirection);
+
 protected:
 	/** Create the slicer pipeline. */
-	void CreateSlice(int direction);
+	void CreateSlice();
 
-	void DeleteSlice(int direction);
+	/** Delete the slicer pipeline. */
+	void DeleteSlice();
 
 	void UpdatePlaneOrigin(int direction);
 
