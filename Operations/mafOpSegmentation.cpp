@@ -106,6 +106,7 @@
 #include "vtkMAFVolumeToClosedSmoothSurface.h"
 #include "vtkMAFBinaryImageFloodFill.h"
 #include "vtkImageClip.h"
+#include "mafViewSlice.h"
 
 
 
@@ -642,7 +643,7 @@ void mafOpSegmentation::CreateOpDialog()
   mafSetFrame(m_Dialog);
 
   //Create rendering view   
-  m_View = new mafViewSliceNotInterpolated("Volume Slice");  
+  m_View = new mafViewSlice("Volume Slice");  
   m_View->Create();
   m_View->GetGui();
 
@@ -2434,65 +2435,6 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
       }
       break;
     case ID_SLICE_SLIDER:
-      {
-        //if (m_NumSliceSliderEvents == 2)//Validator generate 2 events when the user move the slider REMOVED: GEnerate problems on slice update!
-        {
-          m_NumSliceSliderEvents = 0;
-          if (/*m_CurrentSliceIndex != m_OldSliceIndex &&*/ m_CurrentOperation==MANUAL_SEGMENTATION)
-          {
-            OnEventUpdateManualSlice();
-          }
-          else if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
-          {
-            OnEventUpdateThresholdSlice();
-          }
-          else if(m_CurrentOperation==LOAD_SEGMENTATION)
-          {
-            UpdateSlice();
-            m_View->VmeShow(m_LoadedVolume, true);
-            m_View->CameraUpdate();
-            m_GuiDialog->Update();
-          }
-          else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
-          {
-            UpdateSlice();
-            m_View->VmeShow(m_RefinementVolumeMask, true);
-            m_View->CameraUpdate();
-            m_GuiDialog->Update();
-          }
-          else
-          {
-            UpdateSlice();
-            m_View->CameraUpdate();
-            m_GuiDialog->Update();
-          }
-
-          if(m_CurrentOperation == MANUAL_SEGMENTATION)
-          {
-            CreateRealDrawnImage();
-            if(e->GetSender()!=this)
-            {
-              double low,hi;
-              m_ManualRangeSlider->GetSubRange(&low,&hi);
-              if(hi < m_CurrentSliceIndex)
-              {
-                hi = m_CurrentSliceIndex;
-              }
-              if(low > m_CurrentSliceIndex)
-              {
-                low = m_CurrentSliceIndex;
-              }
-              m_ManualRangeSlider->SetSubRange(low,hi);
-              m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
-            }
-          }
-        }
-//         else
-//         {
-//           m_NumSliceSliderEvents++;
-//         }
-      }
-      break;
     case ID_SLICE_NEXT:
       {
         if(m_CurrentSliceIndex<m_SliceSlider->GetMax())
@@ -2508,7 +2450,6 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
         else if(m_CurrentOperation==LOAD_SEGMENTATION)
         {
           UpdateSlice();
-          m_View->VmeShow(m_LoadedVolume, true);
           m_View->CameraUpdate();
           m_GuiDialog->Update();
         }
@@ -2561,7 +2502,6 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
         else if(m_CurrentOperation==LOAD_SEGMENTATION)
         {
           UpdateSlice();
-          m_View->VmeShow(m_LoadedVolume, true);
           m_View->CameraUpdate();
           m_GuiDialog->Update();
         }
@@ -2667,8 +2607,6 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
         }
         else if(m_CurrentOperation==LOAD_SEGMENTATION)
         {
-          UpdateSlice();
-          m_View->VmeShow(m_LoadedVolume, true);
           m_View->CameraUpdate();
           m_GuiDialog->Update();
         }
@@ -2756,7 +2694,6 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
           UpdateThresholdLabel();
           //UpdateSlice();
           UpdateThresholdRealTimePreview();
-          m_View->VmeShow(m_ThresholdVolumeSlice,true);
           m_View->CameraUpdate();
         }
         //Windowing
@@ -2765,7 +2702,6 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
           double low, hi;
           m_LutSlider->GetSubRange(&low,&hi);
           m_ColorLUT->SetTableRange(low,hi);
-          m_View->SetLut(m_Input,m_ColorLUT);
           m_View->CameraUpdate();
         }
         else if(e->GetSender() == m_AutomaticRangeSlider)
@@ -2811,7 +2747,6 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
         double *sr;
         sr = m_ColorLUT->GetRange();
         m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
-        m_View->SetLut(m_Input,m_ColorLUT);
         m_View->CameraUpdate();
         break;
       }
@@ -2860,10 +2795,8 @@ void mafOpSegmentation::StartDraw(mafEvent *e, bool erase)
 void mafOpSegmentation::OnEventUpdateThresholdSlice()
 //------------------------------------------------------------------------
 {
-  InitEmptyVolumeSlice();
   UpdateThresholdRealTimePreview();
   UpdateSlice();
-  m_View->VmeShow(m_ThresholdVolumeSlice, true);
   m_View->CameraUpdate();
   m_GuiDialog->Update();
 }
@@ -3782,16 +3715,14 @@ void mafOpSegmentation::InitializeViewSlice()
 
   // slicing the volume
   vtkDataSet *dataSet = m_Volume->GetOutput()->GetVTKData();
-  m_View->PlugVisualPipe("mafVMEVolumeGray","mafPipeVolumeSliceNotInterpolated");
-  m_View->PlugVisualPipe("mafVMESegmentationVolume","mafPipeVolumeSliceNotInterpolated");
+  m_View->PlugVisualPipe("mafVMEVolumeGray","mafPipeVolumeOrthoSlice");
+  m_View->PlugVisualPipe("mafVMESegmentationVolume","mafPipeVolumeOrthoSlice");
   m_View->PlugVisualPipe("mafVMEImage","mafPipeImage3D");
   m_View->PlugVisualPipe("mafVMESurface","mafPipeSurfaceSlice");
  
   dataSet->GetPoint((0,0,0),m_SliceOrigin);
-//  m_View->InitializeSlice(m_SliceOrigin);
   m_CurrentSliceIndex = 1;
 
-//  m_View->UpdateSlicePos(0.0);
   m_View->CameraUpdate();
 }
 
@@ -4360,9 +4291,6 @@ void mafOpSegmentation::UpdateSlice()
 
   if(m_CurrentOperation == MANUAL_SEGMENTATION)
     UpdateVolumeSlice();
-
-  //m_View->CameraUpdate();
-  //m_GuiDialog->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -4573,7 +4501,7 @@ void mafOpSegmentation::InitThresholdVolumeSlice()
     m_ThresholdVolumeSlice->ReparentTo(NULL);
     mafDEL(m_ThresholdVolumeSlice);
   }
-  mafNEW(m_ThresholdVolumeSlice);
+  mafNEW(m_ThresholdVolumeSlice); 
 
   m_ThresholdVolumeSlice->ReparentTo(m_Volume->GetParent());
   m_ThresholdVolumeSlice->SetName("Threshold Volume Slice");
@@ -4586,7 +4514,6 @@ void mafOpSegmentation::InitThresholdVolumeSlice()
   m_ThresholdVolumeSlice->Update();
 
   m_View->VmeAdd(m_ThresholdVolumeSlice);
-  m_View->VmeShow(m_ThresholdVolumeSlice,false);
   m_OldSliceIndex = -1;
   UpdateThresholdRealTimePreview();
   m_View->CameraUpdate();
@@ -5018,11 +4945,8 @@ void mafOpSegmentation::UpdateThresholdRealTimePreview()
   
   m_ThresholdVolumeSlice->Modified();
   m_ThresholdVolumeSlice->Update();
-  //m_View->VmeShow(m_ThresholdVolumeSlice,false);
-  //m_View->VmeShow(m_ThresholdVolumeSlice,true);
 
-  //m_View->CameraUpdate();
-  mafDEL(tVol);
+	mafDEL(tVol);
 }
 
 //----------------------------------------------------------------------------

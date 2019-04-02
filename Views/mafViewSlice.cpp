@@ -88,7 +88,7 @@ mafViewSlice::mafViewSlice(wxString label /* =  */, int camera_position /* = CAM
   m_TextColor[1]=0;
   m_TextColor[2]=0;
 
-  m_ShowVolumeTICKs = true;
+  m_ShowVolumeTICKs = showTICKs;
 	  
   // Added by Losi 11.25.2009
   m_TrilinearInterpolationOn = TRUE;

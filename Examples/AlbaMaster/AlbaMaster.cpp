@@ -118,6 +118,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "mafOpScaleDataset.h"
 #include "mafOpSegmentationRegionGrowingConnectedThreshold.h"
 #include "mafOpSegmentationRegionGrowingLocalAndGlobalThreshold.h"
+#include "mafOpSegmentation.h"
 #include "mafOpSmoothSurface.h"
 #include "mafOpSmoothSurfaceCells.h"
 #include "mafOpSplitSurface.h"
@@ -280,7 +281,9 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new mafOpComputeWrapping("Computing Wrapping"),_("Create"));
 	m_Logic->Plug(new mafOpFreezeVME(),_("Create"));
 	m_Logic->Plug(new mafOpSegmentationRegionGrowingConnectedThreshold(),_("Create"));
-	m_Logic->Plug(new mafOpSegmentationRegionGrowingLocalAndGlobalThreshold(),_("Create"));
+	m_Logic->Plug(new mafOpSegmentationRegionGrowingLocalAndGlobalThreshold(), _("Create"));
+	m_Logic->Plug(new mafOpSegmentation(), _("Create"));
+
 
 	m_Logic->Plug(new mafOpClipSurface("Clip Surface"),_("Modify"));
 	m_Logic->Plug(new mafOpFilterSurface("Filter Surface"),_("Modify"));

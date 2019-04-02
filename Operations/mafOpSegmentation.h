@@ -70,7 +70,7 @@ class vtkPolyDataMapper;
 class vtkActor;
 class vtkStructuredPoints;
 class vtkUnsignedCharArray;
-class mafViewSliceNotInterpolated;
+class mafViewSlice;
 class wxStaticBoxSizer;
 
 //----------------------------------------------------------------------------
@@ -358,7 +358,7 @@ protected:
   int m_NumSliceSliderEvents;         //<Number of events raised by the slider in a single interaction
   int m_CurrentOperation;             //<Current step
   mafGUIDialog* m_Dialog;             //<Dialog - GUI
-  mafViewSliceNotInterpolated* m_View;                 //<Rendering Slice view
+	mafViewSlice* m_View;                 //<Rendering Slice view
   mafGUIButton* m_OkButton;           //<Button -GUI
   mafGUIButton* m_CancelButton;       //<Button -GUI
   mafGUIButton* m_LoadSegmentationButton; //<Button -GUI
