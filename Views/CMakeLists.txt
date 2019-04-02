@@ -28,8 +28,6 @@ SET(PROJECT_SRCS
   mafViewArbitraryOrthoSlice.cpp	mafViewArbitraryOrthoSlice.h
   mafViewSliceBlendRX.cpp  				mafViewSliceBlendRX.h
   mafViewSliceBlend.cpp  					mafViewSliceBlend.h
-  mafViewSliceNotInterpolated.cpp mafViewSliceNotInterpolated.h
-  mafViewSliceNotInterpolatedCompound.cpp  	mafViewSliceNotInterpolatedCompound.h
   mafViewIsosurfaceCompound.cpp							mafViewIsosurfaceCompound.h
 )
 

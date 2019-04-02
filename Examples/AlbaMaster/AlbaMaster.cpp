@@ -153,8 +153,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "mafViewSliceBlend.h"
 #include "mafViewSliceBlendRX.h"
 #include "mafViewSliceGlobal.h"
-#include "mafViewSliceNotInterpolated.h"
-#include "mafViewSliceNotInterpolatedCompound.h"
 #include "mafViewSliceOnCurve.h"
 #include "mafViewSliceOnCurveCompound.h"
 #include "mafViewSlicer.h"
@@ -444,16 +442,6 @@ bool AlbaMaster::OnInit()
 	mafViewSliceGlobal *vSliceGlobal = new mafViewSliceGlobal("Slice Slice Global");
 	//vSliceGlobal->PackageView();
 	m_Logic->Plug(vSliceGlobal);
-
-	//View Slice Not Interpolated
-	mafViewSliceNotInterpolated *vSliceNoInterp = new mafViewSliceNotInterpolated("Slice Not Interpolated");
-	vSliceNoInterp->PackageView();
-	m_Logic->Plug(vSliceNoInterp);
-
-	//View Slice Not Interpolated Compound
-	mafViewSliceNotInterpolatedCompound *vSliceNoInterpC = new mafViewSliceNotInterpolatedCompound("Slice Not Interpolated Compound");
-	vSliceNoInterpC->PackageView();
-	m_Logic->Plug(vSliceNoInterpC);
 
 	//View Slice On Curve
 	mafViewSliceOnCurve *vsliceoncurve = new mafViewSliceOnCurve("Slice On Curve");

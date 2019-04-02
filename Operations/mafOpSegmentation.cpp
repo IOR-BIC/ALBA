@@ -98,7 +98,6 @@
 #include "mafVMEItemVTK.h"
 #include "mafTransformFrame.h"
 #include "mafOpVolumeResample.h"
-#include "mafViewSliceNotInterpolated.h"
 #include "mafTagItem.h"
 #include "mafVME.h"
 
