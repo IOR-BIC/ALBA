@@ -680,3 +680,12 @@ void mafPipeVolumeOrthoSlice::UpdateSlice()
   }    
 }
 
+//----------------------------------------------------------------------------
+vtkMAFVolumeOrthoSlicer * mafPipeVolumeOrthoSlice::GetSlicer(int slicerDirection)
+{
+	if (slicerDirection >= SLICE_X && slicerDirection <= SLICE_Z)
+		return m_Slicer[slicerDirection];
+	else
+		return NULL;
+}
+

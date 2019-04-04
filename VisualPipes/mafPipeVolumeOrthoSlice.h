@@ -146,6 +146,9 @@ public:
 	/** Sets SliceDirection */
 	void SetSliceDirection(int sliceDirection);
 
+	/** returns a slicer*/
+	vtkMAFVolumeOrthoSlicer *GetSlicer(int slicerDirection);
+
 protected:
 	/** Create the slicer pipeline. */
 	void CreateSlice();
@@ -163,7 +166,7 @@ protected:
 
   /** Updates VTK slicers. It also sets GPUEnabled flag.  */
   void UpdateSlice();
-
+	
 protected:		
   double  m_SliceOpacity; ///< Opacity of he volume slice.
 

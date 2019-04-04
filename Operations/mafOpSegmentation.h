@@ -51,17 +51,11 @@ class mafVMEVolumeGray;
 class mafVME;
 class mafVMEImage;
 class mafVME;
-
 class mmiSelectPoint;
-
-class mafVMESegmentationVolume;
 class mafVMESurface;
-
 class mafInteractorPERScalarInformation;
-
 class mafInteractorSegmentationPicker;
 class mafInteractorPERBrushFeedback;
-
 class vtkLookupTable;
 class vtkActor2D;
 class vtkTextMapper;
@@ -103,7 +97,6 @@ public:
     ID_MANUAL_SEGMENTATION,
     ID_REFINEMENT,
     ID_LOAD_SEGMENTATION,
-    ID_RESET_LOADED,
     ID_OK,
     ID_CANCEL,
     ID_VIEW,
@@ -128,27 +121,25 @@ public:
     ID_MANUAL_REDO,
     ID_BUTTON_PREV,
     ID_BUTTON_NEXT,
-    ID_AUTOMATIC_THRESHOLD,
-    ID_AUTOMATIC_INCREASE_MIN_THRESHOLD,
-    ID_AUTOMATIC_INCREASE_MAX_THRESHOLD,
-    ID_AUTOMATIC_DECREASE_MIN_THRESHOLD,
-    ID_AUTOMATIC_DECREASE_MAX_THRESHOLD,
-    ID_AUTOMATIC_DECREASE_MIDDLE_THRESHOLD,
-    ID_AUTOMATIC_INCREASE_MIDDLE_THRESHOLD,
-    ID_AUTOMATIC_ADD_RANGE,
-    ID_AUTOMATIC_REMOVE_RANGE,
-    ID_AUTOMATIC_LIST_OF_RANGE,
-    ID_AUTOMATIC_UPDATE_RANGE,
-    ID_AUTOMATIC_GLOBAL_THRESHOLD,
-    ID_AUTOMATIC_GLOBAL_PREVIEW,
-    ID_AUTOMATIC_INCREASE_MIN_RANGE_VALUE,
-    ID_AUTOMATIC_INCREASE_MAX_RANGE_VALUE,
-    ID_AUTOMATIC_DECREASE_MIN_RANGE_VALUE,
-    ID_AUTOMATIC_DECREASE_MAX_RANGE_VALUE,
-    ID_AUTOMATIC_DECREASE_MIDDLE_RANGE_VALUE,
-    ID_AUTOMATIC_INCREASE_MIDDLE_RANGE_VALUE,
+    ID_AUTO_THRESHOLD,
+    ID_AUTO_INC_MIN_THRESHOLD,
+    ID_AUTO_INC_MAX_THRESHOLD,
+    ID_AUTO_DEC_MIN_THRESHOLD,
+    ID_AUTO_DEC_MAX_THRESHOLD,
+    ID_AUTO_DEC_MIDDLE_THRESHOLD,
+    ID_AUTO_INC_MIDDLE_THRESHOLD,
+    ID_AUTO_ADD_RANGE,
+    ID_AUTO_REMOVE_RANGE,
+    ID_AUTO_LIST_OF_RANGE,
+    ID_AUTO_UPDATE_RANGE,
+    ID_AUTO_GLOBAL_THRESHOLD,
+    ID_AUTO_INC_MIN_RANGE,
+    ID_AUTO_INC_MAX_RANGE,
+    ID_AUTO_DEC_MIN_RANGE,
+    ID_AUTO_DEC_MAX_RANGE,
+    ID_AUTO_DEC_MIDDLE_RANGE,
+    ID_AUTO_INC_MIDDLE_RANGE,
     ID_REFINEMENT_ACTION,
-    ID_REFINEMENT_REGIONS_SIZE,
     ID_REFINEMENT_EVERY_SLICE,
     ID_REFINEMENT_ITERATIVE,
     ID_REFINEMENT_APPLY,
@@ -216,10 +207,7 @@ public:
 
   /** Return true if node is of type mafVMEVolume. */
   static bool SegmentedVolumeAccept(mafVME* node);
-
-  /** Returns the output Volume*/
-  mafVMEVolumeGray *GetOutputVolume(){return m_OutputVolume;};
-
+	 
 protected:
 
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
@@ -254,7 +242,7 @@ protected:
   void InitVolumeDimensions();
   
   /** Initialize the slice */
-  void InitializeViewSlice();
+  void InitializeView();
   
   /** Initialize the volume spacing attribute */
   void InitVolumeSpacing();
@@ -265,35 +253,9 @@ protected:
   /** Init GUI slice slider with volume parameters. */
   void InitGui();
   
-  /** Init Manual Segmentation GUI according to input volume*/
-  void InitManualSegmentationGui();
-  
-  /** Initialize the slices stuff for manual step */
-  void InitManualVolumeSlice();
-
-  /** Initialize the Threshold Volume*/
-  void InitThresholdVolume();
-
-  /** Initialize the Threshold Volume single slice */
-  void InitThresholdVolumeSlice();
-
   /** Initialize the Segmented Volume*/
-  void InitSegmentedVolume();
-
-  /** Initialize color table values for mask visualization. */
-  void InitMaskColorLut(vtkLookupTable *lut);
-
-  /** Init empty volume slice according to input volume*/
-  void InitEmptyVolumeSlice();
-
-  /** Init a slice volume with the specified scalars type according to input volume*/
-  template <class ImageType>
-  void InitDataVolumeSlice(mafVMEVolumeGray *slice);
-  //////////////////////////////////////////////////////////////////////////
-
-  /** Remove the VMEs neded by the operation*/
-  void RemoveVMEs();
-
+  void InitSegmentationVolume();
+	  
   /**Update windowing */
   void UpdateWindowing();
 
@@ -316,7 +278,7 @@ protected:
   void OnRefinementSegmentationEvent(mafEvent *e);
   
   /** Receive events from Load segmentation gui */
-  void OnLoadSegmentationEvent(mafEvent *e);
+  void OnLoadSegmentationEvent();
 
   /** Get the z position of the specified slice index */
   double GetPosFromSliceIndexZ();
@@ -346,6 +308,9 @@ protected:
   void OnPreviousStep();
 
   mafVMEVolumeGray* m_Volume;         //<Input volume
+	mafString m_VolumeName;        //<Loaded volume name
+	mafVMEVolumeGray *m_SegmentationVolume;     //<Segmentation volume
+	vtkImageData     *m_SegmetationSlice;
   double m_SliceOrigin[3];            //<Origin of the slice plane
   int m_VolumeDimensions[3];          //<Dimensions of the volumes (number of slices)
   double m_VolumeSpacing[3];          //<Volume spacing
@@ -379,13 +344,7 @@ protected:
   mafDeviceManager *m_DeviceManager;    //<Device manager
   mafInteractorSER *m_SER;              //<Static event router                        
   mafMatrix m_Matrix;                   //<Volume initial matrix
-  mafVMEVolumeGray *m_LoadedVolume;     //<Loaded volume
-  mafString m_LoadedVolumeName;        //<Loaded volume name
-  mafVMEVolumeGray *m_ThresholdVolume;  //<Volume mask for thresholding
-  mafVMEVolumeGray *m_ThresholdVolumeSlice; //<Single slice volume mask for real-time thresholding preview
-  mafVMEVolumeGray *m_EmptyVolumeSlice; //<Single slice volume that represent current slice (for real-time thresholding preview)
-  mafVMEVolumeGray *m_OutputVolume;     //<Output volume
-  mafVMESurface *m_OutputSurface;          //<Output Surface
+	mafVMESurface *m_OutputSurface;          //<Output Surface
   wxStaticText *m_SnippetsLabel;        //<Suggestion labels - GUI
   mafInteractorSegmentationPicker *m_SegmentationPicker; //<Segmentation picker for interaction
 
@@ -398,12 +357,6 @@ protected:
     int slice;
     vtkUnsignedCharArray *dataArray;
   } UndoRedoState; //<Undo Redo data structure
-
-  /** Save the volume mask for the procedural segmentation volume */
-  void InitManualVolumeMask();
-  
-  /** Update manual volume slice volume*/
-  void UpdateVolumeSlice();
 
   /** Apply volume slice changes*/
   void ApplyVolumeSliceChanges();
@@ -435,8 +388,6 @@ protected:
   /** Create the real drawn image */
   void CreateRealDrawnImage();
 
-  mafVMEVolumeGray *m_ManualVolumeMask;         //< Manual volume mask
-  mafVMEVolumeGray *m_ManualVolumeSlice;        //< Single slice manual volume mask
   mafGUIFloatSlider *m_ManualBrushSizeSlider;   //<Brush size slider - GUI
   wxTextCtrl *m_ManualBrushSizeText;            //<Brush size text box - GUI
   wxRadioBox *m_ManualBrushShapeRadioBox;       //<Brush shape radio - GUI
@@ -495,10 +446,7 @@ protected:
   /** Update the select range using gui values */
   void OnAutomaticUpdateRange();
 
-  /** Perform the preview of automatic segmentation */
-  void OnAutomaticPreview();
-
-  /** Function called when the user use the fine button to change the range of the automatic segmentation */
+   /** Function called when the user use the fine button to change the range of the automatic segmentation */
   void OnAutomaticChangeRangeManually(int eventID);
 
   /** Get camera attributes */
@@ -513,7 +461,6 @@ protected:
   /** Update threshold real-time preview*/
   void UpdateThresholdRealTimePreview();
 
-  mafVMESegmentationVolume *m_SegmentatedVolume; //<Segmentation volume
   int m_AutomaticGlobalThreshold;   //<Global threshold range lower bound
   double m_AutomaticThreshold;      //<Global threshold range lower bound
   double m_AutomaticUpperThreshold; //<Global threshold range upper bound
@@ -544,14 +491,6 @@ protected:
 
   //////////////////////////////////////////////////////////////////////////
   //Segmentation Refinement stuff
-  //////////////////////////////////////////////////////////////////////////
-  
-  /** Save the volume mask for the procedural segmentation volume */
-  void InitRefinementVolumeMask();
-
-  /** Save the volume mask for the procedural segmentation volume */
-  void SaveRefinementVolumeMask();
-  
   /** Reset refinement undo list */
   void ResetRefinementUndoList();
   
@@ -568,12 +507,11 @@ protected:
   void OnEventUpdateThresholdSlice();
 
   /** Update slice visualisation on manual step */
-  void OnEventUpdateManualSlice();
+  void OnUpdateSlice();
 
   /** Update threshold volume data  for preview or output */
   void UpdateThresholdVolumeData();
 
-  mafVMEVolumeGray *m_RefinementVolumeMask; //<Refinement volume mask
   int m_RefinementSegmentationAction;       //<Refinement action fill holes or remove islands
   int m_RefinementRegionsSize;              //<Size for region recognition
   int m_RefinementMajorityThreshold;        //<Used in itk algorithm (not yet exposed and used)
@@ -596,16 +534,10 @@ protected:
   int m_OLdWindowingHi;         //<Windowing original value to restore after exiting operation
 
   int m_GlobalFloodFill;  //< global or local bucket tool
-  int m_FloodErease;      //< switch fill/erease for bucket tool
+  int m_FloodErease;      //< switch fill/erase for bucket tool
 
   wxGauge *m_ProgressBar; //< display progress
-
-  /** Delete children of input vme if they are output of the input volume  */
-  void DeleteOutputs(mafVME* vme);
-
-  /** Determine if the specified vme is an output of the input volume */
-  bool IsOutput(mafVME* vme);
-
+	  
   /** flood fill algorithm */
   void FloodFill(vtkIdType seed);
 

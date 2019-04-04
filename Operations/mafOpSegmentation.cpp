@@ -106,6 +106,8 @@
 #include "vtkMAFBinaryImageFloodFill.h"
 #include "vtkImageClip.h"
 #include "mafViewSlice.h"
+#include "mafPipeVolumeOrthoSlice.h"
+#include "vtkMAFVolumeOrthoSlicer.h"
 
 
 
@@ -136,11 +138,9 @@ static int m_InputVtkType = 0;
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpSegmentation);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
-//----------------------------------------------------------------------------
 {
   m_OpType	= OPTYPE_OP;
   m_Canundo	= true;  
@@ -176,9 +176,6 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
   m_ManualColorLUT = NULL;
 
   m_OldVolumeParent = NULL;
-
-  m_ThresholdVolume           = NULL;
-  m_OutputVolume              = NULL;
   m_OutputSurface      =NULL;
 
   m_SER = NULL;
@@ -191,7 +188,7 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
     m_SegmentationOperationsGui[i] = NULL;
   }
 
-  m_SegmentatedVolume = NULL;
+	m_SegmentationVolume = NULL;
 
   //////////////////////////////////////////////////////////////////////////
   //Manual initializations
@@ -209,10 +206,7 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
   m_ManualRefinementRegionSizeText = NULL;
 
   m_SegmentationPicker = NULL;
-
-  m_ManualVolumeMask = NULL;
-  m_ManualVolumeSlice = NULL;
-
+	 
   m_ManualPER = NULL;
   
   m_ManualUndoList.clear();
@@ -240,8 +234,6 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
   //////////////////////////////////////////////////////////////////////////
   //Refinement initializations
   //////////////////////////////////////////////////////////////////////////
-  m_RefinementVolumeMask = NULL;
-
   m_RefinementUndoList.clear();
   m_RefinementRedoList.clear();
   //////////////////////////////////////////////////////////////////////////
@@ -256,13 +248,7 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
   m_RealDrawnImage = NULL;
   m_CurrentBrushMoveEventCount = 0;
 
-  m_ThresholdVolumeSlice = NULL;
-  m_EmptyVolumeSlice = NULL;
-
-  m_LoadedVolume = NULL;
-  m_LastMouseMovePointID = 0;
-
-  m_LoadedVolumeName = "[Select input volume]";
+   m_LastMouseMovePointID = 0;
 
   m_OldAutomaticThreshold = MAXINT;
   m_OldAutomaticUpperThreshold = MAXINT;
@@ -280,32 +266,20 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
 }
 //----------------------------------------------------------------------------
 mafOpSegmentation::~mafOpSegmentation()
-//----------------------------------------------------------------------------
 {
-
-  RemoveVMEs();
-
-  mafDEL(m_OutputVolume);
-  mafDEL(m_OutputSurface);
-  mafDEL(m_SegmentatedVolume);
-
-  Superclass;
 }
 //----------------------------------------------------------------------------
 bool mafOpSegmentation::Accept(mafVME *node)
-//----------------------------------------------------------------------------
 {
   return (node && node->IsA("mafVMEVolumeGray") );
 }
 //----------------------------------------------------------------------------
 mafOp *mafOpSegmentation::Copy()   
-//----------------------------------------------------------------------------
 {
   return (new mafOpSegmentation(m_Label));
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::OpRun()   
-//----------------------------------------------------------------------------
 {
   
   //////////////////////////////////////////////////////////////////////////
@@ -345,7 +319,7 @@ void mafOpSegmentation::OpRun()
 
   // interface:
   CreateOpDialog();
-  InitializeViewSlice();
+  InitializeView();
   InitGui();
 
   m_OldVolumeParent = m_Volume->GetParent();
@@ -353,8 +327,6 @@ void mafOpSegmentation::OpRun()
 
   m_View->VmeAdd(m_Volume);
   m_View->VmeShow(m_Volume, true);
-  //m_View->VmeCreatePipe(m_Volume);
-  //m_View->UpdateSlicePos(0.0);
   m_View->CameraReset();
   m_View->CameraUpdate();
   
@@ -370,98 +342,14 @@ void mafOpSegmentation::OpRun()
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::OpDo()
-//----------------------------------------------------------------------------
 {
-  mafVMEVolumeGray *targetVolume = NULL;
-  switch (m_CurrentOperation)
-  {
-    case  AUTOMATIC_SEGMENTATION:
-    {
-      UpdateThresholdVolumeData();
-      targetVolume = m_ThresholdVolume;
-    }
-    break;
-    case  MANUAL_SEGMENTATION:
-    {
-      targetVolume = m_ManualVolumeMask;
-    }
-    break;
-    case  REFINEMENT_SEGMENTATION:
-    {
-      targetVolume = m_RefinementVolumeMask;
-    }
-    break;
-    case  LOAD_SEGMENTATION:
-    {
-     targetVolume = m_LoadedVolume;
-    }
-    break;
-  }
-
-
-  if(targetVolume)
-  { 
-    if (!m_OutputVolume)
-    {
-      mafNEW(m_OutputVolume);
-    }
-    m_OutputVolume->DeepCopy(targetVolume);
-// 
-//     if(m_LoadedVolume)
-//     {
-// 
-//       if(IsOutput(m_LoadedVolume))
-//       {
-//         mafDEL(m_LoadedVolume);
-//       }
-//       
-//     }
-
-  //Eliminate previous outputs
-  //DeleteOutputs(m_Input->GetRoot());
-  //Replace the loaded output
-  if(m_LoadedVolume != NULL)
-  {
-    mafVME *previousSurface = m_LoadedVolume->GetParent();
-    m_LoadedVolume->ReparentTo(NULL);
-    m_LoadedVolume = NULL;
-
-    if(previousSurface != NULL)
-      previousSurface->ReparentTo(NULL);
-  }
-
-  m_OutputVolume->SetName(wxString::Format("Segmentation Output (%s)",m_Volume->GetName()).c_str());
-  lutPreset(4,m_OutputVolume->GetMaterial()->m_ColorLut);
-  m_OutputVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
-  m_OutputVolume->GetMaterial()->UpdateFromTables();
-  m_OutputVolume->GetTagArray()->SetTag("SEGMENTATION_PARENT",wxString::Format("%d",m_Volume->GetId()).c_str(),MAF_STRING_TAG);
-
-  mafTagItem *ti = m_OutputVolume->GetTagArray()->GetTag("VME_NATURE");
-  if(ti)
-  {
-    ti->SetValue("SYNTHETIC");
-  }
-  else
-  {
-    mafTagItem tag_Nature;
-    tag_Nature.SetName("VME_NATURE");
-    tag_Nature.SetValue("SYNTHETIC");
-
-    m_OutputVolume->GetTagArray()->SetTag(tag_Nature);
-  }
-
-  //m_OutputVolume->ReparentTo(m_Volume);
-   
-  m_OutputVolume->GetTagArray()->SetTag(mafTagItem("VOLUME_TYPE","BINARY"));
-
-
-  //GENERATIN SURFACE OUTPUT
+	//GENERATIN SURFACE OUTPUT
   wxBusyCursor wait_cursor;
   wxBusyInfo wait(_("Wait! Generating Surface Output"));
 
   
   vtkMAFSmartPointer<vtkMAFVolumeToClosedSmoothSurface> volToSurface;
-  volToSurface->SetInput(m_OutputVolume->GetOutput()->GetVTKData());
+  volToSurface->SetInput(m_SegmentationVolume->GetOutput()->GetVTKData());
   volToSurface->SetContourValue(127.5);
   volToSurface->Update();
   
@@ -474,133 +362,30 @@ void mafOpSegmentation::OpDo()
   m_OutputSurface->SetData(surface,mafVMEVolumeGray::SafeDownCast(m_Input)->GetTimeStamp());
   m_OutputSurface->ReparentTo(m_Input);
   m_OutputSurface->Modified();
-  
-  vtkDEL(surface);
+	m_OutputSurface->Update();
+	vtkDEL(surface);
+	mafDEL(m_OutputSurface);
 
-  mafTagItem *tis = m_OutputSurface->GetTagArray()->GetTag("VME_NATURE");
-  if(tis)
-  {
-    tis->SetValue("SYNTHETIC");
-  }
-  else
-  {
-    mafTagItem tag_Nature;
-    tag_Nature.SetName("VME_NATURE");
-    tag_Nature.SetValue("SYNTHETIC");
-
-    m_OutputSurface->GetTagArray()->SetTag(tag_Nature);
-  }
-
-  m_OutputSurface->Update();
-  
-  //Volume output is a child of surface out
-  //The result tree is Input
-  //                     |-Surface
-  //                          |-Binary volume
-  m_OutputVolume->ReparentTo(m_OutputSurface);
-
-  m_Output=m_OutputSurface;
-
-  }
-  RemoveVMEs();
   mafOp::OpDo();
 }
-
-//----------------------------------------------------------------------------
-void mafOpSegmentation::DeleteOutputs(mafVME* vme)
-  //----------------------------------------------------------------------------
-{
-  const  mafVME::mafChildrenVector *children = vme->GetChildren();
-  for(int i = 0; i < children->size(); i++)
-  {
-    mafVME *child = children->at(i);
-    DeleteOutputs(child);
-    if(IsOutput(child))
-    {
-      child->ReparentTo(NULL);
-    }
-  }
-}
-//----------------------------------------------------------------------------
-bool mafOpSegmentation::IsOutput(mafVME* vme)
-  //----------------------------------------------------------------------------
-{
-  if(vme->GetTagArray() && vme->GetTagArray()->IsTagPresent("SEGMENTATION_PARENT")==true)
-  {
-    const char *tagValue = vme->GetTagArray()->GetTag("SEGMENTATION_PARENT")->GetValue();
-
-    if(atoi(tagValue) == m_Volume->GetId())
-    {
-      return true;
-    }
-  }
-  return false;
-}
-
 //----------------------------------------------------------------------------
 void mafOpSegmentation::OpUndo()
-//----------------------------------------------------------------------------
 {
-  if (m_OutputVolume)
+  if (m_SegmentationVolume)
   {
-    m_OutputVolume->ReparentTo(NULL);
-    mafDEL(m_OutputVolume);
+    m_SegmentationVolume->ReparentTo(NULL);
+    mafDEL(m_SegmentationVolume);
   }
   if (m_OutputSurface)
   {
     m_OutputSurface->ReparentTo(NULL);
-    mafDEL(m_OutputVolume);
+    mafDEL(m_OutputSurface);
   }
-//   if (m_SegmentatedVolume)
-//   {
-//     m_SegmentatedVolume->ReparentTo(NULL);
-//     mafDEL(m_SegmentatedVolume);
-//   }
+
 	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
-void mafOpSegmentation::RemoveVMEs()
-//----------------------------------------------------------------------------
-{
-
-  if(m_ManualVolumeSlice)
-  {
-    m_ManualVolumeSlice->ReparentTo(NULL);
-    mafDEL(m_ManualVolumeSlice);
-  }
-
-  if(m_ThresholdVolume)
-  {
-    m_ThresholdVolume->ReparentTo(NULL);
-    mafDEL(m_ThresholdVolume);
-  }
-  
-  if(m_ManualVolumeMask)
-  {
-    m_ManualVolumeMask->ReparentTo(NULL);
-    mafDEL(m_ManualVolumeMask);
-  }
-
-  if(m_RefinementVolumeMask)
-  {
-    m_RefinementVolumeMask->ReparentTo(NULL);
-    mafDEL(m_RefinementVolumeMask);
-  }
-
-  if(m_ThresholdVolumeSlice)
-  {
-    m_ThresholdVolumeSlice->ReparentTo(NULL);
-    mafDEL(m_ThresholdVolumeSlice);
-  }
-  if(m_EmptyVolumeSlice)
-  {
-    m_EmptyVolumeSlice->ReparentTo(NULL);
-    mafDEL(m_EmptyVolumeSlice);
-  }
-}
-//----------------------------------------------------------------------------
 void mafOpSegmentation::OpStop(int result)
-//----------------------------------------------------------------------------
 {
   // Restore old windowing
   m_ColorLUT->SetTableRange(m_OLdWindowingLow,m_OLdWindowingHi);
@@ -608,11 +393,10 @@ void mafOpSegmentation::OpStop(int result)
   //remove vme now on cancel on ok vme will be removed by opdo method
   if (result == OP_RUN_CANCEL)
   {
-    RemoveVMEs();
-    if (m_SegmentatedVolume)
+    if (m_SegmentationVolume)
     {
-      m_SegmentatedVolume->ReparentTo(NULL);
-      mafDEL(m_SegmentatedVolume);
+			m_SegmentationVolume->ReparentTo(NULL);
+      mafDEL(m_SegmentationVolume);
     }
   }
 
@@ -625,7 +409,6 @@ void mafOpSegmentation::OpStop(int result)
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::CreateOpDialog()
-//----------------------------------------------------------------------------
 {
   wxBusyCursor wait;
   wxPoint defPos = wxDefaultPosition;
@@ -775,10 +558,6 @@ void mafOpSegmentation::CreateOpDialog()
   m_CancelButton->SetListener(this);
   m_CancelButton->SetValidator(mafGUIValidator(this,ID_CANCEL,m_CancelButton));
 
-//   m_LoadSegmentationButton = new mafGUIButton(m_Dialog,ID_LOAD_SEGMENTATION,_("Load"),defPos);
-//   m_LoadSegmentationButton->SetListener(this);
-//   m_LoadSegmentationButton->SetValidator(mafGUIValidator(this,ID_LOAD_SEGMENTATION,m_LoadSegmentationButton));
-
   m_ProgressBar = new wxGauge(m_Dialog,-1,100,wxDefaultPosition,wxSize(200,10));
 
   hSz2->Add(m_OkButton,0,wxEXPAND | wxALL);
@@ -806,10 +585,11 @@ void mafOpSegmentation::CreateOpDialog()
   m_SegmentationOperationsRollOut[MANUAL_SEGMENTATION]      = m_GuiDialog->RollOut(ID_MANUAL_SEGMENTATION, "Manual Segmentation", m_SegmentationOperationsGui[MANUAL_SEGMENTATION], false);
   m_SegmentationOperationsRollOut[REFINEMENT_SEGMENTATION]  = m_GuiDialog->RollOut(ID_REFINEMENT, "Segmentation Refinement", m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION], false);
 
-  m_GuiDialog->Enable(ID_LOAD_SEGMENTATION,false);
+ /* m_GuiDialog->Enable(ID_LOAD_SEGMENTATION,false);
   m_GuiDialog->Enable(ID_AUTO_SEGMENTATION, false);
   m_GuiDialog->Enable(ID_MANUAL_SEGMENTATION,false);
   m_GuiDialog->Enable(ID_REFINEMENT,false);
+*/
 
   m_GuiDialog->TwoButtons(ID_BUTTON_PREV,ID_BUTTON_NEXT,_("Prev"),_("Next"));
 
@@ -835,80 +615,42 @@ void mafOpSegmentation::CreateOpDialog()
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::DeleteOpDialog()
-//----------------------------------------------------------------------------
 {
   mafDEL(m_SegmentationPicker);
   
-  if (m_ThresholdVolume)
-  {
-    m_View->VmeShow(m_ThresholdVolume,false);
-    m_View->VmeRemove(m_ThresholdVolume);
-  }
-  if(m_ManualVolumeSlice)
-  {
-    m_View->VmeShow(m_ManualVolumeSlice,false);
-    m_View->VmeRemove(m_ManualVolumeSlice);
-  }
-  if(m_ThresholdVolumeSlice)
-  {
-    m_View->VmeShow(m_ThresholdVolumeSlice,false);
-    m_View->VmeRemove(m_ThresholdVolumeSlice);
-  }
-  if(m_EmptyVolumeSlice)
-  {
-    m_View->VmeShow(m_EmptyVolumeSlice,false);
-    m_View->VmeRemove(m_EmptyVolumeSlice);
-  }
-  if(m_LoadedVolume)
-  {
-    mafVME *parent = m_LoadedVolume;
-
-    while(parent != m_Volume)
-    {
-      m_View->VmeShow(parent,false);
-      m_View->VmeRemove(parent);
-      parent = parent->GetParent();
-    }
-  }
-
-  //m_Volume->ReparentTo(m_OldVolumeParent);
-  m_Volume->SetBehavior(m_OldBehavior);
+	m_Volume->SetBehavior(m_OldBehavior);
   m_Volume->Update();
-  m_View->VmeShow(m_Volume,false);
-  m_View->VmeRemove(m_Volume);
+	m_View->VmeShow(m_Volume, false);
+	m_View->VmeRemove(m_Volume);
+	m_View->VmeShow(m_SegmentationVolume, false);
+	m_View->VmeRemove(m_SegmentationVolume);
 
   //////////////////////////////////////////////////////////////////////////
   //Remove the threshold label
-  //////////////////////////////////////////////////////////////////////////
   if (m_AutomaticThresholdTextActor)
   {
     m_View->GetFrontRenderer()->RemoveActor(m_AutomaticThresholdTextActor);
   }
   vtkDEL(m_AutomaticThresholdTextActor);
   vtkDEL(m_AutomaticThresholdTextMapper);
-  //////////////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////////////
   //Remove the scalar label
-  //////////////////////////////////////////////////////////////////////////
   if (m_AutomaticScalarTextActor)
   {
     m_View->GetFrontRenderer()->RemoveActor(m_AutomaticScalarTextActor);
   }
   vtkDEL(m_AutomaticScalarTextActor);
   vtkDEL(m_AutomaticScalarTextMapper);
-  //////////////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////////////
   //Remove the slice label
-  //////////////////////////////////////////////////////////////////////////
   if (m_AutomaticSliceTextActor)
   {
     m_View->GetFrontRenderer()->RemoveActor(m_AutomaticSliceTextActor);
   }
   vtkDEL(m_AutomaticSliceTextActor);
   vtkDEL(m_AutomaticSliceTextMapper);
-  //////////////////////////////////////////////////////////////////////////
 
   cppDEL(m_View);      
   cppDEL(m_OkButton);
@@ -941,11 +683,8 @@ void mafOpSegmentation::DeleteOpDialog()
   mafDEL(m_SER);
 
 }
-
-
 //----------------------------------------------------------------------------
 void mafOpSegmentation::FloodFill(vtkIdType seed)
-//----------------------------------------------------------------------------
 {
   UndoBrushPreview();
 
@@ -954,7 +693,7 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
   {
     UndoRedoState urs;
     urs.dataArray = vtkUnsignedCharArray::New();
-    urs.dataArray->DeepCopy( m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
+    urs.dataArray->DeepCopy( m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
     urs.dataArray->SetName("SCALARS");
     urs.plane=-1; // indicate that the undo redo data is global and must be performed on manual volume mask (not slice)
     urs.slice=-1; // indicate that the undo redo data is global and must be performed on manual volume mask (not slice)
@@ -973,9 +712,9 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
     dummy->SetSpacing(m_VolumeSpacing);
     dummy->SetOrigin(0,0,0);
 
-    m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->Update();
+    m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->Update();
     dummy->SetScalarTypeToUnsignedChar();
-    dummy->GetPointData()->SetScalars(m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
+    dummy->GetPointData()->SetScalars(m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
 
     int ext[6];
     double low,hi;
@@ -1015,7 +754,7 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
 
     output->Update();
 
-    vtkUnsignedCharArray* outScalars = (vtkUnsignedCharArray*)m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
+    vtkUnsignedCharArray* outScalars = (vtkUnsignedCharArray*)m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
     for(int x = ext[0]; x <= ext[1]; x++)
     {
       for(int y = ext[2]; y <= ext[3]; y++)
@@ -1026,20 +765,19 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
         }
       }
     }
-    m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(outScalars);
-    m_ManualVolumeMask->Update();
+		m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->SetScalars(outScalars);
+		m_SegmentationVolume->Update();
 
     UpdateSlice();
-    m_View->VmeShow(m_ManualVolumeSlice,true);
-
+ 
     CreateRealDrawnImage();
-    OnEventUpdateManualSlice();
+    OnUpdateSlice();
   }
   else
   {
     UndoRedoState urs;
     urs.dataArray = vtkUnsignedCharArray::New();
-    urs.dataArray->DeepCopy( m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
+    urs.dataArray->DeepCopy(m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
     urs.dataArray->SetName("SCALARS");
     urs.plane=m_CurrentSlicePlane;
     urs.slice=m_CurrentSliceIndex;
@@ -1080,9 +818,9 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
     input->SetSpacing(m_VolumeSpacing);
     input->SetOrigin(0,0,0);
 
-    m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->Update();
+		m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->Update();
     input->SetScalarTypeToUnsignedChar();
-    input->GetPointData()->SetScalars(m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
+    input->GetPointData()->SetScalars(m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
 
     vtkStructuredPoints *output = vtkStructuredPoints::New();
     output->CopyStructure(input);
@@ -1090,42 +828,23 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
 
     int center = ApplyFloodFill(input,output,seed);
 
-    m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
-    m_ManualVolumeSlice->Update();
-
-    m_View->VmeShow(m_ManualVolumeSlice,true);
+		m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
+		m_SegmentationVolume->Update();
 
     CreateRealDrawnImage();
-    OnEventUpdateManualSlice();
+    OnUpdateSlice();
 
     input->Delete();
     output->Delete();
   }
 }
-
 //----------------------------------------------------------------------------
 bool mafOpSegmentation::Refinement()
-//----------------------------------------------------------------------------
 {
-  
-//   if ( !(( m_CurrentSlicePlane == XY && (m_RefinementRegionsSize>m_VolumeDimensions[0] || m_RefinementRegionsSize>m_VolumeDimensions[1]) ) ||
-//          ( m_CurrentSlicePlane == YZ && (m_RefinementRegionsSize>m_VolumeDimensions[1] || m_RefinementRegionsSize>m_VolumeDimensions[2]) ) ||
-//          ( m_CurrentSlicePlane == XZ && (m_RefinementRegionsSize>m_VolumeDimensions[0] || m_RefinementRegionsSize>m_VolumeDimensions[2]) )) )
-//   {
-//     wxMessageBox("Region size is bigger than slice dimension - Choose another value.");
-//     return false;
-//   }
-
-  // threshold values empirically assigned
-
-//   if( !(( m_RefinementRegionsSize > 5) || ( m_RefinementRegionsSize>=3 && (m_RefinementIterative || m_RefinementEverySlice) ) ))
-//     if (wxMessageBox( "Region size is too big, it could take a long time  - Continue?", "Warning", wxYES_NO, NULL) == wxNO)
-//       return false;
-  
-  wxBusyCursor wait_cursor;
+	wxBusyCursor wait_cursor;
   wxBusyInfo wait(_("Wait! The algorithm could take long time!"));
 
-  vtkDataSet *inputDataSet = vtkDataSet::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_RefinementVolumeMask)->GetOutput()->GetVTKData());
+  vtkDataSet *inputDataSet = vtkDataSet::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_SegmentationVolume)->GetOutput()->GetVTKData());
 
   if (inputDataSet)
   {
@@ -1135,7 +854,6 @@ bool mafOpSegmentation::Refinement()
     m_ProgressBar->SetValue(progress);
     m_ProgressBar->Show(true);
     m_ProgressBar->Update();
-    m_GuiDialog->Update();
 
     vtkMAFSmartPointer<vtkUnsignedCharArray> newScalars;
     newScalars->SetName("SCALARS");
@@ -1242,8 +960,8 @@ bool mafOpSegmentation::Refinement()
       newSP->SetScalarTypeToUnsignedChar();
       newSP->Update();
 
-      m_RefinementVolumeMask->SetData(newSP,m_Volume->GetTimeStamp());
-      vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(m_RefinementVolumeMask->GetOutput()->GetVTKData());
+			m_SegmentationVolume->SetData(newSP,m_Volume->GetTimeStamp());
+      vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(m_SegmentationVolume->GetOutput()->GetVTKData());
       spVME->Update();
 
     }
@@ -1257,28 +975,24 @@ bool mafOpSegmentation::Refinement()
       newRG->GetPointData()->SetActiveScalars("SCALARS");
       newRG->Update();
 
-      m_RefinementVolumeMask->SetData(newRG,m_Volume->GetTimeStamp());
-      vtkRectilinearGrid *rgVME = vtkRectilinearGrid::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_RefinementVolumeMask)->GetOutput()->GetVTKData());
+			m_SegmentationVolume->SetData(newRG,m_Volume->GetTimeStamp());
+      vtkRectilinearGrid *rgVME = vtkRectilinearGrid::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_SegmentationVolume)->GetOutput()->GetVTKData());
       rgVME->Update();
     }
 
-    m_RefinementVolumeMask->Update();
+		m_SegmentationVolume->Update();
 
     m_ProgressBar->SetValue(100);
     m_ProgressBar->Show(false);
     m_ProgressBar->Update();
 
     UpdateSlice();
-    m_View->VmeShow(m_RefinementVolumeMask, true);
-    m_View->CameraUpdate();
-    m_GuiDialog->Update();
   }
 
   return true;
 }
 //----------------------------------------------------------------------------
 bool mafOpSegmentation::ApplyRefinementFilter2(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage)
-//----------------------------------------------------------------------------
 {
   vtkMAFImageFillHolesRemoveIslands *filter = vtkMAFImageFillHolesRemoveIslands::New();
   filter->SetInput(inputImage);
@@ -1298,10 +1012,8 @@ bool mafOpSegmentation::ApplyRefinementFilter2(vtkStructuredPoints *inputImage, 
   filter->Delete();
   return true;
 }
-
 //----------------------------------------------------------------------------
 int mafOpSegmentation::ApplyFloodFill(vtkImageData *inputImage, vtkImageData *outputImage, vtkIdType seed)
-//----------------------------------------------------------------------------
 {
   vtkMAFBinaryImageFloodFill *filter = vtkMAFBinaryImageFloodFill::New();
   filter->SetInput(inputImage);
@@ -1319,10 +1031,8 @@ int mafOpSegmentation::ApplyFloodFill(vtkImageData *inputImage, vtkImageData *ou
 
   return next_seed_id;
 }
-
 //----------------------------------------------------------------------------
 bool mafOpSegmentation::ApplyRefinementFilter(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage)
-//----------------------------------------------------------------------------
 {
   typedef itk::VotingBinaryHoleFillingImageFilter<UCharImage, UCharImage> ITKVotingHoleFillingFilter;
   ITKVotingHoleFillingFilter::Pointer holeFillingFilter = ITKVotingHoleFillingFilter::New();
@@ -1421,10 +1131,8 @@ bool mafOpSegmentation::ApplyRefinementFilter(vtkStructuredPoints *inputImage, v
 
   return true;
 }
-
 //----------------------------------------------------------------------------
 void mafOpSegmentation::CreateSliceNavigationGui()
-//----------------------------------------------------------------------------
 {
   if(!m_GuiDialog)
     return;
@@ -1482,15 +1190,11 @@ void mafOpSegmentation::CreateSliceNavigationGui()
   m_GuiDialog->Add(slice_sizer,0,wxALL, 1); 
 
   m_SliceSlider->SetValue(1);
-
   m_SliceSlider->Update();
-  m_GuiDialog->Update();
-
 }
 
 //----------------------------------------------------------------------------
 void mafOpSegmentation::CreateAutoSegmentationGui()
-//----------------------------------------------------------------------------
 {
   mafGUI *currentGui = new mafGUI(this);
 
@@ -1519,18 +1223,12 @@ void mafOpSegmentation::CreateAutoSegmentationGui()
   m_AutomaticThresholdSlider->SetRange(sr[0],sr[1]);
   m_AutomaticThresholdSlider->SetSubRange(sr[1],sr[1]);
 
-  std::vector<int> increaseTrIDs;
-  increaseTrIDs.push_back(ID_AUTOMATIC_INCREASE_MIN_THRESHOLD);
-  increaseTrIDs.push_back(ID_AUTOMATIC_INCREASE_MIDDLE_THRESHOLD);
-  increaseTrIDs.push_back(ID_AUTOMATIC_INCREASE_MAX_THRESHOLD);
+	std::vector<int> increaseTrIDs = { ID_AUTO_INC_MIN_THRESHOLD, ID_AUTO_INC_MIDDLE_THRESHOLD,ID_AUTO_INC_MAX_THRESHOLD };
   currentGui->MultipleButtons(3,3,increaseTrIDs,increaseLabels);
 
   currentGui->Add(m_AutomaticThresholdSlider);
 
-  std::vector<int> decreaseTrIDs;
-  decreaseTrIDs.push_back(ID_AUTOMATIC_DECREASE_MIN_THRESHOLD);
-  decreaseTrIDs.push_back(ID_AUTOMATIC_DECREASE_MIDDLE_THRESHOLD);
-  decreaseTrIDs.push_back(ID_AUTOMATIC_DECREASE_MAX_THRESHOLD);
+	std::vector<int> decreaseTrIDs = { ID_AUTO_DEC_MIN_THRESHOLD, ID_AUTO_DEC_MIDDLE_THRESHOLD, ID_AUTO_DEC_MAX_THRESHOLD};
   currentGui->MultipleButtons(3,3,decreaseTrIDs,decreaseLabels);
 
   //end Threshold
@@ -1538,13 +1236,7 @@ void mafOpSegmentation::CreateAutoSegmentationGui()
   wxString choices[2] = {_("Global"),_("Range")};
   currentGui->Label("");
   currentGui->Label(_("Threshold type:"),true);
-  currentGui->Radio(ID_AUTOMATIC_GLOBAL_THRESHOLD,"",&m_AutomaticGlobalThreshold,2,choices);
-
-  /*currentGui->Label("");*/
-  /*currentGui->Label("Global range:",true);*/
-//   currentGui->Button(ID_AUTOMATIC_GLOBAL_PREVIEW,_("preview"));
-//   currentGui->Enable(ID_AUTOMATIC_GLOBAL_PREVIEW,m_AutomaticGlobalThreshold==GLOBAL);
-  
+  currentGui->Radio(ID_AUTO_GLOBAL_THRESHOLD,"",&m_AutomaticGlobalThreshold,2,choices);
   
   //Slides Range
   //[ + ] [ + ] [ + ]
@@ -1559,47 +1251,35 @@ void mafOpSegmentation::CreateAutoSegmentationGui()
   m_AutomaticRangeSlider->SetRange(1,m_VolumeDimensions[2]);
   m_AutomaticRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
 
-//  currentGui->Label("");
-  std::vector<int> increaseIDs;
-  increaseIDs.push_back(ID_AUTOMATIC_INCREASE_MIN_RANGE_VALUE);
-  increaseIDs.push_back(ID_AUTOMATIC_INCREASE_MIDDLE_RANGE_VALUE);
-  increaseIDs.push_back(ID_AUTOMATIC_INCREASE_MAX_RANGE_VALUE);
+	std::vector<int> increaseIDs = { ID_AUTO_INC_MIN_RANGE, ID_AUTO_INC_MIDDLE_RANGE,ID_AUTO_INC_MAX_RANGE };
   currentGui->MultipleButtons(3,3,increaseIDs,increaseLabels);
   
   currentGui->Add(m_AutomaticRangeSlider);
   
-  std::vector<int> decreaseIDs;
-  decreaseIDs.push_back(ID_AUTOMATIC_DECREASE_MIN_RANGE_VALUE);
-  decreaseIDs.push_back(ID_AUTOMATIC_DECREASE_MIDDLE_RANGE_VALUE);
-  decreaseIDs.push_back(ID_AUTOMATIC_DECREASE_MAX_RANGE_VALUE);
-  currentGui->MultipleButtons(3,3,decreaseIDs,decreaseLabels);
+	std::vector<int> decreaseIDs = { ID_AUTO_DEC_MIN_RANGE, ID_AUTO_DEC_MIDDLE_RANGE, ID_AUTO_DEC_MAX_RANGE };
+	currentGui->MultipleButtons(3,3,decreaseIDs,decreaseLabels);
   //End
 
-  m_AutomaticListOfRange = currentGui->ListBox(ID_AUTOMATIC_LIST_OF_RANGE,"");
-  currentGui->TwoButtons(ID_AUTOMATIC_ADD_RANGE,ID_AUTOMATIC_REMOVE_RANGE,("Add"),_("Remove"));
-  currentGui->Button(ID_AUTOMATIC_UPDATE_RANGE,("Update"));
+  m_AutomaticListOfRange = currentGui->ListBox(ID_AUTO_LIST_OF_RANGE,"");
+  currentGui->TwoButtons(ID_AUTO_ADD_RANGE,ID_AUTO_REMOVE_RANGE,("Add"),_("Remove"));
+  currentGui->Button(ID_AUTO_UPDATE_RANGE,("Update"));
   currentGui->Label("");
 
   m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION] = currentGui;
 }
-
 //----------------------------------------------------------------------------
 void mafOpSegmentation::CreateLoadSegmentationGui()
-//----------------------------------------------------------------------------
 {
   mafGUI *currentGui = new mafGUI(this);
 
-  currentGui->Label(&m_LoadedVolumeName);
-  currentGui->TwoButtons(ID_LOAD_SEGMENTATION,ID_RESET_LOADED,"Load","Reset");
+  currentGui->Label(&m_VolumeName);
+  currentGui->Button(ID_LOAD_SEGMENTATION,"Load");
   m_SegmentationOperationsGui[LOAD_SEGMENTATION] = currentGui;
-
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::CreateManualSegmentationGui()
-//----------------------------------------------------------------------------
 {
-
-  mafGUI *currentGui = new mafGUI(this);
+	  mafGUI *currentGui = new mafGUI(this);
 
   wxString tools[2];
   tools[0] = wxString("brush");
@@ -1620,8 +1300,6 @@ void mafOpSegmentation::CreateManualSegmentationGui()
 
   //////////////////////////////////////////////////////////////////////////
   // Brush Editing options
-  //////////////////////////////////////////////////////////////////////////
-  
   m_BrushEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Brush Options");
   
   // BRUSH SHAPE
@@ -1674,22 +1352,9 @@ void mafOpSegmentation::CreateManualSegmentationGui()
 
   //////////////////////////////////////////////////////////////////////////
   // bucket Editing options
-  //////////////////////////////////////////////////////////////////////////
-
   m_BucketEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Bucket Options");
 
   // BRUSH SHAPE
-//   wxString bucketActions[2];
-//   bucketActions[0] = wxString("fill");
-//   bucketActions[1] = wxString("erase");
-//   w_id = currentGui->GetWidgetId(ID_MANUAL_BUCKET_ACTION);
-// 
-//   wxBoxSizer *bucketActionsSizer = new wxBoxSizer(wxHORIZONTAL);
-//   wxStaticText *bucketActionsLab = new wxStaticText(currentGui, w_id, "Action");
-// 
-//   wxRadioBox *bucketActionsRadioBox = new wxRadioBox(currentGui, w_id, "",wxDefaultPosition, wxSize(130,-1), 2, bucketActions, 2);
-//   bucketActionsRadioBox->SetValidator( mafGUIValidator(currentGui, w_id, bucketActionsRadioBox, &m_ManualBucketActions) );
-
   w_id = currentGui->GetWidgetId(ID_MANUAL_BUCKET_GLOBAL);
   wxCheckBox *globalCheck = new wxCheckBox(currentGui,w_id,"Iterative");
   globalCheck->SetValidator(mafGUIValidator(currentGui, w_id, globalCheck, &m_GlobalFloodFill));
@@ -1699,15 +1364,8 @@ void mafOpSegmentation::CreateManualSegmentationGui()
   m_ManualRangeSlider->SetText(1,"Slices");  
   m_ManualRangeSlider->SetRange(1,m_VolumeDimensions[2]);
   m_ManualRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
-  /*m_ManualRangeSlider->Enable(false);*/
-
-//   bucketActionsSizer->Add(bucketActionsLab,  0, wxRIGHT, 5);
-//   bucketActionsSizer->Add(bucketActionsRadioBox,0, wxRIGHT, 2);
-//   m_BucketEditingSizer->Add(bucketActionsSizer, 0, wxALL, 1);
   m_BucketEditingSizer->Add(globalCheck, 0, wxALL, 1);
   m_BucketEditingSizer->Add(m_ManualRangeSlider, 0, wxALL, 1);
-
-  /////
 
   currentGui->Add(manualToolsVSizer, 0, wxALL, 1);
   currentGui->Add(m_BrushEditingSizer, wxALIGN_CENTER_HORIZONTAL);
@@ -1722,10 +1380,8 @@ void mafOpSegmentation::CreateManualSegmentationGui()
 
   EnableManualSegmentationGui();
 }
-
 //----------------------------------------------------------------------------
 void mafOpSegmentation::EnableManualSegmentationGui()
-//----------------------------------------------------------------------------
 {
   //brush options
   // erase/select, shape, size, continuous picking
@@ -1736,7 +1392,6 @@ void mafOpSegmentation::EnableManualSegmentationGui()
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::CreateRefinementGui()
-//----------------------------------------------------------------------------
 {
   mafGUI *currentGui = new mafGUI(this);
 
@@ -1776,24 +1431,15 @@ void mafOpSegmentation::CreateRefinementGui()
   currentGui->Bool(ID_REFINEMENT_EVERY_SLICE, mafString("Global"), &m_RefinementEverySlice, 0, mafString("Apply refinement procedure on every slice"));
 
   m_RefinementIterative = 0;
-  //currentGui->Bool(ID_REFINEMENT_ITERATIVE, mafString("Iterative"), &m_RefinementIterative, 0, mafString("Switch on/off the iterative feature"));
-  
   currentGui->Bool(ID_REFINEMENT_REMOVE_PENINSULA_REGIONS, mafString("Apply to peninsula regions"), &m_RemovePeninsulaRegions, 1, mafString("Apply refinement on peninsula regions"));
-
   currentGui->TwoButtons(ID_REFINEMENT_UNDO, ID_REFINEMENT_REDO, "Undo", "Redo");
-
   currentGui->Button(ID_REFINEMENT_APPLY, mafString("Apply"), "");
-
-  //currentGui->Integer(-1,"m. thr.",&m_MajorityThreshold,0);
-
   currentGui->Divider();
-
   m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION] = currentGui;
 
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::InitGui()
-//----------------------------------------------------------------------------
 {
   int sliceMax = 1;
 
@@ -1807,93 +1453,53 @@ void mafOpSegmentation::InitGui()
   m_SliceSlider->SetRange(1, sliceMax);
   m_SliceText->SetValidator(mafGUIValidator(this,ID_SLICE_TEXT,m_SliceText,&m_CurrentSliceIndex,m_SliceSlider,1, sliceMax));
   m_CurrentSliceIndex = 1;
-
   m_SliceSlider->Update();
 
-
   m_GuiDialog->FitGui();
-  m_GuiDialog->Update();
-
 }
-
-
 //------------------------------------------------------------------------
-void mafOpSegmentation::InitSegmentedVolume()
-//------------------------------------------------------------------------
+void mafOpSegmentation::InitSegmentationVolume()
 {
-  mafNEW(m_SegmentatedVolume);
-  m_SegmentatedVolume->SetVolumeLink(m_Volume);
-  m_SegmentatedVolume->SetName("Segmented Volume");
-  m_SegmentatedVolume->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
-  m_SegmentatedVolume->ReparentTo(m_Volume->GetParent());
-  m_SegmentatedVolume->SetDoubleThresholdModality(true);
-  m_SegmentatedVolume->Update();
+  mafNEW(m_SegmentationVolume);
+
+	m_SegmentationVolume->SetName(wxString::Format("Segmentation Output (%s)", m_Volume->GetName()).c_str());
+	lutPreset(4, m_SegmentationVolume->GetMaterial()->m_ColorLut);
+	/*
+	m_SegmentationVolume->GetMaterial()->m_ColorLut->SetTableRange(0, 255);
+	m_SegmentationVolume->GetMaterial()->UpdateFromTables();
+	*/
+	vtkLookupTable *lut = m_SegmentationVolume->GetMaterial()->m_ColorLut;
+	if (lut)
+	{
+		lut->SetNumberOfTableValues(2);
+		lut->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
+		lut->SetTableValue(1, 0.9, 0.1, 0.1, 0.4);
+		lut->SetTableRange(0, 255);
+		m_SegmentationVolume->GetMaterial()->UpdateFromTables();
+	}
+
+	vtkDataSet *volData =	m_Volume->GetOutput()->GetVTKData();
+	vtkDataSet *segData = volData->NewInstance();
+	segData->DeepCopy(volData);
+
+	vtkDataArray *volScalars = volData->GetPointData()->GetScalars();
+	vtkUnsignedCharArray *segScalars;
+	vtkNEW(segScalars);
+	segScalars->SetNumberOfTuples(volScalars->GetNumberOfTuples());
+	segData->GetPointData()->SetScalars(segScalars);
+	m_SegmentationVolume->SetData(segData,m_Volume->GetTimeStamp());
+	
+	m_SegmentationVolume->ReparentTo(m_Volume);
+	m_SegmentationVolume->Update();
+
+	m_View->VmeAdd(m_SegmentationVolume);
+	m_View->VmeShow(m_SegmentationVolume, true);
+	mafPipeVolumeOrthoSlice *pipeOrtho = (mafPipeVolumeOrthoSlice *)m_View->GetNodePipe(m_SegmentationVolume);
+	m_SegmetationSlice = (vtkImageData*)(pipeOrtho->GetSlicer(pipeOrtho->GetSliceDirection())->GetOutput());
+
 }
-//------------------------------------------------------------------------
-void mafOpSegmentation::InitThresholdVolume()
-//------------------------------------------------------------------------
-{
-  mafNEW(m_ThresholdVolume);
-  m_ThresholdVolume->DeepCopy(m_Volume);
-  m_ThresholdVolume->SetName("Threshold Volume");
-  m_ThresholdVolume->ReparentTo(m_Volume->GetParent());
-  m_ThresholdVolume->Update();
-
-  m_View->VmeAdd(m_ThresholdVolume);
-  //m_View->VmeCreatePipe(m_ThresholdVolume);
-  m_View->CameraUpdate();
-}
-
-//------------------------------------------------------------------------
-void mafOpSegmentation::InitManualVolumeMask()
-//------------------------------------------------------------------------
-{
-  if (!m_ManualVolumeMask)
-    mafNEW(m_ManualVolumeMask);
-  if(m_LoadedVolume)
-  {
-    m_ManualVolumeMask->DeepCopy(m_LoadedVolume);
-  }
-  else
-  {
-    m_ManualVolumeMask->DeepCopy(m_ThresholdVolume);
-  }
-  
-  m_ManualVolumeMask->SetName("Manual Volume Mask");
-  m_ManualVolumeMask->ReparentTo(m_Volume->GetParent());
-  m_ManualVolumeMask->Update();
-}
-
-//------------------------------------------------------------------------
-void mafOpSegmentation::InitRefinementVolumeMask()
-//------------------------------------------------------------------------
-{
-  if (m_RefinementVolumeMask)
-  {
-    m_View->VmeRemove(m_RefinementVolumeMask);
-    m_RefinementVolumeMask->ReparentTo(NULL);
-    mafDEL(m_RefinementVolumeMask);
-  }
-
-  mafNEW(m_RefinementVolumeMask);
-
-  m_RefinementVolumeMask->DeepCopy(m_ManualVolumeMask);
-  m_RefinementVolumeMask->SetName("Refinement Volume Mask");
-  
-  m_RefinementVolumeMask->ReparentTo(m_Volume->GetParent());
-  vtkLookupTable *lut = m_RefinementVolumeMask->GetMaterial()->m_ColorLut;
-  InitMaskColorLut(lut);
-  lut->SetTableRange(0,255);
-  m_RefinementVolumeMask->GetMaterial()->UpdateFromTables();
-  m_ManualVolumeSlice->Update();
-  m_RefinementVolumeMask->Update();
-  m_View->VmeAdd(m_RefinementVolumeMask);
-  //m_View->VmeCreatePipe(m_RefinementVolumeMask);
-}
-
 //------------------------------------------------------------------------
 void mafOpSegmentation::OnAutomaticStep()
-//------------------------------------------------------------------------
 {
   m_SegmentationPicker->SetFullModifiersMode(true);
   //gui stuff
@@ -1907,57 +1513,6 @@ void mafOpSegmentation::OnAutomaticStep()
   UpdateThresholdLabel();
   m_GuiDialog->Enable(ID_AUTO_SEGMENTATION,true);
   m_GuiDialog->Enable(ID_BUTTON_PREV,true);
-  if(m_LoadedVolume == NULL)
-  {
-    m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
-    m_OldAutomaticThreshold = MAXINT;
-    m_OldAutomaticUpperThreshold = MAXINT;
-    UpdateSlice();
-    InitEmptyVolumeSlice();
-    UpdateThresholdRealTimePreview();
-    m_View->CameraUpdate();
-    m_GuiDialog->Update();
-  }
-  else
-  {
-    m_View->VmeShow(m_ThresholdVolume,false);
-
-    m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
-   
-    if (vtkStructuredPoints::SafeDownCast(m_LoadedVolume->GetOutput()->GetVTKData()))
-    {
-      vtkStructuredPoints *newData = vtkStructuredPoints::SafeDownCast(m_LoadedVolume->GetOutput()->GetVTKData());
-      m_ThresholdVolume->SetData(newData,m_Volume->GetTimeStamp());
-      vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(m_ThresholdVolume->GetOutput()->GetVTKData());
-      spVME->Update();
-
-    }
-    else
-    {
-      vtkRectilinearGrid *newData = vtkRectilinearGrid::SafeDownCast(m_LoadedVolume->GetOutput()->GetVTKData());
-      m_ThresholdVolume->SetData(newData,m_Volume->GetTimeStamp());
-      vtkRectilinearGrid *rgVME = vtkRectilinearGrid::SafeDownCast(m_ThresholdVolume->GetOutput()->GetVTKData());
-      rgVME->Update();
-    }
-
-    m_ThresholdVolume->Update();
-
-    m_SegmentationColorLUT = m_ThresholdVolume->GetMaterial()->m_ColorLut;
-    InitMaskColorLut(m_SegmentationColorLUT);
-
-    m_ThresholdVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
-    mmaVolumeMaterial *currentVolumeMaterial = ((mafVMEOutputVolume *)m_ThresholdVolume->GetOutput())->GetMaterial();
-    currentVolumeMaterial->UpdateFromTables();
-
-    
-    //m_View->VmeShow(m_ThresholdVolume,true);
-
-    m_View->CameraUpdate();
-
-    //m_CurrentOperation = AUTOMATIC_SEGMENTATION;
-    //OnNextStep();
-  }
-
 }
 
 //------------------------------------------------------------------------
@@ -1971,11 +1526,7 @@ void mafOpSegmentation::OnManualStep()
   // brush size slider: min = 1; max = slice size
   m_SnippetsLabel->SetLabel( _(" 'Left Click' Draw. 'Left Click + Ctrl' Erase"));
 
-//   int maxBrushSize;
-//   maxBrushSize = min(m_VolumeDimensions[0], m_VolumeDimensions[1]);
-//   maxBrushSize = min(maxBrushSize, m_VolumeDimensions[2]);
-//   maxBrushSize = round(maxBrushSize/2.0);
-// 
+
   m_ManualBrushSize=1;
   m_ManualBrushSizeSlider->SetValue(m_ManualBrushSize);
   m_ManualBrushSizeText->SetValue("1");
@@ -2005,27 +1556,15 @@ void mafOpSegmentation::OnManualStep()
 
   m_ManualPER->EnableDrawing(true);
 
-//   double low,hi;
-//   m_ManualRangeSlider->GetSubRange(&low,&hi);
-//   low = m_CurrentSliceIndex;
-//   if(hi<low)
-//   {
-//     hi = low;
-//   }
-//   m_ManualRangeSlider->SetSubRange(low,hi);
+
 
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_PICKING_MODALITY, m_CurrentSlicePlane);
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, false);
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
   m_GuiDialog->Enable(ID_MANUAL_SEGMENTATION,true);
-  m_GuiDialog->Update();
-  //logic stuff
-  UpdateVolumeSlice();
 
-  m_View->VmeShow(m_ManualVolumeSlice, true);
   m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
   m_CurrentBrushMoveEventCount = 0;
-
 
   UndoBrushPreview();
   ApplyVolumeSliceChanges();
@@ -2034,8 +1573,7 @@ void mafOpSegmentation::OnManualStep()
 
   CreateRealDrawnImage();
   m_View->CameraUpdate();
-  m_GuiDialog->Update();
-
+  
   m_ManualSegmentationTools = 0;
   m_View->GetWindow()->SetCursor(cursor);
 
@@ -2043,22 +1581,12 @@ void mafOpSegmentation::OnManualStep()
   EnableSizerContent(m_BrushEditingSizer,true);
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
 
-  OnEventUpdateManualSlice();
+  OnUpdateSlice();
 }
 //------------------------------------------------------------------------
 void mafOpSegmentation::OnAutomaticStepExit()
 //------------------------------------------------------------------------
 {
-  if(m_ThresholdVolumeSlice)
-  {
-    m_View->VmeShow(m_ThresholdVolumeSlice,false);
-  }
-  if(m_EmptyVolumeSlice)
-  {
-    m_EmptyVolumeSlice->ReparentTo(NULL);
-    mafDEL(m_EmptyVolumeSlice);
-  }
-
   m_GuiDialog->Enable(ID_AUTO_SEGMENTATION,false);
 }
 //------------------------------------------------------------------------
@@ -2085,7 +1613,6 @@ void mafOpSegmentation::OnManualStepExit()
   //apply residual changes
   ApplyVolumeSliceChanges(); 
   
-  m_View->VmeShow(m_ManualVolumeSlice, false);
   m_GuiDialog->Enable(ID_MANUAL_SEGMENTATION,false);
 
   m_SnippetsLabel->SetLabel( _(""));
@@ -2104,12 +1631,7 @@ void mafOpSegmentation::OnRefinementStep()
   m_GuiDialog->Enable(ID_REFINEMENT,true);
   
   //logic stuff
-  InitRefinementVolumeMask();
-  
   UpdateSlice();
-  m_View->VmeShow(m_RefinementVolumeMask, true);
-  m_View->CameraUpdate();
-  m_GuiDialog->Update();
 }
 
 //------------------------------------------------------------------------
@@ -2121,8 +1643,6 @@ void mafOpSegmentation::OnLoadStep()
   m_GuiDialog->Enable(ID_BUTTON_PREV,false);
 
   UpdateSlice();
-  m_View->CameraUpdate();
-  m_GuiDialog->Update();
 }
 
 //------------------------------------------------------------------------
@@ -2133,15 +1653,12 @@ void mafOpSegmentation::OnNextStep()
   {
     case PRE_SEGMENTATION:
     {
-      InitThresholdVolume();
-      InitSegmentedVolume();
+      InitSegmentationVolume();
       InitializeInteractors();
       InitVolumeDimensions();
       InitVolumeSpacing();
       InitGui();
       UpdateSlice();
-      m_View->CameraUpdate();
-      m_GuiDialog->Update();
       UpdateWindowing();
       InitGui();
 
@@ -2150,46 +1667,21 @@ void mafOpSegmentation::OnNextStep()
     } 
     break;
     case LOAD_SEGMENTATION:
-      {
-        m_GuiDialog->Enable(ID_LOAD_SEGMENTATION,false);
-        if(m_LoadedVolume)
-        {
-          InitManualVolumeMask();
-          InitManualVolumeSlice();
-          m_View->VmeShow(m_LoadedVolume,false);
-          UpdateSlice();
-          m_View->CameraUpdate();
-          m_GuiDialog->Update();
-          m_GuiDialog->Enable(ID_BUTTON_PREV,true);
-          //next step -> MANUAL_SEGMENTATION
-          OnManualStep();
-          m_SegmentationOperationsRollOut[m_CurrentOperation]->RollOut(false);
-          m_CurrentOperation = AUTOMATIC_SEGMENTATION; // trick
-        }
-        else
-        {
-          InitEmptyVolumeSlice();
-          InitThresholdVolumeSlice();
-          //next step -> AUTOMATIC_SEGMENTATION 
-          OnAutomaticStep();
-          UpdateThresholdRealTimePreview();
-          m_View->VmeShow(m_ThresholdVolumeSlice,true);
-          m_View->CameraUpdate();
-        }
-      }
+		{
+			m_GuiDialog->Enable(ID_LOAD_SEGMENTATION, false);
+			{
+				OnAutomaticStep();
+				UpdateThresholdRealTimePreview();
+				m_View->CameraUpdate();
+			}
+    }
       break;
     case AUTOMATIC_SEGMENTATION:
     {
-      OnAutomaticPreview();
       OnAutomaticStepExit();
       m_AutomaticThresholdTextMapper->SetInput("");
       m_GuiDialog->Enable(ID_AUTO_SEGMENTATION,false);
-      InitManualVolumeMask();
-      InitManualVolumeSlice();
-      m_View->VmeShow(m_ThresholdVolume,false);
       UpdateSlice();
-      m_View->CameraUpdate();
-      m_GuiDialog->Update();
       m_GuiDialog->Enable(ID_BUTTON_PREV,true);
       //next step -> MANUAL_SEGMENTATION
       OnManualStep();
@@ -2204,12 +1696,8 @@ void mafOpSegmentation::OnNextStep()
     break;
     case REFINEMENT_SEGMENTATION:
     {
-      SaveRefinementVolumeMask();
       m_GuiDialog->Enable(ID_REFINEMENT,false);
-      m_View->VmeShow(m_RefinementVolumeMask,false);
-
       //next step -> none
-      //OnLoadSegmentationStep();
     }
     break;
     default:
@@ -2234,10 +1722,7 @@ void mafOpSegmentation::OnNextStep()
   m_SliceSlider->Update();
 
 
-  //UpdateSlice();
-
-  m_View->CameraUpdate();
-
+  UpdateSlice();
 }
 //------------------------------------------------------------------------
 void mafOpSegmentation::OnPreviousStep()
@@ -2252,43 +1737,18 @@ void mafOpSegmentation::OnPreviousStep()
     case MANUAL_SEGMENTATION:
     {
       OnManualStepExit();
-      
-      if(m_LoadedVolume)
-      {
-        m_SegmentationOperationsRollOut[m_CurrentOperation]->RollOut(false);
-        m_CurrentOperation = AUTOMATIC_SEGMENTATION;
-        //prev step -> LOAD_SEGMENTATION
-        m_View->VmeShow(m_LoadedVolume,true);
-        OnLoadStep();
-        m_View->CameraUpdate();
-      }
-      else
-      {
-        //prev step -> AUTOMATIC_SEGMENTATION
-        OnAutomaticStepExit();
-        InitEmptyVolumeSlice();
-        InitThresholdVolumeSlice();
-        OnAutomaticStep();
-        UpdateThresholdRealTimePreview();
-        m_View->VmeShow(m_ThresholdVolumeSlice,true);
-        m_View->CameraUpdate();
-      }
     }
     break;
     case REFINEMENT_SEGMENTATION:
     {
       m_GuiDialog->Enable(ID_REFINEMENT,false);
-      m_View->VmeShow(m_RefinementVolumeMask,false);
       OnManualStep();
     }
     break;
     case AUTOMATIC_SEGMENTATION:
       {
         OnAutomaticStepExit();
-        //prev step -> AUTOMATIC_SEGMENTATION
         OnLoadStep();
-//         m_View->VmeShow(m_ThresholdVolume,true);
-//         SetTrilinearInterpolation(m_ThresholdVolume)
       }
       break;
     default:
@@ -2325,7 +1785,7 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     if(e->GetSender() == m_SegmentationOperationsGui[LOAD_SEGMENTATION])
-      OnLoadSegmentationEvent(e);
+      OnLoadSegmentationEvent();
     if(e->GetSender() == m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION])
       OnAutomaticSegmentationEvent(e);
     else if(e->GetSender() == m_SegmentationOperationsGui[MANUAL_SEGMENTATION])
@@ -2433,169 +1893,32 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
           OnPreviousStep();
       }
       break;
-    case ID_SLICE_SLIDER:
-    case ID_SLICE_NEXT:
-      {
-        if(m_CurrentSliceIndex<m_SliceSlider->GetMax())
-          m_CurrentSliceIndex++;
-        if (/*m_CurrentSliceIndex != m_OldSliceIndex &&*/ m_CurrentOperation==MANUAL_SEGMENTATION)
-        {
-          OnEventUpdateManualSlice();
-        }
-        else if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
-        {
-          OnEventUpdateThresholdSlice();
-        }
-        else if(m_CurrentOperation==LOAD_SEGMENTATION)
-        {
-          UpdateSlice();
-          m_View->CameraUpdate();
-          m_GuiDialog->Update();
-        }
-        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
-        {
-          UpdateSlice();
-          m_View->VmeShow(m_RefinementVolumeMask, true);
-          m_View->CameraUpdate();
-          m_GuiDialog->Update();
-        }
-        else
-        {
-          UpdateSlice();
-          m_View->CameraUpdate();
-          m_GuiDialog->Update();
-        }
-        if(m_CurrentOperation == MANUAL_SEGMENTATION)
-        {
-          CreateRealDrawnImage();
-          if(e->GetSender()!=this)
-          {
-            double low,hi;
-            m_ManualRangeSlider->GetSubRange(&low,&hi);
-            if(hi < m_CurrentSliceIndex)
-            {
-              hi = m_CurrentSliceIndex;
-            }
-            if(low > m_CurrentSliceIndex)
-            {
-              low = m_CurrentSliceIndex;
-            }
-            m_ManualRangeSlider->SetSubRange(low,hi);
-            m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
-          }
-        }
-        break;
-      }
-    case ID_SLICE_PREV:
-      {
-        if(m_CurrentSliceIndex>1)
-          m_CurrentSliceIndex--;
-        if (/*m_CurrentSliceIndex != m_OldSliceIndex &&*/ m_CurrentOperation==MANUAL_SEGMENTATION)
-        {
-          OnEventUpdateManualSlice();
-        }
-        else if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
-        {
-          OnEventUpdateThresholdSlice();
-        }
-        else if(m_CurrentOperation==LOAD_SEGMENTATION)
-        {
-          UpdateSlice();
-          m_View->CameraUpdate();
-          m_GuiDialog->Update();
-        }
-        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
-        {
-          UpdateSlice();
-          m_View->VmeShow(m_RefinementVolumeMask, true);
-          m_View->CameraUpdate();
-          m_GuiDialog->Update();
-        }
-        else
-        {
-          UpdateSlice();
-          m_View->CameraUpdate();
-          m_GuiDialog->Update();
-        }
-        if(m_CurrentOperation == MANUAL_SEGMENTATION)
-        {
-          CreateRealDrawnImage();
-          if(e->GetSender()!=this)
-          {
-            double low,hi;
-            m_ManualRangeSlider->GetSubRange(&low,&hi);
-            if(hi < m_CurrentSliceIndex)
-            {
-              hi = m_CurrentSliceIndex;
-            }
-            if(low > m_CurrentSliceIndex)
-            {
-              low = m_CurrentSliceIndex;
-            }
-            m_ManualRangeSlider->SetSubRange(low,hi);
-            m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
-          }
-        }
-        break;
-      }
-    case ID_SLICE_TEXT:
-      {
-        if (/*m_CurrentSliceIndex != m_OldSliceIndex &&*/ m_CurrentOperation==MANUAL_SEGMENTATION)
-        {
-          OnEventUpdateManualSlice();
-        }
-        else if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
-        {
-          OnEventUpdateThresholdSlice();
-        }
-        else if(m_CurrentOperation==LOAD_SEGMENTATION)
-        {
-          UpdateSlice();
-          m_View->VmeShow(m_LoadedVolume, true);
-          m_View->CameraUpdate();
-          m_GuiDialog->Update();
-        }
-        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
-        {
-          UpdateSlice();
-          m_View->VmeShow(m_RefinementVolumeMask, true);
-          m_View->CameraUpdate();
-          m_GuiDialog->Update();
-        }
-        else
-        {
-          UpdateSlice();
-          m_View->CameraUpdate();
-          m_GuiDialog->Update();
-        }
-        if(m_CurrentOperation == MANUAL_SEGMENTATION)
-        {
-          CreateRealDrawnImage();
-          if(e->GetSender()!=this)
-          {
-            double low,hi;
-            m_ManualRangeSlider->GetSubRange(&low,&hi);
-            if(hi < m_CurrentSliceIndex)
-            {
-              hi = m_CurrentSliceIndex;
-            }
-            if(low > m_CurrentSliceIndex)
-            {
-              low = m_CurrentSliceIndex;
-            }
-            m_ManualRangeSlider->SetSubRange(low,hi);
-            m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
-          }
-        }
-        break;
-      }
+		case ID_SLICE_NEXT: 
+		{
+			if (m_CurrentSliceIndex < m_SliceSlider->GetMax())
+				m_CurrentSliceIndex++;
+			OnUpdateSlice();
+		}
+			break;
+		case ID_SLICE_TEXT:
+		{
+			if (m_CurrentSliceIndex > 1)
+				m_CurrentSliceIndex--;
+			OnUpdateSlice();
+		}
+		case ID_SLICE_PREV:
+		case ID_SLICE_SLIDER:
+		{
+			OnUpdateSlice();
+		}
+		break;
     case ID_SLICE_PLANE:
       {
         m_CurrentSliceIndex = 1;
         m_View->SetSliceAxis(m_CurrentSlicePlane);
         if (m_CurrentOperation==MANUAL_SEGMENTATION)
         {
-          OnEventUpdateManualSlice();
+          OnUpdateSlice();
           m_ManualRangeSlider->SetText(1,"Slices");  
           m_ManualRangeSlider->SetRange(1,m_VolumeDimensions[m_CurrentSlicePlane]);
           m_ManualRangeSlider->SetSubRange(1,m_VolumeDimensions[m_CurrentSlicePlane]);
@@ -2609,20 +1932,10 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
           m_View->CameraUpdate();
           m_GuiDialog->Update();
         }
-        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
-        {
-          UpdateSlice();
-          m_View->VmeShow(m_RefinementVolumeMask, true);
-          m_View->CameraUpdate();
-          m_GuiDialog->Update();
-        }
-        else
-        {
-          UpdateSlice();
-          m_View->CameraUpdate();
-          m_GuiDialog->Update();
-        }
-        if(m_CurrentOperation == MANUAL_SEGMENTATION)
+       
+        UpdateSlice();
+        m_GuiDialog->Update();
+				if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
           CreateRealDrawnImage();
         }
@@ -2667,8 +1980,6 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
         if(m_CurrentOperation == MANUAL_SEGMENTATION && m_ManualSegmentationTools == 0)
         {          
           OnBrushEvent(e);
-          m_ManualVolumeSlice->GetOutput()->GetVTKData()->Update();
-          m_ManualVolumeSlice->Update();
           CreateRealDrawnImage();
           m_PickingStarted=false;
         }
@@ -2691,7 +2002,6 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           m_AutomaticThresholdSlider->GetSubRange(&m_AutomaticThreshold,&m_AutomaticUpperThreshold);
           UpdateThresholdLabel();
-          //UpdateSlice();
           UpdateThresholdRealTimePreview();
           m_View->CameraUpdate();
         }
@@ -2736,7 +2046,7 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
             m_CurrentSliceIndex = low;
           }
 
-          OnEvent(new mafEvent(this,ID_SLICE_SLIDER));
+					OnUpdateSlice();
 
         }
         break;
@@ -2747,12 +2057,11 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
         sr = m_ColorLUT->GetRange();
         m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
         m_View->CameraUpdate();
-        break;
       }
+			break;
     case ID_ENABLE_TRILINEAR_INTERPOLATION:
-      {
         m_View->CameraUpdate();
-      }break;
+			break;
     default:
       break;
     }
@@ -2771,7 +2080,7 @@ void mafOpSegmentation::StartDraw(mafEvent *e, bool erase)
   {
     UndoRedoState urs;
     urs.dataArray = vtkUnsignedCharArray::New();
-    urs.dataArray->DeepCopy( m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
+    urs.dataArray->DeepCopy( m_SegmetationSlice->GetPointData()->GetScalars() );
     urs.dataArray->SetName("SCALARS");
     urs.plane=m_CurrentSlicePlane;
     urs.slice=m_CurrentSliceIndex;
@@ -2801,16 +2110,19 @@ void mafOpSegmentation::OnEventUpdateThresholdSlice()
 }
 
 //------------------------------------------------------------------------
-void mafOpSegmentation::OnEventUpdateManualSlice()
+void mafOpSegmentation::OnUpdateSlice()
 //------------------------------------------------------------------------
 {
-  UndoBrushPreview();
-  ApplyVolumeSliceChanges();  
-  UpdateVolumeSlice();
-  UpdateSlice();
-  m_View->VmeShow(m_ManualVolumeSlice, true);
-  m_View->CameraUpdate();
-  m_GuiDialog->Update();
+	if (m_CurrentOperation == MANUAL_SEGMENTATION)
+	{
+		UndoBrushPreview();
+		ApplyVolumeSliceChanges();
+	}
+
+	UpdateSlice();
+
+	if (m_CurrentOperation == MANUAL_SEGMENTATION)
+		CreateRealDrawnImage();
 }
 
 //------------------------------------------------------------------------
@@ -2839,32 +2151,21 @@ void mafOpSegmentation::OnBrushEvent(mafEvent *e)
 }
 
 //------------------------------------------------------------------------
-void mafOpSegmentation::SaveRefinementVolumeMask()
-//------------------------------------------------------------------------
-{
-  m_SegmentatedVolume->SetRefinementVolumeMask(m_RefinementVolumeMask);
-  m_SegmentatedVolume->GetOutput()->Update();
-  m_SegmentatedVolume->Update();
-}
-
-
-//------------------------------------------------------------------------
 void mafOpSegmentation::OnChangeThresholdType()
 //------------------------------------------------------------------------
 {
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTOMATIC_ADD_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTOMATIC_REMOVE_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTOMATIC_UPDATE_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTOMATIC_LIST_OF_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTOMATIC_INCREASE_MIN_RANGE_VALUE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTOMATIC_INCREASE_MAX_RANGE_VALUE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTOMATIC_DECREASE_MIN_RANGE_VALUE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTOMATIC_DECREASE_MAX_RANGE_VALUE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTOMATIC_DECREASE_MIDDLE_RANGE_VALUE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTOMATIC_INCREASE_MIDDLE_RANGE_VALUE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_ADD_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_REMOVE_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_UPDATE_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_LIST_OF_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_INC_MIN_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_INC_MAX_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_DEC_MIN_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_DEC_MAX_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_DEC_MIDDLE_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_INC_MIDDLE_RANGE,m_AutomaticGlobalThreshold == RANGE );
   m_AutomaticRangeSlider->Enable(m_AutomaticGlobalThreshold == RANGE);
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTOMATIC_GLOBAL_PREVIEW,m_AutomaticGlobalThreshold==GLOBAL);
-
+  
 
   UpdateThresholdLabel();
 }
@@ -2924,9 +2225,7 @@ void mafOpSegmentation::OnAutomaticRemoveRange()
 //------------------------------------------------------------------------
 {
   if (m_AutomaticListOfRange->GetSelection()<0)
-  {
     return;
-  }
 
   int j = 0;
   for (int i=0;i<m_AutomaticRanges.size();i++)
@@ -2940,13 +2239,9 @@ void mafOpSegmentation::OnAutomaticRemoveRange()
   m_AutomaticListOfRange->Delete(m_AutomaticListOfRange->GetSelection());
 
   if (m_AutomaticListOfRange->GetCount()>0)
-  {
     SetSelectionAutomaticListOfRange(0);
-  }
   else
-  {
     SetSelectionAutomaticListOfRange(-1);
-  }
 
   m_AutomaticRanges.pop_back();
 
@@ -2957,7 +2252,6 @@ void mafOpSegmentation::OnAutomaticRemoveRange()
   UpdateThresholdLabel();
   UpdateThresholdRealTimePreview();
   OnEventUpdateThresholdSlice();
-  //OnAutomaticPreview();
 }
 
 //------------------------------------------------------------------------
@@ -2967,6 +2261,7 @@ void mafOpSegmentation::UpdateThresholdVolumeData()
   //////////////////////////////////////////////////////////////////////////
   //PREVIEW
   //////////////////////////////////////////////////////////////////////////
+	/** TODO 
   m_SegmentatedVolume->RemoveAllRanges();
   if (m_AutomaticGlobalThreshold == RANGE)
   {
@@ -3007,29 +2302,8 @@ void mafOpSegmentation::UpdateThresholdVolumeData()
   }
 
   m_ThresholdVolume->Update();
+	*/
 }
-//------------------------------------------------------------------------
-void mafOpSegmentation::OnAutomaticPreview()
-//------------------------------------------------------------------------
-{
-  wxBusyCursor wait_cursor;
-  wxBusyInfo wait(_("Creating preview: Please wait"));
-  
-  UpdateThresholdVolumeData();
-
-  m_SegmentationColorLUT = m_ThresholdVolume->GetMaterial()->m_ColorLut;
-  InitMaskColorLut(m_SegmentationColorLUT);
-
-  m_ThresholdVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
-  mmaVolumeMaterial *currentVolumeMaterial = ((mafVMEOutputVolume *)m_ThresholdVolume->GetOutput())->GetMaterial();
-  currentVolumeMaterial->UpdateFromTables();
-
-  m_View->VmeShow(m_ThresholdVolume,true);
-
-  m_View->CameraUpdate();
-  //////////////////////////////////////////////////////////////////////////
-}
-//------------------------------------------------------------------------
 void mafOpSegmentation::OnAutomaticUpdateRange()
 //------------------------------------------------------------------------
 {
@@ -3061,37 +2335,33 @@ void mafOpSegmentation::OnAutomaticUpdateRange()
     m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
 
     UpdateThresholdLabel();
-
-    //OnAutomaticPreview();
   }
 }
-
 //------------------------------------------------------------------------
 void mafOpSegmentation::OnAutomaticChangeRangeManually(int eventID)
-//------------------------------------------------------------------------
 {
   double subMin,subMax;
   m_AutomaticRangeSlider->GetSubRange(&subMin,&subMax);
   
   switch(eventID)
   {
-  case ID_AUTOMATIC_INCREASE_MIN_RANGE_VALUE:
+  case ID_AUTO_INC_MIN_RANGE:
       subMin++;
     break;
-  case ID_AUTOMATIC_INCREASE_MAX_RANGE_VALUE:
+  case ID_AUTO_INC_MAX_RANGE:
       subMax++;
     break;
-  case ID_AUTOMATIC_DECREASE_MAX_RANGE_VALUE:
+  case ID_AUTO_DEC_MAX_RANGE:
       subMax--;
     break;
-  case ID_AUTOMATIC_DECREASE_MIN_RANGE_VALUE:
+  case ID_AUTO_DEC_MIN_RANGE:
       subMin--;
     break;
-  case ID_AUTOMATIC_INCREASE_MIDDLE_RANGE_VALUE:
+  case ID_AUTO_INC_MIDDLE_RANGE:
       subMin++;
       subMax++;
     break;
-  case ID_AUTOMATIC_DECREASE_MIDDLE_RANGE_VALUE:
+  case ID_AUTO_DEC_MIDDLE_RANGE:
       subMin--;
       subMax--;
     break;
@@ -3101,33 +2371,30 @@ void mafOpSegmentation::OnAutomaticChangeRangeManually(int eventID)
   UpdateThresholdRealTimePreview();
   m_View->CameraUpdate();
 }
-
-
 //------------------------------------------------------------------------
 void mafOpSegmentation::OnAutomaticChangeThresholdManually(int eventID)
-//------------------------------------------------------------------------
 {
   m_AutomaticThresholdSlider->GetSubRange(&m_AutomaticThreshold,&m_AutomaticUpperThreshold);
   //Fine tuning threshold selection, get the event and update relative values
   switch(eventID)
   {
-  case ID_AUTOMATIC_INCREASE_MIN_THRESHOLD:
+  case ID_AUTO_INC_MIN_THRESHOLD:
     m_AutomaticThreshold++;
     break;
-  case ID_AUTOMATIC_INCREASE_MAX_THRESHOLD:
+  case ID_AUTO_INC_MAX_THRESHOLD:
     m_AutomaticUpperThreshold++;
     break;
-  case ID_AUTOMATIC_DECREASE_MAX_THRESHOLD:
+  case ID_AUTO_DEC_MAX_THRESHOLD:
     m_AutomaticUpperThreshold--;
     break;
-  case ID_AUTOMATIC_DECREASE_MIN_THRESHOLD:
+  case ID_AUTO_DEC_MIN_THRESHOLD:
     m_AutomaticThreshold--;
     break;
-  case ID_AUTOMATIC_INCREASE_MIDDLE_THRESHOLD:
+  case ID_AUTO_INC_MIDDLE_THRESHOLD:
     m_AutomaticThreshold++;
     m_AutomaticUpperThreshold++;
     break;
-  case ID_AUTOMATIC_DECREASE_MIDDLE_THRESHOLD:
+  case ID_AUTO_DEC_MIDDLE_THRESHOLD:
     m_AutomaticThreshold--;
     m_AutomaticUpperThreshold--;
     break;
@@ -3139,29 +2406,27 @@ void mafOpSegmentation::OnAutomaticChangeThresholdManually(int eventID)
   OnEventUpdateThresholdSlice();
   m_View->CameraUpdate();
 }
-
 //------------------------------------------------------------------------
 void mafOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
-//------------------------------------------------------------------------
 {
   switch(e->GetId())
   {
-  case ID_AUTOMATIC_INCREASE_MIN_RANGE_VALUE:
-  case ID_AUTOMATIC_INCREASE_MAX_RANGE_VALUE:
-  case ID_AUTOMATIC_INCREASE_MIDDLE_RANGE_VALUE:
-  case ID_AUTOMATIC_DECREASE_MIN_RANGE_VALUE:
-  case ID_AUTOMATIC_DECREASE_MAX_RANGE_VALUE:
-  case ID_AUTOMATIC_DECREASE_MIDDLE_RANGE_VALUE:
+  case ID_AUTO_INC_MIN_RANGE:
+  case ID_AUTO_INC_MAX_RANGE:
+  case ID_AUTO_INC_MIDDLE_RANGE:
+  case ID_AUTO_DEC_MIN_RANGE:
+  case ID_AUTO_DEC_MAX_RANGE:
+  case ID_AUTO_DEC_MIDDLE_RANGE:
     {
       OnAutomaticChangeRangeManually(e->GetId());
     }
     break;
-  case ID_AUTOMATIC_INCREASE_MIN_THRESHOLD:
-  case ID_AUTOMATIC_INCREASE_MAX_THRESHOLD:
-  case ID_AUTOMATIC_INCREASE_MIDDLE_THRESHOLD:
-  case ID_AUTOMATIC_DECREASE_MIN_THRESHOLD:
-  case ID_AUTOMATIC_DECREASE_MAX_THRESHOLD:
-  case ID_AUTOMATIC_DECREASE_MIDDLE_THRESHOLD:
+  case ID_AUTO_INC_MIN_THRESHOLD:
+  case ID_AUTO_INC_MAX_THRESHOLD:
+  case ID_AUTO_INC_MIDDLE_THRESHOLD:
+  case ID_AUTO_DEC_MIN_THRESHOLD:
+  case ID_AUTO_DEC_MAX_THRESHOLD:
+  case ID_AUTO_DEC_MIDDLE_THRESHOLD:
     {
       OnAutomaticChangeThresholdManually(e->GetId()); 
     }
@@ -3199,34 +2464,26 @@ void mafOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
       }
     }
     break;
-  case ID_AUTOMATIC_GLOBAL_PREVIEW:
-    {
-      OnAutomaticPreview();
-      m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
-    }
-    break;
-  case ID_AUTOMATIC_THRESHOLD:
+  case ID_AUTO_THRESHOLD:
     {
       m_AutomaticThresholdSlider->GetSubRange(&m_AutomaticThreshold,&m_AutomaticUpperThreshold);
       UpdateThresholdLabel();
     }
     break;
-  case ID_AUTOMATIC_GLOBAL_THRESHOLD:
+  case ID_AUTO_GLOBAL_THRESHOLD:
     {
       OnChangeThresholdType();
-//       if (m_AutomaticRanges.size()>0 && m_AutomaticGlobalThreshold==RANGE)
-//         OnAutomaticPreview();
       UpdateThresholdRealTimePreview();
       OnEventUpdateThresholdSlice();
       m_GuiDialog->Enable(ID_BUTTON_NEXT,(m_AutomaticGlobalThreshold==RANGE && m_AutomaticRanges.size()>0)||(m_AutomaticGlobalThreshold == FALSE));
     }
     break;
-  case ID_AUTOMATIC_UPDATE_RANGE:
+  case ID_AUTO_UPDATE_RANGE:
     {
       OnAutomaticUpdateRange();
     }
     break;
-  case ID_AUTOMATIC_LIST_OF_RANGE:
+  case ID_AUTO_LIST_OF_RANGE:
     {
       if (m_AutomaticListOfRange->GetSelection() != -1)//Check if a range is selected
       {
@@ -3245,36 +2502,33 @@ void mafOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
       }
     }
     break;
-  case ID_AUTOMATIC_ADD_RANGE:
+  case ID_AUTO_ADD_RANGE:
     {
       OnAutomaticAddRange();
     }
     break;
-  case ID_AUTOMATIC_REMOVE_RANGE:
+  case ID_AUTO_REMOVE_RANGE:
     {
       OnAutomaticRemoveRange();
     }
     break;
   default:
     mafEventMacro(*e);
+		return;
   }
-
+	m_GuiDialog->Update();
 }
-
 //------------------------------------------------------------------------
 void mafOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState state)
-//------------------------------------------------------------------------
 { 
   if(state.plane==-1 && state.slice == -1)
   {
-    m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(state.dataArray);
-    m_ManualVolumeMask->Update();
+    m_SegmetationSlice->GetPointData()->SetScalars(state.dataArray);
 
     UpdateSlice();
-    m_View->VmeShow(m_ManualVolumeSlice,true);
 
     CreateRealDrawnImage();
-    OnEventUpdateManualSlice();
+    OnUpdateSlice();
   }
   else
   {
@@ -3283,10 +2537,9 @@ void mafOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
 
       m_CurrentSlicePlane=state.plane;
       m_CurrentSliceIndex=state.slice;
-      //m_View->SetSliceAxis(m_CurrentSlicePlane);
+      m_View->SetSliceAxis(m_CurrentSlicePlane);
       UpdateSlice();
       m_View->CameraUpdate();
-      m_GuiDialog->Update();
       InitGui();
       m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
     }
@@ -3309,9 +2562,6 @@ void mafOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
 
     dataSet->GetPointData()->SetScalars(state.dataArray);
     //Show changes
-    m_ManualVolumeSlice->Update();
-    m_View->VmeShow(m_ManualVolumeSlice, true);
-
     //   if(ResetZoom(undoRedoData,bounds))
     //   {
     //     m_View->SetSliceAxis(m_CurrentSlicePlane);
@@ -3319,14 +2569,12 @@ void mafOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
 
     //m_View->CameraUpdate();
     CreateRealDrawnImage();
-    OnEventUpdateManualSlice();
+    OnUpdateSlice();
     undoRedoData->Delete();
   } 
 }
-
 //------------------------------------------------------------------------
 void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
-//------------------------------------------------------------------------
 {
   switch(e->GetId())
   {
@@ -3364,7 +2612,7 @@ void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
         m_ManualRangeSlider->Enable(m_GlobalFloodFill==TRUE);
         m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
         UndoBrushPreview();
-        OnEventUpdateManualSlice();
+        OnUpdateSlice();
       }
     }
     break;
@@ -3386,8 +2634,8 @@ void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
       dummyPoints->Delete();
       m_View->CameraUpdate();
       m_ManualSegmentationAction = oldAction;
-      break;
     }
+		break;
   case ID_MANUAL_BRUSH_SIZE:
     {
       m_ManualBrushSize = int(m_ManualBrushSize);
@@ -3404,10 +2652,11 @@ void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
       m_View->CameraUpdate();
       m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
       m_ManualSegmentationAction = oldAction;
-      break;
     }
+		break;
   case ID_MANUAL_UNDO:
     {
+		/** TODO 
       int numOfChanges = m_ManualUndoList.size();
       if(numOfChanges)
       {
@@ -3424,7 +2673,6 @@ void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
           m_CurrentSliceIndex=m_ManualUndoList[numOfChanges-1].slice;
           UpdateSlice();
           m_View->CameraUpdate();
-          m_GuiDialog->Update();
         }
         if(m_ManualUndoList[numOfChanges-1].plane == -1 && m_ManualUndoList[numOfChanges-1].slice == -1)
         {
@@ -3454,11 +2702,13 @@ void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 
         ApplyVolumeSliceChanges();
       }
-      break;
+			*/
     }
+		break;
   case ID_MANUAL_REDO:
     {
-      int numOfChanges = m_ManualRedoList.size();
+			/* TODO 
+			int numOfChanges = m_ManualRedoList.size();
       if(numOfChanges)
       {
         vtkDataSet *dataSet = m_ManualVolumeSlice->GetOutput()->GetVTKData();
@@ -3474,7 +2724,6 @@ void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
           m_CurrentSliceIndex=m_ManualRedoList[numOfChanges-1].slice;
           UpdateSlice();
           m_View->CameraUpdate();
-          m_GuiDialog->Update();
         }
         if(m_ManualRedoList[numOfChanges-1].plane == -1 && m_ManualRedoList[numOfChanges-1].slice == -1)
         {
@@ -3505,6 +2754,7 @@ void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
         //UndoBrushPreview();
         ApplyVolumeSliceChanges();
       }
+			*/
       break;
     }
    default:
@@ -3513,97 +2763,35 @@ void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
   m_GuiDialog->SetFocusIgnoringChildren();
 }
 //------------------------------------------------------------------------
-void mafOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
-//------------------------------------------------------------------------
+void mafOpSegmentation::OnLoadSegmentationEvent()
 {
-  switch(e->GetId())
-  {
-  case ID_LOAD_SEGMENTATION:
-    {
+	mafString title = mafString("Select a segmentation:");
+	mafEvent e(this, VME_CHOOSE);
+	e.SetString(&title);
+	e.SetPointer(&mafOpSegmentation::SegmentedVolumeAccept);
+	mafEventMacro(e);
+	mafVME *vme = e.GetVme();
+	mafVMEVolumeGray *newVolume = mafVMEVolumeGray::SafeDownCast(vme);
 
-      mafString title = mafString("Select a segmentation:");
-      mafEvent e(this,VME_CHOOSE);
-      e.SetString(&title);
-      e.SetPointer(&mafOpSegmentation::SegmentedVolumeAccept);
-      mafEventMacro(e);
-      mafVME *vme = e.GetVme();
-      mafVMEVolumeGray *newVolume = mafVMEVolumeGray::SafeDownCast(vme);
-
-      if(newVolume)
-      {
-        if(m_LoadedVolume)
-        {
-          m_View->VmeShow(m_LoadedVolume,false);
-          m_View->VmeRemove(m_LoadedVolume);
-        }
-        m_LoadedVolume = newVolume;
-        m_LoadedVolume->Update();
-        m_SegmentationColorLUT = m_LoadedVolume->GetMaterial()->m_ColorLut;
-        InitMaskColorLut(m_SegmentationColorLUT);
-        m_LoadedVolume->GetMaterial()->UpdateFromTables();
-        m_LoadedVolume->Update();
-
-        m_LoadedVolumeName = m_LoadedVolume->GetName();
-        m_SegmentationOperationsGui[LOAD_SEGMENTATION]->Update();
-
-        // add vme parents to the view
-
-        mafVME* parent = m_LoadedVolume;
-        std::vector<mafVME*> parents;
-        do 
-        {
-          parents.push_back(parent);
-          parent = parent->GetParent();
-        }
-        while(!parent->IsA("mafVMERoot"));
-
-        for(int p = 0; p < parents.size(); p++)
-        {
-          m_View->VmeAdd(parents.at(parents.size() - (p + 1)));
-        }
-        
-        UpdateSlice();
-        m_View->VmeShow(m_LoadedVolume, true);
-        m_View->CameraUpdate();
-        m_GuiDialog->Update();
-      }
-    }
-    break;
-  case ID_RESET_LOADED:
-    {
-      if(m_LoadedVolume)
-      {
-        m_View->VmeShow(m_LoadedVolume,false);
-      }
-      //m_View->VmeRemove(m_LoadedVolume);
-      m_View->CameraUpdate();
-      m_LoadedVolume = NULL;
-      m_LoadedVolumeName = "[Select input volume]";
-      m_SegmentationOperationsGui[LOAD_SEGMENTATION]->Update();
-    }
-    break;
-  }
+	if (newVolume)
+	{
+		m_SegmentationOperationsGui[LOAD_SEGMENTATION]->Update();
+		vtkDataSet * loadVtkData = newVolume->GetOutput()->GetVTKData();
+		if(vtkRectilinearGrid::SafeDownCast(loadVtkData))
+			m_SegmentationVolume->SetData((vtkRectilinearGrid *)loadVtkData, m_SegmentationVolume->GetTimeStamp());
+		else
+			m_SegmentationVolume->SetData((vtkImageData*)loadVtkData, m_SegmentationVolume->GetTimeStamp());
+		UpdateSlice();
+	}
 }
 //------------------------------------------------------------------------
 void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
-//------------------------------------------------------------------------
 {
   switch(e->GetId())
   {
   case ID_REFINEMENT_ACTION:
     {
       m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_ITERATIVE, m_RefinementSegmentationAction == ID_REFINEMENT_ISLANDS_REMOVE);
-
-    }
-    break;
-  case ID_REFINEMENT_REGIONS_SIZE:
-    {
-
-    }
-    break;
-  case ID_REFINEMENT_EVERY_SLICE:
-    {
-
     }
     break;
   case ID_REFINEMENT_UNDO:
@@ -3611,7 +2799,7 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
       int numOfChanges = m_RefinementUndoList.size();
       if(numOfChanges)
       {
-        vtkDataSet *dataSet = m_RefinementVolumeMask->GetOutput()->GetVTKData();
+        vtkDataSet *dataSet = m_SegmentationVolume->GetOutput()->GetVTKData();
 
         vtkUnsignedCharArray *redoScalars = vtkUnsignedCharArray::New();
         redoScalars->DeepCopy( dataSet->GetPointData()->GetScalars() );
@@ -3626,10 +2814,8 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         vtkMAFSmartPointer<vtkStructuredPoints> newDataSet;
         newDataSet->DeepCopy(dataSet);
 
-        m_RefinementVolumeMask->SetData(newDataSet, m_Volume->GetTimeStamp());
-        
-        m_View->VmeShow(m_RefinementVolumeMask, true);        
-
+        m_SegmentationVolume->SetData(newDataSet, m_Volume->GetTimeStamp());
+     
         vtkDEL(m_RefinementUndoList[numOfChanges-1]);
         m_RefinementUndoList.pop_back();
 
@@ -3637,8 +2823,6 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
         UpdateSlice();
-        m_View->CameraUpdate();
-        m_GuiDialog->Update();
       }
       break;
     }
@@ -3648,7 +2832,7 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
       int numOfChanges = m_RefinementRedoList.size();
       if(numOfChanges)
       {
-        vtkDataSet *dataSet = m_RefinementVolumeMask->GetOutput()->GetVTKData();
+        vtkDataSet *dataSet = m_SegmentationVolume->GetOutput()->GetVTKData();
 
         vtkUnsignedCharArray *undoScalars = vtkUnsignedCharArray::New();
         undoScalars->DeepCopy( dataSet->GetPointData()->GetScalars() );
@@ -3663,8 +2847,7 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         vtkMAFSmartPointer<vtkStructuredPoints> newDataSet;
         newDataSet->DeepCopy(dataSet);
 
-        m_RefinementVolumeMask->SetData(newDataSet, m_Volume->GetTimeStamp());
-        m_View->VmeShow(m_RefinementVolumeMask, true);
+				m_SegmentationVolume->SetData(newDataSet, m_Volume->GetTimeStamp());
 
         vtkDEL(m_RefinementRedoList[numOfChanges-1]);
         m_RefinementRedoList.pop_back();
@@ -3673,15 +2856,13 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
         UpdateSlice();
-        m_View->CameraUpdate();
-        m_GuiDialog->Update();
       }
       break;
     }
   case ID_REFINEMENT_APPLY:
     {
       vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::New();
-      scalars->DeepCopy( m_RefinementVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
+      scalars->DeepCopy(m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
       scalars->SetName("SCALARS");
 
       m_RefinementUndoList.push_back( scalars );
@@ -3690,8 +2871,6 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
       {
         break;
       }
-
-      SaveRefinementVolumeMask();
 
       m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
       m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
@@ -3705,29 +2884,24 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
   }
 
 }
-
 //------------------------------------------------------------------------
-void mafOpSegmentation::InitializeViewSlice()
-//------------------------------------------------------------------------
+void mafOpSegmentation::InitializeView()
 {
-//  m_View->SetTextureInterpolate(true);
+  m_View->SetTextureInterpolate(false);
 
   // slicing the volume
   vtkDataSet *dataSet = m_Volume->GetOutput()->GetVTKData();
   m_View->PlugVisualPipe("mafVMEVolumeGray","mafPipeVolumeOrthoSlice");
-  m_View->PlugVisualPipe("mafVMESegmentationVolume","mafPipeVolumeOrthoSlice");
   m_View->PlugVisualPipe("mafVMEImage","mafPipeImage3D");
   m_View->PlugVisualPipe("mafVMESurface","mafPipeSurfaceSlice");
  
   dataSet->GetPoint((0,0,0),m_SliceOrigin);
   m_CurrentSliceIndex = 1;
 
-  m_View->CameraUpdate();
+  UpdateSlice();
 }
-
 //----------------------------------------------------------------------------
 void mafOpSegmentation::UpdateWindowing()
-//----------------------------------------------------------------------------
 {
   mafVMEOutputVolume *volumeOutput = mafVMEOutputVolume::SafeDownCast(m_Volume->GetOutput());
   double sr[2],subR[2];
@@ -3744,7 +2918,6 @@ void mafOpSegmentation::UpdateWindowing()
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool selection)
-//----------------------------------------------------------------------------
 {
 
   // if spacing are different get the target spacing
@@ -3756,27 +2929,12 @@ void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   double minDiffSpacing = min(min(diffSpacingXY,diffSpacingXZ),diffSpacingYZ);
 
   double targetSpacing = /*max*/(max(m_VolumeSpacing[0],m_VolumeSpacing[1])/*,m_VolumeSpacing[2]*/);
-  switch (m_CurrentSlicePlane)
-  {
-
-//     case XY:
-//       {
-// 
-//       }
-//       break;
-  case XZ:
-    {
+	if (m_CurrentSlicePlane == XZ)
       targetSpacing = (max(m_VolumeSpacing[0],m_VolumeSpacing[2]));
-    }
-    break;
-  case YZ:
-    {
+	else if (m_CurrentSlicePlane == XZ)
       targetSpacing = (max(m_VolumeSpacing[1],m_VolumeSpacing[2]));
-    }
-    break;
-  }
   
-  vtkDataSet *dataset = m_ManualVolumeSlice->GetOutput()->GetVTKData();
+  vtkDataSet *dataset = m_SegmentationVolume->GetOutput()->GetVTKData();
 
   if(!dataset || !(dataset->GetPointData()->GetScalars()))
     return;
@@ -3790,12 +2948,6 @@ void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   double factors[2] = {1,m_VolumeDimensions[0]};
   switch (m_CurrentSlicePlane)
   {
-// 
-//     case XY:
-//       {
-// 
-//       }
-//       break;
     case XZ:
       {
         abscissa = 0;
@@ -3828,9 +2980,7 @@ void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
 
   unsigned char scalar = 0;
   if(selection)
-  {
     scalar = 255;
-  }
 
   double min_distance = MAXDOUBLE;
   int nearestIndex = 0;
@@ -3884,34 +3034,19 @@ void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
         double index = (i * factors[0] + j * factors[1] - nearestDummyIndex);
 
         if(vtkMath::Distance2BetweenPoints(dummyPixel,dummyCenter) < radius2 || index == 0)
-        {
           dummyIndices.push_back(index);
-        }
         else
-        {
           dummyIndices.push_back(-(numberOfPoints + 1));
-        }
       }
     }
   }
   else // square
   {
     for(int i = 0; i < int(m_ManualBrushSize); i++)
-    {
       for(int j = 0; j < int(m_ManualBrushSize); j++) // all pixel in the square are on
-      {
         dummyIndices.push_back((i * factors[0] + j * factors[1] - nearestDummyIndex));
-      }
-    }
   }
-//   for(int i = 0; i < dummyIndices.size(); i++)
-//   {
-//     int curIndex = dummyIndices.at(i) + nearestIndex;
-//     if(curIndex >= 0 && curIndex < numberOfPoints)
-//     {
-//       dataset->GetPointData()->GetScalars()->SetTuple1(curIndex, scalar);
-//     }
-//   }
+
 
   int initialLine = int(double(nearestIndex) / factors[1]) - int(m_ManualBrushSize/2);
   for(int i = 0; i < int(m_ManualBrushSize); i++)
@@ -3922,9 +3057,7 @@ void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
       int realLine = int(double(curIndex) / factors[1]);
       //mafLogMessage("----> %d  %d || %d  %d || %d || %d  %d",realLine,initialLine + j,initialLine,j, curIndex,i,j);
       if(curIndex >= 0 && curIndex < numberOfPoints && realLine == initialLine + i)
-      {
         dataset->GetPointData()->GetScalars()->SetTuple1(curIndex, scalar);
-      }
     }
   }
 
@@ -3933,19 +3066,19 @@ void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   vtkMAFSmartPointer<vtkStructuredPoints> newImage;
   newImage->DeepCopy(dataset);
   newImage->Update();
-  m_ManualVolumeSlice->SetData(newImage,m_ThresholdVolume->GetTimeStamp(), 2);
-  m_ManualVolumeSlice->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
-  m_ManualVolumeSlice->GetOutput()->GetVTKData()->Update();
-  m_ManualVolumeSlice->GetOutput()->Update();
-  m_ManualVolumeSlice->Update();
-  m_View->VmeShow(m_ManualVolumeSlice, true);
-  
+	
+  m_SegmentationVolume->SetData(newImage,m_SegmentationVolume->GetTimeStamp(), 2);
+	/* TODO check if this is required and create a setdata function
+	m_SegmentationVolume->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+	m_SegmentationVolume->GetOutput()->GetVTKData()->Update();
+	m_SegmentationVolume->GetOutput()->Update();
+	m_SegmentationVolume->Update();
+  */
+
   m_ManualBrushSize = oldBrushSize;
 }
-
 //------------------------------------------------------------------------
 void mafOpSegmentation::InitializeInteractors()
-//------------------------------------------------------------------------
 {
   //Create the device manager
   mafNEW(m_DeviceManager);
@@ -3968,8 +3101,6 @@ void mafOpSegmentation::InitializeInteractors()
   mafAction *pntAction = m_SER->AddAction("pntAction",-10);
 
   //create the positional event router
-
-
   mafNEW(m_ManualPER);
   m_ManualPER->SetName("m_EditingPER");
   m_ManualPER->SetListener(this);
@@ -3992,30 +3123,19 @@ void mafOpSegmentation::InitializeInteractors()
   m_SER->AddAction("pntEditingAction");
   pntAction = m_SER->GetAction("pntEditingAction");
   m_ManualPER->AddObserver(m_SegmentationPicker);
-
-//   m_View->GetRWI()->SetMouse(m_DialogMouse);
-//   m_View->SetMouse(m_DialogMouse);
-//   m_OldBehavior=m_Volume->GetBehavior();
-//   m_DialogMouse->SetView(m_View);
-  
+	  
   m_SER->AddAction("pntEditingAction");
   pntAction = m_SER->GetAction("pntEditingAction");
 
-
-  
   mafNEW(m_AutomaticPER);
   pntAction = m_SER->AddAction("pntActionAutomatic",-10);
   pntAction->BindDevice(m_DialogMouse);
   pntAction->BindInteractor(m_AutomaticPER);
   m_AutomaticPER->SetListener(this);
   m_AutomaticPER->SetRenderer(m_View->GetFrontRenderer());
-
-
 }
-
 //------------------------------------------------------------------------
 bool mafOpSegmentation::AutomaticCheckRange(int indexToExclude /* = -1 */)
-//------------------------------------------------------------------------
 {
   double min,max;
   m_AutomaticRangeSlider->GetSubRange(&min,&max);
@@ -4057,10 +3177,8 @@ bool mafOpSegmentation::AutomaticCheckRange(int indexToExclude /* = -1 */)
 
   return true;
 }
-
 //------------------------------------------------------------------------
 void mafOpSegmentation::UpdateSliceLabel()
-//------------------------------------------------------------------------
 {
   //////////////////////////////////////////////////////////////////////////
   //Update slice text actor
@@ -4079,10 +3197,8 @@ void mafOpSegmentation::UpdateSliceLabel()
   m_AutomaticSliceTextMapper->SetInput(text.GetCStr());
   //////////////////////////////////////////////////////////////////////////
 }
-
 //------------------------------------------------------------------------
 void mafOpSegmentation::UpdateThresholdLabel()
-//------------------------------------------------------------------------
 {
   if (m_CurrentOperation == AUTOMATIC_SEGMENTATION && (m_CurrentSlicePlane == XY || m_AutomaticGlobalThreshold == GLOBAL) )
   {
@@ -4155,7 +3271,6 @@ void mafOpSegmentation::InitVolumeDimensions()
         m_SliceSlider->SetRange(1,m_VolumeDimensions[1]);
       else if (m_CurrentSlicePlane == YZ)
         m_SliceSlider->SetRange(1,m_VolumeDimensions[0]);
-      m_GuiDialog->Update();
     }
     if (m_AutomaticRangeSlider)
     {
@@ -4275,422 +3390,29 @@ void mafOpSegmentation::GetSliceOrigin(double *origin)
 void mafOpSegmentation::UpdateSlice()
 //----------------------------------------------------------------------------
 {
+	double posNew[3];
+
   m_OldSliceIndex = m_CurrentSliceIndex;
   m_OldSlicePlane = m_CurrentSlicePlane;
-
   UpdateThresholdLabel();
   UpdateSliceLabel();
-
-  
-  double posNew[3];
-  
   GetSliceOrigin(posNew);
-
   m_View->SetSlice( posNew );
-
-  if(m_CurrentOperation == MANUAL_SEGMENTATION)
-    UpdateVolumeSlice();
+	m_View->CameraUpdate();
+	m_GuiDialog->Update();
 }
 
-//----------------------------------------------------------------------------
-void mafOpSegmentation::InitManualVolumeSlice()
-//----------------------------------------------------------------------------
-{
-
-  if(m_ManualVolumeSlice == NULL)
-  {
-    mafNEW(m_ManualVolumeSlice);
-    m_ManualVolumeSlice->ReparentTo(m_Volume->GetParent());
-    m_ManualVolumeSlice->SetName("Manual Volume Slice");
-    m_View->VmeAdd(m_ManualVolumeSlice);
-    //m_View->VmeCreatePipe(m_ManualVolumeSlice);
-    InitDataVolumeSlice<vtkUnsignedCharArray>(m_ManualVolumeSlice);
-
-    m_View->CameraUpdate();
-  }
-
-}
-
-//----------------------------------------------------------------------------
-void mafOpSegmentation::InitEmptyVolumeSlice()
-//----------------------------------------------------------------------------
-{
-  if(!m_EmptyVolumeSlice)
-  {
-    mafNEW(m_EmptyVolumeSlice);
-  }
-  
-  m_EmptyVolumeSlice->ReparentTo(m_Volume->GetParent());
-  m_EmptyVolumeSlice->SetName("Empty Volume Slice");
-  //m_View->VmeAdd(m_EmptyVolumeSlice);
-  //m_View->VmeCreatePipe(m_EmptyVolumeSlice);
-  //m_View->CameraUpdate();
-
-  InitDataVolumeSlice<vtkDoubleArray>(m_EmptyVolumeSlice);
-}
-
-//----------------------------------------------------------------------------
-template <class ImageType>
-void mafOpSegmentation::InitDataVolumeSlice(mafVMEVolumeGray *slice)
-//----------------------------------------------------------------------------
-{
-  if(!slice || !m_Volume || !m_Volume->GetOutput()->GetVTKData())
-    return;
-
-//   m_OldSliceIndex = m_CurrentSliceIndex;
-//   m_OldSlicePlane = m_CurrentSlicePlane;
-
-
-  vtkDataSet *inputData = NULL;
-
-  inputData = m_Volume->GetOutput()->GetVTKData();
-  inputData->Update();
-
-  vtkDataArray *inputScalars = inputData->GetPointData()->GetScalars();
-
-  vtkMAFSmartPointer<ImageType> scalars;
-  scalars->SetName("SCALARS");
-
-  double origin[3]; 
-
-  vtkDataSet *ds = m_Volume->GetOutput()->GetVTKData();
-
-  GetSliceOrigin(origin);
-
-  int numberOfSlices = 1;
-  int numberOfPoints;
-
-  ///////////////////////////////////////////////////////////////////
-  //Setting up Scalars this is the same both for structured point
-  //and for rectilinear grid
-  if(m_CurrentSlicePlane == XY)
-  {
-    numberOfPoints = m_VolumeDimensions[0]*m_VolumeDimensions[1];
-    scalars->SetNumberOfTuples(numberOfSlices*numberOfPoints);
-    int z=(m_CurrentSliceIndex-1);
-    for (int x=0; x<m_VolumeDimensions[0]; x++)
-      for (int y=0; y<m_VolumeDimensions[1]; y++)
-      { 
-        int volPos=x + y*m_VolumeDimensions[0] + z*m_VolumeDimensions[0]*m_VolumeDimensions[1];
-        int slicePos = x + y*m_VolumeDimensions[0] + 0;
-        scalars->SetTuple1(slicePos, inputScalars->GetTuple1(volPos) );
-      }
-  }
-
-  else if(m_CurrentSlicePlane == YZ)
-  {
-    numberOfPoints = m_VolumeDimensions[1] * m_VolumeDimensions[2];
-    scalars->SetNumberOfTuples(numberOfSlices*numberOfPoints);
-    int x=(m_CurrentSliceIndex-1);
-    for (int y=0; y<m_VolumeDimensions[1]; y++)
-      for (int z=0; z<m_VolumeDimensions[2]; z++)
-      { 
-        int volPos=x + y*m_VolumeDimensions[0] + z*m_VolumeDimensions[0]*m_VolumeDimensions[1];
-        int slicePos=0 + y*numberOfSlices + z*numberOfSlices*m_VolumeDimensions[1];
-        scalars->SetTuple1(slicePos, inputScalars->GetTuple1(volPos) );
-      }
-  }
-
-  else if(m_CurrentSlicePlane == XZ)
-  {
-    numberOfPoints = m_VolumeDimensions[0] * m_VolumeDimensions[2];
-    scalars->SetNumberOfTuples(numberOfSlices*numberOfPoints);
-    int y=(m_CurrentSliceIndex-1);
-    for (int x=0; x<m_VolumeDimensions[0]; x++)
-      for (int z=0; z<m_VolumeDimensions[2]; z++)
-      { 
-        int volPos=x + y*m_VolumeDimensions[0] + z*m_VolumeDimensions[0]*m_VolumeDimensions[1];
-        int slicePos=x + 0 + z*m_VolumeDimensions[0]*numberOfSlices;
-        scalars->SetTuple1(slicePos, inputScalars->GetTuple1(volPos) );
-      }
-  }
-
-
-  //////////////////////////////////////////////////////////////////////////
-  // spacing regolare: imagedata
-  //////////////////////////////////////////////////////////////////////////
-
-  if(ds->IsA("vtkStructuredPoints"))
-  {
-    vtkDataSet *imageData = slice->GetOutput()->GetVTKData();
-    vtkMAFSmartPointer<vtkStructuredPoints> newImageData;
-
-    if(m_CurrentSlicePlane == XY)
-      newImageData->SetDimensions(m_VolumeDimensions[0],m_VolumeDimensions[1],numberOfSlices);
-    else if(m_CurrentSlicePlane == YZ)
-      newImageData->SetDimensions(numberOfSlices,m_VolumeDimensions[1],m_VolumeDimensions[2]);
-    else if(m_CurrentSlicePlane == XZ)
-      newImageData->SetDimensions(m_VolumeDimensions[0],numberOfSlices,m_VolumeDimensions[2]);
-
-    newImageData->SetSpacing(m_VolumeSpacing[0],m_VolumeSpacing[1],m_VolumeSpacing[2]);
-    newImageData->SetScalarTypeToUnsignedChar();
-    newImageData->SetOrigin(origin[0], origin[1], origin[2]);
-    newImageData->GetPointData()->AddArray(scalars);
-    newImageData->GetPointData()->SetActiveScalars("SCALARS");
-    newImageData->Update();
-    slice->SetData(newImageData,0.0);
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  // spacing non regolare: rectilineargrid
-  //////////////////////////////////////////////////////////////////////////
-  else
-  {
-
-    vtkDataSet *rgData = slice->GetOutput()->GetVTKData();
-
-    vtkMAFSmartPointer<vtkRectilinearGrid> newRgData;
-
-    vtkDataArray *x = vtkRectilinearGrid::SafeDownCast(inputData)->GetXCoordinates();
-    vtkDataArray *y = vtkRectilinearGrid::SafeDownCast(inputData)->GetYCoordinates();
-    vtkDataArray *z = vtkRectilinearGrid::SafeDownCast(inputData)->GetZCoordinates();
-
-
-    if(m_CurrentSlicePlane == XY)
-    {
-      z = vtkDoubleArray::New();
-      z->SetNumberOfComponents(1);
-      z->SetNumberOfTuples(1);
-      z->SetTuple1(0, origin[2]);
-      //z->SetTuple1(1, origin[2] + 1.0);
-      newRgData->SetDimensions(m_VolumeDimensions[0],m_VolumeDimensions[1],numberOfSlices);
-    }
-    else if(m_CurrentSlicePlane == YZ)
-    {
-      x = vtkDoubleArray::New();
-      x->SetNumberOfComponents(1);
-      x->SetNumberOfTuples(1);
-      x->SetTuple1(0, origin[0]);
-      //x->SetTuple1(1, origin[0] + 1.0);
-      newRgData->SetDimensions(numberOfSlices,m_VolumeDimensions[1],m_VolumeDimensions[2]);
-    }
-    else if(m_CurrentSlicePlane == XZ)
-    {
-      y = vtkDoubleArray::New();
-      y->SetNumberOfComponents(1);
-      y->SetNumberOfTuples(1);
-      y->SetTuple1(0, origin[1]);
-      //y->SetTuple1(1, origin[1] + 1.0);
-      newRgData->SetDimensions(m_VolumeDimensions[0],numberOfSlices,m_VolumeDimensions[2]);
-    }
-    newRgData->SetXCoordinates(x);
-    newRgData->SetYCoordinates(y);
-    newRgData->SetZCoordinates(z);
-    newRgData->GetPointData()->AddArray(scalars);
-    newRgData->GetPointData()->SetActiveScalars("SCALARS");
-    newRgData->Update();
-    slice->SetData(newRgData, 0.0);
-    if (m_CurrentSlicePlane == YZ) vtkDEL(x);
-    else if (m_CurrentSlicePlane == XZ) vtkDEL(y);
-    else if (m_CurrentSlicePlane == XY) vtkDEL(z);
-  }
-
-  slice->Modified();
-  slice->Update();
-}
-
-//----------------------------------------------------------------------------
-void mafOpSegmentation::InitThresholdVolumeSlice()
-//----------------------------------------------------------------------------
-{
-  if(m_ThresholdVolumeSlice)
-  {
-    m_View->VmeShow(m_ThresholdVolumeSlice,false);
-    m_View->VmeRemove(m_ThresholdVolumeSlice);
-    m_ThresholdVolumeSlice->ReparentTo(NULL);
-    mafDEL(m_ThresholdVolumeSlice);
-  }
-  mafNEW(m_ThresholdVolumeSlice); 
-
-  m_ThresholdVolumeSlice->ReparentTo(m_Volume->GetParent());
-  m_ThresholdVolumeSlice->SetName("Threshold Volume Slice");
-
-  InitDataVolumeSlice<vtkUnsignedCharArray>(m_ThresholdVolumeSlice);
-
-  m_SegmentationColorLUT = m_ThresholdVolumeSlice->GetMaterial()->m_ColorLut;
-  InitMaskColorLut(m_SegmentationColorLUT);
-  m_ThresholdVolumeSlice->GetMaterial()->UpdateFromTables();
-  m_ThresholdVolumeSlice->Update();
-
-  m_View->VmeAdd(m_ThresholdVolumeSlice);
-  m_OldSliceIndex = -1;
-  UpdateThresholdRealTimePreview();
-  m_View->CameraUpdate();
-
-}
-
-//----------------------------------------------------------------------------
-void mafOpSegmentation::UpdateVolumeSlice()
-//----------------------------------------------------------------------------
-{
-  if(!m_ManualVolumeSlice || !m_ManualVolumeMask || !m_ManualVolumeMask->GetOutput()->GetVTKData())
-    return;
-
-  m_OldSliceIndex = m_CurrentSliceIndex;
-  m_OldSlicePlane = m_CurrentSlicePlane;
-
-  
-  vtkDataSet *inputData = NULL;
-  
-  inputData = m_ManualVolumeMask->GetOutput()->GetVTKData();
-  inputData->Update();
-
-  vtkDataArray *inputScalars = inputData->GetPointData()->GetScalars();
-
-  vtkMAFSmartPointer<vtkUnsignedCharArray> scalars;
-  scalars->SetName("SCALARS");
-
-  double origin[3]; 
-
-  vtkDataSet *ds = m_Volume->GetOutput()->GetVTKData();
-  
-  GetSliceOrigin(origin);
-  
-  // Single slice volumes crashes on vmeshow
-  int numberOfSlices = 1;
-  int numberOfPoints;
-
-  ///////////////////////////////////////////////////////////////////
-  //Setting up Scalars this is the same both for structured point
-  //and for rectilinear grid
-  if(m_CurrentSlicePlane == XY)
-  {
-    numberOfPoints = m_VolumeDimensions[0]*m_VolumeDimensions[1];
-    scalars->SetNumberOfTuples(numberOfSlices*numberOfPoints);
-    int z=(m_CurrentSliceIndex-1);
-    for (int x=0; x<m_VolumeDimensions[0]; x++)
-      for (int y=0; y<m_VolumeDimensions[1]; y++)
-      { 
-        int volPos=x + y*m_VolumeDimensions[0] + z*m_VolumeDimensions[0]*m_VolumeDimensions[1];
-        int slicePos = x + y*m_VolumeDimensions[0] + 0;
-        scalars->SetTuple1(slicePos, inputScalars->GetTuple1(volPos) );
-      }
-  }
-
-  else if(m_CurrentSlicePlane == YZ)
-  {
-    numberOfPoints = m_VolumeDimensions[1] * m_VolumeDimensions[2];
-    scalars->SetNumberOfTuples(numberOfSlices*numberOfPoints);
-    int x=(m_CurrentSliceIndex-1);
-    for (int y=0; y<m_VolumeDimensions[1]; y++)
-      for (int z=0; z<m_VolumeDimensions[2]; z++)
-      { 
-        int volPos=x + y*m_VolumeDimensions[0] + z*m_VolumeDimensions[0]*m_VolumeDimensions[1];
-        int slicePos=0 + y*numberOfSlices + z*numberOfSlices*m_VolumeDimensions[1];
-        scalars->SetTuple1(slicePos, inputScalars->GetTuple1(volPos) );
-      }
-  }
-
-  else if(m_CurrentSlicePlane == XZ)
-  {
-    numberOfPoints = m_VolumeDimensions[0] * m_VolumeDimensions[2];
-    scalars->SetNumberOfTuples(numberOfSlices*numberOfPoints);
-    int y=(m_CurrentSliceIndex-1);
-    for (int x=0; x<m_VolumeDimensions[0]; x++)
-      for (int z=0; z<m_VolumeDimensions[2]; z++)
-      { 
-        int volPos=x + y*m_VolumeDimensions[0] + z*m_VolumeDimensions[0]*m_VolumeDimensions[1];
-        int slicePos=x + 0 + z*m_VolumeDimensions[0]*numberOfSlices;
-        scalars->SetTuple1(slicePos, inputScalars->GetTuple1(volPos) );
-      }
-  }
-
-
-  //////////////////////////////////////////////////////////////////////////
-  // spacing regolare: imagedata
-  //////////////////////////////////////////////////////////////////////////
-  if(ds->IsA("vtkStructuredPoints"))
-  {
-    vtkDataSet *imageData = m_ManualVolumeSlice->GetOutput()->GetVTKData();
-    vtkMAFSmartPointer<vtkStructuredPoints> newImageData;
-  
-    if(m_CurrentSlicePlane == XY)
-       newImageData->SetDimensions(m_VolumeDimensions[0],m_VolumeDimensions[1],numberOfSlices);
-    else if(m_CurrentSlicePlane == YZ)
-      newImageData->SetDimensions(numberOfSlices,m_VolumeDimensions[1],m_VolumeDimensions[2]);
-    else if(m_CurrentSlicePlane == XZ)
-      newImageData->SetDimensions(m_VolumeDimensions[0],numberOfSlices,m_VolumeDimensions[2]);
-
-    newImageData->SetSpacing(m_VolumeSpacing[0],m_VolumeSpacing[1],m_VolumeSpacing[2]);
-    newImageData->SetScalarTypeToUnsignedChar();
-    newImageData->SetOrigin(origin[0], origin[1], origin[2]);
-    newImageData->GetPointData()->AddArray(scalars);
-    newImageData->GetPointData()->SetActiveScalars("SCALARS");
-    newImageData->Update();
-    m_ManualVolumeSlice->SetData(newImageData,0.0);
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  // spacing non regolare: rectilineargrid
-  //////////////////////////////////////////////////////////////////////////
-  else
-  {
-
-    vtkDataSet *rgData = m_ManualVolumeSlice->GetOutput()->GetVTKData();
-
-    vtkMAFSmartPointer<vtkRectilinearGrid> newRgData;
-
-    vtkDataArray *x = vtkRectilinearGrid::SafeDownCast(inputData)->GetXCoordinates();
-    vtkDataArray *y = vtkRectilinearGrid::SafeDownCast(inputData)->GetYCoordinates();
-    vtkDataArray *z = vtkRectilinearGrid::SafeDownCast(inputData)->GetZCoordinates();
-
-
-    if(m_CurrentSlicePlane == XY)
-    {
-      z = vtkDoubleArray::New();
-      z->SetNumberOfComponents(1);
-      z->SetNumberOfTuples(1);
-      z->SetTuple1(0, origin[2]);
-      /*z->SetTuple1(1, origin[2] + 1.0);*/
-      newRgData->SetDimensions(m_VolumeDimensions[0],m_VolumeDimensions[1],numberOfSlices);
-    }
-    else if(m_CurrentSlicePlane == YZ)
-    {
-      x = vtkDoubleArray::New();
-      x->SetNumberOfComponents(1);
-      x->SetNumberOfTuples(1);
-      x->SetTuple1(0, origin[0]);
-      /*x->SetTuple1(1, origin[0] + 1.0);*/
-      newRgData->SetDimensions(numberOfSlices,m_VolumeDimensions[1],m_VolumeDimensions[2]);
-    }
-    else if(m_CurrentSlicePlane == XZ)
-    {
-      y = vtkDoubleArray::New();
-      y->SetNumberOfComponents(1);
-      y->SetNumberOfTuples(1);
-      y->SetTuple1(0, origin[1]);
-      /*y->SetTuple1(1, origin[1] + 1.0);*/
-      newRgData->SetDimensions(m_VolumeDimensions[0],numberOfSlices,m_VolumeDimensions[2]);
-    }
-    newRgData->SetXCoordinates(x);
-    newRgData->SetYCoordinates(y);
-    newRgData->SetZCoordinates(z);
-    newRgData->GetPointData()->AddArray(scalars);
-    newRgData->GetPointData()->SetActiveScalars("SCALARS");
-    newRgData->Update();
-    m_ManualVolumeSlice->SetData(newRgData, 0.0);
-    if (m_CurrentSlicePlane == YZ) vtkDEL(x);
-    else if (m_CurrentSlicePlane == XZ) vtkDEL(y);
-    else if (m_CurrentSlicePlane == XY) vtkDEL(z);
-  }
-  m_ManualColorLUT = m_ManualVolumeSlice->GetMaterial()->m_ColorLut;
-  InitMaskColorLut(m_ManualColorLUT);
-  m_ManualVolumeSlice->GetMaterial()->UpdateFromTables();
-  m_ManualVolumeSlice->Update();
-
-}
 
 //----------------------------------------------------------------------------
 void mafOpSegmentation::ApplyVolumeSliceChanges()
 //----------------------------------------------------------------------------
 {
-  vtkDataSet *inputDataSet = vtkDataSet::SafeDownCast(m_ManualVolumeMask->GetOutput()->GetVTKData());
-  vtkDataSet *sliceDataSet = vtkDataSet::SafeDownCast(m_ManualVolumeSlice->GetOutput()->GetVTKData());
+  vtkDataSet *inputDataSet = vtkDataSet::SafeDownCast(m_SegmentationVolume->GetOutput()->GetVTKData());
   
-  if (inputDataSet && sliceDataSet)
+  if (inputDataSet && m_SegmetationSlice)
   {
     vtkDataArray *inputScalars = inputDataSet->GetPointData()->GetScalars();
-    vtkDataArray *scalars = sliceDataSet->GetPointData()->GetScalars();
+    vtkDataArray *scalars = m_SegmetationSlice->GetPointData()->GetScalars();
 
     int numberOfPoints;
     int numberOfSlices=1;
@@ -4734,7 +3456,7 @@ void mafOpSegmentation::ApplyVolumeSliceChanges()
         }
     }
     
-    m_ManualVolumeMask->Update();
+    m_SegmentationVolume->Update();
   }
 
 }
@@ -4773,20 +3495,6 @@ void mafOpSegmentation::ResetRefinementUndoList()
   for (int i=0;i<m_RefinementUndoList.size();i++)
     vtkDEL(m_RefinementUndoList[i]);
   m_RefinementUndoList.clear();
-}
-
-
-//----------------------------------------------------------------------------
-void mafOpSegmentation::InitMaskColorLut(vtkLookupTable *lut)
-//----------------------------------------------------------------------------
-{
-  if(lut)
-  {
-    lut->SetNumberOfTableValues(2);
-    lut->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
-    lut->SetTableValue(1, 0.9, 0.1, 0.1, 0.4);
-    lut->SetTableRange(0,255);
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -4844,12 +3552,12 @@ bool mafOpSegmentation::ResetZoom(vtkDataSet* dataset, double visbleBounds[4])
 void mafOpSegmentation::CreateRealDrawnImage()
 //----------------------------------------------------------------------------
 {
-  m_ManualVolumeSlice->GetOutput()->GetVTKData()->Update();
+  m_SegmentationVolume->GetOutput()->GetVTKData()->Update();
   if(!m_RealDrawnImage)
   {
     m_RealDrawnImage = vtkUnsignedCharArray::New();
   }
-  m_RealDrawnImage->DeepCopy( m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
+  m_RealDrawnImage->DeepCopy( m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
   m_RealDrawnImage->SetName("SCALARS");
 }
 
@@ -4859,11 +3567,11 @@ void mafOpSegmentation::UndoBrushPreview()
 {
   if(m_RealDrawnImage)
   {
-    vtkImageData* dataSet = (vtkImageData*) m_ManualVolumeSlice->GetOutput()->GetVTKData();
+    vtkImageData* dataSet = (vtkImageData*) m_SegmentationVolume->GetOutput()->GetVTKData();
     dataSet->GetPointData()->SetScalars(m_RealDrawnImage);
     dataSet->Update();
-    m_ManualVolumeSlice->SetData(dataSet,m_Volume->GetTimeStamp());
-    m_ManualVolumeSlice->Update();
+    m_SegmentationVolume->SetData(dataSet,m_Volume->GetTimeStamp());
+    m_SegmentationVolume->Update();
     ApplyVolumeSliceChanges();
   }
 }
@@ -4871,18 +3579,11 @@ void mafOpSegmentation::UndoBrushPreview()
 void mafOpSegmentation::UpdateThresholdRealTimePreview()
 //----------------------------------------------------------------------------
 {
-//   if(m_OldAutomaticThreshold == m_AutomaticThreshold && m_OldAutomaticUpperThreshold == m_AutomaticUpperThreshold && m_OldSliceIndex == m_CurrentSliceIndex && m_OldSlicePlane != m_CurrentSlicePlane)
-//   {
-//     return;
-//   }
-//   m_OldSlicePlane = m_CurrentSlicePlane;
-//   m_OldAutomaticThreshold = m_AutomaticThreshold;
-//   m_OldAutomaticUpperThreshold = m_AutomaticUpperThreshold;
   
   mafVMESegmentationVolume *tVol;
   mafNEW(tVol);
 
-  tVol->SetVolumeLink(m_EmptyVolumeSlice);
+  tVol->SetVolumeLink(m_SegmentationVolume);
   tVol->SetName("Threshold Volume");
   tVol->ReparentTo(tVol->GetParent());
   tVol->SetDoubleThresholdModality(true);
@@ -4890,23 +3591,18 @@ void mafOpSegmentation::UpdateThresholdRealTimePreview()
 
 
   tVol->RemoveAllRanges();
-  if (m_AutomaticGlobalThreshold == RANGE)
-  {
-    int result;
-    tVol->SetAutomaticSegmentationThresholdModality(mafVMESegmentationVolume::RANGE);
-    for (int i=0;i<m_AutomaticRanges.size();i++)
-    {
-      if(m_CurrentSliceIndex >= m_AutomaticRanges[i].m_StartSlice + 1 && m_CurrentSliceIndex <= m_AutomaticRanges[i].m_EndSlice + 1)
-        result = tVol->AddRange(0,1,m_AutomaticRanges[i].m_ThresholdValue,m_AutomaticRanges[i].m_UpperThresholdValue);
-      
-//       if (result == MAF_ERROR)
-//       {
-//         return;
-//       }
-    }
-    if(tVol->GetNumberOfRanges() == 0)
-      result = tVol->AddRange(0,1,m_AutomaticThreshold,m_AutomaticUpperThreshold);
-  }
+	if (m_AutomaticGlobalThreshold == RANGE)
+	{
+		int result;
+		tVol->SetAutomaticSegmentationThresholdModality(mafVMESegmentationVolume::RANGE);
+		for (int i = 0; i < m_AutomaticRanges.size(); i++)
+		{
+			if (m_CurrentSliceIndex >= m_AutomaticRanges[i].m_StartSlice + 1 && m_CurrentSliceIndex <= m_AutomaticRanges[i].m_EndSlice + 1)
+				result = tVol->AddRange(0, 1, m_AutomaticRanges[i].m_ThresholdValue, m_AutomaticRanges[i].m_UpperThresholdValue);
+		}
+		if (tVol->GetNumberOfRanges() == 0)
+			result = tVol->AddRange(0, 1, m_AutomaticThreshold, m_AutomaticUpperThreshold);
+	}
   else
   {
     tVol->SetAutomaticSegmentationThresholdModality(mafVMESegmentationVolume::GLOBAL);
@@ -4917,33 +3613,6 @@ void mafOpSegmentation::UpdateThresholdRealTimePreview()
   tVol->GetOutput()->Update();
   tVol->Update();
 
-  if (vtkStructuredPoints::SafeDownCast(tVol->GetOutput()->GetVTKData()))
-  {
-    vtkStructuredPoints *newData = vtkStructuredPoints::SafeDownCast(tVol->GetAutomaticOutput());
-    m_ThresholdVolumeSlice->SetData(newData,m_Volume->GetTimeStamp());
-    vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ThresholdVolumeSlice)->GetOutput()->GetVTKData());
-    spVME->Update();
-
-  }
-  else if(vtkRectilinearGrid::SafeDownCast(tVol->GetOutput()->GetVTKData()))
-  {
-    vtkRectilinearGrid *newData = vtkRectilinearGrid::SafeDownCast(tVol->GetAutomaticOutput());
-    m_ThresholdVolumeSlice->SetData(newData,m_Volume->GetTimeStamp());
-    vtkRectilinearGrid *rgVME = vtkRectilinearGrid::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ThresholdVolumeSlice)->GetOutput()->GetVTKData());
-    rgVME->Update();
-  }
-
-  m_ThresholdVolumeSlice->Update();
-
-  m_SegmentationColorLUT = m_ThresholdVolumeSlice->GetMaterial()->m_ColorLut;
-  InitMaskColorLut(m_SegmentationColorLUT);
-
-  m_ThresholdVolumeSlice->GetMaterial()->m_ColorLut->SetTableRange(0,255);
-  mmaVolumeMaterial *currentVolumeMaterial = ((mafVMEOutputVolume *)m_ThresholdVolumeSlice->GetOutput())->GetMaterial();
-  currentVolumeMaterial->UpdateFromTables();
-  
-  m_ThresholdVolumeSlice->Modified();
-  m_ThresholdVolumeSlice->Update();
 
 	mafDEL(tVol);
 }
@@ -4952,12 +3621,13 @@ void mafOpSegmentation::UpdateThresholdRealTimePreview()
 bool mafOpSegmentation::SegmentedVolumeAccept(mafVME*node)
 //----------------------------------------------------------------------------
 {
+
+	/* TODO fix checks*/
   if(node != NULL  \
     && node->IsMAFType(mafVMEVolumeGray) \
     && m_CurrentVolumeParametersInitialized \
     && mafVMEVolumeGray::SafeDownCast(node)->GetOutput() != NULL \
     && mafVMEVolumeGray::SafeDownCast(node)->GetOutput()->GetVTKData() != NULL \
-//     && vtkDataSet::SafeDownCast(mafVMEVolumeGray::SafeDownCast(node)->GetOutput()->GetVTKData())->GetPointData()->GetScalars() != NULL
     )
   {
     mafVMEVolumeGray *volumeToCheck = mafVMEVolumeGray::SafeDownCast(node);
@@ -5094,7 +3764,7 @@ void mafOpSegmentation::OnEventFloodFill(mafEvent *e)
   int seed[3];
   double seedCoords[3];
   double origin[3];
-  vtkDataSet * dataSet = m_ManualVolumeMask->GetOutput()->GetVTKData();
+  vtkDataSet * dataSet = m_SegmentationVolume->GetOutput()->GetVTKData();
   dataSet->GetPoint(id,seedCoords);
   dataSet->GetPoint(0,origin);
 
