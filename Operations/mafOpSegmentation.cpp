@@ -105,7 +105,7 @@
 #include "vtkMAFVolumeToClosedSmoothSurface.h"
 #include "vtkMAFBinaryImageFloodFill.h"
 #include "vtkImageClip.h"
-#include "mafViewSlice.h"
+#include "mafViewSliceSegmentation.h"
 #include "mafPipeVolumeOrthoSlice.h"
 #include "vtkMAFVolumeOrthoSlicer.h"
 
@@ -425,7 +425,7 @@ void mafOpSegmentation::CreateOpDialog()
   mafSetFrame(m_Dialog);
 
   //Create rendering view   
-  m_View = new mafViewSlice("Volume Slice");  
+  m_View = new mafViewSliceSegmentation("View Segmentation Slice");  
   m_View->Create();
   m_View->GetGui();
 
@@ -622,7 +622,7 @@ void mafOpSegmentation::DeleteOpDialog()
   m_Volume->Update();
 	m_View->VmeShow(m_Volume, false);
 	m_View->VmeRemove(m_Volume);
-	m_View->VmeShow(m_SegmentationVolume, false);
+	m_View->VmeSegmentationShow(m_SegmentationVolume, false);
 	m_View->VmeRemove(m_SegmentationVolume);
 
   //////////////////////////////////////////////////////////////////////////
@@ -1493,7 +1493,7 @@ void mafOpSegmentation::InitSegmentationVolume()
 	m_SegmentationVolume->Update();
 
 	m_View->VmeAdd(m_SegmentationVolume);
-	m_View->VmeShow(m_SegmentationVolume, true);
+	m_View->VmeSegmentationShow(m_SegmentationVolume, true);
 	mafPipeVolumeOrthoSlice *pipeOrtho = (mafPipeVolumeOrthoSlice *)m_View->GetNodePipe(m_SegmentationVolume);
 	m_SegmetationSlice = (vtkImageData*)(pipeOrtho->GetSlicer(pipeOrtho->GetSliceDirection())->GetOutput());
 
@@ -1907,6 +1907,11 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 			OnUpdateSlice();
 		}
 		case ID_SLICE_PREV:
+		{
+			if (m_CurrentSliceIndex > 1)
+				m_CurrentSliceIndex--;
+			OnUpdateSlice();
+		}
 		case ID_SLICE_SLIDER:
 		{
 			OnUpdateSlice();
@@ -2888,6 +2893,7 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
 void mafOpSegmentation::InitializeView()
 {
   m_View->SetTextureInterpolate(false);
+	m_View->SetTrilinearInterpolation(false);
 
   // slicing the volume
   vtkDataSet *dataSet = m_Volume->GetOutput()->GetVTKData();

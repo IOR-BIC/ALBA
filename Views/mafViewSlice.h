@@ -146,7 +146,7 @@ public:
 
   void SetTextureInterpolate(bool interpolate) {m_TextureInterpolate = interpolate;};
 
-	void SetSliceAxis(int sliceAxis);
+	virtual void SetSliceAxis(int sliceAxis);
 
 protected:
 
