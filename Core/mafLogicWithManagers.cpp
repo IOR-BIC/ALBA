@@ -245,6 +245,9 @@ void mafLogicWithManagers::Init(int argc, char **argv)
 	wxString imagePath = mafGetApplicationDirectory().c_str();
 	imagePath += "\\Config\\ExampleAppAbout.bmp";
 	m_AboutDialog->SetImagePath(imagePath);
+
+	// Create and Open View
+	ViewCreate(VIEW_START + 1);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Configure()

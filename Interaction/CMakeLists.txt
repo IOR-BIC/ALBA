@@ -93,6 +93,7 @@ SET(PROJECT_SRCS
   mafGizmoCrossTranslate.cpp  				mafGizmoCrossTranslate.h
   mafGizmoCrossTranslateAxis.cpp  			mafGizmoCrossTranslateAxis.h
   mafGizmoCrossTranslatePlane.cpp  			mafGizmoCrossTranslatePlane.h
+	mafInteractorSlider.cpp								mafInteractorSlider.h
 )
 
 

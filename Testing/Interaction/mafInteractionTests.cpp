@@ -86,6 +86,7 @@
 #include "mafInteractor2DAngleTest.h"
 #include "mafInteractor2DIndicatorTest.h"
 #include "mafInteractorDICOMImporterTest.h"
+#include "mafInteractorSliderTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -194,6 +195,7 @@ int
 	runner.addTest(mafInteractor2DDistanceTest::suite());
  	runner.addTest(mafInteractor2DAngleTest::suite());
  	runner.addTest(mafInteractor2DIndicatorTest::suite());
+	runner.addTest(mafInteractorSliderTest::suite());
 
 	runner.run( controller );
 
