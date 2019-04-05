@@ -330,7 +330,8 @@ void mafOpSegmentation::OpRun()
   m_View->CameraReset();
   m_View->CameraUpdate();
   
-  OnNextStep();
+  Init();
+
   GetCameraAttribute(m_InitialFocalPoint, &m_InitialScaleFactor);
 
   int result = m_Dialog->ShowModal() == wxID_OK ? OP_RUN_OK : OP_RUN_CANCEL;
@@ -502,10 +503,11 @@ void mafOpSegmentation::CreateOpDialog()
   m_View->m_Rwi->SetSize(0,0,650,650);
   m_View->m_Rwi->Show(true);
 
-  m_LutSlider = new mafGUILutSlider(m_Dialog,-1,wxPoint(0,0),wxSize(650,24));
+	m_LutSlider = new mafGUILutSlider(m_Dialog,-1,wxPoint(0,0),wxSize(650,24));
   m_LutSlider->SetListener(this);
   m_LutSlider->SetSize(650,24);
   m_LutSlider->SetMinSize(wxSize(650,24));
+
 
 
   wxBoxSizer * hSz1 = new wxBoxSizer(wxHORIZONTAL);
@@ -552,7 +554,7 @@ void mafOpSegmentation::CreateOpDialog()
   m_OkButton->SetListener(this);
   m_OkButton->SetValidator(mafGUIValidator(this,ID_OK,m_OkButton));
 
-  m_OkButton->Enable(m_CurrentOperation != LOAD_SEGMENTATION);
+  m_OkButton->Enable(false);
  
   m_CancelButton = new mafGUIButton(m_Dialog,ID_CANCEL,_("Cancel"),defPos);
   m_CancelButton->SetListener(this);
@@ -574,16 +576,11 @@ void mafOpSegmentation::CreateOpDialog()
   m_GuiDialog->Divider();
 
   CreateSliceNavigationGui();
-
-  CreateLoadSegmentationGui();
-  CreateAutoSegmentationGui();
-  CreateManualSegmentationGui();
-  CreateRefinementGui();
+  CreateInitSegmentationGui();
+  CreateEditSegmentationGui();
   
-  m_SegmentationOperationsRollOut[LOAD_SEGMENTATION]        = m_GuiDialog->RollOut(ID_LOAD_SEGMENTATION, "Load Segmentation", m_SegmentationOperationsGui[LOAD_SEGMENTATION], false);
-  m_SegmentationOperationsRollOut[AUTOMATIC_SEGMENTATION]   = m_GuiDialog->RollOut(ID_AUTO_SEGMENTATION, "Thresholding", m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION], false);
-  m_SegmentationOperationsRollOut[MANUAL_SEGMENTATION]      = m_GuiDialog->RollOut(ID_MANUAL_SEGMENTATION, "Manual Segmentation", m_SegmentationOperationsGui[MANUAL_SEGMENTATION], false);
-  m_SegmentationOperationsRollOut[REFINEMENT_SEGMENTATION]  = m_GuiDialog->RollOut(ID_REFINEMENT, "Segmentation Refinement", m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION], false);
+  m_SegmentationOperationsRollOut[INIT_SEGMENTATION]   = m_GuiDialog->RollOut(ID_INIT_SEGMENTATION, "Init Segmentation", m_SegmentationOperationsGui[INIT_SEGMENTATION], false);
+  m_SegmentationOperationsRollOut[EDIT_SEGMENTATION]   = m_GuiDialog->RollOut(ID_EDIT_SEGMENTATION, "Edit Segmentation", m_SegmentationOperationsGui[EDIT_SEGMENTATION], false);
 
  /* m_GuiDialog->Enable(ID_LOAD_SEGMENTATION,false);
   m_GuiDialog->Enable(ID_AUTO_SEGMENTATION, false);
@@ -609,9 +606,6 @@ void mafOpSegmentation::CreateOpDialog()
   m_GuiDialog->Update();
 
   UpdateWindowing();
-
-  OnChangeThresholdType();
-
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::DeleteOpDialog()
@@ -660,7 +654,7 @@ void mafOpSegmentation::DeleteOpDialog()
   cppDEL(m_ManualBrushShapeRadioBox);
   cppDEL(m_ManualBrushSizeSlider);
 
-  for(int i=0;i<4;i++)
+  for(int i=0;i<NUMBER_OF_PHASES;i++)
   {
     cppDEL(m_SegmentationOperationsRollOut[i]);
     cppDEL(m_SegmentationOperationsGui[i]);
@@ -701,8 +695,8 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
     //On edit a new branch of redo-list starts, i need to clear the redo stack
     ResetManualRedoList();
 
-    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
-    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
+    m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
+    m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
 
     wxBusyCursor wait_cursor;
     wxBusyInfo wait(_("Wait! The algorithm could take long time!"));
@@ -785,8 +779,8 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
     //On edit a new branch of redo-list starts, i need to clear the redo stack
     ResetManualRedoList();
 
-    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
-    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
+    m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
+    m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
     vtkStructuredPoints *input = vtkStructuredPoints::New();
     double dimensions[3];
 
@@ -1194,7 +1188,7 @@ void mafOpSegmentation::CreateSliceNavigationGui()
 }
 
 //----------------------------------------------------------------------------
-void mafOpSegmentation::CreateAutoSegmentationGui()
+void mafOpSegmentation::CreateInitSegmentationGui()
 {
   mafGUI *currentGui = new mafGUI(this);
 
@@ -1265,21 +1259,15 @@ void mafOpSegmentation::CreateAutoSegmentationGui()
   currentGui->Button(ID_AUTO_UPDATE_RANGE,("Update"));
   currentGui->Label("");
 
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION] = currentGui;
-}
-//----------------------------------------------------------------------------
-void mafOpSegmentation::CreateLoadSegmentationGui()
-{
-  mafGUI *currentGui = new mafGUI(this);
+	currentGui->Label(&m_VolumeName);
+	currentGui->Button(ID_LOAD, "Load");
 
-  currentGui->Label(&m_VolumeName);
-  currentGui->Button(ID_LOAD_SEGMENTATION,"Load");
-  m_SegmentationOperationsGui[LOAD_SEGMENTATION] = currentGui;
+  m_SegmentationOperationsGui[INIT_SEGMENTATION] = currentGui;
 }
 //----------------------------------------------------------------------------
-void mafOpSegmentation::CreateManualSegmentationGui()
+void mafOpSegmentation::CreateEditSegmentationGui()
 {
-	  mafGUI *currentGui = new mafGUI(this);
+	mafGUI *currentGui = new mafGUI(this);
 
   wxString tools[2];
   tools[0] = wxString("brush");
@@ -1376,7 +1364,48 @@ void mafOpSegmentation::CreateManualSegmentationGui()
   EnableSizerContent(m_BucketEditingSizer,false);
   EnableSizerContent(m_BrushEditingSizer,true);
 
-  m_SegmentationOperationsGui[MANUAL_SEGMENTATION] = currentGui;
+	// Action: remove islands OR fill holes.
+	m_RefinementSegmentationAction = ID_REFINEMENT_ISLANDS_REMOVE;
+	wxString operations[2];
+	operations[ID_REFINEMENT_ISLANDS_REMOVE] = wxString("Remove Islands");
+	operations[ID_REFINEMENT_HOLES_FILL] = wxString("Fill Holes");
+
+	currentGui->Combo(ID_REFINEMENT_ACTION, "Action", &m_RefinementSegmentationAction, 2, operations);
+
+	// Size of islands/holes to be taken into consideration
+	m_RefinementRegionsSize = 1;
+	//currentGui->Integer(ID_REFINEMENT_REGIONS_SIZE, mafString("Size"), &m_RefinementRegionsSize, 0, MAXINT, mafString("Max size of islands/holes to be taken into consideration"));
+
+	int stepsNumber = 10;
+	w_id = currentGui->GetWidgetId(ID_MANUAL_REFINEMENT_REGIONS_SIZE);
+
+	int text_w = 45 * 0.8;
+	int slider_w = 120;
+
+	wxTextCtrl *refinementRegionSizeText = new wxTextCtrl(currentGui, w_id, "", wxDefaultPosition, wxSize(text_w, 18), wxSUNKEN_BORDER, wxDefaultValidator, "Size:");
+
+	wxSlider *sli = new wxSlider(currentGui, w_id, 1, 1, stepsNumber, wxDefaultPosition, wxSize(slider_w, 18));
+	sli->SetValidator(mafGUIValidator(currentGui, w_id, sli, &m_RefinementRegionsSize, refinementRegionSizeText));
+	refinementRegionSizeText->SetValidator(mafGUIValidator(currentGui, w_id, refinementRegionSizeText, &m_RefinementRegionsSize, sli, 1, stepsNumber)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
+	wxStaticText *sizeText = new wxStaticText(currentGui, w_id, "Size: ");
+	wxBoxSizer *regionSizeSizer = new wxBoxSizer(wxHORIZONTAL);
+	regionSizeSizer->Add(sizeText, 0);
+	regionSizeSizer->Add(refinementRegionSizeText, 0);
+	regionSizeSizer->Add(sli, 0);
+
+	currentGui->Add(regionSizeSizer);
+
+	// Switch on/off the "apply on every slice" option
+	m_RefinementEverySlice = 0;
+	currentGui->Bool(ID_REFINEMENT_EVERY_SLICE, mafString("Global"), &m_RefinementEverySlice, 0, mafString("Apply refinement procedure on every slice"));
+
+	m_RefinementIterative = 0;
+	currentGui->Bool(ID_REFINEMENT_REMOVE_PENINSULA_REGIONS, mafString("Apply to peninsula regions"), &m_RemovePeninsulaRegions, 1, mafString("Apply refinement on peninsula regions"));
+	currentGui->TwoButtons(ID_REFINEMENT_UNDO, ID_REFINEMENT_REDO, "Undo", "Redo");
+	currentGui->Button(ID_REFINEMENT_APPLY, mafString("Apply"), "");
+	currentGui->Divider();
+
+  m_SegmentationOperationsGui[EDIT_SEGMENTATION] = currentGui;
 
   EnableManualSegmentationGui();
 }
@@ -1390,54 +1419,7 @@ void mafOpSegmentation::EnableManualSegmentationGui()
   m_ManualBrushSizeSlider->Enable(true);
 
 }
-//----------------------------------------------------------------------------
-void mafOpSegmentation::CreateRefinementGui()
-{
-  mafGUI *currentGui = new mafGUI(this);
 
-  // Action: remove islands OR fill holes.
-  m_RefinementSegmentationAction = ID_REFINEMENT_ISLANDS_REMOVE;
-  wxString operations[2];
-  operations[ID_REFINEMENT_ISLANDS_REMOVE] = wxString("Remove Islands");
-  operations[ID_REFINEMENT_HOLES_FILL] = wxString("Fill Holes");
-
-  currentGui->Combo(ID_REFINEMENT_ACTION, "Action", &m_RefinementSegmentationAction, 2, operations);
-
-  // Size of islands/holes to be taken into consideration
-  m_RefinementRegionsSize = 1;
-  //currentGui->Integer(ID_REFINEMENT_REGIONS_SIZE, mafString("Size"), &m_RefinementRegionsSize, 0, MAXINT, mafString("Max size of islands/holes to be taken into consideration"));
-
-  int stepsNumber = 10;
-  int w_id = currentGui->GetWidgetId(ID_MANUAL_REFINEMENT_REGIONS_SIZE);
-
-  int text_w   = 45*0.8;
-  int slider_w = 120;
-
-  wxTextCtrl *refinementRegionSizeText = new wxTextCtrl (currentGui, w_id, "", wxDefaultPosition, wxSize(text_w,  18), wxSUNKEN_BORDER,wxDefaultValidator,"Size:");
-  
-  wxSlider *sli = new wxSlider(currentGui, w_id,1,1,stepsNumber, wxDefaultPosition, wxSize(slider_w,18));
-  sli->SetValidator(mafGUIValidator(currentGui,w_id,sli,&m_RefinementRegionsSize,refinementRegionSizeText));
-  refinementRegionSizeText->SetValidator(mafGUIValidator(currentGui,w_id,refinementRegionSizeText,&m_RefinementRegionsSize,sli,1,stepsNumber)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
-  wxStaticText *sizeText = new wxStaticText(currentGui,w_id,"Size: ");
-  wxBoxSizer *regionSizeSizer = new wxBoxSizer(wxHORIZONTAL);
-  regionSizeSizer->Add(sizeText,0);
-  regionSizeSizer->Add(refinementRegionSizeText, 0);
-  regionSizeSizer->Add(sli,  0);
-
-  currentGui->Add(regionSizeSizer);
-
-  // Switch on/off the "apply on every slice" option
-  m_RefinementEverySlice = 0;
-  currentGui->Bool(ID_REFINEMENT_EVERY_SLICE, mafString("Global"), &m_RefinementEverySlice, 0, mafString("Apply refinement procedure on every slice"));
-
-  m_RefinementIterative = 0;
-  currentGui->Bool(ID_REFINEMENT_REMOVE_PENINSULA_REGIONS, mafString("Apply to peninsula regions"), &m_RemovePeninsulaRegions, 1, mafString("Apply refinement on peninsula regions"));
-  currentGui->TwoButtons(ID_REFINEMENT_UNDO, ID_REFINEMENT_REDO, "Undo", "Redo");
-  currentGui->Button(ID_REFINEMENT_APPLY, mafString("Apply"), "");
-  currentGui->Divider();
-  m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION] = currentGui;
-
-}
 //----------------------------------------------------------------------------
 void mafOpSegmentation::InitGui()
 {
@@ -1501,18 +1483,7 @@ void mafOpSegmentation::InitSegmentationVolume()
 //------------------------------------------------------------------------
 void mafOpSegmentation::OnAutomaticStep()
 {
-  m_SegmentationPicker->SetFullModifiersMode(true);
-  //gui stuff
-  
-  m_SnippetsLabel->SetLabel( _(" 'Left Click + Ctrl' to select lower threshold. 'Left Click + Alt' to select upper threshold"));
-  wxFont boldFont = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
-  boldFont.SetWeight(wxBOLD);
-  m_SnippetsLabel->SetFont(boldFont);
-
-  m_Dialog->Update();
-  UpdateThresholdLabel();
-  m_GuiDialog->Enable(ID_AUTO_SEGMENTATION,true);
-  m_GuiDialog->Enable(ID_BUTTON_PREV,true);
+ 
 }
 
 //------------------------------------------------------------------------
@@ -1558,10 +1529,10 @@ void mafOpSegmentation::OnManualStep()
 
 
 
-  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_PICKING_MODALITY, m_CurrentSlicePlane);
-  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, false);
-  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
-  m_GuiDialog->Enable(ID_MANUAL_SEGMENTATION,true);
+  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_PICKING_MODALITY, m_CurrentSlicePlane);
+  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, false);
+  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
+  m_GuiDialog->Enable(EDIT_SEGMENTATION,true);
 
   m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
   m_CurrentBrushMoveEventCount = 0;
@@ -1579,16 +1550,11 @@ void mafOpSegmentation::OnManualStep()
 
   EnableSizerContent(m_BucketEditingSizer,false);
   EnableSizerContent(m_BrushEditingSizer,true);
-  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
 
   OnUpdateSlice();
 }
-//------------------------------------------------------------------------
-void mafOpSegmentation::OnAutomaticStepExit()
-//------------------------------------------------------------------------
-{
-  m_GuiDialog->Enable(ID_AUTO_SEGMENTATION,false);
-}
+
 //------------------------------------------------------------------------
 void mafOpSegmentation::OnManualStepExit()
 //------------------------------------------------------------------------
@@ -1613,7 +1579,7 @@ void mafOpSegmentation::OnManualStepExit()
   //apply residual changes
   ApplyVolumeSliceChanges(); 
   
-  m_GuiDialog->Enable(ID_MANUAL_SEGMENTATION,false);
+  m_GuiDialog->Enable(EDIT_SEGMENTATION,false);
 
   m_SnippetsLabel->SetLabel( _(""));
 }
@@ -1624,13 +1590,12 @@ void mafOpSegmentation::OnRefinementStep()
 {
   //gui stuff
   m_Dialog->Update();
-  m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, false);
-  m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, false);
-  m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_APPLY, true);
+  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, false);
+  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, false);
+  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_APPLY, true);
   m_GuiDialog->Enable(ID_BUTTON_NEXT,false);
-  m_GuiDialog->Enable(ID_REFINEMENT,true);
-  
-  //logic stuff
+
+	//logic stuff
   UpdateSlice();
 }
 
@@ -1638,7 +1603,7 @@ void mafOpSegmentation::OnRefinementStep()
 void mafOpSegmentation::OnLoadStep()
 //------------------------------------------------------------------------
 {
-  m_GuiDialog->Enable(ID_LOAD_SEGMENTATION,true);
+  m_GuiDialog->Enable(ID_LOAD,true);
   m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
   m_GuiDialog->Enable(ID_BUTTON_PREV,false);
 
@@ -1649,81 +1614,46 @@ void mafOpSegmentation::OnLoadStep()
 void mafOpSegmentation::OnNextStep()
 //------------------------------------------------------------------------
 {
-  switch (m_CurrentOperation)
-  {
-    case PRE_SEGMENTATION:
-    {
-      InitSegmentationVolume();
-      InitializeInteractors();
-      InitVolumeDimensions();
-      InitVolumeSpacing();
-      InitGui();
-      UpdateSlice();
-      UpdateWindowing();
-      InitGui();
+	m_GuiDialog->Enable(ID_LOAD, false);
+	m_SegmentationPicker->SetFullModifiersMode(true);
+	//gui stuff
 
-      //next step -> LOAD Segmentation
-      OnLoadStep();
-    } 
-    break;
-    case LOAD_SEGMENTATION:
-		{
-			m_GuiDialog->Enable(ID_LOAD_SEGMENTATION, false);
-			{
-				OnAutomaticStep();
-				UpdateThresholdRealTimePreview();
-				m_View->CameraUpdate();
-			}
-    }
-      break;
-    case AUTOMATIC_SEGMENTATION:
-    {
-      OnAutomaticStepExit();
-      m_AutomaticThresholdTextMapper->SetInput("");
-      m_GuiDialog->Enable(ID_AUTO_SEGMENTATION,false);
-      UpdateSlice();
-      m_GuiDialog->Enable(ID_BUTTON_PREV,true);
-      //next step -> MANUAL_SEGMENTATION
-      OnManualStep();
-    }
-    break;
-    case  MANUAL_SEGMENTATION:
-    {
-      OnManualStepExit();
-      //next step -> REFINEMENT_SEGMENTATION
-      OnRefinementStep();
-    }
-    break;
-    case REFINEMENT_SEGMENTATION:
-    {
-      m_GuiDialog->Enable(ID_REFINEMENT,false);
-      //next step -> none
-    }
-    break;
-    default:
-    {
-      mafLogMessage("Invalid Operation");
-      return;
-    }
-  }
-  m_CurrentOperation++;
-  m_OkButton->Enable(m_CurrentOperation != LOAD_SEGMENTATION);
-  m_Dialog->Update();
+	m_SnippetsLabel->SetLabel(_(" 'Left Click + Ctrl' to select lower threshold. 'Left Click + Alt' to select upper threshold"));
+	wxFont boldFont = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+	boldFont.SetWeight(wxBOLD);
+	m_SnippetsLabel->SetFont(boldFont);
 
-  int oldSliceIndex = m_CurrentSliceIndex;
+	m_Dialog->Update();
+	UpdateThresholdLabel();
+	m_GuiDialog->Enable(ID_EDIT_SEGMENTATION, true);
+	m_GuiDialog->Enable(ID_BUTTON_PREV, true);
 
-  if( (m_CurrentOperation-1) != PRE_SEGMENTATION)
-    m_SegmentationOperationsRollOut[m_CurrentOperation-1]->RollOut(false);
-  m_SegmentationOperationsRollOut[m_CurrentOperation]->RollOut(true);
+	m_SegmentationOperationsRollOut[INIT_SEGMENTATION]->RollOut(true);
+	m_SegmentationOperationsRollOut[EDIT_SEGMENTATION]->RollOut(false);
 
-  m_CurrentSliceIndex = oldSliceIndex;
-
-  m_SliceSlider->SetValue(m_CurrentSliceIndex);
-  m_SliceSlider->Update();
+	m_CurrentOperation++;
 
 
-  UpdateSlice();
+
+	UpdateSlice();
 }
+
+//----------------------------------------------------------------------------
+void mafOpSegmentation::Init()
+{
+	InitSegmentationVolume();
+	InitializeInteractors();
+	InitVolumeDimensions();
+	InitVolumeSpacing();
+	InitGui();
+	UpdateSlice();
+	UpdateWindowing();
+	InitGui();
+
+	//next step -> LOAD Segmentation
+	OnLoadStep();
+}
+
 //------------------------------------------------------------------------
 void mafOpSegmentation::OnPreviousStep()
 //------------------------------------------------------------------------
@@ -1732,40 +1662,15 @@ void mafOpSegmentation::OnPreviousStep()
   if (answer == wxNO)
     return;
   
-  switch (m_CurrentOperation)
-  {
-    case MANUAL_SEGMENTATION:
-    {
-      OnManualStepExit();
-    }
-    break;
-    case REFINEMENT_SEGMENTATION:
-    {
-      m_GuiDialog->Enable(ID_REFINEMENT,false);
-      OnManualStep();
-    }
-    break;
-    case AUTOMATIC_SEGMENTATION:
-      {
-        OnAutomaticStepExit();
-        OnLoadStep();
-      }
-      break;
-    default:
-    {
-      mafLogMessage("Invalid Operation");
-      return;
-    }
-  }
+  
 
   m_CurrentOperation--;
-  m_OkButton->Enable(m_CurrentOperation != LOAD_SEGMENTATION);
   m_Dialog->Update();
 
   int oldSliceIndex = m_CurrentSliceIndex;
 
-  m_SegmentationOperationsRollOut[m_CurrentOperation+1]->RollOut(false);
-  m_SegmentationOperationsRollOut[m_CurrentOperation]->RollOut(true);
+  m_SegmentationOperationsRollOut[INIT_SEGMENTATION]->RollOut(true);
+  m_SegmentationOperationsRollOut[EDIT_SEGMENTATION]->RollOut(false);
 
   m_CurrentSliceIndex = oldSliceIndex;
 
@@ -1784,13 +1689,13 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
-    if(e->GetSender() == m_SegmentationOperationsGui[LOAD_SEGMENTATION])
+    if(e->GetSender() == m_SegmentationOperationsGui[INIT_SEGMENTATION])
       OnLoadSegmentationEvent();
-    if(e->GetSender() == m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION])
+    if(e->GetSender() == m_SegmentationOperationsGui[INIT_SEGMENTATION])
       OnAutomaticSegmentationEvent(e);
-    else if(e->GetSender() == m_SegmentationOperationsGui[MANUAL_SEGMENTATION])
+    else if(e->GetSender() == m_SegmentationOperationsGui[EDIT_SEGMENTATION])
       OnManualSegmentationEvent(e);
-    else if(e->GetSender() == m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION])
+    else if(e->GetSender() == m_SegmentationOperationsGui[EDIT_SEGMENTATION])
       OnRefinementSegmentationEvent(e);
     else if (e->GetSender() == m_AutomaticPER && e->GetId()== MOUSE_MOVE)
     {
@@ -1825,10 +1730,10 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
     else if (e->GetSender() == m_SegmentationPicker && e->GetId()== mafInteractorSegmentationPicker::VME_ALT_PICKED)
     {
       //Picking during automatic segmentation
-      if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
+      if (m_CurrentOperation==INIT_SEGMENTATION)
       {
         m_AutomaticUpperThreshold = m_AutomaticMouseThreshold;
-        m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
+        m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
         m_AutomaticThreshold=min(m_AutomaticUpperThreshold,m_AutomaticThreshold);
         m_AutomaticThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
         UpdateThresholdLabel();
@@ -1836,7 +1741,7 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
         OnEventUpdateThresholdSlice();
       }
       //Picking during manual segmentation
-      else if(m_CurrentOperation == MANUAL_SEGMENTATION)
+      else if(m_CurrentOperation == EDIT_SEGMENTATION)
       {  
         if(m_ManualSegmentationTools == 1) // bucket
         {
@@ -1854,7 +1759,7 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
     {
     case MOUSE_WHEEL:
       {
-        if(m_CurrentOperation == MANUAL_SEGMENTATION && m_ManualSegmentationTools == 0)
+        if(m_CurrentOperation == EDIT_SEGMENTATION && m_ManualSegmentationTools == 0)
         {
           if(e->GetArg() < 0)
           {
@@ -1875,23 +1780,17 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
           OnBrushEvent(&dummyEvent);
           dummyPoints->Delete();
           m_View->CameraUpdate();
-          m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+          m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
           m_ManualSegmentationAction = oldAction;
           break;
         }
       }
       break;
     case ID_BUTTON_NEXT:
-      {
-        if (m_CurrentOperation < NUMBER_OF_OPERATIONS-1)//if the current operation isn't the last operation
-          OnNextStep();
-      }
+				OnNextStep();
       break;
     case ID_BUTTON_PREV:
-      {
-        if (m_CurrentOperation > 0)//if the current operation isn't the first operation
-          OnPreviousStep();
-      }
+        OnPreviousStep();
       break;
 		case ID_SLICE_NEXT: 
 		{
@@ -1921,51 +1820,45 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
       {
         m_CurrentSliceIndex = 1;
         m_View->SetSliceAxis(m_CurrentSlicePlane);
-        if (m_CurrentOperation==MANUAL_SEGMENTATION)
+        if (m_CurrentOperation== INIT_SEGMENTATION)
         {
           OnUpdateSlice();
           m_ManualRangeSlider->SetText(1,"Slices");  
           m_ManualRangeSlider->SetRange(1,m_VolumeDimensions[m_CurrentSlicePlane]);
           m_ManualRangeSlider->SetSubRange(1,m_VolumeDimensions[m_CurrentSlicePlane]);
         }
-        else if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
+        else if (m_CurrentOperation== INIT_SEGMENTATION) //TODO CHECK THRESHOLD SETTINGS
         {
           OnEventUpdateThresholdSlice();
         }
-        else if(m_CurrentOperation==LOAD_SEGMENTATION)
-        {
-          m_View->CameraUpdate();
-          m_GuiDialog->Update();
-        }
        
-        UpdateSlice();
         m_GuiDialog->Update();
-				if(m_CurrentOperation == MANUAL_SEGMENTATION)
+				if(m_CurrentOperation == EDIT_SEGMENTATION)
         {
           CreateRealDrawnImage();
         }
-        InitGui();
-        if (m_CurrentOperation == AUTOMATIC_SEGMENTATION)
+
+				if (m_CurrentOperation == INIT_SEGMENTATION)//TODO CHECK THRESHOLD SETTINGS
           OnChangeThresholdType();
-        else if(m_CurrentOperation == MANUAL_SEGMENTATION)
-          m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
-        m_View->CameraReset();
-        m_View->CameraUpdate();
+        else if(m_CurrentOperation == EDIT_SEGMENTATION)
+          m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
+
+				UpdateSlice();
         break;
       }
     case VME_PICKED:
       {
         //Picking during automatic segmentation
-        if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
+        if (m_CurrentOperation==INIT_SEGMENTATION)
         {
           m_AutomaticThreshold = m_AutomaticMouseThreshold;
           m_AutomaticUpperThreshold=max(m_AutomaticUpperThreshold,m_AutomaticThreshold);
-          m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
+          m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
           m_AutomaticThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
           UpdateThresholdLabel();
         }
         //Picking during manual segmentation
-        if(m_CurrentOperation == MANUAL_SEGMENTATION)
+        if(m_CurrentOperation == EDIT_SEGMENTATION)
         {
           if(m_ManualSegmentationTools == 1) // bucket
           {
@@ -1982,7 +1875,7 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
       }
     case VME_PICKING:
       {
-        if(m_CurrentOperation == MANUAL_SEGMENTATION && m_ManualSegmentationTools == 0)
+        if(m_CurrentOperation == EDIT_SEGMENTATION && m_ManualSegmentationTools == 0)
         {          
           OnBrushEvent(e);
           CreateRealDrawnImage();
@@ -2095,7 +1988,7 @@ void mafOpSegmentation::StartDraw(mafEvent *e, bool erase)
 
     //On edit a new branch of redo-list starts, i need to clear the redo stack
     ResetManualRedoList();
-    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
+    m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
   }
   else
   {
@@ -2118,7 +2011,7 @@ void mafOpSegmentation::OnEventUpdateThresholdSlice()
 void mafOpSegmentation::OnUpdateSlice()
 //------------------------------------------------------------------------
 {
-	if (m_CurrentOperation == MANUAL_SEGMENTATION)
+	if (m_CurrentOperation == EDIT_SEGMENTATION)
 	{
 		UndoBrushPreview();
 		ApplyVolumeSliceChanges();
@@ -2126,7 +2019,7 @@ void mafOpSegmentation::OnUpdateSlice()
 
 	UpdateSlice();
 
-	if (m_CurrentOperation == MANUAL_SEGMENTATION)
+	if (m_CurrentOperation == EDIT_SEGMENTATION)
 		CreateRealDrawnImage();
 }
 
@@ -2149,7 +2042,7 @@ void mafOpSegmentation::OnBrushEvent(mafEvent *e)
     SelectBrushImage(datasetPoint[0], datasetPoint[1], datasetPoint[2], m_ManualSegmentationAction == MANUAL_SEGMENTATION_SELECT);
     
 
-    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
+    m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
 
     m_View->CameraUpdate();
   }
@@ -2159,16 +2052,16 @@ void mafOpSegmentation::OnBrushEvent(mafEvent *e)
 void mafOpSegmentation::OnChangeThresholdType()
 //------------------------------------------------------------------------
 {
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_ADD_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_REMOVE_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_UPDATE_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_LIST_OF_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_INC_MIN_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_INC_MAX_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_DEC_MIN_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_DEC_MAX_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_DEC_MIDDLE_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTO_INC_MIDDLE_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_ADD_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_REMOVE_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_UPDATE_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_LIST_OF_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_INC_MIN_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_INC_MAX_RANGE,m_AutomaticGlobalThreshold == RANGE );
+  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_DEC_MIN_RANGE,m_AutomaticGlobalThreshold == RANGE );
+	m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_DEC_MAX_RANGE, m_AutomaticGlobalThreshold == RANGE);
+	m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_DEC_MIDDLE_RANGE, m_AutomaticGlobalThreshold == RANGE);
+  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_INC_MIDDLE_RANGE,m_AutomaticGlobalThreshold == RANGE );
   m_AutomaticRangeSlider->Enable(m_AutomaticGlobalThreshold == RANGE);
   
 
@@ -2203,7 +2096,7 @@ void mafOpSegmentation::OnAutomaticAddRange()
 
   m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
 
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
+  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
 
   UpdateThresholdLabel();
   UpdateThresholdRealTimePreview();
@@ -2252,7 +2145,7 @@ void mafOpSegmentation::OnAutomaticRemoveRange()
 
   m_GuiDialog->Enable(ID_BUTTON_NEXT, true);
 
-  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
+  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
 
   UpdateThresholdLabel();
   UpdateThresholdRealTimePreview();
@@ -2337,7 +2230,7 @@ void mafOpSegmentation::OnAutomaticUpdateRange()
 
     m_GuiDialog->Enable(ID_BUTTON_NEXT, true);
 
-    m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
+    m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
 
     UpdateThresholdLabel();
   }
@@ -2501,7 +2394,7 @@ void mafOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
 
         m_AutomaticRangeSlider->SetSubRange(min,max);
 
-        m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
+        m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
        
         m_AutomaticThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
       }
@@ -2546,7 +2439,7 @@ void mafOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
       UpdateSlice();
       m_View->CameraUpdate();
       InitGui();
-      m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+      m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
     }
 
     double focalPoint[3];
@@ -2593,7 +2486,7 @@ void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
       {
         m_ManualRangeSlider->Enable(false);
       }
-      m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+      m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
     }
     break;
   case ID_MANUAL_TOOLS:
@@ -2605,7 +2498,7 @@ void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 
         EnableSizerContent(m_BucketEditingSizer,false);
         EnableSizerContent(m_BrushEditingSizer,true);
-        m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+        m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
       }
       else
       {
@@ -2615,7 +2508,7 @@ void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
         EnableSizerContent(m_BucketEditingSizer,true);
         EnableSizerContent(m_BrushEditingSizer,false);
         m_ManualRangeSlider->Enable(m_GlobalFloodFill==TRUE);
-        m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+        m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
         UndoBrushPreview();
         OnUpdateSlice();
       }
@@ -2655,7 +2548,7 @@ void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
       OnBrushEvent(&dummyEvent);
       dummyPoints->Delete();
       m_View->CameraUpdate();
-      m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+      m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
       m_ManualSegmentationAction = oldAction;
     }
 		break;
@@ -2780,7 +2673,7 @@ void mafOpSegmentation::OnLoadSegmentationEvent()
 
 	if (newVolume)
 	{
-		m_SegmentationOperationsGui[LOAD_SEGMENTATION]->Update();
+		m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
 		vtkDataSet * loadVtkData = newVolume->GetOutput()->GetVTKData();
 		if(vtkRectilinearGrid::SafeDownCast(loadVtkData))
 			m_SegmentationVolume->SetData((vtkRectilinearGrid *)loadVtkData, m_SegmentationVolume->GetTimeStamp());
@@ -2796,7 +2689,7 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
   {
   case ID_REFINEMENT_ACTION:
     {
-      m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_ITERATIVE, m_RefinementSegmentationAction == ID_REFINEMENT_ISLANDS_REMOVE);
+      m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_ITERATIVE, m_RefinementSegmentationAction == ID_REFINEMENT_ISLANDS_REMOVE);
     }
     break;
   case ID_REFINEMENT_UNDO:
@@ -2824,8 +2717,8 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         vtkDEL(m_RefinementUndoList[numOfChanges-1]);
         m_RefinementUndoList.pop_back();
 
-        m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
-        m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
+        m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
+        m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
         UpdateSlice();
       }
@@ -2857,8 +2750,8 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         vtkDEL(m_RefinementRedoList[numOfChanges-1]);
         m_RefinementRedoList.pop_back();
 
-        m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
-        m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
+        m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
+        m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
         UpdateSlice();
       }
@@ -2877,8 +2770,8 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         break;
       }
 
-      m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
-      m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
+      m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
+      m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
       UpdateSlice();
       m_View->CameraUpdate();
@@ -3206,7 +3099,7 @@ void mafOpSegmentation::UpdateSliceLabel()
 //------------------------------------------------------------------------
 void mafOpSegmentation::UpdateThresholdLabel()
 {
-  if (m_CurrentOperation == AUTOMATIC_SEGMENTATION && (m_CurrentSlicePlane == XY || m_AutomaticGlobalThreshold == GLOBAL) )
+  if (m_CurrentOperation == INIT_SEGMENTATION && (m_CurrentSlicePlane == XY || m_AutomaticGlobalThreshold == GLOBAL) )
   {
     if (m_AutomaticGlobalThreshold == RANGE)
     {
@@ -3283,7 +3176,7 @@ void mafOpSegmentation::InitVolumeDimensions()
       m_AutomaticRangeSlider->SetRange(1,m_VolumeDimensions[2]);
       m_AutomaticRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
 
-      m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
+      m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
     }
   }
 }

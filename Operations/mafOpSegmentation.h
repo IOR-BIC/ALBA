@@ -93,10 +93,9 @@ public:
   {
     ID_OPERATION_TYPE = MINID,
     ID_PRE_SEGMENTATION,
-    ID_AUTO_SEGMENTATION,
-    ID_MANUAL_SEGMENTATION,
-    ID_REFINEMENT,
-    ID_LOAD_SEGMENTATION,
+    ID_INIT_SEGMENTATION,
+    ID_EDIT_SEGMENTATION,
+    ID_LOAD,
     ID_OK,
     ID_CANCEL,
     ID_VIEW,
@@ -152,12 +151,9 @@ public:
 
   enum OPERATIONS_IDS
   {
-    PRE_SEGMENTATION = 0,
-    LOAD_SEGMENTATION,
-    AUTOMATIC_SEGMENTATION,
-    MANUAL_SEGMENTATION,
-    REFINEMENT_SEGMENTATION,
-    NUMBER_OF_OPERATIONS,
+    INIT_SEGMENTATION = 0,
+    EDIT_SEGMENTATION,
+    NUMBER_OF_PHASES,
   };
 
   enum MANUAL_SEGMENTATION_IDS
@@ -220,16 +216,10 @@ protected:
   virtual void DeleteOpDialog(); 
   
   /** Creates GUI with commands for automatic segmentation. */
-  virtual void CreateAutoSegmentationGui();
+  virtual void CreateInitSegmentationGui();
   
   /**Creates GUI with commands for manual segmentation. */
-  virtual void CreateManualSegmentationGui();
-  
-  /**Creates GUI with commands for segmentation refinement. */
-  virtual void CreateRefinementGui();
-  
-  /**Creates GUI with commands for loading a previous segmentation. */
-  virtual void CreateLoadSegmentationGui();
+  virtual void CreateEditSegmentationGui();
   
   /** Creates GUI widgets to select the right slice (number of slice and plane)*/
   virtual void CreateSliceNavigationGui();
@@ -304,6 +294,8 @@ protected:
   /** Perform the initializations when the user press next button */
   void OnNextStep();
 
+	void Init();
+
   /** Perform the initializations when the user press previous button */
   void OnPreviousStep();
 
@@ -336,7 +328,7 @@ protected:
   wxSlider *m_SliceSlider;              //<Slice slider - GUI
   wxTextCtrl *m_SliceText;              //<Slice text box - GUI
   mafGUIRollOut *m_SegmentationOperationsRollOut[5]; //< Steps roll-out - GUI
-  mafGUI *m_SegmentationOperationsGui[5]; //<Steps gui
+  mafGUI *m_SegmentationOperationsGui[2]; //<Steps gui
   wxComboBox *m_OperationsList;         //<List if operations (not used)
   mafInteractor *m_OldBehavior;         //<Old volume behavior
   mafVME *m_OldVolumeParent;           //<Old volume parent
