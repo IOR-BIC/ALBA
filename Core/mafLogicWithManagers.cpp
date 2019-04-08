@@ -247,7 +247,7 @@ void mafLogicWithManagers::Init(int argc, char **argv)
 	m_AboutDialog->SetImagePath(imagePath);
 
 	// Create and Open View
-	ViewCreate(VIEW_START + 1);
+	//ViewCreate(VIEW_START + 1);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Configure()
