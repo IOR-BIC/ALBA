@@ -1617,6 +1617,67 @@ void mafGUI::MultipleButtons(int numButtons, int numColumns, std::vector<int> &i
 	Add(fgSizer, 0, wxALL | alignment, M);
 }
 //----------------------------------------------------------------------------
+void mafGUI::MultipleImageButtons(int numButtons, int numColumns, std::vector<int> &ids, std::vector<const char*> &labels, std::vector<const char*> &images, int alignment)
+{
+	std::vector<int> w_ids;
+	std::vector<mafGUIPicButton *> button_list;
+	for (int i = 0; i < ids.size(); i++)
+	{
+		w_ids.push_back(GetWidgetId(ids[i]));
+
+		mafGUIPicButton *btn = new mafGUIPicButton();
+		wxBitmap bitmap = mafPictureFactory::GetPictureFactory()->GetBmp(images[i]);
+
+		btn->Create(this, w_ids[i], bitmap, wxDefaultPosition, wxSize(FW / numColumns, bitmap.GetHeight()));
+		btn->SetBitmapLabel(bitmap);
+		btn->SetFont(m_Font);
+		btn->Refresh();
+		btn->SetValidator(mafGUIValidator(this, w_ids[i], btn));
+
+		wxString tooltip = labels[i];
+
+		if (!tooltip.IsEmpty())
+			btn->SetToolTip(tooltip);
+
+		button_list.push_back(btn);
+	}
+
+	int rows = numButtons / numColumns;
+	wxFlexGridSizer *fgSizer = new wxFlexGridSizer(rows, numColumns, 1, 1);
+	for (int i = 0; i < button_list.size(); i++)
+	{
+		fgSizer->Add(button_list[i], 0, 0);
+	}
+
+	Add(fgSizer, 0, wxALL | alignment, M);
+
+	//////////////////////////////////////////////////////////////////////////
+
+// 	int w_id = GetWidgetId(id);
+// 
+// 	int offset = 4;
+// 	wxSize size(bitmap.GetWidth() + offset, bitmap.GetHeight() + offset); //wxSize(DW, BH));
+// 
+// 	mafGUIPicButton *btn = new mafGUIPicButton();
+// 
+// 	btn->Create(this, w_id, bitmap, wxDefaultPosition, size);
+// 	btn->SetBitmapLabel(bitmap);
+// 	btn->SetFont(m_Font);
+// 	btn->Refresh();
+// 	btn->SetValidator(mafGUIValidator(this, w_id, btn));
+// 
+// 	if (!tooltip.IsEmpty())
+// 		btn->SetToolTip(tooltip.GetCStr());
+// 
+// 	wxStaticText *lab = new wxStaticText(this, w_id, label, dp, wxSize(LW, LH), wxALIGN_LEFT | wxST_NO_AUTORESIZE);
+// 
+// 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+// 	sizer->Add(btn, 0);
+// 	sizer->Add(lab, 0);
+// 
+// 	Add(sizer, 0, wxALL | wxEXPAND, M);
+}
+//----------------------------------------------------------------------------
 void mafGUI::OkCancel()
 {
 	mafGUIButton *b1 = new mafGUIButton(this, wxOK, "Ok", dp, wxSize(FW / 2, BH));

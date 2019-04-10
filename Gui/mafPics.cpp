@@ -163,6 +163,17 @@ void mafPictureFactory::Initialize()
 
 		#include <pic/HINT_IMAGE_ICON.xpm>
 		mafADDPIC(HINT_IMAGE_ICON);
+
+#include <pic/TOOL_PEN.xpm>
+		mafADDPIC(TOOL_PEN);
+#include <pic/TOOL_FILL.xpm>
+		mafADDPIC(TOOL_FILL);
+#include <pic/TOOL_BRUSH.xpm>
+		mafADDPIC(TOOL_BRUSH);
+#include <pic/TOOL_BRUSH2.xpm>
+		mafADDPIC(TOOL_BRUSH2);
+#include <pic/TOOL_ERASE.xpm>
+		mafADDPIC(TOOL_ERASE);
 }
 //----------------------------------------------------------------------------
 mafPictureFactory::~mafPictureFactory()

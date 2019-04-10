@@ -106,10 +106,14 @@ public:
     ID_SLICE_NEXT, 
     ID_SLICE_PREV,
     ID_SLICE_PLANE,
+		ID_SHOW_LABELS,
 	  ID_PRE_VOLUME_SPACING,
 	  ID_PRE_VOLUME_ZERO_VALUE,
     ID_MANUAL_PICKING_MODALITY,
     ID_MANUAL_TOOLS,
+		ID_MANUAL_TOOLS_BRUSH,
+		ID_MANUAL_TOOLS_FILL,
+		ID_MANUAL_TOOLS_ERASE,
     ID_MANUAL_BRUSH_SHAPE,
     ID_MANUAL_BRUSH_SIZE,
     ID_MANUAL_BUCKET_ACTION,
@@ -314,6 +318,7 @@ protected:
   int m_OldSlicePlane;                //<Old slice plane
   int m_NumSliceSliderEvents;         //<Number of events raised by the slider in a single interaction
   int m_CurrentOperation;             //<Current step
+	int m_ShowLabels;
   mafGUIDialog* m_Dialog;             //<Dialog - GUI
 	mafViewSliceSegmentation* m_View;                 //<Rendering Slice view
   mafGUIButton* m_OkButton;           //<Button -GUI
@@ -327,7 +332,8 @@ protected:
   vtkLookupTable *m_ManualColorLUT;     //Lookup table for segmented volume in manual step.
   wxSlider *m_SliceSlider;              //<Slice slider - GUI
   wxTextCtrl *m_SliceText;              //<Slice text box - GUI
-  mafGUIRollOut *m_SegmentationOperationsRollOut[5]; //< Steps roll-out - GUI
+	wxNotebook *m_SegmentationOperationsNotebook;
+	mafGUIHolder *m_SegmentationOperationsPanel[5];
   mafGUI *m_SegmentationOperationsGui[2]; //<Steps gui
   wxComboBox *m_OperationsList;         //<List if operations (not used)
   mafInteractor *m_OldBehavior;         //<Old volume behavior
@@ -383,6 +389,7 @@ protected:
   mafGUIFloatSlider *m_ManualBrushSizeSlider;   //<Brush size slider - GUI
   wxTextCtrl *m_ManualBrushSizeText;            //<Brush size text box - GUI
   wxRadioBox *m_ManualBrushShapeRadioBox;       //<Brush shape radio - GUI
+	wxRadioBox *m_ThresholdTypeRadioBox;					//<Threshold Type radio - GUI
   wxStaticBoxSizer *m_BrushEditingSizer;
   mafGUIButton *m_ManualApplyChanges;           //<Apply changes button - GUI
   int m_ManualSegmentationAction;               //<Manual segmentation action (draw/erease)
