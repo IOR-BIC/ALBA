@@ -113,8 +113,6 @@
 #include "wx/sizer.h"
 #include "mafGUIHolder.h"
 #include "mafGUIDockManager.h"
-#include "wx/os2/toplevel.h"
-
 
 
 #define SPACING_PERCENTAGE_BOUNDS 0.1
@@ -446,13 +444,18 @@ void mafOpSegmentation::CreateOpDialog()
   m_Dialog = new mafGUIDialog(m_Label, mafCLOSEWINDOW);  
   m_Dialog->SetListener(this);
 
-	int dialogSize[2] = { 850, 600 };
+
 
   m_GuiDialog = new mafGUI(this);
   m_GuiDialog->Reparent(m_Dialog);
 
   //Change default frame to our dialog
   wxWindow* oldFrame = mafGetFrame();
+
+	int fw, fh;
+	oldFrame->GetSize(&fw, &fh);
+	int dialogSize[2] = { 850, fh };
+
   mafSetFrame(m_Dialog);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -513,12 +516,14 @@ void mafOpSegmentation::CreateOpDialog()
   //InitializeInteractors();
 
   mafSetFrame(oldFrame);
+	int offset = 200;
+	int viewSize[2] = { dialogSize[1] - offset, dialogSize[1] - offset}; // 650x650
 
-	int viewPos[2] = { 0,0 };
-	int viewSize[2] = { 650,650 };
+	if (viewSize[0] < dialogSize[0] - 200) 
+		viewSize[0] = dialogSize[0] - 200;
 
   // Display window      
-	m_View->m_Rwi->SetSize(viewPos[0], viewPos[1], viewSize[0], viewSize[1]);
+	m_View->m_Rwi->SetSize(0, 0, viewSize[0], viewSize[1]);
   m_View->m_Rwi->Show(true);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -552,14 +557,13 @@ void mafOpSegmentation::CreateOpDialog()
   /////////////////////////////////////////////////////
 
 	wxBoxSizer *view_gui_Sizer = new wxBoxSizer(wxHORIZONTAL);
-
 	view_gui_Sizer->Add(view_lut_Sizer, 0, wxRIGHT);
 	view_gui_Sizer->Add(m_GuiDialog, 0, wxRIGHT);
 
 	//////////////////////////////////////////////////////////////////////////
 	// SNIPPETTS LAB Sizer
 
-  wxBoxSizer *snippets_Sizer = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer *snippets_Sizer = new wxBoxSizer(wxHORIZONTAL);
 	snippets_Sizer->SetMinSize(dialogSize[0], 20);
 
 	m_SnippetsLabel = new wxStaticText(m_Dialog, -1, "", defPos, wxSize(dialogSize[0], 20), wxALIGN_LEFT | wxST_NO_AUTORESIZE);
@@ -567,9 +571,8 @@ void mafOpSegmentation::CreateOpDialog()
 
 	snippets_Sizer->Add(m_SnippetsLabel, 0, wxEXPAND | wxALL, 5);
 
-	//////////////////////////////////////////////////////////////////////////
+	
 	// OK CANCEL BTN + PROGRESS BAR Sizer
-
 	wxBoxSizer *okCancel_progress_Sizer = new wxBoxSizer(wxHORIZONTAL);
 	okCancel_progress_Sizer->SetMinSize(dialogSize[0], 20);
 
@@ -653,10 +656,16 @@ void mafOpSegmentation::CreateOpDialog()
   m_GuiDialog->FitGui();
   m_GuiDialog->Update();
 
-  int x_pos,y_pos,w,h;
-  mafGetFrame()->GetPosition(&x_pos,&y_pos);
-  m_Dialog->GetSize(&w,&h);
-  m_Dialog->SetSize(x_pos+5,y_pos+5,w+50,h+50);
+//   int x_pos,y_pos,w,h;
+//   mafGetFrame()->GetPosition(&x_pos,&y_pos);
+//   m_Dialog->GetSize(&w,&h);
+//   m_Dialog->SetSize(x_pos+5,y_pos+5,w+50,h+50);
+
+	int x_pos = (fw - dialogSize[0]) / 2;
+	int y_pos = (fh - dialogSize[1]) / 2;
+
+	m_Dialog->SetSize(x_pos, y_pos, dialogSize[0], dialogSize[1]);
+
   m_GuiDialog->Update();
 
   m_ProgressBar->Show(false);
@@ -1197,10 +1206,8 @@ void mafOpSegmentation::CreateSliceNavigationGui()
 
 	////////////////////////////////////////////////////////////////////////
 	// SLICE SLIDER
-	////////////////////////////////////////////////////////////////////////
-
+	
 	wxPoint defPos = wxDefaultPosition;
-	wxSize size = wxDefaultSize;
 
 	int id_slider = m_GuiDialog->GetWidgetId(ID_SLICE_SLIDER);
 	int id_text = m_GuiDialog->GetWidgetId(ID_SLICE_TEXT);
@@ -1209,7 +1216,6 @@ void mafOpSegmentation::CreateSliceNavigationGui()
 	wxTextCtrl *slice_text = NULL;
 	wxStaticText *slice_lab = NULL;
 	wxStaticText *slice_foo = NULL;
-	wxBoxSizer *slice_sizer = new wxBoxSizer(wxHORIZONTAL);
 
 	slice_lab = new wxStaticText(m_GuiDialog, -1, "Slice: ", defPos, wxSize(55, 18), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
 	slice_foo = new wxStaticText(m_GuiDialog, -1, "", defPos, wxSize(8, 18), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
@@ -1228,7 +1234,8 @@ void mafOpSegmentation::CreateSliceNavigationGui()
 	b_incr_slice->SetValidator(mafGUIValidator(this, ID_SLICE_NEXT, b_incr_slice));
 	b_decr_slice->SetValidator(mafGUIValidator(this, ID_SLICE_PREV, b_decr_slice));
 
-	slice_sizer->Add(slice_lab, 0, wxRIGHT, 5);
+	wxBoxSizer *slice_sizer = new wxBoxSizer(wxHORIZONTAL);
+	slice_sizer->Add(slice_lab, 0, wxRIGHT);
 	slice_sizer->Add(slice_text, 0);
 	slice_sizer->Add(slice_foo, 0);
 	slice_sizer->Add(b_decr_slice, 0);
@@ -1239,8 +1246,7 @@ void mafOpSegmentation::CreateSliceNavigationGui()
 
 	//////////////////////////////////////////////////////////////////////////
 	// SLICE PLANES
-	//////////////////////////////////////////////////////////////////////////
-
+	
 	wxString planes[3]{ "YZ","XZ","XY" };
 
 	m_GuiDialog->Radio(ID_SLICE_PLANE, "Plane: ", &m_CurrentSlicePlane, 3, planes, 3, "Slice Plane");
@@ -1248,8 +1254,6 @@ void mafOpSegmentation::CreateSliceNavigationGui()
 	//////////////////////////////////////////////////////////////////////////
 
 	m_GuiDialog->Bool(ID_SHOW_LABELS, "Show labels", &m_ShowLabels, 1);
-
-	//////////////////////////////////////////////////////////////////////////
 	m_GuiDialog->Divider(1);
 
 	m_SliceSlider->SetValue(1);
@@ -1262,50 +1266,45 @@ void mafOpSegmentation::CreateInitSegmentationGui()
 
 	////////////////////////////////////////////////////////////////////////
 	// THRESHOLD TYPE Selection
-	////////////////////////////////////////////////////////////////////////
-	
+		
 	currentGui->Label("Threshold type", true);
 
 	wxString choices[3] = { _("Global"),_("Range"), _("Load") };
 	int w_id = currentGui->GetWidgetId(ID_AUTO_GLOBAL_THRESHOLD);
-
-	wxBoxSizer *thresholdTypeLabSizer = new wxBoxSizer(wxHORIZONTAL);
 	
 	m_ThresholdTypeRadioBox = new wxRadioBox(currentGui, w_id, "", wxDefaultPosition, wxSize(170, -1), 3, choices, 3);
 	m_ThresholdTypeRadioBox->SetValidator(mafGUIValidator(currentGui, w_id, m_ThresholdTypeRadioBox, &m_AutomaticGlobalThreshold));
+
+	wxBoxSizer *thresholdTypeLabSizer = new wxBoxSizer(wxHORIZONTAL);
 	thresholdTypeLabSizer->Add(m_ThresholdTypeRadioBox, 0, wxEXPAND, 2);
+	
 	currentGui->Add(thresholdTypeLabSizer);
 	currentGui->Divider(1);
 
 	////////////////////////////////////////////////////////////////////////
 	// THRESHOLD GLOBAL
-	////////////////////////////////////////////////////////////////////////
-
+	
   currentGui->Label(_("Threshold"),true);
 
-  std::vector<const char*> increaseLabels;
-  increaseLabels.push_back("+");
-  increaseLabels.push_back("+");
-  increaseLabels.push_back("+");
-  std::vector<const char*> decreaseLabels;
-  decreaseLabels.push_back("-");
-  decreaseLabels.push_back("-");
-  decreaseLabels.push_back("-");
-  double sr[2];
-  m_Volume->GetOutput()->GetVTKData()->GetScalarRange(sr);
+	std::vector<const char*> increaseLabels = { "+","+","+" };
+  std::vector<const char*> decreaseLabels = { "-","-","-" };
+
+  double scalarRange[2];
+  m_Volume->GetOutput()->GetVTKData()->GetScalarRange(scalarRange);
   
   // Threshold 
   //[ + ] [ + ] [ + ]
   //[min][range][max]
   //[ - ] [ - ] [ - ] 
 
-  m_AutomaticThreshold=sr[1];
-  m_AutomaticUpperThreshold=sr[1];
+  m_AutomaticThreshold=scalarRange[1];
+  m_AutomaticUpperThreshold=scalarRange[1];
+
   m_AutomaticThresholdSlider = new mafGUILutSlider(currentGui,-1,wxPoint(0,0),wxSize(300,24));
   m_AutomaticThresholdSlider->SetListener(this);
   m_AutomaticThresholdSlider->SetText(1,"Threshold");  
-  m_AutomaticThresholdSlider->SetRange(sr[0],sr[1]);
-  m_AutomaticThresholdSlider->SetSubRange(sr[1],sr[1]);
+  m_AutomaticThresholdSlider->SetRange(scalarRange[0],scalarRange[1]);
+  m_AutomaticThresholdSlider->SetSubRange(scalarRange[1],scalarRange[1]);
 
 	std::vector<int> increaseTrIDs = { ID_AUTO_INC_MIN_THRESHOLD, ID_AUTO_INC_MIDDLE_THRESHOLD,ID_AUTO_INC_MAX_THRESHOLD };
   currentGui->MultipleButtons(3,3,increaseTrIDs,increaseLabels);
@@ -1318,8 +1317,7 @@ void mafOpSegmentation::CreateInitSegmentationGui()
 
 	////////////////////////////////////////////////////////////////////////
 	// THRESHOLD RANGE
-	////////////////////////////////////////////////////////////////////////
-  
+	  
   // Slides Range
   //[ + ] [ + ] [ + ]
   //[min][range][max]
@@ -1334,14 +1332,13 @@ void mafOpSegmentation::CreateInitSegmentationGui()
   m_AutomaticRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
 
 	std::vector<int> increaseIDs = { ID_AUTO_INC_MIN_RANGE, ID_AUTO_INC_MIDDLE_RANGE,ID_AUTO_INC_MAX_RANGE };
-  currentGui->MultipleButtons(3,3,increaseIDs,increaseLabels);
+	currentGui->MultipleButtons(3, 3, increaseIDs, increaseLabels);
   
   currentGui->Add(m_AutomaticRangeSlider);
   
 	std::vector<int> decreaseIDs = { ID_AUTO_DEC_MIN_RANGE, ID_AUTO_DEC_MIDDLE_RANGE, ID_AUTO_DEC_MAX_RANGE };
-	currentGui->MultipleButtons(3,3,decreaseIDs,decreaseLabels);
-
-
+	currentGui->MultipleButtons(3, 3, decreaseIDs, decreaseLabels);
+	
   m_AutomaticListOfRange = currentGui->ListBox(ID_AUTO_LIST_OF_RANGE,"");
   currentGui->TwoButtons(ID_AUTO_ADD_RANGE,ID_AUTO_REMOVE_RANGE,("Add"),_("Remove"));
   currentGui->Button(ID_AUTO_UPDATE_RANGE,("Update"));
@@ -1349,8 +1346,7 @@ void mafOpSegmentation::CreateInitSegmentationGui()
 
 	////////////////////////////////////////////////////////////////////////
 	// LOAD RANGE
-	////////////////////////////////////////////////////////////////////////
-
+	
 	currentGui->Label(&m_VolumeName);
 	currentGui->Button(ID_LOAD, "Load");
 	currentGui->Divider(1);
@@ -1378,30 +1374,28 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 
   //////////////////////////////////////////////////////////////////////////
   // Brush Editing options
-  m_BrushEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Brush Options");
   
   // BRUSH SHAPE
-  wxString shapes[2];
-  shapes[0] = wxString("circle");
-  shapes[1] = wxString("square");
+	wxString shapes[2] = { "circle" , "square" };
+	
 	int w_id = currentGui->GetWidgetId(ID_MANUAL_BRUSH_SHAPE);
-
-  wxBoxSizer *brushShapesSizer = new wxBoxSizer(wxHORIZONTAL);
-  wxStaticText *brushShapeLab = new wxStaticText(currentGui, w_id, "Shape");
+	wxStaticText *brushShapeLab = new wxStaticText(currentGui, w_id, "Shape");
 
   m_ManualBrushShapeRadioBox = new wxRadioBox(currentGui, w_id, "",wxDefaultPosition, wxSize(130,-1), 2, shapes, 2);
   m_ManualBrushShapeRadioBox->SetValidator( mafGUIValidator(currentGui, w_id, m_ManualBrushShapeRadioBox, &m_ManualBrushShape) );
-  brushShapesSizer->Add( brushShapeLab,  0, wxRIGHT, 5);
-  brushShapesSizer->Add(m_ManualBrushShapeRadioBox,0, wxRIGHT, 2);
+  
+	wxBoxSizer *brushShapesSizer = new wxBoxSizer(wxHORIZONTAL);
+	brushShapesSizer->Add(brushShapeLab, 0, wxRIGHT, 5);
+  brushShapesSizer->Add(m_ManualBrushShapeRadioBox, 0, wxRIGHT, 2);
 
+	//////////////////////////////////////////////////////////////////////////
   // BRUSH SIZE
   m_ManualBrushSize = 1;
 
   wxStaticText *brushSizeLab  = NULL;
   int id = currentGui->GetWidgetId(ID_MANUAL_BRUSH_SIZE);
-  wxBoxSizer *brushSizeSizer = new wxBoxSizer(wxHORIZONTAL);
 
-  brushSizeLab = new wxStaticText(currentGui, id, "Size (unit)", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+	brushSizeLab = new wxStaticText(currentGui, id, "Size (unit)", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
 
   m_ManualBrushSizeText = new wxTextCtrl(currentGui, id, "", wxDefaultPosition, wxSize(40, 18));
   m_ManualBrushSizeSlider = new mafGUIFloatSlider(currentGui, id,m_ManualBrushSize,1,int(min(m_VolumeDimensions[0],m_VolumeDimensions[1])/2), wxDefaultPosition, wxDefaultSize);
@@ -1419,18 +1413,19 @@ void mafOpSegmentation::CreateEditSegmentationGui()
   m_ManualBrushSizeSlider->Update();
   m_ManualBrushSizeText->Update();
 
+	wxBoxSizer *brushSizeSizer = new wxBoxSizer(wxHORIZONTAL);
   brushSizeSizer->Add(brushSizeLab,  0, wxRIGHT, 5);
   brushSizeSizer->Add(m_ManualBrushSizeText, 0);
   brushSizeSizer->Add(m_ManualBrushSizeSlider, 0);
 
+	m_BrushEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Brush Options");
   m_BrushEditingSizer->Add(brushShapesSizer, 0, wxALL, 1);
   m_BrushEditingSizer->Add(brushSizeSizer, 0, wxALL, 1);
 
-	  //////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
   // Fill Editing options
   m_BucketEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Bucket Options");
 
-  // BRUSH SHAPE
   w_id = currentGui->GetWidgetId(ID_MANUAL_BUCKET_GLOBAL);
   wxCheckBox *globalCheck = new wxCheckBox(currentGui,w_id,"Iterative");
   globalCheck->SetValidator(mafGUIValidator(currentGui, w_id, globalCheck, &m_GlobalFloodFill));
@@ -1440,6 +1435,7 @@ void mafOpSegmentation::CreateEditSegmentationGui()
   m_ManualRangeSlider->SetText(1,"Slices");  
   m_ManualRangeSlider->SetRange(1,m_VolumeDimensions[2]);
   m_ManualRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
+
   m_BucketEditingSizer->Add(globalCheck, 0, wxALL, 1);
   m_BucketEditingSizer->Add(m_ManualRangeSlider, 0, wxALL, 1);
 	
@@ -1449,9 +1445,10 @@ void mafOpSegmentation::CreateEditSegmentationGui()
   /*currentGui->Bool(-1,"Global",&m_GlobalFloodFill,1,"");*/
   currentGui->TwoButtons(ID_MANUAL_UNDO,ID_MANUAL_REDO,"Undo","Redo");
 
-  EnableSizerContent(m_BucketEditingSizer,false);
-  EnableSizerContent(m_BrushEditingSizer,true);
+  EnableSizerContent(m_BucketEditingSizer, false);
+	EnableSizerContent(m_BrushEditingSizer, true);
 
+	//////////////////////////////////////////////////////////////////////////
 	// Action: remove islands OR fill holes.
 	m_RefinementSegmentationAction = ID_REFINEMENT_ISLANDS_REMOVE;
 	wxString operations[2];
@@ -1460,6 +1457,7 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 
 	currentGui->Combo(ID_REFINEMENT_ACTION, "Action", &m_RefinementSegmentationAction, 2, operations);
 
+	//////////////////////////////////////////////////////////////////////////
 	// Size of islands/holes to be taken into consideration
 	m_RefinementRegionsSize = 1;
 	//currentGui->Integer(ID_REFINEMENT_REGIONS_SIZE, mafString("Size"), &m_RefinementRegionsSize, 0, MAXINT, mafString("Max size of islands/holes to be taken into consideration"));
@@ -1467,15 +1465,14 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 	int stepsNumber = 10;
 	w_id = currentGui->GetWidgetId(ID_MANUAL_REFINEMENT_REGIONS_SIZE);
 
-	int text_w = 45 * 0.8;
-	int slider_w = 120;
-
-	wxTextCtrl *refinementRegionSizeText = new wxTextCtrl(currentGui, w_id, "", wxDefaultPosition, wxSize(text_w, 18), wxSUNKEN_BORDER, wxDefaultValidator, "Size:");
-
-	wxSlider *sli = new wxSlider(currentGui, w_id, 1, 1, stepsNumber, wxDefaultPosition, wxSize(slider_w, 18));
-	sli->SetValidator(mafGUIValidator(currentGui, w_id, sli, &m_RefinementRegionsSize, refinementRegionSizeText));
-	refinementRegionSizeText->SetValidator(mafGUIValidator(currentGui, w_id, refinementRegionSizeText, &m_RefinementRegionsSize, sli, 1, stepsNumber)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
 	wxStaticText *sizeText = new wxStaticText(currentGui, w_id, "Size: ");
+	
+	wxTextCtrl *refinementRegionSizeText = new wxTextCtrl(currentGui, w_id, "", wxDefaultPosition, wxSize(36, 18), wxSUNKEN_BORDER, wxDefaultValidator, "Size:");
+	wxSlider *sli = new wxSlider(currentGui, w_id, 1, 1, stepsNumber, wxDefaultPosition, wxSize(120, 18));
+
+	refinementRegionSizeText->SetValidator(mafGUIValidator(currentGui, w_id, refinementRegionSizeText, &m_RefinementRegionsSize, sli, 1, stepsNumber)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
+	sli->SetValidator(mafGUIValidator(currentGui, w_id, sli, &m_RefinementRegionsSize, refinementRegionSizeText));
+	
 	wxBoxSizer *regionSizeSizer = new wxBoxSizer(wxHORIZONTAL);
 	regionSizeSizer->Add(sizeText, 0);
 	regionSizeSizer->Add(refinementRegionSizeText, 0);
