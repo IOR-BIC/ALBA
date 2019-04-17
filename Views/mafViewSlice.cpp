@@ -76,7 +76,6 @@ const int LAST_SLICE_ORIGIN_VALUE_NOT_INITIALIZED = 0;
 //----------------------------------------------------------------------------
 mafViewSlice::mafViewSlice(wxString label /* =  */, int camera_position /* = CAMERA_CT */, bool show_axes /* = false */, bool show_grid /* = false */,  int stereo /* = 0 */,bool showTICKs/* =false */,bool textureInterpolate/* =true */)
 :mafViewVTK(label,camera_position,show_axes,show_grid, stereo)
-//----------------------------------------------------------------------------
 {
   m_CurrentVolume = NULL;
   m_Border        = NULL;
@@ -109,7 +108,6 @@ mafViewSlice::mafViewSlice(wxString label /* =  */, int camera_position /* = CAM
 }
 //----------------------------------------------------------------------------
 mafViewSlice::~mafViewSlice()
-//----------------------------------------------------------------------------
 {
   BorderDelete();
   vtkDEL(m_TextMapper);
@@ -121,7 +119,6 @@ mafViewSlice::~mafViewSlice()
 }
 //----------------------------------------------------------------------------
 mafView *mafViewSlice::Copy(mafObserver *Listener, bool lightCopyEnabled)
-//----------------------------------------------------------------------------
 {
   m_LightCopyEnabled = lightCopyEnabled;
   mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_StereoType,m_ShowVolumeTICKs,m_TextureInterpolate);
@@ -132,9 +129,9 @@ mafView *mafViewSlice::Copy(mafObserver *Listener, bool lightCopyEnabled)
   v->Create();
   return v;
 }
+
 //----------------------------------------------------------------------------
 void mafViewSlice::Create()
-//----------------------------------------------------------------------------
 {
   if(m_LightCopyEnabled) return; //COPY_LIGHT
 
@@ -168,11 +165,8 @@ void mafViewSlice::Create()
   m_Rwi->m_RenFront->AddActor(m_TextActor);
 }
 
-
-
 //----------------------------------------------------------------------------
 void mafViewSlice::SetTextColor(double color[3])
-//----------------------------------------------------------------------------
 {
   m_TextColor[0]=color[0];
   m_TextColor[1]=color[1];
@@ -182,7 +176,6 @@ void mafViewSlice::SetTextColor(double color[3])
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::UpdateText(int ID)
-//----------------------------------------------------------------------------
 {
   m_Text = "";
 
@@ -219,7 +212,6 @@ void mafViewSlice::UpdateText(int ID)
 //----------------------------------------------------------------------------
 //Give an initial origin and normal (optionally) for the slice.
 void mafViewSlice::InitializeSlice(double* Origin, double* Normal)
-//----------------------------------------------------------------------------
 {
   memcpy(m_Slice,Origin,sizeof(m_Slice));
   if (Normal != NULL) {
@@ -253,9 +245,7 @@ void mafViewSlice::InitializeSlice(double* Origin, double* Normal)
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::VmeCreatePipe(mafVME *vme)
-//----------------------------------------------------------------------------
-{
-  
+{  
   mafString pipe_name = "";
   GetVisualPipeName(vme, pipe_name);
 
@@ -388,7 +378,6 @@ void mafViewSlice::VmeCreatePipe(mafVME *vme)
 
 //----------------------------------------------------------------------------
 void mafViewSlice::VmeDeletePipe(mafVME *vme)
-//----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
 
@@ -410,7 +399,6 @@ void mafViewSlice::VmeDeletePipe(mafVME *vme)
 }
 //-------------------------------------------------------------------------
 int mafViewSlice::GetNodeStatus(mafVME *vme)
-//-------------------------------------------------------------------------
 {
   mafSceneNode *n = NULL;
 
@@ -447,9 +435,9 @@ int mafViewSlice::GetNodeStatus(mafVME *vme)
 
   return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
 }
+
 //-------------------------------------------------------------------------
 mafGUI *mafViewSlice::CreateGui()
-//-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
   m_Gui = mafView::CreateGui();
@@ -483,7 +471,6 @@ mafGUI *mafViewSlice::CreateGui()
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
 {
   // Added by Losi 11.25.2009
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -533,7 +520,6 @@ void mafViewSlice::OnEvent(mafEventBase *maf_event)
 
 //----------------------------------------------------------------------------
 void mafViewSlice::SetLutRange(double low_val, double high_val)
-//----------------------------------------------------------------------------
 {
   if(!m_CurrentVolume) 
     return;
@@ -549,9 +535,7 @@ void mafViewSlice::SetLutRange(double low_val, double high_val)
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::SetSlice(double* Origin, double* Normal)
-//----------------------------------------------------------------------------
-{
-  
+{  
   //set slice origin and normal
   if (Origin != NULL)
   {
@@ -559,7 +543,6 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
     m_LastSliceOrigin[0] = m_Slice[0];
     m_LastSliceOrigin[1] = m_Slice[1];
     m_LastSliceOrigin[2] = m_Slice[2];
-
   }
   
   if (Normal != NULL)
@@ -623,7 +606,6 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
 //----------------------------------------------------------------------------
 //Get the slice origin coordinates and normal.
 void mafViewSlice::GetSlice(double* Origin, double* Normal)
-//----------------------------------------------------------------------------
 {
   if (Origin != NULL)
     memcpy(Origin, m_Slice, sizeof(m_Slice));
@@ -634,7 +616,6 @@ void mafViewSlice::GetSlice(double* Origin, double* Normal)
 
 //----------------------------------------------------------------------------
 void mafViewSlice::BorderUpdate()
-//----------------------------------------------------------------------------
 {
   if (NULL != m_Border)
   {
@@ -644,7 +625,6 @@ void mafViewSlice::BorderUpdate()
 
 //----------------------------------------------------------------------------
 void mafViewSlice::BorderCreate(double col[3])
-//----------------------------------------------------------------------------
 {
   m_BorderColor[0] = col[0];
   m_BorderColor[1] = col[1];
@@ -689,7 +669,6 @@ void mafViewSlice::BorderCreate(double col[3])
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::SetBorderOpacity(double value)
-//----------------------------------------------------------------------------
 {
   if(m_Border)
   {
@@ -700,7 +679,6 @@ void mafViewSlice::SetBorderOpacity(double value)
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::BorderDelete()
-//----------------------------------------------------------------------------
 {
   if(m_Border)
   {
@@ -711,7 +689,6 @@ void mafViewSlice::BorderDelete()
 
 //----------------------------------------------------------------------------
 void mafViewSlice::UpdateSurfacesList(mafVME *vme)
-//----------------------------------------------------------------------------
 {
   mafSceneNode *sceneNode = m_Sg->Vme2Node(vme);
   for(int i=0;i<m_CurrentSurface.size();i++)
@@ -733,7 +710,6 @@ void mafViewSlice::UpdateSurfacesList(mafVME *vme)
 
 //----------------------------------------------------------------------------
 void mafViewSlice::VmeShow(mafVME *vme, bool show)
-//----------------------------------------------------------------------------
 {
   if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
   {
@@ -756,7 +732,6 @@ void mafViewSlice::VmeShow(mafVME *vme, bool show)
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::VmeRemove(mafVME *vme)
-//----------------------------------------------------------------------------
 {
   this->UpdateSurfacesList(vme);
   Superclass::VmeRemove(vme);
@@ -776,7 +751,6 @@ void mafViewSlice::Print(std::ostream& os, const int tabs)// const
 
 //-------------------------------------------------------------------------
 void mafViewSlice::MultiplyPointByInputVolumeABSMatrix(double *point)
-//-------------------------------------------------------------------------
 {
   if(m_CurrentVolume && m_CurrentVolume->GetVme())
   {
@@ -798,10 +772,9 @@ void mafViewSlice::MultiplyPointByInputVolumeABSMatrix(double *point)
   } 
 }
 
-
+//-------------------------------------------------------------------------
 void mafViewSlice::CameraUpdate()
-{  
-  
+{    
   if (m_CurrentVolume)
   {
     mafVME *volume = m_CurrentVolume->GetVme();
@@ -839,7 +812,6 @@ void mafViewSlice::CameraUpdate()
   }
   else
   {
-
     if (DEBUG_MODE == true)
       mafLogMessage("Calling Superclass Camera Update ");
   
@@ -847,15 +819,13 @@ void mafViewSlice::CameraUpdate()
   }
 }
 
-
-
+//-------------------------------------------------------------------------
 void mafViewSlice::SetCameraParallelToDataSetLocalAxis( int axis )
 {
   double oldCameraPosition[3] = {0,0,0};
   double oldCameraFocalPoint[3] = {0,0,0};
   double *oldCameraOrientation;
-
-
+	
   this->GetRWI()->GetCamera()->GetFocalPoint(oldCameraFocalPoint);
   this->GetRWI()->GetCamera()->GetPosition(oldCameraPosition);
   oldCameraOrientation = this->GetRWI()->GetCamera()->GetOrientation();
@@ -894,8 +864,7 @@ void mafViewSlice::SetCameraParallelToDataSetLocalAxis( int axis )
     mafTransform::GetVersor(mafTransform::Z,mafMatrix(vmeABSMatrix),newCameraViewUp );
 
     double yVersor[3] = {0,0,0};  
-
-
+		
     mafTransform::GetVersor(mafTransform::Y,mafMatrix(vmeABSMatrix),yVersor );
     mafTransform::MultiplyVectorByScalar(-100, yVersor, yVersor);
     mafTransform::AddVectors(newCameraFocalPoint, yVersor, newCameraPosition);
@@ -920,6 +889,7 @@ void mafViewSlice::SetCameraParallelToDataSetLocalAxis( int axis )
 
 }
 
+//-------------------------------------------------------------------------
 void mafViewSlice::CameraUpdateForRotatedVolumes()
 {
   if (m_CameraPositionId == CAMERA_OS_X)

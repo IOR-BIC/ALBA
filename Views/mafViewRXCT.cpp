@@ -229,10 +229,6 @@ void mafViewRXCT::VmeShow(mafVME *vme, bool show)
       
       if(volumeOutput->GetMaterial()->m_ColorLut)
       {
-        /*m_vtkLUT[CT_COMPOUND_VIEW] = volumeOutput->GetMaterial()->m_ColorLut;
-        m_vtkLUT[CT_COMPOUND_VIEW]->SetRange(sr);
-        m_vtkLUT[CT_COMPOUND_VIEW]->Build();*/
-        
         m_Lut = volumeOutput->GetMaterial()->m_ColorLut;
         m_Lut->SetRange(sr);
         m_Lut->Build();
