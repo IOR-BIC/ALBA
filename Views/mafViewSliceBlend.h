@@ -1,17 +1,16 @@
 /*=========================================================================
+Program:   Alba
+Module:    mafViewSliceBlend.h
+Language:  C++
+Date:      $Date: 2018-01-01 12:00:00 $
+Version:   $Revision: 1.0.0.0 $
+Authors:   Gianluigi Crimi, Nicola Vanella
+==========================================================================
+Copyright (c) BIC-IOR 2018 (https://github.com/IOR-BIC)
 
- Program: MAF2
- Module: mafViewSliceBlend
- Authors: Matteo Giacomoni
- 
- Copyright (c) B3C
- All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
-
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notice for more information.
-
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
 #ifndef __mafViewSliceBlend_H__
@@ -29,7 +28,6 @@
 class mafVME;
 class mafSceneNode;
 class mafGUI;
-class mafGUIFloatSlider;
 class mafGUILutSlider;
 class vtkActor2D;
 
@@ -47,8 +45,8 @@ public:
 
 	mafTypeMacro(mafViewSliceBlend, mafViewVTK);
 
-	/*virtual*/ mafView*  Copy(mafObserver *Listener, bool lightCopyEnabled = false);
-	virtual void			OnEvent(mafEventBase *maf_event);
+	/*virtual*/ mafView* Copy(mafObserver *Listener, bool lightCopyEnabled = false);
+	virtual void OnEvent(mafEventBase *maf_event);
 
 	void Create();
 
@@ -77,6 +75,8 @@ public:
 	/** Change the range of the WindowLevel Lookup table.*/
 	void SetLutRange(double low_val, double high_val);
 
+	void GetLutRange(double minMax[2]);
+
 	/** Set the slice coordinates.*/
 	virtual void SetSliceLocalOrigin(double origin0[3],double origin1[3]);
 
@@ -104,7 +104,10 @@ public:
 	/** Function for the correction of slice pose in case of current volume pose matrix is different from identity */
 	void MultiplyPointByInputVolumeABSMatrix(double *point);
 
-	void SetSlice(int nSlice,double pos[3]);
+	void SetOpacity(double opacity);
+	void SetSlice(int nSlice, double pos[3]);
+
+	double* GetSlice(int nSlice);
 
 protected:
 
@@ -120,7 +123,7 @@ protected:
   double           m_Slice2Position;
 	bool             m_SliceInitialized; 
 
-	double					m_Opacity;
+	double					 m_Opacity;
 
 	std::vector<mafSceneNode*> m_CurrentSurface;
 };
