@@ -124,10 +124,11 @@ enum PLANE_TYPE
   XY,
 };
 
-enum THRESHOLD_TYPE
+enum INIT_MODALITY_TYPE
 {
-  GLOBAL = 0,
-  RANGE,
+  GLOBAL_INIT = 0,
+  RANGE_INIT,
+	LOAD_INIT,
 };
 
 typedef  itk::Image< float, 3> RealImage;
@@ -154,11 +155,8 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
   m_VolumeBounds[0] = m_VolumeBounds[1] = m_VolumeBounds[2] = m_VolumeBounds[3] = m_VolumeBounds[4] = m_VolumeBounds[5] = 0.0;
   m_VolumeParametersInitialized = false;
 
-  m_CurrentSliceIndex   = 1;
-  m_CurrentSlicePlane = XY;
-  m_OldSliceIndex = m_CurrentSliceIndex;
-  m_OldSlicePlane = m_CurrentSlicePlane;
-
+	m_SliceIndexByPlane[0] = m_SliceIndexByPlane[1] = m_SliceIndexByPlane[2] = 1;
+  m_SlicePlane =  XY;
 
   m_NumSliceSliderEvents = 0;
   m_SliceSlider = NULL;
@@ -196,9 +194,7 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
 
   //////////////////////////////////////////////////////////////////////////
   //Manual initializations
-  //////////////////////////////////////////////////////////////////////////
-
-	m_ThresholdTypeRadioBox = NULL;
+	m_InitModalityRadioBox = NULL;
   m_ManualBrushShapeRadioBox = NULL;
   m_ManualBrushShape = CIRCLE_BRUSH_SHAPE;
   m_ManualBrushSize = 1;
@@ -220,7 +216,6 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
   m_PickingStarted = false;
   //////////////////////////////////////////////////////////////////////////
   //Automatic initializations
-  //////////////////////////////////////////////////////////////////////////
   m_AutomaticThreshold = 0.0;
   m_AutomaticUpperThreshold = 0.0;
   m_AutomaticMouseThreshold = 0.0;
@@ -232,17 +227,11 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
   m_AutomaticSliceTextMapper = NULL;
   m_AutomaticScalarTextActor = NULL;
   m_AutomaticScalarTextMapper = NULL;
-  m_AutomaticRangeSlider = NULL;
   m_AutomaticPER = NULL;
-  m_AutomaticGlobalThreshold = GLOBAL;
+  m_InitModality = GLOBAL_INIT;
 
   //////////////////////////////////////////////////////////////////////////
   //Refinement initializations
-  //////////////////////////////////////////////////////////////////////////
-  m_RefinementUndoList.clear();
-  m_RefinementRedoList.clear();
-  //////////////////////////////////////////////////////////////////////////
-
   m_InitialFocalPoint[0]=9999;
   m_InitialFocalPoint[1]=9999;
   m_InitialFocalPoint[2]=9999;
@@ -289,7 +278,6 @@ void mafOpSegmentation::OpRun()
   
   //////////////////////////////////////////////////////////////////////////
   //Initialize of the volume matrix to the indentity
-  //////////////////////////////////////////////////////////////////////////
   m_Volume=mafVMEVolumeGray::SafeDownCast(m_Input);
 
   m_Volume->Update();
@@ -308,32 +296,23 @@ void mafOpSegmentation::OpRun()
   if(m_VolumeParametersInitialized)
   {
     for(int i = 0; i < 6; i++)
-    {
       m_CurrentVolumeBounds[i] =  m_VolumeBounds[i];
-    }
     for(int i = 0; i < 3; i++)
-    {
       m_CurrentVolumeDimensions[i] =  m_VolumeDimensions[i];
-    }
     for(int i = 0; i < 3; i++)
-    {
       m_CurrentVolumeSpacing[i] =  m_VolumeSpacing[i];
-    }
+
     m_CurrentVolumeParametersInitialized = true;
   }
 
   // interface:
   CreateOpDialog();
   InitializeView();
-  InitGui();
 
   m_OldVolumeParent = m_Volume->GetParent();
   m_Volume->ReparentTo(m_Volume->GetRoot());
 
   m_View->VmeAdd(m_Volume);
-  m_View->VmeShow(m_Volume, true);
-  m_View->CameraReset();
-  m_View->CameraUpdate();
   
   Init();
 
@@ -499,7 +478,7 @@ void mafOpSegmentation::CreateOpDialog()
   // Label to indicate the current slice
 
   vtkNEW(m_AutomaticSliceTextMapper);
-	wxString text = wxString::Format("Slice = %d of %d", m_CurrentSliceIndex, m_VolumeDimensions[m_CurrentSlicePlane]);
+	wxString text = wxString::Format("Slice = %d of %d", m_SliceIndex, m_VolumeDimensions[m_SlicePlane]);
 
   m_AutomaticSliceTextMapper->SetInput(text);
   m_AutomaticSliceTextMapper->GetTextProperty()->SetColor(1.0,1.0,0.0);
@@ -641,11 +620,6 @@ void mafOpSegmentation::CreateOpDialog()
 	m_GuiDialog->Add(m_SegmentationOperationsNotebook, wxEXPAND | wxALL);
 	m_GuiDialog->FitGui();
 
- /* m_GuiDialog->Enable(ID_LOAD_SEGMENTATION,false);
-  m_GuiDialog->Enable(ID_AUTO_SEGMENTATION, false);
-  m_GuiDialog->Enable(ID_MANUAL_SEGMENTATION,false);
-  m_GuiDialog->Enable(ID_REFINEMENT,false);
-*/
 
 	m_GuiDialog->TwoButtons(ID_BUTTON_PREV, ID_BUTTON_NEXT, _("Prev"), _("Next"), wxEXPAND | wxALL);
 	m_GuiDialog->Enable(ID_BUTTON_PREV, false);
@@ -656,10 +630,6 @@ void mafOpSegmentation::CreateOpDialog()
   m_GuiDialog->FitGui();
   m_GuiDialog->Update();
 
-//   int x_pos,y_pos,w,h;
-//   mafGetFrame()->GetPosition(&x_pos,&y_pos);
-//   m_Dialog->GetSize(&w,&h);
-//   m_Dialog->SetSize(x_pos+5,y_pos+5,w+50,h+50);
 
 	int x_pos = (fw - dialogSize[0]) / 2;
 	int y_pos = (fh - dialogSize[1]) / 2;
@@ -682,8 +652,8 @@ void mafOpSegmentation::DeleteOpDialog()
   m_Volume->Update();
 	m_View->VmeShow(m_Volume, false);
 	m_View->VmeRemove(m_Volume);
-	m_View->VmeSegmentationShow(m_SegmentationVolume, false);
-	m_View->VmeRemove(m_SegmentationVolume);
+	//m_View->VmeSegmentationShow(m_SegmentationVolume, false);
+	//m_View->VmeRemove(m_SegmentationVolume);
 
   //////////////////////////////////////////////////////////////////////////
   //Remove the threshold label
@@ -712,12 +682,12 @@ void mafOpSegmentation::DeleteOpDialog()
   vtkDEL(m_AutomaticSliceTextActor);
   vtkDEL(m_AutomaticSliceTextMapper);
 
-  cppDEL(m_View);      
+  //cppDEL(m_View);      
   cppDEL(m_OkButton);
   cppDEL(m_CancelButton);
   cppDEL(m_LutWidget);
   cppDEL(m_LutSlider);
-	cppDEL(m_ThresholdTypeRadioBox);
+	cppDEL(m_InitModalityRadioBox);
   cppDEL(m_ManualBrushShapeRadioBox);
   cppDEL(m_ManualBrushSizeSlider);
 
@@ -793,8 +763,8 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
     ext[4] = 0;
     ext[5] = m_VolumeDimensions[2]-1;
 
-    ext[m_CurrentSlicePlane * 2] = (int)low;
-    ext[m_CurrentSlicePlane * 2 + 1] = (int)hi;
+    ext[m_SlicePlane * 2] = (int)low;
+    ext[m_SlicePlane * 2 + 1] = (int)hi;
 
     vtkMAFSmartPointer <vtkImageClip> clipper;
     clipper->SetInput(dummy);
@@ -843,8 +813,8 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
     urs.dataArray = vtkUnsignedCharArray::New();
     urs.dataArray->DeepCopy(m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
     urs.dataArray->SetName("SCALARS");
-    urs.plane=m_CurrentSlicePlane;
-    urs.slice=m_CurrentSliceIndex;
+    urs.plane=m_SlicePlane;
+    urs.slice=m_SliceIndex;
     m_ManualUndoList.push_back( urs );
     //On edit a new branch of redo-list starts, i need to clear the redo stack
     ResetManualRedoList();
@@ -855,7 +825,7 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
     double dimensions[3];
 
 
-    switch(m_CurrentSlicePlane)
+    switch(m_SlicePlane)
     {
     case XY:
       {
@@ -924,7 +894,7 @@ bool mafOpSegmentation::Refinement()
     newScalars->SetNumberOfTuples(m_VolumeDimensions[0]*m_VolumeDimensions[1]*m_VolumeDimensions[2]);
 
     double point[3];
-    inputDataSet->GetPoint(m_CurrentSliceIndex*m_VolumeDimensions[0]*m_VolumeDimensions[1], point);
+    inputDataSet->GetPoint(m_SliceIndex*m_VolumeDimensions[0]*m_VolumeDimensions[1], point);
 
     vtkDataArray *inputScalars = inputDataSet->GetPointData()->GetScalars();
     vtkMAFSmartPointer<vtkUnsignedCharArray> scalars;
@@ -971,7 +941,7 @@ bool mafOpSegmentation::Refinement()
     {
       for (int i= 0;i<m_VolumeDimensions[2];i++)
       {
-        if(i != m_CurrentSliceIndex-1)
+        if(i != m_SliceIndex-1)
           //if(i != zID)
         {
           for (int k=0;k<(m_VolumeDimensions[0]*m_VolumeDimensions[1]);k++)
@@ -1223,13 +1193,13 @@ void mafOpSegmentation::CreateSliceNavigationGui()
 	slice_text->Enable(true);
 	m_SliceText = slice_text;
 
-	m_CurrentSliceIndex = 1;
-	m_SliceSlider = new wxSlider(m_GuiDialog, ID_SLICE_SLIDER, m_CurrentSliceIndex, 1, m_VolumeDimensions[2], defPos, wxSize(64, 18));
+	m_SliceIndex = 1;
+	m_SliceSlider = new wxSlider(m_GuiDialog, ID_SLICE_SLIDER, m_SliceIndex, 1, m_VolumeDimensions[2], defPos, wxSize(64, 18));
 	mafGUIButton *b_incr_slice = new mafGUIButton(m_GuiDialog, ID_SLICE_NEXT, ">", defPos, wxSize(18, 18));
 	mafGUIButton *b_decr_slice = new mafGUIButton(m_GuiDialog, ID_SLICE_PREV, "<", defPos, wxSize(18, 18));
 
-	slice_text->SetValidator(mafGUIValidator(this, ID_SLICE_TEXT, slice_text, &m_CurrentSliceIndex, m_SliceSlider, 1, m_VolumeDimensions[2]));
-	m_SliceSlider->SetValidator(mafGUIValidator(this, ID_SLICE_SLIDER, m_SliceSlider, &m_CurrentSliceIndex, slice_text));
+	slice_text->SetValidator(mafGUIValidator(this, ID_SLICE_TEXT, slice_text, &m_SliceIndex, m_SliceSlider, 1, m_VolumeDimensions[2]));
+	m_SliceSlider->SetValidator(mafGUIValidator(this, ID_SLICE_SLIDER, m_SliceSlider, &m_SliceIndex, slice_text));
 
 	b_incr_slice->SetValidator(mafGUIValidator(this, ID_SLICE_NEXT, b_incr_slice));
 	b_decr_slice->SetValidator(mafGUIValidator(this, ID_SLICE_PREV, b_decr_slice));
@@ -1249,7 +1219,7 @@ void mafOpSegmentation::CreateSliceNavigationGui()
 	
 	wxString planes[3]{ "YZ","XZ","XY" };
 
-	m_GuiDialog->Radio(ID_SLICE_PLANE, "Plane: ", &m_CurrentSlicePlane, 3, planes, 3, "Slice Plane");
+	m_GuiDialog->Radio(ID_SLICE_PLANE, "Plane: ", &m_SlicePlane, 3, planes, 3, "Slice Plane");
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -1272,16 +1242,15 @@ void mafOpSegmentation::CreateInitSegmentationGui()
 	wxString choices[3] = { _("Global"),_("Range"), _("Load") };
 	int w_id = currentGui->GetWidgetId(ID_AUTO_GLOBAL_THRESHOLD);
 	
-	m_ThresholdTypeRadioBox = new wxRadioBox(currentGui, w_id, "", wxDefaultPosition, wxSize(170, -1), 3, choices, 3);
-	m_ThresholdTypeRadioBox->SetValidator(mafGUIValidator(currentGui, w_id, m_ThresholdTypeRadioBox, &m_AutomaticGlobalThreshold));
+	m_InitModalityRadioBox = new wxRadioBox(currentGui, w_id, "", wxDefaultPosition, wxSize(170, -1), 3, choices, 3);
+	m_InitModalityRadioBox->SetValidator(mafGUIValidator(currentGui, w_id, m_InitModalityRadioBox, &m_InitModality));
 
 	wxBoxSizer *thresholdTypeLabSizer = new wxBoxSizer(wxHORIZONTAL);
-	thresholdTypeLabSizer->Add(m_ThresholdTypeRadioBox, 0, wxEXPAND, 2);
-	
+	thresholdTypeLabSizer->Add(m_InitModalityRadioBox, 0, wxEXPAND, 2);
+
 	currentGui->Add(thresholdTypeLabSizer);
 	currentGui->Divider(1);
 
-	////////////////////////////////////////////////////////////////////////
 	// THRESHOLD GLOBAL
 	
   currentGui->Label(_("Threshold"),true);
@@ -1289,69 +1258,44 @@ void mafOpSegmentation::CreateInitSegmentationGui()
 	std::vector<const char*> increaseLabels = { "+","+","+" };
   std::vector<const char*> decreaseLabels = { "-","-","-" };
 
-  double scalarRange[2];
-  m_Volume->GetOutput()->GetVTKData()->GetScalarRange(scalarRange);
-  
+ 	double sr[2];
+  m_Volume->GetOutput()->GetVTKData()->GetScalarRange(sr);
+ 
   // Threshold 
   //[ + ] [ + ] [ + ]
   //[min][range][max]
   //[ - ] [ - ] [ - ] 
 
-  m_AutomaticThreshold=scalarRange[1];
-  m_AutomaticUpperThreshold=scalarRange[1];
-
-  m_AutomaticThresholdSlider = new mafGUILutSlider(currentGui,-1,wxPoint(0,0),wxSize(300,24));
-  m_AutomaticThresholdSlider->SetListener(this);
-  m_AutomaticThresholdSlider->SetText(1,"Threshold");  
-  m_AutomaticThresholdSlider->SetRange(scalarRange[0],scalarRange[1]);
-  m_AutomaticThresholdSlider->SetSubRange(scalarRange[1],scalarRange[1]);
+  m_AutomaticThreshold=sr[1];
+  m_AutomaticUpperThreshold=sr[1];
+  m_ThresholdSlider = new mafGUILutSlider(currentGui,-1,wxPoint(0,0),wxSize(300,24));
+  m_ThresholdSlider->SetListener(this);
+  m_ThresholdSlider->SetText(1,"Threshold");  
+  m_ThresholdSlider->SetRange(sr[0],sr[1]);
+  m_ThresholdSlider->SetSubRange(sr[1],sr[1]);
 
 	std::vector<int> increaseTrIDs = { ID_AUTO_INC_MIN_THRESHOLD, ID_AUTO_INC_MIDDLE_THRESHOLD,ID_AUTO_INC_MAX_THRESHOLD };
   currentGui->MultipleButtons(3,3,increaseTrIDs,increaseLabels);
 
-  currentGui->Add(m_AutomaticThresholdSlider);
+  currentGui->Add(m_ThresholdSlider);
 
 	std::vector<int> decreaseTrIDs = { ID_AUTO_DEC_MIN_THRESHOLD, ID_AUTO_DEC_MIDDLE_THRESHOLD, ID_AUTO_DEC_MAX_THRESHOLD};
   currentGui->MultipleButtons(3,3,decreaseTrIDs,decreaseLabels);
 	currentGui->Divider(1);
 
-	////////////////////////////////////////////////////////////////////////
-	// THRESHOLD RANGE
+	// THRESHOLD RANGES
 	  
-  // Slides Range
-  //[ + ] [ + ] [ + ]
-  //[min][range][max]
-  //[ - ] [ - ] [ - ] 
-
-	currentGui->Label(_("Slice range settings:"), true);
-
-	m_AutomaticRangeSlider = new mafGUILutSlider(currentGui,-1,wxPoint(0,0),wxSize(300,24));
-  m_AutomaticRangeSlider->SetListener(this);
-  m_AutomaticRangeSlider->SetText(1,"Z Axis");  
-  m_AutomaticRangeSlider->SetRange(1,m_VolumeDimensions[2]);
-  m_AutomaticRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
-
-	std::vector<int> increaseIDs = { ID_AUTO_INC_MIN_RANGE, ID_AUTO_INC_MIDDLE_RANGE,ID_AUTO_INC_MAX_RANGE };
-	currentGui->MultipleButtons(3, 3, increaseIDs, increaseLabels);
-  
-  currentGui->Add(m_AutomaticRangeSlider);
-  
-	std::vector<int> decreaseIDs = { ID_AUTO_DEC_MIN_RANGE, ID_AUTO_DEC_MIDDLE_RANGE, ID_AUTO_DEC_MAX_RANGE };
-	currentGui->MultipleButtons(3, 3, decreaseIDs, decreaseLabels);
+ 	currentGui->Label(_("Slice range settings:"), true);
 	
   m_AutomaticListOfRange = currentGui->ListBox(ID_AUTO_LIST_OF_RANGE,"");
-  currentGui->TwoButtons(ID_AUTO_ADD_RANGE,ID_AUTO_REMOVE_RANGE,("Add"),_("Remove"));
-  currentGui->Button(ID_AUTO_UPDATE_RANGE,("Update"));
-	currentGui->Divider(1);
+  currentGui->TwoButtons(ID_SPLIT_RANGE,ID_REMOVE_RANGE,("Split"),_("Remove"));
+  currentGui->Divider(1);
 
-	////////////////////////////////////////////////////////////////////////
-	// LOAD RANGE
+	// LOAD SEGMENTATION
 	
 	currentGui->Label(&m_VolumeName);
 	currentGui->Button(ID_LOAD, "Load");
 	currentGui->Divider(1);
-
-	////////////////////////////////////////////////////////////////////////
 
   m_SegmentationOperationsGui[INIT_SEGMENTATION] = currentGui;
 }
@@ -1388,7 +1332,6 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 	brushShapesSizer->Add(brushShapeLab, 0, wxRIGHT, 5);
   brushShapesSizer->Add(m_ManualBrushShapeRadioBox, 0, wxRIGHT, 2);
 
-	//////////////////////////////////////////////////////////////////////////
   // BRUSH SIZE
   m_ManualBrushSize = 1;
 
@@ -1457,7 +1400,6 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 
 	currentGui->Combo(ID_REFINEMENT_ACTION, "Action", &m_RefinementSegmentationAction, 2, operations);
 
-	//////////////////////////////////////////////////////////////////////////
 	// Size of islands/holes to be taken into consideration
 	m_RefinementRegionsSize = 1;
 	//currentGui->Integer(ID_REFINEMENT_REGIONS_SIZE, mafString("Size"), &m_RefinementRegionsSize, 0, MAXINT, mafString("Max size of islands/holes to be taken into consideration"));
@@ -1505,16 +1447,15 @@ void mafOpSegmentation::EnableManualSegmentationGui()
 }
 
 //----------------------------------------------------------------------------
-void mafOpSegmentation::InitGui()
+void mafOpSegmentation::UpdateSliderValidator()
 {
- int sliceMax = m_VolumeDimensions[m_CurrentSlicePlane];
+	int sliceMax = m_VolumeDimensions[m_SlicePlane];
 
   m_SliceSlider->SetRange(1, sliceMax);
-  m_SliceText->SetValidator(mafGUIValidator(this,ID_SLICE_TEXT,m_SliceText,&m_CurrentSliceIndex,m_SliceSlider,1, sliceMax));
-  m_CurrentSliceIndex = 1;
+  m_SliceText->SetValidator(mafGUIValidator(this,ID_SLICE_TEXT,m_SliceText,&m_SliceIndex,m_SliceSlider,1, sliceMax));
+	m_SliceIndex = m_SliceIndexByPlane[m_SlicePlane];
   m_SliceSlider->Update();
 
-  m_GuiDialog->FitGui();
 }
 //------------------------------------------------------------------------
 void mafOpSegmentation::InitSegmentationVolume()
@@ -1532,7 +1473,7 @@ void mafOpSegmentation::InitSegmentationVolume()
 	{
 		lut->SetNumberOfTableValues(2);
 		lut->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
-		lut->SetTableValue(1, 0.9, 0.1, 0.1, 0.4);
+		lut->SetTableValue(1, 0.0, 0.0, 0.9, 1.0);
 		lut->SetTableRange(0, 255);
 		m_SegmentationVolume->GetMaterial()->UpdateFromTables();
 	}
@@ -1540,6 +1481,46 @@ void mafOpSegmentation::InitSegmentationVolume()
 	vtkDataSet *volData =	m_Volume->GetOutput()->GetVTKData();
 	vtkDataSet *segData = volData->NewInstance();
 	segData->DeepCopy(volData);
+
+	//Workaround we add an epsilon to ensure segmentation volume is always visible
+	//mafViewSegmentation slices adds the same amout to the slice to compensate
+	if (vtkImageData::SafeDownCast(volData))
+	{
+		double newOrigin[3];
+		((vtkImageData *)volData)->GetOrigin(newOrigin);
+		newOrigin[0] += 0.0001;
+		newOrigin[1] -= 0.0001;
+		newOrigin[2] -= 0.0001;
+		((vtkImageData *)segData)->SetOrigin(newOrigin);
+	}
+	else //Rectilinear Grid
+	{
+		int i;
+		vtkRectilinearGrid * volRG = (vtkRectilinearGrid *)volData;
+		vtkRectilinearGrid * segRG = (vtkRectilinearGrid *)segData;
+		vtkDataArray * xCoord = volRG->GetXCoordinates();
+		vtkDataArray * yCoord = volRG->GetYCoordinates();
+		vtkDataArray * zCoord = volRG->GetZCoordinates();
+		vtkDataArray *newXCoord, *newYCoord, *newZCoord;
+		newXCoord = xCoord->NewInstance();
+		newYCoord = yCoord->NewInstance();
+		newZCoord = zCoord->NewInstance();
+		vtkIdType xNTuples = xCoord->GetNumberOfTuples();
+		vtkIdType yNTuples = yCoord->GetNumberOfTuples();
+		vtkIdType zNTuples = zCoord->GetNumberOfTuples();
+		newXCoord->SetNumberOfTuples(xNTuples);
+		newYCoord->SetNumberOfTuples(yNTuples);
+		newZCoord->SetNumberOfTuples(zNTuples);
+		for (i = 0; i < xNTuples; i++)
+			newXCoord->SetTuple1(i, xCoord->GetTuple1(i) + 0.0001);
+		for (i = 0; i < yNTuples; i++)
+			newYCoord->SetTuple1(i, yCoord->GetTuple1(i) - 0.0001);
+		for (i = 0; i < zNTuples; i++)
+			newZCoord->SetTuple1(i, zCoord->GetTuple1(i) - 0.0001);
+		segRG->SetXCoordinates(newXCoord);
+		segRG->SetYCoordinates(newYCoord);
+		segRG->SetZCoordinates(newZCoord);
+	}
 
 	vtkDataArray *volScalars = volData->GetPointData()->GetScalars();
 	vtkUnsignedCharArray *segScalars;
@@ -1552,10 +1533,6 @@ void mafOpSegmentation::InitSegmentationVolume()
 	m_SegmentationVolume->Update();
 
 	m_View->VmeAdd(m_SegmentationVolume);
-	m_View->VmeSegmentationShow(m_SegmentationVolume, true);
-	mafPipeVolumeOrthoSlice *pipeOrtho = (mafPipeVolumeOrthoSlice *)m_View->GetNodePipe(m_SegmentationVolume);
-	m_SegmetationSlice = (vtkImageData*)(pipeOrtho->GetSlicer(pipeOrtho->GetSliceDirection())->GetOutput());
-
 }
 //------------------------------------------------------------------------
 void mafOpSegmentation::OnAutomaticStep()
@@ -1574,7 +1551,6 @@ void mafOpSegmentation::OnManualStep()
   // brush size slider: min = 1; max = slice size
   m_SnippetsLabel->SetLabel( _(" 'Left Click' Draw. 'Left Click + Ctrl' Erase"));
 
-
   m_ManualBrushSize=1;
   m_ManualBrushSizeSlider->SetValue(m_ManualBrushSize);
   m_ManualBrushSizeText->SetValue("1");
@@ -1589,24 +1565,19 @@ void mafOpSegmentation::OnManualStep()
   m_ManualPER->SetRadius(double(m_ManualBrushSize)/2.0);
   m_View->CameraUpdate();
 
-  
   m_SER->GetAction("pntActionAutomatic")->UnBindDevice(m_DialogMouse);
   m_SER->GetAction("pntActionAutomatic")->UnBindInteractor(m_AutomaticPER);
   m_SER->GetAction("pntEditingAction")->BindInteractor(m_ManualPER);
   m_SER->GetAction("pntEditingAction")->BindDevice(m_DialogMouse);
   
-  
   m_AutomaticScalarTextMapper->SetInput("");
-
 
   wxCursor cursor = wxCursor( wxCURSOR_PENCIL );
   m_View->GetWindow()->SetCursor(cursor);
 
   m_ManualPER->EnableDrawing(true);
 
-
-
-  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_PICKING_MODALITY, m_CurrentSlicePlane);
+  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_PICKING_MODALITY, m_SlicePlane);
   m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, false);
   m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
   m_GuiDialog->Enable(EDIT_SEGMENTATION,true);
@@ -1620,7 +1591,6 @@ void mafOpSegmentation::OnManualStep()
   UpdateSlice();
 
   CreateRealDrawnImage();
-  m_View->CameraUpdate();
   
   m_ManualSegmentationTools = 0;
   m_View->GetWindow()->SetCursor(cursor);
@@ -1677,19 +1647,7 @@ void mafOpSegmentation::OnRefinementStep()
 }
 
 //------------------------------------------------------------------------
-void mafOpSegmentation::OnLoadStep()
-//------------------------------------------------------------------------
-{
-  m_GuiDialog->Enable(ID_LOAD,true);
-  m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
-  m_GuiDialog->Enable(ID_BUTTON_PREV,false);
-
-  UpdateSlice();
-}
-
-//------------------------------------------------------------------------
 void mafOpSegmentation::OnNextStep()
-//------------------------------------------------------------------------
 {
 	m_GuiDialog->Enable(ID_LOAD, false);
 	m_SegmentationPicker->SetFullModifiersMode(true);
@@ -1719,13 +1677,15 @@ void mafOpSegmentation::Init()
 	InitializeInteractors();
 	InitVolumeDimensions();
 	InitVolumeSpacing();
-	InitGui();
-	UpdateSlice();
 	UpdateWindowing();
-	InitGui();
+	UpdateSliderValidator();
 
-	//next step -> LOAD Segmentation
-	OnLoadStep();
+	m_Helper.SetVolumes(m_Volume, m_SegmentationVolume);
+	m_View->VmeShow(m_Volume, true);
+	m_View->VmeSegmentationShow(m_SegmentationVolume, true);
+
+
+	OnSelectSlicePlane();
 }
 
 //------------------------------------------------------------------------
@@ -1736,24 +1696,23 @@ void mafOpSegmentation::OnPreviousStep()
   if (answer == wxNO)
     return;
   
-  
-
   m_CurrentOperation--;
   m_Dialog->Update();
 
-  int oldSliceIndex = m_CurrentSliceIndex;
+//   TODO Check if this code is useful
+// 
+//   int oldSliceIndex = m_CurrentSliceIndex;
+// 
+// 	m_SegmentationOperationsNotebook->SetSelection(INIT_SEGMENTATION);
+// 
+//   m_CurrentSliceIndex = oldSliceIndex;
+// 
+//   m_SliceSlider->SetValue(m_CurrentSliceIndex);
+//   m_SliceSlider->Update();
 
-	m_SegmentationOperationsNotebook->SetSelection(INIT_SEGMENTATION);
-
-  m_CurrentSliceIndex = oldSliceIndex;
-
-  m_SliceSlider->SetValue(m_CurrentSliceIndex);
-  m_SliceSlider->Update();
-
-  //UpdateSlice();
+	OnThresholdUpate();
 
   m_View->CameraUpdate();
-
 }
 
 //----------------------------------------------------------------------------
@@ -1763,9 +1722,7 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     if(e->GetSender() == m_SegmentationOperationsGui[INIT_SEGMENTATION])
-      OnLoadSegmentationEvent();
-    if(e->GetSender() == m_SegmentationOperationsGui[INIT_SEGMENTATION])
-      OnAutomaticSegmentationEvent(e);
+      OnInitEvent(e);
     else if(e->GetSender() == m_SegmentationOperationsGui[EDIT_SEGMENTATION])
       OnManualSegmentationEvent(e);
     else if(e->GetSender() == m_SegmentationOperationsGui[EDIT_SEGMENTATION])
@@ -1785,13 +1742,10 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
         m_CurrentBrushMoveEventCount = e->GetDouble();
         int oldAction = m_ManualSegmentationAction;
         if(e->GetBool())
-        {
           m_ManualSegmentationAction = MANUAL_SEGMENTATION_ERASE;
-        }
         else
-        {
           m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
-        }
+
         m_LastMouseMovePointID = e->GetArg();
         OnBrushEvent(e);
         m_ManualSegmentationAction = oldAction;
@@ -1808,10 +1762,8 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
         m_AutomaticUpperThreshold = m_AutomaticMouseThreshold;
         m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
         m_AutomaticThreshold=min(m_AutomaticUpperThreshold,m_AutomaticThreshold);
-        m_AutomaticThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
-        UpdateThresholdLabel();
-        UpdateThresholdRealTimePreview();
-        OnEventUpdateThresholdSlice();
+        m_ThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
+				OnThresholdUpate();
       }
       //Picking during manual segmentation
       else if(m_CurrentOperation == EDIT_SEGMENTATION)
@@ -1835,13 +1787,9 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
         if(m_CurrentOperation == EDIT_SEGMENTATION && m_ManualSegmentationTools == 0)
         {
           if(e->GetArg() < 0)
-          {
             m_ManualBrushSize++;
-          }
           else
-          {
             m_ManualBrushSize--;
-          }
           m_ManualPER->SetRadius(double(m_ManualBrushSize)/2);
           UndoBrushPreview();
           int oldAction = m_ManualSegmentationAction;
@@ -1866,59 +1814,26 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
         OnPreviousStep();
       break;
 		case ID_SLICE_NEXT: 
-		{
-			if (m_CurrentSliceIndex < m_SliceSlider->GetMax())
-				m_CurrentSliceIndex++;
+			if (m_SliceIndex < m_SliceSlider->GetMax())
+				m_SliceIndex++;
 			OnUpdateSlice();
-		}
 			break;
 		case ID_SLICE_TEXT:
-		{
-			if (m_CurrentSliceIndex > 1)
-				m_CurrentSliceIndex--;
+			if (m_SliceIndex > 1)
+				m_SliceIndex--;
 			OnUpdateSlice();
-		}
+			break;
 		case ID_SLICE_PREV:
-		{
-			if (m_CurrentSliceIndex > 1)
-				m_CurrentSliceIndex--;
+			if (m_SliceIndex > 1)
+				m_SliceIndex--;
 			OnUpdateSlice();
-		}
+			break;
 		case ID_SLICE_SLIDER:
-		{
 			OnUpdateSlice();
-		}
 		break;
     case ID_SLICE_PLANE:
-      {
-        m_CurrentSliceIndex = 1;
-        m_View->SetSliceAxis(m_CurrentSlicePlane);
-        if (m_CurrentOperation== INIT_SEGMENTATION)
-        {
-          OnUpdateSlice();
-          m_ManualRangeSlider->SetText(1,"Slices");  
-          m_ManualRangeSlider->SetRange(1,m_VolumeDimensions[m_CurrentSlicePlane]);
-          m_ManualRangeSlider->SetSubRange(1,m_VolumeDimensions[m_CurrentSlicePlane]);
-        }
-        else if (m_CurrentOperation== INIT_SEGMENTATION) //TODO CHECK THRESHOLD SETTINGS
-        {
-          OnEventUpdateThresholdSlice();
-        }
-       
-        m_GuiDialog->Update();
-				if(m_CurrentOperation == EDIT_SEGMENTATION)
-        {
-          CreateRealDrawnImage();
-        }
-
-				if (m_CurrentOperation == INIT_SEGMENTATION)//TODO CHECK THRESHOLD SETTINGS
-          OnChangeThresholdType();
-        else if(m_CurrentOperation == EDIT_SEGMENTATION)
-          m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
-
-				UpdateSlice();
+			OnSelectSlicePlane();
         break;
-      }
 		case ID_SHOW_LABELS:
 		{
 			if(m_ShowLabels)
@@ -1944,7 +1859,7 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
           m_AutomaticThreshold = m_AutomaticMouseThreshold;
           m_AutomaticUpperThreshold=max(m_AutomaticUpperThreshold,m_AutomaticThreshold);
           m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
-          m_AutomaticThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
+          m_ThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
           UpdateThresholdLabel();
         }
         //Picking during manual segmentation
@@ -1964,7 +1879,6 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
         break;
       }
     case VME_PICKING:
-      {
         if(m_CurrentOperation == EDIT_SEGMENTATION && m_ManualSegmentationTools == 0)
         {          
           OnBrushEvent(e);
@@ -1972,26 +1886,18 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
           m_PickingStarted=false;
         }
         break;
-      }
     case ID_OK:
-      {
         m_Dialog->EndModal(wxID_OK);
         break;
-      }
     case ID_CANCEL:
-      {
         m_Dialog->EndModal(wxID_CANCEL);
         break;
-      }
     case ID_RANGE_MODIFIED:
       {
         //threshold slider
-        if (e->GetSender()==m_AutomaticThresholdSlider)
+        if (e->GetSender()==m_ThresholdSlider)
         {
-          m_AutomaticThresholdSlider->GetSubRange(&m_AutomaticThreshold,&m_AutomaticUpperThreshold);
-          UpdateThresholdLabel();
-          UpdateThresholdRealTimePreview();
-          m_View->CameraUpdate();
+					OnThresholdUpate(e->GetId());
         }
         //Windowing
         else if(e->GetSender() == m_LutSlider)
@@ -2001,41 +1907,18 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
           m_ColorLUT->SetTableRange(low,hi);
           m_View->CameraUpdate();
         }
-        else if(e->GetSender() == m_AutomaticRangeSlider)
-        {
-          double low, hi;
-          m_AutomaticRangeSlider->GetSubRange(&low,&hi);
-
-          if(m_CurrentSliceIndex < low)
-          {
-            m_CurrentSliceIndex = low;
-          }
-          if(m_CurrentSliceIndex > hi)
-          {
-            m_CurrentSliceIndex = hi;
-          }
-
-          if(m_CurrentSlicePlane = XY)
-          {
-            OnEventUpdateThresholdSlice();
-          }
-        }
         else if(e->GetSender() == m_ManualRangeSlider)
         {
           double low, hi;
           m_ManualRangeSlider->GetSubRange(&low,&hi);
 
-          if(m_CurrentSliceIndex > hi)
-          {
-            m_CurrentSliceIndex = hi;
-          }
-          if(m_CurrentSliceIndex < low)
-          {
-            m_CurrentSliceIndex = low;
-          }
+          if(m_SliceIndex > hi)
+						m_SliceIndex = hi;
+
+          if(m_SliceIndex < low)
+						m_SliceIndex = low;
 
 					OnUpdateSlice();
-
         }
         break;
       }
@@ -2056,9 +1939,38 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
   }
 }
 
+//----------------------------------------------------------------------------
+void mafOpSegmentation::OnSelectSlicePlane()
+{
+	UpdateSliderValidator();
+
+	m_View->SetSliceAxis(m_SlicePlane);
+
+	mafPipeVolumeOrthoSlice *pipeOrtho = (mafPipeVolumeOrthoSlice *)m_View->GetNodePipe(m_Volume);
+	m_VolumeSlice = (vtkImageData*)(pipeOrtho->GetSlicer(pipeOrtho->GetSliceDirection())->GetOutput());
+
+	pipeOrtho = (mafPipeVolumeOrthoSlice *)m_View->GetNodePipe(m_SegmentationVolume);
+	pipeOrtho->SetSliceOpacity(0.4);
+	m_SegmetationSlice = (vtkImageData*)(pipeOrtho->GetSlicer(pipeOrtho->GetSliceDirection())->GetOutput());
+
+	m_Helper.SetSlices(m_VolumeSlice, m_SegmetationSlice);
+
+	m_GuiDialog->Update();
+	if (m_CurrentOperation == EDIT_SEGMENTATION)
+		CreateRealDrawnImage();
+
+	UpdateSlice();
+	m_View->CameraReset();
+
+	if (m_CurrentOperation == INIT_SEGMENTATION)
+		OnThresholdUpate();
+	else // EDIT_SEGMENTATION
+		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
+
+}
+
 //------------------------------------------------------------------------
 void mafOpSegmentation::StartDraw(mafEvent *e, bool erase)
-//------------------------------------------------------------------------
 {
   if (erase) m_ManualSegmentationAction = MANUAL_SEGMENTATION_ERASE;
   else m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
@@ -2070,8 +1982,8 @@ void mafOpSegmentation::StartDraw(mafEvent *e, bool erase)
     urs.dataArray = vtkUnsignedCharArray::New();
     urs.dataArray->DeepCopy( m_SegmetationSlice->GetPointData()->GetScalars() );
     urs.dataArray->SetName("SCALARS");
-    urs.plane=m_CurrentSlicePlane;
-    urs.slice=m_CurrentSliceIndex;
+    urs.plane=m_SlicePlane;
+    urs.slice=m_SliceIndex;
     m_ManualUndoList.push_back( urs );
 
     m_PickingStarted = true;
@@ -2086,20 +1998,8 @@ void mafOpSegmentation::StartDraw(mafEvent *e, bool erase)
     m_PickingStarted=false;
   }
 }
-
-//------------------------------------------------------------------------
-void mafOpSegmentation::OnEventUpdateThresholdSlice()
-//------------------------------------------------------------------------
-{
-  UpdateThresholdRealTimePreview();
-  UpdateSlice();
-  m_View->CameraUpdate();
-  m_GuiDialog->Update();
-}
-
 //------------------------------------------------------------------------
 void mafOpSegmentation::OnUpdateSlice()
-//------------------------------------------------------------------------
 {
 	if (m_CurrentOperation == EDIT_SEGMENTATION)
 	{
@@ -2109,7 +2009,9 @@ void mafOpSegmentation::OnUpdateSlice()
 
 	UpdateSlice();
 
-	if (m_CurrentOperation == EDIT_SEGMENTATION)
+	if (m_CurrentOperation == INIT_SEGMENTATION)
+		UpdateThresholdRealTimePreview();
+	else // EDIT_SEGMENTATION
 		CreateRealDrawnImage();
 }
 
@@ -2142,37 +2044,29 @@ void mafOpSegmentation::OnBrushEvent(mafEvent *e)
 void mafOpSegmentation::OnChangeThresholdType()
 //------------------------------------------------------------------------
 {
-  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_ADD_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_REMOVE_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_UPDATE_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_LIST_OF_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_INC_MIN_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_INC_MAX_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_DEC_MIN_RANGE,m_AutomaticGlobalThreshold == RANGE );
-	m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_DEC_MAX_RANGE, m_AutomaticGlobalThreshold == RANGE);
-	m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_DEC_MIDDLE_RANGE, m_AutomaticGlobalThreshold == RANGE);
-  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_INC_MIDDLE_RANGE,m_AutomaticGlobalThreshold == RANGE );
-  m_AutomaticRangeSlider->Enable(m_AutomaticGlobalThreshold == RANGE);
-  
+  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_SPLIT_RANGE,m_InitModality == RANGE_INIT );
+  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_REMOVE_RANGE,m_InitModality == RANGE_INIT);
+  m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_AUTO_LIST_OF_RANGE,m_InitModality == RANGE_INIT);
+ 
+	int thesholdIDs[] = { ID_AUTO_INC_MIN_THRESHOLD, ID_AUTO_INC_MIDDLE_THRESHOLD, ID_AUTO_INC_MAX_THRESHOLD, ID_AUTO_DEC_MIN_THRESHOLD, ID_AUTO_DEC_MIDDLE_THRESHOLD, ID_AUTO_DEC_MAX_THRESHOLD };
+	for(int i=0;i<6;i++)
+		m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(thesholdIDs[i], m_InitModality != LOAD_INIT);
+  m_ThresholdSlider->Enable(m_InitModality != LOAD_INIT);
 
+	m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_LOAD, m_InitModality == LOAD_INIT);
   UpdateThresholdLabel();
 }
 
 //------------------------------------------------------------------------
-void mafOpSegmentation::OnAutomaticAddRange()
+void mafOpSegmentation::OnSplitRange()
 //------------------------------------------------------------------------
 {
   double min,max;
-  m_AutomaticRangeSlider->GetSubRange(&min,&max);
   int iMin = round(min)-1;
   int iMax = round(max)-1;
 
 
-  if (!AutomaticCheckRange())
-  {
-    return;
-  }
-
+  
   //Store the parameters
   AutomaticInfoRange range;
   range.m_EndSlice = iMax;
@@ -2188,11 +2082,7 @@ void mafOpSegmentation::OnAutomaticAddRange()
 
   m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
 
-  UpdateThresholdLabel();
-  UpdateThresholdRealTimePreview();
-
-  OnEventUpdateThresholdSlice();
-  //OnAutomaticPreview();
+  OnThresholdUpate();
 }
 
 //----------------------------------------------------------------------------
@@ -2209,7 +2099,7 @@ void mafOpSegmentation::SetSelectionAutomaticListOfRange(int index)
 
 
 //------------------------------------------------------------------------
-void mafOpSegmentation::OnAutomaticRemoveRange()
+void mafOpSegmentation::OnRemoveRange()
 //------------------------------------------------------------------------
 {
   if (m_AutomaticListOfRange->GetSelection()<0)
@@ -2237,9 +2127,7 @@ void mafOpSegmentation::OnAutomaticRemoveRange()
 
   m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
 
-  UpdateThresholdLabel();
-  UpdateThresholdRealTimePreview();
-  OnEventUpdateThresholdSlice();
+  OnThresholdUpate();
 }
 
 //------------------------------------------------------------------------
@@ -2292,77 +2180,10 @@ void mafOpSegmentation::UpdateThresholdVolumeData()
   m_ThresholdVolume->Update();
 	*/
 }
-void mafOpSegmentation::OnAutomaticUpdateRange()
 //------------------------------------------------------------------------
+void mafOpSegmentation::OnThresholdUpate(int eventID)
 {
-  if (m_AutomaticListOfRange->GetSelection()<0)
-  {
-    return;
-  }
-
-  double min,max;
-  m_AutomaticRangeSlider->GetSubRange(&min,&max);
-  int iMin = round(min)-1;
-  int iMax = round(max)-1;
-
-  if (AutomaticCheckRange(m_AutomaticListOfRange->GetSelection()))
-  {
-    double min,max;
-    m_AutomaticRangeSlider->GetSubRange(&min,&max);
-
-    m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_ThresholdValue = m_AutomaticThreshold;
-    m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_UpperThresholdValue = m_AutomaticUpperThreshold;
-    m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_StartSlice = iMin;
-    m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_EndSlice = iMax;
-
-    wxString line = wxString::Format("[%d,%d] low %.3f high %.3f",iMin+1,iMax+1,m_AutomaticThreshold,m_AutomaticUpperThreshold);
-    m_AutomaticListOfRange->SetString(m_AutomaticListOfRange->GetSelection(),line);
-
-    m_GuiDialog->Enable(ID_BUTTON_NEXT, true);
-
-    m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
-
-    UpdateThresholdLabel();
-  }
-}
-//------------------------------------------------------------------------
-void mafOpSegmentation::OnAutomaticChangeRangeManually(int eventID)
-{
-  double subMin,subMax;
-  m_AutomaticRangeSlider->GetSubRange(&subMin,&subMax);
-  
-  switch(eventID)
-  {
-  case ID_AUTO_INC_MIN_RANGE:
-      subMin++;
-    break;
-  case ID_AUTO_INC_MAX_RANGE:
-      subMax++;
-    break;
-  case ID_AUTO_DEC_MAX_RANGE:
-      subMax--;
-    break;
-  case ID_AUTO_DEC_MIN_RANGE:
-      subMin--;
-    break;
-  case ID_AUTO_INC_MIDDLE_RANGE:
-      subMin++;
-      subMax++;
-    break;
-  case ID_AUTO_DEC_MIDDLE_RANGE:
-      subMin--;
-      subMax--;
-    break;
-  }
-
-  m_AutomaticRangeSlider->SetSubRange(subMin,subMax);
-  UpdateThresholdRealTimePreview();
-  m_View->CameraUpdate();
-}
-//------------------------------------------------------------------------
-void mafOpSegmentation::OnAutomaticChangeThresholdManually(int eventID)
-{
-  m_AutomaticThresholdSlider->GetSubRange(&m_AutomaticThreshold,&m_AutomaticUpperThreshold);
+  m_ThresholdSlider->GetSubRange(&m_AutomaticThreshold,&m_AutomaticUpperThreshold);
   //Fine tuning threshold selection, get the event and update relative values
   switch(eventID)
   {
@@ -2386,92 +2207,46 @@ void mafOpSegmentation::OnAutomaticChangeThresholdManually(int eventID)
     m_AutomaticThreshold--;
     m_AutomaticUpperThreshold--;
     break;
+	case ID_RANGE_MODIFIED:
+		m_ThresholdSlider->GetSubRange(&m_AutomaticThreshold, &m_AutomaticUpperThreshold);
+		break;
+	default:
+		break;
   }
-  m_AutomaticThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
+
+  m_ThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
   
   UpdateThresholdLabel();
   UpdateThresholdRealTimePreview();
-  OnEventUpdateThresholdSlice();
   m_View->CameraUpdate();
 }
 //------------------------------------------------------------------------
-void mafOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
+void mafOpSegmentation::OnInitEvent(mafEvent *e)
 {
   switch(e->GetId())
   {
-  case ID_AUTO_INC_MIN_RANGE:
-  case ID_AUTO_INC_MAX_RANGE:
-  case ID_AUTO_INC_MIDDLE_RANGE:
-  case ID_AUTO_DEC_MIN_RANGE:
-  case ID_AUTO_DEC_MAX_RANGE:
-  case ID_AUTO_DEC_MIDDLE_RANGE:
-    {
-      OnAutomaticChangeRangeManually(e->GetId());
-    }
-    break;
   case ID_AUTO_INC_MIN_THRESHOLD:
   case ID_AUTO_INC_MAX_THRESHOLD:
   case ID_AUTO_INC_MIDDLE_THRESHOLD:
   case ID_AUTO_DEC_MIN_THRESHOLD:
   case ID_AUTO_DEC_MAX_THRESHOLD:
   case ID_AUTO_DEC_MIDDLE_THRESHOLD:
-    {
-      OnAutomaticChangeThresholdManually(e->GetId()); 
-    }
-    break;
-  case mafGUILutSlider::ID_MOUSE_D_CLICK_LEFT:
-    {
-      double min,max;
-      m_AutomaticRangeSlider->GetSubRange(&min,&max);
-      switch(e->GetArg())
-      {
-      case mafGUILutSlider::MAX_BUTTON:
-        {
-          if (m_CurrentSliceIndex<=min)
-            m_AutomaticRangeSlider->SetSubRange(min,min);
-          else
-            m_AutomaticRangeSlider->SetSubRange(min,m_CurrentSliceIndex);
-        }
-        break;
-      case mafGUILutSlider::MIN_BUTTON:
-        {
-          if (m_CurrentSliceIndex>=max)
-            m_AutomaticRangeSlider->SetSubRange(max,max);
-          else
-            m_AutomaticRangeSlider->SetSubRange(m_CurrentSliceIndex,max);
-        }
-        break;
-      case mafGUILutSlider::MIDDLE_BUTTON:
-        {
-          double diff = (max-min)/2;
-          min = m_CurrentSliceIndex-diff;
-          max = m_CurrentSliceIndex+diff;
-          m_AutomaticRangeSlider->SetSubRange(min,max);
-        }
-        break;
-      }
-    }
+    OnThresholdUpate(e->GetId()); 
     break;
   case ID_AUTO_THRESHOLD:
     {
-      m_AutomaticThresholdSlider->GetSubRange(&m_AutomaticThreshold,&m_AutomaticUpperThreshold);
+      m_ThresholdSlider->GetSubRange(&m_AutomaticThreshold,&m_AutomaticUpperThreshold);
       UpdateThresholdLabel();
     }
     break;
   case ID_AUTO_GLOBAL_THRESHOLD:
     {
       OnChangeThresholdType();
-      UpdateThresholdRealTimePreview();
-      OnEventUpdateThresholdSlice();
-      m_GuiDialog->Enable(ID_BUTTON_NEXT,(m_AutomaticGlobalThreshold==RANGE && m_AutomaticRanges.size()>0)||(m_AutomaticGlobalThreshold == FALSE));
+			OnThresholdUpate();
+      m_GuiDialog->Enable(ID_BUTTON_NEXT,(m_InitModality==RANGE_INIT && m_AutomaticRanges.size()>0)||(m_InitModality == FALSE));
     }
     break;
-  case ID_AUTO_UPDATE_RANGE:
-    {
-      OnAutomaticUpdateRange();
-    }
-    break;
-  case ID_AUTO_LIST_OF_RANGE:
+   case ID_AUTO_LIST_OF_RANGE:
     {
       if (m_AutomaticListOfRange->GetSelection() != -1)//Check if a range is selected
       {
@@ -2482,23 +2257,20 @@ void mafOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
         min = m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_StartSlice+1;
         max = m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_EndSlice+1;
 
-        m_AutomaticRangeSlider->SetSubRange(min,max);
-
         m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
        
-        m_AutomaticThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
+        m_ThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
       }
     }
     break;
-  case ID_AUTO_ADD_RANGE:
-    {
-      OnAutomaticAddRange();
-    }
+  case ID_SPLIT_RANGE:
+      OnSplitRange();
     break;
-  case ID_AUTO_REMOVE_RANGE:
-    {
-      OnAutomaticRemoveRange();
-    }
+  case ID_REMOVE_RANGE:
+      OnRemoveRange();
+    break;
+	case ID_LOAD:
+		OnLoadSegmentation();
     break;
   default:
     mafEventMacro(*e);
@@ -2520,15 +2292,15 @@ void mafOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
   }
   else
   {
-    if (state.plane!=m_CurrentSlicePlane || state.slice!=m_CurrentSliceIndex)
+    if (state.plane!=m_SlicePlane || state.slice!= m_SliceIndex)
     {
 
-      m_CurrentSlicePlane=state.plane;
-      m_CurrentSliceIndex=state.slice;
-      m_View->SetSliceAxis(m_CurrentSlicePlane);
+      m_SlicePlane=state.plane;
+			m_SliceIndex =state.slice;
+      m_View->SetSliceAxis(m_SlicePlane);
       UpdateSlice();
       m_View->CameraUpdate();
-      InitGui();
+      UpdateSliderValidator();
       m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
     }
 
@@ -2569,13 +2341,10 @@ void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
   case ID_MANUAL_BUCKET_GLOBAL:
     {
       if(m_GlobalFloodFill)
-      {
         m_ManualRangeSlider->Enable(true);
-      }
       else
-      {
         m_ManualRangeSlider->Enable(false);
-      }
+
       m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
     }
     break;
@@ -2782,7 +2551,7 @@ void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
   m_GuiDialog->SetFocusIgnoringChildren();
 }
 //------------------------------------------------------------------------
-void mafOpSegmentation::OnLoadSegmentationEvent()
+void mafOpSegmentation::OnLoadSegmentation()
 {
 	mafString title = mafString("Select a segmentation:");
 	mafEvent e(this, VME_CHOOSE);
@@ -2909,16 +2678,10 @@ void mafOpSegmentation::InitializeView()
   m_View->SetTextureInterpolate(false);
 	m_View->SetTrilinearInterpolation(false);
 
-  // slicing the volume
-  vtkDataSet *dataSet = m_Volume->GetOutput()->GetVTKData();
+  // setting Visual pipes
   m_View->PlugVisualPipe("mafVMEVolumeGray","mafPipeVolumeOrthoSlice");
   m_View->PlugVisualPipe("mafVMEImage","mafPipeImage3D");
   m_View->PlugVisualPipe("mafVMESurface","mafPipeSurfaceSlice");
- 
-  dataSet->GetPoint((0,0,0),m_SliceOrigin);
-  m_CurrentSliceIndex = 1;
-
-  UpdateSlice();
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::UpdateWindowing()
@@ -2949,9 +2712,9 @@ void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   double minDiffSpacing = min(min(diffSpacingXY,diffSpacingXZ),diffSpacingYZ);
 
   double targetSpacing = /*max*/(max(m_VolumeSpacing[0],m_VolumeSpacing[1])/*,m_VolumeSpacing[2]*/);
-	if (m_CurrentSlicePlane == XZ)
+	if (m_SlicePlane == XZ)
       targetSpacing = (max(m_VolumeSpacing[0],m_VolumeSpacing[2]));
-	else if (m_CurrentSlicePlane == XZ)
+	else if (m_SlicePlane == XZ)
       targetSpacing = (max(m_VolumeSpacing[1],m_VolumeSpacing[2]));
   
   vtkDataSet *dataset = m_SegmentationVolume->GetOutput()->GetVTKData();
@@ -2966,7 +2729,7 @@ void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   int unused = 2;
 
   double factors[2] = {1,m_VolumeDimensions[0]};
-  switch (m_CurrentSlicePlane)
+  switch (m_SlicePlane)
   {
     case XZ:
       {
@@ -3155,72 +2918,29 @@ void mafOpSegmentation::InitializeInteractors()
   m_AutomaticPER->SetRenderer(m_View->GetFrontRenderer());
 }
 //------------------------------------------------------------------------
-bool mafOpSegmentation::AutomaticCheckRange(int indexToExclude /* = -1 */)
-{
-  double min,max;
-  m_AutomaticRangeSlider->GetSubRange(&min,&max);
-
-  int minInt,maxInt;
-  minInt = round(min)-1;
-  maxInt = round(max)-1;
-
-  if (minInt > maxInt)
-  {
-    wxMessageBox("Lower slice index is higher than upper slice index");
-    return false;
-  }
-
-  //Check if any range overlaps with the actual
-  for (int i=0;i<m_AutomaticRanges.size();i++)
-  {
-    if (indexToExclude != i)
-    {
-      if (m_AutomaticRanges[i].m_EndSlice == maxInt || m_AutomaticRanges[i].m_StartSlice == minInt)
-      {
-        wxMessageBox("Range conflict in the correct ranges list");
-        return false;
-      }
-
-      if (m_AutomaticRanges[i].m_EndSlice >= minInt && m_AutomaticRanges[i].m_EndSlice <= maxInt)
-      {
-        wxMessageBox("Overlaps of slices range");
-        return false;
-      }
-
-      if (m_AutomaticRanges[i].m_StartSlice >= minInt && m_AutomaticRanges[i].m_StartSlice <= maxInt)
-      {
-        wxMessageBox("Overlaps of slices range");
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
-//------------------------------------------------------------------------
 void mafOpSegmentation::UpdateSliceLabel()
 {  
   // Update slice text actor   
-	wxString text = wxString::Format("Slice = %d of %d", m_CurrentSliceIndex, m_VolumeDimensions[m_CurrentSlicePlane]);
+	wxString text = wxString::Format("Slice = %d of %d", m_SliceIndex, m_VolumeDimensions[m_SlicePlane]);
 	m_AutomaticSliceTextMapper->SetInput(text);  
 }
 //------------------------------------------------------------------------
 void mafOpSegmentation::UpdateThresholdLabel()
 {
-	if (m_CurrentOperation == INIT_SEGMENTATION && (m_CurrentSlicePlane == XY || m_AutomaticGlobalThreshold == GLOBAL))
+	if (m_CurrentOperation == INIT_SEGMENTATION && (m_SlicePlane == XY || m_InitModality == GLOBAL_INIT))
 	{
-		if (m_AutomaticGlobalThreshold == RANGE)
+		if (m_InitModality == RANGE_INIT)
 		{
 			//Try to find the threshold of the visualized slice
 			for (int i = 0; i < m_AutomaticRanges.size(); i++)
-				if (m_AutomaticRanges[i].m_StartSlice <= m_CurrentSliceIndex - 1 && m_AutomaticRanges[i].m_EndSlice >= m_CurrentSliceIndex - 1)
+				if (m_AutomaticRanges[i].m_StartSlice <= m_SliceIndex - 1 && m_AutomaticRanges[i].m_EndSlice >= m_SliceIndex - 1)
 				{
 					mafString text = wxString::Format("Threshold low:%.3f high:%.3f", m_AutomaticRanges[i].m_ThresholdValue, m_AutomaticRanges[i].m_UpperThresholdValue);
 					m_AutomaticThresholdTextMapper->SetInput(text.GetCStr());
 					return;
 				}
 		}
-		else if (m_AutomaticGlobalThreshold == GLOBAL)
+		else if (m_InitModality == GLOBAL_INIT)
 		{
 			mafString text = wxString::Format("Threshold low:%.3f high:%.3f", m_AutomaticThreshold, m_AutomaticUpperThreshold);
 			m_AutomaticThresholdTextMapper->SetInput(text.GetCStr());
@@ -3270,22 +2990,10 @@ void mafOpSegmentation::InitVolumeDimensions()
 
     m_VolumeParametersInitialized = true;
 
-    if (m_SliceSlider)
-    {
-      if (m_CurrentSlicePlane == XY)
-        m_SliceSlider->SetRange(1,m_VolumeDimensions[2]);
-      else if (m_CurrentSlicePlane == XZ)
-        m_SliceSlider->SetRange(1,m_VolumeDimensions[1]);
-      else if (m_CurrentSlicePlane == YZ)
-        m_SliceSlider->SetRange(1,m_VolumeDimensions[0]);
-    }
-    if (m_AutomaticRangeSlider)
-    {
-      m_AutomaticRangeSlider->SetRange(1,m_VolumeDimensions[2]);
-      m_AutomaticRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
 
-      m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
-    }
+		//Setting start slicing on the center of the volume
+		for (int i = 0; i < 3; i++)
+			m_SliceIndexByPlane[i] = m_VolumeDimensions[i] / 2;
   }
 }
 
@@ -3344,7 +3052,7 @@ double mafOpSegmentation::GetPosFromSliceIndexZ()
     inputDataSet->Update();
 
     double point[3];
-    inputDataSet->GetPoint((m_CurrentSliceIndex-1)*m_VolumeDimensions[0]*m_VolumeDimensions[1], point);
+    inputDataSet->GetPoint((m_SliceIndex-1)*m_VolumeDimensions[0]*m_VolumeDimensions[1], point);
 
     double bounds[6];
     inputDataSet->GetBounds(bounds);
@@ -3368,12 +3076,12 @@ void mafOpSegmentation::GetSliceOrigin(double *origin)
     sp->GetSpacing(spc);
     sp->GetOrigin(origin);
 
-    if (m_CurrentSlicePlane == XY)
-      origin[2] = (m_CurrentSliceIndex-1)*spc[2]+origin[2];
-    else if (m_CurrentSlicePlane == XZ)
-      origin[1] = (m_CurrentSliceIndex-1)*spc[1]+origin[1];
-    else if (m_CurrentSlicePlane == YZ)
-      origin[0] = (m_CurrentSliceIndex-1)*spc[0]+origin[0];
+    if (m_SlicePlane == XY)
+      origin[2] = (m_SliceIndex-1)*spc[2]+origin[2];
+    else if (m_SlicePlane == XZ)
+      origin[1] = (m_SliceIndex -1)*spc[1]+origin[1];
+    else if (m_SlicePlane == YZ)
+      origin[0] = (m_SliceIndex -1)*spc[0]+origin[0];
 
   }
   else
@@ -3384,12 +3092,12 @@ void mafOpSegmentation::GetSliceOrigin(double *origin)
     origin[1] = rg->GetYCoordinates()->GetTuple1(0);
     origin[2] = rg->GetZCoordinates()->GetTuple1(0);
 
-    if (m_CurrentSlicePlane == XY)
-      origin[2] = rg->GetZCoordinates()->GetTuple1(m_CurrentSliceIndex-1);
-    else if (m_CurrentSlicePlane == XZ)
-      origin[1] = rg->GetYCoordinates()->GetTuple1(m_CurrentSliceIndex-1);
-    if (m_CurrentSlicePlane == YZ)
-      origin[0] = rg->GetXCoordinates()->GetTuple1(m_CurrentSliceIndex-1);
+    if (m_SlicePlane == XY)
+      origin[2] = rg->GetZCoordinates()->GetTuple1(m_SliceIndex -1);
+    else if (m_SlicePlane == XZ)
+      origin[1] = rg->GetYCoordinates()->GetTuple1(m_SliceIndex -1);
+    if (m_SlicePlane == YZ)
+      origin[0] = rg->GetXCoordinates()->GetTuple1(m_SliceIndex -1);
   }
 }
 
@@ -3398,15 +3106,12 @@ void mafOpSegmentation::UpdateSlice()
 //----------------------------------------------------------------------------
 {
 	double posNew[3];
-
-  m_OldSliceIndex = m_CurrentSliceIndex;
-  m_OldSlicePlane = m_CurrentSlicePlane;
   UpdateThresholdLabel();
   UpdateSliceLabel();
   GetSliceOrigin(posNew);
   m_View->SetSlice( posNew );
-	m_View->CameraUpdate();
 	m_GuiDialog->Update();
+	m_SliceIndexByPlane[m_SlicePlane] = m_SliceIndex;
 }
 
 
@@ -3424,10 +3129,10 @@ void mafOpSegmentation::ApplyVolumeSliceChanges()
     int numberOfPoints;
     int numberOfSlices=1;
     
-    if(m_OldSlicePlane == XY)
+    if(m_SlicePlane == XY)
     {
       numberOfPoints = m_VolumeDimensions[0]*m_VolumeDimensions[1];
-      int z=(m_OldSliceIndex-1);
+      int z=(m_SliceIndex-1);
       for (int x=0; x<m_VolumeDimensions[0]; x++)
         for (int y=0; y<m_VolumeDimensions[1]; y++)
         { 
@@ -3437,10 +3142,10 @@ void mafOpSegmentation::ApplyVolumeSliceChanges()
         }
     }
 
-    else if(m_OldSlicePlane == YZ)
+    else if(m_SlicePlane == YZ)
     {
       numberOfPoints = m_VolumeDimensions[1] * m_VolumeDimensions[2];
-      int x=(m_OldSliceIndex-1);
+      int x=(m_SliceIndex-1);
       for (int y=0; y<m_VolumeDimensions[1]; y++)
         for (int z=0; z<m_VolumeDimensions[2]; z++)
         { 
@@ -3450,10 +3155,10 @@ void mafOpSegmentation::ApplyVolumeSliceChanges()
         }
     }
 
-    else if(m_OldSlicePlane == XZ)
+    else if(m_SlicePlane == XZ)
     {
       numberOfPoints = m_VolumeDimensions[0] * m_VolumeDimensions[2];
-      int y=(m_OldSliceIndex-1);
+      int y=(m_SliceIndex-1);
       for (int x=0; x<m_VolumeDimensions[0]; x++)
         for (int z=0; z<m_VolumeDimensions[2]; z++)
         { 
@@ -3587,41 +3292,16 @@ void mafOpSegmentation::UpdateThresholdRealTimePreview()
 //----------------------------------------------------------------------------
 {
   
-  mafVMESegmentationVolume *tVol;
-  mafNEW(tVol);
 
-  tVol->SetVolumeLink(m_SegmentationVolume);
-  tVol->SetName("Threshold Volume");
-  tVol->ReparentTo(tVol->GetParent());
-  tVol->SetDoubleThresholdModality(true);
-  tVol->Update();
-
-
-  tVol->RemoveAllRanges();
-	if (m_AutomaticGlobalThreshold == RANGE)
+	if (m_InitModality == GLOBAL_INIT)
 	{
-		int result;
-		tVol->SetAutomaticSegmentationThresholdModality(mafVMESegmentationVolume::RANGE);
-		for (int i = 0; i < m_AutomaticRanges.size(); i++)
-		{
-			if (m_CurrentSliceIndex >= m_AutomaticRanges[i].m_StartSlice + 1 && m_CurrentSliceIndex <= m_AutomaticRanges[i].m_EndSlice + 1)
-				result = tVol->AddRange(0, 1, m_AutomaticRanges[i].m_ThresholdValue, m_AutomaticRanges[i].m_UpperThresholdValue);
-		}
-		if (tVol->GetNumberOfRanges() == 0)
-			result = tVol->AddRange(0, 1, m_AutomaticThreshold, m_AutomaticUpperThreshold);
+		m_Helper.SliceThreshold(m_AutomaticThreshold, m_AutomaticUpperThreshold);
+		m_View->CameraUpdate(); 
 	}
-  else
+	else if (m_InitModality == RANGE_INIT)
   {
-    tVol->SetAutomaticSegmentationThresholdModality(mafVMESegmentationVolume::GLOBAL);
-    tVol->SetAutomaticSegmentationGlobalThreshold(m_AutomaticThreshold,m_AutomaticUpperThreshold);
+			//TODO Update Threshold
   }
-
-
-  tVol->GetOutput()->Update();
-  tVol->Update();
-
-
-	mafDEL(tVol);
 }
 
 //----------------------------------------------------------------------------
@@ -3823,15 +3503,15 @@ void mafOpSegmentation::OnEventFloodFill(mafEvent *e)
 
   if(m_GlobalFloodFill != TRUE)
   {
-    dims[m_CurrentSlicePlane] = 1;
-    seed[m_CurrentSlicePlane] = 0;
+    dims[m_SlicePlane] = 1;
+    seed[m_SlicePlane] = 0;
   }
   else
   {
     double low,hi;
     m_ManualRangeSlider->GetSubRange(&low,&hi);
-    dims[m_CurrentSlicePlane] = (hi - low) + 1;
-    seed[m_CurrentSlicePlane] = seed[m_CurrentSlicePlane] - (low-1);
+    dims[m_SlicePlane] = (hi - low) + 1;
+    seed[m_SlicePlane] = seed[m_SlicePlane] - (low-1);
   }
 
   // recalculate seed id

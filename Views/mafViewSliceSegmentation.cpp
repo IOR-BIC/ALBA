@@ -184,13 +184,13 @@ void mafViewSliceSegmentation::VmeDeletePipe(mafVME *vme)
   
 	if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
 	{
-		if (vme == m_CurrentVolume->GetVme())
+		if (m_CurrentVolume && vme == m_CurrentVolume->GetVme())
 		{
 			m_CurrentVolume = NULL;
 			if (m_AttachCamera)
 				m_AttachCamera->SetVme(NULL);
 		}
-		else if (vme == m_CurrentSegmentation->GetVme())
+		else if (m_CurrentSegmentation && vme == m_CurrentSegmentation->GetVme())
 		{
 			m_CurrentSegmentation = NULL;
 		}
@@ -210,9 +210,15 @@ void mafViewSliceSegmentation::SetSlice(double* Origin, double* Normal)
 	//now set it for current segmentation
   if (m_CurrentSegmentation)
 	{
-    mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentSegmentation->GetPipe());
+		//Workaround we add an epsilon to ensure segmentation volume is always visible
+		//This compensate the volume shift added on OpSegmentation
+		double newOrigin[3];
+		newOrigin[0] = Origin[0] + 0.0001;
+		newOrigin[1] = Origin[1] - 0.0001;
+		newOrigin[2] = Origin[2] - 0.0001;
+		mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentSegmentation->GetPipe());
 		if (pipe != NULL)
-			pipe->SetSlice(Origin, NULL);
+			pipe->SetSlice(newOrigin, NULL);
 	}
  }
 //----------------------------------------------------------------------------

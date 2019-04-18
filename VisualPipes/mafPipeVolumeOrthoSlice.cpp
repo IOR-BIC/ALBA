@@ -204,7 +204,6 @@ void mafPipeVolumeOrthoSlice::Create(mafSceneNode *n)
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::CreateTICKs()
-//----------------------------------------------------------------------------
 {
 	//---- TICKs creation --------------------------
 	vtkPolyData  *CTLinesPD      = vtkPolyData::New();	
@@ -311,7 +310,6 @@ void mafPipeVolumeOrthoSlice::CreateTICKs()
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::CreateSlice()
-//----------------------------------------------------------------------------
 {
 	for (int i = 0; i < 3; i++)
 		if (i == m_SliceDirection || m_SliceDirection == SLICE_ORTHO)
@@ -379,7 +377,6 @@ void mafPipeVolumeOrthoSlice::CreateSlice()
 			m_AssemblyUsed->AddPart(m_SliceActor[i]);
 		}
 }
-
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::DeleteSlice()
 {
@@ -396,7 +393,6 @@ void mafPipeVolumeOrthoSlice::DeleteSlice()
 		}
 
 }
-
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::UpdatePlaneOrigin(int direction)
 {
@@ -414,10 +410,8 @@ void mafPipeVolumeOrthoSlice::UpdatePlaneOrigin(int direction)
 	p[direction] = m_Origin[direction];
 	m_SlicePlane[direction]->SetPoint2(p);
 }
-
 //----------------------------------------------------------------------------
 mafPipeVolumeOrthoSlice::~mafPipeVolumeOrthoSlice()
-//----------------------------------------------------------------------------
 {
   m_Vme->RemoveObserver(this);
 	
@@ -439,7 +433,6 @@ mafPipeVolumeOrthoSlice::~mafPipeVolumeOrthoSlice()
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::SetLutRange(double low, double high)
-//----------------------------------------------------------------------------
 {
   mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
   material->m_Window_LUT = high-low;
@@ -450,33 +443,25 @@ void mafPipeVolumeOrthoSlice::SetLutRange(double low, double high)
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::GetLutRange(double range[2])
-//----------------------------------------------------------------------------
 {
   mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
   material->m_ColorLut->GetTableRange(range);
 }
-
-
 //----------------------------------------------------------------------------
-//Set the origin and normal of the slice
 void mafPipeVolumeOrthoSlice::SetSlice(double* origin, double* normal)
 {
 	if (origin != NULL)
 		for (int i = 0; i < 3; i++)
 			if (m_Slicer[i] && m_Origin[i] != origin[i])
 			{
+				m_Origin[i] = origin[i];
 				m_Slicer[i]->SetPlaneOrigin(m_Origin);
 				UpdatePlaneOrigin(i);
-				m_Origin[i] = origin[i];
 				m_Slicer[i]->Update();
 			}
 }
-
 //----------------------------------------------------------------------------
-//Get the slice origin coordinates and normal.
-//Both, Origin and Normal may be NULL, if the value is not to be retrieved.
-/*virtual*/ void mafPipeVolumeOrthoSlice::GetSlice(double *origin, double *normal)
-//----------------------------------------------------------------------------
+void mafPipeVolumeOrthoSlice::GetSlice(double *origin, double *normal)
 {
   if (origin != NULL)
   {
@@ -492,10 +477,8 @@ void mafPipeVolumeOrthoSlice::SetSlice(double* origin, double* normal)
     normal[2] = m_SliceDirection == SLICE_Z;
   }  
 }
-
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::SetSliceOpacity(double opacity)
-//----------------------------------------------------------------------------
 {
   m_SliceOpacity = opacity;
   
@@ -507,13 +490,11 @@ void mafPipeVolumeOrthoSlice::SetSliceOpacity(double opacity)
 }
 //----------------------------------------------------------------------------
 float mafPipeVolumeOrthoSlice::GetSliceOpacity()
-//----------------------------------------------------------------------------
 {
   return m_SliceOpacity;
 }
 //----------------------------------------------------------------------------
 mafGUI *mafPipeVolumeOrthoSlice::CreateGui()
-//----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
   double b[6] = {-1,1,-1,1,-1,1};
@@ -537,14 +518,11 @@ mafGUI *mafPipeVolumeOrthoSlice::CreateGui()
 		}
 	}
 	m_Gui->Divider();
-//   m_Gui->Bool(ID_ENABLE_GPU, "Enable GPU", &m_EnableGPU, 1, 
-//     _("Enables / disables GPU support for slicing. GPU slicing is typically faster but may produce wrong results on some hardware."));
   m_Gui->Bool(ID_ENABLE_TRILINEAR_INTERPOLATION,"Interpolation",&m_Interpolate,1,"Enable/Disable tri-linear interpolation on slices");
   return m_Gui;
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
  {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
@@ -589,7 +567,6 @@ void mafPipeVolumeOrthoSlice::OnEvent(mafEventBase *maf_event)
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::SetColorLookupTable(vtkLookupTable *lut)
-//----------------------------------------------------------------------------
 {
   int i;
   if (lut == NULL)
@@ -611,7 +588,6 @@ void mafPipeVolumeOrthoSlice::SetColorLookupTable(vtkLookupTable *lut)
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::Select(bool sel)
-//----------------------------------------------------------------------------
 {
 	m_Selected = sel;
 	m_ShowVolumeBox = sel;
@@ -619,17 +595,14 @@ void mafPipeVolumeOrthoSlice::Select(bool sel)
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::HideSlider()
-//----------------------------------------------------------------------------
 {
 	m_ShowSlider=false;
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::ShowSlider()
-//----------------------------------------------------------------------------
 {
 	m_ShowSlider=true;
 }
-
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::SetInterpolation(int on)
 {
@@ -639,7 +612,6 @@ void mafPipeVolumeOrthoSlice::SetInterpolation(int on)
 			m_Texture[i]->SetInterpolate(m_Interpolate);
 	GetLogicManager()->CameraUpdate();
 }
-
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::SetSliceDirection(int sliceDirection)
 {
@@ -650,10 +622,8 @@ void mafPipeVolumeOrthoSlice::SetSliceDirection(int sliceDirection)
 	m_SliceDirection = sliceDirection;
 	CreateSlice();
 }
-
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::ShowTICKsOn()
-//----------------------------------------------------------------------------
 {
 	m_ShowTICKs=true;
 	if(m_TickActor)
@@ -661,17 +631,13 @@ void mafPipeVolumeOrthoSlice::ShowTICKsOn()
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::ShowTICKsOff()
-//----------------------------------------------------------------------------
 {
 	m_ShowTICKs=false;
 	if(m_TickActor)
 		m_TickActor->SetVisibility(m_ShowTICKs);
 }
-
 //------------------------------------------------------------------------
-//Updates VTK slicers. It also sets GPUEnabled flag. 
 void mafPipeVolumeOrthoSlice::UpdateSlice()
-//------------------------------------------------------------------------
 {
   for (int i = 0; i < 3; i++)
   {

@@ -494,12 +494,7 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
 	{
     mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentVolume->GetPipe());
 		if (pipe != NULL)
-		{
 			pipe->SetSlice(Origin, NULL);
-
-			// update text
-			this->UpdateText();
-		}
 	}
  
   double coord[3];
@@ -542,7 +537,8 @@ void mafViewSlice::SetSliceAxis(int sliceAxis)
 			pipe->SetSliceDirection(sliceAxis);
 	}
 	InitializeSlice(m_Slice);
-	SetCameraParallelToDataSetLocalAxis(sliceAxis);
+	if(m_CurrentVolume)
+		SetCameraParallelToDataSetLocalAxis(sliceAxis);
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::GetSlice(double* Origin, double* Normal)

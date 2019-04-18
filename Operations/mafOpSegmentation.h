@@ -21,6 +21,7 @@
 #include "mafMatrix.h"
 #include "mafVME.h"
 #include "mafVMESegmentationVolume.h"
+#include "mafOpSegmentationHelper.h"
 #include "mafDefines.h"
 #include "vtkSystemIncludes.h"
 #include "wx/gauge.h"
@@ -131,17 +132,10 @@ public:
     ID_AUTO_DEC_MAX_THRESHOLD,
     ID_AUTO_DEC_MIDDLE_THRESHOLD,
     ID_AUTO_INC_MIDDLE_THRESHOLD,
-    ID_AUTO_ADD_RANGE,
-    ID_AUTO_REMOVE_RANGE,
+    ID_SPLIT_RANGE,
+    ID_REMOVE_RANGE,
     ID_AUTO_LIST_OF_RANGE,
-    ID_AUTO_UPDATE_RANGE,
     ID_AUTO_GLOBAL_THRESHOLD,
-    ID_AUTO_INC_MIN_RANGE,
-    ID_AUTO_INC_MAX_RANGE,
-    ID_AUTO_DEC_MIN_RANGE,
-    ID_AUTO_DEC_MAX_RANGE,
-    ID_AUTO_DEC_MIDDLE_RANGE,
-    ID_AUTO_INC_MIDDLE_RANGE,
     ID_REFINEMENT_ACTION,
     ID_REFINEMENT_EVERY_SLICE,
     ID_REFINEMENT_ITERATIVE,
@@ -186,6 +180,8 @@ public:
 
    /** Function that handles events sent from other objects. */
   void OnEvent(mafEventBase *maf_event);
+
+	void OnSelectSlicePlane();
 
   /** return the copy of the operation object */
   mafOp* Copy();
@@ -245,7 +241,7 @@ protected:
   void InitializeInteractors();
   
   /** Init GUI slice slider with volume parameters. */
-  void InitGui();
+  void UpdateSliderValidator();
   
   /** Initialize the Segmented Volume*/
   void InitSegmentationVolume();
@@ -263,7 +259,7 @@ protected:
   bool Refinement();
 
   /** Receive events from Automatic segmentation gui */
-  void OnAutomaticSegmentationEvent(mafEvent *e);
+  void OnInitEvent(mafEvent *e);
   
   /** Receive events from Manual segmentation gui */
   void OnManualSegmentationEvent(mafEvent *e);
@@ -272,7 +268,7 @@ protected:
   void OnRefinementSegmentationEvent(mafEvent *e);
   
   /** Receive events from Load segmentation gui */
-  void OnLoadSegmentationEvent();
+  void OnLoadSegmentation();
 
   /** Get the z position of the specified slice index */
   double GetPosFromSliceIndexZ();
@@ -292,8 +288,6 @@ protected:
   /** Initialize Refinement step */
   void OnRefinementStep();
 
-  /** Initialize Load step */
-  void OnLoadStep();
 
   /** Perform the initializations when the user press next button */
   void OnNextStep();
@@ -304,6 +298,7 @@ protected:
   void OnPreviousStep();
 
   mafVMEVolumeGray* m_Volume;         //<Input volume
+	vtkImageData     *m_VolumeSlice;
 	mafString m_VolumeName;        //<Loaded volume name
 	mafVMEVolumeGray *m_SegmentationVolume;     //<Segmentation volume
 	vtkImageData     *m_SegmetationSlice;
@@ -312,10 +307,9 @@ protected:
   double m_VolumeSpacing[3];          //<Volume spacing
   double m_VolumeBounds[6];           //<Volume bounds
   bool m_VolumeParametersInitialized; //<Specify if volume parameters are initialized
-  int m_CurrentSliceIndex;            //<Index of the current slice position
-  int m_OldSliceIndex;                //<Old slice index
-  int m_CurrentSlicePlane;            //<Current slicing plane (xy,xz,yx)
-  int m_OldSlicePlane;                //<Old slice plane
+	int m_SliceIndex;								//GuiVariable
+	int m_SliceIndexByPlane[3];            //<Index of the current slice position
+	int m_SlicePlane;            //<Current slicing plane (xy,xz,yx)
   int m_NumSliceSliderEvents;         //<Number of events raised by the slider in a single interaction
   int m_CurrentOperation;             //<Current step
 	int m_ShowLabels;
@@ -348,7 +342,6 @@ protected:
 
   //////////////////////////////////////////////////////////////////////////
   //Manual segmentation stuff
-  //////////////////////////////////////////////////////////////////////////
   typedef struct urstate
   {
     int plane;
@@ -359,7 +352,7 @@ protected:
   /** Apply volume slice changes*/
   void ApplyVolumeSliceChanges();
   
-  /** Set flags that indicate that the user start drae interaction */
+  /** Set flags that indicate that the user start draw interaction */
   void StartDraw(mafEvent *e, bool erase);
 
   /** Select brush image depending on shape and size */
@@ -389,7 +382,7 @@ protected:
   mafGUIFloatSlider *m_ManualBrushSizeSlider;   //<Brush size slider - GUI
   wxTextCtrl *m_ManualBrushSizeText;            //<Brush size text box - GUI
   wxRadioBox *m_ManualBrushShapeRadioBox;       //<Brush shape radio - GUI
-	wxRadioBox *m_ThresholdTypeRadioBox;					//<Threshold Type radio - GUI
+	wxRadioBox *m_InitModalityRadioBox;					//<Threshold Type radio - GUI
   wxStaticBoxSizer *m_BrushEditingSizer;
   mafGUIButton *m_ManualApplyChanges;           //<Apply changes button - GUI
   int m_ManualSegmentationAction;               //<Manual segmentation action (draw/erease)
@@ -413,16 +406,12 @@ protected:
 
   //////////////////////////////////////////////////////////////////////////
   //Automatic segmentation stuff
-  //////////////////////////////////////////////////////////////////////////
-  
+ 
   /***/
   void SetSelectionAutomaticListOfRange(int index);
 
-  /** Check that the range has right values */
-  bool AutomaticCheckRange(int indexToExclude = -1);
-
   /** Function called when the user use the fine button to change the threshold*/
-  void OnAutomaticChangeThresholdManually(int eventID);
+  void OnThresholdUpate(int eventID=-1);
 
   /** Check if all thresholds exist */
   bool CheckNumberOfThresholds();
@@ -437,16 +426,10 @@ protected:
   void OnChangeThresholdType();
 
   /** Add a new range using gui values */
-  void OnAutomaticAddRange();
+  void OnSplitRange();
 
   /** Remove the select range */
-  void OnAutomaticRemoveRange();
-
-  /** Update the select range using gui values */
-  void OnAutomaticUpdateRange();
-
-   /** Function called when the user use the fine button to change the range of the automatic segmentation */
-  void OnAutomaticChangeRangeManually(int eventID);
+  void OnRemoveRange();
 
   /** Get camera attributes */
   void GetCameraAttribute(double *focalPoint, double* scaleFactor);
@@ -460,23 +443,15 @@ protected:
   /** Update threshold real-time preview*/
   void UpdateThresholdRealTimePreview();
 
-  int m_AutomaticGlobalThreshold;   //<Global threshold range lower bound
+  int m_InitModality;   //<Global threshold range lower bound
   double m_AutomaticThreshold;      //<Global threshold range lower bound
   double m_AutomaticUpperThreshold; //<Global threshold range upper bound
   double m_AutomaticMouseThreshold; //<Mouse threshold
   wxListBox *m_AutomaticListOfRange;//<List of threshold ranges
-  mafGUILutSlider *m_AutomaticRangeSlider;//<Range slider - GUI
-
-  struct AutomaticInfoRange 
-  {
-    int m_StartSlice;
-    int m_EndSlice;
-    double m_ThresholdValue;
-    double m_UpperThresholdValue;
-  };
+  
   std::vector<AutomaticInfoRange> m_AutomaticRanges; //<Automatic range structure
   
-  mafGUILutSlider *m_AutomaticThresholdSlider;//<Threshold slider
+  mafGUILutSlider *m_ThresholdSlider;//<Threshold slider
 
   vtkTextMapper *m_AutomaticThresholdTextMapper;//<Text mapper for threshold visualization
   vtkActor2D *m_AutomaticThresholdTextActor;    //<Text actor for threshold visualization
@@ -501,9 +476,6 @@ protected:
 
   /** Apply refinement algorithm implemented with vtk only */
   bool ApplyRefinementFilter2(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage);
-
-  /** Update slice visualisation on threshold step */
-  void OnEventUpdateThresholdSlice();
 
   /** Update slice visualisation on manual step */
   void OnUpdateSlice();
@@ -536,6 +508,8 @@ protected:
   int m_FloodErease;      //< switch fill/erase for bucket tool
 
   wxGauge *m_ProgressBar; //< display progress
+
+	mafOpSegmentationHelper m_Helper;
 	  
   /** flood fill algorithm */
   void FloodFill(vtkIdType seed);
