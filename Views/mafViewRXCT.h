@@ -1,17 +1,16 @@
 /*=========================================================================
+Program:   Alba
+Module:    mafViewRXCT.h
+Language:  C++
+Date:      $Date: 2018-01-01 12:00:00 $
+Version:   $Revision: 1.0.0.0 $
+Authors:   Gianluigi Crimi, Nicola Vanella
+==========================================================================
+Copyright (c) BIC-IOR 2018 (https://github.com/IOR-BIC)
 
- Program: MAF2
- Module: mafViewRXCT
- Authors: Stefano Perticoni , Paolo Quadrani
- 
- Copyright (c) B3C
- All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
-
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notice for more information.
-
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
 #ifndef __mafViewRXCT_H__
@@ -129,15 +128,13 @@ protected:
   /** set thickness value for all the pipes*/
   void SetThicknessForAllSurfaceSlices(mafVME *root);
 
-  /**
-  Sort the slice */
+  /** Sort the slice */
   void SortSlices();
 
   /** Reset slice positions  */
   void ResetSlicesPosition(mafVME *vme);
 
-	/**
-	Check if the gizmo posiztion is inside the bounding box*/
+	/** Check if the gizmo posiztion is inside the bounding box*/
 	void BoundsValidate(double *pos);
 
   /** Precess events coming from other objects */
@@ -180,5 +177,7 @@ protected:
 
   // Added by Losi 11.25.2009
   int m_TrilinearInterpolationOn;
+
+	bool m_IsSubViewMaximized;
 };
 #endif

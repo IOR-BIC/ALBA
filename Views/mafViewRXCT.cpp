@@ -1,19 +1,17 @@
 /*=========================================================================
+Program:   Alba
+Module:    mafViewRXCT.cpp
+Language:  C++
+Date:      $Date: 2018-01-01 12:00:00 $
+Version:   $Revision: 1.0.0.0 $
+Authors:   Gianluigi Crimi, Nicola Vanella
+==========================================================================
+Copyright (c) BIC-IOR 2018 (https://github.com/IOR-BIC)
 
- Program: MAF2
- Module: mafViewRXCT
- Authors: Stefano Perticoni , Paolo Quadrani
- 
- Copyright (c) B3C
- All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
-
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notice for more information.
-
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
-
 
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
@@ -60,7 +58,6 @@ enum RXCT_SUBVIEW_ID
   VIEWS_NUMBER,
 };
 
-
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewRXCT);
 //----------------------------------------------------------------------------
@@ -68,9 +65,7 @@ mafCxxTypeMacro(mafViewRXCT);
 //----------------------------------------------------------------------------
 mafViewRXCT::mafViewRXCT(wxString label)
 : mafViewCompound(label, 1, 3)
-//----------------------------------------------------------------------------
 {
-
   m_BorderColor[0][0] = 1; m_BorderColor[0][1] = 0; m_BorderColor[0][2] = 0;
   m_BorderColor[1][0] = 0; m_BorderColor[1][1] = 1; m_BorderColor[1][2] = 0;
   m_BorderColor[2][0] = 0; m_BorderColor[2][1] = 0; m_BorderColor[2][2] = 1;
@@ -103,25 +98,26 @@ mafViewRXCT::mafViewRXCT(wxString label)
   m_AllSurface=0;
   m_Border=1;
 
+	m_IsSubViewMaximized = false;
+
   m_TrilinearInterpolationOn = TRUE;
 }
 //----------------------------------------------------------------------------
 mafViewRXCT::~mafViewRXCT()
-//----------------------------------------------------------------------------
 {
-  m_ViewsRX[RX_FRONT_VIEW] = m_ViewsRX[RX_SIDE_VIEW] = NULL;
-  m_ViewCTCompound = NULL;
-  m_CurrentSurface.clear();
+	m_ViewsRX[RX_FRONT_VIEW] = m_ViewsRX[RX_SIDE_VIEW] = NULL;
+	m_ViewCTCompound = NULL;
+	m_CurrentSurface.clear();
 
-  for (int i = RX_FRONT_VIEW;i < VIEWS_NUMBER;i++)
-  {
-    cppDEL(m_LutSliders[i]);
-    //vtkDEL(m_vtkLUT[i]);
-  }
+	for (int i = RX_FRONT_VIEW; i < VIEWS_NUMBER; i++)
+	{
+		cppDEL(m_LutSliders[i]);
+		//vtkDEL(m_vtkLUT[i]);
+	}
 }
+
 //----------------------------------------------------------------------------
 mafView *mafViewRXCT::Copy(mafObserver *Listener, bool lightCopyEnabled)
-//----------------------------------------------------------------------------
 {
   m_LightCopyEnabled = lightCopyEnabled;
   mafViewRXCT *v = new mafViewRXCT(m_Label);
@@ -135,9 +131,44 @@ mafView *mafViewRXCT::Copy(mafObserver *Listener, bool lightCopyEnabled)
   v->Create();
   return v;
 }
+
+//----------------------------------------------------------------------------
+void mafViewRXCT::PackageView()
+{
+	int cam_pos[2] = { CAMERA_RX_FRONT, CAMERA_RX_LEFT };
+	for (int v = RX_FRONT_VIEW; v < CT_COMPOUND_VIEW; v++)
+	{
+		// create to the child view
+		m_ViewsRX[v] = new mafViewRX("RX child view", cam_pos[v]);
+		m_ViewsRX[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeProjected", MUTEX);
+		m_ViewsRX[v]->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeProjected", MUTEX);
+		m_ViewsRX[v]->PlugVisualPipe("mafVMESlicer", "mafVisualPipeSlicerSlice", MUTEX);
+		m_ViewsRX[v]->PlugVisualPipe("mafVMESegmentationVolume", "mafPipeVolumeProjected", MUTEX);
+
+		PlugChildView(m_ViewsRX[v]);
+	}
+
+	m_ViewCTCompound = new mafViewCompound("CT view", 3, 2);
+	mafViewSlice *vs = new mafViewSlice("Slice view", CAMERA_OS_Z);
+	vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeOrthoSlice", MUTEX);
+	vs->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeOrthoSlice", MUTEX);
+	vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", MUTEX);
+	vs->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice", MUTEX);
+	vs->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice", MUTEX);
+	vs->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice", MUTEX);
+	vs->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice", MUTEX);
+	vs->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice", MUTEX);
+	vs->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceSlice", MUTEX);
+	vs->PlugVisualPipe("mafVMEMeter", "mafPipePolylineSlice", MUTEX);
+	vs->PlugVisualPipe("mafVMEWrappedMeter", "mafPipePolylineSlice", MUTEX);
+	vs->PlugVisualPipe("mafVMESegmentationVolume", "mafPipeVolumeOrthoSlice", MUTEX);
+
+	m_ViewCTCompound->PlugChildView(vs);
+	PlugChildView(m_ViewCTCompound);
+}
+
 //----------------------------------------------------------------------------
 void mafViewRXCT::VmeShow(mafVME *vme, bool show)
-//----------------------------------------------------------------------------
 {
 	bool isVmeShowed = m_ChildViewList[0]->IsVmeShowed(vme);
 
@@ -345,7 +376,6 @@ void mafViewRXCT::VmeShow(mafVME *vme, bool show)
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::VmeRemove(mafVME *vme)
-//----------------------------------------------------------------------------
 {
   if (m_CurrentVolume && vme == m_CurrentVolume) 
   {
@@ -355,8 +385,32 @@ void mafViewRXCT::VmeRemove(mafVME *vme)
   Superclass::VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
-void mafViewRXCT::OnEventRangeModified(mafEventBase *maf_event)
+void mafViewRXCT::VmeSelect(mafVME *vme, bool select)
+{
+	for (int i = 0; i < m_NumOfChildView; i++)
+		m_ChildViewList[i]->VmeSelect(vme, select);
+
+	if (m_Gui)
+	{
+		mafPipe *p = ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(vme);
+		if ((vme->IsA("mafVMESurface") || vme->IsA("mafVMESurfaceParametric") || vme->IsA("mafVMESlicer")) && select&&p)
+		{
+			m_Gui->Enable(ID_ALL_SURFACE, true);
+			m_Gui->Enable(ID_BORDER_CHANGE, true);
+			m_Gui->Enable(ID_ADJUST_SLICES, true);
+		}
+		else
+		{
+			m_Gui->Enable(ID_ALL_SURFACE, false);
+			m_Gui->Enable(ID_BORDER_CHANGE, false);
+			m_Gui->Enable(ID_ADJUST_SLICES, false);
+		}
+		m_Gui->Update();
+	}
+}
+
 //----------------------------------------------------------------------------
+void mafViewRXCT::OnEventRangeModified(mafEventBase *maf_event)
 {
   // is the volume visible?
   if(((mafViewSlice *)m_ChildViewList[RX_FRONT_VIEW])->VolumeIsVisible())
@@ -386,7 +440,6 @@ void mafViewRXCT::OnEventRangeModified(mafEventBase *maf_event)
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::OnEventSnapModality()
-//----------------------------------------------------------------------------
 {
   if(this->m_CurrentVolume==NULL && m_Snap)
   {
@@ -407,7 +460,6 @@ void mafViewRXCT::OnEventSnapModality()
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::OnEventSortSlices()
-//----------------------------------------------------------------------------
 {
   mafVME* node=GetSceneGraph()->GetSelectedVme();
   mafPipe *p=((mafViewRX *)m_ChildViewList[0])->GetNodePipe(node);
@@ -472,7 +524,6 @@ void mafViewRXCT::OnEventSortSlices()
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::OnEventSetThickness()
-//----------------------------------------------------------------------------
 {
   if(m_AllSurface)
   {
@@ -500,7 +551,6 @@ void mafViewRXCT::OnEventSetThickness()
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::OnEventMouseMove( mafEvent *e )
-//----------------------------------------------------------------------------
 {
   long movingSliceId;
   movingSliceId = e->GetArg();
@@ -557,7 +607,6 @@ void mafViewRXCT::OnEventMouseMove( mafEvent *e )
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
@@ -664,8 +713,20 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
   }
 }
 //-------------------------------------------------------------------------
-mafGUI* mafViewRXCT::CreateGui()
+void mafViewRXCT::OnSize(wxSizeEvent &size_event)
+{
+	mafViewCompound::OnSize(size_event);
+
+	if (m_IsSubViewMaximized)
+		for (int i = 0; i < CT_CHILD_VIEWS_NUMBER; i++)
+		{
+			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetWindowSize(size_event.GetSize().GetX(), size_event.GetSize().GetY());
+			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->BorderUpdate();
+		}
+}
+
 //-------------------------------------------------------------------------
+mafGUI* mafViewRXCT::CreateGui()
 {
   assert(m_Gui == NULL);
   m_Gui = mafView::CreateGui();
@@ -729,7 +790,6 @@ mafGUI* mafViewRXCT::CreateGui()
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::CreateGuiView()
-//----------------------------------------------------------------------------
 {
   m_GuiView = new mafGUI(this);
   wxBoxSizer *lutsSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -748,55 +808,18 @@ void mafViewRXCT::CreateGuiView()
 	m_GuiView->Update();
   m_GuiView->Reparent(m_Win);
 }
-
-//----------------------------------------------------------------------------
-void mafViewRXCT::PackageView()
-//----------------------------------------------------------------------------
-{
-  int cam_pos[2] = {CAMERA_RX_FRONT, CAMERA_RX_LEFT};
-  for(int v=RX_FRONT_VIEW; v<CT_COMPOUND_VIEW; v++)
-  {
-    // create to the child view
-    m_ViewsRX[v] = new mafViewRX("RX child view", cam_pos[v]);
-    m_ViewsRX[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeProjected",MUTEX);
-    m_ViewsRX[v]->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeProjected",MUTEX);
-    m_ViewsRX[v]->PlugVisualPipe("mafVMESlicer", "mafVisualPipeSlicerSlice",MUTEX);
-    m_ViewsRX[v]->PlugVisualPipe("mafVMESegmentationVolume", "mafPipeVolumeProjected",MUTEX);
-    
-    PlugChildView(m_ViewsRX[v]);
-  }
-
-  m_ViewCTCompound = new mafViewCompound("CT view",3,2);
-  mafViewSlice *vs = new mafViewSlice("Slice view", CAMERA_OS_Z);
-  vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeOrthoSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeOrthoSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMEMeter", "mafPipePolylineSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMEWrappedMeter", "mafPipePolylineSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMESegmentationVolume", "mafPipeVolumeOrthoSlice",MUTEX);
- 
-  m_ViewCTCompound->PlugChildView(vs);
-  PlugChildView(m_ViewCTCompound);
-}
 //----------------------------------------------------------------------------
 void mafViewRXCT::EnableWidgets(bool enable)
-//----------------------------------------------------------------------------
 {
-  if (m_Gui)
-  {
-    m_Gui->Enable(ID_LUT_WIDGET,enable);
-    m_Gui->Enable(ID_RESET_SLICES, enable);
-  }
+	if (m_Gui)
+	{
+		m_Gui->Enable(ID_LUT_WIDGET, enable);
+		m_Gui->Enable(ID_RESET_SLICES, enable);
+	}
 }
+
 //----------------------------------------------------------------------------
 void mafViewRXCT::LayoutSubView(int width, int height)
-//----------------------------------------------------------------------------
 {
   // this implement the Fixed SubViews Layout
   int border = 2;
@@ -822,8 +845,9 @@ void mafViewRXCT::LayoutSubView(int width, int height)
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::MaximizeSubView(int subview_id, bool maximize)
-//----------------------------------------------------------------------------
 {
+	m_IsSubViewMaximized = maximize;
+
   mafViewCompound::MaximizeSubView(subview_id, maximize);
   for(int v=RX_FRONT_VIEW; v<VIEWS_NUMBER; v++)
   {
@@ -845,9 +869,9 @@ void mafViewRXCT::MaximizeSubView(int subview_id, bool maximize)
   m_GuiView->Update();
   
 }
+
 //----------------------------------------------------------------------------
 void mafViewRXCT::GizmoCreate()
-//----------------------------------------------------------------------------
 {
   for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++) 
   {
@@ -866,7 +890,6 @@ void mafViewRXCT::GizmoCreate()
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::GizmoDelete()
-//----------------------------------------------------------------------------
 {
   for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
   {
@@ -881,7 +904,6 @@ void mafViewRXCT::GizmoDelete()
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::SortSlices()
-//----------------------------------------------------------------------------
 {
   bool modified = false;
   int i,j,t;
@@ -919,7 +941,6 @@ void mafViewRXCT::SortSlices()
 
 //----------------------------------------------------------------------------
 void mafViewRXCT::SetThicknessForAllSurfaceSlices(mafVME *root)
-//----------------------------------------------------------------------------
 {
   mafVMEIterator *iter = root->NewIterator();
   for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
@@ -933,34 +954,9 @@ void mafViewRXCT::SetThicknessForAllSurfaceSlices(mafVME *root)
   }
   iter->Delete();
 }
-//----------------------------------------------------------------------------
-void mafViewRXCT::VmeSelect(mafVME *vme, bool select)
-//----------------------------------------------------------------------------
-{
-	for(int i=0; i<m_NumOfChildView; i++)
-		m_ChildViewList[i]->VmeSelect(vme, select);
 
-	if(m_Gui)
-	{
-		mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(vme);
-		if((vme->IsA("mafVMESurface")||vme->IsA("mafVMESurfaceParametric")||vme->IsA("mafVMESlicer"))&&select&&p)
-		{
-			m_Gui->Enable(ID_ALL_SURFACE,true);
-			m_Gui->Enable(ID_BORDER_CHANGE,true);
-			m_Gui->Enable(ID_ADJUST_SLICES,true);
-		}
-		else
-		{
-			m_Gui->Enable(ID_ALL_SURFACE,false);
-			m_Gui->Enable(ID_BORDER_CHANGE,false);
-			m_Gui->Enable(ID_ADJUST_SLICES,false);
-		}
-		m_Gui->Update();
-	}
-}
 //----------------------------------------------------------------------------
 void mafViewRXCT::BoundsValidate(double *pos)
-//----------------------------------------------------------------------------
 {
 	if(m_CurrentVolume)
 	{
@@ -977,7 +973,6 @@ void mafViewRXCT::BoundsValidate(double *pos)
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::ResetSlicesPosition(mafVME *vme)
-//----------------------------------------------------------------------------
 {
   // workaround... :(
   // maybe we need some mechanism to execute view code from op?
@@ -987,7 +982,6 @@ void mafViewRXCT::ResetSlicesPosition(mafVME *vme)
 }
 //----------------------------------------------------------------------------
 bool mafViewRXCT::IsPickedSliceView()
-//----------------------------------------------------------------------------
 {
   mafRWIBase *rwi = m_Mouse->GetRWI();
   if (rwi)
@@ -1011,12 +1005,6 @@ bool mafViewRXCT::IsPickedSliceView()
     }
   }
   return false;
-}
-//-------------------------------------------------------------------------
-void mafViewRXCT::OnSize(wxSizeEvent &size_event)
-//-------------------------------------------------------------------------
-{
-  mafViewCompound::OnSize(size_event);
 }
 
 //----------------------------------------------------------------------------
