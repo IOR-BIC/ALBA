@@ -32,8 +32,7 @@ struct AutomaticInfoRange
 {
 	int m_StartSlice;
 	int m_EndSlice;
-	double m_ThresholdValue;
-	double m_UpperThresholdValue;
+	double m_Threshold[2];
 };
 
 /** mafOpSegmentationHelper Is an helper for Segmentation Operation

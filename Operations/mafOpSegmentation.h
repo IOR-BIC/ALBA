@@ -134,8 +134,8 @@ public:
     ID_AUTO_INC_MIDDLE_THRESHOLD,
     ID_SPLIT_RANGE,
     ID_REMOVE_RANGE,
-    ID_AUTO_LIST_OF_RANGE,
-    ID_AUTO_GLOBAL_THRESHOLD,
+    ID_RANGE_SELECTION,
+    ID_INIT_MODALITY,
     ID_REFINEMENT_ACTION,
     ID_REFINEMENT_EVERY_SLICE,
     ID_REFINEMENT_ITERATIVE,
@@ -260,7 +260,10 @@ protected:
 
   /** Receive events from Automatic segmentation gui */
   void OnInitEvent(mafEvent *e);
-  
+
+	void SetThresholdByRange();
+
+
   /** Receive events from Manual segmentation gui */
   void OnManualSegmentationEvent(mafEvent *e);
   
@@ -275,9 +278,6 @@ protected:
 
   /** Initialize Automatic step */
   void OnAutomaticStep();
-
-  /** De initialize Initialize Automatic step */
-  void OnAutomaticStepExit();
 
   /** Initialize Manual step */
   void OnManualStep();
@@ -311,7 +311,7 @@ protected:
 	int m_SliceIndexByPlane[3];            //<Index of the current slice position
 	int m_SlicePlane;            //<Current slicing plane (xy,xz,yx)
   int m_NumSliceSliderEvents;         //<Number of events raised by the slider in a single interaction
-  int m_CurrentOperation;             //<Current step
+  int m_CurrentPhase;             //<Current step
 	int m_ShowLabels;
   mafGUIDialog* m_Dialog;             //<Dialog - GUI
 	mafViewSliceSegmentation* m_View;                 //<Rendering Slice view
@@ -408,14 +408,11 @@ protected:
   //Automatic segmentation stuff
  
   /***/
-  void SetSelectionAutomaticListOfRange(int index);
+  void SetRangeListSelection(int index);
 
   /** Function called when the user use the fine button to change the threshold*/
   void OnThresholdUpate(int eventID=-1);
-
-  /** Check if all thresholds exist */
-  bool CheckNumberOfThresholds();
-
+	 
   /** Update the value of threshold label for the current slice */
   void UpdateThresholdLabel();
 
@@ -424,6 +421,8 @@ protected:
 
   /** Gui update when the user change threshold type */
   void OnChangeThresholdType();
+
+	void EnableDisableGuiRange();
 
   /** Add a new range using gui values */
   void OnSplitRange();
@@ -443,14 +442,15 @@ protected:
   /** Update threshold real-time preview*/
   void UpdateThresholdRealTimePreview();
 
-  int m_InitModality;   //<Global threshold range lower bound
-  double m_AutomaticThreshold;      //<Global threshold range lower bound
-  double m_AutomaticUpperThreshold; //<Global threshold range upper bound
+  int m_InitModality;   //Init Modality
+  double m_Threshold[2]; //Threshold
   double m_AutomaticMouseThreshold; //<Mouse threshold
-  wxListBox *m_AutomaticListOfRange;//<List of threshold ranges
-  
-  std::vector<AutomaticInfoRange> m_AutomaticRanges; //<Automatic range structure
-  
+
+	int m_CurrentRange;
+	bool m_IgnoreRangeSelEvent;
+  wxListBox *m_RangesGuiList;//<List of threshold ranges
+  std::vector<AutomaticInfoRange> m_RangesVector; //<Automatic range structure
+
   mafGUILutSlider *m_ThresholdSlider;//<Threshold slider
 
   vtkTextMapper *m_AutomaticThresholdTextMapper;//<Text mapper for threshold visualization
@@ -477,7 +477,7 @@ protected:
   /** Apply refinement algorithm implemented with vtk only */
   bool ApplyRefinementFilter2(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage);
 
-  /** Update slice visualisation on manual step */
+  /** Update slice visualization on manual step */
   void OnUpdateSlice();
 
   /** Update threshold volume data  for preview or output */
@@ -521,5 +521,8 @@ protected:
 
   void OnEventFloodFill(mafEvent *e);
 
+	void InitRanges();
+private:
+	void SelectRangeByCurrentSlice();
 };
 #endif
