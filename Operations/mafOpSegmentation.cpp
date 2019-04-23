@@ -1665,14 +1665,14 @@ void mafOpSegmentation::InitRanges()
 {
 	//Store the parameters
 	AutomaticInfoRange range;
-	range.m_StartSlice = 0;
-	range.m_EndSlice = m_VolumeDimensions[2]-1;
+	range.m_StartSlice = 1;
+	range.m_EndSlice = m_VolumeDimensions[2];
 	range.m_Threshold[0] = m_Threshold[0];
 	range.m_Threshold[1] = m_Threshold[1];
 
 	m_RangesVector.push_back(range);
 
-	m_RangesGuiList->Append(wxString::Format("[%d,%d] low:%.1f high:%.1f", range.m_StartSlice + 1, range.m_EndSlice + 1, m_Threshold[0], m_Threshold[1]));
+	m_RangesGuiList->Append(wxString::Format("[%d,%d] low:%.1f high:%.1f", range.m_StartSlice, range.m_EndSlice, m_Threshold[0], m_Threshold[1]));
 	m_RangesGuiList->Select(0);
 }
 
@@ -1682,7 +1682,7 @@ void mafOpSegmentation::SelectRangeByCurrentSlice()
 {
 		m_CurrentRange = 0;
 		int rangesLimit = m_RangesVector.size() - 1;
-		while (m_SliceIndex > m_RangesVector[m_CurrentRange].m_EndSlice + 1 && m_CurrentRange < rangesLimit)
+		while (m_SliceIndex > m_RangesVector[m_CurrentRange].m_EndSlice && m_CurrentRange < rangesLimit)
 			m_CurrentRange++;
 		m_Threshold[0] = m_RangesVector[m_CurrentRange].m_Threshold[0];
 		m_Threshold[1] = m_RangesVector[m_CurrentRange].m_Threshold[1];
@@ -2014,7 +2014,7 @@ void mafOpSegmentation::OnUpdateSlice()
 	if (m_CurrentPhase == INIT_SEGMENTATION && m_InitModality == RANGE_INIT)
 	{
 		//Range update
-		if (m_SliceIndex<m_RangesVector[m_CurrentRange].m_StartSlice + 1 || m_SliceIndex>m_RangesVector[m_CurrentRange].m_EndSlice + 1)
+		if (m_SliceIndex<m_RangesVector[m_CurrentRange].m_StartSlice || m_SliceIndex>m_RangesVector[m_CurrentRange].m_EndSlice)
 			SelectRangeByCurrentSlice();
 		EnableDisableGuiRange();
 	}
@@ -2080,7 +2080,7 @@ void mafOpSegmentation::OnChangeThresholdType()
 void mafOpSegmentation::EnableDisableGuiRange()
 {
 	bool rightModality = m_InitModality == RANGE_INIT;
-	bool notBorder = (m_SliceIndex != m_RangesVector[m_CurrentRange].m_StartSlice+1 && m_SliceIndex != m_RangesVector[m_CurrentRange].m_EndSlice+1);
+	bool notBorder = !(m_SliceIndex == m_RangesVector[m_CurrentRange].m_StartSlice || m_SliceIndex == m_RangesVector[m_CurrentRange].m_EndSlice);
 	
 	m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_SPLIT_RANGE, rightModality && notBorder);
 	m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_REMOVE_RANGE, rightModality && m_RangesVector.size()>1);
@@ -2091,18 +2091,18 @@ void mafOpSegmentation::OnSplitRange()
 {
   //Store the parameters
   AutomaticInfoRange range;
-	range.m_StartSlice = m_SliceIndex + 1;;
+	range.m_StartSlice = m_SliceIndex+1;
 	range.m_EndSlice = m_RangesVector[m_CurrentRange].m_EndSlice;
   range.m_Threshold[0] = m_Threshold[0];
   range.m_Threshold[1] = m_Threshold[1];
 
 	//update current range
 	m_RangesVector[m_CurrentRange].m_EndSlice = m_SliceIndex;
-	m_RangesGuiList->SetString(m_CurrentRange, wxString::Format("[%d,%d] low:%.1f high:%.1f", m_RangesVector[m_CurrentRange].m_StartSlice + 1, m_RangesVector[m_CurrentRange].m_EndSlice + 1, m_Threshold[0], m_Threshold[1]));
+	m_RangesGuiList->SetString(m_CurrentRange, wxString::Format("[%d,%d] low:%.1f high:%.1f", m_RangesVector[m_CurrentRange].m_StartSlice, m_RangesVector[m_CurrentRange].m_EndSlice, m_Threshold[0], m_Threshold[1]));
 
 	//insert new range
   m_RangesVector.insert(m_RangesVector.begin()+m_CurrentRange+1,range);
-	m_RangesGuiList->Insert(wxString::Format("[%d,%d] low:%.1f high:%.1f",range.m_StartSlice+1,range.m_EndSlice+1,m_Threshold[0],m_Threshold[1]),m_CurrentRange+1);
+	m_RangesGuiList->Insert(wxString::Format("[%d,%d] low:%.1f high:%.1f",range.m_StartSlice,range.m_EndSlice,m_Threshold[0],m_Threshold[1]),m_CurrentRange+1);
 
 	m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
 	EnableDisableGuiRange();
@@ -2120,15 +2120,13 @@ void mafOpSegmentation::OnRemoveRange()
 	}
 	else
 	{
-		m_RangesVector[m_CurrentRange + 1].m_StartSlice = 0;
+		m_RangesVector[m_CurrentRange + 1].m_StartSlice = 1;
 		m_RangesVector.erase(m_RangesVector.begin());
 		m_RangesGuiList->Delete(m_CurrentRange);
 	}
 
-	m_Threshold[0] = m_RangesVector[m_CurrentRange].m_Threshold[0];
-	m_Threshold[1] = m_RangesVector[m_CurrentRange].m_Threshold[1];
-
-	m_RangesGuiList->SetString(m_CurrentRange, wxString::Format("[%d,%d] low:%.1f high:%.1f", m_RangesVector[m_CurrentRange].m_StartSlice + 1, m_RangesVector[m_CurrentRange].m_EndSlice + 1, m_Threshold[0], m_Threshold[1]));
+	m_ThresholdSlider->SetSubRange(m_RangesVector[m_CurrentRange].m_Threshold);
+	m_RangesGuiList->SetString(m_CurrentRange, wxString::Format("[%d,%d] low:%.1f high:%.1f", m_RangesVector[m_CurrentRange].m_StartSlice, m_RangesVector[m_CurrentRange].m_EndSlice, m_Threshold[0], m_Threshold[1]));
 	m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
 	EnableDisableGuiRange();
 	OnThresholdUpate();
@@ -2236,7 +2234,7 @@ void mafOpSegmentation::OnThresholdUpate(int eventID)
 	{
 		m_RangesVector[m_CurrentRange].m_Threshold[0] = m_Threshold[0];
 		m_RangesVector[m_CurrentRange].m_Threshold[1] = m_Threshold[1];
-		m_RangesGuiList->SetString(m_CurrentRange, wxString::Format("[%d,%d] low:%.1f high:%.1f", m_RangesVector[m_CurrentRange].m_StartSlice + 1, m_RangesVector[m_CurrentRange].m_EndSlice + 1, m_Threshold[0], m_Threshold[1]));
+		m_RangesGuiList->SetString(m_CurrentRange, wxString::Format("[%d,%d] low:%.1f high:%.1f", m_RangesVector[m_CurrentRange].m_StartSlice, m_RangesVector[m_CurrentRange].m_EndSlice, m_Threshold[0], m_Threshold[1]));
 	}
 
   UpdateThresholdLabel();
