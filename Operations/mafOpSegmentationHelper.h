@@ -19,6 +19,7 @@
 
 #include "mafDefines.h"
 #include "mafString.h"
+#include <vector>
 
 //----------------------------------------------------------------------------
 // forward declarations
@@ -47,15 +48,18 @@ public:
 	void SetVolumes(mafVMEVolumeGray *volume, mafVMEVolumeGray *segmentation);
 	void SetSlices(vtkImageData *volumeSlice,  vtkImageData *segmentationSlice);
 
-	void SliceThreshold(double low, double high);
+	void SliceThreshold(double *threshold);
+	void VolumeThreshold(double *threshold);
+	void VolumeThreshold(std::vector<AutomaticInfoRange> *rangesVector);
+
 
 
 protected:
 
-	void InternalTheshold(int dataType, double low, double high, int n, void * inputPointer, unsigned char * outputPointer);
+	void InternalTheshold(int dataType, double *threshold, int n, void * inputPointer, unsigned char * outputPointer, int offset = 0);
 
 	template<typename DataType>
-	void InternalThreshold(double low, double high, int n, DataType *inputScalars, unsigned char *outputScalars);
+	void InternalThreshold(double *threshold, int n, DataType *inputScalars, unsigned char *outputScalars, int offset);
 
 	mafVMEVolumeGray *m_Volume;
 	mafVMEVolumeGray *m_Segmentation;

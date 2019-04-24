@@ -149,6 +149,9 @@ public:
 	/** returns a slicer*/
 	vtkMAFVolumeOrthoSlicer *GetSlicer(int slicerDirection);
 
+	/** Set the actor picking*/
+	void SetActorPicking(int enable);
+
 protected:
 	/** Create the slicer pipeline. */
 	void CreateSlice();
@@ -199,6 +202,7 @@ protected:
 	bool										m_ShowBounds;
 	bool										m_ShowSlider;
 	bool										m_ShowTICKs;
-  int                    m_Interpolate;
+	bool										m_Pickable;
+  int                     m_Interpolate;
 };
 #endif // __mafPipeVolumeOrthoSlice_H__B

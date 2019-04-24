@@ -276,9 +276,6 @@ protected:
   /** Get the z position of the specified slice index */
   double GetPosFromSliceIndexZ();
 
-  /** Initialize Automatic step */
-  void OnAutomaticStep();
-
   /** Initialize Manual step */
   void OnManualStep();
 
@@ -479,9 +476,6 @@ protected:
 
   /** Update slice visualization on manual step */
   void OnUpdateSlice();
-
-  /** Update threshold volume data  for preview or output */
-  void UpdateThresholdVolumeData();
 
   int m_RefinementSegmentationAction;       //<Refinement action fill holes or remove islands
   int m_RefinementRegionsSize;              //<Size for region recognition

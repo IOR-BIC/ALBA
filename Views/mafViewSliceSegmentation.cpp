@@ -130,7 +130,8 @@ void mafViewSliceSegmentation::VmeCreatePipeForSegmentation(mafVME *vme)
     if (pipe != NULL)
     {
       pipe->SetListener(this);
-      if (pipe->IsA("mafPipeVolumeOrthoSlice"))  
+			mafPipeVolumeOrthoSlice *orthoPipe;
+      if (orthoPipe=mafPipeVolumeOrthoSlice::SafeDownCast(pipe))
       {
 				m_CurrentSegmentation = n;
 
@@ -154,19 +155,21 @@ void mafViewSliceSegmentation::VmeCreatePipeForSegmentation(mafVME *vme)
         }
         if (m_SliceInitialized)
         {
-          ((mafPipeVolumeOrthoSlice *)pipe)->InitializeSliceParameters(slice_mode, m_Slice, false,false,m_TextureInterpolate);
-          ((mafPipeVolumeOrthoSlice *)pipe)->SetNormal(m_SliceNormal);
+					orthoPipe->InitializeSliceParameters(slice_mode, m_Slice, false,false,m_TextureInterpolate);
+					orthoPipe->SetNormal(m_SliceNormal);
         }
         else
         {
-          ((mafPipeVolumeOrthoSlice *)pipe)->InitializeSliceParameters(slice_mode,false,false,m_TextureInterpolate);
+					orthoPipe->InitializeSliceParameters(slice_mode,false,false,m_TextureInterpolate);
         }
 
         if(m_ShowVolumeTICKs)
-          ((mafPipeVolumeOrthoSlice *)pipe)->ShowTICKsOn();
+					orthoPipe->ShowTICKsOn();
         else
-          ((mafPipeVolumeOrthoSlice *)pipe)->ShowTICKsOff();
-        ((mafPipeVolumeOrthoSlice *)pipe)->SetInterpolation(m_TrilinearInterpolationOn);
+					orthoPipe->ShowTICKsOff();
+				orthoPipe->SetInterpolation(m_TrilinearInterpolationOn);
+				orthoPipe->SetActorPicking(false);
+
 				UpdateText();
       }
       pipe->Create(n);

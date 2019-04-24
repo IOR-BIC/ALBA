@@ -19,6 +19,9 @@
 #include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkUnsignedCharArray.h"
+#include "mafVME.h"
+#include "mafVMEVolumeGray.h"
+#include "vtkRectilinearGrid.h"
 
 
 //----------------------------------------------------------------------------
@@ -48,7 +51,7 @@ void mafOpSegmentationHelper::SetSlices(vtkImageData *volumeSlice, vtkImageData 
 }
 
 //----------------------------------------------------------------------------
-void mafOpSegmentationHelper::SliceThreshold(double low, double high)
+void mafOpSegmentationHelper::SliceThreshold(double *threshold)
 {
 	m_VolumeSlice->Update();
 	m_SegmetationSlice->Update();
@@ -63,41 +66,108 @@ void mafOpSegmentationHelper::SliceThreshold(double low, double high)
 	outputScalars->SetNumberOfTuples(nTuples);
 	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
 
-	InternalTheshold(dataType, low, high, nTuples, inputPointer, outputPointer);
+	InternalTheshold(dataType, threshold, nTuples, inputPointer, outputPointer);
 
 	m_SegmetationSlice->GetPointData()->SetScalars(outputScalars);
 
 	vtkDEL(outputScalars);
 }
+//----------------------------------------------------------------------------
+void mafOpSegmentationHelper::VolumeThreshold(double *threshold)
+{
+	m_VolumeSlice->Update();
+	vtkDataSet * segmentation = m_Segmentation->GetOutput()->GetVTKData();
+	vtkDataArray 	*inputScalars = m_Volume->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
+	void *inputPointer = inputScalars->GetVoidPointer(0);
+	int nTuples = inputScalars->GetNumberOfTuples();
+	int dataType = inputScalars->GetDataType();
+
+
+	vtkUnsignedCharArray *outputScalars;
+	vtkNEW(outputScalars);
+	outputScalars->SetNumberOfTuples(nTuples);
+	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
+
+	InternalTheshold(dataType,threshold, nTuples, inputPointer, outputPointer);
+
+	segmentation->GetPointData()->SetScalars(outputScalars);
+
+	vtkDEL(outputScalars);
+}
 
 //----------------------------------------------------------------------------
-void mafOpSegmentationHelper::InternalTheshold(int dataType, double low, double high, int n, void * inputPointer, unsigned char * outputPointer)
+void mafOpSegmentationHelper::VolumeThreshold(std::vector<AutomaticInfoRange> *rangesVector)
+{
+	vtkRectilinearGrid *volRG;
+	m_VolumeSlice->Update();
+	vtkDataSet * segmentation = m_Segmentation->GetOutput()->GetVTKData();
+	vtkDataSet * volumeVtkData = m_Volume->GetOutput()->GetVTKData();
+	vtkDataArray 	*inputScalars =volumeVtkData->GetPointData()->GetScalars();
+	void *inputPointer = inputScalars->GetVoidPointer(0);
+	int nTuples = inputScalars->GetNumberOfTuples();
+	int dataType = inputScalars->GetDataType();
+
+	vtkUnsignedCharArray *outputScalars;
+	vtkNEW(outputScalars);
+	outputScalars->SetNumberOfTuples(nTuples);
+	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
+
+	int dims[3];
+	if (volRG = vtkRectilinearGrid::SafeDownCast(volumeVtkData))
+	{
+		dims[0] = volRG->GetXCoordinates()->GetNumberOfTuples();
+		dims[1] = volRG->GetYCoordinates()->GetNumberOfTuples();
+		dims[2] = volRG->GetZCoordinates()->GetNumberOfTuples();
+	}
+	else
+	{
+		((vtkImageData *)volumeVtkData)->GetDimensions(dims);
+	}
+
+	int sliceSize = dims[0] * dims[1];
+
+	for (int i = 0; i < rangesVector->size(); i++)
+	{
+		AutomaticInfoRange range = (*rangesVector)[i];
+		int areaStart = (range.m_StartSlice - 1)*sliceSize;
+		int areaSize = (range.m_EndSlice+1 - range.m_StartSlice)*sliceSize;
+
+		InternalTheshold(dataType, range.m_Threshold, areaSize, inputPointer, outputPointer, areaStart);
+	}
+
+	segmentation->GetPointData()->SetScalars(outputScalars);
+
+	vtkDEL(outputScalars);
+}
+
+//----------------------------------------------------------------------------
+void mafOpSegmentationHelper::InternalTheshold(int dataType, double *threshold, int n, void * inputPointer, unsigned char * outputPointer, int offset)
 {
 	switch (dataType)
 	{
 		case VTK_CHAR:
-			InternalThreshold(low, high, n, (char*)inputPointer, outputPointer);
+			InternalThreshold(threshold, n, (char*)inputPointer, outputPointer, offset);
 			break;
 		case VTK_UNSIGNED_CHAR:
-			InternalThreshold(low, high, n, (unsigned char*)inputPointer, outputPointer);
+			InternalThreshold(threshold, n, (unsigned char*)inputPointer, outputPointer, offset);
 			break;
 		case VTK_SHORT:
-			InternalThreshold(low, high, n, (short*)inputPointer, outputPointer);
+			InternalThreshold(threshold, n, (short*)inputPointer, outputPointer, offset);
 			break;
 		case VTK_UNSIGNED_SHORT:
-			InternalThreshold(low, high, n, (unsigned short*)inputPointer, outputPointer);
+			InternalThreshold(threshold, n, (unsigned short*)inputPointer, outputPointer, offset);
 			break;
 		case VTK_INT:
-			InternalThreshold(low, high, n, (int *)inputPointer, outputPointer);
+			InternalThreshold(threshold, n, (int *)inputPointer, outputPointer, offset);
 			break;
 		case VTK_UNSIGNED_INT:
-			InternalThreshold(low, high, n, (unsigned int*)inputPointer, outputPointer);
+			InternalThreshold(threshold, n, (unsigned int*)inputPointer, outputPointer, offset);
 			break;
 		case VTK_FLOAT:
-			InternalThreshold(low, high, n, (float*)inputPointer, outputPointer);
+			InternalThreshold(threshold, n, (float*)inputPointer, outputPointer, offset);
 			break;
 		case VTK_DOUBLE:  //NOTE: GPU is not allowed
-			InternalThreshold(low, high, n, (double*)inputPointer, outputPointer);
+			InternalThreshold(threshold, n, (double*)inputPointer, outputPointer, offset);
 			break;
 		default:
 			return;
@@ -106,11 +176,11 @@ void mafOpSegmentationHelper::InternalTheshold(int dataType, double low, double 
 
 // ----------------------------------------------------------------------------
 template<typename DataType>
-void mafOpSegmentationHelper::InternalThreshold(double low, double high, int n, DataType *inputScalars, unsigned char *outputScalars)
+void mafOpSegmentationHelper::InternalThreshold(double *threshold, int n, DataType *inputScalars, unsigned char *outputScalars, int offset)
 {
-	for (int i = 0; i < n; i++)
+	for (int i = offset; i < offset+n; i++)
 	{
-		if (inputScalars[i] >= low && inputScalars[i] <= high)
+		if (inputScalars[i] >= threshold[0] && inputScalars[i] <= threshold[1])
 			outputScalars[i] = FULL;
 		else
 			outputScalars[i] = EMPTY;

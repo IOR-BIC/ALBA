@@ -97,6 +97,7 @@ mafPipeVolumeOrthoSlice::mafPipeVolumeOrthoSlice():mafPipeSlice()
 	m_ShowSlider = true;
 	m_ShowTICKs	 = false;
   m_Interpolate = true;
+	m_Pickable = true;
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeOrthoSlice::InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds/* =false */, bool interpolate/* =true */)
@@ -373,6 +374,7 @@ void mafPipeVolumeOrthoSlice::CreateSlice()
 			m_SliceActor[i]->GetProperty()->SetAmbient(1.f);
 			m_SliceActor[i]->GetProperty()->SetDiffuse(0.f);
 			m_SliceActor[i]->GetProperty()->SetOpacity(m_SliceOpacity);
+			m_SliceActor[i]->SetPickable(m_Pickable);
 
 			m_AssemblyUsed->AddPart(m_SliceActor[i]);
 		}
@@ -655,3 +657,17 @@ vtkMAFVolumeOrthoSlicer * mafPipeVolumeOrthoSlice::GetSlicer(int slicerDirection
 		return NULL;
 }
 
+//----------------------------------------------------------------------------
+void mafPipeVolumeOrthoSlice::SetActorPicking(int enable)
+{
+	m_Pickable = enable;
+	for (int i = 0; i < 3; i++)
+	{
+		if (m_SliceActor[i] != NULL)
+		{
+			m_SliceActor[i]->SetPickable(enable);
+			m_SliceActor[i]->Modified();
+		}
+	}
+	GetLogicManager()->CameraUpdate();
+}
