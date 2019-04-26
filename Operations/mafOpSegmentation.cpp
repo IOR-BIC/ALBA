@@ -426,16 +426,25 @@ void mafOpSegmentation::CreateOpDialog()
 
   m_View->VmeAdd(m_Input->GetRoot()); //add Root
 
+	mafSetFrame(oldFrame);
+	int offset = 200;
+	int viewSize[2] = { dialogSize[1] - offset, dialogSize[1] - offset }; // 650x650
+
+	if (viewSize[0] < dialogSize[0] - 200)
+		viewSize[0] = dialogSize[0] - 200;
+
+	int labelOffset[2] = { 110, 15 };
+
   //////////////////////////////////////////////////////////////////////////
   // Label to indicate the threshold of the slice  
   vtkNEW(m_AutomaticThresholdTextMapper);
   m_AutomaticThresholdTextMapper->SetInput(_("Threshold  = "));
-  m_AutomaticThresholdTextMapper->GetTextProperty()->SetColor(1.0,0.0,0.0);
+  m_AutomaticThresholdTextMapper->GetTextProperty()->SetColor(0.0,1.0,1.0);
   m_AutomaticThresholdTextMapper->GetTextProperty()->AntiAliasingOff();
 
   vtkNEW(m_AutomaticThresholdTextActor);
   m_AutomaticThresholdTextActor->SetMapper(m_AutomaticThresholdTextMapper);
-  m_AutomaticThresholdTextActor->SetPosition(3, 620);
+	m_AutomaticThresholdTextActor->SetPosition(3, viewSize[1] - labelOffset[1]);
   m_AutomaticThresholdTextActor->GetProperty()->SetColor(1.0,0.0,0.0);
 
   m_View->GetFrontRenderer()->AddActor(m_AutomaticThresholdTextActor);
@@ -450,7 +459,7 @@ void mafOpSegmentation::CreateOpDialog()
 
   vtkNEW(m_AutomaticScalarTextActor);
   m_AutomaticScalarTextActor->SetMapper(m_AutomaticScalarTextMapper);
-  m_AutomaticScalarTextActor->SetPosition(550,620);
+	m_AutomaticScalarTextActor->SetPosition(viewSize[0] - labelOffset[0], viewSize[1] - labelOffset[1]);
   m_AutomaticScalarTextActor->GetProperty()->SetColor(0.0,1.0,0.0);
 
   m_View->GetFrontRenderer()->AddActor(m_AutomaticScalarTextActor);
@@ -467,20 +476,13 @@ void mafOpSegmentation::CreateOpDialog()
 
   vtkNEW(m_AutomaticSliceTextActor);
   m_AutomaticSliceTextActor->SetMapper(m_AutomaticSliceTextMapper);
-  m_AutomaticSliceTextActor->SetPosition(550, 5);
+  m_AutomaticSliceTextActor->SetPosition(viewSize[0] - labelOffset[0], 5);
   m_AutomaticSliceTextActor->GetProperty()->SetColor(1.0,1.0,0.0);
 
   m_View->GetFrontRenderer()->AddActor(m_AutomaticSliceTextActor);
   //////////////////////////////////////////////////////////////////////////
 
   //InitializeInteractors();
-
-  mafSetFrame(oldFrame);
-	int offset = 200;
-	int viewSize[2] = { dialogSize[1] - offset, dialogSize[1] - offset}; // 650x650
-
-	if (viewSize[0] < dialogSize[0] - 200) 
-		viewSize[0] = dialogSize[0] - 200;
 
   // Display window      
 	m_View->m_Rwi->SetSize(0, 0, viewSize[0], viewSize[1]);
