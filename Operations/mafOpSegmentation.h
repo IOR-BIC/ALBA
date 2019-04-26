@@ -1,28 +1,25 @@
 /*=========================================================================
-
- Program: MAF2
+ Program: ALBA
  Module: mafOpSegmentation
- Authors: Eleonora Mambrini, Gianluigi Crimi, Alberto Losi
- 
- Copyright (c) B3C
- All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+ Authors: Eleonora Mambrini, Gianluigi Crimi, Alberto Losi, Nicola Vanella
+ ==========================================================================
+ Copyright (c) BIC-IOR 2018 (https://github.com/IOR-BIC)
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+ PURPOSE. See the above copyright notice for more information.
+ =========================================================================*/
 
 #ifndef __mafOpSegmentation_H__
 #define __mafOpSegmentation_H__
 
-#include "mafOp.h"
+#include "mafDefines.h"
 #include "mafMatrix.h"
+#include "mafOp.h"
+#include "mafOpSegmentationHelper.h"
 #include "mafVME.h"
 #include "mafVMESegmentationVolume.h"
-#include "mafOpSegmentationHelper.h"
-#include "mafDefines.h"
+
 #include "vtkSystemIncludes.h"
 #include "wx/gauge.h"
 
@@ -34,38 +31,37 @@ class mafAction;
 class mafDeviceButtonsPadMouseDialog;
 class mafDeviceManager;
 class mafEvent;
-class mafGUIDialog;
-class mafGUIButton;
 class mafGUI;
-class mafGUILutSlider;
-class mafGUILutHistogramSwatch;
-class mafGUIRollOut;
+class mafGUIButton;
+class mafGUIDialog;
 class mafGUIFloatSlider;
-class mafInteractorPicker;
-class mafInteractorCameraMove;
+class mafGUILutHistogramSwatch;
+class mafGUILutSlider;
+class mafGUIRollOut;
 class mafInteractor;
+class mafInteractorCameraMove;
 class mafInteractorGenericMouse;
-class mafInteractorSER;
 class mafInteractorPER;
+class mafInteractorPERBrushFeedback;
+class mafInteractorPERScalarInformation;
+class mafInteractorPicker;
+class mafInteractorSER;
+class mafInteractorSegmentationPicker;
 class mafMatrix;
-class mafVMEVolumeGray;
 class mafVME;
 class mafVMEImage;
-class mafVME;
-class mmiSelectPoint;
 class mafVMESurface;
-class mafInteractorPERScalarInformation;
-class mafInteractorSegmentationPicker;
-class mafInteractorPERBrushFeedback;
-class vtkLookupTable;
-class vtkActor2D;
-class vtkTextMapper;
-class vtkSphereSource;
-class vtkPolyDataMapper;
-class vtkActor;
-class vtkStructuredPoints;
-class vtkUnsignedCharArray;
+class mafVMEVolumeGray;
 class mafViewSliceSegmentation;
+class mmiSelectPoint;
+class vtkActor;
+class vtkActor2D;
+class vtkLookupTable;
+class vtkPolyDataMapper;
+class vtkSphereSource;
+class vtkStructuredPoints;
+class vtkTextMapper;
+class vtkUnsignedCharArray;
 class wxStaticBoxSizer;
 
 //----------------------------------------------------------------------------
@@ -181,8 +177,6 @@ public:
    /** Function that handles events sent from other objects. */
   void OnEvent(mafEventBase *maf_event);
 
-	void OnSelectSlicePlane();
-
   /** return the copy of the operation object */
   mafOp* Copy();
 
@@ -228,6 +222,8 @@ protected:
   //Method to initialize the stuff
   //////////////////////////////////////////////////////////////////////////
   
+	void Init();
+
   /** Initialize the volume dimensions attribute */
   void InitVolumeDimensions();
   
@@ -246,7 +242,7 @@ protected:
   /** Initialize the Segmented Volume*/
   void InitSegmentationVolume();
 	  
-  /**Update windowing */
+  /** Update windowing */
   void UpdateWindowing();
 
   /** Get current slices origin coords origin[3] */
@@ -262,8 +258,7 @@ protected:
   void OnInitEvent(mafEvent *e);
 
 	void SetThresholdByRange();
-
-
+	
   /** Receive events from Manual segmentation gui */
   void OnManualSegmentationEvent(mafEvent *e);
   
@@ -284,14 +279,11 @@ protected:
 
   /** Initialize Refinement step */
   void OnRefinementStep();
-
-
+	
   /** Perform the initializations when the user press next button */
   void OnNextStep();
 
-	void Init();
-
-  /** Perform the initializations when the user press previous button */
+	/** Perform the initializations when the user press previous button */
   void OnPreviousStep();
 
   mafVMEVolumeGray* m_Volume;         //<Input volume
@@ -299,7 +291,8 @@ protected:
 	mafString m_VolumeName;        //<Loaded volume name
 	mafVMEVolumeGray *m_SegmentationVolume;     //<Segmentation volume
 	vtkImageData     *m_SegmetationSlice;
-  double m_SliceOrigin[3];            //<Origin of the slice plane
+  
+	double m_SliceOrigin[3];            //<Origin of the slice plane
   int m_VolumeDimensions[3];          //<Dimensions of the volumes (number of slices)
   double m_VolumeSpacing[3];          //<Volume spacing
   double m_VolumeBounds[6];           //<Volume bounds
@@ -310,7 +303,8 @@ protected:
   int m_NumSliceSliderEvents;         //<Number of events raised by the slider in a single interaction
   int m_CurrentPhase;             //<Current step
 	int m_ShowLabels;
-  mafGUIDialog* m_Dialog;             //<Dialog - GUI
+  
+	mafGUIDialog* m_Dialog;             //<Dialog - GUI
 	mafViewSliceSegmentation* m_View;                 //<Rendering Slice view
   mafGUIButton* m_OkButton;           //<Button -GUI
   mafGUIButton* m_CancelButton;       //<Button -GUI
@@ -382,7 +376,8 @@ protected:
 	wxRadioBox *m_InitModalityRadioBox;					//<Threshold Type radio - GUI
   wxStaticBoxSizer *m_BrushEditingSizer;
   mafGUIButton *m_ManualApplyChanges;           //<Apply changes button - GUI
-  int m_ManualSegmentationAction;               //<Manual segmentation action (draw/erease)
+  
+	int m_ManualSegmentationAction;               //<Manual segmentation action (draw/erease)
   int m_ManualSegmentationTools;                //<Manual segmentation tools (bucket/brush)
   int m_ManualBucketActions;                    //<
   int m_ManualBrushShape;                       //<Brush shape
@@ -420,6 +415,8 @@ protected:
   void OnChangeThresholdType();
 
 	void EnableDisableGuiRange();
+
+	void OnSelectSlicePlane();
 
   /** Add a new range using gui values */
   void OnSplitRange();
@@ -516,7 +513,9 @@ protected:
   void OnEventFloodFill(mafEvent *e);
 
 	void InitRanges();
+
 private:
+
 	void SelectRangeByCurrentSlice();
 };
 #endif
