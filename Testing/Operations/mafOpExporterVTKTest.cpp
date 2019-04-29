@@ -39,6 +39,7 @@
 #include "vtkPolyData.h"
 #include "vtkRectilinearGridReader.h"
 #include "vtkUnstructuredGridReader.h"
+#include "vtkRectilinearGrid.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
@@ -214,7 +215,7 @@ void mafOpExporterVTKTest::TestOpExportVolume()
 
 	mafVMEVolumeGray *volume;
 	mafNEW(volume);
-	result = volume->SetData(reader->GetOutput(), 0.0) == MAF_OK;
+	result = volume->SetData((vtkRectilinearGrid*)reader->GetOutput(), 0.0) == MAF_OK;
 	CPPUNIT_ASSERT(result);
 	volume->Update();
 
