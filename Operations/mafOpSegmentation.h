@@ -318,7 +318,6 @@ protected:
   wxSlider *m_SliceSlider;              //<Slice slider - GUI
   wxTextCtrl *m_SliceText;              //<Slice text box - GUI
 	wxNotebook *m_SegmentationOperationsNotebook;
-	mafGUIHolder *m_SegmentationOperationsPanel[5];
   mafGUI *m_SegmentationOperationsGui[2]; //<Steps gui
   wxComboBox *m_OperationsList;         //<List if operations (not used)
   mafInteractor *m_OldBehavior;         //<Old volume behavior
@@ -330,6 +329,8 @@ protected:
 	mafVMESurface *m_OutputSurface;          //<Output Surface
   wxStaticText *m_SnippetsLabel;        //<Suggestion labels - GUI
   mafInteractorSegmentationPicker *m_SegmentationPicker; //<Segmentation picker for interaction
+
+	mafGUI* m_AppendingOpGui;
 
   //////////////////////////////////////////////////////////////////////////
   //Manual segmentation stuff

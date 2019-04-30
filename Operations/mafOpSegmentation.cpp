@@ -168,14 +168,13 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
 
   m_SER = NULL;
   m_DeviceManager = NULL;
+	
+	m_AppendingOpGui = NULL;
 
-	m_SegmentationOperationsNotebook = NULL;
-
-  for(int i=0;i<4;i++)
-  { 
-    m_SegmentationOperationsGui[i] = NULL;
-		m_SegmentationOperationsPanel[i] = NULL;
-  }
+	for (int i = 0; i < 2; i++)
+	{
+		m_SegmentationOperationsGui[i] = NULL;
+	}
 
 	m_SegmentationVolume = NULL;
 
@@ -806,43 +805,26 @@ void mafOpSegmentation::CreateOpDialog()
 	CreateEditSegmentationGui();
 
 	//////////////////////////////////////////////////////////////////////////
-	// Segmentation Operations Notebook (2 panels: Init, Edit)
+	// Segmentation Operations Phase Buttons
 
-	m_SegmentationOperationsNotebook = new wxNotebook(m_GuiDialog, NULL, defPos, wxDefaultSize, wxNB_TOP);
-	m_SegmentationOperationsNotebook->SetFont(wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)));
-	m_SegmentationOperationsNotebook->SetMinSize(wxSize(guiDialogSize[0], guiDialogSize[1] - 100));
-	m_SegmentationOperationsNotebook->SetSize(guiDialogSize[0], guiDialogSize[1] - 100);
-
-	// Init Panel
-	m_SegmentationOperationsPanel[INIT_SEGMENTATION] = new mafGUIHolder(m_SegmentationOperationsNotebook, -1, false, true);
-	m_SegmentationOperationsPanel[INIT_SEGMENTATION]->Put(m_SegmentationOperationsGui[INIT_SEGMENTATION]);
-
-	m_SegmentationOperationsNotebook->AddPage(m_SegmentationOperationsPanel[INIT_SEGMENTATION], _("Init"));
-
-	// Edit Panel
-	m_SegmentationOperationsPanel[EDIT_SEGMENTATION] = new mafGUIHolder(m_SegmentationOperationsNotebook, -1, false, true);
-	m_SegmentationOperationsPanel[EDIT_SEGMENTATION]->Put(m_SegmentationOperationsGui[EDIT_SEGMENTATION]);
-
-	m_SegmentationOperationsNotebook->AddPage(m_SegmentationOperationsPanel[EDIT_SEGMENTATION], _("Edit"));
-	m_SegmentationOperationsPanel[EDIT_SEGMENTATION]->Enable(false);
-
-	m_GuiDialog->Add(m_SegmentationOperationsNotebook, wxEXPAND | wxALL);
-	m_GuiDialog->FitGui();
-
-	m_GuiDialog->TwoButtons(ID_BUTTON_PREV, ID_BUTTON_NEXT, _("Prev"), _("Next"), wxEXPAND | wxALL);
+	m_GuiDialog->TwoButtons(ID_BUTTON_PREV, ID_BUTTON_NEXT, _("Init"), _("Edit"), wxEXPAND | wxALL);
 	m_GuiDialog->Enable(ID_BUTTON_PREV, false);
 	m_GuiDialog->Enable(ID_BUTTON_NEXT, true);
+	m_GuiDialog->Divider(1);
+
+	// Add Operation Phase Gui
+	m_AppendingOpGui = new mafGUI(NULL);
+	m_AppendingOpGui->AddGui(m_SegmentationOperationsGui[INIT_SEGMENTATION]);
+
+	m_GuiDialog->AddGui(m_AppendingOpGui);
 
 	//////////////////////////////////////////////////////////////////////////
 	m_GuiDialog->FitGui();
-	m_GuiDialog->Update();
 
 	int x_pos = (fw - dialogSize[0]) / 2;
 	int y_pos = (fh - dialogSize[1]) / 2;
 
 	m_Dialog->SetSize(x_pos, y_pos, dialogSize[0], dialogSize[1]);
-
-	m_GuiDialog->Update();
 
 	m_ProgressBar->Show(true);
 	m_GuiDialog->Update();
@@ -1112,7 +1094,7 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 	currentGui->Bool(ID_REFINEMENT_REMOVE_PENINSULA_REGIONS, mafString("Apply to peninsula regions"), &m_RemovePeninsulaRegions, 1, mafString("Apply refinement on peninsula regions"));
 	currentGui->TwoButtons(ID_REFINEMENT_UNDO, ID_REFINEMENT_REDO, "Undo", "Redo");
 	currentGui->Button(ID_REFINEMENT_APPLY, mafString("Apply"), "");
-	currentGui->Divider();
+	currentGui->Divider(1);
 
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION] = currentGui;
 
@@ -1200,14 +1182,13 @@ void mafOpSegmentation::DeleteOpDialog()
 	cppDEL(m_ManualBrushSizeSlider);
 
 	cppDEL(m_SegmentationOperationsGui[INIT_SEGMENTATION]);
-	cppDEL(m_SegmentationOperationsPanel[INIT_SEGMENTATION]);
 	cppDEL(m_SegmentationOperationsGui[EDIT_SEGMENTATION]);
-	cppDEL(m_SegmentationOperationsPanel[EDIT_SEGMENTATION]);
-
-	cppDEL(m_SegmentationOperationsNotebook);
-
+	cppDEL(m_ProgressBar);
 	cppDEL(m_SliceSlider);
 
+	cppDEL(m_SnippetsLabel);
+
+	cppDEL(m_AppendingOpGui);
 	cppDEL(m_GuiDialog);
 	cppDEL(m_Dialog);
 
@@ -1247,7 +1228,6 @@ void mafOpSegmentation::UpdateSliderValidator()
 	m_SliceText->SetValidator(mafGUIValidator(this, ID_SLICE_TEXT, m_SliceText, &m_SliceIndex, m_SliceSlider, 1, sliceMax));
 	m_SliceIndex = m_SliceIndexByPlane[m_SlicePlane];
 	m_SliceSlider->Update();
-
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::UpdateSlice()
@@ -1718,13 +1698,11 @@ void mafOpSegmentation::OnNextStep()
 	UpdateThresholdLabel();
 
 	m_CurrentPhase = EDIT_SEGMENTATION;
+	
+	m_AppendingOpGui->Remove(m_SegmentationOperationsGui[INIT_SEGMENTATION]);
+	m_AppendingOpGui->AddGui(m_SegmentationOperationsGui[EDIT_SEGMENTATION]);
+	m_AppendingOpGui->FitGui();
 
-	m_SegmentationOperationsNotebook->SetSelection(EDIT_SEGMENTATION);
-
-// 	m_SegmentationOperationsNotebook->RemovePage(0);
-// 	m_SegmentationOperationsNotebook->AddPage(m_SegmentationOperationsPanel[EDIT_SEGMENTATION], _("Edit"));
-	m_SegmentationOperationsPanel[INIT_SEGMENTATION]->Enable(false);
-	m_SegmentationOperationsPanel[EDIT_SEGMENTATION]->Enable(true);
 	m_GuiDialog->Enable(ID_BUTTON_PREV, true);
 	m_GuiDialog->Enable(ID_BUTTON_NEXT, false);
 	m_GuiDialog->FitGui();
@@ -1748,12 +1726,10 @@ void mafOpSegmentation::OnPreviousStep()
 
 	m_CurrentPhase = INIT_SEGMENTATION;
 
-	m_SegmentationOperationsNotebook->SetSelection(INIT_SEGMENTATION);
+	m_AppendingOpGui->Remove(m_SegmentationOperationsGui[EDIT_SEGMENTATION]);
+	m_AppendingOpGui->AddGui(m_SegmentationOperationsGui[INIT_SEGMENTATION]);
+	m_AppendingOpGui->FitGui();
 
-// 	m_SegmentationOperationsNotebook->RemovePage(0);
-// 	m_SegmentationOperationsNotebook->AddPage(m_SegmentationOperationsPanel[INIT_SEGMENTATION], _("Init"));
-	m_SegmentationOperationsPanel[INIT_SEGMENTATION]->Enable(true);
-	m_SegmentationOperationsPanel[EDIT_SEGMENTATION]->Enable(false);
 	m_GuiDialog->Enable(ID_BUTTON_PREV, false);
 	m_GuiDialog->Enable(ID_BUTTON_NEXT, true);
 	m_GuiDialog->FitGui();
