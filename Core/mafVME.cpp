@@ -333,6 +333,13 @@ int mafVME::SetParent(mafVME *parent)
 
 			m_AbsMatrixPipe->SetVME(this);
 
+			// if the Node was attached to another tree, first attaching event
+			if (old_root && (new_root != old_root))
+			{
+				ForwardUpEvent(&mafEventBase(this, NODE_ATTACHED_TO_TREE));
+				InvokeEvent(this, NODE_ATTACHED_TO_TREE);
+			}
+
 			return MAF_OK;
 		}
 
@@ -344,7 +351,7 @@ int mafVME::SetParent(mafVME *parent)
 	}
 	else
 	{
-		// reparenting to NULL is admitted in any case
+		// re parenting to NULL is admitted in any case
 		if (m_Parent != NULL)
 		{
 			// send event about detachment from the tree
@@ -841,7 +848,7 @@ int mafVME::InternalStore(mafStorageElement *parent)
 		mafVMELink &link = links_it->second;
 		mafStorageElement *link_item_element = links_element->AppendChild("Link");
 		link_item_element->SetAttribute("Name", links_it->first);
-		link_item_element->SetAttribute("NodeId", link.m_NodeId);
+		link_item_element->SetAttribute("NodeId", link.m_Node->GetId());
 		link_item_element->SetAttribute("linkType", (mafID)link.m_Type);
 	}
 
@@ -1403,7 +1410,7 @@ int mafVME::ReparentTo(mafVME *newparent)
 
 		if (oldparent != newparent)
 		{
-			// self register to preserve from distruction
+			// self register to preserve from destruction
 			Register(this);
 
 			if (oldparent)
@@ -1413,6 +1420,9 @@ int mafVME::ReparentTo(mafVME *newparent)
 
 			if (newparent)
 			{
+				//Set m_Parent to old parent in order to avoid new id generation
+				//when we reparent we don't need new id and m_Parent will be updated from AddChild
+				m_Parent = oldparent;
 				if (newparent->AddChild(this) == MAF_ERROR)
 					return MAF_ERROR;
 			}
