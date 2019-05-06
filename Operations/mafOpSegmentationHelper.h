@@ -25,6 +25,7 @@
 // forward declarations
 class mafVMEVolumeGray;
 class vtkImageData;
+class vtkUnsignedCharArray;
 
 #define EMPTY 0
 #define FULL 255
@@ -34,6 +35,19 @@ struct AutomaticInfoRange
 	int m_StartSlice;
 	int m_EndSlice;
 	double m_Threshold[2];
+};
+
+enum PLANE_TYPE
+{
+	YZ = 0,
+	XZ,
+	XY,
+};
+
+enum BRUSH_SHAPES
+{
+	CIRCLE_BRUSH_SHAPE = 0,
+	SQUARE_BRUSH_SHAPE,
 };
 
 /** mafOpSegmentationHelper Is an helper for Segmentation Operation
@@ -52,8 +66,10 @@ public:
 	void VolumeThreshold(double *threshold);
 	void VolumeThreshold(std::vector<AutomaticInfoRange> *rangesVector);
 
+	void ApplySliceChangesToVolume(int slicePlane, int sliceIndex);
 
 
+	void DrawBrush(double *pos, int slicePlane, int brushSize, int brushShape, bool erase);
 protected:
 
 	void InternalTheshold(int dataType, double *threshold, int n, void * inputPointer, unsigned char * outputPointer, int offset = 0);
@@ -61,17 +77,11 @@ protected:
 	template<typename DataType>
 	void InternalThreshold(double *threshold, int n, DataType *inputScalars, unsigned char *outputScalars, int offset);
 
+	
 	mafVMEVolumeGray *m_Volume;
 	mafVMEVolumeGray *m_Segmentation;
 	vtkImageData     *m_SegmetationSlice;
 	vtkImageData     *m_VolumeSlice;
-
-
-
-	int m_VolumeDimensions[3];          //<Dimensions of the volumes (number of slices)
-
-	
-
 };
 
 #endif

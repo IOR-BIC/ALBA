@@ -61,57 +61,12 @@ mafCxxTypeMacro(mafInteractorPERBrushFeedback)
 mafInteractorPERBrushFeedback::mafInteractorPERBrushFeedback()
 //------------------------------------------------------------------------------
 {
-  m_Radius = 0.5;
-  m_CurrentShape = CIRCLE_BRUSH_SHAPE;
-
-  m_Coordinate = vtkCoordinate::New();
-  m_Coordinate->SetCoordinateSystemToWorld();
-
-  // Measure tools
-  vtkNEW(m_BrushMapper);
-  vtkNEW(m_BrushActor);
-
-  m_SphereSource = vtkSphereSource::New();
-  m_SphereSource->SetCenter(10, 10, 10);
-  m_SphereSource->SetRadius(m_Radius);
-  m_SphereSource->SetPhiResolution
-    (20);
-  m_SphereSource->SetThetaResolution(20);
-  m_SphereSource->Update();
-
-  m_CubeSource = vtkCubeSource::New();
-  m_CubeSource->SetCenter(10, 10, 10);
-  m_CubeSource->SetXLength(int(m_Radius*2));
-  m_CubeSource->SetYLength(int(m_Radius*2));
-  m_CubeSource->SetZLength(1);
-  m_CubeSource->Update();
-
-  m_BrushMapper->SetInput(m_SphereSource->GetOutput());
-  m_BrushMapper->SetTransformCoordinate(m_Coordinate);
-  m_BrushActor->SetMapper(m_BrushMapper);
-  m_BrushActor->GetProperty()->SetColor(0.0,0.0,1.0);
-  m_BrushActor->GetProperty()->SetOpacity(0.025);
-
-  m_IsActorAdded = false;
-
-  m_EnableDrawing = true;
-
-  m_Count = 0;
-
-  m_TargetVolumeSpacing = 1;
 }
 
 //------------------------------------------------------------------------------
 mafInteractorPERBrushFeedback::~mafInteractorPERBrushFeedback()
 //------------------------------------------------------------------------------
 {
-  m_Renderer->RemoveActor2D(m_BrushActor);
-
-  vtkDEL(m_BrushMapper);
-  vtkDEL(m_BrushActor);
-  vtkDEL(m_SphereSource);
-  vtkDEL(m_CubeSource);
-  vtkDEL(m_Coordinate);
 
 }
 
@@ -138,32 +93,7 @@ void mafInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
       OnChar(e);
     }
 
-    // Draw the brush feedback in the right position
-    mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(device);
-		if (mouse)
-		{
-
-			int parallelView = m_Renderer->GetActiveCamera()->GetParallelProjection() != 0;
-			if (parallelView)
-			{
-				//TODO: draw a box
-
-				double pos_2d[2];
-				mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
-				e->Get2DPosition(pos_2d);
-
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-
-				if (m_EnableDrawing)
-				{
-					if (m_CurrentShape == CIRCLE_BRUSH_SHAPE)
-						DrawEllipse(pos_2d[0], pos_2d[1]);
-					else
-						DrawBox(pos_2d[0], pos_2d[1]);
-				}
-			}
-		}
-
+		
     // find if this device is one of those currently interacting
     if (IsInteracting(device))
     {
@@ -224,173 +154,20 @@ void mafInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
           if(cellPicker->Pick(mouse_pos[0],mouse_pos[1],0,r))
           {
             picked_something = true;
+						break;
           }
         }
-        if (picked_something)
-        {
-          vtkPoints *p = vtkPoints::New();
-          double pos_picked[3];
-          cellPicker->GetPickPosition(pos_picked);
-          p->SetNumberOfPoints(1);
-          p->SetPoint(0,pos_picked);
-          v->Pick(mouse_pos[0],mouse_pos[1]);
-          double scalar_value = 0;
-          mafVME *pickedVME = v->GetPickedVme();
-          if(pickedVME)
-          {
-            vtkDataSet *vtk_data = pickedVME->GetOutput()->GetVTKData();
-            //GetPickPosition calculate the picking position with matrix multiplication 
-            //the return value can be affected of some approximation errors, if the value
-            //is outside the bounds FindPoint will return -1;
-            double bounds[6];
-            vtk_data->GetBounds(bounds);
-            if (pos_picked[0]<bounds[0]) pos_picked[0]=bounds[0];
-            if (pos_picked[0]>bounds[1]) pos_picked[0]=bounds[1];
-            if (pos_picked[1]<bounds[2]) pos_picked[1]=bounds[2];
-            if (pos_picked[1]>bounds[3]) pos_picked[1]=bounds[3];
-            if (pos_picked[2]<bounds[4]) pos_picked[2]=bounds[4];
-            if (pos_picked[2]>bounds[5]) pos_picked[2]=bounds[5];
-            int pid = vtk_data->FindPoint(pos_picked);
-            vtkDataArray *scalars = vtk_data->GetPointData()->GetScalars();
-            if (scalars)
-              scalars->GetTuple(pid,&scalar_value);
+				
+				cellPicker->GetPickPosition(m_PickPosition);
 
-            //add a patch otherwise some old events will be rise at the end of mouse move
-            m_Count++;
-
-            mafEvent pick_event(this,MOUSE_MOVE,p);
-            pick_event.SetArg(pid);
-            pick_event.SetDouble(m_Count);
-            pick_event.SetBool(e->GetModifier(MAF_CTRL_KEY) == true);
-            mafEventMacro(pick_event);
-            p->Delete();
-          }
-        }
+				mafEvent pick_event(this, MOUSE_MOVE);
+				pick_event.SetPointer(m_PickPosition);
+				pick_event.SetArg(picked_something);
+				pick_event.SetBool(e->GetModifier(MAF_CTRL_KEY) == true);
+				mafEventMacro(pick_event);
       }
       vtkDEL(cellPicker);
     }
   }
 }
 
-//------------------------------------------------------------------------------
-void mafInteractorPERBrushFeedback::DrawEllipse(double x, double y)
-//------------------------------------------------------------------------------
-{
-  static double dx, dy, dz;
-
-  //RemoveActor();
-
-  double wp[4], p[3];
-  m_Renderer->SetDisplayPoint(x,y,0);
-  m_Renderer->DisplayToWorld();
-  m_Renderer->GetWorldPoint(wp);
-  p[0] = wp[0];
-  p[1] = wp[1];
-  p[2] = wp[2];
-
-  if(!m_IsActorAdded)
-    AddActor();
-
-  m_SphereSource->SetCenter(p);
-  m_SphereSource->Update();
-
-  m_Renderer->GetRenderWindow()->Render();
-
-}
-
-//------------------------------------------------------------------------------
-void mafInteractorPERBrushFeedback::DrawBox(double x, double y)
-//------------------------------------------------------------------------------
-{
-  static double dx, dy, dz;
-
-
-  double wp[4], p[3];
-  m_Renderer->SetDisplayPoint(x,y,0);
-  m_Renderer->DisplayToWorld();
-  m_Renderer->GetWorldPoint(wp);
-  p[0] = wp[0];
-  p[1] = wp[1];
-  p[2] = wp[2];
-
-  if(!m_IsActorAdded)
-    AddActor();
-
-  m_CubeSource->SetCenter(p);
-  m_CubeSource->Update();
-
-  m_Renderer->GetRenderWindow()->Render();
-
-}
-
-//------------------------------------------------------------------------------
-void mafInteractorPERBrushFeedback::RemoveActor()
-//------------------------------------------------------------------------------
-{
-  if (m_Renderer && m_BrushActor)
-  {
-    // Uncomment this to render brush shadow
-// 	  m_Renderer->RemoveActor2D(m_BrushActor);
-// 	  m_Renderer->Render();
-
-    m_IsActorAdded = false;
-  }
-}
-//------------------------------------------------------------------------------
-void mafInteractorPERBrushFeedback::AddActor()
-//------------------------------------------------------------------------------
-{
-  if (m_Renderer && m_BrushActor)
-  {
-    // Uncomment this to render brush shadow
-// 	  m_Renderer->AddActor2D(m_BrushActor);
-// 	  m_Renderer->Render();
-
-    m_IsActorAdded = true;
-  }
-}
-//------------------------------------------------------------------------------
-void mafInteractorPERBrushFeedback::SetRadius(double radius)
-//------------------------------------------------------------------------------
-{
-  m_Radius = radius;
-
-  if (m_SphereSource && m_CubeSource && m_Renderer)
-  {
-    m_SphereSource->SetRadius(m_Radius * m_TargetVolumeSpacing);
-    m_SphereSource->Update();
-
-    m_CubeSource->SetXLength(double(int(2*m_Radius) * m_TargetVolumeSpacing));
-    m_CubeSource->SetYLength(double(int(2*m_Radius) * m_TargetVolumeSpacing));
-    m_CubeSource->SetZLength(double(int(2*m_Radius) * m_TargetVolumeSpacing));
-    m_CubeSource->Update();
-
-    m_Renderer->Render();
-  }
-}
-
-//------------------------------------------------------------------------------
-void mafInteractorPERBrushFeedback::SetBrushShape(int shape)
-//------------------------------------------------------------------------------
-{
-  if(shape == CIRCLE_BRUSH_SHAPE)
-  {
-    m_CurrentShape = CIRCLE_BRUSH_SHAPE;
-
-    m_BrushMapper->SetInput(m_SphereSource->GetOutput());
-    m_BrushMapper->SetTransformCoordinate(m_Coordinate);
-    m_BrushActor->SetMapper(m_BrushMapper);
-    m_BrushActor->GetProperty()->SetColor(0.0,0.0,1.0);
-    m_BrushActor->GetProperty()->SetOpacity(0.025);
-  }
-  else
-  {
-    m_CurrentShape = SQUARE_BRUSH_SHAPE;
-
-    m_BrushMapper->SetInput(m_CubeSource->GetOutput());
-    m_BrushMapper->SetTransformCoordinate(m_Coordinate);
-    m_BrushActor->SetMapper(m_BrushMapper);
-    m_BrushActor->GetProperty()->SetColor(0.0,0.0,1.0);
-    m_BrushActor->GetProperty()->SetOpacity(0.05);
-  }
-}

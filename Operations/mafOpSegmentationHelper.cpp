@@ -23,6 +23,7 @@
 #include "mafVMEVolumeGray.h"
 #include "vtkRectilinearGrid.h"
 
+#define ROUND(X) floor((X)+0.5)
 
 //----------------------------------------------------------------------------
 mafOpSegmentationHelper::mafOpSegmentationHelper()
@@ -57,20 +58,14 @@ void mafOpSegmentationHelper::SliceThreshold(double *threshold)
 	m_SegmetationSlice->Update();
 	vtkDataArray 			*inputScalars = m_VolumeSlice->GetPointData()->GetScalars();
 	void *inputPointer = inputScalars->GetVoidPointer(0);
+	vtkDataArray *outputScalars = m_SegmetationSlice->GetPointData()->GetScalars();
+	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
 	int nTuples = inputScalars->GetNumberOfTuples();
 	int dataType = inputScalars->GetDataType();
-
-
-	vtkUnsignedCharArray *outputScalars;
-	vtkNEW(outputScalars);
-	outputScalars->SetNumberOfTuples(nTuples);
-	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
-
+	
 	InternalTheshold(dataType, threshold, nTuples, inputPointer, outputPointer);
 
-	m_SegmetationSlice->GetPointData()->SetScalars(outputScalars);
-
-	vtkDEL(outputScalars);
+	outputScalars->Modified();
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentationHelper::VolumeThreshold(double *threshold)
@@ -79,20 +74,14 @@ void mafOpSegmentationHelper::VolumeThreshold(double *threshold)
 	vtkDataSet * segmentation = m_Segmentation->GetOutput()->GetVTKData();
 	vtkDataArray 	*inputScalars = m_Volume->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
 	void *inputPointer = inputScalars->GetVoidPointer(0);
+	vtkDataArray *outputScalars = segmentation->GetPointData()->GetScalars();
+	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
 	int nTuples = inputScalars->GetNumberOfTuples();
 	int dataType = inputScalars->GetDataType();
 
-
-	vtkUnsignedCharArray *outputScalars;
-	vtkNEW(outputScalars);
-	outputScalars->SetNumberOfTuples(nTuples);
-	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
-
 	InternalTheshold(dataType,threshold, nTuples, inputPointer, outputPointer);
 
-	segmentation->GetPointData()->SetScalars(outputScalars);
-
-	vtkDEL(outputScalars);
+	outputScalars->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -107,6 +96,8 @@ void mafOpSegmentationHelper::VolumeThreshold(std::vector<AutomaticInfoRange> *r
 	int nTuples = inputScalars->GetNumberOfTuples();
 	int dataType = inputScalars->GetDataType();
 
+
+	//TODO UPDATE no new scalars
 	vtkUnsignedCharArray *outputScalars;
 	vtkNEW(outputScalars);
 	outputScalars->SetNumberOfTuples(nTuples);
@@ -185,5 +176,124 @@ void mafOpSegmentationHelper::InternalThreshold(double *threshold, int n, DataTy
 		else
 			outputScalars[i] = EMPTY;
 	}
+}
+
+//----------------------------------------------------------------------------
+void mafOpSegmentationHelper::ApplySliceChangesToVolume(int slicePlane, int sliceIndex)
+{
+	vtkDataSet *segVolume = vtkDataSet::SafeDownCast(m_Segmentation->GetOutput()->GetVTKData());
+
+	if (segVolume && m_SegmetationSlice)
+	{
+		int *volDims;
+		volDims=((vtkImageData*)segVolume)->GetDimensions();
+		vtkDataArray* volScalars = segVolume->GetPointData()->GetScalars();
+		unsigned char *volScalarsPointer = (unsigned char *)volScalars->GetVoidPointer(0);
+		unsigned char *segScalarPointer = (unsigned char *)m_SegmetationSlice->GetPointData()->GetScalars()->GetVoidPointer(0);;
+
+		int numberOfPoints;
+		int numberOfSlices = 1;
+
+		if (slicePlane == XY)
+		{
+			int z = (sliceIndex - 1);
+			for (int x = 0; x < volDims[0]; x++)
+				for (int y = 0; y < volDims[1]; y++)
+				{
+					int volPos = x + y*volDims[0] + z*volDims[0] * volDims[1];
+					int slicePos = x + y*volDims[0] + 0;
+					volScalarsPointer[volPos] = segScalarPointer[slicePos];
+				}
+		}
+		else if (slicePlane == YZ)
+		{
+			int x = (sliceIndex - 1);
+			for (int y = 0; y < volDims[1]; y++)
+				for (int z = 0; z < volDims[2]; z++)
+				{
+					int volPos = x + y*volDims[0] + z*volDims[0] * volDims[1];
+					int slicePos = 0 + y*numberOfSlices + z*numberOfSlices*volDims[1];
+					volScalarsPointer[volPos] = segScalarPointer[slicePos];
+				}
+		}
+		else if (slicePlane == XZ)
+		{
+			int y = (sliceIndex - 1);
+			for (int z = 0; z < volDims[2]; z++)
+				for (int x = 0; x < volDims[0]; x++)
+				{
+					int volPos = x + y*volDims[0] + z*volDims[0] * volDims[1];
+					int slicePos = x + 0 + z*volDims[0] * numberOfSlices;
+					volScalarsPointer[volPos] = segScalarPointer[slicePos];
+				}
+		}
+
+		volScalars->Modified();
+	}
+}
+
+//----------------------------------------------------------------------------
+void mafOpSegmentationHelper::DrawBrush(double *pos, int slicePlane, int brushSize, int brushShape, bool erase)
+{
+	int fillValue;
+	int sliceDim[3];
+	double bounds[6];
+	double sliceSpacing[3];
+	double sclicePos[2];
+	double distX, distY;
+
+	vtkDataArray *outputScalars = m_SegmetationSlice->GetPointData()->GetScalars();
+	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
+
+	m_SegmetationSlice->GetDimensions(sliceDim);
+	m_SegmetationSlice->GetSpacing(sliceSpacing);
+	m_Segmentation->GetOutput()->GetVTKData()->GetBounds(bounds);
+
+	brushSize/=2;
+	fillValue = erase ? EMPTY : FULL;
+
+	if (slicePlane == XY)
+	{
+		sclicePos[0] = pos[0] - bounds[0];
+		sclicePos[1] = pos[1] - bounds[2];
+	}
+	else if (slicePlane == YZ)
+	{
+		sclicePos[0] = pos[1] - bounds[2]; 
+		sclicePos[1] = pos[2] - bounds[4];
+	}
+	else if (slicePlane == XZ)
+	{
+		sclicePos[0] = pos[0] - bounds[0];
+		sclicePos[1] = pos[2] - bounds[4];
+	}
+
+	int pointX = ROUND(sclicePos[0] / sliceSpacing[0]);
+	int pointY = ROUND(sclicePos[1] / sliceSpacing[1]);
+	int startX = MAX(0,pointX - brushSize);
+	int endX   = MIN(sliceDim[0]-1, pointX + brushSize);
+	int startY = MAX(0, pointY - brushSize);
+	int endY   = MIN(sliceDim[1] - 1,pointY + brushSize);
+
+	if (brushShape == SQUARE_BRUSH_SHAPE)
+	{
+		for (int i = startY; i <= endY; i++)
+			for (int j = startX; j <= endX; j++)
+				outputPointer[i*sliceDim[0] + j] = fillValue;
+	}
+	else //CIRCLE_BRUSH_SHAPE
+	{
+		for (int i = startY; i <= endY; i++)
+		{
+			distY = i - pointY;
+			for (int j = startX; j <= endX; j++)
+			{
+				distX = j - pointX;
+				if (sqrt((distX*distX) + (distY*distY)) <= brushSize)
+					outputPointer[i*sliceDim[0] + j] = fillValue;
+			}
+		}
+	}
+	outputScalars->Modified();
 }
 

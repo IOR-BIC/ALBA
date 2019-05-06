@@ -67,6 +67,16 @@ class wxStaticBoxSizer;
 //----------------------------------------------------------------------------
 // mafOpSegmentation :
 //----------------------------------------------------------------------------
+
+//////////////////////////////////////////////////////////////////////////
+//Manual segmentation stuff
+typedef struct urstate
+{
+	int m_Plane;
+	int m_Slice;
+	vtkUnsignedCharArray *m_Scalars;
+} UndoRedoState; //<Undo Redo data structure
+
 /**
 This operation accept a volume as input and produces a surface as output of segmentation procedure.
 User can select:
@@ -107,10 +117,8 @@ public:
 	  ID_PRE_VOLUME_SPACING,
 	  ID_PRE_VOLUME_ZERO_VALUE,
     ID_MANUAL_PICKING_MODALITY,
-    ID_MANUAL_TOOLS,
 		ID_MANUAL_TOOLS_BRUSH,
 		ID_MANUAL_TOOLS_FILL,
-		ID_MANUAL_TOOLS_ERASE,
     ID_MANUAL_BRUSH_SHAPE,
     ID_MANUAL_BRUSH_SIZE,
     ID_MANUAL_BUCKET_ACTION,
@@ -155,13 +163,7 @@ public:
     MANUAL_SEGMENTATION_SELECT = 0,
     MANUAL_SEGMENTATION_ERASE,
   };
-
-  enum BRUSH_SHAPES
-  {
-    CIRCLE_BRUSH_SHAPE = 0,
-    SQUARE_BRUSH_SHAPE,
-  };
-
+	
   enum REFINEMENT_SEGMENTATION_IDS
   {
     ID_REFINEMENT_ISLANDS_REMOVE = 0,
@@ -260,28 +262,25 @@ protected:
 	void SetThresholdByRange();
 	
   /** Receive events from Manual segmentation gui */
-  void OnManualSegmentationEvent(mafEvent *e);
-  
+  void OnEditSegmentationEvent(mafEvent *e);
+
+	void OnUndoRedo(bool undo);
+
+
   /** Receive events from Refinement segmentation gui */
   void OnRefinementSegmentationEvent(mafEvent *e);
   
   /** Receive events from Load segmentation gui */
   void OnLoadSegmentation();
 
-  /** Get the z position of the specified slice index */
-  double GetPosFromSliceIndexZ();
-
-  /** Initialize Manual step */
-  void OnManualStep();
-
   /** De initialize Initialize Manual step */
-  void OnManualStepExit();
+  void OnEditStepExit();
 
   /** Initialize Refinement step */
   void OnRefinementStep();
 	
   /** Perform the initializations when the user press next button */
-  void OnNextStep();
+  void OnEditStep();
 
 	/** Perform the initializations when the user press previous button */
   void OnPreviousStep();
@@ -290,7 +289,7 @@ protected:
 	vtkImageData     *m_VolumeSlice;
 	mafString m_VolumeName;        //<Loaded volume name
 	mafVMEVolumeGray *m_SegmentationVolume;     //<Segmentation volume
-	vtkImageData     *m_SegmetationSlice;
+	vtkImageData     *m_SegmentationSlice;
   
 	double m_SliceOrigin[3];            //<Origin of the slice plane
   int m_VolumeDimensions[3];          //<Dimensions of the volumes (number of slices)
@@ -298,8 +297,10 @@ protected:
   double m_VolumeBounds[6];           //<Volume bounds
   bool m_VolumeParametersInitialized; //<Specify if volume parameters are initialized
 	int m_SliceIndex;								//GuiVariable
-	int m_SliceIndexByPlane[3];            //<Index of the current slice position
+	int m_OldSliceIndex;								//GuiVariable
+		int m_SliceIndexByPlane[3];            //<Index of the current slice position
 	int m_SlicePlane;            //<Current slicing plane (xy,xz,yx)
+	int m_OldSlicePlane;
   int m_NumSliceSliderEvents;         //<Number of events raised by the slider in a single interaction
   int m_CurrentPhase;             //<Current step
 	int m_ShowLabels;
@@ -331,42 +332,21 @@ protected:
   mafInteractorSegmentationPicker *m_SegmentationPicker; //<Segmentation picker for interaction
 
 	mafGUI* m_AppendingOpGui;
-
-  //////////////////////////////////////////////////////////////////////////
-  //Manual segmentation stuff
-  typedef struct urstate
-  {
-    int plane;
-    int slice;
-    vtkUnsignedCharArray *dataArray;
-  } UndoRedoState; //<Undo Redo data structure
-
-  /** Apply volume slice changes*/
-  void ApplyVolumeSliceChanges();
-  
+	  	  
   /** Set flags that indicate that the user start draw interaction */
   void StartDraw(mafEvent *e, bool erase);
 
-  /** Select brush image depending on shape and size */
-  void SelectBrushImage(double x, double y, double z, bool selection);
-  
-  /** Trap events raised from the brush */
-  void OnBrushEvent(mafEvent *e);
+	UndoRedoState CreateUndoRedoState();
 
-  /** Relead the previous/next undo/redo state*/
-  void ReloadUndoRedoState(vtkDataSet *dataSet, UndoRedoState state);
-  
+
   /** Reset undo list*/
-  void ResetManualUndoList();
+  void ClearManualUndoList();
   
   /** Reset redo list */
-  void ResetManualRedoList();
-  
-  /** Enable manual segmentation gui widget */
-  void EnableManualSegmentationGui();
+  void ClearManualRedoList();
 
   /** Used in brush preview to restore the real drawn image */
-  void UndoBrushPreview();
+  void ApplyRealDrawnImage();
 
   /** Create the real drawn image */
   void CreateRealDrawnImage();
@@ -378,19 +358,19 @@ protected:
   wxStaticBoxSizer *m_BrushEditingSizer;
   mafGUIButton *m_ManualApplyChanges;           //<Apply changes button - GUI
   
-	int m_ManualSegmentationAction;               //<Manual segmentation action (draw/erease)
-  int m_ManualSegmentationTools;                //<Manual segmentation tools (bucket/brush)
+	int m_ManualSegmentationTools;                //<Manual segmentation tools (bucket/brush)
   int m_ManualBucketActions;                    //<
-  int m_ManualBrushShape;                       //<Brush shape
-  double m_ManualBrushSize;                     //<Brush size
+  int m_BrushShape;                       //<Brush shape
+  int m_BrushSize;                     //<Brush size
+	int m_BrushModality;               //< Brush Modality (draw/erase)
+
   int m_ManualRefinementRegionsSize;            //<Refinement region size
   wxComboBox *m_ManualRefinementComboBox;       //<Refinement action combo - GUI
   wxTextCtrl *m_ManualRefinementRegionSizeText; //<Refinement size text - GUI
-  std::vector<UndoRedoState> m_ManualUndoList;  //< Undo stack
-  std::vector<UndoRedoState> m_ManualRedoList;  // Redo stack
-  bool m_PickingStarted;                        //<Determine if picking has started
-  mafInteractorPERBrushFeedback *m_ManualPER;   //<Dynamic event router
-  double m_CurrentBrushMoveEventCount;          //<Id for mouse move event raised by the brush
+  std::vector<UndoRedoState> m_UndoList;  //< Undo stack
+  std::vector<UndoRedoState> m_RedoList;  // Redo stack
+  bool m_IsDrawing;                        //<Determine if picking has started
+  mafInteractorPERBrushFeedback *m_EditPER;   //<Dynamic event router
   vtkUnsignedCharArray *m_RealDrawnImage;       //<Real drawn image used in brush preview
   int m_LastMouseMovePointID;                   //<Last point id in mouse move event
   mafGUILutSlider* m_ManualRangeSlider;         //<
@@ -425,15 +405,6 @@ protected:
   /** Remove the select range */
   void OnRemoveRange();
 
-  /** Get camera attributes */
-  void GetCameraAttribute(double *focalPoint, double* scaleFactor);
-
-  /** Get the visualized bounds */
-  void GetVisualizedBounds(double focalPoint[3], double scaleFactor, double bounds[4]);
-  
-  /** Reset zoom view */
-  bool ResetZoom(vtkDataSet* dataset,double visbleBounds[4]);
-
   /** Update threshold real-time preview*/
   void UpdateThresholdRealTimePreview();
 
@@ -455,7 +426,7 @@ protected:
   vtkTextMapper *m_AutomaticSliceTextMapper;    //<Text mapper for slice visualization
   vtkActor2D *m_AutomaticSliceTextActor;        //<Text mapper for slice visualization
 
-  mafInteractorPERScalarInformation *m_AutomaticPER; //<Interactor for scalar value visualization on mouse move
+  mafInteractorPERScalarInformation *m_InitPER; //<Interactor for scalar value visualization on mouse move
   //////////////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////////////
@@ -480,9 +451,6 @@ protected:
   int m_RefinementMajorityThreshold;        //<Used in itk algorithm (not yet exposed and used)
   int m_RefinementEverySlice;               //<Determine if refinement performed on every slice
   int m_RefinementIterative;                //<Iterative refinement (not yet used)
-
-  double m_InitialFocalPoint[3];            //<Initial camera focal point
-  double m_InitialScaleFactor;              //<Initial camera scale factor
 
   std::vector<vtkUnsignedCharArray *> m_RefinementUndoList; //<Refinement undo list
   std::vector<vtkUnsignedCharArray *> m_RefinementRedoList; //<Refinement redo list

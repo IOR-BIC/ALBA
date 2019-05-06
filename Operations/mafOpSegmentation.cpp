@@ -104,13 +104,6 @@
 
 #define SPACING_PERCENTAGE_BOUNDS 0.1
 
-enum PLANE_TYPE
-{  
-  YZ = 0,
-  XZ,
-  XY,
-};
-
 enum INIT_MODALITY_TYPE
 {
   GLOBAL_INIT = 0,
@@ -182,8 +175,8 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
   //Manual initializations
 	m_InitModalityRadioBox = NULL;
   m_ManualBrushShapeRadioBox = NULL;
-  m_ManualBrushShape = CIRCLE_BRUSH_SHAPE;
-  m_ManualBrushSize = 1;
+  m_BrushShape = CIRCLE_BRUSH_SHAPE;
+  m_BrushSize = 1;
   m_ManualRefinementRegionsSize = 1;
 
   m_ManualBrushSizeText = NULL;
@@ -194,12 +187,9 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
 
   m_SegmentationPicker = NULL;
 	 
-  m_ManualPER = NULL;
-  
-  m_ManualUndoList.clear();
-  m_ManualRedoList.clear();
-
-  m_PickingStarted = false;
+  m_EditPER = NULL;
+ 
+  m_IsDrawing = false;
   //////////////////////////////////////////////////////////////////////////
   //Automatic initializations
 	m_AutomaticMouseThreshold = m_Threshold[0] = m_Threshold [1]= 0.0;
@@ -212,22 +202,15 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
   m_AutomaticSliceTextMapper = NULL;
   m_AutomaticScalarTextActor = NULL;
   m_AutomaticScalarTextMapper = NULL;
-  m_AutomaticPER = NULL;
+  m_InitPER = NULL;
   m_InitModality = GLOBAL_INIT;
 
   //////////////////////////////////////////////////////////////////////////
   //Refinement initializations
-  m_InitialFocalPoint[0]=9999;
-  m_InitialFocalPoint[1]=9999;
-  m_InitialFocalPoint[2]=9999;
-  m_InitialScaleFactor = -1;
-
   m_MajorityThreshold = 9;
 
   m_RealDrawnImage = NULL;
-  m_CurrentBrushMoveEventCount = 0;
-
-   m_LastMouseMovePointID = 0;
+  m_LastMouseMovePointID = 0;
 
   m_OldAutomaticThreshold = MAXINT;
   m_OldAutomaticUpperThreshold = MAXINT;
@@ -274,6 +257,8 @@ void mafOpSegmentation::OpRun()
   //////////////////////////////////////////////////////////////////////////
 
   // interface:
+	InitVolumeDimensions();
+
   CreateOpDialog();
   InitializeView();
 
@@ -283,8 +268,6 @@ void mafOpSegmentation::OpRun()
   m_View->VmeAdd(m_Volume);
   
   Init();
-
-  GetCameraAttribute(m_InitialFocalPoint, &m_InitialScaleFactor);
 
   int result = m_Dialog->ShowModal() == wxID_OK ? OP_RUN_OK : OP_RUN_CANCEL;
 
@@ -352,8 +335,6 @@ void mafOpSegmentation::OpStop(int result)
     }
   }
 
-  ResetManualUndoList();
-  ResetManualRedoList();
   ResetRefinementUndoList();
   ResetRefinementRedoList();
 
@@ -378,7 +359,6 @@ void mafOpSegmentation::Init()
 {
 	InitSegmentationVolume();
 	InitializeInteractors();
-	InitVolumeDimensions();
 	InitVolumeSpacing();
 	UpdateWindowing();
 	UpdateSliderValidator();
@@ -492,12 +472,12 @@ void mafOpSegmentation::InitializeInteractors()
 	mafAction *pntAction = m_SER->AddAction("pntAction", -10);
 
 	//create the positional event router
-	mafNEW(m_ManualPER);
-	m_ManualPER->SetName("m_EditingPER");
-	m_ManualPER->SetListener(this);
+	mafNEW(m_EditPER);
+	m_EditPER->SetName("m_EditingPER");
+	m_EditPER->SetListener(this);
 
 	assert(m_View);
-	m_ManualPER->SetRenderer(m_View->GetFrontRenderer());
+	m_EditPER->SetRenderer(m_View->GetFrontRenderer());
 
 	mafNEW(m_SegmentationPicker);
 
@@ -513,17 +493,17 @@ void mafOpSegmentation::InitializeInteractors()
 
 	m_SER->AddAction("pntEditingAction");
 	pntAction = m_SER->GetAction("pntEditingAction");
-	m_ManualPER->AddObserver(m_SegmentationPicker);
+	m_EditPER->AddObserver(m_SegmentationPicker);
 
 	m_SER->AddAction("pntEditingAction");
 	pntAction = m_SER->GetAction("pntEditingAction");
 
-	mafNEW(m_AutomaticPER);
+	mafNEW(m_InitPER);
 	pntAction = m_SER->AddAction("pntActionAutomatic", -10);
 	pntAction->BindDevice(m_DialogMouse);
-	pntAction->BindInteractor(m_AutomaticPER);
-	m_AutomaticPER->SetListener(this);
-	m_AutomaticPER->SetRenderer(m_View->GetFrontRenderer());
+	pntAction->BindInteractor(m_InitPER);
+	m_InitPER->SetListener(this);
+	m_InitPER->SetRenderer(m_View->GetFrontRenderer());
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::InitVolumeDimensions()
@@ -774,6 +754,7 @@ void mafOpSegmentation::CreateOpDialog()
 	wxFont boldFont = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 	boldFont.SetWeight(wxBOLD);
 	m_SnippetsLabel->SetFont(boldFont);
+	m_SnippetsLabel->SetLabel(_(" 'Left Click + Ctrl' to select lower threshold. 'Left Click + Alt' to select upper threshold"));
 
 	m_ProgressBar = new wxGauge(m_Dialog, -1, 100, defPos, wxSize(200, 10));
 
@@ -973,11 +954,11 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 
 	currentGui->Label("Tools", true);
 
-	std::vector<const char*> toolLabels = { "Brush", "Fill", "Erase" };
-	std::vector<const char*> toolImageNames = { "TOOL_PEN" , "TOOL_FILL", "TOOL_ERASE" };
-	std::vector<int> toolIds = { ID_MANUAL_TOOLS_BRUSH, ID_MANUAL_TOOLS_FILL, ID_MANUAL_TOOLS_ERASE };
+	std::vector<const char*> toolLabels = { "Brush", "Fill" };
+	std::vector<const char*> toolImageNames = { "TOOL_PEN" , "TOOL_FILL" };
+	std::vector<int> toolIds = { ID_MANUAL_TOOLS_BRUSH, ID_MANUAL_TOOLS_FILL };
 
-	currentGui->MultipleImageButtons(3, 3, toolIds, toolLabels, toolImageNames, 0);
+	currentGui->MultipleImageButtons(2, 2, toolIds, toolLabels, toolImageNames, 0);
 	currentGui->Divider(1);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -990,14 +971,14 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 	wxStaticText *brushShapeLab = new wxStaticText(currentGui, w_id, "Shape");
 
 	m_ManualBrushShapeRadioBox = new wxRadioBox(currentGui, w_id, "", wxDefaultPosition, wxSize(130, -1), 2, shapes, 2);
-	m_ManualBrushShapeRadioBox->SetValidator(mafGUIValidator(currentGui, w_id, m_ManualBrushShapeRadioBox, &m_ManualBrushShape));
+	m_ManualBrushShapeRadioBox->SetValidator(mafGUIValidator(currentGui, w_id, m_ManualBrushShapeRadioBox, &m_BrushShape));
 
 	wxBoxSizer *brushShapesSizer = new wxBoxSizer(wxHORIZONTAL);
 	brushShapesSizer->Add(brushShapeLab, 0, wxRIGHT, 5);
 	brushShapesSizer->Add(m_ManualBrushShapeRadioBox, 0, wxRIGHT, 2);
 
 	// BRUSH SIZE
-	m_ManualBrushSize = 1;
+	m_BrushSize = 1;
 
 	wxStaticText *brushSizeLab = NULL;
 	int id = currentGui->GetWidgetId(ID_MANUAL_BRUSH_SIZE);
@@ -1005,13 +986,13 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 	brushSizeLab = new wxStaticText(currentGui, id, "Size (unit)", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
 
 	m_ManualBrushSizeText = new wxTextCtrl(currentGui, id, "", wxDefaultPosition, wxSize(40, 18));
-	m_ManualBrushSizeSlider = new mafGUIFloatSlider(currentGui, id, m_ManualBrushSize, 1, int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 2), wxDefaultPosition, wxDefaultSize);
+	m_ManualBrushSizeSlider = new mafGUIFloatSlider(currentGui, id, m_BrushSize, 1, int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 2), wxDefaultPosition, wxDefaultSize);
 
-	m_ManualBrushSizeText->SetValidator(mafGUIValidator(currentGui, id, m_ManualBrushSizeText, &m_ManualBrushSize, m_ManualBrushSizeSlider, 1, int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 2)));
-	m_ManualBrushSizeSlider->SetValidator(mafGUIValidator(currentGui, id, m_ManualBrushSizeSlider, &m_ManualBrushSize, m_ManualBrushSizeText));
+	m_ManualBrushSizeText->SetValidator(mafGUIValidator(currentGui, id, m_ManualBrushSizeText, &m_BrushSize, m_ManualBrushSizeSlider, 1, int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 2)));
+	m_ManualBrushSizeSlider->SetValidator(mafGUIValidator(currentGui, id, m_ManualBrushSizeSlider, &m_BrushSize, m_ManualBrushSizeText));
 
-	m_ManualBrushSize = 1;
-	m_ManualBrushSizeSlider->SetValue(m_ManualBrushSize);
+	m_BrushSize = 1;
+	m_ManualBrushSizeSlider->SetValue(m_BrushSize);
 	m_ManualBrushSizeText->SetValue("1");
 	m_ManualBrushSizeSlider->SetNumberOfSteps(int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 4) - 2);
 	m_ManualBrushSizeSlider->SetRange(1, int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 4), 1);
@@ -1057,6 +1038,7 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 
 	//////////////////////////////////////////////////////////////////////////
 	// Action: remove islands OR fill holes.
+	/*
 	m_RefinementSegmentationAction = ID_REFINEMENT_ISLANDS_REMOVE;
 	wxString operations[2];
 	operations[ID_REFINEMENT_ISLANDS_REMOVE] = wxString("Remove Islands");
@@ -1095,21 +1077,10 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 	currentGui->TwoButtons(ID_REFINEMENT_UNDO, ID_REFINEMENT_REDO, "Undo", "Redo");
 	currentGui->Button(ID_REFINEMENT_APPLY, mafString("Apply"), "");
 	currentGui->Divider(1);
-
+	*/
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION] = currentGui;
-
-	EnableManualSegmentationGui();
 }
 
-//----------------------------------------------------------------------------
-void mafOpSegmentation::EnableManualSegmentationGui()
-{
-	//brush options
-	// erase/select, shape, size, continuous picking
-	m_ManualBrushShapeRadioBox->Enable(true);
-	m_ManualBrushSizeText->Enable(true);
-	m_ManualBrushSizeSlider->Enable(true);
-}
 //----------------------------------------------------------------------------
 void mafOpSegmentation::EnableDisableGuiRange()
 {
@@ -1198,8 +1169,8 @@ void mafOpSegmentation::DeleteOpDialog()
 		m_DeviceManager->Shutdown();
 
 	mafDEL(m_DeviceManager);
-	mafDEL(m_AutomaticPER);
-	mafDEL(m_ManualPER);
+	mafDEL(m_InitPER);
+	mafDEL(m_EditPER);
 	mafDEL(m_SER);
 }
 
@@ -1214,8 +1185,6 @@ void mafOpSegmentation::UpdateWindowing()
 	currentSurfaceMaterial->m_ColorLut->GetTableRange(subR);
 
 	volumeOutput->GetMaterial()->UpdateProp();
-	//   m_LutWidget->SetMaterial(volumeOutput->GetMaterial());
-	//   m_LutWidget->Enable(true);
 	m_LutSlider->SetRange(sr);
 	m_LutSlider->SetSubRange(subR);
 }
@@ -1403,65 +1372,10 @@ bool mafOpSegmentation::ApplyRefinementFilter(vtkStructuredPoints *inputImage, v
   refinedImage->Update();
 
   outputImage->DeepCopy(refinedImage);
-
-
+	
   return true;
 }
 //----------------------------------------------------------------------------
-void mafOpSegmentation::ApplyVolumeSliceChanges()
-{
-	vtkDataSet *inputDataSet = vtkDataSet::SafeDownCast(m_SegmentationVolume->GetOutput()->GetVTKData());
-
-	if (inputDataSet && m_SegmetationSlice)
-	{
-		vtkDataArray *inputScalars = inputDataSet->GetPointData()->GetScalars();
-		vtkDataArray *scalars = m_SegmetationSlice->GetPointData()->GetScalars();
-
-		int numberOfPoints;
-		int numberOfSlices = 1;
-
-		if (m_SlicePlane == XY)
-		{
-			numberOfPoints = m_VolumeDimensions[0] * m_VolumeDimensions[1];
-			int z = (m_SliceIndex - 1);
-			for (int x = 0; x < m_VolumeDimensions[0]; x++)
-				for (int y = 0; y < m_VolumeDimensions[1]; y++)
-				{
-					int volPos = x + y*m_VolumeDimensions[0] + z*m_VolumeDimensions[0] * m_VolumeDimensions[1];
-					int slicePos = x + y*m_VolumeDimensions[0] + 0;
-					inputScalars->SetTuple1(volPos, scalars->GetTuple1(slicePos));
-				}
-		}
-
-		else if (m_SlicePlane == YZ)
-		{
-			numberOfPoints = m_VolumeDimensions[1] * m_VolumeDimensions[2];
-			int x = (m_SliceIndex - 1);
-			for (int y = 0; y < m_VolumeDimensions[1]; y++)
-				for (int z = 0; z < m_VolumeDimensions[2]; z++)
-				{
-					int volPos = x + y*m_VolumeDimensions[0] + z*m_VolumeDimensions[0] * m_VolumeDimensions[1];
-					int slicePos = 0 + y*numberOfSlices + z*numberOfSlices*m_VolumeDimensions[1];
-					inputScalars->SetTuple1(volPos, scalars->GetTuple1(slicePos));
-				}
-		}
-
-		else if (m_SlicePlane == XZ)
-		{
-			numberOfPoints = m_VolumeDimensions[0] * m_VolumeDimensions[2];
-			int y = (m_SliceIndex - 1);
-			for (int x = 0; x < m_VolumeDimensions[0]; x++)
-				for (int z = 0; z < m_VolumeDimensions[2]; z++)
-				{
-					int volPos = x + y*m_VolumeDimensions[0] + z*m_VolumeDimensions[0] * m_VolumeDimensions[1];
-					int slicePos = x + 0 + z*m_VolumeDimensions[0] * numberOfSlices;
-					inputScalars->SetTuple1(volPos, scalars->GetTuple1(slicePos));
-				}
-		}
-
-		m_SegmentationVolume->Update();
-	}
-}
 
 // EVENTS ////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
@@ -1472,36 +1386,9 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 		if (e->GetSender() == m_SegmentationOperationsGui[INIT_SEGMENTATION])
 			OnInitEvent(e);
 		else if (e->GetSender() == m_SegmentationOperationsGui[EDIT_SEGMENTATION])
-			OnManualSegmentationEvent(e);
+			OnEditSegmentationEvent(e);
 		else if (e->GetSender() == m_SegmentationOperationsGui[EDIT_SEGMENTATION])
 			OnRefinementSegmentationEvent(e);
-		else if (e->GetSender() == m_AutomaticPER && e->GetId() == MOUSE_MOVE)
-		{
-			m_AutomaticMouseThreshold = e->GetDouble();
-			mafString text = wxString::Format("Scalar = %.3f", m_AutomaticMouseThreshold);
-			m_AutomaticScalarTextMapper->SetInput(text.GetCStr());
-			m_View->CameraUpdate();
-		}
-		else if (e->GetSender() == m_ManualPER && e->GetId() == MOUSE_MOVE && m_ManualSegmentationTools == 0)
-		{
-			UndoBrushPreview();
-			if (e->GetDouble() > m_CurrentBrushMoveEventCount && m_ManualSegmentationTools == 0)
-			{
-				m_CurrentBrushMoveEventCount = e->GetDouble();
-				int oldAction = m_ManualSegmentationAction;
-				if (e->GetBool())
-					m_ManualSegmentationAction = MANUAL_SEGMENTATION_ERASE;
-				else
-					m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
-
-				m_LastMouseMovePointID = e->GetArg();
-				OnBrushEvent(e);
-				m_ManualSegmentationAction = oldAction;
-			}
-
-			m_View->CameraUpdate();
-			UndoBrushPreview(); // Undo is execute twice to ensure no spot are left by the brush
-		}
 		else if (e->GetSender() == m_SegmentationPicker && e->GetId() == mafInteractorSegmentationPicker::VME_ALT_PICKED)
 		{
 			//Picking during automatic segmentation
@@ -1535,28 +1422,43 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 			if (m_CurrentPhase == EDIT_SEGMENTATION && m_ManualSegmentationTools == 0)
 			{
 				if (e->GetArg() < 0)
-					m_ManualBrushSize++;
+					m_BrushSize++;
 				else
-					m_ManualBrushSize--;
-				m_ManualPER->SetRadius(double(m_ManualBrushSize) / 2);
-				UndoBrushPreview();
-				int oldAction = m_ManualSegmentationAction;
-				m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
-				mafEvent dummyEvent;
-				vtkPoints *dummyPoints = vtkPoints::New();
-				dummyEvent.SetVtkObj(dummyPoints);
-				dummyEvent.SetArg(m_LastMouseMovePointID);
-				OnBrushEvent(&dummyEvent);
-				dummyPoints->Delete();
+					m_BrushSize--;
+				ApplyRealDrawnImage();
 				m_View->CameraUpdate();
 				m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
-				m_ManualSegmentationAction = oldAction;
 				break;
 			}
 		}
 		break;
+		case MOUSE_MOVE:
+		{
+			if (e->GetSender() == m_InitPER)
+			{
+				m_AutomaticMouseThreshold = e->GetDouble();
+				mafString text = wxString::Format("Scalar = %.3f", m_AutomaticMouseThreshold);
+				m_AutomaticScalarTextMapper->SetInput(text.GetCStr());
+			}
+			else if (e->GetSender() == m_EditPER && m_ManualSegmentationTools == 0)
+			{
+					m_BrushModality = e->GetBool();
+					ApplyRealDrawnImage();
+					if(e->GetArg())
+						m_Helper.DrawBrush((double *)e->GetPointer(), m_SlicePlane, m_BrushSize, m_BrushShape, m_BrushModality);
+			}
+			m_View->CameraUpdate();
+		}
+		break;
+		case MOUSE_UP:
+			if (m_IsDrawing)
+			{
+				CreateRealDrawnImage();
+				m_IsDrawing = false;
+			}
+			break;
 		case ID_BUTTON_NEXT:
-			OnNextStep();
+			OnEditStep();
 			break;
 		case ID_BUTTON_PREV:
 			OnPreviousStep();
@@ -1623,15 +1525,13 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 					StartDraw(e, false);
 				}
 			}
-			m_CurrentBrushMoveEventCount = 0;
 			break;
 		}
 		case VME_PICKING:
 			if (m_CurrentPhase == EDIT_SEGMENTATION && m_ManualSegmentationTools == 0)
 			{
-				OnBrushEvent(e);
-				CreateRealDrawnImage();
-				m_PickingStarted = false;
+				m_Helper.DrawBrush((double *)e->GetPointer(), m_SlicePlane, m_BrushSize, m_BrushShape, m_BrushModality);
+				m_View->CameraUpdate();
 			}
 			break;
 		case ID_OK:
@@ -1686,14 +1586,10 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 		}
 	}
 }
-
 //----------------------------------------------------------------------------
-void mafOpSegmentation::OnNextStep()
+void mafOpSegmentation::OnEditStep()
 {
 	m_GuiDialog->Enable(ID_LOAD, false);
-	m_SegmentationPicker->SetFullModifiersMode(true);
-
-	m_SnippetsLabel->SetLabel(_(" 'Left Click + Ctrl' to select lower threshold. 'Left Click + Alt' to select upper threshold"));
 
 	UpdateThresholdLabel();
 
@@ -1713,7 +1609,50 @@ void mafOpSegmentation::OnNextStep()
 	else if (m_InitModality == RANGE_INIT)
 		m_Helper.VolumeThreshold(&m_RangesVector);
 
+	//gui stuff
+	//set brush cursor - enable drawing
+	// brush size slider: min = 1; max = slice size
+	m_SnippetsLabel->SetLabel(_(" 'Left Click' Draw. 'Left Click + Ctrl' Erase"));
+
+	m_BrushSize = 1;
+	m_ManualBrushSizeSlider->SetValue(m_BrushSize);
+	m_ManualBrushSizeText->SetValue("1");
+	m_ManualBrushSizeSlider->SetNumberOfSteps(int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 4) - 2);
+	m_ManualBrushSizeSlider->SetRange(1, int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 4), 1);
+	m_ManualBrushSizeSlider->SetMax(int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 4));
+	m_ManualBrushSizeSlider->SetMin(1);
+	m_ManualBrushSizeSlider->Update();
+	m_ManualBrushSizeText->Update();
+
+	m_View->CameraUpdate();
+
+	m_SER->GetAction("pntActionAutomatic")->UnBindDevice(m_DialogMouse);
+	m_SER->GetAction("pntActionAutomatic")->UnBindInteractor(m_InitPER);
+	m_SER->GetAction("pntEditingAction")->BindInteractor(m_EditPER);
+	m_SER->GetAction("pntEditingAction")->BindDevice(m_DialogMouse);
+
+	m_AutomaticScalarTextMapper->SetInput("");
+
+	wxCursor cursor = wxCursor(wxCURSOR_PENCIL);
+	m_View->GetWindow()->SetCursor(cursor);
+
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_PICKING_MODALITY, m_SlicePlane);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, false);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
+	m_GuiDialog->Enable(EDIT_SEGMENTATION, true);
+
+	m_GuiDialog->Enable(ID_BUTTON_NEXT, true);
+	
+	m_ManualSegmentationTools = 0;
+	m_View->GetWindow()->SetCursor(cursor);
+
+	EnableSizerContent(m_BucketEditingSizer, false);
+	EnableSizerContent(m_BrushEditingSizer, true);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
+
 	UpdateSlice();
+	m_View->CameraUpdate();
+	CreateRealDrawnImage();
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::OnPreviousStep()
@@ -1722,8 +1661,9 @@ void mafOpSegmentation::OnPreviousStep()
 	if (answer == wxNO)
 		return;
 
-	m_SnippetsLabel->SetLabel(_(""));
+	OnEditStepExit();
 
+	m_SnippetsLabel->SetLabel(_(" 'Left Click + Ctrl' to select lower threshold. 'Left Click + Alt' to select upper threshold"));
 	m_CurrentPhase = INIT_SEGMENTATION;
 
 	m_AppendingOpGui->Remove(m_SegmentationOperationsGui[EDIT_SEGMENTATION]);
@@ -1795,6 +1735,11 @@ void mafOpSegmentation::OnInitEvent(mafEvent *e)
 //----------------------------------------------------------------------------
 void mafOpSegmentation::OnSelectSlicePlane()
 {
+	if (m_CurrentPhase == EDIT_SEGMENTATION)
+	{
+		ApplyRealDrawnImage();
+		m_Helper.ApplySliceChangesToVolume(m_OldSlicePlane, m_OldSliceIndex);
+	}
 	UpdateSliderValidator();
 
 	m_View->SetSliceAxis(m_SlicePlane);
@@ -1804,13 +1749,12 @@ void mafOpSegmentation::OnSelectSlicePlane()
 
 	pipeOrtho = (mafPipeVolumeOrthoSlice *)m_View->GetNodePipe(m_SegmentationVolume);
 	pipeOrtho->SetSliceOpacity(0.4);
-	m_SegmetationSlice = (vtkImageData*)(pipeOrtho->GetSlicer(pipeOrtho->GetSliceDirection())->GetOutput());
+	m_SegmentationSlice = (vtkImageData*)(pipeOrtho->GetSlicer(pipeOrtho->GetSliceDirection())->GetOutput());
 
-	m_Helper.SetSlices(m_VolumeSlice, m_SegmetationSlice);
+	m_Helper.SetSlices(m_VolumeSlice, m_SegmentationSlice);
 
 	m_GuiDialog->Update();
 	if (m_CurrentPhase == EDIT_SEGMENTATION)
-		CreateRealDrawnImage();
 
 	UpdateSlice();
 	m_View->CameraReset();
@@ -1818,17 +1762,23 @@ void mafOpSegmentation::OnSelectSlicePlane()
 	if (m_CurrentPhase == INIT_SEGMENTATION)
 		OnThresholdUpate();
 	else // EDIT_SEGMENTATION
+	{
+		CreateRealDrawnImage();
 		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
+	}
+
+	m_OldSliceIndex = m_SliceIndex;
+	m_OldSlicePlane = m_SlicePlane;
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::OnUpdateSlice()
 {
-	/*if (m_CurrentPhase == EDIT_SEGMENTATION)
+	if (m_CurrentPhase == EDIT_SEGMENTATION)
 	{
-	UndoBrushPreview();
-	ApplyVolumeSliceChanges();
-	}*/
-
+		ApplyRealDrawnImage();
+		m_Helper.ApplySliceChangesToVolume(m_OldSlicePlane, m_OldSliceIndex);
+	}
+	
 	UpdateSlice();
 
 	if (m_CurrentPhase == INIT_SEGMENTATION)
@@ -1844,7 +1794,12 @@ void mafOpSegmentation::OnUpdateSlice()
 		UpdateThresholdRealTimePreview();
 	}
 	else // EDIT_SEGMENTATION
+	{
 		CreateRealDrawnImage();
+		m_View->CameraUpdate();
+	}
+
+	m_OldSliceIndex = m_SliceIndex;
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::OnChangeThresholdType()
@@ -2098,221 +2053,100 @@ bool mafOpSegmentation::SegmentedVolumeAccept(mafVME*node)
 
 // EDIT PHASE EVENTS
 //------------------------------------------------------------------------
-void mafOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
+void mafOpSegmentation::OnEditSegmentationEvent(mafEvent *e)
 {
 	switch (e->GetId())
 	{
-	case ID_MANUAL_BUCKET_GLOBAL:
-	{
-		if (m_GlobalFloodFill)
-			m_ManualRangeSlider->Enable(true);
-		else
-			m_ManualRangeSlider->Enable(false);
-
-		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
-	}
-	break;
-
-	case ID_MANUAL_TOOLS_BRUSH:
-	{
-		m_ManualSegmentationTools = 0;
-
-		wxCursor cursor = wxCursor(wxCURSOR_PENCIL);
-		m_View->GetWindow()->SetCursor(cursor);
-
-		EnableSizerContent(m_BucketEditingSizer, false);
-		EnableSizerContent(m_BrushEditingSizer, true);
-		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
-	}
-	break;
-	case ID_MANUAL_TOOLS_FILL:
-	{
-		m_ManualSegmentationTools = 1;
-
-		wxCursor cursor = wxCursor(wxCURSOR_SPRAYCAN);
-		m_View->GetWindow()->SetCursor(cursor);
-
-		EnableSizerContent(m_BucketEditingSizer, true);
-		EnableSizerContent(m_BrushEditingSizer, false);
-		m_ManualRangeSlider->Enable(m_GlobalFloodFill == TRUE);
-		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
-		UndoBrushPreview();
-		OnUpdateSlice();
-	}
-	break;
-	case ID_MANUAL_TOOLS_ERASE:
-	{}
-	break;
-	//   case ID_MANUAL_TOOLS:
-	//     {
-	//       if(m_ManualSegmentationTools == 0)
-	//       {
-	//         wxCursor cursor = wxCursor( wxCURSOR_PENCIL );
-	//         m_View->GetWindow()->SetCursor(cursor);
-	// 
-	//         EnableSizerContent(m_BucketEditingSizer,false);
-	//         EnableSizerContent(m_BrushEditingSizer,true);
-	//         m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
-	//       }
-	//       else
-	//       {
-	//         wxCursor cursor = wxCursor( wxCURSOR_SPRAYCAN );
-	//         m_View->GetWindow()->SetCursor(cursor);
-	// 
-	//         EnableSizerContent(m_BucketEditingSizer,true);
-	//         EnableSizerContent(m_BrushEditingSizer,false);
-	//         m_ManualRangeSlider->Enable(m_GlobalFloodFill==TRUE);
-	//         m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
-	//         UndoBrushPreview();
-	//         OnUpdateSlice();
-	//       }
-	//     }
-	//     break;
-	case ID_MANUAL_BRUSH_SHAPE:
-	{
-		m_ManualBrushShape = m_ManualBrushShapeRadioBox->GetSelection();
-		if (m_ManualBrushShape == CIRCLE_BRUSH_SHAPE)
-			m_ManualPER->SetBrushShape(CIRCLE_BRUSH_SHAPE);
-		else
-			m_ManualPER->SetBrushShape(SQUARE_BRUSH_SHAPE);
-		UndoBrushPreview();
-		int oldAction = m_ManualSegmentationAction;
-		m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
-		mafEvent dummyEvent;
-		vtkPoints *dummyPoints = vtkPoints::New();
-		dummyEvent.SetVtkObj(dummyPoints);
-		dummyEvent.SetArg(m_LastMouseMovePointID);
-		OnBrushEvent(&dummyEvent);
-		dummyPoints->Delete();
-		m_View->CameraUpdate();
-		m_ManualSegmentationAction = oldAction;
-	}
-	break;
-	case ID_MANUAL_BRUSH_SIZE:
-	{
-		m_ManualBrushSize = int(m_ManualBrushSize);
-		m_ManualPER->SetRadius(double(m_ManualBrushSize) / 2);
-		UndoBrushPreview();
-		int oldAction = m_ManualSegmentationAction;
-		m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
-		mafEvent dummyEvent;
-		vtkPoints *dummyPoints = vtkPoints::New();
-		dummyEvent.SetVtkObj(dummyPoints);
-		dummyEvent.SetArg(m_LastMouseMovePointID);
-		OnBrushEvent(&dummyEvent);
-		dummyPoints->Delete();
-		m_View->CameraUpdate();
-		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
-		m_ManualSegmentationAction = oldAction;
-	}
-	break;
-	case ID_MANUAL_UNDO:
-	{
-		/** TODO
-		int numOfChanges = m_ManualUndoList.size();
-		if(numOfChanges)
+		case ID_MANUAL_BUCKET_GLOBAL:
 		{
-		vtkDataSet *dataSet = m_ManualVolumeSlice->GetOutput()->GetVTKData();
+			if (m_GlobalFloodFill)
+				m_ManualRangeSlider->Enable(true);
+			else
+				m_ManualRangeSlider->Enable(false);
 
-		//if i changed slice/plane from last edit the redo information
-		//are in the plane-slice of last edit (where i saved last undo info).
-		if ((m_CurrentSlicePlane!=m_ManualUndoList[numOfChanges-1].plane ||
-		m_CurrentSliceIndex != m_ManualUndoList[numOfChanges-1].slice) &&
-		m_ManualUndoList[numOfChanges-1].plane != -1 &&
-		m_ManualUndoList[numOfChanges-1].slice != -1)
-		{
-		m_CurrentSlicePlane=m_ManualUndoList[numOfChanges-1].plane;
-		m_CurrentSliceIndex=m_ManualUndoList[numOfChanges-1].slice;
-		UpdateSlice();
-		m_View->CameraUpdate();
+			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
 		}
-		if(m_ManualUndoList[numOfChanges-1].plane == -1 && m_ManualUndoList[numOfChanges-1].slice == -1)
-		{
-		dataSet = m_ManualVolumeMask->GetOutput()->GetVTKData();
-		}
-
-		//Add current state to Redo-list
-		UndoBrushPreview();
-		UndoRedoState urs;
-		urs.dataArray = vtkUnsignedCharArray::New();
-		urs.dataArray->DeepCopy( dataSet->GetPointData()->GetScalars() );
-		urs.dataArray->SetName("SCALARS");
-		urs.plane=m_ManualUndoList[numOfChanges-1].plane;
-		urs.slice=m_ManualUndoList[numOfChanges-1].slice;
-		m_ManualRedoList.push_back(urs);
-
-		//Update current slice with Undo-data
-		ReloadUndoRedoState(dataSet,m_ManualUndoList[numOfChanges-1]);
-
-		//Remove item from undo list
-		vtkDEL(m_ManualUndoList[numOfChanges-1].dataArray);
-		m_ManualUndoList.pop_back();
-
-		//Enable-disable buttons
-		m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
-		m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, true);
-
-		ApplyVolumeSliceChanges();
-		}
-		*/
-	}
-	break;
-	case ID_MANUAL_REDO:
-	{
-		/* TODO
-		int numOfChanges = m_ManualRedoList.size();
-		if(numOfChanges)
-		{
-		vtkDataSet *dataSet = m_ManualVolumeSlice->GetOutput()->GetVTKData();
-
-		//if i changed slice/plane from last edit the redo information
-		//are in the plane-slice of last edit (where i saved last undo info).
-		if ((m_CurrentSlicePlane!=m_ManualRedoList[numOfChanges-1].plane ||
-		m_CurrentSliceIndex != m_ManualRedoList[numOfChanges-1].slice) &&
-		m_ManualRedoList[numOfChanges-1].plane != -1 &&
-		m_ManualRedoList[numOfChanges-1].slice != -1)
-		{
-		m_CurrentSlicePlane=m_ManualRedoList[numOfChanges-1].plane;
-		m_CurrentSliceIndex=m_ManualRedoList[numOfChanges-1].slice;
-		UpdateSlice();
-		m_View->CameraUpdate();
-		}
-		if(m_ManualRedoList[numOfChanges-1].plane == -1 && m_ManualRedoList[numOfChanges-1].slice == -1)
-		{
-		dataSet = m_ManualVolumeMask->GetOutput()->GetVTKData();
-		}
-
-		//Add current state to Undo-list
-		UndoBrushPreview();
-		UndoRedoState urs;
-		urs.dataArray = vtkUnsignedCharArray::New();
-		urs.dataArray->DeepCopy( dataSet->GetPointData()->GetScalars() );
-		urs.dataArray->SetName("SCALARS");
-		urs.plane=m_ManualRedoList[numOfChanges-1].plane;
-		urs.slice=m_ManualRedoList[numOfChanges-1].slice;
-		m_ManualUndoList.push_back(urs);
-
-		//Update current slice with Redo-data
-		ReloadUndoRedoState(dataSet,m_ManualRedoList[numOfChanges-1]);
-
-		//remove item from undo list
-		vtkDEL(m_ManualRedoList[numOfChanges-1].dataArray);
-		m_ManualRedoList.pop_back();
-
-		//Enable-disable buttons
-		m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, true);
-		m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, m_ManualRedoList.size()>0);
-
-		//UndoBrushPreview();
-		ApplyVolumeSliceChanges();
-		}
-		*/
 		break;
-	}
-	default:
-		mafEventMacro(*e);
+
+		case ID_MANUAL_TOOLS_BRUSH:
+		{
+			m_ManualSegmentationTools = 0;
+
+			wxCursor cursor = wxCursor(wxCURSOR_PENCIL);
+			m_View->GetWindow()->SetCursor(cursor);
+
+			EnableSizerContent(m_BucketEditingSizer, false);
+			EnableSizerContent(m_BrushEditingSizer, true);
+			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
+		}
+		break;
+		case ID_MANUAL_TOOLS_FILL:
+		{
+			m_ManualSegmentationTools = 1;
+
+			wxCursor cursor = wxCursor(wxCURSOR_SPRAYCAN);
+			m_View->GetWindow()->SetCursor(cursor);
+
+			EnableSizerContent(m_BucketEditingSizer, true);
+			EnableSizerContent(m_BrushEditingSizer, false);
+			m_ManualRangeSlider->Enable(m_GlobalFloodFill == TRUE);
+			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
+			ApplyRealDrawnImage();
+			OnUpdateSlice();
+		}
+		break;
+		case ID_MANUAL_BRUSH_SHAPE:
+		case ID_MANUAL_BRUSH_SIZE:
+		{
+			m_BrushShape = m_ManualBrushShapeRadioBox->GetSelection();
+			ApplyRealDrawnImage();
+			m_View->CameraUpdate();
+		}
+		break;
+		case ID_MANUAL_UNDO:
+			OnUndoRedo(true);
+			break;
+		case ID_MANUAL_REDO:
+			OnUndoRedo(false);
+			break;
+		default:
+			mafEventMacro(*e);
 	}
 	m_GuiDialog->SetFocusIgnoringChildren();
+}
+//----------------------------------------------------------------------------
+void mafOpSegmentation::OnUndoRedo(bool undo)
+{
+	std::vector<UndoRedoState> &from = undo ? m_UndoList : m_RedoList; 
+	std::vector<UndoRedoState> &to   = undo ? m_RedoList : m_UndoList; 
+	
+	int fromListSize = from.size();
+	
+	//if i changed slice/plane from last edit the redo information
+	//are in the plane-slice of last edit (where i saved last undo info).
+	if (m_SlicePlane != from[fromListSize - 1].m_Plane)
+	{
+		m_SlicePlane = from[fromListSize - 1].m_Plane;
+		m_SliceIndex = from[fromListSize - 1].m_Slice;
+		OnSelectSlicePlane();
+	}
+	else if (m_SliceIndex != from[fromListSize - 1].m_Slice)
+	{
+		m_SliceIndex = from[fromListSize - 1].m_Slice;
+		OnUpdateSlice();
+	}
+
+	to.push_back(CreateUndoRedoState());
+
+	m_RealDrawnImage->DeepCopy(from[fromListSize - 1].m_Scalars);
+	ApplyRealDrawnImage();
+
+	from.pop_back();
+	m_View->CameraUpdate();
+
+	//Enable-disable buttons
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_UndoList.size() > 0);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, m_RedoList.size() > 0);
 }
 //------------------------------------------------------------------------
 void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
@@ -2415,88 +2249,25 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
 
 }
 //----------------------------------------------------------------------------
-void mafOpSegmentation::OnManualStep()
+void mafOpSegmentation::OnEditStepExit()
 {
-  m_SegmentationPicker->SetFullModifiersMode(false);
+	ApplyRealDrawnImage();
+	m_Helper.ApplySliceChangesToVolume(m_SlicePlane, m_SliceIndex);
+	vtkDEL(m_RealDrawnImage);
 
-  //gui stuff
-  //set brush cursor - enable drawing
-  // brush size slider: min = 1; max = slice size
-  m_SnippetsLabel->SetLabel( _(" 'Left Click' Draw. 'Left Click + Ctrl' Erase"));
-
-  m_ManualBrushSize=1;
-  m_ManualBrushSizeSlider->SetValue(m_ManualBrushSize);
-  m_ManualBrushSizeText->SetValue("1");
-  m_ManualBrushSizeSlider->SetNumberOfSteps(int(min(m_VolumeDimensions[0],m_VolumeDimensions[1])/4)-2);
-  m_ManualBrushSizeSlider->SetRange(1,int(min(m_VolumeDimensions[0],m_VolumeDimensions[1])/4),1);
-  m_ManualBrushSizeSlider->SetMax(int(min(m_VolumeDimensions[0],m_VolumeDimensions[1])/4));
-  m_ManualBrushSizeSlider->SetMin(1);
-  m_ManualBrushSizeSlider->Update();
-  m_ManualBrushSizeText->Update();
-  
-  m_ManualPER->SetTargetVolumeSpacing(max(m_VolumeSpacing[0] , m_VolumeSpacing[1]));
-  m_ManualPER->SetRadius(double(m_ManualBrushSize)/2.0);
-  m_View->CameraUpdate();
-
-  m_SER->GetAction("pntActionAutomatic")->UnBindDevice(m_DialogMouse);
-  m_SER->GetAction("pntActionAutomatic")->UnBindInteractor(m_AutomaticPER);
-  m_SER->GetAction("pntEditingAction")->BindInteractor(m_ManualPER);
-  m_SER->GetAction("pntEditingAction")->BindDevice(m_DialogMouse);
-  
-  m_AutomaticScalarTextMapper->SetInput("");
-
-  wxCursor cursor = wxCursor( wxCURSOR_PENCIL );
-  m_View->GetWindow()->SetCursor(cursor);
-
-  m_ManualPER->EnableDrawing(true);
-
-  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_PICKING_MODALITY, m_SlicePlane);
-  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, false);
-  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
-  m_GuiDialog->Enable(EDIT_SEGMENTATION,true);
-
-  m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
-  m_CurrentBrushMoveEventCount = 0;
-
-  UndoBrushPreview();
-  ApplyVolumeSliceChanges();
-
-  UpdateSlice();
-
-  CreateRealDrawnImage();
-  
-  m_ManualSegmentationTools = 0;
-  m_View->GetWindow()->SetCursor(cursor);
-
-  EnableSizerContent(m_BucketEditingSizer,false);
-  EnableSizerContent(m_BrushEditingSizer,true);
-  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
-
-  OnUpdateSlice();
-}
-//----------------------------------------------------------------------------
-void mafOpSegmentation::OnManualStepExit()
-{
-  UndoBrushPreview();
-  if(m_RealDrawnImage)
-  {
-    m_RealDrawnImage->Delete();
-    m_RealDrawnImage = NULL;
-  }
+	ClearManualUndoList();
+	ClearManualRedoList();
 
   //Gui stuff
   //set default cursor - remove draw actor  
   wxCursor cursor = wxCursor( wxCURSOR_DEFAULT );
   m_View->GetWindow()->SetCursor(cursor);
-  m_ManualPER->RemoveActor();
   //logic stuff
-  m_SER->GetAction("pntEditingAction")->UnBindInteractor(m_ManualPER);
+  m_SER->GetAction("pntEditingAction")->UnBindInteractor(m_EditPER);
   m_SER->GetAction("pntEditingAction")->UnBindDevice(m_DialogMouse);
   m_SER->GetAction("pntActionAutomatic")->BindDevice(m_DialogMouse);
-  m_SER->GetAction("pntActionAutomatic")->BindInteractor(m_AutomaticPER);
-  //apply residual changes
-  ApplyVolumeSliceChanges(); 
-  
+  m_SER->GetAction("pntActionAutomatic")->BindInteractor(m_InitPER);
+   
   m_GuiDialog->Enable(EDIT_SEGMENTATION,false);
 
   m_SnippetsLabel->SetLabel( _(""));
@@ -2513,30 +2284,6 @@ void mafOpSegmentation::OnRefinementStep()
 
 	//logic stuff
   UpdateSlice();
-}
-//----------------------------------------------------------------------------
-void mafOpSegmentation::OnBrushEvent(mafEvent *e)
-//------------------------------------------------------------------------
-{
-  vtkPoints *point = vtkPoints::SafeDownCast(e->GetVtkObj());
-  if (point)
-  {
-
-    vtkDataSet *dataset = vtkDataSet::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_Volume)->GetOutput()->GetVTKData());
-    dataset->Update();
-
-    int id;
-    id = e->GetArg();
-    double datasetPoint[3];
-    dataset->GetPoint(id,datasetPoint);
-
-    SelectBrushImage(datasetPoint[0], datasetPoint[1], datasetPoint[2], m_ManualSegmentationAction == MANUAL_SEGMENTATION_SELECT);
-    
-
-    m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
-
-    m_View->CameraUpdate();
-  }
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::OnEventFloodFill(mafEvent *e)
@@ -2619,299 +2366,71 @@ void mafOpSegmentation::OnEventFloodFill(mafEvent *e)
 //----------------------------------------------------------------------------
 void mafOpSegmentation::StartDraw(mafEvent *e, bool erase)
 {
-	if (erase) m_ManualSegmentationAction = MANUAL_SEGMENTATION_ERASE;
-	else m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
-	//Picking starts here I need to save an undo stack
-	UndoBrushPreview();
-	if (!m_PickingStarted)
-	{
-		UndoRedoState urs;
-		urs.dataArray = vtkUnsignedCharArray::New();
-		urs.dataArray->DeepCopy(m_SegmetationSlice->GetPointData()->GetScalars());
-		urs.dataArray->SetName("SCALARS");
-		urs.plane = m_SlicePlane;
-		urs.slice = m_SliceIndex;
-		m_ManualUndoList.push_back(urs);
-
-		m_PickingStarted = true;
-
-		//On edit a new branch of redo-list starts, i need to clear the redo stack
-		ResetManualRedoList();
-		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
-	}
-	else
-	{
-		OnBrushEvent(e);
-		m_PickingStarted = false;
-	}
-}
-
-//------------------------------------------------------------------------
-void mafOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState state)
-{ 
-  if(state.plane==-1 && state.slice == -1)
-  {
-    m_SegmetationSlice->GetPointData()->SetScalars(state.dataArray);
-
-    UpdateSlice();
-
-    CreateRealDrawnImage();
-    OnUpdateSlice();
-  }
-  else
-  {
-    if (state.plane!=m_SlicePlane || state.slice!= m_SliceIndex)
-    {
-      m_SlicePlane=state.plane;
-			m_SliceIndex =state.slice;
-      m_View->SetSliceAxis(m_SlicePlane);
-      UpdateSlice();
-      m_View->CameraUpdate();
-      UpdateSliderValidator();
-      m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
-    }
-
-    double focalPoint[3];
-    double scaleFactor;
-    GetCameraAttribute(focalPoint, &scaleFactor);
-    double bounds[4];
-    GetVisualizedBounds(focalPoint, scaleFactor, bounds);
-
-    vtkImageData* undoRedoData = vtkImageData::New();
-    undoRedoData->DeepCopy(dataSet);
-    undoRedoData->Update();
-
-    for(int i = 0; i < undoRedoData->GetPointData()->GetScalars()->GetNumberOfTuples(); i++)
-    {
-      undoRedoData->GetPointData()->GetScalars()->SetTuple1(i,(unsigned char)abs(state.dataArray->GetTuple1(i) - dataSet->GetPointData()->GetScalars()->GetTuple1(i)));
-    }
-    undoRedoData->Update();
-
-    dataSet->GetPointData()->SetScalars(state.dataArray);
-    //Show changes
-    //   if(ResetZoom(undoRedoData,bounds))
-    //   {
-    //     m_View->SetSliceAxis(m_CurrentSlicePlane);
-    //   }
-
-    //m_View->CameraUpdate();
-    CreateRealDrawnImage();
-    OnUpdateSlice();
-    undoRedoData->Delete();
-  } 
-}
-
-//----------------------------------------------------------------------------
-void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool selection)
-{
-
-  // if spacing are different get the target spacing
-
-  double diffSpacingXY = abs(m_VolumeSpacing[0] - m_VolumeSpacing[1]);
-  double diffSpacingXZ = abs(m_VolumeSpacing[0] - m_VolumeSpacing[2]);
-  double diffSpacingYZ = abs(m_VolumeSpacing[1] - m_VolumeSpacing[2]);
-
-  double minDiffSpacing = min(min(diffSpacingXY,diffSpacingXZ),diffSpacingYZ);
-
-  double targetSpacing = /*max*/(max(m_VolumeSpacing[0],m_VolumeSpacing[1])/*,m_VolumeSpacing[2]*/);
-	if (m_SlicePlane == XZ)
-      targetSpacing = (max(m_VolumeSpacing[0],m_VolumeSpacing[2]));
-	else if (m_SlicePlane == XZ)
-      targetSpacing = (max(m_VolumeSpacing[1],m_VolumeSpacing[2]));
-  
-  vtkDataSet *dataset = m_SegmentationVolume->GetOutput()->GetVTKData();
-
-  if(!dataset || !(dataset->GetPointData()->GetScalars()))
-    return;
-  
-  double center[3]={x,y,z};
-
-  int abscissa = 0;
-  int ordinate = 1;
-  int unused = 2;
-
-  double factors[2] = {1,m_VolumeDimensions[0]};
-  switch (m_SlicePlane)
-  {
-    case XZ:
-      {
-        abscissa = 0;
-        ordinate = 2;
-        unused = 1;
-        // y dimension = 2
-        factors[0] = 1;
-        factors[1] = m_VolumeDimensions[0] * 1;
-      }
-      break;
-    case YZ:
-      {
-        abscissa = 1;
-        ordinate = 2;
-        unused = 0;
-        // x dimension = 2
-        factors[0] = 1;
-        factors[1] = m_VolumeDimensions[1] * 1;
-      }
-      break;
-  }
-
-  double volumeDimensions[3];
-
-  volumeDimensions[abscissa] =  m_VolumeDimensions[abscissa];
-  volumeDimensions[ordinate] = m_VolumeDimensions[ordinate];
-  volumeDimensions[unused] = 1;
-   
-  double numberOfPoints = m_VolumeDimensions[abscissa] * m_VolumeDimensions[ordinate] * volumeDimensions[unused];
-
-  unsigned char scalar = 0;
-  if(selection)
-    scalar = 255;
-
-  double min_distance = MAXDOUBLE;
-  int nearestIndex = 0;
-  //get the nearest dataset point
-  for (int i=0;i<numberOfPoints;i++)
-  {
-    double xyz[3];
-    dataset->GetPoint(i,xyz);
-    //double distance = vtkMath::Distance2BetweenPoints(xyz,center);
-    if(center[0] >= xyz[0] && center[0] < xyz[0] + m_VolumeSpacing[0] \
-        && center[1] >= xyz[1] && center[1] < xyz[1] + m_VolumeSpacing[1] \
-        && center[2] >= xyz[2] && center[2] < xyz[2] + m_VolumeSpacing[2] \
-        /*&& nearestIndex == -1*/)
-    {
-      xyz[0] = xyz[0] +  m_VolumeSpacing[0];
-      xyz[1] = xyz[1] +  m_VolumeSpacing[1];
-      xyz[2] = xyz[2] +  m_VolumeSpacing[2];
-      double distance2 = vtkMath::Distance2BetweenPoints(xyz,center);
-      if(distance2 < min_distance)
-      {
-        nearestIndex = i;
-      }
-    }
-  }
-
-  assert(nearestIndex != -1);
-
-  double oldBrushSize = m_ManualBrushSize;
-  int nearestDummyIndex = int(m_ManualBrushSize / 2) * factors[0] + int(m_ManualBrushSize / 2) * factors[1];//int(m_ManualBrushSize / 2) + int(m_ManualBrushSize / 2) * volumeDimensions[0] + int(m_ManualBrushSize / 2) * volumeDimensions[1];
-  std::vector<int> dummyIndices;
-  if(m_ManualBrushShape == 0 && m_ManualBrushSize > 1) // circle
-  {
-    m_ManualBrushSize ++;
-    nearestDummyIndex = int(m_ManualBrushSize / 2) * factors[0] + int(m_ManualBrushSize / 2) * factors[1];
-    double radius = (double((m_ManualBrushSize) / 2.))* targetSpacing;
-    double radius2 = pow(radius,2);
-    double dummyCenter[3];
-    dummyCenter[abscissa] = radius;
-    dummyCenter[ordinate] = radius;
-    dummyCenter[unused] = 0;
-    
-    for(int i = 0; i < int(m_ManualBrushSize); i++)
-    {
-      for(int j = 0; j < int(m_ManualBrushSize); j++) // remove pixel that are not inside the circle
-      {
-        // get the center of the pixel
-        double dummyPixel[3]; // = {i * m_VolumeSpacing[abscissa] + m_VolumeSpacing[abscissa] / 2., j * m_VolumeSpacing[ordinate] + m_VolumeSpacing[ordinate] / 2.,0};
-        dummyPixel[abscissa] = i * targetSpacing;
-        dummyPixel[ordinate] = j * targetSpacing;
-        dummyPixel[unused] = dummyCenter[unused];
-        double index = (i * factors[0] + j * factors[1] - nearestDummyIndex);
-
-        if(vtkMath::Distance2BetweenPoints(dummyPixel,dummyCenter) < radius2 || index == 0)
-          dummyIndices.push_back(index);
-        else
-          dummyIndices.push_back(-(numberOfPoints + 1));
-      }
-    }
-  }
-  else // square
-  {
-    for(int i = 0; i < int(m_ManualBrushSize); i++)
-      for(int j = 0; j < int(m_ManualBrushSize); j++) // all pixel in the square are on
-        dummyIndices.push_back((i * factors[0] + j * factors[1] - nearestDummyIndex));
-  }
-
-
-  int initialLine = int(double(nearestIndex) / factors[1]) - int(m_ManualBrushSize/2);
-  for(int i = 0; i < int(m_ManualBrushSize); i++)
-  {
-    for(int j = 0; j < int(m_ManualBrushSize); j++) // all pixel in the square are on
-    {
-      int curIndex = dummyIndices.at(i + j * m_ManualBrushSize) + int(nearestIndex);
-      int realLine = int(double(curIndex) / factors[1]);
-      //mafLogMessage("----> %d  %d || %d  %d || %d || %d  %d",realLine,initialLine + j,initialLine,j, curIndex,i,j);
-      if(curIndex >= 0 && curIndex < numberOfPoints && realLine == initialLine + i)
-        dataset->GetPointData()->GetScalars()->SetTuple1(curIndex, scalar);
-    }
-  }
-
-  dataset->GetPointData()->Update();
-  dataset->Update();
-  vtkMAFSmartPointer<vtkStructuredPoints> newImage;
-  newImage->DeepCopy(dataset);
-  newImage->Update();
+	if (erase) m_BrushModality = MANUAL_SEGMENTATION_ERASE;
+	else m_BrushModality = MANUAL_SEGMENTATION_SELECT;
 	
-  m_SegmentationVolume->SetData(newImage,m_SegmentationVolume->GetTimeStamp(), 2);
-	/* TODO check if this is required and create a setdata function
-	m_SegmentationVolume->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
-	m_SegmentationVolume->GetOutput()->GetVTKData()->Update();
-	m_SegmentationVolume->GetOutput()->Update();
-	m_SegmentationVolume->Update();
-  */
+	m_UndoList.push_back(CreateUndoRedoState());
 
-  m_ManualBrushSize = oldBrushSize;
+	m_IsDrawing = true;
+
+	//On edit a new branch of redo-list starts, i need to clear the redo stack
+	ClearManualRedoList();
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, true);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
 }
+//----------------------------------------------------------------------------
+UndoRedoState mafOpSegmentation::CreateUndoRedoState()
+{
+	//Picking starts here I need to save an undo stack
+	ApplyRealDrawnImage();
 
+	//Create State 
+	UndoRedoState urs;
+	urs.m_Scalars = vtkUnsignedCharArray::New();
+	urs.m_Scalars->DeepCopy(m_RealDrawnImage);
+	urs.m_Plane = m_SlicePlane;
+	urs.m_Slice = m_SliceIndex;
+
+	return urs;
+}
 //----------------------------------------------------------------------------
 void mafOpSegmentation::CreateRealDrawnImage()
 {
-	m_VolumeSlice->Update();
-	m_SegmetationSlice->Update();
-
 	if (!m_RealDrawnImage)
-	{
-		m_RealDrawnImage = vtkUnsignedCharArray::New();
-	}
-	m_RealDrawnImage->DeepCopy(m_SegmetationSlice->GetPointData()->GetScalars());
-	m_RealDrawnImage->SetName("SCALARS");
-
-	m_View->CameraUpdate();
+		vtkNEW(m_RealDrawnImage);
+	
+	m_RealDrawnImage->DeepCopy(m_SegmentationSlice->GetPointData()->GetScalars());
 }
 //----------------------------------------------------------------------------
-void mafOpSegmentation::UndoBrushPreview()
+void mafOpSegmentation::ApplyRealDrawnImage()
 {
 	if (m_RealDrawnImage)
 	{
-		vtkImageData* dataSet = (vtkImageData*)m_SegmentationVolume->GetOutput()->GetVTKData();
-		dataSet->GetPointData()->SetScalars(m_RealDrawnImage);
-		dataSet->Update();
-		m_SegmentationVolume->SetData(dataSet, m_Volume->GetTimeStamp());
-		m_SegmentationVolume->Update();
-		ApplyVolumeSliceChanges();
+		vtkDataArray* scalars = m_SegmentationSlice->GetPointData()->GetScalars();
+		scalars->DeepCopy(m_RealDrawnImage);
+		scalars->Modified();
 	}
 }
-
 //----------------------------------------------------------------------------
 void mafOpSegmentation::FloodFill(vtkIdType seed)
 {
-	UndoBrushPreview();
+	ApplyRealDrawnImage();
 
 	int center = seed;
 	if (m_GlobalFloodFill == TRUE)
 	{
 		UndoRedoState urs;
-		urs.dataArray = vtkUnsignedCharArray::New();
-		urs.dataArray->DeepCopy(m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
-		urs.dataArray->SetName("SCALARS");
-		urs.plane = -1; // indicate that the undo redo data is global and must be performed on manual volume mask (not slice)
-		urs.slice = -1; // indicate that the undo redo data is global and must be performed on manual volume mask (not slice)
-		m_ManualUndoList.push_back(urs);
+		urs.m_Scalars = vtkUnsignedCharArray::New();
+		urs.m_Scalars->DeepCopy(m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
+		urs.m_Scalars->SetName("SCALARS");
+		urs.m_Plane = -1; // indicate that the undo redo data is global and must be performed on manual volume mask (not slice)
+		urs.m_Slice = -1; // indicate that the undo redo data is global and must be performed on manual volume mask (not slice)
+		m_UndoList.push_back(urs);
 		//On edit a new branch of redo-list starts, i need to clear the redo stack
-		ResetManualRedoList();
+		ClearManualRedoList();
 
 		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
-		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size() > 0);
+		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_UndoList.size() > 0);
 
 		wxBusyCursor wait_cursor;
 		wxBusyInfo wait(_("Wait! The algorithm could take long time!"));
@@ -2985,17 +2504,17 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
 	else
 	{
 		UndoRedoState urs;
-		urs.dataArray = vtkUnsignedCharArray::New();
-		urs.dataArray->DeepCopy(m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
-		urs.dataArray->SetName("SCALARS");
-		urs.plane = m_SlicePlane;
-		urs.slice = m_SliceIndex;
-		m_ManualUndoList.push_back(urs);
+		urs.m_Scalars = vtkUnsignedCharArray::New();
+		urs.m_Scalars->DeepCopy(m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
+		urs.m_Scalars->SetName("SCALARS");
+		urs.m_Plane = m_SlicePlane;
+		urs.m_Slice = m_SliceIndex;
+		m_UndoList.push_back(urs);
 		//On edit a new branch of redo-list starts, i need to clear the redo stack
-		ResetManualRedoList();
+		ClearManualRedoList();
 
 		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
-		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size() > 0);
+		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_UndoList.size() > 0);
 		vtkStructuredPoints *input = vtkStructuredPoints::New();
 		double dimensions[3];
 
@@ -3197,28 +2716,7 @@ bool mafOpSegmentation::Refinement()
 }
 
 // GET SET ///////////////////////////////////////////////////////////////////
-//----------------------------------------------------------------------------
-double mafOpSegmentation::GetPosFromSliceIndexZ()
-{
-  double pos = -1;
-  vtkDataSet *inputDataSet = vtkDataSet::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_Volume)->GetOutput()->GetVTKData());
 
-  if (inputDataSet)
-  {
-    inputDataSet->Update();
-
-    double point[3];
-    inputDataSet->GetPoint((m_SliceIndex-1)*m_VolumeDimensions[0]*m_VolumeDimensions[1], point);
-
-    double bounds[6];
-    inputDataSet->GetBounds(bounds);
-
-    pos = (point[2] - bounds[4])/ (bounds[5] - bounds[4]);
-
-  }
-  return pos;
-
-}
 //----------------------------------------------------------------------------
 void mafOpSegmentation::GetSliceOrigin(double *origin)
 {
@@ -3254,35 +2752,7 @@ void mafOpSegmentation::GetSliceOrigin(double *origin)
       origin[0] = rg->GetXCoordinates()->GetTuple1(m_SliceIndex -1);
   }
 }
-//----------------------------------------------------------------------------
-void mafOpSegmentation::GetCameraAttribute(double *focalPoint, double *scaleFactor)
-{
-	*scaleFactor = m_View->m_Rwi->m_RenFront->GetActiveCamera()->GetParallelScale();
-	m_View->m_Rwi->m_RenFront->GetActiveCamera()->GetFocalPoint(focalPoint);
-}
-//----------------------------------------------------------------------------
-void mafOpSegmentation::GetVisualizedBounds(double focalPoint[3], double scaleFactor, double bounds[4])
-{
-	double visualizedRatio = scaleFactor / m_InitialScaleFactor;
-	double xTranslation = focalPoint[0] - m_InitialFocalPoint[0];
-	double yTranslation = focalPoint[1] - m_InitialFocalPoint[1];
 
-	double b[6];
-	m_Volume->GetOutput()->GetVTKData()->GetBounds(b);
-
-	double xSize = b[1] - b[0];
-	double ySize = b[3] - b[2];
-
-	double size = max(xSize, ySize);
-
-	double newSize = size * visualizedRatio;
-
-	bounds[0] = focalPoint[0] - newSize / 2;
-	bounds[1] = focalPoint[0] + newSize / 2;
-
-	bounds[2] = focalPoint[1] - newSize / 2;
-	bounds[3] = focalPoint[1] + newSize / 2;
-}
 
 //----------------------------------------------------------------------------
 void mafOpSegmentation::SelectRangeByCurrentSlice()
@@ -3321,19 +2791,19 @@ void mafOpSegmentation::SetThresholdByRange()
 
 // RESET /////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void mafOpSegmentation::ResetManualRedoList()
+void mafOpSegmentation::ClearManualRedoList()
 //----------------------------------------------------------------------------
 {
-  for (int i=0;i<m_ManualRedoList.size();i++)
-    vtkDEL(m_ManualRedoList[i].dataArray);
-  m_ManualRedoList.clear();
+  for (int i=0;i<m_RedoList.size();i++)
+    vtkDEL(m_RedoList[i].m_Scalars);
+  m_RedoList.clear();
 }
 //----------------------------------------------------------------------------
-void mafOpSegmentation::ResetManualUndoList()
+void mafOpSegmentation::ClearManualUndoList()
 {
-  for (int i=0;i<m_ManualUndoList.size();i++)
-    vtkDEL(m_ManualUndoList[i].dataArray);
-  m_ManualUndoList.clear();
+  for (int i=0;i<m_UndoList.size();i++)
+    vtkDEL(m_UndoList[i].m_Scalars);
+  m_UndoList.clear();
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::ResetRefinementRedoList()
@@ -3349,23 +2819,3 @@ void mafOpSegmentation::ResetRefinementUndoList()
     vtkDEL(m_RefinementUndoList[i]);
   m_RefinementUndoList.clear();
 }
-//----------------------------------------------------------------------------
-bool mafOpSegmentation::ResetZoom(vtkDataSet* dataset, double visbleBounds[4])
-{
-	for (int i = 0; i < dataset->GetNumberOfPoints(); i++)
-	{
-		if ((unsigned char)(dataset->GetPointData()->GetScalars()->GetTuple1(i)) == 255)
-		{
-			double x[3];
-			dataset->GetPoint(i, x);
-			if (x[0] > visbleBounds[0] && x[0] < visbleBounds[1] && x[1] > visbleBounds[2] && x[1] < visbleBounds[3])
-			{
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
-
-
