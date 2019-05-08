@@ -936,6 +936,10 @@ void mafVMETest::TestCopyTree()
 {
 	mafSmartPointer<mafVMEHelper> na;
 	mafSmartPointer<mafVMEHelper> na2;
+
+	na->SetName("na");
+	na2->SetName("na2");
+
 	na->AddChild(na2);
 
 	mafVMEHelper *na3 = (mafVMEHelper *)na->CopyTree();

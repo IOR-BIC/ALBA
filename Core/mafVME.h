@@ -701,6 +701,9 @@ protected:
 	This method is called by SetTimeStamp method (that also notifies listeners). */
 	virtual void InternalSetTimeStamp(mafTimeStamp t);
 
+	// Make a Copy of Subtree and Update new Links (Recursive Function)
+	static mafVME* InternalCopyTree(mafVME * vme, mafVME * parent);
+
   /** 
     Set the output and connect it to the VME. This is automatically called
     by GetOutput() of specific VME's */
@@ -763,6 +766,18 @@ protected:
 
   int             m_VisualMode; ///< Store the visual mode to allow the visual pipe to choose the right visual pipe to render the VME
   
+	typedef struct
+	{
+		mafVME *oldPointer;
+		mafVME *newPointer;
+	} VmePointerMap;
+
+	typedef struct
+	{
+		mafString name;
+		mafVME *vme;
+	} VmeLinks;
+
 private:
   mafVME(const mafVME&); // Not implemented
   void operator=(const mafVME&); // Not implemented
