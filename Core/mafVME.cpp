@@ -54,7 +54,6 @@ mafCxxAbstractTypeMacro(mafVME)
 
 //-------------------------------------------------------------------------
 mafVME::mafVME()
-//-------------------------------------------------------------------------
 {
 	m_Parent = NULL;
 	m_Initialized = false;
@@ -77,10 +76,8 @@ mafVME::mafVME()
   m_VisualMode = DEFAULT_VISUAL_MODE;
 }
 
-
 //-------------------------------------------------------------------------
 mafVME::~mafVME()
-//-------------------------------------------------------------------------
 {
   // Pipes must be destroyed in the right order
   // to take into consideration dependencies
@@ -108,7 +105,6 @@ mafVME::~mafVME()
 
 //-------------------------------------------------------------------------
 int mafVME::InternalInitialize()
-//-------------------------------------------------------------------------
 {
 	mafVME *root = GetRoot();
 
@@ -166,7 +162,6 @@ int mafVME::InternalInitialize()
 
 //-------------------------------------------------------------------------
 int mafVME::DeepCopy(mafVME *a)
-//-------------------------------------------------------------------------
 { 
 	assert(a);
 	if (this->CanCopy(a))
@@ -210,7 +205,6 @@ int mafVME::DeepCopy(mafVME *a)
 
 //-------------------------------------------------------------------------
 int mafVME::ShallowCopy(mafVME *a)
-//-------------------------------------------------------------------------
 {  
   // for basic VME ShallowCopy is the same of DeepCopy (no data stored inside)
   return DeepCopy(a);
@@ -218,7 +212,6 @@ int mafVME::ShallowCopy(mafVME *a)
 
 //-------------------------------------------------------------------------
 bool mafVME::Equals(mafVME *vme)
-//-------------------------------------------------------------------------
 {
 	if (!vme || !vme->IsA(GetTypeName()))
 		return false;
@@ -281,7 +274,6 @@ bool mafVME::Equals(mafVME *vme)
 
 //-------------------------------------------------------------------------
 int mafVME::SetParent(mafVME *parent)
-//-------------------------------------------------------------------------
 {
 	if (parent)
 	{
@@ -369,7 +361,6 @@ int mafVME::SetParent(mafVME *parent)
 //Set the time for this VME (not for the whole tree) without notifying listeners. 
 //This method is called by SetTimeStamp method (that also notifies listeners).
 /*virtual*/ void mafVME::InternalSetTimeStamp(mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
 	 if (t<0)
     t=0;
@@ -394,7 +385,6 @@ int mafVME::SetParent(mafVME *parent)
 
 //-------------------------------------------------------------------------
 void mafVME::SetTimeStamp(mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
 	InternalSetTimeStamp(t);
 
@@ -404,14 +394,12 @@ void mafVME::SetTimeStamp(mafTimeStamp t)
 
 //-------------------------------------------------------------------------
 mafTimeStamp mafVME::GetTimeStamp() 
-//-------------------------------------------------------------------------
 {
   return m_CurrentTime;
 }
 
 //-------------------------------------------------------------------------
 void mafVME::SetTreeTime(mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
 	//BES: 26.11.2012 - avoid calling SetTimeStamp because it notifies our listeners
 	//before all VMEs are correctly set, which would cause time inconsistency between VMEs
@@ -423,21 +411,18 @@ void mafVME::SetTreeTime(mafTimeStamp t)
 
 //-------------------------------------------------------------------------
 bool mafVME::IsAnimated()
-//-------------------------------------------------------------------------
 {
   return false;
 }
 
 //-------------------------------------------------------------------------
 bool mafVME::IsDataAvailable()
-//-------------------------------------------------------------------------
 {
   return true;
 }
 
 //-------------------------------------------------------------------------
 int mafVME::GetNumberOfLocalTimeStamps()
-//-------------------------------------------------------------------------
 {
   std::vector<mafTimeStamp> timestamps;
   GetLocalTimeStamps(timestamps);
@@ -446,7 +431,6 @@ int mafVME::GetNumberOfLocalTimeStamps()
 
 //-------------------------------------------------------------------------
 int mafVME::GetNumberOfTimeStamps()
-//-------------------------------------------------------------------------
 {
   std::vector<mafTimeStamp> timestamps;
   GetTimeStamps(timestamps);
@@ -455,7 +439,6 @@ int mafVME::GetNumberOfTimeStamps()
 
 //-------------------------------------------------------------------------
 void mafVME::GetTimeStamps(std::vector<mafTimeStamp> &kframes)
-//-------------------------------------------------------------------------
 {
   GetLocalTimeStamps(kframes);
   
@@ -474,7 +457,6 @@ void mafVME::GetTimeStamps(std::vector<mafTimeStamp> &kframes)
 
 //-------------------------------------------------------------------------
 void mafVME::GetAbsTimeStamps(std::vector<mafTimeStamp> &kframes)
-//-------------------------------------------------------------------------
 {
   GetLocalTimeStamps(kframes);
   
@@ -490,33 +472,27 @@ void mafVME::GetAbsTimeStamps(std::vector<mafTimeStamp> &kframes)
 
 //-------------------------------------------------------------------------
 bool mafVME::CanReparentTo(mafVME *parent)
-//-------------------------------------------------------------------------
 {
   return (parent == NULL)|| (!IsInTree(parent));
 }
 
 //-------------------------------------------------------------------------
 void mafVME::SetPose(const mafMatrix &mat,mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
   mafMatrix new_mat(mat);
   new_mat.SetTimeStamp(t);
   SetMatrix(new_mat);
 }
-
 //-------------------------------------------------------------------------
 void mafVME::SetPose(double x,double y,double z,double rx,double ry,double rz, mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
   double txyz[3],trxyz[3];
   txyz[0]=x; txyz[1]=y; txyz[2]=z;
   trxyz[0]=rx; trxyz[1]=ry; trxyz[2]=rz;
   SetPose(txyz,trxyz,t);
 }
-
 //-------------------------------------------------------------------------
 void mafVME::SetPose(double xyz[3],double rxyz[3], mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
   t=(t<0)?t=m_CurrentTime:t;
 
@@ -531,7 +507,6 @@ void mafVME::SetPose(double xyz[3],double rxyz[3], mafTimeStamp t)
 
 //----------------------------------------------------------------------------
 void mafVME::ApplyMatrix(const mafMatrix &matrix,int premultiply,mafTimeStamp t)
-//----------------------------------------------------------------------------
 {
   t=(t<0)?m_CurrentTime:t;
 
@@ -546,17 +521,14 @@ void mafVME::ApplyMatrix(const mafMatrix &matrix,int premultiply,mafTimeStamp t)
 
 //-------------------------------------------------------------------------
 void mafVME::SetAbsPose(double x,double y,double z,double rx,double ry,double rz, mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
   double txyz[3],trxyz[3];
   txyz[0]=x; txyz[1]=y; txyz[2]=z;
   trxyz[0]=rx; trxyz[1]=ry; trxyz[2]=rz;
   SetAbsPose(txyz,trxyz,t);
 }
-
 //-------------------------------------------------------------------------
 void mafVME::SetAbsPose(double xyz[3],double rxyz[3], mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
   t=(t<0)?m_CurrentTime:t;
   
@@ -571,7 +543,6 @@ void mafVME::SetAbsPose(double xyz[3],double rxyz[3], mafTimeStamp t)
 
 //-------------------------------------------------------------------------
 void mafVME::SetAbsMatrix(const mafMatrix &matrix,mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
   t=(t<0)?m_CurrentTime:t;
 
@@ -581,7 +552,6 @@ void mafVME::SetAbsMatrix(const mafMatrix &matrix,mafTimeStamp t)
 }
 //-------------------------------------------------------------------------
 void mafVME::SetAbsMatrix(const mafMatrix &matrix)
-//-------------------------------------------------------------------------
 {
   if (GetParent())
   {
@@ -604,7 +574,6 @@ void mafVME::SetAbsMatrix(const mafMatrix &matrix)
 
 //----------------------------------------------------------------------------
 void mafVME::ApplyAbsMatrix(const mafMatrix &matrix,int premultiply,mafTimeStamp t)
-//----------------------------------------------------------------------------
 {
   t=(t<0)?m_CurrentTime:t;
   mafTransform new_pose;
@@ -616,10 +585,8 @@ void mafVME::ApplyAbsMatrix(const mafMatrix &matrix,int premultiply,mafTimeStamp
   SetAbsMatrix(new_pose.GetMatrix());
 }
 
-
 //-------------------------------------------------------------------------
 void mafVME::SetOutput(mafVMEOutput *output)
-//-------------------------------------------------------------------------
 {
   cppDEL(m_Output);
 
@@ -637,7 +604,6 @@ void mafVME::SetOutput(mafVMEOutput *output)
 
 //-------------------------------------------------------------------------
 int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
-//-------------------------------------------------------------------------
 {
   if (mpipe!=m_MatrixPipe)
   {
@@ -677,7 +643,6 @@ int mafVME::SetMatrixPipe(mafMatrixPipe *mpipe)
 
 //-------------------------------------------------------------------------
 void mafVME::Update()
-//-------------------------------------------------------------------------
 {
   //InternalPreUpdate();
   //InternalUpdate();
@@ -693,7 +658,6 @@ void mafVME::Update()
 
 //-------------------------------------------------------------------------
 void mafVME::SetCrypting(int crypting)
-//-------------------------------------------------------------------------
 {
 	if (m_Crypting != crypting)
 	{
@@ -712,14 +676,12 @@ void mafVME::SetCrypting(int crypting)
 
 //-------------------------------------------------------------------------
 int mafVME::GetCrypting()
-//-------------------------------------------------------------------------
 {
   return m_Crypting;
 }
 
 //-------------------------------------------------------------------------
 int mafVME::SetDataPipe(mafDataPipe *dpipe)
-//-------------------------------------------------------------------------
 {
   if (dpipe==m_DataPipe.GetPointer())
     return MAF_OK;
@@ -754,7 +716,6 @@ int mafVME::SetDataPipe(mafDataPipe *dpipe)
 
 //-------------------------------------------------------------------------
 void mafVME::OnEvent(mafEventBase *maf_event)
-//-------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
@@ -827,7 +788,6 @@ void mafVME::OnEvent(mafEventBase *maf_event)
 
 //-------------------------------------------------------------------------
 int mafVME::InternalStore(mafStorageElement *parent)
-//-------------------------------------------------------------------------
 {
   parent->SetAttribute("Name", m_Name);
 	parent->SetAttribute("Id", mafString(m_Id));
@@ -870,7 +830,6 @@ int mafVME::InternalStore(mafStorageElement *parent)
 
 //-------------------------------------------------------------------------
 int mafVME::InternalRestore(mafStorageElement *node)
-//-------------------------------------------------------------------------
 {
 	//First restore node Name
 	if (!node->GetAttribute("Name", m_Name))
@@ -985,7 +944,6 @@ void mafVME::SetOldSubIdLink(mafString link_name, mafID link_node_id, mafID link
 
 //-------------------------------------------------------------------------
 mafGUI *mafVME::CreateGui()
-//-------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
 	m_Gui = new mafGUI(this);
@@ -1021,9 +979,9 @@ mafGUI *mafVME::CreateGui()
 
   return m_Gui;
 }
+
 //-------------------------------------------------------------------------
 void mafVME::SetVisualMode(int mode)
-//-------------------------------------------------------------------------
 {
   if (m_VisualMode != mode)
   {
@@ -1036,7 +994,6 @@ void mafVME::SetVisualMode(int mode)
 
 //------------------------------------------------------------------------------
 void mafVME::SetId(mafID id)
-//------------------------------------------------------------------------------
 {
 	m_Id = id;
 	Modified();
@@ -1044,14 +1001,12 @@ void mafVME::SetId(mafID id)
 
 //------------------------------------------------------------------------------
 mafID mafVME::GetId() const
-//------------------------------------------------------------------------------
 {
 	return m_Id;
 }
 
 //------------------------------------------------------------------------------
 int mafVME::Initialize()
-//------------------------------------------------------------------------------
 {
 	if (m_Initialized)
 		return MAF_OK;
@@ -1070,7 +1025,6 @@ int mafVME::Initialize()
 
 //------------------------------------------------------------------------------
 void mafVME::Shutdown()
-//------------------------------------------------------------------------------
 {
 	if (m_Initialized)
 	{
@@ -1081,11 +1035,9 @@ void mafVME::Shutdown()
 
 //-------------------------------------------------------------------------
 void mafVME::ForwardUpEvent(mafEventBase &maf_event)
-//-------------------------------------------------------------------------
 {
 	ForwardUpEvent(&maf_event);
 }
-
 //-------------------------------------------------------------------------
 void mafVME::ForwardUpEvent(mafEventBase *maf_event)
 //-------------------------------------------------------------------------
@@ -1103,14 +1055,12 @@ void mafVME::ForwardUpEvent(mafEventBase *maf_event)
 }
 //-------------------------------------------------------------------------
 void mafVME::ForwardDownEvent(mafEventBase &maf_event)
-//-------------------------------------------------------------------------
 {
 	ForwardDownEvent(&maf_event);
 }
 
 //-------------------------------------------------------------------------
 void mafVME::ForwardDownEvent(mafEventBase *maf_event)
-//-------------------------------------------------------------------------
 {
 	if (GetNumberOfChildren()>0)
 	{
@@ -1122,9 +1072,9 @@ void mafVME::ForwardDownEvent(mafEventBase *maf_event)
 		}
 	}
 }
+
 //-------------------------------------------------------------------------
 void mafVME::SetName(const char *name)
-//-------------------------------------------------------------------------
 {
 	m_GuiName=m_Name=name; // force string copy
 	Modified();
@@ -1134,7 +1084,6 @@ void mafVME::SetName(const char *name)
 
 //-------------------------------------------------------------------------
 mafVMEIterator *mafVME::NewIterator()
-//-------------------------------------------------------------------------
 {
 	mafVMEIterator *iter = mafVMEIterator::New();
 	iter->SetRootNode(this);
@@ -1143,14 +1092,12 @@ mafVMEIterator *mafVME::NewIterator()
 
 //-------------------------------------------------------------------------
 unsigned long mafVME::GetNumberOfChildren() const
-//-------------------------------------------------------------------------
 {
 	return m_Children.size();
 }
 
 //-------------------------------------------------------------------------
 unsigned long mafVME::GetNumberOfChildren(bool onlyVisible /*=false*/)
-//-------------------------------------------------------------------------
 {
 	//This function is redefined because the original is defined const and 
 	//here we call non-const functions
@@ -1171,14 +1118,12 @@ unsigned long mafVME::GetNumberOfChildren(bool onlyVisible /*=false*/)
 
 //-------------------------------------------------------------------------
 bool mafVME::IsAChild(mafVME *a)
-//-------------------------------------------------------------------------
 {
 	return (a->GetParent() == this);
 }
 
 //-------------------------------------------------------------------------
 mafVME *mafVME::GetFirstChild(bool onlyVisible /*=false*/)
-//-------------------------------------------------------------------------
 {
 	if (onlyVisible)
 	{
@@ -1197,7 +1142,6 @@ mafVME *mafVME::GetFirstChild(bool onlyVisible /*=false*/)
 
 //-------------------------------------------------------------------------
 mafVME *mafVME::GetLastChild(bool onlyVisible /*=false*/)
-//-------------------------------------------------------------------------
 {
 	if (onlyVisible)
 	{
@@ -1214,11 +1158,8 @@ mafVME *mafVME::GetLastChild(bool onlyVisible /*=false*/)
 	}
 }
 
-
-
 //-------------------------------------------------------------------------
 mafVME * mafVME::GetChild(mafID idx, bool onlyVisible /*=false*//*=false*/)
-//-------------------------------------------------------------------------
 {
 	if (onlyVisible)
 	{
@@ -1241,7 +1182,6 @@ mafVME * mafVME::GetChild(mafID idx, bool onlyVisible /*=false*//*=false*/)
 
 //-------------------------------------------------------------------------
 int mafVME::FindNodeIdx(mafVME *a, bool onlyVisible /*=false*/)
-//-------------------------------------------------------------------------
 {
 	int nChild = -1;
 	for (mafID i = 0; i<m_Children.size(); i++)
@@ -1256,10 +1196,8 @@ int mafVME::FindNodeIdx(mafVME *a, bool onlyVisible /*=false*/)
 	}
 	return -1;
 }
-
 //-------------------------------------------------------------------------
 int mafVME::FindNodeIdx(const char *name, bool onlyVisible /*=false*/)
-//-------------------------------------------------------------------------
 {
 	int nChild = -1;
 	for (mafID i = 0; i<m_Children.size(); i++)
@@ -1276,7 +1214,6 @@ int mafVME::FindNodeIdx(const char *name, bool onlyVisible /*=false*/)
 }
 //-------------------------------------------------------------------------
 mafVME *mafVME::FindInTreeByTag(const char *name, const char *value, int type)
-//-------------------------------------------------------------------------
 {
 	mafTagItem *titem = GetTagArray()->GetTag(name);
 	if (titem&&mafCString(titem->GetName()) == name)
@@ -1291,7 +1228,6 @@ mafVME *mafVME::FindInTreeByTag(const char *name, const char *value, int type)
 }
 //-------------------------------------------------------------------------
 mafVME *mafVME::FindInTreeByName(const char *name, bool match_case, bool whole_word)
-//-------------------------------------------------------------------------
 {
 	wxString word_to_search;
 	word_to_search = name;
@@ -1327,7 +1263,6 @@ mafVME *mafVME::FindInTreeByName(const char *name, bool match_case, bool whole_w
 }
 //-------------------------------------------------------------------------
 mafVME *mafVME::FindInTreeById(const mafID id)
-//-------------------------------------------------------------------------
 {
 	if (GetId() == id)
 		return this;
@@ -1339,9 +1274,9 @@ mafVME *mafVME::FindInTreeById(const mafID id)
 	}
 	return NULL;
 }
+
 //-------------------------------------------------------------------------
 int mafVME::AddChild(mafVME *node)
-//-------------------------------------------------------------------------
 {
 	if (node->SetParent(this) == MAF_OK)
 	{
@@ -1358,14 +1293,11 @@ int mafVME::AddChild(mafVME *node)
 
 //-------------------------------------------------------------------------
 void mafVME::RemoveChild(mafVME *node)
-//-------------------------------------------------------------------------
 {
 	RemoveChild(FindNodeIdx(node));
 }
-
 //-------------------------------------------------------------------------
 void mafVME::RemoveChild(const mafID idx, bool onlyVisible /*=false*/)
-//-------------------------------------------------------------------------
 {
 	mafVME *oldnode = GetChild(idx, onlyVisible);
 	if (oldnode)
@@ -1395,7 +1327,6 @@ void mafVME::RemoveChild(const mafID idx, bool onlyVisible /*=false*/)
 
 //-------------------------------------------------------------------------
 int mafVME::ReparentTo(mafVME *newparent)
-//-------------------------------------------------------------------------
 {
 	// We cannot reparent to a subnode!!!
 	if (!IsInTree(newparent))
@@ -1445,7 +1376,6 @@ int mafVME::ReparentTo(mafVME *newparent)
 
 //----------------------------------------------------------------------------
 void mafVME::Import(mafVME *tree)
-//-------------------------------------------------------------------------
 {
 	if (tree&&tree->GetNumberOfChildren()>0)
 	{
@@ -1460,7 +1390,6 @@ void mafVME::Import(mafVME *tree)
 
 //-------------------------------------------------------------------------
 mafVME *mafVME::GetRoot()
-//-------------------------------------------------------------------------
 {
 	mafVME *node;
 	for (node = this; node->GetParent(); node = node->GetParent());
@@ -1469,7 +1398,6 @@ mafVME *mafVME::GetRoot()
 
 //-------------------------------------------------------------------------
 bool mafVME::IsInTree(mafVME *a)
-//-------------------------------------------------------------------------
 {
 	for (mafVME* node = a; node; node = node->GetParent())
 	{
@@ -1482,7 +1410,6 @@ bool mafVME::IsInTree(mafVME *a)
 
 //-------------------------------------------------------------------------
 void mafVME::UnRegister(void *o)
-//-------------------------------------------------------------------------
 {
 	if (this->m_ReferenceCount <= 1)
 	{
@@ -1500,7 +1427,6 @@ void mafVME::UnRegister(void *o)
 
 //-------------------------------------------------------------------------
 void mafVME::CleanTree()
-//-------------------------------------------------------------------------
 {
 	for (unsigned long i = 0; i<this->GetNumberOfChildren(); i++)
 	{
@@ -1515,9 +1441,7 @@ void mafVME::CleanTree()
 
 //-------------------------------------------------------------------------
 void mafVME::RemoveAllChildren()
-//-------------------------------------------------------------------------
 {
-
 	for (unsigned long i = 0; i<this->GetNumberOfChildren(); i++)
 	{
 		mafVME *curr = this->GetChild(i);
@@ -1530,18 +1454,16 @@ void mafVME::RemoveAllChildren()
 
 //-------------------------------------------------------------------------
 mafVME *mafVME::MakeCopy(mafVME *a)
-//-------------------------------------------------------------------------
 {
 	mafVME* newnode = a->NewInstance();
 	if (newnode)
 		newnode->DeepCopy(a);
+
 	return newnode;
 }
 
-
 //-------------------------------------------------------------------------
 bool mafVME::CanCopy(mafVME *node)
-//-------------------------------------------------------------------------
 {
 	if (!node)
 		return false;
@@ -1556,7 +1478,6 @@ bool mafVME::CanCopy(mafVME *node)
 
 //-------------------------------------------------------------------------
 bool mafVME::CompareTree(mafVME *vme)
-//-------------------------------------------------------------------------
 {
 	if (!this->Equals(vme))
 		return false;
@@ -1578,33 +1499,110 @@ bool mafVME::CompareTree(mafVME *vme)
 
 //----------------------------------------------------------------------------
 mafVME *mafVME::CopyTree(mafVME *vme, mafVME *parent)
-//-------------------------------------------------------------------------
 {
+	std::vector<VmePointerMap> vmePointerMap;
 
+	mafVMEIterator *iter = vme->NewIterator();
+	for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+	{
+		// Save Old VME Pointer
+		VmePointerMap value;
+		value.oldPointer = node;
+		vmePointerMap.push_back(value);
+	}
+	iter->Delete();
+
+	//////////////////////////////////////////////////////////////////////////
+	// Make Copy of Tree
+	mafVME *copy = InternalCopyTree(vme, parent);
+
+	copy->Register(NULL); //temp registration to avoid destruction on iterator delete 
+
+	//////////////////////////////////////////////////////////////////////////	
+	mafVMEIterator *copyIter = copy->NewIterator();
+
+	int index = 0;
+	for (mafVME *node = copyIter->GetFirstNode(); node; node = copyIter->GetNextNode())
+	{
+		// Find new VME pointer
+		vmePointerMap[index].newPointer = node;
+		index++;
+	}
+	copyIter->Delete();
+
+	//////////////////////////////////////////////////////////////////////////
+	std::vector<mafString> linkToEliminate;
+	std::vector<VmeLinks> linkToUpdate;
+
+	mafVMEIterator *copyIter2 = copy->NewIterator();
+	for (mafVME *node = copyIter2->GetFirstNode(); node; node = copyIter2->GetNextNode())
+	{
+		linkToEliminate.clear();
+		linkToUpdate.clear();
+
+		for (mafVME::mafLinksMap::iterator it = node->GetLinks()->begin(); it != node->GetLinks()->end(); it++)
+		{
+			bool found = false;
+
+			void *oldPointer = it->second.m_Node;
+			for (int i = 0; i < vmePointerMap.size(); i++)
+			{
+				if (oldPointer == vmePointerMap[i].oldPointer)
+				{
+					// Update new Link Pointers
+					VmeLinks newLink;
+					newLink.name = it->first.GetCStr();
+					newLink.vme = vmePointerMap[i].newPointer;
+					linkToUpdate.push_back(newLink);
+					found = true;
+					break;
+				}
+			}
+
+			if (!found)
+				linkToEliminate.push_back(it->first.GetCStr());
+		}
+
+		// Update new Links and Remove Lost Links
+		for (int i = 0; i < linkToUpdate.size(); i++)
+			node->SetLink(linkToUpdate[i].name, linkToUpdate[i].vme);
+		for (int i = 0; i < linkToEliminate.size(); i++)
+			node->RemoveLink(linkToEliminate[i].GetCStr());
+	}
+	copyIter2->Delete();
+	
+	copy->SetReferenceCount(copy->GetReferenceCount() - 1); // this hack avoid that 'v' node die when return
+
+	//////////////////////////////////////////////////////////////////////////
+	return copy;
+}
+
+//-------------------------------------------------------------------------
+mafVME *mafVME::InternalCopyTree(mafVME * vme, mafVME * parent)
+{
 	mafVME *v = vme->MakeCopy();
 	v->Register(NULL);
 	v->ReparentTo(parent);
 
-	for (unsigned long i = 0; i<vme->GetNumberOfChildren(); i++)
+	for (unsigned long i = 0; i < vme->GetNumberOfChildren(); i++)
 	{
 		if (mafVME *child = vme->GetChild(i))
 			if (child->IsVisible())
-				mafVME::CopyTree(child, v);
+				mafVME::InternalCopyTree(child, v);
 	}
 	v->SetReferenceCount(v->GetReferenceCount() - 1); // this hack avoid that 'v' node die when return
+
 	return v;
 }
 
 //-------------------------------------------------------------------------
 void mafVME::SetAttribute(const char *name, mafAttribute *a)
-//-------------------------------------------------------------------------
 {
 	m_Attributes[name] = a;
 }
 
 //-------------------------------------------------------------------------
 mafAttribute *mafVME::GetAttribute(const char *name)
-//-------------------------------------------------------------------------
 {
 	mafAttributesMap::iterator it = m_Attributes.find(name);
 	return (it != m_Attributes.end()) ? (*it).second.GetPointer() : NULL;
@@ -1612,21 +1610,18 @@ mafAttribute *mafVME::GetAttribute(const char *name)
 
 //-------------------------------------------------------------------------
 void mafVME::RemoveAttribute(const char *name)
-//-------------------------------------------------------------------------
 {
 	m_Attributes.erase(m_Attributes.find(name));
 }
 
 //-------------------------------------------------------------------------
 void mafVME::RemoveAllAttributes()
-//-------------------------------------------------------------------------
 {
 	m_Attributes.clear();
 }
 
 //-------------------------------------------------------------------------
 mafTagArray  *mafVME::GetTagArray()
-//-------------------------------------------------------------------------
 {
 	mafTagArray *tarray = mafTagArray::SafeDownCast(GetAttribute("TagArray"));
 	if (!tarray)
@@ -1640,7 +1635,6 @@ mafTagArray  *mafVME::GetTagArray()
 
 //-------------------------------------------------------------------------
 mafVME *mafVME::GetLink(const char *name)
-//-------------------------------------------------------------------------
 {
 	assert(name);
 	mafLinksMap::iterator it = m_Links.find(mafCString(name));
@@ -1666,7 +1660,6 @@ mafVME *mafVME::GetLink(const char *name)
 
 //-------------------------------------------------------------------------
 void mafVME::SetLink(const char *name, mafVME *node)
-//-------------------------------------------------------------------------
 {
 	assert(name);
 	
@@ -1696,8 +1689,7 @@ void mafVME::SetLink(const char *name, mafVME *node, LinkType type)
 
 //----------------------------------------------------------------------------
 void mafVME::SetMandatoryLink(const char *name, mafVME *node)
-{
-		
+{		
 	SetLink(name, node);
 	if (node)
 	{
@@ -1741,7 +1733,6 @@ void mafVME::RemoveBackLink(const char *name, mafVME *node)
 
 //-------------------------------------------------------------------------
 void mafVME::RemoveLink(const char *name)
-//-------------------------------------------------------------------------
 {
 	assert(name);
 	mafLinksMap::iterator it = m_Links.find(mafCString(name));
@@ -1761,7 +1752,6 @@ void mafVME::RemoveLink(const char *name)
 
 //-------------------------------------------------------------------------
 void mafVME::RemoveAllLinks()
-//-------------------------------------------------------------------------
 {
 	for (mafLinksMap::iterator it = m_Links.begin(); it != m_Links.end(); it++)
 	{
@@ -1812,8 +1802,6 @@ void mafVME::GetDependenciesVMEs(mafVMESet &dependencies, mafVME *vme)
 	}
 }
 
-
-
 //----------------------------------------------------------------------------
 void mafVME::RemoveDependenciesVMEs()
 {
@@ -1854,7 +1842,6 @@ bool mafVME::WillBeRemovedWithDependencies(mafVME *vme)
 
 //-------------------------------------------------------------------------
 unsigned long mafVME::GetMTime()
-//-------------------------------------------------------------------------
 {
 	unsigned long mtime = this->mafTimeStamped::GetMTime();
 	if (m_DependsOnLinkedNode)
@@ -1875,7 +1862,6 @@ unsigned long mafVME::GetMTime()
 
 //-------------------------------------------------------------------------
 void mafVME::OnNodeDetachedFromTree(mafEventBase *e)
-//-------------------------------------------------------------------------
 {
 	for (mafLinksMap::iterator it = m_Links.begin(); it != m_Links.end(); it++)
 	{
@@ -1888,7 +1874,6 @@ void mafVME::OnNodeDetachedFromTree(mafEventBase *e)
 
 //-------------------------------------------------------------------------
 void mafVME::OnNodeAttachedToTree(mafEventBase *e)
-//-------------------------------------------------------------------------
 {
 	for (mafLinksMap::iterator it = m_Links.begin(); it != m_Links.end(); it++)
 	{
@@ -1902,7 +1887,6 @@ void mafVME::OnNodeAttachedToTree(mafEventBase *e)
 }
 //-------------------------------------------------------------------------
 void mafVME::OnNodeDestroyed(mafEventBase *e)
-//-------------------------------------------------------------------------
 {
 	for (mafLinksMap::iterator it = m_Links.begin(); it != m_Links.end(); it++)
 	{
@@ -1916,7 +1900,6 @@ void mafVME::OnNodeDestroyed(mafEventBase *e)
 
 //-------------------------------------------------------------------------
 void mafVME::NodeOnEvent(mafEventBase *e)
-//-------------------------------------------------------------------------
 {
 	// events to be sent up or down in the tree are simply forwarded
 	if (e->GetChannel() == MCH_UP)
@@ -2073,14 +2056,12 @@ void mafVME::Print(std::ostream& os, const int tabs)// const
 }
 //-------------------------------------------------------------------------
 char** mafVME::GetIcon()
-//-------------------------------------------------------------------------
 {
 #include "mafVME.xpm"
 	return mafVME_xpm;
 }
 //-------------------------------------------------------------------------
 mafGUI *mafVME::GetGui()
-//-------------------------------------------------------------------------
 {
 	if (m_Gui == NULL)
 		CreateGui();
@@ -2089,14 +2070,12 @@ mafGUI *mafVME::GetGui()
 }
 //-------------------------------------------------------------------------
 void mafVME::DeleteGui()
-//-------------------------------------------------------------------------
 {
 	cppDEL(m_Gui);
 }
 
 //-------------------------------------------------------------------------
 void mafVME::UpdateId()
-//-------------------------------------------------------------------------
 {
 	// If the node was attached under another root its Id is different from -1
 	// when it is attached to the new root it has to be updated anyway.
@@ -2110,7 +2089,6 @@ void mafVME::UpdateId()
 
 //-------------------------------------------------------------------------
 mafVME * mafVME::GetByPath(const char *path, bool onlyVisible /*=true*/)
-//-------------------------------------------------------------------------
 {
 	wxStringTokenizer tkz(wxT(path), wxT("/"));
 
