@@ -1,5 +1,4 @@
 /*=========================================================================
-
  Program: MAF2
  Module: mafOpExporterMSF
  Authors: Paolo Quadrani
@@ -32,7 +31,6 @@ class mafEvent;
 //----------------------------------------------------------------------------
 // mafOpExporterMSF :
 //----------------------------------------------------------------------------
-/** */
 class MAF_EXPORT mafOpExporterMSF: public mafOp
 {
 public:
@@ -57,17 +55,15 @@ public:
 
   /** Export selected subtree-tree to a .msf file*/
   int ExportMSF();
-
+	
 	/** Return an xpm-icon that can be used to represent this operation */
 	virtual char ** GetIcon();
 
-  typedef struct 
-  {
-    int oldID;
-    int newID;
-  } idValues;
-
 protected:
+
+	// Prepare and Storage file
+	int StorageFile();
+
   mafString m_MSFFile;
 	mafString m_MSFFileDir;
 };

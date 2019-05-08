@@ -241,7 +241,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpApplyTrajectoryTest::suite());
 	runner.addTest(mafOpExtractIsosurfaceTest::suite());
 	runner.addTest(mafOpImporterASCIITest::suite());
-	runner.addTest(mafOpExporterMSFTest::suite());
+ 	runner.addTest(mafOpExporterMSFTest::suite());
 	runner.addTest(mafOpFilterSurfaceTest::suite());
 	runner.addTest(mafOpValidateTreeTest::suite());
 	runner.addTest(mafOpGarbageCollectMSFDirTest::suite());

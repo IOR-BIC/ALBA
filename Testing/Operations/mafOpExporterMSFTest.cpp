@@ -233,7 +233,7 @@ void mafOpExporterMSFTest::TestExportMSF2()
   mafVME *volumeExported = storageExport->GetRoot()->GetFirstChild()->GetChild(1);
   volumeExported->Update();
   CPPUNIT_ASSERT( volumeExported->GetOutput()->GetAbsMatrix()->Equals(volume->GetOutput()->GetAbsMatrix()) );
-  mafVME *slicerExported = volume->GetChild(0);
+  mafVME *slicerExported = volumeExported->GetChild(0);
   slicerExported->Update();
   CPPUNIT_ASSERT( slicerExported->GetOutput()->GetAbsMatrix()->Equals(slicer->GetOutput()->GetAbsMatrix()) );
 	

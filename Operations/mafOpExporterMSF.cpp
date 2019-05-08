@@ -1,5 +1,4 @@
 /*=========================================================================
-
  Program: MAF2
  Module: mafOpExporterMSF
  Authors: Paolo Quadrani
@@ -44,7 +43,6 @@ mafCxxTypeMacro(mafOpExporterMSF);
 //----------------------------------------------------------------------------
 mafOpExporterMSF::mafOpExporterMSF(const wxString &label) :
 mafOp(label)
-//----------------------------------------------------------------------------
 {
   m_OpType  = OPTYPE_EXPORTER;
   m_Canundo = true;
@@ -54,20 +52,39 @@ mafOp(label)
 
 }
 //----------------------------------------------------------------------------
-mafOpExporterMSF::~mafOpExporterMSF()
+mafOpExporterMSF::~mafOpExporterMSF() { }
+
 //----------------------------------------------------------------------------
+bool mafOpExporterMSF::Accept(mafVME*vme)
 {
+	return (vme != NULL) && (!vme->IsA("mafVMERoot"));
 }
+
+//----------------------------------------------------------------------------
+mafOp* mafOpExporterMSF::Copy()
+{
+	mafOpExporterMSF *cp = new mafOpExporterMSF(m_Label);
+	cp->m_Listener = m_Listener;
+	cp->m_MSFFile = m_MSFFile;
+	cp->m_MSFFileDir = m_MSFFileDir;
+	return cp;
+}
+
+//----------------------------------------------------------------------------
+char ** mafOpExporterMSF::GetIcon()
+{
+#include "pic/MENU_IMPORT_MSF.xpm"
+	return MENU_IMPORT_MSF_xpm;
+}
+
 //----------------------------------------------------------------------------
 void mafOpExporterMSF::OpRun()   
-//----------------------------------------------------------------------------
 {
 	mafString wildc;
 	const char *ext = GetLogicManager()->GetMsfFileExtension();
 	
 	wildc.Printf("Project File (*.%s)|*.%s", ext, ext);
-
-
+	
 	mafString f;
   if (m_MSFFile.IsEmpty())
   {
@@ -85,15 +102,9 @@ void mafOpExporterMSF::OpRun()
 	}
 	mafEventMacro(mafEvent(this,result));
 }
-//----------------------------------------------------------------------------
-bool mafOpExporterMSF::Accept(mafVME*vme)
-//----------------------------------------------------------------------------
-{
-  return (vme != NULL) && (!vme->IsA("mafVMERoot"));
-}
+
 //----------------------------------------------------------------------------
 int mafOpExporterMSF::ExportMSF()
-//----------------------------------------------------------------------------
 {					
   if (!m_TestMode)
   {
@@ -111,96 +122,33 @@ int mafOpExporterMSF::ExportMSF()
 		m_MSFFile = dir2 + "\\" + name + "." + ext;
 	}
 
-  mafVMEStorage storage;
-  storage.SetURL(m_MSFFile.GetCStr());
-  storage.GetRoot()->SetName("root");
-  storage.SetListener(this);
-  storage.GetRoot()->Initialize();
-
-  std::vector<idValues> values;
-
-  mafVMEIterator *iter = m_Input->NewIterator();
-  for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
-  {
-    idValues value;
-    value.oldID = node->GetId();
-    values.push_back(value);
-  }
-  iter->Delete();
-
-	mafVME::CopyTree(m_Input,storage.GetRoot());
-
-  iter = storage.GetRoot()->GetFirstChild()->NewIterator();
-  int index = 0;
-  for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
-  {
-    idValues value;
-    values[index].newID = node->GetId();
-
-    index++;
-
-    
-  }
-  iter->Delete();
-
-  std::vector<mafString> linkToEliminate;
-  iter = storage.GetRoot()->GetFirstChild()->NewIterator();
-  for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
-  {
-    linkToEliminate.clear();
-
-    for (mafVME::mafLinksMap::iterator it=node->GetLinks()->begin();it!=node->GetLinks()->end();it++)
-    {
-      bool foundID = false;
-      for (int i=0;i<values.size();i++)
-      {
-        int id = it->second.m_NodeId;
-        if (it->second.m_NodeId == values[i].oldID)
-        {
-          it->second.m_NodeId = values[i].newID;
-          foundID = true;
-        }
-      }
-
-      if (!foundID)
-      {
-        linkToEliminate.push_back(it->first.GetCStr());
-      }
-    }
-
-    for (int i=0;i<linkToEliminate.size();i++)
-    {
-      node->RemoveLink(linkToEliminate[i].GetCStr());
-    }
-  }
-  iter->Delete();
-
-  storage.GetRoot()->GetFirstChild()->SetAbsMatrix(*m_Input->GetOutput()->GetAbsMatrix());  //Paolo 5-5-2004
-  if (storage.Store()!=0)
-  {
-    if (!m_TestMode)
-    {
-    	wxMessageBox("Error while exporting MSF");
-    }
-    return MAF_ERROR;
-  }
-
-  return MAF_OK;
-}
-//----------------------------------------------------------------------------
-mafOp* mafOpExporterMSF::Copy()   
-//----------------------------------------------------------------------------
-{
-  mafOpExporterMSF *cp= new mafOpExporterMSF(m_Label);
-  cp->m_Listener    = m_Listener;
-  cp->m_MSFFile     = m_MSFFile;
-  cp->m_MSFFileDir  = m_MSFFileDir;
-  return cp;
+	return StorageFile();
 }
 
 //----------------------------------------------------------------------------
-char ** mafOpExporterMSF::GetIcon()
+int mafOpExporterMSF::StorageFile()
 {
-#include "pic/MENU_IMPORT_MSF.xpm"
-	return MENU_IMPORT_MSF_xpm;
+	mafVMEStorage storage;
+	storage.SetURL(m_MSFFile.GetCStr());
+	storage.GetRoot()->SetName("root");
+	storage.SetListener(this);
+	storage.GetRoot()->Initialize();
+	
+	// Copy Tree 
+	mafVME::CopyTree(m_Input, storage.GetRoot());
+	
+	// Set AbsMatrix
+	storage.GetRoot()->GetFirstChild()->SetAbsMatrix(*m_Input->GetOutput()->GetAbsMatrix());  //Paolo 5-5-2004
+
+	// Store
+	if (storage.Store() != 0)
+	{
+		if (!m_TestMode)
+		{
+			wxMessageBox("Error while exporting MSF");
+		}
+		return MAF_ERROR;
+	}
+
+	return MAF_OK;
 }
