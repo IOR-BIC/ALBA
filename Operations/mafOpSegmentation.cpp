@@ -103,6 +103,7 @@
 #include "wx/sizer.h"
 
 #define SPACING_PERCENTAGE_BOUNDS 0.1
+#define MAX_UNDOLIST_SIZE 25
 
 enum INIT_MODALITY_TYPE
 {
@@ -114,11 +115,10 @@ enum INIT_MODALITY_TYPE
 typedef  itk::Image< float, 3> RealImage;
 typedef  itk::Image< unsigned char, 3> UCharImage;
 
-static int m_CurrentVolumeDimensions[3] = {0,0,0};          //<Used to load only volume with the specified dimensions
-static double m_CurrentVolumeSpacing[3] = {0,0,0};          //<Used to load only volume with the specified spacing
-static double m_CurrentVolumeBounds[6] = {0,0,0,0,0,0};           //<Used to load only volume with the specified bounds
-static bool m_CurrentVolumeParametersInitialized = false;
-static int m_InputVtkType = 0;
+static int glo_CurrVolDims[3] = {0,0,0};          //<Used to load only volume with the specified dimensions
+static double glo_CurrVolSpacing[3] = {0,0,0};          //<Used to load only volume with the specified spacing
+static double glo_CurrVolBounds[6] = {0,0,0,0,0,0};           //<Used to load only volume with the specified bounds
+static mafVME *glo_CurrSeg = NULL;
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpSegmentation);
@@ -130,11 +130,9 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
   m_Canundo	= true;  
 
   m_Volume = NULL;
-  m_VolumeDimensions[0] = m_VolumeDimensions[1] = m_VolumeDimensions[2] = 0;
+  m_VolumeDims[0] = m_VolumeDims[1] = m_VolumeDims[2] = 0;
   m_VolumeSpacing[0] = m_VolumeSpacing[1] = m_VolumeSpacing[2] = 0.0;
   m_VolumeBounds[0] = m_VolumeBounds[1] = m_VolumeBounds[2] = m_VolumeBounds[3] = m_VolumeBounds[4] = m_VolumeBounds[5] = 0.0;
-  m_VolumeParametersInitialized = false;
-
 	m_SliceIndexByPlane[0] = m_SliceIndexByPlane[1] = m_SliceIndexByPlane[2] = 1;
   m_SlicePlane =  XY;
 
@@ -244,7 +242,7 @@ mafOp *mafOpSegmentation::Copy()
 void mafOpSegmentation::OpRun()   
 {  
   //////////////////////////////////////////////////////////////////////////
-  //Initialize of the volume matrix to the indentity
+  //Initialize of the volume matrix to the identity
   m_Volume=mafVMEVolumeGray::SafeDownCast(m_Input);
 
   m_Volume->Update();
@@ -359,7 +357,6 @@ void mafOpSegmentation::Init()
 {
 	InitSegmentationVolume();
 	InitializeInteractors();
-	InitVolumeSpacing();
 	UpdateWindowing();
 	UpdateSliderValidator();
 	InitRanges();
@@ -375,6 +372,7 @@ void mafOpSegmentation::Init()
 void mafOpSegmentation::InitSegmentationVolume()
 {
 	mafNEW(m_SegmentationVolume);
+	glo_CurrSeg = m_SegmentationVolume;
 
 	m_SegmentationVolume->SetName(wxString::Format("Segmentation Output (%s)", m_Volume->GetName()).c_str());
 	lutPreset(4, m_SegmentationVolume->GetMaterial()->m_ColorLut);
@@ -513,79 +511,67 @@ void mafOpSegmentation::InitVolumeDimensions()
 	if (inputDataSet)
 	{
 		inputDataSet->Update();
-
-		m_Volume->GetOutput()->GetVTKData()->GetBounds(m_VolumeBounds);
+		inputDataSet->GetBounds(m_VolumeBounds);
+		inputDataSet->GetBounds(glo_CurrVolBounds);
+		
 
 		if (vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(inputDataSet))
-			sp->GetDimensions(m_VolumeDimensions);
+		{
+			sp->GetDimensions(m_VolumeDims);
+			sp->GetDimensions(glo_CurrVolDims);
+		}
 		else if (vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(inputDataSet))
-			rg->GetDimensions(m_VolumeDimensions);
-
-		m_VolumeParametersInitialized = true;
-
+		{
+			rg->GetDimensions(m_VolumeDims);
+			rg->GetDimensions(glo_CurrVolDims);
+		}
 
 		//Setting start slicing on the center of the volume
 		for (int i = 0; i < 3; i++)
-			m_SliceIndexByPlane[i] = m_VolumeDimensions[i] / 2;
-	}
+			m_SliceIndexByPlane[i] = m_VolumeDims[i] / 2;
 
-	// Set static variable for load segmentation step
-	if (m_VolumeParametersInitialized)
-	{
-		for (int i = 0; i < 6; i++)
-			m_CurrentVolumeBounds[i] = m_VolumeBounds[i];
-		for (int i = 0; i < 3; i++)
-			m_CurrentVolumeDimensions[i] = m_VolumeDimensions[i];
-		for (int i = 0; i < 3; i++)
-			m_CurrentVolumeSpacing[i] = m_VolumeSpacing[i];
+		m_VolumeSpacing[0] = 0;
+		m_VolumeSpacing[1] = 0;
+		m_VolumeSpacing[2] = 0;
 
-		m_CurrentVolumeParametersInitialized = true;
-	}
-}
-//----------------------------------------------------------------------------
-void mafOpSegmentation::InitVolumeSpacing()
-{
-	vtkDataSet *vme_data = m_Volume->GetOutput()->GetVTKData();
-
-	m_VolumeSpacing[0] = 0;
-	m_VolumeSpacing[1] = 0;
-	m_VolumeSpacing[2] = 0;
-
-	if (vtkImageData *image = vtkImageData::SafeDownCast(vme_data))
-	{
-		image->GetSpacing(m_VolumeSpacing);
-	}
-	else if (vtkRectilinearGrid *rgrid = vtkRectilinearGrid::SafeDownCast(vme_data))
-	{
-		for (int xi = 1; xi < rgrid->GetXCoordinates()->GetNumberOfTuples(); xi++)
+		if (vtkImageData *image = vtkImageData::SafeDownCast(inputDataSet))
 		{
-			double spcx = rgrid->GetXCoordinates()->GetTuple1(xi) - rgrid->GetXCoordinates()->GetTuple1(xi - 1);
-			if (m_VolumeSpacing[0] < spcx && spcx != 0.0)
-				m_VolumeSpacing[0] = spcx;
+			image->GetSpacing(m_VolumeSpacing);
+			image->GetSpacing(glo_CurrVolSpacing);
 		}
-
-		for (int yi = 1; yi < rgrid->GetYCoordinates()->GetNumberOfTuples(); yi++)
+		else if (vtkRectilinearGrid *rgrid = vtkRectilinearGrid::SafeDownCast(inputDataSet))
 		{
-			double spcy = rgrid->GetYCoordinates()->GetTuple1(yi) - rgrid->GetYCoordinates()->GetTuple1(yi - 1);
-			if (m_VolumeSpacing[1] < spcy && spcy != 0.0)
-				m_VolumeSpacing[1] = spcy;
-		}
+			for (int xi = 1; xi < rgrid->GetXCoordinates()->GetNumberOfTuples(); xi++)
+			{
+				double spcx = rgrid->GetXCoordinates()->GetTuple1(xi) - rgrid->GetXCoordinates()->GetTuple1(xi - 1);
+				if (m_VolumeSpacing[0] < spcx && spcx != 0.0)
+					glo_CurrVolSpacing[0] = m_VolumeSpacing[0] = spcx;
+			}
 
-		for (int zi = 1; zi < rgrid->GetZCoordinates()->GetNumberOfTuples(); zi++)
-		{
-			double spcz = rgrid->GetZCoordinates()->GetTuple1(zi) - rgrid->GetZCoordinates()->GetTuple1(zi - 1);
-			if (m_VolumeSpacing[2] < spcz && spcz != 0.0)
-				m_VolumeSpacing[2] = spcz;
+			for (int yi = 1; yi < rgrid->GetYCoordinates()->GetNumberOfTuples(); yi++)
+			{
+				double spcy = rgrid->GetYCoordinates()->GetTuple1(yi) - rgrid->GetYCoordinates()->GetTuple1(yi - 1);
+				if (m_VolumeSpacing[1] < spcy && spcy != 0.0)
+					glo_CurrVolSpacing[0] = m_VolumeSpacing[1] = spcy;
+			}
+
+			for (int zi = 1; zi < rgrid->GetZCoordinates()->GetNumberOfTuples(); zi++)
+			{
+				double spcz = rgrid->GetZCoordinates()->GetTuple1(zi) - rgrid->GetZCoordinates()->GetTuple1(zi - 1);
+				if (m_VolumeSpacing[2] < spcz && spcz != 0.0)
+					glo_CurrVolSpacing[0] = m_VolumeSpacing[2] = spcz;
+			}
 		}
 	}
 }
+
 //----------------------------------------------------------------------------
 void mafOpSegmentation::InitRanges()
 {
 	//Store the parameters
 	AutomaticInfoRange range;
 	range.m_StartSlice = 1;
-	range.m_EndSlice = m_VolumeDimensions[2];
+	range.m_EndSlice = m_VolumeDims[2];
 	range.m_Threshold[0] = m_Threshold[0];
 	range.m_Threshold[1] = m_Threshold[1];
 
@@ -684,7 +670,7 @@ void mafOpSegmentation::CreateOpDialog()
 	// Label to indicate the current slice
 
 	vtkNEW(m_AutomaticSliceTextMapper);
-	wxString text = wxString::Format("Slice = %d of %d", m_SliceIndex, m_VolumeDimensions[m_SlicePlane]);
+	wxString text = wxString::Format("Slice = %d of %d", m_SliceIndex, m_VolumeDims[m_SlicePlane]);
 
 	m_AutomaticSliceTextMapper->SetInput(text);
 	m_AutomaticSliceTextMapper->GetTextProperty()->SetColor(1.0, 1.0, 0.0);
@@ -743,7 +729,6 @@ void mafOpSegmentation::CreateOpDialog()
 	m_OkButton = new mafGUIButton(m_Dialog, ID_OK, _("Ok"), defPos);
 	m_OkButton->SetListener(this);
 	m_OkButton->SetValidator(mafGUIValidator(this, ID_OK, m_OkButton));
-	m_OkButton->Enable(false);
 
 	m_CancelButton = new mafGUIButton(m_Dialog, ID_CANCEL, _("Cancel"), defPos);
 	m_CancelButton->SetListener(this);
@@ -788,9 +773,9 @@ void mafOpSegmentation::CreateOpDialog()
 	//////////////////////////////////////////////////////////////////////////
 	// Segmentation Operations Phase Buttons
 
-	m_GuiDialog->TwoButtons(ID_BUTTON_PREV, ID_BUTTON_NEXT, _("Init"), _("Edit"), wxEXPAND | wxALL);
-	m_GuiDialog->Enable(ID_BUTTON_PREV, false);
-	m_GuiDialog->Enable(ID_BUTTON_NEXT, true);
+	m_GuiDialog->TwoButtons(ID_BUTTON_INIT, ID_BUTTON_EDIT, _("Init"), _("Edit"), wxEXPAND | wxALL);
+	m_GuiDialog->Enable(ID_BUTTON_INIT, false);
+	m_GuiDialog->Enable(ID_BUTTON_EDIT, true);
 	m_GuiDialog->Divider(1);
 
 	// Add Operation Phase Gui
@@ -840,11 +825,11 @@ void mafOpSegmentation::CreateSliceNavigationGui()
 	m_SliceText = slice_text;
 
 	m_SliceIndex = 1;
-	m_SliceSlider = new wxSlider(m_GuiDialog, ID_SLICE_SLIDER, m_SliceIndex, 1, m_VolumeDimensions[2], defPos, wxSize(64, 18));
+	m_SliceSlider = new wxSlider(m_GuiDialog, ID_SLICE_SLIDER, m_SliceIndex, 1, m_VolumeDims[2], defPos, wxSize(64, 18));
 	mafGUIButton *b_incr_slice = new mafGUIButton(m_GuiDialog, ID_SLICE_NEXT, ">", defPos, wxSize(18, 18));
 	mafGUIButton *b_decr_slice = new mafGUIButton(m_GuiDialog, ID_SLICE_PREV, "<", defPos, wxSize(18, 18));
 
-	slice_text->SetValidator(mafGUIValidator(this, ID_SLICE_TEXT, slice_text, &m_SliceIndex, m_SliceSlider, 1, m_VolumeDimensions[2]));
+	slice_text->SetValidator(mafGUIValidator(this, ID_SLICE_TEXT, slice_text, &m_SliceIndex, m_SliceSlider, 1, m_VolumeDims[2]));
 	m_SliceSlider->SetValidator(mafGUIValidator(this, ID_SLICE_SLIDER, m_SliceSlider, &m_SliceIndex, slice_text));
 
 	b_incr_slice->SetValidator(mafGUIValidator(this, ID_SLICE_NEXT, b_incr_slice));
@@ -986,17 +971,17 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 	brushSizeLab = new wxStaticText(currentGui, id, "Size (unit)", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
 
 	m_ManualBrushSizeText = new wxTextCtrl(currentGui, id, "", wxDefaultPosition, wxSize(40, 18));
-	m_ManualBrushSizeSlider = new mafGUIFloatSlider(currentGui, id, m_BrushSize, 1, int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 2), wxDefaultPosition, wxDefaultSize);
+	m_ManualBrushSizeSlider = new mafGUIFloatSlider(currentGui, id, m_BrushSize, 1, int(min(m_VolumeDims[0], m_VolumeDims[1]) / 2), wxDefaultPosition, wxDefaultSize);
 
-	m_ManualBrushSizeText->SetValidator(mafGUIValidator(currentGui, id, m_ManualBrushSizeText, &m_BrushSize, m_ManualBrushSizeSlider, 1, int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 2)));
+	m_ManualBrushSizeText->SetValidator(mafGUIValidator(currentGui, id, m_ManualBrushSizeText, &m_BrushSize, m_ManualBrushSizeSlider, 1, int(min(m_VolumeDims[0], m_VolumeDims[1]) / 2)));
 	m_ManualBrushSizeSlider->SetValidator(mafGUIValidator(currentGui, id, m_ManualBrushSizeSlider, &m_BrushSize, m_ManualBrushSizeText));
 
 	m_BrushSize = 1;
 	m_ManualBrushSizeSlider->SetValue(m_BrushSize);
 	m_ManualBrushSizeText->SetValue("1");
-	m_ManualBrushSizeSlider->SetNumberOfSteps(int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 4) - 2);
-	m_ManualBrushSizeSlider->SetRange(1, int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 4), 1);
-	m_ManualBrushSizeSlider->SetMax(int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 4));
+	m_ManualBrushSizeSlider->SetNumberOfSteps(int(min(m_VolumeDims[0], m_VolumeDims[1]) / 4) - 2);
+	m_ManualBrushSizeSlider->SetRange(1, int(min(m_VolumeDims[0], m_VolumeDims[1]) / 4), 1);
+	m_ManualBrushSizeSlider->SetMax(int(min(m_VolumeDims[0], m_VolumeDims[1]) / 4));
 	m_ManualBrushSizeSlider->SetMin(1);
 	m_ManualBrushSizeSlider->Update();
 	m_ManualBrushSizeText->Update();
@@ -1021,8 +1006,8 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 	m_ManualRangeSlider = new mafGUILutSlider(currentGui, -1, wxPoint(0, 0), wxSize(195, 24));
 	m_ManualRangeSlider->SetListener(this);
 	m_ManualRangeSlider->SetText(1, "Slices");
-	m_ManualRangeSlider->SetRange(1, m_VolumeDimensions[2]);
-	m_ManualRangeSlider->SetSubRange(1, m_VolumeDimensions[2]);
+	m_ManualRangeSlider->SetRange(1, m_VolumeDims[2]);
+	m_ManualRangeSlider->SetSubRange(1, m_VolumeDims[2]);
 
 	m_BucketEditingSizer->Add(globalCheck, 0, wxALL, 1);
 	m_BucketEditingSizer->Add(m_ManualRangeSlider, 0, wxALL, 1);
@@ -1191,7 +1176,7 @@ void mafOpSegmentation::UpdateWindowing()
 //----------------------------------------------------------------------------
 void mafOpSegmentation::UpdateSliderValidator()
 {
-	int sliceMax = m_VolumeDimensions[m_SlicePlane];
+	int sliceMax = m_VolumeDims[m_SlicePlane];
 
 	m_SliceSlider->SetRange(1, sliceMax);
 	m_SliceText->SetValidator(mafGUIValidator(this, ID_SLICE_TEXT, m_SliceText, &m_SliceIndex, m_SliceSlider, 1, sliceMax));
@@ -1213,7 +1198,7 @@ void mafOpSegmentation::UpdateSlice()
 void mafOpSegmentation::UpdateSliceLabel()
 {
 	// Update slice text actor   
-	wxString text = wxString::Format("Slice = %d of %d", m_SliceIndex, m_VolumeDimensions[m_SlicePlane]);
+	wxString text = wxString::Format("Slice = %d of %d", m_SliceIndex, m_VolumeDims[m_SlicePlane]);
 	m_AutomaticSliceTextMapper->SetInput(text);
 }
 //----------------------------------------------------------------------------
@@ -1459,10 +1444,10 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 				m_IsDrawing = false;
 			}
 			break;
-		case ID_BUTTON_NEXT:
+		case ID_BUTTON_EDIT:
 			OnEditStep();
 			break;
-		case ID_BUTTON_PREV:
+		case ID_BUTTON_INIT:
 			OnPreviousStep();
 			break;
 		case ID_SLICE_NEXT:
@@ -1601,8 +1586,8 @@ void mafOpSegmentation::OnEditStep()
 	m_AppendingOpGui->AddGui(m_SegmentationOperationsGui[EDIT_SEGMENTATION]);
 	m_AppendingOpGui->FitGui();
 
-	m_GuiDialog->Enable(ID_BUTTON_PREV, true);
-	m_GuiDialog->Enable(ID_BUTTON_NEXT, false);
+	m_GuiDialog->Enable(ID_BUTTON_INIT, true);
+	m_GuiDialog->Enable(ID_BUTTON_EDIT, false);
 	m_GuiDialog->FitGui();
 	m_Dialog->Update();
 	
@@ -1619,9 +1604,9 @@ void mafOpSegmentation::OnEditStep()
 	m_BrushSize = 1;
 	m_ManualBrushSizeSlider->SetValue(m_BrushSize);
 	m_ManualBrushSizeText->SetValue("1");
-	m_ManualBrushSizeSlider->SetNumberOfSteps(int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 4) - 2);
-	m_ManualBrushSizeSlider->SetRange(1, int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 4), 1);
-	m_ManualBrushSizeSlider->SetMax(int(min(m_VolumeDimensions[0], m_VolumeDimensions[1]) / 4));
+	m_ManualBrushSizeSlider->SetNumberOfSteps(int(min(m_VolumeDims[0], m_VolumeDims[1]) / 4) - 2);
+	m_ManualBrushSizeSlider->SetRange(1, int(min(m_VolumeDims[0], m_VolumeDims[1]) / 4), 1);
+	m_ManualBrushSizeSlider->SetMax(int(min(m_VolumeDims[0], m_VolumeDims[1]) / 4));
 	m_ManualBrushSizeSlider->SetMin(1);
 	m_ManualBrushSizeSlider->Update();
 	m_ManualBrushSizeText->Update();
@@ -1641,9 +1626,8 @@ void mafOpSegmentation::OnEditStep()
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_PICKING_MODALITY, m_SlicePlane);
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, false);
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
-	m_GuiDialog->Enable(EDIT_SEGMENTATION, true);
-
-	m_GuiDialog->Enable(ID_BUTTON_NEXT, true);
+	
+	m_GuiDialog->Enable(ID_BUTTON_EDIT, false);
 	
 	m_ManualSegmentationTools = 0;
 	m_View->GetWindow()->SetCursor(cursor);
@@ -1672,8 +1656,8 @@ void mafOpSegmentation::OnPreviousStep()
 	m_AppendingOpGui->AddGui(m_SegmentationOperationsGui[INIT_SEGMENTATION]);
 	m_AppendingOpGui->FitGui();
 
-	m_GuiDialog->Enable(ID_BUTTON_PREV, false);
-	m_GuiDialog->Enable(ID_BUTTON_NEXT, true);
+	m_GuiDialog->Enable(ID_BUTTON_INIT, false);
+	m_GuiDialog->Enable(ID_BUTTON_EDIT, true);
 	m_GuiDialog->FitGui();
 	m_Dialog->Update();
 
@@ -1704,7 +1688,6 @@ void mafOpSegmentation::OnInitEvent(mafEvent *e)
 	{
 		OnChangeThresholdType();
 		OnThresholdUpate();
-		m_GuiDialog->Enable(ID_BUTTON_NEXT, (m_InitModality == RANGE_INIT && m_RangesVector.size() > 0) || (m_InitModality == FALSE));
 	}
 	break;
 	case ID_RANGE_SELECTION:
@@ -1941,112 +1924,45 @@ void mafOpSegmentation::OnLoadSegmentation()
 //----------------------------------------------------------------------------
 bool mafOpSegmentation::SegmentedVolumeAccept(mafVME*node)
 {
-	/* TODO fix checks*/
-	if (node != NULL  \
-		&& node->IsMAFType(mafVMEVolumeGray) \
-		&& m_CurrentVolumeParametersInitialized \
-		&& mafVMEVolumeGray::SafeDownCast(node)->GetOutput() != NULL \
-		&& mafVMEVolumeGray::SafeDownCast(node)->GetOutput()->GetVTKData() != NULL \
-		)
+	if (node != NULL && node != glo_CurrSeg && node->IsMAFType(mafVMEVolumeGray)	&& (mafVMEVolumeGray *)node->GetOutput() != NULL && (mafVMEVolumeGray *)node->GetOutput()->GetVTKData() != NULL)
 	{
-		mafVMEVolumeGray *volumeToCheck = mafVMEVolumeGray::SafeDownCast(node);
+		mafVMEVolumeGray *volumeToCheck = (mafVMEVolumeGray *)node;
 		volumeToCheck->Update();
 		/* loaded volume is of the same vtk type of the input volume */
-		if (volumeToCheck->GetOutput()->GetVTKData()->GetDataObjectType() != m_InputVtkType)
-		{
+		vtkImageData * imageData = vtkImageData::SafeDownCast(volumeToCheck->GetOutput()->GetVTKData());
+		if (imageData == NULL)
 			return false;
-		}
-		/* loaded volume must have the same bounds of the input volume */
+		imageData->Update();
 
+		/* loaded volume must have the same bounds of the input volume */
 		double checkVolBounds[6];
 		int checkVolDim[3];
 		double checkVolSpacing[3];
 
-		volumeToCheck->GetOutput()->GetBounds(checkVolBounds);
+		imageData->GetDimensions(checkVolDim);
+		imageData->GetSpacing(checkVolSpacing);
+		for (int i = 0; i < 3; i++)
+			if (checkVolDim[i] != glo_CurrVolDims[i] || checkVolSpacing[i] != glo_CurrVolSpacing[i])
+				return false;
 
-		//Vtk save/load system writes outputs to strings so there can be some approximations problem 
-		//that can affect saved versus unsaved data comparison 
-		//For this reason we need to compare data bounds after a conversion to string 
-		if (!vtkImageData::SafeDownCast(volumeToCheck->GetOutput()->GetVTKData()))
-		{
-			//Rectilinear grid: we compare only the bound of the volume
-			for (int i = 0; i < 6; i++)
-			{
-				double cVolBound, bVolBound;
-				std::stringstream cVolBoundStr, bVolBoundStr;
-				//We use stringstream to simulate VTK use of filestream
-				cVolBoundStr << m_CurrentVolumeBounds[i];
-				bVolBoundStr << checkVolBounds[i];
-				cVolBoundStr >> cVolBound;
-				bVolBoundStr >> bVolBound;
-
-				if ((cVolBound != bVolBound))
-				{
-					return false;
-				}
-			}
-		}
-		else
-		{
-			//Image data case: We need to simulate VTK bounds calculus.
-			//VTK does not saves the bound of the volume to disk
-			//it saves origin, spacing, and dimensions (as number of voxels)
-			//Then on loading it recalculate the bounds from this data, and obtain 
-			//an amplification of the approximation error.
-			//In this case we need to simulate this process of error amplification.
-			vtkImageData::SafeDownCast(volumeToCheck->GetOutput()->GetVTKData())->GetDimensions(checkVolDim);
-			vtkImageData::SafeDownCast(volumeToCheck->GetOutput()->GetVTKData())->GetSpacing(checkVolSpacing);
-			for (int i = 0; i < 3; i++)
-			{
-				double cVolBound, bVolBound;
-				std::stringstream cVolBoundStr, bVolBoundStr;
-				cVolBoundStr << m_CurrentVolumeBounds[i];
-				bVolBoundStr << checkVolBounds[i];
-				cVolBoundStr >> cVolBound;
-				bVolBoundStr >> bVolBound;
-
-				if ((cVolBound != bVolBound))
-				{
-					return false;
-				}
-			}
-			for (int i = 0; i < 3; i++)
-			{
-				double cVolBound, bVolBound, cVolSpacing, bVolSpacing, cVolTot, bVolTot;
-				std::stringstream cVolBoundStr, bVolBoundStr, cVolSpacingStr, bVolSpacingStr;
-				cVolBoundStr << m_CurrentVolumeBounds[i];
-				bVolBoundStr << checkVolBounds[i];
-				cVolBoundStr >> cVolBound;
-				bVolBoundStr >> bVolBound;
-
-				//converting both origin and spacing to strings
-				cVolSpacingStr << m_CurrentVolumeSpacing[i];
-				bVolSpacingStr << checkVolSpacing[i];
-				cVolSpacingStr >> cVolSpacing;
-				bVolSpacingStr >> bVolSpacing;
-
-				cVolTot = cVolBound + cVolSpacing*checkVolDim[i];
-				bVolTot = bVolBound + bVolSpacing*m_CurrentVolumeDimensions[i];
-
-				if ((cVolTot != bVolTot || checkVolDim[i] != m_CurrentVolumeDimensions[i]))
-				{
-					return false;
-				}
-			}
-		}
+		imageData->GetBounds(checkVolBounds);
+		for (int i = 0; i < 6; i++)
+			if (checkVolBounds[i] != glo_CurrVolBounds[i])
+				return false;
 
 		/* scalar range should be 0 - 255 */
 		double sr[2];
-		volumeToCheck->GetOutput()->Update();
-		volumeToCheck->GetOutput()->GetVTKData()->Update();
-		if (vtkDataSet::SafeDownCast(volumeToCheck->GetOutput()->GetVTKData())->GetPointData() != NULL && vtkDataSet::SafeDownCast(volumeToCheck->GetOutput()->GetVTKData())->GetPointData()->GetScalars() != NULL)
+		if (imageData->GetPointData() != NULL && imageData->GetPointData()->GetScalars() != NULL)
 		{
-			vtkDataSet::SafeDownCast(volumeToCheck->GetOutput()->GetVTKData())->GetPointData()->GetScalars()->GetRange(sr);
+			imageData->GetPointData()->GetScalars()->GetRange(sr);
 			if (sr[0] < 0 || sr[1] > 255) /* scalar range could be 0-0 empty masc or 255-255 full mask */
-			{
 				return false;
-			}
 		}
+		else
+		{
+			return false;
+		}
+		
 		return true;
 	}
 
@@ -2270,8 +2186,6 @@ void mafOpSegmentation::OnEditStepExit()
   m_SER->GetAction("pntActionAutomatic")->BindDevice(m_DialogMouse);
   m_SER->GetAction("pntActionAutomatic")->BindInteractor(m_InitPER);
    
-  m_GuiDialog->Enable(EDIT_SEGMENTATION,false);
-
   m_SnippetsLabel->SetLabel( _(""));
 }
 //----------------------------------------------------------------------------
@@ -2282,7 +2196,7 @@ void mafOpSegmentation::OnRefinementStep()
   m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, false);
   m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, false);
   m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_APPLY, true);
-  m_GuiDialog->Enable(ID_BUTTON_NEXT,false);
+  m_GuiDialog->Enable(ID_BUTTON_EDIT,false);
 
 	//logic stuff
   UpdateSlice();
@@ -2341,9 +2255,9 @@ void mafOpSegmentation::OnEventFloodFill(mafEvent *e)
 		}
 	}
 	double dims[3];
-	dims[0] = m_VolumeDimensions[0];
-	dims[1] = m_VolumeDimensions[1];
-	dims[2] = m_VolumeDimensions[2];
+	dims[0] = m_VolumeDims[0];
+	dims[1] = m_VolumeDims[1];
+	dims[2] = m_VolumeDims[2];
 
 	if (m_GlobalFloodFill != TRUE)
 	{
@@ -2371,6 +2285,11 @@ void mafOpSegmentation::StartDraw(mafEvent *e, bool erase)
 	if (erase) m_BrushModality = MANUAL_SEGMENTATION_ERASE;
 	else m_BrushModality = MANUAL_SEGMENTATION_SELECT;
 	
+	if (m_UndoList.size() == MAX_UNDOLIST_SIZE)
+	{
+		vtkDEL(m_UndoList[0].m_Scalars);
+		m_UndoList.erase(m_UndoList.begin());
+	}
 	m_UndoList.push_back(CreateUndoRedoState());
 
 	m_IsDrawing = true;
@@ -2438,7 +2357,7 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
 		wxBusyInfo wait(_("Wait! The algorithm could take long time!"));
 
 		vtkMAFSmartPointer <vtkImageData>dummy;
-		dummy->SetExtent(0, m_VolumeDimensions[0] - 1, 0, m_VolumeDimensions[1] - 1, 0, m_VolumeDimensions[2] - 1);
+		dummy->SetExtent(0, m_VolumeDims[0] - 1, 0, m_VolumeDims[1] - 1, 0, m_VolumeDims[2] - 1);
 		dummy->SetSpacing(m_VolumeSpacing);
 		dummy->SetOrigin(0, 0, 0);
 
@@ -2453,11 +2372,11 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
 		low--;
 
 		ext[0] = 0;
-		ext[1] = m_VolumeDimensions[0] - 1;
+		ext[1] = m_VolumeDims[0] - 1;
 		ext[2] = 0;
-		ext[3] = m_VolumeDimensions[1] - 1;
+		ext[3] = m_VolumeDims[1] - 1;
 		ext[4] = 0;
-		ext[5] = m_VolumeDimensions[2] - 1;
+		ext[5] = m_VolumeDims[2] - 1;
 
 		ext[m_SlicePlane * 2] = (int)low;
 		ext[m_SlicePlane * 2 + 1] = (int)hi;
@@ -2491,7 +2410,7 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
 			{
 				for (int z = ext[4]; z <= ext[5]; z++)
 				{
-					outScalars->SetTuple1(x + y * m_VolumeDimensions[0] + z * m_VolumeDimensions[1] * m_VolumeDimensions[0], output->GetPointData()->GetScalars()->GetTuple1((x - ext[0]) + (y - ext[2]) * (ext[1] - ext[0] + 1) + (z - ext[4]) *  (ext[1] - ext[0] + 1) * (ext[3] - ext[2] + 1)));
+					outScalars->SetTuple1(x + y * m_VolumeDims[0] + z * m_VolumeDims[1] * m_VolumeDims[0], output->GetPointData()->GetScalars()->GetTuple1((x - ext[0]) + (y - ext[2]) * (ext[1] - ext[0] + 1) + (z - ext[4]) *  (ext[1] - ext[0] + 1) * (ext[3] - ext[2] + 1)));
 				}
 			}
 		}
@@ -2525,20 +2444,20 @@ void mafOpSegmentation::FloodFill(vtkIdType seed)
 		{
 		case XY:
 		{
-			dimensions[0] = m_VolumeDimensions[0];
-			dimensions[1] = m_VolumeDimensions[1];
+			dimensions[0] = m_VolumeDims[0];
+			dimensions[1] = m_VolumeDims[1];
 			dimensions[2] = 1;
 		} break;
 		case XZ:
 		{
-			dimensions[0] = m_VolumeDimensions[0];
-			dimensions[1] = m_VolumeDimensions[2];
+			dimensions[0] = m_VolumeDims[0];
+			dimensions[1] = m_VolumeDims[2];
 			dimensions[2] = 1;
 		} break;
 		case YZ:
 		{
-			dimensions[0] = m_VolumeDimensions[1];
-			dimensions[1] = m_VolumeDimensions[2];
+			dimensions[0] = m_VolumeDims[1];
+			dimensions[1] = m_VolumeDims[2];
 			dimensions[2] = 1;
 		} break;
 		}
@@ -2587,32 +2506,32 @@ bool mafOpSegmentation::Refinement()
 
 		vtkMAFSmartPointer<vtkUnsignedCharArray> newScalars;
 		newScalars->SetName("SCALARS");
-		newScalars->SetNumberOfTuples(m_VolumeDimensions[0] * m_VolumeDimensions[1] * m_VolumeDimensions[2]);
+		newScalars->SetNumberOfTuples(m_VolumeDims[0] * m_VolumeDims[1] * m_VolumeDims[2]);
 
 		double point[3];
-		inputDataSet->GetPoint(m_SliceIndex*m_VolumeDimensions[0] * m_VolumeDimensions[1], point);
+		inputDataSet->GetPoint(m_SliceIndex*m_VolumeDims[0] * m_VolumeDims[1], point);
 
 		vtkDataArray *inputScalars = inputDataSet->GetPointData()->GetScalars();
 		vtkMAFSmartPointer<vtkUnsignedCharArray> scalars;
 		scalars->SetName("SCALARS");
-		scalars->SetNumberOfTuples(m_VolumeDimensions[0] * m_VolumeDimensions[1]);
+		scalars->SetNumberOfTuples(m_VolumeDims[0] * m_VolumeDims[1]);
 
 		if (m_RefinementEverySlice)
 		{
-			for (int i = 0; i < m_VolumeDimensions[2]; i++)
+			for (int i = 0; i < m_VolumeDims[2]; i++)
 			{
-				progress = (i * 100 / m_VolumeDimensions[2]);
+				progress = (i * 100 / m_VolumeDims[2]);
 				m_ProgressBar->SetValue(progress);
 				m_ProgressBar->Update();
 
-				for (int k = 0; k < (m_VolumeDimensions[0] * m_VolumeDimensions[1]); k++)
+				for (int k = 0; k < (m_VolumeDims[0] * m_VolumeDims[1]); k++)
 				{
-					unsigned char value = inputScalars->GetTuple1(k + i*(m_VolumeDimensions[0] * m_VolumeDimensions[1]));
+					unsigned char value = inputScalars->GetTuple1(k + i*(m_VolumeDims[0] * m_VolumeDims[1]));
 					scalars->SetTuple1(k, value);
 				}
 
 				vtkMAFSmartPointer<vtkStructuredPoints> im;
-				im->SetDimensions(m_VolumeDimensions[0], m_VolumeDimensions[1], 1);
+				im->SetDimensions(m_VolumeDims[0], m_VolumeDims[1], 1);
 				im->SetSpacing(m_VolumeSpacing[0], m_VolumeSpacing[1], 0.0);
 				im->GetPointData()->AddArray(scalars);
 				im->GetPointData()->SetActiveScalars("SCALARS");
@@ -2627,7 +2546,7 @@ bool mafOpSegmentation::Refinement()
 					for (int k = 0; k < filteredImage->GetNumberOfPoints(); k++)
 					{
 						unsigned char value = binaryScalars->GetTuple1(k);
-						newScalars->SetTuple1(k + i*(m_VolumeDimensions[0] * m_VolumeDimensions[1]), value);
+						newScalars->SetTuple1(k + i*(m_VolumeDims[0] * m_VolumeDims[1]), value);
 					}
 				}
 			}
@@ -2635,27 +2554,27 @@ bool mafOpSegmentation::Refinement()
 		}
 		else
 		{
-			for (int i = 0; i < m_VolumeDimensions[2]; i++)
+			for (int i = 0; i < m_VolumeDims[2]; i++)
 			{
 				if (i != m_SliceIndex - 1)
 					//if(i != zID)
 				{
-					for (int k = 0; k < (m_VolumeDimensions[0] * m_VolumeDimensions[1]); k++)
+					for (int k = 0; k < (m_VolumeDims[0] * m_VolumeDims[1]); k++)
 					{
-						unsigned char value = inputScalars->GetTuple1(k + i*(m_VolumeDimensions[0] * m_VolumeDimensions[1]));
-						newScalars->SetTuple1(k + i*(m_VolumeDimensions[0] * m_VolumeDimensions[1]), value);
+						unsigned char value = inputScalars->GetTuple1(k + i*(m_VolumeDims[0] * m_VolumeDims[1]));
+						newScalars->SetTuple1(k + i*(m_VolumeDims[0] * m_VolumeDims[1]), value);
 					}
 				}
 				else
 				{
-					for (int k = 0; k < (m_VolumeDimensions[0] * m_VolumeDimensions[1]); k++)
+					for (int k = 0; k < (m_VolumeDims[0] * m_VolumeDims[1]); k++)
 					{
-						unsigned char value = inputScalars->GetTuple1(k + i*(m_VolumeDimensions[0] * m_VolumeDimensions[1]));
+						unsigned char value = inputScalars->GetTuple1(k + i*(m_VolumeDims[0] * m_VolumeDims[1]));
 						scalars->SetTuple1(k, value);
 					}
 
 					vtkMAFSmartPointer<vtkStructuredPoints> im;
-					im->SetDimensions(m_VolumeDimensions[0], m_VolumeDimensions[1], 1);
+					im->SetDimensions(m_VolumeDims[0], m_VolumeDims[1], 1);
 					im->SetSpacing(m_VolumeSpacing[0], m_VolumeSpacing[1], 0.0);
 					im->GetPointData()->AddArray(scalars);
 					im->GetPointData()->SetActiveScalars("SCALARS");
@@ -2670,7 +2589,7 @@ bool mafOpSegmentation::Refinement()
 						for (int k = 0; k < filteredImage->GetNumberOfPoints(); k++)
 						{
 							unsigned char value = binaryScalars->GetTuple1(k);
-							newScalars->SetTuple1(k + i*(m_VolumeDimensions[0] * m_VolumeDimensions[1]), value);
+							newScalars->SetTuple1(k + i*(m_VolumeDims[0] * m_VolumeDims[1]), value);
 						}
 					}
 				}

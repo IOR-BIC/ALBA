@@ -127,8 +127,8 @@ public:
     ID_MANUAL_CANCEL,
     ID_MANUAL_UNDO, 
     ID_MANUAL_REDO,
-    ID_BUTTON_PREV,
-    ID_BUTTON_NEXT,
+    ID_BUTTON_INIT,
+    ID_BUTTON_EDIT,
     ID_AUTO_THRESHOLD,
     ID_AUTO_INC_MIN_THRESHOLD,
     ID_AUTO_INC_MAX_THRESHOLD,
@@ -232,10 +232,7 @@ protected:
   /** Initialize the slice */
   void InitializeView();
   
-  /** Initialize the volume spacing attribute */
-  void InitVolumeSpacing();
-  
-  /** Initialize the Interactors  */
+	/** Initialize the Interactors  */
   void InitializeInteractors();
   
   /** Init GUI slice slider with volume parameters. */
@@ -292,10 +289,9 @@ protected:
 	vtkImageData     *m_SegmentationSlice;
   
 	double m_SliceOrigin[3];            //<Origin of the slice plane
-  int m_VolumeDimensions[3];          //<Dimensions of the volumes (number of slices)
+  int m_VolumeDims[3];          //<Dimensions of the volumes (number of slices)
   double m_VolumeSpacing[3];          //<Volume spacing
   double m_VolumeBounds[6];           //<Volume bounds
-  bool m_VolumeParametersInitialized; //<Specify if volume parameters are initialized
 	int m_SliceIndex;								//GuiVariable
 	int m_OldSliceIndex;								//GuiVariable
 		int m_SliceIndexByPlane[3];            //<Index of the current slice position
