@@ -55,29 +55,28 @@
 #include "vtkSphereSource.h"
 
 #include <assert.h>
+#include "wx\event.h"
+#include "wx\generic\panelg.h"
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafInteractorPERBrushFeedback)
+
+
 //------------------------------------------------------------------------------
 mafInteractorPERBrushFeedback::mafInteractorPERBrushFeedback()
-//------------------------------------------------------------------------------
 {
 }
 
 //------------------------------------------------------------------------------
 mafInteractorPERBrushFeedback::~mafInteractorPERBrushFeedback()
-//------------------------------------------------------------------------------
 {
-
 }
 
 //------------------------------------------------------------------------------
 void mafInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
-//------------------------------------------------------------------------------
 {
   // Make the superclass to manage StartInteractionEvent
   // and StopInteractionEvent: this will make OnStart/StopInteraction()
   // to be called, or eventually the event to be forwarded.
-  Superclass::OnEvent(event);
 
   mafID ch = event->GetChannel();
 
@@ -87,13 +86,23 @@ void mafInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
     mafDevice *device = (mafDevice *)event->GetSender();
     assert(device);
 
+		mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
+
     if (id == mafDeviceButtonsPadMouse::GetMouseCharEventId() && !IsInteracting(device))
     {
-      mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
       OnChar(e);
     }
+		else if (id == mafDeviceButtonsPadMouse::GetWheelId() && e->GetModifier(MAF_SHIFT_KEY))
+		{
+			long rotation = *(double *)e->GetData();
 
-		
+			mafEvent scrollEvent(this, MOUSE_WHEEL, rotation);
+			scrollEvent.SetPointer(m_PickPosition);
+			mafEventMacro(scrollEvent);
+			
+			return;
+		}
+
     // find if this device is one of those currently interacting
     if (IsInteracting(device))
     {
@@ -101,7 +110,6 @@ void mafInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
       // process the Move event
       if (id == mafDeviceButtonsPadTracker::GetTracker3DMoveId() || id == mafDeviceButtonsPadMouse::GetMouse2DMoveId())
       {
-        mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
         OnMove(e);
       }
       // In any case, forward the event to the right behavior
@@ -127,7 +135,6 @@ void mafInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
     else
     {
       double mouse_pos[2];
-      mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
       e->Get2DPosition(mouse_pos);
       bool picked_something = false;
 
@@ -169,5 +176,6 @@ void mafInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
       vtkDEL(cellPicker);
     }
   }
-}
 
+	Superclass::OnEvent(event);
+}

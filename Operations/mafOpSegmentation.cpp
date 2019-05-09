@@ -1425,7 +1425,9 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 					m_BrushSize++;
 				else
 					m_BrushSize--;
+
 				ApplyRealDrawnImage();
+				m_Helper.DrawBrush((double *)e->GetPointer(), m_SlicePlane, m_BrushSize, m_BrushShape, m_BrushModality);
 				m_View->CameraUpdate();
 				m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
 				break;

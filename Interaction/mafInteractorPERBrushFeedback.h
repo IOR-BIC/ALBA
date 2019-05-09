@@ -34,7 +34,7 @@ class vtkSphereSource;
 
 /** Segmentation Editing Interactor
 */
-class MAF_EXPORT mafInteractorPERBrushFeedback : public mafInteractorPER
+class MAF_EXPORT mafInteractorPERBrushFeedback :  public mafInteractorPER
 {
 public: 
   
@@ -42,7 +42,6 @@ public:
 
   /* Main event handler */
   virtual void OnEvent(mafEventBase *event);
- 
   
 protected:
   /** constructor. */
@@ -52,5 +51,6 @@ protected:
   
   bool m_MouseDown;
 	double m_PickPosition[3];
+
 };
 #endif 
