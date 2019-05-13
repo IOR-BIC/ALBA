@@ -262,6 +262,9 @@ EVT_START,
   LOG_ALL_EVENT,
 	LOG_TO_FILE,
 
+	KEY_PRESS,
+	KEY_RELEASE,
+
   //used by mafISATransform to talk with mafOpTransform 
 	MOUSE_DOWN, //(to be removed Marco)
 	MOUSE_MOVE, //(to be removed Marco)

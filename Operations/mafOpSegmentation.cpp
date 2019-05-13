@@ -101,6 +101,11 @@
 
 #include "wx/busyinfo.h"
 #include "wx/sizer.h"
+#include "mafLogicWithManagers.h"
+#include "wx/mac/classic/bitmap.h"
+#include "mafServiceLocator.h"
+#include "mafAbsLogicManager.h"
+#include "mafOpManager.h"
 
 #define SPACING_PERCENTAGE_BOUNDS 0.1
 
@@ -229,6 +234,7 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
 //----------------------------------------------------------------------------
 mafOpSegmentation::~mafOpSegmentation()
 {
+	m_CursorImageVect.clear();
 }
 //----------------------------------------------------------------------------
 bool mafOpSegmentation::Accept(mafVME *node)
@@ -338,6 +344,9 @@ void mafOpSegmentation::OpStop(int result)
   ResetRefinementUndoList();
   ResetRefinementRedoList();
 
+	// Restore old EventFilterFunc
+	//((mafLogicWithManagers*)GetLogicManager())->SetEventFilterFunc(m_OldEventFunc);
+
   mafEventMacro(mafEvent(this,result));
 }
 
@@ -357,6 +366,7 @@ void mafOpSegmentation::InitializeView()
 //----------------------------------------------------------------------------
 void mafOpSegmentation::Init()
 {
+	InitMouseCursors();
 	InitSegmentationVolume();
 	InitializeInteractors();
 	InitVolumeSpacing();
@@ -370,6 +380,10 @@ void mafOpSegmentation::Init()
 
 	OnSelectSlicePlane();
 	OnChangeThresholdType();
+	
+	// Save prev EventFilterFunct and Set Current Function
+	//m_OldEventFunc = ((mafLogicWithManagers*)GetLogicManager())->GetEventFilterFunc();
+	((mafLogicWithManagers*)GetLogicManager())->SetEventFilterFunc(&mafOpSegmentation::OpSegmentationEventFilter);
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentation::InitSegmentationVolume()
@@ -1635,8 +1649,7 @@ void mafOpSegmentation::OnEditStep()
 
 	m_AutomaticScalarTextMapper->SetInput("");
 
-	wxCursor cursor = wxCursor(wxCURSOR_PENCIL);
-	m_View->GetWindow()->SetCursor(cursor);
+	SetCursor(CUR_PENCIL);
 
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_PICKING_MODALITY, m_SlicePlane);
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, false);
@@ -1646,7 +1659,6 @@ void mafOpSegmentation::OnEditStep()
 	m_GuiDialog->Enable(ID_BUTTON_NEXT, true);
 	
 	m_ManualSegmentationTools = 0;
-	m_View->GetWindow()->SetCursor(cursor);
 
 	EnableSizerContent(m_BucketEditingSizer, false);
 	EnableSizerContent(m_BrushEditingSizer, true);
@@ -2074,8 +2086,7 @@ void mafOpSegmentation::OnEditSegmentationEvent(mafEvent *e)
 		{
 			m_ManualSegmentationTools = 0;
 
-			wxCursor cursor = wxCursor(wxCURSOR_PENCIL);
-			m_View->GetWindow()->SetCursor(cursor);
+			SetCursor(CUR_PENCIL);
 
 			EnableSizerContent(m_BucketEditingSizer, false);
 			EnableSizerContent(m_BrushEditingSizer, true);
@@ -2086,8 +2097,7 @@ void mafOpSegmentation::OnEditSegmentationEvent(mafEvent *e)
 		{
 			m_ManualSegmentationTools = 1;
 
-			wxCursor cursor = wxCursor(wxCURSOR_SPRAYCAN);
-			m_View->GetWindow()->SetCursor(cursor);
+			SetCursor(CUR_FILL);
 
 			EnableSizerContent(m_BucketEditingSizer, true);
 			EnableSizerContent(m_BrushEditingSizer, false);
@@ -2260,11 +2270,11 @@ void mafOpSegmentation::OnEditStepExit()
 	ClearManualUndoList();
 	ClearManualRedoList();
 
-  //Gui stuff
-  //set default cursor - remove draw actor  
-  wxCursor cursor = wxCursor( wxCURSOR_DEFAULT );
-  m_View->GetWindow()->SetCursor(cursor);
-  //logic stuff
+  // Gui stuff
+  // Set default cursor - Remove draw actor
+	SetCursor(CUR_DEFAULT);
+
+  // Logic stuff
   m_SER->GetAction("pntEditingAction")->UnBindInteractor(m_EditPER);
   m_SER->GetAction("pntEditingAction")->UnBindDevice(m_DialogMouse);
   m_SER->GetAction("pntActionAutomatic")->BindDevice(m_DialogMouse);
@@ -2820,4 +2830,131 @@ void mafOpSegmentation::ResetRefinementUndoList()
   for (int i=0;i<m_RefinementUndoList.size();i++)
     vtkDEL(m_RefinementUndoList[i]);
   m_RefinementUndoList.clear();
+}
+
+//----------------------------------------------------------------------------
+int mafOpSegmentation::OpSegmentationEventFilter(wxEvent& event)
+{	
+	int keyCode = ((wxKeyEvent&)event).GetKeyCode();
+
+	bool controlKeyDown = ((wxKeyEvent&)event).ControlDown();
+	bool altKeyDown= ((wxKeyEvent&)event).AltDown();
+	bool shiftKeyDown = ((wxKeyEvent&)event).ShiftDown();
+
+	mafAbsLogicManager *logic = mafServiceLocator::GetLogicManager();
+	mafOp *op = logic->GetOpManager()->GetRunningOperation();
+
+	//////////////////////////////////////////////////////////////////////////
+	// Press Button
+	if (event.GetEventType() == wxEVT_KEY_DOWN)
+	{
+		((mafOpSegmentation*)op)->PressKey(keyCode, controlKeyDown, altKeyDown, shiftKeyDown);
+		return true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	// Release Button
+	if (event.GetEventType() == wxEVT_KEY_UP)
+	{
+		((mafOpSegmentation*)op)->ReleaseKey(keyCode, controlKeyDown, altKeyDown, shiftKeyDown);
+		return true;
+	}
+
+	return -1;
+}
+
+//----------------------------------------------------------------------------
+void mafOpSegmentation::PressKey(int keyCode, bool ctrl, bool alt, bool shift)
+{
+	if (m_CurrentPhase == INIT_SEGMENTATION)// && (m_InitModality
+	{
+		if (alt)
+		{
+			SetCursor(CUR_COLOR_PICK_MAX);
+		}
+		else if (ctrl)
+		{
+			SetCursor(CUR_COLOR_PICK_MIN);
+		}
+	}
+	else if (m_CurrentPhase = EDIT_SEGMENTATION)
+	{
+		if (m_ManualSegmentationTools == 0) // Erase
+		{
+			if (ctrl)
+			{
+				SetCursor(CUR_ERASE);
+			}
+		}
+		if (m_ManualSegmentationTools == 1) // Fill
+		{
+			if (ctrl)
+			{
+				SetCursor(CUR_FILL);
+			}
+		}
+	}
+	else SetCursor(CUR_DEFAULT);
+}
+
+//----------------------------------------------------------------------------
+void mafOpSegmentation::ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift)
+{
+	if (m_CurrentPhase == INIT_SEGMENTATION)// && (m_InitModality
+	{
+		SetCursor(CUR_COLOR_PICK_MIN);
+	}
+	else if (m_CurrentPhase = EDIT_SEGMENTATION)
+	{
+		if (m_ManualSegmentationTools == 0) // Draw
+		{
+			SetCursor(CUR_PENCIL);
+		}
+		if (m_ManualSegmentationTools == 1) // Fill
+		{
+			SetCursor(CUR_FILL);
+		}
+	} 
+	else SetCursor(CUR_DEFAULT);
+}
+
+//----------------------------------------------------------------------------
+void mafOpSegmentation::SetCursor(int cursorId)
+{
+	if (cursorId < 0)
+	{
+		m_View->GetWindow()->SetCursor(wxCursor(wxCURSOR_ARROW));
+	}
+	else
+	{
+		int spotX, spotY;
+
+		spotX = 0;
+		spotY = 63;
+
+		m_CursorImageVect[cursorId].SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, spotX);
+		m_CursorImageVect[cursorId].SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, spotY);
+
+		m_View->GetWindow()->SetCursor(wxCursor(m_CursorImageVect[cursorId]));
+	}
+}
+
+//----------------------------------------------------------------------------
+void mafOpSegmentation::InitMouseCursors()
+{
+#include "pic/Cursor/Pencil.xpm"
+#include "pic/Cursor/Pencil_Erase.xpm"
+#include "pic/Cursor/Fill.xpm"
+#include "pic/Cursor/Color_Pick.xpm"
+#include "pic/Cursor/Color_Pick_Up.xpm"
+#include "pic/Cursor/Color_Pick_Down.xpm"
+
+	m_CursorImageVect.clear();
+
+	m_CursorImageVect.push_back(wxImage(Pencil_xpm));
+	m_CursorImageVect.push_back(wxImage(Pencil_Erase_xpm));
+	m_CursorImageVect.push_back(wxImage(Fill_xpm));
+	m_CursorImageVect.push_back(wxImage(Color_Pick_xpm));
+	m_CursorImageVect.push_back(wxImage(Color_Pick_Up_xpm));
+	m_CursorImageVect.push_back(wxImage(Color_Pick_Down_xpm));
 }

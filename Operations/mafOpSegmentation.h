@@ -200,6 +200,10 @@ public:
   /** Return true if node is of type mafVMEVolume. */
   static bool SegmentedVolumeAccept(mafVME* node);
 	 
+	static int OpSegmentationEventFilter(wxEvent& event);
+
+	//eventfilterFunc m_OldEventFunc;
+
 protected:
 
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
@@ -433,8 +437,8 @@ protected:
   //Segmentation Refinement stuff
   /** Reset refinement undo list */
   void ResetRefinementUndoList();
-  
-  /** Reset refinement redo list */
+
+	/** Reset refinement redo list */
   void ResetRefinementRedoList();
 
   /** Apply refinement algorithm implemented with ITK (not used) */
@@ -482,6 +486,27 @@ protected:
   void OnEventFloodFill(mafEvent *e);
 
 	void InitRanges();
+
+	void PressKey(int keyCode, bool ctrl, bool alt, bool shift);
+
+	void InitMouseCursors();
+
+	void ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift);
+
+	std::vector<wxImage> m_CursorImageVect;
+
+	enum MOUSE_CURSOR
+	{
+		CUR_DEFAULT = -1, // Arrow
+		CUR_PENCIL,
+		CUR_ERASE,
+		CUR_FILL,
+		CUR_COLOR_PICK,
+		CUR_COLOR_PICK_MIN,
+		CUR_COLOR_PICK_MAX,
+	};
+
+	void SetCursor(int cursorId);
 
 private:
 
