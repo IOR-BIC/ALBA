@@ -68,14 +68,26 @@ public:
   /** Set the range of the double slider. */
 	void SetRange(double  rmin, double  rmax);
 
-  /** Get the range of the double slider. */
-  void GetRange(double *rmin, double *rmax) {*rmin = m_MinValue; *rmax = m_MaxValue;};
+	/** Set the range of the double slider. */
+	void SetRange(double *range) { SetRange(range[0], range[1]); };
+
+	/** Get the range of the double slider. */
+	void GetRange(double *rmin, double *rmax) { *rmin = m_MinValue; *rmax = m_MaxValue; };
+
+	/** Get the range of the double slider. */
+	void GetRange(double *range) { range[0] = m_MinValue; range[1] = m_MaxValue; };
 
   /** Set the values of the slider's cursors. */
   void SetSubRange(double  low, double  hi ); 
 
-  /** Get the values of the slider's cursors. */
-  void GetSubRange(double *low, double *hi ) {*low = m_LowValue; *hi = m_HighValue;};
+	/** Set the values of the slider's cursors. */
+	void SetSubRange(double *range) { SetSubRange(range[0], range[1]); };
+
+	/** Get the values of the slider's cursors. */
+	void GetSubRange(double *low, double *hi) { *low = m_LowValue; *hi = m_HighValue; };
+
+	/** Get the values of the slider's cursors. */
+	void GetSubRange(double *range) { range[0] = m_LowValue; range[1] = m_HighValue; };
 
   /** Set the position of the slider's cursors and send the event foe range modified. */
   void MoveButton(int id, int pos);

@@ -45,16 +45,14 @@ public:
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
 
-  /** Set Volume data. */
-  virtual int SetData(vtkImageData *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
-  /** Set Volume data. */
-  virtual int SetData(vtkRectilinearGrid *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
-
   /** return the right type of output */  
   mafVMEOutputVolume *GetVolumeOutput() {return (mafVMEOutputVolume *)GetOutput();}
 
   /** return the right type of output */  
   virtual mafVMEOutput *GetOutput();
+
+	/** private to avoid calling by external classes */
+	virtual int SetData(vtkDataSet *data, mafTimeStamp t, int mode = MAF_VME_COPY_DATA);
 
 protected:
   mafVMEVolumeGray();
@@ -67,8 +65,6 @@ private:
   mafVMEVolumeGray(const mafVMEVolumeGray&); // Not implemented
   void operator=(const mafVMEVolumeGray&); // Not implemented
   
-  /** private to avoid calling by external classes */
-  virtual int SetData(vtkDataSet *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 };
 
 #endif

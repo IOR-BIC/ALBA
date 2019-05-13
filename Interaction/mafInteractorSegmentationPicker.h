@@ -48,14 +48,16 @@ protected:
   /** Send to the listener picked point coordinate through vtkPoint and the corresponding scalar value found in that position. */
   void SendPickingInformation(mafView *v, double *mouse_pos = NULL, int msg_id = VME_PICKED, mafMatrix *tracker_pos = NULL, bool mouse_flag = true);
 
-  bool m_IsPicking;         //< Determine if interactor is picking
-  bool m_FullModifiersMode; //< Determine if picking modality is enabled with click and CTRL + click or with CTRL + click and ALT + click
-
   /** constructor. */
   mafInteractorSegmentationPicker();
 
   /** destructor. */
   virtual ~mafInteractorSegmentationPicker();
+
+
+	bool m_IsPicking;         //< Determine if interactor is picking
+	bool m_FullModifiersMode; //< Determine if picking modality is enabled with click and CTRL + click or with CTRL + click and ALT + click
+	double m_PickPosition[3];
 
 };
 #endif 

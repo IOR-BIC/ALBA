@@ -106,9 +106,12 @@ IF (MAF_USE_VTK)
 	mafOpTransform.cpp			mafOpTransform.h
 	mafOpMove.cpp				mafOpMove.h
 	mafOpScaleDataset.cpp		mafOpScaleDataset.h
-
 	mafOpCreateWrappedMeter.cpp
+
 	mafOpSegmentation.cpp  mafOpSegmentation.h
+	mafOpSegmentationHelper.cpp  mafOpSegmentationHelper.h
+
+
 	mafOpExtractGeometry.cpp  mafOpExtractGeometry.h  
 	mafOpCreateWrappedMeter.cpp	mafOpCreateWrappedMeter.h  
 	mafOpComputeWrapping.cpp	mafOpComputeWrapping.h    

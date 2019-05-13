@@ -614,7 +614,7 @@ void mafViewOrthoSlice::SetSlicePosition(long activeGizmoId, vtkPoints *p)
     case (GIZMO_XN)	:
     {
       // update the X normal child view
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSlice(m_GizmoHandlePosition);
     }
     break;
    
@@ -622,14 +622,14 @@ void mafViewOrthoSlice::SetSlicePosition(long activeGizmoId, vtkPoints *p)
     case (GIZMO_YN)	:
     {
       // update the Y normal child view
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);    
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSlice(m_GizmoHandlePosition);    
     }
     break;
 
     case (GIZMO_ZN)	:
     {
       // update the Z normal child view
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSlice(m_GizmoHandlePosition);
     }
     break;
 
@@ -646,7 +646,7 @@ void mafViewOrthoSlice::SetSlicePosition(long activeGizmoId, vtkPoints *p)
   }
 
   // always update the child perspective view
-  ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_PERSPECTIVE_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+  ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_PERSPECTIVE_VIEW]))->SetSlice(m_GizmoHandlePosition);
   
 
   this->CameraUpdate();
