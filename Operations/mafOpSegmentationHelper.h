@@ -37,6 +37,10 @@ struct AutomaticInfoRange
 	double m_Threshold[2];
 };
 
+typedef struct {
+	int x, y;
+} slicePoint;
+
 enum PLANE_TYPE
 {
 	YZ = 0,
@@ -70,6 +74,8 @@ public:
 
 
 	void DrawBrush(double *pos, int slicePlane, int brushSize, int brushShape, bool erase);
+
+	void Fill(double *pos, int slicePlane, double thresholdPerc,  bool erase);
 protected:
 
 	void InternalTheshold(int dataType, double *threshold, int n, void * inputPointer, unsigned char * outputPointer, int offset = 0);
@@ -77,11 +83,18 @@ protected:
 	template<typename DataType>
 	void InternalThreshold(double *threshold, int n, DataType *inputScalars, unsigned char *outputScalars, int offset);
 
-	
+	template<typename DataType>
+	void InternalFill(slicePoint startPoint, double minValue, double maxValue, int fillValue, DataType *inputScalars, unsigned char *outputScalars);
+
+
+	void GetSlicePoint(int slicePlane, double *pos, int *sclicePoint);
+
 	mafVMEVolumeGray *m_Volume;
 	mafVMEVolumeGray *m_Segmentation;
 	vtkImageData     *m_SegmetationSlice;
 	vtkImageData     *m_VolumeSlice;
 };
+
+
 
 #endif

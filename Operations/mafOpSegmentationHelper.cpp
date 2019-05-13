@@ -22,8 +22,11 @@
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 #include "vtkRectilinearGrid.h"
+#include <vector>
 
 #define ROUND(X) floor((X)+0.5)
+
+
 
 //----------------------------------------------------------------------------
 mafOpSegmentationHelper::mafOpSegmentationHelper()
@@ -191,7 +194,6 @@ void mafOpSegmentationHelper::ApplySliceChangesToVolume(int slicePlane, int slic
 		unsigned char *volScalarsPointer = (unsigned char *)volScalars->GetVoidPointer(0);
 		unsigned char *segScalarPointer = (unsigned char *)m_SegmetationSlice->GetPointData()->GetScalars()->GetVoidPointer(0);;
 
-		int numberOfPoints;
 		int numberOfSlices = 1;
 
 		if (slicePlane == XY)
@@ -235,45 +237,22 @@ void mafOpSegmentationHelper::ApplySliceChangesToVolume(int slicePlane, int slic
 //----------------------------------------------------------------------------
 void mafOpSegmentationHelper::DrawBrush(double *pos, int slicePlane, int brushSize, int brushShape, bool erase)
 {
-	int fillValue;
-	int sliceDim[3];
-	double bounds[6];
-	double sliceSpacing[3];
-	double sclicePos[2];
-	double distX, distY;
+	int fillValue, sliceDim[3], point[2];
+	double  distX, distY;
 
 	vtkDataArray *outputScalars = m_SegmetationSlice->GetPointData()->GetScalars();
 	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
-
-	m_SegmetationSlice->GetDimensions(sliceDim);
-	m_SegmetationSlice->GetSpacing(sliceSpacing);
-	m_Segmentation->GetOutput()->GetVTKData()->GetBounds(bounds);
-
-	brushSize/=2;
+		
+	brushSize /= 2;
 	fillValue = erase ? EMPTY : FULL;
 
-	if (slicePlane == XY)
-	{
-		sclicePos[0] = pos[0] - bounds[0];
-		sclicePos[1] = pos[1] - bounds[2];
-	}
-	else if (slicePlane == YZ)
-	{
-		sclicePos[0] = pos[1] - bounds[2]; 
-		sclicePos[1] = pos[2] - bounds[4];
-	}
-	else if (slicePlane == XZ)
-	{
-		sclicePos[0] = pos[0] - bounds[0];
-		sclicePos[1] = pos[2] - bounds[4];
-	}
+	m_SegmetationSlice->GetDimensions(sliceDim);
+	GetSlicePoint(slicePlane, pos, point);
 
-	int pointX = ROUND(sclicePos[0] / sliceSpacing[0]);
-	int pointY = ROUND(sclicePos[1] / sliceSpacing[1]);
-	int startX = MAX(0,pointX - brushSize);
-	int endX   = MIN(sliceDim[0]-1, pointX + brushSize);
-	int startY = MAX(0, pointY - brushSize);
-	int endY   = MIN(sliceDim[1] - 1,pointY + brushSize);
+	int startX = MAX(0,point[0] - brushSize);
+	int endX   = MIN(sliceDim[0]-1, point[0] + brushSize);
+	int startY = MAX(0, point[1] - brushSize);
+	int endY   = MIN(sliceDim[1] - 1,point[1] + brushSize);
 
 	if (brushShape == SQUARE_BRUSH_SHAPE)
 	{
@@ -285,10 +264,10 @@ void mafOpSegmentationHelper::DrawBrush(double *pos, int slicePlane, int brushSi
 	{
 		for (int i = startY; i <= endY; i++)
 		{
-			distY = i - pointY;
+			distY = i - point[1];
 			for (int j = startX; j <= endX; j++)
 			{
-				distX = j - pointX;
+				distX = j - point[0];
 				if (sqrt((distX*distX) + (distY*distY)) <= brushSize)
 					outputPointer[i*sliceDim[0] + j] = fillValue;
 			}
@@ -297,3 +276,174 @@ void mafOpSegmentationHelper::DrawBrush(double *pos, int slicePlane, int brushSi
 	outputScalars->Modified();
 }
 
+//----------------------------------------------------------------------------
+void mafOpSegmentationHelper::GetSlicePoint(int slicePlane, double * pos, int * sclicePoint)
+{
+	double bounds[6], slicePos[2], sliceSpacing[3];
+	m_Segmentation->GetOutput()->GetVTKData()->GetBounds(bounds);
+	m_SegmetationSlice->GetSpacing(sliceSpacing);
+
+	if (slicePlane == XY)
+	{
+		slicePos[0] = pos[0] - bounds[0];
+		slicePos[1] = pos[1] - bounds[2];
+	}
+	else if (slicePlane == YZ)
+	{
+		slicePos[0] = pos[1] - bounds[2];
+		slicePos[1] = pos[2] - bounds[4];
+	}
+	else if (slicePlane == XZ)
+	{
+		slicePos[0] = pos[0] - bounds[0];
+		slicePos[1] = pos[2] - bounds[4];
+	}
+
+	sclicePoint[0] = ROUND(slicePos[0] / sliceSpacing[0]);
+	sclicePoint[1] = ROUND(slicePos[1] / sliceSpacing[1]);
+}
+
+//----------------------------------------------------------------------------
+void mafOpSegmentationHelper::Fill(double *pos, int slicePlane, double thresholdPerc, bool erase)
+{
+	m_VolumeSlice->Update();
+
+	int fillValue, point[2];
+	fillValue = erase ? EMPTY : FULL;
+	vtkDataSet * vol = m_Volume->GetOutput()->GetVTKData();
+
+	double *scalarRange = vol->GetScalarRange();
+	double theshExtention = (scalarRange[1] - scalarRange[0])*thresholdPerc / 100.0;
+	double pickedValue=vol->GetPointData()->GetTuple(vol->FindPoint(pos))[0];
+	double minValue = MAX(scalarRange[0], pickedValue - theshExtention);
+	double maxValue = MIN(scalarRange[1], pickedValue + theshExtention);
+
+	GetSlicePoint(slicePlane, pos, point);
+
+	std::vector<slicePoint> pointList;
+	slicePoint firstPoint;
+	firstPoint.x = point[0];
+	firstPoint.y = point[1];
+	pointList.push_back(firstPoint);
+
+	vtkDataArray *outputScalars = m_SegmetationSlice->GetPointData()->GetScalars();
+	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
+	vtkDataArray 	*inputScalars = m_VolumeSlice->GetPointData()->GetScalars();
+	void *inputPointer = inputScalars->GetVoidPointer(0);
+	int dataType = inputScalars->GetDataType();
+	
+	switch (dataType)
+	{
+		case VTK_CHAR:
+			InternalFill(firstPoint, minValue, maxValue, fillValue, (char*)inputPointer, outputPointer);
+			break;
+		case VTK_UNSIGNED_CHAR:
+			InternalFill(firstPoint, minValue, maxValue, fillValue, (unsigned char*)inputPointer, outputPointer);
+			break;
+		case VTK_SHORT:
+			InternalFill(firstPoint, minValue, maxValue, fillValue, (short*)inputPointer, outputPointer);
+			break;
+		case VTK_UNSIGNED_SHORT:
+			InternalFill(firstPoint, minValue, maxValue, fillValue, (unsigned short*)inputPointer, outputPointer);
+			break;
+		case VTK_INT:
+			InternalFill(firstPoint, minValue, maxValue, fillValue, (int *)inputPointer, outputPointer);
+			break;
+		case VTK_UNSIGNED_INT:
+			InternalFill(firstPoint, minValue, maxValue, fillValue, (unsigned int*)inputPointer, outputPointer);
+			break;
+		case VTK_FLOAT:
+			InternalFill(firstPoint, minValue, maxValue, fillValue, (float*)inputPointer, outputPointer);
+			break;
+		case VTK_DOUBLE:  //NOTE: GPU is not allowed
+			InternalFill(firstPoint, minValue,maxValue, fillValue, (double*)inputPointer, outputPointer);
+			break;
+		default:
+			return;
+	}
+
+	outputScalars->Modified();
+}
+
+//----------------------------------------------------------------------------
+template<typename DataType>
+void mafOpSegmentationHelper::InternalFill(slicePoint startPoint, double minValue, double maxValue, int fillValue, DataType *inputScalars, unsigned char *outputScalars)
+{
+	int  dims[3];
+	m_SegmetationSlice->GetDimensions(dims);
+
+	std::vector<slicePoint> points, newPoints;
+
+	points.push_back(startPoint);
+
+	outputScalars[startPoint.y*dims[0] + startPoint.x] = fillValue;
+	
+	while (points.size() > 0)
+	{
+		for (int i = 0; i < points.size(); i++)
+		{
+			slicePoint currPoint = points[i];
+
+			//point on top
+			if (currPoint.y - 1 >= 0)
+			{
+				int newPointID = (currPoint.y - 1)*dims[0] + currPoint.x;
+				if (outputScalars[newPointID] != fillValue && inputScalars[newPointID] >= minValue && inputScalars[newPointID] <= maxValue)
+				{
+					slicePoint newPoint;
+					newPoint.x = currPoint.x;
+					newPoint.y = currPoint.y - 1;
+					newPoints.push_back(newPoint);
+					outputScalars[newPointID] = fillValue;
+				}
+			}
+
+			//point on bottom
+			if (currPoint.y + 1 < dims[1])
+			{
+				int newPointID = (currPoint.y + 1)*dims[0] + currPoint.x;
+				if (outputScalars[newPointID] != fillValue && inputScalars[newPointID] >= minValue && inputScalars[newPointID] <= maxValue)
+				{
+					slicePoint newPoint;
+					newPoint.x = currPoint.x;
+					newPoint.y = currPoint.y + 1;
+					newPoints.push_back(newPoint);
+					outputScalars[newPointID] = fillValue;
+				}
+
+				//point on left
+				if (currPoint.x - 1 >= 0)
+				{
+					int newPointID = currPoint.y*dims[0] + (currPoint.x - 1);
+					if (outputScalars[newPointID] != fillValue && inputScalars[newPointID] >= minValue && inputScalars[newPointID] <= maxValue)
+					{
+						slicePoint newPoint;
+						newPoint.x = currPoint.x - 1;
+						newPoint.y = currPoint.y;
+						newPoints.push_back(newPoint);
+						outputScalars[newPointID] = fillValue;
+					}
+				}
+
+				//point on left
+				if (currPoint.x + 1 < dims[0])
+				{
+					int newPointID = currPoint.y*dims[0] + (currPoint.x + 1);
+					if (outputScalars[newPointID] != fillValue && inputScalars[newPointID] >= minValue && inputScalars[newPointID] <= maxValue)
+					{
+						slicePoint newPoint;
+						newPoint.x = currPoint.x + 1;
+						newPoint.y = currPoint.y;
+						newPoints.push_back(newPoint);
+						outputScalars[newPointID] = fillValue;
+					}
+				}
+			}
+
+		}
+
+		points.clear();
+		points = newPoints;
+		newPoints.clear();
+	}
+}
