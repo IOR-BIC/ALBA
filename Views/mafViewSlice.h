@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafViewSlice
- Authors: Paolo Quadrani,Stefano Perticoni
+ Authors: Gianluigi Crimi, Paolo Quadrani,Stefano Perticoni
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -23,14 +23,6 @@
 #include "mafViewVTK.h"
 #include "mafMatrix.h"
 #include <vector>
-
-#if defined(DEPRECATE_SUPPORTED) && _MSC_VER >= 1400
-#define DECLSPEC_DEPRECATED_S(x) __declspec(deprecated(x))
-#else
-#define DECLSPEC_DEPRECATED_S(x)
-#pragma deprecated(SetSliceLocalOrigin)
-#pragma deprecated(SetNormal)
-#endif
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -83,7 +75,7 @@ public:
 
   /** Set the origin and normal of the slice 
   Both, Origin and Normal may be NULL, if the current value is to be preserved */
-  virtual void SetSlice(double* Origin, double* Normal = NULL);
+	virtual void SetSlice(double* Origin = NULL, double* Normal = NULL);
 
   /** Get the slice origin coordinates and normal.*/
   void GetSlice(double* Origin, double* Normal = NULL);
@@ -98,7 +90,6 @@ public:
   enum VIEW_SLICE_WIDGET_ID
   {
     ID_NONE = Superclass::ID_LAST,
-    ID_ENABLE_GPU,
     ID_TRILINEAR_INTERPOLATION,
     ID_LAST
   };
@@ -126,11 +117,7 @@ public:
 
   /** Delete the background of the slice. */
   void BorderDelete();
-
-  /** 
-  Give an initial origin and normal (optionally) for the slice.*/
-  void InitializeSlice(double* Origin, double* Normal = NULL);
-
+	  
   /** Set color of the text in CT View**/
   void SetTextColor(double color[3]);
 
@@ -155,34 +142,18 @@ public:
 
   virtual void CameraUpdate();
 
-  void SetEnableGPU(int enable){m_EnableGPU = enable;};
-
   void SetTrilinearInterpolation(int interpolation){m_TrilinearInterpolationOn = interpolation;};
 
   void SetTextureInterpolate(bool interpolate) {m_TextureInterpolate = interpolate;};
-  
-  /** Set the slice coordinates. 
-  DEPRECATED - use SetOrigin or SetSlice */
-  inline virtual DECLSPEC_DEPRECATED_S("SetSliceLocalOrigin(double origin[3]) is deprecated, use SetSlice or SetSliceOrigin") 
-    void SetSliceLocalOrigin(double origin[3]) {
-      return SetSlice(origin, NULL);
-  }
 
-  /** Set the slice coordinates. 
-  DEPRECATED - use SetOrigin or SetSlice */
-  inline virtual DECLSPEC_DEPRECATED_S("SetNormal(double normal[3]) is deprecated, use SetSlice or SetSliceNormal") 
-    void SetNormal(double normal[3]) {
-      return SetSlice(NULL, normal);
-  }
-
-    /** Get the Slice coordinates.
-  DEPRECATED - use GetOrigin or GetSlice*/
-  inline DECLSPEC_DEPRECATED_S("double *GetSlice() is deprecated, use GetSliceOrigin") 
-    double *GetSlice() {
-    return GetSliceOrigin();
-  }
+	virtual void SetSliceAxis(int sliceAxis);
 
 protected:
+
+	/**
+	Give an initial origin and normal (optionally) for the slice.*/
+	void InitializeSlice(double* Origin);
+
 
   /* Correction of slice pose when current volume pose matrix is different from identity: 
   the multiplication is performed inplace */
@@ -206,21 +177,12 @@ protected:
   vtkTextMapper	*m_TextMapper;
   wxString m_Text;
   double	 m_TextColor[3];
-  std::vector<mafSceneNode*> m_CurrentSurface;
-	std::vector<mafSceneNode*> m_CurrentPolyline;
-	std::vector<mafSceneNode*> m_CurrentPolylineGraphEditor;
-  std::vector<mafSceneNode*> m_CurrentMesh;
+  std::vector<mafSceneNode*> m_SlicingVector;
   
   mafMatrix m_OldABSPose;
   mafMatrix m_NewABSPose;
 
-  double m_LastSliceOrigin[3];
-  double m_LastSliceNormal[3];
-
-  // Added by Losi 11.25.2009
-  int m_EnableGPU; ///<Non-zero, if the GPU support for slicing is used (default)
-
-  bool m_TextureInterpolate;
+	bool m_TextureInterpolate;
   int m_TrilinearInterpolationOn;
 };
 #endif

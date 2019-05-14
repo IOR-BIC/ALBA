@@ -95,7 +95,6 @@ SET(vtkMAF_SRCS
       
   vtkMAFErythrocyteSource.cpp  							vtkMAFErythrocyteSource.h  
   vtkMAFImageFillHolesRemoveIslands.cxx  				vtkMAFImageFillHolesRemoveIslands.h  
-  vtkMAFVolumeSlicerNotInterpolated.cxx  				vtkMAFVolumeSlicerNotInterpolated.h
   vtkMAFBinaryImageFloodFill.cxx  						vtkMAFBinaryImageFloodFill.h
   
   ##vtkbioeng####################################

@@ -358,7 +358,7 @@ void vtkMAFVolumeOrthoSlicer::GetSlicingInfo(int* plane1, int* plane2, double* r
 	else
 		inputRG->GetBounds(bounds);
 
-	if (Origin[SclicingMode]<bounds[SclicingMode * 2])
+	if (Origin[SclicingMode]<=bounds[SclicingMode * 2])
 	{
 		*plane1 = *plane2 = 0;
 		*ratio1 = 1.0;
@@ -366,7 +366,7 @@ void vtkMAFVolumeOrthoSlicer::GetSlicingInfo(int* plane1, int* plane2, double* r
 		return;
 	}
 	
-	if (Origin[SclicingMode] > bounds[SclicingMode * 2 + 1])
+	if (Origin[SclicingMode] >= bounds[SclicingMode * 2 + 1])
 	{
 		int dims[3];
 		if (inputID)

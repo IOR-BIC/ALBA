@@ -226,7 +226,10 @@ public:
   /** Multiple Generic Buttons widget. */
   void MultipleButtons(int numButtons, int numColumns, std::vector<int> &ids, std::vector<const char*> &labels, int alignment = wxALL );
 
-  /** Ok-Cancel Button widget. */
+	/** Multiple Image Buttons widget. */
+	void MultipleImageButtons(int numButtons, int numColumns, std::vector<int> &ids, std::vector<const char*> &labels, std::vector<const char*> &images, int alignment);
+	
+	/** Ok-Cancel Button widget. */
   void OkCancel();
 
   /** Integer slider widget. */

@@ -60,9 +60,6 @@ public:
   enum PIPE_VOLUME_SLICE_WIDGET_ID
   {
     ID_LUT_CHOOSER = Superclass::ID_LAST,
-    ID_SLICE_SLIDER_X,
-    ID_SLICE_SLIDER_Y,
-    ID_SLICE_SLIDER_Z,
     ID_OPACITY_SLIDER,
     ID_LAST
   };

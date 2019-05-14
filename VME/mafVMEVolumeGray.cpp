@@ -35,25 +35,17 @@
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEVolumeGray)
 //-------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------
 mafVMEVolumeGray::mafVMEVolumeGray()
-//-------------------------------------------------------------------------
 {
 }
-
 //-------------------------------------------------------------------------
 mafVMEVolumeGray::~mafVMEVolumeGray()
-//-------------------------------------------------------------------------
 {
   // data pipe destroyed in mafVME
   // data vector destroyed in mafVMEGeneric
 }
-
-
 //-------------------------------------------------------------------------
 mafVMEOutput *mafVMEVolumeGray::GetOutput()
-//-------------------------------------------------------------------------
 {
   // allocate the right type of output on demand
   if (m_Output==NULL)
@@ -62,33 +54,8 @@ mafVMEOutput *mafVMEVolumeGray::GetOutput()
   }
   return m_Output;
 }
-
-//-------------------------------------------------------------------------
-int mafVMEVolumeGray::SetData(vtkRectilinearGrid *data, mafTimeStamp t, int mode)
-//-------------------------------------------------------------------------
-{
-  data->Update();
-  if (data->GetPointData()&&data->GetPointData()->GetNumberOfComponents()==1)
-    return Superclass::SetData(data,t,mode);
-
-  mafErrorMacro("Trying to set the wrong type of data inside a "<<(const char *)GetTypeName()<<" :"<< (data?data->GetClassName():"NULL"));
-  return MAF_ERROR;
-}
-
-//-------------------------------------------------------------------------
-int mafVMEVolumeGray::SetData(vtkImageData *data, mafTimeStamp t, int mode)
-//-------------------------------------------------------------------------
-{
-  data->Update();
-  if (data->GetPointData()&&data->GetPointData()->GetNumberOfComponents()==1)
-    return Superclass::SetData(data,t,mode);
-
-  mafErrorMacro("Trying to set the wrong type of data inside a "<<(const char *)GetTypeName()<<" :"<< (data?data->GetClassName():"NULL"));
-  return MAF_ERROR;
-}
 //-------------------------------------------------------------------------
 int mafVMEVolumeGray::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
-//-------------------------------------------------------------------------
 {
   assert(data);
   if (data->IsA("vtkImageData")||data->IsA("vtkRectilinearGrid"))
@@ -104,7 +71,6 @@ int mafVMEVolumeGray::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
 }
 //-------------------------------------------------------------------------
 mafGUI* mafVMEVolumeGray::CreateGui()
-//-------------------------------------------------------------------------
 {
   m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);

@@ -1,27 +1,25 @@
 /*=========================================================================
-
- Program: MAF2
+ Program: ALBA
  Module: mafOpSegmentation
- Authors: Eleonora Mambrini, Gianluigi Crimi, Alberto Losi
- 
- Copyright (c) B3C
- All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+ Authors: Eleonora Mambrini, Gianluigi Crimi, Alberto Losi, Nicola Vanella
+ ==========================================================================
+ Copyright (c) BIC-IOR 2018 (https://github.com/IOR-BIC)
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+ PURPOSE. See the above copyright notice for more information.
+ =========================================================================*/
 
 #ifndef __mafOpSegmentation_H__
 #define __mafOpSegmentation_H__
 
-#include "mafOp.h"
+#include "mafDefines.h"
 #include "mafMatrix.h"
+#include "mafOp.h"
+#include "mafOpSegmentationHelper.h"
 #include "mafVME.h"
 #include "mafVMESegmentationVolume.h"
-#include "mafDefines.h"
+
 #include "vtkSystemIncludes.h"
 #include "wx/gauge.h"
 
@@ -33,49 +31,52 @@ class mafAction;
 class mafDeviceButtonsPadMouseDialog;
 class mafDeviceManager;
 class mafEvent;
-class mafGUIDialog;
-class mafGUIButton;
 class mafGUI;
-class mafGUILutSlider;
-class mafGUILutHistogramSwatch;
-class mafGUIRollOut;
+class mafGUIButton;
+class mafGUIDialog;
 class mafGUIFloatSlider;
-class mafInteractorPicker;
-class mafInteractorCameraMove;
+class mafGUILutHistogramSwatch;
+class mafGUILutSlider;
+class mafGUIRollOut;
 class mafInteractor;
+class mafInteractorCameraMove;
 class mafInteractorGenericMouse;
-class mafInteractorSER;
 class mafInteractorPER;
+class mafInteractorPERBrushFeedback;
+class mafInteractorPERScalarInformation;
+class mafInteractorPicker;
+class mafInteractorSER;
+class mafInteractorSegmentationPicker;
 class mafMatrix;
-class mafVMEVolumeGray;
 class mafVME;
 class mafVMEImage;
-class mafVME;
-
-class mmiSelectPoint;
-
-class mafVMESegmentationVolume;
 class mafVMESurface;
-
-class mafInteractorPERScalarInformation;
-
-class mafInteractorSegmentationPicker;
-class mafInteractorPERBrushFeedback;
-
-class vtkLookupTable;
-class vtkActor2D;
-class vtkTextMapper;
-class vtkSphereSource;
-class vtkPolyDataMapper;
+class mafVMEVolumeGray;
+class mafViewSliceSegmentation;
+class mmiSelectPoint;
 class vtkActor;
+class vtkActor2D;
+class vtkLookupTable;
+class vtkPolyDataMapper;
+class vtkSphereSource;
 class vtkStructuredPoints;
+class vtkTextMapper;
 class vtkUnsignedCharArray;
-class mafViewSliceNotInterpolated;
 class wxStaticBoxSizer;
 
 //----------------------------------------------------------------------------
 // mafOpSegmentation :
 //----------------------------------------------------------------------------
+
+//////////////////////////////////////////////////////////////////////////
+//Manual segmentation stuff
+typedef struct urstate
+{
+	int m_Plane;
+	int m_Slice;
+	vtkUnsignedCharArray *m_Scalars;
+} UndoRedoState; //<Undo Redo data structure
+
 /**
 This operation accept a volume as input and produces a surface as output of segmentation procedure.
 User can select:
@@ -99,11 +100,9 @@ public:
   {
     ID_OPERATION_TYPE = MINID,
     ID_PRE_SEGMENTATION,
-    ID_AUTO_SEGMENTATION,
-    ID_MANUAL_SEGMENTATION,
-    ID_REFINEMENT,
-    ID_LOAD_SEGMENTATION,
-    ID_RESET_LOADED,
+    ID_INIT_SEGMENTATION,
+    ID_EDIT_SEGMENTATION,
+    ID_LOAD,
     ID_OK,
     ID_CANCEL,
     ID_VIEW,
@@ -114,10 +113,12 @@ public:
     ID_SLICE_NEXT, 
     ID_SLICE_PREV,
     ID_SLICE_PLANE,
+		ID_SHOW_LABELS,
 	  ID_PRE_VOLUME_SPACING,
 	  ID_PRE_VOLUME_ZERO_VALUE,
     ID_MANUAL_PICKING_MODALITY,
-    ID_MANUAL_TOOLS,
+		ID_MANUAL_TOOLS_BRUSH,
+		ID_MANUAL_TOOLS_FILL,
     ID_MANUAL_BRUSH_SHAPE,
     ID_MANUAL_BRUSH_SIZE,
     ID_MANUAL_BUCKET_ACTION,
@@ -126,29 +127,20 @@ public:
     ID_MANUAL_CANCEL,
     ID_MANUAL_UNDO, 
     ID_MANUAL_REDO,
-    ID_BUTTON_PREV,
-    ID_BUTTON_NEXT,
-    ID_AUTOMATIC_THRESHOLD,
-    ID_AUTOMATIC_INCREASE_MIN_THRESHOLD,
-    ID_AUTOMATIC_INCREASE_MAX_THRESHOLD,
-    ID_AUTOMATIC_DECREASE_MIN_THRESHOLD,
-    ID_AUTOMATIC_DECREASE_MAX_THRESHOLD,
-    ID_AUTOMATIC_DECREASE_MIDDLE_THRESHOLD,
-    ID_AUTOMATIC_INCREASE_MIDDLE_THRESHOLD,
-    ID_AUTOMATIC_ADD_RANGE,
-    ID_AUTOMATIC_REMOVE_RANGE,
-    ID_AUTOMATIC_LIST_OF_RANGE,
-    ID_AUTOMATIC_UPDATE_RANGE,
-    ID_AUTOMATIC_GLOBAL_THRESHOLD,
-    ID_AUTOMATIC_GLOBAL_PREVIEW,
-    ID_AUTOMATIC_INCREASE_MIN_RANGE_VALUE,
-    ID_AUTOMATIC_INCREASE_MAX_RANGE_VALUE,
-    ID_AUTOMATIC_DECREASE_MIN_RANGE_VALUE,
-    ID_AUTOMATIC_DECREASE_MAX_RANGE_VALUE,
-    ID_AUTOMATIC_DECREASE_MIDDLE_RANGE_VALUE,
-    ID_AUTOMATIC_INCREASE_MIDDLE_RANGE_VALUE,
+    ID_BUTTON_INIT,
+    ID_BUTTON_EDIT,
+    ID_AUTO_THRESHOLD,
+    ID_AUTO_INC_MIN_THRESHOLD,
+    ID_AUTO_INC_MAX_THRESHOLD,
+    ID_AUTO_DEC_MIN_THRESHOLD,
+    ID_AUTO_DEC_MAX_THRESHOLD,
+    ID_AUTO_DEC_MIDDLE_THRESHOLD,
+    ID_AUTO_INC_MIDDLE_THRESHOLD,
+    ID_SPLIT_RANGE,
+    ID_REMOVE_RANGE,
+    ID_RANGE_SELECTION,
+    ID_INIT_MODALITY,
     ID_REFINEMENT_ACTION,
-    ID_REFINEMENT_REGIONS_SIZE,
     ID_REFINEMENT_EVERY_SLICE,
     ID_REFINEMENT_ITERATIVE,
     ID_REFINEMENT_APPLY,
@@ -161,26 +153,11 @@ public:
 
   enum OPERATIONS_IDS
   {
-    PRE_SEGMENTATION = 0,
-    LOAD_SEGMENTATION,
-    AUTOMATIC_SEGMENTATION,
-    MANUAL_SEGMENTATION,
-    REFINEMENT_SEGMENTATION,
-    NUMBER_OF_OPERATIONS,
+    INIT_SEGMENTATION = 0,
+    EDIT_SEGMENTATION,
+    NUMBER_OF_PHASES,
   };
-
-  enum MANUAL_SEGMENTATION_IDS
-  {
-    MANUAL_SEGMENTATION_SELECT = 0,
-    MANUAL_SEGMENTATION_ERASE,
-  };
-
-  enum BRUSH_SHAPES
-  {
-    CIRCLE_BRUSH_SHAPE = 0,
-    SQUARE_BRUSH_SHAPE,
-  };
-
+		
   enum REFINEMENT_SEGMENTATION_IDS
   {
     ID_REFINEMENT_ISLANDS_REMOVE = 0,
@@ -216,10 +193,7 @@ public:
 
   /** Return true if node is of type mafVMEVolume. */
   static bool SegmentedVolumeAccept(mafVME* node);
-
-  /** Returns the output Volume*/
-  mafVMEVolumeGray *GetOutputVolume(){return m_OutputVolume;};
-
+	 
 protected:
 
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
@@ -232,16 +206,10 @@ protected:
   virtual void DeleteOpDialog(); 
   
   /** Creates GUI with commands for automatic segmentation. */
-  virtual void CreateAutoSegmentationGui();
+  virtual void CreateInitSegmentationGui();
   
   /**Creates GUI with commands for manual segmentation. */
-  virtual void CreateManualSegmentationGui();
-  
-  /**Creates GUI with commands for segmentation refinement. */
-  virtual void CreateRefinementGui();
-  
-  /**Creates GUI with commands for loading a previous segmentation. */
-  virtual void CreateLoadSegmentationGui();
+  virtual void CreateEditSegmentationGui();
   
   /** Creates GUI widgets to select the right slice (number of slice and plane)*/
   virtual void CreateSliceNavigationGui();
@@ -250,51 +218,24 @@ protected:
   //Method to initialize the stuff
   //////////////////////////////////////////////////////////////////////////
   
+	void Init();
+
   /** Initialize the volume dimensions attribute */
   void InitVolumeDimensions();
   
   /** Initialize the slice */
-  void InitializeViewSlice();
+  void InitializeView();
   
-  /** Initialize the volume spacing attribute */
-  void InitVolumeSpacing();
-  
-  /** Initialize the Interactors  */
+	/** Initialize the Interactors  */
   void InitializeInteractors();
   
   /** Init GUI slice slider with volume parameters. */
-  void InitGui();
+  void UpdateSliderValidator();
   
-  /** Init Manual Segmentation GUI according to input volume*/
-  void InitManualSegmentationGui();
-  
-  /** Initialize the slices stuff for manual step */
-  void InitManualVolumeSlice();
-
-  /** Initialize the Threshold Volume*/
-  void InitThresholdVolume();
-
-  /** Initialize the Threshold Volume single slice */
-  void InitThresholdVolumeSlice();
-
   /** Initialize the Segmented Volume*/
-  void InitSegmentedVolume();
-
-  /** Initialize color table values for mask visualization. */
-  void InitMaskColorLut(vtkLookupTable *lut);
-
-  /** Init empty volume slice according to input volume*/
-  void InitEmptyVolumeSlice();
-
-  /** Init a slice volume with the specified scalars type according to input volume*/
-  template <class ImageType>
-  void InitDataVolumeSlice(mafVMEVolumeGray *slice);
-  //////////////////////////////////////////////////////////////////////////
-
-  /** Remove the VMEs neded by the operation*/
-  void RemoveVMEs();
-
-  /**Update windowing */
+  void InitSegmentationVolume();
+	  
+  /** Update windowing */
   void UpdateWindowing();
 
   /** Get current slices origin coords origin[3] */
@@ -307,58 +248,55 @@ protected:
   bool Refinement();
 
   /** Receive events from Automatic segmentation gui */
-  void OnAutomaticSegmentationEvent(mafEvent *e);
-  
+  void OnInitEvent(mafEvent *e);
+
+	void SetThresholdByRange();
+	
   /** Receive events from Manual segmentation gui */
-  void OnManualSegmentationEvent(mafEvent *e);
-  
+  void OnEditSegmentationEvent(mafEvent *e);
+
+	void OnUndoRedo(bool undo);
+
+
   /** Receive events from Refinement segmentation gui */
   void OnRefinementSegmentationEvent(mafEvent *e);
   
   /** Receive events from Load segmentation gui */
-  void OnLoadSegmentationEvent(mafEvent *e);
-
-  /** Get the z position of the specified slice index */
-  double GetPosFromSliceIndexZ();
-
-  /** Initialize Automatic step */
-  void OnAutomaticStep();
-
-  /** De initialize Initialize Automatic step */
-  void OnAutomaticStepExit();
-
-  /** Initialize Manual step */
-  void OnManualStep();
+  void OnLoadSegmentation();
 
   /** De initialize Initialize Manual step */
-  void OnManualStepExit();
+  void OnEditStepExit();
 
   /** Initialize Refinement step */
   void OnRefinementStep();
-
-  /** Initialize Load step */
-  void OnLoadStep();
-
+	
   /** Perform the initializations when the user press next button */
-  void OnNextStep();
+  void OnEditStep();
 
-  /** Perform the initializations when the user press previous button */
+	/** Perform the initializations when the user press previous button */
   void OnPreviousStep();
 
   mafVMEVolumeGray* m_Volume;         //<Input volume
-  double m_SliceOrigin[3];            //<Origin of the slice plane
-  int m_VolumeDimensions[3];          //<Dimensions of the volumes (number of slices)
+	vtkImageData     *m_VolumeSlice;
+	mafString m_VolumeName;        //<Loaded volume name
+	mafVMEVolumeGray *m_SegmentationVolume;     //<Segmentation volume
+	vtkImageData     *m_SegmentationSlice;
+  
+	double m_SliceOrigin[3];            //<Origin of the slice plane
+  int m_VolumeDims[3];          //<Dimensions of the volumes (number of slices)
   double m_VolumeSpacing[3];          //<Volume spacing
   double m_VolumeBounds[6];           //<Volume bounds
-  bool m_VolumeParametersInitialized; //<Specify if volume parameters are initialized
-  int m_CurrentSliceIndex;            //<Index of the current slice position
-  int m_OldSliceIndex;                //<Old slice index
-  int m_CurrentSlicePlane;            //<Current slicing plane (xy,xz,yx)
-  int m_OldSlicePlane;                //<Old slice plane
+	int m_SliceIndex;								//GuiVariable
+	int m_OldSliceIndex;								//GuiVariable
+		int m_SliceIndexByPlane[3];            //<Index of the current slice position
+	int m_SlicePlane;            //<Current slicing plane (xy,xz,yx)
+	int m_OldSlicePlane;
   int m_NumSliceSliderEvents;         //<Number of events raised by the slider in a single interaction
-  int m_CurrentOperation;             //<Current step
-  mafGUIDialog* m_Dialog;             //<Dialog - GUI
-  mafViewSliceNotInterpolated* m_View;                 //<Rendering Slice view
+  int m_CurrentPhase;             //<Current step
+	int m_ShowLabels;
+  
+	mafGUIDialog* m_Dialog;             //<Dialog - GUI
+	mafViewSliceSegmentation* m_View;                 //<Rendering Slice view
   mafGUIButton* m_OkButton;           //<Button -GUI
   mafGUIButton* m_CancelButton;       //<Button -GUI
   mafGUIButton* m_LoadSegmentationButton; //<Button -GUI
@@ -370,8 +308,8 @@ protected:
   vtkLookupTable *m_ManualColorLUT;     //Lookup table for segmented volume in manual step.
   wxSlider *m_SliceSlider;              //<Slice slider - GUI
   wxTextCtrl *m_SliceText;              //<Slice text box - GUI
-  mafGUIRollOut *m_SegmentationOperationsRollOut[5]; //< Steps roll-out - GUI
-  mafGUI *m_SegmentationOperationsGui[5]; //<Steps gui
+	wxNotebook *m_SegmentationOperationsNotebook;
+  mafGUI *m_SegmentationOperationsGui[2]; //<Steps gui
   wxComboBox *m_OperationsList;         //<List if operations (not used)
   mafInteractor *m_OldBehavior;         //<Old volume behavior
   mafVME *m_OldVolumeParent;           //<Old volume parent
@@ -379,104 +317,66 @@ protected:
   mafDeviceManager *m_DeviceManager;    //<Device manager
   mafInteractorSER *m_SER;              //<Static event router                        
   mafMatrix m_Matrix;                   //<Volume initial matrix
-  mafVMEVolumeGray *m_LoadedVolume;     //<Loaded volume
-  mafString m_LoadedVolumeName;        //<Loaded volume name
-  mafVMEVolumeGray *m_ThresholdVolume;  //<Volume mask for thresholding
-  mafVMEVolumeGray *m_ThresholdVolumeSlice; //<Single slice volume mask for real-time thresholding preview
-  mafVMEVolumeGray *m_EmptyVolumeSlice; //<Single slice volume that represent current slice (for real-time thresholding preview)
-  mafVMEVolumeGray *m_OutputVolume;     //<Output volume
-  mafVMESurface *m_OutputSurface;          //<Output Surface
+	mafVMESurface *m_OutputSurface;          //<Output Surface
   wxStaticText *m_SnippetsLabel;        //<Suggestion labels - GUI
   mafInteractorSegmentationPicker *m_SegmentationPicker; //<Segmentation picker for interaction
 
-  //////////////////////////////////////////////////////////////////////////
-  //Manual segmentation stuff
-  //////////////////////////////////////////////////////////////////////////
-  typedef struct urstate
-  {
-    int plane;
-    int slice;
-    vtkUnsignedCharArray *dataArray;
-  } UndoRedoState; //<Undo Redo data structure
+	mafGUI* m_AppendingOpGui;
+	  	  
+  /** Set flags that indicate that the user start draw interaction */
+  void StartDraw(mafEvent *e);
 
-  /** Save the volume mask for the procedural segmentation volume */
-  void InitManualVolumeMask();
-  
-  /** Update manual volume slice volume*/
-  void UpdateVolumeSlice();
+	void AddUndoStep();
 
-  /** Apply volume slice changes*/
-  void ApplyVolumeSliceChanges();
-  
-  /** Set flags that indicate that the user start drae interaction */
-  void StartDraw(mafEvent *e, bool erase);
+	UndoRedoState CreateUndoRedoState();
 
-  /** Select brush image depending on shape and size */
-  void SelectBrushImage(double x, double y, double z, bool selection);
-  
-  /** Trap events raised from the brush */
-  void OnBrushEvent(mafEvent *e);
 
-  /** Relead the previous/next undo/redo state*/
-  void ReloadUndoRedoState(vtkDataSet *dataSet, UndoRedoState state);
-  
   /** Reset undo list*/
-  void ResetManualUndoList();
+  void ClearManualUndoList();
   
   /** Reset redo list */
-  void ResetManualRedoList();
-  
-  /** Enable manual segmentation gui widget */
-  void EnableManualSegmentationGui();
+  void ClearManualRedoList();
 
   /** Used in brush preview to restore the real drawn image */
-  void UndoBrushPreview();
+  void ApplyRealDrawnImage();
 
   /** Create the real drawn image */
   void CreateRealDrawnImage();
 
-  mafVMEVolumeGray *m_ManualVolumeMask;         //< Manual volume mask
-  mafVMEVolumeGray *m_ManualVolumeSlice;        //< Single slice manual volume mask
-  mafGUIFloatSlider *m_ManualBrushSizeSlider;   //<Brush size slider - GUI
-  wxTextCtrl *m_ManualBrushSizeText;            //<Brush size text box - GUI
+  mafGUIFloatSlider *m_BrushSizeSlider;   //<Brush size slider - GUI
   wxRadioBox *m_ManualBrushShapeRadioBox;       //<Brush shape radio - GUI
+	wxRadioBox *m_InitModalityRadioBox;					//<Threshold Type radio - GUI
   wxStaticBoxSizer *m_BrushEditingSizer;
   mafGUIButton *m_ManualApplyChanges;           //<Apply changes button - GUI
-  int m_ManualSegmentationAction;               //<Manual segmentation action (draw/erease)
-  int m_ManualSegmentationTools;                //<Manual segmentation tools (bucket/brush)
+  
+	int m_ManualSegmentationTools;                //<Manual segmentation tools (bucket/brush)
   int m_ManualBucketActions;                    //<
-  int m_ManualBrushShape;                       //<Brush shape
-  double m_ManualBrushSize;                     //<Brush size
+  int m_BrushShape;                       //<Brush shape
+  int m_BrushSize;                     //<Brush size
+	int m_BrushFillErase;               //< Brush Modality (draw/erase)
+	int m_FillThesholdPerc;                     //<Brush size
+	
   int m_ManualRefinementRegionsSize;            //<Refinement region size
   wxComboBox *m_ManualRefinementComboBox;       //<Refinement action combo - GUI
   wxTextCtrl *m_ManualRefinementRegionSizeText; //<Refinement size text - GUI
-  std::vector<UndoRedoState> m_ManualUndoList;  //< Undo stack
-  std::vector<UndoRedoState> m_ManualRedoList;  // Redo stack
-  bool m_PickingStarted;                        //<Determine if picking has started
-  mafInteractorPERBrushFeedback *m_ManualPER;   //<Dynamic event router
-  double m_CurrentBrushMoveEventCount;          //<Id for mouse move event raised by the brush
+  std::vector<UndoRedoState> m_UndoList;  //< Undo stack
+  std::vector<UndoRedoState> m_RedoList;  // Redo stack
+  bool m_IsDrawing;                        //<Determine if picking has started
+  mafInteractorPERBrushFeedback *m_EditPER;   //<Dynamic event router
   vtkUnsignedCharArray *m_RealDrawnImage;       //<Real drawn image used in brush preview
   int m_LastMouseMovePointID;                   //<Last point id in mouse move event
-  mafGUILutSlider* m_ManualRangeSlider;         //<
-  wxStaticBoxSizer *m_BucketEditingSizer;       //<
+  wxStaticBoxSizer *m_FillEditingSizer;       //<
   //////////////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////////////
   //Automatic segmentation stuff
-  //////////////////////////////////////////////////////////////////////////
-  
+ 
   /***/
-  void SetSelectionAutomaticListOfRange(int index);
-
-  /** Check that the range has right values */
-  bool AutomaticCheckRange(int indexToExclude = -1);
+  void SetRangeListSelection(int index);
 
   /** Function called when the user use the fine button to change the threshold*/
-  void OnAutomaticChangeThresholdManually(int eventID);
-
-  /** Check if all thresholds exist */
-  bool CheckNumberOfThresholds();
-
+  void OnThresholdUpate(int eventID=-1);
+	 
   /** Update the value of threshold label for the current slice */
   void UpdateThresholdLabel();
 
@@ -486,51 +386,29 @@ protected:
   /** Gui update when the user change threshold type */
   void OnChangeThresholdType();
 
+	void EnableDisableGuiRange();
+
+	void OnSelectSlicePlane();
+
   /** Add a new range using gui values */
-  void OnAutomaticAddRange();
+  void OnSplitRange();
 
   /** Remove the select range */
-  void OnAutomaticRemoveRange();
-
-  /** Update the select range using gui values */
-  void OnAutomaticUpdateRange();
-
-  /** Perform the preview of automatic segmentation */
-  void OnAutomaticPreview();
-
-  /** Function called when the user use the fine button to change the range of the automatic segmentation */
-  void OnAutomaticChangeRangeManually(int eventID);
-
-  /** Get camera attributes */
-  void GetCameraAttribute(double *focalPoint, double* scaleFactor);
-
-  /** Get the visualized bounds */
-  void GetVisualizedBounds(double focalPoint[3], double scaleFactor, double bounds[4]);
-  
-  /** Reset zoom view */
-  bool ResetZoom(vtkDataSet* dataset,double visbleBounds[4]);
+  void OnRemoveRange();
 
   /** Update threshold real-time preview*/
   void UpdateThresholdRealTimePreview();
 
-  mafVMESegmentationVolume *m_SegmentatedVolume; //<Segmentation volume
-  int m_AutomaticGlobalThreshold;   //<Global threshold range lower bound
-  double m_AutomaticThreshold;      //<Global threshold range lower bound
-  double m_AutomaticUpperThreshold; //<Global threshold range upper bound
+  int m_InitModality;   //Init Modality
+  double m_Threshold[2]; //Threshold
   double m_AutomaticMouseThreshold; //<Mouse threshold
-  wxListBox *m_AutomaticListOfRange;//<List of threshold ranges
-  mafGUILutSlider *m_AutomaticRangeSlider;//<Range slider - GUI
 
-  struct AutomaticInfoRange 
-  {
-    int m_StartSlice;
-    int m_EndSlice;
-    double m_ThresholdValue;
-    double m_UpperThresholdValue;
-  };
-  std::vector<AutomaticInfoRange> m_AutomaticRanges; //<Automatic range structure
-  
-  mafGUILutSlider *m_AutomaticThresholdSlider;//<Threshold slider
+	int m_CurrentRange;
+	bool m_IgnoreRangeSelEvent;
+  wxListBox *m_RangesGuiList;//<List of threshold ranges
+  std::vector<AutomaticInfoRange> m_RangesVector; //<Automatic range structure
+
+  mafGUILutSlider *m_ThresholdSlider;//<Threshold slider
 
   vtkTextMapper *m_AutomaticThresholdTextMapper;//<Text mapper for threshold visualization
   vtkActor2D *m_AutomaticThresholdTextActor;    //<Text actor for threshold visualization
@@ -539,19 +417,11 @@ protected:
   vtkTextMapper *m_AutomaticSliceTextMapper;    //<Text mapper for slice visualization
   vtkActor2D *m_AutomaticSliceTextActor;        //<Text mapper for slice visualization
 
-  mafInteractorPERScalarInformation *m_AutomaticPER; //<Interactor for scalar value visualization on mouse move
+  mafInteractorPERScalarInformation *m_InitPER; //<Interactor for scalar value visualization on mouse move
   //////////////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////////////
   //Segmentation Refinement stuff
-  //////////////////////////////////////////////////////////////////////////
-  
-  /** Save the volume mask for the procedural segmentation volume */
-  void InitRefinementVolumeMask();
-
-  /** Save the volume mask for the procedural segmentation volume */
-  void SaveRefinementVolumeMask();
-  
   /** Reset refinement undo list */
   void ResetRefinementUndoList();
   
@@ -564,24 +434,14 @@ protected:
   /** Apply refinement algorithm implemented with vtk only */
   bool ApplyRefinementFilter2(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage);
 
-  /** Update slice visualisation on threshold step */
-  void OnEventUpdateThresholdSlice();
+  /** Update slice visualization on manual step */
+  void OnUpdateSlice();
 
-  /** Update slice visualisation on manual step */
-  void OnEventUpdateManualSlice();
-
-  /** Update threshold volume data  for preview or output */
-  void UpdateThresholdVolumeData();
-
-  mafVMEVolumeGray *m_RefinementVolumeMask; //<Refinement volume mask
   int m_RefinementSegmentationAction;       //<Refinement action fill holes or remove islands
   int m_RefinementRegionsSize;              //<Size for region recognition
   int m_RefinementMajorityThreshold;        //<Used in itk algorithm (not yet exposed and used)
   int m_RefinementEverySlice;               //<Determine if refinement performed on every slice
   int m_RefinementIterative;                //<Iterative refinement (not yet used)
-
-  double m_InitialFocalPoint[3];            //<Initial camera focal point
-  double m_InitialScaleFactor;              //<Initial camera scale factor
 
   std::vector<vtkUnsignedCharArray *> m_RefinementUndoList; //<Refinement undo list
   std::vector<vtkUnsignedCharArray *> m_RefinementRedoList; //<Refinement redo list
@@ -595,26 +455,19 @@ protected:
   int m_OLdWindowingLow;        //<Windowing original value to restore after exiting operation
   int m_OLdWindowingHi;         //<Windowing original value to restore after exiting operation
 
-  int m_GlobalFloodFill;  //< global or local bucket tool
-  int m_FloodErease;      //< switch fill/erease for bucket tool
-
   wxGauge *m_ProgressBar; //< display progress
 
-  /** Delete children of input vme if they are output of the input volume  */
-  void DeleteOutputs(mafVME* vme);
-
-  /** Determine if the specified vme is an output of the input volume */
-  bool IsOutput(mafVME* vme);
-
-  /** flood fill algorithm */
-  void FloodFill(vtkIdType seed);
-
-  /** Apply flood fill filter */
-  int ApplyFloodFill(vtkImageData *inputImage, vtkImageData *outputImage, vtkIdType seed);
-
+	mafOpSegmentationHelper m_Helper;
+	  
+  
   void EnableSizerContent(wxSizer* sizer, bool enable);
 
-  void OnEventFloodFill(mafEvent *e);
+  void Fill(mafEvent *e);
 
+	void InitRanges();
+
+private:
+
+	void SelectRangeByCurrentSlice();
 };
 #endif

@@ -272,7 +272,7 @@ void mafViewRXCT::VmeShow(mafVME *vme, bool show)
       for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
       {
         center[2] = b[5]-step*(i+1);
-        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->InitializeSlice(center);
+        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetSlice(center);
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetTextColor(m_BorderColor[i]);
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->VmeShow(vme,show);
 
@@ -329,7 +329,7 @@ void mafViewRXCT::VmeShow(mafVME *vme, bool show)
         int i=0;
         while (j!=m_Sort[i]) i++;
         double pos[3]={0.0,0.0,m_Pos[m_Sort[i]]};
-        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetSliceLocalOrigin(pos);
+        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetSlice(pos);
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->CameraUpdate();
       }
       mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(vme);
@@ -483,7 +483,7 @@ void mafViewRXCT::OnEventSortSlices()
         m_GizmoSlice[currChildCTView]->UpdateGizmoSliceInLocalPositionOnAxis(currChildCTView,mafGizmoSlice::GIZMO_SLICE_Z,center[2]);
         m_Pos[currChildCTView]=center[2];
         m_Sort[currChildCTView]=currChildCTView;
-        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetSliceLocalOrigin(center);
+        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetSlice(center);
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetTextColor(m_BorderColor[currChildCTView]);
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->UpdateText();
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->BorderCreate(m_BorderColor[currChildCTView]);
@@ -511,7 +511,7 @@ void mafViewRXCT::OnEventSortSlices()
 				m_GizmoSlice[currChildCTView]->UpdateGizmoSliceInLocalPositionOnAxis(currChildCTView,mafGizmoSlice::GIZMO_SLICE_Z,center[2]);
 				m_Pos[currChildCTView]=center[2];
 				m_Sort[currChildCTView]=currChildCTView;
-				((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetSliceLocalOrigin(center);
+				((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetSlice(center);
 				((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetTextColor(m_BorderColor[currChildCTView]);
 				((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->UpdateText();
 				((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->BorderCreate(m_BorderColor[currChildCTView]);
@@ -587,7 +587,7 @@ void mafViewRXCT::OnEventMouseMove( mafEvent *e )
 
       m_Pos[currSubView]=newSliceLocalOrigin[2];
 
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currSubView))->SetSliceLocalOrigin(newSliceLocalOrigin);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currSubView))->SetSlice(newSliceLocalOrigin);
       ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currSubView))->CameraUpdate();
     }
   }
@@ -599,7 +599,7 @@ void mafViewRXCT::OnEventMouseMove( mafEvent *e )
     int i=0;
     while (movingSliceId != m_Sort[i]) i++;
 
-    ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetSliceLocalOrigin(newSliceLocalOrigin);
+    ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetSlice(newSliceLocalOrigin);
     ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->CameraUpdate();
   }
   m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
@@ -927,9 +927,9 @@ void mafViewRXCT::SortSlices()
     double *OldPos;
     for(j=0;j<CT_CHILD_VIEWS_NUMBER; j++)
     {
-      OldPos=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(j))->GetSlice();
+      OldPos=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(j))->GetSliceOrigin();
       OldPos[2]=m_Pos[m_Sort[j]];
-      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(j))->SetSliceLocalOrigin(OldPos);
+      ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(j))->SetSlice(OldPos);
       ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(j))->SetTextColor(m_BorderColor[m_Sort[j]]);
       ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(j))->UpdateText();
       ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(j))->BorderCreate(m_BorderColor[m_Sort[j]]);

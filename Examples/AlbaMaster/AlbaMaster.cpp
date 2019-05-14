@@ -118,6 +118,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "mafOpScaleDataset.h"
 #include "mafOpSegmentationRegionGrowingConnectedThreshold.h"
 #include "mafOpSegmentationRegionGrowingLocalAndGlobalThreshold.h"
+#include "mafOpSegmentation.h"
 #include "mafOpSmoothSurface.h"
 #include "mafOpSmoothSurfaceCells.h"
 #include "mafOpSplitSurface.h"
@@ -152,8 +153,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "mafViewSliceBlend.h"
 #include "mafViewSliceBlendRX.h"
 #include "mafViewSliceGlobal.h"
-#include "mafViewSliceNotInterpolated.h"
-#include "mafViewSliceNotInterpolatedCompound.h"
 #include "mafViewSliceOnCurve.h"
 #include "mafViewSliceOnCurveCompound.h"
 #include "mafViewSlicer.h"
@@ -280,7 +279,9 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new mafOpComputeWrapping("Computing Wrapping"),_("Create"));
 	m_Logic->Plug(new mafOpFreezeVME(),_("Create"));
 	m_Logic->Plug(new mafOpSegmentationRegionGrowingConnectedThreshold(),_("Create"));
-	m_Logic->Plug(new mafOpSegmentationRegionGrowingLocalAndGlobalThreshold(),_("Create"));
+	m_Logic->Plug(new mafOpSegmentationRegionGrowingLocalAndGlobalThreshold(), _("Create"));
+	m_Logic->Plug(new mafOpSegmentation(), _("Create"));
+
 
 	m_Logic->Plug(new mafOpClipSurface("Clip Surface"),_("Modify"));
 	m_Logic->Plug(new mafOpFilterSurface("Filter Surface"),_("Modify"));
@@ -441,16 +442,6 @@ bool AlbaMaster::OnInit()
 	mafViewSliceGlobal *vSliceGlobal = new mafViewSliceGlobal("Slice Slice Global");
 	//vSliceGlobal->PackageView();
 	m_Logic->Plug(vSliceGlobal);
-
-	//View Slice Not Interpolated
-	mafViewSliceNotInterpolated *vSliceNoInterp = new mafViewSliceNotInterpolated("Slice Not Interpolated");
-	vSliceNoInterp->PackageView();
-	m_Logic->Plug(vSliceNoInterp);
-
-	//View Slice Not Interpolated Compound
-	mafViewSliceNotInterpolatedCompound *vSliceNoInterpC = new mafViewSliceNotInterpolatedCompound("Slice Not Interpolated Compound");
-	vSliceNoInterpC->PackageView();
-	m_Logic->Plug(vSliceNoInterpC);
 
 	//View Slice On Curve
 	mafViewSliceOnCurve *vsliceoncurve = new mafViewSliceOnCurve("Slice On Curve");

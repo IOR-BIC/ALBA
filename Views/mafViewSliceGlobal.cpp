@@ -113,10 +113,7 @@ mafViewSliceGlobal::~mafViewSliceGlobal()
   BorderDelete();
   vtkDEL(m_TextMapper);
   vtkDEL(m_TextActor);
-  m_CurrentSurface.clear();
-  m_CurrentPolyline.clear();
-  m_CurrentPolylineGraphEditor.clear();
-  m_CurrentMesh.clear();
+  m_SlicingVector.clear();
 }
 //----------------------------------------------------------------------------
 mafView *mafViewSliceGlobal::Copy(mafObserver *Listener, bool lightCopyEnabled)
@@ -364,7 +361,7 @@ void mafViewSliceGlobal::UpdateSlice()
     if(origin[2] < m_GlobalBounds[4])
       origin[2] = m_GlobalBounds[4];
 
-    SetSlice(origin, NULL);
+		SetSlice(origin);
 
     CameraUpdate();
   }
@@ -413,8 +410,8 @@ void mafViewSliceGlobal::ChangeView(int viewIndex)
 {
   m_ViewIndex = viewIndex;
 
-  double normals[3];
-  normals[0] = normals[1] = normals[2] = 0.0;
+  double normal[3];
+  normal[0] = normal[1] = normal[2] = 0.0;
   
   UpdateSliceParameters();
 
@@ -422,17 +419,17 @@ void mafViewSliceGlobal::ChangeView(int viewIndex)
 
   if(m_ViewIndex == ID_Z)
   {
-    normals[2] = 1.0;
+    normal[2] = 1.0;
     newCameraPositionId = CAMERA_OS_Z;
   }
   else if(m_ViewIndex == ID_Y)
   {
-    normals[1] = 1.0;
+    normal[1] = 1.0;
     newCameraPositionId = CAMERA_OS_Y;
   }
   else if(m_ViewIndex == ID_X)
   {
-    normals[0] = 1.0;
+    normal[0] = 1.0;
     newCameraPositionId = CAMERA_OS_X;
   }
 
@@ -443,7 +440,7 @@ void mafViewSliceGlobal::ChangeView(int viewIndex)
 
 
   CameraSet(m_CameraPositionId);
-  SetSlice(m_Slice, normals);
+  SetSlice(NULL, normal);
   mafMatrix m;
   m_OldABSPose = m; // forcing parallel camera position in case of rotated volumes
   CameraReset();
@@ -679,7 +676,7 @@ void mafViewSliceGlobal::UpdateBounds()
   }
 
 }
-
+/*
 //----------------------------------------------------------------------------
 void mafViewSliceGlobal::SetSlice(double origin[3], float xVect[3], float yVect[3])
 //----------------------------------------------------------------------------
@@ -701,7 +698,7 @@ void mafViewSliceGlobal::SetSlice(double origin[3], float xVect[3], float yVect[
   Superclass::SetSlice(origin);
 
 }
-
+*/
 //-------------------------------------------------------------------------
 int mafViewSliceGlobal::GetNodeStatus(mafVME *vme)
 //-------------------------------------------------------------------------
@@ -709,99 +706,3 @@ int mafViewSliceGlobal::GetNodeStatus(mafVME *vme)
    return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
 }
 
-//----------------------------------------------------------------------------
-void mafViewSliceGlobal::SetSlice(double* Origin, double* Normal)
-//----------------------------------------------------------------------------
-{
-
-  //set slice origin and normal
-  if (Origin != NULL)
-  {
-    memcpy(m_Slice,Origin,sizeof(m_Slice));
-    m_LastSliceOrigin[0] = m_Slice[0];
-    m_LastSliceOrigin[1] = m_Slice[1];
-    m_LastSliceOrigin[2] = m_Slice[2];
-
-  }
-
-  if (Normal != NULL)
-  {
-    memcpy(m_SliceNormal,Normal,sizeof(m_Slice));
-    m_LastSliceNormal[0] = m_SliceNormal[0];
-    m_LastSliceNormal[1] = m_SliceNormal[1];
-    m_LastSliceNormal[2] = m_SliceNormal[2];
-  }
-
-  for(mafSceneNode *node = m_Sg->GetNodeList(); node; node=node->GetNext())
-  {
-		mafPipe * pipe = node->GetPipe();
-    if(pipe && mafPipeVolumeOrthoSlice::SafeDownCast(pipe) )
-    {
-			mafPipeVolumeOrthoSlice::SafeDownCast(pipe)->SetSlice(Origin, Normal);
-    }
-  }
-
-  double normal[3];
-  if (Normal != NULL)
-    memcpy(normal,Normal,sizeof(m_Slice));
-  else
-    this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-
-  double coord[3];
-  coord[0]=Origin[0];
-  coord[1]=Origin[1];
-  coord[2]=Origin[2];
-  MultiplyPointByInputVolumeABSMatrix(coord);
-
-  for(int i = 0; i < m_CurrentSurface.size(); i++)
-  {
-		mafPipe * curSurfPipe = m_CurrentSurface.at(i)->GetPipe();
-    if (curSurfPipe)
-    {
-      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curSurfPipe);
-      if (pipe != NULL){
-        pipe->SetSlice(coord, normal); 
-      }
-    }
-  }	
-
-
-  for(int i = 0;i < m_CurrentPolyline.size();i++)
-  {
-		mafPipe * curPolylinePipe = m_CurrentPolyline.at(i)->GetPipe();
-    if(curPolylinePipe)
-    {
-      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curPolylinePipe);
-      if (pipe != NULL){
-        pipe->SetSlice(coord, normal); 
-      }
-    }
-  }	
-
-  for(int i = 0; i < m_CurrentPolylineGraphEditor.size();i++)
-  {
-		mafPipe * curPGEPipe = m_CurrentPolylineGraphEditor.at(i)->GetPipe();
-    if (curPGEPipe)
-    {
-      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curPGEPipe);
-      if (pipe != NULL){
-        pipe->SetSlice(coord, normal); 
-      }
-    }   
-  }
-
-  for(int i = 0; i < m_CurrentMesh.size();i++)
-  {
-		mafPipe * curMeshPipe = m_CurrentMesh.at(i)->GetPipe();
-    if (curMeshPipe)
-    {
-      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curMeshPipe);
-      if (pipe != NULL){
-        pipe->SetSlice(coord, normal); 
-      }
-    }   
-  }
-
-  // update text
-  this->UpdateText();
-}

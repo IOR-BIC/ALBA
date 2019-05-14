@@ -45,7 +45,6 @@ SET(PROJECT_SRCS
 	mafPipeVolumeArbSlice.cpp				mafPipeVolumeArbSlice.h
   mafPipeVolumeSliceBlend.cpp  				mafPipeVolumeSliceBlend.h
   mafVisualPipeCollisionDetection.cpp  		mafVisualPipeCollisionDetection.h
-  mafPipeVolumeSliceNotInterpolated.cpp  	mafPipeVolumeSliceNotInterpolated.h  
   mafPipeRayCast.cpp  						mafPipeRayCast.h	
   mafPipeWithScalar.cpp 					mafPipeWithScalar.h
 )

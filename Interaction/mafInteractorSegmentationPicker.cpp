@@ -105,6 +105,7 @@ void mafInteractorSegmentationPicker::OnLeftButtonUp()
 //----------------------------------------------------------------------------
 {
   Superclass::OnLeftButtonUp();
+	mafEventMacro(mafEvent(this,MOUSE_UP));
   m_IsPicking = false;
 }
 //----------------------------------------------------------------------------
@@ -136,11 +137,7 @@ void mafInteractorSegmentationPicker::SendPickingInformation(mafView *v, double 
     if (picked_something)
     {
       vtkPoints *p = vtkPoints::New();
-      double pos_picked[3];
-      cellPicker->GetPickPosition(pos_picked);
-      p->SetNumberOfPoints(1);
-      p->SetPoint(0,pos_picked);
-      double scalar_value = 0;
+      cellPicker->GetPickPosition(m_PickPosition);
       mafVME *pickedVME = v->GetPickedVme();
       if(pickedVME)
       {
@@ -150,16 +147,17 @@ void mafInteractorSegmentationPicker::SendPickingInformation(mafView *v, double 
         //is outside the bounds FindPoint will return -1;
         double bounds[6];
         vtk_data->GetBounds(bounds);
-        if (pos_picked[0]<bounds[0]) pos_picked[0]=bounds[0];
-        if (pos_picked[0]>bounds[1]) pos_picked[0]=bounds[1];
-        if (pos_picked[1]<bounds[2]) pos_picked[1]=bounds[2];
-        if (pos_picked[1]>bounds[3]) pos_picked[1]=bounds[3];
-        if (pos_picked[2]<bounds[4]) pos_picked[2]=bounds[4];
-        if (pos_picked[2]>bounds[5]) pos_picked[2]=bounds[5];
+        if (m_PickPosition[0]<bounds[0]) m_PickPosition[0]=bounds[0];
+        if (m_PickPosition[0]>bounds[1]) m_PickPosition[0]=bounds[1];
+        if (m_PickPosition[1]<bounds[2]) m_PickPosition[1]=bounds[2];
+        if (m_PickPosition[1]>bounds[3]) m_PickPosition[1]=bounds[3];
+        if (m_PickPosition[2]<bounds[4]) m_PickPosition[2]=bounds[4];
+        if (m_PickPosition[2]>bounds[5]) m_PickPosition[2]=bounds[5];
 
-        int pid = vtk_data->FindPoint(pos_picked);
+        int pid = vtk_data->FindPoint(m_PickPosition);
         mafEvent pick_event(this,msg_id,p);
         pick_event.SetArg(pid);
+				pick_event.SetPointer(m_PickPosition);
         mafEventMacro(pick_event);
         p->Delete();
       }
