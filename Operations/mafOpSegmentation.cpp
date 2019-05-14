@@ -20,6 +20,7 @@
 //----------------------------------------------------------------------------
 #include "mafOpSegmentation.h"
 
+#include "mafAbsLogicManager.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafAction.h"
 #include "mafDeviceButtonsPadMouseDialog.h"
@@ -47,12 +48,14 @@
 #include "mafInteractorPicker.h"
 #include "mafInteractorSER.h"
 #include "mafInteractorSegmentationPicker.h"
+#include "mafLogicWithManagers.h"
 #include "mafMatrix.h"
+#include "mafOpManager.h"
 #include "mafOpVolumeResample.h"
 #include "mafPics.h"
 #include "mafPipeVolumeOrthoSlice.h"
-#include "mafPipeVolumeOrthoSlice.h"
 #include "mafRWI.h"
+#include "mafServiceLocator.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
 #include "mafTransformFrame.h"
@@ -62,6 +65,7 @@
 #include "mafVMESegmentationVolume.h"
 #include "mafVMESurface.h"
 #include "mafVMEVolumeGray.h"
+
 #include "mafViewSliceSegmentation.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
@@ -100,12 +104,8 @@
 #include "vtkVolumeProperty.h"
 
 #include "wx/busyinfo.h"
-#include "wx/sizer.h"
-#include "mafLogicWithManagers.h"
 #include "wx/mac/classic/bitmap.h"
-#include "mafServiceLocator.h"
-#include "mafAbsLogicManager.h"
-#include "mafOpManager.h"
+#include "wx/sizer.h"
 
 #define SPACING_PERCENTAGE_BOUNDS 0.1
 #define MAX_UNDOLIST_SIZE 25
@@ -115,6 +115,12 @@ enum INIT_MODALITY_TYPE
   GLOBAL_INIT = 0,
   RANGE_INIT,
 	LOAD_INIT,
+};
+
+enum EDIT_MODALITY_TYPE
+{
+	DRAW_EDIT = 0,
+	FILL_EDIT,
 };
 
 typedef  itk::Image< float, 3> RealImage;
@@ -222,7 +228,7 @@ mafOpSegmentation::mafOpSegmentation(const wxString &label) : mafOp(label)
   m_OLdWindowingLow = -1;
   m_OLdWindowingLow = -1;
 
-  m_ManualSegmentationTools  = 0;
+  m_ManualSegmentationTools  = DRAW_EDIT;
   m_ManualBucketActions = 0;
 }
 //----------------------------------------------------------------------------
@@ -374,6 +380,8 @@ void mafOpSegmentation::Init()
 	OnSelectSlicePlane();
 	OnChangeThresholdType();
 	
+	UpdateSliceLabel();
+
 	// Save prev EventFilterFunct and Set Current Function
 	//m_OldEventFunc = ((mafLogicWithManagers*)GetLogicManager())->GetEventFilterFunc();
 	((mafLogicWithManagers*)GetLogicManager())->SetEventFilterFunc(&mafOpSegmentation::OpSegmentationEventFilter);
@@ -749,7 +757,7 @@ void mafOpSegmentation::CreateOpDialog()
 	wxFont boldFont = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 	boldFont.SetWeight(wxBOLD);
 	m_SnippetsLabel->SetFont(boldFont);
-	m_SnippetsLabel->SetLabel(_(" 'Left Click + Ctrl' to select lower threshold. 'Left Click + Alt' to select upper threshold"));
+	m_SnippetsLabel->SetLabel(_(" Ctrl + 'Left Click' select lower threshold. | Alt + 'Left Click' select upper threshold."));
 
 	m_ProgressBar = new wxGauge(m_Dialog, -1, 100, defPos, wxSize(200, 10));
 
@@ -943,6 +951,8 @@ void mafOpSegmentation::CreateInitSegmentationGui()
 void mafOpSegmentation::CreateEditSegmentationGui()
 {
 	mafGUI *currentGui = new mafGUI(this);
+
+	currentGui->HintBox(NULL, "Change Slice: \nAlt + Shift + 'Mouse Scroll' or \n'PageUp/PageDown'");
 
 	//////////////////////////////////////////////////////////////////////////
 	// Tool Selection
@@ -1366,35 +1376,28 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 			OnEditSegmentationEvent(e);
 		else if (e->GetSender() == m_SegmentationOperationsGui[EDIT_SEGMENTATION])
 			OnRefinementSegmentationEvent(e);
-		else if (e->GetSender() == m_SegmentationPicker && e->GetId() == mafInteractorSegmentationPicker::VME_ALT_PICKED)
-		{
-			//Picking during automatic segmentation
-			if (m_CurrentPhase == INIT_SEGMENTATION)
-			{
-				m_Threshold[1] = m_AutomaticMouseThreshold;
-				m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
-				m_Threshold[0] = min(m_Threshold[1], m_Threshold[0]);
-				m_ThresholdSlider->SetSubRange(m_Threshold);
-				OnThresholdUpate();
-			}
-			//Picking during manual segmentation
-			else if (m_CurrentPhase == EDIT_SEGMENTATION)
-			{
-				m_BrushFillErase = true;
-				if (m_ManualSegmentationTools == 1) // bucket
-					Fill(e);
-				else // brush
-					StartDraw(e);
-			}
-		}
 		//SWITCH
 		else switch (e->GetId())
 		{
 		case MOUSE_WHEEL:
 		{
-			if (m_CurrentPhase == EDIT_SEGMENTATION)
+			// Shift+Alt Change Slice
+			if (wxGetKeyState(WXK_ALT))
 			{
-				if (m_ManualSegmentationTools == 0) //BRUSH
+				if (e->GetArg() < 0)
+				{
+					SliceNext();
+					SetCursor(CUR_SLICE_UP);
+				}
+				else
+				{
+					SlicePrev();
+					SetCursor(CUR_SLICE_DOWN);
+				}
+			}
+			else if (m_CurrentPhase == EDIT_SEGMENTATION)
+			{
+				if (m_ManualSegmentationTools == DRAW_EDIT) //BRUSH SIZE
 				{
 					if (e->GetArg() < 0)
 						m_BrushSize++;
@@ -1427,7 +1430,8 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 			else if (e->GetSender() == m_EditPER)
 			{
 					m_BrushFillErase = e->GetBool();
-					if (m_ManualSegmentationTools == 0) {
+					if (m_ManualSegmentationTools == DRAW_EDIT) 
+					{
 						ApplyRealDrawnImage();
 						if (e->GetArg())
 							m_Helper.DrawBrush((double *)e->GetPointer(), m_SlicePlane, m_BrushSize, m_BrushShape, m_BrushFillErase);
@@ -1450,9 +1454,7 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 			OnPreviousStep();
 			break;
 		case ID_SLICE_NEXT:
-			if (m_SliceIndex < m_SliceSlider->GetMax())
-				m_SliceIndex++;
-			OnUpdateSlice();
+			SliceNext();
 			break;
 		case ID_SLICE_TEXT:
 			if (m_SliceIndex > 1)
@@ -1460,9 +1462,7 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 			OnUpdateSlice();
 			break;
 		case ID_SLICE_PREV:
-			if (m_SliceIndex > 1)
-				m_SliceIndex--;
-			OnUpdateSlice();
+			SlicePrev();
 			break;
 		case ID_SLICE_SLIDER:
 			OnUpdateSlice();
@@ -1488,29 +1488,10 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 		}
 		break;
 		case VME_PICKED:
-		{
-			//Picking during automatic segmentation
-			if (m_CurrentPhase == INIT_SEGMENTATION)
-			{
-				m_Threshold[0] = m_AutomaticMouseThreshold;
-				m_Threshold[1] = max(m_Threshold[1], m_Threshold[0]);
-				m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
-				m_ThresholdSlider->SetSubRange(m_Threshold);
-				UpdateThresholdLabel();
-			}
-			//Picking during manual segmentation
-			if (m_CurrentPhase == EDIT_SEGMENTATION)
-			{
-				m_BrushFillErase = false;
-				if (m_ManualSegmentationTools == 1) // bucket
-					Fill(e);
-				else // brush
-					StartDraw(e);
-			}
-			break;
-		}
+			OnPickingEvent(e);
+		break;
 		case VME_PICKING:
-			if (m_CurrentPhase == EDIT_SEGMENTATION && m_ManualSegmentationTools == 0)
+			if (m_CurrentPhase == EDIT_SEGMENTATION && m_ManualSegmentationTools == DRAW_EDIT)
 			{
 				m_Helper.DrawBrush((double *)e->GetPointer(), m_SlicePlane, m_BrushSize, m_BrushShape, m_BrushFillErase);
 				m_View->CameraUpdate();
@@ -1555,6 +1536,22 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 		}
 	}
 }
+
+//----------------------------------------------------------------------------
+void mafOpSegmentation::SliceNext()
+{
+	if (m_SliceIndex < m_SliceSlider->GetMax())
+		m_SliceIndex++;
+	OnUpdateSlice();
+}
+//----------------------------------------------------------------------------
+void mafOpSegmentation::SlicePrev()
+{
+	if (m_SliceIndex > 1)
+		m_SliceIndex--;
+	OnUpdateSlice();
+}
+
 //----------------------------------------------------------------------------
 void mafOpSegmentation::OnEditStep()
 {
@@ -1581,7 +1578,7 @@ void mafOpSegmentation::OnEditStep()
 	//gui stuff
 	//set brush cursor - enable drawing
 	// brush size slider: min = 1; max = slice size
-	m_SnippetsLabel->SetLabel(_(" 'Left Click' Draw. 'Left Click + Ctrl' Erase"));
+	m_SnippetsLabel->SetLabel(_(" 'Left Click' Draw. | Ctrl + 'Left Click' Erase. | Shift + Scroll set brush size."));
 
 	m_BrushSize = 10;
 	m_BrushSizeSlider->Update();
@@ -1602,7 +1599,7 @@ void mafOpSegmentation::OnEditStep()
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
 	m_GuiDialog->Enable(ID_BUTTON_EDIT, false);
 	
-	m_ManualSegmentationTools = 0;
+	m_ManualSegmentationTools = DRAW_EDIT;
 
 	EnableSizerContent(m_FillEditingSizer, false);
 	EnableSizerContent(m_BrushEditingSizer, true);
@@ -1621,7 +1618,7 @@ void mafOpSegmentation::OnPreviousStep()
 
 	OnEditStepExit();
 
-	m_SnippetsLabel->SetLabel(_(" 'Left Click + Ctrl' to select lower threshold. 'Left Click + Alt' to select upper threshold"));
+	m_SnippetsLabel->SetLabel(_(" Ctrl + 'Left Click' select lower threshold. | Alt + 'Left Click' select upper threshold."));
 	m_CurrentPhase = INIT_SEGMENTATION;
 
 	m_AppendingOpGui->Remove(m_SegmentationOperationsGui[EDIT_SEGMENTATION]);
@@ -1727,6 +1724,38 @@ void mafOpSegmentation::OnSelectSlicePlane()
 	m_OldSliceIndex = m_SliceIndex;
 	m_OldSlicePlane = m_SlicePlane;
 }
+//----------------------------------------------------------------------------
+void mafOpSegmentation::OnPickingEvent(mafEvent * e)
+{
+	//Picking during automatic segmentation
+	if (m_CurrentPhase == INIT_SEGMENTATION)
+	{
+		if (e->GetArg() == MAF_ALT_KEY)
+		{
+			m_Threshold[1] = m_AutomaticMouseThreshold;
+			m_Threshold[0] = min(m_Threshold[1], m_Threshold[0]);
+		}
+		else if (e->GetArg() == MAF_CTRL_KEY)
+		{
+			m_Threshold[0] = m_AutomaticMouseThreshold;
+			m_Threshold[1] = max(m_Threshold[1], m_Threshold[0]);
+		}
+		m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
+		m_ThresholdSlider->SetSubRange(m_Threshold);
+		OnThresholdUpate();
+	}
+	//Picking during manual segmentation
+	else if (m_CurrentPhase == EDIT_SEGMENTATION)
+	{
+		//if the sender is the segmentation picker we need to draw / else erase
+		m_BrushFillErase = e->GetArg() == MAF_CTRL_KEY;
+		if (m_ManualSegmentationTools == FILL_EDIT) // bucket
+			Fill(e);
+		else // brush
+			StartDraw(e);
+	}
+}
+
 //----------------------------------------------------------------------------
 void mafOpSegmentation::OnUpdateSlice()
 {
@@ -1956,7 +1985,9 @@ void mafOpSegmentation::OnEditSegmentationEvent(mafEvent *e)
 
 		case ID_MANUAL_TOOLS_BRUSH:
 		{
-			m_ManualSegmentationTools = 0;
+			m_ManualSegmentationTools = DRAW_EDIT;
+
+			m_SnippetsLabel->SetLabel(_(" 'Left Click' Draw. | Ctrl + 'Left Click' Erase. | Shift + Scroll set brush size."));
 
 			SetCursor(CUR_PENCIL);
 
@@ -1967,7 +1998,9 @@ void mafOpSegmentation::OnEditSegmentationEvent(mafEvent *e)
 		break;
 		case ID_MANUAL_TOOLS_FILL:
 		{
-			m_ManualSegmentationTools = 1;
+			m_ManualSegmentationTools = FILL_EDIT;
+
+			m_SnippetsLabel->SetLabel(_(" 'Left Click' Fill. | Ctrl + 'Left Click' Erase. | Shift + Scroll set threshold."));
 
 			SetCursor(CUR_FILL);
 
@@ -2520,31 +2553,31 @@ int mafOpSegmentation::OpSegmentationEventFilter(wxEvent& event)
 //----------------------------------------------------------------------------
 void mafOpSegmentation::PressKey(int keyCode, bool ctrl, bool alt, bool shift)
 {
-	if (m_CurrentPhase == INIT_SEGMENTATION)// && (m_InitModality
+	if (m_CurrentPhase == INIT_SEGMENTATION)
 	{
-		if (alt)
+		if (m_InitModality != LOAD_INIT)
 		{
-			SetCursor(CUR_COLOR_PICK_MAX);
-		}
-		else if (ctrl)
-		{
-			SetCursor(CUR_COLOR_PICK_MIN);
+			if (ctrl) // Pick Min
+			{
+				SetCursor(CUR_COLOR_PICK_MIN);
+			}
+			else if (alt) // Pick Max
+			{
+				SetCursor(CUR_COLOR_PICK_MAX);
+			}
 		}
 	}
 	else if (m_CurrentPhase = EDIT_SEGMENTATION)
 	{
-		if (m_ManualSegmentationTools == 0) // Erase
+		if (ctrl)
 		{
-			if (ctrl)
+			if (m_ManualSegmentationTools == DRAW_EDIT) // Erase
 			{
 				SetCursor(CUR_ERASE);
 			}
-		}
-		if (m_ManualSegmentationTools == 1) // Fill
-		{
-			if (ctrl)
+			else	if (m_ManualSegmentationTools == FILL_EDIT) // Fill
 			{
-				SetCursor(CUR_FILL);
+				SetCursor(CUR_FILL_ERASE);
 			}
 		}
 	}
@@ -2554,22 +2587,43 @@ void mafOpSegmentation::PressKey(int keyCode, bool ctrl, bool alt, bool shift)
 //----------------------------------------------------------------------------
 void mafOpSegmentation::ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift)
 {
-	if (m_CurrentPhase == INIT_SEGMENTATION)// && (m_InitModality
+	if (m_CurrentPhase == INIT_SEGMENTATION)
 	{
-		SetCursor(CUR_COLOR_PICK_MIN);
+		SetCursor(CUR_DEFAULT);
 	}
 	else if (m_CurrentPhase = EDIT_SEGMENTATION)
 	{
-		if (m_ManualSegmentationTools == 0) // Draw
+		if (m_ManualSegmentationTools == DRAW_EDIT) // Draw
 		{
 			SetCursor(CUR_PENCIL);
 		}
-		if (m_ManualSegmentationTools == 1) // Fill
+		if (m_ManualSegmentationTools == FILL_EDIT) // Fill
 		{
 			SetCursor(CUR_FILL);
 		}
+
+		if (ctrl)
+		{
+			if (keyCode = 'z' && m_UndoList.size() > 0)
+			{
+				OnUndoRedo(true);
+			}
+			else if (keyCode = 'y' && m_RedoList.size() > 0)
+			{
+				OnUndoRedo(false);
+			}
+		}
 	} 
 	else SetCursor(CUR_DEFAULT);
+
+	if (keyCode == 312)//WXK_PAGEUP)
+	{
+		SliceNext();
+	}
+	else if (keyCode == 313)//WXK_PAGEDOWN)
+	{
+		SlicePrev();
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -2599,16 +2653,26 @@ void mafOpSegmentation::InitMouseCursors()
 #include "pic/Cursor/Pencil.xpm"
 #include "pic/Cursor/Pencil_Erase.xpm"
 #include "pic/Cursor/Fill.xpm"
+#include "pic/Cursor/Fill_Erase.xpm"
 #include "pic/Cursor/Color_Pick.xpm"
 #include "pic/Cursor/Color_Pick_Up.xpm"
 #include "pic/Cursor/Color_Pick_Down.xpm"
+#include "pic/Cursor/Pencil_Size.xpm"
+#include "pic/Cursor/Pencil_Erase_Size.xpm"
+#include "pic/Cursor/Slice_Up.xpm"
+#include "pic/Cursor/Slice_Down.xpm"
 
 	m_CursorImageVect.clear();
 
 	m_CursorImageVect.push_back(wxImage(Pencil_xpm));
 	m_CursorImageVect.push_back(wxImage(Pencil_Erase_xpm));
 	m_CursorImageVect.push_back(wxImage(Fill_xpm));
+	m_CursorImageVect.push_back(wxImage(Fill_Erase_xpm));
 	m_CursorImageVect.push_back(wxImage(Color_Pick_xpm));
 	m_CursorImageVect.push_back(wxImage(Color_Pick_Up_xpm));
 	m_CursorImageVect.push_back(wxImage(Color_Pick_Down_xpm));
+	m_CursorImageVect.push_back(wxImage(Pencil_Size_xpm));
+	m_CursorImageVect.push_back(wxImage(Pencil_Erase_Size_xpm));
+	m_CursorImageVect.push_back(wxImage(Slice_Up_xpm));
+	m_CursorImageVect.push_back(wxImage(Slice_Down_xpm));
 }

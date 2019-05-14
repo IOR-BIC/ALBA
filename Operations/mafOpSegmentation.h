@@ -173,7 +173,11 @@ public:
    /** Function that handles events sent from other objects. */
   void OnEvent(mafEventBase *maf_event);
 
-  /** return the copy of the operation object */
+	void SliceNext();
+
+	void SlicePrev();
+
+	/** return the copy of the operation object */
   mafOp* Copy();
 
   /** Return true for the acceptable vme type. */
@@ -394,6 +398,8 @@ protected:
 
 	void OnSelectSlicePlane();
 
+	void OnPickingEvent(mafEvent * e);
+
   /** Add a new range using gui values */
   void OnSplitRange();
 
@@ -484,9 +490,14 @@ protected:
 		CUR_PENCIL,
 		CUR_ERASE,
 		CUR_FILL,
+		CUR_FILL_ERASE,
 		CUR_COLOR_PICK,
-		CUR_COLOR_PICK_MIN,
 		CUR_COLOR_PICK_MAX,
+		CUR_COLOR_PICK_MIN,
+		CUR_PENCIL_SIZE,
+		CUR_PENCIL_ERASE_SIZE,
+		CUR_SLICE_UP,
+		CUR_SLICE_DOWN,
 	};
 
 	void SetCursor(int cursorId);
