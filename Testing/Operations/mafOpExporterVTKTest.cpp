@@ -214,7 +214,7 @@ void mafOpExporterVTKTest::TestOpExportVolume()
 
 	mafVMEVolumeGray *volume;
 	mafNEW(volume);
-	result = volume->SetData(reader->GetOutput(), 0.0) == MAF_OK;
+	result = volume->SetData((vtkImageData*)reader->GetOutput(), 0.0) == MAF_OK;
 	CPPUNIT_ASSERT(result);
 	volume->Update();
 

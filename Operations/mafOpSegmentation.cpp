@@ -382,7 +382,7 @@ void mafOpSegmentation::Init()
 	
 	UpdateSliceLabel();
 
-	// Save prev EventFilterFunct and Set Current Function
+	// Save prev EventFilterFunc and Set Current Function
 	//m_OldEventFunc = ((mafLogicWithManagers*)GetLogicManager())->GetEventFilterFunc();
 	((mafLogicWithManagers*)GetLogicManager())->SetEventFilterFunc(&mafOpSegmentation::OpSegmentationEventFilter);
 }
