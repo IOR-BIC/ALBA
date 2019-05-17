@@ -7,7 +7,6 @@ ELSE(MAF_BUILD_MAFDLL)
 ENDIF (MAF_BUILD_MAFDLL)
 
 #ADD_EXECUTABLE(vtkMAFTest vtkMAFTest.cxx)
-#ADD_EXECUTABLE(testDicom testDicom.cxx)
 #ADD_EXECUTABLE(testVTKVolumeSlicer testVTKVolumeSlicer.cxx)
 #ADD_EXECUTABLE(vtkMAFPolyDataSingleSourceShortestPathTest vtkMAFPolyDataSingleSourceShortestPathTest.h vtkMAFPolyDataSingleSourceShortestPathTest.cpp)
 # ADD_EXECUTABLE(vtkMAFImageUnsharpFilterTest vtkMAFImageUnsharpFilterTest.h vtkMAFImageUnsharpFilterTest.cpp)
@@ -31,7 +30,6 @@ SET(PROJECT_SRCS
 	vtkMAFGridActorTest.h vtkMAFGridActorTest.cpp
 	vtkMAFProjectVolumeTest.h vtkMAFProjectVolumeTest.cpp
 	vtkMAFClipSurfaceBoundingBoxTest.h vtkMAFClipSurfaceBoundingBoxTest.cpp
-	vtkMAFRGSliceAccumulateTest.h vtkMAFRGSliceAccumulateTest.cpp
 	vtkMAFRectilinearGridToRectilinearGridFilterTest.h vtkMAFRectilinearGridToRectilinearGridFilterTest.cpp
 	vtkMAFDummyRectilinearGridToRectilinearGridFilter.h vtkMAFDummyRectilinearGridToRectilinearGridFilter.cpp
 	vtkMAFProfilingActorTest.h vtkMAFProfilingActorTest.cpp
@@ -42,7 +40,6 @@ SET(PROJECT_SRCS
 	vtkMAFExtendedGlyph3DTest.h vtkMAFExtendedGlyph3DTest.cpp
 	vtkMAFTransferFunction2DTest.h vtkMAFTransferFunction2DTest.cpp
 	vtkHoleConnectivityTest.h vtkHoleConnectivityTest.cpp
-	vtkDicomUnPackerTest.h vtkDicomUnPackerTest.cpp
 	vtkTriangleQualityRatioTest.h vtkTriangleQualityRatioTest.cpp
 	vtkMAFTubeFilterTest.h vtkMAFTubeFilterTest.cpp
 	vtkMaskPolyDataFilterTest.h vtkMaskPolyDataFilterTest.cpp

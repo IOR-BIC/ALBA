@@ -33,7 +33,6 @@ SET(vtkMAF_SRCS
   vtkMAFProjectVolume.cxx  									vtkMAFProjectVolume.h
   vtkMAFRayCast3DPicker.cxx  							vtkMAFRayCast3DPicker.h
   vtkMAFRectilinearGridToRectilinearGridFilter.cxx  	vtkMAFRectilinearGridToRectilinearGridFilter.h
-  vtkMAFRGSliceAccumulate.cxx  							vtkMAFRGSliceAccumulate.h
   vtkMAFRulerActor2D.cxx  								vtkMAFRulerActor2D.h
   vtkMAFSimpleRulerActor2D.cxx  						vtkMAFSimpleRulerActor2D.h
   vtkMAFTextActorMeter.cxx  							vtkMAFTextActorMeter.h
@@ -45,7 +44,6 @@ SET(vtkMAF_SRCS
   vtkMAFXYPlotActor.cxx  								vtkMAFXYPlotActor.h
   vtkMAFPolyDataNormals.cxx  							vtkMAFPolyDataNormals.h
   ##from vtkMAF
-  vtkDicomUnPacker.cxx  								vtkDicomUnPacker.h
   vtkImageUnPacker.cxx  								vtkImageUnPacker.h
   vtkPackedImage.cxx  									vtkPackedImage.h
   vtkXRayVolumeMapper.cxx    							vtkXRayVolumeMapper.h
