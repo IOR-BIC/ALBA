@@ -37,7 +37,6 @@
 #include "vtkMAFGridActorTest.h"
 #include "vtkMAFProjectVolumeTest.h"
 #include "vtkMAFClipSurfaceBoundingBoxTest.h"
-#include "vtkMAFRGSliceAccumulateTest.h"
 #include "vtkMAFRectilinearGridToRectilinearGridFilterTest.h"
 #include "vtkMAFDummyRectilinearGridToRectilinearGridFilter.h"
 #include "vtkMAFProfilingActorTest.h"
@@ -48,7 +47,6 @@
 #include "vtkMAFExtendedGlyph3DTest.h"
 #include "vtkMAFTransferFunction2DTest.h"
 #include "vtkHoleConnectivityTest.h"
-#include "vtkDicomUnPackerTest.h"
 #include "vtkTriangleQualityRatioTest.h"
 #include "vtkMaskPolyDataFilterTest.h"
 #include "vtkMAFExtrudeToCircleTest.h"
@@ -163,7 +161,6 @@ int
 	runner.addTest(vtkMAFGridActorTest::suite());
 	runner.addTest(vtkMAFProjectVolumeTest::suite());
 	runner.addTest(vtkMAFClipSurfaceBoundingBoxTest::suite());
-	runner.addTest(vtkMAFRGSliceAccumulateTest::suite());
 	//runner.addTest(vtkMAFRectilinearGridToRectilinearGridFilterTest::suite());
 	runner.addTest(vtkMAFProfilingActorTest::suite());
 	runner.addTest(vtkMAFRulerActor2DTest::suite());
@@ -173,7 +170,6 @@ int
 	runner.addTest(vtkMAFExtendedGlyph3DTest::suite());
 	runner.addTest(vtkMAFTransferFunction2DTest::suite());
 	runner.addTest(vtkHoleConnectivityTest::suite());
-	//runner.addTest(vtkDicomUnPackerTest::suite());
 	runner.addTest(vtkTriangleQualityRatioTest::suite());
 	runner.addTest(vtkMaskPolyDataFilterTest::suite());
 	runner.addTest(vtkMAFExtrudeToCircleTest::suite());
