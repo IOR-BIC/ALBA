@@ -63,7 +63,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPolyData.h"
 #include "vtkStructuredPoints.h"
 #include "vtkRenderer.h"
-#include "vtkMAFRGSliceAccumulate.h"
+#include "mafOpImporterDicomSliceAccHelper.h"
 #include "vtkTransform.h"
 #include "vtkImageData.h"
 #include "vtkTextMapper.h"
@@ -412,8 +412,8 @@ int mafOpImporterDicom::BuildVMEVolumeGrayOutput()
 		int firstSliceAtTimeID = GetSliceIDInSeries(t, 0);
 		mafTimeStamp triggerTime = m_SelectedSeries->GetSlice(firstSliceAtTimeID)->GetTriggerTime();
 
-		vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
-		accumulate->SetNumberOfSlices(SlicesPerFrame);
+		mafOpImporterDicomSliceAccHelper accumulate;
+		accumulate.SetNumOfSlices(SlicesPerFrame);
 
 		int accumSliceN = 0;
 		//Loop foreach slice
@@ -426,17 +426,16 @@ int mafOpImporterDicom::BuildVMEVolumeGrayOutput()
 			vtkImageData *image = slice->GetNewVTKImageData();
 			Crop(image);
 
-			accumulate->SetSlice(accumSliceN, image, slice->GetUnrotatedOrigin());
+			accumulate.SetSlice(accumSliceN, image, slice->GetUnrotatedOrigin());
 
 			progressHelper.UpdateProgressBar(parsedSlices * 100 / totalNumberOfImages);
 			accumSliceN++;
 
 			vtkDEL(image);
 		}
-		accumulate->Update();
 
-		vtkRectilinearGrid *rg_out;
-		rg_out = accumulate->GetOutput();
+		vtkDataSet *rg_out;
+		rg_out = accumulate.GetNewOutput(); 
 		rg_out->Update();
 
 		//Set data at specific time
