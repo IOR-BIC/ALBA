@@ -73,15 +73,14 @@ public:
 	void AddCall(testFunctions func, mafVME* vme);
 
 	virtual bool IsOperationRunning();
-
-
+	
 	virtual const char* GetMsfFileExtension() override;
-
-
+	
 	virtual void VmeRemoved() override;
-
-
+	
 	virtual void PrintImage(mafVMEImage *img) override;
+
+	virtual mafOpManager * GetOpManager() const override;
 
 protected:
 	

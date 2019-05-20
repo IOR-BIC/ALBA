@@ -22,6 +22,7 @@
 
 #include "vtkSystemIncludes.h"
 #include "wx/gauge.h"
+#include "mafLogicWithManagers.h"
 
 
 //----------------------------------------------------------------------------
@@ -173,7 +174,11 @@ public:
    /** Function that handles events sent from other objects. */
   void OnEvent(mafEventBase *maf_event);
 
-  /** return the copy of the operation object */
+	void SliceNext();
+
+	void SlicePrev();
+
+	/** return the copy of the operation object */
   mafOp* Copy();
 
   /** Return true for the acceptable vme type. */
@@ -194,6 +199,8 @@ public:
   /** Return true if node is of type mafVMEVolume. */
   static bool SegmentedVolumeAccept(mafVME* node);
 	 
+	static int OpSegmentationEventFilter(wxEvent& event);
+
 protected:
 
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
@@ -256,8 +263,7 @@ protected:
   void OnEditSegmentationEvent(mafEvent *e);
 
 	void OnUndoRedo(bool undo);
-
-
+	
   /** Receive events from Refinement segmentation gui */
   void OnRefinementSegmentationEvent(mafEvent *e);
   
@@ -329,8 +335,7 @@ protected:
 	void AddUndoStep();
 
 	UndoRedoState CreateUndoRedoState();
-
-
+	
   /** Reset undo list*/
   void ClearManualUndoList();
   
@@ -390,6 +395,8 @@ protected:
 
 	void OnSelectSlicePlane();
 
+	void OnPickingEvent(mafEvent * e);
+
   /** Add a new range using gui values */
   void OnSplitRange();
 
@@ -424,8 +431,8 @@ protected:
   //Segmentation Refinement stuff
   /** Reset refinement undo list */
   void ResetRefinementUndoList();
-  
-  /** Reset refinement redo list */
+
+	/** Reset refinement redo list */
   void ResetRefinementRedoList();
 
   /** Apply refinement algorithm implemented with ITK (not used) */
@@ -458,16 +465,42 @@ protected:
   wxGauge *m_ProgressBar; //< display progress
 
 	mafOpSegmentationHelper m_Helper;
-	  
-  
+	
   void EnableSizerContent(wxSizer* sizer, bool enable);
 
   void Fill(mafEvent *e);
 
 	void InitRanges();
 
+	void PressKey(int keyCode, bool ctrl, bool alt, bool shift);
+
+	void InitMouseCursors();
+
+	void ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift);
+
+	std::vector<wxImage> m_CursorImageVect;
+
+	enum MOUSE_CURSOR
+	{
+		CUR_DEFAULT = -1, // Arrow
+		CUR_PENCIL,
+		CUR_ERASE,
+		CUR_FILL,
+		CUR_FILL_ERASE,
+		CUR_COLOR_PICK,
+		CUR_COLOR_PICK_MAX,
+		CUR_COLOR_PICK_MIN,
+		CUR_PENCIL_SIZE,
+		CUR_PENCIL_ERASE_SIZE,
+		CUR_SLICE_UP,
+		CUR_SLICE_DOWN,
+	};
+
+	void SetCursor(int cursorId);
+
 private:
 
+	eventfilterFunc m_OldEventFunc;
 	void SelectRangeByCurrentSlice();
 };
 #endif

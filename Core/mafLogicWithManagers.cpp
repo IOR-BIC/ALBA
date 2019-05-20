@@ -100,6 +100,7 @@
 #define IDM_WINDOWPREV 4006
 
 
+
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 {
@@ -172,6 +173,8 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_ShowInteractionSettings = false;
 	m_SelectedLandmark = NULL;
 	m_FatalExptionOccurred = false;
+
+	m_EventFilterFunc = NULL;
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers()
@@ -179,9 +182,7 @@ mafLogicWithManagers::~mafLogicWithManagers()
   //free mem
   if(m_WizardManager)
     delete m_WizardManager;
-
-
-
+	
   // Managers are destruct in the OnClose
   cppDEL(m_User);
   cppDEL(m_PrintSupport);
@@ -190,7 +191,6 @@ mafLogicWithManagers::~mafLogicWithManagers()
 	cppDEL(m_ApplicationSettings);
 	cppDEL(m_TimeBarSettings);
 }
-
 
 // APPLICATION ///////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
@@ -1531,7 +1531,6 @@ void mafLogicWithManagers::ShowLandmark(mafVMELandmark * lm, bool visibility)
 // OPERATION /////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OpRunStarting()
-//----------------------------------------------------------------------------
 {
 	m_RunningOperation = true;
   EnableMenuAndToolbar();
@@ -1543,7 +1542,6 @@ void mafLogicWithManagers::OpRunStarting()
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OpRunTerminated(int runOk)
-//----------------------------------------------------------------------------
 {
 	m_RunningOperation = false;
   EnableMenuAndToolbar();
@@ -1557,13 +1555,11 @@ void mafLogicWithManagers::OpRunTerminated(int runOk)
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OpShowGui(bool push_gui, mafGUIPanel *panel)
-//----------------------------------------------------------------------------
 {
 	if(m_SideBar) m_SideBar->OpShowGui(push_gui, panel);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OpHideGui(bool view_closed)
-//----------------------------------------------------------------------------
 {
 	if(m_SideBar) m_SideBar->OpHideGui(view_closed);
 }
@@ -1712,7 +1708,6 @@ void mafLogicWithManagers::CreateWizardToolbar()
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::ConfigureWizardManager()
-	//----------------------------------------------------------------------------
 {
 	//Setting wizard specific data
 	if(m_UseWizardManager)
@@ -2365,7 +2360,6 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::HandleException()
 {
-
 	if (!m_FatalExptionOccurred)
 	{
 		m_FatalExptionOccurred = true;
@@ -2380,4 +2374,13 @@ void mafLogicWithManagers::HandleException()
 		}
 	}
 	OnQuit();
+}
+
+//----------------------------------------------------------------------------
+int mafLogicWithManagers::AppEventFilter(wxEvent& event)
+{
+	if (m_EventFilterFunc)
+		return (*m_EventFilterFunc)(event);
+		
+	else return -1;
 }

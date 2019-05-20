@@ -194,6 +194,7 @@ bool AlbaMaster::OnInit()
 	result = mafPipeFactoryVME::Initialize();
 	assert(result==MAF_OK);
 
+	m_LogicInitialized = false;
 	m_Logic = new mafLogicWithManagers();
 	mafServiceLocator::SetLogicManager(m_Logic);
   
@@ -468,6 +469,8 @@ bool AlbaMaster::OnInit()
 	//m_Logic->ShowSplashScreen();
 	m_Logic->Show();
 	m_Logic->Init(0,NULL); // calls FileNew - which create the root
+	m_LogicInitialized = true;
+
 	return TRUE;
 }
 //--------------------------------------------------------------------------------
@@ -476,8 +479,18 @@ int AlbaMaster::OnExit()
 	cppDEL(m_Logic);
 	return 0;
 }
+
 //--------------------------------------------------------------------------------
 void AlbaMaster::OnFatalException()
 {
 	m_Logic->HandleException();
+}
+
+//--------------------------------------------------------------------------------
+int AlbaMaster::FilterEvent(wxEvent& event)
+{
+	if (m_LogicInitialized)
+		return m_Logic->AppEventFilter(event);
+
+	return -1;
 }
