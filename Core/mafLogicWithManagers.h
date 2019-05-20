@@ -54,6 +54,8 @@ class mafGUISettingsTimeBar;
 class mafHelpManager;
 class mafSnapshotManager;
 
+typedef int(*eventfilterFunc)(wxEvent& event);
+
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
 //----------------------------------------------------------------------------
@@ -170,6 +172,9 @@ public:
 	/** Manage application exception and allow to save at least the tree. */
 	virtual void HandleException();
 
+	/** Manage application Events */
+	int AppEventFilter(wxEvent& event);
+
 	/** Set the revision string */
 	void SetRevision(mafString revision) { m_Revision = revision; };
 
@@ -210,8 +215,14 @@ public:
 	// VME
 	virtual const char* GetMsfFileExtension() { return m_Extension.GetCStr(); }
 		
+	/* Return the Operation Manager */
+	virtual mafOpManager * GetOpManager() const { return m_OpManager; }
 
 	virtual void PrintImage(mafVMEImage *img);
+
+	eventfilterFunc GetEventFilterFunc() const { return m_EventFilterFunc; }
+
+	void SetEventFilterFunc(eventfilterFunc val) { m_EventFilterFunc = val;}
 
 protected:
 	//---------------------------------------------------------
@@ -398,6 +409,8 @@ protected:
 	bool m_UseInteractionManager;
 	bool m_UseHelpManager;
 	bool m_UseSnapshotManager;
+
+	eventfilterFunc m_EventFilterFunc;
 
 	mafGUISettingsDialog	*m_SettingsDialog;
 	mafGUIAboutDialog			*m_AboutDialog;

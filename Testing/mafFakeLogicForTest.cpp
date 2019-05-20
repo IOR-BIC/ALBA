@@ -116,3 +116,9 @@ void mafFakeLogicForTest::PrintImage(mafVMEImage *img)
 {
 	AddCall(mafFakeLogicForTest::FKL_PRINT_IMAGE, (mafVME*)img);
 }
+
+//----------------------------------------------------------------------------
+mafOpManager * mafFakeLogicForTest::GetOpManager() const
+{
+	return NULL;
+}
