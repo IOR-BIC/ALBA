@@ -345,7 +345,7 @@ void mafOpSegmentation::OpStop(int result)
   ResetRefinementRedoList();
 
 	// Restore old EventFilterFunc
-	//((mafLogicWithManagers*)GetLogicManager())->SetEventFilterFunc(m_OldEventFunc);
+	((mafLogicWithManagers*)GetLogicManager())->SetEventFilterFunc(m_OldEventFunc);
 
   mafEventMacro(mafEvent(this,result));
 }
@@ -383,7 +383,7 @@ void mafOpSegmentation::Init()
 	UpdateSliceLabel();
 
 	// Save prev EventFilterFunc and Set Current Function
-	//m_OldEventFunc = ((mafLogicWithManagers*)GetLogicManager())->GetEventFilterFunc();
+	m_OldEventFunc = ((mafLogicWithManagers*)GetLogicManager())->GetEventFilterFunc();
 	((mafLogicWithManagers*)GetLogicManager())->SetEventFilterFunc(&mafOpSegmentation::OpSegmentationEventFilter);
 }
 //----------------------------------------------------------------------------
@@ -2591,7 +2591,7 @@ void mafOpSegmentation::ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift)
 	{
 		SetCursor(CUR_DEFAULT);
 	}
-	else if (m_CurrentPhase = EDIT_SEGMENTATION)
+	else if (m_CurrentPhase == EDIT_SEGMENTATION)
 	{
 		if (m_ManualSegmentationTools == DRAW_EDIT) // Draw
 		{
@@ -2604,11 +2604,11 @@ void mafOpSegmentation::ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift)
 
 		if (ctrl)
 		{
-			if (keyCode = 'z' && m_UndoList.size() > 0)
+			if (keyCode == 'Z' && m_UndoList.size() > 0)
 			{
 				OnUndoRedo(true);
 			}
-			else if (keyCode = 'y' && m_RedoList.size() > 0)
+			else if (keyCode == 'Y' && m_RedoList.size() > 0)
 			{
 				OnUndoRedo(false);
 			}

@@ -22,6 +22,7 @@
 
 #include "vtkSystemIncludes.h"
 #include "wx/gauge.h"
+#include "mafLogicWithManagers.h"
 
 
 //----------------------------------------------------------------------------
@@ -200,8 +201,6 @@ public:
 	 
 	static int OpSegmentationEventFilter(wxEvent& event);
 
-	//eventfilterFunc m_OldEventFunc;
-
 protected:
 
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
@@ -264,8 +263,7 @@ protected:
   void OnEditSegmentationEvent(mafEvent *e);
 
 	void OnUndoRedo(bool undo);
-
-
+	
   /** Receive events from Refinement segmentation gui */
   void OnRefinementSegmentationEvent(mafEvent *e);
   
@@ -337,8 +335,7 @@ protected:
 	void AddUndoStep();
 
 	UndoRedoState CreateUndoRedoState();
-
-
+	
   /** Reset undo list*/
   void ClearManualUndoList();
   
@@ -468,8 +465,7 @@ protected:
   wxGauge *m_ProgressBar; //< display progress
 
 	mafOpSegmentationHelper m_Helper;
-	  
-  
+	
   void EnableSizerContent(wxSizer* sizer, bool enable);
 
   void Fill(mafEvent *e);
@@ -504,6 +500,7 @@ protected:
 
 private:
 
+	eventfilterFunc m_OldEventFunc;
 	void SelectRangeByCurrentSlice();
 };
 #endif
