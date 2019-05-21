@@ -29,8 +29,12 @@ public:
   bool OnInit();
   int  OnExit();
 
+	/** This function filters wxEvents and is used to control global hot keys*/
+	int FilterEvent(wxEvent& event);
+
 protected:
   mafLogicWithManagers *m_Logic;
+	bool m_LogicInitialized;
 
 	void OnFatalException();
 };

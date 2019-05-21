@@ -1077,6 +1077,8 @@ void mafOpImporterDicom::ImportDicomTags()
 	TagsToRead.insert(TAG_StudyDescription);
 	TagsToRead.insert(TAG_SeriesDescription);
 	TagsToRead.insert(TAG_AcquisitionDate);
+	TagsToRead.insert(TAG_PixelSpacing);
+	TagsToRead.insert(TAG_ProtocolName);
 	
 	if (!dcmReader.ReadSelectedTags(TagsToRead))
 	{
@@ -1094,11 +1096,13 @@ void mafOpImporterDicom::ImportDicomTags()
 	READ_AND_SET_TAGARRAY(TAG_PatientsBirthDate, "PatientsBirthDate");
 	READ_AND_SET_TAGARRAY(TAG_PatientsWeight, "PatientsWeight");
 	READ_AND_SET_TAGARRAY(TAG_PatientID, "PatientID");
+	READ_AND_SET_TAGARRAY(TAG_PixelSpacing, "PixelSpacing");
 	READ_AND_SET_TAGARRAY(TAG_PatientsAge, "PatientsAge");
 	READ_AND_SET_TAGARRAY(TAG_InstitutionName, "InstitutionName");
 	READ_AND_SET_TAGARRAY(TAG_StudyDescription, "StudyDescription");
 	READ_AND_SET_TAGARRAY(TAG_SeriesDescription, "SeriesDescription");
 	READ_AND_SET_TAGARRAY(TAG_AcquisitionDate, "AcquisitionDate");
+	READ_AND_SET_TAGARRAY(TAG_ProtocolName, "ProtocolName");
 	
   m_TagArray->SetTag(mafTagItem("VME_NATURE", "NATURAL"));
 }

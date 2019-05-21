@@ -45,72 +45,45 @@
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafInteractorSegmentationPicker)
-//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 mafInteractorSegmentationPicker::mafInteractorSegmentationPicker()
-//------------------------------------------------------------------------------
 {
   m_IsPicking = false;
-  m_FullModifiersMode = false;
 }
-
 //------------------------------------------------------------------------------
 mafInteractorSegmentationPicker::~mafInteractorSegmentationPicker()
-//------------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 void mafInteractorSegmentationPicker::OnLeftButtonDown(mafEventInteraction *e)
-//----------------------------------------------------------------------------
 {
   Superclass::OnLeftButtonDown(e);
-  if (mafDeviceButtonsPadTracker *tracker=mafDeviceButtonsPadTracker::SafeDownCast((mafDevice *)e->GetSender()))
-  { // is it a tracker?
-    mafMatrix *tracker_pose = e->GetMatrix();
-    // extract device avatar's renderer, no avatar == no picking
-    mafAvatar *avatar = tracker->GetAvatar();
-    if (avatar)
-    {
-      // compute pose in the world frame
-      mafMatrix world_pose;
-      mafAvatar3D *avatar3D=mafAvatar3D::SafeDownCast(avatar);
-      if (avatar3D)
-        avatar3D->TrackerToWorld(*tracker_pose,world_pose,mafAvatar3D::CANONICAL_TO_WORLD_SCALE);
-      else
-        world_pose = *tracker_pose;
-      SendPickingInformation(avatar->GetView(),NULL,VME_PICKED,&world_pose,false);
-    }
-  }
-  else if (mafDeviceButtonsPadMouse *mouse=mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)e->GetSender()))
+	mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)e->GetSender());
+
+	if (mouse && e->GetButton() == MAF_LEFT_BUTTON)
   { 
-    if (!m_FullModifiersMode && e->GetButton() == MAF_LEFT_BUTTON && e->GetModifiers() == 0 || m_FullModifiersMode && e->GetModifier(MAF_CTRL_KEY) && e->GetButton() == MAF_LEFT_BUTTON)
-    {
-	    double mouse_pos[2];
-	    e->Get2DPosition(mouse_pos);
-	    SendPickingInformation(mouse->GetView(), mouse_pos);
-    }
-    else if (!m_FullModifiersMode && e->GetModifier(MAF_CTRL_KEY) && e->GetButton() == MAF_LEFT_BUTTON || m_FullModifiersMode && e->GetModifier(MAF_ALT_KEY) && e->GetButton() == MAF_LEFT_BUTTON)
-    {
-      double mouse_pos[2];
-      e->Get2DPosition(mouse_pos);
-      SendPickingInformation(mouse->GetView(), mouse_pos, VME_ALT_PICKED);
-    }
-  }
+		double mouse_pos[2];
+		e->Get2DPosition(mouse_pos);
+
+    if (e->GetModifier(MAF_CTRL_KEY))
+	    SendPickingInformation(mouse->GetView(), mouse_pos,MAF_CTRL_KEY, VME_PICKED);
+		else if (e->GetModifier(MAF_ALT_KEY))
+      SendPickingInformation(mouse->GetView(), mouse_pos,MAF_ALT_KEY, VME_PICKED);
+		else 
+			SendPickingInformation(mouse->GetView(), mouse_pos, 0, VME_PICKED);
+	}
   m_IsPicking = true;
 }
-
 //----------------------------------------------------------------------------
 void mafInteractorSegmentationPicker::OnLeftButtonUp() 
-//----------------------------------------------------------------------------
 {
   Superclass::OnLeftButtonUp();
 	mafEventMacro(mafEvent(this,MOUSE_UP));
   m_IsPicking = false;
 }
 //----------------------------------------------------------------------------
-void mafInteractorSegmentationPicker::SendPickingInformation(mafView *v, double *mouse_pos, int msg_id, mafMatrix *tracker_pos, bool mouse_flag)
-//----------------------------------------------------------------------------
+void mafInteractorSegmentationPicker::SendPickingInformation(mafView *v, double *mouse_pos,long modifier, int eventId)
 {
   bool picked_something = false;
 
@@ -119,68 +92,45 @@ void mafInteractorSegmentationPicker::SendPickingInformation(mafView *v, double 
   cellPicker->SetTolerance(0.001);
   if (v)
   {
-    if(mouse_flag)
+    vtkRendererCollection *rc = v->GetRWI()->GetRenderWindow()->GetRenderers();
+    vtkRenderer *r = NULL;
+    rc->InitTraversal();
+    while(r = rc->GetNextItem())
     {
-      vtkRendererCollection *rc = v->GetRWI()->GetRenderWindow()->GetRenderers();
-      vtkRenderer *r = NULL;
-      rc->InitTraversal();
-      while(r = rc->GetNextItem())
+      if(cellPicker->Pick(mouse_pos[0],mouse_pos[1],0,r))
       {
-        if(cellPicker->Pick(mouse_pos[0],mouse_pos[1],0,r))
-        {
-          picked_something = true;
-        }
+        picked_something = true;
+				break;
       }
     }
-    else
-      picked_something = v->Pick(*tracker_pos);
-    if (picked_something)
-    {
-      vtkPoints *p = vtkPoints::New();
-      cellPicker->GetPickPosition(m_PickPosition);
-      mafVME *pickedVME = v->GetPickedVme();
-      if(pickedVME)
-      {
-        vtkDataSet *vtk_data = pickedVME->GetOutput()->GetVTKData();
-        //GetPickPosition calulate the picking position with matrix multiplication 
-        //the return value can be affected of some approximation errors, if the value
-        //is outside the bounds FindPoint will return -1;
-        double bounds[6];
-        vtk_data->GetBounds(bounds);
-        if (m_PickPosition[0]<bounds[0]) m_PickPosition[0]=bounds[0];
-        if (m_PickPosition[0]>bounds[1]) m_PickPosition[0]=bounds[1];
-        if (m_PickPosition[1]<bounds[2]) m_PickPosition[1]=bounds[2];
-        if (m_PickPosition[1]>bounds[3]) m_PickPosition[1]=bounds[3];
-        if (m_PickPosition[2]<bounds[4]) m_PickPosition[2]=bounds[4];
-        if (m_PickPosition[2]>bounds[5]) m_PickPosition[2]=bounds[5];
-
-        int pid = vtk_data->FindPoint(m_PickPosition);
-        mafEvent pick_event(this,msg_id,p);
-        pick_event.SetArg(pid);
-				pick_event.SetPointer(m_PickPosition);
-        mafEventMacro(pick_event);
-        p->Delete();
-      }
-    }
+		if (picked_something)
+		{
+			cellPicker->GetPickPosition(m_PickPosition);
+			mafVME *pickedVME = v->GetPickedVme();
+			if (pickedVME)
+			{
+				mafEvent pickEvent(this, eventId, modifier);
+				pickEvent.SetPointer(m_PickPosition);
+				mafEventMacro(pickEvent);
+			}
+		}
   }
   vtkDEL(cellPicker);
 }
 
-
 //------------------------------------------------------------------------------
 void mafInteractorSegmentationPicker::OnEvent(mafEventBase *event)
-//------------------------------------------------------------------------------
 {
-  Superclass::OnEvent(event);
-  mafEventInteraction *e = (mafEventInteraction *)event;
+	Superclass::OnEvent(event);
+	mafEventInteraction *e = (mafEventInteraction *)event;
 
-  if ( m_IsPicking && (!m_FullModifiersMode && e->GetButton() == MAF_LEFT_BUTTON && e->GetModifiers() == 0 || m_FullModifiersMode && e->GetModifier(MAF_CTRL_KEY) && e->GetButton() == MAF_LEFT_BUTTON || !m_FullModifiersMode && e->GetModifier(MAF_CTRL_KEY) && e->GetButton() == MAF_LEFT_BUTTON || m_FullModifiersMode && e->GetModifier(MAF_ALT_KEY) && e->GetButton() == MAF_LEFT_BUTTON))
-  {
-    if (mafDeviceButtonsPadMouse *mouse=mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)event->GetSender()))
-    { 
-      double mouse_pos[2];
-      e->Get2DPosition(mouse_pos);
-      SendPickingInformation(mouse->GetView(), mouse_pos,VME_PICKING);
-    }
-  }
+	if (m_IsPicking)
+	{
+		if (mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)event->GetSender()))
+		{
+			double mouse_pos[2];
+			e->Get2DPosition(mouse_pos);
+			SendPickingInformation(mouse->GetView(), mouse_pos,0, VME_PICKING);
+		}
+	}
 }

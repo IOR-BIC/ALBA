@@ -27,18 +27,11 @@
 class MAF_EXPORT mafInteractorSegmentationPicker : public mafInteractorCameraMove
 {
 public:
-  enum GUI_IDS
-  {
-    VME_ALT_PICKED = MINID,
-  };
+ 
   mafTypeMacro(mafInteractorSegmentationPicker,mafInteractorCameraMove);
 
-  /** Redefined to send picking events if continuous picking is enabled */
-  virtual void OnEvent(mafEventBase *event);
-
-  /** Determine if picking modality is enabled with click and CTRL + click or with CTRL + click and ALT + click */
-  void SetFullModifiersMode(bool enable){m_FullModifiersMode = enable;};
-
+	virtual void OnEvent(mafEventBase *event);
+	
 protected:
   /**	This function is called when on mouse button down */ 
   virtual void OnLeftButtonDown(mafEventInteraction *e);
@@ -46,9 +39,9 @@ protected:
   virtual void OnLeftButtonUp();
 
   /** Send to the listener picked point coordinate through vtkPoint and the corresponding scalar value found in that position. */
-  void SendPickingInformation(mafView *v, double *mouse_pos = NULL, int msg_id = VME_PICKED, mafMatrix *tracker_pos = NULL, bool mouse_flag = true);
+	void SendPickingInformation(mafView *v, double *mouse_pos, long modifier, int eventID);
 
-  /** constructor. */
+	/** constructor. */
   mafInteractorSegmentationPicker();
 
   /** destructor. */
@@ -56,8 +49,6 @@ protected:
 
 
 	bool m_IsPicking;         //< Determine if interactor is picking
-	bool m_FullModifiersMode; //< Determine if picking modality is enabled with click and CTRL + click or with CTRL + click and ALT + click
 	double m_PickPosition[3];
-
 };
 #endif 
