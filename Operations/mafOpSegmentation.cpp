@@ -96,8 +96,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkRenderer.h"
 #include "vtkSphereSource.h"
-#include "vtkStructuredPoints.h"
-#include "vtkStructuredPointsWriter.h"
+#include "vtkImageData.h"
 #include "vtkTextMapper.h"
 #include "vtkTextProperty.h"
 #include "vtkUnstructuredGrid.h"
@@ -533,7 +532,7 @@ void mafOpSegmentation::InitVolumeDimensions()
 		inputDataSet->GetBounds(glo_CurrVolBounds);
 		
 
-		if (vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(inputDataSet))
+		if (vtkImageData *sp = vtkImageData::SafeDownCast(inputDataSet))
 		{
 			sp->GetDimensions(m_VolumeDims);
 			sp->GetDimensions(glo_CurrVolDims);
@@ -1121,10 +1120,11 @@ void mafOpSegmentation::DeleteOpDialog()
 
 	m_Volume->SetBehavior(m_OldBehavior);
 	m_Volume->Update();
+	m_View->VmeSegmentationShow(m_SegmentationVolume, false);
+	m_View->VmeRemove(m_SegmentationVolume);
 	m_View->VmeShow(m_Volume, false);
 	m_View->VmeRemove(m_Volume);
-	//m_View->VmeSegmentationShow(m_SegmentationVolume, false);
-	//m_View->VmeRemove(m_SegmentationVolume);
+	m_View->VmeRemove(m_Volume->GetRoot());
 
 	//////////////////////////////////////////////////////////////////////////
 	//Remove the threshold label
@@ -1165,6 +1165,7 @@ void mafOpSegmentation::DeleteOpDialog()
 
 	cppDEL(m_SnippetsLabel);
 
+	mafDEL(m_View);
 	cppDEL(m_AppendingOpGui);
 	cppDEL(m_GuiDialog);
 	cppDEL(m_Dialog);
@@ -1243,7 +1244,7 @@ void mafOpSegmentation::UpdateThresholdRealTimePreview()
 }
 
 //----------------------------------------------------------------------------
-bool mafOpSegmentation::ApplyRefinementFilter2(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage)
+bool mafOpSegmentation::ApplyRefinementFilter2(vtkImageData *inputImage, vtkImageData *outputImage)
 {
   vtkMAFImageFillHolesRemoveIslands *filter = vtkMAFImageFillHolesRemoveIslands::New();
   filter->SetInput(inputImage);
@@ -1258,13 +1259,13 @@ bool mafOpSegmentation::ApplyRefinementFilter2(vtkStructuredPoints *inputImage, 
     filter->SetAlgorithmToRemoveIslands();
   }
   filter->Update();
-  outputImage->DeepCopy(filter->GetOutput());
+  outputImage->DeepCopy((vtkImageData*)filter->GetOutput());
   outputImage->Update();
   filter->Delete();
   return true;
 }
 //----------------------------------------------------------------------------
-bool mafOpSegmentation::ApplyRefinementFilter(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage)
+bool mafOpSegmentation::ApplyRefinementFilter(vtkImageData *inputImage, vtkImageData *outputImage)
 {
   typedef itk::VotingBinaryHoleFillingImageFilter<UCharImage, UCharImage> ITKVotingHoleFillingFilter;
   ITKVotingHoleFillingFilter::Pointer holeFillingFilter = ITKVotingHoleFillingFilter::New();
@@ -1272,7 +1273,7 @@ bool mafOpSegmentation::ApplyRefinementFilter(vtkStructuredPoints *inputImage, v
   typedef itk::VotingBinaryIterativeHoleFillingImageFilter<UCharImage> ITKVotingIterativeHoleFillingFilter;
   ITKVotingIterativeHoleFillingFilter::Pointer iterativeHoleFillingFilter = ITKVotingIterativeHoleFillingFilter::New();
 
-  vtkMAFSmartPointer<vtkStructuredPoints> refinedImage;
+  vtkMAFSmartPointer<vtkImageData> refinedImage;
 
 
   vtkMAFSmartPointer<vtkImageCast> vtkImageToFloat;
@@ -1355,7 +1356,7 @@ bool mafOpSegmentation::ApplyRefinementFilter(vtkStructuredPoints *inputImage, v
   itkTOvtk->Update();
   //////////////////////////////////////////////////////////////////////////
 
-  refinedImage = ((vtkStructuredPoints*)itkTOvtk->GetOutput());
+  refinedImage = ((vtkImageData*)itkTOvtk->GetOutput());
   refinedImage->Update();
 
   outputImage->DeepCopy(refinedImage);
@@ -2089,7 +2090,7 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
 			dataSet->GetPointData()->SetScalars(undoScalars);
 			dataSet->Update();
 
-			vtkMAFSmartPointer<vtkStructuredPoints> newDataSet;
+			vtkMAFSmartPointer<vtkImageData> newDataSet;
 			newDataSet->DeepCopy(dataSet);
 
 			m_SegmentationVolume->SetData(newDataSet, m_Volume->GetTimeStamp());
@@ -2121,7 +2122,7 @@ void mafOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
 			dataSet->GetPointData()->SetScalars(redoScalars);
 			dataSet->Update();
 
-			vtkMAFSmartPointer<vtkStructuredPoints> newDataSet;
+			vtkMAFSmartPointer<vtkImageData> newDataSet;
 			newDataSet->DeepCopy(dataSet);
 
 			m_SegmentationVolume->SetData(newDataSet, m_Volume->GetTimeStamp());
@@ -2307,7 +2308,7 @@ bool mafOpSegmentation::Refinement()
 					scalars->SetTuple1(k, value);
 				}
 
-				vtkMAFSmartPointer<vtkStructuredPoints> im;
+				vtkMAFSmartPointer<vtkImageData> im;
 				im->SetDimensions(m_VolumeDims[0], m_VolumeDims[1], 1);
 				im->SetSpacing(m_VolumeSpacing[0], m_VolumeSpacing[1], 0.0);
 				im->GetPointData()->AddArray(scalars);
@@ -2315,7 +2316,7 @@ bool mafOpSegmentation::Refinement()
 				im->SetScalarTypeToUnsignedChar();
 				im->Update();
 
-				vtkMAFSmartPointer<vtkStructuredPoints> filteredImage;
+				vtkMAFSmartPointer<vtkImageData> filteredImage;
 				if (ApplyRefinementFilter2(im, filteredImage) && filteredImage)
 				{
 					vtkDataArray *binaryScalars = filteredImage->GetPointData()->GetScalars();
@@ -2350,7 +2351,7 @@ bool mafOpSegmentation::Refinement()
 						scalars->SetTuple1(k, value);
 					}
 
-					vtkMAFSmartPointer<vtkStructuredPoints> im;
+					vtkMAFSmartPointer<vtkImageData> im;
 					im->SetDimensions(m_VolumeDims[0], m_VolumeDims[1], 1);
 					im->SetSpacing(m_VolumeSpacing[0], m_VolumeSpacing[1], 0.0);
 					im->GetPointData()->AddArray(scalars);
@@ -2358,7 +2359,7 @@ bool mafOpSegmentation::Refinement()
 					im->SetScalarTypeToUnsignedChar();
 					im->Update();
 
-					vtkMAFSmartPointer<vtkStructuredPoints> filteredImage;
+					vtkMAFSmartPointer<vtkImageData> filteredImage;
 					if (ApplyRefinementFilter2(im, filteredImage) && filteredImage)
 					{
 						vtkDataArray *binaryScalars = filteredImage->GetPointData()->GetScalars();
@@ -2373,10 +2374,10 @@ bool mafOpSegmentation::Refinement()
 			}
 		}
 
-		if (inputDataSet->IsA("vtkStructuredPoints"))
+		if (inputDataSet->IsA("vtkImageData"))
 		{
-			vtkMAFSmartPointer<vtkStructuredPoints> newSP;
-			newSP->CopyStructure(vtkStructuredPoints::SafeDownCast(inputDataSet));
+			vtkMAFSmartPointer<vtkImageData> newSP;
+			newSP->CopyStructure(vtkImageData::SafeDownCast(inputDataSet));
 			newSP->Update();
 			newSP->GetPointData()->AddArray(newScalars);
 			newSP->GetPointData()->SetActiveScalars("SCALARS");
@@ -2384,7 +2385,7 @@ bool mafOpSegmentation::Refinement()
 			newSP->Update();
 
 			m_SegmentationVolume->SetData(newSP, m_Volume->GetTimeStamp());
-			vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(m_SegmentationVolume->GetOutput()->GetVTKData());
+			vtkImageData *spVME = vtkImageData::SafeDownCast(m_SegmentationVolume->GetOutput()->GetVTKData());
 			spVME->Update();
 		}
 		else
@@ -2418,9 +2419,9 @@ bool mafOpSegmentation::Refinement()
 //----------------------------------------------------------------------------
 void mafOpSegmentation::GetSliceOrigin(double *origin)
 {
-  if (m_Volume->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
+  if (m_Volume->GetOutput()->GetVTKData()->IsA("vtkImageData"))
   {
-    vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(m_Volume->GetOutput()->GetVTKData());
+    vtkImageData *sp = vtkImageData::SafeDownCast(m_Volume->GetOutput()->GetVTKData());
     sp->Update();
     double spc[3];
     sp->GetSpacing(spc);

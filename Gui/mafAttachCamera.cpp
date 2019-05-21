@@ -141,12 +141,19 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
 void mafAttachCamera::SetVme(mafVME *node)
 //----------------------------------------------------------------------------
 {
-  if (node == NULL)
+	if (m_AttachedVme && m_AttachedVme==node)
+	{
+		return;
+	}
+	
+	if (m_AttachedVme && m_AttachedVme->IsObserver(this))
+	{
+		m_AttachedVme->RemoveObserver(this);
+	}
+  
+	if (node == NULL)
   {
-    if (m_AttachedVme && m_AttachedVme->IsObserver(this))
-    {
-      m_AttachedVme->RemoveObserver(this);
-    }
+   
     vtkDEL(m_AttachedVmeMatrix);
     m_AttachedVme = NULL;
     m_EnableAttachCamera = 0;
@@ -156,10 +163,7 @@ void mafAttachCamera::SetVme(mafVME *node)
     }
     return;
   }
-  if (m_AttachedVme && m_AttachedVme->Equals(node))
-  {
-    return;
-  }
+  
   if (m_AttachedVmeMatrix == NULL)
   {
     vtkNEW(m_AttachedVmeMatrix);
