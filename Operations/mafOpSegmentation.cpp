@@ -129,7 +129,6 @@ typedef  itk::Image< unsigned char, 3> UCharImage;
 
 static int glo_CurrVolDims[3] = {0,0,0};          //<Used to load only volume with the specified dimensions
 static double glo_CurrVolSpacing[3] = {0,0,0};          //<Used to load only volume with the specified spacing
-static double glo_CurrVolBounds[6] = {0,0,0,0,0,0};           //<Used to load only volume with the specified bounds
 static mafVME *glo_CurrSeg = NULL;
 
 //----------------------------------------------------------------------------
@@ -289,6 +288,15 @@ void mafOpSegmentation::OpDo()
 	//GENERATIN SURFACE OUTPUT
   wxBusyCursor wait_cursor;
   wxBusyInfo wait(_("Wait! Generating Surface Output"));
+
+	if (m_CurrentPhase == INIT_SEGMENTATION)
+	{
+		if (m_InitModality == GLOBAL_INIT)
+			m_Helper.VolumeThreshold(m_Threshold);
+		else if (m_InitModality == RANGE_INIT)
+			m_Helper.VolumeThreshold(&m_RangesVector);
+
+	}
 	  
   vtkMAFSmartPointer<vtkMAFVolumeToClosedSmoothSurface> volToSurface;
   volToSurface->SetInput(m_SegmentationVolume->GetOutput()->GetVTKData());
@@ -531,8 +539,6 @@ void mafOpSegmentation::InitVolumeDimensions()
 	{
 		inputDataSet->Update();
 		inputDataSet->GetBounds(m_VolumeBounds);
-		inputDataSet->GetBounds(glo_CurrVolBounds);
-		
 
 		if (vtkImageData *sp = vtkImageData::SafeDownCast(inputDataSet))
 		{
@@ -1131,9 +1137,7 @@ void mafOpSegmentation::DeleteOpDialog()
 	//////////////////////////////////////////////////////////////////////////
 	//Remove the threshold label
 	if (m_AutomaticThresholdTextActor)
-	{
 		m_View->GetFrontRenderer()->RemoveActor(m_AutomaticThresholdTextActor);
-	}
 	vtkDEL(m_AutomaticThresholdTextActor);
 	vtkDEL(m_AutomaticThresholdTextMapper);
 
@@ -1949,11 +1953,6 @@ bool mafOpSegmentation::SegmentedVolumeAccept(mafVME*node)
 		imageData->GetSpacing(checkVolSpacing);
 		for (int i = 0; i < 3; i++)
 			if (checkVolDim[i] != glo_CurrVolDims[i] || checkVolSpacing[i] != glo_CurrVolSpacing[i])
-				return false;
-
-		imageData->GetBounds(checkVolBounds);
-		for (int i = 0; i < 6; i++)
-			if (checkVolBounds[i] != glo_CurrVolBounds[i])
 				return false;
 
 		/* scalar range should be 0 - 255 */
