@@ -69,6 +69,7 @@
 #include "mafViewSliceSegmentation.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
+#include "mafGUIMDIChild.h"
 
 #include "itkImage.h"
 #include "itkImageToVTKImageFilter.h"
@@ -105,6 +106,7 @@
 #include "wx/busyinfo.h"
 #include "wx/mac/classic/bitmap.h"
 #include "wx/sizer.h"
+#include "wx/window.h"
 
 #define SPACING_PERCENTAGE_BOUNDS 0.1
 #define MAX_UNDOLIST_SIZE 25
@@ -1422,6 +1424,7 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 		break;
 		case MOUSE_MOVE:
 		{
+			((mafGUIMDIChild *)m_View->GetFrame())->SetFocus();
 			if (e->GetSender() == m_InitPER)
 			{
 				m_AutomaticMouseThreshold = e->GetDouble();
