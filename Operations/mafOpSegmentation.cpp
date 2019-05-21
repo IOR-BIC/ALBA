@@ -1424,7 +1424,8 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
 		break;
 		case MOUSE_MOVE:
 		{
-			((mafGUIMDIChild *)m_View->GetFrame())->SetFocus();
+			m_View->GetRWI()->SetFocus();
+			
 			if (e->GetSender() == m_InitPER)
 			{
 				m_AutomaticMouseThreshold = e->GetDouble();
