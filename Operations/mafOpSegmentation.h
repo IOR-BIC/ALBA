@@ -60,7 +60,7 @@ class vtkActor2D;
 class vtkLookupTable;
 class vtkPolyDataMapper;
 class vtkSphereSource;
-class vtkStructuredPoints;
+class vtkImageData;
 class vtkTextMapper;
 class vtkUnsignedCharArray;
 class wxStaticBoxSizer;
@@ -182,16 +182,16 @@ public:
   mafOp* Copy();
 
   /** Return true for the acceptable vme type. */
-  bool Accept(mafVME*node);
+  virtual bool Accept(mafVME*node);
 
   /** Builds operation's interface. */
-  void OpRun();
+	virtual void OpRun();
 
   /** Execute the operation. */
-  void OpDo();
+	virtual void OpDo();
 
   /** Makes the undo for the operation. */
-  void OpUndo();
+  virtual void OpUndo();
 
   /** Return true if node is of type mafVMESegmentationVolume. */
   static bool SegmentationVolumeAccept(mafVME* node) {return(node != NULL  && node->IsMAFType(mafVMESegmentationVolume));};
@@ -436,10 +436,10 @@ protected:
   void ResetRefinementRedoList();
 
   /** Apply refinement algorithm implemented with ITK (not used) */
-  bool ApplyRefinementFilter(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage);
+  bool ApplyRefinementFilter(vtkImageData *inputImage, vtkImageData *outputImage);
 
   /** Apply refinement algorithm implemented with vtk only */
-  bool ApplyRefinementFilter2(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage);
+  bool ApplyRefinementFilter2(vtkImageData *inputImage, vtkImageData *outputImage);
 
   /** Update slice visualization on manual step */
   void OnUpdateSlice();
