@@ -65,9 +65,8 @@ const bool DEBUG_MODE = false;
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewSliceSegmentation);
-//----------------------------------------------------------------------------
 
-#include "mafMemDbg.h"
+
 #include "mafPipeVolumeOrthoSlice.h"
 #include "mafPipeVolumeArbSlice.h"
 
@@ -98,6 +97,15 @@ mafView *mafViewSliceSegmentation::Copy(mafObserver *Listener, bool lightCopyEna
   return v;
 }
 
+
+//----------------------------------------------------------------------------
+void mafViewSliceSegmentation::VmeShow(mafVME *vme, bool show)
+{
+	if (m_IsShowingSegmentation)
+		return;
+	else
+		Superclass::VmeShow(vme, show);
+}
 
 //----------------------------------------------------------------------------
 void mafViewSliceSegmentation::VmeCreatePipe(mafVME *vme)
@@ -241,6 +249,6 @@ void mafViewSliceSegmentation::SetSliceAxis(int sliceAxis)
 void mafViewSliceSegmentation::VmeSegmentationShow(mafVME *vme, bool show)
 {
 	m_IsShowingSegmentation = true;
-	VmeShow(vme, show);
+	Superclass::VmeShow(vme, show);
 	m_IsShowingSegmentation = false;
 }

@@ -117,10 +117,10 @@ mafViewArbitraryOrthoSlice::~mafViewArbitraryOrthoSlice()
 {
 	for(int i=X;i<=Z;i++)
 	{
-		cppDEL(m_GizmoRT[i]);
-		mafDEL(m_Slicer[i]);
+// 		cppDEL(m_GizmoRT[i]);
+// 		mafDEL(m_Slicer[i]);
 		mafDEL(m_SlicerResetMatrix[i]);
-		mafDEL(m_CameraConeVME[i]);
+// 		mafDEL(m_CameraConeVME[i]);
 		delete(m_CameraToSlicer[i]);
 	}
 }
@@ -427,13 +427,8 @@ void mafViewArbitraryOrthoSlice::VmeRemove(mafVME *vme)
 {
 	if (m_CurrentVolume && vme == m_CurrentVolume) 
 	{
+		HideVolume();
 		m_CurrentVolume = NULL;
-
-		for (int i = X; i <= Z; i++)
-		{
-			m_GizmoRT[i]->Show(false);
-			cppDEL(m_GizmoRT[i]);
-		}
 	}
 
 	Superclass::VmeRemove(vme);
@@ -622,6 +617,8 @@ void mafViewArbitraryOrthoSlice::HideVolume()
 	EnableWidgets(false);
 	for(int i=X; i<=Z; i++)
 	{
+		VmeShow(m_CameraConeVME[i], false);
+		VmeShow(m_Slicer[i], false);
 		m_CameraConeVME[i]->ReparentTo(NULL);
 		m_GizmoRT[i]->Show(false);
 
