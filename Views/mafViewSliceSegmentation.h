@@ -51,8 +51,8 @@ public:
   mafTypeMacro(mafViewSliceSegmentation, mafViewSlice);
 
   virtual mafView*  Copy(mafObserver *Listener, bool lightCopyEnabled = false);
-
 	
+	virtual void VmeShow(mafVME *vme, bool show);
 
 	void VmeSegmentationShow(mafVME *vme, bool show);
 
