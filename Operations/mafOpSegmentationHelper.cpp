@@ -73,7 +73,6 @@ void mafOpSegmentationHelper::SliceThreshold(double *threshold)
 //----------------------------------------------------------------------------
 void mafOpSegmentationHelper::VolumeThreshold(double *threshold)
 {
-	m_VolumeSlice->Update();
 	vtkDataSet * segmentation = m_Segmentation->GetOutput()->GetVTKData();
 	vtkDataArray 	*inputScalars = m_Volume->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
 	void *inputPointer = inputScalars->GetVoidPointer(0);

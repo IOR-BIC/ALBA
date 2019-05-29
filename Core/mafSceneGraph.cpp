@@ -206,7 +206,7 @@ void mafSceneGraph::VmeShow(mafVME *vme, bool show)
         bool vme_type_check = vme != NULL && current_vme != NULL;
         if(n->GetPipe() != NULL && current_vme != vme && vme_type_check && !current_vme->IsA("mafVMEGizmo") && vme->GetOutput()->GetTypeId() == current_vme->GetOutput()->GetTypeId())
         {
-					GetLogicManager()->VmeShow(n->GetVme(), false);
+					m_View->VmeShow(n->GetVme(), false);
 					break;
         }
       }
@@ -245,7 +245,7 @@ void mafSceneGraph::VmeShowByType(mafVME *vme,  bool show)
     {
       //- mutex vme may be shown only is no other vme of the same type is currently shown.
       //- mutex vme may always be hidden.
-			GetLogicManager()->VmeShow(n->GetVme(), show);
+			m_View->VmeShow(n->GetVme(), show);
       if (n->GetMutex())
       {
         break;
@@ -271,7 +271,7 @@ void mafSceneGraph::VmeShowSubTree(mafVME *vme,  bool show)
 				// Mutex vme may be shown only is no other vme of the same type is currently shown.
 				// Mutex vme may always be hidden.
 				if (!show || !n->GetMutex())
-					GetLogicManager()->VmeShow(v, show);
+					m_View->VmeShow(v, show);
 			}
 		}
 	}

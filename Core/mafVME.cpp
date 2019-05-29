@@ -1531,13 +1531,11 @@ mafVME *mafVME::CopyTree(mafVME *vme, mafVME *parent)
 	copyIter->Delete();
 
 	//////////////////////////////////////////////////////////////////////////
-	std::vector<mafString> linkToEliminate;
 	std::vector<VmeLinks> linkToUpdate;
 
 	mafVMEIterator *copyIter2 = copy->NewIterator();
 	for (mafVME *node = copyIter2->GetFirstNode(); node; node = copyIter2->GetNextNode())
 	{
-		linkToEliminate.clear();
 		linkToUpdate.clear();
 
 		for (mafVME::mafLinksMap::iterator it = node->GetLinks()->begin(); it != node->GetLinks()->end(); it++)
@@ -1558,19 +1556,16 @@ mafVME *mafVME::CopyTree(mafVME *vme, mafVME *parent)
 					break;
 				}
 			}
-
-			if (!found)
-				linkToEliminate.push_back(it->first.GetCStr());
 		}
 
-		// Update new Links and Remove Lost Links
+		// Update new Links
 		for (int i = 0; i < linkToUpdate.size(); i++)
 			node->SetLink(linkToUpdate[i].name, linkToUpdate[i].vme);
-		for (int i = 0; i < linkToEliminate.size(); i++)
-			node->RemoveLink(linkToEliminate[i].GetCStr());
 	}
 	copyIter2->Delete();
 	
+	linkToUpdate.clear();
+
 	copy->SetReferenceCount(copy->GetReferenceCount() - 1); // this hack avoid that 'v' node die when return
 
 	//////////////////////////////////////////////////////////////////////////
