@@ -24,7 +24,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkDataArray.h"
 #include "mafDefines.h"
 
-#define EPISLON 1e-6
+#define EPISLON 0.0001
 
 //--------------------------------------------------------------------------------------
 mafOpImporterDicomSliceAccHelper::mafOpImporterDicomSliceAccHelper()
