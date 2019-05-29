@@ -476,6 +476,8 @@ bool AlbaMaster::OnInit()
 //--------------------------------------------------------------------------------
 int AlbaMaster::OnExit()
 {
+	m_LogicInitialized = false;
+
 	cppDEL(m_Logic);
 	return 0;
 }
@@ -489,7 +491,7 @@ void AlbaMaster::OnFatalException()
 //--------------------------------------------------------------------------------
 int AlbaMaster::FilterEvent(wxEvent& event)
 {
-	if (m_LogicInitialized)
+	if (m_LogicInitialized && m_Logic)
 		return m_Logic->AppEventFilter(event);
 
 	return -1;

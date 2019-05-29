@@ -129,7 +129,7 @@ void mafGUIAboutDialog::CreateDialog()
 	title += m_Title;
 
 	wxString revision = "";
-	wxRegKey RegKey(wxString("HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + m_Title));
+	wxRegKey RegKey(wxString("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + m_Title));
 	if (RegKey.Exists())
 	{
 		if (RegKey.HasValue(wxString("DisplayVersion")))
