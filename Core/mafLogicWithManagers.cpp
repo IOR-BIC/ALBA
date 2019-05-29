@@ -243,7 +243,7 @@ void mafLogicWithManagers::Init(int argc, char **argv)
 	m_AboutDialog->SetRevision(m_Revision.GetCStr());
 
 	wxString imagePath = mafGetApplicationDirectory().c_str();
-	imagePath += "\\Config\\ExampleAppAbout.bmp";
+	imagePath += "\\Config\\AlbaMasterAbout.bmp";
 	m_AboutDialog->SetImagePath(imagePath);
 
 	// Create and Open View
