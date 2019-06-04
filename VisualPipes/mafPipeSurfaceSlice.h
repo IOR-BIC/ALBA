@@ -81,6 +81,10 @@ public:
   /** Hide bounding box when selection is off. */
 	void ShowBoxSelectionOff(){m_ShowSelection=false;};
 
+	/** Set the actor picking*/
+	void SetActorPicking(int enable);
+
+
   /** IDs for the GUI */
   enum PIPE_SURFACE_WIDGET_ID
   {
@@ -111,6 +115,7 @@ protected:
   double				           m_Border;
 
 	bool	m_ShowSelection;
+	bool	m_Pickable;
 
 
   int m_ScalarVisibility;
