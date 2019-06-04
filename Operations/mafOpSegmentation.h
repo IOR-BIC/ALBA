@@ -225,13 +225,13 @@ protected:
   //Method to initialize the stuff
   //////////////////////////////////////////////////////////////////////////
   
-	void Init();
+	virtual void Init();
 
   /** Initialize the volume dimensions attribute */
   void InitVolumeDimensions();
   
   /** Initialize the slice */
-  void InitializeView();
+  virtual void InitializeView();
   
 	/** Initialize the Interactors  */
   void InitializeInteractors();
