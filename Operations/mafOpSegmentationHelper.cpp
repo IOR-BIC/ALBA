@@ -303,6 +303,104 @@ void mafOpSegmentationHelper::GetSlicePoint(int slicePlane, double * pos, int * 
 }
 
 //----------------------------------------------------------------------------
+void mafOpSegmentationHelper::Connectivity3d(double * pos, int slicePlane, int currentSlice)
+{
+	m_VolumeSlice->Update();
+	int point[2],  dims[3];
+
+	vtkImageData * segmentation = vtkImageData::SafeDownCast(m_Segmentation->GetOutput()->GetVTKData());
+	segmentation->GetDimensions(dims);
+
+	GetSlicePoint(slicePlane, pos, point);
+	
+	std::vector<volPoint> points, newPoints;
+	volPoint firstPoint;
+
+	if (slicePlane == 2)
+	{
+		firstPoint.x = point[0];
+		firstPoint.y = point[1];
+		firstPoint.z = currentSlice;
+	}
+	else if (slicePlane == 1)
+	{
+		firstPoint.x = point[0];
+		firstPoint.y = currentSlice;
+		firstPoint.z = point[1];
+	}
+	else
+	{
+		firstPoint.x = currentSlice;
+		firstPoint.y = point[0];
+		firstPoint.z = point[1];
+	}
+	points.push_back(firstPoint);
+	int firstPointId = firstPoint.x + firstPoint.y*dims[0] + firstPoint.z*dims[0]*dims[1];
+
+	vtkUnsignedCharArray *inputScalars = (vtkUnsignedCharArray*)segmentation->GetPointData()->GetScalars();
+	unsigned char *inputPointer = (unsigned char*)inputScalars->GetVoidPointer(0);
+
+
+	//click outside segmentation do not create output scalars
+	if (!inputPointer[firstPointId])
+		return;
+	
+	vtkUnsignedCharArray 	*outputScalars = inputScalars->NewInstance();
+	outputScalars->SetNumberOfTuples(inputScalars->GetNumberOfTuples());
+	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
+	memset(outputPointer, 0, sizeof(unsigned char)*inputScalars->GetNumberOfTuples());
+
+	outputPointer[firstPointId] = FULL;
+		
+	while (points.size() > 0)
+	{
+		for (int i = 0; i < points.size(); i++)
+		{
+			volPoint p = points[i];
+
+			for (int z = p.z - 1; z <= p.z + 1; z++)
+			{
+				if (z < 0 || z >= dims[2])
+					continue;
+				
+				int zShift = z*dims[0] * dims[1];
+				for (int y = p.y - 1; y <= p.y + 1; y++)
+				{
+					if (y < 0 || y >= dims[1])
+						continue;
+
+					int yShift = y*dims[0];
+
+					for (int x = p.x - 1; x <= p.x + 1; x++)
+					{
+						if (x < 0 || x >= dims[0] || (x == p.x && y == p.y && z == p.z))
+							continue;
+						int shift = yShift + zShift + x;
+						if (!outputPointer[shift] && inputPointer[shift])
+						{
+							outputPointer[shift] = FULL;
+							volPoint newPoint = { x,y,z };
+							newPoints.push_back(newPoint);
+						}
+					}
+				}
+			}
+		}
+		points.clear();
+		points = newPoints;
+		newPoints.clear();
+	}
+
+	segmentation->GetPointData()->SetScalars(outputScalars);
+	vtkDEL(outputScalars);
+
+	segmentation->Modified();
+	m_Segmentation->Modified();
+	m_SegmetationSlice->Modified();
+	m_SegmetationSlice->Update();
+}
+
+//----------------------------------------------------------------------------
 void mafOpSegmentationHelper::Fill(double *pos, int slicePlane, double thresholdPerc, bool erase)
 {
 	m_VolumeSlice->Update();
@@ -319,11 +417,9 @@ void mafOpSegmentationHelper::Fill(double *pos, int slicePlane, double threshold
 
 	GetSlicePoint(slicePlane, pos, point);
 
-	std::vector<slicePoint> pointList;
 	slicePoint firstPoint;
 	firstPoint.x = point[0];
 	firstPoint.y = point[1];
-	pointList.push_back(firstPoint);
 
 	vtkDataArray *outputScalars = m_SegmetationSlice->GetPointData()->GetScalars();
 	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
