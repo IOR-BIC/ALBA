@@ -41,6 +41,10 @@ typedef struct {
 	int x, y;
 } slicePoint;
 
+typedef struct {
+	int x, y, z;
+} volPoint;
+
 enum PLANE_TYPE
 {
 	YZ = 0,
@@ -76,6 +80,9 @@ public:
 	void DrawBrush(double *pos, int slicePlane, int brushSize, int brushShape, bool erase);
 
 	void Fill(double *pos, int slicePlane, double thresholdPerc,  bool erase);
+
+	void Connectivity3d(double * pos, int slicePlane, int currentSlice);
+
 protected:
 
 	void InternalTheshold(int dataType, double *threshold, int n, void * inputPointer, unsigned char * outputPointer, int offset = 0);
@@ -93,6 +100,7 @@ protected:
 	mafVMEVolumeGray *m_Segmentation;
 	vtkImageData     *m_SegmetationSlice;
 	vtkImageData     *m_VolumeSlice;
+public:
 };
 
 

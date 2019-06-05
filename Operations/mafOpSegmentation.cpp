@@ -122,6 +122,7 @@ enum EDIT_MODALITY_TYPE
 {
 	DRAW_EDIT = 0,
 	FILL_EDIT,
+	CONNECTIVITY_3D
 };
 
 typedef  itk::Image< float, 3> RealImage;
@@ -239,7 +240,7 @@ mafOpSegmentation::~mafOpSegmentation()
 //----------------------------------------------------------------------------
 bool mafOpSegmentation::Accept(mafVME *node)
 {
-  return (node && node->IsA("mafVMEVolumeGray") );
+  return (node && node->IsA("mafVMEVolumeGray") && node->GetOutput()->GetVTKData()->IsA("vtkImageData") );
 }
 //----------------------------------------------------------------------------
 mafOp *mafOpSegmentation::Copy()   
@@ -895,7 +896,7 @@ void mafOpSegmentation::CreateInitSegmentationGui()
 
 	currentGui->Label("Threshold type", true);
 
-	wxString choices[3] = { _("Global"),_("Range"), _("Load") };
+	wxString choices[3] = { _("Global"),_("Z-Split"), _("Load") };
 	int w_id = currentGui->GetWidgetId(ID_INIT_MODALITY);
 
 	m_InitModalityRadioBox = new wxRadioBox(currentGui, w_id, "", wxDefaultPosition, wxSize(170, -1), 3, choices, 3);
@@ -940,7 +941,7 @@ void mafOpSegmentation::CreateInitSegmentationGui()
 
 	// THRESHOLD RANGES
 
-	currentGui->Label(_("Slice range settings:"), true);
+	currentGui->Label(_("Slice split settings:"), true);
 
 	m_RangesGuiList = currentGui->ListBox(ID_RANGE_SELECTION, "");
 	currentGui->TwoButtons(ID_SPLIT_RANGE, ID_REMOVE_RANGE, ("Split"), _("Remove"));
@@ -966,11 +967,11 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 
 	currentGui->Label("Tools", true);
 
-	std::vector<const char*> toolLabels = { "Brush", "Fill" };
-	std::vector<const char*> toolImageNames = { "TOOL_PEN" , "TOOL_FILL" };
-	std::vector<int> toolIds = { ID_MANUAL_TOOLS_BRUSH, ID_MANUAL_TOOLS_FILL };
+	std::vector<const char*> toolLabels = { "Brush", "Fill", "3D Connectivity" };
+	std::vector<const char*> toolImageNames = { "TOOL_PEN" , "TOOL_FILL", "TOOL_ERASE" };
+	std::vector<int> toolIds = { ID_MANUAL_TOOLS_BRUSH, ID_MANUAL_TOOLS_FILL, ID_MANUAL_TOOLS_3D_CONNECTIVITY };
 
-	currentGui->MultipleImageButtons(2, 2, toolIds, toolLabels, toolImageNames, 0);
+	currentGui->MultipleImageButtons(3, 3, toolIds, toolLabels, toolImageNames, 0);
 	currentGui->Divider(1);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -1760,8 +1761,11 @@ void mafOpSegmentation::OnPickingEvent(mafEvent * e)
 		m_BrushFillErase = e->GetArg() == MAF_CTRL_KEY;
 		if (m_ManualSegmentationTools == FILL_EDIT) // bucket
 			Fill(e);
-		else // brush
+		else if (m_ManualSegmentationTools == DRAW_EDIT) // brush
 			StartDraw(e);
+		else
+			Conntectivity3D(e);
+
 	}
 }
 
@@ -2015,6 +2019,20 @@ void mafOpSegmentation::OnEditSegmentationEvent(mafEvent *e)
 			OnUpdateSlice();
 		}
 		break;
+		case ID_MANUAL_TOOLS_3D_CONNECTIVITY:
+		{
+			m_ManualSegmentationTools = CONNECTIVITY_3D;
+
+			m_SnippetsLabel->SetLabel(_(" 'Left Click' Select connected area"));
+
+			SetCursor(CUR_FILL);
+
+			EnableSizerContent(m_FillEditingSizer, false);
+			EnableSizerContent(m_BrushEditingSizer, false);
+			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
+			ApplyRealDrawnImage();
+			OnUpdateSlice();
+		}
 		case ID_MANUAL_BRUSH_SHAPE:
 		case ID_MANUAL_BRUSH_SIZE:
 		{
@@ -2040,28 +2058,44 @@ void mafOpSegmentation::OnUndoRedo(bool undo)
 	std::vector<UndoRedoState> &from = undo ? m_UndoList : m_RedoList; 
 	std::vector<UndoRedoState> &to   = undo ? m_RedoList : m_UndoList; 
 	
-	int fromListSize = from.size();
+	int fromIndex = from.size()-1;
 	
-	//if i changed slice/plane from last edit the redo information
-	//are in the plane-slice of last edit (where i saved last undo info).
-	if (m_SlicePlane != from[fromListSize - 1].m_Plane)
+	if (from[fromIndex].m_Plane != -1) //Slice UndoRedo State
 	{
-		m_SlicePlane = from[fromListSize - 1].m_Plane;
-		m_SliceIndex = from[fromListSize - 1].m_Slice;
-		OnSelectSlicePlane();
+		//if i changed slice/plane from last edit the redo information
+		//are in the plane-slice of last edit (where i saved last undo info).
+		if (m_SlicePlane != from[fromIndex].m_Plane)
+		{
+			m_SlicePlane = from[fromIndex].m_Plane;
+			m_SliceIndex = from[fromIndex].m_Slice;
+			OnSelectSlicePlane();
+		}
+		else if (m_SliceIndex != from[fromIndex].m_Slice)
+		{
+			m_SliceIndex = from[fromIndex].m_Slice;
+			OnUpdateSlice();
+		}
+
+		to.push_back(CreateUndoRedoState());
+
+		m_RealDrawnImage->DeepCopy(from[fromIndex].m_Scalars);
+		ApplyRealDrawnImage();
+
+		vtkDEL(from[fromIndex].m_Scalars);
+		from.pop_back();
 	}
-	else if (m_SliceIndex != from[fromListSize - 1].m_Slice)
+	else //Volume UndoRedo state
 	{
-		m_SliceIndex = from[fromListSize - 1].m_Slice;
-		OnUpdateSlice();
+		to.push_back(CreateVolumeUndoRedoState());
+
+		vtkDataArray* segScalars = m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
+		segScalars->DeepCopy(from[fromIndex].m_Scalars);
+		ForceSlicing();
+
+		vtkDEL(from[fromIndex].m_Scalars);
+		from.pop_back();
 	}
 
-	to.push_back(CreateUndoRedoState());
-
-	m_RealDrawnImage->DeepCopy(from[fromListSize - 1].m_Scalars);
-	ApplyRealDrawnImage();
-
-	from.pop_back();
 	m_View->CameraUpdate();
 
 	//Enable-disable buttons
@@ -2227,12 +2261,37 @@ void mafOpSegmentation::StartDraw(mafEvent *e)
 //----------------------------------------------------------------------------
 void mafOpSegmentation::AddUndoStep()
 {
+	if (m_UndoList.size() == 1 && m_UndoList[0].m_Plane == -1)
+		ClearManualUndoList();
+
 	if (m_UndoList.size() == MAX_UNDOLIST_SIZE)
 	{
 		vtkDEL(m_UndoList[0].m_Scalars);
 		m_UndoList.erase(m_UndoList.begin());
 	}
 	m_UndoList.push_back(CreateUndoRedoState());
+}
+
+//----------------------------------------------------------------------------
+void mafOpSegmentation::AddFullVolumeUndoStep()
+{
+	ClearManualUndoList();
+
+	m_UndoList.push_back(CreateVolumeUndoRedoState());
+}
+
+//----------------------------------------------------------------------------
+UndoRedoState mafOpSegmentation::CreateVolumeUndoRedoState()
+{
+	//Create State 
+	UndoRedoState urs;
+	urs.m_Scalars = vtkUnsignedCharArray::New();
+	vtkImageData * segmentation = (vtkImageData *)m_SegmentationVolume->GetOutput()->GetVTKData();
+	urs.m_Scalars->DeepCopy(segmentation->GetPointData()->GetScalars());
+	urs.m_Plane = -1;
+	urs.m_Slice = -1;
+
+	return urs;
 }
 
 //----------------------------------------------------------------------------
@@ -2467,6 +2526,35 @@ void mafOpSegmentation::SelectRangeByCurrentSlice()
 	SetRangeListSelection(m_CurrentRange);
 	EnableDisableGuiRange();
 }
+
+//----------------------------------------------------------------------------
+void mafOpSegmentation::Conntectivity3D(mafEvent * e)
+{
+	wxBusyInfo wait("3D Connectivity: Please wait");
+	
+	AddFullVolumeUndoStep();
+	m_Helper.Connectivity3d((double *)e->GetPointer(), m_SlicePlane, m_SliceIndex-1);
+
+	ForceSlicing();
+	
+	//On edit a new branch of redo-list starts, i need to clear the redo stack
+	ClearManualRedoList();
+
+	m_View->CameraUpdate();
+	CreateRealDrawnImage();
+}
+
+//----------------------------------------------------------------------------
+void mafOpSegmentation::ForceSlicing()
+{
+	mafPipeVolumeOrthoSlice *pipeOrtho = (mafPipeVolumeOrthoSlice *)m_View->GetNodePipe(m_SegmentationVolume);
+	vtkMAFVolumeOrthoSlicer * slicer = pipeOrtho->GetSlicer(pipeOrtho->GetSliceDirection());
+	slicer->Modified();
+	slicer->Update();
+}
+
+
+
 //----------------------------------------------------------------------------
 void mafOpSegmentation::SetRangeListSelection(int index)
 {
@@ -2498,7 +2586,7 @@ void mafOpSegmentation::ClearManualRedoList()
     vtkDEL(m_RedoList[i].m_Scalars);
   m_RedoList.clear();
 
-	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, true);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_UndoList.size()>0);
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
 }
 //----------------------------------------------------------------------------

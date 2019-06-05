@@ -120,6 +120,7 @@ public:
     ID_MANUAL_PICKING_MODALITY,
 		ID_MANUAL_TOOLS_BRUSH,
 		ID_MANUAL_TOOLS_FILL,
+		ID_MANUAL_TOOLS_3D_CONNECTIVITY,
     ID_MANUAL_BRUSH_SHAPE,
     ID_MANUAL_BRUSH_SIZE,
     ID_MANUAL_BUCKET_ACTION,
@@ -502,5 +503,13 @@ private:
 
 	eventfilterFunc m_OldEventFunc;
 	void SelectRangeByCurrentSlice();
+	void Conntectivity3D(mafEvent * e);
+
+	void ForceSlicing();
+
+	void AddFullVolumeUndoStep();
+
+	UndoRedoState CreateVolumeUndoRedoState();
+
 };
 #endif
