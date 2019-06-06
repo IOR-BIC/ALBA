@@ -83,6 +83,7 @@ mafPipeSurfaceSlice::mafPipeSurfaceSlice()
   m_ScalarVisibility = 0;
   m_RenderingDisplayListFlag = 0;
   m_Border=1;
+	m_Pickable = true;
 
 	m_ShowSelection = false;
 
@@ -92,172 +93,174 @@ mafPipeSurfaceSlice::mafPipeSurfaceSlice()
 void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
 //----------------------------------------------------------------------------
 {
-  Superclass::Create(n);
-  
-  m_Selected = false;
-  m_Texture         = NULL;
-  m_Mapper          = NULL;
-  m_Actor           = NULL;
-  m_OutlineActor    = NULL;
-  m_Axes            = NULL;
+	Superclass::Create(n);
 
-  assert(m_Vme->GetOutput()->IsMAFType(mafVMEOutputSurface) \
-         || m_Vme->GetOutput()->IsMAFType(mafVMEOutputPointSet)\
-         || m_Vme->GetOutput()->IsMAFType(mafVMEOutputLandmarkCloud));
-  vtkPolyData *data = NULL;
-  mmaMaterial *material = NULL;
+	m_Selected = false;
+	m_Texture = NULL;
+	m_Mapper = NULL;
+	m_Actor = NULL;
+	m_OutlineActor = NULL;
+	m_Axes = NULL;
+
+	assert(m_Vme->GetOutput()->IsMAFType(mafVMEOutputSurface) \
+		|| m_Vme->GetOutput()->IsMAFType(mafVMEOutputPointSet)\
+		|| m_Vme->GetOutput()->IsMAFType(mafVMEOutputLandmarkCloud));
+	vtkPolyData *data = NULL;
+	mmaMaterial *material = NULL;
 
 	m_Vme->AddObserver(this);
-  
-  vtkMAFSmartPointer<vtkMAFExtendedGlyph3D> glyph;
 
-  if(m_Vme->GetOutput()->IsMAFType(mafVMEOutputSurface))
-  {
-    mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
-    assert(surface_output);
-    surface_output->Update();
-    data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
-    data->Update();
-    material = surface_output->GetMaterial();
-  }
-  else if(m_Vme->GetOutput()->IsMAFType(mafVMEOutputPointSet))
-  {
+	vtkMAFSmartPointer<vtkMAFExtendedGlyph3D> glyph;
+
+	if (m_Vme->GetOutput()->IsMAFType(mafVMEOutputSurface))
+	{
+		mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
+		assert(surface_output);
+		surface_output->Update();
+		data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
+		data->Update();
+		material = surface_output->GetMaterial();
+	}
+	else if (m_Vme->GetOutput()->IsMAFType(mafVMEOutputPointSet))
+	{
 		mafVMELandmarkCloud *lmc = mafVMELandmarkCloud::SafeDownCast(m_Vme);
 		if (!lmc)
 		{
 			mafVMELandmark *lm = mafVMELandmark::SafeDownCast(m_Vme);
-			if(lm)
+			if (lm)
 				lmc = mafVMELandmarkCloud::SafeDownCast(lm->GetParent());
 		}
 
-    if (lmc)
-    {
+		if (lmc)
+		{
 			mafVMEOutputPointSet *landmark_cloud_output = mafVMEOutputPointSet::SafeDownCast(m_Vme->GetOutput());
-      assert(landmark_cloud_output);
-      landmark_cloud_output->Update();
+			assert(landmark_cloud_output);
+			landmark_cloud_output->Update();
 
-			      
-      vtkNEW(m_SphereSource);
-      m_SphereSource->SetRadius(lmc->GetRadius());
-      m_SphereSource->SetThetaResolution(lmc->GetSphereResolution());
-      m_SphereSource->SetPhiResolution(lmc->GetSphereResolution());
-      m_SphereSource->Update();
 
-      glyph->SetSource(m_SphereSource->GetOutput());
-      glyph->SetInput(landmark_cloud_output->GetVTKData());
-      glyph->OrientOff();
-      glyph->ScalingOff();
-      glyph->ScalarVisibilityOn();
-      glyph->Update();
+			vtkNEW(m_SphereSource);
+			m_SphereSource->SetRadius(lmc->GetRadius());
+			m_SphereSource->SetThetaResolution(lmc->GetSphereResolution());
+			m_SphereSource->SetPhiResolution(lmc->GetSphereResolution());
+			m_SphereSource->Update();
 
-      data = vtkPolyData::SafeDownCast(glyph->GetOutput());
-      data->Update();
+			glyph->SetSource(m_SphereSource->GetOutput());
+			glyph->SetInput(landmark_cloud_output->GetVTKData());
+			glyph->OrientOff();
+			glyph->ScalingOff();
+			glyph->ScalarVisibilityOn();
+			glyph->Update();
 
-      material = landmark_cloud_output->GetMaterial();
-    }
-  }
-  
-  
-  assert(data);
-  vtkDataArray *scalars = data->GetPointData()->GetScalars();
-  double sr[2] = {0,1};
+			data = vtkPolyData::SafeDownCast(glyph->GetOutput());
+			data->Update();
 
-	m_Plane	= vtkPlane::New();
+			material = landmark_cloud_output->GetMaterial();
+		}
+	}
+
+
+	assert(data);
+	vtkDataArray *scalars = data->GetPointData()->GetScalars();
+	double sr[2] = { 0,1 };
+
+	m_Plane = vtkPlane::New();
 	m_Cutter = vtkMAFFixedCutter::New();
 
 	m_Plane->SetOrigin(m_Origin);
 	m_Plane->SetNormal(m_Normal);
 	vtkNEW(m_VTKTransform);
-  m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
+	m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
 	m_Plane->SetTransform(m_VTKTransform);
 
 	m_Cutter->SetInput(data);
 	m_Cutter->SetCutFunction(m_Plane);
 	m_Cutter->Update();
-  if(scalars != NULL)
-  {
-    m_ScalarVisibility = 1;
-    scalars->GetRange(sr);
-  }
+	if (scalars != NULL)
+	{
+		m_ScalarVisibility = 1;
+		scalars->GetRange(sr);
+	}
 
-  assert(material);  // all vme that use PipeSurface must have the material correctly set
+	assert(material);  // all vme that use PipeSurface must have the material correctly set
 
-  m_Mapper = vtkPolyDataMapper::New();
+	m_Mapper = vtkPolyDataMapper::New();
 
-  if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
-  {
-    if (data->GetPointData()->GetTCoords() == NULL)
-    {
-      GenerateTextureMapCoordinate();
-    }
-    else
-    {
-      m_Mapper->SetInput(m_Cutter->GetOutput());
-    }
-  }
-  else
-  {
-    m_Mapper->SetInput(m_Cutter->GetOutput());
-  }
-  if(m_Vme->GetOutput()->IsMAFType(mafVMEOutputPointSet)) m_ScalarVisibility = 0;
-  m_Mapper->SetScalarVisibility(m_ScalarVisibility);
-  m_Mapper->SetScalarRange(sr);
-  
-	if(m_Vme->IsAnimated())
-  {
-    m_RenderingDisplayListFlag = 1;
-    m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
-  }
+	if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
+	{
+		if (data->GetPointData()->GetTCoords() == NULL)
+		{
+			GenerateTextureMapCoordinate();
+		}
+		else
+		{
+			m_Mapper->SetInput(m_Cutter->GetOutput());
+		}
+	}
 	else
-  {
-    m_RenderingDisplayListFlag = 0;
-    m_Mapper->ImmediateModeRenderingOff();
-  }
+	{
+		m_Mapper->SetInput(m_Cutter->GetOutput());
+	}
+	if (m_Vme->GetOutput()->IsMAFType(mafVMEOutputPointSet)) m_ScalarVisibility = 0;
+	m_Mapper->SetScalarVisibility(m_ScalarVisibility);
+	m_Mapper->SetScalarRange(sr);
 
-  m_Texture = vtkTexture::New();
-  m_Texture->SetQualityTo32Bit();
-  m_Texture->InterpolateOn();
-  if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
-  {
-    if (material->GetMaterialTexture() != NULL)
-    {
-      m_Texture->SetInput(material->GetMaterialTexture());
-    }
-    else if (material->GetMaterialTextureID() != -1)
-    {
-      mafVME *texture_vme = m_Vme->GetRoot()->FindInTreeById(material->GetMaterialTextureID());
-      texture_vme->GetOutput()->GetVTKData()->Update();
-      m_Texture->SetInput((vtkImageData *)texture_vme->GetOutput()->GetVTKData());
-    }
-    else
-    {
-      mafErrorMacro("texture info not correctly set inside material!! ");
-    }
-  }
+	if (m_Vme->IsAnimated())
+	{
+		m_RenderingDisplayListFlag = 1;
+		m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
+	}
+	else
+	{
+		m_RenderingDisplayListFlag = 0;
+		m_Mapper->ImmediateModeRenderingOff();
+	}
 
-  m_Actor = vtkActor::New();
-  m_Actor->SetMapper(m_Mapper);
-  if (material->m_MaterialType == mmaMaterial::USE_VTK_PROPERTY)
-  {
-  m_Actor->SetProperty(material->m_Prop);
-  }
-//  else if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
-  if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
-  {
-    m_Actor->SetTexture(m_Texture);
-  }
-  m_Actor->GetProperty()->SetLineWidth (1);
-  m_AssemblyFront->AddPart(m_Actor);
+	m_Texture = vtkTexture::New();
+	m_Texture->SetQualityTo32Bit();
+	m_Texture->InterpolateOn();
+	if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
+	{
+		if (material->GetMaterialTexture() != NULL)
+		{
+			m_Texture->SetInput(material->GetMaterialTexture());
+		}
+		else if (material->GetMaterialTextureID() != -1)
+		{
+			mafVME *texture_vme = m_Vme->GetRoot()->FindInTreeById(material->GetMaterialTextureID());
+			texture_vme->GetOutput()->GetVTKData()->Update();
+			m_Texture->SetInput((vtkImageData *)texture_vme->GetOutput()->GetVTKData());
+		}
+		else
+		{
+			mafErrorMacro("texture info not correctly set inside material!! ");
+		}
+	}
 
-  // selection highlight
-  vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInput(data);  
+	m_Actor = vtkActor::New();
+	m_Actor->SetMapper(m_Mapper);
+	if (material->m_MaterialType == mmaMaterial::USE_VTK_PROPERTY)
+	{
+		m_Actor->SetProperty(material->m_Prop);
+	}
+	//  else if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
+	if (material->m_MaterialType == mmaMaterial::USE_TEXTURE)
+	{
+		m_Actor->SetTexture(m_Texture);
+	}
+	m_Actor->GetProperty()->SetLineWidth(1);
+
+	m_Actor->SetPickable(m_Pickable);
+	m_AssemblyFront->AddPart(m_Actor);
+
+	// selection highlight
+	vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
+	corner->SetInput(data);
 
 	vtkMAFSmartPointer<vtkPolyDataMapper> corner_mapper;
 	corner_mapper->SetInput(corner->GetOutput());
 
 	vtkMAFSmartPointer<vtkProperty> corner_props;
-	corner_props->SetColor(1,1,1);
+	corner_props->SetColor(1, 1, 1);
 	corner_props->SetAmbient(1);
 	corner_props->SetRepresentationToWireframe();
 	corner_props->SetInterpolationToFlat();
@@ -268,10 +271,10 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
 	m_OutlineActor->PickableOff();
 	m_OutlineActor->SetProperty(corner_props);
 
-  m_AssemblyFront->AddPart(m_OutlineActor);
+	m_AssemblyFront->AddPart(m_OutlineActor);
 
-  m_Axes = new mafAxes(m_RenFront, m_Vme);
-  m_Axes->SetVisibility(0);
+	m_Axes = new mafAxes(m_RenFront, m_Vme);
+	m_Axes->SetVisibility(0);
 }
 //----------------------------------------------------------------------------
 mafPipeSurfaceSlice::~mafPipeSurfaceSlice()
@@ -302,6 +305,19 @@ void mafPipeSurfaceSlice::Select(bool sel)
 			m_OutlineActor->SetVisibility(sel);
 	}
 }
+
+//----------------------------------------------------------------------------
+void mafPipeSurfaceSlice::SetActorPicking(int enable)
+{
+	m_Pickable = enable;
+	if (m_Actor != NULL)
+	{
+		m_Actor->SetPickable(enable);
+		m_Actor->Modified();
+	}
+	GetLogicManager()->CameraUpdate();
+}
+
 //----------------------------------------------------------------------------
 mafGUI *mafPipeSurfaceSlice::CreateGui()
 //----------------------------------------------------------------------------

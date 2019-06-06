@@ -174,6 +174,8 @@ void mafPictureFactory::Initialize()
 		mafADDPIC(TOOL_BRUSH2);
 #include <pic/TOOL_ERASE.xpm>
 		mafADDPIC(TOOL_ERASE);
+#include <pic/TOOL_CONNECTIVITY.xpm>
+		mafADDPIC(TOOL_CONNECTIVITY);		
 }
 //----------------------------------------------------------------------------
 mafPictureFactory::~mafPictureFactory()
