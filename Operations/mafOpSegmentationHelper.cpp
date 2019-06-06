@@ -26,7 +26,7 @@
 
 #define ROUND(X) floor((X)+0.5)
 
-
+int neighboors[6][3] = { {-1,0,0}, {1,0,0}, {0,-1,0}, {0,1,0}, {0,0,-1}, {0,0,1} };
 
 //----------------------------------------------------------------------------
 mafOpSegmentationHelper::mafOpSegmentationHelper()
@@ -302,6 +302,8 @@ void mafOpSegmentationHelper::GetSlicePoint(int slicePlane, double * pos, int * 
 	sclicePoint[1] = ROUND(slicePos[1] / sliceSpacing[1]);
 }
 
+ 
+
 //----------------------------------------------------------------------------
 void mafOpSegmentationHelper::Connectivity3d(double * pos, int slicePlane, int currentSlice)
 {
@@ -351,6 +353,7 @@ void mafOpSegmentationHelper::Connectivity3d(double * pos, int slicePlane, int c
 	memset(outputPointer, 0, sizeof(unsigned char)*inputScalars->GetNumberOfTuples());
 
 	outputPointer[firstPointId] = FULL;
+	int x, y, z;
 		
 	while (points.size() > 0)
 	{
@@ -358,31 +361,23 @@ void mafOpSegmentationHelper::Connectivity3d(double * pos, int slicePlane, int c
 		{
 			volPoint p = points[i];
 
-			for (int z = p.z - 1; z <= p.z + 1; z++)
+			for (int j = 0; j < 6; j++)
 			{
-				if (z < 0 || z >= dims[2])
+				x = p.x + neighboors[j][0];
+				y = p.y + neighboors[j][1];
+				z = p.z + neighboors[j][2];
+
+
+				if ((z < 0 || z >= dims[2]) || (y < 0 || y >= dims[1]) || (x < 0 || x >= dims[0]))
 					continue;
 				
-				int zShift = z*dims[0] * dims[1];
-				for (int y = p.y - 1; y <= p.y + 1; y++)
+				int id = z*dims[0] * dims[1] + y*dims[0] + x;
+
+				if (!outputPointer[id] && inputPointer[id])
 				{
-					if (y < 0 || y >= dims[1])
-						continue;
-
-					int yShift = y*dims[0];
-
-					for (int x = p.x - 1; x <= p.x + 1; x++)
-					{
-						if (x < 0 || x >= dims[0] || (x == p.x && y == p.y && z == p.z))
-							continue;
-						int shift = yShift + zShift + x;
-						if (!outputPointer[shift] && inputPointer[shift])
-						{
-							outputPointer[shift] = FULL;
-							volPoint newPoint = { x,y,z };
-							newPoints.push_back(newPoint);
-						}
-					}
+					outputPointer[id] = FULL;
+					volPoint newPoint = { x,y,z };
+					newPoints.push_back(newPoint);
 				}
 			}
 		}
