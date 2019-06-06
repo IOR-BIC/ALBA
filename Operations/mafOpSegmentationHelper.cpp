@@ -307,6 +307,7 @@ void mafOpSegmentationHelper::GetSlicePoint(int slicePlane, double * pos, int * 
 //----------------------------------------------------------------------------
 void mafOpSegmentationHelper::Connectivity3d(double * pos, int slicePlane, int currentSlice)
 {
+	unsigned char background, fillValue;
 	m_VolumeSlice->Update();
 	int point[2],  dims[3];
 
@@ -343,16 +344,26 @@ void mafOpSegmentationHelper::Connectivity3d(double * pos, int slicePlane, int c
 	unsigned char *inputPointer = (unsigned char*)inputScalars->GetVoidPointer(0);
 
 
+
 	//click outside segmentation do not create output scalars
-	if (!inputPointer[firstPointId])
-		return;
+	if (inputPointer[firstPointId])
+	{
+		background = EMPTY;
+		fillValue = FULL;
+	}
+	else
+	{
+		background = FULL;
+		fillValue = EMPTY;
+	}
+		
 	
 	vtkUnsignedCharArray 	*outputScalars = inputScalars->NewInstance();
 	outputScalars->SetNumberOfTuples(inputScalars->GetNumberOfTuples());
 	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
-	memset(outputPointer, 0, sizeof(unsigned char)*inputScalars->GetNumberOfTuples());
+	memset(outputPointer, background, sizeof(unsigned char)*inputScalars->GetNumberOfTuples());
 
-	outputPointer[firstPointId] = FULL;
+	outputPointer[firstPointId] = fillValue;
 	int x, y, z;
 		
 	while (points.size() > 0)
@@ -373,9 +384,9 @@ void mafOpSegmentationHelper::Connectivity3d(double * pos, int slicePlane, int c
 				
 				int id = z*dims[0] * dims[1] + y*dims[0] + x;
 
-				if (!outputPointer[id] && inputPointer[id])
+				if (outputPointer[id]!=fillValue && inputPointer[id]==fillValue)
 				{
-					outputPointer[id] = FULL;
+					outputPointer[id] = fillValue;
 					volPoint newPoint = { x,y,z };
 					newPoints.push_back(newPoint);
 				}

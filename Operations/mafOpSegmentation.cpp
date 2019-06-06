@@ -968,7 +968,7 @@ void mafOpSegmentation::CreateEditSegmentationGui()
 	currentGui->Label("Tools", true);
 
 	std::vector<const char*> toolLabels = { "Brush", "Fill", "3D Connectivity" };
-	std::vector<const char*> toolImageNames = { "TOOL_PEN" , "TOOL_FILL", "TOOL_ERASE" };
+	std::vector<const char*> toolImageNames = { "TOOL_PEN" , "TOOL_FILL", "TOOL_CONNECTIVITY" };
 	std::vector<int> toolIds = { ID_MANUAL_TOOLS_BRUSH, ID_MANUAL_TOOLS_FILL, ID_MANUAL_TOOLS_3D_CONNECTIVITY };
 
 	currentGui->MultipleImageButtons(3, 3, toolIds, toolLabels, toolImageNames, 0);
