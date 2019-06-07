@@ -651,7 +651,7 @@ void mafViewArbitraryOrthoSlice::OnLUTRangeModified()
 {
 	mafVME *vme = GetSceneGraph()->GetSelectedVme();
 
-	if( m_CurrentVolume && vme)
+	if( m_CurrentVolume)
 		UpdateSlicersLUT();
 }
 //----------------------------------------------------------------------------
