@@ -318,7 +318,7 @@ mmaMaterial *mafVMEMaps::GetMaterial()
   {
     material = mmaMaterial::New();
     SetAttribute("MaterialAttributes", material);
-    lutPreset(14,GetMaterial()->m_ColorLut);
+    lutPreset(0, material->m_ColorLut);
     //material->m_ColorLut = CreateTable();
     material->UpdateFromLut();
     material->UpdateProp();

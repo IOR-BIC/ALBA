@@ -2708,11 +2708,11 @@ void mafOpSegmentation::ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift)
 	} 
 	else SetCursor(CUR_DEFAULT);
 
-	if (keyCode == 312)//WXK_PAGEUP)
+	if (keyCode == 312 || keyCode == 317)//WXK_PAGEUP)
 	{
 		SliceNext();
 	}
-	else if (keyCode == 313)//WXK_PAGEDOWN)
+	else if (keyCode == 313|| keyCode == 319)//WXK_PAGEDOWN)
 	{
 		SlicePrev();
 	}
