@@ -694,6 +694,7 @@ void mafViewArbitraryOrthoSlice::ShowSlicers(mafVME * vmeVolume, bool show)
 		m_Slicer[i]->ReparentTo(vmeVolume);
 		m_Slicer[i]->SetAbsMatrix(*m_SlicerResetMatrix[i]);
 		m_Slicer[i]->SetSlicedVMELink(vmeVolume);
+		m_Slicer[i]->SetUpdateVTKPropertiesFromMaterial(false);
 		m_Slicer[i]->GetMaterial()->m_ColorLut->DeepCopy(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
 		m_Slicer[i]->Update();
 		m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_Slicer[i], show);

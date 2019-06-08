@@ -167,7 +167,7 @@ void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
     }
   }
 
-  m_Mapper->SetScalarRange(sr);
+  m_Mapper->SetUseLookupTableScalarRange(true);
 
   vtkNEW(m_Actor);
 	m_Actor->SetMapper(m_Mapper);
