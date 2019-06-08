@@ -33,7 +33,7 @@
 class MAF_EXPORT mafPipeSurface : public mafPipeGenericPolydata
 {
 public:
-	mafTypeMacro(mafPipeSurface,mafPipe);
+	mafTypeMacro(mafPipeSurface, mafPipeGenericPolydata);
 
 	mafPipeSurface();
 	virtual     ~mafPipeSurface();

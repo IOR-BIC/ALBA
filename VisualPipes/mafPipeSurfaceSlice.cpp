@@ -57,6 +57,8 @@
 #include "vtkPlane.h"
 #include "vtkMAFExtendedGlyph3D.h"
 #include "vtkSphereSource.h"
+#include "vtkLookupTable.h"
+#include "mafVMEMaps.h"
 
 #include <vector>
 
@@ -119,7 +121,14 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
 		surface_output->Update();
 		data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
 		data->Update();
-		material = surface_output->GetMaterial();
+
+
+		material = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
+		if(!material)
+			material = surface_output->GetMaterial();
+
+		vtkNEW(m_Table);
+		m_Table->DeepCopy(material->m_ColorLut);
 	}
 	else if (m_Vme->GetOutput()->IsMAFType(mafVMEOutputPointSet))
 	{
@@ -202,7 +211,7 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
 	}
 	if (m_Vme->GetOutput()->IsMAFType(mafVMEOutputPointSet)) m_ScalarVisibility = 0;
 	m_Mapper->SetScalarVisibility(m_ScalarVisibility);
-	m_Mapper->SetScalarRange(sr);
+	//m_Mapper->SetScalarRange(sr);
 
 	if (m_Vme->IsAnimated())
 	{
@@ -319,6 +328,16 @@ void mafPipeSurfaceSlice::SetActorPicking(int enable)
 }
 
 //----------------------------------------------------------------------------
+void mafPipeSurfaceSlice::SetLookupTable(vtkLookupTable *table)
+{
+	m_Table->DeepCopy(table);
+	m_Mapper->ScalarVisibilityOn();
+	m_Mapper->SetLookupTable(m_Table);
+	m_Mapper->SetUseLookupTableScalarRange(true);
+	m_Mapper->Modified();
+}
+
+//----------------------------------------------------------------------------
 mafGUI *mafPipeSurfaceSlice::CreateGui()
 //----------------------------------------------------------------------------
 {
@@ -343,6 +362,32 @@ void mafPipeSurfaceSlice::OnEvent(mafEventBase *maf_event)
 				GetLogicManager()->CameraUpdate();
 		  }
 	  break;
+		case ID_LUT:
+		{
+			double sr[2];
+			m_Table->GetTableRange(sr);
+			m_Mapper->SetScalarRange(sr);
+			GetLogicManager()->CameraUpdate();
+		}
+		break;
+		case ID_SCALAR_MAP_ACTIVE:
+		{
+
+			m_Mapper->SetScalarVisibility(true);
+						
+			UpdateScalars();
+
+			if (m_Vme->IsA("mafVMEMaps"))
+			{
+				mmaMaterial *material = (mmaMaterial *)((mafVMEMaps *)m_Vme)->GetMaterial();
+				if (material)
+					SetLookupTable(material->m_ColorLut);
+			}
+		
+			GetLogicManager()->CameraUpdate();
+		}
+		break;
+
       default:
         mafEventMacro(*e);
       break;
@@ -368,6 +413,33 @@ void mafPipeSurfaceSlice::OnEvent(mafEventBase *maf_event)
 		if(m_VTKTransform)  m_VTKTransform->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix());
 		if(m_Plane)  m_Plane->SetTransform(m_VTKTransform);
 	}
+}
+
+//----------------------------------------------------------------------------
+void mafPipeSurfaceSlice::UpdateScalars()
+
+{
+	m_Vme->GetOutput()->GetVTKData()->Update();
+	m_Vme->Update();
+
+	UpdateLUTAndMapperFromNewActiveScalars();
+}
+
+//----------------------------------------------------------------------------
+void mafPipeSurfaceSlice::UpdateLUTAndMapperFromNewActiveScalars()
+{
+	vtkPolyData *data = vtkPolyData::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
+	data->Update();
+	double sr[2];
+
+
+	m_Mapper->SetLookupTable(m_Table);
+	m_Mapper->UseLookupTableScalarRangeOn();
+	m_Mapper->Update();
+	m_Actor->Modified();
+
+	UpdateProperty();
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceSlice::GenerateTextureMapCoordinate()

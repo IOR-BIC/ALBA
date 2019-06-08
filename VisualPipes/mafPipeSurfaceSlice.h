@@ -38,6 +38,7 @@ class vtkMAFFixedCutter;
 class vtkPlane;
 class vtkSphereSource;
 class vtkMAFToLinearTransform;
+class vtkLookupTable;
 
 /** 
   class name: mafPipeSurfaceSlice 
@@ -65,7 +66,13 @@ public:
   /** process events coming from Gui */
   virtual void OnEvent(mafEventBase *maf_event);
 
-  /** Create the VTK rendering pipeline*/
+	void UpdateScalars();
+
+
+	void UpdateLUTAndMapperFromNewActiveScalars();
+
+
+	/** Create the VTK rendering pipeline*/
   virtual void Create(mafSceneNode *n);
 
   /** Manage the actor selection by showing the corner box around the actor when the corresponding VME is selected.*/
@@ -84,16 +91,20 @@ public:
 	/** Set the actor picking*/
 	void SetActorPicking(int enable);
 
+	/** Set the lookup table */
+	void SetLookupTable(vtkLookupTable *table);
 
-  /** IDs for the GUI */
+	/** IDs for the GUI */
   enum PIPE_SURFACE_WIDGET_ID
   {
     ID_SCALAR_VISIBILITY = Superclass::ID_LAST,
     ID_RENDERING_DISPLAY_LIST,
     ID_CHOOSE_TEXTURE,
     ID_TEXTURE_MAPPING_MODE,
-    ID_LAST,
-	ID_BORDER_CHANGE
+		ID_BORDER_CHANGE,
+		ID_LUT,
+		ID_SCALAR_MAP_ACTIVE,
+		ID_LAST,
   };
 
   //bool ImageAccept(mafVME*node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
@@ -111,6 +122,7 @@ protected:
   vtkMAFFixedCutter		      *m_Cutter;
 
   vtkSphereSource         *m_SphereSource;
+	vtkLookupTable *m_Table;
 
   double				           m_Border;
 
