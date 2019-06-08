@@ -196,7 +196,6 @@ void mafViewArbitraryOrthoSlice::VmeShow(mafVME *vme, bool show)
 		}
 	}
 
-	vme->Update();
 	if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
 	{
 		if (show)
@@ -645,7 +644,6 @@ void mafViewArbitraryOrthoSlice::OnReset()
 	}
 
 	RestoreCameraParametersForAllSubviews();
-	UpdateSlicersLUT();
 }
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnLUTRangeModified()
