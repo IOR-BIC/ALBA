@@ -144,7 +144,7 @@ void mafGUIAboutDialog::CreateDialog()
 	wxString description = m_Title;
 	description += "\n";
 	description += _("Application ") + m_Revision;
-	description += "\n© 2019 BIC";
+	description += "\n© 2019 BIC - RIT - IOR";
 
 	description += m_ExtraMessage;
 
