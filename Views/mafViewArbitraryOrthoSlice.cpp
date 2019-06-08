@@ -613,6 +613,7 @@ void mafViewArbitraryOrthoSlice::ShowVolume( mafVME * vme, bool show )
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::HideVolume()
 {
+	OnReset();
 
 	EnableWidgets(false);
 	for(int i=X; i<=Z; i++)
