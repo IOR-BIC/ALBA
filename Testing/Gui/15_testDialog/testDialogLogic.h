@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testDialogLogic
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -18,17 +18,17 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafLogicWithGUI.h" 
-#include "mafObserver.h"
+#include "albaLogicWithGUI.h" 
+#include "albaObserver.h"
 
 // ============================================================================
-class testDialogLogic : public mafObserver
+class testDialogLogic : public albaObserver
 // ============================================================================
 {
 public:
    testDialogLogic();
   ~testDialogLogic();
-   void OnEvent(mafEventBase *maf_event);
+   void OnEvent(albaEventBase *alba_event);
    void Show();
    wxFrame *m_win;
 protected:

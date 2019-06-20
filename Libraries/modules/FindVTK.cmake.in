@@ -1,5 +1,5 @@
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: FindVTK.cmake.in,v $
 # Language:  CMake 1.2
 # Date:      $Date: 2004-10-18 07:42:55 $
@@ -7,7 +7,7 @@
 #
 # Description:
 # This module finds the location of the VTK source and binary paths. It
-# first searches for it inside the MAF tree, otherwise it uses the standard
+# first searches for it inside the ALBA tree, otherwise it uses the standard
 # CMAKE FindVTK module 
 #
 # This module defines

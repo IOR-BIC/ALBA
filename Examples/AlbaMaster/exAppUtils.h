@@ -13,7 +13,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#include "mafDefines.h"
+#include "albaDefines.h"
 
 #ifndef __exAppUtils_H__
 #define __exAppUtils_H__
@@ -23,7 +23,7 @@ class exAppUtils
 public:
 
   /** In DEBUG mode return LHPBuilder source code directory in WIN32 path format. 
-  In RELEASE mode it returns the Application installation directory in WIN32 path format (same as mafGetApplicationDirectory)*/
+  In RELEASE mode it returns the Application installation directory in WIN32 path format (same as albaGetApplicationDirectory)*/
 
   static wxString GetApplicationDirectory();
 	static wxString GetConfigDirectory();

@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmaMeter
  Authors: Marco Petrone, Paolo Quadrani
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -18,26 +18,26 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafAttribute.h"
+#include "albaAttribute.h"
 
 /** mmaMeter 
 */
-class MAF_EXPORT mmaMeter : public mafAttribute
+class ALBA_EXPORT mmaMeter : public albaAttribute
 {
 public:
   mmaMeter();
   virtual ~mmaMeter();
 
-  mafTypeMacro(mmaMeter, mafAttribute);
+  albaTypeMacro(mmaMeter, albaAttribute);
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0) const;
 
   /** Copy the contents of another Meter attribute into this one. */
-  virtual void DeepCopy(const mafAttribute *a);
+  virtual void DeepCopy(const albaAttribute *a);
 
   /** Compare with another Meter attribute. */
-  virtual bool Equals(const mafAttribute *a);
+  virtual bool Equals(const albaAttribute *a);
 
   int m_MeterMode;
   int m_ColorMode;
@@ -56,7 +56,7 @@ public:
   int    m_LabelVisibility;
 
 protected:
-  virtual int InternalStore(mafStorageElement *parent);
-  virtual int InternalRestore(mafStorageElement *node);
+  virtual int InternalStore(albaStorageElement *parent);
+  virtual int InternalRestore(albaStorageElement *node);
 };
 #endif

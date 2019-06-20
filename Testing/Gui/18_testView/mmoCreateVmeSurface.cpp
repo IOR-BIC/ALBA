@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmoCreateVmeSurface
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -14,9 +14,9 @@
 
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -24,12 +24,12 @@
 
 
 #include "mmoCreateVmeSurface.h"
-#include "mafVMESurface.h"
+#include "albaVMESurface.h"
 #include "vtkConeSource.h"
 #include "vtkPolyData.h"
 //----------------------------------------------------------------------------
 mmoCreateVmeSurface::mmoCreateVmeSurface(wxString label)
-: mafOp(label)
+: albaOp(label)
 //----------------------------------------------------------------------------
 {
   m_Canundo = true;
@@ -39,25 +39,25 @@ mmoCreateVmeSurface::mmoCreateVmeSurface(wxString label)
 mmoCreateVmeSurface::~mmoCreateVmeSurface()
 //----------------------------------------------------------------------------
 {
-  mafDEL(m_vme);
+  albaDEL(m_vme);
 }
 //----------------------------------------------------------------------------
-mafOp* mmoCreateVmeSurface::Copy()
+albaOp* mmoCreateVmeSurface::Copy()
 //----------------------------------------------------------------------------
 {
   return new mmoCreateVmeSurface(m_Label);
 }
 //----------------------------------------------------------------------------
-void mmoCreateVmeSurface::OnEvent(mafEvent& e)
+void mmoCreateVmeSurface::OnEvent(albaEvent& e)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(e);
+  albaEventMacro(e);
 }
 //----------------------------------------------------------------------------
 void mmoCreateVmeSurface::OpRun()
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,OP_RUN_OK));
+  albaEventMacro(albaEvent(this,OP_RUN_OK));
 }
 //----------------------------------------------------------------------------
 void mmoCreateVmeSurface::OpDo()
@@ -65,11 +65,11 @@ void mmoCreateVmeSurface::OpDo()
 {
   assert(!m_vme);
 
-  mafNEW(m_vme);
+  albaNEW(m_vme);
   static int counter = 0;
   wxString name = wxString::Format("vme surface %d",counter++);
   m_vme->SetName(name);
-  m_vme->ReparentTo( (mafVME*)m_Input);
+  m_vme->ReparentTo( (albaVME*)m_Input);
 
   vtkConeSource *cs = vtkConeSource::New();
   cs->SetResolution(20);
@@ -78,13 +78,13 @@ void mmoCreateVmeSurface::OpDo()
   m_vme->SetData(cs->GetOutput(),0);
   cs->Delete();
 
-  mafEventMacro(mafEvent(this,VME_ADD,m_vme));
+  albaEventMacro(albaEvent(this,VME_ADD,m_vme));
 }
 //----------------------------------------------------------------------------
 void mmoCreateVmeSurface::OpUndo()
 //----------------------------------------------------------------------------
 {
   assert(m_vme);
-  mafEventMacro(mafEvent(this,VME_REMOVE,m_vme));
-  mafDEL(m_vme);
+  albaEventMacro(albaEvent(this,VME_REMOVE,m_vme));
+  albaDEL(m_vme);
 }

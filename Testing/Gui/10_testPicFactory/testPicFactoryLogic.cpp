@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testPicFactoryLogic
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -16,9 +16,9 @@
 
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -26,21 +26,21 @@
 
 
 #include "testPicFactoryLogic.h"
-#include "mafGUIMDIFrame.h"
-#include "mafGUINamedPanel.h"
-#include "mafGUISashPanel.h"
-#include "mafWXLog.h"
+#include "albaGUIMDIFrame.h"
+#include "albaGUINamedPanel.h"
+#include "albaGUISashPanel.h"
+#include "albaWXLog.h"
 
-#include "mafPics.h"
+#include "albaPics.h"
 #include <wx/statbmp.h>
 
-#include "mafGUI.h"
-#include "mafSideBar.h"
+#include "albaGUI.h"
+#include "albaSideBar.h"
 //----------------------------------------------------------------------------
 testPicFactoryLogic::testPicFactoryLogic()
 //----------------------------------------------------------------------------
 {
-  m_win = new mafGUIMDIFrame("testPicFactory", wxDefaultPosition, wxSize(800, 600));
+  m_win = new albaGUIMDIFrame("testPicFactory", wxDefaultPosition, wxSize(800, 600));
   m_win->SetListener(this);
 
   CreateMenu();
@@ -82,15 +82,15 @@ void testPicFactoryLogic::CreateLogBar()
 //----------------------------------------------------------------------------
 {
   wxTextCtrl *log  = new wxTextCtrl( m_win, -1, "", wxPoint(0,0), wxSize(100,300), wxNO_BORDER | wxTE_MULTILINE );
-  mafWXLog *m_logger = new mafWXLog(log);
+  albaWXLog *m_logger = new albaWXLog(log);
   wxLog *old_log = wxLog::SetActiveTarget( m_logger );
   cppDEL(old_log);
 
-  mafGUINamedPanel *log_panel = new mafGUINamedPanel(m_win,-1,true);
+  albaGUINamedPanel *log_panel = new albaGUINamedPanel(m_win,-1,true);
   log_panel->SetTitle(" Log Area:");
   log_panel->Add(log,1,wxEXPAND);
 
-  m_log_bar = new mafGUISashPanel(m_win, MENU_VIEW_LOGBAR, wxBOTTOM,80,"Log Bar \tCtrl+L");
+  m_log_bar = new albaGUISashPanel(m_win, MENU_VIEW_LOGBAR, wxBOTTOM,80,"Log Bar \tCtrl+L");
   m_log_bar->Put(log_panel);
   //m_log_bar->Show(false);
   wxLogMessage("buongiorno");
@@ -106,16 +106,16 @@ enum
 void testPicFactoryLogic::CreateSideBar()
 //----------------------------------------------------------------------------
 {
-  m_side_bar = new mafGUISashPanel(m_win, MENU_VIEW_SIDEBAR, wxRIGHT,220,"Side Bar \tCtrl+S");
+  m_side_bar = new albaGUISashPanel(m_win, MENU_VIEW_SIDEBAR, wxRIGHT,220,"Side Bar \tCtrl+S");
   
-  mafGUI *gui = new mafGUI(this); 
+  albaGUI *gui = new albaGUI(this); 
 
   gui->Divider();
   gui->Label("all the icons");
   gui->Label("note: Open and Save were overwritten");
 
   
-  #define FOO(n) { wxStaticBitmap *bmp = new wxStaticBitmap(gui,-1, mafPics.GetBmp(#n));  gui->Add(bmp,0,wxLEFT); }
+  #define FOO(n) { wxStaticBitmap *bmp = new wxStaticBitmap(gui,-1, albaPics.GetBmp(#n));  gui->Add(bmp,0,wxLEFT); }
     FOO(FRAME_ICON16x16)
     FOO(FRAME_ICON32x32)
     FOO(CLOSE_SASH)
@@ -155,10 +155,10 @@ void testPicFactoryLogic::CreateSideBar()
   gui->Show();
 }
 //----------------------------------------------------------------------------
-void testPicFactoryLogic::OnEvent(mafEventBase *maf_event)
+void testPicFactoryLogic::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event)) 
+  if (albaEvent *e = albaEvent::SafeDownCast(alba_event)) 
   {
     switch(e->GetId())
     {

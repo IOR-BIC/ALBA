@@ -1,23 +1,23 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmuDOMTreeErrorReporter
  Authors: Marco Petrone m.petrone@cineca.it
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "mafDefines.h"
-//#include "mafIncludeWX.h" // to be removed
+#include "albaDefines.h"
+//#include "albaIncludeWX.h" // to be removed
 
 #include "mmuDOMTreeErrorReporter.h"
-#include "mafXMLString.h"
+#include "albaXMLString.h"
 
 
 #include <assert.h>
@@ -36,10 +36,10 @@ void mmuDOMTreeErrorReporter::error(const XERCES_CPP_NAMESPACE_QUALIFIER SAXPars
   m_SawErrors = true;
   if(m_TestFlag == false)
   {
-    mafErrorMessageMacro("Error at file \"" << toCatch.getSystemId() \
+    albaErrorMessageMacro("Error at file \"" << toCatch.getSystemId() \
       << "\", line " << toCatch.getLineNumber() \
       << ", column " << toCatch.getColumnNumber() \
-      << "\n   Message: " << mafXMLString(toCatch.getMessage()) \
+      << "\n   Message: " << albaXMLString(toCatch.getMessage()) \
       );
   }
 }
@@ -50,10 +50,10 @@ void mmuDOMTreeErrorReporter::fatalError(const XERCES_CPP_NAMESPACE_QUALIFIER SA
   m_SawErrors = true;
   if(m_TestFlag == false)
   {
-    mafErrorMessageMacro("Fatal Error at file \"" << mafXMLString(toCatch.getSystemId()) \
+    albaErrorMessageMacro("Fatal Error at file \"" << albaXMLString(toCatch.getSystemId()) \
 	  << "\", line " << toCatch.getLineNumber() \
 	  << ", column " << toCatch.getColumnNumber() \
-    << "\n   Message: " << mafXMLString(toCatch.getMessage()) \
+    << "\n   Message: " << albaXMLString(toCatch.getMessage()) \
     );
   }
   

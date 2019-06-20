@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmuXMLDOMElement
  Authors: Marco Petrone
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -16,7 +16,7 @@
 #ifndef __mmuXMLDOMElement_h__
 #define __mmuXMLDOMElement_h__
 
-#include "mafUtility.h"
+#include "albaUtility.h"
 
 
 #include <xercesc/dom/DOM.hpp>
@@ -38,9 +38,9 @@
 // mmuXMLDOMElement
 //------------------------------------------------------------------------------
 /** PIMPL class to hide XercesC specific XML DOM objects. 
-  This class is internally used by mafXMLElement for accessing XML DOM objects.
+  This class is internally used by albaXMLElement for accessing XML DOM objects.
 */
-class MAF_EXPORT mmuXMLDOMElement: public mafUtility
+class ALBA_EXPORT mmuXMLDOMElement: public albaUtility
 {
 public:
   /** constructor */

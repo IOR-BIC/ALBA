@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testRWILogic
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,9 +15,9 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -25,8 +25,8 @@
 
 
 #include "testRWILogic.h"
-#include "mafDecl.h"
-#include "mafGUI.h"
+#include "albaDecl.h"
+#include "albaGUI.h"
 #include "testRWIBaseDlg.h"
 #include "testRWIDlg.h"
 
@@ -59,9 +59,9 @@ testRWILogic::testRWILogic()
 
   m_win = new wxFrame(NULL,-1,"TestRWI",wxDefaultPosition,wxDefaultSize,
     wxMINIMIZE_BOX | wxMAXIMIZE_BOX | /*wxRESIZE_BORDER |*/ wxSYSTEM_MENU | wxCAPTION );
-  mafSetFrame(m_win);
+  albaSetFrame(m_win);
 
-  mafGUI *gui = new mafGUI(this);
+  albaGUI *gui = new albaGUI(this);
   gui->Divider();
   gui->Label("Examples of VTK RenderWindow"); 
   gui->Button(ID_D1,"test RWIBase");
@@ -79,10 +79,10 @@ testRWILogic::~testRWILogic()
 {
 }
 //--------------------------------------------------------------------------------
-void testRWILogic::OnEvent(mafEventBase *maf_event)
+void testRWILogic::OnEvent(albaEventBase *alba_event)
 //--------------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event)) 
+  if (albaEvent *e = albaEvent::SafeDownCast(alba_event)) 
   {
     switch(e->GetId())
     {

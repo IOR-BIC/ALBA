@@ -1,4 +1,4 @@
-MAF Multimod Application Framework.
+ALBA (Agile Library for Biomedical Applications)
 
 [Copyright to be added]
 

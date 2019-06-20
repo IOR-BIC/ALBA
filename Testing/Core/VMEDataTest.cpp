@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
- Module: mafViewPlotTest
+ Program: ALBA (Agile Library for Biomedical Applications)
+ Module: albaViewPlotTest
  Authors: Gianluigi Crimi
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -17,10 +17,10 @@
 
 #include "VMEDataTest.h"
 #include <cppunit/config/SourcePrefix.h>
-#include "mafVMERoot.h"
-#include "mafTransform.h"
-#include "mafSmartPointer.h"
-#include "mafIndent.h"
+#include "albaVMERoot.h"
+#include "albaTransform.h"
+#include "albaSmartPointer.h"
+#include "albaIndent.h"
 #include <iostream>
 #include <vector>
 
@@ -28,22 +28,22 @@
 // abs matrix pipe.
 
 //-------------------------------------------------------------------------
-mafCxxTypeMacro(mafVMETestOutputHelper)
+albaCxxTypeMacro(albaVMETestOutputHelper)
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-mafCxxTypeMacro(mafVMETestHelper);
+albaCxxTypeMacro(albaVMETestHelper);
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-mafCxxTypeMacro(mafMatrixPipeTestHelper);
+albaCxxTypeMacro(albaMatrixPipeTestHelper);
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-void mafMatrixPipeTestHelper::InternalUpdate()
+void albaMatrixPipeTestHelper::InternalUpdate()
 //-------------------------------------------------------------------------
 {
-  mafVMETestHelper *vme=(mafVMETestHelper *)m_VME;
+  albaVMETestHelper *vme=(albaVMETestHelper *)m_VME;
   unsigned long index=(GetTimeStamp()<vme->GetMatrixVector().size())?GetTimeStamp():vme->GetMatrixVector().size()-1;
   m_Matrix->DeepCopy(vme->GetMatrixVector()[index]);
 }
@@ -53,11 +53,11 @@ void mafMatrixPipeTestHelper::InternalUpdate()
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-void mafVMETestHelper::Print(std::ostream& os, const int tabs)
+void albaVMETestHelper::Print(std::ostream& os, const int tabs)
 //-------------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);
-  mafIndent indent(tabs);
+  albaIndent indent(tabs);
   os << indent << "Matrix vector: [";
   int i;
   for (i=0;i<m_MatrixVector.size();i++)
@@ -80,12 +80,12 @@ void mafVMETestHelper::Print(std::ostream& os, const int tabs)
 }
 
 //-------------------------------------------------------------------------
-bool mafVMETestHelper::Equals(mafVME *vme)
+bool albaVMETestHelper::Equals(albaVME *vme)
 //-------------------------------------------------------------------------
 {
   if (Superclass::Equals(vme))
   {
-    mafVMETestHelper *vme_test=mafVMETestHelper::SafeDownCast(vme);
+    albaVMETestHelper *vme_test=albaVMETestHelper::SafeDownCast(vme);
     assert(vme);
     int i;
     for (i=0;i<m_MatrixVector.size();i++)
@@ -107,7 +107,7 @@ bool mafVMETestHelper::Equals(mafVME *vme)
 }
 
 //-------------------------------------------------------------------------
-void mafVMETestHelper::SetMatrix(const mafMatrix &mat)
+void albaVMETestHelper::SetMatrix(const albaMatrix &mat)
 //-------------------------------------------------------------------------
 {
   if (m_MatrixVector.size()<=mat.GetTimeStamp()) // make the vector fit the requested size
@@ -118,7 +118,7 @@ void mafVMETestHelper::SetMatrix(const mafMatrix &mat)
 }
 
 //-------------------------------------------------------------------------
-void mafVMETestHelper::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
+void albaVMETestHelper::GetLocalTimeStamps(std::vector<albaTimeStamp> &kframes)
 //-------------------------------------------------------------------------
 {
   kframes.clear();
@@ -130,12 +130,12 @@ void mafVMETestHelper::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
 }
 
 //-------------------------------------------------------------------------
-mafVMETestHelper::mafVMETestHelper()
+albaVMETestHelper::albaVMETestHelper()
 //-------------------------------------------------------------------------
 {
-  m_Output = mafVMETestOutputHelper::New();
+  m_Output = albaVMETestOutputHelper::New();
   m_Output->SetVME(this);
-  SetMatrixPipe(mafMatrixPipeTestHelper::New());
+  SetMatrixPipe(albaMatrixPipeTestHelper::New());
   //
 }
 
@@ -149,10 +149,10 @@ void VMEDataTest::VmeDataMainTest()
 //-------------------------------------------------------------------------
 {
   // create a small tree
-  mafVMETest *vme1=mafVMETest::New();
-  mafVMETest *vme2=mafVMETest::New();
-  mafVMETest *vme3=mafVMETest::New();
-  mafSmartPointer<mafVMERoot> root;
+  albaVMETest *vme1=albaVMETest::New();
+  albaVMETest *vme2=albaVMETest::New();
+  albaVMETest *vme3=albaVMETest::New();
+  albaSmartPointer<albaVMERoot> root;
   
   root->AddChild(vme1);
   root->AddChild(vme2);
@@ -160,7 +160,7 @@ void VMEDataTest::VmeDataMainTest()
 
   root->SetPose(-10,-10,-10,0,0,0,0);
 
-  mafTransform trans;
+  albaTransform trans;
   for (int i=0;i<10;i++)
   {
     
@@ -170,43 +170,43 @@ void VMEDataTest::VmeDataMainTest()
     vme3->SetPose(0,0,0,i*10,i*10,i*10,i);  // test the SetPose(x,y,z,rx,ry,rz,t) function
   }
   
-  mafTransform root_pose_result;
+  albaTransform root_pose_result;
   root_pose_result.SetPosition(-10,-10,-10);
 
   // test output values for different times
   for (int j=0;j<10;j++)
   {
     root->SetTreeTime(j);
-    mafMatrix root_pose = *(root->GetOutput()->GetMatrix());
-    mafMatrix vme1_pose = *(vme1->GetOutput()->GetMatrix());
-    mafMatrix vme2_pose = *(vme2->GetOutput()->GetMatrix());
-    mafMatrix vme3_pose = *(vme3->GetOutput()->GetMatrix());
-    mafMatrix vme1_abspose = *(vme1->GetOutput()->GetAbsMatrix());
-    mafMatrix vme2_abspose = *(vme2->GetOutput()->GetAbsMatrix());
-    mafMatrix vme3_abspose = *(vme3->GetOutput()->GetAbsMatrix());
+    albaMatrix root_pose = *(root->GetOutput()->GetMatrix());
+    albaMatrix vme1_pose = *(vme1->GetOutput()->GetMatrix());
+    albaMatrix vme2_pose = *(vme2->GetOutput()->GetMatrix());
+    albaMatrix vme3_pose = *(vme3->GetOutput()->GetMatrix());
+    albaMatrix vme1_abspose = *(vme1->GetOutput()->GetAbsMatrix());
+    albaMatrix vme2_abspose = *(vme2->GetOutput()->GetAbsMatrix());
+    albaMatrix vme3_abspose = *(vme3->GetOutput()->GetAbsMatrix());
     
-    mafTransform vme1_abspose_test;
+    albaTransform vme1_abspose_test;
     vme1_abspose_test.SetPosition(10*j-10,10*j-10,10*j-10);
     vme1_abspose_test.SetTimeStamp(j);
 
-    mafTransform vme2_abspose_test;
+    albaTransform vme2_abspose_test;
     vme2_abspose_test.SetPosition(j-10,j-10,j-10);
     vme2_abspose_test.SetTimeStamp(j);
 
-    mafTransform vme3_abspose_test;
+    albaTransform vme3_abspose_test;
     vme3_abspose_test.SetPosition(10*j-10,10*j-10,10*j-10);
     vme3_abspose_test.SetOrientation(j*10,j*10,j*10);
     vme3_abspose_test.SetTimeStamp(j);
 
-    mafTransform vme1_pose_test;
+    albaTransform vme1_pose_test;
     vme1_pose_test.SetPosition(10*j,10*j,10*j);
     vme1_pose_test.SetTimeStamp(j);
 
-    mafTransform vme2_pose_test;
+    albaTransform vme2_pose_test;
     vme2_pose_test.SetPosition(j,j,j);
     vme2_pose_test.SetTimeStamp(j);
 
-    mafTransform vme3_pose_test;
+    albaTransform vme3_pose_test;
     vme3_pose_test.SetOrientation(j*10,j*10,j*10);
     vme3_pose_test.SetTimeStamp(j);
 

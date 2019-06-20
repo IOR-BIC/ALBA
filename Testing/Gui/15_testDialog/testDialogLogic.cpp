@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testDialogLogic
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,9 +15,9 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -25,10 +25,10 @@
 
 
 #include "testDialogLogic.h"
-#include "mafGUIDialog.h"
-#include "mafGUIDialogPreview.h"
-#include "mafGUI.h"
-#include "mafGUIValidator.h"
+#include "albaGUIDialog.h"
+#include "albaGUIDialogPreview.h"
+#include "albaGUI.h"
+#include "albaGUIValidator.h"
 #include "testDialogDlg.h"
 //--------------------------------------------------------------------------------
 //const:
@@ -61,30 +61,30 @@ testDialogLogic::testDialogLogic()
 
   m_win = new wxFrame(NULL,-1,"TestDialog",wxDefaultPosition,wxDefaultSize,
     wxMINIMIZE_BOX | wxMAXIMIZE_BOX | /*wxRESIZE_BORDER |*/ wxSYSTEM_MENU | wxCAPTION );
-  mafSetFrame(m_win);
+  albaSetFrame(m_win);
 
-  mafGUI *gui = new mafGUI(this);
+  albaGUI *gui = new albaGUI(this);
   gui->Divider();
-  gui->Label("Examples of mafGUIDialog",true); 
-  gui->Label("mafGUIDialog styles"); 
-  gui->Button(ID_D1,"using mafRESIZABLE style");
+  gui->Label("Examples of albaGUIDialog",true); 
+  gui->Label("albaGUIDialog styles"); 
+  gui->Button(ID_D1,"using albaRESIZABLE style");
   gui->Button(ID_D2,"without");
-  gui->Button(ID_D3,"using mafCLOSEWINDOW");
+  gui->Button(ID_D3,"using albaCLOSEWINDOW");
   gui->Button(ID_D4,"without");
-  gui->Button(ID_D5,"using mafOK style");
-  gui->Button(ID_D6,"using mafOK|mafCANCEL");
-  gui->Button(ID_D7,"using mafCLOSE");
+  gui->Button(ID_D5,"using albaOK style");
+  gui->Button(ID_D6,"using albaOK|albaCANCEL");
+  gui->Button(ID_D7,"using albaCLOSE");
 
-  gui->Label("Dialogs with a mafGUI",true); 
+  gui->Label("Dialogs with a albaGUI",true); 
   gui->Button(ID_D8,"non sizable");
   gui->Button(ID_D9,"sizable");
   gui->Button(ID_10,"GUI and resizable elements");
 
   gui->Label("Receiving Events form a Dialog",true); 
-  gui->Button(ID_11,"using mafGUI");
-  gui->Button(ID_12,"using mafGUIValidators");
+  gui->Button(ID_11,"using albaGUI");
+  gui->Button(ID_12,"using albaGUIValidators");
 
-  gui->Label("Deriving from mafGUIDialog",true); 
+  gui->Label("Deriving from albaGUIDialog",true); 
   gui->Label("allow more control like:"); 
   gui->Label("dynamically enabling ok/cancel,"); 
   gui->Label("or perform actions after OK evt."); 
@@ -105,20 +105,20 @@ testDialogLogic::~testDialogLogic()
   //m_win->Destroy(); //is implicit
 }
 //--------------------------------------------------------------------------------
-void testDialogLogic::OnEvent(mafEventBase *maf_event)
+void testDialogLogic::OnEvent(albaEventBase *alba_event)
 //--------------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event)) 
+  if (albaEvent *e = albaEvent::SafeDownCast(alba_event)) 
   {
     switch(e->GetId())
     {
-    case ID_D1: { mafGUIDialog dlg("foo",mafRESIZABLE|mafCLOSEWINDOW);         dlg.ShowModal(); }break;
-    case ID_D2: { mafGUIDialog dlg("foo",mafCLOSEWINDOW);                      dlg.ShowModal(); }break;
-    case ID_D3: { mafGUIDialog dlg("foo",mafRESIZABLE|mafCLOSEWINDOW);         dlg.ShowModal(); }break;
-    case ID_D4: { mafGUIDialog dlg("foo",mafRESIZABLE|mafCLOSE);               dlg.ShowModal(); }break;
-    case ID_D5: { mafGUIDialog dlg("foo",mafRESIZABLE|mafOK);                  dlg.ShowModal(); }break;
-    case ID_D6: { mafGUIDialog dlg("foo",mafRESIZABLE|mafOK|mafCANCEL);        dlg.ShowModal(); }break;
-    case ID_D7: { mafGUIDialog dlg("foo",mafRESIZABLE|mafCLOSE);               dlg.ShowModal(); }break;
+    case ID_D1: { albaGUIDialog dlg("foo",albaRESIZABLE|albaCLOSEWINDOW);         dlg.ShowModal(); }break;
+    case ID_D2: { albaGUIDialog dlg("foo",albaCLOSEWINDOW);                      dlg.ShowModal(); }break;
+    case ID_D3: { albaGUIDialog dlg("foo",albaRESIZABLE|albaCLOSEWINDOW);         dlg.ShowModal(); }break;
+    case ID_D4: { albaGUIDialog dlg("foo",albaRESIZABLE|albaCLOSE);               dlg.ShowModal(); }break;
+    case ID_D5: { albaGUIDialog dlg("foo",albaRESIZABLE|albaOK);                  dlg.ShowModal(); }break;
+    case ID_D6: { albaGUIDialog dlg("foo",albaRESIZABLE|albaOK|albaCANCEL);        dlg.ShowModal(); }break;
+    case ID_D7: { albaGUIDialog dlg("foo",albaRESIZABLE|albaCLOSE);               dlg.ShowModal(); }break;
     case ID_D8: 
       { 
         //very easy example (without using Sizers): 
@@ -129,9 +129,9 @@ void testDialogLogic::OnEvent(mafEventBase *maf_event)
         //if you make the Dialog the Listener of the GUI
         //also the GUI Button can close the Dialog
 
-        mafGUI *gui = new mafGUI(NULL);
+        albaGUI *gui = new albaGUI(NULL);
         gui->Divider();
-        gui->Label("note that also mafGUI buttons"); 
+        gui->Label("note that also albaGUI buttons"); 
         gui->Label("can close the dialog.");
         gui->Label("");
         gui->Button(wxID_OK,"ok"); //send a wxID_OK
@@ -143,7 +143,7 @@ void testDialogLogic::OnEvent(mafEventBase *maf_event)
 
         // place the GUI on the Dialog calling Add.
         // note that the initial (and minimum if sizable) size of the Dialog are correct //SIL. 14-4-2005: :-) finally
-        mafGUIDialog dlg("pippo",mafCLOSEWINDOW);
+        albaGUIDialog dlg("pippo",albaCLOSEWINDOW);
         gui->SetListener(&dlg);  
         dlg.Add(gui,1,wxEXPAND);
         dlg.ShowModal();
@@ -155,17 +155,17 @@ void testDialogLogic::OnEvent(mafEventBase *maf_event)
     case ID_D9: 
       { 
         //example2:
-        // placing a mafGUI on a Sizable Dialog: 
+        // placing a albaGUI on a Sizable Dialog: 
         // Since Gui don't stretch (if you want this feature, shout a lot to the management)
         // this is a poor solution unless you have something else that stretch on the Dialog
-        mafGUI *gui = new mafGUI(NULL);
-        gui->Label("placing a mafGUI alone");
+        albaGUI *gui = new albaGUI(NULL);
+        gui->Label("placing a albaGUI alone");
         gui->Label("on a resizable Dialog is poor");
         gui->Slider(ID_SLIDER,"",&m_test_variable,0,10); 
         gui->Slider(ID_SLIDER,"",&m_test_variable,0,10); 
         gui->Slider(ID_SLIDER,"",&m_test_variable,0,10); 
 
-        mafGUIDialog dlg("pippo");
+        albaGUIDialog dlg("pippo");
         dlg.Add(gui,1,wxEXPAND);
         dlg.ShowModal();
       }
@@ -174,11 +174,11 @@ void testDialogLogic::OnEvent(mafEventBase *maf_event)
       { 
         //example3:
         // Mixing a gui togheter with other resizable Elements
-        mafGUIDialog dlg("pippo");
+        albaGUIDialog dlg("pippo");
 
         wxPanel *p = new wxPanel(&dlg,-1,wxDefaultPosition,wxSize(200,200),wxSUNKEN_BORDER);
 
-        mafGUI *gui = new mafGUI(NULL);
+        albaGUI *gui = new albaGUI(NULL);
         gui->OkCancel();
         gui->Label("now is better");
         gui->Button(0,"button");
@@ -203,13 +203,13 @@ void testDialogLogic::OnEvent(mafEventBase *maf_event)
       break;
     case ID_11: 
       {
-        //example 4: Receiving Events form a Dialog - using mafGUI
-        mafGUI *gui = new mafGUI(NULL);
+        //example 4: Receiving Events form a Dialog - using albaGUI
+        albaGUI *gui = new albaGUI(NULL);
         gui->Label("This call a function in Logic");
         gui->Divider();
         gui->Button(ID_TEST,"test");
 
-        mafGUIDialog dlg("pippo");
+        albaGUIDialog dlg("pippo");
         gui->SetListener(&dlg); // event from Gui goes to the Dialog
         dlg.SetListener(this);  // event from the Dialog come here
         dlg.Add(gui,1,wxEXPAND);
@@ -218,13 +218,13 @@ void testDialogLogic::OnEvent(mafEventBase *maf_event)
       break;
     case ID_12: 
       {
-        //example 4: Receiving Events form a Dialog - using mafGUIValidators
-        mafGUIDialog dlg("pippo");
+        //example 4: Receiving Events form a Dialog - using albaGUIValidators
+        albaGUIDialog dlg("pippo");
         wxStaticText *lab = new wxStaticText(&dlg,-1,"This call a function in Logic") ;
         dlg.Add(lab);
         wxButton *b = new wxButton(&dlg,ID_TEST,"test");
-        b->SetValidator( mafGUIValidator(this,ID_TEST,b) ); // this way send the event to me
-        //b->SetValidator( mafGUIValidator(&dlg,ID_TEST,b) ); // this way send the event to dlg
+        b->SetValidator( albaGUIValidator(this,ID_TEST,b) ); // this way send the event to me
+        //b->SetValidator( albaGUIValidator(&dlg,ID_TEST,b) ); // this way send the event to dlg
         dlg.Add(b);
         dlg.SetListener(this);  // event from the Dialog come here
         dlg.ShowModal();
@@ -238,9 +238,9 @@ void testDialogLogic::OnEvent(mafEventBase *maf_event)
       break;
     case ID_14:
       {
-        mafGUIDialogPreview dlg("preview",mafCLOSEWINDOW | mafRESIZABLE | mafUSEGUI | mafUSERWI);
+        albaGUIDialogPreview dlg("preview",albaCLOSEWINDOW | albaRESIZABLE | albaUSEGUI | albaUSERWI);
         dlg.SetListener(this);  // event from the Dialog come here
-        mafGUI *gui = dlg.GetGui();
+        albaGUI *gui = dlg.GetGui();
         gui->Label("This call a function in Logic");
         gui->Divider();
         gui->Button(ID_TEST,"test");
@@ -249,7 +249,7 @@ void testDialogLogic::OnEvent(mafEventBase *maf_event)
       break;
     case ID_15:
       {
-        mafGUIDialogPreview dlg("preview",mafCLOSEWINDOW | mafRESIZABLE | mafCLOSE | mafCANCEL | mafOK |mafUSERWI);
+        albaGUIDialogPreview dlg("preview",albaCLOSEWINDOW | albaRESIZABLE | albaCLOSE | albaCANCEL | albaOK |albaUSERWI);
         dlg.SetListener(this);  // event from the Dialog come here
         wxSlider *sli = new wxSlider(&dlg, ID_SLIDER, 0,100,50, wxDefaultPosition);
         dlg.Add(sli);

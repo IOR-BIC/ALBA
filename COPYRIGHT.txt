@@ -1,4 +1,4 @@
-OpenMaf use liàcense agreement
+Alba use license agreement
 
 This is an open-source copyright as follows:
 
@@ -24,7 +24,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 
-OpenMAF is partially based on:
+ALBA is partially based on:
 Visualization Tool Kit (VTK) §
 Crypto++ library £
 wxWindows 2.6.3 library &

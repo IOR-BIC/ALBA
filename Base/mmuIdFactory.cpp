@@ -9,12 +9,12 @@ Version:   $Revision: 1.4 $
 =========================================================================*/
 
 #include "mmuIdFactory.h"
-#include "mafDecl.h"
+#include "albaDecl.h"
 #include <map>
 #include <vector>
 #include <string>
 
-std::map<std::string,mafID> *mmuIdFactoryMap=NULL;
+std::map<std::string,albaID> *mmuIdFactoryMap=NULL;
 std::vector<std::string> *mmuIdFactoryNames=NULL;
 
 /** this class is used to destroy Id factory */
@@ -33,19 +33,19 @@ class mmuIdFactoryDestroyer
 static mmuIdFactoryDestroyer mmuIdFactoryDestroyerSingleton;
 
 // This is for allocating unique  Ids.
-mafID mmuIdFactory::m_IdCounter = MAF_BASE_ID;
+albaID mmuIdFactory::m_IdCounter = ALBA_BASE_ID;
 
 /* not used
 //------------------------------------------------------------------------------
-mafID mmuIdFactory::AllocIdGroup(const char *idname,int num)
+albaID mmuIdFactory::AllocIdGroup(const char *idname,int num)
 //------------------------------------------------------------------------------
 {
-  mafID id=m_IdCounter;
+  albaID id=m_IdCounter;
   m_IdCounter+=num;
 
   if (mmuIdFactoryMap==NULL)
   {
-    mmuIdFactoryMap   = new std::map<std::string,mafID>;
+    mmuIdFactoryMap   = new std::map<std::string,albaID>;
     mmuIdFactoryNames = new std::vector<std::string>;
   }
 
@@ -63,14 +63,14 @@ mafID mmuIdFactory::AllocIdGroup(const char *idname,int num)
 }*/
 
 //------------------------------------------------------------------------------
-mafID mmuIdFactory::GetNextId(const char *idname)
+albaID mmuIdFactory::GetNextId(const char *idname)
 //------------------------------------------------------------------------------
 {
-  mafID id=m_IdCounter++;
+  albaID id=m_IdCounter++;
 
   if (mmuIdFactoryMap==NULL)
   {
-    mmuIdFactoryMap   = new std::map<std::string,mafID>;
+    mmuIdFactoryMap   = new std::map<std::string,albaID>;
     mmuIdFactoryNames = new std::vector<std::string>;
   }
 
@@ -83,12 +83,12 @@ mafID mmuIdFactory::GetNextId(const char *idname)
 }
 
 //------------------------------------------------------------------------------
-mafID mmuIdFactory::GetId(const char *idname)
+albaID mmuIdFactory::GetId(const char *idname)
 //------------------------------------------------------------------------------
 {
-  mafID id=0;
+  albaID id=0;
   
-  std::map<std::string,mafID>::iterator  it=(*mmuIdFactoryMap).find(idname);
+  std::map<std::string,albaID>::iterator  it=(*mmuIdFactoryMap).find(idname);
 
   if (it!=(*mmuIdFactoryMap).end())
   {
@@ -99,7 +99,7 @@ mafID mmuIdFactory::GetId(const char *idname)
 }
 
 //------------------------------------------------------------------------------
-const char *mmuIdFactory::GetIdName(mafID id)
+const char *mmuIdFactory::GetIdName(albaID id)
 //------------------------------------------------------------------------------
 {
   return (id<(*mmuIdFactoryNames).size())?(*mmuIdFactoryNames)[id].c_str():NULL;

@@ -8,7 +8,7 @@
 						Check the ratio between number of Tests and total number of Classes,
                         defined inside the framework. The following table shows the classes without test.
 					</h3>
-                    <h4><br/>Link to <a href="https://www.biomedtown.org/biomed_town/MAF/MAF2%20Floor/documentation/doc/maf-2-0-documentation/CodingStandard/">Coding Conventions</a></h4>
+                    <h4><br/>Link to <a href="https://www.biomedtown.org/biomed_town/ALBA/ALBA%20Floor/documentation/doc/alba-2-0-documentation/CodingStandard/">Coding Conventions</a></h4>
 				</div>
 				<div id="contentTable">
 					<table id="listing">

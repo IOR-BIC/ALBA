@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testSashApp
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,9 +15,9 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -25,7 +25,7 @@
 
 
 #include "testSashApp.h"
-#include "mafPics.h"
+#include "albaPics.h"
 
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -36,7 +36,7 @@ IMPLEMENT_APP(testSashApp)
 bool testSashApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-  mafPics.Initialize();	
+  albaPics.Initialize();	
 
 	m_logic = new testSashLogic();
   SetTopWindow(m_logic->GetTopWin());  

@@ -1,35 +1,35 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: multiThreaderTest
  Authors: Gianluigi Crimi
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// Test mafVMEGeneric class
-#include "mafVMETests.h"
+// Test albaVMEGeneric class
+#include "albaVMETests.h"
 #include "VMEGenericTest.h"
 
-#include "mafVMEGeneric.h"
-#include "mafVMERoot.h"
-#include "mafTransform.h"
-#include "mafAttribute.h"
-#include "mafVMEOutput.h"
-#include "mafDataVector.h"
-#include "mafMatrixVector.h"
-#include "mafVMEIterator.h"
-#include "mafTagArray.h"
-#include "mafTagItem.h"
-#include "mafStorageElement.h"
+#include "albaVMEGeneric.h"
+#include "albaVMERoot.h"
+#include "albaTransform.h"
+#include "albaAttribute.h"
+#include "albaVMEOutput.h"
+#include "albaDataVector.h"
+#include "albaMatrixVector.h"
+#include "albaVMEIterator.h"
+#include "albaTagArray.h"
+#include "albaTagItem.h"
+#include "albaStorageElement.h"
 
-#include "vtkMAFSmartPointer.h"
+#include "vtkALBASmartPointer.h"
 #include "vtkActor.h"
 #include "vtkAssembly.h"
 #include "vtkRenderer.h"
@@ -56,12 +56,12 @@ void VMEGenericTest::VMEGenericMainTest()
 //-------------------------------------------------------------------------
 {
   // create a small tree with 
-  mafSmartPointer<mafVMERoot> root;
+  albaSmartPointer<albaVMERoot> root;
   root->SetName("ROOT");
 
   // create windows
-  vtkMAFSmartPointer<vtkRenderer> renderer;
-  vtkMAFSmartPointer<vtkRenderWindow> renWin;
+  vtkALBASmartPointer<vtkRenderer> renderer;
+  vtkALBASmartPointer<vtkRenderWindow> renWin;
   renWin->AddRenderer(renderer);
 
   renWin->SetSize(500,500);
@@ -69,29 +69,29 @@ void VMEGenericTest::VMEGenericMainTest()
   renderer->SetBackground( 0.1, 0.2, 0.4 );
 
 
-  vtkMAFSmartPointer<vtkConeSource> test_cone;
+  vtkALBASmartPointer<vtkConeSource> test_cone;
   test_cone->SetResolution(30);
   test_cone->SetHeight(2);
   test_cone->SetRadius( 1.0 );
   //test_cone->CappingOn();
-  vtkMAFSmartPointer<vtkPolyDataMapper> test_mapper;
+  vtkALBASmartPointer<vtkPolyDataMapper> test_mapper;
   test_mapper->SetInput(test_cone->GetOutput());
 
-  vtkMAFSmartPointer<vtkActor> test_actor;
+  vtkALBASmartPointer<vtkActor> test_actor;
   test_actor->SetMapper(test_mapper);
   test_actor->SetPosition(4,0,0);
   //test_actor->GetProperty()->SetColor(1,0,0);
   renderer->AddActor(test_actor);
 
-  vtkMAFSmartPointer<vtkAxes> axes;
+  vtkALBASmartPointer<vtkAxes> axes;
   axes->SetScaleFactor(2);
 
   // create a tree of VMEs: notice ref. counter is initially set to 0,
   // so noneed to unregister VME's when they are attached to the tree!
-  mafVMEGeneric *vtitle=mafVMEGeneric::New();
-  mafVMEGeneric *vsphere=mafVMEGeneric::New();
-  mafVMEGeneric *vcone=mafVMEGeneric::New();
-  mafVMEGeneric *vmorph=mafVMEGeneric::New();
+  albaVMEGeneric *vtitle=albaVMEGeneric::New();
+  albaVMEGeneric *vsphere=albaVMEGeneric::New();
+  albaVMEGeneric *vcone=albaVMEGeneric::New();
+  albaVMEGeneric *vmorph=albaVMEGeneric::New();
 
   vtitle->SetName("title");
   vsphere->SetName("sphere");
@@ -100,7 +100,7 @@ void VMEGenericTest::VMEGenericMainTest()
 
   CPPUNIT_ASSERT(vtitle->GetOutput()->GetVTKData()==NULL);
 
-  mafTransform trans;
+  albaTransform trans;
   
   vtitle->SetData(axes->GetOutput(),0);
 
@@ -111,20 +111,20 @@ void VMEGenericTest::VMEGenericMainTest()
   vtitle->AddChild(vmorph);
 
 
-  mafMatrix test_matrix;
+  albaMatrix test_matrix;
   
   // some preliminary tests to check if matrix vector and matrix pipe are working corretly
   test_matrix.Equals( vtitle->GetOutput()->GetAbsMatrix());
 
-  mafTransform::SetPosition(test_matrix,10,10,10);
+  albaTransform::SetPosition(test_matrix,10,10,10);
   vtitle->SetAbsMatrix(test_matrix,0);
   
   test_matrix.Equals( vtitle->GetOutput()->GetAbsMatrix());
 
-  mafTransform::SetPosition(test_matrix,20,20,20);
+  albaTransform::SetPosition(test_matrix,20,20,20);
   vcone->SetAbsMatrix(test_matrix,0);
 
-  mafTransform::SetPosition(test_matrix,10,10,10);
+  albaTransform::SetPosition(test_matrix,10,10,10);
   test_matrix.Equals( vcone->GetOutput()->GetAbsMatrix());
 
   test_matrix.Identity();
@@ -132,12 +132,12 @@ void VMEGenericTest::VMEGenericMainTest()
   vcone->SetPose(test_matrix,0);
 
   // arrays used to store time stamps for later testings
-  std::vector<mafTimeStamp> data_time_stamps;
-  std::vector<mafTimeStamp> matrix_time_stamps;
+  std::vector<albaTimeStamp> data_time_stamps;
+  std::vector<albaTimeStamp> matrix_time_stamps;
 
   // arrays used to store output data and pose matrices for later testing
-  vtkMAFAutoPointer<vtkSphereSource> test_sphere[10];
-  mafMatrix test_vtitle_pose[10],test_sphere_pose[10],test_sphere_abspose[10];
+  vtkALBAAutoPointer<vtkSphereSource> test_sphere[10];
+  albaMatrix test_vtitle_pose[10],test_sphere_pose[10],test_sphere_abspose[10];
 
   //
   // Fill in VME-tree with data and pose matrices to create a beautiful animation
@@ -162,7 +162,7 @@ void VMEGenericTest::VMEGenericMainTest()
     vtitle->SetPose(trans.GetMatrix(),i); //
 
     // The sphere
-    vtkMAFSmartPointer<vtkSphereSource> sphere;
+    vtkALBASmartPointer<vtkSphereSource> sphere;
     sphere->SetRadius(.1+.01*i);
     sphere->Update();
 
@@ -187,7 +187,7 @@ void VMEGenericTest::VMEGenericMainTest()
     }
 
     // the cone
-    vtkMAFSmartPointer<vtkConeSource> cone;
+    vtkALBASmartPointer<vtkConeSource> cone;
     cone->SetResolution(103-i);
     cone->Update();
 
@@ -205,13 +205,13 @@ void VMEGenericTest::VMEGenericMainTest()
     // the morphing tube
     if (i<50)
     {
-      vtkMAFSmartPointer<vtkCylinderSource> cyl;
+      vtkALBASmartPointer<vtkCylinderSource> cyl;
       cyl->SetResolution(52-i);
       morph=cyl;
     }
     else
     {
-      vtkMAFSmartPointer<vtkCubeSource> cube;
+      vtkALBASmartPointer<vtkCubeSource> cube;
       cube->SetYLength((100.0-(double)i)/100.0+.5);
       cube->SetXLength(1);
       cube->SetZLength(1);
@@ -255,7 +255,7 @@ void VMEGenericTest::VMEGenericMainTest()
   {
     root->SetTreeTime(i*10);
     // is matrix generated by matrix pipe correct
-    mafMatrix *pose=vtitle->GetOutput()->GetMatrix();
+    albaMatrix *pose=vtitle->GetOutput()->GetMatrix();
     CPPUNIT_ASSERT(pose!=NULL);
     CPPUNIT_ASSERT(*pose==test_vtitle_pose[i]);
   }
@@ -265,13 +265,13 @@ void VMEGenericTest::VMEGenericMainTest()
   {
     root->SetTreeTime(i*10*.5+25);
     // is matrix generated by matrix pipe correct
-    mafMatrix *pose=vsphere->GetOutput()->GetMatrix();
+    albaMatrix *pose=vsphere->GetOutput()->GetMatrix();
     CPPUNIT_ASSERT(pose!=NULL);
     CPPUNIT_ASSERT(*pose==test_sphere_pose[i]);  
   }
 
   // test random matrix access
-  mafMatrix tmp_mat;
+  albaMatrix tmp_mat;
   vsphere->GetOutput()->GetMatrix(tmp_mat,50*.5+25);
   CPPUNIT_ASSERT(tmp_mat==test_sphere_pose[5]);
 
@@ -285,11 +285,11 @@ void VMEGenericTest::VMEGenericMainTest()
   cerr << "Testing VME time dynamic behavior\n";
 
   // Test display of generic VME tree of surfaces
-  mafVMEIterator *iter=root->NewIterator();
+  albaVMEIterator *iter=root->NewIterator();
 
   root->SetTreeTime(0);
 
-  mafVME *node;
+  albaVME *node;
 
   // connect VME to assemblies and put root assembly into the renderer
   for (node=iter->GetFirstNode();node;node=iter->GetNextNode())
@@ -297,29 +297,29 @@ void VMEGenericTest::VMEGenericMainTest()
     if (node)
     {
     
-      if (node->IsA("mafVMERoot")) 
+      if (node->IsA("albaVMERoot")) 
       {
-        vtkMAFSmartPointer<vtkAssembly> vmeasm;
-        mafSmartPointer<mafClientData> attr;
+        vtkALBASmartPointer<vtkAssembly> vmeasm;
+        albaSmartPointer<albaClientData> attr;
         attr->m_Prop3D=vmeasm;
         node->SetAttribute("ClientData",attr);
         renderer->AddActor(vmeasm);
       }
-      else if (node->IsA("mafVMEPointSet"))
+      else if (node->IsA("albaVMEPointSet"))
       {
         vtkDataSet *data=node->GetOutput()->GetVTKData();
         CPPUNIT_ASSERT(data!=NULL);
 
         CPPUNIT_ASSERT(data->IsA("vtkPolyData")!=0);
 
-        vtkMAFSmartPointer<vtkGlyph3D> glyph;
+        vtkALBASmartPointer<vtkGlyph3D> glyph;
         glyph->SetInput((vtkPolyData *)data);
 
-        vtkMAFSmartPointer<vtkPolyDataMapper> mapper;
+        vtkALBASmartPointer<vtkPolyDataMapper> mapper;
 
         mapper->SetInput(glyph->GetOutput());
 
-        vtkMAFSmartPointer<vtkSphereSource> sphere;
+        vtkALBASmartPointer<vtkSphereSource> sphere;
         sphere->SetRadius(.01);
   
 
@@ -328,12 +328,12 @@ void VMEGenericTest::VMEGenericMainTest()
         glyph->SetScaleModeToScaleByScalar();
         glyph->SetColorModeToColorByScale();
   
-        vtkMAFSmartPointer<vtkActor> vmeact;
+        vtkALBASmartPointer<vtkActor> vmeact;
         vmeact->SetMapper(mapper);
         vmeact->GetProperty()->SetColor(0,1,0);
-        vtkMAFSmartPointer<vtkAssembly> vmeasm;
+        vtkALBASmartPointer<vtkAssembly> vmeasm;
         vmeasm->AddPart(vmeact);
-        mafSmartPointer<mafClientData> attr;
+        albaSmartPointer<albaClientData> attr;
         attr->m_Prop3D=vmeasm;
         node->SetAttribute("ClientData",attr);
 
@@ -341,7 +341,7 @@ void VMEGenericTest::VMEGenericMainTest()
 
         CPPUNIT_ASSERT(node->GetAttribute("ClientData")==attr.GetPointer());
       
-        mafClientData *pattr=mafClientData::SafeDownCast(node->GetParent()->GetAttribute("ClientData"));
+        albaClientData *pattr=albaClientData::SafeDownCast(node->GetParent()->GetAttribute("ClientData"));
         vtkAssembly *pvmeasm=pattr->m_Prop3D;
       
         CPPUNIT_ASSERT(pvmeasm!=NULL);
@@ -359,24 +359,24 @@ void VMEGenericTest::VMEGenericMainTest()
 
         mapper->SetInput((vtkPolyData *)data);
   
-        vtkMAFSmartPointer<vtkActor> vmeact;
+        vtkALBASmartPointer<vtkActor> vmeact;
         vmeact->GetProperty()->SetColor(0,1,0);
         vmeact->GetProperty()->SetOpacity(1);
         vmeact->SetMapper(mapper);
         mapper->Delete();
 
-        vtkMAFSmartPointer<vtkAssembly> vmeasm;
+        vtkALBASmartPointer<vtkAssembly> vmeasm;
         vmeasm->AddPart(vmeact);
 
         vmeasm->SetUserTransform(node->GetOutput()->GetTransform()->GetVTKTransform());
 
-        mafSmartPointer<mafClientData> attr;
+        albaSmartPointer<albaClientData> attr;
         attr->m_Prop3D=vmeasm;
         node->SetAttribute("ClientData",attr);
 
         CPPUNIT_ASSERT(node->GetAttribute("ClientData")==attr.GetPointer());
 
-        mafClientData *pattr=mafClientData::SafeDownCast(node->GetParent()->GetAttribute("ClientData"));
+        albaClientData *pattr=albaClientData::SafeDownCast(node->GetParent()->GetAttribute("ClientData"));
         vtkAssembly *pvmeasm=pattr->m_Prop3D;
       
         CPPUNIT_ASSERT(pvmeasm!=NULL);
@@ -405,7 +405,7 @@ void VMEGenericTest::VMEGenericMainTest()
 
   cerr << "Testing GetTimeBounds()\n";
 
-  mafTimeStamp treeTimeBounds[2],vtitleTimeBounds[2], vsphereTimeBounds[2],vconeTimeBounds[2],vmorphTimeBounds[2];
+  albaTimeStamp treeTimeBounds[2],vtitleTimeBounds[2], vsphereTimeBounds[2],vconeTimeBounds[2],vmorphTimeBounds[2];
 
   root->GetOutput()->GetTimeBounds(treeTimeBounds);
 
@@ -430,8 +430,8 @@ void VMEGenericTest::VMEGenericMainTest()
   cerr << "Cone TBounds = [" << vconeTimeBounds[0] <<"," << vconeTimeBounds[1] << "]\n";
   cerr << "Morph TBounds = [" << vmorphTimeBounds[0] <<"," << vmorphTimeBounds[1] << "]\n";
   
-  std::vector<mafTimeStamp> dataTimeStamps;
-  std::vector<mafTimeStamp> matrixTimeStamps;
+  std::vector<albaTimeStamp> dataTimeStamps;
+  std::vector<albaTimeStamp> matrixTimeStamps;
   
   vcone->GetDataVector()->GetTimeStamps(dataTimeStamps);
   vcone->GetMatrixVector()->GetTimeStamps(matrixTimeStamps);
@@ -442,9 +442,9 @@ void VMEGenericTest::VMEGenericMainTest()
   cerr << "VME-Cone data_time_stamps={";
   for (int n=0;n<dataTimeStamps.size();n++)
   {
-    mafTimeStamp t1=dataTimeStamps[n];
+    albaTimeStamp t1=dataTimeStamps[n];
 
-    mafTimeStamp t2=data_time_stamps[n];
+    albaTimeStamp t2=data_time_stamps[n];
 
     //CPPUNIT_ASSERT(t1==t2);
     cerr << t1 ;
@@ -460,9 +460,9 @@ void VMEGenericTest::VMEGenericMainTest()
 
   for (int m=0;m<matrixTimeStamps.size();m++)
   {
-    mafTimeStamp t1=matrixTimeStamps[m];
+    albaTimeStamp t1=matrixTimeStamps[m];
 
-    mafTimeStamp t2=matrix_time_stamps[m];
+    albaTimeStamp t2=matrix_time_stamps[m];
 
     CPPUNIT_ASSERT(t1==t2);
 
@@ -488,7 +488,7 @@ void VMEGenericTest::VMEGenericMainTest()
   root->SetTreeTime(0);
 
   
-  mafOBB treeBounds,tree4DBounds;
+  albaOBB treeBounds,tree4DBounds;
   root->GetOutput()->GetBounds(treeBounds);
 
   root->GetOutput()->Get4DBounds(tree4DBounds);
@@ -523,7 +523,7 @@ void VMEGenericTest::VMEGenericMainTest()
 
   tree4DBoundsActor->GetProperty()->SetColor(1,0,0);
 
-  mafClientData *attr=mafClientData::SafeDownCast(root->GetAttribute("ClientData")); 
+  albaClientData *attr=albaClientData::SafeDownCast(root->GetAttribute("ClientData")); 
   vtkAssembly *rootAsm=attr->m_Prop3D;
 
   double asmBounds[6];
@@ -588,7 +588,7 @@ void VMEGenericTest::VMEGenericMainTest()
   }
 
 
-  mafClientData *root_attr=mafClientData::SafeDownCast(root->GetAttribute("ClientData"));
+  albaClientData *root_attr=albaClientData::SafeDownCast(root->GetAttribute("ClientData"));
   vtkAssembly *rasm=root_attr->m_Prop3D;
   renderer->RemoveActor(rasm);
   
@@ -611,7 +611,7 @@ void VMEGenericTest::VMEGenericMainTest()
 	cerr << "\n";
 	
 	//create random transform
-	mafTransform v_t;
+	albaTransform v_t;
 
 	float translation[3] = {vtkMath::Random(0.0, 10.0), 
 													vtkMath::Random(0.0, 10.0), 
@@ -645,7 +645,7 @@ void VMEGenericTest::VMEGenericMainTest()
 
   cerr << "\n";
 
-  mafMatrix test_frame;
+  albaMatrix test_frame;
 
   cerr << "##################################################" << "\n";
   cerr << "Getting PIPPO Auxiliary Ref Sys..." << "\n";
@@ -722,18 +722,18 @@ void VMEGenericTest::VMEGenericMainTest()
   //------------------------
   // Create a simple tree
   //------------------------
-  vtitle->GetTagArray()->SetTag(mafTagItem("TestTag1","1"));
+  vtitle->GetTagArray()->SetTag(albaTagItem("TestTag1","1"));
   const char *multcomp[3]={"100","200","300"};
-  vtitle->GetTagArray()->SetTag(mafTagItem("TestTag2",multcomp,3));
-  vtitle->GetTagArray()->SetTag(mafTagItem("TestTag1",5.5555));
+  vtitle->GetTagArray()->SetTag(albaTagItem("TestTag2",multcomp,3));
+  vtitle->GetTagArray()->SetTag(albaTagItem("TestTag1",5.5555));
 
   //---------------------------
   // try to copy the sub tree
   //---------------------------
 
-  mafAutoPointer<mafVMERoot> newroot=mafVMERoot::SafeDownCast(root->CopyTree());
+  albaAutoPointer<albaVMERoot> newroot=albaVMERoot::SafeDownCast(root->CopyTree());
 
-  mafVMEItem::GlobalCompareDataFlagOn();
+  albaVMEItem::GlobalCompareDataFlagOn();
   //---------------------------------------
   // Compare the new tree with the old one
   //---------------------------------------
@@ -743,16 +743,16 @@ void VMEGenericTest::VMEGenericMainTest()
   //------------------------------
   // compare test that should fail
   //------------------------------
-  mafAutoPointer<mafVME> badVME=vmorph->MakeCopy();
+  albaAutoPointer<albaVME> badVME=vmorph->MakeCopy();
 
-  mafMatrix mat;
+  albaMatrix mat;
   mat.SetTimeStamp(23.4455667788);
   badVME->SetMatrix(mat);
 
   CPPUNIT_ASSERT(!vmorph->Equals(badVME));
 
 
-  mafAutoPointer<mafVME> badTree=root->GetFirstChild()->CopyTree();
+  albaAutoPointer<albaVME> badTree=root->GetFirstChild()->CopyTree();
   badTree->AddChild(badVME);
   
   CPPUNIT_ASSERT(!root->GetFirstChild()->CompareTree(badTree));
@@ -764,8 +764,8 @@ void VMEGenericTest::VMEGenericMainTest()
   std::cerr<<"Test completed successfully!"<<std::endl;
 
 
-  mafDEL(vtitle);
-  mafDEL(vsphere);
-  mafDEL(vcone);
-  mafDEL(vmorph);
+  albaDEL(vtitle);
+  albaDEL(vsphere);
+  albaDEL(vcone);
+  albaDEL(vmorph);
 }

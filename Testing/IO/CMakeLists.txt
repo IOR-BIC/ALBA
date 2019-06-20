@@ -1,27 +1,27 @@
-PROJECT (mafIO_TEST)
+PROJECT (albaIO_TEST)
 
-IF(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(XercesC mafDLL) #to solve linking problems XercesC libs must be added before mafDLL
-ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafTests mafBase mafGui mafIO vtkRendering)
-ENDIF (MAF_BUILD_MAFDLL)
+IF(ALBA_BUILD_ALBADLL)
+  LINK_LIBRARIES(XercesC albaDLL) #to solve linking problems XercesC libs must be added before albaDLL
+ELSE(ALBA_BUILD_ALBADLL)
+  LINK_LIBRARIES(albaTests albaBase albaGui albaIO vtkRendering)
+ENDIF (ALBA_BUILD_ALBADLL)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------
 SET(PROJECT_SRCS 
-	mafIOTests.cpp 					mafIOTests.h
-  mafStorableTest.cpp 				mafStorableTest.h
-	mafStorageTest.cpp 				mafStorageTest.h
+	albaIOTests.cpp 					albaIOTests.h
+  albaStorableTest.cpp 				albaStorableTest.h
+	albaStorageTest.cpp 				albaStorageTest.h
 	mmuDOMTreeErrorReporterTest.cpp	mmuDOMTreeErrorReporterTest.h
-	mafXMLStringTest.cpp 			mafXMLStringTest.h
+	albaXMLStringTest.cpp 			albaXMLStringTest.h
 	mmuXMLDOMTest.cpp 				mmuXMLDOMTest.h
 	mmuXMLDOMElementTest.cpp 		mmuXMLDOMElementTest.h
-	mafCurlUtilityTest.cpp 			mafCurlUtilityTest.h
+	albaCurlUtilityTest.cpp 			albaCurlUtilityTest.h
 )
 
-ADD_EXECUTABLE(mafIOTests ${PROJECT_SRCS})
-ADD_TEST(mafIOTests  ${EXECUTABLE_OUTPUT_PATH}/mafIOTests)
+ADD_EXECUTABLE(albaIOTests ${PROJECT_SRCS})
+ADD_TEST(albaIOTests  ${EXECUTABLE_OUTPUT_PATH}/albaIOTests)
 IF (WIN32)
-  SET_TARGET_PROPERTIES(mafIOTests PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(albaIOTests PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)

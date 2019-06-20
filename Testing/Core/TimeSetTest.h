@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
- Module: mafViewPlotTest
+ Program: ALBA (Agile Library for Biomedical Applications)
+ Module: albaViewPlotTest
  Authors: Gianluigi Crimi
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -17,11 +17,11 @@
 #ifndef __CPP_UNIT_TimeSetTest_H__
 #define __CPP_UNIT_TimeSetTest_H__
 
-#include "mafTest.h"
-#include "mafVME.h"
+#include "albaTest.h"
+#include "albaVME.h"
 
 
-class TimeSetTest : public mafTest
+class TimeSetTest : public albaTest
 {
   CPPUNIT_TEST_SUITE( TimeSetTest );
   CPPUNIT_TEST( TimeSetMainTest );

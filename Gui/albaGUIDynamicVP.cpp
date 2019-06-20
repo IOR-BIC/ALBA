@@ -1,0 +1,492 @@
+/*========================================================================= 
+  Program: Multimod Application Framework RELOADED 
+  Module: $RCSfile: albaGUIDynamicVP.cpp,v $ 
+  Language: C++ 
+  Date: $Date: 2012-04-06 08:28:12 $ 
+  Version: $Revision: 1.1.2.4 $ 
+  Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
+  ========================================================================== 
+  Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
+  See the COPYINGS file for license details 
+  =========================================================================
+*/
+
+#include "albaDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
+
+#include "albaGUIDynamicVP.h"  
+#include "albaGUI.h"
+#include "albaGUIScrolledPanel.h"
+#include "albaGUIValidator.h"
+#include "albaSceneGraph.h"
+#include "albaSceneNode.h"
+#include "albaPipe.h"
+#include "albaPipeFactory.h"
+#include "albaView.h"
+
+#include <wx/statline.h>
+
+#include "albaDbg.h"
+
+//----------------------------------------------------------------------------
+// albaGUIDynamicVP
+//----------------------------------------------------------------------------
+const wxEventType wxEVT_DEFERED_DELETE = wxNewEventType();
+
+BEGIN_EVENT_TABLE(albaGUIDynamicVP,albaGUIPanel)
+  EVT_CUSTOM(wxEVT_DEFERED_DELETE, wxID_ANY, albaGUIDynamicVP::OnDeferedDelete)
+END_EVENT_TABLE()
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+albaGUIDynamicVP::albaGUIDynamicVP( wxWindow* parent, wxWindowID id, long GUIstyle,
+                             const wxPoint& pos, const wxSize& size, long style) : 
+  albaGUIPanel(parent, id, pos, size, style), m_NotifyId(id)
+//----------------------------------------------------------------------------
+{
+  m_SceneNode = NULL;
+  m_Listener = NULL;
+  m_VPipes = NULL;
+  m_VPipe = NULL;    
+  m_ComboVP = NULL;
+  m_VPipeIndex = -1; 
+  
+  //create items
+  wxBoxSizer* bSizerMain = new wxBoxSizer( wxVERTICAL );
+
+  m_GUI_This = new wxPanel( this, wxID_ANY);
+  m_GUI_This->SetExtraStyle(m_GUI_This->GetExtraStyle() | wxWS_EX_VALIDATE_RECURSIVELY);
+  m_GUI_This->SetSizer(CreateGUI(m_GuiStyle = GUIstyle));
+  m_GUI_This->Layout();
+  
+  bSizerMain->Add( m_GUI_This, 0, wxEXPAND | wxALL, 0 );
+
+  m_GUI_VP = new albaGUIScrolledPanel( this, wxID_ANY);  
+  bSizerMain->Add( m_GUI_VP, 1, wxEXPAND | wxALL, 0 );
+
+  this->SetSizer( bSizerMain );
+  this->Layout();   
+
+  m_GUI_This->TransferDataToWindow();
+}
+
+//----------------------------------------------------------------------------
+albaGUIDynamicVP::~albaGUIDynamicVP()
+//----------------------------------------------------------------------------
+{  
+  OnCloseVP();  
+}
+
+
+//------------------------------------------------------------------------
+//Creates GUI (to be added into m_GUI_This) according to the given style. 
+//This routine is called from SetStyle and from the ctor. 
+//N.B. when called from ctor the overriden function is not 
+//called but this one (C++ feature).
+/*virtual*/ wxSizer* albaGUIDynamicVP::CreateGUI(long style)
+//------------------------------------------------------------------------
+{
+  m_ComboVP = NULL;
+
+  wxBoxSizer* bSizerGT = new wxBoxSizer( wxVERTICAL );
+
+  if ((style & GS_NO_NAME) == 0)
+  {
+    wxBoxSizer* bSizer1 = new wxBoxSizer( wxHORIZONTAL );  
+    bSizer1->Add( new wxStaticText( m_GUI_This, wxID_ANY, _("Name:"), 
+      wxDefaultPosition, wxSize( 60,-1 )), 0, wxALL, 5 );
+
+    wxTextCtrl* textName = new wxTextCtrl( m_GUI_This, ID_NAME, 
+      wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+      ((style & GS_READONLY_NAME) == 0 ? 0 : wxTE_READONLY) );
+
+    textName->SetValidator(albaGUIValidator(this, ID_NAME, textName, &m_Name));
+
+    bSizer1->Add( textName, 1, wxALL, 0 );
+    bSizerGT->Add( bSizer1, 0, wxEXPAND, 0 );
+  }
+
+  if ((style & (GS_NO_CLOSE_VP | GS_NO_CREATE_VP)) != (GS_NO_CLOSE_VP | GS_NO_CREATE_VP))
+  {
+    wxBoxSizer* bSizer2 = new wxBoxSizer( wxHORIZONTAL );
+    if ((style & GS_NO_CREATE_VP) == 0)
+    {
+      bSizer2->Add( new wxStaticText( m_GUI_This, wxID_ANY, 
+        _("Visual Pipe:"), wxDefaultPosition, wxSize( 60,-1 )), 0, wxALL, 5 );
+
+      m_ComboVP = new wxComboBox( m_GUI_This, ID_CREATE_VP, 
+        wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
+      m_ComboVP->SetToolTip( _("Selects the visual pipe to be created.") );
+      if (m_VPipes != NULL)
+      {
+        const SUPPORTED_VP_ENTRY* pEntry = m_VPipes;
+        while (pEntry->szClassName != NULL) 
+        {
+          m_ComboVP->Append(pEntry->szUserFriendlyName, (void*)pEntry->szClassName);
+          pEntry++;
+        }
+      }
+
+      m_ComboVP->SetValidator(albaGUIValidator(this, ID_CREATE_VP, m_ComboVP, &m_VPipeIndex));
+      bSizer2->Add( m_ComboVP, 1, wxALL, 1 );
+    }
+
+    if ((style & GS_NO_CLOSE_VP) == 0)
+    {
+      wxButton* bttnClose = new wxButton( m_GUI_This, ID_CLOSE_VP, 
+        _("Close"), wxDefaultPosition, wxSize( 50,-1 ), 0 );
+      bttnClose->SetValidator(albaGUIValidator(this, ID_CLOSE_VP, bttnClose));
+      bSizer2->Add( bttnClose, 0, wxALL, 0 );
+    }
+
+    bSizerGT->Add( bSizer2, 0, wxEXPAND, 0 );
+  }
+
+  if ((style & (GS_NO_CLOSE_VP | GS_NO_CREATE_VP | GS_NO_NAME)) != 
+    (GS_NO_CLOSE_VP | GS_NO_CREATE_VP | GS_NO_NAME)) {  
+    bSizerGT->Add( new wxStaticLine( m_GUI_This, wxID_ANY, 
+      wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL ), 0, wxEXPAND | wxALL, 5 );
+  }
+
+  return bSizerGT;
+}
+
+
+//------------------------------------------------------------------------
+//Sets a new list of visual pipes. 
+void albaGUIDynamicVP::SetVPipesList(const SUPPORTED_VP_ENTRY* pList)
+//------------------------------------------------------------------------
+{
+  if (m_VPipes != pList)
+  {
+    m_VPipes = pList;
+    m_VPipeIndex = -1;       
+
+    if (m_ComboVP != NULL)
+    {
+      m_ComboVP->Clear(); 
+      if (m_VPipes != NULL)
+      {
+        const SUPPORTED_VP_ENTRY* pEntry = m_VPipes;
+        while (pEntry->szClassName != NULL) 
+        {
+          m_ComboVP->Append(pEntry->szUserFriendlyName, (void*)pEntry->szClassName);
+          pEntry++;
+        }
+      }
+    }
+  
+    //and create VP
+    OnCreateVP();
+  }
+}
+
+//------------------------------------------------------------------------
+//Sets a new scene node for visual pipes. 
+//N.B. currently constructed visual pipe is recreated, if needed.
+void albaGUIDynamicVP::SetSceneNode(albaSceneNode* node)
+//------------------------------------------------------------------------
+{
+  if (m_SceneNode != node)
+  {
+    m_SceneNode = node;
+    if (m_SceneNode != NULL)
+      OnCreateVP(); //recreate the current visual pipe
+  }
+}
+
+//------------------------------------------------------------------------
+//Sets a new visual pipe
+void albaGUIDynamicVP::SetVPipeIndex(int nNewIndex)
+//------------------------------------------------------------------------
+{
+  if (m_VPipeIndex != nNewIndex)
+  {
+    m_VPipeIndex = nNewIndex;
+    if (m_SceneNode != NULL)
+      OnCreateVP();
+  }
+}
+
+//----------------------------------------------------------------------------
+void albaGUIDynamicVP::OnEvent(albaEventBase *alba_event)
+//----------------------------------------------------------------------------
+{
+  if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
+  {
+    switch(e->GetId())
+    {      
+    case ID_NAME:
+      NotifyListener(ID_NAME);
+      break;
+
+    case ID_CREATE_VP:
+      OnCreateVP();    
+
+      NotifyListener(ID_CREATE_VP);
+      break;
+
+    case ID_CLOSE_VP:
+      OnCloseVP();
+
+      NotifyListener(ID_CLOSE_VP);
+      break;              
+
+    default:
+      e->Log();
+      break;
+    }         
+  } 
+}
+
+//------------------------------------------------------------------------
+//Notifies the listener, sending the specified notify id 
+//and nData as and argument. 
+/*virtual*/ void albaGUIDynamicVP::NotifyListener(long nData)
+{
+  //notify the listener about change
+  if (m_Listener != NULL)
+  {
+    albaEvent ev(this, m_NotifyId, nData);
+    m_Listener->OnEvent(&ev);
+  }
+}
+
+//------------------------------------------------------------------------
+//Handles the construction of VP
+/*virtual*/ void albaGUIDynamicVP::OnCreateVP()
+//------------------------------------------------------------------------
+{
+  wxCursor busy;
+  
+  if (m_VPipe != NULL) 
+  {
+    int nOldIndex = m_VPipeIndex;    
+    
+    OnCloseVP();
+
+    m_VPipeIndex = nOldIndex;
+
+    if (m_ComboVP != NULL)
+      m_ComboVP->SetSelection(m_VPipeIndex);
+  }
+    
+  _ASSERT(m_VPipe == NULL);
+  if (m_VPipeIndex >= 0)
+  {
+    const char* szPipeName = m_VPipes[m_VPipeIndex].szClassName;
+    CreateVisualPipe(szPipeName);
+
+    if (m_VPipe == NULL)
+      albaLogMessage(_("Cannot create visual pipe: '%s'"), szPipeName);
+    else
+    {
+      albaGUI* pipeGUI = m_VPipe->GetGui();
+      pipeGUI->FitGui();            
+
+      pipeGUI->Reparent(m_GUI_VP);
+      m_GUI_VP->Add(pipeGUI, 1, wxEXPAND);
+      pipeGUI->Show(true);  //our gui is visible (if we are here)
+      pipeGUI->Update();      
+    }
+  }
+}
+
+//------------------------------------------------------------------------
+//Handles the closing of VP
+/*virtual*/ void albaGUIDynamicVP::OnCloseVP()
+//------------------------------------------------------------------------
+{
+  //destroy GUI & pipe
+  if (m_VPipe != NULL)
+  {    
+    wxWindow *current_gui = m_VPipe->GetGui();
+    m_GUI_VP->Remove(current_gui);   
+    current_gui->Show(false);
+    current_gui->Reparent(albaGetFrame());
+
+    DestroyVisualPipe();  //this will also destroy the GUI
+
+    m_VPipeIndex = -1;
+    if (m_ComboVP != NULL)
+      m_ComboVP->SetSelection(m_VPipeIndex);
+
+    m_GUI_VP->Layout();
+    this->Layout();    
+  }    
+}
+
+//------------------------------------------------------------------------
+//Handles destroying of controls. Controls cannot be destroyed 
+//immediately as they are referenced by wxWidgets event handing core.
+//Its immediate destruction would cause crash.
+void albaGUIDynamicVP::OnDeferedDelete(wxEvent& event)
+//------------------------------------------------------------------------
+{
+  //obj is sizer to be deleted
+  wxSizer* sizer = dynamic_cast< wxSizer* >(event.GetEventObject());
+  sizer->Clear();
+  delete sizer;
+}
+
+//------------------------------------------------------------------------
+//Sets a new style
+void albaGUIDynamicVP::SetGUIStyle(long newstyle)
+//------------------------------------------------------------------------
+{
+  if (newstyle != m_GuiStyle)
+  {
+    wxSizer* oldSizer = m_GUI_This->GetSizer();
+    m_GUI_This->SetSizer(CreateGUI(m_GuiStyle = newstyle), false);
+    m_GUI_This->Layout();
+    this->Layout();    
+
+    if (oldSizer != NULL)
+    {
+      //oldSizer cannot be deleted here, it would lead to crash
+      //if SetGUIStyle was called from some handing of control of the GUI
+      //within oldSizer => we just hide it here and mark it to be deleted on idle
+      oldSizer->Show(false);      
+      
+      wxCommandEvent myEvent(wxEVT_DEFERED_DELETE);
+      myEvent.SetEventObject(oldSizer);
+
+      this->AddPendingEvent(myEvent);   
+    }
+
+    m_GUI_This->TransferDataToWindow();
+  }
+}
+
+//------------------------------------------------------------------------
+//Sets a new name associated with the GUI.
+void albaGUIDynamicVP::SetName(const char* szNewName)
+//------------------------------------------------------------------------
+{  
+  m_Name = szNewName;
+  m_GUI_This->TransferDataToWindow();
+}
+
+
+//------------------------------------------------------------------------
+//Constructs geometry visual pipe.
+/*virtual*/ void albaGUIDynamicVP::CreateVisualPipe(const char* classname)
+//------------------------------------------------------------------------
+{
+  DestroyVisualPipe();
+
+  albaPipeFactory *pipe_factory  = albaPipeFactory::GetInstance();    
+  albaPipe *pipe = (albaPipe*)pipe_factory->CreateInstance(classname);
+  if (pipe != NULL)
+  {
+    pipe->SetListener(this->GetListener());
+    pipe->Create(m_SceneNode);
+
+    //if the view associated with this pipe contains only one VME
+    //and one pipe, we will need to reset camera, so it is visible
+    albaView* view = m_SceneNode->GetSceneGraph()->m_View;
+    int nRefCount = albaPipeRegister::RegisterPipe(pipe, view);
+    if (nRefCount == 1 && view->GetNumberOfVisibleVME() == 1)
+      view->CameraReset(m_SceneNode->GetVme());    
+    else
+      view->CameraUpdate();
+  }
+
+  m_VPipe = pipe;
+}
+
+//------------------------------------------------------------------------
+//Destroys geometry visual pipe.
+/*virtual*/ void albaGUIDynamicVP::DestroyVisualPipe()
+//------------------------------------------------------------------------
+{  
+  albaPipeRegister::UnregisterPipe(m_VPipe);
+  cppDEL(m_VPipe); 
+}
+
+#pragma region Register of Pipes
+
+//array of registered views-pipes
+/*static*/ std::vector< albaGUIDynamicVP::albaPipeRegister::VIEW_ITEM > 
+                          albaGUIDynamicVP::albaPipeRegister::m_RegViews;
+
+//------------------------------------------------------------------------
+//Registers the specified pipe with the view.
+//Returns number of pipes registered for this view.
+//N.B. duplicity check of pipes is not performed!
+/*static*/ int albaGUIDynamicVP::albaPipeRegister::RegisterPipe(albaPipe* pipe, albaView* view)
+//------------------------------------------------------------------------
+{
+  //try to find view
+  int nIndex = FindView(view);
+  if (nIndex < 0)
+  {
+    nIndex = (int)m_RegViews.size();
+
+    VIEW_ITEM newitem;
+    newitem.m_View = view;
+    m_RegViews.push_back(newitem);    
+  }
+
+  VIEW_ITEM& item = m_RegViews[nIndex];
+  item.m_Pipes.push_back(pipe);     //we do not check for the duplicities!
+  return (int)item.m_Pipes.size();
+}
+
+//------------------------------------------------------------------------
+//Unregisters the specified pipe with the view (if specified).
+//Returns number of pipes registered for this view (after unregister).
+/*static*/ int albaGUIDynamicVP::albaPipeRegister::UnregisterPipe(albaPipe* pipe, albaView* view)
+//------------------------------------------------------------------------
+{
+  int nStartIndex, nEndIndex;
+  if ((nEndIndex = FindView(view)) >= 0)
+    nStartIndex = nEndIndex;
+  else 
+  {
+    nStartIndex = 0; nEndIndex = (int)m_RegViews.size() - 1;
+  }
+  
+  //search every view item to find the pipe
+  for (int i = nStartIndex; i <= nEndIndex; i++)
+  {
+    VIEW_ITEM& item = m_RegViews[i];
+    int nCount = (int)item.m_Pipes.size();
+    for (int j = 0; j < nCount; j++)
+    {
+      if (item.m_Pipes[j] == pipe)
+      {
+        item.m_Pipes.erase(item.m_Pipes.begin() + j);
+        return (int)item.m_Pipes.size();
+      }
+    }
+  }
+
+  return -1;  //error
+}
+
+//------------------------------------------------------------------------
+//returns index of given view in m_RegViews, or -1, if not found
+/*static*/ int albaGUIDynamicVP::albaPipeRegister::FindView(albaView* view)
+//------------------------------------------------------------------------
+{
+  if (view != NULL)
+  {
+    int nCount = (int)m_RegViews.size();
+    for (int i = 0; i < nCount; i++)
+    {
+      VIEW_ITEM& item = m_RegViews[i];
+      if (item.m_View == view)
+        return i;
+    }
+  }
+
+  return -1;
+}
+
+#pragma endregion Register of Pipes

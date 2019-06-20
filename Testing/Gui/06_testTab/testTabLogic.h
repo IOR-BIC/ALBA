@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testTabLogic
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -19,21 +19,21 @@
 // Include:
 //----------------------------------------------------------------------------
 #include <wx/notebook.h>
-#include "mafEvent.h"
-#include "mafObserver.h"
+#include "albaEvent.h"
+#include "albaObserver.h"
 //----------------------------------------------------------------------------
 // Forward Refs:
 //----------------------------------------------------------------------------
-class mafGUIMDIFrame;
-class mafGUISashPanel;
+class albaGUIMDIFrame;
+class albaGUISashPanel;
 class testTabGui;
 // ============================================================================
-class testTabLogic : public mafObserver
+class testTabLogic : public albaObserver
 // ============================================================================
 {
 public:
   testTabLogic();
-  virtual void  OnEvent(mafEventBase *maf_event);
+  virtual void  OnEvent(albaEventBase *alba_event);
 
   void  Show(); 
   void  OnQuit();
@@ -44,10 +44,10 @@ protected:
  void CreateLogBar();
  void CreateSideBar();
 
- mafGUIMDIFrame   *m_win;
+ albaGUIMDIFrame   *m_win;
  wxMenuBar     *m_menu_bar;
- mafGUISashPanel  *m_log_bar; 
- mafGUISashPanel  *m_side_bar;
+ albaGUISashPanel  *m_log_bar; 
+ albaGUISashPanel  *m_side_bar;
  wxNotebook    *m_notebook;
  testTabGui    *m_gui;
 };

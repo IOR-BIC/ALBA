@@ -8,16 +8,16 @@ currentPathScript = os.path.split(os.path.realpath(__file__))[0]
 
 try:
     sys.path.append(os.path.realpath(os.path.join(currentPathScript,"..","..")))
-    from qa import mafPath
+    from qa import albaPath
 except ImportError:
-    import mafPath
+    import albaPath
 
 def usage():
     print "Usage:  python LCOVCoveragePublish.py"
 
 def publishReport():
     extScriptDir = os.getcwd()
-    os.chdir(mafPath.mafQADir)
+    os.chdir(albaPath.albaQADir)
     baseDir = os.getcwd()
     qaResultsDir = os.path.join(baseDir,"QAResults")
     htmlDir = os.path.join(baseDir,"QAResults", "html")
@@ -170,7 +170,7 @@ if __name__ == "__main__":
 
     disclaimer = """
     ************************************************************
-    This script has been written for publishing inside mafQA site
+    This script has been written for publishing inside albaQA site
     the results of LCOV Coverage.
     It will process all the .html file in order to create coherent
     html pages.

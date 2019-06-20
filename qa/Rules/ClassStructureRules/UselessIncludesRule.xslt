@@ -13,7 +13,7 @@
 						    <li>all the include files inside the AllowedIncludes dictionary are permitted</li>
 						</ul>
 					</h3>
-                    <h4><br/>Link to <a href="https://www.biomedtown.org/biomed_town/MAF/MAF2%20Floor/documentation/doc/maf-2-0-documentation/CodingStandard/">Coding Conventions</a></h4>
+                    <h4><br/>Link to <a href="https://www.biomedtown.org/biomed_town/ALBA/ALBA%20Floor/documentation/doc/alba-2-0-documentation/CodingStandard/">Coding Conventions</a></h4>
 				</div>
 				<div id="contentTable">
 					<table id="listing">

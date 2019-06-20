@@ -17,8 +17,8 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h"
-#include "mafInteractorCameraMove.h"
+#include "albaDefines.h"
+#include "albaInteractorCameraMove.h"
 
 //----------------------------------------------------------------------------
 // Forward declarations:
@@ -52,11 +52,11 @@ Bool = true
 VtkObj = reference to vtkPoints containing the new position of
 point picked during CTRL + left mouse down  
 */
-class MAF_EXPORT mmiVTKPicker : public mafInteractorCameraMove
+class ALBA_EXPORT mmiVTKPicker : public albaInteractorCameraMove
 {
 public:
   /** RTTI macro */
-  mafTypeMacro(mmiVTKPicker,mafInteractorCameraMove);
+  albaTypeMacro(mmiVTKPicker,albaInteractorCameraMove);
 
   /** Enables/disables continuous picking */
   inline void SetContinuousPicking(bool bValue) {
@@ -72,7 +72,7 @@ public:
   virtual void OnMouseMove();
 
   /** redefined to pick cell if CTRL modifier is pressed */
-  virtual void OnLeftButtonDown(mafEventInteraction *e);
+  virtual void OnLeftButtonDown(albaEventInteraction *e);
 
   /** redefined to end pick modality */
   virtual void OnLeftButtonUp();

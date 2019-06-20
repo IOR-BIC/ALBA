@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testPicFactoryApp
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -16,9 +16,9 @@
 
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -26,7 +26,7 @@
 
 
 #include "testPicFactoryApp.h"
-#include "mafPics.h"
+#include "albaPics.h"
 
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -37,17 +37,17 @@ IMPLEMENT_APP(testPicFactoryApp)
 bool testPicFactoryApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-  mafPics.Initialize();	
+  albaPics.Initialize();	
 
   // this defines a char** variable called ico_xpm
   #include "ico.xpm"
   
   // this add the icon to the PicFactory as "ico"
-  mafADDPIC(ico);
+  albaADDPIC(ico);
 
   // these replace the File_Open and File_Save icon with ico
-  mafPics.Add("FILE_OPEN",ico_xpm);
-  mafPics.Add("FILE_SAVE",ico_xpm);
+  albaPics.Add("FILE_OPEN",ico_xpm);
+  albaPics.Add("FILE_SAVE",ico_xpm);
 
   m_logic = new testPicFactoryLogic();
   SetTopWindow(m_logic->GetTopWin());  

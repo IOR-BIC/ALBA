@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmoCreateGenericVme
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -14,9 +14,9 @@
 
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -24,11 +24,11 @@
 
 
 #include "mmoCreateGenericVme.h"
-#include "mafNodeGeneric.h"
+#include "albaNodeGeneric.h"
 
 //----------------------------------------------------------------------------
 mmoCreateGenericVme::mmoCreateGenericVme(wxString label)
-: mafOp(label)
+: albaOp(label)
 //----------------------------------------------------------------------------
 {
   m_Canundo = true;
@@ -38,25 +38,25 @@ mmoCreateGenericVme::mmoCreateGenericVme(wxString label)
 mmoCreateGenericVme::~mmoCreateGenericVme()
 //----------------------------------------------------------------------------
 {
-  mafDEL(m_vme);
+  albaDEL(m_vme);
 }
 //----------------------------------------------------------------------------
-mafOp* mmoCreateGenericVme::Copy()
+albaOp* mmoCreateGenericVme::Copy()
 //----------------------------------------------------------------------------
 {
   return new mmoCreateGenericVme(m_Label);
 }
 //----------------------------------------------------------------------------
-void mmoCreateGenericVme::OnEvent(mafEvent& e)
+void mmoCreateGenericVme::OnEvent(albaEvent& e)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(e);
+  albaEventMacro(e);
 }
 //----------------------------------------------------------------------------
 void mmoCreateGenericVme::OpRun()
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,OP_RUN_OK));
+  albaEventMacro(albaEvent(this,OP_RUN_OK));
 }
 //----------------------------------------------------------------------------
 void mmoCreateGenericVme::OpDo()
@@ -64,18 +64,18 @@ void mmoCreateGenericVme::OpDo()
 {
   assert(!m_vme);
 
-  mafNEW(m_vme);
+  albaNEW(m_vme);
   static int counter = 0;
   wxString name = wxString::Format("vme generic %d",counter++);
   m_vme->SetName(name);
   m_vme->ReparentTo(m_Input);
-  mafEventMacro(mafEvent(this,VME_ADD,m_vme));
+  albaEventMacro(albaEvent(this,VME_ADD,m_vme));
 }
 //----------------------------------------------------------------------------
 void mmoCreateGenericVme::OpUndo()
 //----------------------------------------------------------------------------
 {
   assert(m_vme);
-  mafEventMacro(mafEvent(this,VME_REMOVE,m_vme));
-  mafDEL(m_vme);
+  albaEventMacro(albaEvent(this,VME_REMOVE,m_vme));
+  albaDEL(m_vme);
 }

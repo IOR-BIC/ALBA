@@ -1,5 +1,5 @@
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: FindITK.cmake.in,v $
 # Language:  CMake 1.2
 # Date:      $Date: 2005-06-06 16:57:00 $
@@ -7,7 +7,7 @@
 #
 # Description:
 # This module finds the location of the ITK source and binary paths. It
-# first searches for it inside the MAF tree, otherwise it uses the standard
+# first searches for it inside the ALBA tree, otherwise it uses the standard
 # CMAKE FindITK module 
 #
 # This module defines

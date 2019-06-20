@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmoCreateGenericVme
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -18,27 +18,27 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafOp.h"
+#include "albaOp.h"
 //----------------------------------------------------------------------------
 // Forward Refs:
 //----------------------------------------------------------------------------
-class mafNodeGeneric;
+class albaNodeGeneric;
 // ============================================================================
-class mmoCreateGenericVme : public mafOp
+class mmoCreateGenericVme : public albaOp
 // ============================================================================
 {
 public:
                 mmoCreateGenericVme(wxString label);
                ~mmoCreateGenericVme();
-	virtual void OnEvent(mafEvent& e);
-  mafOp* Copy();
+	virtual void OnEvent(albaEvent& e);
+  albaOp* Copy();
 
-  bool Accept(mafNode* vme) {return vme != NULL;};
+  bool Accept(albaNode* vme) {return vme != NULL;};
   void OpRun();
   void OpDo();
   void OpUndo();
 
 protected:
-  mafNodeGeneric  *m_vme; 
+  albaNodeGeneric  *m_vme; 
 };
 #endif // __mmoCreateGenericVme_H__

@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmaVolumeMaterial
  Authors: Paolo Quadrani
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,33 +15,33 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
 #include "mmaVolumeMaterial.h"
-#include "mafDecl.h"
-#include "mafEvent.h"
-#include "mafGUILutPreset.h"
+#include "albaDecl.h"
+#include "albaEvent.h"
+#include "albaGUILutPreset.h"
 
-#include "mafStorageElement.h"
-#include "mafIndent.h"
+#include "albaStorageElement.h"
+#include "albaIndent.h"
 
-#include "mafVME.h"
+#include "albaVME.h"
 
-#include "vtkMAFSmartPointer.h"
+#include "vtkALBASmartPointer.h"
 #include "vtkLookupTable.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkVolumeProperty.h"
-#include "vtkMAFTransferFunction2D.h"
+#include "vtkALBATransferFunction2D.h"
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mmaVolumeMaterial)
+albaCxxTypeMacro(mmaVolumeMaterial)
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -91,7 +91,7 @@ mmaVolumeMaterial::~mmaVolumeMaterial()
   vtkDEL(m_VolumeProperty);
 }
 //-------------------------------------------------------------------------
-void mmaVolumeMaterial::DeepCopy(const mafAttribute *a)
+void mmaVolumeMaterial::DeepCopy(const albaAttribute *a)
 //-------------------------------------------------------------------------
 { 
   Superclass::DeepCopy(a);
@@ -113,7 +113,7 @@ void mmaVolumeMaterial::DeepCopy(const mafAttribute *a)
   UpdateProp();
 }
 //----------------------------------------------------------------------------
-bool mmaVolumeMaterial::Equals(const mafAttribute *a)
+bool mmaVolumeMaterial::Equals(const albaAttribute *a)
 //----------------------------------------------------------------------------
 {
   if (Superclass::Equals(a))
@@ -135,10 +135,10 @@ bool mmaVolumeMaterial::Equals(const mafAttribute *a)
   return false;
 }
 //-----------------------------------------------------------------------
-int mmaVolumeMaterial::InternalStore(mafStorageElement *parent)
+int mmaVolumeMaterial::InternalStore(albaStorageElement *parent)
 //-----------------------------------------------------------------------
 {  
-  if (Superclass::InternalStore(parent)==MAF_OK)
+  if (Superclass::InternalStore(parent)==ALBA_OK)
   {
     UpdateFromTables();
     // property
@@ -154,7 +154,7 @@ int mmaVolumeMaterial::InternalStore(mafStorageElement *parent)
     parent->StoreDouble("TableRange1", m_TableRange[1]);
     parent->StoreDouble("GammaCorrection", m_GammaCorrection);
     parent->StoreInteger("NumValues", m_NumValues);
-    mafString lutvalues;
+    albaString lutvalues;
     double *rgba;
     for (int v = 0; v < m_NumValues; v++)
     {
@@ -189,15 +189,15 @@ int mmaVolumeMaterial::InternalStore(mafStorageElement *parent)
       point[1] = data_values[2*p + 1];
       parent->StoreVectorN(lutvalues,point,2);
     }
-    return MAF_OK;
+    return ALBA_OK;
   }
-  return MAF_ERROR;
+  return ALBA_ERROR;
 }
 //----------------------------------------------------------------------------
-int mmaVolumeMaterial::InternalRestore(mafStorageElement *node)
+int mmaVolumeMaterial::InternalRestore(albaStorageElement *node)
 //----------------------------------------------------------------------------
 {
-  if (Superclass::InternalRestore(node) == MAF_OK)
+  if (Superclass::InternalRestore(node) == ALBA_OK)
   {
     // property
     node->RestoreText("MaterialName",m_MaterialName);
@@ -213,7 +213,7 @@ int mmaVolumeMaterial::InternalRestore(mafStorageElement *node)
     node->RestoreDouble("GammaCorrection", m_GammaCorrection);
     node->RestoreInteger("NumValues", m_NumValues);
     m_ColorLut->SetNumberOfTableValues(m_NumValues);
-    mafString lutvalues;
+    albaString lutvalues;
     double rgba[4];
     for (int v = 0; v < m_NumValues; v++)
     {
@@ -246,9 +246,9 @@ int mmaVolumeMaterial::InternalRestore(mafStorageElement *node)
       node->RestoreVectorN(lutvalues,point,2);
       m_GradientTransferFunction->AddPoint(point[0],point[1]);
     }
-    return MAF_OK;
+    return ALBA_OK;
   }
-  return MAF_ERROR;
+  return ALBA_ERROR;
 }
 //-----------------------------------------------------------------------
 void mmaVolumeMaterial::UpdateProp()
@@ -326,5 +326,5 @@ void mmaVolumeMaterial::Print(std::ostream& os, const int tabs) const
 //-----------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);
-  mafIndent indent(tabs);
+  albaIndent indent(tabs);
 }

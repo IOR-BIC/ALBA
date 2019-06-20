@@ -1,5 +1,5 @@
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: PackagesMacro.cmake,v $
 # Language:  CMake 1.2
 # Date:      $Date: 2011-06-03 09:29:54 $

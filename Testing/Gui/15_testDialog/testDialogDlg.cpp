@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testDialogDlg
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,9 +15,9 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -25,8 +25,8 @@
 
 #include "testDialogDlg.h"
 #include "wx/busyinfo.h"
-#include "mafDecl.h"
-#include "mafGUIValidator.h"
+#include "albaDecl.h"
+#include "albaGUIValidator.h"
 //----------------------------------------------------------------------------
 // Event ids
 //----------------------------------------------------------------------------
@@ -37,15 +37,15 @@ enum
 };
 //----------------------------------------------------------------------------
 testDialogDlg::testDialogDlg(const wxString& title)
-: mafGUIDialog(title,mafOK|mafCANCEL/*|mafCLOSE*/|mafCLOSEWINDOW)
+: albaGUIDialog(title,albaOK|albaCANCEL/*|albaCLOSE*/|albaCLOSEWINDOW)
 //----------------------------------------------------------------------------
 {
    wxButton *b1 = new wxButton(this,ID_ENABLE,"enable ok");
-   b1->SetValidator( mafGUIValidator(this,ID_ENABLE,b1) ); 
+   b1->SetValidator( albaGUIValidator(this,ID_ENABLE,b1) ); 
    Add(b1);
 
    wxButton *b2 = new wxButton(this,ID_DISABLE,"disable ok");
-   b2->SetValidator( mafGUIValidator(this,ID_DISABLE,b2) ); 
+   b2->SetValidator( albaGUIValidator(this,ID_DISABLE,b2) ); 
    Add(b2);
 }
 //----------------------------------------------------------------------------
@@ -54,10 +54,10 @@ testDialogDlg::~testDialogDlg( )
 {
 }
 //--------------------------------------------------------------------------------
-void testDialogDlg::OnEvent(mafEventBase *event)
+void testDialogDlg::OnEvent(albaEventBase *event)
 //--------------------------------------------------------------------------------
 {
-  if(mafEvent *e = mafEvent::SafeDownCast(event))
+  if(albaEvent *e = albaEvent::SafeDownCast(event))
   {
     switch(e->GetId())
     {
@@ -68,7 +68,7 @@ void testDialogDlg::OnEvent(mafEventBase *event)
       m_OkButton->Enable(false);
       break;
     default:
-      mafGUIDialog::OnEvent(e); //pass unhandled evt. thorough the SuperClass
+      albaGUIDialog::OnEvent(e); //pass unhandled evt. thorough the SuperClass
     }
   }
 }
@@ -91,7 +91,7 @@ void testDialogDlg::OnOK(wxCommandEvent& event)
 {
   int res = wxMessageBox("you pressed OK, are you shure ?","test",wxYES|wxNO|wxICON_QUESTION);
   if (res == wxNO) return;
-  mafGUIDialog::OnOK(event);
+  albaGUIDialog::OnOK(event);
 }
 //----------------------------------------------------------------------------
 void testDialogDlg::OnCancel(wxCommandEvent& event)
@@ -99,6 +99,6 @@ void testDialogDlg::OnCancel(wxCommandEvent& event)
 {
   int res = wxMessageBox("really cancel ?","test",wxYES|wxNO|wxICON_QUESTION);
   if (res == wxNO) return;
-  mafGUIDialog::OnCancel(event);
+  albaGUIDialog::OnCancel(event);
 }
 

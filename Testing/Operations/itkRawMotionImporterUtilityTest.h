@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
- Module: mafItkRawMotionImporterUtilityTest
+ Program: ALBA (Agile Library for Biomedical Applications)
+ Module: albaItkRawMotionImporterUtilityTest
  Authors: Daniele Giunchi
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -14,16 +14,16 @@
 
 =========================================================================*/
 
-#ifndef CPP_UNIT_mafItkRawMotionImporterUtilityTest_H
-#define CPP_UNIT_mafItkRawMotionImporterUtilityTest_H
+#ifndef CPP_UNIT_albaItkRawMotionImporterUtilityTest_H
+#define CPP_UNIT_albaItkRawMotionImporterUtilityTest_H
 
-#include "mafTest.h"
+#include "albaTest.h"
 
-class mafItkRawMotionImporterUtilityTest : public mafTest
+class albaItkRawMotionImporterUtilityTest : public albaTest
 {
 public: 
 
-  CPPUNIT_TEST_SUITE( mafItkRawMotionImporterUtilityTest );
+  CPPUNIT_TEST_SUITE( albaItkRawMotionImporterUtilityTest );
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestReadMatrix );
   CPPUNIT_TEST_SUITE_END();

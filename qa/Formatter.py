@@ -9,9 +9,9 @@ from datetime import datetime
 import getopt
 
 try:
-    from qa import mafPath
+    from qa import albaPath
 except ImportError:
-    import mafPath
+    import albaPath
 
 currentPathScript = os.path.split(os.path.realpath(__file__))[0]
 
@@ -39,7 +39,7 @@ def search_file(filename, search_path):
 def run(param):
    #read xml file
    scriptsDir = os.getcwd()
-   os.chdir(mafPath.mafQADir)
+   os.chdir(albaPath.albaQADir)
    baseDir = os.getcwd()
    qaResultsDir = os.path.join(baseDir,"QAResults")
    xmlDir = os.path.join(baseDir,"QAResults","xml")

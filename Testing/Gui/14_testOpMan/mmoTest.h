@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmoTest
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -18,22 +18,22 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafOp.h"
+#include "albaOp.h"
 //----------------------------------------------------------------------------
 // Forward Refs:
 //----------------------------------------------------------------------------
-class mafNodeGeneric;
+class albaNodeGeneric;
 // ============================================================================
-class mmoTest : public mafOp
+class mmoTest : public albaOp
 // ============================================================================
 {
 public:
                 mmoTest(wxString label);
                ~mmoTest();
-	virtual void OnEvent(mafEvent& e);
-  mafOp* Copy();
+	virtual void OnEvent(albaEvent& e);
+  albaOp* Copy();
 
-  bool Accept(mafNode* vme) {return true;};
+  bool Accept(albaNode* vme) {return true;};
   void OpRun();
   void OpDo();
   void OpUndo();
@@ -41,8 +41,8 @@ public:
 protected:
   void OpStop(int result);
   
-  mafString m_s1;
-  mafString m_s2;
+  albaString m_s1;
+  albaString m_s2;
   int      m_i;
   float    m_f;
   double   m_d;

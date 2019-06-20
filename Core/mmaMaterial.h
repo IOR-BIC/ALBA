@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmaMaterial
  Authors: Paolo Quadrani
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafAttribute.h"
+#include "albaAttribute.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -33,13 +33,13 @@ class vtkImageData;
 // mmaMaterial:
 //----------------------------------------------------------------------------
 /**  */  
-class MAF_EXPORT mmaMaterial : public mafAttribute
+class ALBA_EXPORT mmaMaterial : public albaAttribute
 {
 public:
 	         mmaMaterial();
   virtual ~mmaMaterial();
 
-  mafTypeMacro(mmaMaterial, mafAttribute);
+  albaTypeMacro(mmaMaterial, albaAttribute);
   
   enum MATERIAL_TYPE
   {
@@ -62,10 +62,10 @@ public:
   virtual void Print(std::ostream& os, const int tabs=0) const;
 
   /** Copy the contents of another Meter attribute into this one. */
-  virtual void DeepCopy(const mafAttribute *a);
+  virtual void DeepCopy(const albaAttribute *a);
 
   /** Compare with another Meter attribute. */
-  virtual bool Equals(const mafAttribute *a);
+  virtual bool Equals(const albaAttribute *a);
 
   /** Set the texture image to map on the surface */
   void SetMaterialTexture(vtkImageData *tex);
@@ -76,7 +76,7 @@ public:
   /** Return the vme's id representing the texture */
   int GetMaterialTextureID();
 
-  /** Set the mafVMEImage id to use as texture to map on the surface */
+  /** Set the albaVMEImage id to use as texture to map on the surface */
   void SetMaterialTexture(int tex_id);
 
   /** Apply shading parameters to the vtkProperty */
@@ -88,7 +88,7 @@ public:
   vtkProperty        *m_Prop;
   vtkLookupTable     *m_ColorLut;
 
-  mafString m_MaterialName;
+  albaString m_MaterialName;
   wxBitmap *m_Icon;
   double    m_Value;
   double    m_Ambient[3];
@@ -112,7 +112,7 @@ protected:
   vtkImageData *m_TextureImage;
   int           m_TextureID;
 
-  virtual int InternalStore(mafStorageElement *parent);
-  virtual int InternalRestore(mafStorageElement *node);
+  virtual int InternalStore(albaStorageElement *parent);
+  virtual int InternalRestore(albaStorageElement *node);
 };
 #endif
