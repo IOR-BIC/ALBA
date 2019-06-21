@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmaVolumeMaterial
  Authors: Paolo Quadrani
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafAttribute.h"
+#include "albaAttribute.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -35,22 +35,22 @@ class vtkVolumeProperty2;
 // mmaVolumeMaterial:
 //----------------------------------------------------------------------------
 /**  */  
-class MAF_EXPORT mmaVolumeMaterial : public mafAttribute
+class ALBA_EXPORT mmaVolumeMaterial : public albaAttribute
 {
 public:
 	         mmaVolumeMaterial();
   virtual ~mmaVolumeMaterial();
 
-  mafTypeMacro(mmaVolumeMaterial, mafAttribute);
+  albaTypeMacro(mmaVolumeMaterial, albaAttribute);
   
   /** Print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0) const;
 
   /** Copy the contents of another Meter attribute into this one. */
-  virtual void DeepCopy(const mafAttribute *a);
+  virtual void DeepCopy(const albaAttribute *a);
 
   /** Compare with another Meter attribute. */
-  virtual bool Equals(const mafAttribute *a);
+  virtual bool Equals(const albaAttribute *a);
 
   /** Call to update volume properties.*/
   void UpdateProp();
@@ -68,7 +68,7 @@ public:
   vtkVolumeProperty         *m_VolumeProperty;
   vtkVolumeProperty2        *m_VolumeProperty2;
 
-  mafString m_MaterialName; ///< Associate a name to the volume material, this will be visible into the .msf file
+  albaString m_MaterialName; ///< Associate a name to the volume material, this will be visible into the .msf file
 
   double m_Level_LUT;
   double m_Window_LUT;
@@ -81,8 +81,8 @@ public:
   int    m_Shade; ///< Store the shade parameter for volume rendering (can be 0 pr 1)
 
 protected:
-  virtual int InternalStore(mafStorageElement *parent);
-  virtual int InternalRestore(mafStorageElement *node);
+  virtual int InternalStore(albaStorageElement *parent);
+  virtual int InternalRestore(albaStorageElement *node);
 
   int    m_NumOpacityValues;
   int    m_NumGradientValues;

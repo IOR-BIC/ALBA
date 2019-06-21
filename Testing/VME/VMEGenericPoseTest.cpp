@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: multiThreaderTest
  Authors: Gianluigi Crimi
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -14,12 +14,12 @@
 
 =========================================================================*/
 #include "VMEGenericPoseTest.h"
-#include "mafVMEGeneric.h"
-#include "mafVMERoot.h"
-#include "mafVMEOutput.h"
-#include "mafTransform.h"
-#include "mafSmartPointer.h"
-#include "mafIndent.h"
+#include "albaVMEGeneric.h"
+#include "albaVMERoot.h"
+#include "albaVMEOutput.h"
+#include "albaTransform.h"
+#include "albaSmartPointer.h"
+#include "albaIndent.h"
 #include <iostream>
 
 
@@ -30,10 +30,10 @@ void  VMEGenericPoseTest::VMEGenericPoseMainTest()
 //-------------------------------------------------------------------------
 {
   // create a small tree
-  mafVMEGeneric *vme1=mafVMEGeneric::New();
-  mafVMEGeneric *vme2=mafVMEGeneric::New();
-  mafVMEGeneric *vme3=mafVMEGeneric::New();
-  mafSmartPointer<mafVMERoot> root;
+  albaVMEGeneric *vme1=albaVMEGeneric::New();
+  albaVMEGeneric *vme2=albaVMEGeneric::New();
+  albaVMEGeneric *vme3=albaVMEGeneric::New();
+  albaSmartPointer<albaVMERoot> root;
   
   root->AddChild(vme1);
   root->AddChild(vme2);
@@ -41,7 +41,7 @@ void  VMEGenericPoseTest::VMEGenericPoseMainTest()
 
   root->SetPose(-10,-10,-10,0,0,0,0);
 
-  mafTransform trans;
+  albaTransform trans;
   for (int i=0;i<10;i++)
   {
     
@@ -51,43 +51,43 @@ void  VMEGenericPoseTest::VMEGenericPoseMainTest()
     vme3->SetPose(0,0,0,i*10,i*10,i*10,i);  // test the SetPose(x,y,z,rx,ry,rz,t) function
   }
   
-  mafTransform root_pose_result;
+  albaTransform root_pose_result;
   root_pose_result.SetPosition(-10,-10,-10);
 
   // test output values for different times
   for (int j=0;j<10;j++)
   {
     root->SetTreeTime(j);
-    mafMatrix root_pose = *(root->GetOutput()->GetMatrix());
-    mafMatrix vme1_pose = *(vme1->GetOutput()->GetMatrix());
-    mafMatrix vme2_pose = *(vme2->GetOutput()->GetMatrix());
-    mafMatrix vme3_pose = *(vme3->GetOutput()->GetMatrix());
-    mafMatrix vme1_abspose = *(vme1->GetOutput()->GetAbsMatrix());
-    mafMatrix vme2_abspose = *(vme2->GetOutput()->GetAbsMatrix());
-    mafMatrix vme3_abspose = *(vme3->GetOutput()->GetAbsMatrix());
+    albaMatrix root_pose = *(root->GetOutput()->GetMatrix());
+    albaMatrix vme1_pose = *(vme1->GetOutput()->GetMatrix());
+    albaMatrix vme2_pose = *(vme2->GetOutput()->GetMatrix());
+    albaMatrix vme3_pose = *(vme3->GetOutput()->GetMatrix());
+    albaMatrix vme1_abspose = *(vme1->GetOutput()->GetAbsMatrix());
+    albaMatrix vme2_abspose = *(vme2->GetOutput()->GetAbsMatrix());
+    albaMatrix vme3_abspose = *(vme3->GetOutput()->GetAbsMatrix());
     
-    mafTransform vme1_abspose_test;
+    albaTransform vme1_abspose_test;
     vme1_abspose_test.SetPosition(10*j-10,10*j-10,10*j-10);
     vme1_abspose_test.SetTimeStamp(j);
 
-    mafTransform vme2_abspose_test;
+    albaTransform vme2_abspose_test;
     vme2_abspose_test.SetPosition(j-10,j-10,j-10);
     vme2_abspose_test.SetTimeStamp(j);
 
-    mafTransform vme3_abspose_test;
+    albaTransform vme3_abspose_test;
     vme3_abspose_test.SetPosition(10*j-10,10*j-10,10*j-10);
     vme3_abspose_test.SetOrientation(j*10,j*10,j*10);
     vme3_abspose_test.SetTimeStamp(j);
 
-    mafTransform vme1_pose_test;
+    albaTransform vme1_pose_test;
     vme1_pose_test.SetPosition(10*j,10*j,10*j);
     vme1_pose_test.SetTimeStamp(j);
 
-    mafTransform vme2_pose_test;
+    albaTransform vme2_pose_test;
     vme2_pose_test.SetPosition(j,j,j);
     vme2_pose_test.SetTimeStamp(j);
 
-    mafTransform vme3_pose_test;
+    albaTransform vme3_pose_test;
     vme3_pose_test.SetOrientation(j*10,j*10,j*10);
     vme3_pose_test.SetTimeStamp(j);
 

@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testRWIDlg
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,9 +15,9 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -25,8 +25,8 @@
 
 #include "testRWIDlg.h"
 #include "wx/busyinfo.h"
-#include "mafDecl.h"
-#include "mafGUIValidator.h"
+#include "albaDecl.h"
+#include "albaGUIValidator.h"
 
 //----------------------------------------------------------------------------
 // Event ids
@@ -38,7 +38,7 @@ enum
 };
 //----------------------------------------------------------------------------
 testRWIDlg::testRWIDlg(const wxString& title)
-: mafGUIDialog(title)
+: albaGUIDialog(title)
 //----------------------------------------------------------------------------
 {
   CS  = NULL;
@@ -55,7 +55,7 @@ testRWIDlg::testRWIDlg(const wxString& title)
   A = vtkActor::New();
   A->SetMapper(PDM);
   
-  RWI = new mafRWI(this);
+  RWI = new albaRWI(this);
   RWI->SetSize(0,0,400,300);
   RWI->m_RwiBase->Show(true);
   RWI->m_RenFront->AddActor(A);

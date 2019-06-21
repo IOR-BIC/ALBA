@@ -63,7 +63,7 @@ cd CMake
 
 cd ..
 
-rem \__MAF21_prova\openMAF\Libraries\Extras\bin\gzip -c wxCmake.tar > wxCmake.tar.gz
+rem \__ALBA1_prova\ALBA\Libraries\Extras\bin\gzip -c wxCmake.tar > wxCmake.tar.gz
 
 ..\..\Extras\bin\gzip wxCmake.tar
 

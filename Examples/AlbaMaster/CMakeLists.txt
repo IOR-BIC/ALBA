@@ -17,7 +17,7 @@ PROJECT (AlbaMaster)
 
 SET(PROJECT_SRCS 
 	AlbaMaster.cpp					AlbaMaster.h
-	mafOpInteractionOp.cpp	mafOpInteractionOp.h
+	albaOpInteractionOp.cpp	albaOpInteractionOp.h
 	exWizardSample.cpp			exWizardSample.h
 	exAppUtils.cpp					exAppUtils.h
 )
@@ -68,22 +68,22 @@ IF (WIN32)
   # MESSAGE("variable APP_INSTALLER_EXECUTABLE_OUTPUT_DIR_WIN = " ${APP_INSTALLER_EXECUTABLE_OUTPUT_DIR_WIN})
   
   CONFIGURE_FILE(${APP_INSTALLER_DIR}/AlbaMasterInstallerScript.nsi.in  ${EXECUTABLE_OUTPUT_PATH}/Release/AlbaMasterInstallerScript.nsi @ONLY)
-  CONFIGURE_FILE(${MAF_BINARY_DIR}/INSTALLER/EnumUsersReg.nsh  ${EXECUTABLE_OUTPUT_PATH}/Release/EnumUsersReg.nsh @ONLY)
-  CONFIGURE_FILE(${MAF_BINARY_DIR}/INSTALLER/InstallerCommon.nsh  ${EXECUTABLE_OUTPUT_PATH}/Release/InstallerCommon.nsh @ONLY)
+  CONFIGURE_FILE(${ALBA_BINARY_DIR}/INSTALLER/EnumUsersReg.nsh  ${EXECUTABLE_OUTPUT_PATH}/Release/EnumUsersReg.nsh @ONLY)
+  CONFIGURE_FILE(${ALBA_BINARY_DIR}/INSTALLER/InstallerCommon.nsh  ${EXECUTABLE_OUTPUT_PATH}/Release/InstallerCommon.nsh @ONLY)
 ELSE (WIN32)
   ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS} )
 ENDIF (WIN32)
 
 
-IF(MAF_BUILD_MAFDLL)
+IF(ALBA_BUILD_ALBADLL)
   SET(PROJECT_LIBS
-  mafOperations mafGui mafViews mafVME mafInteraction mafCommon mafService
+  albaOperations albaGui albaViews albaVME albaInteraction albaCommon albaService
 )
-ELSE(MAF_BUILD_MAFDLL)
+ELSE(ALBA_BUILD_ALBADLL)
   SET(PROJECT_LIBS
-  mafOperations mafGui mafViews mafVME mafVisualPipes mafInteraction mafCommon mafService vtkMAF GPUAPI
+  albaOperations albaGui albaViews albaVME albaVisualPipes albaInteraction albaCommon albaService vtkALBA GPUAPI
 )
-ENDIF(MAF_BUILD_MAFDLL)
+ENDIF(ALBA_BUILD_ALBADLL)
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 IF (WIN32)

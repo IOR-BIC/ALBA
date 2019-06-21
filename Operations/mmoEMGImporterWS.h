@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: ALBA (Agile Library for Biomedical Applications)Medical
  Module: mmoEMGImporterWS
  Authors: Roberto Mucci
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "mafOp.h"
+#include "albaOp.h"
 #include <vnl\vnl_matrix.h>
 
 //----------------------------------------------------------------------------
@@ -33,16 +33,16 @@ class medVMEEmg;
 // mmoEMGImporterWS :
 //----------------------------------------------------------------------------
 /** */
-class mmoEMGImporterWS : public mafOp
+class mmoEMGImporterWS : public albaOp
 {
 public:
 	mmoEMGImporterWS(const wxString &label = "EMGImporterWS");
 	~mmoEMGImporterWS(); 
-	mafOp* Copy();
+	albaOp* Copy();
 
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode* node) {return true;};
+	bool Accept(albaNode* node) {return true;};
 
 	/** Builds operation's interface. */
 	void OpRun();

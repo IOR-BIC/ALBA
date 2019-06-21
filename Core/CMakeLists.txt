@@ -2,88 +2,88 @@
 # Copyright and description to be placed here
 #
 
-PROJECT(mafCore)
+PROJECT(albaCore)
 
-DBG_MESSAGE("Configuring project mafCore")
+DBG_MESSAGE("Configuring project albaCore")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  mafAbsMatrixPipe.cpp  		mafAbsMatrixPipe.h
-  mafAttribute.cpp  			mafAttribute.h
-  mafAttributeTraceability.cpp  mafAttributeTraceability.h
-  mafCoreFactory.cpp  			mafCoreFactory.h
-  mafDataPipe.cpp  				mafDataPipe.h
-  mafEventIO.cpp  				mafEventIO.h
-  mafMatrixPipe.cpp  			mafMatrixPipe.h
-  mafVMEIterator.cpp  			mafVMEIterator.h
-  mafOp.cpp  mafOp.h
-  mafOpContextStack.cpp  		mafOpContextStack.h
-  mafOpManager.cpp  			mafOpManager.h
-  mafOpSelect.cpp  				mafOpSelect.h
-  mafOpStack.cpp  				mafOpStack.h
-  mafPrintManager.cpp  			mafPrintManager.h
-  mafTagArray.cpp  				mafTagArray.h
-  mafTagItem.cpp  				mafTagItem.h
-  mafTimeMap.h
-  mafTimeMapScalar.h
-  mafUser.cpp  					mafUser.h
-  mafVME.cpp  					mafVME.h
-  mafVMEManager.cpp  			mafVMEManager.h
-  mafVMEOutput.cpp  			mafVMEOutput.h
-  mafVMEOutputNULL.cpp  		mafVMEOutputNULL.h
-  mafVMERoot.cpp  				mafVMERoot.h
-  mafVMEStorage.cpp  			mafVMEStorage.h
+  albaAbsMatrixPipe.cpp  		albaAbsMatrixPipe.h
+  albaAttribute.cpp  			albaAttribute.h
+  albaAttributeTraceability.cpp  albaAttributeTraceability.h
+  albaCoreFactory.cpp  			albaCoreFactory.h
+  albaDataPipe.cpp  				albaDataPipe.h
+  albaEventIO.cpp  				albaEventIO.h
+  albaMatrixPipe.cpp  			albaMatrixPipe.h
+  albaVMEIterator.cpp  			albaVMEIterator.h
+  albaOp.cpp  albaOp.h
+  albaOpContextStack.cpp  		albaOpContextStack.h
+  albaOpManager.cpp  			albaOpManager.h
+  albaOpSelect.cpp  				albaOpSelect.h
+  albaOpStack.cpp  				albaOpStack.h
+  albaPrintManager.cpp  			albaPrintManager.h
+  albaTagArray.cpp  				albaTagArray.h
+  albaTagItem.cpp  				albaTagItem.h
+  albaTimeMap.h
+  albaTimeMapScalar.h
+  albaUser.cpp  					albaUser.h
+  albaVME.cpp  					albaVME.h
+  albaVMEManager.cpp  			albaVMEManager.h
+  albaVMEOutput.cpp  			albaVMEOutput.h
+  albaVMEOutputNULL.cpp  		albaVMEOutputNULL.h
+  albaVMERoot.cpp  				albaVMERoot.h
+  albaVMEStorage.cpp  			albaVMEStorage.h
   mmaApplicationLayout.cpp  	mmaApplicationLayout.h
-  mafGUIListCtrlBitmap.cpp  	mafGUIListCtrlBitmap.h
-  mafGUIVMEChooser.cpp  		mafGUIVMEChooser.h
-  mafGUIVMEChooserTree.cpp  	mafGUIVMEChooserTree.h
+  albaGUIListCtrlBitmap.cpp  	albaGUIListCtrlBitmap.h
+  albaGUIVMEChooser.cpp  		albaGUIVMEChooser.h
+  albaGUIVMEChooserTree.cpp  	albaGUIVMEChooserTree.h
   mmuTimeSet.cpp  				mmuTimeSet.h
-  mafProgressBarHelper.cpp 		mafProgressBarHelper.h
+  albaProgressBarHelper.cpp 		albaProgressBarHelper.h
 )
 
-IF (MAF_USE_VTK)
+IF (ALBA_USE_VTK)
   SET(PROJECT_SRCS
   ${PROJECT_SRCS}
-  mafAxes.cpp  					mafAxes.h
-  mafLODActor.cpp  				mafLODActor.h
-  mafLogicWithManagers.cpp  	mafLogicWithManagers.h
-  mafPipe.cpp  					mafPipe.h
-  mafPipeBox.cpp  				mafPipeBox.h
-  mafPipeFactory.cpp  			mafPipeFactory.h
-  mafRWI.cpp  					mafRWI.h
-  mafRWIBase.cpp  				mafRWIBase.h
-  mafSceneGraph.cpp  			mafSceneGraph.h
-  mafSceneNode.cpp  			mafSceneNode.h
-  mafViewCompound.cpp  			mafViewCompound.h
-  mafViewHTML.cpp  				mafViewHTML.h
-  mafViewManager.cpp  			mafViewManager.h
-  mafViewPlot.cpp  				mafViewPlot.h
-  mafViewVTK.cpp  				mafViewVTK.h
+  albaAxes.cpp  					albaAxes.h
+  albaLODActor.cpp  				albaLODActor.h
+  albaLogicWithManagers.cpp  	albaLogicWithManagers.h
+  albaPipe.cpp  					albaPipe.h
+  albaPipeBox.cpp  				albaPipeBox.h
+  albaPipeFactory.cpp  			albaPipeFactory.h
+  albaRWI.cpp  					albaRWI.h
+  albaRWIBase.cpp  				albaRWIBase.h
+  albaSceneGraph.cpp  			albaSceneGraph.h
+  albaSceneNode.cpp  			albaSceneNode.h
+  albaViewCompound.cpp  			albaViewCompound.h
+  albaViewHTML.cpp  				albaViewHTML.h
+  albaViewManager.cpp  			albaViewManager.h
+  albaViewPlot.cpp  				albaViewPlot.h
+  albaViewVTK.cpp  				albaViewVTK.h
   mmaMaterial.cpp  				mmaMaterial.h
   mmaVolumeMaterial.cpp  		mmaVolumeMaterial.h
-  mafGUIContextualMenu.cpp  	mafGUIContextualMenu.h
-  mafGUIMaterialButton.cpp  	mafGUIMaterialButton.h
-  mafGUIMaterialChooser.cpp  	mafGUIMaterialChooser.h
-  mafGUITreeContextualMenu.cpp  mafGUITreeContextualMenu.h
-  vtkMAFAssembly.cpp  vtkMAFAssembly.h
+  albaGUIContextualMenu.cpp  	albaGUIContextualMenu.h
+  albaGUIMaterialButton.cpp  	albaGUIMaterialButton.h
+  albaGUIMaterialChooser.cpp  	albaGUIMaterialChooser.h
+  albaGUITreeContextualMenu.cpp  albaGUITreeContextualMenu.h
+  vtkALBAAssembly.cpp  vtkALBAAssembly.h
   )
-ENDIF (MAF_USE_VTK)
+ENDIF (ALBA_USE_VTK)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafBase mafIO mafGui mafInteraction mafOperations curl)
+SET(PROJECT_LIBS albaBase albaIO albaGui albaInteraction albaOperations curl)
 
-IF (MAF_USE_VTK)
+IF (ALBA_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)
-ENDIF (MAF_USE_VTK)
+ENDIF (ALBA_USE_VTK)
 
 # ------------------------------------
 # Find GTK include Dirs 
-# as required by mafRWIBase
+# as required by albaRWIBase
 # ------------------------------------
 #INCLUDE_DIRECTORIES(/usr/include/gtk-2.0 /usr/lib/gtk-2.0/include /usr/include/atk-1.0 /usr/X11R6/include /usr/include/glib-2.0 #/usr/lib/glib-2.0/include /usr/include/pango-1.0 /usr/include/freetype2 /usr/include/freetype2/config )
 
 IF (NOT WIN32)
-  INCLUDE (${MAF_SOURCE_DIR}/modules/FindGTK2.cmake)
+  INCLUDE (${ALBA_SOURCE_DIR}/modules/FindGTK2.cmake)
   INCLUDE_DIRECTORIES(${GTK_INCLUDE_DIRECTORIES})
 ENDIF (NOT WIN32)
 
@@ -91,20 +91,20 @@ ENDIF (NOT WIN32)
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 
-IF (MAF_USE_VTK)
+IF (ALBA_USE_VTK)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_VTK_LIBRARY)
-ENDIF (MAF_USE_VTK)
+ENDIF (ALBA_USE_VTK)
 
-IF (MAF_USE_WX)
+IF (ALBA_USE_WX)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
-ENDIF (MAF_USE_WX)
+ENDIF (ALBA_USE_WX)
 
-IF (MAF_USE_CRYPTO)
+IF (ALBA_USE_CRYPTO)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_CRYPTO_LIBRARY)
-ENDIF (MAF_USE_CRYPTO)
+ENDIF (ALBA_USE_CRYPTO)
 
-IF (MAF_USE_CURL)
+IF (ALBA_USE_CURL)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_CURL_LIBRARY)
-ENDIF (MAF_USE_CURL)
+ENDIF (ALBA_USE_CURL)
 
-ADD_DEPENDENCIES(${PROJECT_NAME} mafService)
+ADD_DEPENDENCIES(${PROJECT_NAME} albaService)

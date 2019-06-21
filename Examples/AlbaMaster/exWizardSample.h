@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   AlbaMaster
-Module:    mafOpInteractionOp.h
+Module:    albaOpInteractionOp.h
 Language:  C++
 Date:      $Date: 2018-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -19,24 +19,24 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafWizard.h"
+#include "albaWizard.h"
 
 //----------------------------------------------------------------------------
 // Forward Refs:
 //----------------------------------------------------------------------------
-class mafVME;
-class mafVMEGizmo;
+class albaVME;
+class albaVMEGizmo;
 class mmiCompositorMouse;
 
 // ============================================================================
-class exWizardSample : public mafWizard
+class exWizardSample : public albaWizard
 {
 public:
   /** Default constructor */
   exWizardSample(const wxString &label);
   
   /** Accept function*/
-  virtual bool Accept(mafVME* vme);
+  virtual bool Accept(albaVME* vme);
 };
 #endif // __exWizardSample_H__
 

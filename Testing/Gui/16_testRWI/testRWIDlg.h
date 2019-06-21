@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testRWIDlg
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -19,10 +19,10 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "wx/dialog.h"
-#include "mafGUIDialog.h"
+#include "albaGUIDialog.h"
 
-#include "mafRWIBase.h"
-#include "mafRWI.h"
+#include "albaRWIBase.h"
+#include "albaRWI.h"
 #include "vtkPolyData.h"
 #include "vtkConeSource.h"
 #include "vtkPolyDataMapper.h"
@@ -35,7 +35,7 @@
 /**
 sample showing the usage of RWIBase
 */
-class testRWIDlg : public mafGUIDialog
+class testRWIDlg : public albaGUIDialog
 {
 public:
 	testRWIDlg (const wxString& title);
@@ -44,6 +44,6 @@ protected:
   vtkConeSource *CS;
   vtkPolyDataMapper *PDM;
   vtkActor *A;
-  mafRWI *RWI;
+  albaRWI *RWI;
 };
 #endif

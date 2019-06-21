@@ -6,7 +6,7 @@ import sys
 import time
 
 if(len(sys.argv) != 2):
-  print "Usage: findCandidatesClasses.py MAF | MED"
+  print "Usage: findCandidatesClasses.py ALBA | MED"
   sys.exit(-1)
 
 framework = sys.argv[1]
@@ -16,12 +16,12 @@ framework = sys.argv[1]
 classDir = sys.path[0] + "\.."
 resultsDir = sys.path[0] 
 
-# if(framework == "MAF"):
-  # classDir = classDir + "\openMAF"
+# if(framework == "ALBA"):
+  # classDir = classDir + "\ALBA"
 # elif(framework == "MED"):
   # classDir = classDir + "\Medical"
 # else:
-  # print "Usage: findCandidatesClasses.py MAF | MED"
+  # print "Usage: findCandidatesClasses.py ALBA | MED"
   # sys.exit(-1)
 
 nTLOC = 0 # Source Line Of Code
@@ -40,7 +40,7 @@ resultFile = open(resultsDir + "/comments_" + framework + ".txt","w+")
 for dirPath,dirName,fileName in os.walk(classDir):
 
   dirName = os.path.basename(dirPath)
-  if((dirName != "Base" and dirName != "Core" and dirName != "Gui" and dirName != "Interaction" and dirName != "Operations" and dirName != "VME" and dirName != "DataPipe" and dirName != "vtkMAF" and dirName != "vtkMED" and (dirName != "Common" or framework == "MAF") and dirName != "Views" and dirName != "DataPipes") or dirPath.find("Testing") != -1):
+  if((dirName != "Base" and dirName != "Core" and dirName != "Gui" and dirName != "Interaction" and dirName != "Operations" and dirName != "VME" and dirName != "DataPipe" and dirName != "vtkALBA" and dirName != "vtkMED" and (dirName != "Common" or framework == "ALBA") and dirName != "Views" and dirName != "DataPipes") or dirPath.find("Testing") != -1):
     continue
   filesNames = os.listdir(dirPath)
   resultFile.write("\n" + os.path.basename(dirPath) + "\n")

@@ -37,7 +37,7 @@
   intTotalLeak = 0
 
   ' Path in which create projects; executables are located here (parabuil dependent)  
-  ' Parabuild active directory is the downloaded CVS module name for example OpenMAF
+  ' Parabuild active directory is the downloaded CVS module name for example ALBA
   
   i = 1
   
@@ -72,13 +72,13 @@
     '-----------------------------------------------------------------------------
     ' executed tests name pattern 
     '-----------------------------------------------------------------------------
-    ' Works with files beginning with "maf" ending with "Test.exe" files only
+    ' Works with files beginning with "alba" ending with "Test.exe" files only
     ' only tests matching this pattern are executed
     ' is you need to modify this behavior modify the next line
     
     ' Names pattern examples:
-    ' pattern to test all maf*Test.exe files
-    ' If  Left(exeFileName, 3) = "maf" And Right(ExeFile, 8) = "Test.exe" Then 
+    ' pattern to test all alba*Test.exe files
+    ' If  Left(exeFileName, 3) = "alba" And Right(ExeFile, 8) = "Test.exe" Then 
     
     ' CURRENT ACTIVE TEST NAME PATTERN
     ' pattern to test all *.exe files

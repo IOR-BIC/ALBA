@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmaMaterial
  Authors: Paolo Quadrani
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,9 +15,9 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -29,17 +29,17 @@
 #include <wx/settings.h>
 
 #include "mmaMaterial.h"
-#include "mafDecl.h"
-#include "mafEvent.h"
-#include "mafGUILutPreset.h"
+#include "albaDecl.h"
+#include "albaEvent.h"
+#include "albaGUILutPreset.h"
 
-#include "mafStorageElement.h"
-#include "mafIndent.h"
-#include "mafVME.h"
+#include "albaStorageElement.h"
+#include "albaIndent.h"
+#include "albaVME.h"
 
-#include "vtkMAFSmartPointer.h"
+#include "vtkALBASmartPointer.h"
 #include "vtkProperty.h"
-#include "vtkMAFTransferFunction2D.h"
+#include "vtkALBATransferFunction2D.h"
 #include "vtkTexturedSphereSource.h"
 #include "vtkTexture.h"
 #include "vtkPolyDataMapper.h"
@@ -54,7 +54,7 @@
 #include "vtkLookupTable.h"
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mmaMaterial)
+albaCxxTypeMacro(mmaMaterial)
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -78,7 +78,7 @@ mmaMaterial::mmaMaterial()
   m_Ambient[1]       = 1.0;
   m_Ambient[2]       = 1.0;
   m_AmbientIntensity = 0.0;
-  wxColour color = mafRandomColor();
+  wxColour color = albaRandomColor();
   m_Diffuse[0]       = color.Red()   /255.0;
   m_Diffuse[1]       = color.Green() /255.0;
   m_Diffuse[2]       = color.Blue()  /255.0;
@@ -117,14 +117,14 @@ wxBitmap *mmaMaterial::MakeIcon()
 {
   //UpdateProp();
 
-	vtkMAFSmartPointer<vtkCamera> camera;
+	vtkALBASmartPointer<vtkCamera> camera;
   camera->ParallelProjectionOff();
   camera->SetViewAngle(30);
   camera->SetFocalPoint(0,0,0);
   camera->SetPosition(0,0,2);
   camera->SetViewUp(0,1,0);
 
-	vtkMAFSmartPointer<vtkLight> light;
+	vtkALBASmartPointer<vtkLight> light;
   light->SetPosition(-1,1,1);
 
   wxColour col = wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT);
@@ -132,18 +132,18 @@ wxBitmap *mmaMaterial::MakeIcon()
   float g = col.Green()/ 255.0;
   float b = col.Blue() / 255.0;
   
-	vtkMAFSmartPointer<vtkRenderer> ren;
+	vtkALBASmartPointer<vtkRenderer> ren;
   ren->SetBackground(r,g,b);
 	ren->AddLight(light);
 	ren->LightFollowCameraOff();
 	ren->SetActiveCamera(camera);
 	
-  vtkMAFSmartPointer<vtkRenderWindow> renwin;
+  vtkALBASmartPointer<vtkRenderWindow> renwin;
   renwin->AddRenderer(ren);
   renwin->OffScreenRenderingOn(); 
 	renwin->SetSize(25, 25);
 
-	vtkMAFSmartPointer<vtkTexturedSphereSource> ss;
+	vtkALBASmartPointer<vtkTexturedSphereSource> ss;
 	ss->SetPhiResolution(20);
 	ss->SetThetaResolution(20);
 	if (this->m_Prop->GetRepresentation() == 1)
@@ -157,17 +157,17 @@ wxBitmap *mmaMaterial::MakeIcon()
 		ss->SetPhiResolution(20);
   } 
 	
-	vtkMAFSmartPointer<vtkTexture> texture;
+	vtkALBASmartPointer<vtkTexture> texture;
   if (m_MaterialType == USE_TEXTURE)
   {
     texture->SetInput(m_TextureImage);
   }
   
-  vtkMAFSmartPointer<vtkPolyDataMapper> pdm;
+  vtkALBASmartPointer<vtkPolyDataMapper> pdm;
 	pdm->SetInput(ss->GetOutput());
 	pdm->SetImmediateModeRendering(0);
 
-	vtkMAFSmartPointer<vtkActor> actor;
+	vtkALBASmartPointer<vtkActor> actor;
   actor->SetMapper(pdm);
   if (m_MaterialType == USE_VTK_PROPERTY)
   {
@@ -186,7 +186,7 @@ wxBitmap *mmaMaterial::MakeIcon()
   renwin->Render();
 
   //capture image from renderer
-	vtkMAFSmartPointer<vtkWindowToImageFilter> w2i;
+	vtkALBASmartPointer<vtkWindowToImageFilter> w2i;
 	w2i->SetInput(renwin);
 	w2i->Update();
 
@@ -196,7 +196,7 @@ wxBitmap *mmaMaterial::MakeIcon()
 	unsigned char buffer[25*25*3];
 
   //flip it - windows Bitmap are upside-down
-  vtkMAFSmartPointer<vtkImageExport> ie;
+  vtkALBASmartPointer<vtkImageExport> ie;
 	ie->SetInput(w2i->GetOutput());
   ie->ImageLowerLeftOff();
   ie->SetExportVoidPointer(buffer);
@@ -213,7 +213,7 @@ wxBitmap *mmaMaterial::MakeIcon()
 	return bmp;
 }
 //-------------------------------------------------------------------------
-void mmaMaterial::DeepCopy(const mafAttribute *a)
+void mmaMaterial::DeepCopy(const albaAttribute *a)
 //-------------------------------------------------------------------------
 { 
   Superclass::DeepCopy(a);
@@ -252,7 +252,7 @@ void mmaMaterial::DeepCopy(const mafAttribute *a)
   UpdateProp();
 }
 //----------------------------------------------------------------------------
-bool mmaMaterial::Equals(const mafAttribute *a)
+bool mmaMaterial::Equals(const albaAttribute *a)
 //----------------------------------------------------------------------------
 {
   if (Superclass::Equals(a))
@@ -289,10 +289,10 @@ bool mmaMaterial::Equals(const mafAttribute *a)
   return false;
 }
 //-----------------------------------------------------------------------
-int mmaMaterial::InternalStore(mafStorageElement *parent)
+int mmaMaterial::InternalStore(albaStorageElement *parent)
 //-----------------------------------------------------------------------
 {  
-  if (Superclass::InternalStore(parent)==MAF_OK)
+  if (Superclass::InternalStore(parent)==ALBA_OK)
   {
     // property
     parent->StoreText("MaterialName",m_MaterialName.GetCStr());
@@ -322,7 +322,7 @@ int mmaMaterial::InternalStore(mafStorageElement *parent)
       parent->StoreDouble("TableRange0", m_TableRange[0]);
       parent->StoreDouble("TableRange1", m_TableRange[1]);
       parent->StoreInteger("NumValues", m_NumValues);
-      mafString lutvalues;
+      albaString lutvalues;
       for (int v = 0; v < m_NumValues; v++)
       {
 				lutvalues = "LUT_VALUE_";
@@ -338,15 +338,15 @@ int mmaMaterial::InternalStore(mafStorageElement *parent)
       parent->StoreInteger("TextureMappingMode", m_TextureMappingMode);
     }
     parent->StoreInteger("MaterialType", m_MaterialType);
-    return MAF_OK;
+    return ALBA_OK;
   }
-  return MAF_ERROR;
+  return ALBA_ERROR;
 }
 //----------------------------------------------------------------------------
-int mmaMaterial::InternalRestore(mafStorageElement *node)
+int mmaMaterial::InternalRestore(albaStorageElement *node)
 //----------------------------------------------------------------------------
 {
-  if (Superclass::InternalRestore(node) == MAF_OK)
+  if (Superclass::InternalRestore(node) == ALBA_OK)
   {
     // property
     node->RestoreText("MaterialName",m_MaterialName);
@@ -378,7 +378,7 @@ int mmaMaterial::InternalRestore(mafStorageElement *node)
       node->RestoreDouble("TableRange1", m_TableRange[1]);
       node->RestoreInteger("NumValues", m_NumValues);
       m_ColorLut->SetNumberOfTableValues(m_NumValues);
-      mafString lutvalues;
+      albaString lutvalues;
       double rgba[4];
       for (int v = 0; v < m_NumValues; v++)
       {
@@ -395,9 +395,9 @@ int mmaMaterial::InternalRestore(mafStorageElement *node)
       node->RestoreInteger("TextureMappingMode", m_TextureMappingMode);
     }
     UpdateProp();
-    return MAF_OK;
+    return ALBA_OK;
   }
-  return MAF_ERROR;
+  return ALBA_ERROR;
 }
 //-----------------------------------------------------------------------
 void mmaMaterial::UpdateProp()
@@ -460,5 +460,5 @@ void mmaMaterial::Print(std::ostream& os, const int tabs) const
 //-----------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);
-  mafIndent indent(tabs);
+  albaIndent indent(tabs);
 }

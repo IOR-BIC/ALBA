@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testGuiLogic
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -18,29 +18,29 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafEvent.h"
-#include "mafObserver.h"
+#include "albaEvent.h"
+#include "albaObserver.h"
 //----------------------------------------------------------------------------
 // Forward References:
 //----------------------------------------------------------------------------
-//class mafGUIMDIFrame;
-class mafGUIFrame;
+//class albaGUIMDIFrame;
+class albaGUIFrame;
 class testGui
   ;
 
 // ============================================================================
-class testGuiLogic : public mafObserver
+class testGuiLogic : public albaObserver
 // ============================================================================
 {
 public:
                 testGuiLogic();
   virtual      ~testGuiLogic(); 
-  virtual void  OnEvent(mafEventBase *maf_event);
+  virtual void  OnEvent(albaEventBase *alba_event);
           void  Show(); 
           void  OnQuit();
       wxWindow* GetTopWin();
 protected:
- mafGUIFrame      *m_win;
+ albaGUIFrame      *m_win;
  testGui       *m_testGui;
 };
 

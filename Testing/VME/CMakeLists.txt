@@ -1,89 +1,89 @@
-PROJECT (mafVME_TEST)
+PROJECT (albaVME_TEST)
 
-IF(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafDLL)
-ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafTests mafVME mafVisualPipes mafDataPipes GPUAPI vtkRendering vtkGraphics mafService) # mafCommon mafOperations)
-ENDIF (MAF_BUILD_MAFDLL)
+IF(ALBA_BUILD_ALBADLL)
+  LINK_LIBRARIES(albaDLL)
+ELSE(ALBA_BUILD_ALBADLL)
+  LINK_LIBRARIES(albaTests albaVME albaVisualPipes albaDataPipes GPUAPI vtkRendering vtkGraphics albaService) # albaCommon albaOperations)
+ENDIF (ALBA_BUILD_ALBADLL)
  
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------
 SET(PROJECT_SRCS 
-	mafVMETests.h mafVMETests.cpp
-	mafVMEExternalDataTest.h mafVMEExternalDataTest.cpp
-	mafVMEVolumeGrayTest.h mafVMEVolumeGrayTest.cpp
-	mafVMESurfaceParametricTest.h mafVMESurfaceParametricTest.cpp
-	mafVMESurfaceTest.h mafVMESurfaceTest.cpp
-	mafVMEGroupTest.h mafVMEGroupTest.cpp
-	mafVMEGizmoTest.h mafVMEGizmoTest.cpp
-	mafVMEScalarMatrixTest.h mafVMEScalarMatrixTest.cpp
-	mafVMEScalarTest.h mafVMEScalarTest.cpp
-	mafVMEPolylineTest.h mafVMEPolylineTest.cpp
-	mafVMEPolylineSplineTest.h mafVMEPolylineSplineTest.cpp
-	mafVMEMeshTest.h mafVMEMeshTest.cpp
-	mafVMELandmarkTest.h mafVMELandmarkTest.cpp
-	mafVMELandmarkCloudTest.h mafVMELandmarkCloudTest.cpp
-	mafMatrixVectorTest.h mafMatrixVectorTest.cpp
-	mafVMEFactoryTest.h mafVMEFactoryTest.cpp
-	mafDataVectorTest.h mafDataVectorTest.cpp
-	mafVMEItemVTKTest.h mafVMEItemVTKTest.cpp
-	mafVMEImageTest.h mafVMEImageTest.cpp
-	mafVMEVolumeRGBTest.h mafVMEVolumeRGBTest.cpp
-	mafVMEInfoTextTest.h mafVMEInfoTextTest.cpp
+	albaVMETests.h albaVMETests.cpp
+	albaVMEExternalDataTest.h albaVMEExternalDataTest.cpp
+	albaVMEVolumeGrayTest.h albaVMEVolumeGrayTest.cpp
+	albaVMESurfaceParametricTest.h albaVMESurfaceParametricTest.cpp
+	albaVMESurfaceTest.h albaVMESurfaceTest.cpp
+	albaVMEGroupTest.h albaVMEGroupTest.cpp
+	albaVMEGizmoTest.h albaVMEGizmoTest.cpp
+	albaVMEScalarMatrixTest.h albaVMEScalarMatrixTest.cpp
+	albaVMEScalarTest.h albaVMEScalarTest.cpp
+	albaVMEPolylineTest.h albaVMEPolylineTest.cpp
+	albaVMEPolylineSplineTest.h albaVMEPolylineSplineTest.cpp
+	albaVMEMeshTest.h albaVMEMeshTest.cpp
+	albaVMELandmarkTest.h albaVMELandmarkTest.cpp
+	albaVMELandmarkCloudTest.h albaVMELandmarkCloudTest.cpp
+	albaMatrixVectorTest.h albaMatrixVectorTest.cpp
+	albaVMEFactoryTest.h albaVMEFactoryTest.cpp
+	albaDataVectorTest.h albaDataVectorTest.cpp
+	albaVMEItemVTKTest.h albaVMEItemVTKTest.cpp
+	albaVMEImageTest.h albaVMEImageTest.cpp
+	albaVMEVolumeRGBTest.h albaVMEVolumeRGBTest.cpp
+	albaVMEInfoTextTest.h albaVMEInfoTextTest.cpp
 	mmaMeterTest.h mmaMeterTest.cpp
-	mafVMEOutputMeterTest.h mafVMEOutputMeterTest.cpp
-	mafVMEPointSetTest.h mafVMEPointSetTest.cpp
-	mafVMEVectorTest.h mafVMEVectorTest.cpp
-	mafVMEOutputPolylineTest.h mafVMEOutputPolylineTest.cpp
-	mafVMEOutputSurfaceTest.h mafVMEOutputSurfaceTest.cpp
-	mafVMEOutputPointSetTest.h mafVMEOutputPointSetTest.cpp
-	mafVMEOutputScalarTest.h mafVMEOutputScalarTest.cpp
-	mafVMEOutputLandmarkCloudTest.h mafVMEOutputLandmarkCloudTest.cpp
-	mafVMEOutputScalarMatrixTest.h mafVMEOutputScalarMatrixTest.cpp
-	mafVMEOutputMeshTest.h mafVMEOutputMeshTest.cpp
-	mafVMEOutputImageTest.h mafVMEOutputImageTest.cpp
-	mafVMEOutputVolumeTest.h mafVMEOutputVolumeTest.cpp
-	mafCryptTest.h mafCryptTest.cpp
-	mafMatrixInterpolatorTest.h mafMatrixInterpolatorTest.cpp
-	mafVMEGenericTest.h mafVMEGenericTest.cpp
-	mafVMEOutputVTKTest.h mafVMEOutputVTKTest.cpp
-	mafVMEItemScalarMatrixTest.h mafVMEItemScalarMatrixTest.cpp
-	mafScalarVectorTest.h mafScalarVectorTest.cpp
-	mafVMEGenericAbstractTest.h mafVMEGenericAbstractTest.cpp
-	mafVMEItemTest.h mafVMEItemTest.cpp
-	mafVMERefSysTest.h mafVMERefSysTest.cpp
-	mafVMEProberTest.h mafVMEProberTest.cpp
-	mafVMEMeterTest.h mafVMEMeterTest.cpp
-	mafMSFImporterTest.h mafMSFImporterTest.cpp
-	mafVMESlicerTest.h mafVMESlicerTest.cpp
-	mafVMERawMotionDataTest.h mafVMERawMotionDataTest.cpp
-	mafPolylineGraphTest.h mafPolylineGraphTest.cpp
-	mafVMEWrappedMeterTest.h mafVMEWrappedMeterTest.cpp
-	mafVMELabeledVolumeTest.h mafVMELabeledVolumeTest.cpp
-	mafVMEAnalogTest.h mafVMEAnalogTest.cpp
-	mafVMEOutputSurfaceEditorTest.h mafVMEOutputSurfaceEditorTest.cpp
-	mafVMEOutputPolylineEditorTest.h mafVMEOutputPolylineEditorTest.cpp
-	mafVMESurfaceEditorTest.h mafVMESurfaceEditorTest.cpp
-	mafVMEPolylineEditorTest.h mafVMEPolylineEditorTest.cpp
-	mafVMEMapsTest.h mafVMEMapsTest.cpp
-	mafVMEOutputWrappedMeterTest.h mafVMEOutputWrappedMeterTest.cpp
-	mafVMEPolylineGraphTest.h mafVMEPolylineGraphTest.cpp
-	mafVMESegmentationVolumeTest.h mafVMESegmentationVolumeTest.cpp
-	mafAttributeSegmentationVolumeTest.h mafAttributeSegmentationVolumeTest.cpp
-	mafVMEOutputComputeWrappingTest.h mafVMEOutputComputeWrappingTest.cpp
-	mafPolylineGraphVertexTest.h mafPolylineGraphVertexTest.cpp
-	mafPolylineGraphEdgeTest.h mafPolylineGraphEdgeTest.cpp
-	mafPolylineGraphBranchTest.h mafPolylineGraphBranchTest.cpp
-	mafDataPipeCustomSegmentationVolumeTest.h mafDataPipeCustomSegmentationVolumeTest.cpp
+	albaVMEOutputMeterTest.h albaVMEOutputMeterTest.cpp
+	albaVMEPointSetTest.h albaVMEPointSetTest.cpp
+	albaVMEVectorTest.h albaVMEVectorTest.cpp
+	albaVMEOutputPolylineTest.h albaVMEOutputPolylineTest.cpp
+	albaVMEOutputSurfaceTest.h albaVMEOutputSurfaceTest.cpp
+	albaVMEOutputPointSetTest.h albaVMEOutputPointSetTest.cpp
+	albaVMEOutputScalarTest.h albaVMEOutputScalarTest.cpp
+	albaVMEOutputLandmarkCloudTest.h albaVMEOutputLandmarkCloudTest.cpp
+	albaVMEOutputScalarMatrixTest.h albaVMEOutputScalarMatrixTest.cpp
+	albaVMEOutputMeshTest.h albaVMEOutputMeshTest.cpp
+	albaVMEOutputImageTest.h albaVMEOutputImageTest.cpp
+	albaVMEOutputVolumeTest.h albaVMEOutputVolumeTest.cpp
+	albaCryptTest.h albaCryptTest.cpp
+	albaMatrixInterpolatorTest.h albaMatrixInterpolatorTest.cpp
+	albaVMEGenericTest.h albaVMEGenericTest.cpp
+	albaVMEOutputVTKTest.h albaVMEOutputVTKTest.cpp
+	albaVMEItemScalarMatrixTest.h albaVMEItemScalarMatrixTest.cpp
+	albaScalarVectorTest.h albaScalarVectorTest.cpp
+	albaVMEGenericAbstractTest.h albaVMEGenericAbstractTest.cpp
+	albaVMEItemTest.h albaVMEItemTest.cpp
+	albaVMERefSysTest.h albaVMERefSysTest.cpp
+	albaVMEProberTest.h albaVMEProberTest.cpp
+	albaVMEMeterTest.h albaVMEMeterTest.cpp
+	albaMSFImporterTest.h albaMSFImporterTest.cpp
+	albaVMESlicerTest.h albaVMESlicerTest.cpp
+	albaVMERawMotionDataTest.h albaVMERawMotionDataTest.cpp
+	albaPolylineGraphTest.h albaPolylineGraphTest.cpp
+	albaVMEWrappedMeterTest.h albaVMEWrappedMeterTest.cpp
+	albaVMELabeledVolumeTest.h albaVMELabeledVolumeTest.cpp
+	albaVMEAnalogTest.h albaVMEAnalogTest.cpp
+	albaVMEOutputSurfaceEditorTest.h albaVMEOutputSurfaceEditorTest.cpp
+	albaVMEOutputPolylineEditorTest.h albaVMEOutputPolylineEditorTest.cpp
+	albaVMESurfaceEditorTest.h albaVMESurfaceEditorTest.cpp
+	albaVMEPolylineEditorTest.h albaVMEPolylineEditorTest.cpp
+	albaVMEMapsTest.h albaVMEMapsTest.cpp
+	albaVMEOutputWrappedMeterTest.h albaVMEOutputWrappedMeterTest.cpp
+	albaVMEPolylineGraphTest.h albaVMEPolylineGraphTest.cpp
+	albaVMESegmentationVolumeTest.h albaVMESegmentationVolumeTest.cpp
+	albaAttributeSegmentationVolumeTest.h albaAttributeSegmentationVolumeTest.cpp
+	albaVMEOutputComputeWrappingTest.h albaVMEOutputComputeWrappingTest.cpp
+	albaPolylineGraphVertexTest.h albaPolylineGraphVertexTest.cpp
+	albaPolylineGraphEdgeTest.h albaPolylineGraphEdgeTest.cpp
+	albaPolylineGraphBranchTest.h albaPolylineGraphBranchTest.cpp
+	albaDataPipeCustomSegmentationVolumeTest.h albaDataPipeCustomSegmentationVolumeTest.cpp
 	VMEGenericPoseTest.h VMEGenericPoseTest.cpp
 	VMEGenericBoundsTest.h VMEGenericBoundsTest.cpp
 	CustomDataPipeTest.h CustomDataPipeTest.cpp
 	VMEGenericTest.h VMEGenericTest.cpp
 )
 
-ADD_EXECUTABLE(mafVMETests ${PROJECT_SRCS})
-ADD_TEST(mafVMETests  ${EXECUTABLE_OUTPUT_PATH}/mafVMETests)
+ADD_EXECUTABLE(albaVMETests ${PROJECT_SRCS})
+ADD_TEST(albaVMETests  ${EXECUTABLE_OUTPUT_PATH}/albaVMETests)
 IF (WIN32)
-  SET_TARGET_PROPERTIES(mafVMETests PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(albaVMETests PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)

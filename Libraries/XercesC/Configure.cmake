@@ -1,5 +1,5 @@
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
 # Date:      $Date: 2011-05-18 07:20:15 $
@@ -15,7 +15,7 @@
 INCLUDE (${MFL_SOURCE_DIR}/modules/PackagesMacro.cmake)
 INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 
-# this is to build XercesC inside the MAF tree
+# this is to build XercesC inside the ALBA tree
 IF (EXISTS "${XercesC_SOURCE_DIR}/Sources")   
   SET (XercesC_SOURCE_PATH "${XercesC_SOURCE_DIR}/Sources")
 ENDIF (EXISTS "${XercesC_SOURCE_DIR}/Sources")
@@ -53,7 +53,7 @@ IF (XercesC_SOURCE_PATH)
     # Run configuration of XercesC library
     MESSAGE(STATUS "XercesC: Configuring external XercesC project")
     EXEC_PROGRAM(${CMAKE_COMMAND} "${XercesC_BINARY_PATH}" ARGS "${XercesC_SOURCE_PATH}" -G"${CMAKE_GENERATOR}" -DLIBRARY_OUTPUT_PATH:PATH="${LIBRARY_OUTPUT_PATH}" -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-    -DEXECUTABLE_OUTPUT_PATH:PATH="${EXECUTABLE_OUTPUT_PATH}" -DBUILD_SHARED_LIBS:BOOL=${MAF_BUILD_MAFDLL}
+    -DEXECUTABLE_OUTPUT_PATH:PATH="${EXECUTABLE_OUTPUT_PATH}" -DBUILD_SHARED_LIBS:BOOL=${ALBA_BUILD_ALBADLL}
      OUTPUT_VARIABLE CMAKE_OUTPUT RETURN_VALUE CMAKE_RETURN)
     
     # write configure log file

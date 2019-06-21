@@ -1,12 +1,12 @@
 #
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: FindSSL.cmake,v $
 # Language:  CMake 2.0
 # Date:      $Date: 2007-01-23 13:34:36 $
 # Version:   $Revision: 1.5 $
 #
-# Description: Find the OpenSSL location, Include headers and link libraries to MAF Project
+# Description: Find the OpenSSL location, Include headers and link libraries to ALBA Project
 # This module defines:
 # SSL_INCULDE_DIR, where to find ".h"
 # SSL_LIBRARIES, the librery to link

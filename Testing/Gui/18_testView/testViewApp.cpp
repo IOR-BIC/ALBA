@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testViewApp
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,9 +15,9 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -25,19 +25,19 @@
 
 
 #include "testViewApp.h"
-#include "mafVMEFactory.h"
-#include "mafPics.h"
-#include "mafGUIMDIFrame.h"
+#include "albaVMEFactory.h"
+#include "albaPics.h"
+#include "albaGUIMDIFrame.h"
 
-#include "mafNodeFactory.h"
-#include "mafNodeGeneric.h"
-#include "mafNodeRoot.h"
-#include "mafVMERoot.h"
-#include "mafVMESurface.h"
-#include "mafPipeFactory.h"
+#include "albaNodeFactory.h"
+#include "albaNodeGeneric.h"
+#include "albaNodeRoot.h"
+#include "albaVMERoot.h"
+#include "albaVMESurface.h"
+#include "albaPipeFactory.h"
 
-#include "mafOpCreateVmeSurface.h"
-#include "mafViewVTK.h"
+#include "albaOpCreateVmeSurface.h"
+#include "albaViewVTK.h"
 #include "testView.h"
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -48,16 +48,16 @@ IMPLEMENT_APP(testViewApp)
 bool testViewApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-  mafPics.Initialize();	
+  albaPics.Initialize();	
 
-  int result = mafVMEFactory::Initialize();
-  assert(result==MAF_OK);
+  int result = albaVMEFactory::Initialize();
+  assert(result==ALBA_OK);
   
   // Inizializzazione e Fill della PipeFactory -- potrebbe essere un SideEffect del Plug dei Nodi
-  result = mafPipeFactory::Initialize();
-  assert(result==MAF_OK);
+  result = albaPipeFactory::Initialize();
+  assert(result==ALBA_OK);
 
-  m_logic = new mafLogicWithManagers();
+  m_logic = new albaLogicWithManagers();
   //m_logic->PlugTimebar(false);
   //m_logic->PlugMenu(false);
   //m_logic->PlugToolbar(false);
@@ -69,12 +69,12 @@ bool testViewApp::OnInit()
   m_logic->Configure();
 
   m_logic->GetTopWin()->SetTitle("testView");
-  SetTopWindow(mafGetFrame());  
+  SetTopWindow(albaGetFrame());  
 
-  m_logic->Plug(new mafOpCreateVmeSurface("Add Vme Surface \tCtrl+A"));
+  m_logic->Plug(new albaOpCreateVmeSurface("Add Vme Surface \tCtrl+A"));
   //m_logic->Plug(new testView("testView"));
   testView *tv = new testView("testView");
-  tv->PlugVisualPipe("mafVMESurface", "mafPipeSurface");
+  tv->PlugVisualPipe("albaVMESurface", "albaPipeSurface");
   m_logic->Plug(tv);
 
   m_logic->Show();

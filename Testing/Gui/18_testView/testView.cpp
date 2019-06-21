@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testView
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,21 +15,21 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
 #include "testView.h"
-#include "mafVME.h"
-#include "mafPipe.h"
-#include "mafPipeFactory.h"
+#include "albaVME.h"
+#include "albaPipe.h"
+#include "albaPipeFactory.h"
 
 //----------------------------------------------------------------------------
-mafView *testView::Copy(mafObserver *Listener)
+albaView *testView::Copy(albaObserver *Listener)
 //----------------------------------------------------------------------------
 {
   testView *v = new testView(m_Label);
@@ -38,37 +38,37 @@ mafView *testView::Copy(mafObserver *Listener)
   return v;
 }
 //----------------------------------------------------------------------------
-int testView::GetNodeStatus(mafNode *vme)
+int testView::GetNodeStatus(albaNode *vme)
 //----------------------------------------------------------------------------
 {
   assert(m_Sg);
-  mafSceneNode *n = m_Sg->Vme2Node(vme);
+  albaSceneNode *n = m_Sg->Vme2Node(vme);
   assert(n);
 
-  if(!vme->IsA("mafVME"))
+  if(!vme->IsA("albaVME"))
     return NODE_NON_VISIBLE;
 
-  mafVME *v = ((mafVME*)vme);
+  albaVME *v = ((albaVME*)vme);
   if( v->GetVisualPipe() == "" )  
     return NODE_NON_VISIBLE;
   else
     return (n->IsVisible()) ? NODE_VISIBLE_ON :  NODE_VISIBLE_OFF;
 }
 //----------------------------------------------------------------------------
-void testView::VmeCreatePipe(mafNode *vme)
+void testView::VmeCreatePipe(albaNode *vme)
 //----------------------------------------------------------------------------
 {
-  mafSceneNode *n = m_Sg->Vme2Node(vme);
+  albaSceneNode *n = m_Sg->Vme2Node(vme);
   assert(n && !n->m_Pipe);
-  assert(vme->IsA("mafVME"));
-  mafVME *v = ((mafVME*)vme);
+  assert(vme->IsA("albaVME"));
+  albaVME *v = ((albaVME*)vme);
 
-  mafObject *obj= NULL;
-  mafString pipe_name = "";
-  mafString vme_type = v->GetTypeName(); // Paolo 2005-04-23 Just to try PlugVisualPipe 
+  albaObject *obj= NULL;
+  albaString pipe_name = "";
+  albaString vme_type = v->GetTypeName(); // Paolo 2005-04-23 Just to try PlugVisualPipe 
                                         // (to be replaced with something that extract the type of the vme)
 
-  mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
+  albaPipeFactory *pipe_factory  = albaPipeFactory::GetInstance();
   assert(pipe_factory!=NULL);
   if (!m_PipeMap.empty() && (m_PipeMap[vme_type].m_Visibility == NODE_VISIBLE_ON))  // Paolo 2005-04-23
   {
@@ -83,17 +83,17 @@ void testView::VmeCreatePipe(mafNode *vme)
     obj = pipe_factory->CreateInstance(pipe_name);
     assert(obj);
   }
-  mafPipe *pipe = (mafPipe*)obj;
+  albaPipe *pipe = (albaPipe*)obj;
   
   pipe->Create(n);
 
-  n->m_Pipe = (mafPipe*)pipe;
+  n->m_Pipe = (albaPipe*)pipe;
 }
 //----------------------------------------------------------------------------
-void testView::VmeDeletePipe(mafNode *vme)
+void testView::VmeDeletePipe(albaNode *vme)
 //----------------------------------------------------------------------------
 {
-  mafSceneNode *n = m_Sg->Vme2Node(vme);
+  albaSceneNode *n = m_Sg->Vme2Node(vme);
   assert(n && n->m_Pipe);
   cppDEL(n->m_Pipe);
 }

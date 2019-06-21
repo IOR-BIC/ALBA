@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmoTest
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -14,9 +14,9 @@
 
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -24,13 +24,13 @@
 
 
 #include "mmoTest.h"
-#include "mafGUIGui.h"
+#include "albaGUIGui.h"
 
 const int ID = MINID;
 
 //----------------------------------------------------------------------------
 mmoTest::mmoTest(wxString label)
-: mafOp(label)
+: albaOp(label)
 //----------------------------------------------------------------------------
 {
   m_s1	= "abcdefghilmnop";   // try use string with spaces -- weird things happens
@@ -46,15 +46,15 @@ mmoTest::~mmoTest()
 {
 }
 //----------------------------------------------------------------------------
-mafOp* mmoTest::Copy()
+albaOp* mmoTest::Copy()
 //----------------------------------------------------------------------------
 {
   return new mmoTest(m_Label);
 }
 //----------------------------------------------------------------------------
-void mmoTest::OpStop(int result) {	HideGui();mafEventMacro(mafEvent(this,result));}
+void mmoTest::OpStop(int result) {	HideGui();albaEventMacro(albaEvent(this,result));}
 //----------------------------------------------------------------------------
-void mmoTest::OnEvent(mafEvent& e)
+void mmoTest::OnEvent(albaEvent& e)
 //----------------------------------------------------------------------------
 {
   switch(e.GetId())
@@ -66,7 +66,7 @@ void mmoTest::OnEvent(mafEvent& e)
     OpStop(OP_RUN_CANCEL);
     break;
   default:
-    mafEventMacro(e); 
+    albaEventMacro(e); 
     break;
   }  
 }
@@ -81,18 +81,18 @@ void mmoTest::OpRun()
   choices[2] = "qua";
 
 
-  m_Gui = new mafGUIGui(this);
+  m_Gui = new albaGUIGui(this);
   m_Gui->SetListener(this);
 
   m_Gui->Label("label");
-  m_Gui->Label("label1",mafString("label2")) ;
+  m_Gui->Label("label1",albaString("label2")) ;
   m_Gui->Divider();
   m_Gui->Divider(1);
   m_Gui->Divider(2);
   m_Gui->Divider(3);
 
   m_Gui->Button  (ID,"button");
-  m_Gui->Button  (ID,"button",mafString("label"));
+  m_Gui->Button  (ID,"button",albaString("label"));
 
   m_Gui->Vector  (ID, "i vector", m_iv);
   m_Gui->Vector  (ID, "f vector", m_fv);

@@ -1,5 +1,5 @@
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: FindVCollide.cmake.in,v $
 # Language:  CMake 1.2
 # Date:      $Date: 2004-08-25 13:44:27 $
@@ -55,7 +55,7 @@ IF (MFL_SOURCE_PATH)
   
 ELSE (MFL_SOURCE_PATH)
   MESSAGE ("UseVCollide: Searching VCollide outside MFL source tree not supported.")
-  # If not built within MAF project try standard places
+  # If not built within ALBA project try standard places
   FIND_PATH(VCOLLIDE_BINARY_PATH UseVCollide.cmake
       [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild1]
       [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild2]

@@ -2,102 +2,102 @@
 # Copyright and description to be placed here
 #
 
-PROJECT(mafGui)
-DBG_MESSAGE("Configuring project mafCore")
+PROJECT(albaGui)
+DBG_MESSAGE("Configuring project albaCore")
 
-CONFIGURE_FILE("${MAF_SOURCE_DIR}/Gui/manifest.in" "${MAF_BINARY_DIR}/Gui/manifest.in" COPYONLY)
+CONFIGURE_FILE("${ALBA_SOURCE_DIR}/Gui/manifest.in" "${ALBA_BINARY_DIR}/Gui/manifest.in" COPYONLY)
 
 SET(PROJECT_SRCS
-  mafEvent.cpp  mafEvent.h
-  mafGUIDialogFindVme.cpp  mafGUIDialogFindVme.h
-  mafGUIDialogLogin.cpp  mafGUIDialogLogin.h
+  albaEvent.cpp  albaEvent.h
+  albaGUIDialogFindVme.cpp  albaGUIDialogFindVme.h
+  albaGUIDialogLogin.cpp  albaGUIDialogLogin.h
   
-  mafGUIDialogTransferFunction2D.cpp  mafGUIDialogTransferFunction2D.h
-  mafTransferFunction2DInteractors.cpp
+  albaGUIDialogTransferFunction2D.cpp  albaGUIDialogTransferFunction2D.h
+  albaTransferFunction2DInteractors.cpp
   
-  mafGUISettings.cpp  mafGUISettings.h
-  mafGUISettingsTimeBar.cpp  mafGUISettingsTimeBar.h
+  albaGUISettings.cpp  albaGUISettings.h
+  albaGUISettingsTimeBar.cpp  albaGUISettingsTimeBar.h
   
-  mafPics.cpp  						mafPics.h
-  mafWXLog.cpp  					mafWXLog.h
-  mafGUIApplicationSettings.cpp  	mafGUIApplicationSettings.h
-  mafGUIButton.cpp  				mafGUIButton.h
-  mafGUICheckListBox.cpp  			mafGUICheckListBox.h
-  mafGUICheckTree.cpp  				mafGUICheckTree.h
-  mafGUIColorSwatch.cpp  			mafGUIColorSwatch.h
-  mafGUIColorWidget.cpp  			mafGUIColorWidget.h
-  mafGUICrossSplitter.cpp  			mafGUICrossSplitter.h
-  mafGUIDialog.cpp  				mafGUIDialog.h
-  mafGUIDockManager.cpp  			mafGUIDockManager.h
-  mafGUIFileHistory.cpp  			mafGUIFileHistory.h
-  mafGUIFlagSplitter.cpp  			mafGUIFlagSplitter.h
-  mafGUIFloatSlider.cpp  			mafGUIFloatSlider.h
-  mafGUIFrame.cpp  					mafGUIFrame.h
-  mafGUI.cpp  						mafGUI.h
-  mafGUIHolder.cpp  				mafGUIHolder.h
-  mafGUILab.cpp  					mafGUILab.h
-  mafGUIListBox.cpp  				mafGUIListBox.h
-  mafGUIListCtrl.cpp  				mafGUIListCtrl.h
-  mafGUIMovieCtrl.cpp  				mafGUIMovieCtrl.h
-  mafGUIMDIChild.cpp  				mafGUIMDIChild.h
-  mafGUIMDIFrame.cpp  				mafGUIMDIFrame.h
-  mafGUIMutexPanel.cpp  			mafGUIMutexPanel.h
-  mafGUINamedPanel.cpp  			mafGUINamedPanel.h
-  mafGUIPanel.cpp  					mafGUIPanel.h
-  mafGUIPanelStack.cpp  			mafGUIPanelStack.h
-  mafGUIPicButton.cpp  				mafGUIPicButton.h
-  mafGUIRangeSlider.cpp  			mafGUIRangeSlider.h
-  mafGUIRollOut.cpp  				mafGUIRollOut.h
-  mafGUISashPanel.h  				mafGUISashPanel.cpp
-  mafGUIScrolledPanel.cpp  			mafGUIScrolledPanel.h
-  mafGUISettingsDialog.cpp  		mafGUISettingsDialog.h
-  mafGUISplittedPanel.cpp  			mafGUISplittedPanel.h
-  mafGUITimeBar.cpp  				mafGUITimeBar.h
-  mafGUITree.cpp  					mafGUITree.h
-  mafGUIValidator.cpp  				mafGUIValidator.h
-  mafGUIViewFrame.cpp  				mafGUIViewFrame.h
-  mafGUIViewWin.cpp  				mafGUIViewWin.h
-  mafGUICrossIncremental.cpp  		mafGUICrossIncremental.h
-  mafGUIComboBox.cpp  				mafGUIComboBox.h
-  mafGUILandmark.cpp  				mafGUILandmark.h
-  mafGUIWizard.cpp  				mafGUIWizard.h
-  mafGUIWizardPage.cpp  			mafGUIWizardPage.h
-  mafGUIWizardPageNew.cpp  			mafGUIWizardPageNew.h
-  mafGUIDicomSettings.cpp  			mafGUIDicomSettings.h
-  mafGUISettingsAdvanced.cpp  		mafGUISettingsAdvanced.h
-  mafGUIDynamicVP.cpp  				mafGUIDynamicVP.h
-  mafGUILutHistogramSwatch.cpp  	mafGUILutHistogramSwatch.h
-  mafGUILutHistogramEditor.cpp  	mafGUILutHistogramEditor.h
-	mafGUIImageViewer.cpp							mafGUIImageViewer.h
-	mafGUIAboutDialog.cpp				mafGUIAboutDialog.h
+  albaPics.cpp  						albaPics.h
+  albaWXLog.cpp  					albaWXLog.h
+  albaGUIApplicationSettings.cpp  	albaGUIApplicationSettings.h
+  albaGUIButton.cpp  				albaGUIButton.h
+  albaGUICheckListBox.cpp  			albaGUICheckListBox.h
+  albaGUICheckTree.cpp  				albaGUICheckTree.h
+  albaGUIColorSwatch.cpp  			albaGUIColorSwatch.h
+  albaGUIColorWidget.cpp  			albaGUIColorWidget.h
+  albaGUICrossSplitter.cpp  			albaGUICrossSplitter.h
+  albaGUIDialog.cpp  				albaGUIDialog.h
+  albaGUIDockManager.cpp  			albaGUIDockManager.h
+  albaGUIFileHistory.cpp  			albaGUIFileHistory.h
+  albaGUIFlagSplitter.cpp  			albaGUIFlagSplitter.h
+  albaGUIFloatSlider.cpp  			albaGUIFloatSlider.h
+  albaGUIFrame.cpp  					albaGUIFrame.h
+  albaGUI.cpp  						albaGUI.h
+  albaGUIHolder.cpp  				albaGUIHolder.h
+  albaGUILab.cpp  					albaGUILab.h
+  albaGUIListBox.cpp  				albaGUIListBox.h
+  albaGUIListCtrl.cpp  				albaGUIListCtrl.h
+  albaGUIMovieCtrl.cpp  				albaGUIMovieCtrl.h
+  albaGUIMDIChild.cpp  				albaGUIMDIChild.h
+  albaGUIMDIFrame.cpp  				albaGUIMDIFrame.h
+  albaGUIMutexPanel.cpp  			albaGUIMutexPanel.h
+  albaGUINamedPanel.cpp  			albaGUINamedPanel.h
+  albaGUIPanel.cpp  					albaGUIPanel.h
+  albaGUIPanelStack.cpp  			albaGUIPanelStack.h
+  albaGUIPicButton.cpp  				albaGUIPicButton.h
+  albaGUIRangeSlider.cpp  			albaGUIRangeSlider.h
+  albaGUIRollOut.cpp  				albaGUIRollOut.h
+  albaGUISashPanel.h  				albaGUISashPanel.cpp
+  albaGUIScrolledPanel.cpp  			albaGUIScrolledPanel.h
+  albaGUISettingsDialog.cpp  		albaGUISettingsDialog.h
+  albaGUISplittedPanel.cpp  			albaGUISplittedPanel.h
+  albaGUITimeBar.cpp  				albaGUITimeBar.h
+  albaGUITree.cpp  					albaGUITree.h
+  albaGUIValidator.cpp  				albaGUIValidator.h
+  albaGUIViewFrame.cpp  				albaGUIViewFrame.h
+  albaGUIViewWin.cpp  				albaGUIViewWin.h
+  albaGUICrossIncremental.cpp  		albaGUICrossIncremental.h
+  albaGUIComboBox.cpp  				albaGUIComboBox.h
+  albaGUILandmark.cpp  				albaGUILandmark.h
+  albaGUIWizard.cpp  				albaGUIWizard.h
+  albaGUIWizardPage.cpp  			albaGUIWizardPage.h
+  albaGUIWizardPageNew.cpp  			albaGUIWizardPageNew.h
+  albaGUIDicomSettings.cpp  			albaGUIDicomSettings.h
+  albaGUISettingsAdvanced.cpp  		albaGUISettingsAdvanced.h
+  albaGUIDynamicVP.cpp  				albaGUIDynamicVP.h
+  albaGUILutHistogramSwatch.cpp  	albaGUILutHistogramSwatch.h
+  albaGUILutHistogramEditor.cpp  	albaGUILutHistogramEditor.h
+	albaGUIImageViewer.cpp							albaGUIImageViewer.h
+	albaGUIAboutDialog.cpp				albaGUIAboutDialog.h
 )
 
-IF (MAF_USE_VTK)
+IF (ALBA_USE_VTK)
   SET(PROJECT_SRCS
   ${PROJECT_SRCS}
-  mafLightKit.cpp					  mafLightKit.h
-  mafGUIDialogPreview.cpp			  mafGUIDialogPreview.h
-  mafGUIDictionaryWidget.cpp		  mafGUIDictionaryWidget.h
-  mafAnimate.cpp					  mafAnimate.h
-  mafAttachCamera.cpp				  mafAttachCamera.h
-	mafAbsSideBar.h
-  mafSideBar.cpp					  mafSideBar.h
-  mafTextKit.cpp					  mafTextKit.h
-  mafVTKLog.cpp						  mafVTKLog.h
+  albaLightKit.cpp					  albaLightKit.h
+  albaGUIDialogPreview.cpp			  albaGUIDialogPreview.h
+  albaGUIDictionaryWidget.cpp		  albaGUIDictionaryWidget.h
+  albaAnimate.cpp					  albaAnimate.h
+  albaAttachCamera.cpp				  albaAttachCamera.h
+	albaAbsSideBar.h
+  albaSideBar.cpp					  albaSideBar.h
+  albaTextKit.cpp					  albaTextKit.h
+  albaVTKLog.cpp						  albaVTKLog.h
 
-  # depends on mafAssembly -> mafRWIBase
-  mafView.cpp						  mafView.h
+  # depends on albaAssembly -> albaRWIBase
+  albaView.cpp						  albaView.h
 
   # these depends on vtkLookupTable
-  mafColor.cpp						  mafColor.h
-  mafGUILutEditor.cpp				  mafGUILutEditor.h
-  mafGUILutPreset.cpp				  mafGUILutPreset.h
-  mafGUILutSlider.cpp				  mafGUILutSlider.h
-  mafGUILutSwatch.cpp				  mafGUILutSwatch.h
-  mafGUILutWidget.cpp				  mafGUILutWidget.h
-  mafGUIHistogramWidget.cpp			  mafGUIHistogramWidget.h
+  albaColor.cpp						  albaColor.h
+  albaGUILutEditor.cpp				  albaGUILutEditor.h
+  albaGUILutPreset.cpp				  albaGUILutPreset.h
+  albaGUILutSlider.cpp				  albaGUILutSlider.h
+  albaGUILutSwatch.cpp				  albaGUILutSwatch.h
+  albaGUILutWidget.cpp				  albaGUILutWidget.h
+  albaGUIHistogramWidget.cpp			  albaGUIHistogramWidget.h
   )
-ENDIF (MAF_USE_VTK)
+ENDIF (ALBA_USE_VTK)
 
 IF (WITH_OPENSSL)
 
@@ -105,14 +105,14 @@ ENDIF(WITH_OPENSSL)
 
 
 # List the kits from VTK that are needed by this project.
-SET(PROJECT_LIBS mafBase)
+SET(PROJECT_LIBS albaBase)
 
 #........................................................
 #solo la vtkCommon e' linkata per default
 #per linkare altre lib inserirle qui di seguito
 #
 #  # VTK specific classes
-#  IF (MAF_USE_VTK)
+#  IF (ALBA_USE_VTK)
 #  SET(PROJECT_LIBS ${PROJECT_LIBS} 
 #    ...... place libname here .....     
 #  )
@@ -121,14 +121,14 @@ SET(PROJECT_LIBS mafBase)
 #    ${PROJECT_SRCS}
 #    ...... place source filenames here .....     
 #  )
-#ENDIF (MAF_USE_VTK)
+#ENDIF (ALBA_USE_VTK)
 #........................................................
 
 #--------------------------------------------------------
 # Do not change anything below this line.
 
 ##### SIL ------------ IF (NOT WIN32)
-##### SIL ------------   #INCLUDE (${MAF_SOURCE_DIR}/modules/FindGTK20.cmake)
+##### SIL ------------   #INCLUDE (${ALBA_SOURCE_DIR}/modules/FindGTK20.cmake)
 ##### SIL ------------ INCLUDE (${CMAKE_ROOT}/Modules/FindGTK.cmake)
 ##### SIL ------------   INCLUDE_DIRECTORIES(${GTK_gtk_INCLUDE_PATH})
 ##### SIL ------------   INCLUDE_DIRECTORIES(${GTK_glib_INCLUDE_PATH})
@@ -152,4 +152,4 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS} GPUAPI)
 #--------------------------------------------------------
 #SUBDIRS(examples)
 
-ADD_DEPENDENCIES(${PROJECT_NAME} mafService)
+ADD_DEPENDENCIES(${PROJECT_NAME} albaService)

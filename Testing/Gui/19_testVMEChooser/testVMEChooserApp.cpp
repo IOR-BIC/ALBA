@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testVMEChooserApp
  Authors: Paolo Quadrani
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,9 +15,9 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -25,15 +25,15 @@
 
 
 #include "testVMEChooserApp.h"
-#include "mafVMEFactory.h"
-#include "mafPics.h"
-#include "mafGUIMDIFrame.h"
+#include "albaVMEFactory.h"
+#include "albaPics.h"
+#include "albaGUIMDIFrame.h"
 
-#include "mafNodeGeneric.h"
-#include "mafNodeRoot.h"
+#include "albaNodeGeneric.h"
+#include "albaNodeRoot.h"
 
-#include "mafOpCreateGenericVme.h"
-#include "mafOpTestVMEChooser.h"
+#include "albaOpCreateGenericVme.h"
+#include "albaOpTestVMEChooser.h"
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
@@ -43,19 +43,19 @@ IMPLEMENT_APP(testVMEChooserApp)
 bool testVMEChooserApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-  mafPics.Initialize();	
+  albaPics.Initialize();	
 
-  int result = mafVMEFactory::Initialize();
-  assert(result==MAF_OK);
+  int result = albaVMEFactory::Initialize();
+  assert(result==ALBA_OK);
 
-  m_logic = new mafLogicWithManagers();
+  m_logic = new albaLogicWithManagers();
   m_logic->Configure();
 
   m_logic->GetTopWin()->SetTitle("testOpMan");
-  m_logic->Plug(new mafOpCreateGenericVme("Add VME Generic \tCtrl+A"));
-  m_logic->Plug(new mafOpTestVMEChooser("Test VME Chooser\tCtrl+B"));
+  m_logic->Plug(new albaOpCreateGenericVme("Add VME Generic \tCtrl+A"));
+  m_logic->Plug(new albaOpTestVMEChooser("Test VME Chooser\tCtrl+B"));
 
-  SetTopWindow(mafGetFrame());  
+  SetTopWindow(albaGetFrame());  
   m_logic->Show();
   m_logic->Init(0,NULL);
   return TRUE;

@@ -42,5 +42,5 @@
 581c584,585
 < 
 ---
-> # to enable compilation from MAF project
+> # to enable compilation from ALBA project
 > BUILD_COMMAND( MAKECOMMAND ${CMAKE_MAKE_PROGRAM} )

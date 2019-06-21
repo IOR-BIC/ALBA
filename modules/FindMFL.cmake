@@ -1,12 +1,12 @@
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: FindMFL.cmake,v $
 # Language:  CMake 2.0
 # Date:      $Date: 2004-12-22 10:14:50 $
 # Version:   $Revision: 1.2 $
 #
 # Description: Find the MFL location. MFL package can be shared by two
-# different MAF distributions.
+# different ALBA distributions.
 # This module defines
 #
 # USE_MFL_FILE - the full path and location of the UseVTK.cmake file
@@ -17,8 +17,8 @@
 # Look for a MFL binary tree
 # 
 
-MESSAGE (STATUS "FindMFL: searching MFL binaries outside MAF tree")
-# If not built within MAF project try standard places
+MESSAGE (STATUS "FindMFL: searching MFL binaries outside ALBA tree")
+# If not built within ALBA project try standard places
 
 # Get the system search path as a list.
 IF(UNIX)

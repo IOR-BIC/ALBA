@@ -1,9 +1,7 @@
-MAF2 is continously building on
+ALBA is continously building on
 
-http://ci.scsitaly.com
+
 
 CMake version on the build server is 2.8.3.
 
 On Windows Vista and Windows 7 you must run CMake as Administrator in order for the Configure process to succeed.
-
-For any problems write to bt-maf2-users@biomedtown.org (you must be registered to www.biomedtown.org)

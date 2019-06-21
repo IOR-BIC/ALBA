@@ -6,13 +6,13 @@ currentPathScript = os.path.split(os.path.realpath(__file__))[0]
 
 try:
     sys.path.append(os.path.realpath(os.path.join(currentPathScript,"..","..")))
-    from qa import mafPath
+    from qa import albaPath
 except ImportError:
-    import mafPath
+    import albaPath
 
 
-modulesDir = mafPath.mafSourcesDir
-qaDir = mafPath.mafQADir
+modulesDir = albaPath.albaSourcesDir
+qaDir = albaPath.albaQADir
 
 def usage():
     print "python ccccScript.py [-h] [-e ccccPath]"

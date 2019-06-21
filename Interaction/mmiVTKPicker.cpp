@@ -11,18 +11,18 @@
   =========================================================================
 */
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
 #include "mmiVTKPicker.h"
-#include "mafEventInteraction.h"
+#include "albaEventInteraction.h"
 
-#include "vtkMAFSmartPointer.h"
+#include "vtkALBASmartPointer.h"
 #include "vtkCamera.h"
 #include "vtkPointPicker.h"
 #include "vtkCellPicker.h"
@@ -30,12 +30,12 @@
 #include "vtkMath.h"
 #include "vtkPoints.h"
 
-#include "mafMemDbg.h"
-//#include "../mafDbg.h"
+#include "albaMemDbg.h"
+//#include "../albaDbg.h"
 
 
 //------------------------------------------------------------------------------
-mafCxxTypeMacro(mmiVTKPicker)
+albaCxxTypeMacro(mmiVTKPicker)
 //------------------------------------------------------------------------------
 
 mmiVTKPicker::~mmiVTKPicker()
@@ -44,7 +44,7 @@ mmiVTKPicker::~mmiVTKPicker()
 }
 
 //----------------------------------------------------------------------------
-void mmiVTKPicker::OnLeftButtonDown(mafEventInteraction *e) 
+void mmiVTKPicker::OnLeftButtonDown(albaEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
   // if the event is NULL return
@@ -58,12 +58,12 @@ void mmiVTKPicker::OnLeftButtonDown(mafEventInteraction *e)
   //we will fix it here
   if (m_Picker != NULL)
   {
-    mafEventMacro(mafEvent(this, VME_PICKED, m_Picker));
+    albaEventMacro(albaEvent(this, VME_PICKED, m_Picker));
     vtkDEL(m_Picker);
   }
 
   // Check if CTRL modifier is pressed
-  if (e->GetModifier(MAF_CTRL_KEY)) 
+  if (e->GetModifier(ALBA_CTRL_KEY)) 
   {    
     // perform picking
     int x = m_LastMousePose[0];
@@ -82,9 +82,9 @@ void mmiVTKPicker::OnLeftButtonDown(mafEventInteraction *e)
       else
       {   
         //picking successful               
-        mafEvent ev(this, VME_PICKING, m_Picker);
+        albaEvent ev(this, VME_PICKING, m_Picker);
         ev.SetBool(false);
-        mafEventMacro(ev);
+        albaEventMacro(ev);
       }
     }
   }
@@ -100,7 +100,7 @@ void mmiVTKPicker::OnLeftButtonUp()
 {
   if (m_Picker != NULL)
   {
-    mafEventMacro(mafEvent(this, VME_PICKED, m_Picker));
+    albaEventMacro(albaEvent(this, VME_PICKED, m_Picker));
     vtkDEL(m_Picker);
   }
 
@@ -156,12 +156,12 @@ void mmiVTKPicker::OnMouseMove()
         pointNewPos[i] = cameraPos[i] + pointNewPos[i]*dblDist;        
       }
 
-      vtkMAFSmartPointer< vtkPoints > points;      
+      vtkALBASmartPointer< vtkPoints > points;      
       points->InsertNextPoint(pointNewPos);
 
-      mafEvent ev(this, VME_PICKING, points);
+      albaEvent ev(this, VME_PICKING, points);
       ev.SetBool(true);        //continuous picking      
-      mafEventMacro(ev);
+      albaEventMacro(ev);
     }    
   }
   else

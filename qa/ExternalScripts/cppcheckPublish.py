@@ -10,13 +10,13 @@ currentPathScript = os.path.split(os.path.realpath(__file__))[0]
 
 try:
     sys.path.append(os.path.realpath(os.path.join(currentPathScript,"..","..")))
-    from qa import mafPath
+    from qa import albaPath
 except ImportError:
-    import mafPath
+    import albaPath
 
 
-modulesDir = mafPath.mafSourcesDir
-qaDir = mafPath.mafQADir
+modulesDir = albaPath.albaSourcesDir
+qaDir = albaPath.albaQADir
 
 def usage():
     print "Usage:  python cppcheckPublish.py"
@@ -82,7 +82,7 @@ def publishReport():
        Cppcheck is an analysis tool for C/C++ code. <br>
        Unlike C/C++ compilers and many other analysis tools, it don't detect syntax errors. <br>
        Cppcheck only detects the types of bugs that the compilers normally fail to detect. The goal is no false positives.<br>
-       Currently the CPPCHECK version used is the 1.4.7, and the check has been executed on the root directory of the MAF framework.<br>
+       Currently the CPPCHECK version used is the 1.4.7, and the check has been executed on the root directory of the ALBA framework.<br>
        <br>Some features:<br>
         
        <ul><li>Out of bounds checking

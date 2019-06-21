@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmuTimeSet
  Authors: Marco Petrone
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,9 +15,9 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -27,7 +27,7 @@
 #include "mmuTimeSet.h"
 #include <math.h>
 //------------------------------------------------------------------------------
-//mafCxxTypeMacro(mmuTimeSet)
+//albaCxxTypeMacro(mmuTimeSet)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -75,19 +75,19 @@ bool mmuTimeSet::operator==(const mmuTimeSet &o)
   return true;
 }
 //------------------------------------------------------------------------------
-void mmuTimeSet::Insert(mafTimeStamp t)
+void mmuTimeSet::Insert(albaTimeStamp t)
 //------------------------------------------------------------------------------
 {
   m_TSet.insert(t);
 }
 //------------------------------------------------------------------------------
-void mmuTimeSet::Append(mafTimeStamp t)
+void mmuTimeSet::Append(albaTimeStamp t)
 //------------------------------------------------------------------------------
 {
   m_TSet.insert(m_TSet.end(),t);
 }
 //------------------------------------------------------------------------------
-void mmuTimeSet::Prepend(mafTimeStamp t)
+void mmuTimeSet::Prepend(albaTimeStamp t)
 //------------------------------------------------------------------------------
 {
   m_TSet.insert(m_TSet.begin(),t);
@@ -100,14 +100,14 @@ void mmuTimeSet::Remove(Iterator ts)
 }
 
 //------------------------------------------------------------------------------
-mafID mmuTimeSet::FindTimeStampIndex(mafTimeStamp t)
+albaID mmuTimeSet::FindTimeStampIndex(albaTimeStamp t)
 //------------------------------------------------------------------------------
 {
   Iterator it=FindTimeStamp(t);
   return it!=m_TSet.end()?std::distance(m_TSet.begin(),it):-1;
 }
 //------------------------------------------------------------------------------
-mafTimeStamp mmuTimeSet::GetByIndex(mafID idx)
+albaTimeStamp mmuTimeSet::GetByIndex(albaID idx)
 //------------------------------------------------------------------------------
 {
   Iterator it=m_TSet.begin();
@@ -115,27 +115,27 @@ mafTimeStamp mmuTimeSet::GetByIndex(mafID idx)
   return (it!=m_TSet.end()?*it:-1);
 }
 //------------------------------------------------------------------------------
-mafTimeStamp mmuTimeSet::GetNearestTimeStamp(mafTimeStamp t)
+albaTimeStamp mmuTimeSet::GetNearestTimeStamp(albaTimeStamp t)
 //------------------------------------------------------------------------------
 {
   Iterator it=FindNearestTimeStamp(t);
   return it!=m_TSet.end()?*it:-1;
 }
 //------------------------------------------------------------------------------
-mafTimeStamp mmuTimeSet::GetTimeStampBefore(mafTimeStamp t)
+albaTimeStamp mmuTimeSet::GetTimeStampBefore(albaTimeStamp t)
 //------------------------------------------------------------------------------
 {
   Iterator it=FindTimeStampBefore(t);
   return it!=m_TSet.end()?*it:-1;
 }
 //------------------------------------------------------------------------------
-mmuTimeSet::Iterator mmuTimeSet::FindTimeStamp(mafTimeStamp t)
+mmuTimeSet::Iterator mmuTimeSet::FindTimeStamp(albaTimeStamp t)
 //------------------------------------------------------------------------------
 {
   return m_TSet.find(t);
 }
 //------------------------------------------------------------------------------
-mmuTimeSet::Iterator mmuTimeSet::FindNearestTimeStamp(mafTimeStamp t)
+mmuTimeSet::Iterator mmuTimeSet::FindNearestTimeStamp(albaTimeStamp t)
 //------------------------------------------------------------------------------
 {
   std::pair<Iterator,Iterator> range=m_TSet.equal_range(t);
@@ -158,7 +158,7 @@ mmuTimeSet::Iterator mmuTimeSet::FindNearestTimeStamp(mafTimeStamp t)
   return --range.second;
 }
 //------------------------------------------------------------------------------
-mmuTimeSet::Iterator mmuTimeSet::FindTimeStampBefore(mafTimeStamp t)
+mmuTimeSet::Iterator mmuTimeSet::FindTimeStampBefore(albaTimeStamp t)
 //------------------------------------------------------------------------------
 {
   Iterator it=m_TSet.lower_bound(t); // find item < t
@@ -220,10 +220,10 @@ int mmuTimeSet::GetNumberOfTimeStamps() const
 }
 
 //-------------------------------------------------------------------------
-void mmuTimeSet::Merge(const std::vector<mafTimeStamp> &v1,const std::vector<mafTimeStamp> &v2,std::vector<mafTimeStamp> &outv)
+void mmuTimeSet::Merge(const std::vector<albaTimeStamp> &v1,const std::vector<albaTimeStamp> &v2,std::vector<albaTimeStamp> &outv)
 //-------------------------------------------------------------------------
 {
-  std::set<mafTimeStamp> outset;
+  std::set<albaTimeStamp> outset;
   for (unsigned int idx=0;idx<v1.size();idx++)
   {
     outset.insert(v1[idx]);
@@ -235,14 +235,14 @@ void mmuTimeSet::Merge(const std::vector<mafTimeStamp> &v1,const std::vector<maf
   }
 
   outv.clear();
-  for (std::set<mafTimeStamp>::iterator it=outset.begin();it!=outset.end();it++)
+  for (std::set<albaTimeStamp>::iterator it=outset.begin();it!=outset.end();it++)
   {
     outv.push_back(*it);
   }
 }
 
 //-------------------------------------------------------------------------
-void mmuTimeSet::Merge(const std::vector<mafTimeStamp> &v)
+void mmuTimeSet::Merge(const std::vector<albaTimeStamp> &v)
 //-------------------------------------------------------------------------
 {
   for (unsigned int i=0;i<v.size();i++)

@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testGui
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -18,25 +18,25 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafEvent.h"
-#include "mafGUI.h"
-#include "mafGUIHolder.h"
-#include "mafObserver.h"
+#include "albaEvent.h"
+#include "albaGUI.h"
+#include "albaGUIHolder.h"
+#include "albaObserver.h"
 // ============================================================================
-class testGui : public mafObserver
+class testGui : public albaObserver
 // ============================================================================
 {
 public:
                 testGui(wxWindow* parent);
   virtual      ~testGui(); 
-  virtual void  OnEvent(mafEventBase *maf_event);
+  virtual void  OnEvent(albaEventBase *alba_event);
   wxWindow*     GetGui();                       
 protected:
- mafGUI         *m_gui;
- mafGUIHolder   *m_guih;
+ albaGUI         *m_gui;
+ albaGUIHolder   *m_guih;
 
- mafString m_s1;
- mafString m_s2;
+ albaString m_s1;
+ albaString m_s2;
  int      m_i;
  float    m_f;
  double   m_d;

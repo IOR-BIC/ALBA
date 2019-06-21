@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testGuiLogic
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -16,9 +16,9 @@
 
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -26,19 +26,19 @@
 
 
 #include "testGuiLogic.h" 
-//#include "mafGUIMDIFrame.h"
-#include "mafGUIFrame.h"
+//#include "albaGUIMDIFrame.h"
+#include "albaGUIFrame.h"
 #include "testGui.h" 
-#include "mafGUIPanel.h" 
+#include "albaGUIPanel.h" 
 
 //----------------------------------------------------------------------------
 testGuiLogic::testGuiLogic()
 //----------------------------------------------------------------------------
 {
-  //m_win = new mafGUIMDIFrame("testFrame", wxDefaultPosition, wxSize(800, 600));
-  m_win = new mafGUIFrame("testGui", wxDefaultPosition, wxSize(800, 600));
+  //m_win = new albaGUIMDIFrame("testFrame", wxDefaultPosition, wxSize(800, 600));
+  m_win = new albaGUIFrame("testGui", wxDefaultPosition, wxSize(800, 600));
   m_win->SetListener(this);
-  //mafGUIPanel *p = new mafGUIPanel(m_win,-1);
+  //albaGUIPanel *p = new albaGUIPanel(m_win,-1);
   //p->Show(true);
   //p->SetSize(100,100);
   m_testGui = new testGui(m_win);
@@ -69,10 +69,10 @@ wxWindow* testGuiLogic::GetTopWin()
   return m_win;
 }
 //----------------------------------------------------------------------------
-void testGuiLogic::OnEvent(mafEventBase *maf_event)
+void testGuiLogic::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event)) 
+  if (albaEvent *e = albaEvent::SafeDownCast(alba_event)) 
   {
     switch(e->GetId())
     {

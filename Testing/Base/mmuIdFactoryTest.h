@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmuIdFactoryTest
  Authors: Daniele Giunchi
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -17,10 +17,10 @@
 #ifndef __CPP_UNIT_mmuIdFactoryTest_H__
 #define __CPP_UNIT_mmuIdFactoryTest_H__
 
-#include "mafTest.h"
+#include "albaTest.h"
 
 /** Test for mmuIdFactory; Use this suite to trace memory problems */
-class mmuIdFactoryTest : public mafTest
+class mmuIdFactoryTest : public albaTest
 {
 public: 
   // CPPUNIT test suite

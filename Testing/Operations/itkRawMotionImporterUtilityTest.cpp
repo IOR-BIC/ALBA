@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
- Module: mafItkRawMotionImporterUtilityTest
+ Program: ALBA (Agile Library for Biomedical Applications)
+ Module: albaItkRawMotionImporterUtilityTest
  Authors: Daniele Giunchi
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -14,17 +14,17 @@
 
 =========================================================================*/
 
-#include "mafDefines.h"
+#include "albaDefines.h"
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
 #include "itkRawMotionImporterUtilityTest.h"
-#include "mafItkRawMotionImporterUtility.h"
-#include "mafString.h"
+#include "albaItkRawMotionImporterUtility.h"
+#include "albaString.h"
 
 #include "vnl/vnl_matrix.h"
 
@@ -37,19 +37,19 @@
 //3.0 3.1 3.2 3.3
 
 //----------------------------------------------------------------------------
-void mafItkRawMotionImporterUtilityTest::TestFixture()
+void albaItkRawMotionImporterUtilityTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //-----------------------------------------------------------
-void mafItkRawMotionImporterUtilityTest::TestDynamicAllocation() 
+void albaItkRawMotionImporterUtilityTest::TestDynamicAllocation() 
 //-----------------------------------------------------------
 {
-  mafItkRawMotionImporterUtility *rMIU=new mafItkRawMotionImporterUtility();
+  albaItkRawMotionImporterUtility *rMIU=new albaItkRawMotionImporterUtility();
   delete rMIU;
 }
 //-----------------------------------------------------------
-void mafItkRawMotionImporterUtilityTest::TestReadMatrix() 
+void albaItkRawMotionImporterUtilityTest::TestReadMatrix() 
 //-----------------------------------------------------------
 {
   enum ID_RESULT
@@ -58,10 +58,10 @@ void mafItkRawMotionImporterUtilityTest::TestReadMatrix()
     RES_ERROR = 1,
   };
 
-  mafString matrixFile = MAF_DATA_ROOT;
+  albaString matrixFile = ALBA_DATA_ROOT;
   matrixFile << "/Matrix/TestMatrix001.txt";
   vnl_matrix<double> mat;
-  mafItkRawMotionImporterUtility *rMIU=new mafItkRawMotionImporterUtility();
+  albaItkRawMotionImporterUtility *rMIU=new albaItkRawMotionImporterUtility();
   int res = rMIU->ReadMatrix(mat,matrixFile);
 
   m_Result = res == RES_OK;

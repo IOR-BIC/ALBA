@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmiInfoImage
  Authors: Paolo Quadrani
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -19,8 +19,8 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h"
-#include "mafInteractorPER.h"
+#include "albaDefines.h"
+#include "albaInteractorPER.h"
 
 //----------------------------------------------------------------------------
 // forward declarations
@@ -28,12 +28,12 @@
 
 /** Class implementing image info reporting on status bar when not interacting.
 */
-class MAF_EXPORT mmiInfoImage : public mafInteractorPER
+class ALBA_EXPORT mmiInfoImage : public albaInteractorPER
 {
 public: 
-  mafTypeMacro(mmiInfoImage,mafInteractorPER);
+  albaTypeMacro(mmiInfoImage,albaInteractorPER);
 
-  virtual void OnEvent(mafEventBase *event);
+  virtual void OnEvent(albaEventBase *event);
 
 protected:
   mmiInfoImage();

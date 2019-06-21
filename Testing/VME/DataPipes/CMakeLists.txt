@@ -1,26 +1,26 @@
-PROJECT (mafDataPipes)
+PROJECT (albaDataPipes)
 
-IF(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafDLL)
-ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafTests mafCore vtkMAF mafService)
-ENDIF (MAF_BUILD_MAFDLL)
+IF(ALBA_BUILD_ALBADLL)
+  LINK_LIBRARIES(albaDLL)
+ELSE(ALBA_BUILD_ALBADLL)
+  LINK_LIBRARIES(albaTests albaCore vtkALBA albaService)
+ENDIF (ALBA_BUILD_ALBADLL)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------
 SET(PROJECT_SRCS 
-	vtkMAFDataPipeTest.h 						vtkMAFDataPipeTest.cpp
-	mafDataPipeInterpolatorTest.h 				mafDataPipeInterpolatorTest.cpp
-	mafDataPipeInterpolatorVTKTest.h 			mafDataPipeInterpolatorVTKTest.cpp
-	mafDataPipeCustomTest.h 					mafDataPipeCustomTest.cpp
-	mafDataPipeInterpolatorScalarMatrixTest.h 	mafDataPipeInterpolatorScalarMatrixTest.cpp
-	mafDataPipeCustomProberTest.h 				mafDataPipeCustomProberTest.cpp
-	mafDataPipesTests.h 						mafDataPipesTests.cpp
+	vtkALBADataPipeTest.h 						vtkALBADataPipeTest.cpp
+	albaDataPipeInterpolatorTest.h 				albaDataPipeInterpolatorTest.cpp
+	albaDataPipeInterpolatorVTKTest.h 			albaDataPipeInterpolatorVTKTest.cpp
+	albaDataPipeCustomTest.h 					albaDataPipeCustomTest.cpp
+	albaDataPipeInterpolatorScalarMatrixTest.h 	albaDataPipeInterpolatorScalarMatrixTest.cpp
+	albaDataPipeCustomProberTest.h 				albaDataPipeCustomProberTest.cpp
+	albaDataPipesTests.h 						albaDataPipesTests.cpp
 )
 
-ADD_EXECUTABLE(mafDataPipesTests ${PROJECT_SRCS})
-ADD_TEST(mafDataPipesTests  ${EXECUTABLE_OUTPUT_PATH}/mafDataPipesTests)
+ADD_EXECUTABLE(albaDataPipesTests ${PROJECT_SRCS})
+ADD_TEST(albaDataPipesTests  ${EXECUTABLE_OUTPUT_PATH}/albaDataPipesTests)
 IF (WIN32)
-  SET_TARGET_PROPERTIES(mafDataPipesTests PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(albaDataPipesTests PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
