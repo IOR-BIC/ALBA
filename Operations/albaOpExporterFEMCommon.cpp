@@ -1,0 +1,327 @@
+/*=========================================================================
+
+Program: ALBA
+Module: albaOpExporterFEMCommon.cpp
+Authors: Nicola Vanella
+
+Copyright (c) BIC
+All rights reserved. See Copyright.txt or
+http://www.scsitaly.com/Copyright.htm for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#include "albaDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
+
+#include "albaOpExporterFEMCommon.h"
+#include "albaOpImporterAnsysCommon.h"
+
+#include "albaDecl.h"
+#include "albaGUI.h"
+#include "albaVMEMesh.h"
+
+// vtk includes
+#include "vtkUnstructuredGrid.h"
+#include "vtkFieldData.h"
+#include "vtkDoubleArray.h"
+#include "vtkIntArray.h"
+#include "vtkDataSet.h"
+#include "vtkCellData.h"
+
+#include "wx/stdpaths.h"
+
+#define DEFAULT_POISSON 0.3
+
+//----------------------------------------------------------------------------
+albaCxxTypeMacro(albaOpExporterFEMCommon);
+
+//----------------------------------------------------------------------------
+albaOpExporterFEMCommon::albaOpExporterFEMCommon(const wxString &label) :
+albaOp(label)
+{
+	m_MaterialData = NULL;
+	m_MatIdArray = NULL;
+
+	m_Egap = 50;
+
+	m_Freq_fp = NULL;
+	m_FrequencyFileName = "";
+
+	// Advanced Configuration
+	m_DensitySelection = USE_MEAN_DENSISTY;
+}
+//----------------------------------------------------------------------------
+albaOpExporterFEMCommon::~albaOpExporterFEMCommon()
+{	
+	vtkDEL(m_MaterialData);
+	delete[] m_MatIdArray;
+}
+
+//----------------------------------------------------------------------------
+void albaOpExporterFEMCommon::CreateGui()
+{
+	m_Gui = new albaGUI(this);
+
+	if (HasMaterials())
+	{
+		m_Gui->Label(_("FEM Exporter Properties"), true);
+
+		// Frequency
+		m_Gui->Label("Output Frequency file: ");
+
+		albaString wildc = "Frequency File (*.*)|*.*";
+		m_Gui->FileSave(ID_FREQUENCY_FILE_NAME, "Freq file", &m_FrequencyFileName, wildc.GetCStr());
+
+		m_Gui->Label("");
+		const wxString choices[] = { "Mean", "Maximum" };
+		m_Gui->Label("Grouping Density");
+		m_Gui->Combo(ID_DENSITY_SELECTION, "", &m_DensitySelection, 2, choices);
+
+		m_Gui->Label("");
+		m_Gui->Label("Elasticity Gap value");
+		m_Gui->Double(ID_GAP_VALUE, "", &m_Egap);
+
+		m_Gui->Divider();
+		m_Gui->Label("");
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaOpExporterFEMCommon::SetDefaultFrequencyFile()
+{
+	wxStandardPaths std_paths;
+	wxString userPath = std_paths.GetUserDataDir();
+	m_FrequencyFileName = userPath;
+	m_FrequencyFileName += "\\";
+	m_FrequencyFileName += m_Input->GetName();
+	m_FrequencyFileName += "-Freq.txt";
+}
+
+//----------------------------------------------------------------------------
+bool albaOpExporterFEMCommon::HasMaterials()
+{
+	bool hasMaterials = false;
+
+	albaVMEMesh *input = albaVMEMesh::SafeDownCast(m_Input);
+	assert(input);
+
+	vtkUnstructuredGrid *inputUGrid = input->GetUnstructuredGridOutput()->GetUnstructuredGridData();
+
+	if (inputUGrid != NULL)
+	{
+		hasMaterials = inputUGrid->GetCellData()->GetArray("EX") != NULL;
+	}
+
+	return hasMaterials;
+}
+
+//----------------------------------------------------------------------------
+vtkIdType * albaOpExporterFEMCommon::GetMatIdArray()
+{
+	if (m_MatIdArray == NULL)
+		GetMaterialData();
+
+	return m_MatIdArray;
+}
+
+//----------------------------------------------------------------------------
+void albaOpExporterFEMCommon::CreateBins(int numElements, MaterialProp *elProps, std::vector<MaterialProp> *materialProperties)
+{
+	if (!m_FrequencyFileName.IsEmpty() && (m_Freq_fp = fopen(m_FrequencyFileName.GetCStr(), "w")) == NULL)
+	{
+		if (GetTestMode() == false)
+		{
+			wxMessageBox("Frequency file can't be opened");
+		}
+	}
+
+	typedef std::vector<int> idVectorType;
+	idVectorType idVector;
+	double densAccumulator, nuxyAccumulator;
+
+	m_MatIdArray = new vtkIdType[numElements];
+
+	// COMPUTE MATERIALS & WRITE FREQUENCY FILE
+	qsort(elProps, numElements, sizeof(MaterialProp), compareE);
+
+	albaLogMessage("-- Writing frequency file\n");
+
+	if (m_Freq_fp != NULL)
+		fprintf(m_Freq_fp, "rho \t\t E \t\t NUMBER OF ELEMENTS\n\n");
+
+	vtkIdType freq = 1;
+	vtkIdType numMats = 1;
+	materialProperties->push_back(elProps[0]);
+
+	double E = elProps[0].ex;
+	double dens = densAccumulator = elProps[0].density;
+	double nuxy = nuxyAccumulator = elProps[0].nuxy;
+
+	if (numElements > 0)
+		m_MatIdArray[elProps[0].elementID] = numMats;
+
+	// grouping materials according to E value
+	for (int id = 1; id < numElements; id++)
+	{
+		if (E - elProps[id].ex > m_Egap) // generate statistics for old group and create a new group
+		{
+			if (m_DensitySelection == USE_MEAN_DENSISTY)
+			{
+				dens = (*materialProperties)[numMats - 1].density = densAccumulator / freq;
+				nuxy = (*materialProperties)[numMats - 1].nuxy = nuxyAccumulator / freq;
+			}
+
+			// print statistics
+			if (m_Freq_fp != NULL)
+				fprintf(m_Freq_fp, "%f \t %f \t %d\n", dens, E, freq);
+
+			dens = densAccumulator = elProps[id].density;
+			nuxy = nuxyAccumulator = elProps[id].nuxy;
+
+			materialProperties->push_back(elProps[id]);
+
+			E = elProps[id].ex;
+			numMats++;
+			freq = 1;
+		}
+		else
+		{
+			densAccumulator += elProps[id].density;
+			nuxyAccumulator += elProps[id].nuxy;
+			freq++;
+		}
+		m_MatIdArray[elProps[id].elementID] = numMats;
+	}
+
+	if (m_DensitySelection == USE_MEAN_DENSISTY)
+	{
+		dens = (*materialProperties)[numMats - 1].density = densAccumulator / freq;
+		nuxy = (*materialProperties)[numMats - 1].nuxy = nuxyAccumulator / freq;
+	}
+
+	// Print statistics
+	if (m_Freq_fp != NULL)
+	{
+		fprintf(m_Freq_fp, "%f \t %f \t %d\n", dens, E, freq);
+		fclose(m_Freq_fp);
+	}
+}
+
+//----------------------------------------------------------------------------
+int albaOpExporterFEMCommon::compareE(const void *p1, const void *p2)
+{
+	double result;
+	// decreasing order 
+	result = ((MaterialProp *)p2)->ex - ((MaterialProp *)p1)->ex;
+	if (result < 0)
+		return -1;
+	if (result > 0)
+		return 1;
+	return 0;
+}
+
+//----------------------------------------------------------------------------
+vtkFieldData* albaOpExporterFEMCommon::CreateMaterialsData(std::vector <MaterialProp>materialProperties)
+{
+	vtkIdType numMats = materialProperties.size();
+	char *vectorNames[3] = { "EX","NUXY","DENS" };
+
+	vtkFieldData * fdata = vtkFieldData::New();
+
+	vtkDoubleArray *iarr = vtkDoubleArray::New();
+	iarr->SetName("material_id");
+	iarr->SetNumberOfValues(numMats);
+
+	for (int j = 0; j < numMats; j++)
+		iarr->InsertValue(j, j + 1);
+
+	// Add the i-th data array to the field data
+	fdata->AddArray(iarr);
+	//Clean up
+	iarr->Delete();
+
+	// Create field data data array
+	for (int i = 0; i < 3; i++)
+	{
+		// Create the i-th data array
+		vtkDoubleArray *darr = vtkDoubleArray::New();
+		darr->SetName(vectorNames[i]);
+		darr->SetNumberOfValues(numMats);
+
+		for (int j = 0; j < numMats; j++)
+		{
+			// fill i-th data array with j-th value 
+			// cycle on materials
+			if (i == EX)
+				darr->InsertValue(j, materialProperties[j].ex);
+			else if (i == NUXY)
+				darr->InsertValue(j, materialProperties[j].nuxy);
+			else if (i == DENS)
+				darr->InsertValue(j, materialProperties[j].density);
+		}
+
+		// Add the i-th data array to the field data
+		fdata->AddArray(darr);
+
+		// Clean up
+		darr->Delete();
+	}
+
+	return fdata;
+}
+
+//---------------------------------------------------------------------------
+vtkFieldData *albaOpExporterFEMCommon::GetMaterialData()
+{
+	albaVMEMesh *input = albaVMEMesh::SafeDownCast(m_Input);
+	assert(input);
+
+	vtkUnstructuredGrid *inputUGrid = input->GetUnstructuredGridOutput()->GetUnstructuredGridData();
+
+	if (m_MaterialData == NULL)
+	{
+		int numElements = inputUGrid->GetNumberOfCells();
+
+		vtkDataArray *arrayE = inputUGrid->GetCellData()->GetArray("EX");
+		//if (arrayE == NULL) numElements = 1;
+
+		MaterialProp *elProps;
+		elProps = new MaterialProp[numElements];
+
+		vtkDataArray *arrayMaterial = inputUGrid->GetCellData()->GetArray("Material");
+		vtkDataArray *arrayPoisson = inputUGrid->GetCellData()->GetArray("NUXY");
+		vtkDataArray *arrayDens = inputUGrid->GetCellData()->GetArray("DENS");
+
+		for (int i = 0; i < numElements; i++)
+		{
+			elProps[i].elementID = i;
+			elProps[i].density = arrayDens ? arrayDens->GetTuple(i)[0] : 0;
+			elProps[i].nuxy = arrayPoisson ? arrayPoisson->GetTuple(i)[0] : DEFAULT_POISSON;
+			elProps[i].ex = arrayE ? arrayE->GetTuple(i)[0] : 0;
+		}
+
+		std::vector <MaterialProp> materialProperties;
+
+		CreateBins(numElements, elProps, &materialProperties);
+
+		// Create MaterialsData
+		m_MaterialData = CreateMaterialsData(materialProperties);
+
+		materialProperties.clear();
+
+		delete[] elProps;
+	}
+
+	return m_MaterialData;
+}
+
+

@@ -1,5 +1,5 @@
 # Load CppUnit stuff
-INCLUDE(${MAF_SOURCE_DIR}/Libraries/modules/FindCppUnit.cmake)
+INCLUDE(${ALBA_SOURCE_DIR}/Libraries/modules/FindCppUnit.cmake)
 IF (CPPUNIT_FOUND)
   #MESSAGE("Found Cppunit library")
   INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})
@@ -9,14 +9,14 @@ ELSE (CPPUNIT_FOUND)
   MESSAGE("Cppunit library not found! Please fill the corresponding cache entries")
 ENDIF (CPPUNIT_FOUND)
 
-PROJECT(mafTests)
+PROJECT(albaTests)
 
-DBG_MESSAGE("Configuring project mafTESTS")
+DBG_MESSAGE("Configuring project albaTESTS")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  mafTest.cpp 				mafTest.h
-  mafFakeLogicForTest.cpp 	mafFakeLogicForTest.h
+  albaTest.cpp 				albaTest.h
+  albaFakeLogicForTest.cpp 	albaFakeLogicForTest.h
 	)
 	
 # Create the library.
@@ -73,19 +73,19 @@ IF (BUILD_VISUALPIPES_TESTING)
   SUBDIRS(VisualPipes)
 ENDIF (BUILD_VISUALPIPES_TESTING)
 
-OPTION(BUILD_vtkMAF_TESTING "Enable building of testing for vtkMAF classes" ON)
-IF (BUILD_vtkMAF_TESTING)
-  SUBDIRS(vtkMAF)
-ENDIF (BUILD_vtkMAF_TESTING)
+OPTION(BUILD_vtkALBA_TESTING "Enable building of testing for vtkALBA classes" ON)
+IF (BUILD_vtkALBA_TESTING)
+  SUBDIRS(vtkALBA)
+ENDIF (BUILD_vtkALBA_TESTING)
 	
 OPTION(BUILD_DATAPIPES_TESTING "Enable building of testing for DataPipe classes" OFF)
 IF (BUILD_DATAPIPES_TESTING)
   SUBDIRS(VME/DataPipes)
 ENDIF (BUILD_DATAPIPES_TESTING)
 
-IF (MAF_USE_WXMOZILLA)
+IF (ALBA_USE_WXMOZILLA)
   OPTION(BUILD_WXMOZILLA_TESTING "Enable building of testing wxMozilla" OFF)
   IF (BUILD_WXMOZILLA_TESTING)
     SUBDIRS(exMozilla)
   ENDIF (BUILD_WXMOZILLA_TESTING)
-ENDIF (MAF_USE_WXMOZILLA)
+ENDIF (ALBA_USE_WXMOZILLA)

@@ -1,8 +1,8 @@
 #Include utility macro for debug messages printing
-INCLUDE (@MAF_SOURCE_DIR@/modules/DebugMacro.cmake)
+INCLUDE (@ALBA_SOURCE_DIR@/modules/DebugMacro.cmake)
 
 #Set DEBUG variable to TRUE or FALSE according printing debug messages intention or use the value
-#in file ${MAF_SOURCE_DIR}/modules/DebugMacro.cmake
+#in file ${ALBA_SOURCE_DIR}/modules/DebugMacro.cmake
 #SET (DEBUG TRUE)
 
 #MY_BUILD_TYPE result from the substituttion of "" to ".\" in the variable MY_BUILD_PATH that indicate the build_type (es. Debug, Release. ...)

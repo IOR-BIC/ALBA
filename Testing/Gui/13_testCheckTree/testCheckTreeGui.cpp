@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testCheckTreeGui
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -16,9 +16,9 @@
 
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -47,7 +47,7 @@ testCheckTreeGui::testCheckTreeGui(wxWindow* parent)
   m_dv2[0]=m_dv2[1]=m_dv2[2]=3.45678;
 
   
-  m_gui = new mafGUIGui(this);
+  m_gui = new albaGUIGui(this);
   
   m_gui->Label("bold label",true);
   m_gui->Label("label",wxString("label"));
@@ -78,7 +78,7 @@ testCheckTreeGui::testCheckTreeGui(wxWindow* parent)
   m_gui->Label("");
 
 
-  m_guih = new mafGUIGuiHolder(parent,-1,true,true);
+  m_guih = new albaGUIGuiHolder(parent,-1,true,true);
   //m_guih->SetSize(100,100);
   m_guih->Put(m_gui);
   m_guih->Show(true);
@@ -124,7 +124,7 @@ testCheckTreeGui::testCheckTreeGui(wxWindow* parent)
   m_gui->Vector  (ID, "d vector", m_dv);
 
   wxListBox				*lb   = m_gui->ListBox    (ID);
-  mafGUICheckListBox *cl   = m_gui->CheckList  (ID);
+  albaGUICheckListBox *cl   = m_gui->CheckList  (ID);
   wxGrid					*grid = m_gui->Grid       (ID);
 
   lb->Append("qui");
@@ -187,10 +187,10 @@ wxWindow* testCheckTreeGui::GetGui()
   return m_guih;
 }
 //----------------------------------------------------------------------------
-void testCheckTreeGui::OnEvent(mafEventBase *maf_event)
+void testCheckTreeGui::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
-  if(mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  if(albaEvent *e = albaEvent::SafeDownCast(alba_event))
   {
     e->Log(); 
     /*

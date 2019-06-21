@@ -15,7 +15,7 @@ class coverageScriptTest(unittest.TestCase):
     
     def testCountClassesMaf(self):
         cc = coverageScript.coverageCalculator()
-        cc.DoxygenClassIndexWebAdress = "http://doc.openmaf.org/classes.html"
+        cc.DoxygenClassIndexWebAdress = "http://doc.openalba.org/classes.html"
         numClasses = cc.CountClassess()
 	print str(cc.DoxygenClassIndexWebAdress) + " has " + str(numClasses) + " classes"
 	
@@ -27,7 +27,7 @@ class coverageScriptTest(unittest.TestCase):
     def testGenerateLog(self):
 	print os.getcwd()
 	cc = coverageScript.coverageCalculator()
-        cc.DoxygenClassIndexWebAdress = "http://doc.openmaf.org/classes.html"
+        cc.DoxygenClassIndexWebAdress = "http://doc.openalba.org/classes.html"
 	cc.WriteLog()
     
     def UrlLister(self):

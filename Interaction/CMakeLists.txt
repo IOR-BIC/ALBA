@@ -2,126 +2,126 @@
 # Copyright and description to be placed here
 #
 
-PROJECT(mafInteraction)
+PROJECT(albaInteraction)
 
 DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
   
- #mafAvatar3D2DPicker.cpp					mafAvatar3D2DPicker.h
+ #albaAvatar3D2DPicker.cpp					albaAvatar3D2DPicker.h
   
-  mafAction.cpp  							mafAction.h
-  mafAgent.cpp  							mafAgent.h
-  mafAgentEventHandler.cpp  				mafAgentEventHandler.h
-  mafAgentEventQueue.cpp  					mafAgentEventQueue.h
-  mafAgentThreaded.cpp  					mafAgentThreaded.h
-  mafAvatar.cpp  							mafAvatar.h
-  mafAvatar2D.cpp  							mafAvatar2D.h
-  mafAvatar3D.cpp  							mafAvatar3D.h
-  mafAvatar3DCone.cpp  						mafAvatar3DCone.h
-  mafCameraTransform.cpp  					mafCameraTransform.h
-  mafGizmoAutoscaleHelper.cpp  				mafGizmoAutoscaleHelper.h
-  mafDevice.cpp  							mafDevice.h
-  mafDeviceManager.cpp  					mafDeviceManager.h
-  mafDeviceSet.cpp  						mafDeviceSet.h
-  mafEventInteraction.cpp  					mafEventInteraction.h
-  mafGizmoBoundingBox.cpp  					mafGizmoBoundingBox.h
-  mafGizmoHandle.cpp  						mafGizmoHandle.h
-  mafGizmoInterface.cpp  					mafGizmoInterface.h
-  mafGizmoPath.cpp  						mafGizmoPath.h
-  mafGizmoPathRuler.cpp  					mafGizmoPathRuler.h
-  mafGizmoROI.cpp  							mafGizmoROI.h
-  mafGizmoRotate.cpp  						mafGizmoRotate.h
-  mafGizmoRotateCircle.cpp  				mafGizmoRotateCircle.h
-  mafGizmoRotateFan.cpp  					mafGizmoRotateFan.h
-  mafGizmoScale.cpp  						mafGizmoScale.h
-  mafGizmoScaleAxis.cpp  					mafGizmoScaleAxis.h
-  mafGizmoScaleIsotropic.cpp  				mafGizmoScaleIsotropic.h
-  mafGizmoTranslate.cpp  					mafGizmoTranslate.h
-  mafGizmoTranslateAxis.cpp  				mafGizmoTranslateAxis.h
-  mafGizmoTranslatePlane.cpp  				mafGizmoTranslatePlane.h
-  mafGizmoSlice.cpp  						mafGizmoSlice.h
-  mafGizmoInteractionDebugger.cpp  			mafGizmoInteractionDebugger.h
-  mafGUIGizmoInterface.cpp  				mafGUIGizmoInterface.h
-  mafGUIGizmoRotate.cpp  					mafGUIGizmoRotate.h
-  mafGUIGizmoScale.cpp  					mafGUIGizmoScale.h
-  mafGUIGizmoTranslate.cpp  				mafGUIGizmoTranslate.h
-  mafGUISaveRestorePose.cpp  				mafGUISaveRestorePose.h
-  mafGUITransformInterface.cpp  			mafGUITransformInterface.h
-  mafGUITransformMouse.cpp  				mafGUITransformMouse.h
-  mafGUITransformTextEntries.cpp  			mafGUITransformTextEntries.h
-  mafInteractionFactory.cpp  				mafInteractionFactory.h
-  mafInteractionManager.cpp  				mafInteractionManager.h
-  mafInteractor.cpp  						mafInteractor.h
-  mafRefSys.cpp  							mafRefSys.h  
-  mafDeviceButtonsPad.cpp  					mafDeviceButtonsPad.h
-  mafDeviceButtonsPadMouse.cpp  			mafDeviceButtonsPadMouse.h
-  mafDeviceButtonsPadTracker.cpp  			mafDeviceButtonsPadTracker.h  
-  mafInteractor2DAngle.cpp  				mafInteractor2DAngle.h
-  mafInteractor2DDistance.cpp  				mafInteractor2DDistance.h
-  mafInteractor2DIndicator.cpp  			mafInteractor2DIndicator.h
-  mafInteractor6DOF.cpp  					mafInteractor6DOF.h
-  mafInteractor6DOFCameraMove.cpp  			mafInteractor6DOFCameraMove.h
-  mafInteractorCameraMove.cpp  				mafInteractorCameraMove.h
-  mafInteractorCompositorMouse.cpp  		mafInteractorCompositorMouse.h
-  mafInteractorConstraint.cpp  				mafInteractorConstraint.h
-  mafInteractorExtractIsosurface.cpp  		mafInteractorExtractIsosurface.h
-  mafInteractorGeneric6DOF.cpp  			mafInteractorGeneric6DOF.h
-  mafInteractorGenericInterface.cpp  		mafInteractorGenericInterface.h
-  mafInteractorGenericMouse.cpp  			mafInteractorGenericMouse.h
-  mafInteractorPER.cpp  					mafInteractorPER.h
-  mafInteractorPicker.cpp  					mafInteractorPicker.h
-  mafInteractorSelectCell.cpp  				mafInteractorSelectCell.h
-  mafInteractorSER.cpp  					mafInteractorSER.h  ######################
-  mafInteractorCameraPicker.cpp  					mafInteractorCameraPicker.h
-  mafInteractorPERPicker.cpp  				mafInteractorPERPicker.h
-  mafInteractorDICOMImporter.h  			mafInteractorDICOMImporter.cpp  
-  mafInteractorSegmentationPicker.cpp  		mafInteractorSegmentationPicker.h 
-  mafInteractorPERScalarInformation.cpp  	mafInteractorPERScalarInformation.h
-  mafInteractorPERBrushFeedback.cpp  		mafInteractorPERBrushFeedback.h
+  albaAction.cpp  							albaAction.h
+  albaAgent.cpp  							albaAgent.h
+  albaAgentEventHandler.cpp  				albaAgentEventHandler.h
+  albaAgentEventQueue.cpp  					albaAgentEventQueue.h
+  albaAgentThreaded.cpp  					albaAgentThreaded.h
+  albaAvatar.cpp  							albaAvatar.h
+  albaAvatar2D.cpp  							albaAvatar2D.h
+  albaAvatar3D.cpp  							albaAvatar3D.h
+  albaAvatar3DCone.cpp  						albaAvatar3DCone.h
+  albaCameraTransform.cpp  					albaCameraTransform.h
+  albaGizmoAutoscaleHelper.cpp  				albaGizmoAutoscaleHelper.h
+  albaDevice.cpp  							albaDevice.h
+  albaDeviceManager.cpp  					albaDeviceManager.h
+  albaDeviceSet.cpp  						albaDeviceSet.h
+  albaEventInteraction.cpp  					albaEventInteraction.h
+  albaGizmoBoundingBox.cpp  					albaGizmoBoundingBox.h
+  albaGizmoHandle.cpp  						albaGizmoHandle.h
+  albaGizmoInterface.cpp  					albaGizmoInterface.h
+  albaGizmoPath.cpp  						albaGizmoPath.h
+  albaGizmoPathRuler.cpp  					albaGizmoPathRuler.h
+  albaGizmoROI.cpp  							albaGizmoROI.h
+  albaGizmoRotate.cpp  						albaGizmoRotate.h
+  albaGizmoRotateCircle.cpp  				albaGizmoRotateCircle.h
+  albaGizmoRotateFan.cpp  					albaGizmoRotateFan.h
+  albaGizmoScale.cpp  						albaGizmoScale.h
+  albaGizmoScaleAxis.cpp  					albaGizmoScaleAxis.h
+  albaGizmoScaleIsotropic.cpp  				albaGizmoScaleIsotropic.h
+  albaGizmoTranslate.cpp  					albaGizmoTranslate.h
+  albaGizmoTranslateAxis.cpp  				albaGizmoTranslateAxis.h
+  albaGizmoTranslatePlane.cpp  				albaGizmoTranslatePlane.h
+  albaGizmoSlice.cpp  						albaGizmoSlice.h
+  albaGizmoInteractionDebugger.cpp  			albaGizmoInteractionDebugger.h
+  albaGUIGizmoInterface.cpp  				albaGUIGizmoInterface.h
+  albaGUIGizmoRotate.cpp  					albaGUIGizmoRotate.h
+  albaGUIGizmoScale.cpp  					albaGUIGizmoScale.h
+  albaGUIGizmoTranslate.cpp  				albaGUIGizmoTranslate.h
+  albaGUISaveRestorePose.cpp  				albaGUISaveRestorePose.h
+  albaGUITransformInterface.cpp  			albaGUITransformInterface.h
+  albaGUITransformMouse.cpp  				albaGUITransformMouse.h
+  albaGUITransformTextEntries.cpp  			albaGUITransformTextEntries.h
+  albaInteractionFactory.cpp  				albaInteractionFactory.h
+  albaInteractionManager.cpp  				albaInteractionManager.h
+  albaInteractor.cpp  						albaInteractor.h
+  albaRefSys.cpp  							albaRefSys.h  
+  albaDeviceButtonsPad.cpp  					albaDeviceButtonsPad.h
+  albaDeviceButtonsPadMouse.cpp  			albaDeviceButtonsPadMouse.h
+  albaDeviceButtonsPadTracker.cpp  			albaDeviceButtonsPadTracker.h  
+  albaInteractor2DAngle.cpp  				albaInteractor2DAngle.h
+  albaInteractor2DDistance.cpp  				albaInteractor2DDistance.h
+  albaInteractor2DIndicator.cpp  			albaInteractor2DIndicator.h
+  albaInteractor6DOF.cpp  					albaInteractor6DOF.h
+  albaInteractor6DOFCameraMove.cpp  			albaInteractor6DOFCameraMove.h
+  albaInteractorCameraMove.cpp  				albaInteractorCameraMove.h
+  albaInteractorCompositorMouse.cpp  		albaInteractorCompositorMouse.h
+  albaInteractorConstraint.cpp  				albaInteractorConstraint.h
+  albaInteractorExtractIsosurface.cpp  		albaInteractorExtractIsosurface.h
+  albaInteractorGeneric6DOF.cpp  			albaInteractorGeneric6DOF.h
+  albaInteractorGenericInterface.cpp  		albaInteractorGenericInterface.h
+  albaInteractorGenericMouse.cpp  			albaInteractorGenericMouse.h
+  albaInteractorPER.cpp  					albaInteractorPER.h
+  albaInteractorPicker.cpp  					albaInteractorPicker.h
+  albaInteractorSelectCell.cpp  				albaInteractorSelectCell.h
+  albaInteractorSER.cpp  					albaInteractorSER.h  ######################
+  albaInteractorCameraPicker.cpp  					albaInteractorCameraPicker.h
+  albaInteractorPERPicker.cpp  				albaInteractorPERPicker.h
+  albaInteractorDICOMImporter.h  			albaInteractorDICOMImporter.cpp  
+  albaInteractorSegmentationPicker.cpp  		albaInteractorSegmentationPicker.h 
+  albaInteractorPERScalarInformation.cpp  	albaInteractorPERScalarInformation.h
+  albaInteractorPERBrushFeedback.cpp  		albaInteractorPERBrushFeedback.h
   mmiVTKPicker.cpp  						mmiVTKPicker.h
   mmiInfoImage.cpp  						mmiInfoImage.h
   mmiSelectPoint.cpp  						mmiSelectPoint.h
-  mafGizmoPolylineGraph.cpp  				mafGizmoPolylineGraph.h
-  mafDeviceButtonsPadMouseDialog.cpp	  	mafDeviceButtonsPadMouseDialog.h
-  mafGUITransformSliders.cpp  				mafGUITransformSliders.h    
-  mafGizmoCrossRotateTranslate.cpp  		mafGizmoCrossRotateTranslate.h	  
-  mafGizmoCrossRotate.cpp  					mafGizmoCrossRotate.h
-  mafGizmoCrossRotateAxis.cpp  				mafGizmoCrossRotateAxis.h
-  mafGizmoCrossRotateFan.cpp  				mafGizmoCrossRotateFan.h
-  mafGizmoCrossTranslate.cpp  				mafGizmoCrossTranslate.h
-  mafGizmoCrossTranslateAxis.cpp  			mafGizmoCrossTranslateAxis.h
-  mafGizmoCrossTranslatePlane.cpp  			mafGizmoCrossTranslatePlane.h
-	mafInteractorSlider.cpp								mafInteractorSlider.h
+  albaGizmoPolylineGraph.cpp  				albaGizmoPolylineGraph.h
+  albaDeviceButtonsPadMouseDialog.cpp	  	albaDeviceButtonsPadMouseDialog.h
+  albaGUITransformSliders.cpp  				albaGUITransformSliders.h    
+  albaGizmoCrossRotateTranslate.cpp  		albaGizmoCrossRotateTranslate.h	  
+  albaGizmoCrossRotate.cpp  					albaGizmoCrossRotate.h
+  albaGizmoCrossRotateAxis.cpp  				albaGizmoCrossRotateAxis.h
+  albaGizmoCrossRotateFan.cpp  				albaGizmoCrossRotateFan.h
+  albaGizmoCrossTranslate.cpp  				albaGizmoCrossTranslate.h
+  albaGizmoCrossTranslateAxis.cpp  			albaGizmoCrossTranslateAxis.h
+  albaGizmoCrossTranslatePlane.cpp  			albaGizmoCrossTranslatePlane.h
+	albaInteractorSlider.cpp								albaInteractorSlider.h
 )
 
 
 
 
-IF (MAF_USE_P5_GLOVE)
+IF (ALBA_USE_P5_GLOVE)
   SET(PROJECT_SRCS
   ${PROJECT_SRCS}
-  mafDeviceButtonsPadTrackerP5Glove.cpp		mafDeviceButtonsPadTrackerP5Glove.h
+  albaDeviceButtonsPadTrackerP5Glove.cpp		albaDeviceButtonsPadTrackerP5Glove.h
   )
-ENDIF (MAF_USE_P5_GLOVE)
+ENDIF (ALBA_USE_P5_GLOVE)
 
-IF (MAF_USE_WIIMOTE)
+IF (ALBA_USE_WIIMOTE)
   SET(PROJECT_SRCS
   ${PROJECT_SRCS}
-  mafDeviceTrackerWIIMote.cpp				mafDeviceTrackerWIIMote.h
+  albaDeviceTrackerWIIMote.cpp				albaDeviceTrackerWIIMote.h
   )
-ENDIF (MAF_USE_WIIMOTE)
+ENDIF (ALBA_USE_WIIMOTE)
 
-#IF (MAF_USE_VTK)
+#IF (ALBA_USE_VTK)
 #  SET(PROJECT_SRCS
 #  ${PROJECT_SRCS}
 #  )
-#ENDIF (MAF_USE_VTK)
+#ENDIF (ALBA_USE_VTK)
 
 IF (WIN32)
-  OPTION(MAF_USE_P5_GLOVE "Link driver for P5 glove device" OFF)
-  OPTION(MAF_USE_WIIMOTE "Link driver for WIIMote device" OFF)
+  OPTION(ALBA_USE_P5_GLOVE "Link driver for P5 glove device" OFF)
+  OPTION(ALBA_USE_WIIMOTE "Link driver for WIIMote device" OFF)
 ENDIF (WIN32)
 
 # currently special drivers only supported under WIN32
@@ -130,26 +130,26 @@ ENDIF (WIN32)
 #ENDIF (WIN32)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF)
+SET(PROJECT_LIBS albaBase albaIO albaGui vtkALBA)
 
 # currently special drivers only supported under WIN32
 #IF (WIN32)
-  SET(PROJECT_LIBS ${PROJECT_LIBS} mafDrivers)
+  SET(PROJECT_LIBS ${PROJECT_LIBS} albaDrivers)
 #ENDIF (WIN32)
 
-#IF (MAF_USE_VTK)
+#IF (ALBA_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkHybrid)
-#ENDIF (MAF_USE_VTK)
+#ENDIF (ALBA_USE_VTK)
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 
-ADD_DEPENDENCIES(${PROJECT_NAME} mafCommon mafVME vtkMAF mafService)
+ADD_DEPENDENCIES(${PROJECT_NAME} albaCommon albaVME vtkALBA albaService)
 
-IF (MAF_USE_WX)
+IF (ALBA_USE_WX)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
-ENDIF (MAF_USE_WX)
+ENDIF (ALBA_USE_WX)
 
-#CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafInteractionConfigure.h.in ${PROJECT_BINARY_DIR}/mafInteractionConfigure.h IMMEDIATE)
+#CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/albaInteractionConfigure.h.in ${PROJECT_BINARY_DIR}/albaInteractionConfigure.h IMMEDIATE)
 

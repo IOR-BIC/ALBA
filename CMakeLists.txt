@@ -1,16 +1,16 @@
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
 # Date:      $Date: 2011-09-28 09:28:59 $
 # Version:   $Revision: 1.44.2.12 $
 #
 # Description:
-# CMake Project file for the MAF.
+# CMake Project file for the ALBA.
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4) 
 
-PROJECT (MAF)
+PROJECT (ALBA)
 
 
 
@@ -43,7 +43,7 @@ IF(MSVC AND NOT (${CMAKE_VERSION} VERSION_LESS 2.8.11))
 		# set stack reserved size to ~10MB
 		# CMake previously automatically set this value for MSVC builds, but the
 		# behavior was changed in CMake 2.8.11 (Issue 12437) to use the MSVC default
-		# value (1 MB) which is not enough for us. Test mafOpExporterGRFWSTest fails 
+		# value (1 MB) which is not enough for us. Test albaOpExporterGRFWSTest fails 
 		# due to stackoverflow 
 		SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:10000000")
 ENDIF()
@@ -51,7 +51,7 @@ ENDIF()
 #-----------------------------------------------------------------------------
 # Macro for DEBUG logging
 #-----------------------------------------------------------------------------
-INCLUDE (${MAF_SOURCE_DIR}/modules/DebugMacro.cmake)
+INCLUDE (${ALBA_SOURCE_DIR}/modules/DebugMacro.cmake)
 MARK_AS_ADVANCED (
   DEBUG_MESSAGES
 )
@@ -59,16 +59,16 @@ MARK_AS_ADVANCED (
 OPTION(DEBUG_MESSAGES "Enable debug Messages" OFF)
 
 #-----------------------------------------------------------------------------
-# this define the MAF_SUBPROJECT macro
+# this define the ALBA_SUBPROJECT macro
 #-----------------------------------------------------------------------------
-INCLUDE (${MAF_SOURCE_DIR}/modules/MAFConfigMacro.cmake)
+INCLUDE (${ALBA_SOURCE_DIR}/modules/ALBAConfigMacro.cmake)
 
 #-----------------------------------------------------------------------------
 # where to place output binaries
 #-----------------------------------------------------------------------------
-SET (LIBRARY_OUTPUT_PATH ${MAF_BINARY_DIR}/bin/ CACHE INTERNAL
+SET (LIBRARY_OUTPUT_PATH ${ALBA_BINARY_DIR}/bin/ CACHE INTERNAL
      "Single output directory for building all libraries.")
-SET (EXECUTABLE_OUTPUT_PATH ${MAF_BINARY_DIR}/bin/ CACHE INTERNAL 
+SET (EXECUTABLE_OUTPUT_PATH ${ALBA_BINARY_DIR}/bin/ CACHE INTERNAL 
      "Single output directory for building all executables.")
 
 MARK_AS_ADVANCED (
@@ -77,13 +77,13 @@ MARK_AS_ADVANCED (
 )
 
 #-----------------------------------------------------------------------------
-# MAF version number.  An even minor number corresponds to releases.
+# ALBA version number.  An even minor number corresponds to releases.
 #-----------------------------------------------------------------------------
-SET(MAF_MAJOR_VERSION 2)
-SET(MAF_MINOR_VERSION 2)
-SET(MAF_BUILD_VERSION 0)
-SET(MAF_VERSION
-    "${MAF_MAJOR_VERSION}.${MAF_MINOR_VERSION}.${MAF_BUILD_VERSION}")
+SET(ALBA_MAJOR_VERSION 2)
+SET(ALBA_MINOR_VERSION 2)
+SET(ALBA_BUILD_VERSION 0)
+SET(ALBA_VERSION
+    "${ALBA_MAJOR_VERSION}.${ALBA_MINOR_VERSION}.${ALBA_BUILD_VERSION}")
 
 #-----------------------------------------------------------------------------
 # this is to enable precompiled headers under VC6.0
@@ -110,15 +110,15 @@ ENDIF (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 
 
 #-----------------------------------------------------------------------------
-# Options for MAF building
+# Options for ALBA building
 #-----------------------------------------------------------------------------
 #Remove temporarily the BUILD_SHARED_LIBS because it is not possible to switch the compilation to dynamic.
 #SET(BUILD_SHARED_LIBS 0)
 # OPTION(BUILD_SHARED_LIBS "Build with shared libraries." OFF )
 OPTION(BUILD_EXAMPLE_APP "Build Example App." ON )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
-OPTION(MAF_BUILD_MAFDLL "Build mafDLL.dll." OFF)
-OPTION(MAF_QA "Generate QA" OFF)
+OPTION(ALBA_BUILD_ALBADLL "Build albaDLL.dll." OFF)
+OPTION(ALBA_QA "Generate QA" OFF)
 
 FIND_FILE( VISUAL_STUDIO_RUNTIME vcredist_x86.exe )
 STRING(REPLACE "/" "\\" VISUAL_STUDIO_RUNTIME ${VISUAL_STUDIO_RUNTIME})
@@ -127,9 +127,9 @@ STRING(REPLACE "/" "\\" VISUAL_STUDIO_RUNTIME ${VISUAL_STUDIO_RUNTIME})
   # BUILD_SHARED_LIBS
 # )
 
-IF(MAF_BUILD_MAFDLL)
-  SET(MAF_BUILD_MAFDLL 1)
-ENDIF (MAF_BUILD_MAFDLL)
+IF(ALBA_BUILD_ALBADLL)
+  SET(ALBA_BUILD_ALBADLL 1)
+ENDIF (ALBA_BUILD_ALBADLL)
 
 SET (CONFIGURE_ERROR 0)
 
@@ -139,8 +139,8 @@ SET (CONFIGURE_ERROR 0)
 INCLUDE (${CMAKE_ROOT}/Modules/FindThreads.cmake)
 
 # Create the header to configure the classes.
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafConfigure.h.in
-             ${PROJECT_BINARY_DIR}/mafConfigure.h
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/albaConfigure.h.in
+             ${PROJECT_BINARY_DIR}/albaConfigure.h
              @ONLY)
 
 
@@ -157,31 +157,31 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/EnumUsersReg.nsh ${PROJECT_BINARY
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/InstallerCommon.nsh.in ${PROJECT_BINARY_DIR}/Installer/InstallerCommon.nsh @ONLY)
 			 
 #-----------------------------------------------------------------------------
-# Check if MFL is inside the MAF tree.
+# Check if MFL is inside the ALBA tree.
 #-----------------------------------------------------------------------------
-MAF_SUBPROJECT(MFL Libraries)
+ALBA_SUBPROJECT(MFL Libraries)
 
 IF (MFL_CONFIG_FOUND)
-  FIND_FILE (USE_MFL_FILE UseMFL.cmake "${MAF_BINARY_DIR}/Libraries") 
+  FIND_FILE (USE_MFL_FILE UseMFL.cmake "${ALBA_BINARY_DIR}/Libraries") 
   IF (USE_MFL_FILE)
-    DBG_MESSAGE("MAF: MFL Configured")
-    SET (MAF_CAN_BUILD 1)
+    DBG_MESSAGE("ALBA: MFL Configured")
+    SET (ALBA_CAN_BUILD 1)
   ENDIF (USE_MFL_FILE)   
 ELSE (MFL_CONFIG_FOUND)
-  # Search for MFL outside the MAF tree: MFL must be already built!
+  # Search for MFL outside the ALBA tree: MFL must be already built!
   # If found the USE_MFL_FILE variable is set 
-  MESSAGE(STATUS "MAF: Searching for MFL libraries")
-  INCLUDE (${MAF_SOURCE_DIR}/modules/FindMFL.cmake)
+  MESSAGE(STATUS "ALBA: Searching for MFL libraries")
+  INCLUDE (${ALBA_SOURCE_DIR}/modules/FindMFL.cmake)
   IF (MFL_FOUND)
-    MESSAGE(STATUS "MAF: Found MFL use file at: ${USE_MFL_FILE}")  
-    SET (MAF_CAN_BUILD 1)
+    MESSAGE(STATUS "ALBA: Found MFL use file at: ${USE_MFL_FILE}")  
+    SET (ALBA_CAN_BUILD 1)
   ENDIF (MFL_FOUND)
 ENDIF (MFL_CONFIG_FOUND)
 
 #-----------------------------------------------------------------------------
-# If MFL found or configure continue with MAF Configuration
+# If MFL found or configure continue with ALBA Configuration
 #-----------------------------------------------------------------------------
-IF (MAF_CAN_BUILD)
+IF (ALBA_CAN_BUILD)
   # include all necessary for using the MFL
   INCLUDE (${USE_MFL_FILE})
 
@@ -189,30 +189,30 @@ IF (MAF_CAN_BUILD)
   INCLUDE_DIRECTORIES(BEFORE ".")
 
   ###############add all subdirs but "modules"
-  SET(INCLUDE_DIRS "${MAF_BINARY_DIR}" "${MAF_SOURCE_DIR}/Base" "${MAF_SOURCE_DIR}/Common" "${MAF_BINARY_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction/Drivers" 
-              "${MAF_SOURCE_DIR}/Core" "${MAF_SOURCE_DIR}/Service" "${MAF_SOURCE_DIR}/Gui" "${MAF_SOURCE_DIR}/IO" "${MAF_SOURCE_DIR}/Operations" "${MAF_SOURCE_DIR}/VME" "${MAF_SOURCE_DIR}/VisualPipes" "${MAF_SOURCE_DIR}/Views"
-              "${MAF_SOURCE_DIR}/VME/DataPipes" "${MAF_SOURCE_DIR}/vtkMAF" "${MAF_BINARY_DIR}/vtkMAF"  "${MAF_SOURCE_DIR}/GPUAPI" 
-              "${MAF_SOURCE_DIR}/GPUAPI/GLEW" "${MAF_SOURCE_DIR}/GPUAPI/FBO")
-  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${MAF_SOURCE_DIR}/mafDLL" "${MAF_BINARY_DIR}/Libraries/ITK/Sources/InsightToolkit-3.0.1/Wrapping/WrapITK/ExternalProjects/ItkVtkGlue/src")
+  SET(INCLUDE_DIRS "${ALBA_BINARY_DIR}" "${ALBA_SOURCE_DIR}/Base" "${ALBA_SOURCE_DIR}/Common" "${ALBA_BINARY_DIR}/Interaction" "${ALBA_SOURCE_DIR}/Interaction" "${ALBA_SOURCE_DIR}/Interaction/Drivers" 
+              "${ALBA_SOURCE_DIR}/Core" "${ALBA_SOURCE_DIR}/Service" "${ALBA_SOURCE_DIR}/Gui" "${ALBA_SOURCE_DIR}/IO" "${ALBA_SOURCE_DIR}/Operations" "${ALBA_SOURCE_DIR}/VME" "${ALBA_SOURCE_DIR}/VisualPipes" "${ALBA_SOURCE_DIR}/Views"
+              "${ALBA_SOURCE_DIR}/VME/DataPipes" "${ALBA_SOURCE_DIR}/vtkALBA" "${ALBA_BINARY_DIR}/vtkALBA"  "${ALBA_SOURCE_DIR}/GPUAPI" 
+              "${ALBA_SOURCE_DIR}/GPUAPI/GLEW" "${ALBA_SOURCE_DIR}/GPUAPI/FBO")
+  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${ALBA_SOURCE_DIR}/albaDLL" "${ALBA_BINARY_DIR}/Libraries/ITK/Sources/InsightToolkit-3.0.1/Wrapping/WrapITK/ExternalProjects/ItkVtkGlue/src")
 	
 	if(BUILD_TESTING)
-	  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${MAF_SOURCE_DIR}/Testing" )
+	  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${ALBA_SOURCE_DIR}/Testing" )
 	endif(BUILD_TESTING)
   
   INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
   
 
 IF(WIN32)
-	LINK_DIRECTORIES(${MAF_SOURCE_DIR}/GPUAPI/GLEW)
+	LINK_DIRECTORIES(${ALBA_SOURCE_DIR}/GPUAPI/GLEW)
 ENDIF(WIN32)
 
-# IF(MAF_BUILD_MAFDLL)
+# IF(ALBA_BUILD_ALBADLL)
   ################################
-  #It's necessary to delete the previous files from the mafDLL project
-  # FILE(GLOB h_to_delete "${MAF_SOURCE_DIR}/mafDLL/*.h")
-  # FILE(GLOB cpp_to_delete "${MAF_SOURCE_DIR}/mafDLL/*.cpp")
-  # FILE(GLOB cxx_to_delete "${MAF_SOURCE_DIR}/mafDLL/*.cxx")
-  # FILE(GLOB txx_to_delete "${MAF_SOURCE_DIR}/mafDLL/*.txx")
+  #It's necessary to delete the previous files from the albaDLL project
+  # FILE(GLOB h_to_delete "${ALBA_SOURCE_DIR}/albaDLL/*.h")
+  # FILE(GLOB cpp_to_delete "${ALBA_SOURCE_DIR}/albaDLL/*.cpp")
+  # FILE(GLOB cxx_to_delete "${ALBA_SOURCE_DIR}/albaDLL/*.cxx")
+  # FILE(GLOB txx_to_delete "${ALBA_SOURCE_DIR}/albaDLL/*.txx")
 
   # FOREACH(f ${h_to_delete})
     # FILE(REMOVE "${f}")
@@ -230,45 +230,45 @@ ENDIF(WIN32)
     # FILE(REMOVE "${f}")
   # ENDFOREACH(f ${txx_to_delete})
   ################################
-# ENDIF(MAF_BUILD_MAFDLL)
+# ENDIF(ALBA_BUILD_ALBADLL)
 
-  # Configuring MAF kits
-  DBG_MESSAGE("MAF: Configuring MAF Kits")
-  MESSAGE(STATUS "MAF: Configuring MAF Kits")
+  # Configuring ALBA kits
+  DBG_MESSAGE("ALBA: Configuring ALBA Kits")
+  MESSAGE(STATUS "ALBA: Configuring ALBA Kits")
   
-  IF(MAF_BUILD_MAFDLL)
+  IF(ALBA_BUILD_ALBADLL)
   
     IF(WIN32)
       SUBDIRS (GPUAPI)
     ENDIF(WIN32)
-    IF (MAF_USE_VTK)
-      SUBDIRS (vtkMAF)
-    ENDIF (MAF_USE_VTK)
-    SUBDIRS (mafDLL)
+    IF (ALBA_USE_VTK)
+      SUBDIRS (vtkALBA)
+    ENDIF (ALBA_USE_VTK)
+    SUBDIRS (albaDLL)
     
-  ELSE (MAF_BUILD_MAFDLL)
+  ELSE (ALBA_BUILD_ALBADLL)
   
     IF(WIN32)
       SUBDIRS (GPUAPI)
     ENDIF(WIN32)
       SUBDIRS (Base)
-    IF (MAF_USE_VTK)
+    IF (ALBA_USE_VTK)
       SUBDIRS (Interaction)
-    ENDIF (MAF_USE_VTK)	
+    ENDIF (ALBA_USE_VTK)	
     SUBDIRS (Gui)
     SUBDIRS (IO)
     SUBDIRS (Core)
 	SUBDIRS (Service)
-    IF (MAF_USE_VTK)
+    IF (ALBA_USE_VTK)
 	  SUBDIRS (Common)
-      SUBDIRS (vtkMAF)
+      SUBDIRS (vtkALBA)
       SUBDIRS (VME)
 			SUBDIRS (VisualPipes)
 	  SUBDIRS (Views)
       SUBDIRS (Operations)
-    ENDIF (MAF_USE_VTK)
+    ENDIF (ALBA_USE_VTK)
     
-  ENDIF(MAF_BUILD_MAFDLL)
+  ENDIF(ALBA_BUILD_ALBADLL)
 
   SET(BUILD_SHARED_LIBS 0)
   # IF(BUILD_SHARED_LIBS)
@@ -291,7 +291,7 @@ ENDIF(WIN32)
   INCLUDE(CMakeExportBuildSettings)
   
   CMAKE_EXPORT_BUILD_SETTINGS(
-  ${MAF_BINARY_DIR}/MAFBuildSettings.cmake
+  ${ALBA_BINARY_DIR}/ALBABuildSettings.cmake
   )
   
   IF(NOT (${CMAKE_VERSION} VERSION_LESS 3.0))
@@ -299,45 +299,45 @@ ENDIF(WIN32)
   ENDIF(NOT (${CMAKE_VERSION} VERSION_LESS 3.0))
   
   EXPORT_LIBRARY_DEPENDENCIES(
-  ${MAF_BINARY_DIR}/MAFLibraryDepends.cmake
+  ${ALBA_BINARY_DIR}/ALBALibraryDepends.cmake
   )
 
   CONFIGURE_FILE(
-  ${MAF_SOURCE_DIR}/MAFConfig.cmake.in
-  ${MAF_BINARY_DIR}/MAFConfig.cmake
+  ${ALBA_SOURCE_DIR}/ALBAConfig.cmake.in
+  ${ALBA_BINARY_DIR}/ALBAConfig.cmake
   @ONLY IMMEDIATE
   )
   
-  #### Include directory for binary distribution of MAF
-  SET(MAF_INSTALL_INCLUDE_DIRS ${INCLUDE_DIRS})
+  #### Include directory for binary distribution of ALBA
+  SET(ALBA_INSTALL_INCLUDE_DIRS ${INCLUDE_DIRS})
   
   
   CONFIGURE_FILE(
-  ${MAF_SOURCE_DIR}/MAFUse.cmake.in
-  ${MAF_BINARY_DIR}/MAFUse.cmake
+  ${ALBA_SOURCE_DIR}/ALBAUse.cmake.in
+  ${ALBA_BINARY_DIR}/ALBAUse.cmake
   @ONLY IMMEDIATE
   )
 
   #-----------------------------------------------------------------------------
   # Build examples too ?
   #-----------------------------------------------------------------------------
-  IF (BUILD_EXAMPLE_APP AND MAF_CAN_BUILD)
+  IF (BUILD_EXAMPLE_APP AND ALBA_CAN_BUILD)
     SUBDIRS(Examples)
-  ENDIF (BUILD_EXAMPLE_APP AND MAF_CAN_BUILD)
+  ENDIF (BUILD_EXAMPLE_APP AND ALBA_CAN_BUILD)
   
   #-----------------------------------------------------------------------------
   # QA stuff
   #-----------------------------------------------------------------------------
-  IF(MAF_QA)
+  IF(ALBA_QA)
     SUBDIRS(qa)
-  ENDIF(MAF_QA)
+  ENDIF(ALBA_QA)
   
   #-----------------------------------------------------------------------------
   # Testing stuff
   #-----------------------------------------------------------------------------
   
-  # TestData MAF_DATA_ROOT should be filled even if BUILD_TESTING is set to off 
-  FIND_PATH(MAF_DATA_ROOT "TestingDataRoot.txt" "${MAF_SOURCE_DIR}/Testing/unittestData" "${MAF_SOURCE_DIR}/../mmData/TestingData" "${MAF_SOURCE_DIR}/../unittestData" DOC "Test data repository")
+  # TestData ALBA_DATA_ROOT should be filled even if BUILD_TESTING is set to off 
+  FIND_PATH(ALBA_DATA_ROOT "TestingDataRoot.txt" "${ALBA_SOURCE_DIR}/Testing/unittestData" "${ALBA_SOURCE_DIR}/../mmData/TestingData" "${ALBA_SOURCE_DIR}/../unittestData" DOC "Test data repository")
     
   IF(BUILD_TESTING)
     INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
@@ -355,9 +355,9 @@ ENDIF(WIN32)
     SUBDIRS (Testing)
     
   ENDIF(BUILD_TESTING)
-ELSE (MAF_CAN_BUILD)
-  MESSAGE (FATAL_ERROR "MFL library not found or configuration error, cannot build MAF")
-ENDIF (MAF_CAN_BUILD)
+ELSE (ALBA_CAN_BUILD)
+  MESSAGE (FATAL_ERROR "MFL library not found or configuration error, cannot build ALBA")
+ENDIF (ALBA_CAN_BUILD)
 
 MARK_AS_ADVANCED(
    USE_MFL_FILE
@@ -365,22 +365,22 @@ MARK_AS_ADVANCED(
 
 
 #-----------------------------------------------------------------------------
-# MAF_PARABUILD deploy stuff.  
+# ALBA_PARABUILD deploy stuff.  
 #-----------------------------------------------------------------------------
 
-# This is specific for automatic deploy of maf through Parabuild.
-# A MAF_PARABUILD_VERSION variable is created to gather versioning information
+# This is specific for automatic deploy of alba through Parabuild.
+# A ALBA_PARABUILD_VERSION variable is created to gather versioning information
       
 # this values are set by hand when major or minor is released
-SET(MAF_PARABUILD_MAJOR_VERSION 2 CACHE INTERNAL "major version")
-SET(MAF_PARABUILD_MINOR_VERSION 2 CACHE INTERNAL "minor version")
+SET(ALBA_PARABUILD_MAJOR_VERSION 2 CACHE INTERNAL "major version")
+SET(ALBA_PARABUILD_MINOR_VERSION 2 CACHE INTERNAL "minor version")
 
 # automatic values from parabuild created temporary environment variable
-SET(MAF_PARABUILD_BUILD_TIMESTAMP $ENV{PARABUILD_BUILD_TIMESTAMP} CACHE INTERNAL "build timestamp")
-SET(MAF_PARABUILD_BUILD_NUMBER $ENV{PARABUILD_BUILD_NUMBER} CACHE INTERNAL "build number")
+SET(ALBA_PARABUILD_BUILD_TIMESTAMP $ENV{PARABUILD_BUILD_TIMESTAMP} CACHE INTERNAL "build timestamp")
+SET(ALBA_PARABUILD_BUILD_NUMBER $ENV{PARABUILD_BUILD_NUMBER} CACHE INTERNAL "build number")
 
 # create the main version variable:
-SET(MAF_PARABUILD_VERSION "${MAF_PARABUILD_MAJOR_VERSION}_${MAF_PARABUILD_MINOR_VERSION}_TS_${MAF_PARABUILD_BUILD_TIMESTAMP}_BUILD_${MAF_PARABUILD_BUILD_NUMBER}" CACHE INTERNAL "big version identifier concatenating other identifier")
+SET(ALBA_PARABUILD_VERSION "${ALBA_PARABUILD_MAJOR_VERSION}_${ALBA_PARABUILD_MINOR_VERSION}_TS_${ALBA_PARABUILD_BUILD_TIMESTAMP}_BUILD_${ALBA_PARABUILD_BUILD_NUMBER}" CACHE INTERNAL "big version identifier concatenating other identifier")
  
 #-----------------------------------------------------------------------------
 # Write the list of variables and their values that are defined by CMake 

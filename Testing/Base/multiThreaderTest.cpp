@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: multiThreaderTest
  Authors: Gianluigi Crimi
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,8 +15,8 @@
 =========================================================================*/
 
 #include "multiThreaderTest.h"
-#include "mafMultiThreader.h"
-#include "mafMutexLock.h"
+#include "albaMultiThreader.h"
+#include "albaMutexLock.h"
 
 #include <iostream>
 using namespace std;
@@ -26,7 +26,7 @@ class test_data
 public:
   int thread_id;
   int flag;
-  mafMutexLock lock;
+  albaMutexLock lock;
 };
 
 //----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ static void ThreadFunction(mmuThreadInfoStruct *data)
   std::cerr<<"Thread "<<mydata->thread_id<<" (ID="<<data->m_ThreadID<<") waiting for gate\n";
   mydata->lock.Lock(); // wait for gate
   mydata->flag=2;
-  for (;mydata->flag;) mafSleep(10); // wait for flag reset
+  for (;mydata->flag;) albaSleep(10); // wait for flag reset
   std::cerr<<"Thread "<<mydata->thread_id<<" (ID="<<data->m_ThreadID<<") is dying\n";
 }
 
@@ -47,7 +47,7 @@ static void ThreadFunction(mmuThreadInfoStruct *data)
 void multiThreaderTest::MultiThreaderMainTest()
 //----------------------------------------------------------------------------
 {  
-  mafMultiThreader threader;
+  albaMultiThreader threader;
   test_data data[8];
   int i;
   for (i=0;i<8;i++)
@@ -57,7 +57,7 @@ void multiThreaderTest::MultiThreaderMainTest()
     data[i].lock.Lock();
     threader.SpawnThread(ThreadFunction,&(data[i]));
   }
-  mafSleep(2000); // wait 2secs for all threads to complete their work
+  albaSleep(2000); // wait 2secs for all threads to complete their work
   std::cerr<<"Gate1\n";
   
   for (i=0;i<8;i++)
@@ -65,7 +65,7 @@ void multiThreaderTest::MultiThreaderMainTest()
     CPPUNIT_ASSERT(data[i].flag==1);
     data[i].lock.Unlock();
   }
-  mafSleep(2000); // wait 2secs for all threads to complete their work
+  albaSleep(2000); // wait 2secs for all threads to complete their work
   
   for (i=0;i<8;i++)
   {
@@ -76,7 +76,7 @@ void multiThreaderTest::MultiThreaderMainTest()
   {
    data[i].flag=0;
   }
-  mafSleep(2000); // wait 2secs for all threads to complete their work
+  albaSleep(2000); // wait 2secs for all threads to complete their work
 
   std::cerr<<"Test completed successfully!"<<std::endl;
 }

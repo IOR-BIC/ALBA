@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: ALBA (Agile Library for Biomedical Applications)Medical
  Module: mmoEMGImporterWS
  Authors: Roberto Mucci
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -14,9 +14,9 @@
 
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -27,22 +27,22 @@
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>
-#include "mafGUIGui.h"
+#include "albaGUIGui.h"
 
-#include "mafTagArray.h"
+#include "albaTagArray.h"
 #include "medVMEEmg.h"
 
 #include <iostream>
 
 //----------------------------------------------------------------------------
 mmoEMGImporterWS::mmoEMGImporterWS(const wxString &label) :
-mafOp(label)
+albaOp(label)
 //----------------------------------------------------------------------------
 {
 	m_OpType	= OPTYPE_IMPORTER;
 	m_Canundo	= true;
 	m_File		= "";
-	m_FileDir = (mafGetApplicationDirectory() + "/Data/External/").c_str();
+	m_FileDir = (albaGetApplicationDirectory() + "/Data/External/").c_str();
 
   m_EmgScalar = NULL;
 }
@@ -50,10 +50,10 @@ mafOp(label)
 mmoEMGImporterWS::~mmoEMGImporterWS()
 //----------------------------------------------------------------------------
 {
-  mafDEL(m_EmgScalar);
+  albaDEL(m_EmgScalar);
 }
 //----------------------------------------------------------------------------
-mafOp* mmoEMGImporterWS::Copy()   
+albaOp* mmoEMGImporterWS::Copy()   
 //----------------------------------------------------------------------------
 {
 	mmoEMGImporterWS *cp = new mmoEMGImporterWS(m_Label);
@@ -69,14 +69,14 @@ void mmoEMGImporterWS::OpRun()
 	m_File = "";
 	wxString pgd_wildc	= "EMG File (*.*)|*.*";
   wxString f;
-  f = mafGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
+  f = albaGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
 	if(!f.IsEmpty() && wxFileExists(f))
 	{
 	  m_File = f;
     Read();
     result = OP_RUN_OK;
   }
-  mafEventMacro(mafEvent(this,result));
+  albaEventMacro(albaEvent(this,result));
 }
 
 //----------------------------------------------------------------------------
@@ -86,18 +86,18 @@ void mmoEMGImporterWS::Read()
   //if (!m_TestMode)
     wxBusyInfo wait("Please wait, working...");
   
-  mafNEW(m_EmgScalar);
+  albaNEW(m_EmgScalar);
   wxString path, name, ext;
   wxSplitPath(m_File.c_str(),&path,&name,&ext);
   m_EmgScalar->SetName(name);
 
-  mafTagItem tag_Nature;
+  albaTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");
   tag_Nature.SetValue("NATURAL");
 
   m_EmgScalar->GetTagArray()->SetTag(tag_Nature);
 
-  mafString time, scalar;
+  albaString time, scalar;
   wxFileInputStream inputFile( m_File );
   wxTextInputStream text( inputFile );
 
@@ -109,7 +109,7 @@ void mmoEMGImporterWS::Read()
   line = text.ReadLine(); 
   if (line.CompareTo("ANALOG")!= 0)
   {
-    mafErrorMessage("Invalid file format!");
+    albaErrorMessage("Invalid file format!");
     return;
   }
  

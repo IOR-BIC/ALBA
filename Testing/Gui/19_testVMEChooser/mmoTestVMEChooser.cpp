@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmoTestVMEChooser
  Authors: Paolo Quadrani
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -14,9 +14,9 @@
 
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -24,12 +24,12 @@
 
 
 #include "mmoTestVMEChooser.h"
-#include "mafGUIGui.h"
-#include "mafGUIVMEChooserTree.h"
+#include "albaGUIGui.h"
+#include "albaGUIVMEChooserTree.h"
 
 //----------------------------------------------------------------------------
 mmoTestVMEChooser::mmoTestVMEChooser(wxString label)
-: mafOp(label)
+: albaOp(label)
 //----------------------------------------------------------------------------
 {
 }
@@ -39,7 +39,7 @@ mmoTestVMEChooser::~mmoTestVMEChooser()
 {
 }
 //----------------------------------------------------------------------------
-mafOp* mmoTestVMEChooser::Copy()
+albaOp* mmoTestVMEChooser::Copy()
 //----------------------------------------------------------------------------
 {
   return new mmoTestVMEChooser(m_Label);
@@ -49,7 +49,7 @@ void mmoTestVMEChooser::OpStop(int result)
 //----------------------------------------------------------------------------
  {
    HideGui();
-   mafEventMacro(mafEvent(this,result));
+   albaEventMacro(albaEvent(this,result));
  }
 //----------------------------------------------------------------------------
 // constants
@@ -65,7 +65,7 @@ enum VME_CHOOSER_WIDGET_ID
 void mmoTestVMEChooser::OpRun()
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mafGUIGui(this);
+  m_Gui = new albaGUIGui(this);
   m_Gui->SetListener(this);
 
   m_Gui->Button(ID_VME_CHOOSER, "Choose VME");
@@ -78,10 +78,10 @@ void mmoTestVMEChooser::OpRun()
   ShowGui();
 }
 //----------------------------------------------------------------------------
-void mmoTestVMEChooser::OnEvent(mafEventBase *event)
+void mmoTestVMEChooser::OnEvent(albaEventBase *event)
 //----------------------------------------------------------------------------
 {
-  if(mafEvent *e = mafEvent::SafeDownCast(event))
+  if(albaEvent *e = albaEvent::SafeDownCast(event))
   {
     switch(e->GetId())
     {
@@ -94,39 +94,39 @@ void mmoTestVMEChooser::OnEvent(mafEventBase *event)
       case ID_VME_CHOOSER:
       {
         e->SetId(VME_CHOOSE);
-        mafEventMacro(*e);
+        albaEventMacro(*e);
         m_ChoosedNode = e->GetVme();
       }
       break;
       case ID_VME_CHOOSER_FLAT:
         e->SetId(VME_CHOOSE);
         e->SetBool(true);
-        mafEventMacro(*e);
+        albaEventMacro(*e);
         m_ChoosedNode = e->GetVme();
       break;
       case CHOSE_WITH_ACCEPT:
       {
-        mafString title = "Choose 'vme generic 1'";
+        albaString title = "Choose 'vme generic 1'";
         e->SetId(VME_CHOOSE);
         e->SetString(&title);
         e->SetArg((long)&mmoTestVMEChooser::Validate);
-        mafEventMacro(*e);
+        albaEventMacro(*e);
         m_ChoosedNode = e->GetVme();
       }
       break;
       case CHOSE_WITH_ACCEPT_AND_FLAT:
         {
-          mafString title = "Choose 'vme generic 1'";
+          albaString title = "Choose 'vme generic 1'";
           e->SetId(VME_CHOOSE);
           e->SetString(&title);
           e->SetArg((long)&mmoTestVMEChooser::Validate);
           e->SetBool(true);
-          mafEventMacro(*e);
+          albaEventMacro(*e);
           m_ChoosedNode = e->GetVme();
         }
         break;
       default:
-        mafEventMacro(*e);
+        albaEventMacro(*e);
       break;
     }  
   }

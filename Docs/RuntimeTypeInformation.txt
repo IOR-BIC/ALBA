@@ -1,8 +1,8 @@
-[HOWTO about MAF custom RTTI Apis]
+[HOWTO about ALBA custom RTTI Apis]
 
-The new MAF tree now has its own API for RTTI. These rtti Apis are implementated
+The new ALBA tree now has its own API for RTTI. These rtti Apis are implementated
 over standard C++ RTTI mechanims, and in most part the two syntax are equivalent. 
-MAF systax are inspired to VTK and ITK syntax for the same kind of objects. See 
+ALBA systax are inspired to VTK and ITK syntax for the same kind of objects. See 
 the Doxygen pages fr more
 details on syntax.
 The idea behaind these Apis is to provide simple functions to query an object
@@ -17,26 +17,26 @@ type is not related to the pointed object but to the pointer itself. E.g.
 GetStaticName() returns the type of the pointer. On the other hand non static
 functions query the pointed object. Following example shows the difference:
 
-mafObject *ptr = new mafEvent;
-mafString static_name = ptr->GetStaticTypeName();
-mafString real_name = ptr->GetTypeName();
+albaObject *ptr = new albaEvent;
+albaString static_name = ptr->GetStaticTypeName();
+albaString real_name = ptr->GetTypeName();
 
-static_name is "mafObject", while real_name is "mafEvent".
+static_name is "albaObject", while real_name is "albaEvent".
 
 *** RTTI Macro and Abstract VS Concrete classes
-Any class inheriting from mafObject must add one of the two following lines
+Any class inheriting from albaObject must add one of the two following lines
 to its declaration (in the public: area):
 
-  mafTypeMacro(classname,parent_classname);
+  albaTypeMacro(classname,parent_classname);
 
 or
 
- mafAbstractTypeMacro(classname,parent_classname);
+ albaAbstractTypeMacro(classname,parent_classname);
 
 where "classname" is the name of the class, and "parent_classname" is the name
-of the main parent class. Note in MAF multiple inheritance is supported but
+of the main parent class. Note in ALBA multiple inheritance is supported but
 with limitations, and hierarchical RTTI only refers to main parent class. See
-also (MAF interfaces HowTo)
+also (ALBA interfaces HowTo)
 
 The first macro must be used by concrete classes, i.e. that do not have pure 
 virtual member functions and thus can be created. Classes representing only
@@ -44,14 +44,14 @@ interfaces (abstract classes) must use the second macro. The difference is
 the first also defines methods to instantiate the class (see the ObjectFactory
 HowTo).
 
-Also, all classes inheriting from mafObjectFactory must add one of the following 
+Also, all classes inheriting from albaObjectFactory must add one of the following 
 two lines to the .cpp file:
 
-mafCxxTypeMacro(classname)
+albaCxxTypeMacro(classname)
 
 or
 
-mafCxxAbstractTypeMacro(classname)
+albaCxxAbstractTypeMacro(classname)
 
 *** Superclass typedef
 Type macros also define the "Superclass" type, which concide with the parent

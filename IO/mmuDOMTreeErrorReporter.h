@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmuDOMTreeErrorReporter
  Authors: Marco Petrone
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -28,7 +28,7 @@ class name: mmuDOMTreeErrorReporter
   Utility class to catch XML error rised while parsing XML 
 */
 
-class MAF_EXPORT mmuDOMTreeErrorReporter : public XERCES_CPP_NAMESPACE_QUALIFIER ErrorHandler
+class ALBA_EXPORT mmuDOMTreeErrorReporter : public XERCES_CPP_NAMESPACE_QUALIFIER ErrorHandler
 {
 public:
     /** constructor */

@@ -2,15 +2,15 @@
 # Copyright and description to be placed here
 #
 #
-PROJECT(mafDoxygen)
-DBG_MESSAGE("Configuring project mafDoxygen")
+PROJECT(albaDoxygen)
+DBG_MESSAGE("Configuring project albaDoxygen")
 
 INCLUDE (${CMAKE_ROOT}/Modules/Documentation.cmake OPTIONAL)
 
 IF (BUILD_DOCUMENTATION)
-  SET (DOXYFILE ${PROJECT_BINARY_DIR}/maf_doxyfile)
-  CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/maf_doxyfile.in
-             ${PROJECT_BINARY_DIR}/maf_doxyfile
+  SET (DOXYFILE ${PROJECT_BINARY_DIR}/alba_doxyfile)
+  CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/alba_doxyfile.in
+             ${PROJECT_BINARY_DIR}/alba_doxyfile
              @ONLY)
   IF (WIN32)
     CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/makedoc.bat.in

@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: VMEGenericBoundsTest
  Authors: Gianluigi Crimi
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -17,9 +17,9 @@
 #ifndef __CPP_UNIT_VMEGenericBoundsTest_H__
 #define __CPP_UNIT_VMEGenericBoundsTest_H__
 
-#include "mafTest.h"
+#include "albaTest.h"
 
-class VMEGenericBoundsTest : public mafTest
+class VMEGenericBoundsTest : public albaTest
 {
   CPPUNIT_TEST_SUITE( VMEGenericBoundsTest );
   CPPUNIT_TEST( VMEGenericBoundsMainTest );

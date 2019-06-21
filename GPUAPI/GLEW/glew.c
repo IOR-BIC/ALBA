@@ -10677,7 +10677,7 @@ PFNWGLCOPYIMAGESUBDATANVPROC __wglewCopyImageSubDataNV = NULL;
 PFNWGLCREATEAFFINITYDCNVPROC __wglewCreateAffinityDCNV = NULL;
 PFNWGLDELETEDCNVPROC __wglewDeleteDCNV = NULL;
 PFNWGLENUMGPUDEVICESNVPROC __wglewEnumGpuDevicesNV = NULL;
-PFNWGLENUMGPUSFROMAFFINITYDCNVPROC __wglewEnumGpusFromAffinityDCNV = NULL;
+PFNWGLENUMGPUSFROALBAFINITYDCNVPROC __wglewEnumGpusFromAffinityDCNV = NULL;
 PFNWGLENUMGPUSNVPROC __wglewEnumGpusNV = NULL;
 
 PFNWGLBINDVIDEODEVICENVPROC __wglewBindVideoDeviceNV = NULL;
@@ -11204,7 +11204,7 @@ static GLboolean _glewInit_WGL_NV_gpu_affinity (WGLEW_CONTEXT_ARG_DEF_INIT)
   r = ((wglCreateAffinityDCNV = (PFNWGLCREATEAFFINITYDCNVPROC)glewGetProcAddress((const GLubyte*)"wglCreateAffinityDCNV")) == NULL) || r;
   r = ((wglDeleteDCNV = (PFNWGLDELETEDCNVPROC)glewGetProcAddress((const GLubyte*)"wglDeleteDCNV")) == NULL) || r;
   r = ((wglEnumGpuDevicesNV = (PFNWGLENUMGPUDEVICESNVPROC)glewGetProcAddress((const GLubyte*)"wglEnumGpuDevicesNV")) == NULL) || r;
-  r = ((wglEnumGpusFromAffinityDCNV = (PFNWGLENUMGPUSFROMAFFINITYDCNVPROC)glewGetProcAddress((const GLubyte*)"wglEnumGpusFromAffinityDCNV")) == NULL) || r;
+  r = ((wglEnumGpusFromAffinityDCNV = (PFNWGLENUMGPUSFROALBAFINITYDCNVPROC)glewGetProcAddress((const GLubyte*)"wglEnumGpusFromAffinityDCNV")) == NULL) || r;
   r = ((wglEnumGpusNV = (PFNWGLENUMGPUSNVPROC)glewGetProcAddress((const GLubyte*)"wglEnumGpusNV")) == NULL) || r;
 
   return r;

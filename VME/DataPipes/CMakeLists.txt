@@ -1,35 +1,35 @@
-PROJECT(mafDataPipes)
+PROJECT(albaDataPipes)
 
 DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  mafDataPipeInterpolator.cpp
-  mafDataPipeInterpolator.h
-  mafDataPipeCustom.cpp
-  mafDataPipeCustom.h
-  mafDataPipeCustomProber.cpp
-  mafDataPipeCustomProber.h
-  mafDataPipeInterpolatorVTK.cpp
-  mafDataPipeInterpolatorVTK.h
-  vtkMAFDataPipe.cpp
-  vtkMAFDataPipe.h
+  albaDataPipeInterpolator.cpp
+  albaDataPipeInterpolator.h
+  albaDataPipeCustom.cpp
+  albaDataPipeCustom.h
+  albaDataPipeCustomProber.cpp
+  albaDataPipeCustomProber.h
+  albaDataPipeInterpolatorVTK.cpp
+  albaDataPipeInterpolatorVTK.h
+  vtkALBADataPipe.cpp
+  vtkALBADataPipe.h
 )
 
-IF (MAF_USE_ITK)
+IF (ALBA_USE_ITK)
 SET(PROJECT_SRCS  ${PROJECT_SRCS}
-  mafDataPipeInterpolatorScalarMatrix.cpp
-  mafDataPipeInterpolatorScalarMatrix.h
+  albaDataPipeInterpolatorScalarMatrix.cpp
+  albaDataPipeInterpolatorScalarMatrix.h
   )
-ENDIF (MAF_USE_ITK)
+ENDIF (ALBA_USE_ITK)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafCore vtkMAF)
+SET(PROJECT_LIBS albaCore vtkALBA)
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 
-IF (MAF_USE_VTK)
+IF (ALBA_USE_VTK)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_VTK_LIBRARY)
-ENDIF (MAF_USE_VTK)
+ENDIF (ALBA_USE_VTK)

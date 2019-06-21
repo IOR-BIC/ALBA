@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmiSelectPoint
  Authors: Matteo Giacomoni , Stefano Perticoni
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -20,9 +20,9 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDefines.h"
-#include "mafInteractorCameraMove.h"
-#include "mafMTime.h"
+#include "albaDefines.h"
+#include "albaInteractorCameraMove.h"
+#include "albaMTime.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -41,7 +41,7 @@ A pick can be set to happen with LeftMouseButton + CTRL or LeftMouseButton only
 
 When the pick is performed a:
 
-mafEvent(this,VME_PICKED,pickedPoint,pickedCellId);
+albaEvent(this,VME_PICKED,pickedPoint,pickedCellId);
 
 is issued.
 
@@ -52,19 +52,19 @@ pointFromEvent->GetPoint(0,pointCoordinates);
 int cellID = e->GetArg();
 
 */
-class MAF_EXPORT mmiSelectPoint : public mafInteractorCameraMove
+class ALBA_EXPORT mmiSelectPoint : public albaInteractorCameraMove
 {
 public:
-	mafTypeMacro(mmiSelectPoint,mafInteractorCameraMove);
+	albaTypeMacro(mmiSelectPoint,albaInteractorCameraMove);
 
 	/** redefined not to move the camera if something has been picked */
 	virtual void OnMouseMove();
 
 	/** redefined to pick cell if CTRL modifier is pressed */
-	virtual void OnLeftButtonDown(mafEventInteraction *e);
+	virtual void OnLeftButtonDown(albaEventInteraction *e);
 
 	/** redefined to end pick modality */
-	virtual void OnButtonUp(mafEventInteraction *e);
+	virtual void OnButtonUp(albaEventInteraction *e);
 
   /** Set the CTRL modifier to On => picking performed on LeftButtonDown + CTRL */
   void SetCtrlModifierOn(){m_UseCtrlModifier = true;};
@@ -85,7 +85,7 @@ protected:
 	virtual ~mmiSelectPoint();
 
 	/** send the picking informations to the listener */
-	void PickCell(mafDevice *device);
+	void PickCell(albaDevice *device);
 
 	bool m_IsPicking;
 
@@ -94,7 +94,7 @@ protected:
 private:
 	mmiSelectPoint(const mmiSelectPoint&);  // Not implemented.
 	void operator=(const mmiSelectPoint&);  // Not implemented.
-	void OnEvent(mafEventBase *event);
+	void OnEvent(albaEventBase *event);
 
 };
 #endif 

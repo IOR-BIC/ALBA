@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testTabGui
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -16,9 +16,9 @@
 
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -47,10 +47,10 @@ testTabGui::testTabGui(wxWindow* parent)
   m_dv2[0]=m_dv2[1]=m_dv2[2]=3.45678;
 
   
-  m_gui = new mafGUI(this);
+  m_gui = new albaGUI(this);
   
   m_gui->Label("label");
-  m_gui->Label("label1",mafString("label2"));
+  m_gui->Label("label1",albaString("label2"));
   m_gui->Divider();
   m_gui->Divider(1);
   m_gui->Divider(2);
@@ -107,7 +107,7 @@ testTabGui::testTabGui(wxWindow* parent)
   */
   /*
   wxListBox				*lb   = m_gui->ListBox    (ID);
-  mafGUICheckListBox *cl   = m_gui->CheckList  (ID);
+  albaGUICheckListBox *cl   = m_gui->CheckList  (ID);
   wxGrid					*grid = m_gui->Grid       (ID);
 
   lb->Append("qui");
@@ -153,7 +153,7 @@ testTabGui::testTabGui(wxWindow* parent)
   m_gui->Label("");
 
 
-  m_guih = new mafGUIHolder(parent,-1,true,true);
+  m_guih = new albaGUIHolder(parent,-1,true,true);
   //m_guih->SetSize(100,100);
   m_guih->Put(m_gui);
   m_guih->Show(true);
@@ -176,10 +176,10 @@ wxWindow* testTabGui::GetGui()
   return m_guih;
 }
 //----------------------------------------------------------------------------
-void testTabGui::OnEvent(mafEventBase *maf_event)
+void testTabGui::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event)) 
+  if (albaEvent *e = albaEvent::SafeDownCast(alba_event)) 
   {
     e->Log(); 
     /*

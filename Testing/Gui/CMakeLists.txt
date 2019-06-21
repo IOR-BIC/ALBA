@@ -1,11 +1,11 @@
 PROJECT (Gui_TEST)
 
-# mafGUI e' indipendente da Core, ma i test no -- Silvano 04/04/05
-IF(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafDLL)
-ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafTests mafCore mafVME mafGui mafService)
-ENDIF (MAF_BUILD_MAFDLL)
+# albaGUI e' indipendente da Core, ma i test no -- Silvano 04/04/05
+IF(ALBA_BUILD_ALBADLL)
+  LINK_LIBRARIES(albaDLL)
+ELSE(ALBA_BUILD_ALBADLL)
+  LINK_LIBRARIES(albaTests albaCore albaVME albaGui albaService)
+ENDIF (ALBA_BUILD_ALBADLL)
 
 #SUBDIRS(Minimal)
 #SUBDIRS(01_testGui)
@@ -33,18 +33,18 @@ ENDIF (MAF_BUILD_MAFDLL)
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------
 SET(PROJECT_SRCS 
-	mafGuiTests.h 					mafGuiTests.cpp
-	mafAttachCameraTest.h 			mafAttachCameraTest.cpp
-	mafGUISettingsAdvancedTest.h 	mafGUISettingsAdvancedTest.cpp
-	mafGUIDicomSettingsTest.h 		mafGUIDicomSettingsTest.cpp
-	mafGUIWizardTest.h 				mafGUIWizardTest.cpp
-	mafGUIWizardPageTest.h 			mafGUIWizardPageTest.cpp
-	mafGUILandmarkTest.h 			mafGUILandmarkTest.cpp
-	mafGUIWizardPageNewTest.h 		mafGUIWizardPageNewTest.cpp
+	albaGuiTests.h 					albaGuiTests.cpp
+	albaAttachCameraTest.h 			albaAttachCameraTest.cpp
+	albaGUISettingsAdvancedTest.h 	albaGUISettingsAdvancedTest.cpp
+	albaGUIDicomSettingsTest.h 		albaGUIDicomSettingsTest.cpp
+	albaGUIWizardTest.h 				albaGUIWizardTest.cpp
+	albaGUIWizardPageTest.h 			albaGUIWizardPageTest.cpp
+	albaGUILandmarkTest.h 			albaGUILandmarkTest.cpp
+	albaGUIWizardPageNewTest.h 		albaGUIWizardPageNewTest.cpp
 )
 
-ADD_EXECUTABLE(mafGuiTests ${PROJECT_SRCS})
-ADD_TEST(mafGuiTests  ${EXECUTABLE_OUTPUT_PATH}/mafGuiTests)
+ADD_EXECUTABLE(albaGuiTests ${PROJECT_SRCS})
+ADD_TEST(albaGuiTests  ${EXECUTABLE_OUTPUT_PATH}/albaGuiTests)
 IF (WIN32)
-  SET_TARGET_PROPERTIES(mafGuiTests PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(albaGuiTests PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)

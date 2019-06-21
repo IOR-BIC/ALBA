@@ -1,33 +1,33 @@
-[HOW-TO about IO-Mechanisms in MAF]
+[HOW-TO about IO-Mechanisms in ALBA]
 
 ** Serialization
-MAF 2.0 introduced a new mechanism for supporting I/O: serialization. Serialization is a technique strictly related to Object Oriented Programming, and represent the capability of single objects to store and restore them self from a persistent support. MAF serialization support is based on few base classes, but before describing them it's important to report key features of this implementation:
+ALBA 2.0 introduced a new mechanism for supporting I/O: serialization. Serialization is a technique strictly related to Object Oriented Programming, and represent the capability of single objects to store and restore them self from a persistent support. ALBA serialization support is based on few base classes, but before describing them it's important to report key features of this implementation:
 - easy extension of classes with serialization capabilities
 - independence of the serialization mechanism from the specific storage format
 - support for storing most common basic data types
 - storage mechanism oriented to a hierarchically organized object structure 
 
   Imperative vs Declarative
-Since the MAF serialization is oriented to C++ classes, it was not possible to implement mechanisms for auto-serialization, because C++ language does not provide mechanism for introspection of classes properties. The idea to impose strictly programming rules seems clearly not applicable, since one of MAF 2.0 general objectives is increased usability/simplicity/extensibility. For this reason, as we are going to see the serialization must be an imperative procedure, where each object implements a couple of member functions to store and restore itself. Nevertheless, a future MAF extension could include wrapping toward script languages capable of strong introspection (like Python). In such case it could be possible to implement an automatic store/restore mechanism.
+Since the ALBA serialization is oriented to C++ classes, it was not possible to implement mechanisms for auto-serialization, because C++ language does not provide mechanism for introspection of classes properties. The idea to impose strictly programming rules seems clearly not applicable, since one of ALBA 2.0 general objectives is increased usability/simplicity/extensibility. For this reason, as we are going to see the serialization must be an imperative procedure, where each object implements a couple of member functions to store and restore itself. Nevertheless, a future ALBA extension could include wrapping toward script languages capable of strong introspection (like Python). In such case it could be possible to implement an automatic store/restore mechanism.
 
   Serialization components
 Serialization is implemented through three main components:
-- mafStorage 
-- mafStorageElement
-- mafStorable
+- albaStorage 
+- albaStorageElement
+- albaStorable
 
-  The mafStorage
-The Storage is the class responsible to connect to the storage support (being it a file, a network connection or a DB). The mafStorage object is an abstract class, defining APIs for such kind of objects, while concrete implementations of this object define the specific kind of storage support. E.g. mafXMLStorage class already implemented inside MAF is an implementation storing objects into an XML file, and is currently based on Xerces-C library, from the Apache project (@ref@).
+  The albaStorage
+The Storage is the class responsible to connect to the storage support (being it a file, a network connection or a DB). The albaStorage object is an abstract class, defining APIs for such kind of objects, while concrete implementations of this object define the specific kind of storage support. E.g. albaXMLStorage class already implemented inside ALBA is an implementation storing objects into an XML file, and is currently based on Xerces-C library, from the Apache project (@ref@).
 
-Another important feature the Storage object is also responsible for is the implementation of a simple mechanism for abstracting the real location of a storage file. This feature is not yet completely implemented in MAF 2.0, and is probably going to be available in a next release.
+Another important feature the Storage object is also responsible for is the implementation of a simple mechanism for abstracting the real location of a storage file. This feature is not yet completely implemented in ALBA 2.0, and is probably going to be available in a next release.
 
 The main APIs of storage are:
 SetURL()/GetURL()   specify/retrieve the URL string to reach the storage.
 Store()/Restore()   start the storing/restoring procedure
 SetRoot()           set the top element of the hierarchy to be stored 
 
-  The mafStorageElement
-The mafStorageElement represent the "serialized" version of an object, it's an abstract class specifying all APIs to store and restore basic data types. Concrete classes represent the way for formatting the information: e.g. mafXMLElement represent an XML node, implemented on top of the Xerces-C library. The mafStorageElement object hides completely the specific format and the library it is based on. Following is a list of APIs for storing/restoring basic types:
+  The albaStorageElement
+The albaStorageElement represent the "serialized" version of an object, it's an abstract class specifying all APIs to store and restore basic data types. Concrete classes represent the way for formatting the information: e.g. albaXMLElement represent an XML node, implemented on top of the Xerces-C library. The albaStorageElement object hides completely the specific format and the library it is based on. Following is a list of APIs for storing/restoring basic types:
 
 StoreText( text , name )
 StoreDouble( value, name )
@@ -42,34 +42,34 @@ RestoreInteger( value, name )
 RestoreMatrix( matrix, name )
 RestoreVectorN( comps, num, name )
 RestoreObject( object, name )
-mafObject *RestoreObject( name )
-mafObject *RestoreObject( element );
+albaObject *RestoreObject( name )
+albaObject *RestoreObject( element );
 
 Therefore a storage element implementation must be able to store and restore text, double precision floating point number, integer number, a 4x4 matrix and a generic serializable object. The RestoreObject() function is able to recreate and restore a generic object, the only constraints are: the object must be a "storable" objects (see next section) and it must have been plugged in the object factory to be created from its string "name".
 
-  The mafStorable
-To be storable an object must be inherited from "mafStorable". The mafStorable is an interface class implementing a "Store" and "Restore" function:
+  The albaStorable
+To be storable an object must be inherited from "albaStorable". The albaStorable is an interface class implementing a "Store" and "Restore" function:
 
-int Store(mafStoreElement *parent)
+int Store(albaStoreElement *parent)
 
-int Restore(mafStoreElement *element)
+int Restore(albaStoreElement *element)
 
 These two methods can be called by other objects to make the object to be stored/restored. The storable object should note override these two methods for defining their own way to store/restore, but reimplement the InternalStore() a InternalRestore(), whose semantic is equivalent to Store() and Restore().
-Since inside MAF 2.0 is allowed the multiple inheritance, any object can be made storable by adding the mafStorable object in its parent classes list and then implementing the InternalStore()/InternalRestore(). Example of storable object:
+Since inside ALBA 2.0 is allowed the multiple inheritance, any object can be made storable by adding the albaStorable object in its parent classes list and then implementing the InternalStore()/InternalRestore(). Example of storable object:
 
-class example_class : public my_parent_class, public mafStorable
+class example_class : public my_parent_class, public albaStorable
 {
 public:
 ...
 
 protected:
 
-int InternalStore(mafStorageElement *parent);
-int InternalRestore(mafStorageElement *element);
+int InternalStore(albaStorageElement *parent);
+int InternalRestore(albaStorageElement *element);
 };
 
-In general no restriction is imposed to my_parent_class but not implementing the same methods of mafStorable (e.g. Store/Restore/InternalStore/InternalRestore).
-An important restriction regards objects to be stored with StoreObject method of mafStorageElement: this method is thought for storing objects plugged in the object factory, thus when restored the object can be automatically recreated from the object factory: this means who restore the object does not need to know the restored the object. This mechanism allows the MAF to have extensible components like nodes (VMEs), devices and in future also visual pipes, operations and views. (eventually through plugins). Since mafObjectFactory only supports mafObject's, an object to be stored with StoreObject() method needs to be inherited from mafObject.
+In general no restriction is imposed to my_parent_class but not implementing the same methods of albaStorable (e.g. Store/Restore/InternalStore/InternalRestore).
+An important restriction regards objects to be stored with StoreObject method of albaStorageElement: this method is thought for storing objects plugged in the object factory, thus when restored the object can be automatically recreated from the object factory: this means who restore the object does not need to know the restored the object. This mechanism allows the ALBA to have extensible components like nodes (VMEs), devices and in future also visual pipes, operations and views. (eventually through plugins). Since albaObjectFactory only supports albaObject's, an object to be stored with StoreObject() method needs to be inherited from albaObject.
  
 Storing
 When storing the argument represent the storage element inside which the storable object should serialize.

@@ -9,7 +9,7 @@
 						This rule extrapolates comments from unit tests in order to create online documentation,
                         for a quick "How to use this class" tutorial.
 					</h3>
-                    <h4><br/>Link to <a href="http://www.biomedtown.org/biomed_town/MAF/MAF3%20Floor/documentation/qa/maf3-automatic-guide-creator-script/">Guide Creator rule</a></h4>
+                    <h4><br/>Link to <a href="http://www.biomedtown.org/biomed_town/ALBA/ALBA3%20Floor/documentation/qa/alba-automatic-guide-creator-script/">Guide Creator rule</a></h4>
 				</div>
 				<div id="contentTable">
 					<table id="listing">

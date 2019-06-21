@@ -1,0 +1,30 @@
+# Tell the user project where to find headers and libraries
+SET(ALBA_INCLUDE_DIRS
+  "@ALBA_SOURCE_DIR@/Base"
+  "@ALBA_SOURCE_DIR@/Core"
+  "@ALBA_SOURCE_DIR@/Gui"
+  "@ALBA_SOURCE_DIR@/Interaction"
+  "@ALBA_SOURCE_DIR@/Interaction/Drivers"
+  "@ALBA_BINARY_DIR@/Interaction"
+  "@ALBA_SOURCE_DIR@/IO"
+  "@ALBA_SOURCE_DIR@/Operations"
+  "@ALBA_SOURCE_DIR@/VME"
+  "@ALBA_SOURCE_DIR@/VME/DataPipes"
+  "@ALBA_SOURCE_DIR@/vtkALBA"
+  "@ALBA_BINARY_DIR@"
+  "@ALBA_BINARY_DIR@/vtkALBA"
+)
+
+SET(ALBA_BUILD_SETTINGS_FILE
+  "@ALBA_BINARY_DIR@/ALBABuildSettings.cmake"
+)
+
+INCLUDE(
+  "@ALBA_BINARY_DIR@/ALBALibraryDepends.cmake"
+)
+
+SET(ALBA_LIBRARY_DIRS "@LIBRARY_OUTPUT_PATH@")
+
+SET(ALBA_USE_FILE
+  "@ALBA_BINARY_DIR@/ALBAUse.cmake"
+)

@@ -19,7 +19,7 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafLogicWithManagers.h" 
+#include "albaLogicWithManagers.h" 
 
 // ============================================================================
 class AlbaMaster : public wxApp
@@ -33,7 +33,7 @@ public:
 	int FilterEvent(wxEvent& event);
 
 protected:
-  mafLogicWithManagers *m_Logic;
+  albaLogicWithManagers *m_Logic;
 	bool m_LogicInitialized;
 
 	void OnFatalException();

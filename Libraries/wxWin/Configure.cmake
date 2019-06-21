@@ -1,5 +1,5 @@
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
 # Date:      $Date: 2011-05-25 09:59:40 $
@@ -36,7 +36,7 @@
 INCLUDE (${MFL_SOURCE_DIR}/modules/PackagesMacro.cmake)
 INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 
-# this option is to build WXWIN inside the MAF tree
+# this option is to build WXWIN inside the ALBA tree
 IF (EXISTS "${WXWIN_SOURCE_DIR}/Sources")   
   SET (WXWIN_SOURCE_PATH "${WXWIN_SOURCE_DIR}/Sources")
 ENDIF (EXISTS "${WXWIN_SOURCE_DIR}/Sources")
@@ -88,7 +88,7 @@ IF (WXWIN_SOURCE_PATH)
       -DLIBRARY_OUTPUT_PATH:PATH="${LIBRARY_OUTPUT_PATH}" 
       -DEXECUTABLE_OUTPUT_PATH:PATH="${EXECUTABLE_OUTPUT_PATH}" 
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-      -DBUILD_SHARED_LIBS:BOOL=${MAF_BUILD_MAFDLL}
+      -DBUILD_SHARED_LIBS:BOOL=${ALBA_BUILD_ALBADLL}
       -DWX_USE_HTML:BOOL=TRUE
       OUTPUT_VARIABLE CMAKE_OUTPUT 
       RETURN_VALUE CMAKE_RETURN)

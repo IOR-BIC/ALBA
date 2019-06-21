@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   AlbaMaster
-Module:    mafOpInteractionOp.cpp
+Module:    albaOpInteractionOp.cpp
 Language:  C++
 Date:      $Date: 2018-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,22 +13,22 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in ALBA must include "mafDefines.h" as first.
+// NOTE: Every CPP file in ALBA must include "albaDefines.h" as first.
 // This force to include Window, wxWidgets and VTK exactly in this order.
 //----------------------------------------------------------------------------
 
 #include "exWizardSample.h"
-#include "mafWizardBlockSelection.h"
-#include "mafWizardBlockOperation.h"
-#include "mafWizardBlockInformation.h"
+#include "albaWizardBlockSelection.h"
+#include "albaWizardBlockOperation.h"
+#include "albaWizardBlockInformation.h"
 
 
 //--------------------------------------------------------------------------------
-exWizardSample::exWizardSample( const wxString &label ):mafWizard(label)
+exWizardSample::exWizardSample( const wxString &label ):albaWizard(label)
 {
-	mafWizardBlockInformation *infoBlock=new mafWizardBlockInformation("START");
+	albaWizardBlockInformation *infoBlock=new albaWizardBlockInformation("START");
   infoBlock->SetBoxLabel("Info");
   infoBlock->SetDescription("Import Loop:\nYou can import and show a series of VTK files.");
   infoBlock->SetWindowTitle("information");
@@ -36,15 +36,15 @@ exWizardSample::exWizardSample( const wxString &label ):mafWizard(label)
   infoBlock->SetBlockProgress(10);
   
   //Start Block (import a VTK file)   
-  mafWizardBlockOperation *opBlock=new mafWizardBlockOperation("Import");
+  albaWizardBlockOperation *opBlock=new albaWizardBlockOperation("Import");
   opBlock->SetRequiredView("");
   opBlock->VmeSelect("root");
-  opBlock->SetRequiredOperation("mafOpImporterVTK");
+  opBlock->SetRequiredOperation("albaOpImporterVTK");
   opBlock->SetNextBlock("opPause");
   opBlock->SetBlockProgress(25);
 
   //Move block (position the Block)
-  mafWizardBlockOperation *opBlock2=new mafWizardBlockOperation("opPause");
+  albaWizardBlockOperation *opBlock2=new albaWizardBlockOperation("opPause");
   opBlock2->SetRequiredView("VTK view");
   opBlock2->VmeSelect("lastChild");
   opBlock2->SetRequiredOperation("PAUSE");
@@ -52,7 +52,7 @@ exWizardSample::exWizardSample( const wxString &label ):mafWizard(label)
   opBlock2->SetBlockProgress(75);
   
   //Select Block ask user if want to import another file
-  mafWizardBlockSelection *selectorBlock=new mafWizardBlockSelection("Select");
+  albaWizardBlockSelection *selectorBlock=new albaWizardBlockSelection("Select");
   selectorBlock->SetWindowTitle("Test Selector");
   selectorBlock->SetDescription("Wizard Selector Test window");
   selectorBlock->AddChoice("Import another VTK","deleteBlock"); 
@@ -60,7 +60,7 @@ exWizardSample::exWizardSample( const wxString &label ):mafWizard(label)
   selectorBlock->SetBlockProgress(100);
 
   //Move block (position the Block)
-  mafWizardBlockOperation *deleteBlock=new mafWizardBlockOperation("deleteBlock");
+  albaWizardBlockOperation *deleteBlock=new albaWizardBlockOperation("deleteBlock");
   deleteBlock->SetRequiredOperation("DELETE");
   deleteBlock->SetNextBlock("Import");
 	
@@ -75,7 +75,7 @@ exWizardSample::exWizardSample( const wxString &label ):mafWizard(label)
 }
 
 //--------------------------------------------------------------------------------
-bool exWizardSample::Accept(mafVME* vme)
+bool exWizardSample::Accept(albaVME* vme)
 {
   return true;
 }

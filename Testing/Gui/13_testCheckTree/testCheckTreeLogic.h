@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testCheckTreeLogic
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -18,43 +18,43 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafEvent.h"
+#include "albaEvent.h"
 #include <wx/notebook.h>
 #include <wx/toolbar.h>
-#include "mafObserver.h"
+#include "albaObserver.h"
 
 //----------------------------------------------------------------------------
 // Forward Refs:
 //----------------------------------------------------------------------------
-class mafGUIMDIFrame;
-class mafGUISashPanel;
-class mafGUICheckTree;
+class albaGUIMDIFrame;
+class albaGUISashPanel;
+class albaGUICheckTree;
 class testCheckTreeGui;
 
 //-------------------------------------------------------------------------
 // TestNode
 //-------------------------------------------------------------------------
-#include "mafNode.h"
-class mafNodeA: public mafNode
+#include "albaNode.h"
+class albaNodeA: public albaNode
 {
 public:
-  mafTypeMacro(mafNodeA,mafNode);
+  albaTypeMacro(albaNodeA,albaNode);
 };
-class mafNodeB: public mafNode
+class albaNodeB: public albaNode
 {
 public:
-  mafTypeMacro(mafNodeB,mafNode);
+  albaTypeMacro(albaNodeB,albaNode);
 };
 
 
 // ============================================================================
-class testCheckTreeLogic : public mafObserver
+class testCheckTreeLogic : public albaObserver
 // ============================================================================
 {
 public:
                 testCheckTreeLogic();
                ~testCheckTreeLogic();
-  virtual void  OnEvent(mafEventBase *maf_event);
+  virtual void  OnEvent(albaEventBase *alba_event);
           void  Show(); 
           void  OnQuit();
       wxWindow* GetTopWin();
@@ -65,15 +65,15 @@ protected:
   void CreateSideBar();
   void CreateToolBar();
 
-  mafGUIMDIFrame   *m_win;
+  albaGUIMDIFrame   *m_win;
   wxMenuBar     *m_menu_bar;
-  mafGUISashPanel  *m_log_bar; 
-  mafGUISashPanel  *m_side_bar;
-  mafGUICheckTree  *m_tree;
+  albaGUISashPanel  *m_log_bar; 
+  albaGUISashPanel  *m_side_bar;
+  albaGUICheckTree  *m_tree;
   wxNotebook    *m_notebook;
 
-  mafNodeA    *m_nodea;
-  mafNodeB    *m_nodeb;
+  albaNodeA    *m_nodea;
+  albaNodeB    *m_nodeb;
 
   wxToolBar *m_toolbar;
 };

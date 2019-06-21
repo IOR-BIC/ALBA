@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmaApplicationLayout
  Authors: Paolo Quadrani
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -20,31 +20,31 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafAttribute.h"
+#include "albaAttribute.h"
 
 
-#ifdef MAF_EXPORTS
-#include "mafDllMacros.h"
-EXPORT_STL_VECTOR(MAF_EXPORT,ViewLayoutInfo);
+#ifdef ALBA_EXPORTS
+#include "albaDllMacros.h"
+EXPORT_STL_VECTOR(ALBA_EXPORT,ViewLayoutInfo);
 #endif
 //----------------------------------------------------------------------------
 // mmaApplicationLayout:
 //----------------------------------------------------------------------------
 /**  */  
-class MAF_EXPORT mmaApplicationLayout : public mafAttribute
+class ALBA_EXPORT mmaApplicationLayout : public albaAttribute
 {
 public:
 	         mmaApplicationLayout();
   virtual ~mmaApplicationLayout();
 
-  mafTypeMacro(mmaApplicationLayout, mafAttribute);
+  albaTypeMacro(mmaApplicationLayout, albaAttribute);
 
  
   /** Copy the contents of another Meter attribute into this one. */
-  virtual void DeepCopy(const mafAttribute *a);
+  virtual void DeepCopy(const albaAttribute *a);
 
   /** Compare with another Meter attribute. */
-  virtual bool Equals(const mafAttribute *a);
+  virtual bool Equals(const albaAttribute *a);
 
    /** Set a informations regarding the application dimension, position and maximize state. */
   void SetApplicationInfo(int maximized, int pos[2], int size[2]);
@@ -53,7 +53,7 @@ public:
   void GetApplicationInfo(int &maximized, int pos[2], int size[2]);
 
   /** Set the visibility for the corresponding interface element.*/
-  void SetInterfaceElementVisibility(mafString panel_name, int visibility);
+  void SetInterfaceElementVisibility(albaString panel_name, int visibility);
 
   /** Return the stored visibility for the Toolbar.*/
   int GetToolBarVisibility() {return m_ToolBarVisibility;};
@@ -65,8 +65,8 @@ public:
   int GetSideBarVisibility() {return m_SideBarVisibility;};
 
 protected:
-  virtual int InternalStore(mafStorageElement *parent);
-  virtual int InternalRestore(mafStorageElement *node);
+  virtual int InternalStore(albaStorageElement *parent);
+  virtual int InternalRestore(albaStorageElement *node);
 
   int m_AppMaximized;
   int m_AppPosition[2];

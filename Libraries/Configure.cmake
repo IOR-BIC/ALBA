@@ -1,5 +1,5 @@
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
 # Date:      $Date: 2007-06-29 08:54:08 $
@@ -17,27 +17,27 @@ SET (DEBUG FALSE)
 SET (MFL_TARGETS "")
 
 # options for configuring MFL libraries
-OPTION(MAF_USE_VTK "Find and Link the VTK library." ON)
-OPTION(MAF_USE_ITK "Find and Link the ITK library." ON)
-OPTION(MAF_USE_WX "Find and Link the wxWidgets library." ON)
-OPTION(MAF_USE_VCOLLIDE "Find and Link the VCOLLIDE library." OFF)
-OPTION(MAF_USE_XercesC "Find and Link the XercesC library." ON)
+OPTION(ALBA_USE_VTK "Find and Link the VTK library." ON)
+OPTION(ALBA_USE_ITK "Find and Link the ITK library." ON)
+OPTION(ALBA_USE_WX "Find and Link the wxWidgets library." ON)
+OPTION(ALBA_USE_VCOLLIDE "Find and Link the VCOLLIDE library." OFF)
+OPTION(ALBA_USE_XercesC "Find and Link the XercesC library." ON)
 
-OPTION(MAF_USE_CURL "Find and Link the cURL library." ON)
+OPTION(ALBA_USE_CURL "Find and Link the cURL library." ON)
 
 IF (EXISTS ${MFL_SOURCE_DIR}/wxMozilla)
-  OPTION(MAF_USE_WXMOZILLA "Find and Link the wxMozilla library." OFF)
+  OPTION(ALBA_USE_WXMOZILLA "Find and Link the wxMozilla library." OFF)
 ENDIF (EXISTS ${MFL_SOURCE_DIR}/wxMozilla)
 
 IF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 6")
-  OPTION(MAF_USE_CRYPTO "Find and Link the CRYPTO library." ON)
+  OPTION(ALBA_USE_CRYPTO "Find and Link the CRYPTO library." ON)
 ELSE (${CMAKE_GENERATOR} STREQUAL "Visual Studio 6")
-  OPTION(MAF_USE_CRYPTO "Find and Link the CRYPTO library." ON)
+  OPTION(ALBA_USE_CRYPTO "Find and Link the CRYPTO library." ON)
 ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 6")
 
-# options for GDCM and BTK from MAF2Medical
-OPTION(MAF_USE_GDCM "Find and Link the GDCM library." ON)
-OPTION(MAF_USE_BTK "Find and Link the BTK library." ON)
+# options for GDCM and BTK from ALBAMedical
+OPTION(ALBA_USE_GDCM "Find and Link the GDCM library." ON)
+OPTION(ALBA_USE_BTK "Find and Link the BTK library." ON)
 
 
 #
@@ -46,75 +46,75 @@ OPTION(MAF_USE_BTK "Find and Link the BTK library." ON)
 MFL_SUBPROJECT (MFL_MODULES modules)
 
 #
-# this is to build VTK inside the MAF tree
+# this is to build VTK inside the ALBA tree
 #
-IF (MAF_USE_VTK)
+IF (ALBA_USE_VTK)
   MFL_SUBPROJECT(VTK VTK)
-ENDIF (MAF_USE_VTK)
+ENDIF (ALBA_USE_VTK)
 
 #
 # GDCM Library
 #
-IF (MAF_USE_GDCM)
+IF (ALBA_USE_GDCM)
   MFL_SUBPROJECT(GDCM GDCM)
-ENDIF(MAF_USE_GDCM)
+ENDIF(ALBA_USE_GDCM)
 
 #
-# this is to build ITK inside the MAF tree
+# this is to build ITK inside the ALBA tree
 #
-IF (MAF_USE_ITK)
+IF (ALBA_USE_ITK)
   MFL_SUBPROJECT(ITK ITK)
-ENDIF (MAF_USE_ITK)
+ENDIF (ALBA_USE_ITK)
 
 #
-# this is to build VCOLLIDE inside the MAF tree
+# this is to build VCOLLIDE inside the ALBA tree
 #
-#IF (MAF_USE_VCOLLIDE)
+#IF (ALBA_USE_VCOLLIDE)
 #MFL_SUBPROJECT(VCollide20 VCollide20)
-#ENDIF (MAF_USE_VCOLLIDE)
+#ENDIF (ALBA_USE_VCOLLIDE)
 
 #
 # wxWindows Library
 #
-IF (MAF_USE_WX)
+IF (ALBA_USE_WX)
   MFL_SUBPROJECT(WXWIN wxWin)
-ENDIF (MAF_USE_WX)
+ENDIF (ALBA_USE_WX)
 
 #
 # XercesC Library
 #
-IF (MAF_USE_XercesC)
+IF (ALBA_USE_XercesC)
   MFL_SUBPROJECT(XercesC XercesC)
-ENDIF(MAF_USE_XercesC)
+ENDIF(ALBA_USE_XercesC)
 
 #
 # cURL Library
 #
-IF (MAF_USE_CURL)
+IF (ALBA_USE_CURL)
   MFL_SUBPROJECT(CURL CURL)
-ENDIF(MAF_USE_CURL)
+ENDIF(ALBA_USE_CURL)
 
 #
 # Crypto Library
 #
-IF (MAF_USE_CRYPTO)
+IF (ALBA_USE_CRYPTO)
   MFL_SUBPROJECT(CRYPTO CRYPTO)
-ENDIF(MAF_USE_CRYPTO)
+ENDIF(ALBA_USE_CRYPTO)
 
 
 #
 # BTK Library
 #
-IF (MAF_USE_BTK)
+IF (ALBA_USE_BTK)
   MFL_SUBPROJECT(BTK BTK)
-ENDIF(MAF_USE_BTK)
+ENDIF(ALBA_USE_BTK)
 
 #
 # wxMozilla Library
 #
-IF (MAF_USE_WXMOZILLA)
+IF (ALBA_USE_WXMOZILLA)
   MFL_SUBPROJECT(wxMozilla wxMozilla)
-ENDIF(MAF_USE_WXMOZILLA)
+ENDIF(ALBA_USE_WXMOZILLA)
 
 
 # Create module files in build directory

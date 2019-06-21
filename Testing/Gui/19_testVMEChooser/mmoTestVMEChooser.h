@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmoTestVMEChooser
  Authors: Paolo Quadrani
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -18,34 +18,34 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafOp.h"
-#include "mafNode.h"
+#include "albaOp.h"
+#include "albaNode.h"
 
 //----------------------------------------------------------------------------
 // Forward Refs:
 //----------------------------------------------------------------------------
-class mafNodeGeneric;
-class mafNode;
+class albaNodeGeneric;
+class albaNode;
 
 // ============================================================================
-class mmoTestVMEChooser : public mafOp
+class mmoTestVMEChooser : public albaOp
 // ============================================================================
 {
 public:
                 mmoTestVMEChooser(wxString label);
                ~mmoTestVMEChooser();
-	virtual void OnEvent(mafEventBase *event);
-  mafOp* Copy();
+	virtual void OnEvent(albaEventBase *event);
+  albaOp* Copy();
 
-  bool Accept(mafNode* vme) {return true;};
+  bool Accept(albaNode* vme) {return true;};
   void OpRun();
   void OpDo();
   void OpUndo();
 
-  static bool Validate(mafNode *node) {return(node != NULL && strcmp(node->GetName(),"vme generic 1") == 0);};
+  static bool Validate(albaNode *node) {return(node != NULL && strcmp(node->GetName(),"vme generic 1") == 0);};
 
 protected:
   void OpStop(int result);
-  mafNode *m_ChoosedNode;
+  albaNode *m_ChoosedNode;
 };
 #endif // __mmoTestVMEChooser_H__

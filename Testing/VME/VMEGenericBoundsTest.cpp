@@ -1,34 +1,34 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: multiThreaderTest
  Authors: Gianluigi Crimi
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// Test mafVMEGeneric class
+// Test albaVMEGeneric class
 #include "VMEGenericBoundsTest.h"
-#include "mafVMETests.h"
+#include "albaVMETests.h"
 
-#include "mafVMEGeneric.h"
-#include "mafVMERoot.h"
-#include "mafTransform.h"
-#include "mafVMEOutput.h"
-//#include "mafDataVector.h"
-//#include "mafMatrixVector.h"
-#include "mafVMEIterator.h"
-//#include "mafTagArray.h"
-//#include "mafTagItem.h"
-#include "mafOBB.h"
+#include "albaVMEGeneric.h"
+#include "albaVMERoot.h"
+#include "albaTransform.h"
+#include "albaVMEOutput.h"
+//#include "albaDataVector.h"
+//#include "albaMatrixVector.h"
+#include "albaVMEIterator.h"
+//#include "albaTagArray.h"
+//#include "albaTagItem.h"
+#include "albaOBB.h"
 
-#include "vtkMAFSmartPointer.h"
+#include "vtkALBASmartPointer.h"
 #include "vtkActor.h"
 #include "vtkAssembly.h"
 #include "vtkRenderer.h"
@@ -55,14 +55,14 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
 //-------------------------------------------------------------------------
 {
   // create a small tree with 
-  mafSmartPointer<mafVMERoot> root;
+  albaSmartPointer<albaVMERoot> root;
   root->SetName("ROOT");
 
   // create windows
-  vtkMAFSmartPointer<vtkRenderer> renderer;
-  vtkMAFSmartPointer<vtkRenderWindow> renWin;
+  vtkALBASmartPointer<vtkRenderer> renderer;
+  vtkALBASmartPointer<vtkRenderWindow> renWin;
   renWin->AddRenderer(renderer);
-  vtkMAFSmartPointer<vtkRenderWindowInteractor> iren = vtkRenderWindowInteractor::New();
+  vtkALBASmartPointer<vtkRenderWindowInteractor> iren = vtkRenderWindowInteractor::New();
   iren->SetRenderWindow(renWin);
 
   //renderer->SetBackground(0.1, 0.1, 0.1);
@@ -72,9 +72,9 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
   //renWin->StereoRenderOn();
 
   // create a tree of VMEs composed of 2 boxes under a root box.
-  mafVMEGeneric *box0=mafVMEGeneric::New();
-  mafVMEGeneric *box1=mafVMEGeneric::New();
-  mafVMEGeneric *box2=mafVMEGeneric::New();
+  albaVMEGeneric *box0=albaVMEGeneric::New();
+  albaVMEGeneric *box1=albaVMEGeneric::New();
+  albaVMEGeneric *box2=albaVMEGeneric::New();
 
   box0->SetName("box0");
   box1->SetName("box1");
@@ -89,7 +89,7 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
   box0->AddChild(box1);
   box0->AddChild(box2);
 
-  vtkMAFSmartPointer<vtkCubeSource> box_source;
+  vtkALBASmartPointer<vtkCubeSource> box_source;
   box_source->SetCenter(0,0,0);
   box_source->SetXLength(1);
   box_source->SetYLength(1);
@@ -100,11 +100,11 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
   box1->SetData(box_source->GetOutput(),0);
   box2->SetData(box_source->GetOutput(),0);
 
-  mafTransform trans;
+  albaTransform trans;
 
   // must store cube bounds since vtkCubeSource has a bug and generates
   // a cube of wrong size.
-  mafOBB cube_bounds[201];
+  albaOBB cube_bounds[201];
 
   //
   // Fill in the tree poses to make the boxes to move.
@@ -157,8 +157,8 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
   {
     root->SetTreeTime(i);
     
-    mafOBB local_bounds0,local_bounds1,local_bounds2;
-    mafOBB bounds0,bounds1,bounds2;
+    albaOBB local_bounds0,local_bounds1,local_bounds2;
+    albaOBB bounds0,bounds1,bounds2;
     box0->GetOutput()->GetVMELocalBounds(local_bounds0);
     box1->GetOutput()->GetVMELocalBounds(local_bounds1);
     box2->GetOutput()->GetVMELocalBounds(local_bounds2);
@@ -202,7 +202,7 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
         CPPUNIT_ASSERT(bounds2.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
 
         // tree bounds
-        mafOBB tree_bounds,test_tree_bounds;
+        albaOBB tree_bounds,test_tree_bounds;
         test_tree_bounds.m_Bounds[0]=cube_bounds[i].m_Bounds[0]-i;
         test_tree_bounds.m_Bounds[1]=cube_bounds[i].m_Bounds[1]+i;
         test_tree_bounds.m_Bounds[2]=cube_bounds[i].m_Bounds[2];
@@ -239,7 +239,7 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
 
 
         // tree bounds
-        mafOBB tree_bounds,test_tree_bounds;
+        albaOBB tree_bounds,test_tree_bounds;
         test_tree_bounds.m_Bounds[0]=cube_bounds[i].m_Bounds[0]-50;
         test_tree_bounds.m_Bounds[1]=cube_bounds[i].m_Bounds[1]+50;
         test_tree_bounds.m_Bounds[2]=cube_bounds[i].m_Bounds[2]+i-50;
@@ -296,7 +296,7 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
   cerr << "Testing VME time dynamic behavior\n";
 
   // Test display of generic VME tree of surfaces
-  mafVMEIterator *iter=root->NewIterator();
+  albaVMEIterator *iter=root->NewIterator();
 
   root->SetTreeTime(0);
   //renderer->GetActiveCamera()->Zoom(.5);
@@ -304,18 +304,18 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
   renderer->ResetCamera();
   renderer->GetActiveCamera()->SetViewAngle(0);
 
-  mafVME *node;
+  albaVME *node;
 
   // connect VME to assemblies and put root assembly into the renderer
   for (node=iter->GetFirstNode();node;node=iter->GetNextNode())
   {
-    if (mafVME *vme=mafVME::SafeDownCast(node))
+    if (albaVME *vme=albaVME::SafeDownCast(node))
     {
     
-      if (vme->IsA("mafVMERoot")) 
+      if (vme->IsA("albaVMERoot")) 
       {
-        vtkMAFSmartPointer<vtkAssembly> vmeasm;
-        mafSmartPointer<mafClientData> attr;
+        vtkALBASmartPointer<vtkAssembly> vmeasm;
+        albaSmartPointer<albaClientData> attr;
         attr->m_Prop3D=vmeasm;
         vme->SetAttribute("ClientData",attr);
         renderer->AddActor(vmeasm);
@@ -331,22 +331,22 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
 
         mapper->SetInput((vtkPolyData *)data);
   
-        vtkMAFSmartPointer<vtkActor> vmeact;
+        vtkALBASmartPointer<vtkActor> vmeact;
         vmeact->SetMapper(mapper);
         mapper->Delete();
 
-        vtkMAFSmartPointer<vtkAssembly> vmeasm;
+        vtkALBASmartPointer<vtkAssembly> vmeasm;
         vmeasm->AddPart(vmeact);
 
         vmeasm->SetUserTransform(vme->GetOutput()->GetTransform()->GetVTKTransform());
 
-        mafSmartPointer<mafClientData> attr;
+        albaSmartPointer<albaClientData> attr;
         attr->m_Prop3D=vmeasm;
         vme->SetAttribute("ClientData",attr);
 
         CPPUNIT_ASSERT(vme->GetAttribute("ClientData")==attr.GetPointer());
 
-        mafClientData *pattr=mafClientData::SafeDownCast(vme->GetParent()->GetAttribute("ClientData"));
+        albaClientData *pattr=albaClientData::SafeDownCast(vme->GetParent()->GetAttribute("ClientData"));
         vtkAssembly *pvmeasm=pattr->m_Prop3D;
       
         CPPUNIT_ASSERT(pvmeasm!=NULL);
@@ -385,7 +385,7 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
 
   cerr << "Testing GetTimeBounds()\n";
 
-  mafTimeStamp treeTimeBounds[2],vtitleTimeBounds[2], vsphereTimeBounds[2],vconeTimeBounds[2],vmorphTimeBounds[2];
+  albaTimeStamp treeTimeBounds[2],vtitleTimeBounds[2], vsphereTimeBounds[2],vconeTimeBounds[2],vmorphTimeBounds[2];
 
   root->GetOutput()->GetTimeBounds(treeTimeBounds);
 
@@ -410,8 +410,8 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
   cerr << "Cone TBounds = [" << vconeTimeBounds[0] <<"," << vconeTimeBounds[1] << "]\n";
   cerr << "Morph TBounds = [" << vmorphTimeBounds[0] <<"," << vmorphTimeBounds[1] << "]\n";
   
-  std::vector<mafTimeStamp> dataTimeStamps;
-  std::vector<mafTimeStamp> matrixTimeStamps;
+  std::vector<albaTimeStamp> dataTimeStamps;
+  std::vector<albaTimeStamp> matrixTimeStamps;
   
   vcone->GetDataVector()->GetTimeStamps(dataTimeStamps);
   vcone->GetMatrixVector()->GetTimeStamps(matrixTimeStamps);
@@ -422,9 +422,9 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
   cerr << "VME-Cone data_time_stamps={";
   for (int n=0;n<dataTimeStamps.size();n++)
   {
-    mafTimeStamp t1=dataTimeStamps[n];
+    albaTimeStamp t1=dataTimeStamps[n];
 
-    mafTimeStamp t2=data_time_stamps[n];
+    albaTimeStamp t2=data_time_stamps[n];
 
     //CPPUNIT_ASSERT(t1==t2);
     cerr << t1 ;
@@ -440,9 +440,9 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
 
   for (int m=0;m<matrixTimeStamps.size();m++)
   {
-    mafTimeStamp t1=matrixTimeStamps[m];
+    albaTimeStamp t1=matrixTimeStamps[m];
 
-    mafTimeStamp t2=matrix_time_stamps[m];
+    albaTimeStamp t2=matrix_time_stamps[m];
 
     CPPUNIT_ASSERT(t1==t2);
 
@@ -468,7 +468,7 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
   root->SetTreeTime(0);
 
   
-  mafOBB treeBounds,tree4DBounds;
+  albaOBB treeBounds,tree4DBounds;
   root->GetOutput()->GetBounds(treeBounds);
 
   root->GetOutput()->Get4DBounds(tree4DBounds);
@@ -503,7 +503,7 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
 
   tree4DBoundsActor->GetProperty()->SetColor(1,0,0);
 
-  mafClientData *attr=mafClientData::SafeDownCast(root->GetAttribute("ClientData")); 
+  albaClientData *attr=albaClientData::SafeDownCast(root->GetAttribute("ClientData")); 
   vtkAssembly *rootAsm=attr->m_Prop3D;
 
   double asmBounds[6];
@@ -574,13 +574,13 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
   }
 
 
-  mafClientData *root_attr=mafClientData::SafeDownCast(root->GetAttribute("ClientData"));
+  albaClientData *root_attr=albaClientData::SafeDownCast(root->GetAttribute("ClientData"));
   vtkAssembly *rasm=root_attr->m_Prop3D;
   renderer->RemoveActor(rasm);
   
   for (node=iter->GetFirstNode();node;node=iter->GetNextNode())
   {
-    mafVME *vme=mafVME::SafeDownCast(node);
+    albaVME *vme=albaVME::SafeDownCast(node);
     CPPUNIT_ASSERT(vme);
     vme->RemoveAttribute("ClientData");
   }
@@ -598,16 +598,16 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
   //------------------------
   // Create a simple tree
   //------------------------
-  vtitle->GetTagArray()->SetTag(mafTagItem("TestTag1","1"));
+  vtitle->GetTagArray()->SetTag(albaTagItem("TestTag1","1"));
   const char *multcomp[3]={"100","200","300"};
-  vtitle->GetTagArray()->SetTag(mafTagItem("TestTag2",multcomp,3));
-  vtitle->GetTagArray()->SetTag(mafTagItem("TestTag1",5.5555));
+  vtitle->GetTagArray()->SetTag(albaTagItem("TestTag2",multcomp,3));
+  vtitle->GetTagArray()->SetTag(albaTagItem("TestTag1",5.5555));
 
   //---------------------------
   // try to copy the sub tree
   //---------------------------
 
-  mafVMERoot *newroot=mafVMERoot::SafeDownCast(root->CopyTree());
+  albaVMERoot *newroot=albaVMERoot::SafeDownCast(root->CopyTree());
 
   */
   std::cerr<<"Test completed successfully!"<<std::endl;

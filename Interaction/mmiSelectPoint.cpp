@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmiSelectPoint
  Authors: Matteo Giacomoni , Stefano Perticoni
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -14,14 +14,14 @@
 
 =========================================================================*/
 
-#include "mafDefines.h"
+#include "albaDefines.h"
 
 #include "mmiSelectPoint.h"
-#include "mafDeviceButtonsPadMouse.h"
-#include "mafInteractor.h"
-#include "mafRWIBase.h"
-#include "mafEventInteraction.h"
-#include "mafEvent.h"
+#include "albaDeviceButtonsPadMouse.h"
+#include "albaInteractor.h"
+#include "albaRWIBase.h"
+#include "albaEventInteraction.h"
+#include "albaEvent.h"
 
 #include "vtkAbstractPicker.h"
 #include "vtkPointPicker.h"
@@ -35,7 +35,7 @@
 #include <assert.h>
 
 //------------------------------------------------------------------------------
-mafCxxTypeMacro(mmiSelectPoint)
+albaCxxTypeMacro(mmiSelectPoint)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -65,20 +65,20 @@ void mmiSelectPoint::OnMouseMove()
 	}
 }
 //----------------------------------------------------------------------------
-void mmiSelectPoint::OnLeftButtonDown(mafEventInteraction *e) 
+void mmiSelectPoint::OnLeftButtonDown(albaEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
   if (e == NULL)
   {
     return;
   }
-	else if (e->GetModifier(MAF_CTRL_KEY) && m_UseCtrlModifier) 
+	else if (e->GetModifier(ALBA_CTRL_KEY) && m_UseCtrlModifier) 
 	{
 		// picking mode on
 		m_IsPicking = true;
 
 		// perform picking
-		PickCell((mafDevice *)e->GetSender());
+		PickCell((albaDevice *)e->GetSender());
 	}
   else if (!m_UseCtrlModifier)
   {
@@ -86,7 +86,7 @@ void mmiSelectPoint::OnLeftButtonDown(mafEventInteraction *e)
     m_IsPicking = true;
 
     // perform picking
-    PickCell((mafDevice *)e->GetSender());
+    PickCell((albaDevice *)e->GetSender());
   }
 	else
 	{
@@ -95,7 +95,7 @@ void mmiSelectPoint::OnLeftButtonDown(mafEventInteraction *e)
 	}
 }
 //----------------------------------------------------------------------------
-void mmiSelectPoint::OnButtonUp(mafEventInteraction *e)
+void mmiSelectPoint::OnButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   if (e == NULL)
@@ -109,13 +109,13 @@ void mmiSelectPoint::OnButtonUp(mafEventInteraction *e)
 	Superclass::OnButtonUp(e);
 }
 //----------------------------------------------------------------------------
-void mmiSelectPoint::PickCell( mafDevice *device )
+void mmiSelectPoint::PickCell( albaDevice *device )
 //----------------------------------------------------------------------------
 {
 	int x = m_LastMousePose[0];
 	int y = m_LastMousePose[1];
 
-	mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(device);
+	albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast(device);
 	if( mouse && m_Renderer)
 	{
 		double pos_picked[3];
@@ -130,7 +130,7 @@ void mmiSelectPoint::PickCell( mafDevice *device )
 			vtkPoints *pickedPoint = vtkPoints::New();
 			pickedPoint->SetNumberOfPoints(1);
 			pickedPoint->SetPoint(0,pos_picked);
-			mafEventMacro(mafEvent(this,VME_PICKED,(vtkObject *)pickedPoint,pointPicker->GetPointId()));
+			albaEventMacro(albaEvent(this,VME_PICKED,(vtkObject *)pickedPoint,pointPicker->GetPointId()));
 			pickedPoint->Delete();
 
 			//  wxString msg = "picked something";
@@ -142,7 +142,7 @@ void mmiSelectPoint::PickCell( mafDevice *device )
 	}
 }
 //----------------------------------------------------------------------------
-void mmiSelectPoint::OnEvent(mafEventBase *event)
+void mmiSelectPoint::OnEvent(albaEventBase *event)
 //------------------------------------------------------------------------------
 {
 	Superclass::OnEvent(event);

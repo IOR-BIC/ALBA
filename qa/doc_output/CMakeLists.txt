@@ -1,9 +1,9 @@
 #
 #  CMakeLists.txt
-#  MAF
+#  ALBA
 #
 #  Created by Daniele Giunchi - Paolo Quadrani on 10/09/10.
-#  Copyright 2009 B3C. All rights reserved.
+#  Copyright 2009 BIC
 #
 #  See Licence at: http://tiny.cc/QXJ4D
 #
@@ -22,11 +22,11 @@ find_package(Doxygen)
 ## #################################################################
 
 if (DOXYGEN_FOUND)
-  configure_file(MAF2Doxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MAF2Doxyfile IMMEDIATE @ONLY)
-  configure_file(MAF2DoxyfileWithoutvtkMaf.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MAF2DoxyfileWithoutvtkMaf IMMEDIATE @ONLY)
-  configure_file(MAF2DoxyfileWithTests.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MAF2DoxyfileWithTests IMMEDIATE @ONLY)
-  configure_file(MAF2PythonDoxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MAF2PythonDoxyfile IMMEDIATE @ONLY)
-  configure_file(vtkMAF2Doxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/vtkMAF2Doxyfile IMMEDIATE @ONLY)
+  configure_file(ALBADoxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/ALBADoxyfile IMMEDIATE @ONLY)
+  configure_file(ALBADoxyfileWithoutvtkMaf.in     ${CMAKE_BINARY_DIR}/qa/doc_output/ALBADoxyfileWithoutvtkMaf IMMEDIATE @ONLY)
+  configure_file(ALBADoxyfileWithTests.in     ${CMAKE_BINARY_DIR}/qa/doc_output/ALBADoxyfileWithTests IMMEDIATE @ONLY)
+  configure_file(ALBAPythonDoxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/ALBAPythonDoxyfile IMMEDIATE @ONLY)
+  configure_file(vtkALBADoxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/vtkALBADoxyfile IMMEDIATE @ONLY)
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
@@ -40,32 +40,32 @@ execute_process(
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
-  COMMAND ${CMAKE_COMMAND} -E remove_directory vtkMAF2Doxyfile
+  COMMAND ${CMAKE_COMMAND} -E remove_directory vtkALBADoxyfile
 )
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
-  COMMAND ${CMAKE_COMMAND} -E remove_directory MAF2DoxyfileWithoutvtkMaf
+  COMMAND ${CMAKE_COMMAND} -E remove_directory ALBADoxyfileWithoutvtkMaf
 )
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
-  COMMAND ${DOXYGEN_EXECUTABLE} MAF2Doxyfile
+  COMMAND ${DOXYGEN_EXECUTABLE} ALBADoxyfile
 )
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
-  COMMAND ${DOXYGEN_EXECUTABLE} MAF2DoxyfileWithTests
+  COMMAND ${DOXYGEN_EXECUTABLE} ALBADoxyfileWithTests
 )
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
-  COMMAND ${DOXYGEN_EXECUTABLE} vtkMAF2Doxyfile
+  COMMAND ${DOXYGEN_EXECUTABLE} vtkALBADoxyfile
 )
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
-  COMMAND ${DOXYGEN_EXECUTABLE} MAF2DoxyfileWithoutvtkMaf
+  COMMAND ${DOXYGEN_EXECUTABLE} ALBADoxyfileWithoutvtkMaf
 )
 
 else (DOXYGEN_FOUND)
