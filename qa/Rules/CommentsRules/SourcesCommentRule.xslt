@@ -9,7 +9,7 @@
                         If the value, expressed as percentage, falls inside a range of 10% - 40%, the class is considered well commented,
                         otherwise the file is reported in the following table with the current percentage.
 					</h3>
-                    <h4><br/>Link to <a href="https://www.biomedtown.org/biomed_town/MAF/MAF2%20Floor/documentation/doc/maf-2-0-documentation/CodingStandard/">Coding Conventions</a></h4>
+                    <h4><br/>Link to <a href="https://www.biomedtown.org/biomed_town/ALBA/ALBA%20Floor/documentation/doc/alba-2-0-documentation/CodingStandard/">Coding Conventions</a></h4>
 				</div>
 				<div id="contentTable">
 					<table id="listing">

@@ -1,4 +1,4 @@
-#include "mafDefines.h"
+#include "albaDefines.h"
 
 #include "wxVTKRenderWindowInteractor.h"
 #include "vtkCamera.h"

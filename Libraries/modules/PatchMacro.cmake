@@ -1,5 +1,5 @@
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: PatchMacro.cmake,v $
 # Language:  CMake 1.2
 # Date:      $Date: 2006-07-28 09:50:20 $
@@ -46,7 +46,7 @@ MACRO(FIND_AND_APPLAY_PATCHES PACKAGE_NAME PATCH_DIR SOURCE_DIR)
 
 				EXEC_PROGRAM("${PATCH_EXECUTABLE} -N ${MyDiffName} ${MyDiffFile} " ${SOURCE_DIR}${MyDiffDir} RETURN_VALUE PATCH_RETVAL)
 				IF (${PATCH_RETVAL} LESS 0)
-					MESSAGE(FATAL_ERROR "Cannot patch ${PACKAGE_NAME} package: patch ended with return value ${PATCH_RETVAL}.\nNote: This happens usually on MS Windows, if you do not run CMAKE as administrator. Resolution of this problem is as follows. First, close CMAKE and then delete both Sources and Build subdirectories of package ${PACKAGE_NAME} from the directory where to build the binaries (or preferably the whole directory). After that execute CMAKE, this time as administrator (use the right click on the CMAKE shortcut) - please do not mistake this for running CMAKE under a user account with administration rights, and repeat the process. Should the problem persists, contact MAF2 developer group.\n")
+					MESSAGE(FATAL_ERROR "Cannot patch ${PACKAGE_NAME} package: patch ended with return value ${PATCH_RETVAL}.\nNote: This happens usually on MS Windows, if you do not run CMAKE as administrator. Resolution of this problem is as follows. First, close CMAKE and then delete both Sources and Build subdirectories of package ${PACKAGE_NAME} from the directory where to build the binaries (or preferably the whole directory). After that execute CMAKE, this time as administrator (use the right click on the CMAKE shortcut) - please do not mistake this for running CMAKE under a user account with administration rights, and repeat the process. Should the problem persists, contact ALBA developer group.\n")
 				ENDIF(${PATCH_RETVAL} LESS 0)
  			ENDFOREACH ( MyDiffFile ${MyDiffFileList} )
 		ELSE(PATCH_EXECUTABLE)	

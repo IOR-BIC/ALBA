@@ -80,7 +80,7 @@
 #define __glew_h__
 #define __GLEW_H__
 
-#define GLEW_STATIC	//BES: 26.10.2012 - in MAF2, we are always using STATIC version
+#define GLEW_STATIC	//BES: 26.10.2012 - in ALBA, we are always using STATIC version
 
 #if defined(__gl_h_) || defined(__GL_H__) || defined(__X_GL_H)
 #error gl.h included before glew.h

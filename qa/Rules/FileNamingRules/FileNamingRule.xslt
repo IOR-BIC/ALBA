@@ -8,7 +8,7 @@
 						This rule checks if file naming convention respect coding standard one.
                         If not, the class is inserted in the following table.
 					</h3>
-                    <h4><br/>Link to <a href="https://www.biomedtown.org/biomed_town/MAF/MAF2%20Floor/documentation/doc/maf-2-0-documentation/CodingStandard/">Coding Conventions</a></h4>
+                    <h4><br/>Link to <a href="https://www.biomedtown.org/biomed_town/ALBA/ALBA%20Floor/documentation/doc/alba-2-0-documentation/CodingStandard/">Coding Conventions</a></h4>
 				</div>
 				<div id="contentTable">
 					<table id="listing">

@@ -133,7 +133,7 @@ namespace FileNameConvention
               {
                 // classes inherited from base classes; 
                 // check inheritance according to the second rule of the naming convention:
-                // e.g. mafView -> mafViewVTK
+                // e.g. albaView -> albaViewVTK
                 if (CheckInheritance(f, k))
                 {
                   wrong = false;
@@ -273,7 +273,7 @@ namespace FileNameConvention
             if (dicKey == libAcronym)
             {
               // *********************** NOT IMPLEMENTED!! *************************
-              // Generic MAF class: check that class name extend parentClasses name
+              // Generic ALBA class: check that class name extend parentClasses name
               // *********************** NOT IMPLEMENTED!! *************************
 
               // dicKey is the library acronym.

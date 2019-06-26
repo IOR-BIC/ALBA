@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testMinimalWX
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -14,7 +14,7 @@
 
 =========================================================================*/
 
-#include "mafIncludeWX.h"
+#include "albaIncludeWX.h"
 
 // ============================================================================
 class myApp : public wxApp
@@ -60,7 +60,7 @@ IMPLEMENT_APP(myApp)
 bool myApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-    myFrame *frame = new myFrame("mafGUITest",wxPoint(50, 50), wxSize(450, 340));
+    myFrame *frame = new myFrame("albaGUITest",wxPoint(50, 50), wxSize(450, 340));
     frame->Show(TRUE);
     return TRUE;
 }

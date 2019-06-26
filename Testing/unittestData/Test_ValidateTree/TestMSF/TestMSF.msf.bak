@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <MSF Version="2.2">
-  <Root Crypting="0" Id="-1" MaxNodeId="53" Name="msf_test_import_export_VME" Type="mafVMERoot">
+  <Root Crypting="0" Id="-1" MaxNodeId="53" Name="msf_test_import_export_VME" Type="albaVMERoot">
     <Attributes NumberOfItems="3">
-      <Item NumberOfTags="0" Type="mafTagArray">
+      <Item NumberOfTags="0" Type="albaTagArray">
         <Name>LHDL</Name>
       </Item>
-      <Item NumberOfTags="105" Type="mafTagArray">
+      <Item NumberOfTags="105" Type="albaTagArray">
         <Name>TagArray</Name>
         <TItem Mult="1" Name="APP_STAMP" Type="STR">
           <TItem>
@@ -57,64 +57,64 @@
             <TC>enter a value</TC>
           </TItem>
         </TItem>
-        <TItem Mult="1" Name="L0000_resource_MAF" Type="STR">
+        <TItem Mult="1" Name="L0000_resource_ALBA" Type="STR">
           <TItem>
             <TC>enter a value</TC>
           </TItem>
         </TItem>
-        <TItem Mult="1" Name="L0000_resource_MAF_Procedural" Type="STR">
+        <TItem Mult="1" Name="L0000_resource_ALBA_Procedural" Type="STR">
           <TItem>
             <TC>false</TC>
           </TItem>
         </TItem>
-        <TItem Mult="1" Name="L0000_resource_MAF_Procedural_VMElinkURI1" Type="STR">
+        <TItem Mult="1" Name="L0000_resource_ALBA_Procedural_VMElinkURI1" Type="STR">
           <TItem>
             <TC>This tag will be filled during the upload process</TC>
           </TItem>
         </TItem>
-        <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace" Type="STR">
+        <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace" Type="STR">
           <TItem>
             <TC>enter a value</TC>
           </TItem>
         </TItem>
-        <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_TimeStampVector" Type="STR">
+        <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_TimeStampVector" Type="STR">
           <TItem>
             <TC>0</TC>
           </TItem>
         </TItem>
-        <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
+        <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
           <TItem>
             <TC>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</TC>
           </TItem>
         </TItem>
-        <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo" Type="STR">
+        <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo" Type="STR">
           <TItem>
             <TC>enter a value</TC>
           </TItem>
         </TItem>
-        <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeChildURI1" Type="STR">
+        <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeChildURI1" Type="STR">
           <TItem>
             <TC>This tag will be filled during the upload process</TC>
           </TItem>
         </TItem>
-        <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootName" Type="STR">
+        <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootName" Type="STR">
           <TItem>
             <TC>msf_test_import_export_VME</TC>
           </TItem>
         </TItem>
-        <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootURI" Type="STR">
+        <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootURI" Type="STR">
           <TItem>
             <TC>Automated Tag Not Handled (instance exists)</TC>
           </TItem>
         </TItem>
-        <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeTreeCreationDate" Type="STR">
+        <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeTreeCreationDate" Type="STR">
           <TItem>
             <TC></TC>
           </TItem>
         </TItem>
-        <TItem Mult="1" Name="L0000_resource_MAF_VmeType" Type="STR">
+        <TItem Mult="1" Name="L0000_resource_ALBA_VmeType" Type="STR">
           <TItem>
-            <TC>mafVMERoot</TC>
+            <TC>albaVMERoot</TC>
           </TItem>
         </TItem>
         <TItem Mult="1" Name="L0000_resource_data" Type="STR">
@@ -533,7 +533,7 @@
           </TItem>
         </TItem>
       </Item>
-      <Item Type="mafAttributeTraceability">
+      <Item Type="albaAttributeTraceability">
         <Name>TrialAttribute</Name>
         <TrialEvent>Modify</TrialEvent>
         <Operation>lhpOpUploadMultiVMERefactor</Operation>
@@ -602,7 +602,7 @@
         <Application>LHPBuilder 1_2_TS_20091017191928_BUILD_266</Application>
         <OperatorID>perticoni</OperatorID>
         <TrialEvent>Modify</TrialEvent>
-        <Operation>mafOpValidateTree</Operation>
+        <Operation>albaOpValidateTree</Operation>
         <Parameters></Parameters>
         <Date>19/10/2009 10:44:33</Date>
         <Application>LHPBuilder 1_2_TS_20091017191928_BUILD_266</Application>
@@ -626,7 +626,7 @@
         <Application>LHPBuilder 1_2_TS_20091020152409_BUILD_273</Application>
         <OperatorID>perticoni</OperatorID>
         <TrialEvent>Modify</TrialEvent>
-        <Operation>mafOpValidateTree</Operation>
+        <Operation>albaOpValidateTree</Operation>
         <Parameters></Parameters>
         <Date>20/10/2009 17:34:04</Date>
         <Application>LHPBuilder 1_2_TS_20091020152409_BUILD_273</Application>
@@ -656,7 +656,7 @@
         <Application>LHPBuilder 1_2_TS_20091021121853_BUILD_275</Application>
         <OperatorID>perticoni</OperatorID>
         <TrialEvent>Modify</TrialEvent>
-        <Operation>mafOpValidateTree</Operation>
+        <Operation>albaOpValidateTree</Operation>
         <Parameters></Parameters>
         <Date>23/10/2009 18:50:58</Date>
         <Application>LHPBuilder 1_2_TS_20091021121853_BUILD_275</Application>
@@ -692,25 +692,25 @@
         <Application>LHPBuilder 1_2_TS_20091106130154_BUILD_309</Application>
         <OperatorID>perticoni</OperatorID>
         <TrialEvent>Modify</TrialEvent>
-        <Operation>mafOpValidateTree</Operation>
+        <Operation>albaOpValidateTree</Operation>
         <Parameters></Parameters>
         <Date>16/04/2010 11:14:27</Date>
         <Application>LHPBuilder 1_2_TS_20100224205148_BUILD_250</Application>
         <OperatorID></OperatorID>
         <TrialEvent>Modify</TrialEvent>
-        <Operation>mafOpValidateTree</Operation>
+        <Operation>albaOpValidateTree</Operation>
         <Parameters></Parameters>
         <Date>16/04/2010 11:14:48</Date>
         <Application>LHPBuilder 1_2_TS_20100224205148_BUILD_250</Application>
         <OperatorID></OperatorID>
         <TrialEvent>Modify</TrialEvent>
-        <Operation>mafOpValidateTree</Operation>
+        <Operation>albaOpValidateTree</Operation>
         <Parameters></Parameters>
         <Date>19/04/2010 10:46:02</Date>
         <Application>LHPBuilder 1_2_TS_20100224205148_BUILD_250</Application>
         <OperatorID></OperatorID>
         <TrialEvent>Modify</TrialEvent>
-        <Operation>mafOpValidateTree</Operation>
+        <Operation>albaOpValidateTree</Operation>
         <Parameters></Parameters>
         <Date>19/04/2010 10:46:09</Date>
         <Application>LHPBuilder 1_2_TS_20100224205148_BUILD_250</Application>
@@ -719,12 +719,12 @@
     </Attributes>
     <Links NumberOfLinks="0"/>
     <Children NumberOfItems="8">
-      <Node Crypting="0" Id="1" Name="test_volume" Type="mafVMEVolumeGray">
+      <Node Crypting="0" Id="1" Name="test_volume" Type="albaVMEVolumeGray">
         <Attributes NumberOfItems="4">
-          <Item NumberOfTags="0" Type="mafTagArray">
+          <Item NumberOfTags="0" Type="albaTagArray">
             <Name>LHDL</Name>
           </Item>
-          <Item NumberOfTags="113" Type="mafTagArray">
+          <Item NumberOfTags="113" Type="albaTagArray">
             <Name>TagArray</Name>
             <TItem Mult="1" Name="Dicom_CT_model" Type="STR">
               <TItem>
@@ -801,64 +801,64 @@
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA" Type="STR">
               <TItem>
                 <TC> </TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural" Type="STR">
               <TItem>
                 <TC>false</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural_VMElinkURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural_VMElinkURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace" Type="STR">
               <TItem>
                 <TC> </TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_TimeStampVector" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_TimeStampVector" Type="STR">
               <TItem>
                 <TC>0</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
               <TItem>
                 <TC>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo" Type="STR">
               <TItem>
                 <TC> </TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeChildURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeChildURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootName" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootName" Type="STR">
               <TItem>
                 <TC>msf_test_import_export_VME</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootURI" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootURI" Type="STR">
               <TItem>
                 <TC>Automated Tag Not Handled (instance exists)</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeTreeCreationDate" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeTreeCreationDate" Type="STR">
               <TItem>
                 <TC></TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_VmeType" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_VmeType" Type="STR">
               <TItem>
-                <TC>mafVMEVolumeGray</TC>
+                <TC>albaVMEVolumeGray</TC>
               </TItem>
             </TItem>
             <TItem Mult="1" Name="L0000_resource_data" Type="STR">
@@ -1292,7 +1292,7 @@
               </TItem>
             </TItem>
           </Item>
-          <Item Type="mafAttributeTraceability">
+          <Item Type="albaAttributeTraceability">
             <Name>TrialAttribute</Name>
             <TrialEvent>Modify</TrialEvent>
             <Operation>lhpOpUploadMultiVMERefactor</Operation>
@@ -1450,15 +1450,15 @@
         </Attributes>
         <Links NumberOfLinks="0"/>
         <Children NumberOfItems="0"/>
-        <DataVector ItemTypeName="mafVMEItemVTK" NumberOfItems="1" SingleFileMode="false" VectorID="0">
-          <VItem Type="mafVMEItemVTK">
+        <DataVector ItemTypeName="albaVMEItemVTK" NumberOfItems="1" SingleFileMode="false" VectorID="0">
+          <VItem Type="albaVMEItemVTK">
             <URL>TestMSF.1.vtk</URL>
             <Id>1</Id>
             <DataType>vtkRectilinearGrid</DataType>
             <TimeStamp>0</TimeStamp>
             <Crypting>false</Crypting>
             <Bounds>232.617 240.821 164.649 171.094 -105.2 -103.9 </Bounds>
-            <TagArray NumberOfTags="1" Type="mafTagArray">
+            <TagArray NumberOfTags="1" Type="albaTagArray">
               <Name></Name>
               <TItem Mult="1" Name="MD5Checksum" Type="STR">
                 <TItem>
@@ -1470,9 +1470,9 @@
         </DataVector>
         <MatrixVector NumberOfItems="0"/>
       </Node>
-      <Node Crypting="0" Id="4" Name="test_mesh_tetra10" Type="mafVMEMesh">
+      <Node Crypting="0" Id="4" Name="test_mesh_tetra10" Type="albaVMEMesh">
         <Attributes NumberOfItems="3">
-          <Item NumberOfTags="0" Type="mafTagArray">
+          <Item NumberOfTags="0" Type="albaTagArray">
             <Name>LHDL</Name>
           </Item>
           <Item Type="mmaMaterial">
@@ -1496,7 +1496,7 @@
             <Representation>2</Representation>
             <MaterialType>0</MaterialType>
           </Item>
-          <Item NumberOfTags="105" Type="mafTagArray">
+          <Item NumberOfTags="105" Type="albaTagArray">
             <Name>TagArray</Name>
             <TItem Mult="1" Name="L0000" Type="STR">
               <TItem>
@@ -1543,64 +1543,64 @@
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural" Type="STR">
               <TItem>
                 <TC>false</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural_VMElinkURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural_VMElinkURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_TimeStampVector" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_TimeStampVector" Type="STR">
               <TItem>
                 <TC>0</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
               <TItem>
                 <TC>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeChildURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeChildURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootName" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootName" Type="STR">
               <TItem>
                 <TC>msf_test_import_export_VME</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootURI" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootURI" Type="STR">
               <TItem>
                 <TC>Automated Tag Not Handled (instance exists)</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeTreeCreationDate" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeTreeCreationDate" Type="STR">
               <TItem>
                 <TC></TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_VmeType" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_VmeType" Type="STR">
               <TItem>
-                <TC>mafVMEMesh</TC>
+                <TC>albaVMEMesh</TC>
               </TItem>
             </TItem>
             <TItem Mult="1" Name="L0000_resource_data" Type="STR">
@@ -2027,15 +2027,15 @@
         </Attributes>
         <Links NumberOfLinks="0"/>
         <Children NumberOfItems="0"/>
-        <DataVector ItemTypeName="mafVMEItemVTK" NumberOfItems="1" SingleFileMode="false" VectorID="3">
-          <VItem Type="mafVMEItemVTK">
+        <DataVector ItemTypeName="albaVMEItemVTK" NumberOfItems="1" SingleFileMode="false" VectorID="3">
+          <VItem Type="albaVMEItemVTK">
             <URL>TestMSF.4.vtk</URL>
             <Id>4</Id>
             <DataType>vtkUnstructuredGrid</DataType>
             <TimeStamp>0</TimeStamp>
             <Crypting>false</Crypting>
             <Bounds>0 1 0 1 0 1 </Bounds>
-            <TagArray NumberOfTags="1" Type="mafTagArray">
+            <TagArray NumberOfTags="1" Type="albaTagArray">
               <Name></Name>
               <TItem Mult="1" Name="MD5Checksum" Type="STR">
                 <TItem>
@@ -2047,9 +2047,9 @@
         </DataVector>
         <MatrixVector NumberOfItems="0"/>
       </Node>
-      <Node Crypting="0" Id="5" Name="test_surface" Type="mafVMESurface">
+      <Node Crypting="0" Id="5" Name="test_surface" Type="albaVMESurface">
         <Attributes NumberOfItems="3">
-          <Item NumberOfTags="0" Type="mafTagArray">
+          <Item NumberOfTags="0" Type="albaTagArray">
             <Name>LHDL</Name>
           </Item>
           <Item Type="mmaMaterial">
@@ -2073,7 +2073,7 @@
             <Representation>2</Representation>
             <MaterialType>0</MaterialType>
           </Item>
-          <Item NumberOfTags="106" Type="mafTagArray">
+          <Item NumberOfTags="106" Type="albaTagArray">
             <Name>TagArray</Name>
             <TItem Mult="1" Name="L0000" Type="STR">
               <TItem>
@@ -2120,64 +2120,64 @@
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural" Type="STR">
               <TItem>
                 <TC>false</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural_VMElinkURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural_VMElinkURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_TimeStampVector" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_TimeStampVector" Type="STR">
               <TItem>
                 <TC>0</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
               <TItem>
                 <TC>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeChildURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeChildURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootName" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootName" Type="STR">
               <TItem>
                 <TC>msf_test_import_export_VME</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootURI" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootURI" Type="STR">
               <TItem>
                 <TC>Automated Tag Not Handled (instance exists)</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeTreeCreationDate" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeTreeCreationDate" Type="STR">
               <TItem>
                 <TC></TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_VmeType" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_VmeType" Type="STR">
               <TItem>
-                <TC>mafVMESurface</TC>
+                <TC>albaVMESurface</TC>
               </TItem>
             </TItem>
             <TItem Mult="1" Name="L0000_resource_data" Type="STR">
@@ -2609,15 +2609,15 @@
         </Attributes>
         <Links NumberOfLinks="0"/>
         <Children NumberOfItems="0"/>
-        <DataVector ItemTypeName="mafVMEItemVTK" NumberOfItems="1" SingleFileMode="false" VectorID="5">
-          <VItem Type="mafVMEItemVTK">
+        <DataVector ItemTypeName="albaVMEItemVTK" NumberOfItems="1" SingleFileMode="false" VectorID="5">
+          <VItem Type="albaVMEItemVTK">
             <URL>TestMSF.6.vtk</URL>
             <Id>6</Id>
             <DataType>vtkPolyData</DataType>
             <TimeStamp>0</TimeStamp>
             <Crypting>false</Crypting>
             <Bounds>-1 1 -2 2 -1 1 </Bounds>
-            <TagArray NumberOfTags="1" Type="mafTagArray">
+            <TagArray NumberOfTags="1" Type="albaTagArray">
               <Name></Name>
               <TItem Mult="1" Name="MD5Checksum" Type="STR">
                 <TItem>
@@ -2629,9 +2629,9 @@
         </DataVector>
         <MatrixVector NumberOfItems="0"/>
       </Node>
-      <Node Crypting="0" Id="11" Name="test_vector_GRFtimevar" Type="mafVMEVector">
+      <Node Crypting="0" Id="11" Name="test_vector_GRFtimevar" Type="albaVMEVector">
         <Attributes NumberOfItems="3">
-          <Item NumberOfTags="0" Type="mafTagArray">
+          <Item NumberOfTags="0" Type="albaTagArray">
             <Name>LHDL</Name>
           </Item>
           <Item Type="mmaMaterial">
@@ -2655,7 +2655,7 @@
             <Representation>2</Representation>
             <MaterialType>0</MaterialType>
           </Item>
-          <Item NumberOfTags="103" Type="mafTagArray">
+          <Item NumberOfTags="103" Type="albaTagArray">
             <Name>TagArray</Name>
             <TItem Mult="1" Name="GRF_boh" Type="STR">
               <TItem>
@@ -2707,64 +2707,64 @@
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural" Type="STR">
               <TItem>
                 <TC>false</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural_VMElinkURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural_VMElinkURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_TimeStampVector" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_TimeStampVector" Type="STR">
               <TItem>
                 <TC>0 4.572 4.58</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
               <TItem>
                 <TC>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeChildURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeChildURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootName" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootName" Type="STR">
               <TItem>
                 <TC>msf_test_import_export_VME</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootURI" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootURI" Type="STR">
               <TItem>
                 <TC>Automated Tag Not Handled (instance exists)</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeTreeCreationDate" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeTreeCreationDate" Type="STR">
               <TItem>
                 <TC></TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_VmeType" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_VmeType" Type="STR">
               <TItem>
-                <TC>mafVMEVector</TC>
+                <TC>albaVMEVector</TC>
               </TItem>
             </TItem>
             <TItem Mult="1" Name="L0000_resource_data" Type="STR">
@@ -3176,15 +3176,15 @@
         </Attributes>
         <Links NumberOfLinks="0"/>
         <Children NumberOfItems="0"/>
-        <DataVector ArchiveFileName="TestMSF.18.zvtk" ItemTypeName="mafVMEItemVTK" NumberOfItems="2" SingleFileMode="true" VectorID="18">
-          <VItem Type="mafVMEItemVTK">
+        <DataVector ArchiveFileName="TestMSF.18.zvtk" ItemTypeName="albaVMEItemVTK" NumberOfItems="2" SingleFileMode="true" VectorID="18">
+          <VItem Type="albaVMEItemVTK">
             <URL>TestMSF.26.vtk</URL>
             <Id>26</Id>
             <DataType>vtkPolyData</DataType>
             <TimeStamp>4.572</TimeStamp>
             <Crypting>false</Crypting>
             <Bounds>17.28499031066895 79.17447662353516 324.7859497070313 393.6944885253906 0 819.3365478515625 </Bounds>
-            <TagArray NumberOfTags="1" Type="mafTagArray">
+            <TagArray NumberOfTags="1" Type="albaTagArray">
               <Name></Name>
               <TItem Mult="1" Name="MD5Checksum" Type="STR">
                 <TItem>
@@ -3193,14 +3193,14 @@
               </TItem>
             </TagArray>
           </VItem>
-          <VItem Type="mafVMEItemVTK">
+          <VItem Type="albaVMEItemVTK">
             <URL>TestMSF.42.vtk</URL>
             <Id>42</Id>
             <DataType>vtkPolyData</DataType>
             <TimeStamp>4.58</TimeStamp>
             <Crypting>false</Crypting>
             <Bounds>17.38890266418457 77.75251770019531 326.1643981933594 402.6717834472656 0 805.6646728515625 </Bounds>
-            <TagArray NumberOfTags="1" Type="mafTagArray">
+            <TagArray NumberOfTags="1" Type="albaTagArray">
               <Name></Name>
               <TItem Mult="1" Name="MD5Checksum" Type="STR">
                 <TItem>
@@ -3228,9 +3228,9 @@
 </Matrix>
         </MatrixVector>
       </Node>
-      <Node Crypting="0" Id="12" Name="test_ landmark cloud" Type="mafVMELandmarkCloud">
+      <Node Crypting="0" Id="12" Name="test_ landmark cloud" Type="albaVMELandmarkCloud">
         <Attributes NumberOfItems="3">
-          <Item NumberOfTags="0" Type="mafTagArray">
+          <Item NumberOfTags="0" Type="albaTagArray">
             <Name>LHDL</Name>
           </Item>
           <Item Type="mmaMaterial">
@@ -3254,7 +3254,7 @@
             <Representation>2</Representation>
             <MaterialType>0</MaterialType>
           </Item>
-          <Item NumberOfTags="107" Type="mafTagArray">
+          <Item NumberOfTags="107" Type="albaTagArray">
             <Name>TagArray</Name>
             <TItem Mult="1" Name="L0000" Type="STR">
               <TItem>
@@ -3301,64 +3301,64 @@
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural" Type="STR">
               <TItem>
                 <TC>false</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural_VMElinkURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural_VMElinkURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_TimeStampVector" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_TimeStampVector" Type="STR">
               <TItem>
                 <TC>0</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
               <TItem>
                 <TC>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeChildURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeChildURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootName" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootName" Type="STR">
               <TItem>
                 <TC>msf_test_import_export_VME</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootURI" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootURI" Type="STR">
               <TItem>
                 <TC>Automated Tag Not Handled (instance exists)</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeTreeCreationDate" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeTreeCreationDate" Type="STR">
               <TItem>
                 <TC></TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_VmeType" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_VmeType" Type="STR">
               <TItem>
-                <TC>mafVMELandmarkCloud</TC>
+                <TC>albaVMELandmarkCloud</TC>
               </TItem>
             </TItem>
             <TItem Mult="1" Name="L0000_resource_data" Type="STR">
@@ -3795,15 +3795,15 @@
         </Attributes>
         <Links NumberOfLinks="0"/>
         <Children NumberOfItems="0"/>
-        <DataVector ItemTypeName="mafVMEItemVTK" NumberOfItems="1" SingleFileMode="false" VectorID="2">
-          <VItem Type="mafVMEItemVTK">
+        <DataVector ItemTypeName="albaVMEItemVTK" NumberOfItems="1" SingleFileMode="false" VectorID="2">
+          <VItem Type="albaVMEItemVTK">
             <URL>TestMSF.50.vtk</URL>
             <Id>50</Id>
             <DataType>vtkPolyData</DataType>
             <TimeStamp>0</TimeStamp>
             <Crypting>false</Crypting>
             <Bounds>0 0 50 50 100 100 </Bounds>
-            <TagArray NumberOfTags="1" Type="mafTagArray">
+            <TagArray NumberOfTags="1" Type="albaTagArray">
               <Name></Name>
               <TItem Mult="1" Name="MD5Checksum" Type="STR">
                 <TItem>
@@ -3817,12 +3817,12 @@
         <LM_SPHERE_RESOLUTION>15</LM_SPHERE_RESOLUTION>
         <LM_RADIUS>1</LM_RADIUS>
       </Node>
-      <Node Crypting="0" Id="23" Name="ExternalFile.txt" Type="mafVMEExternalData">
+      <Node Crypting="0" Id="23" Name="ExternalFile.txt" Type="albaVMEExternalData">
         <Attributes NumberOfItems="3">
-          <Item NumberOfTags="0" Type="mafTagArray">
+          <Item NumberOfTags="0" Type="albaTagArray">
             <Name>LHDL</Name>
           </Item>
-          <Item NumberOfTags="104" Type="mafTagArray">
+          <Item NumberOfTags="104" Type="albaTagArray">
             <Name>TagArray</Name>
             <TItem Mult="1" Name="EXTDATA_EXTENSION" Type="STR">
               <TItem>
@@ -3879,64 +3879,64 @@
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural" Type="STR">
               <TItem>
                 <TC>false</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural_VMElinkURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural_VMElinkURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_TimeStampVector" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_TimeStampVector" Type="STR">
               <TItem>
                 <TC>0</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
               <TItem>
                 <TC>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeChildURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeChildURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootName" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootName" Type="STR">
               <TItem>
                 <TC>msf_test_import_export_VME</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootURI" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootURI" Type="STR">
               <TItem>
                 <TC>Automated Tag Not Handled (instance exists)</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeTreeCreationDate" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeTreeCreationDate" Type="STR">
               <TItem>
                 <TC></TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_VmeType" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_VmeType" Type="STR">
               <TItem>
-                <TC>mafVMEExternalData</TC>
+                <TC>albaVMEExternalData</TC>
               </TItem>
             </TItem>
             <TItem Mult="1" Name="L0000_resource_data" Type="STR">
@@ -4181,7 +4181,7 @@
             </TItem>
             <TItem Mult="1" Name="L0000_resource_data_Traceability_CreateEvent_Operation" Type="STR">
               <TItem>
-                <TC>mafOpOpenExternalFile</TC>
+                <TC>albaOpOpenExternalFile</TC>
               </TItem>
             </TItem>
             <TItem Mult="1" Name="L0000_resource_data_Traceability_CreateEvent_OperatorID" Type="STR">
@@ -4345,10 +4345,10 @@
               </TItem>
             </TItem>
           </Item>
-          <Item Type="mafAttributeTraceability">
+          <Item Type="albaAttributeTraceability">
             <Name>TrialAttribute</Name>
             <TrialEvent>Modify</TrialEvent>
-            <Operation>mafOpOpenExternalFile</Operation>
+            <Operation>albaOpOpenExternalFile</Operation>
             <Parameters></Parameters>
             <Date>17/09/2009 19:09:33</Date>
             <Application>LHPBuilder 1_2_TS_20090917163701_BUILD_190</Application>
@@ -4360,31 +4360,31 @@
             <Application>LHPBuilder 1_2_TS_20090917163701_BUILD_190</Application>
             <OperatorID>perticoni</OperatorID>
             <TrialEvent>Modify</TrialEvent>
-            <Operation>mafOpOpenExternalFile</Operation>
+            <Operation>albaOpOpenExternalFile</Operation>
             <Parameters></Parameters>
             <Date>20/10/2009 17:34:26</Date>
             <Application>LHPBuilder 1_2_TS_20091020152409_BUILD_273</Application>
             <OperatorID>perticoni</OperatorID>
             <TrialEvent>Modify</TrialEvent>
-            <Operation>mafOpOpenExternalFile</Operation>
+            <Operation>albaOpOpenExternalFile</Operation>
             <Parameters></Parameters>
             <Date>20/10/2009 17:34:45</Date>
             <Application>LHPBuilder 1_2_TS_20091020152409_BUILD_273</Application>
             <OperatorID>perticoni</OperatorID>
             <TrialEvent>Modify</TrialEvent>
-            <Operation>mafOpOpenExternalFile</Operation>
+            <Operation>albaOpOpenExternalFile</Operation>
             <Parameters></Parameters>
             <Date>20/10/2009 17:45:15</Date>
             <Application>LHPBuilder 1_2_TS_20091020152409_BUILD_273</Application>
             <OperatorID>perticoni</OperatorID>
             <TrialEvent>Modify</TrialEvent>
-            <Operation>mafOpOpenExternalFile</Operation>
+            <Operation>albaOpOpenExternalFile</Operation>
             <Parameters></Parameters>
             <Date>20/10/2009 17:49:48</Date>
             <Application>LHPBuilder 1_2_TS_20091020152409_BUILD_273</Application>
             <OperatorID>perticoni</OperatorID>
             <TrialEvent>Modify</TrialEvent>
-            <Operation>mafOpOpenExternalFile</Operation>
+            <Operation>albaOpOpenExternalFile</Operation>
             <Parameters></Parameters>
             <Date>23/10/2009 18:51:06</Date>
             <Application>LHPBuilder 1_2_TS_20091021121853_BUILD_275</Application>
@@ -4406,12 +4406,12 @@
 0 0 0 1 
 </Transform>
       </Node>
-      <Node Crypting="0" Id="24" Name="Bn_2295_bc_0012" Type="mafVMEImage">
+      <Node Crypting="0" Id="24" Name="Bn_2295_bc_0012" Type="albaVMEImage">
         <Attributes NumberOfItems="2">
-          <Item NumberOfTags="0" Type="mafTagArray">
+          <Item NumberOfTags="0" Type="albaTagArray">
             <Name>LHDL</Name>
           </Item>
-          <Item NumberOfTags="103" Type="mafTagArray">
+          <Item NumberOfTags="103" Type="albaTagArray">
             <Name>TagArray</Name>
             <TItem Mult="1" Name="L0000" Type="STR">
               <TItem>
@@ -4458,64 +4458,64 @@
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural" Type="STR">
               <TItem>
                 <TC>false</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural_VMElinkURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural_VMElinkURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_TimeStampVector" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_TimeStampVector" Type="STR">
               <TItem>
                 <TC>0</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
               <TItem>
                 <TC>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeChildURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeChildURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootName" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootName" Type="STR">
               <TItem>
                 <TC>msf_test_import_export_VME</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootURI" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootURI" Type="STR">
               <TItem>
                 <TC>Automated Tag Not Handled (instance exists)</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeTreeCreationDate" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeTreeCreationDate" Type="STR">
               <TItem>
                 <TC></TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_VmeType" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_VmeType" Type="STR">
               <TItem>
-                <TC>mafVMEImage</TC>
+                <TC>albaVMEImage</TC>
               </TItem>
             </TItem>
             <TItem Mult="1" Name="L0000_resource_data" Type="STR">
@@ -4932,15 +4932,15 @@
         </Attributes>
         <Links NumberOfLinks="0"/>
         <Children NumberOfItems="0"/>
-        <DataVector ItemTypeName="mafVMEItemVTK" NumberOfItems="1" SingleFileMode="false" VectorID="53">
-          <VItem Type="mafVMEItemVTK">
+        <DataVector ItemTypeName="albaVMEItemVTK" NumberOfItems="1" SingleFileMode="false" VectorID="53">
+          <VItem Type="albaVMEItemVTK">
             <URL>TestMSF.54.vtk</URL>
             <Id>54</Id>
             <DataType>vtkStructuredPoints</DataType>
             <TimeStamp>0</TimeStamp>
             <Crypting>false</Crypting>
             <Bounds>0 1023 0 1023 0 0 </Bounds>
-            <TagArray NumberOfTags="1" Type="mafTagArray">
+            <TagArray NumberOfTags="1" Type="albaTagArray">
               <Name></Name>
               <TItem Mult="1" Name="MD5Checksum" Type="STR">
                 <TItem>
@@ -4952,9 +4952,9 @@
         </DataVector>
         <MatrixVector NumberOfItems="0"/>
       </Node>
-      <Node Crypting="0" Id="25" Name="Polyline" Type="mafVMEPolyline">
+      <Node Crypting="0" Id="25" Name="Polyline" Type="albaVMEPolyline">
         <Attributes NumberOfItems="3">
-          <Item NumberOfTags="0" Type="mafTagArray">
+          <Item NumberOfTags="0" Type="albaTagArray">
             <Name>LHDL</Name>
           </Item>
           <Item Type="mmaMaterial">
@@ -4978,7 +4978,7 @@
             <Representation>2</Representation>
             <MaterialType>0</MaterialType>
           </Item>
-          <Item NumberOfTags="110" Type="mafTagArray">
+          <Item NumberOfTags="110" Type="albaTagArray">
             <Name>TagArray</Name>
             <TItem Mult="1" Name="L0000" Type="STR">
               <TItem>
@@ -5025,64 +5025,64 @@
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural" Type="STR">
               <TItem>
                 <TC>false</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_Procedural_VMElinkURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_Procedural_VMElinkURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_TimeStampVector" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_TimeStampVector" Type="STR">
               <TItem>
                 <TC>0</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TimeSpace_VMEabsoluteMatrixPose" Type="STR">
               <TItem>
                 <TC>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo" Type="STR">
               <TItem>
                 <TC>enter a value</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeChildURI1" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeChildURI1" Type="STR">
               <TItem>
                 <TC>This tag will be filled during the upload process</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootName" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootName" Type="STR">
               <TItem>
                 <TC>msf_test_import_export_VME</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeRootURI" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeRootURI" Type="STR">
               <TItem>
                 <TC>Automated Tag Not Handled (instance exists)</TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_TreeInfo_VmeTreeCreationDate" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_TreeInfo_VmeTreeCreationDate" Type="STR">
               <TItem>
                 <TC></TC>
               </TItem>
             </TItem>
-            <TItem Mult="1" Name="L0000_resource_MAF_VmeType" Type="STR">
+            <TItem Mult="1" Name="L0000_resource_ALBA_VmeType" Type="STR">
               <TItem>
-                <TC>mafVMEPolyline</TC>
+                <TC>albaVMEPolyline</TC>
               </TItem>
             </TItem>
             <TItem Mult="1" Name="L0000_resource_data" Type="STR">
@@ -5534,15 +5534,15 @@
         </Attributes>
         <Links NumberOfLinks="0"/>
         <Children NumberOfItems="0"/>
-        <DataVector ItemTypeName="mafVMEItemVTK" NumberOfItems="1" SingleFileMode="false" VectorID="55">
-          <VItem Type="mafVMEItemVTK">
+        <DataVector ItemTypeName="albaVMEItemVTK" NumberOfItems="1" SingleFileMode="false" VectorID="55">
+          <VItem Type="albaVMEItemVTK">
             <URL>TestMSF.56.vtk</URL>
             <Id>56</Id>
             <DataType>vtkPolyData</DataType>
             <TimeStamp>0</TimeStamp>
             <Crypting>false</Crypting>
             <Bounds>31.16697692871094 76.05429077148438 45.80414581298828 88.46102905273438 53 53.75 </Bounds>
-            <TagArray NumberOfTags="1" Type="mafTagArray">
+            <TagArray NumberOfTags="1" Type="albaTagArray">
               <Name></Name>
               <TItem Mult="1" Name="MD5Checksum" Type="STR">
                 <TItem>

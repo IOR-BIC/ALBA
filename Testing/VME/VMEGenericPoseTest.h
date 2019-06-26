@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: VMEGenericPoseTest
  Authors: Gianluigi Crimi
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -17,9 +17,9 @@
 #ifndef __CPP_UNIT_VMEGenericPoseTest_H__
 #define __CPP_UNIT_VMEGenericPoseTest_H__
 
-#include "mafTest.h"
+#include "albaTest.h"
 
-class VMEGenericPoseTest : public mafTest
+class VMEGenericPoseTest : public albaTest
 {
   CPPUNIT_TEST_SUITE( VMEGenericPoseTest );
   CPPUNIT_TEST( VMEGenericPoseMainTest );

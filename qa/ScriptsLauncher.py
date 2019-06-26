@@ -4,13 +4,13 @@ import getopt
 import shutil
 
 try:
-    from qa import mafPath
+    from qa import albaPath
 except ImportError:
-    import mafPath
+    import albaPath
 
 currentPathScript = os.path.split(os.path.realpath(__file__))[0]
-modulesDir = mafPath.mafSourcesDir
-outputDir = mafPath.mafQADir
+modulesDir = albaPath.albaSourcesDir
+outputDir = albaPath.albaQADir
 
 def run(param):
     scriptsDir = currentPathScript
@@ -65,7 +65,7 @@ def run(param):
 
         for item in os.listdir(baseDir):
             if (os.path.isfile(os.path.join(baseDir, item))==False):
-                if(item.find("maf") != -1):
+                if(item.find("alba") != -1):
                     os.system("python " + externalScriptFile + " " + item)
     if(param['cppcheck']):
         baseDir = modulesDir
@@ -77,7 +77,7 @@ def run(param):
         externalScriptFile = os.path.join(currentPathScript, "ExternalScripts", "ccccScript.py")
         for item in os.listdir(baseDir):
             if (os.path.isfile(os.path.join(baseDir, item))==False):
-                if(item.find("maf") != -1):
+                if(item.find("alba") != -1):
                     os.system("python " + externalScriptFile + " -m " + item)          
 def usage():
     print "Usage: python ScriptLauncher.py [-h] [-l] [-c]"

@@ -11,13 +11,13 @@ from numpy import arange
 
 """
 try:
-    from qa import mafPath
+    from qa import albaPath
 except ImportError:
-    import mafPath
+    import albaPath
 """
 currentPathScript = os.path.split(os.path.realpath(__file__))[0]
-#modulesDir = mafPath.mafSourcesDir
-#outputDir = mafPath.mafQADir
+#modulesDir = albaPath.albaSourcesDir
+#outputDir = albaPath.albaQADir
 
 ruleArray = []
 

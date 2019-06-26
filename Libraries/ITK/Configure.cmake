@@ -1,5 +1,5 @@
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
 # Date:      $Date: 2011-11-22 10:35:33 $
@@ -17,7 +17,7 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 #
 # This option is for using ANSI stream within ITK library
 #
-# this is to build ITK inside the MAF tree
+# this is to build ITK inside the ALBA tree
 IF (EXISTS "${ITK_SOURCE_DIR}/Sources")   
   SET (ITK_SOURCE_PATH "${ITK_SOURCE_DIR}/Sources")
 ENDIF (EXISTS "${ITK_SOURCE_DIR}/Sources")

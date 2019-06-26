@@ -1,80 +1,80 @@
-PROJECT (mafInteraction_TEST)
+PROJECT (albaInteraction_TEST)
 
-IF(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafDLL)
-ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafTests mafInteraction mafCore mafVME mafVisualPipes mafBase mafCommon mafViews mafService GPUAPI)
-ENDIF (MAF_BUILD_MAFDLL)
+IF(ALBA_BUILD_ALBADLL)
+  LINK_LIBRARIES(albaDLL)
+ELSE(ALBA_BUILD_ALBADLL)
+  LINK_LIBRARIES(albaTests albaInteraction albaCore albaVME albaVisualPipes albaBase albaCommon albaViews albaService GPUAPI)
+ENDIF (ALBA_BUILD_ALBADLL)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------
 SET(PROJECT_SRCS 
-	mafInteractionTests.h mafInteractionTests.cpp
-	mafGizmoPathTest.h mafGizmoPathTest.cpp
-	mafGizmoPathRulerTest.h mafGizmoPathRulerTest.cpp
-	mafInteractorSelectCellTest.h mafInteractorSelectCellTest.cpp
-	mafGizmoTranslateAxisTest.h mafGizmoTranslateAxisTest.cpp
-	mafGizmoTranslatePlaneTest.h mafGizmoTranslatePlaneTest.cpp
-	mafGizmoBoundingBoxTest.h mafGizmoBoundingBoxTest.cpp
-	mafGizmoScaleIsotropicTest.h mafGizmoScaleIsotropicTest.cpp
-	mafGizmoRotateFanTest.h mafGizmoRotateFanTest.cpp
-	mafGizmoROITest.h mafGizmoROITest.cpp
-	mafGizmoHandleTest.h mafGizmoHandleTest.cpp
-	mafAgentTest.h mafAgentTest.cpp
-	mafGizmoRotateCircleTest.h mafGizmoRotateCircleTest.cpp
-	mafGizmoTranslateTest.h mafGizmoTranslateTest.cpp
-	mafGizmoRotateTest.h mafGizmoRotateTest.cpp
-	mafGizmoSliceTest.h mafGizmoSliceTest.cpp
-	mafGizmoInteractionDebuggerTest.h mafGizmoInteractionDebuggerTest.cpp
-	mafGizmoInterfaceTest.h mafGizmoInterfaceTest.cpp
-	mafInteractorConstraintTest.h mafInteractorConstraintTest.cpp
-	mafRefSysTest.h mafRefSysTest.cpp
-	mafDeviceSetTest.h mafDeviceSetTest.cpp
-	mafGUIGizmoTranslateTest.h mafGUIGizmoTranslateTest.cpp
-	mafGUIGizmoRotateTest.h mafGUIGizmoRotateTest.cpp
-	mafGUIGizmoScaleTest.h mafGUIGizmoScaleTest.cpp
-	mafEventInteractionTest.h mafEventInteractionTest.cpp
-	mafDeviceManagerTest.h mafDeviceManagerTest.cpp
-	mafInteractionFactoryTest.h mafInteractionFactoryTest.cpp
-	mafGUITransformTextEntriesTest.h mafGUITransformTextEntriesTest.cpp
-	mafInteractorCompositorMouseTest.h mafInteractorCompositorMouseTest.cpp
-	mafActionTest.h mafActionTest.cpp
-	mafGUISaveRestorePoseTest.h mafGUISaveRestorePoseTest.cpp
-	mafAgentEventQueueTest.h mafAgentEventQueueTest.cpp
-	mafAgentThreadedTest.h mafAgentThreadedTest.cpp
-	mafInteractorPERTest.h mafInteractorPERTest.cpp
-	mafDeviceTest.h mafDeviceTest.cpp
-	mafGizmoScaleAxisTest.h mafGizmoScaleAxisTest.cpp
-	mafGizmoScaleTest.h mafGizmoScaleTest.cpp
-	#mafDeviceClientMAFTest.h mafDeviceClientMAFTest.cpp
-	mafInteractorExtractIsosurfaceTest.h mafInteractorExtractIsosurfaceTest.cpp
-	mafInteractorTest.h mafInteractorTest.cpp
-	mafInteractor6DOFCameraMoveTest.h mafInteractor6DOFCameraMoveTest.cpp
-	mafAvatar2DTest.h mafAvatar2DTest.cpp
-	mafAvatarTest.h mafAvatarTest.cpp 
-	mafInteractorSERTest.h mafInteractorSERTest.cpp
-	mafInteractor6DOFTest.h mafInteractor6DOFTest.cpp
-	mafInteractorGeneric6DOFTest.h mafInteractorGeneric6DOFTest.cpp
-	mafGUIGizmoInterfaceTest.h mafGUIGizmoInterfaceTest.cpp
-	mafGUITransformInterfaceTest.h mafGUITransformInterfaceTest.cpp
-	mafAvatar3DConeTest.h mafAvatar3DConeTest.cpp
-	mafGUITransformMouseTest.h mafGUITransformMouseTest.cpp
-	mafGizmoPolylineGraphTest.h mafGizmoPolylineGraphTest.cpp
-	mafDeviceButtonsPadMouseDialogTest.h mafDeviceButtonsPadMouseDialogTest.cpp
-	mafGUITransformSlidersTest.h mafGUITransformSlidersTest.cpp
+	albaInteractionTests.h albaInteractionTests.cpp
+	albaGizmoPathTest.h albaGizmoPathTest.cpp
+	albaGizmoPathRulerTest.h albaGizmoPathRulerTest.cpp
+	albaInteractorSelectCellTest.h albaInteractorSelectCellTest.cpp
+	albaGizmoTranslateAxisTest.h albaGizmoTranslateAxisTest.cpp
+	albaGizmoTranslatePlaneTest.h albaGizmoTranslatePlaneTest.cpp
+	albaGizmoBoundingBoxTest.h albaGizmoBoundingBoxTest.cpp
+	albaGizmoScaleIsotropicTest.h albaGizmoScaleIsotropicTest.cpp
+	albaGizmoRotateFanTest.h albaGizmoRotateFanTest.cpp
+	albaGizmoROITest.h albaGizmoROITest.cpp
+	albaGizmoHandleTest.h albaGizmoHandleTest.cpp
+	albaAgentTest.h albaAgentTest.cpp
+	albaGizmoRotateCircleTest.h albaGizmoRotateCircleTest.cpp
+	albaGizmoTranslateTest.h albaGizmoTranslateTest.cpp
+	albaGizmoRotateTest.h albaGizmoRotateTest.cpp
+	albaGizmoSliceTest.h albaGizmoSliceTest.cpp
+	albaGizmoInteractionDebuggerTest.h albaGizmoInteractionDebuggerTest.cpp
+	albaGizmoInterfaceTest.h albaGizmoInterfaceTest.cpp
+	albaInteractorConstraintTest.h albaInteractorConstraintTest.cpp
+	albaRefSysTest.h albaRefSysTest.cpp
+	albaDeviceSetTest.h albaDeviceSetTest.cpp
+	albaGUIGizmoTranslateTest.h albaGUIGizmoTranslateTest.cpp
+	albaGUIGizmoRotateTest.h albaGUIGizmoRotateTest.cpp
+	albaGUIGizmoScaleTest.h albaGUIGizmoScaleTest.cpp
+	albaEventInteractionTest.h albaEventInteractionTest.cpp
+	albaDeviceManagerTest.h albaDeviceManagerTest.cpp
+	albaInteractionFactoryTest.h albaInteractionFactoryTest.cpp
+	albaGUITransformTextEntriesTest.h albaGUITransformTextEntriesTest.cpp
+	albaInteractorCompositorMouseTest.h albaInteractorCompositorMouseTest.cpp
+	albaActionTest.h albaActionTest.cpp
+	albaGUISaveRestorePoseTest.h albaGUISaveRestorePoseTest.cpp
+	albaAgentEventQueueTest.h albaAgentEventQueueTest.cpp
+	albaAgentThreadedTest.h albaAgentThreadedTest.cpp
+	albaInteractorPERTest.h albaInteractorPERTest.cpp
+	albaDeviceTest.h albaDeviceTest.cpp
+	albaGizmoScaleAxisTest.h albaGizmoScaleAxisTest.cpp
+	albaGizmoScaleTest.h albaGizmoScaleTest.cpp
+	#albaDeviceClientALBATest.h albaDeviceClientALBATest.cpp
+	albaInteractorExtractIsosurfaceTest.h albaInteractorExtractIsosurfaceTest.cpp
+	albaInteractorTest.h albaInteractorTest.cpp
+	albaInteractor6DOFCameraMoveTest.h albaInteractor6DOFCameraMoveTest.cpp
+	albaAvatar2DTest.h albaAvatar2DTest.cpp
+	albaAvatarTest.h albaAvatarTest.cpp 
+	albaInteractorSERTest.h albaInteractorSERTest.cpp
+	albaInteractor6DOFTest.h albaInteractor6DOFTest.cpp
+	albaInteractorGeneric6DOFTest.h albaInteractorGeneric6DOFTest.cpp
+	albaGUIGizmoInterfaceTest.h albaGUIGizmoInterfaceTest.cpp
+	albaGUITransformInterfaceTest.h albaGUITransformInterfaceTest.cpp
+	albaAvatar3DConeTest.h albaAvatar3DConeTest.cpp
+	albaGUITransformMouseTest.h albaGUITransformMouseTest.cpp
+	albaGizmoPolylineGraphTest.h albaGizmoPolylineGraphTest.cpp
+	albaDeviceButtonsPadMouseDialogTest.h albaDeviceButtonsPadMouseDialogTest.cpp
+	albaGUITransformSlidersTest.h albaGUITransformSlidersTest.cpp
 	mmiVTKPickerTest.h mmiVTKPickerTest.cpp
 	mmiSelectPointTest.h mmiSelectPointTest.cpp
 	mmiInfoImageTest.h mmiInfoImageTest.cpp
-	mafInteractorDICOMImporterTest.h mafInteractorDICOMImporterTest.cpp
-	mafInteractor2DDistanceTest.h mafInteractor2DDistanceTest.cpp
-	mafInteractor2DAngleTest.h mafInteractor2DAngleTest.cpp
-	mafInteractor2DIndicatorTest.h mafInteractor2DIndicatorTest.cpp
-	mafInteractorSliderTest.h	mafInteractorSliderTest.cpp
+	albaInteractorDICOMImporterTest.h albaInteractorDICOMImporterTest.cpp
+	albaInteractor2DDistanceTest.h albaInteractor2DDistanceTest.cpp
+	albaInteractor2DAngleTest.h albaInteractor2DAngleTest.cpp
+	albaInteractor2DIndicatorTest.h albaInteractor2DIndicatorTest.cpp
+	albaInteractorSliderTest.h	albaInteractorSliderTest.cpp
 )
 
-ADD_EXECUTABLE(mafInteractionTests ${PROJECT_SRCS})
-ADD_TEST(mafInteractionTests  ${EXECUTABLE_OUTPUT_PATH}/mafInteractionTests)
+ADD_EXECUTABLE(albaInteractionTests ${PROJECT_SRCS})
+ADD_TEST(albaInteractionTests  ${EXECUTABLE_OUTPUT_PATH}/albaInteractionTests)
 IF (WIN32)
-  SET_TARGET_PROPERTIES(mafInteractionTests PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(albaInteractionTests PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)

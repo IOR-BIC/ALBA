@@ -2,16 +2,16 @@
 # Copyright and description to be placed here
 #
 
-PROJECT(mafService)
+PROJECT(albaService)
 
 DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
 
-	mafServiceLocator.cpp 	mafServiceLocator.h
-	mafServiceClient.cpp 	mafServiceClient.h
-	mafAbsLogicManager.h
+	albaServiceLocator.cpp 	albaServiceLocator.h
+	albaServiceClient.cpp 	albaServiceClient.h
+	albaAbsLogicManager.h
 )
 
 # Create the library.

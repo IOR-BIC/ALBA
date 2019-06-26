@@ -1,5 +1,5 @@
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
 # Date:      $Date: 2011-05-18 07:16:55 $
@@ -15,7 +15,7 @@
 INCLUDE (${MFL_SOURCE_DIR}/modules/PackagesMacro.cmake)
 INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 
-# this is to build CRYPTO inside the MAF tree
+# this is to build CRYPTO inside the ALBA tree
 IF (EXISTS "${CRYPTO_SOURCE_DIR}/Sources")   
   SET (CRYPTO_SOURCE_PATH "${CRYPTO_SOURCE_DIR}/Sources")
 ENDIF (EXISTS "${CRYPTO_SOURCE_DIR}/Sources")

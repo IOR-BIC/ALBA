@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testCheckTreeGui
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -18,22 +18,22 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafEvent.h"
-#include "mafGUIGui.h"
-#include "mafGUIGuiHolder.h"
-#include "mafObserver.h"
+#include "albaEvent.h"
+#include "albaGUIGui.h"
+#include "albaGUIGuiHolder.h"
+#include "albaObserver.h"
 
 // ============================================================================
-class testCheckTreeGui : public mafObserver
+class testCheckTreeGui : public albaObserver
 // ============================================================================
 {
 public:
                 testCheckTreeGui(wxWindow* parent);
   virtual      ~testCheckTreeGui(); 
-  virtual void  OnEvent(mafEventBase *maf_event);
+  virtual void  OnEvent(albaEventBase *alba_event);
   wxWindow*     GetGui();                       
- mafGUIGui         *m_gui;
- mafGUIGuiHolder   *m_guih;
+ albaGUIGui         *m_gui;
+ albaGUIGuiHolder   *m_guih;
 protected:
 
  wxString m_s1;

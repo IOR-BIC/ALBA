@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testDialogDlg
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -19,19 +19,19 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "wx/dialog.h"
-#include "mafGUIDialog.h"
+#include "albaGUIDialog.h"
 //----------------------------------------------------------------------------
 // testDialogDlg :
 //----------------------------------------------------------------------------
 /**
-sample showing a class derived from mafGUIDialog
+sample showing a class derived from albaGUIDialog
 */
-class testDialogDlg : public mafGUIDialog
+class testDialogDlg : public albaGUIDialog
 {
 public:
 	testDialogDlg (const wxString& title);
 	virtual ~testDialogDlg (); 
-  void OnEvent(mafEventBase *event);
+  void OnEvent(albaEventBase *event);
 
 protected:
 	/** Close the dialog */

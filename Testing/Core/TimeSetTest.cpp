@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
- Module: mafViewPlotTest
+ Program: ALBA (Agile Library for Biomedical Applications)
+ Module: albaViewPlotTest
  Authors: Gianluigi Crimi
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -17,14 +17,14 @@
 #include "TimeSetTest.h"
 #include <cppunit/config/SourcePrefix.h>
 #include "mmuTimeSet.h"
-#include "mafDefines.h"
+#include "albaDefines.h"
 #include <iostream>
 
 void TimeSetTest::TimeSetMainTest()
 {
-  mafTimeStamp tarray[6]={1, 2.5, 1.2, 1.8, 3.6, 0.5};
+  albaTimeStamp tarray[6]={1, 2.5, 1.2, 1.8, 3.6, 0.5};
 
-  // mmuTimeSet is a container for mafTimeStamps
+  // mmuTimeSet is a container for albaTimeStamps
   mmuTimeSet tset;
   int i;
   for (i=0;i<6;i++)
@@ -33,7 +33,7 @@ void TimeSetTest::TimeSetMainTest()
   CPPUNIT_ASSERT(tset.GetNumberOfTimeStamps()==6);
 
   // test ordering
-  mafTimeStamp old_t;
+  albaTimeStamp old_t;
   mmuTimeSet::Iterator it;
   for (old_t=0,it=tset.Begin();it!=tset.End();it++)
   {
@@ -61,7 +61,7 @@ void TimeSetTest::TimeSetMainTest()
   // check we have the correct number of time stamps
   CPPUNIT_ASSERT(tset.GetNumberOfTimeStamps()==10);
 
-  mafTimeStamp final_tarray[10]={.2, .3, .5, 1, 1.2, 1.8, 2, 2.5, 3.6, 4};
+  albaTimeStamp final_tarray[10]={.2, .3, .5, 1, 1.2, 1.8, 2, 2.5, 3.6, 4};
 
 
   // check for set sort integrity

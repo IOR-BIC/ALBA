@@ -1,2 +1,2 @@
-mafDecl.h
-mafConfigure.h
+albaDecl.h
+albaConfigure.h

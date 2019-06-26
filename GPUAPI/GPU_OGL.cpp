@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: GPU_OGL
  Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -30,8 +30,8 @@
 #endif // _WIN32
 #include "GPU_OGL.h"
 
-/*static*/bool mafGPUOGL::m_bGPUOGLSupported = false;
-/*static*/bool mafGPUOGL::m_bGPUOGLInitialized = false;
+/*static*/bool albaGPUOGL::m_bGPUOGLSupported = false;
+/*static*/bool albaGPUOGL::m_bGPUOGLInitialized = false;
 
 #ifdef _WIN32
 #ifdef _DEBUG
@@ -135,7 +135,7 @@ GLint gltWriteTGA(const char *szFileName, GLenum gltyp)
 
 
 //ctor
-mafGPUOGL::mafGPUOGL()
+albaGPUOGL::albaGPUOGL()
 {
 #ifdef _WIN32
   m_vs_ps[0] = m_vs_ps[1] = NULL;
@@ -156,7 +156,7 @@ mafGPUOGL::mafGPUOGL()
     if (m_bGPUOGLSupported)
     {
       //activate our rendering context
-      mafGPUOGLContext context(this);
+      albaGPUOGLContext context(this);
 
       m_bGPUOGLSupported = glewInit() == GLEW_OK;
       if (m_bGPUOGLSupported)
@@ -178,7 +178,7 @@ mafGPUOGL::mafGPUOGL()
   m_TargetSizeCx = 1.0f; m_TargetSizeCy = 1.0f;
 }
 
-mafGPUOGL::~mafGPUOGL()
+albaGPUOGL::~albaGPUOGL()
 {
   DestroyShaders();
 #ifdef _WIN32
@@ -189,17 +189,17 @@ mafGPUOGL::~mafGPUOGL()
 #ifdef _WIN32
 //------------------------------------------------------------------------
 // Results true if the given OpenGL extension is supported
-bool mafGPUOGL::IsExtSupported(const char* extension)
+bool albaGPUOGL::IsExtSupported(const char* extension)
 //------------------------------------------------------------------------
 {
-  mafGPUOGLContext context(this);
+  albaGPUOGLContext context(this);
   return glewGetExtension(extension) == GL_TRUE;
 }
 
 //------------------------------------------------------------------------
 //Creates OpenGL rendering context. 
 //Called from CreateShaders, returns false, if the context could not be created
-bool mafGPUOGL::CreateRenderingContext(wxString* err)
+bool albaGPUOGL::CreateRenderingContext(wxString* err)
 //------------------------------------------------------------------------
 {
   //create OpenGL rendering window
@@ -207,7 +207,7 @@ bool mafGPUOGL::CreateRenderingContext(wxString* err)
     return false;
   
   //activate our rendering context
-  mafGPUOGLContext context(this);
+  albaGPUOGLContext context(this);
   if (m_TextureId == 0)
     glGenTextures(1, &m_TextureId);
 
@@ -219,12 +219,12 @@ bool mafGPUOGL::CreateRenderingContext(wxString* err)
 
 //------------------------------------------------------------------------
 //Destroys the rendering context
-void mafGPUOGL::DestroyRenderingContext()
+void albaGPUOGL::DestroyRenderingContext()
 //------------------------------------------------------------------------
 {
   { //NB. this block here is required!
     //activate our rendering context
-    mafGPUOGLContext context(this);
+    albaGPUOGLContext context(this);
 
     if (m_TextureId != 0)
       glDeleteTextures(1, &m_TextureId);
@@ -246,7 +246,7 @@ void mafGPUOGL::DestroyRenderingContext()
 //Initializes simple vertex and fragment shader 
 //if a shader is not specified, the parameter vs or ps must be NULL
 //returns false, if an error occurs and the description of the error in err parameter
-bool mafGPUOGL::CreateShaders(const char* vs, const char* ps, wxString* err)
+bool albaGPUOGL::CreateShaders(const char* vs, const char* ps, wxString* err)
 //------------------------------------------------------------------------
 {
 #ifndef _WIN32
@@ -258,7 +258,7 @@ bool mafGPUOGL::CreateShaders(const char* vs, const char* ps, wxString* err)
   if (!CreateRenderingContext(err))
     return false;  
 
-  mafGPUOGLContext myContext(this);  
+  albaGPUOGLContext myContext(this);  
   DestroyShaders();  //if we have previously created shaders, remove them first
 
   //vertex shader
@@ -324,12 +324,12 @@ bool mafGPUOGL::CreateShaders(const char* vs, const char* ps, wxString* err)
 
 //------------------------------------------------------------------------
 // Releases OpenGL resources allocated for shaders by CreateShaders
-void mafGPUOGL::DestroyShaders()
+void albaGPUOGL::DestroyShaders()
 //------------------------------------------------------------------------
 {
 #ifdef _WIN32
   //activate our rendering context
-  mafGPUOGLContext myContext(this);  
+  albaGPUOGLContext myContext(this);  
 
   for (int i = 0; i < 2; i++)
   {
@@ -353,13 +353,13 @@ void mafGPUOGL::DestroyShaders()
 //Every successive rendering will go through custom program
 //Returns false, if the program could not be loaded. 
 //------------------------------------------------------------------------
-bool mafGPUOGL::BeginExecute(wxString* err)
+bool albaGPUOGL::BeginExecute(wxString* err)
 {
 #ifndef _WIN32
   return false;
 #else
   //activate our rendering context
-  mafGPUOGLContext myContext(this);  
+  albaGPUOGLContext myContext(this);  
   
   //load shader into hardware pipeline    
   glUseProgramObjectARB(m_progObj);
@@ -422,11 +422,11 @@ bool mafGPUOGL::BeginExecute(wxString* err)
 
 //------------------------------------------------------------------------
 // Unloads the current shading program
-void mafGPUOGL::EndExecute()
+void albaGPUOGL::EndExecute()
 //------------------------------------------------------------------------
 {
 #ifdef _WIN32
-  mafGPUOGLContext myContext(this);
+  albaGPUOGLContext myContext(this);
   m_nGPUGLContextRef--;   //quit the context (see BeginExecute)
 #endif
 }
@@ -434,11 +434,11 @@ void mafGPUOGL::EndExecute()
 //------------------------------------------------------------------------
 //Sets program parameter 
 //Must be called after BeginExecute
-void mafGPUOGL::SetParameter(const char* paramname, float fvalue)
+void albaGPUOGL::SetParameter(const char* paramname, float fvalue)
 //------------------------------------------------------------------------
 {
 #ifdef _WIN32
-  mafGPUOGLContext myContext(this);
+  albaGPUOGLContext myContext(this);
 
   GLint iPos = glGetUniformLocationARB(m_progObj, paramname);
   if (iPos >= 0)
@@ -449,11 +449,11 @@ void mafGPUOGL::SetParameter(const char* paramname, float fvalue)
 //------------------------------------------------------------------------
 //Sets program parameter 
 //Must be called after BeginExecute
-void mafGPUOGL::SetParameter(const char* paramname, int ivalue)
+void albaGPUOGL::SetParameter(const char* paramname, int ivalue)
 //------------------------------------------------------------------------
 {
 #ifdef _WIN32
-  mafGPUOGLContext myContext(this);
+  albaGPUOGLContext myContext(this);
 
   GLint iPos = glGetUniformLocationARB(m_progObj, paramname);
   if (iPos >= 0)
@@ -464,11 +464,11 @@ void mafGPUOGL::SetParameter(const char* paramname, int ivalue)
 //------------------------------------------------------------------------
 //Sets program parameter 
 //Must be called after BeginExecute
-void mafGPUOGL::SetParameter(const char* paramname, float fvector[3])
+void albaGPUOGL::SetParameter(const char* paramname, float fvector[3])
 //------------------------------------------------------------------------
 {
 #ifdef _WIN32
-  mafGPUOGLContext myContext(this);
+  albaGPUOGLContext myContext(this);
 
   GLint iPos = glGetUniformLocationARB(m_progObj, paramname);
   if (iPos >= 0)
@@ -479,11 +479,11 @@ void mafGPUOGL::SetParameter(const char* paramname, float fvector[3])
 //------------------------------------------------------------------------
 //Sets program parameter 
 //Must be called after BeginExecute
-void mafGPUOGL::SetParameter(const char* paramname, int ivector[3])
+void albaGPUOGL::SetParameter(const char* paramname, int ivector[3])
 //------------------------------------------------------------------------
 {
 #ifdef _WIN32
-  mafGPUOGLContext myContext(this);
+  albaGPUOGLContext myContext(this);
 
   GLint iPos = glGetUniformLocationARB(m_progObj, paramname);
   if (iPos >= 0)
@@ -494,7 +494,7 @@ void mafGPUOGL::SetParameter(const char* paramname, int ivector[3])
 //------------------------------------------------------------------------
 //Initializes computation
 //Initialize camera, viewport, etc.
-/*virtual*/ void mafGPUOGL::InitializeComputation()
+/*virtual*/ void albaGPUOGL::InitializeComputation()
 //------------------------------------------------------------------------
 {  
 #ifdef _WIN32  
@@ -512,7 +512,7 @@ void mafGPUOGL::SetParameter(const char* paramname, int ivector[3])
 
 //------------------------------------------------------------------------
 //Sends geometry into the hardware pipeline to run shaders
-/*virtual*/ void mafGPUOGL::RunComputation()
+/*virtual*/ void albaGPUOGL::RunComputation()
 //------------------------------------------------------------------------
 {
 #ifdef _WIN32  
@@ -535,7 +535,7 @@ void mafGPUOGL::SetParameter(const char* paramname, int ivector[3])
 //------------------------------------------------------------------------
 //Finalizes computation
 //It resets camera, viewport, etc. to original state
-/*virtual*/ void mafGPUOGL::FinalizeComputation()
+/*virtual*/ void albaGPUOGL::FinalizeComputation()
 //------------------------------------------------------------------------
 {  
 #if _WIN32
@@ -548,7 +548,7 @@ void mafGPUOGL::SetParameter(const char* paramname, int ivector[3])
 //It calls BeginExecution, InitializeComputation, RunComputation, 
 //FinalizeComputation and EndExecution  
 //Returns false, if the program could not be executed.
-bool mafGPUOGL::ExecuteProgram(wxString* err)
+bool albaGPUOGL::ExecuteProgram(wxString* err)
 //------------------------------------------------------------------------
 {
   //switch to our rendering context
@@ -569,11 +569,11 @@ bool mafGPUOGL::ExecuteProgram(wxString* err)
 //Copies the result from the framebuffer (target) into the given buffer
 //The buffer must be capable to hold W*H pixels, i.e., W*H bytes if 
 //bGetVector is false, otherwise 3*W*H - W and H are set in SetTarget
-void mafGPUOGL::GetResult(void* pBuffer, GLenum data_type, bool bGetVector)
+void albaGPUOGL::GetResult(void* pBuffer, GLenum data_type, bool bGetVector)
 //------------------------------------------------------------------------
 {
   //switch to our context
-  mafGPUOGLContext context(this);
+  albaGPUOGLContext context(this);
 
   glPushAttrib(GL_ALL_ATTRIB_BITS);  
   glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -599,12 +599,12 @@ void mafGPUOGL::GetResult(void* pBuffer, GLenum data_type, bool bGetVector)
   glPopAttrib();
 }
 
-#define RW_CLASSNAME "mafGPUOGL_RW"
+#define RW_CLASSNAME "albaGPUOGL_RW"
 
 //------------------------------------------------------------------------
 //Creates OpenGL rendering window
 //Returns false, if the OpenGL rendering window could not be created.
-bool mafGPUOGL::CreateRenderingWindow(wxString* err)
+bool albaGPUOGL::CreateRenderingWindow(wxString* err)
 //------------------------------------------------------------------------
 {
   if (m_hRWnd == NULL)
@@ -687,7 +687,7 @@ bool mafGPUOGL::CreateRenderingWindow(wxString* err)
 
 //------------------------------------------------------------------------
 // Destroys the rendering window
-void mafGPUOGL::DestroyRenderingWindow()
+void albaGPUOGL::DestroyRenderingWindow()
 //------------------------------------------------------------------------
 {
   assert(m_nGPUGLContextRef == 0);
@@ -720,7 +720,7 @@ void mafGPUOGL::DestroyRenderingWindow()
 
 //------------------------------------------------------------------------
 //Formats Windows LastError into err
-void mafGPUOGL::GetLastErrorText(wxString* err)
+void albaGPUOGL::GetLastErrorText(wxString* err)
 //------------------------------------------------------------------------
 {
   if (err != NULL)
@@ -745,7 +745,7 @@ void mafGPUOGL::GetLastErrorText(wxString* err)
 
 //------------------------------------------------------------------------
 // Switch to our OpenGL context
-mafGPUOGL::mafGPUOGLContext::mafGPUOGLContext(mafGPUOGL* pThis) : m_pThis(pThis)
+albaGPUOGL::albaGPUOGLContext::albaGPUOGLContext(albaGPUOGL* pThis) : m_pThis(pThis)
 //------------------------------------------------------------------------
 {  
   if (pThis->m_nGPUGLContextRef == 0)
@@ -760,7 +760,7 @@ mafGPUOGL::mafGPUOGLContext::mafGPUOGLContext(mafGPUOGL* pThis) : m_pThis(pThis)
 
 //------------------------------------------------------------------------
 //Restores the original OpenGL context
-mafGPUOGL::mafGPUOGLContext::~mafGPUOGLContext()
+albaGPUOGL::albaGPUOGLContext::~albaGPUOGLContext()
 //------------------------------------------------------------------------
 {
   if ((--m_pThis->m_nGPUGLContextRef) == 0)
@@ -771,19 +771,19 @@ mafGPUOGL::mafGPUOGLContext::~mafGPUOGLContext()
 //Activates the OpenGL rendering context of this object
 //Typically used in preprocessing to load input data 
 //NB. DisableRenderingContext should be called asap
-void mafGPUOGL::EnableRenderingContext()
+void albaGPUOGL::EnableRenderingContext()
 //------------------------------------------------------------------------
 {
-  mafGPUOGLContext context(this);
+  albaGPUOGLContext context(this);
   m_nGPUGLContextRef++;
 }
 
 //------------------------------------------------------------------------
 //Deactivates the OpenGL rendering context of this object activated by EnableRenderingContext method.
-void mafGPUOGL::DisableRenderingContext()
+void albaGPUOGL::DisableRenderingContext()
 //------------------------------------------------------------------------
 {
-  mafGPUOGLContext context(this);
+  albaGPUOGLContext context(this);
   m_nGPUGLContextRef--;
 }
 #endif // _WIN32

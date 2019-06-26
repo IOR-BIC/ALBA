@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmaMeter
  Authors: Marco Petrone, Paolo Quadrani
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,23 +15,23 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
 #include "mmaMeter.h"
-#include "mafVMEMeter.h"
-#include "mafStorageElement.h"
-#include "mafIndent.h"
+#include "albaVMEMeter.h"
+#include "albaStorageElement.h"
+#include "albaIndent.h"
 
 #include <assert.h>
 
 //-------------------------------------------------------------------------
-mafCxxTypeMacro(mmaMeter)
+albaCxxTypeMacro(mmaMeter)
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
@@ -40,16 +40,16 @@ mmaMeter::mmaMeter()
 {
   m_Name           = "MeterAttributes";
   m_LabelVisibility= 1;
-  m_ColorMode      = mafVMEMeter::ONE_COLOR;
-  m_Representation = mafVMEMeter::LINE_REPRESENTATION;
+  m_ColorMode      = albaVMEMeter::ONE_COLOR;
+  m_Representation = albaVMEMeter::LINE_REPRESENTATION;
   m_Capping        = 0;
-  m_MeterMode      = mafVMEMeter::POINT_DISTANCE;
+  m_MeterMode      = albaVMEMeter::POINT_DISTANCE;
   m_TubeRadius     = 1.0;
   m_InitMeasure    = 0.0;
   m_GenerateEvent  = 0;
   m_ThresholdEvent = 0;
   m_DeltaPercent   = 10.0;
-  m_MeasureType    = mafVMEMeter::ABSOLUTE_MEASURE;
+  m_MeasureType    = albaVMEMeter::ABSOLUTE_MEASURE;
 
   m_DistanceRange[0] = 0.0;
   m_DistanceRange[1] = 1.0;
@@ -60,7 +60,7 @@ mmaMeter::~mmaMeter()
 {
 }
 //-------------------------------------------------------------------------
-void mmaMeter::DeepCopy(const mafAttribute *a)
+void mmaMeter::DeepCopy(const albaAttribute *a)
 //-------------------------------------------------------------------------
 { 
   Superclass::DeepCopy(a);
@@ -79,7 +79,7 @@ void mmaMeter::DeepCopy(const mafAttribute *a)
   m_LabelVisibility = ((mmaMeter *)a)->m_LabelVisibility;
 }
 //-------------------------------------------------------------------------
-bool mmaMeter::Equals(const mafAttribute *a)
+bool mmaMeter::Equals(const albaAttribute *a)
 //-------------------------------------------------------------------------
 {
   if (Superclass::Equals(a))
@@ -101,10 +101,10 @@ bool mmaMeter::Equals(const mafAttribute *a)
   return false;
 }
 //-----------------------------------------------------------------------
-int mmaMeter::InternalStore(mafStorageElement *parent)
+int mmaMeter::InternalStore(albaStorageElement *parent)
 //-----------------------------------------------------------------------
 {  
-  if (Superclass::InternalStore(parent)==MAF_OK)
+  if (Superclass::InternalStore(parent)==ALBA_OK)
   {
     parent->StoreInteger("MeterMode", m_MeterMode);
     parent->StoreInteger("ColorMode", m_ColorMode);
@@ -118,18 +118,18 @@ int mmaMeter::InternalStore(mafStorageElement *parent)
     parent->StoreDouble("InitMeasure",m_InitMeasure);
     parent->StoreDouble("TubeRadius",m_TubeRadius);
     parent->StoreVectorN("DistanceRange",m_DistanceRange,2);
-    return MAF_OK;
+    return ALBA_OK;
   }
-  return MAF_ERROR;
+  return ALBA_ERROR;
 }
 //-----------------------------------------------------------------------
-int mmaMeter::InternalRestore(mafStorageElement *node)
+int mmaMeter::InternalRestore(albaStorageElement *node)
 //-----------------------------------------------------------------------
 {
-  if (Superclass::InternalRestore(node)==MAF_OK)
+  if (Superclass::InternalRestore(node)==ALBA_OK)
   {
-    //mafMatrix matrix;  //modified by Marco. 29-9-2005 It seems this field is not stored...
-    ///if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
+    //albaMatrix matrix;  //modified by Marco. 29-9-2005 It seems this field is not stored...
+    ///if (node->RestoreMatrix("Transform",&matrix)==ALBA_OK)
     //{
       node->RestoreInteger("MeterMode", m_MeterMode);
       node->RestoreInteger("ColorMode", m_ColorMode);
@@ -143,15 +143,15 @@ int mmaMeter::InternalRestore(mafStorageElement *node)
       node->RestoreDouble("InitMeasure",m_InitMeasure);
       node->RestoreDouble("TubeRadius",m_TubeRadius);
       node->RestoreVectorN("DistanceRange",m_DistanceRange,2);
-      return MAF_OK;
+      return ALBA_OK;
     //}
   }
-  return MAF_ERROR;
+  return ALBA_ERROR;
 }
 //-----------------------------------------------------------------------
 void mmaMeter::Print(std::ostream& os, const int tabs) const
 //-----------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);
-  mafIndent indent(tabs);
+  albaIndent indent(tabs);
 }

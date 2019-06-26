@@ -5,11 +5,11 @@ currentPathScript = os.path.split(os.path.realpath(__file__))[0]
 
 try:
     sys.path.append(os.path.realpath(os.path.join(currentPathScript,"..","..")))
-    from qa import mafPath
+    from qa import albaPath
 except ImportError:
-    import mafPath
+    import albaPath
 
-modulesDir = os.path.abspath(mafPath.mafSourcesDir)
+modulesDir = os.path.abspath(albaPath.albaSourcesDir)
 currentModule = ""
 
 def usage():
@@ -19,9 +19,9 @@ def createCoverageReport():
     extScriptDir = currentPathScript
     baseDir = modulesDir
     moduleDir = os.path.join(baseDir,currentModule)
-    testDir = os.path.join(mafPath.mafTestsDir, currentModule + "Test")
-    binDir = os.path.join(mafPath.mafBinaryDir, "bin") #here can be also with Debug
-    qaResultsDir = os.path.join(mafPath.mafQADir, "QAResults")
+    testDir = os.path.join(albaPath.albaTestsDir, currentModule + "Test")
+    binDir = os.path.join(albaPath.albaBinaryDir, "bin") #here can be also with Debug
+    qaResultsDir = os.path.join(albaPath.albaQADir, "QAResults")
     LCOVExternalCoverageDir = os.path.join(qaResultsDir, "externalLCOVCoverage")
 
     if(os.path.exists(moduleDir) == False):
@@ -48,7 +48,7 @@ def createCoverageReport():
     os.system("rm -fR "+ moduleCoverageReportDir)
     os.mkdir(moduleCoverageReportDir);
 
-    gcdaDir = os.path.join(mafPath.mafBinaryDir,"src",currentModule,"CMakeFiles",currentModule+".dir")
+    gcdaDir = os.path.join(albaPath.albaBinaryDir,"src",currentModule,"CMakeFiles",currentModule+".dir")
     os.chdir(gcdaDir)
 
     os.system("find . -type f -name '*.gcda' -print | xargs /bin/rm -f")

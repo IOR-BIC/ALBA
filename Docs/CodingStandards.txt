@@ -1,28 +1,28 @@
-[HOW-TO about MAF coding]
+[HOW-TO about ALBA coding]
 
 ** NAMING CONVENTIONS **
 
-MAF classes
+ALBA classes
 Each class name should start with tree characters from the following list:
-"maf" - for generic maf classes
-"mmo" - for maf operations
+"alba" - for generic alba classes
+"mmo" - for alba operations
 "mmg" - for GUI related classes
-"mmd" - for MAF devices
+"mmd" - for ALBA devices
 "mmi" - for interactors
 
-After first three characters, the class name is composed of a number of words separated by capital letters, e.g. "mafViewManager", "mafEventListener", "mafObserver" etc. 
+After first three characters, the class name is composed of a number of words separated by capital letters, e.g. "albaViewManager", "albaEventListener", "albaObserver" etc. 
 
 Member Variables
-For MAF classes, member variables name starts with "m_" to clearly state it's a member variable, followed by a number of words, each one starting with capital letter: e.g. "m_Observers", "m_ViewManager", "m_Initialized"
+For ALBA classes, member variables name starts with "m_" to clearly state it's a member variable, followed by a number of words, each one starting with capital letter: e.g. "m_Observers", "m_ViewManager", "m_Initialized"
 
 Member Functions
-For MAF classes, member function names are composed by words starting with capital letters, e.g. "SetRenderWindow()", "GetActorsList()", "IsInitialized()". When a function is for setting or gettig the value of a member variable, its name is composed by "Set" or "Get" followed by variable name without the leading "m_", e.g. "SetRenderWindow()". 
+For ALBA classes, member function names are composed by words starting with capital letters, e.g. "SetRenderWindow()", "GetActorsList()", "IsInitialized()". When a function is for setting or gettig the value of a member variable, its name is composed by "Set" or "Get" followed by variable name without the leading "m_", e.g. "SetRenderWindow()". 
 
 ** SOURCES ORGANIZATION **
-Each class should have two files, one for class declaration and one for class implementation, with the same name of the class followed respectivelly by ".h" and ".cpp": e.g. "mafObserver.h" and "mafObserver.cpp"
+Each class should have two files, one for class declaration and one for class implementation, with the same name of the class followed respectivelly by ".h" and ".cpp": e.g. "albaObserver.h" and "albaObserver.cpp"
 
 ** LICENSING AND AUTHORS **
-Source files of the MAF distribution should have an header of the form:
+Source files of the ALBA distribution should have an header of the form:
 
 /*=========================================================================
   Program:   Multimod Application Framework RELOADED
@@ -38,11 +38,11 @@ Source files of the MAF distribution should have an header of the form:
 =========================================================================*/
 
 Each file should report the author's organization in place of "CINECA", but all
-files in MAF distribution should undergo the details of the BSD-like license
+files in ALBA distribution should undergo the details of the BSD-like license
 reported in COPYINGS file.
 
 ** COMMENTS STYLING **
-Code comments style inside MAF has been selected to allow a good readability of the code and to allow an automatic document processing by means of the doyxgen utility. In general code is organized in specific sections, where each section is separated by comments with dash lines to make evident code separation. Following are comments styling for different kind 
+Code comments style inside ALBA has been selected to allow a good readability of the code and to allow an automatic document processing by means of the doyxgen utility. In general code is organized in specific sections, where each section is separated by comments with dash lines to make evident code separation. Following are comments styling for different kind 
 of elements/sections.
 
 - MEMBER FUNCTIONS DECLARATION

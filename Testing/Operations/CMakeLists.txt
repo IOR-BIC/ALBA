@@ -1,133 +1,133 @@
 PROJECT (Operations_TEST)
 
-IF(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafDLL)
-ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafTests mafOperations mafVME mafCommon mafService)
-ENDIF (MAF_BUILD_MAFDLL)
+IF(ALBA_BUILD_ALBADLL)
+  LINK_LIBRARIES(albaDLL)
+ELSE(ALBA_BUILD_ALBADLL)
+  LINK_LIBRARIES(albaTests albaOperations albaVME albaCommon albaService)
+ENDIF (ALBA_BUILD_ALBADLL)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------
 SET(PROJECT_SRCS 
-	mafOperationsTests.h mafOperationsTests.cpp
-	mafOpImporterMSF1xTest.h mafOpImporterMSF1xTest.cpp
-	mafOpImporterSTLTest.h mafOpImporterSTLTest.cpp
-	mafOpExporterSTLTest.h mafOpExporterSTLTest.cpp
-	mafOpCropTest.h mafOpCropTest.cpp
-	mafOpVOIDensityTest.h mafOpVOIDensityTest.cpp
-	mafOpImporterImageTest.h mafOpImporterImageTest.cpp
-	mafOpImporterRAWVolumeTest.h mafOpImporterRAWVolumeTest.cpp
-	mafOpImporterVRMLTest.h mafOpImporterVRMLTest.cpp
-	mafOpExporterRAWTest.h mafOpExporterRAWTest.cpp
-	mafOpCreateGroupTest.h mafOpCreateGroupTest.cpp
-	mafOpReparentToTest.h mafOpReparentToTest.cpp
-	mafOpDecimateSurfaceTest.h mafOpDecimateSurfaceTest.cpp
-	mafOpConnectivitySurfaceTest.h mafOpConnectivitySurfaceTest.cpp
-	mafOpRemoveCellsTest.h mafOpRemoveCellsTest.cpp
-	mafOpBooleanSurfaceTest.h mafOpBooleanSurfaceTest.cpp
-	mafOpEditNormalsTest.h mafOpEditNormalsTest.cpp
-	mafOpExporterBMPTest.h mafOpExporterBMPTest.cpp
-	mafOpImporterMSFTest.h mafOpImporterMSFTest.cpp
-	mafOpImporterExternalFileTest.h mafOpImporterExternalFileTest.cpp
-	mafOpOpenExternalFileTest.h mafOpOpenExternalFileTest.cpp
-	mafOpDecomposeTimeVarVMETest.h mafOpDecomposeTimeVarVMETest.cpp
-	mafOpLabelExtractorTest.h mafOpLabelExtractorTest.cpp
-	mafOpImporterVTKTest.h mafOpImporterVTKTest.cpp
-	mafOpCreateVolumeTest.h mafOpCreateVolumeTest.cpp
-	mafOpVOIDensityEditorTestTest.h mafOpVOIDensityEditorTestTest.cpp
-	mafOpAddLandmarkTest.h mafOpAddLandmarkTest.cpp
-	mafOpApplyTrajectoryTest.h mafOpApplyTrajectoryTest.cpp
-	mafOpExtractIsosurfaceTest.h mafOpExtractIsosurfaceTest.cpp
-	mafOpImporterASCIITest.h mafOpImporterASCIITest.cpp
-	mafOpExporterMSFTest.h mafOpExporterMSFTest.cpp
-	mafOpFilterSurfaceTest.h mafOpFilterSurfaceTest.cpp
-	mafOpValidateTreeTest.h mafOpValidateTreeTest.cpp
-	mafOpGarbageCollectMSFDirTest.h mafOpGarbageCollectMSFDirTest.cpp
-	mafOpScalarToSurfaceTest.h mafOpScalarToSurfaceTest.cpp
-	mafASCIIImporterUtilityTest.h mafASCIIImporterUtilityTest.cpp
-	mafOpEditMetadataTest.h mafOpEditMetadataTest.cpp
-	mafOpFilterVolumeTest.h mafOpFilterVolumeTest.cpp
-	mafOpMAFTransformTest.h mafOpMAFTransformTest.cpp
-	mafOpTransformInterfaceTest.h mafOpTransformInterfaceTest.cpp
-	mafVMEMeshAnsysTextImporterTest.h mafVMEMeshAnsysTextImporterTest.cpp
-	mafVMEMeshAnsysTextExporterTest.h mafVMEMeshAnsysTextExporterTest.cpp
-	mafOpImporterMeshTest.h mafOpImporterMeshTest.cpp
-	mafOpExporterMeshTest.h mafOpExporterMeshTest.cpp
-	mafVMEDataSetAttributesImporterTest.h mafVMEDataSetAttributesImporterTest.cpp
-	mafOpImporterVMEDataSetAttributesTest.h mafOpImporterVMEDataSetAttributesTest.cpp
-	mafOpCreateMeterTest.h mafOpCreateMeterTest.cpp
-	mafOpCreateProberTest.h mafOpCreateProberTest.cpp
-	mafOpCreateRefSysTest.h mafOpCreateRefSysTest.cpp
-	mafOpCreateSlicerTest.h mafOpCreateSlicerTest.cpp
-	mafOpCreateSplineTest.h mafOpCreateSplineTest.cpp
-	mafOpCreateSurfaceParametricTest.h mafOpCreateSurfaceParametricTest.cpp
-	mafOpExporterVTKTest.h mafOpExporterVTKTest.cpp
-	mafOpExporterLandmarkTest.h mafOpExporterLandmarkTest.cpp
-	mafOpImporterLandmarkTest.h mafOpImporterLandmarkTest.cpp
-	mafOpImporterGRFWSTest.h mafOpImporterGRFWSTest.cpp
-	mafOpImporterAnalogWSTest.h mafOpImporterAnalogWSTest.cpp
-	mafGeometryEditorPolylineGraphTest.h mafGeometryEditorPolylineGraphTest.cpp
-	mafOpMatrixVectorMathTest.h mafOpMatrixVectorMathTest.cpp
-	mafOpVolumeMeasureTest.h mafOpVolumeMeasureTest.cpp
-	mafOpImporterRAWImagesTest.h mafOpImporterRAWImagesTest.cpp
-	mafOpImporterLandmarkTXTTest.h mafOpImporterLandmarkTXTTest.cpp
-	mafOpImporterLandmarkWSTest.h mafOpImporterLandmarkWSTest.cpp
-	mafOpExtrusionHolesTest.h mafOpExtrusionHolesTest.cpp
-	mafOpExporterWrappedMeterTest.h mafOpExporterWrappedMeterTest.cpp
-	mafOpFreezeVMETest.h mafOpFreezeVMETest.cpp
-	mafOpLabelizeSurfaceTest.h mafOpLabelizeSurfaceTest.cpp
-	mafOpCleanSurfaceTest.h mafOpCleanSurfaceTest.cpp
-	mafOpSmoothSurfaceTest.h mafOpSmoothSurfaceTest.cpp
-	mafOpTriangulateSurfaceTest.h mafOpTriangulateSurfaceTest.cpp
-	mafOpSurfaceMirrorTest.h mafOpSurfaceMirrorTest.cpp
-	mafOpVolumeMirrorTest.h mafOpVolumeMirrorTest.cpp
-	mafOpExporterMetersTest.h mafOpExporterMetersTest.cpp
-	mafOpSubdivideTest.h mafOpSubdivideTest.cpp
-	mafOpCreateSurfaceTest.h mafOpCreateSurfaceTest.cpp
-	mafOpVolumeResampleTest.h mafOpVolumeResampleTest.cpp
-	mafOpSegmentationRegionGrowingConnectedThresholdTest.h mafOpSegmentationRegionGrowingConnectedThresholdTest.cpp
-	mafOpScaleDatasetTest.h mafOpScaleDatasetTest.cpp
-	mafOpCreateLabeledVolumeTest.h mafOpCreateLabeledVolumeTest.cpp
-	mafOpComputeWrappingTest.h mafOpComputeWrappingTest.cpp
-	mafOpComputeInertialTensorTest.h mafOpComputeInertialTensorTest.cpp
-	mafOpSplitSurfaceTest.h mafOpSplitSurfaceTest.cpp
-	mafOpMML3Test.h mafOpMML3Test.cpp
-	mafOpExtractGeometryTest.h mafOpExtractGeometryTest.cpp
-	mafOpImporterDicomTest.h mafOpImporterDicomTest.cpp
+	albaOperationsTests.h albaOperationsTests.cpp
+	albaOpImporterMSF1xTest.h albaOpImporterMSF1xTest.cpp
+	albaOpImporterSTLTest.h albaOpImporterSTLTest.cpp
+	albaOpExporterSTLTest.h albaOpExporterSTLTest.cpp
+	albaOpCropTest.h albaOpCropTest.cpp
+	albaOpVOIDensityTest.h albaOpVOIDensityTest.cpp
+	albaOpImporterImageTest.h albaOpImporterImageTest.cpp
+	albaOpImporterRAWVolumeTest.h albaOpImporterRAWVolumeTest.cpp
+	albaOpImporterVRMLTest.h albaOpImporterVRMLTest.cpp
+	albaOpExporterRAWTest.h albaOpExporterRAWTest.cpp
+	albaOpCreateGroupTest.h albaOpCreateGroupTest.cpp
+	albaOpReparentToTest.h albaOpReparentToTest.cpp
+	albaOpDecimateSurfaceTest.h albaOpDecimateSurfaceTest.cpp
+	albaOpConnectivitySurfaceTest.h albaOpConnectivitySurfaceTest.cpp
+	albaOpRemoveCellsTest.h albaOpRemoveCellsTest.cpp
+	albaOpBooleanSurfaceTest.h albaOpBooleanSurfaceTest.cpp
+	albaOpEditNormalsTest.h albaOpEditNormalsTest.cpp
+	albaOpExporterBMPTest.h albaOpExporterBMPTest.cpp
+	albaOpImporterMSFTest.h albaOpImporterMSFTest.cpp
+	albaOpImporterExternalFileTest.h albaOpImporterExternalFileTest.cpp
+	albaOpOpenExternalFileTest.h albaOpOpenExternalFileTest.cpp
+	albaOpDecomposeTimeVarVMETest.h albaOpDecomposeTimeVarVMETest.cpp
+	albaOpLabelExtractorTest.h albaOpLabelExtractorTest.cpp
+	albaOpImporterVTKTest.h albaOpImporterVTKTest.cpp
+	albaOpCreateVolumeTest.h albaOpCreateVolumeTest.cpp
+	albaOpVOIDensityEditorTestTest.h albaOpVOIDensityEditorTestTest.cpp
+	albaOpAddLandmarkTest.h albaOpAddLandmarkTest.cpp
+	albaOpApplyTrajectoryTest.h albaOpApplyTrajectoryTest.cpp
+	albaOpExtractIsosurfaceTest.h albaOpExtractIsosurfaceTest.cpp
+	albaOpImporterASCIITest.h albaOpImporterASCIITest.cpp
+	albaOpExporterMSFTest.h albaOpExporterMSFTest.cpp
+	albaOpFilterSurfaceTest.h albaOpFilterSurfaceTest.cpp
+	albaOpValidateTreeTest.h albaOpValidateTreeTest.cpp
+	albaOpGarbageCollectMSFDirTest.h albaOpGarbageCollectMSFDirTest.cpp
+	albaOpScalarToSurfaceTest.h albaOpScalarToSurfaceTest.cpp
+	albaASCIIImporterUtilityTest.h albaASCIIImporterUtilityTest.cpp
+	albaOpEditMetadataTest.h albaOpEditMetadataTest.cpp
+	albaOpFilterVolumeTest.h albaOpFilterVolumeTest.cpp
+	albaOpALBATransformTest.h albaOpALBATransformTest.cpp
+	albaOpTransformInterfaceTest.h albaOpTransformInterfaceTest.cpp
+	albaVMEMeshAnsysTextImporterTest.h albaVMEMeshAnsysTextImporterTest.cpp
+	albaVMEMeshAnsysTextExporterTest.h albaVMEMeshAnsysTextExporterTest.cpp
+	albaOpImporterMeshTest.h albaOpImporterMeshTest.cpp
+	albaOpExporterMeshTest.h albaOpExporterMeshTest.cpp
+	albaVMEDataSetAttributesImporterTest.h albaVMEDataSetAttributesImporterTest.cpp
+	albaOpImporterVMEDataSetAttributesTest.h albaOpImporterVMEDataSetAttributesTest.cpp
+	albaOpCreateMeterTest.h albaOpCreateMeterTest.cpp
+	albaOpCreateProberTest.h albaOpCreateProberTest.cpp
+	albaOpCreateRefSysTest.h albaOpCreateRefSysTest.cpp
+	albaOpCreateSlicerTest.h albaOpCreateSlicerTest.cpp
+	albaOpCreateSplineTest.h albaOpCreateSplineTest.cpp
+	albaOpCreateSurfaceParametricTest.h albaOpCreateSurfaceParametricTest.cpp
+	albaOpExporterVTKTest.h albaOpExporterVTKTest.cpp
+	albaOpExporterLandmarkTest.h albaOpExporterLandmarkTest.cpp
+	albaOpImporterLandmarkTest.h albaOpImporterLandmarkTest.cpp
+	albaOpImporterGRFWSTest.h albaOpImporterGRFWSTest.cpp
+	albaOpImporterAnalogWSTest.h albaOpImporterAnalogWSTest.cpp
+	albaGeometryEditorPolylineGraphTest.h albaGeometryEditorPolylineGraphTest.cpp
+	albaOpMatrixVectorMathTest.h albaOpMatrixVectorMathTest.cpp
+	albaOpVolumeMeasureTest.h albaOpVolumeMeasureTest.cpp
+	albaOpImporterRAWImagesTest.h albaOpImporterRAWImagesTest.cpp
+	albaOpImporterLandmarkTXTTest.h albaOpImporterLandmarkTXTTest.cpp
+	albaOpImporterLandmarkWSTest.h albaOpImporterLandmarkWSTest.cpp
+	albaOpExtrusionHolesTest.h albaOpExtrusionHolesTest.cpp
+	albaOpExporterWrappedMeterTest.h albaOpExporterWrappedMeterTest.cpp
+	albaOpFreezeVMETest.h albaOpFreezeVMETest.cpp
+	albaOpLabelizeSurfaceTest.h albaOpLabelizeSurfaceTest.cpp
+	albaOpCleanSurfaceTest.h albaOpCleanSurfaceTest.cpp
+	albaOpSmoothSurfaceTest.h albaOpSmoothSurfaceTest.cpp
+	albaOpTriangulateSurfaceTest.h albaOpTriangulateSurfaceTest.cpp
+	albaOpSurfaceMirrorTest.h albaOpSurfaceMirrorTest.cpp
+	albaOpVolumeMirrorTest.h albaOpVolumeMirrorTest.cpp
+	albaOpExporterMetersTest.h albaOpExporterMetersTest.cpp
+	albaOpSubdivideTest.h albaOpSubdivideTest.cpp
+	albaOpCreateSurfaceTest.h albaOpCreateSurfaceTest.cpp
+	albaOpVolumeResampleTest.h albaOpVolumeResampleTest.cpp
+	albaOpSegmentationRegionGrowingConnectedThresholdTest.h albaOpSegmentationRegionGrowingConnectedThresholdTest.cpp
+	albaOpScaleDatasetTest.h albaOpScaleDatasetTest.cpp
+	albaOpCreateLabeledVolumeTest.h albaOpCreateLabeledVolumeTest.cpp
+	albaOpComputeWrappingTest.h albaOpComputeWrappingTest.cpp
+	albaOpComputeInertialTensorTest.h albaOpComputeInertialTensorTest.cpp
+	albaOpSplitSurfaceTest.h albaOpSplitSurfaceTest.cpp
+	albaOpMML3Test.h albaOpMML3Test.cpp
+	albaOpExtractGeometryTest.h albaOpExtractGeometryTest.cpp
+	albaOpImporterDicomTest.h albaOpImporterDicomTest.cpp
 	itkRawMotionImporterUtilityTest.h itkRawMotionImporterUtilityTest.cpp
-	mafOpMakeVMETimevaryingTest.h mafOpMakeVMETimevaryingTest.cpp
-	mafOpEqualizeHistogramTest.h mafOpEqualizeHistogramTest.cpp
-	mafOpCreateWrappedMeterTest.h mafOpCreateWrappedMeterTest.cpp
-	mafOpFlipNormalsTest.h mafOpFlipNormalsTest.cpp
-	mafOpSmoothSurfaceCellsTest.h mafOpSmoothSurfaceCellsTest.cpp
-	mafOpMeshQualityTest.h mafOpMeshQualityTest.cpp
-	mafOpCropDeformableROITest.h mafOpCropDeformableROITest.cpp
-	mafOpMoveTest.h mafOpMoveTest.cpp
-	mafOpExporterAnalogWSTest.h mafOpExporterAnalogWSTest.cpp
-	mafOpExporterGRFWSTest.h mafOpExporterGRFWSTest.cpp
-	mafOpExporterLandmarkWSTest.h mafOpExporterLandmarkWSTest.cpp
-	mafDicomClassesTest.h mafDicomClassesTest.cpp
-	mafOpImporterC3DTest.h mafOpImporterC3DTest.cpp
-	mafOpImporterMotionDataTest.h mafOpImporterMotionDataTest.cpp
-	mafOpFillHolesTest.h mafOpFillHolesTest.cpp
-	mafOpImporterVTKXMLTest.h mafOpImporterVTKXMLTest.cpp
-	mafOpInteractiveClipSurfaceTest.h mafOpInteractiveClipSurfaceTest.cpp
-	mafOpCreateEditSkeletonTest.h mafOpCreateEditSkeletonTest.cpp
-	mafOpRegisterClustersTest.h mafOpRegisterClustersTest.cpp
-	mafOpClassicICPRegistrationTest.h mafOpClassicICPRegistrationTest.cpp
-	mafOpMML3ParameterViewTest.h mafOpMML3ParameterViewTest.cpp
-	mafOpInteractionDebuggerTest.h mafOpInteractionDebuggerTest.cpp
-	mafOpIterativeRegistrationTest.h mafOpIterativeRegistrationTest.cpp
-	mafOpTransformTest.h mafOpTransformTest.cpp
-	mafOpImporterAnsysCDBFileTest.h mafOpImporterAnsysCDBFileTest.cpp
-	mafOpExporterAnsysCDBFileTest.h mafOpExporterAnsysCDBFileTest.cpp
-	mafOpImporterAnsysInputFileTest.h mafOpImporterAnsysInputFileTest.cpp
-	mafOpExporterAnsysInputFileTest.h mafOpExporterAnsysInputFileTest.cpp
+	albaOpMakeVMETimevaryingTest.h albaOpMakeVMETimevaryingTest.cpp
+	albaOpEqualizeHistogramTest.h albaOpEqualizeHistogramTest.cpp
+	albaOpCreateWrappedMeterTest.h albaOpCreateWrappedMeterTest.cpp
+	albaOpFlipNormalsTest.h albaOpFlipNormalsTest.cpp
+	albaOpSmoothSurfaceCellsTest.h albaOpSmoothSurfaceCellsTest.cpp
+	albaOpMeshQualityTest.h albaOpMeshQualityTest.cpp
+	albaOpCropDeformableROITest.h albaOpCropDeformableROITest.cpp
+	albaOpMoveTest.h albaOpMoveTest.cpp
+	albaOpExporterAnalogWSTest.h albaOpExporterAnalogWSTest.cpp
+	albaOpExporterGRFWSTest.h albaOpExporterGRFWSTest.cpp
+	albaOpExporterLandmarkWSTest.h albaOpExporterLandmarkWSTest.cpp
+	albaDicomClassesTest.h albaDicomClassesTest.cpp
+	albaOpImporterC3DTest.h albaOpImporterC3DTest.cpp
+	albaOpImporterMotionDataTest.h albaOpImporterMotionDataTest.cpp
+	albaOpFillHolesTest.h albaOpFillHolesTest.cpp
+	albaOpImporterVTKXMLTest.h albaOpImporterVTKXMLTest.cpp
+	albaOpInteractiveClipSurfaceTest.h albaOpInteractiveClipSurfaceTest.cpp
+	albaOpCreateEditSkeletonTest.h albaOpCreateEditSkeletonTest.cpp
+	albaOpRegisterClustersTest.h albaOpRegisterClustersTest.cpp
+	albaOpClassicICPRegistrationTest.h albaOpClassicICPRegistrationTest.cpp
+	albaOpMML3ParameterViewTest.h albaOpMML3ParameterViewTest.cpp
+	albaOpInteractionDebuggerTest.h albaOpInteractionDebuggerTest.cpp
+	albaOpIterativeRegistrationTest.h albaOpIterativeRegistrationTest.cpp
+	albaOpTransformTest.h albaOpTransformTest.cpp
+	albaOpImporterAnsysCDBFileTest.h albaOpImporterAnsysCDBFileTest.cpp
+	albaOpExporterAnsysCDBFileTest.h albaOpExporterAnsysCDBFileTest.cpp
+	albaOpImporterAnsysInputFileTest.h albaOpImporterAnsysInputFileTest.cpp
+	albaOpExporterAnsysInputFileTest.h albaOpExporterAnsysInputFileTest.cpp
 )
 
-ADD_EXECUTABLE(mafOperationsTests ${PROJECT_SRCS})
-ADD_TEST(mafOperationsTests  ${EXECUTABLE_OUTPUT_PATH}/mafOperationsTests)
+ADD_EXECUTABLE(albaOperationsTests ${PROJECT_SRCS})
+ADD_TEST(albaOperationsTests  ${EXECUTABLE_OUTPUT_PATH}/albaOperationsTests)
 IF (WIN32)
-  SET_TARGET_PROPERTIES(mafOperationsTests PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(albaOperationsTests PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)

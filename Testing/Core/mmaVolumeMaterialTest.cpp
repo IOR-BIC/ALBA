@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmaVolumeMaterialTest
  Authors: Paolo Quadrani
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,9 +15,9 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -97,17 +97,17 @@ void mmaVolumeMaterialTest::TestUpdateProp()
   vm1->m_ColorLut->GetHueRange(hr);
   vm1->m_ColorLut->GetSaturationRange(sr);
   vm1->m_ColorLut->GetTableRange(tr);
-  result = mafEquals(hr[0], 0.0);
+  result = albaEquals(hr[0], 0.0);
   TEST_RESULT;
-  result = mafEquals(hr[1], 0.4);
+  result = albaEquals(hr[1], 0.4);
   TEST_RESULT;
-  result = mafEquals(sr[0], 0.0);
+  result = albaEquals(sr[0], 0.0);
   TEST_RESULT;
-  result = mafEquals(sr[1], 0.5);
+  result = albaEquals(sr[1], 0.5);
   TEST_RESULT;
-  result = mafEquals(tr[0], 0.0);
+  result = albaEquals(tr[0], 0.0);
   TEST_RESULT;
-  result = mafEquals(tr[1], 300.0);
+  result = albaEquals(tr[1], 300.0);
   TEST_RESULT;
 
   delete vm1;
@@ -128,17 +128,17 @@ void mmaVolumeMaterialTest::TestUpdateFromTables()
   vm1->m_ColorLut->SetTableRange(100.0, 300.0);
   vm1->UpdateFromTables();
   
-  result = mafEquals(vm1->m_HueRange[0], 0);
+  result = albaEquals(vm1->m_HueRange[0], 0);
   TEST_RESULT;
-  result = mafEquals(vm1->m_HueRange[1], 0.4);
+  result = albaEquals(vm1->m_HueRange[1], 0.4);
   TEST_RESULT;
-  result = mafEquals(vm1->m_SaturationRange[0], 0);
+  result = albaEquals(vm1->m_SaturationRange[0], 0);
   TEST_RESULT;
-  result = mafEquals(vm1->m_SaturationRange[1], 0.5);
+  result = albaEquals(vm1->m_SaturationRange[1], 0.5);
   TEST_RESULT;
-  result = mafEquals(vm1->m_TableRange[0], 100.0);
+  result = albaEquals(vm1->m_TableRange[0], 100.0);
   TEST_RESULT;
-  result = mafEquals(vm1->m_TableRange[1], 300.0);
+  result = albaEquals(vm1->m_TableRange[1], 300.0);
   TEST_RESULT;
 
   delete vm1;

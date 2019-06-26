@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmaApplicationLayout
  Authors: Paolo Quadrani
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,31 +15,31 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
 #include "mmaApplicationLayout.h"
-#include "mafDecl.h"
-#include "mafEvent.h"
-#include "mafView.h"
+#include "albaDecl.h"
+#include "albaEvent.h"
+#include "albaView.h"
 
-#include "mafStorageElement.h"
-#include "mafIndent.h"
-#include "mafVME.h"
-#include "mafSceneGraph.h"
-#include "mafSceneNode.h"
-#include "mafRWIBase.h"
+#include "albaStorageElement.h"
+#include "albaIndent.h"
+#include "albaVME.h"
+#include "albaSceneGraph.h"
+#include "albaSceneNode.h"
+#include "albaRWIBase.h"
 
 #include "vtkCamera.h"
 #include <iterator>
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mmaApplicationLayout)
+albaCxxTypeMacro(mmaApplicationLayout)
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -59,14 +59,14 @@ mmaApplicationLayout::~mmaApplicationLayout()
 {
 }
 //-------------------------------------------------------------------------
-void mmaApplicationLayout::DeepCopy(const mafAttribute *a)
+void mmaApplicationLayout::DeepCopy(const albaAttribute *a)
 //-------------------------------------------------------------------------
 { 
   Superclass::DeepCopy(a);
   mmaApplicationLayout *src_layout = (mmaApplicationLayout *)a;
 }
 //----------------------------------------------------------------------------
-bool mmaApplicationLayout::Equals(const mafAttribute *a)
+bool mmaApplicationLayout::Equals(const albaAttribute *a)
 //----------------------------------------------------------------------------
 {
   if (Superclass::Equals(a))
@@ -97,7 +97,7 @@ void mmaApplicationLayout::SetApplicationInfo(int maximized, int pos[2], int siz
   m_AppSize[1] = size[1];
 }
 //-----------------------------------------------------------------------
-void mmaApplicationLayout::SetInterfaceElementVisibility(mafString panel_name, int visibility)
+void mmaApplicationLayout::SetInterfaceElementVisibility(albaString panel_name, int visibility)
 //-----------------------------------------------------------------------
 {
   if (panel_name.Equals("toolbar"))
@@ -114,10 +114,10 @@ void mmaApplicationLayout::SetInterfaceElementVisibility(mafString panel_name, i
   }
 }
 //-----------------------------------------------------------------------
-int mmaApplicationLayout::InternalStore(mafStorageElement *parent)
+int mmaApplicationLayout::InternalStore(albaStorageElement *parent)
 //-----------------------------------------------------------------------
 {  
-  if (Superclass::InternalStore(parent)==MAF_OK)
+  if (Superclass::InternalStore(parent)==ALBA_OK)
   {
     parent->StoreInteger("APPLICATION_MAXIMIZED", m_AppMaximized);
     parent->StoreVectorN("APPLICATION_SIZE",m_AppSize,2);
@@ -127,15 +127,15 @@ int mmaApplicationLayout::InternalStore(mafStorageElement *parent)
     parent->StoreInteger("SIDEBAR_VISIBILITY", m_SideBarVisibility);
     parent->StoreInteger("LOGBAR_VISIBILITY", m_LogBarVisibility);
 
-    return MAF_OK;
+    return ALBA_OK;
   }
-  return MAF_ERROR;
+  return ALBA_ERROR;
 }
 //----------------------------------------------------------------------------
-int mmaApplicationLayout::InternalRestore(mafStorageElement *node)
+int mmaApplicationLayout::InternalRestore(albaStorageElement *node)
 //----------------------------------------------------------------------------
 {
-  if (Superclass::InternalRestore(node) == MAF_OK)
+  if (Superclass::InternalRestore(node) == ALBA_OK)
   {
     node->RestoreInteger("APPLICATION_MAXIMIZED", m_AppMaximized);
     node->RestoreVectorN("APPLICATION_SIZE",m_AppSize,2);
@@ -145,7 +145,7 @@ int mmaApplicationLayout::InternalRestore(mafStorageElement *node)
     node->RestoreInteger("SIDEBAR_VISIBILITY", m_SideBarVisibility);
     node->RestoreInteger("LOGBAR_VISIBILITY", m_LogBarVisibility);
 
-    return MAF_OK;
+    return ALBA_OK;
   }
-  return MAF_ERROR;
+  return ALBA_ERROR;
 }

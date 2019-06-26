@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testRWIBaseDlg
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,9 +15,9 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -25,8 +25,8 @@
 
 #include "testRWIBaseDlg.h"
 #include "wx/busyinfo.h"
-#include "mafDecl.h"
-#include "mafGUIValidator.h"
+#include "albaDecl.h"
+#include "albaGUIValidator.h"
 
 //----------------------------------------------------------------------------
 // Event ids
@@ -38,7 +38,7 @@ enum
 };
 //----------------------------------------------------------------------------
 testRWIBaseDlg::testRWIBaseDlg(const wxString& title)
-: mafGUIDialog(title)
+: albaGUIDialog(title)
 //----------------------------------------------------------------------------
 {
   CS  = NULL;
@@ -65,14 +65,14 @@ testRWIBaseDlg::testRWIBaseDlg(const wxString& title)
   RW->AddRenderer(R);
   R->ResetCamera();
 
-  RWI = new mafRWIBase(this,-1);
+  RWI = new albaRWIBase(this,-1);
   ((wxWindow*)RWI)->SetSize(300,200);
   RWI->SetRenderWindow(RW);   //SIL. 14-4-2005: Uncomment This to have a leak
   RWI->Show(true);
   this->Add(RWI,1);
   
   /*
-  RWI2 = new mafRWI(m_win);
+  RWI2 = new albaRWI(m_win);
   RWI2->m_rwi->Show(true);
   RWI2->m_r1->AddActor(A);
   RWI2->CameraReset();

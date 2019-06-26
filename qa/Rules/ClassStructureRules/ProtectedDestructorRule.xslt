@@ -5,10 +5,10 @@
 				</div>
 				<div id="subheader" class="clear">
 					<h3>
-						This rule checks, in particular, if the each maf class which inherits from mafObjectBase
+						This rule checks, in particular, if the each alba class which inherits from albaObjectBase
 						has the <u>Protected Destructor</u> in order to ensure Reference Counting.  
 					</h3>
-                    <h4><br/>Link to <a href="https://www.biomedtown.org/biomed_town/MAF/MAF2%20Floor/documentation/doc/maf-2-0-documentation/CodingStandard/">Coding Conventions</a></h4>
+                    <h4><br/>Link to <a href="https://www.biomedtown.org/biomed_town/ALBA/ALBA%20Floor/documentation/doc/alba-2-0-documentation/CodingStandard/">Coding Conventions</a></h4>
 				</div>
 				<div id="contentTable">
 					<table id="listing">

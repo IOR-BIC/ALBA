@@ -1,5 +1,5 @@
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 1.2
 # Date:      $Date: 2006-06-12 15:33:14 $

@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmoCreateVmeSurface
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -18,28 +18,28 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafOp.h"
-#include "mafVME.h"
+#include "albaOp.h"
+#include "albaVME.h"
 //----------------------------------------------------------------------------
 // Forward Refs:
 //----------------------------------------------------------------------------
-class mafVMESurface;
+class albaVMESurface;
 // ============================================================================
-class mmoCreateVmeSurface : public mafOp
+class mmoCreateVmeSurface : public albaOp
 // ============================================================================
 {
 public:
                 mmoCreateVmeSurface(wxString label);
                ~mmoCreateVmeSurface();
-	virtual void OnEvent(mafEvent& e);
-  mafOp* Copy();
+	virtual void OnEvent(albaEvent& e);
+  albaOp* Copy();
 
-  bool Accept(mafNode* vme) {return vme && vme->IsMAFType(mafVME);};
+  bool Accept(albaNode* vme) {return vme && vme->IsALBAType(albaVME);};
   void OpRun();
   void OpDo();
   void OpUndo();
 
 protected:
-  mafVMESurface  *m_vme; 
+  albaVMESurface  *m_vme; 
 };
 #endif // __mmoCreateVmeSurface_H__

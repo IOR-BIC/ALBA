@@ -18,7 +18,7 @@ xmlns:str="http://exslt.org/strings" extension-element-prefixes="str">
       <!--a href="#">another link</a> | <a href="#">another link</a> | <a href="#">another link</a> | <a href="#">another link</a-->
     @@@_PUBLISH_DATE_@@@
     </div>
-    <div id="logo"><h1>MAF Quality Assurance</h1></div>
+    <div id="logo"><h1>ALBA Quality Assurance</h1></div>
     <div id="content">
       <div id="menu">
         <ul>

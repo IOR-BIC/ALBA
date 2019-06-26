@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: mmuTimeSet
  Authors: Marco Petrone
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -18,34 +18,34 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "mafUtility.h"
-#include "mafDefines.h"
+#include "albaUtility.h"
+#include "albaDefines.h"
 #include <set>
 #include <vector>
-#ifdef MAF_EXPORTS
-#include "mafDllMacros.h"
-EXPORT_STL_VECTOR(MAF_EXPORT,mafTimeStamp);
+#ifdef ALBA_EXPORTS
+#include "albaDllMacros.h"
+EXPORT_STL_VECTOR(ALBA_EXPORT,albaTimeStamp);
 #endif
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------
-typedef std::vector<mafTimeStamp> mmuTimeVector;
+typedef std::vector<albaTimeStamp> mmuTimeVector;
 
 //------------------------------------------------------------------------------
 // mmuTimeSet
 //------------------------------------------------------------------------------
-/** class wrapping an STL "set" of mafTimeStamps providing API to query and merge.
+/** class wrapping an STL "set" of albaTimeStamps providing API to query and merge.
   mmuTimeSet 
   @todo
   - test Merge of variuos case of time vectors
 */
-class MAF_EXPORT mmuTimeSet: public mafUtility
+class ALBA_EXPORT mmuTimeSet: public albaUtility
 {
 public:
   mmuTimeSet();
   virtual ~mmuTimeSet();
 
-//  mafTypeMacro(mmuTimeSet,mafUtility);
+//  albaTypeMacro(mmuTimeSet,albaUtility);
  
   /** copy constructor, this makes a copy of the set */
   mmuTimeSet(const mmuTimeSet& c);
@@ -55,23 +55,23 @@ public:
 
   bool operator==(const mmuTimeSet &o);
 
-  typedef std::set<mafTimeStamp> TSet;
-  typedef std::set<mafTimeStamp>::iterator Iterator;
+  typedef std::set<albaTimeStamp> TSet;
+  typedef std::set<albaTimeStamp>::iterator Iterator;
  
   /** insert a timestamp in the set */
-  void Insert(mafTimeStamp t);
+  void Insert(albaTimeStamp t);
 
   /** 
     insert a timestamp forcing insertion point search to start
     from the end of the set. In case times are inserted already 
     ordered this ensures a constant time for insertion */
-  void Append(mafTimeStamp t);
+  void Append(albaTimeStamp t);
 
   /** 
     insert a timestamp forcing insertion point search to start
     from the start of the set. In case times are inserted already 
     ordered this ensures a constant time for insertion */
-  void Prepend(mafTimeStamp t);
+  void Prepend(albaTimeStamp t);
 
   /** remove timestamp from the set*/
   void Remove(Iterator ts);
@@ -86,31 +86,31 @@ public:
   const TSet &GetConstTSet() const{return m_TSet;}
 
   /**  Return the idx-th item of the set. return -1 if not found. */
-  mafTimeStamp GetByIndex(mafID idx);
+  albaTimeStamp GetByIndex(albaID idx);
   
   /** Return the timestamp with value clsest to t */
-  mafTimeStamp GetNearestTimeStamp(mafTimeStamp t);
+  albaTimeStamp GetNearestTimeStamp(albaTimeStamp t);
 
   /** Return timestamp with value <= t */
-  mafTimeStamp GetTimeStampBefore(mafTimeStamp t);
+  albaTimeStamp GetTimeStampBefore(albaTimeStamp t);
 
   /** return index of the given timestamp. return -1 if not found. */
-  mafID FindTimeStampIndex(mafTimeStamp t);
+  albaID FindTimeStampIndex(albaTimeStamp t);
 
   /** 
     Return the iterator pointing to the item with value "t". Return
     TSet::end() if not found.*/
-  Iterator FindTimeStamp(mafTimeStamp t);
+  Iterator FindTimeStamp(albaTimeStamp t);
   
   /** 
     Return the iterator pointing to the item with value "t". Return
     TSet::end() if none found.*/
-  Iterator FindNearestTimeStamp(mafTimeStamp t);
+  Iterator FindNearestTimeStamp(albaTimeStamp t);
 
   /** 
     Return the iterator pointing to the item with lower or equal to "t". Return
     TSet::end() if none found.*/
-  Iterator FindTimeStampBefore(mafTimeStamp t);
+  Iterator FindTimeStampBefore(albaTimeStamp t);
 
   /** Merge two different time-stamps sets*/
   static void Merge(const mmuTimeSet &v1,const mmuTimeSet &v2,mmuTimeSet &outv);
@@ -119,10 +119,10 @@ public:
   void Merge(const mmuTimeSet &v);
 
   /** Merge two different time-stamps vectors*/
-  static void Merge(const std::vector<mafTimeStamp> &v1,const std::vector<mafTimeStamp> &v2,std::vector<mafTimeStamp> &outv);
+  static void Merge(const std::vector<albaTimeStamp> &v1,const std::vector<albaTimeStamp> &v2,std::vector<albaTimeStamp> &outv);
 
   /** Merge a time-stamps vector into this set*/
-  void Merge(const std::vector<mafTimeStamp> &v);
+  void Merge(const std::vector<albaTimeStamp> &v);
 
   /** return the number of time stamps */
   int GetNumberOfTimeStamps() const;

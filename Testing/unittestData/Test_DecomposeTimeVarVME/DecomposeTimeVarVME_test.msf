@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <MSF Version="2.0">
 
-  <Root Crypting="0" Id="-1" MaxNodeId="4" Name="root" Type="mafVMERoot">
+  <Root Crypting="0" Id="-1" MaxNodeId="4" Name="root" Type="albaVMERoot">
     <Attributes NumberOfItems="2">
-      <Item NumberOfTags="0" Type="mafTagArray">
+      <Item NumberOfTags="0" Type="albaTagArray">
         <Name>LHDL</Name>
       </Item>
-      <Item NumberOfTags="1" Type="mafTagArray">
+      <Item NumberOfTags="1" Type="albaTagArray">
         <Name>TagArray</Name>
         <TItem Mult="1" Name="APP_STAMP" Type="STR">
           <TItem>
@@ -17,9 +17,9 @@
     </Attributes>
     <Links NumberOfLinks="0"/>
     <Children NumberOfItems="1">
-      <Node Crypting="0" Id="1" Name="cnBC0_walking01" Type="mafVMELandmarkCloud">
+      <Node Crypting="0" Id="1" Name="cnBC0_walking01" Type="albaVMELandmarkCloud">
         <Attributes NumberOfItems="3">
-          <Item NumberOfTags="0" Type="mafTagArray">
+          <Item NumberOfTags="0" Type="albaTagArray">
             <Name>LHDL</Name>
           </Item>
           <Item Type="mmaMaterial">
@@ -43,7 +43,7 @@
             <Representation>2</Representation>
             <MaterialType>0</MaterialType>
           </Item>
-          <Item NumberOfTags="3" Type="mafTagArray">
+          <Item NumberOfTags="3" Type="albaTagArray">
             <Name>TagArray</Name>
             <TItem Mult="1" Name="MFL_VME_LANDMARK_CLOUD_STATE" Type="NUM">
               <TItem>
@@ -64,9 +64,9 @@
         </Attributes>
         <Links NumberOfLinks="0"/>
         <Children NumberOfItems="1">
-          <Node Crypting="0" Id="-1" Name="C7" Type="mafVMELandmark">
+          <Node Crypting="0" Id="-1" Name="C7" Type="albaVMELandmark">
             <Attributes NumberOfItems="3">
-              <Item NumberOfTags="0" Type="mafTagArray">
+              <Item NumberOfTags="0" Type="albaTagArray">
                 <Name>LHDL</Name>
               </Item>
               <Item Type="mmaMaterial">
@@ -90,7 +90,7 @@
                 <Representation>2</Representation>
                 <MaterialType>0</MaterialType>
               </Item>
-              <Item NumberOfTags="0" Type="mafTagArray">
+              <Item NumberOfTags="0" Type="albaTagArray">
                 <Name>TagArray</Name>
               </Item>
             </Attributes>
@@ -2050,7 +2050,7 @@
             </MatrixVector>
           </Node>
         </Children>
-        <DataVector ArchiveFileName="" ItemTypeName="mafVMEItemVTK" NumberOfItems="0" SingleFileMode="true" VectorID="0"/>
+        <DataVector ArchiveFileName="" ItemTypeName="albaVMEItemVTK" NumberOfItems="0" SingleFileMode="true" VectorID="0"/>
         <MatrixVector NumberOfItems="0"/>
         <LM_SPHERE_RESOLUTION>15</LM_SPHERE_RESOLUTION>
         <LM_RADIUS>10</LM_RADIUS>

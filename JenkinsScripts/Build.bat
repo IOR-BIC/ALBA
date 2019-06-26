@@ -12,7 +12,7 @@ REM ----------------------------------------------------------------------------
 cd Build
 
 CALL "%PROGRAMFILES%/Microsoft Visual Studio 10.0/Common7/Tools/vsvars32.bat"
-devenv MAF.sln /project ALL_BUILD.vcxproj /build debug /out build_log.txt
+devenv ALBA.sln /project ALL_BUILD.vcxproj /build debug /out build_log.txt
 
 cd ..
   
@@ -25,7 +25,7 @@ REM ----------------------------------------------------------------------------
 cd Build
 
 CALL "%PROGRAMFILES%/Microsoft Visual Studio 10.0/Common7/Tools/vsvars32.bat"
-devenv MAF.sln /project ALL_BUILD.vcxproj /build release /out build_log.txt
+devenv ALBA.sln /project ALL_BUILD.vcxproj /build release /out build_log.txt
 
 cd ..
   

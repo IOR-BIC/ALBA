@@ -17,9 +17,9 @@ SET(PROJECT_SRCS
 )
 
 # List libraries that are needed by this project.
-# SET(PROJECT_LIBS "mafVME" "mafInteraction" "vtkMAF")
+# SET(PROJECT_LIBS "albaVME" "albaInteraction" "vtkALBA")
 
-# SET(PROJECT_LIBS ${PROJECT_LIBS} vtkMAF)
+# SET(PROJECT_LIBS ${PROJECT_LIBS} vtkALBA)
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})

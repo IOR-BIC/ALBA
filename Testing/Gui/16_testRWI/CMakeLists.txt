@@ -17,15 +17,15 @@ testRWIBaseDlg.h
 
 IF (WIN32)
   ADD_EXECUTABLE(${PROJECT_NAME} WIN32 ${PROJECT_SRCS} ${PROJECT_SOURCE_DIR}/app.rc)
-  CONFIGURE_FILE( ${MAF_SOURCE_DIR}/Gui/manifest.in ${EXECUTABLE_OUTPUT_PATH}/Debug/${PROJECT_NAME}.exe.manifest COPYONLY)
+  CONFIGURE_FILE( ${ALBA_SOURCE_DIR}/Gui/manifest.in ${EXECUTABLE_OUTPUT_PATH}/Debug/${PROJECT_NAME}.exe.manifest COPYONLY)
 ELSE (WIN32)
   ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS} )
 ENDIF (WIN32)
 
 SET(PROJECT_LIBS
-  mafBase
-  mafCore
-  mafVME
+  albaBase
+  albaCore
+  albaVME
   vtkCommon
   vtkRendering
   vtkGraphics

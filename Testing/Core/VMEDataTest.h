@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
- Module: mafViewPlotTest
+ Program: ALBA (Agile Library for Biomedical Applications)
+ Module: albaViewPlotTest
  Authors: Gianluigi Crimi
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -24,19 +24,19 @@
 #include <cppunit/TestResult.h>
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
-#include "mafVME.h"
-#include "mafVMEOutput.h"
-#include "mafMatrixPipe.h"
+#include "albaVME.h"
+#include "albaVMEOutput.h"
+#include "albaMatrixPipe.h"
 
 //-------------------------------------------------------------------------
 /** a simple VME created just for testing purposes.
     This VME stores pose matrices and data at integral time stamps. The data
     is represented by a single float number representing the extent of a symmetric
     object.*/
-class mafVMETestHelper : public mafVME
+class albaVMETestHelper : public albaVME
 {
 public:
-  mafTypeMacro(mafVMETestHelper,mafVME);
+  albaTypeMacro(albaVMETestHelper,albaVME);
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);
@@ -44,58 +44,58 @@ public:
   /**
     Compare two VME. Two VME are considered equivalent if they have equivalent 
     items, TagArrays, MatrixVectors, Name and Type. */
-  virtual bool Equals(mafVME *vme);
+  virtual bool Equals(albaVME *vme);
  
   /**
     Set the Pose matrix of the VME. This function modifies the MatrixVector. You can
     set or get the Pose for a specified time. When setting, if the time does not exist
     the MatrixVector creates a new KeyMatrix on the fly. When getting, the matrix vector
     interpolates on the fly according to the matrix interpolator.*/
-  void SetMatrix(const mafMatrix &mat);
+  void SetMatrix(const albaMatrix &mat);
 
   /** Set the data inside the internal data vector */
-  void SetData(const double data, mafTimeStamp t) {m_DataVector[t]=data;}
+  void SetData(const double data, albaTimeStamp t) {m_DataVector[t]=data;}
 
   /**
     Return the list of timestamps for this VME. Timestamps list is 
     obtained merging timestamps for matrixes and VME items*/
-  virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
+  virtual void GetLocalTimeStamps(std::vector<albaTimeStamp> &kframes);
 
-  std::vector<mafSmartPointer<mafMatrix> > &GetMatrixVector() {return m_MatrixVector;}
+  std::vector<albaSmartPointer<albaMatrix> > &GetMatrixVector() {return m_MatrixVector;}
 
 protected:
-  mafVMETestHelper();
+  albaVMETestHelper();
 
-  std::vector<mafSmartPointer<mafMatrix> > m_MatrixVector;
+  std::vector<albaSmartPointer<albaMatrix> > m_MatrixVector;
   std::vector<double>                      m_DataVector;
 };
 
 //-------------------------------------------------------------------------
 /** Simple VME output concrete class for test purposes.
   */
-class mafVMETestOutputHelper : public mafVMEOutput
+class albaVMETestOutputHelper : public albaVMEOutput
 {
 public:
-  mafTypeMacro(mafVMETestOutputHelper,mafVMEOutput)
+  albaTypeMacro(albaVMETestOutputHelper,albaVMEOutput)
 		  
 protected:
-  mafVMETestOutputHelper(){}; // to be allocated with New()
-  virtual ~mafVMETestOutputHelper(){}; // to be deleted with Delete()
+  albaVMETestOutputHelper(){}; // to be allocated with New()
+  virtual ~albaVMETestOutputHelper(){}; // to be deleted with Delete()
 
 private:
-  mafVMETestOutputHelper(const mafVMETestOutputHelper&); // Not implemented
-  void operator=(const mafVMETestOutputHelper&); // Not implemented
+  albaVMETestOutputHelper(const albaVMETestOutputHelper&); // Not implemented
+  void operator=(const albaVMETestOutputHelper&); // Not implemented
 };
 
 //-------------------------------------------------------------------------
 /** simple matrix pipe to produce output data! */
-class MAF_EXPORT mafMatrixPipeTestHelper:public mafMatrixPipe
+class ALBA_EXPORT albaMatrixPipeTestHelper:public albaMatrixPipe
 {
 public:
-	mafTypeMacro(mafMatrixPipeTestHelper,mafMatrixPipe);
+	albaTypeMacro(albaMatrixPipeTestHelper,albaMatrixPipe);
 
 	/** This DataPipe accepts only VME's with internal DataArray. */
-	virtual bool Accept(mafVME *vme) {return Superclass::Accept(vme)&&vme->IsMAFType(mafVMETestHelper);}
+	virtual bool Accept(albaVME *vme) {return Superclass::Accept(vme)&&vme->IsALBAType(albaVMETestHelper);}
 
 protected:
 	/** update the output matrix */

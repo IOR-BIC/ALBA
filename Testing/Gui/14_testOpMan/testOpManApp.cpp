@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testOpManApp
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,9 +15,9 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "albaDefines.h" 
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -25,16 +25,16 @@
 
 
 #include "testOpManApp.h"
-#include "mafNodeFactory.h"
-#include "mafPics.h"
-#include "mafGUIMDIFrame.h"
+#include "albaNodeFactory.h"
+#include "albaPics.h"
+#include "albaGUIMDIFrame.h"
 
-#include "mafNodeFactory.h"
-#include "mafNodeGeneric.h"
-#include "mafNodeRoot.h"
+#include "albaNodeFactory.h"
+#include "albaNodeGeneric.h"
+#include "albaNodeRoot.h"
 
-#include "mafOpCreateGenericVme.h"
-#include "mafOpTest.h"
+#include "albaOpCreateGenericVme.h"
+#include "albaOpTest.h"
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
@@ -44,23 +44,23 @@ IMPLEMENT_APP(testOpManApp)
 bool testOpManApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-  mafPics.Initialize();	
+  albaPics.Initialize();	
 
-  mafNodeFactory *node_factory  = mafNodeFactory::GetInstance();
+  albaNodeFactory *node_factory  = albaNodeFactory::GetInstance();
   assert(node_factory!=NULL);
-  int result = mafNodeFactory::Initialize();
-  assert(result==MAF_OK);
-  mafPlugNode<mafNodeRoot>("mafNodeRoot");
-  mafPlugNode<mafNodeGeneric>("mafNodeGeneric");
+  int result = albaNodeFactory::Initialize();
+  assert(result==ALBA_OK);
+  albaPlugNode<albaNodeRoot>("albaNodeRoot");
+  albaPlugNode<albaNodeGeneric>("albaNodeGeneric");
 
-  m_logic = new mafLogicWithManagers();
+  m_logic = new albaLogicWithManagers();
   m_logic->Configure();
 
   m_logic->GetTopWin()->SetTitle("testOpMan");
-  m_logic->Plug(new mafOpCreateGenericVme("Add Vme Generic \tCtrl+A"));
-  m_logic->Plug(new mafOpTest("Test \tCtrl+B"));
+  m_logic->Plug(new albaOpCreateGenericVme("Add Vme Generic \tCtrl+A"));
+  m_logic->Plug(new albaOpTest("Test \tCtrl+B"));
 
-  SetTopWindow(mafGetFrame());  
+  SetTopWindow(albaGetFrame());  
   m_logic->Show();
   m_logic->Init(0,NULL);
   return TRUE;

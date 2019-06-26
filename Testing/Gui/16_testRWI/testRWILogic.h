@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: testRWILogic
  Authors: Silvano Imboden
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -18,28 +18,28 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafEvent.h" 
+#include "albaEvent.h" 
 #include <wx/frame.h>
-#include "mafObserver.h"
+#include "albaObserver.h"
 //----------------------------------------------------------------------------
 // Forward Decl:
 //----------------------------------------------------------------------------
 class vtkRenderWindow;
 class vtkRenderer;
-class mafRWIBase;
-class mafRWI;
+class albaRWIBase;
+class albaRWI;
 class vtkConeSource;
 class vtkPolyDataMapper;
 class vtkActor;
 
 // ============================================================================
-class testRWILogic : public mafObserver
+class testRWILogic : public albaObserver
 // ============================================================================
 {
 public:
    testRWILogic();
   ~testRWILogic();
-   void OnEvent(mafEventBase *maf_event);
+   void OnEvent(albaEventBase *alba_event);
    void Show();
 
    wxFrame *m_win;

@@ -1,12 +1,12 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: ALBA (Agile Library for Biomedical Applications)
  Module: GPU_OGL
  Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
  
- Copyright (c) B3C
+ Copyright (c) BIC
  All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -48,7 +48,7 @@
 	#pragma message ("GPU_OGL is supported for WIN32 platform only");
 #endif
 
-class mafGPUOGL
+class albaGPUOGL
 {
 protected:
   //singleton
@@ -58,19 +58,19 @@ protected:
 protected:
 #ifdef _WIN32
   //smart class for context switch
-  class mafGPUOGLContext
+  class albaGPUOGLContext
   {
   private:
-    mafGPUOGL* m_pThis;
+    albaGPUOGL* m_pThis;
   public:
     /** Switch to our OpenGL context */
-    mafGPUOGLContext(mafGPUOGL* pThis);
+    albaGPUOGLContext(albaGPUOGL* pThis);
 
     /** Restores the original OpenGL context */
-    ~mafGPUOGLContext();
+    ~albaGPUOGLContext();
   };
 
-  friend class mafGPUOGLContext;
+  friend class albaGPUOGLContext;
 
   int m_nGPUGLContextRef;  //<larger than 0, if our OpenGL context is active
 
@@ -99,14 +99,14 @@ protected:
   
 public:
   //ctor & dtor
-  mafGPUOGL();
-  ~mafGPUOGL();
+  albaGPUOGL();
+  ~albaGPUOGL();
 
 public:
   /** Results true if OpenGL GPU is supported */
   inline static bool IsSupported() {
     if (!m_bGPUOGLInitialized) {
-      mafGPUOGL init;   //this will perform initialization in the constructor
+      albaGPUOGL init;   //this will perform initialization in the constructor
     }
 
     return m_bGPUOGLSupported;

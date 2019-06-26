@@ -2,52 +2,52 @@
 # Copyright and description to be placed here
 #
 
-PROJECT(mafViews)
+PROJECT(albaViews)
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
   
-  mafViewArbitrarySlice.cpp				mafViewArbitrarySlice.h
-  mafViewOrthoSlice.cpp						mafViewOrthoSlice.h
-  mafViewRX.cpp										mafViewRX.h
-  mafViewRXCT.cpp									mafViewRXCT.h
-  mafViewSlice.cpp								mafViewSlice.h
-  mafViewGlobalSlice.cpp					mafViewGlobalSlice.h
-  mafViewGlobalSliceCompound.cpp	mafViewGlobalSliceCompound.h
-  mafViewImage.cpp								mafViewImage.h
-  mafViewRXCompound.cpp						mafViewRXCompound.h
-  mafView3D.cpp										mafView3D.h
-  mafViewImageCompound.cpp				mafViewImageCompound.h
-  mafViewCT.cpp										mafViewCT.h
-  mafViewCompoundWindowing.cpp		mafViewCompoundWindowing.h
-  mafViewVTKCompound.cpp					mafViewVTKCompound.h
-  mafViewSlicer.cpp								mafViewSlicer.h
-  mafViewSliceOnCurve.cpp					mafViewSliceOnCurve.h
-  mafViewSliceOnCurveCompound.cpp	mafViewSliceOnCurveCompound.h
-  mafViewSliceGlobal.cpp					mafViewSliceGlobal.h
-  mafViewArbitraryOrthoSlice.cpp	mafViewArbitraryOrthoSlice.h
-  mafViewSliceBlendRX.cpp					mafViewSliceBlendRX.h
-  mafViewSliceBlend.cpp						mafViewSliceBlend.h
-	mafViewSliceSegmentation.cpp		mafViewSliceSegmentation.h
-  mafViewIsosurfaceCompound.cpp		mafViewIsosurfaceCompound.h
+  albaViewArbitrarySlice.cpp				albaViewArbitrarySlice.h
+  albaViewOrthoSlice.cpp						albaViewOrthoSlice.h
+  albaViewRX.cpp										albaViewRX.h
+  albaViewRXCT.cpp									albaViewRXCT.h
+  albaViewSlice.cpp								albaViewSlice.h
+  albaViewGlobalSlice.cpp					albaViewGlobalSlice.h
+  albaViewGlobalSliceCompound.cpp	albaViewGlobalSliceCompound.h
+  albaViewImage.cpp								albaViewImage.h
+  albaViewRXCompound.cpp						albaViewRXCompound.h
+  albaView3D.cpp										albaView3D.h
+  albaViewImageCompound.cpp				albaViewImageCompound.h
+  albaViewCT.cpp										albaViewCT.h
+  albaViewCompoundWindowing.cpp		albaViewCompoundWindowing.h
+  albaViewVTKCompound.cpp					albaViewVTKCompound.h
+  albaViewSlicer.cpp								albaViewSlicer.h
+  albaViewSliceOnCurve.cpp					albaViewSliceOnCurve.h
+  albaViewSliceOnCurveCompound.cpp	albaViewSliceOnCurveCompound.h
+  albaViewSliceGlobal.cpp					albaViewSliceGlobal.h
+  albaViewArbitraryOrthoSlice.cpp	albaViewArbitraryOrthoSlice.h
+  albaViewSliceBlendRX.cpp					albaViewSliceBlendRX.h
+  albaViewSliceBlend.cpp						albaViewSliceBlend.h
+	albaViewSliceSegmentation.cpp		albaViewSliceSegmentation.h
+  albaViewIsosurfaceCompound.cpp		albaViewIsosurfaceCompound.h
 )
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafVME mafInteraction mafCore)
+SET(PROJECT_LIBS albaVME albaInteraction albaCore)
 
-SET(PROJECT_LIBS ${PROJECT_LIBS} vtkMAF)
+SET(PROJECT_LIBS ${PROJECT_LIBS} vtkALBA)
 
-IF(MAF_BUILD_MAFDLL)
+IF(ALBA_BUILD_ALBADLL)
   SET(BUILD_SHARED_LIBS 1)
-  ADD_DEFINITIONS(-DMAF_EXPORTS)
+  ADD_DEFINITIONS(-DALBA_EXPORTS)
   
   # Create the library.
   ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
-  TARGET_LINK_LIBRARIES(${PROJECT_NAME} mafDLL vtkMAF mafCommon mafVME mafInteraction)
-ELSE(MAF_BUILD_MAFDLL)
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} albaDLL vtkALBA albaCommon albaVME albaInteraction)
+ELSE(ALBA_BUILD_ALBADLL)
   # Create the library.
   ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
   TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
-ENDIF(MAF_BUILD_MAFDLL)
+ENDIF(ALBA_BUILD_ALBADLL)
 
-ADD_DEPENDENCIES(${PROJECT_NAME} mafCommon mafVME mafInteraction mafService)
+ADD_DEPENDENCIES(${PROJECT_NAME} albaCommon albaVME albaInteraction albaService)

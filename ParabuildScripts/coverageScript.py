@@ -93,7 +93,7 @@ class coverageCalculator:
         ### print links
         
        ##         # print website_text
-        #matches = sre.findall('MAF_ITK_VC71D</a>', website_text)
+        #matches = sre.findall('ALBA_ITK_VC71D</a>', website_text)
         
         ## print matches
         ## print len(matches)
@@ -102,7 +102,7 @@ class coverageCalculator:
     
     def CountTests(self):	
 	
-	dirToParse = ['Testing','vtkMAF']
+	dirToParse = ['Testing','vtkALBA']
 	startDir = os.getcwd()    
 	# print startDir
 	os.chdir(os.pardir)

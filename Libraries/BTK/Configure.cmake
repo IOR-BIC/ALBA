@@ -1,5 +1,5 @@
 #
-# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
 # Date:      $Date: 2012-02-14 15:32:02 $
@@ -11,11 +11,11 @@
 # BTK_CONFIGURED  true if library configured correctly
 
 
-OPTION(MAF_USE_CRYPTO "Find and Link the CRYPTO library." ON)
+OPTION(ALBA_USE_CRYPTO "Find and Link the CRYPTO library." ON)
 INCLUDE (${MFL_SOURCE_DIR}/modules/PackagesMacro.cmake)
 INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 
-# this is to build BTK inside the MAF tree
+# this is to build BTK inside the ALBA tree
 IF (EXISTS "${BTK_SOURCE_DIR}/Sources")   
   SET (BTK_SOURCE_PATH "${BTK_SOURCE_DIR}/Sources")
 ENDIF (EXISTS "${BTK_SOURCE_DIR}/Sources")

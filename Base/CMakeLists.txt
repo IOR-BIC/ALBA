@@ -2,79 +2,79 @@
 # Copyright and description to be placed here
 #
 
-PROJECT(mafBase)
+PROJECT(albaBase)
 
-DBG_MESSAGE("Configuring project mafCore")
+DBG_MESSAGE("Configuring project albaCore")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
 #sorted_vector.h
-mafBase.h
-mafDecl.cpp				mafDecl.h
-mafDbg.h
-mafDataChecksum.h
-mafDefines.cpp			mafDefines.h
-mafDirectory.cpp		mafDirectory.h
-mafDynamicLoader.cpp	mafDynamicLoader.h
-mafEventBase.cpp		mafEventBase.h
-mafEventSender.h
-mafEventBroadcaster.cpp		mafEventBroadcaster.h
-mafIncludeWIN32.h
-mafIncludeWX.h
-mafIndent.cpp			mafIndent.h
-mafLUTLibrary.cpp		mafLUTLibrary.h
-mafMTime.cpp			mafMTime.h
-mafMatrix.cpp			mafMatrix.h
-mafMatrix3x3.cpp		mafMatrix3x3.h
-mafVect3d.cpp			mafVect3d.h
-mafMultiThreader.cpp	mafMultiThreader.h
-mafMutexLock.cpp		mafMutexLock.h
-mafOBB.cpp				mafOBB.h
-mafObject.cpp			mafObject.h
-mafObjectFactory.cpp	mafObjectFactory.h
-mafObserver.cpp			mafObserver.h
-mafObserverCallback.cpp	mafObserverCallback.h
-mafReferenceCounted.cpp	mafReferenceCounted.h
-mafSmartPointer.h
-mafString.cpp			mafString.h
-mafTimeStamped.cpp		mafTimeStamped.h
-mafTransform.cpp		mafTransform.h
-mafTransformBase.cpp	mafTransformBase.h
-mafTransformFrame.cpp	mafTransformFrame.h
-mafVector.h
-mafVersion.h
+albaBase.h
+albaDecl.cpp				albaDecl.h
+albaDbg.h
+albaDataChecksum.h
+albaDefines.cpp			albaDefines.h
+albaDirectory.cpp		albaDirectory.h
+albaDynamicLoader.cpp	albaDynamicLoader.h
+albaEventBase.cpp		albaEventBase.h
+albaEventSender.h
+albaEventBroadcaster.cpp		albaEventBroadcaster.h
+albaIncludeWIN32.h
+albaIncludeWX.h
+albaIndent.cpp			albaIndent.h
+albaLUTLibrary.cpp		albaLUTLibrary.h
+albaMTime.cpp			albaMTime.h
+albaMatrix.cpp			albaMatrix.h
+albaMatrix3x3.cpp		albaMatrix3x3.h
+albaVect3d.cpp			albaVect3d.h
+albaMultiThreader.cpp	albaMultiThreader.h
+albaMutexLock.cpp		albaMutexLock.h
+albaOBB.cpp				albaOBB.h
+albaObject.cpp			albaObject.h
+albaObjectFactory.cpp	albaObjectFactory.h
+albaObserver.cpp			albaObserver.h
+albaObserverCallback.cpp	albaObserverCallback.h
+albaReferenceCounted.cpp	albaReferenceCounted.h
+albaSmartPointer.h
+albaString.cpp			albaString.h
+albaTimeStamped.cpp		albaTimeStamped.h
+albaTransform.cpp		albaTransform.h
+albaTransformBase.cpp	albaTransformBase.h
+albaTransformFrame.cpp	albaTransformFrame.h
+albaVector.h
+albaVersion.h
 mmuIdFactory.cpp		mmuIdFactory.h
-mafUtility.h
-vtkMAFSmartPointer.h
-vtkMAFToLinearTransform.h
-mafZipUtility.cpp		mafZipUtility.h
+albaUtility.h
+vtkALBASmartPointer.h
+vtkALBAToLinearTransform.h
+albaZipUtility.cpp		albaZipUtility.h
 )
 
-IF (MAF_USE_VTK)
+IF (ALBA_USE_VTK)
   SET(PROJECT_SRCS
     ${PROJECT_SRCS}
-    vtkMAFToLinearTransform.cxx		vtkMAFToLinearTransform.h
-    vtkMAFSmartPointer.h
+    vtkALBAToLinearTransform.cxx		vtkALBAToLinearTransform.h
+    vtkALBASmartPointer.h
   )
-ENDIF (MAF_USE_VTK)
+ENDIF (ALBA_USE_VTK)
 
 # List libraries that are needed by this project.
 #SET(PROJECT_LIBS "" )
 
-IF (MAF_USE_VTK)
+IF (ALBA_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)
-ENDIF (MAF_USE_VTK)
+ENDIF (ALBA_USE_VTK)
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 
-ADD_DEPENDENCIES(${PROJECT_NAME} mafService)
+ADD_DEPENDENCIES(${PROJECT_NAME} albaService)
 
-IF (MAF_USE_VTK)
+IF (ALBA_USE_VTK)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_VTK_LIBRARY)
-ENDIF (MAF_USE_VTK)
+ENDIF (ALBA_USE_VTK)
 
-IF (MAF_USE_WX)
+IF (ALBA_USE_WX)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
-ENDIF (MAF_USE_WX)
+ENDIF (ALBA_USE_WX)
