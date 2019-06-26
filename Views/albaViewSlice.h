@@ -148,13 +148,12 @@ public:
 
 	virtual void SetSliceAxis(int sliceAxis);
 
-protected:
-
 	/**
 	Give an initial origin and normal (optionally) for the slice.*/
 	void InitializeSlice(double* Origin);
 
-
+protected:
+	
   /* Correction of slice pose when current volume pose matrix is different from identity: 
   the multiplication is performed inplace */
   void MultiplyPointByInputVolumeABSMatrix(double *point);
