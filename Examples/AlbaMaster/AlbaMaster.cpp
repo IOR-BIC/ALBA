@@ -43,6 +43,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpClipSurface.h"
 #include "albaOpComputeWrapping.h"
 #include "albaOpConnectivitySurface.h"
+#include "albaOpCreateAverageLandmark.h"
 #include "albaOpCreateEditSkeleton.h"
 #include "albaOpCreateGroup.h"
 #include "albaOpCreateLabeledVolume.h"
@@ -265,6 +266,7 @@ bool AlbaMaster::OnInit()
 
 	m_Logic->Plug(new albaOpCreateVolume("Create Volume"), _("Create"));
 	m_Logic->Plug(new albaOpAddLandmark("Add Landmark  \tCtrl+A"), _("Create"));
+	m_Logic->Plug(new albaOpCreateAverageLandmark("Create Average Landmark"), _("Create"));
 	m_Logic->Plug(new albaOpCreateGroup("Group"),_("Create"));
 	m_Logic->Plug(new albaOpCreateMeter("Meter"),_("Create"));
 	m_Logic->Plug(new albaOpCreateRefSys("RefSys"),_("Create"));
