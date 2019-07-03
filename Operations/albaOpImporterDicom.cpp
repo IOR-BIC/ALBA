@@ -211,7 +211,7 @@ void albaOpImporterDicom::OpRun()
 	if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
 		lastDicomDir = albaGetLastUserFolder().c_str();		
 			
-	wxDirDialog dialog(m_Wizard->GetParent(),"", lastDicomDir,wxRESIZE_BORDER, m_Wizard->GetPosition());
+	wxDirDialog dialog(m_Wizard->GetParent(),"", lastDicomDir, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER, m_Wizard->GetPosition());
 	dialog.SetReturnCode(wxID_OK);
 	int ret_code = dialog.ShowModal();
 
@@ -1091,7 +1091,7 @@ void albaOpImporterDicom::ImportDicomTags()
 
 	std::string tagString;
 
-	READ_AND_SET_TAGARRAY(TAG_PatientsName, "patientsName");
+	READ_AND_SET_TAGARRAY(TAG_PatientsName, "PatientsName");
 	READ_AND_SET_TAGARRAY(TAG_PatientsSex, "PatientsSex");
 	READ_AND_SET_TAGARRAY(TAG_PatientsBirthDate, "PatientsBirthDate");
 	READ_AND_SET_TAGARRAY(TAG_PatientsWeight, "PatientsWeight");

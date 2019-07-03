@@ -74,6 +74,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpExporterRAW.h"
 #include "albaOpExporterSTL.h"
 #include "albaOpExporterVTK.h"
+#include "albaOpExporterDicom.h"
 #include "albaOpExporterWrappedMeter.h"
 #include "albaOpExtractIsosurface.h"
 #include "albaOpExtrusionHoles.h"
@@ -251,6 +252,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpExporterMSF("MSF"));
 	m_Logic->Plug(new albaOpExporterSTL("STL"));
 	m_Logic->Plug(new albaOpExporterVTK("VTK"));
+	m_Logic->Plug(new albaOpExporterDicom("Dicom"),"",true,dicomSettings);
 	m_Logic->Plug(new albaOpExporterRAW("Raw"));
 	m_Logic->Plug(new albaOpExporterLandmark("Landmark"));
 	m_Logic->Plug(new albaOpExporterWrappedMeter());
