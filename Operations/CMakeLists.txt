@@ -29,6 +29,7 @@ IF (ALBA_USE_VTK)
 	albaOpCreateSlicer.cpp	    				albaOpCreateSlicer.h
 	albaOpCreateSpline.cpp	    				albaOpCreateSpline.h
 	albaOpCreateVolume.cpp	    				albaOpCreateVolume.h
+	albaOpCreateAverageLandmark.cpp		albaOpCreateAverageLandmark.h
 	albaOpVolumeUnion.cpp	    				albaOpVolumeUnion.h
 	albaOpRemoveCells.cpp	    				albaOpRemoveCells.h
 	albaOpEditMetadata.cpp	    				albaOpEditMetadata.h
