@@ -2423,15 +2423,17 @@
 #define TAG_ACR_NEMA_2C_OverlayBitsForCodeWord   gdcm_ns::Tag(0x6000, 0x0804) /* (0x6000-0x60ff,0x0804) */
 
 
-#define ATTRIBUTE_ImagePositionPatient           <0x0020, 0x0032>
-#define ATTRIBUTE_ImageOrientationPatient        <0x0020, 0x0037>
-#define ATTRIBUTE_TriggerTime                    <0x0018, 0x1060>
-#define ATTRIBUTE_Rows                           <0x0028, 0x0010>
-#define ATTRIBUTE_Columns                        <0x0028, 0x0011>
-#define ATTRIBUTE_PixelSpacing                   <0x0028, 0x0030>
-#define ATTRIBUTE_NominalScannedPixelSpacing     <0x0018, 0x2010>
-#define ATTRIBUTE_ImagerPixelSpacing             <0x0018, 0x1164>
-
+#define ATTRIBUTE_ImagePositionPatient						<0x0020, 0x0032>
+#define ATTRIBUTE_ImageOrientationPatient					<0x0020, 0x0037>
+#define ATTRIBUTE_TriggerTime											<0x0018, 0x1060>
+#define ATTRIBUTE_Rows														<0x0028, 0x0010>
+#define ATTRIBUTE_Columns													<0x0028, 0x0011>
+#define ATTRIBUTE_PixelSpacing										<0x0028, 0x0030>
+#define ATTRIBUTE_NominalScannedPixelSpacing			<0x0018, 0x2010>
+#define ATTRIBUTE_ImagerPixelSpacing							<0x0018, 0x1164>
+#define ATTRIBUTE_StudyInstanceUID								<0x0020, 0x000d>
+#define ATTRIBUTE_SeriesInstanceUID								<0x0020, 0x000e>
+#define ATTRIBUTE_PatientName											<0x0010, 0x0010>
 
 
 #endif /* !ALBA_DICOM_TAG_DEFINES_H */
