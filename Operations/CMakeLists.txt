@@ -69,6 +69,8 @@ IF (ALBA_USE_VTK)
 	albaOpExporterAnsysInputFile.cpp	albaOpExporterAnsysInputFile.h
 	albaOpExporterAnsysCDBFile.cpp	albaOpExporterAnsysCDBFile.h
 	
+	albaOpExporterDicom.cpp albaOpExporterDicom.h
+	
 	albaGeometryEditorPolylineGraph.cpp	albaGeometryEditorPolylineGraph.h
 	albaOpCreateLabeledVolume.cpp	albaOpCreateLabeledVolume.h
 	albaOpImporterLandmark.cpp		albaOpImporterLandmark.h
