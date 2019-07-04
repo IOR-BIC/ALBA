@@ -241,7 +241,7 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 	// Init About Dialog
 	m_AboutDialog->SetTitle(m_AppTitle);
 	m_AboutDialog->SetRevision(m_Revision.GetCStr());
-
+	m_AboutDialog->SetVersion("0.1");
 	wxString imagePath = albaGetApplicationDirectory().c_str();
 	imagePath += "\\Config\\AlbaMasterAbout.bmp";
 	m_AboutDialog->SetImagePath(imagePath);
