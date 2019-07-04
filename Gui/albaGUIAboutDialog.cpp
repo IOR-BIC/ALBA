@@ -58,6 +58,7 @@ albaGUIAboutDialog::albaGUIAboutDialog(wxString dialog_title)
 {  
 	m_Title = "";
 	m_Revision = "";
+	m_Version = "";
 	m_ImagePath = "";	
 	m_WebSiteURL = "";
 	m_LicenseURL = "";
@@ -105,6 +106,13 @@ void albaGUIAboutDialog::OnEvent(albaEventBase *alba_event)
   }
 }
 
+void albaGUIAboutDialog::SetRevision(wxString revision)
+{
+	albaString tmp = revision.c_str();
+	tmp.Replace('_', ' ');
+	m_Revision = tmp.GetCStr();
+}
+	
 //----------------------------------------------------------------------------
 void albaGUIAboutDialog::SetWebSite(wxString webSite)
 {
@@ -138,12 +146,16 @@ void albaGUIAboutDialog::CreateDialog()
 			revision = "Unknown Build";
 
 		SetRevision(revision);
-		albaLogMessage(wxString::Format("%s", m_Revision));
 	}
 
 	wxString description = m_Title;
 	description += "\n";
-	description += _("Application ") + m_Revision;
+	
+	if (!m_Version.IsEmpty())
+		description += _("Version ") + m_Version +  _("\n");
+	
+	description += m_Revision + _("\n");
+	
 	description += "\n© 2019 BIC - RIT - IOR";
 
 	description += m_ExtraMessage;
