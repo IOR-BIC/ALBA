@@ -188,7 +188,13 @@ void albaOpExporterDicom::OnEvent(albaEventBase *alba_event)
 	}
 }
 
-#define DETAG(name) gdcm::DataElement de##name(TAG_##name); de##name.SetByteValue(m_##name.GetCStr(), m_##name.Length());
+#define DETAG(name) if(!m_##name.IsEmpty()) { \
+	gdcm::DataElement de##name(TAG_##name); \
+	de##name.SetByteValue(m_##name.GetCStr(), m_##name.Length());\
+	dcmDataSet.Replace(de##name);\
+}
+
+	
 
 
 //----------------------------------------------------------------------------
@@ -355,19 +361,8 @@ void albaOpExporterDicom::ExportDicom()
 		for (int c = 0; c < 6; c++)
 			orientPatientAttr.SetValue(cosines[c], c);
 
-		DETAG(PatientsName);
-		DETAG(PatientsSex);
-		DETAG(PatientsBirthDate);
-		DETAG(PatientsWeight);
-		DETAG(PatientsAge);
-		DETAG(PatientID);
-		DETAG(InstitutionName);
-		DETAG(StudyDescription);
-		DETAG(SeriesDescription);
-		DETAG(AcquisitionDate);
-		DETAG(PixelSpacing);
-		DETAG(ProtocolName);
 
+	
 		// We pass both :
 		// 1. the fake generated image
 		// 2. the 'DERIVED' dataset object
@@ -382,18 +377,18 @@ void albaOpExporterDicom::ExportDicom()
 		dcmDataSet.Replace(studyDE);
 		dcmDataSet.Replace(seriesDE);
 
-		dcmDataSet.Replace(dePatientsName);
-		dcmDataSet.Replace(dePatientsSex);
-		dcmDataSet.Replace(dePatientsBirthDate);
-		dcmDataSet.Replace(dePatientsWeight);
-		dcmDataSet.Replace(dePatientsAge);
-		dcmDataSet.Replace(dePatientID);
-		dcmDataSet.Replace(deInstitutionName);
-		dcmDataSet.Replace(deStudyDescription);
-		dcmDataSet.Replace(deSeriesDescription);
-		dcmDataSet.Replace(deAcquisitionDate);
-		dcmDataSet.Replace(dePixelSpacing);
-		dcmDataSet.Replace(deProtocolName);
+		DETAG(PatientsName);
+		DETAG(PatientsSex);
+		DETAG(PatientsBirthDate);
+		DETAG(PatientsWeight);
+		DETAG(PatientsAge);
+		DETAG(PatientID);
+		DETAG(InstitutionName);
+		DETAG(StudyDescription);
+		DETAG(SeriesDescription);
+		DETAG(AcquisitionDate);
+		DETAG(ProtocolName);
+
 		albaString filename;
 		filename.Printf("%s/%s.%d.dcm", m_Folder.GetCStr(), m_Input->GetName(), i);
 
