@@ -123,16 +123,22 @@ albaOpManager::~albaOpManager()
   m_Context.Clear();
   m_OpCut->ClipboardClear();
 
+	std::set<albaGUISettings *> settingsToDelete;
+
   for(int i = 0; i < m_NumOp; i++)
   {
     albaGUISettings *s = m_OpList[i]->GetSetting();
     if (s != NULL)
-    {
-      delete s;
-    }
-    delete m_OpList[i];
+			settingsToDelete.insert(s);
+
+		delete m_OpList[i];
   }
   m_OpList.clear();
+
+	std::set<albaGUISettings *>::iterator it;
+	for (it = settingsToDelete.begin(); it != settingsToDelete.end(); ++it)
+		delete *it;
+	
 
   cppDEL(m_OpSelect);
   cppDEL(m_OpCut);
