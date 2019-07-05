@@ -1079,6 +1079,8 @@ void albaOpImporterDicom::ImportDicomTags()
 	TagsToRead.insert(TAG_AcquisitionDate);
 	TagsToRead.insert(TAG_PixelSpacing);
 	TagsToRead.insert(TAG_ProtocolName);
+	TagsToRead.insert(TAG_ManufacturersModelName);
+
 	
 	if (!dcmReader.ReadSelectedTags(TagsToRead))
 	{
@@ -1103,7 +1105,8 @@ void albaOpImporterDicom::ImportDicomTags()
 	READ_AND_SET_TAGARRAY(TAG_SeriesDescription, "SeriesDescription");
 	READ_AND_SET_TAGARRAY(TAG_AcquisitionDate, "AcquisitionDate");
 	READ_AND_SET_TAGARRAY(TAG_ProtocolName, "ProtocolName");
-	
+	READ_AND_SET_TAGARRAY(TAG_ManufacturersModelName, "ManufacturersModelName");
+
   m_TagArray->SetTag(albaTagItem("VME_NATURE", "NATURAL"));
 }
 //----------------------------------------------------------------------------
