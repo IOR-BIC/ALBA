@@ -40,6 +40,7 @@ albaLicenceManager::albaLicenceManager(wxString appName)
 	m_RegistrationDialog = NULL;
 	m_GenerateLicenceDialog = NULL;
 	m_PreviewImage = NULL;
+	m_LicModality = TIME_LICENCE;
 
 	m_CryptKey = "";
 	m_FirstKey = "";
@@ -67,7 +68,7 @@ albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 		unsigned long secs = SecondsInThisMillennium();
 
 		sprintf(tmp, "%s-code:%lu", m_AppName.c_str(), secs);
-				
+					
 		wxString cryptedCode = EncryptStr(tmp);
 		
 		//create a new regkey to store the encripted string
@@ -78,16 +79,24 @@ albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 	}
 	else
 	{
-		wxDateTime currentDate,dateExpire;
-		bool hasExpire=GetExpireDate(dateExpire);
+		if (m_LicModality == TIME_LICENCE)
+		{
+			wxDateTime currentDate, dateExpire;
+			bool hasExpire = GetExpireDate(dateExpire);
 
-		if (!hasExpire)
-			return TRIAL_MODE;
-				
-		currentDate.SetToCurrent();
+			if (!hasExpire)
+				return TRIAL_MODE;
 
-		if (dateExpire.IsEarlierThan(currentDate))
-			return EXPIRED_MODE;
+			currentDate.SetToCurrent();
+
+			if (dateExpire.IsEarlierThan(currentDate))
+				return EXPIRED_MODE;
+		}
+		else //BINARY_LICENCE
+		{
+			if (!IsRegistred())
+				return TRIAL_MODE;
+		}
 	}
 
 	return LICENSED_MODE;
@@ -106,7 +115,7 @@ bool albaLicenceManager::GetExpireDate( wxDateTime &dateExpire)
 	RegKey.QueryValue("ExpireDate", encriptedExpire);
 	wxString decriptedExpire = DecryptStr(encriptedExpire);
 
-	//if decriptedExpire is empty there can be a rewriting tentative so we set an ealier date to
+	//if decriptedExpire is empty there can be a rewriting tentative so we set an earlier date to
 	//return expired licence status
 	if (decriptedExpire.empty())
 		dateExpire.SetToCurrent().Add(wxDateSpan(0, 0, -1));
@@ -115,6 +124,27 @@ bool albaLicenceManager::GetExpireDate( wxDateTime &dateExpire)
 
 	return true;
 }
+
+
+//----------------------------------------------------------------------------
+bool albaLicenceManager::IsRegistred()
+{
+	wxString regKeyStr = wxString("HKEY_CURRENT_USER\\Software\\" + m_AppName + "-lic");
+	wxRegKey RegKey(regKeyStr);
+
+	if (!RegKey.HasValue("Registered"))
+		return false;
+
+	wxString encriptedRegistered;
+	RegKey.QueryValue("Registered", encriptedRegistered);
+	wxString decriptedRegistered = DecryptStr(encriptedRegistered);
+
+	if (decriptedRegistered.empty())
+		return false;
+
+	return true;
+}
+
 
 //----------------------------------------------------------------------------
 unsigned long albaLicenceManager::SecondsInThisMillennium()
@@ -130,14 +160,25 @@ unsigned long albaLicenceManager::SecondsInThisMillennium()
 }
 
 //----------------------------------------------------------------------------
-void albaLicenceManager::AddLicence(wxDateTime expireDate)
+void albaLicenceManager::AddTimeLicence(wxDateTime expireDate)
 {
 	wxString cryptedDate = EncryptStr(expireDate.FormatISODate());
 	
 	wxString regKeyStr = wxString("HKEY_CURRENT_USER\\Software\\" + m_AppName + "-lic");
 	wxRegKey RegKey(regKeyStr);
 	RegKey.Create();
-	RegKey.SetValue("ExpireDate", cryptedDate.c_str());
+	RegKey.SetValue("Registered", cryptedDate.c_str());
+}
+
+//----------------------------------------------------------------------------
+void albaLicenceManager::AddBinaryLicence()
+{
+	wxString criptedReg = EncryptStr("REGISTERED");
+
+	wxString regKeyStr = wxString("HKEY_CURRENT_USER\\Software\\" + m_AppName + "-lic");
+	wxRegKey RegKey(regKeyStr);
+	RegKey.Create();
+	RegKey.SetValue("Registered", criptedReg.c_str());
 }
 
 //----------------------------------------------------------------------------
@@ -157,7 +198,7 @@ albaLicenceManager::addLicenceStatuses albaLicenceManager::CheckCreateLicence(wx
 
 	RegKey.QueryValue("LocalKey", localKey);
 
-	//if the decritpted key is empty is possible to have a manomission and we must return wrong licence
+	//if the decrypted key is empty is possible to have a manumission and we must return wrong licence
 	decriptedKey = DecryptStr(localKey.c_str());
 	if (decriptedKey.empty())
 	{
@@ -179,22 +220,32 @@ albaLicenceManager::addLicenceStatuses albaLicenceManager::CheckCreateLicence(wx
 		return WRONG_LICENCE;
 	}
 
-	wxString dateString = decripRegString.substr(locKeyLen + 1, licLen);
-	wxDateTime RegDate, currentExpDate, currentDate;
+	if (m_LicModality == TIME_LICENCE)
+	{
+		wxString dateString = decripRegString.substr(locKeyLen + 1, licLen);
+		wxDateTime RegDate, currentExpDate, currentDate;
 
-	RegDate.ParseDate(dateString.c_str());
-	currentDate.SetToCurrent();
+		RegDate.ParseDate(dateString.c_str());
+		currentDate.SetToCurrent();
 
-	//check dates 
-	if (RegDate.IsEarlierThan(currentDate))
-		return BAD_DATE;
-	
-	//check if the licence was already registered, current expire date >= licence expire date
-	bool hasExpire = GetExpireDate(currentExpDate);
-	if (hasExpire && (RegDate.IsEarlierThan(currentExpDate) || RegDate.IsEqualTo(currentExpDate)))
-		return ALREADY_REGISTERED;
+		//check dates 
+		if (RegDate.IsEarlierThan(currentDate))
+			return BAD_DATE;
 
-	AddLicence(RegDate);
+		//check if the licence was already registered, current expire date >= licence expire date
+		bool hasExpire = GetExpireDate(currentExpDate);
+		if (hasExpire && (RegDate.IsEarlierThan(currentExpDate) || RegDate.IsEqualTo(currentExpDate)))
+			return ALREADY_REGISTERED;
+		AddTimeLicence(RegDate);
+	}
+	else //BINARY_LICENCE
+	{
+		wxString regString = decripRegString.substr(locKeyLen + 1, licLen);
+		if (strcmp(regString.c_str(), "REGISTERED"))
+			return WRONG_LICENCE;
+
+		AddBinaryLicence();
+	}
 	return LICENCE_ADDED;
 }
 
@@ -226,7 +277,7 @@ wxString albaLicenceManager::DecryptStr(wxString plainStr)
 
 #ifdef _DEBUG
 //----------------------------------------------------------------------------
-albaLicenceManager::CreateNewLicenceStatuses albaLicenceManager::CreateNewLicence(wxString RegCode, wxDateTime expirationDate, wxString &newLicence)
+albaLicenceManager::CreateNewLicenceStatuses albaLicenceManager::CreateNewTimeLicence(wxString RegCode, wxDateTime expirationDate, wxString &newLicence)
 {
 	wxString decriptedRegCode, encLicence;
 	
@@ -265,6 +316,48 @@ albaLicenceManager::CreateNewLicenceStatuses albaLicenceManager::CreateNewLicenc
 
 	return LICENCE_CREATED;
 }
+
+//----------------------------------------------------------------------------
+albaLicenceManager::CreateNewLicenceStatuses albaLicenceManager::CreateNewBinaryLicence(wxString RegCode, wxString &newLicence)
+{
+	wxString decriptedRegCode, encLicence;
+
+	decriptedRegCode = DecryptStr(RegCode);
+	if (decriptedRegCode.empty())
+	{
+		return WRONG_BASE_STRING;
+	}
+
+	char tmp[255];
+	sprintf(tmp, "%s-code:", m_AppName.c_str());
+	int baseRegLen = strlen(tmp);
+
+	wxString baseRegCode = decriptedRegCode.substr(0, baseRegLen);
+	wxString secsInMillennium = decriptedRegCode.substr(baseRegLen);
+
+	if (strncmp(tmp, baseRegCode.c_str(), baseRegLen))
+		return WRONG_BASE_STRING;
+
+	unsigned long secsInMil;
+	sscanf(secsInMillennium.c_str(), "%ud", &secsInMil);
+
+	if (secsInMil < 0 || secsInMil > SecondsInThisMillennium())
+		return WRONG_SECS_IN_MILLENNIUM;
+
+	char fullCheckStr[255];
+	sprintf(fullCheckStr, "%s%lu", tmp, secsInMil);
+
+	if (strcmp(fullCheckStr, decriptedRegCode.c_str()))
+		return WRONG_FULL_STRING;
+
+	char licence[255];
+	sprintf(licence, "%s|REGISTERED", decriptedRegCode.c_str());
+
+	newLicence = EncryptStr(licence);
+
+	return LICENCE_CREATED;
+}
+
 #endif
 
 //GUI - Show Licence Dialog
@@ -406,14 +499,17 @@ void albaLicenceManager::ShowGenerateLicenceDialog()
 
 		mainSizer->Add(labelSizer1, 0, wxALL | wxEXPAND, 5);
 
-		// TEXT CTRL - DATE
-		m_CalendarCtrl = new wxCalendarCtrl(m_GenerateLicenceDialog, -1, wxDateTime::Now());// , wxPoint(-1, -1), wxSize(-1, -1), wxALL | wxALIGN_LEFT | wxST_NO_AUTORESIZE);
-		
-		// Merging sizers into dialog		
-		wxStaticBoxSizer *labelSizer2 = new wxStaticBoxSizer(wxVERTICAL, m_GenerateLicenceDialog, "Date");
-		labelSizer2->Add(m_CalendarCtrl, 0, wxALL | wxEXPAND, 0);
+		if (m_LicModality == TIME_LICENCE)
+		{
+			// TEXT CTRL - DATE
+			m_CalendarCtrl = new wxCalendarCtrl(m_GenerateLicenceDialog, -1, wxDateTime::Now());// , wxPoint(-1, -1), wxSize(-1, -1), wxALL | wxALIGN_LEFT | wxST_NO_AUTORESIZE);
 
-		mainSizer->Add(labelSizer2, 0, wxALL | wxEXPAND, 5);
+			// Merging sizers into dialog		
+			wxStaticBoxSizer *labelSizer2 = new wxStaticBoxSizer(wxVERTICAL, m_GenerateLicenceDialog, "Date");
+			labelSizer2->Add(m_CalendarCtrl, 0, wxALL | wxEXPAND, 0);
+
+			mainSizer->Add(labelSizer2, 0, wxALL | wxEXPAND, 5);
+		}
 
 		// VERIFY BUTTON
 		albaGUIButton *generateButton = new albaGUIButton(m_GenerateLicenceDialog, ID_GENERATE_KEY, "Generate", wxPoint(-1, -1));
@@ -471,7 +567,7 @@ void albaLicenceManager::OnEvent(albaEventBase *alba_event)
 			if (m_SecondKey.Length() > 0)
 			{
 				wxString message = "Warning";
-				wxString title = "Titolo";
+				wxString title;
 				long style = wxOK;
 
 				switch (CheckCreateLicence(m_SecondKey))
@@ -481,17 +577,25 @@ void albaLicenceManager::OnEvent(albaEventBase *alba_event)
 					title = "Licence Added!";
 					message = "Congratulation, you have successfully activated this product.\n";
 
-					// Show Expiration Date and Calculate days left
-					wxDateTime exDate;
-					GetExpireDate(exDate);
+					if (m_LicModality == TIME_LICENCE)
+					{
+						// Show Expiration Date and Calculate days left
+						wxDateTime exDate;
+						GetExpireDate(exDate);
 
-					char temp[20];
-					sprintf(temp, "%02d-%02d-%d", exDate.GetDay(), exDate.GetMonth() + 1, exDate.GetYear());
-					wxString expirationDate = temp;
+						char temp[20];
+						sprintf(temp, "%02d-%02d-%d", exDate.GetDay(), exDate.GetMonth() + 1, exDate.GetYear());
+						wxString expirationDate = temp;
 
-					wxString expirationDateStatus = m_AppName + " Licensed User Expiration date: " + expirationDate;
+						wxString expirationDateStatus = m_AppName + " Licensed User Expiration date: " + expirationDate;
 
-					message += "\n" + expirationDateStatus;
+						message += "\n" + expirationDateStatus;
+					}
+					else
+					{
+						message += "\n";
+					}
+					
 					message += "\n\nPlease restart the application to apply the update.";
 
 					style = wxOK;
@@ -527,7 +631,12 @@ void albaLicenceManager::OnEvent(albaEventBase *alba_event)
 #ifdef _DEBUG
 		case ID_GENERATE_KEY:
 		{
-			int result = CreateNewLicence(m_FirstKey, m_CalendarCtrl->GetDate(), m_SecondKey);
+			int result;
+			if (m_LicModality == TIME_LICENCE)
+				result = CreateNewTimeLicence(m_FirstKey, m_CalendarCtrl->GetDate(), m_SecondKey);
+			else //BINARY_LICENCE
+				result = CreateNewBinaryLicence(m_FirstKey, m_SecondKey);
+
 			m_Result_textCtrl->SetValue(m_SecondKey);
 			m_Result_textCtrl->SelectAll();
 

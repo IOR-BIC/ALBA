@@ -37,6 +37,11 @@ public:
 		EXPIRED_MODE,
 	};
 
+	enum licenceModalities {
+		TIME_LICENCE,
+		BINARY_LICENCE,
+	};
+
 	enum addLicenceStatuses {
 		LICENCE_ADDED,
 		WRONG_LICENCE,
@@ -77,7 +82,10 @@ public:
 
 	/** set expire date to the argument, return false if there is no expire date */
 	bool albaLicenceManager::GetExpireDate(wxDateTime &dateExpire);
-	
+
+	/** set expire date to the argument, return false if there is no expire date */
+	bool albaLicenceManager::IsRegistred();
+
 	/** sets the listener */
 	void SetListener(albaObserver *Listener) { m_Listener = Listener; };
 		
@@ -90,6 +98,13 @@ public:
 	/*Set the image path. This is showed in RegistrationDialog*/
 	void SetImagePath(wxString path) { m_RegImagePath = path; };
 
+
+	/** Returns LicModality */
+	albaLicenceManager::licenceModalities GetLicModality() const { return m_LicModality; }
+
+	/** Sets LicModality */
+	void SetLicModality(albaLicenceManager::licenceModalities licModality) { m_LicModality = licModality; }
+
 protected:
 
 	/** encrypts the input string */
@@ -101,7 +116,10 @@ protected:
 #ifdef _DEBUG
 
 	/** creates a new licence string */
-	CreateNewLicenceStatuses CreateNewLicence(wxString RegCode, wxDateTime expirationDate, wxString &newLicence);
+	CreateNewLicenceStatuses CreateNewTimeLicence(wxString RegCode, wxDateTime expirationDate, wxString &newLicence);
+
+	/** creates a new licence string */
+	CreateNewLicenceStatuses CreateNewBinaryLicence(wxString RegCode, wxString &newLicence);
 #endif
 	
 	/** check a new licence and add is to the current user */
@@ -111,8 +129,11 @@ protected:
 	unsigned long SecondsInThisMillennium();
 
 	/** license the software to expireDate*/
-	void AddLicence(wxDateTime expireDate);
-	
+	void AddTimeLicence(wxDateTime expireDate);
+
+	/** license the software to expireDate*/
+	void AddBinaryLicence();
+
 	wxString m_AppName;
 	wxString m_CryptKey;
 	wxString m_RegMail;
@@ -136,5 +157,7 @@ protected:
 	wxTextCtrl			*m_FirstKey_textCtrl;
 	wxTextCtrl			*m_Result_textCtrl;
 	wxCalendarCtrl	*m_CalendarCtrl;
+
+	licenceModalities m_LicModality;
 };
 #endif
