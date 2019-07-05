@@ -83,6 +83,7 @@ protected:
 	albaString m_AcquisitionDate;
 	albaString m_PixelSpacing;
 	albaString m_ProtocolName;
+	albaString m_ManufacturersModelName;
 
 };
 #endif

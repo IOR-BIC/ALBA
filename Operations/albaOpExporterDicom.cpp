@@ -135,7 +135,7 @@ void albaOpExporterDicom::OpRun()
 		m_InstitutionName = m_Input->GetTagArray()->GetTag("InstitutionName") ? m_Input->GetTagArray()->GetTag("InstitutionName")->GetValue() : "";
 		m_AcquisitionDate = m_Input->GetTagArray()->GetTag("AcquisitionDate") ? m_Input->GetTagArray()->GetTag("AcquisitionDate")->GetValue() : "";
 		m_ProtocolName = m_Input->GetTagArray()->GetTag("ProtocolName") ? m_Input->GetTagArray()->GetTag("ProtocolName")->GetValue() : "";
-	
+		m_ManufacturersModelName = m_Input->GetTagArray()->GetTag("ManufacturersModelName") ? m_Input->GetTagArray()->GetTag("ManufacturersModelName")->GetValue() : "";
 
 		m_Gui = new albaGUI(this);
 
@@ -152,6 +152,8 @@ void albaOpExporterDicom::OpRun()
 		m_Gui->String(-1, "Institution:", &m_InstitutionName, "", false);
 		m_Gui->String(-1, "Acq. Date:", &m_AcquisitionDate, "", false);
 		m_Gui->String(-1, "Protocol:", &m_ProtocolName, "", false);
+		m_Gui->String(-1, "Model:", &m_ManufacturersModelName, "", false);
+		
 		m_Gui->Label("");
 
 		m_Gui->OkCancel();
@@ -388,6 +390,7 @@ void albaOpExporterDicom::ExportDicom()
 		DETAG(SeriesDescription);
 		DETAG(AcquisitionDate);
 		DETAG(ProtocolName);
+		DETAG(ManufacturersModelName);
 
 		albaString filename;
 		filename.Printf("%s/%s.%d.dcm", m_Folder.GetCStr(), m_Input->GetName(), i);
