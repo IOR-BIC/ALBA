@@ -274,8 +274,8 @@ albaGUI* albaViewSliceBlendRX::CreateGui()
 // 	m_Gui->VectorN(ID_SLICE_POSITION, "Slice 1", m_Slice1_Position);
 // 	m_Gui->VectorN(ID_SLICE_POSITION, "Slice 2", m_Slice2_Position);
 
-	m_Gui->Double(ID_SLICE_POSITION, "Top:", m_SliceTop_Position+2);
-	m_Gui->Double(ID_SLICE_POSITION, "Bottom:", m_SliceBottom_Position+2);
+	m_Gui->Double(ID_SLICE_POSITION, "Cranial:", m_SliceTop_Position+2);
+	m_Gui->Double(ID_SLICE_POSITION, "Caudal:", m_SliceBottom_Position+2);
 	m_Gui->Divider(1);
 
 	m_Gui->FitInside();
