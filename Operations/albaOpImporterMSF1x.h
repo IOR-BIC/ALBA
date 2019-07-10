@@ -56,6 +56,9 @@ public:
       This is used when the operation is executed not using user interface. */
   void SetFileName(const char *name) {m_File = name;};
 
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char ** GetIcon();
+
 protected:
   albaString m_File;
   albaString m_FileDir;
