@@ -111,3 +111,10 @@ void albaOpImporterMSF1x::ImportMSF()
 
   cppDEL(m_Importer);
 }
+
+//----------------------------------------------------------------------------
+char ** albaOpImporterMSF1x::GetIcon()
+{
+#include "pic/MENU_IMPORT_MSF.xpm"
+	return MENU_IMPORT_MSF_xpm;
+}

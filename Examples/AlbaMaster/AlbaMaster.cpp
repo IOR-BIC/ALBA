@@ -228,7 +228,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpImporterSTL("STL"));
 	m_Logic->Plug(new albaOpImporterVRML("VRML"));
 	m_Logic->Plug(new albaOpImporterVTK("VTK"));
-	m_Logic->Plug(new albaOpImporterMSF("MSF"));
+	m_Logic->Plug(new albaOpImporterMSF("ALBA"));
 	m_Logic->Plug(new albaOpImporterMSF1x("MSF 1.x"));
 	m_Logic->Plug(new albaOpImporterMesh("Mesh"));
 	m_Logic->Plug(new albaOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
@@ -249,7 +249,7 @@ bool AlbaMaster::OnInit()
 	// Exporter Menu:
 	//------------------------------------------------------------
 
-	m_Logic->Plug(new albaOpExporterMSF("MSF"));
+	m_Logic->Plug(new albaOpExporterMSF("ALBA"));
 	m_Logic->Plug(new albaOpExporterSTL("STL"));
 	m_Logic->Plug(new albaOpExporterVTK("VTK"));
 	m_Logic->Plug(new albaOpExporterDicom("Dicom"),"",true,dicomSettings);

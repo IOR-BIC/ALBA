@@ -73,8 +73,8 @@ albaOp* albaOpExporterMSF::Copy()
 //----------------------------------------------------------------------------
 char ** albaOpExporterMSF::GetIcon()
 {
-#include "pic/MENU_IMPORT_MSF.xpm"
-	return MENU_IMPORT_MSF_xpm;
+#include "pic/MENU_IMPORT_ALBA.xpm"
+	return MENU_IMPORT_ALBA_xpm;
 }
 
 //----------------------------------------------------------------------------
