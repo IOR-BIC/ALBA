@@ -108,7 +108,7 @@ int albaOpExporterMSF::ExportMSF()
 {					
   if (!m_TestMode)
   {
-  	wxBusyInfo wait("Saving MSF: Please wait");
+  	wxBusyInfo wait("Saving Project: Please wait");
   }
   assert(m_MSFFile != "");
 
