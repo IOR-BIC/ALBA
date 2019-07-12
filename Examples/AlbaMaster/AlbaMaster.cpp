@@ -473,7 +473,8 @@ bool AlbaMaster::OnInit()
 
 	//m_Logic->ShowSplashScreen();
 	m_Logic->Show();
-	m_Logic->Init(0,NULL); // calls FileNew - which create the root
+	m_Logic->Init(argc, argv); // calls FileNew - which create the root
+
 	m_LogicInitialized = true;
 
 	return TRUE;
