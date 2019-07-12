@@ -664,13 +664,13 @@ int albaVMEManager::MSFSave()
 	}
 	
   if(!m_TestMode) 
-    wait=new wxBusyInfo(_("Saving MSF: Please wait"));
+    wait=new wxBusyInfo(_("Saving Project: Please wait"));
   
   m_Storage->SetURL(m_MSFFile.GetCStr());
   if (m_Storage->Store() != ALBA_OK) // store the tree
   {
     ret=false;
-    albaLogMessage(_("Error during MSF saving"));
+    albaLogMessage(_("Error during saving"));
   }
   // add the msf (or zmsf) to the history
   if (!m_ZipFile.IsEmpty())
