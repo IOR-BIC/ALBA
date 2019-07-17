@@ -2434,6 +2434,8 @@
 #define ATTRIBUTE_StudyInstanceUID								<0x0020, 0x000d>
 #define ATTRIBUTE_SeriesInstanceUID								<0x0020, 0x000e>
 #define ATTRIBUTE_PatientName											<0x0010, 0x0010>
+#define ATTRIBUTE_SeriesNumber										<0x0020, 0x0011>
+#define ATTRIBUTE_InstanceNumber									<0x0020, 0x0013>
 
 
 #endif /* !ALBA_DICOM_TAG_DEFINES_H */

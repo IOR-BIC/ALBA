@@ -220,10 +220,11 @@ void albaOpExporterDicom::ExportDicom()
 	{
 		rg->GetDimensions(dims);
 		origin[0] = rg->GetXCoordinates()->GetTuple1(0);
-		origin[1] = rg->GetXCoordinates()->GetTuple1(0);
+		origin[1] = rg->GetYCoordinates()->GetTuple1(0);
+		origin[2] = rg->GetZCoordinates()->GetTuple1(0);
 		spacing[0] = rg->GetXCoordinates()->GetTuple1(1) - origin[0];
 		spacing[1] = rg->GetYCoordinates()->GetTuple1(1) - origin[1];
-		spacing[2] = rg->GetXCoordinates()->GetTuple1(1) - origin[2];
+		spacing[2] = rg->GetZCoordinates()->GetTuple1(1) - origin[2];
 		zCoord = vtkDoubleArray::SafeDownCast(rg->GetZCoordinates());
 	}
 
@@ -244,7 +245,7 @@ void albaOpExporterDicom::ExportDicom()
 	gdcm::DataElement seriesDE(TAG_SeriesInstanceUID);
 	seriesDE.SetByteValue(seriesID.GetCStr(), seriesID.Length());
 	seriesDE.SetVR(gdcm::Attribute ATTRIBUTE_SeriesInstanceUID::GetVR());
-
+	
 	albaProgressBarHelper helper(this);
 
 	helper.InitProgressBar("Exporting...");
@@ -362,9 +363,16 @@ void albaOpExporterDicom::ExportDicom()
 		gdcm::Attribute ATTRIBUTE_ImageOrientationPatient orientPatientAttr;
 		for (int c = 0; c < 6; c++)
 			orientPatientAttr.SetValue(cosines[c], c);
+		
+		//Series Num:
+		gdcm::Attribute ATTRIBUTE_SeriesNumber seriesNumAttr;
+		seriesNumAttr.SetValue(i + 1);
+		
+		//Instance Num:
+		gdcm::Attribute ATTRIBUTE_InstanceNumber instanceNumAttr;
+		instanceNumAttr.SetValue(i + 2);
 
-
-	
+		
 		// We pass both :
 		// 1. the fake generated image
 		// 2. the 'DERIVED' dataset object
@@ -376,6 +384,8 @@ void albaOpExporterDicom::ExportDicom()
 		dcmDataSet.Replace(imgPosAttr.GetAsDataElement());
 		dcmDataSet.Replace(pixelSpacingAttr.GetAsDataElement());
 		dcmDataSet.Replace(orientPatientAttr.GetAsDataElement());
+		dcmDataSet.Replace(seriesNumAttr.GetAsDataElement());
+		dcmDataSet.Replace(instanceNumAttr.GetAsDataElement());
 		dcmDataSet.Replace(studyDE);
 		dcmDataSet.Replace(seriesDE);
 
