@@ -469,6 +469,16 @@ bool AlbaMaster::OnInit()
 	//vHtml->PackageView();
 	m_Logic->Plug(vHtml);
 
+	//////////////////////////////////////////////////////////////////////////
+	// Splash Screen
+	albaString splashImageName = "AlbaMasterSplash.bmp";
+
+	wxString splashDir = albaGetApplicationDirectory().c_str();
+	wxBitmap splashBitmap;
+	splashBitmap.LoadFile(splashDir + "\\Config\\" + splashImageName, wxBITMAP_TYPE_BMP);
+	m_Logic->ShowSplashScreen(splashBitmap);
+
+	//////////////////////////////////////////////////////////////////////////
 	wxHandleFatalExceptions();
 
 	//m_Logic->ShowSplashScreen();
