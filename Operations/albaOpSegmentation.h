@@ -473,11 +473,11 @@ protected:
 
 	void InitRanges();
 
-	void PressKey(int keyCode, bool ctrl, bool alt, bool shift);
+	int PressKey(int keyCode, bool ctrl, bool alt, bool shift);
 
 	void InitMouseCursors();
 
-	void ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift);
+	int ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift);
 
 	std::vector<wxImage> m_CursorImageVect;
 
