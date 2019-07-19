@@ -42,6 +42,12 @@ public:
 		BINARY_LICENCE,
 	};
 
+	enum licenceScope
+	{
+		USER_LICENCE,
+		MACHINE_LICENCE,
+	};
+
 	enum addLicenceStatuses {
 		LICENCE_ADDED,
 		WRONG_LICENCE,
@@ -105,6 +111,8 @@ public:
 	/** Sets LicModality */
 	void SetLicModality(albaLicenceManager::licenceModalities licModality) { m_LicModality = licModality; }
 
+	void SetLicScope(albaLicenceManager::licenceScope scope);
+
 protected:
 
 	/** encrypts the input string */
@@ -136,6 +144,7 @@ protected:
 
 	wxString m_AppName;
 	wxString m_CryptKey;
+	wxString m_RegistryBaseKey;
 	wxString m_RegMail;
 	wxString m_RegImagePath;
 
