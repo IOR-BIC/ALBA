@@ -74,9 +74,15 @@ void albaOpImporterMSF::OpRun()
   if (!m_TestMode)
   {
     albaString fileDir = albaGetLastUserFolder().c_str();
+		
 		albaString wildc;
 		const	char *ext = GetLogicManager()->GetMsfFileExtension();
-		wildc.Printf("Project File (*.%s)|*.%s", ext, ext);
+
+		wildc = wxString::Format("All Supported File (*.%s;*.z%s;msf;zmsf)|*.%s;*.%s;*.msf;*.zmsf", ext, ext, ext, ext);
+		wildc += wxString::Format("|Alba Project File (*.%s)|*.%s", ext, ext);
+		wildc += wxString::Format("|Alba Compressed File (*.z%s)|*.z%s", ext, ext);
+		wildc += wxString::Format("|MAF Project File (*.msf)|*.msf");
+		wildc += wxString::Format("|MAF Compressed File (*.zmsf)|*.zmsf", ext, ext);
 
     m_File = albaGetOpenFile(fileDir, wildc, _("Choose Project file")).c_str();
   }
@@ -323,6 +329,6 @@ void albaOpImporterMSF::RemoveTempDirectory()
 //----------------------------------------------------------------------------
 char ** albaOpImporterMSF::GetIcon()
 {
-#include "pic/MENU_IMPORT_MSF.xpm"
-	return MENU_IMPORT_MSF_xpm;
+#include "pic/MENU_IMPORT_ALBA.xpm"
+	return MENU_IMPORT_ALBA_xpm;
 }

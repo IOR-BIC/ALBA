@@ -2627,24 +2627,24 @@ int albaOpSegmentation::OpSegmentationEventFilter(wxEvent& event)
 	// Press Button
 	if (event.GetEventType() == wxEVT_KEY_DOWN)
 	{
-		((albaOpSegmentation*)op)->PressKey(keyCode, controlKeyDown, altKeyDown, shiftKeyDown);
-		return true;
+		return ((albaOpSegmentation*)op)->PressKey(keyCode, controlKeyDown, altKeyDown, shiftKeyDown);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	// Release Button
 	if (event.GetEventType() == wxEVT_KEY_UP)
 	{
-		((albaOpSegmentation*)op)->ReleaseKey(keyCode, controlKeyDown, altKeyDown, shiftKeyDown);
-		return true;
+		return ((albaOpSegmentation*)op)->ReleaseKey(keyCode, controlKeyDown, altKeyDown, shiftKeyDown);
 	}
 
 	return -1;
 }
 
 //----------------------------------------------------------------------------
-void albaOpSegmentation::PressKey(int keyCode, bool ctrl, bool alt, bool shift)
+int albaOpSegmentation::PressKey(int keyCode, bool ctrl, bool alt, bool shift)
 {
+	int result = -1;
+
 	if (m_CurrentPhase == INIT_SEGMENTATION)
 	{
 		if (m_InitModality != LOAD_INIT)
@@ -2652,10 +2652,12 @@ void albaOpSegmentation::PressKey(int keyCode, bool ctrl, bool alt, bool shift)
 			if (ctrl) // Pick Min
 			{
 				SetCursor(CUR_COLOR_PICK_MIN);
+				result = 1;
 			}
 			else if (alt) // Pick Max
 			{
 				SetCursor(CUR_COLOR_PICK_MAX);
+				result = 1;
 			}
 		}
 	}
@@ -2666,19 +2668,25 @@ void albaOpSegmentation::PressKey(int keyCode, bool ctrl, bool alt, bool shift)
 			if (m_ManualSegmentationTools == DRAW_EDIT) // Erase
 			{
 				SetCursor(CUR_ERASE);
+				result = 1;
 			}
 			else	if (m_ManualSegmentationTools == FILL_EDIT) // Fill
 			{
 				SetCursor(CUR_FILL_ERASE);
+				result = 1;
 			}
 		}
 	}
 	else SetCursor(CUR_DEFAULT);
+
+	return result;
 }
 
 //----------------------------------------------------------------------------
-void albaOpSegmentation::ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift)
+int albaOpSegmentation::ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift)
 {
+	int result = -1;
+
 	if (m_CurrentPhase == INIT_SEGMENTATION)
 	{
 		SetCursor(CUR_DEFAULT);
@@ -2688,10 +2696,12 @@ void albaOpSegmentation::ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift
 		if (m_ManualSegmentationTools == DRAW_EDIT) // Draw
 		{
 			SetCursor(CUR_PENCIL);
+			result = 1;
 		}
 		if (m_ManualSegmentationTools == FILL_EDIT) // Fill
 		{
 			SetCursor(CUR_FILL);
+			result = 1;
 		}
 
 		if (ctrl)
@@ -2699,10 +2709,12 @@ void albaOpSegmentation::ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift
 			if (keyCode == 'Z' && m_UndoList.size() > 0)
 			{
 				OnUndoRedo(true);
+				result = 1;
 			}
 			else if (keyCode == 'Y' && m_RedoList.size() > 0)
 			{
 				OnUndoRedo(false);
+				result = 1;
 			}
 		}
 	} 
@@ -2711,11 +2723,15 @@ void albaOpSegmentation::ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift
 	if (keyCode == 312 || keyCode == 317)//WXK_PAGEUP)
 	{
 		SliceNext();
+		result = 1;
 	}
 	else if (keyCode == 313|| keyCode == 319)//WXK_PAGEDOWN)
 	{
 		SlicePrev();
+		result = 1;
 	}
+
+	return result;
 }
 
 //----------------------------------------------------------------------------
