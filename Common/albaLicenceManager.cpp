@@ -58,7 +58,7 @@ albaLicenceManager::~albaLicenceManager()
 //----------------------------------------------------------------------------
 albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 {
-	wxString regKeyStr = wxString("HKEY_CURRENT_USER\\Software\\" + m_AppName + "-lic");
+	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
 	wxRegKey RegKey(regKeyStr);
 	if (!RegKey.Exists())
 	{
@@ -105,7 +105,7 @@ albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 //----------------------------------------------------------------------------
 bool albaLicenceManager::GetExpireDate( wxDateTime &dateExpire)
 {
-	wxString regKeyStr = wxString("HKEY_CURRENT_USER\\Software\\" + m_AppName + "-lic");
+	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
 	wxRegKey RegKey(regKeyStr);
 
 	if (!RegKey.HasValue("ExpireDate"))
@@ -129,7 +129,7 @@ bool albaLicenceManager::GetExpireDate( wxDateTime &dateExpire)
 //----------------------------------------------------------------------------
 bool albaLicenceManager::IsRegistred()
 {
-	wxString regKeyStr = wxString("HKEY_CURRENT_USER\\Software\\" + m_AppName + "-lic");
+	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
 	wxRegKey RegKey(regKeyStr);
 
 	if (!RegKey.HasValue("Registered"))
@@ -164,7 +164,7 @@ void albaLicenceManager::AddTimeLicence(wxDateTime expireDate)
 {
 	wxString cryptedDate = EncryptStr(expireDate.FormatISODate());
 	
-	wxString regKeyStr = wxString("HKEY_CURRENT_USER\\Software\\" + m_AppName + "-lic");
+	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
 	wxRegKey RegKey(regKeyStr);
 	RegKey.Create();
 	RegKey.SetValue("Registered", cryptedDate.c_str());
@@ -175,7 +175,7 @@ void albaLicenceManager::AddBinaryLicence()
 {
 	wxString criptedReg = EncryptStr("REGISTERED");
 
-	wxString regKeyStr = wxString("HKEY_CURRENT_USER\\Software\\" + m_AppName + "-lic");
+	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
 	wxRegKey RegKey(regKeyStr);
 	RegKey.Create();
 	RegKey.SetValue("Registered", criptedReg.c_str());
@@ -185,7 +185,7 @@ void albaLicenceManager::AddBinaryLicence()
 albaLicenceManager::addLicenceStatuses albaLicenceManager::CheckCreateLicence(wxString registrationString)
 {
 	wxString decriptedExpire,decriptedKey;
-	wxString regKeyStr = wxString("HKEY_CURRENT_USER\\Software\\" + m_AppName + "-lic");
+	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
 	wxString localKey;
 	wxRegKey RegKey(regKeyStr);
 
@@ -364,7 +364,7 @@ albaLicenceManager::CreateNewLicenceStatuses albaLicenceManager::CreateNewBinary
 //----------------------------------------------------------------------------
 void albaLicenceManager::ShowRegistrationDialog()
 {
-	wxString regKeyStr = wxString("HKEY_CURRENT_USER\\Software\\" + m_AppName + "-lic");
+	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
 	wxRegKey RegKey(regKeyStr);
 	if (RegKey.Exists())
 	{
@@ -655,6 +655,15 @@ void albaLicenceManager::OnEvent(albaEventBase *alba_event)
 			break;
 		}
 	}
+}
+
+//----------------------------------------------------------------------------
+void albaLicenceManager::SetLicScope(licenceScope scope)
+{
+	if (scope == licenceScope::USER_LICENCE)
+		m_RegistryBaseKey = "HKEY_CURRENT_USER\\Software\\";
+	else
+		m_RegistryBaseKey = "HKEY_LOCAL_MACHINE\\Software\\";
 }
 
 //----------------------------------------------------------------------------
