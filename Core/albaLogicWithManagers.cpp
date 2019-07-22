@@ -160,7 +160,7 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_AboutDialog = new albaGUIAboutDialog();
 
 	m_Revision = _("0.1");
-	m_Extension = "msf";
+	m_Extension = "alba";
 
 	m_UseWizardManager = false;
 	m_WizardRunning = false;
@@ -1153,7 +1153,14 @@ void albaLogicWithManagers::OnFileOpen(const char *file_to_open)
 		{
 			wxString file;
 
-			wxString wildc = _("Storage File (*." + m_Extension + ")|*." + m_Extension + "|Compressed file (*.z" + m_Extension + ")|*.z" + m_Extension + "");
+			albaString wildc;
+			const	char *ext = m_Extension;
+			wildc = wxString::Format("All Supported File (*.%s;*.z%s;msf;zmsf)|*.%s;*.%s;*.msf;*.zmsf", ext, ext, ext, ext);
+			wildc += wxString::Format("|Alba Project File (*.%s)|*.%s", ext, ext);
+			wildc += wxString::Format("|Alba Compressed File (*.z%s)|*.z%s", ext, ext);
+			wildc += wxString::Format("|MAF Project File (*.msf)|*.msf");
+			wildc += wxString::Format("|MAF Compressed File (*.zmsf)|*.zmsf", ext, ext);
+
 			if (file_to_open != NULL)
 			{
 				file = file_to_open;

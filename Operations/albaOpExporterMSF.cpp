@@ -73,8 +73,8 @@ albaOp* albaOpExporterMSF::Copy()
 //----------------------------------------------------------------------------
 char ** albaOpExporterMSF::GetIcon()
 {
-#include "pic/MENU_IMPORT_MSF.xpm"
-	return MENU_IMPORT_MSF_xpm;
+#include "pic/MENU_IMPORT_ALBA.xpm"
+	return MENU_IMPORT_ALBA_xpm;
 }
 
 //----------------------------------------------------------------------------
@@ -108,7 +108,7 @@ int albaOpExporterMSF::ExportMSF()
 {					
   if (!m_TestMode)
   {
-  	wxBusyInfo wait("Saving MSF: Please wait");
+  	wxBusyInfo wait("Saving Project: Please wait");
   }
   assert(m_MSFFile != "");
 

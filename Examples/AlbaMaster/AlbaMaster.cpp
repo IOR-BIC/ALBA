@@ -34,8 +34,45 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaVMERoot.h"
 #include "albaVMESurface.h"
 
+//EXPORTERS
+#include "albaOpExporterAnsysCDBFile.h"
+#include "albaOpExporterAnsysInputFile.h"
+#include "albaOpExporterBmp.h"
+#include "albaOpExporterDicom.h"
+#include "albaOpExporterGRFWS.h"
+#include "albaOpExporterLandmark.h"
+#include "albaOpExporterMSF.h"
+#include "albaOpExporterMesh.h"
+#include "albaOpExporterMeters.h"
+#include "albaOpExporterRAW.h"
+#include "albaOpExporterSTL.h"
+#include "albaOpExporterVTK.h"
+#include "albaOpExporterWrappedMeter.h"
+
+//IMPORTERS
+#include "albaOpImporterASCII.h"
+#include "albaOpImporterAnalogWS.h"
+#include "albaOpImporterAnsysCDBFile.h"
+#include "albaOpImporterAnsysInputFile.h"
+#include "albaOpImporterC3D.h"
+#include "albaOpImporterDicom.h"
+#include "albaOpImporterGRFWS.h"
+#include "albaOpImporterImage.h"
+#include "albaOpImporterLandmark.h"
+#include "albaOpImporterLandmarkTXT.h"
+#include "albaOpImporterLandmarkWS.h"
+#include "albaOpImporterMSF.h"
+#include "albaOpImporterMSF1x.h"
+#include "albaOpImporterMesh.h"
+#include "albaOpImporterRAWImages.h"
+#include "albaOpImporterRAWVolume.h"
+#include "albaOpImporterSTL.h"
+#include "albaOpImporterVRML.h"
+#include "albaOpImporterVTK.h"
+
 // OPERATIONS
 #include "albaOp2DMeasure.h"
+#include "albaOpALBATransform.h"
 #include "albaOpAddLandmark.h"
 #include "albaOpBooleanSurface.h"
 #include "albaOpClassicICPRegistration.h"
@@ -61,54 +98,17 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpDecimateSurface.h"
 #include "albaOpEditMetadata.h"
 #include "albaOpEditNormals.h"
-#include "albaOpEqualizeHistogram.h"
-
-//EXPORTERS
-#include "albaOpExporterAnsysCDBFile.h"
-#include "albaOpExporterAnsysInputFile.h"
-#include "albaOpExporterGRFWS.h"
-#include "albaOpExporterLandmark.h"
-#include "albaOpExporterMSF.h"
-#include "albaOpExporterMesh.h"
-#include "albaOpExporterMeters.h"
-#include "albaOpExporterRAW.h"
-#include "albaOpExporterSTL.h"
-#include "albaOpExporterVTK.h"
-#include "albaOpExporterDicom.h"
-#include "albaOpExporterWrappedMeter.h"
 #include "albaOpExtractIsosurface.h"
 #include "albaOpExtrusionHoles.h"
+#include "albaOpEqualizeHistogram.h"
 #include "albaOpFillHoles.h"
 #include "albaOpFilterSurface.h"
 #include "albaOpFilterVolume.h"
 #include "albaOpFlipNormals.h"
 #include "albaOpFreezeVME.h"
-
-//IMPORTERS
-#include "albaOpImporterASCII.h"
-#include "albaOpImporterAnalogWS.h"
-#include "albaOpImporterAnsysCDBFile.h"
-#include "albaOpImporterAnsysInputFile.h"
-#include "albaOpImporterC3D.h"
-#include "albaOpImporterDicom.h"
-#include "albaOpImporterGRFWS.h"
-#include "albaOpImporterImage.h"
-#include "albaOpImporterLandmark.h"
-#include "albaOpImporterLandmarkTXT.h"
-#include "albaOpImporterLandmarkWS.h"
-#include "albaOpImporterMSF.h"
-#include "albaOpImporterMSF1x.h"
-#include "albaOpImporterMesh.h"
-#include "albaOpImporterRAWImages.h"
-#include "albaOpImporterRAWVolume.h"
-#include "albaOpImporterSTL.h"
-#include "albaOpImporterVRML.h"
-#include "albaOpImporterVTK.h"
-
 #include "albaOpInteractiveClipSurface.h"
 #include "albaOpIterativeRegistration.h"
 #include "albaOpLabelizeSurface.h"
-#include "albaOpALBATransform.h"
 #include "albaOpMML.h"
 #include "albaOpMML3.h"
 #include "albaOpMakeVMETimevarying.h"
@@ -118,9 +118,9 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpRegisterClusters.h"
 #include "albaOpRemoveCells.h"
 #include "albaOpScaleDataset.h"
+#include "albaOpSegmentation.h"
 #include "albaOpSegmentationRegionGrowingConnectedThreshold.h"
 #include "albaOpSegmentationRegionGrowingLocalAndGlobalThreshold.h"
-#include "albaOpSegmentation.h"
 #include "albaOpSmoothSurface.h"
 #include "albaOpSmoothSurfaceCells.h"
 #include "albaOpSplitSurface.h"
@@ -228,7 +228,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpImporterSTL("STL"));
 	m_Logic->Plug(new albaOpImporterVRML("VRML"));
 	m_Logic->Plug(new albaOpImporterVTK("VTK"));
-	m_Logic->Plug(new albaOpImporterMSF("MSF"));
+	m_Logic->Plug(new albaOpImporterMSF("ALBA"));
 	m_Logic->Plug(new albaOpImporterMSF1x("MSF 1.x"));
 	m_Logic->Plug(new albaOpImporterMesh("Mesh"));
 	m_Logic->Plug(new albaOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
@@ -249,11 +249,12 @@ bool AlbaMaster::OnInit()
 	// Exporter Menu:
 	//------------------------------------------------------------
 
-	m_Logic->Plug(new albaOpExporterMSF("MSF"));
+	m_Logic->Plug(new albaOpExporterMSF("ALBA"));
 	m_Logic->Plug(new albaOpExporterSTL("STL"));
 	m_Logic->Plug(new albaOpExporterVTK("VTK"));
 	m_Logic->Plug(new albaOpExporterDicom("Dicom"),"",true,dicomSettings);
 	m_Logic->Plug(new albaOpExporterRAW("Raw"));
+	m_Logic->Plug(new albaOpExporterBmp("Bmp"));
 	m_Logic->Plug(new albaOpExporterLandmark("Landmark"));
 	m_Logic->Plug(new albaOpExporterWrappedMeter());
 	m_Logic->Plug(new albaOpExporterGRFWS());
@@ -468,11 +469,22 @@ bool AlbaMaster::OnInit()
 	//vHtml->PackageView();
 	m_Logic->Plug(vHtml);
 
+	//////////////////////////////////////////////////////////////////////////
+	// Splash Screen
+	albaString splashImageName = "AlbaMasterSplash.bmp";
+
+	wxString splashDir = albaGetApplicationDirectory().c_str();
+	wxBitmap splashBitmap;
+	splashBitmap.LoadFile(splashDir + "\\Config\\" + splashImageName, wxBITMAP_TYPE_BMP);
+	m_Logic->ShowSplashScreen(splashBitmap);
+
+	//////////////////////////////////////////////////////////////////////////
 	wxHandleFatalExceptions();
 
 	//m_Logic->ShowSplashScreen();
 	m_Logic->Show();
-	m_Logic->Init(0,NULL); // calls FileNew - which create the root
+	m_Logic->Init(argc, argv); // calls FileNew - which create the root
+
 	m_LogicInitialized = true;
 
 	return TRUE;
