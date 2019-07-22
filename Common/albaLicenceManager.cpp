@@ -72,8 +72,9 @@ albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 		wxString cryptedCode = EncryptStr(tmp);
 		
 		//create a new regkey to store the encripted string
-		RegKey.Create();
-		RegKey.SetValue("LocalKey", cryptedCode.c_str());
+		bool created = RegKey.Create();
+		if(created)
+			RegKey.SetValue("LocalKey", cryptedCode.c_str());
 
 		return TRIAL_MODE;
 	}
