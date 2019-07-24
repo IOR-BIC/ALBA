@@ -204,6 +204,8 @@ void albaOpExporterDicom::ExportDicom()
 {		
 	int dims[3];
 	double origin[3],spacing[3];
+	double sr[2];
+	int scalarSpan, scalarShift;
 	vtkDoubleArray *zCoord=NULL;
 	m_Input->GetOutput()->Update();
 
@@ -266,8 +268,11 @@ void albaOpExporterDicom::ExportDicom()
 		im->SetPhotometricInterpretation(gdcm::PhotometricInterpretation::MONOCHROME2);
 
 		void *start=volume->GetPointData()->GetScalars()->GetVoidPointer(0);
+		volume->GetScalarRange(sr);
+		scalarSpan = sr[1] - sr[0];
 		int pixelSize;
 		void *buffer;
+		bool rescaled=false;
 
 		switch (volume->GetPointData()->GetScalars()->GetDataType())
 		{
@@ -292,9 +297,22 @@ void albaOpExporterDicom::ExportDicom()
 				im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::UINT16);
 				break;
 			case VTK_INT:
-				pixelSize = sizeof(int);
-				buffer = (int *)start + imgDim*i;
-				im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::INT32);
+				if (scalarSpan < 65535)
+				{
+					buffer = new unsigned short[imgDim];
+					pixelSize = sizeof(unsigned short);
+					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::INT16);
+					scalarShift = -sr[0];
+					rescaled = true;
+					im->SetIntercept(-scalarShift);
+					ScaleIntScalars((int *)start + imgDim*i,(unsigned short *) buffer, scalarShift, imgDim);
+				}
+				else
+				{
+					pixelSize = sizeof(int);
+					buffer = (int *)start + imgDim*i;
+					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::INT32);
+				}
 				break;
 			case VTK_UNSIGNED_INT:
 				pixelSize = sizeof(unsigned int);
@@ -320,7 +338,7 @@ void albaOpExporterDicom::ExportDicom()
 		gdcm::DataElement pixeldata(gdcm::Tag(0x7fe0, 0x0010));
 		pixeldata.SetByteValue((const char*)buffer, (uint32_t)size);
 		im->SetDataElement(pixeldata);
-
+	
 	
 		gdcm::SmartPointer<gdcm::File> file = new gdcm::File; // empty file
 
@@ -410,6 +428,12 @@ void albaOpExporterDicom::ExportDicom()
 		if (!w.Write())
 			break;
 
+		if (rescaled) 
+		{
+			delete[] buffer;
+			rescaled = false;
+		}
+
 		helper.UpdateProgressBar((i + 1) * 100 / dims[2] );
 	}
 	helper.CloseProgressBar();
@@ -426,4 +450,13 @@ char ** albaOpExporterDicom::GetIcon()
 albaGUIDicomSettings* albaOpExporterDicom::GetSetting()
 {
 	return (albaGUIDicomSettings*)Superclass::GetSetting();
+}
+
+//----------------------------------------------------------------------------
+void albaOpExporterDicom::ScaleIntScalars(int * from,unsigned short *to, int scalarShift, int imgDim)
+{
+	for (int i = 0; i < imgDim; i++)
+	{
+		to[i] = from[i] + scalarShift;
+	}
 }
