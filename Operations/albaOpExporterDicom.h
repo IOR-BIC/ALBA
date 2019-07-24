@@ -85,5 +85,7 @@ protected:
 	albaString m_ProtocolName;
 	albaString m_ManufacturersModelName;
 
+private:
+	void ScaleIntScalars(int * from,unsigned short *to, int scalarShift, int imgDim);
 };
 #endif
