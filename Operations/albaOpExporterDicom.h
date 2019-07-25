@@ -67,7 +67,14 @@ public:
 	albaGUIDicomSettings* GetSetting();
 	
 protected:
-  albaString  m_Folder;
+
+	void ScaleIntToUShortScalars(int * from, unsigned short *to, int scalarShift, int imgDim);
+
+	void ScaleIntToShortScalars(int * from, unsigned short *to, int imgDim);
+
+	void ScaleUIntToUShortScalars(unsigned int * from, unsigned short *to, int scalarShift, int imgDim);
+
+	albaString  m_Folder;
   albaVME   *m_Vme; 
 	int				m_ABSMatrixFlag;
 	
@@ -85,7 +92,6 @@ protected:
 	albaString m_ProtocolName;
 	albaString m_ManufacturersModelName;
 
-private:
-	void ScaleIntScalars(int * from,unsigned short *to, int scalarShift, int imgDim);
+	
 };
 #endif

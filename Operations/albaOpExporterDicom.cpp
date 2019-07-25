@@ -216,7 +216,7 @@ void albaOpExporterDicom::ExportDicom()
 	{
 		int tmp = wxMessageBox("The output directory already contains this Dicom\ndo you want to override it? ", "File Exists" , wxYES_NO | wxYES_DEFAULT | wxICON_QUESTION | wxCENTRE | wxSTAY_ON_TOP);
 
-		//User has pessed cancel
+		//User has pressed no
 		if (tmp == wxNO)
 			return;
 	}
