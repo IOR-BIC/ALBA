@@ -26,6 +26,12 @@
 
 !include InstallerCommon.nsh
 
+!macro 	EditLicencePage
+	; Change the Defult License Agreement to Look like a Readme Dialog
+		
+	!define MUI_LICENSEPAGE_CHECKBOX
+!macroend
+
 !insertmacro Init_MUI 
 
 !macro AddExtraFiles
