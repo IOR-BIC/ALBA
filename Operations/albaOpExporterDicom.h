@@ -47,7 +47,7 @@ public:
   bool Accept(albaVME*node);
 
 	/** Builds operation's interface. */
-  void OpRun();
+  virtual void OpRun();
 
   void ApplyABSMatrixOn() {m_ABSMatrixFlag = 1;};
   void ApplyABSMatrixOff() {m_ABSMatrixFlag = 0;};
