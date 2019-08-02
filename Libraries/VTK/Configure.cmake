@@ -36,8 +36,10 @@ IF (EXISTS "${VTK_SOURCE_DIR}/Packages")
   ##The macro must run only one time
   IF (NOT EXISTS "${VTK_SOURCE_PATH}")
   	FIND_AND_UNPACK_PACKAGE (VTK ${VTK_PACKAGE_PATH} "${VTK_UNPACK_PATH}")
-  	FIND_AND_APPLAY_PATCHES(VTK ${VTK_PATCH_PATH} "${VTK_SOURCE_PATH}")
   ENDIF (NOT EXISTS "${VTK_SOURCE_PATH}")
+	
+	FIND_AND_APPLAY_PATCHES(VTK ${VTK_PATCH_PATH} "${VTK_SOURCE_PATH}")
+	
 ENDIF (EXISTS "${VTK_SOURCE_DIR}/Packages")
 
 ##ci vorra' un controllo se tutto e' stato eseguito???
