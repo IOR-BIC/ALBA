@@ -1,18 +1,15 @@
 /*=========================================================================
-
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaWizardWaitOpTest
  Authors: Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
-
-
+ 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+ =========================================================================*/
 
 #include "albaDefines.h"
 //----------------------------------------------------------------------------
@@ -150,17 +147,14 @@
 #include "vtkALBASmartPointer.h"
 #include "albaVMEOutputNULL.h"
 
-
 // Visual Leak Detector
 //#include <vld.h>
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(DummyVme);
-//-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 albaVMEOutput *DummyVme::GetOutput()
-//-------------------------------------------------------------------------
 {
 	// allocate the right type of output on demand
 	if (m_Output==NULL)
@@ -170,10 +164,8 @@ albaVMEOutput *DummyVme::GetOutput()
 	return m_Output;
 }
 
-
 //----------------------------------------------------------------------------
 void DummyObserver::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
@@ -184,7 +176,7 @@ void DummyObserver::OnEvent(albaEventBase *alba_event)
 	}
 }
 
-
+//----------------------------------------------------------------------------
 //Main Test Executor
 int	main( int argc, char* argv[] )
 {
@@ -335,4 +327,3 @@ int	main( int argc, char* argv[] )
 
 	return result.wasSuccessful() ? 0 : 1;
 }
-

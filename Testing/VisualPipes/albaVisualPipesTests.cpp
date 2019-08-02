@@ -1,17 +1,14 @@
 /*=========================================================================
-
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaWizardWaitOpTest
  Authors: Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
-
-
+ 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notice for more information.
-
 =========================================================================*/
 
 #include "albaDefines.h"
@@ -22,6 +19,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 #include "albaVisualPipesTests.h"
+
 #include "albaFakeLogicForTest.h"
 #include "albaPipeCompoundTest.h"
 #include "albaPipeCompoundVolumeDRRTest.h"
@@ -163,7 +161,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipeCompoundVolumeMIPTest::suite());
 	runner.addTest(albaPipeCompoundVolumeDRRTest::suite());
 	runner.addTest(albaPipeCompoundVolumeIsosurfaceTest::suite());
-	//runner.addTest(albaPipeRayCastTest::suite());
+	runner.addTest(albaPipeRayCastTest::suite());
 
 	runner.run( controller );
 
@@ -175,4 +173,3 @@ int	main( int argc, char* argv[] )
 
 	return result.wasSuccessful() ? 0 : 1;
 }
-

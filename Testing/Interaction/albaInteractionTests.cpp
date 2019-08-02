@@ -1,17 +1,14 @@
 /*=========================================================================
-
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaWizardWaitOpTest
  Authors: Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
-
-
+ 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notice for more information.
-
 =========================================================================*/
 
 #include "albaDefines.h"
@@ -95,22 +92,22 @@
 #include <cppunit/TestRunner.h>
 #include "vtkFileOutputWindow.h"
 
-
-
+//----------------------------------------------------------------------------
 void	DummyObserver::OnEvent(albaEventBase *alba_event)
 {
 	albaLogMessage("\nEntering DummyObserver::OnEvent...\n");
 	m_LastReceivedEventID =  alba_event->GetId();
 }
 
+//----------------------------------------------------------------------------
 int DummyObserver::GetLastReceivedEventID()
 {
 	return m_LastReceivedEventID;
 }
 
+//----------------------------------------------------------------------------
 //Main Test Executor
-int
-	main( int argc, char* argv[] )
+int	main( int argc, char* argv[] )
 {
 	// Create log of VTK error messages
 	vtkALBASmartPointer<vtkFileOutputWindow> log;
@@ -208,12 +205,12 @@ int
 	return result.wasSuccessful() ? 0 : 1;
 }
 
-
+//----------------------------------------------------------------------------
 void mockListener::OnEvent(albaEventBase *alba_event)
 {
 	m_Event = *alba_event;
 }
-
+//----------------------------------------------------------------------------
 albaEventBase * mockListener::GetEvent()
 {
 	return &m_Event;
