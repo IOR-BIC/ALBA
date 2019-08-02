@@ -1,18 +1,15 @@
 /*=========================================================================
-
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaWizardWaitOpTest
  Authors: Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
-
-
+ 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+ =========================================================================*/
 
 #include "albaDefines.h"
 //----------------------------------------------------------------------------
@@ -63,16 +60,13 @@
 albaCxxTypeMacro(albaTestObject);
 //--------------------------------------------------------------------------------
 
-
 //--------------------------------------------------------------------------------
 albaCxxTypeMacro(albaFooObject);
 //--------------------------------------------------------------------------------
 
 //Main Test Executor
-int
-	main( int argc, char* argv[] )
+int	main( int argc, char* argv[] )
 {
-
 	// Create log of VTK error messages
 	vtkALBASmartPointer<vtkFileOutputWindow> log;
 	vtkOutputWindow::SetInstance(log);
@@ -95,33 +89,33 @@ int
 	CPPUNIT_NS::TestRunner runner;
 
 
-// 	runner.addTest(albaStringTest::suite());
-// 	runner.addTest(albaTransformTest::suite());
-// 	runner.addTest(albaTransformFrameTest::suite());
-// 	runner.addTest(albaMatrixTest::suite());
-// 	runner.addTest(albaMatrix3x3Test::suite());
-// 	runner.addTest(albaOBBTest::suite());
-// 	runner.addTest(albaDirectoryTest::suite());
-// 	runner.addTest(albaEventSenderTest::suite());
-// 	runner.addTest(albaEventBaseTest::suite());
-// 	runner.addTest(albaEventBroadcasterTest::suite());
-// 	runner.addTest(albaObjectTest::suite());
-// 	runner.addTest(albaIndentTest::suite());
-// 	runner.addTest(albaDirectoryTest::suite());
-// 	runner.addTest(albaTransformBaseTest::suite());
-// 	runner.addTest(albaObserverTest::suite());
-// 	runner.addTest(albaVersionTest::suite());
-// 	runner.addTest(mmuIdFactoryTest::suite());
-// 	runner.addTest(albaVectorTest::suite());
-// 	runner.addTest(albaObjectFactoryTest::suite());
-// 	runner.addTest(vtkALBAToLinearTransformTest::suite());
-// 	runner.addTest(albaReferenceCountedTest::suite());
-// 	runner.addTest(albaLUTLibraryTest::suite());
+	runner.addTest(albaStringTest::suite());
+	runner.addTest(albaTransformTest::suite());
+	runner.addTest(albaTransformFrameTest::suite());
+	runner.addTest(albaMatrixTest::suite());
+	runner.addTest(albaMatrix3x3Test::suite());
+	runner.addTest(albaOBBTest::suite());
+	runner.addTest(albaDirectoryTest::suite());
+	runner.addTest(albaEventSenderTest::suite());
+	runner.addTest(albaEventBaseTest::suite());
+	runner.addTest(albaEventBroadcasterTest::suite());
+	runner.addTest(albaObjectTest::suite());
+	runner.addTest(albaIndentTest::suite());
+	runner.addTest(albaDirectoryTest::suite());
+	runner.addTest(albaTransformBaseTest::suite());
+	runner.addTest(albaObserverTest::suite());
+	runner.addTest(albaVersionTest::suite());
+	runner.addTest(mmuIdFactoryTest::suite());
+	runner.addTest(albaVectorTest::suite());
+	runner.addTest(albaObjectFactoryTest::suite());
+	runner.addTest(vtkALBAToLinearTransformTest::suite());
+	runner.addTest(albaReferenceCountedTest::suite());
+	runner.addTest(albaLUTLibraryTest::suite());
 	runner.addTest(albaDynamicLoaderTest::suite());
-// 	runner.addTest(albaDataChecksumTest::suite());
-// 	runner.addTest(albaVect3dTest::suite());
-// 	runner.addTest(albaEventTest::suite());
-// 	runner.addTest(multiThreaderTest::suite());
+	runner.addTest(albaDataChecksumTest::suite());
+	runner.addTest(albaVect3dTest::suite());
+	runner.addTest(albaEventTest::suite());
+	runner.addTest(multiThreaderTest::suite());
 
 
 	runner.run( controller );
@@ -132,4 +126,3 @@ int
 
 	return result.wasSuccessful() ? 0 : 1;
 }
-
