@@ -22,7 +22,6 @@
 !define MUI_ABORTWARNING
 !define MUI_ICON "${PRODUCT_INSTALLER_DIR_WIN}\${PRODUCT_NAME}.ico"
 !define MUI_UNICON "${PRODUCT_INSTALLER_DIR_WIN}\${PRODUCT_NAME}Uninstall.ico"
-!define MUI_LICENSEPAGE_CHECKBOX
 
 !define MUI_HEADERIMAGE_BITMAP "${PRODUCT_INSTALLER_DIR_WIN}\header.bmp"
 !define MUI_WELCOMEFINISHPAGE_BITMAP "${PRODUCT_INSTALLER_DIR_WIN}\welcome.bmp"
@@ -129,19 +128,22 @@ FunctionEnd
 ;; Setting Custom Pages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  
 !macro Init_MUI
-	; Installer pages ;;;;;;;;;;;;;;
-	; Welcome page
-	!insertmacro MUI_PAGE_WELCOME
-	!insertmacro MUI_PAGE_LICENSE "${PRODUCT_INSTALLER_DIR_WIN}\${PRODUCT_NAME}Licence.txt"
-	!insertmacro MUI_PAGE_DIRECTORY
+
+	!insertmacro EditLicencePage ; Optional
 	
+	; Installer pages ;;;;;;;;;;;;;;
+	!insertmacro MUI_PAGE_WELCOME
+	!insertmacro MUI_PAGE_LICENSE "${PRODUCT_INSTALLER_DIR_WIN}\${PRODUCT_NAME}Licence.rtf"
+	!insertmacro MUI_PAGE_DIRECTORY
+	;!insertmacro MUI_PAGE_INSTFILES
+	;!insertmacro MUI_PAGE_FINISH
+
 	!insertmacro  CheckOlderVersion
 	
 	!insertmacro MUI_PAGE_INSTFILES
 	!define MUI_FINISHPAGE_NOAUTOCLOSE
 
 	; Uninstaller pages ;;;;;;;;;;;;
-	; Welcome page
 	!define MUI_PAGE_CUSTOMFUNCTION_SHOW un.ModifyUnWelcome
 	!define MUI_PAGE_CUSTOMFUNCTION_LEAVE un.LeaveUnWelcome
 	!insertmacro MUI_UNPAGE_WELCOME
@@ -150,6 +152,7 @@ FunctionEnd
 
 	; Language files
 	!insertmacro MUI_LANGUAGE "English"
+	!insertmacro MUI_RESERVEFILE_LANGDLL
 
 !macroend
 

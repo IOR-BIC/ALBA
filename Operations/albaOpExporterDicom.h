@@ -47,7 +47,7 @@ public:
   bool Accept(albaVME*node);
 
 	/** Builds operation's interface. */
-  void OpRun();
+  virtual void OpRun();
 
   void ApplyABSMatrixOn() {m_ABSMatrixFlag = 1;};
   void ApplyABSMatrixOff() {m_ABSMatrixFlag = 0;};
@@ -67,7 +67,14 @@ public:
 	albaGUIDicomSettings* GetSetting();
 	
 protected:
-  albaString  m_Folder;
+
+	void ScaleIntToUShortScalars(int * from, unsigned short *to, int scalarShift, int imgDim);
+
+	void ScaleIntToShortScalars(int * from, unsigned short *to, int imgDim);
+
+	void ScaleUIntToUShortScalars(unsigned int * from, unsigned short *to, int scalarShift, int imgDim);
+
+	albaString  m_Folder;
   albaVME   *m_Vme; 
 	int				m_ABSMatrixFlag;
 	
@@ -85,5 +92,6 @@ protected:
 	albaString m_ProtocolName;
 	albaString m_ManufacturersModelName;
 
+	
 };
 #endif

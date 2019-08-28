@@ -80,6 +80,9 @@ public:
 	/*Show Gui Dialog for Registration Licence*/
 	void ShowRegistrationDialog();
 
+	/*Hide Gui Dialog for Registration Licence*/
+	void HideRegistrationDialog();
+
 	/*Show Gui Dialog for Generation Licence (Debug Mode)*/
 	void ShowGenerateLicenceDialog();
 
@@ -151,6 +154,8 @@ protected:
 	albaObserver *m_Listener;
 
 	//GUI
+
+	bool m_RegistrationDialogIsOpened;
 
 	/*Copy string to clipboard*/
 	void ToClipboard(HWND hwnd, const std::string &s);

@@ -37,6 +37,8 @@ albaLicenceManager::albaLicenceManager(wxString appName)
 {
 	m_AppName = appName;
 
+	m_RegistrationDialogIsOpened = false;
+
 	m_RegistrationDialog = NULL;
 	m_GenerateLicenceDialog = NULL;
 	m_PreviewImage = NULL;
@@ -71,11 +73,15 @@ albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 					
 		wxString cryptedCode = EncryptStr(tmp);
 		
-		//create a new regkey to store the encripted string
+		//create a new regkey to store the encrypted string
+		wxLog::EnableLogging(false);
 		bool created = RegKey.Create();
+		
 		if(created)
 			RegKey.SetValue("LocalKey", cryptedCode.c_str());
-
+		wxLog::EnableLogging(true);
+		
+		
 		return TRIAL_MODE;
 	}
 	else
@@ -365,6 +371,9 @@ albaLicenceManager::CreateNewLicenceStatuses albaLicenceManager::CreateNewBinary
 //----------------------------------------------------------------------------
 void albaLicenceManager::ShowRegistrationDialog()
 {
+	if (m_RegistrationDialogIsOpened)
+		HideRegistrationDialog();
+
 	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
 	wxRegKey RegKey(regKeyStr);
 	if (RegKey.Exists())
@@ -469,6 +478,18 @@ void albaLicenceManager::ShowRegistrationDialog()
 	int posY = p.y + s.GetHeight() * .5 - m_RegistrationDialog->GetSize().GetHeight() * .5;
 	m_RegistrationDialog->SetPosition(wxPoint(posX, posY));
 	m_RegistrationDialog->ShowModal();
+
+	m_RegistrationDialogIsOpened = true;
+}
+
+//----------------------------------------------------------------------------
+void albaLicenceManager::HideRegistrationDialog()
+{
+	m_RegistrationDialog->Hide();
+	//m_RegistrationDialog->DissociateHandle();
+	//m_RegistrationDialog->Close();
+
+	m_RegistrationDialogIsOpened = false;
 }
 
 //----------------------------------------------------------------------------
@@ -625,7 +646,10 @@ void albaLicenceManager::OnEvent(albaEventBase *alba_event)
 				break;
 				}
 				
-				wxMessageBox(message, title, style, NULL);
+				int res = wxMessageBox(message, title, style, NULL);
+
+				if (res == wxOK)
+					HideRegistrationDialog();
 			}
 		}
 		break;
