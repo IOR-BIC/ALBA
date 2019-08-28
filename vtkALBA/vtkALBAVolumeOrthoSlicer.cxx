@@ -191,13 +191,13 @@ void vtkALBAVolumeOrthoSlicer::Execute()
 template<typename DataType>
 void vtkALBAVolumeOrthoSlicer::SliceScalars(int *inputDims, DataType *inputScalars, DataType *slicedScalars)
 {
-	int x, y, z, idx1, idx2, newIdx, range[2];
-	int sliceSize, jOffset1, jOffset2, kOffset1, kOffset2, plane1, plane2;
+	vtkIdType x, y, z, idx1, idx2, newIdx, range[2], sliceSize, jOffset1, jOffset2, kOffset1, kOffset2;
+	int plane1, plane2;
 	double acc;
 	double ratio1, ratio2;
 	
 	newIdx = 0;
-	sliceSize = inputDims[0] * inputDims[1];
+	sliceSize = (vtkIdType)inputDims[0] * (vtkIdType)inputDims[1];
 	GetSlicingInfo(&plane1, &plane2, &ratio1, &ratio2);
 	
 	switch (this->SclicingMode)

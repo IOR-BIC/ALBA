@@ -2533,7 +2533,7 @@ void albaOpMeshDeformation::UpdateControlCurve(CONTROL_CURVE* pCurve, int flags)
         vtkIdList *idlist = vtkIdList::New() ;
         
         int nCount = pCurve->pCCList->GetNumberOfIds();
-        int* ptIdx = pCurve->pCCList->GetPointer(0);
+				vtkIdType* ptIdx = pCurve->pCCList->GetPointer(0);
         for (int j = 0; j < nCount; j += 2)
         {
           const albaPolylineGraph::Vertex* pV0 = pCurve->pPolyLines[0]->GetConstVertexPtr(ptIdx[j]);

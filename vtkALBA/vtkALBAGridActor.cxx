@@ -105,7 +105,7 @@ void vtkALBAGridActor::GridCreate()
 	vtkCellArray  *gc = vtkCellArray::New(); 
   gc->Allocate(gc->EstimateSize(nc,2));
   
-	int i, id=0, cp[2];
+	vtkIdType i, id=0, cp[2];
   for(i=0; i<nline; i++)
 	{
 			gp->SetPoint(id,   i,				0,				0);

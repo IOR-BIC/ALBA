@@ -92,7 +92,7 @@ void albaVMEOutputScalar::UpdateVTKRepresentation()
 {
   double data = GetScalarData();
 
-  int pointId[2];
+	vtkIdType pointId[2];
   double time_point = GetTimeStamp();
   vtkALBASmartPointer<vtkPoints> points;
   vtkALBASmartPointer<vtkCellArray> verts;

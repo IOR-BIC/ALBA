@@ -530,7 +530,7 @@ void albaOpMML3ModelView3DPipe::AddAxisLandmark(double *pos)
   // add point and cell to polyline and make visible
   m_AxisLinePolydata->GetPoints()->InsertNextPoint(pos) ;
   if (i >= 1){
-    int endPointIds[2] ;
+		vtkIdType endPointIds[2] ;
     endPointIds[0] = i-1 ;
     endPointIds[1] = i ;
     m_AxisLinePolydata->GetLines()->InsertNextCell(2, endPointIds) ;

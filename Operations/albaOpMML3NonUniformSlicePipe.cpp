@@ -153,7 +153,7 @@ albaOpMML3NonUniformSlicePipe::albaOpMML3NonUniformSlicePipe(vtkPolyData *surfac
 
   vtkCellArray *sectionLinesCells = vtkCellArray::New() ;
   for (int i = 0 ;  i < numberOfSectionLines ;  i++){
-    int endPtIndices[2] ;
+		vtkIdType endPtIndices[2] ;
 
     // left tick mark
     endPtIndices[0] = 4*i ;
@@ -447,7 +447,7 @@ void albaOpMML3NonUniformSlicePipe::UpdateSliceLines()
   vtkCellArray *sliceLinesCells = m_SliceLinesPolydata->GetLines() ;
   sliceLinesCells->Initialize() ;
   for (int i = 0 ;  i < m_NumberOfSlices ;  i++){
-    int endPtIndices[2] ;
+		vtkIdType endPtIndices[2] ;
     endPtIndices[0] = 2*i ;
     endPtIndices[1] = 2*i+1 ;
     sliceLinesCells->InsertNextCell(2, endPtIndices) ;

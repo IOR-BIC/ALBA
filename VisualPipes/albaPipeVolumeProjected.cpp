@@ -172,7 +172,7 @@ void albaPipeVolumeProjected::Create(albaSceneNode *n)
 	vtkPolyData  *CTLinesPD      = vtkPolyData::New();	
 	vtkPoints    *CTLinesPoints  = vtkPoints::New();	
 	vtkCellArray *CTCells        = vtkCellArray::New();
-	int points_id[2];    
+	vtkIdType points_id[2];
 	int	counter = 0;
   vtkRectilinearGrid *rg_data = vtkRectilinearGrid::SafeDownCast(vtk_data);
 	if (rg_data)

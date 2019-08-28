@@ -258,8 +258,8 @@ void albaOpImporterGRFWS::ReadForcePlates()
   vtkALBASmartPointer<vtkPoints> pointsm2;
   vtkALBASmartPointer<vtkCellArray> cellArraym1;
   vtkALBASmartPointer<vtkCellArray> cellArraym2;
-  int pointId1[2];
-  int pointId2[2];
+	vtkIdType pointId1[2];
+	vtkIdType pointId2[2];
 
   albaNEW(m_ForceLeft);
   albaNEW(m_ForceRight);
@@ -527,7 +527,7 @@ void albaOpImporterGRFWS::ReadSingleVector()
   vtkALBASmartPointer<vtkPolyData> force1;
   vtkALBASmartPointer<vtkPoints> pointsf1;
   vtkALBASmartPointer<vtkCellArray> cellArrayf1;
-  int pointId1[2];
+	vtkIdType pointId1[2];
 
   albaNEW(m_ForceLeft);
 
