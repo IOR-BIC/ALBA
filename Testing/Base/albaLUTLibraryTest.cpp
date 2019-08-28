@@ -127,7 +127,7 @@ void albaLUTLibraryTest::TestAdd()
   std::string dirPrefix = ALBA_DATA_ROOT;
   dirPrefix  +=  "/Test_LUTStorage/";
 
-  string oldDir = dirPrefix  + "LUTLib/";
+	std::string oldDir = dirPrefix  + "LUTLib/";
   
   lutLib->SetDir(oldDir.c_str());
   lutLib->Load();

@@ -19,9 +19,10 @@
 
 MACRO(FIND_AND_APPLAY_PATCHES PACKAGE_NAME PATCH_DIR SOURCE_DIR)
 
+	
 #look if there are files to patch 
  	FILE(GLOB_RECURSE MyDiffFileList "${PATCH_DIR}/*.diff")
- 	IF (MyDiffFileList)	
+ 	IF (MyDiffFileList)
  		IF (WIN32)
 			#searching for patching program
 	  	SET (GNUWIN32_INSTALL_PATH ${MFL_SOURCE_DIR}/Extras)
