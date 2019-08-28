@@ -230,7 +230,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpImporterVTK("VTK"));
 	m_Logic->Plug(new albaOpImporterMSF("ALBA"));
 	m_Logic->Plug(new albaOpImporterMSF1x("MSF 1.x"));
-	m_Logic->Plug(new albaOpImporterMesh("Mesh"));
+	m_Logic->Plug(new albaOpImporterMesh("Generic Mesh"), "Finite Element");
 	m_Logic->Plug(new albaOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
 	m_Logic->Plug(new albaOpImporterAnsysInputFile("Ansys Input File"), "Finite Element");
 	m_Logic->Plug(new albaOpImporterASCII("ASCII"));
