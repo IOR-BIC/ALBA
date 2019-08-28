@@ -238,7 +238,7 @@ void vtkALBARulerActor2D::RulerCreate()
   double m0 = Margin;
   double m1 = Margin - 2;
 
-  int i, id=0, cp[2];
+	vtkIdType i, id=0, cp[2];
   for(i=0; i<Ntick; i++)
 	{
 			Points->SetPoint(id,     Position[0]+i, Position[1]+m0,	0);

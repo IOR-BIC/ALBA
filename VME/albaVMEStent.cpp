@@ -820,7 +820,7 @@ void albaVMEStent::UpdateStentPolydataFromSimplex_Simple()
     vpoints->Squeeze() ;
 
 
-    int tindices[2];
+		vtkIdType tindices[2];
     vtkCellArray *lines = vtkCellArray::New() ;
     lines->Allocate(40000) ;  
 
@@ -974,7 +974,7 @@ void albaVMEStent::UpdateStentPolydataFromSimplex_Abbott()
 
       // Construct and insert pair of strut cells
       if (isLinkPoint){
-        int t[5] ;
+				vtkIdType t[5] ;
         t[0] = tindices_struts[0] ;
         t[1] = newPtIds[1] ;
         t[2] = newPtIds[0] ;
@@ -990,7 +990,7 @@ void albaVMEStent::UpdateStentPolydataFromSimplex_Abbott()
         lines->InsertNextCell(5, t);
       }
       else{
-        int t[4] ;
+				vtkIdType t[4] ;
         t[0] = tindices_struts[0] ;
         t[1] = newPtIds[1] ;
         t[2] = newPtIds[0] ;
@@ -1010,7 +1010,7 @@ void albaVMEStent::UpdateStentPolydataFromSimplex_Abbott()
     // Link cells
     //----------------------------------------
     for(StrutIterator iter = m_StentSource->GetLinksList().begin(); iter !=m_StentSource->GetLinksList().end(); iter++){
-      int tindices[2];
+			vtkIdType tindices[2];
       tindices[0] = iter->startVertex;
       tindices[1] = iter->endVertex;
       lines->InsertNextCell(2, tindices);
@@ -1130,7 +1130,7 @@ void albaVMEStent::UpdateStentPolydataFromSimplex_ViewAsSimplex()
     vpoints->Delete() ;
 
 
-    int tindices[10];
+		vtkIdType tindices[10];
     vtkCellArray *cells = vtkCellArray::New() ;
     cells->Allocate(40000) ;  
 
@@ -1481,7 +1481,7 @@ void albaVMEStent::CreateExtrapolatedLine(vtkPolyData* lineIn, vtkPolyData* line
   }
 
   // create the polyline cell
-  int *ids = new int[m] ;
+	vtkIdType *ids = new vtkIdType[m] ;
   for (int i = 0 ;  i < m ;  i++)
     ids[i] = i ;
   lines->InsertNextCell(m, ids) ;
@@ -1522,7 +1522,7 @@ void albaVMEStent::CreateTruncatedLine(vtkPolyData* lineIn, vtkPolyData* lineOut
 
   // create the polyline cell
   vtkCellArray *lines = vtkCellArray::New() ;
-  int *ids = new int[m] ;
+	vtkIdType *ids = new vtkIdType[m] ;
   for (int i = 0 ;  i < m ;  i++)
     ids[i] = i ;
   lines->InsertNextCell(m, ids) ;
@@ -1941,7 +1941,7 @@ void albaVMEStent::PartialInitDefFilterFromStentModel()
   m_DeformFilter->SetCenterLocationIdx(m_StentSource->centerLocationIndex.begin()) ;
 
   // copy info about struts and links
-  int tindices[2];
+	vtkIdType tindices[2];
   vtkCellArray* strutArray = vtkCellArray::New() ;
   vtkCellArray* linkArray = vtkCellArray::New() ;
 

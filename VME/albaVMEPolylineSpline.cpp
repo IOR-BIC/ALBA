@@ -341,7 +341,7 @@ void albaVMEPolylineSpline::OrderPolyline(vtkPolyData *polyline)
 {
   //cell 
   vtkALBASmartPointer<vtkCellArray> cellArray;
-  int pointId[2];
+	vtkIdType pointId[2];
 
   for(int i = 0; i< polyline->GetNumberOfPoints();i++)
   {
@@ -485,7 +485,7 @@ void albaVMEPolylineSpline::OrderPolylineByAxis(vtkPolyData* polyline, int axis)
       }
 
       int j;
-      int pointId[2];
+			vtkIdType pointId[2];
       for(j = 0; j< newPoints->GetNumberOfPoints();j++)
       {
         if (j > 0)
@@ -512,7 +512,7 @@ void albaVMEPolylineSpline::OrderPolylineByAxis(vtkPolyData* polyline, int axis)
       }
 
       int j;
-      int pointId[2];
+			vtkIdType pointId[2];
       for(j = 0; j< newPoints->GetNumberOfPoints();j++)
       {
         if (j > 0)
@@ -538,7 +538,7 @@ void albaVMEPolylineSpline::OrderPolylineByAxis(vtkPolyData* polyline, int axis)
       }
 
       int j;
-      int pointId[2];
+			vtkIdType pointId[2];
       for(j = 0; j< newPoints->GetNumberOfPoints();j++)
       {
         if (j > 0)

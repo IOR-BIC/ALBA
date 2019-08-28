@@ -354,7 +354,7 @@ void vtkALBAFillingHole::BuildPatch()
   int dv1,dv2;
   bool bflag;
   double dLength;
-  int *pVertexIndex,*pVertexIndex2,*pEdgeIndex;
+	vtkIdType *pVertexIndex,*pVertexIndex2,*pEdgeIndex;
 
   CVertex		*pVertex1,*pVertex2;
   CTriangle	*pTriangle, *pNeighTriangle;
@@ -720,7 +720,7 @@ vtkALBAFillingHole::CVertex* vtkALBAFillingHole::AddOnePointToTriangle(double *p
   CVertex		*pNewVertex;
   CTriangle	*pNewTriangle;
   CEdge		*pEdge, *pNewEdge;
-  int				*pVertexIndex,*pEdgeIndex;
+	vtkIdType				*pVertexIndex,*pEdgeIndex;
 
   //add a new vertex
   pNewVertex = new CVertex(pCoord);
@@ -1111,8 +1111,8 @@ void vtkALBAFillingHole::RefinePatch()
   CVertex		*pVertex,*pNewVertex;
   CTriangle *pTriangle;
   CEdge *pEdge;
-  int *pVertexIndex;
-  int *pEdgeIndex;
+	vtkIdType *pVertexIndex;
+	vtkIdType *pEdgeIndex;
 
 #if defined(_FILLING_DBG)
   int nCheckEdgePos = 0;
@@ -1273,7 +1273,7 @@ void vtkALBAFillingHole::ExtendPatch()
   int id;
   CVertex *pVertex,*pNewVertex;
   CTriangle	*pTriangle,*pNewTriangle;
-  int		*pVertexIndex,*pNewVertexIndex;
+	vtkIdType		*pVertexIndex,*pNewVertexIndex;
 
   vtkstd::vector<int>::iterator	oneringend,onering;
   vtkstd::vector<int> surroundvertexes,surroundtriangles;
@@ -2054,7 +2054,7 @@ void vtkALBAFillingHole::MergePatch()
   CVertex	*pVertex,*pNewVertex;
   CTriangle	*pNewTriangle;
   int v0,v1,v2;
-  int *pVertexIndex;
+	vtkIdType *pVertexIndex;
   int NumOfNewTriangle;
 
   vtkstd::vector<CVertex*>::iterator	vertex,vertexstart;
@@ -2446,7 +2446,7 @@ void vtkALBAFillingHole::BuildMesh()
   bool bflag;
 
   double dLength;
-  int *pVertexIndex,*pVertexIndex2,*pEdgeIndex;
+	vtkIdType *pVertexIndex,*pVertexIndex2,*pEdgeIndex;
   
   CEdge		*pEdge;
   CTriangle	*pTriangle, *pNeighTriangle;
@@ -2580,7 +2580,7 @@ void vtkALBAFillingHole::UpdateMesh(int id)
   bool bflag;
 
   double dLength;
-  int *pVertexIndex,*pVertexIndex2;
+	vtkIdType *pVertexIndex,*pVertexIndex2;
 
   CVertex		*pVertex,*pVertex1,*pVertex2;
   CTriangle	*pTriangle, *pNeighTriangle;

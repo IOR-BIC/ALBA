@@ -497,7 +497,7 @@ void albaVMEMeter::InternalUpdate()
   m_Goniometer->Update();
   vtkPolyData *polydata = m_Goniometer->GetOutput();
   int num = m_Goniometer->GetOutput()->GetNumberOfPoints();
-  int pointId[2];
+	vtkIdType pointId[2];
   vtkALBASmartPointer<vtkCellArray> cellArray;
   for(int i = 0; i< num;i++)
   {

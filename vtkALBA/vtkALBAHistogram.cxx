@@ -199,7 +199,7 @@ void vtkALBAHistogram::HistogramCreate()
   ChangeInfo = vtkImageChangeInformation::New();
   ChangeInfo->SetOutputOrigin(0,0,0);
 
-  int cp[2] = {0,1};
+	vtkIdType cp[2] = {0,1};
   vtkPoints *p = vtkPoints::New();
   p->SetNumberOfPoints(2);
   p->SetPoint(0,0,0,0);

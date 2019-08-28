@@ -218,7 +218,7 @@ void albaPipeTrajectories::UpdateProperty(bool fromTag)
   vtkALBASmartPointer<vtkPoints> points;
   vtkALBASmartPointer<vtkCellArray> cellArray;
 
-  int pointId[2], counter = 0;
+	vtkIdType pointId[2], counter = 0;
   bool current, previous, sphere_visibility;
 
   if (m_MatrixVector)

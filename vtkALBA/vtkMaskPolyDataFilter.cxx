@@ -83,7 +83,8 @@ void vtkMaskPolyDataFilter::Execute()
 	int numPts=input->GetNumberOfPoints();
 	vtkPointData *inPointData=input->GetPointData(), *outPointData=output->GetPointData();
 	vtkCellData *inCellData=input->GetCellData(), *outCellData=output->GetCellData();
-	int idx, cellId, subId;
+	vtkIdType idx, cellId;
+	int subId;
 	double  closestPoint[3];
 	double *currentPoint,*x1;
 	x1 = new double[3];
@@ -293,7 +294,9 @@ void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double z)
 	//reset conversion table values
 	memset(IdConversionTable,-1,sizeof(vtkIdType)*nPoints);
 	
-	int cellId, pointOverBound, pointUnderBound, cellNPoints, addedPoints;
+	vtkIdType cellId;
+	vtkIdType pointOverBound, pointUnderBound, cellNPoints, addedPoints;
+
 	cellId=addedPoints=0;
 
 	vtkCellArray *polys;
