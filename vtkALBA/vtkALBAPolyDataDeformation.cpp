@@ -1799,7 +1799,8 @@ double vtkALBAPolyDataDeformation::GetDistance( vtkIdType nPtStartId,
   //this is just to speed-up the search for intersection
   vtkGenericCell* cellLoc = vtkGenericCell::New();
 
-  int nCellId, nSubId;
+	vtkIdType nCellId;
+	int nSubId;
   double x[3], par_x[3];
   double dblRetDist = 0.0, t = 0.0;
   while (dblRetDist < dblMaxDist)     //search is limited

@@ -261,7 +261,7 @@ void albaOpInteractionDebugger::BuildVMEPolyline( vtkPoints * in_points, albaVME
   vtkALBASmartPointer<vtkPolyData> in_data;
   vtkALBASmartPointer<vtkCellArray> in_cells;
 
-  int pointId[2];
+	vtkIdType pointId[2];
   for(int i = 0; i< in_points->GetNumberOfPoints();i++)
   {
     if (i > 0)

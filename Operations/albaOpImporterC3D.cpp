@@ -724,14 +724,14 @@ void albaOpImporterC3D::ImportPlatform(albaOpImporterC3D::_InternalC3DData &intD
 		vtkALBASmartPointer<vtkPolyData> vectorForce;
 		vtkALBASmartPointer<vtkPoints> pointsForce;
 		vtkALBASmartPointer<vtkCellArray> cellArrayForce;
-		int pointIdForce[2] = { 0,1 };
+		vtkIdType pointIdForce[2] = { 0,1 };
 		vectorForce->SetPoints(pointsForce);
 		vectorForce->SetLines(cellArrayForce);
 
 		vtkALBASmartPointer<vtkPolyData> vectorMoment;
 		vtkALBASmartPointer<vtkPoints> pointsMoment;
 		vtkALBASmartPointer<vtkCellArray> cellArrayMoment;
-		int pointIdMoment[2] = { 0,1 };
+		vtkIdType pointIdMoment[2] = { 0,1 };
 		vectorMoment->SetPoints(pointsMoment);
 		vectorMoment->SetLines(cellArrayMoment);
 

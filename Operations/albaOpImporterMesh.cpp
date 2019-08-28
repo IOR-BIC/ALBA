@@ -22,7 +22,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "albaOpImporterMesh.h"
+#include "albaOpImporterMesh.h" 
 
 #include "wx/busyinfo.h"
 
@@ -55,6 +55,8 @@ albaOp(label)
   m_ImportedVmeMesh = NULL;
   m_NodesFileName = "";
   m_ElementsFileName = "";
+	m_MaterialsFileName = "";
+	m_SimplifiedFormat = true;
 }
 
 //----------------------------------------------------------------------------
@@ -95,7 +97,16 @@ int albaOpImporterMesh::Read()
   albaVMEMeshAnsysTextImporter *reader = new albaVMEMeshAnsysTextImporter;
 	reader->SetNodesFileName(m_NodesFileName.GetCStr());
   reader->SetElementsFileName(m_ElementsFileName.GetCStr());
-  reader->SetMode(albaVMEMeshAnsysTextImporter::GENERIC_MODE);
+	
+	if (m_SimplifiedFormat)
+	{
+		reader->SetMode(albaVMEMeshAnsysTextImporter::GENERIC_MODE);
+	}
+	else
+	{
+		reader->SetMode(albaVMEMeshAnsysTextImporter::ANSYS_MODE);
+		reader->SetMaterialsFileName(m_MaterialsFileName.GetCStr());
+	}
 
 	int returnValue = reader->Read();
 
@@ -129,9 +140,10 @@ int albaOpImporterMesh::Read()
 enum Mesh_Importer_ID
 {
   ID_FIRST = MINID,
-  ID_Importer_Type,
+  ID_Simplified_Format,
   ID_NodesFileName,
   ID_ElementsFileName,
+	ID_MaterialsFileName,
   ID_OK,
   ID_CANCEL,
 };
@@ -145,6 +157,7 @@ void albaOpImporterMesh::CreateGui()
   m_Gui->SetListener(this);
 
   m_Gui->Label("", true);
+	m_Gui->Bool(ID_Simplified_Format, "Use Simplified format", &m_SimplifiedFormat,true);
 
   //////////////////////////////////////////////////////////////////////////
 
@@ -156,9 +169,13 @@ void albaOpImporterMesh::CreateGui()
   m_Gui->FileOpen (ID_ElementsFileName,	"",	&m_ElementsFileName, wildcard);
   m_Gui->Divider();
 
+  m_Gui->Label(_("materials file (optional):"), true);
+  m_Gui->FileOpen (ID_MaterialsFileName,	"",	&m_MaterialsFileName, wildcard);
   m_Gui->Divider(2);
   //////////////////////////////////////////////////////////////////////////
   m_Gui->Label("");
+
+	m_Gui->Enable(ID_MaterialsFileName, !m_SimplifiedFormat);
 
   m_Gui->OkCancel();
   m_Gui->Label("");
@@ -176,11 +193,12 @@ void albaOpImporterMesh::OnEvent(albaEventBase *alba_event)
     switch(e->GetId())
     {
       case ID_NodesFileName:
-        // this->SetNodesFileName(m_NodesFileName.GetCStr());       
-      break;
       case ID_ElementsFileName:
-        // this->SetElementsFileName(m_ElementsFileName.GetCStr());
+			case ID_MaterialsFileName:
       break;
+			case ID_Simplified_Format:
+				m_Gui->Enable(ID_MaterialsFileName, !m_SimplifiedFormat);
+			break;
       case wxOK:
       {
         this->Read();

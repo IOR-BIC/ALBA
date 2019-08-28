@@ -1,18 +1,15 @@
 /*=========================================================================
-
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaWizardWaitOpTest
  Authors: Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
-
-
+ 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+ =========================================================================*/
 
 #include "albaDefines.h"
 //----------------------------------------------------------------------------
@@ -120,8 +117,7 @@
 #include "albaServiceLocator.h"
 
 //Main Test Executor
-int
-	main( int argc, char* argv[] )
+int	main( int argc, char* argv[] )
 {
 	// Create log of VTK error messages
 	vtkALBASmartPointer<vtkFileOutputWindow> log;
@@ -238,4 +234,3 @@ int
 	outputter.write(); 
  	return result.wasSuccessful() ? 0 : 1;
 }
-

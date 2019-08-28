@@ -3076,7 +3076,7 @@ bool vtkALBAPolyDataNavigator::ChangePointIdInCell(vtkPolyData *polydata, int ce
   vtkCell *cell = polydata->GetCell(cellId) ; // probably very inefficient !
   int n = cell->GetNumberOfPoints() ;
 
-  int *ptIds = new int[n] ;
+	vtkIdType *ptIds = new vtkIdType[n] ;
   for (int i = 0 ;  i < n ;  i++){
     int id = cell->GetPointId(i) ;
     if (id == idold){

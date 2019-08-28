@@ -107,11 +107,10 @@ int albaVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGri
 {
   // check this is a valid nodes id field data: 
   vtkIntArray *nodesIDArray = vtkIntArray::SafeDownCast(inputUGrid->GetPointData()->GetArray("Id"));
-  if(nodesIDArray)
-  {
+  
+	if(nodesIDArray==NULL)
     nodesIDArray = vtkIntArray::SafeDownCast(inputUGrid->GetPointData()->GetArray("id"));
-  }
-
+  
   vtkIntArray *syntheticNodesIDArray = NULL;
 
   if (nodesIDArray == NULL)

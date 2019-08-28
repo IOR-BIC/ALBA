@@ -59,8 +59,6 @@ public:
   void SetElementsFileName(const char *name)   {this->m_ElementsFileName = name;};
   const char *GetElementsFileName() {return this->m_ElementsFileName;};
 
-  void SetMode(int mode){}
-
   /** Builds operation's interface. */
 	void OpRun();
 
@@ -77,8 +75,11 @@ protected:
 
   /** Nodes file name*/
   albaString m_NodesFileName;
-
-  /** Elements file name*/
+	/** Elements file name*/
   albaString m_ElementsFileName;
+	/** Materials file name*/
+  albaString m_MaterialsFileName;
+
+	int m_SimplifiedFormat;
 };
 #endif

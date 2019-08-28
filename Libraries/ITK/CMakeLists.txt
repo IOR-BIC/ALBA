@@ -1,4 +1,3 @@
-#
 # Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 1.2

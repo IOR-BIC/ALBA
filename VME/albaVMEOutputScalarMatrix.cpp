@@ -154,7 +154,7 @@ void albaVMEOutputScalarMatrix::UpdateVTKRepresentation()
         }
         num_of_points = vz.size();
       }
-      int pointId[2];
+			vtkIdType pointId[2];
       int progress_point = 0;
       double time_point = GetTimeStamp();
       double x_coord, y_coord, z_coord;

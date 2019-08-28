@@ -117,10 +117,7 @@ albaViewArbitraryOrthoSlice::~albaViewArbitraryOrthoSlice()
 {
 	for(int i=X;i<=Z;i++)
 	{
-// 		cppDEL(m_GizmoRT[i]);
-// 		albaDEL(m_Slicer[i]);
 		albaDEL(m_SlicerResetMatrix[i]);
-// 		albaDEL(m_CameraConeVME[i]);
 		delete(m_CameraToSlicer[i]);
 	}
 }

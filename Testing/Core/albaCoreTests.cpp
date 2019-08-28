@@ -1,5 +1,4 @@
 /*=========================================================================
-
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaWizardWaitOpTest
  Authors: Gianluigi Crimi
@@ -7,11 +6,9 @@
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
 
-
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notice for more information.
-
 =========================================================================*/
 
 #include "albaDefines.h"
@@ -101,10 +98,8 @@ albaVMEHelper::albaVMEHelper()
 	SetOutput(output);
 }
 
-
 //----------------------------------------------------------------------------
 void DummyObserver::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
@@ -115,7 +110,6 @@ void DummyObserver::OnEvent(albaEventBase *alba_event)
 
 //----------------------------------------------------------------------------
 DummyObserver::~DummyObserver()
-//----------------------------------------------------------------------------
 {
 	for(int i=0;i<m_ListEvent.size();i++)
 	{
@@ -124,20 +118,16 @@ DummyObserver::~DummyObserver()
 	m_ListEvent.clear();
 }
 
-
 //----------------------------------------------------------------------------
 albaOpDummyHelper::albaOpDummyHelper(wxString label,  bool canundo, int opType, bool inputPreserving)
-//----------------------------------------------------------------------------
 {
 	m_Canundo = canundo;
 	m_OpType = opType;
 	m_InputPreserving = inputPreserving;
 }
 
-
 //----------------------------------------------------------------------------
 bool RemoveDir(const char *dirName)
-//----------------------------------------------------------------------------
 {
 	wxArrayString filenameArray;
 	wxDir::GetAllFiles(dirName,&filenameArray);
@@ -155,12 +145,11 @@ bool RemoveDir(const char *dirName)
 	}
 
 	return true;
-
 }
 
+//----------------------------------------------------------------------------
 //Main Test Executor
-int
-main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 	// Create log of VTK error messages
 	vtkALBASmartPointer<vtkFileOutputWindow> log;
@@ -248,4 +237,3 @@ main(int argc, char* argv[])
 
 	return result.wasSuccessful() ? 0 : 1;
 }
-
