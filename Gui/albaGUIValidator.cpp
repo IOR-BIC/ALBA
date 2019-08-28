@@ -1047,7 +1047,11 @@ void albaGUIValidator::OnButton(wxCommandEvent& event)
       break;
       case VAL_DIROPEN:
       {
-        wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
+				if (wxDirExists(m_MafStringVar->GetCStr()))
+					path = m_MafStringVar->GetCStr();
+				else
+					wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
+
         wxDirDialog dialog(m_Button,"", path, 0, m_Button->GetPosition());
 				dialog.SetReturnCode(wxID_OK);
 				ret_code = dialog.ShowModal();

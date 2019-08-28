@@ -40,7 +40,7 @@ public:
   
   albaTypeMacro(albaOpExporterDicom, albaOp);
 
-  albaOp* Copy();
+  virtual albaOp* Copy();
 	void OnEvent(albaEventBase *alba_event);
 
 	/** Return true for the acceptable vme type. */
@@ -70,7 +70,7 @@ protected:
 
 	void ScaleIntToUShortScalars(int * from, unsigned short *to, int scalarShift, int imgDim);
 
-	void ScaleIntToShortScalars(int * from, unsigned short *to, int imgDim);
+	void ScaleIntToShortScalars(int * from, short *to, int imgDim);
 
 	void ScaleUIntToUShortScalars(unsigned int * from, unsigned short *to, int scalarShift, int imgDim);
 
@@ -93,5 +93,9 @@ protected:
 	albaString m_ManufacturersModelName;
 
 	
+private:
+
+	template<typename InDataType, typename OutDataType>
+	void ScalarScale(InDataType from, OutDataType to, int imgDim, int scalarShift=0);
 };
 #endif

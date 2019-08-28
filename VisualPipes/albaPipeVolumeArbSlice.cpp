@@ -260,7 +260,7 @@ void albaPipeVolumeArbSlice::CreateTICKs()
 	vtkPolyData  *CTLinesPD      = vtkPolyData::New();	
 	vtkPoints    *CTLinesPoints  = vtkPoints::New();	
 	vtkCellArray *CTCells        = vtkCellArray::New();
-	int points_id[2];    
+	vtkIdType points_id[2];
 	int	counter = 0;
 
 	vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();

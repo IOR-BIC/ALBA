@@ -221,7 +221,7 @@ void vtkALBASimpleRulerActor2D::RulerCreate()
   double m0 = Margin;
   double m1 = Margin - 2;
 
-  int i, id=0, cp[2];
+	vtkIdType i, id=0, cp[2];
   for(i=0; i<Ntick; i++)
 	{
 			Points->SetPoint(id,     i, m0,	0);
@@ -332,8 +332,8 @@ void vtkALBASimpleRulerActor2D::CreateFixedTick()
 	vtkCellArray  *fixedTick_CellArray = vtkCellArray::New();
 	fixedTick_CellArray->Allocate(fixedTick_CellArray->EstimateSize(nSegments, 2));
 
-	int id = 0;
-	int cp[2];
+	vtkIdType id = 0;
+	vtkIdType cp[2];
 
 	for (int i = 0; i < nSegments; i++)
 	{
