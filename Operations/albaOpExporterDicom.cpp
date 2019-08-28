@@ -292,47 +292,47 @@ void albaOpExporterDicom::ExportDicom()
 		switch (volume->GetPointData()->GetScalars()->GetDataType())
 		{
 			case VTK_CHAR:
-				pixelSize = sizeof(char);
-				buffer = (char *)start + imgDim*i;
+				pixelSize = sizeof(INT8);
+				buffer = (INT8 *)start + imgDim*i;
 				im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::INT8);
-				break ;
+				break;
 			case VTK_UNSIGNED_CHAR:
-				pixelSize = sizeof(unsigned char);
-				buffer = (unsigned char *)start + imgDim*i;
+				pixelSize = sizeof(UINT8);
+				buffer = (UINT8 *)start + imgDim*i;
 				im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::UINT8);
 				break;
 			case VTK_SHORT:
-				pixelSize = sizeof(short);
-				buffer = (short *)start + imgDim*i;
+				pixelSize = sizeof(INT16);
+				buffer = (INT16 *)start + imgDim*i;
 				im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::INT16);
 				break;
 			case VTK_UNSIGNED_SHORT:
-				pixelSize = sizeof(unsigned short);
-				buffer = (unsigned short *)start + imgDim*i;
+				pixelSize = sizeof(UINT16);
+				buffer = (UINT16 *)start + imgDim*i;
 				im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::UINT16);
 				break;
 			case VTK_INT:
 				if (sr[0] >= -32768 && sr[1] <= 32767)
 				{
-					buffer = new short[imgDim];
-					pixelSize = sizeof(short);
+					buffer = new INT16[imgDim];
+					pixelSize = sizeof(INT16);
 					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::INT16);
 					rescaled = true;
-					ScaleIntToShortScalars((int *)start + imgDim*i, (unsigned short *)buffer, imgDim);
+					ScalarScale((int *)start + imgDim*i, (INT16 *)buffer, imgDim);
 				}
 				else if (scalarSpan <= 65535)
 				{
-					buffer = new unsigned short[imgDim];
-					pixelSize = sizeof(unsigned short);
+					buffer = new UINT16[imgDim];
+					pixelSize = sizeof(UINT16);
 					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::UINT16);
 					scalarShift = -sr[0];
 					rescaled = true;
 					im->SetIntercept(-scalarShift);
-					ScaleIntToUShortScalars((int *)start + imgDim*i,(unsigned short *) buffer, scalarShift, imgDim);
+					ScalarScale((int *)start + imgDim*i, (unsigned short *)buffer, imgDim, scalarShift);
 				}
 				else
 				{
-					pixelSize = sizeof(int);
+					pixelSize = sizeof(INT32);
 					buffer = (int *)start + imgDim*i;
 					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::INT32);
 				}
@@ -340,41 +340,120 @@ void albaOpExporterDicom::ExportDicom()
 			case VTK_UNSIGNED_INT:
 				if (sr[1] <= 65535)
 				{
-					buffer = new short[imgDim];
-					pixelSize = sizeof(short);
+					buffer = new INT16[imgDim];
+					pixelSize = sizeof(INT16);
 					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::INT16);
 					rescaled = true;
-					ScaleUIntToUShortScalars((unsigned int *)start + imgDim*i, (unsigned short *)buffer, 0, imgDim);
+					ScalarScale((unsigned int *)start + imgDim*i, (unsigned short *)buffer, imgDim);
 				}
 				else if (scalarSpan <= 65535)
 				{
-					buffer = new unsigned short[imgDim];
-					pixelSize = sizeof(unsigned short);
+					buffer = new UINT16[imgDim];
+					pixelSize = sizeof(UINT16);
 					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::UINT16);
 					scalarShift = -sr[0];
 					rescaled = true;
 					im->SetIntercept(-scalarShift);
-					ScaleUIntToUShortScalars((unsigned int *)start + imgDim*i, (unsigned short *)buffer, scalarShift, imgDim);
+					ScalarScale((unsigned int *)start + imgDim*i, (unsigned short *)buffer, imgDim, scalarShift);
 				}
 				else
 				{
-					pixelSize = sizeof(unsigned int);
-					buffer = (unsigned int *)start + imgDim*i;
+					pixelSize = sizeof(UINT32);
+					buffer = (UINT32 *)start + imgDim*i;
 					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::UINT32);
 				}
 				break;
 			case VTK_FLOAT:
-				pixelSize = sizeof(float);
-				buffer = (float *)start + imgDim*i;
-				im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::FLOAT32);
+				if (sr[0] >= -32768 && sr[1] <= 32767)
+				{
+					buffer = new INT16[imgDim];
+					pixelSize = sizeof(INT16);
+					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::INT16);
+					rescaled = true;
+					ScalarScale((float *)start + imgDim*i, (INT16 *)buffer, imgDim);
+				}
+				else if (scalarSpan <= 65535)
+				{
+					buffer = new UINT16[imgDim];
+					pixelSize = sizeof(UINT16);
+					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::UINT16);
+					scalarShift = -sr[0];
+					rescaled = true;
+					im->SetIntercept(-scalarShift);
+					ScalarScale((float *)start + imgDim*i, (UINT16 *)buffer, imgDim, scalarShift);
+				}
+				else if (sr[0] >= -2147483648 && sr[1] <= 2147483647)
+				{
+					buffer = new INT32[imgDim];
+					pixelSize = sizeof(INT32);
+					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::INT32);
+					rescaled = true;
+					ScalarScale((float *)start + imgDim*i, (INT32 *)buffer, imgDim);
+				}
+				else if (scalarSpan <= 4294967295)
+				{
+					buffer = new UINT32[imgDim];
+					pixelSize = sizeof(UINT32);
+					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::UINT32);
+					scalarShift = -sr[0];
+					rescaled = true;
+					im->SetIntercept(-scalarShift);
+					ScalarScale((float *)start + imgDim*i, (UINT32 *)buffer, imgDim, scalarShift);
+				}
+				else
+				{
+					albaErrorMessage("Cannot save a Dicom from this Volume");
+					return;
+				}
 				break;
-			case VTK_DOUBLE: 
-				pixelSize = sizeof(double);
-				buffer = (double *)start + imgDim*i;
-				im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::FLOAT64);
+			case VTK_DOUBLE:
+				if (sr[0] >= -32768 && sr[1] <= 32767)
+				{
+					buffer = new INT16[imgDim];
+					pixelSize = sizeof(INT16);
+					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::INT16);
+					rescaled = true;
+					ScalarScale((double *)start + imgDim*i, (INT16 *)buffer, imgDim);
+				}
+				else if (scalarSpan <= 65535)
+				{
+					buffer = new UINT16[imgDim];
+					pixelSize = sizeof(UINT16);
+					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::UINT16);
+					scalarShift = -sr[0];
+					rescaled = true;
+					im->SetIntercept(-scalarShift);
+					ScalarScale((double *)start + imgDim*i, (UINT16 *)buffer, imgDim, scalarShift);
+				}
+				else if (sr[0] >= -2147483648 && sr[1] <= 2147483647)
+				{
+					buffer = new INT32[imgDim];
+					pixelSize = sizeof(INT32);
+					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::INT32);
+					rescaled = true;
+					ScalarScale((double *)start + imgDim*i, (INT32 *)buffer, imgDim);
+				}
+				else if (scalarSpan <= 4294967295)
+				{
+					buffer = new UINT32[imgDim];
+					pixelSize = sizeof(UINT32);
+					im->GetPixelFormat().SetScalarType(gdcm::PixelFormat::ScalarType::UINT32);
+					scalarShift = -sr[0];
+					rescaled = true;
+					im->SetIntercept(-scalarShift);
+					ScalarScale((double *)start + imgDim*i, (UINT32 *)buffer, imgDim, scalarShift);
+				}
+				else
+				{
+					albaErrorMessage("Cannot save a Dicom from this Volume");
+					return;
+				}
 				break;
 			default:
-				return;
+				{
+					albaErrorMessage("Cannot save a Dicom from this Volume");
+					return;
+				}
 		}
 
 		long size = imgDim * pixelSize;
@@ -496,22 +575,10 @@ albaGUIDicomSettings* albaOpExporterDicom::GetSetting()
 }
 
 //----------------------------------------------------------------------------
-void albaOpExporterDicom::ScaleIntToUShortScalars(int * from,unsigned short *to, int scalarShift, int imgDim)
+template<typename InDataType, typename OutDataType>
+void albaOpExporterDicom::ScalarScale(InDataType from, OutDataType to, int imgDim, int scalarShift/*=0*/)
 {
 	for (int i = 0; i < imgDim; i++)
 		to[i] = from[i] + scalarShift;
 }
 
-//----------------------------------------------------------------------------
-void albaOpExporterDicom::ScaleIntToShortScalars(int * from, unsigned short *to, int imgDim)
-{
-	for (int i = 0; i < imgDim; i++)
-		to[i] = from[i];
-}
-
-//----------------------------------------------------------------------------
-void albaOpExporterDicom::ScaleUIntToUShortScalars(unsigned int * from, unsigned short *to, int scalarShift, int imgDim)
-{
-	for (int i = 0; i < imgDim; i++)
-		to[i] = from[i] + scalarShift;
-}
