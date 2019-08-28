@@ -125,8 +125,8 @@ void albaOpExporterMesh::OnOK()
 
 	// Generate the three output files
 	wxString wxstr(m_File.GetCStr());
-	wxString wxname = wxstr.Before('.');
-	wxString wxextension = wxstr.After('.');
+	wxString wxname = wxstr.BeforeLast('.');
+	wxString wxextension = wxstr.AfterLast('.');
 
 	m_NodesFileName << wxname.c_str() << "_NODES." << wxextension.c_str();
 	m_ElementsFileName << wxname.c_str() << "_ELEMENTS." << wxextension.c_str();
