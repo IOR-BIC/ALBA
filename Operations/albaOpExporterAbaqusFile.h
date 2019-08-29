@@ -20,7 +20,6 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "albaOpExporterFEMCommon.h"
-#include "albaVMEMesh.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkIntArray.h"
 #include <map>
@@ -28,10 +27,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaVME;
-class albaVMEMesh;
-class albaEvent;
-class albaProgressBarHelper;
+
 
 #define MAX_ELEMENT_NODES 10
 
@@ -48,11 +44,6 @@ public:
     
   albaOp* Copy();
 
-    /** Apply vme abs matrix to data geometry */
-  void ApplyABSMatrixOn() {m_ABSMatrixFlag = 1;};
-  void ApplyABSMatrixOff() {m_ABSMatrixFlag = 0;};
-  void SetApplyABSMatrix(int apply_matrix) {m_ABSMatrixFlag = apply_matrix;};
-
   /** Set/Get output file name*/
   void SetOutputFileName(const char *outputFileName) {m_AbaqusOutputFileNameFullPath = outputFileName;};
   const char *GetOutputFileName() {return m_AbaqusOutputFileNameFullPath.c_str();};
@@ -63,16 +54,9 @@ public:
   virtual void OnEvent(albaEventBase *alba_event);
 
 	void UpdateGui();
-
-  /** Return true for the acceptable vme type. */
-  bool Accept(albaVME *node);
-
+	 
   /** Builds operation's interface. */
 	void OpRun();
-
-  /** Return the "pid" of the wxExecute() ansysWriter.py process; use only for debugging
-  purposes */
-  long GetPid();
 
 protected:
 
@@ -92,10 +76,6 @@ protected:
   int WriteElementsFile(FILE *file);
   int WriteMaterialsFile(FILE *file);  
 
-  albaProgressBarHelper *m_ProgressHelper;
-  float m_TotalElements;
-  long m_CurrentProgress;
-
   int m_IntCharSize;
   
   wxString m_AbaqusOutputFileNameFullPath;
@@ -105,10 +85,6 @@ protected:
 
   /** Abaqus input file name */
   albaString m_AbaqusInputFileName;
-
-  int m_ABSMatrixFlag;
-
-  long m_Pid;  
 
   enum ABAQUS_EXPORTER_ID
   {

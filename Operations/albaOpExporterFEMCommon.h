@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 #include "albaDefines.h"
 #include "albaOp.h"
+#include "albaVMEMesh.h"
 
 #include "vtkUnstructuredGrid.h"
 #include "vtkIntArray.h"
@@ -30,6 +31,9 @@ PURPOSE.  See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
+class albaVME;
+class albaEvent;
+class albaProgressBarHelper;
 
 // Element Properties: element ID, density, Young Module
 typedef struct
@@ -61,7 +65,13 @@ class ALBA_EXPORT albaOpExporterFEMCommon : public albaOp
 public:
 		
 	albaOpExporterFEMCommon(const wxString &label = "albaOpExporterFEMCommon");
-	~albaOpExporterFEMCommon(); 
+	~albaOpExporterFEMCommon();
+
+	/** Apply vme abs matrix to data geometry */
+	void ApplyABSMatrixOn() { m_ABSMatrixFlag = 1; };
+	void ApplyABSMatrixOff() { m_ABSMatrixFlag = 0; };
+	void SetApplyABSMatrix(int apply_matrix) { m_ABSMatrixFlag = apply_matrix; };
+
 
 	albaTypeMacro(albaOpExporterFEMCommon, albaOp);
 
@@ -97,7 +107,9 @@ protected:
 	/** Static function witch compares two ElementProps used for qsort in decreasing order */
 	static int compareE(const void *p1, const void *p2);
 	
-private:
+	albaProgressBarHelper *m_ProgressHelper;
+	float m_TotalElements;
+	long m_CurrentProgress;
 
 	vtkFieldData *m_MaterialData;
 	vtkIdType *m_MatIdArray;
@@ -106,7 +118,8 @@ private:
 
 	// Advanced Configuration
 	int m_DensitySelection;
-
+	int m_ABSMatrixFlag;
+	
 	albaString m_FrequencyFileName;
 	FILE *m_Freq_fp;
 };

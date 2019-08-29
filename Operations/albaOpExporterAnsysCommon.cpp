@@ -68,12 +68,10 @@ albaOpExporterFEMCommon(label)
 {
   m_OpType  = OPTYPE_EXPORTER;
   m_Canundo = true;
-  m_ImporterType = 0;
-
+  
   m_AnsysOutputFileNameFullPath		= "";
 	wxStandardPaths std_paths;
 
-  m_Pid = -1;
   m_ABSMatrixFlag = 1;
 }
 //----------------------------------------------------------------------------
@@ -82,11 +80,6 @@ albaOpExporterAnsysCommon::~albaOpExporterAnsysCommon()
 
 }
 
-//----------------------------------------------------------------------------
-bool albaOpExporterAnsysCommon::Accept(albaVME *node)
-{
-  return (node->IsA("albaVMEMesh"));
-}
 //----------------------------------------------------------------------------
 void albaOpExporterAnsysCommon::OpRun()   
 {
@@ -223,12 +216,6 @@ int albaOpExporterAnsysCommon::compareElem(const void *p1, const void *p2)
 				assert(0); //two elements have the same element ID
 		}
   }
-}
-
-//----------------------------------------------------------------------------
-long albaOpExporterAnsysCommon::GetPid()   
-{
-  return m_Pid;
 }
 
 //---------------------------------------------------------------------------

@@ -77,7 +77,6 @@ albaOpExporterAbaqusFile::albaOpExporterAbaqusFile(const wxString &label) :
   m_AbaqusOutputFileNameFullPath		= "";
   wxStandardPaths std_paths;
 
-  m_Pid = -1;
   m_ABSMatrixFlag = 1;
 	m_EnableBackCalculation = 1;
 }
@@ -104,11 +103,7 @@ albaOp* albaOpExporterAbaqusFile::Copy()
   albaOpExporterAbaqusFile *cp = new albaOpExporterAbaqusFile(m_Label);
   return cp;
 }
-//----------------------------------------------------------------------------
-bool albaOpExporterAbaqusFile::Accept(albaVME *node)
-{
-  return (node->IsA("albaVMEMesh"));
-}
+
 //----------------------------------------------------------------------------
 void albaOpExporterAbaqusFile::OpRun()   
 {
@@ -319,11 +314,6 @@ int albaOpExporterAbaqusFile::compareElem(const void *p1, const void *p2)
   }
 }
 
-//----------------------------------------------------------------------------
-long albaOpExporterAbaqusFile::GetPid()   
-{
-  return m_Pid;
-}
 
 //---------------------------------------------------------------------------
 int albaOpExporterAbaqusFile::Write()

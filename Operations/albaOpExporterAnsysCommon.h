@@ -29,10 +29,6 @@ PURPOSE.  See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaVME;
-class albaVMEMesh;
-class albaEvent;
-class albaProgressBarHelper;
 
 typedef struct ExportElementStruct
 {
@@ -57,11 +53,6 @@ public:
 	albaAbstractTypeMacro(albaOpExporterAnsysCommon, albaOpExporterFEMCommon);
 
 	
-  /** Apply vme abs matrix to data geometry */
-  void ApplyABSMatrixOn() {m_ABSMatrixFlag = 1;};
-  void ApplyABSMatrixOff() {m_ABSMatrixFlag = 0;};
-  void SetApplyABSMatrix(int apply_matrix) {m_ABSMatrixFlag = apply_matrix;};
-
   /** Set/Get output file name*/
   void SetOutputFileName(const char *outputFileName) {m_AnsysOutputFileNameFullPath = outputFileName;};
   const char *GetOutputFileName() {return m_AnsysOutputFileNameFullPath.c_str();};
@@ -71,15 +62,9 @@ public:
 
   virtual void OnEvent(albaEventBase *alba_event);
 
-  /** Return true for the acceptable vme type. */
-  bool Accept(albaVME *node);
-
   /** Builds operation's interface. */
 	void OpRun();
-
-  /** Return the "pid" of the wxExecute() ansysWriter.py process; use only for debugging
-  purposes */
-  long GetPid();
+	
 
 protected:	
   virtual albaString GetWildcard() = 0;
@@ -97,24 +82,14 @@ protected:
 
 	static int compareElem(const void *p1, const void *p2);
 
-	albaProgressBarHelper *m_ProgressHelper;
 
   int m_IntCharSize;
 
-  float m_TotalElements;
-  long m_CurrentProgress;
-  long m_OperationProgress;
+	/** Ansys input file name */
+	wxString m_AnsysOutputFileNameFullPath;
 
-  wxString m_AnsysOutputFileNameFullPath;
-
-  int m_ImporterType;
-
-  /** Ansys input file name */
-  albaString m_AnsysInputFileName;
-
-  int m_ABSMatrixFlag;
-
-  long m_Pid;  
+	albaString m_FrequencyFileName;
+	FILE *m_Freq_fp;
 
   enum ANSYS_EXPORTER_ID
   {
