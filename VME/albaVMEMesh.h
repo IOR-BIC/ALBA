@@ -29,6 +29,55 @@ class vtkDataSet;
 class vtkUnstructuredGrid;
 class mmaMaterial;
 
+typedef struct configurationStruct
+{
+	//---------------------RhoQCTFromHU-----------------
+	/*rho = a + b * HU*/
+	double rhoIntercept;
+	double rhoSlope;
+
+	//---------------------RhoQCTFromHU-----------------
+	//rho calibration
+	int rhoCalibrationCorrectionIsActive;
+	int rhoCalibrationCorrectionType;
+
+	//---------------------RhoASHFromRhoQCT-----------------
+	//rho interval
+	double rhoQCT1, rhoQCT2;
+	//single interval rho calibration
+	double a_CalibrationCorrection, b_CalibrationCorrection;
+	//three intervals rho calibration
+	double a_RhoQCTLessThanRhoQCT1, b_RhoQCTLessThanRhoQCT1;
+	double a_RhoQCTBetweenRhoQCT1AndRhoQCT2, b_RhoQCTBetweenRhoQCT1AndRhoQCT2;
+	double a_RhoQCTBiggerThanRhoQCT2, b_RhoQCTBiggerThanRhoQCT2;
+
+	//---------------------RhoWetFromRhoAsh-----------------
+	int rhoWetConversionIsActive;
+	double a_rhoWet;
+
+	//---------------YoungModuleFromRho-----------------
+	int densityIntervalsNumber;
+	double rho1, rho2;
+	//single interval rho calibration
+	double a_OneInterval, b_OneInterval, c_OneInterval;
+	//three intervals rho calibration
+	double a_RhoLessThanRho1, b_RhoLessThanAsh1, c_RhoLessThanRho1;
+	double a_RhoBetweenRho1andRho2, b_RhoBetweenRho1andRho2, c_RhoBetweenRho1andRho2;
+	double a_RhoBiggerThanRho2, b_RhoBiggerThanRho2, c_RhoBiggerThanRho2;
+
+	double minElasticity;
+
+	//-------------Integration Parameters---------------
+	int m_IntegrationSteps;
+	int m_YoungModuleCalculationModality;
+
+	//---------------Advanced Parameters----------------
+	int m_DensityOutput;
+	double m_PoissonRatio;
+
+} BonematConfiguration;
+
+
 /** albaVMEMesh - A vme that can accept vtkUnstructuredGrid 
 dataset only. it's used to store finite element analysis
 data*/

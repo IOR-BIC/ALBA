@@ -34,21 +34,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaVMERoot.h"
 #include "albaVMESurface.h"
 
-//EXPORTERS
-#include "albaOpExporterAnsysCDBFile.h"
-#include "albaOpExporterAnsysInputFile.h"
-#include "albaOpExporterBmp.h"
-#include "albaOpExporterDicom.h"
-#include "albaOpExporterGRFWS.h"
-#include "albaOpExporterLandmark.h"
-#include "albaOpExporterMSF.h"
-#include "albaOpExporterMesh.h"
-#include "albaOpExporterMeters.h"
-#include "albaOpExporterRAW.h"
-#include "albaOpExporterSTL.h"
-#include "albaOpExporterVTK.h"
-#include "albaOpExporterWrappedMeter.h"
-
 //IMPORTERS
 #include "albaOpImporterASCII.h"
 #include "albaOpImporterAnalogWS.h"
@@ -69,6 +54,23 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpImporterSTL.h"
 #include "albaOpImporterVRML.h"
 #include "albaOpImporterVTK.h"
+#include "albaOpImporterAbaqusFile.h"
+
+//EXPORTERS
+#include "albaOpExporterAnsysCDBFile.h"
+#include "albaOpExporterAnsysInputFile.h"
+#include "albaOpExporterBmp.h"
+#include "albaOpExporterDicom.h"
+#include "albaOpExporterGRFWS.h"
+#include "albaOpExporterLandmark.h"
+#include "albaOpExporterMSF.h"
+#include "albaOpExporterMesh.h"
+#include "albaOpExporterMeters.h"
+#include "albaOpExporterRAW.h"
+#include "albaOpExporterSTL.h"
+#include "albaOpExporterVTK.h"
+#include "albaOpExporterWrappedMeter.h"
+#include "albaOpExporterAbaqusFile.h"
 
 // OPERATIONS
 #include "albaOp2DMeasure.h"
@@ -185,7 +187,6 @@ bool AlbaMaster::OnInit()
 #include "Examples/AlbaMaster/FRAME_ICON32x32.xpm"
 	albaADDPIC(FRAME_ICON32x32);
 #include "Examples/MedicalIcons/MDICHILD_ICON.xpm"
-
 	albaADDPIC(MDICHILD_ICON);
 
 	int result;
@@ -230,9 +231,10 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpImporterVTK("VTK"));
 	m_Logic->Plug(new albaOpImporterMSF("ALBA"));
 	m_Logic->Plug(new albaOpImporterMSF1x("MSF 1.x"));
-	m_Logic->Plug(new albaOpImporterMesh("Generic Mesh"), "Finite Element");
 	m_Logic->Plug(new albaOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
 	m_Logic->Plug(new albaOpImporterAnsysInputFile("Ansys Input File"), "Finite Element");
+	m_Logic->Plug(new albaOpImporterAbaqusFile("Abaqus File"), "Finite Element");
+	m_Logic->Plug(new albaOpImporterMesh("Generic Mesh"), "Finite Element");
 	m_Logic->Plug(new albaOpImporterASCII("ASCII"));
 
 	albaGUIDicomSettings *dicomSettings=new albaGUIDicomSettings(NULL,"DICOM");
@@ -261,7 +263,9 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpExporterMeters());
 	m_Logic->Plug(new albaOpExporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
 	m_Logic->Plug(new albaOpExporterAnsysInputFile("Ansys Input File"), "Finite Element");
+	m_Logic->Plug(new albaOpExporterAbaqusFile("Abaqus File"), "Finite Element");
 	m_Logic->Plug(new albaOpExporterMesh("Generic Mesh"), "Finite Element");
+	
 
 	//------------------------------------------------------------
 	// Operation Menu:
