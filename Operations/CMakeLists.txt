@@ -70,6 +70,9 @@ IF (ALBA_USE_VTK)
 	albaOpExporterAnsysInputFile.cpp	albaOpExporterAnsysInputFile.h
 	albaOpExporterAnsysCDBFile.cpp	albaOpExporterAnsysCDBFile.h
 	
+	albaOpImporterAbaqusFile.cpp	albaOpImporterAbaqusFile.h
+	albaOpExporterAbaqusFile.cpp	albaOpExporterAbaqusFile.h
+	
 	albaOpExporterDicom.cpp albaOpExporterDicom.h
 	
 	albaGeometryEditorPolylineGraph.cpp	albaGeometryEditorPolylineGraph.h
@@ -211,7 +214,7 @@ IF (ALBA_USE_BTK)
 ENDIF (ALBA_USE_BTK)
 
 
-ADD_DEPENDENCIES(${PROJECT_NAME} albaCommon vtkALBA albaService)
+ADD_DEPENDENCIES(${PROJECT_NAME} albaVME albaCommon vtkALBA albaService)
 
 IF (ALBA_USE_VTK)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_VTK_LIBRARY)
