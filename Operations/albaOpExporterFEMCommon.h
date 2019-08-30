@@ -2,7 +2,7 @@
 
 Program: ALBA
 Module: albaOpExporterFEMCommon.h
-Authors: Nicola Vanella
+Authors: Nicola Vanella, Gianluigi Crimi
 
 Copyright (c) BIC
 All rights reserved. See Copyright.txt or
@@ -63,17 +63,8 @@ enum DensitySelection
 class ALBA_EXPORT albaOpExporterFEMCommon : public albaOp
 {
 public:
-		
-	albaOpExporterFEMCommon(const wxString &label = "albaOpExporterFEMCommon");
-	~albaOpExporterFEMCommon();
 
-	/** Apply vme abs matrix to data geometry */
-	void ApplyABSMatrixOn() { m_ABSMatrixFlag = 1; };
-	void ApplyABSMatrixOff() { m_ABSMatrixFlag = 0; };
-	void SetApplyABSMatrix(int apply_matrix) { m_ABSMatrixFlag = apply_matrix; };
-
-
-	albaTypeMacro(albaOpExporterFEMCommon, albaOp);
+	albaAbstractTypeMacro(albaOpExporterFEMCommon, albaOp);
 
 	enum EXPORTER_FEM_ID
 	{
@@ -82,19 +73,57 @@ public:
 		ID_DENSITY_SELECTION,
 		ID_POISSON_RATIO,
 		ID_FREQUENCY_FILE_NAME,
-		MINID,
+		ID_ABS_MATRIX_TO_STL,
+		ID_ENABLE_BACKCALCULATION,
+		ID_MIN_ELASTICITY,
+		ID_RHO_DENSITY_INTERVALS_NUMBER,
+		ID_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_SINGLE_DENSITY_INTERVAL_0,
+		ID_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_SINGLE_DENSITY_INTERVAL_1,
+		ID_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_SINGLE_DENSITY_INTERVAL_2,
+		ID_DENSITY_ONE_INTERVAL_ROLLOUT,
+		ID_DENSITY_INTERVAL_0,
+		ID_DENSITY_INTERVAL_1,
+		ID_FIRST_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_0,
+		ID_FIRST_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_1,
+		ID_FIRST_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_2,
+		ID_SECOND_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_0,
+		ID_SECOND_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_1,
+		ID_SECOND_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_2,
+		ID_THIRD_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_0,
+		ID_THIRD_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_1,
+		ID_THIRD_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_2,
+		ID_DENSITY_THREE_INTERVALS_ROLLOUT,
+		MINID
 	};
+			
+	albaOpExporterFEMCommon(const wxString &label = "albaOpExporterFEMCommon");
+	~albaOpExporterFEMCommon();
 
+	/** Apply vme abs matrix to data geometry */
+	void ApplyABSMatrixOn() { m_ABSMatrixFlag = 1; };
+	void ApplyABSMatrixOff() { m_ABSMatrixFlag = 0; };
+	void SetApplyABSMatrix(int apply_matrix) { m_ABSMatrixFlag = apply_matrix; };
+
+	/** Return true for the acceptable vme type. */
+	bool Accept(albaVME *node);
+	
 	vtkIdType * GetMatIdArray();
 
 	vtkFieldData *GetMaterialData();
 
 	void SetDefaultFrequencyFile();
 
+	//----------------------------------------------------------------------------
+	virtual void OnEvent(albaEventBase *alba_event);
+
 protected:
 
+	virtual void OnOK() = 0;
+	
 	/** Create the dialog interface for the exporter. */
 	virtual void CreateGui();
+
+	void UpdateGui();
 
 	bool  HasMaterials();
 
@@ -106,6 +135,22 @@ protected:
 
 	/** Static function witch compares two ElementProps used for qsort in decreasing order */
 	static int compareE(const void *p1, const void *p2);
+
+	
+
+	int m_EnableBackCalculation;
+	bool m_HasConfiguration;
+
+	albaGUIRollOut *m_GuiRollOutDensityOneInterval;
+	albaGUIRollOut *m_GuiRollOutDensityThreeIntervals;
+
+	albaGUI *m_GuiASDensityOneInterval;
+	albaGUI *m_GuiASDensityThreeIntervals;
+
+	BonematConfiguration m_Configuration;
+
+	void LoadConfigurationTags();
+	double GetDoubleTag(wxString tagName);
 	
 	albaProgressBarHelper *m_ProgressHelper;
 	float m_TotalElements;

@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaOpExporterMesh
- Authors: Simone Brazzale, Nicola Vanella
+ Authors: Simone Brazzale, Nicola Vanella, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -62,17 +62,11 @@ public:
 
   /** Builds operation's interface. */
 	void OpRun();
-	
-	virtual void OnEvent(albaEventBase *alba_event);
-
+		
 	/** Export the mesh*/
 	int Write();
 
 protected:
-	/** Create the dialog interface for the importer. */
-	virtual void CreateGui();
-
-	void OpStop(int result);
 
 	void OnOK();
 

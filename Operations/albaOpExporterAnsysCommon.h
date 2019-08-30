@@ -2,7 +2,7 @@
 
 Program: ALBA
 Module: albaOpExporterAnsysCommon.h
-Authors: Nicola Vanella
+Authors: Nicola Vanella, Giangluigi Crimi
 
 Copyright (c) BIC
 All rights reserved. See Copyright.txt or
@@ -59,19 +59,13 @@ public:
 
   /** Export the input mesh by writing it in Ansys .inp format */
   virtual int Write() = 0;
-
-  virtual void OnEvent(albaEventBase *alba_event);
-
+	  
   /** Builds operation's interface. */
 	void OpRun();
 	
-
 protected:	
   virtual albaString GetWildcard() = 0;
 
-  /** Create the dialog interface for the importer. */
-  virtual void CreateGui();  
-  
 	void Init();
 	
 	void OpStop(int result);
@@ -90,11 +84,5 @@ protected:
 
 	albaString m_FrequencyFileName;
 	FILE *m_Freq_fp;
-
-  enum ANSYS_EXPORTER_ID
-  {
-    ID_ABS_MATRIX_TO_STL = MINID,  
-  };
-
 };
 #endif
