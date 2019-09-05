@@ -73,7 +73,7 @@ public:
 		ID_DENSITY_SELECTION,
 		ID_POISSON_RATIO,
 		ID_FREQUENCY_FILE_NAME,
-		ID_ABS_MATRIX_TO_STL,
+		ID_ABS_MATRIX,
 		ID_ENABLE_BACKCALCULATION,
 		ID_MIN_ELASTICITY,
 		ID_RHO_DENSITY_INTERVALS_NUMBER,
@@ -139,6 +139,8 @@ protected:
 	/** Calculates the density from the value of elasticity */
 	double DensityBackCalculation(double elasticity);
 	
+	/** extend this function to add exporter specific GUI */
+	virtual void AddSpecificGui() {};
 
 	int m_EnableBackCalculation;
 	bool m_HasConfiguration;

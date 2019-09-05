@@ -80,7 +80,7 @@ void albaOpExporterFEMCommon::CreateGui()
 	m_Gui = new albaGUI(this);
 
 	m_Gui->Label("Absolute matrix", true);
-	m_Gui->Bool(ID_ABS_MATRIX_TO_STL, "Apply", &m_ABSMatrixFlag, 0);
+	m_Gui->Bool(ID_ABS_MATRIX, "Apply", &m_ABSMatrixFlag, 0);
 	m_Gui->Divider(1);
 
 	bool hasMaterials = HasMaterials();
@@ -174,6 +174,8 @@ void albaOpExporterFEMCommon::CreateGui()
 
 		UpdateGui();
 	}
+
+	AddSpecificGui();
 	
 	m_Gui->Label("");
 	m_Gui->OkCancel();
