@@ -44,9 +44,6 @@ albaCxxTypeMacro(albaOpExporterMesh);
 albaOpExporterMesh::albaOpExporterMesh(const wxString &label) :
 	albaOpExporterFEMCommon(label)
 {
-  m_OpType  = OPTYPE_EXPORTER;
-  m_Canundo = true;
-
   m_NodesFileName = "";
   m_ElementsFileName = "";
   m_MaterialsFileName = "";
@@ -84,29 +81,6 @@ albaString albaOpExporterMesh::GetWildcard()
 }
 
 //----------------------------------------------------------------------------
-void albaOpExporterMesh::OnEvent(albaEventBase *alba_event)
-{
-	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-	{
-		switch (e->GetId())
-		{
-		case wxOK:
-		{
-			OnOK();
-		}
-		break;
-		case wxCANCEL:
-		{
-			this->OpStop(OP_RUN_CANCEL);
-		}
-		break;
-		default:
-			albaEventMacro(*e);
-			break;
-		}
-	}
-}
-//----------------------------------------------------------------------------
 void albaOpExporterMesh::OnOK()
 {
 	albaString wildcard = GetWildcard();
@@ -134,35 +108,6 @@ void albaOpExporterMesh::OnOK()
 
 	// Write to output
 	int result = Write();
-
-	if (result == ALBA_OK)
-	{
-		OpStop(OP_RUN_OK);
-	}
-	else
-	{
-		OpStop(OP_RUN_OK);
-	}
-}
-//----------------------------------------------------------------------------
-void albaOpExporterMesh::OpStop(int result)
-{
-	HideGui();
-	albaEventMacro(albaEvent(this, result));
-}
-
-//----------------------------------------------------------------------------
-void albaOpExporterMesh::CreateGui()
-{
-	Superclass::CreateGui();
-
-	m_Gui->OkCancel();
-	m_Gui->Divider();
-
-	m_Gui->FitGui();
-	m_Gui->Update();
-
-	ShowGui();
 }
 
 //----------------------------------------------------------------------------
