@@ -136,6 +136,8 @@ protected:
 	/** Static function witch compares two ElementProps used for qsort in decreasing order */
 	static int compareE(const void *p1, const void *p2);
 
+	/** Calculates the density from the value of elasticity */
+	double DensityBackCalculation(double elasticity);
 	
 
 	int m_EnableBackCalculation;

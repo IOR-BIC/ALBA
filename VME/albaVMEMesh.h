@@ -29,6 +29,12 @@ class vtkDataSet;
 class vtkUnstructuredGrid;
 class mmaMaterial;
 
+enum
+{
+	SINGLE_INTERVAL = 0,
+	THREE_INTERVALS = 1,
+};
+
 typedef struct configurationStruct
 {
 	//---------------------RhoQCTFromHU-----------------
@@ -61,7 +67,7 @@ typedef struct configurationStruct
 	//single interval rho calibration
 	double a_OneInterval, b_OneInterval, c_OneInterval;
 	//three intervals rho calibration
-	double a_RhoLessThanRho1, b_RhoLessThanAsh1, c_RhoLessThanRho1;
+	double a_RhoLessThanRho1, b_RhoLessThanRho1, c_RhoLessThanRho1;
 	double a_RhoBetweenRho1andRho2, b_RhoBetweenRho1andRho2, c_RhoBetweenRho1andRho2;
 	double a_RhoBiggerThanRho2, b_RhoBiggerThanRho2, c_RhoBiggerThanRho2;
 
