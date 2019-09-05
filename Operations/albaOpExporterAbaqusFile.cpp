@@ -4,7 +4,7 @@
   Language:  C++
   Date:      $Date: 2010-12-03 14:58:16 $
   Version:   $Revision: 1.1.1.1.2.3 $
-  Authors:   Nicola Vanella
+  Authors:   Nicola Vanella, Gianluigi Crimi
 ==========================================================================
 Copyright (c) BIC-IOR 2019 (https://github.com/IOR-BIC)
 
@@ -30,13 +30,10 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaDecl.h"
 #include "albaGUI.h"
 #include "albaSmartPointer.h"
-#include "albaTagItem.h"
-#include "albaTagArray.h"
 #include "albaVME.h"
 #include "albaVMEMesh.h"
 #include "albaVMEMeshAnsysTextExporter.h"
 #include "albaAbsMatrixPipe.h"
-#include "albaGUIRollOut.h"
 #include "albaProgressBarHelper.h"
 
 #include <iostream>
@@ -69,17 +66,11 @@ albaCxxTypeMacro(albaOpExporterAbaqusFile);
 albaOpExporterAbaqusFile::albaOpExporterAbaqusFile(const wxString &label) :
 	albaOpExporterFEMCommon(label)
 {
-  m_OpType  = OPTYPE_EXPORTER;
-  m_Canundo = true;
-  m_ImporterType = 0;
+	m_OpType = OPTYPE_EXPORTER;
+	m_Canundo = true;
+
   m_ImportedVmeMesh = NULL;
-
-  m_AbaqusOutputFileNameFullPath		= "";
-  wxStandardPaths std_paths;
-
-  m_Pid = -1;
-  m_ABSMatrixFlag = 1;
-	m_EnableBackCalculation = 1;
+	m_AbaqusOutputFileNameFullPath		= "";
 }
 //----------------------------------------------------------------------------
 albaOpExporterAbaqusFile::~albaOpExporterAbaqusFile()
@@ -104,11 +95,7 @@ albaOp* albaOpExporterAbaqusFile::Copy()
   albaOpExporterAbaqusFile *cp = new albaOpExporterAbaqusFile(m_Label);
   return cp;
 }
-//----------------------------------------------------------------------------
-bool albaOpExporterAbaqusFile::Accept(albaVME *node)
-{
-  return (node->IsA("albaVMEMesh"));
-}
+
 //----------------------------------------------------------------------------
 void albaOpExporterAbaqusFile::OpRun()   
 {
@@ -119,36 +106,6 @@ void albaOpExporterAbaqusFile::OpRun()
 albaString albaOpExporterAbaqusFile::GetWildcard()
 {
   return "inp files (*.inp)|*.inp|All Files (*.*)|*.*";
-}
-
-//----------------------------------------------------------------------------
-void albaOpExporterAbaqusFile::OnEvent(albaEventBase *alba_event) 
-{
-  if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-  {
-    switch(e->GetId())
-    {
-    case wxOK:
-      {
-        OnOK();
-        this->OpStop(OP_RUN_OK);
-      }
-      break;
-    case wxCANCEL:
-      {
-        this->OpStop(OP_RUN_CANCEL);
-      }
-      break;
-		case ID_ENABLE_BACKCALCULATION:
-		case ID_RHO_DENSITY_INTERVALS_NUMBER:
-		{
-			UpdateGui();
-		}
-    default:
-      albaEventMacro(*e);
-      break;
-    }	
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -171,126 +128,6 @@ void albaOpExporterAbaqusFile::OpStop(int result)
 {
   HideGui();
   albaEventMacro(albaEvent(this,result));        
-}
-
-//----------------------------------------------------------------------------
-void albaOpExporterAbaqusFile::CreateGui()
-{
-	Superclass::CreateGui();
-
-	m_Gui->Divider(2);
-
-  m_Gui->Label("Absolute matrix",true);
-  m_Gui->Bool(ID_ABS_MATRIX_TO_STL,"Apply",&m_ABSMatrixFlag,0);
-	m_Gui->Divider(1);
-
-	LoadConfigurationTags();
-
-	if (m_HasConfiguration)
-	{
-		m_Gui->Label("Back Calculation", true);
-		m_Gui->Bool(ID_ENABLE_BACKCALCULATION, "Enable", &m_EnableBackCalculation);
-
-		//////////////////////////////////////////////////////////////////////////
-		// Density - Elasticity
-		m_Gui->Label("Density-elasticity relationship", true);
-		m_Gui->Label("E = a + b * Rho^c", false);
-
-		m_Gui->Label("Minimum Elasticity Modulus", false);
-		m_Gui->Double(ID_MIN_ELASTICITY, "", &m_Configuration.minElasticity);
-		m_Gui->Divider();
-		m_Gui->Divider();
-		m_Gui->Divider();
-
-		const wxString densityChoices[] = { "Single interval", "Three intervals" };
-		m_Gui->Combo(ID_RHO_DENSITY_INTERVALS_NUMBER, "", &m_Configuration.densityIntervalsNumber, 2, densityChoices);
-
-		m_GuiASDensityOneInterval = new albaGUI(this);
-
-		m_GuiASDensityOneInterval->Double(ID_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_SINGLE_DENSITY_INTERVAL_0, "a", &m_Configuration.a_OneInterval);
-		m_GuiASDensityOneInterval->Double(ID_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_SINGLE_DENSITY_INTERVAL_1, "b", &m_Configuration.b_OneInterval);
-		m_GuiASDensityOneInterval->Double(ID_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_SINGLE_DENSITY_INTERVAL_2, "c", &m_Configuration.c_OneInterval);
-
-		m_GuiRollOutDensityOneInterval = m_Gui->RollOut(ID_DENSITY_ONE_INTERVAL_ROLLOUT, _("Single interval"), m_GuiASDensityOneInterval);
-
-		m_Gui->Divider();
-
-		m_GuiASDensityThreeIntervals = new albaGUI(this);
-
-		m_GuiASDensityThreeIntervals->Double(ID_DENSITY_INTERVAL_0, "Rho1", &m_Configuration.rho1);
-		m_GuiASDensityThreeIntervals->Double(ID_DENSITY_INTERVAL_1, "Rho2", &m_Configuration.rho2);
-
-		m_GuiASDensityThreeIntervals->Label("Rho < Rho1");
-		m_GuiASDensityThreeIntervals->Double(ID_FIRST_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_0, "a", &m_Configuration.a_RhoLessThanRho1);
-		m_GuiASDensityThreeIntervals->Double(ID_FIRST_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_1, "b", &m_Configuration.b_RhoLessThanAsh1);
-		m_GuiASDensityThreeIntervals->Double(ID_FIRST_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_2, "c", &m_Configuration.c_RhoLessThanRho1);
-
-		m_GuiASDensityThreeIntervals->Label("Rho1 <= Rho <= Rho2");
-		m_GuiASDensityThreeIntervals->Double(ID_SECOND_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_0, "a", &m_Configuration.a_RhoBetweenRho1andRho2);
-		m_GuiASDensityThreeIntervals->Double(ID_SECOND_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_1, "b", &m_Configuration.b_RhoBetweenRho1andRho2);
-		m_GuiASDensityThreeIntervals->Double(ID_SECOND_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_2, "c", &m_Configuration.c_RhoBetweenRho1andRho2);
-
-		m_GuiASDensityThreeIntervals->Label("Rho > Rho2");
-		m_GuiASDensityThreeIntervals->Double(ID_THIRD_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_0, "a", &m_Configuration.a_RhoBiggerThanRho2);
-		m_GuiASDensityThreeIntervals->Double(ID_THIRD_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_1, "b", &m_Configuration.b_RhoBiggerThanRho2);
-		m_GuiASDensityThreeIntervals->Double(ID_THIRD_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_2, "c", &m_Configuration.c_RhoBiggerThanRho2);
-
-		m_GuiASDensityThreeIntervals->Divider(2);
-
-		//   EnableTwoIntervals(true);
-
-		m_GuiASDensityThreeIntervals->Enable(ID_DENSITY_INTERVAL_0, true);
-		m_GuiASDensityThreeIntervals->Enable(ID_DENSITY_INTERVAL_1, true);
-
-		m_GuiASDensityThreeIntervals->Enable(ID_RHO_DENSITY_INTERVALS_NUMBER, true);
-
-		m_GuiRollOutDensityThreeIntervals = m_Gui->RollOut(ID_DENSITY_THREE_INTERVALS_ROLLOUT, _("Three intervals"), m_GuiASDensityThreeIntervals);
-
-		UpdateGui();
-	}
-	//////////////////////////////////////////////////////////////////////////
-	
-  m_Gui->OkCancel();  
-  m_Gui->Divider();
-
-  ShowGui();
-}
-
-//----------------------------------------------------------------------------
-void albaOpExporterAbaqusFile::UpdateGui()
-{
-	bool enable = m_EnableBackCalculation == 1;
-
-	m_Gui->Enable(ID_MIN_ELASTICITY, enable);
-	m_Gui->Enable(ID_RHO_DENSITY_INTERVALS_NUMBER, enable);
-	m_Gui->Enable(ID_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_SINGLE_DENSITY_INTERVAL_0, enable);
-	m_Gui->Enable(ID_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_SINGLE_DENSITY_INTERVAL_1, enable);
-	m_Gui->Enable(ID_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_SINGLE_DENSITY_INTERVAL_2, enable);
-	m_Gui->Enable(ID_DENSITY_ONE_INTERVAL_ROLLOUT, enable);
-	m_Gui->Enable(ID_DENSITY_INTERVAL_0, enable);
-	m_Gui->Enable(ID_DENSITY_INTERVAL_1, enable);
-	m_Gui->Enable(ID_FIRST_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_0, enable);
-	m_Gui->Enable(ID_FIRST_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_1, enable);
-	m_Gui->Enable(ID_FIRST_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_2, enable);
-	m_Gui->Enable(ID_SECOND_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_0, enable);
-	m_Gui->Enable(ID_SECOND_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_1, enable);
-	m_Gui->Enable(ID_SECOND_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_2, enable);
-	m_Gui->Enable(ID_THIRD_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_0, enable);
-	m_Gui->Enable(ID_THIRD_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_1, enable);
-	m_Gui->Enable(ID_THIRD_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_2, enable);
-	m_Gui->Enable(ID_DENSITY_THREE_INTERVALS_ROLLOUT, enable);
-
-	m_GuiRollOutDensityOneInterval->RollOut(m_Configuration.densityIntervalsNumber == 0 && enable ? true : false);
-	m_Gui->Enable(ID_DENSITY_ONE_INTERVAL_ROLLOUT, m_Configuration.densityIntervalsNumber == 0 && enable ? true : false);
-
-	m_GuiRollOutDensityThreeIntervals->RollOut(m_Configuration.densityIntervalsNumber == 1 && enable ? true : false);
-	m_Gui->Enable(ID_DENSITY_THREE_INTERVALS_ROLLOUT, m_Configuration.densityIntervalsNumber == 1 && enable ? true : false);
-
-	m_GuiASDensityOneInterval->Update();
-	m_GuiASDensityThreeIntervals->Update();
-
-	m_Gui->FitGui();
-	m_Gui->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -319,11 +156,6 @@ int albaOpExporterAbaqusFile::compareElem(const void *p1, const void *p2)
   }
 }
 
-//----------------------------------------------------------------------------
-long albaOpExporterAbaqusFile::GetPid()   
-{
-  return m_Pid;
-}
 
 //---------------------------------------------------------------------------
 int albaOpExporterAbaqusFile::Write()
@@ -694,85 +526,4 @@ int albaOpExporterAbaqusFile::WriteMaterialsFile(FILE *file)
   }  
 
   return ALBA_OK;
-}
-
-//----------------------------------------------------------------------------
-void albaOpExporterAbaqusFile::LoadConfigurationTags()
-{
-	m_HasConfiguration = false;
-
-	if (m_Input && m_Input->GetTagArray()->IsTagPresent("BMT_CONFIG_TAG"))
-	{
-		//---------------------RhoQCTFromHU-----------------
-		/*rho = a + b * HU*/
-		m_Configuration.rhoIntercept = GetDoubleTag("rhoIntercept");
-		m_Configuration.rhoSlope = GetDoubleTag("rhoSlope");
-
-		//three intervals rho calibration
-		m_Configuration.a_RhoLessThanRho1 = GetDoubleTag("a_RhoLessThanRho1");
-		m_Configuration.b_RhoLessThanAsh1 = GetDoubleTag("b_RhoLessThanAsh1");
-		m_Configuration.c_RhoLessThanRho1 = GetDoubleTag("c_RhoLessThanRho1");
-
-		m_Configuration.a_RhoBetweenRho1andRho2 = GetDoubleTag("a_RhoBetweenRho1andRho2");
-		m_Configuration.b_RhoBetweenRho1andRho2 = GetDoubleTag("b_RhoBetweenRho1andRho2");
-		m_Configuration.c_RhoBetweenRho1andRho2 = GetDoubleTag("c_RhoBetweenRho1andRho2");
-
-		m_Configuration.a_RhoBiggerThanRho2 = GetDoubleTag("a_RhoBiggerThanRho2");
-		m_Configuration.b_RhoBiggerThanRho2 = GetDoubleTag("b_RhoBiggerThanRho2");
-		m_Configuration.c_RhoBiggerThanRho2 = GetDoubleTag("b_RhoBiggerThanRho2");
-
-		m_Configuration.m_IntegrationSteps = GetDoubleTag("m_IntegrationSteps");
-		m_Configuration.rho1 = m_Configuration.rho2 = GetDoubleTag("rho2");
-
-		m_Configuration.densityIntervalsNumber = GetDoubleTag("densityIntervalsNumber"); //appOpBonematCommon::SINGLE_INTERVAL;
-
-		m_Configuration.a_OneInterval = GetDoubleTag("a_OneInterval");
-		m_Configuration.b_OneInterval = GetDoubleTag("b_OneInterval");
-		m_Configuration.c_OneInterval = GetDoubleTag("c_OneInterval");
-
-		m_Configuration.m_YoungModuleCalculationModality = GetDoubleTag("m_YoungModuleCalculationModality"); //appOpBonematCommon::HU_INTEGRATION;
-
-																																																				 //Rho Calibration Flag
-		m_Configuration.rhoCalibrationCorrectionIsActive = GetDoubleTag("rhoCalibrationCorrectionIsActive");
-		m_Configuration.rhoCalibrationCorrectionType = GetDoubleTag("rhoCalibrationCorrectionType"); //equals to single interval
-
-		m_Configuration.rhoQCT1 = GetDoubleTag("rhoQCT1");
-		m_Configuration.rhoQCT2 = GetDoubleTag("rhoQCT2");
-
-		//single interval rho calibration
-		m_Configuration.a_CalibrationCorrection = GetDoubleTag("a_CalibrationCorrection");
-		m_Configuration.b_CalibrationCorrection = GetDoubleTag("b_CalibrationCorrection");
-
-		//three intervals rho calibration
-		m_Configuration.a_RhoQCTLessThanRhoQCT1 = GetDoubleTag("a_RhoQCTLessThanRhoQCT1");
-		m_Configuration.b_RhoQCTLessThanRhoQCT1 = GetDoubleTag("b_RhoQCTLessThanRhoQCT1");
-
-		m_Configuration.a_RhoQCTBetweenRhoQCT1AndRhoQCT2 = GetDoubleTag("a_RhoQCTBetweenRhoQCT1AndRhoQCT2");
-		m_Configuration.b_RhoQCTBetweenRhoQCT1AndRhoQCT2 = GetDoubleTag("b_RhoQCTBetweenRhoQCT1AndRhoQCT2");
-
-		m_Configuration.a_RhoQCTBiggerThanRhoQCT2 = GetDoubleTag("a_RhoQCTBiggerThanRhoQCT2");
-		m_Configuration.b_RhoQCTBiggerThanRhoQCT2 = GetDoubleTag("b_RhoQCTBiggerThanRhoQCT2");
-
-		m_Configuration.rhoWetConversionIsActive = GetDoubleTag("rhoWetConversionIsActive");
-		m_Configuration.a_rhoWet = GetDoubleTag("a_rhoWet");
-
-		// Advanced Configuration
-		m_Configuration.m_DensityOutput = GetDoubleTag("m_DensityOutput"); //appOpBonematCommon::RhoSelection::USE_RHO_QCT;
-		m_Configuration.m_PoissonRatio = GetDoubleTag("m_PoissonRatio");
-		m_Configuration.minElasticity = GetDoubleTag("minElasticity"); // 1e-6;
-
-		m_HasConfiguration = true;
-	}
-}
-//----------------------------------------------------------------------------
-double albaOpExporterAbaqusFile::GetDoubleTag(wxString tagName)
-{
-	if (m_Input->GetTagArray()->IsTagPresent("bmtConf_" + tagName))
-	{
-		albaTagItem *tagItem = m_Input->GetTagArray()->GetTag("bmtConf_" + tagName);
-
-		return tagItem->GetValueAsDouble();
-	}
-
-	return -1;
 }

@@ -31,6 +31,12 @@ class ALBA_EXPORT albaOpExporterAnsysInputFile : public albaOpExporterAnsysCommo
 public:
 	albaOpExporterAnsysInputFile(const wxString &label = "albaOpExporterAnsysInputFile");
 	~albaOpExporterAnsysInputFile(); 
+
+	enum EXPORTER_FEM_ID
+	{
+		ID_CREATE_COMPONENTS = MINID,
+		MINID
+	};
 	
   albaTypeMacro(albaOpExporterAnsysInputFile, albaOp);
 
@@ -42,9 +48,13 @@ public:
 protected:
   albaString GetWildcard();
 
+	void AddSpecificGui();
+
   int WriteHeaderFile(FILE *file );
   int WriteNodesFile(FILE *file );
   int WriteElementsFile(FILE *file);
-  int WriteMaterialsFile(FILE *file);  
+  int WriteMaterialsFile(FILE *file);
+
+	int m_CreateComponents;
 };
 #endif

@@ -2,7 +2,7 @@
 
 Program: ALBA
 Module: albaOpExporterAnsysCommon.cpp
-Authors: Nicola Vanella
+Authors: Nicola Vanella, Gianluigi Crimi
 
 Copyright (c) BIC
 All rights reserved. See Copyright.txt or
@@ -60,21 +60,13 @@ PURPOSE.  See the above copyright notice for more information.
 #include "wx/stdpaths.h"
 
 //----------------------------------------------------------------------------
-albaCxxAbstractTypeMacro(albaOpExporterAnsysCommon);
+albaCxxAbstractTypeMacro(albaOpExporterAnsysCommon); 
 
 //----------------------------------------------------------------------------
 albaOpExporterAnsysCommon::albaOpExporterAnsysCommon(const wxString &label) :
 albaOpExporterFEMCommon(label)
 {
-  m_OpType  = OPTYPE_EXPORTER;
-  m_Canundo = true;
-  m_ImporterType = 0;
-
   m_AnsysOutputFileNameFullPath		= "";
-	wxStandardPaths std_paths;
-
-  m_Pid = -1;
-  m_ABSMatrixFlag = 1;
 }
 //----------------------------------------------------------------------------
 albaOpExporterAnsysCommon::~albaOpExporterAnsysCommon()
@@ -83,40 +75,11 @@ albaOpExporterAnsysCommon::~albaOpExporterAnsysCommon()
 }
 
 //----------------------------------------------------------------------------
-bool albaOpExporterAnsysCommon::Accept(albaVME *node)
-{
-  return (node->IsA("albaVMEMesh"));
-}
-//----------------------------------------------------------------------------
 void albaOpExporterAnsysCommon::OpRun()   
 {
 	Init();
 	SetDefaultFrequencyFile();
   CreateGui();
-}
-//----------------------------------------------------------------------------
-void albaOpExporterAnsysCommon::OnEvent(albaEventBase *alba_event) 
-{
-  if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-  {
-    switch(e->GetId())
-    {
-    case wxOK:
-      {
-        OnOK();
-        this->OpStop(OP_RUN_OK);
-      }
-      break;
-    case wxCANCEL:
-      {
-        this->OpStop(OP_RUN_CANCEL);
-      }
-      break;
-    default:
-      albaEventMacro(*e);
-      break;
-    }	
-  }
 }
 //----------------------------------------------------------------------------
 void albaOpExporterAnsysCommon::OnOK()
@@ -138,28 +101,6 @@ void albaOpExporterAnsysCommon::OpStop(int result)
 {
   HideGui();
   albaEventMacro(albaEvent(this,result));        
-}
-
-//----------------------------------------------------------------------------
-void albaOpExporterAnsysCommon::CreateGui()
-{
-  Superclass::CreateGui();
-
-	m_Gui->Divider(2);
-
-	m_Gui->Label("Absolute matrix",true);
-  m_Gui->Bool(ID_ABS_MATRIX_TO_STL,"Apply",&m_ABSMatrixFlag,0);
-
-	m_Gui->Divider(2);
-	m_Gui->Label("");
-
-  m_Gui->OkCancel();  
-  m_Gui->Divider();
-
-	m_Gui->FitGui();
-	m_Gui->Update();
-
-  ShowGui();
 }
 
 //---------------------------------------------------------------------------
@@ -223,12 +164,6 @@ int albaOpExporterAnsysCommon::compareElem(const void *p1, const void *p2)
 				assert(0); //two elements have the same element ID
 		}
   }
-}
-
-//----------------------------------------------------------------------------
-long albaOpExporterAnsysCommon::GetPid()   
-{
-  return m_Pid;
 }
 
 //---------------------------------------------------------------------------
