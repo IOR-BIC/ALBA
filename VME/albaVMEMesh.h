@@ -155,7 +155,7 @@ public:
 	static double GetDoubleTag(albaVME *vme, wxString tagName);
 
 	/** save the configuration to a file in xml format*/
-	int SaveConfigurationFile(BonematConfiguration configuration, const char *configurationFileName);
+	static int SaveConfigurationFile(BonematConfiguration configuration, const char *configurationFileName);
 
 	/** return the output */
   virtual albaVMEOutput *GetOutput();
