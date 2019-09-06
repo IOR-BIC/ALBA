@@ -128,7 +128,8 @@ public:
   /** return an xpm-icon that can be used to represent this node */
   static char ** GetIcon();   //SIL. 11-4-2005:
 
-  void OnEvent(albaEventBase *alba_event);
+	/** Precess events coming from other objects */
+  virtual void OnEvent(albaEventBase *alba_event);
 
 
 	/** Returns StoreDataVector */

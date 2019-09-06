@@ -109,7 +109,7 @@ void albaOpExporterFEMCommon::CreateGui()
 
 	m_Gui->Divider(2);
 
-	LoadConfigurationTags();
+	m_HasConfiguration=albaVMEMesh::LoadConfigurationTags((albaVMEMesh *)m_Input, m_Configuration);
 
 	if (hasMaterials && m_HasConfiguration)
 	{
@@ -469,87 +469,6 @@ vtkFieldData *albaOpExporterFEMCommon::GetMaterialData()
 	}
 
 	return m_MaterialData;
-}
-
-//----------------------------------------------------------------------------
-void albaOpExporterFEMCommon::LoadConfigurationTags()
-{
-	m_HasConfiguration = false;
-
-	if (m_Input && m_Input->GetTagArray()->IsTagPresent("BMT_CONFIG_TAG"))
-	{
-		//---------------------RhoQCTFromHU-----------------
-		/*rho = a + b * HU*/
-		m_Configuration.rhoIntercept = GetDoubleTag("rhoIntercept");
-		m_Configuration.rhoSlope = GetDoubleTag("rhoSlope");
-
-		//three intervals rho calibration
-		m_Configuration.a_RhoLessThanRho1 = GetDoubleTag("a_RhoLessThanRho1");
-		m_Configuration.b_RhoLessThanRho1 = GetDoubleTag("b_RhoLessThanRho1");
-		m_Configuration.c_RhoLessThanRho1 = GetDoubleTag("c_RhoLessThanRho1");
-
-		m_Configuration.a_RhoBetweenRho1andRho2 = GetDoubleTag("a_RhoBetweenRho1andRho2");
-		m_Configuration.b_RhoBetweenRho1andRho2 = GetDoubleTag("b_RhoBetweenRho1andRho2");
-		m_Configuration.c_RhoBetweenRho1andRho2 = GetDoubleTag("c_RhoBetweenRho1andRho2");
-
-		m_Configuration.a_RhoBiggerThanRho2 = GetDoubleTag("a_RhoBiggerThanRho2");
-		m_Configuration.b_RhoBiggerThanRho2 = GetDoubleTag("b_RhoBiggerThanRho2");
-		m_Configuration.c_RhoBiggerThanRho2 = GetDoubleTag("b_RhoBiggerThanRho2");
-
-		m_Configuration.m_IntegrationSteps = GetDoubleTag("m_IntegrationSteps");
-		m_Configuration.rho1 = m_Configuration.rho2 = GetDoubleTag("rho2");
-
-		m_Configuration.densityIntervalsNumber = GetDoubleTag("densityIntervalsNumber"); //appOpBonematCommon::SINGLE_INTERVAL;
-
-		m_Configuration.a_OneInterval = GetDoubleTag("a_OneInterval");
-		m_Configuration.b_OneInterval = GetDoubleTag("b_OneInterval");
-		m_Configuration.c_OneInterval = GetDoubleTag("c_OneInterval");
-
-		m_Configuration.m_YoungModuleCalculationModality = GetDoubleTag("m_YoungModuleCalculationModality"); //appOpBonematCommon::HU_INTEGRATION;
-
-																																																				 //Rho Calibration Flag
-		m_Configuration.rhoCalibrationCorrectionIsActive = GetDoubleTag("rhoCalibrationCorrectionIsActive");
-		m_Configuration.rhoCalibrationCorrectionType = GetDoubleTag("rhoCalibrationCorrectionType"); //equals to single interval
-
-		m_Configuration.rhoQCT1 = GetDoubleTag("rhoQCT1");
-		m_Configuration.rhoQCT2 = GetDoubleTag("rhoQCT2");
-
-		//single interval rho calibration
-		m_Configuration.a_CalibrationCorrection = GetDoubleTag("a_CalibrationCorrection");
-		m_Configuration.b_CalibrationCorrection = GetDoubleTag("b_CalibrationCorrection");
-
-		//three intervals rho calibration
-		m_Configuration.a_RhoQCTLessThanRhoQCT1 = GetDoubleTag("a_RhoQCTLessThanRhoQCT1");
-		m_Configuration.b_RhoQCTLessThanRhoQCT1 = GetDoubleTag("b_RhoQCTLessThanRhoQCT1");
-
-		m_Configuration.a_RhoQCTBetweenRhoQCT1AndRhoQCT2 = GetDoubleTag("a_RhoQCTBetweenRhoQCT1AndRhoQCT2");
-		m_Configuration.b_RhoQCTBetweenRhoQCT1AndRhoQCT2 = GetDoubleTag("b_RhoQCTBetweenRhoQCT1AndRhoQCT2");
-
-		m_Configuration.a_RhoQCTBiggerThanRhoQCT2 = GetDoubleTag("a_RhoQCTBiggerThanRhoQCT2");
-		m_Configuration.b_RhoQCTBiggerThanRhoQCT2 = GetDoubleTag("b_RhoQCTBiggerThanRhoQCT2");
-
-		m_Configuration.rhoWetConversionIsActive = GetDoubleTag("rhoWetConversionIsActive");
-		m_Configuration.a_rhoWet = GetDoubleTag("a_rhoWet");
-
-		// Advanced Configuration
-		m_Configuration.m_DensityOutput = GetDoubleTag("m_DensityOutput"); //appOpBonematCommon::RhoSelection::USE_RHO_QCT;
-		m_Configuration.m_PoissonRatio = GetDoubleTag("m_PoissonRatio");
-		m_Configuration.minElasticity = GetDoubleTag("minElasticity"); // 1e-6;
-
-		m_HasConfiguration = true;
-	}
-}
-//----------------------------------------------------------------------------
-double albaOpExporterFEMCommon::GetDoubleTag(wxString tagName)
-{
-	if (m_Input->GetTagArray()->IsTagPresent("bmtConf_" + tagName))
-	{
-		albaTagItem *tagItem = m_Input->GetTagArray()->GetTag("bmtConf_" + tagName);
-
-		return tagItem->GetValueAsDouble();
-	}
-
-	return -1;
 }
 
 //----------------------------------------------------------------------------
