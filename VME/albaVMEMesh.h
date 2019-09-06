@@ -35,6 +35,20 @@ enum
 	THREE_INTERVALS = 1,
 };
 
+enum
+{
+	HU_INTEGRATION = 0,
+	YOUNG_MODULE_INTEGRATION = 1,
+	INTEGRATION_MODALITIES_NUMBER,
+};
+
+enum RhoSelection
+{
+	USE_RHO_QCT,
+	USE_RHO_ASH,
+	USE_RHO_WET,
+};
+
 typedef struct configurationStruct
 {
 	//---------------------RhoQCTFromHU-----------------
@@ -90,7 +104,14 @@ data*/
 class ALBA_EXPORT albaVMEMesh : public albaVMEGeneric
 {
 public:
-  albaTypeMacro(albaVMEMesh,albaVMEGeneric);
+	enum 
+	{
+		ID_NONE = MINID,
+		ID_DISABLED,
+		ID_SAVE,
+	};
+
+	albaTypeMacro(albaVMEMesh, albaVMEGeneric);
 
   /** Set data for the give timestamp. 
   This function automatically creates a VMEItem for the data to be stored. 
@@ -127,8 +148,16 @@ public:
 	/** return the Element Reals Array*/
 	static vtkIntArray *GetElementsRealArray(vtkUnstructuredGrid *inputUGrid);
 
-	
-  /** return the output */
+	/** Load configuration tags from a mesh vme and stores it to conf var, returns false if tags are not present */
+	static bool LoadConfigurationTags(albaVMEMesh *vme, BonematConfiguration &conf);
+
+	/** Get a double value from a specific tag */
+	static double GetDoubleTag(albaVME *vme, wxString tagName);
+
+	/** save the configuration to a file in xml format*/
+	static int SaveConfigurationFile(BonematConfiguration configuration, const char *configurationFileName);
+
+	/** return the output */
   virtual albaVMEOutput *GetOutput();
 
   /** return icon */
@@ -143,15 +172,24 @@ public:
   /** Return pointer to material attribute. */
   mmaMaterial *GetMaterial();
 
+	/** Precess events coming from other objects */
+	void OnEvent(albaEventBase *alba_event);
+	
 protected:
   albaVMEMesh();
   virtual ~albaVMEMesh();
+
+	/** Create GUI for the VME */
+	virtual albaGUI *CreateGui();
+
 
 	/** Return the array with the name given. Returns NULL is array not found */
 	vtkIntArray *GetIntCellArray(const char *arrayName, const char *arrayName2);
 
 	/** Return the array with the name given. Returns NULL is array not found */
 	static vtkIntArray *GetIntCellArray(vtkUnstructuredGrid *inputUGrid, const char *arrayName, const char *arrayName2);
+
+	BonematConfiguration m_Configuration;
 
 private:
   albaVMEMesh(const albaVMEMesh&); // Not implemented

@@ -153,9 +153,6 @@ protected:
 
 	BonematConfiguration m_Configuration;
 
-	void LoadConfigurationTags();
-	double GetDoubleTag(wxString tagName);
-	
 	albaProgressBarHelper *m_ProgressHelper;
 	float m_TotalElements;
 	long m_CurrentProgress;
