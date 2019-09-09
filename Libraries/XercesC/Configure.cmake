@@ -30,11 +30,8 @@ IF (EXISTS "${XercesC_SOURCE_DIR}/Packages")
   SET (XercesC_PATCH_PATH "${XercesC_SOURCE_DIR}/Patches")
   IF (NOT EXISTS "${XercesC_SOURCE_PATH}")
   	FIND_AND_UNPACK_PACKAGE (XercesC ${XercesC_PACKAGE_PATH} "${XercesC_BINARY_DIR}/Sources" ${XercesC_SOURCE_PATH})
+  	FIND_AND_APPLAY_PATCHES (XercesC ${XercesC_PATCH_PATH} "${XercesC_SOURCE_PATH}")
   ENDIF (NOT EXISTS "${XercesC_SOURCE_PATH}")
-	
- 	FIND_AND_APPLAY_PATCHES (XercesC ${XercesC_PATCH_PATH} "${XercesC_SOURCE_PATH}")
-
-	
 ENDIF (EXISTS "${XercesC_SOURCE_DIR}/Packages")
 
 
