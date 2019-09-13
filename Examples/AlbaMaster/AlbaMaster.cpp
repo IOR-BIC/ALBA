@@ -399,7 +399,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaView3D("3D"));
 
 	//View Arbitrary Orthoslice
-	albaViewArbitraryOrthoSlice *varbitraryortho=new albaViewArbitraryOrthoSlice("Arbitrary Orthoslice");
+	albaViewArbitraryOrthoSlice *varbitraryortho=new albaViewArbitraryOrthoSlice("Arbitrary Orthoslice", albaAxes::BODY);
 	varbitraryortho->PackageView();
 	m_Logic->Plug(varbitraryortho);
 
