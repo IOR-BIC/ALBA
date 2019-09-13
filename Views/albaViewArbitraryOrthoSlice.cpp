@@ -93,8 +93,9 @@ enum ARBITRARY_SUBVIEW_ID
 #define AsixToView(a) ( (a) == X ? X_VIEW : ((a) == Y ? Y_VIEW : Z_VIEW))
 
 //----------------------------------------------------------------------------
-albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label) : albaViewCompoundWindowing(label, 2, 2)
+albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxes::AXIS_TYPE_ENUM axesType) : albaViewCompoundWindowing(label, 2, 2)
 {
+	m_AxesType = axesType;
 	m_InputVolume = NULL;
 	m_GizmoRT[0] = m_GizmoRT[1] = m_GizmoRT[2] = NULL;
 	m_View3d   = NULL;
@@ -124,7 +125,7 @@ albaViewArbitraryOrthoSlice::~albaViewArbitraryOrthoSlice()
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::PackageView()
 {
-	m_View3d = new albaViewVTK("",CAMERA_PERSPECTIVE,true,false,0,false,albaAxes::HEAD);
+	m_View3d = new albaViewVTK("",CAMERA_PERSPECTIVE,true,false,0,false,m_AxesType);
 	m_View3d->PlugVisualPipe("albaVMEVolumeGray", "albaPipeBox", MUTEX);
 	m_View3d->PlugVisualPipe("albaVMEGizmo", "albaPipeGizmo", NON_VISIBLE);
 	PlugChildView(m_View3d);
@@ -136,7 +137,7 @@ void albaViewArbitraryOrthoSlice::PackageView()
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
 {
-	m_ViewSlice[v] = new albaViewVTK("", CAMERA_OS_X + v, true, false, 0, false, albaAxes::HEAD);
+	m_ViewSlice[v] = new albaViewVTK("", CAMERA_OS_X + v, true, false, 0, false, m_AxesType);
 	m_ViewSlice[v]->PlugVisualPipe("albaVMEVolumeGray", "albaPipeBox", NON_VISIBLE);
 
 	m_ViewSlice[v]->PlugVisualPipe("albaVMEImage", "albaPipeBox", NON_VISIBLE);
