@@ -99,7 +99,6 @@ albaOp* albaOpExporterAbaqusFile::Copy()
 //----------------------------------------------------------------------------
 void albaOpExporterAbaqusFile::OpRun()   
 {
-	SetDefaultFrequencyFile();
   CreateGui();
 }
 //----------------------------------------------------------------------------

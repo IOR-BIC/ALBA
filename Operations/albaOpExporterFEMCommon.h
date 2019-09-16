@@ -51,11 +51,6 @@ enum MyEnum
 	DENS
 };
 
-enum DensitySelection
-{
-	USE_MEAN_DENSISTY,
-	USE_MAXIMUM_DENSITY,
-};
 
 //----------------------------------------------------------------------------
 // albaOpExporterFEMCommon :
@@ -70,9 +65,7 @@ public:
 	{
 		ID_FIRST = MINID,
 		ID_GAP_VALUE,
-		ID_DENSITY_SELECTION,
 		ID_POISSON_RATIO,
-		ID_FREQUENCY_FILE_NAME,
 		ID_ABS_MATRIX,
 		ID_ENABLE_BACKCALCULATION,
 		ID_MIN_ELASTICITY,
@@ -93,6 +86,7 @@ public:
 		ID_THIRD_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_1,
 		ID_THIRD_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_2,
 		ID_DENSITY_THREE_INTERVALS_ROLLOUT,
+		ID_BACK_PROPAGATION_ROLLOUT,
 		MINID
 	};
 			
@@ -110,8 +104,6 @@ public:
 	vtkIdType * GetMatIdArray();
 
 	vtkFieldData *GetMaterialData();
-
-	void SetDefaultFrequencyFile();
 
 	//----------------------------------------------------------------------------
 	virtual void OnEvent(albaEventBase *alba_event);
@@ -145,9 +137,11 @@ protected:
 	int m_EnableBackCalculation;
 	bool m_HasConfiguration;
 
+	albaGUIRollOut *m_BackPropRollOut;
 	albaGUIRollOut *m_GuiRollOutDensityOneInterval;
 	albaGUIRollOut *m_GuiRollOutDensityThreeIntervals;
 
+	albaGUI *m_BackPropGui;
 	albaGUI *m_GuiASDensityOneInterval;
 	albaGUI *m_GuiASDensityThreeIntervals;
 
@@ -162,11 +156,6 @@ protected:
 
 	double m_Egap;
 
-	// Advanced Configuration
-	int m_DensitySelection;
 	int m_ABSMatrixFlag;
-	
-	albaString m_FrequencyFileName;
-	FILE *m_Freq_fp;
 };
 #endif
