@@ -1,20 +1,18 @@
 /*=========================================================================
-
   Program:   Visualization Toolkit
-  Module:    $RCSfile: vtkALBAGlobalAxesHeadActor.h,v $
+  Module:    $RCSfile: vtkALBAGlobalAxesPolydataActor.h,v $
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
+	This software is distributed WITHOUT ANY WARRANTY; without even
+	the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+	PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 
-#ifndef __vtkALBAGlobalAxesHeadActor_h
-#define __vtkALBAGlobalAxesHeadActor_h
+#ifndef __vtkALBAGlobalAxesPolydataActor_h
+#define __vtkALBAGlobalAxesPolydataActor_h
 
 #include "vtkProp3D.h"
 #include "albaConfigure.h"
@@ -33,9 +31,9 @@ class vtkTransformFilter;
 class vtkVectorText;
 
 /**
-Classname: vtkALBAGlobalAxesHeadActor
+ClassName: vtkALBAGlobalAxesPolydataActor
 
-vtkALBAGlobalAxesHeadActor - a 3D head used to give camera orientation feedback.
+vtkALBAGlobalAxesPolydataActor - a 3D head used to give camera orientation feedback.
 This class is used along with vtkALBAOrientationMarkerWidget to build a render window superimposed rotating head.
 A file ..\Config\HelperData\3dHead.vtk containing the 3d head polydata must exists in the current working directory (to be improved)
 This is based on ALBA vertical apps dir structure template which is as follows:
@@ -44,24 +42,31 @@ albaVerticalAppDir\Config\HelperData\3dHead.vtk
 The 3d head should be contained in [-0.5 , 0.5, -0.5, 0.5, -0.5 , 0.5] (approx head dim should be 1)
 
 Description:
-vtkALBAGlobalAxesHeadActor is an hybrid 3D actor used to represent an anatomical
+vtkALBAGlobalAxesPolydataActor is an hybrid 3D actor used to represent an anatomical
 orientation marker in a scene.  The class consists of a 3D head centered
 on the world origin.
 
 Caveats:
-vtkALBAGlobalAxesHeadActor is primarily intended for use with
+vtkALBAGlobalAxesPolydataActor is primarily intended for use with
 vtkOrientationMarkerWidget. 
 
 See Also:
 vtkALBAOrientationMarkerWidget albaAxes 
-
 */
 
-class ALBA_EXPORT vtkALBAGlobalAxesHeadActor : public vtkProp3D
+class ALBA_EXPORT vtkALBAGlobalAxesPolydataActor : public vtkProp3D
 {
 public:
-  static vtkALBAGlobalAxesHeadActor *New();
-  vtkTypeRevisionMacro(vtkALBAGlobalAxesHeadActor,vtkProp3D);
+
+	enum ACTOR_TYPE_ENUM
+	{
+		HEAD,
+		BODY,
+	};
+
+	vtkALBAGlobalAxesPolydataActor(int type = HEAD);
+  static vtkALBAGlobalAxesPolydataActor *New();
+  vtkTypeRevisionMacro(vtkALBAGlobalAxesPolydataActor,vtkProp3D);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -72,7 +77,11 @@ public:
 
   // Description:
   // This is the vtk file containing the 3D head. It must exists.
-  std::string GetHeadABSFileName();
+  std::string GetABSFileName();
+
+	// Description:
+	// Set the vtk file containing the 3D head or Body
+	void SetFileName(std::string filename);
 
   // Description:
   // Support the standard render methods.
@@ -105,7 +114,7 @@ public:
 
   // Description:
   // Get the cube properties.
-  vtkProperty *GetHeadProperty();
+  vtkProperty *GetProperty();
 
   // Description:
   // Get the text edges properties.
@@ -113,8 +122,8 @@ public:
 
   // Description:
   // Enable/disable drawing the cube.
-  void SetHeadVisibility(int);
-  int GetHeadVisibility();
+  void SetVisibility(int);
+  int GetVisibility();
 
   // Description:
   // Get the assembly so that user supplied transforms can be applied
@@ -125,22 +134,27 @@ public:
   // Set the initial position
   void SetInitialPose(vtkMatrix4x4* initMatrix);
 
-protected:
-  vtkALBAGlobalAxesHeadActor();
-  ~vtkALBAGlobalAxesHeadActor();
+	void SetType(int type);
 
-  vtkPolyDataReader  *HeadReader;
-  vtkActor           *HeadActor;
+protected:
+
+	~vtkALBAGlobalAxesPolydataActor();
+
+  vtkPolyDataReader  *Reader;
+  vtkActor           *Actor;
 
   void                UpdateProps();
 
   vtkAssembly        *Assembly;
 
-  std::string HeadFileName;
+	int ActorType;
+  std::string FileName;
 
 private:
-  vtkALBAGlobalAxesHeadActor(const vtkALBAGlobalAxesHeadActor&);  // Not implemented.
-  void operator=(const vtkALBAGlobalAxesHeadActor&);  // Not implemented.
+
+  vtkALBAGlobalAxesPolydataActor(const vtkALBAGlobalAxesPolydataActor&);  // Not implemented.
+
+	void operator=(const vtkALBAGlobalAxesPolydataActor&);  // Not implemented.
   bool FileExists(const char* filename);
 };
 
