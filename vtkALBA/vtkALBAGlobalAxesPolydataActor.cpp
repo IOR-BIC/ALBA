@@ -219,7 +219,7 @@ std::string vtkALBAGlobalAxesPolydataActor::GetABSFileName()
 	char buf[256];
 	vtkDirectory::GetCurrentWorkingDirectory(buf, 256);
 	std::string path = buf;
-	path.append("\\Config\\HelperData\\");
+	path.append("\\..\\Config\\HelperData\\");
 	path.append(FileName);
 
 	bool exists = FileExists(path.c_str());

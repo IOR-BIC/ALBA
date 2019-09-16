@@ -366,11 +366,6 @@ void albaVMEMeshAnsysTextExporterTest::TestTetra10TrivialMeshExport()
   exporter->SetInput(ugrid);
   exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
   exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
- 	
-// 	albaOpExporterFEMCommon tmpFEMop1;
-// 	tmpFEMop1.SetInput(reader->GetOutput());
-// 	exporter->SetMaterialData(tmpFEMop1.GetMaterialData());
-//  	exporter->SetMatIdArray(tmpFEMop1.GetMatIdArray());
 
   exporter->Write();
 
@@ -394,11 +389,6 @@ void albaVMEMeshAnsysTextExporterTest::TestTetra10TrivialMeshExport()
   exporter->SetInput(ugrid);
   exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
   exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
-
-// 	albaOpExporterFEMCommon tmpFEMop2;
-// 	tmpFEMop2.SetInput(reader->GetOutput());
-// 	exporter->SetMaterialData(tmpFEMop2.GetMaterialData());
-// 	exporter->SetMatIdArray(tmpFEMop2.GetMatIdArray());
 
   exporter->Write();
 
@@ -440,11 +430,6 @@ void albaVMEMeshAnsysTextExporterTest::TestTetra10NodesIdJumpingMaterialsIdJumpi
 	exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
 	exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
 
-// 	albaOpExporterFEMCommon tmpFEMop1;
-// 	tmpFEMop1.SetInput(reader->GetOutput());
-// 	exporter->SetMaterialData(tmpFEMop1.GetMaterialData());
-// 	exporter->SetMatIdArray(tmpFEMop1.GetMatIdArray());
-
 	exporter->Write();
 
 	// mesh with materials
@@ -467,11 +452,6 @@ void albaVMEMeshAnsysTextExporterTest::TestTetra10NodesIdJumpingMaterialsIdJumpi
 	exporter->SetInput(ugrid);
 	exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
 	exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
-
-// 	albaOpExporterFEMCommon tmpFEMop2;
-// 	tmpFEMop2.SetInput(reader->GetOutput());
-// 	exporter->SetMaterialData(tmpFEMop2.GetMaterialData());
-// 	exporter->SetMatIdArray(tmpFEMop2.GetMatIdArray());
 
 	exporter->Write();
 
@@ -532,11 +512,6 @@ void albaVMEMeshAnsysTextExporterTest::TestBonemattedTetra10ElementsIdJumpingMat
 	reader->Read();
 // 	this->Read(reader, dirPrefix, true, true, albaString("BonemattedMeshWithMaterials.vtk"));
 // 
-// 	albaOpExporterFEMCommon tmpFEMop1;
-// 	tmpFEMop1.SetInput(reader->GetOutput());
-// 	exporter->SetMaterialData(tmpFEMop1.GetMaterialData());
-// 	exporter->SetMatIdArray(tmpFEMop1.GetMatIdArray());
-
 	exporter->Write();
 
 	// cleanup
@@ -600,12 +575,6 @@ void albaVMEMeshAnsysTextExporterTest::TestBonemattedTetra10ElementsIdJumpingMat
 	reader->SetMaterialsFileName(outputMaterialsFileName.GetCStr());
 	reader->Read();
 	// 	this->Read(reader, dirPrefix, true, true, albaString("BonemattedMeshWithMaterials.vtk"));
-	// 
-
-// 	albaOpExporterFEMCommon tmpFEMop1;
-// 	tmpFEMop1.SetInput(reader->GetOutput());
-// 	exporter->SetMaterialData(tmpFEMop1.GetMaterialData());
-// 	exporter->SetMatIdArray(tmpFEMop1.GetMatIdArray());
 
 	exporter->ApplyMatrixOn();
 	exporter->SetMatrix(mat);
@@ -668,10 +637,6 @@ void albaVMEMeshAnsysTextExporterTest::TestBonemattedTetra10ElementsIdJumpingNoM
 	reader->Read();
 	// 	this->Read(reader, dirPrefix, true, true, albaString("BonemattedMeshWithMaterials.vtk"));
 	// 
-// 	albaOpExporterFEMCommon tmpFEMop1;
-// 	tmpFEMop1.SetInput(reader->GetOutput());
-// 	exporter->SetMaterialData(tmpFEMop1.GetMaterialData());
-// 	exporter->SetMatIdArray(tmpFEMop1.GetMatIdArray());
 
 	exporter->Write();
 
@@ -732,11 +697,6 @@ void albaVMEMeshAnsysTextExporterTest::TestExportTetra10VtkWithoutAnsysInformati
 	reader->Read();
 	// 	this->Read(reader, dirPrefix, true, true, albaString("BonemattedMeshWithMaterials.vtk"));
 	// 
-// 	albaOpExporterFEMCommon tmpFEMop1;
-// 	tmpFEMop1.SetInput(reader->GetOutput());
-// 	exporter->SetMaterialData(tmpFEMop1.GetMaterialData());
-// 	exporter->SetMatIdArray(tmpFEMop1.GetMatIdArray());
-
 	exporter->Write();
 
 	// cleanup
@@ -812,11 +772,6 @@ void albaVMEMeshAnsysTextExporterTest::TestExportTetra4VtkWithoutAnsysInformatio
 	reader->SetMaterialsFileName(outputMaterialsFileName.GetCStr());
 	reader->Read();
 	// 	this->Read(reader, dirPrefix, true, true, albaString("BonemattedMeshWithMaterials.vtk"));
-	// 
-// 	albaOpExporterFEMCommon tmpFEMop1;
-// 	tmpFEMop1.SetInput(reader->GetOutput());
-// 	exporter->SetMaterialData(tmpFEMop1.GetMaterialData());
-// 	exporter->SetMatIdArray(tmpFEMop1.GetMatIdArray());
 
 	exporter->Write();
 
