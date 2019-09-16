@@ -244,7 +244,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpALBATransformTest::suite());
  	runner.addTest(albaOpTransformInterfaceTest::suite());
 	runner.addTest(albaVMEMeshAnsysTextImporterTest::suite());
-	runner.addTest(albaVMEMeshAnsysTextExporterTest::suite()); TO FIX
+	runner.addTest(albaVMEMeshAnsysTextExporterTest::suite());
 	runner.addTest(albaOpImporterMeshTest::suite());
 	runner.addTest(albaOpExporterMeshTest::suite());
 	runner.addTest(albaVMEDataSetAttributesImporterTest::suite());
