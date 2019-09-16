@@ -58,12 +58,6 @@ albaOp(label)
 	m_MatIdArray = NULL;
 	m_Egap = 50;
 
-	m_Freq_fp = NULL;
-	m_FrequencyFileName = "";
-
-	// Advanced Configuration
-	m_DensitySelection = USE_MEAN_DENSISTY;
-	
 	m_ABSMatrixFlag = 1;
 	m_EnableBackCalculation = 1;
 }
@@ -85,25 +79,13 @@ void albaOpExporterFEMCommon::CreateGui()
 
 	bool hasMaterials = HasMaterials();
 
+	m_Gui->Label(_("FEM Exporter Properties"), true);
+
 	if (hasMaterials)
 	{
-		m_Gui->Label(_("FEM Exporter Properties"), true);
-
-		// Frequency
-		m_Gui->Label("Output Frequency file: ");
-
-		albaString wildc = "Frequency File (*.*)|*.*";
-		m_Gui->FileSave(ID_FREQUENCY_FILE_NAME, "Freq file", &m_FrequencyFileName, wildc.GetCStr());
-		m_Gui->Divider();
-
 		m_Gui->Label("Elasticity Gap value");
 		m_Gui->Double(ID_GAP_VALUE, "", &m_Egap);
 		m_Gui->Divider();
-
-		const wxString choices[] = { "Mean", "Maximum" };
-		m_Gui->Label("Grouping Density");
-		m_Gui->Combo(ID_DENSITY_SELECTION, "", &m_DensitySelection, 2, choices);
-
 		m_Gui->Label("");
 	}
 
@@ -111,25 +93,24 @@ void albaOpExporterFEMCommon::CreateGui()
 
 	m_HasConfiguration=albaVMEMesh::LoadConfigurationTags((albaVMEMesh *)m_Input, m_Configuration);
 
-	if (hasMaterials && m_HasConfiguration)
+	if (hasMaterials)
 	{
 		m_Gui->Label("Back Calculation", true);
 		m_Gui->Bool(ID_ENABLE_BACKCALCULATION, "Enable", &m_EnableBackCalculation);
-		m_Gui->Label("");
+		m_Gui->Divider();
+		m_Gui->Divider();
+
+		m_BackPropGui = new albaGUI(this);
 
 		//////////////////////////////////////////////////////////////////////////
 		// Density - Elasticity
-		m_Gui->Label("Density-elasticity relationship", true);
-		m_Gui->Label("E = a + b * Rho^c", false);
-
-		m_Gui->Label("Minimum Elasticity Modulus", false);
-		m_Gui->Double(ID_MIN_ELASTICITY, "", &m_Configuration.minElasticity);
-		m_Gui->Divider();
-		m_Gui->Divider();
-		m_Gui->Divider();
+		m_BackPropGui->Label("Density-elasticity relationship", true);
+		m_BackPropGui->Label("E = a + b * Rho^c", false);
+		m_BackPropGui->Divider();
+		m_BackPropGui->Divider();
 
 		const wxString densityChoices[] = { "Single interval", "Three intervals" };
-		m_Gui->Combo(ID_RHO_DENSITY_INTERVALS_NUMBER, "", &m_Configuration.densityIntervalsNumber, 2, densityChoices);
+		m_BackPropGui->Combo(ID_RHO_DENSITY_INTERVALS_NUMBER, "", &m_Configuration.densityIntervalsNumber, 2, densityChoices);
 
 		m_GuiASDensityOneInterval = new albaGUI(this);
 
@@ -137,9 +118,9 @@ void albaOpExporterFEMCommon::CreateGui()
 		m_GuiASDensityOneInterval->Double(ID_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_SINGLE_DENSITY_INTERVAL_1, "b", &m_Configuration.b_OneInterval);
 		m_GuiASDensityOneInterval->Double(ID_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_SINGLE_DENSITY_INTERVAL_2, "c", &m_Configuration.c_OneInterval);
 
-		m_GuiRollOutDensityOneInterval = m_Gui->RollOut(ID_DENSITY_ONE_INTERVAL_ROLLOUT, _("Single interval"), m_GuiASDensityOneInterval);
+		m_GuiRollOutDensityOneInterval = m_BackPropGui->RollOut(ID_DENSITY_ONE_INTERVAL_ROLLOUT, _("Single interval"), m_GuiASDensityOneInterval);
 
-		m_Gui->Divider();
+		m_BackPropGui->Divider();
 
 		m_GuiASDensityThreeIntervals = new albaGUI(this);
 
@@ -170,8 +151,12 @@ void albaOpExporterFEMCommon::CreateGui()
 
 		m_GuiASDensityThreeIntervals->Enable(ID_RHO_DENSITY_INTERVALS_NUMBER, true);
 
-		m_GuiRollOutDensityThreeIntervals = m_Gui->RollOut(ID_DENSITY_THREE_INTERVALS_ROLLOUT, _("Three intervals"), m_GuiASDensityThreeIntervals);
+		m_GuiRollOutDensityThreeIntervals = m_BackPropGui->RollOut(ID_DENSITY_THREE_INTERVALS_ROLLOUT, _("Three intervals"), m_GuiASDensityThreeIntervals);
 
+		m_BackPropRollOut = m_Gui->RollOut(ID_BACK_PROPAGATION_ROLLOUT, _("Back Calculation Settings"), m_BackPropGui);
+
+		if (m_HasConfiguration)
+			m_BackPropRollOut->RollOut(false);
 		UpdateGui();
 	}
 
@@ -208,7 +193,6 @@ void albaOpExporterFEMCommon::UpdateGui()
 	m_Gui->Enable(ID_THIRD_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_1, enable);
 	m_Gui->Enable(ID_THIRD_EXPONENTIAL_COEFFICIENTS_VECTOR_V3_2, enable);
 	m_Gui->Enable(ID_DENSITY_THREE_INTERVALS_ROLLOUT, enable);
-	m_Gui->Enable(ID_DENSITY_SELECTION, !enable);
 			
 
 	m_GuiRollOutDensityOneInterval->RollOut(m_Configuration.densityIntervalsNumber == SINGLE_INTERVAL && enable);
@@ -222,18 +206,6 @@ void albaOpExporterFEMCommon::UpdateGui()
 
 	m_Gui->FitGui();
 	m_Gui->Update();
-}
-
-
-//----------------------------------------------------------------------------
-void albaOpExporterFEMCommon::SetDefaultFrequencyFile()
-{
-	wxStandardPaths std_paths;
-	wxString userPath = std_paths.GetUserDataDir();
-	m_FrequencyFileName = userPath;
-	m_FrequencyFileName += "\\";
-	m_FrequencyFileName += m_Input->GetName();
-	m_FrequencyFileName += "-Freq.txt";
 }
 
 //----------------------------------------------------------------------------
@@ -259,9 +231,13 @@ void albaOpExporterFEMCommon::OnEvent(albaEventBase *alba_event)
 			{
 				UpdateGui();
 			}
+			case ID_DENSITY_ONE_INTERVAL_ROLLOUT:
+			case ID_DENSITY_THREE_INTERVALS_ROLLOUT:
+				m_Gui->FitGui();
+			break;
 			default:
 				albaEventMacro(*e);
-				break;
+			break;
 		}
 	}
 }
@@ -302,21 +278,11 @@ vtkIdType * albaOpExporterFEMCommon::GetMatIdArray()
 //----------------------------------------------------------------------------
 void albaOpExporterFEMCommon::CreateBins(int numElements, MaterialProp *elProps, std::vector<MaterialProp> *materialProperties)
 {
-	// COMPUTE MATERIALS & WRITE FREQUENCY FILE
-	if (!m_FrequencyFileName.IsEmpty() && (m_Freq_fp = fopen(m_FrequencyFileName.GetCStr(), "w")) == NULL && GetTestMode() == false)
-		albaErrorMessage("Frequency file can't be opened");
-	
 	//Sorting elements
 	qsort(elProps, numElements, sizeof(MaterialProp), compareE);
 
-	//Writing freq file intestation
-	if (m_Freq_fp != NULL)
-		fprintf(m_Freq_fp, "rho \t\t E \t\t NUMBER OF ELEMENTS\n\n");
-
 	//accumulator and stats for first material
-	vtkIdType freq = 1;
 	vtkIdType numMats = 1;
-	double densAccumulator = elProps[0].density;
 	double E = elProps[0].ex;
 	
 	m_MatIdArray = new vtkIdType[numElements];
@@ -334,28 +300,15 @@ void albaOpExporterFEMCommon::CreateBins(int numElements, MaterialProp *elProps,
 
 			if (m_EnableBackCalculation)
 				(*materialProperties)[matId].density = DensityBackCalculation(elProps[id - 1].ex);
-			else if (m_DensitySelection == USE_MEAN_DENSISTY)
-				(*materialProperties)[matId].density = densAccumulator / freq;
 			//else 
-			//  the max density is already contained in the materialProperties struct
+			//  the density is already contained in the materialProperties struct
 
-			// print statistics
-			if (m_Freq_fp != NULL)
-				fprintf(m_Freq_fp, "%f \t %f \t %d\n", (*materialProperties)[matId].density, (*materialProperties)[matId].ex, freq);
-
-			//accumulator and stats for next material
+			//update E value and increase matNum
 			if (id < (numElements - 1))
 			{
-				freq = 1;
 				numMats++;
-				densAccumulator = elProps[id].density;
 				E = elProps[id].ex;
 			}
-		}
-		else
-		{
-			densAccumulator += elProps[id].density;
-			freq++;
 		}
 		m_MatIdArray[elProps[id].elementID] = numMats;
 	}
