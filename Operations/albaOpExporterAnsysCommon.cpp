@@ -78,7 +78,6 @@ albaOpExporterAnsysCommon::~albaOpExporterAnsysCommon()
 void albaOpExporterAnsysCommon::OpRun()   
 {
 	Init();
-	SetDefaultFrequencyFile();
   CreateGui();
 }
 //----------------------------------------------------------------------------
