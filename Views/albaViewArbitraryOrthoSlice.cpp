@@ -46,6 +46,7 @@
 #include "albaAttribute.h"
 #include "albaGUILutSlider.h"
 #include "albaGUILutSwatch.h"
+#include "albaViewSlice.h"
 
 #include "vtkTransform.h"
 #include "vtkLookupTable.h"
@@ -74,6 +75,7 @@
 #include "vtkProperty2D.h"
 #include "vtkSphereSource.h"
 #include "vtkALBASmartPointer.h"
+#include "albaPipeMeshSlice.h"
 
 albaCxxTypeMacro(albaViewArbitraryOrthoSlice);
 
@@ -137,7 +139,7 @@ void albaViewArbitraryOrthoSlice::PackageView()
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
 {
-	m_ViewSlice[v] = new albaViewVTK("", CAMERA_OS_X + v, true, false, 0, false, m_AxesType);
+	m_ViewSlice[v] = new albaViewSlice("", CAMERA_OS_X + v, true, false, 0, false, m_AxesType);
 	m_ViewSlice[v]->PlugVisualPipe("albaVMEVolumeGray", "albaPipeBox", NON_VISIBLE);
 
 	m_ViewSlice[v]->PlugVisualPipe("albaVMEImage", "albaPipeBox", NON_VISIBLE);
@@ -190,6 +192,10 @@ void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 				surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
 
 				pipeSlice->SetSlice(surfaceOriginTranslated, normal);
+
+				albaPipeMeshSlice* meshPipe = albaPipeMeshSlice::SafeDownCast(pipeSlice);
+				if(meshPipe)
+					meshPipe->SetFlipNormalOff();
 			}
 		}
 	}
