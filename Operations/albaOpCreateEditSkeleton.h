@@ -39,7 +39,7 @@ class ALBA_EXPORT albaOpCreateEditSkeleton: public albaOp
 {
 public:
   /** constructor */
-	albaOpCreateEditSkeleton(wxString label = "Create/Edit Skeleton");
+	albaOpCreateEditSkeleton(wxString label = "Create Edit Skeleton");
   /** destructor */
 	~albaOpCreateEditSkeleton(); 
 

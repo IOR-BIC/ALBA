@@ -36,7 +36,7 @@ class albaEvent;
 class ALBA_EXPORT albaOpTriangulateSurface: public albaOp
 {
 public:
-	albaOpTriangulateSurface(const wxString &label = "FilterSurface");
+	albaOpTriangulateSurface(const wxString &label = "Triangulate Surface");
 	~albaOpTriangulateSurface(); 
 	virtual void OnEvent(albaEventBase *alba_event);
 

@@ -38,7 +38,7 @@ class ALBA_EXPORT albaOpCreateWrappedMeter: public albaOp
 {
 public:
   /** constructor */
-  albaOpCreateWrappedMeter(const wxString &label = "CreateWrappedMeter");
+  albaOpCreateWrappedMeter(const wxString &label = "Create Wrapped Meter");
   /** destructor */
   ~albaOpCreateWrappedMeter(); 
 

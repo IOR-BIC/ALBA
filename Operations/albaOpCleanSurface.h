@@ -37,7 +37,7 @@ class ALBA_EXPORT albaOpCleanSurface: public albaOp
 {
 public:
   /** constructor */
-	albaOpCleanSurface(const wxString &label = "CleanSurface");
+	albaOpCleanSurface(const wxString &label = "Clean Surface");
   /** destructor */
 	~albaOpCleanSurface();
   /** Answer to the messages coming from interface. */ 

@@ -59,7 +59,7 @@ class vtkALBAClipSurfaceBoundingBox;
 class ALBA_EXPORT albaOpInteractiveClipSurface: public albaOp
 {
 public:
-  albaOpInteractiveClipSurface(const wxString &label = "albaOpInteractiveClipSurface");
+  albaOpInteractiveClipSurface(const wxString &label = "Interactive Clip Surface");
   ~albaOpInteractiveClipSurface(); 
 	virtual void OnEvent(albaEventBase *alba_event);
 
