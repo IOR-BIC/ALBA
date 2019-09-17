@@ -53,7 +53,6 @@ class albaGUILutSlider;
 class albaGUILutSwatch;
 class albaVMEPolylineEditor;
 class albaGizmoCrossRotateTranslate;
-class albaViewSlice;
 
 
 /*
@@ -219,7 +218,7 @@ protected:
 	void CreateViewCameraNormalFeedbackActors();
 	void UpdateWindowing(bool enable,albaVME *vme);
 	
-	albaViewSlice *m_ViewSlice[3];
+	albaViewVTK *m_ViewSlice[3];
 	albaViewVTK *m_View3d;
 
 	albaVME          	*m_CurrentVolume;
