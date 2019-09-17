@@ -139,7 +139,7 @@ void albaViewArbitraryOrthoSlice::PackageView()
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
 {
-	m_ViewSlice[v] = new albaViewSlice("", CAMERA_OS_X + v, true, false, 0, false, m_AxesType);
+	m_ViewSlice[v] = new albaViewVTK("", CAMERA_OS_X + v, true, false, 0, false, m_AxesType);
 	m_ViewSlice[v]->PlugVisualPipe("albaVMEVolumeGray", "albaPipeBox", NON_VISIBLE);
 
 	m_ViewSlice[v]->PlugVisualPipe("albaVMEImage", "albaPipeBox", NON_VISIBLE);
