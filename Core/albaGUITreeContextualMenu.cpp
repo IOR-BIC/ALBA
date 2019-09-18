@@ -59,6 +59,8 @@
 #include "pic/menu/EDIT_PASTE.xpm"
 #include "pic/menu/EDIT_DELETE.xpm"
 #include "pic/menu/EDIT_REPARENT.xpm"
+#include "pic/menu/EDIT_EXPAND_TREE.xpm"
+#include "pic/menu/EDIT_COLLAPSE_TREE.xpm"
 #include "pic/menu/EDIT_ADD_GROUP.xpm"
 #include "pic/menu/SHOW.xpm"
 #include "pic/menu/HIDE.xpm"
@@ -176,6 +178,9 @@ void albaGUITreeContextualMenu::CreateContextualMenu(albaGUICheckTree *tree, alb
 
 		albaGUI::AddMenuItem(this, RMENU_ADD_GROUP, "Add Group", EDIT_ADD_GROUP_xpm);
 		this->AppendSeparator();
+		albaGUI::AddMenuItem(this, RMENU_EXPAND_SUBTREE, "Expand", EDIT_EXPAND_TREE_xpm);
+		albaGUI::AddMenuItem(this, RMENU_COLLAPSE_SUBTREE, "Collapse", EDIT_COLLAPSE_TREE_xpm);
+		this->AppendSeparator();
 		albaGUI::AddMenuItem(this, RMENU_CUT, "Cut", EDIT_CUT_xpm);
 		albaGUI::AddMenuItem(this, RMENU_COPY, "Copy", EDIT_COPY_xpm);
 		albaGUI::AddMenuItem(this, RMENU_PASTE, "Paste", EDIT_PASTE_xpm);
@@ -292,6 +297,14 @@ void albaGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 			GetLogicManager()->VmeShow(m_VmeActive, show);
     }
 		break;
+
+		case RMENU_EXPAND_SUBTREE:
+			ExpandSubTree(m_NodeActive);
+		break;
+		case RMENU_COLLAPSE_SUBTREE:
+			CollapseSubTree(m_NodeActive);
+		break;
+		
 		case RMENU_SHOW_SUBTREE:
 			m_SceneGraph->VmeShowSubTree(m_VmeActive, true);
 		break;
@@ -346,4 +359,29 @@ void albaGUITreeContextualMenu::CryptSubTree(bool crypt)
     v->SetCrypting(crypt);
 	}
 	iter->Delete();
+}
+
+//----------------------------------------------------------------------------
+void albaGUITreeContextualMenu::ExpandSubTree(albaVME *node)
+{
+	m_NodeTree->ExpandNode((long long)node); // Expand first node
+
+	for (int i = 0; i < node->GetNumberOfChildren(); i++)
+	{
+		if (node->GetChild(i) && node->GetChild(i)->GetNumberOfChildren() > 0)
+			ExpandSubTree(node->GetChild(i));
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaGUITreeContextualMenu::CollapseSubTree(albaVME *node)
+{
+	if(node != node->GetRoot())
+		m_NodeTree->CollapseNode((long long)node); // Collapse first node
+
+	for (int i = 0; i < node->GetNumberOfChildren(); i++)
+	{
+		if (node->GetChild(i) && node->GetChild(i)->GetNumberOfChildren() > 0)
+			CollapseSubTree(node->GetChild(i));
+	}
 }
