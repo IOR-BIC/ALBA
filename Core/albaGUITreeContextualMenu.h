@@ -46,6 +46,8 @@ enum TREE_CONTEXTUAL_MENU_ID
 	RMENU_SHOW_SAMETYPE,
 	RMENU_HIDE_SUBTREE,
 	RMENU_HIDE_SAMETYPE,
+	RMENU_EXPAND_SUBTREE,
+	RMENU_COLLAPSE_SUBTREE,
 	RMENU_ADD_GROUP,
 	RMENU_CUT,
 	RMENU_COPY,
@@ -101,6 +103,9 @@ protected:
   /** Enable/disable crypto for a subtree. */
   void CryptSubTree(bool crypt);
   
+	void ExpandSubTree(albaVME *vme);
+	void CollapseSubTree(albaVME *vme);
+
 	/** Answer contextual men's selection. */
 	virtual void OnContextualMenu(wxCommandEvent& event);
   DECLARE_EVENT_TABLE()
