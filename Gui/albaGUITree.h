@@ -160,6 +160,8 @@ public:
   /** expand the children of node_id */
   void ExpandNode(long long node_id);
 
+	bool IsNodeExpanded(long long node_id);
+
   /** Set the Listener that will receive event-notification, the Listener can be changed any time  */
   void SetListener(albaObserver *listener)   {m_Listener=listener;}; 
 
