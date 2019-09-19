@@ -43,7 +43,7 @@ public:
 
   virtual void OnEvent(albaEventBase *alba_event);
 
-  albaOp* Copy();
+	albaOp* Copy();
 
 	/** Return true for the acceptable vme type. */
 	bool Accept(albaVME *node);
@@ -69,10 +69,18 @@ protected:
   /** Create the dialog interface for the importer. */
   virtual void CreateGui();  
 
-  int m_ImporterType;
+	void OpenMeshFile();
+
+	void AutoComplete();
+
+	int GetLine(FILE *fp, char *buffer);
+
+	int m_ImporterType;
 	albaVMEMesh *m_ImportedVmeMesh;
   albaString	m_FileDir;
 
+	/** File name*/
+	albaString m_FileName;
   /** Nodes file name*/
   albaString m_NodesFileName;
 	/** Elements file name*/

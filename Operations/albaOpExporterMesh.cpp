@@ -151,7 +151,7 @@ int albaOpExporterMesh::Write()
   }
   f_Out.close();
 
-  // free memeory
+  // free memory
   delete writer;
   return returnValue;
 }
