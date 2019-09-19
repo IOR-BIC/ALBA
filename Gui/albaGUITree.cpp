@@ -475,3 +475,15 @@ void albaGUITree::ExpandNode(long long node_id)
   if(!item.IsOk()) return;
   m_NodeTree->Expand(item);
 }
+
+//----------------------------------------------------------------------------
+bool albaGUITree::IsNodeExpanded(long long node_id)
+{
+	if (!NodeExist(node_id)) return false;
+
+	wxTreeItemId item = ItemFromNode(node_id);
+	if (!item.IsOk()) return false;
+
+	bool isExpanded = m_NodeTree->IsExpanded(item);
+	return isExpanded;
+}
