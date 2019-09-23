@@ -72,6 +72,8 @@ albaVMEMeshAnsysTextExporter::albaVMEMeshAnsysTextExporter()
 
 	m_MaterialData = NULL;
 	m_MatIdArray = NULL;
+
+	m_WriteMode = ANSYS_MODE;
 }
 //----------------------------------------------------------------------------
 albaVMEMeshAnsysTextExporter::~albaVMEMeshAnsysTextExporter()
@@ -97,7 +99,8 @@ int albaVMEMeshAnsysTextExporter::Write()
     return ALBA_ERROR;
   }
 
-  WriteMaterialsFile(m_Input, m_OutputMaterialsFileName);
+	if (m_WriteMode == ANSYS_MODE)
+		WriteMaterialsFile(m_Input, m_OutputMaterialsFileName);
   
   return ALBA_OK;
 }
@@ -347,16 +350,20 @@ int albaVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputU
 	FILE *file=fopen(outputFileName,"w");
 		
   for (int rowID = 0 ; rowID < rowsNumber ; rowID++)
-  {
-		int esys = 0;// <TODO!!!!!> this seems to be always 0... to be supported in the future anyway
-		int comp = 1;// <TODO!!!!!> this seems to be always 1... to be supported in the future anyway
-
+  {		
     fprintf(file, "%d ", elementIdArray->GetValue(rowID));
-		fprintf(file, "%d ", materialArray[rowID]);
-		fprintf(file, "%d ", typeArray->GetValue(rowID));
-		fprintf(file, "%d ", realArray->GetValue(rowID));
-		fprintf(file, "%d ", esys);
-		fprintf(file, "%d ", comp);
+
+		if (m_WriteMode == ANSYS_MODE)
+		{
+			int esys = 0;// <TODO!!!!!> this seems to be always 0... to be supported in the future anyway
+			int comp = 1;// <TODO!!!!!> this seems to be always 1... to be supported in the future anyway
+
+			fprintf(file, "%d ", materialArray[rowID]);
+			fprintf(file, "%d ", typeArray->GetValue(rowID));
+			fprintf(file, "%d ", realArray->GetValue(rowID));
+			fprintf(file, "%d ", esys);
+			fprintf(file, "%d ", comp);
+		}
 
     // get the ith cell from input mesh
     vtkCell *currentCell = inputUGrid->GetCell(rowID);
