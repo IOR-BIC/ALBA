@@ -124,11 +124,23 @@ int albaOpExporterMesh::Write()
 
   writer->SetOutputNodesFileName(m_NodesFileName.GetCStr());
   writer->SetOutputElementsFileName(m_ElementsFileName.GetCStr());
-  writer->SetOutputMaterialsFileName(m_MaterialsFileName.GetCStr());
 
-	writer->SetMaterialData(GetMaterialData());
-	writer->SetMatIdArray(GetMatIdArray());
+	bool hasMaterials = HasMaterials();
 
+	if (hasMaterials)
+	{
+		writer->SetMode(albaVMEMeshAnsysTextExporter::ANSYS_MODE);
+
+		writer->SetOutputMaterialsFileName(m_MaterialsFileName.GetCStr());
+
+		writer->SetMaterialData(GetMaterialData());
+		writer->SetMatIdArray(GetMatIdArray());
+	}
+	else
+	{
+		writer->SetMode(albaVMEMeshAnsysTextExporter::GENERIC_MODE);
+	}
+	
   // Write
 	int returnValue = writer->Write();
 
@@ -147,11 +159,13 @@ int albaOpExporterMesh::Write()
     f_Out << "FILE LIST:" << "\n";
     f_Out << m_NodesFileName.GetCStr() << "\n";
     f_Out << m_ElementsFileName.GetCStr() << "\n";
-    f_Out << m_MaterialsFileName.GetCStr() << "\n";
+    
+		if (hasMaterials)
+			f_Out << m_MaterialsFileName.GetCStr() << "\n";
   }
   f_Out.close();
 
-  // free memeory
+  // free memory
   delete writer;
   return returnValue;
 }

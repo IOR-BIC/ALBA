@@ -71,7 +71,7 @@ protected:
 	void OnOK();
 
 	albaString GetWildcard();
-  
+
 	wxString m_FileDir;
   albaString m_File;
 

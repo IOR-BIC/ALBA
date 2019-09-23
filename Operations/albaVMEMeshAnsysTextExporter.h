@@ -85,12 +85,20 @@ public:
 	void SetMaterialData(vtkFieldData *materialData) { m_MaterialData = materialData; };
 	void SetMatIdArray(vtkIdType *idArray) { m_MatIdArray = idArray; };
 
+	void SetMode(int mode) { m_WriteMode = mode; }
+
   /** Write output files; return ALBA_OK if succesful, otherwise ALBA_ERROR  */
   int Write();
 
   albaVMEMeshAnsysTextExporter();
   ~albaVMEMeshAnsysTextExporter();
 	
+	enum
+	{
+		ANSYS_MODE = 0,
+		GENERIC_MODE,
+	};
+
 protected:
 
   int WriteNodesFile(vtkUnstructuredGrid *inputUGrid, const char *outputFileName);
@@ -102,6 +110,10 @@ protected:
 	vtkFieldData *m_MaterialData;
 	vtkIdType *m_MatIdArray;
   
+	/**
+	Writer Mode 0-Ansys 1-Generic*/
+	int m_WriteMode;
+
   /**
   // Output file name*/
   const char *m_OutputNodesFileName;
