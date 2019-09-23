@@ -156,11 +156,11 @@ void albaOpImporterMesh::CreateGui()
   m_Gui = new albaGUI(this);
   m_Gui->SetListener(this);
 
-	m_Gui->Label("", true);
+	m_Gui->Label("");
 
   //////////////////////////////////////////////////////////////////////////
 
-	m_Gui->Label(_("File:"), true);
+	m_Gui->Label(_("Selected Mesh File"), true);
 	m_Gui->String(NULL, "Mesh File:", &m_FileName);
 	m_Gui->Button(ID_FileName, "Change File");
 
