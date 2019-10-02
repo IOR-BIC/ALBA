@@ -272,7 +272,7 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
       for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
       {
         center[2] = b[5]-step*(i+1);
-        ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetSlice(center);
+        ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->InitializeSlice(center);
         ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetTextColor(m_BorderColor[i]);
         ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->VmeShow(vme,show);
 
