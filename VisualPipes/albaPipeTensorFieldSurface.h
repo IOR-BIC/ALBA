@@ -29,7 +29,7 @@ class vtkDataSet;
 class vtkLookupTable;
 class vtkActor;
 class vtkScalarBarActor;
-class vtkStructuredPoints;
+class vtkImageData;
 
 /** Displays the surface of input VME (even, if it is volume),
 using color mapping according to X,Y,Z or magnitude of associated
@@ -89,7 +89,7 @@ public:
   /*virtual*/ void OnEvent(albaEventBase *alba_event);
   void EigenVectors3x3(double A[3][3], double lambda[3], double V[3][3]);
   void MultiplyColumnsByScalars(const double *s, const double *A, double *B) const;
-  bool ComputeEigenvalues(vtkStructuredPoints* tensorVolume,double sr[2],int mode);
+  bool ComputeEigenvalues(vtkImageData* tensorVolume,double sr[2],int mode);
 
 protected:
   /*virtual*/ albaGUI  *CreateGui();

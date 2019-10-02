@@ -61,7 +61,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkOutlineFilter.h"
 #include "vtkImageData.h"
 #include "vtkPolyData.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRenderer.h"
 #include "albaOpImporterDicomSliceAccHelper.h"
 #include "vtkTransform.h"

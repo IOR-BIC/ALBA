@@ -47,7 +47,7 @@
 #include "vtkPolyData.h"
 #include "vtkActor.h"
 #include "vtkOutlineCornerFilter.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkALBAVolumeSlicer.h"
 #include "vtkProperty.h"
@@ -307,7 +307,7 @@ void albaPipeVolumeArbSlice::CreateTICKs()
 			}
 		}
 	}
-	vtkStructuredPoints *sp_data = vtkStructuredPoints::SafeDownCast(vtk_data);
+	vtkImageData *sp_data = vtkImageData::SafeDownCast(vtk_data);
 	if (sp_data)
 	{
 		int dim[3];
@@ -367,7 +367,7 @@ void albaPipeVolumeArbSlice::CreateSlice()
 
   vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
   vtk_data->Update();
-  if(vtk_data->IsA("vtkImageData") || vtk_data->IsA("vtkStructuredPoints"))
+  if(vtk_data->IsA("vtkImageData") || vtk_data->IsA("vtkImageData"))
   {
     ((vtkImageData *)vtk_data)->GetSpacing(xspc,yspc,zspc);
   }

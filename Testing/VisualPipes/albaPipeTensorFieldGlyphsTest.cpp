@@ -36,7 +36,7 @@
 #include "vtkFloatArray.h"
 #include "vtkPointData.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkALBAAssembly.h"
 #include "vtkProp3DCollection.h"
@@ -107,7 +107,7 @@ void albaPipeTensorFieldGlyphsTest::TestCreate()
 	
   int x,y,z;
   x = y = z = 10;
-  vtkALBASmartPointer<vtkStructuredPoints> image;
+  vtkALBASmartPointer<vtkImageData> image;
   double origin[3] = {0.0,0.0, -45.};
   image->SetOrigin(origin);
   image->SetDimensions(x,y,z);

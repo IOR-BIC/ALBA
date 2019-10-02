@@ -36,7 +36,7 @@ class albaDataPipeCustom;
 
 class vtkRenderer;
 class vtkWindowLevelLookupTable;
-class vtkStructuredPoints;
+class vtkImageData;
 class vtkRectilinearGrid;
 class vtkProbeFilter;
 class vtkTexture;
@@ -203,7 +203,7 @@ protected:
 
   vtkWindowLevelLookupTable * m_LookUpTable;
   vtkWindowLevelLookupTable * m_LookUpTableColor;
-  vtkStructuredPoints       * m_SP;
+  vtkImageData       * m_SP;
   vtkRectilinearGrid        * m_RG;
   vtkProbeFilter          * m_ProbeFilter;
   vtkTexture        * m_Texture;  

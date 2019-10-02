@@ -48,7 +48,7 @@
 #include "vtkImageShiftScale.h"
 #include "vtkProbeFilter.h" 
 #include "vtkRectilinearGrid.h" 
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkLookupTable.h"
 #include "vtkImageResample.h"
 
@@ -117,7 +117,7 @@ void albaPipeVolumeVR::Create(albaSceneNode *n)
     //Get the bounds for m_Vme as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax)
     m_Vme->GetOutput()->GetVTKData()->GetBounds(bounds);
 
-    m_StructuredImage = vtkStructuredPoints::New();
+    m_StructuredImage = vtkImageData::New();
 
     m_Probe = vtkProbeFilter::New();
 
@@ -427,7 +427,7 @@ void albaPipeVolumeVR::SetNumberPoints(int n)
   int dim[3];
   double bounds[6];
 
-  ((vtkStructuredPoints *)m_Vme->GetOutput()->GetVTKData())->GetDimensions(dim);
+  ((vtkImageData *)m_Vme->GetOutput()->GetVTKData())->GetDimensions(dim);
 
   //Get the bounds for m_Vme as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax)
   m_Vme->GetOutput()->GetVTKData()->GetBounds(bounds);
@@ -438,7 +438,7 @@ void albaPipeVolumeVR::SetNumberPoints(int n)
 
   if(m_StructuredImage) m_StructuredImage->Delete();
 
-  m_StructuredImage = vtkStructuredPoints::New();
+  m_StructuredImage = vtkImageData::New();
 
   m_StructuredImage->SetOrigin(bounds[0],bounds[2],bounds[4]);
   int dim_z = (bounds[5]-bounds[4])/spaceInt_z + 1;

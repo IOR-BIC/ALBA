@@ -33,7 +33,7 @@
 
 #include "vtkDataSetReader.h"
 #include "vtkFloatArray.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -110,7 +110,7 @@ void albaPipeTensorFieldSliceTest::TestCreate()
 
 	int x, y, z;
 	x = y = z = 10;
-	vtkALBASmartPointer<vtkStructuredPoints> image;
+	vtkALBASmartPointer<vtkImageData> image;
 	double origin[3] = { 0.0,0.0, -45. };
 	image->SetOrigin(origin);
 	image->SetDimensions(x, y, z);

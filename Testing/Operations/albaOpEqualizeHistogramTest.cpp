@@ -32,7 +32,7 @@
 #include "vtkDataSetReader.h"
 #include "vtkImageData.h"
 #include "vtkImageCast.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkDataSet.h"
 #include "vtkDataArray.h"
@@ -142,7 +142,7 @@ void OpEqualizeHistogramDerivedTestClass::ExecuteOpRun()
 
 
 
-  /*vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
+  /*vtkImageData *sp = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
   if (sp == NULL)
   {
     op->SetInput(m_VolumeInput);
@@ -160,7 +160,7 @@ void OpEqualizeHistogramDerivedTestClass::ExecuteOpRun()
   m_VolumeInput->Update();
 
   albaNEW(m_VolumeOutput);
-  m_VolumeOutput->SetData(vtkStructuredPoints::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData()),m_VolumeInput->GetTimeStamp());
+  m_VolumeOutput->SetData(vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData()),m_VolumeInput->GetTimeStamp());
   albaString name = m_VolumeInput->GetName();
   name<<" - Equalized Histogram";
   m_VolumeOutput->SetName(name);

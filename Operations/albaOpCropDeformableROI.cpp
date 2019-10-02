@@ -36,7 +36,7 @@
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkImageData.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkTransform.h"
 #include "vtkTransformFilter.h"
 #include "wx\busyinfo.h"

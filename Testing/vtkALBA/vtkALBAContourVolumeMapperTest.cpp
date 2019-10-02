@@ -35,7 +35,7 @@
 #include "vtkContourFilter.h"
 #include "vtkImageData.h"
 #include "vtkImageActor.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
 #include "vtkFloatArray.h"

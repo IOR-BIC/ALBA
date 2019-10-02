@@ -41,7 +41,7 @@ typedef albaOpVolumeResample movr;
 
 #include "vtkALBASmartPointer.h"
 #include "vtkDataSet.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkDataSetWriter.h"
 #include "vtkTransform.h"
@@ -125,7 +125,7 @@ void albaOpVolumeResampleTest::TestResampleInternal( const char *inFileName, con
 
   albaVME *Output = opVolumeResample->GetOutput();
   Output->GetOutput()->GetVTKData()->Update();
-  vtkStructuredPoints *outputVTKData=vtkStructuredPoints::SafeDownCast(Output->GetOutput()->GetVTKData());
+  vtkImageData *outputVTKData=vtkImageData::SafeDownCast(Output->GetOutput()->GetVTKData());
 
   CPPUNIT_ASSERT(outputVTKData!=NULL);
 

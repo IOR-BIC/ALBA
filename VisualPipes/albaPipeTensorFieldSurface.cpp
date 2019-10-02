@@ -46,7 +46,7 @@
 #include "vtkMath.h"
 #include "vtkFloatArray.h"
 #include "vtkDoubleArray.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 
 //#include "vtkArrayCalculator.h"
 
@@ -274,7 +274,7 @@ void albaPipeTensorFieldSurface::OnEvent(albaEventBase *alba_event)
 
   double sr[2];
   vtkDataArray* da ;
-  vtkStructuredPoints *orgData =vtkStructuredPoints::SafeDownCast(m_Vme->GetOutput()->GetVTKData()) ;  
+  vtkImageData *orgData =vtkImageData::SafeDownCast(m_Vme->GetOutput()->GetVTKData()) ;  
   da = orgData->GetPointData()->GetTensors(tensor_name);
   
   m_SurfaceMapper->SelectColorArray(tensor_name);
@@ -347,7 +347,7 @@ void albaPipeTensorFieldSurface::MultiplyColumnsByScalars(const double *s, const
 	
 }
 //------------------------------------------------------------------------------
-bool albaPipeTensorFieldSurface::ComputeEigenvalues(vtkStructuredPoints* tensorVolume,double sr[2],int mode)
+bool albaPipeTensorFieldSurface::ComputeEigenvalues(vtkImageData* tensorVolume,double sr[2],int mode)
 //------------------------------------------------------------------------------
 {
 	vtkDoubleArray* tensorArray =  vtkDoubleArray::SafeDownCast(tensorVolume->GetPointData()->GetTensors());

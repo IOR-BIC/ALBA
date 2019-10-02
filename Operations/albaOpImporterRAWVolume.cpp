@@ -46,7 +46,7 @@
 #include "vtkDataArray.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkDoubleArray.h"
 
 //----------------------------------------------------------------------------
@@ -478,9 +478,9 @@ bool albaOpImporterRAWVolume::Import()
 
 	if(m_BuildRectilinearGrid)
 	{
-		// conversion from vtkStructuredPoints to vtkRectilinearGrid
+		// conversion from vtkImageData to vtkRectilinearGrid
 
-		vtkALBASmartPointer<vtkStructuredPoints> structured_data = image_to_sp->GetOutput();
+		vtkALBASmartPointer<vtkImageData> structured_data = (vtkImageData *)image_to_sp->GetOutput();
 		vtkALBASmartPointer<vtkPointData> data = structured_data->GetPointData();
 		vtkALBASmartPointer<vtkDataArray> scalars = data->GetScalars();
 
