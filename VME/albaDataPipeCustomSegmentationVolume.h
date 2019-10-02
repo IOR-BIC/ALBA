@@ -27,7 +27,7 @@
 // forward declarations
 //----------------------------------------------------------------------------
 class vtkRectilinearGrid;
-class vtkStructuredPoints;
+class vtkImageData;
 class albaVME;
 /** */
 class ALBA_EXPORT albaDataPipeCustomSegmentationVolume : public albaDataPipeCustom
@@ -174,16 +174,16 @@ protected:
   /*virtual*/ void Execute();
 
   vtkRectilinearGrid *m_RG;
-  vtkStructuredPoints *m_SP;
+  vtkImageData *m_SP;
 
   vtkRectilinearGrid *m_AutomaticRG;
-  vtkStructuredPoints *m_AutomaticSP;
+  vtkImageData *m_AutomaticSP;
   vtkRectilinearGrid *m_ManualRG;
-  vtkStructuredPoints *m_ManualSP;
+  vtkImageData *m_ManualSP;
   vtkRectilinearGrid *m_RefinementRG;
-  vtkStructuredPoints *m_RefinementSP;
+  vtkImageData *m_RefinementSP;
   vtkRectilinearGrid *m_RegionGrowingRG;
-  vtkStructuredPoints *m_RegionGrowingSP;
+  vtkImageData *m_RegionGrowingSP;
 
   bool m_ChangedManualData;
   bool m_ChangedAutomaticData;

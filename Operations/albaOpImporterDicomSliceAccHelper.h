@@ -18,7 +18,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaConfigure.h"
 #include <vtkRectilinearGridSource.h>
 #include "vtkRectilinearGrid.h"
-#include <vtkStructuredPoints.h>
+#include <vtkImageData.h>
 #include <vtkImageData.h>
 
 class ALBA_EXPORT albaOpImporterDicomSliceAccHelper
@@ -31,10 +31,6 @@ public:
   /**
   Set the slice into the RectilinearGrid*/
   void SetSlice(int slice_num,vtkImageData *slice, double* unRotatedOrigin);
-  void SetSlice(int slice_num, vtkStructuredPoints * slice,double* unRotatedOrigin)
-  {
-	  SetSlice(slice_num, (vtkImageData *)slice, unRotatedOrigin);
-  }
  
  
 	vtkDataSet* GetNewOutput();

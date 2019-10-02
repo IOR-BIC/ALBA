@@ -40,7 +40,7 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkALBAAssembly.h"

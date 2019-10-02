@@ -21,7 +21,7 @@
 #include "vtkStructuredPointsToStructuredPointsFilter.h"
 
 class vtkImageData;
-class vtkStructuredPoints;
+class vtkImageData;
 
 #define OFF_PIXEL 0
 #define ON_PIXEL 255

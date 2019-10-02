@@ -21,7 +21,7 @@
 #include "vtkALBASmartPointer.h"
 
 #include "vtkImageData.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkFloatArray.h"
 
@@ -59,7 +59,7 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToX()
   filter->Update();
 
   //check Control
-  vtkStructuredPoints *projectedImage = vtkStructuredPoints::SafeDownCast(filter->GetOutput());
+  vtkImageData *projectedImage = vtkImageData::SafeDownCast(filter->GetOutput());
 	projectedImage->Update();
   for(int j=0;j<glo_Dimension[1]*glo_Dimension[2];j++)
   {
@@ -97,7 +97,7 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToY()
   filter->Update();
 
   //check Control
-  vtkStructuredPoints *projectedImage = (vtkStructuredPoints *)filter->GetOutput();
+  vtkImageData *projectedImage = (vtkImageData *)filter->GetOutput();
   for(int j=0;j<glo_Dimension[0]*glo_Dimension[2];j++)
   {
     float value1 = arrayControl->GetTuple1(j);
@@ -133,7 +133,7 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToZ()
   filter->Update();
 
   //check Control
-  vtkStructuredPoints *projectedImage = (vtkStructuredPoints *)filter->GetOutput();
+  vtkImageData *projectedImage = (vtkImageData *)filter->GetOutput();
   for(int j=0;j<glo_Dimension[0]*glo_Dimension[1];j++)
   {
     float value1 = arrayControl->GetTuple1(j);
@@ -174,7 +174,7 @@ void vtkALBAProjectVolumeTest::TestRangeProjectionX()
 	filter->Update();
 
 	//check Control
-	vtkStructuredPoints *projectedImage = (vtkStructuredPoints *)filter->GetOutput();
+	vtkImageData *projectedImage = (vtkImageData *)filter->GetOutput();
 	for (int j = 0; j < glo_Dimension[1] * glo_Dimension[2]; j++)
 	{
 		float value1 = arrayControl->GetTuple1(j);
@@ -213,7 +213,7 @@ void vtkALBAProjectVolumeTest::TestRangeProjectionY()
 	filter->Update();
 
 	//check Control
-	vtkStructuredPoints *projectedImage = (vtkStructuredPoints *)filter->GetOutput();
+	vtkImageData *projectedImage = (vtkImageData *)filter->GetOutput();
 	for (int j = 0; j < glo_Dimension[0] * glo_Dimension[2]; j++)
 	{
 		float value1 = arrayControl->GetTuple1(j);
@@ -250,7 +250,7 @@ void vtkALBAProjectVolumeTest::TestRangeProjectionZ()
 	filter->Update();
 
 	//check Control
-	vtkStructuredPoints *projectedImage = (vtkStructuredPoints *)filter->GetOutput();
+	vtkImageData *projectedImage = (vtkImageData *)filter->GetOutput();
 	for (int j = 0; j < glo_Dimension[0] * glo_Dimension[1]; j++)
 	{
 		float value1 = arrayControl->GetTuple1(j);

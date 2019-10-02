@@ -32,7 +32,7 @@ class albaVMEGizmo;
 
 class vtkRectilinearGrid;
 class vtkProbeFilter;
-class vtkStructuredPoints;
+class vtkImageData;
 class albaGizmoROI;
 
 //----------------------------------------------------------------------------
@@ -77,7 +77,7 @@ protected:
   albaGizmoROI *m_GizmoROI; ///< Gizmo used to define sub-volume region to crop
   
 	vtkRectilinearGrid *m_InputRG; ///< Pointer for Rectilinear Grid volume
-	vtkStructuredPoints *m_InputSP; ///< Pointer for Structured Points volume
+	vtkImageData *m_InputSP; ///< Pointer for Structured Points volume
 
 	double m_XSpacing; ///< X Spacing for cropped volume On Structured Points data
 	double m_YSpacing; ///< Y Spacing for cropped volume On Structured Points data
@@ -93,7 +93,7 @@ protected:
   int m_ShowROI; ///< Flag used to show/hide crop gizmo
 
 	vtkRectilinearGrid	*m_OutputRG; ///< Pointer for Rectilinear Grid cropped volume
-	vtkStructuredPoints *m_OutputSP; ///< Pointer for Structured Points cropped volume
+	vtkImageData *m_OutputSP; ///< Pointer for Structured Points cropped volume
 
   bool  m_ShowShadingPlane;
 };

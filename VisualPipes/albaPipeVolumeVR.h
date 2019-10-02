@@ -36,7 +36,7 @@ class vtkLODProp3D;
 class vtkImageShiftScale;
 class vtkProbeFilter;
 class vtkRectilinearGrid; 
-class vtkStructuredPoints;
+class vtkImageData;
 class vtkImageResample;
 /**
 className: albaPipeVolumeVR
@@ -131,7 +131,7 @@ protected:
   vtkProperty									*m_PropertyLOD;
   vtkImageShiftScale					*m_ImageShift;
 
-  vtkStructuredPoints					*m_StructuredImage;
+  vtkImageData					*m_StructuredImage;
   vtkProbeFilter							*m_Probe;
 
 	vtkImageResample						*m_ResampleFilter;

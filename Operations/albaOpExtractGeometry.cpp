@@ -37,7 +37,7 @@
 
 #include "albaOpVolumeResample.h"
 
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkCleanPolyData.h"
 #include "vtkDecimatePro.h"
 #include "vtkALBAFixTopology.h"

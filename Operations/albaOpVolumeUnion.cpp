@@ -36,7 +36,7 @@
 #include "vtkALBASmartPointer.h"
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkProbeFilter.h"
 #include "vtkExtractRectilinearGrid.h"
 #include "vtkDoubleArray.h"
@@ -113,7 +113,7 @@ void albaOpVolumeUnion::OpRun()
 	m_FirstVMEVolume = albaVMEVolume::SafeDownCast(m_Input);
 	m_FirstVMEVolume->Update();
 
-	if ( !(m_FirstVMEVolume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid")) && !(m_FirstVMEVolume->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints")) )
+	if ( !(m_FirstVMEVolume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid")) && !(m_FirstVMEVolume->GetOutput()->GetVTKData()->IsA("vtkImageData")) )
 	{
 		wxMessageBox("The input VME has not a VTK RectilinearGrid or StructuredPoints data!");
 		OpStop(OP_RUN_CANCEL);
@@ -136,7 +136,7 @@ void albaOpVolumeUnion::BuildVolumeUnion()
 	//Input data(first volume)
 	m_FirstVMEVolume->Update();
 	vtkALBASmartPointer<vtkRectilinearGrid> rgrid_firstvol;
-	vtkALBASmartPointer<vtkStructuredPoints> rgrid_firstvolstr;
+	vtkALBASmartPointer<vtkImageData> rgrid_firstvolstr;
 	if(m_FirstVMEVolume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
 	{
 	  rgrid_firstvol->DeepCopy(m_FirstVMEVolume->GetVolumeOutput()->GetRectilinearData());
@@ -155,7 +155,7 @@ void albaOpVolumeUnion::BuildVolumeUnion()
 	//Input data(second volume)
 	m_SecondVMEVolume->Update();
 	vtkALBASmartPointer<vtkRectilinearGrid> rgrid_secondvol;
-	vtkALBASmartPointer<vtkStructuredPoints> rgrid_secondvolstr;
+	vtkALBASmartPointer<vtkImageData> rgrid_secondvolstr;
 	if(m_SecondVMEVolume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
 	{
 	  rgrid_secondvol->DeepCopy(m_SecondVMEVolume->GetVolumeOutput()->GetRectilinearData());
@@ -346,7 +346,7 @@ void albaOpVolumeUnion::BuildVolumeUnion()
 	}
 	else
 	{
-		m_VolUnionRGstr = vtkStructuredPoints::New();
+		m_VolUnionRGstr = vtkImageData::New();
 		m_VolUnionRGstr->SetDimensions(resolution[0],resolution[1],resolution[2]);
 		m_VolUnionRGstr->SetOrigin(m_bounds[0],m_bounds[2],m_bounds[4]);
 		m_VolUnionRGstr->SetSpacing(m_spacingXYZ);
@@ -526,7 +526,7 @@ void albaOpVolumeUnion::OnEvent(albaEventBase *alba_event)
 					albaString title = "Choose Union Volume";
 					bool selOK = VmeChoose(title,e);
 					if(selOK) {
-						if ( !(m_SecondVMEVolume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid")) && !(m_SecondVMEVolume->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints")) )
+						if ( !(m_SecondVMEVolume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid")) && !(m_SecondVMEVolume->GetOutput()->GetVTKData()->IsA("vtkImageData")) )
 						{
 							wxMessageBox("The second input VME has not a VTK RectilinearGrid or StructuredPoints data!");
 							OpStop(OP_RUN_CANCEL);

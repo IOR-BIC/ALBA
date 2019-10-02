@@ -39,7 +39,7 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkCamera.h"
 
 #include "vtkALBASmartPointer.h"
@@ -117,7 +117,7 @@ void albaPipeVectorFieldSliceTest::TestCreate()
 
 	int x, y, z;
 	x = y = z = 10;
-	vtkALBASmartPointer<vtkStructuredPoints> image;
+	vtkALBASmartPointer<vtkImageData> image;
 	double origin[3] = { 0.0,0.0, -45. };
 	image->SetOrigin(origin);
 	image->SetDimensions(x, y, z);

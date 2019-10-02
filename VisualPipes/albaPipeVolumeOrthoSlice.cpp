@@ -44,7 +44,7 @@
 #include "vtkPolyData.h"
 #include "vtkActor.h"
 #include "vtkOutlineCornerFilter.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkALBAVolumeOrthoSlicer.h"
 #include "vtkProperty.h"
@@ -257,7 +257,7 @@ void albaPipeVolumeOrthoSlice::CreateTICKs()
 			}
 		}
 	}
-	vtkStructuredPoints *sp_data = vtkStructuredPoints::SafeDownCast(vtk_data);
+	vtkImageData *sp_data = vtkImageData::SafeDownCast(vtk_data);
 	if (sp_data)
 	{
 		int dim[3];

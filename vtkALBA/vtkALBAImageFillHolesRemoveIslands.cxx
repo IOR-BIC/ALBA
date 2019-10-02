@@ -20,7 +20,7 @@
 
 #include "vtkALBASmartPointer.h"
 #include "vtkObjectFactory.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkPointData.h"
@@ -75,11 +75,11 @@ void vtkALBAImageFillHolesRemoveIslands::Execute()
 //------------------------------------------------------------------------------
 {
   // get input
-  vtkStructuredPoints *input = (vtkStructuredPoints*)this->GetInput();
+  vtkImageData *input = (vtkImageData*)this->GetInput();
   input->Update();
 
   // prepare output
-  vtkStructuredPoints *output = this->GetOutput();
+  vtkImageData *output = (vtkImageData *)this->GetOutput();
   output->DeepCopy(input);
   output->UpdateData();
   output->Update();
@@ -187,5 +187,5 @@ void vtkALBAImageFillHolesRemoveIslands::Execute()
   flood_fill->Delete();
   output->UpdateData();
   output->Update();
-  this->SetOutput(output);
+  this->SetOutput((vtkStructuredPoints*)output);
 }

@@ -34,7 +34,7 @@
 #include "albaTagArray.h"
 
 #include "vtkDataSet.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkImageCast.h"
 #include "vtkPoints.h"
 #include "vtkSphereSource.h"
@@ -313,7 +313,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   vtkALBASmartPointer<vtkImageToStructuredPoints> image_to_sp;
   image_to_sp->SetInput(image);
   image_to_sp->Update();
-  m_VolumeOut->SetData(image_to_sp->GetOutput(),m_ResampleInput->GetTimeStamp());
+  m_VolumeOut->SetData((vtkImageData*)image_to_sp->GetOutput(),m_ResampleInput->GetTimeStamp());
 
   albaTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");
@@ -371,7 +371,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OnEvent(albaEventBase *a
         double b[6],spacing[3],origin[3];
         albaVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetBounds(b);
 
-        vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(albaVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
+        vtkImageData *sp = vtkImageData::SafeDownCast(albaVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
         sp->Update();
 
         sp->GetSpacing(spacing);
@@ -409,7 +409,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OnEvent(albaEventBase *a
           GetLogicManager()->VmeShow(m_Sphere, true);
 					GetLogicManager()->CameraUpdate();
 
-          vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(albaVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
+          vtkImageData *sp = vtkImageData::SafeDownCast(albaVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
           sp->Update();
 
           int id;

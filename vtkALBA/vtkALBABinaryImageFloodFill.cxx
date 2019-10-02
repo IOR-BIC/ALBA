@@ -19,7 +19,7 @@
 #include "vtkALBASmartPointer.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkStructuredPointsWriter.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkPointData.h"
@@ -67,7 +67,7 @@ void vtkALBABinaryImageFloodFill::Execute()
 //------------------------------------------------------------------------------
 {
   // get input
-  vtkStructuredPoints *input = (vtkStructuredPoints*)this->GetInput();
+  vtkImageData *input = (vtkImageData*)this->GetInput();
   input->Update();
 
   // Get the image dimensions based on input
@@ -84,7 +84,7 @@ void vtkALBABinaryImageFloodFill::Execute()
     }
   }
   
-  vtkStructuredPoints *intermediate_output = NULL;
+  vtkImageData *intermediate_output = NULL;
   
   // call the right flood fill template function
   switch(image_dimension)
@@ -108,16 +108,16 @@ void vtkALBABinaryImageFloodFill::Execute()
   }
   
   // prepare output
-  vtkStructuredPoints *output = this->GetOutput();
+  vtkImageData *output = (vtkImageData *)this->GetOutput();
   output->DeepCopy(intermediate_output);
   output->UpdateData();
   output->Update();
-  this->SetOutput(output);
+  this->SetOutput((vtkStructuredPoints *)output);
   intermediate_output->Delete();
 }
 //------------------------------------------------------------------------------
 template <unsigned int ImageDimension>
-vtkStructuredPoints *vtkALBABinaryImageFloodFill::FloodFill(vtkStructuredPoints *input)
+vtkImageData *vtkALBABinaryImageFloodFill::FloodFill(vtkImageData *input)
  //------------------------------------------------------------------------------
 {
   ComputeItkSeed();
@@ -183,7 +183,7 @@ vtkStructuredPoints *vtkALBABinaryImageFloodFill::FloodFill(vtkStructuredPoints 
   
   itk2Vtk->Update();
 
-  vtkStructuredPoints *output = vtkStructuredPoints::New();
+  vtkImageData *output = vtkImageData::New();
   output->CopyInformation(input);
   output->CopyStructure(input);
   output->DeepCopy(itk2Vtk->GetOutput());
@@ -198,7 +198,7 @@ vtkStructuredPoints *vtkALBABinaryImageFloodFill::FloodFill(vtkStructuredPoints 
 //   itkDouble2Vtk->SetInput(distance->GetOutput());
 //   itkDouble2Vtk->Update();
 // 
-//   vtkStructuredPoints *distanceImage = (vtkStructuredPoints *)itkDouble2Vtk->GetOutput();
+//   vtkImageData *distanceImage = (vtkImageData *)itkDouble2Vtk->GetOutput();
 //   distanceImage->Update();
 //   vtkDoubleArray *distanceScalars = (vtkDoubleArray *)distanceImage->GetPointData()->GetScalars();
 // 
@@ -225,7 +225,7 @@ void vtkALBABinaryImageFloodFill::ComputeItkSeed()
 //------------------------------------------------------------------------------
 {
   // get input
-  vtkStructuredPoints *input = (vtkStructuredPoints*)this->GetInput();
+  vtkImageData *input = (vtkImageData*)this->GetInput();
   input->Update();
 
   // Get the image dimensions based on input

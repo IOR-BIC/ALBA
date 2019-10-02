@@ -46,7 +46,7 @@
 #include "vtkImageThreshold.h"
 #include "vtkMatrix4x4.h"
 #include "vtkALBAContourVolumeMapper.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkPointData.h"
@@ -382,7 +382,7 @@ void albaOpLabelExtractor::ExtractLabel()
     double bounds[6];
     rgrid->GetBounds(bounds);
 
-    vtkALBASmartPointer<vtkStructuredPoints> sp;
+    vtkALBASmartPointer<vtkImageData> sp;
 
     double xmin = bounds[0];
     double xmax = bounds[1];
@@ -482,7 +482,7 @@ void albaOpLabelExtractor::ExtractLabel()
   }
   else
   {
-    vtkALBASmartPointer<vtkStructuredPoints> sp = (vtkStructuredPoints *)m_Ds;
+    vtkALBASmartPointer<vtkImageData> sp = (vtkImageData *)m_Ds;
     vol->DeepCopy((vtkImageData *)sp);  
   }
   
