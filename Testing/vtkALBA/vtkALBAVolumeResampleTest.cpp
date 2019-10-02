@@ -21,7 +21,7 @@
 #include "vtkALBAVolumeResample.h"
 
 #include "vtkDataSet.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 
 #include "vtkRectilinearGridReader.h"
 #include "vtkRectilinearGrid.h"
@@ -113,7 +113,7 @@ void vtkALBAVolumeResampleTest::TestResampleInternal( const char *inFileName , c
   resample->SetLevel(l);
   resample->AutoSpacingOff();
   
-  vtkStructuredPoints *outputSP = vtkStructuredPoints::New();
+  vtkImageData *outputSP = vtkImageData::New();
   
   outputSP->SetSource(NULL);
   outputSP->SetOrigin(inputDataOrigin);

@@ -32,7 +32,7 @@
 #include "vtkALBASmartPointer.h"
 #include "vtkCubeSource.h"
 #include "vtkPolyData.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkDoubleArray.h"
 #include "vtkPointData.h"
 
@@ -53,7 +53,7 @@ void albaOpScaleDatasetTest::TestStaticAllocation()
 void albaOpScaleDatasetTest::TestOpDoVolume() 
 //-----------------------------------------------------------
 {
-  vtkALBASmartPointer<vtkStructuredPoints> sp;
+  vtkALBASmartPointer<vtkImageData> sp;
   sp->SetOrigin(0.0,0.0,0.0);
   sp->SetSpacing(1.0,1.0,1.0);
   sp->SetDimensions(5,10,6);
@@ -95,7 +95,7 @@ void albaOpScaleDatasetTest::TestOpDoVolume()
   volumeOutput->GetOutput()->Update();
   volumeOutput->Update();
 
-  vtkStructuredPoints *spOutput = vtkStructuredPoints::SafeDownCast(volumeOutput->GetOutput()->GetVTKData());
+  vtkImageData *spOutput = vtkImageData::SafeDownCast(volumeOutput->GetOutput()->GetVTKData());
   spOutput->Update();
 
   double endPoint[3];

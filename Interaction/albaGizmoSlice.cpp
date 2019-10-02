@@ -45,7 +45,7 @@
 #include "vtkPlaneSource.h"
 #include "vtkOutlineFilter.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPoints.h"
 #include "vtkCubeSource.h"
@@ -475,12 +475,12 @@ void albaGizmoSlice::InitSnapArray(albaVME *vol, int axis)
 	    else if(axis == GIZMO_SLICE_Z)
 		    this->m_SnapArray->DeepCopy((vtkDoubleArray *)((vtkRectilinearGrid *)vol_data)->GetZCoordinates());
     }
-    if(vol_data->IsA("vtkStructuredPoints") || vol_data->IsA("vtkImageData"))
+    if(vol_data->IsA("vtkImageData") || vol_data->IsA("vtkImageData"))
     {
 	    int dim[3];
 	    double spc[3];
-	    ((vtkStructuredPoints *)vol_data)->GetDimensions(dim);
-	    ((vtkStructuredPoints *)vol_data)->GetSpacing(spc);
+	    ((vtkImageData *)vol_data)->GetDimensions(dim);
+	    ((vtkImageData *)vol_data)->GetSpacing(spc);
 	    this->m_SnapArray = vtkDoubleArray::New();
 	    this->m_SnapArray->SetNumberOfValues(dim[axis]);
 	    for(int i=0;i<dim[axis];i++)

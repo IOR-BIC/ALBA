@@ -42,7 +42,7 @@
 #include "vtkALBARegionGrowingLocalGlobalThreshold.h"
 #include "vtkImageData.h"
 #include "vtkPointData.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkImageToStructuredPoints.h"
 #include "vtkPolyDataConnectivityFilter.h"
 #include "vtkImageMedian3D.h"
@@ -155,7 +155,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
 {
   m_VolumeInput = albaVMEVolumeGray::SafeDownCast(m_Input);
 
-  vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
+  vtkImageData *sp = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
   vtkImageData *im = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
   if (sp == NULL && im == NULL)
   {
@@ -206,7 +206,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
     vtkALBASmartPointer<vtkImageToStructuredPoints> f;
     f->SetInput(median->GetOutput());
     f->Update();
-    volMediano->SetData(f->GetOutput(),m_VolumeInput->GetTimeStamp());
+    volMediano->SetData((vtkImageData *)f->GetOutput(),m_VolumeInput->GetTimeStamp());
     volMediano->ReparentTo(m_VolumeInput);
     volMediano->Update();
 
@@ -744,7 +744,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
         filter->Update();
 
         //Generate the vme output of the region growing
-        m_VolumeOutputRegionGrowing->SetData(filter->GetOutput(),m_VolumeInput->GetTimeStamp());
+        m_VolumeOutputRegionGrowing->SetData((vtkImageData *)filter->GetOutput(),m_VolumeInput->GetTimeStamp());
         m_VolumeOutputRegionGrowing->SetName(_("Segmentation Output - first step"));
         m_VolumeOutputRegionGrowing->ReparentTo(m_VolumeInput);
         m_VolumeOutputRegionGrowing->Update();
@@ -770,13 +770,13 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
         filter->Update();
 
         //Generate the vme output of the morphological closing
-        m_VolumeOutputMorpho->SetData(filter->GetOutput(),m_VolumeInput->GetTimeStamp());
+        m_VolumeOutputMorpho->SetData((vtkImageData *)filter->GetOutput(),m_VolumeInput->GetTimeStamp());
         m_VolumeOutputMorpho->SetName(_("Segmentation Output - second step"));
         m_VolumeOutputMorpho->ReparentTo(m_VolumeInput);
         m_VolumeOutputMorpho->Update();
 
         vtkALBASmartPointer<vtkALBAContourVolumeMapper> extractIsosurface;
-        extractIsosurface->SetInput(filter->GetOutput());
+        extractIsosurface->SetInput((vtkImageData *)filter->GetOutput());
         extractIsosurface->SetContourValue(m_UpperLabel);
         extractIsosurface->Update();
 

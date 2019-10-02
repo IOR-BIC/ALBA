@@ -35,7 +35,7 @@
 #include "vtkALBASmartPointer.h"
 
 #include "vtkDataSet.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 
 #include "vtkFeatureEdges.h"
@@ -207,9 +207,9 @@ void albaOpVOIDensityEditor::EditVolumeScalars()
   vtkDataSet *volumeData = m_Input->GetOutput()->GetVTKData();
   volumeData->Update();
   
-  if (volumeData->IsA("vtkStructuredPoints"))
+  if (volumeData->IsA("vtkImageData"))
   {
-    m_OldData = vtkStructuredPoints::New();
+    m_OldData = vtkImageData::New();
   }
   else if (volumeData->IsA("vtkRectilinearGrid"))
   {
@@ -264,9 +264,9 @@ void albaOpVOIDensityEditor::OpUndo()
   if (m_OldData != NULL)
   {
     int result = ALBA_ERROR;
-    if (m_OldData->IsA("vtkStructuredPoints"))
+    if (m_OldData->IsA("vtkImageData"))
     {
-      result = ((albaVMEVolumeGray *)m_Input)->SetData((vtkStructuredPoints *)m_OldData, m_CurrentTimestamp);
+      result = ((albaVMEVolumeGray *)m_Input)->SetData((vtkImageData *)m_OldData, m_CurrentTimestamp);
     }
     else if (m_OldData->IsA("vtkRectilinearGrid"))
     {

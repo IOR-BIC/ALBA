@@ -39,7 +39,7 @@
 #include "vtkImageMathematics.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkImageData.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkPNGWriter.h"
 

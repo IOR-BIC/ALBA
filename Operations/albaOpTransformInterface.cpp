@@ -43,7 +43,7 @@
 #include "vtkTransform.h"
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkTransformFilter.h"
@@ -144,7 +144,7 @@ void albaOpTransformInterface::OpDo()
 	vtkALBASmartPointer<vtkPolyData> pd;
 	vtkALBASmartPointer<vtkUnstructuredGrid> ug;
 	vtkALBASmartPointer<vtkRectilinearGrid> rg;
-	vtkALBASmartPointer<vtkStructuredPoints> sp;
+	vtkALBASmartPointer<vtkImageData> sp;
 
 	if (m_EnableScaling == 1 && 
 			!( 
@@ -222,14 +222,14 @@ void albaOpTransformInterface::OpDo()
 
       ((albaVMEGeneric *)m_Input)->SetData(tf->GetOutput(),m_Input->GetTimeStamp());
     }
-    else if (dataSet->IsA("vtkStructuredPoints"))
+    else if (dataSet->IsA("vtkImageData"))
     {
       if (!m_TestMode)
       {
       	wxBusyInfo wait_info("Applying scaling to data...");
       }
 
-      vtkStructuredPoints *currentSP = vtkStructuredPoints::SafeDownCast(m_Input->GetOutput()->GetVTKData());
+      vtkImageData *currentSP = vtkImageData::SafeDownCast(m_Input->GetOutput()->GetVTKData());
       assert(currentSP);
  
       sp->DeepCopy(currentSP);

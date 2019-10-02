@@ -49,7 +49,7 @@
 #include "albaVMEOutputVolume.h"
 
 #include "vtkWindowLevelLookupTable.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkTexture.h"
 #include "vtkPolyDataMapper.h"
@@ -295,9 +295,9 @@ void albaVMELabeledVolume::UpdateScalars()
     //Set the scalar values of the labeled volume to OUTRANGE_SCALAR
     vtkDataArray *originalScalars;
 
-    if ( m_Dataset->IsA( "vtkStructuredPoints" ) )
+    if ( m_Dataset->IsA( "vtkImageData" ) )
     {
-      vtkStructuredPoints *sp = (vtkStructuredPoints*) m_Dataset;
+      vtkImageData *sp = (vtkImageData*) m_Dataset;
       originalScalars = sp->GetPointData()->GetScalars();  
     }
     else if ( m_Dataset->IsA( "vtkRectilinearGrid" ) )
@@ -328,9 +328,9 @@ void albaVMELabeledVolume::GenerateLabeledVolume()
     vtkDataArray *labelScalars;
     vtkDataArray *volumeScalars;
 
-    if ( m_Dataset->IsA( "vtkStructuredPoints" ) )
+    if ( m_Dataset->IsA( "vtkImageData" ) )
     {
-      vtkStructuredPoints *sp = (vtkStructuredPoints*) m_Dataset;
+      vtkImageData *sp = (vtkImageData*) m_Dataset;
       labelScalars = sp->GetPointData()->GetScalars();
       volumeScalars = sp->GetPointData()->GetScalars();  
     }
@@ -727,17 +727,17 @@ void albaVMELabeledVolume::CreateSlicePipeline()
 
   // Get the volume dimensions
   int dimensions[3];
-  if ( m_Dataset->IsA( "vtkStructuredPoints" ) )
+  if ( m_Dataset->IsA( "vtkImageData" ) )
   {
-    vtkStructuredPoints *sp = (vtkStructuredPoints*) m_Dataset;
+    vtkImageData *sp = (vtkImageData*) m_Dataset;
     sp->GetDimensions( dimensions );
 
     // Compute the spacing values
     float xSpacing = ( m_Bounds[1] - m_Bounds[0] ) / ( dimensions[0] - 1 );
     float ySpacing = ( m_Bounds[3] - m_Bounds[2] ) / ( dimensions[1] - 1 );
     
-    // Create vtkStructuredPoints with dimensions and spacing computed before
-    m_SP = vtkStructuredPoints::New();
+    // Create vtkImageData with dimensions and spacing computed before
+    m_SP = vtkImageData::New();
     m_SP->SetDimensions( dimensions[0], dimensions[1], 1 );  
     m_SP->SetSpacing( xSpacing, ySpacing, 1.0f);
     m_SP->SetOrigin( m_Bounds[0], m_Bounds[2], m_Slice );
@@ -756,8 +756,8 @@ void albaVMELabeledVolume::CreateSlicePipeline()
     float xSpacing = ( m_Bounds[1] - m_Bounds[0] ) / ( dimensions[0] - 1 );
     float ySpacing = ( m_Bounds[3] - m_Bounds[2] ) / ( dimensions[1] - 1 );
 
-    // Create vtkStructuredPoints with dimensions and spacing computed before
-    m_SP = vtkStructuredPoints::New();
+    // Create vtkImageData with dimensions and spacing computed before
+    m_SP = vtkImageData::New();
     m_SP->SetDimensions( dimensions[0], dimensions[1], 1 );  
     m_SP->SetSpacing( xSpacing, ySpacing, 1.0f);
     m_SP->SetOrigin( m_Bounds[0], m_Bounds[2], m_Slice );
@@ -770,7 +770,7 @@ void albaVMELabeledVolume::CreateSlicePipeline()
 
   // Create a texture with the default m_LookUpTable and with input the probeFilter output
   m_Texture = vtkTexture::New();	
-  m_Texture->SetInput( m_ProbeFilter->GetStructuredPointsOutput() );
+  m_Texture->SetInput( (vtkImageData *)m_ProbeFilter->GetStructuredPointsOutput() );
   m_Texture->InterpolateOn();
   m_Texture->MapColorScalarsThroughLookupTableOn();//
   m_Texture->SetLookupTable( m_LookUpTable );

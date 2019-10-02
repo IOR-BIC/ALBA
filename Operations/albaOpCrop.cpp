@@ -37,7 +37,7 @@
 #include "vtkALBASmartPointer.h"
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkProbeFilter.h"
 #include "vtkExtractRectilinearGrid.h"
 #include "vtkDoubleArray.h"
@@ -106,10 +106,10 @@ void albaOpCrop::OpRun()
 		m_GizmoROI->Show(e.GetBool());
 	}
 
-	if (volume->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
+	if (volume->GetOutput()->GetVTKData()->IsA("vtkImageData"))
   {
 		vtkNEW(m_InputSP);
-		m_InputSP->DeepCopy(vtkStructuredPoints::SafeDownCast(volume->GetOutput()->GetVTKData()));
+		m_InputSP->DeepCopy(vtkImageData::SafeDownCast(volume->GetOutput()->GetVTKData()));
     m_InputSP->Update();
 		m_InputSP->GetBounds(m_InputBounds);	
 		if(!m_TestMode)
@@ -197,7 +197,7 @@ void albaOpCrop::Crop()
 		extractRG->Delete();
 		extractRG = NULL;
 	}
-	else if (output->GetVTKData()->IsA("vtkStructuredPoints"))
+	else if (output->GetVTKData()->IsA("vtkImageData"))
 	{
 		int voi_dim[6];
         int original_vol_dim[6];
@@ -270,7 +270,7 @@ void albaOpCrop::Crop()
 		m_InputSP->GetOrigin(in_org);
 
 		// using the vtkALBASmartPointer allows you to don't mind the object Delete
-		vtkALBASmartPointer<vtkStructuredPoints> v_esp;
+		vtkALBASmartPointer<vtkImageData> v_esp;
 		v_esp->SetOrigin(in_org[0] + voi_dim[0] * m_XSpacing,
 										 in_org[1] + voi_dim[2] * m_YSpacing,
 										 in_org[2] + voi_dim[4] * m_ZSpacing);
@@ -281,18 +281,23 @@ void albaOpCrop::Crop()
 		v_esp->Modified();
 
 		// I'm using probe filter instead of ExtractVOI (see why before...)
+		wxBusyInfo *wait=NULL;
 		if (!m_TestMode)
 		{
-			wxBusyInfo wait(_("please wait, cropping..."));
+			wait=new wxBusyInfo(_("Please wait, cropping..."));
 		}
     
 		vtkALBASmartPointer<vtkProbeFilter> probeFilter;
+		albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, probeFilter));
+
 		probeFilter->SetInput(v_esp);
 		probeFilter->SetSource(m_InputSP);
 		probeFilter->Update();
 
 		vtkNEW(m_OutputSP);
 		m_OutputSP->DeepCopy(probeFilter->GetOutput());
+
+		cppDEL(wait);
 	}
 }
 //----------------------------------------------------------------------------

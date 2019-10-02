@@ -65,7 +65,7 @@
 #include "albaVMEGizmo.h"
 #include "albaGizmoInterface.h"
 #include "albaDataPipe.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkDataSetWriter.h"
 #include "vtkUnsignedShortArray.h"
 #include "albaRWIBase.h"

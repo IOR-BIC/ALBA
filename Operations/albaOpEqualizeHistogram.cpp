@@ -36,7 +36,7 @@
 #include "vtkImageData.h"
 #include "vtkImageCast.h"
 #include "vtkPointData.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkImageToStructuredPoints.h"
 
 #include "itkVTKImageToImageFilter.h"
@@ -110,7 +110,7 @@ void albaOpEqualizeHistogram::OpRun()
 {
   m_VolumeInput = albaVMEVolumeGray::SafeDownCast(m_Input);
 
-  vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
+  vtkImageData *sp = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
   //vtkImageData *im = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
   if (sp == NULL)
   {
@@ -139,7 +139,7 @@ void albaOpEqualizeHistogram::OpRun()
   m_VolumeInput->Update();
 
   albaNEW(m_VolumeOutput);
-  m_VolumeOutput->SetData(vtkStructuredPoints::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData()),m_VolumeInput->GetTimeStamp());
+  m_VolumeOutput->SetData(vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData()),m_VolumeInput->GetTimeStamp());
   albaString name = m_VolumeInput->GetName();
   name<<" - Equalized Histogram";
   m_VolumeOutput->SetName(name);
@@ -299,7 +299,7 @@ void albaOpEqualizeHistogram::Algorithm()
   imTosp->SetInput(imOut);
   imTosp->Update();
 
-  m_VolumeOutput->SetData(imTosp->GetOutput(),m_VolumeInput->GetTimeStamp());
+  m_VolumeOutput->SetData((vtkImageData *)imTosp->GetOutput(),m_VolumeInput->GetTimeStamp());
   m_VolumeOutput->Update();
 
 }

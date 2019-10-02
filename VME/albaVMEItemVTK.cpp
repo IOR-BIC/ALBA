@@ -165,8 +165,8 @@ bool albaVMEItemVTK::Equals(albaVMEItem *a)
       // We test for equivalence of data types. It could happen that the written 
       // dataset is inherited from a standard dataset type, thus when we read it 
       // back the data type is changed but data is the same. E.g. vtkImageData
-      // are always written as vtkStructuredPoints by vtkDataSetWriter, thus when 
-      // read back it becomes a vtkStructuredPoints with the same data.
+      // are always written as vtkImageData by vtkDataSetWriter, thus when 
+      // read back it becomes a vtkImageData with the same data.
       if (data1->SafeDownCast(data2)==NULL&&data2->SafeDownCast(data1)==NULL)
         return false;
 
@@ -389,7 +389,7 @@ int albaVMEItemVTK::ReadData(albaString &filename, int resolvedURL)
       UpdateReader(reader, filename);
       data = ((vtkPolyDataReader *)reader)->GetOutput();
     }
-    else if (datatype == "vtkStructuredPoints" || datatype == "vtkImageData")
+    else if (datatype == "vtkImageData" || datatype == "vtkStructuredPoint")
     {
       reader = vtkStructuredPointsReader::New();
       UpdateReader(reader, filename);

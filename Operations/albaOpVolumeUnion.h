@@ -31,7 +31,7 @@ class albaString;
 class vtkProbeFilter;
 class vtkRectilinearGrid;
 class vtkProbeFilter;
-class vtkStructuredPoints;
+class vtkImageData;
 class albaVMEVolume;  
 
 //----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ public:
   bool m_vme_is_selected;
 
   vtkRectilinearGrid *m_VolUnionRG; ///< Pointer for Rectilinear Grid volume union
-  vtkStructuredPoints *m_VolUnionRGstr;
+  vtkImageData *m_VolUnionRGstr;
   albaVMEVolume *m_FirstVMEVolume;
   albaVMEVolume *m_SecondVMEVolume;
 

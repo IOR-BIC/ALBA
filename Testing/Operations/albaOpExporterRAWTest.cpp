@@ -36,7 +36,7 @@
 
 #include "vtkRectilinearGrid.h"
 #include "vtkImageData.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkShortArray.h"
 
@@ -70,7 +70,7 @@ void albaOpExporterRAWTest::Test()
 
 	albaVMEVolumeGray *vmeVolumeGrayImported = albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
 	vmeVolumeGrayImported->Update();
-	((vtkStructuredPoints *)(vmeVolumeGrayImported->GetOutput()->GetVTKData()))->UpdateData();
+	((vtkImageData *)(vmeVolumeGrayImported->GetOutput()->GetVTKData()))->UpdateData();
 
 	//Initialize exporter and export the volume imported
 	albaOpExporterRAW *exporter=new albaOpExporterRAW("exporter raw");
@@ -118,7 +118,7 @@ void albaOpExporterRAWTest::Test()
 	DataExported->ComputeBounds();
 	CPPUNIT_ASSERT(DataExported);
 
-	vtkStructuredPoints *DataImported=vtkStructuredPoints::SafeDownCast(vmeVolumeGrayImported->GetOutput()->GetVTKData());
+	vtkImageData *DataImported=vtkImageData::SafeDownCast(vmeVolumeGrayImported->GetOutput()->GetVTKData());
 	DataImported->UpdateData();
 	DataImported->ComputeBounds();
 	CPPUNIT_ASSERT(DataImported);
@@ -233,7 +233,7 @@ void albaOpExporterRAWTest::TestRG()
 
 	albaVMEVolumeGray *vmeVolumeGrayExported = albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
 	vmeVolumeGrayExported->Update();
-	((vtkStructuredPoints *)(vmeVolumeGrayExported->GetOutput()->GetVTKData()))->UpdateData();
+	((vtkImageData *)(vmeVolumeGrayExported->GetOutput()->GetVTKData()))->UpdateData();
 
 	//Check if the volume imported and the volume exported are equal
 	vtkImageData *DataExported=vtkImageData::SafeDownCast(vmeVolumeGrayExported->GetOutput()->GetVTKData());

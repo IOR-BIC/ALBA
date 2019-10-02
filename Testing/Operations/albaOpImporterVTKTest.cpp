@@ -34,7 +34,7 @@
 #include "albaVMEPolyline.h"
 #include "vtkPolyData.h"
 #include "albaVMEVolumeGray.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "albaVMELandmarkCloud.h"
 #include "albaVMESurface.h"
@@ -175,7 +175,7 @@ void albaOpImporterVTKTest::TestImportVTKVolumeSP()
 	volume->Modified();
 	volume->Update();
 
-	vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(volume->GetOutput()->GetVTKData());
+	vtkImageData *sp = vtkImageData::SafeDownCast(volume->GetOutput()->GetVTKData());
 
 	CPPUNIT_ASSERT(sp != NULL);
 

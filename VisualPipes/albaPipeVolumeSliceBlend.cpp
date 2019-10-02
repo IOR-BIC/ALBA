@@ -44,7 +44,7 @@
 #include "vtkPolyData.h"
 #include "vtkActor.h"
 #include "vtkOutlineCornerFilter.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkALBAVolumeOrthoSlicer.h"
 #include "vtkProperty.h"

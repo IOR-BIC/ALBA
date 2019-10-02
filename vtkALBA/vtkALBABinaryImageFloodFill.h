@@ -21,7 +21,7 @@
 #include "vtkStructuredPointsToStructuredPointsFilter.h"
 
 class vtkImageData;
-class vtkStructuredPoints;
+class vtkImageData;
 
 #define OFF_PIXEL 0
 #define ON_PIXEL 255
@@ -84,7 +84,7 @@ private:
 
   /** Itk pipeline for flood fill */
   template <unsigned int ImageDimension>
-  vtkStructuredPoints *FloodFill(vtkStructuredPoints *input);
+  vtkImageData *FloodFill(vtkImageData *input);
 
   /** Compute Itk seed for the given Vtk id (Seed) */
   void ComputeItkSeed();
