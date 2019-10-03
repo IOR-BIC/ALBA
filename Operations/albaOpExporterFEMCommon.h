@@ -119,7 +119,7 @@ protected:
 
 	bool  HasMaterials();
 
-	/** Creates material Bins By grouping element props, internally sorts elProps vector  and save frequency file */
+	/** Creates material Bins By grouping element props, internally sorts elProps vector */
 	void CreateBins(int numElements, MaterialProp *elProps, std::vector<MaterialProp> *materialProperties);
 
 	/** Generates Arrays And MaterialsData from element properties vector */
