@@ -32,7 +32,7 @@ class albaOp;
 class albaGUI;
 class albaEvent;
 class vtkDataSet;
-class vtkStructuredPoints;
+class vtkImageData;
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
@@ -94,7 +94,7 @@ protected:
   int      m_SamplingRate[3];
 	wxString m_SurfaceName;
 
-  vtkStructuredPoints *m_OutputData;
+  vtkImageData *m_OutputData;
   vtkDataSet          *m_Ds;
 	albaVMESurface       *m_Vme;
   albaGUICheckListBox     *m_LabelCheckBox;

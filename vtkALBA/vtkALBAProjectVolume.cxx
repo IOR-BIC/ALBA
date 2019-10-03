@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaDefines.h"
 #include "vtkALBAProjectVolume.h"
 #include "vtkObjectFactory.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 #include "vtkRectilinearGrid.h"
@@ -41,7 +41,7 @@ vtkALBAProjectVolume::vtkALBAProjectVolume()
 {
   ProjectionMode = VTK_PROJECT_FROM_X;
 	ProjectSubRange = false;
-	vtkSource::SetNthOutput(0, vtkStructuredPoints::New());
+	vtkSource::SetNthOutput(0, vtkImageData::New());
 	// Releasing data
 	Outputs[0]->ReleaseData();
 	Outputs[0]->Delete();

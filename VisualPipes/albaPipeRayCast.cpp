@@ -58,7 +58,7 @@
 #include "vtkProperty.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineCornerFilter.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "albaTagArray.h"
 
 //----------------------------------------------------------------------------
@@ -460,7 +460,7 @@ void albaPipeRayCast::UpdateFromData()
   vtkALBASmartPointer<vtkVolumeRayCastCompositeFunction> compositeFunction;
   compositeFunction->SetCompositeMethodToClassifyFirst();
   m_RayCastMapper->SetVolumeRayCastFunction(compositeFunction);
-  m_RayCastMapper->SetInput(m_RayCastCleaner->GetOutput());
+  m_RayCastMapper->SetInput((vtkImageData *)m_RayCastCleaner->GetOutput());
   
   //Create a empty volume to manage the mapper
   if (m_Volume==NULL)

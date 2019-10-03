@@ -60,7 +60,7 @@
 #include <wx/tokenzr.h>
 #include "albaGUIButton.h"
 #include "albaGUIDialog.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 
 //----------------------------------------------------------------------------
@@ -1094,9 +1094,9 @@ void albaPipeTensorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ra
 			}
 
 
-		}else if (orgData->IsA("vtkStructuredPoints") || orgData->IsA("vtkImageData"))
+		}else if (orgData->IsA("vtkImageData") || orgData->IsA("vtkImageData"))
 		{
-			vtkStructuredPoints *orgDataS =vtkStructuredPoints::SafeDownCast(m_Vme->GetOutput()->GetVTKData()) ;
+			vtkImageData *orgDataS =vtkImageData::SafeDownCast(m_Vme->GetOutput()->GetVTKData()) ;
 			orgDataS->GetOrigin(origin) ;
 			orgDataS->GetSpacing(spacing) ;
 			orgDataS->GetDimensions(dim);
@@ -1209,7 +1209,7 @@ void albaPipeTensorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ra
 	tensors->SetNumberOfComponents(9) ;
 	tensors->SetName("tensors") ;
 
-	vtkStructuredPoints *orgData =vtkStructuredPoints::SafeDownCast(m_Vme->GetOutput()->GetVTKData()) ;
+	vtkImageData *orgData =vtkImageData::SafeDownCast(m_Vme->GetOutput()->GetVTKData()) ;
 
 	vtkPointData *allPoints = orgData->GetPointData();
 	vtkDataArray *old_scalars = allPoints->GetScalars();

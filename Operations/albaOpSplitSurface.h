@@ -54,7 +54,7 @@ class vtkALBAClipSurfaceBoundingBox;
 class ALBA_EXPORT albaOpSplitSurface: public albaOp
 {
 public:
-  albaOpSplitSurface(const wxString &label = "ClipSurface");
+  albaOpSplitSurface(const wxString &label = "Split Surface");
   ~albaOpSplitSurface(); 
 	virtual void OnEvent(albaEventBase *alba_event);
 

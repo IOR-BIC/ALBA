@@ -21,7 +21,7 @@
 #include "vtkStructuredPointsToStructuredPointsFilter.h"
 
 class vtkImageData;
-class vtkStructuredPoints;
+class vtkImageData;
 class vtkDataArray;
 
 

@@ -51,7 +51,7 @@
 #include "vtkOutlineSource.h"
 #include "vtkProperty.h"
 #include "vtkPolyData.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkPointData.h"
 #include "vtkTransform.h"
@@ -486,7 +486,7 @@ void albaOpVolumeResample::Resample()
         volumeResampleFilter->SetVolumeAxisX(xAxis);
         volumeResampleFilter->SetVolumeAxisY(yAxis);
         
-        vtkALBASmartPointer<vtkStructuredPoints> outputSPVtkData;
+        vtkALBASmartPointer<vtkImageData> outputSPVtkData;
         outputSPVtkData->SetSpacing(m_VolumeSpacing);
         outputSPVtkData->SetScalarType(inputData->GetPointData()->GetScalars()->GetDataType());
         outputSPVtkData->SetExtent(outputSPExtent);
@@ -1297,10 +1297,10 @@ void albaOpVolumeResample::PrintVolume( ostream& os , albaVME *volume , const ch
   vtkDataSet *inputDataSet = input->GetOutput()->GetVTKData();
   if (logMessage) os << logMessage << std::endl;
   os << "data is: ";
-  if (inputDataSet->IsA("vtkStructuredPoints"))
+  if (inputDataSet->IsA("vtkImageData"))
   {
-    os << "vtkStructuredPoints" << std::endl;
-    vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(inputDataSet);
+    os << "vtkImageData" << std::endl;
+    vtkImageData *sp = vtkImageData::SafeDownCast(inputDataSet);
     double origin[3];
     sp->GetOrigin(origin);
     PrintDouble3(os, origin, "origin");

@@ -41,7 +41,7 @@ class ALBA_EXPORT albaOpSmoothSurface: public albaOp
 {
 public:
   /** object constructor */
-	albaOpSmoothSurface(const wxString &label = "FilterSurface");
+	albaOpSmoothSurface(const wxString &label = "Smooth Surface");
   /** object destructor */  
 	~albaOpSmoothSurface();
   /** method for catch the dispatched events */

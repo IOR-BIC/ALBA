@@ -50,7 +50,7 @@ class vtkLookupTable;
 class ALBA_EXPORT albaOpLabelizeSurface: public albaOp
 {
 public:
-	albaOpLabelizeSurface(const wxString &label = "ClipSurface");
+	albaOpLabelizeSurface(const wxString &label = "Labelize Surface");
 	~albaOpLabelizeSurface(); 
 	virtual void OnEvent(albaEventBase *alba_event);
 

@@ -40,7 +40,7 @@ class ALBA_EXPORT albaOpCreateLabeledVolume: public albaOp
 {
 public:
   /** constructor */
-  albaOpCreateLabeledVolume(const wxString &label = "Create labeled volume");
+  albaOpCreateLabeledVolume(const wxString &label = "Create Labeled Volume");
   /** destructor */
   ~albaOpCreateLabeledVolume(); 
 

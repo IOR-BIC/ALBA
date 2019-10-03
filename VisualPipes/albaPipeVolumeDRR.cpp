@@ -57,7 +57,7 @@
 #include "albaVMEItemVTK.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRenderer.h"
 #include "vtkImageResample.h"
 //----------------------------------------------------------------------------

@@ -59,6 +59,8 @@
 #include "pic/menu/EDIT_PASTE.xpm"
 #include "pic/menu/EDIT_DELETE.xpm"
 #include "pic/menu/EDIT_REPARENT.xpm"
+#include "pic/menu/EDIT_EXPAND_TREE.xpm"
+#include "pic/menu/EDIT_COLLAPSE_TREE.xpm"
 #include "pic/menu/EDIT_ADD_GROUP.xpm"
 #include "pic/menu/SHOW.xpm"
 #include "pic/menu/HIDE.xpm"
@@ -173,6 +175,26 @@ void albaGUITreeContextualMenu::CreateContextualMenu(albaGUICheckTree *tree, alb
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+				
+		m_NodeTree = tree;
+		if (m_NodeTree != NULL && m_VmeActive->GetNumberOfChildren() > 0)
+		{
+			if (m_VmeActive && m_VmeActive->Equals(m_VmeActive->GetRoot()))
+			{
+				albaGUI::AddMenuItem(this, RMENU_COLLAPSE_SUBTREE, "Collapse All", EDIT_COLLAPSE_TREE_xpm);
+				albaGUI::AddMenuItem(this, RMENU_EXPAND_SUBTREE, "Expand All", EDIT_EXPAND_TREE_xpm);
+				this->AppendSeparator();
+			}
+			else
+			{
+				if (m_NodeTree->IsNodeExpanded((long long)m_NodeActive))
+					albaGUI::AddMenuItem(this, RMENU_COLLAPSE_SUBTREE, "Collapse", EDIT_COLLAPSE_TREE_xpm);
+				else
+					albaGUI::AddMenuItem(this, RMENU_EXPAND_SUBTREE, "Expand", EDIT_EXPAND_TREE_xpm);
+
+				this->AppendSeparator();
+			}
+		}
 
 		albaGUI::AddMenuItem(this, RMENU_ADD_GROUP, "Add Group", EDIT_ADD_GROUP_xpm);
 		this->AppendSeparator();
@@ -188,7 +210,6 @@ void albaGUITreeContextualMenu::CreateContextualMenu(albaGUICheckTree *tree, alb
 		this->AppendSeparator();
 		this->Append(RMENU_SORT_TREE, "Sort children nodes");
 
-		m_NodeTree = tree;
 		if (m_NodeTree != NULL)
 		{
 			// m_NodeTree == NULL should be only in test mode.
@@ -292,6 +313,14 @@ void albaGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 			GetLogicManager()->VmeShow(m_VmeActive, show);
     }
 		break;
+
+		case RMENU_EXPAND_SUBTREE:
+			ExpandSubTree(m_NodeActive);
+		break;
+		case RMENU_COLLAPSE_SUBTREE:
+			CollapseSubTree(m_NodeActive);
+		break;
+		
 		case RMENU_SHOW_SUBTREE:
 			m_SceneGraph->VmeShowSubTree(m_VmeActive, true);
 		break;
@@ -346,4 +375,29 @@ void albaGUITreeContextualMenu::CryptSubTree(bool crypt)
     v->SetCrypting(crypt);
 	}
 	iter->Delete();
+}
+
+//----------------------------------------------------------------------------
+void albaGUITreeContextualMenu::ExpandSubTree(albaVME *node)
+{
+	m_NodeTree->ExpandNode((long long)node); // Expand first node
+
+	for (int i = 0; i < node->GetNumberOfChildren(); i++)
+	{
+		if (node->GetChild(i) && node->GetChild(i)->GetNumberOfChildren() > 0)
+			ExpandSubTree(node->GetChild(i));
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaGUITreeContextualMenu::CollapseSubTree(albaVME *node)
+{
+	if(node != node->GetRoot())
+		m_NodeTree->CollapseNode((long long)node); // Collapse first node
+
+	for (int i = 0; i < node->GetNumberOfChildren(); i++)
+	{
+		if (node->GetChild(i) && node->GetChild(i)->GetNumberOfChildren() > 0)
+			CollapseSubTree(node->GetChild(i));
+	}
 }

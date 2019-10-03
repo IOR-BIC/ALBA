@@ -30,7 +30,7 @@
 #include "vtkALBASmartPointer.h"
 #include "vtkStructuredPointsReader.h"
 #include "vtkStructuredPointsWriter.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkDataArray.h"
 #include "vtkPointData.h"
 
@@ -52,7 +52,7 @@ void vtkALBARayCastCleanerTest::TestFilter()
 //-------------------------------------------------------------------------
 {
 
-  vtkStructuredPoints *oldOutput,*newOutput;
+  vtkImageData *oldOutput,*newOutput;
 
   //Loading unfiltered data
   vtkALBASmartPointer<vtkStructuredPointsReader> r;
@@ -70,13 +70,13 @@ void vtkALBARayCastCleanerTest::TestFilter()
 
   //creating filter
   vtkALBASmartPointer<vtkALBARayCastCleaner> filter;
-  filter->SetInput(r->GetOutput());
+  filter->SetInput((vtkImageData *)r->GetOutput());
   filter->SetModalityToCT();
   filter->Update();
   
   //getting output
-  oldOutput=r2->GetOutput();
-  newOutput=filter->GetOutput();
+  oldOutput= (vtkImageData *)r2->GetOutput();
+  newOutput= (vtkImageData *)filter->GetOutput();
   
   //base tests
   CPPUNIT_ASSERT( (oldOutput!= NULL) && (newOutput != NULL));
@@ -122,7 +122,7 @@ void vtkALBARayCastCleanerTest::TestFilterMR()
 //-------------------------------------------------------------------------
 {
 
-  vtkStructuredPoints *oldOutput,*newOutput;
+  vtkImageData *oldOutput,*newOutput;
   
   //Loading unfiltered data
   vtkALBASmartPointer<vtkStructuredPointsReader> r;
@@ -140,13 +140,13 @@ void vtkALBARayCastCleanerTest::TestFilterMR()
   
   //creating filter
   vtkALBASmartPointer<vtkALBARayCastCleaner> filter;
-  filter->SetInput(r->GetOutput());
+  filter->SetInput((vtkImageData *)r->GetOutput());
   filter->SetModalityToMR();
   filter->Update();
   
   //getting output
-  oldOutput=r2->GetOutput();
-  newOutput=filter->GetOutput();
+  oldOutput= (vtkImageData *)r2->GetOutput();
+  newOutput= (vtkImageData *)filter->GetOutput();
   
   //base tests
   CPPUNIT_ASSERT( (oldOutput!= NULL) && (newOutput != NULL));

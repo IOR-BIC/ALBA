@@ -46,7 +46,7 @@
 #include "vtkImageActor.h"
 #include "vtkDataSetWriter.h"
 #include "vtkImageData.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 
 #include <iostream>
 #include "vtkDataSet.h"
@@ -88,7 +88,7 @@ void albaVMESlicerTest::TestBug2454And2524Regression()
 
 	int numPoints = datasetReader->GetOutput()->GetNumberOfPoints();
 
-	volumeToSlice->SetData(datasetReader->GetStructuredPointsOutput(), -1);
+	volumeToSlice->SetData((vtkImageData *)datasetReader->GetStructuredPointsOutput(), -1);
 
 	albaSmartPointer<albaTransform> trans;
 

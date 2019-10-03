@@ -51,7 +51,7 @@
 #include "vtkActor.h"
 #include "vtkScalarBarActor.h"
 #include "vtkRenderer.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkCellData.h"
 #include "vtkCellArray.h"
 #include "vtkFloatArray.h"
@@ -1251,9 +1251,9 @@ void albaPipeVectorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ra
 		}
 		outputFile2.close();//debug
 	}
-	else if (orgData->IsA("vtkStructuredPoints") || orgData->IsA("vtkImageData"))
+	else if (orgData->IsA("vtkImageData") || orgData->IsA("vtkImageData"))
 	{
-		vtkStructuredPoints *orgDataS =vtkStructuredPoints::SafeDownCast(orgData) ;
+		vtkImageData *orgDataS =vtkImageData::SafeDownCast(orgData) ;
 		double origin[3],spacing[3];
 		int dim[3],increment[3];
 		orgDataS->GetOrigin(origin) ;

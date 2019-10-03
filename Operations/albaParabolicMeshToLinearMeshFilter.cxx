@@ -205,7 +205,7 @@ void albaParabolicMeshToLinearMeshFilter::Execute()
       outPD->AddArray(newArray);
 
       //modified by Daniele
-      if(strcmp(activeArray->GetName(), newArray->GetName()) == 0) 
+      if(activeArray && strcmp(activeArray->GetName(), newArray->GetName()) == 0) 
         outPD->SetScalars(newArray);
 
       newArray->Delete();

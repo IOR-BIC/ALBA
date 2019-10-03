@@ -31,7 +31,7 @@
 #include "albaVMESurfaceParametric.h"
 #include "albaVMEVolumeGray.h"
 
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
@@ -66,7 +66,7 @@ void albaOpVOIDensityEditorTestTest::EditVolumeScalarsTest()
   albaVMEVolumeGray *vol = albaVMEVolumeGray::SafeDownCast(opVolume->GetOutput());
 
   double sr[2];
-  vtkStructuredPoints *data = vtkStructuredPoints::SafeDownCast(vol->GetOutput()->GetVTKData());
+  vtkImageData *data = vtkImageData::SafeDownCast(vol->GetOutput()->GetVTKData());
   data->Update();
   data->GetScalarRange(sr);
   result = albaEquals(sr[0], sr[1]);
@@ -86,7 +86,7 @@ void albaOpVOIDensityEditorTestTest::EditVolumeScalarsTest()
   editDensity->SetSurface(surf);
   editDensity->EditVolumeScalars();
   
-  data = vtkStructuredPoints::SafeDownCast(vol->GetOutput()->GetVTKData());
+  data = vtkImageData::SafeDownCast(vol->GetOutput()->GetVTKData());
   data->Update();
   data->GetScalarRange(sr);
   result = !albaEquals(sr[0], sr[1]);

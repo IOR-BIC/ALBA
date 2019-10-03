@@ -11,7 +11,7 @@ SET(vtkALBA_SRCS
 
   vtkALBAOrientationMarkerWidget.h  						vtkALBAOrientationMarkerWidget.cpp  
   vtkALBAAnnotatedCubeActor.h  							vtkALBAAnnotatedCubeActor.cpp  
-  vtkALBAGlobalAxesHeadActor.h  							vtkALBAGlobalAxesHeadActor.cpp
+  vtkALBAGlobalAxesPolydataActor.h  			vtkALBAGlobalAxesPolydataActor.cpp
   
   vtkALBACellsFilter.cxx  								vtkALBACellsFilter.h  
   vtkALBARemoveCellsFilter.cxx  							vtkALBARemoveCellsFilter.h

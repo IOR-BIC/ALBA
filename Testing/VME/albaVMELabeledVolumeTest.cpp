@@ -31,7 +31,7 @@
 #include "albaTagItem.h"
 #include "albaVMERoot.h"
 #include "albaVMEStorage.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkPointData.h"

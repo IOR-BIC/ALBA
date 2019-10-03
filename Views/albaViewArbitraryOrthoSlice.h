@@ -28,6 +28,7 @@
 #include "vtkCubeSource.h"
 #include "vtkPlane.h"
 #include "vtkCutter.h"
+#include "albaAxes.h"
 #include "vtkALBATubeFilter.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkLineSource.h"
@@ -107,7 +108,7 @@ class ALBA_EXPORT albaViewArbitraryOrthoSlice: public albaViewCompoundWindowing
 	*/
 public:
 	/** constructor*/
-	albaViewArbitraryOrthoSlice(wxString label = "View Arbitrary OrthoSlice with Windowing");
+	albaViewArbitraryOrthoSlice(wxString label = "View Arbitrary OrthoSlice with Windowing", albaAxes::AXIS_TYPE_ENUM axesType= albaAxes::HEAD);
 
 	/** destructor*/
 	virtual ~albaViewArbitraryOrthoSlice(); 
@@ -238,6 +239,7 @@ protected:
 	albaGizmoCrossRotateTranslate *m_GizmoRT[3];
 		
 	albaVMEVolumeGray *m_InputVolume;
+	albaAxes::AXIS_TYPE_ENUM m_AxesType;
 };
 
 #endif

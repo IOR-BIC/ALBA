@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaDefines.h"
 #include "vtkALBARGtoSPImageFilter.h"
 #include "vtkObjectFactory.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 #include "vtkRectilinearGrid.h"
@@ -39,7 +39,7 @@ void vtkALBARGtoSPImageFilter::PropagateUpdateExtent(vtkDataObject *output)
 //=========================================================================
 vtkALBARGtoSPImageFilter::vtkALBARGtoSPImageFilter()
 {
-	vtkSource::SetNthOutput(0, vtkStructuredPoints::New());
+	vtkSource::SetNthOutput(0, vtkImageData::New());
 	// Releasing data
 	Outputs[0]->ReleaseData();
 	Outputs[0]->Delete();

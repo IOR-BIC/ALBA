@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    $RCSfile: vtkALBAGlobalAxesHeadActor.cpp,v $
+  Module:    $RCSfile: vtkALBAGlobalAxesPolydataActor.cpp,v $
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -13,7 +13,7 @@
 
 =========================================================================*/
 
-#include "vtkALBAGlobalAxesHeadActor.h"
+#include "vtkALBAGlobalAxesPolydataActor.h"
 
 #include "vtkActor.h"
 #include "vtkAppendPolyData.h"
@@ -36,97 +36,109 @@
 #include "vtkDirectory.h"
 #include "vtkTransformPolydataFilter.h"
 
-vtkCxxRevisionMacro(vtkALBAGlobalAxesHeadActor, "$Revision: 1.1.2.5 $");
-vtkStandardNewMacro(vtkALBAGlobalAxesHeadActor);
+vtkCxxRevisionMacro(vtkALBAGlobalAxesPolydataActor, "$Revision: 1.1.2.5 $");
+vtkStandardNewMacro(vtkALBAGlobalAxesPolydataActor);
 
 #include "albaConfigure.h"
 //-------------------------------------------------------------------------
-vtkALBAGlobalAxesHeadActor::vtkALBAGlobalAxesHeadActor()
+vtkALBAGlobalAxesPolydataActor::vtkALBAGlobalAxesPolydataActor(int type /*=HEAD*/)
 {
-
-  HeadFileName = "UNDEFINED_HeadABSFileName";
+  FileName = "UNDEFINED_ABSFileName";
   this->Assembly = vtkAssembly::New();
 
-  this->HeadReader = vtkPolyDataReader::New();
-  this->HeadFileName = "3dHead.vtk";
+  this->Reader = vtkPolyDataReader::New();
 
-  std::string headABSFileName = GetHeadABSFileName();
-
-  // DEVELOPER MODE:
-  // 3dHead.vtk is available in ALBA_DATA_ROOT\\VTK_Surfaces\\3dHead.vtk");
-
-  // DEPLOY MODE:
-  // The file ..\Config\HelperData\3dHead.vtk containing the 3d head polydata must exists in the current working directory (to be improved)
-  // This is based on ALBA vertical apps dir structure template which is as follows:
-  // albaVerticalAppDir\bin\albaApp.exe (current working directory)
-  // albaVerticalAppDir\Config\HelperData\3dHead.vtk
-  // The 3d head should be contained in [-0.5 , 0.5, -0.5, 0.5, -0.5 , 0.5] (approx head dim should be 1)  
-  assert(FileExists(headABSFileName.c_str()));
-
-  HeadReader->SetFileName(headABSFileName.c_str());
-
-  HeadReader->Update();
-
-  int numCells = HeadReader->GetOutput()->GetNumberOfCells();
-  assert(numCells > 0); // if this assert fail check for HeadABSFileName problems
-
-  vtkPolyDataMapper *headMapper = vtkPolyDataMapper::New();
-  this->HeadActor = vtkActor::New();
-  headMapper->SetInput( this->HeadReader->GetOutput() );
-  this->HeadActor->SetMapper( headMapper );
-  this->HeadActor->SetVisibility(1);
-  headMapper->Delete();
-
-  this->Assembly->AddPart( this->HeadActor );
-
-  vtkProperty* prop = this->HeadActor->GetProperty();
-  prop->SetRepresentationToSurface();
-  prop->SetColor(1, 1, 1);
- 
-  this->UpdateProps();
+	//SetType(type);
 }
 
 //-------------------------------------------------------------------------
-vtkALBAGlobalAxesHeadActor::~vtkALBAGlobalAxesHeadActor()
+void vtkALBAGlobalAxesPolydataActor::SetType(int type)
 {
-  this->HeadReader->Delete();
-  this->HeadActor->Delete();
+	ActorType = type;
+
+	if (ActorType == HEAD)
+		SetFileName("3dHead.vtk");
+
+	if (ActorType == BODY)
+		SetFileName("3dBody.vtk");
+
+	std::string ABSFileName = GetABSFileName();
+
+	// DEVELOPER MODE:
+	// 3dHead.vtk is available in ALBA_DATA_ROOT\\VTK_Surfaces\\3dHead.vtk");
+
+	// DEPLOY MODE:
+	// The file ..\Config\HelperData\3dHead.vtk containing the 3d head polydata must exists in the current working directory (to be improved)
+	// This is based on ALBA vertical apps dir structure template which is as follows:
+	// albaVerticalAppDir\bin\albaApp.exe (current working directory)
+	// albaVerticalAppDir\Config\HelperData\3dHead.vtk
+	// The 3d head should be contained in [-0.5 , 0.5, -0.5, 0.5, -0.5 , 0.5] (approx head dim should be 1)
+
+	assert(FileExists(ABSFileName.c_str()));
+
+	Reader->SetFileName(ABSFileName.c_str());
+
+	Reader->Update();
+
+	int numCells = Reader->GetOutput()->GetNumberOfCells();
+	assert(numCells > 0); // if this assert fail check for ABSFileName problems
+
+	vtkPolyDataMapper *headMapper = vtkPolyDataMapper::New();
+	this->Actor = vtkActor::New();
+	headMapper->SetInput(this->Reader->GetOutput());
+	this->Actor->SetMapper(headMapper);
+	this->Actor->SetVisibility(1);
+	headMapper->Delete();
+
+	this->Assembly->AddPart(this->Actor);
+
+	vtkProperty* prop = this->Actor->GetProperty();
+	prop->SetRepresentationToSurface();
+	prop->SetColor(1, 1, 1);
+
+	this->UpdateProps();
+}
+
+//-------------------------------------------------------------------------
+vtkALBAGlobalAxesPolydataActor::~vtkALBAGlobalAxesPolydataActor()
+{
+  this->Reader->Delete();
+  this->Actor->Delete();
 
   this->Assembly->Delete();
 }
 
-
 //-------------------------------------------------------------------------
-void vtkALBAGlobalAxesHeadActor::SetHeadVisibility(int vis)
+void vtkALBAGlobalAxesPolydataActor::SetVisibility(int vis)
 {
-  this->HeadActor->SetVisibility(vis);
+  this->Actor->SetVisibility(vis);
   this->Assembly->Modified();
 }
 
 //-------------------------------------------------------------------------
-int vtkALBAGlobalAxesHeadActor::GetHeadVisibility()
+int vtkALBAGlobalAxesPolydataActor::GetVisibility()
 {
-  return this->HeadActor->GetVisibility();
+  return this->Actor->GetVisibility();
 }
 
 //-------------------------------------------------------------------------
 // Shallow copy of a vtkAnnotatedCubeActor.
-void vtkALBAGlobalAxesHeadActor::ShallowCopy(vtkProp *prop)
+void vtkALBAGlobalAxesPolydataActor::ShallowCopy(vtkProp *prop)
 {
-  vtkALBAGlobalAxesHeadActor *a = vtkALBAGlobalAxesHeadActor::SafeDownCast(prop);
+  vtkALBAGlobalAxesPolydataActor *a = vtkALBAGlobalAxesPolydataActor::SafeDownCast(prop);
 
   // Now do superclass
   this->vtkProp3D::ShallowCopy(prop);
 }
 
 //-------------------------------------------------------------------------
-void vtkALBAGlobalAxesHeadActor::GetActors(vtkPropCollection *ac)
+void vtkALBAGlobalAxesPolydataActor::GetActors(vtkPropCollection *ac)
 {
   this->Assembly->GetActors( ac );
 }
 
 //-------------------------------------------------------------------------
-int vtkALBAGlobalAxesHeadActor::RenderOpaqueGeometry(vtkViewport *vp)
+int vtkALBAGlobalAxesPolydataActor::RenderOpaqueGeometry(vtkViewport *vp)
 {
   this->UpdateProps();
 
@@ -134,7 +146,7 @@ int vtkALBAGlobalAxesHeadActor::RenderOpaqueGeometry(vtkViewport *vp)
 }
 
 //-----------------------------------------------------------------------------
-int vtkALBAGlobalAxesHeadActor::RenderTranslucentPolygonalGeometry(vtkViewport *vp)
+int vtkALBAGlobalAxesPolydataActor::RenderTranslucentPolygonalGeometry(vtkViewport *vp)
 {
   this->UpdateProps();
 
@@ -147,7 +159,7 @@ int vtkALBAGlobalAxesHeadActor::RenderTranslucentPolygonalGeometry(vtkViewport *
 //-----------------------------------------------------------------------------
 // Description:
 // Does this prop have some translucent polygonal geometry?
-int vtkALBAGlobalAxesHeadActor::HasTranslucentPolygonalGeometry()
+int vtkALBAGlobalAxesPolydataActor::HasTranslucentPolygonalGeometry()
 {
   this->UpdateProps();
 
@@ -157,60 +169,58 @@ int vtkALBAGlobalAxesHeadActor::HasTranslucentPolygonalGeometry()
 }
 
 //-----------------------------------------------------------------------------
-void vtkALBAGlobalAxesHeadActor::ReleaseGraphicsResources(vtkWindow *win)
+void vtkALBAGlobalAxesPolydataActor::ReleaseGraphicsResources(vtkWindow *win)
 {
   this->Assembly->ReleaseGraphicsResources( win );
 }
 
 //-------------------------------------------------------------------------
-void vtkALBAGlobalAxesHeadActor::GetBounds(double bounds[6])
+void vtkALBAGlobalAxesPolydataActor::GetBounds(double bounds[6])
 {
   this->Assembly->GetBounds( bounds );
 }
 
 //-------------------------------------------------------------------------
 // Get the bounds for this Actor as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax).
-double *vtkALBAGlobalAxesHeadActor::GetBounds()
+double *vtkALBAGlobalAxesPolydataActor::GetBounds()
 {
   return this->Assembly->GetBounds( );
 }
 
 //-------------------------------------------------------------------------
-unsigned long int vtkALBAGlobalAxesHeadActor::GetMTime()
+unsigned long int vtkALBAGlobalAxesPolydataActor::GetMTime()
 {
   return this->Assembly->GetMTime();
 }
 
 //-------------------------------------------------------------------------
-vtkProperty *vtkALBAGlobalAxesHeadActor::GetHeadProperty()
+vtkProperty *vtkALBAGlobalAxesPolydataActor::GetProperty()
 {
-  return this->HeadActor->GetProperty();
+  return this->Actor->GetProperty();
 }
 
 //-------------------------------------------------------------------------
-void vtkALBAGlobalAxesHeadActor::UpdateProps()
+void vtkALBAGlobalAxesPolydataActor::UpdateProps()
 {
   // nothing to do
 }
 
 //-------------------------------------------------------------------------
-void vtkALBAGlobalAxesHeadActor::PrintSelf(ostream& os, vtkIndent indent)
+void vtkALBAGlobalAxesPolydataActor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
 
-
-std::string vtkALBAGlobalAxesHeadActor::GetHeadABSFileName()
+//-------------------------------------------------------------------------
+std::string vtkALBAGlobalAxesPolydataActor::GetABSFileName()
 {
-
-	// search the 3dHead.vtk
-
+	// search the file .vtk
 	// search in deploy dir (deploy scenario)
 	char buf[256];
 	vtkDirectory::GetCurrentWorkingDirectory(buf, 256);
 	std::string path = buf;
 	path.append("\\..\\Config\\HelperData\\");
-	path.append(HeadFileName);
+	path.append(FileName);
 
 	bool exists = FileExists(path.c_str());
 
@@ -222,7 +232,8 @@ std::string vtkALBAGlobalAxesHeadActor::GetHeadABSFileName()
 	// else search in ALBA testing dir (developer scenario)
 	path.clear();
 	path.append(ALBA_DATA_ROOT);
-	path.append("\\VTK_Surfaces\\3dHead.vtk");
+	path.append("\\VTK_Surfaces\\");
+	path.append(FileName);
 
 	exists = FileExists(path.c_str());
 
@@ -231,12 +242,19 @@ std::string vtkALBAGlobalAxesHeadActor::GetHeadABSFileName()
 		return path;
 	}
 
-	return "3dHead.vtk NOT FOUND!";
+	return FileName + " NOT FOUND!";
+}
+
+//-------------------------------------------------------------------------
+void vtkALBAGlobalAxesPolydataActor::SetFileName(std::string filename)
+{
+	this->FileName = filename;
 }
 
 using namespace std;
 
-bool vtkALBAGlobalAxesHeadActor::FileExists(const char* filename)
+//-------------------------------------------------------------------------
+bool vtkALBAGlobalAxesPolydataActor::FileExists(const char* filename)
 {
 	FILE* fp = NULL;
 
@@ -251,10 +269,11 @@ bool vtkALBAGlobalAxesHeadActor::FileExists(const char* filename)
 	return false;
 }
 
-void vtkALBAGlobalAxesHeadActor::SetInitialPose(vtkMatrix4x4* initMatrix)
+//-------------------------------------------------------------------------
+void vtkALBAGlobalAxesPolydataActor::SetInitialPose(vtkMatrix4x4* initMatrix)
 {
   // Directly transform polydata
-  vtkPolyData* data = ((vtkPolyData*)((vtkPolyDataMapper*)this->HeadActor->GetMapper())->GetInput());
+  vtkPolyData* data = ((vtkPolyData*)((vtkPolyDataMapper*)this->Actor->GetMapper())->GetInput());
 
   vtkTransform* initTransform;
   vtkTransformPolyDataFilter* transformer;
@@ -270,9 +289,9 @@ void vtkALBAGlobalAxesHeadActor::SetInitialPose(vtkMatrix4x4* initMatrix)
   data->DeepCopy(transformer->GetOutput());
   data->Update();
   data->Modified();
-  ((vtkPolyDataMapper*)this->HeadActor->GetMapper())->Update();
-  ((vtkPolyDataMapper*)this->HeadActor->GetMapper())->Modified();
-  this->HeadActor->Modified();
+  ((vtkPolyDataMapper*)this->Actor->GetMapper())->Update();
+  ((vtkPolyDataMapper*)this->Actor->GetMapper())->Modified();
+  this->Actor->Modified();
 
   transformer->Delete();
   initTransform->Delete();

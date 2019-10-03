@@ -987,8 +987,8 @@ bool albaOpImporterRAWImages::Import()
   ///////////////////////////////////////////////////////////////////////
   if(m_Rect)
   {
-    // conversion from vtkStructuredPoints to vtkRectilinearGrid
-    vtkStructuredPoints	*structured_data = convert->GetOutput();
+    // conversion from vtkImageData to vtkRectilinearGrid
+    vtkImageData	*structured_data = convert->GetOutput();
     vtkPointData *data = structured_data->GetPointData();
     vtkDataArray *scalars = data->GetScalars();
     vtkDoubleArray *XDoubleArray = vtkDoubleArray::New();

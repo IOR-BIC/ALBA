@@ -39,7 +39,7 @@
 #include "vtkAbstractTransform.h"
 #include "vtkImageCast.h"
 #include "vtkImageData.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkPolyData.h"
 #include "albaVMEGroup.h"
 #include "albaProgressBarHelper.h"
@@ -100,7 +100,7 @@ void albaOpExporterVTK::OpRun()
   vtkDataSet *inputData = m_Input->GetOutput()->GetVTKData();
   assert(inputData);
 
-  bool isStructuredPoints = inputData->IsA("vtkStructuredPoints");
+  bool isStructuredPoints = inputData->IsA("vtkImageData");
 
   albaString wildc = "vtk Data (*.vtk)|*.vtk";
 
@@ -196,7 +196,7 @@ void albaOpExporterVTK::SaveVTKData()
   
   if (m_ForceUnsignedShortScalarOutputForStructuredPoints)
   {    
-    imageCast->SetInput(vtkStructuredPoints::SafeDownCast(inputData));
+    imageCast->SetInput(vtkImageData::SafeDownCast(inputData));
     imageCast->SetOutputScalarTypeToUnsignedShort();
     imageCast->Update();
     writerInput = imageCast->GetOutput();

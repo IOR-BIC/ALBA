@@ -42,7 +42,7 @@
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkImageWriter.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkDoubleArray.h"
 #include "vtkShortArray.h"
 #include "vtkDataSet.h"
@@ -138,8 +138,8 @@ void albaOpExporterRAW::SaveVolume()
 	albaVMEVolumeGray *volume=albaVMEVolumeGray::SafeDownCast(m_Input);
 	volume->Modified();
 	
-	//if it is a vtkStructuredPoints
-	if (vtkStructuredPoints::SafeDownCast(volume->GetOutput()->GetVTKData()) || vtkImageData::SafeDownCast(volume->GetOutput()->GetVTKData()))
+	//if it is a vtkImageData
+	if (vtkImageData::SafeDownCast(volume->GetOutput()->GetVTKData()) || vtkImageData::SafeDownCast(volume->GetOutput()->GetVTKData()))
 	{
 		int dim[3];
 		vtkImageData *ImageData = vtkImageData::SafeDownCast(volume->GetOutput()->GetVTKData());
@@ -245,7 +245,7 @@ void albaOpExporterRAW::SaveVolume()
 		if (m_SingleFile)
 		{
 					
-			vtkStructuredPoints *StructuredPoints;
+			vtkImageData *StructuredPoints;
 			vtkNEW(StructuredPoints);
 
 			StructuredPoints->SetOrigin(xmin, ymin, zmin);
@@ -338,7 +338,7 @@ void albaOpExporterRAW::SaveVolume()
 		{
 			int slice_size = xdim*ydim;
 
-			vtkStructuredPoints *StructuredPoints;
+			vtkImageData *StructuredPoints;
 			vtkNEW(StructuredPoints);
 			StructuredPoints->SetOrigin(xmin, ymin, 0);
 			StructuredPoints->SetDimensions(xdim, ydim, 1);

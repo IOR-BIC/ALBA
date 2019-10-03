@@ -18,7 +18,7 @@
 #include "vtkALBARayCastCleaner.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkUnsignedShortArray.h"
 #include "vtkPointData.h"
 #include "vtkALBASmartPointer.h"
@@ -62,7 +62,7 @@ vtkALBARayCastCleaner::~vtkALBARayCastCleaner()
 void vtkALBARayCastCleaner::Execute()
 //------------------------------------------------------------------------------
 {
-  vtkStructuredPoints *outputImage = this->GetOutput();
+  vtkImageData *outputImage = (vtkImageData *)this->GetOutput();
   this->GetInput()->Update();
 
   double range[2];
@@ -125,7 +125,7 @@ void vtkALBARayCastCleaner::Execute()
   outputImage->GetPointData()->Update();
   outputImage->UpdateData();
   outputImage->Update();
-  this->SetOutput(outputImage);
+  this->SetOutput((vtkStructuredPoints*)outputImage);
 
   vtkDEL(newScalars);
 }

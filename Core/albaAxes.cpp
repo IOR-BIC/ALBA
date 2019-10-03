@@ -1,17 +1,14 @@
 /*=========================================================================
-
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaAxes
  Authors: Silvano Imboden , Stefano perticoni
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
-
-
+ 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notice for more information.
-
 =========================================================================*/
 
 #include "albaDefines.h" 
@@ -41,16 +38,15 @@
 #include "vtkRenderWindow.h"
 #include "vtkALBAOrientationMarkerWidget.h"
 #include "vtkALBAAnnotatedCubeActor.h"
-#include "vtkALBAGlobalAxesHeadActor.h"
+#include "vtkALBAGlobalAxesPolydataActor.h"
 
 //----------------------------------------------------------------------------
 albaAxes::albaAxes(vtkRenderer *ren, albaVME* vme, int axesType)
-//----------------------------------------------------------------------------
 {
 	m_AxesType = axesType;
 	m_OrientationMarkerWidget = NULL;
 	m_AnnotatedCubeActor = NULL;
-	m_GlobalAxesHeadActor = NULL;
+	m_GlobalAxesPolydataActor = NULL;
 	m_Coord = NULL;
 	m_AxesLUT = NULL;
 
@@ -66,7 +62,6 @@ albaAxes::albaAxes(vtkRenderer *ren, albaVME* vme, int axesType)
 
 	if (m_AxesType == TRIAD)
 	{
-
 		m_TriadAxes = vtkAxes::New();
 		m_TriadAxes->SetScaleFactor(1);
 
@@ -119,12 +114,14 @@ albaAxes::albaAxes(vtkRenderer *ren, albaVME* vme, int axesType)
 	}
 	else if (m_AxesType == HEAD)
 	{
-		m_GlobalAxesHeadActor = vtkALBAGlobalAxesHeadActor::New();
+		m_GlobalAxesPolydataActor = vtkALBAGlobalAxesPolydataActor::New();
+		m_GlobalAxesPolydataActor->SetType(vtkALBAGlobalAxesPolydataActor::HEAD);
     m_OrientationMarkerWidget = vtkALBAOrientationMarkerWidget::New();
-    if(m_Vme)
-      m_GlobalAxesHeadActor->SetInitialPose(m_Vme->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix());
 
-		wxString headABSFileName = m_GlobalAxesHeadActor->GetHeadABSFileName().c_str();
+    if(m_Vme)
+      m_GlobalAxesPolydataActor->SetInitialPose(m_Vme->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix());
+
+		wxString headABSFileName = m_GlobalAxesPolydataActor->GetABSFileName().c_str();
 
 		bool exists = wxFileExists(headABSFileName.c_str());
 		assert(exists);
@@ -142,21 +139,52 @@ albaAxes::albaAxes(vtkRenderer *ren, albaVME* vme, int axesType)
 			return;
 		}
 
-
-		m_OrientationMarkerWidget->SetOrientationMarker(m_GlobalAxesHeadActor);
+		m_OrientationMarkerWidget->SetOrientationMarker(m_GlobalAxesPolydataActor);
 		m_OrientationMarkerWidget->SetInteractor(m_Renderer->GetRenderWindow()->GetInteractor());
 		m_OrientationMarkerWidget->SetEnabled(1);
 		m_OrientationMarkerWidget->SetInteractive(0);
 		m_OrientationMarkerWidget->SetViewport(0.75, 0., 1, 0.25);
 	}
+	else if (m_AxesType == BODY)
+	{
+		m_GlobalAxesPolydataActor = vtkALBAGlobalAxesPolydataActor::New();
+		m_GlobalAxesPolydataActor->SetType(vtkALBAGlobalAxesPolydataActor::BODY);
+		//m_GlobalAxesPolydataActor = new vtkALBAGlobalAxesPolydataActor(vtkALBAGlobalAxesPolydataActor::BODY);
+		m_OrientationMarkerWidget = vtkALBAOrientationMarkerWidget::New();
 
+		if (m_Vme)
+			m_GlobalAxesPolydataActor->SetInitialPose(m_Vme->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix());
+
+		wxString bodyABSFileName = m_GlobalAxesPolydataActor->GetABSFileName().c_str();
+
+		bool exists = wxFileExists(bodyABSFileName.c_str());
+		assert(exists);
+
+		if (exists)
+		{
+			// continue
+		}
+		else
+		{
+			wxString tmp = "Body VTK file not found: ";
+			tmp.Append(bodyABSFileName.c_str());
+			tmp.Append(" cannot create 3d body marker");
+			wxMessageBox(tmp);
+			return;
+		}
+
+		m_OrientationMarkerWidget->SetOrientationMarker(m_GlobalAxesPolydataActor);
+		m_OrientationMarkerWidget->SetInteractor(m_Renderer->GetRenderWindow()->GetInteractor());
+		m_OrientationMarkerWidget->SetEnabled(1);
+		m_OrientationMarkerWidget->SetInteractive(0);
+		m_OrientationMarkerWidget->SetViewport(0.90, 0., 1, 0.18);
+	}
 }
 //----------------------------------------------------------------------------
 albaAxes::~albaAxes()
-//----------------------------------------------------------------------------
 {
 	vtkDEL(m_AnnotatedCubeActor);
-	vtkDEL(m_GlobalAxesHeadActor);
+	vtkDEL(m_GlobalAxesPolydataActor);
 
 	if (m_OrientationMarkerWidget != NULL) m_OrientationMarkerWidget->SetInteractor(NULL);
 	vtkDEL(m_OrientationMarkerWidget);
@@ -172,7 +200,6 @@ albaAxes::~albaAxes()
 }
 //----------------------------------------------------------------------------
 void albaAxes::SetVisibility(bool show)
-//----------------------------------------------------------------------------
 {
 	if(m_AxesType == TRIAD)
 		m_AxesActor2D->SetVisibility(show);
@@ -181,7 +208,6 @@ void albaAxes::SetVisibility(bool show)
 }
 //----------------------------------------------------------------------------
 void albaAxes::SetPose( vtkMatrix4x4 *abs_pose_matrix )
-//----------------------------------------------------------------------------
 {
 	// WARNING - I am assuming that if m_Vme != NULL --> m_Coord ISA vtkALBALocalAxisCoordinate
 	if(!m_Vme) return;
@@ -193,5 +219,3 @@ void albaAxes::SetPose( vtkMatrix4x4 *abs_pose_matrix )
 		coord->SetMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix());
 	coord->Modified();
 }
-
-
