@@ -69,15 +69,8 @@ albaGUI* albaVMEOutputMesh::CreateGui()
 {
   assert(m_Gui == NULL);
   m_Gui = albaVMEOutput::CreateGui();
-  if (GetUnstructuredGridData())
-  {
-    this->Update();
-    m_NumCells = GetUnstructuredGridData()->GetNumberOfCells();
-    m_NumNodes = GetUnstructuredGridData()->GetNumberOfPoints();
-  }
-	m_Gui->Label(_("Elements: "), &m_NumCells, true);
-	m_Gui->Label(_("Nodes: "), &m_NumNodes, true);
   m_Gui->Divider();
+
 	return m_Gui;
 }
 //-------------------------------------------------------------------------
