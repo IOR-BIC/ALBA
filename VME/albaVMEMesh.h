@@ -22,11 +22,14 @@
 #include "albaVMEGeneric.h"
 #include "albaVMEOutputMesh.h"
 #include "vtkIntArray.h"
+#include "albaGUIRollOut.h"
+
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class vtkDataSet;
 class vtkUnstructuredGrid;
+class wxBitmap;
 class mmaMaterial;
 
 enum
@@ -108,6 +111,7 @@ public:
 	{
 		ID_NONE = MINID,
 		ID_DISABLED,
+		ID_BONEMAT_CONFIG_ROLLOUT,
 		ID_SAVE,
 	};
 
@@ -176,7 +180,8 @@ public:
 	void OnEvent(albaEventBase *alba_event);
 	
 protected:
-  albaVMEMesh();
+
+	albaVMEMesh();
   virtual ~albaVMEMesh();
 
 	/** Create GUI for the VME */
@@ -190,6 +195,13 @@ protected:
 	static vtkIntArray *GetIntCellArray(vtkUnstructuredGrid *inputUGrid, const char *arrayName, const char *arrayName2);
 
 	BonematConfiguration m_Configuration;
+
+	// GUI elements
+	albaGUIRollOut *m_GuiRollOutBonematConfig;
+	albaGUI *m_GuiBonematConfig;
+
+	albaString  m_NumCells;
+	albaString  m_NumNodes;
 
 private:
   albaVMEMesh(const albaVMEMesh&); // Not implemented

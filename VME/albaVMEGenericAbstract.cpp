@@ -384,11 +384,9 @@ albaGUI *albaVMEGenericAbstract::CreateGui()
 {
   m_Gui = albaVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
-#ifdef ALBA_USE_CRYPTO
-  m_Gui->Bool(ID_VME_CRYPTING,"crypt",&m_Crypting);
-#endif
 	m_Gui->Divider();
-  return m_Gui;
+
+	return m_Gui;
 }
 
 //-------------------------------------------------------------------------

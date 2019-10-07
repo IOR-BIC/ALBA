@@ -51,6 +51,7 @@
 #include <xercesc/sax/ErrorHandler.hpp>
 #include "albaXMLString.h"
 #include "albaEvent.h"
+#include "albaPics.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEMesh)
@@ -58,6 +59,7 @@ albaCxxTypeMacro(albaVMEMesh)
 //-------------------------------------------------------------------------
 albaVMEMesh::albaVMEMesh()
 {
+	m_NumNodes = m_NumCells = "0";
 }
 //-------------------------------------------------------------------------
 albaVMEMesh::~albaVMEMesh()
@@ -66,159 +68,165 @@ albaVMEMesh::~albaVMEMesh()
 //----------------------------------------------------------------------------
 albaGUI * albaVMEMesh::CreateGui()
 {
-	bool hasConfiguration;
-	
 	Superclass::CreateGui();
 
-	m_Gui->Label("", true);
+	if (this->GetUnstructuredGridOutput() && this->GetUnstructuredGridOutput()->GetVTKData())
+	{
+		this->Update();
+		m_NumCells = this->GetUnstructuredGridOutput()->GetVTKData()->GetNumberOfCells();
+		m_NumNodes = this->GetUnstructuredGridOutput()->GetVTKData()->GetNumberOfPoints();
+	}
 
-	hasConfiguration = LoadConfigurationTags(this, m_Configuration);
+	m_Gui->Label(_("Elem: "), &m_NumCells, true);
+	m_Gui->Label(_("Nodes: "), &m_NumNodes, true);
+	
+	bool hasConfiguration = LoadConfigurationTags(this, m_Configuration);
 	
 	if (hasConfiguration)
 	{
-		//////////////////////////////////////////////////////////////////////////
-		m_Gui->Label("CT densitometric calibration", true);
-		m_Gui->Label("RhoQCT = a + b * HU", false);
+		m_Gui->Divider(1);
+		//m_Gui->Label("Bonemat configuration parameters");
 
-		m_Gui->Double(ID_DISABLED, "a", &m_Configuration.rhoIntercept);
-		m_Gui->Double(ID_DISABLED, "b", &m_Configuration.rhoSlope);
-		m_Gui->Divider(2);
+		m_GuiBonematConfig = new albaGUI(this);
+		//////////////////////////////////////////////////////////////////////////
+		// Save Config
+ 		//wxBitmap bitmap = albaPictureFactory::GetPictureFactory()->GetBmp("FILE_SAVE");
+		//m_GuiBonematConfig->ImageButton(ID_SAVE, "Save Configuration", bitmap, "Save Configuration");
+		m_GuiBonematConfig->Button(ID_SAVE, "Save Configuration");
+		m_GuiBonematConfig->Divider(2);
+
+		//////////////////////////////////////////////////////////////////////////
+		m_GuiBonematConfig->Label("CT densitometric calibration", true);
+		m_GuiBonematConfig->Label("RhoQCT = a + b * HU", false);
+
+		m_GuiBonematConfig->Double(ID_DISABLED, "a", &m_Configuration.rhoIntercept);
+		m_GuiBonematConfig->Double(ID_DISABLED, "b", &m_Configuration.rhoSlope);
+		m_GuiBonematConfig->Divider(2);
 
 		//////////////////////////////////////////////////////////////////////////
 		// Calibration
-
 		if (m_Configuration.rhoCalibrationCorrectionIsActive)
 		{
-			m_Gui->Label("Correction of the calibration", true);
-			m_Gui->Label("RhoAsh = a + b * RhoQCT", false);
+			m_GuiBonematConfig->Label("Correction of the calibration", true);
+			m_GuiBonematConfig->Label("RhoAsh = a + b * RhoQCT", false);
 
-			m_Gui->Divider();
+			m_GuiBonematConfig->Divider();
 
 			if (m_Configuration.rhoCalibrationCorrectionType == 0) // SINGLE_INTERVAL = 0,	THREE_INTERVALS = 1
 			{
-				m_Gui->Label("Single interval");
+				m_GuiBonematConfig->Label("Single interval");
 
-				m_Gui->Double(ID_DISABLED, "a", &m_Configuration.a_CalibrationCorrection);
-				m_Gui->Double(ID_DISABLED, "b", &m_Configuration.b_CalibrationCorrection);
+				m_GuiBonematConfig->Double(ID_DISABLED, "a", &m_Configuration.a_CalibrationCorrection);
+				m_GuiBonematConfig->Double(ID_DISABLED, "b", &m_Configuration.b_CalibrationCorrection);
 			}
 			else
 			{
-				m_Gui->Label("Three intervals");
+				m_GuiBonematConfig->Label("Three intervals");
 
-				m_Gui->Double(ID_DISABLED, "RhoQCT1", &m_Configuration.rhoQCT1);
-				m_Gui->Double(ID_DISABLED, "RhoQCT2", &m_Configuration.rhoQCT2);
+				m_GuiBonematConfig->Double(ID_DISABLED, "RhoQCT1", &m_Configuration.rhoQCT1);
+				m_GuiBonematConfig->Double(ID_DISABLED, "RhoQCT2", &m_Configuration.rhoQCT2);
 
-				m_Gui->Divider();
+				m_GuiBonematConfig->Divider();
 
-				m_Gui->Label("RhoQCT < RhoQCT1");
-				m_Gui->Double(ID_DISABLED, "a", &m_Configuration.a_RhoQCTLessThanRhoQCT1);
-				m_Gui->Double(ID_DISABLED, "b", &m_Configuration.b_RhoQCTLessThanRhoQCT1);
+				m_GuiBonematConfig->Label("RhoQCT < RhoQCT1");
+				m_GuiBonematConfig->Double(ID_DISABLED, "a", &m_Configuration.a_RhoQCTLessThanRhoQCT1);
+				m_GuiBonematConfig->Double(ID_DISABLED, "b", &m_Configuration.b_RhoQCTLessThanRhoQCT1);
 
-				m_Gui->Label("RhoQCT1 <= RhoQCT <= RhoQCT2");
-				m_Gui->Double(ID_DISABLED, "a", &m_Configuration.a_RhoQCTBetweenRhoQCT1AndRhoQCT2);
-				m_Gui->Double(ID_DISABLED, "b", &m_Configuration.b_RhoQCTBetweenRhoQCT1AndRhoQCT2);
+				m_GuiBonematConfig->Label("RhoQCT1 <= RhoQCT <= RhoQCT2");
+				m_GuiBonematConfig->Double(ID_DISABLED, "a", &m_Configuration.a_RhoQCTBetweenRhoQCT1AndRhoQCT2);
+				m_GuiBonematConfig->Double(ID_DISABLED, "b", &m_Configuration.b_RhoQCTBetweenRhoQCT1AndRhoQCT2);
 
-				m_Gui->Label("RhoQCT > RhoQCT2");
-				m_Gui->Double(ID_DISABLED, "a", &m_Configuration.a_RhoQCTBiggerThanRhoQCT2);
-				m_Gui->Double(ID_DISABLED, "b", &m_Configuration.b_RhoQCTBiggerThanRhoQCT2);
+				m_GuiBonematConfig->Label("RhoQCT > RhoQCT2");
+				m_GuiBonematConfig->Double(ID_DISABLED, "a", &m_Configuration.a_RhoQCTBiggerThanRhoQCT2);
+				m_GuiBonematConfig->Double(ID_DISABLED, "b", &m_Configuration.b_RhoQCTBiggerThanRhoQCT2);
 			}
 
-			m_Gui->Divider(2);
+			m_GuiBonematConfig->Divider(2);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		// RhoAsh - RhoWet
 		if (m_Configuration.rhoWetConversionIsActive)
 		{
-			m_Gui->Label("RhoAsh -> RhoWet Conversion", true);
-			m_Gui->Label("RhoAsh = a * RhoWet", false);
-
-			m_Gui->Double(ID_DISABLED, "a", &m_Configuration.a_rhoWet);
-
-			m_Gui->Divider(2);
+			m_GuiBonematConfig->Label("RhoAsh -> RhoWet Conversion", true);
+			m_GuiBonematConfig->Label("RhoAsh = a * RhoWet", false);
+			m_GuiBonematConfig->Double(ID_DISABLED, "a", &m_Configuration.a_rhoWet);
+			m_GuiBonematConfig->Divider(2);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		// Density - Elasticity
-		m_Gui->Label("Density-elasticity relationship", true);
-		m_Gui->Label("E = a + b * Rho^c", false);
+		m_GuiBonematConfig->Label("Density-elasticity relationship", true);
+		m_GuiBonematConfig->Label("E = a + b * Rho^c", false);
 
-		m_Gui->Label("Minimum Elasticity Modulus:", false);
-		m_Gui->Double(ID_DISABLED, "", &m_Configuration.minElasticity);
-		m_Gui->Divider();
+		//m_GuiBonematConfig->Label("Minimum Elasticity Modulus:", false);
+		m_GuiBonematConfig->Double(ID_DISABLED, "Min Elasticity Modulus:", &m_Configuration.minElasticity, MINDOUBLE, MAXDOUBLE, -1, "", false, 0.60);
+		m_GuiBonematConfig->Divider();
 
 		if (m_Configuration.densityIntervalsNumber == 0) // SINGLE_INTERVAL = 0,	THREE_INTERVALS = 1
 		{
-			m_Gui->Label("Single interval");
-			m_Gui->Double(ID_DISABLED, "a", &m_Configuration.a_OneInterval);
-			m_Gui->Double(ID_DISABLED, "b", &m_Configuration.b_OneInterval);
-			m_Gui->Double(ID_DISABLED, "c", &m_Configuration.c_OneInterval);
+			m_GuiBonematConfig->Label("Single interval");
+			m_GuiBonematConfig->Double(ID_DISABLED, "a", &m_Configuration.a_OneInterval);
+			m_GuiBonematConfig->Double(ID_DISABLED, "b", &m_Configuration.b_OneInterval);
+			m_GuiBonematConfig->Double(ID_DISABLED, "c", &m_Configuration.c_OneInterval);
 		}
 		else
 		{
-			m_Gui->Label("Three intervals");
+			m_GuiBonematConfig->Label("Three intervals");
 
-			m_Gui->Double(ID_DISABLED, "Rho1", &m_Configuration.rho1);
-			m_Gui->Double(ID_DISABLED, "Rho2", &m_Configuration.rho2);
+			m_GuiBonematConfig->Double(ID_DISABLED, "Rho1", &m_Configuration.rho1);
+			m_GuiBonematConfig->Double(ID_DISABLED, "Rho2", &m_Configuration.rho2);
 
-			m_Gui->Label("Rho < Rho1");
-			m_Gui->Double(ID_DISABLED, "a", &m_Configuration.a_RhoLessThanRho1);
-			m_Gui->Double(ID_DISABLED, "b", &m_Configuration.b_RhoLessThanRho1);
-			m_Gui->Double(ID_DISABLED, "c", &m_Configuration.c_RhoLessThanRho1);
+			m_GuiBonematConfig->Label("Rho < Rho1");
+			m_GuiBonematConfig->Double(ID_DISABLED, "a", &m_Configuration.a_RhoLessThanRho1);
+			m_GuiBonematConfig->Double(ID_DISABLED, "b", &m_Configuration.b_RhoLessThanRho1);
+			m_GuiBonematConfig->Double(ID_DISABLED, "c", &m_Configuration.c_RhoLessThanRho1);
 
-			m_Gui->Label("Rho1 <= Rho <= Rho2");
-			m_Gui->Double(ID_DISABLED, "a", &m_Configuration.a_RhoBetweenRho1andRho2);
-			m_Gui->Double(ID_DISABLED, "b", &m_Configuration.b_RhoBetweenRho1andRho2);
-			m_Gui->Double(ID_DISABLED, "c", &m_Configuration.c_RhoBetweenRho1andRho2);
+			m_GuiBonematConfig->Label("Rho1 <= Rho <= Rho2");
+			m_GuiBonematConfig->Double(ID_DISABLED, "a", &m_Configuration.a_RhoBetweenRho1andRho2);
+			m_GuiBonematConfig->Double(ID_DISABLED, "b", &m_Configuration.b_RhoBetweenRho1andRho2);
+			m_GuiBonematConfig->Double(ID_DISABLED, "c", &m_Configuration.c_RhoBetweenRho1andRho2);
 
-			m_Gui->Label("Rho > Rho2");
-			m_Gui->Double(ID_DISABLED, "a", &m_Configuration.a_RhoBiggerThanRho2);
-			m_Gui->Double(ID_DISABLED, "b", &m_Configuration.b_RhoBiggerThanRho2);
-			m_Gui->Double(ID_DISABLED, "c", &m_Configuration.c_RhoBiggerThanRho2);
+			m_GuiBonematConfig->Label("Rho > Rho2");
+			m_GuiBonematConfig->Double(ID_DISABLED, "a", &m_Configuration.a_RhoBiggerThanRho2);
+			m_GuiBonematConfig->Double(ID_DISABLED, "b", &m_Configuration.b_RhoBiggerThanRho2);
+			m_GuiBonematConfig->Double(ID_DISABLED, "c", &m_Configuration.c_RhoBiggerThanRho2);
 		}
 
-		m_Gui->Divider(2);
+		m_GuiBonematConfig->Divider(2);
+
 		//////////////////////////////////////////////////////////////////////////
 		// Young's modulus
-
-		m_Gui->Divider();
+		m_GuiBonematConfig->Divider();
 		const wxString choices[] = { "HU integration", "E integration" };
-		m_Gui->Label("Young's modulus (E) calculation modality:", "", TRUE);
-		m_Gui->Combo(ID_DISABLED, "", &m_Configuration.m_YoungModuleCalculationModality, 2, choices);
-		m_Gui->Label("Integration steps:");
-		m_Gui->Integer(ID_DISABLED, "", &m_Configuration.m_IntegrationSteps);
+		m_GuiBonematConfig->Label("Bonemat integration parameter", "", TRUE);
+		m_GuiBonematConfig->Combo(ID_DISABLED, "", &m_Configuration.m_YoungModuleCalculationModality, 2, choices);
+		//m_GuiBonematConfig->Label("Integration steps:");
+		m_GuiBonematConfig->Integer(ID_DISABLED, "Integration steps:", &m_Configuration.m_IntegrationSteps, MININT, MAXINT, "", false, 0.50);
 
-		m_Gui->Divider(2);
+		m_GuiBonematConfig->Divider(2);
 
 		//////////////////////////////////////////////////////////////////////////
 		// Advanced 
-		m_Gui->Label("Advanced Configuration", TRUE);
+		m_GuiBonematConfig->Label("Advanced Configuration", TRUE);
 		const wxString choices3[] = { "rhoQCT", "rhoAsh", "rhoWet" };
-		//m_DensityOutputText = choices3[m_Configuration.m_DensityOutput];
-		m_Gui->Label("Density Output:");
-		m_Gui->Combo(ID_DISABLED, "", &m_Configuration.m_DensityOutput, 3, choices3);
-		//m_Gui->String(ID_DISABLED,"Density Output", &m_DensityOutputText,"");
-		// 		m_Gui->Divider();
-		// 		m_Gui->Divider();
-		//m_Gui->Combo(appOpBonematCommon::BONEMAT_ID::ID_RHO_SELECTION, "", &m_Configuration.m_DensityOutput, 3, choices3);
 
-		m_Gui->Label("Poisson's Ratio:");
-		m_Gui->Double(ID_DISABLED, "", &m_Configuration.m_PoissonRatio);
-
-		m_Gui->Enable(ID_DISABLED, false);
+		//m_GuiBonematConfig->Label("Density Output:");
+		m_GuiBonematConfig->Combo(ID_DISABLED, "Density Output:", &m_Configuration.m_DensityOutput, 3, choices3, "", 0.45);
+		//m_GuiBonematConfig->Label("Poisson's Ratio:");
+		m_GuiBonematConfig->Double(ID_DISABLED, "Poisson's Ratio:", &m_Configuration.m_PoissonRatio, MINDOUBLE, MAXDOUBLE, -1, "", false, 0.45);
 
 		//////////////////////////////////////////////////////////////////////////
-		// Save Button
-		m_Gui->Divider(2);
-		m_Gui->Label("");
-		m_Gui->Button(ID_SAVE, "Save Configuration");
-	}
-	else
-	{
-		m_Gui->Label("No Configuration");
+
+		m_GuiBonematConfig->Enable(ID_DISABLED, false);
+		m_GuiRollOutBonematConfig = m_Gui->RollOut(ID_BONEMAT_CONFIG_ROLLOUT, _("Bonemat config parameters"), m_GuiBonematConfig);
+		m_GuiRollOutBonematConfig->RollOut(false);
 	}
 
 	m_Gui->Divider(2);
+
+	m_Gui->FitGui();
+	m_Gui->Update();
 
 	return m_Gui;
 }
@@ -251,14 +259,17 @@ int albaVMEMesh::InternalInitialize()
 int albaVMEMesh::SetData(vtkUnstructuredGrid *data, albaTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
-  assert(data);
-  vtkUnstructuredGrid *unstructuredGrid = vtkUnstructuredGrid::SafeDownCast(data);
+	assert(data);
+	vtkUnstructuredGrid *unstructuredGrid = vtkUnstructuredGrid::SafeDownCast(data);
 
-  if(unstructuredGrid)
-  {
-    unstructuredGrid->Update();
-    return Superclass::SetData(unstructuredGrid,t,mode);
-  }
+	if (unstructuredGrid)
+	{
+		unstructuredGrid->Update();
+
+		m_NumCells = unstructuredGrid->GetNumberOfCells();
+		m_NumNodes = unstructuredGrid->GetNumberOfPoints();
+		return Superclass::SetData(unstructuredGrid, t, mode);
+	}
   else
   {
     albaErrorMacro("Trying to set the wrong type of data inside a VME Mesh :"<< (data?data->GetClassName():"NULL"));
@@ -275,11 +286,15 @@ int albaVMEMesh::SetData(vtkDataSet *data, albaTimeStamp t, int mode)
   if (unstructuredGrid) 
   {
     unstructuredGrid->Update();
+
+		m_NumCells = unstructuredGrid->GetNumberOfCells();
+		m_NumNodes = unstructuredGrid->GetNumberOfPoints();
     return Superclass::SetData(data,t,mode);
   }
   else
   {
     albaErrorMacro("Trying to set the wrong type of data inside a VME Mesh :"<< (data?data->GetClassName():"NULL"));
+		m_NumNodes = m_NumCells = "0";
     return ALBA_ERROR;
   }
 }
@@ -313,18 +328,26 @@ void albaVMEMesh::OnEvent(albaEventBase *alba_event)
 {
 	albaEvent *e = albaEvent::SafeDownCast(alba_event);
 
-	if (e && e->GetSender() == m_Gui && e->GetId() == ID_SAVE)
+	if (e && e->GetSender() == m_Gui)
 	{
-		albaString initialFileName;
-		initialFileName = albaGetDocumentsDirectory().c_str();
-		initialFileName.Append("\\newConfigurationFile.xml");
+		if (e->GetId() == ID_SAVE)
+		{
+			albaString initialFileName;
+			initialFileName = albaGetDocumentsDirectory().c_str();
+			initialFileName.Append("\\newConfigurationFile.xml");
 
-		albaString wildc = "configuration xml file (*.xml)|*.xml";
-		albaString newFileName = albaGetSaveFile(initialFileName.GetCStr(), wildc).c_str();
+			albaString wildc = "configuration xml file (*.xml)|*.xml";
+			albaString newFileName = albaGetSaveFile(initialFileName.GetCStr(), wildc).c_str();
 
-		if (newFileName != "")
-			SaveConfigurationFile(m_Configuration, newFileName);
-		return;
+			if (newFileName != "")
+				SaveConfigurationFile(m_Configuration, newFileName);
+			return;
+		}
+		else if (e->GetId() == ID_BONEMAT_CONFIG_ROLLOUT)
+		{
+			// Call Update and Fit Gui for VMEPanel in SideBar
+			GetLogicManager()->VmeModified(this);
+		}
 	}
 	else
 	{
@@ -712,5 +735,3 @@ int albaVMEMesh::SaveConfigurationFile(BonematConfiguration configuration, const
 
 	return ALBA_OK;
 }
-
-

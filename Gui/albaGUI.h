@@ -138,13 +138,13 @@ public:
   void String(int id,albaString label,albaString *var, albaString tooltip = "", bool multiline = false, bool password = false, bool interactive = false);
   
   /** Integer entry widget. */
-  void Integer(int id,albaString label,int *var, int min = MININT, int max = MAXINT, albaString tooltip = "", bool labelAlwaysEnable = false);
+  void Integer(int id,albaString label,int *var, int min = MININT, int max = MAXINT, albaString tooltip = "", bool labelAlwaysEnable = false, double customSizer = 1.0);
 
   /** Float entry widget. */
   void Float(int id,albaString label,float *var, float min = MINFLOAT, float max = MAXFLOAT, int flag=0, int decimal_digit = -1, albaString tooltip = "");
 
   /** Double entry widget. */
-  void Double(int id,albaString label,double *var, double	min = MINDOUBLE, double max = MAXDOUBLE, int decimal_digit = -1, albaString tooltip = "", bool labelAlwaysEnable = false);
+  void Double(int id,albaString label,double *var, double	min = MINDOUBLE, double max = MAXDOUBLE, int decimal_digit = -1, albaString tooltip = "", bool labelAlwaysEnable = false, double customSizer = 1.0);
 
   /** Integer vector3 entry widget. */
   void Vector(int id,wxString label, int var[3], int min = MININT, int max = MAXINT, wxString tooltip = "", wxColour *bg_colour = NULL);
@@ -183,7 +183,7 @@ public:
 	void RadioButton(int id, wxString label, int selected=true, wxString tooltip = "");
 
   /** Combo widget. */
-  wxComboBox *Combo(int id,albaString label, int *var, int numchoices = 0, const wxString choices[] = NULL, albaString tooltip = "");
+  wxComboBox *Combo(int id,albaString label, int *var, int numchoices = 0, const wxString choices[] = NULL, albaString tooltip = "", double customSizer = 1.0);
 
   /** File open dialog widget. */
   void FileOpen(int id,albaString label,albaString *var, const albaString wildcard = "", albaString tooltip = "");

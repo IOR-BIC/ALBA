@@ -818,37 +818,51 @@ void albaGUI::String(int id, albaString label, albaString *var, albaString toolt
 	}
 }
 //----------------------------------------------------------------------------
-void albaGUI::Integer(int id,albaString label,int* var,int min, int max, albaString tooltip, bool labelAlwaysEnable)
+void albaGUI::Integer(int id,albaString label,int* var,int min, int max, albaString tooltip, bool labelAlwaysEnable, double customSizer)
 {
-  int w_id;
-	if(label.IsEmpty())
+	int w_id;
+	int fw = FW;
+	int lw = LW;
+	int dw = DW;
+	long labStyle = wxALIGN_RIGHT | wxST_NO_AUTORESIZE;
+
+	if (customSizer < 1.0 && customSizer > 0.0)
 	{
-    w_id = GetWidgetId(id);
-		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,LH), m_EntryStyle  );
-		text->SetValidator( albaGUIValidator(this,w_id,text,var,min,max) );
-    text->SetFont(m_Font);
-		if(!tooltip.IsEmpty()) 
-      text->SetToolTip(tooltip.GetCStr());
-	  Add(text,0,wxALL, M);
+		lw = (fw * customSizer) - (2 * LM);
+		dw = (fw - lw) - (2 * HM);
+		fw *= customSizer;
+
+		labStyle = wxALIGN_LEFT | wxST_NO_AUTORESIZE;
+	}
+
+	if (label.IsEmpty())
+	{
+		w_id = GetWidgetId(id);
+		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(fw, LH), m_EntryStyle);
+		text->SetValidator(albaGUIValidator(this, w_id, text, var, min, max));
+		text->SetFont(m_Font);
+		if (!tooltip.IsEmpty())
+			text->SetToolTip(tooltip.GetCStr());
+		Add(text, 0, wxALL, M);
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, labelAlwaysEnable?-1:GetWidgetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
-    if(m_UseBackgroundColor) 
-      lab->SetBackgroundColour(m_BackgroundColor);
-    lab->SetFont(m_Font);
+		wxStaticText *lab = new wxStaticText(this, labelAlwaysEnable ? -1 : GetWidgetId(id), label.GetCStr(), dp, wxSize(lw, LH), labStyle);
+		if (m_UseBackgroundColor)
+			lab->SetBackgroundColour(m_BackgroundColor);
+		lab->SetFont(m_Font);
 
-    w_id = GetWidgetId(id);
-		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,LH), m_EntryStyle  );
-		text->SetValidator( albaGUIValidator(this,w_id,text,var,min,max) );
-    text->SetFont(m_Font);
-		if(!tooltip.IsEmpty())
+		w_id = GetWidgetId(id);
+		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(dw, LH), m_EntryStyle);
+		text->SetValidator(albaGUIValidator(this, w_id, text, var, min, max));
+		text->SetFont(m_Font);
+		if (!tooltip.IsEmpty())
 			text->SetToolTip(tooltip.GetCStr());
 
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add( lab,  0, wxRIGHT, LM);
-		sizer->Add( text, 0, wxRIGHT, HM);
-		Add(sizer,0,wxALL, M);
+		sizer->Add(lab, 0, wxRIGHT, LM);
+		sizer->Add(text, 0, wxRIGHT, HM);
+		Add(sizer, 0, wxALL, M);
 	}
 }
 //----------------------------------------------------------------------------
@@ -887,13 +901,26 @@ void albaGUI::Float(int id, albaString label, float* var, float min, float max, 
 	}
 }
 //----------------------------------------------------------------------------
-void albaGUI::Double(int id, albaString label, double* var, double min, double max, int decimal_digit, albaString tooltip, bool labelAlwaysEnable)
+void albaGUI::Double(int id, albaString label, double* var, double min, double max, int decimal_digit, albaString tooltip, bool labelAlwaysEnable, double customSizer)
 {
 	int w_id;
+	int fw = FW;
+	int lw = LW;
+	int dw = DW;
+	long labStyle = wxALIGN_RIGHT | wxST_NO_AUTORESIZE;
+
+	if (customSizer <1.0 && customSizer > 0.0)
+	{
+		lw = (fw * customSizer) - (2 * LM);
+		dw = (fw - lw) - (2 * HM);
+		fw *= customSizer;
+		labStyle = wxALIGN_LEFT | wxST_NO_AUTORESIZE;
+	}
+
 	if (label.IsEmpty())
 	{
 		w_id = GetWidgetId(id);
-		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(FW, LH), m_EntryStyle);
+		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(lw, LH), m_EntryStyle);
 		text->SetValidator(albaGUIValidator(this, w_id, text, var, min, max, decimal_digit));
 		text->SetFont(m_Font);
 		if (!tooltip.IsEmpty())
@@ -902,13 +929,13 @@ void albaGUI::Double(int id, albaString label, double* var, double min, double m
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, labelAlwaysEnable ? -1 : GetWidgetId(id), label.GetCStr(), dp, wxSize(LW, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
+		wxStaticText *lab = new wxStaticText(this, labelAlwaysEnable ? -1 : GetWidgetId(id), label.GetCStr(), dp, wxSize(lw, LH), labStyle);
 		if (m_UseBackgroundColor)
 			lab->SetBackgroundColour(m_BackgroundColor);
 		lab->SetFont(m_Font);
 
 		w_id = GetWidgetId(id);
-		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(DW, LH), m_EntryStyle);
+		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(dw, LH), m_EntryStyle);
 		text->SetValidator(albaGUIValidator(this, w_id, text, var, min, max, decimal_digit));
 		text->SetFont(m_Font);
 		if (!tooltip.IsEmpty())
@@ -1264,22 +1291,34 @@ void albaGUI::RadioButton(int id, wxString label, int selected, wxString tooltip
 }
 
 //----------------------------------------------------------------------------
-wxComboBox *albaGUI::Combo(int id, albaString label, int* var, int numchoices, const wxString choices[], albaString tooltip)
-//----------------------------------------------------------------------------
+wxComboBox *albaGUI::Combo(int id, albaString label, int* var, int numchoices, const wxString choices[], albaString tooltip, double customSizer)
 {
 	wxComboBox *combo = NULL;
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	int w_id;
 
+	int fw = FW;
+	int lw = LW;
+	int dw = DW;
+	long labStyle = wxALIGN_RIGHT | wxST_NO_AUTORESIZE;
+
+	if (customSizer < 1.0 && customSizer > 0.0)
+	{
+		lw = (fw * customSizer) - (2 * LM);
+		dw = (fw - lw) - (2 * HM);
+		fw *= customSizer;
+		labStyle = wxALIGN_LEFT | wxST_NO_AUTORESIZE;
+	}
+
 	if (!label.IsEmpty())
 	{
-		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(LW, -1), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
+		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(lw, -1), labStyle);
 		if (m_UseBackgroundColor)
 			lab->SetBackgroundColour(m_BackgroundColor);
 		lab->SetFont(m_Font);
 
 		w_id = GetWidgetId(id);
-		combo = new wxComboBox(this, w_id, "", dp, wxSize(DW, -1), numchoices, choices, wxCB_READONLY);
+		combo = new wxComboBox(this, w_id, "", dp, wxSize(dw, -1), numchoices, choices, wxCB_READONLY);
 		combo->SetFont(m_Font);
 		sizer->Add(lab, 0, wxRIGHT, LM);
 		sizer->Add(combo, 0, wxRIGHT, HM);
@@ -1287,7 +1326,7 @@ wxComboBox *albaGUI::Combo(int id, albaString label, int* var, int numchoices, c
 	else
 	{
 		w_id = GetWidgetId(id);
-		combo = new wxComboBox(this, w_id, "", dp, wxSize(FW, -1), numchoices, choices, wxCB_READONLY);
+		combo = new wxComboBox(this, w_id, "", dp, wxSize(fw, -1), numchoices, choices, wxCB_READONLY);
 		combo->SetFont(m_Font);
 		sizer->Add(combo, 0, wxRIGHT, HM);
 	}
@@ -1563,7 +1602,7 @@ void albaGUI::ImageButton(int id, const char* label, wxBitmap bitmap, albaString
 	if (!tooltip.IsEmpty())
 		btn->SetToolTip(tooltip.GetCStr());
 
-	wxStaticText *lab = new wxStaticText(this, w_id, label, dp, wxSize(LW , LH), wxALIGN_LEFT | wxST_NO_AUTORESIZE);
+	wxStaticText *lab = new wxStaticText(this, w_id, label, dp, wxSize(DW, LH), wxALIGN_LEFT | wxST_NO_AUTORESIZE);
 
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add(btn, 0);
