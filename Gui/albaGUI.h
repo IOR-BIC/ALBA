@@ -115,33 +115,33 @@ public:
 
   /** Separator widget. */
 	void Divider(long style = 0);
-
-  /** Label widget. */
+	
+	/** Label widget. */
   void Label(albaString label,bool bold = false, bool multiline = false);
 
   /** Label widget. */
   void Label(albaString *var ,bool bold = false, bool multiline = false);
 
   /** Double label widget. */
-	void Label(albaString label1,albaString label2, bool bold_label = false, bool bold_var = false);
+	void Label(albaString label1,albaString label2, bool bold_label = false, bool bold_var = false, double customSizer = 1.0);
 
   /** Double label widget. */
-  void Label(albaString label1,albaString *var, bool bold_label = false, bool bold_var = false);
+  void Label(albaString label1,albaString *var, bool bold_label = false, bool bold_var = false, bool multiline = false, double customSizer = 1.0);
 
 	/** Hint Box widget. */
 	void HintBox(int id, wxString label, wxString title = "Hint", bool showIcon = true);
 
 	/** String entry widget. */
-	void String(int id, wxString label, wxString *var, wxString tooltip = "", bool multiline = false, bool password = false, bool interactive = false);
+	void String(int id, wxString label, wxString *var, wxString tooltip = "", bool multiline = false, bool password = false, bool interactive = false, double customSizer = 1.0);
 
   /** String entry widget. */
-  void String(int id,albaString label,albaString *var, albaString tooltip = "", bool multiline = false, bool password = false, bool interactive = false);
+  void String(int id,albaString label,albaString *var, albaString tooltip = "", bool multiline = false, bool password = false, bool interactive = false, double customSizer = 1.0);
   
   /** Integer entry widget. */
   void Integer(int id,albaString label,int *var, int min = MININT, int max = MAXINT, albaString tooltip = "", bool labelAlwaysEnable = false, double customSizer = 1.0);
 
   /** Float entry widget. */
-  void Float(int id,albaString label,float *var, float min = MINFLOAT, float max = MAXFLOAT, int flag=0, int decimal_digit = -1, albaString tooltip = "");
+  void Float(int id,albaString label,float *var, float min = MINFLOAT, float max = MAXFLOAT, int flag=0, int decimal_digit = -1, albaString tooltip = "", double customSizer = 1.0);
 
   /** Double entry widget. */
   void Double(int id,albaString label,double *var, double	min = MINDOUBLE, double max = MAXDOUBLE, int decimal_digit = -1, albaString tooltip = "", bool labelAlwaysEnable = false, double customSizer = 1.0);
