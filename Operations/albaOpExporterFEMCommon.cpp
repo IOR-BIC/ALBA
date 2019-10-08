@@ -95,7 +95,7 @@ void albaOpExporterFEMCommon::CreateGui()
 
 	if (hasMaterials)
 	{
-		m_Gui->Label("Back Calculation", true);
+		m_Gui->Label("Density Back Calculation", true);
 		m_Gui->Bool(ID_ENABLE_BACKCALCULATION, "Enable", &m_EnableBackCalculation);
 		m_Gui->Divider();
 		m_Gui->Divider();
@@ -104,6 +104,9 @@ void albaOpExporterFEMCommon::CreateGui()
 
 		//////////////////////////////////////////////////////////////////////////
 		// Density - Elasticity
+		m_BackPropGui->Divider();
+		m_BackPropGui->Divider();
+		m_BackPropGui->Divider();
 		m_BackPropGui->Label("Density-elasticity relationship", true);
 		m_BackPropGui->Label("E = a + b * Rho^c", false);
 		m_BackPropGui->Divider();

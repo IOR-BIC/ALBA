@@ -272,6 +272,7 @@ void albaGUI::Divider(long style)
 		Add(div, 0, wxALL, 2 * M);
 	}
 }
+
 //----------------------------------------------------------------------------
 /** in the multiline case - explicit newline must be inserted in the string - also append a newline at the end */
 void albaGUI::Label(albaString label, bool bold, bool multiline)
@@ -306,10 +307,23 @@ void albaGUI::Label(albaString *var, bool bold, bool multiline)
 	Add(lab, 0, wxEXPAND | wxALL, M);
 }
 //----------------------------------------------------------------------------
-void albaGUI::Label(albaString label1, albaString label2, bool bold_label, bool bold_var)
+void albaGUI::Label(albaString label1, albaString label2, bool bold_label, bool bold_var, double customSizer)
 {
-	wxStaticText* lab1 = new wxStaticText(this, -1, label1.GetCStr(), dp, wxSize(LW, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
-	wxStaticText* lab2 = new wxStaticText(this, -1, label2.GetCStr(), dp, wxSize(-1, LH), wxALIGN_LEFT);
+	int fw = FW;
+	int lw = LW;
+	int dw = -1;
+	long labStyle = wxALIGN_RIGHT | wxST_NO_AUTORESIZE;
+
+	if (customSizer <1.0 && customSizer > 0.0)
+	{
+		lw = (fw * customSizer) - (2 * LM);
+		dw = (fw - lw) - LM;
+		fw *= customSizer;
+		labStyle = wxALIGN_LEFT | wxST_NO_AUTORESIZE;
+	}
+
+	wxStaticText* lab1 = new wxStaticText(this, -1, label1.GetCStr(), dp, wxSize(lw, LH), labStyle);
+	wxStaticText* lab2 = new wxStaticText(this, -1, label2.GetCStr(), dp, wxSize(dw, LH), wxALIGN_LEFT);
 	
 	if (bold_label)
 		lab1->SetFont(m_BoldFont);
@@ -334,10 +348,25 @@ void albaGUI::Label(albaString label1, albaString label2, bool bold_label, bool 
 	Add(sizer, 0, wxALL, M);
 }
 //----------------------------------------------------------------------------
-void albaGUI::Label(albaString label1, albaString *var, bool bold_label, bool bold_var)
+void albaGUI::Label(albaString label1, albaString *var, bool bold_label, bool bold_var, bool multiline, double customSizer)
 {
-	wxStaticText* lab1 = new wxStaticText(this, -1, label1.GetCStr(), dp, wxSize(LW, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
-	wxStaticText* lab2 = new wxStaticText(this, -1, var->GetCStr(), dp, wxSize(-1, LH), wxALIGN_LEFT);
+	int h = (multiline) ? -1 : LH;
+
+	int fw = FW;
+	int lw = LW;
+	int dw = -1;
+	long labStyle = wxALIGN_RIGHT | wxST_NO_AUTORESIZE;
+
+	if (customSizer <1.0 && customSizer > 0.0)
+	{
+		lw = (fw * customSizer) - (2 * LM);
+		dw = (fw - lw) - LM;
+		fw *= customSizer;
+		labStyle = wxALIGN_LEFT | wxST_NO_AUTORESIZE;
+	}
+
+	wxStaticText* lab1 = new wxStaticText(this, -1, label1.GetCStr(), dp, wxSize(lw, h), labStyle);
+	wxStaticText* lab2 = new wxStaticText(this, -1, var->GetCStr(), dp, wxSize(dw, h), wxALIGN_LEFT);
 
 	if (m_UseBackgroundColor)
 	{
@@ -503,7 +532,6 @@ void albaGUI::Vector(int id, wxString label, int var[3], int min, int max, wxStr
 // integer vector form 2
 //----------------------------------------------------------------------------
 void albaGUI::Vector(int id, wxString label, int var[3], int minx, int maxx, int miny, int maxy, int minz, int maxz, wxString tooltip, wxColour *bg_colour)
-//----------------------------------------------------------------------------
 {
 	int w_id;
 	wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
@@ -548,7 +576,6 @@ void albaGUI::Vector(int id, wxString label, int var[3], int minx, int maxx, int
 // float vector form 1
 //----------------------------------------------------------------------------
 void albaGUI::Vector(int id, wxString label, float var[3], float min, float max, int decimal_digit, wxString tooltip, wxColour *bg_colour) // <*> togliere la seconda forma
-//----------------------------------------------------------------------------
 {
 	int w_id;
 	wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
@@ -726,40 +753,55 @@ void albaGUI::Vector(int id, wxString label, double var[3], double minx, double 
 }
 
 //----------------------------------------------------------------------------
-void albaGUI::String(int id, wxString label, wxString* var, wxString tooltip, bool multiline, bool password, bool interactive)
+void albaGUI::String(int id, wxString label, wxString* var, wxString tooltip, bool multiline, bool password, bool interactive, double customSizer)
 {
-	int sw = LH;
+	int lh = LH;
+	int fw = FW;
+	int lw = LW;
+	int dw = DW;
+
 	long e_style = m_EntryStyle;
 	if (multiline)
 	{
-		sw *= 5;
+		lh *= 5;
 		e_style |= wxTE_MULTILINE | wxTE_WORDWRAP;
 	}
 	if (password)
 		e_style |= wxTE_PASSWORD;
+
+	long labStyle = wxALIGN_RIGHT | wxST_NO_AUTORESIZE;
+
+	if (customSizer <1.0 && customSizer > 0.0)
+	{
+		lw = (fw * customSizer) - (2 * LM);
+		dw = (fw - lw) - LM;
+		fw *= customSizer;
+		labStyle = wxALIGN_LEFT | wxST_NO_AUTORESIZE;
+	}
 
 	if (label == "")
 	{
 		int w_id = GetWidgetId(id);
 		wxTextCtrl *text = NULL;
 
-		text = new wxTextCtrl(this, w_id, "", dp, wxSize(FW, sw), e_style);
+		text = new wxTextCtrl(this, w_id, "", dp, wxSize(fw, lh), e_style);
 		text->SetValidator(albaGUIValidator(this, w_id, text, var,interactive));
 		text->SetFont(m_Font);
+
 		if (tooltip != "")
 			text->SetToolTip(tooltip);
 		Add(text, 0, wxALL, M);
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
+		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(lw, lh), labStyle);
 		if (m_UseBackgroundColor)
 			lab->SetBackgroundColour(m_BackgroundColor);
 		lab->SetFont(m_Font);
 
 		int w_id = GetWidgetId(id);
 		wxTextCtrl *text = NULL;
-		text = new wxTextCtrl(this, w_id, "", dp, wxSize(DW, sw), e_style);
+		text = new wxTextCtrl(this, w_id, "", dp, wxSize(dw, lh), e_style);
 		text->SetValidator(albaGUIValidator(this, w_id, text, var, interactive));
 		text->SetFont(m_Font);
 
@@ -773,41 +815,59 @@ void albaGUI::String(int id, wxString label, wxString* var, wxString tooltip, bo
 	}
 }
 //----------------------------------------------------------------------------
-void albaGUI::String(int id, albaString label, albaString *var, albaString tooltip, bool multiline, bool password, bool interactive)
+void albaGUI::String(int id, albaString label, albaString *var, albaString tooltip, bool multiline, bool password, bool interactive, double customSizer)
 {
-	int sw = LH;
+	int lh = LH;
+	int fw = FW;
+	int lw = LW;
+	int dw = DW;
+
 	long e_style = m_EntryStyle;
 	if (multiline)
 	{
-		sw *= 5;
+		lh *= 5;
 		e_style |= wxTE_MULTILINE | wxTE_WORDWRAP;
 	}
+
 	if (password)
 		e_style |= wxTE_PASSWORD;
+
+	long labStyle = wxALIGN_RIGHT | wxST_NO_AUTORESIZE;
+
+	if (customSizer <1.0 && customSizer > 0.0)
+	{
+		lw = (fw * customSizer) - (2 * LM);
+		dw = (fw - lw) - LM;
+		fw *= customSizer;
+		labStyle = wxALIGN_LEFT | wxST_NO_AUTORESIZE;
+	}
 
 	if (label.IsEmpty())
 	{
 		int w_id = GetWidgetId(id);
 		wxTextCtrl  *text = NULL;
-		text = new wxTextCtrl(this, w_id, "", dp, wxSize(FW, sw), e_style);
+		text = new wxTextCtrl(this, w_id, "", dp, wxSize(FW, lh), e_style);
 		text->SetValidator(albaGUIValidator(this, w_id, text, var, interactive));
 		text->SetFont(m_Font);
+
 		if (!tooltip.IsEmpty())
 			text->SetToolTip(tooltip.GetCStr());
+
 		Add(text, 0, wxALL, M);
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(LW, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
+		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(lw, lh), labStyle);
 		if (m_UseBackgroundColor)
 			lab->SetBackgroundColour(m_BackgroundColor);
 		lab->SetFont(m_Font);
 
 		int w_id = GetWidgetId(id);
 		wxTextCtrl  *text = NULL;
-		text = new wxTextCtrl(this, w_id, "", dp, wxSize(DW, sw), e_style);
+		text = new wxTextCtrl(this, w_id, "", dp, wxSize(dw, lh), e_style);
 		text->SetValidator(albaGUIValidator(this, w_id, text, var,interactive));
 		text->SetFont(m_Font);
+
 		if (!tooltip.IsEmpty())
 			text->SetToolTip(tooltip.GetCStr());
 
@@ -829,7 +889,7 @@ void albaGUI::Integer(int id,albaString label,int* var,int min, int max, albaStr
 	if (customSizer < 1.0 && customSizer > 0.0)
 	{
 		lw = (fw * customSizer) - (2 * LM);
-		dw = (fw - lw) - (2 * HM);
+		dw = (fw - lw) - LM;
 		fw *= customSizer;
 
 		labStyle = wxALIGN_LEFT | wxST_NO_AUTORESIZE;
@@ -866,13 +926,27 @@ void albaGUI::Integer(int id,albaString label,int* var,int min, int max, albaStr
 	}
 }
 //----------------------------------------------------------------------------
-void albaGUI::Float(int id, albaString label, float* var, float min, float max, int flag, int decimal_digit, albaString tooltip)
+void albaGUI::Float(int id, albaString label, float* var, float min, float max, int flag, int decimal_digit, albaString tooltip, double customSizer)
 {
 	int w_id;
+	int fw = FW;
+	int lw = LW;
+	int dw = DW;
+	long labStyle = wxALIGN_RIGHT | wxST_NO_AUTORESIZE;
+
+	if (customSizer < 1.0 && customSizer > 0.0)
+	{
+		lw = (fw * customSizer) - (2 * LM);
+		dw = (fw - lw) - LM;
+		fw *= customSizer;
+
+		labStyle = wxALIGN_LEFT | wxST_NO_AUTORESIZE;
+	}
+
 	if (label.IsEmpty())
 	{
 		w_id = GetWidgetId(id);
-		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(FW, LH), m_EntryStyle);
+		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(fw, LH), m_EntryStyle);
 		text->SetValidator(albaGUIValidator(this, w_id, text, var, min, max, decimal_digit));
 		text->SetFont(m_Font);
 
@@ -881,13 +955,13 @@ void albaGUI::Float(int id, albaString label, float* var, float min, float max, 
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(LW, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
+		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(lw, LH), labStyle);
 		if (m_UseBackgroundColor)
 			lab->SetBackgroundColour(m_BackgroundColor);
 		lab->SetFont(m_Font);
 
 		w_id = GetWidgetId(id);
-		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(DW, LH), m_EntryStyle);
+		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(dw, LH), m_EntryStyle);
 		text->SetValidator(albaGUIValidator(this, w_id, text, var, min, max, decimal_digit));
 		text->SetFont(m_Font);
 
@@ -912,7 +986,7 @@ void albaGUI::Double(int id, albaString label, double* var, double min, double m
 	if (customSizer <1.0 && customSizer > 0.0)
 	{
 		lw = (fw * customSizer) - (2 * LM);
-		dw = (fw - lw) - (2 * HM);
+		dw = (fw - lw) - LM;
 		fw *= customSizer;
 		labStyle = wxALIGN_LEFT | wxST_NO_AUTORESIZE;
 	}
@@ -1305,7 +1379,7 @@ wxComboBox *albaGUI::Combo(int id, albaString label, int* var, int numchoices, c
 	if (customSizer < 1.0 && customSizer > 0.0)
 	{
 		lw = (fw * customSizer) - (2 * LM);
-		dw = (fw - lw) - (2 * HM);
+		dw = (fw - lw) - LM;
 		fw *= customSizer;
 		labStyle = wxALIGN_LEFT | wxST_NO_AUTORESIZE;
 	}
@@ -1484,7 +1558,6 @@ void albaGUI::Color(int id, wxString label, wxColour* var, wxString tooltip)
 	Add(sizer, 0, wxALL, M);
 }
 
-#ifdef ALBA_USE_VTK //:::::::::::::::::::::::::::::::::
 //----------------------------------------------------------------------------
 albaGUILutSwatch *albaGUI::Lut(int id, wxString label, vtkLookupTable *lut)
 {
@@ -1504,7 +1577,6 @@ albaGUILutSwatch *albaGUI::Lut(int id, wxString label, vtkLookupTable *lut)
 	Add(sizer, 0, wxALL, M);
 	return luts;
 }
-#endif             //:::::::::::::::::::::::::::::::::
 
 //----------------------------------------------------------------------------
 void albaGUI::TwoButtons(int firstID, int secondID, const char* label1, const char* label2, int alignment /* = wxALL */, int width)
@@ -1533,18 +1605,18 @@ void albaGUI::DoubleUpDown(int labelID, int firstID, int secondID, albaString la
 	// Double entry
 	int w_id;
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	int btnW = LH+LH;
+	int btnW = LH;
 
 	if (label.IsEmpty())
 	{
 		w_id = GetWidgetId(labelID);
-		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(FW - btnW, BH), m_EntryStyle);
+		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(FW - (2 * btnW) - HM, BH), m_EntryStyle);
 		text->SetValidator(albaGUIValidator(this, w_id, text, var, min, max, decimal_digit));
 		text->SetFont(m_Font);
 		if (!tooltip.IsEmpty())
 			text->SetToolTip(tooltip.GetCStr());
 
-		Add(text, 0, wxALL, 0);
+		sizer->Add(text, 0, wxRIGHT, HM);
 	}
 	else
 	{
@@ -1554,7 +1626,7 @@ void albaGUI::DoubleUpDown(int labelID, int firstID, int secondID, albaString la
 		lab->SetFont(m_Font);
 
 		w_id = GetWidgetId(labelID);
-		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(DW - btnW, BH), m_EntryStyle);
+		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(DW - (2 * btnW) - HM, BH), m_EntryStyle);
 		text->SetValidator(albaGUIValidator(this, w_id, text, var, min, max, decimal_digit));
 		text->SetFont(m_Font);
 		if (!tooltip.IsEmpty())
@@ -1565,15 +1637,13 @@ void albaGUI::DoubleUpDown(int labelID, int firstID, int secondID, albaString la
 	}
 
 	// Two Buttons
-	int w = btnW / 2;
-
 	int w_idFirst = GetWidgetId(firstID);
-	albaGUIButton    *b1 = new albaGUIButton(this, w_idFirst, "-", dp, wxSize(w, BH));
+	albaGUIButton    *b1 = new albaGUIButton(this, w_idFirst, "-", dp, wxSize(btnW, BH));
 	b1->SetValidator(albaGUIValidator(this, w_idFirst, b1));
 	b1->SetFont(m_Font);
 
 	int w_idSecond = GetWidgetId(secondID);
-	albaGUIButton    *b2 = new albaGUIButton(this, w_idSecond, "+", dp, wxSize(w, BH));
+	albaGUIButton    *b2 = new albaGUIButton(this, w_idSecond, "+", dp, wxSize(btnW, BH));
 	b2->SetValidator(albaGUIValidator(this, w_idSecond, b2));
 	b2->SetFont(m_Font);
 	
@@ -2047,7 +2117,6 @@ int albaGUI::GetWidgetId(int mod_id)
 
 //----------------------------------------------------------------------------
 void albaGUI::BoolGrid(int numRows, int numColumns, std::vector<int> &ids, std::vector<const char*> &labelsRows,std::vector<const char*> &labelsColumns, int *var, albaString tooltip /* = "" */ )
-//----------------------------------------------------------------------------
 {
   std::vector<int> w_ids;
   std::vector<wxCheckBox *> check_list;
