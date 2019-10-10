@@ -100,39 +100,44 @@ void albaOpEditMetadata::OpRun()
   std::vector<std::string> tag_list;
   m_TagArray->GetTagList(tag_list);
 
-  if(!m_TestMode)
-  {
-    m_Gui = new albaGUI(this);
+	if (!m_TestMode)
+	{
+		m_Gui = new albaGUI(this);
 
-    m_MetadataList = m_Gui->ListBox(ID_METADATA_LIST,"",120);
-    for (int t=0; t<tag_list.size();t++)
-      m_MetadataList->Insert(tag_list[t].c_str(),0);
+		m_Gui->Label("");
 
-    if (!m_MetadataList->IsEmpty())
-    {
-      m_MetadataList->SetSelection(0,true);//
-      SelectTag(m_MetadataList->GetString(0).c_str());
-    }
+		m_MetadataList = m_Gui->ListBox(ID_METADATA_LIST, "", 120);
+		for (int t = 0; t < tag_list.size(); t++)
+			m_MetadataList->Insert(tag_list[t].c_str(), 0);
 
-    wxString tag_type[2] = {_("numeric"),_("string")};
+		if (!m_MetadataList->IsEmpty())
+		{
+			m_MetadataList->SetSelection(0, true);//
+			SelectTag(m_MetadataList->GetString(0).c_str());
+		}
 
-    m_Gui->Button(ID_ADD_METADATA,_("Add"));
-    m_Gui->Button(ID_REMOVE_METADATA,_("Remove"));
-    m_Gui->Divider(2);
-    m_Gui->String(ID_TAG_NAME,_("name"),&m_TagName);
-    m_Gui->Combo(ID_TAG_TYPE,_("type"),&m_TagType,2,tag_type);
-    m_Gui->Integer(ID_TAG_MULTEPLICITY,_("multep."),&m_TagMulteplicity,1);
-    m_Gui->Integer(ID_TAG_COMPONENT,_("comp"),&m_TagComponent,0);
-    m_Gui->Double(ID_TAG_DOUBLE_VALUE,_("num. value"),&m_TagValueAsDouble);
-    m_Gui->String(ID_TAG_STRING_VALUE,_("string value"),&m_TagValueAsString);
+		wxString tag_type[2] = { _("Numeric"),_("String") };
 
-    EnableWidgets();
-    m_Gui->OkCancel();
-    
-	  m_Gui->Divider();
+		m_Gui->TwoButtons(ID_ADD_METADATA, ID_REMOVE_METADATA, "Add", "Remove");
+		m_Gui->Divider(2);
+		m_Gui->Label("Property", true);
+		m_Gui->String(ID_TAG_NAME, _("Name"), &m_TagName, "", false, false, false, 0.35);
+		m_Gui->Combo(ID_TAG_TYPE, _("Type"), &m_TagType, 2, tag_type, "", 0.35);
+		m_Gui->Integer(ID_TAG_MULTEPLICITY, _("Multep."), &m_TagMulteplicity, 1, MAXINT, "", false, 0.35);
+		m_Gui->Integer(ID_TAG_COMPONENT, _("Comp"), &m_TagComponent, 0, MAXINT, "", false, 0.35);
+		m_Gui->Double(ID_TAG_DOUBLE_VALUE, _("Num. value"), &m_TagValueAsDouble, MINDOUBLE, MAXDOUBLE, -1, "", false, 0.35);
+		m_Gui->String(ID_TAG_STRING_VALUE, _("String value"), &m_TagValueAsString, "", true, false, false, 0.35);
 
-    ShowGui();
-  }
+		EnableWidgets();
+
+		//////////////////////////////////////////////////////////////////////////
+		m_Gui->Label("");
+		m_Gui->Divider(1);
+		m_Gui->OkCancel();
+		m_Gui->Label("");
+
+		ShowGui();
+	}
 }
 //----------------------------------------------------------------------------
 void albaOpEditMetadata::SelectTag(const char *tag_name)

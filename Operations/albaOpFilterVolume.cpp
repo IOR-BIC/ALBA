@@ -134,28 +134,27 @@ void albaOpFilterVolume::CreateGui()
 {
   // interface:
   m_Gui = new albaGUI(this);
-
-	
-  m_Gui->Bool(ID_APPLY_ON_INPUT,_("Apply on input"),&m_ApplyDirectlyOnInput,0,_("Check this flag for big volumes to save memory"));
-  m_Gui->Label("");
-  m_Gui->Label(_("Smooth"),true);
+		
+  m_Gui->Bool(ID_APPLY_ON_INPUT,_("Apply on input"),&m_ApplyDirectlyOnInput,1,_("Check this flag for big volumes to save memory"));
+ 
+	m_Gui->Divider(2);
+	m_Gui->Label(_("Smooth"),true);
   m_Gui->Vector(ID_STANDARD_DEVIATION,_("Sd: "),m_StandardDeviation,0.1,100,2,_("standard deviation for smooth filter"));
   m_Gui->Vector(ID_RADIUS_FACTOR,_("Radius: "),m_SmoothRadius,1,10,2,_("radius for smooth filter"));
   m_Gui->Button(ID_SMOOTH,_("Apply smooth"));
 
-  m_Gui->Label("");
+	m_Gui->Divider(2);
   m_Gui->Label(_("Median"),true);
   m_Gui->Vector(ID_KERNEL_SIZE,_("Kernel: "),m_KernelSize,1,10,_("Size of kernel"));
   m_Gui->Button(ID_MEDIAN,_("Apply median"));
-	
 	
 	double *dataRange = m_InputData->GetScalarRange();
 	m_ReplaceRange[0] = dataRange[0];
 	m_ReplaceRange[1] = dataRange[1];
 	m_ReplaceValue = 0;
 
+	m_Gui->Divider(2);
 	m_Gui->Label("Replace values",true);
-
 	m_Gui->FloatSlider(ID_REPLACE_MIN, _("From: "), &m_ReplaceRange[0], dataRange[0],dataRange[1]);
 	m_Gui->FloatSlider(ID_REPLACE_MAX, _("To: "), &m_ReplaceRange[1], dataRange[0], dataRange[1]);
 	m_Gui->Double(ID_REPLACE_VALUE, _("Value: "), &m_ReplaceValue);
@@ -164,13 +163,16 @@ void albaOpFilterVolume::CreateGui()
   m_Gui->Divider(2);
   m_Gui->Button(ID_PREVIEW,_("Preview"));
   m_Gui->Button(ID_RESET_ALL,_("Clear"));
-  m_Gui->OkCancel();
-  m_Gui->Enable(wxOK,false);
-
   m_Gui->Enable(ID_PREVIEW,false);
   m_Gui->Enable(ID_RESET_ALL,false);
 
-  m_Gui->Divider();
+	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Label("");
+	m_Gui->Divider(1);
+	m_Gui->OkCancel();
+	m_Gui->Label("");
+
+	m_Gui->Enable(wxOK, false);
 }
 //----------------------------------------------------------------------------
 void albaOpFilterVolume::OpDo()

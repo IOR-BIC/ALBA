@@ -107,15 +107,19 @@ void albaOpVolumeMirror::OpRun()
 		m_Gui = new albaGUI(this);
 		m_Gui->SetListener(this);
 
-		m_Gui->Label("this doesn't work on animated vme");
-		m_Gui->Label("");
+		m_Gui->HintBox(NULL, "This doesn't work on animated vme");
+// 		m_Gui->Label("this doesn't work on animated vme");
+// 		m_Gui->Label("");
 		
-		m_Gui->Bool(ID_MIRRORX,"mirror x coords", &m_MirrorX, 1);
-		m_Gui->Bool(ID_MIRRORY,"mirror y coords", &m_MirrorY, 1);
-		m_Gui->Bool(ID_MIRRORZ,"mirror z coords", &m_MirrorZ, 1);
+		m_Gui->Bool(ID_MIRRORX,"Mirror x coords", &m_MirrorX, 1);
+		m_Gui->Bool(ID_MIRRORY,"Mirror y coords", &m_MirrorY, 1);
+		m_Gui->Bool(ID_MIRRORZ,"Mirror z coords", &m_MirrorZ, 1);
 
+		//////////////////////////////////////////////////////////////////////////
 		m_Gui->Label("");
+		m_Gui->Divider(1);
 		m_Gui->OkCancel();
+		m_Gui->Label("");
 
 		ShowGui();
 	}

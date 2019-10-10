@@ -106,22 +106,22 @@ void albaOpClassicICPRegistration::CreateGui()
 	m_Gui = new albaGUI(this);
 	m_Gui->SetListener(this);
 
-	m_Gui->Label("");
-	m_Gui->Label(_("source:"),true);
+	m_Gui->Label(_("Source:"),true);
 	m_Gui->Label(&m_InputName);
-	m_Gui->Label("");
-	m_Gui->Label(_("target:"),true);
+	m_Gui->Label(_("Target:"),true);
 	m_Gui->Label(&m_TargetName);
-	m_Gui->Button(ID_CHOOSE,_("choose target"));
-	m_Gui->Label("");
+	m_Gui->Button(ID_CHOOSE,_("Choose target"));
 	m_Gui->Bool(-1, "Copy subtree", &m_CopySubTree,true);
+	
+	m_Gui->Divider(1);
+	m_Gui->Double(ID_CONVERGENCE, _("Conv.step"), &m_Convergence, 1.0e-20, 1.0e+20, 10);
+	m_Gui->FileSave(ID_FILE,_("Report log"),&m_ReportFilename,wildcard);
+
+	//////////////////////////////////////////////////////////////////////////
 	m_Gui->Label("");
-	m_Gui->Double(ID_CONVERGENCE, _("conv.step"), &m_Convergence, 1.0e-20, 1.0e+20, 10);
-	m_Gui->Label("");
-	m_Gui->FileSave(ID_FILE,_("report log"),&m_ReportFilename,wildcard);
-	m_Gui->Label("");
+	m_Gui->Divider(1);
 	m_Gui->OkCancel();
-	m_Gui->Divider();
+	m_Gui->Label("");
 
 	m_Gui->Enable(wxOK,false);
 }
