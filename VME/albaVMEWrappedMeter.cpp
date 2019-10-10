@@ -1593,12 +1593,12 @@ albaGUI* albaVMEWrappedMeter::CreateGui()
   int num_mode = 3;
 	int num_wrap = 3;
 
-	const wxString wrap_choices_string[] = {_("manual"), _("automated"), _("IOR_automated")};
+	const wxString wrap_choices_string[] = {_("Manual"), _("Automated"), _("IOR_automated")};
 
   m_Gui = albaVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
-  m_Gui->Combo(ID_WRAPPED_METER_MODE,_("wrap"),&m_WrappedMode,num_wrap,wrap_choices_string,_("Choose the meter mode"));
+  m_Gui->Combo(ID_WRAPPED_METER_MODE,_("Wrap"),&m_WrappedMode,num_wrap,wrap_choices_string,_("Choose the meter mode"));
 	m_Gui->Divider();
 
 	albaVME *start_vme = GetStartVME();
@@ -1613,7 +1613,7 @@ albaGUI* albaVMEWrappedMeter::CreateGui()
   albaVME *wrapped_vme = GetWrappedVME();
   m_WrappedVmeName = wrapped_vme ? wrapped_vme->GetName() : _("none");
   m_Gui->Button(ID_WRAPPED_METER_LINK,&m_WrappedVmeName,_("Wrapped"), _("Select the vme representing Vme to be wrapped"));
-  m_Gui->Bool(ID_WRAPPED_SIDE,"reverse direction", &m_WrapSide ,1);
+  m_Gui->Bool(ID_WRAPPED_SIDE,"Reverse direction", &m_WrapSide ,1);
 
   m_Gui->Enable(ID_WRAPPED_METER_LINK, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
   m_Gui->Enable(ID_WRAPPED_SIDE, m_WrappedMode == AUTOMATED_WRAP);
@@ -1653,16 +1653,13 @@ albaGUI* albaVMEWrappedMeter::CreateGui()
 		}
 	}
   
-  m_Gui->Button(ID_ADD_POINT, _("Add"), "" ,"");
-  m_Gui->Button(ID_REMOVE_POINT, _("Remove"), "" ,"");
-  m_Gui->Button(ID_UP, _("Up"), "" ,"");
-  m_Gui->Button(ID_DOWN, _("Down"), "" ,"");
+	m_Gui->TwoButtons(ID_ADD_POINT, ID_REMOVE_POINT, "Add", "Remove");
+	m_Gui->TwoButtons(ID_UP, ID_DOWN, "Up", "Down");
 
   EnableManualModeWidget(m_WrappedMode == MANUAL_WRAP);
 
 	m_Gui->Divider();
 	m_Gui->Divider();
-	m_Gui->Divider(2);
   //m_Gui->Button(ID_SAVE_FILE_BUTTON, _("Save in file"),"" ,"");
 	m_Gui->Divider();
 

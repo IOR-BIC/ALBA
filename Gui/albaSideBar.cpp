@@ -299,6 +299,7 @@ void albaSideBar::UpdateVmePanel()
 
 		if (vme_out_gui)
 		{
+			m_AppendingGUI->Divider(1);
 			m_AppendingGUI->Label(_("Output"),true);
 			m_AppendingGUI->AddGui(vme_out_gui);
 		}

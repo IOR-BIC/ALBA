@@ -478,9 +478,9 @@ albaGUI* albaVMELabeledVolume::CreateGui()
   m_Gui->SetListener(this); 
 
   // Settings for the buttons that will control the list box
-  m_Gui->Button(ID_INSERT_LABEL, _("Add label"), "", _("Add a label"));
-  m_Gui->Button(ID_REMOVE_LABEL, _("Remove label"), "", _("Remove a label"));
-  m_Gui->Button(ID_EDIT_LABEL, _("Edit label"), "", _("Edit a label"));
+	m_Gui->TwoButtons(ID_INSERT_LABEL, ID_REMOVE_LABEL, "Add Label", "Remove Label");
+	m_Gui->Button(ID_EDIT_LABEL, _("Edit label"), "", _("Edit a label"));
+
   if (m_VolumeLink)
   {
     EnableWidgets(true);
@@ -529,7 +529,6 @@ albaGUI* albaVMELabeledVolume::CreateGui()
     }
   }
     
-  m_Gui->Divider(2);	
   m_Gui->Update(); 
   
   return m_Gui;

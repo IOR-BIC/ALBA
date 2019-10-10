@@ -712,7 +712,7 @@ albaGUI* albaVMEMeter::CreateGui()
   m_Gui = albaVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
-  m_Gui->Combo(ID_METER_MODE,_("mode"),&(GetMeterAttributes()->m_MeterMode),num_mode,mode_choices_string,_("Choose the meter mode"));
+  m_Gui->Combo(ID_METER_MODE,_("Mode"),&(GetMeterAttributes()->m_MeterMode),num_mode,mode_choices_string,_("Choose the meter mode"));
   m_Gui->Divider();
 
   UpdateLinks();
@@ -724,7 +724,7 @@ albaGUI* albaVMEMeter::CreateGui()
   if(GetMeterAttributes()->m_MeterMode == POINT_DISTANCE)
     m_Gui->Enable(ID_END2_METER_LINK,false);
 
-  m_Gui->Bool(ID_PLOT_PROFILE,_("plot profile"),&m_GenerateHistogram);
+  m_Gui->Bool(ID_PLOT_PROFILE,_("Plot profile"),&m_GenerateHistogram);
   m_Gui->Enable(ID_PLOT_PROFILE,GetMeterAttributes()->m_MeterMode == POINT_DISTANCE);
 
   m_Gui->Button(ID_PLOTTED_VME_LINK,&m_ProbeVmeName,_("Probed"), _("Select the vme that will be plotted"));

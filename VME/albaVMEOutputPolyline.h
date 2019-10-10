@@ -70,6 +70,7 @@ protected:
 
   albaGUI *CreateGui();
 
+	albaString m_VtkDataType;
   albaString m_Length;
   albaString m_NumberOfPoints;
 private:

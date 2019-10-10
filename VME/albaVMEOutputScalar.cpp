@@ -126,7 +126,7 @@ albaGUI* albaVMEOutputScalar::CreateGui()
   /*double data = GetScalarData();
   m_ScalarDataString = "";
   m_ScalarDataString << data;*/
-  m_Gui->Label(_("data: "),&m_ScalarDataString);
+  m_Gui->Label(_("Data:"),&m_ScalarDataString);
 	m_Gui->Divider(); 
 	return m_Gui;
 }

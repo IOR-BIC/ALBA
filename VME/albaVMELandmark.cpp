@@ -366,16 +366,19 @@ albaGUI* albaVMELandmark::CreateGui()
 //-------------------------------------------------------------------------
 {
   m_Gui = albaVME::CreateGui(); // Called to show info about vmes' type and name
-  double xyz[3],rxyz[3];
+  
+	double xyz[3],rxyz[3];
   this->GetOutput()->GetAbsPose(xyz,rxyz);
-  m_Gui->Label("abs pose:");
-  m_Position[0] = wxString::Format("x: %f",xyz[0]);
-  m_Position[1] = wxString::Format("y: %f",xyz[1]);
-  m_Position[2] = wxString::Format("z: %f",xyz[2]);
-  m_Gui->Label("", &m_Position[0]);
-  m_Gui->Label("", &m_Position[1]);
-  m_Gui->Label("", &m_Position[2]);
+  m_Gui->Label("Abs pose:", true);
+  m_Position[0] = wxString::Format("%f",xyz[0]);
+  m_Position[1] = wxString::Format("%f",xyz[1]);
+  m_Position[2] = wxString::Format("%f",xyz[2]);
+
+  m_Gui->Label("x:", &m_Position[0]);
+  m_Gui->Label("y:", &m_Position[1]);
+  m_Gui->Label("z:", &m_Position[2]);
   m_Gui->Divider();
+	
 	return m_Gui;
 }
 

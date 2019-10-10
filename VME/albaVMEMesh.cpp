@@ -223,8 +223,6 @@ albaGUI * albaVMEMesh::CreateGui()
 		m_GuiRollOutBonematConfig->RollOut(false);
 	}
 
-	m_Gui->Divider(2);
-
 	m_Gui->FitGui();
 	m_Gui->Update();
 

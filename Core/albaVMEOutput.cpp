@@ -545,7 +545,7 @@ albaGUI* albaVMEOutput::CreateGui()
   m_Gui = new albaGUI(m_VME);
 
   albaString type = GetTypeName(); 
-  m_Gui->Label("Type: ", type, true);
+  m_Gui->Label("Type:", type, true);
 	m_Gui->Divider();
   return m_Gui;
 }

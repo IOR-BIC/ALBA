@@ -964,7 +964,7 @@ albaGUI *albaVME::CreateGui()
 		m_Gui->Button(ID_PRINT_INFO, typeName, "", "Print node debug information");
 
 	m_Gui->Divider(1);
-	m_Gui->String(ID_NAME, "Name :", &m_GuiName);
+	m_Gui->String(ID_NAME, "Name", &m_GuiName);
 	m_Gui->Divider();
 
   return m_Gui;

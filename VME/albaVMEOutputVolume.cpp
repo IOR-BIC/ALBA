@@ -114,14 +114,15 @@ albaGUI* albaVMEOutputVolume::CreateGui()
     m_VtkDataType << this->GetVTKData()->GetClassName();
   }
 
-  m_Gui->Label(_("vtk type: "), &m_VtkDataType);
-  m_Gui->Label(_(" bounds: "),true);
+	m_Gui->Label(_("Vtk type:"), &m_VtkDataType, true, false, false, 0.35);
+  m_Gui->Label(_("Bounds:"),true);
   m_Gui->Label(&m_VolumeBounds[0]);
   m_Gui->Label(&m_VolumeBounds[1]);
   m_Gui->Label(&m_VolumeBounds[2]);
-  m_Gui->Label(_("scalar range:"),true);
+  m_Gui->Label(_("Scalar range:"),true);
   m_Gui->Label(&m_ScaralRangeString);
   m_Gui->Divider();
+
 	return m_Gui;
 }
 //-------------------------------------------------------------------------

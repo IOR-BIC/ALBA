@@ -137,7 +137,12 @@ void albaOpCreateEditSkeleton::CreateGui()
 {
 	m_Gui = new albaGUI(this);
 	m_Gui->AddGui(m_Editor->GetGui());
+
+	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Label("");
+	m_Gui->Divider(1);
 	m_Gui->OkCancel();
+	m_Gui->Label("");
 }
 //----------------------------------------------------------------------------
 void albaOpCreateEditSkeleton::OnEvent(albaEventBase *alba_event)

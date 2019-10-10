@@ -304,8 +304,7 @@ void albaGeometryEditorPolylineGraph::CreateGui()
 	m_Gui->Radio(ID_POINT_TOOL,_("Point Tool"),&m_PointTool,4,choices_point_tool);
 	m_Gui->Enable(ID_POINT_TOOL,m_Action==ID_POINT_ACTION);
 
-  m_Gui->Label(_("Point Radius"));
-  m_Gui->Double(ID_SPHERE_RADIUS,"",&m_SphereRadius);
+	m_Gui->Double(ID_SPHERE_RADIUS, "Point Radius", &m_SphereRadius, MINDOUBLE, MAXDOUBLE, -1, "", false, 0.35);
   m_Gui->Enable(ID_SPHERE_RADIUS,m_Action==ID_POINT_ACTION);
 
 	m_Gui->Button(ID_BUTTON_POINT_DELETE,_("Delete"));
@@ -317,7 +316,6 @@ void albaGeometryEditorPolylineGraph::CreateGui()
 
 	m_Gui->Button(ID_BUTTON_BRANCH_DELETE,_("Delete"));
 	m_Gui->Enable(ID_BUTTON_BRANCH_DELETE,m_Action==ID_BRANCH_ACTION && m_SelectedBranch!=UNDEFINED_BRANCH_ID);
-
 }
 //----------------------------------------------------------------------------
 albaGUI* albaGeometryEditorPolylineGraph::GetGui()

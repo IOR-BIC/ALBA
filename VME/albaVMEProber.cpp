@@ -426,8 +426,8 @@ albaGUI* albaVMEProber::CreateGui()
   m_Gui->Button(ID_SURFACE_LINK,&m_SurfaceName,_("Surface"), _("Select the polydata to probe the volume"));
 
   m_ProberMode = GetMode();
-  wxString prober_mode[2] = {_("density"), _("distance")};
-  m_Gui->Combo(ID_MODALITY,_("modality"), &m_ProberMode, 2, prober_mode);
+  wxString prober_mode[2] = {_("Density"), _("Distance")};
+  m_Gui->Combo(ID_MODALITY,_("Modality"), &m_ProberMode, 2, prober_mode);
 	m_Gui->Divider();
   return m_Gui;
 }
