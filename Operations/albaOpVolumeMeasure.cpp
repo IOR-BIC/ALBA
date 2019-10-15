@@ -107,20 +107,17 @@ void albaOpVolumeMeasure::OpRun()
 	m_Gui->SetListener(this);
 
   m_Gui->Button(ID_COMPUTE_MEASURE,_("Compute"));
-  m_Gui->Label(_("measure result:"),true);
+  m_Gui->Label(_("Measure result"),true);
+    
+  m_Gui->Label(_(" Volume="),&m_VolumeMeasure, false, false, false, 0.36);
+	m_Gui->Label(_(" Surf. area="),&m_SurfaceArea, false, false, false, 0.36);
+	m_Gui->Label(_(" N.S.I.="),&m_NormalizedShapeIndex, false, false, false, 0.36);
   
-  
-  m_Gui->Label(_("volume= "),&m_VolumeMeasure);
-	m_Gui->Label(_("surf. area= "),&m_SurfaceArea);
-	m_Gui->Label(_("N.S.I.= "),&m_NormalizedShapeIndex);
-  
-  m_Gui->Divider();
-  m_Gui->Label(_("Measure description."),true);
-  m_Gui->Button(ID_STORE_MEASURE,_("Store"));
+  m_Gui->Divider(1);
+  m_Gui->Label(_("Measure description"),true);
   //m_Gui->Button(ID_ADD_TO_VME_TREE,"Add to msf");
-  m_Gui->Button(ID_REMOVE_MEASURE,_("Remove"));
+	m_Gui->TwoButtons(ID_STORE_MEASURE, ID_REMOVE_MEASURE, "Store", "Remove");
   m_MeasureList = m_Gui->ListBox(ID_MEASURE_LIST);
-	m_Gui->Button(ID_CLOSE_OP,_("Close"));
 
   albaVME *root = m_Input->GetRoot();
   if(root->GetTagArray()->IsTagPresent("VOLUME_MEASURE"))
@@ -137,8 +134,13 @@ void albaOpVolumeMeasure::OpRun()
     m_Gui->Enable(ID_REMOVE_MEASURE,false);
   }
 
-  m_Gui->Divider(0);
-  ShowGui();
+	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Label("");
+	m_Gui->Divider(1);
+	m_Gui->Button(ID_CLOSE_OP, _("Close"));
+	m_Gui->Label("");
+
+	ShowGui();
 }
 //----------------------------------------------------------------------------
 void albaOpVolumeMeasure::OpDo()
