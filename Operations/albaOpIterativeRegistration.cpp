@@ -200,58 +200,49 @@ void albaOpIterativeRegistration::OpStop(int result)
   albaEventMacro(albaEvent(this,result));   
 }
 
-
+//----------------------------------------------------------------------------
 void albaOpIterativeRegistration::CreateGui() 
 {
    // create Gui
   m_Gui = new albaGUI(this);
   m_Gui->SetListener(this);
  
-  m_Gui->Label("source vme:", true);
+  m_Gui->Label("Source vme:", true);
   m_Gui->Label(&m_SourceVmeName, false, true);
    
-
   m_Gui->Divider(2); 
-  m_Gui->Button(ID_CHOOSE_TARGET,  "choose target", "", "choose registration target vme");
-  
-  
-  m_Gui->Label("target vme:", true);
-
-  m_Gui->Label(&m_TargetVmeName, false, true); 
-  m_Gui->Divider(2); 
-  m_Gui->Label("mouse interaction", true);
-  m_Gui->Label("left mouse: pick landmark");
-  m_Gui->Label("middle mouse: translate landmark");
-  m_Gui->Label("middle mouse + ctrl: translate and snap");
-  m_Gui->Divider(2);
-
-  m_Gui->Button(ID_REGISTER,"register","","perform rigid registration");
-  m_Gui->Enable(ID_REGISTER, false);
    
+  m_Gui->Label("Target vme:", true);
+  m_Gui->Label(&m_TargetVmeName, false, true); 
+	m_Gui->Button(ID_CHOOSE_TARGET, "Choose target", "", "Choose registration target vme");
+	m_Gui->Divider(2);
+
+	m_Gui->HintBox(NULL, "Left btn: pick landmark\nMiddle btn: translate landmark\nMiddle btn+ctrl: translate and snap","Mouse interaction");
+
+  m_Gui->Button(ID_REGISTER,"Register","","Perform rigid registration");
+  m_Gui->Enable(ID_REGISTER, false);
+	m_Gui->Divider(2);
+
   // source gui
-  m_Gui->Divider(2);
-  m_Gui->Label("source landmark:", true);
+  m_Gui->Label("Source landmark:", true);
   m_GuiLandmark[SOURCE] = new albaGUILandmark(m_SourceVME, this);
   m_GuiLandmark[SOURCE]->SetLMCloudName("source_lc");
   m_Gui->AddGui(m_GuiLandmark[SOURCE]->GetGui());
 
   // target gui
   m_Gui->Divider(2);
-  m_Gui->Label("target landmark:", true);
+  m_Gui->Label("Target landmark:", true);
   m_GuiLandmark[TARGET] = new albaGUILandmark(m_TargetVME, this);
   m_GuiLandmark[TARGET]->SetLMCloudName("target_lc");
   m_Gui->AddGui(m_GuiLandmark[TARGET]->GetGui());
 
-  m_Gui->Divider(2);
-  m_Gui->Divider();
-  m_Gui->Divider();
-  
-	m_Gui->OkCancel(); 
-  m_Gui->Label("");
+	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Label("");
+	m_Gui->Divider(1);
+	m_Gui->OkCancel();
+	m_Gui->Label("");
 
-  m_Gui->Update(); 
-
-  ShowGui();
+	ShowGui();
 }
 
 void albaOpIterativeRegistration::OnRegister(albaEventBase *alba_event)

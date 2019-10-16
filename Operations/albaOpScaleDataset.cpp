@@ -254,9 +254,7 @@ void albaOpScaleDataset::CreateGui()
 {
   m_Gui = new albaGUI(this);
 
-  m_Gui->Divider(2);
-  m_Gui->Label("gizmo interaction", true);
-  m_Gui->Label("left mouse: interact through gizmo");
+	m_Gui->HintBox(NULL, "Left mouse: interact through gizmo", "Gizmo interaction");
 
   //---------------------------------
   // Scaling Gizmo Gui
@@ -277,21 +275,24 @@ void albaOpScaleDataset::CreateGui()
 
   //--------------------------------- 
   m_Gui->Divider(2);
-  m_Gui->Label("auxiliary ref sys", true);
-  m_Gui->Button(ID_AUX_REF_SYS,"choose");
+  m_Gui->Label("Auxiliary refsys", true);
 
-  if(this->m_RefSysVME == NULL)
-  {
-    SetRefSysVME(m_Input);
-    m_RefSysVMEName = m_Input->GetName();
-  }
-  m_Gui->Label("refsys name: ",&m_RefSysVMEName);
+	if (this->m_RefSysVME == NULL)
+	{
+		SetRefSysVME(m_Input);
+		m_RefSysVMEName = m_Input->GetName();
+	}
+	m_Gui->Label(&m_RefSysVMEName);
 
-  m_Gui->Divider(2);
-  m_Gui->Button(ID_RESET,"reset","","Cancel the transformation.");
+	m_Gui->Button(ID_AUX_REF_SYS,"Choose");
+  m_Gui->Button(ID_RESET,"Reset","","Cancel the transformation.");
 
-	m_Gui->OkCancel(); 
-  m_Gui->Label("");
+	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Label("");
+	m_Gui->Divider(1);
+	m_Gui->OkCancel();
+	m_Gui->Label("");
+
   //--------------------------------- 
 
   m_Gui->Update();

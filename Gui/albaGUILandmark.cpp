@@ -151,8 +151,8 @@ void albaGUILandmark::CreateGui()
   m_Gui->Double(ID_TRANSLATE_Y, "Translate Y", &m_Position[1]);
   m_Gui->Double(ID_TRANSLATE_Z, "Translate Z", &m_Position[2]);
   m_Gui->Divider();
- 	m_Gui->Button(ID_REF_SYS,"choose refsys");
-  m_Gui->Label(albaString("refsys name: "),&m_RefSysVMEName);
+ 	m_Gui->Button(ID_REF_SYS,"Choose refsys");
+  m_Gui->Label(&m_RefSysVMEName);
 
 }
 

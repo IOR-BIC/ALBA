@@ -121,22 +121,23 @@ void albaOpVOIDensity::OpRun()
 		m_Gui->Button(ID_EVALUATE_DENSITY, _("Evaluate"), "", _("Evaluate density inside the choosed surface"));
 		m_Gui->Divider(2);
 		m_Gui->Label(_("Number of voxel inside the VOI"));
-		m_Gui->String(ID_NUM_SCALARS,"n=",&m_NumberOfScalarsString,"");
+		m_Gui->String(ID_NUM_SCALARS,"Num=",&m_NumberOfScalarsString,"");
 		m_Gui->Label(_("Voxels's scalar mean inside the VOI"));
-		m_Gui->String(ID_MEAN_SCALAR,"m=",&m_MeanScalarString,"");
-		m_Gui->String(ID_MAX_SCALAR,"max=",&m_MaxScalarString,"");
-		m_Gui->String(ID_MIN_SCALAR,"min=",&m_MinScalarString,"");
-		m_Gui->String(ID_STANDARD_DEVIATION,"stdev=",&m_StandardDeviationString,"");
+		m_Gui->String(ID_MEAN_SCALAR,"Mean=",&m_MeanScalarString,"");
+		m_Gui->String(ID_MAX_SCALAR,"Max=",&m_MaxScalarString,"");
+		m_Gui->String(ID_MIN_SCALAR,"Min=",&m_MinScalarString,"");
+		m_Gui->String(ID_STANDARD_DEVIATION,"Std dev=",&m_StandardDeviationString,"");
 		//m_VoxelList=m_Gui->ListBox(ID_VOXEL_LIST);
-		m_Gui->Divider(2);
-		m_Gui->Divider();
+
+		//////////////////////////////////////////////////////////////////////////
+		m_Gui->Label("");
+		m_Gui->Divider(1);
 		m_Gui->OkCancel();
+		m_Gui->Label("");
 	  
 		m_Gui->Enable(ID_EVALUATE_DENSITY, false);
 		m_Gui->Enable(wxOK, false);
 		m_Gui->Update();
-
-		m_Gui->Divider();
 
 		ShowGui();
 	}

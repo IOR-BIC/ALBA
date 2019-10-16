@@ -170,12 +170,12 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::CreateGui()
 {
   m_Gui = new albaGUI(this);
 
-  m_Gui->Label(_("Parameters"));
-  m_Gui->Integer(ID_LOWER,_("lower"),&m_Lower,MINLONG,MAXLONG,_("minimum intensity value to be included in segmentation"));
-  m_Gui->Integer(ID_UPPER,_("upper"),&m_Upper,MINLONG,MAXLONG,_("maximum intensity value to be included in segmentation"));
-  m_Gui->Integer(ID_REPLACE,_("replace"),&m_Replace,0,MAXINT,_("segmented region value"));
-  m_Gui->Label(_("Voxel val:"),&m_SeedScalarValue);
-  m_Gui->VectorN(ID_SEED,_("seed"),m_Seed,m_ImageDim,MININT,MAXINT,"seed point to start growing, in image coordinates");
+  m_Gui->Label(_("Parameters"), true);
+  m_Gui->Integer(ID_LOWER,_("Lower"),&m_Lower,MINLONG,MAXLONG,_("Minimum intensity value to be included in segmentation"));
+  m_Gui->Integer(ID_UPPER,_("Upper"),&m_Upper,MINLONG,MAXLONG,_("Maximum intensity value to be included in segmentation"));
+  m_Gui->Integer(ID_REPLACE,_("Replace"),&m_Replace,0,MAXINT,_("Segmented region value"));
+  m_Gui->Label(_("Voxel value:"),&m_SeedScalarValue, true, false, false, 0.45);
+  m_Gui->VectorN(ID_SEED,_("Seed"),m_Seed,m_ImageDim,MININT,MAXINT,"Seed point to start growing, in image coordinates");
 
 //   m_Gui->Label(_("Anisotropic curvature diffusion parameters"));
 //   m_Gui->Integer(ID_ITERATIONS,_("iterations"),&m_NumIter,0,MAXINT,_("number of iterations. Default [5]"));
@@ -183,7 +183,13 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::CreateGui()
 //   m_Gui->Float(ID_CONDUCTANCE,_("conductance"),&m_Conductance,MINFLOAT,MAXFLOAT,0,-1,_("conductance. Default [1.0]"));
 //   m_Gui->Bool(ID_USE_SPACING,_("use spacing"),&m_UseSpacing,1,_("do NOT use image spacing when computing filter"));
 
-  m_Gui->OkCancel();
+//////////////////////////////////////////////////////////////////////////
+	m_Gui->Label("");
+	m_Gui->Divider(1);
+	m_Gui->OkCancel();
+	m_Gui->Label("");
+
+	ShowGui();
 
   ShowGui();
 }

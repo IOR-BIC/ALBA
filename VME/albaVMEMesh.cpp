@@ -223,8 +223,6 @@ albaGUI * albaVMEMesh::CreateGui()
 		m_GuiRollOutBonematConfig->RollOut(false);
 	}
 
-	m_Gui->Divider(2);
-
 	m_Gui->FitGui();
 	m_Gui->Update();
 
@@ -461,10 +459,11 @@ bool albaVMEMesh::LoadConfigurationTags(albaVMEMesh *vme, BonematConfiguration &
 
 		conf.a_RhoBiggerThanRho2 = GetDoubleTag(vme, "a_RhoBiggerThanRho2");
 		conf.b_RhoBiggerThanRho2 = GetDoubleTag(vme, "b_RhoBiggerThanRho2");
-		conf.c_RhoBiggerThanRho2 = GetDoubleTag(vme, "b_RhoBiggerThanRho2");
+		conf.c_RhoBiggerThanRho2 = GetDoubleTag(vme, "c_RhoBiggerThanRho2");
 
 		conf.m_IntegrationSteps = GetDoubleTag(vme, "m_IntegrationSteps");
-		conf.rho1 = conf.rho2 = GetDoubleTag(vme, "rho2");
+		conf.rho1 = GetDoubleTag(vme, "rho1");
+		conf.rho2 = GetDoubleTag(vme, "rho2");
 
 		conf.densityIntervalsNumber = GetDoubleTag(vme, "densityIntervalsNumber"); //appOpBonematCommon::SINGLE_INTERVAL;
 

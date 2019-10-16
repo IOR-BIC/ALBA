@@ -84,10 +84,16 @@ void albaOpCreateVolume::OpRun()
 //----------------------------------------------------------------------------
 {
   m_Gui = new albaGUI(this);
+	m_Gui->Label("");
   m_Gui->Vector(ID_SPACING, "xyz spc", m_Spacing, 0.0000000001);
   m_Gui->Vector(ID_DIMENSIONS, "xyz dim", m_Dimensions, 0.0000000001);
-  m_Gui->Double(ID_SCALA_VALUE, "density", &m_Density, 0.0);
+  m_Gui->Double(ID_SCALA_VALUE, "Density", &m_Density, 0.0);
+
+	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Label("");
+	m_Gui->Divider(1);
   m_Gui->OkCancel();
+ 	m_Gui->Label("");
 
   ShowGui();
 }

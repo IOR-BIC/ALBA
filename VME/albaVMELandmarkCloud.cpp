@@ -828,7 +828,7 @@ albaGUI* albaVMELandmarkCloud::CreateGui()
 	m_Gui->Divider();
   GetRadius(); // Called to update m_Radius var from tag
 
-  m_Gui->Double(ID_LM_RADIUS, "radius", &m_Radius, 0.0,MAXDOUBLE,-1);
+  m_Gui->Double(ID_LM_RADIUS, "Radius", &m_Radius, 0.0,MAXDOUBLE,-1);
   m_Gui->Integer(ID_LM_SPHERE_RESOLUTION, "Resolution", &m_SphereResolution, 0.0,MAXINT);
   
   m_Gui->Divider();

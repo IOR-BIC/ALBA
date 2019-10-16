@@ -55,7 +55,7 @@ albaGUI *albaVMEOutputComputeWrapping::CreateGui()
 
   albaVMEComputeWrapping *wrappedMeter = (albaVMEComputeWrapping *)m_VME;
   m_Distance = wrappedMeter->GetDistance();
-  m_Gui->Label(_("distance: "), &m_Distance, true);
+  m_Gui->Label(_("Distance:"), &m_Distance, true);
 
 	double *coordinateFIRST = NULL;
 	double *coordinateLAST = NULL;
@@ -77,11 +77,11 @@ albaGUI *albaVMEOutputComputeWrapping::CreateGui()
     m_MiddlePoints[m_MiddlePoints.size()-1] = wxString::Format("%.2f %.2f %.2f", coordinateLAST[0], coordinateLAST[1], coordinateLAST[2]);
 
   
-	m_Gui->Label(_("first mp:"), &m_MiddlePoints[0], true);
-	m_Gui->Label(_("last mp:"), &m_MiddlePoints[m_MiddlePoints.size()-1], true);
+	m_Gui->Label(_("First mp:"), &m_MiddlePoints[0], true);
+	m_Gui->Label(_("Last mp:"), &m_MiddlePoints[m_MiddlePoints.size()-1], true);
 
   m_Angle = wrappedMeter->GetAngle();
-  m_Gui->Label(_("angle: "), &m_Angle, true);
+  m_Gui->Label(_("Angle:"), &m_Angle, true);
 	m_Gui->Divider();
 
   return m_Gui;

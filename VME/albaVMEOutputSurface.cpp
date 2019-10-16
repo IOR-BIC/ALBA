@@ -108,6 +108,7 @@ albaGUI* albaVMEOutputSurface::CreateGui()
 {
   assert(m_Gui == NULL);
   m_Gui = albaVMEOutput::CreateGui();
+
   this->Update();
   /*if (GetSurfaceData())
   {
@@ -115,8 +116,9 @@ albaGUI* albaVMEOutputSurface::CreateGui()
     int num = GetSurfaceData()->GetNumberOfPolys();
     m_NumTriangles = num;
   }*/
-  m_Gui->Label(_("triangles: "), &m_NumTriangles, true);
+  m_Gui->Label(_("Triangles:"), &m_NumTriangles, true, false, false, 0.35);
   m_Gui->Divider();
+
 	return m_Gui;
 }
 //-------------------------------------------------------------------------

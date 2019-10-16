@@ -260,7 +260,7 @@ albaGUI *albaVMERoot::CreateGui()
   {
     m_ApplicationStamp = GetTagArray()->GetTag("APP_STAMP")->GetValue();
   }
-  m_Gui->String(ID_APPLICATION_STAMP, "app stamp", &m_ApplicationStamp, "Tag to associate a msf file \nto a particular application.");
+  m_Gui->String(ID_APPLICATION_STAMP, "App Stamp", &m_ApplicationStamp, "Tag to associate a msf file \nto a particular application.");
   m_Gui->Divider();
 	return m_Gui;
 }

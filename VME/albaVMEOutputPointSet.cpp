@@ -90,8 +90,9 @@ albaGUI* albaVMEOutputPointSet::CreateGui()
     int num = GetPointSetData()->GetNumberOfVerts();
     m_NumPoints = num;
   }
-  m_Gui->Label(_("points: "), &m_NumPoints, true);
+  m_Gui->Label(_("Points:"), &m_NumPoints, true);
 	m_Gui->Divider();
+
   return m_Gui;
 }
 //-------------------------------------------------------------------------

@@ -908,7 +908,7 @@ albaGUI* albaVMESurfaceParametric::CreateGui()
 	{
 		wxString geometryType[7] = { "Sphere", "Cone", "Cylinder", "Cube", "Plane", "Ellipsoid", "Truncated Cone" };
 		m_Gui->Combo(ID_GEOMETRY_TYPE, "", &m_GeometryType, 7, geometryType);
-		m_Gui->Divider(2);
+		m_Gui->Divider();
 		
 		CreateGuiSphere();
 		CreateGuiCone();
@@ -918,8 +918,6 @@ albaGUI* albaVMESurfaceParametric::CreateGui()
 		CreateGuiEllipsoid();
 		CreateGuiTruncatedCone();
 
-		m_Gui->Divider(2);
-		
 		AddLineToGUI(m_GuiSphere, 7);
 		AddLineToGUI(m_GuiCone, 2);
 		AddLineToGUI(m_GuiCylinder, 3);
@@ -973,4 +971,6 @@ void albaVMESurfaceParametric::EnableParametricSurfaceGui( int surfaceTypeID )
 
 	m_Gui->FitGui();
 	m_Gui->Update();
+
+	GetLogicManager()->VmeSelect(this);
 }

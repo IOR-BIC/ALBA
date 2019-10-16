@@ -351,10 +351,9 @@ void albaOpAddLandmark::CreateGui()
 
 	//////////////////////////////////////////////////////////////////////////
 	m_Gui->Label("");
-
+	m_Gui->Divider(1);
 	m_Gui->OkCancel();
-	m_Gui->Label("");
-	m_Gui->Label("");
+ 	m_Gui->Label("");
 
 	ShowGui();
 }

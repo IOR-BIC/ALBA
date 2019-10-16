@@ -159,14 +159,15 @@ void albaOpConnectivitySurface::CreateGui()
     m_Alert = "";
 
   m_Gui->Label(&m_Alert, true, true);
-  m_Gui->Label("");
 
-  m_Gui->OkCancel();
-  m_Gui->Enable(wxOK,false);
+	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Label("");
+	m_Gui->Divider(1);
+	m_Gui->OkCancel();
+	m_Gui->Label("");
 
-  m_Gui->Divider();
-  //m_Gui->Update();
-  ShowGui();
+	m_Gui->Enable(wxOK, false);
+	ShowGui();
 }
 //----------------------------------------------------------------------------
 void albaOpConnectivitySurface::OpRun()   

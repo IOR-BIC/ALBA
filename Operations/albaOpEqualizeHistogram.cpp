@@ -156,6 +156,8 @@ void albaOpEqualizeHistogram::CreateGui()
   // interface:
   m_Gui = new albaGUI(this);
 
+	m_Gui->Label("");
+
   // ToDO: add your custom widgets...
   m_Gui->Double(ID_ALPHA,_("Alpha"),&m_Alpha,0.0,1.0);
   m_Gui->Double(ID_BETA,_("Beta"),&m_Beta,0.0,1.0);
@@ -163,10 +165,14 @@ void albaOpEqualizeHistogram::CreateGui()
   m_Gui->Divider(1);
   m_Gui->Button(ID_EXECUTE,_("Execute"));
   m_Gui->Button(ID_HISTOGRAM,_("Histogram"));
-  m_Gui->Divider(1);
-  m_Gui->OkCancel();
 
-  ShowGui();
+	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Label("");
+	m_Gui->Divider(1);
+	m_Gui->OkCancel();
+	m_Gui->Label("");
+
+	ShowGui();
 }
 //----------------------------------------------------------------------------
 void albaOpEqualizeHistogram::CreateHistogramDialog()

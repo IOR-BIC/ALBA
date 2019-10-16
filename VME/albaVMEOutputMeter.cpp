@@ -52,10 +52,10 @@ albaGUI *albaVMEOutputMeter::CreateGui()
   m_Gui = albaVMEOutput::CreateGui();
   
   m_Distance = ((albaVMEMeter *)m_VME)->GetDistance();
-  m_Gui->Label(_("distance: "), &m_Distance, true);
+  m_Gui->Label(_("Distance:"), &m_Distance, true);
 
   m_Angle = ((albaVMEMeter *)m_VME)->GetAngle();
-  m_Gui->Label(_("angle: "), &m_Angle, true);
+  m_Gui->Label(_("Angle:"), &m_Angle, true);
 	m_Gui->Divider();
 
   return m_Gui;

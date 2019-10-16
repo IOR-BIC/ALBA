@@ -531,42 +531,44 @@ double albaOpRegisterClusters::CalculateDeviation(vtkPoints* sourcePoints, vtkPo
 //----------------------------------------------------------------------------
 void albaOpRegisterClusters::OpRun()
 {
-	if(!m_TestMode)
+	if (!m_TestMode)
 	{
 		int num_choices = 3;
-		const wxString choices_string[] = {_("rigid"), _("similarity"), _("affine")};
+		const wxString choices_string[] = { _("Rigid"), _("Similarity"), _("Affine") };
 		albaString wildcard = "Dictionary (*.txt)|*.txt|All Files (*.*)|*.*";
 
 		m_Gui = new albaGUI(this);
 		m_Gui->SetListener(this);
 
-		m_Gui->Label(_("source :"),true);
+		m_Gui->Label(_("Source:"), true);
 		m_Gui->Label(&m_SourceName);
 
-		m_Gui->Label(_("target :"),true);
+		m_Gui->Label(_("Target:"), true);
 		m_Gui->Label(&m_TargetName);
+		m_Gui->Button(ID_CHOOSE, _("Target "));
 
-		m_Gui->Label(_("follower surface:"),true);
+		m_Gui->Label(_("Follower surface:"), true);
 		m_Gui->Label(&m_FollowerName);
+		m_Gui->Button(ID_CHOOSE_SURFACE, _("Follower surface"));
 
-		m_Gui->Button(ID_CHOOSE,_("target "));
-		m_Gui->Button(ID_CHOOSE_SURFACE,_("follower surface"));
+		m_Gui->Button(ID_WEIGHT, _("Weighted registration"));
+		m_Gui->Enable(ID_WEIGHT, false);
 
-		m_Gui->Button(ID_WEIGHT,_("weighted registration"));
-		m_Gui->Enable(ID_WEIGHT,false);
+		m_Gui->Divider(1);
+		m_Gui->Combo(ID_REGTYPE, _("Reg. type"), &m_RegistrationMode, num_choices, choices_string);
 
-		m_Gui->Combo(ID_REGTYPE, _("reg. type"), &m_RegistrationMode, num_choices, choices_string);
+		m_Gui->Bool(ID_MULTIPLE_TIME_REGISTRATION, _("Multi-Time"), &m_MultiTime, 1);
+		m_Gui->Enable(ID_MULTIPLE_TIME_REGISTRATION, false);
+		m_Gui->Bool(ID_APPLY_REGISTRATION, _("Apply to landmarks"), &m_Apply, 1, _("Apply registration matrix to landmarks"));
 
-		m_Gui->Bool(ID_MULTIPLE_TIME_REGISTRATION,_("multi-time"),&m_MultiTime,1);
-		m_Gui->Enable(ID_MULTIPLE_TIME_REGISTRATION,false);
-
-		m_Gui->Label(_("Apply registration matrix to landmarks"));
-		m_Gui->Bool(ID_APPLY_REGISTRATION,_("Apply"),&m_Apply,1);
-		
+		//////////////////////////////////////////////////////////////////////////
+		m_Gui->Label("");
+		m_Gui->Divider(1);
 		m_Gui->OkCancel();
+		m_Gui->Label("");
 
-		m_Gui->Enable(wxOK,false);
-		m_Gui->Divider();
+		m_Gui->Enable(wxOK, false);
+
 		ShowGui();
 	}
 }

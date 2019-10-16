@@ -256,9 +256,10 @@ albaGUI* albaVMEOutputScalarMatrix::CreateGui()
   m_NumberOfRows << (int)data.rows();
   m_NumberOfColumns = "";
   m_NumberOfColumns << (int)data.columns();
-  m_Gui->Label(_("rows: "),&m_NumberOfRows);
-  m_Gui->Label(_("columns: "),&m_NumberOfColumns);
+  m_Gui->Label(_("Rows:"),&m_NumberOfRows);
+  m_Gui->Label(_("Columns:"),&m_NumberOfColumns);
 	m_Gui->Divider(); 
+
 	return m_Gui;
 }
 

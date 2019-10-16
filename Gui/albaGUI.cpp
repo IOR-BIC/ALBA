@@ -411,7 +411,7 @@ void albaGUI::HintBox(int id, wxString label, wxString title, bool showIcon)
 
 	boxSizer->Add(new wxStaticText(this, NULL, label));
 
-	Add(boxSizer);
+	Add(boxSizer, 0, wxALL, M);
 }
 
 //----------------------------------------------------------------------------

@@ -32,9 +32,10 @@
 
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
-
 #include "vtkMath.h"
 #include <assert.h>
+
+#define NULL_STRING_DATA "--"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEOutputPolyline)
@@ -79,15 +80,23 @@ albaGUI* albaVMEOutputPolyline::CreateGui()
   {
     this->Update();
   }
-  albaString vtk_data_type;
-  vtk_data_type << albaString(GetVTKData()->GetClassName());
-  m_Gui->Label(_("vtk type: "), vtk_data_type, true);
+
+	m_VtkDataType << NULL_STRING_DATA;
+
+	vtkDataSet *data = this->GetVTKData();
+	if (data != NULL)
+	{
+		m_VtkDataType.Erase(0);
+		m_VtkDataType << this->GetVTKData()->GetClassName();
+	}
+
+  m_Gui->Label(_("Vtk type:"), &m_VtkDataType, true, false, false, 0.35);
   
   //m_Length = albaString(wxString::Format(_("%.2f"),CalculateLength()));
-  m_Gui->Label(_(" Length: "), &m_Length ,true);
+  m_Gui->Label(_("Length:"), &m_Length ,true);
 
   m_NumberOfPoints = albaString(((vtkPolyData *)m_VME->GetOutput()->GetVTKData())->GetNumberOfPoints());
-  m_Gui->Label(_("Points: "), &m_NumberOfPoints ,true);
+  m_Gui->Label(_("Points:"), &m_NumberOfPoints ,true);
 
   return m_Gui;
 }
@@ -135,9 +144,7 @@ double albaVMEOutputPolyline::CalculateLength()
       pts->GetPoint(i-1, pos2);
 
       sum += sqrt(vtkMath::Distance2BetweenPoints(pos1, pos2));
-
     }
-
   }
   
   return sum;

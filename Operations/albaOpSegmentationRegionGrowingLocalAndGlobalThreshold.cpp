@@ -389,9 +389,14 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
   m_Gui->Button(ID_REGION_GROWING,_("Region growing"));
   m_Gui->Button(ID_MORPHOLOGICAL,_("Morphological closing"));
   m_Gui->Enable(ID_MORPHOLOGICAL,false);
-  m_Gui->OkCancel();
-  m_Gui->Enable(wxOK,false);
-  m_Gui->Divider(1);
+
+	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Label("");
+	m_Gui->Divider(1);
+	m_Gui->OkCancel();
+	m_Gui->Label("");
+
+	m_Gui->Enable(wxOK, false);
 
   m_Gui->FitGui();
   ShowGui();

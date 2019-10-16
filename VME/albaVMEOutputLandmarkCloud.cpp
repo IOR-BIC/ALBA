@@ -68,8 +68,10 @@ albaGUI* albaVMEOutputLandmarkCloud::CreateGui()
 {
   assert(m_Gui == NULL);
   m_Gui = albaVMEOutput::CreateGui();
+
   m_NumLandmarks = albaVMELandmarkCloud::SafeDownCast(m_VME)->GetNumberOfLandmarks();
-  m_Gui->Label(_("points: "), &m_NumLandmarks, true);
+  m_Gui->Label(_("Points:"), &m_NumLandmarks, true);
+
   m_Gui->Divider();
 	return m_Gui;
 }
