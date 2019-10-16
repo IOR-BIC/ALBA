@@ -52,23 +52,7 @@
 
 
 //----------------------------------------------------------------------------
-/*
-
-DATA ARRAY NAMING
-
-NODES:
---------------------------------
-id array name: "Id"    type:  vtkIntArray
-
-
-CELLS:  
---------------------------------
-material array name: "Material"   type: vtkIntArray
-
-*/
-//----------------------------------------------------------------------------
 // constants
-//----------------------------------------------------------------------------
 
 const int CHAR_BUF_SIZE = 1000;
 
@@ -80,7 +64,7 @@ albaVMEMeshAnsysTextImporter::albaVMEMeshAnsysTextImporter()
   m_ElementType = UNSUPPORTED_ELEMENT;
   m_NodesPerElement = -1;
   m_MeshType = UNKNOWN;
-  m_ReaderMode = ANSYS_MODE;
+  m_ReaderMode = WITH_MAT_MODE;
 
   m_Output = NULL;
 }
@@ -96,10 +80,11 @@ int albaVMEMeshAnsysTextImporter::Read()
   vtkALBASmartPointer<vtkUnstructuredGrid> grid;
   grid->Initialize();
 
-  if (this->ParseNodesFile(grid) == -1) return ALBA_ERROR ; 
-  if (this->ParseElementsFile(grid) == -1) return ALBA_ERROR;
+  if (ParseNodesFile(grid) == -1) return ALBA_ERROR ; 
+  if (ParseElementsFile(grid) == -1) return ALBA_ERROR;
 
-  int ret = this->ParseMaterialsFile(grid, m_MaterialsFileName);
+	if (m_ReaderMode == WITH_MAT_MODE)
+		if (ParseMaterialsFile(grid, m_MaterialsFileName) == -1) return ALBA_ERROR;
 
   // allocate the output if not yet allocated...
   if (m_Output == NULL)
@@ -121,9 +106,9 @@ int albaVMEMeshAnsysTextImporter::Read()
 
   vtkALBASmartPointer<vtkUnstructuredGrid> gridToLinearize;
   
-  if (ret == 0)
+  if (m_ReaderMode == WITH_MAT_MODE)
   {
-    albaLogMessage("Materials file found; building mesh attribute data from materials info...");
+    albaLogMessage("Materials file found. Building mesh attribute data from materials info...");
 
     // convert field data from materials to cell data       
     FEMDataToCellData(grid.GetPointer(), gridToLinearize.GetPointer());
@@ -133,24 +118,7 @@ int albaVMEMeshAnsysTextImporter::Read()
     albaLogMessage("Materials file not found! Not building attribute data from materials info...");
     gridToLinearize = grid;
   }
-  
-  // NOT HANDLING LINEARIZATION...
-  //// do we have to linearize?
-
-  //if (MeshType == PARABOLIC)
-  //{
-  //  // linearize input mesh 
-  //  
-  //  p2l->SetInput(gridToLinearize);
-  //  
-  //  // Importer->SetInput(p2l->GetOutput());
-  //}
-  //else
-  //{
-  //  // Importer->SetInput(gridToLinearize);
-  //}
-
-  
+   
   m_Output->SetDataByDetaching(gridToLinearize,0);
 
   return ALBA_OK;
@@ -176,7 +144,7 @@ int albaVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
 
   if (ReadMatrix(M,this->m_NodesFileName))
   {
-    albaErrorMacro("Node files not found! File:" << m_NodesFileName << " does not exist!" << endl);
+    albaErrorMacro("Wrong Node file! File:" << m_NodesFileName << endl);
 	  return -1;
   }
 
@@ -279,17 +247,15 @@ int albaVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
   //  column:          1          2         2
   //  from ANSYS file: TYPE, 2  $ MAT, 2  $ REAL, 3
 
-  // elId  mat  type real ?   ?   pointId...
-  // 37411 440  50   2    0   1   119324    6996    6994    4809   70910   70925   70920   84679 84682   84683
+  // elId  mat  pointId...
+  // 37411 440  119324    6996    6994    4809   70910   70925   70920   84679 84682   84683
 
   int ansysELEMENTIDColumn = 0; 
   int ansysMATERIALColumn = 1; 
-  int ansysTYPEColumn = 2;
-  int ansysREALColumn = 3;
 
-  m_FirstConnectivityColumn = 6;
+  m_FirstConnectivityColumn = 2;
 
-  if(m_ReaderMode == GENERIC_MODE)
+  if(m_ReaderMode == WITHOUT_MAT_MODE)
   {
     // elId  pointId...
     // 37411 119324    6996    6994    4809   70910   70925   70920   84679 84682   84683
@@ -307,7 +273,7 @@ int albaVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
 
   if (ReadMatrix(ElementsFileMatrix,this->m_ElementsFileName))
   {
-    albaErrorMacro("Elements file not found! File:" << m_ElementsFileName << "does not exist!" << endl);
+    albaErrorMacro("Wrong Elements file! File:" << m_ElementsFileName << endl);
 	  return -1;
   }
 
@@ -358,11 +324,9 @@ int albaVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
 
   AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysELEMENTIDColumn, "Id");
 
-  if(m_ReaderMode == ANSYS_MODE)
+  if(m_ReaderMode == WITH_MAT_MODE)
   {
-    AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysTYPEColumn, "Type");
     AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysMATERIALColumn, "Material",true);
-    AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysREALColumn, "Real"); 
   }
 
  
@@ -374,224 +338,77 @@ int albaVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
 
 //----------------------------------------------------------------------------
 int albaVMEMeshAnsysTextImporter::ParseMaterialsFile(vtkUnstructuredGrid *grid, const char *matfilename)
-//----------------------------------------------------------------------------
 {
-  if (strcmp(matfilename, "") == 0)
-  {
-    albaLogMessage("Materials filename not specified!");
-    return -1;
-  }
+	if (strcmp(matfilename, "") == 0)
+	{
+		albaLogMessage("Materials filename not specified!");
+		return -1;
+	}
 
-	// read materials from file
-	vcl_ifstream input;
+	vnl_matrix<double> matMtr;
+
+	if (ReadMatrix(matMtr, matfilename))
+	{
+		albaErrorMacro("Wrong Materials file!\nCannot read matrix, File:" << matfilename << endl);
+		return -1;
+	}
+
+
+	int nCols = matMtr.cols();
+	int nRows = matMtr.rows();
+
+	if (nCols != 4)
+	{
+		albaErrorMacro("Wrong Materials file!\nWrong column number, File:" << matfilename << endl);
+		return -1;
+	}
+	if (nRows < 1)
+	{
+		albaErrorMacro("Wrong Materials file!\nNo entries found, File:" << matfilename << endl);
+		return -1;
+	}
 
 	/*
 
-	 Example Material text field
+	Example Material text field:
 
-	 MATERIAL NUMBER =      1 EVALUATED AT TEMPERATURE OF   0.0000    
-	 EX   =   18304.    
-	 DENS =   1.2747    
-	 PRXY =  0.30000  
-
-	 material: (index, map(string, double))
+	MAT_N	Ex	NUxy	Dens
+	1	4001.62	0.3	0.418279
+	2	3903.85	0.3	0.411391
+	3	3584.65	0.3	0.388501
+	4	3418.35	0.3	0.376311
 
 	*/
 
-	vcl_string startStr;
-	vcl_string tmpStr;
+	char *array_names[] = { "material_id","EX","NUXY","DENS" };
 
-	// material prop numerical value
-	double value;
-
-	// materials properties vector [loc_num_prop x num_mat];
-	typedef vcl_vector<double> row_vector;
-	vcl_vector<row_vector> mat_prop_values_vec;
-	vcl_vector<row_vector> mat_prop_ids_vec;
-	row_vector mat_prop_values_min_vec;
-	row_vector mat_prop_values_max_vec;
-
-
-	// holds material properties name; first element is "material_id"
-	vcl_vector<vcl_string> mat_prop_name_vec;
-	mat_prop_name_vec.push_back("material_id");
-	//id props does not need min max, pushing back for other props align
-	mat_prop_values_min_vec.push_back(0);
-	mat_prop_values_max_vec.push_back(0);
-
-
-	// number of material properties
-	int num_prop = 1;
-	// number of materials
-	int num_mat = 0;
+	vtkFieldData *fdata = vtkFieldData::New();
 	
 
-	/*
-		mat_name_vec: ["material_id", "EX", "NUX", "DENS"]
-		mat_prop_values_min_vec[min(matID), min(EX), min(NUX), min(DENS)]
-		mat_prop_values_max_vec[max(matID), max(EX), max(NUX), max(DENS)]
-
-		mat_prop_value_vec[0] .... mat_prop_value_vec[n-1]
-					matID												matID
-					EX													EX
-					NUX													DENS
-
-		mat_prop_value_vec[0] .... mat_prop_value_vec[n-1]
-					0														0
-					1														1
-					2														3
-	*/
-
-	input.open(matfilename, ios::out);
-
-	if (input.is_open())
+	for (int i = 0; i < 4; i++)
 	{
-		int propPos;
+		vtkDoubleArray *darr = vtkDoubleArray::New();
+		darr->SetName(array_names[i]);
+		darr->SetNumberOfValues(nRows);
 
-		//reading materials
-		while (input >> startStr)
+		for (int j = 0; j < nRows; j++)
 		{
-			if (startStr == "MATERIAL")
-			{
-				//found new material
-				int material_id;
-
-				// skip first line characters until "=" is encountered
-				input.ignore(INT_MAX, '=');
-				input >> material_id;
-				row_vector matValueVector;
-				row_vector matPropIdVector;
-				matValueVector.push_back(material_id);
-				matPropIdVector.push_back(0);
-				mat_prop_values_vec.push_back(matValueVector);
-				mat_prop_ids_vec.push_back(matPropIdVector);
-				num_mat++;
-			}
-			else 
-			{
-				//         =        5
-				input >> tmpStr >> value;
-
-				//Search Property name
-				for(propPos=num_prop-1;propPos>=0;propPos--)
-				{
-					if (startStr == mat_prop_name_vec[propPos])
-						break;
-				}
-
-				//Property name not found add new prop
-				if (propPos < 0)
-				{
-					mat_prop_name_vec.push_back(startStr);
-					mat_prop_values_min_vec.push_back(value);
-					mat_prop_values_max_vec.push_back(value);
-					num_prop++;
-					propPos=num_prop-1;
-				}
-
-				mat_prop_values_min_vec[propPos]=MIN(value,mat_prop_values_min_vec[propPos]);
-				mat_prop_values_max_vec[propPos]=MAX(value,mat_prop_values_max_vec[propPos]);
-				mat_prop_values_vec[num_mat-1].push_back(value);
-				mat_prop_ids_vec[num_mat-1].push_back(propPos);				
-			}
-
-			// next line should be the materials line, we ignore it;
-			input.ignore(INT_MAX, '\n');
+			// fill ith data array with jth value 
+			darr->SetTuple1(j, matMtr[j][i]);
 		}
-				
-		vtkFieldData *fdata = vtkFieldData::New();
-  		
-		// create field data data array
-		for (int propIndex = 0; propIndex < num_prop; propIndex++)
-		{
-			int assignToAll=false;
-			double assignValue=0;
 
-
-			// create the ith data array
-			vtkDoubleArray *darr = vtkDoubleArray::New();
-			darr->SetName(mat_prop_name_vec[propIndex].c_str());
-			darr->SetNumberOfValues(num_mat);
-    
-			for (int j = 0; j < num_mat; j++)
-			{
-				//Search Property id
-				for(propPos=mat_prop_ids_vec[j].size()-1;propPos>=0;propPos--)
-				{
-					if (mat_prop_ids_vec[j][propPos]==propIndex)
-					{
-						//assign prop value
-						value=mat_prop_values_vec[j][propPos];
-						break;
-					}
-				}
-
-				//Property id not found assign default value ask value to the user
-				if (propPos < 0)
-				{
-					//If user does not have already select "Apply to all" for this property we ask him the value for current material
-					if (!assignToAll)
-					{
-						//setting default value to the min of the range
-						assignValue=MIN(value,mat_prop_values_min_vec[propIndex]);
-						
-						//Create strings for GUI
-						albaString matLabel;
-						albaString rangeLabel;
-						albaString applyLabel;
-						matLabel.Printf(" Material N. %d has no property %s defined", (int)mat_prop_values_vec[j][0], mat_prop_name_vec[propIndex].c_str());
-						rangeLabel.Printf(" %s current Range is (%.4f,%.4f)",mat_prop_name_vec[propIndex].c_str(), mat_prop_values_min_vec[propIndex], mat_prop_values_max_vec[propIndex]);
-						applyLabel.Printf("Apply to all %s",mat_prop_name_vec[propIndex].c_str());
-															
-						//Create GUI
-						albaGUI *dialogGui;
-						dialogGui = new albaGUI(NULL);
-						dialogGui->Label(matLabel,"",true);
-						dialogGui->Label("");
-						dialogGui->Label(rangeLabel,"");
-						dialogGui->Label("");
-						dialogGui->Label("Please Insert property value");
-						dialogGui->Double(-1,_("Value: "), &assignValue);
-						dialogGui->Bool(-1,applyLabel, &assignToAll,true);
-						dialogGui->FitGui();
-
-						//Create and show dialog
-						albaGUIDialog *dialog;
-						dialog = new albaGUIDialog("Unkonwn Property Value", albaRESIZABLE | albaOK);
-						dialog->Add(dialogGui);
-						dialog->SetMinSize(wxSize(320,100));
-						dialog->Fit();
-						dialog->ShowModal();
-
-						//Updating current property range
-						mat_prop_values_min_vec[propIndex]=MIN(assignValue,mat_prop_values_min_vec[propIndex]);
-						mat_prop_values_max_vec[propIndex]=MAX(assignValue,mat_prop_values_max_vec[propIndex]);
-					}
-					//updating property value
-					value=assignValue;
-				}
-
-				// fill ith data array with jth value 
-				darr->InsertValue(j, value);
-			}
-			// add the ith data array to the field data
+		double *range = darr->GetRange();
+		
+		// add the ith data array to the field data if contains non zero values
+		if(range[0]!=0 || range[1]!=0)
 			fdata->AddArray(darr);
 
-			//clean up
-			darr->Delete();
-		}
-
-		grid->SetFieldData(fdata);
-		fdata->Delete();
-
-		return 0;
-	}
-	else
-	{
-		 albaErrorMacro("File:" << matfilename << "does not exist" << endl << "Not building attribute data from materials id." << endl);
-		 return -1;
+		//clean up
+		darr->Delete();
 	}
 
+	grid->SetFieldData(fdata);
+	fdata->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -691,15 +508,22 @@ int albaVMEMeshAnsysTextImporter::GetElementType()
 
 //----------------------------------------------------------------------------
 int albaVMEMeshAnsysTextImporter::ReadMatrix(vnl_matrix<double> &M, const char *fname)
-//----------------------------------------------------------------------------
 {
-  vcl_ifstream v_raw_matrix(fname, std::ios::in);
+  vcl_ifstream matrix_stream(fname, std::ios::in);
 
-
-  if(v_raw_matrix.is_open() != 0)
+  if(matrix_stream.is_open() != 0)
   {	
-    M.read_ascii(v_raw_matrix);
-    return 0;
+    if(M.read_ascii(matrix_stream))
+			return 0;
+		else
+		{
+			matrix_stream.clear();
+			matrix_stream.seekg(0, ios::beg);
+			char buffer[1024];
+			matrix_stream.getline(buffer,1024);
+			if (M.read_ascii(matrix_stream))
+				return 0;
+		}
   }
 
   return 1;

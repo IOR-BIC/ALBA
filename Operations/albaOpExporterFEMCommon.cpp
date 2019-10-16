@@ -221,12 +221,12 @@ void albaOpExporterFEMCommon::OnEvent(albaEventBase *alba_event)
 			case wxOK:
 			{
 				OnOK();
-				this->OpStop(OP_RUN_OK);
+				OpStop(OP_RUN_OK);
 			}
 			break;
 			case wxCANCEL:
 			{
-				this->OpStop(OP_RUN_CANCEL);
+				OpStop(OP_RUN_CANCEL);
 			}
 			break;
 			case ID_ENABLE_BACKCALCULATION:

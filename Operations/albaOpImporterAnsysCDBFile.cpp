@@ -77,18 +77,12 @@ int albaOpImporterAnsysCDBFile::ParseAnsysFile(albaString fileName)
 	
   ReadInit(fileName);
 
-  FILE *nodesFile, *materialsFile;
+  FILE *nodesFile;
   nodesFile = fopen(m_NodesFileName, "w");
 	if (!nodesFile)
 	{
 		albaLogMessage("Cannot Open: %s",m_NodesFileName.c_str());
-		return ALBA_ERROR;
-	}
-
-  materialsFile = fopen(m_MaterialsFileName, "w");
-	if (!materialsFile)
-	{
-		albaLogMessage("Cannot Open: %s",m_MaterialsFileName.c_str());
+		cppDEL(m_ProgressHelper);
 		return ALBA_ERROR;
 	}
 
@@ -115,13 +109,17 @@ int albaOpImporterAnsysCDBFile::ParseAnsysFile(albaString fileName)
 
     if(strncmp (m_Line,"MPDATA,",7) == 0)
     {
-      ReadMPDATA(materialsFile);
+      ReadMPDATA();
     }
   }
+	fclose(nodesFile);
 
-  fclose(nodesFile);
-  fclose(materialsFile);
-
+	if (WriteMaterials() == ALBA_ERROR)
+	{
+		cppDEL(m_ProgressHelper);
+		return ALBA_ERROR;
+	}
+  
 	ReadFinalize();
   cppDEL(m_ProgressHelper);
 

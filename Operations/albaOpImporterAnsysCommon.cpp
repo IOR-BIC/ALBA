@@ -85,6 +85,8 @@ albaOpImporterAnsysCommon::~albaOpImporterAnsysCommon()
       delete[] m_Components[c].Ranges;
   }
   m_Components.clear();
+
+	m_Materials.clear();
 }
 //----------------------------------------------------------------------------
 bool albaOpImporterAnsysCommon::Accept(albaVME *node)
@@ -332,9 +334,10 @@ int albaOpImporterAnsysCommon::ReadEBLOCK()
   return ALBA_OK;
 }
 //----------------------------------------------------------------------------
-int albaOpImporterAnsysCommon::ReadMPDATA(FILE *outFile)
+int albaOpImporterAnsysCommon::ReadMPDATA()
 {
-  char matName[254], unusedStr[254], matValue[254];
+	char matName[254], unusedStr[254];
+	float matValue;
   int matId;
 
   //MPDATA,EX  ,2,1,          1000.0  or MP,EX  ,2,1,          1000.0
@@ -344,24 +347,30 @@ int albaOpImporterAnsysCommon::ReadMPDATA(FILE *outFile)
   if(commaNum <= 4)
   {
     //MPDATA EX   2 1           1000.0  or //MP EX   2 1           1000.0   
-    sscanf(m_Line, "%s %s %d %s", unusedStr, matName, &matId, matValue);
+    sscanf(m_Line, "%s %s %d %f", unusedStr, matName, &matId, &matValue);
   }
   else
   {
     //MPDATA R5.0  1 EX          1  1   26630.9000    
-    sscanf(m_Line, "%s %s %s %s %d %s %s", unusedStr, unusedStr, unusedStr, matName, &matId, unusedStr, matValue);
+    sscanf(m_Line, "%s %s %s %s %d %s %f", unusedStr, unusedStr, unusedStr, matName, &matId, unusedStr, &matValue);
   }
 
   if(matId != m_CurrentMatId)
   {  
-    if(m_CurrentMatId != -1)
-      fprintf(outFile,"\n");
-
-    fprintf(outFile,"MATERIAL NUMBER =      %d EVALUATED AT TEMPERATURE OF   0.0  \n", matId);
+		AnsysMaterial newMat = { matId,0,0.3,0 };
+		m_Materials.push_back(newMat);
     m_CurrentMatId = matId;
   }
+	
+	albaString matNames[4] = { "EX","NUXY","DENS" };
 
-  fprintf(outFile,"%s = %s\n", matName, matValue);
+	if (matNames[0].Equals(matName))
+		m_Materials[m_Materials.size() - 1].Ex = matValue;
+	else if (matNames[1].Equals(matName))
+		m_Materials[m_Materials.size() - 1].Nuxy = matValue;
+	else if (matNames[2].Equals(matName))
+		m_Materials[m_Materials.size() - 1].Dens = matValue;
+
 
   return ALBA_OK; 
 }
@@ -448,7 +457,8 @@ int albaOpImporterAnsysCommon::WriteElements(int comp)
       elemType = myElem.Type;
       nNodes = myElem.NodesNumber;
 
-      fprintf(elementsFile,"%d\t%d\t%d\t%d\t%d\t%d", elemId,matId,elemType,idConstants,0,1);
+//			fprintf(elementsFile, "%d\t%d\t%d\t%d\t%d\t%d", elemId, matId, elemType, idConstants, 0, 1);
+			fprintf(elementsFile, "%d\t%d", elemId, matId);
 
       for (int j=0;j<nNodes;j++)
       {
@@ -463,6 +473,23 @@ int albaOpImporterAnsysCommon::WriteElements(int comp)
   return ALBA_OK;
 }
 
+//----------------------------------------------------------------------------
+int albaOpImporterAnsysCommon::WriteMaterials()
+{
+	FILE *materialsFile = fopen(m_MaterialsFileName, "w");
+	if (!materialsFile)
+	{
+		albaLogMessage("Cannot Open: %s", m_MaterialsFileName.c_str());
+		return ALBA_ERROR;
+	}
+	for (int i = 0; i < m_Materials.size(); i++)
+	{
+		fprintf(materialsFile, "%d %f %f %f\n", m_Materials[i].Id, m_Materials[i].Ex, m_Materials[i].Nuxy, m_Materials[i].Dens);
+	}
+	fclose(materialsFile);
+	
+	return ALBA_OK;
+}
 //----------------------------------------------------------------------------
 void albaOpImporterAnsysCommon::AddElement(int Id, int nNodes, int type, int matId, int *nodes)
 {

@@ -79,20 +79,15 @@ int albaOpImporterAnsysInputFile::ParseAnsysFile(albaString fileName)
 
   ReadInit(fileName);
 
-  FILE *nodesFile, *materialsFile;
+  FILE *nodesFile;
 	nodesFile = fopen(m_NodesFileName, "w");
 	if (!nodesFile)
 	{
 		albaLogMessage("Cannot Open: %s",m_NodesFileName.c_str());
+		cppDEL(m_ProgressHelper);
 		return ALBA_ERROR;
 	}
-	materialsFile = fopen(m_MaterialsFileName, "w");
-	if (!materialsFile)
-	{
-		albaLogMessage("Cannot Open: %s",m_MaterialsFileName.c_str());
-		return ALBA_ERROR;
-	}
-  int lineLenght;
+	int lineLenght;
 
   m_CurrentMatId = -1;
 
@@ -110,7 +105,7 @@ int albaOpImporterAnsysInputFile::ParseAnsysFile(albaString fileName)
 
     if(strncmp (m_Line,"MP,",3) == 0 || strncmp (m_Line,"MPDATA,",7) == 0)
     {
-      ReadMPDATA(materialsFile);
+      ReadMPDATA();
     } 
     
     if(strncmp (m_Line,"TYPE,",5) == 0)
@@ -130,8 +125,12 @@ int albaOpImporterAnsysInputFile::ParseAnsysFile(albaString fileName)
   }
 
   fclose(nodesFile);
-  fclose(materialsFile);
-
+	if (WriteMaterials() == ALBA_ERROR)
+	{
+		cppDEL(m_ProgressHelper);
+		return ALBA_ERROR;
+	}
+  
   ReadFinalize();
   cppDEL(m_ProgressHelper);
 
@@ -181,7 +180,7 @@ int albaOpImporterAnsysInputFile::UpdateElements()
   else
   {
     // INP from Ansys
-    while (strncmp (m_Line,"CM,",3) != 0) 
+    while (strncmp(m_Line, "EN,", 3) == 0 || strncmp(m_Line, "EMORE,", 6) == 0)
     {    
       if(strncmp (m_Line,"EN,",3) == 0)
       {

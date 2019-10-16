@@ -77,7 +77,7 @@ void albaOpExporterMesh::OpRun()
 //----------------------------------------------------------------------------
 albaString albaOpExporterMesh::GetWildcard()
 {
-	return "lis files (*.lis)|*.lis|All Files (*.*)|*.*";
+	return "lis files (*.txt)|*.txt|All Files (*.*)|*.*";
 }
 
 //----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ void albaOpExporterMesh::OnOK()
 	m_FileDir = "";
 
 	m_FileDir << this->m_Input->GetName();
-	m_FileDir << ".lis";
+	m_FileDir << ".txt";
 
 	wxString f;
 	f = albaGetSaveFile(m_FileDir, wildcard).c_str();
@@ -129,7 +129,7 @@ int albaOpExporterMesh::Write()
 
 	if (hasMaterials)
 	{
-		writer->SetMode(albaVMEMeshAnsysTextExporter::ANSYS_MODE);
+		writer->SetMode(albaVMEMeshAnsysTextExporter::WITH_MAT_MODE);
 
 		writer->SetOutputMaterialsFileName(m_MaterialsFileName.GetCStr());
 
@@ -138,7 +138,7 @@ int albaOpExporterMesh::Write()
 	}
 	else
 	{
-		writer->SetMode(albaVMEMeshAnsysTextExporter::GENERIC_MODE);
+		writer->SetMode(albaVMEMeshAnsysTextExporter::WITHOUT_MAT_MODE);
 	}
 	
   // Write
@@ -151,19 +151,6 @@ int albaOpExporterMesh::Write()
       albaMessage(_("Error writing output files! See log window for details..."),_("Error"));
     }
   }
-
-  // Create a dummy file that will be used to check for duplicate files
-  std::ofstream f_Out(m_File);
-  if (!f_Out.bad())
-  {
-    f_Out << "FILE LIST:" << "\n";
-    f_Out << m_NodesFileName.GetCStr() << "\n";
-    f_Out << m_ElementsFileName.GetCStr() << "\n";
-    
-		if (hasMaterials)
-			f_Out << m_MaterialsFileName.GetCStr() << "\n";
-  }
-  f_Out.close();
 
   // free memory
   delete writer;
