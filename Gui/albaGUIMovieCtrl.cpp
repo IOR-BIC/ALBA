@@ -61,7 +61,7 @@ m_Timer(NULL, ID_TIMER)
 
   m_Loop = false;
 
-  m_LoopCheck = new wxCheckBox(this, ID_LOOP, "loop", wxDefaultPosition, wxSize(-1,17), 0 );
+  m_LoopCheck = new wxCheckBox(this, ID_LOOP, "Loop", wxDefaultPosition, wxSize(-1,17), 0 );
   m_LoopCheck->SetValidator( albaGUIValidator(this,ID_LOOP,m_LoopCheck,&m_Loop) );
   TransferDataToWindow();
 
