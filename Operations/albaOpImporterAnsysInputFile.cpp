@@ -87,11 +87,11 @@ int albaOpImporterAnsysInputFile::ParseAnsysFile(albaString fileName)
 		cppDEL(m_ProgressHelper);
 		return ALBA_ERROR;
 	}
-	int lineLenght;
-
+	
   m_CurrentMatId = -1;
 
-  while ((lineLenght = GetLine(m_FilePointer, m_Line)) != 0) 
+	int lineLenght = GetLine(m_FilePointer, m_Line);
+  while (lineLenght != 0) 
   {
     if(strncmp (m_Line,"N,",2) == 0)
     {
@@ -111,6 +111,7 @@ int albaOpImporterAnsysInputFile::ParseAnsysFile(albaString fileName)
     if(strncmp (m_Line,"TYPE,",5) == 0)
     {
       UpdateElements();
+			continue;
     }
 
     if(strncmp (m_Line,"EBLOCK,",7) == 0)
@@ -122,6 +123,8 @@ int albaOpImporterAnsysInputFile::ParseAnsysFile(albaString fileName)
     {
       ReadCMBLOCK();
     }
+
+		lineLenght = GetLine(m_FilePointer, m_Line);
   }
 
   fclose(nodesFile);
@@ -180,7 +183,7 @@ int albaOpImporterAnsysInputFile::UpdateElements()
   else
   {
     // INP from Ansys
-    while (strncmp(m_Line, "EN,", 3) == 0 || strncmp(m_Line, "EMORE,", 6) == 0)
+    while (strncmp(m_Line, "EN,", 3) == 0 || strncmp(m_Line, "EMORE,", 6) == 0 || strncmp(m_Line, "ESYS,", 5) == 0 || strncmp(m_Line,"\n",1) == 0 )
     {    
       if(strncmp (m_Line,"EN,",3) == 0)
       {

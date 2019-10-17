@@ -69,7 +69,7 @@ void albaOpImporterVMEDataSetAttributesTest::TestImportAttributes()
 
   meshImporter->SetNodesFileName(nodesFileName.GetCStr());
   meshImporter->SetElementsFileName(elementsFileName.GetCStr());
-
+	meshImporter->SetImportMaterials(false);
   meshImporter->Read();
 
 	albaVME *node=meshImporter->GetOutput();

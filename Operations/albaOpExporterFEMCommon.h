@@ -108,6 +108,13 @@ public:
 	//----------------------------------------------------------------------------
 	virtual void OnEvent(albaEventBase *alba_event);
 
+
+	/** Returns EnableBackCalculation */
+	int GetEnableBackCalculation() const { return m_EnableBackCalculation; }
+
+	/** Sets EnableBackCalculation */
+	void SetEnableBackCalculation(int enableBackCalculation) { m_EnableBackCalculation = enableBackCalculation; }
+
 protected:
 
 	virtual void OnOK() = 0;
