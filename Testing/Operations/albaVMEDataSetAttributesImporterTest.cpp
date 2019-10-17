@@ -90,7 +90,10 @@ void albaVMEDataSetAttributesImporterTest::ReadMesh(albaString &dirPrefix, bool 
 	nodesFileName << "NLIST.lis";
 
 	albaString elementsFileName = dirPrefix;
-	elementsFileName << "ELIST.lis";
+	if (readMaterials)
+		elementsFileName << "ELIST_MAT.lis";
+	else
+		elementsFileName << "ELIST.lis";
 
 	cerr << std::endl << "nodes file:" << nodesFileName.GetCStr() << std::endl;
 	m_AnsysTextReader->SetNodesFileName(nodesFileName.GetCStr());
@@ -107,6 +110,11 @@ void albaVMEDataSetAttributesImporterTest::ReadMesh(albaString &dirPrefix, bool 
 
 		cerr << "materials file:" << materialsFileName.GetCStr() << std::endl;
 		m_AnsysTextReader->SetMaterialsFileName(materialsFileName.GetCStr());
+		m_AnsysTextReader->SetMode(albaVMEMeshAnsysTextImporter::WITH_MAT_MODE);
+	}
+	else
+	{
+		m_AnsysTextReader->SetMode(albaVMEMeshAnsysTextImporter::WITHOUT_MAT_MODE);
 	}
 
 	CPPUNIT_ASSERT(m_AnsysTextReader->Read() == ALBA_OK);

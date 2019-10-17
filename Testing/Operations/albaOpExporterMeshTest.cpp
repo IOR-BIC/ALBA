@@ -96,7 +96,7 @@ void albaOpExporterMeshTest::TestExporterMesh()
   meshExporter->SetNodesFileName(nodesFileName.GetCStr());
   meshExporter->SetElementsFileName(elementsFileName.GetCStr());
   meshExporter->SetMaterialsFileName(materialsFileName.GetCStr());
-
+	meshExporter->SetEnableBackCalculation(false);
   meshExporter->SetInput(vmeMesh);
   meshExporter->Write();
 
@@ -159,14 +159,14 @@ void albaOpExporterMeshTest::TestExporterMesh()
   CPPUNIT_ASSERT( n == 3);
   CPPUNIT_ASSERT( val_scalar[0][0] == 1);
   CPPUNIT_ASSERT( val_scalar[1][0] == 2);
-  CPPUNIT_ASSERT( val_scalar[0][2] == 1);
-  CPPUNIT_ASSERT( val_scalar[1][2] == 1);
-  CPPUNIT_ASSERT( val_scalar[0][6] == 2);
-  CPPUNIT_ASSERT( val_scalar[1][6] == 1);
-  CPPUNIT_ASSERT( val_scalar[0][10] == 12);
-  CPPUNIT_ASSERT( val_scalar[1][10] == 3);
-  CPPUNIT_ASSERT( val_scalar[0][13] == 5);
-  CPPUNIT_ASSERT( val_scalar[1][13] == 11);
+  CPPUNIT_ASSERT( val_scalar[0][1] == 1);
+  CPPUNIT_ASSERT( val_scalar[1][1] == 1);
+  CPPUNIT_ASSERT( val_scalar[0][4] == 6);
+  CPPUNIT_ASSERT( val_scalar[1][4] == 12);
+  CPPUNIT_ASSERT( val_scalar[0][6] == 12);
+  CPPUNIT_ASSERT( val_scalar[1][6] == 3);
+  CPPUNIT_ASSERT( val_scalar[0][9] == 5);
+  CPPUNIT_ASSERT( val_scalar[1][9] == 11);
   // -------------------
 
   // Test MATERIAL file
@@ -175,12 +175,17 @@ void albaOpExporterMeshTest::TestExporterMesh()
   wxFileInputStream inputFile_m( file_m );
   wxTextInputStream text_m( inputFile_m );
 
-  line = text_m.ReadLine();
-  wxStringTokenizer tkz_m(line,wxT(' '),wxTOKEN_DEFAULT);
-  albaString title = tkz_m.GetNextToken();
-  CPPUNIT_ASSERT( title.Compare("MATERIAL")==0);
-  // -------------------
-	
+	line = text_m.ReadLine();
+	albaString header = line;
+	CPPUNIT_ASSERT(header.Compare("MAT_N\tEx\tNUxy\tDens") == 0);
+
+	line = text_m.ReadLine();
+	albaString mat = line;
+	CPPUNIT_ASSERT(mat.Compare("1\t200000\t0.33\t1.07") == 0);
+
+	// -------------------
+
+
   albaDEL(meshExporter);
   albaDEL(importerVTK);
 

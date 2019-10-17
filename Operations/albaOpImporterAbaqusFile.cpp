@@ -175,7 +175,7 @@ int albaOpImporterAbaqusFile::Import()
   }
 
   mkdir(m_CacheDir);
-  if(!wxDirExists(m_DataDir))
+  if(!wxDirExists(m_CacheDir))
   {
     albaLogMessage("Cloud not create Read Cache Directory");
     return ALBA_ERROR;
@@ -744,11 +744,8 @@ int albaOpImporterAbaqusFile::ReadMaterials(FILE *outFile)
   if(m_MatIDMap.find(matName) == m_MatIDMap.end())
   {
     // Write Material file
-    fprintf(outFile,"MATERIAL NUMBER =      %d EVALUATED AT TEMPERATURE OF   0.0  \n", m_LastMatId);
-    fprintf(outFile,"EX = %s\n", matEx);
-    fprintf(outFile,"NUXY = %s\n", matNuxy);
-    fprintf(outFile,"\n");
-
+    fprintf(outFile,"%d %s %s 0\n", m_LastMatId, matEx, matNuxy);
+    
     m_MatIDMap[matName] = m_LastMatId;
     m_LastMatId++;
   }
@@ -808,8 +805,8 @@ int albaOpImporterAbaqusFile::ReadInstance()
 //----------------------------------------------------------------------------
 int albaOpImporterAbaqusFile::WriteElements()
 {
-  int elemId, matId, elemType; 
-  int numElements=0,nNodes=0,idConstants=1;
+  int elemId, matId; 
+  int numElements=0,nNodes=0;
 
   FILE *elementsPartFile;
 
@@ -850,12 +847,10 @@ int albaOpImporterAbaqusFile::WriteElements()
 					matId=matNameIter->second;
 			}
       
-      elemType = myElem.type;
-      nNodes = myElem.nodesNumber;
+      fprintf(elementsPartFile,"%d\t%d", elemId,matId);
 
-      fprintf(elementsPartFile,"%d\t%d\t%d\t%d\t%d\t%d", elemId,matId,elemType,idConstants,0,1);
-
-      for (int j=0;j<nNodes;j++)
+			nNodes = myElem.nodesNumber;
+			for (int j = 0; j < nNodes; j++)
       {
         fprintf(elementsPartFile,"\t%d",myElem.nodes[j]);
       }

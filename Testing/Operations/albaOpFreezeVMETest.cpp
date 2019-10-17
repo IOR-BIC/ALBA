@@ -423,7 +423,7 @@ void albaOpFreezeVMETest::TestFreezeVMEProfileSpline()
   points->InsertNextPoint(2.0,0.0,0.0);
 
   //create cells
-  int pointId[2];
+  vtkIdType pointId[2];
   for(int i = 0; i< points->GetNumberOfPoints();i++)
   {
     if (i > 0)

@@ -49,6 +49,14 @@ struct AnsysElement
   int *Nodes;
 };
 
+struct AnsysMaterial
+{
+	int Id;
+	double Ex;
+	double Nuxy;
+	double Dens;
+};
+
 //----------------------------------------------------------------------------
 // lhpOpImporterAnsysFile :
 //----------------------------------------------------------------------------
@@ -87,7 +95,7 @@ protected:
 
   int ReadNBLOCK(FILE *outFile);
   int ReadEBLOCK();
-  int ReadMPDATA(FILE *outFile);
+  int ReadMPDATA();
   int ReadCMBLOCK();
 
 	int GetLine(FILE *fp, char *buffer);
@@ -95,6 +103,7 @@ protected:
   int ReadInit(albaString &fileName);
 
   int WriteElements(int part);
+	int WriteMaterials();
 
   void AddElement(int Id, int nNodes, int type, int matId, int *nodes);
   bool IsInRange(int elemId, int partId);
@@ -131,5 +140,6 @@ protected:
 
   std::vector<AnsysElement> m_Elements;
   std::vector<AnsysComponent> m_Components;
+	std::vector<AnsysMaterial> m_Materials;
 };
 #endif

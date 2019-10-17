@@ -64,30 +64,28 @@ public:
 
 	/** Import the mesh*/
 	int Read();
+	
+	/** Returns ImportMaterials */
+	int GetImportMaterials() const { return m_ImportMaterials; }
+
+	/** Sets ImportMaterials */
+	void SetImportMaterials(int importMaterials) { m_ImportMaterials = importMaterials; }
 
 protected:
   /** Create the dialog interface for the importer. */
   virtual void CreateGui();  
-
-	void OpenMeshFile();
-
-	void AutoComplete();
-
-	int GetLine(FILE *fp, char *buffer);
-
+		
 	int m_ImporterType;
 	albaVMEMesh *m_ImportedVmeMesh;
   albaString	m_FileDir;
 
-	/** File name*/
-	albaString m_FileName;
-  /** Nodes file name*/
+	/** Nodes file name*/
   albaString m_NodesFileName;
 	/** Elements file name*/
   albaString m_ElementsFileName;
 	/** Materials file name*/
   albaString m_MaterialsFileName;
 
-	int m_SimplifiedFormat;
+	int m_ImportMaterials;
 };
 #endif

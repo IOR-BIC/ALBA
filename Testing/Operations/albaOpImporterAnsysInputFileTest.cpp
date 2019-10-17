@@ -126,18 +126,20 @@ void albaOpImporterAnsysInputFileTest::ImportInputFile(albaString fileName, int 
 
   CPPUNIT_ASSERT(numPoints == numPntsExpected); // Total points
 
-  // Materials
-  vtkDataArray *materialsIDArray = NULL;
+	// Materials
+	if (numMatsExpected != 0)
+	{
+		vtkDataArray *materialsIDArray = NULL;
 
-  // try field data
-  materialsIDArray = inputUGrid->GetFieldData()->GetArray("material_id");
+		// try field data
+		materialsIDArray = inputUGrid->GetFieldData()->GetArray("material_id");
 
-  CPPUNIT_ASSERT(materialsIDArray != NULL);
+		CPPUNIT_ASSERT(materialsIDArray != NULL);
 
-  int numberOfMaterials = materialsIDArray->GetNumberOfTuples();
+		int numberOfMaterials = materialsIDArray->GetNumberOfTuples();
 
-  CPPUNIT_ASSERT(numberOfMaterials == numMatsExpected); // Total materials
-
+		CPPUNIT_ASSERT(numberOfMaterials == numMatsExpected); // Total materials
+	}
   // Elements
   int numberOfElements = inputUGrid->GetNumberOfCells();
 
