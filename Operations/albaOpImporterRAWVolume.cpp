@@ -127,7 +127,7 @@ void albaOpImporterRAWVolume::OpRun()
 	m_Gui = new albaGUI(this);
 
 	//dialog +++++++++++++++++++++++++++++++++++++++
-	m_Dialog = new albaGUIDialogPreview(_("raw importer"), albaCLOSEWINDOW | albaRESIZABLE | albaUSEGUI | albaUSERWI);
+	m_Dialog = new albaGUIDialogPreview(_("Raw importer"), albaCLOSEWINDOW | albaRESIZABLE | albaUSEGUI | albaUSERWI);
 
 	//Preview Pipeline ++++++++++++++++++++++++++++++
 	vtkNEW(m_Reader);
@@ -153,36 +153,40 @@ void albaOpImporterRAWVolume::OpRun()
 	m_Gui->Show(true);
 	m_Gui->Divider(0);
   albaString wildc = _("Raw data (*.raw)|*.raw|All files (*.*)|*.*");
-	m_Gui->FileOpen(ID_FILE,_("file"),&m_RawFile,wildc);
+	m_Gui->FileOpen(ID_FILE,_("File"),&m_RawFile,wildc);
 
   wxString endian_choices[2] = {_("Big Endian"),_("Little Endian")};
   wxString scalar_choices[5] = {_("char"),_("short"),_("int"),_("float"),_("double")};
 	m_Gui->Divider(0);
-	m_Gui->Combo(ID_BITS,_("endian"),&m_Endian,2,endian_choices);
-	m_Gui->Combo(ID_SCALAR_TYPE,"scalar type",&m_ScalarType,5,scalar_choices);
-	m_Gui->Bool(ID_SIGNED,"signed",&m_Signed);
+	m_Gui->Combo(ID_BITS,_("Endian"),&m_Endian,2,endian_choices);
+	m_Gui->Combo(ID_SCALAR_TYPE,"Scalar type",&m_ScalarType,5,scalar_choices);
+	m_Gui->Bool(ID_SIGNED,"Signed",&m_Signed);
 
 	m_Gui->Divider(0);
-	m_Gui->Label(_("dimensions (x,y,z)"));
+	m_Gui->Label(_("Dimensions (x,y,z)"));
 	m_Gui->Vector(ID_DIM, "",m_DataDimemsion,1,10000); 
-  m_Gui->VectorN(ID_VOI_SLICES,_("slices VOI"),m_SliceVOI,2,0,MAXINT,_("define the range of slice to import."));
+  m_Gui->VectorN(ID_VOI_SLICES,_("Slices VOI"),m_SliceVOI,2,0,MAXINT,_("Define the range of slice to import."));
 	
 	m_Gui->Divider(0);
-	m_Gui->Label(_("spacing in mm/pixel (x,y,z)"));
+	m_Gui->Label(_("Spacing in mm/pixel (x,y,z)"));
 	m_Gui->Vector(ID_SPC, "",m_DataSpacing,0.0000001, 100000,-1);
 
-	m_Gui->Button(ID_COORD,_("load"),_("z coord file:"),_("load the file for non regulary spaced raw volume"));
+	m_Gui->Button(ID_COORD,_("Load"),_("Z coord file"),_("Load the file for non regulary spaced raw volume"));
 
 	m_Gui->Divider(0);
-	m_Gui->Button(ID_GUESS,_("guess"),_("header size"));
+	m_Gui->Button(ID_GUESS,_("Guess"),_("Header size"));
 	m_Gui->Integer(ID_HEADER,_(" "),&m_FileHeader,0);
 
+	//////////////////////////////////////////////////////////////////////////
 	m_Gui->Label("");
+	m_Gui->Divider(1);
 	m_Gui->OkCancel();
+	m_Gui->Label("");
 
 	//slice slider +++++++++++++++++++++++++++++++++++++++++++
   m_GuiSlider = new albaGUI(this);
-  m_SliceSlider = m_GuiSlider->Slider(ID_SLICE,_("slice num"),&m_CurrentSlice,0);
+  m_SliceSlider = m_GuiSlider->Slider(ID_SLICE,_("Slice num"),&m_CurrentSlice,0);
+
   m_GuiSlider->Show(true);
   m_GuiSlider->Reparent(m_Dialog);
   wxBoxSizer *slider_sizer = new wxBoxSizer( wxHORIZONTAL );
