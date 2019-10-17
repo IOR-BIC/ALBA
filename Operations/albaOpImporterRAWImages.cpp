@@ -244,7 +244,7 @@ void albaOpImporterRAWImages::CreateGui()
   int res=OP_RUN_OK;
   if(!this->m_TestMode)
   {
-    m_Dialog = new albaGUIDialogPreview(_("raw importer"), albaCLOSEWINDOW | albaRESIZABLE | albaUSEGUI | albaUSERWI);
+    m_Dialog = new albaGUIDialogPreview(_("Raw importer"), albaCLOSEWINDOW | albaRESIZABLE | albaUSEGUI | albaUSERWI);
 
     wxString bit_choices[4] = {_("8 bits"),_("16 bits Big Endian"),_("16 bits Little Endian"),_("24 bits (RGB)")};
     wxString type_choices[2] = {_("interleaved"),_("not interleaved")};
@@ -253,35 +253,35 @@ void albaOpImporterRAWImages::CreateGui()
     m_Gui->SetListener(this);
 
     m_Gui->Divider(0);
-    m_Gui->DirOpen(ID_OPEN_DIR, _("raw folder"),&m_RawDirectory);
-    m_Gui->String(ID_STRING_PREFIX,_("file pref."), &m_Prefix);
-    m_Gui->String(ID_STRING_PATTERN,_("file patt."), &m_Pattern);
-    m_Gui->String(ID_STRING_EXT,_("file ext."), &m_Extension);
+    m_Gui->DirOpen(ID_OPEN_DIR, _("Raw folder"),&m_RawDirectory);
+    m_Gui->String(ID_STRING_PREFIX,_("File pref."), &m_Prefix);
+    m_Gui->String(ID_STRING_PATTERN,_("File patt."), &m_Pattern);
+    m_Gui->String(ID_STRING_EXT,_("File ext."), &m_Extension);
     m_Gui->Divider(0);
-    m_Gui->Combo(ID_BITS,_("bits/pixel"),&m_Bit,4,bit_choices);
+    m_Gui->Combo(ID_BITS,_("Bits/Pixel"),&m_Bit,4,bit_choices);
 #ifdef VME_VOLUME_LARGE //LargeReader supports non-interleaved mode
     m_Gui->Combo(ID_RGB_TYPE,"",&m_RgbType,2,type_choices);
 #endif
     m_Gui->Enable(ID_RGB_TYPE,false);
-    m_Gui->Bool(ID_SIGNED,_("signed"),&m_Signed);
+    m_Gui->Bool(ID_SIGNED,_("Signed"),&m_Signed);
     m_Gui->Divider(0);
-    m_Gui->Label(_("dimensions (x,y,z):"));
-    m_Gui->Label(_("z is the number of slices"));
+    m_Gui->Label(_("Dimensions (x,y,z):"));
+    m_Gui->Label(_("Z is the number of slices"));
     m_Gui->Vector(ID_DIMENSIONS,"",m_Dimension,1,10000,1,10000,1,10000);
-    m_Gui->Bool(ID_ROI,_("define ROI"),&m_CropMode);
-    m_Gui->Label(_("spacing in mm/pixel (x,y,z)"));
+    m_Gui->Bool(ID_ROI,_("Define ROI"),&m_CropMode);
+    m_Gui->Label(_("Spacing in mm/pixel (x,y,z)"));
     //m_Gui->Vector(ID_SPC, "",m_Spacing,0.0000001, 100000,6); 	
     m_Gui->Double(ID_SPC_X,_("x: "),&m_Spacing[0],0.0000001, 100000,3,6);
     m_Gui->Double(ID_SPC_Y,_("y: "),&m_Spacing[1],0.0000001, 100000,3,6);
     m_Gui->Double(ID_SPC_Z,_("z: "),&m_Spacing[2],0.0000001, 100000,3,6);
     m_Gui->Divider(0);
-    m_Gui->Label(_("z coordinates file:"));
-    m_Gui->Button(ID_COORD,_("load"),"", _("load the file for non regularly spaced raw volume"));
+    m_Gui->Label(_("X coordinates file:"));
+    m_Gui->Button(ID_COORD,_("Load"),"", _("Load the file for non regularly spaced raw volume"));
     m_Gui->Divider(0);
-    m_Gui->Button(ID_GUESS,_("guess"),_("header size"));
+    m_Gui->Button(ID_GUESS,_("Guess"),_("Header size"));
     m_Gui->Integer(ID_HEADER," ",&m_Header,0);
-    m_Gui->Integer(ID_OFFSET,_("file offset:"),&m_Offset,0, MAXINT,_("set the first slice number in the files name"));
-    m_Gui->Integer(ID_SPACING,_("file spc.:"),&m_FileSpacing,1, MAXINT, _("set the spacing between the slices in the files name"));
+    m_Gui->Integer(ID_OFFSET,_("File offset:"),&m_Offset,0, MAXINT,_("set the first slice number in the files name"));
+    m_Gui->Integer(ID_SPACING,_("File spc.:"),&m_FileSpacing,1, MAXINT, _("set the spacing between the slices in the files name"));
     m_Gui->Divider(0);
 
     m_Gui->Label(_("Crop Dim."),true);
@@ -291,16 +291,18 @@ void albaOpImporterRAWImages::CreateGui()
     m_DimXCrop = wxString::Format("%d", 0);
     m_DimYCrop = wxString::Format("%d", 0);
 
-    m_Gui->Divider(0);
-    m_Gui->OkCancel();
-    m_Gui->Divider(0);
-    m_Gui->Show(true);
+		//////////////////////////////////////////////////////////////////////////
+		m_Gui->Label("");
+		m_Gui->Divider(1);
+		m_Gui->OkCancel();
+		m_Gui->Label("");
+
+		m_Gui->Show(true);
     m_Gui->Update();
-
-
+		
     //slice slider +++++++++++++++++++++++++++++++++++++++++++
     wxPoint dp = wxDefaultPosition;
-    m_SliceLab     = new wxStaticText(m_Dialog, -1, _(" slice num. "),dp, wxSize(-1,16));
+    m_SliceLab     = new wxStaticText(m_Dialog, -1, _(" Slice num. "),dp, wxSize(-1,16));
     m_SliceText    = new wxTextCtrl  (m_Dialog, -1, "",					   dp, wxSize(30,16), wxNO_BORDER);
     m_SliceSlider  = new wxSlider     (m_Dialog, -1,0,0,100,		   dp, wxSize(200,22));
 
@@ -315,8 +317,8 @@ void albaOpImporterRAWImages::CreateGui()
 
 #pragma warning(suppress: 6211) // warning C6211: Leaking memory 'slice_sizer' due to an exception. Consider using a local catch block to clean up memory:
     m_GuiSlider = new albaGUI(this);      
-    m_GuiSlider->Bool(ID_LOOKUPTABLE, _("use lookup table"), &m_UseLookupTable, 1, 
-      _("determines whether the default lookup table should be used for the preview"));
+    m_GuiSlider->Bool(ID_LOOKUPTABLE, _("Use lookup table"), &m_UseLookupTable, 1, 
+      _("Determines whether the default lookup table should be used for the preview"));
     m_GuiSlider->Show(true);
     m_GuiSlider->Reparent(m_Dialog);
     slice_sizer->Add(m_GuiSlider, 0, wxALIGN_CENTER|wxLEFT);
