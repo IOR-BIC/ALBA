@@ -116,11 +116,10 @@ void albaAnimate::CreateGui()
   wxSize bs(dw/2-wm,bh);
 	wxPoint dp = wxDefaultPosition;
 
-	wxStaticText *lab = new wxStaticText(m_Gui,-1,"fly pose",dp,wxSize(lw,bh));
-  lab->SetFont(m_Gui->GetBoldFont());
+	wxStaticText *lab = new wxStaticText(m_Gui,-1,"Fly pose",dp,wxSize(lw,bh));
 
-	m_StorePositionButton  = new albaGUIButton (m_Gui,ID_STORE, "add", dp,bs);
-  m_DeletePositionButton = new albaGUIButton (m_Gui,ID_DELETE,"remove",dp,bs);
+	m_StorePositionButton  = new albaGUIButton (m_Gui,ID_STORE, "Add", dp,bs);
+  m_DeletePositionButton = new albaGUIButton (m_Gui,ID_DELETE,"Remove",dp,bs);
   
   m_StorePositionButton->SetListener(this);
 	m_DeletePositionButton->SetListener(this);
@@ -134,8 +133,8 @@ void albaAnimate::CreateGui()
 	m_PositionList = m_Gui->ListBox(ID_LIST," ");
 
   wxStaticText *labRefresh = new wxStaticText(m_Gui,-1,"        ",dp,wxSize(lw,bh));
-  m_RefreshPositionButton = new albaGUIButton (m_Gui,ID_REFRESH,"refresh",dp,bs);
-  m_RenamePositionButton = new albaGUIButton (m_Gui,ID_RENAME,"rename",dp,bs);
+  m_RefreshPositionButton = new albaGUIButton (m_Gui,ID_REFRESH,"Refresh",dp,bs);
+  m_RenamePositionButton = new albaGUIButton (m_Gui,ID_RENAME,"Rename",dp,bs);
 
 
   m_RefreshPositionButton->SetListener(this);
@@ -149,8 +148,8 @@ void albaAnimate::CreateGui()
 
 
   wxStaticText *labImport = new wxStaticText(m_Gui,-1,"        ",dp,wxSize(lw,bh));
-  m_ImportPositionButton = new albaGUIButton (m_Gui,ID_IMPORT,"import",dp,bs);
-  m_ExportPositionButton = new albaGUIButton (m_Gui,ID_EXPORT,"export",dp,bs);
+  m_ImportPositionButton = new albaGUIButton (m_Gui,ID_IMPORT,"Import",dp,bs);
+  m_ExportPositionButton = new albaGUIButton (m_Gui,ID_EXPORT,"Export",dp,bs);
 
   m_ImportPositionButton->SetListener(this);
   m_ExportPositionButton->SetListener(this);
@@ -161,7 +160,7 @@ void albaAnimate::CreateGui()
   sizerImport->Add(m_ExportPositionButton,  0, wxRIGHT, wm);
   m_Gui->Add(sizerImport,0,wxALL,rm); 
 
-	m_Gui->Bool(ID_INTERPOLATE,_("interpolate"),&m_InterpolateFlag, 1);
+	m_Gui->Bool(ID_INTERPOLATE,_("Interpolate"),&m_InterpolateFlag, 1);
   
   m_AnimatePlayer = new albaGUIMovieCtrl(m_Gui);
   m_AnimatePlayer->SetListener(this);

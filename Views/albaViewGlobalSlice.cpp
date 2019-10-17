@@ -584,9 +584,9 @@ albaGUI* albaViewGlobalSlice::CreateGui()
 	assert(m_Gui == NULL);
   m_Gui = albaView::CreateGui();
 	
-	m_GlobalSlider = m_Gui->FloatSlider(ID_POS_SLIDER,"pos.",&m_SliderOrigin,m_GlobalBounds[4],m_GlobalBounds[5]);
-	m_Gui->Combo(ID_CHANGE_VIEW,"view",&m_ViewIndex,3,Views);
-	m_OpacitySlider = m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_Opacity,0.1,1.0);
+	m_GlobalSlider = m_Gui->FloatSlider(ID_POS_SLIDER,"Pos.",&m_SliderOrigin,m_GlobalBounds[4],m_GlobalBounds[5]);
+	m_Gui->Combo(ID_CHANGE_VIEW,"View",&m_ViewIndex,3,Views);
+	m_OpacitySlider = m_Gui->FloatSlider(ID_OPACITY_SLIDER,"Opacity",&m_Opacity,0.1,1.0);
 
 	bool Enable = false;
   albaVME *selVME = m_Sg->GetSelectedVme();

@@ -65,7 +65,7 @@ BEGIN_EVENT_TABLE(albaGUICrossIncremental,albaGUIPanel)
 END_EVENT_TABLE()
 
 
-#define FONTSIZE 9
+#define FONTSIZE 8
 
 //----------------------------------------------------------------------------
 albaGUICrossIncremental::albaGUICrossIncremental(wxWindow* parent, wxWindowID id, const char * label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, bool boldLabel /* = true */, int modality /* = ID_COMPLETE_LAYOUT */, const wxPoint& pos /* = wxDefaultPosition */, const wxSize& size /* = wxDefaultSize */, double min /* = MINFLOAT */, double max /* = MAXFLOAT */, int decimal_digit /* = -1 */, long style /* = wxTAB_TRAVERSAL | wxCLIP_CHILDREN */, bool comboStep /* = false */, albaString *buttonUpDown_text /* = NULL */, albaString *buttonLeftRight_text /* = NULL */)

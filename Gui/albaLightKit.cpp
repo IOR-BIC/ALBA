@@ -95,10 +95,10 @@ void albaLightKit::CreateGui()
   wxSize ls(lw,bh);
 	wxPoint dp = wxDefaultPosition;
 	
-  wxStaticText *lab = new wxStaticText(m_Gui,-1,"lights list",dp,ls, wxALIGN_RIGHT);
+  wxStaticText *lab = new wxStaticText(m_Gui,-1,"Lights",dp,ls, wxALIGN_RIGHT);
 	
-	m_ButtonAdd = new albaGUIButton (m_Gui,ID_ADD_LIGHT,"add",dp,bs);
-  m_ButtonRemove = new albaGUIButton (m_Gui,ID_REMOVE_LIGHT,"remove",dp,bs);
+	m_ButtonAdd = new albaGUIButton (m_Gui,ID_ADD_LIGHT,"Add",dp,bs);
+  m_ButtonRemove = new albaGUIButton (m_Gui,ID_REMOVE_LIGHT,"Remove",dp,bs);
 	m_ButtonAdd->SetListener(this);
 	m_ButtonRemove->SetListener(this);
 
@@ -110,11 +110,11 @@ void albaLightKit::CreateGui()
 	
 	m_LightList = m_Gui->ListBox(ID_LIGHT_LIST, " ");
 
-	m_Gui->Bool(ID_LIGHT_ON_OFF,"on-off",&m_LightOnOff,0);
-	m_Gui->FloatSlider(ID_LIGHT_AZIMUTH,"azimuth",&m_LightAzimuth,-90.0,90.0);
-	m_Gui->FloatSlider(ID_LIGHT_ELEVATION,"elevation",&m_LightElevation,-90.0,90.0);
-	m_Gui->FloatSlider(ID_LIGHT_INTENSITY,"intensity",&m_LightIntensity,0.0,1.0);
-	m_Gui->Color(ID_LIGHT_COLOR,"color",&m_LightColor);
+	m_Gui->Bool(ID_LIGHT_ON_OFF,"On-Off",&m_LightOnOff,0);
+	m_Gui->FloatSlider(ID_LIGHT_AZIMUTH,"Azimuth",&m_LightAzimuth,-90.0,90.0);
+	m_Gui->FloatSlider(ID_LIGHT_ELEVATION,"Elevation",&m_LightElevation,-90.0,90.0);
+	m_Gui->FloatSlider(ID_LIGHT_INTENSITY,"Intensity",&m_LightIntensity,0.0,1.0);
+	m_Gui->Color(ID_LIGHT_COLOR,"Color",&m_LightColor);
 
 	//init the listbox with the existent light
 	for(int i=0; i<MAX_NUM_LIGHT; i++)

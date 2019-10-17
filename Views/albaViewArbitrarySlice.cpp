@@ -547,7 +547,6 @@ albaGUI* albaViewArbitrarySlice::CreateGui()
 	m_Gui = albaView::CreateGui();
 
 	//combo box to choose the type of gizmo
-	m_Gui->Label("");
 	m_Gui->Label("Choose Gizmo");
 	wxString Text[2]={_("Gizmo Translation"),_("Gizmo Rotation")};
 	m_Gui->Combo(ID_COMBO_GIZMOS,"",&m_TypeGizmo,2,Text);
@@ -557,7 +556,7 @@ albaGUI* albaViewArbitrarySlice::CreateGui()
 	m_Gui->Button(ID_RESET,_("Reset"),"");
 	m_Gui->Divider(2);
 
-	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
 
 	m_Gui->Bool(ID_TRILINEAR_INTERPOLATION_ON,"Interpolation",&m_TrilinearInterpolationOn,1);
 
@@ -740,6 +739,10 @@ void albaViewArbitrarySlice::CreateGizmos()
 	}
 
 	m_GuiGizmos->Update();
+	m_GuiGizmos->FitGui();
+
+	m_Gui->Update();
+	m_Gui->FitGui();
 }
 
 //-------------------------------------------------------------------------

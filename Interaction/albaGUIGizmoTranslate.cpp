@@ -65,7 +65,7 @@ void albaGUIGizmoTranslate::CreateGui()
   m_Gui = new albaGUI(this);
 
   m_Gui->Divider(2);
-  m_Gui->Label("translation gizmo abs position", true);
+  m_Gui->Label("Translation gizmo abs position", true);
   m_Gui->Double(ID_TRANSLATE_X, "Translate X", &m_Position[0]);
   m_Gui->Double(ID_TRANSLATE_Y, "Translate Y", &m_Position[1]);
   m_Gui->Double(ID_TRANSLATE_Z, "Translate Z", &m_Position[2]);

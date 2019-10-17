@@ -98,20 +98,20 @@ enum TEXT_KIT_WIDGET_ID
 void albaTextKit::CreateGui()
 //----------------------------------------------------------------------------
 {
-  wxString align[9] = {"upper left","upper center","upper right",
-                       "center left","center","center right",
-                       "lower left","lower center","lower right"};
+  wxString align[9] = {"Upper left","Upper center","Upper right",
+                       "Center left","Center","Center right",
+                       "Lower left","Lower center","Lower right"};
 
   m_Gui = new albaGUI(this);
 	m_Gui->Show(true);
   m_Gui->Label("Text kit",true);
-  m_Gui->Bool(ID_SHOW_TEXT,"show",&m_ShowText,0,"Show/hide text");
-  m_Gui->String(ID_TEXT_IN_VIEW,"view text",&m_TextInView,"Text visualized into the view");
-  m_Gui->Button(ID_NLINE_TEXT_IN_VIEW,"edit","n-line text");
+  m_Gui->Bool(ID_SHOW_TEXT,"Show",&m_ShowText,0,"Show/hide text");
+  m_Gui->String(ID_TEXT_IN_VIEW,"View text",&m_TextInView,"Text visualized into the view");
+  m_Gui->Button(ID_NLINE_TEXT_IN_VIEW,"Edit","n-line text");
 
-  m_Gui->Color(ID_TEXT_COLOR,"color",&m_TextColor);
-  m_Gui->Combo(ID_TEXT_ALIGN,"align",&m_TextAlign,9,align,"Align text inside the view");
-  m_Gui->Integer(ID_TEXT_SIZE,"font size",&m_TextSize,1,300);
+  m_Gui->Color(ID_TEXT_COLOR,"Color",&m_TextColor);
+  m_Gui->Combo(ID_TEXT_ALIGN,"Align",&m_TextAlign,9,align,"Align text inside the view");
+  m_Gui->Integer(ID_TEXT_SIZE,"Font size",&m_TextSize,1,300);
 	m_Gui->Divider();
 	m_Gui->Update();
 }
