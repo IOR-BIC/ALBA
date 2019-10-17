@@ -608,8 +608,8 @@ albaGUI *albaPipeVolumeArbSlice::CreateGui()
   assert(m_Gui == NULL);
   double b[6] = {-1,1,-1,1,-1,1};
   m_Gui = new albaGUI(this);
-  m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
-	m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_SliceOpacity,0.1,1.0);
+  m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
+	m_Gui->FloatSlider(ID_OPACITY_SLIDER,"Opacity",&m_SliceOpacity,0.1,1.0);
   m_Vme->GetOutput()->GetVMELocalBounds(b);
 	m_Gui->Divider();
 //   m_Gui->Bool(ID_ENABLE_GPU, "Enable GPU", &m_EnableGPU, 1, 

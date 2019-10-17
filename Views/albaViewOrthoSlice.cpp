@@ -375,14 +375,14 @@ void albaViewOrthoSlice::OnEvent(albaEventBase *alba_event)
 albaGUI* albaViewOrthoSlice::CreateGui()
 //-------------------------------------------------------------------------
 {
-  wxString layout_choices[3] = {"default","layout 1","layout 2"};
+  wxString layout_choices[3] = {"Default","Layout 1","Layout 2"};
 
   assert(m_Gui == NULL);
 	m_Gui = albaView::CreateGui();
 
-  m_Gui->Combo(ID_LAYOUT_CHOOSER,"layout",&m_LayoutConfiguration,3,layout_choices);
+  m_Gui->Combo(ID_LAYOUT_CHOOSER,"Layout",&m_LayoutConfiguration,3,layout_choices);
   m_Gui->Divider();
-  m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+  m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
   m_Gui->Divider(2);
 
   wxString sidesName[2];
@@ -392,7 +392,7 @@ albaGUI* albaViewOrthoSlice::CreateGui()
 
 	m_Gui->Bool(ID_SNAP,"Snap on grid",&m_Snap,1);
 
-  m_Gui->Button(ID_RESET_SLICES,"reset slices","");
+  m_Gui->Button(ID_RESET_SLICES,"Reset slices","");
   m_Gui->Divider();
 
 	m_Gui->Bool(ID_ALL_SURFACE,"All Surface",&m_AllSurface);

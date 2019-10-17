@@ -94,40 +94,42 @@ enum VTK_EXPORTER_ID
   ID_FORCE_UNSIGNED_SHORT_SCALARS_OUTPUT_FOR_STRUCTURED_POINTS,
 };
 //----------------------------------------------------------------------------
-void albaOpExporterVTK::OpRun()   
+void albaOpExporterVTK::OpRun()
 //----------------------------------------------------------------------------
 {
-  vtkDataSet *inputData = m_Input->GetOutput()->GetVTKData();
-  assert(inputData);
+	vtkDataSet *inputData = m_Input->GetOutput()->GetVTKData();
+	assert(inputData);
 
-  bool isStructuredPoints = inputData->IsA("vtkImageData");
-
-  albaString wildc = "vtk Data (*.vtk)|*.vtk";
+	albaString wildc = "vtk Data (*.vtk)|*.vtk";
 
 	m_FileDir = albaGetLastUserFolder().c_str();
 	m_File = m_FileDir + "\\" + m_Input->GetName() + ".vtk";
 
-  m_Gui = new albaGUI(this);
-  m_Gui->FileSave(ID_CHOOSE_FILENAME, _("vtk file"), &m_File, wildc);
-	m_Gui->Label("file type",true);
-	m_Gui->Bool(ID_VTK_BINARY_FILE,"binary",&m_Binary,0);
-	m_Gui->Label("absolute matrix",true);
-	m_Gui->Bool(ID_ABS_MATRIX,"apply",&m_ABSMatrixFlag,0);
-	if (m_Input->IsA("albaVMESurface") || m_Input->IsA("albaVMEPointSet") || m_Input->IsA("albaVMEGroup")||m_Input->IsA("albaVMEMesh")||m_Input->IsA("albaVMEPolyline"))
-		m_Gui->Enable(ID_ABS_MATRIX,true);
+	m_Gui = new albaGUI(this);
+	m_Gui->FileSave(ID_CHOOSE_FILENAME, _("VTK file"), &m_File, wildc);
+/*	m_Gui->Label("File type", true);*/
+	m_Gui->Bool(ID_VTK_BINARY_FILE, "Binary File type", &m_Binary, 1);
+/*	m_Gui->Label("Absolute matrix", true);*/
+	m_Gui->Bool(ID_ABS_MATRIX, "Apply Absolute matrix", &m_ABSMatrixFlag, 1);
+
+	if (m_Input->IsA("albaVMESurface") || m_Input->IsA("albaVMEPointSet") || m_Input->IsA("albaVMEGroup") || m_Input->IsA("albaVMEMesh") || m_Input->IsA("albaVMEPolyline"))
+		m_Gui->Enable(ID_ABS_MATRIX, true);
 	else
-		m_Gui->Enable(ID_ABS_MATRIX,false);
+		m_Gui->Enable(ID_ABS_MATRIX, false);
 
-  m_Gui->Divider(2);
-  m_Gui->Label("Force UNSIGNED SHORT scalar output");
-  m_Gui->Bool(ID_FORCE_UNSIGNED_SHORT_SCALARS_OUTPUT_FOR_STRUCTURED_POINTS, "", &m_ForceUnsignedShortScalarOutputForStructuredPoints);
-  m_Gui->Enable(ID_FORCE_UNSIGNED_SHORT_SCALARS_OUTPUT_FOR_STRUCTURED_POINTS, isStructuredPoints ? true : false);
-  m_Gui->Divider(2);
+	if (inputData->IsA("vtkImageData"))
+	{
+		m_Gui->Divider(2);
+		m_Gui->Bool(ID_FORCE_UNSIGNED_SHORT_SCALARS_OUTPUT_FOR_STRUCTURED_POINTS, "Force unsigned short scalar output", &m_ForceUnsignedShortScalarOutputForStructuredPoints, 1);
+	}
 
+	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Label("");
+	m_Gui->Divider(1);
 	m_Gui->OkCancel();
-  m_Gui->Enable(wxOK, !m_File.IsEmpty());
-	
-	m_Gui->Divider();
+	m_Gui->Label("");
+
+	m_Gui->Enable(wxOK, !m_File.IsEmpty());
 
 	ShowGui();
 }
