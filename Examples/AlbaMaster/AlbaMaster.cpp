@@ -226,6 +226,7 @@ bool AlbaMaster::OnInit()
 
 	m_Logic->Plug(new albaOpImporterImage("Images"));
 	m_Logic->Plug(new albaOpImporterRAWVolume("RAW Volume"));
+	m_Logic->Plug(new albaOpImporterRAWImages("RAW Images"));
 	m_Logic->Plug(new albaOpImporterSTL("STL"));
 	m_Logic->Plug(new albaOpImporterVRML("VRML"));
 	m_Logic->Plug(new albaOpImporterVTK("VTK"));
@@ -245,7 +246,6 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpImporterC3D("C3D"),"Landmark Suite");
 	m_Logic->Plug(new albaOpImporterAnalogWS("EMG"));
 	m_Logic->Plug(new albaOpImporterGRFWS("GRF"));
-	m_Logic->Plug(new albaOpImporterRAWImages("RAW Images"));
 
 	//------------------------------------------------------------
 	// Exporter Menu:
