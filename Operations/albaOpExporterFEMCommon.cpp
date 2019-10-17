@@ -442,7 +442,7 @@ double albaOpExporterFEMCommon::DensityBackCalculation(double elasticity)
 		if (elasticity < e1)
 			return pow(((elasticity - m_Configuration.a_RhoLessThanRho1) / m_Configuration.b_RhoLessThanRho1), 1.0 / m_Configuration.c_RhoLessThanRho1);
 		else if (elasticity < e2)
-			return pow(((elasticity - m_Configuration.a_RhoBetweenRho1andRho2) / m_Configuration.a_RhoBetweenRho1andRho2), 1.0 / m_Configuration.c_RhoBetweenRho1andRho2);
+			return pow(((elasticity - m_Configuration.a_RhoBetweenRho1andRho2) / m_Configuration.b_RhoBetweenRho1andRho2), 1.0 / m_Configuration.c_RhoBetweenRho1andRho2);
 		else 
 			return pow(((elasticity - m_Configuration.a_RhoBiggerThanRho2) / m_Configuration.b_RhoBiggerThanRho2), 1.0 / m_Configuration.c_RhoBiggerThanRho2);
 	}
