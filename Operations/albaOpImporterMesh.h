@@ -64,6 +64,12 @@ public:
 
 	/** Import the mesh*/
 	int Read();
+	
+	/** Returns ImportMaterials */
+	int GetImportMaterials() const { return m_ImportMaterials; }
+
+	/** Sets ImportMaterials */
+	void SetImportMaterials(int importMaterials) { m_ImportMaterials = importMaterials; }
 
 protected:
   /** Create the dialog interface for the importer. */

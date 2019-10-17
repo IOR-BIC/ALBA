@@ -101,7 +101,12 @@ albaString inputELISTFileName /*= "ELIST.lis"*/, albaString inputMPLISTFileName 
 
     cerr << "materials file:" << materialsFileName.GetCStr() << std::endl;
     reader->SetMaterialsFileName(materialsFileName.GetCStr());
-  }
+		reader->SetMode(albaVMEMeshAnsysTextImporter::WITH_MAT_MODE);
+	}
+	else
+	{
+		reader->SetMode(albaVMEMeshAnsysTextImporter::WITHOUT_MAT_MODE);
+	}
 
   CPPUNIT_ASSERT(reader->Read() == ALBA_OK);
   CPPUNIT_ASSERT(reader->GetOutput() != NULL);
@@ -370,7 +375,7 @@ void albaVMEMeshAnsysTextExporterTest::TestTetra10TrivialMeshExport()
   exporter->Write();
 
   // mesh with materials
-  this->Read(reader, dirPrefix, true, true, albaString("tet10WithMaterials.vtk"));
+  this->Read(reader, dirPrefix, true, true, albaString("tet10WithMaterials.vtk"),"NLIST.lis","ELIST_MAT.lis");
   numPoints = ugrid->GetNumberOfPoints();
   numCells = ugrid->GetNumberOfCells();
 
@@ -433,7 +438,7 @@ void albaVMEMeshAnsysTextExporterTest::TestTetra10NodesIdJumpingMaterialsIdJumpi
 	exporter->Write();
 
 	// mesh with materials
-	this->Read(reader, dirPrefix, true, true, albaString("tet10WithMaterials.vtk"));
+	this->Read(reader, dirPrefix, true, true, albaString("tet10WithMaterials.vtk"),"NLIST.lis","ELIST_MAT.lis");
 	numPoints = ugrid->GetNumberOfPoints();
 	numCells = ugrid->GetNumberOfCells();
 
@@ -680,24 +685,19 @@ void albaVMEMeshAnsysTextExporterTest::TestExportTetra10VtkWithoutAnsysInformati
 	albaString outputElementsFileName = outputDir;
 	outputElementsFileName << "/ELISTvtkTetra10WithoutAnsysInformations.txt";
 
-	albaString outputMaterialsFileName = outputDir;
-	outputMaterialsFileName << "/MPLISTvtkTetra10WithoutAnsysInformations.txt";
-
 	albaVMEMeshAnsysTextExporter *exporter = new albaVMEMeshAnsysTextExporter;
 	exporter->SetInput(ugrid);
 	exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
 	exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
-	exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
+	exporter->SetMode(albaVMEMeshAnsysTextExporter::WITHOUT_MAT_MODE);
 	exporter->Write();
 
 	albaVMEMeshAnsysTextImporter *reader = new albaVMEMeshAnsysTextImporter;
 	reader->SetNodesFileName(outputNodesFileName.GetCStr());
 	reader->SetElementsFileName(outputElementsFileName.GetCStr());
-	reader->SetMaterialsFileName(outputMaterialsFileName.GetCStr());
+	reader->SetMode(albaVMEMeshAnsysTextExporter::WITHOUT_MAT_MODE);
 	reader->Read();
-	// 	this->Read(reader, dirPrefix, true, true, albaString("BonemattedMeshWithMaterials.vtk"));
-	// 
-	exporter->Write();
+	
 
 	// cleanup
 	delete exporter;
@@ -756,24 +756,19 @@ void albaVMEMeshAnsysTextExporterTest::TestExportTetra4VtkWithoutAnsysInformatio
 	albaString outputElementsFileName = outputDir;
 	outputElementsFileName << "/ELISTvtkTetra4WithoutAnsysInformations.txt";
 
-	albaString outputMaterialsFileName = outputDir;
-	outputMaterialsFileName << "/MPLISTvtkTetra4WithoutAnsysInformations.txt";
 
 	albaVMEMeshAnsysTextExporter *exporter = new albaVMEMeshAnsysTextExporter;
 	exporter->SetInput(ugrid);
 	exporter->SetOutputNodesFileName(outputNodesFileName.GetCStr());
 	exporter->SetOutputElementsFileName(outputElementsFileName.GetCStr());
-	exporter->SetOutputMaterialsFileName(outputMaterialsFileName.GetCStr());
+	exporter->SetMode(albaVMEMeshAnsysTextExporter::WITHOUT_MAT_MODE);
 	exporter->Write();
 
 	albaVMEMeshAnsysTextImporter *reader = new albaVMEMeshAnsysTextImporter;
 	reader->SetNodesFileName(outputNodesFileName.GetCStr());
 	reader->SetElementsFileName(outputElementsFileName.GetCStr());
-	reader->SetMaterialsFileName(outputMaterialsFileName.GetCStr());
+	reader->SetMode(albaVMEMeshAnsysTextImporter::WITHOUT_MAT_MODE);
 	reader->Read();
-	// 	this->Read(reader, dirPrefix, true, true, albaString("BonemattedMeshWithMaterials.vtk"));
-
-	exporter->Write();
 
 	// cleanup
 	delete exporter;

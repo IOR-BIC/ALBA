@@ -102,7 +102,7 @@ void albaOpExporterGRFWSTest::TestWrite()
 	vtkALBASmartPointer<vtkPoints> points;
 	vtkALBASmartPointer<vtkCellArray> cellArray;
 	vtkALBASmartPointer<vtkPolyData> force;
-	int pointId[2];
+	vtkIdType pointId[2];
 
 	// Fill vectors
 	for (int i = 0; i <= 10; i++)
@@ -269,7 +269,7 @@ void albaOpExporterGRFWSTest::TestWriteFast()
 	vtkALBASmartPointer<vtkPoints> points;
 	vtkALBASmartPointer<vtkCellArray> cellArray;
 	vtkALBASmartPointer<vtkPolyData> force;
-	int pointId[2];
+	vtkIdType pointId[2];
 
 	// Fill vectors
 	for (int i = 0; i < 3; i++)
@@ -435,7 +435,7 @@ void albaOpExporterGRFWSTest::TestWriteSingleVector()
 	vtkALBASmartPointer<vtkPoints> points;
 	vtkALBASmartPointer<vtkCellArray> cellArray;
 	vtkALBASmartPointer<vtkPolyData> force;
-	int pointId[2];
+	vtkIdType pointId[2];
 
 	// Fill vector
 	for (int i = 0; i <= 10; i++)
@@ -525,7 +525,7 @@ void albaOpExporterGRFWSTest::TestWriteSingleVectorFast()
 	vtkALBASmartPointer<vtkPoints> points;
 	vtkALBASmartPointer<vtkCellArray> cellArray;
 	vtkALBASmartPointer<vtkPolyData> force;
-	int pointId[2];
+	vtkIdType pointId[2];
 
 	// Fill vector
 	for (int i = 0; i <= 10; i++)

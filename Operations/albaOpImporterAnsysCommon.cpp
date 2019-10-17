@@ -190,15 +190,20 @@ int albaOpImporterAnsysCommon::Import()
   {
     albaVMEMeshAnsysTextImporter *reader = new albaVMEMeshAnsysTextImporter;
     reader->SetNodesFileName(m_NodesFileName.c_str());
-    reader->SetMaterialsFileName(m_MaterialsFileName.c_str());
-    WriteElements(c);
-    reader->SetElementsFileName(m_Components[c].ElementsFileName.c_str());
+		if (m_Materials.size() > 0)
+			reader->SetMaterialsFileName(m_MaterialsFileName.c_str());
+		else
+			reader->SetMode(albaVMEMeshAnsysTextImporter::WITHOUT_MAT_MODE);
+		
+		WriteElements(c);
+		
+		reader->SetElementsFileName(m_Components[c].ElementsFileName.c_str());
 
-	  returnValue = reader->Read();
+		returnValue = reader->Read();
 
-    if (returnValue == ALBA_ERROR)
-    {
-      if (!m_TestMode)
+		if (returnValue == ALBA_ERROR)
+		{
+			if (!m_TestMode)
         albaMessage(_("Error parsing input files! See log window for details..."),_("Error"));
 		  else
 			  printf("Error parsing input files!");
@@ -445,6 +450,7 @@ int albaOpImporterAnsysCommon::WriteElements(int comp)
   }
 
   int elemId, matId = 0, elemType = 0, idConstants = 0, nNodes, nodes[16];
+	bool hasMaterials = m_Materials.size() > 0;
 
   for (int e=0; e<m_Elements.size(); e++)
   {
@@ -458,7 +464,10 @@ int albaOpImporterAnsysCommon::WriteElements(int comp)
       nNodes = myElem.NodesNumber;
 
 //			fprintf(elementsFile, "%d\t%d\t%d\t%d\t%d\t%d", elemId, matId, elemType, idConstants, 0, 1);
-			fprintf(elementsFile, "%d\t%d", elemId, matId);
+			if(hasMaterials)
+				fprintf(elementsFile, "%d\t%d", elemId, matId);
+			else
+				fprintf(elementsFile, "%d", elemId);
 
       for (int j=0;j<nNodes;j++)
       {
