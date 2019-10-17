@@ -95,8 +95,8 @@ public:
 	
 	enum
 	{
-		ANSYS_MODE = 0,
-		GENERIC_MODE,
+		WITH_MAT_MODE = 0,
+		WITHOUT_MAT_MODE,
 	};
 
 protected:

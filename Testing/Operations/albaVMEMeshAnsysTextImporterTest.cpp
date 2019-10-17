@@ -79,7 +79,10 @@ void albaVMEMeshAnsysTextImporterTest::Read(albaVMEMeshAnsysTextImporter* reader
   nodesFileName << "NLIST.lis";
 
   albaString elementsFileName = dirPrefix;
-  elementsFileName << "ELIST.lis";
+	if(readMaterials)
+	  elementsFileName << "ELIST_MAT.lis";
+	else
+		elementsFileName << "ELIST.lis";
 
   cerr << std::endl << "nodes file:" << nodesFileName.GetCStr() << std::endl;
   reader->SetNodesFileName(nodesFileName.GetCStr());
@@ -96,13 +99,18 @@ void albaVMEMeshAnsysTextImporterTest::Read(albaVMEMeshAnsysTextImporter* reader
 
     cerr << "materials file:" << materialsFileName.GetCStr() << std::endl;
     reader->SetMaterialsFileName(materialsFileName.GetCStr());
-  }
+		reader->SetMode(albaVMEMeshAnsysTextImporter::WITH_MAT_MODE);
+	}
+	else
+	{
+		reader->SetMode(albaVMEMeshAnsysTextImporter::WITHOUT_MAT_MODE);
+	}
 
-  CPPUNIT_ASSERT(reader->Read() == ALBA_OK);
+	CPPUNIT_ASSERT(reader->Read() == ALBA_OK);
 
-  CPPUNIT_ASSERT(reader->GetOutput() != NULL);
+	CPPUNIT_ASSERT(reader->GetOutput() != NULL);
 
-  vtkUnstructuredGrid* data = reader->GetOutput()->GetUnstructuredGridOutput()->GetUnstructuredGridData();
+	vtkUnstructuredGrid* data = reader->GetOutput()->GetUnstructuredGridOutput()->GetUnstructuredGridData();
   data->Update();
   
 	albaString outputDir = GET_TEST_DATA_DIR();
@@ -132,7 +140,10 @@ void albaVMEMeshAnsysTextImporterTest::ReadAndDisplay( albaString &dirPrefix, in
   nodesFileName << "NLIST.lis";
 
   albaString elementsFileName = dirPrefix;
-  elementsFileName << "ELIST.lis";
+	if (readMaterials)
+		elementsFileName << "ELIST_MAT.lis";
+	else
+		elementsFileName << "ELIST.lis";
 
   cerr << std::endl << "nodes file:" << nodesFileName.GetCStr() << std::endl;
   reader->SetNodesFileName(nodesFileName.GetCStr());
@@ -149,7 +160,12 @@ void albaVMEMeshAnsysTextImporterTest::ReadAndDisplay( albaString &dirPrefix, in
 
     cerr << "materials file:" << materialsFileName.GetCStr() << std::endl;
     reader->SetMaterialsFileName(materialsFileName.GetCStr());
+		reader->SetMode(albaVMEMeshAnsysTextImporter::WITH_MAT_MODE);
   }
+	else
+	{
+		reader->SetMode(albaVMEMeshAnsysTextImporter::WITHOUT_MAT_MODE);
+	}
     
   CPPUNIT_ASSERT(reader->Read() == ALBA_OK);
 
@@ -214,9 +230,12 @@ void albaVMEMeshAnsysTextImporterTest::ReadAndDisplay( albaString &dirPrefix, in
   } 
   else if (dataType == CELL_DATA)
   {
-    ugrid->GetCellData()->SetActiveScalars("Material");
-    int ntuples = ugrid->GetCellData()->GetArray("Material")->GetNumberOfTuples();
-    CPPUNIT_ASSERT(ntuples == ugrid->GetNumberOfCells());
+		if (readMaterials)
+		{
+			ugrid->GetCellData()->SetActiveScalars("Material");
+			int ntuples = ugrid->GetCellData()->GetArray("Material")->GetNumberOfTuples();
+			CPPUNIT_ASSERT(ntuples == ugrid->GetNumberOfCells());
+		}
 
     // render cell data for linear cells only (vtk 4.4 bug)
     if (reader->GetMeshType() == albaVMEMeshAnsysTextImporter::LINEAR)
@@ -258,8 +277,11 @@ void albaVMEMeshAnsysTextImporterTest::RenderData(  vtkUnstructuredGrid *data, i
   } 
   else if (dataType == CELL_DATA)
   {
-    data->GetCellData()->GetScalars("Material")->GetRange(range);
-    cout << "material range: [" << range[0] <<":" << range[1] << "]"<<  std::endl;
+		if (data->GetCellData()->GetScalars("Material"))
+		{
+			data->GetCellData()->GetScalars("Material")->GetRange(range);
+			cout << "material range: [" << range[0] << ":" << range[1] << "]" << std::endl;
+		}
   }
   else
   {

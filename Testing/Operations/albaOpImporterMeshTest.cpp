@@ -67,6 +67,7 @@ void albaOpImporterMeshTest::TestImportGenericMesh()
 
   meshImporter->SetNodesFileName(nodesFileName.GetCStr());
   meshImporter->SetElementsFileName(elementsFileName.GetCStr());
+	meshImporter->SetImportMaterials(false);
 
   meshImporter->Read();
 

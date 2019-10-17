@@ -204,7 +204,7 @@ int	main( int argc, char* argv[] )
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
 
-	//runner.addTest(albaOpImporterMSF1xTest::suite());
+	//runner.addTest(albaOpImporterMSF1xTest::suite()); 
 	runner.addTest(albaOpImporterSTLTest::suite());
 	runner.addTest(albaOpExporterSTLTest::suite());
 	runner.addTest(albaOpCropTest::suite());
@@ -243,10 +243,10 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpFilterVolumeTest::suite());
 	runner.addTest(albaOpALBATransformTest::suite());
  	runner.addTest(albaOpTransformInterfaceTest::suite());
-	runner.addTest(albaVMEMeshAnsysTextImporterTest::suite());
-	runner.addTest(albaVMEMeshAnsysTextExporterTest::suite());
-	runner.addTest(albaOpImporterMeshTest::suite());
-	runner.addTest(albaOpExporterMeshTest::suite());
+	runner.addTest(albaVMEMeshAnsysTextImporterTest::suite());  
+	runner.addTest(albaVMEMeshAnsysTextExporterTest::suite()); 
+	runner.addTest(albaOpImporterMeshTest::suite()); 
+	runner.addTest(albaOpExporterMeshTest::suite());  
 	runner.addTest(albaVMEDataSetAttributesImporterTest::suite());
 	runner.addTest(albaOpImporterVMEDataSetAttributesTest::suite());
 	runner.addTest(albaOpCreateMeterTest::suite());
@@ -311,11 +311,11 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpClassicICPRegistrationTest::suite());
 	runner.addTest(albaOpMML3ParameterViewTest::suite());
 	runner.addTest(albaOpInteractionDebuggerTest::suite());
-	runner.addTest(albaOpIterativeRegistrationTest::suite());
-	runner.addTest(albaOpImporterAnsysCDBFileTest::suite());
+	runner.addTest(albaOpIterativeRegistrationTest::suite()); 
+	runner.addTest(albaOpImporterAnsysCDBFileTest::suite()); 
  	runner.addTest(albaOpImporterAnsysInputFileTest::suite());
- 	runner.addTest(albaOpExporterAnsysCDBFileTest::suite());
-// 	runner.addTest(albaOpExporterAnsysInputFileTest::suite()); TO FIX
+ 	runner.addTest(albaOpExporterAnsysCDBFileTest::suite()); 
+ 	runner.addTest(albaOpExporterAnsysInputFileTest::suite()); 
 
 	runner.run( controller );
 
