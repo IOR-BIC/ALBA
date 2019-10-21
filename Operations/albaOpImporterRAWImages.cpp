@@ -280,8 +280,8 @@ void albaOpImporterRAWImages::CreateGui()
     m_Gui->Divider(0);
     m_Gui->Button(ID_GUESS,_("Guess"),_("Header size"));
     m_Gui->Integer(ID_HEADER," ",&m_Header,0);
-    m_Gui->Integer(ID_OFFSET,_("File offset:"),&m_Offset,0, MAXINT,_("set the first slice number in the files name"));
-    m_Gui->Integer(ID_SPACING,_("File spc.:"),&m_FileSpacing,1, MAXINT, _("set the spacing between the slices in the files name"));
+    m_Gui->Integer(ID_OFFSET,_("File offset:"),&m_Offset,0, MAXINT,_("Set the first slice number in the files name"));
+    m_Gui->Integer(ID_SPACING,_("File spc.:"),&m_FileSpacing,1, MAXINT, _("Set the spacing between the slices in the files name"));
     m_Gui->Divider(0);
 
     m_Gui->Label(_("Crop Dim."),true);

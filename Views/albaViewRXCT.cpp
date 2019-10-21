@@ -734,11 +734,11 @@ albaGUI* albaViewRXCT::CreateGui()
   wxString m_Choices[2];
   m_Choices[0]="Right";
   m_Choices[1]="Left";
-  m_Gui->Radio(ID_RIGHT_OR_LEFT,"Side",&m_RightOrLeft,2,m_Choices);
+	m_Gui->Radio(ID_RIGHT_OR_LEFT, "Side", &m_RightOrLeft, 2, m_Choices);
 
   m_Gui->Bool(ID_SNAP,"Snap on grid",&m_Snap,1);
 
-  m_Gui->Bool(ID_MOVE_ALL_SLICES,"Move all",&m_MoveAllSlices);
+  m_Gui->Bool(ID_MOVE_ALL_SLICES,"Move all",&m_MoveAllSlices,1);
 
   m_Gui->Button(ID_ADJUST_SLICES,"Adjust Slices");
 
@@ -767,7 +767,7 @@ albaGUI* albaViewRXCT::CreateGui()
 	for(int i=0;i<=CT_CHILD_VIEWS_NUMBER;i++)
 		(((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetGui());
 
-  m_Gui->Button(ID_RESET_SLICES,"reset slices","");
+  m_Gui->Button(ID_RESET_SLICES,"Reset slices","");
 
   if (m_CurrentVolume)
   {
