@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkImageData.h"
 #include <map>
 #include <vector>
+#include <set>
 #include "albaGUIWizard.h"
 #include "vtkMatrix4x4.h"
 
@@ -65,6 +66,8 @@ namespace gdcm {
 	template<uint16_t Group, uint16_t Element,int TVR, int TVM> class Attribute;
 }
 
+#define READTAG(t) gdcm::DirectoryHelper::GetStringValueFromTag(t,dcmDataSet)
+#define READ_AND_SET_TAGARRAY(X,Y) tagString = READTAG(X); if (!tagString.empty()) m_TagArray->SetTag(albaTagItem(Y, tagString.c_str()));
 
 
 //----------------------------------------------------------------------------
@@ -138,6 +141,13 @@ public:
 
 protected:
 
+	/* Override this function to add specific tags to the reader, see implementation for an example */
+	virtual void InsertAppSpecificTagsToReadList(std::set<gdcm::Tag> &TagsToRead);
+
+	/* Override this function to read and set tags to the reader, see implementation for an example */
+	virtual void ReadAndSetAppSpecificTags(albaTagArray * m_TagArray, gdcm::DataSet & dcmDataSet);
+
+	
 	enum DICOM_IMPORTER_GUI_ID
 	{
 		ID_FIRST = albaGUIWizard::ID_LAST,
@@ -149,6 +159,12 @@ protected:
 		ID_VME_TYPE,
 		ID_SHOW_TEXT,
 		ID_UPDATE_NAME
+	};
+
+	enum
+	{
+		TYPE_VOLUME,
+		TYPE_IMAGE,
 	};
 
 	/** OnEvent helper functions */
@@ -273,6 +289,7 @@ protected:
 
 	/** destructor */
 	~albaOpImporterDicom();
+private:
 };
 
 
