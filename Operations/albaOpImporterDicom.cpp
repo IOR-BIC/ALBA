@@ -89,11 +89,6 @@ albaCxxTypeMacro(albaOpImporterDicom);
 
 //----------------------------------------------------------------------------
 // constants :
-enum
-{
-	TYPE_VOLUME,
-	TYPE_IMAGE,
-};
 
 #define EPSILON 1e-7
 
@@ -160,6 +155,38 @@ albaOpImporterDicom::~albaOpImporterDicom()
 	vtkDEL(m_SliceActor);
 	albaDEL(m_Output);
 }
+
+
+
+//----------------------------------------------------------------------------
+void albaOpImporterDicom::InsertAppSpecificTagsToReadList(std::set<gdcm::Tag> &TagsToRead)
+{
+	/**
+	Example*:
+	---
+	
+	TagsToRead.insert(TAG_ManufacturersModelName);
+	
+	---
+	*This add the ManufacturersModelName to the list of the "to read" tags
+	*/
+}
+
+//----------------------------------------------------------------------------
+void albaOpImporterDicom::ReadAndSetAppSpecificTags(albaTagArray * m_TagArray, gdcm::DataSet & dcmDataSet)
+{
+	/**
+	Example*:
+	---
+
+	READ_AND_SET_TAGARRAY(TAG_ManufacturersModelName, "ManufacturersModelName");
+
+	---
+	*This code will search the ManufacturersModelName and if exist will add an alba tag in the VME output
+	the tag should be inserted InsertAppSpecificTagsToReadList method
+	*/
+}
+
 //----------------------------------------------------------------------------
 albaOp *albaOpImporterDicom::Copy()
 {
@@ -756,7 +783,6 @@ bool albaOpImporterDicom::LoadDicomFromDir(const char *dicomDirABSPath)
 	return m_StudyList->GetStudiesNum()>0;
 }
 
-#define READTAG(t) gdcm::DirectoryHelper::GetStringValueFromTag(t,dcmDataSet)
 
 //----------------------------------------------------------------------------
 albaDicomSlice *albaOpImporterDicom::ReadDicomFile(albaString fileName)
@@ -1046,8 +1072,6 @@ void albaOpImporterDicom::SetPlaneDims()
 	m_SlicePlane->SetPoint2(0,diffy,0);
 }
 
-#define READ_AND_SET_TAGARRAY(X,Y) tagString = READTAG(X); if (!tagString.empty()) m_TagArray->SetTag(albaTagItem(Y, tagString.c_str()));
-
 //----------------------------------------------------------------------------
 void albaOpImporterDicom::ImportDicomTags()
 {
@@ -1081,6 +1105,7 @@ void albaOpImporterDicom::ImportDicomTags()
 	TagsToRead.insert(TAG_ProtocolName);
 	TagsToRead.insert(TAG_ManufacturersModelName);
 
+	InsertAppSpecificTagsToReadList(TagsToRead);
 	
 	if (!dcmReader.ReadSelectedTags(TagsToRead))
 	{
@@ -1105,7 +1130,8 @@ void albaOpImporterDicom::ImportDicomTags()
 	READ_AND_SET_TAGARRAY(TAG_SeriesDescription, "SeriesDescription");
 	READ_AND_SET_TAGARRAY(TAG_AcquisitionDate, "AcquisitionDate");
 	READ_AND_SET_TAGARRAY(TAG_ProtocolName, "ProtocolName");
-	READ_AND_SET_TAGARRAY(TAG_ManufacturersModelName, "ManufacturersModelName");
+
+	ReadAndSetAppSpecificTags(m_TagArray,dcmDataSet);
 
   m_TagArray->SetTag(albaTagItem("VME_NATURE", "NATURAL"));
 }

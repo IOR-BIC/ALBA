@@ -479,6 +479,15 @@ void albaViewArbitraryOrthoSlice::UpdateSubviewsCamerasToFaceSlices()
 
 	CameraUpdate();
 }
+
+//----------------------------------------------------------------------------
+char ** albaViewArbitraryOrthoSlice::GetIcon()
+{
+
+#include "pic/VIEW_ARB_ORTHO.xpm"
+	return VIEW_ARB_ORTHO_xpm;
+}
+
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::CreateGuiView()
 {

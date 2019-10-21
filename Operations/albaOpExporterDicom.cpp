@@ -191,15 +191,6 @@ void albaOpExporterDicom::OnEvent(albaEventBase *alba_event)
 	}
 }
 
-#define DETAG(name) if(!m_##name.IsEmpty()) { \
-	gdcm::DataElement de##name(TAG_##name); \
-	de##name.SetByteValue(m_##name.GetCStr(), m_##name.Length());\
-	dcmDataSet.Replace(de##name);\
-}
-
-	
-
-
 //----------------------------------------------------------------------------
 void albaOpExporterDicom::ExportDicom()
 {		
@@ -209,8 +200,7 @@ void albaOpExporterDicom::ExportDicom()
 	int scalarSpan, scalarShift;
 	vtkDoubleArray *zCoord=NULL;
 
-	albaString firstFilename;
-	firstFilename.Printf("%s/%s.0.dcm", m_Folder.GetCStr(), m_Input->GetName());
+	albaString firstFilename = GetIthFilename(0);
 
 	if (wxFileExists(firstFilename.GetCStr()))
 	{
@@ -529,21 +519,22 @@ void albaOpExporterDicom::ExportDicom()
 		dcmDataSet.Replace(studyDE);
 		dcmDataSet.Replace(seriesDE);
 
-		DETAG(PatientsName);
-		DETAG(PatientsSex);
-		DETAG(PatientsBirthDate);
-		DETAG(PatientsWeight);
-		DETAG(PatientsAge);
-		DETAG(PatientID);
-		DETAG(InstitutionName);
-		DETAG(StudyDescription);
-		DETAG(SeriesDescription);
-		DETAG(AcquisitionDate);
-		DETAG(ProtocolName);
-		DETAG(ManufacturersModelName);
+		DEFINE_TAG(PatientsName);
+		DEFINE_TAG(PatientsSex);
+		DEFINE_TAG(PatientsBirthDate);
+		DEFINE_TAG(PatientsWeight);
+		DEFINE_TAG(PatientsAge);
+		DEFINE_TAG(PatientID);
+		DEFINE_TAG(InstitutionName);
+		DEFINE_TAG(StudyDescription);
+		DEFINE_TAG(SeriesDescription);
+		DEFINE_TAG(AcquisitionDate);
+		DEFINE_TAG(ProtocolName);
+		DEFINE_TAG(ManufacturersModelName);
 
-		albaString filename;
-		filename.Printf("%s/%s.%d.dcm", m_Folder.GetCStr(), m_Input->GetName(), i);
+		DefineAppSpecificTags(dcmDataSet);
+
+		albaString filename=GetIthFilename(i);
 
 		// Set the filename:
 		w.SetFileName(filename.GetCStr());
@@ -559,6 +550,32 @@ void albaOpExporterDicom::ExportDicom()
 		helper.UpdateProgressBar((i + 1) * 100 / dims[2] );
 	}
 	helper.CloseProgressBar();
+}
+
+//----------------------------------------------------------------------------
+void albaOpExporterDicom::DefineAppSpecificTags(gdcm::DataSet & dcmDataSet)
+{
+	/** 
+	Example*: 
+	---
+	
+	DEFINE_TAG(ImageComments);
+	
+	---
+	*albaString m_ImageComment should be a class member and TAG_ImageComment a defined Dicom Tag
+	*/
+}
+
+//----------------------------------------------------------------------------
+albaString albaOpExporterDicom::GetIthFilename(int i)
+{
+	albaString filename, name;
+	name = m_Input->GetName();
+	name.Replace('.', '_');
+	name.Replace(',', '_');
+	name.Replace(':', '_');
+	filename.Printf("%s/%s.%d.dcm", m_Folder.GetCStr(), name.GetCStr(), i);
+	return filename;
 }
 
 //----------------------------------------------------------------------------

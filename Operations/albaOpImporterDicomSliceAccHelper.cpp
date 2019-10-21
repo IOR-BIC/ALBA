@@ -55,8 +55,12 @@ void albaOpImporterDicomSliceAccHelper::SetSlice(int slice_num,vtkImageData * sl
 			
 			slice->GetSpacing(spacing);
 			slice->GetExtent(extent);
+			double origin[3];
 			SetSpacing(spacing); 
-			SetOrigin(unRotatedOrigin);
+			origin[0] = unRotatedOrigin[0] + spacing[0] * extent[0];
+			origin[1] = unRotatedOrigin[1] + spacing[1] * extent[2];
+			origin[2] = unRotatedOrigin[2];
+			SetOrigin(origin);
 			SetDims(dimensions);
 			m_DataType = scalar_type;
 			Allocate();

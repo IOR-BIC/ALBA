@@ -27,6 +27,15 @@
 //----------------------------------------------------------------------------
 class albaVME;
 class albaGUIDicomSettings;
+namespace gdcm {
+	class DataSet;
+}
+
+#define DEFINE_TAG(name) if(!m_##name.IsEmpty()) { \
+	gdcm::DataElement de##name(TAG_##name); \
+	de##name.SetByteValue(m_##name.GetCStr(), m_##name.Length());\
+	dcmDataSet.Replace(de##name);\
+}
 
 //----------------------------------------------------------------------------
 // albaOpExporterDicom :
@@ -60,6 +69,7 @@ public:
   /** Export vtk data. */
   void ExportDicom();
 
+
  	/** Return an xpm-icon that can be used to represent this operation */
 	virtual char ** GetIcon();
 
@@ -67,6 +77,12 @@ public:
 	albaGUIDicomSettings* GetSetting();
 	
 protected:
+
+	/**Use this function to define application specific Dicom tags, see implementation for an example*/
+	virtual void DefineAppSpecificTags(gdcm::DataSet & dcmDataSet);
+
+	/**Returns the name of ith file*/
+	albaString GetIthFilename(int i);
 
 	void ScaleIntToUShortScalars(int * from, unsigned short *to, int scalarShift, int imgDim);
 
