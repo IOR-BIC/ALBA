@@ -414,8 +414,8 @@ albaGUI *albaPipeVolumeSliceBlend::CreateGui()
   //Create pipe gui
   assert(m_Gui == NULL);
   m_Gui = new albaGUI(this);
-  m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
-  m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_SliceOpacity,0.0,1.0);
+  m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
+  m_Gui->FloatSlider(ID_OPACITY_SLIDER,"Opacity",&m_SliceOpacity,0.0,1.0);
   m_Gui->Divider();
   return m_Gui;
 }

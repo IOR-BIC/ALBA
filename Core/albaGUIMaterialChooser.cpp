@@ -212,7 +212,7 @@ void albaGUIMaterialChooser::CreateGUI()
   
   //m_Gui->Label		(""); 
 	m_Gui->Label("Current material",1);
-	m_Gui->String(ID_NAME,"name",&m_MaterialName);
+	m_Gui->String(ID_NAME,"Name",&m_MaterialName);
 
 	m_Gui->Label		("");
 	m_Gui->Label		("");

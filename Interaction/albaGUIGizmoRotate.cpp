@@ -64,7 +64,7 @@ void albaGUIGizmoRotate::CreateGui()
   m_Gui = new albaGUI(this);
   
   m_Gui->Divider(2);
-  m_Gui->Label("rotation gizmo abs orientation", true);
+  m_Gui->Label("Rotation gizmo abs orientation", true);
   m_Gui->Double(ID_ROTATE_X, "Rotate X", &m_Orientation[0]);
   m_Gui->Double(ID_ROTATE_Y, "Rotate Y", &m_Orientation[1]);
   m_Gui->Double(ID_ROTATE_Z, "Rotate Z", &m_Orientation[2]);

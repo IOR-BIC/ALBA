@@ -86,7 +86,7 @@ void albaAttachCamera::CreateGui()
 {
 	m_Gui = new albaGUI(this);
 	m_Gui->Show(true);
-  m_Gui->Bool(ID_CAMERA_ATTACH,"attach",&m_EnableAttachCamera,0,"Attach the camera to selected vme");
+  m_Gui->Bool(ID_CAMERA_ATTACH,"Attach",&m_EnableAttachCamera,0,"Attach the camera to selected vme");
 	m_Gui->Divider();
 	m_Gui->Update();
 }

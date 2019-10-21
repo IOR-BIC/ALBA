@@ -875,36 +875,37 @@ albaGUI *albaRWI::CreateGui()
 		for(int i = 0; i < 6; i++)
 			m_Sizer->Add(m_CameraButtons[i],0,0);
 		m_Gui->Add(m_Sizer);
-		m_Gui->Label("Camera parameters");
-		m_Gui->Vector(ID_FOCAL_POINT, "focal pnt.", m_FocalPoint);
-		m_Gui->Vector(ID_CAMERA_POSITION, "position", m_CameraPosition);
+
+		m_Gui->Label("Camera parameters", true);
+		m_Gui->Vector(ID_FOCAL_POINT, "Focal pnt.", m_FocalPoint);
+		m_Gui->Vector(ID_CAMERA_POSITION, "Position", m_CameraPosition);
 		//m_Gui->Vector(ID_CAMERA_VIEW_UP, "view up", m_CameraViewUp);
 		//m_Gui->Vector(ID_CAMERA_ORIENTATION, "orientation", m_CameraOrientation);
-		albaGUICrossIncremental *ci = m_Gui->CrossIncremental(ID_CAMERA_ORIENTATION,"orientation", &m_StepCameraOrientation, &m_TopBottomAccumulation, &m_LeftRigthAccumulation,albaGUICrossIncremental::ID_COMPLETE_LAYOUT,"Change the rotation step value from the entry.",false);
+		albaGUICrossIncremental *ci = m_Gui->CrossIncremental(ID_CAMERA_ORIENTATION,"Orientation", &m_StepCameraOrientation, &m_TopBottomAccumulation, &m_LeftRigthAccumulation,albaGUICrossIncremental::ID_COMPLETE_LAYOUT,"Change the rotation step value from the entry.",false);
 		ci->EnableStep(true);
 		m_Gui->Divider(2);
 	}
 
-	m_Gui->Bool(ID_SHOW_GRID,"grid",&m_ShowGrid,0,"Turn On/Off the grid");
-	m_Gui->Combo(ID_GRID_NORMAL,"grid norm",&m_GridNormal,3,grid_normal,"orientation axes for the grid");
-	m_Gui->Double(ID_GRID_POS,"grid pos",	&m_GridPosition);
-	m_Gui->Color(ID_GRID_COLOR,"grid color",&m_GridColour);
+	m_Gui->Bool(ID_SHOW_GRID,"Grid",&m_ShowGrid,0,"Turn On/Off the grid");
+	m_Gui->Combo(ID_GRID_NORMAL,"Grid norm",&m_GridNormal,3,grid_normal,"orientation axes for the grid");
+	m_Gui->Double(ID_GRID_POS,"Grid pos",	&m_GridPosition);
+	m_Gui->Color(ID_GRID_COLOR,"Grid color",&m_GridColour);
 	m_Gui->Divider(2);
-	m_Gui->Bool(ID_SHOW_AXES,"show axes",&m_ShowAxes,0);
-	m_Gui->Color(ID_BG_COLOR,"back color",&m_BGColour);
+	m_Gui->Bool(ID_SHOW_AXES,"Show axes",&m_ShowAxes,0);
+	m_Gui->Color(ID_BG_COLOR,"Back color",&m_BGColour);
 		
 	if (m_StereoType)
 	{
 		m_Gui->Divider(2);
-		m_Gui->Label("stero movie");
-		m_Gui->DirOpen(ID_STERO_MOVIE_DIR,"dir",&m_StereoMovieDir);
+		m_Gui->Label("Stereo movie");
+		m_Gui->DirOpen(ID_STERO_MOVIE_DIR,"Dir",&m_StereoMovieDir);
 		m_Gui->Bool(ID_STERO_MOVIE,"Start rec",&m_StereoMovieEnable);
 		m_Gui->Enable(ID_STERO_MOVIE_DIR,m_StereoType != 0);
 		m_Gui->Enable(ID_STERO_MOVIE,false);
 	}
 
 	m_Gui->Divider(2);
-	m_Gui->Bool(ID_SHOW_ORIENTATOR,"orientation",&m_ShowOrientator);
+	m_Gui->Bool(ID_SHOW_ORIENTATOR,"Orientation",&m_ShowOrientator);
 	m_Gui->Bool(ID_SHOW_PROFILING_INFORMATION,"fps",&m_ShowProfilingInformation);
 	m_Gui->Divider();
 	return m_Gui;
