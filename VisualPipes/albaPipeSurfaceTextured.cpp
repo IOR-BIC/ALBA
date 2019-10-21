@@ -333,28 +333,27 @@ albaGUI *albaPipeSurfaceTextured::CreateGui()
 
   assert(m_Gui == NULL);
   m_Gui = new albaGUI(this);
-  m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"displaylist",&m_RenderingDisplayListFlag,0,"turn on/off \nrendering displaylist calculation");
-  m_Gui->Bool(ID_SCALAR_VISIBILITY,"scalar vis.", &m_ScalarVisibility,0,"turn on/off the scalar visibility");
+  m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"Display list",&m_RenderingDisplayListFlag,0,"Turn on/off \nrendering display list calculation");
+  m_Gui->Bool(ID_SCALAR_VISIBILITY,"Scalar vis.", &m_ScalarVisibility,0,"Turn on/off the scalar visibility");
   m_Gui->Divider();
-  m_Gui->Bool(ID_USE_VTK_PROPERTY,"property",&m_UseVTKProperty);
+  m_Gui->Bool(ID_USE_VTK_PROPERTY,"Property",&m_UseVTKProperty);
   m_MaterialButton = new albaGUIMaterialButton(m_Vme,this);
   m_Gui->AddGui(m_MaterialButton->GetGui());
   m_MaterialButton->Enable(m_UseVTKProperty != 0);
   m_Gui->Divider();
-  m_Gui->Bool(ID_USE_TEXTURE,"texture",&m_UseTexture);
-  m_Gui->Button(ID_CHOOSE_TEXTURE,"texture");
+  m_Gui->Bool(ID_USE_TEXTURE,"Texture",&m_UseTexture);
+  m_Gui->Button(ID_CHOOSE_TEXTURE,"Texture");
   albaVMEOutputSurface *surface_output = albaVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
   //m_Gui->Combo(ID_TEXTURE_MAPPING_MODE,"mapping",&surface_output->GetMaterial()->m_TextureMappingMode,3,mapping_mode);
   m_Gui->Enable(ID_CHOOSE_TEXTURE,m_UseTexture != 0);
   m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,m_UseTexture != 0);
   m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE && m_UseTexture != 0);
   m_Gui->Divider();
-  m_Gui->Bool(ID_USE_LOOKUP_TABLE,"lut",&m_UseLookupTable);
-  m_Gui->Lut(ID_LUT,"lut",m_SurfaceMaterial->m_ColorLut);
+  m_Gui->Bool(ID_USE_LOOKUP_TABLE,"Lut",&m_UseLookupTable);
+  m_Gui->Lut(ID_LUT,"Lut",m_SurfaceMaterial->m_ColorLut);
   m_Gui->Enable(ID_LUT,m_UseLookupTable != 0);
   m_Gui->Divider(2);
   m_Gui->Bool(ID_ENABLE_LOD,"LOD",&m_EnableActorLOD);
-  m_Gui->Label("");
 
   if (m_SurfaceMaterial == NULL)
   {
