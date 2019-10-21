@@ -147,6 +147,9 @@ public:
 
 	/** Force the updating of the camera. */
 	virtual void UpdateSubviewsCamerasToFaceSlices();
+	
+	/** return an xpm-icon that can be used to represent this view */
+	virtual char ** GetIcon();
 
 protected:
 
