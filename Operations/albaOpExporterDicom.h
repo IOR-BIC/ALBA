@@ -78,7 +78,7 @@ public:
 	
 protected:
 
-	/**Use this function to define application specific dicom tags, se implementation for an example*/
+	/**Use this function to define application specific Dicom tags, see implementation for an example*/
 	virtual void DefineAppSpecificTags(gdcm::DataSet & dcmDataSet);
 
 	/**Returns the name of ith file*/
