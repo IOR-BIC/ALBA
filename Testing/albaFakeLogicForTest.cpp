@@ -122,3 +122,9 @@ albaOpManager * albaFakeLogicForTest::GetOpManager() const
 {
 	return NULL;
 }
+
+//----------------------------------------------------------------------------
+albaViewManager * albaFakeLogicForTest::GetViewManager()
+{
+	return NULL;
+}
