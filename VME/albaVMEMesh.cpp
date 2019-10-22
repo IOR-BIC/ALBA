@@ -345,12 +345,11 @@ void albaVMEMesh::OnEvent(albaEventBase *alba_event)
 		{
 			// Call Update and Fit Gui for VMEPanel in SideBar
 			GetLogicManager()->VmeModified(this);
+			return;
 		}
 	}
-	else
-	{
-		Superclass::OnEvent(alba_event);
-	}
+	
+	Superclass::OnEvent(alba_event);	
 }
 
 //------------------------------------------------------------------------
