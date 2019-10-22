@@ -65,7 +65,7 @@ public:
 	/** Change the visibility of the bounding box actor representing the selection for the vme. */
 	virtual	void Select(bool select)										{};
 
-	/** Update the properties according to the vme's tags. */
+	/** Update the properties */
 	virtual	void UpdateProperty(bool fromTag = false)		{};
 
   /** Get assembly front/back */
