@@ -20,6 +20,7 @@
 class albaVME;
 class albaVMEImage;
 class albaOpManager;
+class albaViewManager;
 
 class albaAbsLogicManager
 {
@@ -57,6 +58,8 @@ public:
 	virtual void PrintImage(albaVMEImage *img) = 0;
 
 	virtual albaOpManager * GetOpManager() const = 0;
+
+	virtual albaViewManager *GetViewManager() = 0;
 
 };
 #endif

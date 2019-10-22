@@ -389,4 +389,14 @@ void albaPipeWithScalar::SetLookupTableToMapper()
 	m_Mapper->SetLookupTable(m_Table);
 }
 
-
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::UpdateProperty(bool fromTag)
+{
+	if (m_ScalarMapActive)
+	{
+		if (m_ActiveScalarType == POINT_TYPE)
+			m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->Modified();
+		else if (m_ActiveScalarType == CELL_TYPE)
+			m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars()->Modified();
+	}
+}
