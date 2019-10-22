@@ -222,11 +222,7 @@ void albaPipeGenericPolydata::Select(bool sel)
 		m_OutlineActor->SetVisibility(sel);
 	}
 }
-//----------------------------------------------------------------------------
-void albaPipeGenericPolydata::UpdateProperty(bool fromTag)
-//----------------------------------------------------------------------------
-{
-}
+
 //----------------------------------------------------------------------------
 albaGUI *albaPipeGenericPolydata::CreateGui()
 {
@@ -266,7 +262,7 @@ void albaPipeGenericPolydata::OnEvent(albaEventBase *alba_event)
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
-		switch(e->GetId()) 
+ 		switch(e->GetId()) 
 		{
       case ID_WIREFRAME:
         {
@@ -312,13 +308,9 @@ void albaPipeGenericPolydata::OnEvent(albaEventBase *alba_event)
       case ID_USE_VTK_PROPERTY:
 				{
 					if (m_UseVTKProperty != 0)
-					{
 						m_Actor->SetProperty(m_ObjectMaterial->m_Prop);
-					}
 					else
-					{
 						m_Actor->SetProperty(NULL);
-					}
 
 					if(m_Wireframe == 0) 
 						SetWireframeOff();

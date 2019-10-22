@@ -82,6 +82,9 @@ public:
   /** Gets the lookup table*/
 	vtkLookupTable *GetLookupTable(){return m_Table;};
 
+	/** Update the properties */
+	virtual void UpdateProperty(bool fromTag = false);
+
 protected:
 	
   vtkLookupTable  *m_Table;

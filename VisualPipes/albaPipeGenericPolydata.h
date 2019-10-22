@@ -112,7 +112,6 @@ protected:
 
 	virtual vtkPolyData* GetInputAsPolyData() = 0;
 	
-  void UpdateProperty(bool fromTag = false);
 
   albaGUIMaterialButton       *m_MaterialButton;
 

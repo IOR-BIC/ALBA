@@ -218,6 +218,8 @@ public:
 	/* Return the Operation Manager */
 	virtual albaOpManager * GetOpManager() const { return m_OpManager; }
 
+	virtual albaViewManager *GetViewManager() { return m_ViewManager; }
+
 	virtual void PrintImage(albaVMEImage *img);
 
 	eventfilterFunc GetEventFilterFunc() const { return m_EventFilterFunc; }
