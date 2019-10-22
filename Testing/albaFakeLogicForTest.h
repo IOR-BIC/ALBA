@@ -82,6 +82,9 @@ public:
 
 	virtual albaOpManager * GetOpManager() const override;
 
+	virtual albaViewManager *GetViewManager();
+
+
 protected:
 	
 	std::vector<calls> m_Calls;
