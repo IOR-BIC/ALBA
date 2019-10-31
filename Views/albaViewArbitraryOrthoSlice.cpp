@@ -114,6 +114,8 @@ albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxe
 		m_CameraPositionForReset[i][0] = m_CameraPositionForReset[i][1] = m_CameraPositionForReset[i][2] = 0;
 		m_CameraViewUpForReset[i][0] = m_CameraViewUpForReset[i][1] = m_CameraViewUpForReset[i][2] = 0;
 	}
+
+	m_SkipCameraUpdate = 0;
 }
 //----------------------------------------------------------------------------
 albaViewArbitraryOrthoSlice::~albaViewArbitraryOrthoSlice()
@@ -159,6 +161,7 @@ void albaViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 {
+	m_SkipCameraUpdate++;
 	if (vme->IsA("albaVMEGizmo"))
 	{
 		for (int i = 0; i <= Z; i++)
@@ -216,7 +219,17 @@ void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 
 	if (ActivateWindowing(vme))
 		UpdateWindowing(show, vme);
+
+	m_SkipCameraUpdate--;
 }
+
+//----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::CameraUpdate()
+{
+	if (!m_SkipCameraUpdate)
+		Superclass::CameraUpdate();
+}
+
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::OnEvent(albaEventBase *alba_event)
 {

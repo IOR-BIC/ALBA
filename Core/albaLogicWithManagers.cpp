@@ -175,6 +175,8 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_FatalExptionOccurred = false;
 
 	m_EventFilterFunc = NULL;
+
+	m_SkipCameraUpdate = false;
 }
 //----------------------------------------------------------------------------
 albaLogicWithManagers::~albaLogicWithManagers()
@@ -1233,6 +1235,8 @@ void albaLogicWithManagers::VmeShow(albaVME *vme, bool visibility)
 	if (!vme)
 		return;
 
+	m_SkipCameraUpdate++;
+
 	if (m_ViewManager)
 	{
 		albaVMELandmarkCloud *lmc = albaVMELandmarkCloud::SafeDownCast(vme);
@@ -1250,6 +1254,10 @@ void albaLogicWithManagers::VmeShow(albaVME *vme, bool visibility)
 	}
 
 	ShowInSideBar(vme, visibility);
+
+	m_SkipCameraUpdate--;
+	
+	CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::VmeModified(albaVME *vme)
@@ -1286,8 +1294,6 @@ void albaLogicWithManagers::VmeAdd(albaVME *vme)
 		return;
 	if(m_VMEManager) 
     m_VMEManager->VmeAdd(vme);
-
-
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::VmeAdded(albaVME *vme)
@@ -1633,16 +1639,8 @@ void albaLogicWithManagers::ViewContextualMenu(bool vme_menu)
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::CameraUpdate()
 {
-	if (m_ViewManager)
+	if (m_ViewManager && !m_SkipCameraUpdate)
 		m_ViewManager->CameraUpdate();
-
-#ifdef ALBA_USE_VTK
-	//PERFORMANCE WARNING : if view manager exist this will cause another camera update!!
-	// An else could be added to reduce CAMERA_UPDATE by a 2 factor. This has been done for the HipOp vertical App showing
-	// big performance improvement in composite views creation.
-	if (m_InteractionManager)
-		m_InteractionManager->CameraUpdate(m_ViewManager->GetSelectedView());
-#endif
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::CameraReset()
