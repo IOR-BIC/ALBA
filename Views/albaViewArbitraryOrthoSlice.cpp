@@ -114,6 +114,8 @@ albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxe
 		m_CameraPositionForReset[i][0] = m_CameraPositionForReset[i][1] = m_CameraPositionForReset[i][2] = 0;
 		m_CameraViewUpForReset[i][0] = m_CameraViewUpForReset[i][1] = m_CameraViewUpForReset[i][2] = 0;
 	}
+
+	m_SkipCameraUpdate = 0;
 }
 //----------------------------------------------------------------------------
 albaViewArbitraryOrthoSlice::~albaViewArbitraryOrthoSlice()
@@ -159,6 +161,7 @@ void albaViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 {
+	m_SkipCameraUpdate++;
 	if (vme->IsA("albaVMEGizmo"))
 	{
 		for (int i = 0; i <= Z; i++)
@@ -181,7 +184,8 @@ void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 
 		for (int view = Z_VIEW; view <= Y_VIEW; view++)
 		{
-			albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(m_ChildViewList[view]->GetNodePipe(vme));
+			albaPipe* nodePipe = m_ChildViewList[view]->GetNodePipe(vme);
+			albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(nodePipe);
 			if (pipeSlice)
 			{
 				double surfaceOriginTranslated[3];
@@ -193,7 +197,7 @@ void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 
 				pipeSlice->SetSlice(surfaceOriginTranslated, normal);
 
-				albaPipeMeshSlice* meshPipe = albaPipeMeshSlice::SafeDownCast(pipeSlice);
+				albaPipeMeshSlice* meshPipe = albaPipeMeshSlice::SafeDownCast(nodePipe);
 				if(meshPipe)
 					meshPipe->SetFlipNormalOff();
 			}
@@ -215,7 +219,17 @@ void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 
 	if (ActivateWindowing(vme))
 		UpdateWindowing(show, vme);
+
+	m_SkipCameraUpdate--;
 }
+
+//----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::CameraUpdate()
+{
+	if (!m_SkipCameraUpdate)
+		Superclass::CameraUpdate();
+}
+
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::OnEvent(albaEventBase *alba_event)
 {

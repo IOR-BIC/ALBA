@@ -442,6 +442,8 @@ protected:
 	bool							m_LogToFile;
 	albaWXLog          *m_Logger;
 	albaVTKLog         *m_VtkLog;
+
+	int				m_SkipCameraUpdate;
 	
 	albaGUIApplicationSettings *m_ApplicationSettings;
 	albaGUISettingsTimeBar  *m_TimeBarSettings;

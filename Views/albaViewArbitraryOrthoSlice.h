@@ -133,6 +133,10 @@ public:
 	/** Show/Hide VMEs into plugged sub-views*/
 	virtual void VmeShow(albaVME *vme, bool show);
 
+	/** optimized cameraupdate method*/
+	virtual void CameraUpdate();
+
+
 	/** Remove VME into plugged sub-views*/
 	virtual void VmeRemove(albaVME *vme);
 
@@ -243,6 +247,8 @@ protected:
 		
 	albaVMEVolumeGray *m_InputVolume;
 	albaAxes::AXIS_TYPE_ENUM m_AxesType;
+
+	int m_SkipCameraUpdate;
 };
 
 #endif

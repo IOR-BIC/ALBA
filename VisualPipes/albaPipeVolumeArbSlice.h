@@ -22,6 +22,7 @@
 //----------------------------------------------------------------------------
 #include "albaDefines.h"
 #include "albaPipeSlice.h"
+#include "albaPipe.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -49,11 +50,11 @@ class name: albaPipeVolumeArbSlice
   of the volume data. The visual pipe can also render 3 different slices centered in a origin point
   and oriented along 3 different axes.
 */
-class ALBA_EXPORT albaPipeVolumeArbSlice : public albaPipeSlice
+class ALBA_EXPORT albaPipeVolumeArbSlice : public albaPipe, public albaPipeSlice
 {
 public:
   /** RTTI Macro */
-  albaTypeMacro(albaPipeVolumeArbSlice,albaPipeSlice);
+  albaTypeMacro(albaPipeVolumeArbSlice,albaPipe);
   /** Constructor */
 	  albaPipeVolumeArbSlice();
   /** Destructor */

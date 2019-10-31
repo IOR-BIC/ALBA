@@ -317,6 +317,7 @@ void albaViewSlice::VmeCreatePipe(albaVME *vme)
         albaPipeSlice* spipe = albaPipeSlice::SafeDownCast(pipe);
         if (spipe != NULL)
         { 
+					albaPipeMeshSlice *meshPipe;
 					if(pipe->IsA("albaPipePolylineGraphEditor"))
           {
             if(m_CameraPositionId==CAMERA_OS_P)
@@ -324,6 +325,11 @@ void albaViewSlice::VmeCreatePipe(albaVME *vme)
             else
               ((albaPipePolylineGraphEditor *)pipe)->SetModalitySlice();				
           }
+					else if (meshPipe = albaPipeMeshSlice::SafeDownCast(pipe))
+					{
+						if  (m_CameraPositionId == CAMERA_OS_X)
+							meshPipe->SetFlipNormalOff();
+					}
           //common stuff
 					m_SlicingVector.push_back(n);
           double positionSlice[3];
@@ -501,8 +507,9 @@ void albaViewSlice::SetSlice(double* Origin, double* Normal)
 
   for(int i = 0; i < m_SlicingVector.size(); i++)
   {
-		albaPipeSlice *pipe = (albaPipeSlice *)m_SlicingVector.at(i)->GetPipe();
-    pipe->SetSlice(coord, m_SliceNormal); 
+		albaPipeSlice *pipe = albaPipeSlice::SafeDownCast(m_SlicingVector.at(i)->GetPipe());
+		if(pipe)
+			pipe->SetSlice(coord, m_SliceNormal);
   }	
 	  
   // update text

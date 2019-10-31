@@ -22,6 +22,7 @@
 //----------------------------------------------------------------------------
 #include "albaDefines.h"
 #include "albaPipeSlice.h"
+#include "albaPipe.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -38,7 +39,7 @@ class vtkPlane;
 //----------------------------------------------------------------------------
 // albaPipePolylineGraphEditor :
 //----------------------------------------------------------------------------
-class ALBA_EXPORT albaPipePolylineGraphEditor : public albaPipeSlice
+class ALBA_EXPORT albaPipePolylineGraphEditor : public albaPipe, public albaPipeSlice
 {
 public:
 	albaTypeMacro(albaPipePolylineGraphEditor,albaPipe);
