@@ -22,7 +22,7 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "albaDefines.h"
-#include "albaPipe.h"
+class albaObject;
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -33,22 +33,15 @@ class vtkActor;
 /**
 class name : albaPipeSlice
 */
-class ALBA_EXPORT albaPipeSlice : public albaPipe
+class ALBA_EXPORT albaPipeSlice
 {
 public:
-  /** RTTI macro */
-  albaTypeMacro(albaPipeSlice, albaPipe);
 
   /** constructor. */
   albaPipeSlice();
   /** destructor. */
   virtual ~albaPipeSlice();
 
-protected: 
-  double m_Origin[3];     ///< origin of the cutting plane
-  double m_Normal[3];     ///< normal of the cutting plane    
-
-public:	  
   /** gets the slice normal */
   inline virtual const double* GetOrigin() {
     return m_Origin;
@@ -86,6 +79,13 @@ public:
   /** Set the origin and normal of the slice.
   Both, Origin and Normal may be NULL, if the current value is to be preserved. */
   virtual void SetSlice(double* Origin, double* Normal);   
+
+	static albaPipeSlice *SafeDownCast(albaObject *pointer);
+
+protected:
+
+	double m_Origin[3];     ///< origin of the cutting plane
+	double m_Normal[3];     ///< normal of the cutting plane    
 };  
 
 #endif // albaPipeSlice_h__

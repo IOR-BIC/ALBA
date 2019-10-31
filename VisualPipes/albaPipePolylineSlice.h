@@ -22,6 +22,7 @@
 //----------------------------------------------------------------------------
 #include "albaDefines.h"
 #include "albaPipeSlice.h"
+#include "albaPipe.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -54,11 +55,11 @@ class vtkSplineFilter;
   class name: albaPipePolylineSlice.
   Pipe which manage the visualization of the section of a polyline.
 */
-class ALBA_EXPORT albaPipePolylineSlice : public albaPipeSlice
+class ALBA_EXPORT albaPipePolylineSlice : public albaPipe, public albaPipeSlice
 {
 public:
   /** RTTI Macro*/
-  albaTypeMacro(albaPipePolylineSlice,albaPipeSlice);
+  albaTypeMacro(albaPipePolylineSlice,albaPipe);
 
   /** Constructor. */
   albaPipePolylineSlice();

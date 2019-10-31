@@ -22,6 +22,7 @@
 //----------------------------------------------------------------------------
 #include "albaDefines.h"
 #include "albaPipeSlice.h"
+#include "albaPipe.h"
 #include "albaVMEImage.h"
 
 //----------------------------------------------------------------------------
@@ -45,11 +46,11 @@ class vtkLookupTable;
   Visual pipe that allow to visualize a surface polydata sliced according to 
   a slicing plain. The result effect is the contour of the surface cut by the plain.
 */
-class ALBA_EXPORT albaPipeSurfaceSlice : public albaPipeSlice
+class ALBA_EXPORT albaPipeSurfaceSlice : public albaPipe, public albaPipeSlice
 {
 public:
   /** RTTI Macro */
-  albaTypeMacro(albaPipeSurfaceSlice,albaPipeSlice);
+  albaTypeMacro(albaPipeSurfaceSlice,albaPipe);
 
   /** Constructor. */
   albaPipeSurfaceSlice();

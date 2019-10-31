@@ -181,7 +181,8 @@ void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 
 		for (int view = Z_VIEW; view <= Y_VIEW; view++)
 		{
-			albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(m_ChildViewList[view]->GetNodePipe(vme));
+			albaPipe* nodePipe = m_ChildViewList[view]->GetNodePipe(vme);
+			albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(nodePipe);
 			if (pipeSlice)
 			{
 				double surfaceOriginTranslated[3];
@@ -193,7 +194,7 @@ void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 
 				pipeSlice->SetSlice(surfaceOriginTranslated, normal);
 
-				albaPipeMeshSlice* meshPipe = albaPipeMeshSlice::SafeDownCast(pipeSlice);
+				albaPipeMeshSlice* meshPipe = albaPipeMeshSlice::SafeDownCast(nodePipe);
 				if(meshPipe)
 					meshPipe->SetFlipNormalOff();
 			}

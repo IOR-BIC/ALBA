@@ -157,14 +157,7 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 		{
       case ID_SCALARS:
         {
-          if(m_ScalarIndex < m_PointCellArraySeparation)
-          {
-            m_ActiveScalarType = POINT_TYPE;
-          }
-          else 
-          {
-            m_ActiveScalarType = CELL_TYPE;
-          }
+					m_ActiveScalarType = (m_ScalarIndex < m_PointCellArraySeparation) ? POINT_TYPE : CELL_TYPE;
           UpdateActiveScalarsInVMEDataVectorItems();
 					GetLogicManager()->CameraUpdate();
         }
@@ -208,24 +201,10 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 {
+
+	m_Vme->Update();
   
-  m_Vme->GetOutput()->GetVTKData()->Update();
-  m_Vme->Update();
-  
-  if(m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0)
-  {
-    m_Vme->GetOutput()->GetVTKData()->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
-    m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->Modified();
-  }
-  else if(m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays-m_PointCellArraySeparation >0) )
-  {
-    m_Vme->GetOutput()->GetVTKData()->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
-    m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars()->Modified();
-  }
-  m_Vme->Modified();
-  m_Vme->GetOutput()->GetVTKData()->Update();
-  m_Vme->Update();
-  
+	
 	if(albaVMEGeneric::SafeDownCast(m_Vme) && ((albaVMEGeneric *)m_Vme)->GetDataVector())
 	{
 		for (albaDataVector::Iterator it = ((albaVMEGeneric *)m_Vme)->GetDataVector()->Begin(); it != ((albaVMEGeneric *)m_Vme)->GetDataVector()->End(); it++)
@@ -252,6 +231,7 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 
 					outputVTK->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
 					outputVTK->GetPointData()->GetScalars()->Modified();
+					outputVTK->GetCellData()->SetActiveScalars("");
 				}
 				else if(m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation >0))
 				{
@@ -270,11 +250,29 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 
 					outputVTK->GetCellData()->SetActiveScalars(scalarsToActivate.c_str());
 					outputVTK->GetCellData()->GetScalars()->Modified();
+					outputVTK->GetPointData()->SetActiveScalars("");
 				}
 				outputVTK->Modified();
 				outputVTK->Update();
-      
+
 			}
+		}
+	}
+	else
+	{
+		vtkDataSet * vtkData = m_Vme->GetOutput()->GetVTKData();
+		vtkData->Update();
+		if (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0)
+		{
+			vtkData->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
+			vtkData->GetPointData()->GetScalars()->Modified();
+			vtkData->GetCellData()->SetActiveScalars("");
+		}
+		else if (m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation > 0))
+		{
+			vtkData->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
+			vtkData->GetCellData()->GetScalars()->Modified();
+			vtkData->GetPointData()->SetActiveScalars("");
 		}
 	}
   m_Vme->Modified();
@@ -313,7 +311,6 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
   m_Actor->Modified();
 
   UpdateProperty();
-	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

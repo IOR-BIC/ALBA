@@ -217,11 +217,7 @@ void albaViewOrthoSlice::ApplySliceSetting(int view, albaVME * vme)
 		surfacePipe->SetThickness(m_Border);
 
 	if (meshPipe)
-	{
 		meshPipe->SetThickness(m_Border);
-		if (view == YN_VIEW)
-			meshPipe->SetFlipNormalOff();
-	}
 }
 
 //----------------------------------------------------------------------------

@@ -20,17 +20,11 @@
 //----------------------------------------------------------------------------
 
 #include "albaPipeSlice.h"
-#include "albaVME.h"
+#include "albaObject.h"
 
 
 //----------------------------------------------------------------------------
-albaCxxTypeMacro(albaPipeSlice);
-//----------------------------------------------------------------------------
-
-#include "albaMemDbg.h"
-
-//----------------------------------------------------------------------------
-albaPipeSlice::albaPipeSlice() :albaPipe()
+albaPipeSlice::albaPipeSlice()
 //----------------------------------------------------------------------------
 {  
   m_Origin[0] = m_Origin[1] = m_Origin[2] = 0.0;
@@ -84,4 +78,17 @@ albaPipeSlice::~albaPipeSlice()
     m_Normal[1] = Normal[1];
     m_Normal[2] = Normal[2];
   }  
+}
+
+//----------------------------------------------------------------------------
+albaPipeSlice *albaPipeSlice::SafeDownCast(albaObject *pointer)
+{
+	try 
+	{
+		return dynamic_cast<albaPipeSlice *>(pointer); 
+	} 
+	catch (std::bad_cast) 
+	{ 
+		return NULL; 
+	}
 }
