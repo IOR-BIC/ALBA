@@ -85,6 +85,11 @@ public:
 	void SetNormalsTypeToPoints();
 	void SetNormalsTypeToCells();
 	int GetNormalsType() {return m_ShowCellsNormals;};
+	
+	/** Set the flip of normal filter to on*/
+	void SetFlipNormalOn();
+	/** Set the flip of normal filter to off*/
+	void SetFlipNormalOff();
   
   /** Set the actor border visible or not*/
   void SetEdgesVisibilityOn();
@@ -104,8 +109,8 @@ protected:
   vtkDataSetMapper        *m_MapperWired;
   vtkActor                *m_ActorWired;
 	vtkActor                *m_OutlineActor;
-	vtkALBAPolyDataNormals   *m_NormalsFilter;
-	albaAxes                 *m_Axes;
+	vtkALBAPolyDataNormals  *m_NormalsFilter;
+	albaAxes                *m_Axes;
 	vtkPolyData							*m_InputAsPolydata;
 
 	albaGUILutSwatch *m_LutSwatch;
@@ -119,6 +124,7 @@ protected:
 	int											 m_ShowCellsNormals;
   int                      m_BorderElementsWiredActor;
   int                      m_UseVTKProperty;
+	int											 m_FlipNormals;
 	double				           m_Border;
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
