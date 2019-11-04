@@ -164,9 +164,17 @@ void albaViewCompound::VmeSelect(albaVME *vme, bool select)
 void albaViewCompound::VmeShow(albaVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
-  for(int i=0; i<m_NumOfChildView; i++)
-    m_ChildViewList[i]->VmeShow(vme, show);
+	for (int i = 0; i < m_NumOfChildView; i++)
+		m_ChildViewList[i]->VmeShow(vme, show);
 }
+
+//----------------------------------------------------------------------------
+void albaViewCompound::VmeUpdateProperty(albaVME *vme, bool fromTag /*= false*/)
+{
+	for (int i = 0; i < m_NumOfChildView; i++)
+		m_ChildViewList[i]->VmeUpdateProperty(vme, fromTag);
+}
+
 //----------------------------------------------------------------------------
 int albaViewCompound::GetNodeStatus(albaVME *vme)
 //----------------------------------------------------------------------------

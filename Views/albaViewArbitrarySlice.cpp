@@ -259,7 +259,8 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 			vtkDEL(TransformReset);
 		}
 		
-		albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(vme));
+		albaPipe * nodePipe = ((albaViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(vme);
+		albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(nodePipe);
 		if (pipeSlice)
 		{
 			double surfaceOriginTranslated[3];
@@ -271,7 +272,7 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 
 			pipeSlice->SetSlice(surfaceOriginTranslated, normal);
 		}
-		albaPipeMeshSlice *pipeSliceViewMesh = albaPipeMeshSlice::SafeDownCast(pipeSlice);
+		albaPipeMeshSlice *pipeSliceViewMesh = albaPipeMeshSlice::SafeDownCast(nodePipe);
 		if (pipeSliceViewMesh)
 			pipeSliceViewMesh->SetFlipNormalOff();
 	}

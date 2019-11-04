@@ -106,7 +106,7 @@ void vtkALBALandmarkCloudOutlineCornerFilterTest::TestBounds()
 	points->SetNumberOfPoints(10);
 	double coord[3];
 
-	for (int i = 0; i<10; i++)
+	for (vtkIdType i = 0; i<10; i++)
 	{
 		coord[0] = i * 1.5;
 		coord[1] = i *-2.5;

@@ -49,7 +49,7 @@ vtkALBAPolyDataNormals::vtkALBAPolyDataNormals()
 	}
 
 	vtkPolyData* outp = this->GetOutput();
-	if (outp == NULL || tm > this->m_LastUpdateTime)
+	if (outp == NULL || tm > this->m_LastUpdateTime || this->FlipNormals)
 	{
 		//perform full update
 		Superclass::UpdateData(output);		

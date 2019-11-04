@@ -196,7 +196,7 @@ void vtkALBACellsFilterTest::TestGetIdMarkedCell()
   assert(nc != 0);
 
   const int markedCellsNumber = 3;
-  int markedCellsIDs[markedCellsNumber] = {0, 10, 20} ;
+  vtkIdType markedCellsIDs[markedCellsNumber] = {0, 10, 20} ;
 
   for (int i = 0;i < markedCellsNumber; i++)
   {

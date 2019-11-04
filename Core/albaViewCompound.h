@@ -96,7 +96,7 @@ public:
   /** 
   Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(albaVME *vme, bool show);
-	virtual void VmeUpdateProperty(albaVME *vme, bool fromTag = false)		{};
+	virtual void VmeUpdateProperty(albaVME *vme, bool fromTag = false);
 
 	virtual bool IsVmeShowed(albaVME *vme);;
 
