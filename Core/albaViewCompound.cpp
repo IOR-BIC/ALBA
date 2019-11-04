@@ -261,6 +261,16 @@ albaGUI* albaViewCompound::CreateGui()
   m_Gui->Combo(ID_LAYOUT_CHOOSER,"layout",&m_LayoutConfiguration,4,layout_choices);
   return m_Gui;
 }
+
+//----------------------------------------------------------------------------
+void albaViewCompound::SetWindowSize(int w, int h)
+{
+	m_Size.SetWidth(w);
+	m_Size.SetHeight(h);
+	m_Win->SetSize(w, h);
+	OnLayout();
+}
+
 //----------------------------------------------------------------------------
 void albaViewCompound::OnSize(wxSizeEvent &event)
 //----------------------------------------------------------------------------

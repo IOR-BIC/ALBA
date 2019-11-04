@@ -108,6 +108,10 @@ public:
   having albaViewCompound::GetNodeStatus allow albaGUICheckTree to not know about albaSceneGraph */
   virtual int  GetNodeStatus(albaVME *vme);
 
+	/** Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */
+	virtual void SetWindowSize(int w, int h);;
+
+	/** On size event*/
   virtual void OnSize(wxSizeEvent &event);
 
   /** IDs for the GUI */

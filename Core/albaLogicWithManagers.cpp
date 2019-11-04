@@ -252,8 +252,15 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::Configure()
 {
+	// Fill the SettingsDialog
+	m_SettingsDialog->AddPage(m_ApplicationSettings->GetGui(), m_ApplicationSettings->GetLabel());
+
 	if (m_PlugTimebar)
+	{
 		m_TimeBarSettings = new albaGUISettingsTimeBar(this);
+
+		m_SettingsDialog->AddPage(m_TimeBarSettings->GetGui(), m_TimeBarSettings->GetLabel());
+	}
 
 	if (m_UseVMEManager)
 	{
@@ -263,18 +270,18 @@ void albaLogicWithManagers::Configure()
 		//m_VMEManager->SetSingleBinaryFile(m_StorageSettings->GetSingleFileStatus()!= 0);
 	}
 
-	// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
 	if (m_UseInteractionManager)
 	{
 		m_InteractionManager = new albaInteractionManager();
 		m_InteractionManager->SetListener(this);
-		
+
 		m_Mouse = m_InteractionManager->GetMouseDevice();
 		//SIL m_InteractionManager->GetClientDevice()->AddObserver(this, MCH_INPUT);
-	}
-#endif
 
+		if (m_ShowInteractionSettings)
+			m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
+	}
+	
 	if (m_UseViewManager)
 	{
 		m_ViewManager = new albaViewManager();
@@ -300,16 +307,9 @@ void albaLogicWithManagers::Configure()
 	{
 		m_SnapshotManager = new albaSnapshotManager();
 		m_SnapshotManager->SetMouse(m_Mouse);
+
+		m_SettingsDialog->AddPage(m_SnapshotManager->GetSettingsGui(), "Snapshot");
 	}
-
-	// Fill the SettingsDialog
-	m_SettingsDialog->AddPage(m_ApplicationSettings->GetGui(), m_ApplicationSettings->GetLabel());
-
-	if (m_ShowInteractionSettings && m_InteractionManager)
-		//m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
-
-		if (m_TimeBarSettings)
-			m_SettingsDialog->AddPage(m_TimeBarSettings->GetGui(), m_TimeBarSettings->GetLabel());
 
 	ConfigureWizardManager();
 }
