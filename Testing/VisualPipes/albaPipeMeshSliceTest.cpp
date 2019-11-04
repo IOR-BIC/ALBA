@@ -397,7 +397,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
   pipeMeshSlice->SetSlice(origin,normal);
   pipeMeshSlice->Create(sceneNode);
 
-  pipeMeshSlice->SetWiredActorVisibilityOff();
+  pipeMeshSlice->SetEdgesVisibilityOn();
   pipeMeshSlice->SetWireframeOff();
   pipeMeshSlice->OnEvent(&albaEvent(this, VME_TIME_SET));
   ////////// ACTORS List ///////////////
@@ -792,7 +792,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
 
   pipeMeshSlice->SetThickness(3.0);
   pipeMeshSlice->SetWireframeOn();
-  pipeMeshSlice->SetWiredActorVisibilityOn();
+  pipeMeshSlice->SetEdgesVisibilityOn();
   pipeMeshSlice->SetActorPicking(false);
   pipeMeshSlice->OnEvent(&albaEvent(this, VME_TIME_SET));
 

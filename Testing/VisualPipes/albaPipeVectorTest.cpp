@@ -82,7 +82,7 @@ void albaPipeVectorTest::TestPipeExecution()
   vtkALBASmartPointer<vtkPolyData> poly;
   vtkALBASmartPointer<vtkPoints> points1;
   vtkALBASmartPointer<vtkCellArray> cellArray1;
-  int pointId1[2];
+  vtkIdType pointId1[2];
   double force1X = 12.5;
   double force1Y = 201.7;
   double force1Z = 20.6;

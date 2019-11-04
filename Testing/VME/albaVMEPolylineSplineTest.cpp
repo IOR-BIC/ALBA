@@ -87,7 +87,7 @@ void albaVMEPolylineSplineTest::TestSetData()
   This create a reversal order cellarray. in this test we must prove that the OrderPolyline
   method affects the cellarray, with the reorder of the cells based on the points sequence.
   */
-	int pointId[2];
+	vtkIdType pointId[2];
 	for(int i = in_points->GetNumberOfPoints()-1; i>=0 ;i--)
 	{
 		if (i < in_points->GetNumberOfPoints()-1)
@@ -111,8 +111,8 @@ void albaVMEPolylineSplineTest::TestSetData()
   polylineSpline->OrderPolyline(in_data);
   vtkCellArray *cellArray = in_data->GetLines();
   int num;
-  int *id;
-  int ntps;
+  vtkIdType *id;
+  vtkIdType ntps;
   for(int i=0 ; i<cellArray->GetNumberOfCells(); i++)
   {
     num = cellArray->GetNextCell(ntps,id);
