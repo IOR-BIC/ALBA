@@ -50,7 +50,7 @@ void vtkALBAPolyDataMirrorTest::BeforeTest()
 	m_TestPolyData->SetPolys(cellArray);
 
 	double zero = 0.0;
-	int pointId[3];
+	vtkIdType pointId[3];
 	points->InsertNextPoint(zero,zero,zero);
 	points->InsertNextPoint(0.5,0.5,0.5);
 	points->InsertNextPoint(1.0,1.0,3.0);

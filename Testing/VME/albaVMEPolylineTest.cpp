@@ -74,7 +74,7 @@ void albaVMEPolylineTest::TestSetData()
 
   in_points->Modified();
  
-	int pointId[2];
+	vtkIdType pointId[2];
 	for(int i = 0; i< in_points->GetNumberOfPoints();i++)
 	{
 		if (i > 0)

@@ -95,7 +95,7 @@ void albaGizmoPathRulerTest::CreateTestData()
 
   CPPUNIT_ASSERT(points->GetNumberOfPoints() == 5);
 
-  int pointId[2];
+  vtkIdType pointId[2];
   for(int i = 0; i< points->GetNumberOfPoints();i++)
   {
     if (i > 0)

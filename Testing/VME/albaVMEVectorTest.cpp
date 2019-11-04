@@ -76,7 +76,7 @@ void albaVMEVectorTest::TestSetData()
   pts->InsertNextPoint(1.0,1.0,1.0);
 
   vtkALBASmartPointer<vtkCellArray> cells;
-  int cell[2] = {0,1};
+  vtkIdType cell[2] = {0,1};
   cells->InsertNextCell(2,cell);
 
   vtkALBASmartPointer<vtkPolyData> line;
@@ -94,7 +94,7 @@ void albaVMEVectorTest::TestSetData()
   pts_bad_1->InsertNextPoint(2.0,2.0,2.0);
 
   vtkALBASmartPointer<vtkCellArray> cells_bad_1;
-  int cell_bad_1[3] = {0,1,2};
+  vtkIdType cell_bad_1[3] = {0,1,2};
   cells_bad_1->InsertNextCell(3,cell_bad_1);
 
   vtkALBASmartPointer<vtkPolyData> line_bad_1;
@@ -113,9 +113,9 @@ void albaVMEVectorTest::TestSetData()
   pts_bad_2->InsertNextPoint(3.0,3.0,3.0);
 
   vtkALBASmartPointer<vtkCellArray> cells_bad_2;
-  int cell_bad_2_0[2] = {0,1};
-  int cell_bad_2_1[2] = {1,2};
-  int cell_bad_2_2[2] = {2,3};
+  vtkIdType cell_bad_2_0[2] = {0,1};
+	vtkIdType cell_bad_2_1[2] = {1,2};
+	vtkIdType cell_bad_2_2[2] = {2,3};
   cells_bad_2->InsertNextCell(2,cell_bad_2_0);
   cells_bad_2->InsertNextCell(2,cell_bad_2_1);
   cells_bad_2->InsertNextCell(2,cell_bad_2_2);
@@ -138,7 +138,7 @@ void albaVMEVectorTest::TestGetModule()
   pts->InsertNextPoint(1.0,0.0,0.0);
 
   vtkALBASmartPointer<vtkCellArray> cells;
-  int cell[2] = {0,1};
+  vtkIdType cell[2] = {0,1};
   cells->InsertNextCell(2,cell);
 
   vtkALBASmartPointer<vtkPolyData> line;

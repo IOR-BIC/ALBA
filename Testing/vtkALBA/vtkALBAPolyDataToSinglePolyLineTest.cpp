@@ -56,7 +56,7 @@ void vtkALBAPolyDataToSinglePolyLineTest::TestConversion()
   points->InsertNextPoint(1.0,1.0,1.0); // second point - third cell
 
   //create Lines
-  int pointId[2];
+  vtkIdType pointId[2];
   for(int i = 0; i< points->GetNumberOfPoints();i++)
   {
     if (i > 0)

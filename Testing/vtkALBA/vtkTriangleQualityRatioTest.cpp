@@ -52,7 +52,7 @@ void vtkTriangleQualityRatioTest::QualityTestValues()
 	dataset->SetLines(cellArray);
 
 	double zero = 0.0;
-	int pointId[3];
+	vtkIdType pointId[3];
 	points->InsertNextPoint(zero,zero,zero);
 	points->InsertNextPoint(0.5,1.0,zero);
 	points->InsertNextPoint(1.0,zero,zero);

@@ -87,7 +87,7 @@ void albaVMEPointSetTest::TestSetData()
   vtkALBASmartPointer<vtkCellArray> cells;
   for (int i=0;i<NUM_OF_POINTS-1;i++)
   {
-    int cell[2] = {i,i+1};
+    vtkIdType cell[2] = {i,i+1};
     cells->InsertNextCell(2,cell);
   }
 

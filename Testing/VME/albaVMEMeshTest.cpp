@@ -65,7 +65,7 @@ void albaVMEMeshTest::TestSetData()
   triangulation->Update();
 
   // to be used later...
-  int cellsNumber = triangulation->GetOutput()->GetNumberOfCells();
+  vtkIdType cellsNumber = triangulation->GetOutput()->GetNumberOfCells();
 
   albaVMEMesh *vmeMesh;
 
