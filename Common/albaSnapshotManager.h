@@ -22,6 +22,8 @@
 //----------------------------------------------------------------------------
 #include "albaDefines.h"
 #include "albaObserver.h"
+#include "albaGUI.h"
+#include "albaGUISettings.h"
 
 //----------------------------------------------------------------------------
 // forward reference
@@ -34,11 +36,11 @@ class albaDeviceButtonsPadMouse;
 /**
   Class Name: albaSnapshotManager.
 */
-class ALBA_EXPORT albaSnapshotManager : albaObserver
+class ALBA_EXPORT albaSnapshotManager : albaGUISettings, albaObserver
 {
 public:
 
-  /** Default constructor */
+	/** Default constructor */
 	albaSnapshotManager();
 
   /** Default destructor */
@@ -70,13 +72,26 @@ public:
 	/* Set Mouse for imageViewer interaction*/
 	void SetMouse(albaDeviceButtonsPadMouse *mouse);
 
+	/* Return the gui for Settings Dialog*/
+	albaGUI* GetSettingsGui();
+
 protected:
+
+	/** Initialize the application settings.*/
+	void InitializeSettings();
 
 	void SelectImage();
 
-	wxString			 			m_GroupName;
-	albaVMEGroup					*m_SnapshotsGroup;
-	albaGUIImageViewer		*m_ImageViewer;
+	wxString						m_GroupName;
+	albaVMEGroup				*m_SnapshotsGroup;
+	albaGUIImageViewer	*m_ImageViewer;
+
+	albaGUI							*m_SettingsGui;
+
+	wxColour m_ColorBackground;
+	int m_SnapshotsCustomResoluzion;
+	int m_SnapshotsWidth;
+	int m_SnapshotsHeight;
 
 private:
   friend class albaLogicWithManagers;
