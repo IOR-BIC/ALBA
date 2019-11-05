@@ -60,6 +60,12 @@ albaOp(label)
 
 	m_ABSMatrixFlag = 1;
 	m_EnableBackCalculation = 1;
+
+	memset(&m_Configuration, 0, sizeof(BonematConfiguration));
+	
+	m_Configuration.rho2 = 1; 
+	m_Configuration.b_OneInterval = m_Configuration.b_RhoLessThanRho1 = m_Configuration.b_RhoBetweenRho1andRho2 = m_Configuration.b_RhoBiggerThanRho2 = 1;
+	m_Configuration.c_OneInterval = m_Configuration.c_RhoLessThanRho1 = m_Configuration.c_RhoBetweenRho1andRho2 = m_Configuration.c_RhoBiggerThanRho2 = 1;
 }
 //----------------------------------------------------------------------------
 albaOpExporterFEMCommon::~albaOpExporterFEMCommon()
