@@ -1378,16 +1378,19 @@ void albaLogicWithManagers::VmeDoubleClicked(albaEvent &e)
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::VmeSelect(albaVME *vme)
 {
-	if (vme != NULL && m_OpManager)
+
+	if (vme != NULL && m_OpManager && m_OpManager->GetSelectedVme()!=vme)
+	{
 		m_OpManager->OpSelect(vme);
 
-	// currently albaInteraction is strictly dependent on VTK (marco)
+		// currently albaInteraction is strictly dependent on VTK (marco)
 #ifdef ALBA_USE_VTK
-	if (m_InteractionManager)
-		m_InteractionManager->VmeSelected(vme);
+		if (m_InteractionManager)
+			m_InteractionManager->VmeSelected(vme);
 #endif
 
-	EnableMenuAndToolbar();
+		EnableMenuAndToolbar();
+	}
 }
 
 //----------------------------------------------------------------------------
