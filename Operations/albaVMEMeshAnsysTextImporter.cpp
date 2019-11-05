@@ -265,7 +265,18 @@ int albaVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
   int ret = GetElementType();
   if (ret == -1 || ret == UNSUPPORTED_ELEMENT )  
   {
-    return -1;
+		if (m_FirstConnectivityColumn == 1)
+		{
+			//Try to skip mat column
+			m_FirstConnectivityColumn = 2;
+			ret = GetElementType();
+			if (ret == -1 || ret == UNSUPPORTED_ELEMENT)
+			{
+				return -1;
+			}
+		}
+		else
+			return -1;
   }
 
   // id list for connectivity
