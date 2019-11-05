@@ -76,6 +76,7 @@
 #include "vtkSphereSource.h"
 #include "vtkALBASmartPointer.h"
 #include "albaPipeMeshSlice.h"
+#include "albaPipeSurfaceTextured.h"
 
 albaCxxTypeMacro(albaViewArbitraryOrthoSlice);
 
@@ -723,8 +724,17 @@ void albaViewArbitraryOrthoSlice::ShowSlicers(albaVME * vmeVolume, bool show)
 		m_Slicer[i]->SetUpdateVTKPropertiesFromMaterial(false);
 		m_Slicer[i]->GetMaterial()->m_ColorLut->DeepCopy(albaVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
 		m_Slicer[i]->Update();
+
 		m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_Slicer[i], show);
+		albaPipeSurfaceTextured *pipeSlice = albaPipeSurfaceTextured::SafeDownCast(m_ChildViewList[PERSPECTIVE_VIEW]->GetNodePipe(m_Slicer[i]));
+		if(pipeSlice)
+			pipeSlice->SetActorPicking(false);
+
 		m_ChildViewList[AsixToView(i)]->VmeShow(m_Slicer[i], show);
+		pipeSlice = albaPipeSurfaceTextured::SafeDownCast(m_ChildViewList[AsixToView(i)]->GetNodePipe(m_Slicer[i]));
+		if (pipeSlice)
+			pipeSlice->SetActorPicking(false);
+
 		BuildCameraConeVME(i);
 		m_CameraToSlicer[i] = new albaAttachCamera(m_Gui, ((albaViewVTK*)m_ChildViewList[AsixToView(i)])->m_Rwi, this);
 		m_CameraToSlicer[i]->SetStartingMatrix(m_Slicer[i]->GetOutput()->GetAbsMatrix());
