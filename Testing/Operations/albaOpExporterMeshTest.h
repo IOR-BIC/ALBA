@@ -26,13 +26,19 @@ class albaOpExporterMeshTest : public albaTest
   CPPUNIT_TEST_SUITE( albaOpExporterMeshTest );
   CPPUNIT_TEST( TestConstructor );
   CPPUNIT_TEST( TestExporterMesh );
-  CPPUNIT_TEST_SUITE_END();
+	CPPUNIT_TEST(TestBackCalculation);
+	CPPUNIT_TEST(TestBackCalculationSetValues);
+	CPPUNIT_TEST(TestBackCalculationTripleInterval);
+	CPPUNIT_TEST_SUITE_END();
 
   protected:
     
   void TestConstructor();
   void TestExporterMesh();
-	  
+	void TestBackCalculation();
+	void TestBackCalculationSetValues();
+	void TestBackCalculationTripleInterval();
+
 };
 
 #endif
