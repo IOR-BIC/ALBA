@@ -115,6 +115,13 @@ public:
 	/** Sets EnableBackCalculation */
 	void SetEnableBackCalculation(int enableBackCalculation) { m_EnableBackCalculation = enableBackCalculation; }
 
+
+	/** Returns Configuration */
+	BonematConfiguration GetConfiguration() const { return m_Configuration; }
+
+	/** Sets Configuration */
+	void SetConfiguration(BonematConfiguration configuration) { m_Configuration = configuration; }
+
 protected:
 
 	virtual void OnOK() = 0;
