@@ -192,6 +192,240 @@ void albaOpExporterMeshTest::TestExporterMesh()
   delete dummyVme;
 }
 
+//----------------------------------------------------------------------------
+void albaOpExporterMeshTest::TestBackCalculation()
+{
+	// Generate output files
+	albaString dirPrefix = ALBA_DATA_ROOT;
+	dirPrefix << "/FEM/pipemesh/";
+
+	albaString vtkFileName = dirPrefix;
+	vtkFileName << "hex8.vtk";
+
+	albaString outPrefix = GET_TEST_DATA_DIR();
+
+	albaString fileName = outPrefix;
+	fileName << "/testMeshExporter.lis";
+
+	albaString nodesFileName = outPrefix;
+	nodesFileName << "/testMeshExporter_NODES.lis";
+
+	albaString elementsFileName = outPrefix;
+	elementsFileName << "/testMeshExporter_ELEMENTS.lis";
+
+	albaString materialsFileName = outPrefix;
+	materialsFileName << "/testMeshExporter_MATERIALS.lis";
+
+	// Import a hex8 VTK file which will be used for testing the Operation
+	albaOpImporterVTK* importerVTK = new albaOpImporterVTK();
+	importerVTK->TestModeOn();
+
+	// Use a dummy vme as input
+	DummyVme *dummyVme = new DummyVme();
+	importerVTK->SetInput(dummyVme);
+	importerVTK->SetFileName(vtkFileName.GetCStr());
+	importerVTK->ImportVTK();
+
+	albaVMEMesh *vmeMesh = albaVMEMesh::SafeDownCast(importerVTK->GetOutput());
+	vmeMesh->Update();
+	((vtkUnstructuredGrid *)(vmeMesh->GetOutput()->GetVTKData()))->UpdateData();
+
+
+	// Call the exporter
+	albaOpExporterMesh *meshExporter = new albaOpExporterMesh("mesh exporter");
+	meshExporter->TestModeOn();
+
+	meshExporter->SetFileName(fileName.GetCStr());
+	meshExporter->SetNodesFileName(nodesFileName.GetCStr());
+	meshExporter->SetElementsFileName(elementsFileName.GetCStr());
+	meshExporter->SetMaterialsFileName(materialsFileName.GetCStr());
+	meshExporter->SetEnableBackCalculation(true);
+	meshExporter->SetInput(vmeMesh);
+	meshExporter->Write();
+
+
+	// Test MATERIAL file
+	wxString line;
+	wxString file_m;
+	file_m.append(materialsFileName.GetCStr());
+	wxFileInputStream inputFile_m(file_m);
+	wxTextInputStream text_m(inputFile_m);
+
+	line = text_m.ReadLine();
+	albaString header = line;
+	CPPUNIT_ASSERT(header.Compare("MAT_N\tEx\tNUxy\tDens") == 0);
+
+	line = text_m.ReadLine();
+	albaString mat = line;
+	CPPUNIT_ASSERT(mat.Compare("1\t200000\t0.33\t200000") == 0);
+
+	albaDEL(meshExporter);
+	albaDEL(importerVTK);
+	delete dummyVme;
+}
+
+//----------------------------------------------------------------------------
+void albaOpExporterMeshTest::TestBackCalculationSetValues()
+{
+	// Generate output files
+	albaString dirPrefix = ALBA_DATA_ROOT;
+	dirPrefix << "/FEM/pipemesh/";
+
+	albaString vtkFileName = dirPrefix;
+	vtkFileName << "hex8.vtk";
+
+	albaString outPrefix = GET_TEST_DATA_DIR();
+
+	albaString fileName = outPrefix;
+	fileName << "/testMeshExporter.lis";
+
+	albaString nodesFileName = outPrefix;
+	nodesFileName << "/testMeshExporter_NODES.lis";
+
+	albaString elementsFileName = outPrefix;
+	elementsFileName << "/testMeshExporter_ELEMENTS.lis";
+
+	albaString materialsFileName = outPrefix;
+	materialsFileName << "/testMeshExporter_MATERIALS.lis";
+
+	// Import a hex8 VTK file which will be used for testing the Operation
+	albaOpImporterVTK* importerVTK = new albaOpImporterVTK();
+	importerVTK->TestModeOn();
+
+	// Use a dummy vme as input
+	DummyVme *dummyVme = new DummyVme();
+	importerVTK->SetInput(dummyVme);
+	importerVTK->SetFileName(vtkFileName.GetCStr());
+	importerVTK->ImportVTK();
+
+	albaVMEMesh *vmeMesh = albaVMEMesh::SafeDownCast(importerVTK->GetOutput());
+	vmeMesh->Update();
+	((vtkUnstructuredGrid *)(vmeMesh->GetOutput()->GetVTKData()))->UpdateData();
+
+
+	// Call the exporter
+	albaOpExporterMesh *meshExporter = new albaOpExporterMesh("mesh exporter");
+	meshExporter->TestModeOn();
+
+	meshExporter->SetFileName(fileName.GetCStr());
+	meshExporter->SetNodesFileName(nodesFileName.GetCStr());
+	meshExporter->SetElementsFileName(elementsFileName.GetCStr());
+	meshExporter->SetMaterialsFileName(materialsFileName.GetCStr());
+	meshExporter->SetEnableBackCalculation(true);
+	
+	//Change configuration values 
+	BonematConfiguration conf = meshExporter->GetConfiguration();
+	conf.a_OneInterval++;
+	conf.b_OneInterval++;
+	conf.c_OneInterval++;
+	meshExporter->SetConfiguration(conf);
+
+	meshExporter->SetInput(vmeMesh);
+	meshExporter->Write();
+
+
+	// Test MATERIAL file
+	wxString line;
+	wxString file_m;
+	file_m.append(materialsFileName.GetCStr());
+	wxFileInputStream inputFile_m(file_m);
+	wxTextInputStream text_m(inputFile_m);
+
+	line = text_m.ReadLine();
+	albaString header = line;
+	CPPUNIT_ASSERT(header.Compare("MAT_N\tEx\tNUxy\tDens") == 0);
+
+	line = text_m.ReadLine();
+	albaString mat = line;
+	CPPUNIT_ASSERT(mat.Compare("1\t200000\t0.33\t316.227") == 0);
+
+	albaDEL(meshExporter);
+	albaDEL(importerVTK);
+	delete dummyVme;
+}
+
+//----------------------------------------------------------------------------
+void albaOpExporterMeshTest::TestBackCalculationTripleInterval()
+{
+
+	// Generate output files
+	albaString dirPrefix = ALBA_DATA_ROOT;
+	dirPrefix << "/FEM/pipemesh/";
+
+	albaString vtkFileName = dirPrefix;
+	vtkFileName << "hex8.vtk";
+
+	albaString outPrefix = GET_TEST_DATA_DIR();
+
+	albaString fileName = outPrefix;
+	fileName << "/testMeshExporter.lis";
+
+	albaString nodesFileName = outPrefix;
+	nodesFileName << "/testMeshExporter_NODES.lis";
+
+	albaString elementsFileName = outPrefix;
+	elementsFileName << "/testMeshExporter_ELEMENTS.lis";
+
+	albaString materialsFileName = outPrefix;
+	materialsFileName << "/testMeshExporter_MATERIALS.lis";
+
+	// Import a hex8 VTK file which will be used for testing the Operation
+	albaOpImporterVTK* importerVTK = new albaOpImporterVTK();
+	importerVTK->TestModeOn();
+
+	// Use a dummy vme as input
+	DummyVme *dummyVme = new DummyVme();
+	importerVTK->SetInput(dummyVme);
+	importerVTK->SetFileName(vtkFileName.GetCStr());
+	importerVTK->ImportVTK();
+
+	albaVMEMesh *vmeMesh = albaVMEMesh::SafeDownCast(importerVTK->GetOutput());
+	vmeMesh->Update();
+	((vtkUnstructuredGrid *)(vmeMesh->GetOutput()->GetVTKData()))->UpdateData();
+
+
+	// Call the exporter
+	albaOpExporterMesh *meshExporter = new albaOpExporterMesh("mesh exporter");
+	meshExporter->TestModeOn();
+
+	meshExporter->SetFileName(fileName.GetCStr());
+	meshExporter->SetNodesFileName(nodesFileName.GetCStr());
+	meshExporter->SetElementsFileName(elementsFileName.GetCStr());
+	meshExporter->SetMaterialsFileName(materialsFileName.GetCStr());
+	meshExporter->SetEnableBackCalculation(true);
+
+	//Change configuration values 
+	BonematConfiguration conf = meshExporter->GetConfiguration();
+	conf.densityIntervalsNumber = THREE_INTERVALS;
+	conf.a_RhoBiggerThanRho2 = 1;
+	conf.b_RhoBiggerThanRho2 = 3;
+	conf.c_RhoBiggerThanRho2 = 4;
+	meshExporter->SetConfiguration(conf);
+
+	meshExporter->SetInput(vmeMesh);
+	meshExporter->Write();
+
+
+	// Test MATERIAL file
+	wxString line;
+	wxString file_m;
+	file_m.append(materialsFileName.GetCStr());
+	wxFileInputStream inputFile_m(file_m);
+	wxTextInputStream text_m(inputFile_m);
+
+	line = text_m.ReadLine();
+	albaString header = line;
+	CPPUNIT_ASSERT(header.Compare("MAT_N\tEx\tNUxy\tDens") == 0);
+
+	line = text_m.ReadLine();
+	albaString mat = line;
+	CPPUNIT_ASSERT(mat.Compare("1\t200000\t0.33\t16.0685") == 0);
+
+	albaDEL(meshExporter);
+	albaDEL(importerVTK);
+	delete dummyVme;
+}
+
 void albaOpExporterMeshTest::TestConstructor()
 {
 
