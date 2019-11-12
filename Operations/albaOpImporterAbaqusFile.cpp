@@ -162,6 +162,7 @@ int albaOpImporterAbaqusFile::Import()
 
   m_LastMatId = 1;
   m_MatIDMap.clear();
+	m_Parts.clear();
 
   albaLogMessage( _T("Current working directory is: '%s' "), wxGetCwd().c_str() );
 

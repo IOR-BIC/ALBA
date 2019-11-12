@@ -52,6 +52,7 @@
 #include "albaOpEditMetadataTest.h"
 #include "albaOpEditNormalsTest.h"
 #include "albaOpEqualizeHistogramTest.h"
+#include "albaOpExporterAbaqusFileTest.h"
 #include "albaOpExporterAnalogWSTest.h"
 #include "albaOpExporterAnsysCDBFileTest.h"
 #include "albaOpExporterAnsysInputFileTest.h" 
@@ -75,6 +76,7 @@
 #include "albaOpFlipNormalsTest.h"
 #include "albaOpFreezeVMETest.h"
 #include "albaOpGarbageCollectMSFDirTest.h"
+#include "albaOpImporterAbaqusFileTest.h"
 #include "albaOpImporterASCIITest.h"
 #include "albaOpImporterAnalogWSTest.h"
 #include "albaOpImporterAnsysCDBFileTest.h"
@@ -316,6 +318,8 @@ int	main( int argc, char* argv[] )
  	runner.addTest(albaOpImporterAnsysInputFileTest::suite());
  	runner.addTest(albaOpExporterAnsysCDBFileTest::suite()); 
  	runner.addTest(albaOpExporterAnsysInputFileTest::suite()); 
+	runner.addTest(albaOpImporterAbaqusFileTest::suite());
+	runner.addTest(albaOpExporterAbaqusFileTest::suite());
 
 	runner.run( controller );
 
