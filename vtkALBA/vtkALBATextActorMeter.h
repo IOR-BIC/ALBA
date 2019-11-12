@@ -1,35 +1,17 @@
 /*=========================================================================
-
- Program: ALBA (Agile Library for Biomedical Applications)
- Module: vtkALBATextActorMeter
- Authors: Daniele Giunchi
- 
- Copyright (c) BIC
- All rights reserved. See Copyright.txt or
-
-
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*//*=========================================================================
-
-  Program:   Multimod Fundation Library
-  Module:    $RCSfile: vtkALBATextActorMeter.h,v $
-  Language:  C++
-  Date:      $Date: 2009-06-08 14:54:55 $
-  Version:   $Revision: 1.1.2.2 $
-  Authors:   Daniele Giunchi
-  Project:   MultiMod Project (www.ior.it/multimod)
-
+Program:   ALBA
+Module:    vtkALBATextActorMeter.h
+Language:  C++
+Date:      $Date: 2009-05-19 14:29:53 $
+Version:   $Revision: 1.1 $
+Authors:   Daniele Giunchi
 ==========================================================================
-  Copyright (c) 2002/2003 
-  CINECA - Interuniversity Consortium (www.cineca.it)
-  v. Magnanelli 6/3
-  40033 Casalecchio di Reno (BO)
-  Italy
-  ph. +39-051-6171411 (90 lines) - Fax +39-051-6132198
-========================================================================= */
+Copyright (c) BIC-IOR 2019 (https://github.com/IOR-BIC)
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See the above copyright notice for more information.
+=========================================================================*/
 
 #ifndef __vtkALBATextActorMeter_h
 #define __vtkALBATextActorMeter_h
@@ -56,7 +38,6 @@ class vtkALBATextActorMeter:
 */
 //-----------------------------------------------------------------------------
 class ALBA_EXPORT vtkALBATextActorMeter : public vtkActor2D
-//-----------------------------------------------------------------------------
 {
  public:
   /** RTTI macro. */
@@ -85,6 +66,11 @@ class ALBA_EXPORT vtkALBATextActorMeter : public vtkActor2D
   /** Modify text actor color. */
   void SetColor(double r,double g,double b);
 	
+	/** Modify text actor color. */
+	void SetOpacity(double opacity);
+
+	vtkTextActor *GetTextActor() { return TextActor; }
+
 protected:
   /** constructor. */
 	vtkALBATextActorMeter();
@@ -99,8 +85,7 @@ protected:
   //variables
   vtkTextActor *TextActor;
   double TextPosition[4];
-
-	
+		
 private:
   /** Hide the two parameter Render() method from the user and the compiler. */
   virtual void Render(vtkRenderer *, vtkMapper *) {};
@@ -109,4 +94,4 @@ private:
   /** Assign Operator Not implemented. */
   void operator=(const vtkALBATextActorMeter&);
 };
-#endif
+#endif // __vtkALBATextActorMeter_h
