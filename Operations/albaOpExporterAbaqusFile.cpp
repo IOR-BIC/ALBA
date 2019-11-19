@@ -1,10 +1,10 @@
 /*=========================================================================
-  Program:   Bonemat
-  Module:    albaOpExporterAbaqusFile.cpp
-  Language:  C++
-  Date:      $Date: 2010-12-03 14:58:16 $
-  Version:   $Revision: 1.1.1.1.2.3 $
-  Authors:   Nicola Vanella, Gianluigi Crimi
+Program:   ALBA
+Module:    albaOpExporterAbaqusFile.cpp
+Language:  C++
+Date:      $Date: 2009-05-19 14:29:53 $
+Version:   $Revision: 1.1 $
+Authors:   Nicola Vanella
 ==========================================================================
 Copyright (c) BIC-IOR 2019 (https://github.com/IOR-BIC)
 

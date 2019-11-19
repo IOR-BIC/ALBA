@@ -1,17 +1,16 @@
 /*=========================================================================
+Program:   ALBA
+Module:    vtkALBATextActorMeter.cxx
+Language:  C++
+Date:      $Date: 2009-05-19 14:29:53 $
+Version:   $Revision: 1.1 $
+Authors:   Daniele Giunchi
+==========================================================================
+Copyright (c) BIC-IOR 2019 (https://github.com/IOR-BIC)
 
- Program: ALBA (Agile Library for Biomedical Applications)
- Module: vtkALBATextActorMeter
- Authors: Daniele Giunchi
- 
- Copyright (c) BIC
- All rights reserved. See Copyright.txt or
-
-
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notice for more information.
-
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
 #include "vtkALBATextActorMeter.h"
@@ -28,32 +27,26 @@
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 
-
-
 vtkCxxRevisionMacro(vtkALBATextActorMeter, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkALBATextActorMeter);
 //------------------------------------------------------------------------------
 vtkALBATextActorMeter::vtkALBATextActorMeter()
-//------------------------------------------------------------------------------
 {
   TextActor = NULL;
   MeterCreate();
 }
 //------------------------------------------------------------------------------
 vtkALBATextActorMeter::~vtkALBATextActorMeter()
-//------------------------------------------------------------------------------
 {
   if(TextActor) TextActor->Delete();
 }
 //------------------------------------------------------------------------------
 void vtkALBATextActorMeter::PrintSelf(ostream& os, vtkIndent indent)
-//------------------------------------------------------------------------------
 {
   this->Superclass::PrintSelf(os,indent);
 }
 //------------------------------------------------------------------------------
 int vtkALBATextActorMeter::RenderOverlay(vtkViewport *viewport)
-//------------------------------------------------------------------------------
 {
   vtkRenderer *ren = static_cast<vtkRenderer *>(viewport);
 
@@ -64,12 +57,10 @@ int vtkALBATextActorMeter::RenderOverlay(vtkViewport *viewport)
   this->Modified();
 
   TextActor->RenderOverlay(viewport);
-  return 1;
-  
+  return 1;  
 }
 //------------------------------------------------------------------------------
 int vtkALBATextActorMeter::RenderOpaqueGeometry(vtkViewport *viewport)
-//------------------------------------------------------------------------------
 {
 	TextActor->RenderOpaqueGeometry(viewport);
 	
@@ -77,18 +68,15 @@ int vtkALBATextActorMeter::RenderOpaqueGeometry(vtkViewport *viewport)
 }
 //------------------------------------------------------------------------------
 void vtkALBATextActorMeter::MeterCreate()
-//------------------------------------------------------------------------------
 {
   if (TextActor == NULL) TextActor = vtkTextActor::New();
   TextActor->SetInput("");
 
   TextActor->SetPosition(-30 ,-30);
   TextActor->Modified();
-
 }
 //----------------------------------------------------------------------------
 void vtkALBATextActorMeter::MeterUpdate(vtkRenderer *ren)
-//----------------------------------------------------------------------------
 {
   double dp[3];
   
@@ -97,19 +85,21 @@ void vtkALBATextActorMeter::MeterUpdate(vtkRenderer *ren)
   ren->GetDisplayPoint(dp);
   
   TextActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
-  TextActor->SetPosition(dp[0] ,dp[1]);
-  
+  TextActor->SetPosition(dp[0] ,dp[1]);  
 }
 
 //----------------------------------------------------------------------------
 double *vtkALBATextActorMeter::GetTextPosition()
-//----------------------------------------------------------------------------
 {
 	return TextPosition;
 }
 //----------------------------------------------------------------------------
 void vtkALBATextActorMeter::SetColor(double r,double g,double b)
-//----------------------------------------------------------------------------
 {
   TextActor->GetTextProperty()->SetColor(r,g,b);
+}
+//----------------------------------------------------------------------------
+void vtkALBATextActorMeter::SetOpacity(double opacity)
+{
+	TextActor->GetTextProperty()->SetOpacity(opacity);
 }
