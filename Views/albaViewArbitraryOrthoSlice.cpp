@@ -672,6 +672,8 @@ void albaViewArbitraryOrthoSlice::OnReset()
 	}
 
 	RestoreCameraParametersForAllSubviews();
+
+	CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::OnLUTRangeModified()
