@@ -44,6 +44,8 @@ void albaOpExporterAbaqusFileTest::TestAbaqusFile_FileExist()
 void albaOpExporterAbaqusFileTest::TestAbaqusFile_ReadData()
 {
   CompareAbaqusFilesData("mesh3.inp");
+
+	CompareAbaqusFilesData("mesh_10_elementi_generate.inp");
 }
 
 //----------------------------------------------------------------------------------------
