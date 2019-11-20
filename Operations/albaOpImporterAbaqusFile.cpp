@@ -342,6 +342,7 @@ int albaOpImporterAbaqusFile::ParseAbaqusFile(albaString fileName)
     if(strncmp (m_Line,"*MATERIAL,",10) == 0)
     {
       ReadMaterials(materialsFile);
+			readnewline = false;
     }
 
     if(strncmp (m_Line,"*END PART",9) == 0)
@@ -711,7 +712,10 @@ int albaOpImporterAbaqusFile::ReadSolid()
   {
     std::string cmpName = (*m_Elsets)[i].name;
 
-    int equalRes = cmpName.substr(0,cmpName.size()-1).compare(elsetName.c_str());
+		if (cmpName.size() > 0 && cmpName[cmpName.size() - 1] == '\n')
+			cmpName = cmpName.substr(0, cmpName.size() - 1);
+			
+    int equalRes = cmpName.compare(elsetName.c_str());
 
     if(equalRes==0)
     {
@@ -725,33 +729,58 @@ int albaOpImporterAbaqusFile::ReadSolid()
 //----------------------------------------------------------------------------
 int albaOpImporterAbaqusFile::ReadMaterials(FILE *outFile)
 {
-  char matEx[254], matNuxy[254];
+	char matEx[254], matNuxy[254], matDens[254];
 
-  // *Material, name=Mat_1
-  std::string line = m_Line;
-  std::size_t pos = line.find("NAME=");
-  std::string matName = line.substr(pos+5).c_str();
+	// *Material, name=Mat_1
+	std::string line = m_Line;
+	std::size_t pos = line.find("NAME=");
+	std::string matName = line.substr(pos + 5).c_str();
 
-  //*Elastic
-  GetLine(m_FilePointer, m_Line);
+	while (GetLine(m_FilePointer, m_Line) != 0)
+	{
+		sprintf(matNuxy, "0");
+		sprintf(matDens, "0");
 
-  //3.296537922150794, 0.35
-  GetLine(m_FilePointer, m_Line);
+		// *Density
+		if (strncmp(m_Line, "*DENSITY", 8) == 0)
+		{
+			// 1e-12,
+			GetLine(m_FilePointer, m_Line);
+			ReplaceInString(m_Line, ',', ' ');
 
-  ReplaceInString(m_Line, ',', ' ');
+			int nReaded = sscanf(m_Line, "%s", matDens);
+			if (nReaded == 0) sprintf(matDens, "0");
 
-  int nReaded = sscanf(m_Line, "%s %s", matEx, matNuxy);
+			GetLine(m_FilePointer, m_Line); // Next Line
+		}
 
-  if(m_MatIDMap.find(matName) == m_MatIDMap.end())
-  {
-    // Write Material file
-    fprintf(outFile,"%d %s %s 0\n", m_LastMatId, matEx, matNuxy);
-    
-    m_MatIDMap[matName] = m_LastMatId;
-    m_LastMatId++;
-  }
+		// *Elastic
+		if (strncmp(m_Line, "*ELASTIC", 8) == 0)
+		{
+			// 3.296537922150794, 0.35
+			GetLine(m_FilePointer, m_Line);
+			ReplaceInString(m_Line, ',', ' ');
 
-  return ALBA_OK; 
+			int nReaded = sscanf(m_Line, "%s %s", matEx, matNuxy);
+			if (nReaded == 1) sprintf(matNuxy, "0");
+
+			GetLine(m_FilePointer, m_Line); // Next Line
+		}
+		
+		if (m_MatIDMap.find(matName) == m_MatIDMap.end())
+		{
+			// Write Material file
+			fprintf(outFile, "%d %s %s %s\n", m_LastMatId, matEx, matNuxy, matDens);
+
+			m_MatIDMap[matName] = m_LastMatId;
+			m_LastMatId++;
+		}
+
+		if (strncmp(m_Line, "*MATERIAL,", 10) == 0)
+			break;
+	}
+
+	return ALBA_OK;
 }
 //----------------------------------------------------------------------------
 int albaOpImporterAbaqusFile::ReadInstance()
