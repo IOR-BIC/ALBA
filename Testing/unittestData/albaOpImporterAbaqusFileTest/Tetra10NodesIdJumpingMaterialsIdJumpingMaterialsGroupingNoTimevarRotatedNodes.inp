@@ -122,12 +122,18 @@
 *Solid Section, elset=Set_4, material=Mat_1
 **
 *Material, name=Mat_1
+*Density
+ 1e-12,
 *Elastic
 3644.16992200, 0.30000000
 *Material, name=Mat_2
+*Density
+ 1.,
 *Elastic
 3191.51001000, 0.30000000
 *Material, name=Mat_3
+*Density
+ 2.,
 *Elastic
 2289.17993200, 0.30000000
 *Material, name=Mat_4
