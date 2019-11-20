@@ -639,7 +639,7 @@ int albaOpImporterAbaqusFile::ReadElset()
 	char *linePointer;
 	int elemId;
 
-  //*Elset, elset=Set_Part1_1
+  //*Elset, elset=Set_Part1_1, ...
   std::string line = m_Line;
   std::size_t pos = line.find("ELSET=");
   std::string elsetName = line.substr(pos+6, line.size()-1);
@@ -647,27 +647,48 @@ int albaOpImporterAbaqusFile::ReadElset()
    if((pos = elsetName.find(",")) != std::string::npos)
      elsetName = elsetName.substr(0, pos);
 
-  // Read element list
-  // 1, 2, 3, 4,  ...
-  while (GetLine(m_FilePointer, m_Line) != 0)
-  {
-    linePointer=m_Line;
+	 //*Elset, elset=Set_Part1_1, ..., generate
+	 if (line.find("GENERATE") != std::string::npos)
+	 {
+		 int start=0, end=0, inc=0;
+		 // Start, End, Incr.
+		 //    1,  651,    1
+		 GetLine(m_FilePointer, m_Line);
 
-    nReaded = sscanf(linePointer, "%d", &elemId);
-    if(nReaded)
-    {
-			(*m_ElementsToElset)[elemId]=currentElsetIndex;
-    }
-    else
-      break;
-      
-    while (nReaded && (linePointer = strchr(linePointer,',')))
-    {
-      linePointer++;
-      nReaded = sscanf(linePointer, "%d", &elemId);
-      (*m_ElementsToElset)[elemId]=currentElsetIndex;      
-    }
-  }
+		///RemoveInString(m_Line, ' ');		 
+		//ReplaceInString(m_Line, ',', ' ');
+
+		 int nReaded = sscanf(m_Line, "%d,%d,%d", &start, &end, &inc);
+
+		 for (int i = start; i <= end; i += inc)
+		 {
+			 (*m_ElementsToElset)[i] = currentElsetIndex;
+		 }
+	 }
+	 else
+	 {
+		 // Read element list
+		 // 1, 2, 3, 4,  ...
+		 while (GetLine(m_FilePointer, m_Line) != 0)
+		 {
+			 linePointer = m_Line;
+
+			 nReaded = sscanf(linePointer, "%d", &elemId);
+			 if (nReaded)
+			 {
+				 (*m_ElementsToElset)[elemId] = currentElsetIndex;
+			 }
+			 else
+				 break;
+
+			 while (nReaded && (linePointer = strchr(linePointer, ',')))
+			 {
+				 linePointer++;
+				 nReaded = sscanf(linePointer, "%d", &elemId);
+				 (*m_ElementsToElset)[elemId] = currentElsetIndex;
+			 }
+		 }
+	 }
 
   //*Solid Section, elset=Set_Part1_1, material=Mat_1 
 
@@ -738,7 +759,9 @@ int albaOpImporterAbaqusFile::ReadMaterials(FILE *outFile)
 
 	while (GetLine(m_FilePointer, m_Line) != 0)
 	{
-		sprintf(matNuxy, "0");
+		// Default Values
+		sprintf(matEx, "0");
+		sprintf(matNuxy, "0.3");
 		sprintf(matDens, "0");
 
 		// *Density
@@ -757,12 +780,20 @@ int albaOpImporterAbaqusFile::ReadMaterials(FILE *outFile)
 		// *Elastic
 		if (strncmp(m_Line, "*ELASTIC", 8) == 0)
 		{
-			// 3.296537922150794, 0.35
-			GetLine(m_FilePointer, m_Line);
-			ReplaceInString(m_Line, ',', ' ');
+			line = m_Line;
+			if(line.find("TYPE=") != std::string::npos)
+			{
+				// Not Supported
+			}
+			else
+			{
+				// 3.296537922150794, 0.35
+				GetLine(m_FilePointer, m_Line);
+				ReplaceInString(m_Line, ',', ' ');
 
-			int nReaded = sscanf(m_Line, "%s %s", matEx, matNuxy);
-			if (nReaded == 1) sprintf(matNuxy, "0");
+				int nReaded = sscanf(m_Line, "%s %s", matEx, matNuxy);
+				if (nReaded == 1) sprintf(matNuxy, "0");
+			}
 
 			GetLine(m_FilePointer, m_Line); // Next Line
 		}
