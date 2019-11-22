@@ -186,6 +186,12 @@ bool AlbaMaster::OnInit()
 	albaADDPIC(FRAME_ICON16x16);
 #include "Examples/AlbaMaster/FRAME_ICON32x32.xpm"
 	albaADDPIC(FRAME_ICON32x32);
+#include "Examples/AlbaMaster/FRAME_ICON64x64.xpm"
+	albaADDPIC(FRAME_ICON64x64);
+#include "Examples/AlbaMaster/FRAME_ICON128x128.xpm"
+	albaADDPIC(FRAME_ICON128x128);
+#include "Examples/AlbaMaster/FRAME_ICON256x256.xpm"
+	albaADDPIC(FRAME_ICON256x256);
 #include "Examples/AlbaMaster/MDICHILD_ICON.xpm"
 	albaADDPIC(MDICHILD_ICON);
 
