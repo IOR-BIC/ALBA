@@ -148,6 +148,9 @@ albaGUIMDIFrame::albaGUIMDIFrame(const wxString& title, const wxPoint& pos, cons
   wxIconBundle ib;
   ib.AddIcon( albaPictureFactory::GetPictureFactory()->GetIcon("FRAME_ICON16x16") );
   ib.AddIcon( albaPictureFactory::GetPictureFactory()->GetIcon("FRAME_ICON32x32") );
+	ib.AddIcon(albaPictureFactory::GetPictureFactory()->GetIcon("FRAME_ICON64x64"));
+	ib.AddIcon(albaPictureFactory::GetPictureFactory()->GetIcon("FRAME_ICON128x128"));
+	ib.AddIcon(albaPictureFactory::GetPictureFactory()->GetIcon("FRAME_ICON256x256"));
   SetIcons(ib);
 
 #ifdef ALBA_USE_VTK
