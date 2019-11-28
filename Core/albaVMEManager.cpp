@@ -70,7 +70,9 @@ albaVMEManager::albaVMEManager()
   m_ZipHandler = NULL;
   m_FileSystem = NULL;
 
-  m_TestMode = false;
+	m_IgnoreAppStamp = false;
+  
+	m_TestMode = false;
 }
 //----------------------------------------------------------------------------
 albaVMEManager::~albaVMEManager()
@@ -359,7 +361,7 @@ int albaVMEManager::MSFOpen(albaString filename)
     }
    
   }
-	if(app_stamp.Equals("INVALID") || !stamp_found) 
+	if((app_stamp.Equals("INVALID") || !stamp_found) && !m_IgnoreAppStamp) 
 	{
 		int answer = wxMessageBox("This file was not created under this application\nYou can lose data.\n\nAre you sure to open this file?","Confirm", wxYES_NO|wxICON_QUESTION, albaGetFrame());
 		if(answer != wxYES)

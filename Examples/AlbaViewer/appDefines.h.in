@@ -1,0 +1,15 @@
+#ifndef __appDefines_h
+#define __appDefines_h
+
+#include "albaDefines.h"
+
+//--------------------------------------------------------------------------
+// Data root used to reach data for testing
+//--------------------------------------------------------------------------
+#define APP_DATA_ROOT "@ALBAVIEWER_DATA_ROOT@"
+#define APP_SOURCE_DIR "@ALBAVIEWER_SOURCE_DIR@"
+
+//BES: added for VPHOP_WP10 support
+#define VPHOP_WP10
+#endif // __appDefines_h
+
