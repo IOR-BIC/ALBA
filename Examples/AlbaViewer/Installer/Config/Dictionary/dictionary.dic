@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<Dictionary Name="Dictionary" Version="1.0">
+
+  <Group Name="New_Group1">
+    <Element>New_Element_1</Element>
+    <Element>New_Element_2</Element>
+    <Element>New_Element_3</Element>
+    <Element>New_Element_4</Element>
+    <Element>New_Element_5</Element>
+    <Element>New_Element_6</Element>
+  </Group>
+
+  <Group Name="New_Group2">
+    <Element>New_Element_1</Element>
+    <Element>New_Element_2</Element>
+    <Element>New_Element_3</Element>
+  </Group>
+
+  <Group Name="New_Group3"/>
+
+  <Group Name="New_Group_4">
+    <Element>New_Element_1</Element>
+  </Group>
+
+</Dictionary>

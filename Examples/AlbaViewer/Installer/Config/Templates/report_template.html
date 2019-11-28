@@ -1,0 +1,261 @@
+<HTML>
+    <head>
+	    <style type="text/css">
+			body {
+			background-image: url('[ALBAVariable ImgDir]\bg_rt3s.png');
+			background-repeat:no-repeat;
+			background-attachment:fixed;
+			background-position: top right; 
+			font: ms"MS Sans Serif", sans-serif;	
+			max-width:98%;
+			}
+			#head {
+			width: 100%;
+			margin: 5px;
+			padding: 5px;
+			}
+			#logo{
+			margin: 5px;
+			padding: 5px;
+			border: none;
+			}
+			h1 {
+			color: #990000;
+			text-align: center;
+			border: white thin solid;
+			background-color: #ccc;
+			width: 100%;
+			margin: 5px;
+			padding: 5px;
+			}
+			h2 {
+			color: white;
+			text-align: center;
+			text-shadow: 0 0 24px #C00, 0 0 4px #C00, 1px 1px 2px #000;
+			border: white thin solid;
+			background-color: #990000;
+			width: 100%;
+			margin: 5px;
+			padding: 5px;
+			}
+			h3 {
+			color: #990000;
+			text-align: center;
+			border: white thin solid;
+			background-color: #ccc;
+			width: 60%;
+			margin: 5px;
+			padding: 5px;
+			}
+            h4 {
+			color: black;
+			text-align: center;
+			border: white thin solid;
+			background-color: #ccc;
+			width: 60%;
+			margin: 5px;
+			padding: 5px;
+			}
+			img {
+			margin: 5px;
+			padding: 10px;
+			border: thin solid #ccc;
+			}
+			#footer {
+			color: black;
+			text-align: center;
+			border: white thin solid;
+			background-color: #ccc;
+			width: 100%;
+			margin: 5px;
+			padding: 5px;
+			font-size: small;
+			}			
+		</style>
+		<meta http-equiv=Content-Language content=it>
+		<meta http-equiv=Content-Type content=text/html; charset=windows-1252>
+		<title>AlbaViewer(c) Surgical Planning Report</title>
+	</head>
+	<body>
+		<!-- <div id=head><img src="[ALBAVariable ImgDir]/logo.png" height=93px id="logo"/></div>-->
+		<h1>AlbaViewer(c) Surgical Planning Report</h1>
+		<br/>
+		<table border="0px" align="center" cellspacing="3px" cellpadding="2px" width="70%">
+			<tr valign="top">
+				<tr>		
+					<!-- tabella annidata -->
+					<table border="0px" align="center" cellspacing="0px" cellpadding="0px" width="90%">
+
+                    <!-- PLANNING DATA -->
+					<tr>
+						<td align="center" colspan="3"><h2>PLANNING DATA</h2></td>
+					</tr>
+					<tr>
+						<td align="right" width="50%" colspan="2"><b>Planning date:&nbsp</b></td>
+						<td>[ALBAVariable PlanningDate]</td>
+					</tr>
+					<tr>
+						<td align="right" width="50%" colspan="2"><b>Planning performed by:&nbsp</b></td>
+						<td>Dr. [ALBAVariable PerformedBy]</td>
+					</tr>
+                    [ALBAIf HasPatientName]
+					<tr>
+						<td align="right" width="50%" colspan="2"><b>Patient name:&nbsp</b></td>
+						<td>[ALBAVariable PatientName]</td>
+					</tr>
+                    [/ALBAIf HasPatientName]
+                    [ALBAIf HasPatientSex]
+					<tr>
+						<td align="right" width="50%" colspan="2"><b>Patient Sex:&nbsp</b></td>
+						<td>[ALBAVariable PatientSex]</td>
+					</tr>
+                    [/ALBAIf HasPatientSex]
+                    [ALBAIf HasPatientBirthdate]
+					<tr>
+						<td align="right" width="50%" colspan="2"><b>Patient Birthdate:&nbsp</b></td>
+						<td>[ALBAVariable PatientBirthdate]</td>
+					</tr>
+                    [/ALBAIf HasPatientBirthdate]
+                    [ALBAIf HasLaterality]
+					<tr>
+						<td align="right" width="50%" colspan="2"><b>Laterality:&nbsp</b></td>
+						<td>[ALBAVariable Laterality]</td>
+					</tr>
+                    [/ALBAIf HasLaterality]
+                    [ALBAIf HasComments]
+                    <tr>
+						<td align="right" width="50%" colspan="2"><b>Comments:&nbsp</b></td>
+						<td>[ALBAVariable Comments]</td>
+					</tr>
+                    [/ALBAIf HasComments]
+
+                    <!-- IMPLANT DATA -->
+                    [ALBAIf HasImplants]
+					    <tr>
+						    <td align="center" colspan="3"><h2>IMPLANT DATA</h2></td>
+					    </tr>
+                        [ALBALoop ImplantLoop]
+                            <tr >
+						        <td align="center" colspan="3"  ><h3>[ALBAVariable ImplantType]</h3></td>
+					        </tr>
+					        <tr>
+						        <td align="right" width="50%" colspan="2"><b>Brand:&nbsp</b></td>
+						        <td>[ALBAVariable ImplantBrand]</td>
+					        </tr>
+                            <tr>
+						        <td align="right" width="50%" colspan="2"><b>Model:&nbsp</b></td>
+						        <td>[ALBAVariable ImplantModel]</td>
+					        </tr>
+                            <tr>
+                                <td align="right" width="50%" colspan="2"><b>Components:&nbsp</b></td>
+                            
+                                <td>[ALBALoop ImplantComponentsLoop]
+                                        -[ALBAVariable ImplantComponent] <br /> 
+                                    [/ALBALoop ImplantComponentsLoop]
+                                </td>
+					         </tr>
+                        [/ALBALoop ImplantLoop]
+                    [/ALBAIf HasImplants]
+
+                    <!-- MEASURES -->
+                    [ALBAIf HasMeasures]
+					    <tr>
+					        <td align="center" colspan="3"><h2>MEASURES</h2></td>
+					    </tr>
+                        [ALBALoop MeasuresLoop]
+					        <tr>
+						        <td align="right" width="50%" colspan="2"><b>Measure:&nbsp</b></td>
+						        <td>[ALBAVariable Measure]</td>
+					        </tr>
+                        [/ALBALoop MeasuresLoop]
+                    [/ALBAIf HasMeasures]
+
+                    <!-- MUSCULOSKELETAL PARAMETERS -->
+                    [ALBAIf HasMusculoskeletalParameters]
+					    <tr>
+					        <td align="center" colspan="3"><h2>MUSCULOSKELETAL PARAMETERS</h2></td>
+					    </tr>
+
+                		<tr>
+						    <td align="center" colspan="3"><b><h4>[ALBAVariable SidePlanning]</h4></b></td>
+					    </tr>
+
+                        <tr >
+						    <td align="center" colspan="3"  ><h3>Dysmetria Measuring</h3></td>
+					    </tr>
+					    <tr>
+						    <td align="right" width="50%" colspan="2"><b>Operated Leg Length PRE-OP:&nbsp</b></td>
+						    <td>[ALBAVariable OperatedLegLengthPRE]</td>
+					    </tr>
+                		<tr>
+						    <td align="right" width="50%" colspan="2"><b>Operated Leg Length POST-OP:&nbsp</b></td>
+						    <td>[ALBAVariable OperatedLegLengthPOST]</td>
+					    </tr>
+                		<tr>
+						    <td align="right" width="50%" colspan="2"><b>Contralateral Leg Length:&nbsp</b></td>
+						    <td>[ALBAVariable ControlateralLegLength]</td>
+					    </tr>
+                		<tr>
+						    <td align="right" width="50%" colspan="2"><b>Operated Leg Length Variation:&nbsp</b></td>
+						    <td>[ALBAVariable OperatedLegVariation]</td>
+					    </tr>
+                		<tr>
+						    <td align="right" width="50%" colspan="2"><b>Leg Length Dysmetria PRE-OP:&nbsp</b></td>
+						    <td>[ALBAVariable LegLengthDysmetriaPRE]</td>
+					    </tr>
+                		<tr>
+						    <td align="right" width="50%" colspan="2"><b>Leg Length Dysmetria POST-OP:&nbsp</b></td>
+						    <td>[ALBAVariable LegLengthDysmetriaPOST]</td>
+					    </tr>
+
+                        <tr >
+						    <td align="center" colspan="3"  ><h3>Abductor Muscles Parameters Estimation</h3></td>
+					    </tr>
+					    <tr>
+						    <td align="right" width="50%" colspan="2"><b>Average Abductors Length PRE-OP:&nbsp</b></td>
+						    <td>[ALBAVariable AVERAGE_METER_LENGTH_PRE]</td>
+					    </tr>
+                		<tr>
+						    <td align="right" width="50%" colspan="2"><b>Average Abductors Length POST-OP:&nbsp</b></td>
+						    <td>[ALBAVariable AVERAGE_METER_LENGTH_POST]</td>
+					    </tr>
+                		<tr>
+						    <td align="right" width="50%" colspan="2"><b>Average Abductors Length Variation (%):&nbsp</b></td>
+						    <td>[ALBAVariable AVERAGE_METER_LENGTH_PERCENT]</td>
+					    </tr>
+                		<tr>
+						    <td align="right" width="50%" colspan="2"><b>Average Abductors Lever Arm PRE-OP:&nbsp</b></td>
+						    <td>[ALBAVariable AVERAGE_ABSOLUTE_LEVER_ARM_PRE]</td>
+					    </tr>
+                		<tr>
+						    <td align="right" width="50%" colspan="2"><b>Average Abductors Lever Arm POST-OP:&nbsp</b></td>
+						    <td>[ALBAVariable AVERAGE_ABSOLUTE_LEVER_ARM_POST]</td>
+					    </tr>
+                		<tr>
+						    <td align="right" width="50%" colspan="2"><b>Average Abductors Lever Arm Variation (%):&nbsp</b></td>
+						    <td>[ALBAVariable AVERAGE_ABSOLUTE_LEVER_ARM_PERCENT]</td>
+					    </tr>
+                    [/ALBAIf HasMusculoskeletalParameters]
+
+                    <!-- IMAGES -->				
+                    [ALBAIf HasImages]
+					    <tr>
+                        <td align="center" colspan="3"><h2>IMAGES</h2></td>
+                        </tr>
+                        [ALBALoop ImagesLoop]
+                        <tr>
+                            <td align="center" colspan="3">                           		
+                                   <img src="[ALBAVariable ImageSrc]"/> 
+                               <!--</a>-->
+                            </td>
+                        </tr>
+                        [/ALBALoop ImagesLoop]
+                    [/ALBAIf HasImages]
+			    </tr>
+			</tr>
+		</table>
+		<!-- <hr>
+		<center><small><i>Real Time Simulation for Safer vascular Stenting - RT3S<br>RT3S- 248801 Integrated project of the 7th Framework Program<br>by <a href="www.scsitaly.com" target="_blank">SCS / B3C</a> </i></small></center>-->
+		<div id="footer"><b>AlbaViewer(c) surgical planning system</b><br>(c)Copyright(c) 2013 SCS s.r.l.<br>All rights reserved</div>
+	<body>
+</HTML>

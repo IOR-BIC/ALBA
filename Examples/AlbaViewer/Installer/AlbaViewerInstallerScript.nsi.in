@@ -1,0 +1,95 @@
+;==========================================================================
+; Program:   AlbaViewer
+; Module:    AlbaViewerInstallerScript.nsi.in
+; Language:  NSIS
+; Date:      $Date: 2019-01-01 12:00:00 $
+; Version:   $Revision: 1.0.0.0 $
+; Authors:   Nicola Vanella
+;==========================================================================
+; Copyright (c) BIC-IOR 2019 (https://github.com/IOR-BIC)
+;
+; This software is distributed WITHOUT ANY WARRANTY; without even
+; the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+; PURPOSE. See the above copyright notice for more information.
+;==========================================================================
+
+!define PRODUCT_NAME "AlbaViewer"
+!define PRODUCT_PUBLISHER "LTM-IOR"
+!define PRODUCT_WEB_SITE "https://github.com/IOR-BIC"
+
+!define PRODUCT_VERSION "@ALBAVIEWER_VERSION@"
+!define PRODUCT_EXE_NAME "${PRODUCT_NAME}.exe"
+;!define PRODUCT_MANUAL_DIR "@MANUAL_HTML_DIR@"
+
+!define PRODUCT_EXECUTABLE_OUTPUT_PATH_WIN "@ALBAVIEWER_EXECUTABLE_OUTPUT_PATH@"
+!define PRODUCT_INSTALLER_DIR_WIN "@ALBAVIEWER_INSTALLER_DIR@"
+
+!include InstallerCommon.nsh
+
+!macro EditLicencePage
+
+	; Change the Defult License Agreement to Look like a Readme Dialog
+	;!define MUI_TEXT_LICENSE_TITLE "HIPOP TITLE" 
+	;!define MUI_TEXT_LICENSE_SUBTITLE "HIPOP SUBTITLE $(^NameDA)."
+	;!define MUI_INNERTEXT_LICENSE_TOP "HIPOP INNERTEXT"
+	;!define MUI_INNERTEXT_LICENSE_BOTTOM "HIPOP INNERTEXT LICENSE BOTTOM"
+	;!define MUI_LICENSEPAGE_TEXT_BOTTOM "HIPOP TEXT BOTTOM"	
+	
+	!define MUI_LICENSEPAGE_CHECKBOX
+!macroend
+
+!insertmacro Init_MUI 
+
+!macro AddExtraFiles
+	;Add here extra files
+	CreateDirectory "$INSTDIR\data"
+	CreateDirectory "$INSTDIR\data\external"
+	CreateDirectory "$INSTDIR\data\msf"
+	
+	CreateDirectory "$INSTDIR\Layout"
+	SetOutPath "$INSTDIR\Layout"
+	File "@ALBAVIEWER_INSTALLER_DIR_WIN@\layout.mly"
+	
+	SetOutPath "$INSTDIR\bin"
+!macroend
+
+!insertmacro CreateInstaller
+
+Section -Post 
+	!insertmacro WriteRegKeys 	
+	
+	${EnumUsersReg} EraseFirstRun temp.key
+	;Add here extra RegKey
+	
+	;Associate *.alb files with AlbaViewer
+	
+	WriteRegStr HKCR ".msf" "" "MSF File"
+	;WriteRegStr HKCR ".alb" "" "AlbaViewer File"
+	;WriteRegStr HKCR "${PRODUCT_NAME}" "" "AlbaViewer File"
+	;WriteRegStr HKCR "${PRODUCT_NAME}\shell" "" "open"
+	WriteRegStr HKCR "AlbaViewer File\DefaultIcon" "" "$INSTDIR\Config\AlbaViewer_File.ico"
+
+  ;WriteRegStr HKCR "AlbaViewer File\shell\open\command" "" '"$INSTDIR\bin\${PRODUCT_EXE_NAME}" "%1"'
+	
+SectionEnd
+
+Function "EraseFirstRun"
+	Pop $0
+	ReadRegStr $0 HKU "$0\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" "AppData"
+	${If} $0 != ""
+	Delete "$0\${PRODUCT_NAME}\FirstRun"  
+	${EndIf}
+	
+FunctionEnd
+
+!macro RemoveExtraFiles
+
+	;Remove AlbaViewer File Association	
+	;DeleteRegKey HKCR "AlbaViewer File"
+	;DeleteRegKey HKCR ".alb"
+	;DeleteRegKey HKCR "${PRODUCT_NAME}"
+	
+!macroend
+
+!insertmacro CreateUninstaller 
+
