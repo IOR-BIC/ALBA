@@ -70,7 +70,9 @@ albaVMEManager::albaVMEManager()
   m_ZipHandler = NULL;
   m_FileSystem = NULL;
 
-  m_TestMode = false;
+	m_IgnoreAppStamp = false;
+  
+	m_TestMode = false;
 }
 //----------------------------------------------------------------------------
 albaVMEManager::~albaVMEManager()
@@ -345,7 +347,7 @@ int albaVMEManager::MSFOpen(albaString filename)
 		tag_appstamp.SetValue(this->m_AppStamp.at(0).GetCStr());
 		root_node->GetTagArray()->SetTag(tag_appstamp); // set appstamp tag of the root
 	}
-	
+
 	albaString app_stamp;
   app_stamp << root_node->GetTagArray()->GetTag("APP_STAMP")->GetValue();
   // First check for compatibility with all stored App stamps
@@ -359,15 +361,13 @@ int albaVMEManager::MSFOpen(albaString filename)
     }
    
   }
-	if(app_stamp.Equals("INVALID") || !stamp_found) 
+	if((app_stamp.Equals("INVALID") || !stamp_found) && !m_IgnoreAppStamp) 
 	{
 		int answer = wxMessageBox("This file was not created under this application\nYou can lose data.\n\nAre you sure to open this file?","Confirm", wxYES_NO|wxICON_QUESTION, albaGetFrame());
 		if(answer != wxYES)
 		{
 			//Application stamp not valid
 			m_Modified = false;
-			m_Storage->Delete();
-			m_Storage = NULL;
     
 			MSFNew();
 			if(!m_TestMode) // Losi 02/16/2010 for test class
@@ -606,7 +606,16 @@ int albaVMEManager::MSFSave()
   wxBusyInfo *wait;
   int ret=ALBA_OK;
 
-  if(m_MSFFile.IsEmpty()) 
+	bool fromDifferentApp = false;
+	if (m_Storage)
+	{
+		albaVMERoot *root_node = m_Storage->GetRoot();
+		albaString app_stamp;
+		app_stamp << root_node->GetTagArray()->GetTag("APP_STAMP")->GetValue();
+		fromDifferentApp = !app_stamp.Equals(m_AppStamp.at(0).GetCStr());
+	}
+
+  if(m_MSFFile.IsEmpty() || fromDifferentApp) 
   {
     // new file to save: ask to the application which is the default
     // modality to save binary files.
@@ -666,6 +675,13 @@ int albaVMEManager::MSFSave()
   if(!m_TestMode) 
     wait=new wxBusyInfo(_("Saving Project: Please wait"));
   
+	//Update the application stamps
+	albaTagItem tag_appstamp;
+	tag_appstamp.SetName("APP_STAMP");
+	tag_appstamp.SetValue(this->m_AppStamp.at(0).GetCStr());
+	m_Storage->GetRoot()->GetTagArray()->SetTag(tag_appstamp); // set the appstamp tag for the root
+	AddCreationDate(m_Storage->GetRoot());
+
   m_Storage->SetURL(m_MSFFile.GetCStr());
   if (m_Storage->Store() != ALBA_OK) // store the tree
   {

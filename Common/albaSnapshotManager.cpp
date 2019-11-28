@@ -237,7 +237,14 @@ void albaSnapshotManager::FindOrCreateSnapshotGroup(albaVME *root)
 void albaSnapshotManager::ShowSnapshotPreview()
 {
 	if (m_ImageViewer && m_SnapshotsGroup)
-		m_ImageViewer->ShowImageDialog(m_SnapshotsGroup);
+	{
+		int numImages = GetNSnapshots(); 
+
+		if (numImages > 0) // Select Last Image
+			m_ImageViewer->ShowImageDialog(m_SnapshotsGroup, numImages-1);
+		else
+			m_ImageViewer->ShowImageDialog(m_SnapshotsGroup);
+	}
 }
 
 //----------------------------------------------------------------------------

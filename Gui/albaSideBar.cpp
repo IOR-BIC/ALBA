@@ -96,7 +96,8 @@ albaSideBar::albaSideBar(albaGUIMDIFrame* parent, int id, albaObserver *Listener
 
     m_VmePipePanel = new albaGUIHolder(m_VmeNotebook,-1,false,true);
     m_VmeNotebook->AddPage(m_VmePipePanel,_(" Visual props "));
-    m_VmePanel = new albaGUIHolder(m_VmeNotebook,-1,false,true);
+   
+		m_VmePanel = new albaGUIHolder(m_VmeNotebook,-1,false,true);
     m_VmeNotebook->AddPage(m_VmePanel,_("VME"));
 
     m_SideSplittedPanel->SetMinimumPaneSize(50);

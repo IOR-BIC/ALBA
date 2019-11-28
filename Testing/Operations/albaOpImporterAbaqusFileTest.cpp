@@ -71,6 +71,8 @@ void albaOpImporterAbaqusFileTest::TestAnsysHypermeshInputFile()
   ImportInputFile("mesh_3_elementi.inp", 18, 0, 3);
 
   ImportInputFile("mesh_22_elementi.inp", 60, 0, 22);
+
+	ImportInputFile("mesh_10_elementi_generate.inp", 18, 2, 10);
 }
 
 //----------------------------------------------------------------------------------------
