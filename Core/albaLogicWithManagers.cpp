@@ -2091,7 +2091,7 @@ void albaLogicWithManagers::ShowSplashScreen()
 void albaLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage)
 {
 	long splash_style = wxSIMPLE_BORDER | wxSTAY_ON_TOP;
-	wxSplashScreen* splash = new wxSplashScreen(splashImage,
+	m_SplashScreen = new wxSplashScreen(splashImage,
 		wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT,
 		2000, NULL, -1, wxDefaultPosition, wxDefaultSize,
 		splash_style);
