@@ -314,17 +314,23 @@ void appLogic::ShowVMEOnView()
 		{
 			volume = iNode;
 		}
-		else
-		{
-			VmeShow(volume, true); // Show all VMEs
-		}
 	}
-	iter->Delete();
-
+	
 	if (volume)
 	{
 		VmeShow(volume, true); // Show Last Volume
 	}
+
+
+	for (albaVME *iNode = iter->GetFirstNode(); iNode; iNode = iter->GetNextNode())
+	{
+		if (!iNode->IsA("albaVMEVolumeGray"))
+		{
+			VmeShow(iNode, true); // Show all VMEs
+		}
+	}
+
+	iter->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -332,7 +338,7 @@ void appLogic::VmeAdded(albaVME *vme)
 {
 	albaLogicWithManagers::VmeAdded(vme);
 
-	VmeShow(vme, true);
+	//VmeShow(vme, true);
 }
 
 //----------------------------------------------------------------------------
