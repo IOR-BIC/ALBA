@@ -1257,6 +1257,8 @@ void albaLogicWithManagers::VmeShow(albaVME *vme, bool visibility)
 
 	m_SkipCameraUpdate--;
 	
+	albaYield();
+
 	CameraUpdate();
 }
 //----------------------------------------------------------------------------
