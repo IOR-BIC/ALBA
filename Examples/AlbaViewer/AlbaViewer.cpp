@@ -151,7 +151,7 @@ void AlbaViewer::OnFatalException()
 }
 
 //--------------------------------------------------------------------------------
-int AlbaViewer::FilterEvent(wxEvent& event)
+int AlbaViewer::FilterEvent(wxEvent& event) 
 {
 	int keyCode = ((wxKeyEvent&)event).GetKeyCode();
 	bool controlDown = ((wxKeyEvent&)event).ControlDown();
