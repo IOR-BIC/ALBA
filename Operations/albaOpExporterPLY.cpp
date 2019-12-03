@@ -67,24 +67,24 @@ bool albaOpExporterPLY::Accept(albaVME*node)
 //----------------------------------------------------------------------------
 // constants
 //----------------------------------------------------------------------------
-enum STL_EXPORTER_ID
+enum PLY_EXPORTER_ID
 {
-  ID_STL_BINARY_FILE = MINID,
-	ID_ABS_MATRIX_TO_STL,
+  ID_PLY_BINARY_FILE = MINID,
+	ID_ABS_MATRIX_TO_PLY,
   ID_CHOOSE_FILENAME,
 };
 //----------------------------------------------------------------------------
 void albaOpExporterPLY::OpRun()   
 //----------------------------------------------------------------------------
 {
-  albaString wildc = "Stereo Litography (*.stl)|*.stl";
+  albaString wildc = "Polygon File Format (*.ply)|*.ply";
 
   m_Gui = new albaGUI(this);
 	m_Gui->FileSave(ID_CHOOSE_FILENAME,"ply file", &m_File, wildc,"Save As...");
   m_Gui->Label("file type",true);
-	m_Gui->Bool(ID_STL_BINARY_FILE,"binary",&m_Binary,0);
+	m_Gui->Bool(ID_PLY_BINARY_FILE,"binary",&m_Binary,0);
 	m_Gui->Label("absolute matrix",true);
-	m_Gui->Bool(ID_ABS_MATRIX_TO_STL,"apply",&m_ABSMatrixFlag,0);
+	m_Gui->Bool(ID_ABS_MATRIX_TO_PLY,"apply",&m_ABSMatrixFlag,0);
 	m_Gui->OkCancel();
   m_Gui->Enable(wxOK,m_File != "");
 	
@@ -101,35 +101,6 @@ void albaOpExporterPLY::OnEvent(albaEventBase *alba_event)
     switch(e->GetId())
     {
       case wxOK:
-				/*{
-					//albaString FileDir = albaGetApplicationDirectory().c_str();
-					//FileDir<<"\\";
-          albaString name = m_Input->GetName();
-          if (name.FindChr('\\') != -1 || name.FindChr('/') != -1 || name.FindChr(':') != -1 || 
-            name.FindChr('?')  != -1 || name.FindChr('"') != -1 || name.FindChr('<') != -1 || 
-            name.FindChr('>')  != -1 || name.FindChr('|') != -1 )
-          {
-            albaMessage("Node name contains invalid chars.\nA node name can not contain chars like \\ / : * ? \" < > |");
-            m_File = "";
-          }
-          else
-          {
-            m_FileDir << this->m_Input->GetName();
-            m_FileDir << ".stl";
-            albaString wildc = "STL (*.stl)|*.stl";
-            m_File = albaGetSaveFile(m_FileDir.GetCStr(), wildc.GetCStr()).c_str();
-          }
-
-					if(m_File.IsEmpty())
-					{
-            OpStop(OP_RUN_CANCEL);
-					}
-					else
-          {
-            ExportSurface();
-            OpStop(OP_RUN_OK);
-          }
-				}*/
         ExportSurface();
         OpStop(OP_RUN_OK);
       break;
