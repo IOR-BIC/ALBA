@@ -441,9 +441,10 @@ void appLogic::CreateToolbar()
 	m_ToolBar->AddTool(ID_SHOW_ORTHOSLICE_VIEW, albaPictureFactory::GetPictureFactory()->GetBmp("VIEW_ORTHO"), _("View OrthoSlice"));
 	m_ToolBar->AddSeparator();
 
-	m_ToolBar->AddTool(CAMERA_RESET, albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_ALL"), _("reset camera to fit all (ctrl+f)"));
-	m_ToolBar->AddTool(CAMERA_FIT, albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"), _("reset camera to fit selected object (ctrl+shift+f)"));
-	m_ToolBar->AddTool(CAMERA_FLYTO, albaPictureFactory::GetPictureFactory()->GetBmp("FLYTO"), _("fly to object under mouse"));
+	// Camera	
+	m_ToolBar->AddTool(CAMERA_RESET, albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_ALL"), _("Reset camera to fit all"));
+	m_ToolBar->AddTool(CAMERA_FIT, albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"), _("Reset camera to fit selected object"));
+	m_ToolBar->AddTool(CAMERA_FLYTO, albaPictureFactory::GetPictureFactory()->GetBmp("FLYTO"), _("Fly to object under mouse"));
 
 	if (m_UseSnapshotManager)
 	{
