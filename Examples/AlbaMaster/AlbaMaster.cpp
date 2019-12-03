@@ -68,6 +68,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpExporterMeters.h"
 #include "albaOpExporterRAW.h"
 #include "albaOpExporterSTL.h"
+#include "albaOpExporterPLY.h"
 #include "albaOpExporterVTK.h"
 #include "albaOpExporterWrappedMeter.h"
 #include "albaOpExporterAbaqusFile.h"
@@ -259,6 +260,7 @@ bool AlbaMaster::OnInit()
 
 	m_Logic->Plug(new albaOpExporterMSF("ALBA"));
 	m_Logic->Plug(new albaOpExporterSTL("STL"));
+	m_Logic->Plug(new albaOpExporterPLY("PLY"));
 	m_Logic->Plug(new albaOpExporterVTK("VTK"));
 	m_Logic->Plug(new albaOpExporterDicom("Dicom"),"",true,dicomSettings);
 	m_Logic->Plug(new albaOpExporterRAW("Raw"));
