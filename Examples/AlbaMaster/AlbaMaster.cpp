@@ -52,6 +52,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpImporterRAWImages.h"
 #include "albaOpImporterRAWVolume.h"
 #include "albaOpImporterSTL.h"
+#include "albaOpImporterPLY.h"
 #include "albaOpImporterVRML.h"
 #include "albaOpImporterVTK.h"
 #include "albaOpImporterAbaqusFile.h"
@@ -235,6 +236,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpImporterRAWVolume("RAW Volume"));
 	m_Logic->Plug(new albaOpImporterRAWImages("RAW Images"));
 	m_Logic->Plug(new albaOpImporterSTL("STL"));
+	m_Logic->Plug(new albaOpImporterPLY("PLY"));
 	m_Logic->Plug(new albaOpImporterVRML("VRML"));
 	m_Logic->Plug(new albaOpImporterVTK("VTK"));
 	m_Logic->Plug(new albaOpImporterMSF("ALBA"));
