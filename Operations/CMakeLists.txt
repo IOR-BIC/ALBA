@@ -48,6 +48,7 @@ IF (ALBA_USE_VTK)
 	albaOpExporterSTL.cpp	  		  		albaOpExporterSTL.h
 	albaOpExporterPLY.cpp	  		  		albaOpExporterPLY.h
 	albaOpImporterSTL.cpp	  		  		albaOpImporterSTL.h
+	albaOpImporterPLY.cpp	  		  		albaOpImporterPLY.h
 	albaOpTransformInterface.cpp	    	albaOpTransformInterface.h
 	albaOpValidateTree.cpp	    				albaOpValidateTree.h
 	albaOpVOIDensity.cpp	    					albaOpVOIDensity.h
