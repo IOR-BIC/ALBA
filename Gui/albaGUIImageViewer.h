@@ -46,6 +46,7 @@ enum ImageViewerEvents
 	ID_IMAGE_NEXT,
 	ID_IMAGE_SELECT,
 	ID_IMAGE_SAVE,
+	ID_SAVE_ALL,
 	ID_IMAGE_DELETE,
 	ID_IMAGE_PRINT,
 	ID_SETTING_ENABLE_RESOLUTION,
@@ -101,6 +102,7 @@ protected:
 	
 	int SaveVMEImage(albaVMEImage *image, wxString imageFileName, bool scale = false);
 	void SaveImageAs();
+	void SaveAllImages();
 
 	albaObserver *m_Listener;
 

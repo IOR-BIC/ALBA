@@ -111,10 +111,16 @@ std::string albaGetSaveFile(const char * initial, const char * wild, const char 
 //----------------------------------------------------------------------------
 {
   wxString path, name, ext;
+	wxString defaultname = "NewFile";
   wxSplitPath(initial,&path,&name,&ext);
-  if(name != "" && ext != "") name = wxString::Format("%s.%s",name.c_str(),ext.c_str());
-  wxString wildcard = wild;
-  wxString defaultname = "NewFile";
+	if (name != "" && ext != "")
+	{
+		name = wxString::Format("%s.%s", name.c_str(), ext.c_str());
+		defaultname = name;
+	}
+  
+	wxString wildcard = wild;
+
   wildcard += "|All Files (*.*)|*.*";
   
 	long style = wxSAVE | wxHIDE_READONLY;
