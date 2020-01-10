@@ -71,20 +71,20 @@ albaGizmoTranslate::albaGizmoTranslate(albaVME* input, albaObserver *listener, b
   albaNEW(m_PivotPose);
   m_PivotPose->DeepCopy(absInputMatrix);
 
-  for (int i = 0; i < 3; i++)
-  {
-    // Create albaGizmoTranslateAxis and send events to this
-	albaString name("Arrow");
-	if(i == 0) name.Append("X");
-	else if(i == 1) name.Append("Y");
-	else if(i == 2) name.Append("Z");
-    m_GTAxis[i] = new albaGizmoTranslateAxis(input, this, name);
-	  m_GTAxis[i]->SetAxis(i);
+	for (int i = 0; i < 3; i++)
+	{
+		// Create albaGizmoTranslateAxis and send events to this
+		albaString name("Arrow");
+		if (i == 0) name.Append("X");
+		else if (i == 1) name.Append("Y");
+		else if (i == 2) name.Append("Z");
+		m_GTAxis[i] = new albaGizmoTranslateAxis(input, this, name);
+		m_GTAxis[i]->SetAxis(i);
 
-    // Create albaGTranslateAPlane 
-    m_GTPlane[i] = new albaGizmoTranslatePlane(input, this);
-    m_GTPlane[i]->SetPlane(i);
-  }
+		// Create albaGTranslateAPlane 
+		m_GTPlane[i] = new albaGizmoTranslatePlane(input, this);
+		m_GTPlane[i]->SetPlane(i);
+	}
 
   SetAlwaysVisible(true);
   SetAutoscale(true);
