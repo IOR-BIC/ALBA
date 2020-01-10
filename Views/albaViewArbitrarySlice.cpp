@@ -167,8 +167,9 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 	{
 		if(vme->GetOutput()->IsA("albaVMEOutputVolume") && vme != m_CurrentVolume)
 		{
-			double sr[2],SliceCenterVolumeReset[3];
-			albaVME *Volume=vme;
+			double SliceCenterVolumeReset[4];
+			SliceCenterVolumeReset[3] = 1;
+			albaVME *Volume = vme;
 			m_CurrentVolume = Volume;
 
 			// get the VTK volume
@@ -176,42 +177,25 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 			data->Update();
 			//Get center of Volume to can the reset
 			data->GetCenter(SliceCenterVolumeReset);
-			//Get scalar range of the volume
-			data->GetScalarRange(sr);
-			data=NULL;
-
+		
 			albaTransform::GetOrientation(vme->GetAbsMatrixPipe()->GetMatrix(),m_SliceAngleReset);
-
 			//Compute the center of Volume in absolute coordinate, to center the surface and gizmo
-			vtkPoints *pts;
-			vtkNEW(pts);
-			pts->InsertNextPoint(SliceCenterVolumeReset);
-			vtkPolyData *pd=vtkPolyData::New();
-			pd->SetPoints(pts);
 			vtkTransform *transform;
 			vtkNEW(transform);
-			transform->Identity();
 			transform->SetMatrix(vme->GetOutput()->GetMatrix()->GetVTKMatrix());
 			transform->Update();
-			vtkTransformPolyDataFilter *filter;
-			vtkNEW(filter);
-			filter->SetInput(pd);
-			filter->SetTransform(transform);
-			filter->Update();
-			filter->GetOutput()->GetCenter(m_SliceCenterSurface);
-			filter->GetOutput()->GetCenter(m_SliceCenterSurfaceReset);
-
+			transform->MultiplyPoint(SliceCenterVolumeReset, m_SliceCenterSurface);
+			transform->MultiplyPoint(SliceCenterVolumeReset, m_SliceCenterSurfaceReset);
+					
 			//Create a matrix to permit the reset of the gizmos
 			vtkTransform *TransformReset;
 			vtkNEW(TransformReset);
-			TransformReset->Identity();
 			TransformReset->Translate(m_SliceCenterSurfaceReset);
 			TransformReset->RotateX(m_SliceAngleReset[0]);
 			TransformReset->RotateY(m_SliceAngleReset[1]);
 			TransformReset->RotateZ(m_SliceAngleReset[2]);
 			TransformReset->Update();
 			albaNEW(m_MatrixReset);
-			m_MatrixReset->Identity();
 			m_MatrixReset->SetVTKMatrix(TransformReset->GetMatrix());
 
 			//Create VME slicer
@@ -252,10 +236,7 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 
 			m_Slicer->SetVisibleToTraverse(false);
 
-			vtkDEL(pts);
-			vtkDEL(pd);
 			vtkDEL(transform);
-			vtkDEL(filter);
 			vtkDEL(TransformReset);
 		}
 		
@@ -436,7 +417,6 @@ void albaViewArbitrarySlice::OnEventGizmoRotate(albaEventBase *alba_event)
 }
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::OnEventThis(albaEventBase *alba_event)
-	//----------------------------------------------------------------------------
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
@@ -526,7 +506,6 @@ void albaViewArbitrarySlice::OnEventThis(albaEventBase *alba_event)
 }
 //----------------------------------------------------------------------------
 albaView *albaViewArbitrarySlice::Copy(albaObserver *Listener, bool lightCopyEnabled)
-	//----------------------------------------------------------------------------
 {
 	m_LightCopyEnabled = lightCopyEnabled;
 	albaViewArbitrarySlice *v = new albaViewArbitrarySlice(m_Label);
@@ -542,7 +521,6 @@ albaView *albaViewArbitrarySlice::Copy(albaObserver *Listener, bool lightCopyEna
 }
 //----------------------------------------------------------------------------
 albaGUI* albaViewArbitrarySlice::CreateGui()
-	//----------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
 	m_Gui = albaView::CreateGui();
@@ -569,7 +547,6 @@ albaGUI* albaViewArbitrarySlice::CreateGui()
 }
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::VmeRemove(albaVME *vme)
-	//----------------------------------------------------------------------------
 {
 	if (m_CurrentVolume && vme == m_CurrentVolume) 
 	{
@@ -585,7 +562,6 @@ void albaViewArbitrarySlice::VmeRemove(albaVME *vme)
 }
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::PostMultiplyEventMatrix(albaEventBase *alba_event)
-	//----------------------------------------------------------------------------
 {  
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
@@ -614,7 +590,6 @@ void albaViewArbitrarySlice::PostMultiplyEventMatrix(albaEventBase *alba_event)
 }
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::CameraUpdate()
-	//----------------------------------------------------------------------------
 {
 	if (m_AttachCamera != NULL)
 	{

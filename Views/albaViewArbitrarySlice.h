@@ -136,9 +136,9 @@ protected:
 	albaMatrix					*m_MatrixReset;
 	albaAttachCamera		*m_AttachCamera;
 
-	double	m_SliceCenterSurface[3];
-	double	m_SliceCenterSurfaceReset[3];
-	double	m_SliceAngleReset[3];
+	double	m_SliceCenterSurface[4];
+	double	m_SliceCenterSurfaceReset[4];
+	double	m_SliceAngleReset[4];
 	int			m_TypeGizmo;
 
 	albaGUI				*m_GuiGizmos;
