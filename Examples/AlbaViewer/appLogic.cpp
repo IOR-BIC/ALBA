@@ -48,6 +48,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaGUIViewFrame.h"
 #include "albaGUIMDIChild.h"
 #include "vtkTimerLog.h"
+#include "albaTagArray.h"
 
 //----------------------------------------------------------------------------
 appLogic::appLogic() : albaLogicWithManagers()
@@ -326,7 +327,11 @@ void appLogic::ShowVMEOnView()
 	{
 		if (!iNode->IsA("albaVMEVolumeGray"))
 		{
-			VmeShow(iNode, true); // Show all VMEs
+			bool vme_in_tree = !iNode->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") ||
+				(iNode->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") &&
+					iNode->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() != 0);
+
+			VmeShow(iNode, vme_in_tree); // Show all VMEs
 		}
 	}
 

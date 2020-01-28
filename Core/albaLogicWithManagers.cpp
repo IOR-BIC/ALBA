@@ -1294,6 +1294,7 @@ void albaLogicWithManagers::VmeAdd(albaVME *vme)
 {
 	if (!vme) 
 		return;
+
 	if(m_VMEManager) 
     m_VMEManager->VmeAdd(vme);
 }
