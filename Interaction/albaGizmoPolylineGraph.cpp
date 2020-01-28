@@ -229,27 +229,25 @@ void albaGizmoPolylineGraph::DestroyVMEGizmo()
 //Destroys VTK pipeline for the gizmo. Called from DestroyVMEGizmo.
 /*virtual*/ void albaGizmoPolylineGraph::DestroyGizmoVTKData()
 //----------------------------------------------------------------------------
-{  
-  m_SphereSource->Delete();
-  if(m_ShowOnlyDirectionAxis == false)
-  {
-  for (int i = 0; i < 3; i++)
-  {
-    m_AxisSource[i]->Delete();
-    m_Axis[i]->Delete();
-  }
-  m_PlaneSource->Delete();
-  }
-  else
-  {
-    m_AxisSource[2]->Delete();
-    m_Axis[2]->Delete();
-  }
-  
-  
-  m_AppendPolyData->Delete();
-}
+{
+	m_SphereSource->Delete();
+	if (m_ShowOnlyDirectionAxis == false)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			m_AxisSource[i]->Delete();
+			m_Axis[i]->Delete();
+		}
+		m_PlaneSource->Delete();
+	}
+	else
+	{
+		m_AxisSource[2]->Delete();
+		m_Axis[2]->Delete();
+	}
 
+	m_AppendPolyData->Delete();
+}
 //------------------------------------------------------------------------
 //Creates the interactor for the gizmo. Called from ctor. 
 /*virtual*/ void albaGizmoPolylineGraph::CreateInteractor()
@@ -257,17 +255,11 @@ void albaGizmoPolylineGraph::DestroyVMEGizmo()
 {  
   m_RefSysVME = m_InputVME;
 
-  albaMatrix *absMatrix;
-  absMatrix = m_RefSysVME->GetOutput()->GetAbsMatrix();
-
   albaNEW(m_GizmoInteractor);
   m_LeftMouseInteractor = m_GizmoInteractor->CreateBehavior(MOUSE_LEFT);
-
   m_LeftMouseInteractor->SetListener(this);
   m_LeftMouseInteractor->SetVME(m_InputVME);
-
   m_LeftMouseInteractor->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
-
   m_LeftMouseInteractor->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
   m_LeftMouseInteractor->EnableTranslation(true);    
 
