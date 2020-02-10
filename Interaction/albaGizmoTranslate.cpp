@@ -71,20 +71,20 @@ albaGizmoTranslate::albaGizmoTranslate(albaVME* input, albaObserver *listener, b
   albaNEW(m_PivotPose);
   m_PivotPose->DeepCopy(absInputMatrix);
 
-  for (int i = 0; i < 3; i++)
-  {
-    // Create albaGizmoTranslateAxis and send events to this
-	albaString name("Arrow");
-	if(i == 0) name.Append("X");
-	else if(i == 1) name.Append("Y");
-	else if(i == 2) name.Append("Z");
-    m_GTAxis[i] = new albaGizmoTranslateAxis(input, this, name);
-	  m_GTAxis[i]->SetAxis(i);
+	for (int i = 0; i < 3; i++)
+	{
+		// Create albaGizmoTranslateAxis and send events to this
+		albaString name("Arrow");
+		if (i == 0) name.Append("X");
+		else if (i == 1) name.Append("Y");
+		else if (i == 2) name.Append("Z");
+		m_GTAxis[i] = new albaGizmoTranslateAxis(input, this, name);
+		m_GTAxis[i]->SetAxis(i);
 
-    // Create albaGTranslateAPlane 
-    m_GTPlane[i] = new albaGizmoTranslatePlane(input, this);
-    m_GTPlane[i]->SetPlane(i);
-  }
+		// Create albaGTranslateAPlane 
+		m_GTPlane[i] = new albaGizmoTranslatePlane(input, this);
+		m_GTPlane[i]->SetPlane(i);
+	}
 
   SetAlwaysVisible(true);
   SetAutoscale(true);
@@ -472,27 +472,17 @@ void albaGizmoTranslate::SetRefSys(albaVME *refSys)
 
   m_RefSysVME = refSys;
   SetAbsPose(m_RefSysVME->GetOutput()->GetAbsMatrix());
-  if (m_RefSysVME == m_InputVME)
-  {
+  
+	if (m_RefSysVME == m_InputVME)
     SetModalityToLocal();
-    // if the gizmo is visible set the widgets visibility to true
-    // if the ref-sys is local
-    if (m_Visibility == true)
-    {
-      if (m_BuildGUI) m_GuiGizmoTranslate->EnableWidgets(true);
-    }
-  }
   else
-  {
     SetModalityToGlobal();
-
-    // if the gizmo is visible set the widgets visibility to false
-    // if the ref-sys is global since this ref-sys cannot be changed
-    if (m_Visibility == true)
-    {
-      if (m_BuildGUI) m_GuiGizmoTranslate->EnableWidgets(false);
-    }
-  }
+	
+	// if the gizmo is visible set the widgets visibility to false
+	// if the ref-sys is global since this ref-sys cannot be changed
+	if (m_Visibility == true && m_BuildGUI)
+		m_GuiGizmoTranslate->EnableWidgets(true);
+	
 }
 //----------------------------------------------------------------------------
 void albaGizmoTranslate::SetConstraintModality(int axis, int constrainModality)
