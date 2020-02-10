@@ -99,6 +99,10 @@ public:
 
 	/** Generate Gizmos and pose them in the right position*/
 	void CreateGizmos();
+
+	/** */
+	virtual void VmeSelect(albaVME *node, bool select);
+
 protected:
 
 	/** Internally used to create a new instance of the GUI. 
