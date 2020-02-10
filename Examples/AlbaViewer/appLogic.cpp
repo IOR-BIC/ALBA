@@ -48,6 +48,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaGUIViewFrame.h"
 #include "albaGUIMDIChild.h"
 #include "vtkTimerLog.h"
+#include "albaTagArray.h"
 
 //----------------------------------------------------------------------------
 appLogic::appLogic() : albaLogicWithManagers()
@@ -326,7 +327,11 @@ void appLogic::ShowVMEOnView()
 	{
 		if (!iNode->IsA("albaVMEVolumeGray"))
 		{
-			VmeShow(iNode, true); // Show all VMEs
+			bool vme_in_tree = !iNode->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") ||
+				(iNode->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") &&
+					iNode->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() != 0);
+
+			VmeShow(iNode, vme_in_tree); // Show all VMEs
 		}
 	}
 
@@ -401,7 +406,8 @@ void appLogic::CreateMenu()
 	m_MenuBar->Append(m_ViewMenu, _("&View"));
 
 	// Operations Menu ////////////////////////////////////////////////////////////////////
-	m_OpMenu = new wxMenu;  // NOT USED
+	m_OpMenu = new wxMenu; 
+	m_MenuBar->Append(m_OpMenu, _("&Operations"));
 
 	// Wizard Menu ////////////////////////////////////////////////////////////////////
 	if (m_UseWizardManager)
@@ -470,8 +476,3 @@ void appLogic::EnableMenuAndToolbar()
 	}
 }
 
-//----------------------------------------------------------------------------
-void appLogic::CreateControlPanel()
-{
-	m_SideBar = new appSideBar(m_Win, MENU_VIEW_SIDEBAR, this); //Custom SideBar
-}

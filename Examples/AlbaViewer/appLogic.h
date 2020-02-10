@@ -73,9 +73,6 @@ protected:
 	/** A new View has Been Created - Logic must create the View Frame */
 	virtual void ViewCreate(int viewId);
 
-	/** Virtual method to create the side bar */
-	virtual void CreateControlPanel();
-
 	/** Redefined to add View,Op, Import, Export menu */
 	virtual void CreateMenu();
 
