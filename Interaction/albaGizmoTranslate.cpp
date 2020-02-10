@@ -472,27 +472,17 @@ void albaGizmoTranslate::SetRefSys(albaVME *refSys)
 
   m_RefSysVME = refSys;
   SetAbsPose(m_RefSysVME->GetOutput()->GetAbsMatrix());
-  if (m_RefSysVME == m_InputVME)
-  {
+  
+	if (m_RefSysVME == m_InputVME)
     SetModalityToLocal();
-    // if the gizmo is visible set the widgets visibility to true
-    // if the ref-sys is local
-    if (m_Visibility == true)
-    {
-      if (m_BuildGUI) m_GuiGizmoTranslate->EnableWidgets(true);
-    }
-  }
   else
-  {
     SetModalityToGlobal();
-
-    // if the gizmo is visible set the widgets visibility to false
-    // if the ref-sys is global since this ref-sys cannot be changed
-    if (m_Visibility == true)
-    {
-      if (m_BuildGUI) m_GuiGizmoTranslate->EnableWidgets(false);
-    }
-  }
+	
+	// if the gizmo is visible set the widgets visibility to false
+	// if the ref-sys is global since this ref-sys cannot be changed
+	if (m_Visibility == true && m_BuildGUI)
+		m_GuiGizmoTranslate->EnableWidgets(true);
+	
 }
 //----------------------------------------------------------------------------
 void albaGizmoTranslate::SetConstraintModality(int axis, int constrainModality)
