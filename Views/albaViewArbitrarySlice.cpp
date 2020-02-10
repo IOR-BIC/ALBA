@@ -73,6 +73,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkCamera.h"
 #include "vtkImageData.h"
 #include "albaPipeSlice.h"
+#include "albaPipeVolumeArbSlice.h"
 
 #define EPSILON 1.5e-5
 
@@ -229,7 +230,7 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 		}
 		else
 		{
-			albaPipe * nodePipe = ((albaViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(vme);
+			albaPipe *  nodePipe= ((albaViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(vme);
 			albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(nodePipe);
 			if (pipeSlice)
 			{
@@ -423,13 +424,20 @@ void albaViewArbitrarySlice::OnEventThis(albaEventBase *alba_event)
 				break;
 			}
 		case ID_TRILINEAR_INTERPOLATION_ON:
+		{
+			if (m_CurrentVolume)
 			{
-				/*if (m_Slicer)
+				for (int i = 0; i < m_NumOfChildView; i++)
 				{
-					m_Slicer->SetTrilinearInterpolation(m_TrilinearInterpolationOn == TRUE);
-					GetLogicManager()->CameraUpdate();
-				}*/
+					albaPipeVolumeArbSlice *p = albaPipeVolumeArbSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
+					if (p)
+					{
+						p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+					}
+				}
+				this->CameraUpdate();
 			}
+		}
 			break;
 		default:
 			albaViewCompound::OnEvent(alba_event);
@@ -443,6 +451,12 @@ void albaViewArbitrarySlice::OnReset()
 	m_GizmoRotate->SetAbsPose(m_MatrixReset);
 	m_GizmoTranslate->SetAbsPose(m_MatrixReset);
 	m_SlicingMatrix->DeepCopy(m_MatrixReset);
+
+	m_SliceCenterSurface[0] = m_SliceCenterSurfaceReset[1];
+	m_SliceCenterSurface[1] = m_SliceCenterSurfaceReset[1];
+	m_SliceCenterSurface[2] = m_SliceCenterSurfaceReset[2];
+
+	m_AttachCamera->UpdateCameraMatrix();
 	//update because I need to refresh the normal of the camera
 	SetSlices();
 }
@@ -705,6 +719,13 @@ void albaViewArbitrarySlice::CreateGizmos()
 	m_Gui->FitGui();
 	m_Gui->Fit();
 	m_Gui->FitInside();
+}
+
+//----------------------------------------------------------------------------
+void albaViewArbitrarySlice::VmeSelect(albaVME *node, bool select)
+{
+
+	m_ChildViewList[ARBITRARY_VIEW]->VmeSelect(node, select);
 }
 
 //-------------------------------------------------------------------------
