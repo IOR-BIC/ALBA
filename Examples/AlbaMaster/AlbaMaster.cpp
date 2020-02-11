@@ -52,6 +52,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpImporterRAWImages.h"
 #include "albaOpImporterRAWVolume.h"
 #include "albaOpImporterSTL.h"
+#include "albaOpImporterPLY.h"
 #include "albaOpImporterVRML.h"
 #include "albaOpImporterVTK.h"
 #include "albaOpImporterAbaqusFile.h"
@@ -68,6 +69,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpExporterMeters.h"
 #include "albaOpExporterRAW.h"
 #include "albaOpExporterSTL.h"
+#include "albaOpExporterPLY.h"
 #include "albaOpExporterVTK.h"
 #include "albaOpExporterWrappedMeter.h"
 #include "albaOpExporterAbaqusFile.h"
@@ -195,6 +197,11 @@ bool AlbaMaster::OnInit()
 #include "Examples/AlbaMaster/MDICHILD_ICON.xpm"
 	albaADDPIC(MDICHILD_ICON);
 
+#include "pic/GIZMO_TRANSLATE_ICON.xpm"
+	albaADDPIC(GIZMO_TRANSLATE_ICON);
+#include "pic/GIZMO_ROTATE_ICON.xpm"
+	albaADDPIC(GIZMO_ROTATE_ICON);
+
 	int result;
 	result = albaVMEFactory::Initialize();
 	assert(result==ALBA_OK);
@@ -234,6 +241,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpImporterRAWVolume("RAW Volume"));
 	m_Logic->Plug(new albaOpImporterRAWImages("RAW Images"));
 	m_Logic->Plug(new albaOpImporterSTL("STL"));
+	m_Logic->Plug(new albaOpImporterPLY("PLY"));
 	m_Logic->Plug(new albaOpImporterVRML("VRML"));
 	m_Logic->Plug(new albaOpImporterVTK("VTK"));
 	m_Logic->Plug(new albaOpImporterMSF("ALBA"));
@@ -259,6 +267,7 @@ bool AlbaMaster::OnInit()
 
 	m_Logic->Plug(new albaOpExporterMSF("ALBA"));
 	m_Logic->Plug(new albaOpExporterSTL("STL"));
+	m_Logic->Plug(new albaOpExporterPLY("PLY"));
 	m_Logic->Plug(new albaOpExporterVTK("VTK"));
 	m_Logic->Plug(new albaOpExporterDicom("Dicom"),"",true,dicomSettings);
 	m_Logic->Plug(new albaOpExporterRAW("Raw"));

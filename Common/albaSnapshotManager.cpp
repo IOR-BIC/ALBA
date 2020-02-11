@@ -207,6 +207,7 @@ void albaSnapshotManager::CreateSnapshot(albaVME *root, albaView *selectedView)
 	image->SetName(imageName);
 	image->SetTimeStamp(0);
 	image->ReparentTo(m_SnapshotsGroup);
+	image->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 0.0));
 
 	albaDEL(image);
 	//////////////////////////////////////////////////////////////////////////

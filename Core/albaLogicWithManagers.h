@@ -53,6 +53,7 @@ class albaGUIApplicationSettings;
 class albaGUISettingsTimeBar;
 class albaHelpManager;
 class albaSnapshotManager;
+class wxSplashScreen;
 
 typedef int(*eventfilterFunc)(wxEvent& event);
 
@@ -430,6 +431,7 @@ protected:
 	wxStaticText* m_WizardLabel;
 	bool m_CancelledBeforeOpStarting;
 	wxMenu *m_WizardMenu;
+	wxSplashScreen* m_SplashScreen;
 
 	long							m_ChildFrameStyle;
 	albaGUIMDIFrame		*m_Win;

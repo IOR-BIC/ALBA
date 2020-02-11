@@ -38,7 +38,6 @@
 
 //----------------------------------------------------------------------------
 albaAttachCamera::albaAttachCamera(wxWindow* parent, albaRWI *rwi, albaObserver *Listener)
-//----------------------------------------------------------------------------
 {
   m_Gui = NULL;
 
@@ -50,8 +49,10 @@ albaAttachCamera::albaAttachCamera(wxWindow* parent, albaRWI *rwi, albaObserver 
   m_EnableAttachCamera = 0;
   
   m_AttachedVme       = NULL;
-  m_AttachedVmeMatrix = NULL;
+	m_AttachedMatrix = NULL;
+  m_CurrentMatrix = NULL;
   vtkNEW(m_StartingMatrix);
+	vtkNEW(m_CurrentMatrix);
 
   if (parent)
   {
@@ -60,9 +61,8 @@ albaAttachCamera::albaAttachCamera(wxWindow* parent, albaRWI *rwi, albaObserver 
 }
 //----------------------------------------------------------------------------
 albaAttachCamera::~albaAttachCamera() 
-//----------------------------------------------------------------------------
 {
-  vtkDEL(m_AttachedVmeMatrix);
+  vtkDEL(m_CurrentMatrix);
   vtkDEL(m_StartingMatrix);
   if (m_AttachedVme && m_AttachedVme->IsValid())
   {
@@ -75,14 +75,12 @@ albaAttachCamera::~albaAttachCamera()
 }
 //----------------------------------------------------------------------------
 // constants
-//----------------------------------------------------------------------------
 enum ATTACH_CAMERA_WIDGET_ID
 {
 	ID_CAMERA_ATTACH = MINID,
 };
 //----------------------------------------------------------------------------
 void albaAttachCamera::CreateGui()
-//----------------------------------------------------------------------------
 {
 	m_Gui = new albaGUI(this);
 	m_Gui->Show(true);
@@ -92,7 +90,6 @@ void albaAttachCamera::CreateGui()
 }
 //----------------------------------------------------------------------------
 void albaAttachCamera::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
@@ -139,7 +136,6 @@ void albaAttachCamera::OnEvent(albaEventBase *alba_event)
 }
 //----------------------------------------------------------------------------
 void albaAttachCamera::SetVme(albaVME *node)
-//----------------------------------------------------------------------------
 {
 	if (m_AttachedVme && m_AttachedVme==node)
 	{
@@ -154,7 +150,6 @@ void albaAttachCamera::SetVme(albaVME *node)
 	if (node == NULL)
   {
    
-    vtkDEL(m_AttachedVmeMatrix);
     m_AttachedVme = NULL;
     m_EnableAttachCamera = 0;
     if (m_Gui != NULL)
@@ -164,12 +159,10 @@ void albaAttachCamera::SetVme(albaVME *node)
     return;
   }
   
-  if (m_AttachedVmeMatrix == NULL)
-  {
-    vtkNEW(m_AttachedVmeMatrix);
-  }
+ 
   m_AttachedVme = node;
-  m_AttachedVmeMatrix->DeepCopy(m_StartingMatrix);
+  m_CurrentMatrix->DeepCopy(m_StartingMatrix);
+	m_AttachedMatrix = NULL;
 
   vtkALBASmartPointer<vtkTransform> delta;
   delta->PreMultiply();
@@ -185,105 +178,98 @@ void albaAttachCamera::SetVme(albaVME *node)
 }
 //----------------------------------------------------------------------------
 void albaAttachCamera::SetStartingMatrix(albaMatrix *matrix)
-//----------------------------------------------------------------------------
 {
   if(matrix)
     m_StartingMatrix->DeepCopy(matrix->GetVTKMatrix());
 }
 //----------------------------------------------------------------------------
 void albaAttachCamera::UpdateCameraMatrix()
-//----------------------------------------------------------------------------
 {
   if (m_EnableAttachCamera == 0)
   {
     return;
   }
 
-  if (m_AttachedVme != NULL)
+  if (m_AttachedVme || m_AttachedMatrix)
   {
-    vtkMatrix4x4 *new_matrix = m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix();
+		
+    vtkMatrix4x4 *new_matrix = m_AttachedVme ? m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix() : m_AttachedMatrix;
 
-    m_AttachedVmeMatrix->Invert();
+    m_CurrentMatrix->Invert();
 
     vtkALBASmartPointer<vtkTransform> delta;
     delta->PreMultiply();
     delta->Concatenate(new_matrix);
-    delta->Concatenate(m_AttachedVmeMatrix);
+    delta->Concatenate(m_CurrentMatrix);
 
     m_RenderWindow->m_Camera->ApplyTransform(delta);
-    m_AttachedVmeMatrix->DeepCopy(new_matrix);
+    m_CurrentMatrix->DeepCopy(new_matrix);
   }
 }
 
-void albaAttachCamera::PrintSelf( ostream& os)
-{
-  os << "-------------------------------------------------------" << std::endl;
-  os << "albaAttachCamera " << this << " PrintSelf:" << std::endl;
-  
-  os << "Camera attach enabled flag m_EnableAttachCamera: " << m_EnableAttachCamera << std::endl;
-  os << "Vme to follow with camera m_AttachedVme: " << (m_AttachedVme ? m_AttachedVme->GetName() : "NULL") << std::endl; 
-  os << "m_AttachedVmeMatrix: " << m_AttachedVmeMatrix << std::endl;
-  if (m_AttachedVmeMatrix)
-  {
-    m_AttachedVmeMatrix->PrintSelf(os, NULL);
-  }
-
-
-  os << "m_StartingMatrix: " << m_StartingMatrix << std::endl;
-  
-  if (m_StartingMatrix)
-  {
-    m_StartingMatrix->PrintSelf(os,NULL);
-  }
-
-  os << "m_Listener: " << m_Listener << std::endl;
-  os << "m_Gui: " << m_Gui << std::endl;
-  os << "m_RenderWindow: " << m_RenderWindow << std::endl;
-  os << "m_ParentPanel: " << m_ParentPanel << std::endl;
-  os << "-------------------------------------------------------" << std::endl;
-}
 
 albaMatrix albaAttachCamera::GetStartingMatrix()
 {
   return albaMatrix(m_StartingMatrix);
 }
-
+//----------------------------------------------------------------------------
 void albaAttachCamera::SetListener( albaObserver *Listener )
 {
   m_Listener = Listener;
 }
-
+//----------------------------------------------------------------------------
 albaObserver * albaAttachCamera::GetListener()
 {
   return m_Listener;
 }
-
+//----------------------------------------------------------------------------
 void albaAttachCamera::EnableAttachCamera()
 {
   m_EnableAttachCamera = TRUE;
 }
-
+//----------------------------------------------------------------------------
 void albaAttachCamera::DisableAttachCamera()
 {
   m_EnableAttachCamera = FALSE;
 }
-
+//----------------------------------------------------------------------------
 int albaAttachCamera::GetEnableAttachCamera()
 {
   return m_EnableAttachCamera;
 }
-
+//----------------------------------------------------------------------------
 void albaAttachCamera::SetEnableAttachCamera( int enable )
 {
   m_EnableAttachCamera = enable;
 }
-
+//----------------------------------------------------------------------------
 albaVME * albaAttachCamera::GetVme()
 {
   return m_AttachedVme;
 }
-
+//----------------------------------------------------------------------------
 albaGUI * albaAttachCamera::GetGui()
 {
   return m_Gui;
+}
+
+//----------------------------------------------------------------------------
+void albaAttachCamera::SetAttachedMatrix(vtkMatrix4x4 * attachedMatrix)
+{
+	bool attachedCameraEnabled = m_EnableAttachCamera;
+	SetVme(NULL);
+	m_EnableAttachCamera = attachedCameraEnabled;
+	m_AttachedMatrix = attachedMatrix;
+
+	m_CurrentMatrix->DeepCopy(m_StartingMatrix);
+
+	vtkALBASmartPointer<vtkTransform> delta;
+	delta->PreMultiply();
+	delta->Concatenate(m_StartingMatrix);
+
+	if (m_RenderWindow)
+	{
+		m_RenderWindow->m_Camera->ApplyTransform(delta);
+		m_RenderWindow->CameraUpdate();
+	}
 }

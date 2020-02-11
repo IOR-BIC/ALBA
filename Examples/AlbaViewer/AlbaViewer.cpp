@@ -42,6 +42,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaWizard.h"
 #include "appWizardSample.h"
 #endif
+#include "albaOpTransform.h"
 
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -79,7 +80,6 @@ bool AlbaViewer::OnInit()
 
 	//////////////////////////////////////////////////////////////////////////
 	//Views
-	//////////////////////////////////////////////////////////////////////////
 
 	// VTK View (Surface)
 	m_Logic->Plug(new albaViewVTK("Surface"));	
@@ -88,6 +88,10 @@ bool AlbaViewer::OnInit()
 	albaViewOrthoSlice *vortho = new albaViewOrthoSlice("Orthoslice");
 	vortho->PackageView();
 	m_Logic->Plug(vortho);
+
+	//////////////////////////////////////////////////////////////////////////
+	//Operations
+	m_Logic->Plug(new albaOpTransform("Transform \tCtrl+t"));
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -151,7 +155,7 @@ void AlbaViewer::OnFatalException()
 }
 
 //--------------------------------------------------------------------------------
-int AlbaViewer::FilterEvent(wxEvent& event)
+int AlbaViewer::FilterEvent(wxEvent& event) 
 {
 	int keyCode = ((wxKeyEvent&)event).GetKeyCode();
 	bool controlDown = ((wxKeyEvent&)event).ControlDown();

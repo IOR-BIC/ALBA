@@ -43,8 +43,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaGUISettingsAdvanced.h"
 #include "albaVMEItemVTK.h"
 #include "albaDataVector.h"
-#include "albaTransform.h"
-#include "albaTransformFrame.h"
 #include "albaSmartPointer.h"
 #include "albaVMEGroup.h"
 #include "mmaMaterial.h"
@@ -64,7 +62,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkImageData.h"
 #include "vtkRenderer.h"
 #include "albaOpImporterDicomSliceAccHelper.h"
-#include "vtkTransform.h"
 #include "vtkImageData.h"
 #include "vtkTextMapper.h"
 #include "vtkTextProperty.h"
@@ -791,7 +788,7 @@ albaDicomSlice *albaOpImporterDicom::ReadDicomFile(albaString fileName)
 	std::string dcmModality, dcmStudyInstanceUID, dcmSeriesInstanceUID, dcmScanOptions;
 	std::string date, description, patientName, birthdate, photometricInterpretation;
 	double dcmTriggerTime = 0;
-	double defaulOrienatation[6] = { 1.0,0.0,0.0,0.0,1.0,1.0 };
+	double defaulOrienatation[6] = { 1.0,0.0,0.0,0.0,1.0,0.0 };
 	double dcmImageOrientationPatient[6];
 	double dcmImagePositionPatient[3] = {0.0,0.0,0.0};
 	int imageSize[2];

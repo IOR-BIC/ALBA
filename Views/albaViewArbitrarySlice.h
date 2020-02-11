@@ -2,7 +2,7 @@
 
 Program: ALBA
 Module: albaViewArbitrarySlice
-Authors: Eleonora Mambrini , Stefano Perticoni
+Authors: Eleonora Mambrini , Stefano Perticoni, Gianluigi Crimi
 
 Copyright (c) BIC
 All rights reserved. See Copyright.txt or
@@ -38,6 +38,7 @@ class albaGUI;
 class albaGUILutSlider;
 class albaGUILutSwatch;
 class albaVMEPolylineEditor;
+class vtkMatrix4x4;
 
 /** 
 Class Name: albaViewArbitrarySlice.
@@ -61,6 +62,8 @@ public:
 	enum ID_GUI
 	{
 		ID_COMBO_GIZMOS = Superclass::ID_LAST,
+		ID_GIZMO_TRANSLATE,
+		ID_GIZMO_ROTATE,
 		ID_RESET,
 		ID_TRILINEAR_INTERPOLATION_ON,
 		ID_LAST,
@@ -98,6 +101,10 @@ public:
 
 	/** Generate Gizmos and pose them in the right position*/
 	void CreateGizmos();
+
+	/** */
+	virtual void VmeSelect(albaVME *node, bool select);
+
 protected:
 
 	/** Internally used to create a new instance of the GUI. 
@@ -113,6 +120,12 @@ protected:
 
 	/** Handling events sent from other objects. Called by public method OnEvent().*/
 	void OnEventThis(albaEventBase *alba_event);  
+
+	void SetGizmo(int typeGizmo);
+
+	void OnReset();
+
+	void SetSlices();
 
 	/** This function is called when a rotate gizmo is moved*/
 	void OnEventGizmoRotate(albaEventBase *alba_event);
@@ -132,13 +145,13 @@ protected:
 	albaGizmoTranslate *m_GizmoTranslate;
 	albaGizmoRotate		*m_GizmoRotate;
 	albaVME          	*m_CurrentVolume;
-	albaVMESlicer			*m_Slicer;
-	albaMatrix					*m_MatrixReset;
-	albaAttachCamera		*m_AttachCamera;
+	albaMatrix				*m_MatrixReset;
+	albaAttachCamera	*m_AttachCamera;
+	albaMatrix			*m_SlicingMatrix;
 
-	double	m_SliceCenterSurface[3];
-	double	m_SliceCenterSurfaceReset[3];
-	double	m_SliceAngleReset[3];
+	double	m_SliceCenterSurface[4];
+	double	m_SliceCenterSurfaceReset[4];
+	double	m_SliceAngleReset[4];
 	int			m_TypeGizmo;
 
 	albaGUI				*m_GuiGizmos;
