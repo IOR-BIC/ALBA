@@ -197,6 +197,11 @@ bool AlbaMaster::OnInit()
 #include "Examples/AlbaMaster/MDICHILD_ICON.xpm"
 	albaADDPIC(MDICHILD_ICON);
 
+#include "pic/GIZMO_TRANSLATE_ICON.xpm"
+	albaADDPIC(GIZMO_TRANSLATE_ICON);
+#include "pic/GIZMO_ROTATE_ICON.xpm"
+	albaADDPIC(GIZMO_ROTATE_ICON);
+
 	int result;
 	result = albaVMEFactory::Initialize();
 	assert(result==ALBA_OK);

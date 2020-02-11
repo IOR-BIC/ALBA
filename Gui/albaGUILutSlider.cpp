@@ -29,7 +29,7 @@
 #include "albaDecl.h"
 #include "albaEvent.h"
 
-#define BUTT_H 18
+#define BUTT_H 20
 #define BUTT_W 5 // min size of mid button
 
 #define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
@@ -139,7 +139,7 @@ BEGIN_EVENT_TABLE(albaGUILutSlider,wxPanel)
 END_EVENT_TABLE()
 //----------------------------------------------------------------------------
 albaGUILutSlider::albaGUILutSlider(wxWindow *parent, wxWindowID id, const wxPoint& pos /* = wxDefaultPosition */, const wxSize& size /* = wxDefaultSize */, long style /* = 0 */, const char* middleButtonTitle /* = "windowing" */)
-:wxPanel(parent,id,pos,size,wxSUNKEN_BORDER | wxCLIP_CHILDREN )
+:wxPanel(parent,id,pos,size, wxBORDER_SIMPLE | wxCLIP_CHILDREN )
 //----------------------------------------------------------------------------
 {
   m_Listener = NULL;
@@ -155,6 +155,7 @@ albaGUILutSlider::albaGUILutSlider(wxWindow *parent, wxWindowID id, const wxPoin
   m_MaxLabel      = new wxStaticText(this, -1, "", wxPoint(0,0), wxSize(35, BUTT_H));
 
   SetMinSize(size);
+	
 
   m_FloatingPointText = false;
   m_FixedText = false;

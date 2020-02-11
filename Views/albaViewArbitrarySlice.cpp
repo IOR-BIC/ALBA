@@ -74,6 +74,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkImageData.h"
 #include "albaPipeSlice.h"
 #include "albaPipeVolumeArbSlice.h"
+#include "albaGUIPicButton.h"
 
 #define EPSILON 1.5e-5
 
@@ -286,8 +287,21 @@ void albaViewArbitrarySlice::OnEvent(albaEventBase *alba_event)
 	}
 	else
 	{
-		// if no one can handle this event send it to the operation listener
-		Superclass::OnEvent(alba_event);
+		switch (alba_event->GetId())
+		{
+		case ID_GIZMO_TRANSLATE:
+			SetGizmo(GIZMO_TRANSLATE);
+			break;
+
+		case ID_GIZMO_ROTATE:
+			SetGizmo(GIZMO_ROTATE);
+			break;
+
+		default:
+			// if no one can handle this event send it to the operation listener
+			Superclass::OnEvent(alba_event);
+			break;
+		}
 	}	
 }
 //----------------------------------------------------------------------------
@@ -375,22 +389,7 @@ void albaViewArbitrarySlice::OnEventThis(albaEventBase *alba_event)
 		switch(e->GetId()) 
 		{
 		case ID_COMBO_GIZMOS:
-			if(m_CurrentVolume)
-			{
-				if(m_TypeGizmo == GIZMO_TRANSLATE)
-				{
-					m_GizmoTranslate->Show(true);
-					m_GizmoTranslate->SetAbsPose(m_SlicingMatrix,0);
-					m_GizmoRotate->Show(false);
-				}
-				else if(m_TypeGizmo == GIZMO_ROTATE)
-				{
-					m_GizmoTranslate->Show(false);
-					m_GizmoRotate->Show(true);
-					m_GizmoRotate->SetAbsPose(m_SlicingMatrix,0);
-				}
-			}
-			CameraUpdate();
+			SetGizmo(m_TypeGizmo);
 			break;
 
 		case ID_RANGE_MODIFIED:
@@ -443,6 +442,30 @@ void albaViewArbitrarySlice::OnEventThis(albaEventBase *alba_event)
 			albaViewCompound::OnEvent(alba_event);
 		}
 	}
+}
+
+//----------------------------------------------------------------------------
+void albaViewArbitrarySlice::SetGizmo(int typeGizmo)
+{
+	if (m_CurrentVolume)
+	{
+		if (typeGizmo == GIZMO_TRANSLATE)
+		{
+			m_GizmoTranslate->Show(true);
+			m_GizmoTranslate->SetAbsPose(m_SlicingMatrix, 0);
+			m_GizmoRotate->Show(false);
+		}
+		else if (typeGizmo == GIZMO_ROTATE)
+		{
+			m_GizmoTranslate->Show(false);
+			m_GizmoRotate->Show(true);
+			m_GizmoRotate->SetAbsPose(m_SlicingMatrix, 0);
+		}
+
+		m_TypeGizmo = typeGizmo;
+		m_Gui->Update();
+	}
+	CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -516,21 +539,18 @@ albaGUI* albaViewArbitrarySlice::CreateGui()
 	assert(m_Gui == NULL);
 	m_Gui = albaView::CreateGui();
 
-	//combo box to choose the type of gizmo
-	m_Gui->Label("Choose Gizmo");
-	wxString Text[2]={_("Gizmo Translation"),_("Gizmo Rotation")};
-	m_Gui->Combo(ID_COMBO_GIZMOS,"",&m_TypeGizmo,2,Text);
+	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER, "Lut", m_ColorLUT);
 
-	m_Gui->Label("");
+	m_Gui->Bool(ID_TRILINEAR_INTERPOLATION_ON, "Interpolation", &m_TrilinearInterpolationOn, 1);
+
+	m_Gui->Divider(1);
+
+	wxString Text[2]={_("Translation"),_("Rotation")};
+	m_Gui->Radio(ID_COMBO_GIZMOS, "Gizmo", &m_TypeGizmo, 2, Text);
+
 	//button to reset at the start position
 	m_Gui->Button(ID_RESET,_("Reset"),"");
-	m_Gui->Divider(2);
 
-	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
-
-	m_Gui->Bool(ID_TRILINEAR_INTERPOLATION_ON,"Interpolation",&m_TrilinearInterpolationOn,1);
-
-	m_Gui->Divider();
 	m_Gui->Update();
 
 	EnableWidgets(m_CurrentVolume);
@@ -604,13 +624,29 @@ void albaViewArbitrarySlice::CreateGuiView()
 {
 	m_GuiView = new albaGUI(this);
 
-	m_LutSlider = new albaGUILutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
+	wxBoxSizer *mainVertSizer = new wxBoxSizer(wxHORIZONTAL);
+	m_LutSlider = new albaGUILutSlider(m_GuiView, -1, wxPoint(0, 0), wxSize(500, 24));
 	m_LutSlider->SetListener(this);
-	m_LutSlider->SetSize(500,24);
-	m_LutSlider->SetMinSize(wxSize(500,24));
-	EnableWidgets( m_CurrentVolume );
-	m_GuiView->Add(m_LutSlider);
+	m_LutSlider->SetSize(500, 24);
+	m_LutSlider->SetMinSize(wxSize(500, 24));
+
+	albaGUIPicButton *button1 = new albaGUIPicButton(m_GuiView, "GIZMO_TRANSLATE_ICON", ID_GIZMO_TRANSLATE, this);
+	button1->SetListener(this);
+	button1->SetToolTip("Translate");
+
+	albaGUIPicButton *button2 = new albaGUIPicButton(m_GuiView, "GIZMO_ROTATE_ICON", ID_GIZMO_ROTATE, this);
+	button2->SetListener(this);
+	button2->SetToolTip("Rotate");
+
+	mainVertSizer->Add(button1);
+	mainVertSizer->Add(button2);
+	mainVertSizer->Add(m_LutSlider, wxEXPAND);
+
+	m_GuiView->Add(mainVertSizer, 1, wxEXPAND);
+
 	m_GuiView->Reparent(m_Win);
+
+	//EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::EnableWidgets(bool enable)
@@ -620,7 +656,10 @@ void albaViewArbitrarySlice::EnableWidgets(bool enable)
 		m_Gui->Enable(ID_RESET, enable);
 		m_Gui->Enable(ID_COMBO_GIZMOS, enable);
 		m_Gui->Enable(ID_LUT_CHOOSER, enable);
+ 		m_Gui->Enable(ID_GIZMO_TRANSLATE, enable);
+ 		m_Gui->Enable(ID_GIZMO_ROTATE, enable);
 		m_LutSlider->Enable(enable);
+
 		m_Gui->FitGui();
 		m_Gui->Update();
 	}
