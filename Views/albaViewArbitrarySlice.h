@@ -62,6 +62,8 @@ public:
 	enum ID_GUI
 	{
 		ID_COMBO_GIZMOS = Superclass::ID_LAST,
+		ID_GIZMO_TRANSLATE,
+		ID_GIZMO_ROTATE,
 		ID_RESET,
 		ID_TRILINEAR_INTERPOLATION_ON,
 		ID_LAST,
@@ -118,6 +120,8 @@ protected:
 
 	/** Handling events sent from other objects. Called by public method OnEvent().*/
 	void OnEventThis(albaEventBase *alba_event);  
+
+	void SetGizmo(int typeGizmo);
 
 	void OnReset();
 
