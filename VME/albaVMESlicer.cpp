@@ -48,6 +48,8 @@
 #include "vtkTransform.h"
 
 #include <assert.h>
+#include "albaVMEVolumeGray.h"
+#include "mmaVolumeMaterial.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMESlicer)
@@ -126,7 +128,14 @@ mmaMaterial *albaVMESlicer::GetMaterial()
   {
     material = mmaMaterial::New();
     SetAttribute("MaterialAttributes", material);
-    lutPreset(4,GetMaterial()->m_ColorLut);
+		albaVMEVolumeGray *slicedVolume = albaVMEVolumeGray::SafeDownCast(GetSlicedVMELink());
+		if (slicedVolume && slicedVolume->GetMaterial())
+		{
+			mmaVolumeMaterial * volumeMaterial = slicedVolume->GetMaterial();
+			material->m_ColorLut->DeepCopy(volumeMaterial->m_ColorLut);
+		}
+		else
+			lutPreset(4,GetMaterial()->m_ColorLut);
   }
   return material;
 }
@@ -279,13 +288,13 @@ void albaVMESlicer::InternalPreUpdate()
 //-----------------------------------------------------------------------
 {
   albaVME *vol = GetSlicedVMELink();
-  if(vol)
-  {
-    vtkDataSet *vtkdata = vol->GetOutput()->GetVTKData();
-    if (vtkdata)
-    {
-      double pos[3];
-      float vectX[3],vectY[3], n[3];
+	if (vol)
+	{
+		vtkDataSet *vtkdata = vol->GetOutput()->GetVTKData();
+		if (vtkdata)
+		{
+			double pos[3];
+			float vectX[3], vectY[3], n[3];
 
 			//transform
 			m_CopyTransform->SetMatrix(m_Transform->GetMatrix());
@@ -301,59 +310,65 @@ void albaVMESlicer::InternalPreUpdate()
 			parentTransform->SetMatrix(GetParent()->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 			parentTransform->Update();
 
-			parentTransform->Concatenate(slicedVMETransform,0);
+			parentTransform->Concatenate(slicedVMETransform, 0);
 			parentTransform->Update();
 
-			m_CopyTransform->Concatenate(parentTransform,0);
+			m_CopyTransform->Concatenate(parentTransform, 0);
 			m_CopyTransform->Update();
-      m_CopyTransform->GetPosition(pos);
-      m_CopyTransform->GetVersor(0, vectX);
-      m_CopyTransform->GetVersor(1, vectY);
+			m_CopyTransform->GetPosition(pos);
+			m_CopyTransform->GetVersor(0, vectX);
+			m_CopyTransform->GetVersor(1, vectY);
 
-      vtkMath::Normalize(vectX);
-      vtkMath::Normalize(vectY);
-      vtkMath::Cross(vectY, vectX, n);
-      vtkMath::Normalize(n);
-      vtkMath::Cross(n, vectX, vectY);
-      vtkMath::Normalize(vectY);
+			vtkMath::Normalize(vectX);
+			vtkMath::Normalize(vectY);
+			vtkMath::Cross(vectY, vectX, n);
+			vtkMath::Normalize(n);
+			vtkMath::Cross(n, vectX, vectY);
+			vtkMath::Normalize(vectY);
 
-      vtkdata->Update();
-      vtkDataArray *scalars = vtkdata->GetPointData()->GetScalars();
-      if (scalars == NULL)
-      {
-        return;
-      }
+			vtkdata->Update();
+			vtkDataArray *scalars = vtkdata->GetPointData()->GetScalars();
+			if (scalars == NULL)
+			{
+				return;
+			}
 
-      vtkImageData *texture = m_PSlicer->GetTexture();
-      texture->SetScalarType(scalars->GetDataType());
-      texture->SetNumberOfScalarComponents(scalars->GetNumberOfComponents());
-      texture->Modified();
+			vtkImageData *texture = m_PSlicer->GetTexture();
+			texture->SetScalarType(scalars->GetDataType());
+			texture->SetNumberOfScalarComponents(scalars->GetNumberOfComponents());
+			texture->Modified();
 
-      GetMaterial()->SetMaterialTexture(texture);
-      texture->GetScalarRange(GetMaterial()->m_TableRange);
-      
-	  if (m_UpdateVTKPropertiesFromMaterial == true)
-	  {
-		  GetMaterial()->UpdateProp();
-	  }
-	  
-      m_PSlicer->SetInput(vtkdata);
-      m_PSlicer->SetPlaneOrigin(pos);
-      m_PSlicer->SetPlaneAxisX(vectX);
-      m_PSlicer->SetPlaneAxisY(vectY);
+			mmaMaterial * material = GetMaterial();
+			material->SetMaterialTexture(texture);
+			albaVMEVolumeGray *slicedVolume = albaVMEVolumeGray::SafeDownCast(vol);
+			albaVMEOutputVolume *volumeOutput = slicedVolume ? albaVMEOutputVolume::SafeDownCast(slicedVolume->GetOutput()) : NULL;
+			if (slicedVolume)
+			{
+				mmaVolumeMaterial * volumeMaterial = volumeOutput->GetMaterial();
+				volumeMaterial->m_ColorLut->GetTableRange(material->m_TableRange);
+			}
+			else
+			{
+				texture->GetScalarRange(material->m_TableRange);
+			}
 
-      m_ISlicer->SetInput(vtkdata);
-      m_ISlicer->SetPlaneOrigin(pos);
-      m_ISlicer->SetPlaneAxisX(vectX);
-      m_ISlicer->SetPlaneAxisY(vectY);
+			if (m_UpdateVTKPropertiesFromMaterial)
+				material->UpdateProp();
 
-      m_BackTransform->SetTransform(m_CopyTransform->GetVTKTransform()->GetInverse());
+			m_PSlicer->SetInput(vtkdata);
+			m_PSlicer->SetPlaneOrigin(pos);
+			m_PSlicer->SetPlaneAxisX(vectX);
+			m_PSlicer->SetPlaneAxisY(vectY);
+
+			m_ISlicer->SetInput(vtkdata);
+			m_ISlicer->SetPlaneOrigin(pos);
+			m_ISlicer->SetPlaneAxisX(vectX);
+			m_ISlicer->SetPlaneAxisY(vectY);
+
+			m_BackTransform->SetTransform(m_CopyTransform->GetVTKTransform()->GetInverse());
 			m_BackTransform->Update();
-      /*m_BackTransformParent->SetTransform(transform->GetInverse());
-      m_BackTransform->SetInput(m_BackTransformParent->GetOutput());
-      m_BackTransform->Update();*/
-    }
-  }
+		}
+	}
 
   m_SlicedName = vol ? vol->GetName() : _("none");
 }
@@ -363,31 +378,44 @@ void albaVMESlicer::InternalUpdate()
 //-----------------------------------------------------------------------
 {
   albaVME *vol = GetSlicedVMELink();
-  if(vol)
-  {
-    vol->Update();
-    if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
-    {
-      m_PSlicer->Update();
-      m_ISlicer->Update();
+	if (vol)
+	{
+		vol->Update();
+		if (vtkDataSet *vtkdata = vol->GetOutput()->GetVTKData())
+		{
+			m_PSlicer->Update();
+			m_ISlicer->Update();
 
-      vtkDataArray *scalars = vtkdata->GetPointData()->GetScalars();
-      if (scalars == NULL)
-      {
-        return;
-      }
+			vtkDataArray *scalars = vtkdata->GetPointData()->GetScalars();
+			if (scalars == NULL)
+			{
+				return;
+			}
 
-      vtkImageData *texture = m_PSlicer->GetTexture();
+			vtkImageData *texture = m_PSlicer->GetTexture();
 
-      GetMaterial()->SetMaterialTexture(texture);
-      texture->GetScalarRange(GetMaterial()->m_TableRange);
+			mmaMaterial * material = GetMaterial();
 
-	  if (m_UpdateVTKPropertiesFromMaterial == true)
-	  {
-		GetMaterial()->UpdateProp();
-	  }
-    }
-  }
+			material->SetMaterialTexture(texture);
+
+			albaVMEVolumeGray *slicedVolume = albaVMEVolumeGray::SafeDownCast(vol);
+			albaVMEOutputVolume *volumeOutput = slicedVolume ? albaVMEOutputVolume::SafeDownCast(slicedVolume->GetOutput()) : NULL;
+			if (slicedVolume)
+			{
+				mmaVolumeMaterial * volumeMaterial = volumeOutput->GetMaterial();
+				volumeMaterial->m_ColorLut->GetTableRange(material->m_TableRange);
+			}
+			else
+			{
+				texture->GetScalarRange(material->m_TableRange);
+			}
+
+			if (m_UpdateVTKPropertiesFromMaterial == true)
+			{
+				GetMaterial()->UpdateProp();
+			}
+		}
+	}
 }
 //-----------------------------------------------------------------------
 int albaVMESlicer::InternalStore(albaStorageElement *parent)
