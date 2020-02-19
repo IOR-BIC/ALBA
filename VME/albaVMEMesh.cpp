@@ -160,7 +160,8 @@ albaGUI * albaVMEMesh::CreateGui()
 		m_GuiBonematConfig->Label("E = a + b * Rho^c", false);
 
 		//m_GuiBonematConfig->Label("Minimum Elasticity Modulus:", false);
-		m_GuiBonematConfig->Double(ID_DISABLED, "Min Elasticity Modulus:", &m_Configuration.minElasticity, MINDOUBLE, MAXDOUBLE, -1, "", false, 0.60);
+		m_GuiBonematConfig->Double(ID_DISABLED, "Min Elasticity Modulus:", &m_Configuration.elasticityBounds[0], MINDOUBLE, MAXDOUBLE, -1, "", false, 0.60);
+		m_GuiBonematConfig->Double(ID_DISABLED, "Max Elasticity Modulus:", &m_Configuration.elasticityBounds[1], MINDOUBLE, MAXDOUBLE, -1, "", false, 0.60);
 		m_GuiBonematConfig->Divider();
 
 		if (m_Configuration.densityIntervalsNumber == 0) // SINGLE_INTERVAL = 0,	THREE_INTERVALS = 1
@@ -499,7 +500,8 @@ bool albaVMEMesh::LoadConfigurationTags(albaVMEMesh *vme, BonematConfiguration &
 		// Advanced Configuration
 		conf.m_DensityOutput = GetDoubleTag(vme, "m_DensityOutput"); //appOpBonematCommon::RhoSelection::USE_RHO_QCT;
 		conf.m_PoissonRatio = GetDoubleTag(vme, "m_PoissonRatio");
-		conf.minElasticity = GetDoubleTag(vme, "minElasticity"); // 1e-6;
+		conf.elasticityBounds[0] = GetDoubleTag(vme, "minElasticity");
+		conf.elasticityBounds[1] = GetDoubleTag(vme, "maxElasticity");
 
 		return true;
 	}
@@ -635,7 +637,8 @@ int albaVMEMesh::SaveConfigurationFile(BonematConfiguration configuration, const
 		densityRelationshipNode->setAttribute(albaXMLString("IntervalsType"), albaXMLString("THREE"));
 	}
 
-	densityRelationshipNode->setAttribute(albaXMLString("MinElasticity"), albaXMLString(albaString(configuration.minElasticity)));
+	densityRelationshipNode->setAttribute(albaXMLString("MinElasticity"), albaXMLString(albaString(configuration.elasticityBounds[0])));
+	densityRelationshipNode->setAttribute(albaXMLString("MaxElasticity"), albaXMLString(albaString(configuration.elasticityBounds[1])));
 
 	XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *densitySingleIntervalNode = doc->createElement(albaXMLString("DENSITY_SINGLE_INTERVAL"));
 	densitySingleIntervalNode->setAttribute(albaXMLString("a"), albaXMLString(albaString(configuration.a_OneInterval)));
