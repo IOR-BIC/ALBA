@@ -834,6 +834,7 @@ albaDicomSlice *albaOpImporterDicom::ReadDicomFile(albaString fileName)
 
 	//Read Study-Series IDs
 	dcmStudyInstanceUID = READTAG(TAG_StudyInstanceUID);
+	dcmSeriesInstanceUID = READTAG(TAG_SeriesInstanceUID);
 	dcmAcquisitionNumber = READTAG(TAG_AcquisitionNumber);
 	
 	//Try to read image position patient form Dicom
