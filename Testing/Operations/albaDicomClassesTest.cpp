@@ -45,6 +45,9 @@
 #define D_NewDcmStudyID "Id-Study-2"
 #define D_DcmSeriesID "Id-Series-1"
 #define D_NewDcmSeriesID "Id-Series-2"
+#define D_DcmSeriesID "Id-Series-1"
+#define D_DcmAcquisitionNumber "1"
+#define D_NewDcmAcquisitionNumber "2"
 #define D_Position { 0.0, 1.0, 2.0 }
 #define D_SliceSize { 256, 256 }
 #define D_NewPosition { 0.0, 2.0, 1.0 }
@@ -313,7 +316,7 @@ void albaDicomClassesTest::TestSliceGetStudyID()
 //----------------------------------------------------------------------------
 void albaDicomClassesTest::TestSeriesDynamicAllocation()
 {
-	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID);
+	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID,D_DcmAcquisitionNumber);
 	
 	cppDEL(series);
 }
@@ -323,7 +326,7 @@ void albaDicomClassesTest::TestSeriesAddSlice()
 {
 	albaDicomSlice *sliceDicom = CreateBaseSlice();
 
-	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID);
+	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID,D_DcmAcquisitionNumber);
 
 	series->AddSlice(sliceDicom);
 
@@ -339,7 +342,7 @@ void albaDicomClassesTest::TestSeriesGetSlicesNum()
 	albaDicomSlice *sliceDicom = CreateBaseSlice();
 	albaDicomSlice *sliceDicom2 = CreateBaseSlice();
 
-	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID);
+	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID, D_DcmAcquisitionNumber);
 
 	series->AddSlice(sliceDicom);
 	CPPUNIT_ASSERT(series->GetSlicesNum() == 1);
@@ -359,7 +362,7 @@ void albaDicomClassesTest::TestSeriesIsRotated()
 	double patientNewOri[6] = D_NewOrientation;
 	sliceDicom2->SetDcmImageOrientationPatient(patientNewOri);
 
-	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID);
+	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID, D_DcmAcquisitionNumber);
 
 	series->AddSlice(sliceDicom);
 	CPPUNIT_ASSERT(series->IsRotated() == false);
@@ -377,7 +380,7 @@ void albaDicomClassesTest::TestSeriesGetSlices()
 	albaDicomSlice *sliceDicom = CreateBaseSlice();
 	albaDicomSlice *sliceDicom2 = CreateBaseSlice();
 	
-	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID);
+	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID, D_DcmAcquisitionNumber);
 	series->AddSlice(sliceDicom);
 	series->AddSlice(sliceDicom2);
 
@@ -393,7 +396,7 @@ void albaDicomClassesTest::TestSeriesGetSlices()
 //----------------------------------------------------------------------------
 void albaDicomClassesTest::TestSeriesGetSerieID()
 {
-	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID);
+	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID, D_DcmAcquisitionNumber);
 	
 	CPPUNIT_ASSERT(series->GetSerieID() == D_DcmSeriesID);
 
@@ -406,7 +409,7 @@ void albaDicomClassesTest::TestSeriesGetDimensions()
 	//Using the default constructor
 	albaDicomSlice *sliceDicom = CreateBaseSlice();
 
-	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID);
+	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID, D_DcmAcquisitionNumber);
 	series->AddSlice(sliceDicom);
 
 	const int *dims=series->GetDimensions();
@@ -422,7 +425,7 @@ void albaDicomClassesTest::TestSeriesGetCardiacImagesNum()
 {
 	albaDicomSlice *sliceDicom = CreateBaseSlice();
 
-	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID);
+	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID, D_DcmAcquisitionNumber);
 	series->AddSlice(sliceDicom);
 
 	CPPUNIT_ASSERT(series->GetCardiacImagesNum() == D_DcmCardiacNumberOfImages);
@@ -437,7 +440,7 @@ void albaDicomClassesTest::TestSeriesSortSlices()
 	albaDicomSlice *sliceDicom = CreateBaseSlice();
 	albaDicomSlice *sliceDicom2 = CreateBaseSlice(newPos);
 
-	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID);
+	albaDicomSeries *series = new albaDicomSeries(D_DcmSeriesID, D_DcmAcquisitionNumber);
 	series->AddSlice(sliceDicom);
 	series->AddSlice(sliceDicom2);
 
@@ -473,25 +476,36 @@ void albaDicomClassesTest::TestStudyAddSlice()
 	albaDicomSlice *sliceDicom = CreateBaseSlice();
 	albaDicomSlice *sliceDicom2 = CreateBaseSlice();
 	albaDicomSlice *sliceDicom3 = CreateBaseSlice();
+	albaDicomSlice *sliceDicom4 = CreateBaseSlice();
 
-	sliceDicom2->SetSeriesID(D_NewDcmSeriesID);
+	sliceDicom2->SetAcquisitionNumber(D_NewDcmAcquisitionNumber);
+	sliceDicom3->SetSeriesID(D_NewDcmSeriesID);
 
 	albaDicomStudy *study = new albaDicomStudy(D_DcmStudyID);
 
+	//first slice
 	study->AddSlice(sliceDicom);
 	CPPUNIT_ASSERT(study->GetSeriesNum() == 1);
 	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlicesNum() == 1);
 	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlice(0) == sliceDicom);
 
+	//slice with new AcquisitionNumber
 	study->AddSlice(sliceDicom2);
 	CPPUNIT_ASSERT(study->GetSeriesNum() == 2);
 	CPPUNIT_ASSERT(study->GetSeries(1)->GetSlicesNum() == 1);
 	CPPUNIT_ASSERT(study->GetSeries(1)->GetSlice(0) == sliceDicom2);
 
+	//slice with new seriesID
 	study->AddSlice(sliceDicom3);
-	CPPUNIT_ASSERT(study->GetSeriesNum() == 2);
+	CPPUNIT_ASSERT(study->GetSeriesNum() == 3);
+	CPPUNIT_ASSERT(study->GetSeries(2)->GetSlicesNum() == 1);
+	CPPUNIT_ASSERT(study->GetSeries(2)->GetSlice(0) == sliceDicom3);
+
+	//slice with already know seriesID and AcquisitionNumber
+	study->AddSlice(sliceDicom4);
+	CPPUNIT_ASSERT(study->GetSeriesNum() == 3);
 	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlicesNum() == 2);
-	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlice(1) == sliceDicom3);
+	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlice(1) == sliceDicom4);
 
 	cppDEL(study);
 }
