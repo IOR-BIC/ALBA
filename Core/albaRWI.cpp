@@ -75,7 +75,7 @@ albaRWI::albaRWI()
 	m_Axes    = NULL;
 
 	m_ProfilingActor = NULL;
-	for (int b=0; b<6; b++)
+	for (int b=0; b<7; b++)
 	{
 		m_CameraButtons[b] = NULL;
 	}
@@ -115,7 +115,7 @@ albaRWI::albaRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_a
 
 	m_ProfilingActor = NULL;
 
-	for (int b=0; b<6; b++)
+	for (int b=0; b<7; b++)
 	{
 		m_CameraButtons[b] = NULL;
 	}
@@ -848,6 +848,7 @@ enum RWI_WIDGET_ID
 	ID_CAMERA_TOP,
 	ID_CAMERA_BOTTOM,
 	ID_FOCAL_POINT,
+	ID_CAMERA_ORTHO,
 	ID_CAMERA_POSITION,
 	ID_CAMERA_VIEW_UP,
 	ID_CAMERA_ORIENTATION,
@@ -872,9 +873,24 @@ albaGUI *albaRWI::CreateGui()
 		m_CameraButtons[3] = new albaGUIPicButton(m_Gui, "PIC_FRONT", ID_CAMERA_FRONT,  this);
 		m_CameraButtons[4] = new albaGUIPicButton(m_Gui, "PIC_LEFT",  ID_CAMERA_LEFT,   this);
 		m_CameraButtons[5] = new albaGUIPicButton(m_Gui, "PIC_RIGHT", ID_CAMERA_RIGHT,  this);
-		for(int i = 0; i < 6; i++)
-			m_Sizer->Add(m_CameraButtons[i],0,0);
+		m_CameraButtons[6] = new albaGUIPicButton(m_Gui, "PIC_ORTHO", ID_CAMERA_ORTHO, this);
+
+		m_CameraButtons[0]->SetToolTip("Bottom");
+		m_CameraButtons[1]->SetToolTip("Top");
+		m_CameraButtons[2]->SetToolTip("Back");
+		m_CameraButtons[3]->SetToolTip("Front");
+		m_CameraButtons[4]->SetToolTip("Left");
+		m_CameraButtons[5]->SetToolTip("Right");
+		m_CameraButtons[6]->SetToolTip("Orthographic");
+		
+		for (int i = 0; i < 7; i++)
+		{
+			if(i==6) m_Sizer->Add(new wxStaticText(m_Gui, -1, " ", wxPoint(-1, -1), wxSize(25, -1), wxALIGN_LEFT));
+			m_Sizer->Add(m_CameraButtons[i], 0, 0);		
+		}		
+
 		m_Gui->Add(m_Sizer);
+		m_Gui->Divider(1);
 
 		m_Gui->Label("Camera parameters", true);
 		m_Gui->Vector(ID_FOCAL_POINT, "Focal pnt.", m_FocalPoint);
@@ -985,6 +1001,12 @@ void albaRWI::OnEvent(albaEventBase *alba_event)
 			break;
 		case ID_CAMERA_BOTTOM:
 			CameraSet(CAMERA_PERSPECTIVE_BOTTOM);
+			break;
+		case ID_CAMERA_ORTHO: 
+		{
+			m_Camera->ParallelProjectionOn();
+ 			CameraUpdate();
+		}
 			break;
 		case ID_FOCAL_POINT:
 		case ID_CAMERA_POSITION:
