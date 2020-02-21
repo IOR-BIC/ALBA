@@ -163,7 +163,7 @@ protected:
 	wxColour	    m_BGColour;
 	wxColour	    m_GridColour;
 	double        m_GridPosition;
-	albaGUIPicButton *m_CameraButtons[6];
+	albaGUIPicButton *m_CameraButtons[7];
 	wxBoxSizer	 *m_Sizer;
 
 	albaAxes          *m_Axes; ///< Actor representing a global reference system.
