@@ -163,7 +163,7 @@ protected:
 	wxColour	    m_BGColour;
 	wxColour	    m_GridColour;
 	double        m_GridPosition;
-	albaGUIPicButton *m_CameraButtons[7];
+	albaGUIPicButton *m_CameraButtons[6];
 	wxBoxSizer	 *m_Sizer;
 
 	albaAxes          *m_Axes; ///< Actor representing a global reference system.
@@ -171,6 +171,8 @@ protected:
 	int               m_ShowGrid; ///< Flag used to show/hide the grid.
 	int               m_GridNormal;
 	int               m_ShowAxes;  ///< Flag used to show/hide axes in low left corner of the view
+
+	int								m_ParallelView; ///< Flag used to set Camera Mode Orthographic or Perspective
 
 	int           m_StereoType;
 	vtkALBATextOrientator     *m_Orientator;
