@@ -792,3 +792,11 @@ void albaViewArbitrarySlice::DestroyGizmos()
 
 	m_Gui->Update();
 }
+
+//----------------------------------------------------------------------------
+albaMatrix* albaViewArbitrarySlice::GetSlicerMatrix()
+{
+	return m_GizmoTranslate->GetAbsPose();
+	//return m_GizmoRT[axis]->GetAbsPose();
+	//return m_Slicer[0]->GetOutput()->GetAbsMatrix();
+}
