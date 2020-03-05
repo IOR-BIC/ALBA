@@ -99,6 +99,7 @@ public:
 	/** Remove Gizmos, Observers from the volume */
 	void DestroyGizmos();
 
+	albaMatrix* GetSlicerMatrix();
 	/** Generate Gizmos and pose them in the right position*/
 	void CreateGizmos();
 

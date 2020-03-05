@@ -155,6 +155,8 @@ public:
 	/** return an xpm-icon that can be used to represent this view */
 	virtual char ** GetIcon();
 
+	albaMatrix* GetSlicerMatrix(int axis = X);
+	void SetSlicerMatrix(albaMatrix* matrix, int axis = X);
 protected:
 
 	enum AXIS { X = 0, Y = 1, Z = 2 };
