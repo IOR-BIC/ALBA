@@ -100,6 +100,8 @@ public:
 	void DestroyGizmos();
 
 	albaMatrix* GetSlicerMatrix();
+	void SetSlicerMatrix(albaMatrix* matrix, int axis = 0);
+
 	/** Generate Gizmos and pose them in the right position*/
 	void CreateGizmos();
 
