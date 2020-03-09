@@ -75,6 +75,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaPipeSlice.h"
 #include "albaPipeVolumeArbSlice.h"
 #include "albaGUIPicButton.h"
+#include "albaRefSys.h"
 
 #define EPSILON 1.5e-5
 
@@ -796,7 +797,10 @@ void albaViewArbitrarySlice::DestroyGizmos()
 //----------------------------------------------------------------------------
 albaMatrix* albaViewArbitrarySlice::GetSlicerMatrix()
 {
-	return m_GizmoTranslate->GetAbsPose();
-	//return m_GizmoRT[axis]->GetAbsPose();
-	//return m_Slicer[0]->GetOutput()->GetAbsMatrix();
+	return m_SlicingMatrix; 
+}
+//----------------------------------------------------------------------------
+void albaViewArbitrarySlice::SetSlicerMatrix(albaMatrix* matrix, int axis)
+{
+	m_SlicingMatrix = matrix;
 }
