@@ -120,6 +120,7 @@ public:
 	{
 		ID_COMBO_CHOOSE_EXPORT_AXIS = Superclass::ID_LAST,
 		ID_RESET,
+		ID_GPUENABLED,
 		ID_SHOW_GIZMO,
 		ID_UPDATE_LUT, 
 		ID_LAST,
@@ -189,7 +190,9 @@ protected:
 
 	void OnEventThis(albaEventBase *alba_event);  
 
-	
+	/**Sets GPU Acceleration On/Off according to current status*/
+	void SetEnableGPU();
+
 	void OnLUTChooser();
 	void OnLUTRangeModified();
 
@@ -249,6 +252,7 @@ protected:
 	albaAxes::AXIS_TYPE_ENUM m_AxesType;
 
 	int m_SkipCameraUpdate;
+	int m_EnableGPU;
 };
 
 #endif

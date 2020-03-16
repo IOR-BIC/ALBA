@@ -102,7 +102,7 @@ albaVMESlicer::albaVMESlicer()
   GetMaterial()->m_MaterialType = mmaMaterial::USE_TEXTURE;
   GetMaterial()->m_TextureMappingMode = mmaMaterial::PLANE_MAPPING;
 
-  m_TrilinearInterpolationOn = true;
+  m_TrilinearInterpolationOn = m_EnableGPU = true;
 }
 
 //-------------------------------------------------------------------------
@@ -470,7 +470,12 @@ void albaVMESlicer::SetTrilinearInterpolation(bool on)
 {
   m_TrilinearInterpolationOn = on;
   if(m_ISlicer)
-  {
-    m_ISlicer->SetTrilinearInterpolation(on == TRUE);
-  }
+    m_ISlicer->SetTrilinearInterpolation(on);
+}
+
+void albaVMESlicer::SetEnableGPU(bool val)
+{
+	m_EnableGPU = val;
+	if (m_ISlicer)
+		m_ISlicer->SetGPUEnabled(m_EnableGPU);
 }
