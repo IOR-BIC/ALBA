@@ -518,6 +518,21 @@ char ** albaViewArbitraryOrthoSlice::GetIcon()
 }
 
 //----------------------------------------------------------------------------
+albaMatrix* albaViewArbitraryOrthoSlice::GetSlicerMatrix(int axis)
+{
+	return m_GizmoRT[axis]->GetAbsPose();
+}
+
+//----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::SetSlicerMatrix(albaMatrix* matrix, int axis)
+{
+	m_GizmoRT[axis]->SetAbsPose(matrix);
+
+	RestoreCameraParametersForAllSubviews();
+	CameraUpdate();
+}
+
+//----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::CreateGuiView()
 {
 	m_GuiView = new albaGUI(this);
