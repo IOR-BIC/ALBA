@@ -120,6 +120,7 @@ public:
 	{
 		ID_COMBO_CHOOSE_EXPORT_AXIS = Superclass::ID_LAST,
 		ID_RESET,
+		ID_GPUENABLED,
 		ID_SHOW_GIZMO,
 		ID_UPDATE_LUT, 
 		ID_LAST,
@@ -155,6 +156,8 @@ public:
 	/** return an xpm-icon that can be used to represent this view */
 	virtual char ** GetIcon();
 
+	albaMatrix* GetSlicerMatrix(int axis = X);
+	void SetSlicerMatrix(albaMatrix* matrix, int axis = X);
 protected:
 
 	enum AXIS { X = 0, Y = 1, Z = 2 };
@@ -189,7 +192,9 @@ protected:
 
 	void OnEventThis(albaEventBase *alba_event);  
 
-	
+	/**Sets GPU Acceleration On/Off according to current status*/
+	void SetEnableGPU();
+
 	void OnLUTChooser();
 	void OnLUTRangeModified();
 
@@ -249,6 +254,7 @@ protected:
 	albaAxes::AXIS_TYPE_ENUM m_AxesType;
 
 	int m_SkipCameraUpdate;
+	int m_EnableGPU;
 };
 
 #endif
