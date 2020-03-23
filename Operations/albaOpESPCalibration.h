@@ -61,11 +61,11 @@ class albaVMELandmarkCloud;
 class albaHTMLTemplateParser;
 struct Calibration;
 
-enum TAIL_POSITION {
-	TAIL_FRONT,
-	TAIL_REAR,
-	TAIL_LEFT,
-	TAIL_RIGHT,
+enum TailPosition {
+	TAIL_ON_FRONT,
+	TAIL_ON_REAR,
+	TAIL_ON_LEFT,
+	TAIL_ON_RIGHT,
 };
 
 //----------------------------------------------------------------------------
@@ -132,12 +132,14 @@ protected:
 	template<typename DataType>
 	Range CalculateCutOfRange(int scalarSizes, DataType * scalars, double cutOff);
 
-	albaVME *CreateParallelepiped(double center[3], char * name, double xLen, double yLen, double height);
-	albaVME *CreateCylinder(double centerX, double centerY, double centerZ, char * name, double height, double radius);
+	albaVME *CreateVMEParallelepiped(double center[3], char * name, double xLen, double yLen, double height);
+	albaVME *CreateVMECylinder(double centerX, double centerY, double centerZ, char * name, double height, double radius);
 
-	bool GetCenter(vtkImageData *rg, Range xRange, Range yRange, int zEight, double *center/*, albaVMELandmarkCloud *lmc*/);
+	Cylinder CreateCylinder(double * origin, double * spacing, double centerX, double centerY, double centerZ, double radius, double cylHeight);
 
-	double GetRadius(vtkImageData *rg, Range xRange, Range yRange, int zEight, double center[3], bool getInner = true);
+	BoneCylinder CreateBoneCylinder(TailPosition tailPosition, double * origin, double * spacing, double centerX, double centerY, double centerZ, double innerRadius, double OuterRadius, double cylHeight);
+	
+	Tail CreateTail(double * origin, double * spacing, double centerX, double centerY, double centerZ, double xSize, double ySize, double zSize);
 
 	bool CalculateSpinalDensityInfo(vtkImageData *rg);
 
@@ -146,13 +148,13 @@ protected:
 	bool CalculateTailDensityInfo(vtkImageData *rg);
 
 
-	double GetTailCenter(vtkImageData *rg, int side, double x, double y, double z);
+	double GetTailCenter(vtkImageData *rg, TailPosition tailPos, double x, double y, double z);
 
 	bool FitPoints();
 
 
 
-	Cylinder m_InnerCylinders[3];
+	Cylinder m_SpinalCylinders[3];
 	BoneCylinder m_BoneCylinders[2];
 	Tail m_Tail;
 
