@@ -104,7 +104,7 @@ public:
 	};
 
   /** Retrieve the direction of projection as string */
-  char *GetProjectionModeAsString(void)
+  char *GetProjectionSideAsString(void)
   {
      switch (this->ProjectionSide) {
         case VTK_PROJECT_FROM_X: return "X";
