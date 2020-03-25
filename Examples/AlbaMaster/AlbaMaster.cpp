@@ -137,6 +137,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpVolumeMeasure.h"
 #include "albaOpVolumeMirror.h"
 #include "albaOpVolumeResample.h"
+#include "albaOpESPCalibration.h"
 
 // VIEWS
 #include "albaView3D.h"
@@ -353,7 +354,8 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpIterativeRegistration(),_("Register"));
 	m_Logic->Plug(new albaOpRegisterClusters("Clusters"),_("Register"));
 	m_Logic->Plug(new albaOpClassicICPRegistration("Surface"),_("Register"));
-	
+
+	m_Logic->Plug(new albaOpESPCalibration("Calibrate ESP Phantom"), _("Calibration"));
 	//------------------------------------------------------------
 	
 #ifdef USE_WIZARD

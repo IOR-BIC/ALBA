@@ -147,9 +147,9 @@ void albaPipeVolumeProjected::Create(albaSceneNode *n)
 
 	m_ProjectFilter->SetInput(vtk_data); 
 	if (m_CamPosition == CAMERA_RX_FRONT )
-			m_ProjectFilter->SetProjectionModeToY();
+			m_ProjectFilter->SetProjectionSideToY();
 	else
-			m_ProjectFilter->SetProjectionModeToX();
+			m_ProjectFilter->SetProjectionSideToX();
 	m_ProjectFilter->SetProjectSubRange(m_RangeProjectionEnabled);
 	m_ProjectFilter->SetProjectionRange(m_ProjectionRange);
 	m_ProjectFilter->Update();
