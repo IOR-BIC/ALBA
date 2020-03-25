@@ -117,6 +117,7 @@ albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxe
 	}
 
 	m_SkipCameraUpdate = 0;
+	m_EnableGPU = false; 
 }
 //----------------------------------------------------------------------------
 albaViewArbitraryOrthoSlice::~albaViewArbitraryOrthoSlice()
@@ -404,11 +405,22 @@ void albaViewArbitraryOrthoSlice::OnEventThis(albaEventBase *alba_event)
 		case ID_UPDATE_LUT:
 			UpdateSlicersLUT();
 		break;
+		case ID_GPUENABLED:
+			SetEnableGPU();
+		break;
 		default:
 			albaViewCompound::OnEvent(alba_event);
 		}
 	}
 }
+
+void albaViewArbitraryOrthoSlice::SetEnableGPU()
+{
+	for (int i = X; i <= Z; i++)
+		if (m_Slicer) m_Slicer[i]->SetEnableGPU(m_EnableGPU);
+	CameraUpdate();
+}
+
 //----------------------------------------------------------------------------
 albaView *albaViewArbitraryOrthoSlice::Copy(albaObserver *Listener, bool lightCopyEnabled)
 {
@@ -432,6 +444,8 @@ albaGUI* albaViewArbitraryOrthoSlice::CreateGui()
 
 	m_Gui->Label("");
 	m_Gui->Button(ID_RESET,_("Reset slices"),"");
+	m_Gui->Divider();
+	m_Gui->Bool(ID_GPUENABLED, "Enable GPU Acceleration", &m_EnableGPU, 1, "Enable GPU Accelerarion");
 	m_Gui->Divider();
 
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
@@ -740,6 +754,7 @@ void albaViewArbitraryOrthoSlice::ShowSlicers(albaVME * vmeVolume, bool show)
 		m_Slicer[i]->SetSlicedVMELink(vmeVolume);
 		m_Slicer[i]->SetUpdateVTKPropertiesFromMaterial(false);
 		m_Slicer[i]->GetMaterial()->m_ColorLut->DeepCopy(albaVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
+		m_Slicer[i]->SetEnableGPU(m_EnableGPU);
 		m_Slicer[i]->Update();
 
 		m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_Slicer[i], show);

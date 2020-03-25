@@ -134,6 +134,23 @@ public:
 	/** Sets EllipsoidZLenght */
 	void SetEllipsoidZLenght(double ellipsoidZLenght) { m_EllipsoidZLenght = ellipsoidZLenght; }
 
+	/** Gets CubeXLength */
+	double GetCubeXLength() const { return m_CubeXLength; }
+	
+	/** Sets CubeXLength */
+	void SetCubeXLength(double val) { m_CubeXLength = val; }
+	
+	/** Gets CubeYLength */
+	double GetCubeYLength() const { return m_CubeYLength; }
+
+	/** Sets CubeYLength */
+	void SetCubeYLength(double val) { m_CubeYLength = val; }
+	
+	/** Gets CubeZLength */
+	double GetCubeZLength() const { return m_CubeZLength; }
+
+	/** Sets CubeYLength */
+	void SetCubeZLength(double val) { m_CubeZLength = val; }
 protected:
 
   albaVMESurfaceParametric();

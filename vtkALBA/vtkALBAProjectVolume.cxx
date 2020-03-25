@@ -31,6 +31,8 @@ vtkStandardNewMacro(vtkALBAProjectVolume);
 
 #define AIR_LIMIT -500
 
+#define PROJECT_MEAN (ProjectionModality == VTK_PROJECT_MEAN)
+
 //----------------------------------------------------------------------------
 void vtkALBAProjectVolume::PropagateUpdateExtent(vtkDataObject *output)
 {
@@ -39,7 +41,8 @@ void vtkALBAProjectVolume::PropagateUpdateExtent(vtkDataObject *output)
 //=========================================================================
 vtkALBAProjectVolume::vtkALBAProjectVolume()
 {
-  ProjectionMode = VTK_PROJECT_FROM_X;
+  ProjectionSide = VTK_PROJECT_FROM_X;
+	ProjectionModality = VTK_PROJECT_MEAN;
 	ProjectSubRange = false;
 	vtkSource::SetNthOutput(0, vtkImageData::New());
 	// Releasing data
@@ -76,7 +79,7 @@ void vtkALBAProjectVolume::ExecuteInformation()
 	dims[1] = wholeExtent[3] - wholeExtent[2] + 1;
 	dims[2] = wholeExtent[5] - wholeExtent[4] + 1;
 
-	switch (this->ProjectionMode) {
+	switch (this->ProjectionSide) {
 		case VTK_PROJECT_FROM_X:
 			outDims[0] = dims[1];
 			outDims[1] = dims[2];
@@ -118,7 +121,7 @@ void vtkALBAProjectVolume::Execute()
 
 	inputRG ? inputRG->GetDimensions(inputDims) : inputID->GetDimensions(inputDims);
 
-	switch (this->ProjectionMode) {
+	switch (this->ProjectionSide) {
 		case VTK_PROJECT_FROM_X:
 			projectedDims[0] = inputDims[1];
 			projectedDims[1] = inputDims[2];
@@ -191,21 +194,21 @@ void vtkALBAProjectVolume::ProjectScalars(int * inputDims, DataType * inputScala
 	if (ProjectSubRange)
 	{
 		range[0] = MAX(ProjectionRange[0], 0);
-		range[1] = MIN(ProjectionRange[1], inputDims[ProjectionMode - 1]);
+		range[1] = MIN(ProjectionRange[1], inputDims[ProjectionSide - 1]);
 		rangeSize = range[1] - range[0];
 	}
 	else
 	{
 		range[0] = 0;
-		range[1] = inputDims[ProjectionMode - 1];
-		rangeSize = inputDims[ProjectionMode - 1];
+		range[1] = inputDims[ProjectionSide - 1];
+		rangeSize = inputDims[ProjectionSide - 1];
 	}
 
 
 	sliceSize = inputDims[0] * inputDims[1];
 	newIdx = 0;
 
-	switch (this->ProjectionMode)
+	switch (this->ProjectionSide)
 	{
 		case VTK_PROJECT_FROM_X:
 			for (z = 0; z < inputDims[2]; z++)
@@ -214,13 +217,16 @@ void vtkALBAProjectVolume::ProjectScalars(int * inputDims, DataType * inputScala
 				for (y = 0; y < inputDims[1]; y++)
 				{
 					jOffset = y * inputDims[0];
-					acc = 0;
+					acc = PROJECT_MEAN ? 0 : VTK_FLOAT_MIN;
 					for (x = range[0]; x < range[1]; x++)
 					{
 						idx = x + jOffset + kOffset;
-						acc += MAX(AIR_LIMIT, inputScalars[idx]);
+						if(PROJECT_MEAN)
+							acc += MAX(AIR_LIMIT, inputScalars[idx]);
+						else
+							acc = MAX(acc, inputScalars[idx]);
 					}
-					projScalars[newIdx] = acc / rangeSize;
+					projScalars[newIdx] = PROJECT_MEAN ? (acc / rangeSize) : acc;
 					newIdx++;
 				}
 			}
@@ -231,14 +237,17 @@ void vtkALBAProjectVolume::ProjectScalars(int * inputDims, DataType * inputScala
 				kOffset = z * sliceSize;
 				for (x = 0; x < inputDims[0]; x++)
 				{
-					acc = 0;
+					acc = PROJECT_MEAN ? 0 : VTK_FLOAT_MIN;
 					for (y = range[0]; y < range[1]; y++)
 					{
 						jOffset = y * inputDims[0];
 						idx = x + jOffset + kOffset;
-						acc += MAX(AIR_LIMIT, inputScalars[idx]);
+						if(PROJECT_MEAN)
+							acc += MAX(AIR_LIMIT, inputScalars[idx]);
+						else
+							acc = MAX(acc, inputScalars[idx]);
 					}
-					projScalars[newIdx] = acc / rangeSize;
+					projScalars[newIdx] = PROJECT_MEAN ? (acc / rangeSize) : acc;
 					newIdx++;
 				}
 			}
@@ -249,14 +258,17 @@ void vtkALBAProjectVolume::ProjectScalars(int * inputDims, DataType * inputScala
 				jOffset = y * inputDims[0];
 				for (x = 0; x < inputDims[0]; x++)
 				{
-					acc = 0;
+					acc = PROJECT_MEAN ? 0 : VTK_FLOAT_MIN;
 					for (z = range[0]; z < range[1]; z++)
 					{
 						kOffset = z * sliceSize;
 						idx = x + jOffset + kOffset;
-						acc += MAX(AIR_LIMIT, inputScalars[idx]);
+						if(PROJECT_MEAN)
+							acc += MAX(AIR_LIMIT, inputScalars[idx]);
+						else
+							acc = MAX(acc, inputScalars[idx]);
 					}
-					projScalars[newIdx] = acc / rangeSize;
+					projScalars[newIdx] = PROJECT_MEAN ? (acc / rangeSize) : acc;
 					newIdx++;
 				}
 			}
@@ -272,7 +284,7 @@ void vtkALBAProjectVolume::GenerateOutputFromID(vtkImageData * inputSP, int * pr
 	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
 	
 	inputSP->GetSpacing(inputSpacing);
-	switch (this->ProjectionMode) {
+	switch (this->ProjectionSide) {
 		case VTK_PROJECT_FROM_X:
 			outputSpacing[0] = inputSpacing[1];
 			outputSpacing[1] = inputSpacing[2];
@@ -315,7 +327,7 @@ void vtkALBAProjectVolume::GenerateOutputFromRG(vtkRectilinearGrid * inputRG, in
 
 	ZCoordinates->InsertComponent(0, 0, 0);
 
-	switch (this->ProjectionMode) {
+	switch (this->ProjectionSide) {
 		case VTK_PROJECT_FROM_X:
 			XCoordinates->DeepCopy(inputRG->GetYCoordinates());
 			YCoordinates->DeepCopy(inputRG->GetZCoordinates());

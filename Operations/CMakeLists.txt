@@ -154,6 +154,8 @@ IF (ALBA_USE_VTK)
 	albaOpExporterLandmarkWS.cpp	albaOpExporterLandmarkWS.h
 	  
 	albaOpExporterFEMCommon.cpp	albaOpExporterFEMCommon.h
+	
+	albaOpESPCalibration.cpp		albaOpESPCalibration.h
   )
 ENDIF (ALBA_USE_VTK)
 

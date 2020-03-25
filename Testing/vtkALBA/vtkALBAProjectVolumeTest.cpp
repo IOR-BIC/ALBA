@@ -55,7 +55,7 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToX()
   //use filter
   vtkALBASmartPointer<vtkALBAProjectVolume> filter;
   filter->SetInput(image);
-  filter->SetProjectionModeToX();
+  filter->SetProjectionSideToX();
   filter->Update();
 
   //check Control
@@ -93,7 +93,7 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToY()
   //use filter
   vtkALBASmartPointer<vtkALBAProjectVolume> filter;
   filter->SetInput(image);
-  filter->SetProjectionModeToY();
+  filter->SetProjectionSideToY();
   filter->Update();
 
   //check Control
@@ -129,7 +129,7 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToZ()
   //use filter
   vtkALBASmartPointer<vtkALBAProjectVolume> filter;
   filter->SetInput(image);
-  filter->SetProjectionModeToZ();
+  filter->SetProjectionSideToZ();
   filter->Update();
 
   //check Control
@@ -168,7 +168,7 @@ void vtkALBAProjectVolumeTest::TestRangeProjectionX()
 	vtkALBASmartPointer<vtkALBAProjectVolume> filter;
 	CPPUNIT_ASSERT(filter->GetProjectSubRange() == false);
 	filter->SetInput(image);
-	filter->SetProjectionModeToX();
+	filter->SetProjectionSideToX();
 	filter->ProjectSubRangeOn();
 	filter->SetProjectionRange(range);
 	filter->Update();
@@ -207,7 +207,7 @@ void vtkALBAProjectVolumeTest::TestRangeProjectionY()
 	vtkALBASmartPointer<vtkALBAProjectVolume> filter;
 	CPPUNIT_ASSERT(filter->GetProjectSubRange() == false);
 	filter->SetInput(image);
-	filter->SetProjectionModeToY();
+	filter->SetProjectionSideToY();
 	filter->ProjectSubRangeOn();
 	filter->SetProjectionRange(range);
 	filter->Update();
@@ -244,7 +244,7 @@ void vtkALBAProjectVolumeTest::TestRangeProjectionZ()
 	//use filter
 	vtkALBASmartPointer<vtkALBAProjectVolume> filter;
 	filter->SetInput(image);
-	filter->SetProjectionModeToZ();
+	filter->SetProjectionSideToZ();
 	filter->ProjectSubRangeOn();
 	filter->SetProjectionRange(range);
 	filter->Update();

@@ -115,6 +115,8 @@ public:
   /** Set tri-linear interpolation */
   void SetTrilinearInterpolation(bool on);
 
+	/** Enable/Disable GPU*/
+	void SetEnableGPU(bool val=true);
 protected:
   albaVMESlicer();
   virtual ~albaVMESlicer();
@@ -147,6 +149,8 @@ protected:
   bool m_UpdateVTKPropertiesFromMaterial;
 
   bool m_TrilinearInterpolationOn;
+
+	bool m_EnableGPU;
 
 private:
   albaVMESlicer(const albaVMESlicer&); // Not implemented
