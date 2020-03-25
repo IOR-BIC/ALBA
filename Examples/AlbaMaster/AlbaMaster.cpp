@@ -91,6 +91,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpCreateMeter.h"
 #include "albaOpCreateProber.h"
 #include "albaOpCreateRefSys.h"
+#include "albaOpCreateRefSysFromViewSlice.h"
 #include "albaOpCreateSlicer.h"
 #include "albaOpCreateSpline.h"
 #include "albaOpCreateSurface.h"
@@ -292,6 +293,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpCreateGroup("Group"),_("Create"));
 	m_Logic->Plug(new albaOpCreateMeter("Meter"),_("Create"));
 	m_Logic->Plug(new albaOpCreateRefSys("RefSys"),_("Create"));
+	m_Logic->Plug(new albaOpCreateRefSysFromViewSlice("RefSys from View Slice"), _("Create"));
 	m_Logic->Plug(new albaOpCreateProber("Prober"),_("Create"));
 	m_Logic->Plug(new albaOpCreateSlicer("Slicer"),_("Create"));
 	m_Logic->Plug(new albaOpExtractIsosurface("Extract Isosurface"),_("Create"));

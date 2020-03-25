@@ -49,6 +49,7 @@ public:
     PARAMETRIC_PLANE,
     PARAMETRIC_ELLIPSOID,
 		PARAMETRIC_TRUNCATED_CONE,
+		PARAMETRIC_ELLIPTIC_CYLINDER,
   };
 
   /** Copy the contents of another albaVMESurfaceParametric into this one. */
@@ -148,6 +149,7 @@ protected:
     CHANGE_VALUE_PLANE,
     CHANGE_VALUE_ELLIPSOID,
 		CHANGE_VALUE_TRUNCATED_CONE,
+		CHANGE_VALUE_ELLIPTIC_CYLINDER,
     ID_GEOMETRY_TYPE,
     ID_LAST
   };
@@ -186,6 +188,8 @@ protected:
 
 	void CreateSphere();
 
+	void CreateEllipticCylinder();
+
   /** Internally used to create a new instance of the GUI.*/
   virtual albaGUI *CreateGui();
 
@@ -197,6 +201,7 @@ protected:
   void CreateGuiSphere();
   void CreateGuiEllipsoid();
 	void CreateGuiTruncatedCone();
+	void CreateGuiEllipticCylinder();
   
   albaGUI *m_GuiSphere;
   albaGUI *m_GuiCone;
@@ -205,6 +210,7 @@ protected:
   albaGUI *m_GuiPlane;
   albaGUI *m_GuiEllipsoid;
 	albaGUI *m_GuiTruncatedCone;
+	albaGUI  *m_GuiEllipticCylinder;
 
 	albaTransform *m_Transform; 
 	vtkPolyData  *m_PolyData;
@@ -249,7 +255,14 @@ protected:
 	double m_TruncatedConeRes;
 	int m_TruncatedConeCapping;
 	int m_TruncatedConeOrientationAxis;
-  
+
+	double m_EllipticCylinderHeight;
+	double m_EllipticCylinderR1;
+	double m_EllipticCylinderR2;
+	double m_EllipticCylinderRes;
+	int m_EllipticCylinderCapping;
+	int m_EllipticCylinderOrientationAxis;
+
 private:
   albaVMESurfaceParametric(const albaVMESurfaceParametric&); // Not implemented
   void operator=(const albaVMESurfaceParametric&); // Not implemented

@@ -120,7 +120,7 @@ Function CheckIfVS2015RedistributablePackageIsAlreadyInstalled
 	to install this application. The installer will now install them."
 		 
 		;ExecShell "open" "https://www.microsoft.com/en-us/download/details.aspx?id=30679"
-		ExecWait '"$INSTDIR\bin\vcredist_@INSTALLER_ARCH@.exe"'
+		ExecWait '"$INSTDIR\bin\vc_redist.@INSTALLER_ARCH@.exe"'
 FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

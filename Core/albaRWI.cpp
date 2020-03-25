@@ -87,7 +87,7 @@ albaRWI::albaRWI()
 
 	m_StereoMovieDir    = "";
 	m_StereoMovieEnable = 0;
-
+	m_ParallelView = 0;
 	m_ShowProfilingInformation = 0;
 
 	m_TopBottomAccumulation = m_TopBottomAccumulationLast = 0.0;
@@ -157,6 +157,7 @@ void albaRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use
 	m_Camera = vtkCamera::New();
 	m_Camera->SetViewAngle(20); 
 	m_Camera->ParallelProjectionOn(); 
+	m_ParallelView = m_Camera->GetParallelProjection();
 	UpdateCameraParameters();
 
 	m_RenFront = vtkRenderer::New();
@@ -319,6 +320,8 @@ void albaRWI::CameraSet(int cam_position, double zoom)
 	else
 		m_Camera->ParallelProjectionOn();
 
+	m_ParallelView = m_Camera->GetParallelProjection();
+
 	switch (cam_position) 
 	{
 	case CAMERA_FRONT:
@@ -432,6 +435,8 @@ void albaRWI::CameraSet( double pos[3],double viewUp[3], double zoom /*= 1.*/, b
 		m_Camera->ParallelProjectionOn();
 	else
 		m_Camera->ParallelProjectionOff();
+
+	m_ParallelView = m_Camera->GetParallelProjection();
 
 	m_Camera->SetFocalPoint(0,0,0);
 	m_Camera->SetPosition(pos[0]*100,pos[1]*100,pos[2]*100);
@@ -848,6 +853,7 @@ enum RWI_WIDGET_ID
 	ID_CAMERA_TOP,
 	ID_CAMERA_BOTTOM,
 	ID_FOCAL_POINT,
+	ID_CAMERA_ORTHO,
 	ID_CAMERA_POSITION,
 	ID_CAMERA_VIEW_UP,
 	ID_CAMERA_ORIENTATION,
@@ -872,9 +878,22 @@ albaGUI *albaRWI::CreateGui()
 		m_CameraButtons[3] = new albaGUIPicButton(m_Gui, "PIC_FRONT", ID_CAMERA_FRONT,  this);
 		m_CameraButtons[4] = new albaGUIPicButton(m_Gui, "PIC_LEFT",  ID_CAMERA_LEFT,   this);
 		m_CameraButtons[5] = new albaGUIPicButton(m_Gui, "PIC_RIGHT", ID_CAMERA_RIGHT,  this);
-		for(int i = 0; i < 6; i++)
-			m_Sizer->Add(m_CameraButtons[i],0,0);
+
+		m_CameraButtons[0]->SetToolTip("Bottom");
+		m_CameraButtons[1]->SetToolTip("Top");
+		m_CameraButtons[2]->SetToolTip("Back");
+		m_CameraButtons[3]->SetToolTip("Front");
+		m_CameraButtons[4]->SetToolTip("Left");
+		m_CameraButtons[5]->SetToolTip("Right");
+		
+		for (int i = 0; i < 6; i++)
+		{
+			m_Sizer->Add(m_CameraButtons[i], 0, 0);		
+		}		
+
 		m_Gui->Add(m_Sizer);
+		m_Gui->Bool(ID_CAMERA_ORTHO, "Orthographic Projection", &m_ParallelView, 1);
+		m_Gui->Divider(1);
 
 		m_Gui->Label("Camera parameters", true);
 		m_Gui->Vector(ID_FOCAL_POINT, "Focal pnt.", m_FocalPoint);
@@ -985,6 +1004,12 @@ void albaRWI::OnEvent(albaEventBase *alba_event)
 			break;
 		case ID_CAMERA_BOTTOM:
 			CameraSet(CAMERA_PERSPECTIVE_BOTTOM);
+			break;
+		case ID_CAMERA_ORTHO: 
+		{
+			m_Camera->SetParallelProjection(m_ParallelView);
+ 			CameraUpdate();
+		}
 			break;
 		case ID_FOCAL_POINT:
 		case ID_CAMERA_POSITION:
