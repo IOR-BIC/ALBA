@@ -68,8 +68,8 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToX()
     CPPUNIT_ASSERT(value1 == value2);
   }
 
-  CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"X")==0);
-  CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_X );
+  CPPUNIT_ASSERT(strcmp(filter->GetProjectionSideAsString(),"X")==0);
+  CPPUNIT_ASSERT(filter->GetProjectionSide() == VTK_PROJECT_FROM_X );
 
 	vtkDEL(image);
 }
@@ -104,8 +104,8 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToY()
     float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
     CPPUNIT_ASSERT(value1 == value2);
   }
-  CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"Y")==0);
-  CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_Y );
+  CPPUNIT_ASSERT(strcmp(filter->GetProjectionSideAsString(),"Y")==0);
+  CPPUNIT_ASSERT(filter->GetProjectionSide() == VTK_PROJECT_FROM_Y );
 
 	vtkDEL(image);
 }
@@ -140,8 +140,8 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToZ()
     float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
     CPPUNIT_ASSERT(value1 == value2);
   }
-  CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"Z")==0);
-  CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_Z );
+  CPPUNIT_ASSERT(strcmp(filter->GetProjectionSideAsString(),"Z")==0);
+  CPPUNIT_ASSERT(filter->GetProjectionSide() == VTK_PROJECT_FROM_Z );
 
 	vtkDEL(image);
 }
