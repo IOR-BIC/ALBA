@@ -23,6 +23,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOp.h"
 #include "albaVMEVolumeGray.h"
 
+
 //----------------------------------------------------------------------------
 // Forward references :
 //----------------------------------------------------------------------------
@@ -95,7 +96,7 @@ public:
 	/** Execute the operation. */
 	/*virtual*/ void OpDo();
 
-	void Calibrate();
+	int Calibrate();
 
 	/** Receive events coming from the user interface.*/
 	void OnEvent(albaEventBase *alba_event);
@@ -112,7 +113,7 @@ protected:
 	//----------------------------------------------------------------------------
 	enum CALIBRATION_ID
 	{
-		ID_GENARATE_REPORT = MINID,
+		ID_SAVE_CALIBRATION = MINID,
 		MINID,
 	};
 
@@ -124,7 +125,7 @@ protected:
 
 
 	/** Generate Report*/
-	bool CreateReport();
+	bool SaveCalibration();
 
 
 	Range CaluculateCutOffRange(vtkImageData *imgData, double cutOff);
@@ -172,8 +173,6 @@ protected:
 	albaHTMLTemplateParser *m_Parser;
 
 	albaView *m_View;
-private:
-	void AddCalibrationToDB();
 
 };
 #endif
