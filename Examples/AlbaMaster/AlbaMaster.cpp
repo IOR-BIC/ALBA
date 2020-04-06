@@ -104,6 +104,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpEditMetadata.h"
 #include "albaOpEditNormals.h"
 #include "albaOpExtractIsosurface.h"
+#include "albaOpExtractImageFromArbitraryView.h"
 #include "albaOpExtrusionHoles.h"
 #include "albaOpEqualizeHistogram.h"
 #include "albaOpFillHoles.h"
@@ -298,6 +299,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpCreateProber("Prober"),_("Create"));
 	m_Logic->Plug(new albaOpCreateSlicer("Slicer"),_("Create"));
 	m_Logic->Plug(new albaOpExtractIsosurface("Extract Isosurface"),_("Create"));
+	m_Logic->Plug(new albaOpExtractImageFromArbitraryView("Extract Image from Arbitrary View"), _("Create"));
 	m_Logic->Plug(new albaOpCreateSurfaceParametric("Parametric Surface"),_("Create"));
 	m_Logic->Plug(new albaOpCreateSpline("Spline"),_("Create"));
 	m_Logic->Plug(new albaOpCreateLabeledVolume(),_("Create"));

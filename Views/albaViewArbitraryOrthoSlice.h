@@ -158,6 +158,11 @@ public:
 
 	albaMatrix* GetSlicerMatrix(int axis = X);
 	void SetSlicerMatrix(albaMatrix* matrix, int axis = X);
+
+	albaViewVTK * GetViewArbitrary();
+	albaViewVTK * GetViewSlice(int axis);
+	albaPipe* GetPipeSlice(int axis);
+
 protected:
 
 	enum AXIS { X = 0, Y = 1, Z = 2 };
@@ -229,7 +234,7 @@ protected:
 
 	void CreateViewCameraNormalFeedbackActors();
 	void UpdateWindowing(bool enable,albaVME *vme);
-	
+
 	albaViewVTK *m_ViewSlice[3];
 	albaViewVTK *m_View3d;
 
