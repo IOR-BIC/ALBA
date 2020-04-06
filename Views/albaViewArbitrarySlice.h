@@ -108,6 +108,11 @@ public:
 	/** */
 	virtual void VmeSelect(albaVME *node, bool select);
 
+	albaViewVTK * GetViewArbitrary();
+
+	albaViewVTK * GetViewSlice();
+
+	albaPipe* GetPipeSlice();
 protected:
 
 	/** Internally used to create a new instance of the GUI. 
