@@ -804,3 +804,22 @@ void albaViewArbitrarySlice::SetSlicerMatrix(albaMatrix* matrix, int axis)
 {
 	m_SlicingMatrix = matrix;
 }
+
+//----------------------------------------------------------------------------
+albaViewVTK * albaViewArbitrarySlice::GetViewArbitrary()
+{
+	return (albaViewVTK*)m_ChildViewList[ARBITRARY_VIEW];
+}
+//----------------------------------------------------------------------------
+albaViewVTK * albaViewArbitrarySlice::GetViewSlice()
+{
+	return (albaViewVTK*)m_ChildViewList[SLICE_VIEW];
+}
+//----------------------------------------------------------------------------
+albaPipe* albaViewArbitrarySlice::GetPipeSlice()
+{
+	albaPipe *pipeSlice = NULL;
+	pipeSlice = GetViewSlice()->GetNodePipe(m_CurrentVolume);
+
+	return pipeSlice;
+}

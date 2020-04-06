@@ -994,3 +994,22 @@ void albaViewArbitraryOrthoSlice::UpdateWindowing(bool enable,albaVME *vme)
 	if(vme->GetOutput() && vme->GetOutput()->IsA("albaVMEOutputVolume") && enable)
 		VolumeWindowing(vme);
 }
+
+//----------------------------------------------------------------------------
+albaViewVTK * albaViewArbitraryOrthoSlice::GetViewArbitrary()
+{
+	return (albaViewVTK*)m_ChildViewList[PERSPECTIVE_VIEW];
+}
+//----------------------------------------------------------------------------
+albaViewVTK * albaViewArbitraryOrthoSlice::GetViewSlice(int axis)
+{
+	return (albaViewVTK*)m_ChildViewList[AsixToView(axis)];
+}
+//----------------------------------------------------------------------------
+albaPipe* albaViewArbitraryOrthoSlice::GetPipeSlice(int axis)
+{
+	albaPipe *pipeSlice = NULL;
+	pipeSlice = GetViewSlice(axis)->GetNodePipe(m_Slicer[axis]);
+
+	return pipeSlice;
+}

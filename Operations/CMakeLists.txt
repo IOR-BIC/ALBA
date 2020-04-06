@@ -156,6 +156,8 @@ IF (ALBA_USE_VTK)
 	albaOpExporterFEMCommon.cpp	albaOpExporterFEMCommon.h
 	
 	albaOpESPCalibration.cpp		albaOpESPCalibration.h
+	
+	albaOpExtractImageFromArbitraryView.cpp		albaOpExtractImageFromArbitraryView.h
   )
 ENDIF (ALBA_USE_VTK)
 
