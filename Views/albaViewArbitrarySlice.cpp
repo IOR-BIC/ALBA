@@ -816,7 +816,7 @@ albaViewVTK * albaViewArbitrarySlice::GetViewSlice()
 	return (albaViewVTK*)m_ChildViewList[SLICE_VIEW];
 }
 //----------------------------------------------------------------------------
-albaPipe* albaViewArbitrarySlice::GetPipeSlice()
+albaPipe* albaViewArbitrarySlice::GetPipeSlice() 
 {
 	albaPipe *pipeSlice = NULL;
 	pipeSlice = GetViewSlice()->GetNodePipe(m_CurrentVolume);
