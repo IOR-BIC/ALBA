@@ -1032,3 +1032,21 @@ void albaViewArbitraryOrthoSlice::OnLoadFromRefsys()
 		OnEventGizmoRotate(finalMatrix.GetVTKMatrix(), -1);
 	}
 }
+//----------------------------------------------------------------------------
+albaViewVTK * albaViewArbitraryOrthoSlice::GetViewArbitrary()
+{
+	return (albaViewVTK*)m_ChildViewList[PERSPECTIVE_VIEW];
+}
+//----------------------------------------------------------------------------
+albaViewVTK * albaViewArbitraryOrthoSlice::GetViewSlice(int axis)
+{
+	return (albaViewVTK*)m_ChildViewList[AsixToView(axis)];
+}
+//----------------------------------------------------------------------------
+albaPipe* albaViewArbitraryOrthoSlice::GetPipeSlice(int axis)
+{
+	albaPipe *pipeSlice = NULL;
+	pipeSlice = GetViewSlice(axis)->GetNodePipe(m_Slicer[axis]);
+
+	return pipeSlice;
+}
