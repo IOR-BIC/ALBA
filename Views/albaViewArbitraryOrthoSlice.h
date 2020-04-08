@@ -159,6 +159,11 @@ public:
 
 	albaMatrix* GetSlicerMatrix(int axis = X);
 	void SetSlicerMatrix(albaMatrix* matrix, int axis = X);
+
+	albaViewVTK * GetViewArbitrary();
+	albaViewVTK * GetViewSlice(int axis);
+	albaPipe* GetPipeSlice(int axis);
+
 protected:
 
 	enum AXIS { X = 0, Y = 1, Z = 2 };
