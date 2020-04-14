@@ -120,6 +120,7 @@ public:
 	{
 		ID_COMBO_CHOOSE_EXPORT_AXIS = Superclass::ID_LAST,
 		ID_RESET,
+		ID_LOAD_FROM_REFSYS,
 		ID_GPUENABLED,
 		ID_SHOW_GIZMO,
 		ID_UPDATE_LUT, 
@@ -158,6 +159,11 @@ public:
 
 	albaMatrix* GetSlicerMatrix(int axis = X);
 	void SetSlicerMatrix(albaMatrix* matrix, int axis = X);
+
+	albaViewVTK * GetViewArbitrary();
+	albaViewVTK * GetViewSlice(int axis);
+	albaPipe* GetPipeSlice(int axis);
+
 protected:
 
 	enum AXIS { X = 0, Y = 1, Z = 2 };
@@ -205,20 +211,22 @@ protected:
 	void RestoreCameraParametersForAllSubviews();
 
 	/**	This function is called when a translate gizmo is moved*/
-	void OnEventGizmoTranslate(albaEventBase *alba_event, int side);
+	void OnEventGizmoTranslate(vtkMatrix4x4 *matrix, int planeSkip);
 
-	void GetOrthoPlanes(int side, int * orthoPlanes);
-	void PostMultiplyEventMatrixToGizmoCross(albaEventBase * inputEvent, albaGizmoCrossRotateTranslate *targetGizmo);
+	int GetGizmoPlane(void *gizmo);
+
+	int IsGizmoTranslate(void *gizmo);
+	void PostMultiplyEventMatrixToGizmoCross(vtkMatrix4x4 * matrix, albaGizmoCrossRotateTranslate *targetGizmo);
 	
 	/** Post multiply alba_event matrix to given slicer */
-	void PostMultiplyEventMatrixToSlicer(albaEventBase *alba_event, int slicerAxis);
+	void PostMultiplyEventMatrixToSlicer(vtkMatrix4x4 *matrix, int slicerAxis);
 
 	/** Post multiply alba_event matrix to the 3 slicers */
-	void PostMultiplyEventMatrixToSlicers(albaEventBase *alba_event);
+	void PostMultiplyEventMatrixToSlicers(vtkMatrix4x4 *matrix);
 
 	/** Windowing for volumes data. This function overrides superclass method.*/
 	void VolumeWindowing(albaVME *volume);
-	void OnEventGizmoRotate(albaEventBase *alba_event, int side);
+	void OnEventGizmoRotate(vtkMatrix4x4 *matrix, int planeSkip);
 
 	void SetSlices();
 			
@@ -229,6 +237,10 @@ protected:
 
 	void CreateViewCameraNormalFeedbackActors();
 	void UpdateWindowing(bool enable,albaVME *vme);
+
+	/** Accept All VME excluding current */
+	static bool AcceptRefSys(albaVME *node);
+
 	
 	albaViewVTK *m_ViewSlice[3];
 	albaViewVTK *m_View3d;
@@ -255,6 +267,10 @@ protected:
 
 	int m_SkipCameraUpdate;
 	int m_EnableGPU;
+	int m_IsShowingSlicerGizmo;
+	
+private:
+	void OnLoadFromRefsys();
 };
 
 #endif

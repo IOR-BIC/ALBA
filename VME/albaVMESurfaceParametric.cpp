@@ -471,9 +471,9 @@ int albaVMESurfaceParametric::InternalStore(albaStorageElement *parent)
 			parent->StoreInteger("TruncatedConeCapping", m_TruncatedConeCapping) == ALBA_OK &&
 			parent->StoreInteger("TruncatedConeOrientationAxis", m_TruncatedConeOrientationAxis) == ALBA_OK &&
 
-			parent->StoreInteger("EllipticCylinderHeight", m_EllipticCylinderHeight) == ALBA_OK &&
-			parent->StoreInteger("EllipticCylinderR1", m_EllipticCylinderR1) == ALBA_OK &&
-			parent->StoreInteger("EllipticCylinderR2", m_EllipticCylinderR2) == ALBA_OK &&
+			parent->StoreDouble("EllipticCylinderHeight", m_EllipticCylinderHeight) == ALBA_OK &&
+			parent->StoreDouble("EllipticCylinderR1", m_EllipticCylinderR1) == ALBA_OK &&
+			parent->StoreDouble("EllipticCylinderR2", m_EllipticCylinderR2) == ALBA_OK &&
 			parent->StoreInteger("EllipticCylinderRes", m_EllipticCylinderRes) == ALBA_OK &&
 			parent->StoreInteger("EllipticCylinderCapping", m_EllipticCylinderCapping) == ALBA_OK &&
 			parent->StoreInteger("EllipticCylinderOrientationAxis", m_EllipticCylinderOrientationAxis) == ALBA_OK

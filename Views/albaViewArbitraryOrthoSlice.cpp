@@ -95,6 +95,8 @@ enum ARBITRARY_SUBVIEW_ID
 
 #define AsixToView(a) ( (a) == X ? X_VIEW : ((a) == Y ? Y_VIEW : Z_VIEW))
 
+albaVME *GLO_CurrentVolume;
+
 //----------------------------------------------------------------------------
 albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxes::AXIS_TYPE_ENUM axesType) : albaViewCompoundWindowing(label, 2, 2)
 {
@@ -118,6 +120,7 @@ albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxe
 
 	m_SkipCameraUpdate = 0;
 	m_EnableGPU = false; 
+	m_IsShowingSlicerGizmo = false;
 }
 //----------------------------------------------------------------------------
 albaViewArbitraryOrthoSlice::~albaViewArbitraryOrthoSlice()
@@ -164,7 +167,9 @@ void albaViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
 void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 {
 	m_SkipCameraUpdate++;
-	if (vme->IsA("albaVMEGizmo"))
+	if ((m_IsShowingSlicerGizmo && vme->IsA("albaVMEGizmo")) || 
+		albaString("AxisRotationFeedbackGizmo").Equals(vme->GetName()) ||
+		albaString("PlaneTranslationFeedbackGizmo").Equals(vme->GetName()))
 	{
 		for (int i = 0; i <= Z; i++)
 		{
@@ -243,19 +248,19 @@ void albaViewArbitraryOrthoSlice::OnEvent(albaEventBase *alba_event)
 	}
 	else if (alba_event->GetId() == ID_TRANSFORM)
 	{	
-		for (int i = X; i <= Z; i++)
+		albaEvent *e = albaEvent::SafeDownCast(alba_event);
+		vtkMatrix4x4 *  matrix= e->GetMatrix()->GetVTKMatrix();
+		void * sender = alba_event->GetSender();
+		int plane = GetGizmoPlane(sender);
+
+		if (plane >= 0)
 		{
-			if (alba_event->GetSender() == m_GizmoRT[i]->m_GizmoCrossTranslate)
-			{
-				OnEventGizmoTranslate(alba_event, i);
-				return;
-			}
-			else if (alba_event->GetSender() == m_GizmoRT[i]->m_GizmoCrossRotate) // from rotation gizmo
-			{
-				OnEventGizmoRotate(alba_event, i);
-				return;
-			}
+			if (IsGizmoTranslate(sender))
+				OnEventGizmoTranslate(matrix, plane);
+			else 
+				OnEventGizmoRotate(matrix, plane);
 		}
+		else
 			albaEventMacro(*alba_event); 
 	}
 	else
@@ -264,101 +269,79 @@ void albaViewArbitraryOrthoSlice::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::OnEventGizmoTranslate(albaEventBase *alba_event, int side)
+int albaViewArbitraryOrthoSlice::GetGizmoPlane(void *gizmo)
 {
-	switch(alba_event->GetId())
+	for (int i = 0; i < 3; i++)
 	{
-	case ID_TRANSFORM:
-		{    
-			vtkCamera *zViewCamera = ((albaViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera();
-			int orthoPlanes[2];
-			GetOrthoPlanes(side, orthoPlanes);
-
-			PostMultiplyEventMatrixToGizmoCross(alba_event, m_GizmoRT[orthoPlanes[0]]);
-			PostMultiplyEventMatrixToGizmoCross(alba_event, m_GizmoRT[orthoPlanes[1]]);
-
-			// post multiplying matrices coming from the gizmo to the slicers
-			PostMultiplyEventMatrixToSlicers(alba_event);
-
-			albaEvent *e = albaEvent::SafeDownCast(alba_event);
-
-			//compute the incremental translation
-			vtkTransform *tr;
-			vtkNEW(tr);
-			tr->PostMultiply();
-			tr->SetMatrix(e->GetMatrix()->GetVTKMatrix());
-			tr->Update();
-			double translation[3];
-			tr->GetPosition(translation);
-
-			//increase the translation
-			m_VolumeVTKDataCenterABSCoords[0]+=translation[0];
-			m_VolumeVTKDataCenterABSCoords[1]+=translation[1];
-			m_VolumeVTKDataCenterABSCoords[2]+=translation[2];
-			vtkDEL(tr);
-
-			SetSlices();
-		}
-		break;
-
-	default:
-		{
-			albaEventMacro(*alba_event);
-		}
+		if (gizmo == m_GizmoRT[i]->m_GizmoCrossTranslate || gizmo == m_GizmoRT[i]->m_GizmoCrossRotate)
+			return i;
 	}
+	return -1;
+}
+
+//----------------------------------------------------------------------------
+int albaViewArbitraryOrthoSlice::IsGizmoTranslate(void *gizmo)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		if (gizmo == m_GizmoRT[i]->m_GizmoCrossTranslate)
+			return true;
+	}
+	return false;
 }
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::GetOrthoPlanes(int side, int * orthoPlanes)
+void albaViewArbitraryOrthoSlice::OnEventGizmoTranslate(vtkMatrix4x4 *matrix, int planeSkip)
 {
-	if (side == X)
+
+	vtkCamera *zViewCamera = ((albaViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera();
+	
+	for (int i = 0; i < 3; i++)
 	{
-		orthoPlanes[0] = Y;
-		orthoPlanes[1] = Z;
+		if (i != planeSkip)
+		{
+			PostMultiplyEventMatrixToGizmoCross(matrix, m_GizmoRT[i]);
+			PostMultiplyEventMatrixToSlicer(matrix, i);
+		}
 	}
-	else if (side == Y)
-	{
-		orthoPlanes[0] = Z;
-		orthoPlanes[1] = X;
-	}
-	else
-	{
-		orthoPlanes[0] = Y;
-		orthoPlanes[1] = X;
-	}
+
+	//compute the incremental translation
+	vtkTransform *tr;
+	vtkNEW(tr);
+	tr->PostMultiply();
+	tr->SetMatrix(matrix);
+	tr->Update();
+	double translation[3];
+	tr->GetPosition(translation);
+
+	albaLogMessage("Translation: x:%f, y:%f, z:%f", translation[0], translation[1], translation[2]);
+
+	//increase the translation
+	m_VolumeVTKDataCenterABSCoords[0] += translation[0];
+	m_VolumeVTKDataCenterABSCoords[1] += translation[1];
+	m_VolumeVTKDataCenterABSCoords[2] += translation[2];
+	vtkDEL(tr);
+
+	SetSlices();
 }
+
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::OnEventGizmoRotate(albaEventBase *alba_event, int side)
+void albaViewArbitraryOrthoSlice::OnEventGizmoRotate(vtkMatrix4x4 *matrix, int planeSkip)
 {
-	switch (alba_event->GetId())
+	// roll the camera based on gizmo
+	vtkALBASmartPointer<vtkTransform> tr;
+	tr->SetMatrix(matrix);
+	
+	for (int i = 0; i < 3; i++)
 	{
-		case ID_TRANSFORM:
+		if (i != planeSkip)
 		{
-			// roll the camera based on gizmo
-			albaEvent *event = albaEvent::SafeDownCast(alba_event);
-			vtkMatrix4x4 *mat = event->GetMatrix()->GetVTKMatrix();
-			vtkALBASmartPointer<vtkTransform> tr;
-			tr->SetMatrix(mat);
-
-			int orthoPlanes[2];
-			GetOrthoPlanes(side, orthoPlanes);
-
-			PostMultiplyEventMatrixToGizmoCross(alba_event, m_GizmoRT[orthoPlanes[0]]);
-			PostMultiplyEventMatrixToGizmoCross(alba_event, m_GizmoRT[orthoPlanes[1]]);
-			PostMultiplyEventMatrixToSlicer(alba_event, orthoPlanes[0]);
-			PostMultiplyEventMatrixToSlicer(alba_event, orthoPlanes[1]);
-
-			m_ChildViewList[AsixToView(orthoPlanes[0])]->GetRWI()->GetCamera()->ApplyTransform(tr);
-			m_ChildViewList[AsixToView(orthoPlanes[1])]->GetRWI()->GetCamera()->ApplyTransform(tr);
-
-			SetSlices();
-		}
-		break;
-
-		default:
-		{
-			albaEventMacro(*alba_event);
+			PostMultiplyEventMatrixToGizmoCross(matrix, m_GizmoRT[i]);
+			PostMultiplyEventMatrixToSlicer(matrix, i);
+			m_ChildViewList[AsixToView(i)]->GetRWI()->GetCamera()->ApplyTransform(tr);
 		}
 	}
+
+	SetSlices();
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::SetSlices()
@@ -397,10 +380,13 @@ void albaViewArbitraryOrthoSlice::OnEventThis(albaEventBase *alba_event)
 			OnLUTRangeModified();
 		break;
 		case ID_LUT_CHOOSER:
-				OnLUTChooser();
+			OnLUTChooser();
 		break;
 		case ID_RESET:
-				OnReset();
+			OnReset();
+		break;
+		case ID_LOAD_FROM_REFSYS:
+			OnLoadFromRefsys();
 		break;
 		case ID_UPDATE_LUT:
 			UpdateSlicersLUT();
@@ -444,6 +430,8 @@ albaGUI* albaViewArbitraryOrthoSlice::CreateGui()
 
 	m_Gui->Label("");
 	m_Gui->Button(ID_RESET,_("Reset slices"),"");
+	m_Gui->Button(ID_LOAD_FROM_REFSYS, _("Load from Refsys"), "");
+
 	m_Gui->Divider();
 	m_Gui->Bool(ID_GPUENABLED, "Enable GPU Acceleration", &m_EnableGPU, 1, "Enable GPU Accelerarion");
 	m_Gui->Divider();
@@ -466,36 +454,30 @@ void albaViewArbitraryOrthoSlice::VmeRemove(albaVME *vme)
 	Superclass::VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(albaEventBase *alba_event)
+void albaViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(vtkMatrix4x4 *matrix)
 {  
 	for (int i = 0; i < 3; i++)
-		PostMultiplyEventMatrixToSlicer(alba_event, i);
+		PostMultiplyEventMatrixToSlicer(matrix, i);
 }
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(albaEventBase *alba_event, int slicerAxis)
+void albaViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(vtkMatrix4x4 *matrix, int slicerAxis)
 {  
-	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-	{
-		// handle incoming transform event...
+	// handle incoming transform event...
 		vtkTransform *tr = vtkTransform::New();
 		tr->PostMultiply();
 		tr->SetMatrix(m_Slicer[slicerAxis]->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
-		tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
+		tr->Concatenate(matrix);
 		tr->Update();
 
 		albaMatrix absPose;
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(m_Slicer[slicerAxis]->GetTimeStamp());
 
-		if (e->GetArg() == albaInteractorGenericMouse::MOUSE_MOVE)
-		{
-			// ... and update the slicer with the new abs pose
-			m_Slicer[slicerAxis]->SetAbsMatrix(absPose);
-		} 
+		// ... and update the slicer with the new abs pose
+		m_Slicer[slicerAxis]->SetAbsMatrix(absPose);
 
 		// clean up
 		tr->Delete();
-	}
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::UpdateSubviewsCamerasToFaceSlices()
@@ -732,6 +714,7 @@ void albaViewArbitraryOrthoSlice::OnLUTChooser()
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::ShowSlicers(albaVME * vmeVolume, bool show)
 {
+	m_IsShowingSlicerGizmo = true;
 	char slicerNames[3][10] = { "m_SlicerX","m_SlicerY","m_SlicerZ" };
 	char gizmoNames[3][13] = { "m_GizmoXView","m_GizmoYView","m_GizmoZView" };
 	enum albaGizmoCrossRotateTranslate::COLOR gizmoColors[3][2] = { { albaGizmoCrossRotateTranslate::GREEN, albaGizmoCrossRotateTranslate::BLUE },
@@ -801,6 +784,8 @@ void albaViewArbitraryOrthoSlice::ShowSlicers(albaVME * vmeVolume, bool show)
 
 	UpdateSubviewsCamerasToFaceSlices();
 	CreateViewCameraNormalFeedbackActors();
+
+	m_IsShowingSlicerGizmo = false;
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::BuildCameraConeVME(int side)
@@ -871,14 +856,13 @@ bool albaViewArbitraryOrthoSlice::BelongsToNormalGizmo( albaVME * vme, int side)
 }
 
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::PostMultiplyEventMatrixToGizmoCross( albaEventBase * inputEvent , albaGizmoCrossRotateTranslate *targetGizmo )
+void albaViewArbitraryOrthoSlice::PostMultiplyEventMatrixToGizmoCross(vtkMatrix4x4 * matrix, albaGizmoCrossRotateTranslate *targetGizmo )
 {
-	albaEvent *e = albaEvent::SafeDownCast(inputEvent);
 
 	vtkTransform *tr1 = vtkTransform::New();
 	tr1->PostMultiply();
 	tr1->SetMatrix(targetGizmo->GetAbsPose()->GetVTKMatrix());
-	tr1->Concatenate(e->GetMatrix()->GetVTKMatrix());
+	tr1->Concatenate(matrix);
 	tr1->Update();
 
 	albaMatrix absPose;
@@ -993,4 +977,83 @@ void albaViewArbitraryOrthoSlice::UpdateWindowing(bool enable,albaVME *vme)
 {
 	if(vme->GetOutput() && vme->GetOutput()->IsA("albaVMEOutputVolume") && enable)
 		VolumeWindowing(vme);
+}
+
+//----------------------------------------------------------------------------
+bool albaViewArbitraryOrthoSlice::AcceptRefSys(albaVME *node)
+{
+	if (GLO_CurrentVolume == NULL || !node->IsA("albaVMERefSys"))
+		return false;
+
+	double bounds[6];
+	GLO_CurrentVolume->GetOutput()->GetBounds(bounds);
+	double pos[3];
+	albaTransform::GetPosition(*node->GetOutput()->GetAbsMatrix(), pos);
+
+	return ((pos[0] >= bounds[0]) && (pos[0] <= bounds[1]) && \
+		(pos[1] >= bounds[2]) && (pos[1] <= bounds[3]) && \
+		(pos[2] >= bounds[4]) && (pos[2] <= bounds[5]));
+}
+
+//----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::OnLoadFromRefsys()
+{
+	GLO_CurrentVolume = m_CurrentVolume;
+	albaString title = _("Choose RefSys");
+	albaEvent e;
+	e.SetId(VME_CHOOSE);
+	e.SetPointer(&albaViewArbitraryOrthoSlice::AcceptRefSys);
+	e.SetString(&title);
+	albaEventMacro(e);
+	albaVME *n = e.GetVme();
+	if (n != NULL)
+	{
+		albaMatrix *refSysMatrix = n->GetOutput()->GetAbsMatrix();
+		albaMatrix *slicerMatrix = GetSlicerMatrix();
+
+		//We need to find the roto-translation matrix that moves current slicer matrix to the refsys absolute matrix 
+		//We can use the following formula to find the B matrix:
+		//((AB)^?1)*(A) = B^?1
+
+		//In this formula AB is the target, the refsys matrix in this case
+		//A is the current slicer matrix
+		//and B is the transform from current slicer matrix to the refsys
+
+		albaMatrix translation, rotation;
+
+		//Calculating (AB)^?1
+		albaMatrix ABinverse;
+		ABinverse.DeepCopy(refSysMatrix);
+		ABinverse.Invert();
+		
+		//Multiplying (AB)^?1 to A to obtain B^-1
+		albaTransform Binverse;
+		Binverse.SetMatrix(ABinverse);
+		Binverse.Concatenate(*slicerMatrix, false);
+
+		//Obtaing the final matrix by inverting Binverse, (B^-1)^-1 = B
+		albaMatrix finalMatrix = Binverse.GetMatrix();
+		finalMatrix.Invert();
+
+		//OneventGizmoRotate manages both rotations and translations
+		OnEventGizmoRotate(finalMatrix.GetVTKMatrix(), -1);
+	}
+}
+//----------------------------------------------------------------------------
+albaViewVTK * albaViewArbitraryOrthoSlice::GetViewArbitrary()
+{
+	return (albaViewVTK*)m_ChildViewList[PERSPECTIVE_VIEW];
+}
+//----------------------------------------------------------------------------
+albaViewVTK * albaViewArbitraryOrthoSlice::GetViewSlice(int axis)
+{
+	return (albaViewVTK*)m_ChildViewList[AsixToView(axis)];
+}
+//----------------------------------------------------------------------------
+albaPipe* albaViewArbitraryOrthoSlice::GetPipeSlice(int axis)
+{
+	albaPipe *pipeSlice = NULL;
+	pipeSlice = GetViewSlice(axis)->GetNodePipe(m_Slicer[axis]);
+
+	return pipeSlice;
 }
