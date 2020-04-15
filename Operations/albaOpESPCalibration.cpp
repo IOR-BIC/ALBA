@@ -57,15 +57,18 @@ PURPOSE. See the above copyright notice for more information.
 #define AIR_VALUE -1000.0
 #define TARGET_MAX 1380.0	 //Scale factor 	
 #define CUT_OFF_BODY 975.0 //Middle point from wings (700) and Cortical (700)
-#define CUT_OFF_WINGS 425.0 //Middle point from outside (150) and wings (700)
+#define CUT_OFF_WINGS 350.0 //Middle point from outside (150) and wings (700)
 #define TAIL_RATIO 14.0/20.0 //Tail on L3 to rearwall ratio
-#define INTERVERTEBRAL_SPACE_RATIO 1.0/10.0
-#define MARGIN_REDUCTION 0.75
+#define MARGIN_REDUCTION 0.70
 
 #define FRONT_BACK_CYL_RADIUS_RATIO 7.5/9.0
-#define FRONT_BACK_CYL_HEIGHT_RATIO 0.75
 #define BACK_CYL_R1_R2_RATIO 9.5/13.0
 #define BACK_CYL_MARGIN_REDUCTION 0.94
+
+#define INT_VERT_SPACE 7
+#define CYL_SPACE 23
+#define CYL_HEIGHT 12
+#define BACK_CYL_HEIGHT 6
 
 #define TAILSIZE_MIN 6.0
 #define TAILSIZE_MAX 13.0
@@ -79,10 +82,13 @@ PURPOSE. See the above copyright notice for more information.
 #define SIDE_Y 1
 
 
-#define FULL_VERTEBRAL_ZSPACE 80
+#define FULL_VERTEBRAL_ZSPACE 100
+#define CROPPED_VERTEBRAL_ZSPACE 80
 #define FULL_VERTEBRAL_MAX_HSPACE 62
 #define FULL_VERTEBRAL_MIN_HSPACE 35
 #define FULL_VERTEBRAL_MAX_ERROR 5
+#define ZCROP_SPACE 10
+
 
 //#define CREATE_SAMPLING_CLOUDS
 
@@ -108,7 +114,7 @@ albaOpESPCalibration::~albaOpESPCalibration()
 //----------------------------------------------------------------------------
 bool albaOpESPCalibration::Accept(albaVME *node)
 {
-	return node->IsA("albaVMEVolumeGray");
+	return node->IsA("albaVMEVolumeGray") && vtkImageData::SafeDownCast(node->GetOutput()->GetVTKData());
 }
 
 //----------------------------------------------------------------------------
@@ -144,6 +150,10 @@ void albaOpESPCalibration::OpStop(int result)
 		HideGui();
 	}
 
+	for (int i = 0; i < toHidelist.size(); i++)
+		GetLogicManager()->VmeShow(toHidelist[i], false);
+
+
 	albaEventMacro(albaEvent(this, result));
 }
 //----------------------------------------------------------------------------
@@ -155,6 +165,7 @@ void albaOpESPCalibration::OpDo()
 //----------------------------------------------------------------------------
 int albaOpESPCalibration::Calibrate()
 {
+	m_Volume->Update();
 	m_Volume->GetOutput()->Update();
 	vtkImageData *volumeData = vtkImageData::SafeDownCast(m_Volume->GetOutput()->GetVTKData());
 	
@@ -346,33 +357,54 @@ int albaOpESPCalibration::Calibrate()
 	centerX = origin[0] + (xBodyCenter*spacing[0]);
 	centerY = origin[1] + (yBodyCenter*spacing[1]);
 	
-	double interVertSpace = (zWingsRange.r - zBodyRange.l) * INTERVERTEBRAL_SPACE_RATIO;
-	
-	int fullVertHeight = zWingsRange.r - zBodyRange.l;
-	if (abs(fullVertHeight*spacing[2] - FULL_VERTEBRAL_ZSPACE) > FULL_VERTEBRAL_MAX_ERROR)
+
+	int fullVertHeight = (zWingsRange.r - zWingsRange.l)*spacing[2];
+	int addZpad = 1; 
+	if (abs(fullVertHeight - FULL_VERTEBRAL_ZSPACE) > FULL_VERTEBRAL_MAX_ERROR)
 	{
-		albaErrorMessage("Error: Cannot estimate vertebral height!");
-		return ALBA_ERROR; 
+		if (abs(fullVertHeight - CROPPED_VERTEBRAL_ZSPACE) > FULL_VERTEBRAL_MAX_ERROR)
+		{
+			albaErrorMessage("Error: Cannot estimate vertebral height!");
+			return ALBA_ERROR;
+		}
+		
+		addZpad = 0;
 	}
 
-	double cylSpace = (fullVertHeight - interVertSpace * 2.5) / 3;
-	double cylHeight = cylSpace * spacing[2] * MARGIN_REDUCTION;
+
 	double backCylFullRadius = bodyRadius * spacing[0] * FRONT_BACK_CYL_RADIUS_RATIO;
 	double TailCubeCenter[3], TailCubeXlen, TailCubeYLen;
+	double zOrigin;
 
-	centerZ[0] = origin[2] + (zBodyRange.l + cylSpace*2.5 + 2.25*interVertSpace) *spacing[2];
-	centerZ[1] = origin[2] + (zBodyRange.l + cylSpace*1.5 + 1.25*interVertSpace) * spacing[2];
-	centerZ[2] = origin[2] + (zBodyRange.l + cylSpace*0.5 + 0.25*interVertSpace) * spacing[2];
+	int upSide = abs(zWingsRange.l-zBodyRange.l)<abs(zWingsRange.r - zBodyRange.r);
 	
+	if (upSide)
+	{
 
-	CreateVMECylinder(centerX, centerY, centerZ[0], "CYL L1", cylHeight, radius);
-	m_SpinalCylinders[0] = CreateCylinder(origin, spacing, centerX, centerY, centerZ[0], radius, cylHeight);
+		zOrigin = origin[2] + (zWingsRange.l *spacing[2]);
 
-	CreateVMECylinder(centerX, centerY, centerZ[1], "CYL L2", cylHeight, radius);
-	m_SpinalCylinders[1] = CreateCylinder(origin, spacing, centerX, centerY, centerZ[1], radius, cylHeight);
+
+		centerZ[0] = zOrigin + addZpad*ZCROP_SPACE + CYL_SPACE*2.5 + 2 * INT_VERT_SPACE;
+		centerZ[1] = zOrigin + addZpad*ZCROP_SPACE + CYL_SPACE*1.5 + INT_VERT_SPACE;
+		centerZ[2] = zOrigin + addZpad*ZCROP_SPACE + CYL_SPACE*0.5;
+	}
+	else
+	{
+
+		zOrigin = origin[2] + (zWingsRange.r *spacing[2]);
+		centerZ[0] = zOrigin - (addZpad*ZCROP_SPACE + CYL_SPACE*2.5 + 2 * INT_VERT_SPACE);
+		centerZ[1] = zOrigin - (addZpad*ZCROP_SPACE + CYL_SPACE*1.5 + INT_VERT_SPACE);
+		centerZ[2] = zOrigin - (addZpad*ZCROP_SPACE + CYL_SPACE*0.5);
+	}
+
+	CreateVMECylinder(centerX, centerY, centerZ[0], "CYL L1", CYL_HEIGHT, radius);
+	m_SpinalCylinders[0] = CreateCylinder(origin, spacing, centerX, centerY, centerZ[0], radius, CYL_HEIGHT);
+
+	CreateVMECylinder(centerX, centerY, centerZ[1], "CYL L2", CYL_HEIGHT, radius);
+	m_SpinalCylinders[1] = CreateCylinder(origin, spacing, centerX, centerY, centerZ[1], radius, CYL_HEIGHT);
 	
-	CreateVMECylinder(centerX, centerY, centerZ[2], "CYL L3", cylHeight, radius);
-	m_SpinalCylinders[2] = CreateCylinder(origin, spacing, centerX, centerY, centerZ[2], radius, cylHeight);
+	CreateVMECylinder(centerX, centerY, centerZ[2], "CYL L3", CYL_HEIGHT, radius);
+	m_SpinalCylinders[2] = CreateCylinder(origin, spacing, centerX, centerY, centerZ[2], radius, CYL_HEIGHT);
 
 
 	if (wingsOnX)
@@ -406,31 +438,30 @@ int albaOpESPCalibration::Calibrate()
 	}
 	
 	double backOutRadius = backCylFullRadius*BACK_CYL_MARGIN_REDUCTION;
-	double backCylHeight = cylHeight * FRONT_BACK_CYL_HEIGHT_RATIO;
 	double backInRadius = (backOutRadius * BACK_CYL_R1_R2_RATIO) + (backCylFullRadius-backOutRadius);  //adding margin reduction
 
 
-	m_BoneCylinders[0] = CreateBoneCylinder(tailPosition,origin, spacing, BackCylCenterX, BackCylCenterY, centerZ[1],backInRadius,backOutRadius, backCylHeight);
-	CreateVMECylinder(BackCylCenterX, BackCylCenterY, centerZ[1], "Rear CYL L2 out", backCylHeight, backOutRadius);
-	CreateVMECylinder(BackCylCenterX, BackCylCenterY, centerZ[1], "Rear CYL L2 in", backCylHeight, backInRadius);
+	m_BoneCylinders[0] = CreateBoneCylinder(tailPosition,origin, spacing, BackCylCenterX, BackCylCenterY, centerZ[1],backInRadius,backOutRadius, BACK_CYL_HEIGHT);
+	CreateVMECylinder(BackCylCenterX, BackCylCenterY, centerZ[1], "Rear CYL L2 out", BACK_CYL_HEIGHT, backOutRadius);
+	CreateVMECylinder(BackCylCenterX, BackCylCenterY, centerZ[1], "Rear CYL L2 in", BACK_CYL_HEIGHT, backInRadius);
 
-	m_BoneCylinders[1] = CreateBoneCylinder(tailPosition, origin, spacing, BackCylCenterX, BackCylCenterY, centerZ[2], backInRadius, backOutRadius, backCylHeight);
-	CreateVMECylinder(BackCylCenterX, BackCylCenterY, centerZ[2], "Rear CYL L3 out", backCylHeight, backOutRadius);
-	CreateVMECylinder(BackCylCenterX, BackCylCenterY, centerZ[2], "Rear CYL L3 in", backCylHeight, backInRadius);
+	m_BoneCylinders[1] = CreateBoneCylinder(tailPosition, origin, spacing, BackCylCenterX, BackCylCenterY, centerZ[2], backInRadius, backOutRadius, BACK_CYL_HEIGHT);
+	CreateVMECylinder(BackCylCenterX, BackCylCenterY, centerZ[2], "Rear CYL L3 out", BACK_CYL_HEIGHT, backOutRadius);
+	CreateVMECylinder(BackCylCenterX, BackCylCenterY, centerZ[2], "Rear CYL L3 in", BACK_CYL_HEIGHT, backInRadius);
 
-	m_Tail = CreateTail(origin, spacing, TailCubeCenter[0], TailCubeCenter[1], TailCubeCenter[2], TailCubeXlen, TailCubeYLen, cylHeight);
-	CreateVMEParallelepiped(TailCubeCenter, "Tail", TailCubeXlen, TailCubeYLen, cylHeight);
+	m_Tail = CreateTail(origin, spacing, TailCubeCenter[0], TailCubeCenter[1], TailCubeCenter[2], TailCubeXlen, TailCubeYLen, CYL_HEIGHT);
+	CreateVMEParallelepiped(TailCubeCenter, "Tail", TailCubeXlen, TailCubeYLen, CYL_HEIGHT);
 
 
-
+	/*
 	albaVMELandmarkCloud *lCloud;
 	albaNEW(lCloud);
 	lCloud->SetName("PointRef");
 	
 	
 	lCloud->AppendLandmark(centerX, centerY, centerZ[1], "center");
-	lCloud->AppendLandmark(centerX, centerY, origin[2] + zBodyRange.l*spacing[2], "zBodyL");
-	lCloud->AppendLandmark(centerX, centerY, origin[2] + zBodyRange.r*spacing[2], "zBodyR");
+	lCloud->AppendLandmark(centerX, centerY, origin[2] + zWingsRange.l*spacing[2], "zWingL");
+	lCloud->AppendLandmark(centerX, centerY, origin[2] + zWingsRange.r*spacing[2], "zWingR");
 
 	
 	lCloud->AppendLandmark(origin[0] + (rearWall*spacing[0]), origin[1] + ((dims[1] / 2)*spacing[1]), origin[2] + ((dims[2] / 2)*spacing[2]), "wall");
@@ -447,12 +478,13 @@ int albaOpESPCalibration::Calibrate()
 
 
 	lCloud->ReparentTo(m_Volume);
-
 	
-	
+	*/
+		
 	CalculateSpinalDensityInfo((vtkImageData *)volumeData);
 	CalculateTailDensityInfo((vtkImageData *)volumeData);
 	CalculateBoneDensityInfo((vtkImageData *)volumeData);
+	
 
 	FitPoints();
 
@@ -625,24 +657,28 @@ Range albaOpESPCalibration::CalculateCutOfRange(int scalarSizes, DataType * scal
 //----------------------------------------------------------------------------
 albaVME *albaOpESPCalibration::CreateVMEParallelepiped(double center[3], char * name, double xLen, double yLen, double height)
 {
-	albaTransform cylinderBase;
-	cylinderBase.RotateX(90, false);
-	cylinderBase.Translate(center, false);
-	cylinderBase.Update();
+	albaTransform ParalelepipeddBase;
+	ParalelepipeddBase.RotateX(90, false);
+	ParalelepipeddBase.Translate(center, false);
+	ParalelepipeddBase.Update();
 
 
-	albaVMESurfaceParametric *cylinder;
-	albaNEW(cylinder);
-	cylinder->SetName(name);
-	cylinder->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_CUBE);
-	cylinder->SetCubeXLength(xLen);
-	cylinder->SetCubeYLength(yLen);
-	cylinder->SetCubeZLength(height);
-	cylinder->SetMatrix(cylinderBase.GetMatrix());
+	albaVMESurfaceParametric *paralelepiped;
+	albaNEW(paralelepiped);
+	paralelepiped->SetName(name);
+	paralelepiped->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_CUBE);
+	paralelepiped->SetCubeXLength(xLen);
+	paralelepiped->SetCubeYLength(yLen);
+	paralelepiped->SetCubeZLength(height);
+	paralelepiped->SetMatrix(ParalelepipeddBase.GetMatrix());
 
-	cylinder->ReparentTo(m_Volume);
+	paralelepiped->ReparentTo(m_Volume);
 
-	return cylinder;
+	GetLogicManager()->VmeShow(paralelepiped, true);
+
+	toHidelist.push_back(paralelepiped);
+
+	return paralelepiped;
 }
 
 
@@ -664,6 +700,10 @@ albaVME *albaOpESPCalibration::CreateVMECylinder(double centerX, double centerY,
 	cylinder->SetMatrix(cylinderBase.GetMatrix());
 
 	cylinder->ReparentTo(m_Volume);
+
+	GetLogicManager()->VmeShow(cylinder, true);
+
+	toHidelist.push_back(cylinder);
 
 	return cylinder;
 }
