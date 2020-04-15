@@ -229,18 +229,18 @@ void albaOpExtractImageFromArbitraryView::ExtractImage()
 	//////////////////////////////////////////////////////////////////////////
 	// Find or Create Snapshots group
 	wxString m_GroupName = "Slices";
-	albaVME *root = m_Input->GetRoot();
+	//albaVME *root = m_Input->GetRoot();
 
-	if (m_ImageSlicesGroup == NULL || m_ImageSlicesGroup != (albaVMEGroup *)root->FindInTreeByName(m_GroupName))
+	if (m_ImageSlicesGroup == NULL || m_ImageSlicesGroup != (albaVMEGroup *)m_Input->FindInTreeByName(m_GroupName))
 	{
-		m_ImageSlicesGroup = (albaVMEGroup *)root->FindInTreeByName(m_GroupName);
+		m_ImageSlicesGroup = (albaVMEGroup *)m_Input->FindInTreeByName(m_GroupName);
 
 		if (m_ImageSlicesGroup == NULL)
 		{
 			albaNEW(m_ImageSlicesGroup);
 			m_ImageSlicesGroup->SetName(m_GroupName);
 			if (!m_ShowInTree) m_ImageSlicesGroup->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 0.0));
-			m_ImageSlicesGroup->ReparentTo(root);
+			m_ImageSlicesGroup->ReparentTo(m_Input);
 			m_ImageSlicesGroup->Delete();
 		}
 	}
