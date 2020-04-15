@@ -1196,6 +1196,12 @@ char ** albaOpESPCalibration::GetIcon()
 	return MENU_CALIBRATION_ICON_xpm;
 }
 
+#define ADD_DICOM_TAG(TAGTOADD) if (m_Input->GetTagArray()->IsTagPresent(TAGTOADD))													\
+																{																																						\
+																	albaString tmpStr = m_Input->GetTagArray()->GetTag(TAGTOADD)->GetValue();	\
+																	dicomTags->setAttribute(albaXMLString(TAGTOADD), albaXMLString(tmpStr));	\
+																}
+
 // Create Report
 //----------------------------------------------------------------------------
 bool albaOpESPCalibration::SaveCalibration() 
@@ -1293,6 +1299,33 @@ bool albaOpESPCalibration::SaveCalibration()
 			area800->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[4].min)));
 			area800->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[4].max)));
 			densitometricCalibration->appendChild(area800);
+
+			//Area 400
+			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *dicomTags = doc->createElement(albaXMLString("DicomTags"));
+			ADD_DICOM_TAG("Modality");
+
+			ADD_DICOM_TAG("AcquisitionDate");
+			ADD_DICOM_TAG("Manufacturer");
+			ADD_DICOM_TAG("InstitutionName");
+			ADD_DICOM_TAG("ManufacturersModelName");
+
+			ADD_DICOM_TAG("KVP");
+			ADD_DICOM_TAG("XRayTubeCurrent");
+			ADD_DICOM_TAG("FocalSpots");
+			ADD_DICOM_TAG("FilterType");
+
+			ADD_DICOM_TAG("SliceThickness");
+			ADD_DICOM_TAG("TableHeight");
+			ADD_DICOM_TAG("ExposureTime");
+			ADD_DICOM_TAG("TotalCollimationWidth");
+			ADD_DICOM_TAG("SpiralPitchFactor");
+
+			ADD_DICOM_TAG("SpacingBetweenSlices");
+			ADD_DICOM_TAG("PixelSpacing");
+			ADD_DICOM_TAG("ConvolutionKernel");
+
+
+			densitometricCalibration->appendChild(dicomTags);
 
 			root->appendChild(densitometricCalibration);
 		}
