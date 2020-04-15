@@ -27,6 +27,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaObject.h"
 #include "albaOp.h"
 #include "albaPipe.h"
+#include "albaServiceClient.h"
 #include "albaTagArray.h"
 #include "albaVME.h"
 #include "albaVMEImage.h"
@@ -67,7 +68,11 @@ albaOpExtractImageFromArbitraryView::albaOpExtractImageFromArbitraryView(wxStrin
 	m_ImageSlicesGroup = NULL;
 
 	m_Axis = 2; //Default Z
+
 	m_ShowInTree = true;
+	m_ChooseName = true;
+
+	m_ImageName = "";
 }
 
 //----------------------------------------------------------------------------
@@ -98,6 +103,8 @@ void albaOpExtractImageFromArbitraryView::OpRun()
 		if (e.GetBool())
 		{
 			m_View = e.GetView();
+
+			GetLogicManager()->VmeShow(m_Input, true);
 
 			CreateGui();
 		}
@@ -161,6 +168,12 @@ void albaOpExtractImageFromArbitraryView::CreateGui()
 		m_Gui->Label("");
 		wxString axisChoice[3] = { "X","Y","Z" };
 		m_Gui->Combo(ID_AXIS, "Axis", &m_Axis, 3, axisChoice);
+	}
+
+	if (m_ChooseName) 
+	{
+		m_Gui->Divider(1);
+		m_Gui->String(NULL, "Name", &m_ImageName);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -233,18 +246,26 @@ void albaOpExtractImageFromArbitraryView::ExtractImage()
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	// Generate Slice name
+	// Generate Image Slice name
 	wxString imageName = "Slice";
+
+	wxString axisName[3] = { "X","Y","Z" };
 
 	char tmp[20];
 	int count = 1;
 	do
 	{
-		sprintf(tmp, "%s_%d", imageName, count);
+		sprintf(tmp, "%s_%s_%d", imageName, axisName[m_Axis], count);
 		count++;
 	} while (m_ImageSlicesGroup->FindInTreeByName(tmp) != NULL);
 
 	imageName = tmp;
+
+	if (m_ChooseName)
+	{
+		if (!m_ImageName.IsEmpty())
+			imageName = m_ImageName;
+	}
 
 	//////////////////////////////////////////////////////////////////////////	
 	albaVMEImage *image;
@@ -273,8 +294,11 @@ wxBitmap * albaOpExtractImageFromArbitraryView::GetSliceImage()
 
 	renderer->SetBackground(0.0, 0.0, 0.0);
 
+	double bounds[6];
+	m_Input->GetOutput()->GetBounds(bounds);
+
 	renderWindow->AddRenderer(renderer);
-	renderWindow->SetSize(640, 480);
+	renderWindow->SetSize(bounds[3] - bounds[2], bounds[1] - bounds[0]);
 	renderWindow->SetPosition(0, 0);
 
 	albaPipe *pipeSlice = NULL;
@@ -287,6 +311,11 @@ wxBitmap * albaOpExtractImageFromArbitraryView::GetSliceImage()
 		else if (m_View->IsA("albaViewArbitraryOrthoSlice"))
 		{
 			pipeSlice = albaViewArbitraryOrthoSlice::SafeDownCast(m_View)->GetPipeSlice(m_Axis);
+
+			if (m_Axis == 0)
+				renderWindow->SetSize(bounds[5] - bounds[4], bounds[3] - bounds[2]);
+			else if (m_Axis == 1)
+				renderWindow->SetSize(bounds[1] - bounds[0], bounds[5] - bounds[4]);
 		}
 	}
 	if (pipeSlice == NULL) return NULL;
@@ -303,18 +332,19 @@ wxBitmap * albaOpExtractImageFromArbitraryView::GetSliceImage()
 
 		actor = actorList->GetNextProp();
 	}
-	double x, y, z, vx, vy, vz;
 
-	// albaPipeVolumeArbSlice::SLICE_Z
-	x = 0; y = 0; z = -1; vx = 0; vy = -1; vz = 0;
+	// Set Camera Properties
+	double x, y, z, vx, vy, vz;
+	x = 0; y = 0; z = -1; vx = 0; vy = -1; vz = 0; // axis = Z
 
 	renderer->GetActiveCamera()->ParallelProjectionOn();
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
 	renderer->GetActiveCamera()->SetPosition(x * 100, y * 100, z * 100);
 	renderer->GetActiveCamera()->SetViewUp(vx, vy, vz);
 	renderer->GetActiveCamera()->SetClippingRange(0.1, 1000);
+	renderer->GetActiveCamera()->Zoom(2.0);
+	//renderer->ResetCamera();
 
-	renderer->ResetCamera();
 	renderWindow->Render();
 
 	int dim[3];

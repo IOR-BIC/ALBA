@@ -80,5 +80,8 @@ protected:
 
 	int m_Axis;
 	bool m_ShowInTree;
+	bool m_ChooseName;
+	
+	wxString m_ImageName;
 };
 #endif

@@ -154,7 +154,7 @@ protected:
 	bool FitPoints();
 
 
-
+	std::vector <albaVME *> toHidelist;
 	Cylinder m_SpinalCylinders[3];
 	BoneCylinder m_BoneCylinders[2];
 	Tail m_Tail;
