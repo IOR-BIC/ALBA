@@ -54,6 +54,8 @@ PURPOSE. See the above copyright notice for more information.
 
 #include "wx\bitmap.h"
 #include "wx\image.h"
+#include "albaViewManager.h"
+#include "albaAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpExtractImageFromArbitraryView);
@@ -83,7 +85,10 @@ albaOpExtractImageFromArbitraryView::~albaOpExtractImageFromArbitraryView()
 //----------------------------------------------------------------------------
 bool albaOpExtractImageFromArbitraryView::Accept(albaVME *node)
 {
-	return node->IsA("albaVMEVolumeGray");
+	albaView *view = GetLogicManager()->GetViewManager()->GetSelectedView();
+	bool hasView = view && (view->IsA("albaViewArbitrarySlice") || view->IsA("albaViewArbitraryOrthoSlice"));
+	
+	return (hasView && node->IsA("albaVMEVolumeGray"));
 }
 
 //----------------------------------------------------------------------------
@@ -95,6 +100,8 @@ albaOp* albaOpExtractImageFromArbitraryView::Copy()
 //----------------------------------------------------------------------------
 void albaOpExtractImageFromArbitraryView::OpRun()
 {
+	bool hasView = false;
+
 	if (!m_TestMode)
 	{
 		albaEvent e(this, VIEW_SELECTED);
@@ -103,9 +110,12 @@ void albaOpExtractImageFromArbitraryView::OpRun()
 		if (e.GetBool())
 		{
 			m_View = e.GetView();
+			hasView = m_View && (m_View->IsA("albaViewArbitrarySlice") || m_View->IsA("albaViewArbitraryOrthoSlice"));
+		}
 
+		if (hasView)
+		{
 			GetLogicManager()->VmeShow(m_Input, true);
-
 			CreateGui();
 		}
 		else
