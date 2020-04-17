@@ -73,6 +73,7 @@ albaOpExtractImageFromArbitraryView::albaOpExtractImageFromArbitraryView(wxStrin
 
 	m_ShowInTree = true;
 	m_ChooseName = true;
+	m_ShowExtractButton = false;
 
 	m_ImageName = "";
 }
@@ -128,16 +129,16 @@ void albaOpExtractImageFromArbitraryView::OpRun()
 //----------------------------------------------------------------------------
 void albaOpExtractImageFromArbitraryView::OpStop(int result)
 {
+	if (result == OP_RUN_OK && 	!m_ShowExtractButton)
+	{
+		ExtractImage();
+	}
+	
 	if (!m_TestMode)
 	{
 		HideGui();
 	}
 
-	if (result == OP_RUN_OK)
-	{
-		ExtractImage();
-	}
-	
 	albaEventMacro(albaEvent(this, result));
 }
 //----------------------------------------------------------------------------
@@ -152,6 +153,10 @@ void albaOpExtractImageFromArbitraryView::OnEvent(albaEventBase *alba_event)
 	{
 		switch (e->GetId())
 		{
+		case ID_EXTRACT:
+			ExtractImage();
+			break;
+
 		case wxOK:
 			OpStop(OP_RUN_OK);
 			break;
@@ -184,6 +189,12 @@ void albaOpExtractImageFromArbitraryView::CreateGui()
 	{
 		m_Gui->Divider(1);
 		m_Gui->String(NULL, "Name", &m_ImageName);
+	}
+
+	if (m_ShowExtractButton) 
+	{
+		m_Gui->Divider(1);
+		m_Gui->Button(ID_EXTRACT, "Extract");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
