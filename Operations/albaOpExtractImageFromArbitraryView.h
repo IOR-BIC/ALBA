@@ -61,6 +61,7 @@ public:
 	{
 		ID_TYPE = MINID,
 		ID_AXIS,
+		ID_EXTRACT,
 	};
 
 protected:
@@ -81,6 +82,7 @@ protected:
 	int m_Axis;
 	bool m_ShowInTree;
 	bool m_ChooseName;
+	bool m_ShowExtractButton;
 	
 	wxString m_ImageName;
 };
