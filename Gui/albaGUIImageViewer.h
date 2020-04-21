@@ -49,6 +49,7 @@ enum ImageViewerEvents
 	ID_SAVE_ALL,
 	ID_IMAGE_DELETE,
 	ID_IMAGE_PRINT,
+	ID_OK,
 	ID_SETTING_ENABLE_RESOLUTION,
 	ID_SETTING_RESOLUTION,
 	ID_SETTING_COLOR,
@@ -74,6 +75,8 @@ public:
 	/** Show ImagePreview dialog*/
 	void ShowImageDialog(albaVMEGroup *group, int selection = 0);
 
+	void HideImageDialog();
+
 	void Reset();
 
 	wxString GetSelectedImageName();
@@ -82,6 +85,8 @@ public:
 	void UpdateSelectionDialog(int selection);
 
 	void SetTitle(wxString title) { m_TitleDialog = title; };
+	void EnableOkButton(bool enable) { m_EnableOkButton = enable; };
+	void EnablePrintButton(bool enable) { m_EnablePrintButton = enable; };
 	void EnableDeleteButton(bool enable) { m_EnableDeleteButton = enable; };
 	void EnableSaveButton(bool enable) { m_EnableSaveImageButton = enable; };
 	void EnableCheckButton(bool enable) { m_EnableImageCheckButton = enable; };
@@ -113,13 +118,17 @@ protected:
 	int m_ImageSelection;
 	int m_ImageCheck;
 
+	bool m_IsDialogOpened;
+
 	albaGUIDialog			*m_Dialog;
 	albaGUIButton			*m_PrevBtn;
 	albaGUIButton			*m_NextBtn;
 	wxCheckBox				*m_CheckBtn;
 	
 	wxString m_TitleDialog;
-	
+
+	bool m_EnableOkButton;
+	bool m_EnablePrintButton;
 	bool m_EnableDeleteButton;
 	bool m_EnableSaveImageButton;
 	bool m_EnableImageCheckButton;

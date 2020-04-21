@@ -74,12 +74,16 @@ albaGUIImageViewer::albaGUIImageViewer(albaObserver *Listener, const albaString 
 	m_NextBtn = NULL;
 	m_CheckBtn = NULL;
 
+	m_IsDialogOpened = false;
+
 	m_ImageCheck = 0;
 	m_ImageSelection = 0;
 	m_ImagesList.clear();
 
 	m_TitleDialog = "Image Viewer";
 
+	m_EnableOkButton = false;
+	m_EnablePrintButton = true;
 	m_EnableDeleteButton = false;
 	m_EnableSaveImageButton= false;
 	m_EnableImageCheckButton = false;
@@ -134,6 +138,13 @@ void albaGUIImageViewer::OnEvent(albaEventBase *alba_event)
 			if (m_EnableImageCheckButton) albaEventMacro(*e);
 			UpdateSelectionDialog(m_ImageSelection + 1);
 
+		}
+		break;
+		case ID_OK:
+		{
+			if (m_EnableOkButton) albaEventMacro(*e);
+
+			HideImageDialog();
 		}
 		break;
 		case ID_IMAGE_PRINT:
@@ -261,13 +272,15 @@ void albaGUIImageViewer::ShowImageDialog(albaVMEGroup *group, int selection)
 			buttonBoxSizer->Add(saveAllBtn, 0, wxALIGN_CENTER, 0);
 		}
 
-		albaGUILab *printLab = new albaGUILab(m_Dialog, -1, "  ");
-		buttonBoxSizer->Add(printLab, 0, wxALIGN_CENTER, 0);
+		if (m_EnablePrintButton)
+		{
+			albaGUILab *printLab = new albaGUILab(m_Dialog, -1, "  ");
+			buttonBoxSizer->Add(printLab, 0, wxALIGN_CENTER, 0);
 
-		albaGUIButton *printBtn = new albaGUIButton(m_Dialog, ID_IMAGE_PRINT, "Print...", wxPoint(-1, -1));
-		printBtn->SetListener(this);
-		buttonBoxSizer->Add(printBtn, 0, wxALIGN_CENTER, 0);
-
+			albaGUIButton *printBtn = new albaGUIButton(m_Dialog, ID_IMAGE_PRINT, "Print...", wxPoint(-1, -1));
+			printBtn->SetListener(this);
+			buttonBoxSizer->Add(printBtn, 0, wxALIGN_CENTER, 0);
+		}
 
 		if (m_EnableImageCheckButton)
 		{
@@ -277,6 +290,16 @@ void albaGUIImageViewer::ShowImageDialog(albaVMEGroup *group, int selection)
 			m_CheckBtn = new wxCheckBox(m_Dialog, ID_IMAGE_SELECT, "Select", wxPoint(-1, -1));
 			m_CheckBtn->SetValidator(albaGUIValidator(this, ID_IMAGE_SELECT, m_CheckBtn, &m_ImageCheck));
 			buttonBoxSizer->Add(m_CheckBtn, 0, wxALIGN_CENTER, 0);
+		}
+
+		if (m_EnableOkButton)
+		{
+			albaGUILab *okLab = new albaGUILab(m_Dialog, -1, "  ");
+			buttonBoxSizer->Add(okLab, 0, wxALIGN_CENTER, 0);
+
+			albaGUIButton *okBtn = new albaGUIButton(m_Dialog, ID_OK, "OK", wxPoint(-1, -1));
+			okBtn->SetListener(this);
+			buttonBoxSizer->Add(okBtn, 0, wxALIGN_RIGHT, 0);
 		}
 
 		m_Dialog->Add(m_RwiSizer, 0, wxALL);
@@ -292,12 +315,26 @@ void albaGUIImageViewer::ShowImageDialog(albaVMEGroup *group, int selection)
 		m_Dialog->SetPosition(wxPoint(posX, posY));
 	}
 
+	if (m_IsDialogOpened)
+		HideImageDialog();
+
 	if (m_CheckBtn)
 		m_CheckBtn->SetValue(m_ImageCheck);
 
 		UpdateSelectionDialog(selection);
 
 	m_Dialog->ShowModal();
+
+	m_IsDialogOpened = true;
+}
+
+//----------------------------------------------------------------------------
+void albaGUIImageViewer::HideImageDialog()
+{
+	if (m_Dialog)
+		m_Dialog->Hide();
+
+	m_IsDialogOpened = false;
 }
 
 //----------------------------------------------------------------------------
