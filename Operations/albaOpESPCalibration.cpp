@@ -57,15 +57,15 @@ PURPOSE. See the above copyright notice for more information.
 #define AIR_VALUE -1000.0
 #define TARGET_MAX 1380.0	 //Scale factor 	
 #define CUT_OFF_BODY 975.0 //Middle point from wings (700) and Cortical (700)
-#define CUT_OFF_WINGS 425.0 //Middle point from outside (150) and wings (700)
+#define CUT_OFF_WINGS 350.0 //Middle point from outside (150) and wings (700)
 #define TAIL_RATIO 14.0/20.0 //Tail on L3 to rearwall ratio
-#define INTERVERTEBRAL_SPACE_RATIO 1.0/10.0
-#define MARGIN_REDUCTION 0.75
+#define MARGIN_REDUCTION 0.70
 
-#define FRONT_BACK_CYL_RADIUS_RATIO 7.5/9.0
-#define FRONT_BACK_CYL_HEIGHT_RATIO 0.75
-#define BACK_CYL_R1_R2_RATIO 9.5/13.0
-#define BACK_CYL_MARGIN_REDUCTION 0.94
+
+#define CYL_HEIGHT 12
+#define BACK_CYL_HEIGHT 4
+#define BACK_CYL_INNER_RADIUS 9.8
+#define BACK_CYL_OUTER_RADIUS 11.8
 
 #define TAILSIZE_MIN 6.0
 #define TAILSIZE_MAX 13.0
@@ -79,12 +79,17 @@ PURPOSE. See the above copyright notice for more information.
 #define SIDE_Y 1
 
 
-#define FULL_VERTEBRAL_ZSPACE 80
+#define WINGS_ZSPACE 70
+#define WINGS_ZCENTER_1 64
+#define WINGS_ZCENTER_2 35
+#define WINGS_ZCENTER_3 6
+
 #define FULL_VERTEBRAL_MAX_HSPACE 62
 #define FULL_VERTEBRAL_MIN_HSPACE 35
 #define FULL_VERTEBRAL_MAX_ERROR 5
 
-//#define CREATE_SAMPLING_CLOUDS
+
+//#define CREATE_DEBUG_DATA
 
 
 
@@ -108,7 +113,7 @@ albaOpESPCalibration::~albaOpESPCalibration()
 //----------------------------------------------------------------------------
 bool albaOpESPCalibration::Accept(albaVME *node)
 {
-	return node->IsA("albaVMEVolumeGray");
+	return node->IsA("albaVMEVolumeGray") && vtkImageData::SafeDownCast(node->GetOutput()->GetVTKData());
 }
 
 //----------------------------------------------------------------------------
@@ -124,6 +129,8 @@ void albaOpESPCalibration::OpRun()
 	wxBusyCursor waitCursor;
 
 	m_Volume = albaVMEVolumeGray::SafeDownCast(m_Input);
+	
+	GetLogicManager()->VmeShow(m_Volume, true);
 	
 	int result=Calibrate();
 
@@ -144,6 +151,10 @@ void albaOpESPCalibration::OpStop(int result)
 		HideGui();
 	}
 
+	for (int i = 0; i < toHidelist.size(); i++)
+		GetLogicManager()->VmeShow(toHidelist[i], false);
+
+
 	albaEventMacro(albaEvent(this, result));
 }
 //----------------------------------------------------------------------------
@@ -155,6 +166,7 @@ void albaOpESPCalibration::OpDo()
 //----------------------------------------------------------------------------
 int albaOpESPCalibration::Calibrate()
 {
+	m_Volume->Update();
 	m_Volume->GetOutput()->Update();
 	vtkImageData *volumeData = vtkImageData::SafeDownCast(m_Volume->GetOutput()->GetVTKData());
 	
@@ -170,12 +182,14 @@ int albaOpESPCalibration::Calibrate()
 	projectFilterX->SetProjectionSideToX();
 	projectFilterX->Update();
 
+#ifdef CREATE_DEBUG_DATA
 	albaVMEImage *imageOutputX;
 	albaNEW(imageOutputX);
 	imageOutputX->SetData((vtkImageData *)projectFilterX->GetOutput(), m_Volume->GetMTime());
 	imageOutputX->SetName("outputX");
 	imageOutputX->ReparentTo(m_Volume);
-	
+#endif
+
 	vtkALBAProjectVolume *projectFilterY;
 	vtkNEW(projectFilterY);
 	projectFilterY->SetInput(volumeData);
@@ -183,11 +197,13 @@ int albaOpESPCalibration::Calibrate()
 	projectFilterY->SetProjectionSideToY();
 	projectFilterY->Update();
 
+#ifdef CREATE_DEBUG_DATA
 	albaVMEImage *imageOutputY;
 	albaNEW(imageOutputY);
 	imageOutputY->SetData((vtkImageData *)projectFilterY->GetOutput(), m_Volume->GetMTime());
 	imageOutputY->SetName("outputY");
 	imageOutputY->ReparentTo(m_Volume);
+#endif
 
 	vtkALBAProjectVolume *projectFilterYX;
 	vtkNEW(projectFilterYX);
@@ -196,11 +212,13 @@ int albaOpESPCalibration::Calibrate()
 	projectFilterYX->SetProjectionSideToY();
 	projectFilterYX->Update();
 
+#ifdef CREATE_DEBUG_DATA
 	albaVMEImage *imageOutputYX;
 	albaNEW(imageOutputYX);
 	imageOutputYX->SetData((vtkImageData *)projectFilterYX->GetOutput(), m_Volume->GetMTime());
 	imageOutputYX->SetName("outputYX");
 	imageOutputYX->ReparentTo(m_Volume);
+#endif
 
 	vtkALBAProjectVolume *projectFilterXY;
 	vtkNEW(projectFilterXY);
@@ -209,13 +227,15 @@ int albaOpESPCalibration::Calibrate()
 	projectFilterXY->SetProjectionSideToY();
 	projectFilterXY->Update();
 
+#ifdef CREATE_DEBUG_DATA
 	albaVMEImage *imageOutputXY;
 	albaNEW(imageOutputXY);
 	imageOutputXY->SetData((vtkImageData *)projectFilterXY->GetOutput(), m_Volume->GetMTime());
 	imageOutputXY->SetName("outputXY");
 	imageOutputXY->ReparentTo(m_Volume);
+#endif
 
-		vtkALBAProjectVolume *projectFilterYZ;
+	vtkALBAProjectVolume *projectFilterYZ;
 	vtkNEW(projectFilterYZ);
 
 
@@ -286,7 +306,8 @@ int albaOpESPCalibration::Calibrate()
 			projectFilterY->SetProjectionRange(0, rearWall);
 			projectFilterY->Update();
 			projectFilterYZ->SetInput(projectFilterY->GetOutput());
-
+			projectFilterYZ->SetProjectSubRange(false);
+			projectFilterYZ->SetProjectionRange(0, xWingsRange.l + (xBodyRange.l - xWingsRange.l)*3/4);
 		}
 	}
 	else
@@ -328,15 +349,23 @@ int albaOpESPCalibration::Calibrate()
 	projectFilterYZ->SetProjectionSideToX();
 	projectFilterYZ->Update();
 
+#ifdef CREATE_DEBUG_DATA
 	albaVMEImage *imageOutputYZ;
 	albaNEW(imageOutputYZ);
 	imageOutputYZ->SetData((vtkImageData *)projectFilterYZ->GetOutput(), m_Volume->GetMTime());
 	imageOutputYZ->SetName("outputYZ");
 	imageOutputYZ->ReparentTo(m_Volume);
+#endif
 
 	albaLogMessage("Calculate Z body cut off:");
 	Range zBodyRange = CaluculateCutOffRange((vtkImageData *)projectFilterYZ->GetOutput(), bodyCutOff);
 	Range zWingsRange = CaluculateCutOffRange((vtkImageData *)projectFilterYZ->GetOutput(), wingsCutOff);
+
+	projectFilterY->SetProjectSubRange(false);
+	projectFilterY->Update();
+	projectFilterYZ->SetProjectSubRange(true);
+	projectFilterYZ->Update();
+	Range zWingsOnlyRange = CaluculateCutOffRange((vtkImageData *)projectFilterYZ->GetOutput(), wingsCutOff);
 
 
 	double radius = bodyRadius * spacing[0] * MARGIN_REDUCTION;
@@ -346,33 +375,43 @@ int albaOpESPCalibration::Calibrate()
 	centerX = origin[0] + (xBodyCenter*spacing[0]);
 	centerY = origin[1] + (yBodyCenter*spacing[1]);
 	
-	double interVertSpace = (zWingsRange.r - zBodyRange.l) * INTERVERTEBRAL_SPACE_RATIO;
-	
-	int fullVertHeight = zWingsRange.r - zBodyRange.l;
-	if (abs(fullVertHeight*spacing[2] - FULL_VERTEBRAL_ZSPACE) > FULL_VERTEBRAL_MAX_ERROR)
+
+	int fullVertHeight = (zWingsOnlyRange.r - zWingsOnlyRange.l)*spacing[2];
+	if (abs(fullVertHeight - WINGS_ZSPACE) > FULL_VERTEBRAL_MAX_ERROR)
 	{
 		albaErrorMessage("Error: Cannot estimate vertebral height!");
-		return ALBA_ERROR; 
+		return ALBA_ERROR;
 	}
 
-	double cylSpace = (fullVertHeight - interVertSpace * 2.5) / 3;
-	double cylHeight = cylSpace * spacing[2] * MARGIN_REDUCTION;
-	double backCylFullRadius = bodyRadius * spacing[0] * FRONT_BACK_CYL_RADIUS_RATIO;
+
 	double TailCubeCenter[3], TailCubeXlen, TailCubeYLen;
+	double zOrigin;
 
-	centerZ[0] = origin[2] + (zBodyRange.l + cylSpace*2.5 + 2.25*interVertSpace) *spacing[2];
-	centerZ[1] = origin[2] + (zBodyRange.l + cylSpace*1.5 + 1.25*interVertSpace) * spacing[2];
-	centerZ[2] = origin[2] + (zBodyRange.l + cylSpace*0.5 + 0.25*interVertSpace) * spacing[2];
+	int upSide = abs(zWingsRange.l-zBodyRange.l)<abs(zWingsRange.r - zBodyRange.r);
 	
+	if (upSide)
+	{
+		zOrigin = origin[2] + (zWingsOnlyRange.l*spacing[2]);
+		centerZ[0] = zOrigin + WINGS_ZCENTER_1;
+		centerZ[1] = zOrigin + WINGS_ZCENTER_2;
+		centerZ[2] = zOrigin + WINGS_ZCENTER_3;
+	}
+	else
+	{
+		zOrigin = origin[2] + (zWingsOnlyRange.r *spacing[2]);
+		centerZ[0] = zOrigin - WINGS_ZCENTER_1;
+		centerZ[1] = zOrigin - WINGS_ZCENTER_2;
+		centerZ[2] = zOrigin - WINGS_ZCENTER_3;
+	}
 
-	CreateVMECylinder(centerX, centerY, centerZ[0], "CYL L1", cylHeight, radius);
-	m_SpinalCylinders[0] = CreateCylinder(origin, spacing, centerX, centerY, centerZ[0], radius, cylHeight);
+	CreateVMECylinder(centerX, centerY, centerZ[0], "CYL L1", CYL_HEIGHT, radius);
+	m_SpinalCylinders[0] = CreateCylinder(origin, spacing, centerX, centerY, centerZ[0], radius, CYL_HEIGHT);
 
-	CreateVMECylinder(centerX, centerY, centerZ[1], "CYL L2", cylHeight, radius);
-	m_SpinalCylinders[1] = CreateCylinder(origin, spacing, centerX, centerY, centerZ[1], radius, cylHeight);
+	CreateVMECylinder(centerX, centerY, centerZ[1], "CYL L2", CYL_HEIGHT, radius);
+	m_SpinalCylinders[1] = CreateCylinder(origin, spacing, centerX, centerY, centerZ[1], radius, CYL_HEIGHT);
 	
-	CreateVMECylinder(centerX, centerY, centerZ[2], "CYL L3", cylHeight, radius);
-	m_SpinalCylinders[2] = CreateCylinder(origin, spacing, centerX, centerY, centerZ[2], radius, cylHeight);
+	CreateVMECylinder(centerX, centerY, centerZ[2], "CYL L3", CYL_HEIGHT, radius);
+	m_SpinalCylinders[2] = CreateCylinder(origin, spacing, centerX, centerY, centerZ[2], radius, CYL_HEIGHT);
 
 
 	if (wingsOnX)
@@ -405,32 +444,32 @@ int albaOpESPCalibration::Calibrate()
 		TailCubeYLen = TAILSIZE_MIN;
 	}
 	
-	double backOutRadius = backCylFullRadius*BACK_CYL_MARGIN_REDUCTION;
-	double backCylHeight = cylHeight * FRONT_BACK_CYL_HEIGHT_RATIO;
-	double backInRadius = (backOutRadius * BACK_CYL_R1_R2_RATIO) + (backCylFullRadius-backOutRadius);  //adding margin reduction
+	double backCylPos[3];
+
+	GetBoneCenter(volumeData, tailPosition, BackCylCenterX, BackCylCenterY, centerZ[1], backCylPos);
+	m_BoneCylinders[0] = CreateBoneCylinder(tailPosition,origin, spacing, backCylPos[0], backCylPos[1], backCylPos[2], BACK_CYL_INNER_RADIUS, BACK_CYL_OUTER_RADIUS, BACK_CYL_HEIGHT);
+	CreateVMECylinder(backCylPos[0], backCylPos[1], backCylPos[2], "Rear CYL L2 out", BACK_CYL_HEIGHT, BACK_CYL_OUTER_RADIUS);
+	CreateVMECylinder(backCylPos[0], backCylPos[1], backCylPos[2], "Rear CYL L2 in", BACK_CYL_HEIGHT, BACK_CYL_INNER_RADIUS);
+
+	GetBoneCenter(volumeData, tailPosition, BackCylCenterX, BackCylCenterY, centerZ[2], backCylPos);
+
+	m_BoneCylinders[1] = CreateBoneCylinder(tailPosition, origin, spacing, backCylPos[0], backCylPos[1], backCylPos[2], BACK_CYL_INNER_RADIUS, BACK_CYL_OUTER_RADIUS, BACK_CYL_HEIGHT);
+	CreateVMECylinder(backCylPos[0], backCylPos[1], backCylPos[2], "Rear CYL L3 out", BACK_CYL_HEIGHT, BACK_CYL_OUTER_RADIUS);
+	CreateVMECylinder(backCylPos[0], backCylPos[1], backCylPos[2], "Rear CYL L3 in", BACK_CYL_HEIGHT, BACK_CYL_INNER_RADIUS);
+
+	m_Tail = CreateTail(origin, spacing, TailCubeCenter[0], TailCubeCenter[1], TailCubeCenter[2], TailCubeXlen, TailCubeYLen, CYL_HEIGHT);
+	CreateVMEParallelepiped(TailCubeCenter, "Tail", TailCubeXlen, TailCubeYLen, CYL_HEIGHT);
 
 
-	m_BoneCylinders[0] = CreateBoneCylinder(tailPosition,origin, spacing, BackCylCenterX, BackCylCenterY, centerZ[1],backInRadius,backOutRadius, backCylHeight);
-	CreateVMECylinder(BackCylCenterX, BackCylCenterY, centerZ[1], "Rear CYL L2 out", backCylHeight, backOutRadius);
-	CreateVMECylinder(BackCylCenterX, BackCylCenterY, centerZ[1], "Rear CYL L2 in", backCylHeight, backInRadius);
-
-	m_BoneCylinders[1] = CreateBoneCylinder(tailPosition, origin, spacing, BackCylCenterX, BackCylCenterY, centerZ[2], backInRadius, backOutRadius, backCylHeight);
-	CreateVMECylinder(BackCylCenterX, BackCylCenterY, centerZ[2], "Rear CYL L3 out", backCylHeight, backOutRadius);
-	CreateVMECylinder(BackCylCenterX, BackCylCenterY, centerZ[2], "Rear CYL L3 in", backCylHeight, backInRadius);
-
-	m_Tail = CreateTail(origin, spacing, TailCubeCenter[0], TailCubeCenter[1], TailCubeCenter[2], TailCubeXlen, TailCubeYLen, cylHeight);
-	CreateVMEParallelepiped(TailCubeCenter, "Tail", TailCubeXlen, TailCubeYLen, cylHeight);
-
-
-
+	/*
 	albaVMELandmarkCloud *lCloud;
 	albaNEW(lCloud);
 	lCloud->SetName("PointRef");
 	
 	
 	lCloud->AppendLandmark(centerX, centerY, centerZ[1], "center");
-	lCloud->AppendLandmark(centerX, centerY, origin[2] + zBodyRange.l*spacing[2], "zBodyL");
-	lCloud->AppendLandmark(centerX, centerY, origin[2] + zBodyRange.r*spacing[2], "zBodyR");
+	lCloud->AppendLandmark(centerX, centerY, origin[2] + zWingsRange.l*spacing[2], "zWingL");
+	lCloud->AppendLandmark(centerX, centerY, origin[2] + zWingsRange.r*spacing[2], "zWingR");
 
 	
 	lCloud->AppendLandmark(origin[0] + (rearWall*spacing[0]), origin[1] + ((dims[1] / 2)*spacing[1]), origin[2] + ((dims[2] / 2)*spacing[2]), "wall");
@@ -447,12 +486,13 @@ int albaOpESPCalibration::Calibrate()
 
 
 	lCloud->ReparentTo(m_Volume);
-
 	
-	
+	*/
+		
 	CalculateSpinalDensityInfo((vtkImageData *)volumeData);
 	CalculateTailDensityInfo((vtkImageData *)volumeData);
 	CalculateBoneDensityInfo((vtkImageData *)volumeData);
+	
 
 	FitPoints();
 
@@ -625,24 +665,28 @@ Range albaOpESPCalibration::CalculateCutOfRange(int scalarSizes, DataType * scal
 //----------------------------------------------------------------------------
 albaVME *albaOpESPCalibration::CreateVMEParallelepiped(double center[3], char * name, double xLen, double yLen, double height)
 {
-	albaTransform cylinderBase;
-	cylinderBase.RotateX(90, false);
-	cylinderBase.Translate(center, false);
-	cylinderBase.Update();
+	albaTransform ParalelepipeddBase;
+	ParalelepipeddBase.RotateX(90, false);
+	ParalelepipeddBase.Translate(center, false);
+	ParalelepipeddBase.Update();
 
 
-	albaVMESurfaceParametric *cylinder;
-	albaNEW(cylinder);
-	cylinder->SetName(name);
-	cylinder->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_CUBE);
-	cylinder->SetCubeXLength(xLen);
-	cylinder->SetCubeYLength(yLen);
-	cylinder->SetCubeZLength(height);
-	cylinder->SetMatrix(cylinderBase.GetMatrix());
+	albaVMESurfaceParametric *paralelepiped;
+	albaNEW(paralelepiped);
+	paralelepiped->SetName(name);
+	paralelepiped->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_CUBE);
+	paralelepiped->SetCubeXLength(xLen);
+	paralelepiped->SetCubeYLength(yLen);
+	paralelepiped->SetCubeZLength(height);
+	paralelepiped->SetMatrix(ParalelepipeddBase.GetMatrix());
 
-	cylinder->ReparentTo(m_Volume);
+	paralelepiped->ReparentTo(m_Volume);
 
-	return cylinder;
+	GetLogicManager()->VmeShow(paralelepiped, true);
+
+	toHidelist.push_back(paralelepiped);
+
+	return paralelepiped;
 }
 
 
@@ -664,6 +708,10 @@ albaVME *albaOpESPCalibration::CreateVMECylinder(double centerX, double centerY,
 	cylinder->SetMatrix(cylinderBase.GetMatrix());
 
 	cylinder->ReparentTo(m_Volume);
+
+	GetLogicManager()->VmeShow(cylinder, true);
+
+	toHidelist.push_back(cylinder);
 
 	return cylinder;
 }
@@ -690,7 +738,7 @@ bool albaOpESPCalibration::CalculateSpinalDensityInfo(vtkImageData *rg)
 		double acc = 0;
 		double minValue = VTK_DOUBLE_MAX, maxValue = VTK_DOUBLE_MIN;
 
-#ifdef CREATE_SAMPLING_CLOUDS
+#ifdef CREATE_DEBUG_DATA
 		albaVMELandmarkCloud *lCloud;
 		albaString tmp;
 		tmp.Printf("PointMean Spongious Area:%d", i);
@@ -718,7 +766,7 @@ bool albaOpESPCalibration::CalculateSpinalDensityInfo(vtkImageData *rg)
 						minValue = MIN(scalar, minValue);
 						values.push_back(scalar);
 
-#ifdef CREATE_SAMPLING_CLOUDS
+#ifdef CREATE_DEBUG_DATA
 						if (!(((int)acc) % 15) && (z == cyl.zRange.l || z == cyl.zRange.r)) {
 							double pCoord[3];
 							pCoord[0] = currentPointVect[0];
@@ -750,7 +798,7 @@ bool albaOpESPCalibration::CalculateSpinalDensityInfo(vtkImageData *rg)
 		
 		albaLogMessage("\Spinal area L%d:\n Mean:%f\n Min:%f\n Max:%f\n stdDev:%f", i+1, mean, minValue, maxValue, stdDev);
 
-#ifdef CREATE_SAMPLING_CLOUDS
+#ifdef CREATE_DEBUG_DATA
 		lCloud->ReparentTo(m_Volume);
 #endif
 	}
@@ -785,7 +833,7 @@ bool albaOpESPCalibration::CalculateBoneDensityInfo(vtkImageData *rg)
 		center[0] = cyl.centerX;
 		center[1] = cyl.centerY;
 		
-#ifdef CREATE_SAMPLING_CLOUDS
+#ifdef CREATE_DEBUG_DATA
 		albaVMELandmarkCloud *lCloud;
 		albaString tmp;
 		tmp.Printf("PointMean Cortical Area:%d", i);
@@ -816,8 +864,8 @@ bool albaOpESPCalibration::CalculateBoneDensityInfo(vtkImageData *rg)
 						minValue = MIN(scalar, minValue);
 						values.push_back(scalar);
 
-#ifdef CREATE_SAMPLING_CLOUDS
-						if (!(((int)acc) % 15) && (z == cyl.zRange.l || z == cyl.zRange.r)) {
+#ifdef CREATE_DEBUG_DATA
+						if (!(((int)acc) % 1) && (z == cyl.zRange.l || z == cyl.zRange.r)) {
 							double pCoord[3];
 							pCoord[0] = currentPointVect[0];
 							pCoord[1] = currentPointVect[1];
@@ -836,7 +884,7 @@ bool albaOpESPCalibration::CalculateBoneDensityInfo(vtkImageData *rg)
 
 		albaLogMessage("\nBone area #%d:\n Mean:%f\n ", i, m_BoneMean[i]);
 
-#ifdef CREATE_SAMPLING_CLOUDS
+#ifdef CREATE_DEBUG_DATA
 		lCloud->ReparentTo(m_Volume);
 #endif
 	}
@@ -880,7 +928,7 @@ bool albaOpESPCalibration::CalculateTailDensityInfo(vtkImageData *rg)
 	double acc = 0;
 	double minValue = VTK_DOUBLE_MAX, maxValue = VTK_DOUBLE_MIN;
 
-#ifdef CREATE_SAMPLING_CLOUDS
+#ifdef CREATE_DEBUG_DATA
 	albaVMELandmarkCloud *lCloud;
 	albaNEW(lCloud);
 	lCloud->SetName("Tail Area");
@@ -902,15 +950,15 @@ bool albaOpESPCalibration::CalculateTailDensityInfo(vtkImageData *rg)
 					minValue = MIN(scalar, minValue);
 					values.push_back(scalar);
 
-#ifdef CREATE_SAMPLING_CLOUDS
+#ifdef CREATE_DEBUG_DATA
 					if (!(((int)acc) % 15) && (z == m_Tail.zRange.l || z == m_Tail.zRange.r)) {
 			
 						albaString lName;
 						double pCoord[3];
 
 						lName.Printf("Point %d ", (int)acc);
-						pCoord[0] = origin[0] + z*spacing[0];
-						pCoord[1] = origin[1] + z*spacing[1];
+						pCoord[0] = origin[0] + x*spacing[0];
+						pCoord[1] = origin[1] + y*spacing[1];
 						pCoord[2] = origin[2] + z*spacing[2];
 						lCloud->AppendLandmark(pCoord[0], pCoord[1], pCoord[2], lName.GetCStr());
 					}
@@ -933,7 +981,7 @@ bool albaOpESPCalibration::CalculateTailDensityInfo(vtkImageData *rg)
 
 	albaLogMessage("\nTail area:\n Mean:%f\n Min:%f\n Max:%f\n stdDev:%f", mean, minValue, maxValue, stdDev);
 
-#ifdef CREATE_SAMPLING_CLOUDS
+#ifdef CREATE_DEBUG_DATA
 	lCloud->ReparentTo(m_Volume);
 #endif
 
@@ -951,10 +999,8 @@ double albaOpESPCalibration::GetTailCenter(vtkImageData *rg, TailPosition tailPo
 	double *spacing = rg->GetSpacing();
 
 	int *dims = rg->GetDimensions();
-	int zPos = startCenter / (dims[0]*dims[1]);
-	int yResidue = startCenter - (zPos * dims[0] * dims[1]);
-	int yPos = yResidue / dims[0];
-	int xPos = yResidue - (yPos * dims[0]);
+	int xPos, yPos, zPos;
+	IdToXYZpos(startCenter, dims, xPos, yPos, zPos);
 	bool onTail = true;
 
 	int l, r;
@@ -977,8 +1023,6 @@ double albaOpESPCalibration::GetTailCenter(vtkImageData *rg, TailPosition tailPo
 			r++;
 		}
 		
-		//TODO ADD CHECK ON SIZE
-
 		double center = (l + r) / 2.0;
 		return origin[0] + center*spacing[0];
 	
@@ -1002,12 +1046,82 @@ double albaOpESPCalibration::GetTailCenter(vtkImageData *rg, TailPosition tailPo
 			r++;
 		}
 
-		//TODO ADD CHECK ON SIZE
-
 		double center = (l + r) / 2.0;
 		return origin[1] + center*spacing[1];
-
 	}
+}
+
+//----------------------------------------------------------------------------
+void albaOpESPCalibration::GetBoneCenter(vtkImageData *rg, TailPosition tailPos, double x, double y, double z, double newCenter[3])
+{
+	vtkDataArray* scalars = rg->GetPointData()->GetScalars();
+
+	if (tailPos == TAIL_ON_FRONT)
+		y += 4;
+	else 	if (tailPos == TAIL_ON_REAR)
+		y -= 4;
+	else 	if (tailPos == TAIL_ON_RIGHT)
+		x += 4;
+	else
+		x -= 4;
+
+	vtkIdType startCenter = rg->FindPoint(x, y, z);
+	double *origin = rg->GetOrigin();
+	double *spacing = rg->GetSpacing();
+
+	int *dims = rg->GetDimensions();
+	int xPos, yPos, zPos;
+	IdToXYZpos(startCenter, dims, xPos, yPos, zPos);
+
+	bool onAir = true, onBone = true;
+
+
+	int l, r, t;
+	if (tailPos == TAIL_ON_FRONT || tailPos == TAIL_ON_REAR)
+	{
+		l = xPos;
+		while (onAir)
+		{
+			vtkIdType currentPoint = zPos * dims[0] * dims[1] + yPos * dims[0] + l;
+			onAir = scalars->GetTuple1(currentPoint) < CUT_OFF_WINGS;
+			l--;
+		}
+
+		onAir = true;
+		r = xPos;
+		while (onAir)
+		{
+			vtkIdType currentPoint = zPos * dims[0] * dims[1] + yPos * dims[0] + r;
+			onAir = scalars->GetTuple1(currentPoint) < CUT_OFF_WINGS;
+			r++;
+		}
+
+		int xCenter = (l + r) / 2.0;
+		newCenter[0] = origin[0] + xCenter*spacing[0];
+
+		t = yPos;
+		onAir = true;
+		while (onAir)
+		{
+			tailPos == TAIL_ON_FRONT ? t-- : t++;
+			vtkIdType currentPoint = zPos * dims[0] * dims[1] + t * dims[0] + xCenter;
+			onAir = scalars->GetTuple1(currentPoint) < CUT_OFF_WINGS;
+		}
+
+		newCenter[1] = origin[1] + t*spacing[1];
+
+		newCenter[2] = z;
+	}
+
+}
+
+//----------------------------------------------------------------------------
+void albaOpESPCalibration::IdToXYZpos(vtkIdType startCenter, int * dims, int &xPos, int &yPos, int &zPos)
+{
+	zPos = startCenter / (dims[0] * dims[1]);
+	int yResidue = startCenter - (zPos * dims[0] * dims[1]);
+	yPos = yResidue / dims[0];
+	xPos = yResidue - (yPos * dims[0]);
 }
 
 //----------------------------------------------------------------------------
@@ -1049,6 +1163,7 @@ bool albaOpESPCalibration::FitPoints()
 	{
 		double x = m_AreaInfo[i].mean;
 		double y = expected[i];
+		m_AreaInfo[i].errorOnEstimation = abs(x - y);
 
 		//current (y_i - a0 - a1 * x_i)^2
 		yRes = pow((y - m_Intercept - (m_Slope * x)), 2);
@@ -1074,51 +1189,77 @@ bool albaOpESPCalibration::FitPoints()
 //----------------------------------------------------------------------------
 void albaOpESPCalibration::CreateGui()
 {
+	wxColour red = wxColour(230, 0, 0);
+	wxColour orange = wxColour(240, 126, 0);
+	wxColour yellow = wxColour(240, 228, 0);
+	wxColour black = wxColour(0, 0, 0);
+	wxColour color;
+
 	// Interface:
 	m_Gui = new albaGUI(this);
 	m_Gui->Divider();
 	m_Gui->Label("Calibration:", true);
-	m_Gui->Label("(mgHA/cm^3 = slope * GV + intercept)");
-	m_Gui->Double(-1, "Slope", &m_Slope,VTK_DOUBLE_MIN,VTK_DOUBLE_MAX,4);
-	m_Gui->Double(-1, "Intercept", &m_Intercept, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 4);
-	m_Gui->Double(-1, "R^2", &m_RSquare, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 4);
+	m_Gui->Label("(mgHA/cm^3 = slope * GV + intercept)", "", true);
+	m_Gui->Double(-1, "Slope", &m_Slope, m_Slope, m_Slope,4, "", true);
+	
+	color = black;
+	if (m_Intercept > 100)
+		color = red;
+	else if (m_Intercept > 50)
+		color = orange;
+	else if (m_Intercept > 10)
+		color = yellow;
+	m_Gui->Double(-1, "Intercept*", &m_Intercept, m_Intercept, m_Intercept, 4, "", true, 1.0, color);
+
+	color = black;
+	if (m_RSquare < 0.90)
+		color = red;
+	else if (m_RSquare < 0.95)
+		color = orange;
+	else if (m_RSquare < 0.98)
+		color = yellow;
+	m_Gui->Double(-1, "R^2*", &m_RSquare, m_RSquare, m_RSquare, 4, "", true, 1.0, color);
 	m_Gui->Divider(1);
 
 	m_Gui->Divider();
 	m_Gui->Divider();
 	m_Gui->Divider();
 	m_Gui->Label("Spongious T1, Area 50:", true);
-	m_Gui->Double(-1, "Mean", &m_AreaInfo[0].mean, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "StdDev", &m_AreaInfo[0].sdtdev, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "Min", &m_AreaInfo[0].min, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "Max", &m_AreaInfo[0].max, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
+	m_Gui->Double(-1, "Mean", &m_AreaInfo[0].mean, m_AreaInfo[0].mean, m_AreaInfo[0].mean, 2, "", true);
+	m_Gui->Double(-1, "EE", &m_AreaInfo[0].errorOnEstimation, m_AreaInfo[0].errorOnEstimation, m_AreaInfo[0].errorOnEstimation, 2, "", true);
+	m_Gui->Double(-1, "StdDev", &m_AreaInfo[0].sdtdev, m_AreaInfo[0].sdtdev, m_AreaInfo[0].sdtdev, 2, "", true);
+	m_Gui->Double(-1, "Min", &m_AreaInfo[0].min, m_AreaInfo[0].min, m_AreaInfo[0].min, 2, "", true);
+	m_Gui->Double(-1, "Max", &m_AreaInfo[0].max, m_AreaInfo[0].max, m_AreaInfo[0].max, 2, "", true);
 			
 	m_Gui->Divider();
 	m_Gui->Divider();
 	m_Gui->Divider();
 	m_Gui->Label("Spongious T2, Area 100:", true);
-	m_Gui->Double(-1, "Mean", &m_AreaInfo[1].mean, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "StdDev", &m_AreaInfo[1].sdtdev, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "Min", &m_AreaInfo[1].min, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "Max", &m_AreaInfo[1].max, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
+	m_Gui->Double(-1, "Mean", &m_AreaInfo[1].mean, m_AreaInfo[1].mean, m_AreaInfo[1].mean, 2, "", true);
+	m_Gui->Double(-1, "EE", &m_AreaInfo[1].errorOnEstimation, m_AreaInfo[1].errorOnEstimation, m_AreaInfo[1].errorOnEstimation, 2, "", true);
+	m_Gui->Double(-1, "StdDev", &m_AreaInfo[1].sdtdev, m_AreaInfo[1].sdtdev, m_AreaInfo[1].sdtdev, 2, "", true);
+	m_Gui->Double(-1, "Min", &m_AreaInfo[1].min, m_AreaInfo[1].min, m_AreaInfo[1].min, 2, "", true);
+	m_Gui->Double(-1, "Max", &m_AreaInfo[1].max, m_AreaInfo[1].max, m_AreaInfo[1].max, 2, "", true);
 
 	m_Gui->Divider();
 	m_Gui->Divider();
 	m_Gui->Divider();
 	m_Gui->Label("Spongious T3, Area 200:", true);
-	m_Gui->Double(-1, "Mean", &m_AreaInfo[2].mean, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "StdDev", &m_AreaInfo[2].sdtdev, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "Min", &m_AreaInfo[2].min, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "Max", &m_AreaInfo[2].max, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
+	m_Gui->Double(-1, "Mean", &m_AreaInfo[2].mean, m_AreaInfo[2].mean, m_AreaInfo[2].mean, 2, "", true);
+	m_Gui->Double(-1, "EE", &m_AreaInfo[2].errorOnEstimation, m_AreaInfo[2].errorOnEstimation, m_AreaInfo[2].errorOnEstimation, 2, "", true);
+	m_Gui->Double(-1, "StdDev", &m_AreaInfo[2].sdtdev, m_AreaInfo[2].sdtdev, m_AreaInfo[2].sdtdev, 2, "", true);
+	m_Gui->Double(-1, "Min", &m_AreaInfo[2].min, m_AreaInfo[2].min, m_AreaInfo[2].min, 2, "", true);
+	m_Gui->Double(-1, "Max", &m_AreaInfo[2].max, m_AreaInfo[2].max, m_AreaInfo[2].max, 2, "", true);
 
 	m_Gui->Divider();
 	m_Gui->Divider();
 	m_Gui->Divider();
 	m_Gui->Label("Spinal Process, Area 400:", true);
-	m_Gui->Double(-1, "Mean", &m_AreaInfo[3].mean, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "StdDev", &m_AreaInfo[3].sdtdev, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "Min", &m_AreaInfo[3].min, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "Max", &m_AreaInfo[3].max, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
+	m_Gui->Double(-1, "Mean", &m_AreaInfo[3].mean, m_AreaInfo[3].mean, m_AreaInfo[3].mean, 2, "", true);
+	m_Gui->Double(-1, "EE", &m_AreaInfo[3].errorOnEstimation, m_AreaInfo[3].errorOnEstimation, m_AreaInfo[3].errorOnEstimation, 2, "", true);
+	m_Gui->Double(-1, "StdDev", &m_AreaInfo[3].sdtdev, m_AreaInfo[3].sdtdev, m_AreaInfo[3].sdtdev, 2, "", true);
+	m_Gui->Double(-1, "Min", &m_AreaInfo[3].min, m_AreaInfo[3].min, m_AreaInfo[3].min, 2, "", true);
+	m_Gui->Double(-1, "Max", &m_AreaInfo[3].max, m_AreaInfo[3].max, m_AreaInfo[3].max, 2, "", true);
 
 
 	
@@ -1126,13 +1267,14 @@ void albaOpESPCalibration::CreateGui()
 	m_Gui->Divider();
 	m_Gui->Divider();
 	m_Gui->Label("Cortical Structures, Area 800:",true);
-	m_Gui->Double(-1, "L2 Mean", &m_BoneMean[0], VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "L3 Mean", &m_BoneMean[1], VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
+	m_Gui->Double(-1, "L2 Mean", &m_BoneMean[0], m_BoneMean[0], m_BoneMean[0], 2, "", true);
+	m_Gui->Double(-1, "L3 Mean", &m_BoneMean[1], m_BoneMean[1], m_BoneMean[1], 2, "", true);
 	m_Gui->Label("   Full area:");
-	m_Gui->Double(-1, "Mean", &m_AreaInfo[4].mean, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "StdDev", &m_AreaInfo[4].sdtdev, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "Min", &m_AreaInfo[4].min, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
-	m_Gui->Double(-1, "Max", &m_AreaInfo[4].max, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 2);
+	m_Gui->Double(-1, "Mean", &m_AreaInfo[4].mean, m_AreaInfo[4].mean, m_AreaInfo[4].mean, 2, "", true);
+	m_Gui->Double(-1, "EE", &m_AreaInfo[4].errorOnEstimation, m_AreaInfo[4].errorOnEstimation, m_AreaInfo[4].errorOnEstimation, 2, "", true);
+	m_Gui->Double(-1, "StdDev", &m_AreaInfo[4].sdtdev, m_AreaInfo[4].sdtdev, m_AreaInfo[4].sdtdev, 2, "", true);
+	m_Gui->Double(-1, "Min", &m_AreaInfo[4].min, m_AreaInfo[4].min, m_AreaInfo[4].min, 2, "", true);
+	m_Gui->Double(-1, "Max", &m_AreaInfo[4].max, m_AreaInfo[4].max, m_AreaInfo[4].max, 2, "", true);
 
 
 	m_Gui->Label("");
@@ -1155,6 +1297,12 @@ char ** albaOpESPCalibration::GetIcon()
 #include "pic/MENU_CALIBRATION_ICON.xpm"
 	return MENU_CALIBRATION_ICON_xpm;
 }
+
+#define ADD_DICOM_TAG(TAGTOADD) if (m_Input->GetTagArray()->IsTagPresent(TAGTOADD))													\
+																{																																						\
+																	albaString tmpStr = m_Input->GetTagArray()->GetTag(TAGTOADD)->GetValue();	\
+																	dicomTags->setAttribute(albaXMLString(TAGTOADD), albaXMLString(tmpStr));	\
+																}
 
 // Create Report
 //----------------------------------------------------------------------------
@@ -1214,6 +1362,7 @@ bool albaOpESPCalibration::SaveCalibration()
 			//Area 50
 			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *area50 = doc->createElement(albaXMLString("SpongiousT1Area50"));
 			area50->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[0].mean)));
+			area50->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[0].errorOnEstimation)));
 			area50->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[0].sdtdev)));
 			area50->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[0].min)));
 			area50->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[0].max)));
@@ -1222,6 +1371,7 @@ bool albaOpESPCalibration::SaveCalibration()
 			//Area 100
 			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *area100 = doc->createElement(albaXMLString("SpongiousT2Area100"));
 			area100->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[1].mean)));
+			area100->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[1].errorOnEstimation)));
 			area100->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[1].sdtdev)));
 			area100->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[1].min)));
 			area100->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[1].max)));
@@ -1230,6 +1380,7 @@ bool albaOpESPCalibration::SaveCalibration()
 			//Area 200
 			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *area200 = doc->createElement(albaXMLString("SpongiousT2Area200"));
 			area200->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[2].mean)));
+			area200->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[2].errorOnEstimation)));
 			area200->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[2].sdtdev)));
 			area200->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[2].min)));
 			area200->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[2].max)));
@@ -1238,6 +1389,8 @@ bool albaOpESPCalibration::SaveCalibration()
 			//Area 400
 			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *area400 = doc->createElement(albaXMLString("SpinalProcessArea400"));
 			area400->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[3].mean)));
+			area400->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[3].errorOnEstimation)));
+
 			area400->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[3].sdtdev)));
 			area400->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[3].min)));
 			area400->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[3].max)));
@@ -1249,10 +1402,38 @@ bool albaOpESPCalibration::SaveCalibration()
 			area800->setAttribute(albaXMLString("MeanL2"), albaXMLString(albaString(m_BoneMean[0])));
 			area800->setAttribute(albaXMLString("MeanL3"), albaXMLString(albaString(m_BoneMean[1])));
 			area800->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[4].mean)));
+			area800->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[0].errorOnEstimation)));
 			area800->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[4].sdtdev)));
 			area800->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[4].min)));
 			area800->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[4].max)));
 			densitometricCalibration->appendChild(area800);
+
+			//Area 400
+			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *dicomTags = doc->createElement(albaXMLString("DicomTags"));
+			ADD_DICOM_TAG("Modality");
+
+			ADD_DICOM_TAG("AcquisitionDate");
+			ADD_DICOM_TAG("Manufacturer");
+			ADD_DICOM_TAG("InstitutionName");
+			ADD_DICOM_TAG("ManufacturersModelName");
+
+			ADD_DICOM_TAG("KVP");
+			ADD_DICOM_TAG("XRayTubeCurrent");
+			ADD_DICOM_TAG("FocalSpots");
+			ADD_DICOM_TAG("FilterType");
+
+			ADD_DICOM_TAG("SliceThickness");
+			ADD_DICOM_TAG("TableHeight");
+			ADD_DICOM_TAG("ExposureTime");
+			ADD_DICOM_TAG("TotalCollimationWidth");
+			ADD_DICOM_TAG("SpiralPitchFactor");
+
+			ADD_DICOM_TAG("SpacingBetweenSlices");
+			ADD_DICOM_TAG("PixelSpacing");
+			ADD_DICOM_TAG("ConvolutionKernel");
+
+
+			densitometricCalibration->appendChild(dicomTags);
 
 			root->appendChild(densitometricCalibration);
 		}

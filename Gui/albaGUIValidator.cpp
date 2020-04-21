@@ -118,7 +118,7 @@ bool albaGUIValidator::IsValid()
     case VAL_DOUBLE:
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
       if ( !m_DoubleVar ) return false;
-      if (  m_DoubleMin >= m_DoubleMax  ) return false;
+      if (  m_DoubleMin > m_DoubleMax  ) return false;
 			if ( m_DecimalDigits < -1 ) return false;
     break;
     case VAL_INTEGER:
