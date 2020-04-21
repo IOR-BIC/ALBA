@@ -22,6 +22,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaDecl.h"
 #include "albaOp.h"
 #include "albaVMEVolumeGray.h"
+#include "vtkDataSet.h"
 
 
 //----------------------------------------------------------------------------
@@ -54,7 +55,7 @@ struct Tail
 
 struct DensityInfo
 {
-	double min, max, mean, sdtdev, nPoints;
+	double min, max, mean, errorOnEstimation, sdtdev, nPoints;
 };
 
 class vtkImageData;
@@ -150,6 +151,12 @@ protected:
 
 
 	double GetTailCenter(vtkImageData *rg, TailPosition tailPos, double x, double y, double z);
+
+	void GetBoneCenter(vtkImageData *rg, TailPosition tailPos, double x, double y, double z, double newCenter[3]);
+
+	void IdToXYZpos(vtkIdType startCenter, int * dims, int &xPos, int &yPos, int &zPos);
+
+
 
 	bool FitPoints();
 
