@@ -157,7 +157,7 @@ public:
 	/** return an xpm-icon that can be used to represent this view */
 	virtual char ** GetIcon();
 
-	albaMatrix* GetSlicerMatrix(int axis = X);
+	albaMatrix* GetSlicerMatrix(int axis = Z);
 	void SetSlicerMatrix(albaMatrix* matrix, int axis = X);
 
 	albaViewVTK * GetViewArbitrary();
