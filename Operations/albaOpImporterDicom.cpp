@@ -1091,6 +1091,7 @@ void albaOpImporterDicom::ImportDicomTags()
 	}
 
 	std::set<gdcm::Tag> TagsToRead;
+
 	TagsToRead.insert(TAG_PatientsName);
 	TagsToRead.insert(TAG_PatientsSex);
 	TagsToRead.insert(TAG_PatientsBirthDate);
@@ -1104,6 +1105,19 @@ void albaOpImporterDicom::ImportDicomTags()
 	TagsToRead.insert(TAG_PixelSpacing);
 	TagsToRead.insert(TAG_ProtocolName);
 	TagsToRead.insert(TAG_ManufacturersModelName);
+	TagsToRead.insert(TAG_Modality);
+	TagsToRead.insert(TAG_Manufacturer);
+	TagsToRead.insert(TAG_KVP);
+	TagsToRead.insert(TAG_XRayTubeCurrent);
+	TagsToRead.insert(TAG_FocalSpots);
+	TagsToRead.insert(TAG_FilterType);
+	TagsToRead.insert(TAG_SliceThickness);
+	TagsToRead.insert(TAG_TableHeight);
+	TagsToRead.insert(TAG_ExposureTime);
+	TagsToRead.insert(TAG_SpiralPitchFactor);
+	TagsToRead.insert(TAG_SpacingBetweenSlices);
+	TagsToRead.insert(TAG_ConvolutionKernel);
+
 
 	InsertAppSpecificTagsToReadList(TagsToRead);
 	
@@ -1130,6 +1144,20 @@ void albaOpImporterDicom::ImportDicomTags()
 	READ_AND_SET_TAGARRAY(TAG_SeriesDescription, "SeriesDescription");
 	READ_AND_SET_TAGARRAY(TAG_AcquisitionDate, "AcquisitionDate");
 	READ_AND_SET_TAGARRAY(TAG_ProtocolName, "ProtocolName");
+	READ_AND_SET_TAGARRAY(TAG_Modality, "Modality");
+	READ_AND_SET_TAGARRAY(TAG_Manufacturer, "Manufacturer");
+	READ_AND_SET_TAGARRAY(TAG_ManufacturersModelName, "ManufacturersModelName");
+	READ_AND_SET_TAGARRAY(TAG_KVP, "KVP");
+	READ_AND_SET_TAGARRAY(TAG_XRayTubeCurrent, "XRayTubeCurrent");
+	READ_AND_SET_TAGARRAY(TAG_FocalSpots, "FocalSpots");
+	READ_AND_SET_TAGARRAY(TAG_FilterType, "FilterType");
+	READ_AND_SET_TAGARRAY(TAG_SliceThickness, "SliceThickness");
+	READ_AND_SET_TAGARRAY(TAG_TableHeight, "TableHeight");
+	READ_AND_SET_TAGARRAY(TAG_ExposureTime, "ExposureTime");
+	READ_AND_SET_TAGARRAY(TAG_TotalCollimationWidth, "TotalCollimationWidth");
+	READ_AND_SET_TAGARRAY(TAG_SpiralPitchFactor, "SpiralPitchFactor");
+	READ_AND_SET_TAGARRAY(TAG_SpacingBetweenSlices, "SpacingBetweenSlices");
+	READ_AND_SET_TAGARRAY(TAG_ConvolutionKernel, "ConvolutionKernel");
 
 	ReadAndSetAppSpecificTags(m_TagArray,dcmDataSet);
 

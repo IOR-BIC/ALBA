@@ -144,7 +144,7 @@ public:
   void Float(int id,albaString label,float *var, float min = MINFLOAT, float max = MAXFLOAT, int flag=0, int decimal_digit = -1, albaString tooltip = "", double customSizer = 1.0);
 
   /** Double entry widget. */
-  void Double(int id,albaString label,double *var, double	min = MINDOUBLE, double max = MAXDOUBLE, int decimal_digit = -1, albaString tooltip = "", bool labelAlwaysEnable = false, double customSizer = 1.0);
+  void Double(int id,albaString label,double *var, double	min = MINDOUBLE, double max = MAXDOUBLE, int decimal_digit = -1, albaString tooltip = "", bool labelAlwaysEnable = false, double customSizer = 1.0,wxColour fontColor=wxColour(0,0,0));
 
   /** Integer vector3 entry widget. */
   void Vector(int id,wxString label, int var[3], int min = MININT, int max = MAXINT, wxString tooltip = "", wxColour *bg_colour = NULL);
