@@ -56,12 +56,16 @@ public:
 
 	/** Receive events coming from the user interface.*/
 	void OnEvent(albaEventBase *alba_event);
-  
+
 	enum OP_EXTRACT_IMAGE_ID
 	{
 		ID_TYPE = MINID,
 		ID_AXIS,
 		ID_EXTRACT,
+		ID_SLICES_LIST,
+		ID_RENAME,
+		ID_REMOVE,
+		ID_RES,
 	};
 
 protected:
@@ -72,18 +76,32 @@ protected:
 	/** Create the Operation GUI */
 	virtual void CreateGui();
 
+	void UpdateListbox();
+
+	void SelectImageSlice();
+	void RenameImageSlice();
+	void RemoveImageSlice();
+	void ShowImageSlice();
+
 	void ExtractImage();
+
+	void SaveTags(albaVMEImage * image);
 
 	wxBitmap *GetSliceImage();
 
 	albaView *m_View;
 	albaVMEGroup *m_ImageSlicesGroup;
 
+	wxListBox *m_SlicesListBox;
+
 	int m_Axis;
 	bool m_ShowInTree;
 	bool m_ChooseName;
 	bool m_ShowExtractButton;
-	
+	bool m_ShowSliceList;
+	albaString m_GuiMessage;
+
 	wxString m_ImageName;
+	albaVMEImage *m_CurrentImage;
 };
 #endif
