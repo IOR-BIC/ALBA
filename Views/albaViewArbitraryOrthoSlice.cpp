@@ -506,12 +506,38 @@ albaMatrix* albaViewArbitraryOrthoSlice::GetSlicerMatrix(int axis)
 }
 
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::SetSlicerMatrix(albaMatrix* matrix, int axis)
+void albaViewArbitraryOrthoSlice::SetSlicerMatrix(albaMatrix* matrix)
 {
-	m_GizmoRT[axis]->SetAbsPose(matrix);
+	if (matrix == NULL) return;
 
-	RestoreCameraParametersForAllSubviews();
-	CameraUpdate();
+	albaMatrix *slicerMatrix = GetSlicerMatrix();
+
+	//We need to find the roto-translation matrix that moves current slicer matrix to the refsys absolute matrix 
+	//We can use the following formula to find the B matrix:
+	//((AB)^?1)*(A) = B^?1
+
+	//In this formula AB is the target, the refsys matrix in this case
+	//A is the current slicer matrix
+	//and B is the transform from current slicer matrix to the refsys
+
+	albaMatrix translation, rotation;
+
+	//Calculating (AB)^?1
+	albaMatrix ABinverse;
+	ABinverse.DeepCopy(matrix);
+	ABinverse.Invert();
+
+	//Multiplying (AB)^?1 to A to obtain B^-1
+	albaTransform Binverse;
+	Binverse.SetMatrix(ABinverse);
+	Binverse.Concatenate(*slicerMatrix, false);
+
+	//Obtaing the final matrix by inverting Binverse, (B^-1)^-1 = B
+	albaMatrix finalMatrix = Binverse.GetMatrix();
+	finalMatrix.Invert();
+
+	//OneventGizmoRotate manages both rotations and translations
+	OnEventGizmoRotate(finalMatrix.GetVTKMatrix(), -1);
 }
 
 //----------------------------------------------------------------------------
@@ -1006,38 +1032,9 @@ void albaViewArbitraryOrthoSlice::OnLoadFromRefsys()
 	e.SetString(&title);
 	albaEventMacro(e);
 	albaVME *n = e.GetVme();
+	
 	if (n != NULL)
-	{
-		albaMatrix *refSysMatrix = n->GetOutput()->GetAbsMatrix();
-		albaMatrix *slicerMatrix = GetSlicerMatrix();
-
-		//We need to find the roto-translation matrix that moves current slicer matrix to the refsys absolute matrix 
-		//We can use the following formula to find the B matrix:
-		//((AB)^?1)*(A) = B^?1
-
-		//In this formula AB is the target, the refsys matrix in this case
-		//A is the current slicer matrix
-		//and B is the transform from current slicer matrix to the refsys
-
-		albaMatrix translation, rotation;
-
-		//Calculating (AB)^?1
-		albaMatrix ABinverse;
-		ABinverse.DeepCopy(refSysMatrix);
-		ABinverse.Invert();
-		
-		//Multiplying (AB)^?1 to A to obtain B^-1
-		albaTransform Binverse;
-		Binverse.SetMatrix(ABinverse);
-		Binverse.Concatenate(*slicerMatrix, false);
-
-		//Obtaing the final matrix by inverting Binverse, (B^-1)^-1 = B
-		albaMatrix finalMatrix = Binverse.GetMatrix();
-		finalMatrix.Invert();
-
-		//OneventGizmoRotate manages both rotations and translations
-		OnEventGizmoRotate(finalMatrix.GetVTKMatrix(), -1);
-	}
+		SetSlicerMatrix(n->GetOutput()->GetAbsMatrix());
 }
 //----------------------------------------------------------------------------
 albaViewVTK * albaViewArbitraryOrthoSlice::GetViewArbitrary()
