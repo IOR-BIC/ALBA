@@ -56,6 +56,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "wx\image.h"
 #include "albaViewManager.h"
 #include "albaAbsLogicManager.h"
+#include "albaGUIValidator.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpExtractImageFromArbitraryView);
@@ -73,9 +74,15 @@ albaOpExtractImageFromArbitraryView::albaOpExtractImageFromArbitraryView(wxStrin
 
 	m_ShowInTree = true;
 	m_ChooseName = true;
-	m_ShowExtractButton = false;
+	m_ShowExtractButton = true;
+	m_ShowSliceList = true;
 
+	m_SlicesListBox = NULL;
+
+	m_CurrentImage = NULL;
 	m_ImageName = "";
+
+	m_GuiMessage = "";
 }
 
 //----------------------------------------------------------------------------
@@ -118,6 +125,7 @@ void albaOpExtractImageFromArbitraryView::OpRun()
 		{
 			GetLogicManager()->VmeShow(m_Input, true);
 			CreateGui();
+			UpdateListbox();
 		}
 		else
 		{
@@ -136,6 +144,7 @@ void albaOpExtractImageFromArbitraryView::OpStop(int result)
 	
 	if (!m_TestMode)
 	{
+		//m_SlicesListBox->Clear();
 		HideGui();
 	}
 
@@ -154,9 +163,43 @@ void albaOpExtractImageFromArbitraryView::OnEvent(albaEventBase *alba_event)
 		switch (e->GetId())
 		{
 		case ID_EXTRACT:
+		{
 			ExtractImage();
+			UpdateListbox();
+
+			if (m_ShowExtractButton && !m_ShowSliceList)
+			{
+				m_GuiMessage = "Extracted Slice image!";
+				m_Gui->Update();
+			}
+		}
 			break;
 
+		case ID_SLICES_LIST:
+		{
+			SelectImageSlice();
+			ShowImageSlice();
+		}
+			break;
+ 		case ID_REMOVE:
+ 		{
+			RemoveImageSlice();
+			UpdateListbox();
+ 		}
+ 		break;
+
+		case ID_RENAME:
+		{
+			RenameImageSlice();
+			UpdateListbox();			
+		}
+		break;
+		
+		case ID_RES:
+		{
+			ShowImageSlice();
+		}
+		break;
 		case wxOK:
 			OpStop(OP_RUN_OK);
 			break;
@@ -185,17 +228,41 @@ void albaOpExtractImageFromArbitraryView::CreateGui()
 		m_Gui->Combo(ID_AXIS, "Axis", &m_Axis, 3, axisChoice);
 	}
 
-	if (m_ChooseName) 
-	{
-		m_Gui->Divider(1);
-		m_Gui->String(NULL, "Name", &m_ImageName);
-	}
-
 	if (m_ShowExtractButton) 
 	{
 		m_Gui->Divider(1);
 		m_Gui->Button(ID_EXTRACT, "Extract");
+		m_Gui->Divider(1);
+
+		if (m_ShowSliceList)
+		{
+			m_Gui->Label("Slice Images", 1);
+			m_SlicesListBox = m_Gui->ListBox(ID_SLICES_LIST, "", 200);
+			m_Gui->Divider();
+
+			m_Gui->String(NULL, "Name", &m_ImageName);
+			m_Gui->TwoButtons(ID_RENAME, ID_REMOVE, "Rename", "Remove");
+
+			m_Gui->Enable(ID_RENAME, m_SlicesListBox->GetCount() != 0);
+			m_Gui->Enable(ID_REMOVE, m_SlicesListBox->GetCount() != 0);
+		}
+		else
+		{
+			m_Gui->Divider();
+			m_Gui->String(NULL, "Name", &m_ImageName);
+		}
 	}
+	else
+	{
+		if (m_ChooseName)
+		{
+			m_Gui->Divider(1);
+			m_Gui->String(NULL, "Name", &m_ImageName);
+		}
+	}
+
+	//
+	m_Gui->Label(&m_GuiMessage);
 
 	//////////////////////////////////////////////////////////////////////////
 	m_Gui->Label("");
@@ -204,6 +271,141 @@ void albaOpExtractImageFromArbitraryView::CreateGui()
 	m_Gui->Label("");
 
 	ShowGui();
+}
+
+//----------------------------------------------------------------------------
+void albaOpExtractImageFromArbitraryView::UpdateListbox()
+{
+	if (m_SlicesListBox)
+	{
+		m_SlicesListBox->Clear();
+
+		albaVMEGroup *sliceGroup = NULL;
+
+		if (m_Input->IsA("albaVMEVolumeGray"))
+			sliceGroup = albaVMEGroup::SafeDownCast(m_Input->FindInTreeByName("Slices"));
+
+		if (sliceGroup)
+		{
+			for (int i = 0; i < sliceGroup->GetNumberOfChildren(); i++)
+			{
+				if (sliceGroup->GetChild(i)->IsA("albaVMEImage"))
+					m_SlicesListBox->Append(_(sliceGroup->GetChild(i)->GetName()));
+			}
+
+			m_Gui->Enable(ID_RENAME, m_SlicesListBox->GetCount() != 0);
+			m_Gui->Enable(ID_REMOVE, m_SlicesListBox->GetCount() != 0);
+			m_Gui->Update();
+		}
+	}
+}
+//----------------------------------------------------------------------------
+void albaOpExtractImageFromArbitraryView::SelectImageSlice()
+{
+	m_CurrentImage = NULL;
+
+	if (m_SlicesListBox)
+	{
+		albaVMEGroup *sliceGroup = NULL;
+
+		if (m_Input->IsA("albaVMEVolumeGray"))
+			sliceGroup = albaVMEGroup::SafeDownCast(m_Input->FindInTreeByName("Slices"));
+
+		if (sliceGroup)
+		{
+			int selection = m_SlicesListBox->GetSelection();
+
+			if (selection >= 0 && selection < sliceGroup->GetNumberOfChildren())
+				if (sliceGroup->GetChild(selection)->IsA("albaVMEImage"))
+				{
+					m_CurrentImage = (albaVMEImage*)sliceGroup->GetChild(selection);
+					m_ImageName = m_CurrentImage->GetName();
+					m_Gui->Update();
+				}
+		}
+	}
+}
+//----------------------------------------------------------------------------
+void albaOpExtractImageFromArbitraryView::RenameImageSlice()
+{
+	if (m_CurrentImage != NULL)
+	{
+		albaVMEGroup *sliceGroup = NULL;
+
+		if (m_Input->IsA("albaVMEVolumeGray"))
+			sliceGroup = albaVMEGroup::SafeDownCast(m_Input->FindInTreeByName("Slices"));
+
+		if (sliceGroup)
+		{
+			for (int i = 0; i < sliceGroup->GetNumberOfChildren(); i++)
+			{
+				if (sliceGroup->GetChild(i) == m_CurrentImage)
+					sliceGroup->GetChild(i)->SetName(m_ImageName);
+			}
+		}		
+	}
+
+	m_ImageName = "";
+}
+//----------------------------------------------------------------------------
+void albaOpExtractImageFromArbitraryView::RemoveImageSlice()
+{
+	if (m_CurrentImage != NULL)
+	{
+		albaVMEGroup *sliceGroup = NULL;
+
+		if (m_Input->IsA("albaVMEVolumeGray"))
+			sliceGroup = albaVMEGroup::SafeDownCast(m_Input->FindInTreeByName("Slices"));
+
+		if (sliceGroup)
+		{
+			for (int i = 0; i < sliceGroup->GetNumberOfChildren(); i++)
+			{
+				if (sliceGroup->GetChild(i) == m_CurrentImage)
+					sliceGroup->RemoveChild(i);
+
+				if (((i - 1) >= 0) && ((i - 1) < sliceGroup->GetNumberOfChildren()))
+				{
+					m_SlicesListBox->Select(i - 1);
+				}
+
+				((albaGUIValidator *)m_SlicesListBox->GetValidator())->TransferFromWindow();
+				m_SlicesListBox->Update();
+			}
+		}
+	}
+}
+//----------------------------------------------------------------------------
+void albaOpExtractImageFromArbitraryView::ShowImageSlice()
+{
+	if (m_CurrentImage != NULL)
+	{
+		if (m_CurrentImage->GetTagArray()->IsTagPresent("SLICE_MATRIX"))
+		{
+			albaTagItem *tagPoint = m_CurrentImage->GetTagArray()->GetTag("SLICE_MATRIX");
+
+			// Matrix
+			albaMatrix *matrix = NULL;
+			albaNEW(matrix);
+
+			int ind = 0;
+			for (int i = 0; i < 4; i++)
+				for (int j = 0; j < 4; j++)
+				{
+					double value = tagPoint->GetValueAsDouble(ind++);
+					matrix->SetElement(i, j, value);
+				}
+
+			if (m_View->IsA("albaViewArbitrarySlice"))
+			{
+				((albaViewArbitrarySlice*)m_View)->SetSlicerMatrix(matrix);
+			}
+			else if (m_View->IsA("albaViewArbitraryOrthoSlice"))
+			{
+				((albaViewArbitraryOrthoSlice*)m_View)->SetSlicerMatrix(matrix);
+			}
+		}
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -295,13 +497,60 @@ void albaOpExtractImageFromArbitraryView::ExtractImage()
 	image->SetData(vtkimg, 0);
 	image->SetName(imageName);
 	image->SetTimeStamp(0);
-	if (!m_ShowInTree) image->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 0.0));
 	image->ReparentTo(m_ImageSlicesGroup);
+	
+	SaveTags(image);
+
+	m_CurrentImage = image;
 
 	albaDEL(image);
 	//////////////////////////////////////////////////////////////////////////
 	vtkDEL(buffer);
 	vtkDEL(vtkimg);
+}
+//----------------------------------------------------------------------------
+void albaOpExtractImageFromArbitraryView::SaveTags(albaVMEImage * image)
+{
+	// Visible in Tree
+	if (!m_ShowInTree) 
+		image->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 0.0));
+
+	// Extracted From View
+	image->GetTagArray()->SetTag(albaTagItem("SLICE_EXTRACTED_FROM", m_View->GetTypeName()));
+	
+	// Axis
+	wxString axis[3] = { "X","Y","Z" };
+	image->GetTagArray()->SetTag(albaTagItem("SLICE_AXIS", axis[m_Axis]));
+
+	// Matrix
+	albaMatrix *matrix = NULL;
+
+	if (m_View->IsA("albaViewArbitrarySlice"))
+	{
+		matrix = ((albaViewArbitrarySlice*)m_View)->GetSlicerMatrix();
+	}
+	else if (m_View->IsA("albaViewArbitraryOrthoSlice"))
+	{
+		matrix = ((albaViewArbitraryOrthoSlice*)m_View)->GetSlicerMatrix();
+	}
+
+	if (matrix)
+	{
+		albaTagItem tagMatrix;
+		tagMatrix.SetName("SLICE_MATRIX");
+		int ind = 0;
+
+		for (int i = 0; i < 4; i++)
+			for (int j = 0; j < 4; j++)
+				tagMatrix.SetValue(matrix->GetElement(i, j), ind++);
+
+		if (image->GetTagArray()->IsTagPresent("SLICE_MATRIX"))
+			image->GetTagArray()->DeleteTag("SLICE_MATRIX");
+
+		image->GetTagArray()->SetTag(tagMatrix);
+	}
+
+	//image->GetTagArray()->SetTag(albaTagItem("SLICE_MATRIX", textMatrix));
 }
 
 //----------------------------------------------------------------------------
