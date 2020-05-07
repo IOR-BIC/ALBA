@@ -22,10 +22,12 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOp.h"
 #include "albaVMEGroup.h"
 #include "albaDecl.h"
+#include "vtkImageData.h"
 
 //----------------------------------------------------------------------------
 // Forward references :
 //----------------------------------------------------------------------------
+class vtkimageData;
 
 //----------------------------------------------------------------------------
 // Class Name: albaOpExtractImageFromArbitraryView
@@ -83,25 +85,24 @@ protected:
 	void RemoveImageSlice();
 	void ShowImageSlice();
 
-	void ExtractImage();
+	virtual void ExtractImage();
+	virtual vtkImageData *GetSliceImageData();
+	virtual void SaveTags(albaVMEImage *image);
+	virtual wxString GenerateImageName();
 
-	void SaveTags(albaVMEImage * image);
-
-	wxBitmap *GetSliceImage();
-
-	albaView *m_View;
-	albaVMEGroup *m_ImageSlicesGroup;
-
-	wxListBox *m_SlicesListBox;
+	albaView			*m_View;
+	albaVMEGroup	*m_ImageSlicesGroup;
+	albaVMEImage  *m_CurrentImage;
+	wxListBox			*m_SlicesListBox;
 
 	int m_Axis;
 	bool m_ShowInTree;
 	bool m_ChooseName;
 	bool m_ShowExtractButton;
 	bool m_ShowSliceList;
+	int m_Magnification;
+	
 	albaString m_GuiMessage;
-
 	wxString m_ImageName;
-	albaVMEImage *m_CurrentImage;
 };
 #endif
