@@ -71,6 +71,7 @@ albaOpExtractImageFromArbitraryView::albaOpExtractImageFromArbitraryView(wxStrin
 	m_ImageSlicesGroup = NULL;
 
 	m_Axis = 2; //Default Z
+	m_Magnification = 0;
 
 	m_ShowInTree = true;
 	m_ChooseName = true;
@@ -120,6 +121,8 @@ void albaOpExtractImageFromArbitraryView::OpRun()
 			m_View = e.GetView();
 			hasView = m_View && (m_View->IsA("albaViewArbitrarySlice") || m_View->IsA("albaViewArbitraryOrthoSlice"));
 		}
+
+		m_ImageSlicesGroup = (albaVMEGroup *)m_Input->GetRoot()->FindInTreeByName("Slices");
 
 		if (hasView)
 		{
@@ -228,6 +231,10 @@ void albaOpExtractImageFromArbitraryView::CreateGui()
 		m_Gui->Combo(ID_AXIS, "Axis", &m_Axis, 3, axisChoice);
 	}
 
+	wxString magnificationChoice[3] = { "x1","x2","x3" };
+	//m_Gui->Combo(ID_AXIS, "Res", &m_Magnification, 3, magnificationChoice);
+	m_Gui->Radio(NULL, "Res", &m_Magnification, 3, magnificationChoice,3);
+
 	if (m_ShowExtractButton) 
 	{
 		m_Gui->Divider(1);
@@ -280,17 +287,12 @@ void albaOpExtractImageFromArbitraryView::UpdateListbox()
 	{
 		m_SlicesListBox->Clear();
 
-		albaVMEGroup *sliceGroup = NULL;
-
-		if (m_Input->IsA("albaVMEVolumeGray"))
-			sliceGroup = albaVMEGroup::SafeDownCast(m_Input->FindInTreeByName("Slices"));
-
-		if (sliceGroup)
+		if (m_ImageSlicesGroup)
 		{
-			for (int i = 0; i < sliceGroup->GetNumberOfChildren(); i++)
+			for (int i = 0; i < m_ImageSlicesGroup->GetNumberOfChildren(); i++)
 			{
-				if (sliceGroup->GetChild(i)->IsA("albaVMEImage"))
-					m_SlicesListBox->Append(_(sliceGroup->GetChild(i)->GetName()));
+				if (m_ImageSlicesGroup->GetChild(i)->IsA("albaVMEImage"))
+					m_SlicesListBox->Append(_(m_ImageSlicesGroup->GetChild(i)->GetName()));
 			}
 
 			m_Gui->Enable(ID_RENAME, m_SlicesListBox->GetCount() != 0);
@@ -306,19 +308,14 @@ void albaOpExtractImageFromArbitraryView::SelectImageSlice()
 
 	if (m_SlicesListBox)
 	{
-		albaVMEGroup *sliceGroup = NULL;
-
-		if (m_Input->IsA("albaVMEVolumeGray"))
-			sliceGroup = albaVMEGroup::SafeDownCast(m_Input->FindInTreeByName("Slices"));
-
-		if (sliceGroup)
+		if (m_ImageSlicesGroup)
 		{
 			int selection = m_SlicesListBox->GetSelection();
 
-			if (selection >= 0 && selection < sliceGroup->GetNumberOfChildren())
-				if (sliceGroup->GetChild(selection)->IsA("albaVMEImage"))
+			if (selection >= 0 && selection < m_ImageSlicesGroup->GetNumberOfChildren())
+				if (m_ImageSlicesGroup->GetChild(selection)->IsA("albaVMEImage"))
 				{
-					m_CurrentImage = (albaVMEImage*)sliceGroup->GetChild(selection);
+					m_CurrentImage = (albaVMEImage*)m_ImageSlicesGroup->GetChild(selection);
 					m_ImageName = m_CurrentImage->GetName();
 					m_Gui->Update();
 				}
@@ -330,17 +327,12 @@ void albaOpExtractImageFromArbitraryView::RenameImageSlice()
 {
 	if (m_CurrentImage != NULL)
 	{
-		albaVMEGroup *sliceGroup = NULL;
-
-		if (m_Input->IsA("albaVMEVolumeGray"))
-			sliceGroup = albaVMEGroup::SafeDownCast(m_Input->FindInTreeByName("Slices"));
-
-		if (sliceGroup)
+		if (m_ImageSlicesGroup)
 		{
-			for (int i = 0; i < sliceGroup->GetNumberOfChildren(); i++)
+			for (int i = 0; i < m_ImageSlicesGroup->GetNumberOfChildren(); i++)
 			{
-				if (sliceGroup->GetChild(i) == m_CurrentImage)
-					sliceGroup->GetChild(i)->SetName(m_ImageName);
+				if (m_ImageSlicesGroup->GetChild(i) == m_CurrentImage)
+					m_ImageSlicesGroup->GetChild(i)->SetName(m_ImageName);
 			}
 		}		
 	}
@@ -352,19 +344,14 @@ void albaOpExtractImageFromArbitraryView::RemoveImageSlice()
 {
 	if (m_CurrentImage != NULL)
 	{
-		albaVMEGroup *sliceGroup = NULL;
-
-		if (m_Input->IsA("albaVMEVolumeGray"))
-			sliceGroup = albaVMEGroup::SafeDownCast(m_Input->FindInTreeByName("Slices"));
-
-		if (sliceGroup)
+		if (m_ImageSlicesGroup)
 		{
-			for (int i = 0; i < sliceGroup->GetNumberOfChildren(); i++)
+			for (int i = 0; i < m_ImageSlicesGroup->GetNumberOfChildren(); i++)
 			{
-				if (sliceGroup->GetChild(i) == m_CurrentImage)
-					sliceGroup->RemoveChild(i);
+				if (m_ImageSlicesGroup->GetChild(i) == m_CurrentImage)
+					m_ImageSlicesGroup->RemoveChild(i);
 
-				if (((i - 1) >= 0) && ((i - 1) < sliceGroup->GetNumberOfChildren()))
+				if (((i - 1) >= 0) && ((i - 1) < m_ImageSlicesGroup->GetNumberOfChildren()))
 				{
 					m_SlicesListBox->Select(i - 1);
 				}
@@ -411,153 +398,42 @@ void albaOpExtractImageFromArbitraryView::ShowImageSlice()
 //----------------------------------------------------------------------------
 void albaOpExtractImageFromArbitraryView::ExtractImage()
 {
-	wxImage img;
-
-	wxBitmap* btm = GetSliceImage();
-	if (btm == NULL)
-	{
-		wxMessageBox("An error occurred!");
-		return;
-	}
-
-	img = btm->ConvertToImage();
-
-	//////////////////////////////////////////////////////////////////////////
-
-	int NumberOfComponents = 3;
-	vtkUnsignedCharArray *buffer;
-	vtkNEW(buffer);
-	buffer->SetNumberOfComponents(NumberOfComponents);
-
-	unsigned char *p = img.GetData();
-	assert(p);
-	for (int i = 0; i < img.GetWidth() * img.GetHeight(); i++)
-	{
-		unsigned char r = *p++;
-		unsigned char g = *p++;
-		unsigned char b = *p++;
-
-		buffer->InsertNextTuple3(r, g, b);
-	}
-
-	vtkImageData *vtkimg;
-	vtkNEW(vtkimg);
-	vtkimg->SetNumberOfScalarComponents(NumberOfComponents);
-	vtkimg->SetScalarTypeToUnsignedChar();
-	vtkimg->SetDimensions(img.GetWidth(), img.GetHeight(), 1);
-	vtkimg->SetUpdateExtentToWholeExtent();
-	assert(vtkimg->GetPointData());
-	vtkimg->GetPointData()->SetScalars(buffer);
-
-	//////////////////////////////////////////////////////////////////////////
 	// Find or Create Snapshots group
-	wxString m_GroupName = "Slices";
-	//albaVME *root = m_Input->GetRoot();
+	albaVMEGroup *group = NULL;
+	group = m_ImageSlicesGroup;
 
-	if (m_ImageSlicesGroup == NULL || m_ImageSlicesGroup != (albaVMEGroup *)m_Input->FindInTreeByName(m_GroupName))
+	if (group == NULL)
 	{
-		m_ImageSlicesGroup = (albaVMEGroup *)m_Input->FindInTreeByName(m_GroupName);
-
-		if (m_ImageSlicesGroup == NULL)
-		{
-			albaNEW(m_ImageSlicesGroup);
-			m_ImageSlicesGroup->SetName(m_GroupName);
-			if (!m_ShowInTree) m_ImageSlicesGroup->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 0.0));
-			m_ImageSlicesGroup->ReparentTo(m_Input);
-			m_ImageSlicesGroup->Delete();
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	// Generate Image Slice name
-	wxString imageName = "Slice";
-
-	wxString axisName[3] = { "X","Y","Z" };
-
-	char tmp[20];
-	int count = 1;
-	do
-	{
-		sprintf(tmp, "%s_%s_%d", imageName, axisName[m_Axis], count);
-		count++;
-	} while (m_ImageSlicesGroup->FindInTreeByName(tmp) != NULL);
-
-	imageName = tmp;
-
-	if (m_ChooseName)
-	{
-		if (!m_ImageName.IsEmpty())
-			imageName = m_ImageName;
+		albaNEW(group);
+		group->SetName("Slices");
+		if (!m_ShowInTree) group->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 0.0));
+		group->ReparentTo(m_Input);
+		m_ImageSlicesGroup = group;
+		albaDEL(group);
 	}
 
 	//////////////////////////////////////////////////////////////////////////	
-	albaVMEImage *image;
-	albaNEW(image);
+	// Create and Save Image
+	albaVMEImage *vmeImage = NULL;
+	albaNEW(vmeImage);
 
-	image->SetData(vtkimg, 0);
-	image->SetName(imageName);
-	image->SetTimeStamp(0);
-	image->ReparentTo(m_ImageSlicesGroup);
-	
-	SaveTags(image);
+	vmeImage->SetData(GetSliceImageData(), 0);
+	vmeImage->SetName(GenerateImageName());
+	vmeImage->SetTimeStamp(0);
+	vmeImage->ReparentTo(m_ImageSlicesGroup);
 
-	m_CurrentImage = image;
+	SaveTags(vmeImage);
 
-	albaDEL(image);
-	//////////////////////////////////////////////////////////////////////////
-	vtkDEL(buffer);
-	vtkDEL(vtkimg);
-}
-//----------------------------------------------------------------------------
-void albaOpExtractImageFromArbitraryView::SaveTags(albaVMEImage * image)
-{
-	// Visible in Tree
-	if (!m_ShowInTree) 
-		image->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 0.0));
+	m_CurrentImage = vmeImage;
 
-	// Extracted From View
-	image->GetTagArray()->SetTag(albaTagItem("SLICE_EXTRACTED_FROM", m_View->GetTypeName()));
-	
-	// Axis
-	wxString axis[3] = { "X","Y","Z" };
-	image->GetTagArray()->SetTag(albaTagItem("SLICE_AXIS", axis[m_Axis]));
-
-	// Matrix
-	albaMatrix *matrix = NULL;
-
-	if (m_View->IsA("albaViewArbitrarySlice"))
-	{
-		matrix = ((albaViewArbitrarySlice*)m_View)->GetSlicerMatrix();
-	}
-	else if (m_View->IsA("albaViewArbitraryOrthoSlice"))
-	{
-		matrix = ((albaViewArbitraryOrthoSlice*)m_View)->GetSlicerMatrix();
-	}
-
-	if (matrix)
-	{
-		albaTagItem tagMatrix;
-		tagMatrix.SetName("SLICE_MATRIX");
-		int ind = 0;
-
-		for (int i = 0; i < 4; i++)
-			for (int j = 0; j < 4; j++)
-				tagMatrix.SetValue(matrix->GetElement(i, j), ind++);
-
-		if (image->GetTagArray()->IsTagPresent("SLICE_MATRIX"))
-			image->GetTagArray()->DeleteTag("SLICE_MATRIX");
-
-		image->GetTagArray()->SetTag(tagMatrix);
-	}
-
-	//image->GetTagArray()->SetTag(albaTagItem("SLICE_MATRIX", textMatrix));
+	albaDEL(vmeImage);
 }
 
 //----------------------------------------------------------------------------
-wxBitmap * albaOpExtractImageFromArbitraryView::GetSliceImage()
+vtkImageData *albaOpExtractImageFromArbitraryView::GetSliceImageData()
 {
-	vtkRenderer *renderer;
-	vtkRenderWindow *renderWindow;
+	vtkRenderer *renderer = NULL;
+	vtkRenderWindow *renderWindow = NULL;
 
 	vtkNEW(renderer);
 	vtkNEW(renderWindow);
@@ -565,7 +441,7 @@ wxBitmap * albaOpExtractImageFromArbitraryView::GetSliceImage()
 	renderer->SetBackground(0.0, 0.0, 0.0);
 
 	double bounds[6];
-	m_Input->GetOutput()->GetBounds(bounds);
+	m_Input->GetOutput()->GetVMELocalBounds(bounds);
 
 	renderWindow->AddRenderer(renderer);
 	renderWindow->SetSize(bounds[3] - bounds[2], bounds[1] - bounds[0]);
@@ -605,7 +481,7 @@ wxBitmap * albaOpExtractImageFromArbitraryView::GetSliceImage()
 
 	// Set Camera Properties
 	double x, y, z, vx, vy, vz;
-	x = 0; y = 0; z = -1; vx = 0; vy = -1; vz = 0; // axis = Z
+	x = 0; y = 0; z = -1; vx = 0; vy = 1; vz = 0; // axis = Z
 
 	renderer->GetActiveCamera()->ParallelProjectionOn();
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
@@ -618,36 +494,99 @@ wxBitmap * albaOpExtractImageFromArbitraryView::GetSliceImage()
 	renderWindow->Render();
 
 	int dim[3];
-	int magnification = 1;
 	renderWindow->OffScreenRenderingOn();
 
 	vtkALBASmartPointer<vtkWindowToImageFilter> w2i;
 	w2i->SetInput(renderWindow);
-	w2i->SetMagnification(magnification);
+	w2i->SetMagnification(m_Magnification + 1);
 	w2i->Update();
 	w2i->GetOutput()->GetDimensions(dim);
 
 	renderWindow->OffScreenRenderingOff();
 
-	assert(dim[0] > 0 && dim[1] > 0);
-	unsigned char *buffer = new unsigned char[dim[0] * dim[1] * 3];
-
-	//flip it - windows Bitmap are upside-down
-	vtkALBASmartPointer<vtkImageExport> ie;
-	ie->SetInput(w2i->GetOutput());
-	ie->ImageLowerLeftOff();
-	ie->SetExportVoidPointer(buffer);
-	ie->Export();
-
-	// Translate to a wxBitmap
-	wxImage  *img = new wxImage(dim[0], dim[1], buffer, TRUE);
-	wxBitmap *bmp = new wxBitmap(img, 24);
-
-	delete img;
-	delete buffer;
-
 	vtkDEL(renderer);
 	vtkDEL(renderWindow);
 
-	return bmp;
+	// Create ImageData
+	vtkImageData *imageData = NULL;
+	vtkNEW(imageData);
+
+	imageData->SetNumberOfScalarComponents(3);
+	imageData->SetScalarTypeToUnsignedChar();
+	imageData->SetDimensions(dim[0], dim[1], 1);
+	imageData->SetUpdateExtentToWholeExtent();
+	assert(imageData->GetPointData());
+	imageData->GetPointData()->SetScalars(w2i->GetOutput()->GetPointData()->GetScalars());
+
+	return imageData;
+}
+
+//----------------------------------------------------------------------------
+wxString albaOpExtractImageFromArbitraryView::GenerateImageName()
+{
+	wxString imageName = "Slice";
+	wxString axisName[3] = { "X","Y","Z" };
+
+	char tmp[20];
+	int count = 1;
+	do
+	{
+		sprintf(tmp, "%s_%s_%d", imageName, axisName[m_Axis], count);
+		count++;
+	} while (m_ImageSlicesGroup->FindInTreeByName(tmp) != NULL);
+
+	imageName = tmp;
+
+	if (m_ChooseName)
+	{
+		if (!m_ImageName.IsEmpty())
+			imageName = m_ImageName;
+	}
+
+	return imageName;
+}
+
+//----------------------------------------------------------------------------
+void albaOpExtractImageFromArbitraryView::SaveTags(albaVMEImage * image)
+{
+	// Visible in Tree
+	if (!m_ShowInTree)
+		image->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 0.0));
+
+	// Extracted From View
+	image->GetTagArray()->SetTag(albaTagItem("SLICE_EXTRACTED_FROM", m_View->GetTypeName()));
+
+	// Axis
+	wxString axis[3] = { "X","Y","Z" };
+	image->GetTagArray()->SetTag(albaTagItem("SLICE_AXIS", axis[m_Axis]));
+
+	// Matrix
+	albaMatrix *matrix = NULL;
+
+	if (m_View->IsA("albaViewArbitrarySlice"))
+	{
+		matrix = ((albaViewArbitrarySlice*)m_View)->GetSlicerMatrix();
+	}
+	else if (m_View->IsA("albaViewArbitraryOrthoSlice"))
+	{
+		matrix = ((albaViewArbitraryOrthoSlice*)m_View)->GetSlicerMatrix();
+	}
+
+	if (matrix)
+	{
+		albaTagItem tagMatrix;
+		tagMatrix.SetName("SLICE_MATRIX");
+		int ind = 0;
+
+		for (int i = 0; i < 4; i++)
+			for (int j = 0; j < 4; j++)
+				tagMatrix.SetValue(matrix->GetElement(i, j), ind++);
+
+		if (image->GetTagArray()->IsTagPresent("SLICE_MATRIX"))
+			image->GetTagArray()->DeleteTag("SLICE_MATRIX");
+
+		image->GetTagArray()->SetTag(tagMatrix);
+	}
+
+	//image->GetTagArray()->SetTag(albaTagItem("SLICE_MATRIX", textMatrix));
 }
