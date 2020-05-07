@@ -57,6 +57,10 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaViewManager.h"
 #include "albaAbsLogicManager.h"
 #include "albaGUIValidator.h"
+#include "albaPipeBox.h"
+#include "vtkOutlineSource.h"
+#include "albaPipeSurfaceTextured.h"
+#include "vtkPolyDataMapper.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpExtractImageFromArbitraryView);
@@ -325,7 +329,7 @@ void albaOpExtractImageFromArbitraryView::SelectImageSlice()
 //----------------------------------------------------------------------------
 void albaOpExtractImageFromArbitraryView::RenameImageSlice()
 {
-	if (m_CurrentImage != NULL)
+	if (m_CurrentImage != NULL && !m_ImageName.IsEmpty())
 	{
 		if (m_ImageSlicesGroup)
 		{
@@ -444,7 +448,7 @@ vtkImageData *albaOpExtractImageFromArbitraryView::GetSliceImageData()
 	m_Input->GetOutput()->GetVMELocalBounds(bounds);
 
 	renderWindow->AddRenderer(renderer);
-	renderWindow->SetSize(bounds[3] - bounds[2], bounds[1] - bounds[0]);
+	renderWindow->SetSize(bounds[1] - bounds[0], bounds[3] - bounds[2]);
 	renderWindow->SetPosition(0, 0);
 
 	albaPipe *pipeSlice = NULL;
@@ -458,13 +462,33 @@ vtkImageData *albaOpExtractImageFromArbitraryView::GetSliceImageData()
 		{
 			pipeSlice = albaViewArbitraryOrthoSlice::SafeDownCast(m_View)->GetPipeSlice(m_Axis);
 
-			if (m_Axis == 0)
-				renderWindow->SetSize(bounds[5] - bounds[4], bounds[3] - bounds[2]);
-			else if (m_Axis == 1)
-				renderWindow->SetSize(bounds[1] - bounds[0], bounds[5] - bounds[4]);
+			((albaPipeSurfaceTextured*)pipeSlice)->GetBounds(bounds);
 		}
 	}
+	
 	if (pipeSlice == NULL) return NULL;
+
+	double x, y, z, vx, vy, vz;
+	
+	if (m_Axis == 0) // X
+	{
+		renderWindow->SetSize(bounds[3] - bounds[2], bounds[5] - bounds[4]);
+
+		// 	x=-1 ;y=0; z=0; vx=0; vy=0; vz=1;
+		x = 1; y = 0; z = 0; vx = 0; vy = 0; vz = 1; // axis = X
+	}
+	else if (m_Axis == 1) // Y
+	{
+		renderWindow->SetSize(bounds[5] - bounds[4], bounds[1] - bounds[0]);
+		x = 0; y = -1; z = 0; vx = 0; vy = 0; vz = 1; // // axis = Y
+	} 
+	else // Z
+	{
+		renderWindow->SetSize(bounds[1] - bounds[0], bounds[3] - bounds[2]);
+		x = 0; y = 0; z = -1; vx = 0; vy = 1; vz = 0; // axis = Z
+	}
+
+	x = 0; y = 0; z = -1; vx = 0; vy = 1; vz = 0; // axis = Z
 
 	vtkPropCollection *actorList = vtkPropCollection::New();
 	pipeSlice->GetAssemblyFront()->GetActors(actorList);
@@ -479,10 +503,7 @@ vtkImageData *albaOpExtractImageFromArbitraryView::GetSliceImageData()
 		actor = actorList->GetNextProp();
 	}
 
-	// Set Camera Properties
-	double x, y, z, vx, vy, vz;
-	x = 0; y = 0; z = -1; vx = 0; vy = 1; vz = 0; // axis = Z
-
+ 	// Set Camera Properties
 	renderer->GetActiveCamera()->ParallelProjectionOn();
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
 	renderer->GetActiveCamera()->SetPosition(x * 100, y * 100, z * 100);
