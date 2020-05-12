@@ -209,11 +209,13 @@ void albaGizmoCrossTranslate::OnEventGizmoComponents(albaEventBase *alba_event)
               albaVMESlicer *slicer = NULL;
               slicer = albaVMESlicer::SafeDownCast(m_InputVME);
 
-              assert(slicer);
-
               albaVMEVolumeGray *slicedVolume = NULL;
 
-              slicedVolume = albaVMEVolumeGray::SafeDownCast(slicer->GetSlicedVMELink());
+							if(slicer)
+								slicedVolume = albaVMEVolumeGray::SafeDownCast(slicer->GetSlicedVMELink());
+							else
+								slicedVolume = albaVMEVolumeGray::SafeDownCast(m_InputVME);
+
               assert(slicedVolume);
 
               slicedVolume->GetOutput()->GetVTKData()->GetBounds(slicedVolumeBounds);

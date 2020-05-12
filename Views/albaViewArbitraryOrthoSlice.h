@@ -123,7 +123,6 @@ public:
 		ID_LOAD_FROM_REFSYS,
 		ID_GPUENABLED,
 		ID_SHOW_GIZMO,
-		ID_UPDATE_LUT, 
 		ID_LAST,
 	};
 
@@ -157,13 +156,18 @@ public:
 	/** return an xpm-icon that can be used to represent this view */
 	virtual char ** GetIcon();
 
+	/** */
+	virtual void VmeSelect(albaVME *node, bool select);
+
+	void UpdateConesPosition();
+
+
 	albaMatrix* GetSlicerMatrix(int axis = Z);
 	void SetSlicerMatrix(albaMatrix* matrix);
 
 	albaViewVTK * GetViewArbitrary();
 	albaViewVTK * GetViewSlice(int axis);
 	albaPipe* GetPipeSlice(int axis);
-
 protected:
 
 	enum AXIS { X = 0, Y = 1, Z = 2 };
@@ -204,8 +208,6 @@ protected:
 	void OnLUTChooser();
 	void OnLUTRangeModified();
 
-	void UpdateSlicersLUT();
-
 	void OnReset();
 
 	void RestoreCameraParametersForAllSubviews();
@@ -216,24 +218,14 @@ protected:
 	int GetGizmoPlane(void *gizmo);
 
 	int IsGizmoTranslate(void *gizmo);
-	void PostMultiplyEventMatrixToGizmoCross(vtkMatrix4x4 * matrix, albaGizmoCrossRotateTranslate *targetGizmo);
+	void PostMultiplyEventMatrix(vtkMatrix4x4 * matrix, int slicerAxis);
 	
-	/** Post multiply alba_event matrix to given slicer */
-	void PostMultiplyEventMatrixToSlicer(vtkMatrix4x4 *matrix, int slicerAxis);
-
-	/** Post multiply alba_event matrix to the 3 slicers */
-	void PostMultiplyEventMatrixToSlicers(vtkMatrix4x4 *matrix);
-
 	/** Windowing for volumes data. This function overrides superclass method.*/
 	void VolumeWindowing(albaVME *volume);
 	void OnEventGizmoRotate(vtkMatrix4x4 *matrix, int planeSkip);
 
 	void SetSlices();
-			
-	albaPipeSurface * GetPipe(int inView, albaVMESurface *inSurface);
-			
-	/** Recompute all slicers output */
-	void UpdateSlicers(int axis);
+					
 
 	void CreateViewCameraNormalFeedbackActors();
 	void UpdateWindowing(bool enable,albaVME *vme);
@@ -245,13 +237,13 @@ protected:
 	albaViewVTK *m_ViewSlice[3];
 	albaViewVTK *m_View3d;
 
-	albaVME          	*m_CurrentVolume;
-	albaVMESlicer			*m_Slicer[3];
-	albaMatrix					*m_SlicerResetMatrix[3];
+	albaMatrix					*m_SlicingResetMatrix[3];
+	albaMatrix					*m_SlicingMatrix[3];
+
 	albaAttachCamera		*m_CameraToSlicer[3];
 
-	double	m_VolumeVTKDataCenterABSCoords[3];
-	double	m_VolumeVTKDataCenterABSCoordinatesReset[3];
+	double	m_SlicingOrigin[3];
+	double	m_SlicingOriginReset[3];
 	double	m_VolumeVTKDataABSOrientation[3];
 	
 	albaVMESurface *m_CameraConeVME[3];

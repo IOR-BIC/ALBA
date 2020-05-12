@@ -90,9 +90,6 @@ public:
 	/** Force the updating of the camera. */
 	virtual void CameraUpdate();
 
-	/* Update slicer settings according to m_CurrentVolume*/
-	void UpdateSlicerBehavior();
-
 	/** return an xpm-icon that can be used to represent this view */
 	char ** GetIcon();
 
