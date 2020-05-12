@@ -56,11 +56,13 @@ void albaGizmoCrossRotateTranslate::Create(albaVME *input, albaObserver* listene
 	albaVMESlicer *slicer = NULL;
 	slicer = albaVMESlicer::SafeDownCast(input);
 
-	assert(slicer);
-
 	albaVMEVolumeGray *slicedVolume = NULL;
+	
+	if (slicer)
+		slicedVolume = albaVMEVolumeGray::SafeDownCast(slicer->GetSlicedVMELink());
+	else
+		slicedVolume = albaVMEVolumeGray::SafeDownCast(input);
 
-	slicedVolume = albaVMEVolumeGray::SafeDownCast(slicer->GetSlicedVMELink());
 	assert(slicedVolume);
 	
 	m_GizmoCrossTranslate = new albaGizmoCrossTranslate(input, this, BuildGUI, normal);
