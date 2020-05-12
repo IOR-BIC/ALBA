@@ -78,6 +78,7 @@ albaPipeVolumeArbOrthoSlice::albaPipeVolumeArbOrthoSlice():albaPipe()
 	m_Box = NULL;
 	m_Mapper = NULL;
 	m_Actor = NULL;
+	m_GhostActor = NULL;
 
 	m_TickActor = NULL;
 
@@ -203,6 +204,7 @@ void albaPipeVolumeArbOrthoSlice::Create(albaSceneNode *n)
 		m_AssemblyUsed->AddPart(m_Actor);
 	}
 
+	n->SetPipe(this);
 }
 
 void albaPipeVolumeArbOrthoSlice::CreateSlice(int direction, albaSceneNode *n)
@@ -395,7 +397,7 @@ albaGUI *albaPipeVolumeArbOrthoSlice::CreateGui()
   assert(m_Gui == NULL);
   double b[6] = {-1,1,-1,1,-1,1};
   m_Gui = new albaGUI(this);
-  m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+  m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
 	m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_SliceOpacity,0.1,1.0);
   m_Vme->GetOutput()->GetVMELocalBounds(b);
 	if(m_ShowSlider)

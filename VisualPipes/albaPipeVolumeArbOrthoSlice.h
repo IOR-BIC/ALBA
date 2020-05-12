@@ -30,6 +30,11 @@ PURPOSE.  See the above copyright notice for more information.
 class albaPipeVolumeArbSlice;
 class vtkALBAAssembly;
 class albaVMEOutputVolume;
+class albaGUIFloatSlider;
+class vtkLookupTable;
+class vtkOutlineSource;
+class albaLODActor;
+
 
 /** 
 class name: albaPipeVolumeArbOrthoSlice
@@ -83,12 +88,6 @@ public:
   /** Get the slice origin coordinates and normal.
   Both, Origin and Normal may be NULL, if the value is not to be retrieved.*/
   /*virtual*/ void GetSlice(int direction, double* Origin, double* Normal);
-
-  /** Assign a color lookup table to the slices*/
-  void SetColorLookupTable(vtkLookupTable *lut);
-
-  /** Return the color lookup table of the slices*/
-  vtkLookupTable *GetColorLookupTable();;
 
   /** Set the opacity of the slice. */
   void SetSliceOpacity(double opacity);
@@ -159,12 +158,12 @@ protected:
 	albaPipeVolumeArbSlice *m_SlicingPipes[3];
 
 	albaVMEOutputVolume			*m_VolumeOutput;
+	vtkLookupTable         *m_ColorLUT;
 
 	int m_EnableGPU;  ///<Non-zero, if the GPU support for slicing is used (default)
 	bool                    m_Interpolate;
 	int m_TrilinearInterpolationOn; //<define if tri-linear interpolation is performed or not on slice's texture
 	double  m_SliceOpacity; ///< Opacity of he volume slice.
-
 
   bool                    m_ShowVolumeBox;
 	bool										m_ShowBounds;
