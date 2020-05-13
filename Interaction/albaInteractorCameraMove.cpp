@@ -270,8 +270,6 @@ void albaInteractorCameraMove::Spin()
   if (m_Renderer == NULL)
     return;
 
-	if (m_CurrentCamera->GetParallelProjection()) return; 
-
   double *center = m_Renderer->GetCenter();
 
   double newAngle = 

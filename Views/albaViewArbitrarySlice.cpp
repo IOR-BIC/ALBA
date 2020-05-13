@@ -209,8 +209,7 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 			m_ChildViewList[ARBITRARY_VIEW]->VmeShow(m_CurrentVolume, show);
 			m_ChildViewList[SLICE_VIEW]->VmeShow(m_CurrentVolume, show);
 
-			UpdateSlicerBehavior();
-
+		
 			//Set camera of slice view in way that it will follow the volume
 			if(!m_AttachCamera)
 				m_AttachCamera=new albaAttachCamera(m_Gui,((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->m_Rwi,this);
@@ -610,11 +609,6 @@ void albaViewArbitrarySlice::PostMultiplyEventMatrix(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::CameraUpdate()
 {
-	if (m_AttachCamera != NULL)
-	{
-		//Camera follows the slicer
-		m_AttachCamera->UpdateCameraMatrix();
-	}
 	for(int i=0; i<m_NumOfChildView; i++)
 	{		
 		m_ChildViewList[i]->CameraUpdate();
@@ -665,27 +659,7 @@ void albaViewArbitrarySlice::EnableWidgets(bool enable)
 		m_Gui->Update();
 	}
 }
-//----------------------------------------------------------------------------
-void albaViewArbitrarySlice::UpdateSlicerBehavior()
-{
-	/*
-	if(m_CurrentVolume->GetBehavior())
-	{
-		m_Slicer->SetBehavior(m_CurrentVolume->GetBehavior());
-		albaPipeSurfaceTextured *pArb=(albaPipeSurfaceTextured *)(m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(m_Slicer);
-		pArb->SetActorPicking(true);
-		albaPipeSurfaceTextured *pSli=(albaPipeSurfaceTextured *)(m_ChildViewList[SLICE_VIEW])->GetNodePipe(m_Slicer);
-		pSli->SetActorPicking(true);
-	}
-	else
-	{
-		m_Slicer->SetBehavior(NULL);
-		albaPipeSurfaceTextured *pArb=(albaPipeSurfaceTextured *)(m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(m_Slicer);
-		pArb->SetActorPicking(false);
-		albaPipeSurfaceTextured *pSli=(albaPipeSurfaceTextured *)(m_ChildViewList[SLICE_VIEW])->GetNodePipe(m_Slicer);
-		pSli->SetActorPicking(false);
-	}*/
-};
+
 
 //----------------------------------------------------------------------------
 char ** albaViewArbitrarySlice::GetIcon()

@@ -47,6 +47,7 @@ SET(PROJECT_SRCS
   albaVisualPipeCollisionDetection.cpp  		albaVisualPipeCollisionDetection.h
   albaPipeRayCast.cpp  						albaPipeRayCast.h	
   albaPipeWithScalar.cpp 					albaPipeWithScalar.h
+  albaPipeVolumeArbOrthoSlice.cpp			albaPipeVolumeArbOrthoSlice.h
 )
 
 

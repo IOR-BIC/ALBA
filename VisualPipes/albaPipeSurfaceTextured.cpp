@@ -517,6 +517,13 @@ void albaPipeSurfaceTextured::SetEnableActorLOD(bool value)
   if(m_Gui)
     m_Gui->Update();
 }
+
+//----------------------------------------------------------------------------
+void albaPipeSurfaceTextured::GetBounds(double bounds[6])
+{
+	m_Mapper->GetBounds(bounds);
+}
+
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTextured::SetActorPicking(int enable)
 //----------------------------------------------------------------------------

@@ -873,7 +873,7 @@ unsigned int vtkALBAVolumeSlicer::GetGLDataType(int nVTKdata_type)
     GLint iformat;
     if (inDType == VTK_CHAR || inDType == VTK_UNSIGNED_CHAR)
        iformat = GL_ALPHA;
-    else if (inDType == VTK_SHORT || inDType == VTK_UNSIGNED_SHORT)
+    else if (inDType == VTK_UNSIGNED_SHORT)
       iformat = GL_ALPHA16;
     else
       iformat = GL_ALPHA32F_ARB;

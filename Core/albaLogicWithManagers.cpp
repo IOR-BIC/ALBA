@@ -1553,24 +1553,27 @@ void albaLogicWithManagers::OpRunStarting()
 {
 	m_RunningOperation = true;
   EnableMenuAndToolbar();
-// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-  if(m_InteractionManager) m_InteractionManager->EnableSelect(false);
-#endif
-  if(m_SideBar)    m_SideBar->EnableSelect(false);
+
+  if(m_InteractionManager) 
+		m_InteractionManager->EnableSelect(false);
+
+  if(m_SideBar)    
+		m_SideBar->EnableSelect(false);
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::OpRunTerminated(int runOk)
 {
 	m_RunningOperation = false;
   EnableMenuAndToolbar();
-// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
+
   if(m_InteractionManager) 
     m_InteractionManager->EnableSelect(true);
-#endif
+
   if(m_SideBar)
     m_SideBar->EnableSelect(true);
+
+	if(m_ApplicationSettings->IsAutoSaveOn())
+		OnFileSave();
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::OpShowGui(bool push_gui, albaGUIPanel *panel)
@@ -1582,7 +1585,6 @@ void albaLogicWithManagers::OpHideGui(bool view_closed)
 {
 	if(m_SideBar) m_SideBar->OpHideGui(view_closed);
 }
-
 
 // VIEW //////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
@@ -1654,7 +1656,6 @@ void albaLogicWithManagers::CameraReset()
 	if (m_ViewManager) 
 		m_ViewManager->CameraReset();
 }
-
 
 // WIZARD ////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
@@ -1757,7 +1758,6 @@ void albaLogicWithManagers::WizardRunTerminated()
 	if (m_SideBar)
 		m_SideBar->EnableSelect(true);
 }
-
 
 // MENU-TOOLBAR //////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
