@@ -24,7 +24,8 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaVMEVolumeGray.h"
 #include "vtkDataSet.h"
 
-
+#include <xercesc/util/XercesDefs.hpp>
+#include <xercesc/dom/DOM.hpp>
 //----------------------------------------------------------------------------
 // Forward references :
 //----------------------------------------------------------------------------
@@ -129,6 +130,7 @@ protected:
 	bool SaveCalibration();
 
 
+	bool CheckNodeElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node, const char *elementName);
 	Range CaluculateCutOffRange(vtkImageData *imgData, double cutOff);
 
 	template<typename DataType>
