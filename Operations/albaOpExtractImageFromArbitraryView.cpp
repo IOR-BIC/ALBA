@@ -65,6 +65,7 @@ albaOpExtractImageFromArbitraryView::albaOpExtractImageFromArbitraryView(wxStrin
 	m_ImageName = "";
 
 	m_Reslice = NULL;
+	vtkNEW(m_Reslice);
 }
 
 //----------------------------------------------------------------------------
@@ -91,8 +92,6 @@ albaOp* albaOpExtractImageFromArbitraryView::Copy()
 //----------------------------------------------------------------------------
 void albaOpExtractImageFromArbitraryView::OpRun()
 {
-	vtkNEW(m_Reslice);
-
 	bool hasView = false;
 
 	if (!m_TestMode)
@@ -365,12 +364,14 @@ void albaOpExtractImageFromArbitraryView::ExtractImage()
 	// Create and Save Image
 	albaVMEImage *vmeImage = NULL;
 	albaNEW(vmeImage);
-
-	vmeImage->SetData(GetSliceImageData(), 0);
+	
+	vtkImageData *imageData = GetSliceImageData();
+	
+	vmeImage->SetData(imageData, 0);
 	vmeImage->SetName(GenerateImageName());
 	vmeImage->SetTimeStamp(0);
 	vmeImage->ReparentTo(m_ImageSlicesGroup);
-
+	
 	SaveTags(vmeImage);
 
 	m_CurrentImage = vmeImage;
@@ -420,7 +421,7 @@ vtkImageData *albaOpExtractImageFromArbitraryView::GetSliceImageData()
 	transform->RotateWXYZ(angle, 0, 0, 1);
 	transform->Translate(-center[0], -center[1], -center[2]);
 
-	// Reslice does all of the work
+		// Reslice does all of the work
 	m_Reslice->SetInput(imageData);
 	m_Reslice->SetResliceTransform(transform);
 	m_Reslice->SetInterpolationModeToCubic();
