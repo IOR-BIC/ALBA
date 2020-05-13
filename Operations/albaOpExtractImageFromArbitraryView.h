@@ -22,7 +22,8 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOp.h"
 #include "albaVMEGroup.h"
 #include "albaDecl.h"
-#include "vtkImageData.h"
+#include "vtkTransform.h"
+#include "vtkImageReslice.h"
 
 //----------------------------------------------------------------------------
 // Forward references :
@@ -95,14 +96,12 @@ protected:
 	albaVMEImage  *m_CurrentImage;
 	wxListBox			*m_SlicesListBox;
 
+	vtkImageReslice *m_Reslice;
+
+	wxString m_ImageName;
 	int m_Axis;
 	bool m_ShowInTree;
-	bool m_ChooseName;
-	bool m_ShowExtractButton;
-	bool m_ShowSliceList;
 	int m_Magnification;
 	
-	albaString m_GuiMessage;
-	wxString m_ImageName;
 };
 #endif
