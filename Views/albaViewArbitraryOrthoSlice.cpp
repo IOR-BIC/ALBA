@@ -426,6 +426,11 @@ void albaViewArbitraryOrthoSlice::SetEnableGPU()
 		if (pipeSlice)
 			pipeSlice->SetEnableGPU(m_EnableGPU);
 	}
+
+	albaPipeVolumeArbOrthoSlice *pipeSlice = albaPipeVolumeArbOrthoSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_InputVolume));
+	if (pipeSlice)
+		pipeSlice->SetEnableGPU(m_EnableGPU);
+
 	CameraUpdate();
 }
 
@@ -746,15 +751,16 @@ void albaViewArbitraryOrthoSlice::ShowSlicers(albaVME * vmeVolume, bool show)
 	for (int i = X; i <= Z; i++)
 	{
 		m_ChildViewList[AsixToView(i)]->VmeShow(m_InputVolume, show);
-		albaPipeVolumeArbSlice *pipeSlice = albaPipeVolumeArbSlice::SafeDownCast(m_ChildViewList[AsixToView(i)]->GetNodePipe(m_InputVolume));
-		BuildCameraConeVME(i);
 		m_CameraToSlicer[i] = new albaAttachCamera(m_Gui, ((albaViewVTK*)m_ChildViewList[AsixToView(i)])->m_Rwi, this);
 		m_CameraToSlicer[i]->SetStartingMatrix(m_SlicingResetMatrix[i]);
 		m_CameraToSlicer[i]->SetVme(m_InputVolume);
 		m_CameraToSlicer[i]->SetAttachedMatrix(m_SlicingMatrix[i]->GetVTKMatrix());
 		m_CameraToSlicer[i]->EnableAttachCamera();
+
+		BuildCameraConeVME(i);
 	}
 
+	SetEnableGPU();
 	ResetCameraToSlices();
 	SetSlices();
 		
