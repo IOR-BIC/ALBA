@@ -51,6 +51,8 @@ PURPOSE. See the above copyright notice for more information.
 #include <xercesc/framework/LocalFileInputSource.hpp>
 #include <xercesc/sax/ErrorHandler.hpp>
 #include "albaXMLString.h"
+#include "mmuDOMTreeErrorReporter.h"
+#include "xercesc/parsers/XercesDOMParser.hpp"
 
 #define WATER_VALUE 0
 
@@ -1230,6 +1232,8 @@ void albaOpESPCalibration::CreateGui()
 	m_Gui->Double(-1, "StdDev", &m_AreaInfo[0].sdtdev, m_AreaInfo[0].sdtdev, m_AreaInfo[0].sdtdev, 2, "", true);
 	m_Gui->Double(-1, "Min", &m_AreaInfo[0].min, m_AreaInfo[0].min, m_AreaInfo[0].min, 2, "", true);
 	m_Gui->Double(-1, "Max", &m_AreaInfo[0].max, m_AreaInfo[0].max, m_AreaInfo[0].max, 2, "", true);
+	m_Gui->Double(-1, "Points #", &m_AreaInfo[0].nPoints, m_AreaInfo[0].nPoints, m_AreaInfo[0].nPoints, 2, "", true);
+
 			
 	m_Gui->Divider();
 	m_Gui->Divider();
@@ -1240,6 +1244,8 @@ void albaOpESPCalibration::CreateGui()
 	m_Gui->Double(-1, "StdDev", &m_AreaInfo[1].sdtdev, m_AreaInfo[1].sdtdev, m_AreaInfo[1].sdtdev, 2, "", true);
 	m_Gui->Double(-1, "Min", &m_AreaInfo[1].min, m_AreaInfo[1].min, m_AreaInfo[1].min, 2, "", true);
 	m_Gui->Double(-1, "Max", &m_AreaInfo[1].max, m_AreaInfo[1].max, m_AreaInfo[1].max, 2, "", true);
+	m_Gui->Double(-1, "Points #", &m_AreaInfo[1].nPoints, m_AreaInfo[1].nPoints, m_AreaInfo[1].nPoints, 2, "", true);
+
 
 	m_Gui->Divider();
 	m_Gui->Divider();
@@ -1250,6 +1256,7 @@ void albaOpESPCalibration::CreateGui()
 	m_Gui->Double(-1, "StdDev", &m_AreaInfo[2].sdtdev, m_AreaInfo[2].sdtdev, m_AreaInfo[2].sdtdev, 2, "", true);
 	m_Gui->Double(-1, "Min", &m_AreaInfo[2].min, m_AreaInfo[2].min, m_AreaInfo[2].min, 2, "", true);
 	m_Gui->Double(-1, "Max", &m_AreaInfo[2].max, m_AreaInfo[2].max, m_AreaInfo[2].max, 2, "", true);
+	m_Gui->Double(-1, "Points #", &m_AreaInfo[2].nPoints, m_AreaInfo[2].nPoints, m_AreaInfo[2].nPoints, 2, "", true);
 
 	m_Gui->Divider();
 	m_Gui->Divider();
@@ -1260,6 +1267,7 @@ void albaOpESPCalibration::CreateGui()
 	m_Gui->Double(-1, "StdDev", &m_AreaInfo[3].sdtdev, m_AreaInfo[3].sdtdev, m_AreaInfo[3].sdtdev, 2, "", true);
 	m_Gui->Double(-1, "Min", &m_AreaInfo[3].min, m_AreaInfo[3].min, m_AreaInfo[3].min, 2, "", true);
 	m_Gui->Double(-1, "Max", &m_AreaInfo[3].max, m_AreaInfo[3].max, m_AreaInfo[3].max, 2, "", true);
+	m_Gui->Double(-1, "Points #", &m_AreaInfo[3].nPoints, m_AreaInfo[3].nPoints, m_AreaInfo[3].nPoints, 2, "", true);
 
 
 	
@@ -1275,6 +1283,7 @@ void albaOpESPCalibration::CreateGui()
 	m_Gui->Double(-1, "StdDev", &m_AreaInfo[4].sdtdev, m_AreaInfo[4].sdtdev, m_AreaInfo[4].sdtdev, 2, "", true);
 	m_Gui->Double(-1, "Min", &m_AreaInfo[4].min, m_AreaInfo[4].min, m_AreaInfo[4].min, 2, "", true);
 	m_Gui->Double(-1, "Max", &m_AreaInfo[4].max, m_AreaInfo[4].max, m_AreaInfo[4].max, 2, "", true);
+	m_Gui->Double(-1, "Points #", &m_AreaInfo[4].nPoints, m_AreaInfo[4].nPoints, m_AreaInfo[4].nPoints, 2, "", true);
 
 
 	m_Gui->Label("");
@@ -1306,37 +1315,84 @@ char ** albaOpESPCalibration::GetIcon()
 
 // Create Report
 //----------------------------------------------------------------------------
-bool albaOpESPCalibration::SaveCalibration() 
+bool albaOpESPCalibration::SaveCalibration()
+{
+
+	//Open the file xml
+	try
 	{
+		XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Initialize();
+	}
+	catch (const XERCES_CPP_NAMESPACE_QUALIFIER XMLException& toCatch)
+	{
+		// Do your failure processing here
+		return ALBA_ERROR;
+	}
 
-		albaString initialFileName;
-		initialFileName = albaGetDocumentsDirectory().c_str();
-		initialFileName.Append("\\ESPcalibration.xml");
 
-		albaString wildc = "Calibration xml file (*.xml)|*.xml";
-		albaString calbrationFilename = albaGetSaveFile(initialFileName.GetCStr(), wildc).c_str();
+	XMLCh tempStr[100];
+	XERCES_CPP_NAMESPACE_QUALIFIER XercesDOMParser *XMLParser = NULL;
+	XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *root=NULL;
+	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc = NULL;
+	XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode("LS", tempStr, 99);
+	XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementation *impl = XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementationRegistry::getDOMImplementation(tempStr);
+	XERCES_CPP_NAMESPACE_QUALIFIER DOMWriter* theSerializer = ((XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementationLS*)impl)->createDOMWriter();
+	theSerializer->setNewLine(albaXMLString("\r"));
 
-		//Open the file xml
-		try
+	if (theSerializer->canSetFeature(XERCES_CPP_NAMESPACE_QUALIFIER XMLUni::fgDOMWRTFormatPrettyPrint, true))
+		theSerializer->setFeature(XERCES_CPP_NAMESPACE_QUALIFIER XMLUni::fgDOMWRTFormatPrettyPrint, true);
+
+
+	albaString initialFileName;
+	initialFileName = albaGetDocumentsDirectory().c_str();
+	initialFileName.Append("\\ESPcalibration.xml");
+
+	albaString wildc = "Calibration xml file (*.xml)|*.xml";
+	albaString calbrationFilename = albaGetSaveFile(initialFileName.GetCStr(), wildc).c_str();
+	
+	if (wxFileExists(calbrationFilename.GetCStr()))
+	{
+		XMLParser = new  XERCES_CPP_NAMESPACE_QUALIFIER XercesDOMParser;
+
+		XMLParser->setValidationScheme(XERCES_CPP_NAMESPACE_QUALIFIER XercesDOMParser::Val_Auto);
+		XMLParser->setDoNamespaces(false);
+		XMLParser->setDoSchema(false);
+		XMLParser->setCreateEntityReferenceNodes(false);
+
+		mmuDOMTreeErrorReporter *errReporter = new mmuDOMTreeErrorReporter();
+		XMLParser->setErrorHandler(errReporter);
+
+		XMLParser->parse(calbrationFilename.GetCStr());
+		int errorCount = XMLParser->getErrorCount();
+
+		if (errorCount != 0)
 		{
-			XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Initialize();
-		}
-		catch (const XERCES_CPP_NAMESPACE_QUALIFIER XMLException& toCatch)
-		{
-			// Do your failure processing here
+			// errors while parsing...
+			cppDEL(errReporter);
+			cppDEL(XMLParser);
+
+			albaErrorMessage("Errors while parsing XML file");
 			return ALBA_ERROR;
 		}
 
-		XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc;
-		XMLCh tempStr[100];
-		XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode("LS", tempStr, 99);
-		XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementation *impl = XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementationRegistry::getDOMImplementation(tempStr);
-		XERCES_CPP_NAMESPACE_QUALIFIER DOMWriter* theSerializer = ((XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementationLS*)impl)->createDOMWriter();
-		theSerializer->setNewLine(albaXMLString("\r"));
+		// extract the root element and wrap inside a albaXMLElement
+		doc = XMLParser->getDocument();
+		root = doc->getDocumentElement();
+		if (!CheckNodeElement(root, "CALIBRATION"))
+		{
+			// errors while parsing...
+			cppDEL(errReporter);
+			cppDEL(XMLParser);
 
-		if (theSerializer->canSetFeature(XERCES_CPP_NAMESPACE_QUALIFIER XMLUni::fgDOMWRTFormatPrettyPrint, true))
-			theSerializer->setFeature(XERCES_CPP_NAMESPACE_QUALIFIER XMLUni::fgDOMWRTFormatPrettyPrint, true);
+			albaErrorMessage("Wrong XML file, this is not a calibration file");
+			return ALBA_ERROR;
+		}
 
+
+		cppDEL(errReporter);
+	}
+	else
+	{
 		doc = impl->createDocument(NULL, albaXMLString("CALIBRATION"), NULL);
 
 		doc->setEncoding(albaXMLString("UTF-8"));
@@ -1344,139 +1400,160 @@ bool albaOpESPCalibration::SaveCalibration()
 		doc->setVersion(albaXMLString("1.0"));
 
 		// extract root element and wrap it with an albaXMLElement object
-		XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *root = doc->getDocumentElement();
-		assert(root);
+		root = doc->getDocumentElement();
+	}
+	if (root == NULL)
+		return ALBA_ERROR;
 
-		// attach version attribute to the root node
-		root->setAttribute(albaXMLString("Version"), albaXMLString(albaString(1)));
+	// attach version attribute to the root node
+	root->setAttribute(albaXMLString("Version"), albaXMLString(albaString(1)));
 
-		try
-		{
-			// DENSITOMETRIC_CALIBRATION
-			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *densitometricCalibration = doc->createElement(albaXMLString("DensitometricCalibration"));
-			densitometricCalibration->setAttribute(albaXMLString("CalibrationType"), albaXMLString(albaString("ESP_Phantom")));
-			densitometricCalibration->setAttribute(albaXMLString("Intercept"), albaXMLString(albaString(m_Intercept)));
-			densitometricCalibration->setAttribute(albaXMLString("Slope"), albaXMLString(albaString(m_Slope)));
-			densitometricCalibration->setAttribute(albaXMLString("RSquare"), albaXMLString(albaString(m_RSquare)));
+	try
+	{
+		// DENSITOMETRIC_CALIBRATION
+		XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *densitometricCalibration = doc->createElement(albaXMLString("DensitometricCalibration"));
+		densitometricCalibration->setAttribute(albaXMLString("CalibrationType"), albaXMLString(albaString("ESP_Phantom")));
+		densitometricCalibration->setAttribute(albaXMLString("Intercept"), albaXMLString(albaString(m_Intercept)));
+		densitometricCalibration->setAttribute(albaXMLString("Slope"), albaXMLString(albaString(m_Slope)));
+		densitometricCalibration->setAttribute(albaXMLString("RSquare"), albaXMLString(albaString(m_RSquare)));
 
-			//Area 50
-			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *area50 = doc->createElement(albaXMLString("SpongiousT1Area50"));
-			area50->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[0].mean)));
-			area50->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[0].errorOnEstimation)));
-			area50->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[0].sdtdev)));
-			area50->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[0].min)));
-			area50->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[0].max)));
-			densitometricCalibration->appendChild(area50);
+		//Area 50
+		XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *area50 = doc->createElement(albaXMLString("SpongiousT1Area50"));
+		area50->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[0].mean)));
+		area50->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[0].errorOnEstimation)));
+		area50->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[0].sdtdev)));
+		area50->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[0].min)));
+		area50->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[0].max)));
+		area50->setAttribute(albaXMLString("NPoints"), albaXMLString(albaString(m_AreaInfo[0].nPoints)));
+		densitometricCalibration->appendChild(area50);
 
-			//Area 100
-			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *area100 = doc->createElement(albaXMLString("SpongiousT2Area100"));
-			area100->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[1].mean)));
-			area100->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[1].errorOnEstimation)));
-			area100->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[1].sdtdev)));
-			area100->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[1].min)));
-			area100->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[1].max)));
-			densitometricCalibration->appendChild(area100);
+		//Area 100
+		XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *area100 = doc->createElement(albaXMLString("SpongiousT2Area100"));
+		area100->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[1].mean)));
+		area100->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[1].errorOnEstimation)));
+		area100->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[1].sdtdev)));
+		area100->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[1].min)));
+		area100->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[1].max)));
+		area100->setAttribute(albaXMLString("NPoints"), albaXMLString(albaString(m_AreaInfo[1].nPoints)));
 
-			//Area 200
-			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *area200 = doc->createElement(albaXMLString("SpongiousT2Area200"));
-			area200->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[2].mean)));
-			area200->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[2].errorOnEstimation)));
-			area200->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[2].sdtdev)));
-			area200->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[2].min)));
-			area200->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[2].max)));
-			densitometricCalibration->appendChild(area200);
+		densitometricCalibration->appendChild(area100);
 
-			//Area 400
-			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *area400 = doc->createElement(albaXMLString("SpinalProcessArea400"));
-			area400->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[3].mean)));
-			area400->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[3].errorOnEstimation)));
+		//Area 200
+		XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *area200 = doc->createElement(albaXMLString("SpongiousT2Area200"));
+		area200->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[2].mean)));
+		area200->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[2].errorOnEstimation)));
+		area200->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[2].sdtdev)));
+		area200->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[2].min)));
+		area200->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[2].max)));
+		area200->setAttribute(albaXMLString("NPoints"), albaXMLString(albaString(m_AreaInfo[2].nPoints)));
+		densitometricCalibration->appendChild(area200);
 
-			area400->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[3].sdtdev)));
-			area400->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[3].min)));
-			area400->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[3].max)));
-			densitometricCalibration->appendChild(area400);
+		//Area 400
+		XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *area400 = doc->createElement(albaXMLString("SpinalProcessArea400"));
+		area400->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[3].mean)));
+		area400->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[3].errorOnEstimation)));
+		area400->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[3].sdtdev)));
+		area400->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[3].min)));
+		area400->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[3].max)));
+		area400->setAttribute(albaXMLString("NPoints"), albaXMLString(albaString(m_AreaInfo[3].nPoints)));
+		densitometricCalibration->appendChild(area400);
+
+		//Area 400
+		XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *area800 = doc->createElement(albaXMLString("SpinalProcessArea400"));
+		area800->setAttribute(albaXMLString("MeanL2"), albaXMLString(albaString(m_BoneMean[0])));
+		area800->setAttribute(albaXMLString("MeanL3"), albaXMLString(albaString(m_BoneMean[1])));
+		area800->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[4].mean)));
+		area800->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[0].errorOnEstimation)));
+		area800->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[4].sdtdev)));
+		area800->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[4].min)));
+		area800->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[4].max)));
+		area800->setAttribute(albaXMLString("NPoints"), albaXMLString(albaString(m_AreaInfo[4].nPoints)));
+		densitometricCalibration->appendChild(area800);
+
+		//Area 400
+		XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *dicomTags = doc->createElement(albaXMLString("DicomTags"));
+		ADD_DICOM_TAG("Modality");
+
+		ADD_DICOM_TAG("AcquisitionDate");
+		ADD_DICOM_TAG("Manufacturer");
+		ADD_DICOM_TAG("InstitutionName");
+		ADD_DICOM_TAG("ManufacturersModelName");
+
+		ADD_DICOM_TAG("KVP");
+		ADD_DICOM_TAG("XRayTubeCurrent");
+		ADD_DICOM_TAG("FocalSpots");
+		ADD_DICOM_TAG("FilterType");
+
+		ADD_DICOM_TAG("SliceThickness");
+		ADD_DICOM_TAG("TableHeight");
+		ADD_DICOM_TAG("ExposureTime");
+		ADD_DICOM_TAG("TotalCollimationWidth");
+		ADD_DICOM_TAG("SpiralPitchFactor");
+
+		ADD_DICOM_TAG("SpacingBetweenSlices");
+		ADD_DICOM_TAG("PixelSpacing");
+		ADD_DICOM_TAG("ConvolutionKernel");
 
 
-			//Area 400
-			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *area800 = doc->createElement(albaXMLString("SpinalProcessArea400"));
-			area800->setAttribute(albaXMLString("MeanL2"), albaXMLString(albaString(m_BoneMean[0])));
-			area800->setAttribute(albaXMLString("MeanL3"), albaXMLString(albaString(m_BoneMean[1])));
-			area800->setAttribute(albaXMLString("Mean"), albaXMLString(albaString(m_AreaInfo[4].mean)));
-			area800->setAttribute(albaXMLString("EE"), albaXMLString(albaString(m_AreaInfo[0].errorOnEstimation)));
-			area800->setAttribute(albaXMLString("StdDev"), albaXMLString(albaString(m_AreaInfo[4].sdtdev)));
-			area800->setAttribute(albaXMLString("Min"), albaXMLString(albaString(m_AreaInfo[4].min)));
-			area800->setAttribute(albaXMLString("Max"), albaXMLString(albaString(m_AreaInfo[4].max)));
-			densitometricCalibration->appendChild(area800);
+		densitometricCalibration->appendChild(dicomTags);
 
-			//Area 400
-			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *dicomTags = doc->createElement(albaXMLString("DicomTags"));
-			ADD_DICOM_TAG("Modality");
-
-			ADD_DICOM_TAG("AcquisitionDate");
-			ADD_DICOM_TAG("Manufacturer");
-			ADD_DICOM_TAG("InstitutionName");
-			ADD_DICOM_TAG("ManufacturersModelName");
-
-			ADD_DICOM_TAG("KVP");
-			ADD_DICOM_TAG("XRayTubeCurrent");
-			ADD_DICOM_TAG("FocalSpots");
-			ADD_DICOM_TAG("FilterType");
-
-			ADD_DICOM_TAG("SliceThickness");
-			ADD_DICOM_TAG("TableHeight");
-			ADD_DICOM_TAG("ExposureTime");
-			ADD_DICOM_TAG("TotalCollimationWidth");
-			ADD_DICOM_TAG("SpiralPitchFactor");
-
-			ADD_DICOM_TAG("SpacingBetweenSlices");
-			ADD_DICOM_TAG("PixelSpacing");
-			ADD_DICOM_TAG("ConvolutionKernel");
-
-
-			densitometricCalibration->appendChild(dicomTags);
-
-			root->appendChild(densitometricCalibration);
-		}
-		catch (...)
-		{
-			return ALBA_ERROR;
-		}
-
-		XERCES_CPP_NAMESPACE_QUALIFIER XMLFormatTarget *XMLTarget;
-		albaString fileName = calbrationFilename;
-
-		XMLTarget = new XERCES_CPP_NAMESPACE_QUALIFIER LocalFileFormatTarget(fileName);
-
-		try
-		{
-			// do the serialization through DOMWriter::writeNode();
-			theSerializer->writeNode(XMLTarget, *doc);
-		}
-		catch (const XERCES_CPP_NAMESPACE_QUALIFIER  XMLException& toCatch)
-		{
-			char* message = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode(toCatch.getMessage());
-			XERCES_CPP_NAMESPACE_QUALIFIER XMLString::release(&message);
-			return ALBA_ERROR;
-		}
-		catch (const XERCES_CPP_NAMESPACE_QUALIFIER DOMException& toCatch)
-		{
-			char* message = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode(toCatch.msg);
-			XERCES_CPP_NAMESPACE_QUALIFIER XMLString::release(&message);
-			return ALBA_ERROR;
-		}
-		catch (...) {
-			return ALBA_ERROR;
-		}
-
-		theSerializer->release();
-		cppDEL(XMLTarget);
-		doc->release();
-
-		XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Terminate();
-
-		albaLogMessage("New calibration file has been written %s", fileName.GetCStr());
-
-		return ALBA_OK;
+		root->appendChild(densitometricCalibration);
+	}
+	catch (...)
+	{
+		return ALBA_ERROR;
 	}
 
+	XERCES_CPP_NAMESPACE_QUALIFIER XMLFormatTarget *XMLTarget;
+	albaString fileName = calbrationFilename;
 
+	XMLTarget = new XERCES_CPP_NAMESPACE_QUALIFIER LocalFileFormatTarget(fileName);
+
+	try
+	{
+		// do the serialization through DOMWriter::writeNode();
+		theSerializer->writeNode(XMLTarget, *doc);
+	}
+	catch (const XERCES_CPP_NAMESPACE_QUALIFIER  XMLException& toCatch)
+	{
+		char* message = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode(toCatch.getMessage());
+		XERCES_CPP_NAMESPACE_QUALIFIER XMLString::release(&message);
+		return ALBA_ERROR;
+	}
+	catch (const XERCES_CPP_NAMESPACE_QUALIFIER DOMException& toCatch)
+	{
+		char* message = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode(toCatch.msg);
+		XERCES_CPP_NAMESPACE_QUALIFIER XMLString::release(&message);
+		return ALBA_ERROR;
+	}
+	catch (...) {
+		return ALBA_ERROR;
+	}
+
+	theSerializer->release();
+	cppDEL(XMLTarget);
+	doc->release();
+
+	XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Terminate();
+
+	albaLogMessage("New calibration file has been written %s", fileName.GetCStr());
+
+	return ALBA_OK;
+
+	cppDEL(XMLParser);
+
+}
+
+//---------------------------------------------------------------------------
+bool albaOpESPCalibration::CheckNodeElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node, const char *elementName)
+{
+	//Reading nodes
+	if (node->getNodeType() != XERCES_CPP_NAMESPACE_QUALIFIER DOMNode::ELEMENT_NODE)
+		return false;
+
+	XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *nodeElement = (XERCES_CPP_NAMESPACE_QUALIFIER DOMElement*)node;
+	albaString nameElement = "";
+	nameElement = albaXMLString(nodeElement->getTagName());
+
+	return (nameElement == elementName);
+}
