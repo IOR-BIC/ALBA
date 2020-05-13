@@ -21,12 +21,14 @@ PURPOSE. See the above copyright notice for more information.
 
 #include "albaOpExtractImageFromArbitraryView.h"
 
+#include "albaAbsLogicManager.h"
 #include "albaDecl.h"
 #include "albaEvent.h"
 #include "albaGUI.h"
-#include "albaObject.h"
+#include "albaGUIValidator.h"
 #include "albaOp.h"
 #include "albaPipe.h"
+#include "albaPipeVolumeArbSlice.h"
 #include "albaServiceClient.h"
 #include "albaTagArray.h"
 #include "albaVME.h"
@@ -34,33 +36,11 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaView.h"
 #include "albaViewArbitraryOrthoSlice.h"
 #include "albaViewArbitrarySlice.h"
-#include "albaViewCompound.h"
-#include "albaViewSlice.h"
-#include "albaViewVTK.h"
-
-#include "vtkALBAAssembly.h"
-#include "vtkALBASmartPointer.h"
-#include "vtkCamera.h"
-#include "vtkDataSet.h"
-#include "vtkDataSetAttributes.h"
-#include "vtkImageData.h"
-#include "vtkImageExport.h"
-#include "vtkPointData.h"
-#include "vtkPropCollection.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkWindowToImageFilter.h"
-
-#include "wx\bitmap.h"
-#include "wx\image.h"
 #include "albaViewManager.h"
-#include "albaAbsLogicManager.h"
-#include "albaGUIValidator.h"
-#include "albaPipeBox.h"
-#include "vtkOutlineSource.h"
-#include "albaPipeSurfaceTextured.h"
-#include "vtkPolyDataMapper.h"
+
+#include "vtkImageData.h"
+#include "vtkImageReslice.h"
+#include "vtkTransform.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpExtractImageFromArbitraryView);
@@ -78,21 +58,19 @@ albaOpExtractImageFromArbitraryView::albaOpExtractImageFromArbitraryView(wxStrin
 	m_Magnification = 0;
 
 	m_ShowInTree = true;
-	m_ChooseName = true;
-	m_ShowExtractButton = true;
-	m_ShowSliceList = true;
-
+	
 	m_SlicesListBox = NULL;
 
 	m_CurrentImage = NULL;
 	m_ImageName = "";
 
-	m_GuiMessage = "";
+	m_Reslice = NULL;
 }
 
 //----------------------------------------------------------------------------
 albaOpExtractImageFromArbitraryView::~albaOpExtractImageFromArbitraryView()
 {
+	vtkDEL(m_Reslice);
 }
 
 //----------------------------------------------------------------------------
@@ -113,6 +91,8 @@ albaOp* albaOpExtractImageFromArbitraryView::Copy()
 //----------------------------------------------------------------------------
 void albaOpExtractImageFromArbitraryView::OpRun()
 {
+	vtkNEW(m_Reslice);
+
 	bool hasView = false;
 
 	if (!m_TestMode)
@@ -144,14 +124,8 @@ void albaOpExtractImageFromArbitraryView::OpRun()
 //----------------------------------------------------------------------------
 void albaOpExtractImageFromArbitraryView::OpStop(int result)
 {
-	if (result == OP_RUN_OK && 	!m_ShowExtractButton)
-	{
-		ExtractImage();
-	}
-	
 	if (!m_TestMode)
 	{
-		//m_SlicesListBox->Clear();
 		HideGui();
 	}
 
@@ -173,14 +147,8 @@ void albaOpExtractImageFromArbitraryView::OnEvent(albaEventBase *alba_event)
 		{
 			ExtractImage();
 			UpdateListbox();
-
-			if (m_ShowExtractButton && !m_ShowSliceList)
-			{
-				m_GuiMessage = "Extracted Slice image!";
-				m_Gui->Update();
-			}
 		}
-			break;
+		break;
 
 		case ID_SLICES_LIST:
 		{
@@ -188,7 +156,8 @@ void albaOpExtractImageFromArbitraryView::OnEvent(albaEventBase *alba_event)
 			ShowImageSlice();
 		}
 			break;
- 		case ID_REMOVE:
+
+		case ID_REMOVE:
  		{
 			RemoveImageSlice();
 			UpdateListbox();
@@ -207,6 +176,7 @@ void albaOpExtractImageFromArbitraryView::OnEvent(albaEventBase *alba_event)
 			ShowImageSlice();
 		}
 		break;
+		
 		case wxOK:
 			OpStop(OP_RUN_OK);
 			break;
@@ -228,57 +198,32 @@ void albaOpExtractImageFromArbitraryView::CreateGui()
 	// Interface:
 	m_Gui = new albaGUI(this);
 
-	if(m_View && m_View->IsA("albaViewArbitraryOrthoSlice"))
+	if (m_View && m_View->IsA("albaViewArbitraryOrthoSlice"))
 	{
 		m_Gui->Label("");
 		wxString axisChoice[3] = { "X","Y","Z" };
 		m_Gui->Combo(ID_AXIS, "Axis", &m_Axis, 3, axisChoice);
 	}
+	
+	m_Gui->Label("Slice Images", 1);
+	m_SlicesListBox = m_Gui->ListBox(ID_SLICES_LIST, "", 200);
+	m_Gui->Divider();
 
-	wxString magnificationChoice[3] = { "x1","x2","x3" };
-	//m_Gui->Combo(ID_AXIS, "Res", &m_Magnification, 3, magnificationChoice);
-	m_Gui->Radio(NULL, "Res", &m_Magnification, 3, magnificationChoice,3);
+	m_Gui->String(NULL, "Name", &m_ImageName);
+	m_Gui->TwoButtons(ID_RENAME, ID_REMOVE, "Rename", "Remove");
 
-	if (m_ShowExtractButton) 
-	{
-		m_Gui->Divider(1);
-		m_Gui->Button(ID_EXTRACT, "Extract");
-		m_Gui->Divider(1);
+	m_Gui->Divider(1);
+	m_Gui->Button(ID_EXTRACT, "Extract");
+	m_Gui->Divider(1);
 
-		if (m_ShowSliceList)
-		{
-			m_Gui->Label("Slice Images", 1);
-			m_SlicesListBox = m_Gui->ListBox(ID_SLICES_LIST, "", 200);
-			m_Gui->Divider();
-
-			m_Gui->String(NULL, "Name", &m_ImageName);
-			m_Gui->TwoButtons(ID_RENAME, ID_REMOVE, "Rename", "Remove");
-
-			m_Gui->Enable(ID_RENAME, m_SlicesListBox->GetCount() != 0);
-			m_Gui->Enable(ID_REMOVE, m_SlicesListBox->GetCount() != 0);
-		}
-		else
-		{
-			m_Gui->Divider();
-			m_Gui->String(NULL, "Name", &m_ImageName);
-		}
-	}
-	else
-	{
-		if (m_ChooseName)
-		{
-			m_Gui->Divider(1);
-			m_Gui->String(NULL, "Name", &m_ImageName);
-		}
-	}
-
-	//
-	m_Gui->Label(&m_GuiMessage);
+	m_Gui->Enable(ID_RENAME, m_SlicesListBox->GetCount() != 0);
+	m_Gui->Enable(ID_REMOVE, m_SlicesListBox->GetCount() != 0);
 
 	//////////////////////////////////////////////////////////////////////////
 	m_Gui->Label("");
 	m_Gui->Divider(1);
-	m_Gui->OkCancel();
+	//m_Gui->OkCancel();
+	m_Gui->Button(wxCANCEL, "Close");
 	m_Gui->Label("");
 
 	ShowGui();
@@ -436,22 +381,10 @@ void albaOpExtractImageFromArbitraryView::ExtractImage()
 //----------------------------------------------------------------------------
 vtkImageData *albaOpExtractImageFromArbitraryView::GetSliceImageData()
 {
-	vtkRenderer *renderer = NULL;
-	vtkRenderWindow *renderWindow = NULL;
-
-	vtkNEW(renderer);
-	vtkNEW(renderWindow);
-
-	renderer->SetBackground(0.0, 0.0, 0.0);
-
 	double bounds[6];
-	m_Input->GetOutput()->GetVMELocalBounds(bounds);
-
-	renderWindow->AddRenderer(renderer);
-	renderWindow->SetSize(bounds[1] - bounds[0], bounds[3] - bounds[2]);
-	renderWindow->SetPosition(0, 0);
-
+	vtkImageData *imageData = NULL;
 	albaPipe *pipeSlice = NULL;
+
 	if (m_View)
 	{
 		if (m_View->IsA("albaViewArbitrarySlice"))
@@ -461,85 +394,43 @@ vtkImageData *albaOpExtractImageFromArbitraryView::GetSliceImageData()
 		else if (m_View->IsA("albaViewArbitraryOrthoSlice"))
 		{
 			pipeSlice = albaViewArbitraryOrthoSlice::SafeDownCast(m_View)->GetPipeSlice(m_Axis);
-
-			((albaPipeSurfaceTextured*)pipeSlice)->GetBounds(bounds);
 		}
 	}
-	
-	if (pipeSlice == NULL) return NULL;
 
-	double x, y, z, vx, vy, vz;
-	
-	if (m_Axis == 0) // X
-	{
-		renderWindow->SetSize(bounds[3] - bounds[2], bounds[5] - bounds[4]);
+	if (!pipeSlice) return NULL;
 
-		// 	x=-1 ;y=0; z=0; vx=0; vy=0; vz=1;
-		x = 1; y = 0; z = 0; vx = 0; vy = 0; vz = 1; // axis = X
-	}
-	else if (m_Axis == 1) // Y
-	{
-		renderWindow->SetSize(bounds[5] - bounds[4], bounds[1] - bounds[0]);
-		x = 0; y = -1; z = 0; vx = 0; vy = 0; vz = 1; // // axis = Y
-	} 
-	else // Z
-	{
-		renderWindow->SetSize(bounds[1] - bounds[0], bounds[3] - bounds[2]);
-		x = 0; y = 0; z = -1; vx = 0; vy = 1; vz = 0; // axis = Z
-	}
+	imageData = ((albaPipeVolumeArbSlice*)pipeSlice)->GetImageData();
 
-	x = 0; y = 0; z = -1; vx = 0; vy = 1; vz = 0; // axis = Z
+	//return imageData;
 
-	vtkPropCollection *actorList = vtkPropCollection::New();
-	pipeSlice->GetAssemblyFront()->GetActors(actorList);
+	// Rotate Image
+	imageData->GetBounds(bounds);
 
-	actorList->InitTraversal();
-	vtkProp *actor = actorList->GetNextProp();
-	while (actor)
-	{
-		renderer->AddActor(actor);
-		renderWindow->Render();
+	double angle = -90;
+	double center[3];
+	center[0] = (bounds[1] + bounds[0]) / 2.0;
+	center[1] = (bounds[3] + bounds[2]) / 2.0;
+	center[2] = (bounds[5] + bounds[4]) / 2.0;
 
-		actor = actorList->GetNextProp();
-	}
+	if (m_Axis == 0 || m_Axis == 1) angle = 180;
 
- 	// Set Camera Properties
-	renderer->GetActiveCamera()->ParallelProjectionOn();
-	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
-	renderer->GetActiveCamera()->SetPosition(x * 100, y * 100, z * 100);
-	renderer->GetActiveCamera()->SetViewUp(vx, vy, vz);
-	renderer->GetActiveCamera()->SetClippingRange(0.1, 1000);
-	renderer->GetActiveCamera()->Zoom(2.0);
-	//renderer->ResetCamera();
+	vtkTransform *transform = NULL;
+	vtkNEW(transform);
+	transform->Translate(center[0], center[1], center[2]);
+	transform->RotateWXYZ(angle, 0, 0, 1);
+	transform->Translate(-center[0], -center[1], -center[2]);
 
-	renderWindow->Render();
+	// Reslice does all of the work
+	m_Reslice->SetInput(imageData);
+	m_Reslice->SetResliceTransform(transform);
+	m_Reslice->SetInterpolationModeToCubic();
+	m_Reslice->SetOutputSpacing(imageData->GetSpacing());
+	m_Reslice->SetOutputOrigin(imageData->GetOrigin());
+	m_Reslice->SetOutputExtent(imageData->GetExtent());
 
-	int dim[3];
-	renderWindow->OffScreenRenderingOn();
+	vtkDEL(transform);
 
-	vtkALBASmartPointer<vtkWindowToImageFilter> w2i;
-	w2i->SetInput(renderWindow);
-	w2i->SetMagnification(m_Magnification + 1);
-	w2i->Update();
-	w2i->GetOutput()->GetDimensions(dim);
-
-	renderWindow->OffScreenRenderingOff();
-
-	vtkDEL(renderer);
-	vtkDEL(renderWindow);
-
-	// Create ImageData
-	vtkImageData *imageData = NULL;
-	vtkNEW(imageData);
-
-	imageData->SetNumberOfScalarComponents(3);
-	imageData->SetScalarTypeToUnsignedChar();
-	imageData->SetDimensions(dim[0], dim[1], 1);
-	imageData->SetUpdateExtentToWholeExtent();
-	assert(imageData->GetPointData());
-	imageData->GetPointData()->SetScalars(w2i->GetOutput()->GetPointData()->GetScalars());
-
-	return imageData;
+	return m_Reslice->GetOutput();
 }
 
 //----------------------------------------------------------------------------
@@ -558,11 +449,8 @@ wxString albaOpExtractImageFromArbitraryView::GenerateImageName()
 
 	imageName = tmp;
 
-	if (m_ChooseName)
-	{
-		if (!m_ImageName.IsEmpty())
-			imageName = m_ImageName;
-	}
+	if (!m_ImageName.IsEmpty())
+		imageName = m_ImageName;
 
 	return imageName;
 }
@@ -608,6 +496,4 @@ void albaOpExtractImageFromArbitraryView::SaveTags(albaVMEImage * image)
 
 		image->GetTagArray()->SetTag(tagMatrix);
 	}
-
-	//image->GetTagArray()->SetTag(albaTagItem("SLICE_MATRIX", textMatrix));
 }
