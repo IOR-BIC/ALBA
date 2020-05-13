@@ -60,12 +60,17 @@ public:
   /** set the material of the output image data*/ 
   void SetMaterial(mmaMaterial *material);
 
+	/** Update all the output data structures (data, bounds, matrix and abs matrix).*/
+	virtual void Update();
+	
 protected:
   mmaMaterial *m_Material;
 
   albaGUI *CreateGui();
 
-
+	albaString m_ImageBounds[3];
+	albaString m_ImageSize;
+	
 private:
   albaVMEOutputImage(const albaVMEOutputImage&); // Not implemented
   void operator=(const albaVMEOutputImage&); // Not implemented
