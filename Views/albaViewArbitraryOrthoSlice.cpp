@@ -243,7 +243,6 @@ void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::VmeSelect(albaVME *node, bool select)
 {
-
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeSelect(node, select);
 }
 
@@ -504,12 +503,36 @@ albaMatrix* albaViewArbitraryOrthoSlice::GetSlicerMatrix(int axis)
 }
 
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::SetSlicerMatrix(albaMatrix* matrix, int axis)
+void albaViewArbitraryOrthoSlice::SetSlicerMatrix(albaMatrix* matrix)
 {
-	m_GizmoRT[axis]->SetAbsPose(matrix);
+	if (matrix == NULL) return;
+	
+	albaMatrix *slicerMatrix = GetSlicerMatrix();
 
-	RestoreCameraParametersForAllSubviews();
-	CameraUpdate();
+	//We need to find the roto-translation matrix that moves current slicer matrix to the refsys absolute matrix 
+	//We can use the following formula to find the B matrix:
+	//((AB)^-1)*(A) = B^-1
+
+	//In this formula AB is the target, the refsys matrix in this case
+	//A is the current slicer matrix
+	//and B is the transform from current slicer matrix to the refsys
+
+	//Calculating (AB)^-1
+	albaMatrix ABinverse;
+	ABinverse.DeepCopy(matrix);
+	ABinverse.Invert();
+	
+	//Multiplying (AB)^-1 to A to obtain B^-1
+	albaTransform Binverse;
+	Binverse.SetMatrix(ABinverse);
+	Binverse.Concatenate(*slicerMatrix, false);
+
+	//Obtaining the final matrix by inverting Binverse, (B^-1)^-1 = B
+	albaMatrix finalMatrix = Binverse.GetMatrix();
+	finalMatrix.Invert();
+
+	//OnEventGizmoTranslate manages both rotations and translations
+	OnEventGizmoTranslate(finalMatrix.GetVTKMatrix(), -1);
 }
 
 //----------------------------------------------------------------------------
@@ -960,36 +983,9 @@ void albaViewArbitraryOrthoSlice::OnLoadFromRefsys()
 	e.SetString(&title);
 	albaEventMacro(e);
 	albaVME *n = e.GetVme();
+	
 	if (n != NULL)
-	{
-		albaMatrix *refSysMatrix = n->GetOutput()->GetAbsMatrix();
-		albaMatrix *slicerMatrix = GetSlicerMatrix();
-
-		//We need to find the roto-translation matrix that moves current slicer matrix to the refsys absolute matrix 
-		//We can use the following formula to find the B matrix:
-		//((AB)^-1)*(A) = B^-1
-
-		//In this formula AB is the target, the refsys matrix in this case
-		//A is the current slicer matrix
-		//and B is the transform from current slicer matrix to the refsys
-
-		//Calculating (AB)^-1
-		albaMatrix ABinverse;
-		ABinverse.DeepCopy(refSysMatrix);
-		ABinverse.Invert();
-		
-		//Multiplying (AB)^-1 to A to obtain B^-1
-		albaTransform Binverse;
-		Binverse.SetMatrix(ABinverse);
-		Binverse.Concatenate(*slicerMatrix, false);
-
-		//Obtaining the final matrix by inverting Binverse, (B^-1)^-1 = B
-		albaMatrix finalMatrix = Binverse.GetMatrix();
-		finalMatrix.Invert();
-
-		//OnEventGizmoTranslate manages both rotations and translations
-		OnEventGizmoTranslate(finalMatrix.GetVTKMatrix(), -1);
-	}
+		SetSlicerMatrix(n->GetOutput()->GetAbsMatrix());
 }
 //----------------------------------------------------------------------------
 albaViewVTK * albaViewArbitraryOrthoSlice::GetViewArbitrary()

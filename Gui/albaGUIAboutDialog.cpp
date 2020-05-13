@@ -156,7 +156,7 @@ void albaGUIAboutDialog::CreateDialog()
 	
 	description += m_Revision + _("\n");
 	
-	description += "\n© 2019 BIC - RIT - IOR";
+	description += "\n© 2020 BIC - RIT - IOR";
 
 	description += m_ExtraMessage;
 

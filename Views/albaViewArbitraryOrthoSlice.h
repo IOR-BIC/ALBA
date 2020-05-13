@@ -163,7 +163,7 @@ public:
 
 
 	albaMatrix* GetSlicerMatrix(int axis = Z);
-	void SetSlicerMatrix(albaMatrix* matrix, int axis = X);
+	void SetSlicerMatrix(albaMatrix* matrix);
 
 	albaViewVTK * GetViewArbitrary();
 	albaViewVTK * GetViewSlice(int axis);

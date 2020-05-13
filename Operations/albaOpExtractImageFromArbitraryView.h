@@ -22,10 +22,12 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOp.h"
 #include "albaVMEGroup.h"
 #include "albaDecl.h"
+#include "vtkImageData.h"
 
 //----------------------------------------------------------------------------
 // Forward references :
 //----------------------------------------------------------------------------
+class vtkimageData;
 
 //----------------------------------------------------------------------------
 // Class Name: albaOpExtractImageFromArbitraryView
@@ -56,12 +58,16 @@ public:
 
 	/** Receive events coming from the user interface.*/
 	void OnEvent(albaEventBase *alba_event);
-  
+
 	enum OP_EXTRACT_IMAGE_ID
 	{
 		ID_TYPE = MINID,
 		ID_AXIS,
 		ID_EXTRACT,
+		ID_SLICES_LIST,
+		ID_RENAME,
+		ID_REMOVE,
+		ID_RES,
 	};
 
 protected:
@@ -72,18 +78,31 @@ protected:
 	/** Create the Operation GUI */
 	virtual void CreateGui();
 
-	void ExtractImage();
+	void UpdateListbox();
 
-	wxBitmap *GetSliceImage();
+	void SelectImageSlice();
+	void RenameImageSlice();
+	void RemoveImageSlice();
+	void ShowImageSlice();
 
-	albaView *m_View;
-	albaVMEGroup *m_ImageSlicesGroup;
+	virtual void ExtractImage();
+	virtual vtkImageData *GetSliceImageData();
+	virtual void SaveTags(albaVMEImage *image);
+	virtual wxString GenerateImageName();
+
+	albaView			*m_View;
+	albaVMEGroup	*m_ImageSlicesGroup;
+	albaVMEImage  *m_CurrentImage;
+	wxListBox			*m_SlicesListBox;
 
 	int m_Axis;
 	bool m_ShowInTree;
 	bool m_ChooseName;
 	bool m_ShowExtractButton;
+	bool m_ShowSliceList;
+	int m_Magnification;
 	
+	albaString m_GuiMessage;
 	wxString m_ImageName;
 };
 #endif
