@@ -42,12 +42,17 @@
 #include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkUnsignedCharArray.h"
+#include "albaGUI.h"
 
 //----------------------------------------------------------------------------
-albaSnapshotManager::albaSnapshotManager()
+albaSnapshotManager::albaSnapshotManager(/*albaObserver *Listener, const albaString &label*/) :
+	albaGUISettings(this, _("Snapshot Manager"))
 {
 	m_SnapshotsGroup = NULL;
 	m_ImageViewer = NULL;
+	m_SettingsGui = NULL;
+
+	InitializeSettings();
 
 	m_GroupName = "Snapshots";
 
@@ -78,6 +83,31 @@ void albaSnapshotManager::OnEvent(albaEventBase *alba_event)
 		}
 		break;
 
+		case ID_SETTING_ENABLE_RESOLUTION:
+		{
+			m_SettingsGui->Enable(ID_SETTING_RESOLUTION, m_SnapshotsCustomResoluzion);
+			m_SettingsGui->Update();
+			m_Config->Write("Snapshot_CustomResolution", m_SnapshotsCustomResoluzion);
+			m_Config->Flush();
+		}
+		break;
+		case  ID_SETTING_RESOLUTION:
+		{
+			m_Config->Write("Snapshot_WidthResolution", m_SnapshotsWidth);
+			m_Config->Write("Snapshot_HeightResolution", m_SnapshotsHeight);
+			m_Config->Flush();
+		}
+		break;
+
+		case ID_SETTING_COLOR:
+		{
+			m_Config->Write("Snapshot_ColorBackgroundR", m_ColorBackground.Red());
+			m_Config->Write("Snapshot_ColorBackgroundB", m_ColorBackground.Blue());
+			m_Config->Write("Snapshot_ColorBackgroundG", m_ColorBackground.Green());
+			m_Config->Flush();
+		}
+		break;
+
 		default:
 			break;
 		}
@@ -96,13 +126,32 @@ void albaSnapshotManager::CreateSnapshot(albaVME *root, albaView *selectedView)
 	if (selectedView)
 	{
 		wxColor color = selectedView->GetBackgroundColor();
-		selectedView->SetBackgroundColor(wxColor(255, 255, 255));
+		selectedView->SetBackgroundColor(m_ColorBackground);
 
 		wxBitmap btmComp;
-		selectedView->GetImage(btmComp);
-		img = btmComp.ConvertToImage();
+		wxSize wSize = selectedView->GetWindow()->GetSize();
 
+		float w = wSize.x;
+		float h = wSize.y;
+
+		if (m_SnapshotsCustomResoluzion)
+		{
+			w = MAX(wSize.x, m_SnapshotsWidth);
+			h = (w == wSize.x) ? wSize.y : w * wSize.y / wSize.x;
+
+			if(h<m_SnapshotsHeight)
+			{
+				h = MAX(wSize.y, m_SnapshotsHeight);
+				w = (h == wSize.y) ? wSize.x : h * wSize.x / wSize.y;
+			}
+		}
+
+		selectedView->SetWindowSize(w, h);
+		selectedView->CameraUpdate();
+		selectedView->GetImage(btmComp);
+		selectedView->SetWindowSize(wSize.x, wSize.y);;
 		selectedView->SetBackgroundColor(color);
+		img = btmComp.ConvertToImage();
 	}
 	else
 	{
@@ -158,6 +207,7 @@ void albaSnapshotManager::CreateSnapshot(albaVME *root, albaView *selectedView)
 	image->SetName(imageName);
 	image->SetTimeStamp(0);
 	image->ReparentTo(m_SnapshotsGroup);
+	image->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 0.0));
 
 	albaDEL(image);
 	//////////////////////////////////////////////////////////////////////////
@@ -188,7 +238,14 @@ void albaSnapshotManager::FindOrCreateSnapshotGroup(albaVME *root)
 void albaSnapshotManager::ShowSnapshotPreview()
 {
 	if (m_ImageViewer && m_SnapshotsGroup)
-		m_ImageViewer->ShowImageDialog(m_SnapshotsGroup);
+	{
+		int numImages = GetNSnapshots(); 
+
+		if (numImages > 0) // Select Last Image
+			m_ImageViewer->ShowImageDialog(m_SnapshotsGroup, numImages-1);
+		else
+			m_ImageViewer->ShowImageDialog(m_SnapshotsGroup);
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -213,4 +270,63 @@ bool albaSnapshotManager::HasSnapshots(albaVME *root)
 void albaSnapshotManager::SetMouse(albaDeviceButtonsPadMouse *mouse)
 {
 	m_ImageViewer->SetMouse(mouse);
+}
+
+//----------------------------------------------------------------------------
+albaGUI* albaSnapshotManager::GetSettingsGui()
+{
+	if (m_SettingsGui == NULL)
+	{
+		m_SettingsGui = new albaGUI(this);
+		
+		m_SettingsGui->Label("Snapshot Settings", true);
+		m_SettingsGui->Label("");
+
+		m_SettingsGui->Label("Image Resolution");
+		m_SettingsGui->Bool(ID_SETTING_ENABLE_RESOLUTION, "Customize", &m_SnapshotsCustomResoluzion, 1);
+		m_SettingsGui->Integer(ID_SETTING_RESOLUTION, "Min Width", &m_SnapshotsWidth, 800);
+		m_SettingsGui->Integer(ID_SETTING_RESOLUTION, "Min Height", &m_SnapshotsHeight, 600);
+		m_SettingsGui->Divider(1);
+
+		m_SettingsGui->Label("Background");
+		m_SettingsGui->Color(ID_SETTING_COLOR, "Color", &m_ColorBackground);
+		m_SettingsGui->Label("");
+
+		m_SettingsGui->Enable(ID_SETTING_RESOLUTION, m_SnapshotsCustomResoluzion);
+	}
+
+	return m_SettingsGui;
+}
+
+//----------------------------------------------------------------------------
+void albaSnapshotManager::InitializeSettings()
+{
+	m_SnapshotsCustomResoluzion = 0;
+	m_SnapshotsWidth = 800;
+	m_SnapshotsHeight = 600;
+	int m_Color[3];
+	m_Color[0] = m_Color[1] = m_Color[2] = 255;
+
+	//On first run i cannot read configuration
+	if (!m_Config->Read("Snapshot_CustomResolution", &m_SnapshotsCustomResoluzion))
+		m_Config->Write("Snapshot_CustomResolution", m_SnapshotsCustomResoluzion); // So i will save default value
+
+	if (!m_Config->Read("Snapshot_WidthResolution", &m_SnapshotsWidth))
+		m_Config->Write("Snapshot_WidthResolution", m_SnapshotsWidth); // So i will save default value
+
+	if (!m_Config->Read("SnapshotHeightResolution", &m_SnapshotsHeight))
+		m_Config->Write("Snapshot_HeightResolution", m_SnapshotsHeight); // So i will save default value
+
+	if (!m_Config->Read("Snapshot_ColorBackgroundR", &m_Color[0]))
+		m_Config->Write("Snapshot_ColorBackgroundR", m_Color[0]); // So i will save default value
+
+	if (!m_Config->Read("Snapshot_ColorBackgroundB", &m_Color[1]))
+		m_Config->Write("Snapshot_ColorBackgroundB", m_Color[1]); // So i will save default value
+
+	if (!m_Config->Read("Snapshot_ColorBackgroundG", &m_Color[2]))
+		m_Config->Write("Snapshot_ColorBackgroundG", m_Color[2]); // So i will save default value
+	
+	m_ColorBackground = wxColor(m_Color[0], m_Color[1], m_Color[2]);
+
+	m_Config->Flush();
 }

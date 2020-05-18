@@ -1,17 +1,14 @@
 /*=========================================================================
-
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaGUIApplicationSettings
- Authors: Paolo Quadrani
+ Authors: Paolo Quadrani - Nicola Vanella
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
-
-
+ 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notice for more information.
-
 =========================================================================*/
 
 #ifndef __albaGUIApplicationSettings_H__
@@ -50,6 +47,7 @@ public:
     ID_LOG_TO_FILE = MINID,
     ID_LOG_DIR,
     ID_WARN_UNDO,
+		ID_AUTOSAVE,
   };
   
   /** Answer to the messages coming from interface. */
@@ -60,9 +58,11 @@ public:
 
   /** Set the log status flag.*/
   void SetLogFileStatus(int log_status);
-
-  
-  /** Return the folder in which store the log files.*/
+	  
+	/** Enable/Disable AutoSave Project */
+	void SetAutoSave(int autoSave);
+	
+	/** Return the folder in which store the log files.*/
   albaString &GetLogFolder() {return m_LogFolder;};
 
   /** Set a folder name for the log file.*/
@@ -75,6 +75,9 @@ public:
   void EnableLogDirChoices(){m_EnableLogDirChoices = true;};
   /** Disable the possibility to choose log directory. */
   void DisableLogDirChoices(){m_EnableLogDirChoices = false;};
+
+	bool IsAutoSaveOn() { return m_AutoSaveProject !=0; };
+	int *GetAutoSave() { return &m_AutoSaveProject; };
 
 protected:
   /** Create the GUI for the setting panel.*/
@@ -93,5 +96,7 @@ protected:
   int m_WarnUserFlag; ///< Warn user flag on not supported undo operations
 
   bool m_EnableLogDirChoices;
+
+	int m_AutoSaveProject;
 };
 #endif

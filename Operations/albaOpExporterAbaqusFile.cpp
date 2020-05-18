@@ -1,10 +1,10 @@
 /*=========================================================================
-  Program:   Bonemat
-  Module:    albaOpExporterAbaqusFile.cpp
-  Language:  C++
-  Date:      $Date: 2010-12-03 14:58:16 $
-  Version:   $Revision: 1.1.1.1.2.3 $
-  Authors:   Nicola Vanella, Gianluigi Crimi
+Program:   ALBA
+Module:    albaOpExporterAbaqusFile.cpp
+Language:  C++
+Date:      $Date: 2009-05-19 14:29:53 $
+Version:   $Revision: 1.1 $
+Authors:   Nicola Vanella
 ==========================================================================
 Copyright (c) BIC-IOR 2019 (https://github.com/IOR-BIC)
 
@@ -450,79 +450,47 @@ int albaOpExporterAbaqusFile::WriteElementsFile(FILE *file)
 //---------------------------------------------------------------------------
 int albaOpExporterAbaqusFile::WriteMaterialsFile(FILE *file)
 {
-  albaVMEMesh *input = albaVMEMesh::SafeDownCast(m_Input);
-  assert(input);
+	// check this is a valid materials field data: I am assuming that vtk field data
+	// contains only material attributes otherwise this code will not work
+	vtkDataArray *materialsIDArray;
+	vtkDataArray *exArray;
+	vtkDataArray *nuxyArray;
+	vtkDataArray *densArray;
 
-  vtkUnstructuredGrid *inputUGrid = input->GetUnstructuredGridOutput()->GetUnstructuredGridData();
+	if (m_MaterialData)
+	{
+		// try field data
+		materialsIDArray = m_MaterialData->GetArray("material_id");
+		exArray = m_MaterialData->GetArray("EX");
+		nuxyArray = m_MaterialData->GetArray("NUXY");
+		densArray = m_MaterialData->GetArray("DENS");
 
-	vtkFieldData *materialData = GetMaterialData();
+		if (materialsIDArray && exArray && nuxyArray)
+		{
+			// get the number of materials
+			int numberOfMaterials = materialsIDArray->GetNumberOfTuples();
 
-  vtkDataArray *materialsIDArray = NULL;
-
-  // try field data
-  materialsIDArray = materialData->GetArray("material_id");
-
-  if (materialsIDArray != NULL)
-  {
-		albaLogMessage("Found material array in field data");
-
-    // get the number of materials
-    int numberOfMaterials = materialsIDArray->GetNumberOfTuples();
-
-    // get the number of materials properties
-    int numberOfMaterialProperties = materialData->GetNumberOfArrays() - 1; // 1 is the materialsIDArray
-		
-    // gather material properties array names
-    vcl_vector<wxString> materialProperties;
-    for (int arrayID = 0; arrayID < materialData->GetNumberOfArrays(); arrayID++)
-    {
-      wxString arrayName = materialData->GetArray(arrayID)->GetName();
-      if (arrayName != "material_id")
-      {
-        materialProperties.push_back(arrayName);
-      }
-    }
-
-    // For each material
-    for (int i = 0; i < numberOfMaterials; i++)
-    {
-      float matProgress = (m_CurrentProgress + i) / m_TotalElements;
-      m_ProgressHelper->UpdateProgressBar(matProgress * 100);
-
-      int materialID = materialsIDArray->GetTuple(i)[0];
-      double EX, NUXY;
-			bool exFound = false, nuxyFound = false;
-
-      // For each property
-      for (int j = 0; j < numberOfMaterialProperties; j++)
-      {
-        wxString arrayName = materialProperties[j];
-        vtkDataArray *array = materialData->GetArray(arrayName.c_str());
-
-				if (arrayName.compare("EX") == 0)
-				{
-					EX = array->GetTuple(i)[0];
-					exFound = true;
-				}
-
-				if (arrayName.compare("NUXY") == 0)
-				{
-					NUXY = array->GetTuple(i)[0];
-					nuxyFound = true;
-				}
-      }
-
-			if (exFound && nuxyFound)
+			// write each material
+			for (int i = 0; i < numberOfMaterials; i++)
 			{
+				int materialID = materialsIDArray->GetTuple1(i);
+
 				fprintf(file, "*Material, name=Mat_%d\n", materialID);
+
+				if (densArray && i < densArray->GetNumberOfTuples())
+				{
+					fprintf(file, "*Density\n");
+					fprintf(file, "%.8lf,", densArray->GetTuple1(i));
+					fprintf(file, "\n");
+				}
+
 				fprintf(file, "*Elastic\n");
-				fprintf(file, "%.8lf, %.8lf", EX, NUXY);
+				fprintf(file, "%.8lf, %.8lf", exArray->GetTuple1(i), nuxyArray->GetTuple1(i));
 				fprintf(file, "\n");
 			}
-    }  
 
-    m_CurrentProgress += numberOfMaterials;
-  }  
-
-  return ALBA_OK;
+			m_CurrentProgress += numberOfMaterials;
+		}
+	}
+	return ALBA_OK;
 }

@@ -74,6 +74,7 @@
 #include "albaPipePolylineSlice.h"
 #include "albaPipeSurfaceSlice.h"
 #include "albaPipeVolumeArbSlice.h"
+#include "albaPipeVolumeArbOrthoSlice.h"
 #include "albaPipeVolumeOrthoSlice.h"
 #include "albaPipeCompoundVolume.h"
 #include "albaPipeCompoundVolumeFixedScalars.h"
@@ -197,6 +198,7 @@ albaPipeFactoryVME::albaPipeFactoryVME()
   albaPlugPipeMacro(albaVisualPipeCollisionDetection, "Pipe for visualization of collision between 2 surfaces.");
 
 	albaPlugPipeMacro(albaPipeVolumeArbSlice, "albaPipeVolumeArbSlice.");
+	albaPlugPipeMacro(albaPipeVolumeArbOrthoSlice, "albaPipeVolumeArbOrthoSlice.");
 	albaPlugPipeMacro(albaPipeVolumeOrthoSlice, "albaPipeVolumeOrthoSlice.");
 	albaPlugPipeMacro(albaPipeSurfaceSlice, "albaPipeSurfaceSlice.");
   albaPlugPipeMacro(albaPipePolylineSlice, "albaPipePolylineSlice.");

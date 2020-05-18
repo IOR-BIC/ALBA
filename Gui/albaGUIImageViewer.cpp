@@ -44,6 +44,7 @@
 #include "vtkImageData.h"
 #include "vtkImageFlip.h"
 #include "vtkJPEGWriter.h"
+#include "vtkPNGWriter.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkPlaneSource.h"
 #include "vtkPointData.h"
@@ -73,12 +74,16 @@ albaGUIImageViewer::albaGUIImageViewer(albaObserver *Listener, const albaString 
 	m_NextBtn = NULL;
 	m_CheckBtn = NULL;
 
+	m_IsDialogOpened = false;
+
 	m_ImageCheck = 0;
 	m_ImageSelection = 0;
 	m_ImagesList.clear();
 
 	m_TitleDialog = "Image Viewer";
 
+	m_EnableOkButton = false;
+	m_EnablePrintButton = true;
 	m_EnableDeleteButton = false;
 	m_EnableSaveImageButton= false;
 	m_EnableImageCheckButton = false;
@@ -135,6 +140,13 @@ void albaGUIImageViewer::OnEvent(albaEventBase *alba_event)
 
 		}
 		break;
+		case ID_OK:
+		{
+			if (m_EnableOkButton) albaEventMacro(*e);
+
+			HideImageDialog();
+		}
+		break;
 		case ID_IMAGE_PRINT:
 		{
 			if (m_ImageSelection >= 0 && m_ImageSelection < m_ImagesList.size())
@@ -148,6 +160,11 @@ void albaGUIImageViewer::OnEvent(albaEventBase *alba_event)
 		case ID_IMAGE_SAVE:
 		{
 			SaveImageAs();
+		}
+		break;
+		case ID_SAVE_ALL:
+		{
+			SaveAllImages();
 		}
 		break;
 		case ID_IMAGE:
@@ -249,15 +266,21 @@ void albaGUIImageViewer::ShowImageDialog(albaVMEGroup *group, int selection)
 			albaGUIButton *saveBtn = new albaGUIButton(m_Dialog, ID_IMAGE_SAVE, "Save Image As...", wxPoint(-1, -1));
 			saveBtn->SetListener(this);
 			buttonBoxSizer->Add(saveBtn, 0, wxALIGN_CENTER, 0);
+
+			albaGUIButton *saveAllBtn = new albaGUIButton(m_Dialog, ID_SAVE_ALL, "Save All", wxPoint(-1, -1));
+			saveAllBtn->SetListener(this);
+			buttonBoxSizer->Add(saveAllBtn, 0, wxALIGN_CENTER, 0);
 		}
 
-		albaGUILab *printLab = new albaGUILab(m_Dialog, -1, "  ");
-		buttonBoxSizer->Add(printLab, 0, wxALIGN_CENTER, 0);
+		if (m_EnablePrintButton)
+		{
+			albaGUILab *printLab = new albaGUILab(m_Dialog, -1, "  ");
+			buttonBoxSizer->Add(printLab, 0, wxALIGN_CENTER, 0);
 
-		albaGUIButton *printBtn = new albaGUIButton(m_Dialog, ID_IMAGE_PRINT, "Print...", wxPoint(-1, -1));
-		printBtn->SetListener(this);
-		buttonBoxSizer->Add(printBtn, 0, wxALIGN_CENTER, 0);
-
+			albaGUIButton *printBtn = new albaGUIButton(m_Dialog, ID_IMAGE_PRINT, "Print...", wxPoint(-1, -1));
+			printBtn->SetListener(this);
+			buttonBoxSizer->Add(printBtn, 0, wxALIGN_CENTER, 0);
+		}
 
 		if (m_EnableImageCheckButton)
 		{
@@ -267,6 +290,16 @@ void albaGUIImageViewer::ShowImageDialog(albaVMEGroup *group, int selection)
 			m_CheckBtn = new wxCheckBox(m_Dialog, ID_IMAGE_SELECT, "Select", wxPoint(-1, -1));
 			m_CheckBtn->SetValidator(albaGUIValidator(this, ID_IMAGE_SELECT, m_CheckBtn, &m_ImageCheck));
 			buttonBoxSizer->Add(m_CheckBtn, 0, wxALIGN_CENTER, 0);
+		}
+
+		if (m_EnableOkButton)
+		{
+			albaGUILab *okLab = new albaGUILab(m_Dialog, -1, "  ");
+			buttonBoxSizer->Add(okLab, 0, wxALIGN_CENTER, 0);
+
+			albaGUIButton *okBtn = new albaGUIButton(m_Dialog, ID_OK, "OK", wxPoint(-1, -1));
+			okBtn->SetListener(this);
+			buttonBoxSizer->Add(okBtn, 0, wxALIGN_RIGHT, 0);
 		}
 
 		m_Dialog->Add(m_RwiSizer, 0, wxALL);
@@ -282,12 +315,26 @@ void albaGUIImageViewer::ShowImageDialog(albaVMEGroup *group, int selection)
 		m_Dialog->SetPosition(wxPoint(posX, posY));
 	}
 
+	if (m_IsDialogOpened)
+		HideImageDialog();
+
 	if (m_CheckBtn)
 		m_CheckBtn->SetValue(m_ImageCheck);
 
 		UpdateSelectionDialog(selection);
 
 	m_Dialog->ShowModal();
+
+	m_IsDialogOpened = true;
+}
+
+//----------------------------------------------------------------------------
+void albaGUIImageViewer::HideImageDialog()
+{
+	if (m_Dialog)
+		m_Dialog->Hide();
+
+	m_IsDialogOpened = false;
 }
 
 //----------------------------------------------------------------------------
@@ -473,6 +520,22 @@ int albaGUIImageViewer::SaveVMEImage(albaVMEImage *image, wxString imageFileName
 
 			result = OP_RUN_OK;
 		}
+		else if (extension == "png")
+		{
+			vtkPNGWriter *pngWriter;
+			vtkNEW(pngWriter);
+
+			// Save image
+			pngWriter->SetInput(imageData);
+// 			pngWriter->SetPixelPerMeterX(pixelXMeterX);
+// 			pngWriter->SetPixelPerMeterY(pixelXMeterY);
+			pngWriter->SetFileName(imageFileName);
+			pngWriter->Write();
+
+			vtkDEL(pngWriter);
+
+			result = OP_RUN_OK;
+		}
 	}
 
 	return result;
@@ -482,10 +545,13 @@ void albaGUIImageViewer::SaveImageAs()
 {
 	if (m_ImageSelection >= 0 && m_ImageSelection < m_ImagesList.size())
 	{
-		albaString fileNameFullPath = albaGetDocumentsDirectory().c_str();
-		fileNameFullPath.Append("\\NewImage.jpg");
+		albaString fileName = "\\"; 
+		fileName += GetSelectedImageName();
+		fileName += ".png";
 
-		albaString wildc = "JPEG (*.jpg)|*.jpg; |Bitmap (*.bmp)|*.bmp";
+		albaString fileNameFullPath = albaGetDocumentsDirectory().c_str();
+		fileNameFullPath.Append(fileName);
+		albaString wildc = "PNG (*.png)|*.png; |JPEG (*.jpg)|*.jpg; |Bitmap (*.bmp)|*.bmp";
 		wxString newFileName = albaGetSaveFile(fileNameFullPath.GetCStr(), wildc, "Save Image as").c_str();
 
 		if (m_ImagesGroup)
@@ -495,6 +561,41 @@ void albaGUIImageViewer::SaveImageAs()
 
 			if (SaveVMEImage(image, newFileName) == OP_RUN_OK)
 				wxMessageBox("Image Saved!");
+		}
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaGUIImageViewer::SaveAllImages()
+{
+	if (m_ImageSelection >= 0 && m_ImageSelection < m_ImagesList.size())
+	{
+		albaString fileNameFullPath = albaGetDocumentsDirectory().c_str();
+		wxString newdir = albaGetDirName(fileNameFullPath.GetCStr()).c_str();
+		
+		if (m_ImagesGroup)
+		{
+			int immSavedCount = 0;
+			for (int i = 0; i < m_ImagesList.size(); i++)
+			{
+				albaString fileName = "\\";
+				fileName += m_ImagesList[i];
+				fileName += ".png";
+
+				wxString newFileName = newdir;
+				newFileName.append(fileName);
+
+				albaVMEImage *image = (albaVMEImage*)m_ImagesGroup->FindInTreeByName(m_ImagesList[i]);
+
+				if (image != NULL  && SaveVMEImage(image, newFileName) == OP_RUN_OK)
+					immSavedCount++;
+				else
+					wxMessageBox("Error during Image Save");
+			}
+
+			wxString message;
+			message.Printf("%d images Saved!", immSavedCount);
+			wxMessageBox(message);
 		}
 	}
 }

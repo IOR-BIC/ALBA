@@ -1,0 +1,80 @@
+;==========================================================================
+; Program:   AlbaViewer
+; Module:    AlbaViewerInstallerScript.nsi.in
+; Language:  NSIS
+; Date:      $Date: 2019-01-01 12:00:00 $
+; Version:   $Revision: 1.0.0.0 $
+; Authors:   Nicola Vanella
+;==========================================================================
+; Copyright (c) BIC-IOR 2019 (https://github.com/IOR-BIC)
+;
+; This software is distributed WITHOUT ANY WARRANTY; without even
+; the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+; PURPOSE. See the above copyright notice for more information.
+;==========================================================================
+
+!define PRODUCT_NAME "AlbaViewer"
+!define PRODUCT_PUBLISHER "BIC-IOR"
+!define PRODUCT_WEB_SITE "https://github.com/IOR-BIC"
+
+!define PRODUCT_VERSION "@APP_VERSION@"
+!define PRODUCT_EXE_NAME "${PRODUCT_NAME}.exe"
+;!define PRODUCT_MANUAL_DIR "@MANUAL_HTML_DIR@"
+
+!define PRODUCT_EXECUTABLE_OUTPUT_PATH_WIN "@APP_INSTALLER_EXECUTABLE_OUTPUT_DIR_WIN@\Release"
+!define PRODUCT_INSTALLER_DIR_WIN "@APP_INSTALLER_DIR_WIN@"
+
+!include InstallerCommon.nsh
+
+!macro 	EditLicencePage
+	; Change the Defult License Agreement to Look like a Readme Dialog
+		
+	!define MUI_LICENSEPAGE_CHECKBOX
+!macroend
+
+!insertmacro Init_MUI 
+
+!macro AddExtraFiles
+	;Add here extra files
+!macroend
+
+!insertmacro CreateInstaller
+
+Section -Post 
+	!insertmacro WriteRegKeys 	
+	
+	${EnumUsersReg} EraseFirstRun temp.key
+	;Add here extra RegKey
+	
+	;Associate *.alba files with Alba
+	
+	;WriteRegStr HKCR ".msf" "" "MSF File"
+	;WriteRegStr HKCR ".alba" "" "Alba File"
+	;WriteRegStr HKCR "${PRODUCT_NAME}" "" "Alba File"
+	;WriteRegStr HKCR "${PRODUCT_NAME}\shell" "" "open"
+	;WriteRegStr HKCR "Alba File\DefaultIcon" "" "$INSTDIR\Config\AlbaViewer_File.ico"
+
+  ;WriteRegStr HKCR "AlbaViewer File\shell\open\command" "" '"$INSTDIR\bin\${PRODUCT_EXE_NAME}" "%1"'
+	
+SectionEnd
+
+Function "EraseFirstRun"
+	Pop $0
+	ReadRegStr $0 HKU "$0\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" "AppData"
+	${If} $0 != ""
+	Delete "$0\${PRODUCT_NAME}\FirstRun"  
+	${EndIf}
+	
+FunctionEnd
+
+!macro RemoveExtraFiles
+
+	;Remove AlbaViewer File Association	
+	;DeleteRegKey HKCR "AlbaViewer File"
+	;DeleteRegKey HKCR ".alb"
+	;DeleteRegKey HKCR "${PRODUCT_NAME}"
+	
+!macroend
+
+!insertmacro CreateUninstaller 
+

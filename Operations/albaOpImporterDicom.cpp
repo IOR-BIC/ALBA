@@ -43,8 +43,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaGUISettingsAdvanced.h"
 #include "albaVMEItemVTK.h"
 #include "albaDataVector.h"
-#include "albaTransform.h"
-#include "albaTransformFrame.h"
 #include "albaSmartPointer.h"
 #include "albaVMEGroup.h"
 #include "mmaMaterial.h"
@@ -64,7 +62,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkImageData.h"
 #include "vtkRenderer.h"
 #include "albaOpImporterDicomSliceAccHelper.h"
-#include "vtkTransform.h"
 #include "vtkImageData.h"
 #include "vtkTextMapper.h"
 #include "vtkTextProperty.h"
@@ -788,10 +785,10 @@ bool albaOpImporterDicom::LoadDicomFromDir(const char *dicomDirABSPath)
 albaDicomSlice *albaOpImporterDicom::ReadDicomFile(albaString fileName)
 {
 	int dcmCardiacNumberOfImages = -1;
-	std::string dcmModality, dcmStudyInstanceUID, dcmSeriesInstanceUID, dcmScanOptions;
+	std::string dcmModality, dcmStudyInstanceUID, dcmAcquisitionNumber, dcmSeriesInstanceUID, dcmScanOptions;
 	std::string date, description, patientName, birthdate, photometricInterpretation;
 	double dcmTriggerTime = 0;
-	double defaulOrienatation[6] = { 1.0,0.0,0.0,0.0,1.0,1.0 };
+	double defaulOrienatation[6] = { 1.0,0.0,0.0,0.0,1.0,0.0 };
 	double dcmImageOrientationPatient[6];
 	double dcmImagePositionPatient[3] = {0.0,0.0,0.0};
 	int imageSize[2];
@@ -809,6 +806,7 @@ albaDicomSlice *albaOpImporterDicom::ReadDicomFile(albaString fileName)
 	std::set<gdcm::Tag> TagsToRead;
 	TagsToRead.insert(TAG_StudyInstanceUID);
 	TagsToRead.insert(TAG_SeriesInstanceUID);
+	TagsToRead.insert(TAG_AcquisitionNumber);
 	TagsToRead.insert(TAG_ScanOptions);
 	TagsToRead.insert(TAG_ImagePositionPatient);
 	TagsToRead.insert(TAG_ImageOrientationPatient);
@@ -837,6 +835,7 @@ albaDicomSlice *albaOpImporterDicom::ReadDicomFile(albaString fileName)
 	//Read Study-Series IDs
 	dcmStudyInstanceUID = READTAG(TAG_StudyInstanceUID);
 	dcmSeriesInstanceUID = READTAG(TAG_SeriesInstanceUID);
+	dcmAcquisitionNumber = READTAG(TAG_AcquisitionNumber);
 	
 	//Try to read image position patient form Dicom
 	if (dcmDataSet.FindDataElement(TAG_ImagePositionPatient))
@@ -907,6 +906,7 @@ albaDicomSlice *albaOpImporterDicom::ReadDicomFile(albaString fileName)
 	newSlice->SetPhotometricInterpretation(photometricInterpretation.c_str());
 	newSlice->SetSeriesID(dcmSeriesInstanceUID.c_str());
 	newSlice->SetStudyID(dcmStudyInstanceUID.c_str());
+	newSlice->SetAcquisitionNumber(dcmAcquisitionNumber.c_str());
 	newSlice->SetSliceSize(imageSize);
 		
 	return newSlice;
@@ -1091,6 +1091,7 @@ void albaOpImporterDicom::ImportDicomTags()
 	}
 
 	std::set<gdcm::Tag> TagsToRead;
+
 	TagsToRead.insert(TAG_PatientsName);
 	TagsToRead.insert(TAG_PatientsSex);
 	TagsToRead.insert(TAG_PatientsBirthDate);
@@ -1104,6 +1105,19 @@ void albaOpImporterDicom::ImportDicomTags()
 	TagsToRead.insert(TAG_PixelSpacing);
 	TagsToRead.insert(TAG_ProtocolName);
 	TagsToRead.insert(TAG_ManufacturersModelName);
+	TagsToRead.insert(TAG_Modality);
+	TagsToRead.insert(TAG_Manufacturer);
+	TagsToRead.insert(TAG_KVP);
+	TagsToRead.insert(TAG_XRayTubeCurrent);
+	TagsToRead.insert(TAG_FocalSpots);
+	TagsToRead.insert(TAG_FilterType);
+	TagsToRead.insert(TAG_SliceThickness);
+	TagsToRead.insert(TAG_TableHeight);
+	TagsToRead.insert(TAG_ExposureTime);
+	TagsToRead.insert(TAG_SpiralPitchFactor);
+	TagsToRead.insert(TAG_SpacingBetweenSlices);
+	TagsToRead.insert(TAG_ConvolutionKernel);
+
 
 	InsertAppSpecificTagsToReadList(TagsToRead);
 	
@@ -1130,6 +1144,20 @@ void albaOpImporterDicom::ImportDicomTags()
 	READ_AND_SET_TAGARRAY(TAG_SeriesDescription, "SeriesDescription");
 	READ_AND_SET_TAGARRAY(TAG_AcquisitionDate, "AcquisitionDate");
 	READ_AND_SET_TAGARRAY(TAG_ProtocolName, "ProtocolName");
+	READ_AND_SET_TAGARRAY(TAG_Modality, "Modality");
+	READ_AND_SET_TAGARRAY(TAG_Manufacturer, "Manufacturer");
+	READ_AND_SET_TAGARRAY(TAG_ManufacturersModelName, "ManufacturersModelName");
+	READ_AND_SET_TAGARRAY(TAG_KVP, "KVP");
+	READ_AND_SET_TAGARRAY(TAG_XRayTubeCurrent, "XRayTubeCurrent");
+	READ_AND_SET_TAGARRAY(TAG_FocalSpots, "FocalSpots");
+	READ_AND_SET_TAGARRAY(TAG_FilterType, "FilterType");
+	READ_AND_SET_TAGARRAY(TAG_SliceThickness, "SliceThickness");
+	READ_AND_SET_TAGARRAY(TAG_TableHeight, "TableHeight");
+	READ_AND_SET_TAGARRAY(TAG_ExposureTime, "ExposureTime");
+	READ_AND_SET_TAGARRAY(TAG_TotalCollimationWidth, "TotalCollimationWidth");
+	READ_AND_SET_TAGARRAY(TAG_SpiralPitchFactor, "SpiralPitchFactor");
+	READ_AND_SET_TAGARRAY(TAG_SpacingBetweenSlices, "SpacingBetweenSlices");
+	READ_AND_SET_TAGARRAY(TAG_ConvolutionKernel, "ConvolutionKernel");
 
 	ReadAndSetAppSpecificTags(m_TagArray,dcmDataSet);
 
@@ -1359,8 +1387,9 @@ void albaDicomStudy::AddSlice(albaDicomSlice *slice)
 	albaDicomSeries *series = NULL;
 
 	albaString serieID = slice->GetSeriesID();
+	albaString acqusitionNumber = slice->GetAcquisitionNumber();
 	for (int i = 0; i < m_Series.size() && !series; i++)
-		if (serieID == m_Series[i]->GetSerieID())
+		if (serieID == m_Series[i]->GetSerieID() && m_Series[i]->GetAcquisitionNumber() == acqusitionNumber)
 		{
 			series = m_Series[i];
 			break;
@@ -1369,7 +1398,7 @@ void albaDicomStudy::AddSlice(albaDicomSlice *slice)
 	//if the study does not exist we create a new study and push it back on study vector
 	if (series == NULL)
 	{
-		series = new albaDicomSeries(slice->GetSeriesID());
+		series = new albaDicomSeries(serieID,acqusitionNumber);
 		m_Series.push_back(series);
 	}
 

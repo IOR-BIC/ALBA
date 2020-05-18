@@ -1,0 +1,1057 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 6.3.2.2 (Windows)"/>
+	<meta name="created" content="2019-12-03T11:36:03.433000000"/>
+	<meta name="changed" content="2019-12-03T12:13:31.479000000"/>
+	<style type="text/css">
+		@page { margin: 2cm }
+		h1 { margin-bottom: 0.21cm; background: transparent }
+		h1.western { font-family: "Liberation Serif", serif }
+		h1.cjk { font-family: "NSimSun"; font-size: 24pt }
+		h1.ctl { font-family: "Lucida Sans"; font-size: 24pt }
+		p { margin-bottom: 0.25cm; background: transparent; line-height: 115% }
+		h2 { margin-top: 0.35cm; margin-bottom: 0.21cm; background: transparent }
+		h2.western { font-family: "Liberation Serif", serif }
+		h2.cjk { font-family: "NSimSun" }
+		h2.ctl { font-family: "Lucida Sans" }
+		h3 { margin-top: 0.25cm; margin-bottom: 0.21cm; background: transparent }
+		h3.western { font-family: "Liberation Serif", serif }
+		h3.cjk { font-family: "NSimSun" }
+		h3.ctl { font-family: "Lucida Sans" }
+		a:link { so-language: zxx }
+	</style>
+</head>
+<body lang="it-IT" dir="ltr"><p><font size="6" style="font-size: 24pt"><b>User
+Guide</b> </font>
+</p>
+<p align="justify" style="margin-bottom: 0cm">This is a brief manual
+of the AlbaViewer software. It is intended to be a guide to the user,
+and we hope it can help rather than confuse you. Please be aware that
+the manual is work in progress. It may not be complete or updated,
+and we cannot ensure all the information in it is 100% correct. 
+</p>
+<p align="justify" style="margin-bottom: 0cm">AlbaViewer is not
+intended for clinical use, nor for commercial use. It cannot be used
+for commercial purposes (e.g. consultancy), nor redistributed. You
+use it at your own risk, and you are responsible for the
+interpretation of any results. 
+</p>
+<p style="margin-bottom: 0cm; line-height: 100%"><br/>
+
+</p>
+<hr/>
+
+<h1 class="western"><font size="5" style="font-size: 20pt">System
+Requirements </font>
+</h1>
+<p align="justify">To use this software you just need a PC running
+Microsoft Windows (we are sorry but currently other operative systems
+are not supported). The minimum system requirements are: 
+</p>
+<ul>
+	<li><p style="margin-bottom: 0cm">Operating System: Windows (XP or
+	later versions) 
+	</p>
+	<li><p style="margin-bottom: 0cm">Processor: 1.0 GHz 
+	</p>
+	<li><p style="margin-bottom: 0cm">RAM: 1GB (3 GB recommended) 
+	</p>
+	<li><p style="margin-bottom: 0cm">Graphics Card: Compatible with
+	OpenGL 1.2 
+	</p>
+	<li><p>Hard Disk: 40MB 
+	</p>
+</ul>
+<hr/>
+
+<h1 class="western"><font size="5" style="font-size: 20pt">AlbaViewer
+basics: software framework</font> 
+</h1>
+<p align="justify">To allow the user to interact with and visualise
+data, we embedded the core algorithm of AlbaViewer in a software
+framework based on the Visualisation Toolkit (www.vtk.org) and other
+specialised libraries. Within this framework, the main entities
+exposed to users are: 
+</p>
+<ul>
+	<li><p align="justify" style="margin-bottom: 0cm">Data objects,
+	called also Virtual Medical Entities, VMEs for short in the
+	following; 
+	</p>
+	<li><p align="justify" style="margin-bottom: 0cm">Views, that
+	provide interactive visualisation of the VMEs; 
+	</p>
+	<li><p align="justify" style="margin-bottom: 0cm">Operations, that
+	create new VMEs or modify existing ones (special Operations are the
+	Importers, that let you import and convert into a VME almost any
+	biomedical dataset, and the Exporters that can convert the VME into
+	files formatted according to common standards); 
+	</p>
+	<li><p align="justify">Graphical User Interface (GUI) components; 
+	</p>
+</ul>
+<p align="justify">Each session of AlbaViewer , including data, can
+be saved and reloaded. When saving, object properties and
+relationships among objects are stored in an XML file with extension
+.bmt . This .bmt file links to a complementary folder, in which the
+datasets relative to each object are stored in binary format. 
+</p>
+<p align="justify"><br/>
+<br/>
+
+</p>
+<h2 class="western"><font size="4" style="font-size: 16pt">VMEs </font>
+</h2>
+<p align="justify">VMEs provide the data representation. A VME
+represents a data entity. There are many VME types, that can be used
+to represent almost any biomedical image or signal. VMEs are
+organized in a hierarchical tree (VME Tree or data Tree) and they are
+all composed by a dataset, a matrix that defines the pose of the VME
+with respect to its parent in the VME Tree, and a set of metadata
+that provides all the attributes of the VME. 
+</p>
+<h3 class="western" align="justify">Root 
+</h3>
+<p align="justify"><img src="Figures/VME/albaVMERoot.png" name="Immagine1" alt="figure Figures/VME/albaVMERoot.png" align="bottom" width="16" height="15" border="0"/>
+
+Root is the base VME of the datatree. This vme is used as entry point
+for the creation of all other VMEs. This VME cannot be created by the
+user but is created when AlbaViewer is launched or a new .bmt is
+created (<i>Path: File &#8197;&rarr;&#8197; New</i>) 
+</p>
+<h3 class="western" align="justify">Group 
+</h3>
+<p align="justify"><img src="Figures/VME/albaVMEGroup.png" name="Immagine2" alt="figure Figures/VME/albaVMEGroup.png" align="bottom" width="15" height="14" border="0"/>
+
+Group is a VME used for grouping and tree management propouse. You
+can create this VME in the tree contextual menu. The name of the
+group can be changed in the VME tab. 
+</p>
+<h3 class="western" align="justify">Volume Gray 
+</h3>
+<p align="justify"><img src="Figures/VME/albaVMEVolumeGray.png" name="Immagine3" alt="figure Figures/VME/albaVMEVolumeGray.png" align="bottom" width="17" height="18" border="0"/>
+
+Volume is a VME that contains a volumetric 3d dataset tipically
+obtained from a CT or MRI acquisition. The data contained in this
+dataset is stored in a regular grid of voxels. This VME can contains
+two type of data: 
+</p>
+<ul>
+	<li><p align="justify" style="margin-bottom: 0cm">Structured Points:
+	this is a topological and geometrical regular array of points. In
+	this case all voxels have the same size. 
+	</p>
+	<li><p align="justify">Rectilinear Grid: represents a geometric
+	structure that is topologically regular with variable spacing in the
+	three coordinate directions x-y-z. In this case the size of voxels
+	is not constant. 
+	</p>
+</ul>
+<h3 class="western" align="justify"><a name="toc-Subsubsection-5.1.4"></a>
+Mesh 
+</h3>
+<p align="justify"><img src="Figures/VME/albaVMEMesh.png" name="Immagine4" alt="figure Figures/VME/albaVMEMesh.png" align="bottom" width="16" height="18" border="0"/>
+
+albaVMEMesh is a VME that contains an unstructured grid data. This
+VME contains volumetric objects. Three-dimensional meshes are created
+for finite element analysis (FEM) and consist of tetrahedra,
+pyramids, prisms, hexahedra or wedge. 
+</p>
+<h2 class="western" align="justify">Views 
+</h2>
+<p align="justify" style="margin-bottom: 0cm">Views allow data
+examination. There are various views that permit to examine the VMEs.
+A View provides an interactive representation of the VME Tree. For
+each view the system maintains a display list of the VMEs that are
+currently rendered in that view. The Views available in AlbaViewer
+are: Orthoslice and Surface.</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<hr/>
+
+<h1 class="western"><font size="5" style="font-size: 20pt">AlbaViewer
+basics: Graphical User Interface (GUI)</font> 
+</h1>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<h2 class="western">User Interaction 
+</h2>
+<p>In all visualization windows the mouse interaction with the
+available objects happens as follows: 
+</p>
+<ul>
+	<li><p style="margin-bottom: 0cm"><b>left mouse button</b> to <i>rotate</i>
+		</p>
+	<li><p style="margin-bottom: 0cm"><b>shift + left mouse button</b>
+	or <b>central mouse button</b> (or press down the scroll wheel) to
+	<i>translate/pan</i> 
+	</p>
+	<li><p><b>right mouse button </b>or <b>scrool wheel</b> (only on
+	Windows 10) to <i>zoom in/out</i>. 
+	</p>
+	<p></p>
+</ul>
+<p style="margin-bottom: 0cm"><a name="MouseInteraction"></a><img src="Figures/MouseInteraction.png" name="Immagine6" alt="figure Figures/MouseInteraction.png" align="bottom" width="1122" height="219" border="0"/>
+
+</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<hr/>
+
+<h2 class="western">GUI environment 
+</h2>
+<p>The basic structure of the GUI is composed of: 
+</p>
+<ul>
+	<li><p style="margin-bottom: 0cm">Menu Bar 
+	</p>
+	<li><p style="margin-bottom: 0cm">Main Working Area 
+	</p>
+	<li><p style="margin-bottom: 0cm">Lateral Control Panel, showing the
+	VME hierarchical structure 
+	</p>
+	<li><p>Log Panel, for the system messages. 
+	</p>
+</ul>
+<p>Contextual menus (upon clicking right mouse button) are also
+available for Views, VMEs, and for the VME tree. 
+</p>
+<h3 class="western">Menu Bar 
+</h3>
+<ul>
+	<li><p style="margin-bottom: 0cm"><b>File</b> 
+	</p>
+	<p style="margin-bottom: 0cm">This item contains all the commands
+	related to input/output operations; in the application skeleton the
+	basic features are open/save/new commands to respectively load,
+	store, or initialize a new .bmt session file. All
+	importers/exporters will be described in detail in the corresponding
+	sections. 
+	</p>
+	<li><p style="margin-bottom: 0cm"><b>Edit</b> 
+	</p>
+	<p style="margin-bottom: 0cm">This item contains the commands to
+	cut/copy/paste/delete any VME from the tree. Undo/redo commands are
+	also available. Find VME allows the user to search a VME by name in
+	the data tree. Each command has a keyboard shortcut, displayed in
+	the menu. Finally, some settings of the application can be chosen
+	(changes will take effect when the application restarts). 
+	</p>
+	<li><p style="margin-bottom: 0cm"><b>View</b> 
+	</p>
+	<p style="margin-bottom: 0cm">This item contains the list of the
+	available views. To add a new view, simply hit View and select the
+	desired view. It is also possible to select which of the other bars
+	(Toolbar, Log Panel, Control Panel) should be visible in the global
+	application window. All views will be described in detail in the
+	following. 
+	</p>
+</ul>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<h3 class="western">Control Panel 
+</h3>
+<p style="margin-bottom: 0cm">The Control Panel is formed by three
+sub-windows: 
+</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<p style="margin-bottom: 0cm"><b>Data Tree </b>
+</p>
+<p>This sub-window shows the loaded VMEs, with their hierarchical
+structure. For the selected VME three other tabs are active (in the
+bottom part of the Control bar): it shows all VMEs loaded in the
+application, with their hierarchical structure. The user can select
+only one VME at a time. For the selected VME, two other tabs, shown
+below the tree, are active: 
+</p>
+<p><i><b>Visual props</b></i> shows the rendering properties of the
+selected VME according to the active view. 
+</p>
+<p><br/>
+<br/>
+
+</p>
+<ul>
+	<p style="margin-bottom: 0cm"><a name="visualProps"></a><img src="Figures/visualProps.png" name="Immagine7" alt="figure Figures/visualProps.png" align="bottom" width="747" height="646" border="0"/>
+
+		</p>
+</ul>
+<p style="margin-bottom: 0cm"><b>View Settings </b>This sub-window
+shows the settings of the active view. These can be consistently
+different depending on the type of active view. For example, camera
+parameters will be shown when a Surface view is active, slice or
+look-up table settings when an Orthoslice view is active. 
+</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<p style="margin-bottom: 0cm"><a name="viewSettings"></a><img src="Figures/viewSettings.png" name="Immagine9" alt="figure Figures/viewSettings.png" align="bottom" width="747" height="646" border="0"/>
+
+</p>
+<h3 class="western">Contextual Menus (i.e. mouse right-click) 
+</h3>
+<p style="margin-bottom: 0cm">View contextual menu 
+</p>
+<p>It can be activated pressing with right mouse button in any view
+background. It provides specific actions for the active view: 
+</p>
+<ul>
+	<li><p style="margin-bottom: 0cm"><i>Rename view</i> allows to
+	assign a specific name to the current view; 
+	</p>
+	<li><p style="margin-bottom: 0cm"><i>Normal size/maximize</i> allows
+	to restore the size view to maximized or normal; in compound views
+	this command is available for the view as a whole or for the
+	selected sub panel; 
+	</p>
+	<li><p style="margin-bottom: 0cm"><i>Save as image</i> allows to
+	save the content of the view in a standard image format (bmp, jpg,
+	tiff, etc.); in compound views this command is available for the
+	view as a whole or for the selected sub panel; 
+	</p>
+	<li><p><i>Export as VRML</i> allows to save the content of the
+	rendered view in VRML format. 
+	</p>
+</ul>
+<p style="margin-bottom: 0cm"><a name="contextualMenu"></a><img src="Figures/contestualMenu.png" name="Immagine10" alt="figure Figures/contestualMenu.png" align="bottom" width="511" height="631" border="0"/>
+
+</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<p style="margin-bottom: 0cm">VME contextual menu 
+</p>
+<p>It can be activated pressing with right mouse button on any VME
+displayed in any view (provided it is also the one selected in the
+VME tree). It adds to the actions of the View contextual menu, some
+other actions that are specific for the VMEs: 
+</p>
+<ul>
+	<li><p style="margin-bottom: 0cm"><i>Hide</i> removes from the
+	display list the selected VME; 
+	</p>
+	<li><p style="margin-bottom: 0cm"><i>Delete</i> deletes from the
+	Data Tree the selected VME; 
+	</p>
+	<li><p style="margin-bottom: 0cm"><i>Transform</i> launches the
+	Transform operation on the selected VME. 
+	</p>
+	<li><p><i>Visual props</i> opens a GUI exposing the visual
+	properties of the VME according to the selected View, or (in
+	compound views) the view sub-panel. 
+	</p>
+	<li><p></p>
+</ul>
+<p style="margin-bottom: 0cm"><a name="vmeContextualMenu"></a><img src="Figures/vmeContestualMenu.png" name="Immagine11" alt="figure Figures/vmeContestualMenu.png" align="bottom" width="751" height="519" border="0"/>
+
+</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<p style="margin-bottom: 0cm">Tree contextual menu 
+</p>
+<p>It becomes active upon a right mouse click, on any VME in the VME
+tree. It provides the following functionalities: 
+</p>
+<ul>
+	<li><p style="margin-bottom: 0cm"><i>Display</i> <i>(present if a
+	view is opened) </i>This sub menu (Figure&nbsp;<a href="../../../../BIC_64/ALBA/Examples/AlbaViewer/Installer/Help/AlbaViewer_help.html#treeContextualMenuShow">b&darr;</a>)
+	provides the following functionalities used to show/hide VMEs:</p>
+	<ul>
+		<li><p style="margin-bottom: 0cm"><i>Show/Hide</i> show or hide the
+		current VME 
+		</p>
+		<li><p style="margin-bottom: 0cm"><i>Show sub-tree (present if a
+		view is opened)</i> displays in the current view all the VMEs of
+		the sub-tree related to the selected VME; 
+		</p>
+		<li><p style="margin-bottom: 0cm"><i>Show same type</i> it is
+		present if the selected VME can be displayed in the active view. It
+		displays in the current view all the VMEs of the same type of the
+		selected one; 
+		</p>
+		<li><p style="margin-bottom: 0cm"><i>Hide sub-tree</i> removes from
+		visualization in the active view all the VMEs of the sub-tree of
+		the selected VME; 
+		</p>
+		<li><p style="margin-bottom: 0cm"><i>Hide same type</i> removes
+		from visualization in the current view all the VMEs of the same
+		type of the selected one; 
+		</p>
+	</ul>
+	<li><p style="margin-bottom: 0cm"><i>Add Group</i> Adds a Group to
+	the tree, as a son of the selected VME. 
+	</p>
+	<li><p style="margin-bottom: 0cm"><i>Cut </i>Cuts the current VME
+	(and the relative subtree); the VME is removed from the tree and
+	placed in the clipboard. 
+	</p>
+	<li><p style="margin-bottom: 0cm"><i>Copy </i>Copies the current VME
+	(and the relative subtree); the VME is placed in the clipboard, but
+	not removed from the tree. 
+	</p>
+	<li><p style="margin-bottom: 0cm"><i>Paste </i>Pastes the content of
+	the clipboard, a a son of the selected VME. 
+	</p>
+	<li><p style="margin-bottom: 0cm"><i>Delete </i>Deletes the current
+	VME (and the relative subtree). 
+	</p>
+	<li><p style="margin-bottom: 0cm"><i>Reparent to... </i>Reparents
+	the selected VME to another VME, without changing its absolute pose 
+	</p>
+	<li><p style="margin-bottom: 0cm"><i>Sort children nodes</i> Sorts
+	children nodes in alphabetical order. 
+	</p>
+	<li><p style="margin-bottom: 0cm"><i>Keep tree nodes sorted</i>
+	Keeps the alphabetical sorting even when new VMEs are added to the
+	data tree. 
+	</p>
+	<li><p style="margin-bottom: 0cm"><i>Crypt</i> This sub menu
+	(Figure&nbsp;<a href="../../../../BIC_64/ALBA/Examples/AlbaViewer/Installer/Help/AlbaViewer_help.html#treeContextualMenuCrypt">c&darr;</a>)
+	provides the functionalities for VME encrypting:</p>
+	<ul>
+		<li><p style="margin-bottom: 0cm"><i>Crypt</i> Applies encryption
+		to the selected VME; 
+		</p>
+		<li><p style="margin-bottom: 0cm"><i>Enable crypt sub-tree</i>
+		Applies encryption to all VMEs of a sub-tree. 
+		</p>
+		<li><p><i>Disable crypt sub-tree</i> Removes encryption from all
+		VMEs of a sub-tree. 
+		</p>
+	</ul>
+</ul>
+<p style="margin-bottom: 0cm"><a name="treeContextualMenu"></a><img src="Figures/treeContestualMenu.png" name="Immagine12" alt="figure Figures/treeContestualMenu.png" align="bottom" width="276" height="295" border="0"/>
+
+(a) 
+<img src="Figures/vmeContestualMenuShow.png" name="Immagine13" alt="figure Figures/vmeContestualMenuShow.png" align="bottom" width="135" height="127" border="0"/>
+
+(b) 
+<img src="Figures/vmeContestualMenuCrypt.png" name="Immagine14" alt="figure Figures/vmeContestualMenuCrypt.png" align="bottom" width="205" height="72" border="0"/>
+
+(c)&emsp; 
+</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<hr/>
+
+<h2 class="western" style="margin-top: 0cm; margin-bottom: 0cm">Views
+(Menu View) 
+</h2>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<p align="justify" style="margin-bottom: 0cm">Every VME can be
+visualized and managed through a combination of views and operations.
+Many instances of the same view with different VMEs displayed and/or
+different views can be opened at the same time according to the
+user&rsquo;s needs, and to memory usage limits of the computer. Views
+can be single, or composed by different sub-views (visualization
+panels). Each visualization panel views can be (i) perspective, i.e
+visualizing a VME in space through a camera that can be
+roto-translated or zoomed, or (ii) slice, i.e. slicing a VME through
+a defined plane.</p>
+<p align="justify" style="margin-bottom: 0cm"><br/>
+
+</p>
+<p style="margin-bottom: 0cm"><a name="viewMenuViews"></a><img src="Figures/viewMenuViews.png" name="Immagine15" alt="figure Figures/viewMenuViews.png" align="bottom" width="1118" height="603" border="0"/>
+
+</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<p align="justify" style="margin-bottom: 0cm">Special interaction
+objects (Gizmos, i.e. particular handles instantiated by a View or an
+Operation to allow direct interaction with the mouse) are present in
+the slice views to facilitate the definition and the fine tuning of
+the view settings. 
+</p>
+<p align="justify" style="margin-bottom: 0cm"><br/>
+
+</p>
+<p style="margin-bottom: 0cm"><a name="viewMenuGizmo"></a><img src="Figures/viewMenuGizmo.png" name="Immagine16" alt="figure Figures/viewMenuGizmo.png" align="bottom" width="1118" height="631" border="0"/>
+
+</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<h3 class="western" style="margin-top: 0cm; margin-bottom: 0cm">View
+OrthoSlice</h3>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<p>The OrthoSlice View is a compound view made of four panels and
+three gizmos. A perspective panel shows a volume intersected by the
+three orthogonal planes and the other three panels show a parallel
+view of each other slice. The Orthoslice View supports the
+visualization of: 
+</p>
+<ul>
+	<li><p style="margin-bottom: 0cm">Volume, one at a time. Windowing
+	for the volume scalar is available. It applies to all view
+	panels.<br/>
+Volume visual properties (&ldquo;Visual props&rdquo;
+	panel accessible through contextual menu): the user can change or
+	define the LUT of the volume scalars, and its opacity in the
+	visualization; the x,y,z quotes can also be changed manually.</p>
+	<p style="margin-bottom: 0cm"></p>
+	<p style="margin-bottom: 0cm"><a name="Figure-23"></a><a name="orthoslice"></a>
+	<img src="Figures/orthoslice.png" name="Immagine17" alt="figure Figures/Views/orthoslice.png" align="bottom" width="750" height="611" border="0"/>
+
+		</p>
+	<p style="margin-bottom: 0cm"></p>
+	<p style="margin-bottom: 0cm"><a name="orthosliceProps"></a><img src="Figures/orthosliceProps.png" name="Immagine18" alt="figure Figures/Views/orthosliceProps.png" align="bottom" width="841" height="855" border="0"/>
+
+		</p>
+	<p style="margin-bottom: 0cm"></p>
+	<li><p>Mesh, even more than one simultaneously, with a 3D rendering
+	in the perspective view panel, and the sliced contour in the
+	orthogonal slice panels.<br/>
+<br/>
+<br/>
+
+	</p>
+</ul>
+<p>The view properties can be changed from the &ldquo;View settings&rdquo;
+panel: 
+</p>
+<ol>
+	<li><p style="margin-bottom: 0cm">&ldquo;layout&rdquo;: the user can
+	change the layout of the panels in the view. 
+	</p>
+	<li><p style="margin-bottom: 0cm">&ldquo;LUT&rdquo;: the user can
+	set or define the look-up table to be assigned to the scalars of the
+	Volume currently visualized. 
+	</p>
+	<li><p>&ldquo;Snap on grid&rdquo;: the user can select whether to
+	avoid interpolation between slices and perform slice cuts only at
+	values of the original grid. 
+	</p>
+	<p></p>
+</ol>
+<p style="margin-bottom: 0cm"><a name="fig:26"></a><img src="Figures/orthoscliceSetting.png" name="Immagine19" alt="figure Figures/Views/orthoscliceSetting.png" align="middle" width="911" height="757" border="0"/>
+
+</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<h3 class="western" style="margin-top: 0cm; margin-bottom: 0cm">View
+Surface 
+</h3>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<p style="margin-bottom: 0cm">The Surface View is a three-dimensional
+perspective render window. 
+</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<p style="margin-bottom: 0cm"><a name="viewSurface"></a><img src="Figures/surface.png" name="Immagine20" alt="figure Figures/Views/surface.png" align="middle" width="528" height="629" border="0"/>
+
+</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<p>The Surface View supports in AlbaViewer the visualization of: 
+</p>
+<ul>
+	<li><p style="margin-bottom: 0cm">Volumes, displayed only with their
+	bounding box. 
+	</p>
+	<li><p>Mesh (&ldquo;Visual props&rdquo; panel of the control bar,
+	below the VME tree, or &ldquo;Visual props&rdquo; in the contextual
+	menu).</p>
+</ul>
+<p>The view properties can be changed from the &ldquo;View settings&rdquo;
+panel: 
+</p>
+<ul>
+	<li><p style="margin-bottom: 0cm">&ldquo;camera parameters&rdquo;:
+	the user can control the camera with text entries rather than with
+	the mouse, if a predefined exact camera position has to be set; 
+	</p>
+	<li><p style="margin-bottom: 0cm">&ldquo;grid&rdquo; commands make
+	it possible to visualize the grid or the axes and modify their
+	colours 
+	</p>
+	<li><p style="margin-bottom: 0cm">&ldquo;show axes&rdquo; shows or
+	hides the reference system gizmo 
+	</p>
+	<li><p>&ldquo;back color&rdquo; lets the user set the background
+	colour. The other settings below are part of Surface View in ALBA
+	but are of little use in AlbaViewer. 
+	</p>
+	<p></p>
+</ul>
+<p style="margin-bottom: 0cm"><a name="viewSurfaceSettings"></a><img src="Figures/surfaceSettings.png" name="Immagine21" alt="figure Figures/Views/surfaceSettings.png" align="bottom" width="747" height="647" border="0"/>
+
+</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<hr/>
+
+<h1 class="western"><a name="License"></a>License 
+</h1>
+<p><br/>
+<br/>
+
+</p>
+<p align="justify" style="margin-bottom: 0cm">AlbaViewer v1.0 use
+license agreement, license grant and restrictions on use. 
+</p>
+<p align="justify" style="margin-bottom: 0cm">The software named
+AlbaViewer v1.0 and any accompanying documentation, manuals or data
+(hereafter collectively &ldquo;software&rdquo;) is property of
+Istituto Ortopedico Rizzoli and the copyright law protects it. 
+</p>
+<p align="justify" style="margin-bottom: 0cm">A revocable, limited,
+non-transferable, non-assignable, non-exclusive use license is hereby
+granted by Istituto Ortopedico Rizzoli, (hereafter &ldquo;licensor&rdquo;)
+to the user named below (hereafter &ldquo;user&rdquo;) for the
+limited use of the Software as long as the Software is used in
+accordance with all the provisions of this Agreement. 
+</p>
+<p align="justify" style="margin-bottom: 0cm">software is intended
+only for non-commercial research and education. It may not be used in
+relation to any commercial or military activity. software use must be
+acknowledged in all publications, presentations, or documents
+describing work in which software is used. 
+</p>
+<p align="justify" style="margin-bottom: 0cm">It is understood by
+user that software is made available only on the condition that
+software will not be modified in any way or otherwise transformed
+into any other form. user shall not modify, translate, reverse
+engineer, decompile, or disassemble software or any portion of
+software. user shall not distribute software or create and distribute
+derivative works based on software. User shall not duplicate in any
+form, except for archival purposes, the programs, program statements
+or any other materials relating to software supplied by licensor to
+user. 
+</p>
+<p align="justify" style="margin-bottom: 0cm">User shall not remove
+any copyright notices or other proprietary notices or labels from
+software. 
+</p>
+<p align="justify" style="margin-bottom: 0cm">The rights and license
+granted user hereunder to use software are restricted solely and
+exclusively to user and may not be assigned, rented, subleased,
+sub-licensed, sold, offered for sale, transferred, disposed of,
+encumbered or mortgaged. 
+</p>
+<p align="justify" style="margin-bottom: 0cm">Title and all ownership
+and proprietary rights to the software and any derivative works
+thereof (including without limitation copyright, patent, trademark,
+and trade secret rights) shall remain in licensor. 
+</p>
+<p align="justify" style="margin-bottom: 0cm">Since the software is
+provided free of charge, the software is provided on an &ldquo;as is&rdquo;
+basis. Accordingly, licensor does not make and hereby expressly
+disclaims, any and all representations or warranties of any kind with
+respect to the software, including without limitation any implied
+warranties of merchantability, fitness for a particular purpose, and
+non-infringement, and any warranty with respect to the accuracy or
+applicability of the software or of data or algorithms contained in
+the software. 
+</p>
+<p align="justify" style="margin-bottom: 0cm">Licensor accepts no
+responsibility for, and makes no representations as to, the accuracy
+or reliability of any report, output, or data prepared by or with the
+assistance of software. The entire risk as to the use, quality and
+performance of software is born by user. Should software prove
+defective in any way, user, and not licensor, assumes the entire cost
+of any service and repair. licensor is not obligated to render any
+technical assistance or support in the use or operation of software
+or to correct or fix any defects or bugs in the software. 
+</p>
+<p align="justify" style="margin-bottom: 0cm">Under no circumstances
+shall licensor or its affiliates, officers, directors, contractors,
+students, employees and agents, be liable to Licensee or any other
+person for any damages, losses or liabilities whatsoever or any
+general, special, incidental or consequential damages of any
+character, including without limitation damages for loss of good
+will, lost profits, work stoppage, computer failure or malfunction,
+or any and all other monetary damages or losses. In no event shall
+licensor or its affiliates, officers, directors, contractors,
+students, employees, and agents be liable to user with respect to any
+claim or demand made against user by any other person. 
+</p>
+<p align="justify" style="margin-bottom: 0cm">Licensee agrees to
+indemnify and hold licensor, and its affiliates, officers, directors,
+contractors, students, employees, and agents, harmless of, from and
+against all claims, costs, expenses, damages, and liabilities,
+including reasonable attorney&rsquo;s fees, actually or allegedly
+resulting from or incident to the use, operation, or storage of
+software. 
+</p>
+<p align="justify" style="margin-bottom: 0cm">In view of the unique
+and proprietary nature of software, it is understood and agreed that
+licensor&rsquo;s remedies at law for a breach by user of user&rsquo;s
+obligations under this Agreement may be inadequate and that licensor
+shall, in the event of any such breach, be entitled to equitable
+relief (including, without limitation, provisional and permanent
+injunctive relief) in addition to all other remedies provided under
+this Agreement or available to licensor at law. 
+</p>
+<p align="justify" style="margin-bottom: 0cm">The License under this
+Agreement may be terminated at the sole discretion of licensor at any
+time by licensor. The License under this Agreement will automatically
+terminate upon user&rsquo;s failure to comply with any of the terms
+and conditions of this Agreement. Upon termination of the License
+under this Agreement for any reason, user shall make no further use
+of software and user shall destroy all copies of software. 
+</p>
+<p align="justify">AlbaViewer is partially based on ALBA 
+</p>
+<hr/>
+
+<h2 class="western" align="justify"><b>ALBA</b> Licence 
+</h2>
+<p align="left" style="margin-bottom: 0cm">This is an open-source
+copyright as follows: 
+</p>
+<p align="left">Redistribution and use in source and binary forms,
+with or without modification, are permitted provided that the
+following conditions are met: 
+</p>
+<ul>
+	<li><p align="left" style="margin-bottom: 0cm">Redistributions of
+	source code must retain the above copyright notice, this list of
+	conditions and the following disclaimer. 
+	</p>
+	<li><p align="left" style="margin-bottom: 0cm">Redistributions in
+	binary form must reproduce the above copyright notice, this list of
+	conditions and the following disclaimer in the documentation and/or
+	other materials provided with the distribution. 
+	</p>
+	<li><p align="left">Modified source versions must be plainly marked
+	as such, and must not be misrepresented as being the original
+	software. 
+	</p>
+</ul>
+<p align="left" style="margin-bottom: 0cm">This software is provided
+by the copyright holders and contributors &rsquo;as is&rsquo; and any
+express or implied warranties, including, but not limited to, the
+implied warranties of merchantability and fitness for a particular
+purpose are disclaimed. In no event shall the regents or contributors
+be liable for any direct, indirect, incidental, special, exemplary,
+or consequential damages (including, but not limited to, procurement
+of substitute goods or services; loss of use, data, or profits; or
+business interruption) however caused and on any theory of liability,
+whether in contract, strict liability, or tort (including negligence
+or otherwise) arising in any way out of the use of this software,
+even if advised of the possibility of such damage. 
+</p>
+<p align="left" style="margin-bottom: 0cm">Alba is partially based
+on: 
+</p>
+<p align="left" style="margin-bottom: 0cm">Visualization Tool Kit
+(VTK) (<b>1</b>) 
+</p>
+<p align="left" style="margin-bottom: 0cm">wxWindows Library (<b>2</b>)
+</p>
+<p align="left" style="margin-bottom: 0cm">GDCM (Grassroots DICOM)
+(<b>3</b>) 
+</p>
+<p align="left" style="margin-bottom: 0cm">ITK Library (<b>4</b>) 
+</p>
+<p align="left" style="margin-bottom: 0cm">XercesC Library (<b>5</b>)
+</p>
+<p align="left">CRYPTO++ Library (<b>6</b>) 
+</p>
+<ol>
+	<li><p align="left" style="margin-bottom: 0cm"><b>The Visualization
+	Toolkit (VTK) copyright</b></p>
+	<p align="left" style="margin-bottom: 0cm">This is an open-source
+	copyright as follows: Copyright &copy; 1993-2002@ Ken Martin, Will
+	Schroeder, Bill Lorensen. All rights reserved. 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">Redistribution and use in
+	source and binary forms, with or without modification, are permitted
+	provided that the following conditions are met: * Redistributions of
+	source code must retain the above copyright notice, this list of
+	conditions and the following disclaimer. * Redistributions in binary
+	form must reproduce the above copyright notice, this list of
+	conditions and the following disclaimer in the documentation and/or
+	other materials provided with the distribution. * Neither name of
+	Ken Martin, Will Schroeder, or Bill Lorensen nor the names of any
+	contributors may be used to endorse or promote products derived from
+	this software without specific prior written permission. * Modified
+	source versions must be plainly marked as such, and must not be
+	misrepresented as being the original software. 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">This software is provided
+	by the copyright holders and contributors &rsquo;as is&rsquo; and
+	any express or implied warranties, including, but not limited to,
+	the implied warranties of merchantability and fitness for a
+	particular purpose are disclaimed. In no event shall the regents or
+	contributors be liable for any direct, indirect, incidental,
+	special, exemplary, or consequential damages (including, but not
+	limited to, procurement of substitute goods or services; loss of
+	use, data, or profits; or business interruption) however caused and
+	on any theory of liability, whether in contract, strict liability,
+	or tort (including negligence or otherwise) arising in any way out
+	of the use of this software, even if advised of the possibility of
+	such damage. 
+	</p>
+	<li><p align="left" style="margin-bottom: 0cm"><b>wxWindows Library
+	Licence</b></p>
+	<p align="left" style="margin-bottom: 0cm">Copyright (C) 1998 Julian
+	Smart, Robert Roebling [, ...] 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">Everyone is permitted to
+	copy and distribute verbatim copies of this licence document, but
+	changing it is not allowed. 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">wxWindows library licence
+	terms and conditions for copying, distribution and modification 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">This library is free
+	software; you can redistribute it and/or modify it under the terms
+	of the GNU Library General Public Licence as published by the Free
+	Software Foundation; either version 2 of the Licence, or (at your
+	option) any later version. 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">This library is
+	distributed in the hope that it will be useful, but without any
+	warranty; without even the implied warranty of merchantability or
+	fitness for a particular purpose. see the GNU Library General Public
+	Licence for more details. 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">exception notice 
+	</p>
+	<ul>
+		<li><p align="left" style="margin-bottom: 0cm">As a special
+		exception, the copyright holders of this library give permission
+		for additional uses of the text contained in this release of the
+		library as licenced under the wxWindows Library Licence, applying
+		either version 3 of the Licence, or (at your option) any later
+		version of the Licence as published by the copyright holders of
+		version 3 of the Licence document. 
+		</p>
+		<li><p align="left" style="margin-bottom: 0cm">The exception is
+		that you may use, copy, link, modify and distribute under the
+		user&rsquo;s own terms, binary object code versions of works based
+		on the Library. 
+		</p>
+		<li><p align="left" style="margin-bottom: 0cm">If you copy code
+		from files distributed under the terms of the GNU General Public
+		Licence or the GNU Library General Public Licence into a copy of
+		this library, as this licence permits, the exception does not apply
+		to the code that you add in this way. To avoid misleading anyone as
+		to the status of such modified files, you must delete this
+		exception notice from such code and/or adjust the licensing
+		conditions notice accordingly. 
+		</p>
+		<li><p align="left" style="margin-bottom: 0cm">If you write
+		modifications of your own for this library, it is your choice
+		whether to permit this exception to apply to your modifications. If
+		you do not wish that, you must delete the exception notice from
+		such code and/or adjust the licensing conditions notice
+		accordingly. 
+		</p>
+	</ul>
+	<li><p align="left" style="margin-bottom: 0cm"><b>GDCM (Grassroots
+	DICOM) licence</b></p>
+	<p align="left" style="margin-bottom: 0cm">Copyright (c) 2006-2016
+	Mathieu Malaterre Copyright (c) 1993-2005 CREATIS (CREATIS = Centre
+	de Recherche et d&rsquo;Applications en Traitement de l&rsquo;Image)
+	All rights reserved. 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">Redistribution and use in
+	source and binary forms, with or without modification, are permitted
+	provided that the following conditions are met: 
+	</p>
+	<ul>
+		<li><p align="left" style="margin-bottom: 0cm">Redistributions of
+		source code must retain the above copyright notice, this list of
+		conditions and the following disclaimer. 
+		</p>
+		<li><p align="left" style="margin-bottom: 0cm">Redistributions in
+		binary form must reproduce the above copyright notice, this list of
+		conditions and the following disclaimer in the documentation and/or
+		other materials provided with the distribution. 
+		</p>
+		<li><p align="left" style="margin-bottom: 0cm">Neither name of
+		Mathieu Malaterre, or CREATIS, nor the names of any contributors
+		(CNRS, INSERM, UCB, Universite Lyon I), may be used to endorse or
+		promote products derived from this software without specific prior
+		written permission. 
+		</p>
+	</ul>
+	<p align="left" style="margin-bottom: 0cm">This software is provided
+	by the copyright holders and contributors &ldquo;as is&rdquo; and
+	any express or implied warranties, including, but not limited to,
+	the implied warranties of merchantability and fitness for a
+	particular purpose are disclaimed. In no event shall the copyright
+	holder or contributors be liable for any direct, indirect,
+	incidental, special, exemplary, or consequential damages (including,
+	but not limited to, procurement of substitute goods or services;
+	loss of use, data, or profits; or business interruption) however
+	caused and on any theory of liability, whether in contract, strict
+	liability, or tort (including negligence or otherwise) arising in
+	any way out of the use of this software, even if advised of the
+	possibility of such damage. 
+	</p>
+	<li><p align="left" style="margin-bottom: 0cm"><b>ITK Library
+	licence</b></p>
+	<p align="left" style="margin-bottom: 0cm">The Insight Segmentation
+	and Registration Toolkit (ITK) was initially developed under
+	contract to the National Library of Medicine at the National
+	Institutes of Health. ITK is partially derived from VTK and VXL,
+	hence some code is copyrighted accordingly (see VTKCopyright.txt and
+	VXLCopyright.txt).<br/>
+The ITK copyright is as follows:<br/>
+Copyright
+	(c) 1999-2003 Insight Software Consortium All rights
+	reserved.<br/>
+Redistribution and use in source and binary forms,
+	with or without modification, are permitted provided that the
+	following conditions are met: 
+	</p>
+	<ul>
+		<li><p align="left" style="margin-bottom: 0cm">Redistributions of
+		source code must retain the above copyright notice, this list of
+		conditions and the following disclaimer. 
+		</p>
+		<li><p align="left" style="margin-bottom: 0cm">Redistributions in
+		binary form must reproduce the above copyright notice, this list of
+		conditions and the following disclaimer in the documentation and/or
+		other materials provided with the distribution. 
+		</p>
+		<li><p align="left" style="margin-bottom: 0cm">The name of the
+		Insight Software Consortium, or the names of any consortium
+		members, or of any contributors, may not be used to endorse or
+		promote products derived from this software without specific prior
+		written permission. 
+		</p>
+		<li><p align="left" style="margin-bottom: 0cm">Modified source
+		versions must be plainly marked as such, and must not be
+		misrepresented as being the original software. 
+		</p>
+	</ul>
+	<p align="left" style="margin-bottom: 0cm">This software is provided
+	by the copyright holder and contributors &ldquo;as is&rdquo;&rsquo;
+	and any express or implied warranties, including, but not limited
+	to, the implied warranties of merchantability and fitness for a
+	particular purpose are disclaimed. In no event shall the authors or
+	contributors be liable for any direct, indirect, incidental,
+	special, exemplary, or consequential damages (including, but not
+	limited to, procurement of substitute goods or services; loss of
+	use, data, or profits; or business interruption) however caused and
+	on any theory of liability, whether in contract, strict liability,
+	or tort (including negligence or otherwise) arising in any way out
+	of the use of this software, even if advised of the possibility of
+	such damage. 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">See also the ITK web
+	site: <a href="http://www.itk.org/">http://www.itk.org</a> for more
+	information. 
+	</p>
+	<li><p align="left" style="margin-bottom: 0cm"><b>XercesC Library
+	licence</b></p>
+	<p align="left" style="margin-bottom: 0cm">Copyright 1999-2004 The
+	Apache Software Foundation. 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">Licensed under the Apache
+	License, Version 2.0 (the &quot;License&quot;); you may not use this
+	file except in compliance with the License. You may obtain a copy of
+	the License at 
+	</p>
+	<p align="left" style="margin-bottom: 0cm"><a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a>
+		</p>
+	<p align="left" style="margin-bottom: 0cm">Unless required by
+	applicable law or agreed to in writing, software 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">distributed under the
+	License is distributed on an &quot;as is&quot; basis, without
+	warranties or conditions of any kind, either express or implied. See
+	the License for the specific language governing permissions and
+	limitations under the License. 
+	</p>
+	<li><p align="left" style="margin-bottom: 0cm"><b>CRYPTO++ Library
+	licence</b></p>
+	<p align="left" style="margin-bottom: 0cm">Compilation Copyright (c)
+	1995-2003 by Wei Dai. All rights reserved. This copyright applies
+	only to this software distribution package as a compilation, and
+	does not imply a copyright on any particular file in the package. 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">The following files are
+	copyrighted by their respective original authors, and their use is
+	subject to additional licenses included in these files. 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">mars.cpp - Copyright 1998
+	Brian Gladman. 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">All other files in this
+	compilation are placed in the public domain by Wei Dai and other
+	contributors. 
+	</p>
+	<p align="left" style="margin-bottom: 0cm">Permission to use, copy,
+	modify, and distribute this compilation for any purpose, including
+	commercial applications, is hereby granted without fee, subject to
+	the following restrictions: 
+	</p>
+	<ul>
+		<li><p align="left" style="margin-bottom: 0cm">Any copy or
+		modification of this compilation in any form, except in object code
+		form as part of an application software, must include the above
+		copyright notice and this license. 
+		</p>
+		<li><p align="left" style="margin-bottom: 0cm">Users of this
+		software agree that any modification or extension they provide to
+		Wei Dai will be considered public domain and not copyrighted unless
+		it includes an explicit copyright notice. 
+		</p>
+		<li><p align="left" style="margin-bottom: 0cm">Wei Dai makes no
+		warranty or representation that the operation of the software in
+		this compilation will be error-free, and Wei Dai is under no
+		obligation to provide any services, by way of maintenance, update,
+		or otherwise. 
+		</p>
+		<p align="left" style="margin-bottom: 0cm">The software and any
+		documentation are provided &quot;as is&quot; without express or
+		implied warranty including, but not limited to, the implied
+		warranties of merchantability and fitness for a particular purpose.
+		in no event will wei dai or any other contributor be liable for
+		direct, incidental or consequential damages, even if advised of the
+		possibility of such damages. 
+		</p>
+		<li><p align="left" style="margin-bottom: 0cm">Users will not use
+		Wei Dai or any other contributor&rsquo;s name in any publicity or
+		advertising, without prior written consent in each case. 
+		</p>
+		<li><p align="left" style="margin-bottom: 0cm">Export of this
+		software from the United States may require a specific license from
+		the United States Government. It is the responsibility of any
+		person or organization contemplating export to obtain such a
+		license before exporting. 
+		</p>
+		<li><p align="left">Certain parts of this software may be protected
+		by patents. It is the users&rsquo; responsibility to obtain the
+		appropriate licenses before using those parts.<br/>
+If this
+		compilation is used in object code form in an application software,
+		acknowledgement of the author is not required but would be
+		appreciated. The contribution of any useful modifications or
+		extensions to Wei Dai is not required but would also be
+		appreciated. 
+		</p>
+	</ul>
+</ol>
+<p align="left" style="margin-bottom: 0cm; line-height: 100%"><br/>
+
+</p>
+</body>
+</html>

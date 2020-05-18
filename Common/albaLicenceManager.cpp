@@ -49,6 +49,7 @@ albaLicenceManager::albaLicenceManager(wxString appName)
 	m_SecondKey = "";
 	m_RegMail = "";
 	m_RegImagePath = "";
+	SetLicScope(licenceScope::USER_LICENCE);
 }
 
 //----------------------------------------------------------------------------

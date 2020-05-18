@@ -76,6 +76,9 @@
 #include "vtkSphereSource.h"
 #include "vtkALBASmartPointer.h"
 #include "albaPipeMeshSlice.h"
+#include "albaPipeSurfaceTextured.h"
+#include "albaPipeVolumeArbOrthoSlice.h"
+#include "albaPipeVolumeArbSlice.h"
 
 albaCxxTypeMacro(albaViewArbitraryOrthoSlice);
 
@@ -94,6 +97,10 @@ enum ARBITRARY_SUBVIEW_ID
 
 #define AsixToView(a) ( (a) == X ? X_VIEW : ((a) == Y ? Y_VIEW : Z_VIEW))
 
+#define EPSILON 1.5e-5
+
+albaVME *GLO_CurrentVolume;
+
 //----------------------------------------------------------------------------
 albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxes::AXIS_TYPE_ENUM axesType) : albaViewCompoundWindowing(label, 2, 2)
 {
@@ -102,12 +109,11 @@ albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxe
 	m_GizmoRT[0] = m_GizmoRT[1] = m_GizmoRT[2] = NULL;
 	m_View3d   = NULL;
 	m_ViewSlice[0] = m_ViewSlice[1] = m_ViewSlice[2] = NULL;
-	m_SlicerResetMatrix[0] = m_SlicerResetMatrix[1] = m_SlicerResetMatrix[2] = NULL;
-	m_CurrentVolume   = NULL;
-	m_Slicer[0] = m_Slicer[1] = m_Slicer[2] = NULL;
+	m_SlicingResetMatrix[0] = m_SlicingResetMatrix[1] = m_SlicingResetMatrix[2] = NULL;
+	m_InputVolume   = NULL;
 	m_CameraToSlicer[0] = m_CameraToSlicer[1] = m_CameraToSlicer[2] = NULL;
-	m_VolumeVTKDataCenterABSCoords[0] = m_VolumeVTKDataCenterABSCoords[1] = m_VolumeVTKDataCenterABSCoords[2] = 0.0;
-	m_VolumeVTKDataCenterABSCoordinatesReset[0] = m_VolumeVTKDataCenterABSCoordinatesReset[1] = m_VolumeVTKDataCenterABSCoordinatesReset[2] = 0.0;
+	m_SlicingOrigin[0] = m_SlicingOrigin[1] = m_SlicingOrigin[2] = 0.0;
+	m_SlicingOriginReset[0] = m_SlicingOriginReset[1] = m_SlicingOriginReset[2] = 0.0;
 	m_CameraConeVME[0] = m_CameraConeVME[1] = m_CameraConeVME[2] = NULL;
 	for (int i = X; i <= Z; i++)
 	{
@@ -116,13 +122,20 @@ albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxe
 	}
 
 	m_SkipCameraUpdate = 0;
+	m_EnableGPU = false; 
+	m_IsShowingSlicerGizmo = false;
+	for (int i = X; i <= Z; i++)
+	{
+		albaNEW(m_SlicingMatrix[i]);
+	}
 }
 //----------------------------------------------------------------------------
 albaViewArbitraryOrthoSlice::~albaViewArbitraryOrthoSlice()
 {
 	for(int i=X;i<=Z;i++)
 	{
-		albaDEL(m_SlicerResetMatrix[i]);
+		albaDEL(m_SlicingResetMatrix[i]);
+		albaDEL(m_SlicingMatrix[i]);
 		delete(m_CameraToSlicer[i]);
 	}
 }
@@ -130,7 +143,7 @@ albaViewArbitraryOrthoSlice::~albaViewArbitraryOrthoSlice()
 void albaViewArbitraryOrthoSlice::PackageView()
 {
 	m_View3d = new albaViewVTK("",CAMERA_PERSPECTIVE,true,false,0,false,m_AxesType);
-	m_View3d->PlugVisualPipe("albaVMEVolumeGray", "albaPipeBox", MUTEX);
+	m_View3d->PlugVisualPipe("albaVMEVolumeGray", "albaPipeVolumeArbOrthoSlice", MUTEX);
 	m_View3d->PlugVisualPipe("albaVMEGizmo", "albaPipeGizmo", NON_VISIBLE);
 	PlugChildView(m_View3d);
 
@@ -142,7 +155,7 @@ void albaViewArbitraryOrthoSlice::PackageView()
 void albaViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
 {
 	m_ViewSlice[v] = new albaViewVTK("", CAMERA_OS_X + v, true, false, 0, false, m_AxesType);
-	m_ViewSlice[v]->PlugVisualPipe("albaVMEVolumeGray", "albaPipeBox", NON_VISIBLE);
+	m_ViewSlice[v]->PlugVisualPipe("albaVMEVolumeGray", "albaPipeVolumeArbSlice", MUTEX);
 
 	m_ViewSlice[v]->PlugVisualPipe("albaVMEImage", "albaPipeBox", NON_VISIBLE);
 	m_ViewSlice[v]->PlugVisualPipe("albaVMESegmentationVolume", "albaPipeVolumeOrthoSlice");
@@ -162,7 +175,22 @@ void albaViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
 void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 {
 	m_SkipCameraUpdate++;
-	if (vme->IsA("albaVMEGizmo"))
+
+	if (vme->GetOutput()->IsA("albaVMEOutputVolume"))
+	{
+		if (show)
+		{
+			ShowVolume(vme, show);
+			StoreCameraParametersForAllSubviews();
+		}
+		else//if show==false
+		{
+			HideVolume();
+		}
+	}
+	else if ((m_IsShowingSlicerGizmo && vme->IsA("albaVMEGizmo")) || 
+		albaString("AxisRotationFeedbackGizmo").Equals(vme->GetName()) ||
+		albaString("PlaneTranslationFeedbackGizmo").Equals(vme->GetName()))
 	{
 		for (int i = 0; i <= Z; i++)
 		{
@@ -191,9 +219,9 @@ void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 				double surfaceOriginTranslated[3];
 				double normal[3];
 				((albaViewSlice*)m_ChildViewList[view])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-				surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
-				surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
-				surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
+				surfaceOriginTranslated[0] = m_SlicingOrigin[0] + normal[0] * 0.1;
+				surfaceOriginTranslated[1] = m_SlicingOrigin[1] + normal[1] * 0.1;
+				surfaceOriginTranslated[2] = m_SlicingOrigin[2] + normal[2] * 0.1;
 
 				pipeSlice->SetSlice(surfaceOriginTranslated, normal);
 
@@ -204,23 +232,25 @@ void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 		}
 	}
 
-	if (vme->GetOutput()->IsA("albaVMEOutputVolume"))
-	{
-		if (show)
-		{
-			ShowVolume(vme, show);
-			StoreCameraParametersForAllSubviews();
-		}
-		else//if show==false
-		{
-			HideVolume();
-		}
-	}
+	
 
 	if (ActivateWindowing(vme))
 		UpdateWindowing(show, vme);
 
 	m_SkipCameraUpdate--;
+}
+
+//----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::VmeSelect(albaVME *node, bool select)
+{
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeSelect(node, select);
+}
+
+//----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::UpdateConesPosition()
+{
+	for(int i=X;i<=Z;i++)
+	m_CameraConeVME[i]->SetAbsMatrix(*m_GizmoRT[i]->GetAbsPose());
 }
 
 //----------------------------------------------------------------------------
@@ -241,19 +271,19 @@ void albaViewArbitraryOrthoSlice::OnEvent(albaEventBase *alba_event)
 	}
 	else if (alba_event->GetId() == ID_TRANSFORM)
 	{	
-		for (int i = X; i <= Z; i++)
+		albaEvent *e = albaEvent::SafeDownCast(alba_event);
+		vtkMatrix4x4 *  matrix= e->GetMatrix()->GetVTKMatrix();
+		void * sender = alba_event->GetSender();
+		int plane = GetGizmoPlane(sender);
+
+		if (plane >= 0)
 		{
-			if (alba_event->GetSender() == m_GizmoRT[i]->m_GizmoCrossTranslate)
-			{
-				OnEventGizmoTranslate(alba_event, i);
-				return;
-			}
-			else if (alba_event->GetSender() == m_GizmoRT[i]->m_GizmoCrossRotate) // from rotation gizmo
-			{
-				OnEventGizmoRotate(alba_event, i);
-				return;
-			}
+			if (IsGizmoTranslate(sender))
+				OnEventGizmoTranslate(matrix, plane);
+			else 
+				OnEventGizmoRotate(matrix, plane);
 		}
+		else
 			albaEventMacro(*alba_event); 
 	}
 	else
@@ -262,124 +292,100 @@ void albaViewArbitraryOrthoSlice::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::OnEventGizmoTranslate(albaEventBase *alba_event, int side)
+int albaViewArbitraryOrthoSlice::GetGizmoPlane(void *gizmo)
 {
-	switch(alba_event->GetId())
+	for (int i = X; i <= Z; i++)
 	{
-	case ID_TRANSFORM:
-		{    
-			vtkCamera *zViewCamera = ((albaViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera();
-			int orthoPlanes[2];
-			GetOrthoPlanes(side, orthoPlanes);
-
-			PostMultiplyEventMatrixToGizmoCross(alba_event, m_GizmoRT[orthoPlanes[0]]);
-			PostMultiplyEventMatrixToGizmoCross(alba_event, m_GizmoRT[orthoPlanes[1]]);
-
-			// post multiplying matrices coming from the gizmo to the slicers
-			PostMultiplyEventMatrixToSlicers(alba_event);
-
-			albaEvent *e = albaEvent::SafeDownCast(alba_event);
-
-			//compute the incremental translation
-			vtkTransform *tr;
-			vtkNEW(tr);
-			tr->PostMultiply();
-			tr->SetMatrix(e->GetMatrix()->GetVTKMatrix());
-			tr->Update();
-			double translation[3];
-			tr->GetPosition(translation);
-
-			//increase the translation
-			m_VolumeVTKDataCenterABSCoords[0]+=translation[0];
-			m_VolumeVTKDataCenterABSCoords[1]+=translation[1];
-			m_VolumeVTKDataCenterABSCoords[2]+=translation[2];
-			vtkDEL(tr);
-
-			SetSlices();
-		}
-		break;
-
-	default:
-		{
-			albaEventMacro(*alba_event);
-		}
+		if (gizmo == m_GizmoRT[i]->m_GizmoCrossTranslate || gizmo == m_GizmoRT[i]->m_GizmoCrossRotate)
+			return i;
 	}
+	return -1;
+}
+
+//----------------------------------------------------------------------------
+int albaViewArbitraryOrthoSlice::IsGizmoTranslate(void *gizmo)
+{
+	for (int i = X; i <= Z; i++)
+	{
+		if (gizmo == m_GizmoRT[i]->m_GizmoCrossTranslate)
+			return true;
+	}
+	return false;
 }
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::GetOrthoPlanes(int side, int * orthoPlanes)
+void albaViewArbitraryOrthoSlice::OnEventGizmoTranslate(vtkMatrix4x4 *matrix, int planeSkip)
 {
-	if (side == X)
+	double translation[3];
+
+	for (int i = X; i <= Z; i++)
 	{
-		orthoPlanes[0] = Y;
-		orthoPlanes[1] = Z;
+		if (i != planeSkip)
+			PostMultiplyEventMatrix(matrix,i);
 	}
-	else if (side == Y)
-	{
-		orthoPlanes[0] = Z;
-		orthoPlanes[1] = X;
-	}
-	else
-	{
-		orthoPlanes[0] = Y;
-		orthoPlanes[1] = X;
-	}
+
+	UpdateConesPosition();
+
+	albaTransform::GetPosition(matrix, translation);
+
+	//increase the translation
+	m_SlicingOrigin[0] += translation[0];
+	m_SlicingOrigin[1] += translation[1];
+	m_SlicingOrigin[2] += translation[2];
+	
+	SetSlices();
 }
+
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::OnEventGizmoRotate(albaEventBase *alba_event, int side)
+void albaViewArbitraryOrthoSlice::OnEventGizmoRotate(vtkMatrix4x4 *matrix, int planeSkip)
 {
-	switch (alba_event->GetId())
+	for (int i = X; i <= Z; i++)
 	{
-		case ID_TRANSFORM:
-		{
-			// roll the camera based on gizmo
-			albaEvent *event = albaEvent::SafeDownCast(alba_event);
-			vtkMatrix4x4 *mat = event->GetMatrix()->GetVTKMatrix();
-			vtkALBASmartPointer<vtkTransform> tr;
-			tr->SetMatrix(mat);
-
-			int orthoPlanes[2];
-			GetOrthoPlanes(side, orthoPlanes);
-
-			PostMultiplyEventMatrixToGizmoCross(alba_event, m_GizmoRT[orthoPlanes[0]]);
-			PostMultiplyEventMatrixToGizmoCross(alba_event, m_GizmoRT[orthoPlanes[1]]);
-			PostMultiplyEventMatrixToSlicer(alba_event, orthoPlanes[0]);
-			PostMultiplyEventMatrixToSlicer(alba_event, orthoPlanes[1]);
-
-			m_ChildViewList[AsixToView(orthoPlanes[0])]->GetRWI()->GetCamera()->ApplyTransform(tr);
-			m_ChildViewList[AsixToView(orthoPlanes[1])]->GetRWI()->GetCamera()->ApplyTransform(tr);
-
-			SetSlices();
-		}
-		break;
-
-		default:
-		{
-			albaEventMacro(*alba_event);
-		}
+		if (i != planeSkip)
+			PostMultiplyEventMatrix(matrix, i);
 	}
+
+	UpdateConesPosition();
+
+	SetSlices();
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::SetSlices()
 {
-	//update the normal of the cutter plane of the surface
-	albaVME *root = m_CurrentVolume->GetRoot();
-	for (int view = Z_VIEW; view <= Y_VIEW; view++)
+	albaPipeVolumeArbOrthoSlice *pipeOrthoSlice = albaPipeVolumeArbOrthoSlice::SafeDownCast(m_ChildViewList[PERSPECTIVE_VIEW]->GetNodePipe(m_InputVolume));
+
+	if (pipeOrthoSlice == NULL)
+		return;
+	
+	albaVME *root = m_InputVolume->GetRoot();
+		
+	for (int i = X; i <= Z; i++)
 	{
+		//update the normal of the cutter plane of the surface
 		double surfaceOriginTranslated[3];
 		double normal[3];
-		((albaViewSlice*)m_ChildViewList[view])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-		surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
-		surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
-		surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
+		((albaViewSlice*)m_ChildViewList[AsixToView(i)])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+		surfaceOriginTranslated[0] = m_SlicingOrigin[0] + normal[0] * EPSILON;
+		surfaceOriginTranslated[1] = m_SlicingOrigin[1] + normal[1] * EPSILON;
+		surfaceOriginTranslated[2] = m_SlicingOrigin[2] + normal[2] * EPSILON;
 
 		albaVMEIterator *iter = root->NewIterator();
 		for (albaVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 		{
-			albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(m_ChildViewList[view]->GetNodePipe(node));
-			if (pipeSlice)
-				pipeSlice->SetSlice(surfaceOriginTranslated, normal);
+			if (node != m_InputVolume)
+			{
+				albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[AsixToView(i)])->GetNodePipe(node));
+				if (pipeSlice)
+					pipeSlice->SetSlice(surfaceOriginTranslated, normal);
+			}
 		}
 		iter->Delete();
+
+
+		albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[AsixToView(i)])->GetNodePipe(m_InputVolume));
+		if (pipeSlice)
+			pipeSlice->SetSlice(m_SlicingOrigin, normal);
+
+		pipeOrthoSlice->SetSlice(i, m_SlicingOrigin, normal);
 	}
 	CameraUpdate();
 }
@@ -395,19 +401,39 @@ void albaViewArbitraryOrthoSlice::OnEventThis(albaEventBase *alba_event)
 			OnLUTRangeModified();
 		break;
 		case ID_LUT_CHOOSER:
-				OnLUTChooser();
+			OnLUTChooser();
 		break;
 		case ID_RESET:
-				OnReset();
+			OnReset();
 		break;
-		case ID_UPDATE_LUT:
-			UpdateSlicersLUT();
+		case ID_LOAD_FROM_REFSYS:
+			OnLoadFromRefsys();
+		break;
+		case ID_GPUENABLED:
+			SetEnableGPU();
 		break;
 		default:
 			albaViewCompound::OnEvent(alba_event);
 		}
 	}
 }
+
+void albaViewArbitraryOrthoSlice::SetEnableGPU()
+{
+	for (int i = X; i <= Z; i++)
+	{
+		albaPipeVolumeArbSlice *pipeSlice = albaPipeVolumeArbSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[AsixToView(i)])->GetNodePipe(m_InputVolume));
+		if (pipeSlice)
+			pipeSlice->SetEnableGPU(m_EnableGPU);
+	}
+
+	albaPipeVolumeArbOrthoSlice *pipeSlice = albaPipeVolumeArbOrthoSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_InputVolume));
+	if (pipeSlice)
+		pipeSlice->SetEnableGPU(m_EnableGPU);
+
+	CameraUpdate();
+}
+
 //----------------------------------------------------------------------------
 albaView *albaViewArbitraryOrthoSlice::Copy(albaObserver *Listener, bool lightCopyEnabled)
 {
@@ -431,57 +457,30 @@ albaGUI* albaViewArbitraryOrthoSlice::CreateGui()
 
 	m_Gui->Label("");
 	m_Gui->Button(ID_RESET,_("Reset slices"),"");
+	m_Gui->Button(ID_LOAD_FROM_REFSYS, _("Load from Refsys"), "");
+
+	m_Gui->Divider();
+	m_Gui->Bool(ID_GPUENABLED, "Enable GPU Acceleration", &m_EnableGPU, 1, "Enable GPU Acceleration");
 	m_Gui->Divider();
 
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
 	m_Gui->Update();
 		
-	EnableWidgets( (m_CurrentVolume != NULL) );
+	EnableWidgets( (m_InputVolume != NULL) );
 	return m_Gui;
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::VmeRemove(albaVME *vme)
 {
-	if (m_CurrentVolume && vme == m_CurrentVolume) 
+	if (m_InputVolume && vme == m_InputVolume) 
 	{
 		HideVolume();
-		m_CurrentVolume = NULL;
+		m_InputVolume = NULL;
 	}
 
 	Superclass::VmeRemove(vme);
 }
-//----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(albaEventBase *alba_event)
-{  
-	for (int i = 0; i < 3; i++)
-		PostMultiplyEventMatrixToSlicer(alba_event, i);
-}
-//----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(albaEventBase *alba_event, int slicerAxis)
-{  
-	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-	{
-		// handle incoming transform event...
-		vtkTransform *tr = vtkTransform::New();
-		tr->PostMultiply();
-		tr->SetMatrix(m_Slicer[slicerAxis]->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
-		tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
-		tr->Update();
 
-		albaMatrix absPose;
-		absPose.DeepCopy(tr->GetMatrix());
-		absPose.SetTimeStamp(m_Slicer[slicerAxis]->GetTimeStamp());
-
-		if (e->GetArg() == albaInteractorGenericMouse::MOUSE_MOVE)
-		{
-			// ... and update the slicer with the new abs pose
-			m_Slicer[slicerAxis]->SetAbsMatrix(absPose);
-		} 
-
-		// clean up
-		tr->Delete();
-	}
-}
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::UpdateSubviewsCamerasToFaceSlices()
 {
@@ -503,6 +502,45 @@ char ** albaViewArbitraryOrthoSlice::GetIcon()
 }
 
 //----------------------------------------------------------------------------
+albaMatrix* albaViewArbitraryOrthoSlice::GetSlicerMatrix(int axis)
+{
+	return m_GizmoRT[axis]->GetAbsPose();
+}
+
+//----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::SetSlicerMatrix(albaMatrix* matrix)
+{
+	if (matrix == NULL) return;
+	
+	albaMatrix *slicerMatrix = GetSlicerMatrix();
+
+	//We need to find the roto-translation matrix that moves current slicer matrix to the refsys absolute matrix 
+	//We can use the following formula to find the B matrix:
+	//((AB)^-1)*(A) = B^-1
+
+	//In this formula AB is the target, the refsys matrix in this case
+	//A is the current slicer matrix
+	//and B is the transform from current slicer matrix to the refsys
+
+	//Calculating (AB)^-1
+	albaMatrix ABinverse;
+	ABinverse.DeepCopy(matrix);
+	ABinverse.Invert();
+	
+	//Multiplying (AB)^-1 to A to obtain B^-1
+	albaTransform Binverse;
+	Binverse.SetMatrix(ABinverse);
+	Binverse.Concatenate(*slicerMatrix, false);
+
+	//Obtaining the final matrix by inverting Binverse, (B^-1)^-1 = B
+	albaMatrix finalMatrix = Binverse.GetMatrix();
+	finalMatrix.Invert();
+
+	//OnEventGizmoTranslate manages both rotations and translations
+	OnEventGizmoTranslate(finalMatrix.GetVTKMatrix(), -1);
+}
+
+//----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::CreateGuiView()
 {
 	m_GuiView = new albaGUI(this);
@@ -512,7 +550,7 @@ void albaViewArbitraryOrthoSlice::CreateGuiView()
 	m_LutSlider->SetListener(this);
 	m_LutSlider->SetSize(500,24);
 	m_LutSlider->SetMinSize(wxSize(500,24));
-	EnableWidgets(m_CurrentVolume != NULL);
+	EnableWidgets(m_InputVolume != NULL);
 	m_GuiView->Add(m_LutSlider);
 	m_GuiView->Reparent(m_Win);
 }
@@ -527,7 +565,7 @@ void albaViewArbitraryOrthoSlice::EnableWidgets(bool enable)
 		m_Gui->FitGui();
 		m_Gui->Update();
 	}
-
+	 
 	m_LutSlider->Enable(enable);
 }
 //----------------------------------------------------------------------------
@@ -538,23 +576,21 @@ void albaViewArbitraryOrthoSlice::VolumeWindowing(albaVME *volume)
 	data->Update();
 	data->GetScalarRange(sr);
 
-	mmaMaterial *currentSurfaceMaterial = m_Slicer[Z]->GetMaterial();
-	m_ColorLUT = currentSurfaceMaterial->m_ColorLut;
-	assert(m_ColorLUT);
+	mmaVolumeMaterial *currentVolumeMaterial = ((albaVMEOutputVolume *)m_InputVolume->GetOutput())->GetMaterial();
+	m_ColorLUT = currentVolumeMaterial->m_ColorLut;
 	m_LutWidget->SetLut(m_ColorLUT);
-	m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
-	m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
-	m_LutSlider->SetSubRange((long)currentSurfaceMaterial->m_TableRange[0],(long)currentSurfaceMaterial->m_TableRange[1]);
-
-	m_Slicer[Y]->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
-	m_Slicer[Z]->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
+	m_LutSlider->SetRange((long)sr[0], (long)sr[1]);
+	m_LutSlider->SetSubRange((long)currentVolumeMaterial->m_TableRange[0], (long)currentVolumeMaterial->m_TableRange[1]);
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::ShowVolume( albaVME * vme, bool show )
 {
-	if (m_CurrentVolume == vme) return;
+	if (m_InputVolume == vme) return;
 
-	m_CurrentVolume = vme;
+	if (m_InputVolume)
+		GetLogicManager()->VmeShow(m_InputVolume, false);
+
+	m_InputVolume = albaVMEVolumeGray::SafeDownCast(vme);
 
 	wxBusyInfo wait("please wait");
 
@@ -598,13 +634,13 @@ void albaViewArbitraryOrthoSlice::ShowVolume( albaVME * vme, bool show )
 	localToABSTPDF->SetInput(sliceCenterLocalCoordsPolydata);
 	localToABSTPDF->SetTransform(sliceCenterLocalCoordsToABSCoordsTransform);
 	localToABSTPDF->Update();
-	localToABSTPDF->GetOutput()->GetCenter(m_VolumeVTKDataCenterABSCoords);
-	localToABSTPDF->GetOutput()->GetCenter(m_VolumeVTKDataCenterABSCoordinatesReset);
+	localToABSTPDF->GetOutput()->GetCenter(m_SlicingOrigin);
+	localToABSTPDF->GetOutput()->GetCenter(m_SlicingOriginReset);
 
 	vtkTransform *transformReset;
 	vtkNEW(transformReset);
 	transformReset->Identity();
-	transformReset->Translate(m_VolumeVTKDataCenterABSCoordinatesReset);
+	transformReset->Translate(m_SlicingOriginReset);
 	transformReset->RotateZ(m_VolumeVTKDataABSOrientation[2]);
 	transformReset->RotateX(m_VolumeVTKDataABSOrientation[0]);
 	transformReset->RotateY(m_VolumeVTKDataABSOrientation[1]);
@@ -621,8 +657,9 @@ void albaViewArbitraryOrthoSlice::ShowVolume( albaVME * vme, bool show )
 			slicerTransform->RotateX(90);
 		slicerTransform->Update();
 
-		albaNEW(m_SlicerResetMatrix[i]);
-		m_SlicerResetMatrix[i]->DeepCopy(slicerTransform->GetMatrix());
+		albaNEW(m_SlicingResetMatrix[i]);
+		m_SlicingResetMatrix[i]->DeepCopy(slicerTransform->GetMatrix());
+		m_SlicingMatrix[i]->DeepCopy(m_SlicingResetMatrix[i]);
 	}
 
 	ShowSlicers(vme, show);
@@ -634,7 +671,6 @@ void albaViewArbitraryOrthoSlice::ShowVolume( albaVME * vme, bool show )
 	vtkDEL(transformReset);
 
 	VolumeWindowing(vme);
-	UpdateSlicersLUT();
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::HideVolume()
@@ -642,22 +678,21 @@ void albaViewArbitraryOrthoSlice::HideVolume()
 	OnReset();
 
 	EnableWidgets(false);
+	
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_InputVolume, false);
 	for(int i=X; i<=Z; i++)
 	{
 		VmeShow(m_CameraConeVME[i], false);
-		VmeShow(m_Slicer[i], false);
+		m_ChildViewList[AsixToView(i)]->VmeShow(m_InputVolume, false);
 		m_CameraConeVME[i]->ReparentTo(NULL);
 		m_GizmoRT[i]->Show(false);
 
 		m_CameraToSlicer[i]->SetVme(NULL);
-		m_Slicer[i]->SetBehavior(NULL);
-		m_Slicer[i]->ReparentTo(NULL);
 		albaDEL(m_CameraConeVME[i]);
-		albaDEL(m_Slicer[i]);
-		albaDEL(m_SlicerResetMatrix[i]);
+		albaDEL(m_SlicingResetMatrix[i]);
 	}
 
-	m_CurrentVolume = NULL;
+	m_InputVolume = NULL;
 	m_ColorLUT = NULL;
 	m_LutWidget->SetLut(m_ColorLUT);
 }
@@ -666,87 +701,84 @@ void albaViewArbitraryOrthoSlice::OnReset()
 {
 	for (int i = X; i <= Z; i++)
 	{
-		m_GizmoRT[i]->SetAbsPose(m_SlicerResetMatrix[i]);
-		m_Slicer[i]->SetAbsMatrix(*m_SlicerResetMatrix[i]);
+		m_GizmoRT[i]->SetAbsPose(m_SlicingResetMatrix[i]);
+		m_SlicingMatrix[i]->DeepCopy(m_SlicingResetMatrix[i]);
+		m_SlicingOrigin[i] = m_SlicingOriginReset[i];
 	}
 
 	RestoreCameraParametersForAllSubviews();
+	SetSlices();
+	UpdateConesPosition();
+
+	CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::OnLUTRangeModified()
 {
-	albaVME *vme = GetSceneGraph()->GetSelectedVme();
-
-	if( m_CurrentVolume)
-		UpdateSlicersLUT();
+	if (m_InputVolume)
+	{
+		double low, hi;
+		m_LutSlider->GetSubRange(&low, &hi);
+		m_ColorLUT->SetTableRange(low, hi);
+		GetLogicManager()->CameraUpdate();
+	}
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::OnLUTChooser()
 {
-	double *sr;
+	if (m_InputVolume)
+	{
+		double *sr;
 
-	if(m_CurrentVolume ) {
 		sr = m_ColorLUT->GetRange();
-		m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
-
-		m_Slicer[X]->GetMaterial()->m_ColorLut->DeepCopy(m_ColorLUT);
-		m_Slicer[X]->GetMaterial()->m_ColorLut->Modified();
-		m_Slicer[Y]->GetMaterial()->m_ColorLut->DeepCopy(m_ColorLUT);
-		m_Slicer[Y]->GetMaterial()->m_ColorLut->Modified();
-
-		CameraUpdate();
+		m_LutSlider->SetSubRange((long)sr[0], (long)sr[1]);
 	}
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::ShowSlicers(albaVME * vmeVolume, bool show)
 {
+	m_IsShowingSlicerGizmo = true;
 	char slicerNames[3][10] = { "m_SlicerX","m_SlicerY","m_SlicerZ" };
 	char gizmoNames[3][13] = { "m_GizmoXView","m_GizmoYView","m_GizmoZView" };
 	enum albaGizmoCrossRotateTranslate::COLOR gizmoColors[3][2] = { { albaGizmoCrossRotateTranslate::GREEN, albaGizmoCrossRotateTranslate::BLUE },
 																																 { albaGizmoCrossRotateTranslate::BLUE,  albaGizmoCrossRotateTranslate::RED },
 																																 { albaGizmoCrossRotateTranslate::GREEN, albaGizmoCrossRotateTranslate::RED } };
 
-	EnableWidgets((m_CurrentVolume != NULL));
+	EnableWidgets((m_InputVolume != NULL));
 	// register sliced volume
 	m_InputVolume = albaVMEVolumeGray::SafeDownCast(vmeVolume);
 	assert(m_InputVolume);
 
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_InputVolume, show);
+	
 	for (int i = X; i <= Z; i++)
 	{
-		if(m_Slicer[i]==NULL)
-			albaNEW(m_Slicer[i]);
-		m_Slicer[i]->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 0.0));
-		m_Slicer[i]->SetName(slicerNames[i]);
-		m_Slicer[i]->ReparentTo(vmeVolume);
-		m_Slicer[i]->SetAbsMatrix(*m_SlicerResetMatrix[i]);
-		m_Slicer[i]->SetSlicedVMELink(vmeVolume);
-		m_Slicer[i]->SetUpdateVTKPropertiesFromMaterial(false);
-		m_Slicer[i]->GetMaterial()->m_ColorLut->DeepCopy(albaVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
-		m_Slicer[i]->Update();
-		m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_Slicer[i], show);
-		m_ChildViewList[AsixToView(i)]->VmeShow(m_Slicer[i], show);
-		BuildCameraConeVME(i);
+		m_ChildViewList[AsixToView(i)]->VmeShow(m_InputVolume, show);
 		m_CameraToSlicer[i] = new albaAttachCamera(m_Gui, ((albaViewVTK*)m_ChildViewList[AsixToView(i)])->m_Rwi, this);
-		m_CameraToSlicer[i]->SetStartingMatrix(m_Slicer[i]->GetOutput()->GetAbsMatrix());
-		m_CameraToSlicer[i]->SetVme(m_Slicer[Z]);
+		m_CameraToSlicer[i]->SetStartingMatrix(m_SlicingResetMatrix[i]);
+		m_CameraToSlicer[i]->SetVme(m_InputVolume);
+		m_CameraToSlicer[i]->SetAttachedMatrix(m_SlicingMatrix[i]->GetVTKMatrix());
 		m_CameraToSlicer[i]->EnableAttachCamera();
 
+		BuildCameraConeVME(i);
 	}
 
+	SetEnableGPU();
 	ResetCameraToSlices();
+	SetSlices();
 		
 	for (int i = X; i <= Z; i++)
 	{
 		if(m_GizmoRT[i]==NULL)
 		{
 			m_GizmoRT[i] = new albaGizmoCrossRotateTranslate();
-			m_GizmoRT[i]->Create(m_Slicer[i], this, true, i);
+			m_GizmoRT[i]->Create(m_InputVolume, this, true, i);
 		}
 
 		m_GizmoRT[i]->SetName(gizmoNames[i]);
-		m_GizmoRT[i]->SetInput(m_Slicer[i]);
-		m_GizmoRT[i]->SetRefSys(m_Slicer[i]);
-		m_GizmoRT[i]->SetAbsPose(m_SlicerResetMatrix[i]);
+		m_GizmoRT[i]->SetInput(m_InputVolume);
+		m_GizmoRT[i]->SetRefSys(m_InputVolume);
+		m_GizmoRT[i]->SetAbsPose(m_SlicingResetMatrix[i]);
 		m_GizmoRT[i]->SetColor(albaGizmoCrossRotateTranslate::GREW, gizmoColors[i][0]);
 		m_GizmoRT[i]->SetColor(albaGizmoCrossRotateTranslate::GTAEW, gizmoColors[i][0]);
 		m_GizmoRT[i]->SetColor(albaGizmoCrossRotateTranslate::GTPEW, gizmoColors[i][0]);
@@ -754,26 +786,29 @@ void albaViewArbitraryOrthoSlice::ShowSlicers(albaVME * vmeVolume, bool show)
 		m_GizmoRT[i]->SetColor(albaGizmoCrossRotateTranslate::GTANS, gizmoColors[i][1]);
 		m_GizmoRT[i]->SetColor(albaGizmoCrossRotateTranslate::GTPNS, gizmoColors[i][1]);
 		m_GizmoRT[i]->Show(true);
-		m_Slicer[i]->SetVisibleToTraverse(false);
 	}
 
+	UpdateConesPosition();
 	UpdateSubviewsCamerasToFaceSlices();
 	CreateViewCameraNormalFeedbackActors();
+
+	m_IsShowingSlicerGizmo = false;
 }
+
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::BuildCameraConeVME(int side)
 {
 	char coneNames[3][12] = { "ConeXCamera","ConeYCamera","ConeZCamera" };
 	double col[3][3] = { { 1,0,0 },{ 0,1,0 },{ 0,0,1 } };
 	double b[6];
-	m_CurrentVolume->GetOutput()->GetVMELocalBounds(b);
+	m_InputVolume->GetOutput()->GetVMELocalBounds(b);
 
 	double p1[3] = { b[0], b[2], b[4] };
 	double p2[3] = { b[1], b[3], b[5] };
 	double coneRadius = sqrt(vtkMath::Distance2BetweenPoints(p1, p2)) / 10.0;
 
 	vtkConeSource *cameraConeSource = vtkConeSource::New();
-	cameraConeSource->SetCenter(0, 0, b[(side * 2) + 1] / 2 + coneRadius / 2);
+	cameraConeSource->SetCenter(0, 0, coneRadius*2.0);
 	cameraConeSource->SetResolution(20);
 	cameraConeSource->SetDirection(0, 0, -1);
 
@@ -789,7 +824,7 @@ void albaViewArbitraryOrthoSlice::BuildCameraConeVME(int side)
 	// DEBUG
 	m_CameraConeVME[side]->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 0.0));
 	m_CameraConeVME[side]->SetName(coneNames[side]);
-	m_CameraConeVME[side]->SetData(cameraConeSource->GetOutput(), m_CurrentVolume->GetTimeStamp());
+	m_CameraConeVME[side]->SetData(cameraConeSource->GetOutput(), m_InputVolume->GetTimeStamp());
 	m_CameraConeVME[side]->SetVisibleToTraverse(false);
 
 	m_CameraConeVME[side]->GetMaterial()->m_Prop->SetColor(col[side]);
@@ -799,8 +834,8 @@ void albaViewArbitraryOrthoSlice::BuildCameraConeVME(int side)
 	m_CameraConeVME[side]->GetMaterial()->m_Prop->SetOpacity(0.2);
 
 	// default slicer matrix rotation component is identity when the input volume has identity pose matrix
-	if (m_CameraConeVME[side]->GetParent() != m_Slicer[side])
-		m_CameraConeVME[side]->ReparentTo(m_Slicer[side]);
+	if (m_CameraConeVME[side]->GetParent() != m_InputVolume)
+		m_CameraConeVME[side]->ReparentTo(m_InputVolume);
 
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_CameraConeVME[side], true);
 
@@ -829,29 +864,33 @@ bool albaViewArbitraryOrthoSlice::BelongsToNormalGizmo( albaVME * vme, int side)
 }
 
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::PostMultiplyEventMatrixToGizmoCross( albaEventBase * inputEvent , albaGizmoCrossRotateTranslate *targetGizmo )
+void albaViewArbitraryOrthoSlice::PostMultiplyEventMatrix(vtkMatrix4x4 * matrix, int slicerAxis)
 {
-	albaEvent *e = albaEvent::SafeDownCast(inputEvent);
-
 	vtkTransform *tr1 = vtkTransform::New();
 	tr1->PostMultiply();
-	tr1->SetMatrix(targetGizmo->GetAbsPose()->GetVTKMatrix());
-	tr1->Concatenate(e->GetMatrix()->GetVTKMatrix());
+	tr1->SetMatrix(m_GizmoRT[slicerAxis]->GetAbsPose()->GetVTKMatrix());
+	tr1->Concatenate(matrix);
 	tr1->Update();
 
 	albaMatrix absPose;
 	absPose.DeepCopy(tr1->GetMatrix());
-	absPose.SetTimeStamp(m_GizmoRT[1]->GetAbsPose()->GetTimeStamp());
+	absPose.SetTimeStamp(m_GizmoRT[slicerAxis]->GetAbsPose()->GetTimeStamp());
+	
+	// ... and update the slicer with the new abs pose
+	
+	m_GizmoRT[slicerAxis]->SetAbsPose(&absPose);
+	m_SlicingMatrix[slicerAxis]->DeepCopy(m_GizmoRT[slicerAxis]->GetAbsPose());
 
-	targetGizmo->SetAbsPose(&absPose);
+	m_CameraToSlicer[slicerAxis]->UpdateCameraMatrix();
 
 	vtkDEL(tr1);
 }
+
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::ResetCameraToSlices()
 {
 	for(int i=0;i<=Z;i++)
-		((albaViewVTK*)m_ChildViewList[AsixToView(i)])->CameraReset(m_Slicer[i]);
+		((albaViewVTK*)m_ChildViewList[AsixToView(i)])->CameraReset(m_InputVolume);
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::StoreCameraParametersForAllSubviews()
@@ -874,18 +913,7 @@ void albaViewArbitraryOrthoSlice::RestoreCameraParametersForAllSubviews()
 		xViewCamera->SetViewUp(m_CameraViewUpForReset[i]);
 	}
 }
-//----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::UpdateSlicers(int axis)
-{
-	m_Slicer[axis]->SetAbsMatrix(m_Slicer[axis]->GetAbsMatrixPipe()->GetMatrix());
-	m_Slicer[axis]->GetSurfaceOutput()->GetVTKData()->Modified();
-	m_Slicer[axis]->GetSurfaceOutput()->GetVTKData()->Update();
-}
-//----------------------------------------------------------------------------
-albaPipeSurface * albaViewArbitraryOrthoSlice::GetPipe(int inView, albaVMESurface *inSurface)
-{
-	return (albaPipeSurface *)((m_ChildViewList[inView])->GetNodePipe(inSurface));
-}
+
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::CreateViewCameraNormalFeedbackActors()
 {
@@ -931,24 +959,58 @@ void albaViewArbitraryOrthoSlice::CreateViewCameraNormalFeedbackActors()
 	}
 }
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::UpdateSlicersLUT()
-{
-	double low, hi;
-	m_LutSlider->GetSubRange(&low,&hi);
-	m_ColorLUT->SetTableRange(low,hi);
-
-	for (int i = X; i <= Z; i++)
-	{
-		albaVMEOutputSurface *surfaceOutputSlicer = albaVMEOutputSurface::SafeDownCast(m_Slicer[i]->GetOutput());
-		surfaceOutputSlicer->Update();
-		surfaceOutputSlicer->GetMaterial()->m_ColorLut->SetTableRange(low, hi);
-	}
-
-	CameraUpdate();
-}
-//----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::UpdateWindowing(bool enable,albaVME *vme)
 {
 	if(vme->GetOutput() && vme->GetOutput()->IsA("albaVMEOutputVolume") && enable)
 		VolumeWindowing(vme);
+}
+
+//----------------------------------------------------------------------------
+bool albaViewArbitraryOrthoSlice::AcceptRefSys(albaVME *node)
+{
+	if (GLO_CurrentVolume == NULL || !node->IsA("albaVMERefSys"))
+		return false;
+
+	double bounds[6];
+	GLO_CurrentVolume->GetOutput()->GetBounds(bounds);
+	double pos[3];
+	albaTransform::GetPosition(*node->GetOutput()->GetAbsMatrix(), pos);
+
+	return ((pos[0] >= bounds[0]) && (pos[0] <= bounds[1]) && \
+		(pos[1] >= bounds[2]) && (pos[1] <= bounds[3]) && \
+		(pos[2] >= bounds[4]) && (pos[2] <= bounds[5]));
+}
+
+//----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::OnLoadFromRefsys()
+{
+	GLO_CurrentVolume = m_InputVolume;
+	albaString title = _("Choose RefSys");
+	albaEvent e;
+	e.SetId(VME_CHOOSE);
+	e.SetPointer(&albaViewArbitraryOrthoSlice::AcceptRefSys);
+	e.SetString(&title);
+	albaEventMacro(e);
+	albaVME *n = e.GetVme();
+	
+	if (n != NULL)
+		SetSlicerMatrix(n->GetOutput()->GetAbsMatrix());
+}
+//----------------------------------------------------------------------------
+albaViewVTK * albaViewArbitraryOrthoSlice::GetViewArbitrary()
+{
+	return (albaViewVTK*)m_ChildViewList[PERSPECTIVE_VIEW];
+}
+//----------------------------------------------------------------------------
+albaViewVTK * albaViewArbitraryOrthoSlice::GetViewSlice(int axis)
+{
+	return (albaViewVTK*)m_ChildViewList[AsixToView(axis)];
+}
+//----------------------------------------------------------------------------
+albaPipe* albaViewArbitraryOrthoSlice::GetPipeSlice(int axis)
+{
+	albaPipe *pipeSlice = NULL;
+	pipeSlice = GetViewSlice(axis)->GetNodePipe(m_InputVolume);
+
+	return pipeSlice;
 }

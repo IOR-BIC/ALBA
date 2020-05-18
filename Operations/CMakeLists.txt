@@ -26,6 +26,7 @@ IF (ALBA_USE_VTK)
 	albaOpCreateSurfaceParametric.cpp	albaOpCreateSurfaceParametric.h
 	albaOpCreateProber.cpp	    				albaOpCreateProber.h
 	albaOpCreateRefSys.cpp	    				albaOpCreateRefSys.h
+	albaOpCreateRefSysFromViewSlice.cpp	albaOpCreateRefSysFromViewSlice.h
 	albaOpCreateSlicer.cpp	    				albaOpCreateSlicer.h
 	albaOpCreateSpline.cpp	    				albaOpCreateSpline.h
 	albaOpCreateVolume.cpp	    				albaOpCreateVolume.h
@@ -46,7 +47,9 @@ IF (ALBA_USE_VTK)
 	albaOpImporterRAWVolume.cpp	    	albaOpImporterRAWVolume.h
 	albaOpReparentTo.cpp	    					albaOpReparentTo.h
 	albaOpExporterSTL.cpp	  		  		albaOpExporterSTL.h
+	albaOpExporterPLY.cpp	  		  		albaOpExporterPLY.h
 	albaOpImporterSTL.cpp	  		  		albaOpImporterSTL.h
+	albaOpImporterPLY.cpp	  		  		albaOpImporterPLY.h
 	albaOpTransformInterface.cpp	    	albaOpTransformInterface.h
 	albaOpValidateTree.cpp	    				albaOpValidateTree.h
 	albaOpVOIDensity.cpp	    					albaOpVOIDensity.h
@@ -151,6 +154,10 @@ IF (ALBA_USE_VTK)
 	albaOpExporterLandmarkWS.cpp	albaOpExporterLandmarkWS.h
 	  
 	albaOpExporterFEMCommon.cpp	albaOpExporterFEMCommon.h
+	
+	albaOpESPCalibration.cpp		albaOpESPCalibration.h
+	
+	albaOpExtractImageFromArbitraryView.cpp		albaOpExtractImageFromArbitraryView.h
   )
 ENDIF (ALBA_USE_VTK)
 

@@ -33,8 +33,8 @@ PURPOSE.  See the above copyright notice for more information.
 // .SECTION See Also
 // vtkGeometryFilter vtkExtractGeometry vtkExtractGrid
 
-#ifndef __vtkALBAProjectRG_h
-#define __vtkALBAProjectRG_h
+#ifndef __vtkALBAProjectVolume_h
+#define __vtkALBAProjectVolume_h
 
 #include "vtkDataSetToDataSetFilter.h"
 #include "albaConfigure.h"
@@ -42,6 +42,9 @@ PURPOSE.  See the above copyright notice for more information.
 #define VTK_PROJECT_FROM_X 1
 #define VTK_PROJECT_FROM_Y 2
 #define VTK_PROJECT_FROM_Z 3
+
+#define VTK_PROJECT_MEAN 1
+#define VTK_PROJECT_MAX 2
 
 class vtkDataArray;
 class vtkImageData;
@@ -64,28 +67,46 @@ Class Name: vtkALBAProjectVolume.
 class ALBA_EXPORT vtkALBAProjectVolume : public vtkDataSetToDataSetFilter
 {
 public:
-  /** RTTI Macro */
-  vtkTypeRevisionMacro(vtkALBAProjectVolume, vtkDataSetToDataSetFilter);
-  
-  /** Static Function for object instantiation */
-  static vtkALBAProjectVolume *New();
+	/** RTTI Macro */
+	vtkTypeRevisionMacro(vtkALBAProjectVolume, vtkDataSetToDataSetFilter);
 
-  /** Set Projection Direction to X */
-  void SetProjectionModeToX()
-    {this->SetProjectionMode(VTK_PROJECT_FROM_X);};
+	/** Static Function for object instantiation */
+	static vtkALBAProjectVolume *New();
+
+	/** Set Projection Direction to X */
+	void SetProjectionSideToX()
+	{
+		this->SetProjectionSide(VTK_PROJECT_FROM_X);
+	};
+
+	/** Set Projection Direction to Y */
+	void SetProjectionSideToY()
+	{
+		this->SetProjectionSide(VTK_PROJECT_FROM_Y);
+	};
+
+	/** Set Projection Direction to Z */
+	void SetProjectionSideToZ()
+	{
+		this->SetProjectionSide(VTK_PROJECT_FROM_Z);
+	};
+
+	/** Set Projection Modality to Mean */
+	void SetProjectionModalityToMean()
+	{
+		this->SetProjectionModality(VTK_PROJECT_MEAN);
+	};
  
-  /** Set Projection Direction to Y */
-  void SetProjectionModeToY()
-    {this->SetProjectionMode(VTK_PROJECT_FROM_Y);};
- 
-  /** Set Projection Direction to Z */
-  void SetProjectionModeToZ()
-    {this->SetProjectionMode(VTK_PROJECT_FROM_Z);};
- 
+	/** Set Projection Modality to Max */
+	void SetProjectionModalityToMax()
+	{
+		this->SetProjectionModality(VTK_PROJECT_MAX);
+	};
+
   /** Retrieve the direction of projection as string */
-  char *GetProjectionModeAsString(void)
+  char *GetProjectionSideAsString(void)
   {
-     switch (this->ProjectionMode) {
+     switch (this->ProjectionSide) {
         case VTK_PROJECT_FROM_X: return "X";
         case VTK_PROJECT_FROM_Y: return "Y";
      }
@@ -95,10 +116,16 @@ public:
 	/** Updated function to avoid extent propagation */
 	virtual void PropagateUpdateExtent(vtkDataObject *output);
 
-  /** Macro for Set Projection Mode */
-  vtkSetMacro(ProjectionMode,int);
-  /** Macro for Get Projection Mode */
-  vtkGetMacro(ProjectionMode,int);
+  /** Macro for Set Projection Side */
+  vtkSetMacro(ProjectionSide,int);
+  /** Macro for Get Projection Side */
+  vtkGetMacro(ProjectionSide,int);
+
+	/** Macro for Set Projection Modality */
+	vtkSetMacro(ProjectionModality, int);
+	/** Macro for Get Projection Modality */
+	vtkGetMacro(ProjectionModality, int);
+
 
 	/** Macro for Set Project Sub Range status */
 	vtkSetMacro(ProjectSubRange, bool);
@@ -134,7 +161,8 @@ protected:
 
 	void GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars);
 
-	int  ProjectionMode;
+	int  ProjectionSide;
+	int	 ProjectionModality;
 	bool ProjectSubRange;
 	int  ProjectionRange[2];
 };

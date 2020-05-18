@@ -42,7 +42,7 @@ class ALBA_EXPORT albaGUIAboutDialog : public albaObserver
 
 public:
 	/** constructor */
-	albaGUIAboutDialog(wxString dialog_title = _("Application Settings"));
+	albaGUIAboutDialog(wxString dialog_title = _("About Dialog"));
 
 	void CreateDialog();
 

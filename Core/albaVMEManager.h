@@ -141,6 +141,9 @@ public:
   /** Set the flag for test mode without GUI */
   void SetTestMode(bool testmode){m_TestMode = testmode;}; // Losi 02/16/2010 for test class
 
+	/** Set the flag for attive controll in Open Alba Project */
+	void IgnoreAppStamp(bool ignore) { m_IgnoreAppStamp = ignore; };
+
 protected:
   /** Create a compressed msf file: zmsf.*/
   bool MakeZip(const albaString &zipname, wxArrayString *files);
@@ -171,6 +174,7 @@ protected:
   albaVMEStorage*      m_Storage;          ///< Associated storage
   bool                m_TestMode;         ///< set true for test mode without GUI
 
+	bool								m_IgnoreAppStamp;   /// Flag used to Open Alba Project File with appStamp verification 
   /** friend test class */
   friend class albaVMEManagerTest; // Losi 02/16/2010 for test class
 };

@@ -354,7 +354,7 @@ class albaDicomSeries
 {
 public:
 
-	albaDicomSeries(albaString seriesID) { m_SeriesID = seriesID;  m_IsRotated = false; m_CardiacImagesNum = 0; }
+	albaDicomSeries(albaString seriesID, albaString acquisitionNumber) { m_SeriesID = seriesID; m_AcquisitionNumber = acquisitionNumber; m_IsRotated = false; m_CardiacImagesNum = 0; }
 
 	~albaDicomSeries();
 
@@ -376,6 +376,9 @@ public:
 	/** Returns SerieID */
 	albaString GetSerieID() const { return m_SeriesID; }
 
+	/** Returns AcquisitionNumber */
+	albaString GetAcquisitionNumber() const { return m_AcquisitionNumber; }
+
 	/** Return the slices dims */
 	const int *GetDimensions() { return m_Dimensions; }
 
@@ -384,7 +387,7 @@ public:
 
 	/** Sort slices internally */
 	void SortSlices();
-		
+
 protected:
 
 	/** Check if Dicom dataset contains rotations */
@@ -393,6 +396,7 @@ protected:
 	std::vector<albaDicomSlice *> m_Slices;
 	int m_Dimensions[3];
 	albaString m_SeriesID;
+	albaString m_AcquisitionNumber;
 	bool m_IsRotated;
 	int m_CardiacImagesNum;
 };
@@ -542,6 +546,13 @@ public:
 	/** Sets SliceSize */
 	void SetSliceSize(int *sliceSize) { m_SliceSize[0] = sliceSize[0]; m_SliceSize[1] = sliceSize[1]; }
 
+
+	/** Returns AcquisitionNumber */
+	albaString GetAcquisitionNumber() const { return m_AcquisitionNumber; }
+
+	/** Sets AcquisitionNumber */
+	void SetAcquisitionNumber(albaString acquisitionNumber) { m_AcquisitionNumber = acquisitionNumber; }
+
 protected:
 
 	/** Compute VTK Scalar Type from Dicom image*/
@@ -561,6 +572,7 @@ protected:
 	albaString m_Modality;
 	albaString m_PhotometricInterpretation;
 	albaString m_SeriesID;
+	albaString m_AcquisitionNumber;
 	albaString m_StudyID;
 
 	double m_TriggerTime;

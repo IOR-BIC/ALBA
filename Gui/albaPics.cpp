@@ -108,6 +108,8 @@ void albaPictureFactory::Initialize()
     albaADDPIC(PIC_RIGHT);
     #include <pic/PIC_TOP.xpm>
     albaADDPIC(PIC_TOP);
+		#include <pic/PIC_ORTHO.xpm>
+		albaADDPIC(PIC_ORTHO);
     #include <pic/TIME_BEGIN.xpm>
     albaADDPIC(TIME_BEGIN);
     #include <pic/TIME_END.xpm>      

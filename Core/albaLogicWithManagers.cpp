@@ -254,8 +254,15 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::Configure()
 {
+	// Fill the SettingsDialog
+	m_SettingsDialog->AddPage(m_ApplicationSettings->GetGui(), m_ApplicationSettings->GetLabel());
+
 	if (m_PlugTimebar)
+	{
 		m_TimeBarSettings = new albaGUISettingsTimeBar(this);
+
+		m_SettingsDialog->AddPage(m_TimeBarSettings->GetGui(), m_TimeBarSettings->GetLabel());
+	}
 
 	if (m_UseVMEManager)
 	{
@@ -265,18 +272,18 @@ void albaLogicWithManagers::Configure()
 		//m_VMEManager->SetSingleBinaryFile(m_StorageSettings->GetSingleFileStatus()!= 0);
 	}
 
-	// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
 	if (m_UseInteractionManager)
 	{
 		m_InteractionManager = new albaInteractionManager();
 		m_InteractionManager->SetListener(this);
-		
+
 		m_Mouse = m_InteractionManager->GetMouseDevice();
 		//SIL m_InteractionManager->GetClientDevice()->AddObserver(this, MCH_INPUT);
-	}
-#endif
 
+		if (m_ShowInteractionSettings)
+			m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
+	}
+	
 	if (m_UseViewManager)
 	{
 		m_ViewManager = new albaViewManager();
@@ -302,16 +309,9 @@ void albaLogicWithManagers::Configure()
 	{
 		m_SnapshotManager = new albaSnapshotManager();
 		m_SnapshotManager->SetMouse(m_Mouse);
+
+		m_SettingsDialog->AddPage(m_SnapshotManager->GetSettingsGui(), "Snapshot");
 	}
-
-	// Fill the SettingsDialog
-	m_SettingsDialog->AddPage(m_ApplicationSettings->GetGui(), m_ApplicationSettings->GetLabel());
-
-	if (m_ShowInteractionSettings && m_InteractionManager)
-		//m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
-
-		if (m_TimeBarSettings)
-			m_SettingsDialog->AddPage(m_TimeBarSettings->GetGui(), m_TimeBarSettings->GetLabel());
 
 	ConfigureWizardManager();
 }
@@ -1257,6 +1257,8 @@ void albaLogicWithManagers::VmeShow(albaVME *vme, bool visibility)
 
 	m_SkipCameraUpdate--;
 	
+	albaYield();
+
 	CameraUpdate();
 }
 //----------------------------------------------------------------------------
@@ -1292,6 +1294,7 @@ void albaLogicWithManagers::VmeAdd(albaVME *vme)
 {
 	if (!vme) 
 		return;
+
 	if(m_VMEManager) 
     m_VMEManager->VmeAdd(vme);
 }
@@ -1378,16 +1381,19 @@ void albaLogicWithManagers::VmeDoubleClicked(albaEvent &e)
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::VmeSelect(albaVME *vme)
 {
-	if (vme != NULL && m_OpManager)
+
+	if (vme != NULL && m_OpManager && m_OpManager->GetSelectedVme()!=vme)
+	{
 		m_OpManager->OpSelect(vme);
 
-	// currently albaInteraction is strictly dependent on VTK (marco)
+		// currently albaInteraction is strictly dependent on VTK (marco)
 #ifdef ALBA_USE_VTK
-	if (m_InteractionManager)
-		m_InteractionManager->VmeSelected(vme);
+		if (m_InteractionManager)
+			m_InteractionManager->VmeSelected(vme);
 #endif
 
-	EnableMenuAndToolbar();
+		EnableMenuAndToolbar();
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -1547,24 +1553,27 @@ void albaLogicWithManagers::OpRunStarting()
 {
 	m_RunningOperation = true;
   EnableMenuAndToolbar();
-// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-  if(m_InteractionManager) m_InteractionManager->EnableSelect(false);
-#endif
-  if(m_SideBar)    m_SideBar->EnableSelect(false);
+
+  if(m_InteractionManager) 
+		m_InteractionManager->EnableSelect(false);
+
+  if(m_SideBar)    
+		m_SideBar->EnableSelect(false);
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::OpRunTerminated(int runOk)
 {
 	m_RunningOperation = false;
   EnableMenuAndToolbar();
-// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
+
   if(m_InteractionManager) 
     m_InteractionManager->EnableSelect(true);
-#endif
+
   if(m_SideBar)
     m_SideBar->EnableSelect(true);
+
+	if(m_ApplicationSettings->IsAutoSaveOn())
+		OnFileSave();
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::OpShowGui(bool push_gui, albaGUIPanel *panel)
@@ -1576,7 +1585,6 @@ void albaLogicWithManagers::OpHideGui(bool view_closed)
 {
 	if(m_SideBar) m_SideBar->OpHideGui(view_closed);
 }
-
 
 // VIEW //////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
@@ -1648,7 +1656,6 @@ void albaLogicWithManagers::CameraReset()
 	if (m_ViewManager) 
 		m_ViewManager->CameraReset();
 }
-
 
 // WIZARD ////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
@@ -1751,7 +1758,6 @@ void albaLogicWithManagers::WizardRunTerminated()
 	if (m_SideBar)
 		m_SideBar->EnableSelect(true);
 }
-
 
 // MENU-TOOLBAR //////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
@@ -2088,7 +2094,7 @@ void albaLogicWithManagers::ShowSplashScreen()
 void albaLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage)
 {
 	long splash_style = wxSIMPLE_BORDER | wxSTAY_ON_TOP;
-	wxSplashScreen* splash = new wxSplashScreen(splashImage,
+	m_SplashScreen = new wxSplashScreen(splashImage,
 		wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT,
 		2000, NULL, -1, wxDefaultPosition, wxDefaultSize,
 		splash_style);

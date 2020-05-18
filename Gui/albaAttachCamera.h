@@ -84,7 +84,12 @@ public:
   Returns the albaAttachCamera's GUI */
 	albaGUI *GetGui();
 
-  void PrintSelf(ostream& os);
+
+	/** Returns AttachedMatrix */
+	vtkMatrix4x4 * GetAttachedMatrix() const { return m_AttachedMatrix; }
+
+	/** Sets AttachedMatrix */
+	void SetAttachedMatrix(vtkMatrix4x4 * attachedMatrix);
 
 protected:
   
@@ -94,7 +99,8 @@ protected:
 
   int						 m_EnableAttachCamera; ///< Flag to turn On/Off the camera attaching on a particular VME
   albaVME				*m_AttachedVme; ///< VME on which the camera is attached when the attach-camera option is 'On'
-  vtkMatrix4x4	*m_AttachedVmeMatrix; ///< Matrix given to the Camera to be moved together with m_AttachedVme
+	vtkMatrix4x4	*m_AttachedMatrix; ///< Matrix given to the Camera to be moved together with m_AttachedVme
+	vtkMatrix4x4	*m_CurrentMatrix; ///< Matrix given to the Camera to be moved together with m_AttachedVme
   vtkMatrix4x4	*m_StartingMatrix; ///< Matrix given to the Camera to be moved together with m_AttachedVme
 
 

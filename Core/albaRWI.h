@@ -172,6 +172,8 @@ protected:
 	int               m_GridNormal;
 	int               m_ShowAxes;  ///< Flag used to show/hide axes in low left corner of the view
 
+	int								m_ParallelView; ///< Flag used to set Camera Mode Orthographic or Perspective
+
 	int           m_StereoType;
 	vtkALBATextOrientator     *m_Orientator;
 	int          m_ShowProfilingInformation;

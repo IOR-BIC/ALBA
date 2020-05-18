@@ -88,7 +88,8 @@ typedef struct configurationStruct
 	double a_RhoBetweenRho1andRho2, b_RhoBetweenRho1andRho2, c_RhoBetweenRho1andRho2;
 	double a_RhoBiggerThanRho2, b_RhoBiggerThanRho2, c_RhoBiggerThanRho2;
 
-	double minElasticity;
+	double elasticityBounds[2];
+	
 
 	//-------------Integration Parameters---------------
 	int m_IntegrationSteps;
@@ -97,6 +98,7 @@ typedef struct configurationStruct
 	//---------------Advanced Parameters----------------
 	int m_DensityOutput;
 	double m_PoissonRatio;
+	int m_ElasticityBoundsOnInteg;
 
 } BonematConfiguration;
 
