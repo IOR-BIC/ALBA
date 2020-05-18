@@ -212,6 +212,8 @@ albaGUI * albaVMEMesh::CreateGui()
 		m_GuiBonematConfig->Label("Advanced Configuration", TRUE);
 		const wxString choices3[] = { "rhoQCT", "rhoAsh", "rhoWet" };
 
+		m_GuiBonematConfig->Bool(ID_DISABLED, "Apply E bounds on Integration:", &m_Configuration.m_ElasticityBoundsOnInteg, 1);
+	
 		//m_GuiBonematConfig->Label("Density Output:");
 		m_GuiBonematConfig->Combo(ID_DISABLED, "Density Output:", &m_Configuration.m_DensityOutput, 3, choices3, "", 0.45);
 		//m_GuiBonematConfig->Label("Poisson's Ratio:");
@@ -500,6 +502,7 @@ bool albaVMEMesh::LoadConfigurationTags(albaVMEMesh *vme, BonematConfiguration &
 		// Advanced Configuration
 		conf.m_DensityOutput = GetDoubleTag(vme, "m_DensityOutput"); //appOpBonematCommon::RhoSelection::USE_RHO_QCT;
 		conf.m_PoissonRatio = GetDoubleTag(vme, "m_PoissonRatio");
+		conf.m_ElasticityBoundsOnInteg = GetDoubleTag(vme, "m_ElasticityBoundsOnInteg");
 		conf.elasticityBounds[0] = GetDoubleTag(vme, "minElasticity");
 		conf.elasticityBounds[1] = GetDoubleTag(vme, "maxElasticity");
 
@@ -696,6 +699,15 @@ int albaVMEMesh::SaveConfigurationFile(BonematConfiguration configuration, const
 	}
 
 	advancedConfig->setAttribute(albaXMLString("PoissonRatio"), albaXMLString(albaString(configuration.m_PoissonRatio)));
+
+	if (configuration.m_ElasticityBoundsOnInteg)
+	{
+		advancedConfig->setAttribute(albaXMLString("ElasticityBoundsOnIntegration"), albaXMLString("true"));
+	}
+	else
+	{
+		advancedConfig->setAttribute(albaXMLString("ElasticityBoundsOnIntegration"), albaXMLString("false"));
+	}
 
 	root->appendChild(advancedConfig);
 	// 
