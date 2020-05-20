@@ -145,6 +145,7 @@ void albaInteractorPERPicker::SendPickingInformation(albaView *v, double *mouse_
 				if (cellPicker->Pick(mouse_pos[0], mouse_pos[1], 0, r))
 				{
 					picked_something = true;
+					break;
 				}
 			}
 		}

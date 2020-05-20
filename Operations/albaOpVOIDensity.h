@@ -34,7 +34,8 @@ public:
 	albaOpVOIDensity(const wxString &label = "VOIDensity");
 	~albaOpVOIDensity(); 
 	virtual void OnEvent(albaEventBase *alba_event);
-  
+
+
   albaTypeMacro(albaOpVOIDensity, albaOp);
 
   /** return a copy of itself, this needs to put the operation into the undo stack. */
@@ -51,9 +52,6 @@ public:
 
 	/** Execute the operation. */
 	void OpUndo();
-
-	/**	Set surface of input in test mode*/
-	void SetSurface(albaVME *Surface){m_Surface=Surface;};
 
 	/**	Return the min scalar*/
 	double GetMinScalar(){return m_MinScalar;};
@@ -76,6 +74,11 @@ public:
  	static bool OutputSurfaceAccept(albaVME* Node) {return(Node != NULL && (Node->GetOutput()->IsA("albaVMEOutputSurface")));};
 
 protected:
+
+	int SetSurface(albaVME *surface);
+
+	virtual void CreateGui();
+
   albaVME        *m_Surface;
   vtkDoubleArray *m_VOIScalars;
   albaString       m_NumberOfScalarsString;
