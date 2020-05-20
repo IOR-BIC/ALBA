@@ -137,7 +137,6 @@ public:
 	/** optimized cameraupdate method*/
 	virtual void CameraUpdate();
 
-
 	/** Remove VME into plugged sub-views*/
 	virtual void VmeRemove(albaVME *vme);
 
@@ -152,14 +151,14 @@ public:
 
 	/** Force the updating of the camera. */
 	virtual void UpdateSubviewsCamerasToFaceSlices();
+
+	void ShowGizmos(bool show);
 	
 	/** return an xpm-icon that can be used to represent this view */
 	virtual char ** GetIcon();
 
 	/** */
 	virtual void VmeSelect(albaVME *node, bool select);
-
-	void UpdateConesPosition();
 
 
 	albaMatrix* GetSlicerMatrix(int axis = Z);
@@ -168,6 +167,9 @@ public:
 	albaViewVTK * GetViewArbitrary();
 	albaViewVTK * GetViewSlice(int axis);
 	albaPipe* GetPipeSlice(int axis);
+	albaVMEVolumeGray * GetVolume() { return m_InputVolume; }
+	
+	double* GetSlicingOrigin() { return m_SlicingOrigin; }
 protected:
 
 	enum AXIS { X = 0, Y = 1, Z = 2 };
@@ -181,6 +183,8 @@ protected:
 	void ShowSlicers( albaVME * vmeVolume, bool show );
 	
 	void ResetCameraToSlices();
+
+	void UpdateConesPosition();
 
 	/** 
 	Create the helper cone giving feedback for camera direction*/

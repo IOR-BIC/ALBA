@@ -494,6 +494,16 @@ void albaViewArbitraryOrthoSlice::UpdateSubviewsCamerasToFaceSlices()
 }
 
 //----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::ShowGizmos(bool show)
+{
+	for (int i = X; i <= Z; i++)
+	{
+		if(m_GizmoRT[i])
+		m_GizmoRT[i]->Show(show);
+	}
+}
+
+//----------------------------------------------------------------------------
 char ** albaViewArbitraryOrthoSlice::GetIcon()
 {
 
