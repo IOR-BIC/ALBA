@@ -141,7 +141,7 @@ protected:
 
 	Cylinder CreateCylinder(double * origin, double * spacing, double centerX, double centerY, double centerZ, double radius, double cylHeight);
 
-	BoneCylinder CreateBoneCylinder(TailPosition tailPosition, double * origin, double * spacing, double centerX, double centerY, double centerZ, double innerRadius, double OuterRadius, double cylHeight);
+	BoneCylinder CreateBoneCylinder(TailPosition tailPosition, double * origin, double * spacing, double center[3], double wallCenter[3], double innerRadius, double OuterRadius, double cylHeight);
 	
 	Tail CreateTail(double * origin, double * spacing, double centerX, double centerY, double centerZ, double xSize, double ySize, double zSize);
 
@@ -154,7 +154,7 @@ protected:
 
 	double GetTailCenter(vtkImageData *rg, TailPosition tailPos, double x, double y, double z);
 
-	void GetBoneCenter(vtkImageData *rg, TailPosition tailPos, double x, double y, double z, double newCenter[3]);
+	void GetBoneCenter(vtkImageData *rg, TailPosition tailPos, double x, double y, double z, double newCenter[3], double wallPos[3]);
 
 	void IdToXYZpos(vtkIdType startCenter, int * dims, int &xPos, int &yPos, int &zPos);
 

@@ -64,10 +64,10 @@ PURPOSE. See the above copyright notice for more information.
 #define MARGIN_REDUCTION 0.70
 
 
-#define CYL_HEIGHT 12
-#define BACK_CYL_HEIGHT 4
-#define BACK_CYL_INNER_RADIUS 9.8
-#define BACK_CYL_OUTER_RADIUS 11.8
+#define CYL_HEIGHT 10
+#define BACK_CYL_INNER_RADIUS 9.5
+#define BACK_CYL_OUTER_RADIUS 11.5
+#define BACK_CYL_WALL_DIST 6.25
 
 #define TAILSIZE_MIN 6.0
 #define TAILSIZE_MAX 13.0
@@ -446,18 +446,20 @@ int albaOpESPCalibration::Calibrate()
 		TailCubeYLen = TAILSIZE_MIN;
 	}
 	
-	double backCylPos[3];
+	double backCylPos[3], backWallPos[3];
 
-	GetBoneCenter(volumeData, tailPosition, BackCylCenterX, BackCylCenterY, centerZ[1], backCylPos);
-	m_BoneCylinders[0] = CreateBoneCylinder(tailPosition,origin, spacing, backCylPos[0], backCylPos[1], backCylPos[2], BACK_CYL_INNER_RADIUS, BACK_CYL_OUTER_RADIUS, BACK_CYL_HEIGHT);
-	CreateVMECylinder(backCylPos[0], backCylPos[1], backCylPos[2], "Rear CYL L2 out", BACK_CYL_HEIGHT, BACK_CYL_OUTER_RADIUS);
-	CreateVMECylinder(backCylPos[0], backCylPos[1], backCylPos[2], "Rear CYL L2 in", BACK_CYL_HEIGHT, BACK_CYL_INNER_RADIUS);
+	GetBoneCenter(volumeData, tailPosition, BackCylCenterX, BackCylCenterY, centerZ[1], backCylPos, backWallPos);
+	m_BoneCylinders[0] = CreateBoneCylinder(tailPosition,origin, spacing, backCylPos, backWallPos, BACK_CYL_INNER_RADIUS, BACK_CYL_OUTER_RADIUS, CYL_HEIGHT);
+	CreateVMECylinder(backCylPos[0], backCylPos[1], backCylPos[2], "Rear CYL L2 out", CYL_HEIGHT, BACK_CYL_OUTER_RADIUS);
+	CreateVMECylinder(backCylPos[0], backCylPos[1], backCylPos[2], "Rear CYL L2 in", CYL_HEIGHT, BACK_CYL_INNER_RADIUS);
+	CreateVMEParallelepiped(backWallPos, "CYL L2 limit", BACK_CYL_OUTER_RADIUS*2.0, 0, CYL_HEIGHT);
 
-	GetBoneCenter(volumeData, tailPosition, BackCylCenterX, BackCylCenterY, centerZ[2], backCylPos);
 
-	m_BoneCylinders[1] = CreateBoneCylinder(tailPosition, origin, spacing, backCylPos[0], backCylPos[1], backCylPos[2], BACK_CYL_INNER_RADIUS, BACK_CYL_OUTER_RADIUS, BACK_CYL_HEIGHT);
-	CreateVMECylinder(backCylPos[0], backCylPos[1], backCylPos[2], "Rear CYL L3 out", BACK_CYL_HEIGHT, BACK_CYL_OUTER_RADIUS);
-	CreateVMECylinder(backCylPos[0], backCylPos[1], backCylPos[2], "Rear CYL L3 in", BACK_CYL_HEIGHT, BACK_CYL_INNER_RADIUS);
+	GetBoneCenter(volumeData, tailPosition, BackCylCenterX, BackCylCenterY, centerZ[2], backCylPos, backWallPos);
+	m_BoneCylinders[1] = CreateBoneCylinder(tailPosition, origin, spacing, backCylPos, backWallPos, BACK_CYL_INNER_RADIUS, BACK_CYL_OUTER_RADIUS, CYL_HEIGHT);
+	CreateVMECylinder(backCylPos[0], backCylPos[1], backCylPos[2], "Rear CYL L3 out", CYL_HEIGHT, BACK_CYL_OUTER_RADIUS);
+	CreateVMECylinder(backCylPos[0], backCylPos[1], backCylPos[2], "Rear CYL L3 in", CYL_HEIGHT, BACK_CYL_INNER_RADIUS);
+	CreateVMEParallelepiped(backWallPos, "CYL L3 limit", BACK_CYL_OUTER_RADIUS*2.0, 0, CYL_HEIGHT);
 
 	m_Tail = CreateTail(origin, spacing, TailCubeCenter[0], TailCubeCenter[1], TailCubeCenter[2], TailCubeXlen, TailCubeYLen, CYL_HEIGHT);
 	CreateVMEParallelepiped(TailCubeCenter, "Tail", TailCubeXlen, TailCubeYLen, CYL_HEIGHT);
@@ -519,29 +521,29 @@ Cylinder albaOpESPCalibration::CreateCylinder(double * origin, double * spacing,
 }
 
 //----------------------------------------------------------------------------
-BoneCylinder albaOpESPCalibration::CreateBoneCylinder(TailPosition tailPosition, double * origin, double * spacing, double centerX, double centerY, double centerZ, double innerRadius,double OuterRadius, double cylHeight)
+BoneCylinder albaOpESPCalibration::CreateBoneCylinder(TailPosition tailPosition, double * origin, double * spacing, double center[3], double wallCenter[3], double innerRadius,double OuterRadius, double cylHeight)
 {
 	BoneCylinder cyl;
-	cyl.centerX = centerX;
-	cyl.centerY = centerY;
+	cyl.centerX = center[0];
+	cyl.centerY = center[1];
 	cyl.InnerRadius = innerRadius;
 	cyl.OuterRadius = OuterRadius;
-	cyl.xRange.l = ((centerX - OuterRadius) - origin[0]) / spacing[0];
-	cyl.xRange.r = ((centerX + OuterRadius) - origin[0]) / spacing[0];
-	cyl.yRange.l = ((centerY - OuterRadius) - origin[1]) / spacing[1];
-	cyl.yRange.r = ((centerY + OuterRadius) - origin[1]) / spacing[1];
-	cyl.zRange.l = ((centerZ - cylHeight / 2.0) - origin[2]) / spacing[2];
-	cyl.zRange.r = ((centerZ + cylHeight / 2.0) - origin[2]) / spacing[2];
+	cyl.xRange.l = ((center[0] - OuterRadius) - origin[0]) / spacing[0];
+	cyl.xRange.r = ((center[0] + OuterRadius) - origin[0]) / spacing[0];
+	cyl.yRange.l = ((center[1] - OuterRadius) - origin[1]) / spacing[1];
+	cyl.yRange.r = ((center[1] + OuterRadius) - origin[1]) / spacing[1];
+	cyl.zRange.l = ((center[2] - cylHeight / 2.0) - origin[2]) / spacing[2];
+	cyl.zRange.r = ((center[2] + cylHeight / 2.0) - origin[2]) / spacing[2];
 
 	//add cut area by excluding area before the rearwall
 	if (tailPosition == TAIL_ON_RIGHT)
-		cyl.xRange.l = (centerX - origin[0]) / spacing[0];
+		cyl.xRange.l = (wallCenter[0] - origin[0]) / spacing[0];
 	else if (tailPosition == TAIL_ON_LEFT)
-		cyl.xRange.r = (centerX - origin[0]) / spacing[0];
+		cyl.xRange.r = (wallCenter[0] - origin[0]) / spacing[0];
 	else if (tailPosition == TAIL_ON_FRONT)
-		cyl.yRange.l = (centerY - origin[1]) / spacing[1];
+		cyl.yRange.l = (wallCenter[1] - origin[1]) / spacing[1];
 	else if (tailPosition == TAIL_ON_FRONT)
-		cyl.yRange.l = (centerY - origin[1]) / spacing[1];
+		cyl.yRange.l = (wallCenter[1] - origin[1]) / spacing[1];
 
 	return cyl;
 }
@@ -1012,7 +1014,7 @@ double albaOpESPCalibration::GetTailCenter(vtkImageData *rg, TailPosition tailPo
 		while (onTail)
 		{
 			vtkIdType currentPoint = zPos * dims[0] * dims[1] + yPos * dims[0] + l;
-			onTail = scalars->GetTuple1(currentPoint) > CUT_OFF_WINGS;
+			onTail = scalars->GetTuple1(currentPoint) > CUT_OFF_WINGS*0.9;
 			l--;
 		}
 
@@ -1021,7 +1023,7 @@ double albaOpESPCalibration::GetTailCenter(vtkImageData *rg, TailPosition tailPo
 		while (onTail)
 		{
 			vtkIdType currentPoint = zPos * dims[0] * dims[1] + yPos * dims[0] + r;
-			onTail = scalars->GetTuple1(currentPoint) > CUT_OFF_WINGS;
+			onTail = scalars->GetTuple1(currentPoint) > CUT_OFF_WINGS*0.9;
 			r++;
 		}
 		
@@ -1054,7 +1056,7 @@ double albaOpESPCalibration::GetTailCenter(vtkImageData *rg, TailPosition tailPo
 }
 
 //----------------------------------------------------------------------------
-void albaOpESPCalibration::GetBoneCenter(vtkImageData *rg, TailPosition tailPos, double x, double y, double z, double newCenter[3])
+void albaOpESPCalibration::GetBoneCenter(vtkImageData *rg, TailPosition tailPos, double x, double y, double z, double newCenter[3], double wallPos[3])
 {
 	vtkDataArray* scalars = rg->GetPointData()->GetScalars();
 
@@ -1115,6 +1117,9 @@ void albaOpESPCalibration::GetBoneCenter(vtkImageData *rg, TailPosition tailPos,
 		newCenter[2] = z;
 	}
 
+	wallPos[0] = newCenter[0];
+	wallPos[1] = newCenter[1] + (TAIL_ON_FRONT ? -BACK_CYL_WALL_DIST : BACK_CYL_WALL_DIST);
+	wallPos[2] = newCenter[2];
 }
 
 //----------------------------------------------------------------------------
