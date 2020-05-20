@@ -95,7 +95,6 @@ albaCxxTypeMacro(albaOpTransform);
 //----------------------------------------------------------------------------
 albaOpTransform::albaOpTransform(const wxString &label)
 :albaOpTransformInterface(label)
-//----------------------------------------------------------------------------
 {
   m_OpType	= OPTYPE_OP;
   m_Canundo = true;
@@ -125,19 +124,16 @@ albaOpTransform::albaOpTransform(const wxString &label)
 }
 //----------------------------------------------------------------------------
 albaOpTransform::~albaOpTransform()
-//----------------------------------------------------------------------------
 {
 
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpTransform::Copy()
-//----------------------------------------------------------------------------
 {
 	return new albaOpTransform(m_Label);
 }
 //----------------------------------------------------------------------------
 bool albaOpTransform::Accept(albaVME *node)
-//----------------------------------------------------------------------------
 {
 	bool accepted = false;
 
@@ -159,7 +155,6 @@ bool albaOpTransform::Accept(albaVME *node)
 }
 //----------------------------------------------------------------------------
 void albaOpTransform::OpRun()
-//----------------------------------------------------------------------------
 {
 	assert(m_Input);
 
@@ -222,14 +217,12 @@ void albaOpTransform::OpRun()
 
 //----------------------------------------------------------------------------
 void albaOpTransform::OpDo()
-//----------------------------------------------------------------------------
 {
 
 }
 
 //----------------------------------------------------------------------------
 void albaOpTransform::OpUndo()
-//----------------------------------------------------------------------------
 {
 	m_Input->SetAbsMatrix(m_OldAbsMatrix);
 
@@ -238,7 +231,6 @@ void albaOpTransform::OpUndo()
 
 //----------------------------------------------------------------------------
 void albaOpTransform::OpStop(int result)
-//----------------------------------------------------------------------------
 {
 	if (!m_TestMode)
 	{
@@ -267,7 +259,6 @@ void albaOpTransform::OpStop(int result)
 
 //----------------------------------------------------------------------------
 void albaOpTransform::CreateGui()
-//----------------------------------------------------------------------------
 {
 	m_Gui = new albaGUI(this);
 
@@ -370,7 +361,6 @@ void albaOpTransform::CreateGui()
 
 //----------------------------------------------------------------------------
 void albaOpTransform::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
 	switch (alba_event->GetId())
 	{
@@ -510,7 +500,6 @@ void albaOpTransform::OnEvent(albaEventBase *alba_event)
 
 //----------------------------------------------------------------------------
 void albaOpTransform::SelectRefSys()
-//----------------------------------------------------------------------------
 {
 	switch (m_RefSystemMode)
 	{
@@ -587,7 +576,6 @@ void albaOpTransform::SelectRefSys()
 
 //----------------------------------------------------------------------------
 void albaOpTransform::ChooseRelativeRefSys()
-//----------------------------------------------------------------------------
 {
 	albaString s;
 	s << "Choose VME Reference System";
@@ -618,7 +606,6 @@ void albaOpTransform::RefSysVmeChanged()
 
 //----------------------------------------------------------------------------
 void albaOpTransform::OnEventTransformGizmo(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
 	albaEvent *e = albaEvent::SafeDownCast(alba_event);
 	long arg = e->GetArg();
@@ -668,7 +655,6 @@ void albaOpTransform::UpdateReferenceSystem()
 
 //----------------------------------------------------------------------------
 void albaOpTransform::PostMultiplyMatrix(albaMatrix *matrix)
-//----------------------------------------------------------------------------
 {
 	// handle incoming transform events
 	vtkTransform *tr = vtkTransform::New();
@@ -727,7 +713,6 @@ void albaOpTransform::OnEventTransformText()
 
 //----------------------------------------------------------------------------
 void albaOpTransform::OnEventPoseTextEntries(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
 	albaTransform tran;
 	tran.Scale(m_Scaling[0], m_Scaling[1], m_Scaling[2], POST_MULTIPLY);
@@ -758,7 +743,6 @@ void albaOpTransform::OnEventPoseTextEntries(albaEventBase *alba_event)
 
 //----------------------------------------------------------------------------
 void albaOpTransform::Reset()
-//----------------------------------------------------------------------------
 {
 	m_Input->SetAbsMatrix(m_OldAbsMatrix, m_CurrentTime);
 	m_TransformVME->SetAbsMatrix(m_OldAbsMatrix, m_CurrentTime);
@@ -802,7 +786,6 @@ void albaOpTransform::Scale(double x, double y, double z)
 
 //----------------------------------------------------------------------------
 void albaOpTransform::UpdateTransformTextEntries()
-//----------------------------------------------------------------------------
 {
 	// Express absPose in RefSysVME ref sys
 	albaTransformFrame *mflTr = albaTransformFrame::New();
