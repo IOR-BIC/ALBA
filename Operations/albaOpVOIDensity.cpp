@@ -266,6 +266,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 	NumberVoxels = VolumeData->GetNumberOfPoints();
 
 	albaProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Evaluating Density...");
 	
 
