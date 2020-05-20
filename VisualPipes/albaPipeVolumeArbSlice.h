@@ -142,6 +142,9 @@ public:
   /** Get the flag that enable/disable GPU */
   int GetEnableGPU();
 
+	/** Get ImageData */
+	vtkImageData *GetImageData() { return m_Image; };
+
   /** Set tri-linear interpolation */  
   void SetTrilinearInterpolation(int on){m_TrilinearInterpolationOn = on; UpdateSlice();};
 

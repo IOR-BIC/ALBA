@@ -587,6 +587,9 @@ void albaViewArbitraryOrthoSlice::ShowVolume( albaVME * vme, bool show )
 {
 	if (m_InputVolume == vme) return;
 
+	if (m_InputVolume)
+		GetLogicManager()->VmeShow(m_InputVolume, false);
+
 	m_InputVolume = albaVMEVolumeGray::SafeDownCast(vme);
 
 	wxBusyInfo wait("please wait");

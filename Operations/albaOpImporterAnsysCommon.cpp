@@ -289,7 +289,7 @@ int albaOpImporterAnsysCommon::ReadEBLOCK()
 {
   char blockName[254];
   int maxId = 0, numElements = 0;
-  int idMaterial,idTypeElement,idConstants,nNodes, elementNumber, nodes[16], unused;
+  int idMaterial,idTypeElement,idConstants,nNodes, elementNumber, nodes[20], unused;
 
   // EBLOCK,19,SOLID,   3436163,    234932   / EBLOCK,19,SOLID,   3436163     or 
   // EBLOCK,19,SOLID,
@@ -310,7 +310,7 @@ int albaOpImporterAnsysCommon::ReadEBLOCK()
       if(nNodes > 8)
       {
         GetLine(m_FilePointer, m_Line);
-        sscanf(m_Line, "%d %d %d %d %d %d %d %d", nodes+8,nodes+9,nodes+10,nodes+11,nodes+12,nodes+13,nodes+14,nodes+15);
+        sscanf(m_Line, "%d %d %d %d %d %d %d %d %d %d %d %d", nodes+8,nodes+9,nodes+10,nodes+11,nodes+12,nodes+13,nodes+14,nodes+15,nodes+16,nodes+17,nodes+18,nodes+19);
       }
 
       AddElement(elementNumber, nNodes, idTypeElement, idMaterial, nodes);
