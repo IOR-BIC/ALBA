@@ -71,11 +71,14 @@ public:
 	/** Extract scalars from input volume that are inside the choosed surface. */
 	void ExtractVolumeScalars();
 
+	/** Set Surface */
+	int SetSurface(albaVME *surface);
+
+
  	static bool OutputSurfaceAccept(albaVME* Node) {return(Node != NULL && (Node->GetOutput()->IsA("albaVMEOutputSurface")));};
 
 protected:
 
-	int SetSurface(albaVME *surface);
 
 	virtual void CreateGui();
 
