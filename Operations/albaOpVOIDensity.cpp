@@ -42,6 +42,7 @@
 #include "vtkDataSet.h"
 #include "vtkALBAImplicitPolyData.h"
 #include "vtkTransformPolyDataFilter.h"
+#include "albaProgressBarHelper.h"
 
 
 //----------------------------------------------------------------------------
@@ -112,36 +113,43 @@ void albaOpVOIDensity::OpRun()
   vtkNEW(m_VOIScalars);
 	if(!this->m_TestMode)
 	{
-		// setup Gui
-		m_Gui = new albaGUI(this);
-		m_Gui->SetListener(this);
-
-		m_Gui->Divider();
-		m_Gui->Button(ID_CHOOSE_SURFACE,_("VOI surface"));
-		m_Gui->Button(ID_EVALUATE_DENSITY, _("Evaluate"), "", _("Evaluate density inside the choosed surface"));
-		m_Gui->Divider(2);
-		m_Gui->Label(_("Number of voxel inside the VOI"));
-		m_Gui->String(ID_NUM_SCALARS,"Num=",&m_NumberOfScalarsString,"");
-		m_Gui->Label(_("Voxels's scalar mean inside the VOI"));
-		m_Gui->String(ID_MEAN_SCALAR,"Mean=",&m_MeanScalarString,"");
-		m_Gui->String(ID_MAX_SCALAR,"Max=",&m_MaxScalarString,"");
-		m_Gui->String(ID_MIN_SCALAR,"Min=",&m_MinScalarString,"");
-		m_Gui->String(ID_STANDARD_DEVIATION,"Std dev=",&m_StandardDeviationString,"");
-		//m_VoxelList=m_Gui->ListBox(ID_VOXEL_LIST);
-
-		//////////////////////////////////////////////////////////////////////////
-		m_Gui->Label("");
-		m_Gui->Divider(1);
-		m_Gui->OkCancel();
-		m_Gui->Label("");
-	  
-		m_Gui->Enable(ID_EVALUATE_DENSITY, false);
-		m_Gui->Enable(wxOK, false);
-		m_Gui->Update();
+		CreateGui();
 
 		ShowGui();
 	}
 }
+
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::CreateGui()
+{
+	// setup Gui
+	m_Gui = new albaGUI(this);
+	m_Gui->SetListener(this);
+
+	m_Gui->Divider();
+	m_Gui->Button(ID_CHOOSE_SURFACE, _("VOI surface"));
+	m_Gui->Button(ID_EVALUATE_DENSITY, _("Evaluate"), "", _("Evaluate density inside the choosed surface"));
+	m_Gui->Divider(2);
+	m_Gui->Label(_("Number of voxel inside the VOI"));
+	m_Gui->String(ID_NUM_SCALARS, "Num=", &m_NumberOfScalarsString, "");
+	m_Gui->Label(_("Voxels's scalar mean inside the VOI"));
+	m_Gui->String(ID_MEAN_SCALAR, "Mean=", &m_MeanScalarString, "");
+	m_Gui->String(ID_MAX_SCALAR, "Max=", &m_MaxScalarString, "");
+	m_Gui->String(ID_MIN_SCALAR, "Min=", &m_MinScalarString, "");
+	m_Gui->String(ID_STANDARD_DEVIATION, "Std dev=", &m_StandardDeviationString, "");
+	//m_VoxelList=m_Gui->ListBox(ID_VOXEL_LIST);
+
+	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Label("");
+	m_Gui->Divider(1);
+	m_Gui->OkCancel();
+	m_Gui->Label("");
+
+	m_Gui->Enable(ID_EVALUATE_DENSITY, false);
+	m_Gui->Enable(wxOK, false);
+	m_Gui->Update();
+}
+
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::OpDo()
 //----------------------------------------------------------------------------
@@ -152,6 +160,35 @@ void albaOpVOIDensity::OpUndo()
 //----------------------------------------------------------------------------
 {
 }
+
+//----------------------------------------------------------------------------
+int albaOpVOIDensity::SetSurface(albaVME *surface)
+{
+	m_Surface = surface;
+	if (m_Surface == NULL)
+		return ALBA_ERROR;
+	m_Surface->Update();
+	vtkALBASmartPointer<vtkFeatureEdges> FE;
+	FE->SetInput((vtkPolyData *)(m_Surface->GetOutput()->GetVTKData()));
+	FE->SetFeatureAngle(30);
+	FE->SetBoundaryEdges(1);
+	FE->SetColoring(0);
+	FE->SetFeatureEdges(0);
+	FE->SetManifoldEdges(0);
+	FE->SetNonManifoldEdges(0);
+	FE->Update();
+
+	if (FE->GetOutput()->GetNumberOfCells() != 0)
+	{
+		//open polydata
+		albaMessage(_("Open surface choosed!!"), _("Warning"));
+		m_Surface = NULL;
+		return ALBA_ERROR;
+	}
+
+	return ALBA_OK;
+}
+
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
@@ -166,27 +203,9 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
         albaEvent event(this,VME_CHOOSE,&title);
 				event.SetPointer(&albaOpVOIDensity::OutputSurfaceAccept);
 				albaEventMacro(event);
-				m_Surface = event.GetVme();
-				if(m_Surface == NULL)
-					return;
-				m_Surface->Update();
-				vtkALBASmartPointer<vtkFeatureEdges> FE;
-				FE->SetInput((vtkPolyData *)(m_Surface->GetOutput()->GetVTKData()));
-				FE->SetFeatureAngle(30);
-				FE->SetBoundaryEdges(1);
-				FE->SetColoring(0);
-				FE->SetFeatureEdges(0);
-				FE->SetManifoldEdges(0);
-				FE->SetNonManifoldEdges(0);
-				FE->Update();
 
-				if(FE->GetOutput()->GetNumberOfCells() != 0)
-				{
-					//open polydata
-					albaMessage(_("Open surface choosed!!"), _("Warning"));
-					m_Surface = NULL;
+				if (SetSurface(event.GetVme())==ALBA_ERROR)
 					return;
-				}
 				
 				m_Gui->Enable(ID_EVALUATE_DENSITY, true);
 				m_Gui->Enable(wxOK, true);
@@ -245,6 +264,12 @@ void albaOpVOIDensity::ExtractVolumeScalars()
   vtkALBASmartPointer<vtkDataSet> VolumeData = m_Input->GetOutput()->GetVTKData();
   VolumeData->Update();
 	NumberVoxels = VolumeData->GetNumberOfPoints();
+
+	albaProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("Evaluating Density...");
+	
+
   
 	for (int voxel=0; voxel<NumberVoxels; voxel++)
   {
@@ -265,6 +290,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
         m_VOIScalars->InsertNextTuple(&InsideScalar);
       }
     }
+		progressHelper.UpdateProgressBar(voxel*100/NumberVoxels);
   }
   if(m_NumberOfScalars > 0)
   {
