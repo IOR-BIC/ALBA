@@ -119,6 +119,9 @@ public:
   //----------------------------------------------------------------------------
   albaGUI *GetGui() {return (m_GuiGizmoScale->GetGui());};
 
+	bool GetApplyScaleToVME() const { return m_ApplyScaleToVME; }
+	void SetApplyScaleToVME(bool val) { m_ApplyScaleToVME = val; }
+
 protected:
 
   albaGUIGizmoScale *m_GuiGizmoScale;
@@ -156,6 +159,11 @@ private:
   Register if the gizmo gui has to be built at startup*/
   bool m_BuildGUI;
 
+	bool m_ApplyScaleToVME;
+
+	double m_CurrentDist;
+	double m_ScaleDiff;
+
   /**
   Scaling gizmo initial pose; used to restore scale gizmo axis pose after a gizmo drag event*/
   albaMatrix *m_InitialGizmoPose;
@@ -170,7 +178,7 @@ private:
 
   /** 
   Return the scaling value to be applied to vme on current axis based on active gizmo position */
-  double GetScalingValue() const;
+  double GetScalingValue();
 
   
   /** 
@@ -188,7 +196,6 @@ private:
   /**
   test friend*/
   friend class albaGizmoScaleTest;
-
 };
 #endif
 
