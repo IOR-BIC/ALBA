@@ -153,13 +153,17 @@ public:
 	void SetCubeZLength(double val) { m_CubeZLength = val; }
 
 	double GetEllipticCylinderR1() const { return m_EllipticCylinderR1; }
-	void SetEllipticCylinderR1(double val) { m_EllipticCylinderR1 = val; }
+	void SetEllipticCylinderR1(double val);
 	double GetEllipticCylinderHeight() const { return m_EllipticCylinderHeight; }
-	void SetEllipticCylinderHeight(double val) { m_EllipticCylinderHeight = val; }
+	void SetEllipticCylinderHeight(double val);
 	double GetEllipticCylinderR2() const { return m_EllipticCylinderR2; }
-	void SetEllipticCylinderR2(double val) { m_EllipticCylinderR2 = val; }
+	void SetEllipticCylinderR2(double val);
 	int GetEllipticCylinderCapping() const { return m_EllipticCylinderCapping; }
-	void SetEllipticCylinderCapping(int val) { m_EllipticCylinderCapping = val; }
+	void SetEllipticCylinderCapping(int val);
+	double GetCylinderRes() const { return m_CylinderRes;}
+	void SetCylinderRes(double val);
+	double GetEllipticCylinderRes() const { return m_EllipticCylinderRes; }
+	void SetEllipticCylinderRes(double val);
 protected:
 
   albaVMESurfaceParametric();

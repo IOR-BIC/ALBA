@@ -952,6 +952,48 @@ void albaVMESurfaceParametric::SetCylinderHeight(double cylinderHeight)
 	Modified();
 }
 
+//----------------------------------------------------------------------------
+void albaVMESurfaceParametric::SetEllipticCylinderR1(double val)
+{
+	m_EllipticCylinderR1 = val;
+	Modified();
+}
+
+//----------------------------------------------------------------------------
+void albaVMESurfaceParametric::SetEllipticCylinderHeight(double val)
+{
+	m_EllipticCylinderHeight = val;
+	Modified();
+}
+
+//----------------------------------------------------------------------------
+void albaVMESurfaceParametric::SetEllipticCylinderR2(double val)
+{
+	m_EllipticCylinderR2 = val;
+	Modified();
+}
+
+//----------------------------------------------------------------------------
+void albaVMESurfaceParametric::SetEllipticCylinderCapping(int val)
+{
+	m_EllipticCylinderCapping = val;
+	Modified();
+}
+
+//----------------------------------------------------------------------------
+void albaVMESurfaceParametric::SetCylinderRes(double val)
+{
+	m_CylinderRes = val;
+	Modified();
+}
+
+//----------------------------------------------------------------------------
+void albaVMESurfaceParametric::SetEllipticCylinderRes(double val)
+{
+	m_EllipticCylinderRes = val;
+	Modified();
+}
+
 //-------------------------------------------------------------------------
 char** albaVMESurfaceParametric::GetIcon() 
 {
