@@ -494,6 +494,16 @@ void albaViewArbitraryOrthoSlice::UpdateSubviewsCamerasToFaceSlices()
 }
 
 //----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::ShowGizmos(bool show)
+{
+	for (int i = X; i <= Z; i++)
+	{
+		if(m_GizmoRT[i])
+		m_GizmoRT[i]->Show(show);
+	}
+}
+
+//----------------------------------------------------------------------------
 char ** albaViewArbitraryOrthoSlice::GetIcon()
 {
 
@@ -688,6 +698,7 @@ void albaViewArbitraryOrthoSlice::HideVolume()
 		m_GizmoRT[i]->Show(false);
 
 		m_CameraToSlicer[i]->SetVme(NULL);
+		cppDEL(m_GizmoRT[i]);
 		albaDEL(m_CameraConeVME[i]);
 		albaDEL(m_SlicingResetMatrix[i]);
 	}
@@ -756,7 +767,9 @@ void albaViewArbitraryOrthoSlice::ShowSlicers(albaVME * vmeVolume, bool show)
 		m_ChildViewList[AsixToView(i)]->VmeShow(m_InputVolume, show);
 		m_CameraToSlicer[i] = new albaAttachCamera(m_Gui, ((albaViewVTK*)m_ChildViewList[AsixToView(i)])->m_Rwi, this);
 		m_CameraToSlicer[i]->SetStartingMatrix(m_SlicingResetMatrix[i]);
-		m_CameraToSlicer[i]->SetVme(m_InputVolume);
+		m_CameraToSlicer[i]->SetAttachedMatrix(m_SlicingMatrix[i]->GetVTKMatrix());
+		m_CameraToSlicer[i]->SetAttachedMatrix(m_SlicingMatrix[i]->GetVTKMatrix());
+		m_CameraToSlicer[i]->SetAttachedMatrix(m_SlicingMatrix[i]->GetVTKMatrix());
 		m_CameraToSlicer[i]->SetAttachedMatrix(m_SlicingMatrix[i]->GetVTKMatrix());
 		m_CameraToSlicer[i]->EnableAttachCamera();
 
