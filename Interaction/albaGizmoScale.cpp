@@ -98,6 +98,8 @@ albaGizmoScale::albaGizmoScale(albaVME* input, albaObserver *listener , bool bui
 
 	// and will be on the superimposed layer
 	this->SetAlwaysVisible(true);
+
+	m_ApplyScaleToVME = true;
 }
 //----------------------------------------------------------------------------
 albaGizmoScale::~albaGizmoScale() 
@@ -209,6 +211,8 @@ void albaGizmoScale::OnEventGizmoComponents(albaEventBase *alba_event)
 					m_VmeMatrixRelativeToRefSysVME->DeepCopy(&tr->GetMatrix());
 
 					m_RefSysVMEAbsMatrixAtMouseDown->DeepCopy(m_RefSysVME->GetOutput()->GetAbsMatrix());
+
+					m_CurrentDist = 0;
 				}
 				else if (arg == albaInteractorGenericMouse::MOUSE_MOVE)
 				{               
@@ -294,22 +298,31 @@ void albaGizmoScale::OnEventGizmoComponents(albaEventBase *alba_event)
 					scaleTrans->PostMultiply();
 					scaleTrans->SetMatrix(m_VmeMatrixRelativeToRefSysVME->GetVTKMatrix());
 
+					double scaleDiff[3];
+					scaleDiff[0] = scaleDiff[1] = scaleDiff[2] = 1;
+				
 					vtkALBASmartPointer<vtkTransform> absScaleTrans;
 					if (m_ActiveGizmoComponent == X_AXIS)
 					{
 						absScaleTrans->Scale(scale, 1, 1); 
+						scaleDiff[0] = m_ScaleDiff;
 					}
 					else if (m_ActiveGizmoComponent == Y_AXIS)
 					{
 						absScaleTrans->Scale(1, scale, 1);
+						scaleDiff[1] = m_ScaleDiff;
 					}
 					else if (m_ActiveGizmoComponent == Z_AXIS)
 					{
 						absScaleTrans->Scale (1, 1, scale);
+						scaleDiff[2] = m_ScaleDiff;
 					}
 					else if (m_ActiveGizmoComponent == ISOTROPIC)
 					{
 						absScaleTrans->Scale(scale, scale, scale);
+						scaleDiff[0] = m_ScaleDiff;
+						scaleDiff[1] = m_ScaleDiff;
+						scaleDiff[2] = m_ScaleDiff;
 					}
 
 					scaleTrans->Concatenate(absScaleTrans);
@@ -331,11 +344,13 @@ void albaGizmoScale::OnEventGizmoComponents(albaEventBase *alba_event)
 					newVmeAbsPoseTr.GetPointer()->SetInputFrame(m_RefSysVMEAbsMatrixAtMouseDown);
 
 					// Set VME Pose
-					m_InputVME->SetAbsMatrix(newVmeAbsPoseTr.GetPointer()->GetMatrix());
+					if(m_ApplyScaleToVME)
+						m_InputVME->SetAbsMatrix(newVmeAbsPoseTr.GetPointer()->GetMatrix());
 
 					// notify the vme about changed vme abs pose due to scaling; also send new vme bs matrix
 					albaEvent e2s;
 					e2s.SetSender(this);
+					e2s.SetPointer(scaleDiff);
 					e2s.SetMatrix((newVmeAbsPoseTr.GetPointer())->GetMatrixPointer());
 					e2s.SetId(ID_TRANSFORM);
 					albaEventMacro(e2s);
@@ -516,7 +531,8 @@ void albaGizmoScale::SendTransformMatrixFromGui(albaEventBase *alba_event)
 	albaMatrix newAbsPose;
 	newAbsPose = newVmeAbsPoseTransformFrame.GetPointer()->GetMatrix();
 
-	m_InputVME->SetAbsMatrix(newAbsPose , m_InputVME->GetTimeStamp());
+	if(m_ApplyScaleToVME)
+		m_InputVME->SetAbsMatrix(newAbsPose , m_InputVME->GetTimeStamp());
 
 	vmeMatrixRelativeToRefSysVME->Delete();
 	refSysVMEAbsMatrix->Delete();
@@ -593,8 +609,7 @@ void albaGizmoScale::SetRefSys(albaVME *refSys)
 }
 
 //----------------------------------------------------------------------------
-double albaGizmoScale::GetScalingValue() const
-	//----------------------------------------------------------------------------
+double albaGizmoScale::GetScalingValue()
 {
 	int gizmoId = X_AXIS;
 	if (X_AXIS <= m_ActiveGizmoComponent && m_ActiveGizmoComponent <= Z_AXIS)
@@ -627,8 +642,14 @@ double albaGizmoScale::GetScalingValue() const
 	double sign = vtkMath::Dot(p0p1, refSysVersor) > 0 ? 1 : -1;
 	dist *= sign;
 
+	double actDist = dist - m_CurrentDist;
+
+	m_CurrentDist = dist;
+
 	// scale to be applied
 	scale =  fabs(1 + dist / gizmoLength);
+	
+	m_ScaleDiff =  fabs(1 + actDist / gizmoLength);
 	return scale;
 }
 
