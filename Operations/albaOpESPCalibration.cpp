@@ -1169,7 +1169,7 @@ bool albaOpESPCalibration::FitPoints()
 	double resSum = 0;
 	for (int i = 0; i < nPoints; i++)
 	{
-		double x = m_AreaInfo[i].mean;
+		double x = (m_AreaInfo[i].mean*m_Slope)+m_Intercept;
 		double y = expected[i];
 		m_AreaInfo[i].errorOnEstimation = abs(x - y);
 
