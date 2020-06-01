@@ -83,7 +83,7 @@ public:
 	/** Add the variable specified in the name string to the list of variables */
 	void AddImageVar(wxString name, albaView *view, wxString label = "");
 	/** Add the variable specified in the name string to the list of variables */
-	void AddImageVar(wxString name, vtkImageData *imageData, wxString label = "");
+	void AddImageVar(wxString name, vtkImageData *imageData, wxString label = "", int flipAxis = -1);
 	/** Push the variable specified in the name string to the list of variables */
 	void PushImageVar(wxString name, wxString imagePath, wxString label = "");
 	/** Push the variable specified in the name string to the list of variables */
