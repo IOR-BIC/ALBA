@@ -71,6 +71,7 @@ public:
 		ID_REMOVE_LANDMARK,
 		ID_CHANGE_TIME,
 		ID_SHOW_GROUP,
+		ID_RADIUS,
 	};
 
 	albaOpAddLandmark(const wxString &label = "AddLandmark  \tCtrl+A");
@@ -119,7 +120,7 @@ public:
 
 	void EnableShowAllMode(bool mode) { m_ShowAllMode = mode; };
 
-	void SetLandmarkRadius(double radius) { m_Radius = radius; }
+	void SetLandmarkRadius(double radius);
 
 protected:
 	/** Create the AddLandmarks interface. */

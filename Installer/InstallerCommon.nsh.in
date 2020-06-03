@@ -165,8 +165,7 @@ Function .onInit
 	;"Check InstallDir"
 	${If} ${RunningX64}
 		;MessageBox MB_OK "Running on 64-bit Windows"
-		;StrCpy $INSTDIR "$PROGRAMFILES64\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}"
-		StrCpy $INSTDIR "$PROGRAMFILES64\${PRODUCT_NAME}"
+		StrCpy $INSTDIR "$PROGRAMFILES64\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}"
 	${Else}
 		;MessageBox MB_OK "Running on 32-bit Windows"
 	${EndIf}
@@ -213,8 +212,7 @@ FunctionEnd
 	Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 	OutFile "Setup_${PRODUCT_NAME}_${PRODUCT_VERSION}.exe"
 
-	;InstallDir "$PROGRAMFILES\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}"
-	InstallDir "$PROGRAMFILES\${PRODUCT_NAME}"
+	InstallDir "$PROGRAMFILES\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}"
 	
 	InstallDirRegKey HKCU "${PRODUCT_DIR_REGKEY}" ""
 
