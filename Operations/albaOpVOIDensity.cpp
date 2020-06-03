@@ -271,6 +271,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 	m_NumberOfScalars = 0;
 	m_MaxScalar = -99999.0;
 	m_MinScalar = 99999.0;
+	m_VOIScalars->Reset();
 
 	vtkAbstractTransform *transform;
 	vtkPolyData *polydata;
@@ -320,7 +321,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
         m_VOIScalars->InsertNextTuple(&InsideScalar);
       }
     }
-		progressHelper.UpdateProgressBar(voxel*100/NumberVoxels);
+		progressHelper.UpdateProgressBar(voxel*100.0/NumberVoxels);
   }
   if(m_NumberOfScalars > 0)
   {
