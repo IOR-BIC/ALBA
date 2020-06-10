@@ -28,7 +28,7 @@ public:
 	albaTextFileReaderHelper();
 	~albaTextFileReaderHelper();
 
-	int GetLine();
+	int GetLine(bool toUpper=false);
 	int ReplaceInString(char *str, char from, char to);
 	int ReadInit(albaString &fileName, int textMode, int showProgressBar, albaString progressBarText, albaObserver  *listener);
 

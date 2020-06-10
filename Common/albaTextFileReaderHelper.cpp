@@ -46,7 +46,7 @@ albaTextFileReaderHelper::~albaTextFileReaderHelper()
 
 
 //----------------------------------------------------------------------------
-int albaTextFileReaderHelper::GetLine()
+int albaTextFileReaderHelper::GetLine(bool toUpper)
 {
 	char readValue;
 	int readedChars = 0;
@@ -62,7 +62,11 @@ int albaTextFileReaderHelper::GetLine()
 				break;
 		}
 
-		m_Line[readedChars] = readValue = m_Buffer[m_BufferPointer];
+		if(toUpper)
+			m_Line[readedChars] = readValue = (toupper(m_Buffer[m_BufferPointer]));
+		else
+			m_Line[readedChars] = readValue = m_Buffer[m_BufferPointer];
+	
 		readedChars++;
 		m_BufferPointer++;
 		m_BufferLeft--;
