@@ -71,18 +71,20 @@ albaString albaOpImporterAnsysCDBFile::GetWildcard()
 //----------------------------------------------------------------------------
 int albaOpImporterAnsysCDBFile::ParseAnsysFile(albaString fileName)
 {
-	m_ProgressHelper = new albaProgressBarHelper(m_Listener);
-	m_ProgressHelper->SetTextMode(m_TestMode);
-	m_ProgressHelper->InitProgressBar("Please wait parsing CDBAnsys File...");
 	
-  ReadInit(fileName);
+	if (ReadInit(fileName, GetTestMode(), true, "Please wait parsing CDBAnsys File...", m_Listener) == ALBA_ERROR)
+	{
+		albaLogMessage("Cannot Open: %s", fileName);
+		ReadFinalize();
+		return ALBA_ERROR;
+	}
 
   FILE *nodesFile;
   nodesFile = fopen(m_NodesFileName, "w");
 	if (!nodesFile)
 	{
 		albaLogMessage("Cannot Open: %s",m_NodesFileName.c_str());
-		cppDEL(m_ProgressHelper);
+		ReadFinalize();
 		return ALBA_ERROR;
 	}
 
@@ -90,7 +92,7 @@ int albaOpImporterAnsysCDBFile::ParseAnsysFile(albaString fileName)
 
   m_CurrentMatId = -1;
 
-  while ((lineLenght = GetLine(m_FilePointer, m_Line)) != 0) 
+  while ((lineLenght = GetLine()) != 0) 
   {
     if(strncmp (m_Line,"NBLOCK,",7) == 0)
     {
@@ -116,12 +118,11 @@ int albaOpImporterAnsysCDBFile::ParseAnsysFile(albaString fileName)
 
 	if (WriteMaterials() == ALBA_ERROR)
 	{
-		cppDEL(m_ProgressHelper);
+		ReadFinalize();
 		return ALBA_ERROR;
 	}
   
 	ReadFinalize();
-  cppDEL(m_ProgressHelper);
 
   return ALBA_OK;
 }

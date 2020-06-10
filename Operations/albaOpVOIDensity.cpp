@@ -43,6 +43,7 @@
 #include "vtkALBAImplicitPolyData.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "albaProgressBarHelper.h"
+#include "albaTagArray.h"
 
 
 //----------------------------------------------------------------------------
@@ -162,6 +163,34 @@ void albaOpVOIDensity::OpUndo()
 }
 
 //----------------------------------------------------------------------------
+void albaOpVOIDensity::OpStop(int result)
+{
+	if (result == OP_RUN_OK)
+	{
+		SetDoubleTag("NumberOfScalars", m_NumberOfScalars);
+		SetDoubleTag("MeanScalar", m_MeanScalar);
+		SetDoubleTag("MaxScalar", m_MaxScalar);
+		SetDoubleTag("MinScalar", m_MinScalar);
+		SetDoubleTag("StandardDeviation", m_StandardDeviation);
+	}
+
+	Superclass::OpStop(result);
+}
+
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::SetDoubleTag(wxString tagName, double value)
+{
+	albaTagItem tagItem;
+	tagItem.SetName("VOI_" + tagName);
+	tagItem.SetValue(value);
+
+	if (m_Surface->GetTagArray()->IsTagPresent("VOI_" + tagName))
+		m_Surface->GetTagArray()->DeleteTag("VOI_" + tagName);
+
+	m_Surface->GetTagArray()->SetTag(tagItem);
+}
+
+//----------------------------------------------------------------------------
 int albaOpVOIDensity::SetSurface(albaVME *surface)
 {
 	m_Surface = surface;
@@ -208,11 +237,12 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 					return;
 				
 				m_Gui->Enable(ID_EVALUATE_DENSITY, true);
-				m_Gui->Enable(wxOK, true);
+				m_Gui->Enable(wxOK, false);
 			}
 			break;
 			case ID_EVALUATE_DENSITY:
 				ExtractVolumeScalars();
+				m_Gui->Enable(wxOK, true);
 			break;
 			case wxOK:
 				OpStop(OP_RUN_OK);
@@ -241,6 +271,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 	m_NumberOfScalars = 0;
 	m_MaxScalar = -99999.0;
 	m_MinScalar = 99999.0;
+	m_VOIScalars->Reset();
 
 	vtkAbstractTransform *transform;
 	vtkPolyData *polydata;
@@ -290,7 +321,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
         m_VOIScalars->InsertNextTuple(&InsideScalar);
       }
     }
-		progressHelper.UpdateProgressBar(voxel*100/NumberVoxels);
+		progressHelper.UpdateProgressBar(voxel*100.0/NumberVoxels);
   }
   if(m_NumberOfScalars > 0)
   {

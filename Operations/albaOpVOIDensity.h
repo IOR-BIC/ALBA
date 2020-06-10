@@ -53,6 +53,9 @@ public:
 	/** Execute the operation. */
 	void OpUndo();
 
+	/** Called on Op Stop */
+	virtual void OpStop(int result);
+
 	/**	Return the min scalar*/
 	double GetMinScalar(){return m_MinScalar;};
 
@@ -78,6 +81,10 @@ public:
  	static bool OutputSurfaceAccept(albaVME* Node) {return(Node != NULL && (Node->GetOutput()->IsA("albaVMEOutputSurface")));};
 
 protected:
+
+	/** Stores a tag on the selected surface */
+	void SetDoubleTag(wxString tagName, double value);
+
 
 
 	virtual void CreateGui();

@@ -65,8 +65,8 @@ PURPOSE. See the above copyright notice for more information.
 
 
 #define CYL_HEIGHT 10
-#define BACK_CYL_INNER_RADIUS 9.5
-#define BACK_CYL_OUTER_RADIUS 11.5
+#define BACK_CYL_INNER_RADIUS 9.3
+#define BACK_CYL_OUTER_RADIUS 11.3
 #define BACK_CYL_WALL_DIST 6.25
 
 #define TAILSIZE_MIN 6.0
@@ -709,6 +709,7 @@ albaVME *albaOpESPCalibration::CreateVMECylinder(double centerX, double centerY,
 	cylinder->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_CYLINDER);
 	cylinder->SetCylinderHeight(height);
 	cylinder->SetCylinderRadius(radius);
+	cylinder->SetCylinderRes(50);
 	cylinder->SetMatrix(cylinderBase.GetMatrix());
 
 	cylinder->ReparentTo(m_Volume);
@@ -1168,7 +1169,7 @@ bool albaOpESPCalibration::FitPoints()
 	double resSum = 0;
 	for (int i = 0; i < nPoints; i++)
 	{
-		double x = m_AreaInfo[i].mean;
+		double x = (m_AreaInfo[i].mean*m_Slope)+m_Intercept;
 		double y = expected[i];
 		m_AreaInfo[i].errorOnEstimation = abs(x - y);
 

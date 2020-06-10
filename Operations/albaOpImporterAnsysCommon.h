@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 // Include :
 //----------------------------------------------------------------------------
 #include "albaDefines.h"
+#include "albaTextFileReaderHelper.h"
 #include "albaOp.h"
 
 //----------------------------------------------------------------------------
@@ -63,7 +64,7 @@ struct AnsysMaterial
 /** 
 Importer for Ansys Input files
 */
-class ALBA_EXPORT albaOpImporterAnsysCommon : public albaOp
+class ALBA_EXPORT albaOpImporterAnsysCommon : public albaTextFileReaderHelper, public albaOp
 {
 public:
 
@@ -98,17 +99,11 @@ protected:
   int ReadMPDATA();
   int ReadCMBLOCK();
 
-	int GetLine(FILE *fp, char *buffer);
-	int ReplaceInString(char *str, char from, char to);
-  int ReadInit(albaString &fileName);
-
   int WriteElements(int part);
 	int WriteMaterials();
 
   void AddElement(int Id, int nNodes, int type, int matId, int *nodes);
   bool IsInRange(int elemId, int partId);
-
-  void ReadFinalize();
 
   wxBusyInfo *m_BusyInfo;
 
@@ -126,15 +121,7 @@ protected:
 	/** Materials file name*/
 	wxString m_MaterialsFileName;
 
-	albaProgressBarHelper *m_ProgressHelper;
-  
-  FILE * m_FilePointer;
-	char *m_Buffer;
-	int m_BufferLeft;
-  int m_BufferPointer;
-  char m_Line[512];
-  long m_FileSize;
-	long m_BytesReaded;
+
   
 	int m_CurrentMatId;  
 

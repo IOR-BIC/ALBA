@@ -178,9 +178,9 @@ void albaOpAddLandmark::OpRun()
 
 			vtkDataSet * vtkData = m_PickedVme->GetOutput()->GetVTKData();
 			if (vtkData)
-				m_Cloud->SetRadius(vtkData->GetLength() / 60.0);
+				SetLandmarkRadius(vtkData->GetLength() / 60.0);
 			else
-				m_Cloud->SetRadius(7.0);
+				SetLandmarkRadius(7.0);
 
 			m_Cloud->ReparentTo(m_PickedVme);
 
@@ -349,6 +349,9 @@ void albaOpAddLandmark::CreateGui()
 	m_Gui->Button(ID_LOAD, _("Load dictionary"));
 	m_Gui->Button(ID_SAVE, _("Save dictionary"));	
 
+	m_Gui->Divider(2);
+	m_Gui->Double(ID_RADIUS,"Radius:", &m_Radius);
+
 	//////////////////////////////////////////////////////////////////////////
 	m_Gui->Label("");
 	m_Gui->Divider(1);
@@ -389,6 +392,12 @@ void albaOpAddLandmark::OnEvent(albaEventBase *alba_event)
 			}
 			break;
 
+			case ID_RADIUS:
+			{
+				SetLandmarkRadius(m_Radius);
+				GetLogicManager()->CameraUpdate();
+			}
+			break;
 			case VME_PICKED:
 			{
 				pts = vtkPoints::SafeDownCast(e->GetVtkObj());
@@ -818,6 +827,16 @@ int albaOpAddLandmark::SaveDictionary(wxString fileName)
 
 	if (fileName != "") 
 		return SaveLandmarksDefinitions(fileName);
+}
+
+//----------------------------------------------------------------------------
+void albaOpAddLandmark::SetLandmarkRadius(double radius)
+{
+	m_Radius = radius;
+	if (m_Cloud)
+		m_Cloud->SetRadius(m_Radius);
+	if (m_SelectedLandmarkCloud)
+		m_SelectedLandmarkCloud->SetRadius(m_Radius);
 }
 
 //---------------------------------------------------------------------------
