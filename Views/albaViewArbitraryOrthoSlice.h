@@ -122,6 +122,7 @@ public:
 		ID_RESET,
 		ID_LOAD_FROM_REFSYS,
 		ID_GPUENABLED,
+		ID_CAMERA_FOLLOW_GIZMO,
 		ID_SHOW_GIZMO,
 		ID_LAST,
 	};
@@ -263,6 +264,7 @@ protected:
 
 	int m_SkipCameraUpdate;
 	int m_EnableGPU;
+	int m_CameraFollowGizmo;
 	int m_IsShowingSlicerGizmo;
 	
 private:
