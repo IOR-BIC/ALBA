@@ -143,8 +143,8 @@ void albaPipeSurfaceTest::TestPipeExecution()
 		case BASE_TEST:
 			break;
 		case WIREFRAME_TEST:
-				pipeSurface->SetWireframeOn();
-				pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_WIREFRAME));
+				pipeSurface->SetRepresentation(albaPipeGenericPolydata::WIREFRAME_REP);
+				pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_REPRESENTATION));
 			break;
 		case CELL_NORMAL_TEST:
 				pipeSurface->SetNormalsTypeToCells();
@@ -194,8 +194,8 @@ void albaPipeSurfaceTest::TestPipeExecution()
 		case BASE_TEST:
 			break;
 		case WIREFRAME_TEST:
-			pipeSurface->SetWireframeOff();
-			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_WIREFRAME));
+			pipeSurface->SetRepresentation(albaPipeGenericPolydata::SURFACE_REP);
+			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_REPRESENTATION));
 			break;
 		case CELL_NORMAL_TEST:
 			pipeSurface->SetNormalsTypeToPoints();

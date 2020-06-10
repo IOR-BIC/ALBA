@@ -31,6 +31,7 @@ SET(PROJECT_SRCS
   albaHelpManager.cpp  													albaHelpManager.h  
 	albaSnapshotManager.cpp  											albaSnapshotManager.h
 	albaLicenceManager.cpp 												albaLicenceManager.h  
+	albaTextFileReaderHelper.cpp										albaTextFileReaderHelper.h
 )
 
 # List libraries that are needed by this project.

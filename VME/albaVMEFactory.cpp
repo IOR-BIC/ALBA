@@ -55,6 +55,7 @@
 #include "albaVMEVolume.h"
 #include "albaVMEVolumeGray.h"
 #include "albaVMEVolumeRGB.h"
+#include "albaVMEPointCloud.h"
 
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
@@ -141,6 +142,7 @@ albaVMEFactory::albaVMEFactory()
   albaPlugVMEMacro(albaVMEImage,"Image");
   albaPlugVMEMacro(albaVMEMesh,"Mesh");
   albaPlugVMEMacro(albaVMESurface,"Surface");
+	albaPlugVMEMacro(albaVMEPointCloud, "Point Cloud");
   albaPlugVMEMacro(albaVMESurfaceParametric,"Parametric Surface");
   albaPlugVMEMacro(albaVMEVolumeGray,"Volume");
   albaPlugVMEMacro(albaVMEVolumeRGB,"Volume RGB");
