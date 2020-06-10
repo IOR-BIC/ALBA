@@ -350,9 +350,7 @@ void albaPipeGenericPolydata::OnEvent(albaEventBase *alba_event)
 						else
 							m_Representation = SURFACE_REP;
 
-						bool newWireframe = (material->m_Prop->GetRepresentation() == VTK_WIREFRAME);
 						SetRepresentation((REPRESENTATIONS)m_Representation);
-
 					}
 				}
 				break;
@@ -382,28 +380,31 @@ void albaPipeGenericPolydata::SetRepresentation(REPRESENTATIONS rep)
 
 	m_Representation = rep;
 
-	switch (rep)
+	if (m_Actor)
 	{
-		case albaPipeGenericPolydata::SURFACE_REP:
-			m_Actor->GetProperty()->SetRepresentationToSurface();
-			m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
-			break;
-		case albaPipeGenericPolydata::WIREFRAME_REP:
-			m_Actor->GetProperty()->SetRepresentationToWireframe();
-			m_ActorWired->SetVisibility(0);
-			break;
-		case albaPipeGenericPolydata::POINTS_REP:
-			m_Actor->GetProperty()->SetRepresentationToPoints();
-			m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
-			break;
-		default:
-			break;
+		switch (rep)
+		{
+			case albaPipeGenericPolydata::SURFACE_REP:
+				m_Actor->GetProperty()->SetRepresentationToSurface();
+				m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
+				break;
+			case albaPipeGenericPolydata::WIREFRAME_REP:
+				m_Actor->GetProperty()->SetRepresentationToWireframe();
+				m_ActorWired->SetVisibility(0);
+				break;
+			case albaPipeGenericPolydata::POINTS_REP:
+				m_Actor->GetProperty()->SetRepresentationToPoints();
+				m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
+				break;
+			default:
+				break;
+		}
+		m_Actor->Modified();
+		m_ActorWired->Modified();
+		m_ObjectMaterial->m_Representation = m_Actor->GetProperty()->GetRepresentation();
 	}
 
-	m_ObjectMaterial->m_Representation = m_Actor->GetProperty()->GetRepresentation();
-	m_Actor->Modified();
-	m_ActorWired->Modified();
-	if (m_Gui)
+		if (m_Gui)
 	{
 		m_Gui->Enable(ID_THICKNESS, m_Representation != SURFACE_REP);
 		m_Gui->Enable(ID_EDGE_VISIBILITY, m_Representation != WIREFRAME_REP); 
