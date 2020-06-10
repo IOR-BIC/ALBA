@@ -131,6 +131,7 @@ albaViewArbitrarySlice::albaViewArbitrarySlice(wxString label, bool show_ruler)
 	albaNEW(m_SlicingMatrix);
 
 	m_TrilinearInterpolationOn = TRUE;
+	m_CameraFollowGizmo = false;
 }
 //----------------------------------------------------------------------------
 albaViewArbitrarySlice::~albaViewArbitrarySlice()
@@ -315,7 +316,8 @@ void albaViewArbitrarySlice::OnEventGizmoTranslate(albaEventBase *alba_event)
 
 			// post multiplying matrixes coming from the gizmo to the vme
 			// gizmo does not set vme pose  since they cannot scale
-			PostMultiplyEventMatrix(alba_event);
+			if(m_CameraFollowGizmo)
+				PostMultiplyEventMatrix(alba_event);
 
 			albaEvent *e = albaEvent::SafeDownCast(alba_event);
 
@@ -550,6 +552,10 @@ albaGUI* albaViewArbitrarySlice::CreateGui()
 
 	//button to reset at the start position
 	m_Gui->Button(ID_RESET,_("Reset"),"");
+
+	m_Gui->Divider();
+	m_Gui->Bool(ID_CAMERA_FOLLOW_GIZMO, "Camera follow gizmos", &m_CameraFollowGizmo, 1, "Camera follow gizmos");
+	m_Gui->Divider();
 
 	m_Gui->Update();
 
