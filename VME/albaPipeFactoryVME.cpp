@@ -37,6 +37,7 @@
 #include "albaPipeGizmo.h"
 #include "albaPipeLandmarkCloud.h"
 #include "albaPipePointSet.h"
+#include "albaPipePointCloud.h"
 #include "albaPipePolyline.h"
 #include "albaPipeIsosurface.h"
 #ifdef WIN32
@@ -142,6 +143,7 @@ albaPipeFactoryVME::albaPipeFactoryVME()
   albaPlugPipeMacro(albaPipeMeter,"Pipe for albaVMEMeter");
   albaPlugPipeMacro(albaPipeVolumeProjected,"Pipe for render vtk volumes as a projected image along X,Y or Z axes");
   albaPlugPipeMacro(albaPipePointSet,"Pipe for render vtk pointset");
+	albaPlugPipeMacro(albaPipePointCloud, "Pipe for render pointcloud");
   albaPlugPipeMacro(albaPipePolyline,"Pipe for render polylines");
   albaPlugPipeMacro(albaPipeVector,"Pipe to render vectors ");
   albaPlugPipeMacro(albaPipeLandmarkCloud,"Pipe for render landmark clouds");

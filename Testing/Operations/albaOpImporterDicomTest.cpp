@@ -33,7 +33,6 @@
 #include "albaOpImporterDicom.h"
 #include "albaVMEGroup.h"
 #include "albaVMEVolumeGray.h"
-#include "albaVMEPointSet.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkImageData.h"

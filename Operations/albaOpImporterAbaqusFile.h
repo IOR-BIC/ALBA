@@ -20,6 +20,7 @@ PURPOSE. See the above copyright notice for more information.
 // Include :
 //----------------------------------------------------------------------------
 #include "albaOp.h"
+#include "albaTextFileReaderHelper.h"
 #include <map>
 #include <set>
 #include "albaMatrix.h"
@@ -65,7 +66,7 @@ struct AbaqusPart
 //----------------------------------------------------------------------------
 // albaOpImporterAbaqusFile :
 //----------------------------------------------------------------------------
-class ALBA_EXPORT albaOpImporterAbaqusFile : public albaOp
+class ALBA_EXPORT albaOpImporterAbaqusFile : public albaTextFileReaderHelper, public albaOp
 {
 public:
   albaOpImporterAbaqusFile(const wxString &label = "AbaqusImporter");
@@ -109,14 +110,7 @@ protected:
   int ReadInstance();
   int WriteElements();
 
-  int GetLine(FILE *fp, char *buffer);
-  int ReplaceInString(char *str, char from, char to);
-  int ReadInit(albaString &fileName);
-  void ReadFinalize();
-
-  /**/
- 	albaProgressBarHelper *m_ProgressHelper;
-
+  
   wxString m_AbaqusInputFileNameFullPath;
 
   int m_ImporterType;
@@ -126,14 +120,6 @@ protected:
   albaString m_DataDir;
 
   long m_OperationProgress;
-
-  FILE * m_FilePointer;
-  char *m_Buffer;
-  int m_BufferLeft;
-  int m_BufferPointer;
-  char m_Line[512];
-  long m_FileSize;
-  long m_BytesReaded;
 
   std::map<std::string,int> m_MatIDMap;
   int m_LastMatId;

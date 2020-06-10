@@ -39,6 +39,7 @@ SET(PROJECT_SRCS
   albaVMESegmentationVolume.cpp  			albaVMESegmentationVolume.h
   albaAttributeSegmentationVolume.cpp  		albaAttributeSegmentationVolume.h
 	albaDataPipeCustomSegmentationVolume.cpp  	albaDataPipeCustomSegmentationVolume.h
+	albaVMEPointCloud.cpp 					albaVMEPointCloud.h
 )
 
 IF (ALBA_USE_CRYPTO)

@@ -252,12 +252,13 @@ int albaOpImporterAbaqusFile::Import()
 //----------------------------------------------------------------------------
 int albaOpImporterAbaqusFile::ParseAbaqusFile(albaString fileName)
 {
-  // Init ProgressBar
-  m_ProgressHelper = new albaProgressBarHelper(m_Listener);
-  m_ProgressHelper->SetTextMode(m_TestMode);
-  m_ProgressHelper->InitProgressBar("Please wait parsing Abaqus File...");
 
-  ReadInit(fileName);
+	if (ReadInit(fileName, m_TestMode, true, "Please wait parsing Abaqus File...", m_Listener) == ALBA_ERROR)
+	{
+		albaLogMessage("Cannot Open: %s", fileName);
+		ReadFinalize();
+		return ALBA_ERROR;
+	}
 
   // Init Files
   FILE *nodesFile=NULL, *partNodesFile=NULL, *materialsFile=NULL;
@@ -282,7 +283,7 @@ int albaOpImporterAbaqusFile::ParseAbaqusFile(albaString fileName)
   int currentPart = SetPart();
   int readnewline=true;
 
-  while (!readnewline || (GetLine(m_FilePointer, m_Line)) != 0) 
+  while (!readnewline || (GetLine()) != 0) 
   {
     //if(strncmp (m_Line,"*HEADING",8) == 0)
     //{
@@ -417,7 +418,7 @@ int albaOpImporterAbaqusFile::ReadHeader(FILE *outFile)
   char projectkName[254];
   char echo[4], model[4], history[4], contact[4];
 
-  while ((lineLenght = GetLine(m_FilePointer, m_Line)) != 0 && strncmp (m_Line,"*PART,",6) != 0) 
+  while ((lineLenght = GetLine()) != 0 && strncmp (m_Line,"*PART,",6) != 0) 
   {
     if(strncmp (m_Line,"** JOB NAME:",12) == 0)
     {
@@ -451,10 +452,10 @@ int albaOpImporterAbaqusFile::ReadNodes(FILE *outFile)
 
   // *Node
   //      1,         -1.0,          1.0,         -1.0
-  while (GetLine(m_FilePointer, m_Line) != 0)
+  while (GetLine() != 0)
   {
     if(strncmp (m_Line,"*NODE,",5) == 0)
-     GetLine(m_FilePointer, m_Line); 
+     GetLine(); 
 
     linePointer=m_Line;
 
@@ -540,7 +541,7 @@ int albaOpImporterAbaqusFile::ReadElements()
 	else 
 		hasType = false;
 
-  while (GetLine(m_FilePointer, m_Line) != 0)
+  while (GetLine() != 0)
   {
     if(hasType)
     {
@@ -556,7 +557,7 @@ int albaOpImporterAbaqusFile::ReadElements()
       if(nReaded != 0 && nReaded < nNodes+1)
       {
         // Read second line
-        GetLine(m_FilePointer, m_Line);
+        GetLine();
         int shift = nReaded-1;
         nReaded = sscanf(m_Line, "%d, %d, %d, %d, %d, %d, %d, %d, %d, %d", nodes+shift+0,nodes+shift+1,nodes+shift+2,nodes+shift+3,nodes+shift+4,nodes+shift+5,nodes+shift+6,nodes+shift+7);
         totReaded+=nReaded;
@@ -653,7 +654,7 @@ int albaOpImporterAbaqusFile::ReadElset()
 		 int start=0, end=0, inc=0;
 		 // Start, End, Incr.
 		 //    1,  651,    1
-		 GetLine(m_FilePointer, m_Line);
+		 GetLine();
 
 		///RemoveInString(m_Line, ' ');		 
 		//ReplaceInString(m_Line, ',', ' ');
@@ -669,7 +670,7 @@ int albaOpImporterAbaqusFile::ReadElset()
 	 {
 		 // Read element list
 		 // 1, 2, 3, 4,  ...
-		 while (GetLine(m_FilePointer, m_Line) != 0)
+		 while (GetLine() != 0)
 		 {
 			 linePointer = m_Line;
 
@@ -757,7 +758,7 @@ int albaOpImporterAbaqusFile::ReadMaterials(FILE *outFile)
 	std::size_t pos = line.find("NAME=");
 	std::string matName = line.substr(pos + 5).c_str();
 
-	while (GetLine(m_FilePointer, m_Line) != 0)
+	while (GetLine() != 0)
 	{
 		// Default Values
 		sprintf(matEx, "0");
@@ -768,13 +769,13 @@ int albaOpImporterAbaqusFile::ReadMaterials(FILE *outFile)
 		if (strncmp(m_Line, "*DENSITY", 8) == 0)
 		{
 			// 1e-12,
-			GetLine(m_FilePointer, m_Line);
+			GetLine();
 			ReplaceInString(m_Line, ',', ' ');
 
 			int nReaded = sscanf(m_Line, "%s", matDens);
 			if (nReaded == 0) sprintf(matDens, "0");
 
-			GetLine(m_FilePointer, m_Line); // Next Line
+			GetLine(); // Next Line
 		}
 
 		// *Elastic
@@ -788,14 +789,14 @@ int albaOpImporterAbaqusFile::ReadMaterials(FILE *outFile)
 			else
 			{
 				// 3.296537922150794, 0.35
-				GetLine(m_FilePointer, m_Line);
+				GetLine();
 				ReplaceInString(m_Line, ',', ' ');
 
 				int nReaded = sscanf(m_Line, "%s %s", matEx, matNuxy);
 				if (nReaded == 1) sprintf(matNuxy, "0");
 			}
 
-			GetLine(m_FilePointer, m_Line); // Next Line
+			GetLine(); // Next Line
 		}
 		
 		if (m_MatIDMap.find(matName) == m_MatIDMap.end())
@@ -824,7 +825,7 @@ int albaOpImporterAbaqusFile::ReadInstance()
     std::size_t pos = line.find("PART=");
     std::string partName = line.substr(pos+5).c_str();
 
-    GetLine(m_FilePointer, m_Line);
+    GetLine();
 
     AbaqusTransform myTransform;  
     myTransform.partName = partName;
@@ -846,7 +847,7 @@ int albaOpImporterAbaqusFile::ReadInstance()
 			return ALBA_OK;
 		}
 
-    GetLine(m_FilePointer, m_Line);
+    GetLine();
 
     nReaded = sscanf(m_Line, "%f, %f, %f, %f, %f, %f, %f", values+3,values+4,values+5,values+6,values+7,values+8,values+9);
     if(nReaded==7)
@@ -923,84 +924,6 @@ int albaOpImporterAbaqusFile::WriteElements()
   }
 
   return ALBA_OK;
-}
-
-//----------------------------------------------------------------------------
-int albaOpImporterAbaqusFile::GetLine(FILE *fp, char *lineBuffer)
-{
-  char readValue;
-  int readedChars=0;
-
-  do 
-  {
-		if (m_BufferLeft == 0)
-		{
-			m_BufferLeft = fread(m_Buffer,sizeof(char),READ_BUFFER_SIZE,m_FilePointer);
-			m_BufferPointer = 0;
-			//Breaks if EOF is reached
-			if(m_BufferLeft==0)
-				break;
-		}
-
-		lineBuffer[readedChars]=readValue=(toupper(m_Buffer[m_BufferPointer]));
-		readedChars++;
-		m_BufferPointer++;
-		m_BufferLeft--;
-  } while (readValue != '\n');
-
-  lineBuffer[readedChars]=0;
-
-	//Windows translate CR/LF into CR char we need to count a char more for each newline
-	m_BytesReaded+=readedChars+1; 
-  m_ProgressHelper->UpdateProgressBar(((double)m_BytesReaded) * 100 / m_FileSize);
-
-  return readedChars;
-}
-//----------------------------------------------------------------------------
-int albaOpImporterAbaqusFile::ReplaceInString(char *str, char from, char to)
-{
-  int count=0;
-
-  for (int i=0; str[i]!= '\0'; i++)
-  {
-    if (str[i] == from)
-    {
-      str[i]=to;
-      count++;
-    }
-  }
-
-  return count;
-}
-//----------------------------------------------------------------------------
-int albaOpImporterAbaqusFile::ReadInit(albaString &fileName)
-{
-	m_FilePointer = fopen(fileName.GetCStr(), "r");
-
-	if (m_FilePointer == NULL)
-	{
-		if(GetTestMode()==false)
-			albaMessage(_("Error parsing input files! File not found."),_("Error"));
-		else 
-			printf("Error parsing input files! File not found.\n");
-		return ALBA_ERROR;
-	}
-
-	// Calculate file size
-	fseek(m_FilePointer, 0L, SEEK_END);
-	m_FileSize = ftell(m_FilePointer);
-	fseek(m_FilePointer, 0L, SEEK_SET);
-
-	m_Buffer=new char[READ_BUFFER_SIZE];
-	m_BytesReaded = m_BufferLeft = m_BufferPointer = 0;
-
-  return ALBA_OK;
-}
-//----------------------------------------------------------------------------
-void albaOpImporterAbaqusFile::ReadFinalize()
-{
-  delete [] m_Buffer;
-  fclose(m_FilePointer);
 }
 
 //----------------------------------------------------------------------------
