@@ -123,6 +123,7 @@ albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxe
 
 	m_SkipCameraUpdate = 0;
 	m_EnableGPU = false; 
+	m_CameraFollowGizmo = false;
 	m_IsShowingSlicerGizmo = false;
 	for (int i = X; i <= Z; i++)
 	{
@@ -319,7 +320,7 @@ void albaViewArbitraryOrthoSlice::OnEventGizmoTranslate(vtkMatrix4x4 *matrix, in
 
 	for (int i = X; i <= Z; i++)
 	{
-		if (i != planeSkip)
+		if (i != planeSkip && m_CameraFollowGizmo)
 			PostMultiplyEventMatrix(matrix,i);
 	}
 
@@ -464,6 +465,11 @@ albaGUI* albaViewArbitraryOrthoSlice::CreateGui()
 	m_Gui->Divider();
 
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
+
+	m_Gui->Divider();
+	m_Gui->Bool(ID_CAMERA_FOLLOW_GIZMO, "Camera follow gizmos", &m_CameraFollowGizmo, 1, "Camera follow gizmos");
+	m_Gui->Divider();
+
 	m_Gui->Update();
 		
 	EnableWidgets( (m_InputVolume != NULL) );
