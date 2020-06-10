@@ -66,6 +66,7 @@ public:
 		ID_GIZMO_ROTATE,
 		ID_RESET,
 		ID_TRILINEAR_INTERPOLATION_ON,
+		ID_CAMERA_FOLLOW_GIZMO,
 		ID_LAST,
 	};
 
@@ -160,7 +161,8 @@ protected:
 	int			m_TypeGizmo;
 
 	albaGUI				*m_GuiGizmos;
-		
+	
+	int m_CameraFollowGizmo;
 	int m_TrilinearInterpolationOn;
 };
 #endif
