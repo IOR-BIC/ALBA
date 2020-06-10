@@ -55,7 +55,9 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpImporterPLY.h"
 #include "albaOpImporterVRML.h"
 #include "albaOpImporterVTK.h"
+#include "albaOpImporterVTKXML.h"
 #include "albaOpImporterAbaqusFile.h"
+#include "albaOpImporterDicFile.h"
 
 //EXPORTERS
 #include "albaOpExporterAnsysCDBFile.h"
@@ -71,6 +73,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpExporterSTL.h"
 #include "albaOpExporterPLY.h"
 #include "albaOpExporterVTK.h"
+#include "albaOpExporterVTKXML.h"
 #include "albaOpExporterWrappedMeter.h"
 #include "albaOpExporterAbaqusFile.h"
 
@@ -247,6 +250,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpImporterPLY("PLY"));
 	m_Logic->Plug(new albaOpImporterVRML("VRML"));
 	m_Logic->Plug(new albaOpImporterVTK("VTK"));
+	m_Logic->Plug(new albaOpImporterVTKXML("VTK xml"));
 	m_Logic->Plug(new albaOpImporterMSF("ALBA"));
 	m_Logic->Plug(new albaOpImporterMSF1x("MSF 1.x"));
 	m_Logic->Plug(new albaOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
@@ -263,6 +267,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpImporterC3D("C3D"),"Landmark Suite");
 	m_Logic->Plug(new albaOpImporterAnalogWS("EMG"));
 	m_Logic->Plug(new albaOpImporterGRFWS("GRF"));
+	m_Logic->Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
 
 	//------------------------------------------------------------
 	// Exporter Menu:
@@ -272,6 +277,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpExporterSTL("STL"));
 	m_Logic->Plug(new albaOpExporterPLY("PLY"));
 	m_Logic->Plug(new albaOpExporterVTK("VTK"));
+	m_Logic->Plug(new albaOpExporterVTKXML("VTK"));
 	m_Logic->Plug(new albaOpExporterDicom("Dicom"),"",true,dicomSettings);
 	m_Logic->Plug(new albaOpExporterRAW("Raw"));
 	m_Logic->Plug(new albaOpExporterBmp("Bmp"));
