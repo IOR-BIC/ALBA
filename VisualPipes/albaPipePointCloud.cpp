@@ -40,6 +40,7 @@ albaPipePointCloud::albaPipePointCloud()
 //----------------------------------------------------------------------------
 {
 	m_Representation = POINTS_REP;
+	m_SkipNormalFilter = true;
 }
 
 //----------------------------------------------------------------------------
