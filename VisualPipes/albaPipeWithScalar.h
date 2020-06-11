@@ -27,6 +27,7 @@
 //----------------------------------------------------------------------------
 class vtkLookupTable;
 class albaGUILutSwatch;
+class albaGUILutSlider;
 class vtkDataSetMapper;
 class vtkActor;
 class mmaMaterial;
@@ -53,6 +54,7 @@ public:
 	{
 		ID_SCALARS = albaPipe::ID_LAST,
 		ID_LUT,
+		ID_LUT_SLIDER,
 		ID_SCALAR_MAP_ACTIVE,
 		ID_LAST,
 	};
@@ -90,6 +92,7 @@ protected:
   vtkLookupTable  *m_Table;
 	
 	albaGUILutSwatch *m_LutSwatch;
+	albaGUILutSlider		*m_LutSlider;
 
   void CreateFieldDataControlArrays();
 	

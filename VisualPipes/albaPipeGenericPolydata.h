@@ -132,6 +132,7 @@ protected:
   int                      m_BorderElementsWiredActor;
   int                      m_UseVTKProperty;
 	int											 m_FlipNormals;
+	int											 m_SkipNormalFilter;
 	double				           m_Border;
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
