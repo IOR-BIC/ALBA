@@ -320,8 +320,8 @@ void albaViewArbitraryOrthoSlice::OnEventGizmoTranslate(vtkMatrix4x4 *matrix, in
 
 	for (int i = X; i <= Z; i++)
 	{
-		if (i != planeSkip && m_CameraFollowGizmo)
-			PostMultiplyEventMatrix(matrix,i);
+		if (i != planeSkip)
+			PostMultiplyEventMatrix(matrix,i,false);
 	}
 
 	UpdateConesPosition();
@@ -885,7 +885,7 @@ bool albaViewArbitraryOrthoSlice::BelongsToNormalGizmo( albaVME * vme, int side)
 }
 
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::PostMultiplyEventMatrix(vtkMatrix4x4 * matrix, int slicerAxis)
+void albaViewArbitraryOrthoSlice::PostMultiplyEventMatrix(vtkMatrix4x4 * matrix, int slicerAxis, int isRotation)
 {
 	vtkTransform *tr1 = vtkTransform::New();
 	tr1->PostMultiply();
@@ -900,7 +900,26 @@ void albaViewArbitraryOrthoSlice::PostMultiplyEventMatrix(vtkMatrix4x4 * matrix,
 	// ... and update the slicer with the new abs pose
 	
 	m_GizmoRT[slicerAxis]->SetAbsPose(&absPose);
-	m_SlicingMatrix[slicerAxis]->DeepCopy(m_GizmoRT[slicerAxis]->GetAbsPose());
+	if (m_CameraFollowGizmo)
+	{
+		m_SlicingMatrix[slicerAxis]->DeepCopy(m_GizmoRT[slicerAxis]->GetAbsPose());
+	}
+	else
+	{
+		albaMatrix rotation;
+		rotation.CopyRotation(matrix);
+		vtkTransform *tr2 = vtkTransform::New();
+		tr2->PostMultiply();
+		tr2->SetMatrix(m_SlicingMatrix[slicerAxis]->GetVTKMatrix());
+		if (isRotation)
+			tr2->Concatenate(matrix);
+		else
+			tr2->Concatenate(rotation.GetVTKMatrix());
+
+		tr2->Update();
+
+		m_SlicingMatrix[slicerAxis]->DeepCopy(tr2->GetMatrix());
+ 	}
 
 	m_CameraToSlicer[slicerAxis]->UpdateCameraMatrix();
 

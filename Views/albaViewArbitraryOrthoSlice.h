@@ -223,7 +223,7 @@ protected:
 	int GetGizmoPlane(void *gizmo);
 
 	int IsGizmoTranslate(void *gizmo);
-	void PostMultiplyEventMatrix(vtkMatrix4x4 * matrix, int slicerAxis);
+	void PostMultiplyEventMatrix(vtkMatrix4x4 * matrix, int slicerAxis, int isRotation=true);
 	
 	/** Windowing for volumes data. This function overrides superclass method.*/
 	void VolumeWindowing(albaVME *volume);
