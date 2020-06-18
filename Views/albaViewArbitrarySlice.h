@@ -140,7 +140,7 @@ protected:
 	void OnEventGizmoTranslate(albaEventBase *alba_event);
 
 	/** Post multiply matrix for incoming transform events */
-	void PostMultiplyEventMatrix(albaEventBase *alba_event);
+	void PostMultiplyEventMatrix(albaEventBase *alba_event, int isRotation=true);
 
 	/** Windowing for volumes data. This function overrides superclass method.*/
 	void VolumeWindowing(albaVME *volume);
