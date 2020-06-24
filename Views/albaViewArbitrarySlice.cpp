@@ -222,6 +222,12 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 
 			CreateGizmos();
 
+			for (int i = 0; i < 1; i++)
+			{
+				albaPipeVolumeArbSlice *p = albaPipeVolumeArbSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
+				if (p)
+					p->SetEnableGPU(true);
+			}
 			SetSlices();
 			
 			m_Gui->FitGui();
@@ -316,8 +322,7 @@ void albaViewArbitrarySlice::OnEventGizmoTranslate(albaEventBase *alba_event)
 
 			// post multiplying matrixes coming from the gizmo to the vme
 			// gizmo does not set vme pose  since they cannot scale
-			if(m_CameraFollowGizmo)
-				PostMultiplyEventMatrix(alba_event);
+			PostMultiplyEventMatrix(alba_event,false);
 
 			albaEvent *e = albaEvent::SafeDownCast(alba_event);
 
@@ -578,35 +583,31 @@ void albaViewArbitrarySlice::VmeRemove(albaVME *vme)
 	Superclass::VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
-void albaViewArbitrarySlice::PostMultiplyEventMatrix(albaEventBase *alba_event)
+void albaViewArbitrarySlice::PostMultiplyEventMatrix(albaEventBase *alba_event, int isRotation)
 {  
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
-		long arg = e->GetArg();
-		/*double orientation[3];
-		albaMatrix* matrix = e->GetMatrix();
-		albaMatrix rotMatrix;
 
-		albaTransform::GetOrientation(*matrix, orientation);
-		albaTransform::SetOrientation(rotMatrix, orientation);*/
-
-		// handle incoming transform events
+		albaMatrix rotation;
+		vtkMatrix4x4 * matrix = e->GetMatrix()->GetVTKMatrix();
+		
+		rotation.CopyRotation(matrix);
 		vtkTransform *tr = vtkTransform::New();
 		tr->PostMultiply();
 		tr->SetMatrix(m_SlicingMatrix->GetVTKMatrix());
-		tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
-		tr->Update();
+		if (isRotation || m_CameraFollowGizmo)
+			tr->Concatenate(matrix);
+		else
+			tr->Concatenate(rotation.GetVTKMatrix());
+
 
 		albaMatrix absPose;
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(m_CurrentVolume->GetTimeStamp());
 
-		if (arg == albaInteractorGenericMouse::MOUSE_MOVE)
-		{
-			// move vme
-			m_SlicingMatrix->DeepCopy(&absPose);
-			m_AttachCamera->UpdateCameraMatrix();
-		} 
+		
+		m_SlicingMatrix->DeepCopy(&absPose);
+		m_AttachCamera->UpdateCameraMatrix(); 
 
 		// clean up
 		tr->Delete();
