@@ -200,8 +200,8 @@ void albaOpExtractImageFromArbitraryView::CreateGui()
 	if (m_View && m_View->IsA("albaViewArbitraryOrthoSlice"))
 	{
 		m_Gui->Label("");
-		wxString axisChoice[3] = { "X","Y","Z" };
-		m_Gui->Combo(ID_AXIS, "Axis", &m_Axis, 3, axisChoice);
+		wxString axisChoice[3] = { "Sagittal", "Coronal", "Axial" };
+		m_Gui->Combo(ID_AXIS, "Plane", &m_Axis, 3, axisChoice);
 	}
 	
 	m_Gui->Label("Slice Images", 1);
