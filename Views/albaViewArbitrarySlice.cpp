@@ -132,6 +132,7 @@ albaViewArbitrarySlice::albaViewArbitrarySlice(wxString label, bool show_ruler)
 
 	m_TrilinearInterpolationOn = TRUE;
 	m_CameraFollowGizmo = false;
+	m_EnableGPU = true;
 }
 //----------------------------------------------------------------------------
 albaViewArbitrarySlice::~albaViewArbitrarySlice()
@@ -222,12 +223,7 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 
 			CreateGizmos();
 
-			for (int i = 0; i < 1; i++)
-			{
-				albaPipeVolumeArbSlice *p = albaPipeVolumeArbSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
-				if (p)
-					p->SetEnableGPU(true);
-			}
+			SetEnableGPU();
 			SetSlices();
 			
 			m_Gui->FitGui();
@@ -445,6 +441,9 @@ void albaViewArbitrarySlice::OnEventThis(albaEventBase *alba_event)
 			}
 		}
 			break;
+		case ID_GPUENABLED:
+			SetEnableGPU();
+		break;
 		default:
 			albaViewCompound::OnEvent(alba_event);
 		}
@@ -548,7 +547,13 @@ albaGUI* albaViewArbitrarySlice::CreateGui()
 
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER, "Lut", m_ColorLUT);
 
+	m_Gui->Divider();
 	m_Gui->Bool(ID_TRILINEAR_INTERPOLATION_ON, "Interpolation", &m_TrilinearInterpolationOn, 1);
+	m_Gui->Divider();
+
+	m_Gui->Divider();
+	m_Gui->Bool(ID_GPUENABLED, "Enable GPU Acceleration", &m_EnableGPU, 1, "Enable GPU Acceleration");
+	m_Gui->Divider();
 
 	m_Gui->Divider(1);
 
@@ -803,4 +808,17 @@ albaPipe* albaViewArbitrarySlice::GetPipeSlice()
 	pipeSlice = GetViewSlice()->GetNodePipe(m_CurrentVolume);
 
 	return pipeSlice;
+}
+
+void albaViewArbitrarySlice::SetEnableGPU()
+{
+	for (int i = ARBITRARY_VIEW; i <= SLICE_VIEW; i++)
+	{
+		albaPipeVolumeArbSlice *pipeSlice = albaPipeVolumeArbSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
+		if (pipeSlice)
+			pipeSlice->SetEnableGPU(m_EnableGPU);
+	}
+
+	
+	CameraUpdate();
 }

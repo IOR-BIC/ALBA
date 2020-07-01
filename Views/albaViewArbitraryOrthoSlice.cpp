@@ -122,7 +122,7 @@ albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxe
 	}
 
 	m_SkipCameraUpdate = 0;
-	m_EnableGPU = false; 
+	m_EnableGPU = true; 
 	m_CameraFollowGizmo = false;
 	m_IsShowingSlicerGizmo = false;
 	for (int i = X; i <= Z; i++)
