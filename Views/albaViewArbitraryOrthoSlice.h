@@ -124,6 +124,7 @@ public:
 		ID_GPUENABLED,
 		ID_CAMERA_FOLLOW_GIZMO,
 		ID_SHOW_GIZMO,
+		ID_SLICING_ORIGIN,
 		ID_LAST,
 	};
 
@@ -187,6 +188,8 @@ protected:
 
 	void UpdateConesPosition();
 
+	void OnSlicingOrigin();
+
 	/** 
 	Create the helper cone giving feedback for camera direction*/
 	void BuildCameraConeVME(int axis);
@@ -247,6 +250,7 @@ protected:
 
 	albaAttachCamera		*m_CameraToSlicer[3];
 
+	double	m_SlicingOriginGUI[3];
 	double	m_SlicingOrigin[3];
 	double	m_SlicingOriginReset[3];
 	double	m_VolumeVTKDataABSOrientation[3];

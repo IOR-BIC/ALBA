@@ -67,6 +67,7 @@ public:
 		ID_RESET,
 		ID_TRILINEAR_INTERPOLATION_ON,
 		ID_CAMERA_FOLLOW_GIZMO,
+		ID_GPUENABLED,
 		ID_LAST,
 	};
 
@@ -145,6 +146,10 @@ protected:
 	/** Windowing for volumes data. This function overrides superclass method.*/
 	void VolumeWindowing(albaVME *volume);
 
+	/** Set the GPU according to m_EnableGPU variable*/
+	void SetEnableGPU();
+
+
 	albaViewVTK *m_ViewSlice;
 	albaViewVTK *m_ViewArbitrary;
 
@@ -164,5 +169,7 @@ protected:
 	
 	int m_CameraFollowGizmo;
 	int m_TrilinearInterpolationOn;
+	int m_EnableGPU;
+
 };
 #endif
