@@ -259,16 +259,18 @@ void albaViewArbitraryOrthoSlice::UpdateConesPosition()
 void albaViewArbitraryOrthoSlice::OnSlicingOrigin()
 {
 	
-	double origin[3], normal[3], translation[3];
-	
-	for (int i = 0; i < 3; i++)
-	{
-		translation[i] = m_SlicingOriginGUI[i] - m_SlicingOrigin[i];
-	}
-	albaMatrix transMatrix;
-	albaTransform::Translate(transMatrix, translation, true);
+	if (m_InputVolume) {
+		double origin[3], normal[3], translation[3];
 
-	OnEventGizmoTranslate(transMatrix.GetVTKMatrix(), -1);
+		for (int i = 0; i < 3; i++)
+		{
+			translation[i] = m_SlicingOriginGUI[i] - m_SlicingOrigin[i];
+		}
+		albaMatrix transMatrix;
+		albaTransform::Translate(transMatrix, translation, true);
+
+		OnEventGizmoTranslate(transMatrix.GetVTKMatrix(), -1);
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -613,6 +615,7 @@ void albaViewArbitraryOrthoSlice::EnableWidgets(bool enable)
 		m_Gui->Enable(ID_RESET, enable);
 		m_Gui->Enable(ID_LUT_CHOOSER, enable);
 		m_Gui->Enable(ID_SHOW_GIZMO, enable);
+		m_Gui->Enable(ID_SLICING_ORIGIN, enable);
 		m_Gui->FitGui();
 		m_Gui->Update();
 	}
