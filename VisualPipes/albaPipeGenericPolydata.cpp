@@ -73,6 +73,7 @@ albaPipeGenericPolydata::albaPipeGenericPolydata()
   m_UseVTKProperty  = 1;
 
 	m_FlipNormals = false;
+	m_SkipNormalFilter = false;
   m_BorderElementsWiredActor = false;
 	m_Border = 1;
 }
@@ -130,19 +131,25 @@ void albaPipeGenericPolydata::ExecutePipe()
 	
 	vtkPolyData *polyData=GetInputAsPolyData();
 
-	vtkNEW(m_NormalsFilter);
-	m_NormalsFilter->SetFlipNormals(m_FlipNormals);
-	m_NormalsFilter->SetComputePointNormals(!m_ShowCellsNormals);
-	m_NormalsFilter->SetComputeCellNormals(m_ShowCellsNormals);
-	m_NormalsFilter->SetInput(polyData);
-	m_Mapper->SetInput(m_NormalsFilter->GetOutput());	
-
+	if (m_SkipNormalFilter)
+	{
+		m_Mapper->SetInput(polyData);
+	}
+	else
+	{
+		vtkNEW(m_NormalsFilter);
+		m_NormalsFilter->SetFlipNormals(m_FlipNormals);
+		m_NormalsFilter->SetComputePointNormals(!m_ShowCellsNormals);
+		m_NormalsFilter->SetComputeCellNormals(m_ShowCellsNormals);
+		m_NormalsFilter->SetInput(polyData);
+		m_Mapper->SetInput(m_NormalsFilter->GetOutput());
+	}
 
   m_Mapper->Update();
 	m_Mapper->SetResolveCoincidentTopologyToPolygonOffset();
 
   vtkNEW(m_MapperWired);
-  m_MapperWired->SetInput(m_NormalsFilter->GetOutput());
+  m_MapperWired->SetInput(m_SkipNormalFilter ? polyData : m_NormalsFilter->GetOutput());
   m_MapperWired->SetScalarRange(0,0);
   m_MapperWired->ScalarVisibilityOff();
 
@@ -350,9 +357,7 @@ void albaPipeGenericPolydata::OnEvent(albaEventBase *alba_event)
 						else
 							m_Representation = SURFACE_REP;
 
-						bool newWireframe = (material->m_Prop->GetRepresentation() == VTK_WIREFRAME);
 						SetRepresentation((REPRESENTATIONS)m_Representation);
-
 					}
 				}
 				break;
@@ -382,28 +387,31 @@ void albaPipeGenericPolydata::SetRepresentation(REPRESENTATIONS rep)
 
 	m_Representation = rep;
 
-	switch (rep)
+	if (m_Actor)
 	{
-		case albaPipeGenericPolydata::SURFACE_REP:
-			m_Actor->GetProperty()->SetRepresentationToSurface();
-			m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
-			break;
-		case albaPipeGenericPolydata::WIREFRAME_REP:
-			m_Actor->GetProperty()->SetRepresentationToWireframe();
-			m_ActorWired->SetVisibility(0);
-			break;
-		case albaPipeGenericPolydata::POINTS_REP:
-			m_Actor->GetProperty()->SetRepresentationToPoints();
-			m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
-			break;
-		default:
-			break;
+		switch (rep)
+		{
+			case albaPipeGenericPolydata::SURFACE_REP:
+				m_Actor->GetProperty()->SetRepresentationToSurface();
+				m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
+				break;
+			case albaPipeGenericPolydata::WIREFRAME_REP:
+				m_Actor->GetProperty()->SetRepresentationToWireframe();
+				m_ActorWired->SetVisibility(0);
+				break;
+			case albaPipeGenericPolydata::POINTS_REP:
+				m_Actor->GetProperty()->SetRepresentationToPoints();
+				m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
+				break;
+			default:
+				break;
+		}
+		m_Actor->Modified();
+		m_ActorWired->Modified();
+		m_ObjectMaterial->m_Representation = m_Actor->GetProperty()->GetRepresentation();
 	}
 
-	m_ObjectMaterial->m_Representation = m_Actor->GetProperty()->GetRepresentation();
-	m_Actor->Modified();
-	m_ActorWired->Modified();
-	if (m_Gui)
+		if (m_Gui)
 	{
 		m_Gui->Enable(ID_THICKNESS, m_Representation != SURFACE_REP);
 		m_Gui->Enable(ID_EDGE_VISIBILITY, m_Representation != WIREFRAME_REP); 
@@ -416,9 +424,12 @@ void albaPipeGenericPolydata::SetRepresentation(REPRESENTATIONS rep)
 void albaPipeGenericPolydata::SetNormalsTypeToPoints()
 {
 	m_ShowCellsNormals=0;
-	m_NormalsFilter->ComputeCellNormalsOff();
-	m_NormalsFilter->ComputePointNormalsOn();
-	m_NormalsFilter->Update();
+	if (m_NormalsFilter)
+	{
+		m_NormalsFilter->ComputeCellNormalsOff();
+		m_NormalsFilter->ComputePointNormalsOn();
+		m_NormalsFilter->Update();
+	}
 	GetLogicManager()->CameraUpdate();
 }
 
@@ -426,9 +437,12 @@ void albaPipeGenericPolydata::SetNormalsTypeToPoints()
 void albaPipeGenericPolydata::SetNormalsTypeToCells()
 {
 	m_ShowCellsNormals=1 ;
-	m_NormalsFilter->ComputeCellNormalsOn();
-	m_NormalsFilter->ComputePointNormalsOff();
-	m_NormalsFilter->Update();
+	if (m_NormalsFilter)
+	{
+		m_NormalsFilter->ComputeCellNormalsOn();
+		m_NormalsFilter->ComputePointNormalsOff();
+		m_NormalsFilter->Update();
+	}
 	GetLogicManager()->CameraUpdate();
 }
 

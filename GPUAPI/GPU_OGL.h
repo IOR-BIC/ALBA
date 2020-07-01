@@ -244,6 +244,14 @@ public:
 #endif
   }
 
+	/** Copies the result from the framebuffer (target) into the given buffer
+	The buffer must be capable to hold W*H pixels, i.e., W*H bytes if
+	bGetVector is false, otherwise 3*W*H - W and H are set in SetTarget*/
+	inline void GetResult(double* pBuffer, bool bGetVector = true) {
+#ifdef _WIN32
+		GetResult(pBuffer, GL_DOUBLE, bGetVector);
+#endif
+	}
 #ifdef _WIN32
   /** Copies the result from the framebuffer (target) into the given buffer
   The buffer must be capable to hold W*H pixels, i.e., W*H bytes if 
