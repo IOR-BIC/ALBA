@@ -113,6 +113,7 @@ albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxe
 	m_InputVolume   = NULL;
 	m_CameraToSlicer[0] = m_CameraToSlicer[1] = m_CameraToSlicer[2] = NULL;
 	m_SlicingOrigin[0] = m_SlicingOrigin[1] = m_SlicingOrigin[2] = 0.0;
+	m_SlicingOriginGUI[0] = m_SlicingOriginGUI[1] = m_SlicingOriginGUI[2] = 0.0;
 	m_SlicingOriginReset[0] = m_SlicingOriginReset[1] = m_SlicingOriginReset[2] = 0.0;
 	m_CameraConeVME[0] = m_CameraConeVME[1] = m_CameraConeVME[2] = NULL;
 	for (int i = X; i <= Z; i++)
@@ -255,6 +256,22 @@ void albaViewArbitraryOrthoSlice::UpdateConesPosition()
 }
 
 //----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::OnSlicingOrigin()
+{
+	
+	double origin[3], normal[3], translation[3];
+	
+	for (int i = 0; i < 3; i++)
+	{
+		translation[i] = m_SlicingOriginGUI[i] - m_SlicingOrigin[i];
+	}
+	albaMatrix transMatrix;
+	albaTransform::Translate(transMatrix, translation, true);
+
+	OnEventGizmoTranslate(transMatrix.GetVTKMatrix(), -1);
+}
+
+//----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::CameraUpdate()
 {
 	if (!m_SkipCameraUpdate)
@@ -361,6 +378,8 @@ void albaViewArbitraryOrthoSlice::SetSlices()
 		
 	for (int i = X; i <= Z; i++)
 	{
+		m_SlicingOriginGUI[i] = m_SlicingOrigin[i];
+
 		//update the normal of the cutter plane of the surface
 		double surfaceOriginTranslated[3];
 		double normal[3];
@@ -389,6 +408,7 @@ void albaViewArbitraryOrthoSlice::SetSlices()
 		pipeOrthoSlice->SetSlice(i, m_SlicingOrigin, normal);
 	}
 	CameraUpdate();
+	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::OnEventThis(albaEventBase *alba_event)
@@ -413,6 +433,9 @@ void albaViewArbitraryOrthoSlice::OnEventThis(albaEventBase *alba_event)
 		case ID_GPUENABLED:
 			SetEnableGPU();
 		break;
+		case ID_SLICING_ORIGIN:
+			OnSlicingOrigin();
+			break;
 		default:
 			albaViewCompound::OnEvent(alba_event);
 		}
@@ -462,9 +485,19 @@ albaGUI* albaViewArbitraryOrthoSlice::CreateGui()
 
 	m_Gui->Divider();
 	m_Gui->Bool(ID_GPUENABLED, "Enable GPU Acceleration", &m_EnableGPU, 1, "Enable GPU Acceleration");
+	
 	m_Gui->Divider();
 
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
+
+	m_Gui->Divider();
+	m_Gui->Divider();
+	m_Gui->Label("Slicing Origin:", true);
+	m_Gui->Double(ID_SLICING_ORIGIN, "X:", &m_SlicingOriginGUI[0]);
+	m_Gui->Double(ID_SLICING_ORIGIN, "Y:", &m_SlicingOriginGUI[1]);
+	m_Gui->Double(ID_SLICING_ORIGIN, "Z:", &m_SlicingOriginGUI[2]);
+	m_Gui->Divider();
+	m_Gui->Divider();
 
 	m_Gui->Divider();
 	m_Gui->Bool(ID_CAMERA_FOLLOW_GIZMO, "Camera follow gizmos", &m_CameraFollowGizmo, 1, "Camera follow gizmos");
@@ -653,6 +686,7 @@ void albaViewArbitraryOrthoSlice::ShowVolume( albaVME * vme, bool show )
 	localToABSTPDF->SetTransform(sliceCenterLocalCoordsToABSCoordsTransform);
 	localToABSTPDF->Update();
 	localToABSTPDF->GetOutput()->GetCenter(m_SlicingOrigin);
+	localToABSTPDF->GetOutput()->GetCenter(m_SlicingOriginGUI);
 	localToABSTPDF->GetOutput()->GetCenter(m_SlicingOriginReset);
 
 	vtkTransform *transformReset;
@@ -722,7 +756,7 @@ void albaViewArbitraryOrthoSlice::OnReset()
 	{
 		m_GizmoRT[i]->SetAbsPose(m_SlicingResetMatrix[i]);
 		m_SlicingMatrix[i]->DeepCopy(m_SlicingResetMatrix[i]);
-		m_SlicingOrigin[i] = m_SlicingOriginReset[i];
+		m_SlicingOriginGUI[i] = m_SlicingOrigin[i] = m_SlicingOriginReset[i];
 	}
 
 	RestoreCameraParametersForAllSubviews();
