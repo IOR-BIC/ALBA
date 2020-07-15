@@ -58,6 +58,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpImporterVTKXML.h"
 #include "albaOpImporterAbaqusFile.h"
 #include "albaOpImporterDicFile.h"
+#include "albaOpImporterPointCloud.h"
 
 //EXPORTERS
 #include "albaOpExporterAnsysCDBFile.h"
@@ -268,6 +269,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpImporterAnalogWS("EMG"));
 	m_Logic->Plug(new albaOpImporterGRFWS("GRF"));
 	m_Logic->Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
+	m_Logic->Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
 
 	//------------------------------------------------------------
 	// Exporter Menu:
