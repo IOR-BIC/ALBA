@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaPipeSurfaceTest
- Authors: Matteo Giacomoni
+ Module: albaPipePointCloudTest
+ Authors: Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -23,11 +23,11 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "albaPipeSurfaceTest.h"
-#include "albaPipeSurface.h"
+#include "albaPipePointCloudTest.h"
+#include "albaPipePointCloud.h"
 
 #include "albaSceneNode.h"
-#include "albaVMESurface.h"
+#include "albaVMEPointCloud.h"
 #include "mmaMaterial.h"
 
 #include "albaVMERoot.h"
@@ -43,32 +43,29 @@
 
 #include <iostream>
 
-enum PIPE_SURFACE_ACTORS
+enum PIPE_POINT_CLOUD_ACTORS
   {
-    PIPE_SURFACE_ACTOR,
-    PIPE_SURFACE_ACTOR_WIRED,
-    PIPE_SURFACE_ACTOR_OUTLINE_CORNER,
-    PIPE_SURFACE_NUMBER_OF_ACTORS,
+    PIPE_POINT_CLOUD_ACTOR,
+    PIPE_POINT_CLOUD_ACTOR_WIRED,
+    PIPE_POINT_CLOUD_ACTOR_OUTLINE_CORNER,
+    PIPE_POINT_CLOUD_NUMBER_OF_ACTORS,
   };
 
-enum TESTS_PIPE_SURFACE
+enum TESTS_PIPE_POINT_CLOUD
 {
   BASE_TEST,
-	WIREFRAME_TEST,
-	POINTS_TEST,
-  CELL_NORMAL_TEST,
   SCALAR_TEST,
   VTK_PROPERTY_TEST,
-	EDGE_TEST,
+	THICKNESS_TEST,
   NUMBER_OF_TEST,
 };
 
 //----------------------------------------------------------------------------
-void albaPipeSurfaceTest::TestFixture()
+void albaPipePointCloudTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void albaPipeSurfaceTest::BeforeTest()
+void albaPipePointCloudTest::BeforeTest()
 {
   vtkNEW(m_Renderer);
   vtkNEW(m_RenderWindow);
@@ -83,93 +80,77 @@ void albaPipeSurfaceTest::BeforeTest()
 	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
 //----------------------------------------------------------------------------
-void albaPipeSurfaceTest::AfterTest()
+void albaPipePointCloudTest::AfterTest()
 {
   vtkDEL(m_Renderer);
   vtkDEL(m_RenderWindow);
   vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void albaPipeSurfaceTest::TestPipeExecution()
+void albaPipePointCloudTest::TestPipeExecution()
 {
   ////// Create VME (import vtkData) ////////////////////
   vtkDataSetReader *Importer;
   vtkNEW(Importer);
   albaString filename=ALBA_DATA_ROOT;
-  filename<<"/Test_PipeSurface/surface0.vtk";
+  filename<<"/Test_PipePointCloud/PointCloud.vtk";
   Importer->SetFileName(filename);
   Importer->Update();
-  albaVMESurface *surface;
-  albaNEW(surface);
-  surface->SetData((vtkPolyData*)Importer->GetOutput(),0.0);
-  surface->GetOutput()->Update();
-  surface->GetMaterial();
+  albaVMEPointCloud *pointCloud;
+  albaNEW(pointCloud);
+  pointCloud->SetData((vtkPolyData*)Importer->GetOutput(),0.0);
+  pointCloud->GetOutput()->Update();
+  pointCloud->GetMaterial();
 
 	//Setting standard material to avoid random color selection
-	surface->GetMaterial()->m_Diffuse[0]=0.3;
-	surface->GetMaterial()->m_Diffuse[1]=0.6;
-	surface->GetMaterial()->m_Diffuse[2]=0.9;
-	surface->GetMaterial()->UpdateProp();
+	pointCloud->GetMaterial()->m_Diffuse[0]=0.3;
+	pointCloud->GetMaterial()->m_Diffuse[1]=0.6;
+	pointCloud->GetMaterial()->m_Diffuse[2]=0.9;
+	pointCloud->GetMaterial()->UpdateProp();
 
-  surface->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
-  surface->Update();
+  pointCloud->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+  pointCloud->Update();
   
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *sceneNode;
-  sceneNode = new albaSceneNode(NULL,NULL,surface, NULL);
+  sceneNode = new albaSceneNode(NULL,NULL,pointCloud, NULL);
 
   /////////// Pipe Instance and Creation ///////////
-  albaPipeSurface *pipeSurface = new albaPipeSurface;
-  pipeSurface->Create(sceneNode);
+  albaPipePointCloud *pipePointCloud = new albaPipePointCloud;
+  pipePointCloud->Create(sceneNode);
   
   ////////// ACTORS List ///////////////
   vtkPropCollection *actorList = vtkPropCollection::New();
 
 	const char *strings[NUMBER_OF_TEST];
 	strings[0] = "BASE_TEST";
-	strings[1] = "WIREFRAME_TEST";
-	strings[2] = "POINTS_TEST";
-	strings[3] = "CELL_NORMAL_TEST";
-	strings[4] = "SCALAR_TEST";
-	strings[5] = "VTK_PRPOERTY_TEST";
-	strings[6] = "EDGE_TEST";
+	strings[1] = "SCALAR_TEST";
+	strings[2] = "VTK_PRPOERTY_TEST";
+	strings[3] = "THICKNESS_TEST";
 	
   for(int i=0;i<NUMBER_OF_TEST;i++)
   {
-		switch ((TESTS_PIPE_SURFACE) i)
+		switch ((TESTS_PIPE_POINT_CLOUD) i)
 		{
 		case BASE_TEST:
 			break;
-		case WIREFRAME_TEST:
-			pipeSurface->SetRepresentation(albaPipeGenericPolydata::WIREFRAME_REP);
-			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_REPRESENTATION));
-			break;
-		case POINTS_TEST:
-			pipeSurface->SetRepresentation(albaPipeGenericPolydata::POINTS_REP);
-			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_REPRESENTATION));
-			break;
-		case CELL_NORMAL_TEST:
-				pipeSurface->SetNormalsTypeToCells();
-				pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_NORMALS_TYPE));
-			break;
 		case SCALAR_TEST:
-				pipeSurface->SetScalarMapActive(true);
-				pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_SCALAR_MAP_ACTIVE));
+				pipePointCloud->SetScalarMapActive(true);
+				pipePointCloud->OnEvent(&albaEvent(this, albaPipePointCloud::ID_SCALAR_MAP_ACTIVE));
 			break;
 		case VTK_PROPERTY_TEST:
-				pipeSurface->SetUseVTKProperty(true);
-				pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_USE_VTK_PROPERTY));
+				pipePointCloud->SetUseVTKProperty(true);
+				pipePointCloud->OnEvent(&albaEvent(this, albaPipePointCloud::ID_USE_VTK_PROPERTY));
 			break;
-		case EDGE_TEST:
-				pipeSurface->SetEdgesVisibilityOn();
-				pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_EDGE_VISIBILITY));
+		case THICKNESS_TEST:
+				pipePointCloud->SetThickness(5);
 			break;
 		default:
 			break;
 		}
 				
 		//Updating Actor Lists
-		pipeSurface->GetAssemblyFront()->GetActors(actorList);
+		pipePointCloud->GetAssemblyFront()->GetActors(actorList);
    
 		actorList->InitTraversal();
 		vtkProp *actor = actorList->GetNextProp();
@@ -181,9 +162,9 @@ void albaPipeSurfaceTest::TestPipeExecution()
 		}
 		
 		// Rendering - check images 
-    vtkActor *surfaceActor;
-    surfaceActor = (vtkActor *) SelectActorToControl(actorList, PIPE_SURFACE_ACTOR);
-    CPPUNIT_ASSERT(surfaceActor != NULL);
+    vtkActor *pointCloudActor;
+    pointCloudActor = (vtkActor *) SelectActorToControl(actorList, PIPE_POINT_CLOUD_ACTOR);
+    CPPUNIT_ASSERT(pointCloudActor != NULL);
 
     m_RenderWindow->Render();
 	  printf("\n Visualization: %s \n", strings[i]);
@@ -191,30 +172,20 @@ void albaPipeSurfaceTest::TestPipeExecution()
 		COMPARE_IMAGES("TestPipeExecution", i);
 
 		//Reset Pipe
-		switch ((TESTS_PIPE_SURFACE) i)
+		switch ((TESTS_PIPE_POINT_CLOUD) i)
 		{
 		case BASE_TEST:
 			break;
-		case WIREFRAME_TEST:
-		case POINTS_TEST:
-			pipeSurface->SetRepresentation(albaPipeGenericPolydata::SURFACE_REP);
-			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_REPRESENTATION));
-			break;
-		case CELL_NORMAL_TEST:
-			pipeSurface->SetNormalsTypeToPoints();
-			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_NORMALS_TYPE));
-			break;
 		case SCALAR_TEST:
-			pipeSurface->SetScalarMapActive(false);
-			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_SCALAR_MAP_ACTIVE));
+			pipePointCloud->SetScalarMapActive(false);
+			pipePointCloud->OnEvent(&albaEvent(this, albaPipePointCloud::ID_SCALAR_MAP_ACTIVE));
 			break;
 		case VTK_PROPERTY_TEST:
-			pipeSurface->SetUseVTKProperty(false);
-			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_USE_VTK_PROPERTY));
+			pipePointCloud->SetUseVTKProperty(false);
+			pipePointCloud->OnEvent(&albaEvent(this, albaPipePointCloud::ID_USE_VTK_PROPERTY));
 			break;
-		case EDGE_TEST:
-			pipeSurface->SetEdgesVisibilityOff();
-			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_EDGE_VISIBILITY));
+		case THICKNESS_TEST:
+			pipePointCloud->SetThickness(1);
 			break;
 		default:
 			break;
@@ -223,12 +194,12 @@ void albaPipeSurfaceTest::TestPipeExecution()
 
   vtkDEL(actorList);
   delete sceneNode;
-  albaDEL(surface);
+  albaDEL(pointCloud);
   vtkDEL(Importer);
 }
 
 //----------------------------------------------------------------------------
-vtkProp *albaPipeSurfaceTest::SelectActorToControl(vtkPropCollection *propList, int index)
+vtkProp *albaPipePointCloudTest::SelectActorToControl(vtkPropCollection *propList, int index)
 {
   propList->InitTraversal();
   vtkProp *actor = propList->GetNextProp();

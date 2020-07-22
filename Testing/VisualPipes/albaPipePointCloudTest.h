@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaPipeMeshTest
- Authors: Daniele Giunchi, Gianluigi Crimi
+ Module: albaPipePointCloudTest
+ Authors: Gianlgui Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_albaPipeMeshTest_H__
-#define __CPP_UNIT_albaPipeMeshTest_H__
+#ifndef __CPP_UNIT_albaPipePointCloudTest_H__
+#define __CPP_UNIT_albaPipePointCloudTest_H__
 
 #include "albaTest.h"
 
@@ -24,7 +24,7 @@ class vtkRenderWindowInteractor;
 class vtkProp;
 class vtkPropCollection;
 
-class albaPipeMeshTest : public albaTest
+class albaPipePointCloudTest : public albaTest
 {
   public: 
   // Executed before each test
@@ -33,21 +33,16 @@ class albaPipeMeshTest : public albaTest
   // Executed after each test
   void AfterTest();
 
-	CPPUNIT_TEST_SUITE(albaPipeMeshTest);
+	CPPUNIT_TEST_SUITE( albaPipePointCloudTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
-	CPPUNIT_TEST(TestPipeExecution);
-	CPPUNIT_TEST(TestScalarVisualization);
+	CPPUNIT_TEST( TestPipeExecution );
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();
 	void TestPipeExecution();
-	void TestScalarVisualization();
 
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
-
-  /**Compare Mapper scalarange with controlled values */
-  void ProceduralControl(double controlRangeMapper[2] , vtkProp *propToControl);
 
   /** Select The Actor that will be controlled*/
   vtkProp *SelectActorToControl(vtkPropCollection* propList, int index);
