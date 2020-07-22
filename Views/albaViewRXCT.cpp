@@ -623,6 +623,7 @@ void albaViewRXCT::OnEvent(albaEventBase *alba_event)
       {
         OnEventSnapModality();
       }
+			break;
       case ID_RIGHT_OR_LEFT:
         {
           if (m_RightOrLeft==0)
