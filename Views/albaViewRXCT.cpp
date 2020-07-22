@@ -441,13 +441,7 @@ void albaViewRXCT::OnEventRangeModified(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 void albaViewRXCT::OnEventSnapModality()
 {
-  if(this->m_CurrentVolume==NULL && m_Snap)
-  {
-    wxMessageBox("You can't switch to snap modality!");
-    m_Snap=0;
-    m_Gui->Update();
-  }
-  else
+  if(this->m_CurrentVolume!=NULL)
   {
     for(int i=0; i<6; i++)
     {
