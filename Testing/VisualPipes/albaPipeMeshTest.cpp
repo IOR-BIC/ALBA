@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaPipeMeshTest
- Authors: Daniele Giunchi
+ Authors: Daniele Giunchi, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
