@@ -53,14 +53,24 @@ enum PIPE_MESH_ACTORS
     PIPE_MESH_NUMBER_OF_ACTORS,
   };
 
+enum TESTS_PIPE_MESH
+{
+	BASE_TEST,
+	WIREFRAME_TEST,
+	POINTS_TEST,
+	CELL_NORMAL_TEST,
+	SCALAR_TEST,
+	VTK_PROPERTY_TEST,
+	EDGE_TEST,
+	NUMBER_OF_TEST,
+};
+
 //----------------------------------------------------------------------------
 void albaPipeMeshTest::TestFixture()
-//----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 void albaPipeMeshTest::BeforeTest()
-//----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
   vtkNEW(m_RenderWindow);
@@ -76,15 +86,153 @@ void albaPipeMeshTest::BeforeTest()
 }
 //----------------------------------------------------------------------------
 void albaPipeMeshTest::AfterTest()
-//----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);
   vtkDEL(m_RenderWindow);
   vtkDEL(m_RenderWindowInteractor);
 }
+
 //----------------------------------------------------------------------------
 void albaPipeMeshTest::TestPipeExecution()
+{
+	////// Create VME (import vtkData) ////////////////////
+	vtkDataSetReader *Importer;
+	vtkNEW(Importer);
+	albaString filename = ALBA_DATA_ROOT;
+	filename << "/FEM/pipemesh/hex8.vtk";
+	Importer->SetFileName(filename);
+	Importer->Update();
+	albaVMEMesh *mesh;
+	albaNEW(mesh);
+	mesh->SetData(Importer->GetOutput(), 0.0);
+	mesh->GetOutput()->Update();
+	mesh->GetMaterial();
+
+	//Setting standard material to avoid random color selection
+	mesh->GetMaterial()->m_Diffuse[0] = 0.3;
+	mesh->GetMaterial()->m_Diffuse[1] = 0.6;
+	mesh->GetMaterial()->m_Diffuse[2] = 0.9;
+	mesh->GetMaterial()->UpdateProp();
+
+	mesh->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+	mesh->Update();
+
+	//Assembly will be create when instancing albaSceneNode
+	albaSceneNode *sceneNode;
+	sceneNode = new albaSceneNode(NULL, NULL, mesh, NULL);
+
+	/////////// Pipe Instance and Creation ///////////
+	albaPipeMesh *pipeMesh = new albaPipeMesh;
+	pipeMesh->Create(sceneNode);
+
+	////////// ACTORS List ///////////////
+	vtkPropCollection *actorList = vtkPropCollection::New();
+
+	const char *strings[NUMBER_OF_TEST];
+	strings[0] = "BASE_TEST";
+	strings[1] = "WIREFRAME_TEST";
+	strings[2] = "POINTS_TEST";
+	strings[3] = "CELL_NORMAL_TEST";
+	strings[4] = "SCALAR_TEST";
+	strings[5] = "VTK_PRPOERTY_TEST";
+	strings[6] = "EDGE_TEST";
+
+	for (int i = 0; i < NUMBER_OF_TEST; i++)
+	{
+		switch ((TESTS_PIPE_MESH)i)
+		{
+			case BASE_TEST:
+				break;
+			case WIREFRAME_TEST:
+				pipeMesh->SetRepresentation(albaPipeGenericPolydata::WIREFRAME_REP);
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_REPRESENTATION));
+				break;
+			case POINTS_TEST:
+				pipeMesh->SetRepresentation(albaPipeGenericPolydata::POINTS_REP);
+				pipeMesh->SetThickness(5);
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_REPRESENTATION));
+				break;
+			case CELL_NORMAL_TEST:
+				pipeMesh->SetNormalsTypeToCells();
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_NORMALS_TYPE));
+				break;
+			case SCALAR_TEST:
+				pipeMesh->SetScalarMapActive(true);
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_SCALAR_MAP_ACTIVE));
+				break;
+			case VTK_PROPERTY_TEST:
+				pipeMesh->SetUseVTKProperty(true);
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_USE_VTK_PROPERTY));
+				break;
+			case EDGE_TEST:
+				pipeMesh->SetEdgesVisibilityOn();
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_EDGE_VISIBILITY));
+				break;
+			default:
+				break;
+		}
+
+		//Updating Actor Lists
+		pipeMesh->GetAssemblyFront()->GetActors(actorList);
+
+		actorList->InitTraversal();
+		vtkProp *actor = actorList->GetNextProp();
+		m_Renderer->RemoveAllProps();
+		while (actor)
+		{
+			m_Renderer->AddActor(actor);
+			actor = actorList->GetNextProp();
+		}
+
+		// Rendering - check images 
+		vtkActor *surfaceActor;
+		surfaceActor = (vtkActor *)SelectActorToControl(actorList, PIPE_MESH_ACTOR);
+		CPPUNIT_ASSERT(surfaceActor != NULL);
+
+		m_RenderWindow->Render();
+		printf("\n Visualization: %s \n", strings[i]);
+
+		COMPARE_IMAGES("TestPipeExecution", i);
+
+		//Reset Pipe
+		switch ((TESTS_PIPE_MESH)i)
+		{
+			case BASE_TEST:
+				break;
+			case WIREFRAME_TEST:
+			case POINTS_TEST:
+				pipeMesh->SetRepresentation(albaPipeGenericPolydata::SURFACE_REP);
+				pipeMesh->SetThickness(1);
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_REPRESENTATION));
+				break;
+			case CELL_NORMAL_TEST:
+				pipeMesh->SetNormalsTypeToPoints();
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_NORMALS_TYPE));
+				break;
+			case SCALAR_TEST:
+				pipeMesh->SetScalarMapActive(false);
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_SCALAR_MAP_ACTIVE));
+				break;
+			case VTK_PROPERTY_TEST:
+				pipeMesh->SetUseVTKProperty(false);
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_USE_VTK_PROPERTY));
+				break;
+			case EDGE_TEST:
+				pipeMesh->SetEdgesVisibilityOff();
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_EDGE_VISIBILITY));
+				break;
+			default:
+				break;
+		}
+	}
+
+	vtkDEL(actorList);
+	delete sceneNode;
+	albaDEL(mesh);
+	vtkDEL(Importer);
+}
 //----------------------------------------------------------------------------
+void albaPipeMeshTest::TestScalarVisualization()
 {
   ////// Create VME (import vtkData) ////////////////////
   vtkDataSetReader *Importer;
@@ -177,9 +325,9 @@ void albaPipeMeshTest::TestPipeExecution()
 
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
-		printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
+		printf("\n visualization: %s \n", strings[arrayIndex]);
 
-		COMPARE_IMAGES("TestPipeExecution", arrayIndex);
+		COMPARE_IMAGES("TestScalarVisualization", arrayIndex);
   }
 
   vtkDEL(actorList);
@@ -191,7 +339,6 @@ void albaPipeMeshTest::TestPipeExecution()
 
 //----------------------------------------------------------------------------
 void albaPipeMeshTest::ProceduralControl(double controlRangeMapper[2],vtkProp *propToControl)
-//----------------------------------------------------------------------------
 {
   //procedural control
 
@@ -202,7 +349,6 @@ void albaPipeMeshTest::ProceduralControl(double controlRangeMapper[2],vtkProp *p
 }
 //----------------------------------------------------------------------------
 vtkProp *albaPipeMeshTest::SelectActorToControl(vtkPropCollection *propList, int index)
-//----------------------------------------------------------------------------
 {
   propList->InitTraversal();
   vtkProp *actor = propList->GetNextProp();

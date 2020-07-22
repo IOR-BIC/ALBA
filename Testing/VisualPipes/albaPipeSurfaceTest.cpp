@@ -55,6 +55,7 @@ enum TESTS_PIPE_SURFACE
 {
   BASE_TEST,
 	WIREFRAME_TEST,
+	POINTS_TEST,
   CELL_NORMAL_TEST,
   SCALAR_TEST,
   VTK_PROPERTY_TEST,
@@ -64,12 +65,10 @@ enum TESTS_PIPE_SURFACE
 
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTest::TestFixture()
-//----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTest::BeforeTest()
-//----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
   vtkNEW(m_RenderWindow);
@@ -85,7 +84,6 @@ void albaPipeSurfaceTest::BeforeTest()
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTest::AfterTest()
-//----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);
   vtkDEL(m_RenderWindow);
@@ -93,7 +91,6 @@ void albaPipeSurfaceTest::AfterTest()
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTest::TestPipeExecution()
-//----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
   vtkDataSetReader *Importer;
@@ -131,10 +128,11 @@ void albaPipeSurfaceTest::TestPipeExecution()
 	const char *strings[NUMBER_OF_TEST];
 	strings[0] = "BASE_TEST";
 	strings[1] = "WIREFRAME_TEST";
-	strings[2] = "CELL_NORMAL_TEST";
-	strings[3] = "SCALAR_TEST";
-	strings[4] = "VTK_PRPOERTY_TEST";
-	strings[5] = "EDGE_TEST";
+	strings[2] = "POINTS_TEST";
+	strings[3] = "CELL_NORMAL_TEST";
+	strings[4] = "SCALAR_TEST";
+	strings[5] = "VTK_PRPOERTY_TEST";
+	strings[6] = "EDGE_TEST";
 	
   for(int i=0;i<NUMBER_OF_TEST;i++)
   {
@@ -143,8 +141,12 @@ void albaPipeSurfaceTest::TestPipeExecution()
 		case BASE_TEST:
 			break;
 		case WIREFRAME_TEST:
-				pipeSurface->SetRepresentation(albaPipeGenericPolydata::WIREFRAME_REP);
-				pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_REPRESENTATION));
+			pipeSurface->SetRepresentation(albaPipeGenericPolydata::WIREFRAME_REP);
+			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_REPRESENTATION));
+			break;
+		case POINTS_TEST:
+			pipeSurface->SetRepresentation(albaPipeGenericPolydata::POINTS_REP);
+			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_REPRESENTATION));
 			break;
 		case CELL_NORMAL_TEST:
 				pipeSurface->SetNormalsTypeToCells();
@@ -194,6 +196,7 @@ void albaPipeSurfaceTest::TestPipeExecution()
 		case BASE_TEST:
 			break;
 		case WIREFRAME_TEST:
+		case POINTS_TEST:
 			pipeSurface->SetRepresentation(albaPipeGenericPolydata::SURFACE_REP);
 			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_REPRESENTATION));
 			break;
@@ -226,7 +229,6 @@ void albaPipeSurfaceTest::TestPipeExecution()
 
 //----------------------------------------------------------------------------
 vtkProp *albaPipeSurfaceTest::SelectActorToControl(vtkPropCollection *propList, int index)
-//----------------------------------------------------------------------------
 {
   propList->InitTraversal();
   vtkProp *actor = propList->GetNextProp();

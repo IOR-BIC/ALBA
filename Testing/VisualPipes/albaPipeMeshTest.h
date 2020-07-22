@@ -33,14 +33,16 @@ class albaPipeMeshTest : public albaTest
   // Executed after each test
   void AfterTest();
 
-	CPPUNIT_TEST_SUITE( albaPipeMeshTest );
+	CPPUNIT_TEST_SUITE(albaPipeMeshTest);
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
-	CPPUNIT_TEST( TestPipeExecution );
+	CPPUNIT_TEST(TestPipeExecution);
+	CPPUNIT_TEST(TestScalarVisualization);
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();
 	void TestPipeExecution();
+	void TestScalarVisualization();
 
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
 
