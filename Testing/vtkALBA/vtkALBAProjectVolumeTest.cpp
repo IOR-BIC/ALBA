@@ -264,6 +264,121 @@ void vtkALBAProjectVolumeTest::TestRangeProjectionZ()
 
 
 //----------------------------------------------------------------------------
+void vtkALBAProjectVolumeTest::TestExecutionProjectionMaxX()
+{
+	//create imageData with scalars
+	vtkImageData *image = CreateNewSPWithScalars();
+
+	//Preparing Test Control Data
+	vtkALBASmartPointer<vtkFloatArray> arrayControl;
+	for (int z = 0; z < glo_Dimension[2]; z++)
+		for (int y = 0; y < glo_Dimension[1]; y++)
+		{
+			double acc = VTK_DOUBLE_MIN;
+			for (int x = 0; x < glo_Dimension[0]; x++)
+				acc =  MAX(acc, image->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x));
+			arrayControl->InsertNextTuple1(acc);
+		}
+
+	//use filter
+	vtkALBASmartPointer<vtkALBAProjectVolume> filter;
+	filter->SetInput(image);
+	filter->SetProjectionSideToX();
+	filter->SetProjectionModalityToMax();
+	filter->Update();
+
+	//check Control
+	vtkImageData *projectedImage = vtkImageData::SafeDownCast(filter->GetOutput());
+	projectedImage->Update();
+	for (int j = 0; j < glo_Dimension[1] * glo_Dimension[2]; j++)
+	{
+		float value1 = arrayControl->GetTuple1(j);
+		float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
+		CPPUNIT_ASSERT(value1 == value2);
+	}
+
+	CPPUNIT_ASSERT(strcmp(filter->GetProjectionSideAsString(), "X") == 0);
+	CPPUNIT_ASSERT(filter->GetProjectionSide() == VTK_PROJECT_FROM_X);
+
+	vtkDEL(image);
+}
+
+//--------------------------------------------------
+void vtkALBAProjectVolumeTest::TestExecutionProjectionMaxY()
+{
+	//create imageData with scalars
+	vtkImageData *image = CreateNewSPWithScalars();
+
+	//Preparing Test Control Data
+	vtkALBASmartPointer<vtkFloatArray> arrayControl;
+	for (int z = 0; z < glo_Dimension[2]; z++)
+		for (int x = 0; x < glo_Dimension[0]; x++)
+		{
+			double acc = VTK_DOUBLE_MIN;
+			for (int y = 0; y < glo_Dimension[1]; y++)
+				acc = MAX(acc,image->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x));
+			arrayControl->InsertNextTuple1(acc);
+		}
+
+	//use filter
+	vtkALBASmartPointer<vtkALBAProjectVolume> filter;
+	filter->SetInput(image);
+	filter->SetProjectionSideToY();
+	filter->SetProjectionModalityToMax();
+	filter->Update();
+
+	//check Control
+	vtkImageData *projectedImage = (vtkImageData *)filter->GetOutput();
+	for (int j = 0; j < glo_Dimension[0] * glo_Dimension[2]; j++)
+	{
+		float value1 = arrayControl->GetTuple1(j);
+		float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
+		CPPUNIT_ASSERT(value1 == value2);
+	}
+	CPPUNIT_ASSERT(strcmp(filter->GetProjectionSideAsString(), "Y") == 0);
+	CPPUNIT_ASSERT(filter->GetProjectionSide() == VTK_PROJECT_FROM_Y);
+
+	vtkDEL(image);
+}
+//--------------------------------------------------
+void vtkALBAProjectVolumeTest::TestExecutionProjectionMaxZ()
+{
+	//create imageData with scalars
+	vtkImageData *image = CreateNewSPWithScalars();
+
+	//Preparing Test Control Data
+	vtkALBASmartPointer<vtkFloatArray> arrayControl;
+	for (int y = 0; y < glo_Dimension[1]; y++)
+		for (int x = 0; x < glo_Dimension[0]; x++)
+		{
+			double acc = VTK_DOUBLE_MIN;
+			for (int z = 0; z < glo_Dimension[2]; z++)
+				acc = MAX(acc,image->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x));
+			arrayControl->InsertNextTuple1(acc);
+		}
+
+	//use filter
+	vtkALBASmartPointer<vtkALBAProjectVolume> filter;
+	filter->SetInput(image);
+	filter->SetProjectionSideToZ();
+	filter->SetProjectionModalityToMax();
+	filter->Update();
+
+	//check Control
+	vtkImageData *projectedImage = (vtkImageData *)filter->GetOutput();
+	for (int j = 0; j < glo_Dimension[0] * glo_Dimension[1]; j++)
+	{
+		float value1 = arrayControl->GetTuple1(j);
+		float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
+		CPPUNIT_ASSERT(value1 == value2);
+	}
+	CPPUNIT_ASSERT(strcmp(filter->GetProjectionSideAsString(), "Z") == 0);
+	CPPUNIT_ASSERT(filter->GetProjectionSide() == VTK_PROJECT_FROM_Z);
+
+	vtkDEL(image);
+}
+
+//----------------------------------------------------------------------------
 vtkImageData * vtkALBAProjectVolumeTest::CreateNewSPWithScalars()
 {
 	//create imageData with scalars
