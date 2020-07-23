@@ -35,6 +35,9 @@ class vtkALBAProjectVolumeTest : public albaTest
 		CPPUNIT_TEST(TestRangeProjectionX);
 		CPPUNIT_TEST(TestRangeProjectionY);
 		CPPUNIT_TEST(TestRangeProjectionZ);
+		CPPUNIT_TEST(TestExecutionProjectionMaxX);
+		CPPUNIT_TEST(TestExecutionProjectionMaxY);
+		CPPUNIT_TEST(TestExecutionProjectionMaxZ);
 		/** End Test Suite */
     CPPUNIT_TEST_SUITE_END();
 
@@ -54,6 +57,12 @@ class vtkALBAProjectVolumeTest : public albaTest
 		void TestRangeProjectionY();
 		/** Test for projection on Z and validate the result */
 		void TestRangeProjectionZ();
+		/** Test for projection max and validate the result */
+		void TestExecutionProjectionMaxX();
+		/** Test for projection max and validate the result */
+		void TestExecutionProjectionMaxY();
+		/** Test for projection max and validate the result */
+		void TestExecutionProjectionMaxZ();
 		/** Create a new StructuredPoints for Testing*/
 		vtkImageData *CreateNewSPWithScalars();
 };
