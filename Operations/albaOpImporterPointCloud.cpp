@@ -63,7 +63,7 @@ albaOp(label)
 	m_ScalarNames[0] = "ID1";
 	m_ScalarNames[1] = "ID2";
 	m_ScalarNames[2] = "ID3";
-	m_CommentLine = "%";
+	SetCommentLine("%");
 }
 //----------------------------------------------------------------------------
 albaOpImporterPointCloud::~albaOpImporterPointCloud()
@@ -84,7 +84,7 @@ void albaOpImporterPointCloud::CreateGui()
 
 	m_Gui->Label("");
 	m_Gui->Label("File Characteristics:", 1);
-	m_Gui->String(ID_INPUT, "Comments", &m_CommentLine, "The comment line beginning");
+	m_Gui->String(ID_INPUT, "Comments", &GetCommentLine(), "The comment line beginning");
 	m_Gui->Integer(ID_INPUT, "First Coord", &m_FirstCoordCol, 1, 100, "The Column of the first coordinate");
 	m_Gui->Label("");
 
@@ -161,23 +161,69 @@ void albaOpImporterPointCloud::OnEvent(albaEventBase *alba_event)
 }
 
 //----------------------------------------------------------------------------
+albaString albaOpImporterPointCloud::GetScalarName(int pos) const
+{
+	if (pos < 0 || pos >2)
+		return "";
+	else
+		return m_ScalarNames[pos];
+}
+
+//----------------------------------------------------------------------------
+void albaOpImporterPointCloud::SetScalarName(int pos, albaString val)
+{
+	if (pos < 0 || pos >2)
+		return;
+	else
+		m_ScalarNames[pos] = val;
+}
+
+//----------------------------------------------------------------------------
+void albaOpImporterPointCloud::SetNumberOfScalars(int val)
+{
+	if (val < 0 || val > 3)
+		return;
+	else 
+	m_ScalarsNum = val;
+}
+
+//----------------------------------------------------------------------------
+int albaOpImporterPointCloud::GetScalarColumn(int pos) const
+{
+	if (pos < 0 || pos > 2)
+		return -1;
+	else 
+		return m_ScalarCol[pos];
+}
+
+//----------------------------------------------------------------------------
+void albaOpImporterPointCloud::SetScalarColumn(int pos, int val)
+{
+	if (pos < 0 || pos > 2)
+		return;
+	else
+		m_ScalarCol[pos] = val;
+}
+
+//----------------------------------------------------------------------------
 int albaOpImporterPointCloud::Import(void)
 {
 	
-	m_FileName = "";
 	albaString wildcard = "Point Cloud files (*.*)|*.*|All Files (*.*)|*.*";
 
-
-	wxString f;
-	f = albaGetOpenFile("", wildcard).c_str();
-	if (!f.IsEmpty() && wxFileExists(f))
-		m_FileName = f;
-	else
-		return ALBA_ERROR;
-
-	if (ReadInit(m_FileName, GetTestMode(), true, "Please wait parsing DIC File...", m_Listener) == ALBA_ERROR)
+	if (!GetTestMode())
 	{
-		albaErrorMessage("Cannot Open: %s", m_FileName.GetCStr());
+		wxString f;
+		f = albaGetOpenFile("", wildcard).c_str();
+		if (!f.IsEmpty() && wxFileExists(f))
+			SetFileName(f);
+		else
+			return ALBA_ERROR;
+	}
+
+	if (ReadInit(GetFileName(), GetTestMode(), true, "Please wait parsing Point Cloud File...", m_Listener) == ALBA_ERROR)
+	{
+		albaErrorMessage("Cannot Open: %s", GetFileName().GetCStr());
 		ReadFinalize();
 		return ALBA_ERROR;
 	}
@@ -185,12 +231,12 @@ int albaOpImporterPointCloud::Import(void)
 	
 	wxString path, name, ext;
 
-	wxSplitPath(m_FileName, &path, &name, &ext);
+	wxSplitPath(GetFileName(), &path, &name, &ext);
 
 	
-	albaVMEPointCloud *polydataVME;
-	albaNEW(polydataVME);
-	polydataVME->SetName(name);
+	albaVMEPointCloud *pointCloudVME;
+	albaNEW(pointCloudVME);
+	pointCloudVME->SetName(name);
 
 	vtkPolyData * polydata;
 	vtkNEW(polydata);
@@ -214,7 +260,7 @@ int albaOpImporterPointCloud::Import(void)
 	
 	if (lineLenght == 0)
 	{
-		albaErrorMessage("Wrong file: %s", m_FileName.GetCStr());
+		albaErrorMessage("Wrong file: %s", GetFileName().GetCStr());
 		ReadFinalize();
 		return ALBA_ERROR;
 	}
@@ -233,7 +279,7 @@ int albaOpImporterPointCloud::Import(void)
 	do 
 	{
 		//Skip Comments
-		if (strncmp(m_Line, m_CommentLine.GetCStr(), m_CommentLine.Length()) == 0)
+		if (strncmp(m_Line, GetCommentLine().GetCStr(), GetCommentLine().Length()) == 0)
 				continue;
 
 		pos = 0;
@@ -242,7 +288,19 @@ int albaOpImporterPointCloud::Import(void)
 			nReaded = sscanf(m_Line+pos, "%lf %n", &value, &charReaded);
 			if (nReaded != 1)
 			{
-				albaErrorMessage("Wrong column number\n\n\tFile: %s", m_FileName.GetCStr());
+				if (m_TestMode)
+					albaLogMessage("Wrong column number\n\n\tFile: %s", GetFileName().GetCStr());
+				else
+					albaErrorMessage("Wrong column number\n\n\tFile: %s", GetFileName().GetCStr());
+
+				for (int i = 0; i < m_ScalarsNum; i++)
+					vtkDEL(newArray[i]);
+
+				vtkDEL(newPoints);
+				vtkDEL(polys);
+				vtkDEL(polydata);
+				albaDEL(pointCloudVME);
+
 				ReadFinalize();
 				return ALBA_ERROR;
 			}
@@ -294,11 +352,13 @@ int albaOpImporterPointCloud::Import(void)
 
 	polydata->Modified();
 	polydata->Update();
-	polydataVME->SetData(polydata,0);
+	pointCloudVME->SetData(polydata,0);
 	vtkDEL(polydata);
 
-	polydataVME->ReparentTo(m_Input);
-	albaDEL(polydataVME);
+	pointCloudVME->ReparentTo(m_Input);
+	m_Output = pointCloudVME;
+
+	albaDEL(pointCloudVME);
 
 	ReadFinalize();
 
