@@ -74,9 +74,9 @@ int albaOpImporterDicFile::Import(void)
 	wxSplitPath(m_FileName, &path, &name, &ext);
 
 	
-	albaVMEPointCloud *polydataVME;
-	albaNEW(polydataVME);
-	polydataVME->SetName(name);
+	albaVMEPointCloud *pointCloudVME;
+	albaNEW(pointCloudVME);
+	pointCloudVME->SetName(name);
 
 	vtkPolyData * polydata;
 	vtkNEW(polydata);
@@ -148,11 +148,14 @@ int albaOpImporterDicFile::Import(void)
 
 	polydata->Modified();
 	polydata->Update();
-	polydataVME->SetData(polydata,0);
+	pointCloudVME->SetData(polydata,0);
 	vtkDEL(polydata);
 
-	polydataVME->ReparentTo(m_Input);
-	albaDEL(polydataVME);
+	pointCloudVME->ReparentTo(m_Input);
+
+	m_Output = pointCloudVME;
+
+	albaDEL(pointCloudVME);
 
 	ReadFinalize();
 }
