@@ -22,6 +22,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOp.h"
 #include "albaTextFileReaderHelper.h"
 #include "albaDefines.h"
+#include "albaString.h"
 
 
 //----------------------------------------------------------------------------
@@ -54,8 +55,34 @@ public:
 	/** Event management */
 	virtual void OnEvent(albaEventBase *alba_event);
 
+	/** Get File Name */
+	albaString GetFileName() const { return m_FileName; }
+	/**Set File Name */
+	void SetFileName(albaString val) { m_FileName = val; }
 
+	/**Get Comment Line */
+	albaString GetCommentLine() const { return m_CommentLine; }
+	/**Set Comment Line */
+	void SetCommentLine(albaString val) { m_CommentLine = val; }
+	
+	/** Get Scalar Name */
+	albaString GetScalarName(int pos) const;
+	/** Set Scalar Name */
+	void SetScalarName(int pos, albaString val);
+	
+	/** Get First the coordinate of the first Column */
+	int GetFirstCoordColumn() const { return m_FirstCoordCol; }
+	/** Get First the coordinate of the first Column */
+	void SetFirstCoordColumn(int val) { m_FirstCoordCol = val; }
 
+	/** Get the number of scalars to read */
+	int GetNumberOfScalars() const { return m_ScalarsNum; }
+	
+	/** Set the number of scalars to read */
+	void SetNumberOfScalars(int val);
+
+	int GetScalarColumn(int pos) const;
+	void SetScalarColumn(int pos, int val);
 protected:
 
 	/** imports informations */
@@ -72,6 +99,8 @@ protected:
 
 	albaString m_CommentLine;
 	albaString m_FileName;
+
+	friend class albaOpImporterPointCloudTest;
   	
 };
 #endif
