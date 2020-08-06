@@ -137,6 +137,7 @@
 #include "albaVMEMeshAnsysTextExporterTest.h"
 #include "albaVMEMeshAnsysTextImporterTest.h"
 #include "albaOpImporterDICFileTest.h"
+#include "albaOpImporterPointCloudTest.h"
 
 #include "itkRawMotionImporterUtilityTest.h"
 
@@ -322,6 +323,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpImporterAbaqusFileTest::suite());
 	runner.addTest(albaOpExporterAbaqusFileTest::suite());
 	runner.addTest(albaOpImporterDICFileTest::suite());
+	runner.addTest(albaOpImporterPointCloudTest::suite());
 
 	runner.run( controller );
 
