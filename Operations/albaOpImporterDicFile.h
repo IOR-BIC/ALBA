@@ -47,13 +47,19 @@ public:
 
 	albaOp* Copy();
 
+	/** Get the filename to import */
+	albaString GetFileName() const { return m_FileName; }
 
+	/** Get the filename to import */
+	void SetFileName(albaString val) { m_FileName = val; }
 protected:
 
 	/** imports informations */
 	int Import(void);
 	 
 	albaString m_FileName;
+
+	friend class albaOpImporterDICFileTest;
   
 };
 #endif

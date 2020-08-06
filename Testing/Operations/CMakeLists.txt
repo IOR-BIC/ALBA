@@ -126,6 +126,7 @@ SET(PROJECT_SRCS
 	albaOpExporterAnsysInputFileTest.h albaOpExporterAnsysInputFileTest.cpp
 	albaOpImporterAbaqusFileTest.h albaOpImporterAbaqusFileTest.cpp
 	albaOpExporterAbaqusFileTest.h albaOpExporterAbaqusFileTest.cpp
+	albaOpImporterDICFileTest.cpp albaOpImporterDICFileTest.h
 )
 
 ADD_EXECUTABLE(albaOperationsTests ${PROJECT_SRCS})
