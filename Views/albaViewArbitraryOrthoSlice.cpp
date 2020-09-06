@@ -555,11 +555,37 @@ void albaViewArbitraryOrthoSlice::SetRestoreTagToVME(albaVME *vme)
 
 	for (int i = 0; i < 3; i++)
 	{
+		//Slicing Stuff
 		albaString tagName;
 		tagName.Printf("ArbOrthoSliceMtr%d", i);
 		matrix = GetSlicerMatrix(i);
 		albaTagItem tag(tagName, (double *)matrix->GetElements(), 16);
 		vme->GetTagArray()->SetTag(tag);
+
+
+		//Camera Stuff
+		double values[3],scale;
+		vtkCamera* camera = ((albaViewSlice*)m_ChildViewList[i+1])->GetRWI()->GetCamera();
+		
+		tagName.Printf("ArbOrthoSliceCamPos%d", i);
+		camera->GetPosition(values);
+		albaTagItem tagPos(tagName, values, 3);
+		vme->GetTagArray()->SetTag(tagPos);
+
+		tagName.Printf("ArbOrthoSliceCamFP%d", i);
+		camera->GetFocalPoint(values);
+		albaTagItem tagFP(tagName, values, 3);
+		vme->GetTagArray()->SetTag(tagFP);
+
+		tagName.Printf("ArbOrthoSliceCamUp%d", i);
+		camera->GetViewUp(values);
+		albaTagItem tagUP(tagName, values, 3);
+		vme->GetTagArray()->SetTag(tagUP);
+
+		tagName.Printf("ArbOrthoSliceCamScale%d", i);
+		scale=camera->GetParallelScale();
+		albaTagItem tagScale(tagName, scale);
+		vme->GetTagArray()->SetTag(tagScale);
 	}
 }
 
@@ -568,7 +594,7 @@ void albaViewArbitraryOrthoSlice::RestoreFromVME(albaVME* vme)
 {
 	if (vme == NULL) return;
 	
-
+	//Slicing Stuff
 	for (int i = 0; i < 3; i++)
 	{
 		albaString tagName;
@@ -590,15 +616,62 @@ void albaViewArbitraryOrthoSlice::RestoreFromVME(albaVME* vme)
 		m_GizmoRT[i]->SetAbsPose(&mtr);
 		m_SlicingMatrix[i]->DeepCopy(m_GizmoRT[i]->GetAbsPose());
 		m_CameraToSlicer[i]->UpdateCameraMatrix();
+
+	
+
 	}
 
 	albaTransform::GetPosition(*m_GizmoRT[0]->GetAbsPose(), m_SlicingOrigin);
-	
-	
-
 	UpdateConesPosition();
-
 	SetSlices();
+
+	
+	//Camera Stuff
+	CameraUpdate();
+
+	for (int i = 0; i < 3; i++)
+	{
+		albaString tagName;
+		double values[3];
+		vtkCamera* camera = ((albaViewSlice*)m_ChildViewList[i+1])->GetRWI()->GetCamera();
+
+		tagName.Printf("ArbOrthoSliceCamPos%d", i);
+		albaTagItem *tag = vme->GetTagArray()->GetTag(tagName);
+		if (tag)
+		{
+			for (int j = 0; j < 3; j++)
+				values[j] = tag->GetComponentAsDouble(j);
+			camera->SetPosition(values);
+		}
+
+		tagName.Printf("ArbOrthoSliceCamFP%d", i);
+		tag = vme->GetTagArray()->GetTag(tagName);
+		if (tag)
+		{
+			for (int j = 0; j < 3; j++)
+				values[j] = tag->GetComponentAsDouble(j);
+			camera->SetFocalPoint(values);
+		}
+
+		tagName.Printf("ArbOrthoSliceCamUp%d", i);
+		tag = vme->GetTagArray()->GetTag(tagName);
+		if (tag)
+		{
+			for (int j = 0; j < 3; j++)
+				values[j] = tag->GetComponentAsDouble(j);
+			camera->SetViewUp(values);
+		}
+
+		tagName.Printf("ArbOrthoSliceCamScale%d", i);
+		tag = vme->GetTagArray()->GetTag(tagName);
+		if (tag)
+		{
+			double  scale = tag->GetValueAsDouble();
+			camera->SetParallelScale(scale);
+		}
+	}
+
+	CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
