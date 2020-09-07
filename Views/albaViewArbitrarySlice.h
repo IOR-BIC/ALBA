@@ -97,10 +97,16 @@ public:
 
 	/** Remove Gizmos, Observers from the volume */
 	void DestroyGizmos();
-
+	
+	/** Get the slicer Matrix */
 	albaMatrix* GetSlicerMatrix();
-	void SetSlicerMatrix(albaMatrix* matrix, int axis = 0);
 
+	/** Set tags to restore view parameter to the in input VME */
+	void SetRestoreTagToVME(albaVME *vme);
+
+	/** Restore view parameters from a vme with stored tags*/
+	void RestoreFromVME(albaVME* vme);
+	
 	/** Generate Gizmos and pose them in the right position*/
 	void CreateGizmos();
 
