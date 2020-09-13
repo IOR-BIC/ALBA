@@ -1,5 +1,5 @@
 /*=========================================================================
-  Program:   Bonemat
+  Program:   ALBA (Agile Library for Biomedical Applications)
   Module:    albaOpImporterPointCloud.cpp
   Language:  C++
   Date:      $Date: 2010-11-23 16:50:26 $
@@ -38,9 +38,10 @@ PURPOSE. See the above copyright notice for more information.
 albaCxxTypeMacro(albaOpImporterPointCloud);
 //----------------------------------------------------------------------------
 
-enum BONEMAT_ID
+enum IMPORT_POINT_CLOUD_ID
 {
-	ID_INPUT = MINID,
+	ID_FIRST = MINID,
+	ID_INPUT,
 	ID_SCALAR,
 	ID_SCALAR1,
 	ID_SCALAR2,
@@ -81,12 +82,14 @@ albaOp* albaOpImporterPointCloud::Copy()
 void albaOpImporterPointCloud::CreateGui()
 {
 	m_Gui = new albaGUI(this);
+	m_Gui->SetListener(this);
 
 	m_Gui->Label("");
 	m_Gui->Label("File Characteristics:", 1);
-	m_Gui->String(ID_INPUT, "Comments", &GetCommentLine(), "The comment line beginning");
+	m_Gui->String(ID_INPUT, "Comments", &m_CommentLine, "The comment line beginning");
 	m_Gui->Integer(ID_INPUT, "First Coord", &m_FirstCoordCol, 1, 100, "The Column of the first coordinate");
 	m_Gui->Label("");
+	m_Gui->Divider(1);
 
 	m_Gui->Label("Scalars:", 1);
 	const wxString scalarsChoice[] = { "Zero", "One", "Two", "Three"};
@@ -100,7 +103,12 @@ void albaOpImporterPointCloud::CreateGui()
 		m_Gui->Label("");
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Divider(1);
 	m_Gui->OkCancel();
+
+	m_Gui->FitGui();
+	m_Gui->Update();
 
 	EnableDisableGui();
 }
@@ -155,6 +163,9 @@ void albaOpImporterPointCloud::OnEvent(albaEventBase *alba_event)
 			case ID_SCALAR2:
 			case ID_SCALAR3:
 				EnableDisableGui();
+				break;
+			default:
+				albaEventMacro(*e);
 				break;
 		}
 	}
@@ -375,6 +386,5 @@ bool albaOpImporterPointCloud::Accept(albaVME *node)
 void albaOpImporterPointCloud::OpRun()
 {
 	CreateGui();
-
 	ShowGui();
 }
