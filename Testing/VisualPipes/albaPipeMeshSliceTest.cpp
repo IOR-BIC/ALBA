@@ -269,7 +269,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_Wireframe()
   pipeMeshSlice->SetSlice(origin,normal);
   pipeMeshSlice->Create(sceneNode);
 
-  pipeMeshSlice->SetWireframeOn();
+  pipeMeshSlice->SetRepresentation(albaPipeGenericPolydata::WIREFRAME_REP);
   pipeMeshSlice->OnEvent(&albaEvent(this, VME_TIME_SET));
   ////////// ACTORS List ///////////////
   vtkPropCollection *actorList = vtkPropCollection::New();
@@ -398,7 +398,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
   pipeMeshSlice->Create(sceneNode);
 
   pipeMeshSlice->SetEdgesVisibilityOn();
-  pipeMeshSlice->SetWireframeOff();
+	pipeMeshSlice->SetRepresentation(albaPipeGenericPolydata::SURFACE_REP);
   pipeMeshSlice->OnEvent(&albaEvent(this, VME_TIME_SET));
   ////////// ACTORS List ///////////////
   vtkPropCollection *actorList = vtkPropCollection::New();
@@ -791,8 +791,8 @@ void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
   pipeMeshSlice->Create(sceneNode);
 
   pipeMeshSlice->SetThickness(3.0);
-  pipeMeshSlice->SetWireframeOn();
-  pipeMeshSlice->SetEdgesVisibilityOn();
+	pipeMeshSlice->SetRepresentation(albaPipeGenericPolydata::WIREFRAME_REP);
+	pipeMeshSlice->SetEdgesVisibilityOn();
   pipeMeshSlice->SetActorPicking(false);
   pipeMeshSlice->OnEvent(&albaEvent(this, VME_TIME_SET));
 

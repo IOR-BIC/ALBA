@@ -77,8 +77,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaGUIPicButton.h"
 #include "albaRefSys.h"
 
-#define EPSILON 1.5e-5
-
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaViewArbitrarySlice);
 //----------------------------------------------------------------------------
@@ -131,6 +129,8 @@ albaViewArbitrarySlice::albaViewArbitrarySlice(wxString label, bool show_ruler)
 	albaNEW(m_SlicingMatrix);
 
 	m_TrilinearInterpolationOn = TRUE;
+	m_CameraFollowGizmo = false;
+	m_EnableGPU = true;
 }
 //----------------------------------------------------------------------------
 albaViewArbitrarySlice::~albaViewArbitrarySlice()
@@ -219,8 +219,13 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 			m_AttachCamera->EnableAttachCamera();
 			((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset(m_CurrentVolume);
 
+			albaPipeVolumeArbSlice* pipeVolSlice = albaPipeVolumeArbSlice::SafeDownCast(m_ChildViewList[SLICE_VIEW]->GetNodePipe(m_CurrentVolume));
+			if (pipeVolSlice)
+				pipeVolSlice->SetEnableSliceViewCorrection(true);
+
 			CreateGizmos();
 
+			SetEnableGPU();
 			SetSlices();
 			
 			m_Gui->FitGui();
@@ -235,14 +240,10 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 			albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(nodePipe);
 			if (pipeSlice)
 			{
-				double surfaceOriginTranslated[3];
 				double normal[3];
 				((albaViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-				surfaceOriginTranslated[0] = m_SliceCenterSurface[0] + normal[0] * EPSILON;
-				surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * EPSILON;
-				surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * EPSILON;
-
-				pipeSlice->SetSlice(surfaceOriginTranslated, normal);
+	
+				pipeSlice->SetSlice(m_SliceCenterSurface, normal);
 			}
 			albaPipeMeshSlice *pipeSliceViewMesh = albaPipeMeshSlice::SafeDownCast(nodePipe);
 			if (pipeSliceViewMesh)
@@ -315,7 +316,7 @@ void albaViewArbitrarySlice::OnEventGizmoTranslate(albaEventBase *alba_event)
 
 			// post multiplying matrixes coming from the gizmo to the vme
 			// gizmo does not set vme pose  since they cannot scale
-			PostMultiplyEventMatrix(alba_event);
+			PostMultiplyEventMatrix(alba_event,false);
 
 			albaEvent *e = albaEvent::SafeDownCast(alba_event);
 
@@ -438,6 +439,9 @@ void albaViewArbitrarySlice::OnEventThis(albaEventBase *alba_event)
 			}
 		}
 			break;
+		case ID_GPUENABLED:
+			SetEnableGPU();
+		break;
 		default:
 			albaViewCompound::OnEvent(alba_event);
 		}
@@ -488,12 +492,8 @@ void albaViewArbitrarySlice::OnReset()
 void albaViewArbitrarySlice::SetSlices()
 {
 	//update the normal of the cutter plane of the surface
-	double surfaceOriginTranslated[3];
 	double normal[3];
 	((albaViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-	surfaceOriginTranslated[0] = m_SliceCenterSurface[0] + normal[0] * EPSILON;
-	surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * EPSILON;
-	surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * EPSILON;
 	albaVME *root = m_CurrentVolume->GetRoot();
 	albaVMEIterator *iter = root->NewIterator();
 	for (albaVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
@@ -502,7 +502,7 @@ void albaViewArbitrarySlice::SetSlices()
 		{
 			albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
 			if (pipeSlice)
-				pipeSlice->SetSlice(surfaceOriginTranslated, normal);
+				pipeSlice->SetSlice(m_SliceCenterSurface, normal);
 		}
 	}
 	iter->Delete();
@@ -541,7 +541,13 @@ albaGUI* albaViewArbitrarySlice::CreateGui()
 
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER, "Lut", m_ColorLUT);
 
+	m_Gui->Divider();
 	m_Gui->Bool(ID_TRILINEAR_INTERPOLATION_ON, "Interpolation", &m_TrilinearInterpolationOn, 1);
+	m_Gui->Divider();
+
+	m_Gui->Divider();
+	m_Gui->Bool(ID_GPUENABLED, "Enable GPU Acceleration", &m_EnableGPU, 1, "Enable GPU Acceleration");
+	m_Gui->Divider();
 
 	m_Gui->Divider(1);
 
@@ -550,6 +556,10 @@ albaGUI* albaViewArbitrarySlice::CreateGui()
 
 	//button to reset at the start position
 	m_Gui->Button(ID_RESET,_("Reset"),"");
+
+	m_Gui->Divider();
+	m_Gui->Bool(ID_CAMERA_FOLLOW_GIZMO, "Camera follow gizmos", &m_CameraFollowGizmo, 1, "Camera follow gizmos");
+	m_Gui->Divider();
 
 	m_Gui->Update();
 
@@ -572,35 +582,31 @@ void albaViewArbitrarySlice::VmeRemove(albaVME *vme)
 	Superclass::VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
-void albaViewArbitrarySlice::PostMultiplyEventMatrix(albaEventBase *alba_event)
+void albaViewArbitrarySlice::PostMultiplyEventMatrix(albaEventBase *alba_event, int isRotation)
 {  
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
-		long arg = e->GetArg();
-		/*double orientation[3];
-		albaMatrix* matrix = e->GetMatrix();
-		albaMatrix rotMatrix;
 
-		albaTransform::GetOrientation(*matrix, orientation);
-		albaTransform::SetOrientation(rotMatrix, orientation);*/
-
-		// handle incoming transform events
+		albaMatrix rotation;
+		vtkMatrix4x4 * matrix = e->GetMatrix()->GetVTKMatrix();
+		
+		rotation.CopyRotation(matrix);
 		vtkTransform *tr = vtkTransform::New();
 		tr->PostMultiply();
 		tr->SetMatrix(m_SlicingMatrix->GetVTKMatrix());
-		tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
-		tr->Update();
+		if (isRotation || m_CameraFollowGizmo)
+			tr->Concatenate(matrix);
+		else
+			tr->Concatenate(rotation.GetVTKMatrix());
+
 
 		albaMatrix absPose;
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(m_CurrentVolume->GetTimeStamp());
 
-		if (arg == albaInteractorGenericMouse::MOUSE_MOVE)
-		{
-			// move vme
-			m_SlicingMatrix->DeepCopy(&absPose);
-			m_AttachCamera->UpdateCameraMatrix();
-		} 
+		
+		m_SlicingMatrix->DeepCopy(&absPose);
+		m_AttachCamera->UpdateCameraMatrix(); 
 
 		// clean up
 		tr->Delete();
@@ -773,10 +779,31 @@ albaMatrix* albaViewArbitrarySlice::GetSlicerMatrix()
 {
 	return m_SlicingMatrix; 
 }
+
 //----------------------------------------------------------------------------
-void albaViewArbitrarySlice::SetSlicerMatrix(albaMatrix* matrix, int axis)
+void albaViewArbitrarySlice::SetRestoreTagToVME(albaVME *vme)
 {
-	m_SlicingMatrix = matrix;
+	albaTagItem tag("ArbSliceMtr", (double *)m_SlicingMatrix, 16);
+	vme->GetTagArray()->SetTag(tag);
+}
+
+
+
+//----------------------------------------------------------------------------
+void albaViewArbitrarySlice::RestoreFromVME(albaVME* vme)
+{
+	albaTagItem *tag = vme->GetTagArray()->GetTag("ArbSliceMtr");
+	
+	int n = 0;
+	for (int j = 0; j < 4; j++)
+		for (int k = 0; k < 4; k++)
+		{
+			m_SlicingMatrix->SetElement(j, k, tag->GetComponentAsDouble(n));
+			n++;
+		}
+
+	SetSlices();
+	CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -796,4 +823,17 @@ albaPipe* albaViewArbitrarySlice::GetPipeSlice()
 	pipeSlice = GetViewSlice()->GetNodePipe(m_CurrentVolume);
 
 	return pipeSlice;
+}
+
+void albaViewArbitrarySlice::SetEnableGPU()
+{
+	for (int i = ARBITRARY_VIEW; i <= SLICE_VIEW; i++)
+	{
+		albaPipeVolumeArbSlice *pipeSlice = albaPipeVolumeArbSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
+		if (pipeSlice)
+			pipeSlice->SetEnableGPU(m_EnableGPU);
+	}
+
+	
+	CameraUpdate();
 }

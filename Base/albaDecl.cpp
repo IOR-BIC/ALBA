@@ -29,6 +29,9 @@
 
 // int ALBAExpertMode = TRUE;
 
+static long randCol = 117;
+
+
 static bool yelding;
 //----------------------------------------------------------------------------
 void albaYield()
@@ -306,13 +309,17 @@ wxBitmap albaBlueScale(wxBitmap bmp)
   }
   return wxBitmap(img);
 }
+
+void albaResetRandomColor()
+{
+	randCol = 117;
+}
 //----------------------------------------------------------------------------
 wxColour albaRandomColor()
 //----------------------------------------------------------------------------
 {
-  static long i = 117;
-  i = (i*13)%16+1;
-  switch( i )
+	randCol = (randCol*13)%16+1;
+  switch( randCol )
   {
     case 1:  return wxColour(229,166,215); break;
     case 2:  return wxColour(224,86 ,86 ); break;

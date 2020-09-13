@@ -66,6 +66,8 @@ public:
 		ID_GIZMO_ROTATE,
 		ID_RESET,
 		ID_TRILINEAR_INTERPOLATION_ON,
+		ID_CAMERA_FOLLOW_GIZMO,
+		ID_GPUENABLED,
 		ID_LAST,
 	};
 
@@ -95,10 +97,16 @@ public:
 
 	/** Remove Gizmos, Observers from the volume */
 	void DestroyGizmos();
-
+	
+	/** Get the slicer Matrix */
 	albaMatrix* GetSlicerMatrix();
-	void SetSlicerMatrix(albaMatrix* matrix, int axis = 0);
 
+	/** Set tags to restore view parameter to the in input VME */
+	void SetRestoreTagToVME(albaVME *vme);
+
+	/** Restore view parameters from a vme with stored tags*/
+	void RestoreFromVME(albaVME* vme);
+	
 	/** Generate Gizmos and pose them in the right position*/
 	void CreateGizmos();
 
@@ -139,10 +147,14 @@ protected:
 	void OnEventGizmoTranslate(albaEventBase *alba_event);
 
 	/** Post multiply matrix for incoming transform events */
-	void PostMultiplyEventMatrix(albaEventBase *alba_event);
+	void PostMultiplyEventMatrix(albaEventBase *alba_event, int isRotation=true);
 
 	/** Windowing for volumes data. This function overrides superclass method.*/
 	void VolumeWindowing(albaVME *volume);
+
+	/** Set the GPU according to m_EnableGPU variable*/
+	void SetEnableGPU();
+
 
 	albaViewVTK *m_ViewSlice;
 	albaViewVTK *m_ViewArbitrary;
@@ -160,7 +172,10 @@ protected:
 	int			m_TypeGizmo;
 
 	albaGUI				*m_GuiGizmos;
-		
+	
+	int m_CameraFollowGizmo;
 	int m_TrilinearInterpolationOn;
+	int m_EnableGPU;
+
 };
 #endif
