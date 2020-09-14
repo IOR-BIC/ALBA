@@ -256,7 +256,9 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 	vtkDEL(polydata);
 
 	pointCloudVME->ReparentTo(m_Surface);
-	m_Output = pointCloudVME;
+
+	albaMatrix identityM;
+	pointCloudVME->SetAbsMatrix(identityM);
 
 	albaDEL(pointCloudVME);
 }
