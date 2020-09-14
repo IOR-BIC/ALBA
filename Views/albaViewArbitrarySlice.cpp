@@ -155,6 +155,7 @@ void albaViewArbitrarySlice::PackageView()
 	m_ViewSlice->PlugVisualPipe("albaVMESurfaceParametric", "albaPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("albaVMEMesh", "albaPipeMeshSlice");
 	m_ViewSlice->PlugVisualPipe("albaVMEGizmo", "albaPipeGizmo", NON_VISIBLE);
+	m_ViewSlice->PlugVisualPipe("albaVMEPointCloud", "albaPipeBox", NON_VISIBLE);
 	m_ViewSlice->PlugVisualPipe("albaVMELandmark", "albaPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("albaVMELandmarkCloud", "albaPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("albaVMERefSys", "albaPipeSurfaceSlice");
