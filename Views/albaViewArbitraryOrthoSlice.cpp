@@ -160,6 +160,7 @@ void albaViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
 	m_ViewSlice[v]->PlugVisualPipe("albaVMEImage", "albaPipeBox", NON_VISIBLE);
 	m_ViewSlice[v]->PlugVisualPipe("albaVMESegmentationVolume", "albaPipeVolumeOrthoSlice");
 	m_ViewSlice[v]->PlugVisualPipe("albaVMESurface", "albaPipeSurfaceSlice");
+	m_ViewSlice[v]->PlugVisualPipe("albaVMEPointCloud", "albaPipeBox", NON_VISIBLE);
 	m_ViewSlice[v]->PlugVisualPipe("albaVMESurfaceParametric", "albaPipeSurfaceSlice");
 	m_ViewSlice[v]->PlugVisualPipe("albaVMEMesh", "albaPipeMeshSlice");
 	m_ViewSlice[v]->PlugVisualPipe("albaVMELandmark", "albaPipeSurfaceSlice");
