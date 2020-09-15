@@ -8,9 +8,6 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  
- #albaAvatar3D2DPicker.cpp					albaAvatar3D2DPicker.h
-  
   albaAction.cpp  							albaAction.h
   albaAgent.cpp  							albaAgent.h
   albaAgentEventHandler.cpp  				albaAgentEventHandler.h
@@ -96,9 +93,6 @@ SET(PROJECT_SRCS
 	albaInteractorSlider.cpp								albaInteractorSlider.h
 )
 
-
-
-
 IF (ALBA_USE_P5_GLOVE)
   SET(PROJECT_SRCS
   ${PROJECT_SRCS}
@@ -113,11 +107,7 @@ IF (ALBA_USE_WIIMOTE)
   )
 ENDIF (ALBA_USE_WIIMOTE)
 
-#IF (ALBA_USE_VTK)
-#  SET(PROJECT_SRCS
-#  ${PROJECT_SRCS}
-#  )
-#ENDIF (ALBA_USE_VTK)
+
 
 IF (WIN32)
   OPTION(ALBA_USE_P5_GLOVE "Link driver for P5 glove device" OFF)

@@ -8,7 +8,6 @@ DBG_MESSAGE("Configuring project albaCore")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-#sorted_vector.h
 albaBase.h
 albaDecl.cpp				albaDecl.h
 albaDbg.h
