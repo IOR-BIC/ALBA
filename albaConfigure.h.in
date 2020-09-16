@@ -6,6 +6,10 @@
 // # define ALBA_EXPORTS
 #endif
 
+#ifdef ALBA_EXPORTS
+#include "albaDLLMacros.h"
+#endif
+
 //--------------------------------------------------------------------------
 // Disable some annoying warning message
 //--------------------------------------------------------------------------

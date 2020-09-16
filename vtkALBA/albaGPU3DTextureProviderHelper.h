@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <vector>
 #include "vtkImagedata.h"
-
+#include "albaDefines.h"
 
 class albaGPUOGL;
 
@@ -34,7 +34,7 @@ typedef struct TextureList
 };
 
 
-class albaGPU3DTextureProviderHelper 
+class ALBA_EXPORT albaGPU3DTextureProviderHelper 
 {
 public:
 	albaGPU3DTextureProviderHelper();

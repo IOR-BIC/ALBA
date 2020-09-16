@@ -69,12 +69,10 @@ SET(vtkALBA_SRCS
   vtkHoleConnectivity.cxx  								vtkHoleConnectivity.h
   vtkPatchLine.h  										vtkPatchLine.cpp
   
-  vtkALBAAbstractPointsSource.cpp 						vtkALBAAbstractPointsSource.h
   vtkALBALineStripSource.cpp 							vtkALBALineStripSource.h
 
   vtkALBADataArrayDescriptor.cxx  						vtkALBADataArrayDescriptor.h
   vtkALBAFile.cxx  										vtkALBAFile.h	
-  vtkALBAIdType64.h
   
   ###############################################
   vtkALBAVolumeRayCastMapper.cxx  						vtkALBAVolumeRayCastMapper.h
@@ -101,17 +99,11 @@ SET(vtkALBA_SRCS
   vtkALBAVolumeToClosedSmoothSurface.cxx  				vtkALBAVolumeToClosedSmoothSurface.h
   
   ###############################################
-  vtkBoundingBox.cxx  									vtkBoundingBox.h
-  vtkALBAPastValuesList.cpp  							vtkALBAPastValuesList.h
-  vtkALBAStentModelSource.cpp  							vtkALBAStentModelSource.h
-  vtkALBADeformableSimplexMeshFilter.h
-  vtkALBADeformableSimplexMeshFilter_Impl.h
 	
   vtkALBATubeFilter.cxx 									vtkALBATubeFilter.h
 	
   vtkALBALandmarkCloudOutlineCornerFilter.cxx 			vtkALBALandmarkCloudOutlineCornerFilter.h
   
-  albaGPU3DTextureProviderHelper.cpp 						albaGPU3DTextureProviderHelper.h
 )
 
 IF(WIN32)
@@ -127,6 +119,21 @@ SET(vtkALBA_SRCS  ${vtkALBA_SRCS}
   albaICPUtility.h
 )
 ENDIF (ALBA_USE_ITK)
+
+
+#####PUT HERE FILES THAT DOES NOT NEEDS AN INSTANTIATOR
+SET(vtkALBA_FULL_SRCS
+	${vtkALBA_SRCS}
+  vtkALBAAbstractPointsSource.cpp 						vtkALBAAbstractPointsSource.h
+  vtkBoundingBox.cxx  									vtkBoundingBox.h
+  vtkALBAPastValuesList.cpp  							vtkALBAPastValuesList.h
+  vtkALBAStentModelSource.cpp  							vtkALBAStentModelSource.h
+  vtkALBADeformableSimplexMeshFilter.h
+  vtkALBADeformableSimplexMeshFilter_Impl.h
+  albaGPU3DTextureProviderHelper.cpp 						albaGPU3DTextureProviderHelper.h
+  vtkALBAIdType64.h
+  )
+
 
 # List the kits from VTK that are needed by this project.
 SET(vtkALBA_LIBS vtkCommon  vtkRendering  vtkFiltering  vtkGraphics  vtkHybrid)
@@ -216,7 +223,7 @@ IF(VTK_FOUND)
                          INCLUDES "albaConfigure.h")
 
   # Create the library.
-  ADD_LIBRARY(${PROJECT_NAME} ${vtkALBA_SRCS} ${vtkALBAInstantiator_SRCS})
+  ADD_LIBRARY(${PROJECT_NAME} ${vtkALBA_FULL_SRCS} ${vtkALBAInstantiator_SRCS})
   TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${vtkALBA_LIBS})
   # this is necessaty to force MFL compilation....
 
