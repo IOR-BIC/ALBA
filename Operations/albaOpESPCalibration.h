@@ -74,7 +74,7 @@ enum TailPosition {
 //----------------------------------------------------------------------------
 // Class Name: appOpEmpty
 //----------------------------------------------------------------------------
-class albaOpESPCalibration : public albaOp
+class ALBA_EXPORT albaOpESPCalibration : public albaOp
 {
 public:
 	/** Constructor. */

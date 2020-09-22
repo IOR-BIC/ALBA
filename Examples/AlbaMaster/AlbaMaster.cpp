@@ -25,7 +25,9 @@ PURPOSE. See the above copyright notice for more information.
 #include "AlbaMaster.h"
 
 #include "albaDecl.h"
+#ifdef ALBA_USE_GDCM
 #include "albaGUIDicomSettings.h"
+#endif
 #include "albaGUIMDIFrame.h"
 #include "albaPics.h"
 #include "albaPipeFactoryVME.h"
@@ -40,7 +42,9 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpImporterAnsysCDBFile.h"
 #include "albaOpImporterAnsysInputFile.h"
 #include "albaOpImporterC3D.h"
+#ifdef ALBA_USE_GDCM
 #include "albaOpImporterDicom.h"
+#endif
 #include "albaOpImporterGRFWS.h"
 #include "albaOpImporterImage.h"
 #include "albaOpImporterLandmark.h"
@@ -64,7 +68,9 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpExporterAnsysCDBFile.h"
 #include "albaOpExporterAnsysInputFile.h"
 #include "albaOpExporterBmp.h"
+#ifdef ALBA_USE_GDCM
 #include "albaOpExporterDicom.h"
+#endif 
 #include "albaOpExporterGRFWS.h"
 #include "albaOpExporterLandmark.h"
 #include "albaOpExporterMSF.h"
@@ -260,8 +266,10 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpImporterMesh("Generic Mesh"), "Finite Element");
 	m_Logic->Plug(new albaOpImporterASCII("ASCII"));
 
+#ifdef ALBA_USE_GDCM
 	albaGUIDicomSettings *dicomSettings=new albaGUIDicomSettings(NULL,"DICOM");
 	m_Logic->Plug(new albaOpImporterDicom("DICOM"), "", true, dicomSettings);
+#endif
 	m_Logic->Plug(new albaOpImporterLandmark("Landmark"),"Landmark Suite");
 	m_Logic->Plug(new albaOpImporterLandmarkTXT("Landmark TXT"),"Landmark Suite");
 	m_Logic->Plug(new albaOpImporterLandmarkWS("Landmark WS"),"Landmark Suite");
@@ -280,7 +288,9 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpExporterPLY("PLY"));
 	m_Logic->Plug(new albaOpExporterVTK("VTK"));
 	m_Logic->Plug(new albaOpExporterVTKXML("VTK"));
+#ifdef ALBA_USE_GDCM
 	m_Logic->Plug(new albaOpExporterDicom("Dicom"),"",true,dicomSettings);
+#endif
 	m_Logic->Plug(new albaOpExporterRAW("Raw"));
 	m_Logic->Plug(new albaOpExporterBmp("Bmp"));
 	m_Logic->Plug(new albaOpExporterLandmark("Landmark"));

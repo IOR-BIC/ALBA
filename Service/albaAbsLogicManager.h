@@ -22,7 +22,7 @@ class albaVMEImage;
 class albaOpManager;
 class albaViewManager;
 
-class albaAbsLogicManager
+class ALBA_EXPORT albaAbsLogicManager
 {
 public:
 

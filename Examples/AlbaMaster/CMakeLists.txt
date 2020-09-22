@@ -76,13 +76,9 @@ ENDIF (WIN32)
 
 
 IF(ALBA_BUILD_ALBADLL)
-  SET(PROJECT_LIBS
-  albaOperations albaGui albaViews albaVME albaInteraction albaCommon albaService
-)
+  SET(PROJECT_LIBS XercesC albaDLL vtkALBA)
 ELSE(ALBA_BUILD_ALBADLL)
-  SET(PROJECT_LIBS
-  albaOperations albaGui albaViews albaVME albaVisualPipes albaInteraction albaCommon albaService vtkALBA GPUAPI
-)
+  SET(PROJECT_LIBS albaOperations albaGui albaViews albaVME albaVisualPipes albaInteraction albaCommon albaService vtkALBA GPUAPI)
 ENDIF(ALBA_BUILD_ALBADLL)
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
