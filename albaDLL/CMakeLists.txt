@@ -8,7 +8,19 @@ DBG_MESSAGE("Configuring project albaDLL")
 
 ADD_DEFINITIONS(-DALBA_EXPORTS -UPROJ_SAX2 -UPROJ_XMLPARSER -UPROJ_XMLUTIL -UPROJ_PARSERS -UPROJ_SAX4C -UPROJ_DOM -UPROJ_VALIDATORS -UXML_SINGLEDLL -UXML_USE_WIN32_TRANSCODER -UXML_USE_WIN32_MSGLOADER -UXML_USE_NETACCESSOR_WINSOCK)
 
-LINK_LIBRARIES(glu32 opengl32 vtkHybrid vtkIO vtkRendering vtkGraphics vtkFiltering vtkImaging vtkCommon vtkftgl vtkfreetype XercesC curl Crypto vtkALBA GPUAPI)
+############################## 
+# LINKED LIBRARIES 
+SET(PROJECT_LIBS glu32 opengl32 vtkHybrid vtkIO vtkRendering vtkGraphics vtkFiltering vtkImaging vtkCommon vtkftgl vtkfreetype curl Crypto vtkALBA GPUAPI)
+
+IF (ALBA_USE_XercesC)
+  SET(PROJECT_LIBS ${PROJECT_LIBS} XercesC)
+ENDIF (ALBA_USE_XercesC)
+
+IF (ALBA_USE_GDCM)
+ SET(PROJECT_LIBS ${PROJECT_LIBS} ${GDCM_LIBRARIES})
+ENDIF (ALBA_USE_GDCM)
+
+LINK_LIBRARIES(${PROJECT_LIBS})
 
 
 ###############################################
@@ -393,7 +405,6 @@ IF (ALBA_USE_XercesC)
     ../IO/mmuXMLDOM.h
     ../IO/mmuXMLDOMElement.h
   )
-  SET(PROJECT_LIBS ${PROJECT_LIBS} XercesC)
 ENDIF (ALBA_USE_XercesC)
 
 
@@ -1151,5 +1162,4 @@ ENDIF (ALBA_USE_XercesC)
 
 IF (ALBA_USE_GDCM)
  ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_GDCM_LIBRARY)
- SET(PROJECT_LIBS ${PROJECT_LIBS} ${GDCM_LIBRARIES})
 ENDIF (ALBA_USE_GDCM)
