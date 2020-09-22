@@ -130,6 +130,48 @@ IF (ALBA_USE_VTK)
   )
 ENDIF (ALBA_USE_VTK)
 
+###############################################
+#COMMON
+###############################################
+SET(COMMON_SRCS
+
+  ../Common/albaItkRawMotionImporterUtility.cxx  					../Common/albaItkRawMotionImporterUtility.h  
+  ../Common/albaPolylineGraph.cpp  												../Common/albaPolylineGraph.h  
+  ../Common/albaCurvilinearAbscissaOnSkeletonHelper.cpp  	../Common/albaCurvilinearAbscissaOnSkeletonHelper.h  
+  ../Common/albaRelationalDatabaseAbstractConnector.cpp  	../Common/albaRelationalDatabaseAbstractConnector.h  
+  ../Common/albaResultQueryAbstractHandler.cpp							../Common/albaResultQueryAbstractHandler.h  
+  ../Common/albaQueryObject.h  
+  ../Common/albaHTMLTemplateParser.cpp  										../Common/albaHTMLTemplateParser.h  
+  ../Common/albaHTMLTemplateParserBlock.cpp  							../Common/albaHTMLTemplateParserBlock.h  
+  ../Common/albaWizardBlock.cpp  													../Common/albaWizardBlock.h  
+  ../Common/albaWizard.cpp  																../Common/albaWizard.h  
+  ../Common/albaWizardManager.cpp  												../Common/albaWizardManager.h  
+  ../Common/albaWizardBlockOperation.cpp  									../Common/albaWizardBlockOperation.h  
+  ../Common/albaWizardBlockSelection.cpp  									../Common/albaWizardBlockSelection.h  
+  ../Common/albaWizardBlockTypeCheck.cpp  									../Common/albaWizardBlockTypeCheck.h
+  ../Common/albaWizardBlockFileExistCheck.cpp  						../Common/albaWizardBlockFileExistCheck.h  
+  ../Common/albaWizardBlockVMESelection.cpp  							../Common/albaWizardBlockVMESelection.h
+  ../Common/albaWizardBlockVMEFindOrSelection.cpp  				../Common/albaWizardBlockVMEFindOrSelection.h  
+  ../Common/albaWizardBlockInformation.cpp  								../Common/albaWizardBlockInformation.h
+  ../Common/albaWizardBlockYesNoSelection.cpp  						../Common/albaWizardBlockYesNoSelection.h  
+  ../Common/albaWizardWaitOp.cpp  													../Common/albaWizardWaitOp.h  
+  ../Common/albaWizardSettings.cpp  												../Common/albaWizardSettings.h  
+  ../Common/albaHelpManager.cpp  													../Common/albaHelpManager.h  
+	../Common/albaSnapshotManager.cpp  											../Common/albaSnapshotManager.h
+	../Common/albaLicenceManager.cpp 												../Common/albaLicenceManager.h  
+	../Common/albaTextFileReaderHelper.cpp										../Common/albaTextFileReaderHelper.h
+)
+
+
+###############################################
+#SERVICES
+###############################################
+SET(SERVICE_SRCS
+	../Service/albaServiceLocator.cpp 	../Service/albaServiceLocator.h
+	../Service/albaServiceClient.cpp 	../Service/albaServiceClient.h
+	../Service/albaAbsLogicManager.h
+)
+
 
 ###############################################
 #GUI
@@ -783,9 +825,7 @@ IF (ALBA_USE_VTK)
 	
 	../Operations/albaOpImporterAbaqusFile.cpp	../Operations/albaOpImporterAbaqusFile.h
 	../Operations/albaOpExporterAbaqusFile.cpp	../Operations/albaOpExporterAbaqusFile.h
-	
-	../Operations/albaOpExporterDicom.cpp ../Operations/albaOpExporterDicom.h
-	
+		
 	../Operations/albaGeometryEditorPolylineGraph.cpp	../Operations/albaGeometryEditorPolylineGraph.h
 	../Operations/albaOpCreateLabeledVolume.cpp	../Operations/albaOpCreateLabeledVolume.h
 	../Operations/albaOpImporterLandmark.cpp		../Operations/albaOpImporterLandmark.h
@@ -873,6 +913,7 @@ ENDIF (ALBA_USE_VTK)
 
 IF (ALBA_USE_GDCM)
 SET(OPERATIONS_SRCS ${OPERATIONS_SRCS}
+	../Operations/albaOpExporterDicom.cpp ../Operations/albaOpExporterDicom.h
     ../Operations/albaOpImporterDicom.cpp	../Operations/albaOpImporterDicom.h
 		../Operations/albaOpImporterDicomSliceAccHelper.cpp ../Operations/albaOpImporterDicomSliceAccHelper.h
 		../Operations/albaDicomTagDefines.h
@@ -910,6 +951,37 @@ IF (ALBA_USE_ITK)
     ../Operations/albaOpInteractionDebugger.cpp		../Operations/albaOpInteractionDebugger.h
   )
 ENDIF (ALBA_USE_ITK)
+
+###############################################
+#VIEWS
+###############################################
+SET(VIEWS_SRCS
+  
+  ../Views/albaViewArbitrarySlice.cpp				../Views/albaViewArbitrarySlice.h
+  ../Views/albaViewOrthoSlice.cpp						../Views/albaViewOrthoSlice.h
+  ../Views/albaViewRX.cpp										../Views/albaViewRX.h
+  ../Views/albaViewRXCT.cpp									../Views/albaViewRXCT.h
+  ../Views/albaViewSlice.cpp								../Views/albaViewSlice.h
+  ../Views/albaViewGlobalSlice.cpp					../Views/albaViewGlobalSlice.h
+  ../Views/albaViewGlobalSliceCompound.cpp	../Views/albaViewGlobalSliceCompound.h
+  ../Views/albaViewImage.cpp								../Views/albaViewImage.h
+  ../Views/albaViewRXCompound.cpp						../Views/albaViewRXCompound.h
+  ../Views/albaView3D.cpp										../Views/albaView3D.h
+  ../Views/albaViewImageCompound.cpp				../Views/albaViewImageCompound.h
+  ../Views/albaViewCT.cpp										../Views/albaViewCT.h
+  ../Views/albaViewCompoundWindowing.cpp		../Views/albaViewCompoundWindowing.h
+  ../Views/albaViewVTKCompound.cpp					../Views/albaViewVTKCompound.h
+  ../Views/albaViewSlicer.cpp								../Views/albaViewSlicer.h
+  ../Views/albaViewSliceOnCurve.cpp					../Views/albaViewSliceOnCurve.h
+  ../Views/albaViewSliceOnCurveCompound.cpp	../Views/albaViewSliceOnCurveCompound.h
+  ../Views/albaViewSliceGlobal.cpp					../Views/albaViewSliceGlobal.h
+  ../Views/albaViewArbitraryOrthoSlice.cpp	../Views/albaViewArbitraryOrthoSlice.h
+  ../Views/albaViewSliceBlendRX.cpp					../Views/albaViewSliceBlendRX.h
+  ../Views/albaViewSliceBlend.cpp						../Views/albaViewSliceBlend.h
+  ../Views/albaViewSliceSegmentation.cpp		../Views/albaViewSliceSegmentation.h
+  ../Views/albaViewIsosurfaceCompound.cpp		../Views/albaViewIsosurfaceCompound.h
+)
+
 
 
 ###############################################
@@ -977,13 +1049,16 @@ SET(PROJECT_SRCS
   ${BASE_SRCS}
   ${CORE_SRCS}
   ${GUI_SRCS}
-  ${GUI_SRCS}
+  ${COMMON_SRCS}
+  ${SERVICE_SRCS}
   ${INTERACTION_SRCS}
   ${IO_SRCS}
   ${VME_SRCS}
+  ${VIEWS_SRCS}
+  ${VISUAL_PIPES_SRCS}
   ${DATAPIPES_SRCS}
   ${OPERATIONS_SRCS}
-  ${DRIVERS_SRCS}
+  #${DRIVERS_SRCS}
 )
 
 #################################

@@ -27,10 +27,6 @@
 #include "albaObserver.h"
 #include <map>
 
-#ifdef ALBA_EXPORTS
-#include "albaDllMacros.h"
-EXPORT_STL_MAP(ALBA_EXPORT,int,int);
-#endif
 
 //----------------------------------------------------------------------------
 // class forward :
@@ -45,6 +41,12 @@ class albaGUIRollOut;
 #ifdef ALBA_USE_VTK //:::::::::::::::::::::::::::::::::
 class vtkLookupTable;
 #endif             //:::::::::::::::::::::::::::::::::
+
+
+#ifdef ALBA_EXPORTS
+#include "albaDllMacros.h"
+EXPORT_STL_MAP(ALBA_EXPORT, int, int);
+#endif
 
 
 /**  \par implementation details:

@@ -33,9 +33,8 @@ class albaEvent;
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
-EXPORT_PLY_VECTOR(ALBA_EXPORT,albaString);
-EXPORT_PLY_VECTOR(ALBA_EXPORT,albaVMESurface*);
-EXPORT_PLY_VECTOR(ALBA_EXPORT,int);
+EXPORT_STL_VECTOR(ALBA_EXPORT,albaString);
+EXPORT_STL_VECTOR(ALBA_EXPORT,albaVMESurface*);
 #endif
 
 //----------------------------------------------------------------------------

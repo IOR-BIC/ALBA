@@ -25,10 +25,6 @@
 
 #define EXPORT_STL_LIST(declspec_, T_) \
 	template class declspec_ std::allocator<T_ >; \
-	template class declspec_ std::allocator<std::_List_nod<T_,\
-	std::allocator<T_ > >::_Node>; \
-	template class declspec_ std::allocator<std::_List_nod<T_,\
-	std::allocator<T_ > >::_Node*>; \
 	template class declspec_ std::list<T_ >;
 
 // #define EXPORT_STL_SET(declspec_, T_) \
@@ -55,14 +51,9 @@
 
 #define EXPORT_STL_MAP(declspec_, K_, V_) \
 	template struct declspec_ std::less<K_ >; \
-	template class declspec_ std::allocator<std::_Tree_nod< \
-	std::_Tmap_traits<K_, V_, std::less<K_ >, \
-	std::allocator<std::pair<const K_, V_ > >, false> >::_Node>; \
-	template class declspec_ std::allocator<std::_Tree_nod< \
-	std::_Tmap_traits<K_, V_, std::less<K_ >, \
-	std::allocator<std::pair<const K_, V_ > >, false> >::_Node*>; \
 	template class declspec_ std::allocator<std::pair<const K_, V_ > >; \
 	template class declspec_ std::map<K_, V_ >;
+
 
 #define EXPORT_STL_MAP_CONST_ITERATOR(declspec_, K_, V_) \
 	class_it_base declspec_ std::_Iterator_base; \

@@ -23,10 +23,6 @@
 #include "albaAttribute.h"
 
 
-#ifdef ALBA_EXPORTS
-#include "albaDllMacros.h"
-EXPORT_STL_VECTOR(ALBA_EXPORT,ViewLayoutInfo);
-#endif
 //----------------------------------------------------------------------------
 // mmaApplicationLayout:
 //----------------------------------------------------------------------------
