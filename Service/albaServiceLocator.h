@@ -19,7 +19,7 @@
 
 class albaAbsLogicManager;
 
-class albaServiceLocator
+class ALBA_EXPORT albaServiceLocator
 {
 public:
 

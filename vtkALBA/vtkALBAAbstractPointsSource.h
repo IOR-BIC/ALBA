@@ -24,12 +24,13 @@
 #define __vtkALBAAbstractPointsSource_h
 
 #include "vtkPolyDataSource.h"
+#include "albaConfigure.h"
 
 class vtkPoints;
 class vtkCellArray;
 class vtkPolyData;
 
-class VTK_GRAPHICS_EXPORT vtkALBAAbstractPointsSource : public vtkPolyDataSource 
+class ALBA_EXPORT vtkALBAAbstractPointsSource : public vtkPolyDataSource 
 {
 public:
     
