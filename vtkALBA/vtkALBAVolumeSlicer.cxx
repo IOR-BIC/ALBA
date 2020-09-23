@@ -15,8 +15,8 @@
 =========================================================================*/
 
 
-#include "vtkALBAVolumeSlicer.h"
 #include "albaGPU3DTextureProviderHelper.h"
+#include "vtkALBAVolumeSlicer.h"
 #include "vtkObjectFactory.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkCellArray.h"

@@ -37,7 +37,7 @@ class vtkActor2D;
 /** 
 albaViewSliceBlend is a View that visualize two volume slice.
 */
-class albaViewSliceBlend: public albaViewVTK
+class ALBA_EXPORT albaViewSliceBlend: public albaViewVTK
 {
 public:
 	albaViewSliceBlend(wxString label = "Slice Blend", int camera_position = CAMERA_OS_Z	, bool show_axes = false, bool show_grid = false, int stereo = 0);

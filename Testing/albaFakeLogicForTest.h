@@ -17,10 +17,12 @@
 #ifndef _albaFakeLogicForTest_H
 #define _albaFakeLogicForTest_H
 
+#include "albaConfigure.h"
 #include "albaAbsLogicManager.h"
+
 #include <vector>
 
-class albaFakeLogicForTest : public albaAbsLogicManager
+class  albaFakeLogicForTest : public albaAbsLogicManager
 {
 
 public:

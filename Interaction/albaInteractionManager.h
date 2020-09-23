@@ -63,6 +63,7 @@ class albaGUINamedPanel;
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
 EXPORT_STL_MAP(ALBA_EXPORT,albaString,albaAutoPointer<albaAvatar>);
+EXPORT_STL_VECTOR(ALBA_EXPORT, albaAvatar *);
 EXPORT_STL_LIST(ALBA_EXPORT,albaAutoPointer<albaInteractorPER>);
 #endif
 

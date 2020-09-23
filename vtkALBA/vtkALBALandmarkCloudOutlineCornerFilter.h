@@ -24,9 +24,11 @@
 #define __vtkALBAPointsOutlineCornerFilter_h
 
 #include "vtkDataSetToPolyDataFilter.h"
+#include "albaConfigure.h"
+
 class vtkOutlineCornerSource;
 
-class VTK_GRAPHICS_EXPORT vtkALBALandmarkCloudOutlineCornerFilter : public vtkDataSetToPolyDataFilter
+class ALBA_EXPORT vtkALBALandmarkCloudOutlineCornerFilter : public vtkDataSetToPolyDataFilter
 {
 public:
   vtkTypeRevisionMacro(vtkALBALandmarkCloudOutlineCornerFilter,vtkDataSetToPolyDataFilter);

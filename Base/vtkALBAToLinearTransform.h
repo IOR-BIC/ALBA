@@ -21,6 +21,8 @@
 #define __vtkALBAToLinearTransform_h
 
 #include "vtkLinearTransform.h"
+#include "albaConfigure.h"
+
 
 class albaTransformBase;
 class albaMatrix;
