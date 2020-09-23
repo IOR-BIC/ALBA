@@ -147,18 +147,6 @@ IF (ALBA_USE_BTK)
 	ENDIF (BTK_USE_FILE)
 ENDIF (ALBA_USE_BTK)
 
-#
-# wxMozilla library
-#
-IF (ALBA_USE_WXMOZILLA)
-  SET (wxMozilla_POSSIBLE_ROOT_PATHS @MFL_BINARY_DIR@/wxMozilla/Build @MFL_SOURCE_DIR@/wxMozilla/Sources)
-  FIND_FILE(wxMozilla_USE_FILE UsewxMozilla.cmake ${wxMozilla_POSSIBLE_ROOT_PATHS})
-  FIND_PATH(wxMozilla_BINARY_PATH UsewxMozilla.cmake ${wxMozilla_POSSIBLE_ROOT_PATHS})
-  IF (wxMozilla_USE_FILE)
-    INCLUDE (${wxMozilla_USE_FILE}) # currently only local library is supported
-  ENDIF (wxMozilla_USE_FILE)
-ENDIF (ALBA_USE_WXMOZILLA)
-
 
 #2 MARK_AS_ADVANCED (
 #2 ALBA_USE_VTK
