@@ -45,10 +45,12 @@ A paper can be viewed here: research.microsoft.com/en-us/um/people/hoppe/poisson
 class ALBA_EXPORT vtkALBAPoissonSurfaceReconstruction : public vtkDataSetToPolyDataFilter
 {
 public:
-  /** create instance of the object */
-  static vtkALBAPoissonSurfaceReconstruction *New();
-  /** RTTI macro */
+   /** RTTI macro */
   vtkTypeRevisionMacro(vtkALBAPoissonSurfaceReconstruction,vtkDataSetToPolyDataFilter);
+
+	/** create instance of the object */
+	static vtkALBAPoissonSurfaceReconstruction *New();
+
   /** print object information */
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -571,7 +573,7 @@ void GetSolutions(const double& c,std::vector<double>& roots,const double& EPS) 
 class name: StartingPolynomial
 */
 template<int Degree>
-class StartingPolynomial{
+class ALBA_EXPORT StartingPolynomial{
 public:
 	Polynomial<Degree> p;
 	double start;
@@ -1429,9 +1431,12 @@ public:
 class name: Square
 Represent a square in a marching square algorithms
 */
-class Square{
+class ALBA_EXPORT Square{
 public:
-	const static int CORNERS=4,EDGES=4,NEIGHBORS=4;
+	const static int CORNERS = 4;
+	const static int EDGES = 4;
+	const static int NEIGHBORS = 4;
+
   /** return corner index */
 	static int  CornerIndex			(const int& x,const int& y);
   /**  calculate corner with 0,1 notation */
@@ -1453,9 +1458,11 @@ public:
 class name: Cube
 Represent a cube in a marching cube algorithms
 */
-class Cube{
+class ALBA_EXPORT Cube{
 public:
-	const static int CORNERS=8,EDGES=12,NEIGHBORS=6;
+	const static int CORNERS = 8;
+	const static int EDGES = 12;
+	const static int NEIGHBORS = 6;
 
   /** retrieve corner index */
 	static int  CornerIndex			(const int& x,const int& y,const int& z);
@@ -2776,7 +2783,7 @@ public:
 /** class name: Octree
 Tree with eight child nodes. */
 template<int Degree>
-class Octree{
+class ALBA_EXPORT Octree{
 	TreeOctNode::NeighborKey neighborKey;	
 	TreeOctNode::NeighborKey2 neighborKey2;
 
@@ -3031,6 +3038,7 @@ public:
 	/** get marching cubes triangles */
 	void GetMCIsoTriangles(const Real& isoValue,const int& subdivideDepth,CoredMeshData* mesh,const int& fullDepthIso=0,const int& nonLinearFit=1);
 };
+
 
 
 #endif
