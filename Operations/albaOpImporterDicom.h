@@ -297,7 +297,7 @@ private:
 // albaDicomStudyList:
 //----------------------------------------------------------------------------
 
-class albaDicomStudyList
+class ALBA_EXPORT albaDicomStudyList
 {
 public:
 	~albaDicomStudyList();
@@ -321,7 +321,7 @@ protected:
 // albaDicomStudy:
 //----------------------------------------------------------------------------
 
-class albaDicomStudy
+class ALBA_EXPORT albaDicomStudy
 {
 public:
 
@@ -350,7 +350,7 @@ protected:
 // albaDicomSeries:
 //----------------------------------------------------------------------------
 
-class albaDicomSeries
+class ALBA_EXPORT albaDicomSeries
 {
 public:
 

@@ -1,10 +1,10 @@
-PROJECT (albaInteraction_TEST)
+PROJECT (albaInteractionTests)
 
 IF(ALBA_BUILD_ALBADLL)
-  LINK_LIBRARIES(albaDLL)
+  SET(PROJECT_LIBS albaDLL vtkALBA albaTests)
 ELSE(ALBA_BUILD_ALBADLL)
-  LINK_LIBRARIES(albaTests albaInteraction albaCore albaVME albaVisualPipes albaBase albaCommon albaViews albaService GPUAPI)
-ENDIF (ALBA_BUILD_ALBADLL)
+  SET(PROJECT_LIBS albaTests albaInteraction albaCore albaVME albaVisualPipes albaBase albaCommon albaViews albaService GPUAPI)
+ENDIF(ALBA_BUILD_ALBADLL)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
@@ -73,8 +73,9 @@ SET(PROJECT_SRCS
 	albaInteractorSliderTest.h	albaInteractorSliderTest.cpp
 )
 
-ADD_EXECUTABLE(albaInteractionTests ${PROJECT_SRCS})
-ADD_TEST(albaInteractionTests  ${EXECUTABLE_OUTPUT_PATH}/albaInteractionTests)
+ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+ADD_TEST(${PROJECT_NAME}  ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_NAME})
 IF (WIN32)
-  SET_TARGET_PROPERTIES(albaInteractionTests PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)

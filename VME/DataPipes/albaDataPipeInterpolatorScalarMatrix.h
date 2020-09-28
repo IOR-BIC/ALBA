@@ -26,7 +26,10 @@
 //----------------------------------------------------------------------------
 class albaVMEItemScalarMatrix;
 
-template class ALBA_EXPORT vnl_matrix<double>;
+#ifdef ALBA_EXPORTS
+#include "albaDllMacros.h"
+EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
+#endif
 
 /**
   Class Name: albaScalarMatrixInterpolator.
