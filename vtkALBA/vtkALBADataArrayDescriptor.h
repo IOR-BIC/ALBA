@@ -15,7 +15,6 @@
 #define __vtkALBADataArrayDescriptor_h
 
 #include "vtkObject.h"
-#include "albaDefines.h"
 #include "vtkALBAIdType64.h"
 
 class vtkIdList;
