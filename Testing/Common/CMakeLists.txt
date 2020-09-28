@@ -1,9 +1,9 @@
-PROJECT (albaCommon_TEST)
+PROJECT (albaCommonTests)
 
 IF(ALBA_BUILD_ALBADLL)
-  LINK_LIBRARIES(albaTests albaVME albaCommon)
+  SET(PROJECT_LIBS albaDLL vtkALBA albaTests)
 ELSE(ALBA_BUILD_ALBADLL)
-  LINK_LIBRARIES(albaTests albaVME albaCommon albaService)
+  SET(PROJECT_LIBS albaTests albaVME albaCommon albaService)
 ENDIF(ALBA_BUILD_ALBADLL)
 
 # Set your list of sources here.
@@ -31,8 +31,9 @@ SET(PROJECT_SRCS
 # tests using cppunit testing framework
 #----------------------------------------------------------------------------
 
-ADD_EXECUTABLE(albaCommonTests ${PROJECT_SRCS})
-ADD_TEST(albaCommonTests  ${EXECUTABLE_OUTPUT_PATH}/albaCommonTests)
+ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+ADD_TEST(${PROJECT_NAME}  ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_NAME})
 IF (WIN32)
-  SET_TARGET_PROPERTIES(albaCommonTests PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)

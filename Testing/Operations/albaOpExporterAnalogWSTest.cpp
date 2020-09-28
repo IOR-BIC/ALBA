@@ -25,12 +25,12 @@
 #include "albaOpExporterAnalogWSTest.h"
 #include "albaOpExporterAnalogWS.h"
 
+#include <vnl/vnl_matrix.h>
+
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>
 
-#include <vnl/vnl_vector.h>
-#include <vnl/vnl_matrix.h>
 
 #include "albaString.h"
 #include "albaTagArray.h"
@@ -60,32 +60,27 @@ void albaOpExporterAnalogWSTest::TestStaticAllocation()
 void albaOpExporterAnalogWSTest::TestWrite() 
 //-----------------------------------------------------------
 {
+
 	albaOpExporterAnalogWS *Exporter = new albaOpExporterAnalogWS("Exporter");
 	Exporter->TestModeOn();
 	albaString filename= GET_TEST_DATA_DIR();
   filename<<"/test_Analog.csv";
 	Exporter->SetFileName(filename.GetCStr());
-  
-  vnl_vector<double> v_time;
-  vnl_vector<double> v_first_channel;
-  vnl_vector<double> v_second_channel;
-  vnl_vector<double> v_third_channel;
-  v_time.set_size(10);
-  v_first_channel.set_size(10);
-  v_second_channel.set_size(10);
-  v_third_channel.set_size(10);
+ 
+  double v_time[10], v_first_channel[10], v_second_channel[10], v_third_channel[10];
+
 
   for (int i=0;i<10;i++)
   {
     double d = (i+1)/10.0;
-    v_time.put(i,d);
-    v_first_channel.put(i,i+1);
-    v_second_channel.put(i,(i+1)*2);
-    v_third_channel.put(i,(i+1)*3);
+    v_time[i]=d;
+		v_first_channel[i] = i + 1;
+		v_second_channel[i] = (i + 1) * 2;
+		v_third_channel[i] = (i + 1) * 3;
   }
-  
-  vnl_matrix<double> emgScalar;
-  emgScalar.set_size(4,10);
+
+   vnl_matrix<double> emgScalar;
+   emgScalar.set_size(4,10);
   emgScalar.set_row(0,v_time);
   emgScalar.set_row(1,v_first_channel);
   emgScalar.set_row(2,v_second_channel);
@@ -160,12 +155,6 @@ void albaOpExporterAnalogWSTest::TestWrite()
   tkzName4.GetNextToken();
   wxString st4 = tkzName4.GetNextToken();
   CPPUNIT_ASSERT( st4.Cmp("30") == 0);
-
-  v_time.clear();
-  v_first_channel.clear();
-  v_second_channel.clear();
-  v_third_channel.clear();
-  emgScalar.clear();
   
   albaDEL(analog_test);
   

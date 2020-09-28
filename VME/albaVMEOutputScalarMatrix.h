@@ -29,6 +29,12 @@ class albaVMEGeneric;
 class vtkPolyData;
 #endif //ALBA_USE_VTK
 
+#ifdef ALBA_EXPORTS
+#include "albaDllMacros.h"
+EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
+EXPORT_VNL_VECTOR(ALBA_EXPORT, double);
+#endif
+
 /** NULL output for VME node with a scalar output data.
   albaVMEOutputScalarMatrix is the output produced by a node generating an output
   with a VNL matrix representing scalar/vector/tensor data.
