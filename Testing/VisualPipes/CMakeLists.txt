@@ -1,10 +1,11 @@
-PROJECT (albaVME_TEST)
+PROJECT (albaVisualPipesTests)
 
 IF(ALBA_BUILD_ALBADLL)
-  LINK_LIBRARIES(albaDLL)
+  SET(PROJECT_LIBS albaDLL vtkALBA albaTests) 
 ELSE(ALBA_BUILD_ALBADLL)
-  LINK_LIBRARIES(albaTests albaVME albaVisualPipes albaDataPipes GPUAPI vtkRendering vtkGraphics albaService) # albaCommon albaOperations)
-ENDIF (ALBA_BUILD_ALBADLL)
+  SET(PROJECT_LIBS albaTests albaVME albaVisualPipes albaDataPipes GPUAPI vtkRendering vtkGraphics albaService)
+ENDIF(ALBA_BUILD_ALBADLL)
+ 
  
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
@@ -64,8 +65,9 @@ SET(PROJECT_SRCS
 	albaPipePointCloudTest.cpp albaPipePointCloudTest.h
 )
 
-ADD_EXECUTABLE(albaVisualPipesTests ${PROJECT_SRCS})
-ADD_TEST(albaVisualPipesTests  ${EXECUTABLE_OUTPUT_PATH}/albaVisualPipesTests)
+ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+ADD_TEST(${PROJECT_NAME}  ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_NAME})
 IF (WIN32)
-  SET_TARGET_PROPERTIES(albaVisualPipesTests PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)

@@ -9,6 +9,12 @@
 #  define class_it_base struct
 #endif
 
+#define EXPORT_VNL_MATRIX(declspec_, T_) \
+	template class declspec_ vnl_matrix<T_ >;
+
+#define EXPORT_VNL_VECTOR(declspec_, T_) \
+	template class declspec_ vnl_vector<T_ >;
+
 #define EXPORT_STL_VECTOR(declspec_, T_) \
 	template class declspec_ std::allocator<T_ >; \
 	template class declspec_ std::vector<T_ >;
