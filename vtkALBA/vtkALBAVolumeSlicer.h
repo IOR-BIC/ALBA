@@ -31,11 +31,11 @@
 #ifndef __vtkALBAVolumeSlicer_h
 #define __vtkALBAVolumeSlicer_h
 
-#include "albaConfigure.h"
-#include "vtkDataSetToDataSetFilter.h"
-#include "vtkImageData.h"
-#include "vtkPolyData.h"
 
+#include "vtkDataSetToDataSetFilter.h"
+#include "vtkPolyData.h"
+#include "vtkImageData.h"
+#include "albaConfigure.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -54,9 +54,9 @@ class albaGPU3DTextureProviderHelper;
 class ALBA_EXPORT vtkALBAVolumeSlicer : public vtkDataSetToDataSetFilter {
 public:
   static vtkALBAVolumeSlicer *New();
+
   vtkTypeRevisionMacro(vtkALBAVolumeSlicer, vtkDataSetToDataSetFilter);
 
-#pragma region Attributes
   /**
   Specify a point defining the origin of the plane.*/
   //  vtkSetVector3Macro(PlaneOrigin, double);
@@ -71,9 +71,6 @@ public:
   /** Specify x-axis of the plane*/
   void SetPlaneAxisY(float axis[3]);
   vtkGetVectorMacro(PlaneAxisY, float, 3);
-
-#pragma message("vtkALBAVolumeSlicer::GetWindow, vtkALBAVolumeSlicer::SetWindow are meaningless - THEY SHOULD BE REMOVED ")
-#pragma message("vtkALBAVolumeSlicer::GetLevel, vtkALBAVolumeSlicer::SetLevel are meaningless - THEY SHOULD BE REMOVED ")
 
   /**
   Set / Get the Window for color modulation. The formula for modulation is 
@@ -113,7 +110,6 @@ public:
   
   /** Set tri-linear interpolation */
   void SetTrilinearInterpolation(bool on){m_TriLinearInterpolationOn = on;};
-#pragma endregion Attributes
 
 
   void SetOutput(vtkImageData *data) { 
