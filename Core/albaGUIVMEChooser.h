@@ -37,7 +37,7 @@ Display a modal dialog filled with a vme tree and
 return the choosed vme. The tree is filled from
 the vme passed in the constructor with its children.
 */
-class albaGUIVMEChooser : public albaGUIDialog
+class ALBA_EXPORT albaGUIVMEChooser : public albaGUIDialog
 {
 
 public:
