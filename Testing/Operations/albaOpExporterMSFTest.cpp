@@ -39,26 +39,22 @@
 
 //----------------------------------------------------------------------------
 void albaOpExporterMSFTest::TestFixture()
-//----------------------------------------------------------------------------
 {
 }
 
 //----------------------------------------------------------------------------
 void albaOpExporterMSFTest::TestStaticAllocation()
-//----------------------------------------------------------------------------
 {
   albaOpExporterMSF op;
 }
 //----------------------------------------------------------------------------
 void albaOpExporterMSFTest::TestDynamicAllocation()
-//----------------------------------------------------------------------------
 {
   albaOpExporterMSF *op = new albaOpExporterMSF();
   albaDEL(op);
 }
 //----------------------------------------------------------------------------
 void albaOpExporterMSFTest::TestAccept()
-//----------------------------------------------------------------------------
 {
   albaSmartPointer<DummyVme> vme;
   albaSmartPointer<albaVMERoot> root;
@@ -75,7 +71,6 @@ void albaOpExporterMSFTest::TestAccept()
 }
 //----------------------------------------------------------------------------
 void albaOpExporterMSFTest::TestSetFileName()
-//----------------------------------------------------------------------------
 {
   albaOpExporterMSF *op = new albaOpExporterMSF();
 
@@ -88,7 +83,6 @@ void albaOpExporterMSFTest::TestSetFileName()
 }
 //----------------------------------------------------------------------------
 void albaOpExporterMSFTest::TestExportMSF1()
-//----------------------------------------------------------------------------
 {
   //To Eliminate VTK warning window
   vtkObject::GlobalWarningDisplayOff();
@@ -172,7 +166,6 @@ void albaOpExporterMSFTest::TestExportMSF1()
 }
 //----------------------------------------------------------------------------
 void albaOpExporterMSFTest::TestExportMSF2()
-//----------------------------------------------------------------------------
 {
   //To Eliminate VTK warning window
   vtkObject::GlobalWarningDisplayOff();
