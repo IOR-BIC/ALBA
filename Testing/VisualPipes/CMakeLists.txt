@@ -61,6 +61,7 @@ SET(PROJECT_SRCS
 	albaPipeCompoundVolumeDRRTest.h albaPipeCompoundVolumeDRRTest.cpp
 	albaPipeCompoundVolumeIsosurfaceTest.h albaPipeCompoundVolumeIsosurfaceTest.cpp
 	albaPipeRayCastTest.h albaPipeRayCastTest.cpp
+	albaPipePointCloudTest.cpp albaPipePointCloudTest.h
 )
 
 ADD_EXECUTABLE(albaVisualPipesTests ${PROJECT_SRCS})

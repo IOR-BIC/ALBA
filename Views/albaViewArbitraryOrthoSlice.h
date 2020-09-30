@@ -122,7 +122,9 @@ public:
 		ID_RESET,
 		ID_LOAD_FROM_REFSYS,
 		ID_GPUENABLED,
+		ID_CAMERA_FOLLOW_GIZMO,
 		ID_SHOW_GIZMO,
+		ID_SLICING_ORIGIN,
 		ID_LAST,
 	};
 
@@ -159,10 +161,15 @@ public:
 
 	/** */
 	virtual void VmeSelect(albaVME *node, bool select);
-
-
+	
+	/** Gets the slicing matrix of the selected axis */
 	albaMatrix* GetSlicerMatrix(int axis = Z);
-	void SetSlicerMatrix(albaMatrix* matrix);
+
+	/** Set tags to restore view parameter to the in input VME */
+	void SetRestoreTagToVME(albaVME *vme);
+
+	/** Restore view parameters from a vme with stored tags*/
+	void RestoreFromVME(albaVME* vme);
 
 	albaViewVTK * GetViewArbitrary();
 	albaViewVTK * GetViewSlice(int axis);
@@ -185,6 +192,8 @@ protected:
 	void ResetCameraToSlices();
 
 	void UpdateConesPosition();
+
+	void OnSlicingOrigin();
 
 	/** 
 	Create the helper cone giving feedback for camera direction*/
@@ -222,7 +231,7 @@ protected:
 	int GetGizmoPlane(void *gizmo);
 
 	int IsGizmoTranslate(void *gizmo);
-	void PostMultiplyEventMatrix(vtkMatrix4x4 * matrix, int slicerAxis);
+	void PostMultiplyEventMatrix(vtkMatrix4x4 * matrix, int slicerAxis, int isRotation=true);
 	
 	/** Windowing for volumes data. This function overrides superclass method.*/
 	void VolumeWindowing(albaVME *volume);
@@ -246,6 +255,7 @@ protected:
 
 	albaAttachCamera		*m_CameraToSlicer[3];
 
+	double	m_SlicingOriginGUI[3];
 	double	m_SlicingOrigin[3];
 	double	m_SlicingOriginReset[3];
 	double	m_VolumeVTKDataABSOrientation[3];
@@ -263,6 +273,7 @@ protected:
 
 	int m_SkipCameraUpdate;
 	int m_EnableGPU;
+	int m_CameraFollowGizmo;
 	int m_IsShowingSlicerGizmo;
 	
 private:

@@ -110,6 +110,8 @@ SET(vtkALBA_SRCS
   vtkALBATubeFilter.cxx 									vtkALBATubeFilter.h
 	
   vtkALBALandmarkCloudOutlineCornerFilter.cxx 			vtkALBALandmarkCloudOutlineCornerFilter.h
+  
+  albaGPU3DTextureProviderHelper.cpp 						albaGPU3DTextureProviderHelper.h
 )
 
 IF(WIN32)

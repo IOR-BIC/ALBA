@@ -54,6 +54,7 @@ class albaGUISettingsTimeBar;
 class albaHelpManager;
 class albaSnapshotManager;
 class wxSplashScreen;
+class mmaApplicationLayout;
 
 typedef int(*eventfilterFunc)(wxEvent& event);
 
@@ -227,6 +228,9 @@ public:
 
 	void SetEventFilterFunc(eventfilterFunc val) { m_EventFilterFunc = val;}
 
+	/** Get  application layout*/
+	mmaApplicationLayout* GetLayout() { return m_AppLayout; };
+
 protected:
 	//---------------------------------------------------------
 	// Description:
@@ -399,6 +403,8 @@ protected:
 	albaPrintManager     *m_PrintSupport;
 
 	albaDeviceButtonsPadMouse            *m_Mouse;
+
+	mmaApplicationLayout *m_AppLayout;
 
 	wxMenu *m_ImportMenu;
 	wxMenu *m_ExportMenu;

@@ -49,6 +49,7 @@
 
 #include <vector>
 #include "vtkALBAPolyDataNormals.h"
+#include "albaGUILutSlider.h"
 
 
 //----------------------------------------------------------------------------
@@ -65,6 +66,8 @@ albaPipeWithScalar::albaPipeWithScalar()
 
 	m_ScalarsInComboBoxNames = NULL;
 	m_ScalarsVTKName = NULL;
+	m_LutSwatch = NULL;
+	m_LutSlider = NULL;
 
 	m_ScalarMapActive = 0;
 }
@@ -72,6 +75,7 @@ albaPipeWithScalar::albaPipeWithScalar()
 albaPipeWithScalar::~albaPipeWithScalar()
 {
 	vtkDEL(m_Table);
+	cppDEL(m_LutSlider);
 
 	delete[] m_ScalarsInComboBoxNames;
 	delete[] m_ScalarsVTKName;
@@ -117,6 +121,11 @@ void albaPipeWithScalar::ManageScalarOnExecutePipe(vtkDataSet * dataSet)
 	m_Table->SetTableRange(sr);
 	m_Table->Build();
 	
+	if (m_LutSlider)
+	{
+		m_LutSlider->SetRange(sr);
+		m_LutSlider->SetSubRange(sr);
+	}
 
 	m_ObjectMaterial->m_ColorLut->DeepCopy(m_Table);
 	m_ObjectMaterial->m_ColorLut->Build();
@@ -142,10 +151,18 @@ void albaPipeWithScalar::CreateScalarsGui(albaGUI *gui)
   gui->Divider(2);
 	gui->Bool(ID_SCALAR_MAP_ACTIVE,_("Enable scalar field mapping"), &m_ScalarMapActive, 1);
 	gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsInComboBoxNames);	
+	gui->Divider();
+	
+	m_LutSlider = new albaGUILutSlider(gui, ID_LUT_SLIDER, wxPoint(0, 0), wxSize(304, 22), wxBORDER_NONE);
+	m_LutSlider->SetListener(this);
+	m_LutSlider->SetFloatingPointTextOn();
+	gui->Add(m_LutSlider);
+
   m_LutSwatch=gui->Lut(ID_LUT,"Lut",m_Table);
 
   gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
-  gui->Enable(ID_LUT, m_ScalarMapActive != 0);
+	gui->Enable(ID_LUT, m_ScalarMapActive != 0);
+	gui->Enable(ID_LUT_SLIDER, m_ScalarMapActive != 0);
 	gui->Enable(ID_SCALAR_MAP_ACTIVE,m_NumberOfArrays>0);
 }
 //----------------------------------------------------------------------------
@@ -167,9 +184,20 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
           double sr[2];
           m_Table->GetTableRange(sr);
           m_Mapper->SetScalarRange(sr);
+					if (m_LutSlider)
+						m_LutSlider->SetSubRange(sr);
 					GetLogicManager()->CameraUpdate();
         }
         break;
+			case ID_RANGE_MODIFIED:
+				{
+				double sr[2];
+				m_LutSlider->GetSubRange(sr);
+				m_Table->SetTableRange(sr);
+				m_Mapper->SetScalarRange(sr);
+				GetLogicManager()->CameraUpdate();
+				}
+				break;
       case ID_SCALAR_MAP_ACTIVE:
         {
 					m_Mapper->SetScalarVisibility(m_ScalarMapActive);
@@ -179,6 +207,7 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 						m_Gui->Enable(ID_SCALAR_MAP_ACTIVE,m_NumberOfArrays>0);
 						m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
 						m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
+						m_Gui->Enable(ID_LUT_SLIDER, m_ScalarMapActive != 0);
 						m_Gui->Update();
 					}
 	
@@ -294,7 +323,12 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
   m_Table->SetTableRange(sr);
   m_Table->SetValueRange(sr);
   m_Table->SetHueRange(0.667, 0.0);
-  
+
+	if (m_LutSlider)
+	{
+		m_LutSlider->SetRange(sr);
+		m_LutSlider->SetSubRange(sr);
+	}
   m_ObjectMaterial->m_ColorLut->DeepCopy(m_Table);
   m_ObjectMaterial->UpdateFromLut();
 

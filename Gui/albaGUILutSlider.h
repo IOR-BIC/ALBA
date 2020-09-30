@@ -44,7 +44,7 @@ public:
         wxWindowID id,
         const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize,
-        long style = 0,
+        long style = wxBORDER_SIMPLE | wxCLIP_CHILDREN,
         const char* middleButtonTitle = "windowing"
         );
  ~albaGUILutSlider();

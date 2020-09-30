@@ -158,6 +158,8 @@ IF (ALBA_USE_VTK)
 	albaOpESPCalibration.cpp		albaOpESPCalibration.h
 	
 	albaOpExtractImageFromArbitraryView.cpp		albaOpExtractImageFromArbitraryView.h
+	albaOpImporterDicFile.cpp		albaOpImporterDicFile.h
+	albaOpImporterPointCloud.cpp	albaOpImporterPointCloud.h
   )
 ENDIF (ALBA_USE_VTK)
 

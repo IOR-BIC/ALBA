@@ -458,6 +458,9 @@ ALBA_EXPORT void albaGetOpenMultiFiles(const char * path, const char * wildcard,
 /** show the File Save Dialog Box */
 ALBA_EXPORT std::string  albaGetSaveFile(const char * initial, const char * wildcard, const char * title = "Save File", wxWindow *parent = NULL, bool warnOverWrite=true);
 
+/** Resets the Random Color Selection used for test repeatability */
+ALBA_EXPORT void albaResetRandomColor();
+
 /** return a random wxColour from a palette of 16 */
 ALBA_EXPORT wxColour  albaRandomColor();
 

@@ -855,31 +855,31 @@ void albaVMESurfaceParametric::CreateEllipticCylinder()
 		for (int rs = 0; rs < (m_EllipticCylinderRes - 1); rs++)
 		{
 			polys->InsertNextCell(3);
+			polys->InsertCellPoint(rs + ls*m_EllipticCylinderRes);
+			polys->InsertCellPoint((rs + 1) + (ls + 1)*m_EllipticCylinderRes);
 			polys->InsertCellPoint(rs + (ls + 1)*m_EllipticCylinderRes);
-			polys->InsertCellPoint((rs + 1) + (ls + 1)*m_EllipticCylinderRes);
-			polys->InsertCellPoint(rs + ls*m_EllipticCylinderRes);
 			polys->InsertNextCell(3);
-			polys->InsertCellPoint((rs + 1) + (ls + 1)*m_EllipticCylinderRes);
-			polys->InsertCellPoint((rs + 1) + ls*m_EllipticCylinderRes);
 			polys->InsertCellPoint(rs + ls*m_EllipticCylinderRes);
+			polys->InsertCellPoint((rs + 1) + ls*m_EllipticCylinderRes);
+			polys->InsertCellPoint((rs + 1) + (ls + 1)*m_EllipticCylinderRes);
 		}
 
 		//connect last->first cell
 		polys->InsertNextCell(3);
+		polys->InsertCellPoint((m_EllipticCylinderRes - 1) + ls*m_EllipticCylinderRes);
+		polys->InsertCellPoint(+(ls + 1)*m_EllipticCylinderRes);
 		polys->InsertCellPoint((m_EllipticCylinderRes - 1) + (ls + 1)*m_EllipticCylinderRes);
-		polys->InsertCellPoint(+(ls + 1)*m_EllipticCylinderRes);
-		polys->InsertCellPoint((m_EllipticCylinderRes - 1) + ls*m_EllipticCylinderRes);
 		polys->InsertNextCell(3);
-		polys->InsertCellPoint(+(ls + 1)*m_EllipticCylinderRes);
-		polys->InsertCellPoint(+ls*m_EllipticCylinderRes);
 		polys->InsertCellPoint((m_EllipticCylinderRes - 1) + ls*m_EllipticCylinderRes);
+		polys->InsertCellPoint(+ls*m_EllipticCylinderRes);
+		polys->InsertCellPoint(+(ls + 1)*m_EllipticCylinderRes);
 	}
 
 	if (m_EllipticCylinderCapping > 0)
 	{
 		//Starting Cap
 		polys->InsertNextCell(m_EllipticCylinderRes);
-		for (int i = 0; i < m_EllipticCylinderRes; i++)
+		for (int i = m_EllipticCylinderRes-1; i >=0 ; i--)
 			polys->InsertCellPoint(i);
 
 		//Ending Cap

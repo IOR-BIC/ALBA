@@ -57,12 +57,17 @@
 #include "vtkCellArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
+#include "vtkTransformFilter.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeVolumeArbSlice);
 //----------------------------------------------------------------------------
 
 #include "albaMemDbg.h"
+#include "vtkTransform.h"
+#include "vtkObject.h"
+
+#define EPSILON 1e-3
 
 //----------------------------------------------------------------------------
 albaPipeVolumeArbSlice::albaPipeVolumeArbSlice()
@@ -80,6 +85,7 @@ albaPipeVolumeArbSlice::albaPipeVolumeArbSlice()
 	m_SliceParametersInitialized  = false;
   m_ShowVolumeBox               = false;
 	m_ShowBounds									= false;
+	m_EnableSliceViewCorrection   = false;
   
   m_AssemblyUsed = NULL;
   m_ColorLUT  = NULL;
@@ -103,6 +109,8 @@ albaPipeVolumeArbSlice::albaPipeVolumeArbSlice()
   m_YVector[0] = 0;
   m_YVector[1] = 0;
   m_YVector[2] = 1;
+
+	m_EpisolonNormal[0] = m_EpisolonNormal[2] = m_EpisolonNormal[1] = 0;
 
 	m_ShowTICKs	 = false;
   m_EnableGPU = FALSE;
@@ -414,8 +422,23 @@ void albaPipeVolumeArbSlice::CreateSlice()
   m_SlicerPolygonal->SetGPUEnabled(m_EnableGPU);
 	m_SlicerPolygonal->Update();
 
+	// apply abs matrix to geometry
+	vtkNEW(m_NormalTranform);
+	
+	// to delete
+	vtkNEW(m_NormalTranformFilter);
+
+	m_NormalTranformFilter->SetInput(m_SlicePolydata);
+	m_NormalTranformFilter->SetTransform(m_NormalTranform);
+	m_NormalTranformFilter->Update();
+
+
 	vtkNEW(m_SliceMapper);
-	m_SliceMapper->SetInput(m_SlicePolydata);
+	if (m_EnableSliceViewCorrection)
+		m_SliceMapper->SetInput(m_NormalTranformFilter->GetPolyDataOutput());
+	else
+		m_SliceMapper->SetInput(m_SlicePolydata);
+
 	m_SliceMapper->ScalarVisibilityOff();
 
 	vtkNEW(m_SliceActor);
@@ -457,6 +480,8 @@ albaPipeVolumeArbSlice::~albaPipeVolumeArbSlice()
 	vtkDEL(m_Texture);
 	vtkDEL(m_SliceMapper);
 	vtkDEL(m_SlicePolydata);
+	vtkDEL(m_NormalTranform);
+	vtkDEL(m_NormalTranformFilter);
 	vtkDEL(m_SliceActor);
 	vtkDEL(m_VolumeBoxActor);
 	vtkDEL(m_Actor);
@@ -532,6 +557,7 @@ void albaPipeVolumeArbSlice::SetSlice(double* Origin, double* Normal)
     {
       m_NormalVector[i] = (float)Normal[i];
       n[i] = Normal[i];
+			m_EpisolonNormal[i] = -Normal[i] * EPSILON;
     }
         
     vtkMath::Normalize(n);               
@@ -558,6 +584,14 @@ void albaPipeVolumeArbSlice::SetSlice(double* Origin, double* Normal)
 		m_SlicerPolygonal->SetPlaneAxisY(m_YVector);      
   }
 	
+	if(m_NormalTranformFilter && m_EnableSliceViewCorrection)
+	{
+		m_NormalTranform->Identity();
+		m_NormalTranform->Translate(m_EpisolonNormal);
+		m_NormalTranform->Update();
+
+		m_NormalTranformFilter->Modified();
+	}
 
   UpdateSlice();
 }
@@ -738,3 +772,14 @@ int albaPipeVolumeArbSlice::GetEnableGPU()
 {
   return m_EnableGPU;
 };
+
+//----------------------------------------------------------------------------
+void albaPipeVolumeArbSlice::SetEnableSliceViewCorrection(bool val)
+{
+	m_EnableSliceViewCorrection = val;
+
+	if (m_EnableSliceViewCorrection)
+		m_SliceMapper->SetInput(m_NormalTranformFilter->GetPolyDataOutput());
+	else
+		m_SliceMapper->SetInput(m_SlicePolydata);
+}

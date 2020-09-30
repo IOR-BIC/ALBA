@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: vtkALBAVolumeSlicer
- Authors: Alexander Savenko, Josef Kohout (major change)
+ Authors: Alexander Savenko, Josef Kohout (major change), Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -13,14 +13,10 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-//it must be included before gl.h and glu.h
-#ifdef _WIN32
-#include <Windows.h>
-//#include "../GPUAPI/GPU_OGL.h"  //ALBA/GPUAPI
-#include "GPU_OGL.h"
-#endif
+
 
 #include "vtkALBAVolumeSlicer.h"
+#include "albaGPU3DTextureProviderHelper.h"
 #include "vtkObjectFactory.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkCellArray.h"
@@ -28,13 +24,10 @@
 #include "vtkPointData.h"
 #include "vtkLinearTransform.h"
 #include "vtkMath.h"
-
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkALBAVolumeSlicer, "$Revision: 1.1.2.9 $");
 vtkStandardNewMacro(vtkALBAVolumeSlicer);
-
-#include "albaMemDbg.h"
+vtkCxxRevisionMacro(vtkALBAVolumeSlicer, "$Revision: 1.1.2.9 $");
 
 typedef unsigned short u_short;
 typedef unsigned char u_char;
@@ -79,12 +72,12 @@ vtkALBAVolumeSlicer::vtkALBAVolumeSlicer()
   BNoIntersection = false;
 
 #ifdef _WIN32
-  m_pGPUProvider = NULL;
-  m_TextureId = 0;
   m_bGPUProcessing = false;
 #endif
 
   m_TriLinearInterpolationOn = true;
+
+	m_TextureHelper = new albaGPU3DTextureProviderHelper();
 }
 //----------------------------------------------------------------------------
 vtkALBAVolumeSlicer::~vtkALBAVolumeSlicer() 
@@ -97,17 +90,7 @@ vtkALBAVolumeSlicer::~vtkALBAVolumeSlicer()
   }
 
 #ifdef _WIN32
-  if (m_pGPUProvider != NULL)
-  {
-    if (m_TextureId != 0)
-    {
-      m_pGPUProvider->EnableRenderingContext();    
-      glDeleteTextures(1, (GLuint*)&m_TextureId);
-      m_pGPUProvider->DisableRenderingContext();
-    }
-
-    delete m_pGPUProvider;    //destroy GPU provider
-  }
+	delete m_TextureHelper;
 #endif
 }
 //----------------------------------------------------------------------------
@@ -243,9 +226,6 @@ void vtkALBAVolumeSlicer::ComputeInputUpdateExtents(vtkDataObject *output)
     for (int i = 0; i < 3; i++)
     {
       dataSpacing[i] *= (this->DataDimensions[i] - 1);
-#ifdef _WIN32
-      this->m_GPUDataDimensions[i] = dataSpacing[i];
-#endif
       this->DataBounds[i][0] = this->DataOrigin[i];
       this->DataBounds[i][1] = this->DataOrigin[i] + dataSpacing[i];
     } 
@@ -747,11 +727,10 @@ void vtkALBAVolumeSlicer::ExecuteDataHotFix(vtkDataObject *outputData)
 /*virtual*/ void vtkALBAVolumeSlicer::PrepareVolume(vtkDataSet* input, vtkImageData* output) 
 //----------------------------------------------------------------------------
 {
-  if (LastPreprocessedInput == input && PreprocessingTime > input->GetMTime() && 
-    LastGPUEnabled == GPUEnabled)
+  if (LastPreprocessedInput == input && PreprocessingTime > input->GetMTime() && LastGPUEnabled == GPUEnabled)
     return; //input is the same (and also kind of output) => return now
 
-  LastGPUEnabled = GPUEnabled;
+  m_bGPUProcessing = LastGPUEnabled = GPUEnabled;
   
   //compute coordinates in x, y and z-axis for the volume (defined as 
   //a regular grid - vtkImageData or rectilinear grid - vtkRectilinearGrid  
@@ -766,140 +745,13 @@ void vtkALBAVolumeSlicer::ExecuteDataHotFix(vtkDataObject *outputData)
   this->PreprocessingTime.Modified();
 }
 
-#ifdef _WIN32
 //------------------------------------------------------------------------
-//Gets the GL data type (to be used for albaGPU_OGL) for the given VTK data type
-//Returns -1, if the given data type has no equivalent in OpenGL
-//------------------------------------------------------------------------
-unsigned int vtkALBAVolumeSlicer::GetGLDataType(int nVTKdata_type)
-{
-  //see vtkSystemIncludes.h
-  //#define VTK_VOID            0
-  //#define VTK_BIT             1 
-  //#define VTK_CHAR            2
-  //#define VTK_UNSIGNED_CHAR   3
-  //#define VTK_SHORT           4
-  //#define VTK_UNSIGNED_SHORT  5
-  //#define VTK_INT             6
-  //#define VTK_UNSIGNED_INT    7
-  //#define VTK_LONG            8
-  //#define VTK_UNSIGNED_LONG   9
-  //#define VTK_FLOAT          10
-  //#define VTK_DOUBLE         11 
-  //#define VTK_ID_TYPE        12
-  const unsigned int RET_VALS[] = {
-    (unsigned int)-1, (unsigned int)-1, 
-    GL_BYTE, GL_UNSIGNED_BYTE, 
-    GL_SHORT, GL_UNSIGNED_SHORT,
-    GL_INT, GL_UNSIGNED_INT,
-    GL_INT, GL_UNSIGNED_INT,
-    GL_FLOAT, (unsigned int)-1, (unsigned int)-1,
-  };
-
-  if (nVTKdata_type > VTK_ID_TYPE)
-    return (unsigned int)-1;
-  else
-    return RET_VALS[nVTKdata_type];
-}
-#endif // _WIN32
-
-//------------------------------------------------------------------------
-//Prepares internal data structure for the regular grid data.
-//This routine is called from ExecuteData to prepare data structures used in further computation.
-//NB: if data structures prepared in previous call are still valid, they will be used.
 /*virtual*/ void vtkALBAVolumeSlicer::PrepareVolume(vtkImageData* input, vtkImageData* output)
-//------------------------------------------------------------------------
 {  
 #ifdef _WIN32
-  //GPU checks
-  int inDType = input->GetScalarType();    
-  int outDType = output->GetScalarType();
-
-  unsigned int inGLDtype = GetGLDataType(inDType);
-  unsigned int outGLDtype = GetGLDataType(outDType);
-
-  int nComps = input->GetNumberOfScalarComponents();
-  m_bGPUProcessing = GPUEnabled != 0 && (nComps == 1 || nComps == 3) &&
-    (inGLDtype != (unsigned int)-1 && outGLDtype != (unsigned int)-1);
-
-  if (m_bGPUProcessing)
-  {
-    //GPU processing is allowed by the caller, we have compatible input and output
-    //thus we need to check, if we can process 
-
-    int maxDimGL;    
-    glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE,&maxDimGL);
-
-    if (maxDimGL < max(this->DataDimensions[0], max(this->DataDimensions[1], this->DataDimensions[2])))
-      m_bGPUProcessing = false; //unfortunately, 3D textures of this size are not supported
-    else
-    {
-      if (m_pGPUProvider == NULL)
-        m_bGPUProcessing = CreateGPUProvider();
-    }
-  }
-
-  if (m_bGPUProcessing)
-  {
-    //we need to create texture
-    m_pGPUProvider->EnableRenderingContext();
-
-    if (m_TextureId != 0)
-      glDeleteTextures(1, (GLuint*)&m_TextureId);
-
-    glGenTextures(1, (GLuint*)&m_TextureId);
-    glBindTexture(GL_TEXTURE_3D, m_TextureId);
-
-    glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    glPixelStorei(GL_PACK_SKIP_ROWS, 0);
-    glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
-    glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
-    glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
-
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT);//GL_CLAMP); 
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);//GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);//GL_CLAMP); 
-    
-    //glTexImage3D(GL_TEXTURE_3D, 0, nComps, this->DataDimensions[0],
-    //  this->DataDimensions[1], this->DataDimensions[2], 0, 
-    //  (nComps == 1 ? GL_RED : GL_RGB), inGLDtype, 
-    //  input->GetPointData()->GetScalars()->GetVoidPointer(0)); 
-
-    GLint iformat;
-    if (inDType == VTK_CHAR || inDType == VTK_UNSIGNED_CHAR)
-       iformat = GL_ALPHA;
-    else if (inDType == VTK_UNSIGNED_SHORT)
-      iformat = GL_ALPHA16;
-    else
-      iformat = GL_ALPHA32F_ARB;
-
-    glTexImage3D(GL_TEXTURE_3D, 0, iformat, this->DataDimensions[0],
-      this->DataDimensions[1], this->DataDimensions[2], 0, 
-      (nComps == 1 ? GL_ALPHA : GL_RGB), inGLDtype, 
-      input->GetPointData()->GetScalars()->GetVoidPointer(0)); 
+  if (GPUEnabled)
+		m_bGPUProcessing = m_TextureHelper->InitializeTexture(input,output);
  
-    //memset(input->GetPointData()->GetScalars()->GetVoidPointer(0),
-    //  -1, 64*64*64);
-
-    //glTexImage3D(GL_TEXTURE_3D, 0, iformat, 64,
-    //  64, 64, 0, 
-    //  (nComps == 1 ? GL_ALPHA : GL_RGB), inGLDtype, 
-    //  input->GetPointData()->GetScalars()->GetVoidPointer(0)); 
-
-    if (glGetError() != GL_NO_ERROR) 
-    {
-      vtkWarningMacro(<< "Unexpected GPU failure,  CPU will be used.");
-      m_bGPUProcessing = false;   //if something is wrong, use CPU slicer
-    }
-    
-    m_pGPUProvider->DisableRenderingContext();    
-  }
-
   if (!m_bGPUProcessing)
   {      
 #endif
@@ -927,11 +779,7 @@ unsigned int vtkALBAVolumeSlicer::GetGLDataType(int nVTKdata_type)
 
 
 //------------------------------------------------------------------------
-//Prepares internal data structure for the rectilinear grid data.
-//This routine is called from ExecuteData to prepare data structures used in further computation.
-//NB: if data structures prepared in previous call are still valid, they will be used.
 /*virtual*/ void vtkALBAVolumeSlicer::PrepareVolume(vtkRectilinearGrid* input, vtkImageData* output)
-//------------------------------------------------------------------------
 {  
   //rectilinear grid
 #ifdef _WIN32
@@ -1046,81 +894,55 @@ void vtkALBAVolumeSlicer::CreateSamplingTable(float* voxelcoords[3])
 
 
 //----------------------------------------------------------------------------
-//Slices voxels from input producing image in output.
 template<typename InputDataType> 
 void vtkALBAVolumeSlicer::CreateImage(const InputDataType *inputPointer, vtkImageData *outputObject) 
-//----------------------------------------------------------------------------
 {
-  vtkDataArray* pScalars = outputObject->GetPointData()->GetScalars();
-  void *outputPointer = pScalars->GetVoidPointer(0);
-  
-  switch (pScalars->GetDataType()) 
-  {
-  case VTK_CHAR:
-#ifdef _WIN32
-    if (m_bGPUProcessing)
-      this->CreateImageGPU((char*)outputPointer, outputObject);
-    else
-#endif          
-      this->CreateImage(inputPointer, (char*)outputPointer, outputObject);
-    break;
-  case VTK_UNSIGNED_CHAR:
-#ifdef _WIN32
-    if (m_bGPUProcessing)
-      this->CreateImageGPU((unsigned char*)outputPointer, outputObject);
-    else
-#endif        
-      this->CreateImage(inputPointer, (unsigned char*)outputPointer, outputObject);
-    break;
-  case VTK_SHORT:
-#ifdef _WIN32
-    if (m_bGPUProcessing)
-      this->CreateImageGPU((short*)outputPointer, outputObject);
-    else
+ #ifdef _WIN32
+	if (m_bGPUProcessing)
+	{
+		m_TextureHelper->CreateImage(outputObject, GlobalPlaneAxisX, GlobalPlaneAxisY, GlobalPlaneAxisZ, GlobalPlaneOrigin);
+	}
+	else
+	{
 #endif
-      this->CreateImage(inputPointer, (short*)outputPointer, outputObject);
-    break;
-  case VTK_UNSIGNED_SHORT:
-#ifdef _WIN32
-    if (m_bGPUProcessing)
-      this->CreateImageGPU((unsigned short*) outputPointer, outputObject);
-    else
-#endif
-      this->CreateImage(inputPointer, (unsigned short*)outputPointer, outputObject);
-    break;
-	case VTK_INT:
-#ifdef _WIN32
-		if (m_bGPUProcessing)
-			this->CreateImageGPU((int*)outputPointer, outputObject);
-		else
-#endif
-			this->CreateImage(inputPointer, (int*)outputPointer, outputObject);
-		break;
-	case VTK_UNSIGNED_INT:
-#ifdef _WIN32
-		if (m_bGPUProcessing)
-			this->CreateImageGPU((unsigned int*)outputPointer, outputObject);
-		else
-#endif
-			this->CreateImage(inputPointer, (unsigned int*)outputPointer, outputObject);
-		break;
-  case VTK_FLOAT:
-#ifdef _WIN32
-    if (m_bGPUProcessing)
-      this->CreateImageGPU((float*)outputPointer, outputObject);
-    else
-#endif
-      this->CreateImage(inputPointer, (float*)outputPointer, outputObject);
-    break;
+	vtkDataArray* pScalars = outputObject->GetPointData()->GetScalars();
+	void *outputPointer = pScalars->GetVoidPointer(0);
 
-  case VTK_DOUBLE:
-    this->CreateImage(inputPointer, (double*)outputPointer, outputObject);
-    break;
+	switch (pScalars->GetDataType())
+		{
+			case VTK_CHAR:
+				this->CreateImage(inputPointer, (char*)outputPointer, outputObject);
+				break;
+			case VTK_UNSIGNED_CHAR:
+				this->CreateImage(inputPointer, (unsigned char*)outputPointer, outputObject);
+				break;
+			case VTK_SHORT:
+				this->CreateImage(inputPointer, (short*)outputPointer, outputObject);
+				break;
+			case VTK_UNSIGNED_SHORT:
+				this->CreateImage(inputPointer, (unsigned short*)outputPointer, outputObject);
+				break;
+			case VTK_INT:
+				this->CreateImage(inputPointer, (int*)outputPointer, outputObject);
+				break;
+			case VTK_UNSIGNED_INT:
+				this->CreateImage(inputPointer, (unsigned int*)outputPointer, outputObject);
+				break;
+			case VTK_FLOAT:
+				this->CreateImage(inputPointer, (float*)outputPointer, outputObject);
+				break;
+			case VTK_DOUBLE:
+				this->CreateImage(inputPointer, (double*)outputPointer, outputObject);
+				break;
 
-  default:
-    vtkErrorMacro(<< "vtkALBAVolumeSlicer: Scalar type is not supported");
-    return;
-  }    
+			default:
+				vtkErrorMacro(<< "vtkALBAVolumeSlicer: Scalar type is not supported");
+				return;
+		}
+
+#ifdef _WIN32
+	}
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1281,152 +1103,20 @@ void vtkALBAVolumeSlicer::SetSliceTransform(vtkLinearTransform *trans)
   Modified();
 }
 
-#ifdef _WIN32
-//----------------------------------------------------------------------------
-//Creates GPU provider, shaders, etc. 
-//Returns false, if GPU provider could not be created
-bool vtkALBAVolumeSlicer::CreateGPUProvider()
-//----------------------------------------------------------------------------
-{
-  if (m_pGPUProvider != NULL)
-    return true;  //already created
 
-  if (!albaGPUOGL::IsSupported())
-    return false;
 
-  //supported => OK
-  m_pGPUProvider = new albaGPUOGL();
-
-  //create shader
-  const char* ps = 
-    "uniform sampler3D voxels;   //input voxels data\n"
-    "uniform vec3 dimension;     //area covered by data\n"
-    "uniform vec3 pl_ofs;        //output texture origin\n"
-    "uniform vec3 pl_x;          //output texture x-coord\n"
-    "uniform vec3 pl_y;          //output texture y-coord\n"
-    "\n"
-    "void main(void) \n"
-    "{\n"
-    "  //compute the coordinates of current sample in the space\n"
-    "  vec3 pos_in_space = pl_ofs + gl_FragCoord.x*pl_x + gl_FragCoord.y*pl_y;\n"
-    "\n"
-    "  //convert them into texture coordinates\n"
-    "  vec3 tcoord = vec3(pos_in_space.x / dimension.x,\n"
-    "    pos_in_space.y / dimension.y, \n"
-    "    pos_in_space.z / dimension.z);\n"
-    "\n"
-    "  gl_FragColor = texture3D(voxels, tcoord);  \n"
-    "}\n";
-
-  //wxString ps;
-  //FILE* f = fopen("g:\\shader.glsl", "rt");
-  //char buffer[MAX_PATH + 1];
-  //while (fgets(buffer, MAX_PATH, f))
-  //{
-  //  ps += buffer;
-  //}
-  //fclose(f);
-
-  wxString err;
-  if (!m_pGPUProvider->CreateShaders(NULL, ps, &err))
-  {
-    vtkErrorMacro(<< "GPUProvider->CreateShaders failed:" << err);
-    delete[] m_pGPUProvider;
-    m_pGPUProvider = NULL;
-    return false;
-  }
-  
-  return true;
-}
-
-//----------------------------------------------------------------------------
-//Slices voxels from input producing image in output using GPU.
-template<typename OutputDataType> 
-void vtkALBAVolumeSlicer::CreateImageGPU(OutputDataType* output, vtkImageData *outputObject)
-//----------------------------------------------------------------------------
-{
-  // prepare data for sampling  
-  const int xs = outputObject->GetDimensions()[0], ys = outputObject->GetDimensions()[1];
-  const float dx = outputObject->GetSpacing()[0], dy = outputObject->GetSpacing()[1];
-  const int numComp = this->NumComponents;  
-
-  assert(this->NumComponents == outputObject->GetNumberOfScalarComponents());
-
-  //the first pixel of the texture, i.e., the pixel at [0,0], has coordinates GlobalPlaneOrigin
-  //the pixel [i+1,j] has coordinates equal to the coordinates of the pixel [i,j] + 
-  //GlobalPlaneAxisX*dx; the pixel [i, j+1] has coordinates equal to the coordinates 
-  //of the pixel [i,j] + GlobalPlaneAxisY*dy
-
-  //if the scene is translated so the first voxel has coordinates [0.0, 0.0, 0.0]
-  //the first pixel has coordinates GlobalPlaneOrigin - DataOrigin
-  //as there is SamplingTableMultiplier samples per one mm, pixel coordinates to 
-  //sample indices can be simply obtained using these variables:
-  float xaxis[3] = { this->GlobalPlaneAxisX[0] * dx, this->GlobalPlaneAxisX[1] * dx, 
-    this->GlobalPlaneAxisX[2] * dx
-  };
-
-  float yaxis[3] = { this->GlobalPlaneAxisY[0] * dy, this->GlobalPlaneAxisY[1] * dy, 
-    this->GlobalPlaneAxisY[2] * dy
-  };
-
-  float offset[3] = { this->GlobalPlaneOrigin[0] - this->DataOrigin[0],
-    this->GlobalPlaneOrigin[1] - this->DataOrigin[1], this->GlobalPlaneOrigin[2] - this->DataOrigin[2]
-  };
-
-  //set the size of texture
-  m_pGPUProvider->SetTarget(xs, ys, xs*dx, ys*dy);
-
-  wxString szErr;
-  if (!m_pGPUProvider->BeginExecute(&szErr))
-  {    
-    vtkErrorMacro(<< "GPUProvider->BeginExecute failed:" << szErr);
-    return; //terminate process
-  }
-  else
-  {
-    //set parameters
-    //NB. this cannot be done in preprocessing
-    m_pGPUProvider->SetParameter("pl_x", xaxis);
-    m_pGPUProvider->SetParameter("pl_y", yaxis);
-    m_pGPUProvider->SetParameter("pl_ofs", offset);
-    m_pGPUProvider->SetParameter("dimension", m_GPUDataDimensions);
-
-    //bind our texture is in the first texture unit
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_3D, m_TextureId);
-
-    m_pGPUProvider->SetParameter("voxels", (int)0);
-
-    m_pGPUProvider->InitializeComputation();             
-    m_pGPUProvider->RunComputation();
-    m_pGPUProvider->FinalizeComputation();
-    m_pGPUProvider->EndExecute();
-
-    m_pGPUProvider->GetResult(output, numComp > 1);
-  }
-}
-#endif
 //----------------------------------------------------------------------------
 void vtkALBAVolumeSlicer::SetGPUEnabled(int enable)
 //----------------------------------------------------------------------------
 {
+	if (enable == GPUEnabled)
+		return;
+
   GPUEnabled = enable;
   if (!enable)
   {
 #ifdef _WIN32
-    if (m_pGPUProvider != NULL)
-    {
-      if (m_TextureId != 0)
-      {
-        m_pGPUProvider->EnableRenderingContext();    
-        glDeleteTextures(1, (GLuint*)&m_TextureId);
-        m_pGPUProvider->DisableRenderingContext();
-      }
-
-      delete m_pGPUProvider;    //destroy GPU provider
-
-      m_pGPUProvider = NULL;
-    }
+		m_TextureHelper->UnregisterTexture();
 #endif
   }
 

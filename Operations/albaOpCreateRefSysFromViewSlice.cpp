@@ -32,6 +32,8 @@
 #include "albaViewManager.h"
 #include "albaViewArbitrarySlice.h"
 #include "albaViewArbitraryOrthoSlice.h"
+#include "albaTagArray.h"
+#include "albaTagItem.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpCreateRefSysFromViewSlice);
@@ -99,11 +101,13 @@ void albaOpCreateRefSysFromViewSlice::OpDo()
 
 		if(m_View->IsA("albaViewArbitrarySlice"))
 		{ 
-			matrix = ((albaViewArbitrarySlice*)m_View)->GetSlicerMatrix();
+			matrix= ((albaViewArbitrarySlice *)m_View)->GetSlicerMatrix();
+			((albaViewArbitrarySlice *)m_View)->SetRestoreTagToVME(m_RefSys);
 		}
 		else if (m_View->IsA("albaViewArbitraryOrthoSlice"))
 		{
-			matrix = ((albaViewArbitraryOrthoSlice*)m_View)->GetSlicerMatrix();
+			matrix = ((albaViewArbitraryOrthoSlice *)m_View)->GetSlicerMatrix();
+			((albaViewArbitraryOrthoSlice *)m_View)->SetRestoreTagToVME(m_RefSys);
 		}
 
 		m_RefSys->SetAbsMatrix(*matrix);

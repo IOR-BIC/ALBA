@@ -73,24 +73,26 @@ albaString albaOpImporterAnsysInputFile::GetWildcard()
 //----------------------------------------------------------------------------
 int albaOpImporterAnsysInputFile::ParseAnsysFile(albaString fileName)
 {
-	m_ProgressHelper = new albaProgressBarHelper(m_Listener);
-	m_ProgressHelper->SetTextMode(m_TestMode);
-	m_ProgressHelper->InitProgressBar("Please wait parsing Input Ansys File...");
-
-  ReadInit(fileName);
+ 
+	if (ReadInit(fileName, m_TestMode, true, "Please wait parsing Input Ansys File...", m_Listener) == ALBA_ERROR)
+	{
+		albaLogMessage("Cannot Open: %s", fileName);
+		ReadFinalize();
+		return ALBA_ERROR;
+	}
 
   FILE *nodesFile;
 	nodesFile = fopen(m_NodesFileName, "w");
 	if (!nodesFile)
 	{
 		albaLogMessage("Cannot Open: %s",m_NodesFileName.c_str());
-		cppDEL(m_ProgressHelper);
+		ReadFinalize();
 		return ALBA_ERROR;
 	}
 	
   m_CurrentMatId = -1;
 
-	int lineLenght = GetLine(m_FilePointer, m_Line);
+	int lineLenght = GetLine();
   while (lineLenght != 0) 
   {
     if(strncmp (m_Line,"N,",2) == 0)
@@ -124,18 +126,17 @@ int albaOpImporterAnsysInputFile::ParseAnsysFile(albaString fileName)
       ReadCMBLOCK();
     }
 
-		lineLenght = GetLine(m_FilePointer, m_Line);
+		lineLenght = GetLine();
   }
 
   fclose(nodesFile);
 	if (WriteMaterials() == ALBA_ERROR)
 	{
-		cppDEL(m_ProgressHelper);
+		ReadFinalize();
 		return ALBA_ERROR;
 	}
   
   ReadFinalize();
-  cppDEL(m_ProgressHelper);
 
   return ALBA_OK;
 }
@@ -174,7 +175,7 @@ int albaOpImporterAnsysInputFile::UpdateElements()
   //TYPE  50    MAT  440    REAL  2
   sscanf(m_Line, "%s %d %s %d %s %d", blockName, &idTypeElement, unusedStr, &matCard, unusedStr, &idConstants);
 
-  GetLine(m_FilePointer, m_Line);
+  GetLine();
 
   if(strncmp (m_Line,"EBLOCK,",7) == 0)
   {
@@ -191,7 +192,7 @@ int albaOpImporterAnsysInputFile::UpdateElements()
         ReplaceInString(m_Line, ',', ' ');
         sscanf(m_Line, "%s %d %d %d %d %d %d %d %d %d", blockName, &idMaterial, nodes+0,nodes+1,nodes+2,nodes+3,nodes+4,nodes+5,nodes+6,nodes+7);
 
-        GetLine(m_FilePointer, m_Line);
+        GetLine();
       }
 
       if(strncmp (m_Line,"EMORE,",6) == 0)
@@ -204,7 +205,7 @@ int albaOpImporterAnsysInputFile::UpdateElements()
         AddElement(idMaterial, nNodes, idTypeElement, matCard, nodes);
       }
         
-      GetLine(m_FilePointer, m_Line);
+      GetLine();
     }
   }
 

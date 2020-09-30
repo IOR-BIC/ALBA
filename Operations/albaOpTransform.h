@@ -63,7 +63,14 @@ public:
 	/** Makes the undo for the operation. */
 	void OpUndo();
 
+	/** Undo all changes*/
 	void Reset();
+
+	/** Set identity matrix*/
+	void Identity();
+
+	/** Load Matrix from another VME */
+	void LoadFrom();
 
 	void Translate(double x, double y, double z);
 	void Rotate(double x, double y, double z);
