@@ -73,11 +73,11 @@ void vtkALBADistanceFilterTest::TestGetSet()
 
 	filter->SetDistanceModeToVector();
 	CPPUNIT_ASSERT(filter->GetDistanceMode() == VTK_VECTOR);
-	CPPUNIT_ASSERT(filter->GetDistanceModeAsString() == "Vector");
+	CPPUNIT_ASSERT(!strcmp(filter->GetDistanceModeAsString(), "Vector"));
 
 	filter->SetDistanceModeToScalar();
 	CPPUNIT_ASSERT(filter->GetDistanceMode() == VTK_SCALAR);
-	CPPUNIT_ASSERT(filter->GetDistanceModeAsString() == "Scalar");
+	CPPUNIT_ASSERT(!strcmp(filter->GetDistanceModeAsString(), "Scalar"));
 
 	// Filter Mode
 	filter->SetFilterMode(VTK_DISTANCE_MODE);
@@ -85,11 +85,11 @@ void vtkALBADistanceFilterTest::TestGetSet()
 
 	filter->SetFilterModeToDensity();
 	CPPUNIT_ASSERT(filter->GetFilterMode() == VTK_DENSITY_MODE);
-	CPPUNIT_ASSERT(filter->GetFilterModeAsString() == "Density");
+	CPPUNIT_ASSERT(!strcmp(filter->GetFilterModeAsString(), "Density"));
 
 	filter->SetFilterModeToDistance();
 	CPPUNIT_ASSERT(filter->GetFilterMode() == VTK_DISTANCE_MODE);
-	CPPUNIT_ASSERT(filter->GetFilterModeAsString() == "Distance");
+	CPPUNIT_ASSERT(!strcmp(filter->GetFilterModeAsString(), "Distance"));
 }
 
 //----------------------------------------------------------------------------

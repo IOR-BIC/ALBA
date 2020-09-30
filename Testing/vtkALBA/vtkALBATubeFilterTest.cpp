@@ -156,16 +156,16 @@ void vtkALBATubeFilterTest::TestRadius()
 
 	//
 	filter->SetVaryRadiusToVaryRadiusByVector();
-	CPPUNIT_ASSERT(filter->GetVaryRadiusAsString() == "VaryRadiusByVector");
+	CPPUNIT_ASSERT(!strcmp(filter->GetVaryRadiusAsString(),"VaryRadiusByVector"));
 
 	filter->SetVaryRadiusToVaryRadiusByScalar();
-	CPPUNIT_ASSERT(filter->GetVaryRadiusAsString() == "VaryRadiusByScalar");
+	CPPUNIT_ASSERT(!strcmp(filter->GetVaryRadiusAsString(), "VaryRadiusByScalar"));
 
 	filter->SetVaryRadiusToVaryRadiusByAbsoluteScalar();
-	CPPUNIT_ASSERT(filter->GetVaryRadiusAsString() == "VaryRadiusByAbsoluteScalar");
+	CPPUNIT_ASSERT(!strcmp(filter->GetVaryRadiusAsString(), "VaryRadiusByAbsoluteScalar"));
 
 	filter->SetVaryRadiusToVaryRadiusOff();
-	CPPUNIT_ASSERT(filter->GetVaryRadiusAsString() == "VaryRadiusOff");
+	CPPUNIT_ASSERT(!strcmp(filter->GetVaryRadiusAsString(), "VaryRadiusOff"));
 }
 
 //----------------------------------------------------------------------------
