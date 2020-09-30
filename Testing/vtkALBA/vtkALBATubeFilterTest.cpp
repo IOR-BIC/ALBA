@@ -105,13 +105,13 @@ void vtkALBATubeFilterTest::TestTCoords()
 	
 	//
 	filter->SetGenerateTCoordsToNormalizedLength();
-	CPPUNIT_ASSERT(filter->GetGenerateTCoordsAsString() == "GenerateTCoordsFromNormalizedLength");
+	CPPUNIT_ASSERT(!strcmp(filter->GetGenerateTCoordsAsString(), "GenerateTCoordsFromNormalizedLength"));
 
 	filter->SetGenerateTCoordsToUseLength();
-	CPPUNIT_ASSERT(filter->GetGenerateTCoordsAsString() == "GenerateTCoordsFromLength");
+	CPPUNIT_ASSERT(!strcmp(filter->GetGenerateTCoordsAsString(), "GenerateTCoordsFromLength"));
 
 	filter->SetGenerateTCoordsToUseScalars();
-	CPPUNIT_ASSERT(filter->GetGenerateTCoordsAsString() == "GenerateTCoordsFromScalar");
+	CPPUNIT_ASSERT(!strcmp(filter->GetGenerateTCoordsAsString(), "GenerateTCoordsFromScalar"));
 }
 
 //----------------------------------------------------------------------------
