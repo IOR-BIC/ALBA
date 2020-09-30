@@ -114,9 +114,9 @@ public:
   vtkBooleanMacro(EnableAutoLOD, int)
 
   /** Retrieve interpolation of the volume mapper */
-  static bool GetInterpolation() { return vtkALBAAdaptiveVolumeMapper::Interpolation; }
+  static bool GetInterpolation();
   /** Set interpolation of the volume mapper */
-  static void SetInterpolation(bool val) { vtkALBAAdaptiveVolumeMapper::Interpolation = val; }
+  static void SetInterpolation(bool val);
 
   /** Update the mapper */
   void Update();

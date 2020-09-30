@@ -34,7 +34,10 @@ class albaOBB;
 class albaStorageElement;
 class albaTagArray;
 
-template class ALBA_EXPORT vnl_matrix<double>;
+#ifdef ALBA_EXPORTS
+#include "albaDllMacros.h"
+EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
+#endif
 
 /** albaVMEItemScalarMatrix - store time-varying scalar information into a vnl_vector
   albaVMEItemScalarMatrix is an object that stores the single time stamped scalar array of a

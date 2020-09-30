@@ -1,9 +1,9 @@
-PROJECT (albaViews_TEST)
+PROJECT (albaViewsTests)
 
 IF(ALBA_BUILD_ALBADLL)
-  LINK_LIBRARIES(albaViews)
+  SET(PROJECT_LIBS albaDLL vtkALBA albaTests) 
 ELSE(ALBA_BUILD_ALBADLL)
-  LINK_LIBRARIES(albaTests GPUAPI albaVME albaVisualPipes albaCommon albaViews albaInteraction albaService)
+  SET(PROJECT_LIBS albaTests GPUAPI albaVME albaVisualPipes albaCommon albaViews albaInteraction albaService)
 ENDIF(ALBA_BUILD_ALBADLL)
 
 #-----------------------------------------------------------------------------
@@ -32,8 +32,9 @@ SET(PROJECT_SRCS
 	albaViewIsosurfaceCompoundTest.h albaViewIsosurfaceCompoundTest.cpp
 )
 
-ADD_EXECUTABLE(albaViewsTests ${PROJECT_SRCS})
-ADD_TEST(albaViewsTests  ${EXECUTABLE_OUTPUT_PATH}/albaViewsTests)
+ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+ADD_TEST(${PROJECT_NAME}  ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_NAME})
 IF (WIN32)
-  SET_TARGET_PROPERTIES(albaViewsTests PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)

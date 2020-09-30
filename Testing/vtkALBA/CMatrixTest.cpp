@@ -74,10 +74,6 @@ void CMatrixTest::TestGetMinSize()
   vtkALBAPolyDataDeformation::CMatrix<double> *M1 = new vtkALBAPolyDataDeformation::CMatrix<double>(15,22);
   CPPUNIT_ASSERT(M1->GetMinSize() == 15);
   delete M1;
-
-  vtkALBAPolyDataDeformation::CMatrix<int> *M2 = new vtkALBAPolyDataDeformation::CMatrix<int>(18,7);
-  CPPUNIT_ASSERT(M2->GetMinSize() == 7);
-  delete M2;
 }
 //-------------------------------------------------------------------------
 void CMatrixTest::TestOperator()

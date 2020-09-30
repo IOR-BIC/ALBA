@@ -18,13 +18,15 @@
 #define __albaVMEMeshAnsysTextImporter_h
 
 #include "vtkUnstructuredGrid.h"
-
 #include "albaVMEMesh.h"
-
-#include "vnl/vnl_matrix.h"
-
 #include <map>
 #include <fstream>
+#include "vnl/vnl_matrix.h"
+
+#ifdef ALBA_EXPORTS
+#include "albaDllMacros.h"
+EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
+#endif
 
 /**
  .NAME albaVMEMeshAnsysTextImporter

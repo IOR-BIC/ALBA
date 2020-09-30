@@ -64,20 +64,23 @@ void albaOpImporterAnalogWSTest::TestRead()
   analogScalar->Update();
 
   //check time vector
-  vnl_vector<double> timeVector = analogScalar->GetScalarOutput()->GetScalarData().get_row(0);
-  CPPUNIT_ASSERT( fabs(timeVector[0] - 0.0005) < 0.01 && fabs(timeVector[timeVector.size()-1] - 0.098) < 0.01);
+	double timeVector[2]; 
+	timeVector[0] = analogScalar->GetScalarOutput()->GetScalarData().get(0, 0);
+	timeVector[1] = analogScalar->GetScalarOutput()->GetScalarData().get(0, 195);
+  CPPUNIT_ASSERT( fabs(timeVector[0] - 0.0005) < 0.01 && fabs(timeVector[1] - 0.098) < 0.01);
 
   //check scalar values
-  vnl_vector<double> scalarVector = analogScalar->GetScalarOutput()->GetScalarData().get_row(1);
-  CPPUNIT_ASSERT( fabs(scalarVector[0] - 0.07795) < 0.01 && fabs(scalarVector[scalarVector.size()-1] - 0.175388) < 0.01);
+	double scalarVector[2];
+	scalarVector[0] = analogScalar->GetScalarOutput()->GetScalarData().get(1, 0);
+	scalarVector[1] = analogScalar->GetScalarOutput()->GetScalarData().get(1, 195);
+	CPPUNIT_ASSERT(fabs(scalarVector[0] - 0.07795) < 0.01 && fabs(scalarVector[1] - 0.175388) < 0.01);
 
   //check last scalar values
   int num = analogScalar->GetScalarOutput()->GetScalarData().rows();
-  vnl_vector<double> scalarVectorEnd = analogScalar->GetScalarOutput()->GetScalarData().get_row(num-1);
-
-  double n = scalarVectorEnd[0];
-  double n1 = scalarVectorEnd[scalarVectorEnd.size()-1];
-
-  CPPUNIT_ASSERT( fabs(scalarVectorEnd[0] - 237) < 0.01 && fabs(scalarVectorEnd[scalarVectorEnd.size()-1] - 247) < 0.01);
-  cppDEL(importer);
+	double scalarVectorEnd[2];
+	scalarVectorEnd[0] = analogScalar->GetScalarOutput()->GetScalarData().get(num-1, 0);
+	scalarVectorEnd[1] = analogScalar->GetScalarOutput()->GetScalarData().get(num-1, 195);
+	CPPUNIT_ASSERT(fabs(scalarVectorEnd[0] - 237) < 0.01 && fabs(scalarVectorEnd[1] - 247) < 0.01);
+  
+	cppDEL(importer);
 }

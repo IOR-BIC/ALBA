@@ -16,7 +16,6 @@
 
 
 #include "vtkALBAVolumeSlicer.h"
-#include "albaGPU3DTextureProviderHelper.h"
 #include "vtkObjectFactory.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkCellArray.h"
@@ -25,6 +24,7 @@
 #include "vtkLinearTransform.h"
 #include "vtkMath.h"
 #include "assert.h"
+#include "albaGPU3DTextureProviderHelper.h"
 
 vtkStandardNewMacro(vtkALBAVolumeSlicer);
 vtkCxxRevisionMacro(vtkALBAVolumeSlicer, "$Revision: 1.1.2.9 $");

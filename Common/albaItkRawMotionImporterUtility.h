@@ -52,6 +52,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "albaDefines.h"
 #include <vnl/vnl_matrix.h>
 
+#ifdef ALBA_EXPORTS
+#include "albaDllMacros.h"
+EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
+#endif
+
 /**
   Class Name: itkRawMotionImporterUtility.
   Utility class for reading matrix from file.  Depends from vnl library.

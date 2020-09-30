@@ -30,7 +30,7 @@ PURPOSE. See the above copyright notice for more information.
 /** 
 Reads scalars from a .DIC file
 */
-class albaOpImporterDicFile : public albaTextFileReaderHelper, public albaOp
+class ALBA_EXPORT albaOpImporterDicFile : public albaTextFileReaderHelper, public albaOp
 {
 public:
 
