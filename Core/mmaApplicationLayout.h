@@ -64,6 +64,12 @@ public:
   /** Return the stored visibility for the Sidebar.*/
   int GetSideBarVisibility() {return m_SideBarVisibility;};
 
+	/** Set a informations regarding the VMEChooser dimension, position. */
+	void SetVMEChooserInfo(int pos[2], int size[2]);
+
+	/** Retrieve the stored frame settings.*/
+	void GetVMEChooserInfo(int pos[2], int size[2]);
+
 protected:
   virtual int InternalStore(albaStorageElement *parent);
   virtual int InternalRestore(albaStorageElement *node);
@@ -75,5 +81,8 @@ protected:
   int m_SideBarVisibility;
   int m_ToolBarVisibility;
   int m_LogBarVisibility;
+
+	int m_VMEChooserPosition[2];
+	int m_VMEChooserSize[2];
 };
 #endif

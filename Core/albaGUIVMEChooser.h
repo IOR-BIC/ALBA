@@ -41,13 +41,18 @@ class albaGUIVMEChooser : public albaGUIDialog
 {
 
 public:
-           albaGUIVMEChooser(albaGUICheckTree *tree, wxString dialog_title="Vme Chooser", void *vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, bool multiSelect = false, albaVME *subTree=NULL);
-          ~albaGUIVMEChooser();
+	albaGUIVMEChooser(albaGUICheckTree *tree, wxString dialog_title = "Vme Chooser", void *vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, bool multiSelect = false, albaVME *subTree = NULL);
+
+	~albaGUIVMEChooser();
+
 	std::vector<albaVME*> ShowChooserDialog();
-  void  OnEvent(albaEventBase *alba_event);
+	void  OnEvent(albaEventBase *alba_event);
 
 protected:
-  albaGUIVMEChooserTree *m_ChooserTree;
-  ValidateCallBackType m_ValidateCallback; // pointer to the callback
+	albaGUIVMEChooserTree *m_ChooserTree;
+	ValidateCallBackType m_ValidateCallback; // pointer to the callback
+	
+	void LoadLayout();
+	void SaveLayout();
 };
 #endif
