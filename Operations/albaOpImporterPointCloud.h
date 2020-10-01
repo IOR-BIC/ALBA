@@ -100,5 +100,7 @@ protected:
 
 	friend class albaOpImporterPointCloudTest;
   	
+private:
+	bool IsEmptyLine(char *line);
 };
 #endif
