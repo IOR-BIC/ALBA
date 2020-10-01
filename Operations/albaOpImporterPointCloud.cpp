@@ -293,6 +293,9 @@ int albaOpImporterPointCloud::Import(void)
 		if (strncmp(m_Line, GetCommentLine().GetCStr(), GetCommentLine().Length()) == 0)
 				continue;
 
+		if (IsEmptyLine(m_Line))
+			continue;
+
 		pos = 0;
 		for (int i = 0; i < columNum; i++)
 		{
@@ -374,6 +377,20 @@ int albaOpImporterPointCloud::Import(void)
 	ReadFinalize();
 
 	return ALBA_OK;
+}
+
+//----------------------------------------------------------------------------
+bool albaOpImporterPointCloud::IsEmptyLine(char *line)
+{
+	for (int i = 0;; i++)
+	{
+		if (line[i] == ' ' || line[i] == '\t')
+			continue;
+		else if (line[i] == '\n' || line[i] == '\r' || line[i] == 0)
+			return true;
+		else
+			return false;
+	}
 }
 
 //----------------------------------------------------------------------------
