@@ -123,10 +123,11 @@ void albaPipeMeshSliceTest::TestPipeExecution()
 
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *sceneNode;
-  sceneNode = new albaSceneNode(NULL,NULL,mesh, NULL);
+  sceneNode = new albaSceneNode(NULL,NULL,mesh, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   albaPipeMeshSlice *pipeMeshSlice = new albaPipeMeshSlice;
+	pipeMeshSlice->m_RenFront = m_Renderer;
   pipeMeshSlice->SetScalarMapActive(1);
   double origin[3], normal[3];
 
@@ -249,10 +250,11 @@ void albaPipeMeshSliceTest::TestPipeExecution_Wireframe()
 
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *sceneNode;
-  sceneNode = new albaSceneNode(NULL,NULL,mesh, NULL);
+  sceneNode = new albaSceneNode(NULL,NULL,mesh,m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   albaPipeMeshSlice *pipeMeshSlice = new albaPipeMeshSlice;
+	pipeMeshSlice->m_RenFront = m_Renderer;
   pipeMeshSlice->SetScalarMapActive(1);
   double origin[3], normal[3];
 
@@ -377,10 +379,11 @@ void albaPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
 
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *sceneNode;
-  sceneNode = new albaSceneNode(NULL,NULL,mesh, NULL);
+  sceneNode = new albaSceneNode(NULL,NULL,mesh, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   albaPipeMeshSlice *pipeMeshSlice = new albaPipeMeshSlice;
+	pipeMeshSlice->m_RenFront = m_Renderer;
   pipeMeshSlice->SetScalarMapActive(1);
   double origin[3], normal[3];
 
@@ -506,10 +509,11 @@ void albaPipeMeshSliceTest::TestPipeExecution_FlipNormal()
 
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *sceneNode;
-  sceneNode = new albaSceneNode(NULL,NULL,mesh, NULL);
+  sceneNode = new albaSceneNode(NULL,NULL,mesh, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   albaPipeMeshSlice *pipeMeshSlice = new albaPipeMeshSlice;
+	pipeMeshSlice->m_RenFront = m_Renderer;
   pipeMeshSlice->SetScalarMapActive(1);
 
   double origin[3], normal[3];
@@ -641,10 +645,11 @@ void albaPipeMeshSliceTest::TestPipeExecution_UseVTKProperty()
 
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *sceneNode;
-  sceneNode = new albaSceneNode(NULL,NULL,mesh, NULL);
+  sceneNode = new albaSceneNode(NULL,NULL,mesh, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   albaPipeMeshSlice *pipeMeshSlice = new albaPipeMeshSlice;
+	pipeMeshSlice->m_RenFront = m_Renderer;
   pipeMeshSlice->SetScalarMapActive(0);
   
   double origin[3], normal[3];
@@ -769,10 +774,11 @@ void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
 
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *sceneNode;
-  sceneNode = new albaSceneNode(NULL,NULL,mesh, NULL);
+  sceneNode = new albaSceneNode(NULL,NULL,mesh, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   albaPipeMeshSlice *pipeMeshSlice = new albaPipeMeshSlice;
+	pipeMeshSlice->m_RenFront = m_Renderer;
   pipeMeshSlice->SetScalarMapActive(1);
   
   double origin[3], normal[3];

@@ -119,10 +119,11 @@ void albaPipeMeshTest::TestPipeExecution()
 
 	//Assembly will be create when instancing albaSceneNode
 	albaSceneNode *sceneNode;
-	sceneNode = new albaSceneNode(NULL, NULL, mesh, NULL);
+	sceneNode = new albaSceneNode(NULL, NULL, mesh, m_Renderer);
 
 	/////////// Pipe Instance and Creation ///////////
 	albaPipeMesh *pipeMesh = new albaPipeMesh;
+	pipeMesh->m_RenFront = m_Renderer;
 	pipeMesh->Create(sceneNode);
 
 	////////// ACTORS List ///////////////
@@ -251,10 +252,11 @@ void albaPipeMeshTest::TestScalarVisualization()
   
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *sceneNode;
-  sceneNode = new albaSceneNode(NULL,NULL,mesh, NULL);
+  sceneNode = new albaSceneNode(NULL,NULL,mesh, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   albaPipeMesh *pipeMesh = new albaPipeMesh;
+	pipeMesh->m_RenFront = m_Renderer;
   pipeMesh->SetScalarMapActive(1);
   pipeMesh->Create(sceneNode);
   
