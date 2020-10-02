@@ -17,6 +17,8 @@
 #ifndef _albaAbsLogicManager_H
 #define _albaAbsLogicManager_H
 
+#include "albaConfigure.h"
+
 class albaVME;
 class albaVMEImage;
 class albaOpManager;
