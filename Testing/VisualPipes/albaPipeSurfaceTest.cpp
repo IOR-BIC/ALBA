@@ -116,10 +116,11 @@ void albaPipeSurfaceTest::TestPipeExecution()
   
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *sceneNode;
-  sceneNode = new albaSceneNode(NULL,NULL,surface, NULL);
+  sceneNode = new albaSceneNode(NULL,NULL,surface, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   albaPipeSurface *pipeSurface = new albaPipeSurface;
+	pipeSurface->m_RenFront = m_Renderer;
   pipeSurface->Create(sceneNode);
   
   ////////// ACTORS List ///////////////
