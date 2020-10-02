@@ -113,10 +113,11 @@ void albaPipePointCloudTest::TestPipeExecution()
   
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *sceneNode;
-  sceneNode = new albaSceneNode(NULL,NULL,pointCloud, NULL);
+  sceneNode = new albaSceneNode(NULL,NULL,pointCloud, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   albaPipePointCloud *pipePointCloud = new albaPipePointCloud;
+	pipePointCloud->m_RenFront = m_Renderer;
   pipePointCloud->Create(sceneNode);
   
   ////////// ACTORS List ///////////////
