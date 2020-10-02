@@ -29,6 +29,7 @@ class vtkLookupTable;
 class albaGUILutSwatch;
 class albaGUILutSlider;
 class vtkDataSetMapper;
+class vtkScalarBarActor;
 class vtkActor;
 class mmaMaterial;
 class vtkDataSet;
@@ -49,6 +50,9 @@ public:
 	/** process events coming from Gui */
 	virtual void OnEvent(albaEventBase *alba_event);
 
+	/**Set the scalar bar position */
+	void SetScalarBarPos(int pos);
+
 	/** IDs for the GUI */
 	enum PIPE_WITH_SCALARS_WIDGET_ID
 	{
@@ -56,14 +60,25 @@ public:
 		ID_LUT,
 		ID_LUT_SLIDER,
 		ID_SCALAR_MAP_ACTIVE,
+		ID_ENABLE_SCALAR_BAR,
+		ID_SCALAR_BAR_LAB_N,
+		ID_SCALAR_BAR_POS,
 		ID_LAST,
 	};
 
-  enum PIPE_TYPE_SCALARS
-  {
-    POINT_TYPE = 0,
-    CELL_TYPE,
-  };	  
+	enum PIPE_TYPE_SCALARS
+	{
+		POINT_TYPE = 0,
+		CELL_TYPE,
+	};
+
+	enum SCALAR_BAR_POSITIONS
+	{
+		SB_ON_BOTTOM = 0,
+		SB_ON_TOP,
+		SB_ON_LEFT,
+		SB_ON_RIGHT
+	};
 
   /** Set/Get Active Scalar */
   void SetActiveScalar(int index){m_ScalarIndex = index;};
@@ -87,6 +102,15 @@ public:
 	/** Update the properties */
 	virtual void UpdateProperty(bool fromTag = false);
 
+	/** Create the ScalarBar Actor for Scalar show */
+	void CreateScalarBarActor();
+
+	/** Create the ScalarBar Actor for Scalar show */
+	void DeleteScalarBarActor();
+
+	/** Show/Hide Scalar Bar Actor */
+	void ShowScalarBarActor(bool show = true);
+
 protected:
 	
   vtkLookupTable  *m_Table;
@@ -102,18 +126,26 @@ protected:
   /** Update the visualization with changed scalar*/
   void UpdateVisualizationWithNewSelectedScalars();
 
+	/**Enables or disables Gui Components */
+	void EnableDisableGuiComponents();
+
   wxString                *m_ScalarsInComboBoxNames;
   wxString                *m_ScalarsVTKName;
 	
 	mmaMaterial             *m_ObjectMaterial;
 	vtkDataSetMapper        *m_Mapper; 
 	vtkActor                *m_Actor;
+	vtkScalarBarActor				*m_ScalarBarActor;
+
 
   int                      m_PointCellArraySeparation;
   int                      m_ScalarIndex;
   int                      m_NumberOfArrays;
   int                      m_ActiveScalarType;
   int                      m_ScalarMapActive;
+	int											 m_ShowScalarBar;
+	int											 m_ScalarBarLabNum;
+	int											 m_ScalarBarPos;
 
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
