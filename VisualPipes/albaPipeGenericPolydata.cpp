@@ -49,6 +49,7 @@
 
 #include <vector>
 #include "vtkALBAPolyDataNormals.h"
+#include "vtkScalarBarActor.h"
 
 
 //----------------------------------------------------------------------------
@@ -81,7 +82,8 @@ albaPipeGenericPolydata::albaPipeGenericPolydata()
 albaPipeGenericPolydata::~albaPipeGenericPolydata()
 {
 	RemoveActorsFromAssembly(m_AssemblyFront);
-	
+	DeleteScalarBarActor();
+
 	vtkDEL(m_Mapper);
 	vtkDEL(m_Actor);
 	vtkDEL(m_ActorWired);
@@ -100,6 +102,7 @@ void albaPipeGenericPolydata::Create(albaSceneNode *n)
 	m_Mapper          = NULL;
 	m_Actor           = NULL;
   m_ActorWired      = NULL;
+	m_ScalarBarActor  = NULL;
 	m_OutlineActor    = NULL;
 	m_Axes            = NULL;
 
@@ -208,9 +211,10 @@ void albaPipeGenericPolydata::ExecutePipe()
 	m_OutlineActor->PickableOff();
 	m_OutlineActor->SetProperty(corner_props);
 
+	CreateScalarBarActor();
+
 	if (m_ScalarMapActive)
 		UpdateActiveScalarsInVMEDataVectorItems();
-
 }
 //----------------------------------------------------------------------------
 void albaPipeGenericPolydata::AddActorsToAssembly(vtkALBAAssembly *assembly)
@@ -237,6 +241,8 @@ void albaPipeGenericPolydata::Select(bool sel)
 	if(m_Actor->GetVisibility()) 
 	{
 		m_OutlineActor->SetVisibility(sel);
+
+		ShowScalarBarActor(m_ShowScalarBar);
 	}
 }
 
