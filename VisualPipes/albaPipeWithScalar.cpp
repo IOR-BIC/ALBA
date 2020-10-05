@@ -71,7 +71,9 @@ albaPipeWithScalar::albaPipeWithScalar()
 	m_LutSwatch = NULL;
 	m_LutSlider = NULL;
 
-	m_ScalarMapActive = m_ScalarBarLabNum = m_ScalarBarPos = m_ShowScalarBar = 0;
+	m_ScalarMapActive   = m_ShowScalarBar = 0;
+	m_ScalarBarPos = SB_ON_RIGHT;
+	m_ScalarBarLabNum = 2;
 }
 //----------------------------------------------------------------------------
 albaPipeWithScalar::~albaPipeWithScalar()
@@ -164,7 +166,7 @@ void albaPipeWithScalar::CreateScalarsGui(albaGUI *gui)
   m_LutSwatch=gui->Lut(ID_LUT,"Lut",m_Table);
 
 	wxString numStrs[] = { "Three","Four","Five","Six","Seven","Eight","Nine","Ten" };
-	wxString posStrs[] = { "Bottom", "Top", "Left", "Right" };
+	wxString posStrs[] = { "Top", "Bottom", "Left", "Right" };
 
 	gui->Bool(ID_ENABLE_SCALAR_BAR, "Show scalar bar", &m_ShowScalarBar, 1);
 	gui->Combo(ID_SCALAR_BAR_LAB_N, "Label Number",  &m_ScalarBarLabNum, 8,numStrs);
@@ -243,11 +245,7 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 			case ID_SCALAR_BAR_POS:
 			{
 				int pos = m_ScalarBarPos;
-
 				SetScalarBarPos(pos);
-
-
-
 				GetLogicManager()->CameraUpdate();
 			}
 			break;
@@ -502,9 +500,13 @@ void albaPipeWithScalar::CreateScalarBarActor()
 	m_ScalarBarActor->SetWidth(0.8);
 	m_ScalarBarActor->SetHeight(0.08);
 	m_ScalarBarActor->SetLabelFormat("%6.3g");
+	m_ScalarBarActor->SetNumberOfLabels(m_ScalarBarLabNum + 3);
 	m_ScalarBarActor->GetLabelTextProperty()->SetColor(0.8, 0.8, 0.8);
 	m_ScalarBarActor->SetPickable(0);
 	m_ScalarBarActor->SetVisibility(false);
+
+	SetScalarBarPos(m_ScalarBarPos);
+	
 
 	m_RenFront->AddActor2D(m_ScalarBarActor);
 }
@@ -512,7 +514,7 @@ void albaPipeWithScalar::CreateScalarBarActor()
 //----------------------------------------------------------------------------
 void albaPipeWithScalar::DeleteScalarBarActor()
 {
-	m_RenFront->AddActor2D(m_ScalarBarActor);
+	m_RenFront->RemoveActor2D(m_ScalarBarActor);
 	vtkDEL(m_ScalarBarActor);
 }
 

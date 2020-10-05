@@ -74,8 +74,8 @@ public:
 
 	enum SCALAR_BAR_POSITIONS
 	{
-		SB_ON_BOTTOM = 0,
-		SB_ON_TOP,
+		SB_ON_TOP = 0,
+		SB_ON_BOTTOM,
 		SB_ON_LEFT,
 		SB_ON_RIGHT
 	};
