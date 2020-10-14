@@ -79,6 +79,7 @@ PURPOSE. See the above copyright notice for more information.
 
 // OPERATIONS
 #include "albaOp2DMeasure.h"
+#include "albaOpComputeInertialTensor.h"
 #include "albaOpALBATransform.h"
 #include "albaOpAddLandmark.h"
 #include "albaOpBooleanSurface.h"
@@ -358,6 +359,8 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpVOIDensity("VOI Density"), "Measure");
 	m_Logic->Plug(new albaOpVolumeMeasure("Volume"), "Measure");
 	m_Logic->Plug(new albaOpMeshQuality("Mesh Quality"), "Measure");
+	m_Logic->Plug(new albaOpComputeInertialTensor(), "Measure");
+
 
 	m_Logic->Plug(new albaOpIterativeRegistration(),_("Register"));
 	m_Logic->Plug(new albaOpRegisterClusters("Clusters"),_("Register"));
