@@ -146,6 +146,8 @@ public:
 
 	/** Get ImageData */
 	vtkImageData *GetImageData() { return m_Image; };
+	vtkALBAVolumeSlicer *GetSliceImageData() { return m_SlicerImage; };
+	vtkTexture *GetTexture() { return m_Texture; };
 
   /** Set tri-linear interpolation */  
   void SetTrilinearInterpolation(int on){m_TrilinearInterpolationOn = on; UpdateSlice();};
