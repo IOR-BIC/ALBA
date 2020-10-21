@@ -194,6 +194,7 @@ albaLogicWithManagers::~albaLogicWithManagers()
 	cppDEL(m_AboutDialog);
 	cppDEL(m_ApplicationSettings);
 	cppDEL(m_TimeBarSettings);
+	albaDEL(m_AppLayout);
 }
 
 // APPLICATION ///////////////////////////////////////////////////////////////
@@ -2223,28 +2224,23 @@ void albaLogicWithManagers::StoreLayout()
 		size[0] = rect.GetSize().GetWidth();
 		size[1] = rect.GetSize().GetHeight();
 
-		mmaApplicationLayout *layout;
-		albaNEW(layout);
-
-		layout->SetApplicationInfo(m_Win->IsMaximized(), pos, size);
+	
+		m_AppLayout->SetApplicationInfo(m_Win->IsMaximized(), pos, size);
 		bool toolbar_vis = m_Win->GetDockManager().GetPane("toolbar").IsShown();
-		layout->SetInterfaceElementVisibility("toolbar", toolbar_vis);
+		m_AppLayout->SetInterfaceElementVisibility("toolbar", toolbar_vis);
 		bool sidebar_vis = m_Win->GetDockManager().GetPane("sidebar").IsShown();
-		layout->SetInterfaceElementVisibility("sidebar", sidebar_vis);
+		m_AppLayout->SetInterfaceElementVisibility("sidebar", sidebar_vis);
 		bool logbar_vis = m_Win->GetDockManager().GetPane("logbar").IsShown();
-		layout->SetInterfaceElementVisibility("logbar", logbar_vis);
+		m_AppLayout->SetInterfaceElementVisibility("logbar", logbar_vis);
 
-		m_AppLayout->GetVMEChooserInfo(pos, size);
-		layout->SetVMEChooserInfo(pos, size);
 
-		root->SetAttribute("ApplicationLayout", layout);
+		root->SetAttribute("ApplicationLayout", m_AppLayout);
 
 		xmlStorage->SetURL(layout_file);
 		xmlStorage->Store();
 
 		cppDEL(xmlStorage);
 		albaDEL(root);
-		albaDEL(layout);
 	}
 } 
 //----------------------------------------------------------------------------
@@ -2256,6 +2252,7 @@ void albaLogicWithManagers::RestoreLayout()
 
 	albaVMERoot *root;
 	albaNEW(root);
+	albaNEW(m_AppLayout);
 	root->Initialize();
 	xmlStorage->SetDocument(root);
 
@@ -2285,7 +2282,7 @@ void albaLogicWithManagers::RestoreLayout()
 		m_Win->ShowDockPane("logbar", app_layout->GetLogBarVisibility());
 		m_Win->ShowDockPane("sidebar",  app_layout->GetSideBarVisibility());
 
-		m_AppLayout = app_layout;
+		m_AppLayout->DeepCopy(app_layout);
 	}
 
 	cppDEL(xmlStorage);
