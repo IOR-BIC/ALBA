@@ -52,11 +52,12 @@ mmaApplicationLayout::mmaApplicationLayout()
   m_AppPosition[1] = 0;
   m_AppSize[0] = 800;
   m_AppSize[1] = 600;
+	m_LogBarVisibility = m_SideBarVisibility = m_ToolBarVisibility = true;
 
 	m_VMEChooserPosition[0] = 0;
 	m_VMEChooserPosition[1] = 0;
 	m_VMEChooserSize[0] = 550;
-	m_VMEChooserSize[1] = 550;
+	m_VMEChooserSize[1] = 450;
 }
 //----------------------------------------------------------------------------
 mmaApplicationLayout::~mmaApplicationLayout()
@@ -69,6 +70,20 @@ void mmaApplicationLayout::DeepCopy(const albaAttribute *a)
 { 
   Superclass::DeepCopy(a);
   mmaApplicationLayout *src_layout = (mmaApplicationLayout *)a;
+
+	m_AppMaximized = src_layout->m_AppMaximized;
+	m_AppPosition[0] = src_layout->m_AppPosition[0];
+	m_AppPosition[1] = src_layout->m_AppPosition[1];
+	m_AppSize[0] = src_layout->m_AppSize[0];
+	m_AppSize[1] = src_layout->m_AppSize[1];
+	m_LogBarVisibility = src_layout->m_LogBarVisibility;
+	m_SideBarVisibility = src_layout->m_SideBarVisibility;
+	m_ToolBarVisibility = src_layout->m_ToolBarVisibility;
+
+	m_VMEChooserPosition[0] = src_layout->m_VMEChooserPosition[0];
+	m_VMEChooserPosition[1] = src_layout->m_VMEChooserPosition[1];
+	m_VMEChooserSize[0] = src_layout->m_VMEChooserSize[0];
+	m_VMEChooserSize[1] = src_layout->m_VMEChooserSize[1];
 }
 //----------------------------------------------------------------------------
 bool mmaApplicationLayout::Equals(const albaAttribute *a)
