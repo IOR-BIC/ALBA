@@ -111,6 +111,8 @@ public:
 	/** Show/Hide Scalar Bar Actor */
 	void ShowScalarBarActor(bool show = true);
 
+	int GetScalarBarLabNum() const { return m_ScalarBarLabNum+3; }
+	void SetScalarBarLabNum(int val) { m_ScalarBarLabNum = val-3; }
 protected:
 	
   vtkLookupTable  *m_Table;

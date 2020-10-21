@@ -245,8 +245,8 @@ void albaPipeSurfaceTest::TestPipeExecution()
 		case SCALAR_ACTOR_TEST:
 			pipeSurface->SetScalarMapActive(false);
 			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_SCALAR_MAP_ACTIVE));
-			pipeSurface->ShowScalarBarActor(true);
-			pipeSurface->OnEvent(&albaEvent(false, albaPipeSurface::ID_ENABLE_SCALAR_BAR));
+			pipeSurface->ShowScalarBarActor(false);
+			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_ENABLE_SCALAR_BAR));
 			pipeSurface->Select(false);
 			break;
 		default:
