@@ -35,12 +35,14 @@ class albaPipePointCloudTest : public albaTest
 
 	CPPUNIT_TEST_SUITE( albaPipePointCloudTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
-	CPPUNIT_TEST( TestPipeExecution );
+	CPPUNIT_TEST(TestPipeExecution);
+	CPPUNIT_TEST(TestScalarActorPos);
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();
 	void TestPipeExecution();
+	void TestScalarActorPos();
 
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
 

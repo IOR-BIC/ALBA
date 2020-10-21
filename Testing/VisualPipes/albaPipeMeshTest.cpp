@@ -44,6 +44,8 @@
 
 #include <iostream>
 #include <fstream>
+#include "vtkActor2DCollection.h"
+#include <vector>
 
 enum PIPE_MESH_ACTORS
   {
@@ -62,6 +64,7 @@ enum TESTS_PIPE_MESH
 	SCALAR_TEST,
 	VTK_PROPERTY_TEST,
 	EDGE_TEST,
+	SCALAR_ACTOR_TEST,
 	NUMBER_OF_TEST,
 };
 
@@ -137,6 +140,7 @@ void albaPipeMeshTest::TestPipeExecution()
 	strings[4] = "SCALAR_TEST";
 	strings[5] = "VTK_PRPOERTY_TEST";
 	strings[6] = "EDGE_TEST";
+	strings[7] = "SCALAR_ACTOR_TEST";
 
 	for (int i = 0; i < NUMBER_OF_TEST; i++)
 	{
@@ -169,13 +173,29 @@ void albaPipeMeshTest::TestPipeExecution()
 				pipeMesh->SetEdgesVisibilityOn();
 				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_EDGE_VISIBILITY));
 				break;
+			case SCALAR_ACTOR_TEST:
+				pipeMesh->Select(true);
+				pipeMesh->SetScalarMapActive(true);
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_SCALAR_MAP_ACTIVE));
+				pipeMesh->ShowScalarBarActor(true);
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_ENABLE_SCALAR_BAR));
+				break;
 			default:
 				break;
 		}
 
+		//Store Actors 2D
+		std::vector <vtkActor2D *> act2dList;
+		vtkActor2DCollection * actors2d = pipeMesh->m_RenFront->GetActors2D();
+		vtkActor2D * actor2D;
+		actors2d->InitTraversal();
+		while (actor2D = actors2d->GetNextActor2D())
+		{
+			act2dList.push_back(actor2D);
+		}
+
 		//Updating Actor Lists
 		pipeMesh->GetAssemblyFront()->GetActors(actorList);
-
 		actorList->InitTraversal();
 		vtkProp *actor = actorList->GetNextProp();
 		m_Renderer->RemoveAllProps();
@@ -185,6 +205,12 @@ void albaPipeMeshTest::TestPipeExecution()
 			actor = actorList->GetNextProp();
 		}
 
+		//Restore 2d actor list
+		for (int j = 0; j < act2dList.size(); j++)
+		{
+			m_Renderer->AddActor2D(act2dList[j]);
+		}
+		
 		// Rendering - check images 
 		vtkActor *surfaceActor;
 		surfaceActor = (vtkActor *)SelectActorToControl(actorList, PIPE_MESH_ACTOR);
@@ -221,6 +247,13 @@ void albaPipeMeshTest::TestPipeExecution()
 			case EDGE_TEST:
 				pipeMesh->SetEdgesVisibilityOff();
 				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_EDGE_VISIBILITY));
+				break;
+			case SCALAR_ACTOR_TEST:
+				pipeMesh->SetScalarMapActive(false);
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_SCALAR_MAP_ACTIVE));
+				pipeMesh->ShowScalarBarActor(false);
+				pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_ENABLE_SCALAR_BAR));
+				pipeMesh->Select(false);
 				break;
 			default:
 				break;
