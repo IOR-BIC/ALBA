@@ -44,6 +44,8 @@
 #include "vtkTransformPolyDataFilter.h"
 #include "albaProgressBarHelper.h"
 #include "albaTagArray.h"
+#include "albaVMEPointCloud.h"
+#include "vtkCellArray.h"
 
 
 //----------------------------------------------------------------------------
@@ -79,6 +81,7 @@ albaOpVOIDensity::~albaOpVOIDensity()
 {
 	m_Surface = NULL;
 	vtkDEL(m_VOIScalars);
+	m_VOICoords.clear();
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpVOIDensity::Copy()
@@ -172,6 +175,8 @@ void albaOpVOIDensity::OpStop(int result)
 		SetDoubleTag("MaxScalar", m_MaxScalar);
 		SetDoubleTag("MinScalar", m_MinScalar);
 		SetDoubleTag("StandardDeviation", m_StandardDeviation);
+
+		CreatePointSamplingOutput();
 	}
 
 	Superclass::OpStop(result);
@@ -188,6 +193,74 @@ void albaOpVOIDensity::SetDoubleTag(wxString tagName, double value)
 		m_Surface->GetTagArray()->DeleteTag("VOI_" + tagName);
 
 	m_Surface->GetTagArray()->SetTag(tagItem);
+}
+
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::CreatePointSamplingOutput()
+{
+
+	albaString name = m_Surface->GetName();
+	name += " sampling";
+
+	albaVMEPointCloud *pointCloudVME;
+	albaNEW(pointCloudVME);
+	pointCloudVME->SetName(name);
+
+	vtkPolyData * polydata;
+	vtkNEW(polydata);
+
+	vtkPoints *newPoints;
+	vtkNEW(newPoints);
+
+	//generate cell structure
+	vtkCellArray * polys;
+	vtkNEW(polys);
+
+	vtkDoubleArray *newArray;
+
+
+	vtkNEW(newArray);
+	newArray->SetName("Vol Scalars");
+
+	int nPoints = m_VOICoords.size();
+
+
+	for (int i = 0; i < nPoints; i++)
+	{
+		newArray->InsertNextValue(m_VOIScalars->GetTuple1(i));
+
+		newPoints->InsertNextPoint(m_VOICoords[i].GetVect());
+
+		polys->InsertNextCell(3);
+		polys->InsertCellPoint(i);
+		polys->InsertCellPoint(i);
+		polys->InsertCellPoint(i);
+	}
+
+
+	vtkPointData *outPointData = polydata->GetPointData();
+
+	outPointData->AddArray(newArray);
+	vtkDEL(newArray);
+
+
+	polydata->SetPoints(newPoints);
+	vtkDEL(newPoints);
+
+	polydata->SetPolys(polys);
+	vtkDEL(polys);
+
+	polydata->Modified();
+	polydata->Update();
+	pointCloudVME->SetData(polydata, 0);
+	vtkDEL(polydata);
+
+	pointCloudVME->ReparentTo(m_Surface);
+
+	albaMatrix identityM;
+	pointCloudVME->SetAbsMatrix(identityM);
+
+	albaDEL(pointCloudVME);
 }
 
 //----------------------------------------------------------------------------
@@ -272,6 +345,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 	m_MaxScalar = -99999.0;
 	m_MinScalar = 99999.0;
 	m_VOIScalars->Reset();
+	m_VOICoords.clear();
 
 	vtkAbstractTransform *transform;
 	vtkPolyData *polydata;
@@ -319,6 +393,8 @@ void albaOpVOIDensity::ExtractVolumeScalars()
         m_MinScalar = MIN(InsideScalar,m_MinScalar);
         m_NumberOfScalars++;
         m_VOIScalars->InsertNextTuple(&InsideScalar);
+				albaVect3d vPos(Point);
+				m_VOICoords.push_back(vPos);
       }
     }
 		progressHelper.UpdateProgressBar(voxel*100.0/NumberVoxels);

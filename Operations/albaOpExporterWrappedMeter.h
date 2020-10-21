@@ -23,6 +23,12 @@
 #include "wx/busyinfo.h"
 #include "albaVMEIterator.h"
 #include <fstream>
+
+#ifdef ALBA_EXPORTS
+#include "albaDllMacros.h"
+EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
+#endif
+
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------

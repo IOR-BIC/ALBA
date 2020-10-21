@@ -17,12 +17,14 @@
 #ifndef _albaAbsLogicManager_H
 #define _albaAbsLogicManager_H
 
+#include "albaConfigure.h"
+
 class albaVME;
 class albaVMEImage;
 class albaOpManager;
 class albaViewManager;
 
-class albaAbsLogicManager
+class ALBA_EXPORT albaAbsLogicManager
 {
 public:
 

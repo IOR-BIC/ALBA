@@ -40,6 +40,11 @@
 #include <vnl/algo/vnl_svd.h>
 #include <vnl/algo/vnl_determinant.h>
 
+#ifdef ALBA_EXPORTS
+#include "albaDllMacros.h"
+EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
+#endif
+
 /**
   class name: albaICPUtility
   Implementation of the ICP algorithm utility.

@@ -19,12 +19,12 @@ PURPOSE.  See the above copyright notice for more information.
 
 
 #include <vector>
-#include "vtkImagedata.h"
 
-
+//#include "albaDefines.h"
+class vtkImageData;
 class albaGPUOGL;
 
-typedef struct TextureList
+struct TextureList
 {
 	int m_TexetureID;
 	vtkImageData *m_Volume;

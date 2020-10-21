@@ -19,7 +19,7 @@
 
 class albaAbsLogicManager;
 
-class albaServiceClient
+class ALBA_EXPORT albaServiceClient
 {
 	public:
 		albaServiceClient();

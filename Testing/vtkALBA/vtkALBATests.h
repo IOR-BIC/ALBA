@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaWizardTest
+ Module: vtkALBATests
  Authors: Gianluigi Crimi
  
  Copyright (c) BIC
@@ -18,13 +18,9 @@
 #define __CPP_UNIT_vtkALBATests_H__
 
 
-
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 #include "albaDefines.h"
-
-//Required for template implementations
-#include <vtkALBAPoissonSurfaceReconstruction.cxx>
 
 #endif

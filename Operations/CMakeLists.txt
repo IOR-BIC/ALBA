@@ -76,8 +76,6 @@ IF (ALBA_USE_VTK)
 	albaOpImporterAbaqusFile.cpp	albaOpImporterAbaqusFile.h
 	albaOpExporterAbaqusFile.cpp	albaOpExporterAbaqusFile.h
 	
-	albaOpExporterDicom.cpp albaOpExporterDicom.h
-	
 	albaGeometryEditorPolylineGraph.cpp	albaGeometryEditorPolylineGraph.h
 	albaOpCreateLabeledVolume.cpp	albaOpCreateLabeledVolume.h
 	albaOpImporterLandmark.cpp		albaOpImporterLandmark.h
@@ -165,6 +163,7 @@ ENDIF (ALBA_USE_VTK)
 
 IF (ALBA_USE_GDCM)
 SET(PROJECT_SRCS ${PROJECT_SRCS}
+	albaOpExporterDicom.cpp albaOpExporterDicom.h
     albaOpImporterDicom.cpp	albaOpImporterDicom.h
 		albaOpImporterDicomSliceAccHelper.cpp albaOpImporterDicomSliceAccHelper.h
 		albaDicomTagDefines.h

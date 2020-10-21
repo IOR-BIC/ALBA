@@ -49,6 +49,8 @@ public:
 	CPPUNIT_TEST(TestSeriesIsRotated);
 	CPPUNIT_TEST(TestSeriesGetSlices);
 	CPPUNIT_TEST(TestSeriesGetSerieID);
+	CPPUNIT_TEST(TestSeriesGetAcquisitonNumber);
+	CPPUNIT_TEST(TestSeriesGetImageType);
 	CPPUNIT_TEST(TestSeriesGetDimensions);
 	CPPUNIT_TEST(TestSeriesGetCardiacImagesNum);
 	CPPUNIT_TEST(TestSeriesSortSlices);
@@ -92,6 +94,8 @@ protected:
 	void TestSeriesIsRotated();
 	void TestSeriesGetSlices();
 	void TestSeriesGetSerieID();
+	void TestSeriesGetAcquisitonNumber();
+	void TestSeriesGetImageType();
 	void TestSeriesGetDimensions();
 	void TestSeriesGetCardiacImagesNum();
 	void TestSeriesSortSlices();

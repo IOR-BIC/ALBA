@@ -116,6 +116,11 @@ void albaOpSegmentationRegionGrowingConnectedThresholdTest::CompareImageData(vtk
 void albaOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithm()
 //----------------------------------------------------------------------------
 {
+//                            NOTE!!!!!!
+//	Including ImageFileReader on DLL version causes linking errors somewhere else
+
+#ifndef ALBA_EXPORT
+
   //Read the data of input and use it as input of the operation
   vtkALBASmartPointer<vtkDataSetReader> r;
   albaString fileNameIn = ALBA_DATA_ROOT;
@@ -222,6 +227,7 @@ void albaOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithm()
 
   albaDEL(op);
 
+#endif // !ALBA_EXPORT
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithmRG()

@@ -31,7 +31,6 @@
 
 #include <ostream>
 #include "albaDefines.h"
-#include "vtkALBAToLinearTransform.h"
 #include "vtkTransform.h"
 
 

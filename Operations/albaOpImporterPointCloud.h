@@ -1,5 +1,5 @@
 /*=========================================================================
-Program:   Bonemat
+Program:   ALBA (Agile Library for Biomedical Applications)
 Module:    albaOpImporterPointCloud.h
 Language:  C++
 Date:      $Date: 2010-11-23 16:50:26 $
@@ -31,7 +31,7 @@ PURPOSE. See the above copyright notice for more information.
 /** 
 Reads scalars from a .DIC file
 */
-class albaOpImporterPointCloud : public albaTextFileReaderHelper, public albaOp
+class ALBA_EXPORT albaOpImporterPointCloud : public albaTextFileReaderHelper, public albaOp
 {
 public:
 
@@ -47,10 +47,6 @@ public:
 	void OpRun();
 
 	albaOp* Copy();
-
-	/** Create the dialog interface for the exporter. */
-	virtual void CreateGui();
-
 
 	/** Event management */
 	virtual void OnEvent(albaEventBase *alba_event);
@@ -85,12 +81,14 @@ public:
 	void SetScalarColumn(int pos, int val);
 protected:
 
-	/** imports informations */
-	int Import(void);
+	/** Create the dialog interface for the exporter. */
+	virtual void CreateGui();
 	
-
 	/** Enables*Disables Gui Components */
 	void EnableDisableGui();
+
+	/** imports informations */
+	int Import(void);
 
 	int m_FirstCoordCol;
 	int m_ScalarsNum;
@@ -102,5 +100,7 @@ protected:
 
 	friend class albaOpImporterPointCloudTest;
   	
+private:
+	bool IsEmptyLine(char *line);
 };
 #endif

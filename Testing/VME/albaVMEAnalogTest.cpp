@@ -55,7 +55,7 @@ void albaVMEAnalogTest::TestGetLocalTimeBounds()
 //---------------------------------------------------------
 {
   albaVMEAnalog *analog = NULL;
-  vnl_matrix<double> emgMatrix;
+	vnl_matrix<double> emgMatrix;
   int rows = 5;
   int nTimeStamps = 3;
   emgMatrix.set_size(rows-1 , nTimeStamps);

@@ -74,22 +74,18 @@ ELSE (WIN32)
   ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS} )
 ENDIF (WIN32)
 
-
 IF(ALBA_BUILD_ALBADLL)
-  SET(PROJECT_LIBS
-  albaOperations albaGui albaViews albaVME albaInteraction albaCommon albaService
-)
+  SET(PROJECT_LIBS XercesC albaDLL vtkALBA)
 ELSE(ALBA_BUILD_ALBADLL)
-  SET(PROJECT_LIBS
-  albaOperations albaGui albaViews albaVME albaVisualPipes albaInteraction albaCommon albaService vtkALBA GPUAPI
-)
+  SET(PROJECT_LIBS albaOperations albaGui albaViews albaVME albaVisualPipes albaInteraction albaCommon albaService vtkALBA GPUAPI)
 ENDIF(ALBA_BUILD_ALBADLL)
+
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 IF (WIN32)
   SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
-IF (MED_USE_GDCM)
+IF (ALBA_USE_GDCM)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_GDCM_LIBRARY)
-ENDIF (MED_USE_GDCM)
+ENDIF (ALBA_USE_GDCM)

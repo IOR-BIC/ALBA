@@ -87,9 +87,12 @@ public:
 };
 
 
+
 #ifdef ALBA_EXPORTS
-EXPORT_STL_MAP(ALBA_EXPORT, albaString, mmuNodeLink);
+#include "albaDllMacros.h"
+EXPORT_STL_VECTOR(ALBA_EXPORT, albaAutoPointer<albaVME>);
 #endif
+
 
 #ifdef ALBA_EXPORTS
 template class ALBA_EXPORT albaAutoPointer<albaDataPipe>;

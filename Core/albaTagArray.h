@@ -21,6 +21,7 @@
 #include "albaAttribute.h"
 #include "albaTagItem.h"
 #include <map>
+#include <string>
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"

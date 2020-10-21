@@ -30,7 +30,7 @@ class albaVMERoot;
 /** albaGUIDialogFindVme - a dialog widget with a find VME GUI.
 @sa albaGUIDialog
 */
-class albaGUIDialogFindVme : public albaGUIDialog
+class ALBA_EXPORT albaGUIDialogFindVme : public albaGUIDialog
 {
 public:
 	albaGUIDialogFindVme(const wxString& title, long style = albaCLOSEWINDOW);
