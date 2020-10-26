@@ -364,7 +364,7 @@ int albaOpComputeInertialTensor::ComputeLocalInertialTensor(albaVME* node, int c
 	
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> tranformFilter;
   tranformFilter->SetInput((vtkPolyData *)surf->GetOutput()->GetVTKData());
-  tranformFilter->SetTransform(surf->GetOutput()->GetTransform()->GetVTKTransform());
+  tranformFilter->SetTransform(surf->GetOutput()->GetAbsTransform()->GetVTKTransform());
   tranformFilter->Update();
 
 	// get dataset
@@ -574,7 +574,7 @@ void albaOpComputeInertialTensor::ComputeGlobalInertiaTensor()
 
 		// by the spectral theorem, since the moment of inertia tensor is real and symmetric, there exists a Cartesian coordinate system in which it is diagonal,
 		// the coordinate axes are called the principal axes and the constants I1, I2 and I3 are called the principal moments of inertia. 
-		// extract eigenvalues from jacobian matorix (inertial tensor components referred to principal axes).
+		// extract eigenvalues from jacobian matrix (inertial tensor components referred to principal axes).
 		double eval[3];
 		v[0] = v0; v[1] = v1; v[2] = v2; 
 		vtkMath::Jacobi(a,eval,v);
