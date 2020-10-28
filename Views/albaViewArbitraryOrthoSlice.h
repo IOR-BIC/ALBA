@@ -176,7 +176,12 @@ public:
 	albaPipe* GetPipeSlice(int axis);
 	albaVMEVolumeGray * GetVolume() { return m_InputVolume; }
 	
+	/** Gets current slicing origin */
 	double* GetSlicingOrigin() { return m_SlicingOrigin; }
+
+	/** Sets new slicing origin */
+	void SetSlicingOrigin(double* origin);
+
 protected:
 
 	enum AXIS { X = 0, Y = 1, Z = 2 };

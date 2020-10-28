@@ -1186,3 +1186,13 @@ albaPipe* albaViewArbitraryOrthoSlice::GetPipeSlice(int axis)
 
 	return pipeSlice;
 }
+
+//----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::SetSlicingOrigin(double* origin)
+{
+	m_SlicingOriginGUI[0] = origin[0];
+	m_SlicingOriginGUI[1] = origin[1];
+	m_SlicingOriginGUI[2] = origin[2];
+
+	OnSlicingOrigin();
+}
