@@ -425,6 +425,7 @@ protected:
 	albaGUIAboutDialog			*m_AboutDialog;
 
 	albaString m_Revision;
+	albaString m_BuildNum;
 	albaString m_Extension;
 
 	albaUser *m_User; ///< Applications' user

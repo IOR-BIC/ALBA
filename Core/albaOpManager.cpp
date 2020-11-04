@@ -844,7 +844,7 @@ void albaOpManager::FillTraceabilityAttribute(albaOp *op, albaVME *in_node, alba
       else
         isNatural = "false";
     }
-    traceability->AddTraceabilityEvent(trialEvent, operationName, parameters, dateAndTime, appStamp, userID, isNatural);
+    traceability->AddTraceabilityEvent(trialEvent, operationName, parameters, dateAndTime, appStamp, m_BuildNum, userID, isNatural);
   }
 
   if (out_node != NULL)
@@ -886,7 +886,7 @@ void albaOpManager::FillTraceabilityAttribute(albaOp *op, albaVME *in_node, alba
 
         if (out_node->GetNumberOfChildren() == 0 || c == 1)
         {
-           traceability->AddTraceabilityEvent(trialEvent, operationName, parameters, dateAndTime, appStamp, userID, isNatural);
+           traceability->AddTraceabilityEvent(trialEvent, operationName, parameters, dateAndTime, appStamp,m_BuildNum, userID, isNatural);
         }
         else
         {
@@ -897,7 +897,7 @@ void albaOpManager::FillTraceabilityAttribute(albaOp *op, albaVME *in_node, alba
           par.Append("=");
           par.Append(singleParameter.substr(0, count-2));
           singleParameter = singleParameter.Mid(count);
-          traceability->AddTraceabilityEvent(trialEvent, operationName, par, dateAndTime, appStamp, userID, isNatural);
+          traceability->AddTraceabilityEvent(trialEvent, operationName, par, dateAndTime, appStamp,m_BuildNum, userID, isNatural);
         }
       }
     }

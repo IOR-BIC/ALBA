@@ -161,6 +161,12 @@ public:
 	virtual void EnableOp(bool CanEnable = true);
 
 
+	/**Set Build Num*/
+	albaString GetBuildNum() const { return m_BuildNum; }
+
+	/** Get Build Num*/
+	void SetBuildNum(albaString val) { m_BuildNum = val; }
+
 protected:
 	/** Execute the current operation. */
   virtual void OpDo(albaOp *op);
@@ -216,6 +222,7 @@ protected:
 	albaOpCreateGroup	*m_OpAddGroup; ///< Pointer to the (always available) operation for Adding Group VMEs
   wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menù
 	wxToolBar         *m_ToolBar; ///< Pointer to the application's Toolbal
+	albaString				 m_BuildNum;
 
   albaObserver       *m_Listener;
 
