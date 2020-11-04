@@ -818,6 +818,9 @@ IF (ALBA_USE_VTK)
 	../Operations/albaOpImporterVRML.cpp	  		  		../Operations/albaOpImporterVRML.h
 	../Operations/albaOpExporterVTK.cpp	  		  		../Operations/albaOpExporterVTK.h
 	../Operations/albaOpImporterVTK.cpp	  		  		../Operations/albaOpImporterVTK.h
+	../Operations/albaOpExporterMetaImage.cpp	  		../Operations/albaOpExporterMetaImage.h
+	../Operations/albaOpImporterMetaImage.cpp	  		../Operations/albaOpImporterMetaImage.h
+
 	../Operations/albaOpCrop.cpp	    								../Operations/albaOpCrop.h
 	../Operations/albaOpBooleanSurface.cpp	    			../Operations/albaOpBooleanSurface.h
 	../Operations/albaOpEditNormals.cpp	    				../Operations/albaOpEditNormals.h
