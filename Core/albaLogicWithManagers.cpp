@@ -177,6 +177,8 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_EventFilterFunc = NULL;
 
 	m_SkipCameraUpdate = false;
+
+	m_AppLayout = NULL;
 }
 //----------------------------------------------------------------------------
 albaLogicWithManagers::~albaLogicWithManagers()
@@ -192,6 +194,7 @@ albaLogicWithManagers::~albaLogicWithManagers()
 	cppDEL(m_AboutDialog);
 	cppDEL(m_ApplicationSettings);
 	cppDEL(m_TimeBarSettings);
+	albaDEL(m_AppLayout);
 }
 
 // APPLICATION ///////////////////////////////////////////////////////////////
@@ -2198,46 +2201,47 @@ void albaLogicWithManagers::CreateLogPanel()
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::StoreLayout()
 {
-	int pos[2], size[2];
+	if (m_AppLayout)
+	{
+		int pos[2], size[2];
 
-	albaXMLStorage *xmlStorage = albaXMLStorage::New();
-	xmlStorage->SetFileType("MLY");
-	xmlStorage->SetVersion("2.0");
-	albaVMERoot *root;
-	albaNEW(root);
-	root->Initialize();
-	xmlStorage->SetDocument(root);
+		albaXMLStorage *xmlStorage = albaXMLStorage::New();
+		xmlStorage->SetFileType("MLY");
+		xmlStorage->SetVersion("2.0");
+		albaVMERoot *root;
+		albaNEW(root);
+		root->Initialize();
+		xmlStorage->SetDocument(root);
 
-	wxString layout_file  = albaGetAppDataDirectory().c_str();
-	layout_file << "\\layout.mly";
+		wxString layout_file = albaGetAppDataDirectory().c_str();
+		layout_file << "\\layout.mly";
 
-	wxFrame *frame = (wxFrame *)albaGetFrame();
-	wxRect rect;
-	rect = frame->GetRect();
-	pos[0] = rect.GetPosition().x;
-	pos[1] = rect.GetPosition().y;
-	size[0] = rect.GetSize().GetWidth();
-	size[1] = rect.GetSize().GetHeight();
+		wxFrame *frame = (wxFrame *)albaGetFrame();
+		wxRect rect;
+		rect = frame->GetRect();
+		pos[0] = rect.GetPosition().x;
+		pos[1] = rect.GetPosition().y;
+		size[0] = rect.GetSize().GetWidth();
+		size[1] = rect.GetSize().GetHeight();
 
-	mmaApplicationLayout  *layout;
-	albaNEW(layout);
+	
+		m_AppLayout->SetApplicationInfo(m_Win->IsMaximized(), pos, size);
+		bool toolbar_vis = m_Win->GetDockManager().GetPane("toolbar").IsShown();
+		m_AppLayout->SetInterfaceElementVisibility("toolbar", toolbar_vis);
+		bool sidebar_vis = m_Win->GetDockManager().GetPane("sidebar").IsShown();
+		m_AppLayout->SetInterfaceElementVisibility("sidebar", sidebar_vis);
+		bool logbar_vis = m_Win->GetDockManager().GetPane("logbar").IsShown();
+		m_AppLayout->SetInterfaceElementVisibility("logbar", logbar_vis);
 
-	layout->SetApplicationInfo(m_Win->IsMaximized(), pos, size);
-	bool toolbar_vis = m_Win->GetDockManager().GetPane("toolbar").IsShown();
-	layout->SetInterfaceElementVisibility("toolbar", toolbar_vis);
-	bool sidebar_vis = m_Win->GetDockManager().GetPane("sidebar").IsShown();
-	layout->SetInterfaceElementVisibility("sidebar", sidebar_vis);
-	bool logbar_vis = m_Win->GetDockManager().GetPane("logbar").IsShown();
-	layout->SetInterfaceElementVisibility("logbar", logbar_vis);
 
-	root->SetAttribute("ApplicationLayout", layout);
+		root->SetAttribute("ApplicationLayout", m_AppLayout);
 
-	xmlStorage->SetURL(layout_file);
-	xmlStorage->Store();
+		xmlStorage->SetURL(layout_file);
+		xmlStorage->Store();
 
-	cppDEL(xmlStorage);
-	albaDEL(root);
-	albaDEL(layout);
+		cppDEL(xmlStorage);
+		albaDEL(root);
+	}
 } 
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::RestoreLayout()
@@ -2248,6 +2252,7 @@ void albaLogicWithManagers::RestoreLayout()
 
 	albaVMERoot *root;
 	albaNEW(root);
+	albaNEW(m_AppLayout);
 	root->Initialize();
 	xmlStorage->SetDocument(root);
 
@@ -2276,8 +2281,9 @@ void albaLogicWithManagers::RestoreLayout()
 		m_Win->ShowDockPane("toolbar", app_layout->GetToolBarVisibility());
 		m_Win->ShowDockPane("logbar", app_layout->GetLogBarVisibility());
 		m_Win->ShowDockPane("sidebar",  app_layout->GetSideBarVisibility());
-	}
 
+		m_AppLayout->DeepCopy(app_layout);
+	}
 
 	cppDEL(xmlStorage);
 	albaDEL(root);

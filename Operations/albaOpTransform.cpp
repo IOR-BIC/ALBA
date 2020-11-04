@@ -73,6 +73,8 @@ enum TRANSFORMTEXTENTRIES_ID
 	ID_TEXT_ROTATE,
 	ID_TEXT_SCALE,
 	ID_RESET,
+	ID_LOAD_FROM,
+	ID_IDENTITY,
 };
 
 enum REF_SYS
@@ -292,6 +294,8 @@ void albaOpTransform::CreateGui()
 
 	// Reset Button
 	m_Gui->Button(ID_RESET, "Reset", "", "Cancel the transformation.");
+	m_Gui->Button(ID_LOAD_FROM, "Load From...", "", "Load matrix from another VME");
+	m_Gui->Button(ID_IDENTITY, "Identity", "", "Set Identity Matrix");
 
 	m_Gui->Divider();
 	m_Gui->Divider(2);
@@ -463,6 +467,22 @@ void albaOpTransform::OnEvent(albaEventBase *alba_event)
 	case ID_RESET: // Reset transform
 	{
 		Reset();
+		UpdateTransformTextEntries();
+		GetLogicManager()->CameraUpdate();
+	}
+	break;
+
+	case ID_IDENTITY: // Set identity
+	{
+		Identity();
+		UpdateTransformTextEntries();
+		GetLogicManager()->CameraUpdate();
+	}
+	break;
+
+	case ID_LOAD_FROM: // load from another VME
+	{
+		LoadFrom();
 		UpdateTransformTextEntries();
 		GetLogicManager()->CameraUpdate();
 	}
@@ -677,6 +697,7 @@ void albaOpTransform::PostMultiplyMatrix(albaMatrix *matrix)
 	tr->Delete();
 }
 
+
 //----------------------------------------------------------------------------
 void albaOpTransform::OnEventTransformText()
 {
@@ -749,6 +770,36 @@ void albaOpTransform::Reset()
 
 	SelectRefSys();
 }
+
+//----------------------------------------------------------------------------
+void albaOpTransform::Identity()
+{
+	albaMatrix identityMatr;
+	
+	m_Input->SetAbsMatrix(identityMatr, m_CurrentTime);
+	m_TransformVME->SetAbsMatrix(identityMatr, m_CurrentTime);
+
+	SelectRefSys();
+}
+
+//----------------------------------------------------------------------------
+void albaOpTransform::LoadFrom()
+{
+	albaString s;
+	s << "Choose VME";
+	albaEvent e(this, VME_CHOOSE, &s);
+	e.SetPointer(&AcceptRefSys);
+	albaEventMacro(e);
+
+	albaMatrix targetMtr;
+	targetMtr.DeepCopy(e.GetVme()->GetOutput()->GetAbsMatrix());
+
+	m_Input->SetAbsMatrix(targetMtr, m_CurrentTime);
+	m_TransformVME->SetAbsMatrix(targetMtr, m_CurrentTime);
+
+	SelectRefSys();
+}
+
 
 //----------------------------------------------------------------------------
 void albaOpTransform::Translate(double x, double y, double z)

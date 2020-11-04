@@ -124,6 +124,7 @@ public:
 		ID_GPUENABLED,
 		ID_CAMERA_FOLLOW_GIZMO,
 		ID_SHOW_GIZMO,
+		ID_SLICING_ORIGIN,
 		ID_LAST,
 	};
 
@@ -160,17 +161,27 @@ public:
 
 	/** */
 	virtual void VmeSelect(albaVME *node, bool select);
-
-
+	
+	/** Gets the slicing matrix of the selected axis */
 	albaMatrix* GetSlicerMatrix(int axis = Z);
-	void SetSlicerMatrix(albaMatrix* matrix);
+
+	/** Set tags to restore view parameter to the in input VME */
+	void SetRestoreTagToVME(albaVME *vme);
+
+	/** Restore view parameters from a vme with stored tags*/
+	void RestoreFromVME(albaVME* vme);
 
 	albaViewVTK * GetViewArbitrary();
 	albaViewVTK * GetViewSlice(int axis);
 	albaPipe* GetPipeSlice(int axis);
 	albaVMEVolumeGray * GetVolume() { return m_InputVolume; }
 	
+	/** Gets current slicing origin */
 	double* GetSlicingOrigin() { return m_SlicingOrigin; }
+
+	/** Sets new slicing origin */
+	void SetSlicingOrigin(double* origin);
+
 protected:
 
 	enum AXIS { X = 0, Y = 1, Z = 2 };
@@ -186,6 +197,8 @@ protected:
 	void ResetCameraToSlices();
 
 	void UpdateConesPosition();
+
+	void OnSlicingOrigin();
 
 	/** 
 	Create the helper cone giving feedback for camera direction*/
@@ -247,6 +260,7 @@ protected:
 
 	albaAttachCamera		*m_CameraToSlicer[3];
 
+	double	m_SlicingOriginGUI[3];
 	double	m_SlicingOrigin[3];
 	double	m_SlicingOriginReset[3];
 	double	m_VolumeVTKDataABSOrientation[3];

@@ -74,9 +74,9 @@ int albaOpImporterDicFile::Import(void)
 	wxSplitPath(m_FileName, &path, &name, &ext);
 
 	
-	albaVMEPointCloud *polydataVME;
-	albaNEW(polydataVME);
-	polydataVME->SetName(name);
+	albaVMEPointCloud *pointCloudVME;
+	albaNEW(pointCloudVME);
+	pointCloudVME->SetName(name);
 
 	vtkPolyData * polydata;
 	vtkNEW(polydata);
@@ -112,7 +112,7 @@ int albaOpImporterDicFile::Import(void)
 
 	int pointN = 0;
 
-	while ((lineLenght = GetLine()) != 0)
+	do 
 	{
 		int nReaded = sscanf(m_Line,  "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", &values[0], &values[1], &values[2], &values[3], &values[4], &values[5], &values[6], &values[7], &values[8], &values[9], &values[10], &values[11]);
 
@@ -133,7 +133,8 @@ int albaOpImporterDicFile::Import(void)
 		newArray->InsertNextValue(values[11]);
 
 		pointN++;
-	}
+	} while ((lineLenght = GetLine()) != 0);
+
 
 	vtkPointData *outPointData = polydata->GetPointData();
 	outPointData->AddArray(newArray);
@@ -147,11 +148,14 @@ int albaOpImporterDicFile::Import(void)
 
 	polydata->Modified();
 	polydata->Update();
-	polydataVME->SetData(polydata,0);
+	pointCloudVME->SetData(polydata,0);
 	vtkDEL(polydata);
 
-	polydataVME->ReparentTo(m_Input);
-	albaDEL(polydataVME);
+	pointCloudVME->ReparentTo(m_Input);
+
+	m_Output = pointCloudVME;
+
+	albaDEL(pointCloudVME);
 
 	ReadFinalize();
 }

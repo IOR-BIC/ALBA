@@ -19,6 +19,7 @@
 
 #include "albaOp.h"
 #include "albaVME.h"
+#include "albaVect3d.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -85,12 +86,13 @@ protected:
 	/** Stores a tag on the selected surface */
 	void SetDoubleTag(wxString tagName, double value);
 
-
+	void CreatePointSamplingOutput();
 
 	virtual void CreateGui();
 
   albaVME        *m_Surface;
   vtkDoubleArray *m_VOIScalars;
+	std::vector<albaVect3d> m_VOICoords;
   albaString       m_NumberOfScalarsString;
   int             m_NumberOfScalars;
   albaString       m_MeanScalarString;

@@ -15,7 +15,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
-#include "albaDefines.h"
 #include "albaGPU3DTextureProviderHelper.h"
 #include "vtkImagedata.h"
 #include "vtkRectilinearGrid.h"

@@ -13,6 +13,8 @@ Copyright (c) 2012
 #define __vtkALBATubeFilter_h
 
 #include "vtkPolyDataToPolyDataFilter.h"
+#include "albaConfigure.h"
+
 
 #define VTK_VARY_RADIUS_OFF 0
 #define VTK_VARY_RADIUS_BY_SCALAR 1
@@ -34,7 +36,7 @@ class vtkPoints;
 /*This Class is basically a copy of vtkTubeFilter class except for managing some error cases.
 	when two consecutive points on a line are the same point (or are to close) vtk tube filter does not create the output
 	this class skips consecutive equal points*/
-class VTK_GRAPHICS_EXPORT vtkALBATubeFilter : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkALBATubeFilter : public vtkPolyDataToPolyDataFilter
 {
 public:
 	vtkTypeRevisionMacro(vtkALBATubeFilter, vtkPolyDataToPolyDataFilter);

@@ -59,20 +59,26 @@ void albaXMLStringTest::TestDynamicAllocation()
 void albaXMLStringTest::TestAllConstructors()
 //----------------------------------------------------------------------------
 {
+#ifndef ALBA_EXPORT
+
   albaXMLString s1 = albaXMLString();
 
-  const albaXMLString s2 = albaXMLString("test string");
+  albaXMLString s2 = albaXMLString("test string");
 
   albaXMLString s3 = albaXMLString(s2);
 
   XMLCh *xml_s = 0L;
 
   albaXMLString s4 = albaXMLString(xml_s);
+
+#endif  
+
 }
 //----------------------------------------------------------------------------
 void albaXMLStringTest::TestAppend()
 //----------------------------------------------------------------------------
 {
+#ifndef ALBA_EXPORT
   albaXMLString s1 = albaXMLString("test string for");
   albaXMLString s2 = albaXMLString(" Append");
 
@@ -81,11 +87,13 @@ void albaXMLStringTest::TestAppend()
   const char *cstr_s1 = s1.GetCStr();
 
   CPPUNIT_ASSERT(strcmp(cstr_s1, "test string for Append") == 0);
+#endif
 }
 //----------------------------------------------------------------------------
 void albaXMLStringTest::TestErase()
 //----------------------------------------------------------------------------
 {
+#ifndef ALBA_EXPORT
   albaXMLString s = albaXMLString("test string for Erase");
 
   s.Erase(s.Begin(),s.Begin() + 5);
@@ -93,51 +101,67 @@ void albaXMLStringTest::TestErase()
   const char *cstr_s = s.GetCStr();
 
   CPPUNIT_ASSERT(strcmp(cstr_s, "string for Erase") == 0);
+#endif
 }
 //----------------------------------------------------------------------------
 void albaXMLStringTest::TestBegin()
 //----------------------------------------------------------------------------
 {
+#ifndef ALBA_EXPORT
+
   albaXMLString s = albaXMLString("test string for Begin");
 
   const XMLCh *beg_c = s.Begin();
   XMLCh c = s[0];
 
   CPPUNIT_ASSERT(c == *beg_c);
+#endif
 }
 //----------------------------------------------------------------------------
 void albaXMLStringTest::TestEnd()
 //----------------------------------------------------------------------------
 {
+#ifndef ALBA_EXPORT
+
   albaXMLString s = albaXMLString("test string for End");
 
   const XMLCh *end_c = s.End();
   XMLCh c = s[s.Size()];
 
   CPPUNIT_ASSERT(c == *end_c);
+#endif
 }
 //----------------------------------------------------------------------------
 void albaXMLStringTest::TestSize()
 //----------------------------------------------------------------------------
 {
+#ifndef ALBA_EXPORT
+
   albaXMLString s = albaXMLString("test string for Size");
 
   CPPUNIT_ASSERT(s.Size() == 20);
+#endif
 }
 //----------------------------------------------------------------------------
 void albaXMLStringTest::TestGetCStr()
 //----------------------------------------------------------------------------
 {
+#ifndef ALBA_EXPORT
+
   albaXMLString s = albaXMLString("test string for GetCStr");
 
   const char *cstr_s = s.GetCStr();
 
   CPPUNIT_ASSERT(strcmp(cstr_s, "test string for GetCStr") == 0);
+
+#endif
 }
 //----------------------------------------------------------------------------
 void albaXMLStringTest::TestAllOperators()
 //----------------------------------------------------------------------------
 {
+#ifndef ALBA_EXPORT
+
   albaXMLString s = albaXMLString("test string for Operators");
 
   // test [] operator
@@ -150,4 +174,6 @@ void albaXMLStringTest::TestAllOperators()
   {
     CPPUNIT_ASSERT(xml_c[i] == s[i]);
   }
+
+#endif
 }

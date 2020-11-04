@@ -200,8 +200,8 @@ void albaOpExtractImageFromArbitraryView::CreateGui()
 	if (m_View && m_View->IsA("albaViewArbitraryOrthoSlice"))
 	{
 		m_Gui->Label("");
-		wxString axisChoice[3] = { "X","Y","Z" };
-		m_Gui->Combo(ID_AXIS, "Axis", &m_Axis, 3, axisChoice);
+		wxString axisChoice[3] = { "Sagittal", "Coronal", "Axial" };
+		m_Gui->Combo(ID_AXIS, "Plane", &m_Axis, 3, axisChoice);
 	}
 	
 	m_Gui->Label("Slice Images", 1);
@@ -315,31 +315,10 @@ void albaOpExtractImageFromArbitraryView::ShowImageSlice()
 {
 	if (m_CurrentImage != NULL)
 	{
-		if (m_CurrentImage->GetTagArray()->IsTagPresent("SLICE_MATRIX"))
-		{
-			albaTagItem *tagPoint = m_CurrentImage->GetTagArray()->GetTag("SLICE_MATRIX");
-
-			// Matrix
-			albaMatrix *matrix = NULL;
-			albaNEW(matrix);
-
-			int ind = 0;
-			for (int i = 0; i < 4; i++)
-				for (int j = 0; j < 4; j++)
-				{
-					double value = tagPoint->GetValueAsDouble(ind++);
-					matrix->SetElement(i, j, value);
-				}
-
 			if (m_View->IsA("albaViewArbitrarySlice"))
-			{
-				((albaViewArbitrarySlice*)m_View)->SetSlicerMatrix(matrix);
-			}
+				((albaViewArbitrarySlice*)m_View)->RestoreFromVME(m_CurrentImage);
 			else if (m_View->IsA("albaViewArbitraryOrthoSlice"))
-			{
-				((albaViewArbitraryOrthoSlice*)m_View)->SetSlicerMatrix(matrix);
-			}
-		}
+				((albaViewArbitraryOrthoSlice*)m_View)->RestoreFromVME(m_CurrentImage);
 	}
 }
 
@@ -470,31 +449,15 @@ void albaOpExtractImageFromArbitraryView::SaveTags(albaVMEImage * image)
 	wxString axis[3] = { "X","Y","Z" };
 	image->GetTagArray()->SetTag(albaTagItem("SLICE_AXIS", axis[m_Axis]));
 
-	// Matrix
-	albaMatrix *matrix = NULL;
 
 	if (m_View->IsA("albaViewArbitrarySlice"))
 	{
-		matrix = ((albaViewArbitrarySlice*)m_View)->GetSlicerMatrix();
+		((albaViewArbitrarySlice*)m_View)->SetRestoreTagToVME(image);
 	}
 	else if (m_View->IsA("albaViewArbitraryOrthoSlice"))
 	{
-		matrix = ((albaViewArbitraryOrthoSlice*)m_View)->GetSlicerMatrix();
+		((albaViewArbitraryOrthoSlice*)m_View)->SetRestoreTagToVME(image);
 	}
 
-	if (matrix)
-	{
-		albaTagItem tagMatrix;
-		tagMatrix.SetName("SLICE_MATRIX");
-		int ind = 0;
 
-		for (int i = 0; i < 4; i++)
-			for (int j = 0; j < 4; j++)
-				tagMatrix.SetValue(matrix->GetElement(i, j), ind++);
-
-		if (image->GetTagArray()->IsTagPresent("SLICE_MATRIX"))
-			image->GetTagArray()->DeleteTag("SLICE_MATRIX");
-
-		image->GetTagArray()->SetTag(tagMatrix);
-	}
 }

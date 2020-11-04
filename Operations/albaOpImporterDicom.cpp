@@ -785,7 +785,7 @@ bool albaOpImporterDicom::LoadDicomFromDir(const char *dicomDirABSPath)
 albaDicomSlice *albaOpImporterDicom::ReadDicomFile(albaString fileName)
 {
 	int dcmCardiacNumberOfImages = -1;
-	std::string dcmModality, dcmStudyInstanceUID, dcmAcquisitionNumber, dcmSeriesInstanceUID, dcmScanOptions;
+	std::string dcmModality, dcmStudyInstanceUID, dcmAcquisitionNumber, dcmSeriesInstanceUID, dcmScanOptions, dcmImageType;
 	std::string date, description, patientName, birthdate, photometricInterpretation;
 	double dcmTriggerTime = 0;
 	double defaulOrienatation[6] = { 1.0,0.0,0.0,0.0,1.0,0.0 };
@@ -810,6 +810,7 @@ albaDicomSlice *albaOpImporterDicom::ReadDicomFile(albaString fileName)
 	TagsToRead.insert(TAG_ScanOptions);
 	TagsToRead.insert(TAG_ImagePositionPatient);
 	TagsToRead.insert(TAG_ImageOrientationPatient);
+	TagsToRead.insert(TAG_ImageType);
 	TagsToRead.insert(TAG_TriggerTime);
 	TagsToRead.insert(TAG_CardiacNumberOfImages);
 	TagsToRead.insert(TAG_StudyDate);
@@ -836,6 +837,7 @@ albaDicomSlice *albaOpImporterDicom::ReadDicomFile(albaString fileName)
 	dcmStudyInstanceUID = READTAG(TAG_StudyInstanceUID);
 	dcmSeriesInstanceUID = READTAG(TAG_SeriesInstanceUID);
 	dcmAcquisitionNumber = READTAG(TAG_AcquisitionNumber);
+	dcmImageType = READTAG(TAG_ImageType);
 	
 	//Try to read image position patient form Dicom
 	if (dcmDataSet.FindDataElement(TAG_ImagePositionPatient))
@@ -907,6 +909,7 @@ albaDicomSlice *albaOpImporterDicom::ReadDicomFile(albaString fileName)
 	newSlice->SetSeriesID(dcmSeriesInstanceUID.c_str());
 	newSlice->SetStudyID(dcmStudyInstanceUID.c_str());
 	newSlice->SetAcquisitionNumber(dcmAcquisitionNumber.c_str());
+	newSlice->SetImageType(dcmImageType.c_str());
 	newSlice->SetSliceSize(imageSize);
 		
 	return newSlice;
@@ -1388,8 +1391,10 @@ void albaDicomStudy::AddSlice(albaDicomSlice *slice)
 
 	albaString serieID = slice->GetSeriesID();
 	albaString acqusitionNumber = slice->GetAcquisitionNumber();
+	albaString imageType = slice->GetImageType();
+
 	for (int i = 0; i < m_Series.size() && !series; i++)
-		if (serieID == m_Series[i]->GetSerieID() && m_Series[i]->GetAcquisitionNumber() == acqusitionNumber)
+		if (serieID == m_Series[i]->GetSerieID() && m_Series[i]->GetAcquisitionNumber() == acqusitionNumber && m_Series[i]->GetImageType() == imageType)
 		{
 			series = m_Series[i];
 			break;
@@ -1398,7 +1403,7 @@ void albaDicomStudy::AddSlice(albaDicomSlice *slice)
 	//if the study does not exist we create a new study and push it back on study vector
 	if (series == NULL)
 	{
-		series = new albaDicomSeries(serieID,acqusitionNumber);
+		series = new albaDicomSeries(serieID,acqusitionNumber, imageType);
 		m_Series.push_back(series);
 	}
 

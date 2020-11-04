@@ -1,10 +1,11 @@
-PROJECT (Operations_TEST)
+PROJECT (albaOperationsTests)
 
 IF(ALBA_BUILD_ALBADLL)
-  LINK_LIBRARIES(albaDLL)
+  SET(PROJECT_LIBS XercesC albaDLL vtkALBA albaTests) 
 ELSE(ALBA_BUILD_ALBADLL)
-  LINK_LIBRARIES(albaTests albaOperations albaVME albaCommon albaService)
-ENDIF (ALBA_BUILD_ALBADLL)
+  SET(PROJECT_LIBS albaTests albaOperations albaVME albaCommon albaService)
+ENDIF(ALBA_BUILD_ALBADLL)
+
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
@@ -126,10 +127,14 @@ SET(PROJECT_SRCS
 	albaOpExporterAnsysInputFileTest.h albaOpExporterAnsysInputFileTest.cpp
 	albaOpImporterAbaqusFileTest.h albaOpImporterAbaqusFileTest.cpp
 	albaOpExporterAbaqusFileTest.h albaOpExporterAbaqusFileTest.cpp
+	albaOpImporterDICFileTest.cpp albaOpImporterDICFileTest.h
+	albaOpImporterPointCloudTest.cpp albaOpImporterPointCloudTest.h
 )
 
-ADD_EXECUTABLE(albaOperationsTests ${PROJECT_SRCS})
-ADD_TEST(albaOperationsTests  ${EXECUTABLE_OUTPUT_PATH}/albaOperationsTests)
+
+ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+ADD_TEST(${PROJECT_NAME}  ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_NAME})
 IF (WIN32)
-  SET_TARGET_PROPERTIES(albaOperationsTests PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)

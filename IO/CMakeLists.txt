@@ -15,13 +15,6 @@ SET(PROJECT_SRCS
   mmuDOMTreeErrorReporter.h  	mmuDOMTreeErrorReporter.cpp
 )
 
-# IO classes for VTK related objects
-IF (ALBA_USE_VTK)
-  #SET(PROJECT_SRCS
-  #${PROJECT_SRCS}
-  #)
-ENDIF (ALBA_USE_VTK)
-
 # List libraries that are needed by this project.
 
 IF(BUILD_SHARED_LIBS)

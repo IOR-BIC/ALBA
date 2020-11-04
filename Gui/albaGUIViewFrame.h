@@ -29,7 +29,7 @@ class albaView;
 //----------------------------------------------------------------------------
 // albaGUIViewFrame :
 //----------------------------------------------------------------------------
-class albaGUIViewFrame: public wxFrame , public albaObserver
+class ALBA_EXPORT albaGUIViewFrame: public wxFrame , public albaObserver
 {
 	public:
 	albaGUIViewFrame(wxFrame* parent, 
