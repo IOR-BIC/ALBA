@@ -85,7 +85,7 @@ albaOp* albaOpImporterMetaImage::Copy()
 //----------------------------------------------------------------------------
 void albaOpImporterMetaImage::OpRun()   
 {
-	albaString wildc = "Meta Data Image (*.mha, *.mhd)|*.mha, *.mhd";
+	albaString wildc = "Meta Data Image (*.mha)|*.mha";
   albaString f;
   if (m_File.IsEmpty())
   {
@@ -159,15 +159,17 @@ int albaOpImporterMetaImage::ImportMetaImage()
 				m_Output = m_VmeGrayVol;
 			}
 	
-			//Setting output matrix
-			double cosines[6];
-
-			for (int i = 0; i < 2; i++)
-				for (int j = 0; j < 3; j++)
-					cosines[i * 3 + j] = itkImage->GetDirection()[i][j];
 
 			albaMatrix orientationMatrix;
-			orientationMatrix.SetFromDirectionCosines(cosines);
+			const InputImageTypeFloat::DirectionType & direction = itkImage->GetDirection();
+
+
+			for (int i = 0; i < 3; i++)
+				for (int j = 0; j < 3; j++)
+				{
+					orientationMatrix[i][j] = direction[i][j];
+				}
+
 			m_Output->SetAbsMatrix(orientationMatrix);
 
 
@@ -176,8 +178,6 @@ int albaOpImporterMetaImage::ImportMetaImage()
 			std::vector<std::string> keys = metaDataDictionary.GetKeys();
 			itk::MetaDataDictionary::ConstIterator dicIter = metaDataDictionary.Begin();
 			itk::MetaDataDictionary::ConstIterator dicEnd = metaDataDictionary.End();
-
-
 
 			while (dicIter != dicEnd)
 			{

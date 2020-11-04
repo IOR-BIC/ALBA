@@ -82,6 +82,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpExporterPLY.h"
 #include "albaOpExporterVTK.h"
 #include "albaOpExporterVTKXML.h"
+#include "albaOpExporterMetaImage.h"
 #include "albaOpExporterWrappedMeter.h"
 #include "albaOpExporterAbaqusFile.h"
 
@@ -291,6 +292,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpExporterPLY("PLY"));
 	m_Logic->Plug(new albaOpExporterVTK("VTK"));
 	m_Logic->Plug(new albaOpExporterVTKXML("VTK"));
+	m_Logic->Plug(new albaOpExporterMetaImage("MetaImage"));
 #ifdef ALBA_USE_GDCM
 	m_Logic->Plug(new albaOpExporterDicom("Dicom"),"",true,dicomSettings);
 #endif
