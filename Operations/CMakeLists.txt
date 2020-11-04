@@ -57,6 +57,8 @@ IF (ALBA_USE_VTK)
 	albaOpImporterVRML.cpp	  		  		albaOpImporterVRML.h
 	albaOpExporterVTK.cpp	  		  		albaOpExporterVTK.h
 	albaOpImporterVTK.cpp	  		  		albaOpImporterVTK.h
+	albaOpExporterMetaImage.cpp	  		  		albaOpExporterMetaImage.h
+	albaOpImporterMetaImage.cpp	  		  		albaOpImporterMetaImage.h
 	albaOpCrop.cpp	    								albaOpCrop.h
 	albaOpBooleanSurface.cpp	    			albaOpBooleanSurface.h
 	albaOpEditNormals.cpp	    				albaOpEditNormals.h
