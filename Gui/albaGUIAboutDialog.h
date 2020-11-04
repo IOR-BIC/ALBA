@@ -54,7 +54,7 @@ public:
 
 	void SetImagePath(wxString imagePath) { m_ImagePath = imagePath; };
 	void SetTitle(wxString title) { m_Title = title; };
-	void SetRevision(wxString revision);;
+	void SetBuildNum(wxString revision);
 	void SetVersion(wxString ver) { m_Version = ver; };
 	void SetWebSite(wxString webSite);
 	void SetLicenseURL(wxString licenseURL);
@@ -70,7 +70,7 @@ protected:
 	wxImage				*m_PreviewImage;
 
 	wxString			m_Title;
-	wxString			m_Revision;
+	wxString			m_BuildNum;
 	wxString			m_Version;
 	wxString			m_ImagePath;
 	wxString			m_WebSiteURL;
