@@ -159,7 +159,6 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_SettingsDialog = new albaGUISettingsDialog();
 	m_AboutDialog = new albaGUIAboutDialog();
 
-	m_Revision = _("0.1");
 	m_Extension = "alba";
 
 	m_UseWizardManager = false;
