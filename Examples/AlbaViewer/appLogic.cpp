@@ -77,8 +77,6 @@ void appLogic::Init(int argc, char **argv)
 	albaLogicWithManagers::Init(argc, argv);
 	m_Win->ShowDockPane("logbar", false);
 
-	SetRevision("1.0");
-
 	if (!wxDirExists(albaGetAppDataDirectory().c_str()))
 		wxMkDir(albaGetAppDataDirectory().c_str());
 
