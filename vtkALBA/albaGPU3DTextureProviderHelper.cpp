@@ -55,6 +55,7 @@ albaGPU3DTextureProviderHelper::~albaGPU3DTextureProviderHelper()
 //----------------------------------------------------------------------------
 int albaGPU3DTextureProviderHelper::InitializeTexture(vtkImageData *volume, vtkImageData *output)
 {
+
 	
 	int pos = GetTextureIndex(volume);
 	if (pos != -1)
@@ -90,7 +91,7 @@ int albaGPU3DTextureProviderHelper::InitializeTexture(vtkImageData *volume, vtkI
 	int nComps = volume->GetNumberOfScalarComponents();
 	
 	//Check data types
-	if (!((nComps == 1 || nComps == 3) && (inGLDtype != (unsigned int)-1 && outGLDtype != (unsigned int)-1)))
+	if (!(nComps == 1 || nComps == 3))
 		return false;
 
 	int maxDimGL;
@@ -247,7 +248,7 @@ unsigned int albaGPU3DTextureProviderHelper::GetGLDataType(int nVTKdata_type)
 		(unsigned int)-1, (unsigned int)-1,
 		GL_BYTE, GL_UNSIGNED_BYTE,
 		GL_SHORT, GL_UNSIGNED_SHORT,
-		GL_INT, GL_UNSIGNED_INT,
+		(unsigned int)-1, GL_UNSIGNED_INT,
 		GL_INT, GL_UNSIGNED_INT,
 		GL_FLOAT, (unsigned int)-1, (unsigned int)-1,
 	};

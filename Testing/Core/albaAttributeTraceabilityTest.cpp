@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaAttributeTraceabilityTest
- Authors: Roberto Mucci
+ Authors: Roberto Mucci, Gianlugi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -32,20 +32,17 @@
 
 //----------------------------------------------------------------------------
 void albaAttributeTraceabilityTest::TestFixture()
-//----------------------------------------------------------------------------
 {
 }
 
 //----------------------------------------------------------------------------
 void albaAttributeTraceabilityTest::TestStaticAllocation()
-//----------------------------------------------------------------------------
 {
   albaAttributeTraceability vm;
 }
 
 //----------------------------------------------------------------------------
 void albaAttributeTraceabilityTest::TestDynamicAllocation()
-//----------------------------------------------------------------------------
 {
   albaAttributeTraceability *vm = new albaAttributeTraceability();
   delete vm;
@@ -53,29 +50,32 @@ void albaAttributeTraceabilityTest::TestDynamicAllocation()
 
 //----------------------------------------------------------------------------
 void albaAttributeTraceabilityTest::TestAddTraceabilityEvent()
-//----------------------------------------------------------------------------
 {
   albaAttributeTraceability *at1 = new albaAttributeTraceability(); 
  
-  at1->AddTraceabilityEvent("test", "testParameter", "17/11/2008", "testApp", "testUser", "NATURAL");
-  at1->AddTraceabilityEvent("test1", "testParameter1", "18/11/2008", "testApp1", "testUser1", "SYNTHETIC");
+  at1->AddTraceabilityEvent("trial1","test", "testParameter", "17/11/2008", "testApp","Build_1","testUser","NATURAL");
+  at1->AddTraceabilityEvent("trial2","test1", "testParameter1", "18/11/2008", "testApp1", "Build_2", "testUser1", "SYNTHETIC");
 
   
-  if(at1->m_TraceabilityVector[0].m_TrialEvent == "test" &&
-      at1->m_TraceabilityVector[0].m_OperationName == "testParameter" &&
-      at1->m_TraceabilityVector[0].m_Parameters == "17/11/2008" &&
-      at1->m_TraceabilityVector[0].m_Date == "testApp" &&
-      at1->m_TraceabilityVector[0].m_AppStamp == "testUser" &&
-      at1->m_TraceabilityVector[0].m_OperatorID == "NATURAL" &&
-      at1->m_TraceabilityVector[1].m_TrialEvent == "test1" &&
-      at1->m_TraceabilityVector[1].m_OperationName == "testParameter1" &&
-      at1->m_TraceabilityVector[1].m_Parameters == "18/11/2008" &&
-      at1->m_TraceabilityVector[1].m_Date == "testApp1" &&
-      at1->m_TraceabilityVector[1].m_AppStamp == "testUser1" &&
-      at1->m_TraceabilityVector[1].m_OperatorID == "SYNTHETIC")
-    {
-      result = true;
-    }
+	if (at1->m_TraceabilityVector[0].m_TrialEvent == "trial1" &&
+		at1->m_TraceabilityVector[0].m_OperationName == "test" &&
+		at1->m_TraceabilityVector[0].m_Parameters == "testParameter"  &&
+		at1->m_TraceabilityVector[0].m_Date == "17/11/2008"  &&
+		at1->m_TraceabilityVector[0].m_AppStamp == "testApp" &&
+		at1->m_TraceabilityVector[0].m_BuildNum == "Build_1" &&
+		at1->m_TraceabilityVector[0].m_OperatorID == "testUser" &&
+		at1->m_TraceabilityVector[0].m_IsNatural == "NATURAL" &&
+		at1->m_TraceabilityVector[1].m_TrialEvent == "trial2" &&
+		at1->m_TraceabilityVector[1].m_OperationName == "test1" &&
+		at1->m_TraceabilityVector[1].m_Parameters == "testParameter1" &&
+		at1->m_TraceabilityVector[1].m_Date == "18/11/2008" &&
+		at1->m_TraceabilityVector[1].m_AppStamp == "testApp1" &&
+		at1->m_TraceabilityVector[1].m_BuildNum == "Build_2" &&
+		at1->m_TraceabilityVector[1].m_OperatorID == "testUser1" &&
+		at1->m_TraceabilityVector[1].m_IsNatural == "SYNTHETIC")
+	{
+		result = true;
+	}
 
   TEST_RESULT;
 
@@ -84,12 +84,11 @@ void albaAttributeTraceabilityTest::TestAddTraceabilityEvent()
 
 //----------------------------------------------------------------------------
 void albaAttributeTraceabilityTest::TestRemoveTraceabilityEvent()
-//----------------------------------------------------------------------------
 {
   albaAttributeTraceability *at1 = new albaAttributeTraceability(); 
 
-  at1->AddTraceabilityEvent("test", "testParameter", "17/11/2008", "testApp", "testUser", "NATURAL");
-  at1->AddTraceabilityEvent("test1", "testParameter1", "18/11/2008", "testApp1", "testUser1", "SYNTHETIC");
+  at1->AddTraceabilityEvent("trial1", "test", "testParameter", "17/11/2008", "testApp", "Build_1", "testUser", "NATURAL");
+  at1->AddTraceabilityEvent("trial2", "test1", "testParameter1", "18/11/2008", "testApp1","Build_2", "testUser1", "SYNTHETIC");
 
   result = (at1->m_TraceabilityVector.size() == 2);
   TEST_RESULT;
@@ -99,19 +98,20 @@ void albaAttributeTraceabilityTest::TestRemoveTraceabilityEvent()
   result = (at1->m_TraceabilityVector.size() == 1);
   TEST_RESULT;
 
-  if(at1->m_TraceabilityVector[0].m_TrialEvent == "test" &&
-    at1->m_TraceabilityVector[0].m_OperationName == "testParameter" &&
-    at1->m_TraceabilityVector[0].m_Parameters == "17/11/2008" &&
-    at1->m_TraceabilityVector[0].m_Date == "testApp" &&
-    at1->m_TraceabilityVector[0].m_AppStamp == "testUser" &&
-    at1->m_TraceabilityVector[0].m_OperatorID == "NATURAL")
+  if(at1->m_TraceabilityVector[0].m_TrialEvent == "trial1" &&
+    at1->m_TraceabilityVector[0].m_OperationName == "test" &&
+    at1->m_TraceabilityVector[0].m_Parameters == "testParameter" &&
+    at1->m_TraceabilityVector[0].m_Date == "17/11/2008" &&
+		at1->m_TraceabilityVector[0].m_AppStamp == "testApp" &&
+		at1->m_TraceabilityVector[0].m_BuildNum == "Build_1" &&
+		at1->m_TraceabilityVector[0].m_OperatorID == "testUser" &&
+    at1->m_TraceabilityVector[0].m_IsNatural == "NATURAL")
   {
     result = true;
   }
   else
   {
     result = false;
-
   }
 
   TEST_RESULT
@@ -125,11 +125,11 @@ void albaAttributeTraceabilityTest::TestGetLastTrialEvent()
 {
   albaAttributeTraceability *at1 = new albaAttributeTraceability(); 
 
-  at1->AddTraceabilityEvent("test", "testParameter", "17/11/2008", "testApp", "testUser", "NATURAL");
-  at1->AddTraceabilityEvent("test1", "testParameter1", "18/11/2008", "testApp1", "testUser1", "SYNTHETIC");
+  at1->AddTraceabilityEvent("trial1", "test", "testParameter", "17/11/2008", "testApp","build_0", "testUser", "NATURAL");
+  at1->AddTraceabilityEvent("trial2", "test1", "testParameter1", "18/11/2008", "testApp1", "build_1", "testUser1", "SYNTHETIC");
 
   albaString event = at1->GetLastTrialEvent();
-  result = (strcmp(event.GetCStr(), "test1") == 0);
+  result = (strcmp(event.GetCStr(), "trial2") == 0);
 
   TEST_RESULT
 
@@ -142,8 +142,8 @@ void albaAttributeTraceabilityTest::TestDeepCopy()
   albaAttributeTraceability *at1 = new albaAttributeTraceability(); 
   albaAttributeTraceability *at2 = new albaAttributeTraceability();
 
-  at1->AddTraceabilityEvent("test", "testParameter", "17/11/2008", "testApp", "testUser", "NATURAL");
-  at1->AddTraceabilityEvent("test1", "testParameter1", "18/11/2008", "testApp1", "testUser1", "NATURAL1");
+  at1->AddTraceabilityEvent("trial1", "test", "testParameter", "17/11/2008", "testApp", "build_1", "testUser", "NATURAL");
+  at1->AddTraceabilityEvent("trial2", "test1", "testParameter1", "18/11/2008", "testApp1","build_2", "testUser1", "NATURAL1");
 
   at2->DeepCopy(at1);
 
@@ -153,8 +153,9 @@ void albaAttributeTraceabilityTest::TestDeepCopy()
     if(at1->m_TraceabilityVector[i].m_TrialEvent != at2->m_TraceabilityVector[i].m_TrialEvent ||
       at1->m_TraceabilityVector[i].m_OperationName != at2->m_TraceabilityVector[i].m_OperationName ||
       at1->m_TraceabilityVector[i].m_Parameters != at2->m_TraceabilityVector[i].m_Parameters ||
-      at1->m_TraceabilityVector[i].m_Date != at2->m_TraceabilityVector[i].m_Date ||
+			at1->m_TraceabilityVector[i].m_Date != at2->m_TraceabilityVector[i].m_Date ||
       at1->m_TraceabilityVector[i].m_AppStamp != at2->m_TraceabilityVector[i].m_AppStamp ||
+			at1->m_TraceabilityVector[i].m_BuildNum != at2->m_TraceabilityVector[i].m_BuildNum ||
       at1->m_TraceabilityVector[i].m_OperatorID != at2->m_TraceabilityVector[i].m_OperatorID)
     {
       result = false;
@@ -175,17 +176,25 @@ void albaAttributeTraceabilityTest::TestEquals()
 //----------------------------------------------------------------------------
 {
   albaAttributeTraceability *at1 = new albaAttributeTraceability();
-  albaAttributeTraceability *at2 = new albaAttributeTraceability();
+	albaAttributeTraceability *at2 = new albaAttributeTraceability();
+	albaAttributeTraceability *at3 = new albaAttributeTraceability();
 
-  at1->AddTraceabilityEvent("test", "testParameter", "17/11/2008", "testApp", "testUser", "NATURAL");
-  at1->AddTraceabilityEvent("test1", "testParameter1", "18/11/2008", "testApp1", "testUser1", "NATURAL1");
+  at1->AddTraceabilityEvent("trial1","test", "testParameter", "17/11/2008", "testApp", "build_1", "testUser", "NATURAL");
+  at1->AddTraceabilityEvent("trial2", "test1", "testParameter1", "18/11/2008", "testApp1", "build_2", "testUser1", "NATURAL1");
 
-  at2->AddTraceabilityEvent("test", "testParameter", "17/11/2008", "testApp", "testUser", "NATURAL");
-  at2->AddTraceabilityEvent("test1", "testParameter1", "18/11/2008", "testApp1", "testUser1", "NATURAL1");
+  at2->AddTraceabilityEvent("trial1", "test", "testParameter", "17/11/2008", "testApp", "build_1", "testUser", "NATURAL");
+  at2->AddTraceabilityEvent("trial2", "test1", "testParameter1", "18/11/2008", "testApp1", "build_2", "testUser1", "NATURAL1");
 
-  result = at2->Equals(at1);
-  TEST_RESULT;
+	at3->AddTraceabilityEvent("trial1", "test", "testParameter", "17/11/2008", "testApp", "build_1", "testUser", "NATURAL");
+	at3->AddTraceabilityEvent("trialDiff", "test1", "testParameter1", "18/11/2008", "testApp1", "build_2", "testUser1", "NATURAL1");
+
+	result = at2->Equals(at1);
+	TEST_RESULT;
+
+	result = at2->Equals(at1);
+	TEST_RESULT;
 
   delete at1;
   delete at2;
+	delete at3;
 }

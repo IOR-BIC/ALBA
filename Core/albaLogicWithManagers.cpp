@@ -159,7 +159,6 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_SettingsDialog = new albaGUISettingsDialog();
 	m_AboutDialog = new albaGUIAboutDialog();
 
-	m_Revision = _("0.1");
 	m_Extension = "alba";
 
 	m_UseWizardManager = false;
@@ -201,6 +200,19 @@ albaLogicWithManagers::~albaLogicWithManagers()
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::Init(int argc, char **argv)
 {
+
+	//Setting Build Version
+	wxString buildNum = "";
+	wxRegKey RegKey(wxString("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + m_AppTitle));
+	if (RegKey.Exists())
+	{
+		if (RegKey.HasValue(wxString("DisplayVersion")))
+			RegKey.QueryValue(wxString("DisplayVersion"), buildNum);
+		else
+			buildNum = "Unknown Build";
+	}
+	m_BuildNum = buildNum;
+
 	if (m_WizardManager)
 	{
 		m_WizardManager->FillSettingDialog(m_SettingsDialog);
@@ -229,6 +241,7 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 	if (m_OpManager)
 	{
 		m_OpManager->FillSettingDialog(m_SettingsDialog);
+		m_OpManager->SetBuildNum(m_BuildNum);
 
 		if (argc > 1)
 		{
@@ -243,9 +256,11 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 		}
 	}
 
+	
+
 	// Init About Dialog
 	m_AboutDialog->SetTitle(m_AppTitle);
-	m_AboutDialog->SetRevision(m_Revision.GetCStr());
+	m_AboutDialog->SetBuildNum(m_BuildNum.GetCStr());
 	m_AboutDialog->SetVersion("0.1");
 	wxString imagePath = albaGetApplicationDirectory().c_str();
 	imagePath += "\\Config\\AlbaMasterAbout.bmp";

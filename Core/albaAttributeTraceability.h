@@ -21,20 +21,21 @@
 #include "albaAttribute.h"
 #include <vector>
 
-struct m_Traceability
+struct albaTraceability
 {
   albaString m_TrialEvent;
   albaString m_OperationName;
   albaString m_Parameters;
   albaString m_Date;
   albaString m_AppStamp;
+	albaString m_BuildNum;
   albaString m_OperatorID;
   albaString m_IsNatural;
 };
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
-EXPORT_STL_VECTOR(ALBA_EXPORT,m_Traceability);
+EXPORT_STL_VECTOR(ALBA_EXPORT,albaTraceability);
 #endif
 
 //----------------------------------------------------------------------------
@@ -50,7 +51,7 @@ public:
   albaTypeMacro(albaAttributeTraceability,albaAttribute);
 
   /** add a create event */
-  void AddTraceabilityEvent(albaString m_TrialEvent, albaString operationName, albaString parmaters, albaString date, albaString appStamp, albaString operatorID, albaString isNatural = "");
+  void AddTraceabilityEvent(albaString m_TrialEvent, albaString operationName, albaString parmaters, albaString date, albaString appStamp,albaString buildNum, albaString operatorID, albaString isNatural);
  
   /** remove a traceability event */
   void RemoveTraceabilityEvent(); 
@@ -67,7 +68,7 @@ public:
   /** return trial type form vetor of traceability event*/
   albaString GetLastTrialEvent();
 
-  std::vector<m_Traceability> m_TraceabilityVector;
+  std::vector<albaTraceability> m_TraceabilityVector;
 
 protected:
   
