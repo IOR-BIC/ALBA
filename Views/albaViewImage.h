@@ -50,12 +50,9 @@ public:
   virtual albaView*  Copy(albaObserver *Listener, bool lightCopyEnabled = false);
   virtual void			OnEvent(albaEventBase *alba_event);
 
-  void Create();
+  virtual void Create();
 
-  /** 
-  Set the visualization status for the vme (visible, not visible, mutex, ...) \sa albaSceneGraph albaView*/
-  virtual int GetNodeStatus(albaVME *vme);
-
+ 
   /** IDs for the view GUI */
   enum VIEW_SLICE_WIDGET_ID
   {
