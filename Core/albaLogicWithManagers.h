@@ -177,8 +177,6 @@ public:
 	/** Manage application Events */
 	int AppEventFilter(wxEvent& event);
 
-	/** Set the revision string */
-	void SetRevision(albaString revision) { m_Revision = revision; };
 
 	/** Set ALBA Expert Mode*/
 	void ALBAExpertModeOn() { (*GetALBAExpertMode()) = TRUE; };
@@ -424,7 +422,6 @@ protected:
 	albaGUISettingsDialog	*m_SettingsDialog;
 	albaGUIAboutDialog			*m_AboutDialog;
 
-	albaString m_Revision;
 	albaString m_BuildNum;
 	albaString m_Extension;
 

@@ -178,15 +178,35 @@ void albaOpExporterMetaImage::ExportMetaImage()
 	//Absolute Matrix
   if (m_ABSMatrixFlag)
   {
+
+		//orientation 
 		InputImageTypeFloat::DirectionType newDirection;
-		albaMatrix rot;
-		rot.CopyRotation(*m_Input->GetOutput()->GetAbsMatrix());
+		albaMatrix rot,invRot;
+		albaMatrix * absMatrix = m_Input->GetOutput()->GetAbsMatrix();
+		rot.CopyRotation(*absMatrix);
 
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
 				newDirection[i][j] = rot[i][j];
 
 		itkImage->SetDirection(newDirection);
+
+		//current origin is the actual image origin we can calculate it by multiplying with current abs matrix 
+		double imageOrigin[4], currentOrigin[4], newOrigin[4];
+		imageOrigin[0] = itkImage->GetOrigin()[0];
+		imageOrigin[1] = itkImage->GetOrigin()[1];
+		imageOrigin[2] = itkImage->GetOrigin()[2];
+		imageOrigin[3] = 1;
+		absMatrix->MultiplyPoint(imageOrigin, currentOrigin);
+
+		//The output must contain an origin witch should be equal to current origin when multiplied to the rotation matrix stored in the image
+		//so we multiplity the current origin with the inverse of the rotation matrix
+		invRot.DeepCopy(&rot);
+		invRot.Invert();
+		invRot.MultiplyPoint(currentOrigin, newOrigin);
+
+
+		itkImage->SetOrigin(newOrigin);
   }
   
 
