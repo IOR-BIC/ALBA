@@ -104,33 +104,10 @@ void albaViewImage::Create()
   vtkNEW(m_Picker2D);
   m_Picker2D->InitializePickList();
 
-}
-//-------------------------------------------------------------------------
-int albaViewImage::GetNodeStatus(albaVME *vme)
-//-------------------------------------------------------------------------
-{
-  albaSceneNode *n = NULL;
-  if (m_Sg != NULL)
-  {
-    n = m_Sg->Vme2Node(vme);
-    if (vme->IsALBAType(albaVMEImage) || vme->IsA("albaVMEAdvancedProber") || vme->IsALBAType(albaVMESurface))
-    {
-      if (n != NULL)
-      {
-      	n->SetMutex(true);
-      }
-    }
-    else
-    {
-      if (n != NULL)
-      {
-      	n->SetPipeCreatable(false);
-      }
-    }
-  }
+	PlugVisualPipe("albaVMEImage", "albaPipeImage3D", MUTEX);
 
-  return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
 }
+
 //-------------------------------------------------------------------------
 albaGUI *albaViewImage::CreateGui()
 //-------------------------------------------------------------------------
