@@ -170,7 +170,8 @@ void albaViewImageCompound::VmeShow(albaVME *vme, bool show)
 	{
 		m_CurrentImage=albaVMEImage::SafeDownCast(vme);
 		albaPipeImage3D *pipe = (albaPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(vme);
-		m_ColorLUT = pipe ? pipe->GetLUT() : NULL;
+		//when show is false the color lut must be NULL because the image will be removed from the view
+		m_ColorLUT = pipe && show ? pipe->GetLUT() : NULL;
 		UpdateWindowing(show && pipe && pipe->IsGrayImage());
 	}
 	
@@ -190,22 +191,21 @@ void albaViewImageCompound::EnableWidgets(bool enable)
 void albaViewImageCompound::UpdateWindowing(bool enable)
 //----------------------------------------------------------------------------
 {
+	m_LutWidget->SetLut(m_ColorLUT);
+	EnableWidgets(enable);
+
 	if(enable && m_CurrentImage)
 	{
 		double sr[2];
 		m_CurrentImage->GetOutput()->GetVTKData()->GetScalarRange(sr);
 		m_ColorLUT->SetRange(sr);
       
-    m_LutWidget->SetLut(m_ColorLUT);
 		m_LutWidget->Enable(true);
 		m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
 		m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
-
-		EnableWidgets(enable);
 	}
 	else
 	{
-		EnableWidgets(enable);
 		m_LutSlider->SetRange(-100,100);
 		m_LutSlider->SetSubRange(-100,100);
 	}
