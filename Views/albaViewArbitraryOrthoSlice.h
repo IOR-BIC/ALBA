@@ -224,7 +224,7 @@ protected:
 	void SetEnableGPU();
 
 	void OnLUTChooser();
-	void OnLUTRangeModified();
+	virtual void OnLUTRangeModified();
 
 	void OnReset();
 
@@ -239,7 +239,7 @@ protected:
 	void PostMultiplyEventMatrix(vtkMatrix4x4 * matrix, int slicerAxis, int isRotation=true);
 	
 	/** Windowing for volumes data. This function overrides superclass method.*/
-	void VolumeWindowing(albaVME *volume);
+	virtual void VolumeWindowing(albaVME *volume);
 	void OnEventGizmoRotate(vtkMatrix4x4 *matrix, int planeSkip);
 
 	void SetSlices();
