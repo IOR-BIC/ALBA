@@ -110,6 +110,9 @@ public:
   /** Return the DCM_ImagePositionPatient choice */
   int GetDCMImagePositionPatientExceptionHandling(){return m_DCM_ImagePositionPatientchoice;};
 
+	/** Sets the DCM_ImagePositionPatient choice */
+	int SetDCMImagePositionPatientExceptionHandling(int choice) { m_DCM_ImagePositionPatientchoice = choice; m_Config->Write("DCM_ImagePositionPatientchoice", m_DCM_ImagePositionPatientchoice);};
+
 
 	/** Returns SkipCrop */
 	int GetSkipCrop() const { return m_SkipCrop; }
