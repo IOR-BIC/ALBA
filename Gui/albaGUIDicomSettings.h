@@ -111,11 +111,7 @@ public:
   int GetDCMImagePositionPatientExceptionHandling(){return m_DCM_ImagePositionPatientchoice;};
 
 	/** Sets the DCM_ImagePositionPatient choice */
-<<<<<<< HEAD
 	void SetDCMImagePositionPatientExceptionHandling(int choice) { m_DCM_ImagePositionPatientchoice = choice; m_Config->Write("DCM_ImagePositionPatientchoice", m_DCM_ImagePositionPatientchoice);};
-=======
-	int SetDCMImagePositionPatientExceptionHandling(int choice) { m_DCM_ImagePositionPatientchoice = choice; m_Config->Write("DCM_ImagePositionPatientchoice", m_DCM_ImagePositionPatientchoice);};
->>>>>>> 008a5dff9a1c89e9fe1aa84241531e2444dc8c11
 
 
 	/** Returns SkipCrop */
