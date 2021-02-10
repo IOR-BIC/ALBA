@@ -359,7 +359,7 @@ int albaOpImporterDicom::BuildVMEImagesOutput()
 
 	albaNEW(imagesGroupOuput);
 
-	imagesGroupOuput->SetName(wxString::Format("%s images",m_VMEName));
+	imagesGroupOuput->SetName(wxString::Format("%s images",m_VMEName.GetCStr()));
 	imagesGroupOuput->ReparentTo(m_Input);
 
 	int parsedSlices = 0;
