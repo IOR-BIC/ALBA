@@ -89,3 +89,10 @@ ENDIF (WIN32)
 IF (ALBA_USE_GDCM)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_GDCM_LIBRARY)
 ENDIF (ALBA_USE_GDCM)
+
+  # Generate Version File Info  
+  INCLUDE (${ALBA_SOURCE_DIR}/modules/DateTimeMacro.cmake)
+  DATE2(date) #(dd-mm-yyyy)
+  STRING (REPLACE "-" "/" APP_DATE ${date} )
+  message(${PROJECT_NAME} " " ${APP_VERSION} " " ${APP_DATE})
+  CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Version.txt.in ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.txt @ONLY)

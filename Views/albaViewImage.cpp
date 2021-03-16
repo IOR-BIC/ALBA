@@ -145,7 +145,7 @@ void albaViewImage::OnEvent(albaEventBase *alba_event)
 void albaViewImage::VmeShow(albaVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
-  if (vme->IsALBAType(albaVMEImage) || vme->IsA("albaVMEAdvancedProber") || vme->IsALBAType(albaVMESurface))
+  if (vme->IsALBAType(albaVMEImage))
   {
     if (show)
     {
@@ -163,9 +163,8 @@ void albaViewImage::VmeShow(albaVME *vme, bool show)
   }
   else
 	{
-    m_AttachCamera->SetVme(NULL);
+		Superclass::VmeShow(vme, show);
 	}
-  
 }
 //----------------------------------------------------------------------------
 void albaViewImage::VmeDeletePipe(albaVME *vme)
