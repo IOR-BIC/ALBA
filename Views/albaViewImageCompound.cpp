@@ -163,16 +163,29 @@ void albaViewImageCompound::PackageView()
 void albaViewImageCompound::VmeShow(albaVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
+	//avoid double show (with camera/lut reset) of the current image
+	if (vme == m_CurrentImage && show)
+		return;
+
 	for(int i=0; i<this->GetNumberOfSubView(); i++)
     m_ChildViewList[i]->VmeShow(vme, show);
 
 	if (vme->IsA("albaVMEImage"))
 	{
-		m_CurrentImage=albaVMEImage::SafeDownCast(vme);
-		albaPipeImage3D *pipe = (albaPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(vme);
-		//when show is false the color lut must be NULL because the image will be removed from the view
-		m_ColorLUT = pipe && show ? pipe->GetLUT() : NULL;
-		UpdateWindowing(show && pipe && pipe->IsGrayImage());
+		if (show)
+		{
+			m_CurrentImage = (albaVMEImage *)vme;
+			albaPipeImage3D *pipe = (albaPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(vme);
+			//when show is false the color lut must be NULL because the image will be removed from the view
+			m_ColorLUT = pipe && show ? pipe->GetLUT() : NULL;
+			UpdateWindowing(show && pipe && pipe->IsGrayImage());
+		}
+		else
+		{
+			m_CurrentImage = NULL;
+			m_ColorLUT = NULL;
+			UpdateWindowing(false);
+		}
 	}
 	
 	GetLogicManager()->CameraUpdate();
