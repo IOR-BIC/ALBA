@@ -104,6 +104,7 @@ SET(vtkALBA_SRCS
 	
   vtkALBALandmarkCloudOutlineCornerFilter.cxx 			vtkALBALandmarkCloudOutlineCornerFilter.h
   
+	vtkALBACircleSource.cxx								vtkALBACircleSource.h
 )
 
 IF(WIN32)
