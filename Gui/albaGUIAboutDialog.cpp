@@ -43,6 +43,7 @@
 #include "albaGUIButton.h"
 #include "albaGUIValidator.h"
 #include "albaLogicWithManagers.h"
+#include "wx/datetime.h"
 
 //----------------------------------------------------------------------------
 // constant :
@@ -139,13 +140,19 @@ void albaGUIAboutDialog::CreateDialog()
 	wxString description = m_Title;
 	description += "\n";
 	
-	if (!m_Version.IsEmpty())
-		description += _("Version ") + m_Version +  _("\n");
-	
-	description += m_BuildNum + _("\n");
-	
-	description += "\n© 2020 BIC - RIT - IOR";
+	// Build number
+	description += m_BuildNum;
 
+	// Version
+	if (!m_Version.IsEmpty())
+		description += _(" - Version ") + m_Version;
+	
+	// Copyright
+	wxString copyright;
+	copyright.Printf("\n\n© %d BIC - RIT - IOR", (1900 + wxDateTime::GetTmNow()->tm_year));
+	description += copyright;
+
+	// Extra
 	description += m_ExtraMessage;
 
 	//////////////////////////////////////////////////////////////////////////
