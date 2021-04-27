@@ -113,10 +113,10 @@ public:
 	void CalculateCropExtent();
 			
 	/** Build a volume from the list of Dicom files. */
-	int BuildVMEVolumeGrayOutput();
+	virtual int BuildVMEVolumeGrayOutput();
 		
 	/** Build images starting from the list of Dicom files. */
-	int BuildVMEImagesOutput();
+	virtual int BuildVMEImagesOutput();
 
 	/** Create the pipeline to read the images. */
 	virtual void CreateSliceVTKPipeline();
