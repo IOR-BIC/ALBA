@@ -394,17 +394,22 @@ void albaGUI::Label(albaString label1, albaString *var, bool bold_label, bool bo
 }
 
 //----------------------------------------------------------------------------
-void albaGUI::HintBox(int id, wxString label, wxString title, bool showIcon)
+void albaGUI::HintBox(int id, wxString label, wxString title, int mode, bool showIcon)
 {
 	wxStaticBoxSizer *boxSizer = new wxStaticBoxSizer(wxHORIZONTAL, this, title);
 
-	if(showIcon)
+	if (showIcon)
 	{
+		wxString iconName = "HINT_IMAGE_ICON";
+		if (mode == 1) iconName = "INFO_IMAGE_ICON";
+		if (mode == 2) iconName = "WARN_IMAGE_ICON";
+
 		int w_id = GetWidgetId(id);
-		wxBitmap bitmap = albaPictureFactory::GetPictureFactory()->GetBmp("HINT_IMAGE_ICON");
+		wxBitmap bitmap = albaPictureFactory::GetPictureFactory()->GetBmp(iconName);
 		wxBitmapButton *bmpButton = new wxBitmapButton(this, w_id, bitmap, wxPoint(0, 0), wxSize(19, 20));
 		bmpButton->SetValidator(albaGUIValidator(this, w_id, bmpButton));
 
+		boxSizer->GetStaticBox()->SetBackgroundColour(wxColor(255, 255, 224));
 		boxSizer->Add(bmpButton);
 		boxSizer->Add(new wxStaticText(this, NULL, " ")); // Separator
 	}
