@@ -165,6 +165,10 @@ void albaPictureFactory::Initialize()
 
 		#include <pic/HINT_IMAGE_ICON.xpm>
 		albaADDPIC(HINT_IMAGE_ICON);
+		#include <pic/INFO_IMAGE_ICON.xpm>
+		albaADDPIC(INFO_IMAGE_ICON);
+		#include <pic/WARN_IMAGE_ICON.xpm>
+		albaADDPIC(WARN_IMAGE_ICON);
 
 #include <pic/TOOL_PEN.xpm>
 		albaADDPIC(TOOL_PEN);
