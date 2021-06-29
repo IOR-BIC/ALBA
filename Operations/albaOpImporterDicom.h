@@ -171,7 +171,7 @@ protected:
 	void OnChangeSlice();
 	void OnRangeModified();
 	void OnWizardChangePage( albaEvent * e );
-	void SelectSeries(albaDicomSeries * selectedSeries);
+	virtual void SelectSeries(albaDicomSeries * selectedSeries);
 	void OnStudySelect();
 	
 	/** Create load page and his GUI for the wizard. */
