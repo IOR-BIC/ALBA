@@ -58,6 +58,11 @@ public:
   vtkSetVector3Macro(NoGradient,double);
   vtkGetVector3Macro(NoGradient,double);
 
+	/**
+	Set / get the Concave mode, by default the filter uses the convex modality*/
+	vtkSetMacro(ConcaveMode, bool);
+	vtkGetMacro(ConcaveMode, bool);
+
 protected:
   vtkALBAImplicitPolyData();
   ~vtkALBAImplicitPolyData();
@@ -68,6 +73,8 @@ protected:
 
 	double NoValue;
 	double NoGradient[3];
+
+	bool ConcaveMode;
 
 	vtkTriangleFilter *Tri;
 	vtkPolyData *Input;
