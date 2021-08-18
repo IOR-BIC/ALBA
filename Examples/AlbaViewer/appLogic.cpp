@@ -77,8 +77,6 @@ void appLogic::Init(int argc, char **argv)
 	albaLogicWithManagers::Init(argc, argv);
 	m_Win->ShowDockPane("logbar", false);
 
-	SetRevision("1.0");
-
 	if (!wxDirExists(albaGetAppDataDirectory().c_str()))
 		wxMkDir(albaGetAppDataDirectory().c_str());
 
@@ -96,7 +94,7 @@ void appLogic::InitAboutDialog()
 {
 	// Init About Dialog
 	m_AboutDialog->SetTitle(m_AppTitle);
-	m_AboutDialog->SetRevision(m_Revision.GetCStr());
+	m_AboutDialog->SetBuildNum(m_BuildNum.GetCStr());
 	m_AboutDialog->SetWebSite("https://github.com/IOR-BIC");
 	//m_AboutDialog->SetLicenseURL("https://github.com/IOR-BIC");
 	//m_AboutDialog->SetExtraMessage("");

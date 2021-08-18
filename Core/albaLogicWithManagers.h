@@ -54,6 +54,7 @@ class albaGUISettingsTimeBar;
 class albaHelpManager;
 class albaSnapshotManager;
 class wxSplashScreen;
+class mmaApplicationLayout;
 
 typedef int(*eventfilterFunc)(wxEvent& event);
 
@@ -176,8 +177,6 @@ public:
 	/** Manage application Events */
 	int AppEventFilter(wxEvent& event);
 
-	/** Set the revision string */
-	void SetRevision(albaString revision) { m_Revision = revision; };
 
 	/** Set ALBA Expert Mode*/
 	void ALBAExpertModeOn() { (*GetALBAExpertMode()) = TRUE; };
@@ -227,6 +226,9 @@ public:
 
 	void SetEventFilterFunc(eventfilterFunc val) { m_EventFilterFunc = val;}
 
+	/** Get  application layout*/
+	mmaApplicationLayout* GetLayout() { return m_AppLayout; };
+
 protected:
 	//---------------------------------------------------------
 	// Description:
@@ -245,7 +247,7 @@ protected:
 	virtual void CreateStorage(albaEvent *e);
 
 	/** This method creates and add the Toolbar, for specific app toolbar override the CreateToolBar method*/
-	void CreateAndPlugToolbar();
+	virtual void CreateAndPlugToolbar();
 
 	/**This method creates the toolbar, override this method for specific app toolbars*/
 	virtual void CreateToolbar();
@@ -400,6 +402,8 @@ protected:
 
 	albaDeviceButtonsPadMouse            *m_Mouse;
 
+	mmaApplicationLayout *m_AppLayout;
+
 	wxMenu *m_ImportMenu;
 	wxMenu *m_ExportMenu;
 	wxMenu *m_RecentFileMenu;
@@ -418,7 +422,7 @@ protected:
 	albaGUISettingsDialog	*m_SettingsDialog;
 	albaGUIAboutDialog			*m_AboutDialog;
 
-	albaString m_Revision;
+	albaString m_BuildNum;
 	albaString m_Extension;
 
 	albaUser *m_User; ///< Applications' user

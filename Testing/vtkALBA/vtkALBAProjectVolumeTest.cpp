@@ -55,7 +55,7 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToX()
   //use filter
   vtkALBASmartPointer<vtkALBAProjectVolume> filter;
   filter->SetInput(image);
-  filter->SetProjectionModeToX();
+  filter->SetProjectionSideToX();
   filter->Update();
 
   //check Control
@@ -68,8 +68,8 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToX()
     CPPUNIT_ASSERT(value1 == value2);
   }
 
-  CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"X")==0);
-  CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_X );
+  CPPUNIT_ASSERT(strcmp(filter->GetProjectionSideAsString(),"X")==0);
+  CPPUNIT_ASSERT(filter->GetProjectionSide() == VTK_PROJECT_FROM_X );
 
 	vtkDEL(image);
 }
@@ -93,7 +93,7 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToY()
   //use filter
   vtkALBASmartPointer<vtkALBAProjectVolume> filter;
   filter->SetInput(image);
-  filter->SetProjectionModeToY();
+  filter->SetProjectionSideToY();
   filter->Update();
 
   //check Control
@@ -104,8 +104,8 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToY()
     float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
     CPPUNIT_ASSERT(value1 == value2);
   }
-  CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"Y")==0);
-  CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_Y );
+  CPPUNIT_ASSERT(strcmp(filter->GetProjectionSideAsString(),"Y")==0);
+  CPPUNIT_ASSERT(filter->GetProjectionSide() == VTK_PROJECT_FROM_Y );
 
 	vtkDEL(image);
 }
@@ -129,7 +129,7 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToZ()
   //use filter
   vtkALBASmartPointer<vtkALBAProjectVolume> filter;
   filter->SetInput(image);
-  filter->SetProjectionModeToZ();
+  filter->SetProjectionSideToZ();
   filter->Update();
 
   //check Control
@@ -140,8 +140,8 @@ void vtkALBAProjectVolumeTest::TestExecutionProjectionModeToZ()
     float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
     CPPUNIT_ASSERT(value1 == value2);
   }
-  CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"Z")==0);
-  CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_Z );
+  CPPUNIT_ASSERT(strcmp(filter->GetProjectionSideAsString(),"Z")==0);
+  CPPUNIT_ASSERT(filter->GetProjectionSide() == VTK_PROJECT_FROM_Z );
 
 	vtkDEL(image);
 }
@@ -168,7 +168,7 @@ void vtkALBAProjectVolumeTest::TestRangeProjectionX()
 	vtkALBASmartPointer<vtkALBAProjectVolume> filter;
 	CPPUNIT_ASSERT(filter->GetProjectSubRange() == false);
 	filter->SetInput(image);
-	filter->SetProjectionModeToX();
+	filter->SetProjectionSideToX();
 	filter->ProjectSubRangeOn();
 	filter->SetProjectionRange(range);
 	filter->Update();
@@ -207,7 +207,7 @@ void vtkALBAProjectVolumeTest::TestRangeProjectionY()
 	vtkALBASmartPointer<vtkALBAProjectVolume> filter;
 	CPPUNIT_ASSERT(filter->GetProjectSubRange() == false);
 	filter->SetInput(image);
-	filter->SetProjectionModeToY();
+	filter->SetProjectionSideToY();
 	filter->ProjectSubRangeOn();
 	filter->SetProjectionRange(range);
 	filter->Update();
@@ -244,7 +244,7 @@ void vtkALBAProjectVolumeTest::TestRangeProjectionZ()
 	//use filter
 	vtkALBASmartPointer<vtkALBAProjectVolume> filter;
 	filter->SetInput(image);
-	filter->SetProjectionModeToZ();
+	filter->SetProjectionSideToZ();
 	filter->ProjectSubRangeOn();
 	filter->SetProjectionRange(range);
 	filter->Update();
@@ -262,6 +262,121 @@ void vtkALBAProjectVolumeTest::TestRangeProjectionZ()
 	vtkDEL(image);
 }
 
+
+//----------------------------------------------------------------------------
+void vtkALBAProjectVolumeTest::TestExecutionProjectionMaxX()
+{
+	//create imageData with scalars
+	vtkImageData *image = CreateNewSPWithScalars();
+
+	//Preparing Test Control Data
+	vtkALBASmartPointer<vtkFloatArray> arrayControl;
+	for (int z = 0; z < glo_Dimension[2]; z++)
+		for (int y = 0; y < glo_Dimension[1]; y++)
+		{
+			double acc = VTK_DOUBLE_MIN;
+			for (int x = 0; x < glo_Dimension[0]; x++)
+				acc =  MAX(acc, image->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x));
+			arrayControl->InsertNextTuple1(acc);
+		}
+
+	//use filter
+	vtkALBASmartPointer<vtkALBAProjectVolume> filter;
+	filter->SetInput(image);
+	filter->SetProjectionSideToX();
+	filter->SetProjectionModalityToMax();
+	filter->Update();
+
+	//check Control
+	vtkImageData *projectedImage = vtkImageData::SafeDownCast(filter->GetOutput());
+	projectedImage->Update();
+	for (int j = 0; j < glo_Dimension[1] * glo_Dimension[2]; j++)
+	{
+		float value1 = arrayControl->GetTuple1(j);
+		float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
+		CPPUNIT_ASSERT(value1 == value2);
+	}
+
+	CPPUNIT_ASSERT(strcmp(filter->GetProjectionSideAsString(), "X") == 0);
+	CPPUNIT_ASSERT(filter->GetProjectionSide() == VTK_PROJECT_FROM_X);
+
+	vtkDEL(image);
+}
+
+//--------------------------------------------------
+void vtkALBAProjectVolumeTest::TestExecutionProjectionMaxY()
+{
+	//create imageData with scalars
+	vtkImageData *image = CreateNewSPWithScalars();
+
+	//Preparing Test Control Data
+	vtkALBASmartPointer<vtkFloatArray> arrayControl;
+	for (int z = 0; z < glo_Dimension[2]; z++)
+		for (int x = 0; x < glo_Dimension[0]; x++)
+		{
+			double acc = VTK_DOUBLE_MIN;
+			for (int y = 0; y < glo_Dimension[1]; y++)
+				acc = MAX(acc,image->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x));
+			arrayControl->InsertNextTuple1(acc);
+		}
+
+	//use filter
+	vtkALBASmartPointer<vtkALBAProjectVolume> filter;
+	filter->SetInput(image);
+	filter->SetProjectionSideToY();
+	filter->SetProjectionModalityToMax();
+	filter->Update();
+
+	//check Control
+	vtkImageData *projectedImage = (vtkImageData *)filter->GetOutput();
+	for (int j = 0; j < glo_Dimension[0] * glo_Dimension[2]; j++)
+	{
+		float value1 = arrayControl->GetTuple1(j);
+		float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
+		CPPUNIT_ASSERT(value1 == value2);
+	}
+	CPPUNIT_ASSERT(strcmp(filter->GetProjectionSideAsString(), "Y") == 0);
+	CPPUNIT_ASSERT(filter->GetProjectionSide() == VTK_PROJECT_FROM_Y);
+
+	vtkDEL(image);
+}
+//--------------------------------------------------
+void vtkALBAProjectVolumeTest::TestExecutionProjectionMaxZ()
+{
+	//create imageData with scalars
+	vtkImageData *image = CreateNewSPWithScalars();
+
+	//Preparing Test Control Data
+	vtkALBASmartPointer<vtkFloatArray> arrayControl;
+	for (int y = 0; y < glo_Dimension[1]; y++)
+		for (int x = 0; x < glo_Dimension[0]; x++)
+		{
+			double acc = VTK_DOUBLE_MIN;
+			for (int z = 0; z < glo_Dimension[2]; z++)
+				acc = MAX(acc,image->GetPointData()->GetScalars()->GetTuple1(z*glo_Dimension[0] * glo_Dimension[1] + y*glo_Dimension[0] + x));
+			arrayControl->InsertNextTuple1(acc);
+		}
+
+	//use filter
+	vtkALBASmartPointer<vtkALBAProjectVolume> filter;
+	filter->SetInput(image);
+	filter->SetProjectionSideToZ();
+	filter->SetProjectionModalityToMax();
+	filter->Update();
+
+	//check Control
+	vtkImageData *projectedImage = (vtkImageData *)filter->GetOutput();
+	for (int j = 0; j < glo_Dimension[0] * glo_Dimension[1]; j++)
+	{
+		float value1 = arrayControl->GetTuple1(j);
+		float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
+		CPPUNIT_ASSERT(value1 == value2);
+	}
+	CPPUNIT_ASSERT(strcmp(filter->GetProjectionSideAsString(), "Z") == 0);
+	CPPUNIT_ASSERT(filter->GetProjectionSide() == VTK_PROJECT_FROM_Z);
+
+	vtkDEL(image);
+}
 
 //----------------------------------------------------------------------------
 vtkImageData * vtkALBAProjectVolumeTest::CreateNewSPWithScalars()

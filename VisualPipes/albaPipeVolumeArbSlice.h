@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaPipeVolumeArbSlice
- Authors: Paolo Quadrani
+ Authors: Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -41,6 +41,8 @@ class vtkALBAAssembly;
 class vtkOutlineSource;
 class albaLODActor;
 class albaVMEOutputVolume;
+class vtkTransformFilter;
+class vtkTransform;
 
 
 /** 
@@ -142,6 +144,11 @@ public:
   /** Get the flag that enable/disable GPU */
   int GetEnableGPU();
 
+	/** Get ImageData */
+	vtkImageData *GetImageData() { return m_Image; };
+	vtkALBAVolumeSlicer *GetSliceImageData() { return m_SlicerImage; };
+	vtkTexture *GetTexture() { return m_Texture; };
+
   /** Set tri-linear interpolation */  
   void SetTrilinearInterpolation(int on){m_TrilinearInterpolationOn = on; UpdateSlice();};
 
@@ -151,6 +158,8 @@ public:
   /** Set tri-linear interpolation to on */
   void SetTrilinearInterpolationOn(){SetTrilinearInterpolation(1);};
 
+	bool isEnabledSliceViewCorrection() const { return m_EnableSliceViewCorrection; }
+	void SetEnableSliceViewCorrection(bool val);
 protected:
 	/** Create the slicer pipeline. */
 	void CreateSlice();
@@ -168,6 +177,7 @@ protected:
 	float		m_XVector[3]; ///< X Vector director of the cutting plane
 	float		m_YVector[3]; ///< Y Vector director of the cutting plane
   float		m_NormalVector[3]; ///< Normal vector defining the cutting plane orientation
+	float		m_EpisolonNormal[3];
   double  m_SliceOpacity; ///< Opacity of he volume slice.
 
 	int		 m_TextureRes; ///< Texture resolution used to render the volume slice
@@ -179,6 +189,9 @@ protected:
 
   vtkALBAVolumeSlicer				 *m_SlicerImage;
 	vtkALBAVolumeSlicer				 *m_SlicerPolygonal;
+
+	vtkTransform					*m_NormalTranform;
+	vtkTransformFilter		*m_NormalTranformFilter;
 	vtkImageData					 *m_Image;
 	vtkTexture						 *m_Texture;
 	int		 m_SliceDirection; ///< Store the slicing direction: SLICE_X, SLICE_Y or SLICE_)
@@ -203,6 +216,7 @@ protected:
 	bool										m_ShowBounds;
 	bool										m_ShowTICKs;
   bool                    m_Interpolate;
+	bool										m_EnableSliceViewCorrection;
   int m_TrilinearInterpolationOn; //<define if tri-linear interpolation is performed or not on slice's texture
 };
 #endif // __albaPipeVolumeArbSlice_H__B

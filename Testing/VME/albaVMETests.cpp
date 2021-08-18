@@ -59,6 +59,7 @@
 #include "albaVMEOutputLandmarkCloudTest.h"
 #include "albaVMEOutputMeshTest.h"
 #include "albaVMEOutputMeterTest.h"
+#include "albaVMEPointCloudTest.h"
 #include "albaVMEOutputPointSetTest.h"
 #include "albaVMEOutputPolylineEditorTest.h"
 #include "albaVMEOutputPolylineTest.h"
@@ -143,6 +144,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaVMEPolylineTest::suite());
 	runner.addTest(albaVMEPolylineSplineTest::suite());
 	runner.addTest(albaVMEMeshTest::suite());
+	runner.addTest(albaVMEPointCloudTest::suite());
 	runner.addTest(albaVMELandmarkTest::suite());
 	runner.addTest(albaVMELandmarkCloudTest::suite());
 	runner.addTest(albaMatrixVectorTest::suite());

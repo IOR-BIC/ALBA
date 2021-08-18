@@ -27,10 +27,6 @@
 #include "albaObserver.h"
 #include <map>
 
-#ifdef ALBA_EXPORTS
-#include "albaDllMacros.h"
-EXPORT_STL_MAP(ALBA_EXPORT,int,int);
-#endif
 
 //----------------------------------------------------------------------------
 // class forward :
@@ -45,6 +41,12 @@ class albaGUIRollOut;
 #ifdef ALBA_USE_VTK //:::::::::::::::::::::::::::::::::
 class vtkLookupTable;
 #endif             //:::::::::::::::::::::::::::::::::
+
+
+#ifdef ALBA_EXPORTS
+#include "albaDllMacros.h"
+EXPORT_STL_MAP(ALBA_EXPORT, int, int);
+#endif
 
 
 /**  \par implementation details:
@@ -129,7 +131,7 @@ public:
   void Label(albaString label1,albaString *var, bool bold_label = false, bool bold_var = false, bool multiline = false, double customSizer = 1.0);
 
 	/** Hint Box widget. */
-	void HintBox(int id, wxString label, wxString title = "Hint", bool showIcon = true);
+	void HintBox(int id, wxString label, wxString title = "Hint", int mode = 0 /*0=Hint (default), 1=Info, 2=Warning*/, bool showIcon = true);
 
 	/** String entry widget. */
 	void String(int id, wxString label, wxString *var, wxString tooltip = "", bool multiline = false, bool password = false, bool interactive = false, double customSizer = 1.0);
@@ -144,7 +146,7 @@ public:
   void Float(int id,albaString label,float *var, float min = MINFLOAT, float max = MAXFLOAT, int flag=0, int decimal_digit = -1, albaString tooltip = "", double customSizer = 1.0);
 
   /** Double entry widget. */
-  void Double(int id,albaString label,double *var, double	min = MINDOUBLE, double max = MAXDOUBLE, int decimal_digit = -1, albaString tooltip = "", bool labelAlwaysEnable = false, double customSizer = 1.0);
+  void Double(int id,albaString label,double *var, double	min = MINDOUBLE, double max = MAXDOUBLE, int decimal_digit = -1, albaString tooltip = "", bool labelAlwaysEnable = false, double customSizer = 1.0,wxColour fontColor=wxColour(0,0,0));
 
   /** Integer vector3 entry widget. */
   void Vector(int id,wxString label, int var[3], int min = MININT, int max = MAXINT, wxString tooltip = "", wxColour *bg_colour = NULL);

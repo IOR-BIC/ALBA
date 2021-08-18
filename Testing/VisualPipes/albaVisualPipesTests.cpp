@@ -72,6 +72,7 @@
 #include "albaVisualPipePolylineGraphTest.h"
 #include "albaVisualPipeSlicerSliceTest.h"
 #include "albaVisualPipeVolumeRayCastingTest.h"
+#include "albaPipePointCloudTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -114,6 +115,8 @@ int	main( int argc, char* argv[] )
 
 	runner.addTest(albaPipeMeshTest::suite());
 	runner.addTest(albaPipeSurfaceTest::suite());
+	runner.addTest(albaPipePointCloudTest::suite());
+
 	runner.addTest(albaPipeGizmoTest::suite());
 	runner.addTest(albaPipeSurfaceTexturedTest::suite());
 	runner.addTest(albaPipeScalarTest::suite());
@@ -162,6 +165,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipeCompoundVolumeDRRTest::suite());
 	runner.addTest(albaPipeCompoundVolumeIsosurfaceTest::suite());
 	runner.addTest(albaPipeRayCastTest::suite());
+
 
 	runner.run( controller );
 

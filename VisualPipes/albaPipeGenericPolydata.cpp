@@ -49,6 +49,7 @@
 
 #include <vector>
 #include "vtkALBAPolyDataNormals.h"
+#include "vtkScalarBarActor.h"
 
 
 //----------------------------------------------------------------------------
@@ -61,7 +62,7 @@ albaPipeGenericPolydata::albaPipeGenericPolydata()
 	m_Gui             = NULL;
   
 	m_ShowCellsNormals = 0;
-  m_Wireframe = 0;
+  m_Representation = SURFACE_REP;
   
   m_MaterialButton	= NULL;
 	m_ActorWired			= NULL;
@@ -73,6 +74,7 @@ albaPipeGenericPolydata::albaPipeGenericPolydata()
   m_UseVTKProperty  = 1;
 
 	m_FlipNormals = false;
+	m_SkipNormalFilter = false;
   m_BorderElementsWiredActor = false;
 	m_Border = 1;
 }
@@ -80,7 +82,8 @@ albaPipeGenericPolydata::albaPipeGenericPolydata()
 albaPipeGenericPolydata::~albaPipeGenericPolydata()
 {
 	RemoveActorsFromAssembly(m_AssemblyFront);
-	
+	DeleteScalarBarActor();
+
 	vtkDEL(m_Mapper);
 	vtkDEL(m_Actor);
 	vtkDEL(m_ActorWired);
@@ -99,6 +102,7 @@ void albaPipeGenericPolydata::Create(albaSceneNode *n)
 	m_Mapper          = NULL;
 	m_Actor           = NULL;
   m_ActorWired      = NULL;
+	m_ScalarBarActor  = NULL;
 	m_OutlineActor    = NULL;
 	m_Axes            = NULL;
 
@@ -130,19 +134,25 @@ void albaPipeGenericPolydata::ExecutePipe()
 	
 	vtkPolyData *polyData=GetInputAsPolyData();
 
-	vtkNEW(m_NormalsFilter);
-	m_NormalsFilter->SetFlipNormals(m_FlipNormals);
-	m_NormalsFilter->SetComputePointNormals(!m_ShowCellsNormals);
-	m_NormalsFilter->SetComputeCellNormals(m_ShowCellsNormals);
-	m_NormalsFilter->SetInput(polyData);
-	m_Mapper->SetInput(m_NormalsFilter->GetOutput());	
-
+	if (m_SkipNormalFilter)
+	{
+		m_Mapper->SetInput(polyData);
+	}
+	else
+	{
+		vtkNEW(m_NormalsFilter);
+		m_NormalsFilter->SetFlipNormals(m_FlipNormals);
+		m_NormalsFilter->SetComputePointNormals(!m_ShowCellsNormals);
+		m_NormalsFilter->SetComputeCellNormals(m_ShowCellsNormals);
+		m_NormalsFilter->SetInput(polyData);
+		m_Mapper->SetInput(m_NormalsFilter->GetOutput());
+	}
 
   m_Mapper->Update();
 	m_Mapper->SetResolveCoincidentTopologyToPolygonOffset();
 
   vtkNEW(m_MapperWired);
-  m_MapperWired->SetInput(m_NormalsFilter->GetOutput());
+  m_MapperWired->SetInput(m_SkipNormalFilter ? polyData : m_NormalsFilter->GetOutput());
   m_MapperWired->SetScalarRange(0,0);
   m_MapperWired->ScalarVisibilityOff();
 
@@ -167,10 +177,19 @@ void albaPipeGenericPolydata::ExecutePipe()
 
 	mmaMaterial *material = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
 	
-	if(material && material->m_Prop )
-		m_Wireframe=(material->m_Prop->GetRepresentation() == VTK_WIREFRAME);
+	if (material && material->m_Prop)
+	{
+		if (material->m_Prop->GetRepresentation() == VTK_WIREFRAME)
+			m_Representation = WIREFRAME_REP;
+		else if (material->m_Prop->GetRepresentation() == VTK_POINTS)
+			m_Representation = POINTS_REP;
+		else
+			m_Representation = SURFACE_REP;
+	}
+
+	SetRepresentation((REPRESENTATIONS)m_Representation);
 	
-	if(m_Wireframe)
+	if(m_Representation == WIREFRAME_REP)
 		SetEdgesVisibilityOff();
   
   // selection highlight
@@ -192,9 +211,10 @@ void albaPipeGenericPolydata::ExecutePipe()
 	m_OutlineActor->PickableOff();
 	m_OutlineActor->SetProperty(corner_props);
 
+	CreateScalarBarActor();
+
 	if (m_ScalarMapActive)
 		UpdateActiveScalarsInVMEDataVectorItems();
-
 }
 //----------------------------------------------------------------------------
 void albaPipeGenericPolydata::AddActorsToAssembly(vtkALBAAssembly *assembly)
@@ -221,6 +241,8 @@ void albaPipeGenericPolydata::Select(bool sel)
 	if(m_Actor->GetVisibility()) 
 	{
 		m_OutlineActor->SetVisibility(sel);
+
+		ShowScalarBarActor(m_ShowScalarBar);
 	}
 }
 
@@ -230,20 +252,20 @@ albaGUI *albaPipeGenericPolydata::CreateGui()
 	assert(m_Gui == NULL);
 	m_Gui = new albaGUI(this);
   
-	m_Gui->Bool(ID_WIREFRAME,_("Wireframe"), &m_Wireframe, 1);
-	m_Gui->FloatSlider(ID_BORDER_CHANGE,_("Thickness"),&m_Border,1.0,5.0);
-	m_Gui->Enable(ID_BORDER_CHANGE,m_Wireframe);
+	m_Gui->Label("Representation:");
+	wxString representation[3] = { "Faces", "Wireframe", "Points" };
+	m_Gui->Combo(ID_REPRESENTATION,"", &m_Representation,3,representation);
+	m_Gui->FloatSlider(ID_THICKNESS,_("Thickness"),&m_Border,1.0,10.0);
+	SetRepresentation((REPRESENTATIONS) m_Representation);
 	m_Gui->Divider(2);
 	
-	wxString normalSelector[2];
+	wxString normalSelector[2] = { "Points Normals", "Cells Normals" };
 	m_Gui->Label("Lighting:");
-	normalSelector[0]="Points Normals";
-	normalSelector[1]="Cells Normals";
 	m_Gui->Combo(ID_NORMALS_TYPE,"",&m_ShowCellsNormals,2,normalSelector);	
 	m_Gui->Divider(2);
 
 	m_Gui->Bool(ID_EDGE_VISIBILITY,_("Element Edges"), &m_BorderElementsWiredActor, 1);
-	m_Gui->Enable(ID_EDGE_VISIBILITY,!m_Wireframe);
+	m_Gui->Enable(ID_EDGE_VISIBILITY,m_Representation!=WIREFRAME_REP);
 
 	m_Gui->Divider(2);
   m_Gui->Bool(ID_USE_VTK_PROPERTY,"Property",&m_UseVTKProperty, 1);
@@ -265,12 +287,9 @@ void albaPipeGenericPolydata::OnEvent(albaEventBase *alba_event)
 	{
  		switch(e->GetId()) 
 		{
-      case ID_WIREFRAME:
+      case ID_REPRESENTATION:
         {
-          if(m_Wireframe == 0) 
-            SetWireframeOff();
-          else
-            SetWireframeOn();
+					SetRepresentation((REPRESENTATIONS)m_Representation);
           
           if(m_Gui)
           {
@@ -300,10 +319,7 @@ void albaPipeGenericPolydata::OnEvent(albaEventBase *alba_event)
         {
 					albaPipeWithScalar::OnEvent(e);
 
-					if(m_Wireframe == 0) 
-						SetWireframeOff();
-					else
-						SetWireframeOn();
+					SetRepresentation((REPRESENTATIONS)m_Representation);
         }
         break;
       case ID_USE_VTK_PROPERTY:
@@ -313,10 +329,8 @@ void albaPipeGenericPolydata::OnEvent(albaEventBase *alba_event)
 					else
 						m_Actor->SetProperty(NULL);
 
-					if(m_Wireframe == 0) 
-						SetWireframeOff();
-					else
-						SetWireframeOn();
+					SetRepresentation((REPRESENTATIONS)m_Representation);
+					SetThickness(m_Border);
 
 					if(m_Gui)
 					{
@@ -327,11 +341,9 @@ void albaPipeGenericPolydata::OnEvent(albaEventBase *alba_event)
 					GetLogicManager()->CameraUpdate();
 				}
 				break;
-			case ID_BORDER_CHANGE:
+			case ID_THICKNESS:
 				{
-					m_Actor->GetProperty()->SetLineWidth(m_Border);
-					m_Actor->Modified();
-					GetLogicManager()->CameraUpdate();
+					SetThickness(m_Border);
 
 					m_MaterialButton->UpdateMaterialIcon();
 					m_MaterialButton->GetGui()->Update();
@@ -342,17 +354,16 @@ void albaPipeGenericPolydata::OnEvent(albaEventBase *alba_event)
 				{
 					albaEventMacro(*e);
 					mmaMaterial *material = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
-					if(material && material->m_Prop )
+					if (material && material->m_Prop)
 					{
-						bool newWireframe=(material->m_Prop->GetRepresentation() == VTK_WIREFRAME);
-						if (newWireframe!=m_Wireframe)
-						{
-							m_Wireframe=newWireframe;
-							if(m_Wireframe == 0) 
-								SetWireframeOff();
-							else
-								SetWireframeOn();
-						}
+						if (material->m_Prop->GetRepresentation() == VTK_WIREFRAME)
+							m_Representation = WIREFRAME_REP;
+						else if (material->m_Prop->GetRepresentation() == VTK_POINTS)
+							m_Representation = POINTS_REP;
+						else
+							m_Representation = SURFACE_REP;
+
+						SetRepresentation((REPRESENTATIONS)m_Representation);
 					}
 				}
 				break;
@@ -374,36 +385,42 @@ void albaPipeGenericPolydata::SetActorPicking(int enable)
 	m_Actor->Modified();
 	GetLogicManager()->CameraUpdate();
 }
+
 //----------------------------------------------------------------------------
-void albaPipeGenericPolydata::SetWireframeOn()
+void albaPipeGenericPolydata::SetRepresentation(REPRESENTATIONS rep)
 {
-	m_Wireframe = true;
-	m_Actor->GetProperty()->SetRepresentationToWireframe();
-  m_ObjectMaterial->m_Representation=m_Actor->GetProperty()->GetRepresentation();
-	m_Actor->Modified();
-	m_ActorWired->SetVisibility(0);
-	m_ActorWired->Modified();
-	if(m_Gui)
-	{ 
-		m_Gui->Enable(ID_BORDER_CHANGE,true);
-		m_Gui->Enable(ID_EDGE_VISIBILITY,false);
-		m_Gui->Update();
-	}
-	GetLogicManager()->CameraUpdate();
-}
-//----------------------------------------------------------------------------
-void albaPipeGenericPolydata::SetWireframeOff()
-{
-	m_Wireframe = false;
-	m_Actor->GetProperty()->SetRepresentationToSurface();
-	m_ObjectMaterial->m_Representation=m_Actor->GetProperty()->GetRepresentation();
-  m_Actor->Modified();
-	m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
-	m_ActorWired->Modified();
-	if(m_Gui)
+	vtkPolyData* inputAsPolyData = GetInputAsPolyData();
+
+	m_Representation = rep;
+
+	if (m_Actor)
 	{
-		m_Gui->Enable(ID_BORDER_CHANGE,false);
-		m_Gui->Enable(ID_EDGE_VISIBILITY,true);
+		switch (rep)
+		{
+			case albaPipeGenericPolydata::SURFACE_REP:
+				m_Actor->GetProperty()->SetRepresentationToSurface();
+				m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
+				break;
+			case albaPipeGenericPolydata::WIREFRAME_REP:
+				m_Actor->GetProperty()->SetRepresentationToWireframe();
+				m_ActorWired->SetVisibility(0);
+				break;
+			case albaPipeGenericPolydata::POINTS_REP:
+				m_Actor->GetProperty()->SetRepresentationToPoints();
+				m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
+				break;
+			default:
+				break;
+		}
+		m_Actor->Modified();
+		m_ActorWired->Modified();
+		m_ObjectMaterial->m_Representation = m_Actor->GetProperty()->GetRepresentation();
+	}
+
+		if (m_Gui)
+	{
+		m_Gui->Enable(ID_THICKNESS, m_Representation != SURFACE_REP);
+		m_Gui->Enable(ID_EDGE_VISIBILITY, m_Representation != WIREFRAME_REP); 
 		m_Gui->Update();
 	}
 	GetLogicManager()->CameraUpdate();
@@ -413,9 +430,12 @@ void albaPipeGenericPolydata::SetWireframeOff()
 void albaPipeGenericPolydata::SetNormalsTypeToPoints()
 {
 	m_ShowCellsNormals=0;
-	m_NormalsFilter->ComputeCellNormalsOff();
-	m_NormalsFilter->ComputePointNormalsOn();
-	m_NormalsFilter->Update();
+	if (m_NormalsFilter)
+	{
+		m_NormalsFilter->ComputeCellNormalsOff();
+		m_NormalsFilter->ComputePointNormalsOn();
+		m_NormalsFilter->Update();
+	}
 	GetLogicManager()->CameraUpdate();
 }
 
@@ -423,9 +443,12 @@ void albaPipeGenericPolydata::SetNormalsTypeToPoints()
 void albaPipeGenericPolydata::SetNormalsTypeToCells()
 {
 	m_ShowCellsNormals=1 ;
-	m_NormalsFilter->ComputeCellNormalsOn();
-	m_NormalsFilter->ComputePointNormalsOff();
-	m_NormalsFilter->Update();
+	if (m_NormalsFilter)
+	{
+		m_NormalsFilter->ComputeCellNormalsOn();
+		m_NormalsFilter->ComputePointNormalsOff();
+		m_NormalsFilter->Update();
+	}
 	GetLogicManager()->CameraUpdate();
 }
 
@@ -477,6 +500,7 @@ void albaPipeGenericPolydata::SetThickness(double thickness)
 {
 	m_Border=thickness;
 	m_Actor->GetProperty()->SetLineWidth(m_Border);
+	m_Actor->GetProperty()->SetPointSize(m_Border);
 	m_Actor->Modified();
 	GetLogicManager()->CameraUpdate();
 }

@@ -98,6 +98,7 @@ typedef struct configurationStruct
 	//---------------Advanced Parameters----------------
 	int m_DensityOutput;
 	double m_PoissonRatio;
+	int m_ElasticityBoundsOnInteg;
 
 } BonematConfiguration;
 

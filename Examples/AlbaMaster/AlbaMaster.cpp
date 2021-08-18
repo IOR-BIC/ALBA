@@ -25,7 +25,9 @@ PURPOSE. See the above copyright notice for more information.
 #include "AlbaMaster.h"
 
 #include "albaDecl.h"
+#ifdef ALBA_USE_GDCM
 #include "albaGUIDicomSettings.h"
+#endif
 #include "albaGUIMDIFrame.h"
 #include "albaPics.h"
 #include "albaPipeFactoryVME.h"
@@ -40,7 +42,9 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpImporterAnsysCDBFile.h"
 #include "albaOpImporterAnsysInputFile.h"
 #include "albaOpImporterC3D.h"
+#ifdef ALBA_USE_GDCM
 #include "albaOpImporterDicom.h"
+#endif
 #include "albaOpImporterGRFWS.h"
 #include "albaOpImporterImage.h"
 #include "albaOpImporterLandmark.h"
@@ -55,13 +59,19 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpImporterPLY.h"
 #include "albaOpImporterVRML.h"
 #include "albaOpImporterVTK.h"
+#include "albaOpImporterMetaImage.h"
+#include "albaOpImporterVTKXML.h"
 #include "albaOpImporterAbaqusFile.h"
+#include "albaOpImporterDicFile.h"
+#include "albaOpImporterPointCloud.h"
 
 //EXPORTERS
 #include "albaOpExporterAnsysCDBFile.h"
 #include "albaOpExporterAnsysInputFile.h"
 #include "albaOpExporterBmp.h"
+#ifdef ALBA_USE_GDCM
 #include "albaOpExporterDicom.h"
+#endif 
 #include "albaOpExporterGRFWS.h"
 #include "albaOpExporterLandmark.h"
 #include "albaOpExporterMSF.h"
@@ -71,11 +81,14 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpExporterSTL.h"
 #include "albaOpExporterPLY.h"
 #include "albaOpExporterVTK.h"
+#include "albaOpExporterVTKXML.h"
+#include "albaOpExporterMetaImage.h"
 #include "albaOpExporterWrappedMeter.h"
 #include "albaOpExporterAbaqusFile.h"
 
 // OPERATIONS
 #include "albaOp2DMeasure.h"
+#include "albaOpComputeInertialTensor.h"
 #include "albaOpALBATransform.h"
 #include "albaOpAddLandmark.h"
 #include "albaOpBooleanSurface.h"
@@ -91,6 +104,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpCreateMeter.h"
 #include "albaOpCreateProber.h"
 #include "albaOpCreateRefSys.h"
+#include "albaOpCreateRefSysFromViewSlice.h"
 #include "albaOpCreateSlicer.h"
 #include "albaOpCreateSpline.h"
 #include "albaOpCreateSurface.h"
@@ -103,6 +117,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpEditMetadata.h"
 #include "albaOpEditNormals.h"
 #include "albaOpExtractIsosurface.h"
+#include "albaOpExtractImageFromArbitraryView.h"
 #include "albaOpExtrusionHoles.h"
 #include "albaOpEqualizeHistogram.h"
 #include "albaOpFillHoles.h"
@@ -136,6 +151,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpVolumeMeasure.h"
 #include "albaOpVolumeMirror.h"
 #include "albaOpVolumeResample.h"
+#include "albaOpESPCalibration.h"
 
 // VIEWS
 #include "albaView3D.h"
@@ -244,6 +260,8 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpImporterPLY("PLY"));
 	m_Logic->Plug(new albaOpImporterVRML("VRML"));
 	m_Logic->Plug(new albaOpImporterVTK("VTK"));
+	m_Logic->Plug(new albaOpImporterVTKXML("VTK xml"));
+	m_Logic->Plug(new albaOpImporterMetaImage("Meta Image"));
 	m_Logic->Plug(new albaOpImporterMSF("ALBA"));
 	m_Logic->Plug(new albaOpImporterMSF1x("MSF 1.x"));
 	m_Logic->Plug(new albaOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
@@ -252,14 +270,18 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpImporterMesh("Generic Mesh"), "Finite Element");
 	m_Logic->Plug(new albaOpImporterASCII("ASCII"));
 
+#ifdef ALBA_USE_GDCM
 	albaGUIDicomSettings *dicomSettings=new albaGUIDicomSettings(NULL,"DICOM");
 	m_Logic->Plug(new albaOpImporterDicom("DICOM"), "", true, dicomSettings);
+#endif
 	m_Logic->Plug(new albaOpImporterLandmark("Landmark"),"Landmark Suite");
 	m_Logic->Plug(new albaOpImporterLandmarkTXT("Landmark TXT"),"Landmark Suite");
 	m_Logic->Plug(new albaOpImporterLandmarkWS("Landmark WS"),"Landmark Suite");
 	m_Logic->Plug(new albaOpImporterC3D("C3D"),"Landmark Suite");
 	m_Logic->Plug(new albaOpImporterAnalogWS("EMG"));
 	m_Logic->Plug(new albaOpImporterGRFWS("GRF"));
+	m_Logic->Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
+	m_Logic->Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
 
 	//------------------------------------------------------------
 	// Exporter Menu:
@@ -269,7 +291,11 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpExporterSTL("STL"));
 	m_Logic->Plug(new albaOpExporterPLY("PLY"));
 	m_Logic->Plug(new albaOpExporterVTK("VTK"));
+	m_Logic->Plug(new albaOpExporterVTKXML("VTK"));
+	m_Logic->Plug(new albaOpExporterMetaImage("MetaImage"));
+#ifdef ALBA_USE_GDCM
 	m_Logic->Plug(new albaOpExporterDicom("Dicom"),"",true,dicomSettings);
+#endif
 	m_Logic->Plug(new albaOpExporterRAW("Raw"));
 	m_Logic->Plug(new albaOpExporterBmp("Bmp"));
 	m_Logic->Plug(new albaOpExporterLandmark("Landmark"));
@@ -292,9 +318,11 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpCreateGroup("Group"),_("Create"));
 	m_Logic->Plug(new albaOpCreateMeter("Meter"),_("Create"));
 	m_Logic->Plug(new albaOpCreateRefSys("RefSys"),_("Create"));
+	m_Logic->Plug(new albaOpCreateRefSysFromViewSlice("RefSys from View Slice"), _("Create"));
 	m_Logic->Plug(new albaOpCreateProber("Prober"),_("Create"));
 	m_Logic->Plug(new albaOpCreateSlicer("Slicer"),_("Create"));
 	m_Logic->Plug(new albaOpExtractIsosurface("Extract Isosurface"),_("Create"));
+	m_Logic->Plug(new albaOpExtractImageFromArbitraryView("Extract Image from Arbitrary View"), _("Create"));
 	m_Logic->Plug(new albaOpCreateSurfaceParametric("Parametric Surface"),_("Create"));
 	m_Logic->Plug(new albaOpCreateSpline("Spline"),_("Create"));
 	m_Logic->Plug(new albaOpCreateLabeledVolume(),_("Create"));
@@ -347,11 +375,14 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpVOIDensity("VOI Density"), "Measure");
 	m_Logic->Plug(new albaOpVolumeMeasure("Volume"), "Measure");
 	m_Logic->Plug(new albaOpMeshQuality("Mesh Quality"), "Measure");
+	m_Logic->Plug(new albaOpComputeInertialTensor(), "Measure");
+
 
 	m_Logic->Plug(new albaOpIterativeRegistration(),_("Register"));
 	m_Logic->Plug(new albaOpRegisterClusters("Clusters"),_("Register"));
 	m_Logic->Plug(new albaOpClassicICPRegistration("Surface"),_("Register"));
-	
+
+	m_Logic->Plug(new albaOpESPCalibration("Calibrate ESP Phantom"), _("Calibration"));
 	//------------------------------------------------------------
 	
 #ifdef USE_WIZARD

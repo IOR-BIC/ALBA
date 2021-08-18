@@ -139,7 +139,7 @@ BEGIN_EVENT_TABLE(albaGUILutSlider,wxPanel)
 END_EVENT_TABLE()
 //----------------------------------------------------------------------------
 albaGUILutSlider::albaGUILutSlider(wxWindow *parent, wxWindowID id, const wxPoint& pos /* = wxDefaultPosition */, const wxSize& size /* = wxDefaultSize */, long style /* = 0 */, const char* middleButtonTitle /* = "windowing" */)
-:wxPanel(parent,id,pos,size, wxBORDER_SIMPLE | wxCLIP_CHILDREN )
+:wxPanel(parent,id,pos,size, style )
 //----------------------------------------------------------------------------
 {
   m_Listener = NULL;

@@ -21,6 +21,12 @@
 #include <vnl/vnl_matrix.h>
 #include <vector>
 
+#ifdef ALBA_EXPORTS
+#include "albaDllMacros.h"
+EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
+#endif
+
+
 /**
   Class Name: albaASCIIImporterUtility.
   Tool based on VNL for extract information from matrix.

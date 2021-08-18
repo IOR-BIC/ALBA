@@ -43,6 +43,7 @@
 #include "albaGUIButton.h"
 #include "albaGUIValidator.h"
 #include "albaLogicWithManagers.h"
+#include "wx/datetime.h"
 
 //----------------------------------------------------------------------------
 // constant :
@@ -57,7 +58,7 @@ enum albaGUIAboutDialog_IDS
 albaGUIAboutDialog::albaGUIAboutDialog(wxString dialog_title)
 {  
 	m_Title = "";
-	m_Revision = "";
+	m_BuildNum = "";
 	m_Version = "";
 	m_ImagePath = "";	
 	m_WebSiteURL = "";
@@ -106,11 +107,11 @@ void albaGUIAboutDialog::OnEvent(albaEventBase *alba_event)
   }
 }
 
-void albaGUIAboutDialog::SetRevision(wxString revision)
+void albaGUIAboutDialog::SetBuildNum(wxString revision)
 {
 	albaString tmp = revision.c_str();
 	tmp.Replace('_', ' ');
-	m_Revision = tmp.GetCStr();
+	m_BuildNum = tmp.GetCStr();
 }
 	
 //----------------------------------------------------------------------------
@@ -136,28 +137,22 @@ void albaGUIAboutDialog::CreateDialog()
 	wxString title = "About ";
 	title += m_Title;
 
-	wxString revision = "";
-	wxRegKey RegKey(wxString("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + m_Title));
-	if (RegKey.Exists())
-	{
-		if (RegKey.HasValue(wxString("DisplayVersion")))
-			RegKey.QueryValue(wxString("DisplayVersion"), revision);
-		else
-			revision = "Unknown Build";
-
-		SetRevision(revision);
-	}
-
 	wxString description = m_Title;
 	description += "\n";
 	
-	if (!m_Version.IsEmpty())
-		description += _("Version ") + m_Version +  _("\n");
-	
-	description += m_Revision + _("\n");
-	
-	description += "\n© 2019 BIC - RIT - IOR";
+	// Build number
+	description += m_BuildNum;
 
+	// Version
+	if (!m_Version.IsEmpty())
+		description += _(" - Version ") + m_Version;
+	
+	// Copyright
+	wxString copyright;
+	copyright.Printf("\n\n© %d BIC - RIT - IOR", (1900 + wxDateTime::GetTmNow()->tm_year));
+	description += copyright;
+
+	// Extra
 	description += m_ExtraMessage;
 
 	//////////////////////////////////////////////////////////////////////////

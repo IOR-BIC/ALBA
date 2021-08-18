@@ -159,7 +159,6 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_SettingsDialog = new albaGUISettingsDialog();
 	m_AboutDialog = new albaGUIAboutDialog();
 
-	m_Revision = _("0.1");
 	m_Extension = "alba";
 
 	m_UseWizardManager = false;
@@ -177,6 +176,8 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_EventFilterFunc = NULL;
 
 	m_SkipCameraUpdate = false;
+
+	m_AppLayout = NULL;
 }
 //----------------------------------------------------------------------------
 albaLogicWithManagers::~albaLogicWithManagers()
@@ -192,12 +193,26 @@ albaLogicWithManagers::~albaLogicWithManagers()
 	cppDEL(m_AboutDialog);
 	cppDEL(m_ApplicationSettings);
 	cppDEL(m_TimeBarSettings);
+	albaDEL(m_AppLayout);
 }
 
 // APPLICATION ///////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::Init(int argc, char **argv)
 {
+
+	//Setting Build Version
+	wxString buildNum = "";
+	wxRegKey RegKey(wxString("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + m_AppTitle));
+	if (RegKey.Exists())
+	{
+		if (RegKey.HasValue(wxString("DisplayVersion")))
+			RegKey.QueryValue(wxString("DisplayVersion"), buildNum);
+		else
+			buildNum = "Unknown Build";
+	}
+	m_BuildNum = buildNum;
+
 	if (m_WizardManager)
 	{
 		m_WizardManager->FillSettingDialog(m_SettingsDialog);
@@ -226,6 +241,7 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 	if (m_OpManager)
 	{
 		m_OpManager->FillSettingDialog(m_SettingsDialog);
+		m_OpManager->SetBuildNum(m_BuildNum);
 
 		if (argc > 1)
 		{
@@ -240,9 +256,11 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 		}
 	}
 
+	
+
 	// Init About Dialog
 	m_AboutDialog->SetTitle(m_AppTitle);
-	m_AboutDialog->SetRevision(m_Revision.GetCStr());
+	m_AboutDialog->SetBuildNum(m_BuildNum.GetCStr());
 	m_AboutDialog->SetVersion("0.1");
 	wxString imagePath = albaGetApplicationDirectory().c_str();
 	imagePath += "\\Config\\AlbaMasterAbout.bmp";
@@ -1553,24 +1571,27 @@ void albaLogicWithManagers::OpRunStarting()
 {
 	m_RunningOperation = true;
   EnableMenuAndToolbar();
-// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-  if(m_InteractionManager) m_InteractionManager->EnableSelect(false);
-#endif
-  if(m_SideBar)    m_SideBar->EnableSelect(false);
+
+  if(m_InteractionManager) 
+		m_InteractionManager->EnableSelect(false);
+
+  if(m_SideBar)    
+		m_SideBar->EnableSelect(false);
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::OpRunTerminated(int runOk)
 {
 	m_RunningOperation = false;
   EnableMenuAndToolbar();
-// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
+
   if(m_InteractionManager) 
     m_InteractionManager->EnableSelect(true);
-#endif
+
   if(m_SideBar)
     m_SideBar->EnableSelect(true);
+
+	if(m_ApplicationSettings->IsAutoSaveOn())
+		OnFileSave();
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::OpShowGui(bool push_gui, albaGUIPanel *panel)
@@ -1582,7 +1603,6 @@ void albaLogicWithManagers::OpHideGui(bool view_closed)
 {
 	if(m_SideBar) m_SideBar->OpHideGui(view_closed);
 }
-
 
 // VIEW //////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
@@ -1654,7 +1674,6 @@ void albaLogicWithManagers::CameraReset()
 	if (m_ViewManager) 
 		m_ViewManager->CameraReset();
 }
-
 
 // WIZARD ////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
@@ -1757,7 +1776,6 @@ void albaLogicWithManagers::WizardRunTerminated()
 	if (m_SideBar)
 		m_SideBar->EnableSelect(true);
 }
-
 
 // MENU-TOOLBAR //////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
@@ -2198,46 +2216,47 @@ void albaLogicWithManagers::CreateLogPanel()
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::StoreLayout()
 {
-	int pos[2], size[2];
+	if (m_AppLayout)
+	{
+		int pos[2], size[2];
 
-	albaXMLStorage *xmlStorage = albaXMLStorage::New();
-	xmlStorage->SetFileType("MLY");
-	xmlStorage->SetVersion("2.0");
-	albaVMERoot *root;
-	albaNEW(root);
-	root->Initialize();
-	xmlStorage->SetDocument(root);
+		albaXMLStorage *xmlStorage = albaXMLStorage::New();
+		xmlStorage->SetFileType("MLY");
+		xmlStorage->SetVersion("2.0");
+		albaVMERoot *root;
+		albaNEW(root);
+		root->Initialize();
+		xmlStorage->SetDocument(root);
 
-	wxString layout_file  = albaGetAppDataDirectory().c_str();
-	layout_file << "\\layout.mly";
+		wxString layout_file = albaGetAppDataDirectory().c_str();
+		layout_file << "\\layout.mly";
 
-	wxFrame *frame = (wxFrame *)albaGetFrame();
-	wxRect rect;
-	rect = frame->GetRect();
-	pos[0] = rect.GetPosition().x;
-	pos[1] = rect.GetPosition().y;
-	size[0] = rect.GetSize().GetWidth();
-	size[1] = rect.GetSize().GetHeight();
+		wxFrame *frame = (wxFrame *)albaGetFrame();
+		wxRect rect;
+		rect = frame->GetRect();
+		pos[0] = rect.GetPosition().x;
+		pos[1] = rect.GetPosition().y;
+		size[0] = rect.GetSize().GetWidth();
+		size[1] = rect.GetSize().GetHeight();
 
-	mmaApplicationLayout  *layout;
-	albaNEW(layout);
+	
+		m_AppLayout->SetApplicationInfo(m_Win->IsMaximized(), pos, size);
+		bool toolbar_vis = m_Win->GetDockManager().GetPane("toolbar").IsShown();
+		m_AppLayout->SetInterfaceElementVisibility("toolbar", toolbar_vis);
+		bool sidebar_vis = m_Win->GetDockManager().GetPane("sidebar").IsShown();
+		m_AppLayout->SetInterfaceElementVisibility("sidebar", sidebar_vis);
+		bool logbar_vis = m_Win->GetDockManager().GetPane("logbar").IsShown();
+		m_AppLayout->SetInterfaceElementVisibility("logbar", logbar_vis);
 
-	layout->SetApplicationInfo(m_Win->IsMaximized(), pos, size);
-	bool toolbar_vis = m_Win->GetDockManager().GetPane("toolbar").IsShown();
-	layout->SetInterfaceElementVisibility("toolbar", toolbar_vis);
-	bool sidebar_vis = m_Win->GetDockManager().GetPane("sidebar").IsShown();
-	layout->SetInterfaceElementVisibility("sidebar", sidebar_vis);
-	bool logbar_vis = m_Win->GetDockManager().GetPane("logbar").IsShown();
-	layout->SetInterfaceElementVisibility("logbar", logbar_vis);
 
-	root->SetAttribute("ApplicationLayout", layout);
+		root->SetAttribute("ApplicationLayout", m_AppLayout);
 
-	xmlStorage->SetURL(layout_file);
-	xmlStorage->Store();
+		xmlStorage->SetURL(layout_file);
+		xmlStorage->Store();
 
-	cppDEL(xmlStorage);
-	albaDEL(root);
-	albaDEL(layout);
+		cppDEL(xmlStorage);
+		albaDEL(root);
+	}
 } 
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::RestoreLayout()
@@ -2248,6 +2267,7 @@ void albaLogicWithManagers::RestoreLayout()
 
 	albaVMERoot *root;
 	albaNEW(root);
+	albaNEW(m_AppLayout);
 	root->Initialize();
 	xmlStorage->SetDocument(root);
 
@@ -2276,8 +2296,9 @@ void albaLogicWithManagers::RestoreLayout()
 		m_Win->ShowDockPane("toolbar", app_layout->GetToolBarVisibility());
 		m_Win->ShowDockPane("logbar", app_layout->GetLogBarVisibility());
 		m_Win->ShowDockPane("sidebar",  app_layout->GetSideBarVisibility());
-	}
 
+		m_AppLayout->DeepCopy(app_layout);
+	}
 
 	cppDEL(xmlStorage);
 	albaDEL(root);

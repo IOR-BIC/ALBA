@@ -120,8 +120,11 @@ public:
 	{
 		ID_COMBO_CHOOSE_EXPORT_AXIS = Superclass::ID_LAST,
 		ID_RESET,
+		ID_LOAD_FROM_REFSYS,
+		ID_GPUENABLED,
+		ID_CAMERA_FOLLOW_GIZMO,
 		ID_SHOW_GIZMO,
-		ID_UPDATE_LUT, 
+		ID_SLICING_ORIGIN,
 		ID_LAST,
 	};
 
@@ -135,7 +138,6 @@ public:
 
 	/** optimized cameraupdate method*/
 	virtual void CameraUpdate();
-
 
 	/** Remove VME into plugged sub-views*/
 	virtual void VmeRemove(albaVME *vme);
@@ -151,9 +153,34 @@ public:
 
 	/** Force the updating of the camera. */
 	virtual void UpdateSubviewsCamerasToFaceSlices();
+
+	void ShowGizmos(bool show);
 	
 	/** return an xpm-icon that can be used to represent this view */
 	virtual char ** GetIcon();
+
+	/** */
+	virtual void VmeSelect(albaVME *node, bool select);
+	
+	/** Gets the slicing matrix of the selected axis */
+	albaMatrix* GetSlicerMatrix(int axis = Z);
+
+	/** Set tags to restore view parameter to the in input VME */
+	void SetRestoreTagToVME(albaVME *vme);
+
+	/** Restore view parameters from a vme with stored tags*/
+	void RestoreFromVME(albaVME* vme);
+
+	albaViewVTK * GetViewArbitrary();
+	albaViewVTK * GetViewSlice(int axis);
+	albaPipe* GetPipeSlice(int axis);
+	albaVMEVolumeGray * GetVolume() { return m_InputVolume; }
+	
+	/** Gets current slicing origin */
+	double* GetSlicingOrigin() { return m_SlicingOrigin; }
+
+	/** Sets new slicing origin */
+	void SetSlicingOrigin(double* origin);
 
 protected:
 
@@ -168,6 +195,10 @@ protected:
 	void ShowSlicers( albaVME * vmeVolume, bool show );
 	
 	void ResetCameraToSlices();
+
+	void UpdateConesPosition();
+
+	void OnSlicingOrigin();
 
 	/** 
 	Create the helper cone giving feedback for camera direction*/
@@ -189,52 +220,49 @@ protected:
 
 	void OnEventThis(albaEventBase *alba_event);  
 
-	
-	void OnLUTChooser();
-	void OnLUTRangeModified();
+	/**Sets GPU Acceleration On/Off according to current status*/
+	void SetEnableGPU();
 
-	void UpdateSlicersLUT();
+	void OnLUTChooser();
+	virtual void OnLUTRangeModified();
 
 	void OnReset();
 
 	void RestoreCameraParametersForAllSubviews();
 
 	/**	This function is called when a translate gizmo is moved*/
-	void OnEventGizmoTranslate(albaEventBase *alba_event, int side);
+	void OnEventGizmoTranslate(vtkMatrix4x4 *matrix, int planeSkip);
 
-	void GetOrthoPlanes(int side, int * orthoPlanes);
-	void PostMultiplyEventMatrixToGizmoCross(albaEventBase * inputEvent, albaGizmoCrossRotateTranslate *targetGizmo);
+	int GetGizmoPlane(void *gizmo);
+
+	int IsGizmoTranslate(void *gizmo);
+	void PostMultiplyEventMatrix(vtkMatrix4x4 * matrix, int slicerAxis, int isRotation=true);
 	
-	/** Post multiply alba_event matrix to given slicer */
-	void PostMultiplyEventMatrixToSlicer(albaEventBase *alba_event, int slicerAxis);
-
-	/** Post multiply alba_event matrix to the 3 slicers */
-	void PostMultiplyEventMatrixToSlicers(albaEventBase *alba_event);
-
 	/** Windowing for volumes data. This function overrides superclass method.*/
-	void VolumeWindowing(albaVME *volume);
-	void OnEventGizmoRotate(albaEventBase *alba_event, int side);
+	virtual void VolumeWindowing(albaVME *volume);
+	void OnEventGizmoRotate(vtkMatrix4x4 *matrix, int planeSkip);
 
 	void SetSlices();
-			
-	albaPipeSurface * GetPipe(int inView, albaVMESurface *inSurface);
-			
-	/** Recompute all slicers output */
-	void UpdateSlicers(int axis);
+					
 
 	void CreateViewCameraNormalFeedbackActors();
 	void UpdateWindowing(bool enable,albaVME *vme);
+
+	/** Accept All VME excluding current */
+	static bool AcceptRefSys(albaVME *node);
+
 	
 	albaViewVTK *m_ViewSlice[3];
 	albaViewVTK *m_View3d;
 
-	albaVME          	*m_CurrentVolume;
-	albaVMESlicer			*m_Slicer[3];
-	albaMatrix					*m_SlicerResetMatrix[3];
+	albaMatrix					*m_SlicingResetMatrix[3];
+	albaMatrix					*m_SlicingMatrix[3];
+
 	albaAttachCamera		*m_CameraToSlicer[3];
 
-	double	m_VolumeVTKDataCenterABSCoords[3];
-	double	m_VolumeVTKDataCenterABSCoordinatesReset[3];
+	double	m_SlicingOriginGUI[3];
+	double	m_SlicingOrigin[3];
+	double	m_SlicingOriginReset[3];
 	double	m_VolumeVTKDataABSOrientation[3];
 	
 	albaVMESurface *m_CameraConeVME[3];
@@ -249,6 +277,12 @@ protected:
 	albaAxes::AXIS_TYPE_ENUM m_AxesType;
 
 	int m_SkipCameraUpdate;
+	int m_EnableGPU;
+	int m_CameraFollowGizmo;
+	int m_IsShowingSlicerGizmo;
+	
+private:
+	void OnLoadFromRefsys();
 };
 
 #endif

@@ -31,6 +31,7 @@
 #include "vtkJPEGWriter.h"
 #include "wx\mac\carbon\bitmap.h"
 #include "wx\image.h"
+#include "vtkImageFlip.h"
 
 //----------------------------------------------------------------------------
 albaHTMLTemplateParserBlock::albaHTMLTemplateParserBlock(int blockType, wxString name)
@@ -166,7 +167,7 @@ void albaHTMLTemplateParserBlock::AddImageVar(wxString name, wxString imagePath,
 }
 
 //----------------------------------------------------------------------------
-void albaHTMLTemplateParserBlock::AddImageVar(wxString name, vtkImageData *imageData, wxString label)
+void albaHTMLTemplateParserBlock::AddImageVar(wxString name, vtkImageData *imageData, wxString label, int flipAxis)
 //----------------------------------------------------------------------------
 {
 	// Write Image
@@ -176,11 +177,20 @@ void albaHTMLTemplateParserBlock::AddImageVar(wxString name, vtkImageData *image
 	vtkJPEGWriter *imageJPEGWriter;
 	vtkNEW(imageJPEGWriter);
 
+	// Flip Image
+	vtkImageFlip* flipFilter = NULL;
+	vtkNEW(flipFilter);
+	if (flipAxis >= 0 && flipAxis < 3)
+		flipFilter->SetFilteredAxis(flipAxis); // flip 0=x 1=y 2=z axis
+	flipFilter->SetInput(imageData);
+	flipFilter->Update();
+
 	// Save image
-	imageJPEGWriter->SetInput(imageData);
+	imageJPEGWriter->SetInput(flipFilter->GetOutput());
 	imageJPEGWriter->SetFileName(imagePath);
 	imageJPEGWriter->Write();
 
+	vtkDEL(flipFilter);
 	vtkDEL(imageJPEGWriter);
 
 	int width = imageData->GetDimensions()[0];

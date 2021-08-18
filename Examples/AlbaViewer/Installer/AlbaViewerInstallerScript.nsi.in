@@ -14,7 +14,7 @@
 ;==========================================================================
 
 !define PRODUCT_NAME "AlbaViewer"
-!define PRODUCT_PUBLISHER "BIC-IOR"
+!define PRODUCT_PUBLISHER "BIC Software"
 !define PRODUCT_WEB_SITE "https://github.com/IOR-BIC"
 
 !define PRODUCT_VERSION "@APP_VERSION@"

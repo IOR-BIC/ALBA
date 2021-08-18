@@ -49,6 +49,9 @@
 
 #include <vector>
 #include "vtkALBAPolyDataNormals.h"
+#include "albaGUILutSlider.h"
+#include "vtkScalarBarActor.h"
+#include "vtkTextProperty.h"
 
 
 //----------------------------------------------------------------------------
@@ -65,13 +68,18 @@ albaPipeWithScalar::albaPipeWithScalar()
 
 	m_ScalarsInComboBoxNames = NULL;
 	m_ScalarsVTKName = NULL;
+	m_LutSwatch = NULL;
+	m_LutSlider = NULL;
 
-	m_ScalarMapActive = 0;
+	m_ScalarMapActive   = m_ShowScalarBar = 0;
+	m_ScalarBarPos = SB_ON_RIGHT;
+	m_ScalarBarLabNum = 2;
 }
 //----------------------------------------------------------------------------
 albaPipeWithScalar::~albaPipeWithScalar()
 {
 	vtkDEL(m_Table);
+	cppDEL(m_LutSlider);
 
 	delete[] m_ScalarsInComboBoxNames;
 	delete[] m_ScalarsVTKName;
@@ -108,15 +116,21 @@ void albaPipeWithScalar::ManageScalarOnExecutePipe(vtkDataSet * dataSet)
 	}
 
 	vtkNEW(m_Table);
-	lutPreset(4, m_Table);
 	m_Table->Build();
 	m_Table->DeepCopy(m_ObjectMaterial->m_ColorLut);
+	lutPreset(19, m_Table);
+
 
 	m_Table->SetValueRange(sr);
 	m_Table->SetHueRange(0.667, 0.0);
 	m_Table->SetTableRange(sr);
 	m_Table->Build();
 	
+	if (m_LutSlider)
+	{
+		m_LutSlider->SetRange(sr);
+		m_LutSlider->SetSubRange(sr);
+	}
 
 	m_ObjectMaterial->m_ColorLut->DeepCopy(m_Table);
 	m_ObjectMaterial->m_ColorLut->Build();
@@ -142,11 +156,23 @@ void albaPipeWithScalar::CreateScalarsGui(albaGUI *gui)
   gui->Divider(2);
 	gui->Bool(ID_SCALAR_MAP_ACTIVE,_("Enable scalar field mapping"), &m_ScalarMapActive, 1);
 	gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsInComboBoxNames);	
+	gui->Divider();
+	
+	m_LutSlider = new albaGUILutSlider(gui, ID_LUT_SLIDER, wxPoint(0, 0), wxSize(304, 22), wxBORDER_NONE);
+	m_LutSlider->SetListener(this);
+	m_LutSlider->SetFloatingPointTextOn();
+	gui->Add(m_LutSlider);
+
   m_LutSwatch=gui->Lut(ID_LUT,"Lut",m_Table);
 
-  gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
-  gui->Enable(ID_LUT, m_ScalarMapActive != 0);
-	gui->Enable(ID_SCALAR_MAP_ACTIVE,m_NumberOfArrays>0);
+	wxString numStrs[] = { "Three","Four","Five","Six","Seven","Eight","Nine","Ten" };
+	wxString posStrs[] = { "Top", "Bottom", "Left", "Right" };
+
+	gui->Bool(ID_ENABLE_SCALAR_BAR, "Show scalar bar", &m_ShowScalarBar, 1);
+	gui->Combo(ID_SCALAR_BAR_LAB_N, "Label Number",  &m_ScalarBarLabNum, 8,numStrs);
+	gui->Combo(ID_SCALAR_BAR_POS, "Bar Position", &m_ScalarBarPos, 4, posStrs);
+
+	EnableDisableGuiComponents();
 }
 //----------------------------------------------------------------------------
 void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
@@ -159,6 +185,10 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
         {
 					m_ActiveScalarType = (m_ScalarIndex < m_PointCellArraySeparation) ? POINT_TYPE : CELL_TYPE;
           UpdateActiveScalarsInVMEDataVectorItems();
+
+					if (m_ScalarBarActor)
+						m_ScalarBarActor->SetTitle(m_ScalarsVTKName[m_ScalarIndex]);
+
 					GetLogicManager()->CameraUpdate();
         }
         break;
@@ -167,24 +197,58 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
           double sr[2];
           m_Table->GetTableRange(sr);
           m_Mapper->SetScalarRange(sr);
+					if (m_LutSlider)
+						m_LutSlider->SetSubRange(sr);
 					GetLogicManager()->CameraUpdate();
         }
         break;
+			case ID_RANGE_MODIFIED:
+				{
+				double sr[2];
+				m_LutSlider->GetSubRange(sr);
+				m_Table->SetTableRange(sr);
+				m_Mapper->SetScalarRange(sr);
+				GetLogicManager()->CameraUpdate();
+				}
+				break;
       case ID_SCALAR_MAP_ACTIVE:
         {
 					m_Mapper->SetScalarVisibility(m_ScalarMapActive);
-				
-					if(m_Gui)
+					if (m_ScalarBarActor)
 					{
-						m_Gui->Enable(ID_SCALAR_MAP_ACTIVE,m_NumberOfArrays>0);
-						m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
-						m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
-						m_Gui->Update();
+						m_ScalarBarActor->SetTitle(m_ScalarsVTKName[m_ScalarIndex]);
+						ShowScalarBarActor(m_ShowScalarBar);
 					}
-	
+				
+					EnableDisableGuiComponents();
 					UpdateActiveScalarsInVMEDataVectorItems();
         }
         break;
+			case ID_ENABLE_SCALAR_BAR:
+			{
+				ShowScalarBarActor(m_ShowScalarBar);
+				EnableDisableGuiComponents();
+
+				GetLogicManager()->CameraUpdate();
+			}
+			break;
+
+			case ID_SCALAR_BAR_LAB_N:
+			{
+				if (m_ScalarBarActor)
+					m_ScalarBarActor->SetNumberOfLabels(m_ScalarBarLabNum + 3);
+
+				GetLogicManager()->CameraUpdate();
+			}
+			break;
+
+			case ID_SCALAR_BAR_POS:
+			{
+				int pos = m_ScalarBarPos;
+				SetScalarBarPos(pos);
+				GetLogicManager()->CameraUpdate();
+			}
+			break;
 
 			default:
 				albaEventMacro(*e);
@@ -196,6 +260,24 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
     UpdateActiveScalarsInVMEDataVectorItems();
     UpdateProperty();
   }
+}
+
+
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::EnableDisableGuiComponents()
+{
+	if (m_Gui)
+	{
+		m_Gui->Enable(ID_SCALAR_MAP_ACTIVE, m_NumberOfArrays > 0);
+		m_Gui->Enable(ID_SCALARS, m_ScalarMapActive);
+		m_Gui->Enable(ID_LUT, m_ScalarMapActive);
+		m_LutSlider->Enable(m_ScalarMapActive);
+		m_Gui->Enable(ID_ENABLE_SCALAR_BAR, m_ScalarMapActive);
+		m_Gui->Enable(ID_SCALAR_BAR_LAB_N, m_ScalarMapActive && m_ShowScalarBar);
+		m_Gui->Enable(ID_SCALAR_BAR_POS, m_ScalarMapActive && m_ShowScalarBar);
+		m_Gui->Update();
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -294,7 +376,12 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
   m_Table->SetTableRange(sr);
   m_Table->SetValueRange(sr);
   m_Table->SetHueRange(0.667, 0.0);
-  
+
+	if (m_LutSlider)
+	{
+		m_LutSlider->SetRange(sr);
+		m_LutSlider->SetSubRange(sr);
+	}
   m_ObjectMaterial->m_ColorLut->DeepCopy(m_Table);
   m_ObjectMaterial->UpdateFromLut();
 
@@ -309,6 +396,8 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
   m_Mapper->Update();
 
   m_Actor->Modified();
+  if(m_ScalarBarActor)
+	m_ScalarBarActor->Modified();
 
   UpdateProperty();
 }
@@ -397,3 +486,84 @@ void albaPipeWithScalar::UpdateProperty(bool fromTag)
 			m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars()->Modified();
 	}
 }
+
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::CreateScalarBarActor()
+{
+	////scalar field map
+	m_ScalarBarActor = vtkScalarBarActor::New();
+	m_ScalarBarActor->SetLookupTable(m_Table);
+	((vtkActor2D*)m_ScalarBarActor)->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+	((vtkActor2D*)m_ScalarBarActor)->GetPositionCoordinate()->SetValue(0.1, 0.01);
+	m_ScalarBarActor->SetOrientationToHorizontal();
+	m_ScalarBarActor->SetWidth(0.8);
+	m_ScalarBarActor->SetHeight(0.08);
+	m_ScalarBarActor->SetLabelFormat("%6.3g");
+	m_ScalarBarActor->SetNumberOfLabels(m_ScalarBarLabNum + 3);
+	m_ScalarBarActor->GetLabelTextProperty()->SetColor(0.8, 0.8, 0.8);
+	m_ScalarBarActor->SetPickable(0);
+	m_ScalarBarActor->SetVisibility(false);
+
+	SetScalarBarPos(m_ScalarBarPos);
+	
+
+	m_RenFront->AddActor2D(m_ScalarBarActor);
+}
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::DeleteScalarBarActor()
+{
+	m_RenFront->RemoveActor2D(m_ScalarBarActor);
+	vtkDEL(m_ScalarBarActor);
+}
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::SetScalarBarPos(int pos)
+{
+	m_ScalarBarPos = pos;
+	if (m_ScalarBarActor)
+	{
+		switch (pos)
+		{
+			case SB_ON_BOTTOM:
+				((vtkActor2D*)m_ScalarBarActor)->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+				((vtkActor2D*)m_ScalarBarActor)->GetPositionCoordinate()->SetValue(0.1, 0.01);
+				m_ScalarBarActor->SetOrientationToHorizontal();
+				m_ScalarBarActor->SetWidth(0.8);
+				m_ScalarBarActor->SetHeight(0.08);
+			break;
+			case SB_ON_TOP:
+				((vtkActor2D*)m_ScalarBarActor)->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+				((vtkActor2D*)m_ScalarBarActor)->GetPositionCoordinate()->SetValue(0.1, 0.91);
+				m_ScalarBarActor->SetOrientationToHorizontal();
+				m_ScalarBarActor->SetWidth(0.8);
+				m_ScalarBarActor->SetHeight(0.08);
+				break;
+			case SB_ON_LEFT:
+				m_ScalarBarActor->SetOrientationToVertical();
+				m_ScalarBarActor->SetWidth(0.08);
+				m_ScalarBarActor->SetHeight(0.9);
+				((vtkActor2D*)m_ScalarBarActor)->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+				((vtkActor2D*)m_ScalarBarActor)->GetPositionCoordinate()->SetValue(0.01, 0.05);
+				break;
+			case SB_ON_RIGHT:
+				m_ScalarBarActor->SetOrientationToVertical();
+				m_ScalarBarActor->SetWidth(0.08);
+				m_ScalarBarActor->SetHeight(0.9);
+				((vtkActor2D*)m_ScalarBarActor)->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+				((vtkActor2D*)m_ScalarBarActor)->GetPositionCoordinate()->SetValue(0.91, 0.05);
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::ShowScalarBarActor(bool show /*= true*/)
+{
+	m_ShowScalarBar = show;
+	m_ScalarBarActor->SetVisibility(m_Selected && m_ScalarMapActive && show);
+}
+

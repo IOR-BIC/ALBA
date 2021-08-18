@@ -21,6 +21,11 @@
 #include "albaVMEGenericAbstract.h"
 #include "vnl/vnl_matrix.h"
 
+#ifdef ALBA_EXPORTS
+#include "albaDllMacros.h"
+EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
+#endif
+
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------

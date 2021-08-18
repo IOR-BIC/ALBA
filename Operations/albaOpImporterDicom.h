@@ -113,10 +113,10 @@ public:
 	void CalculateCropExtent();
 			
 	/** Build a volume from the list of Dicom files. */
-	int BuildVMEVolumeGrayOutput();
+	virtual int BuildVMEVolumeGrayOutput();
 		
 	/** Build images starting from the list of Dicom files. */
-	int BuildVMEImagesOutput();
+	virtual int BuildVMEImagesOutput();
 
 	/** Create the pipeline to read the images. */
 	virtual void CreateSliceVTKPipeline();
@@ -171,7 +171,7 @@ protected:
 	void OnChangeSlice();
 	void OnRangeModified();
 	void OnWizardChangePage( albaEvent * e );
-	void SelectSeries(albaDicomSeries * selectedSeries);
+	virtual void SelectSeries(albaDicomSeries * selectedSeries);
 	void OnStudySelect();
 	
 	/** Create load page and his GUI for the wizard. */
@@ -297,7 +297,7 @@ private:
 // albaDicomStudyList:
 //----------------------------------------------------------------------------
 
-class albaDicomStudyList
+class ALBA_EXPORT albaDicomStudyList
 {
 public:
 	~albaDicomStudyList();
@@ -321,7 +321,7 @@ protected:
 // albaDicomStudy:
 //----------------------------------------------------------------------------
 
-class albaDicomStudy
+class ALBA_EXPORT albaDicomStudy
 {
 public:
 
@@ -350,11 +350,11 @@ protected:
 // albaDicomSeries:
 //----------------------------------------------------------------------------
 
-class albaDicomSeries
+class ALBA_EXPORT albaDicomSeries
 {
 public:
 
-	albaDicomSeries(albaString seriesID, albaString acquisitionNumber) { m_SeriesID = seriesID; m_AcquisitionNumber = acquisitionNumber; m_IsRotated = false; m_CardiacImagesNum = 0; }
+	albaDicomSeries(albaString seriesID, albaString acquisitionNumber, albaString imageType) { m_SeriesID = seriesID; m_AcquisitionNumber = acquisitionNumber; m_ImageType = imageType; m_IsRotated = false; m_CardiacImagesNum = 0; }
 
 	~albaDicomSeries();
 
@@ -376,8 +376,11 @@ public:
 	/** Returns SerieID */
 	albaString GetSerieID() const { return m_SeriesID; }
 
-	/** Returns AcquisitionNumber */
+	/** Returns Acquisition Number */
 	albaString GetAcquisitionNumber() const { return m_AcquisitionNumber; }
+
+	/** Returns Image Type */
+	albaString GetImageType() const { return m_ImageType; }
 
 	/** Return the slices dims */
 	const int *GetDimensions() { return m_Dimensions; }
@@ -397,6 +400,7 @@ protected:
 	int m_Dimensions[3];
 	albaString m_SeriesID;
 	albaString m_AcquisitionNumber;
+	albaString m_ImageType;
 	bool m_IsRotated;
 	int m_CardiacImagesNum;
 };
@@ -553,6 +557,11 @@ public:
 	/** Sets AcquisitionNumber */
 	void SetAcquisitionNumber(albaString acquisitionNumber) { m_AcquisitionNumber = acquisitionNumber; }
 
+	/** Returns Image Type */
+	albaString GetImageType() const { return m_ImageType; }
+
+	/** Sets Image Type */
+	void SetImageType(albaString imageType) { m_ImageType = imageType; }
 protected:
 
 	/** Compute VTK Scalar Type from Dicom image*/
@@ -573,6 +582,7 @@ protected:
 	albaString m_PhotometricInterpretation;
 	albaString m_SeriesID;
 	albaString m_AcquisitionNumber;
+	albaString m_ImageType;
 	albaString m_StudyID;
 
 	double m_TriggerTime;

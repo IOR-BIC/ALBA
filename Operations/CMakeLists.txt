@@ -26,6 +26,7 @@ IF (ALBA_USE_VTK)
 	albaOpCreateSurfaceParametric.cpp	albaOpCreateSurfaceParametric.h
 	albaOpCreateProber.cpp	    				albaOpCreateProber.h
 	albaOpCreateRefSys.cpp	    				albaOpCreateRefSys.h
+	albaOpCreateRefSysFromViewSlice.cpp	albaOpCreateRefSysFromViewSlice.h
 	albaOpCreateSlicer.cpp	    				albaOpCreateSlicer.h
 	albaOpCreateSpline.cpp	    				albaOpCreateSpline.h
 	albaOpCreateVolume.cpp	    				albaOpCreateVolume.h
@@ -56,6 +57,8 @@ IF (ALBA_USE_VTK)
 	albaOpImporterVRML.cpp	  		  		albaOpImporterVRML.h
 	albaOpExporterVTK.cpp	  		  		albaOpExporterVTK.h
 	albaOpImporterVTK.cpp	  		  		albaOpImporterVTK.h
+	albaOpExporterMetaImage.cpp	  		  		albaOpExporterMetaImage.h
+	albaOpImporterMetaImage.cpp	  		  		albaOpImporterMetaImage.h
 	albaOpCrop.cpp	    								albaOpCrop.h
 	albaOpBooleanSurface.cpp	    			albaOpBooleanSurface.h
 	albaOpEditNormals.cpp	    				albaOpEditNormals.h
@@ -74,8 +77,6 @@ IF (ALBA_USE_VTK)
 	
 	albaOpImporterAbaqusFile.cpp	albaOpImporterAbaqusFile.h
 	albaOpExporterAbaqusFile.cpp	albaOpExporterAbaqusFile.h
-	
-	albaOpExporterDicom.cpp albaOpExporterDicom.h
 	
 	albaGeometryEditorPolylineGraph.cpp	albaGeometryEditorPolylineGraph.h
 	albaOpCreateLabeledVolume.cpp	albaOpCreateLabeledVolume.h
@@ -153,11 +154,18 @@ IF (ALBA_USE_VTK)
 	albaOpExporterLandmarkWS.cpp	albaOpExporterLandmarkWS.h
 	  
 	albaOpExporterFEMCommon.cpp	albaOpExporterFEMCommon.h
+	
+	albaOpESPCalibration.cpp		albaOpESPCalibration.h
+	
+	albaOpExtractImageFromArbitraryView.cpp		albaOpExtractImageFromArbitraryView.h
+	albaOpImporterDicFile.cpp		albaOpImporterDicFile.h
+	albaOpImporterPointCloud.cpp	albaOpImporterPointCloud.h
   )
 ENDIF (ALBA_USE_VTK)
 
 IF (ALBA_USE_GDCM)
 SET(PROJECT_SRCS ${PROJECT_SRCS}
+	albaOpExporterDicom.cpp albaOpExporterDicom.h
     albaOpImporterDicom.cpp	albaOpImporterDicom.h
 		albaOpImporterDicomSliceAccHelper.cpp albaOpImporterDicomSliceAccHelper.h
 		albaDicomTagDefines.h

@@ -157,6 +157,16 @@ public:
   /** Return the current alba user */
   albaUser* GetMafUser(){return m_User;};
 
+	/** Enable/Disable the men items operation. */
+	virtual void EnableOp(bool CanEnable = true);
+
+
+	/**Set Build Num*/
+	albaString GetBuildNum() const { return m_BuildNum; }
+
+	/** Get Build Num*/
+	void SetBuildNum(albaString val) { m_BuildNum = val; }
+
 protected:
 	/** Execute the current operation. */
   virtual void OpDo(albaOp *op);
@@ -178,9 +188,6 @@ protected:
 
 	/** Sent a string message to the listener. */
   virtual void Notify(int msg, long arg=0L);
-
-	/** Enable/Disable the men items operation. */
-  virtual void EnableOp(bool CanEnable = true);
 
 	/** Enable/Disable the toolbar's buttons. */
 	virtual void EnableToolbar(bool CanEnable = true);
@@ -215,6 +222,7 @@ protected:
 	albaOpCreateGroup	*m_OpAddGroup; ///< Pointer to the (always available) operation for Adding Group VMEs
   wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menù
 	wxToolBar         *m_ToolBar; ///< Pointer to the application's Toolbal
+	albaString				 m_BuildNum;
 
   albaObserver       *m_Listener;
 

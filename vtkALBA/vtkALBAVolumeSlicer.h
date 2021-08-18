@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: vtkALBAVolumeSlicer
- Authors: Alexander Savenko, Josef Kohout
+ Authors: Alexander Savenko, Josef Kohout, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -31,11 +31,11 @@
 #ifndef __vtkALBAVolumeSlicer_h
 #define __vtkALBAVolumeSlicer_h
 
-#include "albaConfigure.h"
-#include "vtkDataSetToDataSetFilter.h"
-#include "vtkImageData.h"
-#include "vtkPolyData.h"
 
+#include "vtkDataSetToDataSetFilter.h"
+#include "vtkPolyData.h"
+#include "vtkImageData.h"
+#include "albaConfigure.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -47,16 +47,16 @@ class vtkLinearTransform;
 //VS 2008 C++ compiler will produce an incorrect code (compiler BUG), 
 //when GetPlaneOrigin() is called from albaPipeVolumeSlice, function GetPlaneOrigin(double data[3])
 //is called instead of it
-class albaGPUOGL;
+class albaGPU3DTextureProviderHelper;
 #endif
 
 
 class ALBA_EXPORT vtkALBAVolumeSlicer : public vtkDataSetToDataSetFilter {
 public:
   static vtkALBAVolumeSlicer *New();
+
   vtkTypeRevisionMacro(vtkALBAVolumeSlicer, vtkDataSetToDataSetFilter);
 
-#pragma region Attributes
   /**
   Specify a point defining the origin of the plane.*/
   //  vtkSetVector3Macro(PlaneOrigin, double);
@@ -71,9 +71,6 @@ public:
   /** Specify x-axis of the plane*/
   void SetPlaneAxisY(float axis[3]);
   vtkGetVectorMacro(PlaneAxisY, float, 3);
-
-#pragma message("vtkALBAVolumeSlicer::GetWindow, vtkALBAVolumeSlicer::SetWindow are meaningless - THEY SHOULD BE REMOVED ")
-#pragma message("vtkALBAVolumeSlicer::GetLevel, vtkALBAVolumeSlicer::SetLevel are meaningless - THEY SHOULD BE REMOVED ")
 
   /**
   Set / Get the Window for color modulation. The formula for modulation is 
@@ -113,7 +110,6 @@ public:
   
   /** Set tri-linear interpolation */
   void SetTrilinearInterpolation(bool on){m_TriLinearInterpolationOn = on;};
-#pragma endregion Attributes
 
 
   void SetOutput(vtkImageData *data) { 
@@ -206,19 +202,6 @@ protected:
   template<typename InputDataType, typename OutputDataType> 
   void CreateImage(const InputDataType *input, OutputDataType *output, vtkImageData *outputObject);
 
-#ifdef _WIN32
-  /** Slices voxels from input producing image in output using GPU. */  
-  template<typename OutputDataType> 
-  void CreateImageGPU(OutputDataType* output, vtkImageData *outputObject);
-
-  /** Creates GPU provider, shaders, etc. 
-  Returns false, if GPU provider could not be created */
-  bool CreateGPUProvider();
-
-  /** Gets the GL data type (to be used for albaGPU_OGL) for the given VTK data type
-  Returns -1, if the given data type has no equivalent in OpenGL*/
-  unsigned int GetGLDataType(int nVTKdata_type);
-#endif
 
   int   NumComponents;
   // plane coordinates
@@ -261,10 +244,9 @@ protected:
 
 #ifdef _WIN32
   bool m_bGPUProcessing;        //<true, if GPU processing will be used in ExecuteData
-  albaGPUOGL* m_pGPUProvider;    //<GPU provider for GPU computation
-  int m_TextureId;           //<Texture representing the input data
-
-  float m_GPUDataDimensions[3]; //<area covered by input data (in mm)
+  albaGPU3DTextureProviderHelper *m_TextureHelper;
+  
+  //float m_GPUDataDimensions[3]; //<area covered by input data (in mm)
 
   bool m_TriLinearInterpolationOn; //<define if tri-linear interpolation is performed or not on slice's texture
 #endif  

@@ -24,12 +24,13 @@
 #define __vtkALBALineStripSource_h
 
 #include "vtkALBAAbstractPointsSource.h"
+#include "albaConfigure.h"
 
 class vtkPoints;
 class vtkPolyData;
 class vtkCellArray;
 
-class VTK_GRAPHICS_EXPORT vtkALBALineStripSource : public vtkALBAAbstractPointsSource 
+class ALBA_EXPORT vtkALBALineStripSource : public vtkALBAAbstractPointsSource 
 {
 public:
   static vtkALBALineStripSource *New();

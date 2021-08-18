@@ -25,7 +25,7 @@
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
-EXPORT_STL_VECTOR(ALBA_EXPORT,albaEventSource*);
+EXPORT_STL_VECTOR(ALBA_EXPORT, albaEventBroadcaster *);
 #endif
 
 //----------------------------------------------------------------------------

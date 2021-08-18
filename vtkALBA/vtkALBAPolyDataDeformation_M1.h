@@ -258,7 +258,7 @@ protected:
 #pragma region Munkres
   //This class was adopted from John Weaver code (GNU - see below) and thoroughly modified 
   template <class T>
-  class CMatrix 
+  class ALBA_EXPORT CMatrix 
   {
   public:
     /** Constructor. */

@@ -31,7 +31,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaTagArray.h"
 #include "albaVME.h"
 #include "albaVMEMeshAnsysTextImporter.h"
-#include "albaProgressBarHelper.h"
 
 #include "vtkALBASmartPointer.h"
 
@@ -43,9 +42,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "wx/filename.h"
 #include "wx/stdpaths.h"
 #include "wx/busyinfo.h"
-
-//buffer size 1024*1024 
-#define READ_BUFFER_SIZE 1048576 
 #define min(a,b)  (((a) < (b)) ? (a) : (b))
 
 //----------------------------------------------------------------------------
@@ -248,12 +244,12 @@ int albaOpImporterAnsysCommon::ReadNBLOCK(FILE *outFile)
   // NBLOCK,6,SOLID
   int nReaded = sscanf(m_Line, "%s %d, %d", blockName, &maxId, &numElements);
 
-  GetLine(m_FilePointer, m_Line); // (3i8,6e20.13) Line ignored
+  GetLine(); // (3i8,6e20.13) Line ignored
 
   if(nReaded == 1)
   {
     // CDB from Hypermesh
-    while (GetLine(m_FilePointer, m_Line) != 0 && strncmp (m_Line,"N,R5",4) != 0 && strncmp (m_Line,"-1",2) != 0)
+    while (GetLine() != 0 && strncmp (m_Line,"N,R5",4) != 0 && strncmp (m_Line,"-1",2) != 0)
     {
       nodeId = nodeSolidModelEntityId = nodeLine = 0;
       nodeX = nodeY = nodeZ = 0;
@@ -271,7 +267,7 @@ int albaOpImporterAnsysCommon::ReadNBLOCK(FILE *outFile)
     // CDB from Ansys
     for (int i = 0; i < numElements; i++)
     {
-      if(GetLine(m_FilePointer, m_Line) != 0)
+      if(GetLine() != 0)
       {
         nodeId = nodeSolidModelEntityId = nodeLine = 0;
         nodeX = nodeY = nodeZ = 0;
@@ -289,18 +285,18 @@ int albaOpImporterAnsysCommon::ReadEBLOCK()
 {
   char blockName[254];
   int maxId = 0, numElements = 0;
-  int idMaterial,idTypeElement,idConstants,nNodes, elementNumber, nodes[16], unused;
+  int idMaterial,idTypeElement,idConstants,nNodes, elementNumber, nodes[20], unused;
 
   // EBLOCK,19,SOLID,   3436163,    234932   / EBLOCK,19,SOLID,   3436163     or 
   // EBLOCK,19,SOLID,
   int nReaded = sscanf(m_Line, "%s %d, %d", blockName, &maxId, &numElements);
 
-  GetLine(m_FilePointer, m_Line); //(19i8) Line ignored
+  GetLine(); //(19i8) Line ignored
   
   if(nReaded < 3)
   {
     // CDB from Hypermesh
-    while (GetLine(m_FilePointer, m_Line) != 0 )
+    while (GetLine() != 0 )
     {
       int readedElem=sscanf(m_Line, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &idMaterial,&idTypeElement,&idConstants,&unused,&unused,&unused,&unused,&unused,&nNodes,&unused,&elementNumber,nodes+0,nodes+1,nodes+2,nodes+3,nodes+4,nodes+5,nodes+6,nodes+7);
 
@@ -309,8 +305,8 @@ int albaOpImporterAnsysCommon::ReadEBLOCK()
 
       if(nNodes > 8)
       {
-        GetLine(m_FilePointer, m_Line);
-        sscanf(m_Line, "%d %d %d %d %d %d %d %d", nodes+8,nodes+9,nodes+10,nodes+11,nodes+12,nodes+13,nodes+14,nodes+15);
+        GetLine();
+        sscanf(m_Line, "%d %d %d %d %d %d %d %d %d %d %d %d", nodes+8,nodes+9,nodes+10,nodes+11,nodes+12,nodes+13,nodes+14,nodes+15,nodes+16,nodes+17,nodes+18,nodes+19);
       }
 
       AddElement(elementNumber, nNodes, idTypeElement, idMaterial, nodes);
@@ -321,13 +317,13 @@ int albaOpImporterAnsysCommon::ReadEBLOCK()
     // CDB from Ansys
     for (int index = 0; index < numElements; index++)
     {
-      if(GetLine(m_FilePointer, m_Line) != 0)
+      if(GetLine() != 0)
       {
         sscanf(m_Line, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &idMaterial,&idTypeElement,&idConstants,&unused,&unused,&unused,&unused,&unused,&nNodes,&unused,&elementNumber,nodes+0,nodes+1,nodes+2,nodes+3,nodes+4,nodes+5,nodes+6,nodes+7);
 
         if(nNodes > 8)
         {
-          GetLine(m_FilePointer, m_Line);
+          GetLine();
           sscanf(m_Line, "%d %d %d %d %d %d %d %d", nodes+8,nodes+9,nodes+10,nodes+11,nodes+12,nodes+13,nodes+14,nodes+15);
         }
 
@@ -405,7 +401,7 @@ int albaOpImporterAnsysCommon::ReadCMBLOCK()
     AnsysComponent comp;
     comp.Name = fname + "-" + compName.c_str();
 
-    GetLine(m_FilePointer, m_Line); // (8i10) Line ignored
+    GetLine(); // (8i10) Line ignored
 
     // Create range array
     int *idList = new int[compNum];
@@ -414,7 +410,7 @@ int albaOpImporterAnsysCommon::ReadCMBLOCK()
     int value;
     char *linePointer;
 
-    GetLine(m_FilePointer, m_Line);
+    GetLine();
     {
       linePointer=m_Line;
 
@@ -530,78 +526,3 @@ bool albaOpImporterAnsysCommon::IsInRange(int elemId, int partId)
   return false;
 }
 
-//----------------------------------------------------------------------------
-int albaOpImporterAnsysCommon::GetLine(FILE *fp, char *lineBuffer)
-{
-  char readValue;
-  int readedChars=0;
-
-  do 
-  {
-		if (m_BufferLeft == 0)
-		{
-			m_BufferLeft = fread(m_Buffer,sizeof(char),READ_BUFFER_SIZE,m_FilePointer);
-			m_BufferPointer = 0;
-			//Breaks if EOF is reached
-			if(m_BufferLeft==0)
-				break;
-		}
-
-		lineBuffer[readedChars]=readValue=m_Buffer[m_BufferPointer];
-		readedChars++;
-		m_BufferPointer++;
-		m_BufferLeft--;
-  } while (readValue != '\n');
-
-  lineBuffer[readedChars]=0;
-
-	//Windows translate CR/LF into CR char we need to count a char more for each newline
-	m_BytesReaded+=readedChars+1; 
-  m_ProgressHelper->UpdateProgressBar(((double)m_BytesReaded) * 100 / m_FileSize);
-
-  return readedChars;
-}
-//----------------------------------------------------------------------------
-int albaOpImporterAnsysCommon::ReplaceInString(char *str, char from, char to)
-{
-  int count=0;
-
-  for (int i=0; str[i]!= '\0'; i++)
-  {
-    if (str[i] == from)
-    {
-      str[i]=to;
-      count++;
-    }
-  }
-
-  return count;
-}
-//----------------------------------------------------------------------------
-int albaOpImporterAnsysCommon::ReadInit(albaString &fileName)
-{
-	m_FilePointer = fopen(fileName.GetCStr(), "r");
-
-	if (m_FilePointer == NULL)
-	{
-		if(GetTestMode()==false)
-			albaMessage(_("Error parsing input files! File not found."),_("Error"));
-		else 
-			printf("Error parsing input files! File not found.\n");
-		return ALBA_ERROR;
-	}
-
-	// Calculate file size
-	fseek(m_FilePointer, 0L, SEEK_END);
-	m_FileSize = ftell(m_FilePointer);
-	fseek(m_FilePointer, 0L, SEEK_SET);
-
-	m_Buffer=new char[READ_BUFFER_SIZE];
-	m_BytesReaded = m_BufferLeft = m_BufferPointer = 0;
-}
-//----------------------------------------------------------------------------
-void albaOpImporterAnsysCommon::ReadFinalize()
-{
-	delete [] m_Buffer;
-	fclose(m_FilePointer);
-}

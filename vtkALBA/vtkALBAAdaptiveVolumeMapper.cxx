@@ -1877,6 +1877,18 @@ int vtkALBAAdaptiveVolumeMapper::GetDataType()
   return VTK_VOID;
 }
 
+//----------------------------------------------------------------------------
+bool vtkALBAAdaptiveVolumeMapper::GetInterpolation()
+{
+	return vtkALBAAdaptiveVolumeMapper::Interpolation;
+}
+
+//----------------------------------------------------------------------------
+void vtkALBAAdaptiveVolumeMapper::SetInterpolation(bool val)
+{
+	vtkALBAAdaptiveVolumeMapper::Interpolation = val;
+}
+
 //-------------------------------------------------------------------
 void vtkALBAAdaptiveVolumeMapper::Update() 
 //------------------------------------------------------------------------------

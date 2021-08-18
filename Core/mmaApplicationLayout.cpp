@@ -52,6 +52,12 @@ mmaApplicationLayout::mmaApplicationLayout()
   m_AppPosition[1] = 0;
   m_AppSize[0] = 800;
   m_AppSize[1] = 600;
+	m_LogBarVisibility = m_SideBarVisibility = m_ToolBarVisibility = true;
+
+	m_VMEChooserPosition[0] = 0;
+	m_VMEChooserPosition[1] = 0;
+	m_VMEChooserSize[0] = 550;
+	m_VMEChooserSize[1] = 450;
 }
 //----------------------------------------------------------------------------
 mmaApplicationLayout::~mmaApplicationLayout()
@@ -64,6 +70,20 @@ void mmaApplicationLayout::DeepCopy(const albaAttribute *a)
 { 
   Superclass::DeepCopy(a);
   mmaApplicationLayout *src_layout = (mmaApplicationLayout *)a;
+
+	m_AppMaximized = src_layout->m_AppMaximized;
+	m_AppPosition[0] = src_layout->m_AppPosition[0];
+	m_AppPosition[1] = src_layout->m_AppPosition[1];
+	m_AppSize[0] = src_layout->m_AppSize[0];
+	m_AppSize[1] = src_layout->m_AppSize[1];
+	m_LogBarVisibility = src_layout->m_LogBarVisibility;
+	m_SideBarVisibility = src_layout->m_SideBarVisibility;
+	m_ToolBarVisibility = src_layout->m_ToolBarVisibility;
+
+	m_VMEChooserPosition[0] = src_layout->m_VMEChooserPosition[0];
+	m_VMEChooserPosition[1] = src_layout->m_VMEChooserPosition[1];
+	m_VMEChooserSize[0] = src_layout->m_VMEChooserSize[0];
+	m_VMEChooserSize[1] = src_layout->m_VMEChooserSize[1];
 }
 //----------------------------------------------------------------------------
 bool mmaApplicationLayout::Equals(const albaAttribute *a)
@@ -114,6 +134,22 @@ void mmaApplicationLayout::SetInterfaceElementVisibility(albaString panel_name, 
   }
 }
 //-----------------------------------------------------------------------
+void mmaApplicationLayout::GetVMEChooserInfo(int pos[2], int size[2])
+{
+	pos[0] = m_VMEChooserPosition[0];
+	pos[1] = m_VMEChooserPosition[1];
+	size[0] = m_VMEChooserSize[0];
+	size[1] = m_VMEChooserSize[1];
+}
+//-----------------------------------------------------------------------
+void mmaApplicationLayout::SetVMEChooserInfo(int pos[2], int size[2])
+{
+	m_VMEChooserPosition[0] = pos[0];
+	m_VMEChooserPosition[1] = pos[1];
+	m_VMEChooserSize[0] = size[0];
+	m_VMEChooserSize[1] = size[1];
+}
+//-----------------------------------------------------------------------
 int mmaApplicationLayout::InternalStore(albaStorageElement *parent)
 //-----------------------------------------------------------------------
 {  
@@ -126,6 +162,9 @@ int mmaApplicationLayout::InternalStore(albaStorageElement *parent)
     parent->StoreInteger("TOOLBAR_VISIBILITY", m_ToolBarVisibility);
     parent->StoreInteger("SIDEBAR_VISIBILITY", m_SideBarVisibility);
     parent->StoreInteger("LOGBAR_VISIBILITY", m_LogBarVisibility);
+
+		parent->StoreVectorN("VME_CHOOSER_POSITION", m_VMEChooserPosition,2);
+		parent->StoreVectorN("VME_CHOOSER_SIZE", m_VMEChooserSize,2);
 
     return ALBA_OK;
   }
@@ -144,6 +183,9 @@ int mmaApplicationLayout::InternalRestore(albaStorageElement *node)
     node->RestoreInteger("TOOLBAR_VISIBILITY", m_ToolBarVisibility);
     node->RestoreInteger("SIDEBAR_VISIBILITY", m_SideBarVisibility);
     node->RestoreInteger("LOGBAR_VISIBILITY", m_LogBarVisibility);
+
+		node->RestoreVectorN("VME_CHOOSER_POSITION", m_VMEChooserPosition,2);
+		node->RestoreVectorN("VME_CHOOSER_SIZE", m_VMEChooserSize,2);
 
     return ALBA_OK;
   }

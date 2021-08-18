@@ -112,10 +112,11 @@ void albaGizmoScaleIsotropic::CreatePipeline()
   p1[0] = b[0];
   p1[1] = b[2];
   p1[2] = b[4];
-  p2[0] = b[1];
-  p2[1] = b[3];
-  p2[2] = b[5];
-  d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
+	p2[0] = (b[1] != -1) ? b[1] : 100;
+  p2[1] = (b[3] != -1) ? b[3] : 100;
+  p2[2] = (b[5] != -1) ? b[5] : 100;
+
+	d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
   
   // create the cube
   m_Cube = vtkCubeSource::New();

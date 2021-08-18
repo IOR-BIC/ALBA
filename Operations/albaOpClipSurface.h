@@ -149,12 +149,14 @@ protected:
 	vtkPolyData *m_ClippedPolyData;
 
   int		m_ClipModality;
+	int		m_GeometryModality;
 	int		m_GizmoType;
   int		m_ClipInside;
 	int   m_UseGizmo;
 	int		m_GenerateClippedOutput;
 	int		m_ClipBoundBox;
   bool	m_PlaneCreated;
+
 
 	double m_PlaneWidth;
 	double m_PlaneHeight;

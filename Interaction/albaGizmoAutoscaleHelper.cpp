@@ -411,7 +411,7 @@ void albaGizmoAutoscaleHelper::SetVME( albaVME *vme )
 		inputVME->GetOutput()->GetBounds(m_VMEBounds);
 
 		// roll back
-		inputVME->SetVisibleToTraverse(true);
+		inputVME->SetVisibleToTraverse(false);
 
 	}
 	else
@@ -420,4 +420,8 @@ void albaGizmoAutoscaleHelper::SetVME( albaVME *vme )
 		inputVME->GetOutput()->GetBounds(m_VMEBounds);
 	}
 	
+	m_VMEBounds[1] = (m_VMEBounds[1] != -1) ? m_VMEBounds[1] : 100;
+	m_VMEBounds[3] = (m_VMEBounds[3] != -1) ? m_VMEBounds[3] : 100;
+	m_VMEBounds[5] = (m_VMEBounds[5] != -1) ? m_VMEBounds[5] : 100;
+
 }

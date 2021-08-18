@@ -394,17 +394,22 @@ void albaGUI::Label(albaString label1, albaString *var, bool bold_label, bool bo
 }
 
 //----------------------------------------------------------------------------
-void albaGUI::HintBox(int id, wxString label, wxString title, bool showIcon)
+void albaGUI::HintBox(int id, wxString label, wxString title, int mode, bool showIcon)
 {
 	wxStaticBoxSizer *boxSizer = new wxStaticBoxSizer(wxHORIZONTAL, this, title);
 
-	if(showIcon)
+	if (showIcon)
 	{
+		wxString iconName = "HINT_IMAGE_ICON";
+		if (mode == 1) iconName = "INFO_IMAGE_ICON";
+		if (mode == 2) iconName = "WARN_IMAGE_ICON";
+
 		int w_id = GetWidgetId(id);
-		wxBitmap bitmap = albaPictureFactory::GetPictureFactory()->GetBmp("HINT_IMAGE_ICON");
+		wxBitmap bitmap = albaPictureFactory::GetPictureFactory()->GetBmp(iconName);
 		wxBitmapButton *bmpButton = new wxBitmapButton(this, w_id, bitmap, wxPoint(0, 0), wxSize(19, 20));
 		bmpButton->SetValidator(albaGUIValidator(this, w_id, bmpButton));
 
+		boxSizer->GetStaticBox()->SetBackgroundColour(wxColor(255, 255, 224));
 		boxSizer->Add(bmpButton);
 		boxSizer->Add(new wxStaticText(this, NULL, " ")); // Separator
 	}
@@ -975,7 +980,7 @@ void albaGUI::Float(int id, albaString label, float* var, float min, float max, 
 	}
 }
 //----------------------------------------------------------------------------
-void albaGUI::Double(int id, albaString label, double* var, double min, double max, int decimal_digit, albaString tooltip, bool labelAlwaysEnable, double customSizer)
+void albaGUI::Double(int id, albaString label, double* var, double min, double max, int decimal_digit, albaString tooltip, bool labelAlwaysEnable, double customSizer, wxColour fontColor)
 {
 	int w_id;
 	int fw = FW;
@@ -997,6 +1002,7 @@ void albaGUI::Double(int id, albaString label, double* var, double min, double m
 		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(lw, LH), m_EntryStyle);
 		text->SetValidator(albaGUIValidator(this, w_id, text, var, min, max, decimal_digit));
 		text->SetFont(m_Font);
+		text->SetForegroundColour(fontColor);
 		if (!tooltip.IsEmpty())
 			text->SetToolTip(tooltip.GetCStr());
 		Add(text, 0, wxALL, M);
@@ -1006,12 +1012,14 @@ void albaGUI::Double(int id, albaString label, double* var, double min, double m
 		wxStaticText *lab = new wxStaticText(this, labelAlwaysEnable ? -1 : GetWidgetId(id), label.GetCStr(), dp, wxSize(lw, LH), labStyle);
 		if (m_UseBackgroundColor)
 			lab->SetBackgroundColour(m_BackgroundColor);
+		lab->SetForegroundColour(fontColor);
 		lab->SetFont(m_Font);
-
+		
 		w_id = GetWidgetId(id);
 		wxTextCtrl  *text = new wxTextCtrl(this, w_id, "", dp, wxSize(dw, LH), m_EntryStyle);
 		text->SetValidator(albaGUIValidator(this, w_id, text, var, min, max, decimal_digit));
 		text->SetFont(m_Font);
+		text->SetForegroundColour(fontColor);
 		if (!tooltip.IsEmpty())
 			text->SetToolTip(tooltip.GetCStr());
 

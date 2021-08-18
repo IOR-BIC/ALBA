@@ -19,6 +19,7 @@
 
 #include "albaOp.h"
 #include "albaVME.h"
+#include "albaVect3d.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -34,7 +35,8 @@ public:
 	albaOpVOIDensity(const wxString &label = "VOIDensity");
 	~albaOpVOIDensity(); 
 	virtual void OnEvent(albaEventBase *alba_event);
-  
+
+
   albaTypeMacro(albaOpVOIDensity, albaOp);
 
   /** return a copy of itself, this needs to put the operation into the undo stack. */
@@ -52,8 +54,8 @@ public:
 	/** Execute the operation. */
 	void OpUndo();
 
-	/**	Set surface of input in test mode*/
-	void SetSurface(albaVME *Surface){m_Surface=Surface;};
+	/** Called on Op Stop */
+	virtual void OpStop(int result);
 
 	/**	Return the min scalar*/
 	double GetMinScalar(){return m_MinScalar;};
@@ -73,11 +75,24 @@ public:
 	/** Extract scalars from input volume that are inside the choosed surface. */
 	void ExtractVolumeScalars();
 
+	/** Set Surface */
+	int SetSurface(albaVME *surface);
+
+
  	static bool OutputSurfaceAccept(albaVME* Node) {return(Node != NULL && (Node->GetOutput()->IsA("albaVMEOutputSurface")));};
 
 protected:
+
+	/** Stores a tag on the selected surface */
+	void SetDoubleTag(wxString tagName, double value);
+
+	void CreatePointSamplingOutput();
+
+	virtual void CreateGui();
+
   albaVME        *m_Surface;
   vtkDoubleArray *m_VOIScalars;
+	std::vector<albaVect3d> m_VOICoords;
   albaString       m_NumberOfScalarsString;
   int             m_NumberOfScalars;
   albaString       m_MeanScalarString;

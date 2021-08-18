@@ -105,13 +105,13 @@ void vtkALBATubeFilterTest::TestTCoords()
 	
 	//
 	filter->SetGenerateTCoordsToNormalizedLength();
-	CPPUNIT_ASSERT(filter->GetGenerateTCoordsAsString() == "GenerateTCoordsFromNormalizedLength");
+	CPPUNIT_ASSERT(!strcmp(filter->GetGenerateTCoordsAsString(), "GenerateTCoordsFromNormalizedLength"));
 
 	filter->SetGenerateTCoordsToUseLength();
-	CPPUNIT_ASSERT(filter->GetGenerateTCoordsAsString() == "GenerateTCoordsFromLength");
+	CPPUNIT_ASSERT(!strcmp(filter->GetGenerateTCoordsAsString(), "GenerateTCoordsFromLength"));
 
 	filter->SetGenerateTCoordsToUseScalars();
-	CPPUNIT_ASSERT(filter->GetGenerateTCoordsAsString() == "GenerateTCoordsFromScalar");
+	CPPUNIT_ASSERT(!strcmp(filter->GetGenerateTCoordsAsString(), "GenerateTCoordsFromScalar"));
 }
 
 //----------------------------------------------------------------------------
@@ -156,16 +156,16 @@ void vtkALBATubeFilterTest::TestRadius()
 
 	//
 	filter->SetVaryRadiusToVaryRadiusByVector();
-	CPPUNIT_ASSERT(filter->GetVaryRadiusAsString() == "VaryRadiusByVector");
+	CPPUNIT_ASSERT(!strcmp(filter->GetVaryRadiusAsString(),"VaryRadiusByVector"));
 
 	filter->SetVaryRadiusToVaryRadiusByScalar();
-	CPPUNIT_ASSERT(filter->GetVaryRadiusAsString() == "VaryRadiusByScalar");
+	CPPUNIT_ASSERT(!strcmp(filter->GetVaryRadiusAsString(), "VaryRadiusByScalar"));
 
 	filter->SetVaryRadiusToVaryRadiusByAbsoluteScalar();
-	CPPUNIT_ASSERT(filter->GetVaryRadiusAsString() == "VaryRadiusByAbsoluteScalar");
+	CPPUNIT_ASSERT(!strcmp(filter->GetVaryRadiusAsString(), "VaryRadiusByAbsoluteScalar"));
 
 	filter->SetVaryRadiusToVaryRadiusOff();
-	CPPUNIT_ASSERT(filter->GetVaryRadiusAsString() == "VaryRadiusOff");
+	CPPUNIT_ASSERT(!strcmp(filter->GetVaryRadiusAsString(), "VaryRadiusOff"));
 }
 
 //----------------------------------------------------------------------------

@@ -42,6 +42,7 @@
 #include "vtkRenderWindowInteractor.h"
 
 #include <iostream>
+#include "vtkActor2DCollection.h"
 
 enum PIPE_SURFACE_ACTORS
   {
@@ -55,21 +56,21 @@ enum TESTS_PIPE_SURFACE
 {
   BASE_TEST,
 	WIREFRAME_TEST,
+	POINTS_TEST,
   CELL_NORMAL_TEST,
   SCALAR_TEST,
   VTK_PROPERTY_TEST,
 	EDGE_TEST,
+	SCALAR_ACTOR_TEST,
   NUMBER_OF_TEST,
 };
 
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTest::TestFixture()
-//----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTest::BeforeTest()
-//----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
   vtkNEW(m_RenderWindow);
@@ -85,7 +86,6 @@ void albaPipeSurfaceTest::BeforeTest()
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTest::AfterTest()
-//----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);
   vtkDEL(m_RenderWindow);
@@ -93,7 +93,6 @@ void albaPipeSurfaceTest::AfterTest()
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTest::TestPipeExecution()
-//----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
   vtkDataSetReader *Importer;
@@ -119,10 +118,11 @@ void albaPipeSurfaceTest::TestPipeExecution()
   
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *sceneNode;
-  sceneNode = new albaSceneNode(NULL,NULL,surface, NULL);
+  sceneNode = new albaSceneNode(NULL,NULL,surface, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   albaPipeSurface *pipeSurface = new albaPipeSurface;
+	pipeSurface->m_RenFront = m_Renderer;
   pipeSurface->Create(sceneNode);
   
   ////////// ACTORS List ///////////////
@@ -131,10 +131,12 @@ void albaPipeSurfaceTest::TestPipeExecution()
 	const char *strings[NUMBER_OF_TEST];
 	strings[0] = "BASE_TEST";
 	strings[1] = "WIREFRAME_TEST";
-	strings[2] = "CELL_NORMAL_TEST";
-	strings[3] = "SCALAR_TEST";
-	strings[4] = "VTK_PRPOERTY_TEST";
-	strings[5] = "EDGE_TEST";
+	strings[2] = "POINTS_TEST";
+	strings[3] = "CELL_NORMAL_TEST";
+	strings[4] = "SCALAR_TEST";
+	strings[5] = "VTK_PRPOERTY_TEST";
+	strings[6] = "EDGE_TEST";
+	strings[7] = "SCALAR_ACTOR_TEST";
 	
   for(int i=0;i<NUMBER_OF_TEST;i++)
   {
@@ -143,8 +145,12 @@ void albaPipeSurfaceTest::TestPipeExecution()
 		case BASE_TEST:
 			break;
 		case WIREFRAME_TEST:
-				pipeSurface->SetWireframeOn();
-				pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_WIREFRAME));
+			pipeSurface->SetRepresentation(albaPipeGenericPolydata::WIREFRAME_REP);
+			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_REPRESENTATION));
+			break;
+		case POINTS_TEST:
+			pipeSurface->SetRepresentation(albaPipeGenericPolydata::POINTS_REP);
+			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_REPRESENTATION));
 			break;
 		case CELL_NORMAL_TEST:
 				pipeSurface->SetNormalsTypeToCells();
@@ -162,13 +168,29 @@ void albaPipeSurfaceTest::TestPipeExecution()
 				pipeSurface->SetEdgesVisibilityOn();
 				pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_EDGE_VISIBILITY));
 			break;
+		case SCALAR_ACTOR_TEST:
+			pipeSurface->Select(true);
+			pipeSurface->SetScalarMapActive(true);
+			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_SCALAR_MAP_ACTIVE));
+			pipeSurface->ShowScalarBarActor(true);
+			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_ENABLE_SCALAR_BAR));
+			break;
 		default:
 			break;
 		}
 				
+		//Store Actors 2D
+		std::vector <vtkActor2D *> act2dList;
+		vtkActor2DCollection * actors2d = pipeSurface->m_RenFront->GetActors2D();
+		vtkActor2D * actor2D;
+		actors2d->InitTraversal();
+		while (actor2D = actors2d->GetNextActor2D())
+		{
+			act2dList.push_back(actor2D);
+		}
+
 		//Updating Actor Lists
 		pipeSurface->GetAssemblyFront()->GetActors(actorList);
-   
 		actorList->InitTraversal();
 		vtkProp *actor = actorList->GetNextProp();
 		m_Renderer->RemoveAllProps();
@@ -176,6 +198,12 @@ void albaPipeSurfaceTest::TestPipeExecution()
 		{   
 			m_Renderer->AddActor(actor);
 			actor = actorList->GetNextProp();
+		}
+
+		//Restore 2d actor list
+		for (int j = 0; j < act2dList.size(); j++)
+		{
+			m_Renderer->AddActor2D(act2dList[j]);
 		}
 		
 		// Rendering - check images 
@@ -194,8 +222,9 @@ void albaPipeSurfaceTest::TestPipeExecution()
 		case BASE_TEST:
 			break;
 		case WIREFRAME_TEST:
-			pipeSurface->SetWireframeOff();
-			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_WIREFRAME));
+		case POINTS_TEST:
+			pipeSurface->SetRepresentation(albaPipeGenericPolydata::SURFACE_REP);
+			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_REPRESENTATION));
 			break;
 		case CELL_NORMAL_TEST:
 			pipeSurface->SetNormalsTypeToPoints();
@@ -213,6 +242,13 @@ void albaPipeSurfaceTest::TestPipeExecution()
 			pipeSurface->SetEdgesVisibilityOff();
 			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_EDGE_VISIBILITY));
 			break;
+		case SCALAR_ACTOR_TEST:
+			pipeSurface->SetScalarMapActive(false);
+			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_SCALAR_MAP_ACTIVE));
+			pipeSurface->ShowScalarBarActor(false);
+			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_ENABLE_SCALAR_BAR));
+			pipeSurface->Select(false);
+			break;
 		default:
 			break;
 		}
@@ -226,7 +262,6 @@ void albaPipeSurfaceTest::TestPipeExecution()
 
 //----------------------------------------------------------------------------
 vtkProp *albaPipeSurfaceTest::SelectActorToControl(vtkPropCollection *propList, int index)
-//----------------------------------------------------------------------------
 {
   propList->InitTraversal();
   vtkProp *actor = propList->GetNextProp();

@@ -25,7 +25,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "CMatrixTestM1.h"
 
-#include "vtkALBAPolyDataDeformation_M1.cpp"
+#include "vtkALBAPolyDataDeformation_M1.h"
 
 //-------------------------------------------------------------------------
 void CMatrixTestM1::TestDynamicAllocation()
@@ -74,10 +74,6 @@ void CMatrixTestM1::TestGetMinSize()
   vtkALBAPolyDataDeformation_M1::CMatrix<double> *M1 = new vtkALBAPolyDataDeformation_M1::CMatrix<double>(15,22);
   CPPUNIT_ASSERT(M1->GetMinSize() == 15);
   delete M1;
-
-  vtkALBAPolyDataDeformation_M1::CMatrix<int> *M2 = new vtkALBAPolyDataDeformation_M1::CMatrix<int>(18,7);
-  CPPUNIT_ASSERT(M2->GetMinSize() == 7);
-  delete M2;
 }
 //-------------------------------------------------------------------------
 void CMatrixTestM1::TestOperator()

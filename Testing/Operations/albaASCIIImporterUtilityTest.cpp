@@ -119,24 +119,14 @@ void albaASCIIImporterUtilityTest::GetMatrixTest()
   albaASCIIImporterUtility *utility = new albaASCIIImporterUtility();
   albaString filename = ALBA_DATA_ROOT;
 
-  vnl_matrix<double> m1;
+	/* Create a Matrix equals to the one stored in the ASCII file;
+	1.0 2.0 3.0
+	4.0 5.0 6.0
+	7.0 8.0 9.0
+	*/
 
-  /* Create a Matrix equals to the one stored in the ASCII file;
-  1.0 2.0 3.0
-  4.0 5.0 6.0
-  7.0 8.0 9.0
-  */
-
-  m1.set_size(3,3);
-  m1.put(0,0,1.0);
-  m1.put(0,1,2.0);
-  m1.put(0,2,3.0);
-  m1.put(1,0,4.0);
-  m1.put(1,1,5.0);
-  m1.put(1,2,6.0);
-  m1.put(2,0,7.0);
-  m1.put(2,1,8.0);
-  m1.put(2,2,9.0);
+	double m1[3][3] = { {1,2,3},{4,5,6},{7,8,9} };
+	double row[3];
 
 
   filename<<"/Test_ASCIIImporterUtility/matrix_01.txt";
@@ -145,10 +135,14 @@ void albaASCIIImporterUtilityTest::GetMatrixTest()
  
   CPPUNIT_ASSERT(utility->ReadFile(filename) == ALBA_OK);
 
-  vnl_matrix<double> m2 = utility->GetMatrix();
+	for (int i = 0; i < 3; i++)
+	{
+		utility->ExtractRow(i, row);
+		for (int j = 0; j < 3; j++)
+			CPPUNIT_ASSERT(row[j] == m1[i][j]);
+	}
 
-  CPPUNIT_ASSERT(m2 == m1);
-  cppDEL(utility);
+	cppDEL(utility);
 }
 //----------------------------------------------------------------------------
 void albaASCIIImporterUtilityTest::ExtractRowTest()

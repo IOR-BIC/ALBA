@@ -82,6 +82,9 @@ void albaTest::setUp()
 	//NOTE, wxLog produces some memory leaks, set false during test
 	wxLog::EnableLogging(true);
 
+	//Resets Random Color for test repeatability
+	albaResetRandomColor();
+
 	//Run Test Specific Stuff
 	BeforeTest();
 }

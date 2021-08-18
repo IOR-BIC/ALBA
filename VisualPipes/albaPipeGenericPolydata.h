@@ -55,12 +55,20 @@ public:
 	/** IDs for the GUI */
 	enum PIPE_SURFACE_WIDGET_ID
 	{
-		ID_WIREFRAME = albaPipeWithScalar::ID_LAST,
+		ID_REPRESENTATION = albaPipeWithScalar::ID_LAST,
     ID_NORMALS_TYPE,
     ID_EDGE_VISIBILITY,
-		ID_BORDER_CHANGE,
+		ID_THICKNESS,
     ID_USE_VTK_PROPERTY,
 		ID_LAST,
+	};
+
+	/** IDs for the GUI */
+	enum REPRESENTATIONS
+	{
+		SURFACE_REP,
+		WIREFRAME_REP,
+		POINTS_REP
 	};
 
   /** Get assembly front/back */
@@ -77,10 +85,6 @@ public:
   /** Set the actor picking*/
 	void SetActorPicking(int enable = true);
 
-  /** Set the actor wire frame*/
-  void SetWireframeOn();
-  void SetWireframeOff();
-
 	/** Set Normal type generation */
 	void SetNormalsTypeToPoints();
 	void SetNormalsTypeToCells();
@@ -94,6 +98,9 @@ public:
   /** Set the actor border visible or not*/
   void SetEdgesVisibilityOn();
   void SetEdgesVisibilityOff();
+
+	/** Set the reppresentation Type possibility are Surface, Wireframe, Points */
+	virtual void SetRepresentation(REPRESENTATIONS rep);
   
   /** Set VTK Property to visualize the material of vme*/
   void SetUseVTKProperty(int value){m_UseVTKProperty = value;};
@@ -120,11 +127,12 @@ protected:
 
   albaGUIMaterialButton       *m_MaterialButton;
 
-  int                      m_Wireframe;
+  int          m_Representation;
 	int											 m_ShowCellsNormals;
   int                      m_BorderElementsWiredActor;
   int                      m_UseVTKProperty;
 	int											 m_FlipNormals;
+	int											 m_SkipNormalFilter;
 	double				           m_Border;
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/

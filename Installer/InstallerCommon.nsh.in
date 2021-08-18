@@ -11,6 +11,7 @@
 !include MUI2.nsh
 !include Registry.nsh
 !include EnumUsersReg.nsh
+!include x64.nsh
 
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\${PRODUCT_EXE_NAME}"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -120,7 +121,7 @@ Function CheckIfVS2015RedistributablePackageIsAlreadyInstalled
 	to install this application. The installer will now install them."
 		 
 		;ExecShell "open" "https://www.microsoft.com/en-us/download/details.aspx?id=30679"
-		ExecWait '"$INSTDIR\bin\vcredist_@INSTALLER_ARCH@.exe"'
+		ExecWait '"$INSTDIR\bin\vc_redist.@INSTALLER_ARCH@.exe"'
 FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -160,6 +161,15 @@ FunctionEnd
 ;; onInit 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
 Function .onInit
+
+	;"Check InstallDir"
+	${If} ${RunningX64}
+		;MessageBox MB_OK "Running on 64-bit Windows"
+		StrCpy $INSTDIR "$PROGRAMFILES64\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}"
+	${Else}
+		;MessageBox MB_OK "Running on 32-bit Windows"
+	${EndIf}
+
 	UserInfo::GetAccountType
 	pop $0
 	${If} $0 != "admin" ;Require admin rights on NT4+
@@ -167,6 +177,7 @@ Function .onInit
 		SetErrorLevel 740 ;ERROR_ELEVATION_REQUIRED
 		Quit
 	${EndIf}
+	
 FunctionEnd
 
 Var removeAllcheckbox
@@ -201,7 +212,8 @@ FunctionEnd
 	Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 	OutFile "Setup_${PRODUCT_NAME}_${PRODUCT_VERSION}.exe"
 
-	InstallDir "$PROGRAMFILES\${PRODUCT_NAME}"
+	InstallDir "$PROGRAMFILES\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}"
+	
 	InstallDirRegKey HKCU "${PRODUCT_DIR_REGKEY}" ""
 
 	ShowInstDetails show
