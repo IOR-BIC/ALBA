@@ -17,9 +17,10 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef __vtkALBACircleSource_h
 #define __vtkALBACircleSource_h
 
+#include "albaConfigure.h"
 #include "vtkPolyDataSource.h"
 
-class VTK_GRAPHICS_EXPORT vtkALBACircleSource : public vtkPolyDataSource 
+class ALBA_EXPORT vtkALBACircleSource : public vtkPolyDataSource
 {
 public:
   static vtkALBACircleSource *New();
