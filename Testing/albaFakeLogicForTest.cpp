@@ -128,3 +128,9 @@ albaViewManager * albaFakeLogicForTest::GetViewManager()
 {
 	return NULL;
 }
+
+//----------------------------------------------------------------------------
+albaProsthesesDBManager * albaFakeLogicForTest::GetProsthesesDBManager()
+{
+	return NULL;
+}
