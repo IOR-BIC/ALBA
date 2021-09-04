@@ -1,17 +1,16 @@
 /*=========================================================================
+Program:   ALBA (Agile Library for Biomedical Applications)
+Module:    albaOpAddLandmark.h
+Language:  C++
+Date:      $Date: 2021-01-01 12:00:00 $
+Version:   $Revision: 1.0.0.0 $
+Authors:   Paolo Quadrani, Nicola Vanella
+==========================================================================
+Copyright (c) BIC-IOR 2021 (https://github.com/IOR-BIC)
 
- Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaOpAddLandmark
- Authors: Paolo Quadrani, Nicola Vanella
- 
- Copyright (c) BIC
- All rights reserved. See Copyright.txt or
-
-
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notice for more information.
-
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
 #ifndef __albaOpAddLandmark_H__
@@ -23,13 +22,14 @@
 #include "albaOp.h"
 
 #include "albaEvent.h"
+#include "albaInteractorPERPicker.h"
 #include "albaString.h"
 
 #include <vector>
 
 #include <xercesc/util/XercesDefs.hpp>
 #include <xercesc/dom/DOM.hpp>
-#include "albaInteractorPERPicker.h"
+
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -53,7 +53,7 @@ EXPORT_STL_VECTOR(ALBA_EXPORT,albaVMELandmark*);
 //----------------------------------------------------------------------------
 // albaOpAddLandmark :
 //----------------------------------------------------------------------------
-class ALBA_EXPORT albaOpAddLandmark: public albaOp
+class ALBA_EXPORT albaOpAddLandmark : public albaOp
 {
 public:
 
@@ -62,22 +62,28 @@ public:
 	//----------------------------------------------------------------------------
 	enum ADD_LANDMARK_ID
 	{
-		ID_LOAD = MINID,
-		ID_SAVE,
+		ID_LOAD_DICTIONARY = MINID,
+		ID_SAVE_DICTIONARY,
+
+		ID_LANDMARK_NAME,
+		ID_LANDMARK_POSITION,
+		ID_LANDMARK_RADIUS,
+		ID_LANDMARK_ADD,
+		ID_LANDMARK_REMOVE,
+
 		ID_ADD_TO_CURRENT_TIME,
-		ID_CHANGE_POSITION,
-		ID_CHANGE_NAME,
-		ID_ADD_LANDMARK,
-		ID_REMOVE_LANDMARK,
 		ID_CHANGE_TIME,
 		ID_SHOW_GROUP,
-		ID_RADIUS,
+
 	};
 
 	albaOpAddLandmark(const wxString &label = "AddLandmark  \tCtrl+A");
-	~albaOpAddLandmark(); 
+	~albaOpAddLandmark();
 	virtual void OnEvent(albaEventBase *alba_event);
-		
+
+	
+	void UpdateGui();
+
 	albaTypeMacro(albaOpAddLandmark, albaOp);
 
 	virtual albaOp* Copy();
@@ -94,11 +100,15 @@ public:
 	/** Makes the undo for the operation. */
 	void OpUndo();
 
-	void SetCloudName(albaString name);
+	albaVME* GetPickedVme() { return m_PickedVme; };
+	albaVMELandmarkCloud* GetCloud() { return m_Cloud; };
 
-  /** Add landmark to the cloud */
-  void AddLandmark(double pos[3]);
-	
+	void SetCloudName(albaVMELandmarkCloud *cloud, albaString name);
+	void SetCloudColor(albaVMELandmarkCloud *cloud, double r, double g, double b, double a);
+
+	/** Add landmark to the cloud */
+	void AddLandmark(double pos[3]);
+
 	/** Remove landmark from the cloud and tree */
 	void RemoveLandmark();
 
@@ -107,27 +117,20 @@ public:
 
 	/** Deselect landmark to the cloud */
 	void DeselectLandmark();
-
-	void LoadDictionary(wxString fileName = "");
-	int SaveDictionary(wxString fileName ="");
-
-	albaVME* GetPickedVme(){return m_PickedVme;};
-  albaVMELandmarkCloud* GetCloud(){return m_Cloud;};
-
-  void SetLandmarkName(albaString name){m_LandmarkName = name;};
-
-	void EnableAddMode(bool mode) { m_AddModeActive = mode; };
-
-	void EnableShowAllMode(bool mode) { m_ShowAllMode = mode; };
-
+	
+	void SetLandmarkName(albaString name);
+	void SetLandmarkPosition(double pos[3]);
 	void SetLandmarkRadius(double radius);
 
+	void EnableAddMode(bool mode) { m_AddModeFlag = mode; };
+	void EnableShowAllMode(bool mode) { m_ShowAllMode = mode; };
+
+	void LoadDictionary(wxString fileName = "");
+	int SaveDictionary(wxString fileName = "");
+	
 protected:
 	/** Create the AddLandmarks interface. */
 	virtual void CreateGui();
-
-	/** Delete the AddLandmarks interface. */
-	void DeleteGui();
 
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
@@ -135,64 +138,62 @@ protected:
 	/** Restore landmarks from vector. */
 	void RestoreLandmarkVect(std::vector<albaVMELandmark*> &landmarkVect);
 
-	/** Set the color property of the material*/
-	void SetMaterialRGBA(mmaMaterial *material, double r, double g, double b, double a);
-
 	int LoadLandmarksDefinitions(wxString fileName);
 	int SaveLandmarksDefinitions(const char *landmarksFileName);
 
 	bool CheckNodeElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node, const char *elementName);
 	albaString GetElementAttribute(XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node, const char *attributeName);
+	void CheckEnableOkCondition();
 
 	int LoadLandmarksFromVME();
-	void ShowLandmarkGroup();
 
-	void CheckEnableOkCondition();
+	void ShowLandmarkGroup();
 
 	void PushUniqueItem(wxString item);
 
 	int m_AddToCurrentTime;
 
-  albaVMELandmarkCloud	*m_Cloud;
-	albaVME      				*m_PickedVme;
-
-	albaVMELandmarkCloud	*m_SelectedLandmarkCloud;
-	albaVMELandmark *m_CurrentLandmark;
-	albaVMELandmark *m_SelectedLandmark;
-
 	std::vector<albaVMELandmark *> m_LandmarkUndoVetc;
 	std::vector<albaVMELandmark *> m_LandmarkRedoVect;
 
+	albaVME *m_PickedVme;
+
+	albaVMELandmarkCloud *m_Cloud;
+	albaVMELandmarkCloud *m_SelectedLandmarkCloud;
+	albaVMELandmark *m_CurrentLandmark;
+	albaVMELandmark *m_SelectedLandmark;
+
 	std::vector<StringVector> m_LandmarkNameVect;
-	StringVector							m_LocalLandmarkNameVect;
-	StringVector							m_AllItemsNameVect;
+	StringVector m_LocalLandmarkNameVect;
+	StringVector m_AllItemsNameVect;
+	
+	albaString m_CloudName;
+	albaString m_LandmarkName;
+	albaString m_SelectedLandmarkName;
 
-	bool					m_CloudCreatedFlag;
-	bool					m_AddModeActive;
-	bool					m_AddLandmarkMode;
-	bool					m_HasSelection;
-	bool					m_FirstOpDo;
-	bool					m_DictionaryLoaded;
+	double m_LandmarkPosition[3]{ 0,0,0 };
+	double m_LandmarkRadius;
+	double m_OldColorCloud[4];
 
-	albaString			m_CloudName;
-	albaString			m_LandmarkName;
-	albaString			m_SelectedLandmarkName;
+	bool m_IsCloudCreated;
+	bool m_AddModeFlag;
 
-	bool					m_ShowAllMode;
-	int						m_LandmarkNameCount;
-	int						m_ShowMode;
-	wxComboBox		*m_ShowComboBox;
+	bool m_FirstOpDo;
+	bool m_DictionaryLoaded;
+	bool m_ShowAllMode;
+	int m_LandmarkNameCount;
+	int m_ShowMode;
 
-	albaString			m_RemoveMessage;
+	wxComboBox *m_ShowComboBox;
 
-  albaInteractorPERPicker	*m_LandmarkPicker;
-  albaInteractor       *m_OldBehavior;
+	albaString m_RemoveMessage;
 
-	double								m_LandmarkPosition[3];
-	double								m_OldColorCloud[4];
-	double								m_Radius;
-  albaGUINamedPanel		*m_GuiPanel;
-  albaGUIDictionaryWidget *m_Dict;
+	albaInteractorPERPicker	*m_LandmarkPicker;
+	albaInteractor *m_OldBehavior;
+
+
+	albaGUINamedPanel *m_GuiPanel;
+	albaGUIDictionaryWidget *m_Dict;
 
 	friend class albaOpAddLandmarkTest;
 };
