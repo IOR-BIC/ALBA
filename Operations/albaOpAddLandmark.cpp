@@ -606,7 +606,8 @@ void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 	m_LandmarkName = "";
 	m_LandmarkPosition[0] = m_LandmarkPosition[1] = m_LandmarkPosition[2] = 0.0;
 
-	m_SelectedItem = m_LandmarkGuiDict->GetItemIndex(name);
+	if (m_LandmarkGuiDict)
+		m_SelectedItem = m_LandmarkGuiDict->GetItemIndex(name);
 
 	m_SelectedLandmark = m_Cloud->GetLandmark(name);
 	if (m_SelectedLandmark)
