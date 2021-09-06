@@ -29,6 +29,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaGUIDictionaryWidget.h"
 #include "albaInteractor.h"
 #include "albaInteractorPicker.h"
+#include "albaLogicWithManagers.h"
 #include "albaVME.h"
 #include "albaVMELandmark.h"
 #include "albaVMELandmarkCloud.h"
@@ -61,51 +62,48 @@ albaOp(label)
 	m_LandmarkUndoVetc.clear();
 	m_LandmarkRedoVect.clear();
 
+	m_GroupsNameVect.clear();
+	m_LandmarkGroupVect.clear();
 	m_LandmarkNameVect.clear();
-	m_LocalLandmarkNameVect.clear();
-	m_AllItemsNameVect.clear();
 
 	m_PickedVme = NULL;
 	m_LandmarkPicker = NULL;
-	m_OldBehavior = NULL;
 
 	m_Cloud = NULL;
-	m_SelectedLandmarkCloud = NULL;
-	m_CurrentLandmark = NULL;
-	m_SelectedLandmark = NULL;
+	m_SelectedGroup = 0;
+	m_SelectedLandmark = -1;
 
-	m_Dict = NULL;
+	m_AuxLandmarkCloud = NULL;
+	m_AuxLandmark = NULL;
+
+	m_GroupComboBox = NULL;
+	m_LandmarkGuiDict = NULL;
+	m_SelectedItem = -1;
 
 	m_CloudName = "New landmark cloud";
 	m_LandmarkName = "";
-	m_SelectedLandmarkName = "Add_New_Landmark";
-	m_LandmarkNameCount = 1;
-	m_LandmarkRadius = -1;
+	m_LandmarkRadius = 0.1;
+
+	m_LandmarkNameFromDef = "";
+	m_AddLandmarkFromDef = false;
 
 	m_RemoveMessage = "";
 
 	// Flags
-	m_ShowMode = 0;
-	m_ShowAllMode = true;
-
 	m_AddModeFlag = true;
 
 	m_IsCloudCreated = false;
-
-	//m_AddLandmarkMode = true;
-
 	m_FirstOpDo = true;
 	m_DictionaryLoaded = false;
-
-
 }
 //----------------------------------------------------------------------------
 albaOpAddLandmark::~albaOpAddLandmark()
 {
+	m_GroupsNameVect.clear();
+	m_LandmarkGroupVect.clear();
 	m_LandmarkNameVect.clear();
-	m_LocalLandmarkNameVect.clear();
-	m_AllItemsNameVect.clear();
 
+	// 
 	for (int i=0; i< m_LandmarkUndoVetc.size(); i++)
 	{
 		albaDEL(m_LandmarkUndoVetc[i]);
@@ -113,6 +111,7 @@ albaOpAddLandmark::~albaOpAddLandmark()
 
 	m_LandmarkUndoVetc.clear();
 
+	//
 	for (int i = 0; i < m_LandmarkRedoVect.size(); i++)
 	{
 		albaDEL(m_LandmarkRedoVect[i]);
@@ -120,6 +119,7 @@ albaOpAddLandmark::~albaOpAddLandmark()
 
 	m_LandmarkRedoVect.clear();
 
+	//
 	albaDEL(m_LandmarkPicker);
 
 	if (m_IsCloudCreated)
@@ -148,7 +148,7 @@ void albaOpAddLandmark::OpRun()
 		if (m_Input->IsALBAType(albaVMELandmarkCloud))
 		{
 			// Add a new landmark to existent landmarkCloud
-			m_Cloud = (albaVMELandmarkCloud*)m_Input;
+			m_Cloud = albaVMELandmarkCloud::SafeDownCast(m_Input);
 			m_PickedVme = m_Input->GetParent();
 		}
 		else if (m_Input->IsALBAType(albaVMELandmark))
@@ -160,6 +160,7 @@ void albaOpAddLandmark::OpRun()
 		}
 		else
 		{
+			// Create New LandmarkCloud
 			albaNEW(m_Cloud);
 			m_Cloud->SetName(m_CloudName);
 			if (m_TestMode) m_Cloud->TestModeOn();
@@ -168,10 +169,8 @@ void albaOpAddLandmark::OpRun()
 
 			// Calculate Landmark radius
 			vtkDataSet * vtkData = m_PickedVme->GetOutput()->GetVTKData();
-			if (vtkData)
-				SetLandmarkRadius(vtkData->GetLength() / 60.0);
-			else
-				SetLandmarkRadius(7.0);
+			double radius = (vtkData != NULL) ? vtkData->GetLength() / 60.0 : 7.0;
+			SetLandmarkRadius(radius);
 
 			m_Cloud->ReparentTo(m_PickedVme);
 
@@ -186,18 +185,6 @@ void albaOpAddLandmark::OpRun()
 
 		albaEventMacro(albaEvent(this, PER_PUSH, (albaObject *)(m_LandmarkPicker)));
 		m_LandmarkPicker->SetListener(this);
-
-		// Create Selected LandmarkCloud
-		albaNEW(m_SelectedLandmarkCloud);
-		m_SelectedLandmarkCloud->SetName(_("Selected Landmark cloud"));
-		m_SelectedLandmarkCloud->SetRadius(m_Cloud->GetRadius());
-		m_SelectedLandmarkCloud->ReparentTo(m_PickedVme);
-
-		if (m_TestMode)	m_SelectedLandmarkCloud->TestModeOn();
-
-		albaNEW(m_SelectedLandmark);
-		m_SelectedLandmark->SetName(_("Selected Landmark"));
-		m_SelectedLandmark->ReparentTo(m_SelectedLandmarkCloud);
 	}
 
 	// Save old color
@@ -206,32 +193,42 @@ void albaOpAddLandmark::OpRun()
 	m_OldColorCloud[1] = material->m_Diffuse[1];
 	m_OldColorCloud[2] = material->m_Diffuse[2];
 	m_OldColorCloud[3] = material->m_Opacity;
-	
+
 	// Set Landmarks color 
-	SetCloudColor(m_SelectedLandmarkCloud, 0.1, 0.1, 1.0, 0.8);
 	SetCloudColor(m_Cloud, 1.0, 0.1, 0.1, 0.8);
 
-	GetLogicManager()->CameraUpdate();
+	m_GroupsNameVect.push_back("Show All");
+	StringVector newVect;
+	m_LandmarkGroupVect.push_back(newVect);
 
 	LoadLandmarksFromVME();
 
 	if (!GetTestMode())
-	{ 
+	{
 		CreateGui();
+		UpdateGui();
 	}
 
-	ShowLandmarkGroup();
+	// Create Aux LandmarkCloud
+	albaNEW(m_AuxLandmarkCloud);
+	m_AuxLandmarkCloud->ReparentTo(m_PickedVme);
+	m_AuxLandmarkCloud->SetRadius(m_Cloud->GetRadius() + 0.01);
+	m_AuxLandmarkCloud->SetName(_("Aux Cloud"));
+	if (m_TestMode) m_AuxLandmarkCloud->TestModeOn();
+	SetCloudColor(m_AuxLandmarkCloud, 0, 1, 1, 0.8);
+
+	albaNEW(m_AuxLandmark);
+	m_AuxLandmark->SetName(_("Aux Landmark"));
+	m_AuxLandmark->ReparentTo(m_AuxLandmarkCloud);
+
+	GetLogicManager()->VmeShow(m_AuxLandmarkCloud, true);
+	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::OpStop(int result)
 {
 	// Reset Landmarks color 
 	SetCloudColor(m_Cloud, m_OldColorCloud[0], m_OldColorCloud[1], m_OldColorCloud[2], m_OldColorCloud[3]);
-
-	if (m_CurrentLandmark)
-	{
-		DeselectLandmark();
-	}
 
 	if (result == OP_RUN_OK)
 	{
@@ -256,15 +253,18 @@ void albaOpAddLandmark::OpStop(int result)
 	albaEventMacro(albaEvent(this, PER_POP));
 	albaDEL(m_LandmarkPicker);
 
-	cppDEL(m_Dict);
+	cppDEL(m_LandmarkGuiDict);
+
+	// Delete Aux Landmark 
+	m_AuxLandmarkCloud->RemoveLandmark(0);
+	albaDEL(m_AuxLandmark);
+	m_AuxLandmarkCloud->ReparentTo(NULL);
+	albaDEL(m_AuxLandmarkCloud);
 
 	if (!m_TestMode)
 	{
 		HideGui();
 	}
-
-	m_SelectedLandmarkCloud->ReparentTo(NULL);
-	albaDEL(m_SelectedLandmarkCloud);
 
 	albaEventMacro(albaEvent(this, result));
 }
@@ -310,16 +310,16 @@ void albaOpAddLandmark::CreateGui()
 	m_Gui->SetListener(this);
 
 	const wxString choices[] = { "Show All" };
-	m_ShowComboBox = m_Gui->Combo(ID_SHOW_GROUP, "", &m_ShowMode, 1, choices);
+	m_GroupComboBox = m_Gui->Combo(ID_SHOW_LANDMARK_GROUP, "", &m_SelectedGroup, 1, choices);
 	m_Gui->Divider(2);
 
 	// Setup dictionary
-	m_Dict = new albaGUIDictionaryWidget(m_Gui, -1);
-	m_Dict->SetListener(this);
-	m_Dict->SetCloud(m_Cloud);
-	m_Dict->InitDictionary(NULL);
-	m_Dict->SetTitle("Landmarks List");
-	m_Gui->Add(m_Dict->GetWidget(), wxEXPAND);
+	m_LandmarkGuiDict = new albaGUIDictionaryWidget(m_Gui, -1);
+	m_LandmarkGuiDict->SetListener(this);
+	m_LandmarkGuiDict->SetCloud(m_Cloud);
+	m_LandmarkGuiDict->InitDictionary(NULL);
+	m_LandmarkGuiDict->SetTitle("Landmarks List");
+	m_Gui->Add(m_LandmarkGuiDict->GetWidget(), wxEXPAND);
 
 	m_Gui->Divider();
 	m_Gui->Divider(2);
@@ -333,7 +333,7 @@ void albaOpAddLandmark::CreateGui()
 
 	m_Gui->Label(_("Landmark Props"));
 	m_Gui->String(ID_LANDMARK_NAME, _("Name"), &m_LandmarkName);
-	m_Gui->Vector(ID_LANDMARK_POSITION, _("Position"), m_LandmarkPosition, MINFLOAT, MAXFLOAT, 2, _("landmark position"));
+	m_Gui->Vector(ID_LANDMARK_POSITION, _("Position"), m_LandmarkPosition, MINFLOAT, MAXFLOAT, 2, _("Landmark position"));
 
 	albaString tooltip(_("If checked, add the landmark to the current time. \nOtherwise add the landmark at time = 0"));
 	m_Gui->Bool(ID_CHANGE_TIME, _("Current time"), &m_AddToCurrentTime, 1, tooltip);
@@ -358,35 +358,75 @@ void albaOpAddLandmark::CreateGui()
 
 	ShowGui();
 }
-//---------------------------------------------------------------------------
-void albaOpAddLandmark::CheckEnableOkCondition()
-{
-	if (m_ShowMode == 0 && m_ShowAllMode)
-	{
-		m_Gui->Enable(wxOK, true);
-	}
-	else
-	{
-		bool res = true;
-
-		if (m_LandmarkNameVect.size() > 0)
-			for (int i = 0; i < m_LandmarkNameVect[m_ShowMode].size(); i++)
-			{
-				if (!this->m_Cloud->FindInTreeByName(m_LandmarkNameVect[m_ShowMode][i]))
-				{
-					res = false;
-					break;
-				}
-			}
-
-		m_Gui->Enable(wxOK, res);
-	}
-}
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::UpdateGui()
 {
 	if (m_Gui && !GetTestMode())
 	{
+		m_GroupComboBox->Clear();
+		for (int i = 0; i < m_GroupsNameVect.size(); i++)
+		{
+			m_GroupComboBox->Insert(m_GroupsNameVect[i], i);
+		}
+
+		if (m_SelectedGroup >= 0)
+		{
+			m_GroupComboBox->Select(m_SelectedGroup);
+
+			m_LandmarkGuiDict->InitDictionary(NULL); // Clear Dictionary
+
+			if (m_SelectedGroup == 0) // Group 0 = All elements
+			{
+				for (int i = 0; i < m_LandmarkNameVect.size(); i++)
+					m_LandmarkGuiDict->AddItem(m_LandmarkNameVect[i]);
+			}
+			else
+			{
+				for (int i = 0; i < m_LandmarkGroupVect[m_SelectedGroup].size(); i++)
+					m_LandmarkGuiDict->AddItem(m_LandmarkGroupVect[m_SelectedGroup][i]);
+			}
+
+			if (m_AddModeFlag)
+			{
+				m_LandmarkGuiDict->AddItem("Add_New_Landmark");
+				m_LandmarkGuiDict->SelectItem("Add_New_Landmark");
+				m_LandmarkGuiDict->SetTitle("Add New Landmark");
+			}
+
+			bool isItemSelected = (m_SelectedItem >= 0 && m_SelectedItem < m_LandmarkGroupVect[m_SelectedGroup].size());
+			if (isItemSelected)
+			{
+				m_LandmarkGuiDict->SelectItem((m_LandmarkGroupVect[m_SelectedGroup][m_SelectedItem]));
+				m_LandmarkGuiDict->SetTitle("Edit selected Landmark");
+			}
+
+			m_Gui->Enable(ID_LANDMARK_REMOVE, isItemSelected);
+			m_Gui->Enable(ID_LANDMARK_POSITION, isItemSelected);
+			m_Gui->Enable(ID_LANDMARK_NAME, isItemSelected);
+
+			// Check Enable Ok Condition
+			if (m_SelectedGroup == 0)
+			{
+				m_Gui->Enable(wxOK, true);
+			}
+			else
+			{
+				bool res = true;
+
+				if (m_LandmarkGroupVect.size() > 0)
+					for (int i = 0; i < m_LandmarkGroupVect[m_SelectedGroup].size(); i++)
+					{
+						if (!this->m_Cloud->FindInTreeByName(m_LandmarkGroupVect[m_SelectedGroup][i]))
+						{
+							res = false;
+							break;
+						}
+					}
+
+				m_Gui->Enable(wxOK, res);
+			}
+		}
+
 		m_Gui->Update();
 	}
 }
@@ -401,15 +441,14 @@ void albaOpAddLandmark::OnEvent(albaEventBase *alba_event)
 	  case ID_LOAD_DICTIONARY: LoadDictionary(); break;
 	  case ID_SAVE_DICTIONARY: SaveDictionary(); break;
 
-	  case ID_SHOW_GROUP: ShowLandmarkGroup(); break;
+	  case ID_SHOW_LANDMARK_GROUP: UpdateGui(); break;
+	  case ITEM_SELECTED: SelectLandmarkByName(*(e->GetString())); break;
 
 	  case ID_LANDMARK_NAME: SetLandmarkName(m_LandmarkName); break;
 	  case ID_LANDMARK_POSITION: SetLandmarkPosition(m_LandmarkPosition); break;
 	  case ID_LANDMARK_RADIUS: SetLandmarkRadius(m_LandmarkRadius);  break;
 
 	  case ID_LANDMARK_REMOVE: RemoveLandmark(); break;
-
-	  case ITEM_SELECTED: SelectLandmark(*(e->GetString())); break;
 
 	  case VME_PICKED:
 	  {
@@ -425,37 +464,18 @@ void albaOpAddLandmark::OnEvent(albaEventBase *alba_event)
 
 		  if (hasPoint)
 		  {
-			  if (m_AddModeFlag)//if (m_AddLandmarkMode)
+			  if (m_AddModeFlag || (!m_AddModeFlag && m_AddLandmarkFromDef))
 			  {
-				  AddLandmark(point);
-
-				  if (m_Gui && !GetTestMode())
-				  {
-					  m_Dict->SetCloud(m_Cloud);
-
-					  albaString nextItem = "Add_New_Landmark";
-					  int pos = m_Dict->GetItemIndex(m_SelectedLandmarkName);
-					  if (pos < m_Dict->GetSize() - 2)
-					  {
-						  nextItem = m_Dict->GetItemByIndex(pos + 1);
-					  }
-
-					  if (!m_AddModeFlag && nextItem == "Add_New_Landmark")
-					  {
-						  nextItem = m_Dict->GetItemByIndex(m_Dict->GetSize() - 1);
-					  }
-
-					  SelectLandmark(nextItem);
-				  }
+				  if (m_SelectedLandmark == -1)
+					  AddLandmark(point);
+				  else
+					  SetLandmarkPosition(point);
 			  }
 			  else
 			  {
 				  SetLandmarkPosition(point);
 			  }
 		  }
-
-		  UpdateGui();
-		  GetLogicManager()->CameraUpdate();
 	  }
 	  break;
 
@@ -469,26 +489,26 @@ void albaOpAddLandmark::OnEvent(albaEventBase *alba_event)
   }
 }
 
-//----------------------------------------------------------------------------
-void albaOpAddLandmark::SetCloudName(albaVMELandmarkCloud *cloud, albaString name)
+//--------------------------------------------------------------------------
+int albaOpAddLandmark::LoadLandmarksFromVME()
 {
-	if (cloud)
-	{
-		m_CloudName = name;
-		cloud->SetName(name);
-	}
-}
-//----------------------------------------------------------------------------
-void albaOpAddLandmark::SetCloudColor(albaVMELandmarkCloud *cloud, double r, double g, double b, double a)
-{
-	mmaMaterial *material = m_Cloud->GetMaterial();
-	material->m_Diffuse[0] = r;
-	material->m_Diffuse[1] = g;
-	material->m_Diffuse[2] = b;
-	material->m_Opacity = a;
-	material->UpdateProp();
-}
+	m_LandmarkNameVect.clear();
 
+	for (int i = 0; i < m_Cloud->GetNumberOfLandmarks(); i++)
+	{
+		albaVMELandmark *lm = m_Cloud->GetLandmark(i);
+		m_LandmarkNameVect.push_back(lm->GetName());
+		m_LandmarkGroupVect[0].push_back(lm->GetName());
+
+		// Create Undo Vector
+		albaVMELandmark* newLandmark = NULL;
+		albaNEW(newLandmark);
+		newLandmark->DeepCopy(lm);
+		m_LandmarkUndoVetc.push_back(newLandmark);
+	}
+
+	return ALBA_OK;
+}
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::RestoreLandmarkVect(std::vector<albaVMELandmark*> &landmarkVect)
 {
@@ -511,519 +531,290 @@ void albaOpAddLandmark::RestoreLandmarkVect(std::vector<albaVMELandmark*> &landm
 }
 
 
-//----------------------------------------------------------------------------
-void albaOpAddLandmark::SetLandmarkName(albaString name)
-{
-	if (this->m_Cloud && m_CurrentLandmark)
-		if (!this->m_Cloud->FindInTreeByName(name))
-		{
-			m_CurrentLandmark->SetName(name);
-
-			// Update local landmark name
-			for (int i = 0; i < m_LocalLandmarkNameVect.size(); i++)
-			{
-				if (m_LocalLandmarkNameVect[i] == m_SelectedLandmarkName)
-				{
-					m_LocalLandmarkNameVect[i] = name;
-					break;
-				}
-			}
-
-			if (m_Gui && !GetTestMode())
-			{
-				m_Dict->UpdateItem(m_SelectedLandmarkName, name);
-			}
-
-			m_LandmarkName = name;
-		}
-		else
-		{
-			wxString existing_lm_msg(_("Landmark with that name already exist, Please change it!"));
-			wxMessageBox(existing_lm_msg, _("Warning"), wxOK | wxICON_WARNING, NULL);
-		}
-}
-//----------------------------------------------------------------------------
-void albaOpAddLandmark::SetLandmarkPosition(double pos[3])
-{
-	if (this->m_Cloud && m_CurrentLandmark && m_SelectedLandmark)
-	{
-		m_LandmarkPosition[0] = pos[0];
-		m_LandmarkPosition[1] = pos[1];
-		m_LandmarkPosition[2] = pos[2];
-
-		m_CurrentLandmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
-		m_SelectedLandmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
-	}
-
-	GetLogicManager()->CameraUpdate();
-	UpdateGui();
-}
-//----------------------------------------------------------------------------
-void albaOpAddLandmark::SetLandmarkRadius(double radius)
-{
-	m_LandmarkRadius = radius;
-
-	if (m_Cloud)
-		m_Cloud->SetRadius(m_LandmarkRadius);
-
-	if (m_SelectedLandmarkCloud)
-		m_SelectedLandmarkCloud->SetRadius(m_LandmarkRadius);
-
-	GetLogicManager()->CameraUpdate();
-}
-
 /// LANDMARK MANAGER
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::AddLandmark(double pos[3])
-{
-	if (m_Gui && !GetTestMode())
-	{
-		m_Dict->RemoveItem("Add_New_Landmark");
-	}
-
-	if (m_SelectedLandmarkName == "Add_New_Landmark")
-	{
-		// Create New Landmark
-		char printStr[100];
-		sprintf(printStr, "New_Landmark_%d", m_LandmarkNameCount);
-
-		m_LandmarkName = printStr;
-		m_SelectedLandmarkName = m_LandmarkName;
-
-		if (m_Gui && !GetTestMode())
-		{
-			m_Dict->AddItem((wxString)m_LandmarkName);
-		}
-
-		m_LocalLandmarkNameVect.push_back((wxString)m_LandmarkName);
-
-		m_LandmarkNameCount++;
-	}
-	else
-	{
-		m_LandmarkName = m_SelectedLandmarkName;
-	}
-
-	//
-	m_LandmarkPosition[0] = pos[0];
-	m_LandmarkPosition[1] = pos[1];
-	m_LandmarkPosition[2] = pos[2];
+ {
+	wxString landmarkName = wxString::Format("New_Landmark_%d", m_LandmarkNameVect.size() + 1);
 
 	albaSmartPointer<albaVMELandmark> landmark;
-	landmark->SetName(m_LandmarkName.GetCStr());
+	landmark->SetName(landmarkName);
+	landmark->SetRadius(m_LandmarkRadius);
 	landmark->ReparentTo(m_Cloud);
 
 	if (NULL != m_PickedVme)
 		landmark->SetTimeStamp(m_PickedVme->GetTimeStamp());
 
-	if (m_AddToCurrentTime)
-		landmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
-	else
-		landmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0, 0);
+	GetLogicManager()->VmeShow(landmark.GetPointer(), true);
+	
+	SelectLandmarkByName(m_Cloud->GetLandmarkName(m_Cloud->GetNumberOfLandmarks() - 1)); // Last
+	SetLandmarkPosition(pos);
 
-	if (m_LandmarkRadius > 0)
+	if (m_AddLandmarkFromDef)
 	{
-		landmark->SetRadius(m_LandmarkRadius);
-		m_SelectedLandmarkCloud->SetRadius(m_LandmarkRadius);
+		landmark->SetName(m_LandmarkNameFromDef);
+		
+		if (m_AddLandmarkFromDefIndex2 >= 0) m_LandmarkNameVect[m_AddLandmarkFromDefIndex2] = m_LandmarkNameFromDef;
+
+		if (m_AddLandmarkFromDefIndex >= 0) m_LandmarkGroupVect[m_SelectedGroup][m_AddLandmarkFromDefIndex] = m_LandmarkNameFromDef;
+
+		if (m_AddLandmarkFromDefIndex3 >= 0) m_LandmarkGroupVect[0][m_AddLandmarkFromDefIndex3] = m_LandmarkNameFromDef;
+
+		m_AddLandmarkFromDef = false;
+
+		int index = m_LandmarkNameVect.size() - m_LandmarkGroupVect[m_SelectedGroup].size() + m_AddLandmarkFromDefIndex;
+		SelectLandmarkByName(m_LandmarkNameVect[index]); // Next
+	}
+	else
+	{
+		m_LandmarkNameVect.push_back(landmarkName);
+		m_LandmarkGroupVect[m_SelectedGroup].push_back(landmarkName);
+
+		SelectLandmarkByName("NONE");
 	}
 
-	landmark->Update();
+	// Show Last Landmark Added 
+	SetCloudColor(m_AuxLandmarkCloud, 0, 1, 0, 0.8);
+	GetLogicManager()->VmeShow(m_AuxLandmarkCloud, true);
 
-	GetLogicManager()->VmeShow(landmark.GetPointer(), true);
 	GetLogicManager()->CameraUpdate();
 
-	if (m_Gui && !GetTestMode())
-	{
-		if (m_AddModeFlag)
-			m_Dict->AddItem("Add_New_Landmark");
-
-		CheckEnableOkCondition();
-	}
+	UpdateGui();
 }
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::RemoveLandmark()
 {	
-	if (m_CurrentLandmark)
+	if (m_Cloud && m_SelectedLandmark >= 0)
 	{
-		albaVME* item = m_CurrentLandmark;
-		albaString itemName = item->GetName();
-
-		int itemToRemove = -1;
-		for (int i = 0; i < m_LocalLandmarkNameVect.size(); i++)
+		albaVMELandmark *landmark = m_Cloud->GetLandmark(m_SelectedLandmark);
+		if (landmark)
 		{
-			if (m_LocalLandmarkNameVect[i] == itemName)
-			{
-				itemToRemove = i;
-				break;
-			}
+			RemoveItem(landmark->GetName());
+			GetLogicManager()->VmeRemove(landmark);
+
+			SelectLandmarkByName("NONE");
+
+			GetLogicManager()->CameraUpdate();
+			UpdateGui();
 		}
+	}
+}
+//----------------------------------------------------------------------------
+void albaOpAddLandmark::SelectLandmarkByName(albaString name)
+{
+	m_RemoveMessage = "";
+	m_LandmarkName = "";
+	m_SelectedLandmark = -1;
 
-		// Find item in dictionary (if loaded)
-		if (m_LandmarkNameVect.size() > 0)
+	m_SelectedItem = m_LandmarkGuiDict->GetItemIndex(name);
+
+	if (m_Cloud->FindInTreeByName(name))
+	{
+		m_LandmarkName = name;
+		m_SelectedLandmark = m_Cloud->GetLandmarkIndex(name);
+
+		m_RemoveMessage = "Landmark is a Dictionary entry";
+
+		double x, y, z;
+		m_Cloud->GetLandmark(m_SelectedLandmark)->GetPoint(x, y, z);
+		m_AuxLandmark->SetAbsPose(x, y, z, 0, 0, 0);
+		SetCloudColor(m_AuxLandmarkCloud, 0, 0, 1, 0.8);
+		GetLogicManager()->VmeShow(m_AuxLandmarkCloud, true);
+
+		UpdateGui();
+
+		// Check Landmark Dependencies
+		albaVMELandmark *landmark = m_Cloud->GetLandmark(m_SelectedLandmark);
+		albaVME::albaVMESet dependenciesVMEs = landmark->GetDependenciesVMEs();
+		if (!dependenciesVMEs.empty())
 		{
-			for (int i = 0; i < m_LandmarkNameVect[0].size(); i++)
-			{
-				if (m_LandmarkNameVect[0][i] == itemName)
-				{
-					itemToRemove = -1;
-					break;
-				}
-			}
+			m_Gui->Enable(ID_LANDMARK_REMOVE, false);
+			m_RemoveMessage = "Landmark has dependency";
 		}
+	}
+	else
+	{
+		GetLogicManager()->VmeShow(m_AuxLandmarkCloud, false); // Hide Aux Landmark
 
-		// Item found and it is not in dictionary - I can remove it
-		if (itemToRemove >= 0)
+		FindDefinition(name);
+	}
+
+	GetLogicManager()->CameraUpdate();
+}
+//----------------------------------------------------------------------------
+void albaOpAddLandmark::FindDefinition(albaString &name)
+{
+	m_AddLandmarkFromDef = false;
+	m_AddLandmarkFromDefIndex = -1;
+	m_AddLandmarkFromDefIndex2 = -1;
+	m_AddLandmarkFromDefIndex3 = -1;
+
+	for (int i = 0; i < m_LandmarkGroupVect[m_SelectedGroup].size(); i++)
+	{
+		if (m_LandmarkGroupVect[m_SelectedGroup][i] == name.GetCStr())
 		{
-			DeselectLandmark();
+			m_LandmarkGuiDict->SelectItem(name);
+			m_LandmarkNameFromDef = name;
+			m_AddLandmarkFromDefIndex = i;
+			m_AddLandmarkFromDef = true;
 
-			GetLogicManager()->VmeRemove(item);
+			for (int j = 0; j < m_LandmarkNameVect.size(); j++)
+				if (m_LandmarkNameVect[j] == name.GetCStr())
+					m_AddLandmarkFromDefIndex2 = j;
 
-			m_LocalLandmarkNameVect.erase(m_LocalLandmarkNameVect.begin() + itemToRemove);
+			for (int k = 0; k < m_LandmarkGroupVect[0].size(); k++)
+				if (m_LandmarkNameVect[k] == name.GetCStr())
+					m_AddLandmarkFromDefIndex3 = k;
+		}
+	}
+}
 
-			if (m_Gui && !GetTestMode())
-			{
-				m_Dict->RemoveItem(itemName);
-				SelectLandmark("Add_New_Landmark");
-			}
+//----------------------------------------------------------------------------
+void albaOpAddLandmark::SetLandmarkName(albaString name)
+{
+	if (m_Cloud && m_SelectedLandmark >= 0)
+	{
+		albaVMELandmark *landmark = m_Cloud->GetLandmark(m_SelectedLandmark);
+		if (landmark)
+		{
+			wxString oldName = landmark->GetName();
+			landmark->SetName(name); // If name is present, restore old name
+
+			ReplaceItem(oldName, landmark->GetName());
+
+			m_LandmarkName = landmark->GetName();
+
+			landmark->Update();
+			UpdateGui();
+		}
+	}
+}
+//----------------------------------------------------------------------------
+void albaOpAddLandmark::SetLandmarkPosition(double pos[3])
+{
+	if (m_Cloud && m_SelectedLandmark >= 0)
+	{
+		albaVMELandmark *landmark = m_Cloud->GetLandmark(m_SelectedLandmark);
+		if (landmark)
+		{
+			m_LandmarkPosition[0] = pos[0];
+			m_LandmarkPosition[1] = pos[1];
+			m_LandmarkPosition[2] = pos[2];
+
+			if (m_AddToCurrentTime)
+				landmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
+			else
+				landmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0, 0);
+
+			landmark->Update();
+
+			// Update Aux Landmark
+			m_AuxLandmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
+			m_AuxLandmark->Update();
 
 			GetLogicManager()->CameraUpdate();
 		}
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpAddLandmark::SelectLandmark(albaString selection)
+void albaOpAddLandmark::SetLandmarkRadius(double radius)
 {
-	if (m_CurrentLandmark)
+	if (m_Cloud)
 	{
-		GetLogicManager()->VmeShow(m_CurrentLandmark, true);
-		GetLogicManager()->VmeShow(m_SelectedLandmarkCloud->GetLandmark(0), false);
+		m_LandmarkRadius = radius;
+		m_Cloud->SetRadius(m_LandmarkRadius);
 
-		m_CurrentLandmark = NULL;
+		GetLogicManager()->CameraUpdate();
 	}
-		
-	if (m_Gui && !GetTestMode())
-	{
-		m_RemoveMessage = "";
-		m_Dict->DeselectItem(m_SelectedLandmarkName);
-		int pos=m_Dict->SelectItem(selection);
-
-		bool m_AddLandmarkMode = (pos == m_Dict->GetSize() - 1) && m_AddModeFlag;
-		
-		if (m_DictionaryLoaded && !m_AddLandmarkMode && m_Cloud->GetLandmark(selection) == NULL)
-			m_AddLandmarkMode = true;
-
-		if(m_AddLandmarkMode)
-			m_Dict->SetTitle("Add landmark");
-		else
-			m_Dict->SetTitle("Edit landmark");
-		
-		m_Gui->Enable(ID_LANDMARK_NAME, !m_AddLandmarkMode);
-		m_Gui->Enable(ID_LANDMARK_POSITION, !m_AddLandmarkMode);
-		m_Gui->Enable(ID_LANDMARK_REMOVE, !m_AddLandmarkMode);
-
-		// Find item in dictionary
-		if (m_LandmarkNameVect.size() > 0)
-		{
-			for (int i = 0; i < m_LandmarkNameVect[0].size(); i++)
-			{
-				if (m_LandmarkNameVect[0][i] == selection)
-				{
-					m_Gui->Enable(ID_LANDMARK_NAME, false);
-					m_Gui->Enable(ID_LANDMARK_REMOVE, false);
-					m_RemoveMessage = "Landmark is a Dictionary entry";
-					break;
-				}
-			}
-		}
-
-		m_Gui->Update();
-	}
-
-	m_SelectedLandmarkName = m_LandmarkName = selection;
-
-	albaVMELandmark *landmark = albaVMELandmark::SafeDownCast(this->m_Cloud->FindInTreeByName(m_SelectedLandmarkName.GetCStr()));
-
-	if (this->m_Cloud && landmark)
-	{
-		m_CurrentLandmark = landmark;
-		m_CurrentLandmark->GetPoint(m_LandmarkPosition);
-		m_SelectedLandmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
-		m_SelectedLandmark->Update();
-
-		GetLogicManager()->VmeShow(m_CurrentLandmark, false);
-		GetLogicManager()->VmeShow(m_SelectedLandmarkCloud->GetLandmark(0), true);
-
-		albaVME::albaVMESet dependenciesVMEs = landmark->GetDependenciesVMEs();
-
-		if (!dependenciesVMEs.empty())
-		{
-			m_Gui->Enable(ID_LANDMARK_REMOVE, false);
-			m_RemoveMessage = "Landmark has dependency";
-			wxString message;
-		}
-	}
-
-	if (m_Gui && !GetTestMode())
-	{
-		m_Gui->Update();
-	}
-
-	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
-void albaOpAddLandmark::DeselectLandmark()
+void albaOpAddLandmark::SetCloudColor(albaVMELandmarkCloud *cloud, double r, double g, double b, double a)
 {
-	if (m_CurrentLandmark)
-	{
-		GetLogicManager()->VmeShow(m_CurrentLandmark, true);
-		GetLogicManager()->VmeShow(m_SelectedLandmarkCloud->GetLandmark(0), true);
-		m_CurrentLandmark = NULL;
-	}
-
-	if (m_Gui && !GetTestMode())
-	{
-		m_RemoveMessage = "";
-		m_Dict->DeselectItem(m_SelectedLandmarkName);
-	}
-
-	GetLogicManager()->CameraUpdate();
-}
-
-//---------------------------------------------------------------------------
-void albaOpAddLandmark::ShowLandmarkGroup()
-{
-	if (m_CurrentLandmark)
-	{
-		GetLogicManager()->VmeShow(m_CurrentLandmark, true);
-		GetLogicManager()->VmeShow(m_SelectedLandmarkCloud->GetLandmark(0), true);
-		m_CurrentLandmark = NULL;
-	}
-
-	wxString firstSelection = "";
-
-	if (!m_TestMode)
-	{
-		if (m_ShowMode == 0)
-		{
-			for (int i = 0; i < m_LocalLandmarkNameVect.size(); i++)
-			{
-				PushUniqueItem(m_LocalLandmarkNameVect[i]);
-			}
-
-			if (m_LandmarkNameVect.size() > 0)
-				for (int i = 0; i < m_LandmarkNameVect[0].size(); i++)
-				{
-					PushUniqueItem(m_LandmarkNameVect[0][i]);
-				}
-
-			if (m_AllItemsNameVect.size() > 0) firstSelection = m_AllItemsNameVect[0];
-
-			m_Dict->InitDictionary(&m_AllItemsNameVect);
-		}
-		else
-		{
-			m_Dict->InitDictionary(&m_LandmarkNameVect[m_ShowMode]);
-		}
-
-		m_Dict->SetTitle("Select landmark");
-
-		if (m_AddModeFlag)
-		{
-			m_Dict->AddItem("Add_New_Landmark");
-			m_Dict->SelectItem("Add_New_Landmark");
-		}
-		else
-		{
-			SelectLandmark(firstSelection);
-		}
-
-		m_Gui->Enable(ID_SHOW_GROUP, true);
-		m_Gui->Update();
-
-		CheckEnableOkCondition();
-	}
+	mmaMaterial *material = cloud->GetMaterial();
+	material->m_Diffuse[0] = r;
+	material->m_Diffuse[1] = g;
+	material->m_Diffuse[2] = b;
+	material->m_Opacity = a;
+	material->UpdateProp();
 }
 
 /// SAVE-LOAD LANDMARK DEFINITIONS
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::LoadDictionary(wxString fileName)
 {
-	if (fileName == "")
+	if (fileName.IsEmpty())
 	{
+		// Select Dictionary file
 		wxString wild_dict = "Dictionary file (*.dic)|*.dic|All files (*.*)|*.*";
 		wxString dict = albaGetLastUserFolder().c_str();
 
 		fileName = albaGetOpenFile(dict, wild_dict, "Choose Dictionary File").c_str();
 	}
 
-	if (fileName != "") 
+	if (!fileName.IsEmpty())
+	{
 		LoadLandmarksDefinitions(fileName);
 
-	m_DictionaryLoaded = true;
-	m_ShowMode = 0;
-	m_AddModeFlag = false;
-	SelectLandmark("");// m_LocalLandmarkNameVect[0]);
+		m_DictionaryLoaded = true;
+		m_SelectedGroup = m_GroupsNameVect.size() - 1; // Last
+		m_AddModeFlag = false;
 
-	ShowLandmarkGroup();
+		UpdateGui();
+	}
+}
+//--------------------------------------------------------------------------
+void albaOpAddLandmark::LoaDictionaryFromVME(albaVMELandmarkCloud *cloud)
+{
+	if (cloud)
+	{
+		m_LandmarkGroupVect.clear();
+		m_LandmarkGroupVect.push_back(m_LandmarkNameVect);
+		//m_LandmarkGroupVect[0].clear();
+
+		StringVector newVect;
+		m_GroupsNameVect.push_back(cloud->GetName());
+
+		for (int i = 0; i < cloud->GetNumberOfLandmarks(); i++)
+		{
+			albaVMELandmark *lm = m_Cloud->GetLandmark(i);
+			m_LandmarkNameVect.push_back(lm->GetName());
+			m_LandmarkGroupVect[0].push_back(lm->GetName());
+			newVect.push_back(lm->GetName());
+		}
+
+		m_LandmarkGroupVect.push_back(newVect);
+
+		m_DictionaryLoaded = true;
+		m_SelectedGroup = m_GroupsNameVect.size() - 1; // Last
+		m_AddModeFlag = false;
+
+		UpdateGui();
+	}
 }
 //----------------------------------------------------------------------------
 int albaOpAddLandmark::SaveDictionary(wxString fileName)
 {
-	if (fileName == "")
+	if (fileName.IsEmpty())
 	{
+		// Select destination file
 		albaString initialFileName;
 		initialFileName = albaGetLastUserFolder().c_str();
-		initialFileName.Append("\\newLandmarkDictionary.xml");
+		initialFileName.Append("\\newLandmarkDictionary.dic");
 
 		albaString wildc = "Dictionary file (*.dic)|*.dic|All files (*.*)|*.*";
 		fileName = albaGetSaveFile(initialFileName.GetCStr(), wildc).c_str();
 	}
 
-	if (fileName != "") 
+	if (!fileName.IsEmpty())
 		return SaveLandmarksDefinitions(fileName);
 }
 
-//---------------------------------------------------------------------------
-int albaOpAddLandmark::SaveLandmarksDefinitions(const char *landmarksFileName)
-{	
-	try // Open the file xml
-	{
-		XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Initialize();
-	}
-	catch (const XERCES_CPP_NAMESPACE_QUALIFIER XMLException& toCatch)
-	{
-		// Do your failure processing here
-		return ALBA_ERROR;
-	}
-
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc;
-	XMLCh tempStr[100];
-	XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode("LS", tempStr, 99);
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementation *impl = XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementationRegistry::getDOMImplementation(tempStr);
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMWriter* theSerializer = ((XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementationLS*)impl)->createDOMWriter();
-	theSerializer->setNewLine(albaXMLString("\r"));
-
-	if (theSerializer->canSetFeature(XERCES_CPP_NAMESPACE_QUALIFIER XMLUni::fgDOMWRTFormatPrettyPrint, true))
-		theSerializer->setFeature(XERCES_CPP_NAMESPACE_QUALIFIER XMLUni::fgDOMWRTFormatPrettyPrint, true);
-
-	doc = impl->createDocument(NULL, albaXMLString("Landmarks_Dictionary"), NULL);
-
-	doc->setEncoding(albaXMLString("UTF-8"));
-	doc->setStandalone(true);
-	doc->setVersion(albaXMLString("1.0"));
-
-	// extract root element and wrap it with an albaXMLElement object
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *root = doc->getDocumentElement();
-	assert(root);
-
-	// attach version attribute to the root node
-	root->setAttribute(albaXMLString("Name"), albaXMLString("nmsBuilder_Landmarks"));
-	root->setAttribute(albaXMLString("Version"), albaXMLString("1.0"));
-
-	// GROUP
-	XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *firtsGroup = doc->createElement(albaXMLString("Group"));
-	firtsGroup->setAttribute(albaXMLString("Name"), albaXMLString(m_Cloud->GetName()));
-
-	// Create all items List - Local items + Dictionary (if loaded)
-	std::set<wxString> allItems;
-
-	for (int i = 0; i < m_LocalLandmarkNameVect.size(); i++)
-	{
-		allItems.insert(m_LocalLandmarkNameVect[i]);
-	}
-
-	if (m_LandmarkNameVect.size() > 0)
-		for (int i = 0; i < m_LandmarkNameVect[0].size(); i++)
-		{
-			allItems.insert(m_LandmarkNameVect[0][i]);
-		}
-
-	std::set<wxString>::iterator it;
-	for (it=allItems.begin(); it != allItems.end(); it++)
-	{
-		XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *elem = doc->createElement(albaXMLString("Landmark"));
-
-		XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node = doc->createTextNode(albaXMLString("Landmark"));
-		node->setNodeValue(albaXMLString(*it));
-		elem->appendChild(node);
-
-		firtsGroup->appendChild(elem);
-	}
-
-	root->appendChild(firtsGroup);
-
-	int lastSelection = m_ShowComboBox->GetSelection();
-
-	for (int i=1; i< m_LandmarkNameVect.size(); i++)
-	{
-		m_ShowComboBox->Select(i);
-		wxString name = m_ShowComboBox->GetValue();
-
-		// GROUP
-		XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *group = doc->createElement(albaXMLString("Group"));
-		group->setAttribute(albaXMLString("Name"), albaXMLString(name));
-
-		for (int j=0; j < m_LandmarkNameVect[i].size(); j++)
-		{
-			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *elem = doc->createElement(albaXMLString("Landmark"));
-
-			XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node = doc->createTextNode(albaXMLString("Landmark"));
-			node->setNodeValue(albaXMLString(m_LandmarkNameVect[i][j]));
-			elem->appendChild(node);
-
-			group->appendChild(elem);
-		}
-		root->appendChild(group);
-	}
-
-	m_ShowComboBox->Select(lastSelection);
-
-	//
-
-	XERCES_CPP_NAMESPACE_QUALIFIER XMLFormatTarget *XMLTarget;
-	albaString fileName = landmarksFileName;
-
-	XMLTarget = new XERCES_CPP_NAMESPACE_QUALIFIER LocalFileFormatTarget(fileName);
-
-	try
-	{
-		// do the serialization through DOMWriter::writeNode();
-		theSerializer->writeNode(XMLTarget, *doc);
-	}
-	catch (const XERCES_CPP_NAMESPACE_QUALIFIER  XMLException& toCatch)
-	{
-		char* message = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode(toCatch.getMessage());
-		XERCES_CPP_NAMESPACE_QUALIFIER XMLString::release(&message);
-		return ALBA_ERROR;
-	}
-	catch (const XERCES_CPP_NAMESPACE_QUALIFIER DOMException& toCatch)
-	{
-		char* message = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode(toCatch.msg);
-		XERCES_CPP_NAMESPACE_QUALIFIER XMLString::release(&message);
-		return ALBA_ERROR;
-	}
-	catch (...) {
-		return ALBA_ERROR;
-	}
-
-	theSerializer->release();
-	cppDEL(XMLTarget);
-	doc->release();
-
-	XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Terminate();
-
-	albaLogMessage(wxString::Format("Landmarks Dictionary has been written %s", fileName.GetCStr()));
-
-	return ALBA_OK;
-}
 //----------------------------------------------------------------------------
 int albaOpAddLandmark::LoadLandmarksDefinitions(wxString fileName)
 {
-	m_LandmarkNameVect.clear();
-	m_LandmarkNameVect.push_back(m_LocalLandmarkNameVect);
-	m_LandmarkNameVect[0].clear();
-
-	StringVector groupNameVect;
+	m_LandmarkGroupVect.clear();
+	m_LandmarkGroupVect.push_back(m_LandmarkNameVect);
+	//m_LandmarkGroupVect[0].clear();
 
 	//Open the file xml
 	try
@@ -1086,12 +877,12 @@ int albaOpAddLandmark::LoadLandmarksDefinitions(wxString fileName)
 		{
 			//Reading Type nodes 
 			XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *typeNode = typesChildren->item(i);
-		
+
 			if (CheckNodeElement(typeNode, "Group"))
 			{
 				wxString dicName = GetElementAttribute(typeNode, "Name");
 
-				groupNameVect.push_back(dicName);
+				m_GroupsNameVect.push_back(dicName);
 
 				StringVector newVect;
 
@@ -1103,14 +894,14 @@ int albaOpAddLandmark::LoadLandmarksDefinitions(wxString fileName)
 					XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *typeNode = typeChildren->item(j);
 
 					if (CheckNodeElement(typeNode, "Landmark"))
-					{ 
+					{
 						newVect.push_back(typeNode->getTextContent());
 						PushUniqueItem(typeNode->getTextContent());
 					}
 				}
 
-				m_LandmarkNameVect.push_back(newVect);
-			}	
+				m_LandmarkGroupVect.push_back(newVect);
+			}
 		}
 	}
 	catch (const  XERCES_CPP_NAMESPACE_QUALIFIER XMLException& toCatch)
@@ -1134,28 +925,138 @@ int albaOpAddLandmark::LoadLandmarksDefinitions(wxString fileName)
 
 	albaLogMessage(_("Configuration file Loaded"));
 
-	// Create All Items Vect
-	for (int i = 0; i < m_AllItemsNameVect.size(); i++)
-		m_LandmarkNameVect[0].push_back(m_AllItemsNameVect[i]);
-	
-	if (!m_TestMode)
+	return ALBA_OK;
+}
+//---------------------------------------------------------------------------
+int albaOpAddLandmark::SaveLandmarksDefinitions(const char *landmarksFileName)
+{	
+	try // Open the file xml
 	{
-		// Update GUI ComboBox
-		m_ShowComboBox->Clear();
-		m_ShowComboBox->AppendString("Show All");
+		XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Initialize();
+	}
+	catch (const XERCES_CPP_NAMESPACE_QUALIFIER XMLException& toCatch)
+	{
+		// Do your failure processing here
+		return ALBA_ERROR;
 	}
 
-	if (m_Gui && !GetTestMode())
+	XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument *doc;
+	XMLCh tempStr[100];
+	XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode("LS", tempStr, 99);
+	XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementation *impl = XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementationRegistry::getDOMImplementation(tempStr);
+	XERCES_CPP_NAMESPACE_QUALIFIER DOMWriter* theSerializer = ((XERCES_CPP_NAMESPACE_QUALIFIER DOMImplementationLS*)impl)->createDOMWriter();
+	theSerializer->setNewLine(albaXMLString("\r"));
+
+	if (theSerializer->canSetFeature(XERCES_CPP_NAMESPACE_QUALIFIER XMLUni::fgDOMWRTFormatPrettyPrint, true))
+		theSerializer->setFeature(XERCES_CPP_NAMESPACE_QUALIFIER XMLUni::fgDOMWRTFormatPrettyPrint, true);
+
+	doc = impl->createDocument(NULL, albaXMLString("Landmarks_Dictionary"), NULL);
+
+	doc->setEncoding(albaXMLString("UTF-8"));
+	doc->setStandalone(true);
+	doc->setVersion(albaXMLString("1.0"));
+
+	// extract root element and wrap it with an albaXMLElement object
+	XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *root = doc->getDocumentElement();
+	assert(root);
+
+	// attach version attribute to the root node
+	root->setAttribute(albaXMLString("Name"), albaXMLString("nmsBuilder_Landmarks"));
+	root->setAttribute(albaXMLString("Version"), albaXMLString("1.0"));
+
+	// GROUP
+	XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *firtsGroup = doc->createElement(albaXMLString("Group"));
+	firtsGroup->setAttribute(albaXMLString("Name"), albaXMLString(m_Cloud->GetName()));
+
+	// Create all items List - Local items + Dictionary (if loaded)
+	std::set<wxString> allItems;
+
+	for (int i = 0; i < m_LandmarkNameVect.size(); i++)
 	{
-		m_Dict->SetTitle("Show All");
+		allItems.insert(m_LandmarkNameVect[i]);
 	}
 
-	for (int g = 0; g < groupNameVect.size(); g++)
+	if (m_LandmarkGroupVect.size() > 0)
+		for (int i = 0; i < m_LandmarkGroupVect[0].size(); i++)
+		{
+			allItems.insert(m_LandmarkGroupVect[0][i]);
+		}
+
+	std::set<wxString>::iterator it;
+	for (it=allItems.begin(); it != allItems.end(); it++)
 	{
-		m_ShowComboBox->AppendString(groupNameVect[g]);
+		XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *elem = doc->createElement(albaXMLString("Landmark"));
+
+		XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node = doc->createTextNode(albaXMLString("Landmark"));
+		node->setNodeValue(albaXMLString(*it));
+		elem->appendChild(node);
+
+		firtsGroup->appendChild(elem);
 	}
 
-	groupNameVect.clear();
+	root->appendChild(firtsGroup);
+
+	int lastSelection = m_GroupComboBox->GetSelection();
+
+	for (int i=1; i< m_LandmarkGroupVect.size(); i++)
+	{
+		m_GroupComboBox->Select(i);
+		wxString name = m_GroupComboBox->GetValue();
+
+		// GROUP
+		XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *group = doc->createElement(albaXMLString("Group"));
+		group->setAttribute(albaXMLString("Name"), albaXMLString(name));
+
+		for (int j=0; j < m_LandmarkGroupVect[i].size(); j++)
+		{
+			XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *elem = doc->createElement(albaXMLString("Landmark"));
+
+			XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node = doc->createTextNode(albaXMLString("Landmark"));
+			node->setNodeValue(albaXMLString(m_LandmarkGroupVect[i][j]));
+			elem->appendChild(node);
+
+			group->appendChild(elem);
+		}
+		root->appendChild(group);
+	}
+
+	m_GroupComboBox->Select(lastSelection);
+
+	//
+
+	XERCES_CPP_NAMESPACE_QUALIFIER XMLFormatTarget *XMLTarget;
+	albaString fileName = landmarksFileName;
+
+	XMLTarget = new XERCES_CPP_NAMESPACE_QUALIFIER LocalFileFormatTarget(fileName);
+
+	try
+	{
+		// do the serialization through DOMWriter::writeNode();
+		theSerializer->writeNode(XMLTarget, *doc);
+	}
+	catch (const XERCES_CPP_NAMESPACE_QUALIFIER  XMLException& toCatch)
+	{
+		char* message = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode(toCatch.getMessage());
+		XERCES_CPP_NAMESPACE_QUALIFIER XMLString::release(&message);
+		return ALBA_ERROR;
+	}
+	catch (const XERCES_CPP_NAMESPACE_QUALIFIER DOMException& toCatch)
+	{
+		char* message = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode(toCatch.msg);
+		XERCES_CPP_NAMESPACE_QUALIFIER XMLString::release(&message);
+		return ALBA_ERROR;
+	}
+	catch (...) {
+		return ALBA_ERROR;
+	}
+
+	theSerializer->release();
+	cppDEL(XMLTarget);
+	doc->release();
+
+	XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Terminate();
+
+	albaLogMessage(wxString::Format("Landmarks Dictionary has been written %s", fileName.GetCStr()));
 
 	return ALBA_OK;
 }
@@ -1180,48 +1081,58 @@ albaString albaOpAddLandmark::GetElementAttribute(XERCES_CPP_NAMESPACE_QUALIFIER
 
 	return albaXMLString(((XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *)node)->getAttribute(albaXMLString(attributeName)));
 }
+
+/// VECTOR UTILITIES
 //---------------------------------------------------------------------------
 void albaOpAddLandmark::PushUniqueItem(wxString item)
 {
-	for (int i = 0; i < m_AllItemsNameVect.size(); i++)
+	for (int i = 0; i < m_LandmarkNameVect.size(); i++)
 	{
-		if (item == m_AllItemsNameVect[i])
+		if (item == m_LandmarkNameVect[i])
 			return;
 	}
 
-	m_AllItemsNameVect.push_back(item);
+	m_LandmarkNameVect.push_back(item);
 }
-
-//--------------------------------------------------------------------------
-int albaOpAddLandmark::LoadLandmarksFromVME()
+//---------------------------------------------------------------------------
+void albaOpAddLandmark::ReplaceItem(wxString oldItem, wxString newItem)
 {
-	m_LocalLandmarkNameVect.clear();
-	int nLandmarks = m_Cloud->GetNumberOfLandmarks();
-
-	for (int i = 0; i < nLandmarks; i++)
+	for (int i = 0; i < m_LandmarkNameVect.size(); i++)
 	{
-		albaVMELandmark *lm = m_Cloud->GetLandmark(i);
-
-		m_LocalLandmarkNameVect.push_back(lm->GetName());
-
-		// Create Undo Vector
-		albaVMELandmark* newLandmark = NULL;
-		albaNEW(newLandmark);
-		newLandmark->DeepCopy(lm);
-		m_LandmarkUndoVetc.push_back(newLandmark);
-
-		wxString name = lm->GetName();
-		int pos = name.Find("New_Landmark_");
-		if (pos>=0)
+		if (oldItem == m_LandmarkNameVect[i])
 		{
-			wxString subName = name.SubString(pos+13, name.Length());
-				
-			int val = atoi(subName);
-
-			if(m_LandmarkNameCount < val)
-				m_LandmarkNameCount = val + 1;
+			m_LandmarkNameVect[i] = newItem;
+			break;
 		}
 	}
 
-	return ALBA_OK;
+	for (int i = 0; i < m_LandmarkGroupVect[m_SelectedGroup].size(); i++)
+	{
+		if (oldItem == m_LandmarkGroupVect[m_SelectedGroup][i])
+		{
+			m_LandmarkGroupVect[m_SelectedGroup][i] = newItem;
+			break;
+		}
+	}
+}
+//---------------------------------------------------------------------------
+void albaOpAddLandmark::RemoveItem(wxString item)
+{
+	for (int i = 0; i < m_LandmarkNameVect.size(); i++)
+	{
+		if (item == m_LandmarkNameVect[i])
+		{
+			m_LandmarkNameVect.erase(m_LandmarkNameVect.begin() + i);
+			break;
+		}
+	}
+
+	for (int i = 0; i < m_LandmarkGroupVect[m_SelectedGroup].size(); i++)
+	{
+		if (item == m_LandmarkGroupVect[m_SelectedGroup][i])
+		{
+			m_LandmarkGroupVect[m_SelectedGroup].erase(m_LandmarkGroupVect[m_SelectedGroup].begin() + i);
+			break;
+		}
+	}
 }
