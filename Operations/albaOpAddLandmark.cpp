@@ -29,6 +29,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaInteractor.h"
 #include "albaInteractorPicker.h"
 #include "albaLogicWithManagers.h"
+#include "albaTagArray.h"
 #include "albaVME.h"
 #include "albaVMELandmark.h"
 #include "albaVMELandmarkCloud.h"
@@ -219,17 +220,19 @@ void albaOpAddLandmark::OpRun()
 
 	// Create Aux LandmarkCloud
 	albaNEW(m_AuxLandmarkCloud);
+	m_AuxLandmarkCloud->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 0.0));
 	m_AuxLandmarkCloud->ReparentTo(m_PickedVme);
 	m_AuxLandmarkCloud->SetRadius(m_Cloud->GetRadius() + 0.01);
 	m_AuxLandmarkCloud->SetName(_("Aux Cloud"));
 	if (m_TestMode) m_AuxLandmarkCloud->TestModeOn();
-	SetCloudColor(m_AuxLandmarkCloud, 0, 1, 1, 0.8);
+	m_AuxLandmarkCloud->SetVisibleToTraverse(false);
+	SetCloudColor(m_AuxLandmarkCloud, 0, 0, 1, 0.8);
 
 	albaNEW(m_AuxLandmark);
 	m_AuxLandmark->SetName(_("Aux Landmark"));
 	m_AuxLandmark->ReparentTo(m_AuxLandmarkCloud);
 
-	GetLogicManager()->VmeShow(m_AuxLandmarkCloud, true);
+	GetLogicManager()->VmeShow(m_AuxLandmarkCloud, false);
 	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
@@ -273,6 +276,8 @@ void albaOpAddLandmark::OpStop(int result)
 	{
 		HideGui();
 	}
+
+	GetLogicManager()->CameraUpdate();
 
 	albaEventMacro(albaEvent(this, result));
 }
@@ -546,6 +551,36 @@ void albaOpAddLandmark::AddLandmark(double pos[3])
  {
 	wxString landmarkName = wxString::Format("New_Landmark_%d", m_LandmarkNameVect.size() + 1);
 
+	if (m_Gui && !GetTestMode() && !m_AddLandmarkFromDef)
+	{
+		wxTextEntryDialog *dlg = new wxTextEntryDialog(NULL, "Name", "Edit Landmark Name", landmarkName);
+		int result = dlg->ShowModal();
+		wxString stringValue = dlg->GetValue();
+		cppDEL(dlg);
+
+		if (result == wxID_OK && !stringValue.IsEmpty())
+		{
+			if (m_Cloud->FindInTreeByName(stringValue) == NULL)
+			{
+				landmarkName = stringValue;
+			}
+			else
+			{
+				albaWarningMessageMacro("There is already a landmatk with this name in the cloud");
+				GetLogicManager()->CameraUpdate();
+				UpdateGui();
+				return;
+			}
+		}
+		else
+		{
+			GetLogicManager()->CameraUpdate();
+			UpdateGui();
+			return;
+		}
+	}
+
+	// Create New Landmark 
 	albaSmartPointer<albaVMELandmark> landmark;
 	landmark->SetName(landmarkName);
 	landmark->SetRadius(m_LandmarkRadius);
@@ -579,7 +614,7 @@ void albaOpAddLandmark::AddLandmark(double pos[3])
 	}
 
 	// Show Last Landmark Added 
-	SetCloudColor(m_AuxLandmarkCloud, 0, 1, 0, 0.8);
+	SetCloudColor(m_AuxLandmarkCloud, 0, 0, 1, 0.8);
 	GetLogicManager()->VmeShow(m_AuxLandmarkCloud, true);
 
 	GetLogicManager()->CameraUpdate();
@@ -643,6 +678,14 @@ void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 
 		// Hide Aux Landmark
 		GetLogicManager()->VmeShow(m_AuxLandmarkCloud, false);
+
+		if (m_Gui)
+		{
+			m_Gui->Enable(ID_LANDMARK_REMOVE, false);
+			m_Gui->Enable(ID_LANDMARK_POSITION, false);
+			m_Gui->Enable(ID_LANDMARK_NAME, false);
+			m_Gui->Update();
+		}
 	}
 }
 //----------------------------------------------------------------------------
