@@ -650,9 +650,9 @@ void albaOpAddLandmark::FindDefinition(albaString &name)
 {
 	m_AddLandmarkFromDef = false;
 
-	for (int i = 0; i < m_LandmarkGroupVect[m_SelectedGroup].size(); i++)
+	for (int i = 0; i < m_LandmarkNameVect.size(); i++)
 	{
-		if (m_LandmarkGroupVect[m_SelectedGroup][i] == name.GetCStr())
+		if (m_LandmarkNameVect[i] == name.GetCStr())
 		{
 			m_RemoveMessage = "Landmark is a Dictionary entry";
 			m_LandmarkNameFromDef = name;
@@ -711,6 +711,9 @@ void albaOpAddLandmark::SetLandmarkRadius(double radius)
 	{
 		m_LandmarkRadius = radius;
 		m_Cloud->SetRadius(m_LandmarkRadius);
+
+		if (m_AuxLandmarkCloud)
+			m_AuxLandmarkCloud->SetRadius(m_LandmarkRadius + 0.01);
 
 		GetLogicManager()->CameraUpdate();
 	}
