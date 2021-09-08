@@ -192,7 +192,7 @@ void albaOpAddLandmarkTest::TestAddLandmark()
   op->SetLandmarkName("one");
   op->AddLandmark(lnd1);
   op->SetLandmarkName("two");
-	op->SelectLandmark("Add_New_Landmark");
+	op->SelectLandmarkByName("Add_New_Landmark");
   op->AddLandmark(lnd2);
   op->OpDo();
 
@@ -238,7 +238,7 @@ void albaOpAddLandmarkTest::TestAddLandmark()
   op->SetLandmarkName("one");
   op->AddLandmark(lnd1);
   op->SetLandmarkName("two");
-	op->SelectLandmark("Add_New_Landmark");
+	op->SelectLandmarkByName("Add_New_Landmark");
   op->AddLandmark(lnd2);
   op->OpDo();
  
@@ -268,7 +268,7 @@ void albaOpAddLandmarkTest::TestAddLandmark()
   op->SetLandmarkName("one");
   op->AddLandmark(lnd1);
   op->SetLandmarkName("two");
-	op->SelectLandmark("Add_New_Landmark");
+  op->SelectLandmarkByName("Add_New_Landmark");
   op->AddLandmark(lnd2);
   op->OpDo();
 
