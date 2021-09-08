@@ -456,15 +456,15 @@ void albaViewArbitrarySlice::SetGizmo(int typeGizmo)
 	{
 		if (typeGizmo == GIZMO_TRANSLATE)
 		{
-			m_GizmoTranslate->Show(true);
-			m_GizmoTranslate->SetAbsPose(m_SlicingMatrix, 0);
 			m_GizmoRotate->Show(false);
+			m_GizmoTranslate->SetAbsPose(m_GizmoRotate->GetAbsPose(), 0);
+			m_GizmoTranslate->Show(true);
 		}
 		else if (typeGizmo == GIZMO_ROTATE)
 		{
 			m_GizmoTranslate->Show(false);
+			m_GizmoRotate->SetAbsPose(m_GizmoTranslate->GetAbsPose(), 0);
 			m_GizmoRotate->Show(true);
-			m_GizmoRotate->SetAbsPose(m_SlicingMatrix, 0);
 		}
 
 		m_TypeGizmo = typeGizmo;
