@@ -81,7 +81,7 @@ public:
 
 	virtual void OnEvent(albaEventBase *alba_event);
 		
-	void UpdateGui();
+	void UpdateGui(bool rebuildDict = false);
 
 	albaTypeMacro(albaOpAddLandmark, albaOp);
 

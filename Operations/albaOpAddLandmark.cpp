@@ -89,7 +89,7 @@ albaOp(label)
 	m_AddLandmarkFromDef = false;
 
 	m_RemoveMessage = "";
-	m_DictMessage = "";
+	m_DictMessage = "Add Landmark";
 
 	// Flags
 	m_AddModeFlag = true;
@@ -215,7 +215,7 @@ void albaOpAddLandmark::OpRun()
 	if (!GetTestMode())
 	{
 		CreateGui();
-		UpdateGui();
+		UpdateGui(true);
 	}
 
 	// Create Aux LandmarkCloud
@@ -373,72 +373,77 @@ void albaOpAddLandmark::CreateGui()
 	ShowGui();
 }
 //----------------------------------------------------------------------------
-void albaOpAddLandmark::UpdateGui()
+void albaOpAddLandmark::UpdateGui(bool rebuildDict /*= false*/)
 {
 	if (m_Gui && !GetTestMode())
 	{
-		m_GroupComboBox->Clear();
-		for (int i = 0; i < m_GroupsNameVect.size(); i++)
+		bool isItemSelected = (m_SelectedItem >= 0 && m_SelectedItem < m_LandmarkGroupVect[m_SelectedGroup].size());
+
+		if (rebuildDict)
 		{
-			m_GroupComboBox->Insert(m_GroupsNameVect[i], i);
+			m_GroupComboBox->Clear();
+			for (int i = 0; i < m_GroupsNameVect.size(); i++)
+			{
+				m_GroupComboBox->Insert(m_GroupsNameVect[i], i);
+			}
+
+			if (m_SelectedGroup >= 0)
+			{
+				m_GroupComboBox->Select(m_SelectedGroup);
+
+				m_LandmarkGuiDict->InitDictionary(NULL); // Clear Dictionary
+
+				if (m_SelectedGroup == 0) // Group 0 = All elements
+				{
+					for (int i = 0; i < m_LandmarkNameVect.size(); i++)
+						m_LandmarkGuiDict->AddItem(m_LandmarkNameVect[i]);
+				}
+				else
+				{
+					for (int i = 0; i < m_LandmarkGroupVect[m_SelectedGroup].size(); i++)
+						m_LandmarkGuiDict->AddItem(m_LandmarkGroupVect[m_SelectedGroup][i]);
+				}
+
+				if (m_AddModeFlag)
+				{
+					m_LandmarkGuiDict->AddItem("Add_New_Landmark");
+					m_LandmarkGuiDict->SelectItem("Add_New_Landmark");					
+				}
+
+				if (isItemSelected)
+				{
+					m_LandmarkGuiDict->SelectItem((m_LandmarkGroupVect[m_SelectedGroup][m_SelectedItem]));
+				}
+			}
 		}
 
-		if (m_SelectedGroup >= 0)
+		m_LandmarkGuiDict->SetTitle(m_DictMessage.GetCStr());
+
+		// Enable Widgets
+		m_Gui->Enable(ID_LANDMARK_REMOVE, isItemSelected && m_SelectedLandmark && m_SelectedLandmark->GetDependenciesVMEs().empty());
+		m_Gui->Enable(ID_LANDMARK_POSITION, isItemSelected && m_SelectedLandmark);
+		m_Gui->Enable(ID_LANDMARK_NAME, isItemSelected && m_SelectedLandmark);
+
+		// Check Enable Ok Condition
+		if (m_SelectedGroup == 0)
 		{
-			m_GroupComboBox->Select(m_SelectedGroup);
+			m_Gui->Enable(wxOK, true);
+		}
+		else
+		{
+			bool res = true;
 
-			m_LandmarkGuiDict->InitDictionary(NULL); // Clear Dictionary
-
-			if (m_SelectedGroup == 0) // Group 0 = All elements
-			{
-				for (int i = 0; i < m_LandmarkNameVect.size(); i++)
-					m_LandmarkGuiDict->AddItem(m_LandmarkNameVect[i]);
-			}
-			else
-			{
+			if (m_LandmarkGroupVect.size() > 0)
 				for (int i = 0; i < m_LandmarkGroupVect[m_SelectedGroup].size(); i++)
-					m_LandmarkGuiDict->AddItem(m_LandmarkGroupVect[m_SelectedGroup][i]);
-			}
-
-			if (m_AddModeFlag)
-			{
-				m_LandmarkGuiDict->AddItem("Add_New_Landmark");
-				m_LandmarkGuiDict->SelectItem("Add_New_Landmark");
-				m_LandmarkGuiDict->SetTitle("Add New Landmark");
-			}
-
-			bool isItemSelected = (m_SelectedItem >= 0 && m_SelectedItem < m_LandmarkGroupVect[m_SelectedGroup].size());
-			if (isItemSelected)
-			{
-				m_LandmarkGuiDict->SelectItem((m_LandmarkGroupVect[m_SelectedGroup][m_SelectedItem]));
-				m_LandmarkGuiDict->SetTitle("Edit selected Landmark");
-			}
-
-			m_Gui->Enable(ID_LANDMARK_REMOVE, isItemSelected && m_SelectedLandmark && m_SelectedLandmark->GetDependenciesVMEs().empty());
-			m_Gui->Enable(ID_LANDMARK_POSITION, isItemSelected && m_SelectedLandmark);
-			m_Gui->Enable(ID_LANDMARK_NAME, isItemSelected && m_SelectedLandmark);
-
-			// Check Enable Ok Condition
-			if (m_SelectedGroup == 0)
-			{
-				m_Gui->Enable(wxOK, true);
-			}
-			else
-			{
-				bool res = true;
-
-				if (m_LandmarkGroupVect.size() > 0)
-					for (int i = 0; i < m_LandmarkGroupVect[m_SelectedGroup].size(); i++)
+				{
+					if (!this->m_Cloud->FindInTreeByName(m_LandmarkGroupVect[m_SelectedGroup][i]))
 					{
-						if (!this->m_Cloud->FindInTreeByName(m_LandmarkGroupVect[m_SelectedGroup][i]))
-						{
-							res = false;
-							break;
-						}
+						res = false;
+						break;
 					}
+				}
 
-				m_Gui->Enable(wxOK, res);
-			}
+			m_Gui->Enable(wxOK, res);
 		}
 
 		m_Gui->Update();
@@ -618,7 +623,7 @@ void albaOpAddLandmark::AddLandmark(double pos[3])
 	GetLogicManager()->VmeShow(m_AuxLandmarkCloud, true);
 
 	GetLogicManager()->CameraUpdate();
-	UpdateGui();
+	UpdateGui(true);
 }
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::RemoveLandmark()
@@ -631,13 +636,14 @@ void albaOpAddLandmark::RemoveLandmark()
 		SelectLandmarkByName("NONE");
 
 		GetLogicManager()->CameraUpdate();
-		UpdateGui();
+		UpdateGui(true);
 	}
 }
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 {
-	m_RemoveMessage = "Add Landmark";
+	m_RemoveMessage = "";
+	m_DictMessage = "Add Landmark";
 	m_LandmarkName = "";
 	m_LandmarkPosition[0] = m_LandmarkPosition[1] = m_LandmarkPosition[2] = 0.0;
 
@@ -678,14 +684,7 @@ void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 
 		// Hide Aux Landmark
 		GetLogicManager()->VmeShow(m_AuxLandmarkCloud, false);
-
-		if (m_Gui)
-		{
-			m_Gui->Enable(ID_LANDMARK_REMOVE, false);
-			m_Gui->Enable(ID_LANDMARK_POSITION, false);
-			m_Gui->Enable(ID_LANDMARK_NAME, false);
-			m_Gui->Update();
-		}
+		UpdateGui();
 	}
 }
 //----------------------------------------------------------------------------
@@ -720,7 +719,7 @@ void albaOpAddLandmark::SetLandmarkName(albaString name)
 			m_LandmarkName = m_SelectedLandmark->GetName();
 
 			m_SelectedLandmark->Update();
-			UpdateGui();
+			UpdateGui(true);
 		}
 	}
 }
@@ -789,7 +788,7 @@ void albaOpAddLandmark::SelectGroup(int index, int item)
 			m_SelectedItem = item;
 		}
 
-		UpdateGui();
+		UpdateGui(true);
 	}	
 }
 
@@ -815,7 +814,7 @@ void albaOpAddLandmark::LoadDictionary(wxString fileName)
 		SelectGroup(m_GroupsNameVect.size() - 1); // Last Group
 		m_AddModeFlag = false;
 
-		UpdateGui();
+		UpdateGui(true);
 	}
 }
 //--------------------------------------------------------------------------
@@ -854,7 +853,7 @@ void albaOpAddLandmark::LoaDictionaryFromCloud(albaVMELandmarkCloud *cloud)
 		SelectGroup(m_GroupsNameVect.size() - 1); // Last Group
 		m_AddModeFlag = false;
 
-		UpdateGui();
+		UpdateGui(true);
 	}
 }
 //----------------------------------------------------------------------------
