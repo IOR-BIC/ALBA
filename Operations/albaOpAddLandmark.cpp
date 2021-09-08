@@ -225,7 +225,6 @@ void albaOpAddLandmark::OpRun()
 	m_AuxLandmarkCloud->SetRadius(m_Cloud->GetRadius() + 0.01);
 	m_AuxLandmarkCloud->SetName(_("Aux Cloud"));
 	if (m_TestMode) m_AuxLandmarkCloud->TestModeOn();
-	m_AuxLandmarkCloud->SetVisibleToTraverse(false);
 	SetCloudColor(m_AuxLandmarkCloud, 0, 0, 1, 0.8);
 
 	albaNEW(m_AuxLandmark);
