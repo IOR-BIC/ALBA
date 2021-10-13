@@ -284,8 +284,7 @@ void albaInteractionManager::AddAvatar(albaAvatar *avatar)
   avatar->SetListener(this);
 
   // Link the avatar to the current renderer (if present)
-  avatar->SetRenderer(m_CurrentRenderer);
-  avatar->SetView(m_SelectedView);
+  avatar->SetRendererAndView(m_CurrentRenderer,m_SelectedView);
 }
 
 //------------------------------------------------------------------------------
@@ -301,7 +300,7 @@ int albaInteractionManager::RemoveAvatar(albaAvatar *avatar)
   avatar->SetListener(NULL);
   
   // unlink the avatar from the renderer
-  avatar->SetRenderer(NULL);
+  avatar->SetRendererAndView(NULL,NULL);
     
   m_Avatars.erase(it);
 

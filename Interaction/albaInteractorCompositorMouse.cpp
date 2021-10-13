@@ -69,7 +69,7 @@ int albaInteractorCompositorMouse::StartInteraction(albaDeviceButtonsPadMouse *m
 //------------------------------------------------------------------------------
 {
   // fill this object m_Renderer ivar and get the camera
-  SetRenderer(mouse->GetRenderer());
+  SetRendererAndView(mouse->GetRenderer(),mouse->GetView());
   if (m_Renderer)
   {
     m_CurrentCamera = m_Renderer->GetActiveCamera();
@@ -263,7 +263,7 @@ void albaInteractorCompositorMouse::InitInteraction(int buttonPressed, albaEvent
     {
       // m_ActiveMMIGeneric is the current active mouse behavior
      
-      m_ActiveMMIGeneric->SetRenderer(m_Renderer);
+      m_ActiveMMIGeneric->SetRendererAndView(m_Renderer,m_View);
       m_ActiveMMIGeneric->SetProp(picked_prop);
       m_ActiveMMIGeneric->SetCurrentCamera(m_Renderer->GetActiveCamera());
       if (m_ActiveMMIGeneric->StartInteraction(mouse)) // force 

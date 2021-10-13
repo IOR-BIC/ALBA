@@ -70,13 +70,7 @@ public:
     Set the renderer this avatar is attached to. When the rederer is
     changed, all props created by this avatar are moved to the new renderer
     and the interaction is changed accordingly */
-  virtual void SetRenderer(vtkRenderer *ren);
-
-  /** set the current view */
-  void SetView(albaView *view);
-
-  /** return current view */
-  albaView *GetView() {return m_View;}
+  virtual void SetRendererAndView(vtkRenderer *ren, albaView *view);
 
   /**  
     Set the actor used to display the 3D cursor.
@@ -204,7 +198,6 @@ protected:
   vtkALBASmartPointer<vtkActor2D>  m_Actor2D;  ///< 2D representation of the avatar
 
   albaGUI*           m_Gui;  ///< the settings Gui
-  albaView*          m_View; ///< the selected view
   int               m_Mode; ///< Avatar modality, either 2D or 3D         
 
   int               m_Cursor3DHideCounter; ///< counter of the HideCursor3D() calls, used to manage concurrent calls

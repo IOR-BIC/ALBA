@@ -69,10 +69,7 @@ public:
   void IgnoreTriggerEventsOn() {SetIgnoreTriggerEvents(true);}
   void IgnoreTriggerEventsOff() {SetIgnoreTriggerEvents(false);}
 
-  /** redefined to accomplish specific tasks*/
-  virtual void SetRenderer(vtkRenderer *ren);
-
-    /** Used to hide default tracker's avatar */
+  /** Used to hide default tracker's avatar */
   void HideAvatar();
   
   /** Used to show back default tracker's avatar */

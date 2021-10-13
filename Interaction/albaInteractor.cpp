@@ -101,10 +101,11 @@ void albaInteractor::SetDevice(albaDevice *device)
 }
 
 //------------------------------------------------------------------------------
-void albaInteractor::SetRenderer(vtkRenderer *ren)
+void albaInteractor::SetRendererAndView(vtkRenderer *ren, albaView *view)
 //------------------------------------------------------------------------------
 {
   m_Renderer = ren;
+	m_View = view;
 }
 //------------------------------------------------------------------------------
 void albaInteractor::SetVME(albaVME *vme)
