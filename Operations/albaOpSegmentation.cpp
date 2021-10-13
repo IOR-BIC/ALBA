@@ -625,7 +625,7 @@ void albaOpSegmentation::CreateOpDialog()
 	// ...................................
 
 	// ...................................
-	// . Ok Canc . SnipLabs   . Progress .
+	// . Progress . SnipLabs   . Ok/Canc .
 	// ...................................
 
 	wxBusyCursor wait;
@@ -753,14 +753,6 @@ void albaOpSegmentation::CreateOpDialog()
 	wxBoxSizer *okCancel_progress_Sizer = new wxBoxSizer(wxHORIZONTAL);
 	okCancel_progress_Sizer->SetMinSize(dialogSize[0], 20);
 
-	m_OkButton = new albaGUIButton(m_Dialog, ID_OK, _("Ok"), defPos);
-	m_OkButton->SetListener(this);
-	m_OkButton->SetValidator(albaGUIValidator(this, ID_OK, m_OkButton));
-
-	m_CancelButton = new albaGUIButton(m_Dialog, ID_CANCEL, _("Cancel"), defPos);
-	m_CancelButton->SetListener(this);
-	m_CancelButton->SetValidator(albaGUIValidator(this, ID_CANCEL, m_CancelButton));
-
 	m_SnippetsLabel = new wxStaticText(m_Dialog, -1, "", defPos, wxSize(dialogSize[0] - 166, 20), wxALIGN_LEFT | wxST_NO_AUTORESIZE);
 	m_SnippetsLabel->SetBackgroundColour(wxColor(254, 221, 134));
 	wxFont boldFont = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
@@ -770,10 +762,18 @@ void albaOpSegmentation::CreateOpDialog()
 
 	m_ProgressBar = new wxGauge(m_Dialog, -1, 100, defPos, wxSize(200, 10));
 
-	okCancel_progress_Sizer->Add(m_OkButton, 0, wxEXPAND | wxALL, 5);
-	okCancel_progress_Sizer->Add(m_CancelButton, 0, wxEXPAND | wxALL, 5);
+	m_OkButton = new albaGUIButton(m_Dialog, ID_OK, _("Ok"), defPos);
+	m_OkButton->SetListener(this);
+	m_OkButton->SetValidator(albaGUIValidator(this, ID_OK, m_OkButton));
+
+	m_CancelButton = new albaGUIButton(m_Dialog, ID_CANCEL, _("Cancel"), defPos);
+	m_CancelButton->SetListener(this);
+	m_CancelButton->SetValidator(albaGUIValidator(this, ID_CANCEL, m_CancelButton));
+
 	okCancel_progress_Sizer->Add(m_SnippetsLabel, 0, wxEXPAND | wxALL, 5);
 	okCancel_progress_Sizer->Add(m_ProgressBar, 0, wxEXPAND | wxALL, 5);
+	okCancel_progress_Sizer->Add(m_OkButton, 0, wxEXPAND | wxALL, 5);
+	okCancel_progress_Sizer->Add(m_CancelButton, 0, wxEXPAND | wxALL, 5);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Dialog
