@@ -30,6 +30,7 @@
 #include "vtkTransform.h"
 
 #include <assert.h>
+#include "albaView.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractorCameraMove)
@@ -94,7 +95,7 @@ void albaInteractorCameraMove::OnEvent(albaEventBase *event)
 //------------------------------------------------------------------------------
 int albaInteractorCameraMove::StartInteraction(albaDeviceButtonsPadMouse *mouse)
 {
-  SetRenderer(mouse->GetRenderer());
+  SetRendererAndView(mouse->GetRenderer(),mouse->GetView());
   if (m_Renderer)
   {
     m_CurrentCamera = m_Renderer->GetActiveCamera();
@@ -267,7 +268,7 @@ void albaInteractorCameraMove::Rotate()
 //----------------------------------------------------------------------------
 void albaInteractorCameraMove::Spin()
 {
-  if (m_Renderer == NULL)
+  if (m_Renderer == NULL || m_View == NULL || !m_View->GetCanSpin())
     return;
 
   double *center = m_Renderer->GetCenter();
@@ -549,7 +550,7 @@ void albaInteractorCameraMove::OnMouseWheel(albaEventInteraction *e)
 		 mouse = albaDeviceButtonsPadMouse::SafeDownCast(device);
 	
 	if (mouse)
-		m_Renderer = mouse->GetRenderer();
+		SetRendererAndView(mouse->GetRenderer(),mouse->GetView());
 
 	if(m_Renderer)
 		m_CurrentCamera = m_Renderer->GetActiveCamera();

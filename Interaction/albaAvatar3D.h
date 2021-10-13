@@ -89,7 +89,7 @@ public:
     Set/Get the renderer this avatar is attached to. When the rederer is
     changed, all props created by this avatar are moved to the new renderer
     and the interaction is changed accordingly */
-  virtual void SetRenderer(vtkRenderer *ren);
+  virtual void SetRendererAndView(vtkRenderer *ren, albaView *view);
   
   /**  
     Hide the 3D cursor, i.e. remove actor from renderer's list. This is

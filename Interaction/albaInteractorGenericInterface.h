@@ -158,7 +158,7 @@ public:
   albaTransform *GetResultTransform() { return m_ResultTransform; }
 
   /** redefined to set the renderer also in the constraint */
-  virtual void SetRenderer(vtkRenderer *ren);
+  virtual void SetRendererAndView(vtkRenderer *ren, albaView *view);
 
   /** Set the node to be transformed */
   virtual void SetVME(albaVME *vme);
