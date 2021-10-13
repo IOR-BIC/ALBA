@@ -287,9 +287,9 @@ void albaInteractorDICOMImporter::OnLeftButtonDown(albaEventInteraction *e)
 
 
 //----------------------------------------------------------------------------
-void albaInteractorDICOMImporter::SetRenderer(vtkRenderer *ren)
+void albaInteractorDICOMImporter::SetRendererAndView(vtkRenderer *ren, albaView *view)
 {
-	m_Renderer = ren;
+	Superclass::SetRendererAndView(ren, view);
 	if(ren)
 		ren->AddActor(m_CropActor);
 }
@@ -297,7 +297,7 @@ void albaInteractorDICOMImporter::SetRenderer(vtkRenderer *ren)
 //----------------------------------------------------------------------------
 void albaInteractorDICOMImporter::SetRWI(albaRWI *rwi)
 {
-	SetRenderer(rwi->m_RenFront);
+	SetRendererAndView(rwi->m_RenFront, m_View);
 	m_RWIbase = rwi->m_RwiBase;
 }
 

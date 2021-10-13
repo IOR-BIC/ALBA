@@ -66,6 +66,8 @@ public:
 protected:
 	wxStaticText* AddText(albaGUIDialog * dialog, wxString &text, int Width, int align);
 
+	wxString GetBuildDate();
+
 	albaGUIDialog	*m_AboutDialog;
 	wxImage				*m_PreviewImage;
 

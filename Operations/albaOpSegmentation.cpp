@@ -503,11 +503,12 @@ void albaOpSegmentation::InitializeInteractors()
 	m_EditPER->SetListener(this);
 
 	assert(m_View);
-	m_EditPER->SetRenderer(m_View->GetFrontRenderer());
+	m_View->SetCanSpin(false);
+	m_EditPER->SetRendererAndView(m_View->GetFrontRenderer(),m_View);
 
 	albaNEW(m_SegmentationPicker);
 
-	m_SegmentationPicker->SetRenderer(m_View->GetFrontRenderer());
+	m_SegmentationPicker->SetRendererAndView(m_View->GetFrontRenderer(),m_View);
 	m_SegmentationPicker->SetListener(this);
 
 	m_View->GetRWI()->SetMouse(m_DialogMouse);
@@ -529,7 +530,7 @@ void albaOpSegmentation::InitializeInteractors()
 	pntAction->BindDevice(m_DialogMouse);
 	pntAction->BindInteractor(m_InitPER);
 	m_InitPER->SetListener(this);
-	m_InitPER->SetRenderer(m_View->GetFrontRenderer());
+	m_InitPER->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::InitVolumeDimensions()

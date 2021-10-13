@@ -129,6 +129,10 @@ public:
   virtual wxWindow*	GetWindow(){return m_Win;};
   virtual wxFrame*	GetFrame() {return m_Frame;};
   virtual albaGUI*		GetGui()   {if(m_Gui == NULL) CreateGui(); assert(m_Gui); return m_Gui;};
+
+	/** destroy the Gui */
+	void DeleteGui();
+
   virtual void		  SetFrame(wxFrame* f) {m_Frame = f;};
 
   virtual void			OnSize(wxSizeEvent &size_event)	{};
@@ -178,6 +182,13 @@ public:
 	virtual wxColor GetBackgroundColor() { return m_BackgroundColor; };
 	virtual void SetBackgroundColor(wxColor color) = 0;
 
+
+	/** Returns CanSpin */
+	bool GetCanSpin() const { return m_CanSpin; }
+
+	/** Sets CanSpin */
+	void SetCanSpin(bool canSpin) { m_CanSpin = canSpin; }
+
 protected:
   albaObserver   *m_Listener;
   wxString       m_Label;
@@ -200,8 +211,22 @@ protected:
 
 	wxColor				m_BackgroundColor;
 
+	bool m_LightCopyEnabled;
+	bool m_CanSpin;
+
   /** Find the VME picked */
   bool FindPickedVme(vtkAssemblyPath *ap = NULL);
+
+	/**
+	Internally used to create a new instance of the GUI. This function should be
+	overridden by subclasses to create specialized GUIs. Each subclass should append
+	its own widgets and define the enum of IDs for the widgets as an extension of
+	the superclass enum. The last id value must be defined as "LAST_ID" to allow the
+	subclass to continue the ID enumeration from it. For appending the widgets in the
+	same panel GUI, each CreateGUI() function should first call the superclass' one.*/
+	virtual albaGUI  *CreateGui();
+
+
 
 public:
   int            m_Mult;    ///< Used to store the multiplicity of the view type created (e.g. the 3rd view surface created).
@@ -209,21 +234,5 @@ public:
   bool           m_Plugged; // forget it - it is used from outside 
   albaView       *m_Next;    // forget it - it is used from outside 
 
-  /** destroy the Gui */
-  void DeleteGui();
-
-  
-  
-protected:
-  /**
-  Internally used to create a new instance of the GUI. This function should be
-  overridden by subclasses to create specialized GUIs. Each subclass should append
-  its own widgets and define the enum of IDs for the widgets as an extension of
-  the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
-  subclass to continue the ID enumeration from it. For appending the widgets in the
-  same panel GUI, each CreateGUI() function should first call the superclass' one.*/
-  virtual albaGUI  *CreateGui();
-	  
-  bool m_LightCopyEnabled;
 };
 #endif

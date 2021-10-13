@@ -146,7 +146,10 @@ void albaGUIAboutDialog::CreateDialog()
 	// Version
 	if (!m_Version.IsEmpty())
 		description += _(" - Version ") + m_Version;
-	
+
+	// Build Date
+	description += GetBuildDate();
+
 	// Copyright
 	wxString copyright;
 	copyright.Printf("\n\n© %d BIC - RIT - IOR", (1900 + wxDateTime::GetTmNow()->tm_year));
@@ -257,4 +260,33 @@ wxStaticText* albaGUIAboutDialog::AddText(albaGUIDialog * dialog, wxString &text
 	guiLabel->SetFont(fixedFont);
 
 	return guiLabel;
+}
+
+//----------------------------------------------------------------------------
+wxString albaGUIAboutDialog::GetBuildDate()
+{
+	unsigned int month, day, year;
+
+	char *months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+		"Sep", "Oct", "Nov", "Dec" };
+
+	char temp[] = __DATE__;
+	unsigned char i;
+
+	year = atoi(temp + 9);
+	*(temp + 6) = 0;
+	day = atoi(temp + 4);
+	*(temp + 3) = 0;
+
+	for (i = 0; i < 12; i++)
+	{
+		if (!strcmp(temp, months[i]))
+		{
+			month = i + 1;
+			wxString date = wxString::Format(" %d/%d/%d ", day, month, year);
+			return date;
+		}
+	}
+
+	return "";
 }

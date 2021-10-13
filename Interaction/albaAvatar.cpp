@@ -167,8 +167,7 @@ void albaAvatar::SetActor2D(vtkActor2D *avatar)
 }
 
 //------------------------------------------------------------------------------
-void albaAvatar::SetRenderer(vtkRenderer *ren)
-//------------------------------------------------------------------------------
+void albaAvatar::SetRendererAndView(vtkRenderer *ren, albaView *view)
 {
   // If already initialized we have to shutdown and then restart
   int old_flag=m_Initialized; 
@@ -177,20 +176,12 @@ void albaAvatar::SetRenderer(vtkRenderer *ren)
     Shutdown();
   }
   
-  m_Renderer=ren;
-  //CanonicalToWorldTransform->SetRenderer(ren);
+	Superclass::SetRendererAndView(ren, view);
   
   if (old_flag)
   {
     Initialize();
   }
-}
-
-//------------------------------------------------------------------------------
-void albaAvatar::SetView(albaView *view)
-//------------------------------------------------------------------------------
-{
-  m_View=view;
 }
 
 //------------------------------------------------------------------------------
@@ -333,8 +324,7 @@ void albaAvatar::OnPostResetCamera(albaEventBase *event)
 void albaAvatar::OnViewSelected(albaEvent *e)
 //------------------------------------------------------------------------------
 {
-  SetRenderer((vtkRenderer *)e->GetData());
-  m_View=e->GetView();
+  SetRendererAndView((vtkRenderer *)e->GetData(), e->GetView());
 }
 //------------------------------------------------------------------------------
 void albaAvatar::OnEvent(albaEventBase *event)

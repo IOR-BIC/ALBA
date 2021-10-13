@@ -191,11 +191,11 @@ void albaAvatar3D::SetTracker(albaDeviceButtonsPadTracker *tracker)
 }
 
 //------------------------------------------------------------------------------
-void albaAvatar3D::SetRenderer(vtkRenderer *ren)
+void albaAvatar3D::SetRendererAndView(vtkRenderer *ren, albaView *view)
 //------------------------------------------------------------------------------
 {
   m_CanonicalToWorldTransform->SetRenderer(ren);
-  Superclass::SetRenderer(ren);
+  Superclass::SetRendererAndView(ren,view);
 }
 
 //------------------------------------------------------------------------------

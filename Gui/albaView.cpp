@@ -71,6 +71,7 @@ albaView::albaView(const wxString &label)
 
 	m_BackgroundColor = wxColour(DEFAULT_BG_COLOR * 255, DEFAULT_BG_COLOR * 255, DEFAULT_BG_COLOR * 255);
 
+	m_CanSpin = true;
   m_HTMLText = "";
   m_LightCopyEnabled = false;
 }
