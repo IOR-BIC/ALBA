@@ -30,6 +30,13 @@ class albaVME;
 class albaSceneNode;
 class albaGUI;
 
+enum VOLUME_SIDE
+{
+	ALL = 0,
+	SIDE_LEFT,
+	SIDE_RIGHT,
+};
+
 //----------------------------------------------------------------------------
 // albaViewRX :
 //----------------------------------------------------------------------------
@@ -91,6 +98,8 @@ public:
   Return true if a there is a volume inside the view.*/
   bool VolumeIsVisible() {return m_CurrentVolume != NULL;};
 
+	void ShowSideVolume(VOLUME_SIDE side);
+
   /** Update camera view*/
   void CameraUpdate();
 
@@ -98,14 +107,15 @@ protected:
 
   /** update camera view for volume with a specific rotation*/
   void CameraUpdateForRotatedVolumes();
-  
-  /** set camera direction parallel to one of the axis of the dataset */
+
+	/** set camera direction parallel to one of the axis of the dataset */
   void SetCameraParallelToDataSetLocalAxis( int axis );
 
   /** create gui widgets */
   virtual albaGUI *CreateGui();  
   albaSceneNode *m_CurrentVolume; ///< Current visualized volume
-  
+	VOLUME_SIDE m_CurrentSide;
+
   albaMatrix m_OldABSPose;
   albaMatrix m_NewABSPose;
 

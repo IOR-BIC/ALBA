@@ -74,7 +74,8 @@ public:
   {
     ID_LUT_WIDGET = Superclass::ID_LAST,
     ID_MOVE_ALL_SLICES,
-    ID_RIGHT_OR_LEFT,
+		ID_SIDE,
+		ID_RIGHT_OR_LEFT,
     ID_SNAP,
     ID_ADJUST_SLICES,
     ID_BORDER_CHANGE,
@@ -153,17 +154,20 @@ protected:
 
   albaGizmoSlice   *m_GizmoSlice[6];
   albaVME    *m_CurrentVolume; ///< Current visualized volume
-  
+	albaSceneNode *m_CurrentSceneNode; ///< Current visualized volume
+
   albaViewRX       *m_ViewsRX[2];
   albaViewCompound *m_ViewCTCompound;
 
   // this member variables are used by side panel gui view
   int m_MoveAllSlices;
   int m_RightOrLeft;
-  int m_Snap;
+	int m_Side;
+	int m_Snap;
   int m_AllSurface;
   wxSize m_Size;
   double m_Border;
+
   std::vector<albaSceneNode*> m_CurrentSurface;
 
   albaGUI  *m_GuiViews[3];
