@@ -225,10 +225,8 @@ albaGUI* albaViewRXCompound::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = albaView::CreateGui();
   
-  wxString m_Choices[2];
-  m_Choices[0]="Right";
-  m_Choices[1]="Left";
-  m_Gui->Radio(ID_RIGHT_OR_LEFT,"Side",&m_RightOrLeft,2,m_Choices);
+	wxString povChoices[2]{ "Right","Left" };
+	m_Gui->Radio(ID_RIGHT_OR_LEFT, "POV", &m_RightOrLeft, 2, povChoices, 2, "Point Of View");
 
   m_Gui->Divider(1);
   

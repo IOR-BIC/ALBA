@@ -381,9 +381,7 @@ albaGUI* albaViewOrthoSlice::CreateGui()
   m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
   m_Gui->Divider(2);
 
-  wxString sidesName[2];
-  sidesName[0] = "left";
-  sidesName[1] = "right";
+	wxString sidesName[2]{ "Left", "Right" };
   // m_Gui->Radio(ID_SIDE_ORTHO, "side", &m_Side, 2, sidesName, 2);
 
 	m_Gui->Bool(ID_SNAP,"Snap on grid",&m_Snap,1);

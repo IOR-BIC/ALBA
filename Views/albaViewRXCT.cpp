@@ -92,6 +92,7 @@ albaViewRXCT::albaViewRXCT(wxString label)
   m_Lut = NULL;
 
   m_RightOrLeft=1;
+	m_Side = 0; // All
   m_MoveAllSlices = 0; 
   m_Snap=0;
   m_CurrentSurface.clear();
@@ -618,7 +619,19 @@ void albaViewRXCT::OnEvent(albaEventBase *alba_event)
         OnEventSnapModality();
       }
 			break;
-      case ID_RIGHT_OR_LEFT:
+
+			case ID_SIDE:
+			{
+				if (m_Side == 0)
+				((albaViewRX *)m_ChildViewList[RX_SIDE_VIEW])->ShowSideVolume(ALL);
+				else if (m_Side == 1)
+				((albaViewRX *)m_ChildViewList[RX_SIDE_VIEW])->ShowSideVolume(SIDE_LEFT);
+				else if (m_Side == 2)
+				((albaViewRX *)m_ChildViewList[RX_SIDE_VIEW])->ShowSideVolume(SIDE_RIGHT);
+			}
+			break;
+      
+			case ID_RIGHT_OR_LEFT:
         {
           if (m_RightOrLeft==0)
           {
@@ -726,10 +739,11 @@ albaGUI* albaViewRXCT::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = albaView::CreateGui();
 
-  wxString m_Choices[2];
-  m_Choices[0]="Right";
-  m_Choices[1]="Left";
-	m_Gui->Radio(ID_RIGHT_OR_LEFT, "Side", &m_RightOrLeft, 2, m_Choices);
+	wxString povChoices[2]{ "Right","Left" };
+	m_Gui->Radio(ID_RIGHT_OR_LEFT, "POV", &m_RightOrLeft, 2, povChoices, 2, "Point Of View");
+
+	wxString sideChoices[3]{ "All", "Left", "Right" };
+	m_Gui->Radio(ID_SIDE, "Side", &m_Side, 3, sideChoices, 1, "Side");
 
   m_Gui->Bool(ID_SNAP,"Snap on grid",&m_Snap,1);
 
