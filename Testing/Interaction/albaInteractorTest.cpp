@@ -79,7 +79,7 @@ void albaInteractorTest::TestSetGetRenderer()
   albaInteractorDummy *interactor;
   albaNEW(interactor);
 
-  interactor->SetRenderer(renderer);
+  interactor->SetRendererAndView(renderer,NULL);
   CPPUNIT_ASSERT(interactor->GetRenderer() == renderer);
 
   vtkDEL(renderer);

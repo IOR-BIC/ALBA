@@ -43,6 +43,7 @@
 #include "albaGUIButton.h"
 #include "albaGUIValidator.h"
 #include "albaLogicWithManagers.h"
+#include "wx/datetime.h"
 
 //----------------------------------------------------------------------------
 // constant :
@@ -58,6 +59,7 @@ albaGUIAboutDialog::albaGUIAboutDialog(wxString dialog_title)
 {  
 	m_Title = "";
 	m_BuildNum = "";
+	m_BuildDate = GetBuildDate();
 	m_Version = "";
 	m_ImagePath = "";	
 	m_WebSiteURL = "";
@@ -139,13 +141,22 @@ void albaGUIAboutDialog::CreateDialog()
 	wxString description = m_Title;
 	description += "\n";
 	
-	if (!m_Version.IsEmpty())
-		description += _("Version ") + m_Version +  _("\n");
-	
-	description += m_BuildNum + _("\n");
-	
-	description += "\n© 2020 BIC - RIT - IOR";
+	// Build number
+	description += m_BuildNum;
 
+	// Version
+	if (!m_Version.IsEmpty())
+		description += _(" - Version ") + m_Version;
+
+	// Build Date
+	description += m_BuildDate;
+
+	// Copyright
+	wxString copyright;
+	copyright.Printf("\n\n© %d BIC - RIT - IOR", (1900 + wxDateTime::GetTmNow()->tm_year));
+	description += copyright;
+
+	// Extra
 	description += m_ExtraMessage;
 
 	//////////////////////////////////////////////////////////////////////////
@@ -250,4 +261,33 @@ wxStaticText* albaGUIAboutDialog::AddText(albaGUIDialog * dialog, wxString &text
 	guiLabel->SetFont(fixedFont);
 
 	return guiLabel;
+}
+
+//----------------------------------------------------------------------------
+wxString albaGUIAboutDialog::GetBuildDate()
+{
+	unsigned int month, day, year;
+
+	char *months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+		"Sep", "Oct", "Nov", "Dec" };
+
+	char temp[] = __DATE__;
+	unsigned char i;
+
+	year = atoi(temp + 9);
+	*(temp + 6) = 0;
+	day = atoi(temp + 4);
+	*(temp + 3) = 0;
+
+	for (i = 0; i < 12; i++)
+	{
+		if (!strcmp(temp, months[i]))
+		{
+			month = i + 1;
+			wxString date = wxString::Format(" %d/%d/%d ", day, month, year);
+			return date;
+		}
+	}
+
+	return "";
 }

@@ -1736,6 +1736,10 @@ void albaLogicWithManagers::CreateWizardToolbar()
 		.Gripper(false)
 	);
 }
+albaProsthesesDBManager * albaLogicWithManagers::GetProsthesesDBManager()
+{
+	return NULL;
+}
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::ConfigureWizardManager()
 {

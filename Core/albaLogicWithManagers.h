@@ -55,6 +55,7 @@ class albaHelpManager;
 class albaSnapshotManager;
 class wxSplashScreen;
 class mmaApplicationLayout;
+class albaProsthesesDBManager;
 
 typedef int(*eventfilterFunc)(wxEvent& event);
 
@@ -228,6 +229,10 @@ public:
 
 	/** Get  application layout*/
 	mmaApplicationLayout* GetLayout() { return m_AppLayout; };
+
+
+	// Inherited via albaAbsLogicManager
+	virtual albaProsthesesDBManager * GetProsthesesDBManager();
 
 protected:
 	//---------------------------------------------------------

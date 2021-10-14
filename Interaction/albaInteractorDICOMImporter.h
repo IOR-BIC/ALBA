@@ -71,7 +71,7 @@ public:
   /** redefined to send the picking world coordinates also */
   virtual void OnLeftButtonDown(albaEventInteraction *e);
 
-	virtual void SetRenderer(vtkRenderer *ren);
+	virtual void SetRendererAndView(vtkRenderer *ren, albaView *view);
 
 	void SetRWI(albaRWI *rwi);
 	

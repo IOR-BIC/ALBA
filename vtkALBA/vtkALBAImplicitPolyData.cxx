@@ -30,7 +30,7 @@ vtkALBAImplicitPolyData::vtkALBAImplicitPolyData()
   this->Locator = NULL;
   this->Poly    = NULL;
   this->Cells   = NULL;
-
+	this->ConcaveMode = false;
 }
 //----------------------------------------------------------------------------
 void vtkALBAImplicitPolyData::SetInput(vtkPolyData *input) 
@@ -112,7 +112,7 @@ double vtkALBAImplicitPolyData::EvaluateFunction(double x[3])
 
 	int cellNum, pid;
 	vtkCell *cell;
-	double dot, ret = -VTK_LARGE_FLOAT, cNormal[3], closestPoint[3];
+	double dot, ret = ConcaveMode ? VTK_LARGE_FLOAT : -VTK_LARGE_FLOAT, cNormal[3], closestPoint[3];
 
     // get point id of closest point in data set
 	pid = this->Locator->FindClosestPoint( x );
@@ -131,11 +131,14 @@ double vtkALBAImplicitPolyData::EvaluateFunction(double x[3])
               cNormal[1]*(x[1]-closestPoint[1]) +
               cNormal[2]*(x[2]-closestPoint[2]) );
 
-      if( dot > ret ) ret = dot;
+      if(ConcaveMode && dot < ret ) ret = dot;
+			else if (!ConcaveMode && dot > ret) ret = dot;
     }
   }
-  if( ret == -VTK_LARGE_FLOAT ) ret = NoValue;
-  return ret;
+  if(ConcaveMode && ret == VTK_LARGE_FLOAT ) ret = NoValue;
+	else if (!ConcaveMode && ret == -VTK_LARGE_FLOAT) ret = NoValue;
+  
+	return ret;
 }
 // Evaluate function gradient at point x[3].
 //----------------------------------------------------------------------------
@@ -172,7 +175,7 @@ void vtkALBAImplicitPolyData::EvaluateGradient( double x[3], double n[3] )
               cNormal[1]*(x[1]-closestPoint[1]) +
               cNormal[2]*(x[2]-closestPoint[2]) );
 
-      if( dot > ret ) 
+      if((ConcaveMode && dot > ret) || (!ConcaveMode && dot < ret))
         for( i=0; i<3; i++ ) n[i] = cNormal[i];
     }
   }

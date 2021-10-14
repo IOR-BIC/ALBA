@@ -57,12 +57,7 @@ albaInteractor6DOF::~albaInteractor6DOF()
   vtkDEL(m_DeltaTransform);
 }
 
-//------------------------------------------------------------------------------
-void albaInteractor6DOF::SetRenderer(vtkRenderer *ren)
-//------------------------------------------------------------------------------
-{
-  Superclass::SetRenderer(ren);
-}
+
 
 //------------------------------------------------------------------------------
 void albaInteractor6DOF::SetTracker(albaDeviceButtonsPadTracker *tracker)
@@ -120,7 +115,8 @@ int albaInteractor6DOF::StartInteraction(albaDeviceButtonsPadTracker *tracker,al
     if (m_Avatar)
     {
       // store the current renderer: camera cannot be changed during interaction!!!
-      SetRenderer(tracker->GetAvatar()->GetRenderer());
+			albaAvatar * avatar = tracker->GetAvatar();
+      SetRendererAndView(avatar->GetRenderer(),avatar->GetView());
       InvokeEvent(this,INTERACTION_STARTED,MCH_UP,m_StartTrackerPoseMatrix);
       return true;
     }

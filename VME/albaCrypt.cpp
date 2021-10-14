@@ -63,6 +63,56 @@ bool albaDefaultEncryptFileFromMemory(const char *in, unsigned int len, const ch
 }
 
 //----------------------------------------------------------------------------
+ALBA_EXPORT extern void albaCalculateteSHA256(const char *filename, std::string &checksum_result)
+{
+	try
+	{
+		SHA256 hashSHA256;
+		HashFilter filterMD5(hashSHA256);
+
+		std::auto_ptr<ChannelSwitch>
+			channelSwitch(new ChannelSwitch);
+
+		channelSwitch->AddDefaultRoute(filterMD5);
+
+		FileSource f(filename, true, channelSwitch.release());
+
+		HexEncoder encoder(new StringSink(checksum_result), true);
+		filterMD5.TransferTo(encoder);
+	}
+	catch (...)
+	{
+		wxString msg = wxString::Format(_("Problem on calculating SHA256 on file %s !!"), filename);
+		wxMessageBox(msg, _("Error"));
+	}
+
+}
+
+//----------------------------------------------------------------------------
+ALBA_EXPORT extern void albaCalculateteSHA256(const char *input_string, int input_len, std::string &checksum_result)
+{
+	try
+	{
+		SHA256 hashSHA256;
+		HashFilter filterMD5(hashSHA256);
+
+		std::auto_ptr<ChannelSwitch>
+			channelSwitch(new ChannelSwitch);
+
+		channelSwitch->AddDefaultRoute(filterMD5);
+
+		StringSource s((const byte *)input_string, input_len, true, channelSwitch.release());
+
+		HexEncoder encoder(new StringSink(checksum_result), true);
+		filterMD5.TransferTo(encoder);
+	}
+	catch (...)
+	{
+		wxMessageBox(_("Problem on calculating Checksum on string!!"), _("Error"));
+	}
+}
+
+//----------------------------------------------------------------------------
 bool albaEncryptFile(const char *filename_in, const char *filename_out, const char *passPhrase)
 //----------------------------------------------------------------------------
 {
@@ -193,8 +243,8 @@ void albaCalculateteChecksum(const char *filename, std::string &checksum_result)
 {
   try
   {
-    MD5 hashMD5;
-    HashFilter filterMD5(hashMD5);
+		MD5 hashMD5;
+		HashFilter filterMD5(hashMD5);
 
     std::auto_ptr<ChannelSwitch>
       channelSwitch(new ChannelSwitch);

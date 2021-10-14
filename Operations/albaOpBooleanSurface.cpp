@@ -719,7 +719,10 @@ void albaOpBooleanSurface::Difference()
 			int result=m_FirstOperatorVME->SetData(resultPolydata,m_Input->GetTimeStamp());
 			if(result == ALBA_ERROR)
 			{
-				albaMessage(_("The result surface hasn't any points"),_("Warning"),wxICON_EXCLAMATION);
+				if (!m_TestMode)
+					albaMessage(_("The result surface hasn't any points"), _("Warning"), wxICON_EXCLAMATION);
+				else
+					albaLogMessage("Warning: The result surface hasn't any points");
 				albaDEL(resultPolydata);
 			}
 			else

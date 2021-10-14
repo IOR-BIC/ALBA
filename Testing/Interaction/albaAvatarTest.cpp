@@ -95,7 +95,7 @@ void albaAvatarTest::TestSetGetView()
   albaViewVTK *dummyView = new albaViewVTK();
   CPPUNIT_ASSERT(dummyView != NULL);
 
-  dummyAvatar->SetView(dummyView);
+  dummyAvatar->SetRendererAndView(NULL,dummyView);
   view = dummyAvatar->GetView();
 
   CPPUNIT_ASSERT(view == dummyView);

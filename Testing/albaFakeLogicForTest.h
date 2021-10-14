@@ -84,8 +84,9 @@ public:
 
 	virtual albaOpManager * GetOpManager() const override;
 
-	virtual albaViewManager *GetViewManager();
+	virtual albaViewManager *GetViewManager() override;
 
+	virtual albaProsthesesDBManager * GetProsthesesDBManager() override;
 
 protected:
 	

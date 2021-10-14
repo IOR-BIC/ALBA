@@ -85,6 +85,8 @@ albaOp(label)
 	m_ClipBoundBox	= 1;
   m_ClipModality  = MODE_IMPLICIT_FUNCTION;
 	m_GizmoType			= GIZMO_TRANSLATE;
+
+	m_GeometryModality = 0;
   
   m_PlaneCreated = false;
 
@@ -139,6 +141,7 @@ enum CLIP_SURFACE_ID
 {
   ID_CHOOSE_SURFACE = MINID,
   ID_CLIP_BY,
+	ID_GEOMETRY_MOD,
   ID_CLIP_INSIDE,
 	ID_GENERATE_CLIPPED_OUTPUT,
 	ID_PLANE_WIDTH,
@@ -202,6 +205,8 @@ void albaOpClipSurface::CreateGui()
 	wxString gizmo_name[3] = {"translate","rotate","scale"};
 	m_Gui->Combo(ID_CHOOSE_GIZMO,_("gizmo"),&m_GizmoType,3,gizmo_name);
 	m_Gui->Button(ID_CHOOSE_SURFACE,_("clipper surface"));
+	wxString geomModality[2] = { "Convex","Concave" };
+	m_Gui->Radio(ID_GEOMETRY_MOD, "", &m_GeometryModality, 2, geomModality);
 	m_Gui->Bool(ID_CLIP_INSIDE,_("reverse clipping"),&m_ClipInside,1);
 	double b[6];
 	m_Input->GetOutput()->GetVMEBounds(b);
@@ -217,6 +222,7 @@ void albaOpClipSurface::CreateGui()
 	m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 	m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 	m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
+	m_Gui->Enable(ID_GEOMETRY_MOD, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
 	m_Gui->Enable(wxOK,m_ResultPolyData != NULL);
 
 	m_Gui->Divider();
@@ -251,6 +257,7 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 			break;
 		case ID_CLIP_BY:
 			m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
+			m_Gui->Enable(ID_GEOMETRY_MOD, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
 			m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);
 			m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 			m_Gui->Enable(ID_USE_GIZMO,m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
@@ -602,6 +609,7 @@ int albaOpClipSurface::Clip()
     transform_data_clipper->Update();
 
 		vtkALBASmartPointer<vtkALBAImplicitPolyData> implicitPolyData;
+		implicitPolyData->SetConcaveMode(m_GeometryModality);
 		implicitPolyData->SetInput(transform_data_clipper->GetOutput());
 		m_Clipper->SetInput(subdivider->GetOutput());
 		m_Clipper->SetClipFunction(implicitPolyData);

@@ -116,11 +116,11 @@ bool albaLicenceManager::GetExpireDate( wxDateTime &dateExpire)
 	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
 	wxRegKey RegKey(regKeyStr);
 
-	if (!RegKey.HasValue("ExpireDate"))
+	if (!RegKey.HasValue("Registered"))
 		return false;
 
 	wxString encriptedExpire;
-	RegKey.QueryValue("ExpireDate", encriptedExpire);
+	RegKey.QueryValue("Registered", encriptedExpire);
 	wxString decriptedExpire = DecryptStr(encriptedExpire);
 
 	//if decriptedExpire is empty there can be a rewriting tentative so we set an earlier date to

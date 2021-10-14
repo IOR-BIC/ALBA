@@ -55,6 +55,7 @@ public:
 	void SetImagePath(wxString imagePath) { m_ImagePath = imagePath; };
 	void SetTitle(wxString title) { m_Title = title; };
 	void SetBuildNum(wxString revision);
+	void SetBuildDate(wxString date) { m_BuildDate = date; };
 	void SetVersion(wxString ver) { m_Version = ver; };
 	void SetWebSite(wxString webSite);
 	void SetLicenseURL(wxString licenseURL);
@@ -62,15 +63,18 @@ public:
 
 	/** Show the Settings Dialog. */
 	bool ShowModal();
-
+	
 protected:
 	wxStaticText* AddText(albaGUIDialog * dialog, wxString &text, int Width, int align);
+
+	wxString GetBuildDate();
 
 	albaGUIDialog	*m_AboutDialog;
 	wxImage				*m_PreviewImage;
 
 	wxString			m_Title;
 	wxString			m_BuildNum;
+	wxString			m_BuildDate;
 	wxString			m_Version;
 	wxString			m_ImagePath;
 	wxString			m_WebSiteURL;

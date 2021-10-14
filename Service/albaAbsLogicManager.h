@@ -23,6 +23,7 @@ class albaVME;
 class albaVMEImage;
 class albaOpManager;
 class albaViewManager;
+class albaProsthesesDBManager;
 
 class ALBA_EXPORT albaAbsLogicManager
 {
@@ -63,5 +64,6 @@ public:
 
 	virtual albaViewManager *GetViewManager() = 0;
 
+	virtual albaProsthesesDBManager * GetProsthesesDBManager() = 0;
 };
 #endif

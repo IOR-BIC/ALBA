@@ -131,7 +131,7 @@ public:
   void Label(albaString label1,albaString *var, bool bold_label = false, bool bold_var = false, bool multiline = false, double customSizer = 1.0);
 
 	/** Hint Box widget. */
-	void HintBox(int id, wxString label, wxString title = "Hint", bool showIcon = true);
+	void HintBox(int id, wxString label, wxString title = "Hint", int mode = 0 /*0=Hint (default), 1=Info, 2=Warning*/, bool showIcon = true);
 
 	/** String entry widget. */
 	void String(int id, wxString label, wxString *var, wxString tooltip = "", bool multiline = false, bool password = false, bool interactive = false, double customSizer = 1.0);

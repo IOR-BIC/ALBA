@@ -9,7 +9,11 @@
 
   // MD5 Checksum calculation for files and strings
   ALBA_EXPORT extern void albaCalculateteChecksum(const char *filename, std::string &checksum_result);
-  ALBA_EXPORT extern void albaCalculateteChecksum(const char *input_string, int input_len, std::string &checksum_result);
+	ALBA_EXPORT extern void albaCalculateteChecksum(const char *input_string, int input_len, std::string &checksum_result);
+
+	// SHA256 Hash calculation for files and strings
+	ALBA_EXPORT extern void albaCalculateteSHA256(const char *filename, std::string &checksum_result);
+	ALBA_EXPORT extern void albaCalculateteSHA256(const char *input_string, int input_len, std::string &checksum_result);
 
   // files encryption/decryption
   ALBA_EXPORT extern bool albaEncryptFile(const char *filename_in, const char *filename_out, const char *passPhrase);

@@ -168,9 +168,13 @@ void albaViewArbitrarySlice::PackageView()
 void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 	//----------------------------------------------------------------------------
 {
+	vme->Update();
+	if (show == false && vme->GetOutput()->IsA("albaVMEOutputVolume"))
+		OnReset();
+
 	m_ChildViewList[ARBITRARY_VIEW]->VmeShow(vme, show);
 	m_ChildViewList[SLICE_VIEW]->VmeShow(vme, show);
-	vme->Update();
+
 	if (show)
 	{
 		if(vme->GetOutput()->IsA("albaVMEOutputVolume") && vme != m_CurrentVolume)
@@ -206,11 +210,6 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 			albaNEW(m_MatrixReset);
 			m_MatrixReset->SetVTKMatrix(TransformReset->GetMatrix());
 			
-			//Show Slicer
-			m_ChildViewList[ARBITRARY_VIEW]->VmeShow(m_CurrentVolume, show);
-			m_ChildViewList[SLICE_VIEW]->VmeShow(m_CurrentVolume, show);
-
-		
 			//Set camera of slice view in way that it will follow the volume
 			if(!m_AttachCamera)
 				m_AttachCamera=new albaAttachCamera(m_Gui,((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->m_Rwi,this);
@@ -456,15 +455,15 @@ void albaViewArbitrarySlice::SetGizmo(int typeGizmo)
 	{
 		if (typeGizmo == GIZMO_TRANSLATE)
 		{
-			m_GizmoTranslate->Show(true);
-			m_GizmoTranslate->SetAbsPose(m_SlicingMatrix, 0);
 			m_GizmoRotate->Show(false);
+			m_GizmoTranslate->SetAbsPose(m_GizmoRotate->GetAbsPose(), 0);
+			m_GizmoTranslate->Show(true);
 		}
 		else if (typeGizmo == GIZMO_ROTATE)
 		{
 			m_GizmoTranslate->Show(false);
+			m_GizmoRotate->SetAbsPose(m_GizmoTranslate->GetAbsPose(), 0);
 			m_GizmoRotate->Show(true);
-			m_GizmoRotate->SetAbsPose(m_SlicingMatrix, 0);
 		}
 
 		m_TypeGizmo = typeGizmo;

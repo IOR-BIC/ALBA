@@ -76,8 +76,9 @@ public:
   /**  
     Set/Get the renderer this interactor is attached to. This methods is redefined
     in subclasses to perform specialized actions when the renderer is changed */
-  virtual void SetRenderer(vtkRenderer *ren);
+  virtual void SetRendererAndView(vtkRenderer *ren, albaView *view);
   vtkRenderer *GetRenderer() {return m_Renderer;}
+	albaView *GetView() {return m_View;}
 
   /** Return the current input device. */
   albaDevice *GetDevice() {return m_Device;}
@@ -209,9 +210,10 @@ protected:
   int           m_ButtonsCounter;       ///< Take count of the number of button pressed.
 
   albaVME       *m_VME;                  ///< the object being interacted (optional)
+	albaView			*m_View;								 ///< the view this interactor is working on
 
   vtkALBASmartPointer<vtkRenderer> m_Renderer; ///< the renderer this interactor is working on
-  vtkALBASmartPointer<vtkProp3D>   m_Prop;     ///< the prop being interacted (optional)
+	vtkALBASmartPointer<vtkProp3D>   m_Prop;     ///< the prop being interacted (optional)
 
   bool m_TestMode;///< Flag used with cppunitTest
 

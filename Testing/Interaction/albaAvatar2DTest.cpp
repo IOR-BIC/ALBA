@@ -61,7 +61,7 @@ void albaAvatar2DTest::TestOnEvent()
   vtkRenderer *dummyRenderer = vtkRenderer::New();
   vtkRenderer *dummyRendererBackup = dummyRenderer;
 
-  albaEventBase dummyEventHandledByTestedClass;
+  albaEvent dummyEventHandledByTestedClass;
   dummyEventHandledByTestedClass.SetSender(this);
   dummyEventHandledByTestedClass.SetId(VIEW_SELECT);
   dummyEventHandledByTestedClass.SetData(dummyRenderer);

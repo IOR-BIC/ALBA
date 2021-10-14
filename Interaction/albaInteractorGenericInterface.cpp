@@ -125,14 +125,14 @@ void albaInteractorGenericInterface::SetPivotRefSys(albaRefSys &pivot_frame )
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericInterface::SetRenderer(vtkRenderer *ren)
+void albaInteractorGenericInterface::SetRendererAndView(vtkRenderer *ren, albaView *view)
 //------------------------------------------------------------------------------
 {
   m_TranslationConstraint->GetRefSys()->SetRenderer(ren);  
   m_RotationConstraint->GetRefSys()->SetRenderer(ren);  
   m_ScaleConstraint->GetRefSys()->SetRenderer(ren);  
   m_PivotRefSys->SetRenderer(ren);
-  Superclass::SetRenderer(ren);
+  Superclass::SetRendererAndView(ren,view);
 }
 
 //------------------------------------------------------------------------------
