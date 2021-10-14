@@ -59,6 +59,7 @@ albaGUIAboutDialog::albaGUIAboutDialog(wxString dialog_title)
 {  
 	m_Title = "";
 	m_BuildNum = "";
+	m_BuildDate = GetBuildDate();
 	m_Version = "";
 	m_ImagePath = "";	
 	m_WebSiteURL = "";
@@ -148,7 +149,7 @@ void albaGUIAboutDialog::CreateDialog()
 		description += _(" - Version ") + m_Version;
 
 	// Build Date
-	description += GetBuildDate();
+	description += m_BuildDate;
 
 	// Copyright
 	wxString copyright;

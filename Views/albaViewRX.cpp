@@ -43,6 +43,9 @@ const bool DEBUG_MODE = false;
 #include "albaAbsMatrixPipe.h"
 #include "albaTransform.h"
 
+#include "albaPipeVolumeProjected.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkStructuredPoints.h"
 #include "vtkDataSet.h"
 #include "vtkALBARayCast3DPicker.h"
 #include "vtkCellPicker.h"
@@ -55,18 +58,16 @@ albaCxxTypeMacro(albaViewRX);
 //----------------------------------------------------------------------------
 albaViewRX::albaViewRX(wxString label, int camera_position, bool show_axes, bool show_grid,  int stereo)
 :albaViewVTK(label,camera_position,show_axes,show_grid,stereo)
-//----------------------------------------------------------------------------
 {
   m_CurrentVolume = NULL;
+	m_CurrentSide = ALL;
 }
 //----------------------------------------------------------------------------
 albaViewRX::~albaViewRX()
-//----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 albaView *albaViewRX::Copy(albaObserver *Listener, bool lightCopyEnabled)
-//----------------------------------------------------------------------------
 {
   m_LightCopyEnabled = lightCopyEnabled;
   albaViewRX *v = new albaViewRX(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_StereoType);
@@ -79,7 +80,6 @@ albaView *albaViewRX::Copy(albaObserver *Listener, bool lightCopyEnabled)
 }
 //----------------------------------------------------------------------------
 void albaViewRX::Create()
-//----------------------------------------------------------------------------
 {
   if(m_LightCopyEnabled) return; //COPY_LIGHT
 
@@ -99,7 +99,6 @@ void albaViewRX::Create()
 }
 //----------------------------------------------------------------------------
 void albaViewRX::VmeCreatePipe(albaVME *vme)
-//----------------------------------------------------------------------------
 {
   albaString pipe_name = "";
   GetVisualPipeName(vme, pipe_name);
@@ -127,6 +126,7 @@ void albaViewRX::VmeCreatePipe(albaVME *vme)
           m_AttachCamera->SetVme(m_CurrentVolume->GetVme());
           CameraUpdate();
         }
+				ShowSideVolume(m_CurrentSide);
       }
       else if(pipe_name.Equals("albaPipeSurfaceSlice"))
       {
@@ -242,7 +242,6 @@ void albaViewRX::VmeCreatePipe(albaVME *vme)
 }
 //----------------------------------------------------------------------------
 void albaViewRX::VmeDeletePipe(albaVME *vme)
-//----------------------------------------------------------------------------
 {
   albaSceneNode *n = m_Sg->Vme2Node(vme);
   
@@ -261,7 +260,6 @@ void albaViewRX::VmeDeletePipe(albaVME *vme)
 }
 //-------------------------------------------------------------------------
 int albaViewRX::GetNodeStatus(albaVME *vme)
-//-------------------------------------------------------------------------
 {
   albaSceneNode *n = NULL;
 	
@@ -300,7 +298,6 @@ int albaViewRX::GetNodeStatus(albaVME *vme)
 }
 //-------------------------------------------------------------------------
 albaGUI *albaViewRX::CreateGui()
-//-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
   m_Gui = albaView::CreateGui();
@@ -310,6 +307,7 @@ albaGUI *albaViewRX::CreateGui()
 	m_Gui->Divider();
   return m_Gui;
 }
+
 /*//----------------------------------------------------------------------------
 void albaViewRX::VmeShow(albaVME *vme, bool show)
 //----------------------------------------------------------------------------
@@ -329,15 +327,15 @@ void albaViewRX::VmeShow(albaVME *vme, bool show)
   }
   CameraUpdate();
 }*/
+
 //----------------------------------------------------------------------------
 void albaViewRX::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
   Superclass::OnEvent(alba_event);
 }
+
 //----------------------------------------------------------------------------
 void albaViewRX::SetLutRange(double low_val, double high_val)
-//----------------------------------------------------------------------------
 {
   if(!m_CurrentVolume) 
     return;
@@ -350,7 +348,6 @@ void albaViewRX::SetLutRange(double low_val, double high_val)
 }
 //----------------------------------------------------------------------------
 void albaViewRX::GetLutRange(double minMax[2])
-//----------------------------------------------------------------------------
 {
   if(!m_CurrentVolume) 
     return;
@@ -363,7 +360,7 @@ void albaViewRX::GetLutRange(double minMax[2])
   }
 }
 
-
+//----------------------------------------------------------------------------
 void albaViewRX::CameraUpdate()
 {
   if (m_CurrentVolume)
@@ -397,7 +394,6 @@ void albaViewRX::CameraUpdate()
   }
   else
   {
-
     if (DEBUG_MODE == true)
       albaLogMessage("Calling Superclass Camera Update ");
     
@@ -406,13 +402,13 @@ void albaViewRX::CameraUpdate()
   }
 }
 
+//----------------------------------------------------------------------------
 void albaViewRX::SetCameraParallelToDataSetLocalAxis( int axis )
 {
   double oldCameraPosition[3] = {0,0,0};
   double oldCameraFocalPoint[3] = {0,0,0};
   double *oldCameraOrientation;
-
-
+	
   this->GetRWI()->GetCamera()->GetFocalPoint(oldCameraFocalPoint);
   this->GetRWI()->GetCamera()->GetPosition(oldCameraPosition);
   oldCameraOrientation = this->GetRWI()->GetCamera()->GetOrientation();
@@ -474,10 +470,9 @@ void albaViewRX::SetCameraParallelToDataSetLocalAxis( int axis )
   camera->SetPosition(newCameraPosition);
   camera->SetViewUp(newCameraViewUp);
   camera->SetClippingRange(0.1,1000);
-
 }
 
-
+//----------------------------------------------------------------------------
 void albaViewRX::CameraUpdateForRotatedVolumes()
 {
   if (m_CurrentVolume != NULL)
@@ -493,4 +488,52 @@ void albaViewRX::CameraUpdateForRotatedVolumes()
   }
 
   Superclass::CameraUpdate();
+}
+
+//----------------------------------------------------------------------------
+void albaViewRX::ShowSideVolume(VOLUME_SIDE side)
+{
+	m_CurrentSide = side;
+	if (m_CurrentVolume != NULL)
+	{
+		int dims[3], range[2];
+
+		vtkDataSet *vtk_data = m_CurrentVolume->GetVme()->GetOutput()->GetVTKData();
+
+		if (NULL != vtk_data)
+		{
+			if (vtk_data->IsA("vtkRectilinearGrid")) {
+				vtkRectilinearGrid *rectilinearGrid = vtkRectilinearGrid::SafeDownCast(vtk_data);
+				rectilinearGrid->GetDimensions(dims);
+			}
+			else if (vtk_data->IsA("vtkImageData")) {
+				vtkImageData *imageData = vtkImageData::SafeDownCast(vtk_data);
+				imageData->GetDimensions(dims);
+			}
+		}
+
+		range[0] = 0;
+		range[1] = dims[0];
+
+		albaPipeVolumeProjected *pipeVolumeProjected = albaPipeVolumeProjected::SafeDownCast(m_CurrentVolume->GetPipe());
+
+		if (pipeVolumeProjected)
+		{
+			if (side == ALL)
+			{
+				pipeVolumeProjected->EnableRangeProjection(false);
+			}
+			else
+			{
+				if (side == SIDE_RIGHT)
+					range[1] = dims[0] / 2;
+
+				if (side == SIDE_LEFT)
+					range[0] = dims[0] / 2;
+
+				pipeVolumeProjected->SetProjectionRange(range);
+				pipeVolumeProjected->EnableRangeProjection(true);
+			}
+		}
+	}
 }
