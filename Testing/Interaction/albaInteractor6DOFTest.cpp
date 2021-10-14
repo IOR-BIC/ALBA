@@ -186,7 +186,7 @@ void albaInteractor6DOFTest::TestSetRenderer()
 
 	CPPUNIT_ASSERT(interactor->GetRenderer() == NULL);
 
-	interactor->SetRenderer(dummyRenderer);
+	interactor->SetRendererAndView(dummyRenderer,NULL);
 	CPPUNIT_ASSERT(interactor->GetRenderer() == dummyRenderer);
 
 	dummyRenderer->Delete();
