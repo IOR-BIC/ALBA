@@ -58,6 +58,7 @@
 #include "pic/menu/EDIT_COPY.xpm"
 #include "pic/menu/EDIT_PASTE.xpm"
 #include "pic/menu/EDIT_DELETE.xpm"
+#include "pic/menu/EDIT_RENAME.xpm"
 #include "pic/menu/EDIT_REPARENT.xpm"
 #include "pic/menu/EDIT_EXPAND_TREE.xpm"
 #include "pic/menu/EDIT_COLLAPSE_TREE.xpm"
@@ -202,6 +203,7 @@ void albaGUITreeContextualMenu::CreateContextualMenu(albaGUICheckTree *tree, alb
 		albaGUI::AddMenuItem(this, RMENU_COPY, "Copy", EDIT_COPY_xpm);
 		albaGUI::AddMenuItem(this, RMENU_PASTE, "Paste", EDIT_PASTE_xpm);
 		albaGUI::AddMenuItem(this, RMENU_DELETE, "Delete", EDIT_DELETE_xpm);
+		albaGUI::AddMenuItem(this, RMENU_RENAME, "Rename", EDIT_RENAME_xpm);
 		albaGUI::AddMenuItem(this, RMENU_REPARENT, "Reparent to...", EDIT_REPARENT_xpm);
 
 		m_OpManager->EnableContextualMenu(this, m_NodeActive);
@@ -291,6 +293,9 @@ void albaGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 		break;
 	case RMENU_DELETE:
 		m_OpManager->RunOpDelete();
+		break;
+	case RMENU_RENAME:
+		m_OpManager->RunOpRename();
 		break;
 	case RMENU_REPARENT:
 		m_OpManager->RunOpReparentTo();

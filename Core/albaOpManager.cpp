@@ -85,72 +85,71 @@ but could not be done the undo.
 
 //----------------------------------------------------------------------------
 albaOpManager::albaOpManager()
-//----------------------------------------------------------------------------
 {
-  m_Listener	     = NULL;
-  m_RunningOp      = NULL;
-	m_Selected	     = NULL;
-  m_NaturalNode    = NULL;
-  m_User           = NULL;
-  m_Warn           = true;
+	m_Listener = NULL;
+	m_RunningOp = NULL;
+	m_Selected = NULL;
+	m_NaturalNode = NULL;
+	m_User = NULL;
+	m_Warn = true;
 
-  m_OpParameters = NULL;
-  
+	m_OpParameters = NULL;
+
 	m_Menu[OPTYPE_IMPORTER] = NULL;
-  m_Menu[OPTYPE_EXPORTER] = NULL;
-  m_Menu[OPTYPE_OP] = NULL;
+	m_Menu[OPTYPE_EXPORTER] = NULL;
+	m_Menu[OPTYPE_OP] = NULL;
 
-  m_OpSelect    = new albaOpSelect();
-  m_OpCut       = new albaOpCut();
-  m_OpCopy      = new albaOpCopy();
-  m_OpPaste     = new albaOpPaste();
-	m_OpReparent  = new albaOpReparentTo();
+	m_OpSelect = new albaOpSelect();
+	m_OpCut = new albaOpCut();
+	m_OpCopy = new albaOpCopy();
+	m_OpPaste = new albaOpPaste();
+	m_OpRename = new albaOpRename();
+	m_OpReparent = new albaOpReparentTo();
 	m_OpAddGroup = new albaOpCreateGroup();
-  //m_optransform = new albaOpTransform();
+	//m_optransform = new albaOpTransform();
 
 	m_ToolBar = NULL;
 	m_MenuBar = NULL;
 
-  m_NumOfAccelerators = 0;
-  m_NumOp = 0;
-  m_OpList.clear();
+	m_NumOfAccelerators = 0;
+	m_NumOp = 0;
+	m_OpList.clear();
 }
 //----------------------------------------------------------------------------
 albaOpManager::~albaOpManager()
-//----------------------------------------------------------------------------
 {
-  // clear clipboard to avoid crash if some VME is still into the clipboard.
-  m_Context.Clear();
-  m_OpCut->ClipboardClear();
+	// clear clipboard to avoid crash if some VME is still into the clipboard.
+	m_Context.Clear();
+	m_OpCut->ClipboardClear();
 
 	std::set<albaGUISettings *> settingsToDelete;
 
-  for(int i = 0; i < m_NumOp; i++)
-  {
-    albaGUISettings *s = m_OpList[i]->GetSetting();
-    if (s != NULL)
+	for (int i = 0; i < m_NumOp; i++)
+	{
+		albaGUISettings *s = m_OpList[i]->GetSetting();
+		if (s != NULL)
 			settingsToDelete.insert(s);
 
 		delete m_OpList[i];
-  }
-  m_OpList.clear();
+	}
+	m_OpList.clear();
 
 	std::set<albaGUISettings *>::iterator it;
 	for (it = settingsToDelete.begin(); it != settingsToDelete.end(); ++it)
 		delete *it;
-	
 
-  cppDEL(m_OpSelect);
-  cppDEL(m_OpCut);
-  cppDEL(m_OpCopy);
-  cppDEL(m_OpPaste);
+
+	cppDEL(m_OpSelect);
+	cppDEL(m_OpCut);
+	cppDEL(m_OpCopy);
+	cppDEL(m_OpPaste);
+	cppDEL(m_OpRename);
 	cppDEL(m_OpReparent);
 	cppDEL(m_OpAddGroup);
-  cppDEL(m_User);
+	cppDEL(m_User);
 }
 //----------------------------------------------------------------------------
 void albaOpManager::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
   albaOp* o = NULL; 
 
@@ -186,7 +185,6 @@ void albaOpManager::OnEvent(albaEventBase *alba_event)
 }
 //----------------------------------------------------------------------------
 void albaOpManager::OpAdd(albaOp *op, wxString menuPath, bool can_undo, albaGUISettings *setting)
-//----------------------------------------------------------------------------
 {
   m_OpList.push_back(op);
   op->m_OpMenuPath = menuPath;
@@ -201,7 +199,6 @@ void albaOpManager::OpAdd(albaOp *op, wxString menuPath, bool can_undo, albaGUIS
 }
 //----------------------------------------------------------------------------
 void albaOpManager::FillSettingDialog(albaGUISettingsDialog *settingDialog)
-//----------------------------------------------------------------------------
 {
   for(int i=0; i<m_NumOp; i++)
   {
@@ -215,7 +212,6 @@ void albaOpManager::FillSettingDialog(albaGUISettingsDialog *settingDialog)
 }
 //----------------------------------------------------------------------------
 void albaOpManager::FillMenu(wxMenu* import, wxMenu* mexport, wxMenu* operations)
-//----------------------------------------------------------------------------
 {
   int submenu_id = 1;
 
@@ -270,7 +266,6 @@ void albaOpManager::FillMenu(wxMenu* import, wxMenu* mexport, wxMenu* operations
 }
 //----------------------------------------------------------------------------
 void albaOpManager::SetAccelerator(albaOp *op)
-//----------------------------------------------------------------------------
 {
   wxString accelerator, flag = "", extra_flag = "", key_code = "";
   int flag_num;
@@ -314,7 +309,6 @@ void albaOpManager::SetAccelerator(albaOp *op)
 }
 //----------------------------------------------------------------------------
 void albaOpManager::VmeSelected(albaVME* v)   
-//----------------------------------------------------------------------------
 {
   m_Selected = v;
   EnableOp();
@@ -336,13 +330,11 @@ void albaOpManager::VmeRemove(albaVME* v)
 
 //----------------------------------------------------------------------------
 albaVME* albaOpManager::GetSelectedVme()
-//----------------------------------------------------------------------------
 {
 	return m_Selected;
 }
 //----------------------------------------------------------------------------
 void albaOpManager::OpSelect(albaVME* vme)
-//----------------------------------------------------------------------------
 {
 	if(vme == m_Selected ) 
     return;
@@ -352,7 +344,6 @@ void albaOpManager::OpSelect(albaVME* vme)
 }
 //----------------------------------------------------------------------------
 void albaOpManager::ClearUndoStack()
-//----------------------------------------------------------------------------
 {
    m_Context.Clear();
    m_OpCut->ClipboardClear();
@@ -360,7 +351,6 @@ void albaOpManager::ClearUndoStack()
 }
 //----------------------------------------------------------------------------
 void albaOpManager::EnableToolbar(bool CanEnable) 
-//----------------------------------------------------------------------------
 {
 	if(!CanEnable)
 	{
@@ -369,6 +359,7 @@ void albaOpManager::EnableToolbar(bool CanEnable)
 		m_ToolBar->EnableTool(OP_CUT,false);
 		m_ToolBar->EnableTool(OP_COPY,false);
 		m_ToolBar->EnableTool(OP_PASTE,false);
+		m_ToolBar->EnableTool(OP_RENAME, false);
 	}
 	else
 	{
@@ -377,55 +368,56 @@ void albaOpManager::EnableToolbar(bool CanEnable)
 		m_ToolBar->EnableTool(OP_CUT,		m_OpCut->Accept(m_Selected) );
 		m_ToolBar->EnableTool(OP_COPY,	m_OpCopy->Accept(m_Selected) );
 		m_ToolBar->EnableTool(OP_PASTE,	m_OpPaste->Accept(m_Selected) );
+		m_ToolBar->EnableTool(OP_RENAME, m_OpRename->Accept(m_Selected));
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpManager::EnableOp(bool CanEnable) 
-//----------------------------------------------------------------------------
+void albaOpManager::EnableOp(bool CanEnable)
 {
-  albaOp *o = NULL;
-	if(m_MenuBar)
-  {
-    if(!CanEnable)
-	  {
-		  if(m_MenuBar->FindItem(OP_DELETE))	m_MenuBar->Enable(OP_DELETE,false);
-		  if(m_MenuBar->FindItem(OP_CUT))			m_MenuBar->Enable(OP_CUT,false);
-		  if(m_MenuBar->FindItem(OP_COPY))		m_MenuBar->Enable(OP_COPY,false);
-		  if(m_MenuBar->FindItem(OP_PASTE))		m_MenuBar->Enable(OP_PASTE,false);
-			if(m_MenuBar->FindItem(OP_REPARENT))		m_MenuBar->Enable(OP_REPARENT, false);
-		  if(m_MenuBar->FindItem(OP_UNDO))		m_MenuBar->Enable(OP_UNDO,false); 
-		  if(m_MenuBar->FindItem(OP_REDO))		m_MenuBar->Enable(OP_REDO,false); 
+	albaOp *o = NULL;
+	if (m_MenuBar)
+	{
+		if (!CanEnable)
+		{
+			if (m_MenuBar->FindItem(OP_DELETE))	m_MenuBar->Enable(OP_DELETE, false);
+			if (m_MenuBar->FindItem(OP_CUT))			m_MenuBar->Enable(OP_CUT, false);
+			if (m_MenuBar->FindItem(OP_COPY))		m_MenuBar->Enable(OP_COPY, false);
+			if (m_MenuBar->FindItem(OP_PASTE))		m_MenuBar->Enable(OP_PASTE, false);
+			if (m_MenuBar->FindItem(OP_RENAME))		m_MenuBar->Enable(OP_RENAME, false);
+			if (m_MenuBar->FindItem(OP_REPARENT))		m_MenuBar->Enable(OP_REPARENT, false);
+			if (m_MenuBar->FindItem(OP_UNDO))		m_MenuBar->Enable(OP_UNDO, false);
+			if (m_MenuBar->FindItem(OP_REDO))		m_MenuBar->Enable(OP_REDO, false);
 
-		  for(int i=0; i<m_NumOp; i++)
-		  {
-        albaOp *o = m_OpList[i];
-        if(m_MenuBar->FindItem(o->m_Id))
-          m_MenuBar->Enable(o->m_Id,false); 
-      }
-	  }
-	  else
-	  {
-		  if(m_MenuBar->FindItem(OP_UNDO))		m_MenuBar->Enable(OP_UNDO,    !m_Context.Undo_IsEmpty());
-		  if(m_MenuBar->FindItem(OP_REDO))		m_MenuBar->Enable(OP_REDO,    !m_Context.Redo_IsEmpty());
-		  if(m_MenuBar->FindItem(OP_DELETE))	m_MenuBar->Enable(OP_DELETE, m_Selected && m_OpCut->Accept(m_Selected));
-		  if(m_MenuBar->FindItem(OP_CUT))			m_MenuBar->Enable(OP_CUT, m_Selected &&  m_OpCut->Accept(m_Selected));
-		  if(m_MenuBar->FindItem(OP_COPY))		m_MenuBar->Enable(OP_COPY, m_Selected &&  m_OpCopy->Accept(m_Selected));
-		  if(m_MenuBar->FindItem(OP_PASTE))		m_MenuBar->Enable(OP_PASTE, m_Selected &&   m_OpPaste->Accept(m_Selected));
-			if(m_MenuBar->FindItem(OP_REPARENT))		m_MenuBar->Enable(OP_REPARENT, m_Selected &&  m_OpReparent->Accept(m_Selected));
+			for (int i = 0; i < m_NumOp; i++)
+			{
+				albaOp *o = m_OpList[i];
+				if (m_MenuBar->FindItem(o->m_Id))
+					m_MenuBar->Enable(o->m_Id, false);
+			}
+		}
+		else
+		{
+			if (m_MenuBar->FindItem(OP_UNDO))		m_MenuBar->Enable(OP_UNDO, !m_Context.Undo_IsEmpty());
+			if (m_MenuBar->FindItem(OP_REDO))		m_MenuBar->Enable(OP_REDO, !m_Context.Redo_IsEmpty());
+			if (m_MenuBar->FindItem(OP_DELETE))	m_MenuBar->Enable(OP_DELETE, m_Selected && m_OpCut->Accept(m_Selected));
+			if (m_MenuBar->FindItem(OP_CUT))			m_MenuBar->Enable(OP_CUT, m_Selected &&  m_OpCut->Accept(m_Selected));
+			if (m_MenuBar->FindItem(OP_COPY))		m_MenuBar->Enable(OP_COPY, m_Selected &&  m_OpCopy->Accept(m_Selected));
+			if (m_MenuBar->FindItem(OP_PASTE))		m_MenuBar->Enable(OP_PASTE, m_Selected &&   m_OpPaste->Accept(m_Selected));
+			if (m_MenuBar->FindItem(OP_RENAME))		m_MenuBar->Enable(OP_RENAME, m_Selected &&  m_OpRename->Accept(m_Selected));
+			if (m_MenuBar->FindItem(OP_REPARENT))		m_MenuBar->Enable(OP_REPARENT, m_Selected &&  m_OpReparent->Accept(m_Selected));
 
-		  for(int i=0; i<m_NumOp; i++)
-		  {
-        albaOp *o = m_OpList[i]; 
-        if(m_MenuBar->FindItem(o->m_Id))
-          m_MenuBar->Enable(o->m_Id, m_Selected && o->Accept(m_Selected));
-      }
-	  }
-  }
-	if(m_ToolBar) EnableToolbar(CanEnable);
+			for (int i = 0; i < m_NumOp; i++)
+			{
+				albaOp *o = m_OpList[i];
+				if (m_MenuBar->FindItem(o->m_Id))
+					m_MenuBar->Enable(o->m_Id, m_Selected && o->Accept(m_Selected));
+			}
+		}
+	}
+	if (m_ToolBar) EnableToolbar(CanEnable);
 }
 //----------------------------------------------------------------------------
 void albaOpManager::EnableContextualMenu(albaGUITreeContextualMenu *contextualMenu, albaVME *node, bool CanEnable)
-//----------------------------------------------------------------------------
 {
 	if(contextualMenu)
 	{
@@ -437,6 +429,7 @@ void albaOpManager::EnableContextualMenu(albaGUITreeContextualMenu *contextualMe
 			contextualMenu->FindItem(RMENU_COPY)->Enable(false);
 			contextualMenu->FindItem(RMENU_PASTE)->Enable(false);
 			contextualMenu->FindItem(RMENU_DELETE)->Enable(false);
+			contextualMenu->FindItem(RMENU_RENAME)->Enable(false);
 			contextualMenu->FindItem(RMENU_REPARENT)->Enable(false);
 		}
 		else
@@ -447,13 +440,13 @@ void albaOpManager::EnableContextualMenu(albaGUITreeContextualMenu *contextualMe
 			contextualMenu->FindItem(RMENU_COPY)->Enable(m_OpCopy->Accept(node));
 			contextualMenu->FindItem(RMENU_PASTE)->Enable(m_OpPaste->Accept(node));
 			contextualMenu->FindItem(RMENU_DELETE)->Enable(m_OpCut->Accept(node));
+			contextualMenu->FindItem(RMENU_RENAME)->Enable(m_OpRename->Accept(node));
 			contextualMenu->FindItem(RMENU_REPARENT)->Enable(m_OpReparent->Accept(node));
 		}
 	}
 }
 //----------------------------------------------------------------------------
 bool albaOpManager::WarnUser(albaOp *op)
-//----------------------------------------------------------------------------
 {
 	bool go = true;
 	if(m_Warn)
@@ -474,7 +467,6 @@ bool albaOpManager::WarnUser(albaOp *op)
 }
 //----------------------------------------------------------------------------
 void albaOpManager::OpRun(albaString &op_type, void *op_param)
-//----------------------------------------------------------------------------
 {
   int i;
   for (i=0; i< m_NumOp; i++)
@@ -490,48 +482,49 @@ void albaOpManager::OpRun(albaString &op_type, void *op_param)
 }
 //----------------------------------------------------------------------------
 void albaOpManager::OpRun(int op_id)
-//----------------------------------------------------------------------------
 {
-  switch(op_id)
-  {
-	  case OP_UNDO:
-			OpUndo();
-	  break;
-	  case OP_REDO:
-			OpRedo();
-	  break;
-
-		case OP_ADD_GROUP:
-			RunOpAddGroup();
+	switch (op_id)
+	{
+	case OP_UNDO:
+		OpUndo();
 		break;
-	  case OP_DELETE:
-			RunOpDelete();
-    break;
-	  case OP_CUT:
-			RunOpCut();
-	  break;
-	  case OP_COPY:
-			RunOpCopy();
-	  break;
-	  case OP_PASTE:
-			RunOpPaste();
-	  break;
-		case OP_REPARENT:
-			RunOpReparentTo();
-			break;
+	case OP_REDO:
+		OpRedo();
+		break;
 
-	  default:
-		{
-      int index = op_id - OP_USER;
-		  if(index >=0 && index <m_NumOp) 
-        OpRun(m_OpList[index]);
-		}
-	  break;
+	case OP_ADD_GROUP:
+		RunOpAddGroup();
+		break;
+	case OP_DELETE:
+		RunOpDelete();
+		break;
+	case OP_CUT:
+		RunOpCut();
+		break;
+	case OP_COPY:
+		RunOpCopy();
+		break;
+	case OP_PASTE:
+		RunOpPaste();
+		break;
+	case OP_RENAME:
+		RunOpRename();
+		break;
+	case OP_REPARENT:
+		RunOpReparentTo();
+		break;
+
+	default:
+	{
+		int index = op_id - OP_USER;
+		if (index >= 0 && index < m_NumOp)
+			OpRun(m_OpList[index]);
+	}
+	break;
 	}
 }
 //----------------------------------------------------------------------------
 void albaOpManager::OpRun(albaOp *op, void *op_param)
-//----------------------------------------------------------------------------
 {
   if(!WarnUser(op))
   {
@@ -678,6 +671,11 @@ void albaOpManager::RunOpDelete()
 		Notify(OP_RUN_TERMINATED, false);
 }
 //----------------------------------------------------------------------------
+void albaOpManager::RunOpRename()
+{
+	OpRun(m_OpRename);
+}
+//----------------------------------------------------------------------------
 void albaOpManager::RunOpReparentTo()
 {
 	OpRun(m_OpReparent);
@@ -685,7 +683,6 @@ void albaOpManager::RunOpReparentTo()
 
 //----------------------------------------------------------------------------
 void albaOpManager::OpRunOk(albaOp *op)
-//----------------------------------------------------------------------------
 {	
   m_Context.Pop();
 	
@@ -708,7 +705,6 @@ void albaOpManager::OpRunOk(albaOp *op)
 }
 //----------------------------------------------------------------------------
 void albaOpManager::OpRunCancel(albaOp *op)
-//----------------------------------------------------------------------------
 {
   m_Context.Pop();
 		
@@ -732,7 +728,6 @@ void albaOpManager::OpRunCancel(albaOp *op)
 //----------------------------------------------------------------------------
 void albaOpManager::OpExec(albaOp *op)
 /** call this to exec an operation without user interaction but with undo/redo services */
-//----------------------------------------------------------------------------
 {
 	EnableOp(false);
 
@@ -753,7 +748,6 @@ void albaOpManager::OpExec(albaOp *op)
 }
 //----------------------------------------------------------------------------
 void albaOpManager::OpDo(albaOp *op)
-//----------------------------------------------------------------------------
 {
   m_Context.Redo_Clear();
   albaVME *in_node = op->GetInput();
@@ -781,9 +775,7 @@ void albaOpManager::OpDo(albaOp *op)
 
 		albaLogMessage("operation '%s' generate %s as output", op->m_Label.c_str(), out_node->GetName());
 	}
-
-
-
+	
   if(op->CanUndo()) 
   {
 	  m_Context.Undo_Push(op);
@@ -796,14 +788,12 @@ void albaOpManager::OpDo(albaOp *op)
 
 //----------------------------------------------------------------------------
 void albaOpManager::SetMafUser(albaUser *user)
-//----------------------------------------------------------------------------
 {
   m_User = user;
 }
 
 //----------------------------------------------------------------------------
 void albaOpManager::FillTraceabilityAttribute(albaOp *op, albaVME *in_node, albaVME *out_node)
-//----------------------------------------------------------------------------
 {
   albaString trialEvent = "Modify";
   albaString operationName;
@@ -906,7 +896,6 @@ void albaOpManager::FillTraceabilityAttribute(albaOp *op, albaVME *in_node, alba
 }
 //----------------------------------------------------------------------------
 void albaOpManager::OpUndo()
-//----------------------------------------------------------------------------
 {
   if( m_Context.Undo_IsEmpty()) 
   {
@@ -959,7 +948,6 @@ void albaOpManager::OpUndo()
 }
 //----------------------------------------------------------------------------
 void albaOpManager::OpRedo()   
-//----------------------------------------------------------------------------
 {
   if( m_Context.Redo_IsEmpty())
   {
@@ -990,7 +978,6 @@ void albaOpManager::OpRedo()
 }
 //----------------------------------------------------------------------------
 void albaOpManager::Notify(int msg, long arg)   
-//----------------------------------------------------------------------------
 {
 	if(m_Context.Caller() == NULL)
 		albaEventMacro(albaEvent(this,msg,m_RunningOp,arg));  
@@ -998,7 +985,6 @@ void albaOpManager::Notify(int msg, long arg)
 }
 //----------------------------------------------------------------------------
 bool albaOpManager::StopCurrentOperation()
-//----------------------------------------------------------------------------
 {
 //  assert(false); //SIL. 2-7-2004: -- Seems that no-one is using this -- but tell me if the program stop here -- thanks
   albaOp *prev_running_op = m_RunningOp;
@@ -1025,13 +1011,11 @@ bool albaOpManager::StopCurrentOperation()
 }
 //----------------------------------------------------------------------------
 albaOp *albaOpManager::GetRunningOperation()
-//----------------------------------------------------------------------------
 {
   return m_RunningOp;
 }
 //----------------------------------------------------------------------------
 bool albaOpManager::ForceStopWithOk()
-//----------------------------------------------------------------------------
 {
   if(!m_RunningOp) 
     return false;
@@ -1044,7 +1028,6 @@ bool albaOpManager::ForceStopWithOk()
 }
 //----------------------------------------------------------------------------
 bool albaOpManager::ForceStopWithCancel()
-//----------------------------------------------------------------------------
 {
   if(!m_RunningOp) 
     return false;
@@ -1056,20 +1039,17 @@ bool albaOpManager::ForceStopWithCancel()
 }
 //----------------------------------------------------------------------------
 void albaOpManager::SetMouse(albaDeviceButtonsPadMouse *mouse)
-//----------------------------------------------------------------------------
 {
   m_Mouse = mouse;
 }
 
 //----------------------------------------------------------------------------
 void albaOpManager::RefreshMenu()
-//----------------------------------------------------------------------------
 {
   EnableOp(!Running());
 }
 //----------------------------------------------------------------------------
 albaOp *albaOpManager::GetOperationById(int id)
-//----------------------------------------------------------------------------
 {
   std::vector<albaOp *>::iterator it = m_OpList.begin();
   for(int i=0;i<m_OpList.size(); i++)

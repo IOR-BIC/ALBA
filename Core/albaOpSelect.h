@@ -174,4 +174,26 @@ protected:
 		bool m_Pasted;
 };
 
+/**
+class name: albaOpPaste
+Operation which perform paste of a node previously copied or cut.
+*/
+class ALBA_EXPORT albaOpRename : public albaOpEdit
+{
+public:
+	/** Constructor. */
+	albaOpRename(wxString label = _("Rename"));
+	/** check if node can be input of the operation. */
+	bool Accept(albaVME* vme);
+	/** execute the operation.  */
+	void OpDo();
+	/** undo the operation. */
+	void OpUndo();
+	/** return a instance of current object. */
+	albaOp* Copy();
+protected:
+	albaString m_OldName;
+	bool m_Renamed;
+};
+
 #endif
