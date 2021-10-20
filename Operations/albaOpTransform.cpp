@@ -101,10 +101,10 @@ albaOpTransform::albaOpTransform(const wxString &label)
   m_OpType	= OPTYPE_OP;
   m_Canundo = true;
 
-	m_RefSystemMode = REF_ABSOLUTE;
+	m_RefSystemMode = REF_CENTER;
 	m_ActiveGizmo = TR_GIZMO;
 
-	m_RefSysVMEName = "";
+	m_RefSysVMEName = "VME Centroid";
 	m_RelativeRefSysVME = NULL;
 	m_TransformVME = NULL;
 
@@ -117,9 +117,7 @@ albaOpTransform::albaOpTransform(const wxString &label)
 
 	m_OriginRefSysPosition[0] = m_OriginRefSysPosition[1] = m_OriginRefSysPosition[2] = 0;
 	m_OriginRefSysOrientation[0] = m_OriginRefSysOrientation[1] = m_OriginRefSysOrientation[2] = 0;
-
-	m_RefSysVMEName = "Absolute";
-	
+		
 	m_GizmoTranslate = NULL;
 	m_GizmoRotate = NULL;
 	m_GizmoScale = NULL;
@@ -214,6 +212,7 @@ void albaOpTransform::OpRun()
 	}
 
 	SetRefSysVME(m_Input->GetRoot());
+	SelectRefSys();
 	UpdateTransformTextEntries();
 }
 
@@ -592,7 +591,6 @@ void albaOpTransform::SelectRefSys()
 		m_Gui->Enable(ID_SET_RELATIVE_REF_SYS, m_RefSystemMode == REF_RELATIVE || m_RefSystemMode == REF_RELATIVE_CENTER);
 	}
 }
-
 
 //----------------------------------------------------------------------------
 void albaOpTransform::ChooseRelativeRefSys()
