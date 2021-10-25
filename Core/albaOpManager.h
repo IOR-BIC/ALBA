@@ -38,6 +38,7 @@ class albaOpSelect;
 class albaOpCut;
 class albaOpCopy;
 class albaOpPaste;
+class albaOpRename;
 class albaOpReparentTo;
 class albaOpCreateGroup;
 class vtkMatrix4x4;
@@ -104,6 +105,7 @@ public:
 	void RunOpCopy();
 	void RunOpPaste();
 	void RunOpDelete();
+	void RunOpRename();
 	void RunOpReparentTo();
 
 	/** Execute the operation 'op' and warn the user if the operation is undoable. */
@@ -218,6 +220,7 @@ protected:
   albaOpCut          *m_OpCut; ///< Pointer to the (always available) operation for cutting VMEs
   albaOpCopy         *m_OpCopy; ///< Pointer to the (always available) operation for copying VMEs
   albaOpPaste        *m_OpPaste; ///< Pointer to the (always available) operation for pasting VMEs
+  albaOpRename		*m_OpRename; ///< Pointer to the (always available) operation for reparenting VMEs
 	albaOpReparentTo		*m_OpReparent; ///< Pointer to the (always available) operation for reparenting VMEs
 	albaOpCreateGroup	*m_OpAddGroup; ///< Pointer to the (always available) operation for Adding Group VMEs
   wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menù
