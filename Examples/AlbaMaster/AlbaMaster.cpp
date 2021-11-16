@@ -261,7 +261,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpImporterVRML("VRML"));
 	m_Logic->Plug(new albaOpImporterVTK("VTK"));
 	m_Logic->Plug(new albaOpImporterVTKXML("VTK xml"));
-	m_Logic->Plug(new albaOpImporterMetaImage("Meta Image"));
+	m_Logic->Plug(new albaOpImporterMetaImage("ITK MetaImage"));
 	m_Logic->Plug(new albaOpImporterMSF("ALBA"));
 	m_Logic->Plug(new albaOpImporterMSF1x("MSF 1.x"));
 	m_Logic->Plug(new albaOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
@@ -292,7 +292,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpExporterPLY("PLY"));
 	m_Logic->Plug(new albaOpExporterVTK("VTK"));
 	m_Logic->Plug(new albaOpExporterVTKXML("VTK"));
-	m_Logic->Plug(new albaOpExporterMetaImage("MetaImage"));
+	m_Logic->Plug(new albaOpExporterMetaImage("ITK MetaImage"));
 #ifdef ALBA_USE_GDCM
 	m_Logic->Plug(new albaOpExporterDicom("Dicom"),"",true,dicomSettings);
 #endif

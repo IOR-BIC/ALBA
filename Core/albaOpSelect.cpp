@@ -438,8 +438,6 @@ restore previous clipboard
   ClipboardRestore();
 }
 
-
-
 /////////////////
 // albaOpPaste ://
 /////////////////
@@ -516,5 +514,56 @@ The copy in the clipboard will be automatically deleted
 	{
 		SetClipboard(m_PastedVme);
 		GetLogicManager()->VmeRemove(m_PastedVme);
+	}
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// albaOpRename
+//////////////////////////////////////////////////////////////////////////
+
+//----------------------------------------------------------------------------
+albaOpRename::albaOpRename(wxString label)
+{
+	m_Label = label;
+	m_OldName = "";
+}
+//----------------------------------------------------------------------------
+albaOp* albaOpRename::Copy()
+{
+	return new albaOpRename(m_Label);
+}
+//----------------------------------------------------------------------------
+bool albaOpRename::Accept(albaVME* vme)
+{
+	return (vme != NULL) && (!vme->IsALBAType(albaVMERoot));
+};
+//----------------------------------------------------------------------------
+void albaOpRename::OpDo()
+{
+	wxTextEntryDialog *dlg = new wxTextEntryDialog(NULL, "Name", "Rename", m_Selection->GetName());
+	int result = dlg->ShowModal();
+	wxString stringValue = dlg->GetValue();
+	cppDEL(dlg);
+
+	if (result == wxID_OK && !stringValue.IsEmpty())
+	{
+		m_OldName = m_Selection->GetName();
+
+		m_Selection->SetName(stringValue);
+		m_Renamed = true;
+	}
+	else
+	{
+		m_Renamed = false;
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaOpRename::OpUndo()
+{
+	if (m_Renamed)
+	{
+		m_Selection->SetName(m_OldName);
 	}
 }

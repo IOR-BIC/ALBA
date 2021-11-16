@@ -90,8 +90,10 @@ void albaPictureFactory::Initialize()
     albaADDPIC(OP_CUT);
     #include <pic/OP_PASTE.xpm>
     albaADDPIC(OP_PASTE);
-		#include <pic/OP_FIND.xpm>
-		albaADDPIC(OP_FIND);
+	#include <pic/OP_RENAME.xpm>
+	albaADDPIC(OP_RENAME);
+	#include <pic/OP_FIND.xpm>
+	albaADDPIC(OP_FIND);
     #include <pic/OP_REDO.xpm>
     albaADDPIC(OP_REDO);
     #include <pic/OP_UNDO.xpm>
