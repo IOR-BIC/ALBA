@@ -1,17 +1,16 @@
 /*=========================================================================
+Program:   AlbaMaster
+Module:    albaOpExtractIsosurface.h
+Language:  C++
+Date:      $Date: 2018-01-01 12:00:00 $
+Version:   $Revision: 1.0.0.0 $
+Authors:   Gianluigi Crimi, Nicola Vanella
+==========================================================================
+Copyright (c) BIC-IOR 2018 (https://github.com/IOR-BIC)
 
- Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaOpExtractIsosurface
- Authors: Paolo Quadrani     Silvano Imboden
- 
- Copyright (c) BIC
- All rights reserved. See Copyright.txt or
-
-
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notice for more information.
-
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
 #ifndef __albaOpExtractIsosurface_H__
@@ -85,7 +84,7 @@ public:
   void SetIsoValue(double isoValue);
 
   /** Extract the isosurface and build the related vme. */
-  void ExtractSurface(bool clean=true);
+  void ExtractSurface();
 
   /** Create the pipeline to generate the isosurface of the volume. */
   void CreateVolumePipeline();
@@ -99,7 +98,13 @@ public:
   /** Set the clean flag.*/
   void SetClean(bool clean);
 
+	void SetConnectivity(bool connectivity);
+
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char ** GetIcon();
+
 protected:
+
   albaVMEGroup *m_OutputGroup; 
   albaGUIDialog		*m_Dialog;
 	albaRWI      *m_Rwi;
@@ -116,6 +121,7 @@ protected:
   int          m_Optimize;
 	int					 m_Clean;
 	int					 m_Triangulate;
+	int					 m_Connectivity;
   int          m_Autolod;
   double       m_BoundingBox[6];
   double       m_SliceOrigin[3];
