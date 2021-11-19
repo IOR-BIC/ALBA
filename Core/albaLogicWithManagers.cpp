@@ -95,6 +95,7 @@
 #include "albaOpSelect.h"
 #include "albaGUIVMEChooserTree.h"
 #include "albaGUI.h"
+#include "albaGUISplashScreen.h"
 
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
@@ -2117,13 +2118,15 @@ void albaLogicWithManagers::ShowSplashScreen()
 	ShowSplashScreen(splashImage);
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage)
+void albaLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage, wxString message)
 {
-	long splash_style = wxSIMPLE_BORDER | wxSTAY_ON_TOP;
-	m_SplashScreen = new wxSplashScreen(splashImage,
-		wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT,
-		2000, NULL, -1, wxDefaultPosition, wxDefaultSize,
-		splash_style);
+	m_SplashScreen = new albaGUISplashScreen(splashImage, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 2000, NULL);
+
+	if (message.IsEmpty()) message = m_BuildNum;
+
+	m_SplashScreen->SetText(message, 5, 5);
+	wxMilliSleep(1500);
+
 	albaYield();
 }
 

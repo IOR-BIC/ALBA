@@ -70,6 +70,7 @@ SET(PROJECT_SRCS
   albaGUILutHistogramEditor.cpp  	albaGUILutHistogramEditor.h
 	albaGUIImageViewer.cpp							albaGUIImageViewer.h
 	albaGUIAboutDialog.cpp				albaGUIAboutDialog.h
+	albaGUISplashScreen.cpp				albaGUISplashScreen.h
 )
 
 IF (ALBA_USE_VTK)
