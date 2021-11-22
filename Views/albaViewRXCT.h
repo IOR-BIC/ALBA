@@ -175,9 +175,9 @@ protected:
 
   //obsolete variable
   //vtkLookupTable  *m_vtkLUT[3];
-  vtkLookupTable  *m_Lut; 
+  vtkLookupTable *m_ColorLUT; 
 
-  albaGUILutSwatch    *m_LutWidget;
+  albaGUILutSwatch *m_LutWidget;
 
   // Added by Losi 11.25.2009
   int m_TrilinearInterpolationOn;
