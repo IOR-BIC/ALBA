@@ -135,7 +135,7 @@ static albaVME *glo_CurrSeg = NULL;
 albaCxxTypeMacro(albaOpSegmentation);
 
 //----------------------------------------------------------------------------
-albaOpSegmentation::albaOpSegmentation(const wxString &label) : albaOp(label)
+albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) : albaOp(label)
 {
   m_OpType	= OPTYPE_OP;
   m_Canundo	= true;  
@@ -151,7 +151,7 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label) : albaOp(label)
   m_SliceSlider = NULL;
 
 	m_ShowLabels = true;
-	m_DisableInit = false;
+	m_DisableInit = disableInit;
 	if(m_DisableInit)
 		m_CurrentPhase = EDIT_SEGMENTATION;
 	else
@@ -245,7 +245,7 @@ bool albaOpSegmentation::Accept(albaVME *node)
 //----------------------------------------------------------------------------
 albaOp *albaOpSegmentation::Copy()   
 {
-  return (new albaOpSegmentation(m_Label));
+  return (new albaOpSegmentation(m_Label,m_DisableInit));
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OpRun()   
@@ -733,8 +733,8 @@ void albaOpSegmentation::CreateOpDialog()
 		m_GuiDialog->TwoButtons(ID_BUTTON_INIT, ID_BUTTON_EDIT, _("Init"), _("Edit"), wxEXPAND | wxALL);
 		m_GuiDialog->Enable(ID_BUTTON_INIT, false);
 		m_GuiDialog->Enable(ID_BUTTON_EDIT, true);
+		m_GuiDialog->Divider(1);
 	}
-	m_GuiDialog->Divider(1);
 
 	// Add Operation Phase Gui
 	m_AppendingOpGui = new albaGUI(NULL);

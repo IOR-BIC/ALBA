@@ -167,7 +167,7 @@ public:
   };
 
   /** constructor. */
-  albaOpSegmentation(const wxString &label = "Segmentation");
+  albaOpSegmentation(const wxString &label = "Segmentation", int disableInit=false);
 
   /** destructor. */
   ~albaOpSegmentation(); 
