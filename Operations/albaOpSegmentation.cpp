@@ -1128,14 +1128,16 @@ void albaOpSegmentation::DeleteOpDialog()
 void albaOpSegmentation::UpdateWindowing()
 {
 	albaVMEOutputVolume *volumeOutput = albaVMEOutputVolume::SafeDownCast(m_Volume->GetOutput());
-	double sr[2], subR[2];
+	double sr[2];
 	volumeOutput->GetVTKData()->GetScalarRange(sr);
-	mmaVolumeMaterial *currentSurfaceMaterial = volumeOutput->GetMaterial();
-	currentSurfaceMaterial->UpdateProp();
-	currentSurfaceMaterial->m_ColorLut->GetTableRange(subR);
-
+	mmaVolumeMaterial *material = volumeOutput->GetMaterial();
+	if (material->GetTableRange()[1] < material->GetTableRange()[0])
+	{
+		material->SetTableRange(sr);
+		material->UpdateProp();
+	}
 	m_LutSlider->SetRange(sr);
-	m_LutSlider->SetSubRange(subR);
+	m_LutSlider->SetSubRange(material->GetTableRange());
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::UpdateSliderValidator()
@@ -1518,7 +1520,6 @@ void albaOpSegmentation::OnEditStep()
 	m_GuiDialog->FitGui();
 	m_Dialog->Update();
 	
-	if()
 	if (m_DisableInit || m_InitModality == GLOBAL_INIT)
 		m_Helper.VolumeThreshold(m_Threshold);
 	else if (m_InitModality == RANGE_INIT)

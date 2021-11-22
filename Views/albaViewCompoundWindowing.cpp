@@ -245,7 +245,7 @@ void albaViewCompoundWindowing::VolumeWindowing(albaVME *volume)
     m_LutWidget->SetLut(m_ColorLUT);
   m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
   //m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
-  m_LutSlider->SetSubRange((long)currentSurfaceMaterial->m_TableRange[0],(long)currentSurfaceMaterial->m_TableRange[1]);
+  m_LutSlider->SetSubRange((long)currentSurfaceMaterial->GetTableRange()[0],(long)currentSurfaceMaterial->GetTableRange()[1]);
 
 }
 

@@ -721,7 +721,7 @@ void albaViewOrthoSlice::CreateOrthoslicesAndGizmos(albaVME *vme)
 	m_ColorLUT = currentVolumeMaterial->m_ColorLut;
 	m_LutWidget->SetLut(m_ColorLUT);
 	m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
-	m_LutSlider->SetSubRange((long)currentVolumeMaterial->m_TableRange[0],(long)currentVolumeMaterial->m_TableRange[1]);
+	m_LutSlider->SetSubRange((long)currentVolumeMaterial->GetTableRange()[0],(long)currentVolumeMaterial->GetTableRange()[1]);
 	for(int i=0; i<m_NumOfChildView; i++)
 	{
 		albaPipeVolumeOrthoSlice *p = (albaPipeVolumeOrthoSlice *)((albaViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);

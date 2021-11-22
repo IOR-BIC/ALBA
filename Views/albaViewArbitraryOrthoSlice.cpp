@@ -716,7 +716,7 @@ void albaViewArbitraryOrthoSlice::VolumeWindowing(albaVME *volume)
 	m_ColorLUT = currentVolumeMaterial->m_ColorLut;
 	m_LutWidget->SetLut(m_ColorLUT);
 	m_LutSlider->SetRange((long)sr[0], (long)sr[1]);
-	m_LutSlider->SetSubRange((long)currentVolumeMaterial->m_TableRange[0], (long)currentVolumeMaterial->m_TableRange[1]);
+	m_LutSlider->SetSubRange((long)currentVolumeMaterial->GetTableRange()[0], (long)currentVolumeMaterial->GetTableRange()[1]);
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::ShowVolume( albaVME * vme, bool show )

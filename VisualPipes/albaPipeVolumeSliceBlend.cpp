@@ -129,9 +129,9 @@ void albaPipeVolumeSliceBlend::Create(albaSceneNode *n)
 
   mmaVolumeMaterial *material = ((albaVMEVolume *)m_Vme)->GetMaterial();
   //If material has a valid table range use it
-  if (material->m_TableRange[1] < material->m_TableRange[0]) 
+  if (material->GetTableRange()[1] < material->GetTableRange()[0]) 
   {
-    m_Vme->GetOutput()->GetVTKData()->GetScalarRange(material->m_TableRange);
+		material->SetTableRange(m_Vme->GetOutput()->GetVTKData()->GetScalarRange());
   }
 
   //Update material
@@ -326,8 +326,7 @@ void albaPipeVolumeSliceBlend::SetLutRange(double low, double high)
   mmaVolumeMaterial *material = ((albaVMEVolume *)m_Vme)->GetMaterial();
   material->m_Window_LUT = high-low;
   material->m_Level_LUT  = (low+high)*.5;
-  material->m_TableRange[0] = low;
-  material->m_TableRange[1] = high;
+	material->SetTableRange(low, high);
   material->UpdateProp();
 }
 //----------------------------------------------------------------------------

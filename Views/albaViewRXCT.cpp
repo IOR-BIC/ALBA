@@ -199,15 +199,17 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
           double volRange[2];
           volumeOutput->GetVTKData()->GetScalarRange(volRange);
 
-          if (volumeOutput->GetMaterial()->m_TableRange[1] < volumeOutput->GetMaterial()->m_TableRange[0]) 
+					const double * tableRange = volumeOutput->GetMaterial()->GetTableRange();
+          if (tableRange[1] < tableRange[0])
           {
             volTableRange[0] = volRange[0];
             volTableRange[1] = volRange[1];
           }
           else
           {
-            volTableRange[0] = volumeOutput->GetMaterial()->m_TableRange[0];
-            volTableRange[1] = volumeOutput->GetMaterial()->m_TableRange[1];
+						
+            volTableRange[0] = tableRange[0];
+            volTableRange[1] = tableRange[1];
           }
 
           double proportionalConstant = ((range[1] - range[0])/(volRange[1] - volRange[0]));
@@ -246,10 +248,12 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
 
       if(volumeOutput->GetMaterial())
       {
-        if (volumeOutput->GetMaterial()->m_TableRange[1] > volumeOutput->GetMaterial()->m_TableRange[0]) 
+				const double * tableRange = volumeOutput->GetMaterial()->GetTableRange();
+
+        if (tableRange[1] > tableRange[0])
         {
-          sr[0] = volumeOutput->GetMaterial()->m_TableRange[0];
-          sr[1] = volumeOutput->GetMaterial()->m_TableRange[1];
+          sr[0] = tableRange[0];
+          sr[1] = tableRange[1];
         }
       }
       
