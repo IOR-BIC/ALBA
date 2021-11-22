@@ -42,6 +42,7 @@ class albaPrintManager;
 class albaDeviceButtonsPadMouse;
 class albaGUISettingsDialog;
 class albaGUIAboutDialog;
+class albaGUISplashScreen;
 class albaGUISettings;
 class albaUser;
 class albaWizardManager;
@@ -53,7 +54,6 @@ class albaGUIApplicationSettings;
 class albaGUISettingsTimeBar;
 class albaHelpManager;
 class albaSnapshotManager;
-class wxSplashScreen;
 class mmaApplicationLayout;
 class albaProsthesesDBManager;
 
@@ -206,7 +206,7 @@ public:
 
 	/**
 	Used to give a splash screen image directly from the bitmap without converting it in xpm.*/
-	virtual void ShowSplashScreen(wxBitmap &splashImage);
+	virtual void ShowSplashScreen(wxBitmap &splashImage, wxString message ="");
 
 	static void ShowWebSite(wxString url);
 	
@@ -440,7 +440,7 @@ protected:
 	wxStaticText* m_WizardLabel;
 	bool m_CancelledBeforeOpStarting;
 	wxMenu *m_WizardMenu;
-	wxSplashScreen* m_SplashScreen;
+	albaGUISplashScreen* m_SplashScreen;
 
 	long							m_ChildFrameStyle;
 	albaGUIMDIFrame		*m_Win;

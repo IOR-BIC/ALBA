@@ -30,6 +30,7 @@ public:
   CPPUNIT_TEST(TestDynamicAllocation);
   CPPUNIT_TEST(TestExtractRG);
   CPPUNIT_TEST(TestExtractSP);
+	CPPUNIT_TEST(TestExtractConnectivity);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -37,9 +38,9 @@ private:
   void TestDynamicAllocation();
   void TestExtractRG();
   void TestExtractSP();
+	void TestExtractConnectivity();
 
   bool result;
-
 };
 
 #endif
