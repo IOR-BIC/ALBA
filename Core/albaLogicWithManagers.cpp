@@ -1789,6 +1789,7 @@ void albaLogicWithManagers::CreateMenu()
 #include "pic/menu/EDIT_CUT.xpm"
 #include "pic/menu/EDIT_DELETE.xpm"
 #include "pic/menu/EDIT_PASTE.xpm"
+#include "pic/menu/EDIT_RENAME.xpm"
 #include "pic/menu/EDIT_REPARENT.xpm"
 #include "pic/menu/EDIT_FIND.xpm"
 #include "pic/menu/EDIT_REDO.xpm"
@@ -1849,6 +1850,7 @@ void albaLogicWithManagers::CreateMenu()
 	albaGUI::AddMenuItem(edit_menu, OP_COPY, _("Copy  \tCtrl+Shift+C"), EDIT_COPY_xpm);
 	albaGUI::AddMenuItem(edit_menu, OP_PASTE, _("Paste \tCtrl+Shift+V"), EDIT_PASTE_xpm);
 	albaGUI::AddMenuItem(edit_menu, OP_DELETE, _("Delete  \tCtrl+Shift+Del"), EDIT_DELETE_xpm);
+	albaGUI::AddMenuItem(edit_menu, OP_RENAME, _("Rename  \tCtrl+Shift+N"), EDIT_RENAME_xpm);
 
 	edit_menu->AppendSeparator();
 	albaGUI::AddMenuItem(edit_menu, OP_REPARENT, _("Reparent to... \tCtrl+Shift+R"), EDIT_REPARENT_xpm);
@@ -1904,26 +1906,28 @@ void albaLogicWithManagers::CreateToolbar()
 	m_ToolBar->SetMargins(0, 0);
 	m_ToolBar->SetToolSeparation(2);
 	m_ToolBar->SetToolBitmapSize(wxSize(20, 20));
-	m_ToolBar->AddTool(MENU_FILE_NEW, albaPictureFactory::GetPictureFactory()->GetBmp("FILE_NEW"), _("new " + m_Extension + " storage file"));
-	m_ToolBar->AddTool(MENU_FILE_OPEN, albaPictureFactory::GetPictureFactory()->GetBmp("FILE_OPEN"), _("open " + m_Extension + " storage file"));
-	m_ToolBar->AddTool(MENU_FILE_SAVE, albaPictureFactory::GetPictureFactory()->GetBmp("FILE_SAVE"), _("save current " + m_Extension + " storage file"));
+	m_ToolBar->AddTool(MENU_FILE_NEW, albaPictureFactory::GetPictureFactory()->GetBmp("FILE_NEW"), _("New " + m_Extension + " storage file"));
+	m_ToolBar->AddTool(MENU_FILE_OPEN, albaPictureFactory::GetPictureFactory()->GetBmp("FILE_OPEN"), _("Open " + m_Extension + " storage file"));
+	m_ToolBar->AddTool(MENU_FILE_SAVE, albaPictureFactory::GetPictureFactory()->GetBmp("FILE_SAVE"), _("Save current " + m_Extension + " storage file"));
 	m_ToolBar->AddSeparator();
 
-	m_ToolBar->AddTool(MENU_FILE_PRINT, albaPictureFactory::GetPictureFactory()->GetBmp("PRINT"), _("print the selected view"));
-	m_ToolBar->AddTool(MENU_FILE_PRINT_PREVIEW, albaPictureFactory::GetPictureFactory()->GetBmp("PRINT_PREVIEW"), _("show the print preview for the selected view"));
+	m_ToolBar->AddTool(MENU_FILE_PRINT, albaPictureFactory::GetPictureFactory()->GetBmp("PRINT"), _("Print the selected view"));
+	m_ToolBar->AddTool(MENU_FILE_PRINT_PREVIEW, albaPictureFactory::GetPictureFactory()->GetBmp("PRINT_PREVIEW"), _("Show the print preview for the selected view"));
 	m_ToolBar->AddSeparator();
 
-	m_ToolBar->AddTool(OP_UNDO, albaPictureFactory::GetPictureFactory()->GetBmp("OP_UNDO"), _("undo (ctrl+z)"));
-	m_ToolBar->AddTool(OP_REDO, albaPictureFactory::GetPictureFactory()->GetBmp("OP_REDO"), _("redo (ctrl+shift+z)"));
+	m_ToolBar->AddTool(OP_UNDO, albaPictureFactory::GetPictureFactory()->GetBmp("OP_UNDO"), _("Undo (ctrl+z)"));
+	m_ToolBar->AddTool(OP_REDO, albaPictureFactory::GetPictureFactory()->GetBmp("OP_REDO"), _("Redo (ctrl+shift+z)"));
 	m_ToolBar->AddSeparator();
 
-	m_ToolBar->AddTool(OP_CUT, albaPictureFactory::GetPictureFactory()->GetBmp("OP_CUT"), _("cut selected vme (ctrl+x)"));
-	m_ToolBar->AddTool(OP_COPY, albaPictureFactory::GetPictureFactory()->GetBmp("OP_COPY"), _("copy selected vme (ctrl+c)"));
-	m_ToolBar->AddTool(OP_PASTE, albaPictureFactory::GetPictureFactory()->GetBmp("OP_PASTE"), _("paste vme (ctrl+v)"));
+	m_ToolBar->AddTool(OP_CUT, albaPictureFactory::GetPictureFactory()->GetBmp("OP_CUT"), _("Cut selected vme (ctrl+x)"));
+	m_ToolBar->AddTool(OP_COPY, albaPictureFactory::GetPictureFactory()->GetBmp("OP_COPY"), _("Copy selected vme (ctrl+c)"));
+	m_ToolBar->AddTool(OP_PASTE, albaPictureFactory::GetPictureFactory()->GetBmp("OP_PASTE"), _("Paste vme (ctrl+v)"));
+	//m_ToolBar->AddTool(OP_RENAME, albaPictureFactory::GetPictureFactory()->GetBmp("OP_RENAME"), _("Rename vme (ctrl+n)"));
 	m_ToolBar->AddSeparator();
-	m_ToolBar->AddTool(CAMERA_RESET, albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_ALL"), _("reset camera to fit all (ctrl+f)"));
-	m_ToolBar->AddTool(CAMERA_FIT, albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"), _("reset camera to fit selected object (ctrl+shift+f)"));
-	m_ToolBar->AddTool(CAMERA_FLYTO, albaPictureFactory::GetPictureFactory()->GetBmp("FLYTO"), _("fly to object under mouse"));
+
+	m_ToolBar->AddTool(CAMERA_RESET, albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_ALL"), _("Reset camera to fit all (ctrl+f)"));
+	m_ToolBar->AddTool(CAMERA_FIT, albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"), _("Reset camera to fit selected object (ctrl+shift+f)"));
+	m_ToolBar->AddTool(CAMERA_FLYTO, albaPictureFactory::GetPictureFactory()->GetBmp("FLYTO"), _("Fly to object under mouse"));
 	
 	if (m_UseSnapshotManager)
 	{

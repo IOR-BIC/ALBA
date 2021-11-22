@@ -90,7 +90,7 @@ void albaAvatar3DConeTest::TestPick()
   albaSmartPointer<albaDeviceButtonsPadTracker> device;
   
   //device->SetAvatar(avatar); NOT USED BECAUSE IT CREATES A GUI
-  avatar->SetRenderer(m_Renderer);
+  avatar->SetRendererAndView(m_Renderer,NULL);
   avatar->SetDevice(device);
 
   m_RenderWindow->Render();

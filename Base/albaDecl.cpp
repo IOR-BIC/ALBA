@@ -488,6 +488,7 @@ std::string  albaIdString(int id)
      case OP_CUT:								s="OP_CUT"; break; 
      case OP_COPY:							s="OP_COPY"; break; 
      case OP_PASTE:							s="OP_PASTE"; break; 
+	 case OP_RENAME:						s = "OP_RENAME"; break;
      case OP_SELECT:						s="OP_SELECT"; break; 
      case OP_TRANSFORM:					s="OP_TRANSFORM"; break; 
      case OP_END:								s="OP_END"; break; 
