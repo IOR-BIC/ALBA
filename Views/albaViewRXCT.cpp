@@ -89,7 +89,7 @@ albaViewRXCT::albaViewRXCT(wxString label)
   
   m_LutSliders[RX_FRONT_VIEW] = m_LutSliders[RX_SIDE_VIEW] = m_LutSliders[CT_COMPOUND_VIEW] = NULL;
   //m_vtkLUT[RX_FRONT_VIEW] = m_vtkLUT[RX_SIDE_VIEW] = m_vtkLUT[CT_COMPOUND_VIEW] = NULL;
-  m_Lut = NULL;
+  m_ColorLUT = NULL;
 
   m_RightOrLeft=1;
 	m_Side = 0; // All
@@ -265,9 +265,9 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
       
       if(volumeOutput->GetMaterial()->m_ColorLut)
       {
-        m_Lut = volumeOutput->GetMaterial()->m_ColorLut;
-        m_Lut->SetRange(sr);
-        m_Lut->Build();
+        m_ColorLUT = volumeOutput->GetMaterial()->m_ColorLut;
+        m_ColorLUT->SetRange(sr);
+        m_ColorLUT->Build();
       }
       
 
@@ -288,7 +288,7 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
         p->SetInterpolation(m_TrilinearInterpolationOn);
 
         //p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
-        p->SetColorLookupTable(m_Lut);
+        p->SetColorLookupTable(m_ColorLUT);
         m_Pos[i] = b[5]-step*(i+1);
       }
       m_CurrentVolume = vme;
@@ -437,7 +437,7 @@ void albaViewRXCT::OnEventRangeModified(albaEventBase *alba_event)
     {
       m_LutSliders[CT_COMPOUND_VIEW]->GetSubRange(&low,&hi);
       //m_vtkLUT[CT_COMPOUND_VIEW]->SetRange(low,hi);
-      m_Lut->SetRange(low,hi);
+      m_ColorLUT->SetTableRange(low,hi);
     }
 
     CameraUpdate();
