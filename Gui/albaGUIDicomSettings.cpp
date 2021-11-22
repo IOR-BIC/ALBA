@@ -42,7 +42,7 @@ albaGUISettings(Listener, label)
   m_CheckNameCompositor[ID_DESCRIPTION] = TRUE; 
   m_CheckNameCompositor[ID_SERIES] = TRUE;
 	  
-  m_AutoVMEType = m_SkipCrop = FALSE;
+  m_AutoResample = m_AutoVMEType = m_SkipCrop = FALSE;
   m_OutputType = 0;
   m_LastDicomDir = "UNEDFINED_m_LastDicomDir";
   m_Step = ID_1X;
@@ -64,7 +64,7 @@ void albaGUIDicomSettings::CreateGui()
 	m_Gui = new albaGUI(this);
 
 	wxString DCM_IMGchoices[2]={_("Skip All"),_("Set Default position")};
-	wxString typeArray[3] = { _("Volume"),_("Images") };
+	wxString typeArray[2] = { _("Volume"),_("Images") };
 	wxString SkipChoices[4] = { _("Load All"),_("load one in two"),_("load one in trhee"),_("load one in four") };
 	
 	m_Gui->Label("Dicom Settings", true);
@@ -74,6 +74,7 @@ void albaGUIDicomSettings::CreateGui()
   m_Gui->Divider(1);
   m_Gui->Bool(ID_AUTO_VME_TYPE,_("Auto VME Type"),&m_AutoVMEType,1);
   m_Gui->Radio(ID_SETTING_VME_TYPE, "VME output", &m_OutputType, 2, typeArray, 1, "");
+	m_Gui->Bool(ID_AUTORESAMPLE_OUTPUT, _("Auto Resample Volume"), &m_AutoResample, 1,"When the slicing space is not regular a resample filter is applied.");
   m_Gui->Divider(1);
 	m_Gui->Combo(ID_STEP,_("Skip Slices:"),&m_Step,4,SkipChoices);
 	m_Gui->Divider(1);
@@ -91,6 +92,7 @@ void albaGUIDicomSettings::EnableItems()
   if (m_Gui)
   {
     m_Gui->Enable(ID_SETTING_VME_TYPE,(m_AutoVMEType || m_SkipCrop ));
+		m_Gui->Enable(ID_AUTORESAMPLE_OUTPUT, (!m_AutoVMEType || m_OutputType == 0));
 	  m_Gui->Update();
   }
 }
@@ -118,6 +120,11 @@ void albaGUIDicomSettings::OnEvent(albaEventBase *alba_event)
 		case ID_SETTING_VME_TYPE:
 		{
 			m_Config->Write("VMEType", m_OutputType);
+		}
+		break;
+		case ID_AUTORESAMPLE_OUTPUT:
+		{
+			m_Config->Write("AutoResample", m_AutoResample);
 		}
 		break;
 		case ID_DCM_POSITION_PATIENT_CHOICE:
@@ -164,7 +171,12 @@ void albaGUIDicomSettings::InitializeSettings()
 		m_OutputType=long_item;
 	else
 		m_Config->Write("VMEType",m_OutputType);
-	
+
+	if (m_Config->Read("AutoResample", &long_item))
+		m_AutoResample = long_item;
+	else
+		m_Config->Write("AutoResample", m_AutoResample);
+		
   if(m_Config->Read("DCM_ImagePositionPatientchoice", &long_item))
 	  m_DCM_ImagePositionPatientchoice=long_item;
   else

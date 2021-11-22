@@ -79,6 +79,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 
 #include "albaDicomTagDefines.h"
+#include "vtkALBAVolumeResample.h"
 
 
 //----------------------------------------------------------------------------
@@ -458,12 +459,80 @@ int albaOpImporterDicom::BuildVMEVolumeGrayOutput()
 			vtkDEL(image);
 		}
 
-		vtkDataSet *rg_out;
-		rg_out = accumulate.GetNewOutput(); 
-		rg_out->Update();
+		vtkDataSet *acc_out;
+		acc_out = accumulate.GetNewOutput(); 
+		acc_out->Update();
 
-		//Set data at specific time
-		VolumeOut->SetDataByDetaching(rg_out, triggerTime);
+		if (GetSetting()->GetAutoResample() && vtkRectilinearGrid::SafeDownCast(acc_out))
+		{
+			vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(acc_out);
+			vtkALBASmartPointer<vtkALBAVolumeResample> resample = vtkALBAVolumeResample::New();
+			vtkALBASmartPointer<vtkImageData> sp;
+
+			double inputDataOrigin[3];
+			inputDataOrigin[0] = rg->GetXCoordinates()->GetComponent(0, 0);
+			inputDataOrigin[1] = rg->GetYCoordinates()->GetComponent(0, 0);
+			inputDataOrigin[2] = rg->GetZCoordinates()->GetComponent(0, 0);
+
+			double sr[2];
+			rg->GetScalarRange(sr);
+			double w = sr[1] - sr[0];
+			double l = (sr[1] + sr[0]) * 0.5;
+			double bounds[6];
+			rg->GetBounds(bounds);
+			
+			double volSpacing[3] = { VTK_DOUBLE_MAX ,VTK_DOUBLE_MAX ,VTK_DOUBLE_MAX };
+			
+			for (int xi = 1; xi < rg->GetXCoordinates()->GetNumberOfTuples(); xi++)
+			{
+				double spcx = rg->GetXCoordinates()->GetTuple1(xi) - rg->GetXCoordinates()->GetTuple1(xi - 1);
+				if (volSpacing[0] > spcx && spcx != 0.0)
+					volSpacing[0] = spcx;
+			}
+
+			for (int yi = 1; yi < rg->GetYCoordinates()->GetNumberOfTuples(); yi++)
+			{
+				double spcy = rg->GetYCoordinates()->GetTuple1(yi) - rg->GetYCoordinates()->GetTuple1(yi - 1);
+				if (volSpacing[1] > spcy && spcy != 0.0)
+					volSpacing[1] = spcy;
+			}
+
+			for (int zi = 1; zi < rg->GetZCoordinates()->GetNumberOfTuples(); zi++)
+			{
+				double spcz = rg->GetZCoordinates()->GetTuple1(zi) - rg->GetZCoordinates()->GetTuple1(zi - 1);
+				if (volSpacing[2] > spcz && spcz != 0.0)
+					volSpacing[2] = spcz;
+			}
+
+			int output_extent[6];
+			output_extent[0] = 0;
+			output_extent[1] = (bounds[1] - bounds[0]) / volSpacing[0];
+			output_extent[2] = 0;
+			output_extent[3] = (bounds[3] - bounds[2]) / volSpacing[1];
+			output_extent[4] = 0;
+			output_extent[5] = (bounds[5] - bounds[4]) / volSpacing[2];
+
+			sp->SetSpacing(volSpacing);
+			sp->SetScalarType(rg->GetPointData()->GetScalars()->GetDataType());
+			sp->SetExtent(output_extent);
+			sp->SetUpdateExtent(output_extent);
+
+			resample->SetZeroValue(0);
+			resample->SetWindow(w);
+			resample->SetLevel(l);
+			resample->SetInput(acc_out);
+			resample->SetOutput(sp);
+			resample->AutoSpacingOff();
+			resample->Update();
+			resample->GetOutput()->Update();
+
+			VolumeOut->SetDataByDetaching(resample->GetOutput(), triggerTime);
+		}
+		else
+		{
+			//Set data at specific time
+			VolumeOut->SetDataByDetaching(acc_out, triggerTime);
+		}
 	}
 
 	//Setting orientation matrix
