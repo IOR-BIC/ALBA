@@ -56,6 +56,7 @@ public:
     ID_CONVERT_UNITS,
     ID_AUTO_VME_TYPE,
     ID_SETTING_VME_TYPE,
+		ID_AUTORESAMPLE_OUTPUT,
     ID_DCM_POSITION_PATIENT_CHOICE,
 		ID_SKIP_CROP,
 		ID_SKIP_NAMING
@@ -113,13 +114,11 @@ public:
 	/** Sets the DCM_ImagePositionPatient choice */
 	void SetDCMImagePositionPatientExceptionHandling(int choice) { m_DCM_ImagePositionPatientchoice = choice; m_Config->Write("DCM_ImagePositionPatientchoice", m_DCM_ImagePositionPatientchoice);};
 
-
 	/** Returns SkipCrop */
 	int GetSkipCrop() const { return m_SkipCrop; }
 
 	/** Sets SkipCrop */
 	void SetSkipCrop(int skipCrop) { m_SkipCrop = skipCrop; m_Config->Write("SkipCrop", m_SkipCrop);}
-
 
 	/** Returns AutoVMEType */
 	int GetAutoVMEType() const { return m_AutoVMEType; }
@@ -127,6 +126,11 @@ public:
 	/** Sets AutoVMEType */
 	void SetAutoVMEType(int autoVMEType) { m_AutoVMEType = autoVMEType; m_Config->Write("AutoVMEType", m_AutoVMEType);}
 
+	/** Returns AutoVMEType */
+	int GetAutoResample() const { return m_AutoResample; }
+
+	/** Sets AutoVMEType */
+	void SetAutoResample(int autoResample) { m_AutoResample = autoResample; m_Config->Write("AutoResample", m_AutoResample); }
 
 	/** Returns OutputType */
 	int GetOutputType() const { return m_OutputType; }
@@ -153,6 +157,7 @@ protected:
 
 	int m_Step;
   int m_AutoVMEType;
+	int m_AutoResample;
 	int m_SkipCrop;
 	wxString m_LastDicomDir;
   int m_DCM_ImagePositionPatientchoice;
