@@ -128,9 +128,9 @@ void albaPipeVolumeArbOrthoSlice::Create(albaSceneNode *n)
   m_Vme->GetOutput()->GetVMELocalBounds(b);
 
   mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
-  if (material->m_TableRange[1] < material->m_TableRange[0]) 
+  if (material->GetTableRange()[1] < material->GetTableRange()[0]) 
   {
-    data->GetScalarRange(material->m_TableRange);
+		material->SetTableRange(data->GetScalarRange());
     material->UpdateProp();
   }
   
