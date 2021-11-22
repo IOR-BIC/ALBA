@@ -1197,9 +1197,9 @@ void albaOpSegmentation::UpdateWindowing()
 	double sr[2], subR[2];
 	volumeOutput->GetVTKData()->GetScalarRange(sr);
 	mmaVolumeMaterial *currentSurfaceMaterial = volumeOutput->GetMaterial();
+	currentSurfaceMaterial->UpdateProp();
 	currentSurfaceMaterial->m_ColorLut->GetTableRange(subR);
 
-	volumeOutput->GetMaterial()->UpdateProp();
 	m_LutSlider->SetRange(sr);
 	m_LutSlider->SetSubRange(subR);
 }
