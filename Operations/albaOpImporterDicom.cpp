@@ -513,10 +513,12 @@ int albaOpImporterDicom::BuildVMEVolumeGrayOutput()
 			output_extent[5] = (bounds[5] - bounds[4]) / volSpacing[2];
 
 			sp->SetSpacing(volSpacing);
+			sp->SetOrigin(inputDataOrigin);
 			sp->SetScalarType(rg->GetPointData()->GetScalars()->GetDataType());
 			sp->SetExtent(output_extent);
 			sp->SetUpdateExtent(output_extent);
 
+			resample->SetVolumeOrigin(inputDataOrigin);
 			resample->SetZeroValue(0);
 			resample->SetWindow(w);
 			resample->SetLevel(l);
