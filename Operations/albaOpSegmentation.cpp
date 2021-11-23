@@ -667,6 +667,10 @@ void albaOpSegmentation::CreateOpDialog()
 
 	m_LutSlider->Update();
 
+	//////////////////////////////////////////////////////////////////////////
+
+	albaVMEOutputVolume *volumeOutput = albaVMEOutputVolume::SafeDownCast(m_Volume->GetOutput());
+	m_ColorLUT = volumeOutput->GetMaterial()->m_ColorLut;
 	/////////////////////////////////////////////////////
 	wxBoxSizer *view_gui_Sizer = new wxBoxSizer(wxHORIZONTAL);
 	view_gui_Sizer->Add(view_lut_Sizer, 0, wxRIGHT);
