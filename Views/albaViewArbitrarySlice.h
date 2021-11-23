@@ -114,10 +114,10 @@ public:
 	virtual void VmeSelect(albaVME *node, bool select);
 
 	albaViewVTK * GetViewArbitrary();
-
 	albaViewVTK * GetViewSlice();
-
 	albaPipe* GetPipeSlice();
+
+	albaVMEVolumeGray * GetVolume() { return m_InputVolume; }
 protected:
 
 	/** Internally used to create a new instance of the GUI. 
@@ -133,6 +133,8 @@ protected:
 
 	/** Handling events sent from other objects. Called by public method OnEvent().*/
 	void OnEventThis(albaEventBase *alba_event);  
+
+	void TrilinearInterpolationOn();
 
 	void SetGizmo(int typeGizmo);
 
@@ -154,14 +156,16 @@ protected:
 
 	/** Set the GPU according to m_EnableGPU variable*/
 	void SetEnableGPU();
-
+	
+	void OnLUTChooser();
+	virtual void OnLUTRangeModified();
 
 	albaViewVTK *m_ViewSlice;
 	albaViewVTK *m_ViewArbitrary;
 
 	albaGizmoTranslate *m_GizmoTranslate;
 	albaGizmoRotate		*m_GizmoRotate;
-	albaVME          	*m_CurrentVolume;
+	albaVMEVolumeGray	*m_InputVolume;
 	albaMatrix				*m_MatrixReset;
 	albaAttachCamera	*m_AttachCamera;
 	albaMatrix			*m_SlicingMatrix;
@@ -171,8 +175,9 @@ protected:
 	double	m_SliceAngleReset[4];
 	int			m_TypeGizmo;
 
-	albaGUI				*m_GuiGizmos;
+	albaGUI *m_GuiGizmos;
 	
+	int m_SkipCameraUpdate;
 	int m_CameraFollowGizmo;
 	int m_TrilinearInterpolationOn;
 	int m_EnableGPU;

@@ -94,7 +94,6 @@
 #include "vtkPoints.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty2D.h"
-#include "vtkRectilinearGrid.h"
 #include "vtkRenderer.h"
 #include "vtkSphereSource.h"
 #include "vtkImageData.h"
@@ -136,7 +135,7 @@ static albaVME *glo_CurrSeg = NULL;
 albaCxxTypeMacro(albaOpSegmentation);
 
 //----------------------------------------------------------------------------
-albaOpSegmentation::albaOpSegmentation(const wxString &label) : albaOp(label)
+albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) : albaOp(label)
 {
   m_OpType	= OPTYPE_OP;
   m_Canundo	= true;  
@@ -152,7 +151,11 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label) : albaOp(label)
   m_SliceSlider = NULL;
 
 	m_ShowLabels = true;
-  m_CurrentPhase = INIT_SEGMENTATION;
+	m_DisableInit = disableInit;
+	if(m_DisableInit)
+		m_CurrentPhase = EDIT_SEGMENTATION;
+	else
+		m_CurrentPhase = INIT_SEGMENTATION;
 
   m_Dialog       = NULL;
   m_View         = NULL;      
@@ -226,9 +229,6 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label) : albaOp(label)
 
   m_RemovePeninsulaRegions = FALSE;
 
-  m_OLdWindowingLow = -1;
-  m_OLdWindowingLow = -1;
-
   m_ManualSegmentationTools  = DRAW_EDIT;
   m_ManualBucketActions = 0;
 }
@@ -245,7 +245,7 @@ bool albaOpSegmentation::Accept(albaVME *node)
 //----------------------------------------------------------------------------
 albaOp *albaOpSegmentation::Copy()   
 {
-  return (new albaOpSegmentation(m_Label));
+  return (new albaOpSegmentation(m_Label,m_DisableInit));
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OpRun()   
@@ -270,7 +270,6 @@ void albaOpSegmentation::OpRun()
   InitializeView();
 
   m_OldVolumeParent = m_Volume->GetParent();
-  m_Volume->ReparentTo(m_Volume->GetRoot());
 
   m_View->VmeAdd(m_Volume);
   
@@ -296,7 +295,6 @@ void albaOpSegmentation::OpDo()
 			m_Helper.VolumeThreshold(m_Threshold);
 		else if (m_InitModality == RANGE_INIT)
 			m_Helper.VolumeThreshold(&m_RangesVector);
-
 	}
 	  
   vtkALBASmartPointer<vtkALBAVolumeToClosedSmoothSurface> volToSurface;
@@ -338,9 +336,6 @@ void albaOpSegmentation::OpUndo()
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OpStop(int result)
 {
-  // Restore old windowing
-  m_ColorLUT->SetTableRange(m_OLdWindowingLow,m_OLdWindowingHi);
-
   //remove vme now on cancel on ok vme will be removed by opdo method
   if (result == OP_RUN_CANCEL)
   {
@@ -388,7 +383,11 @@ void albaOpSegmentation::Init()
 	m_View->VmeSegmentationShow(m_SegmentationVolume, true);
 
 	OnSelectSlicePlane();
-	OnChangeThresholdType();
+	
+	if (m_DisableInit)
+		OnEditStep();
+	else
+		OnChangeThresholdType();
 	
 	UpdateSliceLabel();
 
@@ -424,43 +423,12 @@ void albaOpSegmentation::InitSegmentationVolume()
 
 	//Workaround we add an epsilon to ensure segmentation volume is always visible
 	//albaViewSegmentation slices adds the same amount to the slice to compensate
-	if (vtkImageData::SafeDownCast(volData))
-	{
-		double newOrigin[3];
-		((vtkImageData *)volData)->GetOrigin(newOrigin);
-		newOrigin[0] += 0.0001;
-		newOrigin[1] -= 0.0001;
-		newOrigin[2] -= 0.0001;
-		((vtkImageData *)segData)->SetOrigin(newOrigin);
-	}
-	else //Rectilinear Grid
-	{
-		int i;
-		vtkRectilinearGrid * volRG = (vtkRectilinearGrid *)volData;
-		vtkRectilinearGrid * segRG = (vtkRectilinearGrid *)segData;
-		vtkDataArray * xCoord = volRG->GetXCoordinates();
-		vtkDataArray * yCoord = volRG->GetYCoordinates();
-		vtkDataArray * zCoord = volRG->GetZCoordinates();
-		vtkDataArray *newXCoord, *newYCoord, *newZCoord;
-		newXCoord = xCoord->NewInstance();
-		newYCoord = yCoord->NewInstance();
-		newZCoord = zCoord->NewInstance();
-		vtkIdType xNTuples = xCoord->GetNumberOfTuples();
-		vtkIdType yNTuples = yCoord->GetNumberOfTuples();
-		vtkIdType zNTuples = zCoord->GetNumberOfTuples();
-		newXCoord->SetNumberOfTuples(xNTuples);
-		newYCoord->SetNumberOfTuples(yNTuples);
-		newZCoord->SetNumberOfTuples(zNTuples);
-		for (i = 0; i < xNTuples; i++)
-			newXCoord->SetTuple1(i, xCoord->GetTuple1(i) + 0.0001);
-		for (i = 0; i < yNTuples; i++)
-			newYCoord->SetTuple1(i, yCoord->GetTuple1(i) - 0.0001);
-		for (i = 0; i < zNTuples; i++)
-			newZCoord->SetTuple1(i, zCoord->GetTuple1(i) - 0.0001);
-		segRG->SetXCoordinates(newXCoord);
-		segRG->SetYCoordinates(newYCoord);
-		segRG->SetZCoordinates(newZCoord);
-	}
+	double newOrigin[3];
+	((vtkImageData *)volData)->GetOrigin(newOrigin);
+	newOrigin[0] += 0.0001;
+	newOrigin[1] -= 0.0001;
+	newOrigin[2] -= 0.0001;
+	((vtkImageData *)segData)->SetOrigin(newOrigin);
 
 	vtkDataArray *volScalars = volData->GetPointData()->GetScalars();
 	vtkUnsignedCharArray *segScalars;
@@ -542,70 +510,37 @@ void albaOpSegmentation::InitVolumeDimensions()
 		inputDataSet->Update();
 		inputDataSet->GetBounds(m_VolumeBounds);
 
-		if (vtkImageData *sp = vtkImageData::SafeDownCast(inputDataSet))
-		{
-			sp->GetDimensions(m_VolumeDims);
-			sp->GetDimensions(glo_CurrVolDims);
-		}
-		else if (vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(inputDataSet))
-		{
-			rg->GetDimensions(m_VolumeDims);
-			rg->GetDimensions(glo_CurrVolDims);
-		}
+		vtkImageData *sp = vtkImageData::SafeDownCast(inputDataSet);
+		sp->GetDimensions(m_VolumeDims);
+		sp->GetDimensions(glo_CurrVolDims);
 
 		//Setting start slicing on the center of the volume
 		for (int i = 0; i < 3; i++)
 			m_SliceIndexByPlane[i] = m_VolumeDims[i] / 2;
 
-		m_VolumeSpacing[0] = 0;
-		m_VolumeSpacing[1] = 0;
-		m_VolumeSpacing[2] = 0;
 
-		if (vtkImageData *image = vtkImageData::SafeDownCast(inputDataSet))
-		{
-			image->GetSpacing(m_VolumeSpacing);
-			image->GetSpacing(glo_CurrVolSpacing);
-		}
-		else if (vtkRectilinearGrid *rgrid = vtkRectilinearGrid::SafeDownCast(inputDataSet))
-		{
-			for (int xi = 1; xi < rgrid->GetXCoordinates()->GetNumberOfTuples(); xi++)
-			{
-				double spcx = rgrid->GetXCoordinates()->GetTuple1(xi) - rgrid->GetXCoordinates()->GetTuple1(xi - 1);
-				if (m_VolumeSpacing[0] < spcx && spcx != 0.0)
-					glo_CurrVolSpacing[0] = m_VolumeSpacing[0] = spcx;
-			}
-
-			for (int yi = 1; yi < rgrid->GetYCoordinates()->GetNumberOfTuples(); yi++)
-			{
-				double spcy = rgrid->GetYCoordinates()->GetTuple1(yi) - rgrid->GetYCoordinates()->GetTuple1(yi - 1);
-				if (m_VolumeSpacing[1] < spcy && spcy != 0.0)
-					glo_CurrVolSpacing[0] = m_VolumeSpacing[1] = spcy;
-			}
-
-			for (int zi = 1; zi < rgrid->GetZCoordinates()->GetNumberOfTuples(); zi++)
-			{
-				double spcz = rgrid->GetZCoordinates()->GetTuple1(zi) - rgrid->GetZCoordinates()->GetTuple1(zi - 1);
-				if (m_VolumeSpacing[2] < spcz && spcz != 0.0)
-					glo_CurrVolSpacing[0] = m_VolumeSpacing[2] = spcz;
-			}
-		}
+		sp->GetSpacing(m_VolumeSpacing);
+		sp->GetSpacing(glo_CurrVolSpacing);
 	}
 }
 
 //----------------------------------------------------------------------------
 void albaOpSegmentation::InitRanges()
 {
-	//Store the parameters
-	AutomaticInfoRange range;
-	range.m_StartSlice = 1;
-	range.m_EndSlice = m_VolumeDims[2];
-	range.m_Threshold[0] = m_Threshold[0];
-	range.m_Threshold[1] = m_Threshold[1];
+	if (!m_DisableInit)
+	{
+		//Store the parameters
+		AutomaticInfoRange range;
+		range.m_StartSlice = 1;
+		range.m_EndSlice = m_VolumeDims[2];
+		range.m_Threshold[0] = m_Threshold[0];
+		range.m_Threshold[1] = m_Threshold[1];
 
-	m_RangesVector.push_back(range);
+		m_RangesVector.push_back(range);
 
-	m_RangesGuiList->Append(wxString::Format("[%d,%d] low:%.1f high:%.1f", range.m_StartSlice, range.m_EndSlice, m_Threshold[0], m_Threshold[1]));
-	m_RangesGuiList->Select(0);
+		m_RangesGuiList->Append(wxString::Format("[%d,%d] low:%.1f high:%.1f", range.m_StartSlice, range.m_EndSlice, m_Threshold[0], m_Threshold[1]));
+		m_RangesGuiList->Select(0);
+	}
 }
 
 // DIALOG GUI
@@ -736,11 +671,6 @@ void albaOpSegmentation::CreateOpDialog()
 
 	albaVMEOutputVolume *volumeOutput = albaVMEOutputVolume::SafeDownCast(m_Volume->GetOutput());
 	m_ColorLUT = volumeOutput->GetMaterial()->m_ColorLut;
-	double data[2];
-	m_ColorLUT->GetTableRange(data);
-	m_OLdWindowingLow = data[0];
-	m_OLdWindowingHi = data[1];
-
 	/////////////////////////////////////////////////////
 	wxBoxSizer *view_gui_Sizer = new wxBoxSizer(wxHORIZONTAL);
 	view_gui_Sizer->Add(view_lut_Sizer, 0, wxRIGHT);
@@ -794,20 +724,28 @@ void albaOpSegmentation::CreateOpDialog()
 	//m_GuiDialog->Bool(ID_ENABLE_TRILINEAR_INTERPOLATION,"Interpolation",&m_TrilinearInterpolationOn,1,"Enable/Disable tri-linear interpolation on slices");
 
 	CreateSliceNavigationGui();
-	CreateInitSegmentationGui();
+	if (!m_DisableInit)
+		CreateInitSegmentationGui();
+	else
+		m_Threshold[0] = m_Threshold[1] = VTK_DOUBLE_MAX;
 	CreateEditSegmentationGui();
 
 	//////////////////////////////////////////////////////////////////////////
 	// Segmentation Operations Phase Buttons
-
-	m_GuiDialog->TwoButtons(ID_BUTTON_INIT, ID_BUTTON_EDIT, _("Init"), _("Edit"), wxEXPAND | wxALL);
-	m_GuiDialog->Enable(ID_BUTTON_INIT, false);
-	m_GuiDialog->Enable(ID_BUTTON_EDIT, true);
-	m_GuiDialog->Divider(1);
+	if (!m_DisableInit)
+	{
+		m_GuiDialog->TwoButtons(ID_BUTTON_INIT, ID_BUTTON_EDIT, _("Init"), _("Edit"), wxEXPAND | wxALL);
+		m_GuiDialog->Enable(ID_BUTTON_INIT, false);
+		m_GuiDialog->Enable(ID_BUTTON_EDIT, true);
+		m_GuiDialog->Divider(1);
+	}
 
 	// Add Operation Phase Gui
 	m_AppendingOpGui = new albaGUI(NULL);
-	m_AppendingOpGui->AddGui(m_SegmentationOperationsGui[INIT_SEGMENTATION]);
+	if(m_DisableInit)
+		m_AppendingOpGui->AddGui(m_SegmentationOperationsGui[EDIT_SEGMENTATION]);
+	else
+		m_AppendingOpGui->AddGui(m_SegmentationOperationsGui[INIT_SEGMENTATION]);
 
 	m_GuiDialog->AddGui(m_AppendingOpGui);
 
@@ -1194,14 +1132,16 @@ void albaOpSegmentation::DeleteOpDialog()
 void albaOpSegmentation::UpdateWindowing()
 {
 	albaVMEOutputVolume *volumeOutput = albaVMEOutputVolume::SafeDownCast(m_Volume->GetOutput());
-	double sr[2], subR[2];
+	double sr[2];
 	volumeOutput->GetVTKData()->GetScalarRange(sr);
-	mmaVolumeMaterial *currentSurfaceMaterial = volumeOutput->GetMaterial();
-	currentSurfaceMaterial->UpdateProp();
-	currentSurfaceMaterial->m_ColorLut->GetTableRange(subR);
-
+	mmaVolumeMaterial *material = volumeOutput->GetMaterial();
+	if (material->GetTableRange()[1] < material->GetTableRange()[0])
+	{
+		material->SetTableRange(sr);
+		material->UpdateProp();
+	}
 	m_LutSlider->SetRange(sr);
-	m_LutSlider->SetSubRange(subR);
+	m_LutSlider->SetSubRange(material->GetTableRange());
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::UpdateSliderValidator()
@@ -1572,16 +1512,19 @@ void albaOpSegmentation::OnEditStep()
 
 	m_CurrentPhase = EDIT_SEGMENTATION;
 	
-	m_AppendingOpGui->Remove(m_SegmentationOperationsGui[INIT_SEGMENTATION]);
-	m_AppendingOpGui->AddGui(m_SegmentationOperationsGui[EDIT_SEGMENTATION]);
-	m_AppendingOpGui->FitGui();
+	if (!m_DisableInit)
+	{
+		m_AppendingOpGui->Remove(m_SegmentationOperationsGui[INIT_SEGMENTATION]);
+		m_AppendingOpGui->AddGui(m_SegmentationOperationsGui[EDIT_SEGMENTATION]);
+		m_AppendingOpGui->FitGui();
+	}
 
 	m_GuiDialog->Enable(ID_BUTTON_INIT, true);
 	m_GuiDialog->Enable(ID_BUTTON_EDIT, false);
 	m_GuiDialog->FitGui();
 	m_Dialog->Update();
 	
-	if (m_InitModality == GLOBAL_INIT)
+	if (m_DisableInit || m_InitModality == GLOBAL_INIT)
 		m_Helper.VolumeThreshold(m_Threshold);
 	else if (m_InitModality == RANGE_INIT)
 		m_Helper.VolumeThreshold(&m_RangesVector);
@@ -1719,18 +1662,17 @@ void albaOpSegmentation::OnSelectSlicePlane()
 	m_Helper.SetSlices(m_VolumeSlice, m_SegmentationSlice);
 
 	m_GuiDialog->Update();
-	if (m_CurrentPhase == EDIT_SEGMENTATION)
-
-	UpdateSlice();
-	m_View->CameraReset();
-
+	
 	if (m_CurrentPhase == INIT_SEGMENTATION)
-		OnThresholdUpate();
-	else // EDIT_SEGMENTATION
+		OnThresholdUpate(); 
+	else if (m_CurrentPhase == EDIT_SEGMENTATION)
 	{
+		UpdateSlice();
 		CreateRealDrawnImage();
 		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
 	}
+
+	m_View->CameraReset();
 
 	m_OldSliceIndex = m_SliceIndex;
 	m_OldSlicePlane = m_SlicePlane;
@@ -1804,26 +1746,29 @@ void albaOpSegmentation::OnUpdateSlice()
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OnChangeThresholdType()
 {
-	EnableDisableGuiRange();
-
-	int thesholdIDs[] = { ID_AUTO_INC_MIN_THRESHOLD, ID_AUTO_INC_MIDDLE_THRESHOLD, ID_AUTO_INC_MAX_THRESHOLD, ID_AUTO_DEC_MIN_THRESHOLD, ID_AUTO_DEC_MIDDLE_THRESHOLD, ID_AUTO_DEC_MAX_THRESHOLD };
-	for (int i = 0; i < 6; i++)
-		m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(thesholdIDs[i], m_InitModality != LOAD_INIT);
-	m_ThresholdSlider->Enable(m_InitModality != LOAD_INIT);
-
-	m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_LOAD, m_InitModality == LOAD_INIT);
-
-	if (m_InitModality == LOAD_INIT)
+	if (!m_DisableInit)
 	{
-		//forcing slice update
-		double tmp[3] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MAX, VTK_DOUBLE_MAX };
-		m_View->SetSlice(tmp);
-		UpdateSlice();
-	}
-	else if (m_InitModality == RANGE_INIT)
-		SelectRangeByCurrentSlice();
+		EnableDisableGuiRange();
 
-	UpdateThresholdLabel();
+		int thesholdIDs[] = { ID_AUTO_INC_MIN_THRESHOLD, ID_AUTO_INC_MIDDLE_THRESHOLD, ID_AUTO_INC_MAX_THRESHOLD, ID_AUTO_DEC_MIN_THRESHOLD, ID_AUTO_DEC_MIDDLE_THRESHOLD, ID_AUTO_DEC_MAX_THRESHOLD };
+		for (int i = 0; i < 6; i++)
+			m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(thesholdIDs[i], m_InitModality != LOAD_INIT);
+		m_ThresholdSlider->Enable(m_InitModality != LOAD_INIT);
+
+		m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_LOAD, m_InitModality == LOAD_INIT);
+
+		if (m_InitModality == LOAD_INIT)
+		{
+			//forcing slice update
+			double tmp[3] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MAX, VTK_DOUBLE_MAX };
+			m_View->SetSlice(tmp);
+			UpdateSlice();
+		}
+		else if (m_InitModality == RANGE_INIT)
+			SelectRangeByCurrentSlice();
+
+		UpdateThresholdLabel();
+	}
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OnThresholdUpate(int eventID)
@@ -1929,10 +1874,7 @@ void albaOpSegmentation::OnLoadSegmentation()
 	{
 		m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
 		vtkDataSet * loadVtkData = newVolume->GetOutput()->GetVTKData();
-		if (vtkRectilinearGrid::SafeDownCast(loadVtkData))
-			m_SegmentationVolume->SetData((vtkRectilinearGrid *)loadVtkData, m_SegmentationVolume->GetTimeStamp());
-		else
-			m_SegmentationVolume->SetData((vtkImageData*)loadVtkData, m_SegmentationVolume->GetTimeStamp());
+		m_SegmentationVolume->SetData((vtkImageData*)loadVtkData, m_SegmentationVolume->GetTimeStamp());
 		UpdateSlice();
 	}
 }
@@ -2437,33 +2379,17 @@ bool albaOpSegmentation::Refinement()
 			}
 		}
 
-		if (inputDataSet->IsA("vtkImageData"))
-		{
-			vtkALBASmartPointer<vtkImageData> newSP;
-			newSP->CopyStructure(vtkImageData::SafeDownCast(inputDataSet));
-			newSP->Update();
-			newSP->GetPointData()->AddArray(newScalars);
-			newSP->GetPointData()->SetActiveScalars("SCALARS");
-			newSP->SetScalarTypeToUnsignedChar();
-			newSP->Update();
+		vtkALBASmartPointer<vtkImageData> newSP;
+		newSP->CopyStructure(vtkImageData::SafeDownCast(inputDataSet));
+		newSP->Update();
+		newSP->GetPointData()->AddArray(newScalars);
+		newSP->GetPointData()->SetActiveScalars("SCALARS");
+		newSP->SetScalarTypeToUnsignedChar();
+		newSP->Update();
 
-			m_SegmentationVolume->SetData(newSP, m_Volume->GetTimeStamp());
-			vtkImageData *spVME = vtkImageData::SafeDownCast(m_SegmentationVolume->GetOutput()->GetVTKData());
-			spVME->Update();
-		}
-		else
-		{
-			vtkALBASmartPointer<vtkRectilinearGrid> newRG;
-			newRG->CopyStructure(vtkRectilinearGrid::SafeDownCast(inputDataSet));
-			newRG->Update();
-			newRG->GetPointData()->AddArray(newScalars);
-			newRG->GetPointData()->SetActiveScalars("SCALARS");
-			newRG->Update();
-
-			m_SegmentationVolume->SetData(newRG, m_Volume->GetTimeStamp());
-			vtkRectilinearGrid *rgVME = vtkRectilinearGrid::SafeDownCast(albaVMEVolumeGray::SafeDownCast(m_SegmentationVolume)->GetOutput()->GetVTKData());
-			rgVME->Update();
-		}
+		m_SegmentationVolume->SetData(newSP, m_Volume->GetTimeStamp());
+		vtkImageData *spVME = vtkImageData::SafeDownCast(m_SegmentationVolume->GetOutput()->GetVTKData());
+		spVME->Update();
 
 		m_SegmentationVolume->Update();
 
@@ -2482,38 +2408,20 @@ bool albaOpSegmentation::Refinement()
 //----------------------------------------------------------------------------
 void albaOpSegmentation::GetSliceOrigin(double *origin)
 {
-  if (m_Volume->GetOutput()->GetVTKData()->IsA("vtkImageData"))
-  {
-    vtkImageData *sp = vtkImageData::SafeDownCast(m_Volume->GetOutput()->GetVTKData());
-    sp->Update();
-    double spc[3];
-    sp->GetSpacing(spc);
-    sp->GetOrigin(origin);
+	vtkImageData *sp = vtkImageData::SafeDownCast(m_Volume->GetOutput()->GetVTKData());
+	sp->Update();
+	double spc[3];
+	sp->GetSpacing(spc);
+	sp->GetOrigin(origin);
 
-    if (m_SlicePlane == XY)
-      origin[2] = (m_SliceIndex-1)*spc[2]+origin[2];
-    else if (m_SlicePlane == XZ)
-      origin[1] = (m_SliceIndex -1)*spc[1]+origin[1];
-    else if (m_SlicePlane == YZ)
-      origin[0] = (m_SliceIndex -1)*spc[0]+origin[0];
-
-  }
-  else
-  {
-    vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(m_Volume->GetOutput()->GetVTKData());
-    rg->Update();
-    origin[0] = rg->GetXCoordinates()->GetTuple1(0);
-    origin[1] = rg->GetYCoordinates()->GetTuple1(0);
-    origin[2] = rg->GetZCoordinates()->GetTuple1(0);
-
-    if (m_SlicePlane == XY)
-      origin[2] = rg->GetZCoordinates()->GetTuple1(m_SliceIndex -1);
-    else if (m_SlicePlane == XZ)
-      origin[1] = rg->GetYCoordinates()->GetTuple1(m_SliceIndex -1);
-    if (m_SlicePlane == YZ)
-      origin[0] = rg->GetXCoordinates()->GetTuple1(m_SliceIndex -1);
-  }
+	if (m_SlicePlane == XY)
+		origin[2] = (m_SliceIndex - 1)*spc[2] + origin[2];
+	else if (m_SlicePlane == XZ)
+		origin[1] = (m_SliceIndex - 1)*spc[1] + origin[1];
+	else if (m_SlicePlane == YZ)
+		origin[0] = (m_SliceIndex - 1)*spc[0] + origin[0];
 }
+
 //----------------------------------------------------------------------------
 void albaOpSegmentation::SelectRangeByCurrentSlice()
 {
@@ -2662,7 +2570,7 @@ int albaOpSegmentation::PressKey(int keyCode, bool ctrl, bool alt, bool shift)
 			}
 		}
 	}
-	else if (m_CurrentPhase = EDIT_SEGMENTATION)
+	else if (m_CurrentPhase == EDIT_SEGMENTATION)
 	{
 		if (ctrl)
 		{

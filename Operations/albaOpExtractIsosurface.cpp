@@ -525,7 +525,7 @@ void albaOpExtractIsosurface::CreateSlicePipeline()
   material->UpdateFromTables();
 
   // if the lookup table has not yet been initialized...
-  if (material->m_TableRange[1] < material->m_TableRange[0]) 
+  if (material->GetTableRange()[1] < material->GetTableRange()[0]) 
   {
     double scalarRange[2];
 
@@ -537,8 +537,7 @@ void albaOpExtractIsosurface::CreateSlicePipeline()
     // ...initialize it
     material->m_Window_LUT = high-low;
     material->m_Level_LUT  = (low+high)*.5;
-    material->m_TableRange[0] = low;
-    material->m_TableRange[1] = high;
+		material->SetTableRange(low, high);
   }
   material->UpdateProp();
 
