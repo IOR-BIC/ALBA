@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: GPU_OGL
- Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
+ Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk), Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -12,26 +12,19 @@
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notice for more information.
 
-=========================================================================*//*========================================================================= 
-  Program: Multimod Application Framework RELOADED 
-  Module: $RCSfile: GPU_OGL.cpp,v $ 
-  Language: C++ 
-  Date: $Date: 2009-06-05 13:03:44 $ 
-  Version: $Revision: 1.1.2.3 $ 
-  Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
-  ========================================================================== 
-  Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
-  See the COPYINGS file for license details 
-  =========================================================================
-*/
+=========================================================================*/
 
 #ifdef _WIN32
 #include <Windows.h>
 #endif // _WIN32
 #include "GPU_OGL.h"
+#include "albaDefines.h"
 
-/*static*/bool albaGPUOGL::m_bGPUOGLSupported = false;
-/*static*/bool albaGPUOGL::m_bGPUOGLInitialized = false;
+/*static*/bool albaGPUOGL::glo_bGPUOGLSupported = false;
+/*static*/bool albaGPUOGL::glo_bGPUOGLInitialized = false;
+
+albaGPUOGL *glo_GPUOGL=NULL;
+unsigned int glo_RegCounter = 0;
 
 #ifdef _WIN32
 #ifdef _DEBUG
@@ -134,6 +127,24 @@ GLint gltWriteTGA(const char *szFileName, GLenum gltyp)
 
 
 
+//----------------------------------------------------------------------------
+albaGPUOGL * albaGPUOGL::BindGPUOGL()
+{
+	if (glo_GPUOGL == NULL)
+		glo_GPUOGL = new albaGPUOGL();
+	glo_RegCounter++;
+	return glo_GPUOGL;
+}
+
+//----------------------------------------------------------------------------
+void albaGPUOGL::ReleaseGPUOGL()
+{
+	glo_RegCounter--;
+	assert(glo_RegCounter >= 0);
+	if (glo_RegCounter == 0)
+		cppDEL(glo_GPUOGL);
+}
+
 //ctor
 albaGPUOGL::albaGPUOGL()
 {
@@ -150,18 +161,18 @@ albaGPUOGL::albaGPUOGL()
   m_nGPUGLContextRef = 0;
   m_bUnregWndClass = false;
 
-  if (!m_bGPUOGLInitialized)
+  if (!glo_bGPUOGLInitialized)
   {
-    m_bGPUOGLSupported = CreateRenderingWindow(NULL);
-    if (m_bGPUOGLSupported)
+    glo_bGPUOGLSupported = CreateRenderingWindow(NULL);
+    if (glo_bGPUOGLSupported)
     {
       //activate our rendering context
       albaGPUOGLContext context(this);
 
-      m_bGPUOGLSupported = glewInit() == GLEW_OK;
-      if (m_bGPUOGLSupported)
+      glo_bGPUOGLSupported = glewInit() == GLEW_OK;
+      if (glo_bGPUOGLSupported)
       {
-        m_bGPUOGLSupported = 
+        glo_bGPUOGLSupported = 
           IsExtSupported("GL_ARB_vertex_shader") &&
           IsExtSupported("GL_ARB_fragment_shader") &&
           IsExtSupported("GL_ARB_shader_objects") &&
@@ -170,7 +181,7 @@ albaGPUOGL::albaGPUOGL()
       }
     }
 
-    m_bGPUOGLInitialized = true;
+    glo_bGPUOGLInitialized = true;
   }
 #endif
 

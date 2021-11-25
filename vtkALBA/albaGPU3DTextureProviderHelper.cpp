@@ -217,8 +217,8 @@ void albaGPU3DTextureProviderHelper::UnregisterTexture()
 		glDeleteTextures(1, (GLuint*)&m_TextureId);
 		glo_Textures[pos].m_pGPUProvider->DisableRenderingContext();
 
-		//Delete GPU provider
-		delete glo_Textures[pos].m_pGPUProvider;
+		//Release GPU provider
+		albaGPUOGL::ReleaseGPUOGL();
 
 		//Erase the entry in the list:
 		glo_Textures.erase(glo_Textures.begin() + pos);
@@ -268,7 +268,7 @@ albaGPUOGL *albaGPU3DTextureProviderHelper::CreateGPUProvider()
 		return NULL;
 
 	//supported => OK
-	albaGPUOGL *gpuProvider = new albaGPUOGL();
+	albaGPUOGL *gpuProvider = albaGPUOGL::BindGPUOGL();
 
 	//create shader
 	const char* ps =
@@ -295,7 +295,7 @@ albaGPUOGL *albaGPU3DTextureProviderHelper::CreateGPUProvider()
 	wxString err;
 	if (!gpuProvider->CreateShaders(NULL, ps, &err))
 	{
-		delete gpuProvider;
+		albaGPUOGL::ReleaseGPUOGL();
 		return NULL;
 	}
 
