@@ -113,7 +113,7 @@ albaPipeVolumeArbSlice::albaPipeVolumeArbSlice()
 	m_EpisolonNormal[0] = m_EpisolonNormal[2] = m_EpisolonNormal[1] = 0;
 
 	m_ShowTICKs	 = false;
-  m_EnableGPU = FALSE;
+  m_EnableGPU = true;
   m_Interpolate = true;
   m_TrilinearInterpolationOn = TRUE;
 }

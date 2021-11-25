@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: GPU_OGL
- Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
+ Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk), Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -51,11 +51,14 @@
 class albaGPUOGL
 {
 protected:
-  //singleton
-  static bool m_bGPUOGLInitialized;
-  static bool m_bGPUOGLSupported;
+	//constructor & destructor
+	albaGPUOGL();
+	~albaGPUOGL();
 
-protected:
+	//singleton
+	static bool glo_bGPUOGLInitialized;
+	static bool glo_bGPUOGLSupported;
+
 #ifdef _WIN32
   //smart class for context switch
   class albaGPUOGLContext
@@ -90,6 +93,7 @@ protected:
   unsigned int m_TextureId;     //<Texture into which we will render
   GLenum m_OriginalDrawbuf;     //<Identifier of original drawing buffer
 
+
 #endif
 
   int m_TargetWidth;            //<the width of output texture in pixels
@@ -98,18 +102,17 @@ protected:
   float m_TargetSizeCy;         //<the height of output texture in mm (computation domain)
   
 public:
-  //ctor & dtor
-  albaGPUOGL();
-  ~albaGPUOGL();
 
-public:
+	static albaGPUOGL * BindGPUOGL();
+	static void ReleaseGPUOGL();
+
   /** Results true if OpenGL GPU is supported */
   inline static bool IsSupported() {
-    if (!m_bGPUOGLInitialized) {
+    if (!glo_bGPUOGLInitialized) {
       albaGPUOGL init;   //this will perform initialization in the constructor
     }
 
-    return m_bGPUOGLSupported;
+    return glo_bGPUOGLSupported;
   }
 
   /** Initializes simple vertex and fragment shader 
