@@ -125,7 +125,7 @@ public:
   virtual void UpdateText(int ID = 1);
   
   /** Update list of surfaces vme */
-  void UpdateSurfacesList(albaVME *vme);
+  void RemoveFromSlicingList(albaVME *vme);
 
   virtual void VmeShow(albaVME *vme, bool show);
 
