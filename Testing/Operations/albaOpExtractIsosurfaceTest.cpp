@@ -150,6 +150,7 @@ void albaOpExtractIsosurfaceTest::TestExtractSP()
   albaOpExtractIsosurface *extract = new albaOpExtractIsosurface();
   extract->TestModeOn();
   extract->SetInput(Input);
+	extract->SetConnectivity(false);
   extract->CreateVolumePipeline();
   extract->SetIsoValue(200);
   extract->UpdateSurface();
@@ -170,6 +171,7 @@ void albaOpExtractIsosurfaceTest::TestExtractSP()
   extract1->TestModeOn();
   extract1->SetInput(Input);
   extract1->SetTriangulate(false);
+	extract1->SetConnectivity(false);
   extract1->CreateVolumePipeline();
   extract1->SetIsoValue(200);
   extract1->UpdateSurface();
@@ -189,6 +191,7 @@ void albaOpExtractIsosurfaceTest::TestExtractSP()
   extract2->TestModeOn();
   extract2->SetInput(Input);
   extract2->SetTriangulate(false);
+	extract2->SetConnectivity(false);
   extract2->SetClean(false);
   extract2->CreateVolumePipeline();
   extract2->SetIsoValue(200);
@@ -204,4 +207,83 @@ void albaOpExtractIsosurfaceTest::TestExtractSP()
   cppDEL(extract2);
   albaDEL(output);
   albaDEL(preader);
+}
+
+//----------------------------------------------------------------------------
+void albaOpExtractIsosurfaceTest::TestExtractConnectivity()
+{
+	albaString filename = ALBA_DATA_ROOT;
+	filename << "/VTK_Volumes/CropTestVolumeSP.vtk";
+	vtkStructuredPointsReader *preader = vtkStructuredPointsReader::New();
+	preader->SetFileName(filename);
+	preader->Update();
+
+	vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
+
+	albaSmartPointer<albaVMEVolumeGray> Input;
+	Input->SetDataByDetaching(data, 0);
+	Input->Update();
+	Input->GetOutput()->GetVTKData()->Update();
+
+	//clean on, triangulate on
+	albaOpExtractIsosurface *extract = new albaOpExtractIsosurface();
+	extract->TestModeOn();
+	extract->SetInput(Input);
+	extract->SetConnectivity(true);
+	extract->CreateVolumePipeline();
+	extract->SetIsoValue(200);
+	extract->UpdateSurface();
+
+	extract->ExtractSurface();
+
+	albaVMESurface *output = albaVMESurface::SafeDownCast(extract->GetOutput());
+	albaString number = output->GetSurfaceOutput()->GetNumberOfTriangles();
+
+	result = number.Compare("64") == 0;
+
+	TEST_RESULT;
+	albaDEL(output);
+	cppDEL(extract);
+
+	albaOpExtractIsosurface *extract1 = new albaOpExtractIsosurface();
+	//clean on, triangulate off
+	extract1->TestModeOn();
+	extract1->SetInput(Input);
+	extract1->SetTriangulate(false);
+	extract1->SetConnectivity(true);
+	extract1->CreateVolumePipeline();
+	extract1->SetIsoValue(200);
+	extract1->UpdateSurface();
+	extract1->ExtractSurface();
+
+	output = albaVMESurface::SafeDownCast(extract1->GetOutput());
+	number = output->GetSurfaceOutput()->GetNumberOfTriangles();
+
+	result = number.Compare("64") == 0;
+
+	TEST_RESULT;
+	albaDEL(output);
+	cppDEL(extract1);
+
+	albaOpExtractIsosurface *extract2 = new albaOpExtractIsosurface();
+	//clean off, triangulate off
+	extract2->TestModeOn();
+	extract2->SetInput(Input);
+	extract2->SetTriangulate(false);
+	extract2->SetConnectivity(true);
+	extract2->SetClean(false);
+	extract2->CreateVolumePipeline();
+	extract2->SetIsoValue(200);
+	extract2->UpdateSurface();
+	extract2->ExtractSurface();
+
+	output = albaVMESurface::SafeDownCast(extract2->GetOutput());
+	number = output->GetSurfaceOutput()->GetNumberOfTriangles();
+
+	result = number.Compare("64") == 0;
+
+	TEST_RESULT;
+	cppDEL(extract2);
+	albaDEL(output);
+	albaDEL(preader);
 }

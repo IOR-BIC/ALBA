@@ -6,7 +6,7 @@
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
-
+ http://www.scsitaly.com/Copyright.htm for details.
 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -132,13 +132,17 @@ albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxe
 //----------------------------------------------------------------------------
 albaViewArbitraryOrthoSlice::~albaViewArbitraryOrthoSlice()
 {
-	for(int i=X;i<=Z;i++)
+	m_InputVolume = NULL;
+	m_ColorLUT = NULL;
+
+	for (int i = X; i <= Z; i++)
 	{
 		albaDEL(m_SlicingResetMatrix[i]);
 		albaDEL(m_SlicingMatrix[i]);
 		delete(m_CameraToSlicer[i]);
 	}
 }
+
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::PackageView()
 {
@@ -172,6 +176,7 @@ void albaViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
 
 	PlugChildView(m_ViewSlice[v]);
 }
+
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 {
@@ -227,26 +232,34 @@ void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 			}
 		}
 	}
-
 	
-
 	if (ActivateWindowing(vme))
 		UpdateWindowing(show, vme);
 
 	m_SkipCameraUpdate--;
 }
-
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::VmeSelect(albaVME *node, bool select)
 {
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeSelect(node, select);
 }
+//----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::VmeRemove(albaVME *vme)
+{
+	if (m_InputVolume && vme == m_InputVolume)
+	{
+		HideVolume();
+		m_InputVolume = NULL;
+	}
+
+	Superclass::VmeRemove(vme);
+}
 
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::UpdateConesPosition()
 {
-	for(int i=X;i<=Z;i++)
-	m_CameraConeVME[i]->SetAbsMatrix(*m_GizmoRT[i]->GetAbsPose());
+	for (int i = X; i <= Z; i++)
+		m_CameraConeVME[i]->SetAbsMatrix(*m_GizmoRT[i]->GetAbsPose());
 }
 
 //----------------------------------------------------------------------------
@@ -348,7 +361,6 @@ void albaViewArbitraryOrthoSlice::OnEventGizmoTranslate(vtkMatrix4x4 *matrix, in
 	
 	SetSlices();
 }
-
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::OnEventGizmoRotate(vtkMatrix4x4 *matrix, int planeSkip)
 {
@@ -433,6 +445,7 @@ void albaViewArbitraryOrthoSlice::OnEventThis(albaEventBase *alba_event)
 	}
 }
 
+//----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::SetEnableGPU()
 {
 	for (int i = X; i <= Z; i++)
@@ -499,17 +512,6 @@ albaGUI* albaViewArbitraryOrthoSlice::CreateGui()
 	EnableWidgets( (m_InputVolume != NULL) );
 	return m_Gui;
 }
-//----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::VmeRemove(albaVME *vme)
-{
-	if (m_InputVolume && vme == m_InputVolume) 
-	{
-		HideVolume();
-		m_InputVolume = NULL;
-	}
-
-	Superclass::VmeRemove(vme);
-}
 
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::UpdateSubviewsCamerasToFaceSlices()
@@ -538,7 +540,6 @@ void albaViewArbitraryOrthoSlice::ShowGizmos(bool show)
 //----------------------------------------------------------------------------
 char ** albaViewArbitraryOrthoSlice::GetIcon()
 {
-
 #include "pic/VIEW_ARB_ORTHO.xpm"
 	return VIEW_ARB_ORTHO_xpm;
 }
@@ -681,10 +682,10 @@ void albaViewArbitraryOrthoSlice::CreateGuiView()
 	m_GuiView = new albaGUI(this);
 
 	//m_GuiView->Label("");
-	m_LutSlider = new albaGUILutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
+	m_LutSlider = new albaGUILutSlider(m_GuiView, -1, wxPoint(0, 0), wxSize(500, 24));
 	m_LutSlider->SetListener(this);
-	m_LutSlider->SetSize(500,24);
-	m_LutSlider->SetMinSize(wxSize(500,24));
+	m_LutSlider->SetSize(500, 24);
+	m_LutSlider->SetMinSize(wxSize(500, 24));
 	EnableWidgets(m_InputVolume != NULL);
 	m_GuiView->Add(m_LutSlider);
 	m_GuiView->Reparent(m_Win);
@@ -716,8 +717,9 @@ void albaViewArbitraryOrthoSlice::VolumeWindowing(albaVME *volume)
 	m_ColorLUT = currentVolumeMaterial->m_ColorLut;
 	m_LutWidget->SetLut(m_ColorLUT);
 	m_LutSlider->SetRange((long)sr[0], (long)sr[1]);
-	m_LutSlider->SetSubRange((long)currentVolumeMaterial->m_TableRange[0], (long)currentVolumeMaterial->m_TableRange[1]);
+	m_LutSlider->SetSubRange((long)currentVolumeMaterial->GetTableRange()[0], (long)currentVolumeMaterial->GetTableRange()[1]);
 }
+
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::ShowVolume( albaVME * vme, bool show )
 {
@@ -834,6 +836,7 @@ void albaViewArbitraryOrthoSlice::HideVolume()
 	m_ColorLUT = NULL;
 	m_LutWidget->SetLut(m_ColorLUT);
 }
+
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::OnReset()
 {

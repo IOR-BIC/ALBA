@@ -167,7 +167,7 @@ public:
   };
 
   /** constructor. */
-  albaOpSegmentation(const wxString &label = "Segmentation");
+  albaOpSegmentation(const wxString &label = "Segmentation", int disableInit=false);
 
   /** destructor. */
   ~albaOpSegmentation(); 
@@ -300,6 +300,7 @@ protected:
 	int m_OldSlicePlane;
   int m_NumSliceSliderEvents;         //<Number of events raised by the slider in a single interaction
   int m_CurrentPhase;             //<Current step
+	int m_DisableInit;
 	int m_ShowLabels;
   
 	albaGUIDialog* m_Dialog;             //<Dialog - GUI
@@ -460,9 +461,7 @@ protected:
   int m_OldAutomaticUpperThreshold; //<Used to update real time threshold preview only if needed
 
   int m_RemovePeninsulaRegions; //<Determine if refinement filter removes penisula regions or not
-  int m_OLdWindowingLow;        //<Windowing original value to restore after exiting operation
-  int m_OLdWindowingHi;         //<Windowing original value to restore after exiting operation
-
+ 
   wxGauge *m_ProgressBar; //< display progress
 
 	albaOpSegmentationHelper m_Helper;

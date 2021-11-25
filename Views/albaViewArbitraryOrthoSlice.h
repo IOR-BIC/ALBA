@@ -67,7 +67,6 @@ It is possible to export arbitrary volume slices as image files.
 
 @sa albaGizmoCrossRotateTranslate , albaVMESlicer
 
-
 */
 
 class ALBA_EXPORT albaViewArbitraryOrthoSlice: public albaViewCompoundWindowing

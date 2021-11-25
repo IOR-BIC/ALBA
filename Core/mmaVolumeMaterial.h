@@ -75,10 +75,21 @@ public:
   double m_GammaCorrection;
   double m_HueRange[2];
   double m_SaturationRange[2];
-  double m_TableRange[2];
   int    m_NumValues;
   int    m_InterpolationType; ///< Set the interpolation for the volume rendering: can be 0 (VTK_NEAREST_INTERPOLATION) or 1 (VTK_LINEAR_INTERPOLATION)
   int    m_Shade; ///< Store the shade parameter for volume rendering (can be 0 pr 1)
+
+
+	/** Returns TableRange */
+	double const *GetTableRange() { return m_TableRange; }
+
+	/** Sets TableRange */
+	void SetTableRange(double *tableRange) {
+		m_TableRange[0] = tableRange[0]; m_TableRange[1] = tableRange[1];
+	}
+	void SetTableRange(double a, double b) {
+		m_TableRange[0] = a; m_TableRange[1] = b;
+	}
 
 protected:
   virtual int InternalStore(albaStorageElement *parent);
@@ -87,5 +98,9 @@ protected:
   int    m_NumOpacityValues;
   int    m_NumGradientValues;
   int    m_NumColorValues;
+
+private:
+	double m_TableRange[2];
+
 };
 #endif

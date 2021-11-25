@@ -81,7 +81,7 @@ public:
   void SetSubRange(double  low, double  hi ); 
 
 	/** Set the values of the slider's cursors. */
-	void SetSubRange(double *range) { SetSubRange(range[0], range[1]); };
+	void SetSubRange(const double *range) { SetSubRange(range[0], range[1]); };
 
 	/** Get the values of the slider's cursors. */
 	void GetSubRange(double *low, double *hi) { *low = m_LowValue; *hi = m_HighValue; };
