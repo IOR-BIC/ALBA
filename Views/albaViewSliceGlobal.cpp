@@ -259,7 +259,7 @@ void albaViewSliceGlobal::VmeDeletePipe(albaVME *vme)
 	n->DeletePipe();
 
   if(vme->IsALBAType(albaVMELandmark))
-    UpdateSurfacesList(vme);
+    RemoveFromSlicingList(vme);
 
   m_GlobalBoundsValid = false;
 

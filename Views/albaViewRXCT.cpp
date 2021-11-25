@@ -173,211 +173,188 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
 {
 	bool isVmeShowed = m_ChildViewList[0]->IsVmeShowed(vme);
 
-  for(int i=0; i<CT_COMPOUND_VIEW; i++)
-    m_ChildViewList[i]->VmeShow(vme, show);
+	for (int i = 0; i < CT_COMPOUND_VIEW; i++)
+		m_ChildViewList[i]->VmeShow(vme, show);
 
-  //if (node->IsALBAType(albaVMEVolume))
-  if (vme->GetOutput()->IsA("albaVMEOutputVolume"))
-  {
-    if (show && !isVmeShowed)
-    {
-      double center[3],b[CT_CHILD_VIEWS_NUMBER],step;
-    
-      // set the range for every slider widget
-      albaVMEOutputVolume *volumeOutput = albaVMEOutputVolume::SafeDownCast(vme->GetOutput());
-      for (int childID = RX_FRONT_VIEW; childID < CT_COMPOUND_VIEW; childID++)
-      {
-        double advLow,advHigh;
-        double range[2];
-        if(volumeOutput->GetMaterial())
-        {
-          
-          ((albaViewRX *)m_ChildViewList[childID])->GetLutRange(range); //range of projected
-          double volTableRange[2];
-          vtkLookupTable *cl = volumeOutput->GetMaterial()->m_ColorLut;
-          
-          double volRange[2];
-          volumeOutput->GetVTKData()->GetScalarRange(volRange);
+	//if (node->IsALBAType(albaVMEVolume))
+	if (vme->GetOutput()->IsA("albaVMEOutputVolume"))
+	{
+		if (show && !isVmeShowed)
+		{
+			double center[3], b[CT_CHILD_VIEWS_NUMBER], step;
+
+			// set the range for every slider widget
+			albaVMEOutputVolume *volumeOutput = albaVMEOutputVolume::SafeDownCast(vme->GetOutput());
+			for (int childID = RX_FRONT_VIEW; childID < CT_COMPOUND_VIEW; childID++)
+			{
+				double advLow, advHigh;
+				double range[2];
+				if (volumeOutput->GetMaterial())
+				{
+
+					((albaViewRX *)m_ChildViewList[childID])->GetLutRange(range); //range of projected
+					double volTableRange[2];
+					vtkLookupTable *cl = volumeOutput->GetMaterial()->m_ColorLut;
+
+					double volRange[2];
+					volumeOutput->GetVTKData()->GetScalarRange(volRange);
 
 					const double * tableRange = volumeOutput->GetMaterial()->GetTableRange();
-          if (tableRange[1] < tableRange[0])
-          {
-            volTableRange[0] = volRange[0];
-            volTableRange[1] = volRange[1];
-          }
-          else
-          {
-						
-            volTableRange[0] = tableRange[0];
-            volTableRange[1] = tableRange[1];
-          }
+					if (tableRange[1] < tableRange[0])
+					{
+						volTableRange[0] = volRange[0];
+						volTableRange[1] = volRange[1];
+					}
+					else
+					{
+						volTableRange[0] = tableRange[0];
+						volTableRange[1] = tableRange[1];
+					}
 
-          double proportionalConstant = ((range[1] - range[0])/(volRange[1] - volRange[0]));
-          double inverseProportionalConstant = 1.0 / proportionalConstant;
-          
-          //advLow = range[0] + ((range[1] - range[0])/(volTableRange[1] - volTableRange[0])) * (range[0] - volTableRange[0]);
-          //advHigh = range[1] + ((range[1] - range[0])/(volTableRange[1] - volTableRange[0])) * (range[1] - volTableRange[1]);
-          advLow = proportionalConstant * (volTableRange[0] - volRange[0] + inverseProportionalConstant * range[0]);
-          advHigh = proportionalConstant * (volTableRange[1] - volRange[1] + inverseProportionalConstant * range[1]);
+					double proportionalConstant = ((range[1] - range[0]) / (volRange[1] - volRange[0]));
+					double inverseProportionalConstant = 1.0 / proportionalConstant;
 
-          ((albaViewRX *)m_ChildViewList[childID])->SetLutRange(advLow,advHigh);
-        }
-        else
-        {
-          ((albaViewRX *)m_ChildViewList[childID])->GetLutRange(range);
-          advLow = range[0];
-          advHigh = range[1];
-        }
+					//advLow = range[0] + ((range[1] - range[0])/(volTableRange[1] - volTableRange[0])) * (range[0] - volTableRange[0]);
+					//advHigh = range[1] + ((range[1] - range[0])/(volTableRange[1] - volTableRange[0])) * (range[1] - volTableRange[1]);
+					advLow = proportionalConstant * (volTableRange[0] - volRange[0] + inverseProportionalConstant * range[0]);
+					advHigh = proportionalConstant * (volTableRange[1] - volRange[1] + inverseProportionalConstant * range[1]);
 
-        m_LutSliders[childID]->SetRange(range[0],range[1]);
-        m_LutSliders[childID]->SetSubRange(advLow,advHigh);
+					((albaViewRX *)m_ChildViewList[childID])->SetLutRange(advLow, advHigh);
+				}
+				else
+				{
+					((albaViewRX *)m_ChildViewList[childID])->GetLutRange(range);
+					advLow = range[0];
+					advHigh = range[1];
+				}
 
-				((albaViewRX *)m_ChildViewList[childID])->SetLutRange(advLow,advHigh);
-      }
+				m_LutSliders[childID]->SetRange(range[0], range[1]);
+				m_LutSliders[childID]->SetSubRange(advLow, advHigh);
 
-      double sr[CT_COMPOUND_VIEW];
+				((albaViewRX *)m_ChildViewList[childID])->SetLutRange(advLow, advHigh);
+			}
 
-      // get the VTK volume
-      vtkDataSet *data = vme->GetOutput()->GetVTKData();
-      data->Update();
-      data->GetCenter(center);
-      data->GetScalarRange(sr);
-      double totalSR[2];
-      totalSR[0] = sr[0];
-      totalSR[1] = sr[1];
+			double sr[CT_COMPOUND_VIEW];
 
-      if(volumeOutput->GetMaterial())
-      {
+			// get the VTK volume
+			vtkDataSet *data = vme->GetOutput()->GetVTKData();
+			data->Update();
+			data->GetCenter(center);
+			data->GetScalarRange(sr);
+			double totalSR[2];
+			totalSR[0] = sr[0];
+			totalSR[1] = sr[1];
+
+			if (volumeOutput->GetMaterial())
+			{
 				const double * tableRange = volumeOutput->GetMaterial()->GetTableRange();
 
-        if (tableRange[1] > tableRange[0])
-        {
-          sr[0] = tableRange[0];
-          sr[1] = tableRange[1];
-        }
-      }
-      
-      // set the slider for the CT compound view
-      m_LutSliders[CT_COMPOUND_VIEW]->SetRange(totalSR[0],totalSR[1]);
-      m_LutSliders[CT_COMPOUND_VIEW]->SetSubRange(sr[0],sr[1]);
-      
-      // create a lookup table for CT views
-      
-      if(volumeOutput->GetMaterial()->m_ColorLut)
-      {
-        m_ColorLUT = volumeOutput->GetMaterial()->m_ColorLut;
-        m_ColorLUT->SetRange(sr);
-        m_ColorLUT->Build();
-      }
-      
+				if (tableRange[1] > tableRange[0])
+				{
+					sr[0] = tableRange[0];
+					sr[1] = tableRange[1];
+				}
+			}
 
-      // gather data to initialize CT slices
-      data->GetBounds(b);
-      step = (b[5]-b[4])/7.0;
-      for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
-      {
-        center[2] = b[5]-step*(i+1);
-        ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->InitializeSlice(center);
-        ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetTextColor(m_BorderColor[i]);
-        ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->VmeShow(vme,show);
+			// set the slider for the CT compound view
+			m_LutSliders[CT_COMPOUND_VIEW]->SetRange(totalSR[0], totalSR[1]);
+			m_LutSliders[CT_COMPOUND_VIEW]->SetSubRange(sr[0], sr[1]);
+
+			// create a lookup table for CT views
+
+			if (volumeOutput->GetMaterial()->m_ColorLut)
+			{
+				m_ColorLUT = volumeOutput->GetMaterial()->m_ColorLut;
+				m_ColorLUT->SetRange(sr);
+				m_ColorLUT->Build();
+			}
+			
+			// gather data to initialize CT slices
+			data->GetBounds(b);
+			step = (b[5] - b[4]) / 7.0;
+			for (int i = 0; i < CT_CHILD_VIEWS_NUMBER; i++)
+			{
+				center[2] = b[5] - step*(i + 1);
+				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->InitializeSlice(center);
+				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetTextColor(m_BorderColor[i]);
+				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->VmeShow(vme, show);
 
 				albaPipeVolumeOrthoSlice *p = NULL;
-        // set pipe lookup table
-        p = albaPipeVolumeOrthoSlice::SafeDownCast(((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(vme));
+				// set pipe lookup table
+				p = albaPipeVolumeOrthoSlice::SafeDownCast(((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(vme));
 
-        p->SetInterpolation(m_TrilinearInterpolationOn);
+				p->SetInterpolation(m_TrilinearInterpolationOn);
 
-        //p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
-        p->SetColorLookupTable(m_ColorLUT);
-        m_Pos[i] = b[5]-step*(i+1);
-      }
-      m_CurrentVolume = vme;
-      GizmoCreate();
+				//p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
+				p->SetColorLookupTable(m_ColorLUT);
+				m_Pos[i] = b[5] - step*(i + 1);
+			}
+			m_CurrentVolume = vme;
+			GizmoCreate();
 
-      //BEGIN cycle for remove old surface and redraw the right slice
-      
-      albaVMEIterator *iter = vme->GetRoot()->NewIterator();
-      for (albaVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
-      {
+			//BEGIN cycle for remove old surface and redraw the right slice
+
+			albaVMEIterator *iter = vme->GetRoot()->NewIterator();
+			for (albaVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			{
 				albaVMESurface *surface = albaVMESurface::SafeDownCast(vme);
-        if(surface)
-        {
-          albaPipe *p=(m_ChildViewList[RX_FRONT_VIEW])->GetNodePipe(node);
-          if(p)
-          {
-            this->VmeShow(surface,false);
-            this->VmeShow(surface,true);
-          }
-        } 
-      }
-      iter->Delete();
-      //END cycle for remove old surface and redraw the rigth slice
-    }
-    else if (!show)
-    {
-      m_ChildViewList[CT_COMPOUND_VIEW]->VmeShow(vme, show);
-      m_CurrentVolume = NULL;
-      GizmoDelete();
-    }
+				if (surface)
+				{
+					albaPipe *p = (m_ChildViewList[RX_FRONT_VIEW])->GetNodePipe(node);
+					if (p)
+					{
+						this->VmeShow(surface, false);
+						this->VmeShow(surface, true);
+					}
+				}
+			}
+			iter->Delete();
+			//END cycle for remove old surface and redraw the right slice
+		}
+		else if (!show)
+		{
+			m_ChildViewList[CT_COMPOUND_VIEW]->VmeShow(vme, show);
+			m_CurrentVolume = NULL;
+			GizmoDelete();
+		}
+	}
+	else
+	{
+		m_ChildViewList[CT_COMPOUND_VIEW]->VmeShow(vme, show);
 
-  }
-  else if (vme->IsALBAType(albaVMESurface)||vme->IsALBAType(albaVMESurfaceParametric))
-  {
-    // showing a surface with the volume present already
-    if (show && m_CurrentVolume)
-    {
-      // create the slice in every CT views
-      albaVME *vmeSelected = this->GetSceneGraph()->GetSelectedVme();
-      ((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->VmeShow(vme,show);
-      for(int j=0;j<CT_CHILD_VIEWS_NUMBER;j++)
-      {
-        int i=0;
-        while (j!=m_Sort[i]) i++;
-        double pos[3]={0.0,0.0,m_Pos[m_Sort[i]]};
-        ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetSlice(pos);
-        ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->CameraUpdate();
-      }
-      albaPipe *p=((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(vme);
-  
-      if (vmeSelected==vme)
-      {
-        m_Gui->Enable(ID_ALL_SURFACE,true);
-        m_Gui->Enable(ID_BORDER_CHANGE,true);
-        m_Gui->Enable(ID_ADJUST_SLICES,true);
-        if (p)
-        {
-          double old_thickness=((albaPipeSurfaceSlice *)p)->GetThickness();
-          m_Border=old_thickness;
-          m_Gui->Update();
-        }
-        else
-          m_Border=1;
-      }
+		// showing a surface with the volume present already
+		if (show && m_CurrentVolume)
+		{
+			// create the slice in every CT views
+			albaVME *vmeSelected = this->GetSceneGraph()->GetSelectedVme();
+			if (vmeSelected == vme)
+			{
+				m_Gui->Enable(ID_ALL_SURFACE, true);
+				m_Gui->Enable(ID_BORDER_CHANGE, true);
+				m_Gui->Enable(ID_ADJUST_SLICES, true);
 
-    }//if (show)
-    else if (!show)
-    {
-      // hide the surface
-      m_ChildViewList[CT_COMPOUND_VIEW]->VmeShow(vme, show);
-      albaVME *vmeSelected= this->GetSceneGraph()->GetSelectedVme();
-      if (vmeSelected ==vme)
-      {
-        m_Gui->Enable(ID_ALL_SURFACE,false);
-        m_Gui->Enable(ID_BORDER_CHANGE,false);
-        m_Gui->Enable(ID_ADJUST_SLICES,false);
-      }
-      for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
-      {
-        ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->UpdateSurfacesList(vme);
-      }
-    }//else if(show)
-  }
-  else
-  {
-    m_ChildViewList[CT_COMPOUND_VIEW]->VmeShow(vme, show);
-  }
+				albaPipe *pipe = ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(vme);
+				if (pipe)
+				{
+					m_Border = ((albaPipeSurfaceSlice *)pipe)->GetThickness();
+				}
+				else
+					m_Border = 1;
+			}
+		}
+		else if (!show)
+		{
+			albaVME *vmeSelected = this->GetSceneGraph()->GetSelectedVme();
+			if (vmeSelected == vme)
+			{
+				m_Gui->Enable(ID_ALL_SURFACE, false);
+				m_Gui->Enable(ID_BORDER_CHANGE, false);
+				m_Gui->Enable(ID_ADJUST_SLICES, false);
+			}
+		}
+	}
 
-  EnableWidgets(m_CurrentVolume != NULL);
+	EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
 void albaViewRXCT::VmeRemove(albaVME *vme)
@@ -387,7 +364,7 @@ void albaViewRXCT::VmeRemove(albaVME *vme)
     m_CurrentVolume = NULL;
     GizmoDelete();
   }
-  Superclass::VmeRemove(vme);
+	Superclass::VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
 void albaViewRXCT::VmeSelect(albaVME *vme, bool select)
@@ -828,6 +805,8 @@ void albaViewRXCT::EnableWidgets(bool enable)
 	{
 		m_Gui->Enable(ID_LUT_WIDGET, enable);
 		m_Gui->Enable(ID_RESET_SLICES, enable);
+
+		m_Gui->Update();
 	}
 }
 
