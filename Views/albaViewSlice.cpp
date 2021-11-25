@@ -366,7 +366,7 @@ void albaViewSlice::VmeDeletePipe(albaVME *vme)
 	n->DeletePipe();
 
   if(vme->IsALBAType(albaVMELandmark))
-    UpdateSurfacesList(vme);
+    RemoveFromSlicingList(vme);
 }
 //-------------------------------------------------------------------------
 int albaViewSlice::GetNodeStatus(albaVME *vme)
@@ -623,7 +623,7 @@ void albaViewSlice::BorderDelete()
 }
 
 //----------------------------------------------------------------------------
-void albaViewSlice::UpdateSurfacesList(albaVME *vme)
+void albaViewSlice::RemoveFromSlicingList(albaVME *vme)
 {
   albaSceneNode *sceneNode = m_Sg->Vme2Node(vme);
   for(int i=0;i<m_SlicingVector.size();i++)
@@ -647,15 +647,15 @@ void albaViewSlice::VmeShow(albaVME *vme, bool show)
       this->UpdateText(0);
     }
   }
-	else 
-    this->UpdateSurfacesList(vme);
+	else if (show == false)
+    this->RemoveFromSlicingList(vme);
 
 	Superclass::VmeShow(vme, show);
 }
 //----------------------------------------------------------------------------
 void albaViewSlice::VmeRemove(albaVME *vme)
 {
-  this->UpdateSurfacesList(vme);
+  this->RemoveFromSlicingList(vme);
   Superclass::VmeRemove(vme);
 }
 //-------------------------------------------------------------------------
