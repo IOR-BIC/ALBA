@@ -49,7 +49,7 @@ SET(PROJECT_SRCS
 	albaASCIIImporterUtilityTest.h albaASCIIImporterUtilityTest.cpp
 	albaOpEditMetadataTest.h albaOpEditMetadataTest.cpp
 	albaOpFilterVolumeTest.h albaOpFilterVolumeTest.cpp
-	albaOpALBATransformTest.h albaOpALBATransformTest.cpp
+	albaOpTransformOldTest.h albaOpTransformOldTest.cpp
 	albaOpTransformInterfaceTest.h albaOpTransformInterfaceTest.cpp
 	albaVMEMeshAnsysTextImporterTest.h albaVMEMeshAnsysTextImporterTest.cpp
 	albaVMEMeshAnsysTextExporterTest.h albaVMEMeshAnsysTextExporterTest.cpp

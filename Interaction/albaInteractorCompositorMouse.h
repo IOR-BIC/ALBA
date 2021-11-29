@@ -76,7 +76,7 @@ enum MOUSE_BUTTON
 
   @sa
   - albaInteractorGenericMouse since albaInteractorCompositorMouse is working in pair with this class
-  - albaGUITransformMouse component used by albaOpALBATransform
+  - albaGUITransformMouse component used by albaOpTransformOld
   
 */
 class ALBA_EXPORT albaInteractorCompositorMouse : public albaInteractor

@@ -40,7 +40,7 @@ IF (ALBA_USE_VTK)
 	albaOpConnectivitySurface.cpp	    albaOpConnectivitySurface.h
 	albaOpFilterVolume.cpp	    				albaOpFilterVolume.h
 	albaOpImporterImage.cpp	 		   		albaOpImporterImage.h
-	albaOpALBATransform.cpp	   			 		albaOpALBATransform.h
+	albaOpTransformOld.cpp	   			 		albaOpTransformOld.h
 	albaOpExporterMSF.cpp	   			 		albaOpExporterMSF.h
 	albaOpImporterMSF1x.cpp	    			albaOpImporterMSF1x.h
 	albaOpExporterRaw.cpp	    				albaOpExporterRaw.h

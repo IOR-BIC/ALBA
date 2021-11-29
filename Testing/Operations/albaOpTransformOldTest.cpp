@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaOpALBATransformTest
+ Module: albaOpTransformOldTest
  Authors: Matteo Giacomoni
  
  Copyright (c) BIC
@@ -23,9 +23,9 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "albaOpALBATransformTest.h"
+#include "albaOpTransformOldTest.h"
 
-#include "albaOpALBATransform.h"
+#include "albaOpTransformOld.h"
 #include "albaVMEVolumeGray.h"
 #include "albaVMESurface.h"
 #include "albaVMEExternalData.h"
@@ -41,33 +41,33 @@
 #define DELTA 0.00001
 
 //----------------------------------------------------------------------------
-void albaOpALBATransformTest::TestFixture()
+void albaOpTransformOldTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 
 //----------------------------------------------------------------------------
-void albaOpALBATransformTest::TestStaticAllocation()
+void albaOpTransformOldTest::TestStaticAllocation()
 //----------------------------------------------------------------------------
 {
-  albaOpALBATransform op;
+  albaOpTransformOld op;
 }
 //----------------------------------------------------------------------------
-void albaOpALBATransformTest::TestDynamicAllocation()
+void albaOpTransformOldTest::TestDynamicAllocation()
 //----------------------------------------------------------------------------
 {
-  albaOpALBATransform *op = new albaOpALBATransform();
+  albaOpTransformOld *op = new albaOpTransformOld();
   albaDEL(op);
 }
 //----------------------------------------------------------------------------
-void albaOpALBATransformTest::TestAccept()
+void albaOpTransformOldTest::TestAccept()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEVolumeGray> volume;
   albaSmartPointer<albaVMESurface> surface;
   albaSmartPointer<albaVMEExternalData> external;
 
-  albaOpALBATransform *op = new albaOpALBATransform();
+  albaOpTransformOld *op = new albaOpTransformOld();
   CPPUNIT_ASSERT( op->Accept(volume) == true );
   CPPUNIT_ASSERT( op->Accept(surface) == true );
   CPPUNIT_ASSERT( op->Accept(external) == false );
@@ -76,7 +76,7 @@ void albaOpALBATransformTest::TestAccept()
 
 }
 //----------------------------------------------------------------------------
-void albaOpALBATransformTest::TestOnEventGizmoTranslate()
+void albaOpTransformOldTest::TestOnEventGizmoTranslate()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMESurface> input;
@@ -97,7 +97,7 @@ void albaOpALBATransformTest::TestOnEventGizmoTranslate()
   e->SetArg(albaInteractorGenericMouse::MOUSE_MOVE);
   e->SetMatrix(translateMatrix);
 
-  albaOpALBATransform *op = new albaOpALBATransform();
+  albaOpTransformOld *op = new albaOpTransformOld();
   op->TestModeOn();
   op->SetInput(input);
   op->OpRun();
@@ -120,7 +120,7 @@ void albaOpALBATransformTest::TestOnEventGizmoTranslate()
   delete e;
 }
 //----------------------------------------------------------------------------
-void albaOpALBATransformTest::TestOnEventGizmoRotate()
+void albaOpTransformOldTest::TestOnEventGizmoRotate()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMESurface> input;
@@ -138,7 +138,7 @@ void albaOpALBATransformTest::TestOnEventGizmoRotate()
   e->SetArg(albaInteractorGenericMouse::MOUSE_MOVE);
   e->SetMatrix(&rotateMatrix);
 
-  albaOpALBATransform *op = new albaOpALBATransform();
+  albaOpTransformOld *op = new albaOpTransformOld();
   op->TestModeOn();
   op->SetInput(input);
   op->OpRun();
@@ -164,7 +164,7 @@ void albaOpALBATransformTest::TestOnEventGizmoRotate()
   delete e;
 }
 //----------------------------------------------------------------------------
-void albaOpALBATransformTest::TestOnEventGizmoScale()
+void albaOpTransformOldTest::TestOnEventGizmoScale()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMESurface> input;
@@ -178,7 +178,7 @@ void albaOpALBATransformTest::TestOnEventGizmoScale()
   albaMatrix scaleMatrix;
   albaTransform::Scale(scaleMatrix,10,20,30,0);
 
-  albaOpALBATransform *op = new albaOpALBATransform();
+  albaOpTransformOld *op = new albaOpTransformOld();
   op->TestModeOn();
   op->SetInput(input);
   op->OpRun();
@@ -203,7 +203,7 @@ void albaOpALBATransformTest::TestOnEventGizmoScale()
   albaDEL(op);
 }
 //----------------------------------------------------------------------------
-void albaOpALBATransformTest::TestOnEventGuiTransform()
+void albaOpTransformOldTest::TestOnEventGuiTransform()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMESurface> input;
@@ -222,7 +222,7 @@ void albaOpALBATransformTest::TestOnEventGuiTransform()
   e->SetArg(albaInteractorGenericMouse::MOUSE_MOVE);
   e->SetMatrix(&inputMmatrix);
 
-  albaOpALBATransform *op = new albaOpALBATransform();
+  albaOpTransformOld *op = new albaOpTransformOld();
   op->TestModeOn();
   op->SetInput(input);
   op->OpRun();
@@ -248,7 +248,7 @@ void albaOpALBATransformTest::TestOnEventGuiTransform()
   albaDEL(op);
 }
 //----------------------------------------------------------------------------
-void albaOpALBATransformTest::TestOnEventGuiSaveRestorePose()
+void albaOpTransformOldTest::TestOnEventGuiSaveRestorePose()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMESurface> input;
@@ -267,7 +267,7 @@ void albaOpALBATransformTest::TestOnEventGuiSaveRestorePose()
   e->SetArg(albaInteractorGenericMouse::MOUSE_MOVE);
   e->SetMatrix(&inputMmatrix);
 
-  albaOpALBATransform *op = new albaOpALBATransform();
+  albaOpTransformOld *op = new albaOpTransformOld();
   op->TestModeOn();
   op->SetInput(input);
   op->OpRun();
@@ -293,7 +293,7 @@ void albaOpALBATransformTest::TestOnEventGuiSaveRestorePose()
   albaDEL(op);
 }
 //----------------------------------------------------------------------------
-void albaOpALBATransformTest::TestReset()
+void albaOpTransformOldTest::TestReset()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMESurface> input;
@@ -312,7 +312,7 @@ void albaOpALBATransformTest::TestReset()
   e->SetArg(albaInteractorGenericMouse::MOUSE_MOVE);
   e->SetMatrix(&inputMmatrix);
 
-  albaOpALBATransform *op = new albaOpALBATransform();
+  albaOpTransformOld *op = new albaOpTransformOld();
   op->TestModeOn();
   op->SetInput(input);
   op->OpRun();
@@ -342,7 +342,7 @@ void albaOpALBATransformTest::TestReset()
   albaDEL(op);
 }
 //----------------------------------------------------------------------------
-void albaOpALBATransformTest::TestOpUndo()
+void albaOpTransformOldTest::TestOpUndo()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMESurface> input;
@@ -361,7 +361,7 @@ void albaOpALBATransformTest::TestOpUndo()
   e->SetArg(albaInteractorGenericMouse::MOUSE_MOVE);
   e->SetMatrix(&inputMmatrix);
 
-  albaOpALBATransform *op = new albaOpALBATransform();
+  albaOpTransformOld *op = new albaOpTransformOld();
   op->TestModeOn();
   op->SetInput(input);
   op->OpRun();

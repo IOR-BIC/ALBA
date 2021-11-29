@@ -48,7 +48,7 @@ class albaMatrix;
   ...
 
   @sa
-  albaOpALBATransform for an example on how to plug this component into a transform
+  albaOpTransformOld for an example on how to plug this component into a transform
   operation
 
   @todo
