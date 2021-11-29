@@ -119,7 +119,7 @@ public:
 
   /** (default) Modality to be used when gizmo reference frame is the input vme abs pose: using this modality
   gizmo abs pose will change during the interaction. See albaGizmoTranslate behavior with local (default) vs a different (global) refsys 
-  in albaOpALBATransform for a Local vs Global use case*/
+  in albaOpTransformOld for a Local vs Global use case*/
   void SetModalityToLocal();
 
   /** Modality to be used when gizmo reference frame is different from input vme abs pose */

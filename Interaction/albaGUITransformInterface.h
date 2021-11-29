@@ -35,7 +35,7 @@ class albaVME;
   This abstract class defines interface for object to be plugged in albaOpTransformInterface concrete descendants
 
   @sa
-  albaOpTransformInterface, albaOpALBATransform
+  albaOpTransformInterface, albaOpTransformOld
  
   @todo
 

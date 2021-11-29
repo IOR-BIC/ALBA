@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaOpALBATransform
- Authors: Stefano Perticoni
+ Module: albaOpTransformOld
+ Authors: Stefano Perticoni 
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "albaOpALBATransform.h"
+#include "albaOpTransformOld.h"
 
 #include <wx/busyinfo.h>
 
@@ -70,11 +70,11 @@ enum ALBA_TRANSFORM_ID
 };
 
 //----------------------------------------------------------------------------
-albaCxxTypeMacro(albaOpALBATransform);
+albaCxxTypeMacro(albaOpTransformOld);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-albaOpALBATransform::albaOpALBATransform(const wxString &label) :
+albaOpTransformOld::albaOpTransformOld(const wxString &label) :
 albaOpTransformInterface(label)
 //----------------------------------------------------------------------------
 {
@@ -93,7 +93,7 @@ albaOpTransformInterface(label)
   m_GuiTransformTextEntries = NULL;
 }
 //----------------------------------------------------------------------------
-albaOpALBATransform::~albaOpALBATransform()
+albaOpTransformOld::~albaOpTransformOld()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_GizmoTranslate);
@@ -104,7 +104,7 @@ albaOpALBATransform::~albaOpALBATransform()
   cppDEL(m_GuiTransformTextEntries);
 }
 //----------------------------------------------------------------------------
-bool albaOpALBATransform::Accept(albaVME* vme)
+bool albaOpTransformOld::Accept(albaVME* vme)
 //----------------------------------------------------------------------------
 {
 	albaEvent e(this,VIEW_SELECTED);
@@ -112,14 +112,14 @@ bool albaOpALBATransform::Accept(albaVME* vme)
 	return (vme!=NULL && vme->IsALBAType(albaVME) && !vme->IsA("albaVMERoot") && !vme->IsA("albaVMEExternalData") /*&& e.GetBool()*/);
 }
 //----------------------------------------------------------------------------
-albaOp* albaOpALBATransform::Copy()   
+albaOp* albaOpTransformOld::Copy()   
 //----------------------------------------------------------------------------
 {
-  return new albaOpALBATransform(m_Label);
+  return new albaOpTransformOld(m_Label);
 }
 
 //----------------------------------------------------------------------------
-void albaOpALBATransform::OpRun()
+void albaOpTransformOld::OpRun()
 //----------------------------------------------------------------------------
 {
   // progress bar stuff
@@ -142,7 +142,7 @@ void albaOpALBATransform::OpRun()
 }
 
 //----------------------------------------------------------------------------
-void albaOpALBATransform::OnEvent(albaEventBase *alba_event)
+void albaOpTransformOld::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
   // perform different actions depending on sender
@@ -186,13 +186,13 @@ void albaOpALBATransform::OnEvent(albaEventBase *alba_event)
 }
 	  
 //----------------------------------------------------------------------------
-void albaOpALBATransform::OpDo()
+void albaOpTransformOld::OpDo()
 //----------------------------------------------------------------------------
 {
   albaOpTransformInterface::OpDo();
 }
 //----------------------------------------------------------------------------
-void albaOpALBATransform::OpUndo()
+void albaOpTransformOld::OpUndo()
 //----------------------------------------------------------------------------
 {  
 	m_Input->SetAbsMatrix(m_OldAbsMatrix);
@@ -201,7 +201,7 @@ void albaOpALBATransform::OpUndo()
 	GetLogicManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
-void albaOpALBATransform::OpStop(int result)
+void albaOpTransformOld::OpStop(int result)
 //----------------------------------------------------------------------------
 {  
   // progress bar stuff
@@ -225,7 +225,7 @@ void albaOpALBATransform::OpStop(int result)
 }
 
 //----------------------------------------------------------------------------
-void albaOpALBATransform::OnEventThis(albaEventBase *alba_event)
+void albaOpTransformOld::OnEventThis(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
   albaEvent e(this,VIEW_SELECTED);
@@ -382,7 +382,7 @@ void albaOpALBATransform::OnEventThis(albaEventBase *alba_event)
 }
 
 //----------------------------------------------------------------------------
-void albaOpALBATransform::OnEventGizmoTranslate(albaEventBase *alba_event)
+void albaOpTransformOld::OnEventGizmoTranslate(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
   switch(alba_event->GetId())
@@ -409,7 +409,7 @@ void albaOpALBATransform::OnEventGizmoTranslate(albaEventBase *alba_event)
 }
 
 //----------------------------------------------------------------------------
-void albaOpALBATransform::OnEventGizmoRotate(albaEventBase *alba_event)
+void albaOpTransformOld::OnEventGizmoRotate(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 { 
   switch(alba_event->GetId())
@@ -437,7 +437,7 @@ void albaOpALBATransform::OnEventGizmoRotate(albaEventBase *alba_event)
 }
 
 //----------------------------------------------------------------------------
-void albaOpALBATransform::OnEventGizmoScale(albaEventBase *alba_event)
+void albaOpTransformOld::OnEventGizmoScale(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 { 
   switch(alba_event->GetId())
@@ -463,7 +463,7 @@ void albaOpALBATransform::OnEventGizmoScale(albaEventBase *alba_event)
 
 
 //----------------------------------------------------------------------------
-void albaOpALBATransform::OnEventGuiTransform(albaEventBase *alba_event)
+void albaOpTransformOld::OnEventGuiTransform(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
   switch(alba_event->GetId())
@@ -492,7 +492,7 @@ void albaOpALBATransform::OnEventGuiTransform(albaEventBase *alba_event)
 }             
 
 //----------------------------------------------------------------------------
-void albaOpALBATransform::OnEventGuiSaveRestorePose(albaEventBase *alba_event)
+void albaOpTransformOld::OnEventGuiSaveRestorePose(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
   switch(alba_event->GetId())
@@ -520,7 +520,7 @@ void albaOpALBATransform::OnEventGuiSaveRestorePose(albaEventBase *alba_event)
 
 
 //----------------------------------------------------------------------------
-void albaOpALBATransform::OnEventGuiTransformTextEntries(albaEventBase *alba_event)
+void albaOpTransformOld::OnEventGuiTransformTextEntries(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
@@ -554,7 +554,7 @@ void albaOpALBATransform::OnEventGuiTransformTextEntries(albaEventBase *alba_eve
 }
 
 //----------------------------------------------------------------------------
-void albaOpALBATransform::CreateGui()
+void albaOpTransformOld::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_Gui = new albaGUI(this);
@@ -671,7 +671,7 @@ void albaOpALBATransform::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void albaOpALBATransform::Reset()
+void albaOpTransformOld::Reset()
 //----------------------------------------------------------------------------
 {
   m_Input->SetAbsMatrix(m_OldAbsMatrix);  
@@ -685,7 +685,7 @@ void albaOpALBATransform::Reset()
 }
 
 //----------------------------------------------------------------------------
-void albaOpALBATransform::RefSysVmeChanged()
+void albaOpTransformOld::RefSysVmeChanged()
 //----------------------------------------------------------------------------
 {
   // plugged components set their refsys;
@@ -711,7 +711,7 @@ void albaOpALBATransform::RefSysVmeChanged()
 }
 
 //----------------------------------------------------------------------------
-char ** albaOpALBATransform::GetIcon()
+char ** albaOpTransformOld::GetIcon()
 {
 #include "pic/MENU_OP_TRANSFORM.xpm"
 	return MENU_OP_TRANSFORM_xpm;

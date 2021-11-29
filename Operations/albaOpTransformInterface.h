@@ -44,14 +44,14 @@ class albaVME;
 
   This class defines the basic structure to assemble components for vme transformations.
   Typical object that can be plugged in albaOpTransformInterface concrete descendants are
-  gizmos (albaGizmoXXX)and gui transform components (albaGUITransformXXX). See albaOpALBATransform
+  gizmos (albaGizmoXXX)and gui transform components (albaGUITransformXXX). See albaOpTransformOld
   for a concrete implementation.
 
   @sa
-  albaOpALBATransform, albaGUITransformInterface, albaGizmoInterface
+  albaOpTransformOld, albaGUITransformInterface, albaGizmoInterface
 
   @todo
-  - improve components plugging: see comments in albaOpALBATransform.cpp
+  - improve components plugging: see comments in albaOpTransformOld.cpp
 
 */
 class ALBA_EXPORT albaOpTransformInterface : public albaOp

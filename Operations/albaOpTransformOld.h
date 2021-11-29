@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaOpALBATransform
+ Module: albaOpTransformOld
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __albaOpALBATransform_H__
-#define __albaOpALBATransform_H__
+#ifndef __albaOpTransformOld_H__
+#define __albaOpTransformOld_H__
 
 //----------------------------------------------------------------------------
 // includes :
@@ -34,20 +34,20 @@ class albaGUITransformTextEntries;
 class albaVME;
 
 //----------------------------------------------------------------------------
-// albaOpALBATransform :
+// albaOpTransformOld :
 //----------------------------------------------------------------------------
 /** 
 Transform a vme using constrains 
 */
 
-class ALBA_EXPORT albaOpALBATransform : public albaOpTransformInterface
+class ALBA_EXPORT albaOpTransformOld : public albaOpTransformInterface
 {
 public:
-  albaOpALBATransform(const wxString &label = "Transform  \tCtrl+T");
- ~albaOpALBATransform(); 
+  albaOpTransformOld(const wxString &label = "Transform  \tCtrl+T");
+ ~albaOpTransformOld(); 
   virtual void OnEvent(albaEventBase *alba_event);
   
-  albaTypeMacro(albaOpALBATransform, albaOp);
+  albaTypeMacro(albaOpTransformOld, albaOp);
 
   albaOp* Copy();
 
@@ -100,7 +100,7 @@ protected:
   void RefSysVmeChanged();
 
   /** test friend */
-  friend class albaOpALBATransformTest;
+  friend class albaOpTransformOldTest;
 };
 #endif
   
