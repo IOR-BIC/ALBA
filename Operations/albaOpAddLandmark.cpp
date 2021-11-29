@@ -72,6 +72,7 @@ albaOp(label)
 
 	m_Cloud = NULL;
 	m_SelectedLandmark = NULL;
+	m_LastSelectedLandmark = NULL;
 
 	m_AuxLandmarkCloud = NULL;
 	m_AuxLandmark = NULL;
@@ -607,6 +608,8 @@ void albaOpAddLandmark::AddLandmark(double pos[3])
 		int next = m_LandmarkGuiDict->GetItemIndex(m_LandmarkNameFromDef) + 1;
 		if (next < m_LandmarkGuiDict->GetSize())
 			SelectLandmarkByName(m_LandmarkGuiDict->GetItemByIndex(next));
+		else
+			SelectLandmarkByName(m_LandmarkGuiDict->GetItemByIndex(m_LandmarkGuiDict->GetSize() - 1));
 	}
 	else
 	{
@@ -616,10 +619,6 @@ void albaOpAddLandmark::AddLandmark(double pos[3])
 		// Select Empty Item = Enable Add Mode
 		SelectLandmarkByName("NONE");
 	}
-
-	// Show Last Landmark Added 
-	SetCloudColor(m_AuxLandmarkCloud, 0, 0, 1, 0.8);
-	GetLogicManager()->VmeShow(m_AuxLandmarkCloud, true);
 
 	GetLogicManager()->CameraUpdate();
 	UpdateGui(true);
@@ -641,6 +640,11 @@ void albaOpAddLandmark::RemoveLandmark()
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 {
+	if (m_LastSelectedLandmark)
+	{
+		GetLogicManager()->VmeShow(m_LastSelectedLandmark, true);
+	}
+
 	m_RemoveMessage = "";
 	m_DictMessage = "Add Landmark";
 	m_LandmarkName = "";
@@ -670,11 +674,14 @@ void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 			m_RemoveMessage = "Landmark has dependency";
 		}
 
-		// Update Aux Landmark
+		// Hide Selected Landmark
+		m_LastSelectedLandmark = m_SelectedLandmark;
+		GetLogicManager()->VmeShow(m_SelectedLandmark, false);
+
+		// Update and ShowAux Landmark
 		m_AuxLandmark->SetAbsPose(x, y, z, 0, 0, 0);
 		SetCloudColor(m_AuxLandmarkCloud, 0, 0, 1, 0.8);
 		GetLogicManager()->VmeShow(m_AuxLandmarkCloud, true);
-
 		UpdateGui();
 	}
 	else

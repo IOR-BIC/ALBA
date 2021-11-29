@@ -210,7 +210,7 @@ void albaViewSliceSegmentation::VmeDeletePipe(albaVME *vme)
 	n->DeletePipe();
 
   if(vme->IsALBAType(albaVMELandmark))
-    UpdateSurfacesList(vme);
+    RemoveFromSlicingList(vme);
 }
 
 //----------------------------------------------------------------------------
