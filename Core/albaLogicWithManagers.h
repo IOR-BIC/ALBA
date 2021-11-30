@@ -206,7 +206,7 @@ public:
 
 	/**
 	Used to give a splash screen image directly from the bitmap without converting it in xpm.*/
-	virtual void ShowSplashScreen(wxBitmap &splashImage, wxString message ="");
+	virtual void ShowSplashScreen(wxBitmap &splashImage, wxString message ="", int x = 0, int y = 0, wxColour color = *wxBLACK);
 
 	static void ShowWebSite(wxString url);
 	
