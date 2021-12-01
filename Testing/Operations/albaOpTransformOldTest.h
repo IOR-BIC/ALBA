@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaOpALBATransformTest
+ Module: albaOpTransformOldTest
  Authors: Matteo Giacomoni
  
  Copyright (c) BIC
@@ -14,17 +14,17 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_albaOpALBATransformTest_H__
-#define __CPP_UNIT_albaOpALBATransformTest_H__
+#ifndef __CPP_UNIT_albaOpTransformOldTest_H__
+#define __CPP_UNIT_albaOpTransformOldTest_H__
 
 #include "albaTest.h"
 
-/** Test for albaOpALBATransform; Use this suite to trace memory problems */
-class albaOpALBATransformTest : public albaTest
+/** Test for albaOpTransformOld; Use this suite to trace memory problems */
+class albaOpTransformOldTest : public albaTest
 {
 public: 
   // CPPUNIT test suite
-  CPPUNIT_TEST_SUITE( albaOpALBATransformTest );
+  CPPUNIT_TEST_SUITE( albaOpTransformOldTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestStaticAllocation );
   CPPUNIT_TEST( TestDynamicAllocation );

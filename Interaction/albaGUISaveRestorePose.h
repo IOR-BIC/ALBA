@@ -38,7 +38,7 @@ class albaMatrix;
   guiSaveRestorePose = new albaGUISaveRestorePose(opInputVME, this);
   clientOpGUI->AddGui(guiSaveRestorePose->GetGui());
 
-  @sa albaOpALBATransform
+  @sa albaOpTransformOld
   
 */
 class ALBA_EXPORT albaGUISaveRestorePose : public albaGUITransformInterface

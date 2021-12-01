@@ -67,7 +67,7 @@ protected:
 	Returns false, if GPU provider could not be created */
 	albaGPUOGL *CreateGPUProvider();
 
-	int m_TextureId;
+	unsigned int m_TextureId;
 };
 
 

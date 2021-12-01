@@ -90,7 +90,7 @@ void mmaVolumeMaterialTest::TestUpdateProp()
   mmaVolumeMaterial *vm1 = new mmaVolumeMaterial();
   vm1->m_HueRange[1] = 0.4;
   vm1->m_SaturationRange[1] = 0.5;
-  vm1->m_TableRange[1] = 300.0;
+  vm1->SetTableRange(0, 300.0);
   vm1->UpdateProp();
 
   double hr[2], sr[2], tr[2];
@@ -120,8 +120,7 @@ void mmaVolumeMaterialTest::TestUpdateFromTables()
   mmaVolumeMaterial *vm1 = new mmaVolumeMaterial();
   
   // Set a valid range to allow UpdateFromTables() update m_TableRange member
-  vm1->m_TableRange[0] = 0;
-  vm1->m_TableRange[0] = 1;
+	vm1->SetTableRange(0, 1);
   
   vm1->m_ColorLut->SetHueRange(0.0, 0.4);
   vm1->m_ColorLut->SetSaturationRange(0.0, 0.5);
@@ -136,9 +135,9 @@ void mmaVolumeMaterialTest::TestUpdateFromTables()
   TEST_RESULT;
   result = albaEquals(vm1->m_SaturationRange[1], 0.5);
   TEST_RESULT;
-  result = albaEquals(vm1->m_TableRange[0], 100.0);
+  result = albaEquals(vm1->GetTableRange()[0], 100.0);
   TEST_RESULT;
-  result = albaEquals(vm1->m_TableRange[1], 300.0);
+  result = albaEquals(vm1->GetTableRange()[1], 300.0);
   TEST_RESULT;
 
   delete vm1;

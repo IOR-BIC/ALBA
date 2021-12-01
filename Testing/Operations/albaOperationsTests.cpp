@@ -105,7 +105,7 @@
 #include "albaOpIterativeRegistrationTest.h"
 #include "albaOpLabelExtractorTest.h"
 #include "albaOpLabelizeSurfaceTest.h"
-#include "albaOpALBATransformTest.h"
+#include "albaOpTransformOldTest.h"
 #include "albaOpMML3ParameterViewTest.h"
 #include "albaOpMML3Test.h"
 #include "albaOpMakeVMETimevaryingTest.h"
@@ -245,7 +245,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaASCIIImporterUtilityTest::suite());
 	runner.addTest(albaOpEditMetadataTest::suite());
 	runner.addTest(albaOpFilterVolumeTest::suite());
-	runner.addTest(albaOpALBATransformTest::suite());
+	runner.addTest(albaOpTransformOldTest::suite());
  	runner.addTest(albaOpTransformInterfaceTest::suite());
 	runner.addTest(albaVMEMeshAnsysTextImporterTest::suite());  
 	runner.addTest(albaVMEMeshAnsysTextExporterTest::suite()); 

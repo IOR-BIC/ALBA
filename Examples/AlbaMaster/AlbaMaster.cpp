@@ -89,7 +89,7 @@ PURPOSE. See the above copyright notice for more information.
 // OPERATIONS
 #include "albaOp2DMeasure.h"
 #include "albaOpComputeInertialTensor.h"
-#include "albaOpALBATransform.h"
+#include "albaOpTransformOld.h"
 #include "albaOpAddLandmark.h"
 #include "albaOpBooleanSurface.h"
 #include "albaOpClassicICPRegistration.h"
@@ -343,7 +343,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpConnectivitySurface("Connectivity Surface"),_("Modify"));
 	m_Logic->Plug(new albaOpEditNormals("Edit Normals"),_("Modify"));
 	m_Logic->Plug(new albaOpEditMetadata("Metadata Editor"),_("Modify"));
-	m_Logic->Plug(new albaOpALBATransform("Transform"),_("Modify"));
+	m_Logic->Plug(new albaOpTransformOld("Transform"),_("Modify"));
 	m_Logic->Plug(new albaOpVolumeResample("Resample Volume"),_("Modify"));
 	m_Logic->Plug(new albaOpCrop("Crop Volume"),_("Modify"));
 	m_Logic->Plug(new albaOpBooleanSurface("Boolean Surface"),_("Modify"));
