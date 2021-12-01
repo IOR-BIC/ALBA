@@ -294,9 +294,11 @@ protected:
   double m_VolumeSpacing[3];          //<Volume spacing
   double m_VolumeBounds[6];           //<Volume bounds
 	int m_SliceIndex;								//GuiVariable
+	int m_GUISliceIndex;								//GuiVariable
 	int m_OldSliceIndex;								//GuiVariable
-		int m_SliceIndexByPlane[3];            //<Index of the current slice position
-	int m_SlicePlane;            //<Current slicing plane (xy,xz,yx)
+	int m_SliceIndexByPlane[3];            //<Index of the current slice position
+	int m_SlicePlane;//<Current slicing plane (xy,xz,yx)
+	int m_GUISlicePlane;
 	int m_OldSlicePlane;
   int m_NumSliceSliderEvents;         //<Number of events raised by the slider in a single interaction
   int m_CurrentPhase;             //<Current step
