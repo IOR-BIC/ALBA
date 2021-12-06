@@ -65,14 +65,14 @@ public:
   /** Return a copy of the operation.*/
   albaOp* Copy();
 
-  /** This operation accept everything as input.*/
-  bool Accept(albaVME*node) {return true;};
-
   /** Create the user interface and initialize variables.*/
   void OpRun();
 
 protected: 
   
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) { return true; };
+
   int GetFilesToRemove(set<string> &filesToRemoveSet);
 
   /** 

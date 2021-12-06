@@ -54,7 +54,7 @@ albaOp* albaOpCreateAverageLandmark::Copy()
 	return new albaOpCreateAverageLandmark(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpCreateAverageLandmark::Accept(albaVME*node)
+bool albaOpCreateAverageLandmark::InternalAccept(albaVME*node)
 {
 	return (node && node->IsA("albaVMELandmarkCloud"));	
 }

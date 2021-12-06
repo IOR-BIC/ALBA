@@ -113,7 +113,7 @@ albaOpESPCalibration::~albaOpESPCalibration()
 }
 
 //----------------------------------------------------------------------------
-bool albaOpESPCalibration::Accept(albaVME *node)
+bool albaOpESPCalibration::InternalAccept(albaVME *node)
 {
 	return node->IsA("albaVMEVolumeGray") && vtkImageData::SafeDownCast(node->GetOutput()->GetVTKData());
 }

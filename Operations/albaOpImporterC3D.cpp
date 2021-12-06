@@ -175,7 +175,7 @@ void albaOpImporterC3D::Clear()
 	m_intData.clear();
 }
 //----------------------------------------------------------------------------
-bool albaOpImporterC3D::Accept(albaVME *node)
+bool albaOpImporterC3D::InternalAccept(albaVME *node)
 //----------------------------------------------------------------------------
 {
 	return true;

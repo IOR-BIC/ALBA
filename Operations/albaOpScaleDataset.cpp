@@ -80,7 +80,7 @@ albaOpScaleDataset::~albaOpScaleDataset()
   cppDEL(m_GuiSaveRestorePose);
 }
 //----------------------------------------------------------------------------
-bool albaOpScaleDataset::Accept(albaVME* vme)
+bool albaOpScaleDataset::InternalAccept(albaVME* vme)
 //----------------------------------------------------------------------------
 {
 	return (vme!=NULL && vme->IsALBAType(albaVME) && !vme->IsA("albaVMERoot") && !vme->IsA("albaVMEExternalData"));

@@ -54,9 +54,6 @@ public:
   /** Precess events coming from other objects */
   /*virtual*/ void OnEvent(albaEventBase *alba_event);
 
-  /** Return true for the acceptable vme type. */
-  /*virtual*/ bool Accept(albaVME* vme);
-
   /** Builds operation's interface by calling CreateOpDialog() method. */
   /*virtual*/ void OpRun();
 
@@ -68,6 +65,9 @@ public:
 
 protected:
   
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   /*virtual*/ void OpStop(int result);
 

@@ -78,9 +78,6 @@ public:
   
   albaOp* Copy();
 
-  /** Return true for the acceptable vme type. */
-  bool Accept(albaVME *node);
-
   /** Set the input Abaqus file */
   void SetFileName(const char *abaqusFileNameFullPath) {m_AbaqusInputFileNameFullPath = abaqusFileNameFullPath;};
 
@@ -94,6 +91,9 @@ public:
   int Import();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
   albaString GetWildcard();
 

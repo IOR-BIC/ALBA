@@ -45,9 +45,6 @@ public:
 
 	albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME *node);
-
 	/** Set the filename for the mesh to import */
   void SetFileName(const char *file_name);
 
@@ -72,6 +69,10 @@ public:
 	void SetImportMaterials(int importMaterials) { m_ImportMaterials = importMaterials; }
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   /** Create the dialog interface for the importer. */
   virtual void CreateGui();  
 		

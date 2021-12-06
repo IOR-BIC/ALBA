@@ -71,9 +71,6 @@ public:
   albaOp* Copy();
   void OnEvent(albaEventBase *alba_event);
 
-	/** Return true for the acceptable vme type. */
-  bool Accept(albaVME* vme);
-
 	/** Builds operation's interface by calling CreateOpDialog() method. */
   void OpRun();
 
@@ -160,18 +157,18 @@ protected:
 
   albaInteractorExtractIsosurface *m_DensityPicker;
 
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
 	/** Builds operation's interface and visualization pipeline. */
   void CreateOpDialog();
 
 	/** Remove operation's interface. */
   void DeleteOpDialog();
-
-
+	
 	/** Create the pipeline to generate the slice of the volume. */
   void CreateSlicePipeline();
-
-
-
+	
 	/** Re-slice the volume according to the new coordinate value. */
   void UpdateSlice();
 };

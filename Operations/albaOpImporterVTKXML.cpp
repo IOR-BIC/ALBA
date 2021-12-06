@@ -98,7 +98,7 @@ albaOpImporterVTKXML::~albaOpImporterVTKXML()
   vtkDEL(m_EventRouter);
 }
 //----------------------------------------------------------------------------
-bool albaOpImporterVTKXML::Accept(albaVME* node)   
+bool albaOpImporterVTKXML::InternalAccept(albaVME* node)   
 //----------------------------------------------------------------------------
 {
   return true;

@@ -57,18 +57,20 @@ public:
 
   albaOp* Copy();
 
-  bool Accept(albaVME* vme);
   void OpRun();
   void OpDo();
   void OpUndo();
 
 protected:
-
+	
   /** Structure to store an added VME with the associated TimeStamp */
   typedef struct {
     albaVME * m_VME;
     double m_TimeStamp;
   } VmeTimevaryingItem;
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
   virtual void OpStop(int result);
 

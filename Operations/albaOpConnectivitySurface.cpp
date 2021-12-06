@@ -74,7 +74,7 @@ albaOpConnectivitySurface::~albaOpConnectivitySurface()
 	m_ExtractedVmes.clear();
 }
 //----------------------------------------------------------------------------
-bool albaOpConnectivitySurface::Accept(albaVME*node)
+bool albaOpConnectivitySurface::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVMESurface));

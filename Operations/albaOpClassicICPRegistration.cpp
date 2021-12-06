@@ -75,7 +75,7 @@ albaOp* albaOpClassicICPRegistration::Copy()
 	return new albaOpClassicICPRegistration(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpClassicICPRegistration::Accept(albaVME* vme)
+bool albaOpClassicICPRegistration::InternalAccept(albaVME* vme)
 //----------------------------------------------------------------------------
 {
 	if(!vme) return false;
@@ -257,7 +257,7 @@ void albaOpClassicICPRegistration::OnChooseTarget()
 	albaVME *vme = e.GetVme();
 
 	if(!vme) return; // the user choosed cancel - keep previous target
-  if(!Accept(vme)) // the user choosed ok     - check if it is a valid vme
+  if(!InternalAccept(vme)) // the user choosed ok     - check if it is a valid vme
 	{
     wxString msg = _("target vme must be a non-empty LandmarkCloud or Surface\n please choose another vme \n");
 		wxMessageBox(msg,_("incorrect vme type"),wxOK|wxICON_ERROR);

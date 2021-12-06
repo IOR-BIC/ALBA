@@ -110,7 +110,7 @@ albaOpSegmentationRegionGrowingConnectedThreshold::~albaOpSegmentationRegionGrow
   vtkDEL(m_SphereVTK);
 }
 //----------------------------------------------------------------------------
-bool albaOpSegmentationRegionGrowingConnectedThreshold::Accept(albaVME*node)
+bool albaOpSegmentationRegionGrowingConnectedThreshold::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   // accepts albaVMEVolumeGray data

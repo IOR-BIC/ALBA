@@ -68,9 +68,6 @@ public:
   virtual void OnEvent(albaEventBase *alba_event);
   albaOp* Copy();
 
-  /** Return true for the acceptable vme type. */
-  bool Accept(albaVME*node) {return true;};
-
   /** Build the interface of the operation and the preview pipeline. */
   void OpRun();
 
@@ -122,6 +119,10 @@ public:
   };
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) { return true; };
+
   /** Converts the internal data type into VTK data type */
   inline int GetVTKDataType();
 

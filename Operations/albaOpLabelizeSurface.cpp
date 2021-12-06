@@ -123,7 +123,7 @@ albaOp* albaOpLabelizeSurface::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool albaOpLabelizeSurface::Accept(albaVME*node)
+bool albaOpLabelizeSurface::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node != NULL && node->IsALBAType(albaVMESurface));

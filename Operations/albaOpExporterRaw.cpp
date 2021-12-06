@@ -70,7 +70,7 @@ albaOpExporterRAW::~albaOpExporterRAW()
 {
 }
 //----------------------------------------------------------------------------
-bool albaOpExporterRAW::Accept(albaVME*node)
+bool albaOpExporterRAW::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node != NULL) && node->IsA("albaVMEVolumeGray");

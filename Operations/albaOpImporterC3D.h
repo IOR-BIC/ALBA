@@ -59,9 +59,6 @@ public:
 
 	albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME *node);
-
 	/** Builds operation's interface. */
 	void OpRun();
 
@@ -118,10 +115,13 @@ public:
 	void SetImportEvent(int flag) { m_ImportEventFlag = flag; }
 	int  GetImportEvent() { return m_ImportEventFlag; }
 
-
-
 protected:
+
 	struct _InternalC3DData;
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
 	/** Create the dialog interface for the importer. */
 	virtual void CreateGui();
 

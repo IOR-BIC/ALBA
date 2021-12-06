@@ -63,7 +63,7 @@ albaOpCleanSurface::~albaOpCleanSurface()
 	vtkDEL(m_OriginalPolydata);
 }
 //----------------------------------------------------------------------------
-bool albaOpCleanSurface::Accept(albaVME*node)
+bool albaOpCleanSurface::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsALBAType(albaVMESurface));

@@ -43,9 +43,6 @@ public:
   albaOp* Copy();
 	void OnEvent(albaEventBase *alba_event);
 
- 	/** Return true for the acceptable vme type. */
-  bool Accept(albaVME*node);
-
 	/** Builds operation's interface. */
   void OpRun();
 
@@ -67,6 +64,10 @@ public:
 	virtual char ** GetIcon();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
 

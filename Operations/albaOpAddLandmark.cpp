@@ -138,7 +138,7 @@ albaOp* albaOpAddLandmark::Copy()
 	return op;
 }
 //----------------------------------------------------------------------------
-bool albaOpAddLandmark::Accept(albaVME*node)
+bool albaOpAddLandmark::InternalAccept(albaVME*node)
 {
 	return (node != NULL); // Accept all other VMEs
 }

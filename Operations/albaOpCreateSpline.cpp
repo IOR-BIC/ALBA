@@ -59,7 +59,7 @@ albaOp* albaOpCreateSpline::Copy()
 	return new albaOpCreateSpline(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpCreateSpline::Accept(albaVME*node)
+bool albaOpCreateSpline::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVME));

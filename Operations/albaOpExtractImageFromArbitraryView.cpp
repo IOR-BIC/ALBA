@@ -75,7 +75,7 @@ albaOpExtractImageFromArbitraryView::~albaOpExtractImageFromArbitraryView()
 }
 
 //----------------------------------------------------------------------------
-bool albaOpExtractImageFromArbitraryView::Accept(albaVME *node)
+bool albaOpExtractImageFromArbitraryView::InternalAccept(albaVME *node)
 {
 	albaView *view = GetLogicManager()->GetViewManager()->GetSelectedView();
 	bool hasView = view && (view->IsA("albaViewArbitrarySlice") || view->IsA("albaViewArbitraryOrthoSlice"));

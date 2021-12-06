@@ -60,7 +60,7 @@ albaOp* albaOpCreateLabeledVolume::Copy()
 	return new albaOpCreateLabeledVolume(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpCreateLabeledVolume::Accept(albaVME*node)
+bool albaOpCreateLabeledVolume::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVMEVolumeGray));

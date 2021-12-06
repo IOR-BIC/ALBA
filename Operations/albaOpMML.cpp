@@ -204,7 +204,7 @@ albaOpMML::~albaOpMML( )
 }
 
 //----------------------------------------------------------------------------
-bool albaOpMML::Accept(albaVME* vme)
+bool albaOpMML::InternalAccept(albaVME* vme)
 { 
   return vme != NULL && vme->IsALBAType(albaVMEVolumeGray);
 }

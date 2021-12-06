@@ -92,7 +92,7 @@ albaOp* albaOpIterativeRegistration::Copy()
   return (new albaOpIterativeRegistration(m_Label));
 }
 //----------------------------------------------------------------------------
-bool albaOpIterativeRegistration::Accept(albaVME*node)
+bool albaOpIterativeRegistration::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   if (!node) return false;

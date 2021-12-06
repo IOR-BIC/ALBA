@@ -56,7 +56,7 @@ albaOp* albaOpCreateGroup::Copy()
 	return new albaOpCreateGroup(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpCreateGroup::Accept(albaVME*node)
+bool albaOpCreateGroup::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVME));
