@@ -51,9 +51,6 @@ public:
 
   albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME* vme);
-
 	/** Builds operation's interface. */
 	void OpRun();
 
@@ -82,6 +79,10 @@ public:
 	virtual char ** GetIcon();
 
 protected: 
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
 	/** Create the GUI */
 	virtual void CreateGui();
 

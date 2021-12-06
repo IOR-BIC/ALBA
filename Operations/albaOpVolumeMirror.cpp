@@ -76,7 +76,7 @@ albaOp* albaOpVolumeMirror::Copy()
   return cp;
 }
 //----------------------------------------------------------------------------
-bool albaOpVolumeMirror::Accept(albaVME* node)   
+bool albaOpVolumeMirror::InternalAccept(albaVME* node)   
 //----------------------------------------------------------------------------
 { return  ( node && node->IsALBAType(albaVMEVolumeGray) && node->GetOutput()->GetVTKData()->IsA("vtkImageData")	);
 };   

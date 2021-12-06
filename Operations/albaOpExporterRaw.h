@@ -41,10 +41,7 @@ public:
  ~albaOpExporterRAW(); 
   albaOp* Copy();
 
-  void   OnEvent(albaEventBase *alba_event);
-
-	/** Return true for the acceptable vme type. */
-  bool Accept(albaVME*node);
+  void OnEvent(albaEventBase *alba_event);
 
 	/** Builds operation's interface. */
   void OpRun();
@@ -68,6 +65,10 @@ public:
 	void SetSingleFile(int enable);
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   void OpStop(int result);
 
   wxString		m_ProposedDirectory;///<Default directory where to save file .raw

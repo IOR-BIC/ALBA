@@ -76,7 +76,7 @@ albaOp2DMeasure::~albaOp2DMeasure()
 {
 }
 //----------------------------------------------------------------------------
-bool albaOp2DMeasure::Accept(albaVME *node)
+bool albaOp2DMeasure::InternalAccept(albaVME *node)
 //----------------------------------------------------------------------------
 {
   albaEvent e(this,VIEW_SELECTED);

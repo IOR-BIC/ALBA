@@ -59,7 +59,7 @@ albaOp* albaOpCreateWrappedMeter::Copy()
 	return new albaOpCreateWrappedMeter(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpCreateWrappedMeter::Accept(albaVME*node)
+bool albaOpCreateWrappedMeter::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVME));

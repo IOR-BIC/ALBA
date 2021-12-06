@@ -60,7 +60,6 @@ public:
 
   albaOp* Copy();
 
-	bool Accept(albaVME* Node);
 	void OpRun();	
 	
   /**
@@ -76,7 +75,8 @@ public:
 
 protected:
 
-  
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);  
 
   albaVME *m_VmeSurface;
   

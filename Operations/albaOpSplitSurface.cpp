@@ -130,7 +130,7 @@ albaOp* albaOpSplitSurface::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool albaOpSplitSurface::Accept(albaVME*node)
+bool albaOpSplitSurface::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node != NULL && node->IsALBAType(albaVMESurface));

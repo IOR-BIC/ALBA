@@ -40,9 +40,6 @@ public:
 
 	albaTypeMacro(albaOpImporterPointCloud, albaOp);
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME *node);
-
 	/** Builds operation's interface. */
 	void OpRun();
 
@@ -80,6 +77,9 @@ public:
 	int GetScalarColumn(int pos) const;
 	void SetScalarColumn(int pos, int val);
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
 	/** Create the dialog interface for the exporter. */
 	virtual void CreateGui();

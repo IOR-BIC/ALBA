@@ -105,7 +105,7 @@ albaOpMove::~albaOpMove()
   cppDEL(m_GuiTransformTextEntries);
 }
 //----------------------------------------------------------------------------
-bool albaOpMove::Accept(albaVME* vme)
+bool albaOpMove::InternalAccept(albaVME* vme)
 //----------------------------------------------------------------------------
 {
 	/*albaEvent e(this,VIEW_SELECTED);

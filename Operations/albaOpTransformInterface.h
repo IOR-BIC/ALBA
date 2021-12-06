@@ -59,9 +59,6 @@ class ALBA_EXPORT albaOpTransformInterface : public albaOp
 public:
   albaOpTransformInterface(const wxString &label = "TransformInterface");
   virtual ~albaOpTransformInterface(); 
- 
-  /** Return true for the acceptable vme type. */
-  bool Accept(albaVME* vme) {return true;};
 
   albaTypeMacro(albaOpTransformInterface, albaOp);
 
@@ -86,6 +83,10 @@ public:
   virtual void SetOldAbsMatrix(albaMatrix matrix){m_OldAbsMatrix = matrix;};
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) { return true; };
+
   /** Create the gui */
   virtual void CreateGui() {};
   

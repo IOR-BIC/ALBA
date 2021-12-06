@@ -64,9 +64,6 @@ public:
 
 	void OnEvent(albaEventBase *alba_event);
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME* vme);
-
 	/** Builds operation's interface by calling CreateOpDialog() method. */
 	void OpRun();
 
@@ -104,6 +101,9 @@ public:
   double GetFeatureAngle(){return m_SmoothParameterFeatureAngle;};
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
 	double GetCellsDistance(vtkIdType c1,vtkIdType c2);
 

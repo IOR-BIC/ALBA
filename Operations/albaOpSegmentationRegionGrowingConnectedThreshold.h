@@ -46,9 +46,6 @@ public:
 
   albaTypeMacro(albaOpSegmentationRegionGrowingConnectedThreshold, albaOp);
 
-  /** Return true for the acceptable vme type. */
-  /*virtual*/ bool Accept(albaVME*node);
-
   /*virtual*/ albaOp* Copy();
 
   /** Builds operation's interface. */
@@ -98,6 +95,10 @@ public:
   albaVMEVolumeGray *GetOutputVolume(){return m_VolumeOut;};
     
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   /*virtual*/ void OpStop(int result);
   

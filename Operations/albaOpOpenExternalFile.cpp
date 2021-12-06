@@ -57,7 +57,7 @@ albaOp* albaOpOpenExternalFile::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool albaOpOpenExternalFile::Accept(albaVME*node)
+bool albaOpOpenExternalFile::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node != NULL && node->IsALBAType(albaVMEExternalData));

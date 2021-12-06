@@ -42,10 +42,6 @@ public:
   albaTypeMacro(albaOpFreezeVME, albaOp);
 
   albaOp* Copy();
-
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME*node);
-
 	
   /** Builds operation's interface. */
 	void OpRun();
@@ -53,6 +49,7 @@ public:
 
 protected:
 
-
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 };
 #endif

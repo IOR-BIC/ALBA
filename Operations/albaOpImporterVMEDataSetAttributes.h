@@ -92,9 +92,6 @@ public:
   /** copy the operation */
   albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME *node);
-
   /** Builds operation's interface. */
 	void OpRun();
   
@@ -102,6 +99,9 @@ public:
   virtual void OnEvent(albaEventBase *alba_event);
  
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
   /** file access info */
   albaString m_FileName;

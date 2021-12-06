@@ -60,7 +60,7 @@ albaOpImporterSTL::~albaOpImporterSTL()
     albaDEL(m_ImportedSTLs[i]);
 }
 //----------------------------------------------------------------------------
-bool albaOpImporterSTL::Accept(albaVME*node)
+bool albaOpImporterSTL::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return true;

@@ -132,7 +132,7 @@ albaOpVolumeResample::~albaOpVolumeResample()
 	albaDEL(m_ResampledVme);
 }
 //----------------------------------------------------------------------------
-bool albaOpVolumeResample::Accept(albaVME* vme) 
+bool albaOpVolumeResample::InternalAccept(albaVME* vme) 
 //----------------------------------------------------------------------------
 {
 	albaEvent e(this,VIEW_SELECTED);

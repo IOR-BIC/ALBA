@@ -59,7 +59,7 @@ albaOp* albaOpCreateMeter::Copy()
 	return new albaOpCreateMeter(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpCreateMeter::Accept(albaVME*node)
+bool albaOpCreateMeter::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVME));

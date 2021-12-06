@@ -39,9 +39,6 @@ public:
 
 	albaTypeMacro(albaOpImporterDicFile, albaOp);
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME *node);
-
 	/** Builds operation's interface. */
 	void OpRun();
 
@@ -52,7 +49,11 @@ public:
 
 	/** Get the filename to import */
 	void SetFileName(albaString val) { m_FileName = val; }
+
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
 	/** imports informations */
 	int Import(void);

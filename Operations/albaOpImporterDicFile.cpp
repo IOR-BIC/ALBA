@@ -161,7 +161,7 @@ int albaOpImporterDicFile::Import(void)
 }
 
 //----------------------------------------------------------------------------
-bool albaOpImporterDicFile::Accept(albaVME *node)
+bool albaOpImporterDicFile::InternalAccept(albaVME *node)
 { 
 	return true;
 }

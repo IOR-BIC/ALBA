@@ -394,7 +394,7 @@ bool albaOpImporterPointCloud::IsEmptyLine(char *line)
 }
 
 //----------------------------------------------------------------------------
-bool albaOpImporterPointCloud::Accept(albaVME *node)
+bool albaOpImporterPointCloud::InternalAccept(albaVME *node)
 { 
 	return true;
 }

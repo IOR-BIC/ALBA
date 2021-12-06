@@ -54,8 +54,6 @@ public:
   virtual void OnEvent(albaEventBase *alba_event);
   albaOp* Copy();
 
-  bool Accept(albaVME* vme);  
-
   void OpRun();
 
   /** Get the number of frames inserted by the user and for each
@@ -111,6 +109,10 @@ public:
   };
 
 protected: 
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   /** Additional Gui. */
   void ModeGui();
 

@@ -50,9 +50,6 @@ public:
 	/** Perform validation on the vme chooser */
 	static bool VMEAcceptForReparent(albaVME *vme);
 
-	/** Return true for the acceptable vme type. */
-  bool Accept(albaVME *node);
-
 	/** Builds operation's interface. */
   void OpRun();
 
@@ -68,6 +65,10 @@ public:
   void SetTargetVme(albaVME *target);
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
 	albaVME *m_TargetVme;
   albaVME *m_OldParent;
 };

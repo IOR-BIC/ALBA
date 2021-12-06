@@ -72,7 +72,7 @@ albaOp *albaOpVolumeMeasure::Copy()
 	return new albaOpVolumeMeasure(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpVolumeMeasure::Accept(albaVME*node)
+bool albaOpVolumeMeasure::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   if(node->IsA("albaVMESurface") || node->IsA("albaVMESurfaceParametric"))

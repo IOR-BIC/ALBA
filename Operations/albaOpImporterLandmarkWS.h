@@ -42,9 +42,6 @@ public:
 	~albaOpImporterLandmarkWS(); 
 	albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME* node) {return true;};
-
 	/** Builds operation's interface. */
 	void OpRun();
 
@@ -62,6 +59,10 @@ public:
   void SetFileName(const char *file_name){m_File = file_name;};
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) { return true; };
+
   wxString m_FileDir;
 	wxString m_File;
 	albaVMELandmarkCloud  *m_VmeCloud;

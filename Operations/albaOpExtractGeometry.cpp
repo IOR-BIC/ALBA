@@ -117,7 +117,7 @@ albaOpExtractGeometry::~albaOpExtractGeometry()
   vtkDEL(m_SurfaceExtractor);
 }
 //----------------------------------------------------------------------------
-bool albaOpExtractGeometry::Accept(albaVME*node)
+bool albaOpExtractGeometry::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return ( node != NULL && node->IsA("albaVMEVolumeGray") );

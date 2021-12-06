@@ -59,10 +59,6 @@ class ALBA_EXPORT albaOpIterativeRegistration : public albaOp
     /** 
     Return a copy of itself, this needs to put the operation into the undo stack. */
     albaOp* Copy();
-  	
-    /** 
-    Return true for the acceptable vme type. */
-    bool Accept(albaVME* node);
   
     /** 
     Builds operation's interface. */
@@ -79,6 +75,10 @@ class ALBA_EXPORT albaOpIterativeRegistration : public albaOp
     static bool VmeAccept(albaVME* node) {return(node != NULL);};
   
   protected:
+
+		/** Return true for the acceptable vme type. */
+		bool InternalAccept(albaVME*node);
+
     //void OnRegister(albaEvent &e);
     void OnRegister(albaEventBase *alba_event);
 

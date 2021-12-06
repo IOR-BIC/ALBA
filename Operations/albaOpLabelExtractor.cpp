@@ -101,7 +101,7 @@ albaOp* albaOpLabelExtractor::Copy()
   return (new albaOpLabelExtractor(m_Label));
 }
 //----------------------------------------------------------------------------
-bool albaOpLabelExtractor::Accept(albaVME*vme)
+bool albaOpLabelExtractor::InternalAccept(albaVME*vme)
 //----------------------------------------------------------------------------
 {
 	return (vme != NULL && vme->GetOutput()->IsA("albaVMEOutputVolume") && !vme->IsA("albaVMEImage")); 

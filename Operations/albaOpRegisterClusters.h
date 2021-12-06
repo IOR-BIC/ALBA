@@ -135,10 +135,6 @@ public:
   
   /*virtual*/ albaOp* Copy();
 
-	/** Return true for the acceptable vme type. 
-	This method accepts source landmark cloud (may not be time-variant).*/
-  bool Accept(albaVME* node);   
-
 	/** Builds operation's interface. */
   void OpRun();
 
@@ -300,6 +296,11 @@ public:
 	static bool SurfaceAccept(albaVME* node);
 
 protected:
+
+	/** Return true for the acceptable vme type.
+	This method accepts source landmark cloud (may not be time-variant).*/
+	bool InternalAccept(albaVME*node);
+
   /** Extract matching points between source and target for the given time.
 	Filtering is automatically applied and weights are stored.
 	Returns number of matched points.

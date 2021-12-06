@@ -96,7 +96,7 @@ albaOp *albaOpVolumeUnion::Copy()
 	return new albaOpVolumeUnion(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpVolumeUnion::Accept(albaVME* node)
+bool albaOpVolumeUnion::InternalAccept(albaVME* node)
 //----------------------------------------------------------------------------
 {
 	albaEvent e(this,VIEW_SELECTED);

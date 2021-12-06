@@ -63,7 +63,7 @@ albaOp* albaOpCreateRefSysFromViewSlice::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool albaOpCreateRefSysFromViewSlice::Accept(albaVME*node)
+bool albaOpCreateRefSysFromViewSlice::InternalAccept(albaVME*node)
 {
 	bool hasView = false;
 

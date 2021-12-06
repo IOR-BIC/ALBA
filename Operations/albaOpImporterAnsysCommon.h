@@ -73,9 +73,6 @@ public:
 
 	virtual void OnEvent(albaEventBase *alba_event);
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME *node);
-
 	/** Set the input Ansys file */
 	void SetFileName(const char *ansysInputFileNameFullPath) {m_AnsysInputFileNameFullPath = ansysInputFileNameFullPath;};
 	
@@ -90,6 +87,9 @@ public:
 
 protected:
  
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   virtual albaString GetWildcard() = 0;
 
 	virtual int ParseAnsysFile(albaString fileName) = 0;

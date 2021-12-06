@@ -51,9 +51,6 @@ public:
   /** RTTI Macro */
 	albaTypeMacro(albaOpVolumeMirror, albaOp);
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME* node);   
-
 	/** Builds operation's interface. */
   void OpRun();
 
@@ -62,8 +59,7 @@ public:
 
 	/** Makes the undo for the operation. */
   void OpUndo();
-
-
+	
 	/** Returns MirrorX */
 	int GetMirrorX() const { return m_MirrorX; }
 
@@ -83,6 +79,10 @@ public:
 	void SetMirrorZ(int mirrorZ) { m_MirrorZ = mirrorZ; }
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);
 

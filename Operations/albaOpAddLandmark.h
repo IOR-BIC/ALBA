@@ -87,9 +87,6 @@ public:
 
 	virtual albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME*node);
-
 	/** Return an xpm-icon that can be used to represent this operation */
 	virtual char** GetIcon();
 
@@ -134,6 +131,9 @@ protected:
 	/** Create the AddLandmarks interface. */
 	virtual void CreateGui();
 
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
 
@@ -161,6 +161,7 @@ protected:
 
 	albaVMELandmarkCloud *m_Cloud;
 	albaVMELandmark *m_SelectedLandmark;
+	albaVMELandmark *m_LastSelectedLandmark;
 
 	albaVMELandmarkCloud *m_AuxLandmarkCloud;
 	albaVMELandmark *m_AuxLandmark;

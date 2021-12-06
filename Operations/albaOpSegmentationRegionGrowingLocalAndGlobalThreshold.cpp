@@ -144,7 +144,7 @@ albaOp* albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::Copy()
   return new albaOpSegmentationRegionGrowingLocalAndGlobalThreshold(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::Accept(albaVME* vme)
+bool albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::InternalAccept(albaVME* vme)
 //----------------------------------------------------------------------------
 {
   return vme && vme->IsA("albaVMEVolumeGray");

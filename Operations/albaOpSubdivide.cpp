@@ -60,7 +60,7 @@ albaOpSubdivide::~albaOpSubdivide()
   vtkDEL(m_ResultPolydata);
 }
 //----------------------------------------------------------------------------
-bool albaOpSubdivide::Accept(albaVME*node)
+bool albaOpSubdivide::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return ( node != NULL && node->IsA("albaVMESurface") );

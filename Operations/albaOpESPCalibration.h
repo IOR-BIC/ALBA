@@ -89,9 +89,6 @@ public:
 	/** Return a copy of the operation */
 	/*virtual*/ albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	/*virtual*/ bool Accept(albaVME *node);
-
 	/** Builds operation's interface. */
 	/*virtual*/ void OpRun();
 
@@ -119,17 +116,18 @@ protected:
 		MINID,
 	};
 
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	/*virtual*/ void OpStop(int result);	
 
 	/** Create the Operation GUI */
 	virtual void CreateGui();
-
-
+	
 	/** Generate Report*/
 	bool SaveCalibration();
-
-
+	
 	bool CheckNodeElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node, const char *elementName);
 	Range CaluculateCutOffRange(vtkImageData *imgData, double cutOff);
 
@@ -150,19 +148,15 @@ protected:
 	bool CalculateBoneDensityInfo(vtkImageData *rg);
 
 	bool CalculateTailDensityInfo(vtkImageData *rg);
-
-
+	
 	double GetTailCenter(vtkImageData *rg, TailPosition tailPos, double x, double y, double z);
 
 	void GetBoneCenter(vtkImageData *rg, TailPosition tailPos, double x, double y, double z, double newCenter[3], double wallPos[3]);
 
 	void IdToXYZpos(vtkIdType startCenter, int * dims, int &xPos, int &yPos, int &zPos);
-
-
-
+	
 	bool FitPoints();
-
-
+	
 	std::vector <albaVME *> toHidelist;
 	Cylinder m_SpinalCylinders[3];
 	BoneCylinder m_BoneCylinders[2];
@@ -182,6 +176,5 @@ protected:
 	albaHTMLTemplateParser *m_Parser;
 
 	albaView *m_View;
-
 };
 #endif

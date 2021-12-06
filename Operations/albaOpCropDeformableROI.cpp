@@ -70,7 +70,7 @@ albaOpCropDeformableROI::~albaOpCropDeformableROI()
 
 }
 //----------------------------------------------------------------------------
-bool albaOpCropDeformableROI::Accept(albaVME*node)
+bool albaOpCropDeformableROI::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsA("albaVMEVolumeGray"));

@@ -44,7 +44,6 @@ public:
 
   albaOp* Copy();
 
-  bool Accept(albaVME*node) {return true;};
   void OpRun();
   void OpUndo();
 
@@ -61,11 +60,15 @@ public:
   void AddNewTag(albaString &name);
 
 protected:
+
   enum TAG_TYPE
   {
     NUMERIC_TAG = 0,
     STRING_TAG
   };
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) { return true; };
 
   /** Enable-Disable editing widgets.*/
   void EnableWidgets();
