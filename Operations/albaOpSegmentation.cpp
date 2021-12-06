@@ -1414,7 +1414,7 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 			{
 				m_GUISliceIndex--;
 			}
-			m_SliceIndex = m_GUISliceIndex;
+			SetSlicingIndexes(m_SlicePlane, m_GUISliceIndex);
 			OnUpdateSlice();
 			break;
 		case ID_SLICE_PREV:
@@ -1424,8 +1424,7 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 			OnUpdateSlice();
 			break;
 		case ID_SLICE_PLANE:
-			m_OldSlicePlane = m_SlicePlane;
-			m_SlicePlane = m_GUISlicePlane;
+			SetSlicingIndexes(m_SlicePlane, m_GUISliceIndex);
 			OnSelectSlicePlane();
 			break;
 		case ID_SHOW_LABELS:
@@ -1500,9 +1499,7 @@ void albaOpSegmentation::SliceNext()
 {
 	if (m_SliceIndex < m_SliceSlider->GetMax())
 	{
-		m_OldSliceIndex = m_SliceIndex;
-		m_SliceIndex++;
-		m_GUISliceIndex = m_SliceIndex;
+		SetSlicingIndexes(m_SlicePlane, m_SliceIndex + 1);
 	}
 	OnUpdateSlice();
 }
@@ -1511,9 +1508,7 @@ void albaOpSegmentation::SlicePrev()
 {
 	if (m_SliceIndex > 1)
 	{
-		m_OldSliceIndex = m_SliceIndex;
-		m_SliceIndex--;
-		m_GUISliceIndex = m_SliceIndex;
+		SetSlicingIndexes(m_SlicePlane, m_SliceIndex - 1);
 	}
 	OnUpdateSlice();
 }
@@ -1633,9 +1628,7 @@ void albaOpSegmentation::OnInitEvent(albaEvent *e)
 		if (!m_IgnoreRangeSelEvent && m_RangesGuiList->GetSelection() != -1)//Check if a range is selected
 		{
 			m_CurrentRange = m_RangesGuiList->GetSelection();
-			m_OldSliceIndex = m_SliceIndex;
-			m_GUISliceIndex = m_SliceIndex = (m_RangesVector[m_CurrentRange].m_StartSlice + m_RangesVector[m_CurrentRange].m_EndSlice) / 2;
-
+			SetSlicingIndexes(m_SlicePlane, (m_RangesVector[m_CurrentRange].m_StartSlice + m_RangesVector[m_CurrentRange].m_EndSlice) / 2);
 			SetThresholdByRange();
 			EnableDisableGuiRange();
 		}
@@ -2020,16 +2013,12 @@ void albaOpSegmentation::OnUndoRedo(bool undo)
 		//are in the plane-slice of last edit (where i saved last undo info).
 		if (m_SlicePlane != from[fromIndex].m_Plane)
 		{
-			m_OldSliceIndex = m_SliceIndex;
-			m_OldSlicePlane = m_SlicePlane;
-			m_GUISlicePlane = m_SlicePlane = from[fromIndex].m_Plane;
-			m_GUISliceIndex = m_SliceIndex = from[fromIndex].m_Slice;
+			SetSlicingIndexes(from[fromIndex].m_Plane, from[fromIndex].m_Slice);
 			OnSelectSlicePlane();
 		}
 		else if (m_SliceIndex != from[fromIndex].m_Slice)
 		{
-			m_OldSliceIndex = m_SliceIndex;
-			m_GUISliceIndex = m_SliceIndex = from[fromIndex].m_Slice;
+			SetSlicingIndexes(m_SlicePlane, from[fromIndex].m_Slice);
 			OnUpdateSlice();
 		}
 
@@ -2561,6 +2550,15 @@ int albaOpSegmentation::OpSegmentationEventFilter(wxEvent& event)
 	}
 
 	return -1;
+}
+
+//----------------------------------------------------------------------------
+void albaOpSegmentation::SetSlicingIndexes(int planeindex, int sliceIndex)
+{
+	m_OldSlicePlane = m_SlicePlane;
+	m_OldSliceIndex = m_SliceIndex;
+	m_SlicePlane = planeindex; 
+	m_GUISliceIndex = m_SliceIndex = sliceIndex;
 }
 
 //----------------------------------------------------------------------------
