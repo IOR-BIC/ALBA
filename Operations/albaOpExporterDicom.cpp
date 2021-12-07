@@ -91,7 +91,7 @@ albaOpExporterDicom::~albaOpExporterDicom()
 {
 }
 //----------------------------------------------------------------------------
-bool albaOpExporterDicom::Accept(albaVME *node)
+bool albaOpExporterDicom::InternalAccept(albaVME *node)
 { 
   return (node->IsALBAType(albaVMEVolumeGray));
 }

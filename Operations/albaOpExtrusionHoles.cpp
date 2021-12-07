@@ -100,7 +100,7 @@ albaOpExtrusionHoles::~albaOpExtrusionHoles()
 	vtkDEL(m_OriginalPolydata);
 }
 //----------------------------------------------------------------------------
-bool albaOpExtrusionHoles::Accept(albaVME*node)
+bool albaOpExtrusionHoles::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsA("albaVMESurface"));

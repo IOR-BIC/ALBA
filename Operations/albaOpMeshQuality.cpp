@@ -82,7 +82,7 @@ albaOpMeshQuality::~albaOpMeshQuality()
 	vtkDEL(m_CheckMeshQuality);
 }
 //----------------------------------------------------------------------------
-bool albaOpMeshQuality::Accept(albaVME*node)
+bool albaOpMeshQuality::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsA("albaVMESurface"));

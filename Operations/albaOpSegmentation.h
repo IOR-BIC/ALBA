@@ -183,9 +183,6 @@ public:
 	/** return the copy of the operation object */
   albaOp* Copy();
 
-  /** Return true for the acceptable vme type. */
-  virtual bool Accept(albaVME*node);
-
   /** Builds operation's interface. */
 	virtual void OpRun();
 
@@ -208,6 +205,9 @@ public:
 	void SetSlicingIndexes(int planeindex, int sliceIndex);
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);

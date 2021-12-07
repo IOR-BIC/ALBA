@@ -53,9 +53,6 @@ public:
 
   /*virtual*/ albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	/*virtual*/ bool Accept(albaVME*node);
-
 	/** Builds operation's interface. */
 	/*virtual*/ void OpRun();
 
@@ -68,6 +65,9 @@ public:
   void SetNumberOfSubdivision(int number){ m_NumberOfSubdivision = number;}
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   /*virtual*/ void OpStop(int result);

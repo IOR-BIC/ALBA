@@ -42,9 +42,6 @@ public:
 
   albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME*node);
-
 	/** Set the filename for the mesh to export */
   void SetFileName(const char *file_name) {this->m_File = file_name;};
 
@@ -67,6 +64,9 @@ public:
 	int Write();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
 	void OnOK();
 

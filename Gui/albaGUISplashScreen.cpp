@@ -36,7 +36,7 @@ albaGUISplashScreen::albaGUISplashScreen(const wxBitmap& bitmap, long splashStyl
 void albaGUISplashScreen::SetText(const wxString& text, int x, int y, wxColour color)
 {
 	wxBitmap bitmap(m_noTextBitmap);
-
+	
 	if (!text.empty()) {
 		wxMemoryDC memDC;
 

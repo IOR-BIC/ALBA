@@ -39,14 +39,16 @@ public:
 
  albaOp* Copy();
 
- /** Return true for the acceptable vme type. */
- bool Accept(albaVME* node);
-
  /** Builds operation's interface. */
  void OpRun();
 
  /** Return the "pid" of the wxExecute() */
  long GetPid();
+
+protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
 private:
   long m_Pid;

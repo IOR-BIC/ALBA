@@ -94,7 +94,7 @@ void albaOpExporterGRFWS::Clear()
   m_Treshold.clear();
 }
 //----------------------------------------------------------------------------
-bool albaOpExporterGRFWS::Accept(albaVME*node)
+bool albaOpExporterGRFWS::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   Clear();

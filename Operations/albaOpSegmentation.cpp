@@ -239,7 +239,7 @@ albaOpSegmentation::~albaOpSegmentation()
 	m_CursorImageVect.clear();
 }
 //----------------------------------------------------------------------------
-bool albaOpSegmentation::Accept(albaVME *node)
+bool albaOpSegmentation::InternalAccept(albaVME *node)
 {
   return (node && node->IsA("albaVMEVolumeGray") && node->GetOutput()->GetVTKData()->IsA("vtkImageData") );
 }

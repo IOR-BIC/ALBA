@@ -51,16 +51,12 @@ public:
 
   albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-  bool Accept(albaVME*node) {return true;};
-
 	/** Builds operation's interface. */
   void OpRun();
 
   /** Set the filename for the .stl to import */
   void SetFileName(const char *file_name);
-
-  
+	  
   void SetBuildVolumeFlag(bool buildVolumeFlag) {m_BuildVolumeFlag = buildVolumeFlag;};
   void SetFilePrefix(albaString filePrefix){m_FilePrefix = filePrefix;};  
   void SetFilePattern(albaString filePattern){m_FilePattern = filePattern;};  
@@ -75,10 +71,13 @@ public:
 	virtual char ** GetIcon();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) { return true; };
+
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);
-
-  
+	  
   void BuildImageSequence();
   void BuildVolume();
 

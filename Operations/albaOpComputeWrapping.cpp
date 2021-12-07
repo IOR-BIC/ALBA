@@ -59,7 +59,7 @@ albaOp* albaOpComputeWrapping::Copy()
 	return new albaOpComputeWrapping(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpComputeWrapping::Accept(albaVME*node)
+bool albaOpComputeWrapping::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVME));

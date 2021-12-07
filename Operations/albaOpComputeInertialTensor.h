@@ -67,9 +67,6 @@ public:
   /** clone the object and retrieve a copy*/
   albaOp* Copy();
 
-  /** Return true for the acceptable vme type. */
-  bool Accept(albaVME*node);
-
   /** Builds operation's interface. */
   void OpRun();
 
@@ -120,6 +117,9 @@ protected:
 	/** Get the VME density from the "DENSITY" tag if existent otherwise returns: */  enum {DENSITY_NOT_FOUND = -1};
 	double GetDensity( albaVME* node);
 	
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
 

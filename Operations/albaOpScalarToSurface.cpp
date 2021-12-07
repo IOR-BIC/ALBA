@@ -71,7 +71,7 @@ albaOp* albaOpScalarToSurface::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool albaOpScalarToSurface::Accept(albaVME*node)
+bool albaOpScalarToSurface::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVMEScalar) && ((albaVMEScalar*)node)->IsAnimated());

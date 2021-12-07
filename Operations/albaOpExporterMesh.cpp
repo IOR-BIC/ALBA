@@ -55,7 +55,7 @@ albaOpExporterMesh::~albaOpExporterMesh()
 }
 
 //----------------------------------------------------------------------------
-bool albaOpExporterMesh::Accept(albaVME*node)
+bool albaOpExporterMesh::InternalAccept(albaVME*node)
 {
   // Accept a albaVMEMesh as input
   return (node && node->GetOutput()->IsALBAType(albaVMEOutputMesh));;

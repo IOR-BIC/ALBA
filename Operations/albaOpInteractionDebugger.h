@@ -47,12 +47,8 @@ public:
 
   albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME*node);
-
   /** Builds operation's interface. */
 	void OpRun();
-
 	
   static bool ConstrainAccept(albaVME* node) {return (node != NULL && \
     (node->IsALBAType(albaVMEPolylineGraph))) ;};
@@ -60,6 +56,10 @@ public:
   void OpDo();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   /** Create the dialog interface for the importer. */
   virtual void CreateGui();  
 

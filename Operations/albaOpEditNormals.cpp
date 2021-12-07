@@ -74,7 +74,7 @@ albaOpEditNormals::~albaOpEditNormals()
 	vtkDEL(m_OriginalPolydata);
 }
 //----------------------------------------------------------------------------
-bool albaOpEditNormals::Accept(albaVME*node)
+bool albaOpEditNormals::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsALBAType(albaVMESurface));

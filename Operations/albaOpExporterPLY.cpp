@@ -59,7 +59,7 @@ albaOpExporterPLY::~albaOpExporterPLY()
 {
 }
 //----------------------------------------------------------------------------
-bool albaOpExporterPLY::Accept(albaVME*node)
+bool albaOpExporterPLY::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->GetOutput()->IsALBAType(albaVMEOutputSurface));

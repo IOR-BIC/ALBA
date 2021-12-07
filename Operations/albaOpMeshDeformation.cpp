@@ -154,7 +154,7 @@ albaOpMeshDeformation::~albaOpMeshDeformation()
   albaDEL(m_Output);
 }
 //----------------------------------------------------------------------------
-bool albaOpMeshDeformation::Accept(albaVME*node)
+bool albaOpMeshDeformation::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsA("albaVMESurface"));

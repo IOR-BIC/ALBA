@@ -270,7 +270,7 @@ bool albaOpExporterFEMCommon::HasMaterials()
 }
 
 //----------------------------------------------------------------------------
-bool albaOpExporterFEMCommon::Accept(albaVME *node)
+bool albaOpExporterFEMCommon::InternalAccept(albaVME *node)
 {
 	return (node->IsA("albaVMEMesh"));
 }

@@ -133,7 +133,7 @@ albaOp* albaOpTransform::Copy()
 	return new albaOpTransform(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpTransform::Accept(albaVME *node)
+bool albaOpTransform::InternalAccept(albaVME *node)
 {
 	bool accepted = false;
 

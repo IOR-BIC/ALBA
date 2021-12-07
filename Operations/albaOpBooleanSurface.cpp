@@ -105,7 +105,7 @@ albaOpBooleanSurface::~albaOpBooleanSurface()
   albaDEL(m_ResultVME);
 }
 //----------------------------------------------------------------------------
-bool albaOpBooleanSurface::Accept(albaVME*node)
+bool albaOpBooleanSurface::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && (node->IsALBAType(albaVMESurface))); //|| node->IsALBAType(albaVMESurfaceParametric)));

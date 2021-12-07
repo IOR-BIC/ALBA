@@ -55,7 +55,7 @@ albaOp(label)
 albaOpExporterMSF::~albaOpExporterMSF() { }
 
 //----------------------------------------------------------------------------
-bool albaOpExporterMSF::Accept(albaVME*vme)
+bool albaOpExporterMSF::InternalAccept(albaVME*vme)
 {
 	return (vme != NULL) && (!vme->IsA("albaVMERoot"));
 }

@@ -59,7 +59,7 @@ albaOp* albaOpCreateSurfaceParametric::Copy()
 	return new albaOpCreateSurfaceParametric(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpCreateSurfaceParametric::Accept(albaVME*node)
+bool albaOpCreateSurfaceParametric::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVME));

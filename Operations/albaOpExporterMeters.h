@@ -69,9 +69,6 @@ public:
   /** method for catch the dispatched events */
 	void OnEvent(albaEventBase *alba_event);
 
- 	/** Return true for the acceptable vme type. */
-  bool Accept(albaVME*node);
-
 	/** Builds operation's interface. */
   void OpRun();
 
@@ -85,6 +82,10 @@ public:
   void Export();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   /* Export All meters of an msf in a single ascii file*/
   void ExportTypeOfMeters();
 

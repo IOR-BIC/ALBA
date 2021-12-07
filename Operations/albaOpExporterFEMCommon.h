@@ -51,7 +51,6 @@ enum MyEnum
 	DENS
 };
 
-
 //----------------------------------------------------------------------------
 // albaOpExporterFEMCommon :
 //----------------------------------------------------------------------------
@@ -97,9 +96,6 @@ public:
 	void ApplyABSMatrixOn() { m_ABSMatrixFlag = 1; };
 	void ApplyABSMatrixOff() { m_ABSMatrixFlag = 0; };
 	void SetApplyABSMatrix(int apply_matrix) { m_ABSMatrixFlag = apply_matrix; };
-
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME *node);
 	
 	vtkIdType * GetMatIdArray();
 
@@ -107,15 +103,13 @@ public:
 
 	//----------------------------------------------------------------------------
 	virtual void OnEvent(albaEventBase *alba_event);
-
-
+	
 	/** Returns EnableBackCalculation */
 	int GetEnableBackCalculation() const { return m_EnableBackCalculation; }
 
 	/** Sets EnableBackCalculation */
 	void SetEnableBackCalculation(int enableBackCalculation) { m_EnableBackCalculation = enableBackCalculation; }
-
-
+	
 	/** Returns Configuration */
 	BonematConfiguration GetConfiguration() const { return m_Configuration; }
 
@@ -123,6 +117,9 @@ public:
 	void SetConfiguration(BonematConfiguration configuration) { m_Configuration = configuration; }
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
 	virtual void OnOK() = 0;
 	

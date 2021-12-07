@@ -43,9 +43,6 @@ public:
   albaOp* Copy();
 	void OnEvent(albaEventBase *alba_event);
 
-	/** Return true for the acceptable vme type. */
-  bool Accept(albaVME*node);
-
 	/** Builds operation's interface. */
   void OpRun();
 
@@ -67,6 +64,10 @@ public:
   void SaveVTKData();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   albaString  m_File;
 	albaString  m_FileDir;
   albaVME   *m_Vme; 

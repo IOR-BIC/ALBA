@@ -63,7 +63,7 @@ albaOpTriangulateSurface::~albaOpTriangulateSurface()
 	vtkDEL(m_OriginalPolydata);
 }
 //----------------------------------------------------------------------------
-bool albaOpTriangulateSurface::Accept(albaVME*node)
+bool albaOpTriangulateSurface::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsALBAType(albaVMESurface));

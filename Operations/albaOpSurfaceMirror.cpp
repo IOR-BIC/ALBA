@@ -79,7 +79,7 @@ albaOp* albaOpSurfaceMirror::Copy()
   return cp;
 }
 //----------------------------------------------------------------------------
-bool albaOpSurfaceMirror::Accept(albaVME* node)   
+bool albaOpSurfaceMirror::InternalAccept(albaVME* node)   
 //----------------------------------------------------------------------------
 { return  ( 
 		      node

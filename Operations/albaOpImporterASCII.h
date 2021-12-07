@@ -51,9 +51,6 @@ public:
 
   albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-  bool Accept(albaVME* node) {return true;};
-
 	/** Builds operation's interface. */
   void OpRun();
 
@@ -72,6 +69,10 @@ public:
   void SetFileName(std::string &file);
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) { return true; };
+
   /** Fill the file list getting the list of files matching the specified pattern.*/
   void FillFileList(const char *file_pattern);
 

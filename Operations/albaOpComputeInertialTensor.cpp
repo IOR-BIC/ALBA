@@ -135,7 +135,7 @@ albaOp* albaOpComputeInertialTensor::Copy()
    return op_copy;
 }
 //----------------------------------------------------------------------------
-bool albaOpComputeInertialTensor::Accept(albaVME*node)
+bool albaOpComputeInertialTensor::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return ( (node && node->IsALBAType(albaVMESurface)) || (node && node->IsALBAType(albaVMEGroup)) );

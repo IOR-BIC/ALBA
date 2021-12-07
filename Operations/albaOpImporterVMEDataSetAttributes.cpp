@@ -72,7 +72,7 @@ albaOpImporterVMEDataSetAttributes::~albaOpImporterVMEDataSetAttributes( )
 
 }
 //----------------------------------------------------------------------------
-bool albaOpImporterVMEDataSetAttributes::Accept(albaVME*node)
+bool albaOpImporterVMEDataSetAttributes::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return true;

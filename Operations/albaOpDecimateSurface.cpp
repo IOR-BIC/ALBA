@@ -75,7 +75,7 @@ albaOpDecimateSurface::~albaOpDecimateSurface()
 	vtkDEL(m_OriginalPolydata);
 }
 //----------------------------------------------------------------------------
-bool albaOpDecimateSurface::Accept(albaVME*node)
+bool albaOpDecimateSurface::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVMESurface));

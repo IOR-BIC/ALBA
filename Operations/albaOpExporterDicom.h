@@ -52,9 +52,6 @@ public:
   virtual albaOp* Copy();
 	void OnEvent(albaEventBase *alba_event);
 
-	/** Return true for the acceptable vme type. */
-  bool Accept(albaVME*node);
-
 	/** Builds operation's interface. */
   virtual void OpRun();
 
@@ -77,6 +74,9 @@ public:
 	albaGUIDicomSettings* GetSetting();
 	
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
 	/**Use this function to define application specific Dicom tags, see implementation for an example*/
 	virtual void DefineAppSpecificTags(gdcm::DataSet & dcmDataSet);
