@@ -35,15 +35,11 @@ public:
 	albaOpVOIDensity(const wxString &label = "VOIDensity");
 	~albaOpVOIDensity(); 
 	virtual void OnEvent(albaEventBase *alba_event);
-
-
+	
   albaTypeMacro(albaOpVOIDensity, albaOp);
 
   /** return a copy of itself, this needs to put the operation into the undo stack. */
 	albaOp* Copy();
-	
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME* Node);
 
 	/** Set the input vme for the operation. */
 	void OpRun();
@@ -77,11 +73,13 @@ public:
 
 	/** Set Surface */
 	int SetSurface(albaVME *surface);
-
-
+	
  	static bool OutputSurfaceAccept(albaVME* Node) {return(Node != NULL && (Node->GetOutput()->IsA("albaVMEOutputSurface")));};
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
 	/** Stores a tag on the selected surface */
 	void SetDoubleTag(wxString tagName, double value);

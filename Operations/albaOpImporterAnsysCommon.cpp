@@ -85,7 +85,7 @@ albaOpImporterAnsysCommon::~albaOpImporterAnsysCommon()
 	m_Materials.clear();
 }
 //----------------------------------------------------------------------------
-bool albaOpImporterAnsysCommon::Accept(albaVME *node)
+bool albaOpImporterAnsysCommon::InternalAccept(albaVME *node)
 {
   return true;
 }

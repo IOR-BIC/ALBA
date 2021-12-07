@@ -43,9 +43,6 @@ public:
 
   albaOp* Copy();
 
-	/** this operation does not depend on the selected node */
-  bool Accept(albaVME* node) {return true;};
-
 	/** Builds operation's interface. */
   void OpRun();
 
@@ -60,6 +57,10 @@ public:
 	virtual char ** GetIcon();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) { return true; };
+
   albaString m_File;
   albaString m_FileDir;
   

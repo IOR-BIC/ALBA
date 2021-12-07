@@ -76,7 +76,7 @@ albaOp* albaOpExporterWrappedMeter::Copy()
 	return cp;
 }
 //----------------------------------------------------------------------------
-bool albaOpExporterWrappedMeter::Accept(albaVME*node)
+bool albaOpExporterWrappedMeter::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVMEComputeWrapping));

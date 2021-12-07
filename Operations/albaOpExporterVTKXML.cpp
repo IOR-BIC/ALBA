@@ -70,7 +70,7 @@ albaOpExporterVTKXML::~albaOpExporterVTKXML()
 {
 }
 //----------------------------------------------------------------------------
-bool albaOpExporterVTKXML::Accept(albaVME*node)
+bool albaOpExporterVTKXML::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 { 
   return (node->IsALBAType(albaVME) && !node->IsALBAType(albaVMERoot) && !node->IsALBAType(albaVMEGroup));

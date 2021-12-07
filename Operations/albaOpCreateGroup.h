@@ -38,11 +38,14 @@ public:
 
   albaOp* Copy();
 
-  bool Accept(albaVME*node);
   void OpRun();
   void OpDo();
 
 protected: 
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   albaVMEGroup *m_Group;
 };
 #endif

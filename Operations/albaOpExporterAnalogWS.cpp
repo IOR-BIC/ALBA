@@ -57,7 +57,7 @@ albaOpExporterAnalogWS::~albaOpExporterAnalogWS()
 {
 }
 //----------------------------------------------------------------------------
-bool albaOpExporterAnalogWS::Accept(albaVME*node)
+bool albaOpExporterAnalogWS::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsA("albaVMEAnalog"));

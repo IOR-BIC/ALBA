@@ -35,7 +35,6 @@ public:
 
   albaOp* Copy();
 
-  bool Accept(albaVME*node);
   void OpRun();
   void OpDo();
 
@@ -43,6 +42,9 @@ public:
 	void OpUndo();
 
 protected: 
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
 	// Limb cloud from motion: animated, we will insert stick tip here
 	albaVMELandmarkCloud  *m_LimbCloud;

@@ -79,7 +79,7 @@ albaOpInteractionDebugger::~albaOpInteractionDebugger()
   cppDEL(m_GizmoDebugger);
 }
 
-bool albaOpInteractionDebugger::Accept(albaVME*node)
+bool albaOpInteractionDebugger::InternalAccept(albaVME*node)
 {
   return true;
 }

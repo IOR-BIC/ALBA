@@ -40,9 +40,6 @@ public:
 
   albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-  bool Accept(albaVME* node) {return true;};
-
   /** Set the External filename to be imported. 
   This is used when the operation is executed not using user interface. */
   void SetFileName(const char *name) {m_File = name;};
@@ -55,9 +52,12 @@ public:
 
 	/** Makes the undo for the operation. */
   void OpUndo();
-
-
+	
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) { return true; };
+
   albaString m_FileDir;
 	albaString m_File;
 

@@ -63,9 +63,6 @@ public:
 
 	albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	/*virtual*/ bool Accept(albaVME*node);
-
 	/** Builds operation's interface. */
 	/*virtual*/ void OpRun();
 
@@ -94,6 +91,10 @@ public:
 	vtkPolyData* GetExtrutedSurface(){return m_ResultPolydata;};
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	/*virtual*/ void OpStop(int result);
 

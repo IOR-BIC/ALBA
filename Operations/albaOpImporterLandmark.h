@@ -55,9 +55,6 @@ public:
   /** method for catch the dispatched events */
   virtual void OnEvent(albaEventBase *alba_event);
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME* node) {return true;};
-
 	/** Builds operation's interface. */
 	void OpRun();
 
@@ -76,14 +73,12 @@ public:
 	/** Set the filename for the file to import */
   void SetFileName(const char *file_name){m_File = file_name;};
 	
-
 	/** Returns OnlyCoordinates mode */
 	int GetOnlyCoordinates() const { return m_OnlyCoordinates; }
 
 	/** Sets OnlyCoordinates mode */
 	void SetOnlyCoordinates(int onlyCoordinates) { m_OnlyCoordinates = onlyCoordinates; }
 		
-
 	/** Returns TypeSeparation */
 	int GetTypeSeparation() const { return m_TypeSeparation; }
 
@@ -98,6 +93,9 @@ protected:
     ID_TYPE_SEPARATION,
     MINID,
   };
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) { return true; };
 
   int m_TypeSeparation;
   albaVMELandmarkCloud  *m_VmeCloud;

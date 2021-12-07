@@ -77,7 +77,7 @@ albaOpFreezeVME::~albaOpFreezeVME( )
 
 }
 //----------------------------------------------------------------------------
-bool albaOpFreezeVME::Accept(albaVME*node)
+bool albaOpFreezeVME::InternalAccept(albaVME*node)
 	//----------------------------------------------------------------------------
 {
 	return (node->IsALBAType(albaVME) && 

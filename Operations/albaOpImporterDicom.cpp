@@ -192,7 +192,7 @@ albaOp *albaOpImporterDicom::Copy()
 	return importer;
 }
 //----------------------------------------------------------------------------
-bool albaOpImporterDicom::Accept(albaVME*node)
+bool albaOpImporterDicom::InternalAccept(albaVME*node)
 {
 	if (m_JustOnceImport && node)
 	{

@@ -94,7 +94,7 @@ albaOp* albaOpDecomposeTimeVarVME::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool albaOpDecomposeTimeVarVME::Accept(albaVME* node)
+bool albaOpDecomposeTimeVarVME::InternalAccept(albaVME* node)
 //----------------------------------------------------------------------------
 {
   //Until VMEAnalog is non time varying

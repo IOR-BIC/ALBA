@@ -50,9 +50,6 @@ public:
   /** method for catch the dispatched events */
   virtual void OnEvent(albaEventBase *alba_event);
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME* node) {return true;};
-
 	/** Builds operation's interface. */
 	void OpRun();
 
@@ -71,6 +68,10 @@ public:
   void SetSkipColumn(int column);
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) { return true; };
+
   wxString m_FileDir;
 	wxString m_File;
 	albaVMELandmarkCloud  *m_VmeCloud;

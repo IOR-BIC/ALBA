@@ -67,17 +67,20 @@ public:
   void OnPOperationButton();
   void Update();
   bool SetUpWidget();
+
   albaOpMML(const wxString &label);
   virtual ~albaOpMML(); 
   void   OnEvent(albaEventBase *e);
   albaOp* Copy();
 
-  bool Accept(albaVME* vme);
   void OpRun();
   void OpDo();
   void OpUndo();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
   void    CreateFakeLandmarks();
   void    OnRegistrationCANCEL();

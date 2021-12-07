@@ -145,7 +145,7 @@ albaOp* albaOpInteractiveClipSurface::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool albaOpInteractiveClipSurface::Accept(albaVME*node)
+bool albaOpInteractiveClipSurface::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node != NULL && node->IsALBAType(albaVMESurface));

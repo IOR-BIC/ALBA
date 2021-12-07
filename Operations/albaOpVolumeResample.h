@@ -51,7 +51,6 @@ public:
 
   albaOp* Copy();
 
-  bool Accept(albaVME* vme);
   void OpRun();	
   void OpDo();
   void OpUndo();  
@@ -91,8 +90,10 @@ public:
 
 protected:
   
-  /** Test facilities */
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
+  /** Test facilities */
   void SetROIOrientation(double roiOrientation[3]);
   void SetROIPosition(double roiPosition[3]);
 

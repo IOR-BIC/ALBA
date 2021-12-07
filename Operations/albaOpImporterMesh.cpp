@@ -65,7 +65,7 @@ albaOpImporterMesh::~albaOpImporterMesh()
   albaDEL(m_ImportedVmeMesh);
 }
 //----------------------------------------------------------------------------
-bool albaOpImporterMesh::Accept(albaVME*node)
+bool albaOpImporterMesh::InternalAccept(albaVME*node)
 {
   return true;
 }

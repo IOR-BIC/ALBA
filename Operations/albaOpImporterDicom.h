@@ -88,9 +88,6 @@ public:
 	/** Copy. */
 	albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME*node);
-
 	/** Builds operation's interface calling CreateGui() method. */
 	virtual void OpRun();
 
@@ -141,13 +138,15 @@ public:
 
 protected:
 
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
 	/* Override this function to add specific tags to the reader, see implementation for an example */
 	virtual void InsertAppSpecificTagsToReadList(std::set<gdcm::Tag> &TagsToRead);
 
 	/* Override this function to read and set tags to the reader, see implementation for an example */
 	virtual void ReadAndSetAppSpecificTags(albaTagArray * m_TagArray, gdcm::DataSet & dcmDataSet);
-
-	
+		
 	enum DICOM_IMPORTER_GUI_ID
 	{
 		ID_FIRST = albaGUIWizard::ID_LAST,

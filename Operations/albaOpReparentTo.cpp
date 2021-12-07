@@ -59,7 +59,7 @@ albaOpReparentTo::~albaOpReparentTo( )
 {
 }
 //----------------------------------------------------------------------------
-bool albaOpReparentTo::Accept(albaVME*node)
+bool albaOpReparentTo::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node != NULL && node->IsALBAType(albaVME) && !node->IsALBAType(albaVMERoot) /*&& !node->IsALBAType(albaVMEExternalData)*/);

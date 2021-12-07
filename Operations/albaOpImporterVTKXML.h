@@ -57,9 +57,6 @@ public:
   /** Builds operation's interface. */
   /*virtual*/ void OpRun();
 
-  /** Return true for the acceptable vme type. */
-  /*virtual*/ bool Accept(albaVME* node);
-
   /** Import VTK XML data. */
   virtual int ImportVTKXML();
 
@@ -73,6 +70,9 @@ public:
   void SetFileName(albaString filename);
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
   /** Function to trace error events from the vtk readers.*/
   static void ErrorProcessEvents(vtkObject* sender, unsigned long channel, void* clientdata, void* calldata);

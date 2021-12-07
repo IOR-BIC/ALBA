@@ -108,7 +108,7 @@ albaOpFillHoles::~albaOpFillHoles()
   }
 }
 //----------------------------------------------------------------------------
-bool albaOpFillHoles::Accept(albaVME*node)
+bool albaOpFillHoles::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsA("albaVMESurface"));

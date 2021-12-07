@@ -44,9 +44,6 @@
 #include "albaOpMML3ParameterView.h"
 #include "albaOpMML3NonUniformSlicePipe.h"
 
-
-
-
 //------------------------------------------------------------------------------
 // TODO 7.10.09
 // 
@@ -71,8 +68,6 @@
 // If axis is straight, consider creating all contours at once with a single vtkCutter execution.
 //
 //------------------------------------------------------------------------------
-
-
 
 
 //------------------------------------------------------------------------------
@@ -106,13 +101,12 @@ public:
   ~albaOpMML3(); ///< destructor
 
   albaOp* Copy();
-  bool Accept(albaVME* vme);
+
   void OpRun();
   void OpStop(int result);
   void OpDo();
   void OpUndo();
-
-
+	
   /// static callback which allows vme selector to select only this type
   static bool AcceptVMELandmark(albaVME *node)
   {
@@ -127,9 +121,12 @@ public:
 
   /// static constant: number of non-uniform sections
   static const int m_NumberOfNonUniformSections = 10 ; 
-
-
+	
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   //----------------------------------------------------------------------------
   // Dialog methods
   //----------------------------------------------------------------------------

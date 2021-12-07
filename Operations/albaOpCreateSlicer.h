@@ -38,13 +38,16 @@ public:
 
   albaOp* Copy();
 
-  bool Accept(albaVME *node);
   void OpRun();
   void OpDo();
 
   static bool VolumeAccept(albaVME* node) {return(node != NULL  && node->IsALBAType(albaVMEVolume));};
 
 protected: 
+
+	/** Return true for the acceptable vme type. */
+	/*virtual*/ bool InternalAccept(albaVME*node);
+
   albaVMESlicer *m_Slicer;
   albaVME      *m_SlicedVME;
 };

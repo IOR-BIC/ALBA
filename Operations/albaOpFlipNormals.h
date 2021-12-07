@@ -67,9 +67,6 @@ public:
   /** Precess events coming from other objects */
 	/*virtual*/ void OnEvent(albaEventBase *alba_event);
 
-	/** Return true for the acceptable vme type. */
-	/*virtual*/ bool Accept(albaVME* vme);
-
 	/** Builds operation's interface by calling CreateOpDialog() method. */
 	/*virtual*/ void OpRun();
 
@@ -81,8 +78,7 @@ public:
 
 	/** set the seed ie the cell originating the selection area */
 	void SetSeed(vtkIdType cellSeed);
-
-
+	
   /** get the seed ie the cell originating the selection area */
   vtkIdType GetSeed(){return m_CellSeed;};
 
@@ -99,6 +95,9 @@ public:
 	void FlipNormals();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
 	double GetCellsDistance(vtkIdType c1,vtkIdType c2);
 

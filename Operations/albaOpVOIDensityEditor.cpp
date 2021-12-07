@@ -80,7 +80,7 @@ albaOp* albaOpVOIDensityEditor::Copy()
 	return (new albaOpVOIDensityEditor(m_Label));
 }
 //----------------------------------------------------------------------------
-bool albaOpVOIDensityEditor::Accept(albaVME* Node)
+bool albaOpVOIDensityEditor::InternalAccept(albaVME* Node)
 //----------------------------------------------------------------------------
 {
 	return (Node != NULL && Node->IsA("albaVMEVolumeGray"));

@@ -61,7 +61,7 @@ albaOp* albaOpCreateSlicer::Copy()
 	return new albaOpCreateSlicer(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpCreateSlicer::Accept(albaVME*node)
+bool albaOpCreateSlicer::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node != NULL);

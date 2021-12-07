@@ -61,7 +61,7 @@ albaOp* albaOpCreateRefSys::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool albaOpCreateRefSys::Accept(albaVME*node)
+bool albaOpCreateRefSys::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVME));

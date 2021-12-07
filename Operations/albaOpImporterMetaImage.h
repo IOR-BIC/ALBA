@@ -52,9 +52,6 @@ public:
 
   albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-  bool Accept(albaVME* node) {return true;};
-
 	/** Builds operation's interface. */
   void OpRun();
 
@@ -75,10 +72,13 @@ public:
 	virtual char ** GetIcon();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) { return true; };
+
   wxString m_File;
   wxString m_FileDir;
   
-
   albaVMEImage      *m_VmeImage;
   albaVMEVolumeGray *m_VmeGrayVol;
 };

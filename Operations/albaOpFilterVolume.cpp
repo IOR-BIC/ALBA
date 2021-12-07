@@ -77,7 +77,7 @@ albaOpFilterVolume::~albaOpFilterVolume()
 	vtkDEL(m_OriginalImageData);
 }
 //----------------------------------------------------------------------------
-bool albaOpFilterVolume::Accept(albaVME*node)
+bool albaOpFilterVolume::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVMEVolumeGray));

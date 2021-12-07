@@ -43,9 +43,6 @@ public:
   /** Return a copy of the operation.*/
   albaOp* Copy();
 
-  /** Return true for the acceptable vme type. */
-  bool Accept(albaVME*node);
-
   /** Builds operation's interface. */
   void OpRun();
 
@@ -71,6 +68,10 @@ public:
   void CreateVolume();
 
 private:
+
+	/** Return true for the acceptable vme type. */
+	/*virtual*/ bool InternalAccept(albaVME*node);
+
   albaVMEVolumeGray *m_Volume;
   double m_Spacing[3]; ///< Voxel spacing of the created volume
   double m_Dimensions[3]; ///< Dimensions of created volume

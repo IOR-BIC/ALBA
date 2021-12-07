@@ -78,7 +78,7 @@ albaOp* albaOpExporterMeters::Copy()
 	return cp;
 }
 //----------------------------------------------------------------------------
-bool albaOpExporterMeters::Accept(albaVME*node)
+bool albaOpExporterMeters::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 { 
   bool inputVMEAccepted = false;

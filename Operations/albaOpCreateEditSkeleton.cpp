@@ -68,7 +68,7 @@ albaOp* albaOpCreateEditSkeleton::Copy()
 	return new albaOpCreateEditSkeleton(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpCreateEditSkeleton::Accept(albaVME* vme)
+bool albaOpCreateEditSkeleton::InternalAccept(albaVME* vme)
 //----------------------------------------------------------------------------
 {
 	return (vme != NULL && (vme->IsALBAType(albaVMEVolumeGray)||(vme->IsALBAType(albaVMEPolylineGraph)&&vme->GetParent()->IsALBAType(albaVMEVolumeGray))));

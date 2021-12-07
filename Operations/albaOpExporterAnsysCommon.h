@@ -51,8 +51,7 @@ public:
 	~albaOpExporterAnsysCommon(); 
 
 	albaAbstractTypeMacro(albaOpExporterAnsysCommon, albaOpExporterFEMCommon);
-
-	
+		
   /** Set/Get output file name*/
   void SetOutputFileName(const char *outputFileName) {m_AnsysOutputFileNameFullPath = outputFileName;};
   const char *GetOutputFileName() {return m_AnsysOutputFileNameFullPath.c_str();};
@@ -75,8 +74,7 @@ protected:
   ExportElement *CreateExportElements(albaVMEMesh * input, int rowsNumber, vtkUnstructuredGrid * inputUGrid, FILE * file);
 
 	static int compareElem(const void *p1, const void *p2);
-
-
+	
   int m_IntCharSize;
 
 	/** Ansys input file name */

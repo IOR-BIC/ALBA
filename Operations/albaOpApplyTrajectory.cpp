@@ -86,7 +86,7 @@ albaOp* albaOpApplyTrajectory::Copy()
 	return cp;
 }
 //----------------------------------------------------------------------------
-bool albaOpApplyTrajectory::Accept(albaVME* vme)
+bool albaOpApplyTrajectory::InternalAccept(albaVME* vme)
 //----------------------------------------------------------------------------
 {  
   return !vme->IsAnimated() && !vme->IsA("albaVMERoot") 

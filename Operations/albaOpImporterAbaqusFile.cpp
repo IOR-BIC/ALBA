@@ -96,10 +96,11 @@ albaOpImporterAbaqusFile::~albaOpImporterAbaqusFile()
   albaDEL(m_ImportedVmeMesh);
 }
 //----------------------------------------------------------------------------
-bool albaOpImporterAbaqusFile::Accept(albaVME *node)
+bool albaOpImporterAbaqusFile::InternalAccept(albaVME *node)
 {
   return true;
 }
+
 //----------------------------------------------------------------------------
 albaOp* albaOpImporterAbaqusFile::Copy()   
 {

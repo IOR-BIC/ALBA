@@ -117,7 +117,7 @@ albaOp* albaOpFlipNormals::Copy()
 	return new albaOpFlipNormals(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpFlipNormals::Accept(albaVME* vme)
+bool albaOpFlipNormals::InternalAccept(albaVME* vme)
 //----------------------------------------------------------------------------
 {
 	return vme != NULL && vme->IsALBAType(albaVMESurface);

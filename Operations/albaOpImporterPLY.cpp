@@ -56,7 +56,7 @@ albaOpImporterPLY::~albaOpImporterPLY()
     albaDEL(m_ImportedPLYs[i]);
 }
 //----------------------------------------------------------------------------
-bool albaOpImporterPLY::Accept(albaVME*node)
+bool albaOpImporterPLY::InternalAccept(albaVME*node)
 {
   return true;
 }

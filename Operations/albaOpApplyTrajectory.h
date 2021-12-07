@@ -59,9 +59,6 @@ public:
   /** Copy the operation. */
 	albaOp* Copy();
 
-  /** Return true for the vme to which the trajectories should be applied. */
-  bool Accept(albaVME* vme);
-
   /** Returns true for the vme from which the trajectories should be red. (Callback function) */
   static bool AcceptInputVME(albaVME* node);
 
@@ -101,6 +98,9 @@ public:
   void SetVME(albaVME* vme){m_VME = vme;};
 
 protected:
+
+	/** Return true for the vme to which the trajectories should be applied. */
+	bool InternalAccept(albaVME* vme);
 
   albaMatrix *m_OriginalMatrix;
   albaString m_FileDir;
