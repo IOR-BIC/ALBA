@@ -66,6 +66,7 @@ albaViewImageCompound::albaViewImageCompound( wxString label, int num_row, int n
 	m_LutWidget = NULL;
 	m_LutSlider = NULL;
 	m_ColorLUT = NULL;
+	m_CanSpin = false;
 }
 //----------------------------------------------------------------------------
 albaViewImageCompound::~albaViewImageCompound()
@@ -88,6 +89,7 @@ albaView *albaViewImageCompound::Copy(albaObserver *Listener, bool lightCopyEnab
     v->m_PluggedChildViewList.push_back(m_PluggedChildViewList[i]->Copy(this));
   }
   v->m_NumOfPluggedChildren = m_NumOfPluggedChildren;
+	v->m_CanSpin = m_CanSpin;
   v->Create();
   return v;
 }
