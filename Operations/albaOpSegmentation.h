@@ -127,6 +127,7 @@ public:
     ID_MANUAL_BUCKET_GLOBAL,
     ID_MANUAL_REFINEMENT_REGIONS_SIZE,
     ID_MANUAL_CANCEL,
+		ID_MANUAL_COPY_FROM_LAST_SLICE,
     ID_MANUAL_UNDO, 
     ID_MANUAL_REDO,
     ID_BUTTON_INIT,
@@ -266,6 +267,8 @@ protected:
 	
   /** Receive events from Manual segmentation gui */
   void OnEditSegmentationEvent(albaEvent *e);
+
+	void CopyFromLastSlice();
 
 	void OnUndoRedo(bool undo);
 	

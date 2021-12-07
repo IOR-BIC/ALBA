@@ -234,6 +234,60 @@ void albaOpSegmentationHelper::ApplySliceChangesToVolume(int slicePlane, int sli
 }
 
 //----------------------------------------------------------------------------
+void albaOpSegmentationHelper::CopyVolumeDataToSlice(int slicePlane, int sliceIndex)
+{
+	vtkDataSet *segVolume = vtkDataSet::SafeDownCast(m_Segmentation->GetOutput()->GetVTKData());
+
+	if (segVolume && m_SegmetationSlice)
+	{
+		int *volDims;
+		volDims = ((vtkImageData*)segVolume)->GetDimensions();
+		vtkDataArray* volScalars = segVolume->GetPointData()->GetScalars();
+		unsigned char *volScalarsPointer = (unsigned char *)volScalars->GetVoidPointer(0);
+		vtkDataArray* sliceScalars = m_SegmetationSlice->GetPointData()->GetScalars();
+		unsigned char *segScalarPointer = (unsigned char *)sliceScalars->GetVoidPointer(0);;
+
+		int numberOfSlices = 1;
+
+		if (slicePlane == XY)
+		{
+			int z = (sliceIndex - 1);
+			for (int x = 0; x < volDims[0]; x++)
+				for (int y = 0; y < volDims[1]; y++)
+				{
+					int volPos = x + y*volDims[0] + z*volDims[0] * volDims[1];
+					int slicePos = x + y*volDims[0] + 0;
+					segScalarPointer[slicePos] = volScalarsPointer[volPos];
+				}
+		}
+		else if (slicePlane == YZ)
+		{
+			int x = (sliceIndex - 1);
+			for (int y = 0; y < volDims[1]; y++)
+				for (int z = 0; z < volDims[2]; z++)
+				{
+					int volPos = x + y*volDims[0] + z*volDims[0] * volDims[1];
+					int slicePos = 0 + y*numberOfSlices + z*numberOfSlices*volDims[1];
+					segScalarPointer[slicePos] = volScalarsPointer[volPos];
+				}
+		}
+		else if (slicePlane == XZ)
+		{
+			int y = (sliceIndex - 1);
+			for (int z = 0; z < volDims[2]; z++)
+				for (int x = 0; x < volDims[0]; x++)
+				{
+					int volPos = x + y*volDims[0] + z*volDims[0] * volDims[1];
+					int slicePos = x + 0 + z*volDims[0] * numberOfSlices;
+					segScalarPointer[slicePos] = volScalarsPointer[volPos];
+				}
+		}
+
+		sliceScalars->Modified();
+	}
+}
+
+//----------------------------------------------------------------------------
 void albaOpSegmentationHelper::DrawBrush(double *pos, int slicePlane, int brushSize, int brushShape, bool erase)
 {
 	int fillValue, sliceDim[3], point[2];
