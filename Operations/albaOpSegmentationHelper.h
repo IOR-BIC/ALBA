@@ -76,6 +76,8 @@ public:
 
 	void ApplySliceChangesToVolume(int slicePlane, int sliceIndex);
 
+	void CopyVolumeDataToSlice(int slicePlane, int sliceIndex);
+
 
 	void DrawBrush(double *pos, int slicePlane, int brushSize, int brushShape, bool erase);
 
