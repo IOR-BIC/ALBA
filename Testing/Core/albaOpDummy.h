@@ -35,8 +35,6 @@ public:
 
   albaTypeMacro(albaOpDummy,albaOp);
 
-  /** Return true for the acceptable vme type. */
-  /*virtual*/ bool Accept(albaVME* vme);
   /*virtual*/ albaOp* Copy();
   /** Builds operation's interface. */
   /*virtual*/ void OpRun();
@@ -46,14 +44,16 @@ public:
   /*virtual*/ void OpUndo();
 
   void End();
-
-
-  static bool m_Executed;
+	
+	static bool m_Executed;
   static bool m_Do;
   static bool m_Undo;
   static bool m_Stop;
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	/*virtual*/ bool InternalAccept(albaVME* vme);
 
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   /*virtual*/ void OpStop(int result);
@@ -68,7 +68,7 @@ albaOpDummy::albaOpDummy(wxString label,  bool canundo, int opType, bool inputPr
   m_InputPreserving = inputPreserving;
 }
 //----------------------------------------------------------------------------
-bool albaOpDummy::Accept(albaVME* vme)
+bool albaOpDummy::InternalAccept(albaVME* vme)
 //----------------------------------------------------------------------------
 {
   return vme->IsA("albaVMEDummy");
