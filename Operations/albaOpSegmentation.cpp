@@ -145,7 +145,8 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_VolumeSpacing[0] = m_VolumeSpacing[1] = m_VolumeSpacing[2] = 0.0;
   m_VolumeBounds[0] = m_VolumeBounds[1] = m_VolumeBounds[2] = m_VolumeBounds[3] = m_VolumeBounds[4] = m_VolumeBounds[5] = 0.0;
 	m_SliceIndexByPlane[0] = m_SliceIndexByPlane[1] = m_SliceIndexByPlane[2] = 1;
-  m_SlicePlane =  XY;
+  m_OldSlicePlane = m_GUISlicePlane = m_SlicePlane =  XY;
+	m_OldSliceIndex = m_GUISliceIndex = m_SliceIndex = 1;
 
   m_NumSliceSliderEvents = 0;
   m_SliceSlider = NULL;
@@ -632,7 +633,7 @@ void albaOpSegmentation::CreateOpDialog()
 	// Label to indicate the current slice
 
 	vtkNEW(m_AutomaticSliceTextMapper);
-	wxString text = wxString::Format("Slice = %d of %d", m_SliceIndex, m_VolumeDims[m_SlicePlane]);
+	wxString text = wxString::Format("Slice = %d of %d", m_GUISliceIndex, m_VolumeDims[m_SlicePlane]);
 
 	m_AutomaticSliceTextMapper->SetInput(text);
 	m_AutomaticSliceTextMapper->GetTextProperty()->SetColor(1.0, 1.0, 0.0);
@@ -789,13 +790,13 @@ void albaOpSegmentation::CreateSliceNavigationGui()
 	slice_text->Enable(true);
 	m_SliceText = slice_text;
 
-	m_SliceIndex = 1;
-	m_SliceSlider = new wxSlider(m_GuiDialog, ID_SLICE_SLIDER, m_SliceIndex, 1, m_VolumeDims[2], defPos, wxSize(64, 18));
+
+	m_SliceSlider = new wxSlider(m_GuiDialog, ID_SLICE_SLIDER, m_GUISliceIndex, 1, m_VolumeDims[2], defPos, wxSize(64, 18));
 	albaGUIButton *b_incr_slice = new albaGUIButton(m_GuiDialog, ID_SLICE_NEXT, ">", defPos, wxSize(18, 18));
 	albaGUIButton *b_decr_slice = new albaGUIButton(m_GuiDialog, ID_SLICE_PREV, "<", defPos, wxSize(18, 18));
 
-	slice_text->SetValidator(albaGUIValidator(this, ID_SLICE_TEXT, slice_text, &m_SliceIndex, m_SliceSlider, 1, m_VolumeDims[2]));
-	m_SliceSlider->SetValidator(albaGUIValidator(this, ID_SLICE_SLIDER, m_SliceSlider, &m_SliceIndex, slice_text));
+	slice_text->SetValidator(albaGUIValidator(this, ID_SLICE_TEXT, slice_text, &m_GUISliceIndex, m_SliceSlider, 1, m_VolumeDims[2]));
+	m_SliceSlider->SetValidator(albaGUIValidator(this, ID_SLICE_SLIDER, m_SliceSlider, &m_GUISliceIndex, slice_text));
 
 	b_incr_slice->SetValidator(albaGUIValidator(this, ID_SLICE_NEXT, b_incr_slice));
 	b_decr_slice->SetValidator(albaGUIValidator(this, ID_SLICE_PREV, b_decr_slice));
@@ -815,7 +816,7 @@ void albaOpSegmentation::CreateSliceNavigationGui()
 
 	wxString planes[3]{ "YZ","XZ","XY" };
 
-	m_GuiDialog->Radio(ID_SLICE_PLANE, "Plane: ", &m_SlicePlane, 3, planes, 3, "Slice Plane");
+	m_GuiDialog->Radio(ID_SLICE_PLANE, "Plane: ", &m_GUISlicePlane, 3, planes, 3, "Slice Plane");
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -984,6 +985,7 @@ void albaOpSegmentation::CreateEditSegmentationGui()
 	
 	currentGui->Add(m_BrushEditingSizer, wxALIGN_CENTER_HORIZONTAL);
 	currentGui->Add(m_FillEditingSizer, wxALIGN_CENTER_HORIZONTAL);
+	currentGui->Button(ID_MANUAL_COPY_FROM_LAST_SLICE, "Copy from last slice");
 	currentGui->TwoButtons(ID_MANUAL_UNDO, ID_MANUAL_REDO, "Undo", "Redo");
 
 	EnableSizerContent(m_FillEditingSizer, false);
@@ -1150,7 +1152,7 @@ void albaOpSegmentation::UpdateSliderValidator()
 
 	m_SliceSlider->SetRange(1, sliceMax);
 	m_SliceText->SetValidator(albaGUIValidator(this, ID_SLICE_TEXT, m_SliceText, &m_SliceIndex, m_SliceSlider, 1, sliceMax));
-	m_SliceIndex = m_SliceIndexByPlane[m_SlicePlane];
+	SetSlicingIndexes(m_SlicePlane, m_SliceIndexByPlane[m_SlicePlane]);
 	m_SliceSlider->Update();
 }
 //----------------------------------------------------------------------------
@@ -1408,8 +1410,11 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 			SliceNext();
 			break;
 		case ID_SLICE_TEXT:
-			if (m_SliceIndex > 1)
-				m_SliceIndex--;
+			if (m_GUISliceIndex > 1)
+			{
+				m_GUISliceIndex--;
+			}
+			SetSlicingIndexes(m_SlicePlane, m_GUISliceIndex);
 			OnUpdateSlice();
 			break;
 		case ID_SLICE_PREV:
@@ -1419,6 +1424,7 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 			OnUpdateSlice();
 			break;
 		case ID_SLICE_PLANE:
+			SetSlicingIndexes(m_GUISlicePlane, m_GUISliceIndex);
 			OnSelectSlicePlane();
 			break;
 		case ID_SHOW_LABELS:
@@ -1492,14 +1498,18 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 void albaOpSegmentation::SliceNext()
 {
 	if (m_SliceIndex < m_SliceSlider->GetMax())
-		m_SliceIndex++;
+	{
+		SetSlicingIndexes(m_SlicePlane, m_SliceIndex + 1);
+	}
 	OnUpdateSlice();
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::SlicePrev()
 {
 	if (m_SliceIndex > 1)
-		m_SliceIndex--;
+	{
+		SetSlicingIndexes(m_SlicePlane, m_SliceIndex - 1);
+	}
 	OnUpdateSlice();
 }
 
@@ -1618,8 +1628,7 @@ void albaOpSegmentation::OnInitEvent(albaEvent *e)
 		if (!m_IgnoreRangeSelEvent && m_RangesGuiList->GetSelection() != -1)//Check if a range is selected
 		{
 			m_CurrentRange = m_RangesGuiList->GetSelection();
-			m_SliceIndex = (m_RangesVector[m_CurrentRange].m_StartSlice + m_RangesVector[m_CurrentRange].m_EndSlice) / 2;
-
+			SetSlicingIndexes(m_SlicePlane, (m_RangesVector[m_CurrentRange].m_StartSlice + m_RangesVector[m_CurrentRange].m_EndSlice) / 2);
 			SetThresholdByRange();
 			EnableDisableGuiRange();
 		}
@@ -1673,9 +1682,6 @@ void albaOpSegmentation::OnSelectSlicePlane()
 	}
 
 	m_View->CameraReset();
-
-	m_OldSliceIndex = m_SliceIndex;
-	m_OldSlicePlane = m_SlicePlane;
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OnPickingEvent(albaEvent * e)
@@ -1740,8 +1746,6 @@ void albaOpSegmentation::OnUpdateSlice()
 		CreateRealDrawnImage();
 		m_View->CameraUpdate();
 	}
-
-	m_OldSliceIndex = m_SliceIndex;
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OnChangeThresholdType()
@@ -1929,11 +1933,9 @@ void albaOpSegmentation::OnEditSegmentationEvent(albaEvent *e)
 	{
 		case ID_MANUAL_BUCKET_GLOBAL:
 		{
-			
 			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
 		}
 		break;
-
 		case ID_MANUAL_TOOLS_BRUSH:
 		{
 			m_ManualSegmentationTools = DRAW_EDIT;
@@ -1984,6 +1986,12 @@ void albaOpSegmentation::OnEditSegmentationEvent(albaEvent *e)
 			m_View->CameraUpdate();
 		}
 		break;
+		case ID_MANUAL_COPY_FROM_LAST_SLICE:
+		{
+			CopyFromLastSlice();
+
+		}
+		break;
 		case ID_MANUAL_UNDO:
 			OnUndoRedo(true);
 			break;
@@ -1995,6 +2003,7 @@ void albaOpSegmentation::OnEditSegmentationEvent(albaEvent *e)
 	}
 	m_GuiDialog->SetFocusIgnoringChildren();
 }
+
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OnUndoRedo(bool undo)
 {
@@ -2009,13 +2018,12 @@ void albaOpSegmentation::OnUndoRedo(bool undo)
 		//are in the plane-slice of last edit (where i saved last undo info).
 		if (m_SlicePlane != from[fromIndex].m_Plane)
 		{
-			m_SlicePlane = from[fromIndex].m_Plane;
-			m_SliceIndex = from[fromIndex].m_Slice;
+			SetSlicingIndexes(from[fromIndex].m_Plane, from[fromIndex].m_Slice);
 			OnSelectSlicePlane();
 		}
 		else if (m_SliceIndex != from[fromIndex].m_Slice)
 		{
-			m_SliceIndex = from[fromIndex].m_Slice;
+			SetSlicingIndexes(m_SlicePlane, from[fromIndex].m_Slice);
 			OnUpdateSlice();
 		}
 
@@ -2191,6 +2199,20 @@ void albaOpSegmentation::Fill(albaEvent *e)
 	m_View->CameraUpdate();
 	CreateRealDrawnImage();
 }
+
+//----------------------------------------------------------------------------
+void albaOpSegmentation::CopyFromLastSlice()
+{
+	AddUndoStep();
+	m_Helper.CopyVolumeDataToSlice(m_SlicePlane, m_OldSliceIndex);
+
+	//On edit a new branch of redo-list starts, i need to clear the redo stack
+	ClearManualRedoList();
+
+	m_View->CameraUpdate();
+	CreateRealDrawnImage();
+}
+
 //----------------------------------------------------------------------------
 void albaOpSegmentation::StartDraw(albaEvent *e)
 {
@@ -2547,6 +2569,24 @@ int albaOpSegmentation::OpSegmentationEventFilter(wxEvent& event)
 	}
 
 	return -1;
+}
+
+//----------------------------------------------------------------------------
+void albaOpSegmentation::SetSlicingIndexes(int planeindex, int sliceIndex)
+{
+
+	if (m_CurrentPhase == EDIT_SEGMENTATION)
+		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_COPY_FROM_LAST_SLICE, m_SlicePlane == planeindex);
+		
+	m_OldSlicePlane = m_SlicePlane;
+	m_OldSliceIndex = m_SliceIndex;
+	m_GUISlicePlane = m_SlicePlane = planeindex; 
+	m_GUISliceIndex = m_SliceIndex = sliceIndex;
+
+	if (m_CurrentPhase == EDIT_SEGMENTATION)
+		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
+	else
+		m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
 }
 
 //----------------------------------------------------------------------------
