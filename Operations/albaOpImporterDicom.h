@@ -312,6 +312,8 @@ public:
 
 	/** Returns the total number of series*/
 	int GetSeriesTotalNum();
+
+	void RemoveSingleImagesFromList();
 protected:
 	std::vector<albaDicomStudy *> m_Studies;
 };
@@ -339,6 +341,9 @@ public:
 
 	/** Gets the id-th series */
 	albaDicomSeries *GetSeries(int id) { return m_Series[id]; }
+
+
+	void RemoveSingleImagesFromSeries();
 
 protected:
 	albaString m_StudyID;
