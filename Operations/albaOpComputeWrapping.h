@@ -48,14 +48,17 @@ public:
   /** clone the object and retrieve a copy*/
   albaOp* Copy();
 
-  /** Return true for the acceptable vme type. */
-  bool Accept(albaVME*node);
   /** Builds operation's interface. */
   void OpRun();
-  /** Execute the operation. */
+
+	/** Execute the operation. */
   void OpDo();
 
 protected: 
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   albaVMEComputeWrapping *m_Meter;
 };
 #endif

@@ -58,8 +58,6 @@ public:
     DOUBLE_SCALAR
   };
 
-	bool Accept(albaVME*node) {return true;};
-
 	void OpRun();
 
   /** Set the RAW volume filename to import.*/
@@ -93,6 +91,10 @@ public:
   bool Import();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) { return true; };
+
   void EnableWidgets(bool enable);
   void UpdateReader();
   int  GetFileLength(const char * filename); 

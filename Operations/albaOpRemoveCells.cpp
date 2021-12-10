@@ -131,7 +131,7 @@ albaOp* albaOpRemoveCells::Copy()
   return new albaOpRemoveCells(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpRemoveCells::Accept(albaVME* vme)
+bool albaOpRemoveCells::InternalAccept(albaVME* vme)
 //----------------------------------------------------------------------------
 {
   return vme != NULL && vme->IsALBAType(albaVMESurface);

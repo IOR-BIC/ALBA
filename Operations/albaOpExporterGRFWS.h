@@ -64,9 +64,6 @@ public:
   /** Clear */
   void Clear();
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME* node);
-
 	/** Builds operation's interface. */
 	void OpRun();
 
@@ -146,6 +143,9 @@ protected:
     MINID
 	};
  
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   /* Calculate proposed tresholds */
   void CalculateTresholds();
 

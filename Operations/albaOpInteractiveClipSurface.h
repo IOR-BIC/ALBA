@@ -67,7 +67,6 @@ public:
 
   albaOp* Copy();
 
-  bool Accept(albaVME*node);   
   void OpRun();
 
   /** Execute the operation. */
@@ -110,6 +109,10 @@ public:
     (node->IsALBAType(albaVMEPolylineGraph))) ;};
 
 protected: 
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
 	virtual void OpStop(int result);
 	
   /** Show/hide the gizmo representing the clipping implicit plane. */

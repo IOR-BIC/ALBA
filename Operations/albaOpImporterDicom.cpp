@@ -192,7 +192,7 @@ albaOp *albaOpImporterDicom::Copy()
 	return importer;
 }
 //----------------------------------------------------------------------------
-bool albaOpImporterDicom::Accept(albaVME*node)
+bool albaOpImporterDicom::InternalAccept(albaVME*node)
 {
 	if (m_JustOnceImport && node)
 	{
@@ -834,6 +834,9 @@ bool albaOpImporterDicom::LoadDicomFromDir(const char *dicomDirABSPath)
 	}
 		
 	progressHelper.CloseProgressBar();
+
+	if(GetSetting()->GetAutoVMEType() && GetSetting()->GetOutputType() == TYPE_VOLUME)
+		m_StudyList->RemoveSingleImagesFromList();
 	
 	// start handling files
 	if(m_StudyList->GetStudiesNum() == 0)
@@ -1448,6 +1451,23 @@ int albaDicomStudyList::GetSeriesTotalNum()
 	return total;
 }
 
+//----------------------------------------------------------------------------
+void albaDicomStudyList::RemoveSingleImagesFromList()
+{
+	for (int i = 0; i < m_Studies.size();) //no increment counter increment should not be happen if the current element is erased.
+	{
+		m_Studies[i]->RemoveSingleImagesFromSeries();
+
+		if (m_Studies[i]->GetSeriesNum() == 0)
+		{
+			cppDEL(m_Studies[i]);
+			m_Studies.erase(m_Studies.begin() + i);
+		}
+		else
+			i++;
+	}
+}
+
 ///////////////////////////////albaDicomStudy//////////////////////////////////
 //----------------------------------------------------------------------------
 albaDicomStudy::~albaDicomStudy()
@@ -1479,6 +1499,21 @@ void albaDicomStudy::AddSlice(albaDicomSlice *slice)
 	}
 
 	series->AddSlice(slice);
+}
+
+//----------------------------------------------------------------------------
+void albaDicomStudy::RemoveSingleImagesFromSeries()
+{
+	for (int i = 0; i < m_Series.size();) //no increment counter increment should not be happen if the current element is erased.
+	{
+		if (m_Series[i]->GetSlicesNum() == 1)
+		{
+			cppDEL(m_Series[i]);
+			m_Series.erase(m_Series.begin() + i);
+		}
+		else
+			i++;
+	}
 }
 
 ///////////////////////////////albaDicomSeries//////////////////////////////////

@@ -58,7 +58,6 @@ public:
 
 	albaOp* Copy();
 
-	bool Accept(albaVME*node);   
 	void OpRun();
 	void OpDo();
 	void OpUndo();
@@ -77,6 +76,9 @@ public:
 
 	virtual void OpStop(int result);
 protected: 
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
 	/** Create the GUI */
 	void CreateGui();

@@ -52,9 +52,6 @@ public:
   /** clone the object and retrieve a copy*/
 	albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME* vme);
-
 	/** Builds operation's interface. */
 	void OpRun();
 
@@ -67,6 +64,9 @@ public:
 protected:
 	/** Create the gui */
   virtual void CreateGui();
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME* vme);
 
 	/** Allow to choose the target surface for the registration. */
 	void OnChooseTarget();

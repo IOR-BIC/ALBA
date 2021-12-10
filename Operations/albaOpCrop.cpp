@@ -82,7 +82,7 @@ albaOp *albaOpCrop::Copy()
 	return new albaOpCrop(m_Label,m_ShowShadingPlane);
 }
 //----------------------------------------------------------------------------
-bool albaOpCrop::Accept(albaVME* node)
+bool albaOpCrop::InternalAccept(albaVME* node)
 //----------------------------------------------------------------------------
 {
 	albaEvent e(this,VIEW_SELECTED);

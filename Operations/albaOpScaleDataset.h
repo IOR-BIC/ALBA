@@ -52,9 +52,6 @@ public:
 
   albaOp* Copy();
 
-  /** Return true for the acceptable vme type. */
-  bool Accept(albaVME* vme);
-
   /** Builds operation's interface. */
   void OpRun();
   
@@ -70,6 +67,9 @@ public:
   void SetOldAbsMatrix(albaMatrix matrix){m_OldAbsMatrix = matrix;};
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
   /** Create the gui */
   virtual void CreateGui();

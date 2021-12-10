@@ -50,9 +50,6 @@ public:
 
   /** return a copy of itself, this needs to put the operation into the undo stack. */
 	albaOp* Copy();
-	
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME* Node);
 
 	/** Set the input vme for the operation. */
 	void OpRun();
@@ -78,6 +75,10 @@ public:
  	static bool OutputSurfaceAccept(albaVME* Node) {return(Node != NULL && (Node->GetOutput()->IsA("albaVMEOutputSurface")));};
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   albaVME *m_Surface; ///< Surface used to define the VOI in which write the constant density value.
   double   m_ScalarValue; ///< Scalar value that will fill the volume's voxel.
   double   m_CurrentTimestamp; ///< Timestamp of the input VME.

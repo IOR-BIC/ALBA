@@ -129,7 +129,7 @@ albaOp* albaOpSmoothSurfaceCells::Copy()
 	return new albaOpSmoothSurfaceCells(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpSmoothSurfaceCells::Accept(albaVME* vme)
+bool albaOpSmoothSurfaceCells::InternalAccept(albaVME* vme)
 //----------------------------------------------------------------------------
 {
 	return vme != NULL && vme->IsALBAType(albaVMESurface);

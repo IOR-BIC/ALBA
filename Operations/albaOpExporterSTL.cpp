@@ -59,7 +59,7 @@ albaOpExporterSTL::~albaOpExporterSTL()
 {
 }
 //----------------------------------------------------------------------------
-bool albaOpExporterSTL::Accept(albaVME*node)
+bool albaOpExporterSTL::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->GetOutput()->IsALBAType(albaVMEOutputSurface));

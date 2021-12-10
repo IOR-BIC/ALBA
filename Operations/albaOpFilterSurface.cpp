@@ -79,7 +79,7 @@ albaOpFilterSurface::~albaOpFilterSurface()
 	vtkDEL(m_OriginalPolydata);
 }
 //----------------------------------------------------------------------------
-bool albaOpFilterSurface::Accept(albaVME*node)
+bool albaOpFilterSurface::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVMESurface));

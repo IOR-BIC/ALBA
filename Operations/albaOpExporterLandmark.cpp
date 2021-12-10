@@ -51,7 +51,7 @@ albaOpExporterLandmark::~albaOpExporterLandmark()
   m_LC_names.clear();
 }
 //----------------------------------------------------------------------------
-bool albaOpExporterLandmark::Accept(albaVME*node)   
+bool albaOpExporterLandmark::InternalAccept(albaVME*node)   
 //----------------------------------------------------------------------------
 { 
   m_LC_vector.clear();

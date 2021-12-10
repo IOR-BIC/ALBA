@@ -42,9 +42,6 @@ public:
 	~albaOpExporterLandmark(); 
 	albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME*node);
-
 	/** Build the interface of the operation, i.e the dialog that let choose the name of the output file. */
 	void OpRun();
 
@@ -61,6 +58,10 @@ public:
   void SetDirName(const char *file_name) {m_FileDir = file_name;};
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
 	wxString	m_File;
 	wxString	m_FileDir;
 

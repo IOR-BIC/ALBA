@@ -79,7 +79,7 @@ albaOpEqualizeHistogram::~albaOpEqualizeHistogram()
   albaDEL(m_VolumeOutput);
 }
 //----------------------------------------------------------------------------
-bool albaOpEqualizeHistogram::Accept(albaVME*node)
+bool albaOpEqualizeHistogram::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return ( node != NULL && node->IsA("albaVMEVolumeGray") );

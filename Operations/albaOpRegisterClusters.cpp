@@ -111,7 +111,7 @@ albaOp* albaOpRegisterClusters::Copy()
 
 //----------------------------------------------------------------------------
 //Accept source landmark cloud (may not be time-variant).
-bool albaOpRegisterClusters::Accept(albaVME* node)
+bool albaOpRegisterClusters::InternalAccept(albaVME* node)
 {
 	if (!LMCloudAccept(node))
 		return false;

@@ -52,9 +52,6 @@ public:
 
   albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME *node);
-
 	/** Set the filename for the .stl to import */
   void SetFileName(const char *file_name);
 
@@ -77,6 +74,10 @@ public:
 	virtual char ** GetIcon();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   /** Check if the STL file is binary */
   bool IsFileBinary(const char *name_file);
 

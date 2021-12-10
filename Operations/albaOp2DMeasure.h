@@ -62,9 +62,6 @@ public:
 
   /** Return a copy of itself, this needs to put the operation into the undo stack. */
 	albaOp* Copy();
-	
-	/** Return true for the acceptable vme type. */
-  bool Accept(albaVME*node);
 
 	/** Set the input vme for the operation. */
 	virtual void OpRun();
@@ -73,6 +70,10 @@ public:
 	virtual char ** GetIcon();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);
 

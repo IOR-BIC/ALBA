@@ -58,7 +58,6 @@ public:
 
   albaOp* Copy();
 
-  /*virtual*/ bool Accept(albaVME* node);
   /*virtual*/ void OpRun();	
 	
   /** Makes the undo for the operation. */
@@ -69,6 +68,10 @@ public:
   /*virtual*/ void CreateGui(); 
 
  protected:
+
+	 /** Return true for the acceptable vme type. */
+	 bool InternalAccept(albaVME*node);
+
   ///*virtual*/ void OpStop(int result);	
 
   void BuildVolumeUnion();

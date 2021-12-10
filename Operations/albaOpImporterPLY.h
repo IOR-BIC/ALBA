@@ -51,9 +51,6 @@ public:
 
   albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME *node);
-
 	/** Set the filename for the .stl to import */
   void SetFileName(const char *file_name);
 
@@ -71,10 +68,12 @@ public:
 
   /** Used to retrieve imported data. It is useful when the operation is executed from code.*/
   void GetImportedPLY(std::vector<albaVMESurface*> &importedPLY);
-
-	
+		
 protected:
 
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+	
 	std::vector<albaVMESurface*> m_ImportedPLYs;
   std::vector<albaString>	    m_Files;
 };

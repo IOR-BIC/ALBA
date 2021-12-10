@@ -44,13 +44,14 @@ public:
   /** Copy the operation. */
   albaOp* Copy();
 
-  /** Return true for the acceptable vme type. */
-  bool Accept(albaVME*node);
-
   /** Builds the output surface. */
   void OpRun();
 
 protected: 
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   albaVMESurface *m_Surface;
 };
 #endif

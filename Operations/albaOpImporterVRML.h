@@ -49,7 +49,7 @@ public:
   albaOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME* node) {return true;};
+
 
 	/** Builds operation's interface. */
   void OpRun();
@@ -61,6 +61,10 @@ public:
   void ImportVRML();
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME* node) { return true; };
+
 	albaString m_File;
 	albaString m_FileDir;
   

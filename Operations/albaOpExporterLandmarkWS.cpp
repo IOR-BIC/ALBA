@@ -54,7 +54,7 @@ albaOpExporterLandmarkWS::~albaOpExporterLandmarkWS()
 {
 }
 //----------------------------------------------------------------------------
-bool albaOpExporterLandmarkWS::Accept(albaVME*node)
+bool albaOpExporterLandmarkWS::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsA("albaVMELandmarkCloud"));

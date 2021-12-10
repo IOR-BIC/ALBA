@@ -50,8 +50,7 @@ public:
   /** Return a copy of itself, this needs to put the operation into the undo stack. */
   /*virtual*/  albaOp* Copy();
 
-  /** Return true for the acceptable vme type. */
-  /*virtual*/ bool Accept(albaVME*node);
+
 
   /** Builds operation's interface. */
   /*virtual*/ void OpRun();
@@ -60,6 +59,10 @@ public:
   /*virtual*/ void OpDo();
 
 protected: 
+
+  /** Return true for the acceptable vme type. */
+  /*virtual*/ bool InternalAccept(albaVME*node);
+
   albaVMELabeledVolume *m_LabeledVolume;
 };
 #endif

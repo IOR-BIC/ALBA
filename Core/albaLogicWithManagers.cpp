@@ -2118,13 +2118,13 @@ void albaLogicWithManagers::ShowSplashScreen()
 	ShowSplashScreen(splashImage);
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage, wxString message)
+void albaLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage, wxString message, int x, int y, wxColour color)
 {
 	m_SplashScreen = new albaGUISplashScreen(splashImage, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 2000, NULL);
 
 	if (message.IsEmpty()) message = m_BuildNum;
 
-	m_SplashScreen->SetText(message, 5, 5);
+	m_SplashScreen->SetText(message, x, y, color);
 	wxMilliSleep(1500);
 
 	albaYield();

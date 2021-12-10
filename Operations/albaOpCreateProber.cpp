@@ -59,7 +59,7 @@ albaOp* albaOpCreateProber::Copy()
 	return new albaOpCreateProber(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpCreateProber::Accept(albaVME*node)
+bool albaOpCreateProber::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node != NULL);

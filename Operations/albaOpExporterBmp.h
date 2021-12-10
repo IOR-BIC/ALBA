@@ -41,9 +41,6 @@ public:
  ~albaOpExporterBmp(); 
   albaOp* Copy();
 
-	/** Return true for the acceptable vme type. */
-  bool Accept(albaVME*node);
-
 	/** Builds operation's interface. */
   void OpRun();
 
@@ -68,6 +65,10 @@ public:
   bool WriteImageDataAsMonocromeBitmap( vtkImageData *img, albaString filename);
 
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
   wxString		m_ProposedDirectory;///<Default directory where to save file .bmp
   albaString		m_FileName;///<Name of the file/files where the exporter will save bmp dat
   albaString m_DirName;

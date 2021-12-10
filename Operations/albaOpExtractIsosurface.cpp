@@ -187,7 +187,7 @@ albaOp* albaOpExtractIsosurface::Copy()
   return new albaOpExtractIsosurface(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpExtractIsosurface::Accept(albaVME* vme)
+bool albaOpExtractIsosurface::InternalAccept(albaVME* vme)
 {  
   bool is3DData = false;
   double bounds[6];

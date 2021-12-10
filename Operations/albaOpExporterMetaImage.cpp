@@ -70,7 +70,7 @@ albaOpExporterMetaImage::~albaOpExporterMetaImage()
 {
 }
 //----------------------------------------------------------------------------
-bool albaOpExporterMetaImage::Accept(albaVME *node)
+bool albaOpExporterMetaImage::InternalAccept(albaVME *node)
 { 
   return ((node->IsALBAType(albaVMEVolumeGray) && vtkImageData::SafeDownCast(node->GetOutput()->GetVTKData())) || node->IsALBAType(albaVMEImage));
 }

@@ -76,14 +76,14 @@ public:
 
   /** Return a copy of the operation.*/
   albaOp* Copy();
-
-  /** This operation accept everything as input.*/
-  bool Accept(albaVME*node) {return true;};
-
+	
   /** Create the user interface and initialize variables.*/
   void OpRun();
 
 protected: 
+
+	/** This operation accept everything as input.*/
+	bool InternalAccept(albaVME*node) {return true;};
 
   /** Log errors into the log area according to the error number reported.*/
   void ErrorLog(int error_num, const char *node_name, const char *description = NULL);

@@ -88,9 +88,6 @@ public:
     return cp;
   }
 
-	/** Return true for the acceptable vme type. */
-	bool Accept(albaVME* node) {return true;};
-
   //----------------------------------------------------------------------------
   /** Builds operation's interface. */
   void OpRun()   
@@ -216,8 +213,11 @@ public:
     m_Vme = NULL;
   }
   
-
 protected:
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) {	return true; };
+
   wxString m_FileDir;
 	wxString m_DictDir;
 	wxString m_File;

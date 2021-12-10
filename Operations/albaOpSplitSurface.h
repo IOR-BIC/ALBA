@@ -62,8 +62,7 @@ public:
 
   albaOp* Copy();
 
-  bool Accept(albaVME*node);   
-  void OpRun();
+	void OpRun();
   void OpDo();
   void OpUndo();
 
@@ -100,6 +99,10 @@ public:
 	vtkPolyData *GetClippedPolyData(){return m_ClippedPolyData;};
 
 protected: 
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
+
 	virtual void OpStop(int result);
 	
   /** Show/hide the gizmo representing the clipping implicit plane. */

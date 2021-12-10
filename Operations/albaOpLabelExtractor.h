@@ -56,7 +56,6 @@ public:
 	virtual void OnEvent(albaEventBase *alba_event);
   albaOp* Copy();
 
-  bool Accept(albaVME *vme);
   void OpRun();
 
   /** If labels tags are present retrieve them. */
@@ -75,6 +74,9 @@ public:
 	void ExtractLabel();
 
 protected: 
+
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node);
 
   /** Get the dataset from linked node. */
   void UpdateDataLabel();

@@ -71,7 +71,7 @@ albaOpSmoothSurface::~albaOpSmoothSurface()
 	vtkDEL(m_OriginalPolydata);
 }
 //----------------------------------------------------------------------------
-bool albaOpSmoothSurface::Accept(albaVME*node)
+bool albaOpSmoothSurface::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsALBAType(albaVMESurface));
