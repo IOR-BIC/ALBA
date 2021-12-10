@@ -63,6 +63,7 @@ albaViewImage::albaViewImage(wxString label, int camera_position, bool show_axes
 //----------------------------------------------------------------------------
 {
   m_CurrentImage = NULL;
+	m_CanSpin = false;
 }
 //----------------------------------------------------------------------------
 albaViewImage::~albaViewImage()
@@ -80,6 +81,7 @@ albaView *albaViewImage::Copy(albaObserver *Listener, bool lightCopyEnabled)
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
   v->m_LightCopyEnabled = lightCopyEnabled;
+	v->m_CanSpin = m_CanSpin;
   v->Create();
   return v;
 }
