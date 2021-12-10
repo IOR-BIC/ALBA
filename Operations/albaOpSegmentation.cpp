@@ -167,9 +167,6 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_LutSlider = NULL;
   m_ColorLUT  = NULL;
 
-  m_SegmentationColorLUT = NULL;
-  m_ManualColorLUT = NULL;
-
   m_OldVolumeParent = NULL;
   m_OutputSurface      =NULL;
 
@@ -202,8 +199,7 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
 	 
   m_EditPER = NULL;
  
-  m_IsDrawing = false;
-  //////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
   //Automatic initializations
 	m_AutomaticMouseThreshold = m_Threshold[0] = m_Threshold [1]= 0.0;
 	m_CurrentRange = 0;
@@ -222,7 +218,7 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   //Refinement initializations
   m_MajorityThreshold = 9;
 
-  m_RealDrawnImage = NULL;
+  m_SliceBackup = NULL;
   m_LastMouseMovePointID = 0;
 
   m_OldAutomaticThreshold = MAXINT;
@@ -403,7 +399,7 @@ void albaOpSegmentation::InitSegmentationVolume()
 	glo_CurrSeg = m_SegmentationVolume;
 
 	m_SegmentationVolume->SetName(wxString::Format("Segmentation Output (%s)", m_Volume->GetName()).c_str());
-	lutPreset(4, m_SegmentationVolume->GetMaterial()->m_ColorLut);
+	//lutPreset(4, m_SegmentationVolume->GetMaterial()->m_ColorLut);
 	/*
 	m_SegmentationVolume->GetMaterial()->m_ColorLut->SetTableRange(0, 255);
 	m_SegmentationVolume->GetMaterial()->UpdateFromTables();
@@ -411,9 +407,11 @@ void albaOpSegmentation::InitSegmentationVolume()
 	vtkLookupTable *lut = m_SegmentationVolume->GetMaterial()->m_ColorLut;
 	if (lut)
 	{
-		lut->SetNumberOfTableValues(2);
+		lut->SetNumberOfTableValues(4);
 		lut->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
-		lut->SetTableValue(1, 0.0, 0.0, 0.9, 1.0);
+		lut->SetTableValue(1, 0.1, 0.0, 0.2, 1.0);
+		lut->SetTableValue(2, 0.2, 0.2, 0.7, 1.0);
+		lut->SetTableValue(3, 0.0, 0.0, 0.95, 1.0);
 		lut->SetTableRange(0, 255);
 		m_SegmentationVolume->GetMaterial()->UpdateFromTables();
 	}
@@ -1355,7 +1353,7 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 					else
 						m_BrushSize--;
 
-					ApplyRealDrawnImage();
+					RestoreSliceBackup();
 					m_Helper.DrawBrush((double *)e->GetPointer(), m_SlicePlane, m_BrushSize, m_BrushShape, m_BrushFillErase);
 				}
 				else //FILLER
@@ -1385,7 +1383,7 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 					m_BrushFillErase = e->GetBool();
 					if (m_ManualSegmentationTools == DRAW_EDIT) 
 					{
-						ApplyRealDrawnImage();
+						RestoreSliceBackup();
 						if (e->GetArg())
 							m_Helper.DrawBrush((double *)e->GetPointer(), m_SlicePlane, m_BrushSize, m_BrushShape, m_BrushFillErase);
 					}
@@ -1394,10 +1392,10 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 		}
 		break;
 		case MOUSE_UP:
-			if (m_IsDrawing)
+			if (m_Helper.IsDrawing())
 			{
-				CreateRealDrawnImage();
-				m_IsDrawing = false;
+				m_Helper.EndDrawing();
+				CreateSliceBackup();
 			}
 			break;
 		case ID_BUTTON_EDIT:
@@ -1421,6 +1419,7 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 			SlicePrev();
 			break;
 		case ID_SLICE_SLIDER:
+			SetSlicingIndexes(m_SlicePlane, m_GUISliceIndex);
 			OnUpdateSlice();
 			break;
 		case ID_SLICE_PLANE:
@@ -1571,7 +1570,7 @@ void albaOpSegmentation::OnEditStep()
 
 	UpdateSlice();
 	m_View->CameraUpdate();
-	CreateRealDrawnImage();
+	CreateSliceBackup();
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OnPreviousStep()
@@ -1654,7 +1653,7 @@ void albaOpSegmentation::OnSelectSlicePlane()
 {
 	if (m_CurrentPhase == EDIT_SEGMENTATION)
 	{
-		ApplyRealDrawnImage();
+		RestoreSliceBackup();
 		m_Helper.ApplySliceChangesToVolume(m_OldSlicePlane, m_OldSliceIndex);
 	}
 	UpdateSliderValidator();
@@ -1666,6 +1665,7 @@ void albaOpSegmentation::OnSelectSlicePlane()
 
 	pipeOrtho = (albaPipeVolumeOrthoSlice *)m_View->GetNodePipe(m_SegmentationVolume);
 	pipeOrtho->SetSliceOpacity(0.4);
+	pipeOrtho->SetLutRange(0, 255);
 	m_SegmentationSlice = (vtkImageData*)(pipeOrtho->GetSlicer(pipeOrtho->GetSliceDirection())->GetOutput());
 
 	m_Helper.SetSlices(m_VolumeSlice, m_SegmentationSlice);
@@ -1677,7 +1677,7 @@ void albaOpSegmentation::OnSelectSlicePlane()
 	else if (m_CurrentPhase == EDIT_SEGMENTATION)
 	{
 		UpdateSlice();
-		CreateRealDrawnImage();
+		CreateSliceBackup();
 		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
 	}
 
@@ -1723,7 +1723,7 @@ void albaOpSegmentation::OnUpdateSlice()
 {
 	if (m_CurrentPhase == EDIT_SEGMENTATION)
 	{
-		ApplyRealDrawnImage();
+		RestoreSliceBackup();
 		m_Helper.ApplySliceChangesToVolume(m_OldSlicePlane, m_OldSliceIndex);
 	}
 	
@@ -1743,7 +1743,7 @@ void albaOpSegmentation::OnUpdateSlice()
 	}
 	else // EDIT_SEGMENTATION
 	{
-		CreateRealDrawnImage();
+		CreateSliceBackup();
 		m_View->CameraUpdate();
 	}
 }
@@ -1960,8 +1960,8 @@ void albaOpSegmentation::OnEditSegmentationEvent(albaEvent *e)
 			EnableSizerContent(m_FillEditingSizer, true);
 			EnableSizerContent(m_BrushEditingSizer, false);
 			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
-			ApplyRealDrawnImage();
-			OnUpdateSlice();
+			RestoreSliceBackup();
+			//OnUpdateSlice();
 		}
 		break;
 		case ID_MANUAL_TOOLS_3D_CONNECTIVITY:
@@ -1975,14 +1975,14 @@ void albaOpSegmentation::OnEditSegmentationEvent(albaEvent *e)
 			EnableSizerContent(m_FillEditingSizer, false);
 			EnableSizerContent(m_BrushEditingSizer, false);
 			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
-			ApplyRealDrawnImage();
+			RestoreSliceBackup();
 			OnUpdateSlice();
 		}
 		case ID_MANUAL_BRUSH_SHAPE:
 		case ID_MANUAL_BRUSH_SIZE:
 		{
 			m_BrushShape = m_ManualBrushShapeRadioBox->GetSelection();
-			ApplyRealDrawnImage();
+			RestoreSliceBackup();
 			m_View->CameraUpdate();
 		}
 		break;
@@ -2029,8 +2029,8 @@ void albaOpSegmentation::OnUndoRedo(bool undo)
 
 		to.push_back(CreateUndoRedoState());
 
-		m_RealDrawnImage->DeepCopy(from[fromIndex].m_Scalars);
-		ApplyRealDrawnImage();
+		m_SliceBackup->DeepCopy(from[fromIndex].m_Scalars);
+		RestoreSliceBackup();
 
 		vtkDEL(from[fromIndex].m_Scalars);
 		from.pop_back();
@@ -2153,9 +2153,9 @@ void albaOpSegmentation::OnRefinementSegmentationEvent(albaEvent *e)
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OnEditStepExit()
 {
-	ApplyRealDrawnImage();
+	RestoreSliceBackup();
 	m_Helper.ApplySliceChangesToVolume(m_SlicePlane, m_SliceIndex);
-	vtkDEL(m_RealDrawnImage);
+	vtkDEL(m_SliceBackup);
 
 	ClearManualUndoList();
 	ClearManualRedoList();
@@ -2197,7 +2197,7 @@ void albaOpSegmentation::Fill(albaEvent *e)
 	ClearManualRedoList();
 
 	m_View->CameraUpdate();
-	CreateRealDrawnImage();
+	CreateSliceBackup();
 }
 
 //----------------------------------------------------------------------------
@@ -2210,7 +2210,7 @@ void albaOpSegmentation::CopyFromLastSlice()
 	ClearManualRedoList();
 
 	m_View->CameraUpdate();
-	CreateRealDrawnImage();
+	CreateSliceBackup();
 }
 
 //----------------------------------------------------------------------------
@@ -2218,7 +2218,7 @@ void albaOpSegmentation::StartDraw(albaEvent *e)
 {
 	AddUndoStep();
 	
-	m_IsDrawing = true;
+	m_Helper.StartDrawing();
 
 	//On edit a new branch of redo-list starts, i need to clear the redo stack
 	ClearManualRedoList();
@@ -2263,32 +2263,32 @@ UndoRedoState albaOpSegmentation::CreateVolumeUndoRedoState()
 UndoRedoState albaOpSegmentation::CreateUndoRedoState()
 {
 	//Picking starts here I need to save an undo stack
-	ApplyRealDrawnImage();
+	RestoreSliceBackup();
 
 	//Create State 
 	UndoRedoState urs;
 	urs.m_Scalars = vtkUnsignedCharArray::New();
-	urs.m_Scalars->DeepCopy(m_RealDrawnImage);
+	urs.m_Scalars->DeepCopy(m_SliceBackup);
 	urs.m_Plane = m_SlicePlane;
 	urs.m_Slice = m_SliceIndex;
 
 	return urs;
 }
 //----------------------------------------------------------------------------
-void albaOpSegmentation::CreateRealDrawnImage()
+void albaOpSegmentation::CreateSliceBackup()
 {
-	if (!m_RealDrawnImage)
-		vtkNEW(m_RealDrawnImage);
+	if (!m_SliceBackup)
+		vtkNEW(m_SliceBackup);
 	
-	m_RealDrawnImage->DeepCopy(m_SegmentationSlice->GetPointData()->GetScalars());
+	m_SliceBackup->DeepCopy(m_SegmentationSlice->GetPointData()->GetScalars());
 }
 //----------------------------------------------------------------------------
-void albaOpSegmentation::ApplyRealDrawnImage()
+void albaOpSegmentation::RestoreSliceBackup()
 {
-	if (m_RealDrawnImage)
+	if (m_SliceBackup)
 	{
 		vtkDataArray* scalars = m_SegmentationSlice->GetPointData()->GetScalars();
-		scalars->DeepCopy(m_RealDrawnImage);
+		scalars->DeepCopy(m_SliceBackup);
 		scalars->Modified();
 	}
 }
@@ -2472,7 +2472,7 @@ void albaOpSegmentation::Conntectivity3D(albaEvent * e)
 	ClearManualRedoList();
 
 	m_View->CameraUpdate();
-	CreateRealDrawnImage();
+	CreateSliceBackup();
 }
 
 //----------------------------------------------------------------------------
