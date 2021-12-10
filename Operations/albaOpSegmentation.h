@@ -321,8 +321,6 @@ protected:
   albaGUILutHistogramSwatch	*m_LutWidget; //<LUT widget
   albaGUILutSlider *m_LutSlider;         //<LUT Slider
   vtkLookupTable *m_ColorLUT;           //<Lookup table for LUT widget
-  vtkLookupTable *m_SegmentationColorLUT; //<Lookup table for segmented volume
-  vtkLookupTable *m_ManualColorLUT;     //Lookup table for segmented volume in manual step.
   wxSlider *m_SliceSlider;              //<Slice slider - GUI
   wxTextCtrl *m_SliceText;              //<Slice text box - GUI
 	wxNotebook *m_SegmentationOperationsNotebook;
@@ -377,7 +375,6 @@ protected:
   wxTextCtrl *m_ManualRefinementRegionSizeText; //<Refinement size text - GUI
   std::vector<UndoRedoState> m_UndoList;  //< Undo stack
   std::vector<UndoRedoState> m_RedoList;  // Redo stack
-  bool m_IsDrawing;                        //<Determine if picking has started
   albaInteractorPERBrushFeedback *m_EditPER;   //<Dynamic event router
   vtkUnsignedCharArray *m_SliceBackup;       //<Real drawn image used in brush preview
   int m_LastMouseMovePointID;                   //<Last point id in mouse move event

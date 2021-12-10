@@ -27,8 +27,10 @@ class albaVMEVolumeGray;
 class vtkImageData;
 class vtkUnsignedCharArray;
 
-#define EMPTY 0
-#define FULL 255
+#define EMPTY_VALUE 0
+#define ERASER_VALUE 85
+#define PENCIL_VALUE 170
+#define FULL_VALUE 255
 
 struct AutomaticInfoRange
 {
@@ -81,10 +83,16 @@ public:
 
 	void DrawBrush(double *pos, int slicePlane, int brushSize, int brushShape, bool erase);
 
+	
 	void Fill(double *pos, int slicePlane, double thresholdPerc,  bool erase);
 
 	void Connectivity3d(double * pos, int slicePlane, int currentSlice);
 
+	void EndDrawing()	{ m_IsDrawing = false; }
+
+	void StartDrawing() { m_IsDrawing = true; }
+
+	int IsDrawing() { return m_IsDrawing;}
 protected:
 
 	void InternalTheshold(int dataType, double *threshold, int n, void * inputPointer, unsigned char * outputPointer, int offset = 0);
@@ -95,6 +103,7 @@ protected:
 	template<typename DataType>
 	void InternalFill(slicePoint startPoint, double minValue, double maxValue, int fillValue, DataType *inputScalars, unsigned char *outputScalars);
 
+	void DrawBrushPointer(int x,int y, int *sliceDim, int slicePlane, int brushSize, int brushShape, bool erase);
 
 	void GetSlicePoint(int slicePlane, double *pos, int *sclicePoint);
 
@@ -102,6 +111,8 @@ protected:
 	albaVMEVolumeGray *m_Segmentation;
 	vtkImageData     *m_SegmetationSlice;
 	vtkImageData     *m_VolumeSlice;
+	int m_LastPoint[2];
+	int m_IsDrawing;
 public:
 };
 

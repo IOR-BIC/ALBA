@@ -167,9 +167,6 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_LutSlider = NULL;
   m_ColorLUT  = NULL;
 
-  m_SegmentationColorLUT = NULL;
-  m_ManualColorLUT = NULL;
-
   m_OldVolumeParent = NULL;
   m_OutputSurface      =NULL;
 
@@ -202,8 +199,7 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
 	 
   m_EditPER = NULL;
  
-  m_IsDrawing = false;
-  //////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
   //Automatic initializations
 	m_AutomaticMouseThreshold = m_Threshold[0] = m_Threshold [1]= 0.0;
 	m_CurrentRange = 0;
@@ -403,7 +399,7 @@ void albaOpSegmentation::InitSegmentationVolume()
 	glo_CurrSeg = m_SegmentationVolume;
 
 	m_SegmentationVolume->SetName(wxString::Format("Segmentation Output (%s)", m_Volume->GetName()).c_str());
-	lutPreset(4, m_SegmentationVolume->GetMaterial()->m_ColorLut);
+	//lutPreset(4, m_SegmentationVolume->GetMaterial()->m_ColorLut);
 	/*
 	m_SegmentationVolume->GetMaterial()->m_ColorLut->SetTableRange(0, 255);
 	m_SegmentationVolume->GetMaterial()->UpdateFromTables();
@@ -411,9 +407,11 @@ void albaOpSegmentation::InitSegmentationVolume()
 	vtkLookupTable *lut = m_SegmentationVolume->GetMaterial()->m_ColorLut;
 	if (lut)
 	{
-		lut->SetNumberOfTableValues(2);
+		lut->SetNumberOfTableValues(4);
 		lut->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
-		lut->SetTableValue(1, 0.0, 0.0, 0.9, 1.0);
+		lut->SetTableValue(1, 0.1, 0.0, 0.2, 1.0);
+		lut->SetTableValue(2, 0.2, 0.2, 0.7, 1.0);
+		lut->SetTableValue(3, 0.0, 0.0, 0.95, 1.0);
 		lut->SetTableRange(0, 255);
 		m_SegmentationVolume->GetMaterial()->UpdateFromTables();
 	}
@@ -1394,10 +1392,10 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 		}
 		break;
 		case MOUSE_UP:
-			if (m_IsDrawing)
+			if (m_Helper.IsDrawing())
 			{
+				m_Helper.EndDrawing();
 				CreateSliceBackup();
-				m_IsDrawing = false;
 			}
 			break;
 		case ID_BUTTON_EDIT:
@@ -1667,6 +1665,7 @@ void albaOpSegmentation::OnSelectSlicePlane()
 
 	pipeOrtho = (albaPipeVolumeOrthoSlice *)m_View->GetNodePipe(m_SegmentationVolume);
 	pipeOrtho->SetSliceOpacity(0.4);
+	pipeOrtho->SetLutRange(0, 255);
 	m_SegmentationSlice = (vtkImageData*)(pipeOrtho->GetSlicer(pipeOrtho->GetSliceDirection())->GetOutput());
 
 	m_Helper.SetSlices(m_VolumeSlice, m_SegmentationSlice);
@@ -1962,7 +1961,7 @@ void albaOpSegmentation::OnEditSegmentationEvent(albaEvent *e)
 			EnableSizerContent(m_BrushEditingSizer, false);
 			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
 			RestoreSliceBackup();
-			OnUpdateSlice();
+			//OnUpdateSlice();
 		}
 		break;
 		case ID_MANUAL_TOOLS_3D_CONNECTIVITY:
@@ -2219,7 +2218,7 @@ void albaOpSegmentation::StartDraw(albaEvent *e)
 {
 	AddUndoStep();
 	
-	m_IsDrawing = true;
+	m_Helper.StartDrawing();
 
 	//On edit a new branch of redo-list starts, i need to clear the redo stack
 	ClearManualRedoList();

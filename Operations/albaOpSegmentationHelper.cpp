@@ -33,6 +33,7 @@ albaOpSegmentationHelper::albaOpSegmentationHelper()
 {
 	m_Segmentation = m_Volume = NULL;
 	m_SegmetationSlice = m_SegmetationSlice = NULL;
+	m_IsDrawing = false;
 }
 
 //----------------------------------------------------------------------------
@@ -174,9 +175,9 @@ void albaOpSegmentationHelper::InternalThreshold(double *threshold, int n, DataT
 	for (int i = offset; i < offset+n; i++)
 	{
 		if (inputScalars[i] >= threshold[0] && inputScalars[i] <= threshold[1])
-			outputScalars[i] = FULL;
+			outputScalars[i] = FULL_VALUE;
 		else
-			outputScalars[i] = EMPTY;
+			outputScalars[i] = EMPTY_VALUE;
 	}
 }
 
@@ -290,22 +291,121 @@ void albaOpSegmentationHelper::CopyVolumeDataToSlice(int slicePlane, int sliceIn
 //----------------------------------------------------------------------------
 void albaOpSegmentationHelper::DrawBrush(double *pos, int slicePlane, int brushSize, int brushShape, bool erase)
 {
-	int fillValue, sliceDim[3], point[2];
+	int sliceDim[3], point[2];
+	m_SegmetationSlice->GetDimensions(sliceDim);
+	GetSlicePoint(slicePlane, pos, point);
+	if (m_IsDrawing)
+	{
+		//create a continuous line using Bresenham's algorithm 
+		int x1 = point[0], y1 = point[1], x2 = m_LastPoint[0], y2 = m_LastPoint[1];
+		int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
+		dx = x2 - x1;
+		dy = y2 - y1;
+		dx1 = fabs(dx);
+		dy1 = fabs(dy);
+		px = 2 * dy1 - dx1;
+		py = 2 * dx1 - dy1;
+		if (dy1 <= dx1)
+		{
+			if (dx >= 0)
+			{
+				x = x1;
+				y = y1;
+				xe = x2;
+			}
+			else
+			{
+				x = x2;
+				y = y2;
+				xe = x1;
+			}
+			DrawBrushPointer(x, y, sliceDim, slicePlane, brushSize, brushShape, erase);
+			for (i = 0; x < xe; i++)
+			{
+				x = x + 1;
+				if (px < 0)
+				{
+					px = px + 2 * dy1;
+				}
+				else
+				{
+					if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0))
+					{
+						y = y + 1;
+					}
+					else
+					{
+						y = y - 1;
+					}
+					px = px + 2 * (dy1 - dx1);
+				}
+				DrawBrushPointer(x, y, sliceDim, slicePlane, brushSize, brushShape, erase);
+			}
+		}
+		else
+		{
+			if (dy >= 0)
+			{
+				x = x1;
+				y = y1;
+				ye = y2;
+			}
+			else
+			{
+				x = x2;
+				y = y2;
+				ye = y1;
+			}
+			DrawBrushPointer(x, y, sliceDim, slicePlane, brushSize, brushShape, erase);
+			for (i = 0; y < ye; i++)
+			{
+				y = y + 1;
+				if (py <= 0)
+				{
+					py = py + 2 * dx1;
+				}
+				else
+				{
+					if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0))
+					{
+						x = x + 1;
+					}
+					else
+					{
+						x = x - 1;
+					}
+					py = py + 2 * (dx1 - dy1);
+				}
+				DrawBrushPointer(x, y, sliceDim, slicePlane, brushSize, brushShape, erase);
+			}
+		}
+	}
+	else
+	{
+		DrawBrushPointer(point[0], point[1], sliceDim, slicePlane, brushSize, brushShape, erase);
+	}
+	m_LastPoint[0] = point[0];
+	m_LastPoint[1] = point[1];
+}
+
+//----------------------------------------------------------------------------
+void albaOpSegmentationHelper::DrawBrushPointer(int x, int y, int *sliceDim, int slicePlane, int brushSize, int brushShape, bool erase)
+{
+	int fillValue;
 	double  distX, distY;
 
 	vtkDataArray *outputScalars = m_SegmetationSlice->GetPointData()->GetScalars();
 	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
 		
 	brushSize /= 2;
-	fillValue = erase ? EMPTY : FULL;
+	fillValue = erase ? EMPTY_VALUE : FULL_VALUE; //ERASER_VALUE : PENCIL_VALUE;
 
-	m_SegmetationSlice->GetDimensions(sliceDim);
-	GetSlicePoint(slicePlane, pos, point);
 
-	int startX = MAX(0,point[0] - brushSize);
-	int endX   = MIN(sliceDim[0]-1, point[0] + brushSize);
-	int startY = MAX(0, point[1] - brushSize);
-	int endY   = MIN(sliceDim[1] - 1,point[1] + brushSize);
+	int startX = MAX(0, x - brushSize);
+	int endX   = MIN(sliceDim[0]-1,x + brushSize);
+	int startY = MAX(0, y - brushSize);
+	int endY   = MIN(sliceDim[1] - 1,y + brushSize);
+	int brushSizeToTheSecond = brushSize * brushSize;
 
 	if (brushShape == SQUARE_BRUSH_SHAPE)
 	{
@@ -317,11 +417,11 @@ void albaOpSegmentationHelper::DrawBrush(double *pos, int slicePlane, int brushS
 	{
 		for (int i = startY; i <= endY; i++)
 		{
-			distY = i - point[1];
+			distY = i - y;
 			for (int j = startX; j <= endX; j++)
 			{
-				distX = j - point[0];
-				if (sqrt((distX*distX) + (distY*distY)) <= brushSize)
+				distX = j -x;
+				if ((distX*distX) + (distY*distY) <= brushSizeToTheSecond)
 					outputPointer[i*sliceDim[0] + j] = fillValue;
 			}
 		}
@@ -402,13 +502,13 @@ void albaOpSegmentationHelper::Connectivity3d(double * pos, int slicePlane, int 
 	//click outside segmentation do not create output scalars
 	if (inputPointer[firstPointId])
 	{
-		background = EMPTY;
-		fillValue = FULL;
+		background = EMPTY_VALUE;
+		fillValue = FULL_VALUE;
 	}
 	else
 	{
-		background = FULL;
-		fillValue = EMPTY;
+		background = FULL_VALUE;
+		fillValue = EMPTY_VALUE;
 	}
 		
 	
@@ -466,7 +566,7 @@ void albaOpSegmentationHelper::Fill(double *pos, int slicePlane, double threshol
 	m_VolumeSlice->Update();
 
 	int fillValue, point[2];
-	fillValue = erase ? EMPTY : FULL;
+	fillValue = erase ? EMPTY_VALUE : FULL_VALUE;
 	vtkDataSet * vol = m_Volume->GetOutput()->GetVTKData();
 
 	double *scalarRange = vol->GetScalarRange();
