@@ -218,6 +218,10 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   //Refinement initializations
   m_MajorityThreshold = 9;
 
+	m_BrushFillErase = 0;
+	m_AutofillOnRelease = FALSE;
+
+
   m_SliceBackup = NULL;
   m_LastMouseMovePointID = 0;
 
@@ -952,9 +956,20 @@ void albaOpSegmentation::CreateEditSegmentationGui()
 	brushSizeSizer->Add(brushSizeText, 0);
 	brushSizeSizer->Add(m_BrushSizeSlider, 0);
 
+	id = currentGui->GetWidgetId(ID_MANUAL_AUTOFILL_ON_RELASE);
+	wxCheckBox *check = new wxCheckBox(currentGui, id, "", wxDefaultPosition, wxSize(40, 18));
+	check->SetValidator(albaGUIValidator(this, id, check, &m_AutofillOnRelease));
+
+	wxBoxSizer *autofillSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxStaticText *lab = new wxStaticText(currentGui, id, "Autofill on release ");
+
+	autofillSizer->Add(lab, 0, wxRIGHT);
+	autofillSizer->Add(check, 0, wxRIGHT);
+
 	m_BrushEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Brush Options");
 	m_BrushEditingSizer->Add(brushShapesSizer, 0, wxALL, 1);
 	m_BrushEditingSizer->Add(brushSizeSizer, 0, wxALL, 1);
+	m_BrushEditingSizer->Add(autofillSizer, 0, wxALL, 1);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Fill Editing options
@@ -1380,7 +1395,6 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 			}
 			else if (e->GetSender() == m_EditPER)
 			{
-					m_BrushFillErase = e->GetBool();
 					if (m_ManualSegmentationTools == DRAW_EDIT) 
 					{
 						RestoreSliceBackup();
@@ -1394,7 +1408,8 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 		case MOUSE_UP:
 			if (m_Helper.IsDrawing())
 			{
-				m_Helper.EndDrawing();
+				m_Helper.EndDrawing(m_AutofillOnRelease);
+				m_View->CameraUpdate();
 				CreateSliceBackup();
 			}
 			break;
@@ -1707,7 +1722,6 @@ void albaOpSegmentation::OnPickingEvent(albaEvent * e)
 	else if (m_CurrentPhase == EDIT_SEGMENTATION)
 	{
 		//if the sender is the segmentation picker we need to draw / else erase
-		m_BrushFillErase = e->GetArg() == ALBA_CTRL_KEY;
 		if (m_ManualSegmentationTools == FILL_EDIT) // bucket
 			Fill(e);
 		else if (m_ManualSegmentationTools == DRAW_EDIT) // brush
@@ -1989,7 +2003,6 @@ void albaOpSegmentation::OnEditSegmentationEvent(albaEvent *e)
 		case ID_MANUAL_COPY_FROM_LAST_SLICE:
 		{
 			CopyFromLastSlice();
-
 		}
 		break;
 		case ID_MANUAL_UNDO:
@@ -2616,7 +2629,13 @@ int albaOpSegmentation::PressKey(int keyCode, bool ctrl, bool alt, bool shift)
 		{
 			if (m_ManualSegmentationTools == DRAW_EDIT) // Erase
 			{
-				SetCursor(CUR_ERASE);
+				m_BrushFillErase = !m_BrushFillErase;
+				if (m_BrushFillErase)
+					SetCursor(CUR_ERASE);
+				else
+					SetCursor(CUR_PENCIL);
+				m_Helper.DrawBrush(NULL, m_SlicePlane, m_BrushSize, m_BrushShape, m_BrushFillErase);
+				m_View->CameraUpdate();
 				result = 1;
 			}
 			else	if (m_ManualSegmentationTools == FILL_EDIT) // Fill
@@ -2642,11 +2661,6 @@ int albaOpSegmentation::ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift)
 	}
 	else if (m_CurrentPhase == EDIT_SEGMENTATION)
 	{
-		if (m_ManualSegmentationTools == DRAW_EDIT) // Draw
-		{
-			SetCursor(CUR_PENCIL);
-			result = 1;
-		}
 		if (m_ManualSegmentationTools == FILL_EDIT) // Fill
 		{
 			SetCursor(CUR_FILL);
