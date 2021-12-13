@@ -291,9 +291,17 @@ void albaOpSegmentationHelper::CopyVolumeDataToSlice(int slicePlane, int sliceIn
 //----------------------------------------------------------------------------
 void albaOpSegmentationHelper::DrawBrush(double *pos, int slicePlane, int brushSize, int brushShape, bool erase)
 {
+
 	int sliceDim[3], point[2];
 	m_SegmetationSlice->GetDimensions(sliceDim);
-	GetSlicePoint(slicePlane, pos, point);
+	if (pos != NULL)
+		GetSlicePoint(slicePlane, pos, point);
+	else
+	{
+		point[0] = m_LastPoint[0];
+		point[1] = m_LastPoint[1];
+	}
+
 	if (m_IsDrawing)
 	{
 		//create a continuous line using Bresenham's algorithm 
@@ -398,7 +406,7 @@ void albaOpSegmentationHelper::DrawBrushPointer(int x, int y, int *sliceDim, int
 	unsigned char *outputPointer = (unsigned char*)outputScalars->GetVoidPointer(0);
 		
 	brushSize /= 2;
-	fillValue = erase ? EMPTY_VALUE : FULL_VALUE; //ERASER_VALUE : PENCIL_VALUE;
+	fillValue = erase ? ERASER_VALUE : PENCIL_VALUE;
 
 
 	int startX = MAX(0, x - brushSize);
@@ -457,6 +465,8 @@ void albaOpSegmentationHelper::GetSlicePoint(int slicePlane, double * pos, int *
 }
 
  
+
+
 
 //----------------------------------------------------------------------------
 void albaOpSegmentationHelper::Connectivity3d(double * pos, int slicePlane, int currentSlice)
@@ -558,6 +568,115 @@ void albaOpSegmentationHelper::Connectivity3d(double * pos, int slicePlane, int 
 	m_Segmentation->Modified();
 	m_SegmetationSlice->Modified();
 	m_SegmetationSlice->Update();
+}
+
+//----------------------------------------------------------------------------
+void albaOpSegmentationHelper::EndDrawing(int autofill)
+{
+	m_IsDrawing = false;
+	if (m_SegmetationSlice)
+	{
+		unsigned char *scalars = (unsigned char *) m_SegmetationSlice->GetScalarPointer();
+		unsigned char drawValue;
+		int  dims[3],currIndex;
+		m_SegmetationSlice->GetDimensions(dims);
+
+		if (autofill) //Autofill procedure
+		{
+			int minP[2] = { VTK_INT_MAX, VTK_INT_MAX }, maxP[2] = { VTK_INT_MIN, VTK_INT_MIN };
+
+			//////////////////////////////////
+			//Phase 1 getting drawing area.
+			for (int x = 0; x < dims[0]; x++)
+				for (int y = 0; y < dims[1]; y++) {
+					currIndex = y*dims[0] + x;
+					if (scalars[currIndex] == PENCIL_VALUE || scalars[currIndex] == ERASER_VALUE)
+					{
+						drawValue = scalars[currIndex];
+						minP[0] = MIN(minP[0], x);
+						minP[1] = MIN(minP[1], y);
+						maxP[0] = MAX(maxP[0], x);
+						maxP[1] = MAX(maxP[1], y);
+					}
+				}
+
+			////////////////////////////////////
+			//Phase 2 reverse fill from contours
+			unsigned char *tmpScalars = new unsigned char[dims[0] * dims[1]];
+			memset(tmpScalars, 0, sizeof(unsigned char)*dims[0] * dims[1]);
+
+			//top contour
+			for (int x = minP[0]; x <= maxP[0]; x++)
+				InternalReverseFill(x, minP[1], dims, minP, maxP, scalars, tmpScalars, drawValue);
+			//bottom contour
+			for (int x = minP[0]; x <= maxP[0]; x++)
+				InternalReverseFill(x, maxP[1], dims, minP, maxP, scalars, tmpScalars, drawValue);
+			//left contour
+			for (int y = minP[1]; y <= maxP[1]; y++)
+				InternalReverseFill(minP[0], y, dims, minP, maxP, scalars, tmpScalars, drawValue);
+			//right contour
+			for (int y = minP[1]; y <= maxP[1]; y++)
+				InternalReverseFill(maxP[0], y, dims, minP, maxP, scalars, tmpScalars, drawValue);
+
+			////////////////////////////////////
+			//Phase 3 apply unfilled values in tmp scalars to scalars
+			unsigned char applyValue;
+
+			if (drawValue == PENCIL_VALUE)
+				applyValue = FULL_VALUE;
+			else
+				applyValue = EMPTY_VALUE;
+
+			for (int y = minP[1]; y <= maxP[1]; y++)
+				for (int x = minP[0]; x <= maxP[0]; x++)
+				{
+					currIndex = y*dims[0] + x;
+					if (tmpScalars[currIndex] == 0)
+						scalars[currIndex] = applyValue;
+				}
+				
+
+			delete[] tmpScalars;
+		}
+		else //No autofill just update eraser values to empty or pencil values to full
+		{
+			int scalSize = dims[0] * dims[1];
+			for (int i = 0; i < scalSize; i++)
+				if (scalars[i] == ERASER_VALUE)
+					scalars[i] = EMPTY_VALUE;
+				else if (scalars[i] == PENCIL_VALUE)
+					scalars[i] = FULL_VALUE;
+		}
+		
+		m_SegmetationSlice->Modified();
+		m_SegmetationSlice->Update();
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaOpSegmentationHelper::InternalReverseFill(int x, int y, int *dims, int minP[2], int maxP[2], unsigned char *drawArea, unsigned char * tmpArea, unsigned char drawValue)
+{
+	int currIndex = y*dims[0] + x;
+
+	//do not fill drawed area and already filled areas
+	if (drawArea[currIndex] == drawValue || tmpArea[currIndex] == 1)
+		return;
+
+	tmpArea[currIndex] = 1;
+	
+	//Recursive fill up
+	if (y - 1 >= minP[1])
+		InternalReverseFill(x, y - 1, dims, minP, maxP, drawArea, tmpArea, drawValue);
+	//Recursive fill down
+	if (y + 1 <= maxP[1])
+		InternalReverseFill(x, y + 1, dims, minP, maxP, drawArea, tmpArea, drawValue);
+	//Recursive fill left
+	if (x - 1 >= minP[0])
+		InternalReverseFill(x - 1, y, dims, minP, maxP, drawArea, tmpArea, drawValue);
+	//Recursive fill right
+	if (x + 1 <= maxP[0])
+		InternalReverseFill(x + 1, y, dims, minP, maxP, drawArea, tmpArea, drawValue);
+
 }
 
 //----------------------------------------------------------------------------

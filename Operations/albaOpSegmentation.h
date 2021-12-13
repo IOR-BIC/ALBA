@@ -97,32 +97,33 @@ public:
   //----------------------------------------------------------------------------
   // Constants:
   //----------------------------------------------------------------------------
-  enum GUI_IDS
-  {
-    ID_OPERATION_TYPE = MINID,
-    ID_PRE_SEGMENTATION,
-    ID_INIT_SEGMENTATION,
-    ID_EDIT_SEGMENTATION,
-    ID_LOAD,
-    ID_OK,
-    ID_CANCEL,
-    ID_VIEW,
-    ID_LUT_CHOOSER,
-    ID_ALL_SLICES,
-    ID_SLICE_SLIDER,
-    ID_SLICE_TEXT,
-    ID_SLICE_NEXT, 
-    ID_SLICE_PREV,
-    ID_SLICE_PLANE,
+	enum GUI_IDS
+	{
+		ID_OPERATION_TYPE = MINID,
+		ID_PRE_SEGMENTATION,
+		ID_INIT_SEGMENTATION,
+		ID_EDIT_SEGMENTATION,
+		ID_LOAD,
+		ID_OK,
+		ID_CANCEL,
+		ID_VIEW,
+		ID_LUT_CHOOSER,
+		ID_ALL_SLICES,
+		ID_SLICE_SLIDER,
+		ID_SLICE_TEXT,
+		ID_SLICE_NEXT,
+		ID_SLICE_PREV,
+		ID_SLICE_PLANE,
 		ID_SHOW_LABELS,
-	  ID_PRE_VOLUME_SPACING,
-	  ID_PRE_VOLUME_ZERO_VALUE,
-    ID_MANUAL_PICKING_MODALITY,
+		ID_PRE_VOLUME_SPACING,
+		ID_PRE_VOLUME_ZERO_VALUE,
+		ID_MANUAL_PICKING_MODALITY,
 		ID_MANUAL_TOOLS_BRUSH,
 		ID_MANUAL_TOOLS_FILL,
 		ID_MANUAL_TOOLS_3D_CONNECTIVITY,
-    ID_MANUAL_BRUSH_SHAPE,
-    ID_MANUAL_BRUSH_SIZE,
+		ID_MANUAL_BRUSH_SHAPE,
+		ID_MANUAL_BRUSH_SIZE,
+		ID_MANUAL_AUTOFILL_ON_RELASE,
     ID_MANUAL_BUCKET_ACTION,
     ID_MANUAL_BUCKET_GLOBAL,
     ID_MANUAL_REFINEMENT_REGIONS_SIZE,
@@ -368,6 +369,7 @@ protected:
   int m_BrushShape;                       //<Brush shape
   int m_BrushSize;                     //<Brush size
 	int m_BrushFillErase;               //< Brush Modality (draw/erase)
+	int m_AutofillOnRelease;
 	int m_FillThesholdPerc;                     //<Brush size
 	
   int m_ManualRefinementRegionsSize;            //<Refinement region size

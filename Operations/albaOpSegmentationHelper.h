@@ -88,7 +88,7 @@ public:
 
 	void Connectivity3d(double * pos, int slicePlane, int currentSlice);
 
-	void EndDrawing()	{ m_IsDrawing = false; }
+	void EndDrawing(int autofill);
 
 	void StartDrawing() { m_IsDrawing = true; }
 
@@ -114,6 +114,8 @@ protected:
 	int m_LastPoint[2];
 	int m_IsDrawing;
 public:
+private:
+	void InternalReverseFill(int x, int y, int *dims, int minP[2], int maxP[2], unsigned char *drawArea, unsigned char * tmpArea, unsigned char drawValue);
 };
 
 
