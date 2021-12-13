@@ -105,6 +105,7 @@
 #include "vtkALBATubeFilterTest.h"
 #include "vtkALBARGtoSPImageFilterTest.h"
 #include "vtkALBADistanceFilterTest.h"
+#include "vtkALBACircleSourceTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -227,6 +228,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(vtkALBATubeFilterTest::suite());
 	runner.addTest(vtkALBARGtoSPImageFilterTest::suite());
 	runner.addTest(vtkALBADistanceFilterTest::suite());
+	runner.addTest(vtkALBACircleSourceTest::suite());
 	runner.run( controller );
 
 	// Print test in a compiler compatible format.

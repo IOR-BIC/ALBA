@@ -97,6 +97,7 @@ SET(PROJECT_SRCS
 	vtkALBALineStripSourceTest.h vtkALBALineStripSourceTest.cpp
 	vtkALBARGtoSPImageFilterTest.h vtkALBARGtoSPImageFilterTest.cpp
 	vtkALBADistanceFilterTest.h	vtkALBADistanceFilterTest.cpp
+	vtkALBACircleSourceTest.h	vtkALBACircleSourceTest.cpp
 )
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})
