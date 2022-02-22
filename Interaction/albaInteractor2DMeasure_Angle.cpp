@@ -224,7 +224,7 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 			pointSourceA->GetCenter(pointA);
 			pointSourceB->GetCenter(pointB);
 
-			if (appGeometry::DistancePointToLine(point, pointO, pointA) < POINT_UPDATE_DISTANCE)
+			if (GeometryUtils::DistancePointToLine(point, pointO, pointA) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -257,7 +257,7 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 				Render();
 				return;
 			}
-			else if (appGeometry::DistancePointToLine(point, pointO, pointB) < POINT_UPDATE_DISTANCE)
+			else if (GeometryUtils::DistancePointToLine(point, pointO, pointB) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -332,12 +332,12 @@ void albaInteractor2DMeasure_Angle::UpdateLineActors(double * point1, double * p
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Angle::UpdateCircleActor(double * point1, double * point2, double * ori)
 {
-	double radius = MIN(appGeometry::DistanceBetweenPoints(point1, ori), appGeometry::DistanceBetweenPoints(point2, ori)) * 0.8;
+	double radius = MIN(GeometryUtils::DistanceBetweenPoints(point1, ori), GeometryUtils::DistanceBetweenPoints(point2, ori)) * 0.8;
 
 	double axis[3]{ ori[0], ori[1] + 1.0, 0.0 };
-	double angle = appGeometry::CalculateAngle(point1, point2, ori);
-	double angle1 = appGeometry::CalculateAngle(axis, point1, ori);
-	double angle2 = appGeometry::CalculateAngle(point1, point2, ori) + angle1;
+	double angle = GeometryUtils::CalculateAngle(point1, point2, ori);
+	double angle1 = GeometryUtils::CalculateAngle(axis, point1, ori);
+	double angle2 = GeometryUtils::CalculateAngle(point1, point2, ori) + angle1;
 
 	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[m_CurrMeasure]->GetSource();
 
@@ -373,7 +373,7 @@ void albaInteractor2DMeasure_Angle::AddMeasure(double *point1, double *point2, d
 		double oldPoint1[3], oldPoint2[3], oldPoint3[3];
 		GetMeasureLinePoints(index, oldPoint1, oldPoint2, oldPoint3);
 
-		if (appGeometry::DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
+		if (GeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
 		{
 			m_CurrMeasure = index;
 			m_CurrPoint = POINT_2;
@@ -740,10 +740,10 @@ double albaInteractor2DMeasure_Angle::CalculateAngle(int idx)
 //----------------------------------------------------------------------------
 double albaInteractor2DMeasure_Angle::CalculateAngle(double * point1, double * point2, double * ori)
 {
-	double angle = appGeometry::CalculateAngle(point1, point2, ori);
+	double angle = GeometryUtils::CalculateAngle(point1, point2, ori);
 
 	if (angle > vtkMath::Pi())
-		angle = appGeometry::CalculateAngle(point2, point1, ori);
+		angle = GeometryUtils::CalculateAngle(point2, point1, ori);
 
 	return angle *vtkMath::RadiansToDegrees();
 }

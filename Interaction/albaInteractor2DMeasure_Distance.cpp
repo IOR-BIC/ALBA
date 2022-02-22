@@ -109,7 +109,7 @@ void albaInteractor2DMeasure_Distance::MoveMeasure(int index, double * point)
 	tmp_pos2[1] = point[1] + m_OldLineP2[1];
 	tmp_pos2[2] = 0.0;
 
-	m_MeasureValue = appGeometry::DistanceBetweenPoints(tmp_pos1, tmp_pos2);
+	m_MeasureValue = GeometryUtils::DistanceBetweenPoints(tmp_pos1, tmp_pos2);
 
 	UpdateLineActors(tmp_pos1, tmp_pos2);
 	// Points
@@ -155,7 +155,7 @@ void albaInteractor2DMeasure_Distance::EditMeasure(int index, double *point)
 	//////////////////////////////////////////////////////////////////////////
 	// Update Measure
 
-	double dist = appGeometry::DistanceBetweenPoints(point1, point2);
+	double dist = GeometryUtils::DistanceBetweenPoints(point1, point2);
 
 	if (dist >= m_MinDistance)
 	{
@@ -194,7 +194,7 @@ void albaInteractor2DMeasure_Distance::FindAndHighlight(double * point)
 			lineSource->GetPoint1(linePoint1);
 			lineSource->GetPoint2(linePoint2);
 
-			if (appGeometry::DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
+			if (GeometryUtils::DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -249,7 +249,7 @@ void albaInteractor2DMeasure_Distance::UpdateLineActors(double * point1, double 
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Distance::UpdateLineTickActor(double * point1, double * point2)
 {
-	double tickLenght = appGeometry::DistanceBetweenPoints(point1, point2) * 0.05;
+	double tickLenght = GeometryUtils::DistanceBetweenPoints(point1, point2) * 0.05;
 	tickLenght = tickLenght == 0.0 ? 0.5 : tickLenght;
 
 	if (m_TickLenght > 0.0) tickLenght = m_TickLenght;
@@ -258,10 +258,10 @@ void albaInteractor2DMeasure_Distance::UpdateLineTickActor(double * point1, doub
 	double tick1Point1[3]{ point1[X] - tickLenght, point1[Y], 0.0 };
 	double tick1Point2[3]{ point1[X] + tickLenght, point1[Y], 0.0 };
 
-	double angle = (M_PI / 2) - appGeometry::CalculateAngle(tick1Point1, point2, point1);
+	double angle = (M_PI / 2) - GeometryUtils::CalculateAngle(tick1Point1, point2, point1);
 
-	appGeometry::RotatePoint(tick1Point1, point1, angle);
-	appGeometry::RotatePoint(tick1Point2, point1, angle);
+	GeometryUtils::RotatePoint(tick1Point1, point1, angle);
+	GeometryUtils::RotatePoint(tick1Point2, point1, angle);
 
 	vtkLineSource* tickSourceL = (vtkLineSource*)m_TickStackVectorL[m_CurrMeasure]->GetSource();
 	tickSourceL->SetPoint1(tick1Point1);
@@ -272,8 +272,8 @@ void albaInteractor2DMeasure_Distance::UpdateLineTickActor(double * point1, doub
 	double tick2Point1[3]{ point2[X] - tickLenght, point2[Y], 0.0 };
 	double tick2Point2[3]{ point2[X] + tickLenght, point2[Y], 0.0 };
 
-	appGeometry::RotatePoint(tick2Point1, point2, angle);
-	appGeometry::RotatePoint(tick2Point2, point2, angle);
+	GeometryUtils::RotatePoint(tick2Point1, point2, angle);
+	GeometryUtils::RotatePoint(tick2Point2, point2, angle);
 
 	vtkLineSource* tickSourceR = (vtkLineSource*)m_TickStackVectorR[m_CurrMeasure]->GetSource();
 	tickSourceR->SetPoint1(tick2Point1);
@@ -304,7 +304,7 @@ void albaInteractor2DMeasure_Distance::AddMeasure(double *point1, double *point2
 		double oldPoint1[3], oldPoint2[3];
 		GetMeasureLinePoints(index, oldPoint1, oldPoint2);
 
-		if (appGeometry::DistanceBetweenPoints(oldPoint1, oldPoint2)<POINT_UPDATE_DISTANCE)
+		if (GeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2)<POINT_UPDATE_DISTANCE)
 		{
 			m_CurrMeasure = index;
 			m_CurrPoint = POINT_2;
@@ -313,7 +313,7 @@ void albaInteractor2DMeasure_Distance::AddMeasure(double *point1, double *point2
 		}
 	}
 
-	if (appGeometry::DistanceBetweenPoints(point1, point2) < m_MinDistance)
+	if (GeometryUtils::DistanceBetweenPoints(point1, point2) < m_MinDistance)
 	{
 		point2[X] += m_MinDistance;
 	}
@@ -325,7 +325,7 @@ void albaInteractor2DMeasure_Distance::AddMeasure(double *point1, double *point2
 	int index = m_Measure2DVector.size() - 1;
 
 	albaString text;
-	text.Printf("Distance %.2f mm", appGeometry::DistanceBetweenPoints(point1, point2));
+	text.Printf("Distance %.2f mm", GeometryUtils::DistanceBetweenPoints(point1, point2));
 	m_Measure2DVector[index].Text = text;
 
 	// Update Edit Actors

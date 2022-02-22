@@ -646,13 +646,13 @@ vtkPointSource * albaInteractor2DMeasure::GetNewPointSource()
 /// Points
 
 //---------------------------------------------------------------------------
-bool appGeometry::Equal(double *point1, double *point2)
+bool GeometryUtils::Equal(double *point1, double *point2)
 {
 	return point1[0] == point2[0] && point1[1] == point2[1] && point1[2] == point2[2];
 }
 
 //---------------------------------------------------------------------------
-double * appGeometry::GetMidPoint(double *point1, double *point2)
+double * GeometryUtils::GetMidPoint(double *point1, double *point2)
 {
 	double midPoint[3];
 	midPoint[0] = (point1[0] + point2[0]) / 2;
@@ -663,7 +663,7 @@ double * appGeometry::GetMidPoint(double *point1, double *point2)
 }
 
 //----------------------------------------------------------------------------
-void appGeometry::RotatePoint(double *point, double *origin, double angle)
+void GeometryUtils::RotatePoint(double *point, double *origin, double angle)
 {
 	double s = sin(angle);
 	double c = cos(angle);
@@ -683,7 +683,7 @@ void appGeometry::RotatePoint(double *point, double *origin, double angle)
 }
 
 //----------------------------------------------------------------------------
-double appGeometry::CalculateAngle(double point1[3], double point2[3], double origin[3])
+double GeometryUtils::CalculateAngle(double point1[3], double point2[3], double origin[3])
 {
 	double angleToP1 = atan2((point1[X] - origin[X]), (point1[Y] - origin[Y]));
 	double angleToP2 = atan2((point2[X] - origin[X]), (point2[Y] - origin[Y]));
@@ -696,14 +696,14 @@ double appGeometry::CalculateAngle(double point1[3], double point2[3], double or
 }
 
 //----------------------------------------------------------------------------
-double appGeometry::DistanceBetweenPoints(double *point1, double *point2)
+double GeometryUtils::DistanceBetweenPoints(double *point1, double *point2)
 {
 	return sqrt(pow(point1[X] - point2[X], 2) + pow(point1[Y] - point2[Y], 2));
 }
 
 /// Lines
 //----------------------------------------------------------------------------
-bool appGeometry::FindIntersectionLines(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2)
+bool GeometryUtils::FindIntersectionLines(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2)
 {
 	// Line1 represented as a1x + b1y = c1
 	double a1 = line1Point2[1] - line1Point1[1];
@@ -736,7 +736,7 @@ bool appGeometry::FindIntersectionLines(double(&point)[3], double *line1Point1, 
 	return false;
 }
 //----------------------------------------------------------------------------
-int appGeometry::IntersectLineLine(double *l1p1, double *l1p2, double *l2p1, double *l2p2, double &perc)
+int GeometryUtils::IntersectLineLine(double *l1p1, double *l1p2, double *l2p1, double *l2p2, double &perc)
 {
 	double x[3];
 	double projXYZ[3];
@@ -760,7 +760,7 @@ int appGeometry::IntersectLineLine(double *l1p1, double *l1p2, double *l2p1, dou
 }
 
 //----------------------------------------------------------------------------
-double appGeometry::GetPointToLineDistance(double *point, double *linePoint1, double *linePoint2)
+double GeometryUtils::GetPointToLineDistance(double *point, double *linePoint1, double *linePoint2)
 {
 	double a = linePoint1[1] - linePoint2[1]; // Note: this was incorrectly "y2 - y1" in the original answer
 	double b = linePoint2[0] - linePoint1[0];
@@ -769,7 +769,7 @@ double appGeometry::GetPointToLineDistance(double *point, double *linePoint1, do
 	return abs(a * point[0] + b * point[1] + c) / sqrt(a * a + b * b);
 }
 //----------------------------------------------------------------------------
-float appGeometry::DistancePointToLine(double * point, double * lineP1, double * lineP2)
+float GeometryUtils::DistancePointToLine(double * point, double * lineP1, double * lineP2)
 {
 	double point_x = point[0];
 	double point_y = point[1];
@@ -815,7 +815,7 @@ float appGeometry::DistancePointToLine(double * point, double * lineP1, double *
 }
 
 //----------------------------------------------------------------------------
-void appGeometry::GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance)
+void GeometryUtils::GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance)
 {
 	double L = sqrt(pow((linePoint2[0] - linePoint1[0]), 2) + pow((linePoint2[1] - linePoint1[1]), 2));
 
@@ -828,7 +828,7 @@ void appGeometry::GetParallelLine(double(&point1)[3], double(&point2)[3], double
 	point2[2] = 0.0;
 }
 //----------------------------------------------------------------------------
-bool appGeometry::FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance)
+bool GeometryUtils::FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance)
 {
 	double L = sqrt(pow((linePoint2[0] - linePoint1[0]), 2) + pow((linePoint2[1] - linePoint1[1]), 2));
 	double dist_ratio = distance / L;
@@ -841,7 +841,7 @@ bool appGeometry::FindPointOnLine(double(&point)[3], double *linePoint1, double 
 }
 
 //----------------------------------------------------------------------------
-int appGeometry::PointUpDownLine(double *point, double *lp1, double *lp2)
+int GeometryUtils::PointUpDownLine(double *point, double *lp1, double *lp2)
 {
 	double d = (point[0] - lp1[0]) * (lp2[1] - lp1[1]) - (point[1] - lp1[1]) * (lp2[0] - lp1[0]);
 

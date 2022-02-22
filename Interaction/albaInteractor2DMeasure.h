@@ -296,7 +296,7 @@ private:
 };
 
 
-class appGeometry
+class GeometryUtils
 {
 public:
 

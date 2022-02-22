@@ -120,7 +120,7 @@ void albaInteractor2DMeasure_CenterPoint::MoveMeasure(int index, double * point)
 	tmp_pos2[1] = point[1] + m_OldLineP2[1];
 	tmp_pos2[2] = 0.0;
 
-	m_MeasureValue = appGeometry::DistanceBetweenPoints(tmp_pos1, tmp_pos2);
+	m_MeasureValue = GeometryUtils::DistanceBetweenPoints(tmp_pos1, tmp_pos2);
 
 	UpdateLineActors(tmp_pos1, tmp_pos2);
 	// Points
@@ -170,7 +170,7 @@ void albaInteractor2DMeasure_CenterPoint::EditMeasure(int index, double *point)
 	//////////////////////////////////////////////////////////////////////////
 	// Update Measure
 	albaString text;
-	text.Printf("Distance %.2f mm", appGeometry::DistanceBetweenPoints(point1, point2));
+	text.Printf("Distance %.2f mm", GeometryUtils::DistanceBetweenPoints(point1, point2));
 	//m_MeasureTextVector[index] = text;
 	m_Measure2DVector[index].Text = text;
 
@@ -209,7 +209,7 @@ void albaInteractor2DMeasure_CenterPoint::FindAndHighlight(double * point)
 
 			double radius = vtkMath::Distance2BetweenPoints(linePoint2, centerPoint);
 
-			if (appGeometry::DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
+			if (GeometryUtils::DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -291,7 +291,7 @@ void albaInteractor2DMeasure_CenterPoint::UpdateLineActors(double * point1, doub
 void albaInteractor2DMeasure_CenterPoint::UpdateCircleActor(double * point1, double * point2)
 {
 	double pointC[3]{ (point1[0] + point2[0]) / 2, (point1[1] + point2[1]) / 2, 0.0 };
-	double radius = appGeometry::DistanceBetweenPoints(point1, pointC);
+	double radius = GeometryUtils::DistanceBetweenPoints(point1, pointC);
 
 	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[m_CurrMeasure]->GetSource();
 
@@ -321,7 +321,7 @@ void albaInteractor2DMeasure_CenterPoint::AddMeasure(double *point1, double *poi
 		double oldPoint1[3], oldPoint2[3];
 		GetMeasureLinePoints(index, oldPoint1, oldPoint2);
 
-		if (appGeometry::DistanceBetweenPoints(oldPoint1, oldPoint2)<POINT_UPDATE_DISTANCE)
+		if (GeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2)<POINT_UPDATE_DISTANCE)
 		{
 			m_CurrMeasure = index;
 			m_CurrPoint = POINT_2;
@@ -337,7 +337,7 @@ void albaInteractor2DMeasure_CenterPoint::AddMeasure(double *point1, double *poi
 	int index = m_Measure2DVector.size() - 1;
 
 	albaString text;
-	text.Printf("Center (%.2f, %.2f) - Radius %.2f mm", point1[X], point1[Y], appGeometry::DistanceBetweenPoints(point1, point2));
+	text.Printf("Center (%.2f, %.2f) - Radius %.2f mm", point1[X], point1[Y], GeometryUtils::DistanceBetweenPoints(point1, point2));
 	m_Measure2DVector[index].Text = text;
 
 	// Update Edit Actors

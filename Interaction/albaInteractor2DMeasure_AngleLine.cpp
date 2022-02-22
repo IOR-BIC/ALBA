@@ -255,7 +255,7 @@ void albaInteractor2DMeasure_AngleLine::FindAndHighlight(double * point)
 			pointSourceC->GetCenter(pointC);
 			pointSourceD->GetCenter(pointD);
 
-			if (appGeometry::DistancePointToLine(point, pointA, pointB) < POINT_UPDATE_DISTANCE)
+			if (GeometryUtils::DistancePointToLine(point, pointA, pointB) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -289,7 +289,7 @@ void albaInteractor2DMeasure_AngleLine::FindAndHighlight(double * point)
 				Render();
 				return;
 			}
-			else if (appGeometry::DistancePointToLine(point, pointC, pointD) < POINT_UPDATE_DISTANCE)
+			else if (GeometryUtils::DistancePointToLine(point, pointC, pointD) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -409,7 +409,7 @@ void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point
 		double oldPoint1[3], oldPoint2[3], oldPoint3[3], oldPoint4[3];
 		GetMeasureLinePoints(index, oldPoint1, oldPoint2, oldPoint3, oldPoint4);
 
-		if (appGeometry::DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
+		if (GeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
 		{
 			m_CurrMeasure = index;
 			m_CurrPoint = POINT_2;
