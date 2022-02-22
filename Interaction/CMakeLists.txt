@@ -69,28 +69,41 @@ SET(PROJECT_SRCS
   albaInteractorGenericMouse.cpp  			albaInteractorGenericMouse.h
   albaInteractorPER.cpp  					albaInteractorPER.h
   albaInteractorPicker.cpp  					albaInteractorPicker.h
-  albaInteractorSelectCell.cpp  				albaInteractorSelectCell.h
-  albaInteractorSER.cpp  					albaInteractorSER.h  ######################
-  albaInteractorCameraPicker.cpp  					albaInteractorCameraPicker.h
-  albaInteractorPERPicker.cpp  				albaInteractorPERPicker.h
-  albaInteractorDICOMImporter.h  			albaInteractorDICOMImporter.cpp  
-  albaInteractorSegmentationPicker.cpp  		albaInteractorSegmentationPicker.h 
-  albaInteractorPERScalarInformation.cpp  	albaInteractorPERScalarInformation.h
+  albaInteractorSelectCell.cpp  					albaInteractorSelectCell.h
+  albaInteractorSER.cpp  									albaInteractorSER.h  ######################
+  albaInteractorCameraPicker.cpp  				albaInteractorCameraPicker.h
+  albaInteractorPERPicker.cpp  						albaInteractorPERPicker.h
+  albaInteractorDICOMImporter.h  					albaInteractorDICOMImporter.cpp  
+  albaInteractorSegmentationPicker.cpp  	albaInteractorSegmentationPicker.h 
+  albaInteractorPERScalarInformation.cpp  albaInteractorPERScalarInformation.h
   albaInteractorPERBrushFeedback.cpp  		albaInteractorPERBrushFeedback.h
-  mmiVTKPicker.cpp  						mmiVTKPicker.h
-  mmiInfoImage.cpp  						mmiInfoImage.h
-  mmiSelectPoint.cpp  						mmiSelectPoint.h
-  albaGizmoPolylineGraph.cpp  				albaGizmoPolylineGraph.h
+  mmiVTKPicker.cpp  											mmiVTKPicker.h
+  mmiInfoImage.cpp  											mmiInfoImage.h
+  mmiSelectPoint.cpp  										mmiSelectPoint.h
+  albaGizmoPolylineGraph.cpp  						albaGizmoPolylineGraph.h
   albaDeviceButtonsPadMouseDialog.cpp	  	albaDeviceButtonsPadMouseDialog.h
-  albaGUITransformSliders.cpp  				albaGUITransformSliders.h    
-  albaGizmoCrossRotateTranslate.cpp  		albaGizmoCrossRotateTranslate.h	  
-  albaGizmoCrossRotate.cpp  					albaGizmoCrossRotate.h
-  albaGizmoCrossRotateAxis.cpp  				albaGizmoCrossRotateAxis.h
-  albaGizmoCrossRotateFan.cpp  				albaGizmoCrossRotateFan.h
-  albaGizmoCrossTranslate.cpp  				albaGizmoCrossTranslate.h
-  albaGizmoCrossTranslateAxis.cpp  			albaGizmoCrossTranslateAxis.h
+  albaGUITransformSliders.cpp  						albaGUITransformSliders.h    
+  albaGizmoCrossRotateTranslate.cpp  			albaGizmoCrossRotateTranslate.h	  
+  albaGizmoCrossRotate.cpp  							albaGizmoCrossRotate.h
+  albaGizmoCrossRotateAxis.cpp  					albaGizmoCrossRotateAxis.h
+  albaGizmoCrossRotateFan.cpp  						albaGizmoCrossRotateFan.h
+  albaGizmoCrossTranslate.cpp  						albaGizmoCrossTranslate.h
+  albaGizmoCrossTranslateAxis.cpp  				albaGizmoCrossTranslateAxis.h
   albaGizmoCrossTranslatePlane.cpp  			albaGizmoCrossTranslatePlane.h
 	albaInteractorSlider.cpp								albaInteractorSlider.h
+	
+	albaActor2dStackHelper.cpp							albaActor2dStackHelper.h
+	albaInteractor2DMeasure.cpp							albaInteractor2DMeasure.h
+	albaInteractor2DMeasure.cpp							albaInteractor2DMeasure.h
+	albaInteractor2DMeasure_Angle.cpp				albaInteractor2DMeasure_Angle.h
+	albaInteractor2DMeasure_AngleLine.cpp		albaInteractor2DMeasure_AngleLine.h
+	albaInteractor2DMeasure_CenterPoint.cpp	albaInteractor2DMeasure_CenterPoint.h
+	albaInteractor2DMeasure_Distance.cpp 		albaInteractor2DMeasure_Distance.h
+	albaInteractor2DMeasure_Line.cpp				albaInteractor2DMeasure_Line.h
+	albaInteractor2DMeasure_LineDistance.cpp	albaInteractor2DMeasure_LineDistance.h
+	albaInteractor2DMeasure_MidPoint.cpp		albaInteractor2DMeasure_MidPoint.h
+	albaInteractor2DMeasure_Point.cpp 			albaInteractor2DMeasure_Point.h
+	albaInteractor2DMeasure_Segment.cpp			albaInteractor2DMeasure_Segment.h
 )
 
 IF (ALBA_USE_P5_GLOVE)
