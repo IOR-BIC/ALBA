@@ -139,6 +139,11 @@ void albaInteractor2DMeasure_LineDistance::MoveMeasure(int index, double * point
 		m_ActorAdded = false;
 	}
 
+	// Update Measure
+	albaString text;
+	text.Printf("Distance %.2f mm", GetDistance(index));
+	m_Measure2DVector[index].Text = text;
+
 	albaEventMacro(albaEvent(this, ID_MEASURE_CHANGED, m_MeasureValue));
 	Render();
 }
@@ -173,7 +178,7 @@ void albaInteractor2DMeasure_LineDistance::EditMeasure(int index, double *point)
 	//////////////////////////////////////////////////////////////////////////
 	// Update Measure
 	albaString text;
-	text.Printf("Distance %.2f mm", GeometryUtils::DistanceBetweenPoints(point1, point2));
+	text.Printf("Distance %.2f mm", GetDistance(index));
 	//m_MeasureTextVector[index] = text;
 	m_Measure2DVector[index].Text = text;
 
@@ -373,8 +378,7 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 
 			m_Distances[index] = GeometryUtils::DistancePointToLine(point1, l1P1.GetVect(), l1P2.GetVect());
 			m_Distances[index] *= GeometryUtils::PointUpDownLine(point1, l1P1.GetVect(), l1P2.GetVect());
-
-
+			
 			m_CurrMeasure = index;
 			UpdateLineActors(l1P1.GetVect(), l1P2.GetVect());
 			m_CurrMeasure = -1;
@@ -390,7 +394,7 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 	int index = m_Measure2DVector.size() - 1;
 
 	albaString text;
-	text.Printf("Distance %.2f mm", GeometryUtils::DistanceBetweenPoints(point1, point2));
+	text.Printf("Distance %.2f mm", GetDistance(index));
 	m_Measure2DVector[index].Text = text;
 	
 	// Update Edit Actors
@@ -558,7 +562,7 @@ void albaInteractor2DMeasure_LineDistance::GetMeasureLinePoints(int index, doubl
 //---------------------------------------------------------------------------
 bool albaInteractor2DMeasure_LineDistance::Load(albaVME *input, wxString tag)
 {
-	if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistancePoint1") && input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistancePoint1"))
+	if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistancePoint1") && input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistancePoint2"))
 	{
 		double point1[3], point2[3];
 		albaTagItem *measureTypeTag = input->GetTagArray()->GetTag(tag + "MeasureType");
@@ -625,7 +629,7 @@ bool albaInteractor2DMeasure_LineDistance::Save(albaVME *input, wxString tag)
 		measureLinePoint2Tag.SetNumberOfComponents(nLines);
 
 		albaTagItem measureLineDistanceTag;
-		measureLineDistanceTag.SetName(tag + "MeasureLineDistance");
+		measureLineDistanceTag.SetName(tag + "MeasureLineDistanceDistance");
 		measureLineDistanceTag.SetNumberOfComponents(nLines);
 
 
@@ -649,17 +653,17 @@ bool albaInteractor2DMeasure_LineDistance::Save(albaVME *input, wxString tag)
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))
 			input->GetTagArray()->DeleteTag(tag + "MeasureType");
 
-		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineLabel"))
-			input->GetTagArray()->DeleteTag(tag + "MeasureLineLabel");
+		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistanceLabel"))
+			input->GetTagArray()->DeleteTag(tag + "MeasureLineDistanceLabel");
 
-		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLinePoint1"))
-			input->GetTagArray()->DeleteTag(tag + "MeasureLinePoint1");
+		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistancePoint1"))
+			input->GetTagArray()->DeleteTag(tag + "MeasureLineDistancePoint1");
 
-		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLinePoint2"))
-			input->GetTagArray()->DeleteTag(tag + "MeasureLinePoint2");
+		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistancePoint2"))
+			input->GetTagArray()->DeleteTag(tag + "MeasureLineDistancePoint2");
 
-		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistance"))
-			input->GetTagArray()->DeleteTag(tag + "MeasureLineDistance");
+		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistanceDistance"))
+			input->GetTagArray()->DeleteTag(tag + "MeasureLineDistanceDistance");
 
 		input->GetTagArray()->SetTag(measureTypeTag);
 		input->GetTagArray()->SetTag(measureLabelTag);
