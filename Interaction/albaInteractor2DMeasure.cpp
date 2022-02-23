@@ -569,7 +569,7 @@ void albaInteractor2DMeasure::UpdateTextActor(int index, double *text_pos)
 		if (text.IsEmpty())
 			text = GetMeasureText(index);
 
-		m_Measure2DVector[index].Text = text; //
+		//m_Measure2DVector[index].Text = text; //
 
 		m_TextActorVector[index]->SetText(text);
 		m_TextActorVector[index]->SetTextPosition(text_pos);
