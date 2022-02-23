@@ -269,6 +269,7 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 			case ID_SELECT_INTERACTOR:
 			{
 				SetMeasureInteractor(m_SelectedInteractor);
+				m_SelectedMeasure = (m_InteractorVector[m_CurrentInteractor]->GetMeasureCount() > 0) ? 0 : -1;
 				m_Gui->Update();
 			}
 			break;
@@ -356,6 +357,7 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 				// Update Measure Gui Entry
 				m_SelectedMeasure = m_InteractorVector[m_CurrentInteractor]->GetSelectedMeasureIndex();
 				m_Measure = m_InteractorVector[m_CurrentInteractor]->GetMeasureText(m_SelectedMeasure);
+				m_MeasureLabel = m_InteractorVector[m_CurrentInteractor]->GetMeasureLabel(m_SelectedMeasure);
 
 				UpdateMeasureList();
 				m_Gui->Update();
@@ -368,7 +370,8 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 				m_Measure = m_InteractorVector[m_CurrentInteractor]->GetMeasureText(m_SelectedMeasure);
 				m_MeasureLabel = m_InteractorVector[m_CurrentInteractor]->GetMeasureLabel(m_SelectedMeasure);
 
-				//m_MeasureListBox->Select(m_SelectedMeasure); // TO FIX
+				m_MeasureListBox->SetSelection(m_SelectedMeasure);
+				((albaGUIValidator *)m_MeasureListBox->GetValidator())->TransferFromWindow();
 				m_Gui->Update();
 			}
 			break;
@@ -392,8 +395,6 @@ void albaOpMeasure2D::SetMeasureInteractor(int index)
 
 	m_MaxMeasures = m_InteractorVector[m_CurrentInteractor]->GetMaxMeasures();
 	m_MeasureType = m_InteractorVector[m_CurrentInteractor]->GetMeasureType();
-
-	m_SelectedMeasure = -1;
 
 	UpdateMeasureList();
 }
