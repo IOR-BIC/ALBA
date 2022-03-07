@@ -161,6 +161,8 @@ IF (ALBA_USE_VTK)
 	albaOpExtractImageFromArbitraryView.cpp		albaOpExtractImageFromArbitraryView.h
 	albaOpImporterDicFile.cpp		albaOpImporterDicFile.h
 	albaOpImporterPointCloud.cpp	albaOpImporterPointCloud.h
+	albaOpCreateProsthesis.cpp		albaOpCreateProsthesis.h
+	albaOpImportProsthesisToDB.cpp  albaOpImportProsthesisToDB.h
   )
 ENDIF (ALBA_USE_VTK)
 

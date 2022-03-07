@@ -28,6 +28,7 @@
 #include "albaSideBar.h"
 #include "albaAbsLogicManager.h"
 
+
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
@@ -154,6 +155,9 @@ public:
 
 	/** Must be called before Configure */
 	void PlugSnapshotManager(bool b) { m_UseSnapshotManager = b; };
+
+	/* Initialize Prosthesis DB Manager*/
+	void PlugProsthesisDBManager(albaString passPhrase = "");
 
 	/**  Plug a new wizard */
 	virtual void Plug(albaWizard *wizard, wxString menuPath = "");
@@ -401,6 +405,8 @@ protected:
 	albaHelpManager				 *m_HelpManager;
 	albaSnapshotManager		 *m_SnapshotManager;
 	albaVMELandmark				 *m_SelectedLandmark;
+	albaProsthesesDBManager *m_ProsthesisDBManager;
+
 
 	albaGUIMaterialChooser  *m_MaterialChooser;
 	albaPrintManager     *m_PrintSupport;

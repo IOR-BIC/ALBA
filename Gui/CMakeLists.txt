@@ -71,6 +71,8 @@ SET(PROJECT_SRCS
 	albaGUIImageViewer.cpp							albaGUIImageViewer.h
 	albaGUIAboutDialog.cpp				albaGUIAboutDialog.h
 	albaGUISplashScreen.cpp				albaGUISplashScreen.h
+	albaGUIDialogProsthesisSelection.cpp	albaGUIDialogProsthesisSelection.h
+	albaGUIHyperLink.cpp					albaGUIHyperLink.h
 )
 
 IF (ALBA_USE_VTK)
