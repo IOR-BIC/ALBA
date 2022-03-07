@@ -483,6 +483,12 @@ ALBA_EXPORT std::string albaGetDocumentsDirectory();
 /** return the Last User directory */
 ALBA_EXPORT std::string albaGetLastUserFolder();
 
+/** return the Last User directory */
+ALBA_EXPORT void albaSetAppDebugDir(std::string ddir);
+
+/** return the config directory */
+ALBA_EXPORT std::string albaGetConfigDirectory();
+
 /** Set the Last User directory */
 ALBA_EXPORT void albaSetLastUserFolder(albaString folder);
 

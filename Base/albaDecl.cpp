@@ -29,19 +29,19 @@
 
 // int ALBAExpertMode = TRUE;
 
-static long randCol = 117;
+static long GLO_randCol = 117;
+static bool GLO_yelding;
+static std::string GLO_appDebugDir;
 
-
-static bool yelding;
 //----------------------------------------------------------------------------
 void albaYield()
 //----------------------------------------------------------------------------
 {
-   if(!yelding)
+   if(!GLO_yelding)
    {
-       yelding=true;
+       GLO_yelding=true;
        wxYield();
-       yelding=false;
+       GLO_yelding=false;
    }
 }
 
@@ -146,22 +146,29 @@ std::string albaGetApplicationDirectory()
 //----------------------------------------------------------------------------
 {
 
-	wxStandardPaths std;
-	wxString exePath = std.GetDataDir();
-	
-	//get current working directory
-	wxString cd = wxGetCwd();
+	if (GLO_appDebugDir.empty())
+	{
+		wxStandardPaths std;
+		wxString exePath = std.GetDataDir();
 
-  static wxString app_dir;
+		//get current working directory
+		wxString cd = wxGetCwd();
 
-	wxSetWorkingDirectory(exePath);
-  wxSetWorkingDirectory("..");
-	app_dir = wxGetCwd();
+		static wxString app_dir;
 
-	//Restore working directory
-  wxSetWorkingDirectory(cd);
+		wxSetWorkingDirectory(exePath);
+		wxSetWorkingDirectory("..");
+		app_dir = wxGetCwd();
 
-  return app_dir.c_str();
+		//Restore working directory
+		wxSetWorkingDirectory(cd);
+
+		return app_dir.c_str();
+	}
+	else
+	{
+		return GLO_appDebugDir;
+	}
 }
 //----------------------------------------------------------------------------
 std::string albaGetAppDataDirectory()
@@ -199,6 +206,35 @@ std::string albaGetLastUserFolder()
   delete config;
   return lastUserFolder.c_str();
 }
+
+
+//----------------------------------------------------------------------------
+ALBA_EXPORT void albaSetAppDebugDir(std::string ddir)
+{
+	GLO_appDebugDir = ddir;
+}
+
+//----------------------------------------------------------------------------
+ALBA_EXPORT std::string albaGetConfigDirectory()
+{
+	//getting the Config directory
+	wxString config_dir = albaGetApplicationDirectory().c_str();
+
+	//if the debug directory is set we need to add "Installer" to the PATH
+	if(!GLO_appDebugDir.empty())
+		config_dir += "\\Installer";
+
+	config_dir += "\\Config";
+
+	for (unsigned int i = 0; i < config_dir.Length(); i++)
+	{
+		if (config_dir[i] == '/')
+			config_dir[i] = '\\';
+	}
+
+	return config_dir;
+}
+
 //----------------------------------------------------------------------------
 void albaSetLastUserFolder(albaString folder)
 //----------------------------------------------------------------------------
@@ -312,14 +348,14 @@ wxBitmap albaBlueScale(wxBitmap bmp)
 
 void albaResetRandomColor()
 {
-	randCol = 117;
+	GLO_randCol = 117;
 }
 //----------------------------------------------------------------------------
 wxColour albaRandomColor()
 //----------------------------------------------------------------------------
 {
-	randCol = (randCol*13)%16+1;
-  switch( randCol )
+	GLO_randCol = (GLO_randCol*13)%16+1;
+  switch( GLO_randCol )
   {
     case 1:  return wxColour(229,166,215); break;
     case 2:  return wxColour(224,86 ,86 ); break;
