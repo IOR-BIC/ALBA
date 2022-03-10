@@ -62,6 +62,7 @@ public:
 
 private:
 
+	/** Computes HaudforffDistance */
   void ComputeHausdorffDistance();
   double ComputePointToSurfaceDistance(double point[3], double prevDist, double prevPoint[3]);
   double ComputePointToCellSqrDistance(double point[3], int grid[3], int cellId, int cellStrideZ);

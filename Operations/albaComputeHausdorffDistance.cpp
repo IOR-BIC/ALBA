@@ -891,10 +891,17 @@ vtkPolyData *albaComputeHausdorffDistance::GetOutput()
   albaLogMessage("albaComputeHausdorffDistance: computed.");
 
   int nc=m_VertexErrorValues->GetNumberOfTuples();
+	double sumDist=0;
 
   //Values are on Squared Dist
-  for (int i=0;i<nc;i++)
-    m_VertexErrorValues->SetTuple1(i,sqrt(*m_VertexErrorValues->GetTuple(i)));
+	for (int i = 0; i < nc; i++)
+	{
+		double dist = sqrt(*m_VertexErrorValues->GetTuple(i));
+		sumDist += dist;
+		m_VertexErrorValues->SetTuple1(i, dist);
+	}
+
+
 
   m_VertexErrorValues->SetName("Vertices Hausdorff Distance");
 
