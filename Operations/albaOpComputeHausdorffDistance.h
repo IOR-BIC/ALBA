@@ -1,17 +1,17 @@
 /*=========================================================================
 Program:   LHP
-Module:    $RCSfile: lhpOpComputeHausdorffDistance.h,v $
+Module:    $RCSfile: albaOpComputeHausdorffDistance.h,v $
 Language:  C++
 Date:      $Date: 2011-08-05 09:11:04 $
 Version:   $Revision: 1.1.2.3 $
-Authors:   Eleonora Mambrini
+Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 =========================================================================*/
 
-#ifndef __lhpOpComputeHausdorffDistance_H__
-#define __lhpOpComputeHausdorffDistance_H__
+#ifndef __albaOpComputeHausdorffDistance_H__
+#define __albaOpComputeHausdorffDistance_H__
 
 //----------------------------------------------------------------------------
 // Includes :
@@ -34,7 +34,7 @@ class vtkMAFContourVolumeMapper;
 class vtkPolyData;
 
 
-class LHP_OPERATIONS_EXPORT lhpOpComputeHausdorffDistance: public albaOp
+class ALBA_EXPORT albaOpComputeHausdorffDistance: public albaOp
 {
 public:
   //----------------------------------------------------------------------------
@@ -47,20 +47,17 @@ public:
   };
 
   /** constructor. */
-  lhpOpComputeHausdorffDistance(const wxString &label = "Compute Hausdorff Distance");
+  albaOpComputeHausdorffDistance(const wxString &label = "Compute Hausdorff Distance");
   /** destructor. */
-  ~lhpOpComputeHausdorffDistance(); 
+  ~albaOpComputeHausdorffDistance(); 
 
   /** Precess events coming from other objects */
   /*virtual*/ void OnEvent(albaEventBase *alba_event);
 
   /** RTTI macro */
-  albaTypeMacro(lhpOpComputeHausdorffDistance, albaOp);
+  albaTypeMacro(albaOpComputeHausdorffDistance, albaOp);
 
   /*virtual*/ albaOp* Copy();
-
-  /** Return true for the acceptable vme type. */
-  /*virtual*/ bool Accept(albaVME *node);
 
   /** Builds operation's interface. */
   /*virtual*/ void OpRun();
@@ -83,6 +80,10 @@ protected:
 
   /** Create the operation GUI. */
   void CreateGui();
+
+	/** Return true for the acceptable vme type. */
+	/*virtual*/ bool InternalAccept(albaVME *node);
+
 
   albaString *m_FilenameSTL1, *m_FilenameSTL2;
   albaString *m_VMEName1, *m_VMEName2;

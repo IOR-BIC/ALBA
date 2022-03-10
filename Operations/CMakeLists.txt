@@ -163,6 +163,8 @@ IF (ALBA_USE_VTK)
 	albaOpImporterPointCloud.cpp	albaOpImporterPointCloud.h
 	albaOpCreateProsthesis.cpp		albaOpCreateProsthesis.h
 	albaOpImportProsthesisToDB.cpp  albaOpImportProsthesisToDB.h
+	
+	albaComputeHausdorffDistance.cpp	albaComputeHausdorffDistance.h
 	albaOpComputeHausdorffDistance.cpp albaOpComputeHausdorffDistance.h
   )
 ENDIF (ALBA_USE_VTK)

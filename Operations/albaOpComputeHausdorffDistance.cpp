@@ -1,10 +1,10 @@
 /*=========================================================================
 Program:   LHP
-Module:    $RCSfile: lhpOpComputeHausdorffDistance.cpp,v $
+Module:    $RCSfile: albaOpComputeHausdorffDistance.cpp,v $
 Language:  C++
 Date:      $Date: 2012-03-20 15:32:41 $
 Version:   $Revision: 1.1.2.4 $
-Authors:   Eleonora Mambrini
+Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -37,6 +37,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkALBASmartPointer.h"
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
+#include "albaComputeHausdorffDistance.h"
 
 //-------------------------------------------------------------------------
 // Widget enumeration:
@@ -56,23 +57,20 @@ enum OP_COMPUTE_HAUSDORFF_DISTANCE_IDs
 };
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(lhpOpComputeHausdorffDistance);
-//----------------------------------------------------------------------------
+albaCxxTypeMacro(albaOpComputeHausdorffDistance);
 
 //----------------------------------------------------------------------------
-lhpOpComputeHausdorffDistance::lhpOpComputeHausdorffDistance(const wxString &label) :
-mafOp(label)
-//----------------------------------------------------------------------------
+albaOpComputeHausdorffDistance::albaOpComputeHausdorffDistance(const wxString &label) :albaOp(label)
 {
   m_OpType	= OPTYPE_OP;
   m_Canundo	= true;
 
-  m_FilenameSTL1 = new mafString("");
-  m_FilenameSTL2 = new mafString("");
-  m_OutputDir = new mafString("");
+  m_FilenameSTL1 = new albaString("");
+  m_FilenameSTL2 = new albaString("");
+  m_OutputDir = new albaString("");
 
-  m_VMEName1 = new mafString("NONE");
-  m_VMEName2 = new mafString("NONE");
+  m_VMEName1 = new albaString("NONE");
+  m_VMEName2 = new albaString("NONE");
 
   m_SurfaceOutput = NULL;
   m_SurfaceInput1 = m_SurfaceInput2 = NULL;
@@ -82,16 +80,15 @@ mafOp(label)
   m_STLImporter = NULL;
 }
 //----------------------------------------------------------------------------
-lhpOpComputeHausdorffDistance::~lhpOpComputeHausdorffDistance()
-//----------------------------------------------------------------------------
+albaOpComputeHausdorffDistance::~albaOpComputeHausdorffDistance()
 {
-  mafDEL(m_SurfaceOutput);
+  albaDEL(m_SurfaceOutput);
   if(m_STLImporter)
-    mafDEL(m_STLImporter);
+    albaDEL(m_STLImporter);
   for(int i=0;i<m_ImportedSurfaces.size();i++)
   {
-    mafVMESurface *surface = m_ImportedSurfaces[i];
-    mafDEL(m_ImportedSurfaces[i]);
+    albaVMESurface *surface = m_ImportedSurfaces[i];
+    albaDEL(m_ImportedSurfaces[i]);
   }
   m_ImportedSurfaces.clear();
 
@@ -102,34 +99,30 @@ lhpOpComputeHausdorffDistance::~lhpOpComputeHausdorffDistance()
 	delete m_VMEName2;
 }
 //----------------------------------------------------------------------------
-bool lhpOpComputeHausdorffDistance::Accept(mafNode *node)
-//----------------------------------------------------------------------------
+bool albaOpComputeHausdorffDistance::InternalAccept(albaVME* node)
 {
-  //return ( node != NULL && node->IsA("mafVMESurface") );
+  //return ( node != NULL && node->IsA("albaVMESurface") );
   return true;
 }
 //----------------------------------------------------------------------------
-mafOp *lhpOpComputeHausdorffDistance::Copy()   
-//----------------------------------------------------------------------------
+albaOp *albaOpComputeHausdorffDistance::Copy()   
 {
-  return (new lhpOpComputeHausdorffDistance(m_Label));
+  return (new albaOpComputeHausdorffDistance(m_Label));
 }
 //----------------------------------------------------------------------------
-void lhpOpComputeHausdorffDistance::OpRun()   
-//----------------------------------------------------------------------------
+void albaOpComputeHausdorffDistance::OpRun()   
 {
-  //m_SurfaceInput = mafVMESurface::SafeDownCast(m_Input);
+  //m_SurfaceInput = albaVMESurface::SafeDownCast(m_Input);
 
   //m_SurfaceInput->Update();
 
   CreateGui();
 }
 //----------------------------------------------------------------------------
-void lhpOpComputeHausdorffDistance::CreateGui()
-//----------------------------------------------------------------------------
+void albaOpComputeHausdorffDistance::CreateGui()
 {
   // interface:
-  m_Gui = new mafGUI(this);
+  m_Gui = new albaGUI(this);
 
   m_Gui->Label(" ");
 
@@ -170,10 +163,9 @@ void lhpOpComputeHausdorffDistance::CreateGui()
 
 
 //----------------------------------------------------------------------------
-void lhpOpComputeHausdorffDistance::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
+void albaOpComputeHausdorffDistance::OnEvent(albaEventBase *alba_event)
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
   {
     switch(e->GetId())
     {
@@ -191,16 +183,16 @@ void lhpOpComputeHausdorffDistance::OnEvent(mafEventBase *maf_event)
       break;
     case ID_SELECT_SURFACE1:
       {
-        mafString title = mafString("Select a surface:");
-        mafEvent e(this,VME_CHOOSE);
+        albaString title = albaString("Select a surface:");
+        albaEvent e(this,VME_CHOOSE);
         e.SetString(&title);
-        e.SetArg((long)(&lhpOpComputeHausdorffDistance::SurfaceAccept)); // accept only mafVMESurface
-        mafEventMacro(e);
-        mafVME *vme = (mafVME *)e.GetVme();
+        e.SetArg((long)(&albaOpComputeHausdorffDistance::SurfaceAccept)); // accept only albaVMESurface
+        albaEventMacro(e);
+        albaVME *vme = (albaVME *)e.GetVme();
 
         if(vme)
         {
-          m_SurfaceInput1 = mafVMESurface::SafeDownCast(vme);
+          m_SurfaceInput1 = albaVMESurface::SafeDownCast(vme);
           m_VMEName1->Copy(vme->GetName());
           if(m_SurfaceInput1 && m_SurfaceInput2)
             m_Gui->Enable(ID_OP_OK, true);
@@ -210,16 +202,16 @@ void lhpOpComputeHausdorffDistance::OnEvent(mafEventBase *maf_event)
       break;
     case ID_SELECT_SURFACE2:
       {
-        mafString title = mafString("Select a surface:");
-        mafEvent e(this,VME_CHOOSE);
+        albaString title = albaString("Select a surface:");
+        albaEvent e(this,VME_CHOOSE);
         e.SetString(&title);
-        e.SetArg((long)(&lhpOpComputeHausdorffDistance::SurfaceAccept)); // accept only mafVMESurface
-        mafEventMacro(e);
-        mafVME *vme = (mafVME *)e.GetVme();
+        e.SetArg((long)(&albaOpComputeHausdorffDistance::SurfaceAccept)); // accept only albaVMESurface
+        albaEventMacro(e);
+        albaVME *vme = (albaVME *)e.GetVme();
 
         if(vme)
         {
-          m_SurfaceInput2 = mafVMESurface::SafeDownCast(vme);
+          m_SurfaceInput2 = albaVMESurface::SafeDownCast(vme);
           m_VMEName2->Copy(vme->GetName());
           if(m_SurfaceInput1 && m_SurfaceInput2)
             m_Gui->Enable(ID_OP_OK, true);
@@ -230,10 +222,10 @@ void lhpOpComputeHausdorffDistance::OnEvent(mafEventBase *maf_event)
     case ID_STL1:
       {
         if(m_STLImporter==NULL)
-          m_STLImporter = new mafOpImporterSTL();
+          m_STLImporter = new albaOpImporterSTL();
         m_STLImporter->SetFileName(m_FilenameSTL1->GetCStr());
         m_STLImporter->ImportSTL();
-        std::vector<mafVMESurface*> importedSurfaces;
+        std::vector<albaVMESurface*> importedSurfaces;
         m_STLImporter->GetImportedSTL(importedSurfaces);
         m_SurfaceInput1 = importedSurfaces[0];
 
@@ -249,10 +241,10 @@ void lhpOpComputeHausdorffDistance::OnEvent(mafEventBase *maf_event)
     case ID_STL2:
       {
         if(m_STLImporter==NULL)
-          m_STLImporter = new mafOpImporterSTL();
+          m_STLImporter = new albaOpImporterSTL();
         m_STLImporter->SetFileName(m_FilenameSTL2->GetCStr());
         m_STLImporter->ImportSTL();
-        std::vector<mafVMESurface*> importedSurfaces;
+        std::vector<albaVMESurface*> importedSurfaces;
         m_STLImporter->GetImportedSTL(importedSurfaces);
         m_SurfaceInput2 = importedSurfaces[0];
 
@@ -279,16 +271,14 @@ void lhpOpComputeHausdorffDistance::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void lhpOpComputeHausdorffDistance::OpStop(int result)
-//----------------------------------------------------------------------------
+void albaOpComputeHausdorffDistance::OpStop(int result)
 {
   if(m_Gui)
     HideGui();
-  mafEventMacro(mafEvent(this,result));  
+  albaEventMacro(albaEvent(this,result));  
 }
 //----------------------------------------------------------------------------
-void lhpOpComputeHausdorffDistance::OpUndo()
-//----------------------------------------------------------------------------
+void albaOpComputeHausdorffDistance::OpUndo()
 {
   if (m_SurfaceOutput != NULL)
   {
@@ -296,8 +286,7 @@ void lhpOpComputeHausdorffDistance::OpUndo()
   }
 }
 //----------------------------------------------------------------------------
-void lhpOpComputeHausdorffDistance::OpDo()
-//----------------------------------------------------------------------------
+void albaOpComputeHausdorffDistance::OpDo()
 {
  /* if(m_SurfaceInput1)
     m_SurfaceInput1->ReparentTo(m_Input->GetParent());
@@ -313,16 +302,15 @@ void lhpOpComputeHausdorffDistance::OpDo()
 
 
 //----------------------------------------------------------------------------
-int lhpOpComputeHausdorffDistance::ComputeDistance()
-//----------------------------------------------------------------------------
+int albaOpComputeHausdorffDistance::ComputeDistance()
 {
   m_SurfaceInput1->GetSurfaceOutput()->Update();
   m_SurfaceInput2->GetSurfaceOutput()->Update();
   vtkPolyData *inputData1 = (vtkPolyData *)(m_SurfaceInput1->GetSurfaceOutput()->GetVTKData());
   vtkPolyData *inputData2 = (vtkPolyData *)(m_SurfaceInput2->GetSurfaceOutput()->GetVTKData());
   vtkPolyData *outputData;
-  mafLogMessage("lhpOpComputeHausdorffDistance: Creating Hausdorff Distance filter...");
-  albaOpComputeHausdorffDistance *filter = new albaOpComputeHausdorffDistance();
+  albaLogMessage("albaOpComputeHausdorffDistance: Creating Hausdorff Distance filter...");
+  albaComputeHausdorffDistance *filter = new albaComputeHausdorffDistance();
   albaLogMessage("Created.");
   albaLogMessage("Set input");
   filter->SetData(inputData1, inputData2);

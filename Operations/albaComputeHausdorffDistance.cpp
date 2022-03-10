@@ -1,20 +1,19 @@
 /*=========================================================================
 Program:   LHP
-Module:    $RCSfile: lhpComputeHausdorffDistance.cpp,v $
+Module:    $RCSfile: albaComputeHausdorffDistance.cpp,v $
 Language:  C++
 Date:      $Date: 2011-09-08 15:41:49 $
 Version:   $Revision: 1.1.2.6 $
-Authors:   Eleonora Mambrini
+Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 =========================================================================*/
 
-#include "lhpDefines.h"
-#include "mafDefines.h" 
-#include "mafEvent.h"
+#include "albaDefines.h"
+#include "albaEvent.h"
 //----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// NOTE: Every CPP file in the alba must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
@@ -22,11 +21,10 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 
 //----------------------------------------------------------------------------
 // Includes :
-//----------------------------------------------------------------------------
 #include "wx/busyinfo.h"
-#include "lhpComputeHausdorffDistance.h"
+#include "albaComputeHausdorffDistance.h"
 #include "vtkCleanPolyData.h"
-#include "vtkMAFSmartPointer.h"
+#include "vtkALBASmartPointer.h"
 #include "vtkTriangleFilter.h"
 
 
@@ -41,6 +39,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkUnstructuredGrid.h"
 
 #include <math.h>
+#include "albaProgressBarHelper.h"
 
 #define FILTER_PERC 10
 #define GRID_PERC 10
@@ -70,8 +69,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #endif
 
 //----------------------------------------------------------------------------
-lhpComputeHausdorffDistance::lhpComputeHausdorffDistance()
-//----------------------------------------------------------------------------
+albaComputeHausdorffDistance::albaComputeHausdorffDistance()
 {
   m_OverallDistance = 0;
   m_SamplingDensity = 1;
@@ -109,8 +107,7 @@ lhpComputeHausdorffDistance::lhpComputeHausdorffDistance()
 }
 
 //----------------------------------------------------------------------------
-lhpComputeHausdorffDistance::~lhpComputeHausdorffDistance()
-//----------------------------------------------------------------------------
+albaComputeHausdorffDistance::~albaComputeHausdorffDistance()
 {
   vtkDEL(m_OutputMesh);
   vtkDEL(m_CleanMesh1);
@@ -130,8 +127,7 @@ lhpComputeHausdorffDistance::~lhpComputeHausdorffDistance()
 }
 
 //----------------------------------------------------------------------------
-void lhpComputeHausdorffDistance::ComputeHausdorffDistance()
-//----------------------------------------------------------------------------
+void albaComputeHausdorffDistance::ComputeHausdorffDistance()
 {
   //////////////////////////////////////////////////////////////////////////
   //initialize list of Triangles
@@ -184,7 +180,7 @@ void lhpComputeHausdorffDistance::ComputeHausdorffDistance()
   ComputeTrianglesInCell();
 
   long progress=FILTER_PERC+GRID_PERC;
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+	m_ProgBarHelper->UpdateProgressBar(progress);
 
   
   
@@ -207,7 +203,7 @@ void lhpComputeHausdorffDistance::ComputeHausdorffDistance()
     if ((vertexID%step) == 0)
     {
       progress=FILTER_PERC + GRID_PERC + vertexID*(100-(FILTER_PERC + GRID_PERC))/totVertex;
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+			m_ProgBarHelper->UpdateProgressBar(progress);
     }
       
     int gridDimension = m_GridSize[0]*m_GridSize[1]*m_GridSize[2];
@@ -221,8 +217,7 @@ void lhpComputeHausdorffDistance::ComputeHausdorffDistance()
 }
 
 //----------------------------------------------------------------------------
-void lhpComputeHausdorffDistance::ComputeTrianglesInCell()
-//----------------------------------------------------------------------------
+void albaComputeHausdorffDistance::ComputeTrianglesInCell()
 {
   vtkPoints *sampleList = vtkPoints::New();
 
@@ -284,7 +279,7 @@ void lhpComputeHausdorffDistance::ComputeTrianglesInCell()
       cellId = m_a+n_a*m_GridSize[0]+o_a*cellStride_z;
 
       if(cellId <0 || cellId >= gridDimension)
-        mafLogMessage("Error in ComputeTrianglesInCell. ");
+        albaLogMessage("Error in ComputeTrianglesInCell. ");
       
       intersectingTrianglesForCell[cellId]++;
       m_IntersectingTrianglesForCell[cellId].push_back(i);
@@ -345,7 +340,7 @@ void lhpComputeHausdorffDistance::ComputeTrianglesInCell()
 
       if(cellId < 0 || cellId>= gridDimension)
       {
-        mafLogMessage("Error in ComputeTrianglesInCell()");
+        albaLogMessage("Error in ComputeTrianglesInCell()");
         exit(1);
       }
       
@@ -362,7 +357,7 @@ void lhpComputeHausdorffDistance::ComputeTrianglesInCell()
       cellId = c_buf[j];
       if(cellId < 0 || cellId >= gridDimension)
       {
-        mafLogMessage("Error in ComputeTrianglesInCell()");
+        albaLogMessage("Error in ComputeTrianglesInCell()");
         exit(1);
       }
 
@@ -398,8 +393,7 @@ void lhpComputeHausdorffDistance::ComputeTrianglesInCell()
 }
 
 //----------------------------------------------------------------------------
-void lhpComputeHausdorffDistance::SampleTriangle(vtkGenericCell *triangle, int sampleFrequency, vtkPoints *sampleList)
-//----------------------------------------------------------------------------
+void albaComputeHausdorffDistance::SampleTriangle(vtkGenericCell *triangle, int sampleFrequency, vtkPoints *sampleList)
 {
   if(sampleFrequency == 0)
     return;
@@ -452,8 +446,7 @@ void lhpComputeHausdorffDistance::SampleTriangle(vtkGenericCell *triangle, int s
 
 
 //----------------------------------------------------------------------------
-double lhpComputeHausdorffDistance::ComputePointToSurfaceDistance(double point[3], double prevDist, double prevPoint[3])
-//----------------------------------------------------------------------------
+double albaComputeHausdorffDistance::ComputePointToSurfaceDistance(double point[3], double prevDist, double prevPoint[3])
 {
   double distanceSqr = 0.0;
   //Get relative coordinates of point
@@ -566,8 +559,7 @@ double lhpComputeHausdorffDistance::ComputePointToSurfaceDistance(double point[3
 }
 
 //----------------------------------------------------------------------------
-void lhpComputeHausdorffDistance::GetCellsAtDistance(VECTOR2 *distanceCellsList, int cellGridCoords[3], int distance)
-//----------------------------------------------------------------------------
+void albaComputeHausdorffDistance::GetCellsAtDistance(VECTOR2 *distanceCellsList, int cellGridCoords[3], int distance)
 {
   int maxNumberoOfCells;
   int cellId;
@@ -786,8 +778,7 @@ void lhpComputeHausdorffDistance::GetCellsAtDistance(VECTOR2 *distanceCellsList,
 unsigned long long counter=0;
 
 //----------------------------------------------------------------------------
-double lhpComputeHausdorffDistance::ComputePointToTriangleSqrDistance(double point[3], vtkGenericCell *triangle)
-//----------------------------------------------------------------------------
+double albaComputeHausdorffDistance::ComputePointToTriangleSqrDistance(double point[3], vtkGenericCell *triangle)
 {
   double minSqrDistance;
 
@@ -809,8 +800,7 @@ double lhpComputeHausdorffDistance::ComputePointToTriangleSqrDistance(double poi
 }
 
 //----------------------------------------------------------------------------
-double lhpComputeHausdorffDistance::ComputePointToCellSqrDistance(double point[3], int grid[3], int cellId, int cellStrideZ)
-//----------------------------------------------------------------------------
+double albaComputeHausdorffDistance::ComputePointToCellSqrDistance(double point[3], int grid[3], int cellId, int cellStrideZ)
 {
   double d2,tmp;
   int m,n,o,tmpi;
@@ -853,8 +843,7 @@ double lhpComputeHausdorffDistance::ComputePointToCellSqrDistance(double point[3
 
 
 //----------------------------------------------------------------------------
-vtkPolyData *lhpComputeHausdorffDistance::GetOutput()
-//----------------------------------------------------------------------------
+vtkPolyData *albaComputeHausdorffDistance::GetOutput()
 {
   vtkNEW(m_OutputMesh);
   vtkNEW(m_CleanMesh1);
@@ -864,9 +853,10 @@ vtkPolyData *lhpComputeHausdorffDistance::GetOutput()
   vtkCleanPolyData *cleaner = vtkCleanPolyData::New();
   vtkTriangleFilter *triangulator = vtkTriangleFilter::New();
   
-  wxBusyInfo wait(_("lhpComputeHausdorffDistance: computing Hausdorff distance..."));
+  wxBusyInfo wait(_("albaComputeHausdorffDistance: computing Hausdorff distance..."));
 
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+	m_ProgBarHelper = new albaProgressBarHelper(m_Listener);
+	m_ProgBarHelper->InitProgressBar();
 
   long progress = 0;
 
@@ -880,8 +870,7 @@ vtkPolyData *lhpComputeHausdorffDistance::GetOutput()
   m_CleanMesh1->Update();
 
   progress+=FILTER_PERC/2.0;
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-
+  
   cleaner->SetInput(m_Mesh2);
   cleaner->ConvertPolysToLinesOff();
   cleaner->GetOutput()->Update();
@@ -892,14 +881,14 @@ vtkPolyData *lhpComputeHausdorffDistance::GetOutput()
   m_CleanMesh2->Update();
 
   progress+=FILTER_PERC/2.0;
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+	m_ProgBarHelper->UpdateProgressBar(progress);
 
   
   m_OutputMesh->DeepCopy(m_CleanMesh1);
 
-  mafLogMessage("lhpComputeHausdorffDistance: computing Hausdorff distance...");
+  albaLogMessage("albaComputeHausdorffDistance: computing Hausdorff distance...");
   ComputeHausdorffDistance();
-  mafLogMessage("lhpComputeHausdorffDistance: computed.");
+  albaLogMessage("albaComputeHausdorffDistance: computed.");
 
   int nc=m_VertexErrorValues->GetNumberOfTuples();
 
@@ -913,7 +902,8 @@ vtkPolyData *lhpComputeHausdorffDistance::GetOutput()
 
   m_OutputMesh->GetPointData()->SetActiveScalars("Vertices Hausdorff Distance");
 
-  mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+	m_ProgBarHelper->CloseProgressBar();
+	cppDEL(m_ProgBarHelper);
 
   return m_OutputMesh;
   
@@ -921,8 +911,7 @@ vtkPolyData *lhpComputeHausdorffDistance::GetOutput()
 
 
 //----------------------------------------------------------------------------
-void lhpComputeHausdorffDistance::SetData(vtkPolyData *data1, vtkPolyData *data2)
-//----------------------------------------------------------------------------
+void albaComputeHausdorffDistance::SetData(vtkPolyData *data1, vtkPolyData *data2)
 {
   m_Mesh1 = data1;
   m_Mesh2 = data2;
@@ -930,8 +919,7 @@ void lhpComputeHausdorffDistance::SetData(vtkPolyData *data1, vtkPolyData *data2
 
 
 //----------------------------------------------------------------------------
-void lhpComputeHausdorffDistance::ComputeCellAndGridSize()
-//----------------------------------------------------------------------------
+void albaComputeHausdorffDistance::ComputeCellAndGridSize()
 {
   //get bounding box
   double bb1[6], bb2[6];

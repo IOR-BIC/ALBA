@@ -1,17 +1,17 @@
 /*=========================================================================
 Program:   LHP
-Module:    $RCSfile: lhpComputeHausdorffDistance.h,v $
+Module:    $RCSfile: albaComputeHausdorffDistance.h,v $
 Language:  C++
 Date:      $Date: 2011-08-05 09:11:04 $
 Version:   $Revision: 1.1.2.4 $
-Authors:   Eleonora Mambrini
+Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 =========================================================================*/
 
-#ifndef __lhpComputeHausdorffDistance_H__
-#define __lhpComputeHausdorffDistance_H__
+#ifndef __albaComputeHausdorffDistance_H__
+#define __albaComputeHausdorffDistance_H__
 
 //----------------------------------------------------------------------------
 // Includes :
@@ -29,7 +29,7 @@ class vtkPoints;
 class vtkPolyData;
 class vtkTriangle;
 class vtkUnstructuredGrid;
-class mafObserver;
+class albaProgressBarHelper;
 
 /* Use a bitmap for marking empty cells. Otherwise use array of a simple
  * type. Using a bitmap uses less memory and can be faster than a simple type
@@ -45,18 +45,18 @@ typedef std::vector<int> VECTOR1;
 typedef std::vector<std::vector<int> > VECTOR2;
 
 /** 
-class name : lhpComputeHausdorffDistance
+class name : albaComputeHausdorffDistance
 */
-class lhpComputeHausdorffDistance
+class albaComputeHausdorffDistance
 {
 public:
   /** constructor. */
-  lhpComputeHausdorffDistance();
+  albaComputeHausdorffDistance();
   /** destructor. */
-  ~lhpComputeHausdorffDistance(); 
+  ~albaComputeHausdorffDistance(); 
 
   void SetData(vtkPolyData *data1, vtkPolyData *data2);
-  void SetListener(mafObserver *listener){m_Listener=listener;};
+  void SetListener(albaObserver *listener){m_Listener=listener;};
  
   vtkPolyData *GetOutput();
 
@@ -78,7 +78,7 @@ private:
   vtkPolyData *m_CleanMesh1, *m_CleanMesh2;
   vtkPolyData *m_OutputMesh;
 
-  mafObserver *m_Listener;
+	albaObserver *m_Listener;
 
   int m_NumberOfTriangles1, m_NumberOfTriangles2;
   std::vector<vtkGenericCell*> m_ListOfTriangles2;
@@ -107,6 +107,7 @@ private:
   double m_TotalAreaMesh2;
 
   vtkFloatArray *m_VertexErrorValues;
+	albaProgressBarHelper *m_ProgBarHelper;
 
 };
 #endif
