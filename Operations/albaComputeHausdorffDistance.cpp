@@ -896,12 +896,23 @@ vtkPolyData *albaComputeHausdorffDistance::GetOutput()
   //Values are on Squared Dist
 	for (int i = 0; i < nc; i++)
 	{
-		double dist = sqrt(*m_VertexErrorValues->GetTuple(i));
+		double dist = sqrt(m_VertexErrorValues->GetTuple1(i));
 		sumDist += dist;
 		m_VertexErrorValues->SetTuple1(i, dist);
 	}
 
+	double mean = sumDist / (double)nc;
+	double errSq = 0;
 
+	for (int i = 0; i < nc; i++)
+	{
+		double err = mean-m_VertexErrorValues->GetTuple1(i);
+		errSq += err*err;
+	}
+
+	double stdDev = sqrt(errSq / (double)nc);
+
+	albaLogMessage("Hausdorff Distances:\n Mean=%f, Standard deviation=%f", mean, stdDev);
 
   m_VertexErrorValues->SetName("Vertices Hausdorff Distance");
 
