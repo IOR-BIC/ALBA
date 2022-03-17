@@ -166,7 +166,8 @@ void albaViewArbitrarySlice::PackageView()
 	m_ViewSlice->PlugVisualPipe("albaVMELandmark", "albaPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("albaVMELandmarkCloud", "albaPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("albaVMERefSys", "albaPipeSurfaceSlice");
-
+	m_ViewSlice->PlugVisualPipe("albaVMEProsthesis", "albaPipeSurfaceSlice");
+	
 	PlugChildView(m_ViewArbitrary);
 	PlugChildView(m_ViewSlice);
 }
