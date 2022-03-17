@@ -140,6 +140,8 @@ void albaViewSlicer::PackageView()
   m_ViewSlice->PlugVisualPipe("albaVMESurfaceParametric", "albaPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("albaVMEGizmo", "albaPipeGizmo", NON_VISIBLE);
 	m_ViewSlice->PlugVisualPipe("albaVMEVolumeGray", "albaPipeBox", NON_VISIBLE);
+	m_ViewSlice->PlugVisualPipe("albaVMEProsthesis", "albaPipeSurfaceSlice");
+
 	
 	PlugChildView(m_ViewArbitrary);
 	PlugChildView(m_ViewSlice);

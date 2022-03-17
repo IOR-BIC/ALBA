@@ -96,6 +96,7 @@
 #include "albaGUIVMEChooserTree.h"
 #include "albaGUI.h"
 #include "albaGUISplashScreen.h"
+#include "albaProsthesesDBManager.h"
 
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
@@ -147,6 +148,7 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_OpManager = NULL;
 	m_InteractionManager = NULL;
 	m_SnapshotManager = NULL;
+	m_ProsthesisDBManager = NULL;
 	m_ImportMenu = NULL;
 	m_ExportMenu = NULL;
 	m_OpMenu = NULL;
@@ -378,6 +380,20 @@ void albaLogicWithManagers::Show()
 
 	// must be after the albaLogicWithGUI::Show(); because in that method is set the m_AppTitle var
 	SetApplicationStamp((albaString)m_AppTitle);
+}
+
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::PlugProsthesisDBManager(albaString passPhrase /*= ""*/)
+{
+	if (m_ProsthesisDBManager == NULL)
+		m_ProsthesisDBManager = new albaProsthesesDBManager();
+
+	if(!passPhrase.IsEmpty())
+		m_ProsthesisDBManager->SetPassPhrase(passPhrase);
+
+	m_ProsthesisDBManager->LoadDB();
+
+	wxString imagesPath = albaGetConfigDirectory().c_str();
 }
 
 // Plug
@@ -1739,8 +1755,10 @@ void albaLogicWithManagers::CreateWizardToolbar()
 }
 albaProsthesesDBManager * albaLogicWithManagers::GetProsthesesDBManager()
 {
-	return NULL;
+	return m_ProsthesisDBManager;
 }
+
+
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::ConfigureWizardManager()
 {
