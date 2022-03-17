@@ -37,6 +37,8 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "wx/listctrl.h"
+#include "albaGUITransformMouseFloatVME.h"
+#include "albaInteractorGenericMouseFloatVME.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEProsthesis)
@@ -50,6 +52,9 @@ albaVMEProsthesis::albaVMEProsthesis()
 
 	m_ContentGui = NULL;
 	m_GroupGui = NULL;
+	m_InteractorTransformFloatVME = NULL;
+  m_InteractorGenericMouseFloatVME = NULL;
+
 }
 //-------------------------------------------------------------------------
 albaVMEProsthesis::~albaVMEProsthesis()
@@ -67,6 +72,15 @@ char** albaVMEProsthesis::GetIcon()
 //-------------------------------------------------------------------------
 int albaVMEProsthesis::InternalInitialize()
 {
+
+	if (m_InteractorTransformFloatVME == NULL)
+	{
+		m_InteractorTransformFloatVME = new albaGUITransformMouseFloatVME(this, this);
+		m_InteractorGenericMouseFloatVME = m_InteractorTransformFloatVME->CreateBehavior(MOUSE_LEFT_SHIFT);
+		m_InteractorGenericMouseFloatVME->SetListener(this);
+		m_InteractorGenericMouseFloatVME->SetVME(this);
+	}
+
 	if (Superclass::InternalInitialize() == ALBA_OK)
 	{
 		// force material allocation
@@ -74,6 +88,7 @@ int albaVMEProsthesis::InternalInitialize()
 
 		return ALBA_OK;
 	}
+
 
 	return ALBA_ERROR;
 }
@@ -367,12 +382,14 @@ void albaVMEProsthesis::OnEvent(albaEventBase *alba_event)
 	// events to be sent up or down in the tree are simply forwarded
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
+
 		albaID eventId = e->GetId();
 		int compNum = m_ComponentGui.size();
 		switch (eventId)
 		{
 		case ID_START: break;
 		case ID_PROSTHESIS_CHANGE: ChangeProsthesis(); break;
+		case ID_TRANSFORM: OnTranfromEvent(e); break;
 
 		default:
 			if (eventId >= ID_LAST && eventId < ID_LAST + ID_LAST_COMP_ID*compNum)
@@ -400,6 +417,41 @@ void albaVMEProsthesis::OnComponentEvent(int compGroup, int id)
 
 	default:
 		break;
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaVMEProsthesis::OnTranfromEvent(albaEvent *e)
+{
+	long arg = e->GetArg();
+
+	if (arg == albaInteractorGenericMouse::MOUSE_MOVE)
+	{
+		// Update Matrix
+		// handle incoming transform events
+		vtkTransform *tr = vtkTransform::New();
+		tr->PostMultiply();
+		tr->SetMatrix(GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+		vtkMatrix4x4 * eventMatrix = e->GetMatrix()->GetVTKMatrix();
+		tr->Concatenate(eventMatrix);
+		tr->Update();
+
+		SetAbsMatrix(tr->GetMatrix());
+
+
+		//For GUI update, commented now
+		/*albaMatrix absPose;
+		absPose.DeepCopy(tr->GetMatrix());
+		absPose.SetTimeStamp(m_CurrentTime);
+		albaTransform::GetPosition(absPose, m_Position);
+		albaTransform::GetOrientation(absPose, m_Orientation);
+
+		m_Gui->Update();
+		*/
+
+		tr->Delete();
+
+		GetLogicManager()->CameraUpdate();
 	}
 }
 

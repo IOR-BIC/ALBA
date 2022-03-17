@@ -30,6 +30,8 @@ class vtkTransform;
 class vtkTransformPolyDataFilter;
 class albaProDBCompGroup;
 class albaProDBProsthesis;
+class albaGUITransformMouseFloatVME;
+class albaInteractorGenericMouseFloatVME;
 
 /** albaVMEProsthesis - 
 */
@@ -108,6 +110,8 @@ protected:
 
 	virtual void OnComponentEvent(int compGroup, int id);
 		
+	void OnTranfromEvent(albaEvent *e);
+
 	//Components vtkData
 	std::vector <vtkTransformPolyDataFilter *> m_TransformFilters;
 	std::vector <vtkTransform *> m_Transforms; 
@@ -124,6 +128,10 @@ protected:
 	vtkAppendPolyData *m_AppendPolydata;
 	albaProDBProsthesis *m_Prosthesis;
 	albaString m_ProsthesisName;
+
+	albaGUITransformMouseFloatVME *m_InteractorTransformFloatVME;
+	albaInteractorGenericMouseFloatVME *m_InteractorGenericMouseFloatVME;
+
 
 private:
 	albaVMEProsthesis(const albaVMEProsthesis&); // Not implemented
