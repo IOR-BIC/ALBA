@@ -51,7 +51,10 @@ albaInteractor2DMeasure::albaInteractor2DMeasure()
 
 	m_Mouse = NULL;
 	m_Renderer = NULL;
+	m_CurrentRenderer = NULL;
+	m_AllRenderersVector.clear();
 	m_View = NULL;
+	m_CurrentRwi = NULL;
 
 	m_ParallelView = false;				// Set on InitRenderer
 	m_ParallelScale_OnStart = -1; // Set on InitRenderer
@@ -87,8 +90,7 @@ albaInteractor2DMeasure::albaInteractor2DMeasure()
 
 	m_LastSelection = -1;
 	m_MeasureValue = 0;
-
-
+	
 	SetColorDefault(1.0, 0.0, 1.0);
 	SetColorSelection(0.0, 1.0, 0.0);
 	SetColorEdit(1.0, 1.0, 0.0, 1.0); // yellow
@@ -102,20 +104,12 @@ albaInteractor2DMeasure::~albaInteractor2DMeasure()
 
 	vtkDEL(m_Coordinate);
 
-	for (int i = 0; i < m_TextActorVector.size(); i++)
-	{
-		// Texts
-		m_Renderer->RemoveActor2D(m_TextActorVector[i]);
-		vtkDEL(m_TextActorVector[i]);
-	}
-
-	m_Renderer->GetRenderWindow()->Render();
+	RemoveAllMeasures();
+	Render();
 
 	m_TextActorVector.clear();
-// 	m_MeasureTextVector.clear();
-// 	m_MeasureLabelVector.clear();
-
 	m_Measure2DVector.clear();
+	m_AllRenderersVector.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -123,7 +117,7 @@ void albaInteractor2DMeasure::InitRenderer(albaEventInteraction *e)
 {
 	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
 
-	if (m_Renderer == NULL)
+	//if (m_Renderer == NULL)
 	{
 		if (m_Mouse == NULL)
 		{
@@ -132,6 +126,7 @@ void albaInteractor2DMeasure::InitRenderer(albaEventInteraction *e)
 			m_Mouse = mouse;
 		}
 
+		m_CurrentRwi = m_Mouse->GetRWI();
 		m_Renderer = m_Mouse->GetRenderer();
 	}
 
@@ -141,13 +136,32 @@ void albaInteractor2DMeasure::InitRenderer(albaEventInteraction *e)
 
 		if (m_ParallelScale_OnStart == -1) // Save current Parallel Scale
 			m_ParallelScale_OnStart = m_Renderer->GetActiveCamera()->GetParallelScale();
+
+		// Add Renderer to Vector
+		bool newRenderer = true;
+		for (int i = 0; i < m_AllRenderersVector.size(); i++)
+		{
+			if (m_AllRenderersVector[i] == m_Renderer)
+			{
+				newRenderer = false;
+				break;
+			}
+		}
+		if (newRenderer) m_AllRenderersVector.push_back(m_Renderer);
 	}
 }
+
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure::Render()
 {
-	if (m_Renderer)
-		m_Renderer->GetRenderWindow()->Render();
+// 	if (m_Renderer)
+// 		m_Renderer->GetRenderWindow()->Render();
+
+	for (int i = 0; i < m_AllRenderersVector.size(); i++)
+	{
+		if (m_AllRenderersVector[i])
+			m_AllRenderersVector[i]->GetRenderWindow()->Render();
+	}
 
 	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
 }
@@ -158,10 +172,9 @@ void albaInteractor2DMeasure::OnLeftButtonDown(albaEventInteraction *e)
 {
 	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
 
-	if (!m_ParallelView)
-	{
-		InitRenderer(e);
-	}
+	InitRenderer(e);
+
+	m_CurrentRenderer = m_Renderer;
 
 	m_ShiftPressed = e->GetModifier(ALBA_SHIFT_KEY) ? 1 : 0;
 	m_AltPressed = e->GetModifier(ALBA_ALT_KEY) ? 1 : 0;
@@ -211,6 +224,8 @@ void albaInteractor2DMeasure::OnLeftButtonDown(albaEventInteraction *e)
 void albaInteractor2DMeasure::OnLeftButtonUp(albaEventInteraction *e)
 {
 	if (!m_IsEnabled) return;
+
+	if (m_CurrentRenderer != m_Renderer) return;
 
 	m_DraggingLeft = false;
 	OnButtonUp(e);
@@ -270,10 +285,7 @@ void albaInteractor2DMeasure::OnMove(albaEventInteraction *e)
 {
 	if (!m_IsEnabled) return;
 
-	if (!m_ParallelView)
-	{
-		InitRenderer(e);
-	}
+	InitRenderer(e);
 
 	m_ShiftPressed = e->GetModifier(ALBA_SHIFT_KEY) ? 1 : 0;
 	m_AltPressed = e->GetModifier(ALBA_ALT_KEY) ? 1 : 0;
@@ -299,7 +311,7 @@ void albaInteractor2DMeasure::OnMove(albaEventInteraction *e)
 		{
 			FindAndHighlight(pointCoord);
 		}
-		else
+		else if (m_CurrentRenderer == m_Renderer)
 		{
 			switch (m_Action)
 			{
@@ -364,6 +376,8 @@ void albaInteractor2DMeasure::AddMeasure(double *point1, double *point2 /*= NULL
 	newMeasure.MeasureType = m_MeasureTypeText;
 	newMeasure.Text = text;
 	newMeasure.Label = "";
+	newMeasure.Renderer = m_CurrentRenderer;
+	newMeasure.Rwi = m_CurrentRwi;
 
 	m_Measure2DVector.push_back(newMeasure);
 
@@ -377,17 +391,17 @@ void albaInteractor2DMeasure::AddMeasure(double *point1, double *point2 /*= NULL
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure::RemoveMeasure(int index)
 {
-	if (m_Renderer && index < GetMeasureCount())
+	if (index >= 0 && index < GetMeasureCount() && m_Measure2DVector[index].Renderer)
 	{
+		//////////////////////////////////////////////////////////////////////////
+		// Remove Text
+		m_Measure2DVector[index].Renderer->RemoveActor2D(m_TextActorVector[index]);
+		vtkDEL(m_TextActorVector[index]);
+		m_TextActorVector.erase(m_TextActorVector.begin() + index);
+
 		//////////////////////////////////////////////////////////////////////////
 		// Remove Measure
 		m_Measure2DVector.erase(m_Measure2DVector.begin() + index);
-
-		//////////////////////////////////////////////////////////////////////////
-		// Remove Text
-		m_Renderer->RemoveActor2D(m_TextActorVector[index]);
-		vtkDEL(m_TextActorVector[index]);
-		m_TextActorVector.erase(m_TextActorVector.begin() + index);
 	}
 }
 //---------------------------------------------------------------------------
@@ -402,6 +416,8 @@ void albaInteractor2DMeasure::SelectMeasure(int index)
 {
 	if (index >= 0 && index < m_Measure2DVector.size())
 	{
+		m_Renderer = m_CurrentRenderer = m_Measure2DVector[index].Renderer;
+
 		m_LastSelection = index;
 		m_LastEditing = -1;
 
@@ -464,13 +480,19 @@ void albaInteractor2DMeasure::ShowText(bool show)
 {
 	m_ShowText = show;
 
-// 	for (int i = 0; i < m_TextActorVector.size(); i++)
-// 	{
-// 		m_TextActorVector[i]->SetVisibility(show);
-// 	}
-
 	Update();
 }
+//----------------------------------------------------------------------------
+void albaInteractor2DMeasure::ShowText(int measure, bool show)
+{
+	Color color = m_Colors[COLOR_TEXT];
+
+	m_TextActorVector[measure]->SetColor(color.R, color.G, color.B);
+	m_TextActorVector[measure]->SetOpacity(color.Alpha);
+	m_TextActorVector[measure]->SetVisibility(show);
+	m_Measure2DVector[measure].Renderer->Render();
+}
+
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure::SetAction(MEASURE_ACTIONS action)
 {
@@ -638,6 +660,7 @@ vtkPointSource * albaInteractor2DMeasure::GetNewPointSource()
 	return ps;
 }
 
+/// Geometry Utils
 
 #define VTK_NO_INTERSECTION 0
 #define VTK_YES_INTERSECTION  2
