@@ -187,10 +187,14 @@ void albaInteractor2DMeasure_Distance::FindAndHighlight(double * point)
 	{
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
-			double linePoint1[3];
-			double linePoint2[3];
+			albaActor2dStackHelper *lineStackVector = m_LineStackVector[i];
+			if (m_Renderer != lineStackVector->GetRenderer())
+				continue;
 
-			vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[i]->GetSource();
+			double linePoint1[3], linePoint2[3];
+
+			vtkLineSource* lineSource = (vtkLineSource*)lineStackVector->GetSource();
+
 			lineSource->GetPoint1(linePoint1);
 			lineSource->GetPoint2(linePoint2);
 
@@ -217,7 +221,7 @@ void albaInteractor2DMeasure_Distance::FindAndHighlight(double * point)
 					m_CurrMeasure = i;
 					if (m_MoveMeasureEnable)
 					{
-						m_LineStackVector[i]->SetColor(m_Colors[COLOR_EDIT]);
+						lineStackVector->SetColor(m_Colors[COLOR_EDIT]);
 						SetAction(ACTION_MOVE_MEASURE);
 					}
 				}
@@ -304,8 +308,12 @@ void albaInteractor2DMeasure_Distance::AddMeasure(double *point1, double *point2
 		double oldPoint1[3], oldPoint2[3];
 		GetMeasureLinePoints(index, oldPoint1, oldPoint2);
 
+		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
+
 		if (GeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2)<POINT_UPDATE_DISTANCE)
 		{
+			if (!hasSameRenderer) return;
+
 			m_CurrMeasure = index;
 			m_CurrPoint = POINT_2;
 			EditMeasure(index, point2);

@@ -214,6 +214,10 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 	{
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
+			albaActor2dStackHelper *pointStackVector = m_PointsStackVectorOri[i];
+			if (m_Renderer != pointStackVector->GetRenderer())
+				continue;
+
 			double pointO[3], pointA[3], pointB[3];
 
 			vtkPointSource* pointSourceO = (vtkPointSource*)m_PointsStackVectorOri[i]->GetSource();
@@ -373,8 +377,12 @@ void albaInteractor2DMeasure_Angle::AddMeasure(double *point1, double *point2, d
 		double oldPoint1[3], oldPoint2[3], oldPoint3[3];
 		GetMeasureLinePoints(index, oldPoint1, oldPoint2, oldPoint3);
 
+		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
+
 		if (GeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
 		{
+			if (!hasSameRenderer) return;
+
 			m_CurrMeasure = index;
 			m_CurrPoint = POINT_2;
 			EditMeasure(index, point2);
@@ -382,6 +390,8 @@ void albaInteractor2DMeasure_Angle::AddMeasure(double *point1, double *point2, d
 		}
 		else if (m_SecondLineAdded[index] == false)
 		{
+			if (!hasSameRenderer) return;
+
 			//Adding the second line no need to add a new measure.
 			m_SecondLineAdded[index] = true;
 			

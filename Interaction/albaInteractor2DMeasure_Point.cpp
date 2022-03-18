@@ -112,9 +112,13 @@ void albaInteractor2DMeasure_Point::FindAndHighlight(double *point)
 	{
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
+			albaActor2dStackHelper *pointsStackVector = m_PointsStackVector[i];
+			if(m_Renderer!= pointsStackVector->GetRenderer())
+				continue;
+
 			double tmpPoint[3];
 
-			vtkPointSource* pointSource = (vtkPointSource*)m_PointsStackVector[i]->GetSource();
+			vtkPointSource* pointSource = (vtkPointSource*)pointsStackVector->GetSource();
 			pointSource->GetCenter(tmpPoint);
 
 			if (GeometryUtils::DistanceBetweenPoints(point, tmpPoint) < POINT_UPDATE_DISTANCE)
@@ -123,7 +127,7 @@ void albaInteractor2DMeasure_Point::FindAndHighlight(double *point)
 
 				if (m_MoveMeasureEnable)
 				{
-					m_PointsStackVector[i]->SetColor(m_Colors[COLOR_EDIT]);
+					pointsStackVector->SetColor(m_Colors[COLOR_EDIT]);
 					SetAction(ACTION_MOVE_MEASURE);
 				}
 

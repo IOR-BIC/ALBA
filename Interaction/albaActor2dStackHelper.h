@@ -64,6 +64,9 @@ public:
 	/** Sets actor visibility*/
 	void SetVisibility(bool show);
 
+	vtkRenderer * GetRenderer() const { return m_Renderer; }
+	void SetRenderer(vtkRenderer * val) { m_Renderer = val; }
+
 protected:
 	vtkPolyDataSource		*m_Source;
 	vtkPolyDataMapper2D	*m_Mapper;
