@@ -91,8 +91,11 @@ char ** albaOpMeasure2D::GetIcon()
 //----------------------------------------------------------------------------
 void albaOpMeasure2D::OpRun()
 {
-	// Open View if necessary
-	albaView *view = OpenImageView(VIEW_START + 8);
+	albaView *view = GetLogicManager()->GetViewManager()->GetSelectedView();
+
+	if(view==NULL)
+		view = OpenImageView(VIEW_START + 8); // Open View if necessary
+
 	GetLogicManager()->VmeShow(m_Input, true);
 
 	InitInteractors();
@@ -106,10 +109,10 @@ void albaOpMeasure2D::OpRun()
 		
 		if (view)
 		{
-			for (int i = 0; i < m_InteractorVector.size(); i++)
-				m_InteractorVector[i]->SetRendererByView(view);
+// 			for (int i = 0; i < m_InteractorVector.size(); i++)
+// 				m_InteractorVector[i]->SetRendererByView(view);
 
-			Load();
+			//Load();
 		}
 	}
 	else
@@ -270,6 +273,7 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 			{
 				SetMeasureInteractor(m_SelectedInteractor);
 				m_SelectedMeasure = (m_InteractorVector[m_CurrentInteractor]->GetMeasureCount() > 0) ? 0 : -1;
+				m_MeasureLabel = (m_SelectedMeasure >= 0) ? m_InteractorVector[m_CurrentInteractor]->GetMeasureLabel(m_SelectedMeasure) : "";
 				m_Gui->Update();
 			}
 			break;
@@ -360,7 +364,7 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 				m_MeasureLabel = m_InteractorVector[m_CurrentInteractor]->GetMeasureLabel(m_SelectedMeasure);
 
 				UpdateMeasureList();
-				m_Gui->Update();
+				//m_Gui->Update();
 			}
 			break;
 			case albaInteractor2DMeasure::ID_MEASURE_SELECTED:
