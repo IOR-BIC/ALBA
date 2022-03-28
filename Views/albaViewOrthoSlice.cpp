@@ -1,3 +1,4 @@
+
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
@@ -143,6 +144,11 @@ void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
 	else
 		return;
 
+	if (show && pos == -1)
+		GizmoCreate();
+	
+	if (m_VMElist.size() == 0)
+		GizmoDelete();
 
   // Enable perspective View for every VME
   m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
@@ -191,7 +197,7 @@ void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
 			ApplyViewSettings(vme);
 		}
 	}
-	if (m_CurrentVolume != NULL)
+	else
 	{
 		for (int j = 1; j < m_NumOfChildView; j++)
 		{
@@ -201,6 +207,8 @@ void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
 		}
 		ApplyViewSettings(vme);
 	}
+
+	UpdateGizmoBounds();
 
 	//CameraUpdate();
 	EnableWidgets(m_CurrentVolume != NULL);
@@ -515,12 +523,10 @@ void albaViewOrthoSlice::EnableWidgets(bool enable)
 
 //----------------------------------------------------------------------------
 void albaViewOrthoSlice::GizmoCreate()
-//----------------------------------------------------------------------------
 {
   if( m_Gizmo[0] || m_Gizmo[1] || m_Gizmo[2] ) GizmoDelete();
 
-	if(m_CurrentVolume)
-	{
+
 		int gizmoId;
 		double colors[]    = {1,0,0,  0,1,0,  0,0,1};
 		double direction[] = {albaGizmoSlice::GIZMO_SLICE_X,albaGizmoSlice::GIZMO_SLICE_Y,albaGizmoSlice::GIZMO_SLICE_Z};
@@ -528,13 +534,17 @@ void albaViewOrthoSlice::GizmoCreate()
 		// creates the gizmos
 		for(gizmoId=GIZMO_XN; gizmoId<GIZMOS_NUMBER; gizmoId++) 
 		{
-			double sliceOrigin[3];
-			albaPipeVolumeOrthoSlice *p = NULL;
-			p = albaPipeVolumeOrthoSlice::SafeDownCast(((albaViewSlice *)((albaViewCompound *)m_ChildViewList[0]))->GetNodePipe(m_CurrentVolume));
-      double normal[3];
-			p->GetSlice(sliceOrigin,normal);
+			double sliceOrigin[3] = { 0, 0, 0 };
 
-			m_Gizmo[gizmoId] = new albaGizmoSlice(m_CurrentVolume, this);
+			if (m_CurrentVolume)
+			{
+				albaPipeVolumeOrthoSlice *p = NULL;
+				p = albaPipeVolumeOrthoSlice::SafeDownCast(((albaViewSlice *)((albaViewCompound *)m_ChildViewList[0]))->GetNodePipe(m_CurrentVolume));
+				double normal[3];
+				p->GetSlice(sliceOrigin, normal);
+			}
+
+			m_Gizmo[gizmoId] = new albaGizmoSlice(m_VMElist[0]->GetRoot(), this);
 			m_Gizmo[gizmoId]->CreateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], sliceOrigin[gizmoId]);
 			m_Gizmo[gizmoId]->SetColor(&colors[gizmoId*3]);
 			m_Gizmo[gizmoId]->SetGizmoMovingModalityToBound();
@@ -557,8 +567,6 @@ void albaViewOrthoSlice::GizmoCreate()
 		// ZN view
 		m_ChildViewList[2]->VmeShow(m_Gizmo[GIZMO_YN]->GetOutput(), true);
 		m_ChildViewList[2]->VmeShow(m_Gizmo[GIZMO_ZN]->GetOutput(), true);
-	}
-
 
 }
 //----------------------------------------------------------------------------
@@ -751,25 +759,21 @@ void albaViewOrthoSlice::CreateOrthoslicesAndGizmos(albaVME *vme)
 	rot.MultiplyPoint(zNormal, normal);
 	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSlice(m_GizmoHandlePosition, normal);
   ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetTextColor(colorsZ);
-	GizmoCreate();
 }
 //-------------------------------------------------------------------------
 void albaViewOrthoSlice::DestroyOrthoSlicesAndGizmos()
 //-------------------------------------------------------------------------
 {
 	// Destroy Ortho Stuff
-  if (m_CurrentVolume == NULL)
-  {
-    albaLogMessage("current volume = NULL");
-    return;
-  }
-	m_CurrentVolume->RemoveObserver(this);
-	m_CurrentVolume = NULL;
-	GizmoDelete();
+	if (m_CurrentVolume)
+	{
+		m_CurrentVolume->RemoveObserver(this);
+		m_CurrentVolume = NULL;
+	}
 }
 //-------------------------------------------------------------------------
 void albaViewOrthoSlice::ResetSlicesPosition(albaVME *vme)
-//-------------------------------------------------------------------------
+//---------------------	----------------------------------------------------
 {
   // workaround... :(
   // maybe we need some mechanism to execute view code from op?
@@ -847,4 +851,49 @@ void albaViewOrthoSlice::ApplyViewSettings(albaVME *vme)
       }
     }
   }
+}
+
+//----------------------------------------------------------------------------
+void albaViewOrthoSlice::UpdateGizmoBounds()
+{
+	//if exists a volume or there are no Gizmos we don't need to update bounds.
+	if (m_CurrentVolume || m_Gizmo[0] == NULL)
+		return;
+
+	double minVert[3] = { VTK_DOUBLE_MAX,VTK_DOUBLE_MAX,VTK_DOUBLE_MAX }, maxVert[3] = { VTK_DOUBLE_MIN,VTK_DOUBLE_MIN,VTK_DOUBLE_MIN };
+
+	for (int i = 0; i < m_VMElist.size(); i++)
+	{
+		albaVMEOutput * vmeOutput = m_VMElist[i]->GetOutput();
+		albaMatrix mtr = *vmeOutput->GetAbsMatrix();
+		double *localBounds = vmeOutput->GetVTKData()->GetBounds();
+	
+		double locMinVert[4] = { localBounds[0],localBounds[2],localBounds[4],1 }, locMaxVert[4] = { localBounds[1],localBounds[3],localBounds[5],1};
+		double globMinVert[4], globMaxVert[4];
+
+		mtr.MultiplyPoint(locMinVert, globMinVert);
+		mtr.MultiplyPoint(locMaxVert, globMaxVert);
+
+		for (int i = 0; i < 3; i++)
+		{
+			minVert[i] = MIN(minVert[i], globMinVert[i]);
+			maxVert[i] = MAX(maxVert[i], globMaxVert[i]);
+		}
+	}
+
+	double gizmoBounds[6] = { minVert[0],maxVert[0],minVert[1],maxVert[1],minVert[2],maxVert[2] };
+
+
+	double colors[] = { 1,0,0,  0,1,0,  0,0,1 };
+	double direction[] = { albaGizmoSlice::GIZMO_SLICE_X,albaGizmoSlice::GIZMO_SLICE_Y,albaGizmoSlice::GIZMO_SLICE_Z };
+
+	int gizmoId;
+
+	for (gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
+	{
+		double sliceOrigin[3] = { 0,0,0 };
+		m_Gizmo[gizmoId]->SetBounds(gizmoBounds);
+		m_Gizmo[gizmoId]->UpdateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], sliceOrigin[gizmoId]);
+	}
+
 }

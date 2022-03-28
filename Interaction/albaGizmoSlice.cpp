@@ -61,6 +61,8 @@
 albaGizmoSlice::albaGizmoSlice(albaVME* inputVme, albaObserver *Listener /* = NULL */, const char *name /* =  */, bool inverseHandle /* = false */, double centralClipfactor /* = 0 */)
 //----------------------------------------------------------------------------
 {
+	m_Bounds[0] = m_Bounds[2] = m_Bounds[4] = -10;
+	m_Bounds[1] = m_Bounds[3] = m_Bounds[5] = 10;
   CreateGizmoSlice(inputVme, Listener, name, inverseHandle, centralClipfactor);
 }
 //----------------------------------------------------------------------------
@@ -156,8 +158,9 @@ void albaGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int
 
 	// register id
 	m_Id = gizmoSliceId;
+	vtkDataSet *VolumeVTKData = m_InputVME ? m_InputVME->GetOutput()->GetVTKData() : NULL;
 
-	if (vtkDataSet *VolumeVTKData = m_InputVME->GetOutput()->GetVTKData())
+	if (VolumeVTKData)
 	{
 		VolumeVTKData->Update();
 		VolumeVTKData->GetBounds(m_Bounds);
@@ -317,10 +320,12 @@ void albaGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int
 	// register id
 	m_Id = gizmoSliceId;
 
-	if (vtkDataSet *VolumeVTKData = m_InputVME->GetOutput()->GetVTKData())
+	vtkDataSet *volumeVTKData = m_InputVME ? m_InputVME->GetOutput()->GetVTKData() : NULL;
+
+	if (volumeVTKData)
 	{
-		VolumeVTKData->Update();
-		VolumeVTKData->GetBounds(m_Bounds);
+		volumeVTKData->Update();
+		volumeVTKData->GetBounds(m_Bounds);
 	}
 
 	double wx = m_Bounds[1] - m_Bounds[0];
@@ -479,7 +484,8 @@ void albaGizmoSlice::InitSnapArray(albaVME *vol, int axis)
 		return;
 	}
 
-  if (vtkDataSet *vol_data = vol->GetOutput()->GetVTKData())
+	vtkDataSet *vol_data = vol ? vol->GetOutput()->GetVTKData(): NULL;
+  if (vol_data)
   {
     double b[6], z;
     vol_data->Update();

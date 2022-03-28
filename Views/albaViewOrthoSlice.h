@@ -204,5 +204,7 @@ protected:
 
   std::vector<albaVME*> m_VMElist; ///< VME List
 
+private:
+	void UpdateGizmoBounds();
 };
 #endif
