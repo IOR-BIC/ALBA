@@ -153,6 +153,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpVolumeMirror.h"
 #include "albaOpVolumeResample.h"
 #include "albaOpESPCalibration.h"
+#include "albaOpComputeHausdorffDistance.h"
 
 // VIEWS
 #include "albaView3D.h"
@@ -378,6 +379,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpVolumeMeasure("Volume"), "Measure");
 	m_Logic->Plug(new albaOpMeshQuality("Mesh Quality"), "Measure");
 	m_Logic->Plug(new albaOpComputeInertialTensor(), "Measure");
+	m_Logic->Plug(new albaOpComputeHausdorffDistance(), "Measure");
 	
 	m_Logic->Plug(new albaOpIterativeRegistration(),_("Register"));
 	m_Logic->Plug(new albaOpRegisterClusters("Clusters"),_("Register"));
