@@ -30,6 +30,7 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 class albaDeviceButtonsPadMouse;
 class albaRWI;
+class albaRWIBase;
 
 class vtkALBATextActorMeter;
 class vtkActor2D;
@@ -41,7 +42,6 @@ class vtkRenderWindow;
 class vtkRenderer;
 class vtkRendererCollection;
 class vtkTextActor;
-class vtkXYPlotActor;
 
 #define TEXT_W_SHIFT 10
 #define TEXT_H_SHIFT 5
@@ -160,6 +160,7 @@ public:
 
 	/** Show/Hide Text Labels*/
 	void ShowText(bool show);
+	void ShowText(int measure, bool show);
 
 	/** Set Renderer by View needed*/
 	void SetRendererByView(albaView * view);
@@ -170,6 +171,10 @@ public:
 	/** Returns current measure index */
 	int GetCurreasureIdx() const { return m_CurrMeasure; }
 
+	/** return the current rwi */
+	albaRWIBase* GetCurrentRwi() { return m_CurrentRwi; }
+	albaRWIBase* GetCurrentRwi(int m) {	return m_Measure2DVector[m].Rwi; }
+
 protected:
 
 	struct Measure2D
@@ -178,6 +183,8 @@ protected:
 		albaString MeasureType;
 		albaString Text;
 		albaString Label;
+		vtkRenderer *Renderer = NULL;
+		albaRWIBase *Rwi;
 		//std::vector<double[3]> Points;
 	};
 
@@ -186,7 +193,7 @@ protected:
 	int m_MaxMeasures;
 
 	enum AXIS { X, Y, Z, };
-	enum Colors {	COLOR_DEFAULT, COLOR_EDIT, COLOR_SELECTION, COLOR_DISABLE, COLOR_TEXT };
+	enum Colors { COLOR_DEFAULT, COLOR_EDIT, COLOR_SELECTION, COLOR_DISABLE, COLOR_TEXT };
 	
 	albaInteractor2DMeasure();
 	virtual ~albaInteractor2DMeasure();
@@ -236,9 +243,13 @@ protected:
 	vtkPointSource *GetNewPointSource();
 
 	albaDeviceButtonsPadMouse	*m_Mouse;
-	vtkRenderer								*m_Renderer;
+	vtkRenderer					*m_Renderer;
+	vtkRenderer					*m_CurrentRenderer;
+	std::vector<vtkRenderer *> m_AllRenderersVector;
 	albaView									*m_View;
 	vtkCoordinate							*m_Coordinate;
+
+	albaRWIBase *m_CurrentRwi;
 
 	// Text Actor Vector
 	std::vector<vtkALBATextActorMeter *> m_TextActorVector;

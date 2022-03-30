@@ -73,6 +73,8 @@ SET(PROJECT_SRCS
 	albaGUISplashScreen.cpp				albaGUISplashScreen.h
 	albaGUIDialogProsthesisSelection.cpp	albaGUIDialogProsthesisSelection.h
 	albaGUIHyperLink.cpp					albaGUIHyperLink.h
+	
+	albaGUITransformMouseFloatVME.cpp	albaGUITransformMouseFloatVME.h
 )
 
 IF (ALBA_USE_VTK)

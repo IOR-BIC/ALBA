@@ -30,7 +30,6 @@ class albaGUICheckListBox;
 class albaGUIFloatSlider;
 class albaGUIDialogPreview;
 class albaRWI;
-class albaInteractorExtractIsosurface;
 class albaVMEVolumeGray;
 class albaDataPipeCustom;
 
