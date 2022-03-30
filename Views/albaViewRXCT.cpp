@@ -164,6 +164,7 @@ void albaViewRXCT::PackageView()
 	vs->PlugVisualPipe("albaVMEWrappedMeter", "albaPipePolylineSlice", MUTEX);
 	vs->PlugVisualPipe("albaVMEProsthesis", "albaPipeSurfaceSlice");
 	vs->PlugVisualPipe("albaVMESegmentationVolume", "albaPipeVolumeOrthoSlice", MUTEX);
+	vs->SetCanSpin(false);
 
 	m_ViewCTCompound->PlugChildView(vs);
 	PlugChildView(m_ViewCTCompound);
