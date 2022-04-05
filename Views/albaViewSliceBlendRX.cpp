@@ -365,13 +365,13 @@ void albaViewSliceBlendRX::GizmoCreate()
 	//Create Gizmo0
 	p->GetSliceOrigin(GIZMO_0, m_SliceBottom_Position);
 	m_GizmoSlice[GIZMO_0] = new albaGizmoSlice(m_CurrentVolume, this);
-  m_GizmoSlice[GIZMO_0]->CreateGizmoSliceInLocalPositionOnAxis(GIZMO_0,albaGizmoSlice::GIZMO_SLICE_Z, m_SliceBottom_Position[2]);
+  m_GizmoSlice[GIZMO_0]->UpdateGizmoSliceInLocalPositionOnAxis(GIZMO_0,albaGizmoSlice::GIZMO_SLICE_Z, m_SliceBottom_Position[2]);
   m_GizmoSlice[GIZMO_0]->SetColor(m_BorderColor[GIZMO_0]);
 
   //Create Gizmo1
 	p->GetSliceOrigin(GIZMO_1, m_SliceTop_Position );
 	m_GizmoSlice[GIZMO_1] = new albaGizmoSlice(m_CurrentVolume, this);
-  m_GizmoSlice[GIZMO_1]->CreateGizmoSliceInLocalPositionOnAxis(GIZMO_1,albaGizmoSlice::GIZMO_SLICE_Z, m_SliceTop_Position[2]);
+  m_GizmoSlice[GIZMO_1]->UpdateGizmoSliceInLocalPositionOnAxis(GIZMO_1,albaGizmoSlice::GIZMO_SLICE_Z, m_SliceTop_Position[2]);
   m_GizmoSlice[GIZMO_1]->SetColor(m_BorderColor[GIZMO_1]);
 
   //Show On Gizmos

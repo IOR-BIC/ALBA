@@ -144,7 +144,8 @@ void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
 	else
 		return;
 
-	if (show && pos == -1)
+	//first element showed -> create gizmo
+	if (show && m_VMElist.size() == 1)
 		GizmoCreate();
 	
 	if (m_VMElist.size() == 0)
@@ -545,7 +546,7 @@ void albaViewOrthoSlice::GizmoCreate()
 			}
 
 			m_Gizmo[gizmoId] = new albaGizmoSlice(m_VMElist[0]->GetRoot(), this);
-			m_Gizmo[gizmoId]->CreateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], sliceOrigin[gizmoId]);
+			m_Gizmo[gizmoId]->UpdateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], sliceOrigin[gizmoId]);
 			m_Gizmo[gizmoId]->SetColor(&colors[gizmoId*3]);
 			m_Gizmo[gizmoId]->SetGizmoMovingModalityToBound();
 		}

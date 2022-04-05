@@ -63,8 +63,6 @@ public:
   albaVME *GetOutput(); 
 
 	/** Create the gizmo slice with its id on choosed position on choosed axis*/
-	void CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int axis, double positionOnAxis, bool visibleCubeHandler = true);
-
 	void UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int axis, double positionOnAxis, bool visibleCubeHandler = true);
 
   enum GISMO_SLICE_AXIS_ID
