@@ -87,10 +87,13 @@ void albaInteractor2DMeasure_Distance::MoveMeasure(int index, double * point)
 
 	if (!m_MovingMeasure)
 	{
-		m_OldLineP1[0] = linePoint1[0] - m_StartMousePosition[0];
-		m_OldLineP1[1] = linePoint1[1] - m_StartMousePosition[1];
-		m_OldLineP2[0] = linePoint2[0] - m_StartMousePosition[0];
-		m_OldLineP2[1] = linePoint2[1] - m_StartMousePosition[1];
+		m_OldLineP1[X] = linePoint1[X] - m_StartMousePosition[X];
+		m_OldLineP1[Y] = linePoint1[Y] - m_StartMousePosition[Y];
+		m_OldLineP1[Z] = linePoint1[Z] - m_StartMousePosition[Z];
+
+		m_OldLineP2[X] = linePoint2[X] - m_StartMousePosition[X];
+		m_OldLineP2[Y] = linePoint2[Y] - m_StartMousePosition[Y];
+		m_OldLineP2[Z] = linePoint2[Z] - m_StartMousePosition[Z];
 
 		m_MovingMeasure = true;
 	}
@@ -101,13 +104,13 @@ void albaInteractor2DMeasure_Distance::MoveMeasure(int index, double * point)
 	double tmp_pos1[3];
 	double tmp_pos2[3];
 
-	tmp_pos1[0] = point[0] + m_OldLineP1[0];
-	tmp_pos1[1] = point[1] + m_OldLineP1[1];
-	tmp_pos1[2] = 0.0;
+	tmp_pos1[X] = point[X] + m_OldLineP1[X];
+	tmp_pos1[Y] = point[Y] + m_OldLineP1[Y];
+	tmp_pos1[Z] = point[Z] + m_OldLineP1[Z];
 
-	tmp_pos2[0] = point[0] + m_OldLineP2[0];
-	tmp_pos2[1] = point[1] + m_OldLineP2[1];
-	tmp_pos2[2] = 0.0;
+	tmp_pos2[X] = point[X] + m_OldLineP2[X];
+	tmp_pos2[Y] = point[Y] + m_OldLineP2[Y];
+	tmp_pos2[Z] = point[Z] + m_OldLineP2[Z];
 
 	m_MeasureValue = GeometryUtils::DistanceBetweenPoints(tmp_pos1, tmp_pos2);
 
@@ -143,11 +146,13 @@ void albaInteractor2DMeasure_Distance::EditMeasure(int index, double *point)
 	{
 		point1[X] = point[X];
 		point1[Y] = point[Y];
+		point1[Z] = point[Z];
 	}
 	else if (m_CurrPoint == POINT_2)
 	{
 		point2[X] = point[X];
 		point2[Y] = point[Y];
+		point2[Z] = point[Z];
 	}
 
 	m_LastEditing = index;
@@ -259,8 +264,8 @@ void albaInteractor2DMeasure_Distance::UpdateLineTickActor(double * point1, doub
 	if (m_TickLenght > 0.0) tickLenght = m_TickLenght;
 
 	// tickL
-	double tick1Point1[3]{ point1[X] - tickLenght, point1[Y], 0.0 };
-	double tick1Point2[3]{ point1[X] + tickLenght, point1[Y], 0.0 };
+	double tick1Point1[3]{ point1[X] - tickLenght, point1[Y], point1[Z] };
+	double tick1Point2[3]{ point1[X] + tickLenght, point1[Y], point1[Z] };
 
 	double angle = (M_PI / 2) - GeometryUtils::CalculateAngle(tick1Point1, point2, point1);
 
@@ -273,8 +278,8 @@ void albaInteractor2DMeasure_Distance::UpdateLineTickActor(double * point1, doub
 	tickSourceL->Update();
 
 	// tickR
-	double tick2Point1[3]{ point2[X] - tickLenght, point2[Y], 0.0 };
-	double tick2Point2[3]{ point2[X] + tickLenght, point2[Y], 0.0 };
+	double tick2Point1[3]{ point2[X] - tickLenght, point2[Y], point2[Z] };
+	double tick2Point2[3]{ point2[X] + tickLenght, point2[Y], point2[Z] };
 
 	GeometryUtils::RotatePoint(tick2Point1, point2, angle);
 	GeometryUtils::RotatePoint(tick2Point2, point2, angle);
@@ -486,13 +491,13 @@ bool albaInteractor2DMeasure_Distance::Load(albaVME *input, wxString tag)
 		// Reload points
 		for (int i = 0; i < nLines; i++)
 		{
-			point1[0] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 2 + 0);
-			point1[1] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[2] = 0.0;
+			point1[X] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 2 + 0);
+			point1[Y] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 2 + 1);
+			point1[Z] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 2 + 2);
 
-			point2[0] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 2 + 0);
-			point2[1] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[2] = 0.0;
+			point2[X] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 2 + 0);
+			point2[Y] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 2 + 1);
+			point2[Z] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 2 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -538,11 +543,13 @@ bool albaInteractor2DMeasure_Distance::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			MeasureDistancePoint1Tag.SetValue(point1[0], i * 2 + 0);
-			MeasureDistancePoint1Tag.SetValue(point1[1], i * 2 + 1);
+			MeasureDistancePoint1Tag.SetValue(point1[X], i * 2 + 0);
+			MeasureDistancePoint1Tag.SetValue(point1[Y], i * 2 + 1);
+			MeasureDistancePoint1Tag.SetValue(point1[Z], i * 2 + 2);
 
-			MeasureDistancePoint2Tag.SetValue(point2[0], i * 2 + 0);
-			MeasureDistancePoint2Tag.SetValue(point2[1], i * 2 + 1);
+			MeasureDistancePoint2Tag.SetValue(point2[X], i * 2 + 0);
+			MeasureDistancePoint2Tag.SetValue(point2[Y], i * 2 + 1);
+			MeasureDistancePoint2Tag.SetValue(point2[Z], i * 2 + 2);
 		}
 
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))

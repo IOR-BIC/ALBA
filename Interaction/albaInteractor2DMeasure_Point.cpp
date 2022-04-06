@@ -75,8 +75,6 @@ void albaInteractor2DMeasure_Point::EditMeasure(int index, double *point)
 	if (index < 0 || index >= GetMeasureCount())
 		return;
 
-	point[Z] = 0;
-
 	switch (m_EditConstraint)
 	{
 	case FREE_EDIT: break; // None
@@ -90,7 +88,7 @@ void albaInteractor2DMeasure_Point::EditMeasure(int index, double *point)
 	//////////////////////////////////////////////////////////////////////////
 	// Update Measure
 	albaString text;
-	text.Printf("Point (%.2f, %.2f)", point[X], point[Y]);
+	text.Printf("Point (%.2f, %.2f, %.2f)", point[X], point[Y], point[Z]);
 	m_Measure2DVector[index].Text = text;
 
 	// Point
@@ -177,7 +175,7 @@ void albaInteractor2DMeasure_Point::AddMeasure(double *point)
 	int index = m_Measure2DVector.size() - 1;
 
 	albaString text;
-	text.Printf("Point (%.2f, %.2f)", point[X], point[Y]);
+	text.Printf("Point (%.2f, %.2f, %.2f)", point[X], point[Y], point[Z]);
 	m_Measure2DVector[m_Measure2DVector.size() - 1].Text = text;
 
 	// Update Edit Actors
@@ -289,7 +287,7 @@ bool albaInteractor2DMeasure_Point::Load(albaVME *input, wxString tag)
 		{
 			point1[X] = measurePointTag->GetValueAsDouble(i * 2 + 0);
 			point1[Y] = measurePointTag->GetValueAsDouble(i * 2 + 1);
-			point1[Z] = 0.0;
+			point1[Z] = measurePointTag->GetValueAsDouble(i * 2 + 1);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -333,6 +331,7 @@ bool albaInteractor2DMeasure_Point::Save(albaVME *input, wxString tag)
 
 			measurePointTag.SetValue(point1[X], i * 2 + 0);
 			measurePointTag.SetValue(point1[Y], i * 2 + 1);
+			measurePointTag.SetValue(point1[Z], i * 2 + 2);
 		}
 
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))
@@ -362,11 +361,11 @@ void albaInteractor2DMeasure_Point::LockPointOnLine(double *lineP1, double *line
 
 	m_ConstrLineP1[X] = lineP1[X];
 	m_ConstrLineP1[Y] = lineP1[Y];
-	m_ConstrLineP1[Z] = 0.0;
+	m_ConstrLineP1[Z] = lineP1[Z];
 
 	m_ConstrLineP2[X] = lineP2[X];
 	m_ConstrLineP2[Y] = lineP2[Y];
-	m_ConstrLineP2[Z] = 0.0;
+	m_ConstrLineP2[Z] = lineP2[Z];
 }
 //---------------------------------------------------------------------------
 void albaInteractor2DMeasure_Point::GetPointOnLine(double *point)
@@ -386,4 +385,5 @@ void albaInteractor2DMeasure_Point::GetPointOnLine(double *point)
 
 	point[X] = newPoint[X];
 	point[Y] = newPoint[Y];
+	point[Z] = newPoint[Z];
 }

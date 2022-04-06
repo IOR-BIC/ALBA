@@ -104,12 +104,12 @@ void albaInteractor2DMeasure_Angle::MoveMeasure(int index, double *point)
 
 	if (!m_MovingMeasure)
 	{
-		m_OldLineP1[0] = linePointO[0] - m_StartMousePosition[0];
-		m_OldLineP1[1] = linePointO[1] - m_StartMousePosition[1];
-		m_OldLineP2[0] = linePointA[0] - m_StartMousePosition[0];
-		m_OldLineP2[1] = linePointA[1] - m_StartMousePosition[1];
-		m_OldLineP3[0] = linePointB[0] - m_StartMousePosition[0];
-		m_OldLineP3[1] = linePointB[1] - m_StartMousePosition[1];
+		m_OldLineP1[X] = linePointO[X] - m_StartMousePosition[X];
+		m_OldLineP1[Y] = linePointO[Y] - m_StartMousePosition[Y];
+		m_OldLineP2[X] = linePointA[X] - m_StartMousePosition[X];
+		m_OldLineP2[Y] = linePointA[Y] - m_StartMousePosition[Y];
+		m_OldLineP3[X] = linePointB[X] - m_StartMousePosition[X];
+		m_OldLineP3[Y] = linePointB[Y] - m_StartMousePosition[Y];
 
 		m_MovingMeasure = true;
 	}
@@ -119,17 +119,17 @@ void albaInteractor2DMeasure_Angle::MoveMeasure(int index, double *point)
 
 	double tmp_posO[3], tmp_posA[3], tmp_posB[3];
 
-	tmp_posO[0] = point[0] + m_OldLineP1[0];
-	tmp_posO[1] = point[1] + m_OldLineP1[1];
-	tmp_posO[2] = 0.0;
+	tmp_posO[X] = point[X] + m_OldLineP1[X];
+	tmp_posO[Y] = point[Y] + m_OldLineP1[Y];
+	tmp_posO[Z] = 0.0;
 
-	tmp_posA[0] = point[0] + m_OldLineP2[0];
-	tmp_posA[1] = point[1] + m_OldLineP2[1];
-	tmp_posA[2] = 0.0;
+	tmp_posA[X] = point[X] + m_OldLineP2[X];
+	tmp_posA[Y] = point[Y] + m_OldLineP2[Y];
+	tmp_posA[Z] = 0.0;
 
-	tmp_posB[0] = point[0] + m_OldLineP3[0];
-	tmp_posB[1] = point[1] + m_OldLineP3[1];
-	tmp_posB[2] = 0.0;
+	tmp_posB[X] = point[X] + m_OldLineP3[X];
+	tmp_posB[Y] = point[Y] + m_OldLineP3[Y];
+	tmp_posB[Z] = 0.0;
 
 	m_MeasureValue = CalculateAngle(tmp_posA, tmp_posB, tmp_posO);
 
@@ -338,7 +338,7 @@ void albaInteractor2DMeasure_Angle::UpdateCircleActor(double * point1, double * 
 {
 	double radius = MIN(GeometryUtils::DistanceBetweenPoints(point1, ori), GeometryUtils::DistanceBetweenPoints(point2, ori)) * 0.8;
 
-	double axis[3]{ ori[0], ori[1] + 1.0, 0.0 };
+	double axis[3]{ ori[X], ori[Y] + 1.0, 0.0 };
 	double angle = GeometryUtils::CalculateAngle(point1, point2, ori);
 	double angle1 = GeometryUtils::CalculateAngle(axis, point1, ori);
 	double angle2 = GeometryUtils::CalculateAngle(point1, point2, ori) + angle1;
@@ -624,17 +624,17 @@ bool albaInteractor2DMeasure_Angle::Load(albaVME *input, wxString tag)
 		// Reload points
 		for (int i = 0; i < nAngles; i++)
 		{
-			point1[0] = measureAnglePoint1Tag->GetValueAsDouble(i * 2 + 0);
-			point1[1] = measureAnglePoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[2] = 0.0;
+			point1[X] = measureAnglePoint1Tag->GetValueAsDouble(i * 2 + 0);
+			point1[Y] = measureAnglePoint1Tag->GetValueAsDouble(i * 2 + 1);
+			point1[Z] = 0.0;
 
-			point2[0] = measureAnglePoint2Tag->GetValueAsDouble(i * 2 + 0);
-			point2[1] = measureAnglePoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[2] = 0.0;
+			point2[X] = measureAnglePoint2Tag->GetValueAsDouble(i * 2 + 0);
+			point2[Y] = measureAnglePoint2Tag->GetValueAsDouble(i * 2 + 1);
+			point2[Z] = 0.0;
 
-			point3[0] = measureAnglePoint3Tag->GetValueAsDouble(i * 2 + 0);
-			point3[1] = measureAnglePoint3Tag->GetValueAsDouble(i * 2 + 1);
-			point3[2] = 0.0;
+			point3[X] = measureAnglePoint3Tag->GetValueAsDouble(i * 2 + 0);
+			point3[Y] = measureAnglePoint3Tag->GetValueAsDouble(i * 2 + 1);
+			point3[Z] = 0.0;
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -696,14 +696,14 @@ bool albaInteractor2DMeasure_Angle::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			measureAnglePoint1Tag.SetValue(point1[0], i * 2 + 0);
-			measureAnglePoint1Tag.SetValue(point1[1], i * 2 + 1);
+			measureAnglePoint1Tag.SetValue(point1[X], i * 2 + 0);
+			measureAnglePoint1Tag.SetValue(point1[Y], i * 2 + 1);
 
-			measureAnglePoint2Tag.SetValue(point2[0], i * 2 + 0);
-			measureAnglePoint2Tag.SetValue(point2[1], i * 2 + 1);
+			measureAnglePoint2Tag.SetValue(point2[X], i * 2 + 0);
+			measureAnglePoint2Tag.SetValue(point2[Y], i * 2 + 1);
 
-			measureAnglePoint3Tag.SetValue(point3[0], i * 2 + 0);
-			measureAnglePoint3Tag.SetValue(point3[1], i * 2 + 1);
+			measureAnglePoint3Tag.SetValue(point3[X], i * 2 + 0);
+			measureAnglePoint3Tag.SetValue(point3[Y], i * 2 + 1);
 
 			measureAngleTag.SetValue(m_Angles[i], i);
 		}

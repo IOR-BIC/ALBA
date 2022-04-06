@@ -275,6 +275,7 @@ protected:
 	
 	bool m_EndMeasure;
 	bool m_ParallelView;
+	double m_ViewPlaneNormal[3];
 	double m_ParallelScale_OnStart;
 
 	long m_AddMeasurePhase_Counter;

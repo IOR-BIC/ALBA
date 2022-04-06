@@ -98,10 +98,10 @@ void albaInteractor2DMeasure_CenterPoint::MoveMeasure(int index, double * point)
 
 	if (!m_MovingMeasure)
 	{
-		m_OldLineP1[0] = linePoint1[0] - m_StartMousePosition[0];
-		m_OldLineP1[1] = linePoint1[1] - m_StartMousePosition[1];
-		m_OldLineP2[0] = linePoint2[0] - m_StartMousePosition[0];
-		m_OldLineP2[1] = linePoint2[1] - m_StartMousePosition[1];
+		m_OldLineP1[X] = linePoint1[X] - m_StartMousePosition[X];
+		m_OldLineP1[Y] = linePoint1[Y] - m_StartMousePosition[Y];
+		m_OldLineP2[X] = linePoint2[X] - m_StartMousePosition[X];
+		m_OldLineP2[Y] = linePoint2[Y] - m_StartMousePosition[Y];
 
 		m_MovingMeasure = true;
 	}
@@ -112,13 +112,13 @@ void albaInteractor2DMeasure_CenterPoint::MoveMeasure(int index, double * point)
 	double tmp_pos1[3];
 	double tmp_pos2[3];
 
-	tmp_pos1[0] = point[0] + m_OldLineP1[0];
-	tmp_pos1[1] = point[1] + m_OldLineP1[1];
-	tmp_pos1[2] = 0.0;
+	tmp_pos1[X] = point[X] + m_OldLineP1[X];
+	tmp_pos1[Y] = point[Y] + m_OldLineP1[Y];
+	tmp_pos1[Z] = 0.0;
 
-	tmp_pos2[0] = point[0] + m_OldLineP2[0];
-	tmp_pos2[1] = point[1] + m_OldLineP2[1];
-	tmp_pos2[2] = 0.0;
+	tmp_pos2[X] = point[X] + m_OldLineP2[X];
+	tmp_pos2[Y] = point[Y] + m_OldLineP2[Y];
+	tmp_pos2[Z] = 0.0;
 
 	m_MeasureValue = GeometryUtils::DistanceBetweenPoints(tmp_pos1, tmp_pos2);
 
@@ -209,7 +209,7 @@ void albaInteractor2DMeasure_CenterPoint::FindAndHighlight(double * point)
 			lineSource->GetPoint1(linePoint1);
 			lineSource->GetPoint2(linePoint2);
 
-			double centerPoint[3]{ (linePoint1[0] + linePoint2[0]) / 2, (linePoint1[1] + linePoint2[1]) / 2, 0.0 };
+			double centerPoint[3]{ (linePoint1[X] + linePoint2[X]) / 2, (linePoint1[Y] + linePoint2[Y]) / 2, 0.0 };
 
 			double radius = vtkMath::Distance2BetweenPoints(linePoint2, centerPoint);
 
@@ -277,7 +277,7 @@ void albaInteractor2DMeasure_CenterPoint::UpdatePointsActor(double * point1, dou
 	pointSourceR->Update();
 
 	// Center
-	double pointC[3]{ (point1[0] + point2[0]) / 2, (point1[1] + point2[1]) / 2, 0.0 };
+	double pointC[3]{ (point1[X] + point2[X]) / 2, (point1[Y] + point2[Y]) / 2, 0.0 };
 
 	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[m_CurrMeasure]->GetSource();
 	pointSourceC->SetCenter(pointC);
@@ -294,7 +294,7 @@ void albaInteractor2DMeasure_CenterPoint::UpdateLineActors(double * point1, doub
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_CenterPoint::UpdateCircleActor(double * point1, double * point2)
 {
-	double pointC[3]{ (point1[0] + point2[0]) / 2, (point1[1] + point2[1]) / 2, 0.0 };
+	double pointC[3]{ (point1[X] + point2[X]) / 2, (point1[Y] + point2[Y]) / 2, 0.0 };
 	double radius = GeometryUtils::DistanceBetweenPoints(point1, pointC);
 
 	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[m_CurrMeasure]->GetSource();
@@ -547,13 +547,13 @@ bool albaInteractor2DMeasure_CenterPoint::Load(albaVME *input, wxString tag)
 		// Reload points
 		for (int i = 0; i < nCenters; i++)
 		{
-			point1[0] = measureCenterPoint1Tag->GetValueAsDouble(i * 2 + 0);
-			point1[1] = measureCenterPoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[2] = 0.0;
+			point1[X] = measureCenterPoint1Tag->GetValueAsDouble(i * 2 + 0);
+			point1[Y] = measureCenterPoint1Tag->GetValueAsDouble(i * 2 + 1);
+			point1[Z] = 0.0;
 
-			point2[0] = measureCenterPoint2Tag->GetValueAsDouble(i * 2 + 0);
-			point2[1] = measureCenterPoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[2] = 0.0;
+			point2[X] = measureCenterPoint2Tag->GetValueAsDouble(i * 2 + 0);
+			point2[Y] = measureCenterPoint2Tag->GetValueAsDouble(i * 2 + 1);
+			point2[Z] = 0.0;
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -599,11 +599,11 @@ bool albaInteractor2DMeasure_CenterPoint::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			measureCenterPoint1Tag.SetValue(point1[0], i * 2 + 0);
-			measureCenterPoint1Tag.SetValue(point1[1], i * 2 + 1);
+			measureCenterPoint1Tag.SetValue(point1[X], i * 2 + 0);
+			measureCenterPoint1Tag.SetValue(point1[Y], i * 2 + 1);
 
-			measureCenterPoint2Tag.SetValue(point2[0], i * 2 + 0);
-			measureCenterPoint2Tag.SetValue(point2[1], i * 2 + 1);
+			measureCenterPoint2Tag.SetValue(point2[X], i * 2 + 0);
+			measureCenterPoint2Tag.SetValue(point2[Y], i * 2 + 1);
 		}
 
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))
