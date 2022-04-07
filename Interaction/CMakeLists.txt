@@ -105,6 +105,9 @@ SET(PROJECT_SRCS
 	albaInteractor2DMeasure_Point.cpp 			albaInteractor2DMeasure_Point.h
 	albaInteractor2DMeasure_Segment.cpp			albaInteractor2DMeasure_Segment.h
 	albaInteractor2DMeasure_Template.cpp		albaInteractor2DMeasure_Template.h
+	
+	albaInteractorCompositorMouseFloatVME.cpp albaInteractorCompositorMouseFloatVME.h
+	albaInteractorGenericMouseFloatVME.cpp	albaInteractorGenericMouseFloatVME.h
 )
 
 IF (ALBA_USE_P5_GLOVE)

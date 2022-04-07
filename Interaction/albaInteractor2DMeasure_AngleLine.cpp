@@ -243,6 +243,17 @@ void albaInteractor2DMeasure_AngleLine::FindAndHighlight(double * point)
 	{
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
+			albaActor2dStackHelper *pointStackVectorA = m_PointsStackVectorA[i];
+			albaActor2dStackHelper *pointStackVectorB = m_PointsStackVectorB[i];
+			albaActor2dStackHelper *pointStackVectorC = m_PointsStackVectorC[i];
+			albaActor2dStackHelper *pointStackVectorD = m_PointsStackVectorD[i];
+
+			if (m_Renderer != pointStackVectorA->GetRenderer() && m_Renderer != pointStackVectorB->GetRenderer())
+				continue;
+			
+			if (m_Renderer != pointStackVectorC->GetRenderer() && m_Renderer != pointStackVectorD->GetRenderer())
+				continue;
+
 			double pointA[3], pointB[3], pointC[3], pointD[3];
 
 			vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[i]->GetSource();
@@ -382,6 +393,14 @@ void albaInteractor2DMeasure_AngleLine::UpdateCircleActor(double * point, double
 
 	circleSource->SetRadius(radius);
 	circleSource->SetCenter(point);
+	circleSource->SetResolution(60);
+
+	if (angle < 90.5 && angle > 89.5)
+	{
+		circleSource->SetResolution(2);
+		angle = 180.00;
+	}
+
 	circleSource->SetAngleRange(0, angle*vtkMath::DegreesToRadians());
 }
 //----------------------------------------------------------------------------
@@ -409,18 +428,26 @@ void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point
 		double oldPoint1[3], oldPoint2[3], oldPoint3[3], oldPoint4[3];
 		GetMeasureLinePoints(index, oldPoint1, oldPoint2, oldPoint3, oldPoint4);
 
+		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
+
 		if (GeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
 		{
+			if (!hasSameRenderer) return;
+
 			m_CurrMeasure = index;
 			m_CurrPoint = POINT_2;
 			EditMeasure(index, point2);
-
 			return;
 		}
 		else
 		{
+			if (GeometryUtils::DistanceBetweenPoints(oldPoint3, oldPoint4) > POINT_UPDATE_DISTANCE)
+				m_SecondLineP2Added[index] = true;
+
 			if (m_SecondLineP1Added[index] == false)
 			{
+				if (!hasSameRenderer) return;
+
 				//Adding the first point of second line no need to add a new measure.
 				m_SecondLineP1Added[index] = true;
 
@@ -429,15 +456,16 @@ void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point
 				EditMeasure(index, point3);
 				return;
 			}
-			else if(m_SecondLineP2Added[index] == false)
+			else if (m_SecondLineP2Added[index] == false)
 			{
+				if (!hasSameRenderer) return;
+
 				//Adding the second point of the second line no need to add a new measure.
 				m_SecondLineP2Added[index] = true;
 
 				m_CurrMeasure = index;
 				m_CurrPoint = POINT_4;
 				EditMeasure(index, point4);
-
 				return;
 			}
 		}
@@ -828,6 +856,7 @@ double albaInteractor2DMeasure_AngleLine::CalculateAngle(double * point1, double
 	double result = (angle2 - angle1) * 180 / 3.14;
 	
 	if (result < 0)	result += 360;
+	if (result > 180) result -= 180;
 
 	return result;
 }
