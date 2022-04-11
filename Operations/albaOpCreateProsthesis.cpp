@@ -30,6 +30,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaVME.h"
 #include "albaVMEProsthesis.h"
 #include "vtkTransform.h"
+#include "albaTagArray.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpCreateProsthesis);
@@ -92,6 +93,15 @@ albaVMEProsthesis * albaOpCreateProsthesis::CreateVMEProshesis()
 		newVmeProsthesis->SetProsthesis(prostheses.at(0));
 
 	vtkTransform *trans = vtkTransform::New();
+	albaTagItem *scoresTag = m_Input->GetRoot()->GetTagArray()->GetTag("SideProsthesis");
+	if (scoresTag)
+	{
+		albaString tmp;
+		tmp=scoresTag->GetValue();
+		if (tmp.Equals("Left"))
+			trans->RotateZ(180.0);
+	}
+
 	trans->RotateX(90.0);
 	trans->Update();
 	newVmeProsthesis->SetAbsMatrix(trans->GetMatrix());
