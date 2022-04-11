@@ -32,6 +32,7 @@ class albaProDBCompGroup;
 class albaProDBProsthesis;
 class albaGUITransformMouseFloatVME;
 class albaInteractorGenericMouseFloatVME;
+class albaVMESurface;
 
 /** albaVMEProsthesis - 
 */
@@ -67,6 +68,10 @@ public:
 	static char ** GetIcon();
 
 	void SetProsthesis(albaProDBProsthesis *prosthesis);
+
+	void SetRotCenter(double center[3]);
+
+	void ShowRotCenter(bool show);
 
 	//----------------------------------------------------------------------------
 	// Widgets ID's
@@ -112,6 +117,12 @@ protected:
 		
 	void OnTranfromEvent(albaEvent *e);
 
+	void CreateRotCenterVME();
+
+	void SetRotCenterVME(albaVME *vme);
+	
+	albaVME* GetRotCenterVME();
+
 	//Components vtkData
 	std::vector <vtkTransformPolyDataFilter *> m_TransformFilters;
 	std::vector <vtkTransform *> m_Transforms; 
@@ -132,6 +143,7 @@ protected:
 	albaGUITransformMouseFloatVME *m_InteractorTransformFloatVME;
 	albaInteractorGenericMouseFloatVME *m_InteractorGenericMouseFloatVME;
 
+	albaVMESurface *m_RotCenterVME;
 
 private:
 	albaVMEProsthesis(const albaVMEProsthesis&); // Not implemented
