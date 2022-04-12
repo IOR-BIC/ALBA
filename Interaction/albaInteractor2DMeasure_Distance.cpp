@@ -269,8 +269,12 @@ void albaInteractor2DMeasure_Distance::UpdateLineTickActor(double * point1, doub
 
 	double angle = (M_PI / 2) - GeometryUtils::CalculateAngle(tick1Point1, point2, point1);
 
-	GeometryUtils::RotatePoint(tick1Point1, point1, angle);
-	GeometryUtils::RotatePoint(tick1Point2, point1, angle);
+	angle = GeometryUtils::degreeBetweenTwoVec(point1, point2);
+// 	GeometryUtils::RotatePoint(tick1Point1, point1, angle);
+// 	GeometryUtils::RotatePoint(tick1Point2, point1, angle);
+
+	GeometryUtils::rotAroundA(tick1Point1, point1, angle);
+	GeometryUtils::rotAroundA(tick1Point2, point1, angle);
 
 	vtkLineSource* tickSourceL = (vtkLineSource*)m_TickStackVectorL[m_CurrMeasure]->GetSource();
 	tickSourceL->SetPoint1(tick1Point1);

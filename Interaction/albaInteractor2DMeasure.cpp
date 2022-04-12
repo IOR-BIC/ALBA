@@ -897,3 +897,68 @@ int GeometryUtils::PointUpDownLine(double *point, double *lp1, double *lp2)
 	else
 		return 0;
 }
+
+
+float GeometryUtils::degreeBetweenTwoVec(double *a, double *b)
+{
+	float prod = b[X] * a[X] + b[Y] * a[Y] + b[Z] * a[Z];
+	float mag_axis = sqrt((b[X] * b[X]) + (b[Y] * b[Y]) + (b[Z] * b[Z]));
+	float mag_vec = sqrt((a[X] * a[X]) + (a[Y] * a[Y]) + (a[Z] * a[Z]));
+	float degree = prod / (mag_axis * mag_vec);
+
+	return acos(degree) * 180.0 / vtkMath::Pi();
+}
+
+void GeometryUtils::rotAroundZ(double *point, float degree)
+{
+	double n_point[3];
+
+	n_point[X] = (point[X] * cos(degree * vtkMath::Pi() / 180.0)) - (point[Y] * sin(degree * vtkMath::Pi() / 180.0));
+	n_point[Y] = (point[X] * sin(degree * vtkMath::Pi() / 180.0)) + (point[Y] * cos(degree * vtkMath::Pi() / 180.0));
+	n_point[Z] = point[Z];
+
+	point[X] = n_point[X];
+	point[Y] = n_point[Y];
+	point[Z] = n_point[Z];
+}
+
+void GeometryUtils::rotAroundY(double *point, float degree)
+{
+	double n_point[3];
+
+	n_point[X] = (point[X] * cos(degree * vtkMath::Pi() / 180.0)) + (point[Z] * sin(degree * vtkMath::Pi() / 180.0));
+	n_point[Y] = point[Y];
+	n_point[Z] = ((point[X] * -1.0f) * sin(degree * vtkMath::Pi() / 180.0)) + (point[Z] * cos(degree * vtkMath::Pi() / 180.0));;
+
+	point[X] = n_point[X];
+	point[Y] = n_point[Y];
+	point[Z] = n_point[Z];
+}
+
+void GeometryUtils::rotAroundA(double *point, double *axis, float zdegree)
+{
+	double v1[3] = { 1.0f, 0.0f, 0.0f };
+	double v2[3] = { 0.0f, 1.0f, 0.0f };
+
+	float xdegree = degreeBetweenTwoVec(axis, v1);
+	float ydegree = degreeBetweenTwoVec(axis, v2);
+
+	rotAroundZ(point, xdegree);
+	rotAroundY(point, ydegree);
+	rotAroundZ(point, zdegree);
+	rotAroundY(point, -ydegree);
+	rotAroundZ(point, -xdegree);
+}
+
+/*
+void GeometryUtils::rotAObject(Object& obj, double *axis, float degree)
+{
+	axis = glm::normalize(axis);
+	translate(axis, glm::vec3{ axis[X], axis[Y], axis[Z] });
+	for (int i = 0; i < obj.vertices.size(); i++)
+	{
+		rotAroundA(obj.vertices[i], axis, degree);
+	}
+	rotAroundA(obj.mp, axis, degree);
+	translate(axis, glm::vec3{ axis[X] * -1.0f, axis[Y] * -1.0f, axis[Z] * -1.0f });
+}*/

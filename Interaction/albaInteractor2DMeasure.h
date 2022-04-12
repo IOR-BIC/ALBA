@@ -339,6 +339,12 @@ public:
 	//Returns 1 if the point is up, -1 if is down and 0 if the point is in the line
 	static int PointUpDownLine(double *point, double *lp1, double *lp2);
 
+	static float degreeBetweenTwoVec(double *a, double *b);
+	static void rotAroundZ(double *point, float degree);
+	static void rotAroundY(double *point, float degree);
+	static void rotAroundA(double *point, double *axis, float zdegree);
+
+
 protected:
 
 	enum { X, Y, Z, };
