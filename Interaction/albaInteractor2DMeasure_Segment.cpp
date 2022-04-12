@@ -94,6 +94,7 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 		{
 			point1[X] = newPoint[X];
 			point1[Y] = newPoint[Y];
+			point1[Z] = newPoint[Z];
 		}
 	}
 	else if (m_CurrPoint == POINT_2)
@@ -114,6 +115,7 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 		{
 			point2[X] = newPoint[X];
 			point2[Y] = newPoint[Y];
+			point2[Z] = newPoint[Z];
 		}
 	}
 
@@ -163,11 +165,11 @@ bool albaInteractor2DMeasure_Segment::Load(albaVME *input, wxString tag)
 		{
 			point1[X] = MeasureSegmentPoint1Tag->GetValueAsDouble(i * 2 + 0);
 			point1[Y] = MeasureSegmentPoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[Z] = 0.0;
+			point1[Z] = MeasureSegmentPoint1Tag->GetValueAsDouble(i * 2 + 2);
 
 			point2[X] = MeasureSegmentPoint2Tag->GetValueAsDouble(i * 2 + 0);
 			point2[Y] = MeasureSegmentPoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[Z] = 0.0;
+			point2[Z] = MeasureSegmentPoint2Tag->GetValueAsDouble(i * 2 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -215,9 +217,11 @@ bool albaInteractor2DMeasure_Segment::Save(albaVME *input, wxString tag)
 
 			MeasureSegmentPoint1Tag.SetValue(point1[X], i * 2 + 0);
 			MeasureSegmentPoint1Tag.SetValue(point1[Y], i * 2 + 1);
+			MeasureSegmentPoint1Tag.SetValue(point1[Z], i * 2 + 2);
 
 			MeasureSegmentPoint2Tag.SetValue(point2[X], i * 2 + 0);
 			MeasureSegmentPoint2Tag.SetValue(point2[Y], i * 2 + 1);
+			MeasureSegmentPoint2Tag.SetValue(point2[Z], i * 2 + 2);
 		}
 
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))

@@ -335,7 +335,10 @@ void albaInteractor2DMeasure_Template::AddMeasure(double * pointUL, double * poi
 	vtkNEW(points);
 	points->SetNumberOfPoints(nPoints);
 
-	points->SetPoint(0, GeometryUtils::GetMidPoint(pointUL, pointDR));
+	double midPoint[3];
+	GeometryUtils::GetMidPoint(midPoint, pointUL, pointDR);
+
+	points->SetPoint(0, midPoint);
 	points->SetPoint(1, pointUL);
 	points->SetPoint(2, pointUR);
 	points->SetPoint(3, pointDR);

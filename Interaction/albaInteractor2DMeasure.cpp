@@ -687,21 +687,126 @@ vtkPointSource * albaInteractor2DMeasure::GetNewPointSource()
 /// Points
 
 //---------------------------------------------------------------------------
+double GeometryUtils::Dot(double *point1, double *point2)
+{
+	return point1[X] * point2[X] + point1[Y] * point2[Y] + point1[Z] * point2[Z];
+}
+//---------------------------------------------------------------------------
+double GeometryUtils::Mag(double *point1)
+{
+	return std::sqrt(point1[X] * point1[X] + point1[Y] * point1[Y] + point1[Z] * point1[Z]);
+}
+//---------------------------------------------------------------------------
+float GeometryUtils::Norm2(double *point1)
+{
+	return point1[X] * point1[X] + point1[Y] * point1[Y] + point1[Z] * point1[Z];
+}
+//---------------------------------------------------------------------------
+double GeometryUtils::Norm(double *point1)
+{
+	return sqrt(Norm2(point1));
+}
+//---------------------------------------------------------------------------
+void GeometryUtils::Cross(double(&point)[3], double *point1, double *point2)
+{
+	point[X] = point1[Y] * point2[Z] - point1[Z] * point2[Y];
+	point[Y] = point1[Z] * point2[X] - point1[X] * point2[Z];
+	point[Z] = point1[X] * point2[Y] - point1[Y] * point2[X];
+}
+//---------------------------------------------------------------------------
+double* GeometryUtils::Cross(double *point1, double *point2)
+{
+	double point[3];
+	point[X] = point1[Y] * point2[Z] - point1[Z] * point2[Y];
+	point[Y] = point1[Z] * point2[X] - point1[X] * point2[Z];
+	point[Z] = point1[X] * point2[Y] - point1[Y] * point2[X];
+
+	return point;
+}
+
+/// Points Utils
+
+//---------------------------------------------------------------------------
 bool GeometryUtils::Equal(double *point1, double *point2)
 {
-	return point1[X] == point2[X] && point1[Y] == point2[Y] && point1[Z] == point2[Z];
+	return (point1[X] == point2[X]) && (point1[Y] == point2[Y]) && (point1[Z] == point2[Z]);
+}
+
+//----------------------------------------------------------------------------
+double GeometryUtils::DistanceBetweenPoints(double *point1, double *point2)
+{
+	//return sqrt(vtkMath::Distance2BetweenPoints(point1, point2));
+	return sqrt(pow(point1[X] - point2[X], 2) + pow(point1[Y] - point2[Y], 2) + pow(point1[Z] - point2[Z], 2));
 }
 
 //---------------------------------------------------------------------------
-double * GeometryUtils::GetMidPoint(double *point1, double *point2)
+void GeometryUtils::GetMidPoint(double(&midPoint)[3], double *point1, double *point2)
 {
-	double midPoint[3];
 	midPoint[X] = (point1[X] + point2[X]) / 2;
 	midPoint[Y] = (point1[Y] + point2[Y]) / 2;
 	midPoint[Z] = (point1[Z] + point2[Z]) / 2;
-
-	return midPoint;
 }
+
+//----------------------------------------------------------------------------
+double GeometryUtils::GetAngle(double point1[3], double point2[3]) // Degree
+{
+	return std::acos(Dot(point1, point2) / (Mag(point1)*Mag(point2))) * 180.0 / vtkMath::Pi();
+}
+//----------------------------------------------------------------------------
+double GeometryUtils::GetAngle(double* point1, double* point2, double* origin)
+{
+	double ab[3] = { origin[X] - point1[X], origin[Y] - point1[Y], origin[Z] - point1[Z] };
+	double bc[3] = { point2[X] - origin[X], point2[Y] - origin[Y], point2[Z] - origin[Z] };
+
+	double abVec = sqrt(ab[X] * ab[X] + ab[Y] * ab[Y] + ab[Z] * ab[Z]);
+	double bcVec = sqrt(bc[X] * bc[X] + bc[Y] * bc[Y] + bc[Z] * bc[Z]);
+
+	double abNorm[3] = { ab[X] / abVec, ab[Y] / abVec, ab[Z] / abVec };
+	double bcNorm[3] = { bc[X] / bcVec, bc[Y] / bcVec, bc[Z] / bcVec };
+
+	double res = abNorm[X] * bcNorm[X] + abNorm[Y] * bcNorm[Y] + abNorm[Z] * bcNorm[Z];
+
+	return acos(res) * 180.0 / vtkMath::Pi();
+}
+
+//----------------------------------------------------------------------------
+double GeometryUtils::GetDistancePointToLine(double * point, double * lineP1, double * lineP2)
+{
+	double ab[3] = { lineP2[X] - lineP1[X], lineP2[Y] - lineP1[Y], lineP2[Z] - lineP1[Z] };
+	double ac[3] = { point[X] - lineP1[X], point[Y] - lineP1[Y], point[Z] - lineP1[Z] };
+
+	double area = Mag(Cross(ab, ac));
+	double cd = area / Mag(ab);
+
+	return cd;
+}
+
+//----------------------------------------------------------------------------
+bool GeometryUtils::GetLineLineIntersection(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2)
+{
+	double da[3] = { line1Point2[X] - line1Point1[X], line1Point2[Y] - line1Point1[Y], line1Point2[Z] - line1Point1[Z] };
+	double db[3] = { line2Point2[X] - line2Point1[X], line2Point2[Y] - line2Point1[Y], line2Point2[Z] - line2Point1[Z] };
+	double dc[3] = { line2Point1[X] - line1Point1[X], line2Point1[Y] - line1Point1[Y], line2Point1[Z] - line1Point1[Z] };
+
+	if (Dot(dc, Cross(da, db)) != 0.0) // Lines are not coplanar
+		return false;
+
+	double cross_dc_db[3];
+	Cross(cross_dc_db, da, db);
+
+	double s = Dot(Cross(dc, db), Cross(da, db)) / Norm2(Cross(da, db));
+	if (s >= 0.0 && s <= 1.0)
+	{
+		point[X] = line1Point1[X] + da[X] * s;
+		point[Y] = line1Point1[Y] + da[Y] * s;
+		point[Z] = line1Point1[Z] + da[Z] * s;
+		return true;
+	}
+
+	return false;
+}
+
+
 
 //----------------------------------------------------------------------------
 void GeometryUtils::RotatePoint(double *point, double *origin, double angle)
@@ -714,70 +819,32 @@ void GeometryUtils::RotatePoint(double *point, double *origin, double angle)
 	point[Y] -= origin[Y];
 	point[Z] -= origin[Z];
 
-	// Rotate point
-	double xnew = point[X] * c - point[Y] * s;
-	double ynew = point[X] * s + point[Y] * c;
-	double znew = point[Z];
+	double RotatedPoint[3];
+
+	//First rotate the Z:
+	RotatedPoint[X] = point[X] * c - point[Y] * s;
+	RotatedPoint[Y] = point[X] * s + point[Y] * c;
+	RotatedPoint[Z] = point[Z];
+
+	//Second rotate the Y:
+	RotatedPoint[X] = RotatedPoint[X] * c + RotatedPoint[Z]*s;
+	RotatedPoint[Y] = RotatedPoint[Y];
+	RotatedPoint[Z] = RotatedPoint[Y] * s + RotatedPoint[Z] *c;
+
+	//Third rotate the X:
+	RotatedPoint[X] = RotatedPoint[X];
+	RotatedPoint[Y] = RotatedPoint[Y] * c - RotatedPoint[Z] *s;
+	RotatedPoint[Z] = RotatedPoint[Y] * s + RotatedPoint[Z] *c;
 
 	// Translate point back:
-	point[X] = xnew + origin[X];
-	point[Y] = ynew + origin[Y];
-	point[Z] = znew + origin[Z];
+	point[X] = RotatedPoint[X] + origin[X];
+	point[Y] = RotatedPoint[Y] + origin[Y];
+	point[Z] = RotatedPoint[Z] + origin[Z];
 }
 
-//----------------------------------------------------------------------------
-double GeometryUtils::CalculateAngle(double point1[3], double point2[3], double origin[3])
-{
-	double angleToP1 = atan2((point1[X] - origin[X]), (point1[Y] - origin[Y]));
-	double angleToP2 = atan2((point2[X] - origin[X]), (point2[Y] - origin[Y]));
-
-	double angle = angleToP2 - angleToP1;
-
-	if (angle < 0) angle += (2 * vtkMath::Pi());
-
-	return angle;
-}
-
-//----------------------------------------------------------------------------
-double GeometryUtils::DistanceBetweenPoints(double *point1, double *point2)
-{
-	return sqrt(vtkMath::Distance2BetweenPoints(point1, point2));
-}
 
 /// Lines
-//----------------------------------------------------------------------------
-bool GeometryUtils::FindIntersectionLines(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2)
-{
-	// Line1 represented as a1x + b1y = c1
-	double a1 = line1Point2[Y] - line1Point1[Y];
-	double b1 = line1Point1[X] - line1Point2[X];
-	double c1 = a1*(line1Point1[X]) + b1*(line1Point1[Y]);
 
-	// Line2 represented as a2x + b2y = c2
-	double a2 = line2Point2[Y] - line2Point1[Y];
-	double b2 = line2Point1[X] - line2Point2[X];
-	double c2 = a2*(line2Point1[X]) + b2*(line2Point1[X]);
-
-	double determinant = a1*b2 - a2*b1;
-
-	if (determinant == 0)
-	{
-		// The lines are parallel. This is simplified
-		point[X] = DBL_MAX;
-		point[Y] = DBL_MAX;
-		//point[Z] = 0.0;
-	}
-	else
-	{
-		point[X] = (b2*c1 - b1*c2) / determinant;
-		point[Y] = (a1*c2 - a2*c1) / determinant;
-		//point[Z] = 0.0;
-
-		return true;
-	}
-
-	return false;
-}
 //----------------------------------------------------------------------------
 int GeometryUtils::IntersectLineLine(double *l1p1, double *l1p2, double *l2p1, double *l2p2, double &perc)
 {
@@ -899,15 +966,7 @@ int GeometryUtils::PointUpDownLine(double *point, double *lp1, double *lp2)
 }
 
 
-float GeometryUtils::degreeBetweenTwoVec(double *a, double *b)
-{
-	float prod = b[X] * a[X] + b[Y] * a[Y] + b[Z] * a[Z];
-	float mag_axis = sqrt((b[X] * b[X]) + (b[Y] * b[Y]) + (b[Z] * b[Z]));
-	float mag_vec = sqrt((a[X] * a[X]) + (a[Y] * a[Y]) + (a[Z] * a[Z]));
-	float degree = prod / (mag_axis * mag_vec);
 
-	return acos(degree) * 180.0 / vtkMath::Pi();
-}
 
 void GeometryUtils::rotAroundZ(double *point, float degree)
 {
@@ -940,8 +999,8 @@ void GeometryUtils::rotAroundA(double *point, double *axis, float zdegree)
 	double v1[3] = { 1.0f, 0.0f, 0.0f };
 	double v2[3] = { 0.0f, 1.0f, 0.0f };
 
-	float xdegree = degreeBetweenTwoVec(axis, v1);
-	float ydegree = degreeBetweenTwoVec(axis, v2);
+	float xdegree = GetAngle(axis, v1);
+	float ydegree = GetAngle(axis, v2);
 
 	rotAroundZ(point, xdegree);
 	rotAroundY(point, ydegree);

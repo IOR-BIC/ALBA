@@ -312,21 +312,37 @@ class GeometryUtils
 {
 public:
 
-	/// Points Utils
+	static double Dot(double *point1, double *point2);
+	static double Mag(double *point1);
+
+	static float Norm2(double *point1);
+	static double Norm(double *point1);
+
+	static void Cross(double(&point)[3], double *point1, double *point2);
+	static double* Cross(double *point1, double *point2);
+
 
 	static bool Equal(double *point1, double *point2);
 
-	static double * GetMidPoint(double *point1, double *point2);
+	static double DistanceBetweenPoints(double *point1, double *point2);
+
+	static void GetMidPoint(double(&midPoint)[3], double *point1, double *point2);
+
+	static double GetAngle(double point1[3], double point2[3]);
+	static double GetAngle(double* point1, double* point2, double* origin);
+
+
+	static double GetDistancePointToLine(double * point, double * lineP1, double * lineP2);
 
 	static void RotatePoint(double *point, double *origin, double angle);
 
-	static double DistanceBetweenPoints(double *point1, double *point2);
 
-	static double CalculateAngle(double point1[3], double point2[3], double origin[3]);
+	static bool GetLineLineIntersection(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2);
+
 
 	/// Lines Utils
 
-	static bool FindIntersectionLines(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2);
+	//static bool FindIntersectionLines(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2);
 	static int IntersectLineLine(double *l1p1, double *l1p2, double *l2p1, double *l2p2, double &perc);
 
 	static double GetPointToLineDistance(double *point, double *linePoint1, double *linePoint2);
@@ -339,7 +355,7 @@ public:
 	//Returns 1 if the point is up, -1 if is down and 0 if the point is in the line
 	static int PointUpDownLine(double *point, double *lp1, double *lp2);
 
-	static float degreeBetweenTwoVec(double *a, double *b);
+
 	static void rotAroundZ(double *point, float degree);
 	static void rotAroundY(double *point, float degree);
 	static void rotAroundA(double *point, double *axis, float zdegree);

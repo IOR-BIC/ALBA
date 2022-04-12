@@ -113,13 +113,19 @@ void albaInteractor2DMeasure_AngleLine::MoveMeasure(int index, double *point)
 	{
 		m_OldLineP1[X] = pointA[X] - m_StartMousePosition[X];
 		m_OldLineP1[Y] = pointA[Y] - m_StartMousePosition[Y];
+		m_OldLineP1[Z] = pointA[Z] - m_StartMousePosition[Z];
+
 		m_OldLineP2[X] = pointB[X] - m_StartMousePosition[X];
 		m_OldLineP2[Y] = pointB[Y] - m_StartMousePosition[Y];
+		m_OldLineP2[Z] = pointB[Z] - m_StartMousePosition[Z];
 		
 		m_OldLineP3[X] = pointC[X] - m_StartMousePosition[X];
 		m_OldLineP3[Y] = pointC[Y] - m_StartMousePosition[Y];
+		m_OldLineP3[Z] = pointC[Z] - m_StartMousePosition[Z];
+
 		m_OldLineP4[X] = pointD[X] - m_StartMousePosition[X];
 		m_OldLineP4[Y] = pointD[Y] - m_StartMousePosition[Y];
+		m_OldLineP4[Z] = pointD[Z] - m_StartMousePosition[Z];
 
 		m_MovingMeasure = true;
 	}
@@ -131,19 +137,19 @@ void albaInteractor2DMeasure_AngleLine::MoveMeasure(int index, double *point)
 
 	tmp_posA[X] = m_MoveLineAB ? point[X] + m_OldLineP1[X] : pointA[X];
 	tmp_posA[Y] = m_MoveLineAB ? point[Y] + m_OldLineP1[Y] : pointA[Y];
-	tmp_posA[Z] = 0.0;
+	tmp_posA[Z] = m_MoveLineAB ? point[Z] + m_OldLineP1[Z] : pointA[Z];
 
 	tmp_posB[X] = m_MoveLineAB ? point[X] + m_OldLineP2[X] : pointB[X];
 	tmp_posB[Y] = m_MoveLineAB ? point[Y] + m_OldLineP2[Y] : pointB[Y];
-	tmp_posB[Z] = 0.0;
+	tmp_posB[Z] = m_MoveLineAB ? point[Z] + m_OldLineP2[Z] : pointB[Z];
 
-	tmp_posC[X] = m_MoveLineCD ? point[X] + m_OldLineP3[X]: pointC[X];
-	tmp_posC[Y] = m_MoveLineCD ? point[Y] + m_OldLineP3[Y]: pointC[Y];
-	tmp_posC[Z] = 0.0;
+	tmp_posC[X] = m_MoveLineCD ? point[X] + m_OldLineP3[X] : pointC[X];
+	tmp_posC[Y] = m_MoveLineCD ? point[Y] + m_OldLineP3[Y] : pointC[Y];
+	tmp_posC[Z] = m_MoveLineCD ? point[Z] + m_OldLineP3[Z] : pointC[Z];
 
-	tmp_posD[X] = m_MoveLineCD ? point[X] + m_OldLineP4[X]: pointD[X];
-	tmp_posD[Y] = m_MoveLineCD ? point[Y] + m_OldLineP4[Y]: pointD[Y];
-	tmp_posD[Z] = 0.0;
+	tmp_posD[X] = m_MoveLineCD ? point[X] + m_OldLineP4[X] : pointD[X];
+	tmp_posD[Y] = m_MoveLineCD ? point[Y] + m_OldLineP4[Y] : pointD[Y];
+	tmp_posD[Z] = m_MoveLineCD ? point[Z] + m_OldLineP4[Z] : pointD[Z];
 
 	m_MeasureValue = CalculateAngle(tmp_posA, tmp_posB, tmp_posC, tmp_posD);
 
@@ -187,28 +193,35 @@ void albaInteractor2DMeasure_AngleLine::EditMeasure(int index, double *point)
 	{
 		pointA[X] = point[X];
 		pointA[Y] = point[Y];
+		pointA[Z] = point[Z];
 	}
 	else if (m_CurrPoint == POINT_2)
 	{
 		pointB[X] = point[X];
 		pointB[Y] = point[Y];
+		pointB[Z] = point[Z];
 	}
 	else if (m_CurrPoint == POINT_3)
 	{
 		pointC[X] = point[X];
 		pointC[Y] = point[Y];
+		pointC[Z] = point[Z];
 	}
 	else if (m_CurrPoint == POINT_4)
 	{
 		pointD[X] = point[X];
 		pointD[Y] = point[Y];
+		pointD[Z] = point[Z];
 	}
 	else if (m_CurrPoint == 5) // Edit POINT_3 and POINT_4
 	{
 		pointC[X] = point[X];
 		pointC[Y] = point[Y];
+		pointC[Z] = point[Z];
+
 		pointD[X] = point[X];
 		pointD[Y] = point[Y];
+		pointD[Z] = point[Z];
 	}
 
 	m_LastEditing = index;
@@ -407,10 +420,8 @@ void albaInteractor2DMeasure_AngleLine::UpdateCircleActor(double * point, double
 void albaInteractor2DMeasure_AngleLine::UpdateTextActor(double * point1, double * point2)
 {
 	double text_pos[3];
-	text_pos[X] = (point1[X] + point2[X]) / 2;
-	text_pos[Y] = (point1[Y] + point2[Y]) / 2;
-	text_pos[Z] = (point1[Z] + point2[Z]) / 2;
-
+	GeometryUtils::GetMidPoint(text_pos, point1, point2);
+	
 	text_pos[X] += m_TextSide *TEXT_W_SHIFT;
 	text_pos[Y] -= m_TextSide *TEXT_H_SHIFT;
 
@@ -710,19 +721,19 @@ bool albaInteractor2DMeasure_AngleLine::Load(albaVME *input, wxString tag)
 		{
 			point1[X] = MeasureAngleLinePoint1Tag->GetValueAsDouble(i * 2 + 0);
 			point1[Y] = MeasureAngleLinePoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[Z] = 0.0;
+			point1[Z] = MeasureAngleLinePoint1Tag->GetValueAsDouble(i * 2 + 2);
 
 			point2[X] = MeasureAngleLinePoint2Tag->GetValueAsDouble(i * 2 + 0);
 			point2[Y] = MeasureAngleLinePoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[Z] = 0.0;
+			point2[Z] = MeasureAngleLinePoint2Tag->GetValueAsDouble(i * 2 + 2);
 
 			point3[X] = MeasureAngleLinePoint3Tag->GetValueAsDouble(i * 2 + 0);
 			point3[Y] = MeasureAngleLinePoint3Tag->GetValueAsDouble(i * 2 + 1);
-			point3[Z] = 0.0;
+			point3[Z] = MeasureAngleLinePoint3Tag->GetValueAsDouble(i * 2 + 2);
 
 			point4[X] = MeasureAngleLinePoint4Tag->GetValueAsDouble(i * 2 + 0);
 			point4[Y] = MeasureAngleLinePoint4Tag->GetValueAsDouble(i * 2 + 1);
-			point4[Z] = 0.0;
+			point4[Z] = MeasureAngleLinePoint4Tag->GetValueAsDouble(i * 2 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -792,15 +803,19 @@ bool albaInteractor2DMeasure_AngleLine::Save(albaVME *input, wxString tag)
 
 			MeasureAngleLinePoint1Tag.SetValue(point1[X], i * 2 + 0);
 			MeasureAngleLinePoint1Tag.SetValue(point1[Y], i * 2 + 1);
+			MeasureAngleLinePoint1Tag.SetValue(point1[Z], i * 2 + 2);
 
 			MeasureAngleLinePoint2Tag.SetValue(point2[X], i * 2 + 0);
 			MeasureAngleLinePoint2Tag.SetValue(point2[Y], i * 2 + 1);
+			MeasureAngleLinePoint2Tag.SetValue(point2[Z], i * 2 + 2);
 
 			MeasureAngleLinePoint3Tag.SetValue(point3[X], i * 2 + 0);
 			MeasureAngleLinePoint3Tag.SetValue(point3[Y], i * 2 + 1);
+			MeasureAngleLinePoint3Tag.SetValue(point3[Z], i * 2 + 2);
 
 			MeasureAngleLinePoint4Tag.SetValue(point4[X], i * 2 + 0);
 			MeasureAngleLinePoint4Tag.SetValue(point4[Y], i * 2 + 1);
+			MeasureAngleLinePoint4Tag.SetValue(point4[Z], i * 2 + 2);
 
 			MeasureAngleLineTag.SetValue(m_Angles[i], i);
 		}
@@ -851,12 +866,45 @@ double albaInteractor2DMeasure_AngleLine::CalculateAngle(int idx)
 //----------------------------------------------------------------------------
 double albaInteractor2DMeasure_AngleLine::CalculateAngle(double * point1, double * point2, double * point3, double * point4)
 {
-	double angle1 = atan2(point1[Y] - point2[Y], point1[X] - point2[X]);
-	double angle2 = atan2(point3[Y] - point4[Y], point3[X] - point4[X]);
-	double result = (angle2 - angle1) * 180 / 3.14;
-	
-	if (result < 0)	result += 360;
-	if (result > 180) result -= 180;
+	// 	double angle1 = atan2(point1[Y] - point2[Y], point1[X] - point2[X]);
+	// 	double angle2 = atan2(point3[Y] - point4[Y], point3[X] - point4[X]);
+	// 	double result = (angle2 - angle1) * 180 / 3.14;
+	// 	
+	// 	if (result < 0)	result += 360;
+	// 	if (result > 180) result -= 180;
+	// 
+	// 	return result;
+	// }
 
-	return result;
+	double diff[3] = { point3[X] - point1[X], point3[Y] - point1[Y], point3[Z] - point1[Z] };
+	double newP3[3] = { point3[X] + diff[X], point3[Y] + diff[Y], point3[Z] + diff[Z] };
+	double newP4[3] = { point4[X] - diff[X], point4[Y] - diff[Y], point4[Z] - diff[Z] };
+
+	return GeometryUtils::GetAngle(point1, newP4, point2);
+
+	// Find direction ratio of line AB
+	int ABx = point1[X] - point2[X];
+	int ABy = point1[Y] - point2[Y];
+	int ABz = point1[Z] - point2[Z];
+
+	// Find direction ratio of line BC
+	int BCx = newP4[X] - point2[X];
+	int BCy = newP4[Y] - point2[Y];
+	int BCz = newP4[Z] - point2[Z];
+
+	// Find the dotProduct of lines AB & BC
+	double dotProduct = ABx * BCx + ABy * BCy + ABz * BCz;
+
+	// Find magnitude of line AB and BC
+	double magnitudeAB = ABx * ABx + ABy * ABy + ABz * ABz; 
+	double magnitudeBC = BCx * BCx + BCy * BCy + BCz * BCz;
+
+	// Find the cosine of the angle formed by line AB and BC
+	double angle = dotProduct;
+	angle /= sqrt(magnitudeAB * magnitudeBC);
+
+	// Find angle in radian
+	angle = (angle * 180.0) / vtkMath::Pi();
+
+	return angle;
 }

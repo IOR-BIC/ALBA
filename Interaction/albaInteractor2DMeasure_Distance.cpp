@@ -267,9 +267,9 @@ void albaInteractor2DMeasure_Distance::UpdateLineTickActor(double * point1, doub
 	double tick1Point1[3]{ point1[X] - tickLenght, point1[Y], point1[Z] };
 	double tick1Point2[3]{ point1[X] + tickLenght, point1[Y], point1[Z] };
 
-	double angle = (M_PI / 2) - GeometryUtils::CalculateAngle(tick1Point1, point2, point1);
+	double angle = (M_PI / 2) - GeometryUtils::GetAngle(tick1Point1, point2, point1);
 
-	angle = GeometryUtils::degreeBetweenTwoVec(point1, point2);
+	angle = GeometryUtils::GetAngle(point1, point2);
 // 	GeometryUtils::RotatePoint(tick1Point1, point1, angle);
 // 	GeometryUtils::RotatePoint(tick1Point2, point1, angle);
 

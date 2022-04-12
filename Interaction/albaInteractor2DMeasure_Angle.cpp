@@ -106,10 +106,15 @@ void albaInteractor2DMeasure_Angle::MoveMeasure(int index, double *point)
 	{
 		m_OldLineP1[X] = linePointO[X] - m_StartMousePosition[X];
 		m_OldLineP1[Y] = linePointO[Y] - m_StartMousePosition[Y];
+		m_OldLineP1[Z] = linePointO[Z] - m_StartMousePosition[Z];
+
 		m_OldLineP2[X] = linePointA[X] - m_StartMousePosition[X];
 		m_OldLineP2[Y] = linePointA[Y] - m_StartMousePosition[Y];
+		m_OldLineP2[Z] = linePointA[Z] - m_StartMousePosition[Z];
+
 		m_OldLineP3[X] = linePointB[X] - m_StartMousePosition[X];
 		m_OldLineP3[Y] = linePointB[Y] - m_StartMousePosition[Y];
+		m_OldLineP3[Z] = linePointB[Z] - m_StartMousePosition[Z];
 
 		m_MovingMeasure = true;
 	}
@@ -121,15 +126,15 @@ void albaInteractor2DMeasure_Angle::MoveMeasure(int index, double *point)
 
 	tmp_posO[X] = point[X] + m_OldLineP1[X];
 	tmp_posO[Y] = point[Y] + m_OldLineP1[Y];
-	tmp_posO[Z] = 0.0;
+	tmp_posO[Z] = point[Z] + m_OldLineP1[Z];
 
 	tmp_posA[X] = point[X] + m_OldLineP2[X];
 	tmp_posA[Y] = point[Y] + m_OldLineP2[Y];
-	tmp_posA[Z] = 0.0;
+	tmp_posA[Z] = point[Z] + m_OldLineP2[Z];
 
 	tmp_posB[X] = point[X] + m_OldLineP3[X];
 	tmp_posB[Y] = point[Y] + m_OldLineP3[Y];
-	tmp_posB[Z] = 0.0;
+	tmp_posB[Z] = point[Z] + m_OldLineP3[Z];
 
 	m_MeasureValue = CalculateAngle(tmp_posA, tmp_posB, tmp_posO);
 
@@ -171,16 +176,19 @@ void albaInteractor2DMeasure_Angle::EditMeasure(int index, double *point)
 	{
 		pointO[X] = point[X];
 		pointO[Y] = point[Y];
+		pointO[Z] = point[Z];
 	}
 	else if (m_CurrPoint == POINT_2)
 	{
 		pointA[X] = point[X];
 		pointA[Y] = point[Y];
+		pointA[Z] = point[Z];
 	}
 	else if (m_CurrPoint == POINT_3)
 	{
 		pointB[X] = point[X];
 		pointB[Y] = point[Y];
+		pointB[Z] = point[Z];
 	}
 
 	m_LastEditing = index;
@@ -337,11 +345,12 @@ void albaInteractor2DMeasure_Angle::UpdateLineActors(double * point1, double * p
 void albaInteractor2DMeasure_Angle::UpdateCircleActor(double * point1, double * point2, double * ori)
 {
 	double radius = MIN(GeometryUtils::DistanceBetweenPoints(point1, ori), GeometryUtils::DistanceBetweenPoints(point2, ori)) * 0.8;
+		
+	double axis[3]{ ori[X] * m_ViewPlaneNormal[X], ori[Y] * m_ViewPlaneNormal[Y], ori[Z] * m_ViewPlaneNormal[Z] };
 
-	double axis[3]{ ori[X], ori[Y] + 1.0, 0.0 };
-	double angle = GeometryUtils::CalculateAngle(point1, point2, ori);
-	double angle1 = GeometryUtils::CalculateAngle(axis, point1, ori);
-	double angle2 = GeometryUtils::CalculateAngle(point1, point2, ori) + angle1;
+	double angle = GeometryUtils::GetAngle(point1, point2, ori) * vtkMath::DegreesToRadians();
+	double angle1 = GeometryUtils::GetAngle(axis, point1, ori) * vtkMath::DegreesToRadians();
+	double angle2 = (GeometryUtils::GetAngle(point1, point2, ori) + angle1) * vtkMath::DegreesToRadians();
 
 	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[m_CurrMeasure]->GetSource();
 
@@ -357,9 +366,7 @@ void albaInteractor2DMeasure_Angle::UpdateCircleActor(double * point1, double * 
 void albaInteractor2DMeasure_Angle::UpdateTextActor(double * point1, double * point2)
 {
 	double text_pos[3];
-	text_pos[X] = (point1[X] + point2[X]) / 2;
-	text_pos[Y] = (point1[Y] + point2[Y]) / 2;
-	text_pos[Z] = (point1[Z] + point2[Z]) / 2;
+	GeometryUtils::GetMidPoint(text_pos, point1, point2);
 
 	text_pos[X] += m_TextSide *TEXT_W_SHIFT;
 	text_pos[Y] -= m_TextSide *TEXT_H_SHIFT;
@@ -626,15 +633,15 @@ bool albaInteractor2DMeasure_Angle::Load(albaVME *input, wxString tag)
 		{
 			point1[X] = measureAnglePoint1Tag->GetValueAsDouble(i * 2 + 0);
 			point1[Y] = measureAnglePoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[Z] = 0.0;
+			point1[Z] = measureAnglePoint1Tag->GetValueAsDouble(i * 2 + 2);
 
 			point2[X] = measureAnglePoint2Tag->GetValueAsDouble(i * 2 + 0);
 			point2[Y] = measureAnglePoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[Z] = 0.0;
+			point2[Z] = measureAnglePoint2Tag->GetValueAsDouble(i * 2 + 2);
 
 			point3[X] = measureAnglePoint3Tag->GetValueAsDouble(i * 2 + 0);
 			point3[Y] = measureAnglePoint3Tag->GetValueAsDouble(i * 2 + 1);
-			point3[Z] = 0.0;
+			point3[Z] = measureAnglePoint3Tag->GetValueAsDouble(i * 2 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -698,12 +705,15 @@ bool albaInteractor2DMeasure_Angle::Save(albaVME *input, wxString tag)
 
 			measureAnglePoint1Tag.SetValue(point1[X], i * 2 + 0);
 			measureAnglePoint1Tag.SetValue(point1[Y], i * 2 + 1);
+			measureAnglePoint1Tag.SetValue(point1[Z], i * 2 + 2);
 
 			measureAnglePoint2Tag.SetValue(point2[X], i * 2 + 0);
 			measureAnglePoint2Tag.SetValue(point2[Y], i * 2 + 1);
+			measureAnglePoint2Tag.SetValue(point2[Z], i * 2 + 1);
 
 			measureAnglePoint3Tag.SetValue(point3[X], i * 2 + 0);
 			measureAnglePoint3Tag.SetValue(point3[Y], i * 2 + 1);
+			measureAnglePoint3Tag.SetValue(point3[Z], i * 2 + 1);
 
 			measureAngleTag.SetValue(m_Angles[i], i);
 		}
@@ -750,10 +760,10 @@ double albaInteractor2DMeasure_Angle::CalculateAngle(int idx)
 //----------------------------------------------------------------------------
 double albaInteractor2DMeasure_Angle::CalculateAngle(double * point1, double * point2, double * ori)
 {
-	double angle = GeometryUtils::CalculateAngle(point1, point2, ori);
+	double angle = GeometryUtils::GetAngle(point1, point2, ori);
 
-	if (angle > vtkMath::Pi())
-		angle = GeometryUtils::CalculateAngle(point2, point1, ori);
+	if (angle * vtkMath::DegreesToRadians() > vtkMath::Pi())
+		angle = GeometryUtils::GetAngle(point2, point1, ori);
 
-	return angle *vtkMath::RadiansToDegrees();
+	return angle;
 }
