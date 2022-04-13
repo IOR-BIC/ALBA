@@ -766,7 +766,7 @@ double GeometryUtils::GetAngle(double* point1, double* point2, double* origin)
 
 	double res = abNorm[X] * bcNorm[X] + abNorm[Y] * bcNorm[Y] + abNorm[Z] * bcNorm[Z];
 
-	return acos(res) * 180.0 / vtkMath::Pi();
+	return 180.0 - (acos(res) * 180.0 / vtkMath::Pi());
 }
 
 //----------------------------------------------------------------------------

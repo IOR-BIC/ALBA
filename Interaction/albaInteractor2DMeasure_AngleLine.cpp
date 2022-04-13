@@ -866,45 +866,9 @@ double albaInteractor2DMeasure_AngleLine::CalculateAngle(int idx)
 //----------------------------------------------------------------------------
 double albaInteractor2DMeasure_AngleLine::CalculateAngle(double * point1, double * point2, double * point3, double * point4)
 {
-	// 	double angle1 = atan2(point1[Y] - point2[Y], point1[X] - point2[X]);
-	// 	double angle2 = atan2(point3[Y] - point4[Y], point3[X] - point4[X]);
-	// 	double result = (angle2 - angle1) * 180 / 3.14;
-	// 	
-	// 	if (result < 0)	result += 360;
-	// 	if (result > 180) result -= 180;
-	// 
-	// 	return result;
-	// }
-
-	double diff[3] = { point3[X] - point1[X], point3[Y] - point1[Y], point3[Z] - point1[Z] };
-	double newP3[3] = { point3[X] + diff[X], point3[Y] + diff[Y], point3[Z] + diff[Z] };
+	// Translate Second Line
+	double diff[3] = { point3[X] - point2[X], point3[Y] - point2[Y], point3[Z] - point2[Z] };
 	double newP4[3] = { point4[X] - diff[X], point4[Y] - diff[Y], point4[Z] - diff[Z] };
 
 	return GeometryUtils::GetAngle(point1, newP4, point2);
-
-	// Find direction ratio of line AB
-	int ABx = point1[X] - point2[X];
-	int ABy = point1[Y] - point2[Y];
-	int ABz = point1[Z] - point2[Z];
-
-	// Find direction ratio of line BC
-	int BCx = newP4[X] - point2[X];
-	int BCy = newP4[Y] - point2[Y];
-	int BCz = newP4[Z] - point2[Z];
-
-	// Find the dotProduct of lines AB & BC
-	double dotProduct = ABx * BCx + ABy * BCy + ABz * BCz;
-
-	// Find magnitude of line AB and BC
-	double magnitudeAB = ABx * ABx + ABy * ABy + ABz * ABz; 
-	double magnitudeBC = BCx * BCx + BCy * BCy + BCz * BCz;
-
-	// Find the cosine of the angle formed by line AB and BC
-	double angle = dotProduct;
-	angle /= sqrt(magnitudeAB * magnitudeBC);
-
-	// Find angle in radian
-	angle = (angle * 180.0) / vtkMath::Pi();
-
-	return angle;
 }

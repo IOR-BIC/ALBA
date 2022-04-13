@@ -346,7 +346,7 @@ void albaInteractor2DMeasure_Angle::UpdateCircleActor(double * point1, double * 
 {
 	double radius = MIN(GeometryUtils::DistanceBetweenPoints(point1, ori), GeometryUtils::DistanceBetweenPoints(point2, ori)) * 0.8;
 		
-	double axis[3]{ ori[X] * m_ViewPlaneNormal[X], ori[Y] * m_ViewPlaneNormal[Y], ori[Z] * m_ViewPlaneNormal[Z] };
+	double axis[3]{ /*ori[X] **/ m_ViewPlaneNormal[X], /*ori[Y] **/ m_ViewPlaneNormal[Y], /*ori[Z] **/ m_ViewPlaneNormal[Z] };
 
 	double angle = GeometryUtils::GetAngle(point1, point2, ori) * vtkMath::DegreesToRadians();
 	double angle1 = GeometryUtils::GetAngle(axis, point1, ori) * vtkMath::DegreesToRadians();
@@ -761,9 +761,6 @@ double albaInteractor2DMeasure_Angle::CalculateAngle(int idx)
 double albaInteractor2DMeasure_Angle::CalculateAngle(double * point1, double * point2, double * ori)
 {
 	double angle = GeometryUtils::GetAngle(point1, point2, ori);
-
-	if (angle * vtkMath::DegreesToRadians() > vtkMath::Pi())
-		angle = GeometryUtils::GetAngle(point2, point1, ori);
 
 	return angle;
 }
