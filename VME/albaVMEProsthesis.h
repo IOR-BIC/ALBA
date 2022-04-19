@@ -73,6 +73,8 @@ public:
 
 	void ShowRotCenter(bool show);
 
+	void GetZMinMax(double &zMin, double &zMax);
+
 	//----------------------------------------------------------------------------
 	// Widgets ID's
 	//----------------------------------------------------------------------------
@@ -122,6 +124,7 @@ protected:
 	void SetRotCenterVME(albaVME *vme);
 	
 	albaVME* GetRotCenterVME();
+
 
 	//Components vtkData
 	std::vector <vtkTransformPolyDataFilter *> m_TransformFilters;

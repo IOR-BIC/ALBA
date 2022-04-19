@@ -506,6 +506,26 @@ albaVME* albaVMEProsthesis::GetRotCenterVME()
 	return	m_RotCenterVME;
 }
 
+//----------------------------------------------------------------------------
+void albaVMEProsthesis::GetZMinMax(double &zMin, double &zMax)
+{
+	zMin = VTK_DOUBLE_MAX;
+	zMax = VTK_DOUBLE_MIN;
+	double in[4], out[4];
+
+	albaMatrix *absMtr=GetOutput()->GetAbsMatrix();
+
+	in[3] = 1;
+	vtkDataSet *outputDataSet = GetOutput()->GetVTKData();
+	int nPoints = outputDataSet->GetNumberOfPoints();
+	for (int i = 0; i < nPoints; i++) {
+		outputDataSet->GetPoint(i, in);
+		absMtr->MultiplyPoint(in, out);
+		zMin = MIN(zMin, out[2]);
+		zMax = MAX(zMax, out[2]);
+	}
+}
+
 //-------------------------------------------------------------------------
 void albaVMEProsthesis::SetRotCenter(double center[3])
 {
