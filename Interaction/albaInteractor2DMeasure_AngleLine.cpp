@@ -279,7 +279,7 @@ void albaInteractor2DMeasure_AngleLine::FindAndHighlight(double * point)
 			pointSourceC->GetCenter(pointC);
 			pointSourceD->GetCenter(pointD);
 
-			if (GeometryUtils::DistancePointToLine(point, pointA, pointB) < POINT_UPDATE_DISTANCE)
+			if (albaGeometryUtils::DistancePointToLine(point, pointA, pointB) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -313,7 +313,7 @@ void albaInteractor2DMeasure_AngleLine::FindAndHighlight(double * point)
 				Render();
 				return;
 			}
-			else if (GeometryUtils::DistancePointToLine(point, pointC, pointD) < POINT_UPDATE_DISTANCE)
+			else if (albaGeometryUtils::DistancePointToLine(point, pointC, pointD) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -420,7 +420,7 @@ void albaInteractor2DMeasure_AngleLine::UpdateCircleActor(double * point, double
 void albaInteractor2DMeasure_AngleLine::UpdateTextActor(double * point1, double * point2)
 {
 	double text_pos[3];
-	GeometryUtils::GetMidPoint(text_pos, point1, point2);
+	albaGeometryUtils::GetMidPoint(text_pos, point1, point2);
 	
 	text_pos[X] += m_TextSide *TEXT_W_SHIFT;
 	text_pos[Y] -= m_TextSide *TEXT_H_SHIFT;
@@ -441,7 +441,7 @@ void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point
 
 		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
 
-		if (GeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
+		if (albaGeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
 		{
 			if (!hasSameRenderer) return;
 
@@ -452,7 +452,7 @@ void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point
 		}
 		else
 		{
-			if (GeometryUtils::DistanceBetweenPoints(oldPoint3, oldPoint4) > POINT_UPDATE_DISTANCE)
+			if (albaGeometryUtils::DistanceBetweenPoints(oldPoint3, oldPoint4) > POINT_UPDATE_DISTANCE)
 				m_SecondLineP2Added[index] = true;
 
 			if (m_SecondLineP1Added[index] == false)
@@ -870,5 +870,5 @@ double albaInteractor2DMeasure_AngleLine::CalculateAngle(double * point1, double
 	double diff[3] = { point3[X] - point2[X], point3[Y] - point2[Y], point3[Z] - point2[Z] };
 	double newP4[3] = { point4[X] - diff[X], point4[Y] - diff[Y], point4[Z] - diff[Z] };
 
-	return GeometryUtils::GetAngle(point1, newP4, point2);
+	return albaGeometryUtils::GetAngle(point1, newP4, point2);
 }

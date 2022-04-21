@@ -299,7 +299,7 @@ void albaInteractor2DMeasure_Template::AddMeasure(double * pointUL, double * poi
 		double oldPoint1[3], oldPoint2[3], oldPoint3[3], oldPoint4[3];
 		GetMeasurePoints(index, oldPoint1, oldPoint2, oldPoint3, oldPoint4);
 
-		if (GeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
+		if (albaGeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
 		{
 			m_CurrMeasure = index;
 			m_CurrPoint = POINT_2;
@@ -336,7 +336,7 @@ void albaInteractor2DMeasure_Template::AddMeasure(double * pointUL, double * poi
 	points->SetNumberOfPoints(nPoints);
 
 	double midPoint[3];
-	GeometryUtils::GetMidPoint(midPoint, pointUL, pointDR);
+	albaGeometryUtils::GetMidPoint(midPoint, pointUL, pointDR);
 
 	points->SetPoint(0, midPoint);
 	points->SetPoint(1, pointUL);

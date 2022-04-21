@@ -119,7 +119,7 @@ void albaInteractor2DMeasure_Point::FindAndHighlight(double *point)
 			vtkPointSource* pointSource = (vtkPointSource*)pointsStackVector->GetSource();
 			pointSource->GetCenter(tmpPoint);
 
-			if (GeometryUtils::DistanceBetweenPoints(point, tmpPoint) < POINT_UPDATE_DISTANCE)
+			if (albaGeometryUtils::DistanceBetweenPoints(point, tmpPoint) < POINT_UPDATE_DISTANCE)
 			{
 				m_CurrMeasure = i;
 
@@ -372,8 +372,8 @@ void albaInteractor2DMeasure_Point::GetPointOnLine(double *point)
 {
 	double minLenght = 5.0;
 
-	double dist1 = GeometryUtils::DistanceBetweenPoints(m_ConstrLineP1, point);
-	double dist2 = GeometryUtils::GetPointToLineDistance(point, m_ConstrLineP1, m_ConstrLineP2);
+	double dist1 = albaGeometryUtils::DistanceBetweenPoints(m_ConstrLineP1, point);
+	double dist2 = albaGeometryUtils::DistancePointToLine(point, m_ConstrLineP1, m_ConstrLineP2);
 
 	int sign = (point[X] - m_ConstrLineP1[X] >= 0) ? 1 : -1;
 
@@ -381,7 +381,7 @@ void albaInteractor2DMeasure_Point::GetPointOnLine(double *point)
 	dist = !isnan(dist) ? dist : 0.0;
 
 	double newPoint[3];
-	GeometryUtils::FindPointOnLine(newPoint, m_ConstrLineP1, m_ConstrLineP2, dist*sign);
+	albaGeometryUtils::FindPointOnLine(newPoint, m_ConstrLineP1, m_ConstrLineP2, dist*sign);
 
 	point[X] = newPoint[X];
 	point[Y] = newPoint[Y];

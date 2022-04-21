@@ -114,7 +114,7 @@ void albaInteractor2DMeasure_MidPoint::MoveMeasure(int index, double * point)
 	tmp_pos2[Y] = point[Y] + m_OldLineP2[Y];
 	tmp_pos2[Z] = point[Z] + m_OldLineP2[Z];
 
-	m_MeasureValue = GeometryUtils::DistanceBetweenPoints(tmp_pos1, tmp_pos2);
+	m_MeasureValue = albaGeometryUtils::DistanceBetweenPoints(tmp_pos1, tmp_pos2);
 
 	UpdateLineActors(tmp_pos1, tmp_pos2);
 	// Points
@@ -164,7 +164,7 @@ void albaInteractor2DMeasure_MidPoint::EditMeasure(int index, double *point)
 	//////////////////////////////////////////////////////////////////////////
 	// Update Measure
 	albaString text;
-	text.Printf("Distance %.2f mm", GeometryUtils::DistanceBetweenPoints(point1, point2));
+	text.Printf("Distance %.2f mm", albaGeometryUtils::DistanceBetweenPoints(point1, point2));
 	//m_MeasureTextVector[index] = text;
 	m_Measure2DVector[index].Text = text;
 
@@ -201,7 +201,7 @@ void albaInteractor2DMeasure_MidPoint::FindAndHighlight(double * point)
 			lineSource->GetPoint1(linePoint1);
 			lineSource->GetPoint2(linePoint2);
 
-			if (GeometryUtils::DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
+			if (albaGeometryUtils::DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -269,7 +269,7 @@ void albaInteractor2DMeasure_MidPoint::UpdateLineActors(double * point1, double 
 void albaInteractor2DMeasure_MidPoint::UpdateMidPointActor(double * point1, double * point2)
 {
 	double midPoint[3];
-	GeometryUtils::GetMidPoint(midPoint, point1, point2);
+	albaGeometryUtils::GetMidPoint(midPoint, point1, point2);
 
 	vtkPointSource* pointSource = (vtkPointSource*)m_MidPointsStackVector[m_CurrMeasure]->GetSource();
 	pointSource->SetCenter(midPoint);
@@ -279,7 +279,7 @@ void albaInteractor2DMeasure_MidPoint::UpdateMidPointActor(double * point1, doub
 void albaInteractor2DMeasure_MidPoint::UpdateTextActor(double * point1, double * point2)
 {
 	double text_pos[3];
-	GeometryUtils::GetMidPoint(text_pos, point1, point2);
+	albaGeometryUtils::GetMidPoint(text_pos, point1, point2);
 
 	text_pos[X] += m_TextSide *TEXT_W_SHIFT;
 	text_pos[Y] -= m_TextSide *TEXT_H_SHIFT;
@@ -299,7 +299,7 @@ void albaInteractor2DMeasure_MidPoint::AddMeasure(double *point1, double *point2
 
 		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
 
-		if (GeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2)<POINT_UPDATE_DISTANCE)
+		if (albaGeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2)<POINT_UPDATE_DISTANCE)
 		{
 			if (!hasSameRenderer) return;
 
@@ -317,7 +317,7 @@ void albaInteractor2DMeasure_MidPoint::AddMeasure(double *point1, double *point2
 	int index = m_Measure2DVector.size() - 1;
 
 	albaString text;
-	text.Printf("Distance %.2f mm", GeometryUtils::DistanceBetweenPoints(point1, point2));
+	text.Printf("Distance %.2f mm", albaGeometryUtils::DistanceBetweenPoints(point1, point2));
 	m_Measure2DVector[index].Text = text;
 
 	// Update Edit Actors

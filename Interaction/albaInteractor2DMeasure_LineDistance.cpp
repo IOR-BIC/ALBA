@@ -122,7 +122,7 @@ void albaInteractor2DMeasure_LineDistance::MoveMeasure(int index, double * point
 		tmp_pos2[Y] = point[Y] + m_OldLineP2[Y];
 		tmp_pos2[Z] = point[Z] + m_OldLineP2[Z];
 
-		m_MeasureValue = GeometryUtils::DistanceBetweenPoints(tmp_pos1, tmp_pos2);
+		m_MeasureValue = albaGeometryUtils::DistanceBetweenPoints(tmp_pos1, tmp_pos2);
 
 		UpdateLineActors(tmp_pos1, tmp_pos2);
 		// Points
@@ -134,8 +134,8 @@ void albaInteractor2DMeasure_LineDistance::MoveMeasure(int index, double * point
 		pointSourceC->SetCenter(point);
 		pointSourceC->Update();
 
-		m_Distances[index] = GeometryUtils::DistancePointToLine(point, linePoint1, linePoint2);
-		//m_Distances[index] *= GeometryUtils::PointUpDownLine(point, linePoint1, linePoint2);
+		m_Distances[index] = albaGeometryUtils::DistancePointToLine(point, linePoint1, linePoint2);
+		//m_Distances[index] *= albaGeometryUtils::PointUpDownLine(point, linePoint1, linePoint2);
 
 		m_CurrMeasure = index;
 		UpdateLineActors(linePoint1,linePoint2);
@@ -229,7 +229,7 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 			lineSourceB->GetPoint2(lineBPoint2);
 
 		
-			if (GeometryUtils::DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
+			if (albaGeometryUtils::DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -262,7 +262,7 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 				Render();
 				return;
 			}
-			else if (GeometryUtils::DistancePointToLine(point, lineBPoint1, lineBPoint2) < POINT_UPDATE_DISTANCE)
+			else if (albaGeometryUtils::DistancePointToLine(point, lineBPoint1, lineBPoint2) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -324,15 +324,15 @@ void albaInteractor2DMeasure_LineDistance::UpdateLineActors(double * point1, dou
 
 	if (m_SecondLineAdded[m_CurrMeasure])
 	{
-		GeometryUtils::GetParallelLine(lBp1, lBp2, point1, point2, m_Distances[m_CurrMeasure]);
+		albaGeometryUtils::GetParallelLine(lBp1, lBp2, point1, point2, m_Distances[m_CurrMeasure]);
 
 		lineSourceB->SetPoint1(lBp1);
 		lineSourceB->SetPoint2(lBp2);
 		lineSourceB->Update();
 
 		double m1[3], m2[3];
-		GeometryUtils::GetMidPoint(m1, p1, p2);
-		GeometryUtils::GetMidPoint(m2, lBp1, lBp2);
+		albaGeometryUtils::GetMidPoint(m1, p1, p2);
+		albaGeometryUtils::GetMidPoint(m2, lBp1, lBp2);
 
 		lineSourcePerp->SetPoint1(m1);
 		lineSourcePerp->SetPoint2(m2);
@@ -344,7 +344,7 @@ void albaInteractor2DMeasure_LineDistance::UpdateLineActors(double * point1, dou
 void albaInteractor2DMeasure_LineDistance::UpdateTextActor(double * point1, double * point2)
 {
 	double text_pos[3];
-	GeometryUtils::GetMidPoint(text_pos, point1, point2);
+	albaGeometryUtils::GetMidPoint(text_pos, point1, point2);
 
 	text_pos[X] += m_TextSide *TEXT_W_SHIFT;
 	text_pos[Y] -= m_TextSide *TEXT_H_SHIFT;
@@ -365,7 +365,7 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 
 		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
 
-		if (GeometryUtils::DistanceBetweenPoints(oldPoint1,oldPoint2)<POINT_UPDATE_DISTANCE)
+		if (albaGeometryUtils::DistanceBetweenPoints(oldPoint1,oldPoint2)<POINT_UPDATE_DISTANCE)
 		{
 			if (!hasSameRenderer) return;
 
@@ -388,8 +388,8 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 			l1P1 = lineSource->GetPoint1();
 			l1P2 = lineSource->GetPoint2();
 
-			m_Distances[index] = GeometryUtils::DistancePointToLine(point1, l1P1.GetVect(), l1P2.GetVect());
-			//m_Distances[index] *= GeometryUtils::PointUpDownLine(point1, l1P1.GetVect(), l1P2.GetVect());
+			m_Distances[index] = albaGeometryUtils::DistancePointToLine(point1, l1P1.GetVect(), l1P2.GetVect());
+			//m_Distances[index] *= albaGeometryUtils::PointUpDownLine(point1, l1P1.GetVect(), l1P2.GetVect());
 			
 			vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[index]->GetSource();
 			pointSourceC->SetCenter(point1);

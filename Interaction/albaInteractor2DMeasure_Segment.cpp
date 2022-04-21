@@ -79,8 +79,8 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 
 	if (m_CurrPoint == POINT_1)
 	{
-		double dist1 = GeometryUtils::DistanceBetweenPoints(point1, point);
-		double dist2 = GeometryUtils::GetPointToLineDistance(point, point1, point2);
+		double dist1 = albaGeometryUtils::DistanceBetweenPoints(point1, point);
+		double dist2 = albaGeometryUtils::DistancePointToLine(point, point1, point2);
 
 		int sign = (point[X]-point1[X] >= 0) ? 1 : -1;
 
@@ -88,7 +88,7 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 		dist = !isnan(dist) ? dist : 0.0;
 
 		double newPoint[3];
-		GeometryUtils::FindPointOnLine(newPoint, point1, point2, dist*sign);
+		albaGeometryUtils::FindPointOnLine(newPoint, point1, point2, dist*sign);
 
 		if (newPoint[X] < point2[X] - minLenght)
 		{
@@ -99,9 +99,9 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 	}
 	else if (m_CurrPoint == POINT_2)
 	{
-		double dist1 = GeometryUtils::DistanceBetweenPoints(point1, point);
-		double dist2 = GeometryUtils::GetPointToLineDistance(point, point1, point2);
-		double len = GeometryUtils::DistanceBetweenPoints(point1, point2);
+		double dist1 = albaGeometryUtils::DistanceBetweenPoints(point1, point);
+		double dist2 = albaGeometryUtils::DistancePointToLine(point, point1, point2);
+		double len = albaGeometryUtils::DistanceBetweenPoints(point1, point2);
 
 		int sign = (point[X] - point1[X] >= 0) ? 1 : -1;
 
@@ -109,7 +109,7 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 		dist = !isnan(dist) ? dist : 0.0;
 
 		double newPoint[3];
-		GeometryUtils::FindPointOnLine(newPoint, point1, point2, dist*sign);
+		albaGeometryUtils::FindPointOnLine(newPoint, point1, point2, dist*sign);
 
 		if (newPoint[X] > point1[X] + minLenght)
 		{
@@ -124,7 +124,7 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 	//////////////////////////////////////////////////////////////////////////
 	// Update Measure
 
-	double dist = GeometryUtils::DistanceBetweenPoints(point1, point2);
+	double dist = albaGeometryUtils::DistanceBetweenPoints(point1, point2);
 
 	if (dist >= m_MinDistance)
 	{

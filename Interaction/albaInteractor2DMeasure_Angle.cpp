@@ -236,7 +236,7 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 			pointSourceA->GetCenter(pointA);
 			pointSourceB->GetCenter(pointB);
 
-			if (GeometryUtils::DistancePointToLine(point, pointO, pointA) < POINT_UPDATE_DISTANCE)
+			if (albaGeometryUtils::DistancePointToLine(point, pointO, pointA) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -269,7 +269,7 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 				Render();
 				return;
 			}
-			else if (GeometryUtils::DistancePointToLine(point, pointO, pointB) < POINT_UPDATE_DISTANCE)
+			else if (albaGeometryUtils::DistancePointToLine(point, pointO, pointB) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -344,13 +344,13 @@ void albaInteractor2DMeasure_Angle::UpdateLineActors(double * point1, double * p
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Angle::UpdateCircleActor(double * point1, double * point2, double * ori)
 {
-	double radius = MIN(GeometryUtils::DistanceBetweenPoints(point1, ori), GeometryUtils::DistanceBetweenPoints(point2, ori)) * 0.8;
+	double radius = MIN(albaGeometryUtils::DistanceBetweenPoints(point1, ori), albaGeometryUtils::DistanceBetweenPoints(point2, ori)) * 0.8;
 		
 	double axis[3]{ /*ori[X] **/ m_ViewPlaneNormal[X], /*ori[Y] **/ m_ViewPlaneNormal[Y], /*ori[Z] **/ m_ViewPlaneNormal[Z] };
 
-	double angle = GeometryUtils::GetAngle(point1, point2, ori) * vtkMath::DegreesToRadians();
-	double angle1 = GeometryUtils::GetAngle(axis, point1, ori) * vtkMath::DegreesToRadians();
-	double angle2 = (GeometryUtils::GetAngle(point1, point2, ori) + angle1) * vtkMath::DegreesToRadians();
+	double angle = albaGeometryUtils::GetAngle(point1, point2, ori) * vtkMath::DegreesToRadians();
+	double angle1 = albaGeometryUtils::GetAngle(axis, point1, ori) * vtkMath::DegreesToRadians();
+	double angle2 = (albaGeometryUtils::GetAngle(point1, point2, ori) + angle1) * vtkMath::DegreesToRadians();
 
 	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[m_CurrMeasure]->GetSource();
 
@@ -366,7 +366,7 @@ void albaInteractor2DMeasure_Angle::UpdateCircleActor(double * point1, double * 
 void albaInteractor2DMeasure_Angle::UpdateTextActor(double * point1, double * point2)
 {
 	double text_pos[3];
-	GeometryUtils::GetMidPoint(text_pos, point1, point2);
+	albaGeometryUtils::GetMidPoint(text_pos, point1, point2);
 
 	text_pos[X] += m_TextSide *TEXT_W_SHIFT;
 	text_pos[Y] -= m_TextSide *TEXT_H_SHIFT;
@@ -386,7 +386,7 @@ void albaInteractor2DMeasure_Angle::AddMeasure(double *point1, double *point2, d
 
 		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
 
-		if (GeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
+		if (albaGeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
 		{
 			if (!hasSameRenderer) return;
 
@@ -760,7 +760,7 @@ double albaInteractor2DMeasure_Angle::CalculateAngle(int idx)
 //----------------------------------------------------------------------------
 double albaInteractor2DMeasure_Angle::CalculateAngle(double * point1, double * point2, double * ori)
 {
-	double angle = GeometryUtils::GetAngle(point1, point2, ori);
+	double angle = albaGeometryUtils::GetAngle(point1, point2, ori);
 
 	return angle;
 }
