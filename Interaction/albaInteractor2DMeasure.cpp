@@ -814,6 +814,28 @@ void GeometryUtils::RotatePoint(double *point, double *origin, double angle)
 	double s = sin(angle);
 	double c = cos(angle);
 
+	double d = Dot(origin, point);
+	double cr[3];
+	Cross(cr, origin, point);
+
+		//glm::dvec3 rotated = (v * c) + (glm::cross(k, v) * s) + (k * glm::dot(k, v)) * (1 - c);
+
+		double pnt1[3]{ point[X] * c, point[Y] * c, point[Z] * c };
+
+	cr[X] *= s;
+	cr[Y] *= s;
+	cr[Z] *= s;
+
+	double kdot[3]{ origin[X] * d, origin[Y] * d, origin[Z] * d };
+	kdot[X] *= (1 - c);
+	kdot[Y] *= (1 - c);
+	kdot[Z] *= (1 - c);
+
+	point[X] = pnt1[X] + cr[X] + kdot[X];
+	point[Y] = pnt1[Y] + cr[Y] + kdot[Y];
+	point[Z] = pnt1[Z] + cr[Z] + kdot[Z];
+
+	return;
 	// Translate point back to origin:
 	point[X] -= origin[X];
 	point[Y] -= origin[Y];
@@ -827,14 +849,14 @@ void GeometryUtils::RotatePoint(double *point, double *origin, double angle)
 	RotatedPoint[Z] = point[Z];
 
 	//Second rotate the Y:
-	RotatedPoint[X] = RotatedPoint[X] * c + RotatedPoint[Z]*s;
+	RotatedPoint[X] = RotatedPoint[X] * c + RotatedPoint[Z] * s;
 	RotatedPoint[Y] = RotatedPoint[Y];
-	RotatedPoint[Z] = RotatedPoint[Y] * s + RotatedPoint[Z] *c;
+	RotatedPoint[Z] = RotatedPoint[Y] * s + RotatedPoint[Z] * c;
 
 	//Third rotate the X:
 	RotatedPoint[X] = RotatedPoint[X];
-	RotatedPoint[Y] = RotatedPoint[Y] * c - RotatedPoint[Z] *s;
-	RotatedPoint[Z] = RotatedPoint[Y] * s + RotatedPoint[Z] *c;
+	RotatedPoint[Y] = RotatedPoint[Y] * c - RotatedPoint[Z] * s;
+	RotatedPoint[Z] = RotatedPoint[Y] * s + RotatedPoint[Z] * c;
 
 	// Translate point back:
 	point[X] = RotatedPoint[X] + origin[X];
@@ -880,7 +902,7 @@ double GeometryUtils::GetPointToLineDistance(double *point, double *linePoint1, 
 }
 //----------------------------------------------------------------------------
 float GeometryUtils::DistancePointToLine(double * point, double * lineP1, double * lineP2)
-{
+{	
 	return sqrt(vtkLine::DistanceToLine(point, lineP1, lineP2));
 
 	double point_x = point[X];
@@ -929,15 +951,15 @@ float GeometryUtils::DistancePointToLine(double * point, double * lineP1, double
 //----------------------------------------------------------------------------
 void GeometryUtils::GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance)
 {
-	double L = sqrt(pow((linePoint2[X] - linePoint1[X]), 2) + pow((linePoint2[Y] - linePoint1[Y]), 2));
+	double L = sqrt(pow((linePoint2[X] - linePoint1[X]), 2) + pow((linePoint2[Y] - linePoint1[Y]), 2) + pow((linePoint2[Z] - linePoint1[Z]), 2));
 
 	point1[X] = linePoint1[X] + distance * (linePoint2[Y] - linePoint1[Y]) / L;
 	point1[Y] = linePoint1[Y] + distance * (linePoint1[X] - linePoint2[X]) / L;
-	//point1[Z] = 0.0;
+	point1[Z] = linePoint1[Z] + distance * (linePoint2[Z] - linePoint1[Z]) / L;
 
 	point2[X] = linePoint2[X] + distance * (linePoint2[Y] - linePoint1[Y]) / L;
 	point2[Y] = linePoint2[Y] + distance * (linePoint1[X] - linePoint2[X]) / L;
-	//point2[Z] = 0.0;
+	point2[Z] = linePoint2[Z] + distance * (linePoint2[Z] - linePoint1[Z]) / L;
 }
 //----------------------------------------------------------------------------
 bool GeometryUtils::FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance)

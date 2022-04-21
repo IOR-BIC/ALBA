@@ -85,6 +85,8 @@ protected:
 	std::vector<albaActor2dStackHelper *> m_PointsStackVectorL;
 	std::vector<albaActor2dStackHelper *> m_PointsStackVectorR;
 
+	std::vector<albaActor2dStackHelper *> m_PointsStackVectorC;
+
 	std::vector<bool> m_SecondLineAdded;
 	std::vector<double> m_Distances;
 

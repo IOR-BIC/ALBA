@@ -67,6 +67,7 @@ albaInteractor2DMeasure_LineDistance::~albaInteractor2DMeasure_LineDistance()
 		cppDEL(m_LineStackVectorPerp[i]);
 		cppDEL(m_PointsStackVectorL[i]);
 		cppDEL(m_PointsStackVectorR[i]);
+		cppDEL(m_PointsStackVectorC[i]);
 	}
 }
 
@@ -129,8 +130,12 @@ void albaInteractor2DMeasure_LineDistance::MoveMeasure(int index, double * point
 	}
 	else
 	{
+		vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[index]->GetSource();
+		pointSourceC->SetCenter(point);
+		pointSourceC->Update();
+
 		m_Distances[index] = GeometryUtils::DistancePointToLine(point, linePoint1, linePoint2);
-		m_Distances[index] *= GeometryUtils::PointUpDownLine(point, linePoint1, linePoint2);
+		//m_Distances[index] *= GeometryUtils::PointUpDownLine(point, linePoint1, linePoint2);
 
 		m_CurrMeasure = index;
 		UpdateLineActors(linePoint1,linePoint2);
@@ -327,7 +332,7 @@ void albaInteractor2DMeasure_LineDistance::UpdateLineActors(double * point1, dou
 
 		double m1[3], m2[3];
 		GeometryUtils::GetMidPoint(m1, p1, p2);
-		GeometryUtils::GetMidPoint(m2, lBp1, lBp1);
+		GeometryUtils::GetMidPoint(m2, lBp1, lBp2);
 
 		lineSourcePerp->SetPoint1(m1);
 		lineSourcePerp->SetPoint2(m2);
@@ -384,8 +389,11 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 			l1P2 = lineSource->GetPoint2();
 
 			m_Distances[index] = GeometryUtils::DistancePointToLine(point1, l1P1.GetVect(), l1P2.GetVect());
-			m_Distances[index] *= GeometryUtils::PointUpDownLine(point1, l1P1.GetVect(), l1P2.GetVect());
+			//m_Distances[index] *= GeometryUtils::PointUpDownLine(point1, l1P1.GetVect(), l1P2.GetVect());
 			
+			vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[index]->GetSource();
+			pointSourceC->SetCenter(point1);
+
 			m_CurrMeasure = index;
 			UpdateLineActors(l1P1.GetVect(), l1P2.GetVect());
 			m_CurrMeasure = -1;
@@ -416,6 +424,7 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 	// Add Points
 	m_PointsStackVectorL.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
 	m_PointsStackVectorR.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
+	m_PointsStackVectorC.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
 
 	m_SecondLineAdded.push_back(false);
 	m_Distances.push_back(0);
@@ -444,6 +453,11 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 	//Right
 	m_PointsStackVectorR[index]->GetProperty()->SetPointSize(m_PointSize);
 	m_PointsStackVectorR[index]->SetColor(m_Colors[col]);
+
+	//Right
+	m_PointsStackVectorC[index]->GetProperty()->SetPointSize(m_PointSize);
+	Color red = { 1.0,0,0,1 };
+	m_PointsStackVectorC[index]->SetColor(red);
 
 	m_CurrMeasure = index;
 
@@ -481,6 +495,9 @@ void albaInteractor2DMeasure_LineDistance::RemoveMeasure(int index)
 		//Right
 		cppDEL(m_PointsStackVectorR[index]);
 		m_PointsStackVectorR.erase(m_PointsStackVectorR.begin() + index);
+		//Right
+		cppDEL(m_PointsStackVectorC[index]);
+		m_PointsStackVectorC.erase(m_PointsStackVectorC.begin() + index);
 
 		m_Distances.erase(m_Distances.begin() + index);
 
@@ -534,6 +551,7 @@ void albaInteractor2DMeasure_LineDistance::SetPointSize(double size)
 	{
 		m_PointsStackVectorR[i]->GetProperty()->SetPointSize(m_PointSize);
 		m_PointsStackVectorL[i]->GetProperty()->SetPointSize(m_PointSize);
+		m_PointsStackVectorC[i]->GetProperty()->SetPointSize(m_PointSize);
 	}
 	Render();
 }
