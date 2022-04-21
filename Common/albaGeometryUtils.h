@@ -30,9 +30,10 @@ class albaGeometryUtils
 {
 protected:
 	enum { X, Y, Z, };
+	enum { XY, YZ, XZ, };
 
 public:
-	
+
 	static double Dot(double *point1, double *point2);
 	static double Mag(double *point1);
 
@@ -48,27 +49,19 @@ public:
 
 	static void GetMidPoint(double(&midPoint)[3], double *point1, double *point2);
 
-	static double GetAngle(double point1[3], double point2[3]);
-	static double GetAngle(double* point1, double* point2, double* origin);
-
-
 	static double DistancePointToLine(double * point, double * lineP1, double * lineP2);
-	//static double GetPointToLineDistance(double *point, double *linePoint1, double *linePoint2);
-	//static float DistancePointToLine(double *point, double *lineP1, double *lineP2);
 
-	static void RotatePoint(double *point, double *origin, double angle);
+	static double GetAngle(double* point1, double* point2, double* origin, int plane = XY);
+	static double GetAngle(double point1[3], double point2[3]);
 
+	static void RotatePoint(double *point, double *origin, double angle, int plane = XY);
+
+	/// Lines
 
 	static bool GetLineLineIntersection(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2);
 
-
-	/// Lines Utils
-
-	//static bool FindIntersectionLines(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2);
 	static int IntersectLineLine(double *l1p1, double *l1p2, double *l2p1, double *l2p2, double &perc);
-
-
-
+	
 
 	static void GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance);
 

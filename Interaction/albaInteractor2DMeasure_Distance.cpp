@@ -245,7 +245,6 @@ void albaInteractor2DMeasure_Distance::FindAndHighlight(double * point)
 	}
 }
 
-double angle3 = 0;
 /// UPDATE ///////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Distance::UpdateLineActors(double * point1, double * point2)
@@ -265,85 +264,40 @@ void albaInteractor2DMeasure_Distance::UpdateLineTickActor(double * point1, doub
 	if (m_TickLenght > 0.0) tickLenght = m_TickLenght;
 
 	//////////////////////////////////////////////////////////////////////////
-	double angle = albaGeometryUtils::GetAngle(point1, point2) * vtkMath::DegreesToRadians();
+
 	tickLenght = 0.1;
-	double axix[3] = { point1[X] * m_ViewPlaneNormal[X],point1[Y] * m_ViewPlaneNormal[Y],point1[Z] * m_ViewPlaneNormal[Z] };
-	double lp[3], rp[3], lp2[3], rp2[3], pDiff[3];
 
-	pDiff[X] = point2[X] - point1[X];
-	pDiff[Y] = point2[Y] - point1[Y];
-	pDiff[Z] = point2[Z] - point1[Z];
+	double  pDiff[3] = { point2[X] - point1[X], point2[Y] - point1[Y], point2[Z] - point1[Z] };
 
-	lp[X] = point1[X] - pDiff[X] * tickLenght;
-	lp[Y] = point1[Y] - pDiff[Y] * tickLenght;
-	lp[Z] = point1[Z] - pDiff[Z] * tickLenght;
+	// tickL
+	double tick1Point1[3]{ point1[X] - pDiff[X] * tickLenght, point1[Y] - pDiff[Y] * tickLenght,  point1[Z] - pDiff[Z] * tickLenght };
+	double tick1Point2[3]{ point1[X] + pDiff[X] * tickLenght, point1[Y] + pDiff[Y] * tickLenght,  point1[Z] + pDiff[Z] * tickLenght };
 
-	lp2[X] = point1[X] + pDiff[X] * tickLenght;
-	lp2[Y] = point1[Y] + pDiff[Y] * tickLenght;
-	lp2[Z] = point1[Z] + pDiff[Z] * tickLenght;
+	// tickR
+	double tick2Point1[3]{ point2[X] - pDiff[X] * tickLenght, point2[Y] - pDiff[Y] * tickLenght,  point2[Z] - pDiff[Z] * tickLenght };
+	double tick2Point2[3]{ point2[X] + pDiff[X] * tickLenght, point2[Y] + pDiff[Y] * tickLenght,  point2[Z] + pDiff[Z] * tickLenght };
 
-	double angle2 = albaGeometryUtils::GetAngle(point1, point2);
+	double angle = (M_PI / 2) - albaGeometryUtils::GetAngle(tick1Point1, point2, point1, m_CurrPlane);
 
-	angle3 += M_PI / 16;
-	albaGeometryUtils::RotatePoint(lp, point1, angle3);
- 	//albaGeometryUtils::rotAroundA(lp2, axix, -angle3);
+	albaGeometryUtils::RotatePoint(tick1Point1, point1, angle, m_CurrPlane);
+	albaGeometryUtils::RotatePoint(tick1Point2, point1, angle, m_CurrPlane);
+	albaGeometryUtils::RotatePoint(tick2Point1, point2, angle, m_CurrPlane);
+	albaGeometryUtils::RotatePoint(tick2Point2, point2, angle, m_CurrPlane);
 
-	rp[X] = point2[X] - pDiff[X] * tickLenght;
-	rp[Y] = point2[Y] - pDiff[Y] * tickLenght;
-	rp[Z] = point2[Z] - pDiff[Z] * tickLenght;
-
-	rp2[X] = point2[X] + pDiff[X] * tickLenght;
-	rp2[Y] = point2[Y] + pDiff[Y] * tickLenght;
-	rp2[Z] = point2[Z] + pDiff[Z] * tickLenght;
-
-	albaGeometryUtils::rotAroundA(rp, point2, angle);
-	albaGeometryUtils::rotAroundA(rp2, point2, -angle);
-
-	Color blue = { 0,0,1,1 };
-	m_TickStackVectorL[m_CurrMeasure]->SetColor(blue);
-	Color red = { 1,0,0,1 };
-	m_TickStackVectorR[m_CurrMeasure]->SetColor(red);
+// 	Color blue = { 0,0,1,1 };
+// 	Color red = { 1,0,0,1 };
+// 	m_TickStackVectorL[m_CurrMeasure]->SetColor(blue);
+// 	m_TickStackVectorR[m_CurrMeasure]->SetColor(red);
 
 	vtkLineSource* tickSourceL = (vtkLineSource*)m_TickStackVectorL[m_CurrMeasure]->GetSource();
-	tickSourceL->SetPoint1(lp);
-	tickSourceL->SetPoint2(lp2);
+	tickSourceL->SetPoint1(tick1Point1);
+	tickSourceL->SetPoint2(tick1Point2);
 	tickSourceL->Update();
 	
 	vtkLineSource* tickSourceR = (vtkLineSource*)m_TickStackVectorR[m_CurrMeasure]->GetSource();
-	tickSourceR->SetPoint1(rp);
-	tickSourceR->SetPoint2(rp2);
+	tickSourceR->SetPoint1(tick2Point1);
+	tickSourceR->SetPoint2(tick2Point2);
 	tickSourceR->Update();
-
-	//////////////////////////////////////////////////////////////////////////
-	// tickL
-// 	double tick1Point1[3]{ point1[X] - tickLenght, point1[Y], point1[Z] };
-// 	double tick1Point2[3]{ point1[X] + tickLenght, point1[Y], point1[Z] };
-// 
-// 	double angle = (M_PI / 2) - albaGeometryUtils::GetAngle(tick1Point1, point2, point1);
-// 
-// 	angle = albaGeometryUtils::GetAngle(point1, point2);
-// // 	albaGeometryUtils::RotatePoint(tick1Point1, point1, angle);
-// // 	albaGeometryUtils::RotatePoint(tick1Point2, point1, angle);
-// 
-// 	albaGeometryUtils::rotAroundA(tick1Point1, point1, angle);
-// 	albaGeometryUtils::rotAroundA(tick1Point2, point1, angle);
-// 
-// 	vtkLineSource* tickSourceL = (vtkLineSource*)m_TickStackVectorL[m_CurrMeasure]->GetSource();
-// 	tickSourceL->SetPoint1(tick1Point1);
-// 	tickSourceL->SetPoint2(tick1Point2);
-// 	tickSourceL->Update();
-// 
-// 	// tickR
-// 	double tick2Point1[3]{ point2[X] - tickLenght, point2[Y], point2[Z] };
-// 	double tick2Point2[3]{ point2[X] + tickLenght, point2[Y], point2[Z] };
-// 
-// 	albaGeometryUtils::RotatePoint(tick2Point1, point2, angle);
-// 	albaGeometryUtils::RotatePoint(tick2Point2, point2, angle);
-// 
-// 	vtkLineSource* tickSourceR = (vtkLineSource*)m_TickStackVectorR[m_CurrMeasure]->GetSource();
-// 	tickSourceR->SetPoint1(tick2Point1);
-// 	tickSourceR->SetPoint2(tick2Point2);
-// 	tickSourceR->Update();
 }
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Distance::UpdateTextActor(double * point1, double * point2)

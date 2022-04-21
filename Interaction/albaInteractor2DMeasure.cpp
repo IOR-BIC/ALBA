@@ -132,6 +132,10 @@ void albaInteractor2DMeasure::InitRenderer(albaEventInteraction *e)
 		m_ViewPlaneNormal[Y] = normal[Y];
 		m_ViewPlaneNormal[Z] = normal[Z];
 
+		if (m_ViewPlaneNormal[X] != 0) m_CurrPlane = 1;// YZ;
+		if (m_ViewPlaneNormal[Y] != 0) m_CurrPlane = 2;// XZ;
+		if (m_ViewPlaneNormal[Z] != 0) m_CurrPlane = 0;// XY;
+
 		albaLogMessage("ViewPlaneNormal (%.2f, %.2f, %.2f)", m_ViewPlaneNormal[X], m_ViewPlaneNormal[Y], m_ViewPlaneNormal[Z]);
 
 		if (m_Renderer->GetLayer() != 1)//Frontal Render

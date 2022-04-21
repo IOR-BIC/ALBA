@@ -24,6 +24,8 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaGeometryUtils.h"
 #include "vtkMath.h"
 #include "vtkLine.h"
+#include "vtkTransform.h"
+#include "albaVect3d.h"
 
 #define VTK_NO_INTERSECTION 0
 #define VTK_YES_INTERSECTION  2
@@ -35,7 +37,6 @@ PURPOSE. See the above copyright notice for more information.
 double albaGeometryUtils::Dot(double *point1, double *point2)
 {
 	return vtkMath::Dot(point1, point2);
-	//return point1[X] * point2[X] + point1[Y] * point2[Y] + point1[Z] * point2[Z];
 }
 //---------------------------------------------------------------------------
 double albaGeometryUtils::Mag(double *point1)
@@ -45,41 +46,29 @@ double albaGeometryUtils::Mag(double *point1)
 //---------------------------------------------------------------------------
 float albaGeometryUtils::Norm2(double *point1)
 {
-	//return vtkMath::Norm2D(point1);
 	return point1[X] * point1[X] + point1[Y] * point1[Y] + point1[Z] * point1[Z];
 }
 //---------------------------------------------------------------------------
 double albaGeometryUtils::Norm(double *point1)
 {
 	return vtkMath::Norm(point1);
-	//return sqrt(Norm2(point1));
 }
 //---------------------------------------------------------------------------
 void albaGeometryUtils::Cross(double *point1, double *point2, double *cross)
 {
 	vtkMath::Cross(point1, point2, cross);
-
-// 	double cross[3];
-// 	cross[X] = point1[Y] * point2[Z] - point1[Z] * point2[Y];
-// 	cross[Y] = point1[Z] * point2[X] - point1[X] * point2[Z];
-// 	cross[Z] = point1[X] * point2[Y] - point1[Y] * point2[X];
 }
-
-/// Points Utils
 
 //---------------------------------------------------------------------------
 bool albaGeometryUtils::Equal(double *point1, double *point2)
 {
 	return (point1[X] == point2[X]) && (point1[Y] == point2[Y]) && (point1[Z] == point2[Z]);
 }
-
 //----------------------------------------------------------------------------
 double albaGeometryUtils::DistanceBetweenPoints(double *point1, double *point2)
 {
 	return sqrt(vtkMath::Distance2BetweenPoints(point1, point2));
-	//return sqrt(pow(point1[X] - point2[X], 2) + pow(point1[Y] - point2[Y], 2) + pow(point1[Z] - point2[Z], 2));
 }
-
 //---------------------------------------------------------------------------
 void albaGeometryUtils::GetMidPoint(double(&midPoint)[3], double *point1, double *point2)
 {
@@ -87,108 +76,128 @@ void albaGeometryUtils::GetMidPoint(double(&midPoint)[3], double *point1, double
 	midPoint[Y] = (point1[Y] + point2[Y]) / 2;
 	midPoint[Z] = (point1[Z] + point2[Z]) / 2;
 }
-
-//----------------------------------------------------------------------------
-double albaGeometryUtils::GetAngle(double point1[3], double point2[3]) // Degree
-{
-	return std::acos(Dot(point1, point2) / (Mag(point1)*Mag(point2))) * 180.0 / vtkMath::Pi();
-}
-//----------------------------------------------------------------------------
-double albaGeometryUtils::GetAngle(double* point1, double* point2, double* origin) // Degree
-{
-	double ab[3] = { origin[X] - point1[X], origin[Y] - point1[Y], origin[Z] - point1[Z] };
-	double bc[3] = { point2[X] - origin[X], point2[Y] - origin[Y], point2[Z] - origin[Z] };
-
-	double abVec = sqrt(ab[X] * ab[X] + ab[Y] * ab[Y] + ab[Z] * ab[Z]);
-	double bcVec = sqrt(bc[X] * bc[X] + bc[Y] * bc[Y] + bc[Z] * bc[Z]);
-
-	double abNorm[3] = { ab[X] / abVec, ab[Y] / abVec, ab[Z] / abVec };
-	double bcNorm[3] = { bc[X] / bcVec, bc[Y] / bcVec, bc[Z] / bcVec };
-
-	double res = abNorm[X] * bcNorm[X] + abNorm[Y] * bcNorm[Y] + abNorm[Z] * bcNorm[Z];
-
-	return 180.0 - (acos(res) * 180.0 / vtkMath::Pi());
-}
-
 //----------------------------------------------------------------------------
 double albaGeometryUtils::DistancePointToLine(double * point, double * lineP1, double * lineP2)
 {
 	return vtkLine::DistanceToLine(point, lineP1, lineP2);
+}
 
-// 	double ab[3] = { lineP2[X] - lineP1[X], lineP2[Y] - lineP1[Y], lineP2[Z] - lineP1[Z] };
-// 	double ac[3] = { point[X] - lineP1[X], point[Y] - lineP1[Y], point[Z] - lineP1[Z] };
-// 
-// 	double cross[3];
-// 	Cross(ab, ac, cross);
-// 	
-// 	double area = Mag(cross);
-// 	double cd = area / Mag(ab);
-// 
-// 	return cd;
+//----------------------------------------------------------------------------
+double albaGeometryUtils::GetAngle(double* point1, double* point2, double* origin, int plane) // Degree
+{
+	double angle = 0;
+	double angleToP1, angleToP2;
+
+	switch (plane)
+	{
+	case XY:
+	{
+		angleToP1 = atan2((point1[X] - origin[X]), (point1[Y] - origin[Y]));
+		angleToP2 = atan2((point2[X] - origin[X]), (point2[Y] - origin[Y]));
+	}
+	break;
+	case YZ:
+	{
+		angleToP1 = atan2((point1[Z] - origin[Z]), (point1[Y] - origin[Y]));
+		angleToP2 = atan2((point2[Z] - origin[Z]), (point2[Y] - origin[Y]));
+	}
+	break;
+	case XZ:
+	{
+		angleToP1 = atan2((point1[X] - origin[X]), (point1[Y] - origin[Y]));
+		angleToP2 = atan2((point2[X] - origin[X]), (point2[Y] - origin[Y]));
+	}
+	break;
+	}
+
+	angle = angleToP2 - angleToP1;
+	if (angle < 0) angle += (2 * vtkMath::Pi());
+
+	return angle;
 }
 //----------------------------------------------------------------------------
-// double albaGeometryUtils::GetPointToLineDistance(double *point, double *linePoint1, double *linePoint2)
-// {
-// 	double a = linePoint1[Y] - linePoint2[Y]; // Note: this was incorrectly "y2 - y1" in the original answer
-// 	double b = linePoint2[X] - linePoint1[X];
-// 	double c = linePoint1[X] * linePoint2[Y] - linePoint2[X] * linePoint1[Y];
-// 
-// 	return abs(a * point[X] + b * point[Y] + c) / sqrt(a * a + b * b);
-// }
-//----------------------------------------------------------------------------
-// float albaGeometryUtils::DistancePointToLine(double * point, double * lineP1, double * lineP2)
-// {
-// 	return sqrt(vtkLine::DistanceToLine(point, lineP1, lineP2));
+double albaGeometryUtils::GetAngle(double point1[3], double point2[3]) // Degree
+{
+	//return std::acos(Dot(point1, point2) / (Mag(point1)*Mag(point2))) * 180.0 / vtkMath::Pi();
 
-	// 	double point_x = point[X];
-	// 	double point_y = point[Y];
-	// 
-	// 	double line_x1 = lineP1[X];
-	// 	double line_y1 = lineP1[Y];
-	// 	double line_x2 = lineP2[X];
-	// 	double line_y2 = lineP2[Y];
-	// 
-	// 	double diffX = line_x2 - line_x1;
-	// 	double diffY = line_y2 - line_y1;
-	// 
-	// 	if ((diffX == 0) && (diffY == 0))
-	// 	{
-	// 		diffX = point_x - line_x1;
-	// 		diffY = point_y - line_y1;
-	// 		return sqrt(diffX * diffX + diffY * diffY);
-	// 	}
-	// 
-	// 	float t = ((point_x - line_x1) * diffX + (point_y - line_y1) * diffY) / (diffX * diffX + diffY * diffY);
-	// 
-	// 	if (t < 0)
-	// 	{
-	// 		// Point is nearest to the first point i.e x1 and y1
-	// 		diffX = point_x - line_x1;
-	// 		diffY = point_y - line_y1;
-	// 	}
-	// 	else if (t > 1)
-	// 	{
-	// 		// Point is nearest to the end point i.e x2 and y2
-	// 		diffX = point_x - line_x2;
-	// 		diffY = point_y - line_y2;
-	// 	}
-	// 	else
-	// 	{
-	// 		// If perpendicular line intersect the line segment.
-	// 		diffX = point_x - (line_x1 + t * diffX);
-	// 		diffY = point_y - (line_y1 + t * diffY);
-	// 	}
-	// 
-	// 	// Returning shortest distance
-	// 	return sqrt(diffX * diffX + diffY * diffY);
-//}
+	double magnVect1 = (double)sqrt((point1[X] * point1[X]) + (point1[Y] * point1[Y]) + (point1[Z] * point1[Z]));
+	double magnVect2 = (double)sqrt((point2[X] * point2[X]) + (point2[Y] * point2[Y]) + (point2[Z] * point2[Z]));
+	double vectorsMagnitude = magnVect1 * magnVect2;
+	double dotVect = point1[X] * point2[X] + point1[Y] * point2[Y] + point1[Z] * point2[Z];
+	double angleVect = acos(dotVect / vectorsMagnitude);
+
+	return angleVect * 180.0 / vtkMath::Pi();
+}
+
+//----------------------------------------------------------------------------
+void albaGeometryUtils::RotatePoint(double *point, double *origin, double angle, int plane)
+{
+	double s = sin(angle);
+	double c = cos(angle);
+
+	switch (plane)
+	{
+	case XY:
+	{
+		// Translate point back to origin:
+		point[X] -= origin[X];
+		point[Y] -= origin[Y];
+
+		// Rotate point
+		double xnew = point[X] * c - point[Y] * s;
+		double ynew = point[X] * s + point[Y] * c;
+
+		// Translate point back:
+		point[X] = xnew + origin[X];
+		point[Y] = ynew + origin[Y];
+		point[Z] = 0.0;
+	}
+	break;
+
+	case YZ:
+	{
+		// Translate point back to origin:
+		point[Z] -= origin[Z];
+		point[Y] -= origin[Y];
+
+		// Rotate point
+		double znew = point[Z] * c - point[Y] * s;
+		double ynew = point[Z] * s + point[Y] * c;
+
+		// Translate point back:
+		point[X] = 0.0;
+		point[Y] = ynew + origin[Y];
+		point[Z] = znew + origin[Z];
+	}
+	break;
+
+	case XZ:
+	{
+		// Translate point back to origin:
+		point[X] -= origin[X];
+		point[Z] -= origin[Z];
+
+		// Rotate point
+		double xnew = point[X] * c - point[Z] * s;
+		double znew = point[X] * s + point[Z] * c;
+
+		// Translate point back:
+		point[X] = xnew + origin[X];
+		point[Y] = 0.0;
+		point[Z] = znew + origin[Z];
+	}
+	break;
+	}
+}
+
+/// Lines
 
 //----------------------------------------------------------------------------
 bool albaGeometryUtils::GetLineLineIntersection(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2)
 {
-// 	double u, v;
-// 	int val = vtkLine::Intersection(line1Point1, line1Point2, line2Point1, line2Point2, u, v);
-// 	vtkLine::IntersectWithLine()
+	// 	double u, v;
+	// 	int val = vtkLine::Intersection(line1Point1, line1Point2, line2Point1, line2Point2, u, v);
+	//vtkLine::IntersectWithLine()
 
 	double da[3] = { line1Point2[X] - line1Point1[X], line1Point2[Y] - line1Point1[Y], line1Point2[Z] - line1Point1[Z] };
 	double db[3] = { line2Point2[X] - line2Point1[X], line2Point2[Y] - line2Point1[Y], line2Point2[Z] - line2Point1[Z] };
@@ -214,73 +223,11 @@ bool albaGeometryUtils::GetLineLineIntersection(double(&point)[3], double *line1
 	return false;
 }
 
-
-
-//----------------------------------------------------------------------------
-void albaGeometryUtils::RotatePoint(double *point, double *origin, double angle)
-{
-	double s = sin(angle);
-	double c = cos(angle);
-
-	double d = Dot(origin, point);
-	double cr[3];
-	Cross(cr, origin, point);
-
-	//glm::dvec3 rotated = (v * c) + (glm::cross(k, v) * s) + (k * glm::dot(k, v)) * (1 - c);
-
-	double pnt1[3]{ point[X] * c, point[Y] * c, point[Z] * c };
-
-	cr[X] *= s;
-	cr[Y] *= s;
-	cr[Z] *= s;
-
-	double kdot[3]{ origin[X] * d, origin[Y] * d, origin[Z] * d };
-	kdot[X] *= (1 - c);
-	kdot[Y] *= (1 - c);
-	kdot[Z] *= (1 - c);
-
-	point[X] = pnt1[X] + cr[X] + kdot[X];
-	point[Y] = pnt1[Y] + cr[Y] + kdot[Y];
-	point[Z] = pnt1[Z] + cr[Z] + kdot[Z];
-
-	return;
-	// Translate point back to origin:
-	point[X] -= origin[X];
-	point[Y] -= origin[Y];
-	point[Z] -= origin[Z];
-
-	double RotatedPoint[3];
-
-	//First rotate the Z:
-	RotatedPoint[X] = point[X] * c - point[Y] * s;
-	RotatedPoint[Y] = point[X] * s + point[Y] * c;
-	RotatedPoint[Z] = point[Z];
-
-	//Second rotate the Y:
-	RotatedPoint[X] = RotatedPoint[X] * c + RotatedPoint[Z] * s;
-	RotatedPoint[Y] = RotatedPoint[Y];
-	RotatedPoint[Z] = RotatedPoint[Y] * s + RotatedPoint[Z] * c;
-
-	//Third rotate the X:
-	RotatedPoint[X] = RotatedPoint[X];
-	RotatedPoint[Y] = RotatedPoint[Y] * c - RotatedPoint[Z] * s;
-	RotatedPoint[Z] = RotatedPoint[Y] * s + RotatedPoint[Z] * c;
-
-	// Translate point back:
-	point[X] = RotatedPoint[X] + origin[X];
-	point[Y] = RotatedPoint[Y] + origin[Y];
-	point[Z] = RotatedPoint[Z] + origin[Z];
-}
-
-
-/// Lines
-
 //----------------------------------------------------------------------------
 int albaGeometryUtils::IntersectLineLine(double *l1p1, double *l1p2, double *l2p1, double *l2p2, double &perc)
 {
 	double x[3];
 	double projXYZ[3];
-	int i;
 	double l2Perc;
 
 	double tol = EPSILON;
@@ -288,7 +235,7 @@ int albaGeometryUtils::IntersectLineLine(double *l1p1, double *l1p2, double *l2p
 	if (vtkLine::Intersection(l1p1, l1p2, l2p1, l2p2, perc, l2Perc) == VTK_YES_INTERSECTION)
 	{
 		// make sure we are within tolerance
-		for (i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			x[i] = l2p1[i] + l2Perc * (l2p2[i] - l2p1[i]);
 			projXYZ[i] = l1p1[i] + perc*(l1p2[i] - l1p1[i]);
@@ -296,11 +243,7 @@ int albaGeometryUtils::IntersectLineLine(double *l1p1, double *l1p2, double *l2p
 		return vtkMath::Distance2BetweenPoints(x, projXYZ) <= tol*tol;
 	}
 	else return false;
-
 }
-
-
-
 
 //----------------------------------------------------------------------------
 void albaGeometryUtils::GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance)
@@ -341,6 +284,8 @@ int albaGeometryUtils::PointUpDownLine(double *point, double *lp1, double *lp2)
 		return 0;
 }
 
+
+//----------------------------------------------------------------------------
 void albaGeometryUtils::rotAroundZ(double *point, float degree)
 {
 	double n_point[3];
@@ -353,7 +298,7 @@ void albaGeometryUtils::rotAroundZ(double *point, float degree)
 	point[Y] = n_point[Y];
 	point[Z] = n_point[Z];
 }
-
+//----------------------------------------------------------------------------
 void albaGeometryUtils::rotAroundY(double *point, float degree)
 {
 	double n_point[3];
@@ -366,23 +311,24 @@ void albaGeometryUtils::rotAroundY(double *point, float degree)
 	point[Y] = n_point[Y];
 	point[Z] = n_point[Z];
 }
-
+//----------------------------------------------------------------------------
 void albaGeometryUtils::rotAroundA(double *point, double *axis, float zdegree)
 {
-	double v1[3] = { 1.0f, 0.0f, 0.0f };
-	double v2[3] = { 0.0f, 1.0f, 0.0f };
-
-	float xdegree = GetAngle(axis, v1);
-	float ydegree = GetAngle(axis, v2);
-
-	rotAroundZ(point, xdegree);
-	rotAroundY(point, ydegree);
-	rotAroundZ(point, zdegree);
-	rotAroundY(point, -ydegree);
-	rotAroundZ(point, -xdegree);
+// 	double v1[3] = { 1.0f, 0.0f, 0.0f };
+// 	double v2[3] = { 0.0f, 1.0f, 0.0f };
+// 
+// 	float xdegree = GetAngle(axis, v1);
+// 	float ydegree = GetAngle(axis, v2);
+// 
+// 	rotAroundZ(point, xdegree);
+// 	rotAroundY(point, ydegree);
+// 	rotAroundZ(point, zdegree);
+// 	rotAroundY(point, -ydegree);
+// 	rotAroundZ(point, -xdegree);
 }
 
 /*
+//----------------------------------------------------------------------------
 void albaGeometryUtils::rotAObject(Object& obj, double *axis, float degree)
 {
 axis = glm::normalize(axis);
