@@ -238,10 +238,18 @@ protected:
 	bool IsInBound(double *pos);
 	void ScreenToWorld(double screen[2], double world[3]);
 	void WorldToScreen(double world[3], double screen[2]);
-
-
+	
 	//vtkPointSource produces a random-distributed pointCloud, use this method to obtain a fixed position single point output
 	vtkPointSource *GetNewPointSource();
+	
+	double DistanceBetweenPoints(double *point1, double *point2);
+	double DistancePointToLine(double * point, double * lineP1, double * lineP2);
+	void GetMidPoint(double(&midPoint)[3], double *point1, double *point2);
+	bool FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance);
+	double GetAngle(double* point1, double* point2, double* origin);
+	void RotatePoint(double *point, double *origin, double angle);
+	int PointUpDownLine(double *point, double *lp1, double *lp2);
+	void GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance);
 
 	albaDeviceButtonsPadMouse	*m_Mouse;
 	vtkRenderer					*m_Renderer;

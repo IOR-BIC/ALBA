@@ -682,3 +682,44 @@ vtkPointSource * albaInteractor2DMeasure::GetNewPointSource()
 	return ps;
 }
 
+
+//----------------------------------------------------------------------------
+double albaInteractor2DMeasure::DistanceBetweenPoints(double *point1, double *point2)
+{
+	return albaGeometryUtils::DistanceBetweenPoints(point1, point2);
+}
+//----------------------------------------------------------------------------
+double albaInteractor2DMeasure::DistancePointToLine(double * point, double * lineP1, double * lineP2)
+{
+	return albaGeometryUtils::DistancePointToLine(point, lineP1, lineP2, m_CurrPlane);
+}
+//---------------------------------------------------------------------------
+void albaInteractor2DMeasure::GetMidPoint(double(&midPoint)[3], double *point1, double *point2)
+{
+	albaGeometryUtils::GetMidPoint(midPoint, point1, point2);
+}
+//----------------------------------------------------------------------------
+bool albaInteractor2DMeasure::FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance)
+{
+	return albaGeometryUtils::FindPointOnLine(point, linePoint1, linePoint2, distance); //TODO
+}
+//----------------------------------------------------------------------------
+double albaInteractor2DMeasure::GetAngle(double* point1, double* point2, double* origin)
+{
+	return albaGeometryUtils::GetAngle(point1, point2, origin, m_CurrPlane);
+}
+//----------------------------------------------------------------------------
+void albaInteractor2DMeasure::RotatePoint(double *point, double *origin, double angle)
+{
+	albaGeometryUtils::RotatePoint(point, origin, angle, m_CurrPlane);
+}
+//----------------------------------------------------------------------------
+int albaInteractor2DMeasure::PointUpDownLine(double *point, double *lp1, double *lp2)
+{
+	return albaGeometryUtils::PointUpDownLine(point, lp1, lp2, m_CurrPlane);
+}
+//----------------------------------------------------------------------------
+void albaInteractor2DMeasure::GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance)
+{
+	albaGeometryUtils::GetParallelLine(point1, point2, linePoint1, linePoint2, distance, m_CurrPlane);
+}
