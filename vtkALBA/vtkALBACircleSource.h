@@ -47,6 +47,9 @@ public:
   vtkSetClampMacro(Resolution,int,1,VTK_LARGE_INTEGER);
   vtkGetMacro(Resolution,int);
 
+	/* 0=XY, 1=YZ, 2=XZ*/
+	void SetPlane(int plane) { m_Plane = plane; };
+
 protected:
   vtkALBACircleSource(int res=1);
   ~vtkALBACircleSource() {};
@@ -59,6 +62,9 @@ protected:
 	double Radius;
 
   int Resolution;
+
+	int m_Plane;
+
 private:
   vtkALBACircleSource(const vtkALBACircleSource&);  // Not implemented.
   void operator=(const vtkALBACircleSource&);  // Not implemented.

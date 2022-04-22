@@ -31,7 +31,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkViewport.h"
 #include "vtkPointSource.h"
 #include "albaVect3d.h"
-/*#include "appGeometry.h"*/
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractor2DMeasure_LineDistance)
@@ -96,10 +95,13 @@ void albaInteractor2DMeasure_LineDistance::MoveMeasure(int index, double * point
 	{
 		if (!m_MovingMeasure)
 		{
-			m_OldLineP1[0] = linePoint1[0] - m_StartMousePosition[0];
-			m_OldLineP1[1] = linePoint1[1] - m_StartMousePosition[1];
-			m_OldLineP2[0] = linePoint2[0] - m_StartMousePosition[0];
-			m_OldLineP2[1] = linePoint2[1] - m_StartMousePosition[1];
+			m_OldLineP1[X] = linePoint1[X] - m_StartMousePosition[X];
+			m_OldLineP1[Y] = linePoint1[Y] - m_StartMousePosition[Y];
+			m_OldLineP1[Z] = linePoint1[Z] - m_StartMousePosition[Z];
+
+			m_OldLineP2[X] = linePoint2[X] - m_StartMousePosition[X];
+			m_OldLineP2[Y] = linePoint2[Y] - m_StartMousePosition[Y];
+			m_OldLineP2[Z] = linePoint2[Z] - m_StartMousePosition[Z];
 
 			m_MovingMeasure = true;
 		}
@@ -107,18 +109,10 @@ void albaInteractor2DMeasure_LineDistance::MoveMeasure(int index, double * point
 		// Initialization
 		m_MeasureValue = 0.0;
 
-		double tmp_pos1[3];
-		double tmp_pos2[3];
+		double tmp_pos1[3] = { point[X] + m_OldLineP1[X] , point[Y] + m_OldLineP1[Y] , point[Z] + m_OldLineP1[Z] };
+		double tmp_pos2[3] = { point[X] + m_OldLineP2[X] , point[Y] + m_OldLineP2[Y] , point[Z] + m_OldLineP2[Z] };
 
-		tmp_pos1[0] = point[0] + m_OldLineP1[0];
-		tmp_pos1[1] = point[1] + m_OldLineP1[1];
-		tmp_pos1[2] = 0.0;
-
-		tmp_pos2[0] = point[0] + m_OldLineP2[0];
-		tmp_pos2[1] = point[1] + m_OldLineP2[1];
-		tmp_pos2[2] = 0.0;
-
-		m_MeasureValue = GeometryUtils::DistanceBetweenPoints(tmp_pos1, tmp_pos2);
+		m_MeasureValue = DistanceBetweenPoints(tmp_pos1, tmp_pos2);
 
 		UpdateLineActors(tmp_pos1, tmp_pos2);
 		// Points
@@ -126,11 +120,11 @@ void albaInteractor2DMeasure_LineDistance::MoveMeasure(int index, double * point
 	}
 	else
 	{
-		m_Distances[index] = GeometryUtils::DistancePointToLine(point, linePoint1, linePoint2);
-		m_Distances[index] *= GeometryUtils::PointUpDownLine(point, linePoint1, linePoint2);
+		m_Distances[index] = DistancePointToLine(point, linePoint1, linePoint2);
+		m_Distances[index] *= PointUpDownLine(point, linePoint1, linePoint2);
 
 		m_CurrMeasure = index;
-		UpdateLineActors(linePoint1,linePoint2);
+		UpdateLineActors(linePoint1, linePoint2);
 	}
 
 	//called on mouse up  
@@ -138,11 +132,6 @@ void albaInteractor2DMeasure_LineDistance::MoveMeasure(int index, double * point
 	{
 		m_ActorAdded = false;
 	}
-
-	// Update Measure
-	albaString text;
-	text.Printf("Distance %.2f mm", GetDistance(index));
-	m_Measure2DVector[index].Text = text;
 
 	albaEventMacro(albaEvent(this, ID_MEASURE_CHANGED, m_MeasureValue));
 	Render();
@@ -155,8 +144,7 @@ void albaInteractor2DMeasure_LineDistance::EditMeasure(int index, double *point)
 
 	m_MovingMeasure = true;
 
-	double point1[3];
-	double point2[3];
+	double point1[3], point2[3];
 	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSource();
 
 	lineSource->GetPoint1(point1);
@@ -166,11 +154,13 @@ void albaInteractor2DMeasure_LineDistance::EditMeasure(int index, double *point)
 	{
 		point1[X] = point[X];
 		point1[Y] = point[Y];
+		point1[Z] = point[Z];
 	}
 	else if (m_CurrPoint == POINT_2)
 	{
 		point2[X] = point[X];
 		point2[Y] = point[Y];
+		point2[Z] = point[Z];
 	}
 
 	m_LastEditing = index;
@@ -178,7 +168,7 @@ void albaInteractor2DMeasure_LineDistance::EditMeasure(int index, double *point)
 	//////////////////////////////////////////////////////////////////////////
 	// Update Measure
 	albaString text;
-	text.Printf("Distance %.2f mm", GetDistance(index));
+	text.Printf("Distance %.2f mm", DistanceBetweenPoints(point1, point2));
 	//m_MeasureTextVector[index] = text;
 	m_Measure2DVector[index].Text = text;
 
@@ -203,22 +193,18 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 	{
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
-			albaActor2dStackHelper *lineStackVector = m_LineStackVector[i];
-			if (m_Renderer != lineStackVector->GetRenderer())
-				continue;
-
 			double linePoint1[3], linePoint2[3];
 			double lineBPoint1[3], lineBPoint2[3];
 
-			vtkLineSource* lineSource = (vtkLineSource*)lineStackVector->GetSource();
+			vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[i]->GetSource();
 			lineSource->GetPoint1(linePoint1);
 			lineSource->GetPoint2(linePoint2);
+
 			vtkLineSource* lineSourceB = (vtkLineSource*)m_LineStackVectorB[i]->GetSource();
 			lineSourceB->GetPoint1(lineBPoint1);
 			lineSourceB->GetPoint2(lineBPoint2);
 
-		
-			if (GeometryUtils::DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
+			if (DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -241,7 +227,7 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 					m_CurrMeasure = i;
 					if (m_MoveMeasureEnable)
 					{
-						lineStackVector->SetColor(m_Colors[COLOR_EDIT]);
+						m_LineStackVector[i]->SetColor(m_Colors[COLOR_EDIT]);
 						SetAction(ACTION_MOVE_MEASURE);
 					}
 
@@ -251,7 +237,7 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 				Render();
 				return;
 			}
-			else if (GeometryUtils::DistancePointToLine(point, lineBPoint1, lineBPoint2) < POINT_UPDATE_DISTANCE)
+			else if (DistancePointToLine(point, lineBPoint1, lineBPoint2) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -307,27 +293,26 @@ void albaInteractor2DMeasure_LineDistance::UpdateLineActors(double * point1, dou
 	lineSourceB->GetPoint1(lBp1);
 	lineSourceB->GetPoint2(lBp2);
 
-
 	lineSource->SetPoint1(point1);
 	lineSource->SetPoint2(point2);
 	lineSource->Update();
 
 	if (m_SecondLineAdded[m_CurrMeasure])
 	{
-		GeometryUtils::GetParallelLine(lBp1, lBp2, point1, point2, m_Distances[m_CurrMeasure]);
+		GetParallelLine(lBp1, lBp2, point1, point2, m_Distances[m_CurrMeasure]);
 
 		lineSourceB->SetPoint1(lBp1);
 		lineSourceB->SetPoint2(lBp2);
 		lineSourceB->Update();
 
 		double m1[3], m2[3];
-		m1[0] = (p1[0] + p2[0]) / 2.0;
-		m1[1] = (p1[1] + p2[1]) / 2.0;
-		m1[2] = (p1[2] + p2[2]) / 2.0;
+		m1[X] = (p1[X] + p2[X]) / 2.0;
+		m1[Y] = (p1[Y] + p2[Y]) / 2.0;
+		m1[Z] = (p1[Z] + p2[Z]) / 2.0;
 
-		m2[0] = (lBp1[0] + lBp2[0]) / 2.0;
-		m2[1] = (lBp1[1] + lBp2[1]) / 2.0;
-		m2[2] = (lBp1[2] + lBp2[2]) / 2.0;
+		m2[X] = (lBp1[X] + lBp2[X]) / 2.0;
+		m2[Y] = (lBp1[Y] + lBp2[Y]) / 2.0;
+		m2[Z] = (lBp1[Z] + lBp2[Z]) / 2.0;
 
 		lineSourcePerp->SetPoint1(m1);
 		lineSourcePerp->SetPoint2(m2);
@@ -339,9 +324,7 @@ void albaInteractor2DMeasure_LineDistance::UpdateLineActors(double * point1, dou
 void albaInteractor2DMeasure_LineDistance::UpdateTextActor(double * point1, double * point2)
 {
 	double text_pos[3];
-	text_pos[X] = (point1[X] + point2[X]) / 2;
-	text_pos[Y] = (point1[Y] + point2[Y]) / 2;
-	text_pos[Z] = (point1[Z] + point2[Z]) / 2;
+	GetMidPoint(text_pos, point1, point2);
 
 	text_pos[X] += m_TextSide *TEXT_W_SHIFT;
 	text_pos[Y] -= m_TextSide *TEXT_H_SHIFT;
@@ -360,21 +343,15 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 		double oldPoint1[3], oldPoint2[3];
 		GetMeasureLinePoints(index, oldPoint1, oldPoint2);
 
-		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
-
-		if (GeometryUtils::DistanceBetweenPoints(oldPoint1,oldPoint2)<POINT_UPDATE_DISTANCE)
+		if (DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
 		{
-			if (!hasSameRenderer) return;
-
 			m_CurrMeasure = index;
 			m_CurrPoint = POINT_2;
 			EditMeasure(index, point2);
 			return;
 		}
-		else if (m_SecondLineAdded[index]== false)
+		else if (m_SecondLineAdded[index] == false)
 		{
-			if (!hasSameRenderer) return;
-
 			//Adding the second line no need to add a new measure.
 			m_SecondLineAdded[index] = true;
 			albaVect3d l1P1, l1P2;
@@ -385,8 +362,8 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 			l1P1 = lineSource->GetPoint1();
 			l1P2 = lineSource->GetPoint2();
 
-			m_Distances[index] = GeometryUtils::DistancePointToLine(point1, l1P1.GetVect(), l1P2.GetVect());
-			m_Distances[index] *= GeometryUtils::PointUpDownLine(point1, l1P1.GetVect(), l1P2.GetVect());
+			m_Distances[index] = DistancePointToLine(point1, l1P1.GetVect(), l1P2.GetVect());
+			m_Distances[index] *= PointUpDownLine(point1, l1P1.GetVect(), l1P2.GetVect());
 			
 			m_CurrMeasure = index;
 			UpdateLineActors(l1P1.GetVect(), l1P2.GetVect());
@@ -403,9 +380,9 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 	int index = m_Measure2DVector.size() - 1;
 
 	albaString text;
-	text.Printf("Distance %.2f mm", GetDistance(index));
+	text.Printf("Distance %.2f mm", DistanceBetweenPoints(point1, point2));
 	m_Measure2DVector[index].Text = text;
-	
+
 	// Update Edit Actors
 	UpdateEditActors(point1, point2);
 
@@ -436,8 +413,7 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 	m_LineStackVectorPerp[index]->SetColor(m_Colors[COLOR_DISABLE]);
 	m_LineStackVectorPerp[index]->GetProperty()->SetLineWidth(m_LineWidth);
 	m_LineStackVectorPerp[index]->GetProperty()->SetLineStipplePattern(0xf0f0);
-
-
+	
 	//---Points---
 	//Left
 	m_PointsStackVectorL[index]->GetProperty()->SetPointSize(m_PointSize);
@@ -465,7 +441,7 @@ void albaInteractor2DMeasure_LineDistance::RemoveMeasure(int index)
 		Superclass::RemoveMeasure(index);
 
 		//////////////////////////////////////////////////////////////////////////
-		// Line
+		// LINES
 		cppDEL(m_LineStackVector[index]);
 		m_LineStackVector.erase(m_LineStackVector.begin() + index);
 		//Left
@@ -474,7 +450,6 @@ void albaInteractor2DMeasure_LineDistance::RemoveMeasure(int index)
 
 		cppDEL(m_LineStackVectorPerp[index]);
 		m_LineStackVectorPerp.erase(m_LineStackVectorPerp.begin() + index);
-
 
 		//POINTS
 		//Left
@@ -504,7 +479,7 @@ void albaInteractor2DMeasure_LineDistance::SelectMeasure(int index)
 			m_LineStackVector[i]->SetColor(m_Colors[col]);
 			m_LineStackVectorB[i]->SetColor(m_Colors[col]);
 			m_LineStackVectorPerp[i]->SetColor(m_Colors[COLOR_DISABLE]);
-			
+
 			m_PointsStackVectorL[i]->SetColor(m_Colors[col]);
 			m_PointsStackVectorR[i]->SetColor(m_Colors[col]);
 			SetColor(m_TextActorVector[i], &m_Colors[col]);
@@ -571,7 +546,7 @@ void albaInteractor2DMeasure_LineDistance::GetMeasureLinePoints(int index, doubl
 //---------------------------------------------------------------------------
 bool albaInteractor2DMeasure_LineDistance::Load(albaVME *input, wxString tag)
 {
-	if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistancePoint1") && input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistancePoint2"))
+	if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistancePoint1") && input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistancePoint1"))
 	{
 		double point1[3], point2[3];
 		albaTagItem *measureTypeTag = input->GetTagArray()->GetTag(tag + "MeasureType");
@@ -580,19 +555,18 @@ bool albaInteractor2DMeasure_LineDistance::Load(albaVME *input, wxString tag)
 		albaTagItem *measureLinePoint2Tag = input->GetTagArray()->GetTag(tag + "MeasureLineDistancePoint2");
 		albaTagItem *measureLineDistanceTag = input->GetTagArray()->GetTag(tag + "MeasureLineDistance");
 
-
 		int nLines = measureLinePoint1Tag->GetNumberOfComponents() / 2;
 
 		// Reload points
 		for (int i = 0; i < nLines; i++)
 		{
-			point1[0] = measureLinePoint1Tag->GetValueAsDouble(i * 2 + 0);
-			point1[1] = measureLinePoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[2] = 0.0;
+			point1[X] = measureLinePoint1Tag->GetValueAsDouble(i * 2 + 0);
+			point1[Y] = measureLinePoint1Tag->GetValueAsDouble(i * 2 + 1);
+			point1[Z] = measureLinePoint1Tag->GetValueAsDouble(i * 2 + 2);
 
-			point2[0] = measureLinePoint2Tag->GetValueAsDouble(i * 2 + 0);
-			point2[1] = measureLinePoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[2] = 0.0;
+			point2[X] = measureLinePoint2Tag->GetValueAsDouble(i * 2 + 0);
+			point2[Y] = measureLinePoint2Tag->GetValueAsDouble(i * 2 + 1);
+			point2[Z] = measureLinePoint2Tag->GetValueAsDouble(i * 2 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -638,7 +612,7 @@ bool albaInteractor2DMeasure_LineDistance::Save(albaVME *input, wxString tag)
 		measureLinePoint2Tag.SetNumberOfComponents(nLines);
 
 		albaTagItem measureLineDistanceTag;
-		measureLineDistanceTag.SetName(tag + "MeasureLineDistanceDistance");
+		measureLineDistanceTag.SetName(tag + "MeasureLineDistance");
 		measureLineDistanceTag.SetNumberOfComponents(nLines);
 
 
@@ -650,11 +624,13 @@ bool albaInteractor2DMeasure_LineDistance::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			measureLinePoint1Tag.SetValue(point1[0], i * 2 + 0);
-			measureLinePoint1Tag.SetValue(point1[1], i * 2 + 1);
+			measureLinePoint1Tag.SetValue(point1[X], i * 2 + 0);
+			measureLinePoint1Tag.SetValue(point1[Y], i * 2 + 1);
+			measureLinePoint1Tag.SetValue(point1[Z], i * 2 + 2);
 
-			measureLinePoint2Tag.SetValue(point2[0], i * 2 + 0);
-			measureLinePoint2Tag.SetValue(point2[1], i * 2 + 1);
+			measureLinePoint2Tag.SetValue(point2[X], i * 2 + 0);
+			measureLinePoint2Tag.SetValue(point2[Y], i * 2 + 1);
+			measureLinePoint2Tag.SetValue(point2[Z], i * 2 + 2);
 
 			measureLineDistanceTag.SetValue(m_Distances[i], i);
 		}
@@ -662,17 +638,17 @@ bool albaInteractor2DMeasure_LineDistance::Save(albaVME *input, wxString tag)
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))
 			input->GetTagArray()->DeleteTag(tag + "MeasureType");
 
-		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistanceLabel"))
-			input->GetTagArray()->DeleteTag(tag + "MeasureLineDistanceLabel");
+		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineLabel"))
+			input->GetTagArray()->DeleteTag(tag + "MeasureLineLabel");
 
-		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistancePoint1"))
-			input->GetTagArray()->DeleteTag(tag + "MeasureLineDistancePoint1");
+		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLinePoint1"))
+			input->GetTagArray()->DeleteTag(tag + "MeasureLinePoint1");
 
-		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistancePoint2"))
-			input->GetTagArray()->DeleteTag(tag + "MeasureLineDistancePoint2");
+		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLinePoint2"))
+			input->GetTagArray()->DeleteTag(tag + "MeasureLinePoint2");
 
-		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistanceDistance"))
-			input->GetTagArray()->DeleteTag(tag + "MeasureLineDistanceDistance");
+		if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistance"))
+			input->GetTagArray()->DeleteTag(tag + "MeasureLineDistance");
 
 		input->GetTagArray()->SetTag(measureTypeTag);
 		input->GetTagArray()->SetTag(measureLabelTag);

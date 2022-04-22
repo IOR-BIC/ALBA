@@ -161,31 +161,33 @@ void albaGUIDialogProsthesisSelection::CreateDialog()
 			imgPath = m_ProducerImageFullName;
 		}
 
+
+		// IMAGE Producer
+		m_ProducerImageSizer = new wxBoxSizer(wxVERTICAL);
+
+		wxImage *previewImage = new wxImage(400,140);
 		if (wxFileExists(imgPath))
 		{
-			// IMAGE Producer
-			m_ProducerImageSizer = new wxBoxSizer(wxVERTICAL);
-
-			wxImage *previewImage = new wxImage();
 			previewImage->LoadFile(imgPath.c_str(), wxBITMAP_TYPE_ANY);
-
-			wxBitmap *previewBitmap = new wxBitmap(*previewImage);
-			m_ProducerImageButton = new albaGUIPicButton(this, previewBitmap, -1);
-
-			panelWidth = previewImage->GetWidth();
-
-			m_ProducerImageSizer->Add(m_ProducerImageButton);
-
-			m_MainBoxSizer->Add(m_ProducerImageSizer, 0, wxALL | wxALIGN_CENTER, 0);
-
-			delete previewBitmap;
-			delete previewImage;
 		}
+	
+		wxBitmap *previewBitmap = new wxBitmap(*previewImage);
+		m_ProducerImageButton = new albaGUIPicButton(this, previewBitmap, -1);
+
+		panelWidth = previewImage->GetWidth();
+
+		m_ProducerImageSizer->Add(m_ProducerImageButton);
+
+		m_MainBoxSizer->Add(m_ProducerImageSizer, 0, wxALL | wxALIGN_CENTER, 0);
+
+		delete previewBitmap;
+		delete previewImage;
+
 
 		//////////////////////////////////////////////////////////////////////////
 		// Info Sizer
 		wxBoxSizer *infoBoxSizer = new wxBoxSizer(wxVERTICAL);
-		
+
 		wxStaticBoxSizer *producerBoxSizer = new wxStaticBoxSizer(wxHORIZONTAL, this, "Producer");
 
 		if (m_CurrentProducer)
@@ -210,8 +212,8 @@ void albaGUIDialogProsthesisSelection::CreateDialog()
 			m_ProducerComboBox->SetEditable(false);
 			m_ProducerComboBox->SetValidator(albaGUIValidator(this, ID_PRODUCER_SELECTION, m_ProducerComboBox, &m_SelectedProducer));
 			producerBoxSizer->Add(m_ProducerComboBox, 0, wxALL | wxEXPAND, 0);
-		}	
-		
+		}
+
 		infoBoxSizer->Add(producerBoxSizer, 0, wxALL | wxEXPAND, 5);
 
 		//////////////////////////////////////////////////////////////////////////

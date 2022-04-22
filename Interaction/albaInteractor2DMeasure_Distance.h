@@ -82,6 +82,7 @@ protected:
 	double m_MinDistance;
 	double m_LineTickWidth;
 	double m_TickLenght;
+
 private:
 	albaInteractor2DMeasure_Distance(const albaInteractor2DMeasure_Distance&);   // Not implemented.
 	void operator=(const albaInteractor2DMeasure_Distance&);  // Not implemented.

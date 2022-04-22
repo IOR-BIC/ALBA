@@ -58,7 +58,7 @@ public:
 	bool Load(albaVME *input, wxString tag);
 	bool Save(albaVME *input, wxString tag);
 
-	double CalculateAngle(int idx);
+	double GetMeasureAngle(int idx);
 	double CalculateAngle(double * point1, double * point2, double * point3, double * point4);
 protected:
 
@@ -69,6 +69,8 @@ protected:
 	void MoveMeasure(int index, double * point);
 	void DrawNewMeasure(double * wp);
 	
+	void UpdateMeasure(int index, double measure);
+
 	// RENDERING
 	virtual void UpdateLineActors(double * point1, double * point2, double * point3, double * point4);
 	virtual void UpdatePointsActor(double * point1, double * point2, double * point3, double * point4);
