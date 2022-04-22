@@ -79,8 +79,8 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 
 	if (m_CurrPoint == POINT_1)
 	{
-		double dist1 = GeometryUtils::DistanceBetweenPoints(point1, point);
-		double dist2 = GeometryUtils::GetPointToLineDistance(point, point1, point2);
+		double dist1 = DistanceBetweenPoints(point1, point);
+		double dist2 = DistancePointToLine(point, point1, point2);
 
 		int sign = (point[X]-point1[X] >= 0) ? 1 : -1;
 
@@ -88,19 +88,20 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 		dist = !isnan(dist) ? dist : 0.0;
 
 		double newPoint[3];
-		GeometryUtils::FindPointOnLine(newPoint, point1, point2, dist*sign);
+		FindPointOnLine(newPoint, point1, point2, dist*sign);
 
 		if (newPoint[X] < point2[X] - minLenght)
 		{
 			point1[X] = newPoint[X];
 			point1[Y] = newPoint[Y];
+			point1[Z] = newPoint[Z];
 		}
 	}
 	else if (m_CurrPoint == POINT_2)
 	{
-		double dist1 = GeometryUtils::DistanceBetweenPoints(point1, point);
-		double dist2 = GeometryUtils::GetPointToLineDistance(point, point1, point2);
-		double len = GeometryUtils::DistanceBetweenPoints(point1, point2);
+		double dist1 = DistanceBetweenPoints(point1, point);
+		double dist2 = DistancePointToLine(point, point1, point2);
+		double len = DistanceBetweenPoints(point1, point2);
 
 		int sign = (point[X] - point1[X] >= 0) ? 1 : -1;
 
@@ -108,12 +109,13 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 		dist = !isnan(dist) ? dist : 0.0;
 
 		double newPoint[3];
-		GeometryUtils::FindPointOnLine(newPoint, point1, point2, dist*sign);
+		FindPointOnLine(newPoint, point1, point2, dist*sign);
 
 		if (newPoint[X] > point1[X] + minLenght)
 		{
 			point2[X] = newPoint[X];
 			point2[Y] = newPoint[Y];
+			point2[Z] = newPoint[Z];
 		}
 	}
 
@@ -122,7 +124,7 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 	//////////////////////////////////////////////////////////////////////////
 	// Update Measure
 
-	double dist = GeometryUtils::DistanceBetweenPoints(point1, point2);
+	double dist = DistanceBetweenPoints(point1, point2);
 
 	if (dist >= m_MinDistance)
 	{
@@ -142,8 +144,6 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 	Render();
 }
 
-/// MEASURE //////////////////////////////////////////////////////////////////
-
 /// LOAD/SAVE ////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
 bool albaInteractor2DMeasure_Segment::Load(albaVME *input, wxString tag)
@@ -161,13 +161,13 @@ bool albaInteractor2DMeasure_Segment::Load(albaVME *input, wxString tag)
 		// Reload points
 		for (int i = 0; i < nLines; i++)
 		{
-			point1[0] = MeasureSegmentPoint1Tag->GetValueAsDouble(i * 2 + 0);
-			point1[1] = MeasureSegmentPoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[2] = 0.0;
+			point1[X] = MeasureSegmentPoint1Tag->GetValueAsDouble(i * 2 + 0);
+			point1[Y] = MeasureSegmentPoint1Tag->GetValueAsDouble(i * 2 + 1);
+			point1[Z] = MeasureSegmentPoint1Tag->GetValueAsDouble(i * 2 + 2);
 
-			point2[0] = MeasureSegmentPoint2Tag->GetValueAsDouble(i * 2 + 0);
-			point2[1] = MeasureSegmentPoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[2] = 0.0;
+			point2[X] = MeasureSegmentPoint2Tag->GetValueAsDouble(i * 2 + 0);
+			point2[Y] = MeasureSegmentPoint2Tag->GetValueAsDouble(i * 2 + 1);
+			point2[Z] = MeasureSegmentPoint2Tag->GetValueAsDouble(i * 2 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -213,11 +213,13 @@ bool albaInteractor2DMeasure_Segment::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			MeasureSegmentPoint1Tag.SetValue(point1[0], i * 2 + 0);
-			MeasureSegmentPoint1Tag.SetValue(point1[1], i * 2 + 1);
+			MeasureSegmentPoint1Tag.SetValue(point1[X], i * 2 + 0);
+			MeasureSegmentPoint1Tag.SetValue(point1[Y], i * 2 + 1);
+			MeasureSegmentPoint1Tag.SetValue(point1[Z], i * 2 + 2);
 
-			MeasureSegmentPoint2Tag.SetValue(point2[0], i * 2 + 0);
-			MeasureSegmentPoint2Tag.SetValue(point2[1], i * 2 + 1);
+			MeasureSegmentPoint2Tag.SetValue(point2[X], i * 2 + 0);
+			MeasureSegmentPoint2Tag.SetValue(point2[Y], i * 2 + 1);
+			MeasureSegmentPoint2Tag.SetValue(point2[Z], i * 2 + 2);
 		}
 
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))

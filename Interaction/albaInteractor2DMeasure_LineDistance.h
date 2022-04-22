@@ -44,7 +44,7 @@ public:
 	virtual void RemoveMeasure(int index);
 	/** Select a Measure*/
 	virtual void SelectMeasure(int index);
-	
+
 	virtual void SetPointSize(double size);
 	virtual void SetLineWidth(double width);
 
@@ -66,12 +66,12 @@ protected:
 	// Draw Measure
 	void MoveMeasure(int index, double * point);
 	void DrawNewMeasure(double * wp);
-	
+
 	// RENDERING
 	virtual void UpdateLineActors(double * point1, double * point2);
 	virtual void UpdatePointsActor(double * point1, double * point2);
 	void UpdateTextActor(double * point1, double * point2);
-	
+
 	//UTILS
 	virtual void FindAndHighlight(double * point);
 
@@ -79,8 +79,7 @@ protected:
 	std::vector<albaActor2dStackHelper *> m_LineStackVector;	// Main Line 
 	std::vector<albaActor2dStackHelper *> m_LineStackVectorB; // Second Line
 	std::vector<albaActor2dStackHelper *> m_LineStackVectorPerp; // Perpendicular Line
-
-
+	
 	// Persistent Points
 	std::vector<albaActor2dStackHelper *> m_PointsStackVectorL;
 	std::vector<albaActor2dStackHelper *> m_PointsStackVectorR;

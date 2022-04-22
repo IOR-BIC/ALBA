@@ -117,8 +117,6 @@ void albaInteractor2DMeasure::InitRenderer(albaEventInteraction *e)
 {
 	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
 
-	//if (m_Renderer == NULL)
-	{
 		if (m_Mouse == NULL)
 		{
 			albaDevice *device = albaDevice::SafeDownCast((albaDevice*)e->GetSender());
@@ -128,7 +126,35 @@ void albaInteractor2DMeasure::InitRenderer(albaEventInteraction *e)
 
 		m_CurrentRwi = m_Mouse->GetRWI();
 		m_Renderer = m_Mouse->GetRenderer();
-	}
+
+		double *normal = m_Renderer->GetActiveCamera()->GetViewPlaneNormal();
+		m_ViewPlaneNormal[X] = normal[X];
+		m_ViewPlaneNormal[Y] = normal[Y];
+		m_ViewPlaneNormal[Z] = normal[Z];
+
+		if (m_ViewPlaneNormal[X] != 0) m_CurrPlane = 1;// YZ;
+		if (m_ViewPlaneNormal[Y] != 0) m_CurrPlane = 2;// XZ;
+		if (m_ViewPlaneNormal[Z] != 0) m_CurrPlane = 0;// XY;
+
+		albaLogMessage("ViewPlaneNormal (%.2f, %.2f, %.2f)", m_ViewPlaneNormal[X], m_ViewPlaneNormal[Y], m_ViewPlaneNormal[Z]);
+
+		if (m_Renderer->GetLayer() != 1)//Frontal Render
+		{
+			vtkRendererCollection *rc = m_Mouse->GetRenderer()->GetRenderWindow()->GetRenderers();
+
+			// Searching for a frontal renderer on render collection
+			if (rc)
+			{
+				rc->InitTraversal();
+				vtkRenderer *ren;
+				while (ren = rc->GetNextItem())
+					if (ren->GetLayer() == 1) //Frontal Render
+					{
+						m_Renderer = ren;
+						break;
+					}
+			}
+		}
 
 	if (m_Renderer)
 	{
@@ -154,9 +180,6 @@ void albaInteractor2DMeasure::InitRenderer(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure::Render()
 {
-// 	if (m_Renderer)
-// 		m_Renderer->GetRenderWindow()->Render();
-
 	for (int i = 0; i < m_AllRenderersVector.size(); i++)
 	{
 		if (m_AllRenderersVector[i])
@@ -189,9 +212,8 @@ void albaInteractor2DMeasure::OnLeftButtonDown(albaEventInteraction *e)
 		OnButtonDown(e);
 		m_DraggingLeft = true;
 
-		double pos_2d[2];
+		double pos_2d[2], pointCoord[3];
 		e->Get2DPosition(pos_2d);
-		double pointCoord[3];
 		ScreenToWorld(pos_2d, pointCoord);
 
 		albaEventMacro(albaEvent(this, ID_MEASURE_STARTED));
@@ -362,14 +384,10 @@ void albaInteractor2DMeasure::AddMeasure(double *point1, double *point2 /*= NULL
 	while (m_MaxMeasures > 0 && (GetMeasureCount() >= m_MaxMeasures))
 		RemoveMeasure(GetMeasureCount() - 1);
 
-	point1[Z] = 0.0;
-
-	if (point2 != NULL) point2[Z] = 0.0;;
-
 	//////////////////////////////////////////////////////////////////////////
 	// Add Measure
 	albaString text;
-	text.Printf("Point (%.2f, %.2f)", point1[X], point1[Y]);
+	text.Printf("Point (%.2f, %.2f, %.2f)", point1[X], point1[Y], point1[Z]);
 
 	Measure2D newMeasure;
 	newMeasure.Active = true;
@@ -540,9 +558,8 @@ void albaInteractor2DMeasure::SetRendererByView(albaView * view)
 
 	vtkRendererCollection *rc;
 	rc = view->GetRWI()->GetRenderWindow()->GetRenderers();
-
-	// Searching for a frontal renderer on render collection
-	if (rc)
+		
+	if (rc) // Searching for a frontal renderer on render collection
 	{
 		rc->InitTraversal();
 		vtkRenderer *ren;
@@ -591,8 +608,6 @@ void albaInteractor2DMeasure::UpdateTextActor(int index, double *text_pos)
 		if (text.IsEmpty())
 			text = GetMeasureText(index);
 
-		//m_Measure2DVector[index].Text = text; //
-
 		m_TextActorVector[index]->SetText(text);
 		m_TextActorVector[index]->SetTextPosition(text_pos);
 
@@ -617,8 +632,9 @@ bool albaInteractor2DMeasure::IsInBound(double *pos)
 
 	if (m_Bounds)
 	{
-		if (pos[0] > m_Bounds[0] && pos[0] < m_Bounds[1]) // MarginLeft & MarginRight
-			if (pos[1] > m_Bounds[2] && pos[1] < m_Bounds[3]) // MarginUp & MarginDown
+		if (pos[X] > m_Bounds[0] && pos[X] < m_Bounds[1]) // MarginLeft & MarginRight
+			if (pos[Y] > m_Bounds[2] && pos[Y] < m_Bounds[3]) // MarginUp & MarginDown
+				if (pos[Z] > m_Bounds[4] && pos[Z] < m_Bounds[5]) // MarginUp & MarginDown
 				m_IsInBound = true;
 	}
 
@@ -629,13 +645,17 @@ void albaInteractor2DMeasure::ScreenToWorld(double screen[2], double world[3])
 {
 	double wp[4];
 
-	m_Renderer->SetDisplayPoint(screen[0], screen[1], 0);
+	m_Renderer->SetDisplayPoint(screen[X], screen[Y], 0);
 	m_Renderer->DisplayToWorld();
 	m_Renderer->GetWorldPoint(wp);
 
-	world[0] = wp[0];
-	world[1] = wp[1];
-	world[2] = 0;
+	world[X] = wp[X];
+	world[Y] = wp[Y];
+	world[Z] = wp[Z];
+
+	m_Renderer->GetActiveCamera()->SetViewPlaneNormal(0, 0, -1);
+
+	albaLogMessage("StoW (%f, %f) -> (%f, %f, %f, %f)", screen[X], screen[Y], wp[X], wp[Y], wp[Z], wp[3]);
 }
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure::WorldToScreen(double world[3], double screen[2])
@@ -646,8 +666,10 @@ void albaInteractor2DMeasure::WorldToScreen(double world[3], double screen[2])
 	m_Renderer->WorldToDisplay();
 	m_Renderer->GetDisplayPoint(scr);
 
-	screen[0] = scr[0];
-	screen[1] = scr[1];
+	screen[X] = scr[X];
+	screen[Y] = scr[Y];
+
+	//albaLogMessage("WtoS (%f, %f, %f) -> (%f, %f) %f", world[X], world[Y], world[Z], screen[X], screen[Y], scr[Z]);
 }
 
 //----------------------------------------------------------------------------
@@ -660,218 +682,44 @@ vtkPointSource * albaInteractor2DMeasure::GetNewPointSource()
 	return ps;
 }
 
-/// Geometry Utils
 
-#define VTK_NO_INTERSECTION 0
-#define VTK_YES_INTERSECTION  2
-#define EPSILON 1e-5;
-
-/// Points
-
+//----------------------------------------------------------------------------
+double albaInteractor2DMeasure::DistanceBetweenPoints(double *point1, double *point2)
+{
+	return albaGeometryUtils::DistanceBetweenPoints(point1, point2);
+}
+//----------------------------------------------------------------------------
+double albaInteractor2DMeasure::DistancePointToLine(double * point, double * lineP1, double * lineP2)
+{
+	return albaGeometryUtils::DistancePointToLine(point, lineP1, lineP2, m_CurrPlane);
+}
 //---------------------------------------------------------------------------
-bool GeometryUtils::Equal(double *point1, double *point2)
+void albaInteractor2DMeasure::GetMidPoint(double(&midPoint)[3], double *point1, double *point2)
 {
-	return point1[0] == point2[0] && point1[1] == point2[1] && point1[2] == point2[2];
-}
-
-//---------------------------------------------------------------------------
-double * GeometryUtils::GetMidPoint(double *point1, double *point2)
-{
-	double midPoint[3];
-	midPoint[0] = (point1[0] + point2[0]) / 2;
-	midPoint[1] = (point1[1] + point2[1]) / 2;
-	midPoint[2] = 0.0;
-
-	return midPoint;
-}
-
-//----------------------------------------------------------------------------
-void GeometryUtils::RotatePoint(double *point, double *origin, double angle)
-{
-	double s = sin(angle);
-	double c = cos(angle);
-
-	// Translate point back to origin:
-	point[X] -= origin[X];
-	point[Y] -= origin[Y];
-
-	// Rotate point
-	double xnew = point[X] * c - point[Y] * s;
-	double ynew = point[X] * s + point[Y] * c;
-
-	// Translate point back:
-	point[X] = xnew + origin[X];
-	point[Y] = ynew + origin[Y];
-	point[Z] = 0;
-}
-
-//----------------------------------------------------------------------------
-double GeometryUtils::CalculateAngle(double point1[3], double point2[3], double origin[3])
-{
-	double angleToP1 = atan2((point1[X] - origin[X]), (point1[Y] - origin[Y]));
-	double angleToP2 = atan2((point2[X] - origin[X]), (point2[Y] - origin[Y]));
-
-	double angle = angleToP2 - angleToP1;
-
-	if (angle < 0) angle += (2 * vtkMath::Pi());
-
-	return angle;
-}
-
-//----------------------------------------------------------------------------
-double GeometryUtils::DistanceBetweenPoints(double *point1, double *point2)
-{
-	return sqrt(pow(point1[X] - point2[X], 2) + pow(point1[Y] - point2[Y], 2));
-}
-
-/// Lines
-//----------------------------------------------------------------------------
-bool GeometryUtils::FindIntersectionLines(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2)
-{
-	// Line1 represented as a1x + b1y = c1
-	double a1 = line1Point2[1] - line1Point1[1];
-	double b1 = line1Point1[0] - line1Point2[0];
-	double c1 = a1*(line1Point1[0]) + b1*(line1Point1[1]);
-
-	// Line2 represented as a2x + b2y = c2
-	double a2 = line2Point2[1] - line2Point1[1];
-	double b2 = line2Point1[0] - line2Point2[0];
-	double c2 = a2*(line2Point1[0]) + b2*(line2Point1[0]);
-
-	double determinant = a1*b2 - a2*b1;
-
-	if (determinant == 0)
-	{
-		// The lines are parallel. This is simplified
-		point[0] = DBL_MAX;
-		point[1] = DBL_MAX;
-		point[2] = 0.0;
-	}
-	else
-	{
-		point[0] = (b2*c1 - b1*c2) / determinant;
-		point[1] = (a1*c2 - a2*c1) / determinant;
-		point[2] = 0.0;
-
-		return true;
-	}
-
-	return false;
+	albaGeometryUtils::GetMidPoint(midPoint, point1, point2);
 }
 //----------------------------------------------------------------------------
-int GeometryUtils::IntersectLineLine(double *l1p1, double *l1p2, double *l2p1, double *l2p2, double &perc)
+bool albaInteractor2DMeasure::FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance)
 {
-	double x[3];
-	double projXYZ[3];
-	int i;
-	double l2Perc;
-
-	double tol = EPSILON;
-
-	if (vtkLine::Intersection(l1p1, l1p2, l2p1, l2p2, perc, l2Perc) == VTK_YES_INTERSECTION)
-	{
-		// make sure we are within tolerance
-		for (i = 0; i < 3; i++)
-		{
-			x[i] = l2p1[i] + l2Perc * (l2p2[i] - l2p1[i]);
-			projXYZ[i] = l1p1[i] + perc*(l1p2[i] - l1p1[i]);
-		}
-		return vtkMath::Distance2BetweenPoints(x, projXYZ) <= tol*tol;
-	}
-	else return false;
-
-}
-
-//----------------------------------------------------------------------------
-double GeometryUtils::GetPointToLineDistance(double *point, double *linePoint1, double *linePoint2)
-{
-	double a = linePoint1[1] - linePoint2[1]; // Note: this was incorrectly "y2 - y1" in the original answer
-	double b = linePoint2[0] - linePoint1[0];
-	double c = linePoint1[0] * linePoint2[1] - linePoint2[0] * linePoint1[1];
-
-	return abs(a * point[0] + b * point[1] + c) / sqrt(a * a + b * b);
+	return albaGeometryUtils::FindPointOnLine(point, linePoint1, linePoint2, distance); //TODO
 }
 //----------------------------------------------------------------------------
-float GeometryUtils::DistancePointToLine(double * point, double * lineP1, double * lineP2)
+double albaInteractor2DMeasure::GetAngle(double* point1, double* point2, double* origin)
 {
-	double point_x = point[0];
-	double point_y = point[1];
-
-	double line_x1 = lineP1[0];
-	double line_y1 = lineP1[1];
-	double line_x2 = lineP2[0];
-	double line_y2 = lineP2[1];
-
-	double diffX = line_x2 - line_x1;
-	double diffY = line_y2 - line_y1;
-
-	if ((diffX == 0) && (diffY == 0))
-	{
-		diffX = point_x - line_x1;
-		diffY = point_y - line_y1;
-		return sqrt(diffX * diffX + diffY * diffY);
-	}
-
-	float t = ((point_x - line_x1) * diffX + (point_y - line_y1) * diffY) / (diffX * diffX + diffY * diffY);
-
-	if (t < 0)
-	{
-		// Point is nearest to the first point i.e x1 and y1
-		diffX = point_x - line_x1;
-		diffY = point_y - line_y1;
-	}
-	else if (t > 1)
-	{
-		// Point is nearest to the end point i.e x2 and y2
-		diffX = point_x - line_x2;
-		diffY = point_y - line_y2;
-	}
-	else
-	{
-		// If perpendicular line intersect the line segment.
-		diffX = point_x - (line_x1 + t * diffX);
-		diffY = point_y - (line_y1 + t * diffY);
-	}
-
-	// Returning shortest distance
-	return sqrt(diffX * diffX + diffY * diffY);
-}
-
-//----------------------------------------------------------------------------
-void GeometryUtils::GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance)
-{
-	double L = sqrt(pow((linePoint2[0] - linePoint1[0]), 2) + pow((linePoint2[1] - linePoint1[1]), 2));
-
-	point1[0] = linePoint1[0] + distance * (linePoint2[1] - linePoint1[1]) / L;
-	point1[1] = linePoint1[1] + distance * (linePoint1[0] - linePoint2[0]) / L;
-	point1[2] = 0.0;
-
-	point2[0] = linePoint2[0] + distance * (linePoint2[1] - linePoint1[1]) / L;
-	point2[1] = linePoint2[1] + distance * (linePoint1[0] - linePoint2[0]) / L;
-	point2[2] = 0.0;
+	return albaGeometryUtils::GetAngle(point1, point2, origin, m_CurrPlane);
 }
 //----------------------------------------------------------------------------
-bool GeometryUtils::FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance)
+void albaInteractor2DMeasure::RotatePoint(double *point, double *origin, double angle)
 {
-	double L = sqrt(pow((linePoint2[0] - linePoint1[0]), 2) + pow((linePoint2[1] - linePoint1[1]), 2));
-	double dist_ratio = distance / L;
-
-	point[0] = (1 - dist_ratio)*linePoint1[0] + dist_ratio * linePoint2[0];
-	point[1] = (1 - dist_ratio)*linePoint1[1] + dist_ratio * linePoint2[1];
-	point[2] = 0.0;
-
-	return (dist_ratio > 0 && dist_ratio < 1); //the point is on the line.
+	albaGeometryUtils::RotatePoint(point, origin, angle, m_CurrPlane);
 }
-
 //----------------------------------------------------------------------------
-int GeometryUtils::PointUpDownLine(double *point, double *lp1, double *lp2)
+int albaInteractor2DMeasure::PointUpDownLine(double *point, double *lp1, double *lp2)
 {
-	double d = (point[0] - lp1[0]) * (lp2[1] - lp1[1]) - (point[1] - lp1[1]) * (lp2[0] - lp1[0]);
-
-	if (d > 0)
-		return 1;
-	else if (d < 0)
-		return -1;
-	else
-		return 0;
+	return albaGeometryUtils::PointUpDownLine(point, lp1, lp2, m_CurrPlane);
+}
+//----------------------------------------------------------------------------
+void albaInteractor2DMeasure::GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance)
+{
+	albaGeometryUtils::GetParallelLine(point1, point2, linePoint1, linePoint2, distance, m_CurrPlane);
 }
