@@ -39,6 +39,9 @@ PURPOSE. See the above copyright notice for more information.
 #include "wx/listctrl.h"
 #include "albaGUITransformMouseFloatVME.h"
 #include "albaInteractorGenericMouseFloatVME.h"
+#include "vtkSphereSource.h"
+#include "albaVME.h"
+#include "albaTagArray.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEProsthesis)
@@ -54,6 +57,8 @@ albaVMEProsthesis::albaVMEProsthesis()
 	m_GroupGui = NULL;
 	m_InteractorTransformFloatVME = NULL;
   m_InteractorGenericMouseFloatVME = NULL;
+
+	m_RotCenterVME = NULL;
 
 }
 //-------------------------------------------------------------------------
@@ -453,6 +458,100 @@ void albaVMEProsthesis::OnTranfromEvent(albaEvent *e)
 
 		GetLogicManager()->CameraUpdate();
 	}
+}
+
+//-------------------------------------------------------------------------
+void albaVMEProsthesis::CreateRotCenterVME()
+{
+	if (m_RotCenterVME == NULL)
+	{
+		vtkALBASmartPointer<vtkSphereSource> Sphere;
+		Sphere->SetRadius(2.5);
+		Sphere->Update();
+		albaNEW(m_RotCenterVME);
+		m_RotCenterVME->SetData(Sphere->GetOutput(), 0.0);
+		m_RotCenterVME->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 0.0));
+		m_RotCenterVME->ReparentTo(this);
+		m_RotCenterVME->Delete();
+
+		m_RotCenterVME->SetAbsMatrix(*(this->GetOutput()->GetAbsMatrix()));//RefSys start with prosthesis origin
+
+		SetRotCenterVME(m_RotCenterVME);
+		ShowRotCenter(false);
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaVMEProsthesis::SetRotCenterVME(albaVME *rotCenter)
+{
+
+	if (rotCenter == NULL)
+		return;
+
+	m_RotCenterVME=albaVMESurface::SafeDownCast(rotCenter);
+
+	m_InteractorTransformFloatVME->SetRefSys(m_RotCenterVME);
+
+	SetLink("ROT_REFSYS", rotCenter);
+}
+//----------------------------------------------------------------------------
+albaVME* albaVMEProsthesis::GetRotCenterVME()
+{
+	if (m_RotCenterVME == NULL)
+		SetRotCenterVME(GetLink("ROT_REFSYS"));
+
+	if (m_RotCenterVME == NULL)
+		CreateRotCenterVME();
+
+	return	m_RotCenterVME;
+}
+
+//----------------------------------------------------------------------------
+void albaVMEProsthesis::GetZMinMax(double &zMin, double &zMax)
+{
+	zMin = VTK_DOUBLE_MAX;
+	zMax = VTK_DOUBLE_MIN;
+	double in[4], out[4];
+
+	albaMatrix *absMtr=GetOutput()->GetAbsMatrix();
+
+	in[3] = 1;
+	vtkDataSet *outputDataSet = GetOutput()->GetVTKData();
+	int nPoints = outputDataSet->GetNumberOfPoints();
+	for (int i = 0; i < nPoints; i++) {
+		outputDataSet->GetPoint(i, in);
+		absMtr->MultiplyPoint(in, out);
+		zMin = MIN(zMin, out[2]);
+		zMax = MAX(zMax, out[2]);
+	}
+}
+
+//-------------------------------------------------------------------------
+void albaVMEProsthesis::SetRotCenter(double center[3])
+{
+	albaVMESurface *refSys;
+	refSys = (albaVMESurface*)GetRotCenterVME();
+
+	if (refSys)
+	{
+		double oldOrientation[3];
+		double oldPosition[3];
+
+		refSys->Update();
+		refSys->GetOutput()->GetAbsPose(oldPosition, oldOrientation, m_CurrentTime);
+
+		refSys->SetAbsPose(center[0], center[1], center[2], oldOrientation[0], oldOrientation[1], oldOrientation[2], m_CurrentTime);
+		refSys->Update();
+	}
+
+
+	GetLogicManager()->CameraUpdate();
+}
+
+//-------------------------------------------------------------------------
+void albaVMEProsthesis::ShowRotCenter(bool show)
+{
+	GetLogicManager()->VmeShow(GetRotCenterVME(), show);
 }
 
 //-------------------------------------------------------------------------

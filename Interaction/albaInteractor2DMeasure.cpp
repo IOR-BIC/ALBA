@@ -136,7 +136,7 @@ void albaInteractor2DMeasure::InitRenderer(albaEventInteraction *e)
 		if (m_ViewPlaneNormal[Y] != 0) m_CurrPlane = 2;// XZ;
 		if (m_ViewPlaneNormal[Z] != 0) m_CurrPlane = 0;// XY;
 
-		albaLogMessage("ViewPlaneNormal (%.2f, %.2f, %.2f)", m_ViewPlaneNormal[X], m_ViewPlaneNormal[Y], m_ViewPlaneNormal[Z]);
+		//albaLogMessage("ViewPlaneNormal (%.2f, %.2f, %.2f)", m_ViewPlaneNormal[X], m_ViewPlaneNormal[Y], m_ViewPlaneNormal[Z]);
 
 		if (m_Renderer->GetLayer() != 1)//Frontal Render
 		{
@@ -655,7 +655,7 @@ void albaInteractor2DMeasure::ScreenToWorld(double screen[2], double world[3])
 
 	m_Renderer->GetActiveCamera()->SetViewPlaneNormal(0, 0, -1);
 
-	albaLogMessage("StoW (%f, %f) -> (%f, %f, %f, %f)", screen[X], screen[Y], wp[X], wp[Y], wp[Z], wp[3]);
+	//albaLogMessage("StoW (%f, %f) -> (%f, %f, %f, %f)", screen[X], screen[Y], wp[X], wp[Y], wp[Z], wp[3]);
 }
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure::WorldToScreen(double world[3], double screen[2])

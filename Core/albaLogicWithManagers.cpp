@@ -310,6 +310,8 @@ void albaLogicWithManagers::Configure()
 		m_ViewManager = new albaViewManager();
 		m_ViewManager->SetListener(this);
 		m_ViewManager->SetMouse(m_Mouse);
+
+		m_SettingsDialog->AddPage(m_ViewManager->GetSettingsGui(), "View");
 	}
 
 	if (m_UseOpManager)
@@ -1639,7 +1641,7 @@ void albaLogicWithManagers::ViewCreated(albaView *v)
 		// child views
 		albaGUIMDIChild *c = new albaGUIMDIChild(m_Win, v);
 		c->SetWindowStyleFlag(m_ChildFrameStyle);
-		c->SetListener(m_ViewManager);
+		c->SetListener((albaObserver*)m_ViewManager);
 		v->SetFrame(c);
 	}
 }
