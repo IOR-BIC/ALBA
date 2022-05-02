@@ -126,6 +126,19 @@ albaGUI* albaViewManager::GetSettingsGui()
 
 	return m_SettingsGui;
 }
+
+//----------------------------------------------------------------------------
+void albaViewManager::EnableViewSettings(bool enable /*= true*/)
+{
+	if (m_SettingsGui != NULL)
+	{
+		m_SettingsGui->Enable(ID_VIEW_SETTING_MAXIMIZE, enable);
+		m_SettingsGui->Enable(ID_VIEW_SETTING_OPEN_ONLY_ONE, enable);
+		m_SettingsGui->Enable(ID_VIEW_SETTING_COLOR, enable);
+		m_SettingsGui->Enable(ID_VIEW_SETTING_COLOR_DEFAULT, enable);
+	}
+}
+
 //----------------------------------------------------------------------------
 void albaViewManager::InitializeSettings()
 {

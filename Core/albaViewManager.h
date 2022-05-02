@@ -152,6 +152,7 @@ public:
 
 	void OpenOnlyViewForType(int chose) { m_ViewOpenOnlyOne = chose; };
 	void MaximizeViewOnOpen(int chose) { m_ViewMaximize = chose; };
+	void EnableViewSettings(bool enable = true);
 
 protected:
 
