@@ -236,7 +236,7 @@ public:
  	void SaveDBToFile(albaString DBFile) { m_DBFilename = DBFile; SaveDB(); };
 // 
 	albaString GetDBDir() const { return m_DBDir; }
-	void SetDBDir(albaString val) { m_DBDir = val; }
+	void SetDBDir(albaString val);
 	albaString GetPassPhrase() const { return m_PassPhrase; }
 	void SetPassPhrase(albaString val) { m_PassPhrase = val; }
 private:

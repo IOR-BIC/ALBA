@@ -490,6 +490,14 @@ void albaProsthesesDBManager::AddType(albaProDBType *type)
 }
 
 //----------------------------------------------------------------------------
+void albaProsthesesDBManager::SetDBDir(albaString val)
+{
+	m_DBDir = val;
+	m_DBFilename = m_DBDir + "ProsthesesDB.xml";
+
+}
+
+//----------------------------------------------------------------------------
 int albaProDBCompGroup::Load(XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node)
 {
 	//<Components Name="Stem">
