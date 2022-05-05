@@ -28,7 +28,9 @@ albaCxxTypeMacro(albaInteractorGenericMouseFloatVME);
 
 // ----------------------------------------------------------------------------
 albaInteractorGenericMouseFloatVME::albaInteractorGenericMouseFloatVME() 
-{ }
+{
+	m_Modality2D = false;
+}
 
 // ----------------------------------------------------------------------------
 albaInteractorGenericMouseFloatVME::~albaInteractorGenericMouseFloatVME() 
@@ -37,6 +39,13 @@ albaInteractorGenericMouseFloatVME::~albaInteractorGenericMouseFloatVME()
 //----------------------------------------------------------------------------
 void albaInteractorGenericMouseFloatVME::TrackballRotate()
 {
+
+	if (m_Modality2D)
+	{
+		TrackballRoll();
+		return;
+	}
+
 	// mouse position
 	int x = m_MousePointer2DPosition[0];
 	int y = m_MousePointer2DPosition[1];
