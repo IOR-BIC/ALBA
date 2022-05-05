@@ -526,6 +526,13 @@ void albaVMEProsthesis::GetZMinMax(double &zMin, double &zMax)
 	}
 }
 
+//----------------------------------------------------------------------------
+void albaVMEProsthesis::Set2dModality(bool mod2d)
+{
+	albaInteractorGenericMouseFloatVME* isaRotate = albaInteractorGenericMouseFloatVME::SafeDownCast(m_InteractorTransformFloatVME->GetIsaRotate());
+	isaRotate->Set2DModality(mod2d);
+}
+
 //-------------------------------------------------------------------------
 void albaVMEProsthesis::SetRotCenter(double center[3])
 {

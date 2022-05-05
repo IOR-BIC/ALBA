@@ -32,6 +32,8 @@ public:
   /** Set the current camera */
   //virtual void SetCurrentCamera(vtkCamera *camera) {m_CurrentCamera=camera;}
 
+	void Set2DModality(bool mod2d) { m_Modality2D = mod2d; }
+
 protected:
 
   albaInteractorGenericMouseFloatVME();
@@ -44,6 +46,8 @@ protected:
   virtual void TrackballRotate();
   //void TrackballTranslate();
 	virtual void TrackballRoll();
+
+	bool m_Modality2D;
 
 private:
 

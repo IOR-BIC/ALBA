@@ -33,6 +33,7 @@ class vtkScalarBarActor;
 class vtkActor;
 class mmaMaterial;
 class vtkDataSet;
+class vtkALBADistanceFilter;
 
 //----------------------------------------------------------------------------
 // albaPipeWithScalar :
@@ -57,6 +58,8 @@ public:
 	enum PIPE_WITH_SCALARS_WIDGET_ID
 	{
 		ID_SCALARS = albaPipe::ID_LAST,
+		ID_DENSITY_MAPS,
+		ID_SELECT_DENS_VME,
 		ID_LUT,
 		ID_LUT_SLIDER,
 		ID_SCALAR_MAP_ACTIVE,
@@ -113,9 +116,14 @@ public:
 
 	int GetScalarBarLabNum() const { return m_ScalarBarLabNum+3; }
 	void SetScalarBarLabNum(int val) { m_ScalarBarLabNum = val-3; }
+
+	void SetDensityVolume(albaVME *vol);
+
+	static bool VolumeAccept(albaVME *node);
 protected:
 	
   vtkLookupTable  *m_Table;
+	albaVME *m_DensityVolume;
 	
 	albaGUILutSwatch *m_LutSwatch;
 	albaGUILutSlider		*m_LutSlider;
@@ -138,19 +146,32 @@ protected:
 	vtkDataSetMapper        *m_Mapper; 
 	vtkActor                *m_Actor;
 	vtkScalarBarActor				*m_ScalarBarActor;
+	vtkALBADistanceFilter		*m_DensityFilter;
 
 
   int                      m_PointCellArraySeparation;
   int                      m_ScalarIndex;
   int                      m_NumberOfArrays;
   int                      m_ActiveScalarType;
-  int                      m_ScalarMapActive;
+	int                      m_ScalarMapActive;  //Gui option to enable scalar maps generation to be active a volume must be selected
+	int                      m_DensisyMapActive;
 	int											 m_ShowScalarBar;
 	int											 m_ScalarBarLabNum;
 	int											 m_ScalarBarPos;
+	int											 m_MapsGenActive;  //True when the maps generation is active (not gui option)
 
+	albaString							 m_DensVolName;
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
 	void CreateScalarsGui(albaGUI *gui);
-};  
+
+	//Creates the Stack for density maps visualization
+	void CreateDensityMapStack();
+
+	//Destroys the Density Map Stack
+	void DestroyDensityMapStack();
+
+
+
+};
 #endif // __albaPipeWithScalar_H__
