@@ -22,6 +22,7 @@
 //----------------------------------------------------------------------------
 #include "albaEvent.h"
 #include "albaObserver.h"
+#include "albaGUISettings.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -39,10 +40,21 @@ EXPORT_STL_VECTOR(ALBA_EXPORT,long);
 #endif
 
 //----------------------------------------------------------------------------
+// Widgets ID's
+//----------------------------------------------------------------------------
+enum VieweSettingsEvents
+{	
+	ID_VIEW_SETTING_MAXIMIZE = MINID,
+	ID_VIEW_SETTING_OPEN_ONLY_ONE,
+	ID_VIEW_SETTING_COLOR,
+	ID_VIEW_SETTING_COLOR_DEFAULT,
+};
+
+//----------------------------------------------------------------------------
 // albaViewManager :
 //----------------------------------------------------------------------------
 /** An implementation of albaViewManager with [D]ynamic view [C]reation feature */
-class ALBA_EXPORT albaViewManager: public albaObserver
+class ALBA_EXPORT albaViewManager : albaObserver, albaGUISettings
 {
 
 public:
@@ -135,7 +147,18 @@ public:
   /** Initialize the action for the mouse device.*/
   void SetMouse(albaDeviceButtonsPadMouse *mouse);
 
+	/* Return the gui for Settings Dialog*/
+	albaGUI* GetSettingsGui();
+
+	void OpenOnlyViewForType(int chose) { m_ViewOpenOnlyOne = chose; };
+	void MaximizeViewOnOpen(int chose) { m_ViewMaximize = chose; };
+	void EnableViewSettings(bool enable = true);
+
 protected:
+
+	/** Initialize the application settings.*/
+	void InitializeSettings();
+
   albaDeviceButtonsPadMouse      *m_Mouse;
   albaView       *m_ViewList;  // created view list
 
@@ -151,6 +174,12 @@ protected:
   albaView       *m_ViewMatrixID[MAXVIEW][MAXVIEW];  ///< Matrix to access views directly by (id, multiplicity)
 
   std::vector<long> m_IdInvisibleMenuList; ///< List of views that are no visible into the 'View' menu item.
+
+	albaGUI *m_SettingsGui;
+
+	wxColour m_ViewColorBackground;
+	int m_ViewMaximize;
+	int m_ViewOpenOnlyOne;
 
   /** test friend */
   friend class albaViewManagerTest;

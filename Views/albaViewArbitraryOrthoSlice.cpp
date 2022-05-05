@@ -173,7 +173,8 @@ void albaViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
 	m_ViewSlice[v]->PlugVisualPipe("albaVMEPolylineSpline", "albaPipePolylineSlice");
 	m_ViewSlice[v]->PlugVisualPipe("albaVMEMeter", "albaPipePolyline");
 	m_ViewSlice[v]->PlugVisualPipe("medVMEMuscleWrapper", "albaPipeSurfaceSlice");
-
+	m_ViewSlice[v]->PlugVisualPipe("albaVMEProsthesis", "albaPipeSurfaceSlice");
+	
 	PlugChildView(m_ViewSlice[v]);
 }
 

@@ -18,6 +18,7 @@ IF (ALBA_USE_VTK)
 	albaOpLabelExtractor.cpp	    			albaOpLabelExtractor.h
 	albaOpOpenExternalFile.cpp	    		albaOpOpenExternalFile.h
 	albaOp2DMeasure.cpp	    					albaOp2DMeasure.h
+	albaOpMeasure2D.cpp	    					albaOpMeasure2D.h
 	albaOpAddLandmark.cpp	    				albaOpAddLandmark.h
 	albaOpExporterBmp.cpp	    				albaOpExporterBmp.h
 	albaOpClipSurface.cpp	    				albaOpClipSurface.h
@@ -160,6 +161,11 @@ IF (ALBA_USE_VTK)
 	albaOpExtractImageFromArbitraryView.cpp		albaOpExtractImageFromArbitraryView.h
 	albaOpImporterDicFile.cpp		albaOpImporterDicFile.h
 	albaOpImporterPointCloud.cpp	albaOpImporterPointCloud.h
+	albaOpCreateProsthesis.cpp		albaOpCreateProsthesis.h
+	albaOpImportProsthesisToDB.cpp  albaOpImportProsthesisToDB.h
+	
+	albaComputeHausdorffDistance.cpp	albaComputeHausdorffDistance.h
+	albaOpComputeHausdorffDistance.cpp albaOpComputeHausdorffDistance.h
   )
 ENDIF (ALBA_USE_VTK)
 

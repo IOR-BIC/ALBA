@@ -427,13 +427,10 @@ void albaVMERefSys::OnEvent(albaEventBase *alba_event)
 				{
           // Normal RefSys
 
-					//Make all link not mandatory
-					linkedVME = GetLink("OriginVME");
-					SetLink("OriginVME", linkedVME);
-					linkedVME = GetLink("Point1VME");
-					SetLink("Point1VME", linkedVME);
-					linkedVME = GetLink("Point2VME");
-					SetLink("Point2VME", linkedVME);
+					//Remove links
+					RemoveLink("OriginVME");
+					RemoveLink("Point1VME");
+					RemoveLink("Point2VME");
 					
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,false);
 					m_Gui->Enable(ID_POINT1,false);
@@ -443,14 +440,11 @@ void albaVMERefSys::OnEvent(albaEventBase *alba_event)
 				{
           // RefSys with Origin link
 
-					//Make origin link mandatory and orther link not mandatory
+					//Make origin link mandatory and remove other links
 					linkedVME = GetLink("OriginVME");
 					SetMandatoryLink("OriginVME", linkedVME);
-					linkedVME = GetLink("Point1VME");
-					SetLink("Point1VME", linkedVME);
-					linkedVME = GetLink("Point2VME");
-					SetLink("Point2VME", linkedVME);
-
+					RemoveLink("Point1VME");
+					RemoveLink("Point2VME");
 
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
 					m_Gui->Enable(ID_POINT1,false);

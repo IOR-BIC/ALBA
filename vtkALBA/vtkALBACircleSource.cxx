@@ -38,10 +38,18 @@ vtkALBACircleSource::vtkALBACircleSource(int res)
 	this->AngleRange[1] = vtkMath::Pi() *2.0;
 
   this->Resolution = (res < 3 ? 3 : res);
+
+	m_Plane = 0;
 }
 
 void vtkALBACircleSource::Execute()
 {
+	int A = 0, B = 1, C = 2;
+
+	if (m_Plane == 0) { A = 0; B = 1; C = 2; }; //XY
+	if (m_Plane == 1) { A = 1; B = 2; C = 0; }; //YZ
+	if (m_Plane == 2) { A = 0; B = 2; C = 1; }; //XZ
+
 	int numLines = this->Resolution;
 	int numPts = this->Resolution + 1;
 	double x[3], tc[3];
@@ -65,17 +73,17 @@ void vtkALBACircleSource::Execute()
 	double angleSize = AngleRange[1] - AngleRange[0];
 	double currentAngle;
 	
-	tc[1] = 0.0;
-	tc[2] = 0.0;
-	x[2] = Center[0];
+	tc[B] = 0.0;
+	tc[C] = 0.0;
+	x[C] = Center[A];
 	for (i = 0; i < numPts; i++)
 	{
-		tc[0] = ((double)i / this->Resolution);
+		tc[A] = ((double)i / this->Resolution);
 	
-		currentAngle = AngleRange[0] + angleSize*tc[0];
+		currentAngle = AngleRange[0] + angleSize*tc[A];
 
-		x[0] = Center[0] + sin(currentAngle)*Radius;
-		x[1] = Center[1] + cos(currentAngle)*Radius;
+		x[A] = Center[A] + sin(currentAngle)*Radius;
+		x[B] = Center[B] + cos(currentAngle)*Radius;
 
 		newPoints->InsertPoint(i, x);
 		newTCoords->InsertTuple(i, tc);

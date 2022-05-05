@@ -413,8 +413,8 @@ void albaOpSegmentation::InitSegmentationVolume()
 	{
 		lut->SetNumberOfTableValues(4);
 		lut->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
-		lut->SetTableValue(1, 0.1, 0.0, 0.2, 1.0);
-		lut->SetTableValue(2, 0.2, 0.2, 0.7, 1.0);
+		lut->SetTableValue(1, 0.3, 0.1, 0.1, 1.0);
+		lut->SetTableValue(2, 0.05, 0.25, 0.9, 1.0);
 		lut->SetTableValue(3, 0.0, 0.0, 0.95, 1.0);
 		lut->SetTableRange(0, 255);
 		m_SegmentationVolume->GetMaterial()->UpdateFromTables();

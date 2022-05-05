@@ -32,6 +32,8 @@
 
 #include "albaConfigure.h"
 
+#define DISTANCE_FILTER_SCALARS_NAME "DistanceFilterScalars"
+
 /**
 Class Name:vtkALBADistanceFilter.
 vtkALBADistanceFilter is a filter that computes distance vectors

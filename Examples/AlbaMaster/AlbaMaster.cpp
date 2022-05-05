@@ -88,6 +88,7 @@ PURPOSE. See the above copyright notice for more information.
 
 // OPERATIONS
 #include "albaOp2DMeasure.h"
+#include "albaOpMeasure2D.h"
 #include "albaOpComputeInertialTensor.h"
 #include "albaOpTransformOld.h"
 #include "albaOpAddLandmark.h"
@@ -152,6 +153,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpVolumeMirror.h"
 #include "albaOpVolumeResample.h"
 #include "albaOpESPCalibration.h"
+#include "albaOpComputeHausdorffDistance.h"
 
 // VIEWS
 #include "albaView3D.h"
@@ -371,13 +373,14 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpEqualizeHistogram(),_("Modify"));
 	m_Logic->Plug(new albaOpSmoothSurfaceCells(),_("Modify"));
 
-	m_Logic->Plug(new albaOp2DMeasure("2D Measure"), "Measure");
+	m_Logic->Plug(new albaOpMeasure2D("2D Measure"), "Measure");
+	m_Logic->Plug(new albaOp2DMeasure("2D Measure (Old)"), "Measure");
 	m_Logic->Plug(new albaOpVOIDensity("VOI Density"), "Measure");
 	m_Logic->Plug(new albaOpVolumeMeasure("Volume"), "Measure");
 	m_Logic->Plug(new albaOpMeshQuality("Mesh Quality"), "Measure");
 	m_Logic->Plug(new albaOpComputeInertialTensor(), "Measure");
-
-
+	m_Logic->Plug(new albaOpComputeHausdorffDistance(), "Measure");
+	
 	m_Logic->Plug(new albaOpIterativeRegistration(),_("Register"));
 	m_Logic->Plug(new albaOpRegisterClusters("Clusters"),_("Register"));
 	m_Logic->Plug(new albaOpClassicICPRegistration("Surface"),_("Register"));
