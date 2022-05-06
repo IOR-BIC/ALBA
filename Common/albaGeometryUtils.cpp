@@ -79,52 +79,7 @@ void albaGeometryUtils::GetMidPoint(double(&midPoint)[3], double *point1, double
 //----------------------------------------------------------------------------
 double albaGeometryUtils::DistancePointToLine(double * point, double * lineP1, double * lineP2, int plane)
 {
-	int A = 0, B = 1;
-	if (plane == YZ) { A = 0; B = 1; };
-	if (plane == YZ) { A = 1; B = 2; };
-	if (plane == XZ) { A = 0; B = 2; };
-
-	double point_x = point[A];
-	double point_y = point[B];
-
-	double line_x1 = lineP1[A];
-	double line_y1 = lineP1[B];
-	double line_x2 = lineP2[A];
-	double line_y2 = lineP2[B];
-
-	double diffX = line_x2 - line_x1;
-	double diffY = line_y2 - line_y1;
-
-	if ((diffX == 0) && (diffY == 0))
-	{
-		diffX = point_x - line_x1;
-		diffY = point_y - line_y1;
-		return sqrt(diffX * diffX + diffY * diffY);
-	}
-
-	float t = ((point_x - line_x1) * diffX + (point_y - line_y1) * diffY) / (diffX * diffX + diffY * diffY);
-
-	if (t < 0)
-	{
-		// Point is nearest to the first point i.e x1 and y1
-		diffX = point_x - line_x1;
-		diffY = point_y - line_y1;
-	}
-	else if (t > 1)
-	{
-		// Point is nearest to the end point i.e x2 and y2
-		diffX = point_x - line_x2;
-		diffY = point_y - line_y2;
-	}
-	else
-	{
-		// If perpendicular line intersect the line segment.
-		diffX = point_x - (line_x1 + t * diffX);
-		diffY = point_y - (line_y1 + t * diffY);
-	}
-
-	// Returning shortest distance
-	return sqrt(diffX * diffX + diffY * diffY);
+	return sqrt(vtkLine::DistanceToLine(point, lineP1, lineP2));
 }
 
 //----------------------------------------------------------------------------
@@ -303,21 +258,27 @@ void albaGeometryUtils::GetParallelLine(double(&point1)[3], double(&point2)[3], 
 
 	point1[A] = linePoint1[A] + distance * (linePoint2[B] - linePoint1[B]) / L;
 	point1[B] = linePoint1[B] + distance * (linePoint1[A] - linePoint2[A]) / L;
-	point1[C] = 0.0;
+	point1[C] = linePoint1[C]; // 0.0;
 
 	point2[A] = linePoint2[A] + distance * (linePoint2[B] - linePoint1[B]) / L;
 	point2[B] = linePoint2[B] + distance * (linePoint1[A] - linePoint2[A]) / L;
-	point2[C] = 0.0;
+	point2[C] = linePoint2[C]; // 0.0;
 }
 //----------------------------------------------------------------------------
-bool albaGeometryUtils::FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance)
+bool albaGeometryUtils::FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance, int plane)
 {
-	double L = sqrt(pow((linePoint2[X] - linePoint1[X]), 2) + pow((linePoint2[Y] - linePoint1[Y]), 2));
+	int A = 0, B = 1, C = 2;
+
+	if (plane == XY) { A = 0; B = 1; C = 2; };
+	if (plane == YZ) { A = 1; B = 2; C = 0; };
+	if (plane == XZ) { A = 0; B = 2; C = 1; };
+
+	double L = sqrt(pow((linePoint2[A] - linePoint1[A]), 2) + pow((linePoint2[B] - linePoint1[B]), 2));
 	double dist_ratio = distance / L;
 
-	point[X] = (1 - dist_ratio)*linePoint1[X] + dist_ratio * linePoint2[X];
-	point[Y] = (1 - dist_ratio)*linePoint1[Y] + dist_ratio * linePoint2[Y];
-	//point[Z] = 0.0;
+	point[A] = (1 - dist_ratio)*linePoint1[A] + dist_ratio * linePoint2[A];
+	point[B] = (1 - dist_ratio)*linePoint1[B] + dist_ratio * linePoint2[B];
+	point[C] = linePoint1[C];// 0.0;
 
 	return (dist_ratio > 0 && dist_ratio < 1); //the point is on the line.
 }

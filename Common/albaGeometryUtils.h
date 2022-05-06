@@ -65,7 +65,7 @@ public:
 	/*plane default 0=XY, 1=YZ, 2=XZ*/
 	static void GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance, int plane = XY);
 
-	static bool FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance);
+	static bool FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance, int plane = XY);
 
 	//Returns 1 if the point is up, -1 if is down and 0 if the point is in the line (plane default 0=XY, 1=YZ, 2=XZ)
 	static int PointUpDownLine(double *point, double *lp1, double *lp2, int plane = XY);

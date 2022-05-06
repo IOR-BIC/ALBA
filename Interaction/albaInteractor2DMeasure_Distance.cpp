@@ -202,6 +202,8 @@ void albaInteractor2DMeasure_Distance::FindAndHighlight(double * point)
 
 			lineSource->GetPoint1(linePoint1);
 			lineSource->GetPoint2(linePoint2);
+			double dis = DistancePointToLine(point, linePoint1, linePoint2);
+			albaLogMessage("Dist %f", dis);
 
 			if (DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
 			{
