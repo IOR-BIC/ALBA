@@ -193,34 +193,72 @@ void albaGeometryUtils::RotatePoint(double *point, double *origin, double angle,
 /// Lines
 
 //----------------------------------------------------------------------------
-bool albaGeometryUtils::GetLineLineIntersection(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2)
+bool albaGeometryUtils::GetLineLineIntersection(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2, int plane)
 {
 	// 	double u, v;
 	// 	int val = vtkLine::Intersection(line1Point1, line1Point2, line2Point1, line2Point2, u, v);
 	//vtkLine::IntersectWithLine()
 
-	double da[3] = { line1Point2[X] - line1Point1[X], line1Point2[Y] - line1Point1[Y], line1Point2[Z] - line1Point1[Z] };
-	double db[3] = { line2Point2[X] - line2Point1[X], line2Point2[Y] - line2Point1[Y], line2Point2[Z] - line2Point1[Z] };
-	double dc[3] = { line2Point1[X] - line1Point1[X], line2Point1[Y] - line1Point1[Y], line2Point1[Z] - line1Point1[Z] };
+	int A = 0, B = 1, C = 2;
 
-	double cross_da_db[3];
-	Cross(da, db, cross_da_db);
-	if (Dot(dc, cross_da_db) != 0.0) // Lines are not coplanar
+	if (plane == XY) { A = 0; B = 1; C = 2; };
+	if (plane == YZ) { A = 1; B = 2; C = 0; };
+	if (plane == XZ) { A = 0; B = 2; C = 1; };
+
+		// Mode 1
+		// Line1 represented as a1x + b1y = c1
+		double a1 = line1Point2[B] - line1Point1[B];
+		double b1 = line1Point1[A] - line1Point2[A];
+		double c1 = a1*(line1Point1[A]) + b1*(line1Point1[B]);
+
+		// Line2 represented as a2x + b2y = c2
+		double a2 = line2Point2[B] - line2Point1[B];
+		double b2 = line2Point1[A] - line2Point2[A];
+		double c2 = a2*(line2Point1[A]) + b2*(line2Point1[A]);
+
+		double determinant = a1*b2 - a2*b1;
+
+		if (determinant == 0)
+		{
+			// The lines are parallel. This is simplified
+			point[A] = DBL_MAX;
+			point[B] = DBL_MAX;
+			point[C] = 0.0;
+		}
+		else
+		{
+			point[A] = (b2*c1 - b1*c2) / determinant;
+			point[B] = (a1*c2 - a2*c1) / determinant;
+			point[C] = 0.0;
+
+			return true;
+		}
+
 		return false;
-
-	double cross_dc_db[3];
-	Cross(da, db, cross_dc_db);
-
-	double s = Dot(cross_dc_db, cross_da_db) / Norm2(cross_da_db);
-	if (s >= 0.0 && s <= 1.0)
-	{
-		point[X] = line1Point1[X] + da[X] * s;
-		point[Y] = line1Point1[Y] + da[Y] * s;
-		point[Z] = line1Point1[Z] + da[Z] * s;
-		return true;
-	}
-
-	return false;
+	
+		// Mode 2
+// 	double da[3] = { line1Point2[X] - line1Point1[X], line1Point2[Y] - line1Point1[Y], line1Point2[Z] - line1Point1[Z] };
+// 	double db[3] = { line2Point2[X] - line2Point1[X], line2Point2[Y] - line2Point1[Y], line2Point2[Z] - line2Point1[Z] };
+// 	double dc[3] = { line2Point1[X] - line1Point1[X], line2Point1[Y] - line1Point1[Y], line2Point1[Z] - line1Point1[Z] };
+// 
+// 	double cross_da_db[3];
+// 	Cross(da, db, cross_da_db);
+// 	if (Dot(dc, cross_da_db) != 0.0) // Lines are not coplanar
+// 		return false;
+// 
+// 	double cross_dc_db[3];
+// 	Cross(da, db, cross_dc_db);
+// 
+// 	double s = Dot(cross_dc_db, cross_da_db) / Norm2(cross_da_db);
+// 	if (s >= 0.0 && s <= 1.0)
+// 	{
+// 		point[X] = line1Point1[X] + da[X] * s;
+// 		point[Y] = line1Point1[Y] + da[Y] * s;
+// 		point[Z] = line1Point1[Z] + da[Z] * s;
+// 		return true;
+// 	}
+// 
+// 	return false;
 }
 
 //----------------------------------------------------------------------------

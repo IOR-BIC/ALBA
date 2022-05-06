@@ -58,7 +58,7 @@ public:
 
 	/// Lines
 
-	static bool GetLineLineIntersection(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2);
+	static bool GetLineLineIntersection(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2, int plane = XY);
 
 	static int IntersectLineLine(double *l1p1, double *l1p2, double *l2p1, double *l2p2, double &perc);
 	
