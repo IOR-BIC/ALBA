@@ -191,7 +191,7 @@ void albaPipeWithScalar::CreateDensityMapStack()
 	m_DensityFilter->SetInput(m_Mapper->GetInput());
 	m_DensityFilter->SetFilterModeToDensity();
 	m_DensityFilter->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
-	m_DensityFilter->SetOutOfBoundsDensity(-1000);
+	m_DensityFilter->SetOutOfBoundsDensity(9999);
 	m_DensityFilter->Update();
 
 	m_Mapper->SetInput(m_DensityFilter->GetOutput());
@@ -450,10 +450,17 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
   data->Update();
 
   double sr[2]={0,1};
-  if(m_MapsGenActive || (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0))
-    data->GetPointData()->GetScalars()->GetRange(sr);
-  else if(m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation >0))
-    data->GetCellData()->GetScalars()->GetRange(sr);
+	if (m_MapsGenActive || (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0))
+	{
+		if (m_MapsGenActive)
+			m_DensityVolume->GetOutput()->GetVTKData()->GetScalarRange(sr);
+		else
+			data->GetPointData()->GetScalars()->GetRange(sr);
+	}
+	else if (m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation > 0))
+	{
+		data->GetCellData()->GetScalars()->GetRange(sr);
+	}
 
   m_Table->SetTableRange(sr);
   m_Table->SetValueRange(sr);
@@ -694,5 +701,6 @@ void albaPipeWithScalar::SetDensisyMapActive(int val)
 	EnableDisableGuiComponents();
 	UpdateActiveScalarsInVMEDataVectorItems();
 	GetLogicManager()->CameraUpdate();
+ 
 }
 
