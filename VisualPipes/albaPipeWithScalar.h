@@ -120,6 +120,10 @@ public:
 	void SetDensityVolume(albaVME *vol);
 
 	static bool VolumeAccept(albaVME *node);
+
+	
+	int IsDensisyMapActive() const { return m_DensisyMapActive; }
+	void SetDensisyMapActive(int val);
 protected:
 	
   vtkLookupTable  *m_Table;

@@ -191,14 +191,10 @@ void albaPipeWithScalar::CreateDensityMapStack()
 	m_DensityFilter->SetInput(m_Mapper->GetInput());
 	m_DensityFilter->SetFilterModeToDensity();
 	m_DensityFilter->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+	m_DensityFilter->SetOutOfBoundsDensity(-1000);
 	m_DensityFilter->Update();
 
 	m_Mapper->SetInput(m_DensityFilter->GetOutput());
-
-	vtkALBASmartPointer<vtkPolyDataWriter> w;
-	w->SetInput((vtkPolyData *)m_DensityFilter->GetOutput());
-	w->SetFileName("d:\\test0.vtk");
-	w->Write();
 
 	m_MapsGenActive = true;
 
@@ -257,18 +253,7 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 			break;
 			case ID_DENSITY_MAPS:
 			{
-				//need to disable density filter
-				if (m_MapsGenActive && !m_DensisyMapActive)
-					DestroyDensityMapStack();
-				if (m_DensisyMapActive && m_DensityVolume)
-					CreateDensityMapStack();
-
-				m_Mapper->SetScalarVisibility(m_MapsGenActive);
-
-				EnableDisableGuiComponents();
-				UpdateActiveScalarsInVMEDataVectorItems();
-				GetLogicManager()->CameraUpdate();
-
+				SetDensisyMapActive(m_DensisyMapActive);
 			}
 			break;
 			case ID_SELECT_DENS_VME:
@@ -283,6 +268,11 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 					return;
 
 				SetDensityVolume(vme);
+				m_Mapper->SetScalarVisibility(m_MapsGenActive);
+				EnableDisableGuiComponents();
+				UpdateActiveScalarsInVMEDataVectorItems();
+				GetLogicManager()->CameraUpdate();
+
 			}
 			break;
 			case ID_ENABLE_SCALAR_BAR:
@@ -452,8 +442,13 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 //----------------------------------------------------------------------------
 void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 {
+
+	if (m_ScalarMapActive == false && m_MapsGenActive == false)
+		return;
+
   vtkDataSet *data = m_Mapper->GetInput();
   data->Update();
+
   double sr[2]={0,1};
   if(m_MapsGenActive || (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0))
     data->GetPointData()->GetScalars()->GetRange(sr);
@@ -681,5 +676,23 @@ void albaPipeWithScalar::SetDensityVolume(albaVME *vol)
 bool albaPipeWithScalar::VolumeAccept(albaVME *node)
 {
 	return node->IsA("albaVMEVolumeGray");
+}
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::SetDensisyMapActive(int val)
+{
+	m_DensisyMapActive = val;
+
+	//need to disable density filter
+	if (m_MapsGenActive && !m_DensisyMapActive)
+		DestroyDensityMapStack();
+	if (m_DensisyMapActive && m_DensityVolume)
+		CreateDensityMapStack();
+
+	m_Mapper->SetScalarVisibility(m_MapsGenActive);
+
+	EnableDisableGuiComponents();
+	UpdateActiveScalarsInVMEDataVectorItems();
+	GetLogicManager()->CameraUpdate();
 }
 
