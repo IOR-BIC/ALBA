@@ -367,8 +367,6 @@ void albaInteractor2DMeasure_Point::LockPointOnLine(double *lineP1, double *line
 //---------------------------------------------------------------------------
 void albaInteractor2DMeasure_Point::GetPointOnLine(double *point)
 {
-	double minLenght = 5.0;
-
 	double dist1 = DistanceBetweenPoints(m_ConstrLineP1, point);
 	double dist2 = DistancePointToLine(point, m_ConstrLineP1, m_ConstrLineP2);
 

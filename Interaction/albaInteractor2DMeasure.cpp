@@ -55,6 +55,7 @@ albaInteractor2DMeasure::albaInteractor2DMeasure()
 	m_AllRenderersVector.clear();
 	m_View = NULL;
 	m_CurrentRwi = NULL;
+	m_CurrPlane = 0; // XY;
 
 	m_ParallelView = false;				// Set on InitRenderer
 	m_ParallelScale_OnStart = -1; // Set on InitRenderer
@@ -595,6 +596,7 @@ void albaInteractor2DMeasure::SetRendererByView(albaView * view)
 	}
 
 	m_Renderer = newRenderer;
+	m_CurrentRenderer = newRenderer;
 	m_Renderer->GetRenderWindow()->Render();
 }
 
@@ -701,7 +703,7 @@ void albaInteractor2DMeasure::GetMidPoint(double(&midPoint)[3], double *point1, 
 //----------------------------------------------------------------------------
 bool albaInteractor2DMeasure::FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance)
 {
-	return albaGeometryUtils::FindPointOnLine(point, linePoint1, linePoint2, distance); //TODO
+	return albaGeometryUtils::FindPointOnLine(point, linePoint1, linePoint2, distance, m_CurrPlane);
 }
 //----------------------------------------------------------------------------
 double albaInteractor2DMeasure::GetAngle(double* point1, double* point2, double* origin)
