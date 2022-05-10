@@ -378,58 +378,64 @@ int albaOpImporterAnsysCommon::ReadMPDATA()
 //----------------------------------------------------------------------------
 int albaOpImporterAnsysCommon::ReadCMBLOCK()
 {
-  char compHeader[254], unusedStr[254];
-  int compNum;
+	char compHeader[254], unusedStr[254];
+	int compNum;
 
-  // CMBLOCK,NAME,ELEM,       2  ! comment OR
-  // CMBLOCK,NAME,NODE,       100  ! comment
-  sscanf(m_Line, "%s %d %s", compHeader, &compNum, unusedStr);
+	// CMBLOCK,NAME,ELEM,       2  ! comment OR
+	// CMBLOCK,NAME,NODE,       100  ! comment
+	sscanf(m_Line, "%s %d %s", compHeader, &compNum, unusedStr);
 
-  std::string line = compHeader;
-  std::string name = line.substr(8).c_str();
-  std::size_t pos = name.find(",");
+	std::string line = compHeader;
+	std::string name = line.substr(8).c_str();
+	std::size_t pos = name.find(",");
 
-  std::string compName = name.substr(0,pos).c_str();
-  std::string compType = name.substr(pos+1, 5).c_str();
+	std::string compName = name.substr(0, pos).c_str();
+	std::string compType = name.substr(pos + 1, 5).c_str();
 
-  if(compType== "ELEM,")
-  {
-    wxString fname, fpath, fext;
-    wxFileName::SplitPath(m_AnsysInputFileNameFullPath, &fpath, &fname, &fext);
+	if (compType == "ELEM,")
+	{
+		wxString fname, fpath, fext;
+		wxFileName::SplitPath(m_AnsysInputFileNameFullPath, &fpath, &fname, &fext);
 
-    // Create Component
-    AnsysComponent comp;
-    comp.Name = fname + "-" + compName.c_str();
+		// Create Component
+		AnsysComponent comp;
+		comp.Name = fname + "-" + compName.c_str();
 
-    GetLine(); // (8i10) Line ignored
+		GetLine(); // (8i10) Line ignored
 
-    // Create range array
-    int *idList = new int[compNum];
+		// Create range array
+		int *idList = new int[compNum];
 
-    int nReaded=0, totReaded=0;
-    int value;
-    char *linePointer;
+		int nReaded = 0, totReaded = 0;
+		int value;
+		char *linePointer;
 
-    GetLine();
-    {
-      linePointer=m_Line;
+		GetLine();
+		linePointer = m_Line;
 
-      for (int i=0; i<compNum; i++)
-      {
-        nReaded = sscanf(linePointer, "%d", &value);
-        if(value<0) value*=-1;
-        idList[i] = value;
-        linePointer+=10;
-      }
-    }
+		for (int i = 0; i < compNum; i++)
+		{
+			nReaded = sscanf(linePointer, "%d", &value);
 
-    comp.Ranges=idList;
-    comp.RangeNum=compNum;
+			if (nReaded <= 0)
+			{
+				GetLine(); // New Line
+				linePointer = m_Line;
+				nReaded = sscanf(linePointer, "%d", &value);
+			}
 
-    m_Components.push_back(comp);
-  }
+			if (value < 0) value *= -1;
+			idList[i] = value;
+			linePointer += 10;
+		}
 
-  return ALBA_OK; 
+		comp.Ranges = idList;
+		comp.RangeNum = compNum;
+
+		m_Components.push_back(comp);
+	}
+
+	return ALBA_OK;
 }
 
 //----------------------------------------------------------------------------
