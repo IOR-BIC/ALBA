@@ -140,12 +140,12 @@ void albaPipeWithScalar::ManageScalarOnExecutePipe(vtkDataSet * dataSet)
 	m_Mapper->SetLookupTable(m_Table);
 	m_Mapper->SetScalarRange(sr);
 
-	if (m_ActiveScalarType == POINT_TYPE)
+	if (m_MapsGenActive || m_ActiveScalarType == POINT_TYPE)
 		m_Mapper->SetScalarModeToUsePointData();
-	if (m_ActiveScalarType == CELL_TYPE)
+	else if (m_ActiveScalarType == CELL_TYPE)
 		m_Mapper->SetScalarModeToUseCellData();
 
-	if (m_ScalarMapActive)
+	if (m_MapsGenActive || m_ScalarMapActive)
 		m_Mapper->ScalarVisibilityOn();
 	else
 		m_Mapper->ScalarVisibilityOff();
@@ -475,7 +475,7 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
   m_ObjectMaterial->UpdateFromLut();
 
 
-  if(m_MapsGenActive || m_ScalarMapActive || m_ActiveScalarType == POINT_TYPE)
+  if(m_MapsGenActive || m_ActiveScalarType == POINT_TYPE)
     m_Mapper->SetScalarModeToUsePointData();
   else if(m_ActiveScalarType == CELL_TYPE)
     m_Mapper->SetScalarModeToUseCellData();
