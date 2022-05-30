@@ -92,7 +92,7 @@ int albaOpImporterAnsysCDBFile::ParseAnsysFile(albaString fileName)
 
   m_CurrentMatId = -1;
 
-  while ((lineLenght = GetLine()) != 0) 
+  while ((lineLenght = GetLine(true)) != 0) 
   {
     if(strncmp (m_Line,"NBLOCK,",7) == 0)
     {

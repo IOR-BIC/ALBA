@@ -211,6 +211,13 @@ void albaInteractor2DMeasure::OnLeftButtonDown(albaEventInteraction *e)
 	else if (m_ParallelView && m_IsEnabled)// && m_IsInBound)
 	{
 		OnButtonDown(e);
+		
+		albaVME *picked_vme = GetPickedVME(m_Mouse);
+		if (picked_vme && picked_vme->IsA("albaVMEGizmo"))
+		{
+			return;
+		}
+
 		m_DraggingLeft = true;
 
 		double pos_2d[2], pointCoord[3];
@@ -252,6 +259,12 @@ void albaInteractor2DMeasure::OnLeftButtonUp(albaEventInteraction *e)
 
 	m_DraggingLeft = false;
 	OnButtonUp(e);
+
+	albaVME *picked_vme = GetPickedVME(m_Mouse);
+	if (picked_vme && picked_vme->IsA("albaVMEGizmo"))
+	{
+		return;
+	}
 
 	if (m_ShiftPressed)
 	{
@@ -369,6 +382,7 @@ void albaInteractor2DMeasure::OnEvent(albaEventBase *event)
 		if (id == albaDeviceButtonsPadTracker::GetTracker3DMoveId() || id == albaDeviceButtonsPadMouse::GetMouse2DMoveId())
 		{
 			albaEventInteraction *e = albaEventInteraction::SafeDownCast(event);
+
 			OnMove(e);
 		}
 	}
