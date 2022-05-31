@@ -146,7 +146,10 @@ protected:
 	void OnEventSortSlices();
   /** Precess events coming from other objects */
 	void OnEventSetThickness();
-  /** Precess events coming from other objects */
+
+	/** Sets Thickness on Pipe*/
+	void SetBorder(albaPipe * p);
+	/** Precess events coming from other objects */
   void OnEventMouseMove(albaEvent *e);
   int			m_Sort[6];
   double	m_Pos[6];
