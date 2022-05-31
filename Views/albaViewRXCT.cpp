@@ -43,6 +43,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkDataSet.h"
 #include "vtkLookupTable.h"
 #include "vtkPoints.h"
+#include "albaPipeMeshSlice.h"
 
 //----------------------------------------------------------------------------
 // constants:
@@ -331,8 +332,6 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
 			albaVME *vmeSelected = this->GetSceneGraph()->GetSelectedVme();
 			if (vmeSelected == vme)
 			{
-				m_Gui->Enable(ID_ALL_SURFACE, true);
-				m_Gui->Enable(ID_BORDER_CHANGE, true);
 				m_Gui->Enable(ID_ADJUST_SLICES, true);
 
 				albaPipe *pipe = ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(vme);
@@ -349,8 +348,6 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
 			albaVME *vmeSelected = this->GetSceneGraph()->GetSelectedVme();
 			if (vmeSelected == vme)
 			{
-				m_Gui->Enable(ID_ALL_SURFACE, false);
-				m_Gui->Enable(ID_BORDER_CHANGE, false);
 				m_Gui->Enable(ID_ADJUST_SLICES, false);
 			}
 		}
@@ -378,17 +375,10 @@ void albaViewRXCT::VmeSelect(albaVME *vme, bool select)
 	{
 		albaPipe *p = ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(vme);
 		if ((vme->IsA("albaVMESurface") || vme->IsA("albaVMESurfaceParametric") || vme->IsA("albaVMESlicer")) && select&&p)
-		{
-			m_Gui->Enable(ID_ALL_SURFACE, true);
-			m_Gui->Enable(ID_BORDER_CHANGE, true);
 			m_Gui->Enable(ID_ADJUST_SLICES, true);
-		}
 		else
-		{
-			m_Gui->Enable(ID_ALL_SURFACE, false);
-			m_Gui->Enable(ID_BORDER_CHANGE, false);
 			m_Gui->Enable(ID_ADJUST_SLICES, false);
-		}
+
 		m_Gui->Update();
 	}
 }
@@ -514,19 +504,22 @@ void albaViewRXCT::OnEventSetThickness()
     albaVME *node=this->GetSceneGraph()->GetSelectedVme();
     albaSceneNode *SN = this->GetSceneGraph()->Vme2Node(node);
     albaPipe *p=((albaViewSlice *)((albaViewCompound *)m_ChildViewList[2])->GetSubView(0))->GetNodePipe(node);
-    ((albaPipeSurfaceSlice *)p)->SetThickness(m_Border);
 
-    if(albaVisualPipeSlicerSlice *pipe = albaVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[RX_FRONT_VIEW]->GetNodePipe(node)))
-    {
-      pipe->SetThickness(m_Border);
-    }
+		SetBorder(p);
 
-    if(albaVisualPipeSlicerSlice *pipe = albaVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[RX_SIDE_VIEW]->GetNodePipe(node)))
-    {
-      pipe->SetThickness(m_Border);
-    }
   }
 }
+
+//----------------------------------------------------------------------------
+void albaViewRXCT::SetBorder(albaPipe * p)
+{
+	albaPipeSurfaceSlice *surfPipe = albaPipeSurfaceSlice::SafeDownCast(p);
+	if (surfPipe) surfPipe->SetThickness(m_Border);
+
+	albaPipeMeshSlice* meshPipe = albaPipeMeshSlice::SafeDownCast(p);
+	if (meshPipe) meshPipe->SetThickness(m_Border);
+}
+
 //----------------------------------------------------------------------------
 void albaViewRXCT::OnEventMouseMove( albaEvent *e )
 {
@@ -637,7 +630,8 @@ void albaViewRXCT::OnEvent(albaEventBase *alba_event)
           OnEventSortSlices();
         }
         break;
-        
+       
+			case ID_ALL_SURFACE:
       case ID_BORDER_CHANGE:
       {
         OnEventSetThickness();
@@ -684,15 +678,6 @@ void albaViewRXCT::OnEvent(albaEventBase *alba_event)
           }
         }
         break;
-      case ID_ALL_SURFACE:
-      {
-        if(m_AllSurface)
-        {
-          albaVME *vme=GetSceneGraph()->GetSelectedVme();
-          albaVME* root=vme->GetRoot();
-          SetThicknessForAllSurfaceSlices(root);
-        }
-      }
 
       default:
       albaViewCompound::OnEvent(alba_event);
@@ -741,17 +726,9 @@ albaGUI* albaViewRXCT::CreateGui()
 
   albaVME* node=this->GetSceneGraph()->GetSelectedVme();
   if (node->IsA("albaVMESurface")||node->IsA("albaVMESurfaceParametric")||node->IsA("albaVMESlicer"))
-  {
-    m_Gui->Enable(ID_ALL_SURFACE,true);
-    m_Gui->Enable(ID_BORDER_CHANGE,true);
     m_Gui->Enable(ID_ADJUST_SLICES,true);
-  }
   else
-  {
-    m_Gui->Enable(ID_ALL_SURFACE,false);
-    m_Gui->Enable(ID_BORDER_CHANGE,false);
     m_Gui->Enable(ID_ADJUST_SLICES,false);
-  }
 
 	for(int i=RX_FRONT_VIEW;i<=RX_SIDE_VIEW;i++)
 		((albaViewRX *)m_ChildViewList[i]->GetGui());
@@ -939,12 +916,8 @@ void albaViewRXCT::SetThicknessForAllSurfaceSlices(albaVME *root)
   albaVMEIterator *iter = root->NewIterator();
   for (albaVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
   {
-    if(node->IsA("albaVMESurface"))
-    {
-      albaPipe *p=((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(node);
-      if(p)
-        ((albaPipeSurfaceSlice *)p)->SetThickness(m_Border);
-    }
+     albaPipe *p=((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(node);
+		 SetBorder(p);
   }
   iter->Delete();
 }
