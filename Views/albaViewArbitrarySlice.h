@@ -67,6 +67,8 @@ public:
 		ID_RESET,
 		ID_TRILINEAR_INTERPOLATION_ON,
 		ID_CAMERA_FOLLOW_GIZMO,
+		ID_ALL_SURFACE,
+		ID_BORDER_CHANGE,
 		ID_GPUENABLED,
 		ID_LAST,
 	};
@@ -109,6 +111,16 @@ public:
 	
 	/** Generate Gizmos and pose them in the right position*/
 	void CreateGizmos();
+
+	/** set thickness value for all the pipes*/
+	void SetThicknessForAllSurfaceSlices(albaVME *root);
+
+	/** Set thickness on Pipe */
+	void SetBorder(albaPipe * p);
+
+	/** Precess events coming from other objects */
+	void OnEventSetThickness();
+
 
 	/** */
 	virtual void VmeSelect(albaVME *node, bool select);
@@ -182,5 +194,7 @@ protected:
 	int m_TrilinearInterpolationOn;
 	int m_EnableGPU;
 
+	int m_AllSurface;
+	double m_Border;
 };
 #endif
