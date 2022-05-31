@@ -312,6 +312,8 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
 				}
 			}
 			iter->Delete();
+
+			SetSideOnVolume();
 			//END cycle for remove old surface and redraw the right slice
 		}
 		else if (!show)
@@ -598,12 +600,8 @@ void albaViewRXCT::OnEvent(albaEventBase *alba_event)
 
 			case ID_SIDE:
 			{
-				if (m_Side == 0)
-				((albaViewRX *)m_ChildViewList[RX_SIDE_VIEW])->ShowSideVolume(ALL);
-				else if (m_Side == 1)
-				((albaViewRX *)m_ChildViewList[RX_SIDE_VIEW])->ShowSideVolume(SIDE_LEFT);
-				else if (m_Side == 2)
-				((albaViewRX *)m_ChildViewList[RX_SIDE_VIEW])->ShowSideVolume(SIDE_RIGHT);
+				SetSideOnVolume();
+
 			}
 			break;
       
@@ -688,6 +686,18 @@ void albaViewRXCT::OnEvent(albaEventBase *alba_event)
     albaViewCompound::OnEvent(alba_event);
   }
 }
+
+//----------------------------------------------------------------------------
+void albaViewRXCT::SetSideOnVolume()
+{
+	if (m_Side == 0)
+		((albaViewRX *)m_ChildViewList[RX_SIDE_VIEW])->ShowSideVolume(ALL);
+	else if (m_Side == 1)
+		((albaViewRX *)m_ChildViewList[RX_SIDE_VIEW])->ShowSideVolume(SIDE_LEFT);
+	else if (m_Side == 2)
+		((albaViewRX *)m_ChildViewList[RX_SIDE_VIEW])->ShowSideVolume(SIDE_RIGHT);
+}
+
 //-------------------------------------------------------------------------
 void albaViewRXCT::OnSize(wxSizeEvent &size_event)
 {
