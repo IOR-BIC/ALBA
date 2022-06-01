@@ -57,7 +57,10 @@ public:
   /** Precess events coming from other objects */
   virtual void OnEvent(albaEventBase *alba_event);
   
-  /** Show/Hide VMEs into plugged sub-views */
+	//Sets the side on volume
+	void SetSideOnVolume();
+
+	/** Show/Hide VMEs into plugged sub-views */
   virtual void VmeShow(albaVME *vme, bool show);
 
   /** Remove VME into plugged sub-views */
