@@ -72,6 +72,7 @@ albaPipeWithScalar::albaPipeWithScalar()
 	m_ScalarsVTKName = NULL;
 	m_LutSwatch = NULL;
 	m_LutSlider = NULL;
+	m_ScalarComboBox = NULL;
 	m_DensityVolume = NULL;
 
 	m_MapsGenActive = m_DensisyMapActive = m_ScalarMapActive   = m_ShowScalarBar = 0;
@@ -158,7 +159,7 @@ void albaPipeWithScalar::CreateScalarsGui(albaGUI *gui)
 {
   gui->Divider(2);
 	gui->Bool(ID_SCALAR_MAP_ACTIVE,_("Enable scalar field mapping"), &m_ScalarMapActive, 1);
-	gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsInComboBoxNames);
+	m_ScalarComboBox=gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsInComboBoxNames);
 	gui->Divider();
 	gui->Bool(ID_DENSITY_MAPS, _("Enable Density Maps"), &m_DensisyMapActive, 1);
 	gui->Button(ID_SELECT_DENS_VME, &m_DensVolName, "Select Volume...","Select Density Volume"),

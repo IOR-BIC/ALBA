@@ -120,8 +120,6 @@ protected:
 	albaAxes                *m_Axes;
 	vtkPolyData							*m_InputAsPolydata;
 
-	albaGUILutSwatch *m_LutSwatch;
-
 	virtual vtkPolyData* GetInputAsPolyData() = 0;
 	
 
