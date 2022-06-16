@@ -730,21 +730,21 @@ bool albaInteractor2DMeasure_AngleLine::Load(albaVME *input, wxString tag)
 		// Reload points
 		for (int i = 0; i < nAngles; i++)
 		{
-			point1[X] = MeasureAngleLinePoint1Tag->GetValueAsDouble(i * 2 + 0);
-			point1[Y] = MeasureAngleLinePoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[Z] = MeasureAngleLinePoint1Tag->GetValueAsDouble(i * 2 + 2);
+			point1[X] = MeasureAngleLinePoint1Tag->GetValueAsDouble(i * 3 + 0);
+			point1[Y] = MeasureAngleLinePoint1Tag->GetValueAsDouble(i * 3 + 1);
+			point1[Z] = MeasureAngleLinePoint1Tag->GetValueAsDouble(i * 3 + 2);
 
-			point2[X] = MeasureAngleLinePoint2Tag->GetValueAsDouble(i * 2 + 0);
-			point2[Y] = MeasureAngleLinePoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[Z] = MeasureAngleLinePoint2Tag->GetValueAsDouble(i * 2 + 2);
+			point2[X] = MeasureAngleLinePoint2Tag->GetValueAsDouble(i * 3 + 0);
+			point2[Y] = MeasureAngleLinePoint2Tag->GetValueAsDouble(i * 3 + 1);
+			point2[Z] = MeasureAngleLinePoint2Tag->GetValueAsDouble(i * 3 + 2);
 
-			point3[X] = MeasureAngleLinePoint3Tag->GetValueAsDouble(i * 2 + 0);
-			point3[Y] = MeasureAngleLinePoint3Tag->GetValueAsDouble(i * 2 + 1);
-			point3[Z] = MeasureAngleLinePoint3Tag->GetValueAsDouble(i * 2 + 2);
+			point3[X] = MeasureAngleLinePoint3Tag->GetValueAsDouble(i * 3 + 0);
+			point3[Y] = MeasureAngleLinePoint3Tag->GetValueAsDouble(i * 3 + 1);
+			point3[Z] = MeasureAngleLinePoint3Tag->GetValueAsDouble(i * 3 + 2);
 
-			point4[X] = MeasureAngleLinePoint4Tag->GetValueAsDouble(i * 2 + 0);
-			point4[Y] = MeasureAngleLinePoint4Tag->GetValueAsDouble(i * 2 + 1);
-			point4[Z] = MeasureAngleLinePoint4Tag->GetValueAsDouble(i * 2 + 2);
+			point4[X] = MeasureAngleLinePoint4Tag->GetValueAsDouble(i * 3 + 0);
+			point4[Y] = MeasureAngleLinePoint4Tag->GetValueAsDouble(i * 3 + 1);
+			point4[Z] = MeasureAngleLinePoint4Tag->GetValueAsDouble(i * 3 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -812,21 +812,21 @@ bool albaInteractor2DMeasure_AngleLine::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			MeasureAngleLinePoint1Tag.SetValue(point1[X], i * 2 + 0);
-			MeasureAngleLinePoint1Tag.SetValue(point1[Y], i * 2 + 1);
-			MeasureAngleLinePoint1Tag.SetValue(point1[Z], i * 2 + 2);
+			MeasureAngleLinePoint1Tag.SetValue(point1[X], i * 3 + 0);
+			MeasureAngleLinePoint1Tag.SetValue(point1[Y], i * 3 + 1);
+			MeasureAngleLinePoint1Tag.SetValue(point1[Z], i * 3 + 2);
 
-			MeasureAngleLinePoint2Tag.SetValue(point2[X], i * 2 + 0);
-			MeasureAngleLinePoint2Tag.SetValue(point2[Y], i * 2 + 1);
-			MeasureAngleLinePoint2Tag.SetValue(point2[Z], i * 2 + 2);
+			MeasureAngleLinePoint2Tag.SetValue(point2[X], i * 3 + 0);
+			MeasureAngleLinePoint2Tag.SetValue(point2[Y], i * 3 + 1);
+			MeasureAngleLinePoint2Tag.SetValue(point2[Z], i * 3 + 2);
 
-			MeasureAngleLinePoint3Tag.SetValue(point3[X], i * 2 + 0);
-			MeasureAngleLinePoint3Tag.SetValue(point3[Y], i * 2 + 1);
-			MeasureAngleLinePoint3Tag.SetValue(point3[Z], i * 2 + 2);
+			MeasureAngleLinePoint3Tag.SetValue(point3[X], i * 3 + 0);
+			MeasureAngleLinePoint3Tag.SetValue(point3[Y], i * 3 + 1);
+			MeasureAngleLinePoint3Tag.SetValue(point3[Z], i * 3 + 2);
 
-			MeasureAngleLinePoint4Tag.SetValue(point4[X], i * 2 + 0);
-			MeasureAngleLinePoint4Tag.SetValue(point4[Y], i * 2 + 1);
-			MeasureAngleLinePoint4Tag.SetValue(point4[Z], i * 2 + 2);
+			MeasureAngleLinePoint4Tag.SetValue(point4[X], i * 3 + 0);
+			MeasureAngleLinePoint4Tag.SetValue(point4[Y], i * 3 + 1);
+			MeasureAngleLinePoint4Tag.SetValue(point4[Z], i * 3 + 2);
 
 			MeasureAngleLineTag.SetValue(m_Angles[i], i);
 		}

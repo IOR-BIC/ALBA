@@ -282,9 +282,9 @@ bool albaInteractor2DMeasure_Point::Load(albaVME *input, wxString tag)
 		// Reload points
 		for (int i = 0; i < nPoints; i++)
 		{
-			point1[X] = measurePointTag->GetValueAsDouble(i * 2 + 0);
-			point1[Y] = measurePointTag->GetValueAsDouble(i * 2 + 1);
-			point1[Z] = measurePointTag->GetValueAsDouble(i * 2 + 1);
+			point1[X] = measurePointTag->GetValueAsDouble(i * 3 + 0);
+			point1[Y] = measurePointTag->GetValueAsDouble(i * 3 + 1);
+			point1[Z] = measurePointTag->GetValueAsDouble(i * 3 + 1);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -326,9 +326,9 @@ bool albaInteractor2DMeasure_Point::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			measurePointTag.SetValue(point1[X], i * 2 + 0);
-			measurePointTag.SetValue(point1[Y], i * 2 + 1);
-			measurePointTag.SetValue(point1[Z], i * 2 + 2);
+			measurePointTag.SetValue(point1[X], i * 3 + 0);
+			measurePointTag.SetValue(point1[Y], i * 3 + 1);
+			measurePointTag.SetValue(point1[Z], i * 3 + 2);
 		}
 
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))
