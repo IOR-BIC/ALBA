@@ -131,6 +131,10 @@ protected:
 	
 	albaVME* GetRotCenterVME();
 
+	virtual int InternalStore(albaStorageElement *parent);
+
+	virtual int InternalRestore(albaStorageElement *node);
+
 
 	//Components vtkData
 	std::vector <vtkTransformPolyDataFilter *> m_TransformFilters;
