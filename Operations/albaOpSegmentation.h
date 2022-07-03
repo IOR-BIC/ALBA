@@ -118,6 +118,9 @@ public:
 		ID_PRE_VOLUME_SPACING,
 		ID_PRE_VOLUME_ZERO_VALUE,
 		ID_MANUAL_PICKING_MODALITY,
+		ID_SWITCH_TO_YZ,
+		ID_SWITCH_TO_XZ,
+		ID_SWITCH_TO_XY,
 		ID_MANUAL_TOOLS_BRUSH,
 		ID_MANUAL_TOOLS_FILL,
 		ID_MANUAL_TOOLS_3D_CONNECTIVITY,
@@ -469,6 +472,8 @@ protected:
   int m_OldAutomaticUpperThreshold; //<Used to update real time threshold preview only if needed
 
   int m_RemovePeninsulaRegions; //<Determine if refinement filter removes penisula regions or not
+
+	int m_SwitchTO;        //<Plane to switch to
  
   wxGauge *m_ProgressBar; //< display progress
 
@@ -477,6 +482,8 @@ protected:
   void EnableSizerContent(wxSizer* sizer, bool enable);
 
   void Fill(albaEvent *e);
+
+	void SwitchPlane(albaEvent * e);
 
 	void InitRanges();
 

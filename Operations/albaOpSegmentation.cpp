@@ -121,7 +121,8 @@ enum EDIT_MODALITY_TYPE
 {
 	DRAW_EDIT = 0,
 	FILL_EDIT,
-	CONNECTIVITY_3D
+	CONNECTIVITY_3D,
+	SWITCH_PLANE,
 };
 
 typedef  itk::Image< float, 3> RealImage;
@@ -902,6 +903,21 @@ void albaOpSegmentation::CreateEditSegmentationGui()
 {
 	albaGUI *currentGui = new albaGUI(this);
 
+
+
+	//////////////////////////////////////////////////////////////////////////
+	// Plane switch section
+
+	currentGui->Label("Plane switch", true);
+
+	std::vector<const char*> switchLabels = { "YZ", "XZ", "XY" };
+	std::vector<int> switchIds = { ID_SWITCH_TO_YZ, ID_SWITCH_TO_XZ, ID_SWITCH_TO_XY };
+
+	currentGui->MultipleButtons(3, 3, switchIds, switchLabels);
+	currentGui->Divider(1);
+
+	/////////////////////////////////////////////////////////////////////////
+	// Hint
 	currentGui->HintBox(NULL, "Change Slice: \nAlt + Shift + 'Mouse Scroll' or \n'PageUp/PageDown'");
 
 	//////////////////////////////////////////////////////////////////////////
@@ -1164,7 +1180,7 @@ void albaOpSegmentation::UpdateSliderValidator()
 	int sliceMax = m_VolumeDims[m_SlicePlane];
 
 	m_SliceSlider->SetRange(1, sliceMax);
-	m_SliceText->SetValidator(albaGUIValidator(this, ID_SLICE_TEXT, m_SliceText, &m_SliceIndex, m_SliceSlider, 1, sliceMax));
+	m_SliceText->SetValidator(albaGUIValidator(this, ID_SLICE_TEXT, m_SliceText, &m_GUISliceIndex, m_SliceSlider, 1, sliceMax));
 	SetSlicingIndexes(m_SlicePlane, m_SliceIndexByPlane[m_SlicePlane]);
 	m_SliceSlider->Update();
 }
@@ -1726,6 +1742,8 @@ void albaOpSegmentation::OnPickingEvent(albaEvent * e)
 			Fill(e);
 		else if (m_ManualSegmentationTools == DRAW_EDIT) // brush
 			StartDraw(e);
+		else if (m_ManualSegmentationTools == SWITCH_PLANE)
+			SwitchPlane(e);
 		else
 			Conntectivity3D(e);
 
@@ -1950,16 +1968,21 @@ void albaOpSegmentation::OnEditSegmentationEvent(albaEvent *e)
 			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
 		}
 		break;
-		case ID_MANUAL_TOOLS_BRUSH:
+
+
+		case ID_SWITCH_TO_YZ:
+		case ID_SWITCH_TO_XZ:
+		case ID_SWITCH_TO_XY:
 		{
-			m_ManualSegmentationTools = DRAW_EDIT;
+			m_ManualSegmentationTools = SWITCH_PLANE;
+			m_SwitchTO = e->GetId();
 
 			m_SnippetsLabel->SetLabel(_(" 'Left Click' Draw. | Ctrl + 'Left Click' Erase. | Shift + Scroll set brush size."));
 
-			SetCursor(CUR_PENCIL);
+			SetCursor(CUR_DEFAULT);
 
 			EnableSizerContent(m_FillEditingSizer, false);
-			EnableSizerContent(m_BrushEditingSizer, true);
+			EnableSizerContent(m_BrushEditingSizer, false);
 			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
 		}
 		break;
@@ -2214,6 +2237,32 @@ void albaOpSegmentation::Fill(albaEvent *e)
 }
 
 //----------------------------------------------------------------------------
+void albaOpSegmentation::SwitchPlane(albaEvent * e)
+{
+	int plane, indexes[2],index;
+	m_Helper.GetSlicePoint(m_SlicePlane, (double *)e->GetPointer(), indexes);
+
+	if (m_SwitchTO == ID_SWITCH_TO_YZ)
+	{
+		plane = 0; index = indexes[0];
+	}
+	else if (m_SwitchTO == ID_SWITCH_TO_XZ)
+	{
+		plane = 1; index = indexes[0];
+	}
+	else
+	{
+		plane = 2; index = indexes[0];
+	}
+
+	SetSlicingIndexes(plane, m_SliceIndex);
+	OnSelectSlicePlane();
+	SetSlicingIndexes(m_SlicePlane, index);
+	OnUpdateSlice();
+}
+
+
+//----------------------------------------------------------------------------
 void albaOpSegmentation::CopyFromLastSlice()
 {
 	AddUndoStep();
@@ -2271,6 +2320,7 @@ UndoRedoState albaOpSegmentation::CreateVolumeUndoRedoState()
 
 	return urs;
 }
+
 
 //----------------------------------------------------------------------------
 UndoRedoState albaOpSegmentation::CreateUndoRedoState()
