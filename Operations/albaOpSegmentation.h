@@ -272,6 +272,8 @@ protected:
   /** Receive events from Manual segmentation gui */
   void OnEditSegmentationEvent(albaEvent *e);
 
+	void OnConnectivity3d();
+
 	void CopyFromLastSlice();
 
 	void OnUndoRedo(bool undo);
@@ -368,12 +370,15 @@ protected:
   albaGUIButton *m_ManualApplyChanges;           //<Apply changes button - GUI
   
 	int m_ManualSegmentationTools;                //<Manual segmentation tools (bucket/brush)
-  int m_ManualBucketActions;                    //<
+	int m_OldManualSegmentationTools;
+	int m_CursorId;
+	int m_ManualBucketActions;                    //<
   int m_BrushShape;                       //<Brush shape
   int m_BrushSize;                     //<Brush size
 	int m_BrushFillErase;               //< Brush Modality (draw/erase)
 	int m_AutofillOnRelease;
 	int m_FillThesholdPerc;                     //<Brush size
+	
 	
   int m_ManualRefinementRegionsSize;            //<Refinement region size
   wxComboBox *m_ManualRefinementComboBox;       //<Refinement action combo - GUI
@@ -415,6 +420,8 @@ protected:
 
   /** Remove the select range */
   void OnRemoveRange();
+	
+	void OnFillEdit();
 
   /** Update threshold real-time preview*/
   void UpdateThresholdRealTimePreview();
@@ -527,3 +534,4 @@ private:
 
 };
 #endif
+
