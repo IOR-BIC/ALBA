@@ -501,13 +501,13 @@ bool albaInteractor2DMeasure_Distance::Load(albaVME *input, wxString tag)
 		// Reload points
 		for (int i = 0; i < nLines; i++)
 		{
-			point1[X] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 2 + 0);
-			point1[Y] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[Z] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 2 + 2);
+			point1[X] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 3 + 0);
+			point1[Y] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 3 + 1);
+			point1[Z] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 3 + 2);
 
-			point2[X] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 2 + 0);
-			point2[Y] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[Z] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 2 + 2);
+			point2[X] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 3 + 0);
+			point2[Y] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 3 + 1);
+			point2[Z] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 3 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -553,13 +553,13 @@ bool albaInteractor2DMeasure_Distance::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			MeasureDistancePoint1Tag.SetValue(point1[X], i * 2 + 0);
-			MeasureDistancePoint1Tag.SetValue(point1[Y], i * 2 + 1);
-			MeasureDistancePoint1Tag.SetValue(point1[Z], i * 2 + 2);
+			MeasureDistancePoint1Tag.SetValue(point1[X], i * 3 + 0);
+			MeasureDistancePoint1Tag.SetValue(point1[Y], i * 3 + 1);
+			MeasureDistancePoint1Tag.SetValue(point1[Z], i * 3 + 2);
 
-			MeasureDistancePoint2Tag.SetValue(point2[X], i * 2 + 0);
-			MeasureDistancePoint2Tag.SetValue(point2[Y], i * 2 + 1);
-			MeasureDistancePoint2Tag.SetValue(point2[Z], i * 2 + 2);
+			MeasureDistancePoint2Tag.SetValue(point2[X], i * 3 + 0);
+			MeasureDistancePoint2Tag.SetValue(point2[Y], i * 3 + 1);
+			MeasureDistancePoint2Tag.SetValue(point2[Z], i * 3 + 2);
 		}
 
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))

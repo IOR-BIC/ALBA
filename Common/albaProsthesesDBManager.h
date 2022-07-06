@@ -217,6 +217,7 @@ public:
 	std::vector<albaProDBProsthesis *> SearchProstheses(albaString producer, albaString type, albaString side);
 	std::vector<albaProDBProsthesis *>& GetProstheses() { return m_Prostheses; };
 	bool HasProsthesis(albaString prosthesis, albaProDBProsthesis::PRO_SIDES side);
+	albaProDBProsthesis * GetProsthesis(albaString prosthesis, albaProDBProsthesis::PRO_SIDES side);
 	void DeleteProsthesis(albaString prosthesis, albaProDBProsthesis::PRO_SIDES side);
 	void AddProsthesis(albaProDBProsthesis *prosthesis);
 

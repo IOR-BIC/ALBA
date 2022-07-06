@@ -176,6 +176,9 @@ public:
 	albaRWIBase* GetCurrentRwi() { return m_CurrentRwi; }
 	albaRWIBase* GetCurrentRwi(int m) {	return m_Measure2DVector[m].Rwi; }
 
+	int GetCurrPlane() { return m_CurrPlane; }
+	void SetCurrPlane(int plane) { m_CurrPlane = plane; }
+
 protected:
 
 	struct Measure2D
