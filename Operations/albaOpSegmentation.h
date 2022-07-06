@@ -118,6 +118,9 @@ public:
 		ID_PRE_VOLUME_SPACING,
 		ID_PRE_VOLUME_ZERO_VALUE,
 		ID_MANUAL_PICKING_MODALITY,
+		ID_SWITCH_TO_YZ,
+		ID_SWITCH_TO_XZ,
+		ID_SWITCH_TO_XY,
 		ID_MANUAL_TOOLS_BRUSH,
 		ID_MANUAL_TOOLS_FILL,
 		ID_MANUAL_TOOLS_3D_CONNECTIVITY,
@@ -269,6 +272,10 @@ protected:
   /** Receive events from Manual segmentation gui */
   void OnEditSegmentationEvent(albaEvent *e);
 
+	void OnToolBrush();
+
+	void OnConnectivity3d();
+
 	void CopyFromLastSlice();
 
 	void OnUndoRedo(bool undo);
@@ -365,12 +372,15 @@ protected:
   albaGUIButton *m_ManualApplyChanges;           //<Apply changes button - GUI
   
 	int m_ManualSegmentationTools;                //<Manual segmentation tools (bucket/brush)
-  int m_ManualBucketActions;                    //<
+	int m_OldManualSegmentationTools;
+	int m_CursorId;
+	int m_ManualBucketActions;                    //<
   int m_BrushShape;                       //<Brush shape
   int m_BrushSize;                     //<Brush size
 	int m_BrushFillErase;               //< Brush Modality (draw/erase)
 	int m_AutofillOnRelease;
 	int m_FillThesholdPerc;                     //<Brush size
+	
 	
   int m_ManualRefinementRegionsSize;            //<Refinement region size
   wxComboBox *m_ManualRefinementComboBox;       //<Refinement action combo - GUI
@@ -412,6 +422,8 @@ protected:
 
   /** Remove the select range */
   void OnRemoveRange();
+	
+	void OnFillEdit();
 
   /** Update threshold real-time preview*/
   void UpdateThresholdRealTimePreview();
@@ -469,6 +481,8 @@ protected:
   int m_OldAutomaticUpperThreshold; //<Used to update real time threshold preview only if needed
 
   int m_RemovePeninsulaRegions; //<Determine if refinement filter removes penisula regions or not
+
+	int m_SwitchTO;        //<Plane to switch to
  
   wxGauge *m_ProgressBar; //< display progress
 
@@ -477,6 +491,8 @@ protected:
   void EnableSizerContent(wxSizer* sizer, bool enable);
 
   void Fill(albaEvent *e);
+
+	void SwitchPlane(albaEvent * e);
 
 	void InitRanges();
 
@@ -520,3 +536,4 @@ private:
 
 };
 #endif
+
