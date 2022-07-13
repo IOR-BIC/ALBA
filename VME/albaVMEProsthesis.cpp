@@ -43,6 +43,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaVME.h"
 #include "albaTagArray.h"
 #include "albaStorageElement.h"
+#include "albaMatrixVector.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEProsthesis)
@@ -525,6 +526,11 @@ int albaVMEProsthesis::InternalStore(albaStorageElement *parent)
 	
 	delete[] compSel;
 
+	// sub-element for storing the matrix vector
+	albaStorageElement *matrix_vector = parent->AppendChild("MatrixVector");
+	if (m_MatrixVector->Store(matrix_vector) == ALBA_ERROR)
+		return ALBA_ERROR;
+
 	return ALBA_OK;
 }
 
@@ -569,6 +575,14 @@ int albaVMEProsthesis::InternalRestore(albaStorageElement *node)
 
 
 	delete[] compSel;
+
+	// restore Matrix Vector  
+	if (m_MatrixVector)
+	{
+		albaStorageElement *matrix_vector = node->FindNestedElement("MatrixVector");
+		if (matrix_vector && m_MatrixVector->Restore(matrix_vector))
+			return ALBA_ERROR;
+	}
 
 	return ALBA_OK;
 }
