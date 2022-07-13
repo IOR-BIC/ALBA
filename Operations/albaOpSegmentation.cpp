@@ -2050,7 +2050,10 @@ void albaOpSegmentation::OnToolBrush()
 
 	m_SnippetsLabel->SetLabel(_(" 'Left Click' Draw. | Ctrl + 'Left Click' Erase. | Shift + Scroll set brush size."));
 
-	SetCursor(CUR_PENCIL);
+	if (m_BrushFillErase)
+		SetCursor(CUR_ERASE);
+	else
+		SetCursor(CUR_PENCIL);
 
 	EnableSizerContent(m_FillEditingSizer, false);
 	EnableSizerContent(m_BrushEditingSizer, true);
