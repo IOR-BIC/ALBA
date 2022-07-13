@@ -188,6 +188,15 @@ App_Running_Check:
       Quit
    ${EndIf}
 
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;Chech if Extra app.exe process running? result is stored in $R0
+   ${nsProcess::FindProcess} "${CHECK_EXTRA_PROCESS_ISRUNNING}" $R0
+
+   ${If} $R0 == 0
+      MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${EXTRA_PRODUCT_EXE_NAME} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY App_Running_Check
+      Quit
+   ${EndIf}
+
 FunctionEnd
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -201,6 +210,15 @@ App_Running_Check:
 
    ${If} $R0 == 0
       MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${PRODUCT_NAME} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY App_Running_Check
+      Quit
+   ${EndIf}
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;Chech if Extra app.exe process running? result is stored in $R0
+   ${nsProcess::FindProcess} "${CHECK_EXTRA_PROCESS_ISRUNNING}" $R0
+
+   ${If} $R0 == 0
+      MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${EXTRA_PRODUCT_EXE_NAME} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY App_Running_Check
       Quit
    ${EndIf}
    

@@ -73,6 +73,11 @@ public:
 
 	void ShowRotCenter(bool show);
 
+	void GetZMinMax(double &zMin, double &zMax);
+
+	void Set2dModality(bool mod2d);
+
+
 	//----------------------------------------------------------------------------
 	// Widgets ID's
 	//----------------------------------------------------------------------------
@@ -90,6 +95,9 @@ public:
 		ID_SELECT_COMPONENT,
 		ID_LAST_COMP_ID,
 	};
+
+	/** Gets Current DB Prosthesis*/ 
+	albaProDBProsthesis * GetDBProsthesis() const { return m_Prosthesis; }
 
 protected:
 	albaVMEProsthesis();
@@ -122,6 +130,11 @@ protected:
 	void SetRotCenterVME(albaVME *vme);
 	
 	albaVME* GetRotCenterVME();
+
+	virtual int InternalStore(albaStorageElement *parent);
+
+	virtual int InternalRestore(albaStorageElement *node);
+
 
 	//Components vtkData
 	std::vector <vtkTransformPolyDataFilter *> m_TransformFilters;

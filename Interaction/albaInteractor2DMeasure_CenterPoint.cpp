@@ -98,10 +98,13 @@ void albaInteractor2DMeasure_CenterPoint::MoveMeasure(int index, double * point)
 
 	if (!m_MovingMeasure)
 	{
-		m_OldLineP1[0] = linePoint1[0] - m_StartMousePosition[0];
-		m_OldLineP1[1] = linePoint1[1] - m_StartMousePosition[1];
-		m_OldLineP2[0] = linePoint2[0] - m_StartMousePosition[0];
-		m_OldLineP2[1] = linePoint2[1] - m_StartMousePosition[1];
+		m_OldLineP1[X] = linePoint1[X] - m_StartMousePosition[X];
+		m_OldLineP1[Y] = linePoint1[Y] - m_StartMousePosition[Y];
+		m_OldLineP1[Z] = linePoint1[Z] - m_StartMousePosition[Z];
+
+		m_OldLineP2[X] = linePoint2[X] - m_StartMousePosition[X];
+		m_OldLineP2[Y] = linePoint2[Y] - m_StartMousePosition[Y];
+		m_OldLineP2[Z] = linePoint2[Z] - m_StartMousePosition[Z];
 
 		m_MovingMeasure = true;
 	}
@@ -112,15 +115,15 @@ void albaInteractor2DMeasure_CenterPoint::MoveMeasure(int index, double * point)
 	double tmp_pos1[3];
 	double tmp_pos2[3];
 
-	tmp_pos1[0] = point[0] + m_OldLineP1[0];
-	tmp_pos1[1] = point[1] + m_OldLineP1[1];
-	tmp_pos1[2] = 0.0;
+	tmp_pos1[X] = point[X] + m_OldLineP1[X];
+	tmp_pos1[Y] = point[Y] + m_OldLineP1[Y];
+	tmp_pos1[Z] = point[Z] + m_OldLineP1[Z];
 
-	tmp_pos2[0] = point[0] + m_OldLineP2[0];
-	tmp_pos2[1] = point[1] + m_OldLineP2[1];
-	tmp_pos2[2] = 0.0;
+	tmp_pos2[X] = point[X] + m_OldLineP2[X];
+	tmp_pos2[Y] = point[Y] + m_OldLineP2[Y];
+	tmp_pos2[Z] = point[Z] + m_OldLineP2[Z];
 
-	m_MeasureValue = GeometryUtils::DistanceBetweenPoints(tmp_pos1, tmp_pos2);
+	m_MeasureValue = DistanceBetweenPoints(tmp_pos1, tmp_pos2);
 
 	UpdateLineActors(tmp_pos1, tmp_pos2);
 	// Points
@@ -158,11 +161,13 @@ void albaInteractor2DMeasure_CenterPoint::EditMeasure(int index, double *point)
 	{
 		point1[X] = point[X];
 		point1[Y] = point[Y];
+		point1[Z] = point[Z];
 	}
 	else if (m_CurrPoint == POINT_2)
 	{
 		point2[X] = point[X];
 		point2[Y] = point[Y];
+		point2[Z] = point[Z];
 	}
 
 	m_LastEditing = index;
@@ -170,7 +175,7 @@ void albaInteractor2DMeasure_CenterPoint::EditMeasure(int index, double *point)
 	//////////////////////////////////////////////////////////////////////////
 	// Update Measure
 	albaString text;
-	text.Printf("Distance %.2f mm", GeometryUtils::DistanceBetweenPoints(point1, point2));
+	text.Printf("Distance %.2f mm", DistanceBetweenPoints(point1, point2));
 	//m_MeasureTextVector[index] = text;
 	m_Measure2DVector[index].Text = text;
 
@@ -209,11 +214,12 @@ void albaInteractor2DMeasure_CenterPoint::FindAndHighlight(double * point)
 			lineSource->GetPoint1(linePoint1);
 			lineSource->GetPoint2(linePoint2);
 
-			double centerPoint[3]{ (linePoint1[0] + linePoint2[0]) / 2, (linePoint1[1] + linePoint2[1]) / 2, 0.0 };
+			double centerPoint[3];
+			GetMidPoint(centerPoint, linePoint1, linePoint2);
 
 			double radius = vtkMath::Distance2BetweenPoints(linePoint2, centerPoint);
 
-			if (GeometryUtils::DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
+			if (DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -277,7 +283,8 @@ void albaInteractor2DMeasure_CenterPoint::UpdatePointsActor(double * point1, dou
 	pointSourceR->Update();
 
 	// Center
-	double pointC[3]{ (point1[0] + point2[0]) / 2, (point1[1] + point2[1]) / 2, 0.0 };
+	double pointC[3];
+	GetMidPoint(pointC, point1, point2);
 
 	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[m_CurrMeasure]->GetSource();
 	pointSourceC->SetCenter(pointC);
@@ -294,21 +301,21 @@ void albaInteractor2DMeasure_CenterPoint::UpdateLineActors(double * point1, doub
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_CenterPoint::UpdateCircleActor(double * point1, double * point2)
 {
-	double pointC[3]{ (point1[0] + point2[0]) / 2, (point1[1] + point2[1]) / 2, 0.0 };
-	double radius = GeometryUtils::DistanceBetweenPoints(point1, pointC);
+	double radius = DistanceBetweenPoints(point1, point2) / 2;
+
+	double midPoint[3]; 
+	GetMidPoint(midPoint, point1, point2);
 
 	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[m_CurrMeasure]->GetSource();
-
+	circleSource->SetPlane(m_CurrPlane);
 	circleSource->SetRadius(radius);
-	circleSource->SetCenter(pointC);
+	circleSource->SetCenter(midPoint);
 }
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_CenterPoint::UpdateTextActor(double * point1, double * point2)
 {
 	double text_pos[3];
-	text_pos[X] = point1[X];
-	text_pos[Y] = point1[Y];
-	text_pos[Z] = point1[Z];
+	GetMidPoint(text_pos, point1, point2);
 
 	text_pos[X] += m_TextSide *TEXT_W_SHIFT;
 
@@ -327,7 +334,7 @@ void albaInteractor2DMeasure_CenterPoint::AddMeasure(double *point1, double *poi
 
 		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
 
-		if (GeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2)<POINT_UPDATE_DISTANCE)
+		if (DistanceBetweenPoints(oldPoint1, oldPoint2)<POINT_UPDATE_DISTANCE)
 		{
 			if (!hasSameRenderer) return;
 
@@ -345,7 +352,7 @@ void albaInteractor2DMeasure_CenterPoint::AddMeasure(double *point1, double *poi
 	int index = m_Measure2DVector.size() - 1;
 
 	albaString text;
-	text.Printf("Center (%.2f, %.2f) - Radius %.2f mm", point1[X], point1[Y], GeometryUtils::DistanceBetweenPoints(point1, point2));
+	text.Printf("Center (%.2f, %.2f) - Radius %.2f mm", point1[X], point1[Y], DistanceBetweenPoints(point1, point2));
 	m_Measure2DVector[index].Text = text;
 
 	// Update Edit Actors
@@ -362,8 +369,7 @@ void albaInteractor2DMeasure_CenterPoint::AddMeasure(double *point1, double *poi
 
 	// Add Circle
 	m_CircleStackVector.push_back(new albaActor2dStackHelper(vtkALBACircleSource::New(), m_Renderer));
-
-
+	
 	//////////Setting mapper/actors/proprieties//////////////
 	int col = m_IsEnabled ? COLOR_DEFAULT : COLOR_DISABLE;
 	
@@ -547,13 +553,13 @@ bool albaInteractor2DMeasure_CenterPoint::Load(albaVME *input, wxString tag)
 		// Reload points
 		for (int i = 0; i < nCenters; i++)
 		{
-			point1[0] = measureCenterPoint1Tag->GetValueAsDouble(i * 2 + 0);
-			point1[1] = measureCenterPoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[2] = 0.0;
+			point1[X] = measureCenterPoint1Tag->GetValueAsDouble(i * 3 + 0);
+			point1[Y] = measureCenterPoint1Tag->GetValueAsDouble(i * 3 + 1);
+			point1[Z] = measureCenterPoint1Tag->GetValueAsDouble(i * 3 + 2);
 
-			point2[0] = measureCenterPoint2Tag->GetValueAsDouble(i * 2 + 0);
-			point2[1] = measureCenterPoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[2] = 0.0;
+			point2[X] = measureCenterPoint2Tag->GetValueAsDouble(i * 3 + 0);
+			point2[Y] = measureCenterPoint2Tag->GetValueAsDouble(i * 3 + 1);
+			point2[Z] = measureCenterPoint2Tag->GetValueAsDouble(i * 3 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -599,11 +605,13 @@ bool albaInteractor2DMeasure_CenterPoint::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			measureCenterPoint1Tag.SetValue(point1[0], i * 2 + 0);
-			measureCenterPoint1Tag.SetValue(point1[1], i * 2 + 1);
+			measureCenterPoint1Tag.SetValue(point1[X], i * 3 + 0);
+			measureCenterPoint1Tag.SetValue(point1[Y], i * 3 + 1);
+			measureCenterPoint1Tag.SetValue(point1[Z], i * 3 + 2);
 
-			measureCenterPoint2Tag.SetValue(point2[0], i * 2 + 0);
-			measureCenterPoint2Tag.SetValue(point2[1], i * 2 + 1);
+			measureCenterPoint2Tag.SetValue(point2[X], i * 3 + 0);
+			measureCenterPoint2Tag.SetValue(point2[Y], i * 3 + 1);
+			measureCenterPoint2Tag.SetValue(point2[Z], i * 3 + 2);
 		}
 
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))

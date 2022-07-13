@@ -85,6 +85,12 @@ public:
 		APPLY_DEFAULT_POSITION
 	};
 
+	enum OUTPUT_TYPES
+	{
+		VOLUME_TYPE,
+		IMAGE_TYPE
+	};
+
   enum NAME_COMPOSITOR
   {
    	ID_DESCRIPTION,

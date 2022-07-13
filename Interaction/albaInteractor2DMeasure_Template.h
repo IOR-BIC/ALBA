@@ -84,6 +84,8 @@ public:
 
 	vtkLookupTable* GetLut() { return m_TemplateLookupTable; };
 
+	void SetConfigDir(wxString dir) { m_ConfigDir = dir; };
+
 protected:
 
 	albaInteractor2DMeasure_Template();
@@ -116,6 +118,7 @@ protected:
 	vtkLookupTable	*m_TemplateLookupTable;
 
 	double m_Angle;
+	wxString m_ConfigDir;
 
 private:
 	albaInteractor2DMeasure_Template(const albaInteractor2DMeasure_Template&);   // Not implemented.

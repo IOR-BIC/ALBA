@@ -42,6 +42,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkSphereSource.h"
 #include "albaVME.h"
 #include "albaTagArray.h"
+#include "albaStorageElement.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEProsthesis)
@@ -504,6 +505,99 @@ albaVME* albaVMEProsthesis::GetRotCenterVME()
 		CreateRotCenterVME();
 
 	return	m_RotCenterVME;
+}
+
+//----------------------------------------------------------------------------
+int albaVMEProsthesis::InternalStore(albaStorageElement *parent)
+{
+	int nComp = m_ComponentListBox.size();
+	albaVME::InternalStore(parent);
+	
+	parent->StoreText("ProName", m_Prosthesis->GetName());
+	parent->StoreInteger("ProSide", m_Prosthesis->GetSide());
+	parent->StoreInteger("ProNcomp", nComp);
+	
+	int *compSel = new int[nComp];
+	for (int i = 0; i < nComp; i++)
+		compSel[i] = m_ComponentListBox[i]->GetSelection();
+
+	parent->StoreVectorN("ProCompSel",compSel, nComp);
+	
+	delete[] compSel;
+
+	return ALBA_OK;
+}
+
+//----------------------------------------------------------------------------
+int albaVMEProsthesis::InternalRestore(albaStorageElement *node)
+{
+	albaVME::InternalRestore(node);
+
+	albaString proName; 
+	int nComp, side;
+	node->RestoreText("ProName", proName);
+	node->RestoreInteger("ProNcomp", nComp);
+	node->RestoreInteger("ProSide", side);
+	int *compSel = new int[nComp];
+	
+	node->RestoreVectorN("ProCompSel", compSel, nComp);
+
+
+	albaProsthesesDBManager * prosthesesDBManager = GetLogicManager()->GetProsthesesDBManager();
+	if (prosthesesDBManager == NULL)
+	{
+		albaErrorMessage("Error on Reload Prosthesis, No prostheses DB manager found!\n This project may be created under an other application please reload it with the appropriate software");
+		return ALBA_ERROR;
+	}
+
+	albaProDBProsthesis *prosthesis 	= prosthesesDBManager->GetProsthesis(proName, (albaProDBProsthesis::PRO_SIDES) side);
+
+	if (prosthesis == NULL)
+	{
+		albaErrorMessage("Error on Reload Prosthesis, prostheses '%s' not found on DB,\n please install it and reload the project!", proName.GetCStr());
+		return ALBA_ERROR;
+	}
+
+	SetProsthesis(prosthesis);
+
+	for (int i = 0; i < nComp; i++)
+	{
+		m_ComponentListBox[i]->Select(compSel[i]);
+		SelectComponent(i);
+	}
+	UpdateGui();
+
+
+	delete[] compSel;
+
+	return ALBA_OK;
+}
+
+//----------------------------------------------------------------------------
+void albaVMEProsthesis::GetZMinMax(double &zMin, double &zMax)
+{
+	zMin = VTK_DOUBLE_MAX;
+	zMax = VTK_DOUBLE_MIN;
+	double in[4], out[4];
+
+	albaMatrix *absMtr=GetOutput()->GetAbsMatrix();
+
+	in[3] = 1;
+	vtkDataSet *outputDataSet = GetOutput()->GetVTKData();
+	int nPoints = outputDataSet->GetNumberOfPoints();
+	for (int i = 0; i < nPoints; i++) {
+		outputDataSet->GetPoint(i, in);
+		absMtr->MultiplyPoint(in, out);
+		zMin = MIN(zMin, out[2]);
+		zMax = MAX(zMax, out[2]);
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaVMEProsthesis::Set2dModality(bool mod2d)
+{
+	albaInteractorGenericMouseFloatVME* isaRotate = albaInteractorGenericMouseFloatVME::SafeDownCast(m_InteractorTransformFloatVME->GetIsaRotate());
+	isaRotate->Set2DModality(mod2d);
 }
 
 //-------------------------------------------------------------------------

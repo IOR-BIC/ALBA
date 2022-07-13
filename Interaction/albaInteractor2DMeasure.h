@@ -24,6 +24,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaEvent.h"
 #include "albaInteractorPER.h"
 #include "albaActor2dStackHelper.h"
+#include "albaGeometryUtils.h"
 
 //----------------------------------------------------------------------------
 // Forward references :
@@ -175,6 +176,9 @@ public:
 	albaRWIBase* GetCurrentRwi() { return m_CurrentRwi; }
 	albaRWIBase* GetCurrentRwi(int m) {	return m_Measure2DVector[m].Rwi; }
 
+	int GetCurrPlane() { return m_CurrPlane; }
+	void SetCurrPlane(int plane) { m_CurrPlane = plane; }
+
 protected:
 
 	struct Measure2D
@@ -237,10 +241,18 @@ protected:
 	bool IsInBound(double *pos);
 	void ScreenToWorld(double screen[2], double world[3]);
 	void WorldToScreen(double world[3], double screen[2]);
-
-
+	
 	//vtkPointSource produces a random-distributed pointCloud, use this method to obtain a fixed position single point output
 	vtkPointSource *GetNewPointSource();
+	
+	double DistanceBetweenPoints(double *point1, double *point2);
+	double DistancePointToLine(double * point, double * lineP1, double * lineP2);
+	void GetMidPoint(double(&midPoint)[3], double *point1, double *point2);
+	bool FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance);
+	double GetAngle(double* point1, double* point2, double* origin);
+	void RotatePoint(double *point, double *origin, double angle);
+	int PointUpDownLine(double *point, double *lp1, double *lp2);
+	void GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance);
 
 	albaDeviceButtonsPadMouse	*m_Mouse;
 	vtkRenderer					*m_Renderer;
@@ -275,6 +287,8 @@ protected:
 	
 	bool m_EndMeasure;
 	bool m_ParallelView;
+	double m_ViewPlaneNormal[3];
+	int m_CurrPlane;
 	double m_ParallelScale_OnStart;
 
 	long m_AddMeasurePhase_Counter;
@@ -306,40 +320,4 @@ private:
 	friend class albaInteractor2DMeasureTest;
 };
 
-
-class GeometryUtils
-{
-public:
-
-	/// Points Utils
-
-	static bool Equal(double *point1, double *point2);
-
-	static double * GetMidPoint(double *point1, double *point2);
-
-	static void RotatePoint(double *point, double *origin, double angle);
-
-	static double DistanceBetweenPoints(double *point1, double *point2);
-
-	static double CalculateAngle(double point1[3], double point2[3], double origin[3]);
-
-	/// Lines Utils
-
-	static bool FindIntersectionLines(double(&point)[3], double *line1Point1, double *line1Point2, double *line2Point1, double *line2Point2);
-	static int IntersectLineLine(double *l1p1, double *l1p2, double *l2p1, double *l2p2, double &perc);
-
-	static double GetPointToLineDistance(double *point, double *linePoint1, double *linePoint2);
-	static float DistancePointToLine(double *point, double *lineP1, double *lineP2);
-
-	static void GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance);
-
-	static bool FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance);
-
-	//Returns 1 if the point is up, -1 if is down and 0 if the point is in the line
-	static int PointUpDownLine(double *point, double *lp1, double *lp2);
-
-protected:
-
-	enum { X, Y, Z, };
-};
 #endif

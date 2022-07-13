@@ -429,12 +429,18 @@ std::vector<albaProDBProsthesis *> albaProsthesesDBManager::SearchProstheses(alb
 //----------------------------------------------------------------------------
 bool albaProsthesesDBManager::HasProsthesis(albaString prosthesis, albaProDBProsthesis::PRO_SIDES side)
 {
+	return GetProsthesis(prosthesis, side);
+}
+
+//----------------------------------------------------------------------------
+albaProDBProsthesis * albaProsthesesDBManager::GetProsthesis(albaString prosthesis, albaProDBProsthesis::PRO_SIDES side)
+{
 	for (int i = 0; i < m_Prostheses.size(); i++)
 	{
 		if (m_Prostheses[i]->GetName() == prosthesis && m_Prostheses[i]->GetSide() == side)
-			return true;
+			return m_Prostheses[i];
 	}
-	return false;
+	return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -487,6 +493,14 @@ bool albaProsthesesDBManager::HasType(albaString type)
 void albaProsthesesDBManager::AddType(albaProDBType *type)
 {
 	m_Types.push_back(type);
+}
+
+//----------------------------------------------------------------------------
+void albaProsthesesDBManager::SetDBDir(albaString val)
+{
+	m_DBDir = val;
+	m_DBFilename = m_DBDir + "ProsthesesDB.xml";
+
 }
 
 //----------------------------------------------------------------------------

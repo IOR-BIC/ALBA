@@ -79,6 +79,7 @@
 #include "albaPipeSurfaceTextured.h"
 #include "albaPipeVolumeArbOrthoSlice.h"
 #include "albaPipeVolumeArbSlice.h"
+#include "albaPipeSurfaceSlice.h"
 
 albaCxxTypeMacro(albaViewArbitraryOrthoSlice);
 
@@ -119,6 +120,9 @@ albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxe
 		m_CameraPositionForReset[i][0] = m_CameraPositionForReset[i][1] = m_CameraPositionForReset[i][2] = 0;
 		m_CameraViewUpForReset[i][0] = m_CameraViewUpForReset[i][1] = m_CameraViewUpForReset[i][2] = 0;
 	}
+
+	m_AllSurface = 0;
+	m_Border = 1;
 
 	m_SkipCameraUpdate = 0;
 	m_EnableGPU = true; 
@@ -227,9 +231,10 @@ void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 				((albaViewSlice*)m_ChildViewList[view])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 				pipeSlice->SetSlice(m_SlicingOrigin, normal);
 
+				SetBorder(nodePipe);
+
 				albaPipeMeshSlice* meshPipe = albaPipeMeshSlice::SafeDownCast(nodePipe);
-				if(meshPipe)
-					meshPipe->SetFlipNormalOff();
+				if (meshPipe) meshPipe->SetFlipNormalOff();
 			}
 		}
 	}
@@ -243,6 +248,24 @@ void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 void albaViewArbitraryOrthoSlice::VmeSelect(albaVME *node, bool select)
 {
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeSelect(node, select);
+
+
+
+	if (!m_AllSurface)
+	{
+		albaPipe* nodePipe = m_ChildViewList[Z_VIEW]->GetNodePipe(node);
+
+		albaPipeSurfaceSlice *surfPipe = albaPipeSurfaceSlice::SafeDownCast(nodePipe);
+		if (surfPipe) 
+			m_Border = surfPipe->GetThickness();
+
+		albaPipeMeshSlice* meshPipe = albaPipeMeshSlice::SafeDownCast(nodePipe);
+		if (meshPipe) 
+			m_Border = meshPipe->GetThickness();
+		
+		if(m_Gui)
+			m_Gui->Update();
+	}
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::VmeRemove(albaVME *vme)
@@ -440,6 +463,12 @@ void albaViewArbitraryOrthoSlice::OnEventThis(albaEventBase *alba_event)
 		case ID_SLICING_ORIGIN:
 			OnSlicingOrigin();
 			break;
+		case ID_ALL_SURFACE:
+		case ID_BORDER_CHANGE:
+		{
+			OnEventSetThickness();
+		}
+		break;
 		default:
 			albaViewCompound::OnEvent(alba_event);
 		}
@@ -501,6 +530,11 @@ albaGUI* albaViewArbitraryOrthoSlice::CreateGui()
 	m_Gui->Double(ID_SLICING_ORIGIN, "X:", &m_SlicingOriginGUI[0]);
 	m_Gui->Double(ID_SLICING_ORIGIN, "Y:", &m_SlicingOriginGUI[1]);
 	m_Gui->Double(ID_SLICING_ORIGIN, "Z:", &m_SlicingOriginGUI[2]);
+
+	m_Gui->Bool(ID_ALL_SURFACE, "All Surface", &m_AllSurface);
+	m_Gui->FloatSlider(ID_BORDER_CHANGE, "Border", &m_Border, 1.0, 5.0);
+
+
 	m_Gui->Divider();
 	m_Gui->Divider();
 
@@ -512,6 +546,49 @@ albaGUI* albaViewArbitraryOrthoSlice::CreateGui()
 		
 	EnableWidgets( (m_InputVolume != NULL) );
 	return m_Gui;
+}
+
+
+//----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::OnEventSetThickness()
+{
+	if (m_AllSurface)
+	{
+		albaVME *vme = GetViewArbitrary()->GetSceneGraph()->GetSelectedVme();
+		albaVME *root = vme->GetRoot();
+		SetThicknessForAllSurfaceSlices(root);
+	}
+	else
+	{
+		albaVME *node = GetViewArbitrary()->GetSceneGraph()->GetSelectedVme();
+		albaSceneNode *SN = this->GetSceneGraph()->Vme2Node(node);
+		albaPipe *p = GetViewSlice(0)->GetNodePipe(node);
+		SetBorder(p);
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::SetThicknessForAllSurfaceSlices(albaVME *root)
+{
+	albaVMEIterator *iter = root->NewIterator();
+	for (albaVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+	{
+		//view slice 0 is enough because the property will be applied on all slices.
+			albaViewVTK *view = GetViewSlice(0);
+			albaPipe *p = view->GetNodePipe(node);
+			SetBorder(p);
+	}
+	iter->Delete();
+}
+
+//----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::SetBorder(albaPipe * p)
+{
+	albaPipeSurfaceSlice *surfPipe = albaPipeSurfaceSlice::SafeDownCast(p);
+	if (surfPipe) surfPipe->SetThickness(m_Border);
+
+	albaPipeMeshSlice* meshPipe = albaPipeMeshSlice::SafeDownCast(p);
+	if (meshPipe) meshPipe->SetThickness(m_Border);
 }
 
 //----------------------------------------------------------------------------

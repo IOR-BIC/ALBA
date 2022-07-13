@@ -130,6 +130,7 @@ void vtkALBADistanceFilter::ExecuteData(vtkDataObject *outputObject) {
   vtkFloatArray * const scalars = this->DistanceMode == VTK_SCALAR || this->FilterMode == VTK_DENSITY_MODE ? vtkFloatArray::New(): NULL;
   vtkFloatArray * const vectors = scalars == NULL ? vtkFloatArray::New(): NULL;
   if (scalars) {
+		scalars->SetName(DISTANCE_FILTER_SCALARS_NAME);
     scalars->SetNumberOfComponents(1);
     scalars->SetNumberOfTuples(numPts);
     output->GetPointData()->SetScalars(scalars);
