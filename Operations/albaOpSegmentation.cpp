@@ -1988,7 +1988,6 @@ void albaOpSegmentation::OnEditSegmentationEvent(albaEvent *e)
 		{
 			m_OldManualSegmentationTools = m_ManualSegmentationTools;
 			m_ManualSegmentationTools = SWITCH_PLANE;
-			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Disable();
 			m_SwitchTO = e->GetId();
 
 			m_SnippetsLabel->SetLabel(_(" Click on the image to switch to the selected plane"));
@@ -2278,15 +2277,19 @@ void albaOpSegmentation::SwitchPlane(albaEvent * e)
 
 	if (m_SwitchTO == ID_SWITCH_TO_YZ)
 	{
-		plane = 0; index = indexes[0];
+		plane = 0; index = indexes[0] + 1;
 	}
 	else if (m_SwitchTO == ID_SWITCH_TO_XZ)
 	{
-		plane = 1; index = indexes[1];
+		plane = 1; 
+		if (m_SlicePlane == 0)
+			index = indexes[0] + 1;
+		else
+			index = indexes[1] + 1;
 	}
 	else
 	{
-		plane = 2; index = indexes[1];
+		plane = 2; index = indexes[1]+1;
 	}
 
 	SetSlicingIndexes(plane, m_SliceIndex);

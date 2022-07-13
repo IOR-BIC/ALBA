@@ -272,6 +272,8 @@ protected:
   /** Receive events from Manual segmentation gui */
   void OnEditSegmentationEvent(albaEvent *e);
 
+	void OnToolBrush();
+
 	void OnConnectivity3d();
 
 	void CopyFromLastSlice();
