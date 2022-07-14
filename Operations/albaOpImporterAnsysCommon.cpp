@@ -249,18 +249,22 @@ int albaOpImporterAnsysCommon::ReadNBLOCK(FILE *outFile)
   if(nReaded == 1)
   {
     // CDB from Hypermesh
-    while (GetLine() != 0 && strncmp (m_Line,"N,R5",4) != 0 && strncmp (m_Line,"-1",2) != 0)
-    {
-      nodeId = nodeSolidModelEntityId = nodeLine = 0;
-      nodeX = nodeY = nodeZ = 0;
+	  while (GetLine() != 0 && strncmp(m_Line, "N,R5", 4) != 0 && strncmp(m_Line, "-1", 2) != 0)
+	  {
+		  nodeId = nodeSolidModelEntityId = nodeLine = 0;
+		  nodeX = nodeY = nodeZ = 0;
 
-      //15239 0 0 112.48882247215 -174.4868225037 -378.3886770441 0.0 0.0 0.0
-      int nReaded = sscanf(m_Line, "%d %d %d %lf %lf %lf", &nodeId, &nodeSolidModelEntityId, &nodeLine, &nodeX, &nodeY, &nodeZ);
-			if (nReaded < 2)
-				break;
+		  //15239 0 0 112.48882247215 -174.4868225037 -378.3886770441 0.0 0.0 0.0
+		  int nReaded = sscanf(m_Line, "%d %d %d %lf %lf %lf", &nodeId, &nodeSolidModelEntityId, &nodeLine, &nodeX, &nodeY, &nodeZ);
 
-      fprintf(outFile,"%d\t%.13E\t%.13E\t%.13E\n", nodeId, nodeX, nodeY, nodeZ);
-    }
+		  if (nReaded == 2)
+			  nReaded = sscanf(m_Line, "%d %lf %lf %lf", &nodeId, &nodeX, &nodeY, &nodeZ);
+
+		  if (nReaded < 2)
+			  break;
+
+		  fprintf(outFile, "%d\t%.13E\t%.13E\t%.13E\n", nodeId, nodeX, nodeY, nodeZ);
+	  }
   }
   else
   {

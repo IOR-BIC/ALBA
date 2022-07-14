@@ -501,13 +501,13 @@ bool albaInteractor2DMeasure_MidPoint::Load(albaVME *input, wxString tag)
 		// Reload points
 		for (int i = 0; i < nLines; i++)
 		{
-			point1[X] = measureMidPoint1Tag->GetValueAsDouble(i * 2 + 0);
-			point1[Y] = measureMidPoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[Z] = measureMidPoint1Tag->GetValueAsDouble(i * 2 + 2);
+			point1[X] = measureMidPoint1Tag->GetValueAsDouble(i * 3 + 0);
+			point1[Y] = measureMidPoint1Tag->GetValueAsDouble(i * 3 + 1);
+			point1[Z] = measureMidPoint1Tag->GetValueAsDouble(i * 3 + 2);
 
-			point2[X] = measureMidPoint2Tag->GetValueAsDouble(i * 2 + 0);
-			point2[Y] = measureMidPoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[Z] = measureMidPoint2Tag->GetValueAsDouble(i * 2 + 2);
+			point2[X] = measureMidPoint2Tag->GetValueAsDouble(i * 3 + 0);
+			point2[Y] = measureMidPoint2Tag->GetValueAsDouble(i * 3 + 1);
+			point2[Z] = measureMidPoint2Tag->GetValueAsDouble(i * 3 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -553,13 +553,13 @@ bool albaInteractor2DMeasure_MidPoint::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			measureMidPoint1Tag.SetValue(point1[X], i * 2 + 0);
-			measureMidPoint1Tag.SetValue(point1[Y], i * 2 + 1);
-			measureMidPoint1Tag.SetValue(point1[Z], i * 2 + 2);
+			measureMidPoint1Tag.SetValue(point1[X], i * 3 + 0);
+			measureMidPoint1Tag.SetValue(point1[Y], i * 3 + 1);
+			measureMidPoint1Tag.SetValue(point1[Z], i * 3 + 2);
 
-			measureMidPoint2Tag.SetValue(point2[X], i * 2 + 0);
-			measureMidPoint2Tag.SetValue(point2[Y], i * 2 + 1);
-			measureMidPoint2Tag.SetValue(point2[Z], i * 2 + 2);
+			measureMidPoint2Tag.SetValue(point2[X], i * 3 + 0);
+			measureMidPoint2Tag.SetValue(point2[Y], i * 3 + 1);
+			measureMidPoint2Tag.SetValue(point2[Z], i * 3 + 2);
 		}
 
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))

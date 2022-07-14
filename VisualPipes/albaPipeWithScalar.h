@@ -131,6 +131,7 @@ protected:
 	
 	albaGUILutSwatch *m_LutSwatch;
 	albaGUILutSlider		*m_LutSlider;
+	wxComboBox *m_ScalarComboBox;
 
   void CreateFieldDataControlArrays();
 	
