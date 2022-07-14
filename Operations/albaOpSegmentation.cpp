@@ -1692,6 +1692,8 @@ void albaOpSegmentation::OnSelectSlicePlane()
 	}
 	UpdateSliderValidator();
 
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_COPY_FROM_LAST_SLICE, false);
+
 	m_View->SetSliceAxis(m_SlicePlane);
 
 	albaPipeVolumeOrthoSlice *pipeOrtho = (albaPipeVolumeOrthoSlice *)m_View->GetNodePipe(m_Volume);
@@ -2002,16 +2004,14 @@ void albaOpSegmentation::OnEditSegmentationEvent(albaEvent *e)
 			m_GuiDialog->Enable(ID_SLICE_PREV, false);
 			m_GuiDialog->Enable(ID_SLICE_TEXT, false);
 			m_GuiDialog->Enable(ID_BUTTON_INIT, false);
+			m_GuiDialog->Enable(ID_MANUAL_COPY_FROM_LAST_SLICE, false);
 
 
 			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
 		}
 		break;
 		case ID_MANUAL_TOOLS_BRUSH:
-		{
 			OnToolBrush();
-
-		}
 		break;
 		case ID_MANUAL_TOOLS_FILL:
 			OnFillEdit();
@@ -2309,6 +2309,8 @@ void albaOpSegmentation::SwitchPlane(albaEvent * e)
 	m_GuiDialog->Enable(ID_SLICE_PREV, true);
 	m_GuiDialog->Enable(ID_SLICE_TEXT, true);
 	m_GuiDialog->Enable(ID_BUTTON_INIT, true);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_COPY_FROM_LAST_SLICE, false);
+
 
 	if (m_OldManualSegmentationTools == DRAW_EDIT)
 		OnToolBrush();
