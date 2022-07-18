@@ -220,7 +220,7 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_MajorityThreshold = 9;
 
 	m_BrushFillErase = 0;
-	m_AutofillOnRelease = FALSE;
+	m_AutofillOnRelease = TRUE;
 
 
   m_SliceBackup = NULL;
