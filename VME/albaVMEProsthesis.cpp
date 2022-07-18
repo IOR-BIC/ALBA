@@ -479,7 +479,7 @@ void albaVMEProsthesis::CreateRotCenterVME()
 		m_RotCenterVME->SetAbsMatrix(*(this->GetOutput()->GetAbsMatrix()));//RefSys start with prosthesis origin
 
 		SetRotCenterVME(m_RotCenterVME);
-		ShowRotCenter(false);
+		ShowRotCenter(true);
 	}
 }
 
