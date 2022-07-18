@@ -130,6 +130,7 @@ albaView *albaViewRXCT::Copy(albaObserver *Listener, bool lightCopyEnabled)
     v->m_PluggedChildViewList.push_back(m_PluggedChildViewList[i]->Copy(this));
   }
   v->m_NumOfPluggedChildren = m_NumOfPluggedChildren;
+	v->SetCanSpin(m_CanSpin);
   v->Create();
   return v;
 }
@@ -146,6 +147,7 @@ void albaViewRXCT::PackageView()
 		m_ViewsRX[v]->PlugVisualPipe("albaVMELabeledVolume", "albaPipeVolumeProjected", MUTEX);
 		m_ViewsRX[v]->PlugVisualPipe("albaVMESlicer", "albaVisualPipeSlicerSlice", MUTEX);
 		m_ViewsRX[v]->PlugVisualPipe("albaVMESegmentationVolume", "albaPipeVolumeProjected", MUTEX);
+		m_ViewsRX[v]->SetCanSpin(false);
 
 		PlugChildView(m_ViewsRX[v]);
 	}
@@ -166,6 +168,8 @@ void albaViewRXCT::PackageView()
 	vs->PlugVisualPipe("albaVMEProsthesis", "albaPipeSurfaceSlice");
 	vs->PlugVisualPipe("albaVMESegmentationVolume", "albaPipeVolumeOrthoSlice", MUTEX);
 	vs->SetCanSpin(false);
+
+	SetCanSpin(false);
 
 	m_ViewCTCompound->PlugChildView(vs);
 	PlugChildView(m_ViewCTCompound);
@@ -953,9 +957,18 @@ void albaViewRXCT::ResetSlicesPosition(albaVME *vme)
 {
   // workaround... :(
   // maybe we need some mechanism to execute view code from op?
-  this->VmeShow(vme, false);
-  this->VmeShow(vme, true);
-  CameraUpdate();
+	double b[6];
+	vtkDataSet *data = vme->GetOutput()->GetVTKData();
+	data->GetBounds(b);
+	double step = (b[5] - b[4]) / 7.0;
+	for (int i = 0; i < CT_CHILD_VIEWS_NUMBER; i++)
+	{
+		m_Pos[i] = b[5] - step*(i + 1);
+		m_GizmoSlice[i]->UpdateGizmoSliceInLocalPositionOnAxis(i, albaGizmoSlice::GIZMO_SLICE_Z, m_Pos[i]);
+
+	}
+	SortSlices();
+	CameraUpdate();
 }
 //----------------------------------------------------------------------------
 bool albaViewRXCT::IsPickedSliceView()
