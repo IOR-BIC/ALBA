@@ -146,7 +146,7 @@ protected:
   /** Precess events coming from other objects */
 	void OnEventRangeModified(albaEventBase *alba_event);
   /** Precess events coming from other objects */
-	void OnEventSortSlices();
+	void OnEventSortSlices(albaVME *vme = NULL);
   /** Precess events coming from other objects */
 	void OnEventSetThickness();
 
