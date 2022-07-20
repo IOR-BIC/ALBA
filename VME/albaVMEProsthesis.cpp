@@ -61,7 +61,7 @@ albaVMEProsthesis::albaVMEProsthesis()
   m_InteractorGenericMouseFloatVME = NULL;
 
 	m_RotCenterVME = NULL;
-
+	m_LockOnOpRun = true;
 }
 //-------------------------------------------------------------------------
 albaVMEProsthesis::~albaVMEProsthesis()
@@ -431,8 +431,8 @@ void albaVMEProsthesis::OnComponentEvent(int compGroup, int id)
 void albaVMEProsthesis::OnTranfromEvent(albaEvent *e)
 {
 	long arg = e->GetArg();
-
-	if (arg == albaInteractorGenericMouse::MOUSE_MOVE)
+	
+	if (arg == albaInteractorGenericMouse::MOUSE_MOVE && (!m_LockOnOpRun || !GetLogicManager()->IsOperationRunning()))
 	{
 		// Update Matrix
 		// handle incoming transform events
