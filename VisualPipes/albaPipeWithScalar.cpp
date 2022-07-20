@@ -456,7 +456,7 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 		if (m_MapsGenActive)
 		{
 			sr[0] = 0;
-			sr[1] = 1400;
+			sr[1] = 700;
 		}
 		else
 			data->GetPointData()->GetScalars()->GetRange(sr);
