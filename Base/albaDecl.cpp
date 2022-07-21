@@ -31,18 +31,25 @@
 
 static long GLO_randCol = 117;
 static bool GLO_yelding;
+static bool GLO_yieldEnabled;
 static std::string GLO_appDebugDir;
 
 //----------------------------------------------------------------------------
 void albaYield()
 //----------------------------------------------------------------------------
 {
-   if(!GLO_yelding)
+   if(GLO_yieldEnabled && !GLO_yelding)
    {
        GLO_yelding=true;
        wxYield();
        GLO_yelding=false;
    }
+}
+
+//----------------------------------------------------------------------------
+ALBA_EXPORT void albaEnableYielding(bool enable/*=true*/)
+{
+
 }
 
 //----------------------------------------------------------------------------
