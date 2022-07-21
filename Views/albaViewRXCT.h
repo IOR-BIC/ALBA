@@ -181,7 +181,7 @@ protected:
 
   //obsolete variable
   //vtkLookupTable  *m_vtkLUT[3];
-  vtkLookupTable *m_ColorLUT; 
+  vtkLookupTable *m_VtkLUT; 
 
   albaGUILutSwatch *m_LutWidget;
 
