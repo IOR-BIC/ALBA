@@ -63,6 +63,9 @@ albaInteractor2DMeasure_Template::albaInteractor2DMeasure_Template() : albaInter
 	m_MeasureTypeText = "TEMPLATE";
 	m_EditMeasureEnable = false;
 	m_CurrPoint = NO_POINT;
+	m_CurrPlane = 0; // XY;
+
+	m_ConfigDir = "";
 
 	Color color{ 0.6, 0.0, 0.6, 1.0 };
 
@@ -128,21 +131,25 @@ void albaInteractor2DMeasure_Template::EditMeasure(int index, double *point)
 	{
 		pointUL[X] = point[X];
 		pointUL[Y] = point[Y];
+		pointUL[Z] = point[Z];
 	}
 	else if (m_CurrPoint == POINT_2)
 	{
 		pointUR[X] = point[X];
 		pointUR[Y] = point[Y];
+		pointUR[Z] = point[Z];
 	}
 	else if (m_CurrPoint == POINT_3)
 	{
 		pointDR[X] = point[X];
 		pointDR[Y] = point[Y];
+		pointDR[Z] = point[Z];
 	}
 	else if (m_CurrPoint == POINT_4)
 	{
 		pointDL[X] = point[X];
 		pointDL[Y] = point[Y];
+		pointDL[Z] = point[Z];
 	}
 
 	m_LastEditing = index;
@@ -261,7 +268,7 @@ void albaInteractor2DMeasure_Template::UpdatePointsActor(double * pointUL, doubl
 	pointSourceDL->Update();
 
 	// Center
-	double pointC[3]{ 0.0, 0.0, 0.0 };
+	double pointC[3];
 	GetCenter(m_CurrMeasure, pointC);
 
 	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[m_CurrMeasure]->GetSource();
@@ -271,7 +278,7 @@ void albaInteractor2DMeasure_Template::UpdatePointsActor(double * pointUL, doubl
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Template::UpdateTexureActor(double * pointUL, double * pointUR, double * pointDR, double * pointDL)
 {
-	double pointC[3]{ 0.0, 0.0, 0.0 };
+	double pointC[3];
 	GetCenter(m_CurrMeasure, pointC);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -299,7 +306,7 @@ void albaInteractor2DMeasure_Template::AddMeasure(double * pointUL, double * poi
 		double oldPoint1[3], oldPoint2[3], oldPoint3[3], oldPoint4[3];
 		GetMeasurePoints(index, oldPoint1, oldPoint2, oldPoint3, oldPoint4);
 
-		if (GeometryUtils::DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
+		if (DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
 		{
 			m_CurrMeasure = index;
 			m_CurrPoint = POINT_2;
@@ -335,7 +342,10 @@ void albaInteractor2DMeasure_Template::AddMeasure(double * pointUL, double * poi
 	vtkNEW(points);
 	points->SetNumberOfPoints(nPoints);
 
-	points->SetPoint(0, GeometryUtils::GetMidPoint(pointUL, pointDR));
+	double midPoint[3];
+	GetMidPoint(midPoint, pointUL, pointDR);
+
+	points->SetPoint(0, midPoint);
 	points->SetPoint(1, pointUL);
 	points->SetPoint(2, pointUR);
 	points->SetPoint(3, pointDR);
@@ -381,6 +391,9 @@ void albaInteractor2DMeasure_Template::AddMeasure(double * pointUL, double * poi
 	texture->InterpolateOff();
 
 	wxString configDir = GetConfigDirectory().c_str();
+
+	if (!m_ConfigDir.IsEmpty())
+		configDir = m_ConfigDir;	
 
 	// Read the image which will be the texture
 	vtkPNGReader *imageReader;
@@ -480,14 +493,14 @@ void albaInteractor2DMeasure_Template::EditTextureCoord(int index, double * poin
 	textureCoordinates->SetName("TextureCoordinates");
 	textureCoordinates->SetNumberOfComponents(2);
 
-	double center[2]{ (pointDR[0] + pointUL[0]) / 2, (pointDR[1] + pointUL[1]) / 2 };
+	double center[2]{ (pointDR[X] + pointUL[X]) / 2, (pointDR[Y] + pointUL[Y]) / 2 };
 
-	textureCoordinates->InsertTuple2(0, center[0], center[1]);
-	textureCoordinates->InsertTuple2(1, pointUL[0], pointUL[1]);
-	textureCoordinates->InsertTuple2(2, pointUR[0], pointUR[1]);
-	textureCoordinates->InsertTuple2(3, pointDR[0], pointDR[1]);
-	textureCoordinates->InsertTuple2(4, pointDL[0], pointDL[1]);
-	textureCoordinates->InsertTuple2(5, pointUL[0], pointUL[1]);
+	textureCoordinates->InsertTuple2(0, center[X], center[Y]);
+	textureCoordinates->InsertTuple2(1, pointUL[X], pointUL[Y]);
+	textureCoordinates->InsertTuple2(2, pointUR[X], pointUR[Y]);
+	textureCoordinates->InsertTuple2(3, pointDR[X], pointDR[Y]);
+	textureCoordinates->InsertTuple2(4, pointDL[X], pointDL[Y]);
+	textureCoordinates->InsertTuple2(5, pointUL[X], pointUL[Y]);
 
 	// PolyData - Quad
 	m_QuadVector[index]->GetPointData()->SetTCoords(textureCoordinates);
@@ -665,8 +678,7 @@ void albaInteractor2DMeasure_Template::GetCenter(int index, double *center)
 	// Return center points values
 	if (index >= 0 && index < GetMeasureCount())
 	{
-		double pointUL[3]{ 0.0, 0.0, 0.0 };
-		double pointDR[3]{ 0.0, 0.0, 0.0 };
+		double pointUL[3], pointDR[3];
 
 		// Up Left
 		vtkPointSource* pointSourceUL = (vtkPointSource*)m_PointsStackVectorUL[m_CurrMeasure]->GetSource();
@@ -678,7 +690,7 @@ void albaInteractor2DMeasure_Template::GetCenter(int index, double *center)
 
 		center[X] = (pointUL[X] + pointDR[X]) / 2;
 		center[Y] = (pointUL[Y] + pointDR[Y]) / 2;
-		center[Z] = 0.0;
+		center[Z] = (pointUL[Z] + pointDR[Z]) / 2;
 	}
 }
 
@@ -746,7 +758,7 @@ void albaInteractor2DMeasure_Template::CropImage(albaVMEImage *vmeImage)
 	{
 		double p1[3], p2[3], p3[3], p4[3];
 		GetMeasurePoints(0, p1, p2, p3, p4);
-		double croppingBoxBounds[6]{ p1[0],p3[0],p1[1],p3[1],0,0 };
+		double croppingBoxBounds[6]{ p1[X],p3[X],p1[Y],p3[Y],p1[Z],p3[Z] };
 
 		CropImage(vmeImage, croppingBoxBounds);
 	}
@@ -770,9 +782,9 @@ void albaInteractor2DMeasure_Template::CropImage(albaVMEImage *vmeImage, double 
 
 		double spc[3];
 		inputSP->GetSpacing(spc);
-		double m_XSpacing = spc[0];
-		double m_YSpacing = spc[1];
-		double m_ZSpacing = spc[2];
+		double m_XSpacing = spc[X];
+		double m_YSpacing = spc[Y];
+		double m_ZSpacing = spc[Z];
 
 		double xBoundLength, yBoundLength, zBoundLength;
 		xBoundLength = fabs(inputBounds[1] - inputBounds[0]);
@@ -840,9 +852,9 @@ void albaInteractor2DMeasure_Template::CropImage(albaVMEImage *vmeImage, double 
 
 		// using the vtkALBASmartPointer allows you to don't mind the object Delete
 		vtkALBASmartPointer<vtkImageData> v_esp;
-		v_esp->SetOrigin(in_org[0] + voi_dim[0] * m_XSpacing,
-			in_org[1] + voi_dim[2] * m_YSpacing,
-			in_org[2] + voi_dim[4] * m_ZSpacing);
+		v_esp->SetOrigin(in_org[X] + voi_dim[0] * m_XSpacing,
+			in_org[Y] + voi_dim[2] * m_YSpacing,
+			in_org[Z] + voi_dim[4] * m_ZSpacing);
 		v_esp->SetSpacing(m_XSpacing, m_YSpacing, m_ZSpacing);
 		v_esp->SetDimensions(voi_dim[1] - voi_dim[0] + 1,
 			voi_dim[3] - voi_dim[2] + 1,
@@ -901,21 +913,21 @@ bool albaInteractor2DMeasure_Template::Load(albaVME *input, wxString tag)
 		// Reload points
 		for (int i = 0; i < nTemplates; i++)
 		{
-			pointUL[0] = measureTemplatePoint1Tag->GetValueAsDouble(i * 2 + 0);
-			pointUL[1] = measureTemplatePoint1Tag->GetValueAsDouble(i * 2 + 1);
-			pointUL[2] = 0.0;
+			pointUL[X] = measureTemplatePoint1Tag->GetValueAsDouble(i * 3 + 0);
+			pointUL[Y] = measureTemplatePoint1Tag->GetValueAsDouble(i * 3 + 1);
+			pointUL[Z] = measureTemplatePoint1Tag->GetValueAsDouble(i * 3 + 2);
 
-			pointUR[0] = measureTemplatePoint2Tag->GetValueAsDouble(i * 2 + 0);
-			pointUR[1] = measureTemplatePoint2Tag->GetValueAsDouble(i * 2 + 1);
-			pointUR[2] = 0.0;
+			pointUR[X] = measureTemplatePoint2Tag->GetValueAsDouble(i * 3 + 0);
+			pointUR[Y] = measureTemplatePoint2Tag->GetValueAsDouble(i * 3 + 1);
+			pointUR[Z] = measureTemplatePoint2Tag->GetValueAsDouble(i * 3 + 2);
 
-			pointDR[0] = measureTemplatePoint3Tag->GetValueAsDouble(i * 2 + 0);
-			pointDR[1] = measureTemplatePoint3Tag->GetValueAsDouble(i * 2 + 1);
-			pointDR[2] = 0.0;
+			pointDR[X] = measureTemplatePoint3Tag->GetValueAsDouble(i * 3 + 0);
+			pointDR[Y] = measureTemplatePoint3Tag->GetValueAsDouble(i * 3 + 1);
+			pointDR[Z] = measureTemplatePoint3Tag->GetValueAsDouble(i * 3 + 2);
 
-			pointDL[0] = measureTemplatePoint4Tag->GetValueAsDouble(i * 2 + 0);
-			pointDL[1] = measureTemplatePoint4Tag->GetValueAsDouble(i * 2 + 1);
-			pointDL[2] = 0.0;
+			pointDL[X] = measureTemplatePoint4Tag->GetValueAsDouble(i * 3 + 0);
+			pointDL[Y] = measureTemplatePoint4Tag->GetValueAsDouble(i * 3 + 1);
+			pointDL[Z] = measureTemplatePoint4Tag->GetValueAsDouble(i * 3 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -969,17 +981,21 @@ bool albaInteractor2DMeasure_Template::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			measureTemplatePoint1Tag.SetValue(pointUL[0], i * 2 + 0);
-			measureTemplatePoint1Tag.SetValue(pointUL[1], i * 2 + 1);
+			measureTemplatePoint1Tag.SetValue(pointUL[X], i * 3 + 0);
+			measureTemplatePoint1Tag.SetValue(pointUL[Y], i * 3 + 1);
+			measureTemplatePoint1Tag.SetValue(pointUL[Z], i * 3 + 2);
 
-			measureTemplatePoint2Tag.SetValue(pointUR[0], i * 2 + 0);
-			measureTemplatePoint2Tag.SetValue(pointUR[1], i * 2 + 1);
+			measureTemplatePoint2Tag.SetValue(pointUR[X], i * 3 + 0);
+			measureTemplatePoint2Tag.SetValue(pointUR[Y], i * 3 + 1);
+			measureTemplatePoint2Tag.SetValue(pointUR[Z], i * 3 + 2);
 
-			measureTemplatePoint3Tag.SetValue(pointDR[0], i * 2 + 0);
-			measureTemplatePoint3Tag.SetValue(pointDR[1], i * 2 + 1);
+			measureTemplatePoint3Tag.SetValue(pointDR[X], i * 3 + 0);
+			measureTemplatePoint3Tag.SetValue(pointDR[Y], i * 3 + 1);
+			measureTemplatePoint3Tag.SetValue(pointDR[Z], i * 3 + 2);
 
-			measureTemplatePoint4Tag.SetValue(pointDL[0], i * 2 + 0);
-			measureTemplatePoint4Tag.SetValue(pointDL[1], i * 2 + 1);
+			measureTemplatePoint4Tag.SetValue(pointDL[X], i * 3 + 0);
+			measureTemplatePoint4Tag.SetValue(pointDL[Y], i * 3 + 1);
+			measureTemplatePoint4Tag.SetValue(pointDL[Z], i * 3 + 2);
 		}
 
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))

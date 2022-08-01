@@ -33,6 +33,7 @@ SET(PROJECT_SRCS
 	albaLicenceManager.cpp 												albaLicenceManager.h  
 	albaTextFileReaderHelper.cpp										albaTextFileReaderHelper.h
 	albaProsthesesDBManager.cpp albaProsthesesDBManager.h
+	albaGeometryUtils.cpp		albaGeometryUtils.h
 )
 
 # List libraries that are needed by this project.

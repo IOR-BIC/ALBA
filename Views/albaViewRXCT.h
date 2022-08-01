@@ -57,7 +57,10 @@ public:
   /** Precess events coming from other objects */
   virtual void OnEvent(albaEventBase *alba_event);
   
-  /** Show/Hide VMEs into plugged sub-views */
+	//Sets the side on volume
+	void SetSideOnVolume();
+
+	/** Show/Hide VMEs into plugged sub-views */
   virtual void VmeShow(albaVME *vme, bool show);
 
   /** Remove VME into plugged sub-views */
@@ -143,10 +146,13 @@ protected:
   /** Precess events coming from other objects */
 	void OnEventRangeModified(albaEventBase *alba_event);
   /** Precess events coming from other objects */
-	void OnEventSortSlices();
+	void OnEventSortSlices(albaVME *vme = NULL);
   /** Precess events coming from other objects */
 	void OnEventSetThickness();
-  /** Precess events coming from other objects */
+
+	/** Sets Thickness on Pipe*/
+	void SetBorder(albaPipe * p);
+	/** Precess events coming from other objects */
   void OnEventMouseMove(albaEvent *e);
   int			m_Sort[6];
   double	m_Pos[6];
@@ -175,7 +181,7 @@ protected:
 
   //obsolete variable
   //vtkLookupTable  *m_vtkLUT[3];
-  vtkLookupTable *m_ColorLUT; 
+  vtkLookupTable *m_VtkLUT; 
 
   albaGUILutSwatch *m_LutWidget;
 

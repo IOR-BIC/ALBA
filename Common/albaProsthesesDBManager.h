@@ -217,6 +217,7 @@ public:
 	std::vector<albaProDBProsthesis *> SearchProstheses(albaString producer, albaString type, albaString side);
 	std::vector<albaProDBProsthesis *>& GetProstheses() { return m_Prostheses; };
 	bool HasProsthesis(albaString prosthesis, albaProDBProsthesis::PRO_SIDES side);
+	albaProDBProsthesis * GetProsthesis(albaString prosthesis, albaProDBProsthesis::PRO_SIDES side);
 	void DeleteProsthesis(albaString prosthesis, albaProDBProsthesis::PRO_SIDES side);
 	void AddProsthesis(albaProDBProsthesis *prosthesis);
 
@@ -236,7 +237,7 @@ public:
  	void SaveDBToFile(albaString DBFile) { m_DBFilename = DBFile; SaveDB(); };
 // 
 	albaString GetDBDir() const { return m_DBDir; }
-	void SetDBDir(albaString val) { m_DBDir = val; }
+	void SetDBDir(albaString val);
 	albaString GetPassPhrase() const { return m_PassPhrase; }
 	void SetPassPhrase(albaString val) { m_PassPhrase = val; }
 private:

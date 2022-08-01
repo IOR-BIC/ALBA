@@ -51,11 +51,14 @@
 #include "vtkBMPWriter.h"
 */
 //----------------------------------------------------------------------------
-albaViewManager::albaViewManager()
+albaViewManager::albaViewManager() :	albaGUISettings(this, _("View Manager"))
 //----------------------------------------------------------------------------
 {
   m_Mouse       = NULL;
   m_SelectedRWI = NULL;
+
+	m_SettingsGui = NULL;
+	InitializeSettings();
 
   m_ViewList          = NULL;
   m_Listener          = NULL;
@@ -75,7 +78,6 @@ albaViewManager::albaViewManager()
 }
 //----------------------------------------------------------------------------
 albaViewManager::~albaViewManager()
-//----------------------------------------------------------------------------
 {	
 	if(m_SelectedRWI)
     m_SelectedRWI->SetMouse(NULL);
@@ -96,7 +98,6 @@ albaViewManager::~albaViewManager()
 
 //----------------------------------------------------------------------------
 void albaViewManager::SetMouse(albaDeviceButtonsPadMouse *mouse)
-//----------------------------------------------------------------------------
 {
   m_Mouse = mouse;
   if(m_SelectedView && m_Mouse)
@@ -104,8 +105,71 @@ void albaViewManager::SetMouse(albaDeviceButtonsPadMouse *mouse)
 }
 
 //----------------------------------------------------------------------------
-void albaViewManager::OnEvent(albaEventBase *alba_event)
+albaGUI* albaViewManager::GetSettingsGui()
+{
+	if (m_SettingsGui == NULL)
+	{
+		m_SettingsGui = new albaGUI(this);
+
+		m_SettingsGui->Label("View Settings", true);
+		m_SettingsGui->Label("");
+
+ 		m_SettingsGui->Bool(ID_VIEW_SETTING_MAXIMIZE, "Maximize on open", &m_ViewMaximize, 1);
+		m_SettingsGui->Bool(ID_VIEW_SETTING_OPEN_ONLY_ONE, "Open only one view of each type", &m_ViewOpenOnlyOne, 1);
+		m_SettingsGui->Divider(1);
+
+		m_SettingsGui->Label("Background");
+		m_SettingsGui->Color(ID_VIEW_SETTING_COLOR, "Color", &m_ViewColorBackground);
+		m_SettingsGui->Button(ID_VIEW_SETTING_COLOR_DEFAULT, "Default Color");
+		m_SettingsGui->Label("");
+	}
+
+	return m_SettingsGui;
+}
+
 //----------------------------------------------------------------------------
+void albaViewManager::EnableViewSettings(bool enable /*= true*/)
+{
+	if (m_SettingsGui != NULL)
+	{
+		m_SettingsGui->Enable(ID_VIEW_SETTING_MAXIMIZE, enable);
+		m_SettingsGui->Enable(ID_VIEW_SETTING_OPEN_ONLY_ONE, enable);
+		m_SettingsGui->Enable(ID_VIEW_SETTING_COLOR, enable);
+		m_SettingsGui->Enable(ID_VIEW_SETTING_COLOR_DEFAULT, enable);
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaViewManager::InitializeSettings()
+{
+	m_ViewMaximize = 1;
+	m_ViewOpenOnlyOne = 0;
+		
+	int m_Color[3] = { 71, 71, 71 };
+
+	//On first run i cannot read configuration
+	if (!m_Config->Read("View_Maximize", &m_ViewMaximize))
+		m_Config->Write("View_Maximize", m_ViewMaximize); // So i will save default value
+
+	if (!m_Config->Read("View_OpenOnlyOne", &m_ViewOpenOnlyOne))
+		m_Config->Write("View_OpenOnlyOne", m_ViewOpenOnlyOne); // So i will save default value
+
+	if (!m_Config->Read("View_ColorBackgroundR", &m_Color[0]))
+		m_Config->Write("View_ColorBackgroundR", m_Color[0]); // So i will save default value
+
+	if (!m_Config->Read("View_ColorBackgroundB", &m_Color[1]))
+		m_Config->Write("View_ColorBackgroundB", m_Color[1]); // So i will save default value
+
+	if (!m_Config->Read("View_ColorBackgroundG", &m_Color[2]))
+		m_Config->Write("View_ColorBackgroundG", m_Color[2]); // So i will save default value
+
+	m_ViewColorBackground = wxColor(m_Color[0], m_Color[1], m_Color[2]);
+
+	m_Config->Flush();
+}
+
+//----------------------------------------------------------------------------
+void albaViewManager::OnEvent(albaEventBase *alba_event)
 {
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
@@ -131,6 +195,39 @@ void albaViewManager::OnEvent(albaEventBase *alba_event)
           albaEventMacro(albaEvent(this,VIEW_SELECT)); // forward the view selection event to logic
       }
       break;
+
+			case ID_VIEW_SETTING_MAXIMIZE:
+			{
+				m_Config->Write("View_Maximize", m_ViewMaximize);
+				m_Config->Flush();
+			}
+			break;
+
+			case ID_VIEW_SETTING_OPEN_ONLY_ONE:
+			{
+				m_Config->Write("View_OpenOnlyOne", m_ViewOpenOnlyOne);
+				m_Config->Flush();
+			}
+			break;
+
+			case ID_VIEW_SETTING_COLOR:
+			{
+				m_Config->Write("View_ColorBackgroundR", m_ViewColorBackground.Red());
+				m_Config->Write("View_ColorBackgroundB", m_ViewColorBackground.Blue());
+				m_Config->Write("View_ColorBackgroundG", m_ViewColorBackground.Green());
+				m_Config->Flush();
+			}
+			break;
+			case ID_VIEW_SETTING_COLOR_DEFAULT:
+			{
+				m_ViewColorBackground.Set(71, 71, 71);
+				m_SettingsGui->Update();
+				m_Config->Write("View_ColorBackgroundR", m_ViewColorBackground.Red());
+				m_Config->Write("View_ColorBackgroundB", m_ViewColorBackground.Blue());
+				m_Config->Write("View_ColorBackgroundG", m_ViewColorBackground.Green());
+				m_Config->Flush();
+			}
+			break;
       default:
         albaEventMacro(*e); // forward up the event
       break; 
@@ -139,7 +236,6 @@ void albaViewManager::OnEvent(albaEventBase *alba_event)
 }
 //----------------------------------------------------------------------------
 void albaViewManager::ViewAdd(albaView *view, bool visibleInMenu)
-//----------------------------------------------------------------------------
 {
   m_ViewTemplate[m_TemplateNum] = view;
   // Update the view ID (starting from VIEW_START)
@@ -156,7 +252,6 @@ void albaViewManager::ViewAdd(albaView *view, bool visibleInMenu)
 }
 //----------------------------------------------------------------------------
 void albaViewManager::ViewSelected(albaView *view/*, albaRWIBase *rwi*/)
-//----------------------------------------------------------------------------
 {
   m_SelectedView = view;
 
@@ -173,7 +268,6 @@ void albaViewManager::ViewSelected(albaView *view/*, albaRWIBase *rwi*/)
 }
 //----------------------------------------------------------------------------
 void albaViewManager::VmeAdd(albaVME *vme)   
-//----------------------------------------------------------------------------
 {
   for(albaView* v = m_ViewList; v; v=v->m_Next) 
     v->VmeAdd(vme); // Add the VME in all the views
@@ -188,7 +282,6 @@ void albaViewManager::VmeAdd(albaVME *vme)
 }
 //----------------------------------------------------------------------------
 void albaViewManager::VmeRemove(albaVME *vme)   
-//----------------------------------------------------------------------------
 {
   for(albaView* v = m_ViewList; v; v=v->m_Next) 
     v->VmeRemove(vme); // Remove the VME in all the views
@@ -206,14 +299,12 @@ void albaViewManager::VmeRemove(albaVME *vme)
 }
 //----------------------------------------------------------------------------
 void albaViewManager::VmeModified(albaVME *vme)
-//---------------------------------------------------------------------------
 {
  //@@@ for(albaView* v = m_ViewList; v; v=v->m_next) 
  //@@@   v->VmeModified(vme);  -- view::vmeModified not exist now -- is this required ?
 }
 //----------------------------------------------------------------------------
 void albaViewManager::VmeSelect(albaVME *vme)   
-//----------------------------------------------------------------------------
 {
 	if (vme != m_SelectedVme)
 	{
@@ -232,7 +323,6 @@ void albaViewManager::VmeSelect(albaVME *vme)
 }
 //----------------------------------------------------------------------------
 void albaViewManager::VmeShow(albaVME *vme, bool show)   
-//----------------------------------------------------------------------------
 {
  if(m_ViewBeingCreated) // Important - test m_ViewBeingCreated first
  {
@@ -250,26 +340,22 @@ void albaViewManager::VmeShow(albaVME *vme, bool show)
 }
 //----------------------------------------------------------------------------
 void albaViewManager::PropertyUpdate(bool fromTag)
-//----------------------------------------------------------------------------
 {
   for(albaView* v = m_ViewList; v; v=v->m_Next) 
 		v->VmeUpdateProperty(this->m_SelectedVme, fromTag); // update the vme properties in all views
 }
 //----------------------------------------------------------------------------
 void albaViewManager::CameraReset(bool sel)   
-//----------------------------------------------------------------------------
 {
   if(m_SelectedView) m_SelectedView->CameraReset(sel ? m_SelectedVme : NULL); // reset the camera in the selected view
 }
 //----------------------------------------------------------------------------
 void albaViewManager::CameraReset(albaVME *vme)   
-//----------------------------------------------------------------------------
 {
   if(m_SelectedView) m_SelectedView->CameraReset(); // reset the camera in the selected view
 }
 //----------------------------------------------------------------------------
 void albaViewManager::CameraUpdate(bool only_selected)   
-//----------------------------------------------------------------------------
 {
   if (only_selected && m_SelectedView != NULL)
   {
@@ -281,16 +367,13 @@ void albaViewManager::CameraUpdate(bool only_selected)
 }
 //----------------------------------------------------------------------------
 void albaViewManager::CameraFlyToMode()
-//----------------------------------------------------------------------------
 {
 //  if(m_is) m_is->FlyToMode();
 }
 //----------------------------------------------------------------------------
 void albaViewManager::OnQuit()
-//----------------------------------------------------------------------------
 {
 }
-
 
 //----------------------------------------------------------------------------
 void albaViewManager::FillMenu(wxMenu* menu)
@@ -305,10 +388,8 @@ void albaViewManager::FillMenu(wxMenu* menu)
   }
 }
 
-
 //----------------------------------------------------------------------------
 bool albaViewManager::IsVisibleInMenu(albaView* v)
-//----------------------------------------------------------------------------
 {
   for(int i=0; i<m_IdInvisibleMenuList.size(); i++) // Search the specified view
   {
@@ -319,7 +400,6 @@ bool albaViewManager::IsVisibleInMenu(albaView* v)
 }
 //----------------------------------------------------------------------------
 albaView *albaViewManager::ViewCreate(int id)
-//----------------------------------------------------------------------------
 {
 	albaView* new_view = NULL;
 	albaView* view = NULL;
@@ -333,6 +413,13 @@ albaView *albaViewManager::ViewCreate(int id)
 	view = m_ViewTemplate[index];
   if(!view) return NULL;
 
+
+	if (m_ViewOpenOnlyOne)
+		for (albaView * view = GetList(); view; view = view->m_Next)
+		{
+			if (view->m_Id == id) return view;
+		}
+	
   // Paolo 2005-04-22
   int view_mult = 0;
   new_view = view->Copy(this); // the crated view is a copy of the specified template view
@@ -353,11 +440,13 @@ albaView *albaViewManager::ViewCreate(int id)
 
   albaEventMacro(albaEvent(this,VIEW_CREATED,new_view)); // ask Logic to create the frame
 
- 	new_view->GetFrame()->Maximize();
+	if (m_ViewMaximize)
+		new_view->GetFrame()->Maximize();
 
 	new_view->GetFrame()->SetMinSize(wxSize(500, 300));
 	new_view->GetFrame()->Show(true); // show the view's frame
- 	
+	new_view->SetBackgroundColor(m_ViewColorBackground);
+
 	//Setting size to avoid wrong graphic draw 
 	
 	albaYield();
@@ -366,7 +455,6 @@ albaView *albaViewManager::ViewCreate(int id)
 }
 //----------------------------------------------------------------------------
 albaView *albaViewManager::ViewCreate(wxString label)
-//----------------------------------------------------------------------------
 {
 	albaView* new_view = NULL;
 	albaView* view     = NULL;
@@ -385,6 +473,12 @@ albaView *albaViewManager::ViewCreate(wxString label)
   
   if (view==NULL) 
     return NULL;
+
+	if(m_ViewOpenOnlyOne)
+		for (albaView * view = GetList(); view; view = view->m_Next)
+		{
+			if (view->IsA(label)) return view;
+		}
 
   // Paolo 2005-04-22
   int view_mult = 0;
@@ -405,12 +499,12 @@ albaView *albaViewManager::ViewCreate(wxString label)
   albaEventMacro(albaEvent(this,VIEW_CREATED,new_view)); // ask Logic to create the frame
   
   new_view->GetFrame()->Show(true); // show the view's frame
+	new_view->SetBackgroundColor(m_ViewColorBackground);
 
 	return new_view;
 }
 //----------------------------------------------------------------------------
 void albaViewManager::ViewInsert(albaView *view)
-//----------------------------------------------------------------------------
 {
 	view->SetListener(this);
   view->SetMouse(m_Mouse); // set the mouse for the specified view
@@ -436,7 +530,6 @@ void albaViewManager::ViewInsert(albaView *view)
 }
 //----------------------------------------------------------------------------
 void albaViewManager::ViewDelete(albaView *view)
-//----------------------------------------------------------------------------
 {
   if(m_SelectedView)
   {
@@ -477,7 +570,6 @@ void albaViewManager::ViewDelete(albaView *view)
 }
 //----------------------------------------------------------------------------
 void albaViewManager::ViewDeleteAll()
-//----------------------------------------------------------------------------
 {
   if(m_SelectedView)
   {
@@ -495,20 +587,17 @@ void albaViewManager::ViewDeleteAll()
 }
 //----------------------------------------------------------------------------
 albaView *albaViewManager::GetSelectedView()
-//----------------------------------------------------------------------------
 {
   return m_SelectedView; 
 }
 //----------------------------------------------------------------------------
 void albaViewManager::Activate(albaView *view)
-//----------------------------------------------------------------------------
 {
     ((albaGUIMDIChild *)view->GetFrame())->SetFocus();
 }
 
 //----------------------------------------------------------------------------
 albaView * albaViewManager::GetFromList( const char *label )
-//----------------------------------------------------------------------------
 {
   albaView *view;
   for(view = GetList(); view; view=view->m_Next)

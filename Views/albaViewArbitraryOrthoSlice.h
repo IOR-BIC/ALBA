@@ -124,6 +124,8 @@ public:
 		ID_CAMERA_FOLLOW_GIZMO,
 		ID_SHOW_GIZMO,
 		ID_SLICING_ORIGIN,
+		ID_ALL_SURFACE,
+		ID_BORDER_CHANGE,
 		ID_LAST,
 	};
 
@@ -198,6 +200,14 @@ protected:
 	void UpdateConesPosition();
 
 	void OnSlicingOrigin();
+
+	/** set thickness value for all the pipes*/
+	void SetThicknessForAllSurfaceSlices(albaVME *root);
+
+	void SetBorder(albaPipe * p);
+
+	/** Precess events coming from other objects */
+	void OnEventSetThickness();
 
 	/** 
 	Create the helper cone giving feedback for camera direction*/
@@ -279,7 +289,10 @@ protected:
 	int m_EnableGPU;
 	int m_CameraFollowGizmo;
 	int m_IsShowingSlicerGizmo;
-	
+
+	int m_AllSurface;
+	double m_Border;
+
 private:
 	void OnLoadFromRefsys();
 };

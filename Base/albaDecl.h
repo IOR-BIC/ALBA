@@ -447,6 +447,9 @@ ALBA_EXPORT void albaSetFrame(wxWindow* frame);
 /** process pending events. be careful not to call it recursively */    
 ALBA_EXPORT void albaYield();
 
+/** process pending events. be careful not to call it recursively */
+ALBA_EXPORT void albaEnableYielding(bool enable=true);
+
 /** show the Dir Selection Dialog Box */
 ALBA_EXPORT std::string  albaGetDirName(const char * initial, const char * title = "Select Directory", wxWindow *parent = NULL);
 
