@@ -81,7 +81,10 @@ public:
 
   /** Events handling method */
   void OnEvent(albaEventBase *alba_event);
- 
+
+	void GetPosition(double * slicePlaneOrigin);
+
+
   /** Gizmo is reparented under the vme tree root, this modality is currently not supported */
   void SetModalityToGlobal() {albaLogMessage("Global modality is currently not supported for this item");};
 

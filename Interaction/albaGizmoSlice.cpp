@@ -97,7 +97,7 @@ void albaGizmoSlice::CreateGizmoSlice(albaVME *imputVme, albaObserver *listener,
 
   albaNEW(m_VmeGizmo);
   m_VmeGizmo->SetName(m_Name);
-  m_VmeGizmo->ReparentTo(imputVme);
+  m_VmeGizmo->ReparentTo(m_InputVME);
 
   albaNEW(m_GizmoBehavior);
   m_MouseBH = m_GizmoBehavior->CreateBehavior(MOUSE_LEFT);
@@ -204,7 +204,7 @@ void albaGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int
 	}
 
 
-	double interval[3][2] = { {m_Bounds[0], m_Bounds[1]}, {m_Bounds[2], m_Bounds[3]}, {m_Bounds[4], m_Bounds[5]} };
+	double interval[3][2] = { {m_Bounds[0], m_Bounds[1]}, {m_Bounds[2], m_Bounds[3]}, {m_Bounds[4], m_Bounds[5]} }; 
 
 	InitSnapArray(m_InputVME, axis);
 	m_MouseBH->GetTranslationConstraint()->SetSnapArray(axis, m_SnapArray);
@@ -476,7 +476,8 @@ void albaGizmoSlice::OnEvent(albaEventBase *alba_event)
 
 				//local position of gizmo cube handle centre
 				double slicePlaneOrigin[3];
-				albaTransform::GetPosition(*m_GizmoHandleCenterMatrix, slicePlaneOrigin);
+				GetPosition(slicePlaneOrigin);
+
 
 				
 				// position sent as vtk point
@@ -655,11 +656,13 @@ void albaGizmoSlice::Show(bool show)
 void albaGizmoSlice::SetInput( albaVME *vme )
 //----------------------------------------------------------------------------
 {
-  if (m_VmeGizmo != NULL)
-  {
-    DestroyGizmoSlice();
-    CreateGizmoSlice(vme, m_Listener, m_Name, m_InverseHandle, m_CentralClipFactor);
-  }
+	m_InputVME = vme;
+
+	m_VmeGizmo->ReparentTo(m_InputVME);
+	if (m_InputVME)
+		m_MouseBH->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal(m_InputVME);
+	else
+		m_MouseBH->GetTranslationConstraint()->GetRefSys()->SetTypeToGlobal();
 }
 //----------------------------------------------------------------------------
 void albaGizmoSlice::SetPosition( albaMatrix *mat )
@@ -667,4 +670,10 @@ void albaGizmoSlice::SetPosition( albaMatrix *mat )
 {
   // update the gizmo local position
   m_VmeGizmo->SetMatrix(*mat);		 
+}
+
+//----------------------------------------------------------------------------
+void albaGizmoSlice::GetPosition(double * slicePlaneOrigin)
+{
+	albaTransform::GetPosition(*m_GizmoHandleCenterMatrix, slicePlaneOrigin);
 }
