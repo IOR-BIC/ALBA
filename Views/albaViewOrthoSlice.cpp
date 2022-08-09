@@ -557,6 +557,9 @@ void albaViewOrthoSlice::CreateGizmo()
 //----------------------------------------------------------------------------
 void albaViewOrthoSlice::GizmoShow()
 {
+	if (m_Gizmo[0] == NULL)
+		return;
+
 	double colors[] = { 1,0,0,  0,1,0,  0,0,1 };
 	for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
 	{
