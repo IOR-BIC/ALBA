@@ -44,12 +44,15 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkLookupTable.h"
 #include "vtkPoints.h"
 #include "albaPipeMeshSlice.h"
+#include "albaVMEProsthesis.h"
 
 //----------------------------------------------------------------------------
 // constants:
 //----------------------------------------------------------------------------
 
 const int CT_CHILD_VIEWS_NUMBER  = 6;
+
+#define SLICES_BORDER (1.0/50.0)
 
 enum RXCT_SUBVIEW_ID
 {
@@ -90,7 +93,7 @@ albaViewRXCT::albaViewRXCT(wxString label)
   
   m_LutSliders[RX_FRONT_VIEW] = m_LutSliders[RX_SIDE_VIEW] = m_LutSliders[CT_COMPOUND_VIEW] = NULL;
   //m_vtkLUT[RX_FRONT_VIEW] = m_vtkLUT[RX_SIDE_VIEW] = m_vtkLUT[CT_COMPOUND_VIEW] = NULL;
-  m_ColorLUT = NULL;
+  m_VtkLUT = NULL;
 
   m_RightOrLeft=1;
 	m_Side = 0; // All
@@ -114,8 +117,10 @@ albaViewRXCT::~albaViewRXCT()
 	for (int i = RX_FRONT_VIEW; i < VIEWS_NUMBER; i++)
 	{
 		cppDEL(m_LutSliders[i]);
-		//vtkDEL(m_vtkLUT[i]);
 	}
+
+
+	vtkDEL(m_VtkLUT);
 }
 
 //----------------------------------------------------------------------------
@@ -130,6 +135,7 @@ albaView *albaViewRXCT::Copy(albaObserver *Listener, bool lightCopyEnabled)
     v->m_PluggedChildViewList.push_back(m_PluggedChildViewList[i]->Copy(this));
   }
   v->m_NumOfPluggedChildren = m_NumOfPluggedChildren;
+	v->SetCanSpin(m_CanSpin);
   v->Create();
   return v;
 }
@@ -146,6 +152,7 @@ void albaViewRXCT::PackageView()
 		m_ViewsRX[v]->PlugVisualPipe("albaVMELabeledVolume", "albaPipeVolumeProjected", MUTEX);
 		m_ViewsRX[v]->PlugVisualPipe("albaVMESlicer", "albaVisualPipeSlicerSlice", MUTEX);
 		m_ViewsRX[v]->PlugVisualPipe("albaVMESegmentationVolume", "albaPipeVolumeProjected", MUTEX);
+		m_ViewsRX[v]->SetCanSpin(false);
 
 		PlugChildView(m_ViewsRX[v]);
 	}
@@ -166,6 +173,8 @@ void albaViewRXCT::PackageView()
 	vs->PlugVisualPipe("albaVMEProsthesis", "albaPipeSurfaceSlice");
 	vs->PlugVisualPipe("albaVMESegmentationVolume", "albaPipeVolumeOrthoSlice", MUTEX);
 	vs->SetCanSpin(false);
+
+	SetCanSpin(false);
 
 	m_ViewCTCompound->PlugChildView(vs);
 	PlugChildView(m_ViewCTCompound);
@@ -244,34 +253,26 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
 			data->Update();
 			data->GetCenter(center);
 			data->GetScalarRange(sr);
-			double totalSR[2];
-			totalSR[0] = sr[0];
-			totalSR[1] = sr[1];
-
-			if (volumeOutput->GetMaterial())
-			{
-				const double * tableRange = volumeOutput->GetMaterial()->GetTableRange();
-
-				if (tableRange[1] > tableRange[0])
-				{
-					sr[0] = tableRange[0];
-					sr[1] = tableRange[1];
-				}
-			}
+		
 
 			// set the slider for the CT compound view
-			m_LutSliders[CT_COMPOUND_VIEW]->SetRange(totalSR[0], totalSR[1]);
-			m_LutSliders[CT_COMPOUND_VIEW]->SetSubRange(sr[0], sr[1]);
+			m_LutSliders[CT_COMPOUND_VIEW]->SetRange(sr);
+			m_LutSliders[CT_COMPOUND_VIEW]->SetSubRange(sr);
 
 			// create a lookup table for CT views
 
-			if (volumeOutput->GetMaterial()->m_ColorLut)
+			if (m_VtkLUT == NULL)
+				vtkNEW(m_VtkLUT);
+
+			lutPreset(4, m_VtkLUT);
+			m_VtkLUT->DeepCopy(volumeOutput->GetMaterial()->m_ColorLut);
+			if (m_VtkLUT)
 			{
-				m_ColorLUT = volumeOutput->GetMaterial()->m_ColorLut;
-				m_ColorLUT->SetRange(sr);
-				m_ColorLUT->Build();
+				m_VtkLUT->SetRange(sr);
+				m_VtkLUT->Build();
 			}
-			
+
+
 			// gather data to initialize CT slices
 			data->GetBounds(b);
 			step = (b[5] - b[4]) / 7.0;
@@ -289,7 +290,7 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
 				p->SetInterpolation(m_TrilinearInterpolationOn);
 
 				//p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
-				p->SetColorLookupTable(m_ColorLUT);
+				p->SetColorLookupTable(m_VtkLUT);
 				m_Pos[i] = b[5] - step*(i + 1);
 			}
 			m_CurrentVolume = vme;
@@ -376,7 +377,7 @@ void albaViewRXCT::VmeSelect(albaVME *vme, bool select)
 	if (m_Gui)
 	{
 		albaPipe *p = ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(vme);
-		if ((vme->IsA("albaVMESurface") || vme->IsA("albaVMESurfaceParametric") || vme->IsA("albaVMESlicer")) && select&&p)
+		if ((vme->IsA("albaVMESurface") || vme->IsA("albaVMESurfaceParametric") || vme->IsA("albaVMESlicer") || vme->IsA("albaVMEProsthesis")) && select&&p)
 			m_Gui->Enable(ID_ADJUST_SLICES, true);
 		else
 			m_Gui->Enable(ID_ADJUST_SLICES, false);
@@ -408,7 +409,7 @@ void albaViewRXCT::OnEventRangeModified(albaEventBase *alba_event)
     {
       m_LutSliders[CT_COMPOUND_VIEW]->GetSubRange(&low,&hi);
       //m_vtkLUT[CT_COMPOUND_VIEW]->SetRange(low,hi);
-      m_ColorLUT->SetTableRange(low,hi);
+      m_VtkLUT->SetTableRange(low,hi);
     }
 
     CameraUpdate();
@@ -429,65 +430,58 @@ void albaViewRXCT::OnEventSnapModality()
   }
 }
 //----------------------------------------------------------------------------
-void albaViewRXCT::OnEventSortSlices()
+void albaViewRXCT::OnEventSortSlices(albaVME *vme /*=NULL*/)
 {
-  albaVME* node=GetSceneGraph()->GetSelectedVme();
-  albaPipe *p=((albaViewRX *)m_ChildViewList[0])->GetNodePipe(node);
-  if(node->GetOutput()->IsA("albaVMEOutputVolume"))
-    albaLogMessage("SURFACE NOT SELECTED");
-  else  if (node->IsALBAType(albaVMESurface))
-  {
-    double center[3],b[6],step;
-    albaVMESurface *surface=(albaVMESurface*)node;
-    surface->GetOutput()->GetBounds(b);
-    step = (b[5]-b[4])/7.0;
-    center[0]=0;
-    center[1]=0;
-    for (int currChildCTView=0; currChildCTView < CT_CHILD_VIEWS_NUMBER; currChildCTView++)
-    {
-      if(m_GizmoSlice[currChildCTView])
-      {
-        center[2] = b[5]-step*(currChildCTView+1);
-        center[2] = center[2] > b[5] ? b[5] : center[2];
-        center[2] = center[2] < b[4] ? b[4] : center[2];
-        m_GizmoSlice[currChildCTView]->UpdateGizmoSliceInLocalPositionOnAxis(currChildCTView,albaGizmoSlice::GIZMO_SLICE_Z,center[2]);
-        m_Pos[currChildCTView]=center[2];
-        m_Sort[currChildCTView]=currChildCTView;
-        ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetSlice(center);
-        ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetTextColor(m_BorderColor[currChildCTView]);
-        ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->UpdateText();
-        ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->BorderCreate(m_BorderColor[currChildCTView]);
-        ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->CameraUpdate();
-      }
-    }
-    m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
-    m_ChildViewList[RX_SIDE_VIEW]->CameraUpdate();
-  }
-	else if (node->IsALBAType(albaVMESurfaceParametric))
+	if(vme==NULL)
+		vme = GetSceneGraph()->GetSelectedVme();
+
+	if (vme)
 	{
-		double center[3],b[6],step;
-		albaVMESurfaceParametric *surface=(albaVMESurfaceParametric*)node;
-		surface->GetOutput()->GetBounds(b);
-		step = (b[5]-b[4])/7.0;
-		center[0]=0;
-		center[1]=0;
-		for (int currChildCTView=0; currChildCTView < CT_CHILD_VIEWS_NUMBER; currChildCTView++)
+		albaPipe *p = ((albaViewRX *)m_ChildViewList[0])->GetNodePipe(vme);
+
+		double center[3], step, border, zLenght, zMin, zMax;
+
+		if (vme->IsALBAType(albaVMEProsthesis))
 		{
-			if(m_GizmoSlice[currChildCTView])
+			albaVMEProsthesis::SafeDownCast(vme)->GetZMinMax(zMin, zMax);
+			//Prosthesis has no components showed
+			if (zMin == VTK_DOUBLE_MAX || zMax == VTK_DOUBLE_MIN)
 			{
-				center[2] = b[5]-step*(currChildCTView+1);
-				center[2] = center[2] > b[5] ? b[5] : center[2];
-				center[2] = center[2] < b[4] ? b[4] : center[2];
-				m_GizmoSlice[currChildCTView]->UpdateGizmoSliceInLocalPositionOnAxis(currChildCTView,albaGizmoSlice::GIZMO_SLICE_Z,center[2]);
-				m_Pos[currChildCTView]=center[2];
-				m_Sort[currChildCTView]=currChildCTView;
+				if (m_CurrentVolume)
+					ResetSlicesPosition(m_CurrentVolume);
+				return;
+			}
+		}
+		else
+		{
+			double b[6];
+			vme->GetOutput()->GetVMEBounds(b);
+			zMax = b[5];
+			zMin = b[4];
+		}
+
+		zLenght = zMax - zMin;
+		border = SLICES_BORDER*(zLenght);
+		step = (zLenght - border*2.0) / (CT_CHILD_VIEWS_NUMBER - 1.0);
+		center[0] = center[1] = 0;
+		center[2] = zMax - border;
+
+		for (int currChildCTView = 0; currChildCTView < CT_CHILD_VIEWS_NUMBER; currChildCTView++)
+		{
+			if (m_GizmoSlice[currChildCTView])
+			{
+				m_GizmoSlice[currChildCTView]->UpdateGizmoSliceInLocalPositionOnAxis(currChildCTView, albaGizmoSlice::GIZMO_SLICE_Z, center[2]);
+				m_Pos[currChildCTView] = center[2];
+				m_Sort[currChildCTView] = currChildCTView;
 				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetSlice(center);
 				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetTextColor(m_BorderColor[currChildCTView]);
 				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->UpdateText();
 				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->BorderCreate(m_BorderColor[currChildCTView]);
 				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->CameraUpdate();
+				center[2] -= step;
 			}
 		}
+
 		m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
 		m_ChildViewList[RX_SIDE_VIEW]->CameraUpdate();
 	}
@@ -735,7 +729,7 @@ albaGUI* albaViewRXCT::CreateGui()
   m_Gui->FloatSlider(ID_BORDER_CHANGE,"Border",&m_Border,1.0,5.0);
 
   albaVME* node=this->GetSceneGraph()->GetSelectedVme();
-  if (node->IsA("albaVMESurface")||node->IsA("albaVMESurfaceParametric")||node->IsA("albaVMESlicer"))
+  if (node->IsA("albaVMESurface")||node->IsA("albaVMESurfaceParametric")||node->IsA("albaVMESlicer") || node->IsA("albaVMEProsthesis"))
     m_Gui->Enable(ID_ADJUST_SLICES,true);
   else
     m_Gui->Enable(ID_ADJUST_SLICES,false);
@@ -861,7 +855,7 @@ void albaViewRXCT::GizmoCreate()
     p = albaPipeVolumeOrthoSlice::SafeDownCast(((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
     p->GetSlice(slice,normal);
     m_GizmoSlice[i] = new albaGizmoSlice(m_CurrentVolume, this);
-    m_GizmoSlice[i]->CreateGizmoSliceInLocalPositionOnAxis(i,albaGizmoSlice::GIZMO_SLICE_Z,slice[2]);
+    m_GizmoSlice[i]->UpdateGizmoSliceInLocalPositionOnAxis(i,albaGizmoSlice::GIZMO_SLICE_Z,slice[2]);
     m_GizmoSlice[i]->SetColor(m_BorderColor[i]);
     ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->BorderCreate(m_BorderColor[i]);
 
@@ -953,9 +947,18 @@ void albaViewRXCT::ResetSlicesPosition(albaVME *vme)
 {
   // workaround... :(
   // maybe we need some mechanism to execute view code from op?
-  this->VmeShow(vme, false);
-  this->VmeShow(vme, true);
-  CameraUpdate();
+	double b[6];
+	vtkDataSet *data = vme->GetOutput()->GetVTKData();
+	data->GetBounds(b);
+	double step = (b[5] - b[4]) / 7.0;
+	for (int i = 0; i < CT_CHILD_VIEWS_NUMBER; i++)
+	{
+		m_Pos[i] = b[5] - step*(i + 1);
+		m_GizmoSlice[i]->UpdateGizmoSliceInLocalPositionOnAxis(i, albaGizmoSlice::GIZMO_SLICE_Z, m_Pos[i]);
+
+	}
+	SortSlices();
+	CameraUpdate();
 }
 //----------------------------------------------------------------------------
 bool albaViewRXCT::IsPickedSliceView()

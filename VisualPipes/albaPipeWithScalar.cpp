@@ -95,6 +95,11 @@ void albaPipeWithScalar::ManageScalarOnExecutePipe(vtkDataSet * dataSet)
 	CreateFieldDataControlArrays();
 
 	m_ObjectMaterial = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
+	if (m_ObjectMaterial == NULL)
+	{
+		m_ObjectMaterial = mmaMaterial::New();
+		m_Vme->SetAttribute("MaterialAttributes", m_ObjectMaterial);
+	}
 
 	m_NumberOfArrays = m_PointCellArraySeparation + dataSet->GetCellData()->GetNumberOfArrays();
 
@@ -192,7 +197,7 @@ void albaPipeWithScalar::CreateDensityMapStack()
 	m_DensityFilter->SetInput(m_Mapper->GetInput());
 	m_DensityFilter->SetFilterModeToDensity();
 	m_DensityFilter->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
-	m_DensityFilter->SetOutOfBoundsDensity(9999);
+	m_DensityFilter->SetOutOfBoundsDensity(-9999);
 	m_DensityFilter->Update();
 
 	m_Mapper->SetInput(m_DensityFilter->GetOutput());
@@ -454,7 +459,10 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 	if (m_MapsGenActive || (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0))
 	{
 		if (m_MapsGenActive)
-			m_DensityVolume->GetOutput()->GetVTKData()->GetScalarRange(sr);
+		{
+			sr[0] = 0;
+			sr[1] = 700;
+		}
 		else
 			data->GetPointData()->GetScalars()->GetRange(sr);
 	}

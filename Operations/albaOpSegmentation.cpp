@@ -220,7 +220,7 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_MajorityThreshold = 9;
 
 	m_BrushFillErase = 0;
-	m_AutofillOnRelease = FALSE;
+	m_AutofillOnRelease = TRUE;
 
 
   m_SliceBackup = NULL;
@@ -314,6 +314,7 @@ void albaOpSegmentation::OpDo()
   m_OutputSurface->ReparentTo(m_Input);
   m_OutputSurface->Modified();
 	m_OutputSurface->Update();
+	GetLogicManager()->VmeShow(m_OutputSurface, true);
 	vtkDEL(surface);
 	albaDEL(m_OutputSurface);
 
@@ -1482,6 +1483,11 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 			}
 			break;
 		case ID_OK:
+			if (m_CurrentPhase == EDIT_SEGMENTATION)
+			{
+				SetSlicingIndexes(m_SlicePlane, m_SliceIndex);
+				OnUpdateSlice();
+			}
 			m_Dialog->EndModal(wxID_OK);
 			break;
 		case ID_CANCEL:
