@@ -855,7 +855,7 @@ void albaViewRXCT::GizmoCreate()
     p = albaPipeVolumeOrthoSlice::SafeDownCast(((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
     p->GetSlice(slice,normal);
     m_GizmoSlice[i] = new albaGizmoSlice(m_CurrentVolume, this);
-    m_GizmoSlice[i]->CreateGizmoSliceInLocalPositionOnAxis(i,albaGizmoSlice::GIZMO_SLICE_Z,slice[2]);
+    m_GizmoSlice[i]->UpdateGizmoSliceInLocalPositionOnAxis(i,albaGizmoSlice::GIZMO_SLICE_Z,slice[2]);
     m_GizmoSlice[i]->SetColor(m_BorderColor[i]);
     ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->BorderCreate(m_BorderColor[i]);
 

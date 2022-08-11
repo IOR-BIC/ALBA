@@ -160,10 +160,12 @@ protected:
   void EnableWidgets(bool enable = true);
 
   /** Create the gizmos to move the slices. */
-  void GizmoCreate();
+  void CreateGizmo();
+
+	void GizmoShow();
 
   /** Delete the gizmos. */
-  void GizmoDelete();
+  void DestroyGizmo();
 
   /** Update the slices according to the new position. */
   void SetSlicePosition(long gizmoId, vtkPoints *p);
@@ -179,6 +181,10 @@ protected:
 
   /** Apply View Setting in ChildViews*/
   void ApplyViewSettings(albaVME *vme);
+
+
+	void UpdateGizmoBounds(bool show);
+
 	
   int m_AllSurface;
 	double m_Border;
@@ -201,6 +207,8 @@ protected:
 
   
   int m_TrilinearInterpolationOn;
+
+	albaVME *m_Root;
 
   std::vector<albaVME*> m_VMElist; ///< VME List
 
