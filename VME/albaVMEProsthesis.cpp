@@ -42,6 +42,8 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkSphereSource.h"
 #include "albaVME.h"
 #include "albaTagArray.h"
+#include "albaStorageElement.h"
+#include "albaMatrixVector.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEProsthesis)
@@ -59,7 +61,7 @@ albaVMEProsthesis::albaVMEProsthesis()
   m_InteractorGenericMouseFloatVME = NULL;
 
 	m_RotCenterVME = NULL;
-
+	m_LockOnOpRun = true;
 }
 //-------------------------------------------------------------------------
 albaVMEProsthesis::~albaVMEProsthesis()
@@ -429,8 +431,8 @@ void albaVMEProsthesis::OnComponentEvent(int compGroup, int id)
 void albaVMEProsthesis::OnTranfromEvent(albaEvent *e)
 {
 	long arg = e->GetArg();
-
-	if (arg == albaInteractorGenericMouse::MOUSE_MOVE)
+	
+	if (arg == albaInteractorGenericMouse::MOUSE_MOVE && (!m_LockOnOpRun || !GetLogicManager()->IsOperationRunning()))
 	{
 		// Update Matrix
 		// handle incoming transform events
@@ -477,7 +479,7 @@ void albaVMEProsthesis::CreateRotCenterVME()
 		m_RotCenterVME->SetAbsMatrix(*(this->GetOutput()->GetAbsMatrix()));//RefSys start with prosthesis origin
 
 		SetRotCenterVME(m_RotCenterVME);
-		ShowRotCenter(false);
+		ShowRotCenter(true);
 	}
 }
 
@@ -504,6 +506,85 @@ albaVME* albaVMEProsthesis::GetRotCenterVME()
 		CreateRotCenterVME();
 
 	return	m_RotCenterVME;
+}
+
+//----------------------------------------------------------------------------
+int albaVMEProsthesis::InternalStore(albaStorageElement *parent)
+{
+	int nComp = m_ComponentListBox.size();
+	albaVME::InternalStore(parent);
+	
+	parent->StoreText("ProName", m_Prosthesis->GetName());
+	parent->StoreInteger("ProSide", m_Prosthesis->GetSide());
+	parent->StoreInteger("ProNcomp", nComp);
+	
+	int *compSel = new int[nComp];
+	for (int i = 0; i < nComp; i++)
+		compSel[i] = m_ComponentListBox[i]->GetSelection();
+
+	parent->StoreVectorN("ProCompSel",compSel, nComp);
+	
+	delete[] compSel;
+
+	// sub-element for storing the matrix vector
+	albaStorageElement *matrix_vector = parent->AppendChild("MatrixVector");
+	if (m_MatrixVector->Store(matrix_vector) == ALBA_ERROR)
+		return ALBA_ERROR;
+
+	return ALBA_OK;
+}
+
+//----------------------------------------------------------------------------
+int albaVMEProsthesis::InternalRestore(albaStorageElement *node)
+{
+	albaVME::InternalRestore(node);
+
+	albaString proName; 
+	int nComp, side;
+	node->RestoreText("ProName", proName);
+	node->RestoreInteger("ProNcomp", nComp);
+	node->RestoreInteger("ProSide", side);
+	int *compSel = new int[nComp];
+	
+	node->RestoreVectorN("ProCompSel", compSel, nComp);
+
+
+	albaProsthesesDBManager * prosthesesDBManager = GetLogicManager()->GetProsthesesDBManager();
+	if (prosthesesDBManager == NULL)
+	{
+		albaErrorMessage("Error on Reload Prosthesis, No prostheses DB manager found!\n This project may be created under an other application please reload it with the appropriate software");
+		return ALBA_ERROR;
+	}
+
+	albaProDBProsthesis *prosthesis 	= prosthesesDBManager->GetProsthesis(proName, (albaProDBProsthesis::PRO_SIDES) side);
+
+	if (prosthesis == NULL)
+	{
+		albaErrorMessage("Error on Reload Prosthesis, prostheses '%s' not found on DB,\n please install it and reload the project!", proName.GetCStr());
+		return ALBA_ERROR;
+	}
+
+	SetProsthesis(prosthesis);
+
+	for (int i = 0; i < nComp; i++)
+	{
+		m_ComponentListBox[i]->Select(compSel[i]);
+		SelectComponent(i);
+	}
+	UpdateGui();
+
+
+	delete[] compSel;
+
+	// restore Matrix Vector  
+	if (m_MatrixVector)
+	{
+		albaStorageElement *matrix_vector = node->FindNestedElement("MatrixVector");
+		if (matrix_vector && m_MatrixVector->Restore(matrix_vector))
+			return ALBA_ERROR;
+	}
+
+	return ALBA_OK;
 }
 
 //----------------------------------------------------------------------------

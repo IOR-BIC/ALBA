@@ -261,7 +261,7 @@ protected:
   albaInteractorSER*                 m_StaticEventRouter;
  
   mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
-  std::list<albaAutoPointer<albaInteractorPER> >  m_PERList; ///< the interactor devoted to Positional Event Routing
+  std::list<albaInteractorPER *>  m_PERList; ///< the interactor devoted to Positional Event Routing
 
   std::set<albaView *>                 m_CameraUpdateRequests; ///< requests for Camera update of single views
   

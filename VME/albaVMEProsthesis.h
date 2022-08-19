@@ -99,6 +99,9 @@ public:
 	/** Gets Current DB Prosthesis*/ 
 	albaProDBProsthesis * GetDBProsthesis() const { return m_Prosthesis; }
 
+	bool GetLockOnOpRun() const { return m_LockOnOpRun; }
+	void SetLockOnOpRun(bool val) { m_LockOnOpRun = val; }
+
 protected:
 	albaVMEProsthesis();
 	virtual ~albaVMEProsthesis();
@@ -131,6 +134,10 @@ protected:
 	
 	albaVME* GetRotCenterVME();
 
+	virtual int InternalStore(albaStorageElement *parent);
+
+	virtual int InternalRestore(albaStorageElement *node);
+
 
 	//Components vtkData
 	std::vector <vtkTransformPolyDataFilter *> m_TransformFilters;
@@ -153,6 +160,8 @@ protected:
 	albaInteractorGenericMouseFloatVME *m_InteractorGenericMouseFloatVME;
 
 	albaVMESurface *m_RotCenterVME;
+
+	bool m_LockOnOpRun;
 
 private:
 	albaVMEProsthesis(const albaVMEProsthesis&); // Not implemented

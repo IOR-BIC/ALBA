@@ -63,8 +63,7 @@ public:
   albaVME *GetOutput(); 
 
 	/** Create the gizmo slice with its id on choosed position on choosed axis*/
-	void CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int axis, double positionOnAxis, bool visibleCubeHandler = true);
-  void UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int axis, double positionOnAxis, bool visibleCubeHandler = true);
+	void UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int axis, double positionOnAxis, bool visibleCubeHandler = true);
 
   enum GISMO_SLICE_AXIS_ID
   {
@@ -82,7 +81,10 @@ public:
 
   /** Events handling method */
   void OnEvent(albaEventBase *alba_event);
- 
+
+	void GetPosition(double * slicePlaneOrigin);
+
+
   /** Gizmo is reparented under the vme tree root, this modality is currently not supported */
   void SetModalityToGlobal() {albaLogMessage("Global modality is currently not supported for this item");};
 
@@ -95,11 +97,15 @@ public:
 	void SetEnableCustomizedSnapArray(bool enable){m_CustomizedSnapArrayFlag = enable;};
 	void SetCustomizedSnapArrayStep(double step){m_CustomizedArrayStep = step;};
 
+	double *GetBounds() { return m_Bounds; }
+	void SetBounds(double *val);
 protected:
 
   void CreateGizmoSlice(albaVME *imputVme, albaObserver *listener, const char *name, bool inverseHandle, double centralClipfactor);
 
   void DestroyGizmoSlice();
+
+	double GetBorderCube();
 
 	/** Initialize snap array */
 	void InitSnapArray(albaVME *vol, int axis);
@@ -112,6 +118,7 @@ protected:
   albaVMEGizmo        *m_VmeGizmo;
   albaInteractorCompositorMouse *m_GizmoBehavior;
 	vtkDoubleArray     *m_SnapArray;
+	double m_Bounds[6];
 
   albaMatrix     *m_GizmoHandleCenterMatrix;
   vtkPoints		  *m_Point;
