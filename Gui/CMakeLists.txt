@@ -110,7 +110,7 @@ ENDIF(WITH_OPENSSL)
 
 
 # List the kits from VTK that are needed by this project.
-SET(PROJECT_LIBS albaBase)
+SET(PROJECT_LIBS albaBase XercesC)
 
 #........................................................
 #solo la vtkCommon e' linkata per default

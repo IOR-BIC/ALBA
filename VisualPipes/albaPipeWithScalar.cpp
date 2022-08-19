@@ -95,6 +95,11 @@ void albaPipeWithScalar::ManageScalarOnExecutePipe(vtkDataSet * dataSet)
 	CreateFieldDataControlArrays();
 
 	m_ObjectMaterial = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
+	if (m_ObjectMaterial == NULL)
+	{
+		m_ObjectMaterial = mmaMaterial::New();
+		m_Vme->SetAttribute("MaterialAttributes", m_ObjectMaterial);
+	}
 
 	m_NumberOfArrays = m_PointCellArraySeparation + dataSet->GetCellData()->GetNumberOfArrays();
 
