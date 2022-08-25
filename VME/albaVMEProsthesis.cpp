@@ -337,9 +337,6 @@ void albaVMEProsthesis::ShowComponent(int compGroup)
 		if (m_ShowComponents[i])
 			nShow++;
 	
-//	for (int i = 0; i < nComponents; i++)
-//		m_ComponentGui[i]->Enable(ID_LAST + i*ID_LAST_COMP_ID + ID_SHOW_COMPONENT, nShow!=1 || !m_ShowComponents[i]);
-
 	GetLogicManager()->CameraUpdate(); 
 }
 

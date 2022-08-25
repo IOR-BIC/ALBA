@@ -115,14 +115,14 @@ protected:
 	void UpdateGui();
 	void FitParentGui();
 
-	void ChangeProsthesis();
+	virtual void ChangeProsthesis();
 
 	void AddComponentGroup(albaProDBCompGroup *componentGroup);
 	virtual void CreateComponentGui(int currGroup, albaProDBCompGroup * componentGroup);
 	void ClearComponentGroups();
 
-	void SelectComponent(int compGroup);
-	void ShowComponent(int compGroup);
+	virtual void SelectComponent(int compGroup);
+	virtual void ShowComponent(int compGroup);
 
 	virtual void OnComponentEvent(int compGroup, int id);
 		
