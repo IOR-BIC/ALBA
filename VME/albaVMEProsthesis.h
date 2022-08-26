@@ -67,7 +67,7 @@ public:
 	/** return an xpm-icon that can be used to represent this node */
 	static char ** GetIcon();
 
-	void SetProsthesis(albaProDBProsthesis *prosthesis);
+	virtual void SetProsthesis(albaProDBProsthesis *prosthesis);
 
 	void SetRotCenter(double center[3]);
 
@@ -102,6 +102,9 @@ public:
 	bool GetLockOnOpRun() const { return m_LockOnOpRun; }
 	void SetLockOnOpRun(bool val) { m_LockOnOpRun = val; }
 
+	virtual void SelectComponent(int compGroup, int compId);
+	virtual void ShowComponent(int compGroup, bool show);
+
 protected:
 	albaVMEProsthesis();
 	virtual ~albaVMEProsthesis();
@@ -121,9 +124,6 @@ protected:
 	virtual void CreateComponentGui(int currGroup, albaProDBCompGroup * componentGroup);
 	void ClearComponentGroups();
 
-	virtual void SelectComponent(int compGroup);
-	virtual void ShowComponent(int compGroup);
-
 	virtual void OnComponentEvent(int compGroup, int id);
 		
 	void OnTranfromEvent(albaEvent *e);
@@ -141,7 +141,7 @@ protected:
 
 	//Components vtkData
 	std::vector <vtkTransformPolyDataFilter *> m_TransformFilters;
-	std::vector <vtkTransform *> m_Transforms; 
+	std::vector <vtkTransform *> m_Transforms;
 	
 	//Components Gui
 	std::vector <albaGUI *> m_ComponentGui;
