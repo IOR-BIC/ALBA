@@ -188,21 +188,6 @@ void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
 			m_CurrentVolume = NULL;
       DestroyOrthoSlicesAndGizmos();
     }
-
-    // When one volume is selected/unselected we enable/disable ChildViews for all vme selected
-		for (int i = 0; i < m_VMElist.size(); i++)
-		{
-			albaVME *vme = m_VMElist[i];
-
-			for (int j = 1; j < m_NumOfChildView; j++)
-			{
-				m_ChildViewList[j]->VmeShow(vme, show);
-				if (show)
-					ApplySliceSetting(j, vme);
-
-			}
-			ApplyViewSettings(vme);
-		}
 	}
 	else
 	{
@@ -759,34 +744,41 @@ void albaViewOrthoSlice::CreateOrthoslicesAndGizmos(albaVME *vme)
 	double yNormal[4] = { 0, 1, 0, 1 };
 	double zNormal[4] = { 0, 0, 1, 1 };
 	double normal[4];
+	double forceOrigin[3] = { VTK_DOUBLE_MAX,VTK_DOUBLE_MAX,VTK_DOUBLE_MAX };
 
 	rot.MultiplyPoint(xNormal,normal);
-	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSlice(m_GizmoHandlePosition,normal);
-  ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetTextColor(colorsX);
+	albaViewSlice * xSlice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_XN_VIEW]);
+	xSlice->SetSlice(forceOrigin, normal);
+	xSlice->SetSlice(m_GizmoHandlePosition,normal);
+  xSlice->SetTextColor(colorsX);
 
 	rot.MultiplyPoint(yNormal, normal);
-	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSlice(m_GizmoHandlePosition, normal);
-  ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetTextColor(colorsY);
+	albaViewSlice * ySlice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_YN_VIEW]);
+	ySlice->SetSlice(forceOrigin, normal);
+	ySlice->SetSlice(m_GizmoHandlePosition, normal);
+  ySlice->SetTextColor(colorsY);
 
 	rot.MultiplyPoint(zNormal, normal);
-	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSlice(m_GizmoHandlePosition, normal);
-  ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetTextColor(colorsZ);
+	albaViewSlice * zSlice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]);
+	zSlice->SetSlice(forceOrigin, normal);
+	zSlice->SetSlice(m_GizmoHandlePosition, normal);
+  zSlice->SetTextColor(colorsZ);
 
 	// creates the gizmos
 	double direction[] = { albaGizmoSlice::GIZMO_SLICE_X,albaGizmoSlice::GIZMO_SLICE_Y,albaGizmoSlice::GIZMO_SLICE_Z };
 
+	double sliceOrigin[3] = { 0, 0, 0 };
+
+	if (m_CurrentVolume)
+	{
+		albaPipeVolumeOrthoSlice *p = NULL;
+		p = albaPipeVolumeOrthoSlice::SafeDownCast(((albaViewSlice *)((albaViewCompound *)m_ChildViewList[0]))->GetNodePipe(m_CurrentVolume));
+		double normal[3];
+		p->GetSlice(sliceOrigin, normal);
+	}
+
 	for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
 	{
-		double sliceOrigin[3] = { 0, 0, 0 };
-
-		if (m_CurrentVolume)
-		{
-			albaPipeVolumeOrthoSlice *p = NULL;
-			p = albaPipeVolumeOrthoSlice::SafeDownCast(((albaViewSlice *)((albaViewCompound *)m_ChildViewList[0]))->GetNodePipe(m_CurrentVolume));
-			double normal[3];
-			p->GetSlice(sliceOrigin, normal);
-		}
-
 		m_Gizmo[gizmoId]->SetInput(m_CurrentVolume);
 		m_Gizmo[gizmoId]->UpdateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], sliceOrigin[gizmoId]);
 	}
@@ -897,7 +889,11 @@ void albaViewOrthoSlice::UpdateGizmoBounds(bool show)
 	{
 		albaVMEOutput * vmeOutput = m_VMElist[i]->GetOutput();
 		albaMatrix mtr = *vmeOutput->GetAbsMatrix();
-		double *localBounds = vmeOutput->GetVTKData()->GetBounds();
+		vtkDataSet * vtkData = vmeOutput->GetVTKData();
+		if(vtkData==NULL)
+			continue;
+
+		double *localBounds = vtkData->GetBounds();
 	
 		double locMinVert[4] = { localBounds[0],localBounds[2],localBounds[4],1 }, locMaxVert[4] = { localBounds[1],localBounds[3],localBounds[5],1};
 		double globMinVert[4], globMaxVert[4];

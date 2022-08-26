@@ -286,13 +286,14 @@ void albaVMEProsthesis::ClearComponentGroups()
 }
 
 //-------------------------------------------------------------------------
-void albaVMEProsthesis::SelectComponent(int compGroup)
+void albaVMEProsthesis::SelectComponent(int compGroup, int compId)
 {
 	std::vector<albaProDBCompGroup *> * compGroups = m_Prosthesis->GetCompGroups();
 	albaProDBCompGroup *group = compGroups->at(compGroup);
 	int groups = compGroups->size();
 	std::vector<albaProDBComponent *> *components = group->GetComponents();
-	int compId = m_ComponentListBox[compGroup]->GetSelection();
+	
+	m_ComponentListBox[compGroup]->Select(compId);
 
 	if (groups > 0)
 	{
@@ -323,23 +324,20 @@ void albaVMEProsthesis::SelectComponent(int compGroup)
 	GetLogicManager()->CameraUpdate();
 }
 //-------------------------------------------------------------------------
-void albaVMEProsthesis::ShowComponent(int compGroup)
+void albaVMEProsthesis::ShowComponent(int compGroup, bool show)
 {
-	if (m_ShowComponents[compGroup])
+	if (show)
 		m_AppendPolydata->AddInput(m_TransformFilters[compGroup]->GetOutput());
 	else
 		m_AppendPolydata->RemoveInput(m_TransformFilters[compGroup]->GetOutput());
 	m_AppendPolydata->Update();
-
-
+	GetOutput()->Update();
+	
 	int nShow = 0, nComponents = m_ComponentGui.size();
 	for (int i= 0; i < nComponents; i++)
 		if (m_ShowComponents[i])
 			nShow++;
 	
-//	for (int i = 0; i < nComponents; i++)
-//		m_ComponentGui[i]->Enable(ID_LAST + i*ID_LAST_COMP_ID + ID_SHOW_COMPONENT, nShow!=1 || !m_ShowComponents[i]);
-
 	GetLogicManager()->CameraUpdate(); 
 }
 
@@ -429,8 +427,8 @@ void albaVMEProsthesis::OnComponentEvent(int compGroup, int id)
 {
 	switch (id)
 	{
-	case ID_SHOW_COMPONENT: ShowComponent(compGroup); break;
-	case ID_SELECT_COMPONENT: SelectComponent(compGroup); break;
+	case ID_SHOW_COMPONENT: ShowComponent(compGroup, m_ShowComponents[compGroup]); break;
+	case ID_SELECT_COMPONENT: SelectComponent(compGroup, m_ComponentListBox[compGroup]->GetSelection()); break;
 
 	default:
 		break;
@@ -577,13 +575,9 @@ int albaVMEProsthesis::InternalRestore(albaStorageElement *node)
 	SetProsthesis(prosthesis);
 
 	for (int i = 0; i < nComp; i++)
-	{
-		m_ComponentListBox[i]->Select(compSel[i]);
-		SelectComponent(i);
-	}
+		SelectComponent(i, m_ComponentListBox[i]->GetSelection());
+
 	UpdateGui();
-
-
 	delete[] compSel;
 
 	// restore Matrix Vector  
