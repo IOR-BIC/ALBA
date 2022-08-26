@@ -111,6 +111,13 @@ public:
 	/**Set the thickness value*/
 	void SetThickness(double thickness);
 
+
+	/** Returns ShowOutLine */
+	int GetShowOutLine() const { return m_ShowOutLine; }
+
+	/** Sets ShowOutLine */
+	void SetShowOutLine(int showOutLine);
+
 protected:
 
   vtkDataSetMapper        *m_MapperWired;
@@ -131,6 +138,7 @@ protected:
   int                      m_UseVTKProperty;
 	int											 m_FlipNormals;
 	int											 m_SkipNormalFilter;
+	int											 m_ShowOutLine;
 	double				           m_Border;
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
