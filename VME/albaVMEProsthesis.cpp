@@ -455,17 +455,6 @@ void albaVMEProsthesis::OnTranfromEvent(albaEvent *e)
 
 		SetAbsMatrix(tr->GetMatrix());
 
-
-		//For GUI update, commented now
-		/*albaMatrix absPose;
-		absPose.DeepCopy(tr->GetMatrix());
-		absPose.SetTimeStamp(m_CurrentTime);
-		albaTransform::GetPosition(absPose, m_Position);
-		albaTransform::GetOrientation(absPose, m_Orientation);
-
-		m_Gui->Update();
-		*/
-
 		tr->Delete();
 
 		GetLogicManager()->CameraUpdate();
