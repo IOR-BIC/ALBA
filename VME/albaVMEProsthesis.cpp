@@ -321,6 +321,8 @@ void albaVMEProsthesis::SelectComponent(int compGroup, int compId)
 		}
 	}
 	m_AppendPolydata->Update();
+	GetOutput()->Update();
+
 	GetLogicManager()->CameraUpdate();
 }
 //-------------------------------------------------------------------------
