@@ -43,7 +43,7 @@ public:
 	albaTypeMacro(albaVMEProsthesis,albaVMEGeneric);
 
 	/** Precess events coming from other objects */ 
-	/*virtual*/ void OnEvent(albaEventBase *alba_event);
+	virtual void OnEvent(albaEventBase *alba_event);
 
 	
 	/** Return the suggested pipe-typename for the visualization of this vme */
@@ -126,7 +126,7 @@ protected:
 
 	virtual void OnComponentEvent(int compGroup, int id);
 		
-	void OnTranfromEvent(albaEvent *e);
+	virtual void OnTranfromEvent(albaEvent *e);
 
 	void CreateRotCenterVME();
 
