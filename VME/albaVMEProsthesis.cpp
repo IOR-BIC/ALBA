@@ -61,7 +61,7 @@ albaVMEProsthesis::albaVMEProsthesis()
   m_InteractorGenericMouseFloatVME = NULL;
 
 	m_RotCenterVME = NULL;
-
+	m_LockOnOpRun = true;
 }
 //-------------------------------------------------------------------------
 albaVMEProsthesis::~albaVMEProsthesis()
@@ -330,7 +330,14 @@ void albaVMEProsthesis::ShowComponent(int compGroup)
 	else
 		m_AppendPolydata->RemoveInput(m_TransformFilters[compGroup]->GetOutput());
 	m_AppendPolydata->Update();
-	GetLogicManager()->CameraUpdate();
+
+
+	int nShow = 0, nComponents = m_ComponentGui.size();
+	for (int i= 0; i < nComponents; i++)
+		if (m_ShowComponents[i])
+			nShow++;
+	
+	GetLogicManager()->CameraUpdate(); 
 }
 
 //----------------------------------------------------------------------------
@@ -431,8 +438,8 @@ void albaVMEProsthesis::OnComponentEvent(int compGroup, int id)
 void albaVMEProsthesis::OnTranfromEvent(albaEvent *e)
 {
 	long arg = e->GetArg();
-
-	if (arg == albaInteractorGenericMouse::MOUSE_MOVE)
+	
+	if (arg == albaInteractorGenericMouse::MOUSE_MOVE && (!m_LockOnOpRun || !GetLogicManager()->IsOperationRunning()))
 	{
 		// Update Matrix
 		// handle incoming transform events
@@ -479,7 +486,7 @@ void albaVMEProsthesis::CreateRotCenterVME()
 		m_RotCenterVME->SetAbsMatrix(*(this->GetOutput()->GetAbsMatrix()));//RefSys start with prosthesis origin
 
 		SetRotCenterVME(m_RotCenterVME);
-		ShowRotCenter(false);
+		ShowRotCenter(true);
 	}
 }
 

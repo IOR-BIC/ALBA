@@ -164,6 +164,11 @@ public:
 	void SetCylinderRes(double val);
 	double GetEllipticCylinderRes() const { return m_EllipticCylinderRes; }
 	void SetEllipticCylinderRes(double val);
+	double GetSpherePhiRes() const { return m_SpherePhiRes; }
+	void SetSpherePhiRes(double val) { m_SpherePhiRes = val; }
+	double GetSphereTheRes() const { return m_SphereTheRes; }
+	void SetSphereTheRes(double val) { m_SphereTheRes = val; }
+
 protected:
 
   albaVMESurfaceParametric();

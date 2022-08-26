@@ -99,6 +99,9 @@ public:
 	/** Gets Current DB Prosthesis*/ 
 	albaProDBProsthesis * GetDBProsthesis() const { return m_Prosthesis; }
 
+	bool GetLockOnOpRun() const { return m_LockOnOpRun; }
+	void SetLockOnOpRun(bool val) { m_LockOnOpRun = val; }
+
 protected:
 	albaVMEProsthesis();
 	virtual ~albaVMEProsthesis();
@@ -112,14 +115,14 @@ protected:
 	void UpdateGui();
 	void FitParentGui();
 
-	void ChangeProsthesis();
+	virtual void ChangeProsthesis();
 
 	void AddComponentGroup(albaProDBCompGroup *componentGroup);
 	virtual void CreateComponentGui(int currGroup, albaProDBCompGroup * componentGroup);
 	void ClearComponentGroups();
 
-	void SelectComponent(int compGroup);
-	void ShowComponent(int compGroup);
+	virtual void SelectComponent(int compGroup);
+	virtual void ShowComponent(int compGroup);
 
 	virtual void OnComponentEvent(int compGroup, int id);
 		
@@ -157,6 +160,8 @@ protected:
 	albaInteractorGenericMouseFloatVME *m_InteractorGenericMouseFloatVME;
 
 	albaVMESurface *m_RotCenterVME;
+
+	bool m_LockOnOpRun;
 
 private:
 	albaVMEProsthesis(const albaVMEProsthesis&); // Not implemented

@@ -135,7 +135,7 @@ albaInteractionManager::~albaInteractionManager()
 {
   while(!m_PERList.empty())
   {
-    albaAutoPointer<albaInteractorPER> old_per=*(m_PERList.rbegin());
+    albaInteractorPER *old_per=*(m_PERList.rbegin());
     m_PERList.pop_back();
     assert(old_per);
     SetPER(old_per);
@@ -188,7 +188,7 @@ void albaInteractionManager::PushPER(albaInteractorPER *per)
 bool albaInteractionManager::PopPER()
 {
   // retrieve and delete last item
-  albaAutoPointer<albaInteractorPER> old_per=*(m_PERList.rbegin());
+  albaInteractorPER *old_per=*(m_PERList.rbegin());
   m_PERList.pop_back(); 
 
   assert(old_per); // should always be != NULL

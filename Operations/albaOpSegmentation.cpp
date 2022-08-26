@@ -220,7 +220,7 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_MajorityThreshold = 9;
 
 	m_BrushFillErase = 0;
-	m_AutofillOnRelease = FALSE;
+	m_AutofillOnRelease = TRUE;
 
 
   m_SliceBackup = NULL;
@@ -314,6 +314,7 @@ void albaOpSegmentation::OpDo()
   m_OutputSurface->ReparentTo(m_Input);
   m_OutputSurface->Modified();
 	m_OutputSurface->Update();
+	GetLogicManager()->VmeShow(m_OutputSurface, true);
 	vtkDEL(surface);
 	albaDEL(m_OutputSurface);
 
@@ -1482,6 +1483,11 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 			}
 			break;
 		case ID_OK:
+			if (m_CurrentPhase == EDIT_SEGMENTATION)
+			{
+				SetSlicingIndexes(m_SlicePlane, m_SliceIndex);
+				OnUpdateSlice();
+			}
 			m_Dialog->EndModal(wxID_OK);
 			break;
 		case ID_CANCEL:
@@ -1691,6 +1697,8 @@ void albaOpSegmentation::OnSelectSlicePlane()
 		m_Helper.ApplySliceChangesToVolume(m_OldSlicePlane, m_OldSliceIndex);
 	}
 	UpdateSliderValidator();
+
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_COPY_FROM_LAST_SLICE, false);
 
 	m_View->SetSliceAxis(m_SlicePlane);
 
@@ -2002,16 +2010,14 @@ void albaOpSegmentation::OnEditSegmentationEvent(albaEvent *e)
 			m_GuiDialog->Enable(ID_SLICE_PREV, false);
 			m_GuiDialog->Enable(ID_SLICE_TEXT, false);
 			m_GuiDialog->Enable(ID_BUTTON_INIT, false);
+			m_GuiDialog->Enable(ID_MANUAL_COPY_FROM_LAST_SLICE, false);
 
 
 			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
 		}
 		break;
 		case ID_MANUAL_TOOLS_BRUSH:
-		{
 			OnToolBrush();
-
-		}
 		break;
 		case ID_MANUAL_TOOLS_FILL:
 			OnFillEdit();
@@ -2309,6 +2315,8 @@ void albaOpSegmentation::SwitchPlane(albaEvent * e)
 	m_GuiDialog->Enable(ID_SLICE_PREV, true);
 	m_GuiDialog->Enable(ID_SLICE_TEXT, true);
 	m_GuiDialog->Enable(ID_BUTTON_INIT, true);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_COPY_FROM_LAST_SLICE, false);
+
 
 	if (m_OldManualSegmentationTools == DRAW_EDIT)
 		OnToolBrush();
