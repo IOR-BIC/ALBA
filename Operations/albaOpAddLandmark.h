@@ -161,7 +161,6 @@ protected:
 
 	albaVMELandmarkCloud *m_Cloud;
 	albaVMELandmark *m_SelectedLandmark;
-	albaVMELandmark *m_LastSelectedLandmark;
 
 	albaVMELandmarkCloud *m_AuxLandmarkCloud;
 	albaVMELandmark *m_AuxLandmark;

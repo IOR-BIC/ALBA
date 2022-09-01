@@ -72,7 +72,6 @@ albaOp(label)
 
 	m_Cloud = NULL;
 	m_SelectedLandmark = NULL;
-	m_LastSelectedLandmark = NULL;
 
 	m_AuxLandmarkCloud = NULL;
 	m_AuxLandmark = NULL;
@@ -628,21 +627,33 @@ void albaOpAddLandmark::RemoveLandmark()
 {
 	if (m_Cloud && m_SelectedLandmark)
 	{
-		RemoveItem(m_SelectedLandmark->GetName());
-		GetLogicManager()->VmeRemove(m_SelectedLandmark);
+		albaString nextLandmark = "NONE";
 
+		if (m_SelectedItem >= 0 && m_SelectedItem < m_LandmarkGroupVect[m_SelectedGroup].size() - 1)
+		{
+			nextLandmark = m_LandmarkGroupVect[m_SelectedGroup][m_SelectedItem + 1];
+		}
+
+		RemoveItem(m_SelectedLandmark->GetName());
+		GetLogicManager()->VmeRemove(m_SelectedLandmark);		
+
+		m_SelectedLandmark = NULL;
+		m_SelectedItem = -1;
+
+		SelectLandmarkByName(nextLandmark);
 		SelectLandmarkByName("NONE");
 
-		GetLogicManager()->CameraUpdate();
 		UpdateGui(true);
+		GetLogicManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 {
-	if (m_LastSelectedLandmark)
+	if (m_SelectedLandmark)
 	{
-		GetLogicManager()->VmeShow(m_LastSelectedLandmark, true);
+		// Show Prec Selection
+		GetLogicManager()->VmeShow(m_SelectedLandmark, true);
 	}
 
 	m_RemoveMessage = "";
@@ -654,6 +665,7 @@ void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 		m_SelectedItem = m_LandmarkGuiDict->GetItemIndex(name);
 
 	m_SelectedLandmark = m_Cloud->GetLandmark(name);
+
 	if (m_SelectedLandmark)
 	{
 		m_LandmarkName = name;
@@ -675,7 +687,6 @@ void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 		}
 
 		// Hide Selected Landmark
-		m_LastSelectedLandmark = m_SelectedLandmark;
 		GetLogicManager()->VmeShow(m_SelectedLandmark, false);
 
 		// Update and ShowAux Landmark
@@ -715,18 +726,15 @@ void albaOpAddLandmark::SetLandmarkName(albaString name)
 {
 	if (m_Cloud && m_SelectedLandmark)
 	{
-		if (m_SelectedLandmark)
-		{
-			wxString oldName = m_SelectedLandmark->GetName();
-			m_SelectedLandmark->SetName(name); // If name is present, restore old name
+		wxString oldName = m_SelectedLandmark->GetName();
+		m_SelectedLandmark->SetName(name); // If name is present, restore old name
 
-			ReplaceItem(oldName, m_SelectedLandmark->GetName());
+		ReplaceItem(oldName, m_SelectedLandmark->GetName());
 
-			m_LandmarkName = m_SelectedLandmark->GetName();
+		m_LandmarkName = m_SelectedLandmark->GetName();
 
-			m_SelectedLandmark->Update();
-			UpdateGui(true);
-		}
+		m_SelectedLandmark->Update();
+		UpdateGui(true);
 	}
 }
 //----------------------------------------------------------------------------
