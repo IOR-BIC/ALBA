@@ -131,6 +131,7 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 		albaString text;
 		text.Printf("Distance %.2f mm", dist);
 		m_Measure2DVector[index].Text = text;
+		m_Measure2DVector[index].Value = dist;
 
 		// Line
 		UpdateLineActors(point1, point2);

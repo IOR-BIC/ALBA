@@ -44,6 +44,7 @@ albaInteractor2DMeasure_Angle::albaInteractor2DMeasure_Angle() : albaInteractor2
 	m_MeasureTypeText = "ANGLE";
 
 	m_CurrPoint = NO_POINT;
+	m_AddModeCompleted = true;
 
 	m_LineExtensionLength = 1.0;
 	m_LineStipplePattern = 0xFFFF;
@@ -91,7 +92,10 @@ void albaInteractor2DMeasure_Angle::DrawNewMeasure(double * wp)
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Angle::MoveMeasure(int index, double *point)
 {
-	if (index < 0)
+	if (index < 0 || index >= GetMeasureCount())
+		return;
+
+	if (!m_Measure2DVector[index].Active)
 		return;
 
 	double linePointO[3], linePointA[3], linePointB[3];
@@ -150,6 +154,9 @@ void albaInteractor2DMeasure_Angle::MoveMeasure(int index, double *point)
 void albaInteractor2DMeasure_Angle::EditMeasure(int index, double *point)
 {
 	if (index < 0 || index >= GetMeasureCount())
+		return;
+
+	if (!m_Measure2DVector[index].Active)
 		return;
 
 	m_MovingMeasure = true;
@@ -233,30 +240,33 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 			{
 				SelectMeasure(i);
 
-				if (vtkMath::Distance2BetweenPoints(pointA, point) < POINT_UPDATE_DISTANCE_2)
+				if (m_Measure2DVector[i].Active)
 				{
-					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
-					m_CurrPoint = POINT_2;
-					m_PointsStackVectorA[i]->SetColor(m_Colors[COLOR_EDIT]);
-				}
-				else if (vtkMath::Distance2BetweenPoints(pointO, point) < POINT_UPDATE_DISTANCE_2)
-				{
-					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
-					m_CurrPoint = POINT_1;
-					m_PointsStackVectorOri[i]->SetColor(m_Colors[COLOR_EDIT]);
-				}
-				else
-				{
-					m_CurrMeasure = i;
-					if (m_MoveMeasureEnable)
+					if (vtkMath::Distance2BetweenPoints(pointA, point) < POINT_UPDATE_DISTANCE_2)
 					{
-						m_LineStackVectorOA[i]->SetColor(m_Colors[COLOR_EDIT]);
-						SetAction(ACTION_MOVE_MEASURE);
+						SetAction(ACTION_EDIT_MEASURE);
+						m_CurrMeasure = i;
+						m_CurrPoint = POINT_2;
+						m_PointsStackVectorA[i]->SetColor(m_Colors[COLOR_EDIT]);
 					}
+					else if (vtkMath::Distance2BetweenPoints(pointO, point) < POINT_UPDATE_DISTANCE_2)
+					{
+						SetAction(ACTION_EDIT_MEASURE);
+						m_CurrMeasure = i;
+						m_CurrPoint = POINT_1;
+						m_PointsStackVectorOri[i]->SetColor(m_Colors[COLOR_EDIT]);
+					}
+					else
+					{
+						m_CurrMeasure = i;
+						if (m_MoveMeasureEnable)
+						{
+							m_LineStackVectorOA[i]->SetColor(m_Colors[COLOR_EDIT]);
+							SetAction(ACTION_MOVE_MEASURE);
+						}
 
-					m_MoveLineB = false;
+						m_MoveLineB = false;
+					}
 				}
 
 				Render();
@@ -266,23 +276,26 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 			{
 				SelectMeasure(i);
 
-				if (vtkMath::Distance2BetweenPoints(pointB, point) < POINT_UPDATE_DISTANCE_2)
+				if (m_Measure2DVector[i].Active)
 				{
-					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
-					m_CurrPoint = POINT_3;
-					m_PointsStackVectorB[i]->SetColor(m_Colors[COLOR_EDIT]);
-				}
-				else
-				{
-					m_CurrMeasure = i;
-					if (m_MoveMeasureEnable)
+					if (vtkMath::Distance2BetweenPoints(pointB, point) < POINT_UPDATE_DISTANCE_2)
 					{
-						m_LineStackVectorOB[i]->SetColor(m_Colors[COLOR_EDIT]);
-						SetAction(ACTION_MOVE_MEASURE);
+						SetAction(ACTION_EDIT_MEASURE);
+						m_CurrMeasure = i;
+						m_CurrPoint = POINT_3;
+						m_PointsStackVectorB[i]->SetColor(m_Colors[COLOR_EDIT]);
 					}
+					else
+					{
+						m_CurrMeasure = i;
+						if (m_MoveMeasureEnable)
+						{
+							m_LineStackVectorOB[i]->SetColor(m_Colors[COLOR_EDIT]);
+							SetAction(ACTION_MOVE_MEASURE);
+						}
 
-					m_MoveLineB = true;
+						m_MoveLineB = true;
+					}
 				}
 
 				Render();
@@ -311,6 +324,7 @@ void albaInteractor2DMeasure_Angle::UpdateMeasure(int index, double measure)
 	albaString text;
 	text.Printf("Angle %.2f°", angleDegree);
 	m_Measure2DVector[index].Text = text;
+	m_Measure2DVector[index].Value = angleDegree;
 }
 
 //----------------------------------------------------------------------------
@@ -407,6 +421,15 @@ void albaInteractor2DMeasure_Angle::AddMeasure(double *point1, double *point2, d
 			m_CurrMeasure = index;
 			m_CurrPoint = POINT_2;
 			EditMeasure(index, point2);
+
+			if (m_AddModeCompleted == false)
+			{
+				//RemoveMeasure(GetMeasureCount() - 1);
+				m_AddModeCompleted = true;
+			}
+
+			ActivateMeasure(-1, true);
+
 			return;
 		}
 		else if (m_SecondLineAdded[index] == false)
@@ -415,82 +438,92 @@ void albaInteractor2DMeasure_Angle::AddMeasure(double *point1, double *point2, d
 
 			//Adding the second line no need to add a new measure.
 			m_SecondLineAdded[index] = true;
-			
+
 			m_CurrMeasure = index;
 			m_CurrPoint = POINT_3;
 			EditMeasure(index, point3);
+
+			m_AddModeCompleted = true;
+			ActivateMeasure(-1, true);
 
 			return;
 		}
 	}
 
-	Superclass::AddMeasure(point1, point2);
+	if (m_AddModeCompleted)
+	{
+		Superclass::AddMeasure(point1, point2);
 
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 
-	int index = m_Measure2DVector.size() - 1;
-	double angle = GetAngle(point2, point3, point1);
+		int index = m_Measure2DVector.size() - 1;
+		double angle = GetAngle(point2, point3, point1);
 
-	// Update Measure
-	UpdateMeasure(index, angle);
+		// Update Measure
+		UpdateMeasure(index, angle);
 
-	// Update Edit Actors
-	UpdateEditActors(point1, point2);
+		// Update Edit Actors
+		UpdateEditActors(point1, point2);
 
-	//////////////////////////////////////////////////////////////////////////
-	// Add Points
-	m_PointsStackVectorOri.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
-	m_PointsStackVectorA.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
-	m_PointsStackVectorB.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
+		//////////////////////////////////////////////////////////////////////////
+		// Add Points
+		m_PointsStackVectorOri.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
+		m_PointsStackVectorA.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
+		m_PointsStackVectorB.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
 
-	// Add Lines
-	m_LineStackVectorOA.push_back(new albaActor2dStackHelper(vtkLineSource::New(), m_Renderer));
-	m_LineStackVectorOB.push_back(new albaActor2dStackHelper(vtkLineSource::New(), m_Renderer));
+		// Add Lines
+		m_LineStackVectorOA.push_back(new albaActor2dStackHelper(vtkLineSource::New(), m_Renderer));
+		m_LineStackVectorOB.push_back(new albaActor2dStackHelper(vtkLineSource::New(), m_Renderer));
 
-	// Add Circle
-	m_CircleStackVector.push_back(new albaActor2dStackHelper(vtkALBACircleSource::New(), m_Renderer));
+		// Add Circle
+		m_CircleStackVector.push_back(new albaActor2dStackHelper(vtkALBACircleSource::New(), m_Renderer));
 
-	m_SecondLineAdded.push_back(false);
-	m_Angles.push_back(0);
+		m_SecondLineAdded.push_back(false);
+		m_Angles.push_back(0);
 
-	//////////Setting proprieties//////////////
-	int col = m_IsEnabled ? COLOR_DEFAULT : COLOR_DISABLE;
+		//////////Setting proprieties//////////////
+		int col = m_IsEnabled ? COLOR_DEFAULT : COLOR_DISABLE;
 
-	//Point O (Origin)
-	m_PointsStackVectorOri[index]->GetProperty()->SetPointSize(m_PointSize);
-	m_PointsStackVectorOri[index]->SetColor(m_Colors[col]);
+		//Point O (Origin)
+		m_PointsStackVectorOri[index]->GetProperty()->SetPointSize(m_PointSize);
+		m_PointsStackVectorOri[index]->SetColor(m_Colors[col]);
 
-	//Point A
-	m_PointsStackVectorA[index]->GetProperty()->SetPointSize(m_PointSize);
-	m_PointsStackVectorA[index]->SetColor(m_Colors[col]);
+		//Point A
+		m_PointsStackVectorA[index]->GetProperty()->SetPointSize(m_PointSize);
+		m_PointsStackVectorA[index]->SetColor(m_Colors[col]);
 
-	//Point B
-	m_PointsStackVectorB[index]->GetProperty()->SetPointSize(m_PointSize);
-	m_PointsStackVectorB[index]->SetColor(m_Colors[col]);
+		//Point B
+		m_PointsStackVectorB[index]->GetProperty()->SetPointSize(m_PointSize);
+		m_PointsStackVectorB[index]->SetColor(m_Colors[col]);
 
-	//Line OA
-	m_LineStackVectorOA[index]->SetColor(m_Colors[col]);
-	m_LineStackVectorOA[index]->GetProperty()->SetLineWidth(m_LineWidth);
-	m_LineStackVectorOA[index]->GetProperty()->SetLineStipplePattern(m_LineStipplePattern);
+		//Line OA
+		m_LineStackVectorOA[index]->SetColor(m_Colors[col]);
+		m_LineStackVectorOA[index]->GetProperty()->SetLineWidth(m_LineWidth);
+		m_LineStackVectorOA[index]->GetProperty()->SetLineStipplePattern(m_LineStipplePattern);
 
-	//Line OB
-	m_LineStackVectorOB[index]->SetColor(m_Colors[col]);
-	m_LineStackVectorOB[index]->GetProperty()->SetLineWidth(m_LineWidth);
-	m_LineStackVectorOB[index]->GetProperty()->SetLineStipplePattern(m_LineStipplePattern);
+		//Line OB
+		m_LineStackVectorOB[index]->SetColor(m_Colors[col]);
+		m_LineStackVectorOB[index]->GetProperty()->SetLineWidth(m_LineWidth);
+		m_LineStackVectorOB[index]->GetProperty()->SetLineStipplePattern(m_LineStipplePattern);
 
-	// Circle
-	m_CircleStackVector[index]->GetProperty()->SetLineWidth(m_LineWidth);
-	m_CircleStackVector[index]->SetColor(m_ColorAux);
-	m_CircleStackVector[index]->GetProperty()->SetLineStipplePattern(0xf0f0);
+		// Circle
+		m_CircleStackVector[index]->GetProperty()->SetLineWidth(m_LineWidth);
+		m_CircleStackVector[index]->SetColor(m_ColorAux);
+		m_CircleStackVector[index]->GetProperty()->SetLineStipplePattern(0xf0f0);
 
-	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[index]->GetSource();
-	circleSource->SetResolution(60);
+		vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[index]->GetSource();
+		circleSource->SetResolution(60);
 
-	m_CurrMeasure = index;
+		m_CurrMeasure = index;
+		m_AddModeCompleted = false;
 
-	UpdatePointsActor(point1, point2, point3);
-	UpdateLineActors(point1, point2, point3);
-	UpdateCircleActor(point2, point3, point1);
+		ActivateMeasure(-1, false);
+		ActivateMeasure(index);
+
+		UpdatePointsActor(point1, point2, point3);
+		UpdateLineActors(point1, point2, point3);
+		UpdateCircleActor(point2, point3, point1);
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	albaEventMacro(albaEvent(this, ID_MEASURE_ADDED, GetMeasureText(GetMeasureCount() - 1)));
