@@ -914,5 +914,16 @@ double albaInteractor2DMeasure_AngleLine::CalculateAngle(double * point1, double
 	double diff[3] = { point3[X] - point2[X], point3[Y] - point2[Y], point3[Z] - point2[Z] };
 	double newP4[3] = { point4[X] - diff[X], point4[Y] - diff[Y], point4[Z] - diff[Z] };
 
-	return GetAngle(point1, newP4, point2);
+	double diff2[3] = { point4[X] - point2[X], point4[Y] - point2[Y], point4[Z] - point2[Z] };
+	double newP3[3] = { point3[X] - diff2[X], point3[Y] - diff2[Y], point3[Z] - diff2[Z] };
+
+	// Calculate Smaller angle
+	double angle1 = GetAngle(point1, newP4, point2);
+	double angle2 = GetAngle(point1, newP3, point2);
+	double angle3 = GetAngle(newP4, point1, point2);
+	double angle4 = GetAngle(newP3, point1, point2);
+
+	return MIN(MIN(angle1, angle2), MIN(angle3, angle4));
+	
+	//return GetAngle(point1, newP4, point2);
 }
