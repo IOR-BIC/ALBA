@@ -566,7 +566,7 @@ int albaVMEProsthesis::InternalRestore(albaStorageElement *node)
 	SetProsthesis(prosthesis);
 
 	for (int i = 0; i < nComp; i++)
-		SelectComponent(i, m_ComponentListBox[i]->GetSelection());
+		SelectComponent(i, compSel[i]);
 
 	UpdateGui();
 	delete[] compSel;
