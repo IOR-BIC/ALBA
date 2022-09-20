@@ -181,6 +181,9 @@ public:
 	int GetCurrPlane() { return m_CurrPlane; }
 	void SetCurrPlane(int plane) { m_CurrPlane = plane; }
 
+	// Update and Draw All Measure
+	virtual void ReDrawAll() {};
+
 protected:
 
 	struct Measure2D
