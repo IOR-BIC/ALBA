@@ -277,7 +277,7 @@ bool albaInteractor2DMeasure_Point::Load(albaVME *input, wxString tag)
 		albaTagItem *measureLabelTag = input->GetTagArray()->GetTag(tag + "MeasurePointLabel");
 		albaTagItem *measurePointTag = input->GetTagArray()->GetTag(tag + "MeasurePoint");
 
-		int nPoints = measurePointTag->GetNumberOfComponents() / 2;
+		int nPoints = measurePointTag->GetNumberOfComponents() / 3;
 
 		// Reload points
 		for (int i = 0; i < nPoints; i++)
