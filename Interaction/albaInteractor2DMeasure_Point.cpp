@@ -296,12 +296,14 @@ bool albaInteractor2DMeasure_Point::Load(albaVME *input, wxString tag)
 
 		int nPoints = measurePointTag->GetNumberOfComponents() / 3;
 
+		m_CurrentRenderer = m_Renderer;
+
 		// Reload points
 		for (int i = 0; i < nPoints; i++)
 		{
 			point1[X] = measurePointTag->GetValueAsDouble(i * 3 + 0);
 			point1[Y] = measurePointTag->GetValueAsDouble(i * 3 + 1);
-			point1[Z] = measurePointTag->GetValueAsDouble(i * 3 + 1);
+			point1[Z] = measurePointTag->GetValueAsDouble(i * 3 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);

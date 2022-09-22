@@ -159,6 +159,8 @@ bool albaInteractor2DMeasure_Segment::Load(albaVME *input, wxString tag)
 
 		int nLines = MeasureSegmentPoint1Tag->GetNumberOfComponents() / 2;
 
+		m_CurrentRenderer = m_Renderer;
+
 		// Reload points
 		for (int i = 0; i < nLines; i++)
 		{
