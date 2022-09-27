@@ -69,7 +69,7 @@ public:
 
 	virtual void SetProsthesis(albaProDBProsthesis *prosthesis);
 
-	void SetRotCenter(double center[3]);
+	virtual void SetRotCenter(double center[3]);
 
 	void ShowRotCenter(bool show);
 
