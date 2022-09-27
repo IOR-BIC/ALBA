@@ -675,6 +675,8 @@ bool albaInteractor2DMeasure_Angle::Load(albaVME *input, wxString tag)
 		
 		int nAngles = measureAnglePoint1Tag->GetNumberOfComponents() / 2;
 
+		m_CurrentRenderer = m_Renderer;
+
 		// Reload points
 		for (int i = 0; i < nAngles; i++)
 		{
