@@ -241,7 +241,7 @@ void albaOpClassicICPRegistration::OpDo()
 		if (output)
 		{
 			albaMatrix * absMatrix = output->GetAbsMatrix();
-			//node->SetAbsMatrix(*absMatrix);
+			node->SetAbsMatrix(*absMatrix);
 		}
 	}
 	m_Output = m_Registered;
