@@ -71,7 +71,7 @@ void OpCropDeformableROIDummy::SetDistance(double d)
 void OpCropDeformableROIDummy::SetFillValue(double fillValue)
 //----------------------------------------------------------------------------
 {
-  m_FillValue = fillValue;
+  m_InsideValue = fillValue;
 }
 
 //----------------------------------------------------------------------------
@@ -160,7 +160,7 @@ void albaOpCropDeformableROITest::TestOpExecute()
   vtkNEW(filter);
   filter->SetInput(volume->GetOutput()->GetVTKData());
   filter->SetDistance(distance);
-  filter->SetFillValue(fillValue);
+  filter->SetInsideValue(fillValue);
   filter->SetInsideOut(insideOut);
 
   vtkPolyData *polyData;

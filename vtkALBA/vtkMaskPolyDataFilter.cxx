@@ -59,8 +59,9 @@ vtkMaskPolyDataFilter::vtkMaskPolyDataFilter(vtkPolyData *mask)
   this->SetMask(mask);
 //  this->GenerateMaskScalars = 0;
   this->Distance = 0;
-  this->InsideOut = 0;
-  this->FillValue=0.0;
+  this->InsideOut = this->Binarize = 0;
+  this->InsideValue=this->OutsideValue=0.0;
+
 }
 
 vtkMaskPolyDataFilter::~vtkMaskPolyDataFilter()
@@ -165,7 +166,7 @@ void vtkMaskPolyDataFilter::Execute()
 		if ( (currentPoint[0] <= bounds[0]) || (currentPoint[0] >= bounds[1]) || (currentPoint[1] <= bounds[2]) || (currentPoint[1] >= bounds[3]) || (currentPoint[2] <= bounds[4]) || (currentPoint[2] >= bounds[5])) 
 		{
 			//the point is outside the mask's bounds
-			if (this->InsideOut)
+			if (this->InsideOut && !this->Binarize)
 			{
 				//if InsideOut==1 the point outside should be skipped
 				continue;
@@ -175,7 +176,7 @@ void vtkMaskPolyDataFilter::Execute()
 				// if insideOut==0 the point outside should be filled with the FillValue
 				for (int n=0;n<numcomp;n++)
 				{
-					tuple[n]=this->FillValue;
+					tuple[n]=this->OutsideValue;
 				}
 				outPointData->GetScalars()->SetTuple(i,tuple);
 				// done: go to next point
@@ -219,24 +220,25 @@ void vtkMaskPolyDataFilter::Execute()
 			distance = -distance;
 		}
 
-		if ( this->InsideOut )
+		if ( this->InsideOut || this->Binarize)
 		{
 			if (distance <= this->Distance) 
 			{
 				for (int n=0;n<numcomp;n++)
 				{
-					tuple[n]=this->FillValue;
+					tuple[n]=this->InsideValue;
 				}
 				outPointData->GetScalars()->SetTuple(i,tuple);
 			}
 		}
-		else
+		
+		if(!this->InsideOut || this->Binarize)
 		{
 			if (distance > this->Distance) 
 			{
 				for (int n=0;n<numcomp;n++)
 				{
-					tuple[n]=this->FillValue;
+					tuple[n]=this->OutsideValue;
 				}
 				outPointData->GetScalars()->SetTuple(i,tuple);
 			}
@@ -325,7 +327,7 @@ void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double z)
 
 		if(pointOverBound && pointUnderBound)
 		{
-			//the current cell is intersecating the plane adding it to the new cells
+			//the current cell is intersecting the plane adding it to the new cells
 			new_cells->InsertNextCell(cellNPoints);
 
 			//We relocate the cell points in order to obtain an output with only required points
