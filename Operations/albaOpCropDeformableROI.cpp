@@ -170,27 +170,16 @@ void albaOpCropDeformableROI::Algorithm(albaVME *vme)
 
 		vme->Update();
 
-		if(albaVMESurface::SafeDownCast(vme))
-		{
-			maskPolydata=(vtkPolyData *)(albaVMESurface::SafeDownCast(vme)->GetOutput()->GetVTKData());
-		}
-		if (albaVMESurfaceParametric::SafeDownCast(vme))
-		{
-			maskPolydata = (vtkPolyData *)(albaVMESurfaceParametric::SafeDownCast(vme)->GetSurfaceOutput()->GetVTKData());
-		}
-		
+		maskPolydata=vtkPolyData::SafeDownCast(vme->GetOutput()->GetVTKData());
 		if(!maskPolydata)
 			return;
 
 
-		
 		albaNEW(m_ResultVme);
 		m_ResultVme->DeepCopy(m_Input);
 		albaString resultName = "Masked ";
 		resultName+=m_Input->GetName();
 		m_ResultVme->SetName(resultName);
-
-		vtkPolyData *Mask;
 
 		albaMatrix identityMatrix;
 		albaMatrix maskABSMatrix = vme->GetAbsMatrixPipe()->GetMatrix();

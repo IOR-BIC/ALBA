@@ -89,7 +89,6 @@ void vtkMaskPolyDataFilter::Execute()
 	double  closestPoint[3];
 	double *currentPoint,*x1;
 	x1 = new double[3];
-	double distance; 
 	double distance2;
 	double dot, n[3];
 	vtkCell *cell;
@@ -133,7 +132,16 @@ void vtkMaskPolyDataFilter::Execute()
 
 	int numcomp=outPointData->GetScalars()->GetNumberOfComponents();
 
-	float *tuple=new float[numcomp];
+	float *inTuple = new float[numcomp];
+	float *outTuple = new float[numcomp];
+
+	for (int n = 0; n < numcomp; n++)
+	{
+		inTuple[n] = this->InsideValue;
+		outTuple[n] = this->OutsideValue;
+	}
+
+	this->Distance2 = this->Distance * this->Distance;
 
 	int oldProgress=0;
 	int progress=0;
@@ -174,11 +182,7 @@ void vtkMaskPolyDataFilter::Execute()
 			else
 			{
 				// if insideOut==0 the point outside should be filled with the FillValue
-				for (int n=0;n<numcomp;n++)
-				{
-					tuple[n]=this->OutsideValue;
-				}
-				outPointData->GetScalars()->SetTuple(i,tuple);
+				outPointData->GetScalars()->SetTuple(i,outTuple);
 				// done: go to next point
 				continue;
 			}
@@ -213,36 +217,17 @@ void vtkMaskPolyDataFilter::Execute()
 			dot = vtkMath::Dot(x1,n);     
 		} 
 
-		distance = sqrt(distance2);
-
 		// find if the x point is inside or outside of the polygon: sign of the distance
 		if (dot < 0) {
-			distance = -distance;
+			distance2 = -distance2;
 		}
 
-		if ( this->InsideOut || this->Binarize)
-		{
-			if (distance <= this->Distance) 
-			{
-				for (int n=0;n<numcomp;n++)
-				{
-					tuple[n]=this->InsideValue;
-				}
-				outPointData->GetScalars()->SetTuple(i,tuple);
-			}
-		}
+		if (( this->InsideOut || this->Binarize) && (distance2 <= this->Distance2))
+			outPointData->GetScalars()->SetTuple(i,inTuple);
+
 		
-		if(!this->InsideOut || this->Binarize)
-		{
-			if (distance > this->Distance) 
-			{
-				for (int n=0;n<numcomp;n++)
-				{
-					tuple[n]=this->OutsideValue;
-				}
-				outPointData->GetScalars()->SetTuple(i,tuple);
-			}
-		}  
+		if ((!this->InsideOut || this->Binarize) && (distance2 > this->Distance2))
+				outPointData->GetScalars()->SetTuple(i,outTuple);
 	}
 
 
@@ -253,7 +238,8 @@ void vtkMaskPolyDataFilter::Execute()
 
 	delete [] x1;
 	delete [] weights;
-	delete tuple;
+	delete inTuple;
+	delete outTuple;
 	cellIds->Delete();
 }
 

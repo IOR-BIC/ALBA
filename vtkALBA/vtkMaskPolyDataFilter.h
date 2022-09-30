@@ -113,7 +113,8 @@ protected:
   vtkPolyData *Mask;
 	vtkPolyData *CurrentSliceMask;
 	vtkIdType *IdConversionTable;
-  double Distance; 
+	double Distance;
+	double Distance2;
 	double InsideValue;
 	double OutsideValue;
 	int Binarize;
