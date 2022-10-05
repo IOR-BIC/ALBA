@@ -199,9 +199,12 @@ public:
   /** Return true if node is of type albaVMESegmentationVolume. */
   static bool SegmentationVolumeAccept(albaVME* node) {return(node != NULL  && node->IsALBAType(albaVMESegmentationVolume));};
 
-  /** Return true if node is of type albaVMEVolume. */
-  static bool SegmentedVolumeAccept(albaVME* node);
-	 
+	/** Return true if node is of type albaVMEVolume. */
+	static bool SegmentedVolumeAccept(albaVME* node);
+
+	/** Return true if node is of type albaVMEVolume. */
+	static bool MaskAccept(albaVME* node);
+
 	static int OpSegmentationEventFilter(wxEvent& event);
 
 
@@ -534,6 +537,7 @@ private:
 
 	UndoRedoState CreateVolumeUndoRedoState();
 
+	void OnLoadMask();
 };
 #endif
 

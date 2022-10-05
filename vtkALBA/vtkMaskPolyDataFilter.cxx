@@ -59,8 +59,9 @@ vtkMaskPolyDataFilter::vtkMaskPolyDataFilter(vtkPolyData *mask)
   this->SetMask(mask);
 //  this->GenerateMaskScalars = 0;
   this->Distance = 0;
-  this->InsideOut = 0;
-  this->FillValue=0.0;
+  this->InsideOut = this->Binarize = 0;
+  this->InsideValue=this->OutsideValue=0.0;
+
 }
 
 vtkMaskPolyDataFilter::~vtkMaskPolyDataFilter()
@@ -88,7 +89,6 @@ void vtkMaskPolyDataFilter::Execute()
 	double  closestPoint[3];
 	double *currentPoint,*x1;
 	x1 = new double[3];
-	double distance; 
 	double distance2;
 	double dot, n[3];
 	vtkCell *cell;
@@ -132,7 +132,16 @@ void vtkMaskPolyDataFilter::Execute()
 
 	int numcomp=outPointData->GetScalars()->GetNumberOfComponents();
 
-	float *tuple=new float[numcomp];
+	float *inTuple = new float[numcomp];
+	float *outTuple = new float[numcomp];
+
+	for (int n = 0; n < numcomp; n++)
+	{
+		inTuple[n] = this->InsideValue;
+		outTuple[n] = this->OutsideValue;
+	}
+
+	this->Distance2 = this->Distance * this->Distance;
 
 	int oldProgress=0;
 	int progress=0;
@@ -165,7 +174,7 @@ void vtkMaskPolyDataFilter::Execute()
 		if ( (currentPoint[0] <= bounds[0]) || (currentPoint[0] >= bounds[1]) || (currentPoint[1] <= bounds[2]) || (currentPoint[1] >= bounds[3]) || (currentPoint[2] <= bounds[4]) || (currentPoint[2] >= bounds[5])) 
 		{
 			//the point is outside the mask's bounds
-			if (this->InsideOut)
+			if (this->InsideOut && !this->Binarize)
 			{
 				//if InsideOut==1 the point outside should be skipped
 				continue;
@@ -173,11 +182,7 @@ void vtkMaskPolyDataFilter::Execute()
 			else
 			{
 				// if insideOut==0 the point outside should be filled with the FillValue
-				for (int n=0;n<numcomp;n++)
-				{
-					tuple[n]=this->FillValue;
-				}
-				outPointData->GetScalars()->SetTuple(i,tuple);
+				outPointData->GetScalars()->SetTuple(i,outTuple);
 				// done: go to next point
 				continue;
 			}
@@ -212,35 +217,17 @@ void vtkMaskPolyDataFilter::Execute()
 			dot = vtkMath::Dot(x1,n);     
 		} 
 
-		distance = sqrt(distance2);
-
 		// find if the x point is inside or outside of the polygon: sign of the distance
 		if (dot < 0) {
-			distance = -distance;
+			distance2 = -distance2;
 		}
 
-		if ( this->InsideOut )
-		{
-			if (distance <= this->Distance) 
-			{
-				for (int n=0;n<numcomp;n++)
-				{
-					tuple[n]=this->FillValue;
-				}
-				outPointData->GetScalars()->SetTuple(i,tuple);
-			}
-		}
-		else
-		{
-			if (distance > this->Distance) 
-			{
-				for (int n=0;n<numcomp;n++)
-				{
-					tuple[n]=this->FillValue;
-				}
-				outPointData->GetScalars()->SetTuple(i,tuple);
-			}
-		}  
+		if (( this->InsideOut || this->Binarize) && (distance2 <= this->Distance2))
+			outPointData->GetScalars()->SetTuple(i,inTuple);
+
+		
+		if ((!this->InsideOut || this->Binarize) && (distance2 > this->Distance2))
+				outPointData->GetScalars()->SetTuple(i,outTuple);
 	}
 
 
@@ -251,7 +238,8 @@ void vtkMaskPolyDataFilter::Execute()
 
 	delete [] x1;
 	delete [] weights;
-	delete tuple;
+	delete inTuple;
+	delete outTuple;
 	cellIds->Delete();
 }
 
@@ -325,7 +313,7 @@ void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double z)
 
 		if(pointOverBound && pointUnderBound)
 		{
-			//the current cell is intersecating the plane adding it to the new cells
+			//the current cell is intersecting the plane adding it to the new cells
 			new_cells->InsertNextCell(cellNPoints);
 
 			//We relocate the cell points in order to obtain an output with only required points
