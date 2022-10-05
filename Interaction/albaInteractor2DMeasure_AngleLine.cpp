@@ -46,6 +46,7 @@ albaInteractor2DMeasure_AngleLine::albaInteractor2DMeasure_AngleLine() : albaInt
 	m_MeasureTypeText = "ANGLE_LINE";
 
 	m_CurrPoint = NO_POINT;
+	m_AddModeCompleted = true;
 
 	m_LineExtensionLength = 1.0;
 	m_LineStipplePattern = 0xFFFF;
@@ -95,7 +96,10 @@ void albaInteractor2DMeasure_AngleLine::DrawNewMeasure(double * wp)
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_AngleLine::MoveMeasure(int index, double *point)
 {
-	if (index < 0)
+	if (index < 0 || index >= GetMeasureCount())
+		return;
+
+	if (!m_Measure2DVector[index].Active)
 		return;
 
 	double pointA[3], pointB[3], pointC[3], pointD[3];
@@ -174,6 +178,9 @@ void albaInteractor2DMeasure_AngleLine::MoveMeasure(int index, double *point)
 void albaInteractor2DMeasure_AngleLine::EditMeasure(int index, double *point)
 {
 	if (index < 0 || index >= GetMeasureCount())
+		return;
+
+	if (!m_Measure2DVector[index].Active)
 		return;
 
 	m_MovingMeasure = true;
@@ -284,31 +291,34 @@ void albaInteractor2DMeasure_AngleLine::FindAndHighlight(double * point)
 			{
 				SelectMeasure(i);
 
-				if (vtkMath::Distance2BetweenPoints(pointA, point) < POINT_UPDATE_DISTANCE_2)
+				if (m_Measure2DVector[i].Active)
 				{
-					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
-					m_CurrPoint = POINT_1;
-					m_PointsStackVectorA[i]->SetColor(m_Colors[COLOR_EDIT]);
-				}
-				else if (vtkMath::Distance2BetweenPoints(pointB, point) < POINT_UPDATE_DISTANCE_2)
-				{
-					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
-					m_CurrPoint = POINT_2;
-					m_PointsStackVectorB[i]->SetColor(m_Colors[COLOR_EDIT]);
-				}
-				else
-				{
-					m_CurrMeasure = i;
-					if (m_MoveMeasureEnable)
+					if (vtkMath::Distance2BetweenPoints(pointA, point) < POINT_UPDATE_DISTANCE_2)
 					{
-						m_LineStackVectorAB[i]->SetColor(m_Colors[COLOR_EDIT]);
-						SetAction(ACTION_MOVE_MEASURE);
+						SetAction(ACTION_EDIT_MEASURE);
+						m_CurrMeasure = i;
+						m_CurrPoint = POINT_1;
+						m_PointsStackVectorA[i]->SetColor(m_Colors[COLOR_EDIT]);
 					}
+					else if (vtkMath::Distance2BetweenPoints(pointB, point) < POINT_UPDATE_DISTANCE_2)
+					{
+						SetAction(ACTION_EDIT_MEASURE);
+						m_CurrMeasure = i;
+						m_CurrPoint = POINT_2;
+						m_PointsStackVectorB[i]->SetColor(m_Colors[COLOR_EDIT]);
+					}
+					else
+					{
+						m_CurrMeasure = i;
+						if (m_MoveMeasureEnable)
+						{
+							m_LineStackVectorAB[i]->SetColor(m_Colors[COLOR_EDIT]);
+							SetAction(ACTION_MOVE_MEASURE);
+						}
 
-					m_MoveLineAB = true;
-					m_MoveLineCD = false;
+						m_MoveLineAB = true;
+						m_MoveLineCD = false;
+					}
 				}
 
 				Render();
@@ -318,35 +328,38 @@ void albaInteractor2DMeasure_AngleLine::FindAndHighlight(double * point)
 			{
 				SelectMeasure(i);
 
-				if (vtkMath::Distance2BetweenPoints(pointC, point) < POINT_UPDATE_DISTANCE_2)
+				if (m_Measure2DVector[i].Active)
 				{
-					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
-					m_CurrPoint = POINT_3;
-					m_PointsStackVectorC[i]->SetColor(m_Colors[COLOR_EDIT]);
-				}
-				else if (vtkMath::Distance2BetweenPoints(pointD, point) < POINT_UPDATE_DISTANCE_2)
-				{
-					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
-					m_CurrPoint = POINT_4;
-					m_PointsStackVectorD[i]->SetColor(m_Colors[COLOR_EDIT]);
-				}
-				else
-				{
-					m_CurrMeasure = i;
-					if (m_MoveMeasureEnable)
+					if (vtkMath::Distance2BetweenPoints(pointC, point) < POINT_UPDATE_DISTANCE_2)
 					{
-						m_LineStackVectorCD[i]->SetColor(m_Colors[COLOR_EDIT]);
-						SetAction(ACTION_MOVE_MEASURE);
+						SetAction(ACTION_EDIT_MEASURE);
+						m_CurrMeasure = i;
+						m_CurrPoint = POINT_3;
+						m_PointsStackVectorC[i]->SetColor(m_Colors[COLOR_EDIT]);
 					}
+					else if (vtkMath::Distance2BetweenPoints(pointD, point) < POINT_UPDATE_DISTANCE_2)
+					{
+						SetAction(ACTION_EDIT_MEASURE);
+						m_CurrMeasure = i;
+						m_CurrPoint = POINT_4;
+						m_PointsStackVectorD[i]->SetColor(m_Colors[COLOR_EDIT]);
+					}
+					else
+					{
+						m_CurrMeasure = i;
+						if (m_MoveMeasureEnable)
+						{
+							m_LineStackVectorCD[i]->SetColor(m_Colors[COLOR_EDIT]);
+							SetAction(ACTION_MOVE_MEASURE);
+						}
 
-					m_MoveLineAB = false;
-					m_MoveLineCD = true;
+						m_MoveLineAB = false;
+						m_MoveLineCD = true;
+					}
 				}
+
 				Render();
 				return;
-
 			}
 		}
 
@@ -372,6 +385,7 @@ void albaInteractor2DMeasure_AngleLine::UpdateMeasure(int index, double measure)
 	albaString text;
 	text.Printf("Angle %.2f°", angleDegree);
 	m_Measure2DVector[index].Text = text;
+	m_Measure2DVector[index].Value = angleDegree;
 }
 
 //----------------------------------------------------------------------------
@@ -460,6 +474,15 @@ void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point
 			m_CurrMeasure = index;
 			m_CurrPoint = POINT_2;
 			EditMeasure(index, point2);
+
+			if (m_AddModeCompleted == false)
+			{
+				//RemoveMeasure(GetMeasureCount() - 1);
+				m_AddModeCompleted = true;
+			}
+
+			ActivateMeasure(-1, true);
+
 			return;
 		}
 		else
@@ -477,6 +500,10 @@ void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point
 				m_CurrMeasure = index;
 				m_CurrPoint = 5; // Edit (POINT_3 and POINT_4)
 				EditMeasure(index, point3);
+
+				m_AddModeCompleted = true;
+				ActivateMeasure(-1, true);
+
 				return;
 			}
 			else if (m_SecondLineP2Added[index] == false)
@@ -494,80 +521,86 @@ void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point
 		}
 	}
 
-	Superclass::AddMeasure(point1, point2);
+	if (m_AddModeCompleted)
+	{
+		Superclass::AddMeasure(point1, point2);
 
-	//////////////////////////////////////////////////////////////////////////
-	// Update Measure
-	int index = m_Measure2DVector.size() - 1;
-	double angle = CalculateAngle(point1, point2, point3, point4);
+		//////////////////////////////////////////////////////////////////////////
+		// Update Measure
+		int index = m_Measure2DVector.size() - 1;
+		double angle = CalculateAngle(point1, point2, point3, point4);
 
-	// Update Measure
-	UpdateMeasure(index, angle);
-	
-	// Update Edit Actors
-	UpdateEditActors(point1, point2);
+		// Update Measure
+		UpdateMeasure(index, angle);
 
-	//////////////////////////////////////////////////////////////////////////
-	// Add Points
-	m_PointsStackVectorA.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
-	m_PointsStackVectorB.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
-	m_PointsStackVectorC.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
-	m_PointsStackVectorD.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
+		// Update Edit Actors
+		UpdateEditActors(point1, point2);
 
-	// Add Lines
-	m_LineStackVectorAB.push_back(new albaActor2dStackHelper(vtkLineSource::New(), m_Renderer));
-	m_LineStackVectorCD.push_back(new albaActor2dStackHelper(vtkLineSource::New(), m_Renderer));
+		//////////////////////////////////////////////////////////////////////////
+		// Add Points
+		m_PointsStackVectorA.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
+		m_PointsStackVectorB.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
+		m_PointsStackVectorC.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
+		m_PointsStackVectorD.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
 
-	// Add Circle
-	m_CircleStackVector.push_back(new albaActor2dStackHelper(vtkALBACircleSource::New(), m_Renderer));
+		// Add Lines
+		m_LineStackVectorAB.push_back(new albaActor2dStackHelper(vtkLineSource::New(), m_Renderer));
+		m_LineStackVectorCD.push_back(new albaActor2dStackHelper(vtkLineSource::New(), m_Renderer));
 
-	m_Angles.push_back(0);
-	m_SecondLineP1Added.push_back(false);
-	m_SecondLineP2Added.push_back(false);
+		// Add Circle
+		m_CircleStackVector.push_back(new albaActor2dStackHelper(vtkALBACircleSource::New(), m_Renderer));
 
-	//////////Setting proprieties//////////////
-	int col = m_IsEnabled ? COLOR_DEFAULT : COLOR_DISABLE;
+		m_Angles.push_back(0);
+		m_SecondLineP1Added.push_back(false);
+		m_SecondLineP2Added.push_back(false);
 
-	//Point A
-	m_PointsStackVectorA[index]->GetProperty()->SetPointSize(m_PointSize);
-	m_PointsStackVectorA[index]->SetColor(m_Colors[col]);
+		//////////Setting proprieties//////////////
+		int col = m_IsEnabled ? COLOR_DEFAULT : COLOR_DISABLE;
 
-	//Point B
-	m_PointsStackVectorB[index]->GetProperty()->SetPointSize(m_PointSize);
-	m_PointsStackVectorB[index]->SetColor(m_Colors[col]);
+		//Point A
+		m_PointsStackVectorA[index]->GetProperty()->SetPointSize(m_PointSize);
+		m_PointsStackVectorA[index]->SetColor(m_Colors[col]);
 
-	//Point C
-	m_PointsStackVectorC[index]->GetProperty()->SetPointSize(m_PointSize);
-	m_PointsStackVectorC[index]->SetColor(m_Colors[col]);
+		//Point B
+		m_PointsStackVectorB[index]->GetProperty()->SetPointSize(m_PointSize);
+		m_PointsStackVectorB[index]->SetColor(m_Colors[col]);
 
-	//Point D
-	m_PointsStackVectorD[index]->GetProperty()->SetPointSize(m_PointSize);
-	m_PointsStackVectorD[index]->SetColor(m_Colors[col]);
+		//Point C
+		m_PointsStackVectorC[index]->GetProperty()->SetPointSize(m_PointSize);
+		m_PointsStackVectorC[index]->SetColor(m_Colors[col]);
 
-	//Line AB
-	m_LineStackVectorAB[index]->SetColor(m_Colors[col]);
-	m_LineStackVectorAB[index]->GetProperty()->SetLineWidth(m_LineWidth);
-	m_LineStackVectorAB[index]->GetProperty()->SetLineStipplePattern(m_LineStipplePattern);
+		//Point D
+		m_PointsStackVectorD[index]->GetProperty()->SetPointSize(m_PointSize);
+		m_PointsStackVectorD[index]->SetColor(m_Colors[col]);
 
-	//Line CD
-	m_LineStackVectorCD[index]->SetColor(m_Colors[col]);
-	m_LineStackVectorCD[index]->GetProperty()->SetLineWidth(m_LineWidth);
-	m_LineStackVectorCD[index]->GetProperty()->SetLineStipplePattern(m_LineStipplePattern);
+		//Line AB
+		m_LineStackVectorAB[index]->SetColor(m_Colors[col]);
+		m_LineStackVectorAB[index]->GetProperty()->SetLineWidth(m_LineWidth);
+		m_LineStackVectorAB[index]->GetProperty()->SetLineStipplePattern(m_LineStipplePattern);
 
-	// Circle
-	m_CircleStackVector[index]->GetProperty()->SetLineWidth(m_LineWidth);
-	m_CircleStackVector[index]->SetColor(m_ColorAux);
-	m_CircleStackVector[index]->GetProperty()->SetLineStipplePattern(0xf0f0);
+		//Line CD
+		m_LineStackVectorCD[index]->SetColor(m_Colors[col]);
+		m_LineStackVectorCD[index]->GetProperty()->SetLineWidth(m_LineWidth);
+		m_LineStackVectorCD[index]->GetProperty()->SetLineStipplePattern(m_LineStipplePattern);
 
-	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[index]->GetSource();
-	circleSource->SetResolution(60);
+		// Circle
+		m_CircleStackVector[index]->GetProperty()->SetLineWidth(m_LineWidth);
+		m_CircleStackVector[index]->SetColor(m_ColorAux);
+		m_CircleStackVector[index]->GetProperty()->SetLineStipplePattern(0xf0f0);
 
-	m_CurrMeasure = index;
+		vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[index]->GetSource();
+		circleSource->SetResolution(60);
 
-	UpdatePointsActor(point1, point2, point3, point4);
-	UpdateLineActors(point1, point2, point3, point4);
-	UpdateCircleActor(point1, angle, 10);
+		m_CurrMeasure = index;
+		m_AddModeCompleted = false;
 
+		ActivateMeasure(-1, false);
+		ActivateMeasure(index);
+
+		UpdatePointsActor(point1, point2, point3, point4);
+		UpdateLineActors(point1, point2, point3, point4);
+		UpdateCircleActor(point1, angle, 10);
+	}
 	//////////////////////////////////////////////////////////////////////////
 	albaEventMacro(albaEvent(this, ID_MEASURE_ADDED, GetMeasureText(GetMeasureCount() - 1)));
 
@@ -727,6 +760,8 @@ bool albaInteractor2DMeasure_AngleLine::Load(albaVME *input, wxString tag)
 		
 		int nAngles = MeasureAngleLinePoint1Tag->GetNumberOfComponents() / 2;
 
+		m_CurrentRenderer = m_Renderer;
+
 		// Reload points
 		for (int i = 0; i < nAngles; i++)
 		{
@@ -881,5 +916,16 @@ double albaInteractor2DMeasure_AngleLine::CalculateAngle(double * point1, double
 	double diff[3] = { point3[X] - point2[X], point3[Y] - point2[Y], point3[Z] - point2[Z] };
 	double newP4[3] = { point4[X] - diff[X], point4[Y] - diff[Y], point4[Z] - diff[Z] };
 
-	return GetAngle(point1, newP4, point2);
+	double diff2[3] = { point4[X] - point2[X], point4[Y] - point2[Y], point4[Z] - point2[Z] };
+	double newP3[3] = { point3[X] - diff2[X], point3[Y] - diff2[Y], point3[Z] - diff2[Z] };
+
+	// Calculate Smaller angle
+	double angle1 = GetAngle(point1, newP4, point2);
+	double angle2 = GetAngle(point1, newP3, point2);
+	double angle3 = GetAngle(newP4, point1, point2);
+	double angle4 = GetAngle(newP3, point1, point2);
+
+	return MIN(MIN(angle1, angle2), MIN(angle3, angle4));
+	
+	//return GetAngle(point1, newP4, point2);
 }

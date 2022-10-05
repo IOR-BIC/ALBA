@@ -107,6 +107,8 @@ protected:
 
 	Color m_ColorAux;
 
+	bool m_AddModeCompleted;
+
 private:
 	albaInteractor2DMeasure_AngleLine(const albaInteractor2DMeasure_AngleLine&);   // Not implemented.
 	void operator=(const albaInteractor2DMeasure_AngleLine&);  // Not implemented.

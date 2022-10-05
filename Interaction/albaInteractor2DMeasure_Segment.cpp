@@ -131,6 +131,7 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 		albaString text;
 		text.Printf("Distance %.2f mm", dist);
 		m_Measure2DVector[index].Text = text;
+		m_Measure2DVector[index].Value = dist;
 
 		// Line
 		UpdateLineActors(point1, point2);
@@ -157,6 +158,8 @@ bool albaInteractor2DMeasure_Segment::Load(albaVME *input, wxString tag)
 		albaTagItem *MeasureSegmentPoint2Tag = input->GetTagArray()->GetTag(tag + "MeasureSegmentPoint2");
 
 		int nLines = MeasureSegmentPoint1Tag->GetNumberOfComponents() / 2;
+
+		m_CurrentRenderer = m_Renderer;
 
 		// Reload points
 		for (int i = 0; i < nLines; i++)

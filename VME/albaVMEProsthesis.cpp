@@ -321,6 +321,8 @@ void albaVMEProsthesis::SelectComponent(int compGroup, int compId)
 		}
 	}
 	m_AppendPolydata->Update();
+	GetOutput()->Update();
+
 	GetLogicManager()->CameraUpdate();
 }
 //-------------------------------------------------------------------------
@@ -453,17 +455,6 @@ void albaVMEProsthesis::OnTranfromEvent(albaEvent *e)
 
 		SetAbsMatrix(tr->GetMatrix());
 
-
-		//For GUI update, commented now
-		/*albaMatrix absPose;
-		absPose.DeepCopy(tr->GetMatrix());
-		absPose.SetTimeStamp(m_CurrentTime);
-		albaTransform::GetPosition(absPose, m_Position);
-		albaTransform::GetOrientation(absPose, m_Orientation);
-
-		m_Gui->Update();
-		*/
-
 		tr->Delete();
 
 		GetLogicManager()->CameraUpdate();
@@ -575,7 +566,7 @@ int albaVMEProsthesis::InternalRestore(albaStorageElement *node)
 	SetProsthesis(prosthesis);
 
 	for (int i = 0; i < nComp; i++)
-		SelectComponent(i, m_ComponentListBox[i]->GetSelection());
+		SelectComponent(i, compSel[i]);
 
 	UpdateGui();
 	delete[] compSel;

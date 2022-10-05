@@ -550,6 +550,8 @@ bool albaInteractor2DMeasure_CenterPoint::Load(albaVME *input, wxString tag)
 
 		int nCenters = measureCenterPoint1Tag->GetNumberOfComponents() / 2;
 
+		m_CurrentRenderer = m_Renderer;
+
 		// Reload points
 		for (int i = 0; i < nCenters; i++)
 		{

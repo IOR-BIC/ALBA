@@ -101,6 +101,9 @@
 #include "vtkTextProperty.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkVolumeProperty.h"
+#include "vtkTransform.h"
+#include "vtkTransformFilter.h"
+#include "vtkMaskPolyDataFilter.h"
 
 #include "wx/busyinfo.h"
 #include "wx/mac/classic/bitmap.h"
@@ -114,7 +117,8 @@ enum INIT_MODALITY_TYPE
 {
   GLOBAL_INIT = 0,
   RANGE_INIT,
-	LOAD_INIT,
+	LOADSEGM_INIT,
+	LOADMASK_INIT
 };
 
 enum EDIT_MODALITY_TYPE
@@ -839,12 +843,12 @@ void albaOpSegmentation::CreateInitSegmentationGui()
 	////////////////////////////////////////////////////////////////////////
 	// THRESHOLD TYPE Selection
 
-	currentGui->Label("Threshold type", true);
+	currentGui->Label("Init Modality type", true);
 
-	wxString choices[3] = { _("Global"),_("Z-Split"), _("Load") };
+	wxString choices[4] = { _("Global"),_("Z-Split"), _("Load"), _("Mask") };
 	int w_id = currentGui->GetWidgetId(ID_INIT_MODALITY);
 
-	m_InitModalityRadioBox = new wxRadioBox(currentGui, w_id, "", wxDefaultPosition, wxSize(170, -1), 3, choices, 3);
+	m_InitModalityRadioBox = new wxRadioBox(currentGui, w_id, "", wxDefaultPosition, wxSize(200, -1), 4, choices, 2, wxRA_SPECIFY_COLS | wxSUNKEN_BORDER | wxTAB_TRAVERSAL);
 	m_InitModalityRadioBox->SetValidator(albaGUIValidator(currentGui, w_id, m_InitModalityRadioBox, &m_InitModality));
 
 	wxBoxSizer *thresholdTypeLabSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -1207,7 +1211,7 @@ void albaOpSegmentation::UpdateSliceLabel()
 //----------------------------------------------------------------------------
 void albaOpSegmentation::UpdateThresholdLabel()
 {
-	if (m_CurrentPhase == INIT_SEGMENTATION && (m_InitModality != LOAD_INIT))
+	if (m_CurrentPhase == INIT_SEGMENTATION && (m_InitModality != LOADSEGM_INIT))
 	{
 		albaString text = wxString::Format("Threshold low:%.1f high:%.1f", m_Threshold[0], m_Threshold[1]);
 		m_AutomaticThresholdTextMapper->SetInput(text.GetCStr());
@@ -1680,7 +1684,10 @@ void albaOpSegmentation::OnInitEvent(albaEvent *e)
 		OnRemoveRange();
 		break;
 	case ID_LOAD:
-		OnLoadSegmentation();
+		if (m_InitModality == LOADSEGM_INIT)
+			OnLoadSegmentation();
+		else // m_InitModality == LOADMASK_INIT
+			OnLoadMask();
 		break;
 	default:
 		albaEventMacro(*e);
@@ -1809,12 +1816,12 @@ void albaOpSegmentation::OnChangeThresholdType()
 
 		int thesholdIDs[] = { ID_AUTO_INC_MIN_THRESHOLD, ID_AUTO_INC_MIDDLE_THRESHOLD, ID_AUTO_INC_MAX_THRESHOLD, ID_AUTO_DEC_MIN_THRESHOLD, ID_AUTO_DEC_MIDDLE_THRESHOLD, ID_AUTO_DEC_MAX_THRESHOLD };
 		for (int i = 0; i < 6; i++)
-			m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(thesholdIDs[i], m_InitModality != LOAD_INIT);
-		m_ThresholdSlider->Enable(m_InitModality != LOAD_INIT);
+			m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(thesholdIDs[i], m_InitModality != LOADSEGM_INIT && m_InitModality != LOADMASK_INIT);
+		m_ThresholdSlider->Enable(m_InitModality != LOADSEGM_INIT && m_InitModality != LOADMASK_INIT);
 
-		m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_LOAD, m_InitModality == LOAD_INIT);
+		m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_LOAD, m_InitModality == LOADSEGM_INIT || m_InitModality == LOADMASK_INIT);
 
-		if (m_InitModality == LOAD_INIT)
+		if (m_InitModality == LOADSEGM_INIT)
 		{
 			//forcing slice update
 			double tmp[3] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MAX, VTK_DOUBLE_MAX };
@@ -1935,6 +1942,82 @@ void albaOpSegmentation::OnLoadSegmentation()
 		UpdateSlice();
 	}
 }
+
+//----------------------------------------------------------------------------
+void albaOpSegmentation::OnLoadMask()
+{
+	albaString title = albaString("Select a mask:");
+	albaEvent e(this, VME_CHOOSE);
+	e.SetString(&title);
+	e.SetPointer(&albaOpSegmentation::MaskAccept);
+	albaEventMacro(e);
+	albaVME *vme = e.GetVme();
+
+	vtkPolyData *maskPolydata = vtkPolyData::SafeDownCast(vme->GetOutput()->GetVTKData());
+	if (!maskPolydata)
+		return;
+
+	wxBusyInfo wait("Masking: Please wait!");
+
+
+	vtkPolyData *transformedMaskPolydata = NULL;
+	vtkTransform *transform = NULL;
+	vtkTransformFilter *transformFilter = NULL;
+	albaMatrix identityMatrix;
+	albaMatrix maskABSMatrix = vme->GetAbsMatrixPipe()->GetMatrix();
+	albaMatrix volumeABSMatrix = m_Input->GetAbsMatrixPipe()->GetMatrix();
+
+	bool isMaskMatrixIdentity = maskABSMatrix.Equals(&identityMatrix);
+	bool isVolumeMatrixIdentity = volumeABSMatrix.Equals(&identityMatrix);
+
+	if (isMaskMatrixIdentity && isVolumeMatrixIdentity)
+		transformedMaskPolydata = maskPolydata;
+	else
+	{
+		// if VME matrix is not identity apply it to dataset
+		albaMatrix meshVolumeAlignMatrix;
+
+		//Calculate align matrix 
+		volumeABSMatrix.Invert();
+		albaMatrix::Multiply4x4(volumeABSMatrix, maskABSMatrix, meshVolumeAlignMatrix);
+
+		// apply abs matrix to geometry
+		transform = vtkTransform::New();
+		transform->SetMatrix(meshVolumeAlignMatrix.GetVTKMatrix());
+
+		// to delete
+		transformFilter = vtkTransformFilter::New();
+
+		transformFilter->SetInput(maskPolydata);
+		transformFilter->SetTransform(transform);
+		transformFilter->Update();
+
+		transformedMaskPolydata = transformFilter->GetPolyDataOutput();
+	}
+
+	vtkMaskPolyDataFilter *maskPolydataFilter;
+
+	vtkNEW(maskPolydataFilter);
+	albaVMEVolumeGray *volume = albaVMEVolumeGray::SafeDownCast(m_SegmentationVolume);
+	maskPolydataFilter->SetInput(volume->GetOutput()->GetVTKData());
+	maskPolydataFilter->SetDistance(0);
+	maskPolydataFilter->SetInsideValue(255);
+	maskPolydataFilter->SetOutsideValue(0);
+	maskPolydataFilter->SetInsideOut(false);
+	maskPolydataFilter->SetBinarize(true);
+	maskPolydataFilter->SetMask(transformedMaskPolydata);
+
+	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, maskPolydataFilter));
+	maskPolydataFilter->Update();
+
+	m_SegmentationVolume->SetData(maskPolydataFilter->GetOutput(), m_SegmentationVolume->GetTimeStamp());
+	UpdateSlice();
+
+	vtkDEL(maskPolydataFilter);
+	vtkDEL(transform);
+	vtkDEL(transformFilter);
+}
+
 //----------------------------------------------------------------------------
 bool albaOpSegmentation::SegmentedVolumeAccept(albaVME*node)
 {
@@ -1976,6 +2059,12 @@ bool albaOpSegmentation::SegmentedVolumeAccept(albaVME*node)
 	}
 
 	return false;
+}
+
+//----------------------------------------------------------------------------
+bool albaOpSegmentation::MaskAccept(albaVME* node)
+{
+	return(node != NULL && node->GetOutput()->IsA("albaVMEOutputSurface"));
 }
 
 // EDIT PHASE EVENTS
@@ -2388,8 +2477,6 @@ UndoRedoState albaOpSegmentation::CreateVolumeUndoRedoState()
 
 	return urs;
 }
-
-
 //----------------------------------------------------------------------------
 UndoRedoState albaOpSegmentation::CreateUndoRedoState()
 {
@@ -2727,7 +2814,7 @@ int albaOpSegmentation::PressKey(int keyCode, bool ctrl, bool alt, bool shift)
 
 	if (m_CurrentPhase == INIT_SEGMENTATION)
 	{
-		if (m_InitModality != LOAD_INIT)
+		if (m_InitModality != LOADSEGM_INIT && m_InitModality != LOADMASK_INIT)
 		{
 			if (ctrl) // Pick Min
 			{

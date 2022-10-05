@@ -475,6 +475,14 @@ void albaInteractor2DMeasure::ActivateMeasure(int index, bool activate)
 
 /// GET-SET /////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
+double albaInteractor2DMeasure::GetMeasureValue(int index)
+{
+	if (index >= 0 && index < m_Measure2DVector.size())
+		return m_Measure2DVector[index].Value;
+
+	return 0.0;
+}
+//---------------------------------------------------------------------------
 albaString albaInteractor2DMeasure::GetMeasureText(int index)
 {
 	if (index >= 0 && index < m_Measure2DVector.size())

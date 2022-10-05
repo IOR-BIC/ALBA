@@ -103,8 +103,10 @@ void albaInteractor2DMeasure_Point::EditMeasure(int index, double *point)
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Point::FindAndHighlight(double *point)
 {
-	if (m_CurrMeasure < 0)
+	if (m_CurrMeasure < 0 && m_AddMeasureEnable)
 		SetAction(ACTION_ADD_MEASURE);
+	else
+		SetAction(ACTION_NONE);
 
 	if (m_EditMeasureEnable)
 	{
@@ -140,6 +142,21 @@ void albaInteractor2DMeasure_Point::FindAndHighlight(double *point)
 			m_CurrMeasure = -1;
 			Render();
 		}
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaInteractor2DMeasure_Point::ReDrawAll()
+{
+	double point[3];
+
+	for (int i = 0; i < m_Measure2DVector.size(); i++)
+	{
+		vtkPointSource* pointSource = (vtkPointSource*)m_PointsStackVector[i]->GetSource();
+		pointSource->GetCenter(point);
+
+		UpdatePointActor(point);
+		UpdateTextActor(i, point);
 	}
 }
 
@@ -277,14 +294,16 @@ bool albaInteractor2DMeasure_Point::Load(albaVME *input, wxString tag)
 		albaTagItem *measureLabelTag = input->GetTagArray()->GetTag(tag + "MeasurePointLabel");
 		albaTagItem *measurePointTag = input->GetTagArray()->GetTag(tag + "MeasurePoint");
 
-		int nPoints = measurePointTag->GetNumberOfComponents() / 2;
+		int nPoints = measurePointTag->GetNumberOfComponents() / 3;
+
+		m_CurrentRenderer = m_Renderer;
 
 		// Reload points
 		for (int i = 0; i < nPoints; i++)
 		{
 			point1[X] = measurePointTag->GetValueAsDouble(i * 3 + 0);
 			point1[Y] = measurePointTag->GetValueAsDouble(i * 3 + 1);
-			point1[Z] = measurePointTag->GetValueAsDouble(i * 3 + 1);
+			point1[Z] = measurePointTag->GetValueAsDouble(i * 3 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);

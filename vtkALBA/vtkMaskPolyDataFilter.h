@@ -70,15 +70,30 @@ public:
   vtkBooleanMacro(InsideOut,int);
 
 
+	/**
+	Set/Get the Binarize flag.
+	When off, the inside our outside data is copied from the input volume
+	When  on, the output volume is a binary one 
+	Binarize is off by default.*/
+	vtkSetMacro(Binarize, int);
+	vtkGetMacro(Binarize, int);
+	vtkBooleanMacro(Binarize, int);
+
   /**
   Specify the polygonal dataset to perform the masking.*/
   void SetMask(vtkPolyData *mask) {this->SetNthInput(1, mask);};
   vtkPolyData *GetMask() { return (vtkPolyData *)(this->Inputs[1]);};
 
-  /**
-  Set / get the fill value*/
-  vtkSetMacro(FillValue,double);
-  vtkGetMacro(FillValue,double);
+	/**
+	Set / get the Inside value*/
+	vtkSetMacro(InsideValue, double);
+	vtkGetMacro(InsideValue, double);
+
+	/**
+	Set / get the Outside value*/
+	vtkSetMacro(OutsideValue, double);
+	vtkGetMacro(OutsideValue, double);
+
 	
 	/** Creates the current slice mask, used for algorithm optimization */
 	void InitCurrentSliceMask();
@@ -98,9 +113,12 @@ protected:
   vtkPolyData *Mask;
 	vtkPolyData *CurrentSliceMask;
 	vtkIdType *IdConversionTable;
-  double Distance; 
-  double FillValue;
-  int InsideOut;
+	double Distance;
+	double Distance2;
+	double InsideValue;
+	double OutsideValue;
+	int Binarize;
+	int InsideOut;
 };
 
 #endif

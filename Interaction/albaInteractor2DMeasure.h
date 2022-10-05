@@ -116,6 +116,8 @@ public:
 	virtual bool Save(albaVME *input, wxString tag) { return true; };
 
 	/// GET
+	/** Get Measure Value*/
+	double GetMeasureValue(int index);
 	/** Get Measure Text Value*/
 	albaString GetMeasureText(int index);	
 	/** Get Measure Extra Label*/
@@ -179,6 +181,9 @@ public:
 	int GetCurrPlane() { return m_CurrPlane; }
 	void SetCurrPlane(int plane) { m_CurrPlane = plane; }
 
+	// Update and Draw All Measure
+	virtual void ReDrawAll() {};
+
 protected:
 
 	struct Measure2D
@@ -189,6 +194,7 @@ protected:
 		albaString Label;
 		vtkRenderer *Renderer = NULL;
 		albaRWIBase *Rwi;
+		double Value = 0.0;
 		//std::vector<double[3]> Points;
 	};
 
