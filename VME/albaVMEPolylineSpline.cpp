@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaVMEPolylineSpline
- Authors: Daniele Giunchi & Matteo Giacomoni
+ Authors: Daniele Giunchi & Matteo Giacomoni, Nicola Vanella
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -13,7 +13,6 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
 
 #include "albaDefines.h" 
 //----------------------------------------------------------------------------
@@ -45,6 +44,8 @@
 #include "vtkMath.h"
 
 #include <assert.h>
+#include "albaVMELandmarkCloud.h"
+#include "albaVME.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEPolylineSpline)
@@ -52,7 +53,6 @@ albaCxxTypeMacro(albaVMEPolylineSpline)
 
 //-------------------------------------------------------------------------
 albaVMEPolylineSpline::albaVMEPolylineSpline()
-//-------------------------------------------------------------------------
 {
   albaNEW(m_Transform);
   albaVMEOutputPolyline *output=albaVMEOutputPolyline::New(); // an output with no data
@@ -80,16 +80,15 @@ albaVMEPolylineSpline::albaVMEPolylineSpline()
 }
 //-------------------------------------------------------------------------
 albaVMEPolylineSpline::~albaVMEPolylineSpline()
-//-------------------------------------------------------------------------
 {
   vtkDEL(m_Polyline);
 	vtkDEL(m_PointsSplined);
   albaDEL(m_Transform);
   SetOutput(NULL);
 }
+
 //-------------------------------------------------------------------------
 int albaVMEPolylineSpline::DeepCopy(albaVME *a)
-//-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==ALBA_OK)
   {
@@ -118,7 +117,6 @@ int albaVMEPolylineSpline::DeepCopy(albaVME *a)
 
 //-------------------------------------------------------------------------
 bool albaVMEPolylineSpline::Equals(albaVME *vme)
-//-------------------------------------------------------------------------
 {
   bool ret = false;
   if (Superclass::Equals(vme))
@@ -132,16 +130,14 @@ bool albaVMEPolylineSpline::Equals(albaVME *vme)
   return ret;
 }
 
-
 //-------------------------------------------------------------------------
 albaVMEOutputPolyline *albaVMEPolylineSpline::GetPolylineOutput()
-//-------------------------------------------------------------------------
 {
   return (albaVMEOutputPolyline *)GetOutput();
 }
+
 //-------------------------------------------------------------------------
 void albaVMEPolylineSpline::SetMatrix(const albaMatrix &mat)
-//-------------------------------------------------------------------------
 {
   m_Transform->SetMatrix(mat);
   Modified();
@@ -149,14 +145,12 @@ void albaVMEPolylineSpline::SetMatrix(const albaMatrix &mat)
 
 //-------------------------------------------------------------------------
 bool albaVMEPolylineSpline::IsAnimated()
-//-------------------------------------------------------------------------
 {
   return false;
 }
 
 //-------------------------------------------------------------------------
 bool albaVMEPolylineSpline::IsDataAvailable()
-//-------------------------------------------------------------------------
 {
   if(GetPolylineLink())
     return GetPolylineLink()->IsDataAvailable();
@@ -166,32 +160,66 @@ bool albaVMEPolylineSpline::IsDataAvailable()
 
 //-------------------------------------------------------------------------
 void albaVMEPolylineSpline::GetLocalTimeStamps(std::vector<albaTimeStamp> &kframes)
-//-------------------------------------------------------------------------
 {
   kframes.clear(); // no timestamps
 }
 
 //-----------------------------------------------------------------------
 void albaVMEPolylineSpline::InternalUpdate() //Multi
-//-----------------------------------------------------------------------
 {
-  //wxBusyCursor wait;
-	
-  albaVMEPolyline *vme = albaVMEPolyline::SafeDownCast(GetPolylineLink());
-  
+	//wxBusyCursor wait;
 
-	if (vme == NULL) 
-	{ 
+	albaVMEPolyline *vmePL = albaVMEPolyline::SafeDownCast(GetPolylineLink());
+	albaVMELandmarkCloud *vmeLC = albaVMELandmarkCloud::SafeDownCast(GetPolylineLink());
+
+	if (vmePL == NULL && vmeLC == NULL)
+	{
 		return;
 	}
-  vme->Update();
 
-  vtkPolyData *polyline = ((vtkPolyData *)vme->GetOutput()->GetVTKData());
+	
+	vtkALBASmartPointer<vtkPolyData> poly;
 
-  if(m_OrderByAxisMode) OrderPolylineByAxis(polyline, m_OrderByAxisMode);
+	if (vmePL) 
+	{
+		vmePL->Update();
 
-  vtkALBASmartPointer<vtkPolyData> poly;
-  poly->DeepCopy(polyline);
+		vtkPolyData *polyline = ((vtkPolyData *)vmePL->GetOutput()->GetVTKData());
+
+		if (m_OrderByAxisMode) OrderPolylineByAxis(polyline, m_OrderByAxisMode);
+
+		poly->DeepCopy(polyline);
+	}
+	else
+	{
+		vmeLC->Update();
+
+		vtkALBASmartPointer<vtkPoints> in_points;
+		vtkALBASmartPointer<vtkCellArray> in_cells;
+		vtkIdType pointId[2];
+
+		for (int i = 0; i < vmeLC->GetNumberOfChildren(); i++)
+		{
+			double point[3], rot[3];
+			vmeLC->GetChild(i)->GetOutput()->GetPose(point, rot);
+			in_points->InsertNextPoint(point);
+
+			if (i > 0)
+			{
+				pointId[0] = i - 1;
+				pointId[1] = i;
+				in_cells->InsertNextCell(2, pointId);
+			}
+		}
+
+		in_points->Modified();
+
+		poly->SetPoints(in_points);
+		poly->SetLines(in_cells);
+		poly->Modified();
+		poly->Update();
+	}
+	
   poly->Update();
 
   this->SplinePolyline(poly); // generate a "splined" polyline 
@@ -205,27 +233,24 @@ void albaVMEPolylineSpline::InternalUpdate() //Multi
 }
 //-----------------------------------------------------------------------
 void albaVMEPolylineSpline::InternalPreUpdate()
-//-----------------------------------------------------------------------
 {
-  
 }
 //-----------------------------------------------------------------------
 int albaVMEPolylineSpline::InternalStore(albaStorageElement *parent)
-//-----------------------------------------------------------------------
 {  
   if (Superclass::InternalStore(parent)==ALBA_OK)
   {
-    if(parent->StoreMatrix("Transform",&m_Transform->GetMatrix())==ALBA_OK && 
-       parent->StoreInteger("AxisReorder", m_OrderByAxisMode) == ALBA_OK
-      )    
-      return ALBA_OK;
+		if (parent->StoreMatrix("Transform", &m_Transform->GetMatrix()) == ALBA_OK &&
+			parent->StoreInteger("AxisReorder", m_OrderByAxisMode) == ALBA_OK)
+		{
+			GetLogicManager()->CameraUpdate();
+			return ALBA_OK;
+		}
   }
   return ALBA_ERROR;
 }
-
 //-----------------------------------------------------------------------
 int albaVMEPolylineSpline::InternalRestore(albaStorageElement *node)
-//-----------------------------------------------------------------------
 {
   if (Superclass::InternalRestore(node)==ALBA_OK)
   {
@@ -234,6 +259,7 @@ int albaVMEPolylineSpline::InternalRestore(albaStorageElement *node)
     {
       node->RestoreInteger("AxisReorder",m_OrderByAxisMode);
       m_Transform->SetMatrix(matrix);
+			GetLogicManager()->CameraUpdate();
       return ALBA_OK;
     }
   }
@@ -243,7 +269,6 @@ int albaVMEPolylineSpline::InternalRestore(albaStorageElement *node)
 
 //-----------------------------------------------------------------------
 void albaVMEPolylineSpline::Print(std::ostream& os, const int tabs)
-//-----------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);
   albaIndent indent(tabs);
@@ -251,30 +276,29 @@ void albaVMEPolylineSpline::Print(std::ostream& os, const int tabs)
   albaMatrix m = m_Transform->GetMatrix();
   m.Print(os,indent.GetNextIndent());
 }
+
 //-------------------------------------------------------------------------
 char** albaVMEPolylineSpline::GetIcon() 
-//-------------------------------------------------------------------------
 {
-  #include "albaVMEProcedural.xpm"
-  return albaVMEProcedural_xpm;
+  #include "albaVMEPolylineSpline.xpm"
+  return albaVMEPolylineSpline_xpm;
 }
+
 //-------------------------------------------------------------------------
 void albaVMEPolylineSpline::SetPolylineLink(albaVME *n)
-//-------------------------------------------------------------------------
 {
-	SetLink("PolylineSource", n);
+	SetMandatoryLink("PolylineSource", n);
 }
+
 //-------------------------------------------------------------------------
 albaVME *albaVMEPolylineSpline::GetPolylineLink()
-//-------------------------------------------------------------------------
 {
   return GetLink("PolylineSource");
 }
+
 //-------------------------------------------------------------------------
 albaGUI* albaVMEPolylineSpline::CreateGui()
-//-------------------------------------------------------------------------
 {
-
 	albaID sub_id = -1;
 
   m_Gui = albaVME::CreateGui(); // Called to show info about vmes' type and name
@@ -285,16 +309,16 @@ albaGUI* albaVMEPolylineSpline::CreateGui()
 
 	albaVME *polyline_vme = GetPolylineLink();
   m_PolylineLinkName = polyline_vme ? polyline_vme->GetName() : _("none");
-  m_Gui->Button(ID_LINK_POLYLINE,&m_PolylineLinkName,_("Polyline"), _("Select the Polyline to create the Spline"));
+  m_Gui->Button(ID_LINK_POLYLINE,&m_PolylineLinkName,_("Polyline / Landmark Cloud"), _("Select the Polyline or Landmark Cloud to create the Spline"));
 
 	m_Gui->Update();
 	//this->InternalUpdate();
 
   return m_Gui;
 }
+
 //-------------------------------------------------------------------------
 void albaVMEPolylineSpline::OnEvent(albaEventBase *alba_event)
-//-------------------------------------------------------------------------
 {
   // events to be sent up or down in the tree are simply forwarded
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
@@ -317,6 +341,7 @@ void albaVMEPolylineSpline::OnEvent(albaEventBase *alba_event)
 					InternalUpdate();
           GetPolylineOutput()->Update();
 					m_Gui->Update();
+					GetLogicManager()->CameraUpdate();
         }
       }
       break;
@@ -324,6 +349,8 @@ void albaVMEPolylineSpline::OnEvent(albaEventBase *alba_event)
 				{
 					InternalUpdate();
           GetPolylineOutput()->Update();
+					Update();
+					GetLogicManager()->CameraUpdate();
 				}
 				break;
       default:
@@ -335,9 +362,9 @@ void albaVMEPolylineSpline::OnEvent(albaEventBase *alba_event)
     Superclass::OnEvent(alba_event);
   }
 }
+
 //-------------------------------------------------------------------------
 void albaVMEPolylineSpline::OrderPolyline(vtkPolyData *polyline)
-//-------------------------------------------------------------------------
 {
   //cell 
   vtkALBASmartPointer<vtkCellArray> cellArray;
@@ -357,9 +384,9 @@ void albaVMEPolylineSpline::OrderPolyline(vtkPolyData *polyline)
   polyline->Modified();
   polyline->Update();
 }
+
 //-------------------------------------------------------------------------
 void albaVMEPolylineSpline::SplinePolyline(vtkPolyData *polyline)
-//-------------------------------------------------------------------------
 {
   // ALGORITHM
   m_PointsSplined->Reset();
@@ -400,11 +427,10 @@ void albaVMEPolylineSpline::SplinePolyline(vtkPolyData *polyline)
 
   polyline->SetPoints(m_PointsSplined);
   polyline->Update();
-
 }
+
 /*/-------------------------------------------------------------------------
 void albaVMEPolylineSpline::OptimizeMinimumSpacingSpline()
-//-------------------------------------------------------------------------
 {
   vtkPoints *points = vtkPoints::New();
 
@@ -435,9 +461,9 @@ void albaVMEPolylineSpline::OptimizeMinimumSpacingSpline()
   m_PointsSplined->DeepCopy(points);
   vtkDEL(points);
 }*/
+
 //-------------------------------------------------------------------------
 mmaMaterial *albaVMEPolylineSpline::GetMaterial()
-//-------------------------------------------------------------------------
 {
   mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
   if (material == NULL)
@@ -451,9 +477,24 @@ mmaMaterial *albaVMEPolylineSpline::GetMaterial()
   }
   return material;
 }
+
+//-------------------------------------------------------------------------
+void albaVMEPolylineSpline::SetColor(double r, double g, double b)
+{
+	albaVMEPolyline *polyline_vme = (albaVMEPolyline*)GetPolylineLink();
+
+	if (polyline_vme)
+	{
+		polyline_vme->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+		polyline_vme->GetMaterial()->m_Diffuse[0] = r;
+		polyline_vme->GetMaterial()->m_Diffuse[1] = g;
+		polyline_vme->GetMaterial()->m_Diffuse[2] = b;
+		polyline_vme->GetMaterial()->UpdateProp();
+	}
+}
+
 //-------------------------------------------------------------------------
 void albaVMEPolylineSpline::OrderPolylineByAxis(vtkPolyData* polyline, int axis)
-//-------------------------------------------------------------------------
 {
   vtkALBASmartPointer<vtkPolyData> poly;
   poly->DeepCopy(polyline);
@@ -561,5 +602,4 @@ void albaVMEPolylineSpline::OrderPolylineByAxis(vtkPolyData* polyline, int axis)
 
   polyline->DeepCopy(poly);
   polyline->Update();
-
 }

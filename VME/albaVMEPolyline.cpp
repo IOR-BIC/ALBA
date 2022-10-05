@@ -64,8 +64,8 @@ albaVMEOutput *albaVMEPolyline::GetOutput()
 char** albaVMEPolyline::GetIcon() 
 //-------------------------------------------------------------------------
 {
-  #include "albaVMEFem.xpm"
-	return albaVMEFem_xpm;
+  #include "albaVMEPolyline.xpm"
+	return albaVMEPolyline_xpm;
 }
 //-------------------------------------------------------------------------
 int albaVMEPolyline::InternalInitialize()

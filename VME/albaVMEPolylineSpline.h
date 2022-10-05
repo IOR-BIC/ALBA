@@ -28,6 +28,7 @@ class vtkPolyData;
 class albaVME;
 class vtkPoints;
 class mmaMaterial;
+class albaVMELandmarkCloud;
 
 /** albaVMEPolylineSpline - a procedural VME computing the spline by a given polyline as link
   albaVMEPolylineSpline is a node implementing a spline starting from a polyline using vtkCardinalSpline
@@ -102,6 +103,9 @@ public:
   /** Return pointer to material attribute. */
   mmaMaterial *GetMaterial();
 
+	/** Set color of Spline. */
+	void SetColor(double r, double g, double b);
+
   /** reorganize the points in order to follow an axis */
   void OrderPolylineByAxis(vtkPolyData* polyline, int axis);
 
@@ -112,7 +116,7 @@ public:
     ID_LAST
   };
 
-	static bool PolylineAccept(albaVME*node) {return(node != NULL && (node->IsA("albaVMEPolyline")));};
+	static bool PolylineAccept(albaVME*node) {return(node != NULL && (node->IsA("albaVMEPolyline") || node->IsA("albaVMELandmarkCloud")));};
 
 	/** Precess events coming from other objects */ 
   virtual void OnEvent(albaEventBase *alba_event);
