@@ -46,8 +46,8 @@ class vtkTextActor;
 
 #define TEXT_W_SHIFT 10
 #define TEXT_H_SHIFT 5
-#define POINT_UPDATE_DISTANCE 4
-#define POINT_UPDATE_DISTANCE_2 (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE)
+// #define POINT_UPDATE_DISTANCE 4
+// #define POINT_UPDATE_DISTANCE_2 (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE)
 
 // Class Name: albaInteractor2DMeasure
 class ALBA_EXPORT albaInteractor2DMeasure : public albaInteractorPER
@@ -184,6 +184,8 @@ public:
 	// Update and Draw All Measure
 	virtual void ReDrawAll() {};
 
+	void SetUpdateDistance(int dist/*Default = 4*/);
+
 protected:
 
 	struct Measure2D
@@ -316,6 +318,9 @@ protected:
 	double m_PointSize;
 	double m_LineWidth;
 	int m_TextSide;
+
+	int POINT_UPDATE_DISTANCE = 4;
+	int POINT_UPDATE_DISTANCE_2 = (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE);
 
 private:
 
