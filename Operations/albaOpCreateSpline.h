@@ -42,6 +42,9 @@ public:
   void OpRun();
   void OpDo();
 
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char** GetIcon();
+
 protected: 
 
 	/** Return true for the acceptable vme type. */
