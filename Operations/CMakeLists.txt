@@ -23,6 +23,7 @@ IF (ALBA_USE_VTK)
 	albaOpExporterBmp.cpp	    				albaOpExporterBmp.h
 	albaOpClipSurface.cpp	    				albaOpClipSurface.h
 	albaOpCreateGroup.cpp	    				albaOpCreateGroup.h
+	albaOpCreateInfoText.cpp					albaOpCreateInfoText.h
 	albaOpCreateMeter.cpp	    				albaOpCreateMeter.h
 	albaOpCreateSurfaceParametric.cpp	albaOpCreateSurfaceParametric.h
 	albaOpCreateProber.cpp	    				albaOpCreateProber.h
