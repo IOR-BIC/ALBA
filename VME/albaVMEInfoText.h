@@ -31,12 +31,9 @@ public:
   /** Return the output. This create the output object on demand. */  
   virtual albaVMEOutput *GetOutput();
 
-  /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0);
-
   enum INFOTEX_WIDGET_ID
   {
-    ID_SCALE_FACTOR = Superclass::ID_LAST,
+    ID_LABEL = Superclass::ID_LAST,
     ID_LAST
   };
 
@@ -46,17 +43,8 @@ public:
   /** Compare with another VME-RefSys. */
   virtual bool Equals(albaVME *vme);
 
-  void SetPosShow(bool show, int index);
-  bool GetPosShow(int index);
-  void SetPosLabel(const albaString& label, int index);
-  const char *GetPosLabel(int index);
-  const char *GetPosText(int index);
-
-  void AddString(const albaString& str){m_Strings.push_back(str);Modified();}
-  int GetNumberOfStrings() {return m_Strings.size();}
-  //void GetLocalTimeStamps(std::vector<albaTimeStamp> &kframes){kframes.clear();}
-
-  void SetTimeStamp(albaTimeStamp t);
+  void SetLabel(const albaString& label);
+  const char *GetLabel();
 
   /** return icon */
   static char** GetIcon();
@@ -71,17 +59,11 @@ protected:
   virtual int InternalStore(albaStorageElement *parent);
   virtual int InternalRestore(albaStorageElement *node);
   
-  albaString              m_PositionText[3];
-
-
-private:
 
   albaVMEInfoText(const albaVMEInfoText&); // Not implemented
   void operator=(const albaVMEInfoText&); // Not implemented
 
-  bool                   m_PosShow[3];
-  albaString              m_PosLabels[3];
-  std::vector<albaString> m_Strings;
+  albaString  m_Label;
 };
 
 #endif
