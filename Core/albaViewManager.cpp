@@ -417,7 +417,11 @@ albaView *albaViewManager::ViewCreate(int id)
 	if (m_ViewOpenOnlyOne)
 		for (albaView * view = GetList(); view; view = view->m_Next)
 		{
-			if (view->m_Id == id) return view;
+			if (view->m_Id == id)
+			{
+				Activate(view);
+				return view;
+			}
 		}
 	
   // Paolo 2005-04-22

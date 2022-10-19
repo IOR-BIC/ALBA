@@ -167,6 +167,8 @@ IF (ALBA_USE_VTK)
 	
 	albaComputeHausdorffDistance.cpp	albaComputeHausdorffDistance.h
 	albaOpComputeHausdorffDistance.cpp albaOpComputeHausdorffDistance.h
+	
+	albaOpCreatePolyline.cpp	albaOpCreatePolyline.h
   )
 ENDIF (ALBA_USE_VTK)
 
