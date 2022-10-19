@@ -181,6 +181,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaViewSliceOnCurveCompound.h"
 #include "albaViewSlicer.h"
 #include "albaViewVTK.h"
+#include "albaOpCreateInfoText.h"
 #include "albaViewVTKCompound.h"
 
 //WIZARD
@@ -320,6 +321,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpCreateGroup("Group"),_("Create"));
 	m_Logic->Plug(new albaOpCreateMeter("Meter"),_("Create"));
 	m_Logic->Plug(new albaOpCreateRefSys("RefSys"),_("Create"));
+	m_Logic->Plug(new albaOpCreateInfoText("Info Text"), _("Create"));
 	m_Logic->Plug(new albaOpCreateRefSysFromViewSlice("RefSys from View Slice"), _("Create"));
 	m_Logic->Plug(new albaOpCreateProber("Prober"),_("Create"));
 	m_Logic->Plug(new albaOpCreateSlicer("Slicer"),_("Create"));

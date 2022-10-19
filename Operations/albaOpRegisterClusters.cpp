@@ -503,7 +503,9 @@ double albaOpRegisterClusters::CalculateDeviation(vtkPoints* sourcePoints, vtkPo
 
 	vtkMatrix4x4* matReg = RegisterPoints(sourcePoints, targetPoints, weights);
 	double deviation = CalculateDeviation(sourcePoints, targetPoints, matReg);
-	m_Info->SetAbsPose(deviation, 0.0, 0.0, 0.0, 0.0, 0.0, currTime);
+	albaString label;
+	label.Printf("Registration residual: %f", deviation);
+	m_Info->SetLabel(label);
 	
 	//t_matrix now contains the correct transformation matrix for the current time
 	m_Registered->SetTimeStamp(currTime); //SetCurrentTime(currTime);
@@ -586,8 +588,6 @@ void albaOpRegisterClusters::OpRun()
 		
 	albaNEW(m_Info);	
 	m_Info->SetName(wxString::Format("Info for registration %s into %s",source->GetName(), target->GetName()));
-	m_Info->SetPosLabel("Registration residual: ", 0);
-	m_Info->SetPosShow(true, 0);
 	GetLogicManager()->VmeAdd(m_Info);
 	m_Info->ReparentTo(m_Result);
 
