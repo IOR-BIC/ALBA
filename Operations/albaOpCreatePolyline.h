@@ -66,5 +66,9 @@ protected:
 
 	albaInteractor2DMeasure_Point* m_PointInteractor;
 	albaVMEPolyline *m_Polyline;
+
+	albaString m_PolylineName;
+
+	bool m_IsLoading;
 };
 #endif
