@@ -50,6 +50,8 @@ albaOp(label)
 	m_PointInteractor = NULL;
 
 	m_Polyline = NULL;
+	m_PolylineName = "New Polyline";
+	m_IsLoading = false;
 }
 //----------------------------------------------------------------------------
 albaOpCreatePolyline::~albaOpCreatePolyline( ) 
@@ -96,7 +98,7 @@ void albaOpCreatePolyline::UpdateGui()
 }
 
 //----------------------------------------------------------------------------
-void albaOpCreatePolyline::OpRun()   
+void albaOpCreatePolyline::OpRun()
 {
 	if (!GetTestMode())
 	{
@@ -119,6 +121,28 @@ void albaOpCreatePolyline::OpRun()
 		albaEventMacro(albaEvent(this, PER_PUSH, (albaObject *)m_PointInteractor));
 		m_PointInteractor->Enable(true);
 		m_PointInteractor->SetListener(this);
+
+		if (m_Input->IsA("albaVMEPolyline"))
+		{
+			m_IsLoading = true;
+
+			albaVMEPolyline *polyline = albaVMEPolyline::SafeDownCast(m_Input);
+
+			vtkPolyData *in_data = polyline->GetPolylineOutput()->GetPolylineData();
+
+			double point[3];
+			for (int i = 0; i < in_data->GetNumberOfPoints(); i++)
+			{
+				in_data->GetPoint(i, point);
+				m_PointInteractor->AddMeasure(point);
+			}
+
+			m_PolylineName = "New ";
+			m_PolylineName += m_Input->GetName();
+
+			m_IsLoading = false;
+		}
+
 	}
 }
 //----------------------------------------------------------------------------
@@ -135,7 +159,8 @@ void albaOpCreatePolyline::OpStop(int result)
 	}
 	else
 	{
-		m_Polyline->ReparentTo(NULL);
+		if (m_Polyline)
+			m_Polyline->ReparentTo(NULL);
 	}
 
 	if (m_PointInteractor)
@@ -175,22 +200,23 @@ void albaOpCreatePolyline::OnEvent(albaEventBase *alba_event)
 		}
 		else // From Interactor
 		{
-			switch (e->GetId())
-			{
-			case albaInteractor2DMeasure::ID_MEASURE_SELECTED: break;
-			case albaInteractor2DMeasure::ID_MEASURE_ADDED: break;
-			case albaInteractor2DMeasure::ID_MEASURE_CHANGED: break;
-			case albaInteractor2DMeasure::ID_MEASURE_FINISHED: 
-			{
-				if (m_PointInteractor && m_PointInteractor->GetMeasureCount() > 2)
+			if (!m_IsLoading)
+				switch (e->GetId())
 				{
-					CreatePolyline();
+				case albaInteractor2DMeasure::ID_MEASURE_SELECTED: break;
+				case albaInteractor2DMeasure::ID_MEASURE_ADDED: break;
+				case albaInteractor2DMeasure::ID_MEASURE_CHANGED: break;
+				case albaInteractor2DMeasure::ID_MEASURE_FINISHED:
+				{
+					if (m_PointInteractor && m_PointInteractor->GetMeasureCount() > 2)
+					{
+						CreatePolyline();
 
-					GetLogicManager()->VmeShow(m_Polyline, true);
+						GetLogicManager()->VmeShow(m_Polyline, true);
+					}
 				}
-			}				
 				break;
-			}
+				}
 		}
 	}
 	else
@@ -205,7 +231,7 @@ void albaOpCreatePolyline::CreatePolyline()
 	if (m_Polyline == NULL)
 	{
 		albaNEW(m_Polyline);
-		m_Polyline->SetName("Polyline");
+		m_Polyline->SetName(m_PolylineName);
 		m_Polyline->ReparentTo(m_Input);
 	}
 
