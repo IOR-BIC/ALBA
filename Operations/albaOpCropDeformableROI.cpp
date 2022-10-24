@@ -218,6 +218,7 @@ void albaOpCropDeformableROI::Algorithm(albaVME *vme)
 		albaVMEVolumeGray *volume = albaVMEVolumeGray::SafeDownCast(m_Input);
 		m_MaskPolydataFilter->SetInput(volume->GetOutput()->GetVTKData());
 		m_MaskPolydataFilter->SetDistance(m_Distance);
+		m_MaskPolydataFilter->SetTriplePass(true);
 		m_MaskPolydataFilter->SetInsideValue(m_InsideValue);
 		m_MaskPolydataFilter->SetOutsideValue(m_OutsideValue);
 		if (m_Modality == FILL_OUTSIDE)

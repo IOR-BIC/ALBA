@@ -47,6 +47,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkCellArray.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkCellLocator.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkStructuredPoints.h"
 
 vtkStandardNewMacro(vtkMaskPolyDataFilter);
 
@@ -59,7 +61,7 @@ vtkMaskPolyDataFilter::vtkMaskPolyDataFilter(vtkPolyData *mask)
   this->SetMask(mask);
 //  this->GenerateMaskScalars = 0;
   this->Distance = 0;
-  this->InsideOut = this->Binarize = 0;
+  this->InsideOut = this->Binarize = this->TriplePass = 0;
   this->InsideValue=this->OutsideValue=0.0;
 
 }
@@ -78,16 +80,27 @@ vtkMaskPolyDataFilter::~vtkMaskPolyDataFilter()
 //
 void vtkMaskPolyDataFilter::Execute()
 {
-	int i,j,k, abortExecute=0;
+	if (this->TriplePass)
+		TriplePassAlgorithm();
+	else
+		StandardAlgorithm();
+}
+
+
+
+//----------------------------------------------------------------------------
+void vtkMaskPolyDataFilter::StandardAlgorithm()
+{
+	int i, j, k, abortExecute = 0;
 	vtkDataSet *output = this->GetOutput();
 	vtkDataSet *input = this->GetInput();
-	int numPts=input->GetNumberOfPoints();
-	vtkPointData *inPointData=input->GetPointData(), *outPointData=output->GetPointData();
-	vtkCellData *inCellData=input->GetCellData(), *outCellData=output->GetCellData();
+	int numPts = input->GetNumberOfPoints();
+	vtkPointData *inPointData = input->GetPointData(), *outPointData = output->GetPointData();
+	vtkCellData *inCellData = input->GetCellData(), *outCellData = output->GetCellData();
 	vtkIdType idx, cellId;
 	int subId;
 	double  closestPoint[3];
-	double *currentPoint,*x1;
+	double *currentPoint, *x1;
 	x1 = new double[3];
 	double distance2;
 	double dot, n[3];
@@ -95,27 +108,28 @@ void vtkMaskPolyDataFilter::Execute()
 	vtkIdList *cellIds = vtkIdList::New();
 	double pcoords[3];
 	double bounds[6];
-	double currentZ=VTK_DOUBLE_MIN;
-	
+	double currentZ = VTK_DOUBLE_MIN;
+
+
 	//  vtkDebugMacro(<< "Executing MaskPolyDataFilter");
 
 	//
 	// Initialize self; create output objects
 	//
-	if ( !this->GetMask() )
+	if (!this->GetMask())
 	{
 		//	vtkErrorMacro(<<"No mask specified");
 		return;
 	}
 
-	Mask=this->GetMask();
+	Mask = this->GetMask();
 
 	Mask->GetBounds(bounds);
 
-	double *weights=new double[4];    
+	double *weights = new double[4];
 	cellIds->SetNumberOfIds(Mask->GetMaxCellSize());
 
-	if ( numPts < 1 )
+	if (numPts < 1)
 	{
 		//vtkErrorMacro(<<"No data to Mask");
 		return;
@@ -130,7 +144,7 @@ void vtkMaskPolyDataFilter::Execute()
 	outPointData->DeepCopy(inPointData);
 	outCellData->DeepCopy(inCellData);
 
-	int numcomp=outPointData->GetScalars()->GetNumberOfComponents();
+	int numcomp = outPointData->GetScalars()->GetNumberOfComponents();
 
 	float *inTuple = new float[numcomp];
 	float *outTuple = new float[numcomp];
@@ -143,27 +157,27 @@ void vtkMaskPolyDataFilter::Execute()
 
 	this->Distance2 = this->Distance * this->Distance;
 
-	int oldProgress=0;
-	int progress=0;
+	int oldProgress = 0;
+	int progress = 0;
 
 	InitCurrentSliceMask();
 
 
 	vtkALBASmartPointer<vtkCellLocator> cellLocator;
 
-	for (i = 0; i < numPts && !abortExecute; i++) 
+	for (i = 0; i < numPts && !abortExecute; i++)
 	{
-		
-		progress=((float)i*100/(float)numPts);
 
-		if (progress!=oldProgress)
+		progress = ((float)i * 100 / (float)numPts);
+
+		if (progress != oldProgress)
 		{
-			oldProgress=progress;
-			this->UpdateProgress((float)progress/100.0);
+			oldProgress = progress;
+			this->UpdateProgress((float)progress / 100.0);
 			abortExecute = this->GetAbortExecute();
 		}
 
-		dot=1;
+		dot = 1;
 		currentPoint = output->GetPoint(i);
 
 
@@ -171,7 +185,7 @@ void vtkMaskPolyDataFilter::Execute()
 		// use XNOR table to exclude points that not respect the InsideOut and bounding box condition
 		// i.e. if InsideOut is 1 points inside the sourface must be sets to the FillValue, so points upside the bounding 
 		// box should be skipped
-		if ( (currentPoint[0] <= bounds[0]) || (currentPoint[0] >= bounds[1]) || (currentPoint[1] <= bounds[2]) || (currentPoint[1] >= bounds[3]) || (currentPoint[2] <= bounds[4]) || (currentPoint[2] >= bounds[5])) 
+		if ((currentPoint[0] <= bounds[0]) || (currentPoint[0] >= bounds[1]) || (currentPoint[1] <= bounds[2]) || (currentPoint[1] >= bounds[3]) || (currentPoint[2] <= bounds[4]) || (currentPoint[2] >= bounds[5]))
 		{
 			//the point is outside the mask's bounds
 			if (this->InsideOut && !this->Binarize)
@@ -182,52 +196,52 @@ void vtkMaskPolyDataFilter::Execute()
 			else
 			{
 				// if insideOut==0 the point outside should be filled with the FillValue
-				outPointData->GetScalars()->SetTuple(i,outTuple);
+				outPointData->GetScalars()->SetTuple(i, outTuple);
 				// done: go to next point
 				continue;
 			}
 		}
 		// at this point the cell is inside the bounds
-		
-		if(currentZ!=currentPoint[2])
+
+		if (currentZ != currentPoint[2])
 		{
-			currentZ=currentPoint[2];
-			UpdateCurrentSliceMask(currentZ);
+			currentZ = currentPoint[2];
+			UpdateCurrentSliceMask(currentZ,2);
 			cellLocator->SetDataSet(CurrentSliceMask);
 			cellLocator->BuildLocator();
 			cellLocator->Update();
 		}
-				
+
 
 		cellLocator->FindClosestPoint(currentPoint, closestPoint, cellId, subId, distance2);
 
 
-		if (cellId >= 0) 
+		if (cellId >= 0)
 		{
-			
-				cell = CurrentSliceMask->GetCell(cellId);
-					// Find the normal  
-				vtkPolygon::ComputeNormal(cell->Points,n);	  
-	
-				// Vector from x to x1
-				for (k=0; k<3; k++) 
-					x1[k] = currentPoint[k] - closestPoint[k];
+
+			cell = CurrentSliceMask->GetCell(cellId);
+			// Find the normal  
+			vtkPolygon::ComputeNormal(cell->Points, n);
+
+			// Vector from x to x1
+			for (k = 0; k < 3; k++)
+				x1[k] = currentPoint[k] - closestPoint[k];
 
 			// Projection of the distance vector on the normal
-			dot = vtkMath::Dot(x1,n);     
-		} 
+			dot = vtkMath::Dot(x1, n);
+		}
 
 		// find if the x point is inside or outside of the polygon: sign of the distance
 		if (dot < 0) {
 			distance2 = -distance2;
 		}
 
-		if (( this->InsideOut || this->Binarize) && (distance2 <= this->Distance2))
-			outPointData->GetScalars()->SetTuple(i,inTuple);
+		if ((this->InsideOut || this->Binarize) && (distance2 <= this->Distance2))
+			outPointData->GetScalars()->SetTuple(i, inTuple);
 
-		
+
 		if ((!this->InsideOut || this->Binarize) && (distance2 > this->Distance2))
-				outPointData->GetScalars()->SetTuple(i,outTuple);
+			outPointData->GetScalars()->SetTuple(i, outTuple);
 	}
 
 
@@ -236,14 +250,197 @@ void vtkMaskPolyDataFilter::Execute()
 	// points using mask geometry.
 	//
 
-	delete [] x1;
-	delete [] weights;
+	delete[] x1;
+	delete[] weights;
 	delete inTuple;
 	delete outTuple;
 	cellIds->Delete();
 }
 
+//----------------------------------------------------------------------------
+void vtkMaskPolyDataFilter::TriplePassAlgorithm()
+{
+	int i, j, k, abortExecute = 0;
+	vtkDataSet *output = this->GetOutput();
+	vtkDataSet *input = this->GetInput();
+	int numPts = input->GetNumberOfPoints();
+	vtkPointData *inPointData = input->GetPointData(), *outPointData = output->GetPointData();
+	vtkCellData *inCellData = input->GetCellData(), *outCellData = output->GetCellData();
+	vtkIdType idx, cellId;
+	int dims[3], voxel[3], plane2, plane3, currentPointId;
+	int subId;
+	double  closestPoint[3];
+	double *currentPoint, *x1;
+	x1 = new double[3];
+	double distance2;
+	double dot, n[3];
+	vtkCell *cell;
+	vtkIdList *cellIds = vtkIdList::New();
+	double pcoords[3];
+	double bounds[6];
 
+	//  vtkDebugMacro(<< "Executing MaskPolyDataFilter");
+
+	//
+	// Initialize self; create output objects
+	//
+	if (!this->GetMask())
+	{
+		//	vtkErrorMacro(<<"No mask specified");
+		return;
+	}
+
+	Mask = this->GetMask();
+
+	Mask->GetBounds(bounds);
+
+	double *weights = new double[4];
+	cellIds->SetNumberOfIds(Mask->GetMaxCellSize());
+
+	if (numPts < 1)
+	{
+		//vtkErrorMacro(<<"No data to Mask");
+		return;
+	}
+
+
+	//
+	// Create objects to hold output of contour operation
+	//
+	output->DeepCopy(input);
+
+	outCellData->DeepCopy(inCellData);
+
+	int numcomp = outPointData->GetScalars()->GetNumberOfComponents();
+
+	float *inTuple = new float[numcomp];
+	float *outTuple = new float[numcomp];
+
+	for (int n = 0; n < numcomp; n++)
+	{
+		inTuple[n] = this->InsideValue;
+		outTuple[n] = this->OutsideValue;
+	}
+
+	this->Distance2 = this->Distance * this->Distance;
+
+	int oldProgress = 0;
+	int progress = 0;
+
+	InitCurrentSliceMask();
+
+
+	vtkALBASmartPointer<vtkCellLocator> cellLocator;
+
+	if (vtkRectilinearGrid::SafeDownCast(input))
+		vtkRectilinearGrid::SafeDownCast(input)->GetDimensions(dims);
+	else if (vtkStructuredPoints::SafeDownCast(input))
+		vtkStructuredPoints::SafeDownCast(input)->GetDimensions(dims);
+
+	for (i = 0; i < numPts && !abortExecute; i++)
+			outPointData->GetScalars()->SetTuple1(i, 0);
+
+	i = 0;
+	for (int plane = 0; plane <= 2; plane++)
+	{
+		double currentHeight = VTK_DOUBLE_MIN;
+
+		plane2 = (plane + 1) % 3;
+		plane3 = (plane + 2) % 3;
+		for (voxel[plane] = 0; voxel[plane] < dims[plane]; voxel[plane]++)
+			for (voxel[plane2] = 0; voxel[plane2] < dims[plane2]; voxel[plane2]++)
+				for (voxel[plane3] = 0; voxel[plane3] < dims[plane3]; voxel[plane3]++)
+				{
+					i++;
+					progress = ((float)i * 100 / ((float)numPts * 3));
+
+					if (progress != oldProgress)
+					{
+						oldProgress = progress;
+						this->UpdateProgress((float)progress / 100.0);
+						abortExecute = this->GetAbortExecute();
+					}
+
+					dot = 1;
+
+					currentPointId = voxel[0] + (voxel[1] * dims[0]) + voxel[2] * dims[0] * dims[1];
+					currentPoint = output->GetPoint(currentPointId);
+
+
+
+					// use XNOR table to exclude points that not respect the InsideOut and bounding box condition
+					// i.e. if InsideOut is 1 points inside the sourface must be sets to the FillValue, so points upside the bounding 
+					// box should be skipped
+					if ((currentPoint[0] <= bounds[0]) || (currentPoint[0] >= bounds[1]) || (currentPoint[1] <= bounds[2]) || (currentPoint[1] >= bounds[3]) || (currentPoint[2] <= bounds[4]) || (currentPoint[2] >= bounds[5]))
+					{
+						//the point is outside the mask's bounds
+						continue;
+					}
+					// at this point the cell is inside the bounds
+
+					if (currentHeight != currentPoint[plane])
+					{
+						currentHeight = currentPoint[plane];
+						UpdateCurrentSliceMask(currentHeight, plane);
+						cellLocator->SetDataSet(CurrentSliceMask);
+						cellLocator->BuildLocator();
+						cellLocator->Update();
+					}
+
+
+					cellLocator->FindClosestPoint(currentPoint, closestPoint, cellId, subId, distance2);
+
+
+					if (cellId >= 0)
+					{
+
+						cell = CurrentSliceMask->GetCell(cellId);
+						// Find the normal  
+						vtkPolygon::ComputeNormal(cell->Points, n);
+
+						// Vector from x to x1
+						for (k = 0; k < 3; k++)
+							x1[k] = currentPoint[k] - closestPoint[k];
+
+						// Projection of the distance vector on the normal
+						dot = vtkMath::Dot(x1, n);
+					}
+
+					// find if the x point is inside or outside of the polygon: sign of the distance
+					if (dot < 0) {
+						distance2 = -distance2;
+					}
+
+					if (distance2 <= this->Distance2)
+						outPointData->GetScalars()->SetTuple1(currentPointId, outPointData->GetScalars()->GetTuple1(currentPointId)+1);
+				}
+	}
+
+
+
+	//
+	// Loop over all points creating scalar output determined by evaluating 
+	// points using mask geometry.
+	//
+
+	for (i = 0; i < numPts && !abortExecute; i++)
+	{
+		double value =  outPointData->GetScalars()->GetTuple1(i);
+
+		if ((this->InsideOut || this->Binarize) && (value>=2))
+			outPointData->GetScalars()->SetTuple(i, inTuple);
+		else if ((!this->InsideOut || this->Binarize) && (value < 2))
+			outPointData->GetScalars()->SetTuple(i, outTuple);
+		else 
+			outPointData->GetScalars()->SetTuple(i, inPointData->GetScalars()->GetTuple(i));
+	}
+
+	delete[] x1;
+	delete[] weights;
+	delete inTuple;
+	delete outTuple;
+	cellIds->Delete();
+}
 
 void vtkMaskPolyDataFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -266,7 +463,7 @@ void vtkMaskPolyDataFilter::InitCurrentSliceMask()
 	IdConversionTable= new vtkIdType[Mask->GetNumberOfPoints()];
 }
 
-void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double z)
+void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double value, int plane)
 {
 	int nPoints=Mask->GetNumberOfPoints();
 	vtkIdType *cellIds;
@@ -303,9 +500,9 @@ void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double z)
 		for(int j=0;j<cellNPoints;j++)
 		{
 			double *point=Mask->GetPoint(cellIds[j]);
-			if(point[2]<=z)
+			if(point[plane]<=value)
 				pointUnderBound=true;
-			if(point[2]>=z)
+			if(point[plane]>=value)
 				pointOverBound=true;
 			if(pointUnderBound && pointOverBound)
 				break;
