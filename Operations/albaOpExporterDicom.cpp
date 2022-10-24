@@ -67,6 +67,7 @@
 #include "gdcmDirectoryHelper.h"
 #include "albaOp.h"
 #include "albaTagArray.h"
+#include "albaVMEImage.h"
 
 
 //----------------------------------------------------------------------------
@@ -93,7 +94,7 @@ albaOpExporterDicom::~albaOpExporterDicom()
 //----------------------------------------------------------------------------
 bool albaOpExporterDicom::InternalAccept(albaVME *node)
 { 
-  return (node->IsALBAType(albaVMEVolumeGray));
+  return (node->IsALBAType(albaVMEVolumeGray)||node->IsALBAType(albaVMEImage));
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpExporterDicom::Copy()   

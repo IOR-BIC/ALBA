@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaOpCreateSpline
- Authors: Daniele Giunchi & Matteo Giacomoni
+ Module: albaOpCreateInfoText
+ Authors: Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -14,42 +14,38 @@
 
 =========================================================================*/
 
-#ifndef __albaOpCreateSpline_H__
-#define __albaOpCreateSpline_H__
+#ifndef __albaOpCreateInfoText_H__
+#define __albaOpCreateInfoText_H__
 
 #include "albaOp.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaVMEPolylineSpline;
-class albaGUI;
-class albaEvent;
+class albaVMEInfoText;
+class albaVME;
 //----------------------------------------------------------------------------
-// albaOpCreateSpline :
+// albaOpCreateInfoText :
 //----------------------------------------------------------------------------
 /** */
-class ALBA_EXPORT albaOpCreateSpline: public albaOp
+class ALBA_EXPORT albaOpCreateInfoText: public albaOp
 {
 public:
-  albaOpCreateSpline(const wxString &label = "Create Parametric Surface");
-  ~albaOpCreateSpline(); 
+  albaOpCreateInfoText(const wxString &label = "Create Info Text");
+  ~albaOpCreateInfoText(); 
 
-  albaTypeMacro(albaOpCreateSpline, albaOp);
+  albaTypeMacro(albaOpCreateInfoText, albaOp);
 
   albaOp* Copy();
 
   void OpRun();
   void OpDo();
 
-	/** Return an xpm-icon that can be used to represent this operation */
-	virtual char** GetIcon();
-
 protected: 
 
 	/** Return true for the acceptable vme type. */
-	/*virtual*/ bool InternalAccept(albaVME*node);
+	bool InternalAccept(albaVME*node);
 
-  albaVMEPolylineSpline *m_PolylineSpline;
+	albaVMEInfoText *m_InfoText;
 };
 #endif

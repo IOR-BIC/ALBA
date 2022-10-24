@@ -107,6 +107,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpCreateRefSys.h"
 #include "albaOpCreateRefSysFromViewSlice.h"
 #include "albaOpCreateSlicer.h"
+#include "albaOpCreatePolyline.h"
 #include "albaOpCreateSpline.h"
 #include "albaOpCreateSurface.h"
 #include "albaOpCreateSurfaceParametric.h"
@@ -181,6 +182,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaViewSliceOnCurveCompound.h"
 #include "albaViewSlicer.h"
 #include "albaViewVTK.h"
+#include "albaOpCreateInfoText.h"
 #include "albaViewVTKCompound.h"
 
 //WIZARD
@@ -320,12 +322,14 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpCreateGroup("Group"),_("Create"));
 	m_Logic->Plug(new albaOpCreateMeter("Meter"),_("Create"));
 	m_Logic->Plug(new albaOpCreateRefSys("RefSys"),_("Create"));
+	m_Logic->Plug(new albaOpCreateInfoText("Info Text"), _("Create"));
 	m_Logic->Plug(new albaOpCreateRefSysFromViewSlice("RefSys from View Slice"), _("Create"));
 	m_Logic->Plug(new albaOpCreateProber("Prober"),_("Create"));
 	m_Logic->Plug(new albaOpCreateSlicer("Slicer"),_("Create"));
 	m_Logic->Plug(new albaOpExtractIsosurface("Extract Isosurface"),_("Create"));
 	m_Logic->Plug(new albaOpExtractImageFromArbitraryView("Extract Image from Arbitrary View"), _("Create"));
 	m_Logic->Plug(new albaOpCreateSurfaceParametric("Parametric Surface"),_("Create"));
+	m_Logic->Plug(new albaOpCreatePolyline("Polyline"), _("Create"));
 	m_Logic->Plug(new albaOpCreateSpline("Spline"),_("Create"));
 	m_Logic->Plug(new albaOpCreateLabeledVolume(),_("Create"));
 	m_Logic->Plug(new albaOpCreateEditSkeleton(),_("Create"));

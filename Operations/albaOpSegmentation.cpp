@@ -1964,8 +1964,8 @@ void albaOpSegmentation::OnLoadMask()
 	vtkTransform *transform = NULL;
 	vtkTransformFilter *transformFilter = NULL;
 	albaMatrix identityMatrix;
-	albaMatrix maskABSMatrix = vme->GetAbsMatrixPipe()->GetMatrix();
-	albaMatrix volumeABSMatrix = m_Input->GetAbsMatrixPipe()->GetMatrix();
+	albaMatrix maskABSMatrix = *vme->GetOutput()->GetAbsMatrix();
+	albaMatrix volumeABSMatrix = m_Matrix;
 
 	bool isMaskMatrixIdentity = maskABSMatrix.Equals(&identityMatrix);
 	bool isVolumeMatrixIdentity = volumeABSMatrix.Equals(&identityMatrix);

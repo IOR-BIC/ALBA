@@ -235,15 +235,6 @@ void albaOpClassicICPRegistration::OpDo()
 
 	albaVMEIterator *iter = m_Registered->NewIterator();
 
-	for (albaVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
-	{
-		albaVMEOutput * output = node->GetOutput();
-		if (output)
-		{
-			albaMatrix * absMatrix = output->GetAbsMatrix();
-			node->SetAbsMatrix(*absMatrix);
-		}
-	}
 	m_Output = m_Registered;
 
 	GetLogicManager()->CameraUpdate();

@@ -190,6 +190,13 @@ void albaInteractor2DMeasure::Render()
 	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
 }
 
+//----------------------------------------------------------------------------
+void albaInteractor2DMeasure::SetUpdateDistance(int dist)
+{
+	POINT_UPDATE_DISTANCE = dist;
+	POINT_UPDATE_DISTANCE_2 = (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE);
+}
+
 /// MOUSE EVENTS /////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure::OnLeftButtonDown(albaEventInteraction *e)

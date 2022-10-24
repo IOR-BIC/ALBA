@@ -46,7 +46,8 @@ public:
   
   void SetDistance(double d);
   void SetInsideOut(int i);
-  void SetFillValue(double fillValue);
+	void SetInsideValue(double fillValue);
+	void SetOutsideValue(double fillValue);
 
   void OpExecute();
 
@@ -68,17 +69,23 @@ void OpCropDeformableROIDummy::SetDistance(double d)
 }
 
 //----------------------------------------------------------------------------
-void OpCropDeformableROIDummy::SetFillValue(double fillValue)
+void OpCropDeformableROIDummy::SetInsideValue(double fillValue)
 //----------------------------------------------------------------------------
 {
   m_InsideValue = fillValue;
 }
 
 //----------------------------------------------------------------------------
+void OpCropDeformableROIDummy::SetOutsideValue(double fillValue)
+{
+	m_OutsideValue = fillValue;
+}
+
+//----------------------------------------------------------------------------
 void OpCropDeformableROIDummy::SetInsideOut(int i)
 //----------------------------------------------------------------------------
 {
-  m_InsideOut = i;
+  m_Modality = i;
 }
 
 
@@ -175,7 +182,7 @@ void albaOpCropDeformableROITest::TestOpExecute()
   /// Operation Execute
   OpCropDeformableROIDummy *op = new OpCropDeformableROIDummy();
   op->SetDistance(distance);
-  op->SetFillValue(fillValue);
+  op->SetInsideValue(fillValue);
   op->SetInsideOut(insideOut);
 
   //set mask

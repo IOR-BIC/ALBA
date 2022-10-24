@@ -77,6 +77,7 @@ albaPipeWithScalar::albaPipeWithScalar()
 
 	m_MapsGenActive = m_DensisyMapActive = m_ScalarMapActive   = m_ShowScalarBar = 0;
 	m_ScalarBarPos = SB_ON_RIGHT;
+	m_ScalarBarActor = NULL;
 	m_ScalarBarLabNum = 2;
 }
 //----------------------------------------------------------------------------

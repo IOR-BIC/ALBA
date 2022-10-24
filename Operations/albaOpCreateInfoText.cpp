@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaOpCreateSpline
- Authors: Daniele Giunchi & Matteo Giacomoni
+ Module: albaOpCreateInfoText
+ Authors: Paolo Quadrani
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -23,65 +23,59 @@
 //----------------------------------------------------------------------------
 
 
-#include "albaOpCreateSpline.h"
+#include "albaOpCreateInfoText.h"
 #include "albaDecl.h"
 #include "albaEvent.h"
 
-#include "albaVMEPolylineSpline.h"
+#include "albaVMERoot.h"
+#include "albaVMEInfoText.h"
 
 //----------------------------------------------------------------------------
-// Constants :
-//----------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------
-albaCxxTypeMacro(albaOpCreateSpline);
+albaCxxTypeMacro(albaOpCreateInfoText);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-albaOpCreateSpline::albaOpCreateSpline(const wxString &label) :
+albaOpCreateInfoText::albaOpCreateInfoText(const wxString &label) :
 albaOp(label)
 //----------------------------------------------------------------------------
 {
   m_OpType	= OPTYPE_OP;
   m_Canundo = true;
-  m_PolylineSpline = NULL;
+  m_InfoText   = NULL;
 }
 //----------------------------------------------------------------------------
-albaOpCreateSpline::~albaOpCreateSpline( ) 
+albaOpCreateInfoText::~albaOpCreateInfoText()
 //----------------------------------------------------------------------------
 {
-  albaDEL(m_PolylineSpline);
+  albaDEL(m_InfoText);
 }
 //----------------------------------------------------------------------------
-albaOp* albaOpCreateSpline::Copy()   
+albaOp* albaOpCreateInfoText::Copy()   
 //----------------------------------------------------------------------------
 {
-	return new albaOpCreateSpline(m_Label);
+	return new albaOpCreateInfoText(m_Label);
 }
 //----------------------------------------------------------------------------
-bool albaOpCreateSpline::InternalAccept(albaVME*node)
+bool albaOpCreateInfoText::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVME));
 }
 //----------------------------------------------------------------------------
-char** albaOpCreateSpline::GetIcon()
-{
-#include "pic/MENU_OP_CREATE_POLYLINESPLINE.xpm"
-	return MENU_OP_CREATE_POLYLINESPLINE_xpm;
-}
-//----------------------------------------------------------------------------
-void albaOpCreateSpline::OpRun()   
+void albaOpCreateInfoText::OpRun()
 //----------------------------------------------------------------------------
 {
-  albaNEW(m_PolylineSpline);
-  m_PolylineSpline->SetName("Polyline Spline");
-  m_Output = m_PolylineSpline;
+  albaNEW(m_InfoText);
+  m_InfoText->SetName("InfoText");
+  m_Output = m_InfoText;
   albaEventMacro(albaEvent(this,OP_RUN_OK));
 }
 //----------------------------------------------------------------------------
-void albaOpCreateSpline::OpDo()
+void albaOpCreateInfoText::OpDo()
 //----------------------------------------------------------------------------
 {
-  m_PolylineSpline->ReparentTo(m_Input);
+  if (!m_Input->IsALBAType(albaVMERoot))
+    m_InfoText->ReparentTo(m_Input);
+  else
+    GetLogicManager()->VmeAdd(m_InfoText);
 }
