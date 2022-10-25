@@ -237,6 +237,7 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
 
   m_ManualSegmentationTools  = DRAW_EDIT;
   m_ManualBucketActions = 0;
+	m_TriplePass = false;
 }
 //----------------------------------------------------------------------------
 albaOpSegmentation::~albaOpSegmentation()
@@ -395,7 +396,7 @@ void albaOpSegmentation::Init()
 	if (m_DisableInit)
 		OnEditStep();
 	else
-		OnChangeThresholdType();
+		OnChangeInitModality();
 	
 	UpdateSliceLabel();
 
@@ -898,7 +899,11 @@ void albaOpSegmentation::CreateInitSegmentationGui()
 
 	// LOAD SEGMENTATION
 
-	currentGui->Label(&m_VolumeName);
+	currentGui->Label("Mask Settings:",1);
+	currentGui->Bool(ID_TRIPLE_PASS, "Reduce Glitch", &m_TriplePass, true);
+	currentGui->Divider(1);
+	currentGui->Label("");
+
 	currentGui->Button(ID_LOAD, "Load");
 	currentGui->Divider(1);
 
@@ -1554,6 +1559,7 @@ void albaOpSegmentation::SlicePrev()
 void albaOpSegmentation::OnEditStep()
 {
 	m_GuiDialog->Enable(ID_LOAD, false);
+	m_GuiDialog->Enable(ID_TRIPLE_PASS, false);
 
 	UpdateThresholdLabel();
 
@@ -1661,7 +1667,7 @@ void albaOpSegmentation::OnInitEvent(albaEvent *e)
 	break;
 	case ID_INIT_MODALITY:
 	{
-		OnChangeThresholdType();
+		OnChangeInitModality();
 		OnThresholdUpate();
 	}
 	break;
@@ -1808,7 +1814,7 @@ void albaOpSegmentation::OnUpdateSlice()
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpSegmentation::OnChangeThresholdType()
+void albaOpSegmentation::OnChangeInitModality()
 {
 	if (!m_DisableInit)
 	{
@@ -1820,6 +1826,7 @@ void albaOpSegmentation::OnChangeThresholdType()
 		m_ThresholdSlider->Enable(m_InitModality != LOADSEGM_INIT && m_InitModality != LOADMASK_INIT);
 
 		m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_LOAD, m_InitModality == LOADSEGM_INIT || m_InitModality == LOADMASK_INIT);
+		m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_TRIPLE_PASS, m_InitModality == LOADMASK_INIT);
 
 		if (m_InitModality == LOADSEGM_INIT)
 		{
@@ -2005,6 +2012,7 @@ void albaOpSegmentation::OnLoadMask()
 	maskPolydataFilter->SetOutsideValue(0);
 	maskPolydataFilter->SetInsideOut(false);
 	maskPolydataFilter->SetBinarize(true);
+	maskPolydataFilter->SetTriplePass(m_TriplePass);
 	maskPolydataFilter->SetMask(transformedMaskPolydata);
 
 	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, maskPolydataFilter));
