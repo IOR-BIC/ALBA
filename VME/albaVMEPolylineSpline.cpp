@@ -46,6 +46,8 @@
 #include <assert.h>
 #include "albaVMELandmarkCloud.h"
 #include "albaVME.h"
+#include "albaVMEPointSet.h"
+#include "albaVMEOutput.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEPolylineSpline)
@@ -218,6 +220,11 @@ void albaVMEPolylineSpline::InternalUpdate() //Multi
 		poly->SetLines(in_cells);
 		poly->Modified();
 		poly->Update();
+
+		albaMatrix *vmeAbsPose = vmeLC->GetOutput()->GetAbsMatrix();
+
+		if (vmeAbsPose)
+			this->SetAbsMatrix(*vmeAbsPose, vmeLC->GetTimeStamp());
 	}
 	
   poly->Update();

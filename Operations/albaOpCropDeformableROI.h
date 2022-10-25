@@ -98,6 +98,7 @@ protected:
 	double m_InsideValue;
 	double m_OutsideValue;
 	int m_Modality;
+	int m_TriplePass;
 	albaVME *m_PNode;
 
 	albaVMEVolumeGray *m_ResultVme;

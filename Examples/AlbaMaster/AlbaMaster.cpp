@@ -107,6 +107,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpCreateRefSys.h"
 #include "albaOpCreateRefSysFromViewSlice.h"
 #include "albaOpCreateSlicer.h"
+#include "albaOpCreatePolyline.h"
 #include "albaOpCreateSpline.h"
 #include "albaOpCreateSurface.h"
 #include "albaOpCreateSurfaceParametric.h"
@@ -328,6 +329,7 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpExtractIsosurface("Extract Isosurface"),_("Create"));
 	m_Logic->Plug(new albaOpExtractImageFromArbitraryView("Extract Image from Arbitrary View"), _("Create"));
 	m_Logic->Plug(new albaOpCreateSurfaceParametric("Parametric Surface"),_("Create"));
+	m_Logic->Plug(new albaOpCreatePolyline("Polyline"), _("Create"));
 	m_Logic->Plug(new albaOpCreateSpline("Spline"),_("Create"));
 	m_Logic->Plug(new albaOpCreateLabeledVolume(),_("Create"));
 	m_Logic->Plug(new albaOpCreateEditSkeleton(),_("Create"));
