@@ -58,6 +58,7 @@ albaOp(label)
 
 	m_Distance = 0.0;
 	m_Modality = 0;
+	m_TriplePass = false;
 	m_OutsideValue = m_InsideValue = 0.0;
 	m_PNode = NULL;
 }
@@ -91,6 +92,7 @@ enum FILTER_SURFACE_ID
 	ID_OUTSIDE_VALUE,
 	ID_MAX_DISTANCE,
 	ID_MODALITY,
+	ID_TRIPLE_PASS,
 };
 //----------------------------------------------------------------------------
 void albaOpCropDeformableROI::OpRun()   
@@ -218,7 +220,7 @@ void albaOpCropDeformableROI::Algorithm(albaVME *vme)
 		albaVMEVolumeGray *volume = albaVMEVolumeGray::SafeDownCast(m_Input);
 		m_MaskPolydataFilter->SetInput(volume->GetOutput()->GetVTKData());
 		m_MaskPolydataFilter->SetDistance(m_Distance);
-		m_MaskPolydataFilter->SetTriplePass(true);
+		m_MaskPolydataFilter->SetTriplePass(m_TriplePass);
 		m_MaskPolydataFilter->SetInsideValue(m_InsideValue);
 		m_MaskPolydataFilter->SetOutsideValue(m_OutsideValue);
 		if (m_Modality == FILL_OUTSIDE)
@@ -276,6 +278,7 @@ void albaOpCropDeformableROI::CreateGui()
 	wxString modality_strs[3] = { _("Mask Outside"), _("Mask Inside"), _("Binarize") };
 	m_Gui->Radio(ID_MODALITY, "", &m_Modality, 3, modality_strs);
 	m_Gui->Label("");
+	m_Gui->Bool(ID_TRIPLE_PASS, "Reduce Glitch", &m_TriplePass, true);
 	m_Gui->Label("");
 	m_Gui->Divider(1);
 	m_Gui->OkCancel();
