@@ -157,7 +157,7 @@ bool albaInteractor2DMeasure_Segment::Load(albaVME *input, wxString tag)
 		albaTagItem *MeasureSegmentPoint1Tag = input->GetTagArray()->GetTag(tag + "MeasureSegmentPoint1");
 		albaTagItem *MeasureSegmentPoint2Tag = input->GetTagArray()->GetTag(tag + "MeasureSegmentPoint2");
 
-		int nLines = MeasureSegmentPoint1Tag->GetNumberOfComponents() / 2;
+		int nLines = MeasureSegmentPoint1Tag->GetNumberOfComponents() / 3;
 
 		m_CurrentRenderer = m_Renderer;
 
