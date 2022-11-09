@@ -499,7 +499,7 @@ bool albaInteractor2DMeasure_Distance::Load(albaVME *input, wxString tag)
 		albaTagItem *MeasureDistancePoint1Tag = input->GetTagArray()->GetTag(tag + "MeasureDistancePoint1");
 		albaTagItem *MeasureDistancePoint2Tag = input->GetTagArray()->GetTag(tag + "MeasureDistancePoint2");
 
-		int nLines = MeasureDistancePoint1Tag->GetNumberOfComponents() / 2;
+		int nLines = MeasureDistancePoint1Tag->GetNumberOfComponents() / 3;
 
 		m_CurrentRenderer = m_Renderer;
 
