@@ -155,6 +155,7 @@ public:
     ID_REFINEMENT_REDO,
     ID_ENABLE_TRILINEAR_INTERPOLATION,
     ID_REFINEMENT_REMOVE_PENINSULA_REGIONS,
+		ID_TRIPLE_PASS,
     MINID,
   };
 
@@ -322,6 +323,7 @@ protected:
   int m_CurrentPhase;             //<Current step
 	int m_DisableInit;
 	int m_ShowLabels;
+	int m_TriplePass;
   
 	albaGUIDialog* m_Dialog;             //<Dialog - GUI
 	albaViewSliceSegmentation* m_View;                 //<Rendering Slice view
@@ -412,7 +414,7 @@ protected:
   void UpdateSliceLabel();
 
   /** Gui update when the user change threshold type */
-  void OnChangeThresholdType();
+  void OnChangeInitModality();
 
 	void EnableDisableGuiRange();
 

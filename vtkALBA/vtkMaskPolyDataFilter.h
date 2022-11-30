@@ -79,6 +79,16 @@ public:
 	vtkGetMacro(Binarize, int);
 	vtkBooleanMacro(Binarize, int);
 
+	/**
+	Set/Get the Binarize flag.
+	When off, a single pass algorithm is executed 
+	When  on, the algorithm is executed three times, one in each ortho direction, and then the the output is decided by a 2 of 3 rule.
+	TriplePass is off by default.*/
+	vtkSetMacro(TriplePass, int);
+	vtkGetMacro(TriplePass, int);
+	vtkBooleanMacro(TriplePass, int);
+
+
   /**
   Specify the polygonal dataset to perform the masking.*/
   void SetMask(vtkPolyData *mask) {this->SetNthInput(1, mask);};
@@ -98,9 +108,9 @@ public:
 	/** Creates the current slice mask, used for algorithm optimization */
 	void InitCurrentSliceMask();
 
-	/** Updates the current slice mask depending on z value, after the call on this function
-	    the current slice mask will contains only cells that intersect current z-plane */
-	void UpdateCurrentSliceMask(double z);
+	/** Updates the current slice mask depending on value, after the call on this function
+	    the current slice mask will contains only cells that intersect current plane */
+	void UpdateCurrentSliceMask(double value, int plane);
   
 protected:
   vtkMaskPolyDataFilter(vtkPolyData *cf=NULL);
@@ -110,7 +120,10 @@ protected:
   void operator=(const vtkMaskPolyDataFilter&);
 
   void Execute();
-  vtkPolyData *Mask;
+
+	void StandardAlgorithm();
+
+	vtkPolyData *Mask;
 	vtkPolyData *CurrentSliceMask;
 	vtkIdType *IdConversionTable;
 	double Distance;
@@ -119,6 +132,9 @@ protected:
 	double OutsideValue;
 	int Binarize;
 	int InsideOut;
+	int TriplePass;
+private:
+	void TriplePassAlgorithm();
 };
 
 #endif

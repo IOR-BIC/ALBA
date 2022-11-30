@@ -605,12 +605,6 @@ int albaOpClipSurface::Clip()
 		triangles->SetInput(transform_data_input->GetOutput());
     triangles->Update();
 		
-		// subdivide triangles in sphere 1 to get better clipping
-		vtkALBASmartPointer<vtkLinearSubdivisionFilter> subdivider;
-		subdivider->SetInput(triangles->GetOutput());
-		subdivider->SetNumberOfSubdivisions(1);   //  use  this  (0-3+)  to  see improvement in clipping
-    subdivider->Update();
-		
     m_ClipperVME->Update();
     vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_data_clipper;
     transform_data_clipper->SetTransform((vtkAbstractTransform *)m_ClipperVME->GetAbsMatrixPipe()->GetVTKTransform());
@@ -620,7 +614,7 @@ int albaOpClipSurface::Clip()
 		vtkALBASmartPointer<vtkALBAImplicitPolyData> implicitPolyData;
 		implicitPolyData->SetConcaveMode(m_GeometryModality);
 		implicitPolyData->SetInput(transform_data_clipper->GetOutput());
-		m_Clipper->SetInput(subdivider->GetOutput());
+		m_Clipper->SetInput(triangles->GetOutput());
 		m_Clipper->SetClipFunction(implicitPolyData);
 	}
   else
