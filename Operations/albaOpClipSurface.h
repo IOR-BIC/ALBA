@@ -137,6 +137,7 @@ protected:
 
   albaVMESurface   *m_ClipperVME;
 	albaVMESurface   *m_ClippedVME;
+	albaVMESurface   *m_ReverseClippedVME;
 
   albaVMEGizmo     *m_ImplicitPlaneGizmo;
   vtkPlane        *m_ClipperPlane;
@@ -148,7 +149,6 @@ protected:
   albaInteractorGenericMouse    *m_IsaTranslate;
   albaInteractorGenericMouse    *m_IsaRotate;
 
-  vtkPolyData *m_OldSurface;
 	vtkPolyData *m_ResultPolyData;
 	vtkPolyData *m_ClippedPolyData;
 
