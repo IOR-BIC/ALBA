@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)Medical
- Module: medOpImporterEmgWS
+ Module: albaOpImporterEmgWS
  Authors: Roberto Mucci - Paolo Quadrani
  
  Copyright (c) BIC
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __medOpImporterEmgWS_H__
-#define __medOpImporterEmgWS_H__
+#ifndef __albaOpImporterEmgWS_H__
+#define __albaOpImporterEmgWS_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -28,22 +28,22 @@
 class albaVMEGroup;
 
 /** 
-class name: medOpImporterEmgWS
+class name: albaOpImporterEmgWS
 importer for elettromiography signals
 */
-class medOpImporterEmgWS : public albaOp
+class albaOpImporterEmgWS : public albaOp
 {
 public:
   /** constructor */
-	medOpImporterEmgWS(wxString label);
+	albaOpImporterEmgWS(wxString label);
   /** destructor */
-	~medOpImporterEmgWS(); 
+	~albaOpImporterEmgWS(); 
   /** clone the current object */
 	albaOp* Copy();
 
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(albaNode* node) {return true;};
+	bool InternalAccept(albaVME* node) {return true;};
 
 	/** Builds operation's interface. */
 	void OpRun();

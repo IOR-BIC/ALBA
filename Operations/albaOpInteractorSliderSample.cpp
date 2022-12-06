@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   Albedo
-Module:    appOpInteractorSliderSample.cpp
+Module:    albaOpInteractorSliderSample.cpp
 Language:  C++
 Date:      $Date: 2018-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -19,7 +19,7 @@ PURPOSE. See the above copyright notice for more information.
 // This force to include Window, wxWidgets and VTK exactly in this order.
 //----------------------------------------------------------------------------
 
-#include "appOpInteractorSliderSample.h"
+#include "albaOpInteractorSliderSample.h"
 #include "albaDecl.h"
 #include "albaInteractorSlider.h"
 
@@ -52,11 +52,11 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaVME.h"
 
 //----------------------------------------------------------------------------
-albaCxxTypeMacro(appOpInteractorSliderSample);
+albaCxxTypeMacro(albaOpInteractorSliderSample);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-appOpInteractorSliderSample::appOpInteractorSliderSample(const wxString &label) :
+albaOpInteractorSliderSample::albaOpInteractorSliderSample(const wxString &label) :
 albaOp(label)
 {
   m_OpType  = OPTYPE_OP;
@@ -68,23 +68,23 @@ albaOp(label)
   m_InteractorSlider = NULL;
 }
 //----------------------------------------------------------------------------
-appOpInteractorSliderSample::~appOpInteractorSliderSample()
+albaOpInteractorSliderSample::~albaOpInteractorSliderSample()
 { }
 
 //----------------------------------------------------------------------------
-albaOp* appOpInteractorSliderSample::Copy()
+albaOp* albaOpInteractorSliderSample::Copy()
 {
-	return (new appOpInteractorSliderSample(m_Label));
+	return (new albaOpInteractorSliderSample(m_Label));
 }
 
 //----------------------------------------------------------------------------
-bool appOpInteractorSliderSample::Accept(albaVME *node)
+bool albaOpInteractorSliderSample::Accept(albaVME *node)
 {
   return true;
 }
 
 //----------------------------------------------------------------------------
-void appOpInteractorSliderSample::OpRun()
+void albaOpInteractorSliderSample::OpRun()
 {
 	// Open View if necessary
 // 	albaEvent e(this, VIEW_SELECTED);
@@ -151,7 +151,7 @@ void appOpInteractorSliderSample::OpRun()
 }
 
 //----------------------------------------------------------------------------
-void appOpInteractorSliderSample::CreateGui()
+void albaOpInteractorSliderSample::CreateGui()
 {
 	m_Gui = new albaGUI(this);
 	m_Gui->SetListener(this);
@@ -194,7 +194,7 @@ void appOpInteractorSliderSample::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void appOpInteractorSliderSample::OpStop(int result)
+void albaOpInteractorSliderSample::OpStop(int result)
 {
 	if (!m_TestMode)
 	{
@@ -210,7 +210,7 @@ void appOpInteractorSliderSample::OpStop(int result)
 }
 
 //----------------------------------------------------------------------------
-void appOpInteractorSliderSample::OnEvent(albaEventBase *alba_event)
+void albaOpInteractorSliderSample::OnEvent(albaEventBase *alba_event)
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
@@ -278,7 +278,7 @@ void appOpInteractorSliderSample::OnEvent(albaEventBase *alba_event)
 }
 
 //----------------------------------------------------------------------------
-void appOpInteractorSliderSample::UpdateVolumeSlice()
+void albaOpInteractorSliderSample::UpdateVolumeSlice()
 {
 	albaViewGlobalSlice *viewSlice = albaViewGlobalSlice::SafeDownCast(m_View);
 	 

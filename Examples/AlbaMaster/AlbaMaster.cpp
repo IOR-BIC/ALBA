@@ -185,6 +185,41 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpCreateInfoText.h"
 #include "albaViewVTKCompound.h"
 
+//TMP
+#include "albaOpImporterEmgWS.h"
+#include "albaOpImporterExternalFile.h"
+#include "albaOpImporterMotionData.h"
+#include "albaOpImporterRawMotionData.h"
+#include "albaOpImporterVMEDataSetAttributes.h"
+#include "albaVMERawMotionData.h"
+#include "albaOpExporterAnalogWS.h"
+#include "albaOpExporterLandmarkWS.h"
+#include "albaOpApplyTrajectory.h"
+#include "albaOpCreateProsthesis.h"
+#include "albaOpDecomposeTimeVarVME.h"
+#include "albaOpExtractGeometry.h"
+#include "albaOpGarbageCollectMSFDir.h"
+#include "albaOpLabelExtractor.h"
+#include "albaOpInteractionDebugger.h"
+#include "albaOpMML3ContourWidget.h"
+#include "albaOpMML3GlobalRegistration.h"
+#include "albaOpMML3ModelView.h"
+#include "albaOpMML3ModelView2DPipe.h"
+#include "albaOpMML3ModelView3DPipe.h"
+#include "albaOpMML3NonUniformSlicePipe.h"
+#include "albaOpMML3ParameterView.h"
+#include "albaOpMMLContourWidget.h"
+#include "albaOpMMLModelView.h"
+#include "albaOpMMLParameterView.h"
+#include "albaOpMatrixVectorMath.h"
+#include "albaOpOpenExternalFile.h"
+#include "albaOpScalarToSurface.h"
+#include "albaOpVOIDensityEditor.h"
+#include "albaOpValidateTree.h"
+#include "albaOpVolumeUnion.h"
+#include "albaOpInteractorSliderSample.h"
+
+
 //WIZARD
 // Comment this line to disable wizard sample
 //#define USE_WIZARD
@@ -310,8 +345,16 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpExporterAnsysInputFile("Ansys Input File"), "Finite Element");
 	m_Logic->Plug(new albaOpExporterAbaqusFile("Abaqus File"), "Finite Element");
 	m_Logic->Plug(new albaOpExporterMesh("Generic Mesh"), "Finite Element");
-	
 
+	m_Logic->Plug(new albaOpImporterEmgWS("EmgWS"), "TMP to test");
+	m_Logic->Plug(new albaOpImporterExternalFile(), "TMP to test");
+	m_Logic->Plug(new albaOpImporterRawMotionData("Raw motion data"), "TMP to test");
+	m_Logic->Plug(new albaOpImporterMotionData<albaVMERawMotionData>("Raw Motion Data (template)", "RAW Motion Data (*.MAN)|*.MAN", "Dictionary (*.txt)|*.txt"), "TMP to test");
+	m_Logic->Plug(new albaOpImporterVMEDataSetAttributes(), "TMP to test");
+	m_Logic->Plug(new albaOpExporterAnalogWS(), "TMP to test");
+	m_Logic->Plug(new albaOpExporterLandmarkWS(), "TMP to test");
+
+	
 	//------------------------------------------------------------
 	// Operation Menu:
 	//------------------------------------------------------------
@@ -390,6 +433,21 @@ bool AlbaMaster::OnInit()
 	m_Logic->Plug(new albaOpClassicICPRegistration("Surface"),_("Register"));
 
 	m_Logic->Plug(new albaOpESPCalibration("Calibrate ESP Phantom"), _("Calibration"));
+
+
+	m_Logic->Plug(new albaOpApplyTrajectory(), "TMP to test");
+	m_Logic->Plug(new albaOpCreateProsthesis(), "TMP to test");
+	m_Logic->Plug(new albaOpDecomposeTimeVarVME(), "TMP to test");
+	m_Logic->Plug(new albaOpExtractGeometry(), "TMP to test");
+	m_Logic->Plug(new albaOpGarbageCollectMSFDir(), "TMP to test");
+	m_Logic->Plug(new albaOpLabelExtractor(), "TMP to test");
+	m_Logic->Plug(new albaOpInteractionDebugger(), "TMP to test");
+	m_Logic->Plug(new albaOpOpenExternalFile(), "TMP to test");
+	m_Logic->Plug(new albaOpScalarToSurface(), "TMP to test");
+	m_Logic->Plug(new albaOpVOIDensityEditor(), "TMP to test");
+	m_Logic->Plug(new albaOpValidateTree(), "TMP to test");
+	m_Logic->Plug(new albaOpVolumeUnion(), "TMP to test");
+	m_Logic->Plug(new albaOpInteractorSliderSample(), "TMP to test");
 	//------------------------------------------------------------
 	
 #ifdef USE_WIZARD

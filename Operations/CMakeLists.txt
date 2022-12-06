@@ -169,6 +169,10 @@ IF (ALBA_USE_VTK)
 	albaOpComputeHausdorffDistance.cpp albaOpComputeHausdorffDistance.h
 	
 	albaOpCreatePolyline.cpp	albaOpCreatePolyline.h
+	
+	albaOpImporterEmgWS.cpp albaOpImporterEmgWS.h
+	albaOpImporterRawMotionData.cpp albaOpImporterRawMotionData.h
+	albaOpInteractorSliderSample.cpp albaOpInteractorSliderSample.h
   )
 ENDIF (ALBA_USE_VTK)
 

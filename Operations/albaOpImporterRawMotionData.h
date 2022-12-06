@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)Medical
- Module: medOpImporterRawMotionData
+ Module: albaOpImporterRawMotionData
  Authors: Paolo Quadrani
  
  Copyright (c) BIC
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __medOpImporterRawMotionData_H__
-#define __medOpImporterRawMotionData_H__
+#ifndef __albaOpImporterRawMotionData_H__
+#define __albaOpImporterRawMotionData_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -28,24 +28,24 @@
 class albaVME;                      //era mflVME
 class albaEvent;
 //----------------------------------------------------------------------------
-// medOpImporterRawMotionData :
+// albaOpImporterRawMotionData :
 //----------------------------------------------------------------------------
 /** 
-class name: medOpImporterRawMotionData
+class name: albaOpImporterRawMotionData
 raw motion data are represented from landmark cloud, and this importer will create a landmark cloud with childs.
 */
-class medOpImporterRawMotionData : public albaOp
+class albaOpImporterRawMotionData : public albaOp
 {
 public:
   /** constructor */
-	medOpImporterRawMotionData(wxString label);
+	albaOpImporterRawMotionData(wxString label);
   /** destructor */
-	~medOpImporterRawMotionData();
+	~albaOpImporterRawMotionData();
   /** clone the current object */
 	albaOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(albaNode* node) {return true;};
+	bool InternalAccept(albaVME* node) {return true;};
 
 	/** Builds operation's interface. */
 	void OpRun();
