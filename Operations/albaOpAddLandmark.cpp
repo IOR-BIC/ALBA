@@ -54,7 +54,7 @@ albaCxxTypeMacro(albaOpAddLandmark);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-albaOpAddLandmark::albaOpAddLandmark(const wxString &label) :
+albaOpAddLandmark::albaOpAddLandmark(const wxString &label, const wxString dictionary) :
 albaOp(label)
 {
 	m_OpType = OPTYPE_OP;
@@ -97,6 +97,7 @@ albaOp(label)
 	m_IsCloudCreated = false;
 	m_FirstOpDo = true;
 	m_DictionaryLoaded = false;
+	m_Dictionary = dictionary;
 }
 //----------------------------------------------------------------------------
 albaOpAddLandmark::~albaOpAddLandmark()
@@ -134,6 +135,7 @@ albaOp* albaOpAddLandmark::Copy()
 	albaOpAddLandmark *op = new albaOpAddLandmark(m_Label);
 	op->m_OpType = m_OpType;
 	op->m_Canundo = m_Canundo;
+	op->m_Dictionary = m_Dictionary;
 	return op;
 }
 //----------------------------------------------------------------------------
@@ -230,6 +232,9 @@ void albaOpAddLandmark::OpRun()
 	albaNEW(m_AuxLandmark);
 	m_AuxLandmark->SetName(_("Aux Landmark"));
 	m_AuxLandmark->ReparentTo(m_AuxLandmarkCloud);
+
+	if (!m_Dictionary.IsEmpty())
+		LoadDictionary(m_Dictionary.GetCStr());
 
 	GetLogicManager()->VmeShow(m_AuxLandmarkCloud, false);
 	GetLogicManager()->CameraUpdate();
@@ -336,10 +341,13 @@ void albaOpAddLandmark::CreateGui()
 	m_Gui->Divider();
 	m_Gui->Divider(2);
 
-	m_Gui->Divider();
-	m_Gui->Button(ID_LANDMARK_REMOVE, "Remove");
-	m_Gui->Label(&m_RemoveMessage, true);
-	m_Gui->Divider();
+	if (m_Dictionary.IsEmpty())
+	{
+		m_Gui->Divider();
+		m_Gui->Button(ID_LANDMARK_REMOVE, "Remove");
+		m_Gui->Label(&m_RemoveMessage, true);
+		m_Gui->Divider();
+	}
 
 	m_Gui->Divider(2);
 
@@ -355,10 +363,13 @@ void albaOpAddLandmark::CreateGui()
 	m_Gui->Enable(ID_LANDMARK_NAME, false);
 	m_Gui->Enable(ID_LANDMARK_POSITION, false);
 
-	m_Gui->Label(_("Dictionary"));
-	m_Gui->Button(ID_LOAD_DICTIONARY, _("Load dictionary"));
-	m_Gui->Button(ID_LOAD_DICTIONARY_FROM_CLOUD, _("Load dictionary from Cloud"));
-	m_Gui->Button(ID_SAVE_DICTIONARY, _("Save dictionary"));	
+	if (m_Dictionary.IsEmpty())
+	{
+		m_Gui->Label(_("Dictionary"));
+		m_Gui->Button(ID_LOAD_DICTIONARY, _("Load dictionary"));
+		m_Gui->Button(ID_LOAD_DICTIONARY_FROM_CLOUD, _("Load dictionary from Cloud"));
+		m_Gui->Button(ID_SAVE_DICTIONARY, _("Save dictionary"));
+	}
 
 	m_Gui->Divider(2);
 	m_Gui->Double(ID_LANDMARK_RADIUS,"Radius:", &m_LandmarkRadius);

@@ -114,7 +114,7 @@ bool AlbaMaster::OnInit()
   m_Logic->Plug(new exWizardSample("Import loop"),"");
 #endif
 
-	m_Logic->PlugStandardOperations();
+	m_Logic->PlugStandardViews();
 
 	//////////////////////////////////////////////////////////////////////////
 	// Splash Screen
