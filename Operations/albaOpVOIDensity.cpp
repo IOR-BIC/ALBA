@@ -46,6 +46,7 @@
 #include "albaTagArray.h"
 #include "albaVMEPointCloud.h"
 #include "vtkCellArray.h"
+#include "vtkTransform.h"
 
 
 //----------------------------------------------------------------------------
@@ -347,20 +348,31 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 	m_VOIScalars->Reset();
 	m_VOICoords.clear();
 
-	vtkAbstractTransform *transform;
+	albaMatrix inputMeshABSMatrix = m_Surface->GetAbsMatrixPipe()->GetMatrix();
+	albaMatrix inputVolumeABSMatrix = m_Input->GetAbsMatrixPipe()->GetMatrix();
+
+	//Calculate align matrix 
+	albaMatrix alignMatrix;
+	inputVolumeABSMatrix.Invert();
+	albaMatrix::Multiply4x4(inputVolumeABSMatrix, inputMeshABSMatrix, alignMatrix);
+
+	vtkTransform *transform = NULL;
+	transform = vtkTransform::New();
+	transform->SetMatrix(alignMatrix.GetVTKMatrix());
+
 	vtkPolyData *polydata;
-	m_Surface->GetOutput()->GetBounds(b);
 	m_Surface->Update();
-	transform=(vtkAbstractTransform*)m_Surface->GetAbsMatrixPipe()->GetVTKTransform();
 	polydata=(vtkPolyData *)m_Surface->GetOutput()->GetVTKData();
 
-	vtkALBASmartPointer<vtkTransformPolyDataFilter> TransformDataClipper;
-  TransformDataClipper->SetTransform(transform);
-  TransformDataClipper->SetInput(polydata);
-  TransformDataClipper->Update();
+	vtkALBASmartPointer<vtkTransformPolyDataFilter> TransformDataFilter;
+  TransformDataFilter->SetTransform(transform);
+  TransformDataFilter->SetInput(polydata);
+  TransformDataFilter->Update();
 
 	vtkALBASmartPointer<vtkALBAImplicitPolyData> ImplicitSurface;
-	ImplicitSurface->SetInput(TransformDataClipper->GetOutput());
+	ImplicitSurface->SetInput(TransformDataFilter->GetOutput());
+
+	TransformDataFilter->GetOutput()->GetBounds(b);
 
 	vtkALBASmartPointer<vtkPlanes> ImplicitBox;
   ImplicitBox->SetBounds(b);
@@ -374,7 +386,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Evaluating Density...");
 	
-
+	vtkDEL(transform);
   
 	for (int voxel=0; voxel<NumberVoxels; voxel++)
   {
