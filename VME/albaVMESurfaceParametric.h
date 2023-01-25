@@ -169,6 +169,26 @@ public:
 	double GetSphereTheRes() const { return m_SphereTheRes; }
 	void SetSphereTheRes(double val) { m_SphereTheRes = val; }
 
+
+	/** Returns PlaneOrigin */
+	double *GetPlaneOrigin() { return m_PlaneOrigin; }
+
+	/** Sets PlaneOrigin */
+	void SetPlaneOrigin(double *origin) { m_PlaneOrigin[0] = origin[0]; m_PlaneOrigin[0] = origin[0]; m_PlaneOrigin[0] = origin[0];}
+
+
+	/** Returns PlanePoint1 */
+	double *GetPlanePoint1() { return m_PlanePoint1; }
+
+	/** Sets PlanePoint1 */
+	void SetPlanePoint1(double *point1) { m_PlanePoint1[0] = point1[0]; m_PlanePoint1[0] = point1[0]; m_PlanePoint1[0] = point1[0]; }
+
+	/** Returns PlanePoint2 */
+	double *GetPlanePoint2() { return m_PlanePoint2; }
+
+	/** Sets PlanePoint2 */
+	void SetPlanePoint2(double *Point2) { m_PlanePoint2[0] = Point2[0]; m_PlanePoint2[0] = Point2[0]; m_PlanePoint2[0] = Point2[0]; }
+
 protected:
 
   albaVMESurfaceParametric();
