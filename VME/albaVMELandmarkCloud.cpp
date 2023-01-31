@@ -291,10 +291,10 @@ int albaVMELandmarkCloud::AppendLandmark(double x, double y, double z, const cha
 	}
 	else
 	{
-		lmIndex = m_NumberOfLandmarks - 1;
 		albaNEW(lm);
 		lm->SetName(name);
 		lm->ReparentTo(this);
+		lmIndex = m_NumberOfLandmarks - 1;
 	}
 
 	SetLandmark(lmIndex, x, y, z);
