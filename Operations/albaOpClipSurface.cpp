@@ -36,6 +36,7 @@
 #include "albaGizmoTranslate.h"
 #include "albaGizmoRotate.h"
 #include "albaGizmoScale.h"
+#include "albaVMESurfaceParametric.h"
 
 #include "vtkProperty.h"
 #include "vtkTransform.h"
@@ -132,7 +133,7 @@ albaOp* albaOpClipSurface::Copy()
 bool albaOpClipSurface::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
-	return (node != NULL && node->IsALBAType(albaVMESurface));
+	return (node != NULL && (node->IsALBAType(albaVMESurface)||node->IsALBAType(albaVMESurfaceParametric)));
 }
 
 //----------------------------------------------------------------------------
@@ -240,7 +241,7 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 				e->SetString(&title);
 				e->SetId(VME_CHOOSE);
 				albaEventMacro(*e);
-				m_ClipperVME = albaVMESurface::SafeDownCast(e->GetVme());
+				m_ClipperVME = e->GetVme();
 				if(m_ClipperVME == NULL)
 					return;
 				m_Gui->Enable(wxOK,true);
@@ -540,7 +541,6 @@ void albaOpClipSurface::OpDo()
 
 	name.Printf("Clipped %s", m_Input->GetName());
 	albaNEW(m_ClippedVME);
-	m_ClippedVME->DeepCopy(m_Input);
 	m_ClippedVME->SetData(transform_output->GetOutput(), m_Input->GetTimeStamp());
 	m_ClippedVME->SetName(name);
 	m_ClippedVME->Update();
@@ -557,7 +557,6 @@ void albaOpClipSurface::OpDo()
 
 		name.Printf("Reverse clipped %s", m_Input->GetName());
 		albaNEW(m_ReverseClippedVME);
-		m_ReverseClippedVME->DeepCopy(m_Input);
 		m_ReverseClippedVME->SetData(transform_clipped_output->GetOutput(),m_Input->GetTimeStamp());
 		m_ReverseClippedVME->SetName(name);
 		m_ReverseClippedVME->Update();
@@ -829,6 +828,13 @@ void albaOpClipSurface::UpdateISARefSys()
   m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
   m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
 }
+
+//----------------------------------------------------------------------------
+bool albaOpClipSurface::SurfaceAccept(albaVME*node)
+{
+	return (node != NULL && (node->IsALBAType(albaVMESurface) || node->IsALBAType(albaVMESurfaceParametric)));
+}
+
 //----------------------------------------------------------------------------
 void albaOpClipSurface::SetClippingModality(int mode)
 //----------------------------------------------------------------------------

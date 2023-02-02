@@ -902,6 +902,12 @@ int albaOpAddLandmark::SaveDictionary(wxString fileName)
 //----------------------------------------------------------------------------
 int albaOpAddLandmark::LoadLandmarksDefinitions(wxString fileName)
 {
+
+	if (!wxFileExists(fileName))
+	{
+		albaErrorMessage("Dictionary file %s does not exists", fileName.c_str());
+		return ALBA_ERROR;
+	}
 	m_LandmarkGroupVect.clear();
 	m_LandmarkGroupVect.push_back(m_LandmarkNameVect);
 	//m_LandmarkGroupVect[0].clear();
