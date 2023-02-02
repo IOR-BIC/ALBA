@@ -76,7 +76,7 @@ public:
 		ID_SHOW_LANDMARK_GROUP,
 	};
 
-	albaOpAddLandmark(const wxString &label = "AddLandmark  \tCtrl+A");
+	albaOpAddLandmark(const wxString &label = "AddLandmark  \tCtrl+A", const wxString dictionary = "");
 	~albaOpAddLandmark();
 
 	virtual void OnEvent(albaEventBase *alba_event);
@@ -188,6 +188,7 @@ protected:
 
 	albaString m_RemoveMessage;
 	albaString m_DictMessage;
+	albaString m_Dictionary;
 
 	albaInteractorPERPicker	*m_LandmarkPicker;
 

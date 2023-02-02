@@ -234,10 +234,16 @@ public:
 	/** Get  application layout*/
 	mmaApplicationLayout* GetLayout() { return m_AppLayout; };
 
-
 	// Inherited via albaAbsLogicManager
 	virtual albaProsthesesDBManager * GetProsthesesDBManager();
 
+	/** Plugs a list of standard operations, importer and exporters included */
+	void PlugStandardOperations();
+
+	/** Plugs a list of standard operations, importer and exporters included */
+	void PlugStandardViews();
+
+	
 protected:
 	//---------------------------------------------------------
 	// Description:

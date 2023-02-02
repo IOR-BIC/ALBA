@@ -85,6 +85,7 @@ public:
   with the same name already. Set this flag to false for faster appending. 
 */
 	int AppendLandmark(double x, double y, double z, const char *name);
+	int AppendLandmark(double *pos, const char *name) {return AppendLandmark(pos[0], pos[1], pos[2], name); }
 	int AppendLandmark(const char *name) { return AppendLandmark(0,0,0,name); }
 
   

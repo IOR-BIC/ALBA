@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)Medical
- Module: medOpImporterRawMotionData
+ Module: albaOpImporterRawMotionData
  Authors: Paolo Quadrani
  
  Copyright (c) BIC
@@ -22,7 +22,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "medOpImporterRawMotionData.h"
+#include "albaOpImporterRawMotionData.h"
 #include <wx/busyinfo.h>
 
 
@@ -38,7 +38,7 @@
 // #include <mflVMEIterator.h> non ce ne e' bisogno
 
 //----------------------------------------------------------------------------
-medOpImporterRawMotionData::medOpImporterRawMotionData(wxString label) :
+albaOpImporterRawMotionData::albaOpImporterRawMotionData(wxString label) :
 albaOp(label)
 //----------------------------------------------------------------------------
 {
@@ -54,17 +54,17 @@ albaOp(label)
 	m_DictionaryAvailable = 0;
 }
 //----------------------------------------------------------------------------
-medOpImporterRawMotionData::~medOpImporterRawMotionData( ) 
+albaOpImporterRawMotionData::~albaOpImporterRawMotionData( ) 
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-albaOp* medOpImporterRawMotionData::Copy()   
+albaOp* albaOpImporterRawMotionData::Copy()   
 /** restituisce una copia di se stesso, serve per metterlo nell'undo stack */
 //----------------------------------------------------------------------------
 {
 	//non devo incrementare l'id counter --- vfc le operazioni sono gia inserite nei menu;
-	medOpImporterRawMotionData *cp = new medOpImporterRawMotionData(m_Label);
+	albaOpImporterRawMotionData *cp = new albaOpImporterRawMotionData(m_Label);
 	cp->m_Canundo = m_Canundo;
 	cp->m_OpType = m_OpType;
 	cp->m_Listener = m_Listener;
@@ -76,7 +76,7 @@ albaOp* medOpImporterRawMotionData::Copy()
 	return cp;
 }
 //----------------------------------------------------------------------------
-void medOpImporterRawMotionData::OpRun()   
+void albaOpImporterRawMotionData::OpRun()   
 //----------------------------------------------------------------------------
 {
   
@@ -106,7 +106,7 @@ void medOpImporterRawMotionData::OpRun()
 	albaEventMacro(albaEvent(this,result));
 }
 //----------------------------------------------------------------------------
-void medOpImporterRawMotionData::OpDo()   
+void albaOpImporterRawMotionData::OpDo()   
 //----------------------------------------------------------------------------
 {
 	assert(!m_Vme);
@@ -137,11 +137,11 @@ void medOpImporterRawMotionData::OpDo()
 
 	m_Vme->GetTagArray()->SetTag(tag_Nature); //m_Vme->GetTagArray()->AddTag(tag_Nature);
 
-	albaEventMacro(albaEvent(this,VME_ADD,m_Vme));
+	GetLogicManager()->VmeAdd(m_Vme);
 }
 /*
 //----------------------------------------------------------------------------
-void medOpImporterRawMotionData::OpUndo()   
+void albaOpImporterRawMotionData::OpUndo()   
 
 //----------------------------------------------------------------------------
 {

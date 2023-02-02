@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   Albedo
-Module:    appOpInteractorSliderSample.cpp
+Module:    albaOpInteractorSliderSample.cpp
 Language:  C++
 Date:      $Date: 2018-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,8 +13,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#ifndef __appOpInteractorSliderSample_H__
-#define __appOpInteractorSliderSample_H__
+#ifndef __albaOpInteractorSliderSample_H__
+#define __albaOpInteractorSliderSample_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -33,8 +33,8 @@ class albaView;
 class vtkRectilinearGrid;
 class vtkImageData;
 
-// Class Name: appOpInteractorSliderSample
-class ALBA_EXPORT appOpInteractorSliderSample: public albaOp
+// Class Name: albaOpInteractorSliderSample
+class ALBA_EXPORT albaOpInteractorSliderSample: public albaOp
 {
 public:
 
@@ -48,12 +48,12 @@ public:
 		ID_SLIDER_INIT,
 	};
 
-  appOpInteractorSliderSample(const wxString &label = "Interactor Slider Sample");
- ~appOpInteractorSliderSample(); 
+  albaOpInteractorSliderSample(const wxString &label = "Interactor Slider Sample");
+ ~albaOpInteractorSliderSample(); 
 
 	//virtual void OnEvent(albaEventBase *alba_event);
   
-  albaTypeMacro(appOpInteractorSliderSample, albaOp);
+  albaTypeMacro(albaOpInteractorSliderSample, albaOp);
 
   albaOp* Copy();
 

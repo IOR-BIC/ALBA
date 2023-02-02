@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)Medical
- Module: medOpImporterEmgWS
+ Module: albaOpImporterEmgWS
  Authors: Roberto Mucci - Paolo Quadrani
  
  Copyright (c) BIC
@@ -21,7 +21,7 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-#include "medOpImporterEmgWS.h"
+#include "albaOpImporterEmgWS.h"
 
 #include <wx/busyinfo.h>
 #include <wx/txtstrm.h>
@@ -38,7 +38,7 @@
 #include <iostream>
 
 //----------------------------------------------------------------------------
-medOpImporterEmgWS::medOpImporterEmgWS(wxString label) :
+albaOpImporterEmgWS::albaOpImporterEmgWS(wxString label) :
 albaOp(label)
 //----------------------------------------------------------------------------
 {
@@ -48,22 +48,22 @@ albaOp(label)
   m_Group = NULL;
 }
 //----------------------------------------------------------------------------
-medOpImporterEmgWS::~medOpImporterEmgWS()
+albaOpImporterEmgWS::~albaOpImporterEmgWS()
 //----------------------------------------------------------------------------
 {
   albaDEL(m_Group);
 }
 //----------------------------------------------------------------------------
-albaOp* medOpImporterEmgWS::Copy()   
+albaOp* albaOpImporterEmgWS::Copy()   
 //----------------------------------------------------------------------------
 {
-	medOpImporterEmgWS *cp = new medOpImporterEmgWS(m_Label);
+	albaOpImporterEmgWS *cp = new albaOpImporterEmgWS(m_Label);
 	cp->m_Listener = m_Listener;
 	cp->m_File = m_File;
 	return cp;
 }
 //----------------------------------------------------------------------------
-void medOpImporterEmgWS::OpRun()   
+void albaOpImporterEmgWS::OpRun()   
 //----------------------------------------------------------------------------
 {
 	int result = OP_RUN_CANCEL;
@@ -81,7 +81,7 @@ void medOpImporterEmgWS::OpRun()
 }
 
 //----------------------------------------------------------------------------
-void medOpImporterEmgWS::Read()
+void albaOpImporterEmgWS::Read()
 //----------------------------------------------------------------------------
 {
   //if (!m_TestMode)
