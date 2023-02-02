@@ -147,6 +147,9 @@ public:
   /** Returns the angle between two vectors */
   double AngleBetweenVectors( albaVect3d &vect );
 
+	/** Do a spherical linear interpolation of two vectors*/
+	static albaVect3d Slerp(albaVect3d start, albaVect3d end, double percent);
+
 private:
 
   double m_X, m_Y, m_Z;
