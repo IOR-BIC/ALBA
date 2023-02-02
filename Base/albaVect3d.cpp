@@ -331,6 +331,32 @@ double albaVect3d::AngleBetweenVectors( albaVect3d &vect )
 }
 
 //----------------------------------------------------------------------------
+albaVect3d albaVect3d::Slerp(albaVect3d start, albaVect3d end, double percent)
+{
+	// Dot product - the cosine of the angle between 2 vectors.
+	float dot = start.Dot(end);
+
+	// Clamp it to be in the range of Acos()
+	// This may be unnecessary, but floating point
+	// precision can be a fickle mistress.
+	if (dot < -1.0)
+		dot = -1.0;
+	else if (dot > 1.0)
+		dot = 1.0;
+
+	// acos(dot) returns the angle between start and end,
+	// And multiplying that by percent returns the angle between
+	// start and the final result.
+	double theta = acos(dot) * percent;
+	albaVect3d RelativeVec = end - start * dot;
+	RelativeVec.Normalize();
+
+	// Orthonormal basis
+	// The final result.
+	return ((start*cos(theta)) + (RelativeVec * sin(theta)));
+}
+ 
+//----------------------------------------------------------------------------
 double & albaVect3d::operator[]( int pos )
 //----------------------------------------------------------------------------
 {
