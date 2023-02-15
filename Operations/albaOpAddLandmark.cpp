@@ -54,7 +54,7 @@ albaCxxTypeMacro(albaOpAddLandmark);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-albaOpAddLandmark::albaOpAddLandmark(const wxString &label, const wxString dictionary) :
+albaOpAddLandmark::albaOpAddLandmark(const wxString &label, const wxString dictionary, const wxString cloudName) :
 albaOp(label)
 {
 	m_OpType = OPTYPE_OP;
@@ -81,7 +81,7 @@ albaOp(label)
 	m_SelectedGroup = 0;
 	m_SelectedItem = -1;
 
-	m_CloudName = "New landmark cloud";
+	m_CloudName = cloudName;
 	m_LandmarkName = "";
 	m_LandmarkRadius = 0.1;
 
