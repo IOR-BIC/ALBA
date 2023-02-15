@@ -76,7 +76,7 @@ public:
 		ID_SHOW_LANDMARK_GROUP,
 	};
 
-	albaOpAddLandmark(const wxString &label = "AddLandmark  \tCtrl+A", const wxString dictionary = "");
+	albaOpAddLandmark(const wxString &label = "AddLandmark  \tCtrl+A", const wxString dictionary = "", const wxString cloudName = "New landmark cloud");
 	~albaOpAddLandmark();
 
 	virtual void OnEvent(albaEventBase *alba_event);

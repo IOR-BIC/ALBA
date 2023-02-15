@@ -797,7 +797,8 @@ void albaOpTransform::LoadFrom()
 	albaEventMacro(e);
 
 	albaMatrix targetMtr;
-	targetMtr.DeepCopy(e.GetVme()->GetOutput()->GetAbsMatrix());
+	if(e.GetVme())
+	 targetMtr.DeepCopy(e.GetVme()->GetOutput()->GetAbsMatrix());
 
 	m_Input->SetAbsMatrix(targetMtr, m_CurrentTime);
 	m_TransformVME->SetAbsMatrix(targetMtr, m_CurrentTime);
