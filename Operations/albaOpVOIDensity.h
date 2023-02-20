@@ -102,5 +102,7 @@ protected:
   albaString       m_StandardDeviationString;
   double          m_StandardDeviation;
 	wxListBox			 *m_VoxelList;
+	int							m_EvaluateInSubRange;
+	double							m_SubRange[2];
 };
 #endif

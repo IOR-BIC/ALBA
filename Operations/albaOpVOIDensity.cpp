@@ -46,6 +46,7 @@
 #include "albaTagArray.h"
 #include "albaVMEPointCloud.h"
 #include "vtkCellArray.h"
+#include "vtkTransform.h"
 
 
 //----------------------------------------------------------------------------
@@ -74,6 +75,9 @@ albaOpVOIDensity::albaOpVOIDensity(const wxString &label)
   m_MaxScalarString       = albaString(wxString::Format("%f",m_MaxScalar));
   m_MinScalarString       = albaString(wxString::Format("%f",m_MinScalar));
   m_StandardDeviationString = albaString(wxString::Format("%f",m_StandardDeviation));
+
+	m_EvaluateInSubRange = false;
+	m_SubRange[0] = m_SubRange[1] = 0;
 }
 //----------------------------------------------------------------------------
 albaOpVOIDensity::~albaOpVOIDensity()
@@ -100,8 +104,10 @@ bool albaOpVOIDensity::InternalAccept(albaVME* Node)
 //----------------------------------------------------------------------------
 enum VOI_DENSITY_WIDGET_ID
 {
-  ID_CHOOSE_SURFACE = MINID,
-  ID_EVALUATE_DENSITY,
+	ID_CHOOSE_SURFACE = MINID,
+	ID_EVALUATE_DENSITY,
+	ID_ENABLE_RANGE,
+	ID_RANGE_UPDATED,
   ID_NUMBER_OF_VOXEL_IN_VOI,
 	ID_NUM_SCALARS,
 	ID_MEAN_SCALAR,
@@ -117,6 +123,11 @@ void albaOpVOIDensity::OpRun()
   vtkNEW(m_VOIScalars);
 	if(!this->m_TestMode)
 	{
+		vtkALBASmartPointer<vtkDataSet> VolumeData = m_Input->GetOutput()->GetVTKData();
+		VolumeData->Update();
+
+		VolumeData->GetPointData()->GetScalars()->GetRange(m_SubRange);
+
 		CreateGui();
 
 		ShowGui();
@@ -133,13 +144,16 @@ void albaOpVOIDensity::CreateGui()
 	m_Gui->Divider();
 	m_Gui->Button(ID_CHOOSE_SURFACE, _("VOI surface"));
 	m_Gui->Button(ID_EVALUATE_DENSITY, _("Evaluate"), "", _("Evaluate density inside the choosed surface"));
+	m_Gui->Divider();
+	m_Gui->Bool(ID_ENABLE_RANGE, "Evaluate only in subrange", &m_EvaluateInSubRange, true);
+	m_Gui->VectorN(ID_RANGE_UPDATED, "Range:", m_SubRange, 2, m_SubRange[0], m_SubRange[1]);
 	m_Gui->Divider(2);
 	m_Gui->Label(_("Number of voxel inside the VOI"));
 	m_Gui->String(ID_NUM_SCALARS, "Num=", &m_NumberOfScalarsString, "");
 	m_Gui->Label(_("Voxels's scalar mean inside the VOI"));
 	m_Gui->String(ID_MEAN_SCALAR, "Mean=", &m_MeanScalarString, "");
-	m_Gui->String(ID_MAX_SCALAR, "Max=", &m_MaxScalarString, "");
 	m_Gui->String(ID_MIN_SCALAR, "Min=", &m_MinScalarString, "");
+	m_Gui->String(ID_MAX_SCALAR, "Max=", &m_MaxScalarString, "");
 	m_Gui->String(ID_STANDARD_DEVIATION, "Std dev=", &m_StandardDeviationString, "");
 	//m_VoxelList=m_Gui->ListBox(ID_VOXEL_LIST);
 
@@ -150,6 +164,7 @@ void albaOpVOIDensity::CreateGui()
 	m_Gui->Label("");
 
 	m_Gui->Enable(ID_EVALUATE_DENSITY, false);
+	m_Gui->Enable(ID_RANGE_UPDATED, false);
 	m_Gui->Enable(wxOK, false);
 	m_Gui->Update();
 }
@@ -313,6 +328,17 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 				m_Gui->Enable(wxOK, false);
 			}
 			break;
+			case ID_ENABLE_RANGE:
+				m_Gui->Enable(ID_RANGE_UPDATED, m_EvaluateInSubRange);
+				break;
+			case ID_RANGE_UPDATED:
+				m_Gui->Update();
+				if (m_SubRange[0] > m_SubRange[1])
+					m_SubRange[1] = m_SubRange[0];
+				else if (m_SubRange[1] < m_SubRange[0])
+					m_SubRange[1] = m_SubRange[0];
+				m_Gui->Update();
+				break;
 			case ID_EVALUATE_DENSITY:
 				ExtractVolumeScalars();
 				m_Gui->Enable(wxOK, true);
@@ -333,13 +359,13 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 void albaOpVOIDensity::ExtractVolumeScalars()
 //----------------------------------------------------------------------------
 {
-	if(!this->m_TestMode)
+	if (!this->m_TestMode)
 		wxBusyCursor wait;
 
-  double b[6];
-  double Point[3], InsideScalar = 0.0, SumScalars = 0.0;
-  int NumberVoxels, PointId;
-  
+	double b[6];
+	double Point[3], InsideScalar = 0.0, SumScalars = 0.0;
+	int NumberVoxels, PointId;
+
 	// Reset parameters
 	m_NumberOfScalars = 0;
 	m_MaxScalar = -99999.0;
@@ -347,72 +373,88 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 	m_VOIScalars->Reset();
 	m_VOICoords.clear();
 
-	vtkAbstractTransform *transform;
-	vtkPolyData *polydata;
-	m_Surface->GetOutput()->GetBounds(b);
-	m_Surface->Update();
-	transform=(vtkAbstractTransform*)m_Surface->GetAbsMatrixPipe()->GetVTKTransform();
-	polydata=(vtkPolyData *)m_Surface->GetOutput()->GetVTKData();
+	albaMatrix inputMeshABSMatrix = m_Surface->GetAbsMatrixPipe()->GetMatrix();
+	albaMatrix inputVolumeABSMatrix = m_Input->GetAbsMatrixPipe()->GetMatrix();
 
-	vtkALBASmartPointer<vtkTransformPolyDataFilter> TransformDataClipper;
-  TransformDataClipper->SetTransform(transform);
-  TransformDataClipper->SetInput(polydata);
-  TransformDataClipper->Update();
+	//Calculate align matrix 
+	albaMatrix alignMatrix;
+	inputVolumeABSMatrix.Invert();
+	albaMatrix::Multiply4x4(inputVolumeABSMatrix, inputMeshABSMatrix, alignMatrix);
+
+	vtkTransform *transform = NULL;
+	transform = vtkTransform::New();
+	transform->SetMatrix(alignMatrix.GetVTKMatrix());
+
+	vtkPolyData *polydata;
+	m_Surface->Update();
+	polydata = (vtkPolyData *)m_Surface->GetOutput()->GetVTKData();
+
+	vtkALBASmartPointer<vtkTransformPolyDataFilter> TransformDataFilter;
+	TransformDataFilter->SetTransform(transform);
+	TransformDataFilter->SetInput(polydata);
+	TransformDataFilter->Update();
 
 	vtkALBASmartPointer<vtkALBAImplicitPolyData> ImplicitSurface;
-	ImplicitSurface->SetInput(TransformDataClipper->GetOutput());
+	ImplicitSurface->SetInput(TransformDataFilter->GetOutput());
+
+	TransformDataFilter->GetOutput()->GetBounds(b);
 
 	vtkALBASmartPointer<vtkPlanes> ImplicitBox;
-  ImplicitBox->SetBounds(b);
+	ImplicitBox->SetBounds(b);
 	ImplicitBox->Modified();
 
-  vtkALBASmartPointer<vtkDataSet> VolumeData = m_Input->GetOutput()->GetVTKData();
-  VolumeData->Update();
+	vtkALBASmartPointer<vtkDataSet> VolumeData = m_Input->GetOutput()->GetVTKData();
+	VolumeData->Update();
 	NumberVoxels = VolumeData->GetNumberOfPoints();
 
 	albaProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Evaluating Density...");
-	
 
-  
-	for (int voxel=0; voxel<NumberVoxels; voxel++)
-  {
-    VolumeData->GetPoint(voxel,Point);
-    if(ImplicitBox->EvaluateFunction(Point) < 0)
-    {
-      //point is inside the bounding box of the surface: check
-      //if the point is also inside the surface.
-      if (ImplicitSurface->EvaluateFunction(Point) < 0)
-      {
-        //store the corresponding point's scalar value
-        PointId = VolumeData->FindPoint(Point);
-        InsideScalar = VolumeData->GetPointData()->GetTuple(PointId)[0];
-        SumScalars += InsideScalar;
-        m_MaxScalar = MAX(InsideScalar,m_MaxScalar);
-        m_MinScalar = MIN(InsideScalar,m_MinScalar);
-        m_NumberOfScalars++;
-        m_VOIScalars->InsertNextTuple(&InsideScalar);
-				albaVect3d vPos(Point);
-				m_VOICoords.push_back(vPos);
-      }
-    }
-		progressHelper.UpdateProgressBar(voxel*100.0/NumberVoxels);
-  }
-  if(m_NumberOfScalars > 0)
-  {
-    m_MeanScalar = SumScalars / m_NumberOfScalars;
-  }
-  
-  double Sum = 0.0;
+	vtkDEL(transform);
+
+	for (int voxel = 0; voxel < NumberVoxels; voxel++)
+	{
+		VolumeData->GetPoint(voxel, Point);
+		if (ImplicitBox->EvaluateFunction(Point) < 0)
+		{
+			//point is inside the bounding box of the surface: check
+			//if the point is also inside the surface.
+			if (ImplicitSurface->EvaluateFunction(Point) < 0)
+			{
+				//store the corresponding point's scalar value
+				PointId = VolumeData->FindPoint(Point);
+				InsideScalar = VolumeData->GetPointData()->GetTuple(PointId)[0];
+				if (!m_EvaluateInSubRange || (InsideScalar >= m_SubRange[0] && InsideScalar <= m_SubRange[1]))
+				{
+					SumScalars += InsideScalar;
+					m_MaxScalar = MAX(InsideScalar, m_MaxScalar);
+					m_MinScalar = MIN(InsideScalar, m_MinScalar);
+					m_NumberOfScalars++;
+					m_VOIScalars->InsertNextTuple(&InsideScalar);
+					albaVect3d vPos(Point);
+					m_VOICoords.push_back(vPos);
+				}
+			}
+		}
+		progressHelper.UpdateProgressBar(voxel*100.0 / NumberVoxels);
+	}
+	if (m_NumberOfScalars == 0)
+	{
+		m_MeanScalar = m_MaxScalar = m_MinScalar = m_StandardDeviation = 0;
+	}
+	else
+	{
+		m_MeanScalar = SumScalars / m_NumberOfScalars;
+	double Sum = 0.0;
 	double s;
-  for (int i=0;i<m_NumberOfScalars; i++)
-  {
-    m_VOIScalars->GetTuple(i,&s);
-    Sum += (s - m_MeanScalar) * (s - m_MeanScalar);
-  }
-  m_StandardDeviation = sqrt(Sum/m_NumberOfScalars);
-
+	for (int i = 0; i < m_NumberOfScalars; i++)
+	{
+		m_VOIScalars->GetTuple(i, &s);
+		Sum += (s - m_MeanScalar) * (s - m_MeanScalar);
+	}
+	m_StandardDeviation = sqrt(Sum / m_NumberOfScalars);
+}
   m_NumberOfScalarsString = albaString(wxString::Format("%d",m_NumberOfScalars));
   m_MeanScalarString      = albaString(wxString::Format("%f",m_MeanScalar));
   m_MaxScalarString       = albaString(wxString::Format("%f",m_MaxScalar));
