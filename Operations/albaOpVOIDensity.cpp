@@ -69,12 +69,9 @@ albaOpVOIDensity::albaOpVOIDensity(const wxString &label)
   m_MaxScalar       = 0.0;
   m_MinScalar       = 0.0;
   m_StandardDeviation = 0.0;
+	m_Median = 0.0;
 
-	m_NumberOfScalarsString = albaString(wxString::Format("%d",m_NumberOfScalars));
-  m_MeanScalarString      = albaString(wxString::Format("%f",m_MeanScalar));
-  m_MaxScalarString       = albaString(wxString::Format("%f",m_MaxScalar));
-  m_MinScalarString       = albaString(wxString::Format("%f",m_MinScalar));
-  m_StandardDeviationString = albaString(wxString::Format("%f",m_StandardDeviation));
+	UpdateStrings();
 
 	m_EvaluateInSubRange = false;
 	m_SubRange[0] = m_SubRange[1] = 0;
@@ -114,6 +111,7 @@ enum VOI_DENSITY_WIDGET_ID
 	ID_MIN_SCALAR,
 	ID_MAX_SCALAR,
 	ID_STANDARD_DEVIATION,
+	ID_MEDIAN,
 	ID_VOXEL_LIST,
 };
 //----------------------------------------------------------------------------
@@ -152,6 +150,7 @@ void albaOpVOIDensity::CreateGui()
 	m_Gui->String(ID_NUM_SCALARS, "Num=", &m_NumberOfScalarsString, "");
 	m_Gui->Label(_("Voxels's scalar mean inside the VOI"));
 	m_Gui->String(ID_MEAN_SCALAR, "Mean=", &m_MeanScalarString, "");
+	m_Gui->String(ID_MEDIAN, "Median=", &m_MedianString, "");
 	m_Gui->String(ID_MIN_SCALAR, "Min=", &m_MinScalarString, "");
 	m_Gui->String(ID_MAX_SCALAR, "Max=", &m_MaxScalarString, "");
 	m_Gui->String(ID_STANDARD_DEVIATION, "Std dev=", &m_StandardDeviationString, "");
@@ -190,6 +189,7 @@ void albaOpVOIDensity::OpStop(int result)
 		SetDoubleTag("MaxScalar", m_MaxScalar);
 		SetDoubleTag("MinScalar", m_MinScalar);
 		SetDoubleTag("StandardDeviation", m_StandardDeviation);
+		SetDoubleTag("Median:", m_Median);
 
 		CreatePointSamplingOutput();
 	}
@@ -276,6 +276,35 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 	pointCloudVME->SetAbsMatrix(identityM);
 
 	albaDEL(pointCloudVME);
+}
+
+//----------------------------------------------------------------------------
+double albaOpVOIDensity::GetMedian(vtkDoubleArray *valuesArray)
+{
+	int nTuples = valuesArray->GetNumberOfTuples();
+
+	if (nTuples < 1)
+		return 0;
+
+	double retValue;
+	double *values = new double[nTuples];
+
+	for (int i = 0; i < nTuples; i++)
+		values[i] = valuesArray->GetTuple1(i);
+
+	qsort(values, nTuples, sizeof(double), Cmpfunc);
+	
+	retValue = values[nTuples / 2];
+	
+	delete[] values;
+
+	return retValue;
+}
+
+//----------------------------------------------------------------------------
+int albaOpVOIDensity::Cmpfunc(const void * a, const void * b)
+{
+	return (*(double*)a > *(double*)b);
 }
 
 //----------------------------------------------------------------------------
@@ -446,23 +475,34 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 	else
 	{
 		m_MeanScalar = SumScalars / m_NumberOfScalars;
-	double Sum = 0.0;
-	double s;
-	for (int i = 0; i < m_NumberOfScalars; i++)
-	{
-		m_VOIScalars->GetTuple(i, &s);
-		Sum += (s - m_MeanScalar) * (s - m_MeanScalar);
+		double Sum = 0.0;
+		double s;
+		for (int i = 0; i < m_NumberOfScalars; i++)
+		{
+			m_VOIScalars->GetTuple(i, &s);
+			Sum += (s - m_MeanScalar) * (s - m_MeanScalar);
+		}
+		m_StandardDeviation = sqrt(Sum / m_NumberOfScalars);
 	}
-	m_StandardDeviation = sqrt(Sum / m_NumberOfScalars);
-}
-  m_NumberOfScalarsString = albaString(wxString::Format("%d",m_NumberOfScalars));
-  m_MeanScalarString      = albaString(wxString::Format("%f",m_MeanScalar));
-  m_MaxScalarString       = albaString(wxString::Format("%f",m_MaxScalar));
-  m_MinScalarString       = albaString(wxString::Format("%f",m_MinScalar));
-  m_StandardDeviationString = albaString(wxString::Format("%f",m_StandardDeviation));
-	if(!this->m_TestMode)
+
+	m_Median = GetMedian(m_VOIScalars);
+
+	UpdateStrings();
+
+	if (!this->m_TestMode)
 	{
 		m_Gui->Update();
-		albaLogMessage(wxString::Format("\nn,m,max,min,stdev\n%d,%.3lf,%.3lf,%.3lf,%.3lf",m_NumberOfScalars,m_MeanScalar,m_MaxScalar,m_MinScalar,m_StandardDeviation));
+		albaLogMessage(wxString::Format("\nn,m,max,min,stdev,median\n%d,%.3lf,%.3lf,%.3lf,%.3lf,%3lf", m_NumberOfScalars, m_MeanScalar, m_MaxScalar, m_MinScalar, m_StandardDeviation,m_Median));
 	}
+}
+
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::UpdateStrings()
+{
+	m_NumberOfScalarsString = albaString(wxString::Format("%d", m_NumberOfScalars));
+	m_MeanScalarString = albaString(wxString::Format("%f", m_MeanScalar));
+	m_MaxScalarString = albaString(wxString::Format("%f", m_MaxScalar));
+	m_MinScalarString = albaString(wxString::Format("%f", m_MinScalar));
+	m_StandardDeviationString = albaString(wxString::Format("%f", m_StandardDeviation));
+	m_MedianString = albaString(wxString::Format("%f", m_Median));
 }
