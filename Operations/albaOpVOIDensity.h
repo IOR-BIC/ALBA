@@ -71,6 +71,8 @@ public:
 	/** Extract scalars from input volume that are inside the choosed surface. */
 	void ExtractVolumeScalars();
 
+	void UpdateStrings();
+
 	/** Set Surface */
 	int SetSurface(albaVME *surface);
 	
@@ -86,6 +88,9 @@ protected:
 
 	void CreatePointSamplingOutput();
 
+	double GetMedian(vtkDoubleArray *valuesArray);
+	
+	static int Cmpfunc(const void * a, const void * b);
 	virtual void CreateGui();
 
   albaVME        *m_Surface;
@@ -101,6 +106,8 @@ protected:
   double          m_MinScalar;
   albaString       m_StandardDeviationString;
   double          m_StandardDeviation;
+	albaString       m_MedianString;
+	double					m_Median;
 	wxListBox			 *m_VoxelList;
 	int							m_EvaluateInSubRange;
 	double							m_SubRange[2];
