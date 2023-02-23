@@ -125,8 +125,14 @@ class ALBA_EXPORT vtkALBAHistogram : public vtkActor2D
   /** Turn on/off show lines.*/
   vtkBooleanMacro(ShowLines,int);
 
+	/** Set/Get the number of bins.*/
+	vtkSetMacro(NumberOfBins, int);
+	/** Set/Get the number of bins.*/
+ 	vtkGetMacro(NumberOfBins, int);
+
+
   /** Update the position of the gizmos */
-  void UpdateLines(int min,int max);
+  void UpdateLines(double range[2]);
 
   /** retrieve histogram value (count) from x*/
   long int GetHistogramValue(int x, int y);
@@ -168,12 +174,9 @@ protected:
   int    HisctogramRepresentation;
   int    RenderWidth;
   int    RenderH;
-  int    Line1X;
-  int    Line2X;
   int    OriginY;
   int    OriginX;
-  int    MinLinePosition;
-  int    MaxLinePoistion;
+	double CurrRange[2];
   int    ShowLines;
   bool   AutoscaleCalculated;
 
