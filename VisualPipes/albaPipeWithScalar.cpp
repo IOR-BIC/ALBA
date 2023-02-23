@@ -182,12 +182,12 @@ void albaPipeWithScalar::CreateScalarsGui(albaGUI *gui)
 	gui->Add(m_LutSlider);
 
   m_LutSwatch=gui->Lut(ID_LUT,"Lut",m_Table);
+	gui->Button(ID_SHOW_HISTOGRAM, "Show Histogram");
 
 	wxString numStrs[] = { "Three","Four","Five","Six","Seven","Eight","Nine","Ten" };
 	wxString posStrs[] = { "Top", "Bottom", "Left", "Right" };
 
 	gui->Bool(ID_ENABLE_SCALAR_BAR, "Show scalar bar", &m_ShowScalarBar, 1);
-	gui->Button(ID_SHOW_HISTOGRAM, "Show Histogram");
 	gui->Combo(ID_SCALAR_BAR_LAB_N, "Label Number",  &m_ScalarBarLabNum, 8,numStrs);
 	gui->Combo(ID_SCALAR_BAR_POS, "Bar Position", &m_ScalarBarPos, 4, posStrs);
 
@@ -358,12 +358,14 @@ void albaPipeWithScalar::CreateHistogramDialog()
 	{
 		m_Dialog = new albaGUIDialog("Histogram", albaRESIZABLE);
 
-		m_Histogram = new albaGUIHistogramWidget(m_Gui, -1, wxPoint(0, 0), wxSize(400, 500), wxTAB_TRAVERSAL, true);
-		m_Histogram->SetListener(this);
-		m_Histogram->SetRepresentation(vtkALBAHistogram::BAR_REPRESENTATION);
-		UpdateVisualizationWithNewSelectedScalars();
+		
 
 		albaGUI *gui = new albaGUI(this);
+
+		m_Histogram = new albaGUIHistogramWidget(gui, -1, wxPoint(0, 0), wxSize(400, 500), wxTAB_TRAVERSAL, true);
+		m_Histogram->SetListener(this);
+		UpdateVisualizationWithNewSelectedScalars();
+
 		gui->Add(m_Histogram, 1);
 		gui->AddGui(m_Histogram->GetGui());
 		gui->Button(ID_CLOSE_HISTOGRAM, _("Close"));

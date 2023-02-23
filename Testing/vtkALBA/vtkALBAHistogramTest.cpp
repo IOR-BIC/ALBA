@@ -229,7 +229,8 @@ void vtkALBAHistogramTest::TestHistogramGetAttributesAndUpdateLines()
   actor->LabelVisibilityOn();
   actor->SetLabel("TEST ATTRIBUTES AND UPDATE LINES");
 
-  actor->UpdateLines(50,80);
+	double sr[2] = { 50,80 };
+  actor->UpdateLines(sr);
   actor->ShowLinesOn();
 
   RenderData(actor, "TestHistogramGetAttributesAndUpdateLines");

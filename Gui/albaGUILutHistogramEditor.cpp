@@ -87,10 +87,9 @@ albaGUILutHistogramEditor::albaGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolu
   //Setting up the histogram
   m_Histogram = new albaGUIHistogramWidget(gui,-1,wxPoint(0,0),wxSize(500,100),wxTAB_TRAVERSAL);
   m_Histogram->SetListener(this);
-  m_Histogram->SetRepresentation(vtkALBAHistogram::BAR_REPRESENTATION);
   m_Histogram->SetData(m_ResampledData);
   m_Histogram->SetLut(  material->m_ColorLut );
-  m_Histogram->ShowLines();
+	m_Histogram->ShowLines();
   m_Histogram->ShowText(false);
   gui->Add(m_Histogram,1);
 
@@ -206,7 +205,6 @@ void albaGUILutHistogramEditor::OnEvent(albaEventBase *alba_event)
       case ID_LOG_SCALE_VIEW:
         {
           //Enable disable log scale
-          m_Histogram->AutoscaleHistogramOn();
           m_Histogram->LogarithmicScale(m_LogScale);
           m_Histogram->UpdateLines(m_LowRange, m_HiRange);
           this->Refresh();
