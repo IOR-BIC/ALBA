@@ -23,10 +23,12 @@ class albaOpVOIDensityTest : public albaTest
 {
   CPPUNIT_TEST_SUITE( albaOpVOIDensityTest );
   CPPUNIT_TEST( Test );
+	CPPUNIT_TEST( TestNotAlignedVolume );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
     void Test();
+		void TestNotAlignedVolume();
 };
 
 #endif

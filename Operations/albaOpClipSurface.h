@@ -76,7 +76,7 @@ public:
 		GIZMO_SCALE,
 	};
   
-  static bool SurfaceAccept(albaVME*node) {return(node != NULL && node->IsALBAType(albaVMESurface));};
+  static bool SurfaceAccept(albaVME*node);;
 
   /** Set the modality to clip input surface. Available modality are MODE_SURFACE or MODE_IMPLICIT_FUNCTION*/
   void SetClippingModality(int mode = albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
@@ -135,7 +135,7 @@ protected:
 	/** Clip Using vtkALBAClipSurfaceBoundingBox */
 	void ClipBoundingBox();
 
-  albaVMESurface   *m_ClipperVME;
+  albaVME   *m_ClipperVME;
 	albaVMESurface   *m_ClippedVME;
 	albaVMESurface   *m_ReverseClippedVME;
 

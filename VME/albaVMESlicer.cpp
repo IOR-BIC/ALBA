@@ -53,11 +53,9 @@
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMESlicer)
-//-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 albaVMESlicer::albaVMESlicer()
-//-------------------------------------------------------------------------
 {
   m_UpdateVTKPropertiesFromMaterial = true;
 
@@ -107,7 +105,6 @@ albaVMESlicer::albaVMESlicer()
 
 //-------------------------------------------------------------------------
 albaVMESlicer::~albaVMESlicer()
-//-------------------------------------------------------------------------
 {
   //vtkDEL(m_BackTransformParent);
   vtkDEL(m_CopyTransform);
@@ -121,7 +118,6 @@ albaVMESlicer::~albaVMESlicer()
 
 //-------------------------------------------------------------------------
 mmaMaterial *albaVMESlicer::GetMaterial()
-//-------------------------------------------------------------------------
 {
   mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
   if (material == NULL)
@@ -142,7 +138,6 @@ mmaMaterial *albaVMESlicer::GetMaterial()
 
 //-------------------------------------------------------------------------
 int albaVMESlicer::DeepCopy(albaVME *a)
-//-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==ALBA_OK)
   {
@@ -170,7 +165,6 @@ int albaVMESlicer::DeepCopy(albaVME *a)
 
 //-------------------------------------------------------------------------
 bool albaVMESlicer::Equals(albaVME *vme)
-//-------------------------------------------------------------------------
 {
   bool ret = false;
   if (Superclass::Equals(vme))
@@ -184,7 +178,6 @@ bool albaVMESlicer::Equals(albaVME *vme)
 
 //-------------------------------------------------------------------------
 albaGUI* albaVMESlicer::CreateGui()
-//-------------------------------------------------------------------------
 {
   m_Gui = albaVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
@@ -198,7 +191,6 @@ albaGUI* albaVMESlicer::CreateGui()
 }
 //-------------------------------------------------------------------------
 void albaVMESlicer::OnEvent(albaEventBase *alba_event)
-//-------------------------------------------------------------------------
 {
   // events to be sent up or down in the tree are simply forwarded
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
@@ -235,13 +227,11 @@ void albaVMESlicer::OnEvent(albaEventBase *alba_event)
 }
 //-------------------------------------------------------------------------
 albaVMEOutputSurface *albaVMESlicer::GetSurfaceOutput()
-//-------------------------------------------------------------------------
 {
   return (albaVMEOutputSurface *)GetOutput();
 }
 //-------------------------------------------------------------------------
 void albaVMESlicer::SetMatrix(const albaMatrix &mat)
-//-------------------------------------------------------------------------
 {
   m_Transform->SetMatrix(mat);
   Modified();
@@ -249,14 +239,12 @@ void albaVMESlicer::SetMatrix(const albaMatrix &mat)
 
 //-------------------------------------------------------------------------
 bool albaVMESlicer::IsAnimated()
-//-------------------------------------------------------------------------
 {
   return false;
 }
 
 //-------------------------------------------------------------------------
 bool albaVMESlicer::IsDataAvailable()
-//-------------------------------------------------------------------------
 {
 	if(GetSlicedVMELink())
     return GetSlicedVMELink()->IsDataAvailable();
@@ -266,26 +254,22 @@ bool albaVMESlicer::IsDataAvailable()
 
 //-------------------------------------------------------------------------
 void albaVMESlicer::GetLocalTimeStamps(std::vector<albaTimeStamp> &kframes)
-//-------------------------------------------------------------------------
 {
   kframes.clear(); // no timestamps
 }
 //-----------------------------------------------------------------------
 albaVME *albaVMESlicer::GetSlicedVMELink()
-//-----------------------------------------------------------------------
 {
   return GetLink("SlicedVME");
 }
 //-----------------------------------------------------------------------
 void albaVMESlicer::SetSlicedVMELink(albaVME *node)
-//-----------------------------------------------------------------------
 {
   SetLink("SlicedVME", node);
   Modified();
 }
 //-----------------------------------------------------------------------
 void albaVMESlicer::InternalPreUpdate()
-//-----------------------------------------------------------------------
 {
   albaVME *vol = GetSlicedVMELink();
 	if (vol)
@@ -375,7 +359,6 @@ void albaVMESlicer::InternalPreUpdate()
 
 //-----------------------------------------------------------------------
 void albaVMESlicer::InternalUpdate()
-//-----------------------------------------------------------------------
 {
   albaVME *vol = GetSlicedVMELink();
 	if (vol)
@@ -419,7 +402,6 @@ void albaVMESlicer::InternalUpdate()
 }
 //-----------------------------------------------------------------------
 int albaVMESlicer::InternalStore(albaStorageElement *parent)
-//-----------------------------------------------------------------------
 {  
   if (Superclass::InternalStore(parent)==ALBA_OK)
   {
@@ -431,7 +413,6 @@ int albaVMESlicer::InternalStore(albaStorageElement *parent)
 
 //-----------------------------------------------------------------------
 int albaVMESlicer::InternalRestore(albaStorageElement *node)
-//-----------------------------------------------------------------------
 {
   if (Superclass::InternalRestore(node)==ALBA_OK)
   {
@@ -449,7 +430,6 @@ int albaVMESlicer::InternalRestore(albaStorageElement *node)
 
 //-----------------------------------------------------------------------
 void albaVMESlicer::Print(std::ostream& os, const int tabs)
-//-----------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);
   albaIndent indent(tabs);
@@ -459,20 +439,19 @@ void albaVMESlicer::Print(std::ostream& os, const int tabs)
 }
 //-------------------------------------------------------------------------
 char** albaVMESlicer::GetIcon() 
-//-------------------------------------------------------------------------
 {
-  #include "albaVMESurface.xpm"
-  return albaVMESurface_xpm;
+  #include "albaVMESlicer.xpm"
+  return albaVMESlicer_xpm;
 }
 //-------------------------------------------------------------------------
 void albaVMESlicer::SetTrilinearInterpolation(bool on) 
-//-------------------------------------------------------------------------
 {
   m_TrilinearInterpolationOn = on;
   if(m_ISlicer)
     m_ISlicer->SetTrilinearInterpolation(on);
 }
 
+//-------------------------------------------------------------------------
 void albaVMESlicer::SetEnableGPU(bool val)
 {
 	m_EnableGPU = val;
