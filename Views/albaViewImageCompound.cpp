@@ -41,10 +41,13 @@
 #include "albaVMEOutputImage.h"
 #include "vtkImageData.h"
 #include "vtkTexture.h"
-
+#include "vtkRenderer.h"
 #include "vtkLookupTable.h"
 #include "vtkDataSet.h"
-
+#include "albaGUIPicButton.h"
+#include "vtkViewport.h"
+#include "albaGUILutPreset.h"
+#include "vtkRendererCollection.h"
 //----------------------------------------------------------------------------
 // constants:
 //----------------------------------------------------------------------------
@@ -67,11 +70,33 @@ albaViewImageCompound::albaViewImageCompound( wxString label, int num_row, int n
 	m_LutSlider = NULL;
 	m_ColorLUT = NULL;
 	m_CanSpin = false;
+
+	m_Ruler = NULL;
+	m_Renderer = NULL;
+
+	m_RulerButton = NULL;
+	m_ShowRulerButton = true;
+	m_ShowRuler = false;
+
+	m_ReverseLUTButton = NULL;
+	m_ShowReverseLUTButton = true;
+	m_IsLutReversed = false;
 }
 //----------------------------------------------------------------------------
 albaViewImageCompound::~albaViewImageCompound()
 //----------------------------------------------------------------------------
 {
+	if (m_ReverseLUTButton)
+		delete m_ReverseLUTButton;
+
+	if (m_Ruler)
+	{
+		m_Renderer->RemoveActor2D(m_Ruler);
+		albaDEL(m_Ruler);
+	}
+
+	delete m_RulerButton;
+
 	m_ColorLUT = NULL;
 	cppDEL(m_LutWidget);
 	cppDEL(m_LutSlider);
@@ -97,15 +122,39 @@ albaView *albaViewImageCompound::Copy(albaObserver *Listener, bool lightCopyEnab
 void albaViewImageCompound::CreateGuiView()
 //----------------------------------------------------------------------------
 {
-	m_GuiView = new albaGUI(this);
-  
-  m_LutSlider = new albaGUILutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
+  m_GuiView = new albaGUI(this);
+
+  wxBoxSizer *mainVertSizer = new wxBoxSizer(wxHORIZONTAL);
+
+  m_LutSlider = new albaGUILutSlider(m_GuiView, -1, wxPoint(0, 0), wxSize(500, 24));
   m_LutSlider->SetListener(this);
-  m_LutSlider->SetSize(500,24);
-  m_LutSlider->SetMinSize(wxSize(500,24));
-	EnableWidgets(false);
-  m_GuiView->Add(m_LutSlider);
+  m_LutSlider->SetSize(500, 24);
+  m_LutSlider->SetMinSize(wxSize(500, 24));
+
+  mainVertSizer->Add(m_LutSlider, wxEXPAND);
+
+  if (m_ShowReverseLUTButton)
+  {
+	  m_ReverseLUTButton = new albaGUIPicButton(m_GuiView, "REVERSE_LUT_ICON", ID_REVERSE_LUT, this);
+	  m_ReverseLUTButton->SetToolTip("LUT Reverse");
+	  m_ReverseLUTButton->SetListener(this);
+
+	  mainVertSizer->Add(m_ReverseLUTButton);
+  }
+
+  if (m_ShowRulerButton)
+  {
+	  m_RulerButton = new albaGUIPicButton(m_GuiView, "SHOW_RULER_ICON", ID_VIEW_RULER, this);
+	  m_RulerButton->SetToolTip("Show Ruler");
+	  m_RulerButton->SetListener(this);
+
+	  mainVertSizer->Add(m_RulerButton);
+  }
+
+  m_GuiView->Add(mainVertSizer, 1, wxEXPAND);
   m_GuiView->Reparent(m_Win);
+
+  EnableWidgets(false);
 }
 //----------------------------------------------------------------------------
 void albaViewImageCompound::OnEvent(albaEventBase *alba_event)
@@ -129,12 +178,88 @@ void albaViewImageCompound::OnEvent(albaEventBase *alba_event)
 			{
 				double *sr;
 				sr = m_ColorLUT->GetRange();
+
 				m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+				CameraUpdate();
 			}
 			break;
+
+		case ID_REVERSE_LUT:
+		{			
+			LutReverse();
+		}
+		break;
+
+		case ID_VIEW_RULER:
+		{
+			ShowRuler(!m_ShowRuler);
+		}
+		break;
     default:
       Superclass::OnEvent(alba_event);
   }
+}
+
+//-------------------------------------------------------------------------
+void albaViewImageCompound::LutReverse()
+{
+	if (m_ColorLUT)
+	{
+		if (m_IsLutReversed)
+		{
+			lutPreset(4, m_ColorLUT); // lutGray
+		}
+		else
+		{
+			lutPreset(20, m_ColorLUT); // lutGrayReversed
+		}
+
+		m_IsLutReversed = !m_IsLutReversed;
+
+		CameraUpdate();
+	}
+}
+//----------------------------------------------------------------------------
+void albaViewImageCompound::ShowRuler(bool show)
+{
+	m_ShowRuler = show;
+
+	if (!m_Ruler)
+	{
+		SetRendererByView();
+
+		// 		m_RulerButton->SetBitmap("HIDE_RULER_ICON");
+		// 		m_RulerButton->SetToolTip("Show Ruler");
+
+		m_Ruler = vtkALBASimpleRulerActor2D::New();
+		m_Ruler->SetColor(0.5, 1.0, 1.0);
+		m_Ruler->SetLabelAxesVisibility(false);
+		m_Ruler->SetLegend("mm/tick");
+		m_Ruler->CenterAxesOnScreen(false);
+		m_Ruler->ShowFixedTick(true);
+
+		m_Renderer->AddActor2D((vtkActor2D *)m_Ruler);
+
+		m_Ruler->SetVisibility(show);
+		m_Renderer->GetRenderWindow()->Render();
+	}
+	else
+	{
+		// 		m_RulerButton->SetBitmap("SHOW_RULER_ICON");
+		// 		m_RulerButton->SetToolTip("Hide Ruler");
+
+		m_Ruler->SetVisibility(show);
+		m_Renderer->GetRenderWindow()->Render();
+	}
+
+	if (!m_ShowRuler)
+	{
+		m_RulerButton->SetToolTip("Show Ruler");
+	}
+	else
+	{
+		m_RulerButton->SetToolTip("Hide Ruler");
+	}
 }
 //-------------------------------------------------------------------------
 albaGUI* albaViewImageCompound::CreateGui()
@@ -180,6 +305,7 @@ void albaViewImageCompound::VmeShow(albaVME *vme, bool show)
 			albaPipeImage3D *pipe = (albaPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(vme);
 			//when show is false the color lut must be NULL because the image will be removed from the view
 			m_ColorLUT = pipe && show ? pipe->GetLUT() : NULL;
+			
 			UpdateWindowing(show && pipe && pipe->IsGrayImage());
 		}
 		else
@@ -198,8 +324,15 @@ void albaViewImageCompound::EnableWidgets(bool enable)
 {
 	//if a volume is visualized enable the widgets
 	if(m_Gui)
-		m_Gui->Enable(ID_LUT_CHOOSER,enable);
+		m_Gui->Enable(ID_LUT_CHOOSER, enable);
+
   m_LutSlider->Enable(enable);
+
+  if (m_GuiView)
+  {
+	  m_GuiView->Enable(ID_REVERSE_LUT, enable);
+	  //m_Gui->Enable(ID_VIEW_RULER, enable);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -225,7 +358,7 @@ void albaViewImageCompound::UpdateWindowing(bool enable)
 		m_LutSlider->SetSubRange(-100,100);
 	}
 }
-
+//----------------------------------------------------------------------------
 void albaViewImageCompound::VmeRemove(albaVME *vme)
 {
 	Superclass::VmeRemove(vme);
@@ -237,4 +370,28 @@ void albaViewImageCompound::VmeRemove(albaVME *vme)
 		UpdateWindowing(false);
 	}
 
+}
+
+//----------------------------------------------------------------------------
+void albaViewImageCompound::SetRendererByView()
+{
+	vtkRenderer *newRenderer = NULL;
+
+	vtkRendererCollection *rc;
+	rc = this->GetRWI()->GetRenderWindow()->GetRenderers();
+
+	// Searching for a frontal renderer on render collection
+	if (rc)
+	{
+		rc->InitTraversal();
+		vtkRenderer *ren;
+		while (ren = rc->GetNextItem())
+			if (ren->GetLayer() == 1)//Frontal Render
+			{
+				newRenderer = ren;
+				break;
+			}
+	}
+
+	m_Renderer = newRenderer;
 }
