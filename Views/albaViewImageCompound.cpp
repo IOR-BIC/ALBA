@@ -81,6 +81,7 @@ albaViewImageCompound::albaViewImageCompound( wxString label, int num_row, int n
 	m_ReverseLUTButton = NULL;
 	m_ShowReverseLUTButton = true;
 	m_IsLutReversed = false;
+	m_CurrentLUTPreset = 4;
 }
 //----------------------------------------------------------------------------
 albaViewImageCompound::~albaViewImageCompound()
@@ -205,14 +206,9 @@ void albaViewImageCompound::LutReverse()
 {
 	if (m_ColorLUT)
 	{
-		if (m_IsLutReversed)
-		{
-			lutPreset(4, m_ColorLUT); // lutGray
-		}
-		else
-		{
-			lutPreset(20, m_ColorLUT); // lutGrayReversed
-		}
+		m_CurrentLUTPreset = m_IsLutReversed ? 4 : 20; // gray or reverted gray
+
+		lutPreset(m_CurrentLUTPreset, m_ColorLUT);
 
 		m_IsLutReversed = !m_IsLutReversed;
 
@@ -266,15 +262,17 @@ albaGUI* albaViewImageCompound::CreateGui()
 //-------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-  m_Gui = albaView::CreateGui();
+	m_Gui = albaView::CreateGui();
 
 	m_Gui->AddGui(((albaViewImage*)m_ChildViewList[ID_VIEW_IMAGE])->GetGui());
-	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER, "lut", m_ColorLUT);
 	m_LutWidget->Enable(false);
+
 	m_Gui->Divider();
 	m_Gui->FitGui();
 	m_Gui->Update();
-  return m_Gui;
+
+	return m_Gui;
 }
 //-------------------------------------------------------------------------
 void albaViewImageCompound::PackageView()
@@ -306,6 +304,8 @@ void albaViewImageCompound::VmeShow(albaVME *vme, bool show)
 			//when show is false the color lut must be NULL because the image will be removed from the view
 			m_ColorLUT = pipe && show ? pipe->GetLUT() : NULL;
 			
+			lutPreset(m_CurrentLUTPreset, m_ColorLUT);
+
 			UpdateWindowing(show && pipe && pipe->IsGrayImage());
 		}
 		else

@@ -123,5 +123,6 @@ protected:
 	albaGUIPicButton *m_ReverseLUTButton;
 	bool m_ShowReverseLUTButton;
 	bool m_IsLutReversed;
+	int m_CurrentLUTPreset;
 };
 #endif
