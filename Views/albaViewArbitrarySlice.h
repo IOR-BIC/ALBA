@@ -79,6 +79,8 @@ public:
 	/** Show/Hide VMEs into plugged sub-views*/
 	virtual void VmeShow(albaVME *vme, bool show);
 
+	void GetSlicingNormal(double * normal);
+
 	/** Remove VME into plugged sub-views*/
 	virtual void VmeRemove(albaVME *vme);
 

@@ -231,6 +231,8 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 			m_SlicingMatrix->DeepCopy(m_MatrixReset);
 			m_AttachCamera->SetAttachedMatrix(m_SlicingMatrix->GetVTKMatrix());
 			m_AttachCamera->EnableAttachCamera();
+
+			((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset();
 			((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset(m_InputVolume);
 
 			albaPipeVolumeArbSlice* pipeVolSlice = albaPipeVolumeArbSlice::SafeDownCast(m_ChildViewList[SLICE_VIEW]->GetNodePipe(m_InputVolume));
@@ -255,7 +257,8 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 			if (pipeSlice)
 			{
 				double normal[3];
-				((albaViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+				GetSlicingNormal(normal);
+
 	
 				pipeSlice->SetSlice(m_SliceCenterSurface, normal);
 			}
@@ -287,6 +290,13 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 	
 	m_SkipCameraUpdate--;
 }
+
+//----------------------------------------------------------------------------
+void albaViewArbitrarySlice::GetSlicingNormal(double * normal)
+{
+	((albaViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+}
+
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::VmeSelect(albaVME *node, bool select)
 {
@@ -379,29 +389,24 @@ void albaViewArbitrarySlice::OnEventGizmoTranslate(albaEventBase *alba_event)
 			tr->PostMultiply();
 			tr->SetMatrix(e->GetMatrix()->GetVTKMatrix());
 			tr->Update();
-			double translation[3];
-			tr->GetPosition(translation);
+			double translationIn[4] = { 0,0,0,1 }, traslationOut[4] = { 0,0,0,1 };
+			tr->GetPosition(translationIn);
+
+			albaMatrix mtr;
+			mtr.CopyRotation(*m_SlicingMatrix);
+			mtr.Invert();
+			mtr.MultiplyPoint(translationIn, traslationOut);
 
 			//increase the translation
-			m_SliceCenterSurface[0]+=translation[0];
-			m_SliceCenterSurface[1]+=translation[1];
-			m_SliceCenterSurface[2]+=translation[2];
+			m_SliceCenterSurface[0]+= traslationOut[0];
+			m_SliceCenterSurface[1]+= traslationOut[1];
+			m_SliceCenterSurface[2]+= traslationOut[2];
 
-			//change the position of rotation gizmos
-			vtkTransform *TransformReset;
-			vtkNEW(TransformReset);
-			TransformReset->Identity();
-			TransformReset->Translate(m_SliceCenterSurface);
-			TransformReset->RotateX(m_SliceAngleReset[0]);
-			TransformReset->RotateY(m_SliceAngleReset[1]);
-			TransformReset->RotateZ(m_SliceAngleReset[2]);
-			TransformReset->Update();
 				
 			SetSlices();
 					
 			CameraUpdate();
 			vtkDEL(tr);
-			vtkDEL(TransformReset);
 		}
 		break;
 
@@ -517,7 +522,7 @@ void albaViewArbitrarySlice::SetSlices()
 {
 	//update the normal of the cutter plane of the surface
 	double normal[3];
-	((albaViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+	GetSlicingNormal(normal);
 	albaVME *root = m_InputVolume->GetRoot();
 	albaVMEIterator *iter = root->NewIterator();
 	for (albaVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())

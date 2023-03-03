@@ -257,19 +257,12 @@ albaGUI * albaAttachCamera::GetGui()
 void albaAttachCamera::SetAttachedMatrix(vtkMatrix4x4 * attachedMatrix)
 {
 	bool attachedCameraEnabled = m_EnableAttachCamera;
-	SetVme(NULL);
+	m_AttachedVme = NULL;
 	m_EnableAttachCamera = attachedCameraEnabled;
 	m_AttachedMatrix = attachedMatrix;
-
+	
 	m_CurrentMatrix->DeepCopy(m_StartingMatrix);
 
-	vtkALBASmartPointer<vtkTransform> delta;
-	delta->PreMultiply();
-	delta->Concatenate(m_StartingMatrix);
 
-	if (m_RenderWindow)
-	{
-		m_RenderWindow->m_Camera->ApplyTransform(delta);
-		m_RenderWindow->CameraUpdate();
-	}
+	UpdateCameraMatrix();
 }
