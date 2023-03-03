@@ -13,7 +13,7 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
+#include "albaDefines.h"
 #include "vtkALBAHistogram.h"
 
 #include "vtkRenderer.h"
@@ -62,12 +62,12 @@ vtkALBAHistogram::vtkALBAHistogram()
   PointsRepresentation  = NULL;
   LineRepresentation    = NULL;
 
-  HisctogramRepresentation = LINE_REPRESENTATION;
+  HisctogramRepresentation = BAR_REPRESENTATION;
 
   Color[0] = Color[1] = Color[2] = 1.0;
 
   ScaleFactor       = 1.0;
-  NumberOfBins      = 1;
+  NumberOfBins      = 100;
   LogScaleConstant  = 10.0;
   RenderWidth       = 1;
 
@@ -112,9 +112,10 @@ void vtkALBAHistogram::SetInputData(vtkDataArray* inputData)
     this->Modified();
 
     double sr[2];
-    InputData->GetRange(sr);
-    MinLinePosition = sr[0];
-    MaxLinePoistion = sr[1];
+		InputData->GetRange(sr);
+		UpdateLines(sr);
+		double srw = sr[1] - sr[0] + 1;
+		NumberOfBins = MIN(srw, 100);
 
     AutoscaleCalculated = false;
   }
@@ -172,15 +173,17 @@ int vtkALBAHistogram::RenderOpaqueGeometry(vtkViewport *viewport)
 void vtkALBAHistogram::HistogramCreate()
 //----------------------------------------------------------------------------
 {
-  TextMapper = vtkTextMapper::New();
+  TextMapper = vtkTextMapper::New(); 
   TextMapper->SetInput("");
-  TextMapper->GetTextProperty()->AntiAliasingOff();
-  TextMapper->GetTextProperty()->SetFontFamily(VTK_TIMES);
-  TextMapper->GetTextProperty()->SetColor(1,1,1);
-  TextMapper->GetTextProperty()->SetLineOffset(0.5);
-  TextMapper->GetTextProperty()->SetLineSpacing(1.5);
-  TextMapper->GetTextProperty()->SetJustificationToRight();
-  TextMapper->GetTextProperty()->SetVerticalJustificationToTop();
+	vtkTextProperty * textProperty = TextMapper->GetTextProperty();
+  textProperty->AntiAliasingOff();
+  textProperty->SetFontFamily(VTK_TIMES);
+  textProperty->SetColor(1,1,1);
+  textProperty->SetLineOffset(0.5);
+  textProperty->SetLineSpacing(1.5);
+  textProperty->SetJustificationToRight();
+  textProperty->SetVerticalJustificationToTop();
+	textProperty->SetFontSize(14);
 
   TextActor = vtkActor2D::New();
   TextActor->SetMapper(TextMapper);
@@ -222,6 +225,7 @@ void vtkALBAHistogram::HistogramCreate()
   Glyph->SetSource(LineRepresentation->GetOutput());
   Glyph->SetScaleModeToScaleByScalar();
   Glyph->OrientOn();
+	
   
   vtkCoordinate *coordinate = vtkCoordinate::New();
   coordinate->SetCoordinateSystemToNormalizedDisplay();
@@ -267,6 +271,14 @@ void vtkALBAHistogram::HistogramCreate()
   mapperLine1->Delete();
   mapperLine2->Delete();
 
+	if (InputData)
+	{
+		double sr[2];
+		ImageData->GetScalarRange(sr);
+		double srw = sr[1] - sr[0] + 1;
+		NumberOfBins = MIN(srw, 100);
+	}
+
 }
 //----------------------------------------------------------------------------
 void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
@@ -281,27 +293,7 @@ void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
   ImageData->Update();
   ImageData->GetScalarRange(sr);
   double srw = sr[1]-sr[0]+1;
-
-  if (ImageData->GetScalarType() == VTK_CHAR || ImageData->GetScalarType() == VTK_UNSIGNED_CHAR )
-  {
-    // NumberOfBins  is 256 at most --- HistogramBins coincide with Scalars Values 
-    NumberOfBins = srw; 
-  }
-  else if ( ImageData->GetScalarType() >= VTK_SHORT && ImageData->GetScalarType() <= VTK_UNSIGNED_INT )
-  {
-    // NumberOfBins  can be >> 256 --- HistogramBins << Scalars Values 
-    NumberOfBins = srw;
-    int i=1;
-    while(NumberOfBins > 500 )
-    {
-      NumberOfBins = srw / i++;
-    }
-  }
-  else 
-  {
-    NumberOfBins = ( srw > 500 ) ? 500 : srw ; 
-  }
-
+	
   Accumulate->SetInput(ImageData);
   Accumulate->SetComponentOrigin(sr[0],0,0);  
   Accumulate->SetComponentExtent(0,NumberOfBins,0,0,0,0);
@@ -324,17 +316,17 @@ void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
     
     if (!LogHistogram)
     {
-      ScaleFactor = 1.0 / mean;
+      ScaleFactor = 0.99 / mean;
     }
     else
     {
       if(mean > 0)
       {
-        ScaleFactor = 1.0 / (LogScaleConstant * log(1 + mean));
+        ScaleFactor = 0.99 / (LogScaleConstant * log(1 + mean));
       }
       else
       {
-        ScaleFactor = 1.0 / (- LogScaleConstant * log(1 - mean));
+        ScaleFactor = 0.99 / (- LogScaleConstant * log(1 - mean));
       }
     }
   }
@@ -365,8 +357,8 @@ void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
 
   GetProperty()->SetColor(Color);
   HistActor->GetProperty()->SetColor(Color);
-  TextActor->GetProperty()->SetColor(Color);
-  TextMapper->GetTextProperty()->SetColor(Color);
+  //TextActor->GetProperty()->SetColor(Color);
+  //TextMapper->GetTextProperty()->SetColor(Color);
   RenderWidth = ren->GetSize()[0];
 
   if (HisctogramRepresentation == BAR_REPRESENTATION) 
@@ -395,41 +387,35 @@ void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
 
   InputData->GetRange(sr);
 
-  int shiftLine = sr[0]>=0 ? 0 : -sr[0];
-  Line1X = ((MinLinePosition+shiftLine) * (RenderWidth-1))/(sr[1]-sr[0]);
-  Line2X = ((MaxLinePoistion+shiftLine) * (RenderWidth-1))/(sr[1]-sr[0]);
-
-  Line1->SetPoint1(Line1X,OriginY,0);
-  Line1->SetPoint2(Line1X,OriginY+RenderH,0);
-  Line1->Modified();
-  Line1->Update();
-
-  Line2->SetPoint1(Line2X,OriginY,0);
-  Line2->SetPoint2(Line2X,OriginY+RenderH,0);
-  Line2->Modified();
-  Line2->Update();
+	UpdateLines(CurrRange);
 }
 //----------------------------------------------------------------------------
-void vtkALBAHistogram::UpdateLines(int min, int max)
+void vtkALBAHistogram::UpdateLines(double range[2])
 //----------------------------------------------------------------------------
 {
-  double sr[2];
+  double sr[2],rangeSize,scaledRange[2];
+	int line1X, line2X;
+
+	CurrRange[0] = range[0];
+	CurrRange[1] = range[1];
+
   InputData->GetRange(sr);
+
+	rangeSize = sr[1] - sr[0];
   
-  MinLinePosition = min;
-  MaxLinePoistion = max;
+  scaledRange[0] = range[0]-sr[0];
+  scaledRange[1] = range[1]-sr[0];
 
-  int shiftLine = sr[0]>=0 ? 0 : -sr[0];
-  Line1X = ((MinLinePosition+shiftLine) * (RenderWidth-1))/(sr[1]-sr[0]);
-  Line2X = ((MaxLinePoistion+shiftLine) * (RenderWidth-1))/(sr[1]-sr[0]);
+  line1X = ((scaledRange[0]/rangeSize) * (RenderWidth-1))+1;
+  line2X = ((scaledRange[1]/rangeSize) * (RenderWidth-1))+1;
 
-  Line1->SetPoint1(Line1X,OriginY,0);
-  Line1->SetPoint2(Line1X,OriginY+RenderH,0);
+  Line1->SetPoint1(line1X,OriginY,0);
+  Line1->SetPoint2(line1X,OriginY+RenderH,0);
   Line1->Modified();
   Line1->Update();
 
-  Line2->SetPoint1(Line1X,OriginY,0);
-  Line2->SetPoint2(Line2X,OriginY+RenderH,0);
+  Line2->SetPoint1(line2X,OriginY,0);
+  Line2->SetPoint2(line2X,OriginY+RenderH,0);
   Line2->Modified();
   Line2->Update();
 

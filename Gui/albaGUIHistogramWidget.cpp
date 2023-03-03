@@ -39,7 +39,6 @@
 #include "vtkDataArray.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
-#include "vtkDataArray.h"
 #include "vtkPointData.h"
 #include "vtkLookupTable.h"
 #include "vtkLineSource.h"
@@ -64,24 +63,18 @@ albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /
 
   m_SelectedRange[0] = 0.0;
   m_SelectedRange[1] = 1.0;
-  m_ScaleFactor     = 1.0;
   m_HisctogramValue = 0;
-  m_LogScaleConstant= 10.0;
-  m_DragStart       = 0;
-  m_Representation  = 1;
 
-  m_LowerThreshold = 0;
-  m_UpperThreshold = 1;
+  m_Threshold[0] = 0;
+  m_Threshold[1] = 1;
   
-  m_AutoscaleHistogram = true;
   m_LogHistogramFlag   = false;
-  m_Dragging           = false;
   m_ShowText           = true;
   //////////////////////////////////////////////////////////////////////////
 
   vtkNEW(m_Histogram);
-  m_Histogram->SetColor(1,1,1);
-  m_Histogram->SetHisctogramRepresentation(vtkALBAHistogram::LINE_REPRESENTATION);
+  m_Histogram->SetColor(0.3, 0.3, 0.9);
+  m_Histogram->SetHisctogramRepresentation(vtkALBAHistogram::BAR_REPRESENTATION);
 
   wxBoxSizer *sizerV = new wxBoxSizer(wxVERTICAL);
 
@@ -105,8 +98,8 @@ albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /
 	  m_SliderThresholds->SetListener(this);
 	  m_SliderThresholds->SetSize(5,24);
 	  m_SliderThresholds->SetMinSize(wxSize(5,24));
-	  m_SliderThresholds->SetRange(m_LowerThreshold,m_UpperThreshold);
-	  m_SliderThresholds->SetSubRange(m_LowerThreshold,m_UpperThreshold);
+	  m_SliderThresholds->SetRange(m_Threshold);
+	  m_SliderThresholds->SetSubRange(m_Threshold);
 	  sizerH1->Add(m_SliderThresholds,wxEXPAND);
 	  sizerV->Add(sizerH1, 0,wxEXPAND);
 
@@ -147,9 +140,9 @@ albaGUIHistogramWidget::~albaGUIHistogramWidget()
 void albaGUIHistogramWidget::UpdateLines(int min,int max)
 //----------------------------------------------------------------------------
 {
-  m_LowerThreshold=min;
-  m_UpperThreshold=max;
-  m_Histogram->UpdateLines(min,max);
+  m_Threshold[0]=min;
+  m_Threshold[1]=max;
+  m_Histogram->UpdateLines(m_Threshold);
   m_HistogramRWI->CameraUpdate();
 }
 //----------------------------------------------------------------------------
@@ -166,8 +159,8 @@ albaGUI *albaGUIHistogramWidget::GetGui()
 void albaGUIHistogramWidget::GetThresholds(double *lower, double *upper)
 //----------------------------------------------------------------------------
 {
-  *lower=m_LowerThreshold;
-  *upper=m_UpperThreshold;
+  *lower=m_Threshold[0];
+  *upper=m_Threshold[1];
 }
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::CreateGui()
@@ -185,8 +178,6 @@ void albaGUIHistogramWidget::CreateGui()
     m_Slider->EnableBoundaryHandles(false);
     m_Data->GetRange(m_SelectedRange);
     m_Slider->SetRange(m_SelectedRange);
-//    m_Slider->SetValue(0, m_SelectedRange[0]);
-//    m_Slider->SetValue(2, m_SelectedRange[1]);
     m_Lut->GetTableRange(m_SelectedRange);
     m_Slider->SetValue(0, m_SelectedRange[0]);
     m_Slider->SetValue(2, m_SelectedRange[1]);
@@ -195,12 +186,10 @@ void albaGUIHistogramWidget::CreateGui()
     m_Slider->Update();
     m_Gui->Add(m_Slider);
   }
-  m_Gui->Combo(ID_REPRESENTATION,"represent",&m_Representation,3,represent);
-  m_Gui->Bool(ID_AUTOSCALE,"autoscale", &m_AutoscaleHistogram);
-  m_Gui->Double(ID_SCALE_FACTOR,"scale",&m_ScaleFactor,1.0e-299,MAXDOUBLE,-1);
-  m_Gui->Bool(ID_LOGSCALE,"log",&m_LogHistogramFlag,0,"Enable/Disable log scale for histogram");
-  m_Gui->Double(ID_LOGFACTOR,"log constant",&m_LogScaleConstant,1.0e-299,MAXDOUBLE,-1,"multiplicative factor for log scale histogram");
-  m_Gui->Button(ID_RESET, "reset");
+
+	m_Gui->Slider(ID_NUMBER_OF_BIN, "Bin #:", &m_NumberOfBins, 10, 500, "Sets the number of bins of the Histogream");
+  m_Gui->Bool(ID_LOGSCALE,"Log Scale",&m_LogHistogramFlag,0,"Enable/Disable log scale for histogram");
+	m_Gui->Button(ID_EXPORT_DATA, "Export Data");
   m_Gui->Divider();
 
   EnableWidgets(m_Data != NULL);
@@ -211,43 +200,34 @@ void albaGUIHistogramWidget::OnEvent( albaEventBase *event )
 {
   if (albaEvent *e = albaEvent::SafeDownCast(event))
   {
-    switch(e->GetId())
-    {
-    case ID_RANGE_MODIFIED:
-      {
-        if (m_SliderThresholds)
-          m_SliderThresholds->GetSubRange(&m_LowerThreshold,&m_UpperThreshold);
-        m_Histogram->UpdateLines(m_LowerThreshold,m_UpperThreshold);
-      }
-      break;
-      case ID_REPRESENTATION:
-        SetRepresentation(m_Representation);
-      break;
-      case ID_AUTOSCALE:
-        AutoscaleHistogram(m_AutoscaleHistogram);
-      break;
-      case ID_SCALE_FACTOR:
-        SetScaleFactor(m_ScaleFactor);
-      break;
-      case ID_LOGSCALE:
-        LogarithmicScale(m_LogHistogramFlag);
-      break;
-      case ID_LOGFACTOR:
-        SetLogScaleConstant(m_LogScaleConstant);
-      break;
-      case ID_RESET:
-        ResetHistogram();
-      break;
-      case ID_RANGE_SLICER:
-        m_SelectedRange[0] = m_Slider->GetValue(0);
-        m_SelectedRange[1] = m_Slider->GetValue(2);
-        m_Lut->SetTableRange(m_SelectedRange);
-        albaEventMacro(albaEvent(this,albaGUIHistogramWidget::RANGE_MODIFIED));
-      break;
-      default:
-        e->Log();
-      break; 
-    }
+		switch (e->GetId())
+		{
+			case ID_RANGE_MODIFIED:
+			{
+				if (m_SliderThresholds)
+					m_SliderThresholds->GetSubRange(m_Threshold);
+				m_Histogram->UpdateLines(m_Threshold);
+			}
+			break;
+			case ID_LOGSCALE:
+				LogarithmicScale(m_LogHistogramFlag);
+				break;
+			case ID_RANGE_SLICER:
+				m_SelectedRange[0] = m_Slider->GetValue(0);
+				m_SelectedRange[1] = m_Slider->GetValue(2);
+				m_Lut->SetTableRange(m_SelectedRange);
+				albaEventMacro(albaEvent(this, albaGUIHistogramWidget::RANGE_MODIFIED));
+				break;
+			case ID_NUMBER_OF_BIN:
+				m_Histogram->SetNumberOfBins(m_NumberOfBins);
+				break;
+			case ID_EXPORT_DATA:
+				ExportData();
+				break;
+			default:
+				e->Log();
+				break;
+		}
     m_HistogramRWI->CameraUpdate();
   }
   else if (albaEventInteraction *ei = albaEventInteraction::SafeDownCast(event))
@@ -255,61 +235,15 @@ void albaGUIHistogramWidget::OnEvent( albaEventBase *event )
     if (ei->GetId() == albaDeviceButtonsPadMouse::GetMouse2DMoveId())
     {
       if(m_Histogram->GetInputData() == NULL) return;
-      double pos[2];
-      ei->Get2DPosition(pos);
-      if (m_Dragging)
-      {
-        int dy = pos[1]-m_DragStart;
-        m_ScaleFactor *= ( 1 + dy/100.0 );
-        if(m_Gui)
-        {
-          m_Gui->Update();
-        }
-        m_Histogram->SetScaleFactor(m_ScaleFactor);
-        m_DragStart=pos[1];
-      }
-      else
-      {
-        if (m_ShowText)
-        {
-        m_HisctogramValue = m_Histogram->GetHistogramValue(pos[0],pos[1]);
-        m_Histogram->SetLabel(albaString(m_HisctogramValue).GetCStr());
-        }
-      }
-      m_HistogramRWI->CameraUpdate();
-    }
-    else if (ei->GetId() == albaDeviceButtonsPad::GetButtonDownId())
-    {
-      if (ei->GetButton() == ALBA_LEFT_BUTTON && ei->GetModifier(ALBA_CTRL_KEY))
-      {
-//         if(m_Histogram->GetInputData() == NULL) return;
-//         double pos[2];
-//         ei->Get2DPosition(pos);
-//         m_HisctogramValue = m_Histogram->GetHistogramValue(pos[0],pos[1]);
-//         double scalar = m_Histogram->GetScalarValue(pos[0],pos[1]);
-// 
-//         m_HistogramRWI->CameraUpdate();
+			if (m_ShowText)
+			{
+				double pos[2];
+				ei->Get2DPosition(pos);
 
-        albaEventMacro(*event);
-      }
-      else if (ei->GetButton() == ALBA_RIGHT_BUTTON)
-      {
-        double pos[2];
-        m_Dragging = true;
-        ei->Get2DPosition(pos);
-        m_DragStart = (int)pos[1];
-        if(m_AutoscaleHistogram)
-        {
-          AutoscaleHistogramOff();
-        }
-      }
-    }
-    else if (ei->GetId() == albaDeviceButtonsPad::GetButtonUpId())
-    {
-      if (ei->GetButton() == ALBA_RIGHT_BUTTON)
-      {
-        m_Dragging = false;
-      }
+				m_HisctogramValue = m_Histogram->GetHistogramValue(pos[0], pos[1]);
+				m_Histogram->SetLabel(albaString(m_HisctogramValue).GetCStr());
+			}
+      m_HistogramRWI->CameraUpdate();
     }
   }
 }
@@ -318,11 +252,8 @@ void albaGUIHistogramWidget::UpdateGui()
 //----------------------------------------------------------------------------
 {
   m_HistogramRWI->CameraUpdate();
-  m_ScaleFactor         = m_Histogram->GetScaleFactor();
-  m_LogScaleConstant    = m_Histogram->GetLogScaleConstant();
+	m_NumberOfBins = m_Histogram->GetNumberOfBins();
   m_LogHistogramFlag    = m_Histogram->GetLogHistogram();
-  m_AutoscaleHistogram  = m_Histogram->GetAutoscaleHistogram();
-  m_Representation      = m_Histogram->GetHisctogramRepresentation();
   if (m_Gui != NULL)
   {
     m_Gui->Update();
@@ -335,26 +266,20 @@ void albaGUIHistogramWidget::SetData(vtkDataArray *data)
 {
   m_Data = data;
   m_Histogram->SetInputData(m_Data);
-  double sr[2],subR[2];
+  double sr[2];
   m_Data->GetRange(sr);
-  if (m_Lut)
-  {
-    m_Lut->GetTableRange(subR);
-    m_LowerThreshold = subR[0];
-    m_UpperThreshold = subR[1];
-  }
-  else
-  {
-    m_LowerThreshold = sr[0];
-    m_UpperThreshold = sr[1];
-  }
+
+	if (m_Lut)
+		m_Lut->GetTableRange(m_Threshold);
+	else
+		m_Data->GetRange(m_Threshold);
 
   if (m_SliderThresholds != NULL)
   {
 	  m_SliderThresholds->SetRange(sr[0],sr[1]);
-	  m_SliderThresholds->SetSubRange(m_LowerThreshold,m_UpperThreshold);
+	  m_SliderThresholds->SetSubRange(m_Threshold);
   }
-  m_Histogram->UpdateLines(m_LowerThreshold,m_UpperThreshold);
+  m_Histogram->UpdateLines(m_Threshold);
   UpdateGui();
 }
 
@@ -363,31 +288,22 @@ void albaGUIHistogramWidget::SetLut(vtkLookupTable *lut)
 //----------------------------------------------------------------------------
 {
   m_Lut=lut;
-  double sr[2],subR[2];
+  double sr[2];
   if(m_Data)
     m_Data->GetRange(sr);
   else 
     lut->GetTableRange(sr);
-  lut->GetTableRange(subR);
-  m_LowerThreshold = subR[0];
-  m_UpperThreshold = subR[1];
+  lut->GetTableRange(m_Threshold);
   if (m_SliderThresholds != NULL)
   {
 	  m_SliderThresholds->SetRange(sr[0],sr[1]);
-	  m_SliderThresholds->SetSubRange(m_LowerThreshold,m_UpperThreshold);
+	  m_SliderThresholds->SetSubRange(m_Threshold);
   }
-  m_Histogram->UpdateLines(m_LowerThreshold,m_UpperThreshold);
+  m_Histogram->UpdateLines(m_Threshold);
   UpdateGui();
 }
 
 
-//----------------------------------------------------------------------------
-void albaGUIHistogramWidget::SetScaleFactor(double factor)
-//----------------------------------------------------------------------------
-{
-  m_Histogram->SetScaleFactor(factor);
-  UpdateGui();
-}
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::LogarithmicScale(int enable)
 //----------------------------------------------------------------------------
@@ -395,49 +311,43 @@ void albaGUIHistogramWidget::LogarithmicScale(int enable)
   m_Histogram->SetLogHistogram(enable);
   UpdateGui();
 }
-//----------------------------------------------------------------------------
-void albaGUIHistogramWidget::SetLogScaleConstant(double c)
-//----------------------------------------------------------------------------
-{
-  m_Histogram->SetLogScaleConstant(c);
-  UpdateGui();
-}
-//----------------------------------------------------------------------------
-void albaGUIHistogramWidget::AutoscaleHistogram(int autoscale)
-//----------------------------------------------------------------------------
-{
-  m_Histogram->SetAutoscaleHistogram(autoscale);
-  UpdateGui();
-}
-//----------------------------------------------------------------------------
-void albaGUIHistogramWidget::SetRepresentation(int represent)
-//----------------------------------------------------------------------------
-{
-  switch(represent) 
-  {
-    case vtkALBAHistogram::POINT_REPRESENTATION:
-    case vtkALBAHistogram::LINE_REPRESENTATION:
-    case vtkALBAHistogram::BAR_REPRESENTATION:
-      m_Representation = represent;
-  	break;
-    default:
-      m_Representation = vtkALBAHistogram::POINT_REPRESENTATION;
-  }
-  m_Histogram->SetHisctogramRepresentation(m_Representation);
-  if (m_Gui != NULL)
-  {
-    m_Gui->Update();
-  }
-}
+
+
+
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
-  m_Gui->Enable(albaGUIHistogramWidget::ID_REPRESENTATION, enable);
-  m_Gui->Enable(albaGUIHistogramWidget::ID_AUTOSCALE,enable);
-  m_Gui->Enable(albaGUIHistogramWidget::ID_SCALE_FACTOR,enable && m_AutoscaleHistogram == 0);
-  m_Gui->Enable(albaGUIHistogramWidget::ID_LOGSCALE,enable);
-  m_Gui->Enable(albaGUIHistogramWidget::ID_LOGFACTOR,m_LogHistogramFlag != 0);
+	m_Gui->Enable(albaGUIHistogramWidget::ID_NUMBER_OF_BIN, enable);
+	m_Gui->Enable(albaGUIHistogramWidget::ID_LOGSCALE, enable);
+}
+
+//----------------------------------------------------------------------------
+void albaGUIHistogramWidget::ExportData()
+{
+	wxString proposed = albaGetLastUserFolder().c_str();
+	proposed += m_Data->GetName();
+	proposed += ".csv";
+
+	wxString wildc = "ASCII CSV file (*.csv)|*.csv";
+	wxString f = albaGetSaveFile(proposed, wildc).c_str();
+
+	int result = OP_RUN_CANCEL;
+	if (!f.IsEmpty())
+	{
+		FILE *outFile;
+		outFile = fopen(f.c_str(), "w");
+		//Header
+		fprintf(outFile, "%s;\n",m_Data->GetName());
+
+		//Content
+		for (int i = 0; i < m_Data->GetNumberOfTuples(); i++)
+		{
+			double value = m_Data->GetTuple1(i);
+			fprintf(outFile,"%f;\n", value);
+		}
+		fclose(outFile);
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -456,27 +366,6 @@ void albaGUIHistogramWidget::SetHistogramData(vtkImageData *histogram)
 //----------------------------------------------------------------------------
 {
 	m_HistogramData = histogram;
-}
-//----------------------------------------------------------------------------
-void albaGUIHistogramWidget::ResetHistogram()
-//----------------------------------------------------------------------------
-{
-  AutoscaleHistogram(0);
-  LogarithmicScale(0);
-  SetLogScaleConstant(10);
-  SetRepresentation(vtkALBAHistogram::LINE_REPRESENTATION);
-  AutoscaleHistogram(1);
-  if(m_Slider != NULL && m_Lut != NULL)
-  {
-    m_SelectedRange[0] = m_Slider->GetRange()[0];
-    m_SelectedRange[1] = m_Slider->GetRange()[1];
-    m_Slider->SetValue(0, m_SelectedRange[0]);
-    m_Slider->SetValue(2, m_SelectedRange[1]);
-    m_Lut->SetTableRange(m_SelectedRange);
-    albaEventMacro(albaEvent(this,albaGUIHistogramWidget::RANGE_MODIFIED));
-  }
-
-  UpdateGui();
 }
 //----------------------------------------------------------------------------
 double albaGUIHistogramWidget::GetHistogramScalarValue(int x, int y)

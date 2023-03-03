@@ -182,7 +182,6 @@ void albaOpEqualizeHistogram::CreateHistogramDialog()
 
   m_Histogram = new albaGUIHistogramWidget(m_Gui,-1,wxPoint(0,0),wxSize(400,500),wxTAB_TRAVERSAL,true);
   m_Histogram->SetListener(this);
-  m_Histogram->SetRepresentation(vtkALBAHistogram::BAR_REPRESENTATION);
   vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeOutput->GetOutput()->GetVTKData());
   hd->Update();
   m_Histogram->SetData(hd->GetPointData()->GetScalars());

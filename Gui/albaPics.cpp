@@ -184,6 +184,11 @@ void albaPictureFactory::Initialize()
 		albaADDPIC(TOOL_ERASE);
 #include <pic/TOOL_CONNECTIVITY.xpm>
 		albaADDPIC(TOOL_CONNECTIVITY);		
+
+#include <pic/REVERSE_LUT_ICON.xpm>
+		albaADDPIC(REVERSE_LUT_ICON);
+#include <pic/SHOW_RULER_ICON.xpm>
+		albaADDPIC(SHOW_RULER_ICON);		
 }
 //----------------------------------------------------------------------------
 albaPictureFactory::~albaPictureFactory()

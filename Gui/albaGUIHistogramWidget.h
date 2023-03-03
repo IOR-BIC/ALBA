@@ -59,14 +59,11 @@ public:
 
   enum HISTOGRAM_WIDGET_ID
   {
-    ID_AUTOSCALE = MINID,
-    ID_SCALE_FACTOR,
-    ID_LOGSCALE,
-    ID_LOGFACTOR,
-    ID_REPRESENTATION,
-    ID_RESET,
+		ID_LOGSCALE = MINID,
+		ID_NUMBER_OF_BIN,
     ID_RANGE_SLICER,
     ID_SLIDER_THRESHOLD,
+		ID_EXPORT_DATA,
   };
 
 	/** Set a pre-calculated histogram, just visualize it instead calculate. It is used like a cache.*/
@@ -74,12 +71,6 @@ public:
 
   /** Input data from which generate histogram.*/
   void SetData(vtkDataArray *data);
-
-  /** Set the scale factor for the histogram.*/
-  void SetScaleFactor(double factor);
-
-  /** Return scale factor from the widget.*/
-  double GetScaleFactor() {return m_ScaleFactor;};
 
   /** Enable/disable logarithmic scale for histogram.*/
   void LogarithmicScale(int enable = 1);
@@ -93,29 +84,7 @@ public:
   /** Return the status of log scale flag.*/
   bool IsLogarithmicScale() {return m_LogHistogramFlag != 0;};
 
-  /** Enable/Disable auto-scaling for drawing histogram.*/
-  void AutoscaleHistogram(int autoscale = 1);
-
-  /** Enable auto-scaling for drawing histogram.*/
-  void AutoscaleHistogramOn() {AutoscaleHistogram();};
-
-  /** Disable auto-scaling for drawing histogram.*/
-  void AutoscaleHistogramOff() {AutoscaleHistogram(0);};
-
-  /** Return the status of autoscale flag.*/
-  bool IsAutoScaled() {return m_AutoscaleHistogram != 0;};
-
-  /** Set the multiplicative constant for logarithmic scale histogram.*/
-  void SetLogScaleConstant(double c);
-
-  /** Return the value of the multiplicative constant for logarithmic scale histogram.*/
-  double GetLogScaleConstant() {return m_LogScaleConstant;};
-
-  /** Allow to set the histogram representation.
-  Possible values are: vtkALBAHistogram::POINT_REPRESENTATION, vtkALBAHistogram::LINE_REPRESENTATION or vtkALBAHistogram::BAR_REPRESENTATION*/
-  void SetRepresentation(int represent);
-
-  
+    
   /** Enable/Disable threshold lines visualization */
   void ShowLines(int value=1);
 
@@ -152,21 +121,11 @@ protected:
   /** Enable/disable view widgets.*/
   void EnableWidgets(bool enable = true);
 
-  /** Reset to default histogram parameters.*/
-  void ResetHistogram();
-
   albaObserver   *m_Listener;
-  double         m_ScaleFactor;
-  double         m_LogScaleConstant;
   int            m_HisctogramValue;
   int            m_NumberOfBins;
-  int            m_Representation;
-  int            m_AutoscaleHistogram;
   int            m_LogHistogramFlag;
-  bool           m_Dragging;
-  int            m_DragStart;
-  double         m_LowerThreshold;
-  double         m_UpperThreshold;
+  double         m_Threshold[2];
   int            m_ShowText;
 
   albaGUI        *m_Gui;
@@ -180,5 +139,7 @@ protected:
   albaRWI        *m_HistogramRWI;
   vtkALBAHistogram  *m_Histogram;
 	vtkImageData  *m_HistogramData;
+private:
+	void ExportData();
 };
 #endif

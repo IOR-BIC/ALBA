@@ -335,7 +335,7 @@ int albaVMELandmarkCloud::SetLandmark(int idx, double x, double y, double z, alb
 	}*/
 	lm->SetPose(x, y, z, 0, 0, 0, t);
 
-	return SetLandmarkToPolydata(idx, x, y, z, true, t);
+	return SetLandmarkToPolydata(idx, x, y, z, m_LMChildrenShow[idx], t);
 }
 
 //----------------------------------------------------------------------------

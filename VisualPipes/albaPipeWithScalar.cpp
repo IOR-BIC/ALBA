@@ -46,6 +46,8 @@
 #include "vtkRenderer.h"
 #include "vtkLookupTable.h"
 #include "vtkCellData.h"
+#include "albaGUIDialog.h"
+#include "albaGUIHistogramWidget.h"
 
 #include <vector>
 #include "vtkALBAPolyDataNormals.h"
@@ -79,10 +81,13 @@ albaPipeWithScalar::albaPipeWithScalar()
 	m_ScalarBarPos = SB_ON_RIGHT;
 	m_ScalarBarActor = NULL;
 	m_ScalarBarLabNum = 2;
+	m_Histogram = NULL;
+	m_Dialog = NULL;
 }
 //----------------------------------------------------------------------------
 albaPipeWithScalar::~albaPipeWithScalar()
 {
+	DeleteHistogramDialog();
 	vtkDEL(m_Table);
 	cppDEL(m_LutSlider);
 
@@ -177,6 +182,7 @@ void albaPipeWithScalar::CreateScalarsGui(albaGUI *gui)
 	gui->Add(m_LutSlider);
 
   m_LutSwatch=gui->Lut(ID_LUT,"Lut",m_Table);
+	gui->Button(ID_SHOW_HISTOGRAM, "Show Histogram");
 
 	wxString numStrs[] = { "Three","Four","Five","Six","Seven","Eight","Nine","Ten" };
 	wxString posStrs[] = { "Top", "Bottom", "Left", "Right" };
@@ -307,7 +313,13 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 				GetLogicManager()->CameraUpdate();
 			}
 			break;
-
+			case ID_SHOW_HISTOGRAM:
+				CreateHistogramDialog();
+				break;
+			case ID_CLOSE_HISTOGRAM:
+				m_Dialog->Close(); 
+				DeleteHistogramDialog();
+				break;
 			default:
 				albaEventMacro(*e);
 				break;
@@ -340,6 +352,44 @@ void albaPipeWithScalar::DestroyDensityMapStack()
 }
 
 //----------------------------------------------------------------------------
+void albaPipeWithScalar::CreateHistogramDialog()
+{
+	if (m_Dialog == NULL)
+	{
+		m_Dialog = new albaGUIDialog("Histogram", albaRESIZABLE);
+
+		
+
+		albaGUI *gui = new albaGUI(this);
+
+		m_Histogram = new albaGUIHistogramWidget(gui, -1, wxPoint(0, 0), wxSize(400, 500), wxTAB_TRAVERSAL, true);
+		m_Histogram->SetListener(this);
+		UpdateVisualizationWithNewSelectedScalars();
+
+		gui->Add(m_Histogram, 1);
+		gui->AddGui(m_Histogram->GetGui());
+		gui->Button(ID_CLOSE_HISTOGRAM, _("Close"));
+		gui->FitGui();
+		gui->Update();
+
+		m_Dialog->Add(gui, 1);
+		m_Dialog->SetMinSize(wxSize(600, 600));
+		m_Dialog->Show();
+		m_Dialog->Fit();
+		m_Dialog->FitInside();
+	}
+	else 
+		m_Dialog->Show();
+}
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::DeleteHistogramDialog()
+{
+	cppDEL(m_Histogram);
+	cppDEL(m_Dialog);
+}
+
+//----------------------------------------------------------------------------
 void albaPipeWithScalar::EnableDisableGuiComponents()
 {
 	if (m_Gui)
@@ -353,6 +403,7 @@ void albaPipeWithScalar::EnableDisableGuiComponents()
 		m_Gui->Enable(ID_ENABLE_SCALAR_BAR, scalarMangement);
 		m_Gui->Enable(ID_SCALAR_BAR_LAB_N, scalarMangement && m_ShowScalarBar);
 		m_Gui->Enable(ID_SCALAR_BAR_POS, scalarMangement && m_ShowScalarBar);
+		m_Gui->Enable(ID_SHOW_HISTOGRAM, scalarMangement);
 		m_Gui->Update();
 	}
 }
@@ -466,10 +517,15 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 		}
 		else
 			data->GetPointData()->GetScalars()->GetRange(sr);
+		if (m_Histogram)
+			m_Histogram->SetData(data->GetPointData()->GetScalars());
 	}
 	else if (m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation > 0))
 	{
-		data->GetCellData()->GetScalars()->GetRange(sr);
+		vtkDataArray* scalars = data->GetCellData()->GetScalars();
+		scalars->GetRange(sr);
+		if (m_Histogram)
+			m_Histogram->SetData(scalars);
 	}
 
   m_Table->SetTableRange(sr);

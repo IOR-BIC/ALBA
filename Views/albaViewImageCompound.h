@@ -23,6 +23,8 @@
 #include "albaDefines.h"
 #include "albaViewCompound.h"
 
+#include "vtkALBASimpleRulerActor2D.h"
+#include "vtkRenderWindow.h"
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -33,8 +35,10 @@ class albaViewImage;
 class albaGUILutSlider;
 class albaGUILutSwatch;
 class albaGUIFloatSlider;
+class albaGUIPicButton;
 class vtkLookupTable;
 class albaVMEImage;
+class vtkALBASimpleRulerActor2D;
 
 /**
   Class Name: albaViewImageCompound.
@@ -55,6 +59,8 @@ public:
 	enum VIEW_SLICE_WIDGET_ID
 	{
 		ID_LUT_CHOOSER = Superclass::ID_LAST,
+		ID_REVERSE_LUT,
+		ID_VIEW_RULER,
 		ID_LAST
 	};
 
@@ -70,11 +76,16 @@ public:
   /** Function that handles events sent from other objects. */
   virtual void     OnEvent(albaEventBase *alba_event);
 
+  void LutReverse();
+
 	/** Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(albaVME *vme, bool show);
 
 	/** Function called on VME remove */
 	virtual void VmeRemove(albaVME *vme);
+
+	bool RulerIsVisible() { return m_ShowRuler; };
+	void ShowRuler(bool show);
 
 protected:
   /**
@@ -92,6 +103,8 @@ protected:
   /** Update lutslider with correct values in case of bool variable is true, otherwise disable the widget. */
 	void UpdateWindowing(bool enable);
 
+	void SetRendererByView();
+
 	albaViewImage	*m_ViewImage;
 
 	albaVMEImage *m_CurrentImage;
@@ -100,5 +113,16 @@ protected:
 	albaGUILutSlider		*m_LutSlider;
 
 	vtkLookupTable	*m_ColorLUT;
+
+	vtkALBASimpleRulerActor2D *m_Ruler;
+	vtkRenderer *m_Renderer;
+	albaGUIPicButton *m_RulerButton;
+	bool m_ShowRulerButton;
+	bool m_ShowRuler;
+
+	albaGUIPicButton *m_ReverseLUTButton;
+	bool m_ShowReverseLUTButton;
+	bool m_IsLutReversed;
+	int m_CurrentLUTPreset;
 };
 #endif
