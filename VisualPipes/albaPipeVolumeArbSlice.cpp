@@ -34,6 +34,7 @@
 #include "albaVMEOutputVolume.h"
 
 #include "albaGUIFloatSlider.h"
+#include "albaMatrix.h"
 
 #include "albaLODActor.h"
 #include "vtkALBASmartPointer.h"
@@ -110,7 +111,12 @@ albaPipeVolumeArbSlice::albaPipeVolumeArbSlice()
   m_YVector[1] = 0;
   m_YVector[2] = 1;
 
-	m_EpisolonNormal[0] = m_EpisolonNormal[2] = m_EpisolonNormal[1] = 0;
+	m_EpisolonNormal[0] = m_EpisolonNormal[1] = m_EpisolonNormal[2] = 0;
+	m_Origin[0] = m_Origin[1] = m_Origin[2] = 0;
+	m_Normal[0] = m_Normal[1] = m_Normal[2] = 0;
+	m_Normal[3] = m_Origin[3] = 1;
+
+	m_VolInverseMtr=m_VolInvRotMtr=NULL;
 
 	m_ShowTICKs	 = false;
   m_EnableGPU = true;
@@ -180,6 +186,18 @@ void albaPipeVolumeArbSlice::Create(albaSceneNode *n)
 
   m_VolumeOutput = albaVMEOutputVolume::SafeDownCast(m_Vme->GetOutput());
   assert(m_VolumeOutput != NULL);
+
+	albaNEW(m_VolInverseMtr);
+	m_VolInverseMtr->DeepCopy(m_VolumeOutput->GetAbsMatrix());
+	m_VolIdentityMtr = m_VolInverseMtr->IsIdentity();
+	if (!m_VolIdentityMtr)
+	{
+		m_VolInverseMtr->Invert();
+
+		albaNEW(m_VolInvRotMtr);
+		m_VolInvRotMtr->CopyRotation(*m_VolInverseMtr);
+	}
+
 
   vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
   double b[6];
@@ -487,6 +505,9 @@ albaPipeVolumeArbSlice::~albaPipeVolumeArbSlice()
 	vtkDEL(m_Actor);
 	vtkDEL(m_TickActor);
 
+	albaDEL(m_VolInverseMtr);
+	albaDEL(m_VolInvRotMtr);
+
   if(m_GhostActor) 
     m_AssemblyFront->RemovePart(m_GhostActor);
   vtkDEL(m_GhostActor);
@@ -541,22 +562,43 @@ void albaPipeVolumeArbSlice::SetSlice(double* Origin, double* Normal)
 //----------------------------------------------------------------------------
 {
 	if (Origin != NULL)
-  {
-    m_Origin[0] = Origin[0];
-    m_Origin[1] = Origin[1];
-    m_Origin[2] = Origin[2];
-  }
+	{
+		if (m_VolIdentityMtr)
+		{
+			m_Origin[0] = Origin[0];
+			m_Origin[1] = Origin[1];
+			m_Origin[2] = Origin[2];
+		}
+		else
+		{
+			double originMult[4] = { Origin[0], Origin[1], Origin[2], 1 };
+			m_VolInverseMtr->MultiplyPoint(originMult, m_Origin);
+		}
+	}
 
   if (Normal != NULL)
   {
+		if (m_VolIdentityMtr)
+		{
+			m_Normal[0] = Normal[0];
+			m_Normal[1] = Normal[1];
+			m_Normal[2] = Normal[2];
+		}
+		else
+		{
+			double normalMult[4] = { Normal[0], Normal[1], Normal[2], 1 };
+			m_VolInvRotMtr->MultiplyPoint(normalMult, m_Normal);
+		}
+
+
     //arbitrary slicing =>
     //we need to compute XVector and YVector from the given normal    
     double n[3], xv[3], yv[3];
     for (int i = 0; i < 3; i++) 
     {
-      m_NormalVector[i] = (float)Normal[i];
-      n[i] = Normal[i];
-			m_EpisolonNormal[i] = -Normal[i] * EPSILON;
+      m_NormalVector[i] = (float)m_Normal[i];
+      n[i] = m_Normal[i];
+			m_EpisolonNormal[i] = -m_Normal[i] * EPSILON;
     }
         
     vtkMath::Normalize(n);               

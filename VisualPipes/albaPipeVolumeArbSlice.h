@@ -209,7 +209,12 @@ protected:
 
 	vtkOutlineSource       *m_Box;
   vtkPolyDataMapper	     *m_Mapper;
-  albaLODActor            *m_Actor;
+  albaLODActor           *m_Actor;
+
+
+	bool										m_VolIdentityMtr;
+	albaMatrix						 *m_VolInverseMtr;
+	albaMatrix						 *m_VolInvRotMtr;
 
   bool                    m_SliceParametersInitialized;
   bool                    m_ShowVolumeBox;
