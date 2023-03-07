@@ -263,6 +263,13 @@ void albaAttachCamera::SetAttachedMatrix(vtkMatrix4x4 * attachedMatrix)
 	
 	m_CurrentMatrix->DeepCopy(m_StartingMatrix);
 
+	vtkALBASmartPointer<vtkTransform> delta;
+	delta->PreMultiply();
+	delta->Concatenate(m_StartingMatrix);
 
-	UpdateCameraMatrix();
+	if (m_RenderWindow)
+	{
+		m_RenderWindow->m_Camera->ApplyTransform(delta);
+		m_RenderWindow->CameraUpdate();
+	}
 }
