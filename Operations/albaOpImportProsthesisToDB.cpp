@@ -81,6 +81,7 @@ void albaOpImportProsthesisToDB::OpRun()
 	int nProsthesis = m_ProsthesesDBManager->GetProstheses().size();
 	int nProducer = m_ProsthesesDBManager->GetProducers().size();
 	int nType = m_ProsthesesDBManager->GetTypes().size();
+	m_UpdatedProthesesNum = 0;
 
 	// Select File
 	albaString wildc = "ZIP file (*.zip)|*.zip|XML file (*.xml)|*.xml";
@@ -94,7 +95,7 @@ void albaOpImportProsthesisToDB::OpRun()
 		nProducer = m_ProsthesesDBManager->GetProducers().size() - nProducer;
 		nType = m_ProsthesesDBManager->GetTypes().size() - nType;
 
-		wxString message = wxString::Format("Added %d Prosthesis, %d Producers, %d Types", nProsthesis, nProducer, nType);
+		wxString message = wxString::Format("Added %d Prostheses, %d Producers, %d Types\nUpdated %d Prostheses", nProsthesis, nProducer, nType, m_UpdatedProthesesNum);
 		albaMessage(message);
 	}
 
@@ -197,8 +198,15 @@ int albaOpImportProsthesisToDB::ImportDBFromXml(wxString &dbXmlFile)
 	{
 		albaProDBProsthesis *prosthesis = m_AuxProsthesesDBManager->GetProstheses()[p];
 
-		if (!IsInDB(prosthesis))
-			m_ProsthesesDBManager->AddProsthesis(prosthesis);
+		//if the prosthesis is already on the DB we need to delete it in order to update the model
+		if (IsInDB(prosthesis))
+		{
+			m_ProsthesesDBManager->DeleteProsthesis(prosthesis->GetName(), prosthesis->GetSide());
+			m_UpdatedProthesesNum++;
+		}
+
+		m_ProsthesesDBManager->AddProsthesis(prosthesis);
+
 	}
 
 	m_ProsthesesDBManager->SaveDB();
@@ -270,8 +278,6 @@ std::vector<albaString> albaOpImportProsthesisToDB::ExtractZipFiles(const wxStri
 //----------------------------------------------------------------------------
 bool albaOpImportProsthesisToDB::IsInDB(albaProDBProducer *producer)
 {
-	bool result = false;
-
 	for (int p = 0; p < m_ProsthesesDBManager->GetProducers().size(); p++)
 	{
 		albaProDBProducer *pro = m_ProsthesesDBManager->GetProducers()[p];
@@ -280,13 +286,11 @@ bool albaOpImportProsthesisToDB::IsInDB(albaProDBProducer *producer)
 			return true;
 	}
 
-	return result;
+	return false;
 }
 //----------------------------------------------------------------------------
 bool albaOpImportProsthesisToDB::IsInDB(albaProDBType *type)
 {
-	bool result = false;
-
 	for (int t = 0; t < m_ProsthesesDBManager->GetTypes().size(); t++)
 	{
 		albaProDBType *typ = m_ProsthesesDBManager->GetTypes()[t];
@@ -295,25 +299,21 @@ bool albaOpImportProsthesisToDB::IsInDB(albaProDBType *type)
 			return true;
 	}
 
-	return result;
+	return false;
 }
 //----------------------------------------------------------------------------
 bool albaOpImportProsthesisToDB::IsInDB(albaProDBProsthesis *prosthesis)
 {
-	bool result = false;
-
 	for (int p = 0; p < m_ProsthesesDBManager->GetProstheses().size(); p++)
 	{
 		albaProDBProsthesis *pro = m_ProsthesesDBManager->GetProstheses()[p];
 
-		if (prosthesis->GetName() == pro->GetName() 
-				|| prosthesis->GetSide() == pro->GetSide()
-			//|| prosthesis->GetProducer() == pro->GetProducer()
-			//|| prosthesis->GetType() == pro->GetType()
-			//|| prosthesis->GetBendingAngle() == pro->GetBendingAngle()
-			)
+		//return true also if one of the two prosthesis is bilateral (useful on update prosthesis when a prosthesis scheme changes)
+
+		if (prosthesis->GetName() == pro->GetName() && (prosthesis->GetSide() == albaProDBProsthesis::PRO_BOTH 
+			|| pro->GetSide() == albaProDBProsthesis::PRO_BOTH || prosthesis->GetSide() == pro->GetSide()))
 			return true;
 	}
 
-	return result;
+	return false;
 }
