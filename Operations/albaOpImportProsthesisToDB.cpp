@@ -51,6 +51,7 @@ albaOpImportProsthesisToDB::albaOpImportProsthesisToDB(wxString label) :albaOp(l
 //----------------------------------------------------------------------------
 albaOpImportProsthesisToDB::~albaOpImportProsthesisToDB()
 {
+	delete m_AuxProsthesesDBManager;
 }
 
 //----------------------------------------------------------------------------
@@ -75,9 +76,7 @@ albaOp* albaOpImportProsthesisToDB::Copy()
 //----------------------------------------------------------------------------
 void albaOpImportProsthesisToDB::OpRun()
 {
-	m_ProsthesesDBManager = GetLogicManager()->GetProsthesesDBManager();
-	m_AuxProsthesesDBManager = new albaProsthesesDBManager();
-
+	
 	int nProsthesis = m_ProsthesesDBManager->GetProstheses().size();
 	int nProducer = m_ProsthesesDBManager->GetProducers().size();
 	int nType = m_ProsthesesDBManager->GetTypes().size();
@@ -98,8 +97,6 @@ void albaOpImportProsthesisToDB::OpRun()
 		wxString message = wxString::Format("Added %d Prostheses, %d Producers, %d Types\nUpdated %d Prostheses", nProsthesis, nProducer, nType, m_UpdatedProthesesNum);
 		albaMessage(message);
 	}
-
-	delete m_AuxProsthesesDBManager;
 
 	OpStop(result);
 }
@@ -137,9 +134,27 @@ int albaOpImportProsthesisToDB::ImportDB(wxString dbFile)
 }
 
 //----------------------------------------------------------------------------
+albaProsthesesDBManager * albaOpImportProsthesisToDB::GetProsthesesDBManager() 
+{
+	if (m_ProsthesesDBManager == NULL)
+		m_ProsthesesDBManager = GetLogicManager()->GetProsthesesDBManager();
+
+	return m_ProsthesesDBManager;
+}
+
+//----------------------------------------------------------------------------
+albaProsthesesDBManager * albaOpImportProsthesisToDB::GetAuxProsthesesDBManager() 
+{
+	if(m_AuxProsthesesDBManager == NULL)
+		m_AuxProsthesesDBManager = new albaProsthesesDBManager();
+
+	return m_AuxProsthesesDBManager;
+}
+
+//----------------------------------------------------------------------------
 int albaOpImportProsthesisToDB::ImportDBFromZip(wxString &dbZipFile)
 {
-	wxString dest = m_ProsthesesDBManager->GetDBDir().GetCStr();
+	wxString dest = GetProsthesesDBManager()->GetDBDir().GetCStr();
 	
 	// Open the zip file to read the prosthesis information
 	std::vector<albaString> filesVect = ExtractZipFiles(dbZipFile, dest);
@@ -172,44 +187,44 @@ int albaOpImportProsthesisToDB::ImportDBFromZip(wxString &dbZipFile)
 //----------------------------------------------------------------------------
 int albaOpImportProsthesisToDB::ImportDBFromXml(wxString &dbXmlFile)
 {	
-	m_AuxProsthesesDBManager->SetDBDir(m_ProsthesesDBManager->GetDBDir());
-	m_AuxProsthesesDBManager->LoadDBFromFile(dbXmlFile);
+	GetAuxProsthesesDBManager()->SetDBDir(GetProsthesesDBManager()->GetDBDir());
+	GetAuxProsthesesDBManager()->LoadDBFromFile(dbXmlFile);
 
 	// Producers
-	for (int p =0; p < m_AuxProsthesesDBManager->GetProducers().size(); p++)
+	for (int p =0; p < GetAuxProsthesesDBManager()->GetProducers().size(); p++)
 	{
-		albaProDBProducer *producer = m_AuxProsthesesDBManager->GetProducers()[p];
+		albaProDBProducer *producer = GetAuxProsthesesDBManager()->GetProducers()[p];
 
 		if (!IsInDB(producer))
-			m_ProsthesesDBManager->AddProducer(producer);
+			GetProsthesesDBManager()->AddProducer(producer);
 	}
 
 	// Types
-	for (int t = 0; t < m_AuxProsthesesDBManager->GetTypes().size(); t++)
+	for (int t = 0; t < GetAuxProsthesesDBManager()->GetTypes().size(); t++)
 	{
-		albaProDBType *type = m_AuxProsthesesDBManager->GetTypes()[t];
+		albaProDBType *type = GetAuxProsthesesDBManager()->GetTypes()[t];
 
 		if (!IsInDB(type))
-			m_ProsthesesDBManager->AddType(type);
+			GetProsthesesDBManager()->AddType(type);
 	}
 
 	// Prosthesis
-	for (int p = 0; p < m_AuxProsthesesDBManager->GetProstheses().size(); p++)
+	for (int p = 0; p < GetAuxProsthesesDBManager()->GetProstheses().size(); p++)
 	{
-		albaProDBProsthesis *prosthesis = m_AuxProsthesesDBManager->GetProstheses()[p];
+		albaProDBProsthesis *prosthesis = GetAuxProsthesesDBManager()->GetProstheses()[p];
 
 		//if the prosthesis is already on the DB we need to delete it in order to update the model
 		if (IsInDB(prosthesis))
 		{
-			m_ProsthesesDBManager->DeleteProsthesis(prosthesis->GetName(), prosthesis->GetSide());
+			GetProsthesesDBManager()->DeleteProsthesis(prosthesis->GetName(), prosthesis->GetSide());
 			m_UpdatedProthesesNum++;
 		}
 
-		m_ProsthesesDBManager->AddProsthesis(prosthesis);
+		GetProsthesesDBManager()->AddProsthesis(prosthesis);
 
 	}
 
-	m_ProsthesesDBManager->SaveDB();
+	GetProsthesesDBManager()->SaveDB();
 
 	return OP_RUN_OK;
 }
@@ -278,9 +293,9 @@ std::vector<albaString> albaOpImportProsthesisToDB::ExtractZipFiles(const wxStri
 //----------------------------------------------------------------------------
 bool albaOpImportProsthesisToDB::IsInDB(albaProDBProducer *producer)
 {
-	for (int p = 0; p < m_ProsthesesDBManager->GetProducers().size(); p++)
+	for (int p = 0; p < GetProsthesesDBManager()->GetProducers().size(); p++)
 	{
-		albaProDBProducer *pro = m_ProsthesesDBManager->GetProducers()[p];
+		albaProDBProducer *pro = GetProsthesesDBManager()->GetProducers()[p];
 
 		if (producer->GetName() == pro->GetName() /*|| producer->GetWebSite() == pro->GetWebSite() || producer->GetImgFileName() == pro->GetImgFileName()*/)
 			return true;
@@ -291,9 +306,9 @@ bool albaOpImportProsthesisToDB::IsInDB(albaProDBProducer *producer)
 //----------------------------------------------------------------------------
 bool albaOpImportProsthesisToDB::IsInDB(albaProDBType *type)
 {
-	for (int t = 0; t < m_ProsthesesDBManager->GetTypes().size(); t++)
+	for (int t = 0; t < GetProsthesesDBManager()->GetTypes().size(); t++)
 	{
-		albaProDBType *typ = m_ProsthesesDBManager->GetTypes()[t];
+		albaProDBType *typ = GetProsthesesDBManager()->GetTypes()[t];
 
 		if (type->GetName() == typ->GetName())
 			return true;
@@ -304,9 +319,9 @@ bool albaOpImportProsthesisToDB::IsInDB(albaProDBType *type)
 //----------------------------------------------------------------------------
 bool albaOpImportProsthesisToDB::IsInDB(albaProDBProsthesis *prosthesis)
 {
-	for (int p = 0; p < m_ProsthesesDBManager->GetProstheses().size(); p++)
+	for (int p = 0; p < GetProsthesesDBManager()->GetProstheses().size(); p++)
 	{
-		albaProDBProsthesis *pro = m_ProsthesesDBManager->GetProstheses()[p];
+		albaProDBProsthesis *pro = GetProsthesesDBManager()->GetProstheses()[p];
 
 		//return true also if one of the two prosthesis is bilateral (useful on update prosthesis when a prosthesis scheme changes)
 
