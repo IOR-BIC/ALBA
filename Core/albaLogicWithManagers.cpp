@@ -1459,7 +1459,7 @@ void albaLogicWithManagers::VmeShow(albaVME *vme, bool visibility)
 	if (!vme)
 		return;
 
-	m_SkipCameraUpdate++;
+	EnableCameraUpdateSkip();
 
 	if (m_ViewManager)
 	{
@@ -1479,7 +1479,7 @@ void albaLogicWithManagers::VmeShow(albaVME *vme, bool visibility)
 
 	ShowInSideBar(vme, visibility);
 
-	m_SkipCameraUpdate--;
+	DisableCameraUpdateSkip();
 	
 	albaYield();
 
@@ -1879,6 +1879,19 @@ void albaLogicWithManagers::CameraReset()
 {
 	if (m_ViewManager) 
 		m_ViewManager->CameraReset();
+}
+
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::EnableCameraUpdateSkip()
+{
+	m_SkipCameraUpdate++;
+}
+
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::DisableCameraUpdateSkip()
+{
+	assert(m_SkipCameraUpdate);
+	m_SkipCameraUpdate--;
 }
 
 // WIZARD ////////////////////////////////////////////////////////////////////
