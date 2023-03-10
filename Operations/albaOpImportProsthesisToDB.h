@@ -74,5 +74,7 @@ protected:
 
 	albaProsthesesDBManager *m_ProsthesesDBManager;
 	albaProsthesesDBManager *m_AuxProsthesesDBManager;
+
+	int m_UpdatedProthesesNum;
 };
 #endif

@@ -53,6 +53,10 @@ public:
 
 	virtual void CameraReset() = 0;
 
+	virtual void EnableCameraUpdateSkip() = 0;
+
+	virtual void DisableCameraUpdateSkip() = 0;
+
 	/** Returns true if there is a Running Operation */
 	virtual bool IsOperationRunning() = 0;
 

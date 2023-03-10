@@ -304,7 +304,7 @@ double albaOpVOIDensity::GetMedian(vtkDoubleArray *valuesArray)
 //----------------------------------------------------------------------------
 int albaOpVOIDensity::Cmpfunc(const void * a, const void * b)
 {
-	return (*(double*)a > *(double*)b);
+	return (int)(*(double*)a - *(double*)b);
 }
 
 //----------------------------------------------------------------------------
