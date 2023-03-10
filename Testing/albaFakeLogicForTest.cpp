@@ -134,3 +134,15 @@ albaProsthesesDBManager * albaFakeLogicForTest::GetProsthesesDBManager()
 {
 	return NULL;
 }
+
+//----------------------------------------------------------------------------
+void albaFakeLogicForTest::EnableCameraUpdateSkip()
+{
+	return;
+}
+
+//----------------------------------------------------------------------------
+void albaFakeLogicForTest::DisableCameraUpdateSkip()
+{
+	return;
+}
