@@ -77,7 +77,7 @@ ENDIF (ALBA_USE_ITK)
 # wxWindows Library
 #
 IF (ALBA_USE_WX)
-  MFL_SUBPROJECT(WXWIN wxWin)
+  MFL_SUBPROJECT(WXWIN wxWidgets)
 ENDIF (ALBA_USE_WX)
 
 #
