@@ -84,8 +84,8 @@ public:
 
 protected:
 
-	double m_Origin[3];     ///< origin of the cutting plane
-	double m_Normal[3];     ///< normal of the cutting plane    
+	double m_Origin[4];     ///< origin of the cutting plane
+	double m_Normal[4];     ///< normal of the cutting plane    
 };  
 
 #endif // albaPipeSlice_h__
