@@ -214,6 +214,7 @@ IF (ALBA_USE_ITK)
     albaOpSmoothSurfaceCells.cpp		albaOpSmoothSurfaceCells.h
     albaOpExporterMeters.cpp			albaOpExporterMeters.h
     albaOpInteractionDebugger.cpp	albaOpInteractionDebugger.h
+	albaOpFilterImage.cpp			albaOpFilterImage.h
   )
 ENDIF (ALBA_USE_ITK)
 
