@@ -189,6 +189,7 @@
 #include "albaOpFillHoles.h"
 #include "albaOpFilterSurface.h"
 #include "albaOpFilterVolume.h"
+#include "albaOpFilterImage.h"
 #include "albaOpFlipNormals.h"
 #include "albaOpFreezeVME.h"
 #include "albaOpInteractiveClipSurface.h"
@@ -2051,6 +2052,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpClipSurface("Clip Surface"), _("Modify"));
 	Plug(new albaOpFilterSurface("Filter Surface"), _("Modify"));
 	Plug(new albaOpFilterVolume("Filter Volume"), _("Modify"));
+	Plug(new albaOpFilterImage("Filter Image"), _("Modify"));
 	Plug(new albaOpDecimateSurface("Decimate Surface"), _("Modify"));
 	Plug(new albaOpConnectivitySurface("Connectivity Surface"), _("Modify"));
 	Plug(new albaOpEditNormals("Edit Normals"), _("Modify"));
