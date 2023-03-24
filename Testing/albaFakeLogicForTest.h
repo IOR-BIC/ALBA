@@ -88,6 +88,12 @@ public:
 
 	virtual albaProsthesesDBManager * GetProsthesesDBManager() override;
 
+
+	virtual void EnableCameraUpdateSkip() override;
+
+
+	virtual void DisableCameraUpdateSkip() override;
+
 protected:
 	
 	std::vector<calls> m_Calls;
