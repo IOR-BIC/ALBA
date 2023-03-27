@@ -75,6 +75,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaPipeVolumeArbSlice.h"
 #include "albaGUIPicButton.h"
 #include "albaRefSys.h"
+#include "albaPipeSurfaceSlice.h"
+#include "albaPipeMeshSlice.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaViewArbitrarySlice);
@@ -117,14 +119,20 @@ albaViewArbitrarySlice::albaViewArbitrarySlice(wxString label, bool show_ruler)
 	m_SliceCenterSurface[0] = 0.0;
 	m_SliceCenterSurface[1] = 0.0;
 	m_SliceCenterSurface[2] = 0.0;
+	m_SliceCenterSurface[3] = 1.0;
+
 
 	m_SliceCenterSurfaceReset[0] = 0.0;
 	m_SliceCenterSurfaceReset[1] = 0.0;
 	m_SliceCenterSurfaceReset[2] = 0.0;
+	m_SliceCenterSurfaceReset[3] = 1.0;
 
 	m_TypeGizmo = GIZMO_TRANSLATE;
 
 	albaNEW(m_SlicingMatrix);
+
+	m_AllSurface = 0;
+	m_Border = 1;
 
 	m_TrilinearInterpolationOn = TRUE;
 	m_CameraFollowGizmo = false;
@@ -186,77 +194,86 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 
 	if (show)
 	{
-		if(vme->GetOutput()->IsA("albaVMEOutputVolume") && vme != m_InputVolume)
+		if (vme != m_InputVolume)
 		{
-			double sliceCenterVolumeReset[4];
-			sliceCenterVolumeReset[3] = 1;
-
-			m_InputVolume = albaVMEVolumeGray::SafeDownCast(vme);
-
-			// get the VTK volume
-			vtkDataSet *data = vme->GetOutput()->GetVTKData();
-			data->Update();
-			//Get center of Volume to can the reset
-			data->GetCenter(sliceCenterVolumeReset);
-		
-			albaTransform::GetOrientation(vme->GetAbsMatrixPipe()->GetMatrix(),m_SliceAngleReset);
-			//Compute the center of Volume in absolute coordinate, to center the surface and gizmo
-			vtkTransform *transform;
-			vtkNEW(transform);
-			transform->SetMatrix(vme->GetOutput()->GetMatrix()->GetVTKMatrix());
-			transform->Update();
-			transform->MultiplyPoint(sliceCenterVolumeReset, m_SliceCenterSurface);
-			transform->MultiplyPoint(sliceCenterVolumeReset, m_SliceCenterSurfaceReset);
-					
-			//Create a matrix to permit the reset of the gizmos
-			vtkTransform *TransformReset;
-			vtkNEW(TransformReset);
-			TransformReset->Translate(m_SliceCenterSurfaceReset);
-			TransformReset->RotateX(m_SliceAngleReset[0]);
-			TransformReset->RotateY(m_SliceAngleReset[1]);
-			TransformReset->RotateZ(m_SliceAngleReset[2]);
-			TransformReset->Update();
-			albaNEW(m_MatrixReset);
-			m_MatrixReset->SetVTKMatrix(TransformReset->GetMatrix());
-			
-			//Set camera of slice view in way that it will follow the volume
-			if(!m_AttachCamera)
-				m_AttachCamera=new albaAttachCamera(m_Gui,((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->m_Rwi,this);
-			m_AttachCamera->SetStartingMatrix(m_MatrixReset);
-			m_SlicingMatrix->DeepCopy(m_MatrixReset);
-			m_AttachCamera->SetAttachedMatrix(m_SlicingMatrix->GetVTKMatrix());
-			m_AttachCamera->EnableAttachCamera();
-			((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset(m_InputVolume);
-
-			albaPipeVolumeArbSlice* pipeVolSlice = albaPipeVolumeArbSlice::SafeDownCast(m_ChildViewList[SLICE_VIEW]->GetNodePipe(m_InputVolume));
-			if (pipeVolSlice)
-				pipeVolSlice->SetEnableSliceViewCorrection(true);
-
-			CreateGizmos();
-
-			SetEnableGPU();
-			SetSlices();
-			
-			m_Gui->FitGui();
-			m_Gui->Update();
-			
-			vtkDEL(transform);
-			vtkDEL(TransformReset);
-		}
-		else
-		{
-			albaPipe *  nodePipe= ((albaViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(vme);
-			albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(nodePipe);
-			if (pipeSlice)
+			if (vme->GetOutput()->IsA("albaVMEOutputVolume"))
 			{
-				double normal[3];
-				((albaViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-	
-				pipeSlice->SetSlice(m_SliceCenterSurface, normal);
+				double sliceCenterVolumeReset[4];
+				sliceCenterVolumeReset[3] = 1;
+
+				m_InputVolume = albaVMEVolumeGray::SafeDownCast(vme);
+
+				// get the VTK volume
+				vtkDataSet *data = vme->GetOutput()->GetVTKData();
+				data->Update();
+				//Get center of Volume to can the reset
+				data->GetCenter(sliceCenterVolumeReset);
+
+				albaTransform::GetOrientation(vme->GetAbsMatrixPipe()->GetMatrix(), m_SliceAngleReset);
+				//Compute the center of Volume in absolute coordinate, to center the surface and gizmo
+				vtkTransform *transform;
+				vtkNEW(transform);
+				transform->SetMatrix(vme->GetOutput()->GetMatrix()->GetVTKMatrix());
+				transform->Update();
+				transform->MultiplyPoint(sliceCenterVolumeReset, m_SliceCenterSurface);
+				transform->MultiplyPoint(sliceCenterVolumeReset, m_SliceCenterSurfaceReset);
+
+				//Create a matrix to permit the reset of the gizmos
+				vtkTransform *TransformReset;
+				vtkNEW(TransformReset);
+				TransformReset->Translate(m_SliceCenterSurfaceReset);
+				TransformReset->RotateX(m_SliceAngleReset[0]);
+				TransformReset->RotateY(m_SliceAngleReset[1]);
+				TransformReset->RotateZ(m_SliceAngleReset[2]);
+				TransformReset->Update();
+				albaNEW(m_MatrixReset);
+				m_MatrixReset->SetVTKMatrix(TransformReset->GetMatrix());
+
+
+				m_AttachCamera = new albaAttachCamera(m_Gui, ((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->m_Rwi, this);
+
+				m_AttachCamera->DisableAttachCamera();
+				((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraSet(CAMERA_OS_Z);
+				m_AttachCamera->SetStartingMatrix(m_MatrixReset);
+				m_SlicingMatrix->DeepCopy(m_MatrixReset);
+				m_AttachCamera->SetAttachedMatrix(m_SlicingMatrix->GetVTKMatrix());
+				m_AttachCamera->EnableAttachCamera();
+
+				((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset(m_InputVolume);
+
+
+				albaPipeVolumeArbSlice* pipeVolSlice = albaPipeVolumeArbSlice::SafeDownCast(m_ChildViewList[SLICE_VIEW]->GetNodePipe(m_InputVolume));
+				if (pipeVolSlice)
+					pipeVolSlice->SetEnableSliceViewCorrection(true);
+
+				CreateGizmos();
+
+				SetEnableGPU();
+				SetSlices();
+
+				m_Gui->FitGui();
+				m_Gui->Update();
+
+				vtkDEL(transform);
+				vtkDEL(TransformReset);
 			}
-			albaPipeMeshSlice *pipeSliceViewMesh = albaPipeMeshSlice::SafeDownCast(nodePipe);
-			if (pipeSliceViewMesh)
-				pipeSliceViewMesh->SetFlipNormalOff();
+			else
+			{
+				albaPipe *  nodePipe = ((albaViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(vme);
+				albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(nodePipe);
+				if (pipeSlice)
+				{
+					double normal[3];
+					GetSlicingNormal(normal);
+
+					pipeSlice->SetSlice(m_SliceCenterSurface, normal);
+				}
+
+				SetBorder(nodePipe);
+
+				albaPipeMeshSlice *pipeSliceViewMesh = albaPipeMeshSlice::SafeDownCast(nodePipe);
+				if (pipeSliceViewMesh) pipeSliceViewMesh->SetFlipNormalOff();
+			}
 		}
 	}
 	else//if show=false
@@ -267,6 +284,8 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 
 			DestroyGizmos();
 
+			delete m_AttachCamera;
+			m_AttachCamera = NULL;
 			albaDEL(m_MatrixReset);
 
 			m_InputVolume = NULL;
@@ -280,10 +299,34 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 	
 	m_SkipCameraUpdate--;
 }
+
+//----------------------------------------------------------------------------
+void albaViewArbitrarySlice::GetSlicingNormal(double * normal)
+{
+	((albaViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+}
+
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::VmeSelect(albaVME *node, bool select)
 {
 	m_ChildViewList[ARBITRARY_VIEW]->VmeSelect(node, select);
+
+
+	if (!m_AllSurface)
+	{
+		albaPipe* nodePipe = m_ChildViewList[SLICE_VIEW]->GetNodePipe(node);
+
+		albaPipeSurfaceSlice *surfPipe = albaPipeSurfaceSlice::SafeDownCast(nodePipe);
+		if (surfPipe)
+			m_Border = surfPipe->GetThickness();
+
+		albaPipeMeshSlice* meshPipe = albaPipeMeshSlice::SafeDownCast(nodePipe);
+		if (meshPipe)
+			m_Border = meshPipe->GetThickness();
+
+		if (m_Gui)
+			m_Gui->Update();
+	}
 }
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::VmeRemove(albaVME *vme)
@@ -435,6 +478,12 @@ void albaViewArbitrarySlice::OnEventThis(albaEventBase *alba_event)
 		case ID_GPUENABLED:
 			SetEnableGPU();
 			break;
+		case ID_ALL_SURFACE:
+		case ID_BORDER_CHANGE:
+		{
+			OnEventSetThickness();
+		}
+		break;
 
 		default:
 			albaViewCompound::OnEvent(alba_event);
@@ -487,7 +536,7 @@ void albaViewArbitrarySlice::SetSlices()
 {
 	//update the normal of the cutter plane of the surface
 	double normal[3];
-	((albaViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+	GetSlicingNormal(normal);
 	albaVME *root = m_InputVolume->GetRoot();
 	albaVMEIterator *iter = root->NewIterator();
 	for (albaVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
@@ -500,6 +549,7 @@ void albaViewArbitrarySlice::SetSlices()
 		}
 	}
 	iter->Delete();
+
 
 	albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(m_InputVolume));
 	if (pipeSlice)
@@ -542,6 +592,11 @@ albaGUI* albaViewArbitrarySlice::CreateGui()
 	m_Gui->Divider();
 	m_Gui->Bool(ID_GPUENABLED, "Enable GPU Acceleration", &m_EnableGPU, 1, "Enable GPU Acceleration");
 	m_Gui->Divider();
+
+
+	m_Gui->Bool(ID_ALL_SURFACE, "All Surface", &m_AllSurface);
+	m_Gui->FloatSlider(ID_BORDER_CHANGE, "Border", &m_Border, 1.0, 5.0);
+
 
 	m_Gui->Divider(1);
 
@@ -660,6 +715,49 @@ void albaViewArbitrarySlice::VolumeWindowing(albaVME *volume)
 	m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
 	m_LutSlider->SetSubRange((long)currentVolumeMaterial->GetTableRange()[0],(long)currentVolumeMaterial->GetTableRange()[1]);
 }
+
+//----------------------------------------------------------------------------
+void albaViewArbitrarySlice::OnEventSetThickness()
+{
+	if (m_AllSurface)
+	{
+		albaVME *vme = GetViewArbitrary()->GetSceneGraph()->GetSelectedVme();
+		albaVME *root = vme->GetRoot();
+		SetThicknessForAllSurfaceSlices(root);
+	}
+	else
+	{
+		albaVME *node = GetViewArbitrary()->GetSceneGraph()->GetSelectedVme();
+		albaSceneNode *SN = this->GetSceneGraph()->Vme2Node(node);
+		albaPipe *p = m_ChildViewList[SLICE_VIEW]->GetNodePipe(node);
+		SetBorder(p);
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaViewArbitrarySlice::SetThicknessForAllSurfaceSlices(albaVME *root)
+{
+	albaVMEIterator *iter = root->NewIterator();
+	for (albaVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+	{
+		//view slice 0 is enough because the property will be applied on all slices.
+		albaView *view = m_ChildViewList[SLICE_VIEW];
+		albaPipe *p = view->GetNodePipe(node);
+		SetBorder(p);
+	}
+	iter->Delete();
+}
+
+//----------------------------------------------------------------------------
+void albaViewArbitrarySlice::SetBorder(albaPipe * p)
+{
+	albaPipeSurfaceSlice *surfPipe = albaPipeSurfaceSlice::SafeDownCast(p);
+	if (surfPipe) surfPipe->SetThickness(m_Border);
+
+	albaPipeMeshSlice* meshPipe = albaPipeMeshSlice::SafeDownCast(p);
+	if (meshPipe) meshPipe->SetThickness(m_Border);
+}
+
 
 //-------------------------------------------------------------------------
 void albaViewArbitrarySlice::CreateGizmos()

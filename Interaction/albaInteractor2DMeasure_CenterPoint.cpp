@@ -550,16 +550,18 @@ bool albaInteractor2DMeasure_CenterPoint::Load(albaVME *input, wxString tag)
 
 		int nCenters = measureCenterPoint1Tag->GetNumberOfComponents() / 2;
 
+		m_CurrentRenderer = m_Renderer;
+
 		// Reload points
 		for (int i = 0; i < nCenters; i++)
 		{
-			point1[X] = measureCenterPoint1Tag->GetValueAsDouble(i * 2 + 0);
-			point1[Y] = measureCenterPoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[Z] = measureCenterPoint1Tag->GetValueAsDouble(i * 2 + 2);
+			point1[X] = measureCenterPoint1Tag->GetValueAsDouble(i * 3 + 0);
+			point1[Y] = measureCenterPoint1Tag->GetValueAsDouble(i * 3 + 1);
+			point1[Z] = measureCenterPoint1Tag->GetValueAsDouble(i * 3 + 2);
 
-			point2[X] = measureCenterPoint2Tag->GetValueAsDouble(i * 2 + 0);
-			point2[Y] = measureCenterPoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[Z] = measureCenterPoint2Tag->GetValueAsDouble(i * 2 + 2);
+			point2[X] = measureCenterPoint2Tag->GetValueAsDouble(i * 3 + 0);
+			point2[Y] = measureCenterPoint2Tag->GetValueAsDouble(i * 3 + 1);
+			point2[Z] = measureCenterPoint2Tag->GetValueAsDouble(i * 3 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -605,13 +607,13 @@ bool albaInteractor2DMeasure_CenterPoint::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			measureCenterPoint1Tag.SetValue(point1[X], i * 2 + 0);
-			measureCenterPoint1Tag.SetValue(point1[Y], i * 2 + 1);
-			measureCenterPoint1Tag.SetValue(point1[Z], i * 2 + 2);
+			measureCenterPoint1Tag.SetValue(point1[X], i * 3 + 0);
+			measureCenterPoint1Tag.SetValue(point1[Y], i * 3 + 1);
+			measureCenterPoint1Tag.SetValue(point1[Z], i * 3 + 2);
 
-			measureCenterPoint2Tag.SetValue(point2[X], i * 2 + 0);
-			measureCenterPoint2Tag.SetValue(point2[Y], i * 2 + 1);
-			measureCenterPoint2Tag.SetValue(point2[Z], i * 2 + 2);
+			measureCenterPoint2Tag.SetValue(point2[X], i * 3 + 0);
+			measureCenterPoint2Tag.SetValue(point2[Y], i * 3 + 1);
+			measureCenterPoint2Tag.SetValue(point2[Z], i * 3 + 2);
 		}
 
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))

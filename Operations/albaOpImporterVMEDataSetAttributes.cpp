@@ -48,7 +48,7 @@ albaOpImporterVMEDataSetAttributes::albaOpImporterVMEDataSetAttributes(const wxS
 albaOp(label)
 //----------------------------------------------------------------------------
 {
-  m_OpType  = OPTYPE_OP;
+  m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
   
   m_FileName = "";

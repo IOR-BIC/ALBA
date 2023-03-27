@@ -167,6 +167,7 @@ void albaInteractor2DMeasure_Distance::EditMeasure(int index, double *point)
 		albaString text;
 		text.Printf("Distance %.2f mm", dist);
 		m_Measure2DVector[index].Text = text;
+		m_Measure2DVector[index].Value = dist;
 
 		// Line
 		UpdateLineActors(point1, point2);
@@ -203,7 +204,7 @@ void albaInteractor2DMeasure_Distance::FindAndHighlight(double * point)
 			lineSource->GetPoint1(linePoint1);
 			lineSource->GetPoint2(linePoint2);
 			double dis = DistancePointToLine(point, linePoint1, linePoint2);
-			albaLogMessage("Dist %f", dis);
+			//albaLogMessage("Dist %f", dis);
 
 			if (DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
 			{
@@ -348,8 +349,10 @@ void albaInteractor2DMeasure_Distance::AddMeasure(double *point1, double *point2
 	int index = m_Measure2DVector.size() - 1;
 
 	albaString text;
-	text.Printf("Distance %.2f mm", DistanceBetweenPoints(point1, point2));
+	double dist = DistanceBetweenPoints(point1, point2);
+	text.Printf("Distance %.2f mm", dist);
 	m_Measure2DVector[index].Text = text;
+	m_Measure2DVector[index].Value = dist;
 
 	// Update Edit Actors
 	UpdateEditActors(point1, point2);
@@ -496,18 +499,20 @@ bool albaInteractor2DMeasure_Distance::Load(albaVME *input, wxString tag)
 		albaTagItem *MeasureDistancePoint1Tag = input->GetTagArray()->GetTag(tag + "MeasureDistancePoint1");
 		albaTagItem *MeasureDistancePoint2Tag = input->GetTagArray()->GetTag(tag + "MeasureDistancePoint2");
 
-		int nLines = MeasureDistancePoint1Tag->GetNumberOfComponents() / 2;
+		int nLines = MeasureDistancePoint1Tag->GetNumberOfComponents() / 3;
+
+		m_CurrentRenderer = m_Renderer;
 
 		// Reload points
 		for (int i = 0; i < nLines; i++)
 		{
-			point1[X] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 2 + 0);
-			point1[Y] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[Z] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 2 + 2);
+			point1[X] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 3 + 0);
+			point1[Y] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 3 + 1);
+			point1[Z] = MeasureDistancePoint1Tag->GetValueAsDouble(i * 3 + 2);
 
-			point2[X] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 2 + 0);
-			point2[Y] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[Z] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 2 + 2);
+			point2[X] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 3 + 0);
+			point2[Y] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 3 + 1);
+			point2[Z] = MeasureDistancePoint2Tag->GetValueAsDouble(i * 3 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -553,13 +558,13 @@ bool albaInteractor2DMeasure_Distance::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			MeasureDistancePoint1Tag.SetValue(point1[X], i * 2 + 0);
-			MeasureDistancePoint1Tag.SetValue(point1[Y], i * 2 + 1);
-			MeasureDistancePoint1Tag.SetValue(point1[Z], i * 2 + 2);
+			MeasureDistancePoint1Tag.SetValue(point1[X], i * 3 + 0);
+			MeasureDistancePoint1Tag.SetValue(point1[Y], i * 3 + 1);
+			MeasureDistancePoint1Tag.SetValue(point1[Z], i * 3 + 2);
 
-			MeasureDistancePoint2Tag.SetValue(point2[X], i * 2 + 0);
-			MeasureDistancePoint2Tag.SetValue(point2[Y], i * 2 + 1);
-			MeasureDistancePoint2Tag.SetValue(point2[Z], i * 2 + 2);
+			MeasureDistancePoint2Tag.SetValue(point2[X], i * 3 + 0);
+			MeasureDistancePoint2Tag.SetValue(point2[Y], i * 3 + 1);
+			MeasureDistancePoint2Tag.SetValue(point2[Z], i * 3 + 2);
 		}
 
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))

@@ -34,6 +34,8 @@ class vtkActor;
 class mmaMaterial;
 class vtkDataSet;
 class vtkALBADistanceFilter;
+class albaGUIHistogramWidget;
+class albaGUIDialog;
 
 //----------------------------------------------------------------------------
 // albaPipeWithScalar :
@@ -64,6 +66,8 @@ public:
 		ID_LUT_SLIDER,
 		ID_SCALAR_MAP_ACTIVE,
 		ID_ENABLE_SCALAR_BAR,
+		ID_SHOW_HISTOGRAM,
+		ID_CLOSE_HISTOGRAM,
 		ID_SCALAR_BAR_LAB_N,
 		ID_SCALAR_BAR_POS,
 		ID_LAST,
@@ -131,6 +135,7 @@ protected:
 	
 	albaGUILutSwatch *m_LutSwatch;
 	albaGUILutSlider		*m_LutSlider;
+	wxComboBox *m_ScalarComboBox;
 
   void CreateFieldDataControlArrays();
 	
@@ -143,6 +148,18 @@ protected:
 	/**Enables or disables Gui Components */
 	void EnableDisableGuiComponents();
 
+	/** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
+	void CreateScalarsGui(albaGUI *gui);
+
+	/** Creates the Stack for density maps visualization */
+	void CreateDensityMapStack();
+
+	/** Destroys the Density Map Stack */
+	void DestroyDensityMapStack();
+
+	/** Creates/Show the Histogram */
+	void CreateHistogramDialog();
+
   wxString                *m_ScalarsInComboBoxNames;
   wxString                *m_ScalarsVTKName;
 	
@@ -151,7 +168,8 @@ protected:
 	vtkActor                *m_Actor;
 	vtkScalarBarActor				*m_ScalarBarActor;
 	vtkALBADistanceFilter		*m_DensityFilter;
-
+	albaGUIDialog						*m_Dialog;
+	albaGUIHistogramWidget  *m_Histogram;
 
   int                      m_PointCellArraySeparation;
   int                      m_ScalarIndex;
@@ -166,16 +184,8 @@ protected:
 
 	albaString							 m_DensVolName;
 
-  /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
-	void CreateScalarsGui(albaGUI *gui);
 
-	//Creates the Stack for density maps visualization
-	void CreateDensityMapStack();
-
-	//Destroys the Density Map Stack
-	void DestroyDensityMapStack();
-
-
-
+private:
+	void DeleteHistogramDialog();
 };
 #endif // __albaPipeWithScalar_H__

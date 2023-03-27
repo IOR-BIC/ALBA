@@ -54,7 +54,7 @@ albaCxxTypeMacro(albaOpAddLandmark);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-albaOpAddLandmark::albaOpAddLandmark(const wxString &label) :
+albaOpAddLandmark::albaOpAddLandmark(const wxString &label, const wxString dictionary, const wxString cloudName) :
 albaOp(label)
 {
 	m_OpType = OPTYPE_OP;
@@ -72,7 +72,6 @@ albaOp(label)
 
 	m_Cloud = NULL;
 	m_SelectedLandmark = NULL;
-	m_LastSelectedLandmark = NULL;
 
 	m_AuxLandmarkCloud = NULL;
 	m_AuxLandmark = NULL;
@@ -82,7 +81,7 @@ albaOp(label)
 	m_SelectedGroup = 0;
 	m_SelectedItem = -1;
 
-	m_CloudName = "New landmark cloud";
+	m_CloudName = cloudName;
 	m_LandmarkName = "";
 	m_LandmarkRadius = 0.1;
 
@@ -98,6 +97,7 @@ albaOp(label)
 	m_IsCloudCreated = false;
 	m_FirstOpDo = true;
 	m_DictionaryLoaded = false;
+	m_Dictionary = dictionary;
 }
 //----------------------------------------------------------------------------
 albaOpAddLandmark::~albaOpAddLandmark()
@@ -135,6 +135,7 @@ albaOp* albaOpAddLandmark::Copy()
 	albaOpAddLandmark *op = new albaOpAddLandmark(m_Label);
 	op->m_OpType = m_OpType;
 	op->m_Canundo = m_Canundo;
+	op->m_Dictionary = m_Dictionary;
 	return op;
 }
 //----------------------------------------------------------------------------
@@ -231,6 +232,9 @@ void albaOpAddLandmark::OpRun()
 	albaNEW(m_AuxLandmark);
 	m_AuxLandmark->SetName(_("Aux Landmark"));
 	m_AuxLandmark->ReparentTo(m_AuxLandmarkCloud);
+
+	if (!m_Dictionary.IsEmpty())
+		LoadDictionary(m_Dictionary.GetCStr());
 
 	GetLogicManager()->VmeShow(m_AuxLandmarkCloud, false);
 	GetLogicManager()->CameraUpdate();
@@ -337,10 +341,13 @@ void albaOpAddLandmark::CreateGui()
 	m_Gui->Divider();
 	m_Gui->Divider(2);
 
-	m_Gui->Divider();
-	m_Gui->Button(ID_LANDMARK_REMOVE, "Remove");
-	m_Gui->Label(&m_RemoveMessage, true);
-	m_Gui->Divider();
+	if (m_Dictionary.IsEmpty())
+	{
+		m_Gui->Divider();
+		m_Gui->Button(ID_LANDMARK_REMOVE, "Remove");
+		m_Gui->Label(&m_RemoveMessage, true);
+		m_Gui->Divider();
+	}
 
 	m_Gui->Divider(2);
 
@@ -356,10 +363,13 @@ void albaOpAddLandmark::CreateGui()
 	m_Gui->Enable(ID_LANDMARK_NAME, false);
 	m_Gui->Enable(ID_LANDMARK_POSITION, false);
 
-	m_Gui->Label(_("Dictionary"));
-	m_Gui->Button(ID_LOAD_DICTIONARY, _("Load dictionary"));
-	m_Gui->Button(ID_LOAD_DICTIONARY_FROM_CLOUD, _("Load dictionary from Cloud"));
-	m_Gui->Button(ID_SAVE_DICTIONARY, _("Save dictionary"));	
+	if (m_Dictionary.IsEmpty())
+	{
+		m_Gui->Label(_("Dictionary"));
+		m_Gui->Button(ID_LOAD_DICTIONARY, _("Load dictionary"));
+		m_Gui->Button(ID_LOAD_DICTIONARY_FROM_CLOUD, _("Load dictionary from Cloud"));
+		m_Gui->Button(ID_SAVE_DICTIONARY, _("Save dictionary"));
+	}
 
 	m_Gui->Divider(2);
 	m_Gui->Double(ID_LANDMARK_RADIUS,"Radius:", &m_LandmarkRadius);
@@ -628,21 +638,33 @@ void albaOpAddLandmark::RemoveLandmark()
 {
 	if (m_Cloud && m_SelectedLandmark)
 	{
-		RemoveItem(m_SelectedLandmark->GetName());
-		GetLogicManager()->VmeRemove(m_SelectedLandmark);
+		albaString nextLandmark = "NONE";
 
+		if (m_SelectedItem >= 0 && m_SelectedItem < m_LandmarkGroupVect[m_SelectedGroup].size() - 1)
+		{
+			nextLandmark = m_LandmarkGroupVect[m_SelectedGroup][m_SelectedItem + 1];
+		}
+
+		RemoveItem(m_SelectedLandmark->GetName());
+		GetLogicManager()->VmeRemove(m_SelectedLandmark);		
+
+		m_SelectedLandmark = NULL;
+		m_SelectedItem = -1;
+
+		SelectLandmarkByName(nextLandmark);
 		SelectLandmarkByName("NONE");
 
-		GetLogicManager()->CameraUpdate();
 		UpdateGui(true);
+		GetLogicManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 {
-	if (m_LastSelectedLandmark)
+	if (m_SelectedLandmark)
 	{
-		GetLogicManager()->VmeShow(m_LastSelectedLandmark, true);
+		// Show Prec Selection
+		GetLogicManager()->VmeShow(m_SelectedLandmark, true);
 	}
 
 	m_RemoveMessage = "";
@@ -654,6 +676,7 @@ void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 		m_SelectedItem = m_LandmarkGuiDict->GetItemIndex(name);
 
 	m_SelectedLandmark = m_Cloud->GetLandmark(name);
+
 	if (m_SelectedLandmark)
 	{
 		m_LandmarkName = name;
@@ -675,7 +698,6 @@ void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 		}
 
 		// Hide Selected Landmark
-		m_LastSelectedLandmark = m_SelectedLandmark;
 		GetLogicManager()->VmeShow(m_SelectedLandmark, false);
 
 		// Update and ShowAux Landmark
@@ -715,18 +737,15 @@ void albaOpAddLandmark::SetLandmarkName(albaString name)
 {
 	if (m_Cloud && m_SelectedLandmark)
 	{
-		if (m_SelectedLandmark)
-		{
-			wxString oldName = m_SelectedLandmark->GetName();
-			m_SelectedLandmark->SetName(name); // If name is present, restore old name
+		wxString oldName = m_SelectedLandmark->GetName();
+		m_SelectedLandmark->SetName(name); // If name is present, restore old name
 
-			ReplaceItem(oldName, m_SelectedLandmark->GetName());
+		ReplaceItem(oldName, m_SelectedLandmark->GetName());
 
-			m_LandmarkName = m_SelectedLandmark->GetName();
+		m_LandmarkName = m_SelectedLandmark->GetName();
 
-			m_SelectedLandmark->Update();
-			UpdateGui(true);
-		}
+		m_SelectedLandmark->Update();
+		UpdateGui(true);
 	}
 }
 //----------------------------------------------------------------------------
@@ -883,6 +902,12 @@ int albaOpAddLandmark::SaveDictionary(wxString fileName)
 //----------------------------------------------------------------------------
 int albaOpAddLandmark::LoadLandmarksDefinitions(wxString fileName)
 {
+
+	if (!wxFileExists(fileName))
+	{
+		albaErrorMessage("Dictionary file %s does not exists", fileName.c_str());
+		return ALBA_ERROR;
+	}
 	m_LandmarkGroupVect.clear();
 	m_LandmarkGroupVect.push_back(m_LandmarkNameVect);
 	//m_LandmarkGroupVect[0].clear();

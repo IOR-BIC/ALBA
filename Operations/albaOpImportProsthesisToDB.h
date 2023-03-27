@@ -55,6 +55,14 @@ public:
 
 	int ImportDB(wxString dbFile);
 
+
+	/** Returns ProsthesesDBManager */
+	albaProsthesesDBManager * GetProsthesesDBManager();
+
+
+	/** Returns AuxProsthesesDBManager */
+	albaProsthesesDBManager * GetAuxProsthesesDBManager();
+
 protected:
 
 	/** Return true for the acceptable vme type. */
@@ -74,5 +82,7 @@ protected:
 
 	albaProsthesesDBManager *m_ProsthesesDBManager;
 	albaProsthesesDBManager *m_AuxProsthesesDBManager;
+
+	int m_UpdatedProthesesNum;
 };
 #endif

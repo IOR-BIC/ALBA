@@ -55,12 +55,15 @@
 #include "vtkDoubleArray.h"
 #include "vtkALBADOFMatrix.h"
 #include "vtkMatrix4x4.h"
+#include "albaVMEOutputSurface.h"
 
 
 //----------------------------------------------------------------------------
 albaGizmoSlice::albaGizmoSlice(albaVME* inputVme, albaObserver *Listener /* = NULL */, const char *name /* =  */, bool inverseHandle /* = false */, double centralClipfactor /* = 0 */)
 //----------------------------------------------------------------------------
 {
+	m_Bounds[0] = m_Bounds[2] = m_Bounds[4] = -10;
+	m_Bounds[1] = m_Bounds[3] = m_Bounds[5] = 10;
   CreateGizmoSlice(inputVme, Listener, name, inverseHandle, centralClipfactor);
 }
 //----------------------------------------------------------------------------
@@ -94,13 +97,17 @@ void albaGizmoSlice::CreateGizmoSlice(albaVME *imputVme, albaObserver *listener,
 
   albaNEW(m_VmeGizmo);
   m_VmeGizmo->SetName(m_Name);
-  m_VmeGizmo->ReparentTo(imputVme);
+  m_VmeGizmo->ReparentTo(m_InputVME);
 
   albaNEW(m_GizmoBehavior);
   m_MouseBH = m_GizmoBehavior->CreateBehavior(MOUSE_LEFT);
   m_MouseBH->SetListener(this);
   m_MouseBH->SetVME(m_VmeGizmo);
-  m_MouseBH->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal(m_InputVME);
+	if(m_InputVME)
+		m_MouseBH->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal(m_InputVME);
+	else
+		m_MouseBH->GetTranslationConstraint()->GetRefSys()->SetTypeToGlobal();
+
   m_MouseBH->EnableTranslation(true);
   m_MouseBH->ResultMatrixConcatenationOn();
 
@@ -144,154 +151,6 @@ albaGizmoSlice::~albaGizmoSlice()
   DestroyGizmoSlice();
 }
 //----------------------------------------------------------------------------
-void albaGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int axis, double localPositionOnAxis, bool visibleCubeHandler)
-//----------------------------------------------------------------------------
-{
-  //register gizmo axis
-  m_Axis = axis;
-
-  // register id
-  m_Id = gizmoSliceId;
-	
-	double localBounds[6];
-  if (vtkDataSet *VolumeVTKData = m_InputVME->GetOutput()->GetVTKData())
-  {
-    VolumeVTKData->Update();
-	  VolumeVTKData->GetBounds(localBounds);
-	  double wx = localBounds[1]-localBounds[0];
-	  double wy = localBounds[3]-localBounds[2];
-	  double wz = localBounds[5]-localBounds[4];
-
-    // position of the gizmo cube handle centre
-    double cubeHandleLocalPosition[3];
-    cubeHandleLocalPosition[0] = 0;
-    cubeHandleLocalPosition[1] = 0;
-    cubeHandleLocalPosition[2] = 0;
-
-	  vtkALBASmartPointer<vtkPlaneSource> ps;
-	  ps->SetOrigin(cubeHandleLocalPosition);
-
-    
-    double borderCube = VolumeVTKData->GetLength()/50;
-
-    if(visibleCubeHandler == false)
-    {
-      borderCube = 0;
-    }
-
-    double inversion = 1.;
-    if(false == m_InverseHandle)
-    {
-      cubeHandleLocalPosition[0] = localBounds[0];
-      cubeHandleLocalPosition[1] = localBounds[2];
-      cubeHandleLocalPosition[2] = localBounds[4];
-    }
-    else
-    {
-      cubeHandleLocalPosition[0] = localBounds[1];
-      cubeHandleLocalPosition[1] = localBounds[3];
-      cubeHandleLocalPosition[2] = localBounds[5];
-      inversion = -1.;
-    }
-    
-
-    double interval[3][2] ={{localBounds[0], localBounds[1]}, {localBounds[2], localBounds[3]}, {localBounds[4], localBounds[5]}};
-
-	  this->InitSnapArray(m_InputVME,axis);
-    m_MouseBH->GetTranslationConstraint()->SetSnapArray(axis, m_SnapArray);
-    m_MouseBH->GetTranslationConstraint()->SetConstraintModality(axis, albaInteractorConstraint::BOUNDS);
-
-	  switch(axis)
-	  {
-		  case GIZMO_SLICE_X:
-      { 
-			  cubeHandleLocalPosition[0] = localPositionOnAxis;
-        cubeHandleLocalPosition[1] -= inversion * borderCube /2;
-        cubeHandleLocalPosition[2] -= inversion *borderCube /2;
-				if(wy<0.00001) wy=-10;
-			  ps->SetPoint1(0,inversion * (wy + borderCube /2),0);
-			  ps->SetPoint2(0,0,inversion *(wz + borderCube /2));
-        m_MouseBH->GetTranslationConstraint()->SetBounds(albaInteractorConstraint::X, interval[0]);
-      }
-		  break;
-		  case GIZMO_SLICE_Y:
-      {     
-        cubeHandleLocalPosition[0] -= inversion *borderCube /2;
-			  cubeHandleLocalPosition[1] = localPositionOnAxis;
-        cubeHandleLocalPosition[2] -= inversion *borderCube /2;
-			  ps->SetPoint1(inversion *(wx+ borderCube /2),0,0);
-			  ps->SetPoint2(0,0,inversion *(wz+ borderCube /2)); 
-        m_MouseBH->GetTranslationConstraint()->SetBounds(albaInteractorConstraint::Y, interval[1]);
-      } 
-		  break;
-		  case GIZMO_SLICE_Z:
-		  default:
-      {
-        cubeHandleLocalPosition[0] -= inversion *borderCube /2;
-        cubeHandleLocalPosition[1] -= inversion *borderCube /2;
-			  cubeHandleLocalPosition[2] = localPositionOnAxis;
-			  ps->SetPoint1(inversion *(wx+ borderCube /2),0,0);
-				if(wy<0.00001) wy=-10;
-			  ps->SetPoint2(0,inversion *(wy+ borderCube /2),0);
-        m_MouseBH->GetTranslationConstraint()->SetBounds(albaInteractorConstraint::Z, interval[2]);
-      }
-		  break;
-	  }
-
-    vtkDataSetToPolyDataFilter *cornerFilter;
-
-    if(m_CentralClipFactor == 0)
-    {
-      // create the gizmo outline 
-      cornerFilter = vtkOutlineFilter::New();
-      cornerFilter->SetInput(ps->GetOutput());
-      cornerFilter->Update();
-    }
-    else
-    {
-      // create the gizmo outline 
-      cornerFilter = vtkOutlineCornerFilter::New();
-      cornerFilter->SetInput(ps->GetOutput());
-      ((vtkOutlineCornerFilter*)cornerFilter)->SetCornerFactor(m_CentralClipFactor);
-      cornerFilter->Update();
-    }
-    
-
-    // create the gizmo handle
-	  vtkALBASmartPointer<vtkCubeSource> cs;
-	  cs->SetXLength(VolumeVTKData->GetLength()/50);
-	  cs->SetYLength(VolumeVTKData->GetLength()/50);
-	  cs->SetZLength(VolumeVTKData->GetLength()/50);
-	  cs->Update();
-
-    // append outline and handle
-	  vtkALBASmartPointer<vtkAppendPolyData> apd;
-    if(visibleCubeHandler == true)
-      apd->AddInput(cs->GetOutput());
-	  apd->AddInput(cornerFilter->GetOutput());
-	  apd->Update();
-
-    cornerFilter->Delete();
-
-    m_VmeGizmo->SetData(apd->GetOutput());
-
-    // position the gizmo 
-	  albaSmartPointer<albaTransform> t;
-    t->Translate(cubeHandleLocalPosition, PRE_MULTIPLY);
-	  m_VmeGizmo->SetMatrix(t->GetMatrix());   
-  
-    // m_GizmoHandleCenterMatrix holds the gizmo handle pose
-    albaTransform::SetPosition(*m_GizmoHandleCenterMatrix, cubeHandleLocalPosition);
-    
-    // this matrix is keeped updated by the interactor with the gizmo handle position
-    m_MouseBH->SetResultMatrix(m_GizmoHandleCenterMatrix);
-
-    //Default moving modality
-    this->SetGizmoMovingModalityToBound();
-  }
-}
-
-//----------------------------------------------------------------------------
 void albaGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int axis, double localPositionOnAxis, bool visibleCubeHandler)
 //----------------------------------------------------------------------------
 {
@@ -300,54 +159,59 @@ void albaGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int
 
 	// register id
 	m_Id = gizmoSliceId;
+	vtkDataSet *VolumeVTKData = m_InputVME ? m_InputVME->GetOutput()->GetVTKData() : NULL;
 
-	double localBounds[6];
-	if (vtkDataSet *VolumeVTKData = m_InputVME->GetOutput()->GetVTKData())
+	if (VolumeVTKData)
 	{
 		VolumeVTKData->Update();
-		VolumeVTKData->GetBounds(localBounds);
-		double wx = localBounds[1] - localBounds[0];
-		double wy = localBounds[3] - localBounds[2];
-		double wz = localBounds[5] - localBounds[4];
+		VolumeVTKData->GetBounds(m_Bounds);
+	}
 
-		// position of the gizmo cube handle centre
-		double cubeHandleLocalPosition[3];
-		cubeHandleLocalPosition[0] = 0;
-		cubeHandleLocalPosition[1] = 0;
-		cubeHandleLocalPosition[2] = 0;
+	double wx = m_Bounds[1] - m_Bounds[0];
+	double wy = m_Bounds[3] - m_Bounds[2];
+	double wz = m_Bounds[5] - m_Bounds[4];
 
-		vtkALBASmartPointer<vtkPlaneSource> ps;
-		ps->SetOrigin(cubeHandleLocalPosition);
-		
-		double borderCube = VolumeVTKData->GetLength() / 50;
+	// position of the gizmo cube handle centre
+	double cubeHandleLocalPosition[3];
+	cubeHandleLocalPosition[0] = 0;
+	cubeHandleLocalPosition[1] = 0;
+	cubeHandleLocalPosition[2] = 0;
 
-		if (visibleCubeHandler == false)
-		{
-			borderCube = 0;
-		}
+	vtkALBASmartPointer<vtkPlaneSource> ps;
+	ps->SetOrigin(cubeHandleLocalPosition);
 
-		double inversion = 1.;
-		if (false == m_InverseHandle)
-		{
-			cubeHandleLocalPosition[0] = localBounds[0];
-			cubeHandleLocalPosition[1] = localBounds[2];
-			cubeHandleLocalPosition[2] = localBounds[4];
-		}
-		else
-		{
-			cubeHandleLocalPosition[0] = localBounds[1];
-			cubeHandleLocalPosition[1] = localBounds[3];
-			cubeHandleLocalPosition[2] = localBounds[5];
-			inversion = -1.;
-		}
-		
-		double interval[3][2] = { { localBounds[0], localBounds[1] },{ localBounds[2], localBounds[3] },{ localBounds[4], localBounds[5] } };
-		
-		m_MouseBH->GetTranslationConstraint()->SetSnapArray(axis, m_SnapArray);
-		m_MouseBH->GetTranslationConstraint()->SetConstraintModality(axis, albaInteractorConstraint::BOUNDS);
+	double borderCube=GetBorderCube();
 
-		switch (axis)
-		{
+
+	if (visibleCubeHandler == false)
+	{
+		borderCube = 0;
+	}
+
+	double inversion = 1.;
+	if (false == m_InverseHandle)
+	{
+		cubeHandleLocalPosition[0] = m_Bounds[0];
+		cubeHandleLocalPosition[1] = m_Bounds[2];
+		cubeHandleLocalPosition[2] = m_Bounds[4];
+	}
+	else
+	{
+		cubeHandleLocalPosition[0] = m_Bounds[1];
+		cubeHandleLocalPosition[1] = m_Bounds[3];
+		cubeHandleLocalPosition[2] = m_Bounds[5];
+		inversion = -1.;
+	}
+
+
+	double interval[3][2] = { {m_Bounds[0], m_Bounds[1]}, {m_Bounds[2], m_Bounds[3]}, {m_Bounds[4], m_Bounds[5]} }; 
+
+	InitSnapArray(m_InputVME, axis);
+	m_MouseBH->GetTranslationConstraint()->SetSnapArray(axis, m_SnapArray);
+	m_MouseBH->GetTranslationConstraint()->SetConstraintModality(axis, albaInteractorConstraint::BOUNDS);
+
+	switch (axis)
+	{
 		case GIZMO_SLICE_X:
 		{
 			cubeHandleLocalPosition[0] = localPositionOnAxis;
@@ -381,20 +245,78 @@ void albaGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int
 			m_MouseBH->GetTranslationConstraint()->SetBounds(albaInteractorConstraint::Z, interval[2]);
 		}
 		break;
-		}
-
-		// position the gizmo 
-		albaSmartPointer<albaTransform> t;
-		t->Translate(cubeHandleLocalPosition, PRE_MULTIPLY);
-		m_VmeGizmo->SetMatrix(t->GetMatrix());
-
-		// m_GizmoHandleCenterMatrix holds the gizmo handle pose
-		albaTransform::SetPosition(*m_GizmoHandleCenterMatrix, cubeHandleLocalPosition);
-
-		// this matrix is keeped updated by the interactor with the gizmo handle position
-		m_MouseBH->SetResultMatrix(m_GizmoHandleCenterMatrix);
 	}
+
+	vtkDataSetToPolyDataFilter *cornerFilter;
+
+	if (m_CentralClipFactor == 0)
+	{
+		// create the gizmo outline 
+		cornerFilter = vtkOutlineFilter::New();
+		cornerFilter->SetInput(ps->GetOutput());
+		cornerFilter->Update();
+	}
+	else
+	{
+		// create the gizmo outline 
+		cornerFilter = vtkOutlineCornerFilter::New();
+		cornerFilter->SetInput(ps->GetOutput());
+		((vtkOutlineCornerFilter*)cornerFilter)->SetCornerFactor(m_CentralClipFactor);
+		cornerFilter->Update();
+	}
+
+
+	// create the gizmo handle
+	vtkALBASmartPointer<vtkCubeSource> cs;
+	cs->SetXLength(borderCube);
+	cs->SetYLength(borderCube);
+	cs->SetZLength(borderCube);
+	cs->Update();
+
+	// append outline and handle
+	vtkALBASmartPointer<vtkAppendPolyData> apd;
+	if (visibleCubeHandler == true)
+		apd->AddInput(cs->GetOutput());
+	apd->AddInput(cornerFilter->GetOutput());
+	apd->Update();
+
+	m_VmeGizmo->SetData(apd->GetOutput());
+	m_VmeGizmo->Modified();
+	m_VmeGizmo->Update();
+	m_VmeGizmo->GetSurfaceOutput()->Update();
+	m_VmeGizmo->GetSurfaceOutput()->GetVTKData()->Modified();
+	m_VmeGizmo->GetSurfaceOutput()->GetVTKData()->Update();
+	m_VmeGizmo->GetSurfaceOutput()->GetVTKData()->UpdateData();
+
+	cornerFilter->Delete();
+
+	// position the gizmo 
+	albaSmartPointer<albaTransform> t;
+	t->Translate(cubeHandleLocalPosition, PRE_MULTIPLY);
+	m_VmeGizmo->SetMatrix(t->GetMatrix());
+
+	// m_GizmoHandleCenterMatrix holds the gizmo handle pose
+	albaTransform::SetPosition(*m_GizmoHandleCenterMatrix, cubeHandleLocalPosition);
+
+	// this matrix is keeped updated by the interactor with the gizmo handle position
+	m_MouseBH->SetResultMatrix(m_GizmoHandleCenterMatrix);
+
+	//Default moving modality
+	this->SetGizmoMovingModalityToBound();
 }
+
+//----------------------------------------------------------------------------
+double albaGizmoSlice::GetBorderCube()
+{
+	double dims[3];
+
+	dims[0] = m_Bounds[3] - m_Bounds[0];
+	dims[1] = m_Bounds[4] - m_Bounds[1];
+	dims[2] = m_Bounds[5] - m_Bounds[3];
+
+	return sqrt(dims[0] * dims[0] + dims[1] * dims[1] + dims[2] * dims[2]) / 50.0;
+}
+
 
 //----------------------------------------------------------------------------
 void albaGizmoSlice::SetColor(double col[3])
@@ -415,10 +337,17 @@ albaVME *albaGizmoSlice::GetOutput()
 void albaGizmoSlice::InitSnapArray(albaVME *vol, int axis)
 //----------------------------------------------------------------------------
 {
-	if(true == m_CustomizedSnapArrayFlag)
+	if(m_SnapArray == NULL)
+		m_SnapArray = vtkDoubleArray::New();
+	m_SnapArray->Reset();
+
+	if (vol == NULL)
+		return;
+
+	if(m_CustomizedSnapArrayFlag)
 	{
     //generate snaparray with step criterion
-		this->m_SnapArray = vtkDoubleArray::New();
+		this->m_SnapArray->Reset();
 		if (vtkDataSet *vol_data = vol->GetOutput()->GetVTKData())
 		{
 			double b[6];
@@ -460,15 +389,16 @@ void albaGizmoSlice::InitSnapArray(albaVME *vol, int axis)
 		return;
 	}
 
-  if (vtkDataSet *vol_data = vol->GetOutput()->GetVTKData())
+	vtkDataSet *vol_data = vol ? vol->GetOutput()->GetVTKData(): NULL;
+  if (vol_data)
   {
     double b[6], z;
     vol_data->Update();
     vol_data->GetBounds(b);
     if(vol_data->IsA("vtkRectilinearGrid"))
     {
-	    this->m_SnapArray = vtkDoubleArray::New();
-	    if(axis == GIZMO_SLICE_X)
+			this->m_SnapArray->Reset();
+			if (axis == GIZMO_SLICE_X)
 		    this->m_SnapArray->DeepCopy((vtkDoubleArray *)((vtkRectilinearGrid *)vol_data)->GetXCoordinates());
 	    else if(axis == GIZMO_SLICE_Y)
 		    this->m_SnapArray->DeepCopy((vtkDoubleArray *)((vtkRectilinearGrid *)vol_data)->GetYCoordinates());
@@ -481,8 +411,8 @@ void albaGizmoSlice::InitSnapArray(albaVME *vol, int axis)
 	    double spc[3];
 	    ((vtkImageData *)vol_data)->GetDimensions(dim);
 	    ((vtkImageData *)vol_data)->GetSpacing(spc);
-	    this->m_SnapArray = vtkDoubleArray::New();
-	    this->m_SnapArray->SetNumberOfValues(dim[axis]);
+			this->m_SnapArray->Reset();
+			this->m_SnapArray->SetNumberOfValues(dim[axis]);
 	    for(int i=0;i<dim[axis];i++)
 	    {
 		    z = b[2*axis] + i * spc[axis];
@@ -493,7 +423,7 @@ void albaGizmoSlice::InitSnapArray(albaVME *vol, int axis)
 	{
 		double b[6];
 		vol_data->GetBounds(b);
-		this->m_SnapArray = vtkDoubleArray::New();
+		this->m_SnapArray->Reset();
 		this->m_SnapArray->SetNumberOfValues(2);
 		if(axis == GIZMO_SLICE_X)
 		{
@@ -519,6 +449,14 @@ void albaGizmoSlice::SetHandleCenterMatrix(albaMatrix *m)
 {
   m_GizmoHandleCenterMatrix->DeepCopy(m);
 }
+
+//----------------------------------------------------------------------------
+void albaGizmoSlice::SetBounds(double *val)
+{
+	for (int i = 0; i < 6; i++) 
+		m_Bounds[i] = val[i];
+}
+
 //----------------------------------------------------------------------------
 void albaGizmoSlice::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
@@ -538,7 +476,8 @@ void albaGizmoSlice::OnEvent(albaEventBase *alba_event)
 
 				//local position of gizmo cube handle centre
 				double slicePlaneOrigin[3];
-				albaTransform::GetPosition(*m_GizmoHandleCenterMatrix, slicePlaneOrigin);
+				GetPosition(slicePlaneOrigin);
+
 
 				
 				// position sent as vtk point
@@ -717,11 +656,13 @@ void albaGizmoSlice::Show(bool show)
 void albaGizmoSlice::SetInput( albaVME *vme )
 //----------------------------------------------------------------------------
 {
-  if (m_VmeGizmo != NULL)
-  {
-    DestroyGizmoSlice();
-    CreateGizmoSlice(vme, m_Listener, m_Name, m_InverseHandle, m_CentralClipFactor);
-  }
+	m_InputVME = vme;
+
+	m_VmeGizmo->ReparentTo(m_InputVME);
+	if (m_InputVME)
+		m_MouseBH->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal(m_InputVME);
+	else
+		m_MouseBH->GetTranslationConstraint()->GetRefSys()->SetTypeToGlobal();
 }
 //----------------------------------------------------------------------------
 void albaGizmoSlice::SetPosition( albaMatrix *mat )
@@ -729,4 +670,10 @@ void albaGizmoSlice::SetPosition( albaMatrix *mat )
 {
   // update the gizmo local position
   m_VmeGizmo->SetMatrix(*mat);		 
+}
+
+//----------------------------------------------------------------------------
+void albaGizmoSlice::GetPosition(double * slicePlaneOrigin)
+{
+	albaTransform::GetPosition(*m_GizmoHandleCenterMatrix, slicePlaneOrigin);
 }

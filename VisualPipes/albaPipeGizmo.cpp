@@ -42,6 +42,7 @@
 #include "vtkCaptionActor2D.h"
 #include "albaGizmoAutoscaleHelper.h"
 #include "albaGizmoInterface.h"
+#include "albaVMEOutput.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeGizmo);
@@ -77,7 +78,7 @@ void albaPipeGizmo::Create(albaSceneNode *n)
 	inputVMEGizmo = albaVMEGizmo::SafeDownCast(m_Vme);
 	assert(inputVMEGizmo);
 	inputVMEGizmo->Update();
-	vtkPolyData *data = inputVMEGizmo->GetData();
+	vtkPolyData *data = vtkPolyData::SafeDownCast(inputVMEGizmo->GetOutput()->GetVTKData());
 	assert(data);
 
 	m_Vme->AddObserver(this);

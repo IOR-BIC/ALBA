@@ -36,6 +36,7 @@
 #include "albaGizmoTranslate.h"
 #include "albaGizmoRotate.h"
 #include "albaGizmoScale.h"
+#include "albaVMESurfaceParametric.h"
 
 #include "vtkProperty.h"
 #include "vtkTransform.h"
@@ -64,10 +65,10 @@ albaOp(label)
 {
   m_OpType	= OPTYPE_OP;
   m_Canundo = true;
-	m_InputPreserving = false;
 
   m_ClipperVME    = NULL;
-	m_ClippedVME    = NULL;
+	m_ClippedVME = NULL;
+	m_ReverseClippedVME    = NULL;
   m_ClipperPlane  = NULL;
   m_Arrow         = NULL;
   m_Clipper       = NULL;
@@ -76,11 +77,10 @@ albaOp(label)
   m_ImplicitPlaneGizmo  = NULL;
   m_IsaCompositor       = NULL;
 
-  m_OldSurface = NULL;
 	m_ResultPolyData = NULL;
 	m_ClippedPolyData = NULL;
   
-  m_ClipInside      = 1;
+  m_ClipInside      = 0;
 	m_UseGizmo			=	1;
 	m_ClipBoundBox	= 1;
   m_ClipModality  = MODE_IMPLICIT_FUNCTION;
@@ -100,6 +100,8 @@ albaOp(label)
 	m_GizmoTranslate	= NULL;
 	m_GizmoRotate			= NULL;
 	m_GizmoScale			= NULL;
+
+	m_GenerateClippedOutput = true;
 }
 
 //----------------------------------------------------------------------------
@@ -113,11 +115,11 @@ albaOpClipSurface::~albaOpClipSurface()
 	vtkDEL(m_ResultPolyData);
 	vtkDEL(m_ClippedPolyData);
   albaDEL(m_IsaCompositor);
+	albaDEL(m_ReverseClippedVME);
 	albaDEL(m_ClippedVME);
   vtkDEL(m_ClipperPlane);
   vtkDEL(m_Clipper);
 	vtkDEL(m_ClipperBoundingBox);
-  vtkDEL(m_OldSurface);
   vtkDEL(m_Arrow);
 }
 //----------------------------------------------------------------------------
@@ -131,7 +133,7 @@ albaOp* albaOpClipSurface::Copy()
 bool albaOpClipSurface::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
-	return (node != NULL && node->IsALBAType(albaVMESurface));
+	return (node != NULL && (node->IsALBAType(albaVMESurface)||node->IsALBAType(albaVMESurfaceParametric)));
 }
 
 //----------------------------------------------------------------------------
@@ -156,13 +158,11 @@ void albaOpClipSurface::OpRun()
 {
   vtkNEW(m_Clipper);
 	vtkNEW(m_ClipperBoundingBox);
-  vtkNEW(m_OldSurface);
 
-  m_OldSurface->DeepCopy((vtkPolyData*)m_Input->GetOutput()->GetVTKData());
  
 	vtkNEW(m_ClippedPolyData);
 	vtkNEW(m_ResultPolyData);
-	m_ResultPolyData->DeepCopy(m_OldSurface);
+	m_ResultPolyData->DeepCopy((vtkPolyData*)m_Input->GetOutput()->GetVTKData());
 
 	if(!m_TestMode)
 	{
@@ -219,7 +219,6 @@ void albaOpClipSurface::CreateGui()
 	m_Gui->Bool(ID_GENERATE_CLIPPED_OUTPUT,_("generate clipped output"),&m_GenerateClippedOutput,1);
 	m_Gui->OkCancel();
 
-	m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 	m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 	m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
 	m_Gui->Enable(ID_GEOMETRY_MOD, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
@@ -242,7 +241,7 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 				e->SetString(&title);
 				e->SetId(VME_CHOOSE);
 				albaEventMacro(*e);
-				m_ClipperVME = albaVMESurface::SafeDownCast(e->GetVme());
+				m_ClipperVME = e->GetVme();
 				if(m_ClipperVME == NULL)
 					return;
 				m_Gui->Enable(wxOK,true);
@@ -259,7 +258,6 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 			m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
 			m_Gui->Enable(ID_GEOMETRY_MOD, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
 			m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);
-			m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 			m_Gui->Enable(ID_USE_GIZMO,m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 			m_Gui->Enable(wxOK,m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 			m_ClipInside = m_ClipModality;
@@ -331,7 +329,7 @@ void albaOpClipSurface::ClipBoundingBox()
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_data_input;
 	transform_data_input->SetTransform(m_Input->GetAbsMatrixPipe()->GetVTKTransform());
-	transform_data_input->SetInput(m_OldSurface);
+	transform_data_input->SetInput((vtkPolyData*)m_Input->GetOutput()->GetVTKData());
 	transform_data_input->Update();
 
 	m_ClipperBoundingBox->SetInput(transform_data_input->GetOutput());
@@ -341,8 +339,6 @@ void albaOpClipSurface::ClipBoundingBox()
 
 	m_ResultPolyData->DeepCopy(m_ClipperBoundingBox->GetOutput());
 	m_ResultPolyData->Update();
-
-	int result=((albaVMESurface*)m_Input)->SetData(m_ResultPolyData,m_Input->GetTimeStamp());
 
 	if(m_GenerateClippedOutput)
 	{
@@ -536,12 +532,22 @@ void albaOpClipSurface::OpStop(int result)
 void albaOpClipSurface::OpDo()
 //----------------------------------------------------------------------------
 {
+	albaString name;
+
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_output;
 	transform_output->SetTransform((vtkAbstractTransform *)m_Input->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
 	transform_output->SetInput(m_ResultPolyData);
 	transform_output->Update();
 
-	((albaVMESurface *)m_Input)->SetData(transform_output->GetOutput(),m_Input->GetTimeStamp());
+	name.Printf("Clipped %s", m_Input->GetName());
+	albaNEW(m_ClippedVME);
+	m_ClippedVME->SetData(transform_output->GetOutput(), m_Input->GetTimeStamp());
+	m_ClippedVME->SetName(name);
+	m_ClippedVME->Update();
+	m_ClippedVME->ReparentTo(m_Input);
+	m_ClippedVME->SetAbsMatrix(m_Input->GetAbsMatrixPipe()->GetMatrix());
+
+
 	if(m_GenerateClippedOutput)
 	{
 		vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_clipped_output;
@@ -549,13 +555,14 @@ void albaOpClipSurface::OpDo()
 		transform_clipped_output->SetInput(m_ClippedPolyData);
 		transform_clipped_output->Update();
 
-		albaNEW(m_ClippedVME);
-		m_ClippedVME->DeepCopy(m_Input);
-		m_ClippedVME->SetData(transform_clipped_output->GetOutput(),m_Input->GetTimeStamp());
-		m_ClippedVME->SetName("clipped");
-		m_ClippedVME->Update();
+		name.Printf("Reverse clipped %s", m_Input->GetName());
+		albaNEW(m_ReverseClippedVME);
+		m_ReverseClippedVME->SetData(transform_clipped_output->GetOutput(),m_Input->GetTimeStamp());
+		m_ReverseClippedVME->SetName(name);
+		m_ReverseClippedVME->Update();
 
-		m_ClippedVME->ReparentTo(m_Input->GetParent());
+		m_ReverseClippedVME->ReparentTo(m_Input);
+		m_ReverseClippedVME->SetAbsMatrix(m_Input->GetAbsMatrixPipe()->GetMatrix());
 	}
 	GetLogicManager()->CameraUpdate();
 }
@@ -563,11 +570,12 @@ void albaOpClipSurface::OpDo()
 void albaOpClipSurface::OpUndo()
 //----------------------------------------------------------------------------
 {
-  ((albaVMESurface *)m_Input)->SetData(m_OldSurface,m_Input->GetTimeStamp());
 	if(m_GenerateClippedOutput)
 	{
 		m_ClippedVME->ReparentTo(NULL);
 		albaDEL(m_ClippedVME);
+		m_ReverseClippedVME->ReparentTo(NULL);
+		albaDEL(m_ReverseClippedVME);
 	}
 	GetLogicManager()->CameraUpdate();
 }
@@ -596,12 +604,6 @@ int albaOpClipSurface::Clip()
 		triangles->SetInput(transform_data_input->GetOutput());
     triangles->Update();
 		
-		// subdivide triangles in sphere 1 to get better clipping
-		vtkALBASmartPointer<vtkLinearSubdivisionFilter> subdivider;
-		subdivider->SetInput(triangles->GetOutput());
-		subdivider->SetNumberOfSubdivisions(1);   //  use  this  (0-3+)  to  see improvement in clipping
-    subdivider->Update();
-		
     m_ClipperVME->Update();
     vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_data_clipper;
     transform_data_clipper->SetTransform((vtkAbstractTransform *)m_ClipperVME->GetAbsMatrixPipe()->GetVTKTransform());
@@ -611,7 +613,7 @@ int albaOpClipSurface::Clip()
 		vtkALBASmartPointer<vtkALBAImplicitPolyData> implicitPolyData;
 		implicitPolyData->SetConcaveMode(m_GeometryModality);
 		implicitPolyData->SetInput(transform_data_clipper->GetOutput());
-		m_Clipper->SetInput(subdivider->GetOutput());
+		m_Clipper->SetInput(triangles->GetOutput());
 		m_Clipper->SetClipFunction(implicitPolyData);
 	}
   else
@@ -826,6 +828,13 @@ void albaOpClipSurface::UpdateISARefSys()
   m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
   m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
 }
+
+//----------------------------------------------------------------------------
+bool albaOpClipSurface::SurfaceAccept(albaVME*node)
+{
+	return (node != NULL && (node->IsALBAType(albaVMESurface) || node->IsALBAType(albaVMESurfaceParametric)));
+}
+
 //----------------------------------------------------------------------------
 void albaOpClipSurface::SetClippingModality(int mode)
 //----------------------------------------------------------------------------

@@ -61,121 +61,20 @@ void albaVMEInfoTextTest::TestGetOutput()
            infoVME->GetOutput()->GetVTKData() == NULL;
   TEST_RESULT;
 }
+
 //----------------------------------------------------------------------------
-void albaVMEInfoTextTest::TestAddString()
-//----------------------------------------------------------------------------
-{
-  albaSmartPointer<albaVMEInfoText> infoVME;
-
-  enum
-  {
-    NUMBER_OF_TEST_STRING = 3,
-  };
-
-  albaString testString1 = "First Test String";
-  albaString testString2 = "Second Test String";
-  albaString testString3 = "Third Test String";
-  infoVME->AddString(testString1);
-  infoVME->AddString(testString2);
-  infoVME->AddString(testString3);
-
-  result = NUMBER_OF_TEST_STRING == infoVME->GetNumberOfStrings();
-  TEST_RESULT;
-}
-//----------------------------------------------------------------------------
-void albaVMEInfoTextTest::TestGetSetPosShow()
-//----------------------------------------------------------------------------
-{
-  albaSmartPointer<albaVMEInfoText> infoVME;
-
-  infoVME->SetPosLabel("PosLabel0 ", 0);
-  infoVME->SetPosLabel("PosLabel1 ", 1);
-  infoVME->SetPosLabel("PosLabel2 ", 2);
-
-  albaMatrix matrix;
-  matrix.SetElement(0, 3, 10); //translate 10 in x
-  matrix.SetElement(1, 3, 5); //translate 5 in y
-  matrix.SetElement(2, 3, 1); //translate 1 in z
-
-  infoVME->SetMatrix(matrix);
-  infoVME->Update();
-
-  infoVME->SetPosShow(true, 0);
-  infoVME->SetPosShow(true, 1);
-  infoVME->SetPosShow(false, 2);
-
-  result = infoVME->GetPosShow(0) == true &&
-           infoVME->GetPosShow(1) == true &&
-           infoVME->GetPosShow(2) == false;
-
-  //warning : in this case it is append to the string the translation with 6 digits
-  albaString control1 = infoVME->GetPosText(0);
-  albaString control2 = infoVME->GetPosText(1);
-  albaString control3 = infoVME->GetPosText(2);
-  bool result1 = control1.Equals("PosLabel0 10.000000");
-  bool result2 = control2.Equals("PosLabel1 5.000000");
-  bool result3 = control3.Equals("");
-
-  result = result && result1 && result2 && result3;
-
-  TEST_RESULT;
-}
-//----------------------------------------------------------------------------
-void albaVMEInfoTextTest::TestGetSetPosLabel()
-//----------------------------------------------------------------------------
+void albaVMEInfoTextTest::TestGetSetLabel()
 {
   albaSmartPointer<albaVMEInfoText> infoVME;
   
-  infoVME->SetPosLabel("PosLabel_0", 0);
-  infoVME->SetPosLabel("PosLabel_1", 1);
-  infoVME->SetPosLabel("PosLabel_2", 2);
+  infoVME->SetLabel("PosLabel_0");
 
-  result = albaString(infoVME->GetPosLabel(0)).Equals("PosLabel_0") &&
-           albaString(infoVME->GetPosLabel(1)).Equals("PosLabel_1") &&
-           albaString(infoVME->GetPosLabel(2)).Equals("PosLabel_2");
-
+	result = albaString(infoVME->GetLabel()).Equals("PosLabel_0");
   TEST_RESULT;
 }
 
-//----------------------------------------------------------------------------
-void albaVMEInfoTextTest::TestSetTimeStamp()
-//----------------------------------------------------------------------------
-{
-  albaSmartPointer<albaVMEInfoText> infoVME;
-
-  infoVME->SetPosLabel("PosLabel0 ", 0);
-  infoVME->SetPosLabel("PosLabel1 ", 1);
-  infoVME->SetPosLabel("PosLabel2 ", 2);
-
-  infoVME->SetPosShow(true, 0);
-  infoVME->SetPosShow(true, 1);
-  infoVME->SetPosShow(false, 2); //hide completely the string assigning  ""
-
-  albaMatrix matrix;
-  matrix.SetElement(0, 3, 10); //translate 10 in x
-  matrix.SetElement(1, 3, 5); //translate 5 in y
-  matrix.SetElement(2, 3, 1); //translate 1 in z
-  
-  infoVME->SetMatrix(matrix);
-  infoVME->Update();
-
-  infoVME->SetTimeStamp(1.0);
-
-  //warning : in this case it is append to the string the translation with 6 digits
-  albaString control1 = infoVME->GetPosText(0);
-  albaString control2 = infoVME->GetPosText(1);
-  albaString control3 = infoVME->GetPosText(2);
-  bool result1 = control1.Equals("PosLabel0 10.000000");
-  bool result2 = control2.Equals("PosLabel1 5.000000");
-  bool result3 = control3.Equals("");
-
-  result = result1 && result2 && result3;
-
-  TEST_RESULT;
-}
 //----------------------------------------------------------------------------
 void albaVMEInfoTextTest::TestGetIcon()
-//----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEInfoText> infoVME;
   char **icon = NULL;
@@ -185,7 +84,6 @@ void albaVMEInfoTextTest::TestGetIcon()
 }
 //----------------------------------------------------------------------------
 void albaVMEInfoTextTest::TestDeepCopy()
-//----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEInfoText> infoVME;
 
@@ -194,21 +92,18 @@ void albaVMEInfoTextTest::TestDeepCopy()
     NUMBER_OF_TEST_STRING = 2,
   };
 
-  albaString testString1 = "First Test DeepCopy String";
-  albaString testString2 = "Second Test DeepCopy String";
-  infoVME->AddString(testString1);
-  infoVME->AddString(testString2);
+  albaString testString1 = "Test DeepCopy String";
+  infoVME->SetLabel(testString1);
   
   albaSmartPointer<albaVMEInfoText> infoVMECopy;
   infoVMECopy->DeepCopy(infoVME);
 
-  result = infoVME->GetNumberOfStrings() == infoVMECopy->GetNumberOfStrings();
+  result = testString1.Equals(infoVMECopy->GetLabel());
 
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
 void albaVMEInfoTextTest::TestEquals()
-//----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEInfoText> infoVME;
 
@@ -219,8 +114,7 @@ void albaVMEInfoTextTest::TestEquals()
 
   albaString testString1 = "First Test Equals String";
   albaString testString2 = "Second Test Equals String";
-  infoVME->AddString(testString1);
-  infoVME->AddString(testString2);
+  infoVME->SetLabel(testString1);
 
   albaSmartPointer<albaVMEInfoText> infoVMECopy;
   infoVMECopy->DeepCopy(infoVME);
@@ -230,7 +124,7 @@ void albaVMEInfoTextTest::TestEquals()
   TEST_RESULT;
 
   //create a difference
-  infoVMECopy->AddString("Third  Test Equals String");
+  infoVMECopy->SetLabel(testString2);
 
   result = !infoVMECopy->Equals(infoVME);
   TEST_RESULT;

@@ -100,6 +100,7 @@ protected:
 
 	bool m_MoveLineB;
 	double m_OldLineP3[3];
+	bool m_AddModeCompleted;
 
 	Color m_ColorAux;
 

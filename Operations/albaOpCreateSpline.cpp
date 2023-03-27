@@ -65,6 +65,12 @@ bool albaOpCreateSpline::InternalAccept(albaVME*node)
   return (node && node->IsALBAType(albaVME));
 }
 //----------------------------------------------------------------------------
+char** albaOpCreateSpline::GetIcon()
+{
+#include "pic/MENU_OP_CREATE_POLYLINESPLINE.xpm"
+	return MENU_OP_CREATE_POLYLINESPLINE_xpm;
+}
+//----------------------------------------------------------------------------
 void albaOpCreateSpline::OpRun()   
 //----------------------------------------------------------------------------
 {

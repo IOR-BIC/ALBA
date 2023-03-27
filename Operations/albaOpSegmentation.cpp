@@ -101,6 +101,9 @@
 #include "vtkTextProperty.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkVolumeProperty.h"
+#include "vtkTransform.h"
+#include "vtkTransformFilter.h"
+#include "vtkMaskPolyDataFilter.h"
 
 #include "wx/busyinfo.h"
 #include "wx/mac/classic/bitmap.h"
@@ -114,14 +117,16 @@ enum INIT_MODALITY_TYPE
 {
   GLOBAL_INIT = 0,
   RANGE_INIT,
-	LOAD_INIT,
+	LOADSEGM_INIT,
+	LOADMASK_INIT
 };
 
 enum EDIT_MODALITY_TYPE
 {
 	DRAW_EDIT = 0,
 	FILL_EDIT,
-	CONNECTIVITY_3D
+	CONNECTIVITY_3D,
+	SWITCH_PLANE,
 };
 
 typedef  itk::Image< float, 3> RealImage;
@@ -219,7 +224,7 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_MajorityThreshold = 9;
 
 	m_BrushFillErase = 0;
-	m_AutofillOnRelease = FALSE;
+	m_AutofillOnRelease = TRUE;
 
 
   m_SliceBackup = NULL;
@@ -232,6 +237,7 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
 
   m_ManualSegmentationTools  = DRAW_EDIT;
   m_ManualBucketActions = 0;
+	m_TriplePass = false;
 }
 //----------------------------------------------------------------------------
 albaOpSegmentation::~albaOpSegmentation()
@@ -313,6 +319,7 @@ void albaOpSegmentation::OpDo()
   m_OutputSurface->ReparentTo(m_Input);
   m_OutputSurface->Modified();
 	m_OutputSurface->Update();
+	GetLogicManager()->VmeShow(m_OutputSurface, true);
 	vtkDEL(surface);
 	albaDEL(m_OutputSurface);
 
@@ -384,11 +391,12 @@ void albaOpSegmentation::Init()
 	m_View->VmeSegmentationShow(m_SegmentationVolume, true);
 
 	OnSelectSlicePlane();
-	
+	OnUpdateSlice();
+
 	if (m_DisableInit)
 		OnEditStep();
 	else
-		OnChangeThresholdType();
+		OnChangeInitModality();
 	
 	UpdateSliceLabel();
 
@@ -836,12 +844,12 @@ void albaOpSegmentation::CreateInitSegmentationGui()
 	////////////////////////////////////////////////////////////////////////
 	// THRESHOLD TYPE Selection
 
-	currentGui->Label("Threshold type", true);
+	currentGui->Label("Init Modality type", true);
 
-	wxString choices[3] = { _("Global"),_("Z-Split"), _("Load") };
+	wxString choices[4] = { _("Global"),_("Z-Split"), _("Load"), _("Mask") };
 	int w_id = currentGui->GetWidgetId(ID_INIT_MODALITY);
 
-	m_InitModalityRadioBox = new wxRadioBox(currentGui, w_id, "", wxDefaultPosition, wxSize(170, -1), 3, choices, 3);
+	m_InitModalityRadioBox = new wxRadioBox(currentGui, w_id, "", wxDefaultPosition, wxSize(200, -1), 4, choices, 2, wxRA_SPECIFY_COLS | wxSUNKEN_BORDER | wxTAB_TRAVERSAL);
 	m_InitModalityRadioBox->SetValidator(albaGUIValidator(currentGui, w_id, m_InitModalityRadioBox, &m_InitModality));
 
 	wxBoxSizer *thresholdTypeLabSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -891,7 +899,11 @@ void albaOpSegmentation::CreateInitSegmentationGui()
 
 	// LOAD SEGMENTATION
 
-	currentGui->Label(&m_VolumeName);
+	currentGui->Label("Mask Settings:",1);
+	currentGui->Bool(ID_TRIPLE_PASS, "Reduce Glitch", &m_TriplePass, true);
+	currentGui->Divider(1);
+	currentGui->Label("");
+
 	currentGui->Button(ID_LOAD, "Load");
 	currentGui->Divider(1);
 
@@ -902,6 +914,21 @@ void albaOpSegmentation::CreateEditSegmentationGui()
 {
 	albaGUI *currentGui = new albaGUI(this);
 
+
+
+	//////////////////////////////////////////////////////////////////////////
+	// Plane switch section
+
+	currentGui->Label("Plane switch", true);
+
+	std::vector<const char*> switchLabels = { "YZ", "XZ", "XY" };
+	std::vector<int> switchIds = { ID_SWITCH_TO_YZ, ID_SWITCH_TO_XZ, ID_SWITCH_TO_XY };
+
+	currentGui->MultipleButtons(3, 3, switchIds, switchLabels);
+	currentGui->Divider(1);
+
+	/////////////////////////////////////////////////////////////////////////
+	// Hint
 	currentGui->HintBox(NULL, "Change Slice: \nAlt + Shift + 'Mouse Scroll' or \n'PageUp/PageDown'");
 
 	//////////////////////////////////////////////////////////////////////////
@@ -1164,7 +1191,7 @@ void albaOpSegmentation::UpdateSliderValidator()
 	int sliceMax = m_VolumeDims[m_SlicePlane];
 
 	m_SliceSlider->SetRange(1, sliceMax);
-	m_SliceText->SetValidator(albaGUIValidator(this, ID_SLICE_TEXT, m_SliceText, &m_SliceIndex, m_SliceSlider, 1, sliceMax));
+	m_SliceText->SetValidator(albaGUIValidator(this, ID_SLICE_TEXT, m_SliceText, &m_GUISliceIndex, m_SliceSlider, 1, sliceMax));
 	SetSlicingIndexes(m_SlicePlane, m_SliceIndexByPlane[m_SlicePlane]);
 	m_SliceSlider->Update();
 }
@@ -1189,7 +1216,7 @@ void albaOpSegmentation::UpdateSliceLabel()
 //----------------------------------------------------------------------------
 void albaOpSegmentation::UpdateThresholdLabel()
 {
-	if (m_CurrentPhase == INIT_SEGMENTATION && (m_InitModality != LOAD_INIT))
+	if (m_CurrentPhase == INIT_SEGMENTATION && (m_InitModality != LOADSEGM_INIT))
 	{
 		albaString text = wxString::Format("Threshold low:%.1f high:%.1f", m_Threshold[0], m_Threshold[1]);
 		m_AutomaticThresholdTextMapper->SetInput(text.GetCStr());
@@ -1423,10 +1450,6 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 			SliceNext();
 			break;
 		case ID_SLICE_TEXT:
-			if (m_GUISliceIndex > 1)
-			{
-				m_GUISliceIndex--;
-			}
 			SetSlicingIndexes(m_SlicePlane, m_GUISliceIndex);
 			OnUpdateSlice();
 			break;
@@ -1469,6 +1492,11 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 			}
 			break;
 		case ID_OK:
+			if (m_CurrentPhase == EDIT_SEGMENTATION)
+			{
+				SetSlicingIndexes(m_SlicePlane, m_SliceIndex);
+				OnUpdateSlice();
+			}
 			m_Dialog->EndModal(wxID_OK);
 			break;
 		case ID_CANCEL:
@@ -1531,6 +1559,7 @@ void albaOpSegmentation::SlicePrev()
 void albaOpSegmentation::OnEditStep()
 {
 	m_GuiDialog->Enable(ID_LOAD, false);
+	m_GuiDialog->Enable(ID_TRIPLE_PASS, false);
 
 	UpdateThresholdLabel();
 
@@ -1575,6 +1604,11 @@ void albaOpSegmentation::OnEditStep()
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_PICKING_MODALITY, m_SlicePlane);
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, false);
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_SWITCH_TO_YZ, m_SlicePlane != 0);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_SWITCH_TO_XZ, m_SlicePlane != 1);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_SWITCH_TO_XY, m_SlicePlane != 2);
+
+
 	m_GuiDialog->Enable(ID_BUTTON_EDIT, false);
 	
 	m_ManualSegmentationTools = DRAW_EDIT;
@@ -1633,7 +1667,7 @@ void albaOpSegmentation::OnInitEvent(albaEvent *e)
 	break;
 	case ID_INIT_MODALITY:
 	{
-		OnChangeThresholdType();
+		OnChangeInitModality();
 		OnThresholdUpate();
 	}
 	break;
@@ -1643,6 +1677,7 @@ void albaOpSegmentation::OnInitEvent(albaEvent *e)
 		{
 			m_CurrentRange = m_RangesGuiList->GetSelection();
 			SetSlicingIndexes(m_SlicePlane, (m_RangesVector[m_CurrentRange].m_StartSlice + m_RangesVector[m_CurrentRange].m_EndSlice) / 2);
+			OnUpdateSlice();
 			SetThresholdByRange();
 			EnableDisableGuiRange();
 		}
@@ -1655,7 +1690,10 @@ void albaOpSegmentation::OnInitEvent(albaEvent *e)
 		OnRemoveRange();
 		break;
 	case ID_LOAD:
-		OnLoadSegmentation();
+		if (m_InitModality == LOADSEGM_INIT)
+			OnLoadSegmentation();
+		else // m_InitModality == LOADMASK_INIT
+			OnLoadMask();
 		break;
 	default:
 		albaEventMacro(*e);
@@ -1673,6 +1711,8 @@ void albaOpSegmentation::OnSelectSlicePlane()
 	}
 	UpdateSliderValidator();
 
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_COPY_FROM_LAST_SLICE, false);
+
 	m_View->SetSliceAxis(m_SlicePlane);
 
 	albaPipeVolumeOrthoSlice *pipeOrtho = (albaPipeVolumeOrthoSlice *)m_View->GetNodePipe(m_Volume);
@@ -1686,6 +1726,12 @@ void albaOpSegmentation::OnSelectSlicePlane()
 	m_Helper.SetSlices(m_VolumeSlice, m_SegmentationSlice);
 
 	m_GuiDialog->Update();
+
+	UpdateSlice();
+
+	m_View->CameraReset();
+	m_View->CameraUpdate();
+
 	
 	if (m_CurrentPhase == INIT_SEGMENTATION)
 		OnThresholdUpate(); 
@@ -1693,10 +1739,14 @@ void albaOpSegmentation::OnSelectSlicePlane()
 	{
 		UpdateSlice();
 		CreateSliceBackup();
+
+		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_SWITCH_TO_YZ, m_SlicePlane != 0);
+		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_SWITCH_TO_XZ, m_SlicePlane != 1);
+		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_SWITCH_TO_XY, m_SlicePlane != 2);
+
 		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
 	}
 
-	m_View->CameraReset();
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OnPickingEvent(albaEvent * e)
@@ -1726,6 +1776,8 @@ void albaOpSegmentation::OnPickingEvent(albaEvent * e)
 			Fill(e);
 		else if (m_ManualSegmentationTools == DRAW_EDIT) // brush
 			StartDraw(e);
+		else if (m_ManualSegmentationTools == SWITCH_PLANE)
+			SwitchPlane(e);
 		else
 			Conntectivity3D(e);
 
@@ -1762,7 +1814,7 @@ void albaOpSegmentation::OnUpdateSlice()
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpSegmentation::OnChangeThresholdType()
+void albaOpSegmentation::OnChangeInitModality()
 {
 	if (!m_DisableInit)
 	{
@@ -1770,12 +1822,13 @@ void albaOpSegmentation::OnChangeThresholdType()
 
 		int thesholdIDs[] = { ID_AUTO_INC_MIN_THRESHOLD, ID_AUTO_INC_MIDDLE_THRESHOLD, ID_AUTO_INC_MAX_THRESHOLD, ID_AUTO_DEC_MIN_THRESHOLD, ID_AUTO_DEC_MIDDLE_THRESHOLD, ID_AUTO_DEC_MAX_THRESHOLD };
 		for (int i = 0; i < 6; i++)
-			m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(thesholdIDs[i], m_InitModality != LOAD_INIT);
-		m_ThresholdSlider->Enable(m_InitModality != LOAD_INIT);
+			m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(thesholdIDs[i], m_InitModality != LOADSEGM_INIT && m_InitModality != LOADMASK_INIT);
+		m_ThresholdSlider->Enable(m_InitModality != LOADSEGM_INIT && m_InitModality != LOADMASK_INIT);
 
-		m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_LOAD, m_InitModality == LOAD_INIT);
+		m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_LOAD, m_InitModality == LOADSEGM_INIT || m_InitModality == LOADMASK_INIT);
+		m_SegmentationOperationsGui[INIT_SEGMENTATION]->Enable(ID_TRIPLE_PASS, m_InitModality == LOADMASK_INIT);
 
-		if (m_InitModality == LOAD_INIT)
+		if (m_InitModality == LOADSEGM_INIT)
 		{
 			//forcing slice update
 			double tmp[3] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MAX, VTK_DOUBLE_MAX };
@@ -1896,6 +1949,83 @@ void albaOpSegmentation::OnLoadSegmentation()
 		UpdateSlice();
 	}
 }
+
+//----------------------------------------------------------------------------
+void albaOpSegmentation::OnLoadMask()
+{
+	albaString title = albaString("Select a mask:");
+	albaEvent e(this, VME_CHOOSE);
+	e.SetString(&title);
+	e.SetPointer(&albaOpSegmentation::MaskAccept);
+	albaEventMacro(e);
+	albaVME *vme = e.GetVme();
+
+	vtkPolyData *maskPolydata = vtkPolyData::SafeDownCast(vme->GetOutput()->GetVTKData());
+	if (!maskPolydata)
+		return;
+
+	wxBusyInfo wait("Masking: Please wait!");
+
+
+	vtkPolyData *transformedMaskPolydata = NULL;
+	vtkTransform *transform = NULL;
+	vtkTransformFilter *transformFilter = NULL;
+	albaMatrix identityMatrix;
+	albaMatrix maskABSMatrix = *vme->GetOutput()->GetAbsMatrix();
+	albaMatrix volumeABSMatrix = m_Matrix;
+
+	bool isMaskMatrixIdentity = maskABSMatrix.Equals(&identityMatrix);
+	bool isVolumeMatrixIdentity = volumeABSMatrix.Equals(&identityMatrix);
+
+	if (isMaskMatrixIdentity && isVolumeMatrixIdentity)
+		transformedMaskPolydata = maskPolydata;
+	else
+	{
+		// if VME matrix is not identity apply it to dataset
+		albaMatrix meshVolumeAlignMatrix;
+
+		//Calculate align matrix 
+		volumeABSMatrix.Invert();
+		albaMatrix::Multiply4x4(volumeABSMatrix, maskABSMatrix, meshVolumeAlignMatrix);
+
+		// apply abs matrix to geometry
+		transform = vtkTransform::New();
+		transform->SetMatrix(meshVolumeAlignMatrix.GetVTKMatrix());
+
+		// to delete
+		transformFilter = vtkTransformFilter::New();
+
+		transformFilter->SetInput(maskPolydata);
+		transformFilter->SetTransform(transform);
+		transformFilter->Update();
+
+		transformedMaskPolydata = transformFilter->GetPolyDataOutput();
+	}
+
+	vtkMaskPolyDataFilter *maskPolydataFilter;
+
+	vtkNEW(maskPolydataFilter);
+	albaVMEVolumeGray *volume = albaVMEVolumeGray::SafeDownCast(m_SegmentationVolume);
+	maskPolydataFilter->SetInput(volume->GetOutput()->GetVTKData());
+	maskPolydataFilter->SetDistance(0);
+	maskPolydataFilter->SetInsideValue(255);
+	maskPolydataFilter->SetOutsideValue(0);
+	maskPolydataFilter->SetInsideOut(false);
+	maskPolydataFilter->SetBinarize(true);
+	maskPolydataFilter->SetTriplePass(m_TriplePass);
+	maskPolydataFilter->SetMask(transformedMaskPolydata);
+
+	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, maskPolydataFilter));
+	maskPolydataFilter->Update();
+
+	m_SegmentationVolume->SetData(maskPolydataFilter->GetOutput(), m_SegmentationVolume->GetTimeStamp());
+	UpdateSlice();
+
+	vtkDEL(maskPolydataFilter);
+	vtkDEL(transform);
+	vtkDEL(transformFilter);
+}
+
 //----------------------------------------------------------------------------
 bool albaOpSegmentation::SegmentedVolumeAccept(albaVME*node)
 {
@@ -1939,6 +2069,12 @@ bool albaOpSegmentation::SegmentedVolumeAccept(albaVME*node)
 	return false;
 }
 
+//----------------------------------------------------------------------------
+bool albaOpSegmentation::MaskAccept(albaVME* node)
+{
+	return(node != NULL && node->GetOutput()->IsA("albaVMEOutputSurface"));
+}
+
 // EDIT PHASE EVENTS
 //------------------------------------------------------------------------
 void albaOpSegmentation::OnEditSegmentationEvent(albaEvent *e)
@@ -1950,48 +2086,41 @@ void albaOpSegmentation::OnEditSegmentationEvent(albaEvent *e)
 			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
 		}
 		break;
-		case ID_MANUAL_TOOLS_BRUSH:
+		
+		case ID_SWITCH_TO_YZ:
+		case ID_SWITCH_TO_XZ:
+		case ID_SWITCH_TO_XY:
 		{
-			m_ManualSegmentationTools = DRAW_EDIT;
+			m_OldManualSegmentationTools = m_ManualSegmentationTools;
+			m_ManualSegmentationTools = SWITCH_PLANE;
+			m_SwitchTO = e->GetId();
 
-			m_SnippetsLabel->SetLabel(_(" 'Left Click' Draw. | Ctrl + 'Left Click' Erase. | Shift + Scroll set brush size."));
-
-			SetCursor(CUR_PENCIL);
+			m_SnippetsLabel->SetLabel(_(" Click on the image to switch to the selected plane"));
+		
+			SetCursor(CUR_DEFAULT);
 
 			EnableSizerContent(m_FillEditingSizer, false);
-			EnableSizerContent(m_BrushEditingSizer, true);
+			EnableSizerContent(m_BrushEditingSizer, false);
+			m_GuiDialog->Enable(ID_SLICE_PLANE, false);
+			m_GuiDialog->Enable(ID_SLICE_SLIDER, false);
+			m_GuiDialog->Enable(ID_SLICE_NEXT, false);
+			m_GuiDialog->Enable(ID_SLICE_PREV, false);
+			m_GuiDialog->Enable(ID_SLICE_TEXT, false);
+			m_GuiDialog->Enable(ID_BUTTON_INIT, false);
+			m_GuiDialog->Enable(ID_MANUAL_COPY_FROM_LAST_SLICE, false);
+
+
 			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
 		}
+		break;
+		case ID_MANUAL_TOOLS_BRUSH:
+			OnToolBrush();
 		break;
 		case ID_MANUAL_TOOLS_FILL:
-		{
-			m_ManualSegmentationTools = FILL_EDIT;
-
-			m_SnippetsLabel->SetLabel(_(" 'Left Click' Fill. | Ctrl + 'Left Click' Erase. | Shift + Scroll set threshold."));
-
-			SetCursor(CUR_FILL);
-
-			EnableSizerContent(m_FillEditingSizer, true);
-			EnableSizerContent(m_BrushEditingSizer, false);
-			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
-			RestoreSliceBackup();
-			//OnUpdateSlice();
-		}
+			OnFillEdit();
 		break;
 		case ID_MANUAL_TOOLS_3D_CONNECTIVITY:
-		{
-			m_ManualSegmentationTools = CONNECTIVITY_3D;
-
-			m_SnippetsLabel->SetLabel(_(" 'Left Click' Select connected area"));
-
-			SetCursor(CUR_FILL);
-
-			EnableSizerContent(m_FillEditingSizer, false);
-			EnableSizerContent(m_BrushEditingSizer, false);
-			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
-			RestoreSliceBackup();
-			OnUpdateSlice();
-		}
+			OnConnectivity3d();
 		case ID_MANUAL_BRUSH_SHAPE:
 		case ID_MANUAL_BRUSH_SIZE:
 		{
@@ -2015,6 +2144,39 @@ void albaOpSegmentation::OnEditSegmentationEvent(albaEvent *e)
 			albaEventMacro(*e);
 	}
 	m_GuiDialog->SetFocusIgnoringChildren();
+}
+
+//----------------------------------------------------------------------------
+void albaOpSegmentation::OnToolBrush()
+{
+	m_ManualSegmentationTools = DRAW_EDIT;
+
+	m_SnippetsLabel->SetLabel(_(" 'Left Click' Draw. | Ctrl + 'Left Click' Erase. | Shift + Scroll set brush size."));
+
+	if (m_BrushFillErase)
+		SetCursor(CUR_ERASE);
+	else
+		SetCursor(CUR_PENCIL);
+
+	EnableSizerContent(m_FillEditingSizer, false);
+	EnableSizerContent(m_BrushEditingSizer, true);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
+}
+
+//----------------------------------------------------------------------------
+void albaOpSegmentation::OnConnectivity3d()
+{
+	m_ManualSegmentationTools = CONNECTIVITY_3D;
+
+	m_SnippetsLabel->SetLabel(_(" 'Left Click' Select connected area"));
+
+	SetCursor(CUR_FILL);
+
+	EnableSizerContent(m_FillEditingSizer, false);
+	EnableSizerContent(m_BrushEditingSizer, false);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
+	RestoreSliceBackup();
+	OnUpdateSlice();
 }
 
 //----------------------------------------------------------------------------
@@ -2214,6 +2376,58 @@ void albaOpSegmentation::Fill(albaEvent *e)
 }
 
 //----------------------------------------------------------------------------
+void albaOpSegmentation::SwitchPlane(albaEvent * e)
+{
+	int plane, indexes[2],index;
+	m_Helper.GetSlicePoint(m_SlicePlane, (double *)e->GetPointer(), indexes);
+
+	if (m_SwitchTO == ID_SWITCH_TO_YZ)
+	{
+		plane = 0; index = indexes[0] + 1;
+	}
+	else if (m_SwitchTO == ID_SWITCH_TO_XZ)
+	{
+		plane = 1; 
+		if (m_SlicePlane == 0)
+			index = indexes[0] + 1;
+		else
+			index = indexes[1] + 1;
+	}
+	else
+	{
+		plane = 2; index = indexes[1]+1;
+	}
+
+	SetSlicingIndexes(plane, m_SliceIndex);
+	OnSelectSlicePlane();
+	SetSlicingIndexes(m_SlicePlane, index);
+	OnUpdateSlice();
+
+
+	//Restore old status
+
+	m_GuiDialog->Enable(ID_SLICE_PLANE, true);
+	m_GuiDialog->Enable(ID_SLICE_SLIDER, true);
+	m_GuiDialog->Enable(ID_SLICE_NEXT, true);
+	m_GuiDialog->Enable(ID_SLICE_PREV, true);
+	m_GuiDialog->Enable(ID_SLICE_TEXT, true);
+	m_GuiDialog->Enable(ID_BUTTON_INIT, true);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_COPY_FROM_LAST_SLICE, false);
+
+
+	if (m_OldManualSegmentationTools == DRAW_EDIT)
+		OnToolBrush();
+	else if (m_OldManualSegmentationTools == FILL_EDIT)
+		OnFillEdit();
+	else if (m_OldManualSegmentationTools == CONNECTIVITY_3D)
+		OnConnectivity3d();
+	else
+		assert(false);
+	
+}
+
+
+//----------------------------------------------------------------------------
 void albaOpSegmentation::CopyFromLastSlice()
 {
 	AddUndoStep();
@@ -2271,7 +2485,6 @@ UndoRedoState albaOpSegmentation::CreateVolumeUndoRedoState()
 
 	return urs;
 }
-
 //----------------------------------------------------------------------------
 UndoRedoState albaOpSegmentation::CreateUndoRedoState()
 {
@@ -2609,7 +2822,7 @@ int albaOpSegmentation::PressKey(int keyCode, bool ctrl, bool alt, bool shift)
 
 	if (m_CurrentPhase == INIT_SEGMENTATION)
 	{
-		if (m_InitModality != LOAD_INIT)
+		if (m_InitModality != LOADSEGM_INIT && m_InitModality != LOADMASK_INIT)
 		{
 			if (ctrl) // Pick Min
 			{
@@ -2700,6 +2913,7 @@ int albaOpSegmentation::ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift)
 //----------------------------------------------------------------------------
 void albaOpSegmentation::SetCursor(int cursorId)
 {
+	m_CursorId = cursorId;
 	if (cursorId < 0)
 	{
 		m_View->GetWindow()->SetCursor(wxCursor(wxCURSOR_ARROW));
@@ -2746,4 +2960,20 @@ void albaOpSegmentation::InitMouseCursors()
 	m_CursorImageVect.push_back(wxImage(Pencil_Erase_Size_xpm));
 	m_CursorImageVect.push_back(wxImage(Slice_Up_xpm));
 	m_CursorImageVect.push_back(wxImage(Slice_Down_xpm));
+}
+
+//----------------------------------------------------------------------------
+void albaOpSegmentation::OnFillEdit()
+{
+	m_ManualSegmentationTools = FILL_EDIT;
+
+	m_SnippetsLabel->SetLabel(_(" 'Left Click' Fill. | Ctrl + 'Left Click' Erase. | Shift + Scroll set threshold."));
+
+	SetCursor(CUR_FILL);
+
+	EnableSizerContent(m_FillEditingSizer, true);
+	EnableSizerContent(m_BrushEditingSizer, false);
+	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Update();
+	RestoreSliceBackup();
+	//OnUpdateSlice();
 }

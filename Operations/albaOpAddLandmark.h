@@ -76,7 +76,7 @@ public:
 		ID_SHOW_LANDMARK_GROUP,
 	};
 
-	albaOpAddLandmark(const wxString &label = "AddLandmark  \tCtrl+A");
+	albaOpAddLandmark(const wxString &label = "AddLandmark  \tCtrl+A", const wxString dictionary = "", const wxString cloudName = "New landmark cloud");
 	~albaOpAddLandmark();
 
 	virtual void OnEvent(albaEventBase *alba_event);
@@ -161,7 +161,6 @@ protected:
 
 	albaVMELandmarkCloud *m_Cloud;
 	albaVMELandmark *m_SelectedLandmark;
-	albaVMELandmark *m_LastSelectedLandmark;
 
 	albaVMELandmarkCloud *m_AuxLandmarkCloud;
 	albaVMELandmark *m_AuxLandmark;
@@ -189,6 +188,7 @@ protected:
 
 	albaString m_RemoveMessage;
 	albaString m_DictMessage;
+	albaString m_Dictionary;
 
 	albaInteractorPERPicker	*m_LandmarkPicker;
 

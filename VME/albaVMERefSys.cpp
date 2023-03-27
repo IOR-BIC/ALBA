@@ -549,48 +549,7 @@ void albaVMERefSys::InternalUpdate()
       LogVector3(point1ABSPosition, "point2ABSPosition abs position");
     }
 
-		double point1OriginVector[3],point2OriginVector[3],point1Point2CrossProductVector[3];
-
-		point1OriginVector[0] = point1ABSPosition[0] - originABSPosition[0];
-		point1OriginVector[1] = point1ABSPosition[1] - originABSPosition[1];
-		point1OriginVector[2] = point1ABSPosition[2] - originABSPosition[2];
-
-		point2OriginVector[0] = point2ABSPosition[0] - originABSPosition[0];
-		point2OriginVector[1] = point2ABSPosition[1] - originABSPosition[1];
-		point2OriginVector[2] = point2ABSPosition[2] - originABSPosition[2];
-
-		vtkMath::Normalize(point1OriginVector);
-		vtkMath::Normalize(point2OriginVector);
-
-		vtkMath::Cross(point1OriginVector,point2OriginVector,point1Point2CrossProductVector);
-		vtkMath::Normalize(point1Point2CrossProductVector);
-		vtkMath::Cross(point1Point2CrossProductVector,point1OriginVector,point2OriginVector);
-
-		vtkMatrix4x4 *matrix_translation=vtkMatrix4x4::New();
-		matrix_translation->Identity();
-		for(int i=0;i<3;i++)
-			matrix_translation->SetElement(i,3,originABSPosition[i]);
-
-		vtkMatrix4x4 *matrix_rotation=vtkMatrix4x4::New();
-		matrix_rotation->Identity();
-		for(int i=0;i<3;i++)
-			matrix_rotation->SetElement(i,0,point1OriginVector[i]);
-		for(int i=0;i<3;i++)
-			matrix_rotation->SetElement(i,1,point2OriginVector[i]);
-		for(int i=0;i<3;i++)
-			matrix_rotation->SetElement(i,2,point1Point2CrossProductVector[i]);
-
-		albaMatrix a;
-		a.SetVTKMatrix(matrix_rotation);
-		albaMatrix b;
-		b.SetVTKMatrix(matrix_translation);
-		albaMatrix c;
-		albaMatrix::Multiply4x4(b,a,c);
-
-    vtkDEL(matrix_rotation);
-    vtkDEL(matrix_translation);
-
-    this->SetAbsMatrix(c);
+    this->SetAbsMatrix(GetAbsMatrixFromPoints(originABSPosition, point1ABSPosition, point2ABSPosition));
 		this->Modified();
 	}
 	else if(m_Modality== REFSYS_ORIGIN && originVME)
@@ -617,6 +576,54 @@ void albaVMERefSys::InternalUpdate()
 
 
 }
+
+//----------------------------------------------------------------------------
+albaMatrix albaVMERefSys::GetAbsMatrixFromPoints(double * origin, double * point1,  double * point2)
+{
+	double point1OriginVector[3], point2OriginVector[3], point1Point2CrossProductVector[3];
+
+	point1OriginVector[0] = point1[0] - origin[0];
+	point1OriginVector[1] = point1[1] - origin[1];
+	point1OriginVector[2] = point1[2] - origin[2];
+
+	point2OriginVector[0] = point2[0] - origin[0];
+	point2OriginVector[1] = point2[1] - origin[1];
+	point2OriginVector[2] = point2[2] - origin[2];
+
+	vtkMath::Normalize(point1OriginVector);
+	vtkMath::Normalize(point2OriginVector);
+
+	vtkMath::Cross(point1OriginVector, point2OriginVector, point1Point2CrossProductVector);
+	vtkMath::Normalize(point1Point2CrossProductVector);
+	vtkMath::Cross(point1Point2CrossProductVector, point1OriginVector, point2OriginVector);
+
+	vtkMatrix4x4 *matrix_translation = vtkMatrix4x4::New();
+	matrix_translation->Identity();
+	for (int i = 0; i < 3; i++)
+		matrix_translation->SetElement(i, 3, origin[i]);
+
+	vtkMatrix4x4 *matrix_rotation = vtkMatrix4x4::New();
+	matrix_rotation->Identity();
+	for (int i = 0; i < 3; i++)
+		matrix_rotation->SetElement(i, 0, point1OriginVector[i]);
+	for (int i = 0; i < 3; i++)
+		matrix_rotation->SetElement(i, 1, point2OriginVector[i]);
+	for (int i = 0; i < 3; i++)
+		matrix_rotation->SetElement(i, 2, point1Point2CrossProductVector[i]);
+
+	albaMatrix a;
+	a.SetVTKMatrix(matrix_rotation);
+	albaMatrix b;
+	b.SetVTKMatrix(matrix_translation);
+	albaMatrix c;
+	albaMatrix::Multiply4x4(b, a, c);
+
+	vtkDEL(matrix_rotation);
+	vtkDEL(matrix_translation);
+
+	return c;
+}
+
 //-------------------------------------------------------------------------
 albaVME *albaVMERefSys::GetPoint1VME()
 //-------------------------------------------------------------------------

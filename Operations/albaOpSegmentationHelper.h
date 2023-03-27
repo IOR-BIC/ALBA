@@ -93,6 +93,9 @@ public:
 	void StartDrawing() { m_IsDrawing = true; }
 
 	int IsDrawing() { return m_IsDrawing;}
+
+	void GetSlicePoint(int slicePlane, double *pos, int *sclicePoint);
+
 protected:
 
 	void InternalTheshold(int dataType, double *threshold, int n, void * inputPointer, unsigned char * outputPointer, int offset = 0);
@@ -104,8 +107,6 @@ protected:
 	void InternalFill(slicePoint startPoint, double minValue, double maxValue, int fillValue, DataType *inputScalars, unsigned char *outputScalars);
 
 	void DrawBrushPointer(int x,int y, int *sliceDim, int slicePlane, int brushSize, int brushShape, bool erase);
-
-	void GetSlicePoint(int slicePlane, double *pos, int *sclicePoint);
 
 	albaVMEVolumeGray *m_Volume;
 	albaVMEVolumeGray *m_Segmentation;

@@ -913,21 +913,21 @@ bool albaInteractor2DMeasure_Template::Load(albaVME *input, wxString tag)
 		// Reload points
 		for (int i = 0; i < nTemplates; i++)
 		{
-			pointUL[X] = measureTemplatePoint1Tag->GetValueAsDouble(i * 2 + 0);
-			pointUL[Y] = measureTemplatePoint1Tag->GetValueAsDouble(i * 2 + 1);
-			pointUL[Z] = measureTemplatePoint1Tag->GetValueAsDouble(i * 2 + 2);
+			pointUL[X] = measureTemplatePoint1Tag->GetValueAsDouble(i * 3 + 0);
+			pointUL[Y] = measureTemplatePoint1Tag->GetValueAsDouble(i * 3 + 1);
+			pointUL[Z] = measureTemplatePoint1Tag->GetValueAsDouble(i * 3 + 2);
 
-			pointUR[X] = measureTemplatePoint2Tag->GetValueAsDouble(i * 2 + 0);
-			pointUR[Y] = measureTemplatePoint2Tag->GetValueAsDouble(i * 2 + 1);
-			pointUR[Z] = measureTemplatePoint2Tag->GetValueAsDouble(i * 2 + 2);
+			pointUR[X] = measureTemplatePoint2Tag->GetValueAsDouble(i * 3 + 0);
+			pointUR[Y] = measureTemplatePoint2Tag->GetValueAsDouble(i * 3 + 1);
+			pointUR[Z] = measureTemplatePoint2Tag->GetValueAsDouble(i * 3 + 2);
 
-			pointDR[X] = measureTemplatePoint3Tag->GetValueAsDouble(i * 2 + 0);
-			pointDR[Y] = measureTemplatePoint3Tag->GetValueAsDouble(i * 2 + 1);
-			pointDR[Z] = measureTemplatePoint3Tag->GetValueAsDouble(i * 2 + 2);
+			pointDR[X] = measureTemplatePoint3Tag->GetValueAsDouble(i * 3 + 0);
+			pointDR[Y] = measureTemplatePoint3Tag->GetValueAsDouble(i * 3 + 1);
+			pointDR[Z] = measureTemplatePoint3Tag->GetValueAsDouble(i * 3 + 2);
 
-			pointDL[X] = measureTemplatePoint4Tag->GetValueAsDouble(i * 2 + 0);
-			pointDL[Y] = measureTemplatePoint4Tag->GetValueAsDouble(i * 2 + 1);
-			pointDL[Z] = measureTemplatePoint4Tag->GetValueAsDouble(i * 2 + 2);
+			pointDL[X] = measureTemplatePoint4Tag->GetValueAsDouble(i * 3 + 0);
+			pointDL[Y] = measureTemplatePoint4Tag->GetValueAsDouble(i * 3 + 1);
+			pointDL[Z] = measureTemplatePoint4Tag->GetValueAsDouble(i * 3 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -981,21 +981,21 @@ bool albaInteractor2DMeasure_Template::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			measureTemplatePoint1Tag.SetValue(pointUL[X], i * 2 + 0);
-			measureTemplatePoint1Tag.SetValue(pointUL[Y], i * 2 + 1);
-			measureTemplatePoint1Tag.SetValue(pointUL[Z], i * 2 + 2);
+			measureTemplatePoint1Tag.SetValue(pointUL[X], i * 3 + 0);
+			measureTemplatePoint1Tag.SetValue(pointUL[Y], i * 3 + 1);
+			measureTemplatePoint1Tag.SetValue(pointUL[Z], i * 3 + 2);
 
-			measureTemplatePoint2Tag.SetValue(pointUR[X], i * 2 + 0);
-			measureTemplatePoint2Tag.SetValue(pointUR[Y], i * 2 + 1);
-			measureTemplatePoint2Tag.SetValue(pointUR[Z], i * 2 + 2);
+			measureTemplatePoint2Tag.SetValue(pointUR[X], i * 3 + 0);
+			measureTemplatePoint2Tag.SetValue(pointUR[Y], i * 3 + 1);
+			measureTemplatePoint2Tag.SetValue(pointUR[Z], i * 3 + 2);
 
-			measureTemplatePoint3Tag.SetValue(pointDR[X], i * 2 + 0);
-			measureTemplatePoint3Tag.SetValue(pointDR[Y], i * 2 + 1);
-			measureTemplatePoint3Tag.SetValue(pointDR[Z], i * 2 + 2);
+			measureTemplatePoint3Tag.SetValue(pointDR[X], i * 3 + 0);
+			measureTemplatePoint3Tag.SetValue(pointDR[Y], i * 3 + 1);
+			measureTemplatePoint3Tag.SetValue(pointDR[Z], i * 3 + 2);
 
-			measureTemplatePoint4Tag.SetValue(pointDL[X], i * 2 + 0);
-			measureTemplatePoint4Tag.SetValue(pointDL[Y], i * 2 + 1);
-			measureTemplatePoint4Tag.SetValue(pointDL[Z], i * 2 + 2);
+			measureTemplatePoint4Tag.SetValue(pointDL[X], i * 3 + 0);
+			measureTemplatePoint4Tag.SetValue(pointDL[Y], i * 3 + 1);
+			measureTemplatePoint4Tag.SetValue(pointDL[Z], i * 3 + 2);
 		}
 
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))
