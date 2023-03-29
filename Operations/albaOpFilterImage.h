@@ -30,7 +30,7 @@ class vtkImageData;
 
 const unsigned int Dimension = 2;
 
-typedef double InputPixelTypeFloat;
+typedef float InputPixelTypeFloat;
 typedef itk::Image< InputPixelTypeFloat, Dimension > ImageType;
 
 //----------------------------------------------------------------------------
@@ -79,8 +79,29 @@ public:
 	/** Receive events coming from the user interface.*/
 	void OnEvent(albaEventBase *alba_event);
 
+	/** Runs Selected Filter */
 	void RunFilter(FilterTypes filterType);
   
+	/** Gets the median filter radius parameter */
+	int *GetMedianRadius() { return m_MedianRadius; }
+
+	/** Sets the median filter radius parameter */
+	void SetMedianRadius(int x, int y) { m_MedianRadius[0] = x, m_MedianRadius[1] = y; }
+
+	/** Sets the threshold filter parameters */
+	void SetThreshold(double value, double limit, bool thresholdBelow) { m_ThresholdOutsideValue = value; m_ThresholdLimit = limit; m_ThesholdBelow = thresholdBelow; }
+
+	/** Sets the binary threshold filter parameters */
+	void SetBinaryThreshold(double values[2], double limits[2]) { m_ThresholdBinaryValues[0] = values[0]; m_ThresholdBinaryValues[1] = values[1]; m_ThresholdBinaryLimits[0] = limits[0], m_ThresholdBinaryLimits[1] = limits[1]; }
+
+	/** Sets the binary threshold filter parameters */
+	void SetCannyEdge(double variance, double thresholds[2]) { m_CannyVariance = variance; m_CannyThesholds[0] = thresholds[0];	m_CannyThesholds[1] = thresholds[1];	}
+
+	/** Undo last filter */
+	void UndoFilter();
+
+	/** Sets the ZeroCrossing Edge filter variance parameter */
+	void SetZeroEdgeVariance(double val) { m_ZeroEdgeVariance = val; }
 protected:
 
 
@@ -102,7 +123,6 @@ protected:
 	void CannyEdgeFilter(const ImageType *inputImage, ImageType *outputImage);
 	void ZeroCrossingEdgeFilter(const ImageType *inputImage, ImageType *outputImage);
 	void LaplacianRecursiveFilter(const ImageType *inputImage, ImageType *outputImage);
-	void OnUndo();
 
 	albaVMEImage *m_ImgOut;
 	std::vector<vtkImageData *> m_UndoStack;
