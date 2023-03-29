@@ -46,6 +46,7 @@ public:
 DECLARE_APP(TestApp)
 
 #define COMPARE_IMAGES(imageName, ...) CompareImage(getTestNamer__().getFixtureName().c_str(), imageName, ##__VA_ARGS__)
+#define COMPARE_VTK_IMAGES(vtkImg, imageName, ...) CompareVTKImage(vtkImg, getTestNamer__().getFixtureName().c_str(), imageName, ##__VA_ARGS__)
 #define GET_TEST_DATA_DIR() GetTestDataDir(getTestNamer__().getFixtureName().c_str())
 
 class albaTest : public CPPUNIT_NS::TestFixture
@@ -69,6 +70,8 @@ public:
 
 protected:
 	void CompareImage(albaString suiteName, albaString imageName, int index = -1);
+
+	void CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, albaString imageName, int index=-1);
 	
 	albaString GetTestDataDir(albaString suiteName);
 

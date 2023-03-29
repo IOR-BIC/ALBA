@@ -43,6 +43,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "itkBinaryThresholdImageFilter.h"
 #include "itkZeroCrossingBasedEdgeDetectionImageFilter.h"
 #include "itkLaplacianRecursiveGaussianImageFilter.h"
+#include "itkRescaleIntensityImageFilter.h"
 
 #include "vtkALBASmartPointer.h"
 #include "wx\busyinfo.h"
@@ -99,18 +100,55 @@ void albaOpFilterImage::OpRun()
 		im->Update();
 
 		vtkALBASmartPointer<vtkImageCast> vtkImageToFloat;
-		vtkImageToFloat->SetOutputScalarTypeToDouble();
+		vtkImageToFloat->SetOutputScalarTypeToFloat();
 		vtkImageToFloat->SetInput(im);
 		vtkImageToFloat->Modified();
 		vtkImageToFloat->Update();
-
 
 		albaString name = m_Input->GetName();
 		name << " - Filtered";
 
 		albaNEW(m_ImgOut);
 		m_ImgOut->SetName(name);
-		m_ImgOut->SetData(vtkImageToFloat->GetOutput(), m_Input->GetTimeStamp());
+
+		if (vtkImageToFloat->GetOutput()->GetNumberOfScalarComponents() != 1)
+		{
+			albaLogMessage("Warning the input image is not a monochrome one, it will be converted to apply the filters");
+			int inputDimensions[3];
+			vtkImageToFloat->GetOutput()->GetDimensions(inputDimensions);
+			vtkImageData *outputImageData;
+			vtkNEW(outputImageData);
+			outputImageData->SetDimensions(inputDimensions[0], inputDimensions[1], inputDimensions[2]);
+			outputImageData->SetNumberOfScalarComponents(1);
+			outputImageData->SetScalarType(vtkImageToFloat->GetOutput()->GetScalarType());
+			outputImageData->AllocateScalars();
+
+
+			vtkDataArray *outScalars=outputImageData->GetPointData()->GetScalars();
+			vtkDataArray *inScalars = vtkImageToFloat->GetOutput()->GetPointData()->GetScalars();
+
+			for(int i=0;i<inScalars->GetNumberOfTuples();i++)
+			{
+				float grayValue = 0;
+				for (int j = 0; j< inScalars->GetNumberOfComponents(); j++)
+					grayValue += inScalars->GetComponent(i, j);
+
+				grayValue /= (double)inScalars->GetNumberOfComponents();
+						
+				outScalars->SetTuple1(i, grayValue);
+			}
+
+			m_ImgOut->SetData(outputImageData, m_Input->GetTimeStamp());
+			outputImageData->GetScalarRange(m_ImgRange);
+
+			vtkDEL(outputImageData);
+		}
+		else
+		{
+			m_ImgOut->SetData(vtkImageToFloat->GetOutput(), m_Input->GetTimeStamp());
+			vtkImageToFloat->GetOutput()->GetScalarRange(m_ImgRange);
+		}
+	
 		m_ImgOut->Update();
 		m_ImgOut->ReparentTo(m_Input);
 		m_ImgOut->Delete();
@@ -119,10 +157,11 @@ void albaOpFilterImage::OpRun()
 
 
 		//Preparing ThesholdLimits values and bounds
-		vtkImageToFloat->GetOutput()->GetScalarRange(m_ImgRange);
 		m_ThresholdLimit = (m_ImgRange[0] + m_ImgRange[1]) / 2.0;
 		m_ThresholdBinaryLimits[0] = (m_ImgRange[0] + m_ImgRange[1]) / 3.0;
 		m_ThresholdBinaryLimits[1] = (m_ImgRange[0] + m_ImgRange[1]) * 2.0 / 3.0;
+
+		m_Output = m_ImgOut;
 	}
 
 	if (!m_TestMode)
@@ -183,7 +222,7 @@ void albaOpFilterImage::OnEvent(albaEventBase *alba_event)
 						break;
 
 					case ID_UNDO:
-						OnUndo();
+						UndoFilter();
 					default:
 						Superclass::OnEvent(alba_event);
 						break;
@@ -199,10 +238,19 @@ void albaOpFilterImage::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 void albaOpFilterImage::RunFilter(FilterTypes filterType)
 {
-	wxBusyInfo busy("Applying filter...");
+	wxBusyInfo *busy = NULL;
+	if (!m_TestMode)
+		busy=new wxBusyInfo("Applying filter...");
+	else
+		albaLogMessage("Applying filter...");
+
+
 	
 	ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New();
+	vtkImageData *newGrayImage = NULL;
 	vtkDataSet * imgSrc = m_ImgOut->GetOutput()->GetVTKData();
+
+
 	vtkTOitk->SetInput(vtkImageData::SafeDownCast(imgSrc));
 	vtkTOitk->Update();
 
@@ -266,6 +314,9 @@ void albaOpFilterImage::RunFilter(FilterTypes filterType)
 
 	if (m_Gui)
 		m_Gui->Enable(ID_UNDO, true);
+
+	vtkDEL(newGrayImage);
+	cppDEL(busy);
 }
 
 //----------------------------------------------------------------------------
@@ -323,7 +374,7 @@ void albaOpFilterImage::CreateGui()
 
 	m_Gui->Label("Canny Edge Det. Filter:", 1);
 	m_Gui->Double(-1, "Variance", &m_CannyVariance, 0, 100, 2);
-	m_Gui->VectorN(-1, "Threshold", m_CannyThesholds, 2, 0, 30);
+	m_Gui->VectorN(-1, "Threshold", m_CannyThesholds, 2, 0, 100);
 	m_Gui->Button(CANNY_EDGE, "Apply");
 	m_Gui->Divider(1);
 	m_Gui->Divider(0);
@@ -352,7 +403,7 @@ void albaOpFilterImage::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void albaOpFilterImage::OnUndo()
+void albaOpFilterImage::UndoFilter()
 {
 	m_ImgOut->SetData(m_UndoStack[m_UndoStack.size() - 1], m_Input->GetTimeStamp());
 	vtkDEL(m_UndoStack[m_UndoStack.size() - 1]);
@@ -422,7 +473,8 @@ void albaOpFilterImage::ThresholdBinaryFilter(const ImageType *inputImage, Image
 	FilterType::Pointer filter = FilterType::New();
 	filter->SetInput(inputImage);
 
-	filter->SetOutsideValue(m_ThresholdBinaryValues[0]);
+	filter->SetInsideValue(m_ThresholdBinaryValues[0]);
+	filter->SetOutsideValue(m_ThresholdBinaryValues[1]);
 	filter->SetLowerThreshold(m_ThresholdBinaryLimits[0]);
 	filter->SetUpperThreshold(m_ThresholdBinaryLimits[1]);
 
@@ -469,7 +521,17 @@ void albaOpFilterImage::CannyEdgeFilter(const ImageType *inputImage, ImageType *
 
 	filter->Update();
 
-	outputImage->Graft(filter->GetOutput());
+	// Rescale the pixel values
+	using RescalerType = itk::RescaleIntensityImageFilter<ImageType, ImageType>;
+	RescalerType::Pointer rescaler = RescalerType::New();
+	rescaler->SetInput(filter->GetOutput());
+	rescaler->SetOutputMinimum(0);
+	rescaler->SetOutputMaximum(255);
+	rescaler->Update();
+
+
+
+	outputImage->Graft(rescaler->GetOutput());
 }
 
 //----------------------------------------------------------------------------
@@ -480,10 +542,18 @@ void albaOpFilterImage::ZeroCrossingEdgeFilter(const ImageType *inputImage, Imag
 	filter->SetInput(inputImage);
 
 	filter->SetVariance(m_ZeroEdgeVariance);
-
 	filter->Update();
 
-	outputImage->Graft(filter->GetOutput());
+
+	// Rescale the pixel values
+	using RescalerType = itk::RescaleIntensityImageFilter<ImageType, ImageType>;
+	RescalerType::Pointer rescaler = RescalerType::New();
+	rescaler->SetInput(filter->GetOutput());
+	rescaler->SetOutputMinimum(0);
+	rescaler->SetOutputMaximum(255);
+	rescaler->Update();
+
+	outputImage->Graft(rescaler->GetOutput());
 }
 
 //----------------------------------------------------------------------------
