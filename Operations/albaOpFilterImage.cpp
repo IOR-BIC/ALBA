@@ -44,6 +44,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "itkZeroCrossingBasedEdgeDetectionImageFilter.h"
 #include "itkLaplacianRecursiveGaussianImageFilter.h"
 #include "itkRescaleIntensityImageFilter.h"
+#include "itkOtsuThresholdImageFilter.h"
 
 #include "vtkALBASmartPointer.h"
 #include "wx\busyinfo.h"
@@ -276,6 +277,9 @@ void albaOpFilterImage::RunFilter(FilterTypes filterType)
 		case THRESHOLD_BINARY_FILTER:
 			ThresholdBinaryFilter(vtkTOitk->GetOutput(), outImg);
 			break;
+		case OTSU_THRESHOLD_FILTER:
+			OtsuThresholdFilter(vtkTOitk->GetOutput(), outImg);
+			break;
 		case GRADIENT_MAGNITUDE:
 			GradientMaglitudeFilter(vtkTOitk->GetOutput(), outImg);
 			break;
@@ -359,6 +363,14 @@ void albaOpFilterImage::CreateGui()
 	m_Gui->Divider(1);
 	m_Gui->Divider(0);
 	m_Gui->Divider(0);
+	
+
+	m_Gui->Label("OTSU Threshold Filter:", 1);
+	m_Gui->Button(OTSU_THRESHOLD_FILTER, "Apply");
+	m_Gui->Divider(1);
+	m_Gui->Divider(0);
+	m_Gui->Divider(0);
+
 
 	m_Gui->Label("Gradient Magnitude Filter:", 1);
 	m_Gui->Button(GRADIENT_MAGNITUDE, "Apply");
@@ -482,6 +494,28 @@ void albaOpFilterImage::ThresholdBinaryFilter(const ImageType *inputImage, Image
 
 	outputImage->Graft(filter->GetOutput());
 
+}
+
+//----------------------------------------------------------------------------
+void albaOpFilterImage::OtsuThresholdFilter(const ImageType *inputImage, ImageType *outputImage)
+{
+	using FilterType = itk::OtsuThresholdImageFilter<ImageType, ImageType>;
+
+	FilterType::Pointer filter = FilterType::New();
+	filter->SetInput(inputImage);
+
+	filter->Update();
+
+	// Rescale the pixel values
+	using RescalerType = itk::RescaleIntensityImageFilter<ImageType, ImageType>;
+	RescalerType::Pointer rescaler = RescalerType::New();
+	rescaler->SetInput(filter->GetOutput());
+	rescaler->SetOutputMinimum(0);
+	rescaler->SetOutputMaximum(255);
+	rescaler->Update();
+
+
+	outputImage->Graft(rescaler->GetOutput());
 }
 
 //----------------------------------------------------------------------------
