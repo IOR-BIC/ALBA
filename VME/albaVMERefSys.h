@@ -116,6 +116,9 @@ public:
 	/** Return true if you can use a move operation on this vme */
 	bool IsMovable();
 
+	/** generate an abstract matrix used to put a refsys in the origin who is complanar with p1, andp2*/
+	static albaMatrix GetAbsMatrixFromPoints(double * origin, double * point1, double * point2);
+	
 protected:
   albaVMERefSys();
   virtual ~albaVMERefSys();
@@ -128,6 +131,7 @@ protected:
 
   /** update the output data structure */
   virtual void InternalUpdate();
+
 
   /** used to initialize and create the material attribute if not yet present */
   virtual int InternalInitialize();

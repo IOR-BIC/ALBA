@@ -504,16 +504,18 @@ bool albaInteractor2DMeasure_Line::Load(albaVME *input, wxString tag)
 
 		int nLines = measureLinePoint1Tag->GetNumberOfComponents() / 2;
 
+		m_CurrentRenderer = m_Renderer;
+
 		// Reload points
 		for (int i = 0; i < nLines; i++)
 		{
-			point1[X] = measureLinePoint1Tag->GetValueAsDouble(i * 2 + 0);
-			point1[Y] = measureLinePoint1Tag->GetValueAsDouble(i * 2 + 1);
-			point1[Z] = measureLinePoint1Tag->GetValueAsDouble(i * 2 + 2);
+			point1[X] = measureLinePoint1Tag->GetValueAsDouble(i * 3 + 0);
+			point1[Y] = measureLinePoint1Tag->GetValueAsDouble(i * 3 + 1);
+			point1[Z] = measureLinePoint1Tag->GetValueAsDouble(i * 3 + 2);
 
-			point2[X] = measureLinePoint2Tag->GetValueAsDouble(i * 2 + 0);
-			point2[Y] = measureLinePoint2Tag->GetValueAsDouble(i * 2 + 1);
-			point2[Z] = measureLinePoint2Tag->GetValueAsDouble(i * 2 + 2);
+			point2[X] = measureLinePoint2Tag->GetValueAsDouble(i * 3 + 0);
+			point2[Y] = measureLinePoint2Tag->GetValueAsDouble(i * 3 + 1);
+			point2[Z] = measureLinePoint2Tag->GetValueAsDouble(i * 3 + 2);
 
 			albaString measureType = measureTypeTag->GetValue(i);
 			albaString measureLabel = measureLabelTag->GetValue(i);
@@ -559,13 +561,13 @@ bool albaInteractor2DMeasure_Line::Save(albaVME *input, wxString tag)
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);
 
-			measureLinePoint1Tag.SetValue(point1[X], i * 2 + 0);
-			measureLinePoint1Tag.SetValue(point1[Y], i * 2 + 1);
-			measureLinePoint1Tag.SetValue(point1[Z], i * 2 + 2);
+			measureLinePoint1Tag.SetValue(point1[X], i * 3 + 0);
+			measureLinePoint1Tag.SetValue(point1[Y], i * 3 + 1);
+			measureLinePoint1Tag.SetValue(point1[Z], i * 3 + 2);
 
-			measureLinePoint2Tag.SetValue(point2[X], i * 2 + 0);
-			measureLinePoint2Tag.SetValue(point2[Y], i * 2 + 1);
-			measureLinePoint2Tag.SetValue(point2[Z], i * 2 + 2);
+			measureLinePoint2Tag.SetValue(point2[X], i * 3 + 0);
+			measureLinePoint2Tag.SetValue(point2[Y], i * 3 + 1);
+			measureLinePoint2Tag.SetValue(point2[Z], i * 3 + 2);
 		}
 
 		if (input->GetTagArray()->IsTagPresent(tag + "MeasureType"))

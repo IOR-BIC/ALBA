@@ -281,19 +281,26 @@ int albaVMELandmarkCloud::SetNumberOfLandmarks(int num)
 //----------------------------------------------------------------------------
 int albaVMELandmarkCloud::AppendLandmark(double x, double y, double z, const char *name)
 {
-	if (GetLandmarkIndex(name) >= 0)
+	albaVMELandmark *lm;
+
+	int lmIndex = GetLandmarkIndex(name);
+	if (lmIndex >= 0)
 	{
-		albaErrorMacro("Cannot add new landmark \"" << name << "\": a landmark with the same name already exists!!!");
-		return -1;
+		albaLogMessage("Warning cannot add new landmark \"%s\": a landmark with the same name already exists!!", name);
+		lm = GetLandmark(lmIndex);
 	}
-	
-	albaVMELandmark *newLM;
-	albaNEW(newLM);
-	newLM->SetName(name);
-	newLM->SetPoint(x, y, z);
-	newLM->ReparentTo(this);
-	
-	return m_NumberOfLandmarks-1;
+	else
+	{
+		albaNEW(lm);
+		lm->SetName(name);
+		lm->ReparentTo(this);
+		lmIndex = m_NumberOfLandmarks - 1;
+	}
+
+	SetLandmark(lmIndex, x, y, z);
+
+	return lmIndex;
+
 }
 
 //-------------------------------------------------------------------------
@@ -311,10 +318,24 @@ int albaVMELandmarkCloud::SetLandmark(int idx, double x, double y, double z, alb
 		albaErrorMacro("Problems setting position of " << idx << "th landmark in the open cloud");
 		return ALBA_ERROR;
 	}
-
+	/*albaMatrix * itemMtr = GetMatrixVector()->GetItem(t);
+	if (itemMtr) {
+		albaMatrix identity, mtr;
+		mtr.DeepCopy(itemMtr);
+		if (!identity.Equals(&mtr))
+		{
+			double in[4] = { x,y,z,1 };
+			double out[4];
+			mtr.Invert();
+			mtr.MultiplyPoint(in, out);
+			x = out[0];
+			y = out[1];
+			z = out[2];
+		}
+	}*/
 	lm->SetPose(x, y, z, 0, 0, 0, t);
 
-	return SetLandmarkToPolydata(idx, x, y, z, true, t);
+	return SetLandmarkToPolydata(idx, x, y, z, m_LMChildrenShow[idx], t);
 }
 
 //----------------------------------------------------------------------------
@@ -349,12 +370,21 @@ int albaVMELandmarkCloud::GetLandmarkIndex(const char *name)
 //-------------------------------------------------------------------------
 int albaVMELandmarkCloud::GetLandmark(int idx, double &x,double &y,double &z,albaTimeStamp t)
 {
-  return Superclass::GetPoint(idx,x,y,z,t);
+	double rPos[3];
+	albaVMELandmark *lm=GetLandmark(idx);
+	
+	if (lm == NULL)
+		return false;
+
+	lm->GetPoint(x, y, z);
+
+	return true;
 }
 //-------------------------------------------------------------------------
 int albaVMELandmarkCloud::GetLandmark(int idx, double xyz[3],albaTimeStamp t)
 {
-  return Superclass::GetPoint(idx,xyz,t);
+	double rPos[3];
+	return GetLandmark(idx, xyz[0], xyz[1], xyz[2], t);
 }
 
 //----------------------------------------------------------------------------
@@ -972,8 +1002,8 @@ int albaVMELandmarkCloud::AddChild(albaVME *node)
 			albaMatrix *mat = albaMatrix::SafeDownCast(it->second);
 			albaTimeStamp timeStamp = mat->GetTimeStamp();
 
-			double pos[3];
-			lm->GetPoint(pos, timeStamp);
+			double pos[3], rPos[3];
+			lm->GetOutput()->GetPose(pos, rPos);
 			
 			//On reparent the node is not showed, so visibility is set to false.
 			SetLandmarkToPolydata(m_NumberOfLandmarks - 1, pos[0], pos[1], pos[2], false, timeStamp);

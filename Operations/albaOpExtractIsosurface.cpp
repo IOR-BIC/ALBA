@@ -139,7 +139,7 @@ albaOp(label)
   m_Optimize     = 1;
 	m_Triangulate = 1;
 	m_Clean				= 1;
-	m_Connectivity = 1;
+	m_Connectivity = 0;
 
   m_MultiContoursFlag = 0;
   m_NumberOfContours = 1;

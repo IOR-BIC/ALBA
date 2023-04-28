@@ -43,6 +43,7 @@
 #include "albaVMERoot.h"
 #include "albaClassicICPRegistration.h"
 #include "vtkTransformPolyDataFilter.h"
+#include "albaVMEIterator.h"
 
 //----------------------------------------------------------------------------
 albaOpClassicICPRegistration::albaOpClassicICPRegistration(wxString label) :
@@ -231,6 +232,8 @@ void albaOpClassicICPRegistration::OpDo()
   m_Registered->SetName(name);
 	m_Registered->ReparentTo(m_Input->GetParent());
 	m_Registered->SetAbsMatrix(*final_matrix);
+
+	albaVMEIterator *iter = m_Registered->NewIterator();
 
 	m_Output = m_Registered;
 

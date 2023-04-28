@@ -44,8 +44,9 @@ template <class MotionReader>
 class albaOpImporterMotionData : public albaOp
 {
 public:
-  albaOpImporterMotionData(const wxString &label, const wxString &pgdWildc, const wxString &dicWildc) :  albaOp(label), m_PgdWildc(pgdWildc), m_DicWildc(dicWildc)
-        //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+  albaOpImporterMotionData(wxString label, wxString pgdWildc, wxString dicWildc) :  albaOp(label), m_PgdWildc(pgdWildc), m_DicWildc(dicWildc)
+  
   {
     m_OpType	= OPTYPE_IMPORTER;
     m_Canundo	= true;
@@ -58,10 +59,9 @@ public:
 
     m_DictionaryAvailable = 0;
   }
-      //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
   ~albaOpImporterMotionData( ) 
-    //----------------------------------------------------------------------------
-  {
+   {
     // Must unregister in order to avoid leaks or data loss
     if (m_Output)
     {
@@ -70,12 +70,9 @@ public:
     }
     m_Vme = NULL;    
   }
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
   albaOp* Copy()   
-    /** restituisce una copia di se stesso, serve per metterlo nell'undo stack */
-    //----------------------------------------------------------------------------
   {
-    //non devo incrementare l'id counter --- vfc le operazioni sono gia inserite nei menu;
     albaOpImporterMotionData *cp = new albaOpImporterMotionData(m_Label, m_PgdWildc, m_DicWildc);
     cp->m_Canundo = m_Canundo;
     cp->m_OpType = m_OpType;
@@ -88,10 +85,9 @@ public:
     return cp;
   }
 
-  //----------------------------------------------------------------------------
-  /** Builds operation's interface. */
+//----------------------------------------------------------------------------
+/** Builds operation's interface. */
   void OpRun()   
-    //----------------------------------------------------------------------------
   {
     int result = OP_RUN_CANCEL;
     m_File = "";
@@ -116,10 +112,9 @@ public:
     }
     albaEventMacro(albaEvent(this,result));
   }
-  //----------------------------------------------------------------------------
-  /** Execute the operation. */
+//----------------------------------------------------------------------------
+/** Execute the operation. */
   void OpDo()   
-    //----------------------------------------------------------------------------
   {
     // Modified by Simone Brazzale, 03/12/2010
     assert(!m_Vme);
@@ -157,52 +152,45 @@ public:
     m_Vme->Register(m_Output);
     GetLogicManager()->VmeAdd(m_Vme);
   }
-  //----------------------------------------------------------------------------
-  /** Set file name. */
+//----------------------------------------------------------------------------
+/** Set file name. */
   void SetFileName(wxString filename)   
-    //----------------------------------------------------------------------------
   {
     m_File = filename;
   }
-  //----------------------------------------------------------------------------
-  /** Set dictionary name. */
+//----------------------------------------------------------------------------
+/** Set dictionary name. */
   void SetDictionaryName(wxString dicname)   
-    //----------------------------------------------------------------------------
   {
     m_Dict = dicname;
   }
-  //----------------------------------------------------------------------------
-  /** Set dictionary flag. */
+//----------------------------------------------------------------------------
+/** Set dictionary flag. */
   void SetDictionaryFlagOn()   
-    //----------------------------------------------------------------------------
   {
     this->m_DictionaryAvailable = 1;
   }
-  //----------------------------------------------------------------------------
-  /** Set dictionary flag. */
+//----------------------------------------------------------------------------
+/** Set dictionary flag. */
   void SetDictionaryFlagOff()   
-    //----------------------------------------------------------------------------
   {
     this->m_DictionaryAvailable = 0;
   }
-  //----------------------------------------------------------------------------
-  /** Get dictionary flag. */
+//----------------------------------------------------------------------------
+/** Get dictionary flag. */
   int GetDictionaryFlag()   
-    //----------------------------------------------------------------------------
   {
     return this->m_DictionaryAvailable;
   }
-  //----------------------------------------------------------------------------
-  /** Get output. */
+//----------------------------------------------------------------------------
+/** Get output. */
   albaVME* GetOutput()   
-    //----------------------------------------------------------------------------
   {
     return this->m_Vme;
   }
-  //----------------------------------------------------------------------------
-  //** Makes the undo for the operation.
+//----------------------------------------------------------------------------
+//** Makes the undo for the operation.
   void OpUndo()   
-  //----------------------------------------------------------------------------
   {
     assert(m_Vme);
     m_Output = NULL;

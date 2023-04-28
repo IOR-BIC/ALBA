@@ -286,6 +286,13 @@ void albaMatrix::Identity(double elements[16])
 }
 
 //----------------------------------------------------------------------------
+bool albaMatrix::IsIdentity()
+{
+	albaMatrix identity;
+	return Equals(&identity);
+}
+
+//----------------------------------------------------------------------------
 // Multiplies matrices a and b and stores the result in c.
 void albaMatrix::Multiply4x4(const double a[16], const double b[16], double c[16])
 //----------------------------------------------------------------------------

@@ -118,6 +118,9 @@ public:
   void Identity() { albaMatrix::Identity(*GetElements()); Modified();}
   static void Identity(double elements[16]);
 
+	/** Return true if is an Identity Matrix */
+	bool IsIdentity();
+
   /**
     Matrix Inversion (adapted from Richard Carling in "Graphics Gems," 
     Academic Press, 1990). static version.*/

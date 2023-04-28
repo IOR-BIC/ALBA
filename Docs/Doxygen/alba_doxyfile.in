@@ -71,7 +71,7 @@ INPUT                  = "@ALBA_SOURCE_DIR@/Base/" \
                          "@ALBA_SOURCE_DIR@/VME/" \
                          "@ALBA_SOURCE_DIR@/VME/DataPipes/" \
                          "@ALBA_SOURCE_DIR@/Operations/" \
-			 "@ALBA_SOURCE_DIR@/vtkALBA/" \
+						 "@ALBA_SOURCE_DIR@/vtkALBA/" \
                          "@ALBA_SOURCE_DIR@/Interaction/"
 FILE_PATTERNS          = *.h
 RECURSIVE              = NO

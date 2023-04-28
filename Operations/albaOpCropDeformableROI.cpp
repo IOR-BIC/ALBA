@@ -57,8 +57,9 @@ albaOp(label)
 	m_ResultVme = NULL;
 
 	m_Distance = 0.0;
-	m_InsideOut = 0;
-	m_FillValue = 0.0;
+	m_Modality = 0;
+	m_TriplePass = false;
+	m_OutsideValue = m_InsideValue = 0.0;
 	m_PNode = NULL;
 }
 //----------------------------------------------------------------------------
@@ -87,9 +88,11 @@ albaOp *albaOpCropDeformableROI::Copy()
 enum FILTER_SURFACE_ID
 {
 	ID_DISTANCE  = MINID,
-	ID_FILL_VALUE,
+	ID_INSIDE_VALUE,
+	ID_OUTSIDE_VALUE,
 	ID_MAX_DISTANCE,
-	ID_INSIDE_OUT,
+	ID_MODALITY,
+	ID_TRIPLE_PASS,
 };
 //----------------------------------------------------------------------------
 void albaOpCropDeformableROI::OpRun()   
@@ -126,17 +129,20 @@ void albaOpCropDeformableROI::OnEvent(albaEventBase *alba_event)
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
-		albaVME *n=NULL;
-		switch(e->GetId())
-		{	
-		case wxOK:
-			//Run algorithm and stop operation
-			Algorithm(m_PNode);
-			OpStop(OP_RUN_OK);        
-			break;
-		case wxCANCEL:
-			OpStop(OP_RUN_CANCEL);        
-			break;
+		albaVME *n = NULL;
+		switch (e->GetId())
+		{
+			case ID_MODALITY:
+				EnableDisableGui();
+				break;
+			case wxOK:
+				//Run algorithm and stop operation
+				Algorithm(m_PNode);
+				OpStop(OP_RUN_OK);
+				break;
+			case wxCANCEL:
+				OpStop(OP_RUN_CANCEL);
+				break;
 		}
 	}
 }
@@ -166,27 +172,16 @@ void albaOpCropDeformableROI::Algorithm(albaVME *vme)
 
 		vme->Update();
 
-		if(albaVMESurface::SafeDownCast(vme))
-		{
-			maskPolydata=(vtkPolyData *)(albaVMESurface::SafeDownCast(vme)->GetOutput()->GetVTKData());
-		}
-		if (albaVMESurfaceParametric::SafeDownCast(vme))
-		{
-			maskPolydata = (vtkPolyData *)(albaVMESurfaceParametric::SafeDownCast(vme)->GetSurfaceOutput()->GetVTKData());
-		}
-		
+		maskPolydata=vtkPolyData::SafeDownCast(vme->GetOutput()->GetVTKData());
 		if(!maskPolydata)
 			return;
 
 
-		
 		albaNEW(m_ResultVme);
 		m_ResultVme->DeepCopy(m_Input);
 		albaString resultName = "Masked ";
 		resultName+=m_Input->GetName();
 		m_ResultVme->SetName(resultName);
-
-		vtkPolyData *Mask;
 
 		albaMatrix identityMatrix;
 		albaMatrix maskABSMatrix = vme->GetAbsMatrixPipe()->GetMatrix();
@@ -225,8 +220,25 @@ void albaOpCropDeformableROI::Algorithm(albaVME *vme)
 		albaVMEVolumeGray *volume = albaVMEVolumeGray::SafeDownCast(m_Input);
 		m_MaskPolydataFilter->SetInput(volume->GetOutput()->GetVTKData());
 		m_MaskPolydataFilter->SetDistance(m_Distance);
-		m_MaskPolydataFilter->SetFillValue(m_FillValue);
-		m_MaskPolydataFilter->SetInsideOut(m_InsideOut);
+		m_MaskPolydataFilter->SetTriplePass(m_TriplePass);
+		m_MaskPolydataFilter->SetInsideValue(m_InsideValue);
+		m_MaskPolydataFilter->SetOutsideValue(m_OutsideValue);
+		if (m_Modality == FILL_OUTSIDE)
+		{
+			m_MaskPolydataFilter->SetInsideOut(false);
+			m_MaskPolydataFilter->SetBinarize(false);
+		}
+		else if (m_Modality == FILL_INSIDE)
+		{
+			m_MaskPolydataFilter->SetInsideOut(true);
+			m_MaskPolydataFilter->SetBinarize(false);
+		}
+		else //m_Modality == BINARIZE
+		{
+			m_MaskPolydataFilter->SetInsideOut(false);
+			m_MaskPolydataFilter->SetBinarize(true);
+		}
+
 		m_MaskPolydataFilter->SetMask(transformedMaskPolydata);
     albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,m_MaskPolydataFilter));
 		m_MaskPolydataFilter->Update();
@@ -253,15 +265,34 @@ void albaOpCropDeformableROI::CreateGui()
 
 	m_Gui->Label("");
 	m_Gui->Label("");
-	m_Gui->Double(ID_DISTANCE,_("Distance"),&m_Distance,0.0);
-	m_Gui->Double(ID_FILL_VALUE,_("Fill value"),&m_FillValue);
-	m_Gui->Bool(ID_INSIDE_OUT,_("Mask inside"),&m_InsideOut);
+
+	//Distance is disabled until a fix
+	//m_Gui->Double(ID_DISTANCE, _("Distance"), &m_Distance, 0.0);
+
+	m_Gui->Label("Values:", true); 
+	m_Gui->Double(ID_INSIDE_VALUE, _("Inside"), &m_InsideValue);
+	m_Gui->Double(ID_OUTSIDE_VALUE, _("Outside"), &m_OutsideValue);
 	m_Gui->Label("");
+
+	m_Gui->Label("Modality:", true);
+	wxString modality_strs[3] = { _("Mask Outside"), _("Mask Inside"), _("Binarize") };
+	m_Gui->Radio(ID_MODALITY, "", &m_Modality, 3, modality_strs);
+	m_Gui->Label("");
+	m_Gui->Bool(ID_TRIPLE_PASS, "Reduce Glitch", &m_TriplePass, true);
 	m_Gui->Label("");
 	m_Gui->Divider(1);
 	m_Gui->OkCancel();
 
+	EnableDisableGui();
+
 	m_Gui->Divider();
+}
+
+//----------------------------------------------------------------------------
+void albaOpCropDeformableROI::EnableDisableGui()
+{
+	m_Gui->Enable(ID_INSIDE_VALUE, m_Modality == FILL_INSIDE || m_Modality == BINARIZE);
+	m_Gui->Enable(ID_OUTSIDE_VALUE, m_Modality == FILL_OUTSIDE || m_Modality == BINARIZE);
 }
 
 void albaOpCropDeformableROI::MaskSelection()

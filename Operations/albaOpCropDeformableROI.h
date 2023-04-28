@@ -43,6 +43,14 @@ class albaVMESurface;
 class ALBA_EXPORT albaOpCropDeformableROI: public albaOp
 {
 public:
+
+	enum MODALITIES
+	{
+		FILL_OUTSIDE,
+		FILL_INSIDE,
+		BINARIZE
+	};
+
   /** construct */
 	albaOpCropDeformableROI(const wxString &label = "CropDeformableROI");
   /** destructor */
@@ -87,11 +95,15 @@ protected:
 	vtkMaskPolyDataFilter *m_MaskPolydataFilter;
 
 	double m_Distance;
-	double m_FillValue;
-	int		m_InsideOut;
+	double m_InsideValue;
+	double m_OutsideValue;
+	int m_Modality;
+	int m_TriplePass;
 	albaVME *m_PNode;
 
 	albaVMEVolumeGray *m_ResultVme;
 
+private:
+	void EnableDisableGui();
 };
 #endif

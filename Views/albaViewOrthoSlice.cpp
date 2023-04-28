@@ -1,3 +1,4 @@
+
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
@@ -94,6 +95,8 @@ albaViewOrthoSlice::albaViewOrthoSlice(wxString label)
 
   m_TrilinearInterpolationOn = TRUE;
 
+	m_Root = NULL;
+
 }
 //----------------------------------------------------------------------------
 albaViewOrthoSlice::~albaViewOrthoSlice()
@@ -127,6 +130,8 @@ void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
   // Disable Visual pipes plug at run time
   m_CanPlugVisualPipes=false;
 
+	m_Root = vme->GetRoot();
+
   // Detect selected vme pos
   int pos=-1;
   for (int i=0; i<m_VMElist.size(); i++)
@@ -143,12 +148,19 @@ void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
 	else
 		return;
 
+	//first element showed -> create gizmo
+	if (show && m_VMElist.size() == 1)
+		CreateGizmo();
+	
+	if (m_VMElist.size() == 0)
+		DestroyGizmo();
 
   // Enable perspective View for every VME
   m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
   // Disable ChildView XN, YN and ZN when no Volume is selected
   
-	if (vme->GetOutput()->IsA("albaVMEOutputVolume"))
+	bool isVolume = vme->GetOutput()->IsA("albaVMEOutputVolume");
+	if (isVolume)
 	{
     for(int j=1; j<m_NumOfChildView; j++)
       m_ChildViewList[j]->VmeShow(vme, show);
@@ -173,25 +185,11 @@ void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
 		}
 		else
 		{
+			m_CurrentVolume = NULL;
       DestroyOrthoSlicesAndGizmos();
     }
-
-    // When one volume is selected/unselected we enable/disable ChildViews for all vme selected
-		for (int i = 0; i < m_VMElist.size(); i++)
-		{
-			albaVME *vme = m_VMElist[i];
-
-			for (int j = 1; j < m_NumOfChildView; j++)
-			{
-				m_ChildViewList[j]->VmeShow(vme, show);
-				if (show)
-					ApplySliceSetting(j, vme);
-
-			}
-			ApplyViewSettings(vme);
-		}
 	}
-	if (m_CurrentVolume != NULL)
+	else
 	{
 		for (int j = 1; j < m_NumOfChildView; j++)
 		{
@@ -202,8 +200,13 @@ void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
 		ApplyViewSettings(vme);
 	}
 
+	UpdateGizmoBounds(show); 
+
 	//CameraUpdate();
 	EnableWidgets(m_CurrentVolume != NULL);
+
+	if (isVolume)
+		CameraReset();
 }
 
 //----------------------------------------------------------------------------
@@ -274,8 +277,7 @@ void albaViewOrthoSlice::OnEvent(albaEventBase *alba_event)
 				if(m_AllSurface)
 				{
 					albaVME* vme=GetSceneGraph()->GetSelectedVme();
-					albaVME* root=vme->GetRoot();
-					SetThicknessForAllSurfaceSlices(root);
+					SetThicknessForAllSurfaceSlices(m_Root);
 				}
 			}
 			break;
@@ -312,10 +314,8 @@ void albaViewOrthoSlice::OnEvent(albaEventBase *alba_event)
       {
         // get the gizmo that is being moved
         long gizmoId = e->GetArg();
-        double pos[3];
         vtkPoints *p = (vtkPoints *)e->GetVtkObj();
         if(p == NULL) return;
-        p->GetPoint(0,pos);
         this->SetSlicePosition(gizmoId, p);
       }
       break;
@@ -514,55 +514,64 @@ void albaViewOrthoSlice::EnableWidgets(bool enable)
 }
 
 //----------------------------------------------------------------------------
-void albaViewOrthoSlice::GizmoCreate()
-//----------------------------------------------------------------------------
+void albaViewOrthoSlice::CreateGizmo()
 {
-  if( m_Gizmo[0] || m_Gizmo[1] || m_Gizmo[2] ) GizmoDelete();
+	if (m_Gizmo[0] || m_Gizmo[1] || m_Gizmo[2]) DestroyGizmo();
+	double direction[] = { albaGizmoSlice::GIZMO_SLICE_X,albaGizmoSlice::GIZMO_SLICE_Y,albaGizmoSlice::GIZMO_SLICE_Z };
 
-	if(m_CurrentVolume)
+	// creates the gizmos
+	for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
 	{
-		int gizmoId;
-		double colors[]    = {1,0,0,  0,1,0,  0,0,1};
-		double direction[] = {albaGizmoSlice::GIZMO_SLICE_X,albaGizmoSlice::GIZMO_SLICE_Y,albaGizmoSlice::GIZMO_SLICE_Z};
+		double sliceOrigin[3] = { 0, 0, 0 };
 
-		// creates the gizmos
-		for(gizmoId=GIZMO_XN; gizmoId<GIZMOS_NUMBER; gizmoId++) 
+		if (m_CurrentVolume)
 		{
-			double sliceOrigin[3];
 			albaPipeVolumeOrthoSlice *p = NULL;
 			p = albaPipeVolumeOrthoSlice::SafeDownCast(((albaViewSlice *)((albaViewCompound *)m_ChildViewList[0]))->GetNodePipe(m_CurrentVolume));
-      double normal[3];
-			p->GetSlice(sliceOrigin,normal);
-
-			m_Gizmo[gizmoId] = new albaGizmoSlice(m_CurrentVolume, this);
-			m_Gizmo[gizmoId]->CreateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], sliceOrigin[gizmoId]);
-			m_Gizmo[gizmoId]->SetColor(&colors[gizmoId*3]);
-			m_Gizmo[gizmoId]->SetGizmoMovingModalityToBound();
+			double normal[3];
+			p->GetSlice(sliceOrigin, normal);
 		}
 
-		// put them in the right views:
-		// perspective view
-		m_ChildViewList[0]->VmeShow(m_Gizmo[GIZMO_XN]->GetOutput(), true);
-		m_ChildViewList[0]->VmeShow(m_Gizmo[GIZMO_YN]->GetOutput(), true);
-		m_ChildViewList[0]->VmeShow(m_Gizmo[GIZMO_ZN]->GetOutput(), true);
-
-		// ZN view
-		m_ChildViewList[1]->VmeShow(m_Gizmo[GIZMO_XN]->GetOutput(), true);
-		m_ChildViewList[1]->VmeShow(m_Gizmo[GIZMO_YN]->GetOutput(), true);
-
-		// YN view
-		m_ChildViewList[3]->VmeShow(m_Gizmo[GIZMO_XN]->GetOutput(), true);
-		m_ChildViewList[3]->VmeShow(m_Gizmo[GIZMO_ZN]->GetOutput(), true);
-
-		// ZN view
-		m_ChildViewList[2]->VmeShow(m_Gizmo[GIZMO_YN]->GetOutput(), true);
-		m_ChildViewList[2]->VmeShow(m_Gizmo[GIZMO_ZN]->GetOutput(), true);
+		m_Gizmo[gizmoId] = new albaGizmoSlice(m_Root, this);
+		m_Gizmo[gizmoId]->UpdateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], sliceOrigin[gizmoId]);
 	}
 
-
+	GizmoShow();
 }
+
 //----------------------------------------------------------------------------
-void albaViewOrthoSlice::GizmoDelete()
+void albaViewOrthoSlice::GizmoShow()
+{
+	if (m_Gizmo[0] == NULL)
+		return;
+
+	double colors[] = { 1,0,0,  0,1,0,  0,0,1 };
+	for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
+	{
+		m_Gizmo[gizmoId]->SetGizmoMovingModalityToBound();
+		m_Gizmo[gizmoId]->SetColor(&colors[gizmoId * 3]);
+	}
+	// put them in the right views:
+	// perspective view
+	m_ChildViewList[0]->VmeShow(m_Gizmo[GIZMO_XN]->GetOutput(), true);
+	m_ChildViewList[0]->VmeShow(m_Gizmo[GIZMO_YN]->GetOutput(), true);
+	m_ChildViewList[0]->VmeShow(m_Gizmo[GIZMO_ZN]->GetOutput(), true);
+
+	// ZN view
+	m_ChildViewList[1]->VmeShow(m_Gizmo[GIZMO_XN]->GetOutput(), true);
+	m_ChildViewList[1]->VmeShow(m_Gizmo[GIZMO_YN]->GetOutput(), true);
+
+	// YN view
+	m_ChildViewList[3]->VmeShow(m_Gizmo[GIZMO_XN]->GetOutput(), true);
+	m_ChildViewList[3]->VmeShow(m_Gizmo[GIZMO_ZN]->GetOutput(), true);
+
+	// ZN view
+	m_ChildViewList[2]->VmeShow(m_Gizmo[GIZMO_YN]->GetOutput(), true);
+	m_ChildViewList[2]->VmeShow(m_Gizmo[GIZMO_ZN]->GetOutput(), true);
+}
+
+//----------------------------------------------------------------------------
+void albaViewOrthoSlice::DestroyGizmo()
 //----------------------------------------------------------------------------
 {
   // set gizmos visibility to false
@@ -606,6 +615,7 @@ void albaViewOrthoSlice::SetSlicePosition(long activeGizmoId, vtkPoints *p)
 
   p->GetPoint(0,m_GizmoHandlePosition);
   
+
   switch(activeGizmoId)
   {
     case (GIZMO_XN)	:
@@ -614,22 +624,18 @@ void albaViewOrthoSlice::SetSlicePosition(long activeGizmoId, vtkPoints *p)
       ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSlice(m_GizmoHandlePosition);
     }
     break;
-   
-
     case (GIZMO_YN)	:
     {
       // update the Y normal child view
       ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSlice(m_GizmoHandlePosition);    
     }
     break;
-
     case (GIZMO_ZN)	:
     {
       // update the Z normal child view
       ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSlice(m_GizmoHandlePosition);
     }
     break;
-
   }
 
   for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
@@ -655,8 +661,7 @@ void albaViewOrthoSlice::OnEventSetThickness()
 	if(m_AllSurface)
 	{
 		albaVME* vme=this->GetSceneGraph()->GetSelectedVme();
-		albaVME* root=vme->GetRoot();
-		SetThicknessForAllSurfaceSlices(root);
+		SetThicknessForAllSurfaceSlices(m_Root);
 	}
 	else
 	{
@@ -739,37 +744,59 @@ void albaViewOrthoSlice::CreateOrthoslicesAndGizmos(albaVME *vme)
 	double yNormal[4] = { 0, 1, 0, 1 };
 	double zNormal[4] = { 0, 0, 1, 1 };
 	double normal[4];
+	double forceOrigin[3] = { VTK_DOUBLE_MAX,VTK_DOUBLE_MAX,VTK_DOUBLE_MAX };
 
 	rot.MultiplyPoint(xNormal,normal);
-	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSlice(m_GizmoHandlePosition,normal);
-  ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetTextColor(colorsX);
+	albaViewSlice * xSlice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_XN_VIEW]);
+	xSlice->SetSlice(forceOrigin, normal);
+	xSlice->SetSlice(m_GizmoHandlePosition,normal);
+  xSlice->SetTextColor(colorsX);
 
 	rot.MultiplyPoint(yNormal, normal);
-	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSlice(m_GizmoHandlePosition, normal);
-  ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetTextColor(colorsY);
+	albaViewSlice * ySlice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_YN_VIEW]);
+	ySlice->SetSlice(forceOrigin, normal);
+	ySlice->SetSlice(m_GizmoHandlePosition, normal);
+  ySlice->SetTextColor(colorsY);
 
 	rot.MultiplyPoint(zNormal, normal);
-	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSlice(m_GizmoHandlePosition, normal);
-  ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetTextColor(colorsZ);
-	GizmoCreate();
+	albaViewSlice * zSlice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]);
+	zSlice->SetSlice(forceOrigin, normal);
+	zSlice->SetSlice(m_GizmoHandlePosition, normal);
+  zSlice->SetTextColor(colorsZ);
+
+	// creates the gizmos
+	double direction[] = { albaGizmoSlice::GIZMO_SLICE_X,albaGizmoSlice::GIZMO_SLICE_Y,albaGizmoSlice::GIZMO_SLICE_Z };
+
+	double sliceOrigin[3] = { 0, 0, 0 };
+
+	if (m_CurrentVolume)
+	{
+		albaPipeVolumeOrthoSlice *p = NULL;
+		p = albaPipeVolumeOrthoSlice::SafeDownCast(((albaViewSlice *)((albaViewCompound *)m_ChildViewList[0]))->GetNodePipe(m_CurrentVolume));
+		double normal[3];
+		p->GetSlice(sliceOrigin, normal);
+	}
+
+	for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
+	{
+		m_Gizmo[gizmoId]->SetInput(m_CurrentVolume);
+		m_Gizmo[gizmoId]->UpdateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], sliceOrigin[gizmoId]);
+	}
+	GizmoShow();
 }
 //-------------------------------------------------------------------------
 void albaViewOrthoSlice::DestroyOrthoSlicesAndGizmos()
 //-------------------------------------------------------------------------
 {
-	// Destroy Ortho Stuff
-  if (m_CurrentVolume == NULL)
-  {
-    albaLogMessage("current volume = NULL");
-    return;
-  }
-	m_CurrentVolume->RemoveObserver(this);
-	m_CurrentVolume = NULL;
-	GizmoDelete();
+	for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
+		if(m_Gizmo[gizmoId])
+			m_Gizmo[gizmoId]->SetInput(m_Root);
+
+	GizmoShow();
 }
 //-------------------------------------------------------------------------
 void albaViewOrthoSlice::ResetSlicesPosition(albaVME *vme)
-//-------------------------------------------------------------------------
+//---------------------	----------------------------------------------------
 {
   // workaround... :(
   // maybe we need some mechanism to execute view code from op?
@@ -847,4 +874,72 @@ void albaViewOrthoSlice::ApplyViewSettings(albaVME *vme)
       }
     }
   }
+}
+
+//----------------------------------------------------------------------------
+void albaViewOrthoSlice::UpdateGizmoBounds(bool show)
+{
+	//if exists a volume or there are no Gizmos we don't need to update bounds.
+	if (m_CurrentVolume || m_Gizmo[0] == NULL)
+		return;
+
+	double minVert[3] = { VTK_DOUBLE_MAX,VTK_DOUBLE_MAX,VTK_DOUBLE_MAX }, maxVert[3] = { VTK_DOUBLE_MIN,VTK_DOUBLE_MIN,VTK_DOUBLE_MIN };
+
+	for (int i = 0; i < m_VMElist.size(); i++)
+	{
+		albaVMEOutput * vmeOutput = m_VMElist[i]->GetOutput();
+		albaMatrix mtr = *vmeOutput->GetAbsMatrix();
+		vtkDataSet * vtkData = vmeOutput->GetVTKData();
+		if(vtkData==NULL)
+			continue;
+
+		double *localBounds = vtkData->GetBounds();
+	
+		double locMinVert[4] = { localBounds[0],localBounds[2],localBounds[4],1 }, locMaxVert[4] = { localBounds[1],localBounds[3],localBounds[5],1};
+		double globMinVert[4], globMaxVert[4];
+
+		mtr.MultiplyPoint(locMinVert, globMinVert);
+		mtr.MultiplyPoint(locMaxVert, globMaxVert);
+
+		for (int i = 0; i < 3; i++)
+		{
+			minVert[i] = MIN(minVert[i], globMinVert[i]);
+			maxVert[i] = MAX(maxVert[i], globMaxVert[i]);
+		}
+	}
+
+	double gizmoBounds[6] = { minVert[0],maxVert[0],minVert[1],maxVert[1],minVert[2],maxVert[2] };
+
+
+	double direction[] = { albaGizmoSlice::GIZMO_SLICE_X,albaGizmoSlice::GIZMO_SLICE_Y,albaGizmoSlice::GIZMO_SLICE_Z };
+
+
+	bool firstVMEshowed = show && m_VMElist.size() == 1;
+	if(!firstVMEshowed)
+		m_Gizmo[0]->GetPosition(m_GizmoHandlePosition);
+
+	if (firstVMEshowed || m_GizmoHandlePosition[0]<gizmoBounds[0] || m_GizmoHandlePosition[0]>gizmoBounds[1])
+		m_GizmoHandlePosition[0] = (gizmoBounds[0] + gizmoBounds[1]) / 2;
+
+	if (firstVMEshowed || m_GizmoHandlePosition[1]<gizmoBounds[2] || m_GizmoHandlePosition[1]>gizmoBounds[3])
+		m_GizmoHandlePosition[1] = (gizmoBounds[2] + gizmoBounds[3]) / 2.0;
+	
+	if (firstVMEshowed ||m_GizmoHandlePosition[2]<gizmoBounds[4] || m_GizmoHandlePosition[4]>gizmoBounds[4])
+		m_GizmoHandlePosition[2] = (gizmoBounds[4] + gizmoBounds[5]) / 2.0;
+
+	for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
+	{
+		m_Gizmo[gizmoId]->SetBounds(gizmoBounds);
+		m_Gizmo[gizmoId]->UpdateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], m_GizmoHandlePosition[gizmoId]);
+	}
+
+	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSlice(m_GizmoHandlePosition);
+	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSlice(m_GizmoHandlePosition);
+	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSlice(m_GizmoHandlePosition);
+	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_PERSPECTIVE_VIEW]))->SetSlice(m_GizmoHandlePosition);
+
+	if (firstVMEshowed)
+		CameraReset();
+	else
+		CameraUpdate();
 }

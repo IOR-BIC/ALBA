@@ -67,6 +67,8 @@ protected:
 	void MoveMeasure(int index, double * point);
 	void DrawNewMeasure(double * wp);
 
+	void UpdateMeasure(int index, double measure);
+
 	// RENDERING
 	virtual void UpdateLineActors(double * point1, double * point2);
 	virtual void UpdatePointsActor(double * point1, double * point2);
@@ -91,6 +93,7 @@ protected:
 	int m_LineStipplePattern;
 
 	bool m_MoveLineB;
+	bool m_AddModeCompleted;
 
 private:
 	albaInteractor2DMeasure_LineDistance(const albaInteractor2DMeasure_LineDistance&);   // Not implemented.

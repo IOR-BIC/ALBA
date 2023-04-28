@@ -43,7 +43,7 @@ public:
 	albaTypeMacro(albaVMEProsthesis,albaVMEGeneric);
 
 	/** Precess events coming from other objects */ 
-	/*virtual*/ void OnEvent(albaEventBase *alba_event);
+	virtual void OnEvent(albaEventBase *alba_event);
 
 	
 	/** Return the suggested pipe-typename for the visualization of this vme */
@@ -67,15 +67,16 @@ public:
 	/** return an xpm-icon that can be used to represent this node */
 	static char ** GetIcon();
 
-	void SetProsthesis(albaProDBProsthesis *prosthesis);
+	virtual void SetProsthesis(albaProDBProsthesis *prosthesis);
 
-	void SetRotCenter(double center[3]);
+	virtual void SetRotCenter(double center[3]);
 
 	void ShowRotCenter(bool show);
 
 	void GetZMinMax(double &zMin, double &zMax);
 
 	void Set2dModality(bool mod2d);
+
 
 	//----------------------------------------------------------------------------
 	// Widgets ID's
@@ -95,6 +96,15 @@ public:
 		ID_LAST_COMP_ID,
 	};
 
+	/** Gets Current DB Prosthesis*/ 
+	albaProDBProsthesis * GetDBProsthesis() const { return m_Prosthesis; }
+
+	bool GetLockOnOpRun() const { return m_LockOnOpRun; }
+	void SetLockOnOpRun(bool val) { m_LockOnOpRun = val; }
+
+	virtual void SelectComponent(int compGroup, int compId);
+	virtual void ShowComponent(int compGroup, bool show);
+
 protected:
 	albaVMEProsthesis();
 	virtual ~albaVMEProsthesis();
@@ -108,18 +118,15 @@ protected:
 	void UpdateGui();
 	void FitParentGui();
 
-	void ChangeProsthesis();
+	virtual void ChangeProsthesis();
 
 	void AddComponentGroup(albaProDBCompGroup *componentGroup);
 	virtual void CreateComponentGui(int currGroup, albaProDBCompGroup * componentGroup);
 	void ClearComponentGroups();
 
-	void SelectComponent(int compGroup);
-	void ShowComponent(int compGroup);
-
 	virtual void OnComponentEvent(int compGroup, int id);
 		
-	void OnTranfromEvent(albaEvent *e);
+	virtual void OnTranfromEvent(albaEvent *e);
 
 	void CreateRotCenterVME();
 
@@ -127,10 +134,14 @@ protected:
 	
 	albaVME* GetRotCenterVME();
 
+	virtual int InternalStore(albaStorageElement *parent);
+
+	virtual int InternalRestore(albaStorageElement *node);
+
 
 	//Components vtkData
 	std::vector <vtkTransformPolyDataFilter *> m_TransformFilters;
-	std::vector <vtkTransform *> m_Transforms; 
+	std::vector <vtkTransform *> m_Transforms;
 	
 	//Components Gui
 	std::vector <albaGUI *> m_ComponentGui;
@@ -149,6 +160,8 @@ protected:
 	albaInteractorGenericMouseFloatVME *m_InteractorGenericMouseFloatVME;
 
 	albaVMESurface *m_RotCenterVME;
+
+	bool m_LockOnOpRun;
 
 private:
 	albaVMEProsthesis(const albaVMEProsthesis&); // Not implemented

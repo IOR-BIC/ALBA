@@ -46,8 +46,8 @@ class vtkTextActor;
 
 #define TEXT_W_SHIFT 10
 #define TEXT_H_SHIFT 5
-#define POINT_UPDATE_DISTANCE 4
-#define POINT_UPDATE_DISTANCE_2 (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE)
+// #define POINT_UPDATE_DISTANCE 4
+// #define POINT_UPDATE_DISTANCE_2 (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE)
 
 // Class Name: albaInteractor2DMeasure
 class ALBA_EXPORT albaInteractor2DMeasure : public albaInteractorPER
@@ -116,6 +116,8 @@ public:
 	virtual bool Save(albaVME *input, wxString tag) { return true; };
 
 	/// GET
+	/** Get Measure Value*/
+	double GetMeasureValue(int index);
 	/** Get Measure Text Value*/
 	albaString GetMeasureText(int index);	
 	/** Get Measure Extra Label*/
@@ -176,6 +178,14 @@ public:
 	albaRWIBase* GetCurrentRwi() { return m_CurrentRwi; }
 	albaRWIBase* GetCurrentRwi(int m) {	return m_Measure2DVector[m].Rwi; }
 
+	int GetCurrPlane() { return m_CurrPlane; }
+	void SetCurrPlane(int plane) { m_CurrPlane = plane; }
+
+	// Update and Draw All Measure
+	virtual void ReDrawAll() {};
+
+	void SetUpdateDistance(int dist/*Default = 4*/);
+
 protected:
 
 	struct Measure2D
@@ -186,6 +196,7 @@ protected:
 		albaString Label;
 		vtkRenderer *Renderer = NULL;
 		albaRWIBase *Rwi;
+		double Value = 0.0;
 		//std::vector<double[3]> Points;
 	};
 
@@ -307,6 +318,9 @@ protected:
 	double m_PointSize;
 	double m_LineWidth;
 	int m_TextSide;
+
+	int POINT_UPDATE_DISTANCE = 4;
+	int POINT_UPDATE_DISTANCE_2 = (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE);
 
 private:
 

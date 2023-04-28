@@ -54,6 +54,8 @@ public:
 	void FreeEdit() { m_EditConstraint = FREE_EDIT; };
 	void LockPointOnLine(double *lineP1, double *lineP2);
 
+	virtual void ReDrawAll();
+
 protected:
 
 	enum EDIT_POINT_CONSTRAINTS

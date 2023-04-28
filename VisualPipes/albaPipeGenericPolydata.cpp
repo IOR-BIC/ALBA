@@ -76,6 +76,7 @@ albaPipeGenericPolydata::albaPipeGenericPolydata()
 	m_FlipNormals = false;
 	m_SkipNormalFilter = false;
   m_BorderElementsWiredActor = false;
+	m_ShowOutLine = true;
 	m_Border = 1;
 }
 //----------------------------------------------------------------------------
@@ -240,7 +241,7 @@ void albaPipeGenericPolydata::Select(bool sel)
 	m_Selected = sel;
 	if(m_Actor->GetVisibility()) 
 	{
-		m_OutlineActor->SetVisibility(sel);
+		m_OutlineActor->SetVisibility(sel && m_ShowOutLine);
 
 		ShowScalarBarActor(m_ShowScalarBar);
 	}
@@ -503,5 +504,12 @@ void albaPipeGenericPolydata::SetThickness(double thickness)
 	m_Actor->GetProperty()->SetPointSize(m_Border);
 	m_Actor->Modified();
 	GetLogicManager()->CameraUpdate();
+}
+
+//----------------------------------------------------------------------------
+void albaPipeGenericPolydata::SetShowOutLine(int showOutLine)
+{
+	m_ShowOutLine = showOutLine;
+	Select(m_Selected);
 }
 

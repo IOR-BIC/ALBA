@@ -421,32 +421,38 @@ void albaOpRegisterClusters::CreateMatches()
 /*virtual*/ vtkMatrix4x4* albaOpRegisterClusters::RegisterPoints(vtkPoints* sourcePoints, 
 	vtkPoints* targetPoints, vtkDoubleArray* weights)
 {
-	vtkALBASmartPointer< vtkWeightedLandmarkTransform > RegisterTransform;
+	vtkLandmarkTransform *registerTransform;
 
-	RegisterTransform->SetSourceLandmarks(sourcePoints);
-	RegisterTransform->SetTargetLandmarks(targetPoints);
+	if (m_RegistrationMode == AFFINE)
+		registerTransform = vtkLandmarkTransform::New();
+	else
+		registerTransform = vtkWeightedLandmarkTransform::New();
 
-	if (weights != NULL && weights->GetNumberOfTuples() != 0) {
-		RegisterTransform->SetWeights(weights->GetPointer(0), weights->GetNumberOfTuples());
+	registerTransform->SetSourceLandmarks(sourcePoints);
+	registerTransform->SetTargetLandmarks(targetPoints);
+
+	if (m_RegistrationMode!=AFFINE && weights != NULL && weights->GetNumberOfTuples() != 0) {
+		vtkWeightedLandmarkTransform::SafeDownCast(registerTransform)->SetWeights(weights->GetPointer(0), weights->GetNumberOfTuples());
 	}
 
 	switch (m_RegistrationMode)
 	{
 	case RIGID:
-		RegisterTransform->SetModeToRigidBody();
+		registerTransform->SetModeToRigidBody();
 		break;
 	case SIMILARITY:
-		RegisterTransform->SetModeToSimilarity();
+		registerTransform->SetModeToSimilarity();
 		break;
 	case AFFINE:
-		RegisterTransform->SetModeToAffine();
+		registerTransform->SetModeToAffine();
 		break;
 	}
-	RegisterTransform->Update();
+	registerTransform->Update();
 
-	vtkMatrix4x4* ret = RegisterTransform->GetMatrix();
+	vtkMatrix4x4* ret = registerTransform->GetMatrix();
 	ret->Register(NULL);
 
+	vtkDEL(registerTransform);
 	return ret;
 }
 
@@ -503,7 +509,9 @@ double albaOpRegisterClusters::CalculateDeviation(vtkPoints* sourcePoints, vtkPo
 
 	vtkMatrix4x4* matReg = RegisterPoints(sourcePoints, targetPoints, weights);
 	double deviation = CalculateDeviation(sourcePoints, targetPoints, matReg);
-	m_Info->SetAbsPose(deviation, 0.0, 0.0, 0.0, 0.0, 0.0, currTime);
+	albaString label;
+	label.Printf("Registration residual: %f", deviation);
+	m_Info->SetLabel(label);
 	
 	//t_matrix now contains the correct transformation matrix for the current time
 	m_Registered->SetTimeStamp(currTime); //SetCurrentTime(currTime);
@@ -551,11 +559,13 @@ void albaOpRegisterClusters::OpRun()
 		m_Gui->Label(&m_FollowerName);
 		m_Gui->Button(ID_CHOOSE_SURFACE, _("Follower surface"));
 
-		m_Gui->Button(ID_WEIGHT, _("Weighted registration"));
-		m_Gui->Enable(ID_WEIGHT, false);
 
 		m_Gui->Divider(1);
 		m_Gui->Combo(ID_REGTYPE, _("Reg. type"), &m_RegistrationMode, num_choices, choices_string);
+		m_Gui->Button(ID_WEIGHT, _("Weighted registration"));
+		m_Gui->Divider(1);
+		m_Gui->Enable(ID_WEIGHT, false);
+
 
 		m_Gui->Bool(ID_MULTIPLE_TIME_REGISTRATION, _("Multi-Time"), &m_MultiTime, 1);
 		m_Gui->Enable(ID_MULTIPLE_TIME_REGISTRATION, false);
@@ -586,8 +596,6 @@ void albaOpRegisterClusters::OpRun()
 		
 	albaNEW(m_Info);	
 	m_Info->SetName(wxString::Format("Info for registration %s into %s",source->GetName(), target->GetName()));
-	m_Info->SetPosLabel("Registration residual: ", 0);
-	m_Info->SetPosShow(true, 0);
 	GetLogicManager()->VmeAdd(m_Info);
 	m_Info->ReparentTo(m_Result);
 
@@ -862,7 +870,7 @@ void albaOpRegisterClusters::OnEvent(albaEventBase *alba_event)
 				break;
 
 			case ID_REGTYPE:
-
+				m_Gui->Enable(ID_WEIGHT, m_Target != NULL && m_RegistrationMode != AFFINE);
 				break;
 
 			case ID_WEIGHT:
@@ -914,9 +922,7 @@ void albaOpRegisterClusters::OnChooseLandmarkCloud()
 	albaVME *vme = e.GetVme();
 	OnChooseVme(vme);
 
-	if(vme != NULL) {
-		m_Gui->Enable(ID_WEIGHT,true);
-	}
+	m_Gui->Enable(ID_WEIGHT, m_Target != NULL && m_RegistrationMode != AFFINE);
 }
 
 //----------------------------------------------------------------------------
