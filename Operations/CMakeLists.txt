@@ -173,6 +173,7 @@ IF (ALBA_USE_VTK)
 	albaOpImporterEmgWS.cpp albaOpImporterEmgWS.h
 	albaOpImporterRawMotionData.cpp albaOpImporterRawMotionData.h
 	albaOpInteractorSliderSample.cpp albaOpInteractorSliderSample.h
+	albaOpShowHistory.cpp	albaOpShowHistory.h
   )
 ENDIF (ALBA_USE_VTK)
 
