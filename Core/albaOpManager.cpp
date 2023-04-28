@@ -48,6 +48,7 @@
 #include "albaVMEGenericAbstract.h"
 #include "albaOpReparentTo.h"
 #include "albaOpCreateGroup.h"
+#include "albaOpShowHistory.h"
 
 //------------------------------------------------------------------------------
 // Events
@@ -105,6 +106,7 @@ albaOpManager::albaOpManager()
 	m_OpPaste = new albaOpPaste();
 	m_OpRename = new albaOpRename();
 	m_OpReparent = new albaOpReparentTo();
+	m_OpShowHistory = new albaOpShowHistory();
 	m_OpAddGroup = new albaOpCreateGroup();
 	//m_optransform = new albaOpTransform();
 
@@ -146,6 +148,7 @@ albaOpManager::~albaOpManager()
 	cppDEL(m_OpRename);
 	cppDEL(m_OpReparent);
 	cppDEL(m_OpAddGroup);
+	cppDEL(m_OpShowHistory);
 	cppDEL(m_User);
 }
 //----------------------------------------------------------------------------
@@ -431,6 +434,7 @@ void albaOpManager::EnableContextualMenu(albaGUITreeContextualMenu *contextualMe
 			contextualMenu->FindItem(RMENU_DELETE)->Enable(false);
 			contextualMenu->FindItem(RMENU_RENAME)->Enable(false);
 			contextualMenu->FindItem(RMENU_REPARENT)->Enable(false);
+			contextualMenu->FindItem(RMENU_SHOW_HISTORY)->Enable(false);
 		}
 		else
 		{
@@ -442,6 +446,7 @@ void albaOpManager::EnableContextualMenu(albaGUITreeContextualMenu *contextualMe
 			contextualMenu->FindItem(RMENU_DELETE)->Enable(m_OpCut->Accept(node));
 			contextualMenu->FindItem(RMENU_RENAME)->Enable(m_OpRename->Accept(node));
 			contextualMenu->FindItem(RMENU_REPARENT)->Enable(m_OpReparent->Accept(node));
+			contextualMenu->FindItem(RMENU_SHOW_HISTORY)->Enable(m_OpShowHistory->Accept(node));
 		}
 	}
 }
@@ -679,6 +684,11 @@ void albaOpManager::RunOpRename()
 void albaOpManager::RunOpReparentTo()
 {
 	OpRun(m_OpReparent);
+}
+//----------------------------------------------------------------------------
+void albaOpManager::RunOpShowHistory()
+{
+	OpRun(m_OpShowHistory);
 }
 
 //----------------------------------------------------------------------------

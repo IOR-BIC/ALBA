@@ -46,6 +46,7 @@ public:
 		GAUSSIAN_DISCRETE_FILTER,
 		THRESHOLD_FILTER,
 		THRESHOLD_BINARY_FILTER,
+		OTSU_THRESHOLD_FILTER,
 		GRADIENT_MAGNITUDE,
 		SOBEL_EDGE,
 		CANNY_EDGE,
@@ -118,6 +119,7 @@ protected:
 	void GaussianBlurFilter(const ImageType *inputImage, ImageType *outputImage);
 	void ThresholdFilter(const ImageType *inputImage, ImageType *outputImage);
 	void ThresholdBinaryFilter(const ImageType *inputImage, ImageType *outputImage);
+	void OtsuThresholdFilter(const ImageType *inputImage, ImageType *outputImage);
 	void GradientMaglitudeFilter(const ImageType *inputImage, ImageType *outputImageg);
 	void SobelFilter(const ImageType *inputImage, ImageType *outputImage);
 	void CannyEdgeFilter(const ImageType *inputImage, ImageType *outputImage);
