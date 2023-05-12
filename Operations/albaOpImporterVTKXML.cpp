@@ -128,7 +128,7 @@ void albaOpImporterVTKXML::OpRun()
     if (ImportVTKXML() == ALBA_OK)
     {
       wxString path, name, ext;
-      wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
+      wxFileName::SplitPath(m_File.GetCStr(),&path,&name,&ext);
       albaTagItem tag_Nature;
       tag_Nature.SetName("VME_NATURE");
       tag_Nature.SetValue("NATURAL");
@@ -191,7 +191,7 @@ int albaOpImporterVTKXML::ImportVTKXML()
   albaNEW(m_VmeGeneric);
 
 	wxString path, name, ext;
-	wxSplitPath(m_File, &path, &name, &ext);
+	wxFileName::SplitPath(m_File, &path, &name, &ext);
 
 	if (ext == "vti")
 	{

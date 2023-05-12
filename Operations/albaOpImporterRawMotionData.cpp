@@ -128,7 +128,7 @@ void albaOpImporterRawMotionData::OpDo()
 	m_Vme = reader;
 
   wxString path, name, ext;
-  wxSplitPath(m_File.c_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.c_str(),&path,&name,&ext);
   m_Vme->SetName(name);
 	
 	albaTagItem tag_Nature;

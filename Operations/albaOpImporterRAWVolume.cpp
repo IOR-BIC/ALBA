@@ -580,7 +580,7 @@ bool albaOpImporterRAWVolume::Import()
 	tag_Nature.SetValue("NATURAL");
 
 	wxString name, ext, path;
-  wxSplitPath(m_RawFile.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(m_RawFile.GetCStr(),&path,&name,&ext);
   m_Output->SetName(name.c_str());
   m_Output->GetTagArray()->SetTag(tag_Nature);
   m_Output->ReparentTo(m_Input);

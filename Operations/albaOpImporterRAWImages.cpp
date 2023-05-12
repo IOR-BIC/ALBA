@@ -927,7 +927,7 @@ bool albaOpImporterRAWImages::Import()
 
   wxString slice_name = m_RawDirectory;
   wxString path, name, ext;
-  wxSplitPath(slice_name.c_str(),&path,&name,&ext);
+  wxFileName::SplitPath(slice_name.c_str(),&path,&name,&ext);
 
   vtkALBASmartPointer<vtkImageToStructuredPoints> convert;
 

@@ -244,7 +244,7 @@ void albaOpExporterBmp::SaveBmp()
     exporter->SetInput(imageFlip->GetOutput());
     exporter->SetFileDimensionality(2); // the writer will create a number of 2D images
     exporter->SetFilePattern("%s_%04d.bmp");
-    exporter->SetFilePrefix((char*)prefix.c_str());
+    exporter->SetFilePrefix(prefix.char_str());
      
     exporter->Write();
   }

@@ -190,7 +190,7 @@ void  albaOpImporterVRML::ImportVRML()
 //----------------------------------------------------------------------------
 {
   wxString path, name, ext;
-  wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.GetCStr(),&path,&name,&ext);
 
   albaNEW(m_Group);
   m_Group->SetName(name.c_str());

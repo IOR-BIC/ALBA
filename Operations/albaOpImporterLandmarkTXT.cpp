@@ -157,7 +157,7 @@ void albaOpImporterLandmarkTXT::Read()
   albaNEW(m_VmeCloud);
 
   wxString path, name, ext;
-  wxSplitPath(m_File.c_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.c_str(),&path,&name,&ext);
   m_VmeCloud->SetName(name);
 
   albaTagItem tag_Nature;

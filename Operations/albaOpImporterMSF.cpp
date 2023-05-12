@@ -103,7 +103,7 @@ int albaOpImporterMSF::ImportMSF()
 {
   albaString unixname = m_File;
   wxString path, name, ext;
-  wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.GetCStr(),&path,&name,&ext);
 
 	albaString zippedExt;
 	const char *archExt = GetLogicManager()->GetMsfFileExtension();
@@ -196,7 +196,7 @@ const char *albaOpImporterMSF::ZIPOpen(albaString m_File)
   m_TmpDir = zip_cache;
 
   wxString path, name, ext, complete_name, zfile, out_file;
-  wxSplitPath(ZipFile.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(ZipFile.GetCStr(),&path,&name,&ext);
   complete_name = name + "." + ext;
 
   wxFSFile *zfileStream;
@@ -221,7 +221,7 @@ const char *albaOpImporterMSF::ZIPOpen(albaString m_File)
     RemoveTempDirectory();
     return "";
   }
-  wxSplitPath(zfile,&path,&name,&ext);
+  wxFileName::SplitPath(zfile,&path,&name,&ext);
   complete_name = name + "." + ext;
   if (enable_mid)
     complete_name = complete_name.Mid(length_header_name);
@@ -267,7 +267,7 @@ const char *albaOpImporterMSF::ZIPOpen(albaString m_File)
       return "";
     }
     zip_is = (wxZlibInputStream *)zfileStream->GetStream();
-    wxSplitPath(zfile,&path,&name,&ext);
+    wxFileName::SplitPath(zfile,&path,&name,&ext);
     complete_name = name + "." + ext;
     if (enable_mid)
       complete_name = complete_name.Mid(length_header_name);

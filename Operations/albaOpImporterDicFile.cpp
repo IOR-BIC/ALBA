@@ -71,7 +71,7 @@ int albaOpImporterDicFile::Import(void)
 
 	wxString path, name, ext;
 
-	wxSplitPath(m_FileName, &path, &name, &ext);
+	wxFileName::SplitPath(m_FileName, &path, &name, &ext);
 
 	
 	albaVMEPointCloud *pointCloudVME;

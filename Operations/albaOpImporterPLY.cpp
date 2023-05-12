@@ -147,7 +147,7 @@ void albaOpImporterPLY::ImportPLY()
 	  reader->Update();
 
     wxString path, name, ext;
-    wxSplitPath(fn.GetCStr(),&path,&name,&ext);
+    wxFileName::SplitPath(fn.GetCStr(),&path,&name,&ext);
 
     albaVMESurface *importedPLY;
     albaNEW(importedPLY);

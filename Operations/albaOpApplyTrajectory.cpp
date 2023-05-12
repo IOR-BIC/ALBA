@@ -269,7 +269,7 @@ int albaOpApplyTrajectory::Read()
   m_OriginalMatrix->DeepCopy(m_Input->GetOutput()->GetAbsMatrix());
 
   wxString path, name, ext;
-  wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.GetCStr(),&path,&name,&ext);
 
   double time;
   double newPosition[3];

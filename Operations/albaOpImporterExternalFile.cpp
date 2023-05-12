@@ -86,7 +86,7 @@ void albaOpImporterExternalFile::ImportExternalFile()
 //----------------------------------------------------------------------------
 {
 	wxString path, name, ext;
-	wxSplitPath(m_File, &path, &name, &ext);
+	wxFileName::SplitPath(m_File, &path, &name, &ext);
   
 	wxString vmeName;
 	vmeName << name << "." << ext;

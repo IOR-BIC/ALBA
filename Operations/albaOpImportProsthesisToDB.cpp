@@ -118,7 +118,7 @@ int albaOpImportProsthesisToDB::ImportDB(wxString dbFile)
 	if (wxFileExists(dbFile))
 	{
 		wxString path, name, ext;
-		wxSplitPath(dbFile.c_str(), &path, &name, &ext);
+		wxFileName::SplitPath(dbFile.c_str(), &path, &name, &ext);
 
 		if (ext == "zip")
 		{
@@ -170,7 +170,7 @@ int albaOpImportProsthesisToDB::ImportDBFromZip(wxString &dbZipFile)
 	for (int i = 0; i < filesVect.size(); i++)
 	{
 		wxString path, name, ext;
-		wxSplitPath(filesVect[i].GetCStr(), &path, &name, &ext);
+		wxFileName::SplitPath(filesVect[i].GetCStr(), &path, &name, &ext);
 
 		if (ext == "xml")
 		{

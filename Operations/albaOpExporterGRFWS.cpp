@@ -400,11 +400,11 @@ void albaOpExporterGRFWS::Write()
   wxString file3 = m_File + "_tmp3";
   wxString file4 = m_File + "_tmp4";
 
-  std::ofstream f_Out(m_File);
-  std::ofstream f_Out1(file1);
-  std::ofstream f_Out2(file2);
-  std::ofstream f_Out3(file3);
-  std::ofstream f_Out4(file4);
+  std::ofstream f_Out(m_File.char_str());
+  std::ofstream f_Out1(file1.char_str());
+  std::ofstream f_Out2(file2.char_str());
+  std::ofstream f_Out3(file3.char_str());
+  std::ofstream f_Out4(file4.char_str());
 
   std::vector<albaTimeStamp> kframes1;
   std::vector<albaTimeStamp> kframes2;
@@ -645,11 +645,11 @@ void albaOpExporterGRFWS::WriteFast()
   wxString file3 = m_File + "_tmp3";
   wxString file4 = m_File + "_tmp4";
 
-  std::ofstream f_Out(m_File);
-  std::ofstream f_Out1(file1);
-  std::ofstream f_Out2(file2);
-  std::ofstream f_Out3(file3);
-  std::ofstream f_Out4(file4);
+  std::ofstream f_Out(m_File.char_str());
+  std::ofstream f_Out1(file1.char_str());
+  std::ofstream f_Out2(file2.char_str());
+  std::ofstream f_Out3(file3.char_str());
+  std::ofstream f_Out4(file4.char_str());
 
   std::vector<albaTimeStamp> kframes1;
   std::vector<albaTimeStamp> kframes2;
@@ -966,7 +966,7 @@ void albaOpExporterGRFWS::WriteSingleVector()
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("This may take several minutes, please be patient...");
   
-  std::ofstream f_Out(m_File);
+  std::ofstream f_Out(m_File.char_str());
 
   std::vector<albaTimeStamp> kframes;
   m_ForceLeft->GetTimeStamps(kframes);
@@ -1040,7 +1040,7 @@ void albaOpExporterGRFWS::WriteSingleVectorFast()
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("This may take several minutes, please be patient...");
 
-  std::ofstream f_Out(m_File);
+  std::ofstream f_Out(m_File.char_str());
 
   std::vector<albaTimeStamp> kframes;
   m_ForceLeft->GetTimeStamps(kframes);

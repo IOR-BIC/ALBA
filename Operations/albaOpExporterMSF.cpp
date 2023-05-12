@@ -115,7 +115,7 @@ int albaOpExporterMSF::ExportMSF()
 	if(!wxFileExists(wxString(m_MSFFile)))
 	{
 		wxString path, name, ext, dir2;
-		wxSplitPath(m_MSFFile.GetCStr(),&path,&name,&ext);
+		wxFileName::SplitPath(m_MSFFile.GetCStr(),&path,&name,&ext);
 		dir2 = path + "\\" + name;
 		if(!wxDirExists(dir2))
 			wxMkdir(dir2);

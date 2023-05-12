@@ -242,7 +242,7 @@ int albaOpImporterPointCloud::Import(void)
 	
 	wxString path, name, ext;
 
-	wxSplitPath(GetFileName(), &path, &name, &ext);
+	wxFileName::SplitPath(GetFileName(), &path, &name, &ext);
 
 	
 	albaVMEPointCloud *pointCloudVME;

@@ -130,7 +130,7 @@ void albaOpExporterRAW::SaveVolume()
 //----------------------------------------------------------------------------
 {
 	wxString path,name,ext;
-	::wxSplitPath(m_FileName,&path,&name,&ext);
+	::wxFileName::SplitPath(m_FileName,&path,&name,&ext);
 	path+= _("\\");
 	if(!m_TestMode)
 		wxBusyInfo wait("Please wait, working...");

@@ -129,7 +129,7 @@ int albaOpImporterMetaImage::ImportMetaImage()
 	if (itkImage != NULL)
 	{
 		wxString path, name, ext;
-		wxSplitPath(m_File.c_str(), &path, &name, &ext);
+		wxFileName::SplitPath(m_File.c_str(), &path, &name, &ext);
 
 		ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
 		itkTOvtk->SetInput(itkImage);

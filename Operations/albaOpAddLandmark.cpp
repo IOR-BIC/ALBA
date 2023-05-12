@@ -48,6 +48,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "xercesc\util\PlatformUtils.hpp"
 #include "xercesc\util\XercesDefs.hpp"
 #include <set>
+#include "wx/wx.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpAddLandmark);

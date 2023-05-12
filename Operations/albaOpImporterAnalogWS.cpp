@@ -90,7 +90,7 @@ void albaOpImporterAnalogWS::Read()
   
   albaNEW(m_EmgScalar);
   wxString path, name, ext;
-  wxSplitPath(m_File.c_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.c_str(),&path,&name,&ext);
   m_EmgScalar->SetName(name);
 
   albaTagItem tag_Nature;

@@ -150,7 +150,7 @@ void albaOpImporterGRFWS::ReadForcePlates()
 
 
   wxString path, name, ext;
-  wxSplitPath(m_File.c_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.c_str(),&path,&name,&ext);
 
   albaTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");
@@ -484,7 +484,7 @@ void albaOpImporterGRFWS::ReadSingleVector()
 	progressHelper.InitProgressBar();
 
   wxString path, name, ext;
-  wxSplitPath(m_File.c_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.c_str(),&path,&name,&ext);
 
   albaTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");

@@ -163,7 +163,7 @@ int albaOpImporterVTK::ImportVTK()
 	if (preader->GetNumberOfOutputs() > 0)
 	{
 		wxString path, name, ext;
-		wxSplitPath(m_File.c_str(), &path, &name, &ext);
+		wxFileName::SplitPath(m_File.c_str(), &path, &name, &ext);
 
 		vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
 		if (data)

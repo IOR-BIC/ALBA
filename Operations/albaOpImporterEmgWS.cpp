@@ -89,7 +89,7 @@ void albaOpImporterEmgWS::Read()
   
   albaNEW(m_Group);
   wxString path, name, ext;
-  wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.GetCStr(),&path,&name,&ext);
   m_Group->SetName(name);
 
   albaTagItem tag_Nature;

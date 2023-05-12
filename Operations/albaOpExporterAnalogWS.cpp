@@ -104,7 +104,7 @@ void albaOpExporterAnalogWS::Write()
 
   albaString empty("");
 
-  std::ofstream f_Out(m_File);
+  std::ofstream f_Out(m_File.c_str());
   if (!f_Out.bad())
   {
     // Add ANALOG tag

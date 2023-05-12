@@ -264,7 +264,7 @@ void albaOpImporterSTL::ImportSTL()
 	  reader->Update();
 
     wxString path, name, ext;
-    wxSplitPath(fn.GetCStr(),&path,&name,&ext);
+    wxFileName::SplitPath(fn.GetCStr(),&path,&name,&ext);
 
     albaVMESurface *importedSTL;
     albaNEW(importedSTL);
