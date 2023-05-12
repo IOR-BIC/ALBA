@@ -759,41 +759,39 @@ void albaOpManager::OpExec(albaOp *op)
 //----------------------------------------------------------------------------
 void albaOpManager::OpDo(albaOp *op)
 {
-  m_Context.Redo_Clear();
-  albaVME *in_node = op->GetInput();
- 
-  if (in_node != NULL)
-  {
-    albaLogMessage("executing operation '%s' on input data: %s",op->m_Label.c_str(), in_node->GetName());
-  }
-  else
-  {
-    albaLogMessage("executing operation '%s'",op->m_Label.c_str());
-  }
- 
-	if (op->GetType() != OPTYPE_EDIT)
-		FillTraceabilityAttribute(op, in_node, NULL);
+	m_Context.Redo_Clear();
+	albaVME *in_node = op->GetInput();
+
+	if (in_node != NULL)
+	{
+		albaLogMessage("executing operation '%s' on input data: %s", op->m_Label.c_str(), in_node->GetName());
+	}
+	else
+	{
+		albaLogMessage("executing operation '%s'", op->m_Label.c_str());
+	}
+
+	FillTraceabilityAttribute(op, in_node, NULL);
 
 	op->OpDo();
 
-	
+
 	albaVME *out_node = op->GetOutput();
 	if (out_node != NULL)
 	{
-		if (op->GetType() != OPTYPE_EDIT)
-			FillTraceabilityAttribute(op, NULL, out_node);
+		FillTraceabilityAttribute(op, NULL, out_node);
 
 		albaLogMessage("operation '%s' generate %s as output", op->m_Label.c_str(), out_node->GetName());
 	}
-	
-  if(op->CanUndo()) 
-  {
-	  m_Context.Undo_Push(op);
-  }
-  else
-  {
-	  m_Context.Undo_Clear();
-  }
+
+	if (op->CanUndo())
+	{
+		m_Context.Undo_Push(op);
+	}
+	else
+	{
+		m_Context.Undo_Clear();
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -805,17 +803,34 @@ void albaOpManager::SetMafUser(albaUser *user)
 //----------------------------------------------------------------------------
 void albaOpManager::FillTraceabilityAttribute(albaOp *op, albaVME *in_node, albaVME *out_node)
 {
-  albaString trialEvent = "Modify";
-  albaString operationName;
-  albaString parameters;
-  albaString appStamp;
-  albaString userID;
-  albaString isNatural = "false";
-  wxString revision;
-  wxString dateAndTime;
+	albaString trialEvent = "Modify";
+	albaString operationName;
+	albaString parameters;
+	albaString appStamp;
+	albaString userID;
+	albaString isNatural = "false";
+	wxString revision;
+	wxString dateAndTime;
 
-  operationName = op->GetTypeName();
-  parameters = op->GetParameters();
+	operationName = op->GetTypeName();
+	parameters = op->GetParameters();
+
+	if (op->GetType() == OPTYPE_EDIT)
+	{
+		if (op->m_Label == "Rename" && m_Selected)
+		{
+			in_node = m_Selected;
+
+			trialEvent = "Rename";
+			operationName = "albaOpRaname";
+			parameters = "Old Name: ";
+			parameters += m_Selected->GetName();
+		}
+		else
+		{
+			return;
+		}
+	}
 
   wxDateTime time = wxDateTime::UNow();
   dateAndTime  = wxString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth()+1, time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());
