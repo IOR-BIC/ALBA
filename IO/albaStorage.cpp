@@ -38,7 +38,7 @@ albaStorage::albaStorage()
   //Creating user app tmp directory if does not exist
 	m_TmpFolder=(albaGetAppDataDirectory()+"\\tmp").c_str();
 
-	if(!wxDirExists(m_TmpFolder))
+	if(!wxDirExists(m_TmpFolder.GetCStr()))
 		wxMkdir(m_TmpFolder.GetCStr());
   m_NeedsUpgrade    = false;
 }

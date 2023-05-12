@@ -49,6 +49,11 @@ albaXMLString::albaXMLString(const albaXMLString &right) : m_WStr(NULL) , m_CStr
   m_WStr = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::replicate(right.m_WStr);
 }
 
+albaXMLString::albaXMLString(wxString str)
+{
+	m_WStr = XERCES_CPP_NAMESPACE_QUALIFIER XMLString::transcode((const char *)str.c_str());
+}
+
 //------------------------------------------------------------------------------
 albaXMLString::~albaXMLString()
 //------------------------------------------------------------------------------
