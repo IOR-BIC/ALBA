@@ -2872,7 +2872,7 @@ void albaLogicWithManagers::UpdateMeasureUnit()
 void albaLogicWithManagers::ImportExternalFile(albaString &filename)
 {
 	wxString path, name, ext;
-	wxSplitPath(filename.GetCStr(), &path, &name, &ext);
+	wxFileName::SplitPath(filename.GetCStr(), &path, &name, &ext);
 	ext.MakeLower();
 	if (ext == "vtk")
 	{

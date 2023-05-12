@@ -285,7 +285,7 @@ int albaVMEManager::MSFOpen(albaString filename)
   albaString unixname = filename;
   
   wxString path, name, ext;
-  wxSplitPath(filename.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
 
 	if(ext.IsSameAs("z" + m_MsfFileExtension,true)) 
   {
@@ -419,7 +419,7 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
   zip_cache += "/";
   zip_cache = wxFileName::CreateTempFileName(zip_cache.GetCStr()); // used to get a valid temporary name for cache directory
   wxRemoveFile(zip_cache.GetCStr());
-  wxSplitPath(zip_cache.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(zip_cache.GetCStr(),&path,&name,&ext);
   zip_cache = path + "/" + name + ext;
   zip_cache.ParsePathName();
   
@@ -428,7 +428,7 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
   m_TmpDir = zip_cache;
 
   wxString complete_name, zfile, out_file;
-  wxSplitPath(m_ZipFile.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(m_ZipFile.GetCStr(),&path,&name,&ext);
   complete_name = name + "." + ext;
   
   wxFSFile *zfileStream;
@@ -461,7 +461,7 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
     RemoveTempDirectory(); // remove the temporary directory
     return "";
   }
-  wxSplitPath(zfile,&path,&name,&ext);
+  wxFileName::SplitPath(zfile,&path,&name,&ext);
   complete_name = name + "." + ext;
   if (enable_mid)
     complete_name = complete_name.Mid(length_header_name);
@@ -506,7 +506,7 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
       return "";
     }
     zip_is = (wxZlibInputStream *)zfileStream->GetStream();
-    wxSplitPath(zfile,&path,&name,&ext);
+    wxFileName::SplitPath(zfile,&path,&name,&ext);
     complete_name = name + "." + ext;
     if (enable_mid)
       complete_name = complete_name.Mid(length_header_name);
@@ -574,7 +574,7 @@ bool albaVMEManager::MakeZip(const albaString &zipname, wxArrayString *files)
   for (size_t i = 0; i < files->GetCount(); i++)
   {
     name = files->Item(i);
-    wxSplitPath(name, &path, &short_name, &ext);
+    wxFileName::SplitPath(name, &path, &short_name, &ext);
     short_name += ".";
     short_name += ext;
 
@@ -631,7 +631,7 @@ int albaVMEManager::MSFSave()
       return ALBA_ERROR;
    
     wxString path, name, ext, file_dir;
-    wxSplitPath(file.GetCStr(),&path,&name,&ext);
+    wxFileName::SplitPath(file.GetCStr(),&path,&name,&ext);
 
 		if (!wxFileExists(file.GetCStr()))
 		{

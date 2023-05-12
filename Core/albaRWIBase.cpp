@@ -734,7 +734,7 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
 //---------------------------------------------------------------------------
 {
   wxString path, name, ext;
-  wxSplitPath(filename.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
   if (filename.IsEmpty() || ext.IsEmpty())
   {
     wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg|Image (*.png)|*.png|Image (*.ps)|*.ps|Image (*.tiff)|*.tiff";
@@ -807,7 +807,7 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
   w2i->SetMagnification(magnification);
   w2i->Update();
   
-  wxSplitPath(filename.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
   ext.MakeLower();
   if (ext == "bmp")
   {
@@ -902,7 +902,7 @@ void albaRWIBase::SaveImageRecursive(albaString filename, albaViewCompound *v,in
   if(v == NULL) return;
 
   wxString path, name, ext;
-  wxSplitPath(filename.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
   if (filename.IsEmpty() || ext.IsEmpty())
   {
     //wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
@@ -950,7 +950,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
       wxString subViewString;
       subViewString.Append(filename);
       wxString pathName, fileName, extension;
-      wxSplitPath(subViewString,&pathName,&fileName,&extension);
+      wxFileName::SplitPath(subViewString,&pathName,&fileName,&extension);
 
       subViewString.Clear();
       subViewString.Append(pathName);
@@ -968,7 +968,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
       ///////////////////////////////////
       wxString temp, pathName, fileName, extension;
       temp.Append(filename);
-      wxSplitPath(temp,&pathName,&fileName,&extension);
+      wxFileName::SplitPath(temp,&pathName,&fileName,&extension);
       fileName.Append(wxString::Format("_%d", i));
       temp.Clear();
       temp.Append(pathName);
@@ -1127,7 +1127,7 @@ void albaRWIBase::SaveAllImages(albaString filename, albaViewCompound *v)
 {
   if(v == NULL) return;
   wxString path, name, ext;
-  wxSplitPath(filename,&path,&name,&ext);
+  wxFileName::SplitPath(filename,&path,&name,&ext);
   if (filename.IsEmpty() || ext.IsEmpty())
   {
     albaString wildc = "Image (*.jpg)|*.jpg|Image (*.bmp)|*.bmp|Image (*.png)|*.png";
@@ -1160,7 +1160,7 @@ void albaRWIBase::SaveAllImages(albaString filename, albaViewCompound *v)
   wxBitmap imageBitmap;
   v->GetImage(imageBitmap);
 
-  wxSplitPath(filename,&path,&name,&ext);
+  wxFileName::SplitPath(filename,&path,&name,&ext);
   ext.MakeLower();
   if (ext == "bmp")
   {
