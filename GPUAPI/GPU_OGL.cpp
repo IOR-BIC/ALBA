@@ -15,7 +15,8 @@
 =========================================================================*/
 
 #ifdef _WIN32
-#include <Windows.h>
+#define _WINSOCKAPI_
+
 #endif // _WIN32
 #include "GPU_OGL.h"
 #include "albaDefines.h"
@@ -298,9 +299,9 @@ bool albaGPUOGL::CreateShaders(const char* vs, const char* ps, wxString* err)
     if (!success)
     {
       if (err != NULL)
-      {        
-        glGetInfoLogARB(m_vs_ps[i], MAX_PATH, NULL, err->GetWriteBuf(MAX_PATH + 1));
-        err->UngetWriteBuf();
+      {  
+				err->Alloc(MAX_PATH + 1);
+        glGetInfoLogARB(m_vs_ps[i], MAX_PATH, NULL, err->char_str());
       }
 
       return false;
@@ -321,8 +322,8 @@ bool albaGPUOGL::CreateShaders(const char* vs, const char* ps, wxString* err)
   {
     if (err != NULL)
     {        
-      glGetInfoLogARB(m_progObj, MAX_PATH, NULL, err->GetWriteBuf(MAX_PATH + 1));
-      err->UngetWriteBuf();
+			err->Alloc(MAX_PATH + 1);
+      glGetInfoLogARB(m_progObj, MAX_PATH, NULL, err->char_str());
     }
 
     return false;
@@ -379,15 +380,15 @@ bool albaGPUOGL::BeginExecute(wxString* err)
   {
     m_bValidated = true;
     GLint success;
-
+		
     glValidateProgramARB(m_progObj);
     glGetObjectParameterivARB(m_progObj, GL_OBJECT_VALIDATE_STATUS_ARB, &success);
     if (!success)
     {
       if (err != NULL)
-      {        
-        glGetInfoLogARB(m_progObj, MAX_PATH, NULL, err->GetWriteBuf(MAX_PATH + 1));
-        err->UngetWriteBuf();
+      { 
+				err->Alloc(MAX_PATH + 1);
+        glGetInfoLogARB(m_progObj, MAX_PATH, NULL, err->char_str());
       }
 
       EndExecute();
@@ -626,8 +627,13 @@ bool albaGPUOGL::CreateRenderingWindow(wxString* err)
 
     wc.style			    = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
     wc.lpfnWndProc	  = DefWindowProc;
-    wc.hInstance		  = GetModuleHandle(NULL);    
-    wc.lpszClassName	= RW_CLASSNAME;   
+    wc.hInstance		  = GetModuleHandle(NULL);
+		
+		int len = MultiByteToWideChar(CP_ACP, 0, RW_CLASSNAME, -1, NULL, 0);
+		wchar_t* myWideString = new wchar_t[len];
+		MultiByteToWideChar(CP_ACP, 0, RW_CLASSNAME, -1, myWideString, len);
+
+    wc.lpszClassName	= myWideString;
 
     if (RegisterClass(&wc))
       m_bUnregWndClass = true;
@@ -723,7 +729,11 @@ void albaGPUOGL::DestroyRenderingWindow()
 
   if (m_bUnregWndClass) 
   {
-    UnregisterClass(RW_CLASSNAME, ::GetModuleHandle(NULL));
+		int len = MultiByteToWideChar(CP_ACP, 0, RW_CLASSNAME, -1, NULL, 0);
+		wchar_t* myWideString = new wchar_t[len];
+		MultiByteToWideChar(CP_ACP, 0, RW_CLASSNAME, -1, myWideString, len);
+
+    UnregisterClass(myWideString, ::GetModuleHandle(NULL));
     m_bUnregWndClass = false;
   }
 }
@@ -736,7 +746,7 @@ void albaGPUOGL::GetLastErrorText(wxString* err)
 {
   if (err != NULL)
   {
-    LPVOID lpMsgBuf;
+		LPSTR lpMsgBuf = nullptr; 
     DWORD dw = GetLastError(); 
 
     FormatMessageA(
@@ -746,7 +756,7 @@ void albaGPUOGL::GetLastErrorText(wxString* err)
       NULL,
       dw,
       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-      (LPTSTR) &lpMsgBuf,
+      (LPSTR) &lpMsgBuf,
       0, NULL );
 
     err->Printf("%s", lpMsgBuf);
