@@ -716,20 +716,7 @@ const char *albaString::BaseName(const char *filename)
 void albaString::ExtractPathName()
 //----------------------------------------------------------------------------
 {
-  //wxString path, s;
-  *this = wxPathOnly(GetCStr()).c_str();
-  //Set(path.c_str());
-
-/*  int idx=FindLastChr('/');
-
-  if (idx>=0)
-  { 
-    Erase(idx+1,-1);
-  }
-  else
-  {
-    Set("");
-  }*/
+  *this = wxPathOnly(GetCStr());
 }
 
 //----------------------------------------------------------------------------

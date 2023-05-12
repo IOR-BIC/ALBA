@@ -21,11 +21,11 @@
 #define __albaIncludeWX_h
 
 #ifdef ALBA_USE_WX
-  #ifdef WX_PRECOMP
-      #include "wx/wxprec.h"  //originally was the first line of any lal cpp file 
-  #else
-      #include "wx/wx.h"      //originally was the first line of any lal header file 
-  #endif
+  
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
 #endif
 
 #endif

@@ -25,6 +25,7 @@
 #include "wx/zstream.h"
 #include "wx/fs_zip.h"
 
+
 //----------------------------------------------------------------------------
 std::vector<albaString> ZIPOpen(albaString file)
 //----------------------------------------------------------------------------
@@ -44,7 +45,7 @@ std::vector<albaString> ZIPOpen(albaString file)
   tmpDir = zip_cache;
 
   wxString path, name, ext, complete_name, zfile, out_file;
-  wxSplitPath(ZipFile.GetCStr(),&path,&name,&ext);
+	wxFileName::SplitPath(ZipFile.GetCStr(),&path,&name,&ext);
 	complete_name = name + "." + ext;
 
 	wxFSFile *zfileStream;
@@ -75,7 +76,7 @@ std::vector<albaString> ZIPOpen(albaString file)
 		return filesCreated;
 	}
 
-	wxSplitPath(zfile, &path, &name, &ext);
+	wxFileName::SplitPath(zfile, &path, &name, &ext);
 	complete_name = name + "." + ext;
 
 	if (enable_mid)
@@ -93,7 +94,7 @@ std::vector<albaString> ZIPOpen(albaString file)
 	int s_size;
 	std::ofstream out_file_stream;
 
-	out_file_stream.open(out_file, std::ios_base::binary);
+	out_file_stream.open(out_file.char_str(), std::ios_base::binary);
 
 	s_size = zip_is->GetSize();
 	buf = new char[s_size];
@@ -113,13 +114,13 @@ std::vector<albaString> ZIPOpen(albaString file)
 		zfileStream = fileSystem->OpenFile(zfile);
 
 		zip_is = (wxZlibInputStream *)zfileStream->GetStream();
-		wxSplitPath(zfile, &path, &name, &ext);
+		wxFileName::SplitPath(zfile, &path, &name, &ext);
 		complete_name = name + "." + ext;
 		if (enable_mid)
 			complete_name = complete_name.Mid(length_header_name);
 		out_file = tmpDir + "\\" + complete_name;
 
-		out_file_stream.open(out_file, std::ios_base::binary); // The file to extract is a binary
+		out_file_stream.open(out_file.char_str(), std::ios_base::binary); // The file to extract is a binary
 		s_size = zip_is->GetSize();
 		buf = new char[s_size];
 		zip_is->Read(buf, s_size);

@@ -15,17 +15,19 @@
 =========================================================================*/
 
 #include "albaDecl.h"
-#include <wx/image.h>
 #include <wx/uri.h>
 #include "albaIncludeWX.h"
+#include "wx/filename.h"
+
 #include "mmuIdFactory.h"
 #include <math.h>
 #include "wx\stdpaths.h"
 #include "wx\msw\registry.h"
 #include "albaLogicWithManagers.h"
-#include "wx\confbase.h"
-#include "wx\config.h"
 #include "albaColor.h"
+#include "wx/confbase.h"
+
+
 
 // int ALBAExpertMode = TRUE;
 
@@ -62,7 +64,7 @@ std::string  albaGetDirName(const char * initial, const char * title, wxWindow *
   int result = dialog.ShowModal();
   albaYield(); // wait for the dialog to disappear
 
-  albaString newPath = (result == wxID_OK) ? dialog.GetPath().c_str() : "";
+  albaString newPath = (result == wxID_OK) ? dialog.GetPath() : "";
   albaSetLastUserFolder(newPath);
   return newPath;
 }
@@ -75,20 +77,20 @@ std::string albaGetOpenFile(const char *initial, const char * wild, const char *
 	if (wxDirExists(initial))
 		path = initial;
 	else
-	  wxSplitPath(initial,&path,&name,&ext);
+		wxFileName::SplitPath(initial,&path,&name,&ext);
 
   if(name != "" && ext != "") name = wxString::Format("%s.%s",name.c_str(),ext.c_str());
 
   wxString wildcard=wild;
   wildcard+="|All Files (*.*)|*.*";
  
-	wxFileDialog dialog(parent, title, path, "", wildcard, wxOPEN|wxFILE_MUST_EXIST|wxHIDE_READONLY);
+	wxFileDialog dialog(parent, title, path, "", wildcard, wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 
   dialog.SetReturnCode(wxID_OK);
 	int result = dialog.ShowModal();
   albaYield(); // wait for the dialog to disappear
 
-  albaString newPath = (result == wxID_OK) ? dialog.GetPath().c_str() : "";
+  albaString newPath = (result == wxID_OK) ? dialog.GetPath() : "";
   albaSetLastUserFolder(newPath);
   return newPath;
 }
@@ -100,7 +102,7 @@ void albaGetOpenMultiFiles(const char * path, const char * wild, std::vector<std
   wxString wildcard = wild;
   wildcard += "|All Files (*.*)|*.*";
  
-	wxFileDialog dialog(parent, title, path, "", wildcard, wxOPEN|wxFILE_MUST_EXIST|wxHIDE_READONLY|wxMULTIPLE);
+	wxFileDialog dialog(parent, title, path, "", wildcard, wxFD_OPEN|wxFD_FILE_MUST_EXIST|wxFD_MULTIPLE);
 
   dialog.SetReturnCode(wxID_OK);
 	int result = dialog.ShowModal();
@@ -108,11 +110,11 @@ void albaGetOpenMultiFiles(const char * path, const char * wild, std::vector<std
   wxArrayString wxfiles;
 	(result == wxID_OK) ? dialog.GetPaths(wxfiles) : wxfiles.Empty();
 	for (int i=0;i<wxfiles.GetCount();i++)
-	  files.push_back(wxfiles[i].c_str());
+	  files.push_back((char *)wxfiles[i].char_str());
 	if (wxfiles.GetCount() > 0)
 	{
 		wxString newPath, name, ext;
-		wxSplitPath(wxfiles[0], &newPath, &name, &ext);
+		wxFileName::SplitPath(wxfiles[0], &newPath, &name, &ext);
 		albaSetLastUserFolder(newPath);
 	}
 }
@@ -122,7 +124,7 @@ std::string albaGetSaveFile(const char * initial, const char * wild, const char 
 {
   wxString path, name, ext;
 	wxString defaultname = "NewFile";
-  wxSplitPath(initial,&path,&name,&ext);
+	wxFileName::SplitPath(initial,&path,&name,&ext);
 	if (name != "" && ext != "")
 	{
 		name = wxString::Format("%s.%s", name.c_str(), ext.c_str());
@@ -133,10 +135,10 @@ std::string albaGetSaveFile(const char * initial, const char * wild, const char 
 
   wildcard += "|All Files (*.*)|*.*";
   
-	long style = wxSAVE | wxHIDE_READONLY;
+	long style = wxFD_SAVE;
 
 	if (warnOverWrite)
-		style = style | wxOVERWRITE_PROMPT;
+		style = style | wxFD_OVERWRITE_PROMPT;
 	
 	wxFileDialog dialog(parent,title, initial, defaultname, wildcard, style);
 	
@@ -144,7 +146,7 @@ std::string albaGetSaveFile(const char * initial, const char * wild, const char 
 	int result = dialog.ShowModal();
   albaYield(); // wait for the dialog to disappear
 
-  albaString newPath = (result == wxID_OK) ? dialog.GetPath().c_str() : "";
+  albaString newPath = (result == wxID_OK) ? dialog.GetPath() : "";
   albaSetLastUserFolder(newPath);
   return newPath;
 }
@@ -155,7 +157,7 @@ std::string albaGetApplicationDirectory()
 
 	if (GLO_appDebugDir.empty())
 	{
-		wxStandardPaths std;
+		wxStandardPaths &std= wxStandardPaths::Get();
 		wxString exePath = std.GetDataDir();
 
 		//get current working directory
@@ -182,8 +184,8 @@ std::string albaGetAppDataDirectory()
 //----------------------------------------------------------------------------
 {
   //getting user app directory
-  wxStandardPaths std_paths;
-  wxString appData_dir=std_paths.GetUserDataDir();
+	wxStandardPaths &std = wxStandardPaths::Get();
+	wxString appData_dir = std.GetUserDataDir();
 
   return appData_dir.c_str();
 }
@@ -204,7 +206,7 @@ std::string albaGetLastUserFolder()
   wxString lastUserFolder;
 
   wxString appName = wxApp::GetInstance()->GetAppName();
-  wxConfig *config = new wxConfig(appName);
+	wxConfigBase* config = wxConfigBase::Get();
 
   // Return last User Folder if exists, else Documents folder
   if(!config->Read("LastUserFolder", &lastUserFolder))
@@ -249,12 +251,13 @@ void albaSetLastUserFolder(albaString folder)
   if(folder!="")
   {
     wxString appName = wxApp::GetInstance()->GetAppName();
-    wxConfig *config = new wxConfig(appName);
+		wxConfigBase* config = wxConfigBase::Get();
+		
 
-		if (!wxDirExists(folder))
+		if (!wxDirExists(folder.GetCStr()))
 		{
 			wxString path, name, ext;
-			wxSplitPath(folder, &path, &name, &ext);
+			wxFileName::SplitPath(folder.GetCStr(), &path, &name, &ext);
 			if (wxDirExists(path))
 				folder = path;
 			else
