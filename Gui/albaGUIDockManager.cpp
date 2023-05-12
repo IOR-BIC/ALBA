@@ -1153,7 +1153,7 @@ wxDockUIPart* wxFrameManager::HitTest(int x, int y)
             continue;
            
         // if the point is inside the rectangle, we have a hit
-        if (item->m_Rect.Inside(x,y))
+        if (item->m_Rect.Contains(x,y))
             result = item;
     }
     
@@ -1192,7 +1192,7 @@ void wxFrameManager::SetFrame(wxFrame* frame)
     if (frame->IsKindOf(CLASSINFO(wxMDIParentFrame)))
     {
         wxMDIParentFrame* mdi_frame = (wxMDIParentFrame*)frame;
-        wxMDIClientWindow* client_window = mdi_frame->GetClientWindow();
+				wxMDIClientWindow* client_window = dynamic_cast<wxMDIClientWindow*>(mdi_frame->GetClientWindow());
 
         wxASSERT_MSG(client_window, wxT("Client window is NULL!"));
 

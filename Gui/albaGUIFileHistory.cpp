@@ -43,9 +43,9 @@ void albaGUIFileHistory::AddFileToHistory(const wxString& file)
 {
   int i;
   // if we have already have this file we will remove it and reinsert in first position
-  for(i = 0; i < m_fileHistoryN; i++)
+  for(i = 0; i < m_fileHistory.size(); i++)
   {
-    if(m_fileHistory[i] && wxString(m_fileHistory[i]) == file)
+    if(wxString(m_fileHistory[i]) == file)
 		{
 			RemoveFileFromHistory(i);
 			break;
@@ -56,32 +56,32 @@ void albaGUIFileHistory::AddFileToHistory(const wxString& file)
   // Move existing files (if any) down so we can insert file at beginning.
 
   // First delete filename that has popped off the end of the array (if any)
-  if(m_fileHistoryN == m_fileMaxFiles)
+  if(m_fileHistory.size() == m_fileMaxFiles)
   {
 		delete[] m_fileHistory[m_fileMaxFiles-1];
 		m_fileHistory[m_fileMaxFiles-1] = (wxChar *) NULL;
   }
 
-  if(m_fileHistoryN < m_fileMaxFiles)
+  if(m_fileHistory.size() < m_fileMaxFiles)
   {
     wxNode* node = m_fileMenus.GetFirst();
     while (node)
     {
       wxMenu* menu = (wxMenu*) node->GetData();
-      menu->Append(wxID_FILE1+m_fileHistoryN, _("[EMPTY]"));
+      menu->Append(wxID_FILE1+m_fileHistory.size(), _("[EMPTY]"));
       node = node->GetNext();
     }
-    m_fileHistoryN ++;
+    m_fileHistory.size() ++;
   }
 
   // Shuffle filenames down
-  for (i = (m_fileHistoryN-1); i > 0; i--)
+  for (i = (m_fileHistory.size()-1); i > 0; i--)
   {
     m_fileHistory[i] = m_fileHistory[i-1];
   }
   m_fileHistory[0] = copystring(file);
 
-  for(i = 0; i < m_fileHistoryN; i++)
+  for(i = 0; i < m_fileHistory.size(); i++)
     if(m_fileHistory[i])
     {
       wxString buf;
@@ -99,7 +99,7 @@ void albaGUIFileHistory::AddFileToHistory(const wxString& file)
 void albaGUIFileHistory::RemoveFileFromHistory(int i)
 //----------------------------------------------------------------------------
 {
-  wxCHECK_RET( i < m_fileHistoryN, _("invalid index in albaGUIFileHistory::RemoveFileFromHistory") );
+  wxCHECK_RET( i < m_fileHistory.size(), _("invalid index in albaGUIFileHistory::RemoveFileFromHistory") );
 
   wxNode* node = m_fileMenus.GetFirst();
   while ( node )
@@ -110,14 +110,14 @@ void albaGUIFileHistory::RemoveFileFromHistory(int i)
     delete [] m_fileHistory[i];
 
     int j;
-    for ( j = i; j < m_fileHistoryN - 1; j++ )
+    for ( j = i; j < m_fileHistory.size() - 1; j++ )
     {
       m_fileHistory[j] = m_fileHistory[j + 1];
     }
 
     // shuffle filenames up
     wxString buf;
-    for( j = i; j < m_fileHistoryN - 1; j++ )
+    for( j = i; j < m_fileHistory.size() - 1; j++ )
     {
       buf.Printf(s_MRUEntryFormat, j + 1, m_fileHistory[j]);
       menu->SetLabel(wxID_FILE1 + j, buf);
@@ -126,23 +126,23 @@ void albaGUIFileHistory::RemoveFileFromHistory(int i)
     node = node->GetNext();
 
     // delete the last menu item which is unused now
-    menu->Delete(wxID_FILE1 + m_fileHistoryN - 1);
+    menu->Delete(wxID_FILE1 + m_fileHistory.size() - 1);
   }
 
-  m_fileHistoryN--;
+  m_fileHistory.size()--;
 }
 //----------------------------------------------------------------------------
 void albaGUIFileHistory::AddFilesToMenu()
 //----------------------------------------------------------------------------
 {
-  if (m_fileHistoryN > 0)
+  if (m_fileHistory.size() > 0)
   {
     wxNode* node = m_fileMenus.GetFirst();
     while(node)
     {
       wxMenu* menu = (wxMenu*) node->GetData();
       int i;
-      for(i = 0; i < m_fileHistoryN; i++)
+      for(i = 0; i < m_fileHistory.size(); i++)
       {
         if(m_fileHistory[i])
         {
@@ -162,10 +162,10 @@ void albaGUIFileHistory::AddFilesToMenu()
 void albaGUIFileHistory::AddFilesToMenu(wxMenu* menu)
 //----------------------------------------------------------------------------
 {
-  if(m_fileHistoryN > 0)
+  if(m_fileHistory.size() > 0)
   {
     int i;
-    for(i = 0; i < m_fileHistoryN; i++)
+    for(i = 0; i < m_fileHistory.size(); i++)
     {
       if(m_fileHistory[i])
       {

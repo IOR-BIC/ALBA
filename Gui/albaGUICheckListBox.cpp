@@ -159,7 +159,7 @@ albaString albaGUICheckListBox::GetItemLabel(int id)
 
   m_PreventNotify = true;
   int index = FindItemIndex(id);
-  label = m_CheckListBox->GetString(index).c_str();
+  label = m_CheckListBox->GetString(index);
   m_PreventNotify = false;
 
 	return label;

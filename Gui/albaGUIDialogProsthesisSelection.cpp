@@ -299,7 +299,7 @@ void albaGUIDialogProsthesisSelection::UpdateDialog()
 			wxImage *previewImage = new wxImage();
 
 			wxString path, name, ext;
-			wxSplitPath(m_ProducerImageFullName, &path, &name, &ext);
+			wxFileName::SplitPath(m_ProducerImageFullName, &path, &name, &ext);
 						
 			if (ext == "png") // NOT USED
 			{

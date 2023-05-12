@@ -245,7 +245,7 @@ void albaGUIMDIFrame::OnDropFile(wxDropFilesEvent &event)
   {
     file_to_open = file_list[i].c_str();
 
-    wxSplitPath(file_list[i],&path, &name, &ext);
+    wxFileName::SplitPath(file_list[i],&path, &name, &ext);
 
 		albaString zippedExt;
 		const char *archExt = GetLogicManager()->GetMsfFileExtension();

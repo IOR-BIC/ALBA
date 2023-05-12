@@ -445,7 +445,7 @@ int albaGUIImageViewer::SaveVMEImage(albaVMEImage *image, wxString imageFileName
 	if (image && imageFileName != "")
 	{
 		wxString pathName, fileName, extension;
-		wxSplitPath(imageFileName, &pathName, &fileName, &extension);
+		wxFileName::SplitPath(imageFileName, &pathName, &fileName, &extension);
 
 		// Flip y axis
 		vtkALBASmartPointer<vtkImageFlip> imageFlipFilter;

@@ -40,7 +40,7 @@ albaGUISettings(Listener, label)
     wxMkdir(albaGetAppDataDirectory().c_str());
 
   //creating Logs directory if does not exist
-  if(!wxDirExists(m_LogFolder))
+  if(!wxDirExists(m_LogFolder.GetCStr()))
     wxMkdir(m_LogFolder.GetCStr());
 
   InitializeSettings();
@@ -125,7 +125,7 @@ void albaGUIApplicationSettings::InitializeSettings()
 
 	if(m_Config->Read("LogFolder", &string_item))
   {
-    m_LogFolder = string_item.c_str();
+    m_LogFolder = string_item;
   }
   else
   {

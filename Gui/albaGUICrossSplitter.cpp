@@ -74,7 +74,7 @@ albaGUICrossSplitter::~albaGUICrossSplitter()
 void albaGUICrossSplitter::OnSize(wxSizeEvent &event)
 //----------------------------------------------------------------------------
 {
-  wxPanel::OnSize(event);
+  wxPanel::Layout();
   albaYield();
 
   if (m_With == -1 )

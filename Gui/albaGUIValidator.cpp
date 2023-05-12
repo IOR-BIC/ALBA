@@ -26,6 +26,7 @@
 
 #include "albaGUIValidator.h"
 #include <wx/colordlg.h>
+#include "wx/filename.h"
 //#include <math.h>
 #include "albaEvent.h"
 #include "albaGUIFloatSlider.h"
@@ -721,7 +722,7 @@ bool albaGUIValidator::TransferToWindow(void)
     break;
     case VAL_DIROPEN:
 			path = m_MafStringVar->GetCStr();
-			if( ! ::wxDirExists(path) ) wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext); // it is a filename
+			if( ! ::wxDirExists(path) ) wxFileName::SplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext); // it is a filename
 			m_TextCtrl->SetValue(path);
 			if(path != "")
 			{ 
@@ -730,7 +731,7 @@ bool albaGUIValidator::TransferToWindow(void)
   	break;
     case VAL_FILEOPEN:
     case VAL_FILESAVE:
-			wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
+			wxFileName::SplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
 			if (ext.Len() >0 )
 			{
 				name += ".";
@@ -855,7 +856,7 @@ bool albaGUIValidator::TransferFromWindow(void)
         res = !m_MafStringVar->Equals(s.c_str());
         if (res)
         {
-          *m_MafStringVar = s.c_str();
+          *m_MafStringVar = s;
           m_WidgetData.sValue = m_MafStringVar->GetCStr();
         }
         return res;
@@ -1050,7 +1051,7 @@ void albaGUIValidator::OnButton(wxCommandEvent& event)
 				if (wxDirExists(m_MafStringVar->GetCStr()))
 					path = m_MafStringVar->GetCStr();
 				else
-					wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
+					wxFileName::SplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
 
         wxDirDialog dialog(m_Button,"", path, 0, m_Button->GetPosition());
 				dialog.SetReturnCode(wxID_OK);
@@ -1058,7 +1059,7 @@ void albaGUIValidator::OnButton(wxCommandEvent& event)
         if (ret_code == wxID_OK)
         {
           path = dialog.GetPath();
-          *m_MafStringVar = path.c_str();
+          *m_MafStringVar = path;
           m_TextCtrl->SetLabel(path);
         }
 				else
@@ -1069,20 +1070,20 @@ void albaGUIValidator::OnButton(wxCommandEvent& event)
       break;
       case VAL_FILEOPEN:
       {
-        wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
+        wxFileName::SplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
 				if (ext.Len() >0 )
 				{
 					name += ".";
 					name += ext;
 				}
-        wxFileDialog dialog(m_Button,"Open File", path, name, m_Wildcard.GetCStr(), wxOPEN|wxFILE_MUST_EXIST|wxHIDE_READONLY , m_Button->GetPosition());
+        wxFileDialog dialog(m_Button,"Open File", path, name, m_Wildcard.GetCStr(), wxFD_OPEN|wxFD_FILE_MUST_EXIST , m_Button->GetPosition());
         dialog.SetReturnCode(wxID_OK);
 				ret_code = dialog.ShowModal();
 				if (ret_code == wxID_OK)
         {
           path = dialog.GetPath();
           name = dialog.GetFilename();
-          *m_MafStringVar = path.c_str();
+          *m_MafStringVar = path;
           m_TextCtrl->SetLabel(name);
         }
 				else
@@ -1093,18 +1094,18 @@ void albaGUIValidator::OnButton(wxCommandEvent& event)
       break;
       case VAL_FILESAVE:
       {
-        wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
+        wxFileName::SplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
 				if (ext.Len() >0 )
 				{
 					name += ".";
 					name += ext;
 				}
-        wxFileDialog dialog(m_Button,"Save File", path, name, m_Wildcard.GetCStr(), wxSAVE|wxOVERWRITE_PROMPT|wxHIDE_READONLY , m_Button->GetPosition());
+        wxFileDialog dialog(m_Button,"Save File", path, name, m_Wildcard.GetCStr(), wxFD_SAVE|wxFD_OVERWRITE_PROMPT , m_Button->GetPosition());
         dialog.SetReturnCode(wxID_OK);
 				ret_code = dialog.ShowModal();
 				if (ret_code == wxID_OK)
         {
-          *m_MafStringVar = dialog.GetPath().c_str();
+          *m_MafStringVar = dialog.GetPath();
           m_TextCtrl->SetLabel(dialog.GetFilename());
         }
 				else
@@ -1137,7 +1138,7 @@ void albaGUIValidator::OnButton(wxCommandEvent& event)
     {
         albaYield(); // update gui to let the dialogs disappear
 
-        ( (wxPanel*)m_Button->GetParent() )->SetDefaultItem(NULL);
+       // ( (wxPanel*)m_Button->GetParent() )->SetDefaultItem(NULL);
 
         albaYield(); 
     }

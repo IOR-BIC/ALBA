@@ -72,7 +72,6 @@ void albaGUIFlagSplitter::OnSize(wxSizeEvent& event)
 {
   // resize the window and the sub panels keeping the previous relative positions.
   float rx1,rx2;
-  wxPanel::OnSize(event);
 	this->Refresh(false);
 	Layout();
   albaYield(); 

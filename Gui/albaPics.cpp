@@ -31,7 +31,7 @@
 //----------------------------------------------------------------------------
 // albaPictureFactory_Pimpl
 //----------------------------------------------------------------------------
-typedef std::map<std::string,wxImage> albaPicMap;
+typedef std::map<wxString,wxImage> albaPicMap;
 
 struct albaPictureFactory_Pimpl
 {
@@ -200,7 +200,7 @@ albaPictureFactory::~albaPictureFactory()
 void albaPictureFactory::Add(wxString id,char** xpm)
 //----------------------------------------------------------------------------
 {
-  m_PictureMaps->map[id.c_str()] = wxImage(xpm);
+  m_PictureMaps->map[id] = wxImage(xpm);
 }
 //----------------------------------------------------------------------------
 wxBitmap albaPictureFactory::GetBmp(wxString id)
