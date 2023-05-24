@@ -283,7 +283,7 @@
 #include "albaViewSlicer.h"
 #include "albaViewVTK.h"
 #include "albaViewVTKCompound.h"
-
+#include "albaViewVirtualRX.h"
 
 
 #define IDM_WINDOWNEXT 4004
@@ -2153,6 +2153,11 @@ void albaLogicWithManagers::PlugStandardViews()
 	albaViewRXCompound *vrx = new albaViewRXCompound("RX");
 	vrx->PackageView();
 	Plug(vrx);
+
+	//View RX Compound
+	albaViewVirtualRX *vvrx = new albaViewVirtualRX("Virtual RX");
+	vvrx->PackageView();
+	Plug(vvrx);
 
 	//View Isosurface
 	albaViewVTK *viso = new albaViewVTK("Isosurface");
