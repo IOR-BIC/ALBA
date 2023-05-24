@@ -20,30 +20,31 @@ PURPOSE.  See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 
 #include "albaViewVirtualRX.h"
-#include "albaViewVTK.h"
-#include "albaViewRX.h"
-#include "albaViewSlice.h"
+
+#include "albaGUI.h"
+#include "albaGUILutPreset.h"
+#include "albaGUILutSlider.h"
+#include "albaGUILutSwatch.h"
+#include "albaGizmoSlice.h"
 #include "albaPipeSlice.h"
 #include "albaPipeSurfaceSlice.h"
-#include "albaVMEIterator.h"
-#include "albaGUILutPreset.h"
-#include "albaGUI.h"
-#include "albaGUILutSwatch.h"
-#include "albaGUILutSlider.h"
-#include "albaGizmoSlice.h"
-#include "mmaVolumeMaterial.h"
-#include "albaVMEVolume.h"
-#include "albaVMESurface.h"
-
-#include "vtkDataSet.h"
-#include "vtkLookupTable.h"
-#include "vtkPoints.h"
 #include "albaPipeVolumeOrthoSlice.h"
-#include "albaPipeVolumeSliceBlend.h"
 #include "albaPipeVolumeProjected.h"
+#include "albaPipeVolumeSliceBlend.h"
+#include "albaVMEIterator.h"
+#include "albaVMESurface.h"
+#include "albaVMEVolume.h"
+#include "albaViewRX.h"
+#include "albaViewSlice.h"
+#include "albaViewVTK.h"
+
+#include "mmaVolumeMaterial.h"
 #include "vtkALBAProjectVolume.h"
 #include "vtkALBASmartPointer.h"
+#include "vtkDataSet.h"
 #include "vtkImageData.h"
+#include "vtkLookupTable.h"
+#include "vtkPoints.h"
 
 //----------------------------------------------------------------------------
 // constants:
@@ -84,7 +85,7 @@ albaViewVirtualRX::albaViewVirtualRX(wxString label)
 
 	m_ProjectionRangeGuiSliderX = NULL;
 	m_ProjectionRangeGuiSliderY = NULL;
-	m_ProjectionRangeGuiSliderZ = NULL;
+	//m_ProjectionRangeGuiSliderZ = NULL;
 
 	m_ProjectionMode = 0;
 	m_ProjectionPlane = 0;
@@ -99,6 +100,10 @@ albaViewVirtualRX::~albaViewVirtualRX()
 		cppDEL(m_LutSliders[i]);
 		vtkDEL(m_VtkLUT[i]);
 	}
+
+	delete m_ProjectionRangeGuiSliderX;
+	delete m_ProjectionRangeGuiSliderY;
+	//delete m_ProjectionRangeGuiSliderZ;
 }
 
 //----------------------------------------------------------------------------
@@ -194,6 +199,7 @@ void albaViewVirtualRX::OnEvent(albaEventBase *alba_event)
 			// events from the slider
 		case ID_RANGE_MODIFIED:
 		{
+			// LUT SLIDERS
 			// is the volume visible?
 			if (((albaViewSlice *)m_ChildViewList[RX_FRONT_VIEW])->VolumeIsVisible())
 			{
@@ -211,36 +217,38 @@ void albaViewVirtualRX::OnEvent(albaEventBase *alba_event)
 					((albaViewRX *)m_ChildViewList[RX_SIDE_VIEW])->SetLutRange(low, hi);
 				}
 
-
-				double min, max;
-				if (e->GetSender() == m_ProjectionRangeGuiSliderX)
-				{
-					m_ProjectionRangeGuiSliderX->GetSubRange(&min, &max);
-
-					UpdateProjection(min, max, RX_SIDE_VIEW, m_ProjectionMode);
-					UpdateProjectionGizmos();
-				}
-				else if (e->GetSender() == m_ProjectionRangeGuiSliderY)
-				{
-					m_ProjectionRangeGuiSliderY->GetSubRange(&min, &max);
-
-					UpdateProjection(min, max, RX_FRONT_VIEW, m_ProjectionMode);
-					UpdateProjectionGizmos();
-				}
-				else if (e->GetSender() == m_ProjectionRangeGuiSliderZ)
-				{
-					m_ProjectionRangeGuiSliderZ->GetSubRange(&min, &max);
-
-					UpdateProjection(min, max, 2, m_ProjectionMode);
-					UpdateProjectionGizmos();
-				}
-
-				GetLogicManager()->CameraUpdate();
-
-				//CameraUpdate();
+				CameraUpdate();
 			}
+
+			// PROJECTION SLIDERS
+			double min, max;
+			if (e->GetSender() == m_ProjectionRangeGuiSliderX)
+			{
+				m_ProjectionRangeGuiSliderX->GetSubRange(&min, &max);
+				m_GizmoPoints[0] = min;
+				m_GizmoPoints[1] = max;
+				UpdateProjection(min, max, RX_SIDE_VIEW, m_ProjectionMode);
+				UpdateProjectionGizmos();
+			}
+			else if (e->GetSender() == m_ProjectionRangeGuiSliderY)
+			{
+				m_ProjectionRangeGuiSliderY->GetSubRange(&min, &max);
+				m_GizmoPoints[2] = min;
+				m_GizmoPoints[3] = max;
+				UpdateProjection(min, max, RX_FRONT_VIEW, m_ProjectionMode);
+				UpdateProjectionGizmos();
+			}
+// 			else if (e->GetSender() == m_ProjectionRangeGuiSliderZ)
+// 			{
+// 				m_ProjectionRangeGuiSliderZ->GetSubRange(&min, &max);
+// 				m_GizmoPoints[4] = min;
+// 				m_GizmoPoints[5] = max;
+// 				UpdateProjection(min, max, 2, m_ProjectionMode);
+// 				UpdateProjectionGizmos();
+// 			}
 		}
 		break;
+
 		case ID_RIGHT_OR_LEFT:
 		{
 			if (m_RightOrLeft == 0)
@@ -270,6 +278,7 @@ void albaViewVirtualRX::OnEvent(albaEventBase *alba_event)
 			OnEventMouseMove(e);
 		}
 		break;
+
 		default:
 			albaViewCompound::OnEvent(alba_event);
 		}
@@ -292,61 +301,59 @@ void albaViewVirtualRX::OnEventMouseMove(albaEvent *e)
 		}
 	};
 
+	//
 	vtkPoints *p = (vtkPoints *)e->GetVtkObj();
 
 	if (p == NULL)
 		return;
 
-	long gizmoId = e->GetArg();
-
 	// Get point picked
 	double gizmoPoint[3];
 	p->GetPoint(0, gizmoPoint);
-	
+
+	long gizmoId = e->GetArg();
+
 	BoundsValidate(gizmoPoint, m_VolumeBounds);
 	
-	if (gizmoId == 0 || gizmoId == 1) // RX_FRONT_VIEW X
-	{
-		if (gizmoId == 1 && gizmoPoint[0] < m_GizmoPoints[0]) return; // gizmoId = 0;
-		if (gizmoId == 0 && gizmoPoint[0] > m_GizmoPoints[1]) return; // gizmoId = 1;
-
-		m_GizmoPoints[gizmoId] = gizmoPoint[0];
-
-		// Sort Points
-		m_GizmoPoints[0] = MIN(m_GizmoPoints[0], m_GizmoPoints[1]);
-		m_GizmoPoints[1] = MAX(m_GizmoPoints[0], m_GizmoPoints[1]);
-
-		UpdateProjection(m_GizmoPoints[0], m_GizmoPoints[1], RX_SIDE_VIEW, m_ProjectionMode);
-	}
-	else if (gizmoId == 2 || gizmoId == 3) // RX_SIDE_VIEW Y
-	{
-		if (gizmoId == 3 && gizmoPoint[1] < m_GizmoPoints[2]) gizmoId = 2;
-		if (gizmoId == 2 && gizmoPoint[1] > m_GizmoPoints[3]) gizmoId = 3;
-
-		m_GizmoPoints[gizmoId] = gizmoPoint[1];
-
-		// Sort Points
-		m_GizmoPoints[2] = MIN(m_GizmoPoints[2], m_GizmoPoints[3]);
-		m_GizmoPoints[3] = MAX(m_GizmoPoints[2], m_GizmoPoints[3]);
-
-		UpdateProjection(m_GizmoPoints[2], m_GizmoPoints[3], RX_FRONT_VIEW, m_ProjectionMode);
-	}
-	else if (gizmoId == 4 || gizmoId == 5) // RX_TOP_VIEW Z
-	{
-		if (gizmoId == 5 && gizmoPoint[2] < m_GizmoPoints[4]) gizmoId = 4;
-		if (gizmoId == 4 && gizmoPoint[2] > m_GizmoPoints[5]) gizmoId = 5;
-
-		m_GizmoPoints[gizmoId] = gizmoPoint[2];
-
-		// Sort Points
-		m_GizmoPoints[4] = MIN(m_GizmoPoints[4], m_GizmoPoints[5]);
-		m_GizmoPoints[5] = MAX(m_GizmoPoints[4], m_GizmoPoints[5]);
-
-		UpdateProjection(m_GizmoPoints[4], m_GizmoPoints[5], 2, m_ProjectionMode);
-	}
-
+	Validate(gizmoId, gizmoPoint[gizmoId / 2]);
+	
 	UpdateProjectionGui();
 	GetLogicManager()->CameraUpdate();
+}
+//----------------------------------------------------------------------------
+bool albaViewVirtualRX::Validate(long gizmoId, double gizmoPoint)
+{
+	bool isValid = false;
+
+	int min, max;
+	int plane = RX_SIDE_VIEW;
+
+	if (gizmoId == 0 && gizmoPoint < m_GizmoPoints[1]) { min = 0; max = 1;  plane = RX_SIDE_VIEW; isValid = true; }
+	if (gizmoId == 1 && gizmoPoint > m_GizmoPoints[0]) { min = 0; max = 1;  plane = RX_SIDE_VIEW; isValid = true; }
+
+	if (gizmoId == 2 && gizmoPoint < m_GizmoPoints[3]) { min = 2; max = 3;  plane = RX_FRONT_VIEW; isValid = true; }
+	if (gizmoId == 3 && gizmoPoint > m_GizmoPoints[2]) { min = 2; max = 3;  plane = RX_FRONT_VIEW; isValid = true; }
+
+// 	if (gizmoId == 4 && gizmoPoint < m_GizmoPoints[5]) { min = 4; max = 5;  plane = RX_SIDE_VIEW; isValid = true; }
+// 	if (gizmoId == 5 && gizmoPoint > m_GizmoPoints[4]) { min = 4; max = 5;  plane = RX_SIDE_VIEW; isValid = true; }
+
+	if (isValid)
+	{
+		m_GizmoPoints[gizmoId] = gizmoPoint;
+
+		// Sort Points
+		m_GizmoPoints[min] = MIN(m_GizmoPoints[min], m_GizmoPoints[max]);
+		m_GizmoPoints[max] = MAX(m_GizmoPoints[min], m_GizmoPoints[max]);
+		
+		UpdateProjection(m_GizmoPoints[min], m_GizmoPoints[max], plane, m_ProjectionMode);
+	}
+	else
+	{
+		// No Point Updated - Reset last Position
+		UpdateProjectionGizmos();
+	}
+
+	return isValid;
 }
 
 //-------------------------------------------------------------------------
@@ -374,11 +381,11 @@ albaGUI* albaViewVirtualRX::CreateGui()
 	m_ProjectionRangeGuiSliderY->SetText(1, "Side");
 	m_Gui->Add(m_ProjectionRangeGuiSliderY);
 
-	m_ProjectionRangeGuiSliderZ = NULL;
-	m_ProjectionRangeGuiSliderZ = new albaGUILutSlider(m_Gui, ID_PROJECTION_RANGE, wxPoint(0, 0), wxSize(-1, 24));
-	m_ProjectionRangeGuiSliderZ->SetListener(this);
-	m_ProjectionRangeGuiSliderZ->SetText(1, "Top");
-	//m_Gui->Add(m_ProjectionRangeGuiSliderZ);
+// 	m_ProjectionRangeGuiSliderZ = NULL;
+// 	m_ProjectionRangeGuiSliderZ = new albaGUILutSlider(m_Gui, ID_PROJECTION_RANGE, wxPoint(0, 0), wxSize(-1, 24));
+// 	m_ProjectionRangeGuiSliderZ->SetListener(this);
+// 	m_ProjectionRangeGuiSliderZ->SetText(1, "Top");
+// 	m_Gui->Add(m_ProjectionRangeGuiSliderZ);
 
 	wxString prjChoices[2]{ "Mean", "Max" };
 	m_Gui->Radio(ID_PROJECTION_MODE, "Mode", &m_ProjectionMode, 2, prjChoices, 2, "Projection Modality",1);
@@ -472,8 +479,7 @@ void albaViewVirtualRX::LayoutSubView(int width, int height)
 //----------------------------------------------------------------------------
 void albaViewVirtualRX::CreateGizmo()
 {
-	if (m_PrjGizmo[0] || m_PrjGizmo[1] || m_PrjGizmo[2] ||
-		m_PrjGizmo[3] || m_PrjGizmo[4] || m_PrjGizmo[5]) DestroyGizmo();
+	if (m_PrjGizmo[0] || m_PrjGizmo[1] || m_PrjGizmo[2] || m_PrjGizmo[3] /*|| m_PrjGizmo[4] || m_PrjGizmo[5]*/) DestroyGizmo();
 	
 	if (m_CurrentVolume)
 	{
@@ -611,8 +617,8 @@ void albaViewVirtualRX::UpdateProjectionGui()
 		m_ProjectionRangeGuiSliderY->SetRange(m_VolumeBounds[2], m_VolumeBounds[3]);
 		m_ProjectionRangeGuiSliderY->SetSubRange(m_GizmoPoints[2], m_GizmoPoints[3]);
 
-		m_ProjectionRangeGuiSliderZ->SetRange(m_VolumeBounds[4], m_VolumeBounds[5]);
-		m_ProjectionRangeGuiSliderZ->SetSubRange(m_GizmoPoints[4], m_GizmoPoints[5]);
+// 		m_ProjectionRangeGuiSliderZ->SetRange(m_VolumeBounds[4], m_VolumeBounds[5]);
+// 		m_ProjectionRangeGuiSliderZ->SetSubRange(m_GizmoPoints[4], m_GizmoPoints[5]);
 
 		m_Gui->Update();
 	}
@@ -625,6 +631,7 @@ void albaViewVirtualRX::UpdateProjectionGizmos()
 	for (int gizmoId = GIZMO_XA; gizmoId < GIZMOS_NUMBER; gizmoId++)
 	{
 		m_PrjGizmo[gizmoId]->UpdateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId / 2], m_GizmoPoints[gizmoId]);
+		m_PrjGizmo[gizmoId]->SetGizmoMovingModalityToBound();
 	}
 
 	GetLogicManager()->CameraUpdate();

@@ -24,17 +24,17 @@ PURPOSE.  See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaViewRX;
-class albaVMEVolume;
-class vtkLookupTable;
-class albaGUILutSwatch;
 class albaGUILutSlider;
+class albaGUILutSwatch;
 class albaGizmoSlice;
+class albaVMEVolume;
+class albaViewRX;
+class vtkLookupTable;
 
 //----------------------------------------------------------------------------
 // albaViewVirtualRX :
 //----------------------------------------------------------------------------
-/** This view features two Rx views and one compound view made of six CT slices.*/
+/** This view features two Rx views with projection options*/
 class ALBA_EXPORT albaViewVirtualRX : public albaViewCompound
 {
 public:
@@ -96,6 +96,8 @@ protected:
 	/** Listen mouse events*/
 	void OnEventMouseMove(albaEvent *e);
 
+	bool Validate(long gizmoId, double gizmoPoint);
+
 	/** Redefine to arrange views to generate RXCT visualization.*/
 	virtual void LayoutSubView(int width, int height);
 
@@ -117,22 +119,21 @@ protected:
 
 	albaViewRX *m_ViewsRX[3];
 	
-	// This member variables are used by side panel gui view 
+	// This member variables are used by side panel Gui view 
 	int m_RightOrLeft;
+	int m_ProjectionMode = 0;
+	int m_ProjectionPlane = 0;
+	double m_GizmoPoints[6];
+
+	albaGUILutSlider *m_ProjectionRangeGuiSliderX;
+	albaGUILutSlider *m_ProjectionRangeGuiSliderY;
+	albaGUILutSlider *m_ProjectionRangeGuiSliderZ;
+
+	albaGizmoSlice *m_PrjGizmo[6];
 
 	albaGUI				*m_GuiViews[2];
 	albaGUILutSlider	*m_LutSliders[2];
 	vtkLookupTable		*m_VtkLUT[2];
 	albaGUILutSwatch    *m_LutWidget;
-
-	albaGizmoSlice *m_PrjGizmo[6];
-	double m_GizmoPoints[6];
-			
-	int m_ProjectionMode = 0;
-	int m_ProjectionPlane = 0;
-	
-	albaGUILutSlider *m_ProjectionRangeGuiSliderX;
-	albaGUILutSlider *m_ProjectionRangeGuiSliderY;
-	albaGUILutSlider *m_ProjectionRangeGuiSliderZ;
 };
 #endif
