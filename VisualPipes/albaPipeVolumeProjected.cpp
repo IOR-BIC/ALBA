@@ -360,6 +360,18 @@ void albaPipeVolumeProjected::SetProjectionRange(int range[2])
 }
 
 //----------------------------------------------------------------------------
+void albaPipeVolumeProjected::SetProjectionModality(int modality)
+{
+	if (m_ProjectFilter)
+	{
+		if (modality == 0)
+			m_ProjectFilter->SetProjectionModalityToMean();
+		else
+			m_ProjectFilter->SetProjectionModalityToMax();
+	}
+}
+
+//----------------------------------------------------------------------------
 void albaPipeVolumeProjected::TickActorVisibilityOn()
 //----------------------------------------------------------------------------
 {

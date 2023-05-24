@@ -67,6 +67,9 @@ public:
 	/** Sets the range of projection, the range is expressed like volume dims*/
 	void SetProjectionRange(int range[2]);
 
+	/** Sets projection modality, 0 ToMean, 1 ToMax*/
+	void SetProjectionModality(int modality);
+
   /** Set Tick Actor Visibility */
   void TickActorVisibilityOn();
   void TickActorVisibilityOff();

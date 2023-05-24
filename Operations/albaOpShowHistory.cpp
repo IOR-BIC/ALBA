@@ -106,8 +106,8 @@ void albaOpShowHistory::OpRun()
 
 		m_Dialog = new albaGUIDialog(title, albaRESIZABLE | albaCLOSEWINDOW);
 		
-		#include "pic/menu/EDIT_SHOW_HISTORY.xpm"
-		m_Dialog->SetIcon(wxIcon(EDIT_SHOW_HISTORY_xpm));
+		#include "pic/menu/SHOW_HISTORY.xpm"
+		m_Dialog->SetIcon(wxIcon(SHOW_HISTORY_xpm));
 
 		wxTextCtrl *textCtrl = new wxTextCtrl(m_Dialog, NULL, text, wxDefaultPosition, wxDefaultSize, wxALL | wxEXPAND);
 		textCtrl->SetMinSize(wxSize(450, 400));
