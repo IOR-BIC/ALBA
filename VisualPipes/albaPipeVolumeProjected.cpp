@@ -358,6 +358,15 @@ void albaPipeVolumeProjected::SetProjectionRange(int range[2])
 	if(m_RangeProjectionEnabled)
 		GetLogicManager()->CameraUpdate();
 }
+//----------------------------------------------------------------------------
+void albaPipeVolumeProjected::GetProjectionRange(int *range)
+{
+	if (m_ProjectFilter)
+		m_ProjectFilter->SetProjectSubRange(true);
+
+	if (m_ProjectFilter)
+		m_ProjectFilter->GetProjectionRange(range);
+}
 
 //----------------------------------------------------------------------------
 void albaPipeVolumeProjected::SetProjectionModality(int modality)

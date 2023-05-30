@@ -45,6 +45,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkImageData.h"
 #include "vtkLookupTable.h"
 #include "vtkPoints.h"
+#include "vtkRectilinearGrid.h"
 
 //----------------------------------------------------------------------------
 // constants:
@@ -486,9 +487,32 @@ void albaViewVirtualRX::CreateGizmo()
 		vtkDataSet * vtkData = m_CurrentVolume->GetOutput()->GetVTKData();
 		vtkData->GetBounds(m_VolumeBounds);
 		
-		m_VolumeSize[0] = m_VolumeBounds[1] - m_VolumeBounds[0];
-		m_VolumeSize[1] = m_VolumeBounds[3] - m_VolumeBounds[2];
-		m_VolumeSize[2] = m_VolumeBounds[5] - m_VolumeBounds[4];
+		int dims[3] = { 512, 512, 512 };
+		double spacing[3] = { 1,1,1 };
+
+		if (NULL != vtkData)
+		{
+			if (vtkData->IsA("vtkRectilinearGrid")) {
+				vtkRectilinearGrid *rectilinearGrid = vtkRectilinearGrid::SafeDownCast(vtkData);
+				rectilinearGrid->GetDimensions(dims);
+			}
+			else if (vtkData->IsA("vtkImageData")) {
+				vtkImageData *imageData = vtkImageData::SafeDownCast(vtkData);
+				imageData->GetDimensions(dims);
+				imageData->GetSpacing(spacing);
+			}
+		}
+
+		m_Spacing[0] = spacing[0];
+		m_Spacing[1] = spacing[1];
+		m_Spacing[2] = spacing[2];
+
+		m_VolumeDims[0] = dims[0];
+		m_VolumeDims[1] = dims[1];
+
+		m_VolumeSize[0] = (m_VolumeBounds[1] - m_VolumeBounds[0]);
+		m_VolumeSize[1] = (m_VolumeBounds[3] - m_VolumeBounds[2]);
+		m_VolumeSize[2] = (m_VolumeBounds[5] - m_VolumeBounds[4]);
 	}
 		
 	// Creates the Gizmos
@@ -580,10 +604,36 @@ void albaViewVirtualRX::UpdateProjection(double min, double max, int plane, int 
 	{
 		pipe->SetProjectionModality(m_ProjectionMode);
 
-		int range[2] = { ((min - m_VolumeBounds[plane*2]) / m_VolumeSize[plane]) * 512, ((max - m_VolumeBounds[plane*2]) / m_VolumeSize[plane]) * 512 };
+		int range[2];
+		int pl = plane == 0 ? pl = 1 : pl = 0;
+		double offset = m_VolumeBounds[pl * 2];
+
+		double p1 = (min - offset) /** m_Spacing[pl]*/;
+		double p2 = (max - offset) /** m_Spacing[pl]*/;
+
+		double d1 = p1 / m_VolumeSize[pl];
+		double d2 = p2 / m_VolumeSize[pl];
+
+		double r1 = d1 * m_VolumeDims[pl];
+		double r2 = d2 * m_VolumeDims[pl];
+
+		range[0] = r1 /** m_Spacing[pl]*/;
+		range[1] = r2 /** m_Spacing[pl]*/;
 
 		pipe->SetProjectionRange(range);
 		pipe->EnableRangeProjection(true);
+
+
+		// Update Lut
+		double lutRange[2];
+		pipe->GetFilter()->GetOutput()->GetScalarRange(lutRange);
+
+		m_LutSliders[m_ProjectionPlane]->SetRange(lutRange[0], lutRange[1]);
+		m_LutSliders[m_ProjectionPlane]->SetSubRange(lutRange[0], lutRange[1]);
+
+		((albaViewRX *)m_ChildViewList[m_ProjectionPlane])->SetLutRange(lutRange[0], lutRange[1]);
+
+		m_ChildViewList[m_ProjectionPlane]->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------

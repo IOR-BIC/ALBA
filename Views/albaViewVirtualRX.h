@@ -116,6 +116,8 @@ protected:
 	albaVME *m_CurrentVolume; ///< Current visualized volume
 	double m_VolumeBounds[6];
 	double m_VolumeSize[3];
+	int m_VolumeDims[2];
+	double m_Spacing[3];
 
 	albaViewRX *m_ViewsRX[3];
 	
