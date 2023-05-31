@@ -633,8 +633,11 @@ public:
   /** return a pointer to the output data structure */
   virtual albaVMEOutput *GetOutput() {return m_Output;}
 
-  /** Return the suggested pipe-typename for the visualization of this vme */
-  virtual albaString GetVisualPipe() {return albaString("");};
+	/** Return the suggested pipe-typename for the visualization of this vme */
+	virtual albaString GetVisualPipe() { return albaString(""); };
+
+	/** Return the suggested pipe-typename for the visualization of this vme */
+	virtual albaString GetVisualPipeSlice() { return albaString(""); };
 
   /** Set the mode with which render the VME: DEFAULT_VISUAL_MODE or NO_DATA_VISUAL_MODE.
   Setting the visual mode to default will produce also the reset of the m_EditingVisualPipe

@@ -162,6 +162,10 @@ protected:
 
   void CameraUpdateForRotatedVolumes();
   void SetCameraParallelToDataSetLocalAxis( int axis );
+
+
+	//----------------------------------------------------------------------------
+	virtual void GetVisualPipeName(albaVME *node, albaString &pipe_name);
  
   albaSceneNode    *m_CurrentVolume; ///< Current visualized volume
   vtkActor2D      *m_Border;
