@@ -137,5 +137,7 @@ protected:
 	albaGUILutSlider	*m_LutSliders[2];
 	vtkLookupTable		*m_VtkLUT[2];
 	albaGUILutSwatch    *m_LutWidget;
+
+	int m_UpdateWindowing;
 };
 #endif

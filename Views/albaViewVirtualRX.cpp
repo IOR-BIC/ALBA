@@ -90,6 +90,8 @@ albaViewVirtualRX::albaViewVirtualRX(wxString label)
 
 	m_ProjectionMode = 0;
 	m_ProjectionPlane = 0;
+
+	m_UpdateWindowing = true;
 }
 //----------------------------------------------------------------------------
 albaViewVirtualRX::~albaViewVirtualRX()
@@ -395,6 +397,7 @@ albaGUI* albaViewVirtualRX::CreateGui()
 	m_Gui->Button(ID_PROJECTION_RESET, "Reset");
 	m_Gui->Divider(1);
 
+	m_Gui->Bool(NULL, "Update Windowing", &m_UpdateWindowing, 1);
 	//
 	EnableWidgets(m_CurrentVolume != NULL);
 
@@ -623,17 +626,19 @@ void albaViewVirtualRX::UpdateProjection(double min, double max, int plane, int 
 		pipe->SetProjectionRange(range);
 		pipe->EnableRangeProjection(true);
 
+		if (m_UpdateWindowing)
+		{
+			// Update Lut
+			double lutRange[2];
+			pipe->GetFilter()->GetOutput()->GetScalarRange(lutRange);
 
-		// Update Lut
-		double lutRange[2];
-		pipe->GetFilter()->GetOutput()->GetScalarRange(lutRange);
+			m_LutSliders[m_ProjectionPlane]->SetRange(lutRange[0], lutRange[1]);
+			m_LutSliders[m_ProjectionPlane]->SetSubRange(lutRange[0], lutRange[1]);
 
-		m_LutSliders[m_ProjectionPlane]->SetRange(lutRange[0], lutRange[1]);
-		m_LutSliders[m_ProjectionPlane]->SetSubRange(lutRange[0], lutRange[1]);
+			((albaViewRX *)m_ChildViewList[m_ProjectionPlane])->SetLutRange(lutRange[0], lutRange[1]);
 
-		((albaViewRX *)m_ChildViewList[m_ProjectionPlane])->SetLutRange(lutRange[0], lutRange[1]);
-
-		m_ChildViewList[m_ProjectionPlane]->CameraUpdate();
+			m_ChildViewList[m_ProjectionPlane]->CameraUpdate();
+		}
 	}
 }
 //----------------------------------------------------------------------------
