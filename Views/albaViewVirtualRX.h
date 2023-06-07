@@ -66,6 +66,7 @@ public:
 		ID_PROJECTION_RANGE,
 		ID_PROJECTION_MODE,
 		ID_PROJECTION_RESET,
+		ID_WINDOWING_UPDATE,
 		ID_LAST,
 	};
 
@@ -110,6 +111,7 @@ protected:
 
 	void UpdateProjection(double min, double max, int plane, int modality);
 	void ResetProjection();
+	void UpdateWindowing(int plane);
 	void UpdateProjectionGui();
 	void UpdateProjectionGizmos();
 
