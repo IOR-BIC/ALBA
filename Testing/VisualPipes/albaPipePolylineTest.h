@@ -1,17 +1,14 @@
 /*=========================================================================
-
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaPipePolylineTest
- Authors: Matteo Giacomoni
+ Authors: Matteo Giacomoni, Nicola Vanella
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
-
-
+ 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notice for more information.
-
 =========================================================================*/
 
 #ifndef __CPP_UNIT_albaPipePolylineTest_H__
@@ -35,12 +32,14 @@ public:
 
   CPPUNIT_TEST_SUITE( albaPipePolylineTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
-  CPPUNIT_TEST( TestPipeExecution );
+  CPPUNIT_TEST(TestPipeExecution);
+  CPPUNIT_TEST(TestPipeDensityMap);
   CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();
   void TestPipeExecution();
+  void TestPipeDensityMap();
 
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
 

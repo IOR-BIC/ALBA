@@ -46,6 +46,8 @@
 #include <fstream>
 #include "vtkActor2DCollection.h"
 #include <vector>
+#include "albaVMEVolumeGray.h"
+#include "vtkStructuredPointsReader.h"
 
 enum PIPE_MESH_ACTORS
   {
@@ -368,6 +370,135 @@ void albaPipeMeshTest::TestScalarVisualization()
   vtkDEL(actorList);
   albaDEL(mesh);
   vtkDEL(Importer);
+
+	delete sceneNode;
+}
+//----------------------------------------------------------------------------
+void albaPipeMeshTest::TestPipeDensityMap()
+{
+	////// Create VME (import vtkData) ////////////////////
+	vtkDataSetReader *Importer;
+	vtkNEW(Importer);
+	albaString filename = ALBA_DATA_ROOT;
+	filename << "/FEM/pipemesh/hex8-1.vtk";
+	Importer->SetFileName(filename);
+	Importer->Update();
+	albaVMEMesh *mesh;
+	albaNEW(mesh);
+	mesh->SetData(Importer->GetOutput(), 0.0);
+	mesh->GetOutput()->Update();
+	mesh->GetMaterial();
+	mesh->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+	mesh->Update();
+
+	// Create VME (import Volume) ////////////////////
+	vtkStructuredPointsReader *volumeImporter;
+	vtkNEW(volumeImporter);
+	albaString filename1 = ALBA_DATA_ROOT;
+	filename1 << "/VTK_Volumes/volume.vtk";
+	volumeImporter->SetFileName(filename1.GetCStr());
+	volumeImporter->Update();
+
+	albaVMEVolumeGray *volumeInput;
+	albaNEW(volumeInput);
+	volumeInput->SetData((vtkImageData*)volumeImporter->GetOutput(), 0.0);
+	volumeInput->GetOutput()->GetVTKData()->Update();
+	volumeInput->GetOutput()->Update();
+	volumeInput->Update();
+
+	vtkDEL(volumeImporter);
+
+	//Assembly will be create when instancing albaSceneNode
+	albaSceneNode *sceneNode;
+	sceneNode = new albaSceneNode(NULL, NULL, mesh, m_Renderer);
+
+	/////////// Pipe Instance and Creation ///////////
+	albaPipeMesh *pipeMesh = new albaPipeMesh;
+	pipeMesh->m_RenFront = m_Renderer;
+	pipeMesh->SetScalarMapActive(1);
+	pipeMesh->Create(sceneNode);
+
+	// Enable DensityMap
+	//pipeMesh->ManageScalarOnExecutePipe(polyline->GetOutput()->GetVTKData());
+	pipeMesh->SetDensityVolume(volumeInput);
+	pipeMesh->SetDensisyMapActive(true);
+
+	////////// ACTORS List ///////////////
+	vtkPropCollection *actorList = vtkPropCollection::New();
+	pipeMesh->GetAssemblyFront()->GetActors(actorList);
+
+	actorList->InitTraversal();
+	vtkProp *actor = actorList->GetNextProp();
+	while (actor)
+	{
+		m_Renderer->AddActor(actor);
+		m_RenderWindow->Render();
+
+		actor = actorList->GetNextProp();
+	}
+
+	const char *strings[5];
+	strings[0] = "Id"; //point 
+
+	strings[1] = "Material"; //cell 
+	strings[2] = "EX";
+	strings[3] = "NUXY";
+	strings[4] = "DENS";
+
+	for (int arrayIndex = 0; arrayIndex < pipeMesh->GetNumberOfArrays(); arrayIndex++)
+	{
+		double controlValues[2] = { -9999,-9999 };
+		switch (arrayIndex)
+		{
+		case 0:
+		{
+			controlValues[0] = 1.0;
+			controlValues[1] = 12.0;
+		}
+		break;
+		case 1:
+		{
+			controlValues[0] = 2.0;
+			controlValues[1] = 3.0;
+		}
+		break;
+		case 2:
+		{
+			controlValues[0] = 1000.0;
+			controlValues[1] = 200000.0;
+		}
+		break;
+		case 3:
+		{
+			controlValues[0] = 0.33;
+			controlValues[1] = 0.39;
+		}
+		break;
+		case 4:
+		{
+			controlValues[0] = 0.107;
+			controlValues[1] = 1.07;
+		}
+		break;
+		}
+		pipeMesh->SetActiveScalar(arrayIndex);
+		pipeMesh->OnEvent(&albaEvent(this, albaPipeMesh::ID_SCALARS));
+
+		vtkActor *meshActor;
+		meshActor = (vtkActor *)SelectActorToControl(actorList, PIPE_MESH_ACTOR);
+		CPPUNIT_ASSERT(meshActor != NULL);
+
+		//ProceduralControl(controlValues, meshActor);
+		m_RenderWindow->Render();
+		printf("\n visualization: %s \n", strings[arrayIndex]);
+
+		COMPARE_IMAGES("TestPipeDensityMap", arrayIndex);
+	}
+
+	albaDEL(volumeInput);
+	vtkDEL(actorList);
+	albaDEL(mesh);
+	vtkDEL(Importer);
 
 	delete sceneNode;
 }
