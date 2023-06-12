@@ -682,7 +682,7 @@ void albaViewVirtualRX::UpdateWindowing(int plane)
 		m_LutSliders[plane]->SetRange(newLutRange[0], newLutRange[1]);
 		m_LutSliders[plane]->SetSubRange(newLutSubRange[0], newLutSubRange[1]);
 
-		((albaViewRX *)m_ChildViewList[plane])->SetLutRange(newLutRange[0], newLutRange[1]);
+		((albaViewRX *)m_ChildViewList[plane])->SetLutRange(newLutSubRange[0], newLutSubRange[1]);
 
 		m_ChildViewList[plane]->CameraUpdate();
 	}
