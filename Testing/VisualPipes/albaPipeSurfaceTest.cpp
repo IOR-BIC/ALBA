@@ -363,11 +363,11 @@ void albaPipeSurfaceTest::TestPipeDensityMap()
 			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_EDGE_VISIBILITY));
 			break;
 		case SCALAR_ACTOR_TEST:
-			pipeSurface->Select(true);
-			pipeSurface->SetScalarMapActive(true);
-			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_SCALAR_MAP_ACTIVE));
-			pipeSurface->ShowScalarBarActor(true);
-			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_ENABLE_SCALAR_BAR));
+// 			pipeSurface->Select(true);
+// 			pipeSurface->SetScalarMapActive(true);
+// 			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_SCALAR_MAP_ACTIVE));
+// 			pipeSurface->ShowScalarBarActor(true);
+// 			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_ENABLE_SCALAR_BAR));
 			break;
 		default:
 			break;
@@ -437,11 +437,11 @@ void albaPipeSurfaceTest::TestPipeDensityMap()
 			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_EDGE_VISIBILITY));
 			break;
 		case SCALAR_ACTOR_TEST:
-			pipeSurface->SetScalarMapActive(false);
-			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_SCALAR_MAP_ACTIVE));
-			pipeSurface->ShowScalarBarActor(false);
-			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_ENABLE_SCALAR_BAR));
-			pipeSurface->Select(false);
+// 			pipeSurface->SetScalarMapActive(false);
+// 			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_SCALAR_MAP_ACTIVE));
+// 			pipeSurface->ShowScalarBarActor(false);
+// 			pipeSurface->OnEvent(&albaEvent(this, albaPipeSurface::ID_ENABLE_SCALAR_BAR));
+// 			pipeSurface->Select(false);
 			break;
 		default:
 			break;
