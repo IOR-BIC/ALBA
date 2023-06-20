@@ -474,6 +474,21 @@ void albaInteractor2DMeasure_Distance::SetLineTickLenght(double lenght)
 	m_TickLenght = lenght;
 }
 
+//---------------------------------------------------------------------------
+void albaInteractor2DMeasure_Distance::Show(bool show)
+{
+	for (int i = 0; i < GetMeasureCount(); i++)
+	{
+		m_LineStackVector[i]->SetVisibility(show);
+		m_TickStackVectorL[i]->SetVisibility(show);
+		m_TickStackVectorR[i]->SetVisibility(show);
+
+		m_TextActorVector[i]->SetVisibility(show && m_ShowText);
+	}
+
+	Render();
+}
+
 /// UTILS ///////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
 void albaInteractor2DMeasure_Distance::GetMeasureLinePoints(int index, double *point1, double *point2)

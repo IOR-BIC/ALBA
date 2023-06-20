@@ -714,6 +714,27 @@ void albaInteractor2DMeasure_AngleLine::SetLineWidth(double width)
 	Render();
 }
 
+//---------------------------------------------------------------------------
+void albaInteractor2DMeasure_AngleLine::Show(bool show)
+{
+	for (int i = 0; i < GetMeasureCount(); i++)
+	{
+		m_PointsStackVectorA[i]->SetVisibility(show);
+		m_PointsStackVectorB[i]->SetVisibility(show);
+		m_PointsStackVectorC[i]->SetVisibility(show);
+		m_PointsStackVectorD[i]->SetVisibility(show);
+
+		m_LineStackVectorAB[i]->SetVisibility(show);
+		m_LineStackVectorCD[i]->SetVisibility(show);
+
+		m_CircleStackVector[i]->SetVisibility(show);
+
+		m_TextActorVector[i]->SetVisibility(show && m_ShowText);
+	}
+
+	Render();
+}
+
 /// UTILS ///////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
 void albaInteractor2DMeasure_AngleLine::GetMeasureLinePoints(int index, double *point1, double *point2, double *point3, double *point4)
