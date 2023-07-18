@@ -247,7 +247,7 @@ albaOpSegmentation::~albaOpSegmentation()
 //----------------------------------------------------------------------------
 bool albaOpSegmentation::InternalAccept(albaVME *node)
 {
-  return (node && node->IsA("albaVMEVolumeGray") && node->GetOutput()->GetVTKData()->IsA("vtkImageData") );
+  return (node && node->IsA("albaVMEVolumeGray") && node->GetOutput()->GetVTKData() && node->GetOutput()->GetVTKData()->IsA("vtkImageData") );
 }
 //----------------------------------------------------------------------------
 albaOp *albaOpSegmentation::Copy()   
