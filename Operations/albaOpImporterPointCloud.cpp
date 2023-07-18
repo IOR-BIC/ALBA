@@ -299,6 +299,9 @@ int albaOpImporterPointCloud::Import(void)
 		pos = 0;
 		for (int i = 0; i < columNum; i++)
 		{
+			while (m_Line[pos] == ',' || m_Line[pos] == ';')
+				pos++;
+
 			nReaded = sscanf(m_Line+pos, "%lf %n", &value, &charReaded);
 			if (nReaded != 1)
 			{
