@@ -270,7 +270,7 @@ protected:
 	albaAttachCamera		*m_CameraToSlicer[3];
 
 	double	m_SlicingOriginGUI[3];
-	double	m_SlicingOrigin[3];
+	double	m_SlicingOrigin[4];
 	double	m_SlicingOriginReset[3];
 	double	m_VolumeVTKDataABSOrientation[3];
 	

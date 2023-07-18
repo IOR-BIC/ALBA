@@ -175,6 +175,8 @@ void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
       double bounds[6], edges[3], vol, nPoints;
       vtkDataSet *volOutput;
       volOutput=vme->GetOutput()->GetVTKData();
+			if (volOutput == NULL)
+				return;
       volOutput->GetBounds(bounds);
       nPoints=volOutput->GetNumberOfPoints();
       edges[0]=bounds[1]-bounds[0];
@@ -721,6 +723,8 @@ void albaViewOrthoSlice::CreateOrthoslicesAndGizmos(albaVME *vme)
 	mmaVolumeMaterial *currentVolumeMaterial = ((albaVMEOutputVolume *)m_CurrentVolume->GetOutput())->GetMaterial();
 	double sr[2],vtkDataCenter[3];
 	vtkDataSet *vtkData = m_CurrentVolume->GetOutput()->GetVTKData();
+	if (vtkData == NULL)
+		return;
 	vtkData->Update();
 	vtkData->GetCenter(vtkDataCenter);
 	vtkData->GetCenter(m_GizmoHandlePosition);
