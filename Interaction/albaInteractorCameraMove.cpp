@@ -265,6 +265,8 @@ void albaInteractorCameraMove::Rotate()
 	InvokeEvent(this, CAMERA_MOVED,MCH_UP,m_CurrentCamera);
   m_Renderer->GetRenderWindow()->Render();
 }
+
+#define MAGNET_ANGLE 2
 //----------------------------------------------------------------------------
 void albaInteractorCameraMove::Spin()
 {
@@ -284,9 +286,55 @@ void albaInteractorCameraMove::Spin()
   newAngle *= vtkMath::RadiansToDegrees();
   oldAngle *= vtkMath::RadiansToDegrees();
 
-  m_CurrentCamera->Roll(newAngle - oldAngle);
+	double rollAngle;
+	double angleDiff = newAngle - oldAngle;
+
+	double cameraRoll = m_CurrentCamera->GetRoll()+180.0;
+	double predictedRoll = cameraRoll + angleDiff;
+	if (predictedRoll > 360)
+		predictedRoll = predictedRoll - 360;
+	if (predictedRoll < 0)
+		predictedRoll = predictedRoll + 360;
+
+	//On "magnet" m_MousePose is set to m_LastMousePose in order to cumulate mouse movements 
+	if (predictedRoll > 90 - MAGNET_ANGLE&&predictedRoll < 90 + MAGNET_ANGLE)
+	{
+		rollAngle = 90-cameraRoll;
+		m_MousePose[0] = m_LastMousePose[0];
+		m_MousePose[1] = m_LastMousePose[1];
+	}
+	else if (predictedRoll > 180 - MAGNET_ANGLE&&predictedRoll < 180 + MAGNET_ANGLE)
+	{
+		rollAngle = 180 - cameraRoll;
+		m_MousePose[0] = m_LastMousePose[0];
+		m_MousePose[1] = m_LastMousePose[1];
+	}
+	else if (predictedRoll > 270 - MAGNET_ANGLE&&predictedRoll < 270 + MAGNET_ANGLE)
+	{
+		rollAngle = 270-cameraRoll;
+		m_MousePose[0] = m_LastMousePose[0];
+		m_MousePose[1] = m_LastMousePose[1];
+	}
+	else if (predictedRoll > 360 - MAGNET_ANGLE)
+	{
+		rollAngle = 360- cameraRoll;
+		m_MousePose[0] = m_LastMousePose[0];
+		m_MousePose[1] = m_LastMousePose[1];
+	}
+	else if (predictedRoll < 0 + MAGNET_ANGLE)
+	{
+		rollAngle = -cameraRoll;
+		m_MousePose[0] = m_LastMousePose[0];
+		m_MousePose[1] = m_LastMousePose[1];
+	}
+	else
+	{
+		rollAngle = angleDiff;
+	}
+
+  m_CurrentCamera->Roll(rollAngle);
   m_CurrentCamera->OrthogonalizeViewUp();
-      
+     
   if (m_AutoResetClippingRange) 
 		ResetClippingRange();
 
