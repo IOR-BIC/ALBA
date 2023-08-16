@@ -90,6 +90,8 @@ albaViewSlice::albaViewSlice(wxString label /* =  */, int camera_position /* = C
   m_TrilinearInterpolationOn = TRUE;
   m_TextureInterpolate = textureInterpolate;
 
+	SetDecimals(2);
+
 	InitializeSlice(m_Slice);     //to correctly set the normal
   m_SliceInitialized = false;   //reset initialized to false
 }
@@ -169,15 +171,15 @@ void albaViewSlice::UpdateText(int ID)
 			{
 				case CAMERA_OS_X:
 					m_Text = "X = ";
-					m_Text += wxString::Format("%.1f", m_Slice[0]);
+					m_Text += wxString::Format(m_TextFormat, m_Slice[0]);
 					break;
 				case CAMERA_OS_Y:
 					m_Text = "Y = ";
-					m_Text += wxString::Format("%.1f", m_Slice[1]);
+					m_Text += wxString::Format(m_TextFormat, m_Slice[1]);
 					break;
 				case CAMERA_OS_Z:
 					m_Text = "Z = ";
-					m_Text += wxString::Format("%.1f", m_Slice[2]);
+					m_Text += wxString::Format(m_TextFormat, m_Slice[2]);
 					break;
 				default:
 					break;
@@ -221,6 +223,17 @@ void albaViewSlice::InitializeSlice(double* Origin)
 	
 	m_SliceInitialized = true;
 }
+
+//----------------------------------------------------------------------------
+void albaViewSlice::SetDecimals(int decimals)
+{
+	m_Decimals = decimals; 
+	m_TextFormat.Printf("%%.%df",decimals);
+	UpdateText();
+	if(m_Rwi)
+		CameraUpdate();
+}
+
 //----------------------------------------------------------------------------
 void albaViewSlice::VmeCreatePipe(albaVME *vme)
 {
@@ -805,6 +818,41 @@ void albaViewSlice::SetCameraParallelToDataSetLocalAxis( int axis )
   camera->SetClippingRange(0.1,1000);
 
 }
+
+//----------------------------------------------------------------------------
+void albaViewSlice::GetVisualPipeName(albaVME *node, albaString &pipe_name)
+{
+	assert(node);
+
+	node->Modified();
+	vtkDataSet *data = node->GetOutput()->GetVTKData();
+	albaVMELandmarkCloud *lmc = albaVMELandmarkCloud::SafeDownCast(node);
+	albaVMELandmark *lm = albaVMELandmark::SafeDownCast(node);
+	if (lmc == NULL && data == NULL && lm == NULL)
+	{
+		pipe_name = "albaPipeBox";
+	}
+	else
+	{
+		// custom visualization for the view should be considered only
+		// if we are not in editing mode.
+		albaString vme_type = node->GetTypeName();
+		if (m_PipeMap.count(vme_type))
+		{
+			// pick up the visual pipe from the view's visual pipe map
+			pipe_name = m_PipeMap[vme_type].m_PipeName;
+		}
+	}
+
+	if (pipe_name.IsEmpty())
+	{
+		// pick up the default visual pipe from the vme
+		pipe_name = node->GetVisualPipeSlice();
+		if (pipe_name.IsEmpty())
+			pipe_name = node->GetVisualPipe();
+	}
+}
+
 //-------------------------------------------------------------------------
 void albaViewSlice::CameraUpdateForRotatedVolumes()
 {

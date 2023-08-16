@@ -189,6 +189,7 @@
 #include "albaOpFillHoles.h"
 #include "albaOpFilterSurface.h"
 #include "albaOpFilterVolume.h"
+#include "albaOpFilterImage.h"
 #include "albaOpFlipNormals.h"
 #include "albaOpFreezeVME.h"
 #include "albaOpInteractiveClipSurface.h"
@@ -282,7 +283,7 @@
 #include "albaViewSlicer.h"
 #include "albaViewVTK.h"
 #include "albaViewVTKCompound.h"
-
+#include "albaViewVirtualRX.h"
 
 
 #define IDM_WINDOWNEXT 4004
@@ -2064,6 +2065,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpClipSurface("Clip Surface"), _("Modify"));
 	Plug(new albaOpFilterSurface("Filter Surface"), _("Modify"));
 	Plug(new albaOpFilterVolume("Filter Volume"), _("Modify"));
+	Plug(new albaOpFilterImage("Filter Image"), _("Modify"));
 	Plug(new albaOpDecimateSurface("Decimate Surface"), _("Modify"));
 	Plug(new albaOpConnectivitySurface("Connectivity Surface"), _("Modify"));
 	Plug(new albaOpEditNormals("Edit Normals"), _("Modify"));
@@ -2151,6 +2153,11 @@ void albaLogicWithManagers::PlugStandardViews()
 	albaViewRXCompound *vrx = new albaViewRXCompound("RX");
 	vrx->PackageView();
 	Plug(vrx);
+
+	//View RX Compound
+	albaViewVirtualRX *vvrx = new albaViewVirtualRX("Virtual RX");
+	vvrx->PackageView();
+	Plug(vvrx);
 
 	//View Isosurface
 	albaViewVTK *viso = new albaViewVTK("Isosurface");

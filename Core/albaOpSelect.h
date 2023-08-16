@@ -191,6 +191,9 @@ public:
 	void OpUndo();
 	/** return a instance of current object. */
 	albaOp* Copy();
+
+	albaString GetOldName() { return m_OldName; };
+
 protected:
 	albaString m_OldName;
 	bool m_Renamed;

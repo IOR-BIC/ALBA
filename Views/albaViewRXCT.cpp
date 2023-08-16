@@ -197,6 +197,10 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
 
 			// set the range for every slider widget
 			albaVMEOutputVolume *volumeOutput = albaVMEOutputVolume::SafeDownCast(vme->GetOutput());
+			vtkDataSet * vtkOut = volumeOutput->GetVTKData();
+			if (vtkOut == NULL)
+				return;
+
 			for (int childID = RX_FRONT_VIEW; childID < CT_COMPOUND_VIEW; childID++)
 			{
 				double advLow, advHigh;
@@ -209,7 +213,7 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
 					vtkLookupTable *cl = volumeOutput->GetMaterial()->m_ColorLut;
 
 					double volRange[2];
-					volumeOutput->GetVTKData()->GetScalarRange(volRange);
+					vtkOut->GetScalarRange(volRange);
 
 					const double * tableRange = volumeOutput->GetMaterial()->GetTableRange();
 					if (tableRange[1] < tableRange[0])

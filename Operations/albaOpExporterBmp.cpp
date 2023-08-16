@@ -66,7 +66,7 @@ albaOpExporterBmp::~albaOpExporterBmp()
 bool albaOpExporterBmp::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
-	return (node != NULL) && node->IsA("albaVMEVolumeGray");
+	return (node != NULL) && (node->IsA("albaVMEVolumeGray") || node->IsA("albaVMEVolumeGray"));
 }
 //----------------------------------------------------------------------------
 // Constants :

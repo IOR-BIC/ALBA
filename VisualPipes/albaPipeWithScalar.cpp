@@ -739,6 +739,7 @@ void albaPipeWithScalar::SetDensityVolume(albaVME *vol)
 	else
 	{
 		m_DensVolName = m_DensityVolume ? m_DensityVolume->GetName() : "";
+		m_DensityFilter->SetSource(m_DensityVolume->GetOutput()->GetVTKData());
 		UpdateActiveScalarsInVMEDataVectorItems();
 	}
 

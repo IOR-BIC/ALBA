@@ -575,6 +575,8 @@ albaString albaOpExporterDicom::GetIthFilename(int i)
 	name.Replace('.', '_');
 	name.Replace(',', '_');
 	name.Replace(':', '_');
+	name.Replace('/', '_');
+	name.Replace('\\', '_');
 	filename.Printf("%s/%s.%d.dcm", m_Folder.GetCStr(), name.GetCStr(), i);
 	return filename;
 }

@@ -51,6 +51,8 @@ public:
 	virtual void SetLineTickWidth(double width);
 	virtual void SetLineTickLenght(double lenght);
 
+	virtual void Show(bool show);
+
 	/** Get measure line extremity points*/
 	void GetMeasureLinePoints(int index, double *point1, double *point2);
 

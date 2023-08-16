@@ -1,17 +1,14 @@
 /*=========================================================================
-
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaPipePolylineTest
- Authors: Matteo Giacomoni
+ Authors: Matteo Giacomoni, Nicola Vanella
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
-
-
+ 
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notice for more information.
-
 =========================================================================*/
 
 #include "albaDefines.h" 
@@ -43,6 +40,8 @@
 #include "vtkCamera.h"
 
 #include <iostream>
+#include "vtkStructuredPointsReader.h"
+#include "albaVMEVolumeGray.h"
 
 enum TESTS_PIPE_SURFACE
 {
@@ -63,12 +62,10 @@ enum TESTS_PIPE_SURFACE
 
 //----------------------------------------------------------------------------
 void albaPipePolylineTest::TestFixture()
-//----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 void albaPipePolylineTest::BeforeTest()
-//----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
   vtkNEW(m_RenderWindow);
@@ -84,7 +81,6 @@ void albaPipePolylineTest::BeforeTest()
 }
 //----------------------------------------------------------------------------
 void albaPipePolylineTest::AfterTest()
-//----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);
   vtkDEL(m_RenderWindow);
@@ -92,7 +88,6 @@ void albaPipePolylineTest::AfterTest()
 }
 //----------------------------------------------------------------------------
 void albaPipePolylineTest::TestPipeExecution()
-//----------------------------------------------------------------------------
 {
 	////// Create VME (import vtkData) ////////////////////
 	vtkALBASmartPointer<vtkDataSetReader> importer;
@@ -212,6 +207,155 @@ void albaPipePolylineTest::TestPipeExecution()
 		COMPARE_IMAGES("TestPipeExecution", i);
 	}
 
+	vtkDEL(actorList);
+	delete sceneNode;
+}
+
+//----------------------------------------------------------------------------
+void albaPipePolylineTest::TestPipeDensityMap()
+{
+	////// Create VME (import vtkData) ////////////////////
+	vtkALBASmartPointer<vtkDataSetReader> importer;
+	albaString filename = ALBA_DATA_ROOT;
+	filename << "/Test_PipePolyline/polyline.vtk";
+	importer->SetFileName(filename);
+	importer->Update();
+	albaSmartPointer<albaVMEPolyline> polyline;
+	polyline->SetData((vtkPolyData*)importer->GetOutput(), 0.0);
+	polyline->GetOutput()->Update();
+	polyline->GetMaterial();
+	polyline->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+	polyline->Update();
+
+	// Create VME (import Volume) ////////////////////
+	vtkStructuredPointsReader *volumeImporter;
+	vtkNEW(volumeImporter);
+	albaString filename1 = ALBA_DATA_ROOT;
+	filename1 << "/VTK_Volumes/volume.vtk";
+	volumeImporter->SetFileName(filename1.GetCStr());
+	volumeImporter->Update();
+
+	albaVMEVolumeGray *volumeInput;
+	albaNEW(volumeInput);
+	volumeInput->SetData((vtkImageData*)volumeImporter->GetOutput(), 0.0);
+	volumeInput->GetOutput()->GetVTKData()->Update();
+	volumeInput->GetOutput()->Update();
+	volumeInput->Update();
+
+	vtkDEL(volumeImporter);
+
+	//Assembly will be create when instancing albaSceneNode
+	albaSceneNode *sceneNode;
+	sceneNode = new albaSceneNode(NULL, NULL, polyline, NULL);
+
+	/////////// Pipe Instance and Creation ///////////
+	albaPipePolyline *pipePolyline = new albaPipePolyline;
+	pipePolyline->Create(sceneNode);
+
+	// Enable DensityMap
+	//pipePolyline->ManageScalarOnExecutePipe(polyline->GetOutput()->GetVTKData());
+	pipePolyline->SetDensityVolume(volumeInput);
+	pipePolyline->SetDensisyMapActive(true);
+
+
+	////////// ACTORS List ///////////////
+	vtkPropCollection *actorList = vtkPropCollection::New();
+
+	for (int i = 0; i < NUMBER_OF_TEST; i++)
+	{
+		switch (i)
+		{
+		case TEST_COLOR:
+		{
+			double col[3] = { 1.0,0.0,0.0 };
+			pipePolyline->SetColor(col);
+		}
+		break;
+		case TEST_POLYLINE:
+		{
+			pipePolyline->SetRepresentation(albaPipePolyline::LINES);
+			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_POLYLINE_REPRESENTATION));
+		}
+		break;
+		case TEST_POLYLINE_SPLINE_MODE:
+		{
+			pipePolyline->SetSplineMode(TRUE);
+			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPLINE));
+		}
+		break;
+		case TEST_TUBE:
+		{
+			pipePolyline->SetSplineMode(FALSE);
+			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPLINE));
+			pipePolyline->SetRepresentation(albaPipePolyline::TUBES);
+			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_POLYLINE_REPRESENTATION));
+		}
+		break;
+		case TEST_TUBE_SPLINE_MODE:
+		{
+			pipePolyline->SetSplineMode(TRUE);
+			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPLINE));
+		}
+		break;
+		case TEST_TUBE_CHANGE_VALUES:
+		{
+			pipePolyline->SetRadius(2.0);
+			pipePolyline->SetTubeResolution(5.0);
+			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_TUBE_RADIUS));
+			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_TUBE_RESOLUTION));
+		}
+		break;
+		case TEST_TUBE_CAPPING:
+		{
+			pipePolyline->SetTubeCapping(TRUE);
+			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_TUBE_CAPPING));
+		}
+		break;
+		case TEST_GLYPH:
+		{
+			pipePolyline->SetRepresentation(albaPipePolyline::SPHERES);
+			pipePolyline->SetShowSphere(true);
+			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_POLYLINE_REPRESENTATION));
+		}
+		break;
+		case TEST_GLYPH_CHANGE_VALUES:
+		{
+			pipePolyline->SetRadius(2.0);
+			pipePolyline->SetGlyphResolution(5.0);
+			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPHERE_RADIUS));
+			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPHERE_RESOLUTION));
+		}
+		break;
+		case TEST_GLYPH_SPLINE_MODE:
+		{
+			pipePolyline->SetSplineMode(TRUE);
+			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPLINE));
+			pipePolyline->SetRadius(1.0);
+			pipePolyline->SetGlyphResolution(10.0);
+			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPHERE_RADIUS));
+			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPHERE_RESOLUTION));
+		}
+		break;
+
+		default:
+			break;
+		}
+
+		pipePolyline->GetAssemblyFront()->GetActors(actorList);
+		actorList->InitTraversal();
+		vtkProp *actor = actorList->GetNextProp();
+
+		while (actor)
+		{
+			m_Renderer->AddActor(actor);
+			m_RenderWindow->Render();
+			actor = actorList->GetNextProp();
+		}
+
+		COMPARE_IMAGES("TestPipeDensityMap", i);
+	}
+
+	albaDEL(volumeInput);
 	vtkDEL(actorList);
 	delete sceneNode;
 }

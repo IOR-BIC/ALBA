@@ -76,6 +76,8 @@ int InternalParseData(const char *text,std::vector<T> &vector,int size)
 {
   std::istringstream instr(text);
 
+	vector.resize(size);
+
   for (int i=0;i<size;i++)
   {
     if (instr.eof())

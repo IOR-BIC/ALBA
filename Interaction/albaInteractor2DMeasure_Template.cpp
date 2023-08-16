@@ -719,6 +719,8 @@ void albaInteractor2DMeasure_Template::ShowTexture(bool show)
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
 		m_TexturedQuadVector[i]->SetVisibility(show);
+
+		m_TextActorVector[i]->SetVisibility(show && m_ShowText);
 	}
 	Render();
 }
