@@ -66,10 +66,22 @@ void albaGUIFloatSlider::SetNumberOfSteps(int num)
 double albaGUIFloatSlider::GetValue()
 //----------------------------------------------------------------------------
 {
-  int pos = wxSlider::GetValue();
-  assert (pos >=0 && pos <=this->m_Ticks );
-  this->m_Value = this->m_Min + pos*this->m_Step;
-  return this->m_Value;
+   return this->m_Value;
+}
+
+//----------------------------------------------------------------------------
+double albaGUIFloatSlider::GetSliderValue()
+//----------------------------------------------------------------------------
+{
+	int pos = wxSlider::GetValue();
+	assert(pos >= 0 && pos <= this->m_Ticks);
+	if (pos == 0)
+		m_Value = m_Min;
+	else if (pos == m_Ticks)
+		m_Value = m_Max;
+	else
+		this->m_Value = this->m_Min + pos*this->m_Step;
+	return this->m_Value;
 }
 //----------------------------------------------------------------------------
 void albaGUIFloatSlider::SetValue(double value)
@@ -80,7 +92,7 @@ void albaGUIFloatSlider::SetValue(double value)
 	if(this->m_Value > this->m_Max) this->m_Value = this->m_Max;
 
 	//value has to be discretized
-	this->m_Value = m_Step*(int)floor(m_Value/m_Step+0.5);
+	//this->m_Value = m_Step*(int)floor(m_Value/m_Step+0.5);
 
 	wxSlider::SetValue(floor((value-this->m_Min)/this->m_Step+0.5));
 }
@@ -176,6 +188,6 @@ void albaGUIFloatSlider::DiscretizeRangeRange(double min,double max,double n, do
 	if(rmax > max) rmax -= step;
 
   *rs = step;
-	*ra = rmin;
-	*rb = rmax;
+	*ra = min;
+	*rb = max;
 }

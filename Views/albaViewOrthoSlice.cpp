@@ -195,12 +195,15 @@ void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
       edges[1]=bounds[3]-bounds[2];
       edges[2]=bounds[5]-bounds[4];
       vol=edges[0]*edges[1]*edges[2];
-      m_PolylineRadiusSize=pow(vol/nPoints,1.0/3.0)/2.0;
+			m_XSliceSlider->SetRange(bounds[0], bounds[1]);
+			m_YSliceSlider->SetRange(bounds[2], bounds[3]);
+			m_ZSliceSlider->SetRange(bounds[4], bounds[5]);
+			m_PolylineRadiusSize = pow(vol / nPoints, 1.0 / 3.0) / 2.0;
 		}
 		else
 		{
 			m_CurrentVolume = NULL;
-      DestroyOrthoSlicesAndGizmos();
+      RemoveVolumeFromGizmo();
     }
 	}
 	else
@@ -246,7 +249,7 @@ void albaViewOrthoSlice::VmeRemove(albaVME *vme)
     // Disable ChildViews
     for(int j=1; j<m_NumOfChildView; j++) 
       m_ChildViewList[j]->VmeShow(vme, false);
-    DestroyOrthoSlicesAndGizmos();
+    RemoveVolumeFromGizmo();
     EnableWidgets(false);
   }
   // Remove node from list
@@ -277,8 +280,8 @@ void albaViewOrthoSlice::CreateGuiView()
 void albaViewOrthoSlice::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
-  if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-  {
+	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
+	{
 		switch (e->GetId())
 		{
 			case ID_BORDER_CHANGE:
@@ -293,6 +296,21 @@ void albaViewOrthoSlice::OnEvent(albaEventBase *alba_event)
 					albaVME* vme = GetSceneGraph()->GetSelectedVme();
 					SetThicknessForAllSurfaceSlices(m_Root);
 				}
+			}
+			break;
+			case ID_X_SLIDER:
+			case ID_Y_SLIDER:
+			case ID_Z_SLIDER:
+			{
+				double direction[] = { albaGizmoSlice::GIZMO_SLICE_X,albaGizmoSlice::GIZMO_SLICE_Y,albaGizmoSlice::GIZMO_SLICE_Z };
+
+				for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
+					m_Gizmo[gizmoId]->UpdateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], m_GizmoHandlePosition[gizmoId]);
+
+				for (int i = 0; i < VIEWS_NUMBER; i++)
+					m_Views[i]->SetSlice(m_GizmoHandlePosition);
+
+				CameraUpdate();
 			}
 			break;
 			case ID_LUT_CHOOSER:
@@ -385,7 +403,7 @@ void albaViewOrthoSlice::OnEvent(albaEventBase *alba_event)
 			default:
 				albaViewCompound::OnEvent(alba_event);
 		}
-  }
+	}
 }
 //-------------------------------------------------------------------------
 albaGUI* albaViewOrthoSlice::CreateGui()
@@ -407,11 +425,17 @@ albaGUI* albaViewOrthoSlice::CreateGui()
 
 	m_Gui->Bool(ID_SNAP,"Snap on grid",&m_Snap,1);
 
+	m_XSliceSlider = m_Gui->FloatSlider(ID_X_SLIDER, "X Slice:", &m_GizmoHandlePosition[0], VTK_FLOAT_MIN, VTK_FLOAT_MAX);
+	m_YSliceSlider = m_Gui->FloatSlider(ID_Y_SLIDER, "Y Slice:", &m_GizmoHandlePosition[1], VTK_FLOAT_MIN, VTK_FLOAT_MAX);
+	m_ZSliceSlider = m_Gui->FloatSlider(ID_Z_SLIDER, "Z Slice:", &m_GizmoHandlePosition[2], VTK_FLOAT_MIN, VTK_FLOAT_MAX);
+	
   m_Gui->Button(ID_RESET_SLICES,"Reset slices","");
   m_Gui->Divider();
 
 	m_Gui->Bool(ID_ALL_SURFACE,"All Surface",&m_AllSurface);
 	m_Gui->FloatSlider(ID_BORDER_CHANGE,"Border",&m_Border,1.0,5.0);
+
+
 
   EnableWidgets(m_CurrentVolume != NULL);
   for(int i=1; i<m_NumOfChildView; i++)
@@ -674,6 +698,7 @@ void albaViewOrthoSlice::SetSlicePosition(long activeGizmoId, vtkPoints *p)
   
 
   this->CameraUpdate();
+	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
 void albaViewOrthoSlice::OnEventSetThickness()
@@ -808,7 +833,7 @@ void albaViewOrthoSlice::CreateOrthoslicesAndGizmos(albaVME *vme)
 	GizmoShow();
 }
 //-------------------------------------------------------------------------
-void albaViewOrthoSlice::DestroyOrthoSlicesAndGizmos()
+void albaViewOrthoSlice::RemoveVolumeFromGizmo()
 //-------------------------------------------------------------------------
 {
 	for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
@@ -918,9 +943,9 @@ void albaViewOrthoSlice::UpdateGizmoBounds(bool show)
 
 	double gizmoBounds[6] = { minVert[0],maxVert[0],minVert[1],maxVert[1],minVert[2],maxVert[2] };
 
-
-	double direction[] = { albaGizmoSlice::GIZMO_SLICE_X,albaGizmoSlice::GIZMO_SLICE_Y,albaGizmoSlice::GIZMO_SLICE_Z };
-
+	m_XSliceSlider->SetRange(gizmoBounds[0], gizmoBounds[1]);
+	m_YSliceSlider->SetRange(gizmoBounds[2], gizmoBounds[3]);
+	m_ZSliceSlider->SetRange(gizmoBounds[4], gizmoBounds[5]);
 
 	bool firstVMEshowed = show && m_VMElist.size() == 1;
 	if(!firstVMEshowed)
@@ -934,6 +959,8 @@ void albaViewOrthoSlice::UpdateGizmoBounds(bool show)
 	
 	if (firstVMEshowed ||m_GizmoHandlePosition[2]<gizmoBounds[4] || m_GizmoHandlePosition[4]>gizmoBounds[4])
 		m_GizmoHandlePosition[2] = (gizmoBounds[4] + gizmoBounds[5]) / 2.0;
+
+	double direction[] = { albaGizmoSlice::GIZMO_SLICE_X,albaGizmoSlice::GIZMO_SLICE_Y,albaGizmoSlice::GIZMO_SLICE_Z };
 
 	for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
 	{
