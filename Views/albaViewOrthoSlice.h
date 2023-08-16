@@ -93,6 +93,7 @@ public:
 		ID_ALL_SURFACE,
 		ID_BORDER_CHANGE,
     ID_TRILINEAR_INTERPOLATION,
+		ID_DECIMALS,
     ID_LAST
   };
 
@@ -201,6 +202,7 @@ protected:
   albaViewSlice *m_Views[4]; ///< Child views
   int	m_Side; ///< change Azimuth of the camera
 	int m_Snap; ///<change modality of gizmo to snap on grid
+	int m_Decimals;
   double m_PolylineRadiusSize;
 
   bool m_CanPlugVisualPipes; ///< true if u can plug visual pipes
