@@ -90,6 +90,8 @@ albaViewSlice::albaViewSlice(wxString label /* =  */, int camera_position /* = C
   m_TrilinearInterpolationOn = TRUE;
   m_TextureInterpolate = textureInterpolate;
 
+	SetDecimals(2);
+
 	InitializeSlice(m_Slice);     //to correctly set the normal
   m_SliceInitialized = false;   //reset initialized to false
 }
@@ -169,15 +171,15 @@ void albaViewSlice::UpdateText(int ID)
 			{
 				case CAMERA_OS_X:
 					m_Text = "X = ";
-					m_Text += wxString::Format("%.1f", m_Slice[0]);
+					m_Text += wxString::Format(m_TextFormat, m_Slice[0]);
 					break;
 				case CAMERA_OS_Y:
 					m_Text = "Y = ";
-					m_Text += wxString::Format("%.1f", m_Slice[1]);
+					m_Text += wxString::Format(m_TextFormat, m_Slice[1]);
 					break;
 				case CAMERA_OS_Z:
 					m_Text = "Z = ";
-					m_Text += wxString::Format("%.1f", m_Slice[2]);
+					m_Text += wxString::Format(m_TextFormat, m_Slice[2]);
 					break;
 				default:
 					break;
@@ -221,6 +223,17 @@ void albaViewSlice::InitializeSlice(double* Origin)
 	
 	m_SliceInitialized = true;
 }
+
+//----------------------------------------------------------------------------
+void albaViewSlice::SetDecimals(int decimals)
+{
+	m_Decimals = decimals; 
+	m_TextFormat.Printf("%%.%df",decimals);
+	UpdateText();
+	if(m_Rwi)
+		CameraUpdate();
+}
+
 //----------------------------------------------------------------------------
 void albaViewSlice::VmeCreatePipe(albaVME *vme)
 {

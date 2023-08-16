@@ -152,6 +152,13 @@ public:
 	Give an initial origin and normal (optionally) for the slice.*/
 	void InitializeSlice(double* Origin);
 
+
+	/** Returns Decimals */
+	int GetDecimals() const { return m_Decimals; }
+
+	/** Sets Decimals */
+	void SetDecimals(int decimals);
+
 protected:
 	
   /* Correction of slice pose when current volume pose matrix is different from identity: 
@@ -179,6 +186,8 @@ protected:
   vtkActor2D    *m_TextActor;
   vtkTextMapper	*m_TextMapper;
   wxString m_Text;
+	wxString m_TextFormat;
+	int m_Decimals;
   double	 m_TextColor[3];
   std::vector<albaSceneNode*> m_SlicingVector;
   

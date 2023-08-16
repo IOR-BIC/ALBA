@@ -803,8 +803,14 @@ bool albaGUIValidator::TransferFromWindow(void)
         res = !albaEquals(*m_DoubleVar,dval);
 			if (res)
       {
-				*m_DoubleVar = dval;
         m_FloatSlider->SetValue(dval);
+				*m_DoubleVar = m_FloatSlider->GetValue();
+				if (*m_DoubleVar != dval)
+				{
+					wxString str;
+					str.Printf("%f", *m_DoubleVar);
+					m_TextCtrl->SetValue(str);
+				}
         m_WidgetData.dValue = *m_DoubleVar;
       }
 			return res;
@@ -878,7 +884,7 @@ bool albaGUIValidator::TransferFromWindow(void)
 			return res;
 		break;
     case VAL_FLOAT_SLIDER:
-			*m_DoubleVar = m_FloatSlider->GetValue();
+			*m_DoubleVar = m_FloatSlider->GetSliderValue();
       m_WidgetData.dValue = *m_DoubleVar;
     break;
     case VAL_CHECKBOX:
