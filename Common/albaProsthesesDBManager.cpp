@@ -93,6 +93,8 @@ albaProsthesesDBManager::~albaProsthesesDBManager()
 //----------------------------------------------------------------------------
 int albaProsthesesDBManager::LoadDB()
 {
+	albaLogMessage("Proshesys File: %s", m_DBFilename.GetCStr());
+	
 	if (!wxFileExists(m_DBFilename.GetCStr()))
 		return ALBA_OK;
 
