@@ -24,6 +24,7 @@
 
 #include "albaDecl.h"
 #include "albaVect3d.h"
+#include "vtkMath.h"
 #include <math.h>
 
 
@@ -309,25 +310,38 @@ void albaVect3d::SetValues( double x, double y, double z )
 }
  
 //-----------------------------------------------------------------------
-double albaVect3d::AngleBetweenVectors( albaVect3d &vect )
+double albaVect3d::AngleBetweenVectors( albaVect3d &vect, bool getMinAngle)
 //-----------------------------------------------------------------------
 {
-  // Get the dot product of the vectors
-  double dotProduct = this->Dot(vect);
+	if (getMinAngle)
+	{
+		// Get the dot product of the vectors
+		double dotProduct = this->Dot(vect);
 
-  // Get the product of both of the vectors magnitudes
-  double vectorsMagnitude = this->Magnitude() * vect.Magnitude() ;
+		// Get the product of both of the vectors magnitudes
+		double vectorsMagnitude = this->Magnitude() * vect.Magnitude();
 
-  // Get the angle in radians between the 2 vectors
-  double angle = acos( dotProduct / vectorsMagnitude );
+		// Get the angle in radians between the 2 vectors
+		double angle = acos(dotProduct / vectorsMagnitude);
 
 
-  // Here we make sure that the angle is not a -1.#IND0000000 number, which means indefinite
-  if(_isnan(angle))
-    return 0;
+		// Here we make sure that the angle is not a -1.#IND0000000 number, which means indefinite
+		if (_isnan(angle))
+			return 0;
 
-  // Return the angle in radians
-  return( angle );
+		// Return the angle in radians
+		return(angle);
+	}
+	else
+	{
+		double magnVect1 = (double)sqrt((m_X * m_X) + (m_Y * m_Y) + (m_Z * m_Z));
+		double magnVect2 = (double)sqrt((vect.m_X * vect.m_X) + (vect.m_Y * vect.m_Y) + (vect.m_Z * vect.m_Z));
+		double vectorsMagnitude = magnVect1 * magnVect2;
+		double dotVect = m_X * vect.m_X + m_Y * vect.m_Y + m_Z * vect.m_Z;
+		double angleVect = acos(dotVect / vectorsMagnitude);
+
+		return angleVect * 180.0 / vtkMath::Pi();
+	}
 }
 
 //----------------------------------------------------------------------------
