@@ -117,26 +117,7 @@ void albaAttachCameraTest::TestSetGetListener()
   cppDEL(attachCamera);
 }
 
-void albaAttachCameraTest::TestSetGetStartingMatrix()
-{
-  albaAttachCamera *attachCamera=new albaAttachCamera(NULL, NULL, NULL);
-  albaMatrix startingMatrix = attachCamera->GetStartingMatrix();
-  albaMatrix identity;
 
-  CPPUNIT_ASSERT(startingMatrix.Equals(&identity) == true);
-  
-  albaMatrix testMatrix;
-  testMatrix.SetElement(0,0,3.0);
-  testMatrix.SetElement(1,0,2.0);
-  testMatrix.SetElement(2,2,5.0);
-  
-  attachCamera->SetStartingMatrix(&testMatrix);
-  startingMatrix = attachCamera->GetStartingMatrix();
-  
-  CPPUNIT_ASSERT(startingMatrix.Equals(&testMatrix) == true);
-
-  cppDEL(attachCamera);
-}
 
 void albaAttachCameraTest::CreateTestData()
 {

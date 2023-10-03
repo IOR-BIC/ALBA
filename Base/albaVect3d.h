@@ -145,7 +145,7 @@ public:
   double& operator[](int pos);
 
   /** Returns the angle between two vectors */
-  double AngleBetweenVectors( albaVect3d &vect );
+  double AngleBetweenVectors( albaVect3d &vect, bool getMinAngle=true );
 
 	/** Do a spherical linear interpolation of two vectors*/
 	static albaVect3d Slerp(albaVect3d start, albaVect3d end, double percent);
