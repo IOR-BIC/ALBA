@@ -236,7 +236,7 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 
 				m_AttachCamera->DisableAttachCamera();
 				((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraSet(CAMERA_OS_Z);
-				m_AttachCamera->SetStartingMatrix(m_MatrixReset);
+				m_AttachCamera->SetStartingMatrix(m_MatrixReset->GetVTKMatrix());
 				m_SlicingMatrix->DeepCopy(m_MatrixReset);
 				m_AttachCamera->SetAttachedMatrix(m_SlicingMatrix->GetVTKMatrix());
 				m_AttachCamera->EnableAttachCamera();
