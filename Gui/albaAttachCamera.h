@@ -65,15 +65,14 @@ public:
   To be used in client view overridden CameraUpdate() method*/
   void UpdateCameraMatrix();
 
-  /** Set the vme to follow with camera. 
+	/** Set the vme to follow with camera. 
   This method is optional; in alternative the vme to follow is set on the attach camera activation keeping the selected vme.*/
   void SetVme(albaVME *node);
   albaVME *GetVme();
 
   /**Set an initial transform matrix before attaching camera. 
   this method must be called before SetVme*/
-  void SetStartingMatrix(albaMatrix *matrix);
-  albaMatrix GetStartingMatrix();
+  void SetStartingMatrix(vtkMatrix4x4 *matrix);
 
 	void OnEvent(albaEventBase *alba_event);
   
@@ -83,7 +82,6 @@ public:
 	/** 
   Returns the albaAttachCamera's GUI */
 	albaGUI *GetGui();
-
 
 	/** Returns AttachedMatrix */
 	vtkMatrix4x4 * GetAttachedMatrix() const { return m_AttachedMatrix; }
@@ -101,7 +99,6 @@ protected:
   albaVME				*m_AttachedVme; ///< VME on which the camera is attached when the attach-camera option is 'On'
 	vtkMatrix4x4	*m_AttachedMatrix; ///< Matrix given to the Camera to be moved together with m_AttachedVme
 	vtkMatrix4x4	*m_CurrentMatrix; ///< Matrix given to the Camera to be moved together with m_AttachedVme
-  vtkMatrix4x4	*m_StartingMatrix; ///< Matrix given to the Camera to be moved together with m_AttachedVme
 
 
   albaObserver	*m_Listener;
