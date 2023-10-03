@@ -194,7 +194,10 @@ protected:
 	void StoreCameraParametersForAllSubviews();
 
 	void ShowSlicers( albaVME * vmeVolume, bool show );
-	
+
+	void CreateAttachCamera(int i, int currentView);
+
+
 	void ResetCameraToSlices();
 
 	void UpdateConesPosition();

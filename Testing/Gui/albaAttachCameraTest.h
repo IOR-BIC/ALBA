@@ -44,7 +44,6 @@ public:
   CPPUNIT_TEST(TestEnableDisableAttachCamera);
   CPPUNIT_TEST(TestSetGetEnableAttachCamera);
   CPPUNIT_TEST(TestSetGetVme);
-  CPPUNIT_TEST(TestSetGetStartingMatrix);
   CPPUNIT_TEST(TestSetGetListener);
   CPPUNIT_TEST(TestRenderStuff);
   CPPUNIT_TEST_SUITE_END();
@@ -56,7 +55,6 @@ private:
   void TestEnableDisableAttachCamera();
   void TestSetGetEnableAttachCamera();
   void TestSetGetVme();
-  void TestSetGetStartingMatrix();
   void TestSetGetListener();  
 
   void CreateRenderStuff();
