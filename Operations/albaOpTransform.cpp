@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaOpTransform
- Authors: Nicola Vanella
+ Authors: Nicola Vanella, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or

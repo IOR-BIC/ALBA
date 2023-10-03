@@ -179,7 +179,7 @@ void albaViewSlicer::VmeShow(albaVME *vme, bool show)
       //Set camera of slice view in way that it will follow the volume
       if(!m_AttachCamera)
         m_AttachCamera=new albaAttachCamera(m_Gui,((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->m_Rwi,this);
-      m_AttachCamera->SetStartingMatrix(m_CurrentSlicer->GetOutput()->GetAbsMatrix());
+      m_AttachCamera->SetStartingMatrix(m_CurrentSlicer->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
       m_AttachCamera->SetVme(m_CurrentSlicer);
       ((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset(m_CurrentSlicer);
     }
