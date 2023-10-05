@@ -81,6 +81,7 @@ public:
 		ID_RIGHT_OR_LEFT,
     ID_SNAP,
     ID_ADJUST_SLICES,
+		ID_BALANCE_SLICES,
     ID_BORDER_CHANGE,
     ID_ALL_SURFACE,
     ID_RESET_SLICES,
@@ -147,6 +148,8 @@ protected:
 	void OnEventRangeModified(albaEventBase *alba_event);
   /** Precess events coming from other objects */
 	void OnEventSortSlices(albaVME *vme = NULL);
+	/** Put slices at constant distance */
+	void OnEventBalanceSlices();
   /** Precess events coming from other objects */
 	void OnEventSetThickness();
 
@@ -154,6 +157,8 @@ protected:
 	void SetBorder(albaPipe * p);
 	/** Precess events coming from other objects */
   void OnEventMouseMove(albaEvent *e);
+
+
   int			m_Sort[6];
   double	m_Pos[6];
 
