@@ -433,6 +433,42 @@ void albaViewRXCT::OnEventSnapModality()
     }
   }
 }
+
+//----------------------------------------------------------------------------
+void albaViewRXCT::OnEventBalanceSlices()
+{
+	double firstCenter[3], lastCenter[3], currCenter[3], step;
+	albaViewSlice * firstSlice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0);
+	firstSlice->GetSlice(firstCenter);
+	
+	albaViewSlice * lastSlice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(CT_CHILD_VIEWS_NUMBER-1);
+	lastSlice->GetSlice(lastCenter);
+
+	currCenter[0] = firstCenter[0];
+	currCenter[1] = firstCenter[1];
+	step = (lastCenter[2] - firstCenter[2]) / (double)(CT_CHILD_VIEWS_NUMBER-1);
+
+	//First and last slices does not need a position update
+	for (int currChildCTView = 1; currChildCTView < CT_CHILD_VIEWS_NUMBER-1; currChildCTView++)
+	{
+		if (m_GizmoSlice[currChildCTView])
+		{
+			currCenter[2] = firstCenter[2] + (step*currChildCTView);
+			m_GizmoSlice[currChildCTView]->UpdateGizmoSliceInLocalPositionOnAxis(currChildCTView, albaGizmoSlice::GIZMO_SLICE_Z, currCenter[2]);
+			m_Pos[currChildCTView] = currCenter[2];
+			m_Sort[currChildCTView] = currChildCTView;
+			albaViewSlice * slice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView);
+			slice->SetSlice(currCenter);
+			slice->SetTextColor(m_BorderColor[currChildCTView]);
+			slice->UpdateText();
+			slice->BorderCreate(m_BorderColor[currChildCTView]);
+			slice->CameraUpdate();
+		}
+	}
+
+	m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
+	m_ChildViewList[RX_SIDE_VIEW]->CameraUpdate();
+}
 //----------------------------------------------------------------------------
 void albaViewRXCT::OnEventSortSlices(albaVME *vme /*=NULL*/)
 {
@@ -477,11 +513,12 @@ void albaViewRXCT::OnEventSortSlices(albaVME *vme /*=NULL*/)
 				m_GizmoSlice[currChildCTView]->UpdateGizmoSliceInLocalPositionOnAxis(currChildCTView, albaGizmoSlice::GIZMO_SLICE_Z, center[2]);
 				m_Pos[currChildCTView] = center[2];
 				m_Sort[currChildCTView] = currChildCTView;
-				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetSlice(center);
-				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetTextColor(m_BorderColor[currChildCTView]);
-				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->UpdateText();
-				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->BorderCreate(m_BorderColor[currChildCTView]);
-				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->CameraUpdate();
+				albaViewSlice * slice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView);
+				slice->SetSlice(center);
+				slice->SetTextColor(m_BorderColor[currChildCTView]);
+				slice->UpdateText();
+				slice->BorderCreate(m_BorderColor[currChildCTView]);
+				slice->CameraUpdate();
 				center[2] -= step;
 			}
 		}
@@ -576,6 +613,9 @@ void albaViewRXCT::OnEventMouseMove( albaEvent *e )
   m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
   m_ChildViewList[RX_SIDE_VIEW]->CameraUpdate();
 }
+
+
+
 //----------------------------------------------------------------------------
 void albaViewRXCT::OnEvent(albaEventBase *alba_event)
 {
@@ -622,11 +662,17 @@ void albaViewRXCT::OnEvent(albaEventBase *alba_event)
       break;
 
       case ID_ADJUST_SLICES:
-        {
-          OnEventSortSlices();
-        }
-        break;
-       
+      {
+				OnEventSortSlices();
+      }
+      break;
+
+			case ID_BALANCE_SLICES:
+			{
+				OnEventBalanceSlices();
+			}
+			break;
+				
 			case ID_ALL_SURFACE:
       case ID_BORDER_CHANGE:
       {
@@ -726,6 +772,8 @@ albaGUI* albaViewRXCT::CreateGui()
   m_Gui->Bool(ID_MOVE_ALL_SLICES,"Move all",&m_MoveAllSlices,1);
 
   m_Gui->Button(ID_ADJUST_SLICES,"Adjust Slices");
+	m_Gui->Button(ID_BALANCE_SLICES, "Balance Slices");
+
 
   m_Gui->Divider(1);
 
