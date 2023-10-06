@@ -72,6 +72,15 @@ public:
   /** Create visual pipe and initialize them to build a RXCT view */
   void PackageView();
   
+	/** Views IDs */
+	enum RXCT_SUBVIEW_ID
+	{
+		RX_FRONT_VIEW = 0,
+		RX_SIDE_VIEW,
+		CT_COMPOUND_VIEW,
+		VIEWS_NUMBER,
+	};
+
   /** IDs for the GUI */
   enum VIEW_RXCT_WIDGET_ID
   {
@@ -100,6 +109,10 @@ public:
 
 	/** return an xpm-icon that can be used to represent this view */
 	char ** GetIcon();
+
+	/** Sets the height of a slicer, use -1 as slicer id to set the nearest slicer
+			Returns the index of the updated slicer */
+	int SetSlicerHeight(double zPos, int slicerId = -1);
 
 protected:
   /**
