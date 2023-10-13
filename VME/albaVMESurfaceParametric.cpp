@@ -935,7 +935,10 @@ void albaVMESurfaceParametric::SetGeometryType( int parametricSurfaceTypeID )
 	EnableParametricSurfaceGui(m_GeometryType);
 
 	
-	GetLogicManager()->GetOpManager()->EnableOp();
+	albaOpManager * opManager = GetLogicManager()->GetOpManager();
+	if(opManager)
+		opManager->EnableOp();
+
   Modified();
 }
 //-------------------------------------------------------------------------
