@@ -162,6 +162,7 @@
 #include "albaOpComputeWrapping.h"
 #include "albaOpConnectivitySurface.h"
 #include "albaOpCreateAverageLandmark.h"
+#include "albaOpCreateAveragePlane.h"
 #include "albaOpCreateEditSkeleton.h"
 #include "albaOpCreateGroup.h"
 #include "albaOpCreateLabeledVolume.h"
@@ -2039,6 +2040,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpCreateVolume("Create Volume"), _("Create"));
 	Plug(new albaOpAddLandmark("Add Landmark  \tCtrl+A"), _("Create"));
 	Plug(new albaOpCreateAverageLandmark("Create Average Landmark"), _("Create"));
+	Plug(new albaOpCreateAveragePlane("Create Average Plane"), _("Create"));
 	Plug(new albaOpCreateGroup("Group"), _("Create"));
 	Plug(new albaOpCreateMeter("Meter"), _("Create"));
 	Plug(new albaOpCreateRefSys("RefSys"), _("Create"));
