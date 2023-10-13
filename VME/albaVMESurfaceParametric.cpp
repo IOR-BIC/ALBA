@@ -56,6 +56,7 @@
 #include "vtkMath.h"
 #include "vtkPolyLine.h"
 #include "vtkLinearExtrusionFilter.h"
+#include "albaOpManager.h"
 
 const bool DEBUG_MODE = true;
 
@@ -337,7 +338,7 @@ void albaVMESurfaceParametric::OnEvent(albaEventBase *alba_event)
     {
       case ID_GEOMETRY_TYPE:
       {  
-        EnableParametricSurfaceGui(m_GeometryType);
+				SetGeometryType(m_GeometryType);
         InternalUpdate();
       }
 
@@ -931,6 +932,10 @@ void albaVMESurfaceParametric::CreateEllipticCylinder()
 void albaVMESurfaceParametric::SetGeometryType( int parametricSurfaceTypeID )
 {
   m_GeometryType = parametricSurfaceTypeID;
+	EnableParametricSurfaceGui(m_GeometryType);
+
+	
+	GetLogicManager()->GetOpManager()->EnableOp();
   Modified();
 }
 //-------------------------------------------------------------------------
@@ -1160,35 +1165,36 @@ void albaVMESurfaceParametric::AddLineToGUI(albaGUI *gui, int nLines)
 //-------------------------------------------------------------------------
 void albaVMESurfaceParametric::EnableParametricSurfaceGui( int surfaceTypeID )
 {
-	m_GuiSphere->Enable(CHANGE_VALUE_SPHERE, surfaceTypeID == PARAMETRIC_SPHERE);
-	m_GuiCone->Enable(CHANGE_VALUE_CONE, surfaceTypeID == PARAMETRIC_CONE);
-	m_GuiCylinder->Enable(CHANGE_VALUE_CYLINDER, surfaceTypeID == PARAMETRIC_CYLINDER);
-	m_GuiCube->Enable(CHANGE_VALUE_CUBE, surfaceTypeID == PARAMETRIC_CUBE);
-	m_GuiPlane->Enable(CHANGE_VALUE_PLANE, surfaceTypeID == PARAMETRIC_PLANE);
-	m_GuiEllipsoid->Enable(CHANGE_VALUE_ELLIPSOID, surfaceTypeID == PARAMETRIC_ELLIPSOID);
-	m_GuiTruncatedCone->Enable(CHANGE_VALUE_TRUNCATED_CONE, surfaceTypeID == PARAMETRIC_TRUNCATED_CONE);
-	m_GuiEllipticCylinder->Enable(CHANGE_VALUE_ELLIPTIC_CYLINDER, surfaceTypeID == PARAMETRIC_ELLIPTIC_CYLINDER);
-	
-	m_GuiSphere->Show(surfaceTypeID == PARAMETRIC_SPHERE);
-	m_GuiCone->Show(surfaceTypeID == PARAMETRIC_CONE);
-	m_GuiCylinder->Show(surfaceTypeID == PARAMETRIC_CYLINDER);
-	m_GuiCube->Show(surfaceTypeID == PARAMETRIC_CUBE);
-	m_GuiPlane->Show(surfaceTypeID == PARAMETRIC_PLANE);
-	m_GuiEllipsoid->Show(surfaceTypeID == PARAMETRIC_ELLIPSOID);
-	m_GuiTruncatedCone->Show(surfaceTypeID == PARAMETRIC_TRUNCATED_CONE);
-	m_GuiEllipticCylinder->Show(surfaceTypeID == PARAMETRIC_ELLIPTIC_CYLINDER);
+	if (m_Gui)
+	{
+		m_GuiSphere->Enable(CHANGE_VALUE_SPHERE, surfaceTypeID == PARAMETRIC_SPHERE);
+		m_GuiCone->Enable(CHANGE_VALUE_CONE, surfaceTypeID == PARAMETRIC_CONE);
+		m_GuiCylinder->Enable(CHANGE_VALUE_CYLINDER, surfaceTypeID == PARAMETRIC_CYLINDER);
+		m_GuiCube->Enable(CHANGE_VALUE_CUBE, surfaceTypeID == PARAMETRIC_CUBE);
+		m_GuiPlane->Enable(CHANGE_VALUE_PLANE, surfaceTypeID == PARAMETRIC_PLANE);
+		m_GuiEllipsoid->Enable(CHANGE_VALUE_ELLIPSOID, surfaceTypeID == PARAMETRIC_ELLIPSOID);
+		m_GuiTruncatedCone->Enable(CHANGE_VALUE_TRUNCATED_CONE, surfaceTypeID == PARAMETRIC_TRUNCATED_CONE);
+		m_GuiEllipticCylinder->Enable(CHANGE_VALUE_ELLIPTIC_CYLINDER, surfaceTypeID == PARAMETRIC_ELLIPTIC_CYLINDER);
 
- 	m_GuiSphere->FitGui();
-	m_GuiCone->FitGui();
-	m_GuiCylinder->FitGui();
-	m_GuiCube->FitGui();
-	m_GuiPlane->FitGui();
-	m_GuiEllipsoid->FitGui();
-	m_GuiTruncatedCone->FitGui();
-	m_GuiEllipticCylinder->FitGui();
+		m_GuiSphere->Show(surfaceTypeID == PARAMETRIC_SPHERE);
+		m_GuiCone->Show(surfaceTypeID == PARAMETRIC_CONE);
+		m_GuiCylinder->Show(surfaceTypeID == PARAMETRIC_CYLINDER);
+		m_GuiCube->Show(surfaceTypeID == PARAMETRIC_CUBE);
+		m_GuiPlane->Show(surfaceTypeID == PARAMETRIC_PLANE);
+		m_GuiEllipsoid->Show(surfaceTypeID == PARAMETRIC_ELLIPSOID);
+		m_GuiTruncatedCone->Show(surfaceTypeID == PARAMETRIC_TRUNCATED_CONE);
+		m_GuiEllipticCylinder->Show(surfaceTypeID == PARAMETRIC_ELLIPTIC_CYLINDER);
 
-	m_Gui->FitGui();
-	m_Gui->Update();
+		m_GuiSphere->FitGui();
+		m_GuiCone->FitGui();
+		m_GuiCylinder->FitGui();
+		m_GuiCube->FitGui();
+		m_GuiPlane->FitGui();
+		m_GuiEllipsoid->FitGui();
+		m_GuiTruncatedCone->FitGui();
+		m_GuiEllipticCylinder->FitGui();
 
-	GetLogicManager()->VmeSelect(this);
+		m_Gui->FitGui();
+		m_Gui->Update();
+	}
 }

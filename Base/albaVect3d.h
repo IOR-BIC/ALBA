@@ -98,6 +98,9 @@ public:
   /** Return a pointer to the vector of double */
   inline double* GetVect(){return (double*)this;};
 
+	/** Return a pointer to the vector of double */
+	inline void GetVect(double *vect) { vect[0] = m_X; vect[1] = m_Y; vect[2] = m_Z; };
+
   /** Operator: Return true if the vectors are equals */
   int operator==(albaVect3d &vect);
 

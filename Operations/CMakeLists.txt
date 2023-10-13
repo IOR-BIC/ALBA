@@ -216,6 +216,7 @@ IF (ALBA_USE_ITK)
     albaOpExporterMeters.cpp			albaOpExporterMeters.h
     albaOpInteractionDebugger.cpp	albaOpInteractionDebugger.h
 	albaOpFilterImage.cpp			albaOpFilterImage.h
+	albaOpCreateAveragePlane.cpp	albaOpCreateAveragePlane.h
   )
 ENDIF (ALBA_USE_ITK)
 
