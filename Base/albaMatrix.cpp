@@ -14,6 +14,7 @@
 
 =========================================================================*/
 #include "albaMatrix.h"
+#include "albaVect3d.h"
 #include "albaMatrix3x3.h"
 #include "albaIndent.h"
 #include <assert.h>
@@ -514,6 +515,17 @@ void albaMatrix::MultiplyPoint(const double elem[16],
   out[1] = v1*elem[4]  + v2*elem[5]  + v3*elem[6]  + v4*elem[7];
   out[2] = v1*elem[8]  + v2*elem[9]  + v3*elem[10] + v4*elem[11];
   out[3] = v1*elem[12] + v2*elem[13] + v3*elem[14] + v4*elem[15];
+}
+
+//----------------------------------------------------------------------------
+albaVect3d albaMatrix::MultiplyPoint(albaVect3d point)
+{
+	double in[4], out[4];
+	point.GetVect(in);
+	in[3] = 1;
+	albaMatrix::MultiplyPoint(*GetElements(), in, out);
+	
+	return albaVect3d(out);
 }
 
 //----------------------------------------------------------------------------

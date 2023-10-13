@@ -38,8 +38,6 @@ public:
 
 	virtual void VmeAdd(albaVME *vme) = 0;
 
-	//virtual void VmeAdded(albaVME *vme) = 0;
-
 	virtual void VmeRemove(albaVME *vme) = 0;
 
 	virtual void VmeRemoved() = 0;
@@ -57,6 +55,7 @@ public:
 
 	virtual void DisableCameraUpdateSkip() = 0;
 
+	//Logic
 	/** Returns true if there is a Running Operation */
 	virtual bool IsOperationRunning() = 0;
 
@@ -64,6 +63,7 @@ public:
 
 	virtual void PrintImage(albaVMEImage *img) = 0;
 
+	//Managers
 	virtual albaOpManager * GetOpManager() const = 0;
 
 	virtual albaViewManager *GetViewManager() = 0;
