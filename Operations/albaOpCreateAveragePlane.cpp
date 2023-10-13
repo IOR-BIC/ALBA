@@ -135,10 +135,9 @@ void albaOpCreateAveragePlane::OpDo()
 	outPlane->SetPlanePoint2(outP2.GetVect());
 	outPlane->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_PLANE);
 	outPlane->ReparentTo(m_Input);
-	albaDEL(outPlane);
-
 	m_Output = outPlane;
-	
+	albaDEL(outPlane);
+			
 	GetLogicManager()->VmeShow(m_Output, true);
 	GetLogicManager()->CameraUpdate();
 
