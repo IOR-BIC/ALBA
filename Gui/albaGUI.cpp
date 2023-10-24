@@ -1868,7 +1868,8 @@ wxGrid *albaGUI::Grid(int id, wxString label, int height, int row, int cols, wxS
 
 	grid->EnableEditing(false);
 	grid->SetColLabelSize(LH);
-	grid->SetLabelSize(wxVERTICAL, LW);
+	grid->SetRowLabelSize(wxVERTICAL);
+	grid->SetColLabelSize(LW);
 	grid->SetColSize(0, EW);
 	grid->SetColSize(1, EW);
 
@@ -2060,7 +2061,7 @@ void albaGUI::AddMenuItem(wxMenu *menu, int id, wxString label, char **icon/*=NU
 	//menu icons does not work on this version of wxwindows under winxp
 	if (icon != NULL && osVersion > 5)
 	{
-		wxMenuItem *menuItem = new wxMenuItem(menu, id, label, label, false);
+		wxMenuItem *menuItem = new wxMenuItem(menu, id, label, label);
 		menuItem->SetBitmap(wxImage(icon));
 		menu->Append(menuItem);
 		menu->UpdateUI();

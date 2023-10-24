@@ -1228,7 +1228,7 @@ void wxFrameManager::ProcessMgrEvent(wxFrameManagerEvent& event)
     // first, give the owner frame a chance to override
     if (m_Frame)
     {
-        if (m_Frame->ProcessEvent(event))
+        if (m_Frame->ProcessWindowEvent(event))
             return;
     }
 
@@ -3110,7 +3110,7 @@ void wxFrameManager::ShowHint(const wxRect& rect)
     // go ahead and use a transparent hint
     
     if ((m_Flags & wxAUI_MGR_TRANSPARENT_HINT) != 0 &&
-        os_type == wxWINDOWS_NT && ver_major >= 5)
+        os_type == wxOS_WINDOWS_NT && ver_major >= 5)
     {
         if (m_LastHint == rect)
             return;

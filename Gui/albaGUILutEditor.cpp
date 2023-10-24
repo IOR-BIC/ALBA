@@ -150,7 +150,7 @@ albaGUILutEditor::albaGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoin
   albaGUIButton    *butt;
   
   lab = new wxStaticText(this, -1, _("Presets LUT"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
-	m_PresetCombo = new wxComboBox(this, ID_PRESET, "", dp, wxSize(DW,-1), lutPresetNum+1, presetsLutNames.GetStringArray(), wxCB_READONLY);
+	m_PresetCombo = new wxComboBox(this, ID_PRESET, "", dp, wxSize(DW,-1),  presetsLutNames, wxCB_READONLY);
   sz = new wxBoxSizer(wxHORIZONTAL);
   sz->Add( lab,  1, wxRIGHT, LM);
 	sz->Add( m_PresetCombo,0, wxRIGHT, HM);
@@ -203,7 +203,7 @@ albaGUILutEditor::albaGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoin
   buttonRemoveFromUserLUTS->SetValidator( albaGUIValidator(this,ID_REMOVE_FROM_ULIB,buttonRemoveFromUserLUTS) );  
 
   wxStaticText *staticTextSelectUserLut = new wxStaticText (this, -1, _("select user LUT"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
-  m_UserPresetCombo = new wxComboBox  (this, ID_USER_PRESET, "", dp, wxSize(DW,-1), userLutPresetNum, userLutNames.GetStringArray(), wxCB_READONLY);
+  m_UserPresetCombo = new wxComboBox(this, ID_USER_PRESET, "", dp, wxSize(DW,-1), userLutNames, wxCB_READONLY);
 
   wxBoxSizer   *selectUserLutsHSizer;
 
@@ -438,16 +438,14 @@ void albaGUILutEditor::OnEvent(albaEventBase *alba_event)
         if(m_parent->IsKindOf(CLASSINFO(wxDialog)))
         {
           wxDialog *dlg = (wxDialog *)m_parent;
-					wxCommandEvent cmd(0, wxID_OK);
-          dlg->OnOK( cmd );
+			    dlg->EndModal(wxID_OK);
         }
       break; 
       case ID_CANCEL:
         if(m_parent->IsKindOf(CLASSINFO(wxDialog)))
         {
           wxDialog *dlg = (wxDialog *)m_parent;
-					wxCommandEvent cmd(0, wxID_CANCEL);
-          dlg->OnCancel( cmd );
+					dlg->EndModal(wxID_CANCEL);
         }
       break; 
       case ID_APPLY:

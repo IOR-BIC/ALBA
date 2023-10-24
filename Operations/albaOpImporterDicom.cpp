@@ -226,15 +226,18 @@ void albaOpImporterDicom::OpRun()
 {
 	m_Wizard = new albaGUIWizard(_("DICOM Importer"));
 	m_Wizard->SetListener(this);
+
+/*
+	TODO RESTORE SET BUTTON STRING OPTION
 	if (!GetSetting()->GetSkipCrop())
 		m_Wizard->SetButtonString("Crop >");
 	else
 		m_Wizard->SetButtonString("Finish");
-		
+*/		
 	wxString lastDicomDir = GetSetting()->GetLastDicomDir();
 		
 	if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
-		lastDicomDir = albaGetLastUserFolder().c_str();		
+		lastDicomDir = albaGetLastUserFolder();		
 			
 	wxDirDialog dialog(m_Wizard->GetParent(),"", lastDicomDir, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER, m_Wizard->GetPosition());
 	dialog.SetReturnCode(wxID_OK);
@@ -256,7 +259,7 @@ void albaOpImporterDicom::OpRun()
 		GetSetting()->SetLastDicomDir(path);
 		GuiUpdate();
 
-		if (OpenDir(path.c_str()))
+		if (OpenDir(path))
 		{
 			int wizardResult = RunWizard();
 			OpStop(wizardResult);
@@ -827,7 +830,7 @@ bool albaOpImporterDicom::LoadDicomFromDir(const char *dicomDirABSPath)
 		
 	for (int i = 0; i < fileNumber; i++)
 	{
-		albaDicomSlice *slice= ReadDicomFile((allFiles[i]).c_str());
+		albaDicomSlice *slice= ReadDicomFile(allFiles[i]);
 		if (slice)
 			m_StudyList->AddSlice(slice);
 		progressHelper.UpdateProgressBar( i*100 / fileNumber);
@@ -1352,7 +1355,9 @@ void albaOpImporterDicom::OnWizardChangePage( albaEvent * e )
 		//get the current windowing in order to maintain subrange thought the wizard pages 
 		m_CropPage->GetWindowing(m_SliceRange, m_SliceSubRange);
 		m_DicomInteractor->PlaneVisibilityOff();
-		m_Wizard->SetButtonString("Crop >");
+
+		//TODO RESTORE THIS
+		//m_Wizard->SetButtonString("Crop >");
 	}
 	
 	CameraReset();

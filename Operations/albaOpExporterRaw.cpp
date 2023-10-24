@@ -47,6 +47,8 @@
 #include "vtkShortArray.h"
 #include "vtkDataSet.h"
 
+#include "wx\filename.h"
+
 #include <fstream>
 
 //----------------------------------------------------------------------------
@@ -62,7 +64,7 @@ albaOp(label)
 	m_SingleFile = 1;
 	m_Offset = 0;
 
-  m_ProposedDirectory = albaGetLastUserFolder().c_str();
+  m_ProposedDirectory = albaGetLastUserFolder();
 }
 //----------------------------------------------------------------------------
 albaOpExporterRAW::~albaOpExporterRAW()
@@ -93,7 +95,7 @@ void albaOpExporterRAW::OpRun()
 	if(!m_TestMode)
 	{
 		wxString wildc = "raw file (*.raw)|*.raw";
-		wxString file = albaGetSaveFile(m_ProposedDirectory,wildc).c_str(); 
+		wxString file = albaGetSaveFile(m_ProposedDirectory,wildc).char_str(); 
 		m_FileName = file;
 
 		//Crete GUI
@@ -130,7 +132,7 @@ void albaOpExporterRAW::SaveVolume()
 //----------------------------------------------------------------------------
 {
 	wxString path,name,ext;
-	::wxFileName::SplitPath(m_FileName,&path,&name,&ext);
+	wxFileName::SplitPath(m_FileName.GetCStr(),&path,&name,&ext);
 	path+= _("\\");
 	if(!m_TestMode)
 		wxBusyInfo wait("Please wait, working...");
@@ -172,7 +174,7 @@ void albaOpExporterRAW::SaveVolume()
 			exporter->SetFilePattern("%s_%04d.raw");
 		}
 		
-		char *c_prefix = (char*)( prefix.c_str() ); 
+		char *c_prefix = (char*)( prefix.char_str()); 
 		exporter->SetFilePrefix(c_prefix);
 		exporter->Write();
 
@@ -275,12 +277,12 @@ void albaOpExporterRAW::SaveVolume()
 			if(!m_TestMode)
 			{
 				//saving the z coordinates in a file
-        wxString proposed = albaGetLastUserFolder().c_str();
+        wxString proposed = albaGetLastUserFolder();
 				proposed += _("Z_coordinates_");
 				proposed += m_Input->GetName();
 				proposed += _(".txt");
 				wxString wildc = _("txt file (*.txt)|*.txt");
-				wxString file = albaGetSaveFile(proposed,wildc).c_str();   
+				wxString file = albaGetSaveFile(proposed,wildc).char_str();   
 				nome = (file);
 				f_out.open(nome);
 			}
@@ -363,12 +365,12 @@ void albaOpExporterRAW::SaveVolume()
 			if(!m_TestMode)
 			{
 				//saving the z coordinates in a file
-        wxString proposed = albaGetLastUserFolder().c_str();
+        wxString proposed = albaGetLastUserFolder();
 				proposed += _("Z_coordinates_");
 				proposed += m_Input->GetName();
 				proposed += _(".txt");
 				wxString wildc = _("txt file (*.txt)|*.txt");
-				wxString file = albaGetSaveFile(proposed,wildc).c_str();   
+				wxString file = albaGetSaveFile(proposed,wildc).char_str();   
 				nome = (file);
 				std::ofstream f_out;
 				f_out.open(nome);

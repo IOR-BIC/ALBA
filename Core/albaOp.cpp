@@ -171,7 +171,7 @@ void albaOp::ShowGui()
 		b->SetEventId(ID_HELP);  //SIL. 7-4-2005: 
 		b->SetMinSize(wxSize(16, 16));
 		b->SetListener(this);
-		topSizer->Add(b, 0, wxRIGHT| wxADJUST_MINSIZE, 2);
+		topSizer->Add(b, 0, wxRIGHT, 2);
 	}
 
   m_Guih->Put(m_Gui);

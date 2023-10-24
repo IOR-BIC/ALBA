@@ -90,7 +90,7 @@ albaString albaOpExporterAnsysCDBFile::GetWildcard()
 int albaOpExporterAnsysCDBFile::Write()
 {
   FILE *outFile;
-  outFile = fopen(m_AnsysOutputFileNameFullPath.c_str(), "w");
+  outFile = fopen(m_AnsysOutputFileNameFullPath.char_str(), "w");
 
   albaVMEMesh *input = albaVMEMesh::SafeDownCast(m_Input);
 
@@ -317,10 +317,10 @@ int albaOpExporterAnsysCDBFile::WriteMaterialsFile(FILE *file)
       for (int j = 0; j < numberOfMaterialProperties; j++)
       {
         wxString arrayName = materialProperties[j];
-        vtkDataArray *array = materialData->GetArray(arrayName.c_str());
+        vtkDataArray *array = materialData->GetArray(arrayName.char_str());
 
         fprintf(file,"MPTEMP,R5.0, 1, 1,  0.00000000    ,\n");
-        fprintf(file,"MPDATA,R5.0, 1,%s,     %d, 1, %.8lf    ,",arrayName.c_str(), materialID, array->GetTuple(i)[0]);
+        fprintf(file,"MPDATA,R5.0, 1,%s,     %d, 1, %.8lf    ,",arrayName.char_str(), materialID, array->GetTuple(i)[0]);
         
         fprintf(file,"\n");
       }

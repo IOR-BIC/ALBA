@@ -249,7 +249,7 @@ void albaWizard::BlockExecutionEnd()
     else 
     {
       //getting the wizard substring
-      albaString wizardName = nextBlock.SubString(7,nextBlock.size()-2).c_str();
+      albaString wizardName = nextBlock.SubString(7,nextBlock.size()-2);
       albaEventMacro(albaEvent(this,WIZARD_SWITCH,&wizardName));
     }
   }

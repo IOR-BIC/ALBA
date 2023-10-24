@@ -43,6 +43,8 @@
 #include "vtkVRMLImporter.h"
 #include "vtkRendererCollection.h"
 
+#include "wx/filename.h"
+
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpImporterVRML);
 //----------------------------------------------------------------------------
@@ -139,7 +141,7 @@ albaCxxTypeMacro(albaOpImporterVRML);
 	m_Canundo	= true;
 	m_Group		= NULL;
 
- 	m_FileDir = albaGetLastUserFolder().c_str();
+ 	m_FileDir = albaGetLastUserFolder();
 }
 //----------------------------------------------------------------------------
  albaOpImporterVRML::~ albaOpImporterVRML()
@@ -165,7 +167,7 @@ void  albaOpImporterVRML::OpRun()
 
   if (m_File.IsEmpty())
   {
-    f = albaGetOpenFile(m_FileDir.GetCStr(),vrml_wildc.GetCStr()).c_str(); 	
+    f = albaGetOpenFile(m_FileDir.GetCStr(),vrml_wildc.GetCStr()); 	
     m_File = f;
   }
 
@@ -193,7 +195,7 @@ void  albaOpImporterVRML::ImportVRML()
   wxFileName::SplitPath(m_File.GetCStr(),&path,&name,&ext);
 
   albaNEW(m_Group);
-  m_Group->SetName(name.c_str());
+  m_Group->SetName(name.char_str());
 
   vtkALBASmartPointer<vtkRenderWindow> rw;
 
@@ -230,7 +232,7 @@ void  albaOpImporterVRML::ImportVRML()
       albaTimeStamp t;
       t = m_Input->GetTimeStamp();
       albaSmartPointer<albaVMESurface> surface;
-      surface->SetName(name.c_str());
+      surface->SetName(name.char_str());
       vtkPolyData *data = (vtkPolyData *)actor->GetMapper()->GetInput();
       data->Update();
       if(data->GetNumberOfPolys() != 0)

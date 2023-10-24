@@ -30,12 +30,13 @@
 #include "albaEvent.h"
 
 #include "albaVME.h"
-#include "albaVMERawMotionData.h" // vedere
+#include "albaVMERawMotionData.h" 
 #include "albaTagArray.h"
 #include "albaSmartPointer.h"
+#include "wx/filename.h"
 
 
-// #include <mflVMEIterator.h> non ce ne e' bisogno
+
 
 //----------------------------------------------------------------------------
 albaOpImporterRawMotionData::albaOpImporterRawMotionData(wxString label) :
@@ -46,8 +47,8 @@ albaOp(label)
 	m_Canundo	= false;
 	m_File		= "";
 	m_Dict		= "";
-	m_FileDir = (albaGetApplicationDirectory() + "/Data/External/").c_str();
-	m_DictDir = (albaGetApplicationDirectory() + "/Config/Dictionary/").c_str();
+	m_FileDir = (albaGetApplicationDirectory() + "/Data/External/").char_str();
+	m_DictDir = (albaGetApplicationDirectory() + "/Config/Dictionary/").char_str();
 
 	m_Vme		= NULL;
 	
@@ -86,11 +87,11 @@ void albaOpImporterRawMotionData::OpRun()
 	wxString pgd_wildc	= "RAW Motion Data (*.MAN)|*.MAN";
 	wxString dict_wildc = "Dictionary (*.txt)|*.txt";
 
-	albaString f = albaGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
+	albaString f = albaGetOpenFile(m_FileDir,pgd_wildc); 
 	if(f != "")
 	{
 	m_File = f;
-	f = albaGetOpenFile(m_DictDir,dict_wildc,"Open Dictionary").c_str(); 
+	f = albaGetOpenFile(m_DictDir,dict_wildc,"Open Dictionary"); 
 				if(f != "")
 				{
 				m_Dict = f;
@@ -128,7 +129,7 @@ void albaOpImporterRawMotionData::OpDo()
 	m_Vme = reader;
 
   wxString path, name, ext;
-  wxFileName::SplitPath(m_File.c_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.char_str(),&path,&name,&ext);
   m_Vme->SetName(name);
 	
 	albaTagItem tag_Nature;

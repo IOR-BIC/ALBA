@@ -91,7 +91,7 @@ void albaOpExporterMesh::OnOK()
 	m_FileDir << ".txt";
 
 	wxString f;
-	f = albaGetSaveFile(m_FileDir, wildcard).c_str();
+	f = albaGetSaveFile(m_FileDir, wildcard).char_str();
 	if (!f.IsEmpty())
 	{
 		m_File = f;
@@ -102,9 +102,9 @@ void albaOpExporterMesh::OnOK()
 	wxString wxname = wxstr.BeforeLast('.');
 	wxString wxextension = wxstr.AfterLast('.');
 
-	m_NodesFileName << wxname.c_str() << "_NODES." << wxextension.c_str();
-	m_ElementsFileName << wxname.c_str() << "_ELEMENTS." << wxextension.c_str();
-	m_MaterialsFileName << wxname.c_str() << "_MATERIALS." << wxextension.c_str();
+	m_NodesFileName << wxname.char_str() << "_NODES." << wxextension.char_str();
+	m_ElementsFileName << wxname.char_str() << "_ELEMENTS." << wxextension.char_str();
+	m_MaterialsFileName << wxname.char_str() << "_MATERIALS." << wxextension.char_str();
 
 	// Write to output
 	int result = Write();

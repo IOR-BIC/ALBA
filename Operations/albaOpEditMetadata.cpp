@@ -113,7 +113,7 @@ void albaOpEditMetadata::OpRun()
 		if (!m_MetadataList->IsEmpty())
 		{
 			m_MetadataList->SetSelection(0, true);//
-			SelectTag(m_MetadataList->GetString(0).c_str());
+			SelectTag(m_MetadataList->GetString(0).char_str());
 		}
 
 		wxString tag_type[2] = { _("Numeric"),_("String") };
@@ -186,7 +186,7 @@ void albaOpEditMetadata::OnEvent(albaEventBase *alba_event)
         if (sel >= 0)
         {
           wxString tag_name = m_MetadataList->GetString(sel);
-          SelectTag(tag_name.c_str());
+          SelectTag(tag_name.char_str());
           m_Gui->Update();
         }
       }
@@ -324,12 +324,12 @@ void albaOpEditMetadata::AddNewTag(albaString &name)
   m_TagValueAsDouble  = 0.0;
 
   m_SelectedTag = new albaTagItem();
-  m_SelectedTag->SetName(new_name.c_str());
+  m_SelectedTag->SetName(new_name.char_str());
   m_SelectedTag->SetType(m_TagType+1);
   m_SelectedTag->SetNumberOfComponents(m_TagMulteplicity);
   m_SelectedTag->SetComponent(m_TagValueAsDouble,m_TagComponent);
   bool tag_present = false;
-  while (m_TagArray->IsTagPresent(new_name.c_str()))
+  while (m_TagArray->IsTagPresent(new_name.char_str()))
   {
     tag_present = true;
     new_name = m_TagName;

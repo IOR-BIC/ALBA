@@ -98,7 +98,7 @@ void albaOpClassicICPRegistration::CreateGui()
 //----------------------------------------------------------------------------
 {
 	wxString wildcard = _("Report log (*.log)|*.log");
-	wxString dir = albaGetLastUserFolder().c_str();
+	wxString dir = albaGetLastUserFolder();
 	if(!wxDirExists(dir)) dir = "";
 	m_ReportFilename = dir + _("report.log");
 	

@@ -73,7 +73,7 @@ void albaOpImporterMSF::OpRun()
 {
   if (!m_TestMode)
   {
-    albaString fileDir = albaGetLastUserFolder().c_str();
+    albaString fileDir = albaGetLastUserFolder();
 		
 		albaString wildc;
 		const	char *ext = GetLogicManager()->GetMsfFileExtension();
@@ -84,7 +84,7 @@ void albaOpImporterMSF::OpRun()
 		wildc += wxString::Format("|MAF Project File (*.msf)|*.msf");
 		wildc += wxString::Format("|MAF Compressed File (*.zmsf)|*.zmsf", ext, ext);
 
-    m_File = albaGetOpenFile(fileDir, wildc, _("Choose Project file")).c_str();
+    m_File = albaGetOpenFile(fileDir, wildc, _("Choose Project file"));
   }
 
   int result = OP_RUN_CANCEL;
@@ -188,7 +188,7 @@ const char *albaOpImporterMSF::ZIPOpen(albaString m_File)
   albaString zip_cache = wxPathOnly(m_File.GetCStr());
   if (zip_cache.IsEmpty())
   {
-    zip_cache = albaGetAppDataDirectory().c_str();
+    zip_cache = albaGetAppDataDirectory();
   }
   zip_cache = zip_cache + "\\~TmpData";
   if (!wxDirExists(zip_cache.GetCStr()))
@@ -241,11 +241,11 @@ const char *albaOpImporterMSF::ZIPOpen(albaString m_File)
   if(ext == "msf")
   {
     m_MSFFile = out_file;
-    out_file_stream.open(out_file, std::ios_base::out);
+    out_file_stream.open(out_file.char_str(), std::ios_base::out);
   }
   else
   {
-    out_file_stream.open(out_file, std::ios_base::binary);
+    out_file_stream.open(out_file.char_str(), std::ios_base::binary);
   }
   s_size = zip_is->GetSize();
   buf = new char[s_size];
@@ -275,10 +275,10 @@ const char *albaOpImporterMSF::ZIPOpen(albaString m_File)
     if(ext == "msf")
     {
       m_MSFFile = out_file;
-      out_file_stream.open(out_file, std::ios_base::out);
+      out_file_stream.open(out_file.char_str(), std::ios_base::out);
     }
     else
-      out_file_stream.open(out_file, std::ios_base::binary);
+      out_file_stream.open(out_file.char_str(), std::ios_base::binary);
     s_size = zip_is->GetSize();
     buf = new char[s_size];
     zip_is->Read(buf,s_size);
@@ -308,10 +308,10 @@ void albaOpImporterMSF::RemoveTempDirectory()
   if (m_TmpDir != "")
   {
     wxString working_dir;
-    working_dir = albaGetAppDataDirectory().c_str();
+    working_dir = albaGetAppDataDirectory().char_str();
     wxSetWorkingDirectory(working_dir);
     //remove tmp directory due to zip extraction or compression
-    if(::wxDirExists(m_TmpDir))
+    if(::wxDirExists(m_TmpDir.GetCStr()))
     {
       wxString file_match = m_TmpDir + "/*.*";
       wxString f = wxFindFirstFile(file_match);

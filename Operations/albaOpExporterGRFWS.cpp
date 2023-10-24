@@ -195,17 +195,17 @@ void albaOpExporterGRFWS::OpDo()
   // INPUT is a VECTOR:
   if (m_Input->IsA("albaVMEVector"))
   {
-    wxString proposed = albaGetLastUserFolder().c_str();
+    wxString proposed = albaGetLastUserFolder();
     proposed += m_Input->GetName();
     proposed += "_VECTOR";
     proposed += ".csv";
 
     wxString wildc = "ASCII CSV file (*.csv)|*.csv";
-    wxString f = albaGetSaveFile(proposed,wildc).c_str(); 
+    wxString f = albaGetSaveFile(proposed,wildc).char_str(); 
 
     if(!f.IsEmpty())
     {
-      SetFileName(f.c_str());
+      SetFileName(f.char_str());
       if (!m_FastMethod)
       {
         WriteSingleVector();
@@ -220,17 +220,17 @@ void albaOpExporterGRFWS::OpDo()
   // INPUT is a FORCE PLATE: Load and Execute 
   else if (m_ForceLeft && m_ForceRight && m_MomentLeft && m_MomentRight)
   {
-    wxString proposed = albaGetLastUserFolder().c_str();
+    wxString proposed = albaGetLastUserFolder();
     proposed += m_Input->GetName();
     proposed += "_FORCEPLATES";
     proposed += ".csv";
 
     wxString wildc = "ASCII CSV file (*.csv)|*.csv";
-    wxString f = albaGetSaveFile(proposed,wildc).c_str(); 
+    wxString f = albaGetSaveFile(proposed,wildc).char_str(); 
 
     if(!f.IsEmpty())
     {
-      SetFileName(f.c_str());
+      SetFileName(f.char_str());
       if (!m_FastMethod)
       {
         Write();

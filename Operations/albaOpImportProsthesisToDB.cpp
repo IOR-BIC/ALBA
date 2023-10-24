@@ -84,7 +84,7 @@ void albaOpImportProsthesisToDB::OpRun()
 
 	// Select File
 	albaString wildc = "ZIP file (*.zip)|*.zip|XML file (*.xml)|*.xml";
-	wxString prosthesisFile = albaGetOpenFile(albaGetLastUserFolder().c_str(), wildc, "Select file").c_str();
+	wxString prosthesisFile = albaGetOpenFile(albaGetLastUserFolder(), wildc, "Select file").char_str();
 
 	int result = ImportDB(prosthesisFile);
 
@@ -118,7 +118,7 @@ int albaOpImportProsthesisToDB::ImportDB(wxString dbFile)
 	if (wxFileExists(dbFile))
 	{
 		wxString path, name, ext;
-		wxFileName::SplitPath(dbFile.c_str(), &path, &name, &ext);
+		wxFileName::SplitPath(dbFile, &path, &name, &ext);
 
 		if (ext == "zip")
 		{

@@ -34,7 +34,7 @@
 static long GLO_randCol = 117;
 static bool GLO_yelding;
 static bool GLO_yieldEnabled;
-static std::string GLO_appDebugDir;
+static wxString GLO_appDebugDir;
 
 //----------------------------------------------------------------------------
 void albaYield()
@@ -55,7 +55,7 @@ ALBA_EXPORT void albaEnableYielding(bool enable/*=true*/)
 }
 
 //----------------------------------------------------------------------------
-std::string  albaGetDirName(const char * initial, const char * title, wxWindow *parent)
+wxString  albaGetDirName(const char * initial, const char * title, wxWindow *parent)
 //----------------------------------------------------------------------------
 {
   wxDirDialog dialog(parent, title, initial, wxDD_DEFAULT_STYLE | wxDD_NEW_DIR_BUTTON);
@@ -70,7 +70,7 @@ std::string  albaGetDirName(const char * initial, const char * title, wxWindow *
 }
 
 //----------------------------------------------------------------------------
-std::string albaGetOpenFile(const char *initial, const char * wild, const char * title, wxWindow *parent)
+wxString albaGetOpenFile(const char *initial, const char * wild, const char * title, wxWindow *parent)
 //----------------------------------------------------------------------------
 {
   wxString path, name, ext;
@@ -96,7 +96,7 @@ std::string albaGetOpenFile(const char *initial, const char * wild, const char *
 }
 
 //----------------------------------------------------------------------------
-void albaGetOpenMultiFiles(const char * path, const char * wild, std::vector<std::string> &files, const char * title, wxWindow *parent)
+void albaGetOpenMultiFiles(const char * path, const char * wild, std::vector<wxString> &files, const char * title, wxWindow *parent)
 //----------------------------------------------------------------------------
 {  
   wxString wildcard = wild;
@@ -119,7 +119,7 @@ void albaGetOpenMultiFiles(const char * path, const char * wild, std::vector<std
 	}
 }
 //----------------------------------------------------------------------------
-std::string albaGetSaveFile(const char * initial, const char * wild, const char * title, wxWindow *parent, bool warnOverWrite)
+wxString albaGetSaveFile(const char * initial, const char * wild, const char * title, wxWindow *parent, bool warnOverWrite)
 //----------------------------------------------------------------------------
 {
   wxString path, name, ext;
@@ -151,7 +151,7 @@ std::string albaGetSaveFile(const char * initial, const char * wild, const char 
   return newPath;
 }
 //----------------------------------------------------------------------------
-std::string albaGetApplicationDirectory()
+wxString albaGetApplicationDirectory()
 //----------------------------------------------------------------------------
 {
 
@@ -172,7 +172,7 @@ std::string albaGetApplicationDirectory()
 		//Restore working directory
 		wxSetWorkingDirectory(cd);
 
-		return app_dir.c_str();
+		return app_dir;
 	}
 	else
 	{
@@ -180,7 +180,7 @@ std::string albaGetApplicationDirectory()
 	}
 }
 //----------------------------------------------------------------------------
-std::string albaGetAppDataDirectory()
+wxString albaGetAppDataDirectory()
 //----------------------------------------------------------------------------
 {
   //getting user app directory
@@ -190,7 +190,7 @@ std::string albaGetAppDataDirectory()
   return appData_dir.c_str();
 }
 //----------------------------------------------------------------------------
-std::string albaGetDocumentsDirectory()
+wxString albaGetDocumentsDirectory()
 //----------------------------------------------------------------------------
 {
   //getting the Documents directory
@@ -200,31 +200,29 @@ std::string albaGetDocumentsDirectory()
   return home_dir;
 }
 //----------------------------------------------------------------------------
-std::string albaGetLastUserFolder()
+wxString albaGetLastUserFolder()
 //----------------------------------------------------------------------------
 {  
   wxString lastUserFolder;
 
-  wxString appName = wxApp::GetInstance()->GetAppName();
 	wxConfigBase* config = wxConfigBase::Get();
 
   // Return last User Folder if exists, else Documents folder
   if(!config->Read("LastUserFolder", &lastUserFolder))
     lastUserFolder = albaGetDocumentsDirectory().c_str();
 
-  delete config;
   return lastUserFolder.c_str();
 }
 
 
 //----------------------------------------------------------------------------
-ALBA_EXPORT void albaSetAppDebugDir(std::string ddir)
+ALBA_EXPORT void albaSetAppDebugDir(wxString ddir)
 {
 	GLO_appDebugDir = ddir;
 }
 
 //----------------------------------------------------------------------------
-ALBA_EXPORT std::string albaGetConfigDirectory()
+ALBA_EXPORT wxString albaGetConfigDirectory()
 {
 	//getting the Config directory
 	wxString config_dir = albaGetApplicationDirectory().c_str();
@@ -386,7 +384,7 @@ wxColour albaRandomColor()
   };
 }
 //----------------------------------------------------------------------------
-std::string  albaIdString(int id)
+wxString  albaIdString(int id)
 //----------------------------------------------------------------------------
 {
     wxString s;

@@ -1415,9 +1415,9 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
     wxT("Deformation done. Volume shrinkage: %.4f (Orig = %.2f, New = %.2f)\n"),
     dblNewVolume / dblOrigVolume, dblOrigVolume, dblNewVolume);
 
-  albaLogMessage(szMsg.c_str());
+  albaLogMessage(szMsg.char_str());
 #ifdef _RPT0
-  _RPT0(_CRT_WARN, szMsg.c_str());
+  _RPT0(_CRT_WARN, szMsg.char_str());
 #endif
 #endif
 

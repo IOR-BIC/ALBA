@@ -20,6 +20,7 @@
 #include "albaDefines.h"
 #include "albaBase.h" 
 #include <string.h>
+#include "wx/string.h"
 
 //----------------------------------------------------------
 // forward references:

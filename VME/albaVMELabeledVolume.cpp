@@ -356,14 +356,14 @@ void albaVMELabeledVolume::GenerateLabeledVolume()
       {
         wxString label = m_LabelNameVector.at(c);
         wxStringTokenizer tkz(label,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
-        albaString labelName = tkz.GetNextToken().c_str();
-        albaString labelIntStr = tkz.GetNextToken().c_str();
+        albaString labelName = tkz.GetNextToken();
+        albaString labelIntStr = tkz.GetNextToken();
         m_LabelIntValue = atoi(labelIntStr);
         labelIntVector.push_back(m_LabelIntValue);
-        albaString minStr = tkz.GetNextToken().c_str();
+        albaString minStr = tkz.GetNextToken();
         m_MinValue = atof(minStr);
         minVector.push_back(m_MinValue);
-        albaString maxStr = tkz.GetNextToken().c_str();
+        albaString maxStr = tkz.GetNextToken();
         m_MaxValue = atof(maxStr);
         maxVector.push_back(m_MaxValue);
         counter++;
@@ -861,12 +861,12 @@ void albaVMELabeledVolume::OnEvent(albaEventBase *alba_event)
             if ( m_ItemLabel == componentName )
             {
               wxStringTokenizer tkz(componentName,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
-              albaString labelName = tkz.GetNextToken().c_str();
-              albaString labelIntStr = tkz.GetNextToken().c_str();
+              albaString labelName = tkz.GetNextToken();
+              albaString labelIntStr = tkz.GetNextToken();
               int labelValue = atof(labelIntStr);
-              albaString minStr = tkz.GetNextToken().c_str();
+              albaString minStr = tkz.GetNextToken();
               double min = atof(minStr);
-              albaString maxStr = tkz.GetNextToken().c_str();
+              albaString maxStr = tkz.GetNextToken();
               double max = atof(maxStr);
 
               UpdateScalars();
@@ -1091,7 +1091,7 @@ void albaVMELabeledVolume::UpdateLabel()
     m_CheckListId++;
     m_LabelCheckBox->Update();
     int nComp = m_TagLabel->GetNumberOfComponents();
-    SetLabelTag(labelLine.c_str(), nComp);
+    SetLabelTag(labelLine, nComp);
   }
   else
   {
@@ -1106,7 +1106,7 @@ void albaVMELabeledVolume::UpdateLabel()
       wxString componentName = m_TagLabel->GetValue( w );
       if ( m_ItemLabel == componentName )
       {
-        SetLabelTag(labelLine.c_str(), w );
+        SetLabelTag(labelLine, w );
       }
     }
   }

@@ -84,6 +84,7 @@ IF (ALBA_USE_WX)
  ADD_LIBRARY(Libraries::wx::net ALIAS wxnet)
  ADD_LIBRARY(Libraries::wx::base ALIAS wxbase)
  ADD_LIBRARY(Libraries::wx::core ALIAS wxcore)
+ ADD_LIBRARY(Libraries::wx::html ALIAS wxhtml)
 ENDIF (ALBA_USE_WX) 
  
 #

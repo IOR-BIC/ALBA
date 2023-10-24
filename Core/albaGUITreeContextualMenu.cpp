@@ -313,7 +313,7 @@ void albaGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 			
 			wxString text = "Show";
 			if (!show) text = "Hide";
-			m_DisplaySubMenu->FindItem(RMENU_SHOW_VME)->SetText(text);
+			m_DisplaySubMenu->FindItem(RMENU_SHOW_VME)->SetItemLabel(text);
 
 			GetLogicManager()->VmeShow(m_VmeActive, show);
     }

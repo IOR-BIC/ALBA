@@ -436,26 +436,26 @@ void appLogic::CreateToolbar()
 	m_ToolBar->SetToolBitmapSize(wxSize(20, 20));
 
 	// File
-	m_ToolBar->AddTool(MENU_FILE_NEW, albaPictureFactory::GetPictureFactory()->GetBmp("FILE_NEW"), _("New project"));
-	m_ToolBar->AddTool(MENU_FILE_OPEN, albaPictureFactory::GetPictureFactory()->GetBmp("FILE_OPEN"), _("Open project"));
+	m_ToolBar->AddTool(MENU_FILE_NEW, _("New project"), albaPictureFactory::GetPictureFactory()->GetBmp("FILE_NEW"));
+	m_ToolBar->AddTool(MENU_FILE_OPEN, _("Open project"), albaPictureFactory::GetPictureFactory()->GetBmp("FILE_OPEN"));
 	m_ToolBar->AddSeparator();
 
 	// Views	
-	m_ToolBar->AddTool(ID_SHOW_VIEW_VTK_SURFACE, albaPictureFactory::GetPictureFactory()->GetBmp("VIEW_SURFACE_ICON"), _("View Surface"));
-	m_ToolBar->AddTool(ID_SHOW_ORTHOSLICE_VIEW, albaPictureFactory::GetPictureFactory()->GetBmp("VIEW_ORTHO"), _("View OrthoSlice"));
+	m_ToolBar->AddTool(ID_SHOW_VIEW_VTK_SURFACE, _("View Surface"), albaPictureFactory::GetPictureFactory()->GetBmp("VIEW_SURFACE_ICON"));
+	m_ToolBar->AddTool(ID_SHOW_ORTHOSLICE_VIEW, _("View OrthoSlice"), albaPictureFactory::GetPictureFactory()->GetBmp("VIEW_ORTHO"));
 	m_ToolBar->AddSeparator();
 
 	// Camera	
-	m_ToolBar->AddTool(CAMERA_RESET, albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_ALL"), _("Reset camera to fit all"));
-	m_ToolBar->AddTool(CAMERA_FIT, albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"), _("Reset camera to fit selected object"));
-	m_ToolBar->AddTool(CAMERA_FLYTO, albaPictureFactory::GetPictureFactory()->GetBmp("FLYTO"), _("Fly to object under mouse"));
+	m_ToolBar->AddTool(CAMERA_RESET, _("Reset camera to fit all"), albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_ALL"));
+	m_ToolBar->AddTool(CAMERA_FIT, _("Reset camera to fit selected object"), albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"));
+	m_ToolBar->AddTool(CAMERA_FLYTO, _("Fly to object under mouse"), albaPictureFactory::GetPictureFactory()->GetBmp("FLYTO"));
 
 	if (m_UseSnapshotManager)
 	{
 		// Snapshot tool
 		m_ToolBar->AddSeparator();
-		m_ToolBar->AddTool(MENU_FILE_SNAPSHOT, albaPictureFactory::GetPictureFactory()->GetBmp("CAMERA"), _("Create Snapshot"));
-		m_ToolBar->AddTool(MENU_FILE_MANAGE_SNAPSHOT, albaPictureFactory::GetPictureFactory()->GetBmp("IMAGE_PREVIEW"), _("Manage Snapshots"));
+		m_ToolBar->AddTool(MENU_FILE_SNAPSHOT, _("Create Snapshot"), albaPictureFactory::GetPictureFactory()->GetBmp("CAMERA"));
+		m_ToolBar->AddTool(MENU_FILE_MANAGE_SNAPSHOT, _("Manage Snapshots"), albaPictureFactory::GetPictureFactory()->GetBmp("IMAGE_PREVIEW"));
 	}
 }
 //----------------------------------------------------------------------------

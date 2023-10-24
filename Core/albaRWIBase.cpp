@@ -76,6 +76,8 @@
 #include "vtkImageAppend.h"
 #include "vtkBMPReader.h"
 #include "vtkMath.h"
+#include "wx/filename.h"
+
 
 #include <fstream>
 //----------------------------------------------------------------------------
@@ -724,7 +726,7 @@ wxBitmap *albaRWIBase::GetImage(int magnification)
 
   //translate to a wxBitmap
   wxImage  *img = new wxImage(dim[0],dim[1],buffer,TRUE);
-  wxBitmap *bmp = new wxBitmap(img,24);
+  wxBitmap *bmp = new wxBitmap(*img,24);
   delete img;
   delete buffer;
   return bmp;
@@ -744,7 +746,7 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
     file = albaGetSaveFile(file,wildc).c_str(); 
     if(file.IsEmpty()) 
       return;
-    filename = file.c_str();
+    filename = file;
   }
 
   wxString temporary = filename.GetCStr();
@@ -914,14 +916,14 @@ void albaRWIBase::SaveImageRecursive(albaString filename, albaViewCompound *v,in
     {
       file = m_SaveDir;
       file +=  "\\";
-      filename = name.c_str();
+      filename = name;
     }
 
     file.Append(filename);
     file = albaGetSaveFile(file,wildc).c_str(); 
     if(file.IsEmpty()) 
       return;
-    filename = file.c_str();
+    filename = file;
   }
   
   wxString temporary = filename.GetCStr();
@@ -1060,7 +1062,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
         */
 #ifdef WIN32
         //open file
-        fstream myFile (temp.c_str(), ios::in | ios::out | ios::binary);
+        fstream myFile (temp.char_str(), ios::in | ios::out | ios::binary);
         myFile.seekp (38);
         myFile.write ((char*)&pixelXMeterX, 4);
         myFile.write ((char*)&pixelXMeterY, 4);
@@ -1127,7 +1129,7 @@ void albaRWIBase::SaveAllImages(albaString filename, albaViewCompound *v)
 {
   if(v == NULL) return;
   wxString path, name, ext;
-  wxFileName::SplitPath(filename,&path,&name,&ext);
+  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
   if (filename.IsEmpty() || ext.IsEmpty())
   {
     albaString wildc = "Image (*.jpg)|*.jpg|Image (*.bmp)|*.bmp|Image (*.png)|*.png";
@@ -1139,7 +1141,7 @@ void albaRWIBase::SaveAllImages(albaString filename, albaViewCompound *v)
       filename = albaString(name);
     }
     file.Append(filename);
-    file = albaGetSaveFile(file,wildc).c_str(); 
+    file = albaGetSaveFile(file,wildc); 
     if(file.IsEmpty())
       return;
     filename = file;
@@ -1160,7 +1162,7 @@ void albaRWIBase::SaveAllImages(albaString filename, albaViewCompound *v)
   wxBitmap imageBitmap;
   v->GetImage(imageBitmap);
 
-  wxFileName::SplitPath(filename,&path,&name,&ext);
+  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
   ext.MakeLower();
   if (ext == "bmp")
   {

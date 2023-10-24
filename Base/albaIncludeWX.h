@@ -15,16 +15,16 @@
 =========================================================================*/
 /** This file is used to include wx.h */
 
-#include "albaConfigure.h"   
+//#include "albaConfigure.h"   
 
 #ifndef __albaIncludeWX_h
 #define __albaIncludeWX_h
 
 #ifdef ALBA_USE_WX
   
-#include <wx/wxprec.h>
+//#include <wx/wxprec.h>
 #ifndef WX_PRECOMP
-#include <wx/wx.h>
+#include "wx/wx.h"
 #endif
 #endif
 

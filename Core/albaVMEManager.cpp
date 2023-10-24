@@ -58,7 +58,7 @@ albaVMEManager::albaVMEManager()
   m_LoadingFlag = false;
   m_FileHistoryIdx = -1;
 
-	m_MSFDir   = albaGetLastUserFolder().c_str();;
+	m_MSFDir   = albaGetLastUserFolder();
 	m_MSFFile  = "";
 	m_ZipFile  = "";
   m_TmpDir   = "";
@@ -173,7 +173,7 @@ void albaVMEManager::RemoveTempDirectory()
     wxString working_dir;
     working_dir = albaGetAppDataDirectory().c_str();
     wxSetWorkingDirectory(working_dir);
-    if(::wxDirExists(m_TmpDir)) //remove tmp directory due to zip extraction or compression
+    if(::wxDirExists(m_TmpDir.GetCStr())) //remove tmp directory due to zip extraction or compression
     {
       wxString file_match = m_TmpDir + "/*.*";
       wxString f = wxFindFirstFile(file_match);
@@ -241,7 +241,7 @@ int  albaVMEManager::MSFOpen(int file_id)
 //----------------------------------------------------------------------------
 {
   m_FileHistoryIdx = file_id - wxID_FILE1;
-	albaString file = m_FileHistory.GetHistoryFile(m_FileHistoryIdx).c_str(); // get the filename from history
+	albaString file = m_FileHistory.GetHistoryFile(m_FileHistoryIdx); // get the filename from history
 	return MSFOpen(file);
 }
 //----------------------------------------------------------------------------
@@ -441,7 +441,7 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
   
   if(m_ZipHandler == NULL)
   {
-    m_ZipHandler = new wxZipFSHandler();
+    m_ZipHandler = new wxArchiveFSHandler();
     m_FileSystem->AddHandler(m_ZipHandler); // add the handler that manage zip protocol
     // (the handler to manage the local files protocol is already added to wxFileSystem)
   }
@@ -481,11 +481,11 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
   if(ext.IsSameAs(m_MsfFileExtension,true)) 
   {
     m_MSFFile = out_file; // the file to extract is the msf
-    out_file_stream.open(out_file, std::ios_base::out);
+    out_file_stream.open(out_file.char_str(), std::ios_base::out);
   }
   else
   {
-    out_file_stream.open(out_file, std::ios_base::binary); // the file to extract is a binary
+    out_file_stream.open(out_file.char_str(), std::ios_base::binary); // the file to extract is a binary
   }
   s_size = zip_is->GetSize();
   buf = new char[s_size];
@@ -515,10 +515,10 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
 	if(ext.IsSameAs(m_MsfFileExtension,true))
     {
       m_MSFFile = out_file; // The file to extract is an msf
-      out_file_stream.open(out_file, std::ios_base::out);
+      out_file_stream.open(out_file.char_str(), std::ios_base::out);
     }
     else
-      out_file_stream.open(out_file, std::ios_base::binary); // The file to extract is a binary
+      out_file_stream.open(out_file.char_str(), std::ios_base::binary); // The file to extract is a binary
     s_size = zip_is->GetSize();
     buf = new char[s_size];
     zip_is->Read(buf,s_size);
@@ -626,7 +626,7 @@ int albaVMEManager::MSFSave()
     // ask for the new file name.
     wxString wildc = _("Project file (*."+ m_MsfFileExtension +")|*."
 		              + m_MsfFileExtension +"|Compressed file (*.z"+ m_MsfFileExtension +")|*.z" + m_MsfFileExtension + "");
-    albaString file = albaGetSaveFile(m_MSFDir, wildc.c_str()).c_str();
+    albaString file = albaGetSaveFile(m_MSFDir, wildc.c_str());
     if(file.IsEmpty())
       return ALBA_ERROR;
    

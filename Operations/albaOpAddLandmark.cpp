@@ -826,9 +826,9 @@ void albaOpAddLandmark::LoadDictionary(wxString fileName)
 	{
 		// Select Dictionary file
 		wxString wild_dict = "Dictionary file (*.dic)|*.dic|All files (*.*)|*.*";
-		wxString dict = albaGetLastUserFolder().c_str();
+		wxString dict = albaGetLastUserFolder();
 
-		fileName = albaGetOpenFile(dict, wild_dict, "Choose Dictionary File").c_str();
+		fileName = albaGetOpenFile(dict, wild_dict, "Choose Dictionary File").char_str();
 	}
 
 	if (!fileName.IsEmpty())
@@ -889,11 +889,11 @@ int albaOpAddLandmark::SaveDictionary(wxString fileName)
 	{
 		// Select destination file
 		albaString initialFileName;
-		initialFileName = albaGetLastUserFolder().c_str();
+		initialFileName = albaGetLastUserFolder();
 		initialFileName.Append("\\newLandmarkDictionary.dic");
 
 		albaString wildc = "Dictionary file (*.dic)|*.dic|All files (*.*)|*.*";
-		fileName = albaGetSaveFile(initialFileName.GetCStr(), wildc).c_str();
+		fileName = albaGetSaveFile(initialFileName.GetCStr(), wildc).char_str();
 	}
 
 	if (!fileName.IsEmpty())
@@ -906,7 +906,7 @@ int albaOpAddLandmark::LoadLandmarksDefinitions(wxString fileName)
 
 	if (!wxFileExists(fileName))
 	{
-		albaErrorMessage("Dictionary file %s does not exists", fileName.c_str());
+		albaErrorMessage("Dictionary file %s does not exists", fileName.char_str());
 		return ALBA_ERROR;
 	}
 	m_LandmarkGroupVect.clear();
@@ -936,7 +936,7 @@ int albaOpAddLandmark::LoadLandmarksDefinitions(wxString fileName)
 
 	try
 	{
-		XMLParser->parse(fileName);
+		XMLParser->parse(fileName.char_str());
 		int errorCount = XMLParser->getErrorCount();
 
 		if (errorCount != 0)

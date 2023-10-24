@@ -278,13 +278,13 @@ void albaGUILutSlider::SetText(long i, wxString text)
 	switch(i)
 	{
 		case 0:
-			m_MinLabel->SetTitle(text);
+			m_MinLabel->SetLabel(text);
 		break;
 		case 1:
-			m_MiddleButton->SetTitle(text);
+			m_MiddleButton->SetLabel(text);
 		break;
 		case 2:
-			m_MaxLabel->SetTitle(text);
+			m_MaxLabel->SetLabel(text);
 		break;
 	}
 }

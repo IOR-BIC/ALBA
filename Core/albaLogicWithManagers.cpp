@@ -300,7 +300,7 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 
 	m_Win->SetListener(this);
 
-	m_ChildFrameStyle = 0; wxCAPTION | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER; //wxTHICK_FRAME; // Default style
+	m_ChildFrameStyle = 0; 
 	m_ApplicationSettings = new albaGUIApplicationSettings(this);
 	m_TimeBarSettings = NULL;
 
@@ -1426,7 +1426,7 @@ void albaLogicWithManagers::OnFileSave()
 {
   if(m_VMEManager)
   {
-		albaString save_default_folder = albaGetLastUserFolder().c_str();
+		albaString save_default_folder = albaGetLastUserFolder();
 	  save_default_folder.ParsePathName();
 	  m_VMEManager->SetDirName(save_default_folder);
 	  int saved=m_VMEManager->MSFSave();
@@ -1441,7 +1441,7 @@ void albaLogicWithManagers::OnFileSaveAs()
 {
   if(m_VMEManager) 
   {
-	  albaString save_default_folder = albaGetLastUserFolder().c_str();
+	  albaString save_default_folder = albaGetLastUserFolder();
 	  save_default_folder.ParsePathName();
 	  m_VMEManager->SetDirName(save_default_folder);
 	  int saved=m_VMEManager->MSFSaveAs();
@@ -2423,34 +2423,34 @@ void albaLogicWithManagers::CreateToolbar()
 	m_ToolBar->SetMargins(0, 0);
 	m_ToolBar->SetToolSeparation(2);
 	m_ToolBar->SetToolBitmapSize(wxSize(20, 20));
-	m_ToolBar->AddTool(MENU_FILE_NEW, albaPictureFactory::GetPictureFactory()->GetBmp("FILE_NEW"), _("New " + m_Extension + " storage file"));
-	m_ToolBar->AddTool(MENU_FILE_OPEN, albaPictureFactory::GetPictureFactory()->GetBmp("FILE_OPEN"), _("Open " + m_Extension + " storage file"));
-	m_ToolBar->AddTool(MENU_FILE_SAVE, albaPictureFactory::GetPictureFactory()->GetBmp("FILE_SAVE"), _("Save current " + m_Extension + " storage file"));
+	m_ToolBar->AddTool(MENU_FILE_NEW, "New " + m_Extension + " storage file", albaPictureFactory::GetPictureFactory()->GetBmp("FILE_NEW"));
+	m_ToolBar->AddTool(MENU_FILE_OPEN, _("Open " + m_Extension + " storage file"), albaPictureFactory::GetPictureFactory()->GetBmp("FILE_OPEN"));
+	m_ToolBar->AddTool(MENU_FILE_SAVE, _("Save current " + m_Extension + " storage file"), albaPictureFactory::GetPictureFactory()->GetBmp("FILE_SAVE"));
 	m_ToolBar->AddSeparator();
 
-	m_ToolBar->AddTool(MENU_FILE_PRINT, albaPictureFactory::GetPictureFactory()->GetBmp("PRINT"), _("Print the selected view"));
-	m_ToolBar->AddTool(MENU_FILE_PRINT_PREVIEW, albaPictureFactory::GetPictureFactory()->GetBmp("PRINT_PREVIEW"), _("Show the print preview for the selected view"));
+	m_ToolBar->AddTool(MENU_FILE_PRINT, _("Print the selected view"), albaPictureFactory::GetPictureFactory()->GetBmp("PRINT"));
+	m_ToolBar->AddTool(MENU_FILE_PRINT_PREVIEW, _("Show the print preview for the selected view"), albaPictureFactory::GetPictureFactory()->GetBmp("PRINT_PREVIEW"));
 	m_ToolBar->AddSeparator();
 
-	m_ToolBar->AddTool(OP_UNDO, albaPictureFactory::GetPictureFactory()->GetBmp("OP_UNDO"), _("Undo (ctrl+z)"));
-	m_ToolBar->AddTool(OP_REDO, albaPictureFactory::GetPictureFactory()->GetBmp("OP_REDO"), _("Redo (ctrl+shift+z)"));
+	m_ToolBar->AddTool(OP_UNDO, _("Undo (ctrl+z)"), albaPictureFactory::GetPictureFactory()->GetBmp("OP_UNDO"));
+	m_ToolBar->AddTool(OP_REDO, _("Redo (ctrl+shift+z)"), albaPictureFactory::GetPictureFactory()->GetBmp("OP_REDO"));
 	m_ToolBar->AddSeparator();
 
-	m_ToolBar->AddTool(OP_CUT, albaPictureFactory::GetPictureFactory()->GetBmp("OP_CUT"), _("Cut selected vme (ctrl+x)"));
-	m_ToolBar->AddTool(OP_COPY, albaPictureFactory::GetPictureFactory()->GetBmp("OP_COPY"), _("Copy selected vme (ctrl+c)"));
-	m_ToolBar->AddTool(OP_PASTE, albaPictureFactory::GetPictureFactory()->GetBmp("OP_PASTE"), _("Paste vme (ctrl+v)"));
+	m_ToolBar->AddTool(OP_CUT, _("Cut selected vme (ctrl+x)"), albaPictureFactory::GetPictureFactory()->GetBmp("OP_CUT"));
+	m_ToolBar->AddTool(OP_COPY, _("Copy selected vme (ctrl+c)"), albaPictureFactory::GetPictureFactory()->GetBmp("OP_COPY"));
+	m_ToolBar->AddTool(OP_PASTE, _("Paste vme (ctrl+v)"), albaPictureFactory::GetPictureFactory()->GetBmp("OP_PASTE"));
 	//m_ToolBar->AddTool(OP_RENAME, albaPictureFactory::GetPictureFactory()->GetBmp("OP_RENAME"), _("Rename vme (ctrl+n)"));
 	m_ToolBar->AddSeparator();
 
-	m_ToolBar->AddTool(CAMERA_RESET, albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_ALL"), _("Reset camera to fit all (ctrl+f)"));
-	m_ToolBar->AddTool(CAMERA_FIT, albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"), _("Reset camera to fit selected object (ctrl+shift+f)"));
-	m_ToolBar->AddTool(CAMERA_FLYTO, albaPictureFactory::GetPictureFactory()->GetBmp("FLYTO"), _("Fly to object under mouse"));
+	m_ToolBar->AddTool(CAMERA_RESET, _("Reset camera to fit all (ctrl+f)"), albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_ALL"));
+	m_ToolBar->AddTool(CAMERA_FIT, _("Reset camera to fit selected object (ctrl+shift+f)"), albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"));
+	m_ToolBar->AddTool(CAMERA_FLYTO, _("Fly to object under mouse"), albaPictureFactory::GetPictureFactory()->GetBmp("FLYTO"));
 	
 	if (m_UseSnapshotManager)
 	{
 		m_ToolBar->AddSeparator();
-		m_ToolBar->AddTool(MENU_FILE_SNAPSHOT, albaPictureFactory::GetPictureFactory()->GetBmp("CAMERA"), _("Create Snapshot"));
-		m_ToolBar->AddTool(MENU_FILE_MANAGE_SNAPSHOT, albaPictureFactory::GetPictureFactory()->GetBmp("IMAGE_PREVIEW"), _("Manage Snapshots"));
+		m_ToolBar->AddTool(MENU_FILE_SNAPSHOT, _("Create Snapshot"), albaPictureFactory::GetPictureFactory()->GetBmp("CAMERA"));
+		m_ToolBar->AddTool(MENU_FILE_MANAGE_SNAPSHOT, _("Manage Snapshots"), albaPictureFactory::GetPictureFactory()->GetBmp("IMAGE_PREVIEW"));
 	}
 
 	EnableItem(CAMERA_RESET, false);
@@ -2676,7 +2676,7 @@ void albaLogicWithManagers::ShowWebSite(wxString url)
 	}
 
 	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
-	command = command + "\"" + url.c_str() + "/\"";
+	command = command + "\"" + url + "/\"";
 	wxExecute(command);
 }
 

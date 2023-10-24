@@ -18,7 +18,10 @@ SET(PROJECT_SRCS
   albaTest.cpp 				albaTest.h
   albaFakeLogicForTest.cpp 	albaFakeLogicForTest.h
 	)
-	
+
+# List libraries that are needed by this project.
+SET(PROJECT_LIBS Libraries::wx::net Libraries::wx::core Libraries::wx::base )
+
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})

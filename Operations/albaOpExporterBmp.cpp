@@ -44,6 +44,7 @@
 
 #include <fstream>
 #include "albaProgressBarHelper.h"
+#include "wx\filename.h"
 
 //----------------------------------------------------------------------------
 albaOpExporterBmp::albaOpExporterBmp(const wxString &label) :
@@ -130,7 +131,7 @@ void albaOpExporterBmp::SaveBmp()
   assert(m_DirName != "");
  
   wxString path,name,ext;
-  ::wxSplitPath(m_DirName,&path,&name,&ext);
+	wxFileName::SplitPath(m_DirName.GetCStr(),&path,&name,&ext);
   path+= _("\\");
   path+= name;
   path+= _("\\");
@@ -274,7 +275,7 @@ void albaOpExporterBmp::SaveBmp()
       fileName = wxString::Format("%s_%04d.bmp",prefix, fileNumber);
 
       
-      WriteImageDataAsMonocromeBitmap(imageSlice, fileName.c_str());
+      WriteImageDataAsMonocromeBitmap(imageSlice, fileName);
       scalarSliceIn->Reset();
     }
   }

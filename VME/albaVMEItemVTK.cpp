@@ -117,7 +117,7 @@ void albaVMEItemVTK::DeepCopyVmeLarge(albaVMEItem *a)
 
       vtk_item->ReleaseData();
 
-      albaString filename = albaGetAppDataDirectory().c_str();
+      albaString filename = albaGetAppDataDirectory();
       filename<<"/TMP.vtk";
       albaLogMessage("<<<<<Creating temp file : %s",filename);
       this->ReadData(filename);

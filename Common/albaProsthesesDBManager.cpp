@@ -72,7 +72,7 @@
 //----------------------------------------------------------------------------
 albaProsthesesDBManager::albaProsthesesDBManager()
 {
-	m_DBDir = (albaGetAppDataDirectory()).c_str();
+	m_DBDir = (albaGetAppDataDirectory());
 	m_DBDir += "\\ProsthesesDB\\";
 
 	if(!wxDir::Exists(m_DBDir.GetCStr()))

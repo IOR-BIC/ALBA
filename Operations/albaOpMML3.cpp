@@ -595,9 +595,9 @@ void albaOpMML3::CreateRegistrationDlg()
   m_DisplayModeButton->SetListener(this);
   m_DisplayModeButton->Enable(true);
   if (m_Flag3D == 0) 
-    m_DisplayModeButton->SetTitle("Display 3D");
+    m_DisplayModeButton->SetLabel("Display 3D");
   else 
-    m_DisplayModeButton->SetTitle("Display 2D");
+    m_DisplayModeButton->SetLabel("Display 2D");
 
 
   // preview button
@@ -605,9 +605,9 @@ void albaOpMML3::CreateRegistrationDlg()
   m_PreviewButton->SetListener(this);
   m_PreviewButton->Enable(true) ;
   if (m_PreviewFlag == 0) 
-    m_PreviewButton->SetTitle("Preview On");
+    m_PreviewButton->SetLabel("Preview On");
   else
-    m_PreviewButton->SetTitle("Preview Off");
+    m_PreviewButton->SetLabel("Preview Off");
 
 
   // reset view button
@@ -2171,15 +2171,15 @@ void albaOpMML3::OnUndo()
   case 0: // place
     // other buttons off
     m_TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    m_TranslateOpButton->SetTitle("T");
+    m_TranslateOpButton->SetLabel("T");
     m_RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    m_RotateOpButton->SetTitle("R");
+    m_RotateOpButton->SetLabel("R");
     m_ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    m_ScaleOpButton->SetTitle("S");
+    m_ScaleOpButton->SetLabel("S");
 
     // this button on
     m_PlaceOpButton->SetBackgroundColour(Green);
-    m_PlaceOpButton->SetTitle(">>P<<");
+    m_PlaceOpButton->SetLabel(">>P<<");
 
     //
     ResetOperation();
@@ -2194,15 +2194,15 @@ void albaOpMML3::OnUndo()
   case 1: // translate
     // other buttons off
     m_PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    m_PlaceOpButton->SetTitle("P");
+    m_PlaceOpButton->SetLabel("P");
     m_RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    m_RotateOpButton->SetTitle("R");
+    m_RotateOpButton->SetLabel("R");
     m_ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    m_ScaleOpButton->SetTitle("S");
+    m_ScaleOpButton->SetLabel("S");
 
     // this button on
     m_TranslateOpButton->SetBackgroundColour(Green);
-    m_TranslateOpButton->SetTitle(">>T<<");
+    m_TranslateOpButton->SetLabel(">>T<<");
 
     //
     ResetOperation();
@@ -2217,15 +2217,15 @@ void albaOpMML3::OnUndo()
   case 2: // rotate
     // other buttons off
     m_PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    m_PlaceOpButton->SetTitle("P");
+    m_PlaceOpButton->SetLabel("P");
     m_TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    m_TranslateOpButton->SetTitle("T");
+    m_TranslateOpButton->SetLabel("T");
     m_ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    m_ScaleOpButton->SetTitle("S");
+    m_ScaleOpButton->SetLabel("S");
 
     // this button on
     m_RotateOpButton->SetBackgroundColour(Green);
-    m_RotateOpButton->SetTitle(">>R<<");
+    m_RotateOpButton->SetLabel(">>R<<");
 
     //
     ResetOperation();
@@ -2246,15 +2246,15 @@ void albaOpMML3::OnUndo()
   {
     // other buttons off
     m_PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    m_PlaceOpButton->SetTitle("P");
+    m_PlaceOpButton->SetLabel("P");
     m_TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    m_TranslateOpButton->SetTitle("T");
+    m_TranslateOpButton->SetLabel("T");
     m_RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    m_RotateOpButton->SetTitle("R");
+    m_RotateOpButton->SetLabel("R");
 
     // this button on
     m_ScaleOpButton->SetBackgroundColour(Green);
-    m_ScaleOpButton->SetTitle(">>S<<");
+    m_ScaleOpButton->SetLabel(">>S<<");
 
     m_Model->GetVisualPipe2D()->SetTextYPosition(0.0, 0.9) ;
 
@@ -2326,19 +2326,19 @@ void albaOpMML3::OnDisplayMode()
   if (m_Flag3D == 0){
     m_Model->SetDisplay2D() ;
     m_Widget->On() ;
-    m_DisplayModeButton->SetTitle("Display 3D");
+    m_DisplayModeButton->SetLabel("Display 3D");
     Set2DButtonsEnable(true) ;
   }
   else{
     m_Model->SetDisplay3D() ;
     m_Widget->Off() ;
-    m_DisplayModeButton->SetTitle("Display 2D");
+    m_DisplayModeButton->SetLabel("Display 2D");
     Set2DButtonsEnable(false) ;
   }
 
   // switch off the preview
   m_PreviewFlag = 0 ;
-  m_PreviewButton->SetTitle("Preview On") ;
+  m_PreviewButton->SetLabel("Preview On") ;
 
   m_Model->Render();
 }
@@ -2366,13 +2366,13 @@ void albaOpMML3::OnPreview()
       Set2DButtonsEnable(false) ;
     }
 
-    m_PreviewButton->SetTitle("Preview On");
+    m_PreviewButton->SetLabel("Preview On");
   }
   else{
     // switch on preview
     m_Model->SetDisplayToPreview() ;
     m_Widget->Off() ;
-    m_PreviewButton->SetTitle("Preview Off");
+    m_PreviewButton->SetLabel("Preview Off");
     Set2DButtonsEnable(false) ;
   }
   
@@ -3725,7 +3725,7 @@ albaRWI* albaOpMML3::CreateParameterViewalbaRWI(vtkTextSource *ts, wxString lab,
 
   ts->SetForegroundColor(r,g,b);
   ts->BackingOff(); // no background drawn with text
-  ts->SetText(lab.c_str());
+  ts->SetText(lab.char_str());
 
   vtkPolyDataMapper2D *mapper = vtkPolyDataMapper2D::New();
   mapper->SetInput(ts->GetOutput());
@@ -4399,15 +4399,15 @@ void albaOpMML3::OnPOperationButton()
 
   // other buttons off
   m_TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  m_TranslateOpButton->SetTitle("T");
+  m_TranslateOpButton->SetLabel("T");
   m_RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  m_RotateOpButton->SetTitle("R");
+  m_RotateOpButton->SetLabel("R");
   m_ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  m_ScaleOpButton->SetTitle("S");
+  m_ScaleOpButton->SetLabel("S");
 
   // this button on
   m_PlaceOpButton->SetBackgroundColour(Green);
-  m_PlaceOpButton->SetTitle(">>P<<");
+  m_PlaceOpButton->SetLabel(">>P<<");
 
   //
   ResetOperation();
@@ -4460,15 +4460,15 @@ void albaOpMML3::OnTOperationButton()
 
   // other buttons off
   m_PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  m_PlaceOpButton->SetTitle("P");
+  m_PlaceOpButton->SetLabel("P");
   m_RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  m_RotateOpButton->SetTitle("R");
+  m_RotateOpButton->SetLabel("R");
   m_ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  m_ScaleOpButton->SetTitle("S");
+  m_ScaleOpButton->SetLabel("S");
 
   // this button on
   m_TranslateOpButton->SetBackgroundColour(Green);
-  m_TranslateOpButton->SetTitle(">>T<<");
+  m_TranslateOpButton->SetLabel(">>T<<");
 
   //
   ResetOperation();
@@ -4521,15 +4521,15 @@ void albaOpMML3::OnROperationButton()
 
   // other buttons off
   m_PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  m_PlaceOpButton->SetTitle("P");
+  m_PlaceOpButton->SetLabel("P");
   m_TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  m_TranslateOpButton->SetTitle("T");
+  m_TranslateOpButton->SetLabel("T");
   m_ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  m_ScaleOpButton->SetTitle("S");
+  m_ScaleOpButton->SetLabel("S");
 
   // this button on
   m_RotateOpButton->SetBackgroundColour(Green);
-  m_RotateOpButton->SetTitle(">>R<<");
+  m_RotateOpButton->SetLabel(">>R<<");
 
   //
   ResetOperation();
@@ -4576,15 +4576,15 @@ void albaOpMML3::OnSOperationButton()
 
   // other buttons off
   m_PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  m_PlaceOpButton->SetTitle("P");
+  m_PlaceOpButton->SetLabel("P");
   m_TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  m_TranslateOpButton->SetTitle("T");
+  m_TranslateOpButton->SetLabel("T");
   m_RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  m_RotateOpButton->SetTitle("R");
+  m_RotateOpButton->SetLabel("R");
 
   // this button on
   m_ScaleOpButton->SetBackgroundColour(Green);
-  m_ScaleOpButton->SetTitle(">>S<<");
+  m_ScaleOpButton->SetLabel(">>S<<");
 
   m_Model->GetVisualPipe2D()->SetTextYPosition(0.0, 0.9) ;
 

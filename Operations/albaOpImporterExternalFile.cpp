@@ -28,6 +28,7 @@
 #include "albaDecl.h"
 #include "albaEvent.h"
 #include "albaVMEExternalData.h"
+#include "wx/filename.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpImporterExternalFile);
@@ -43,7 +44,7 @@ albaOp(label)
   m_Input = NULL; 
 
   m_Vme = NULL;
-	m_FileDir = albaGetLastUserFolder().c_str();
+	m_FileDir = albaGetLastUserFolder();
 }
 //----------------------------------------------------------------------------
 albaOpImporterExternalFile::~albaOpImporterExternalFile( ) 
@@ -67,7 +68,7 @@ void albaOpImporterExternalFile::OpRun()
   albaString f;
   if (m_File.IsEmpty())
   {
-    f = albaGetOpenFile(m_FileDir.GetCStr(),wildc.GetCStr()).c_str();
+    f = albaGetOpenFile(m_FileDir.GetCStr(),wildc.GetCStr());
     m_File = f;
   }
   
@@ -86,16 +87,16 @@ void albaOpImporterExternalFile::ImportExternalFile()
 //----------------------------------------------------------------------------
 {
 	wxString path, name, ext;
-	wxFileName::SplitPath(m_File, &path, &name, &ext);
+	wxFileName::SplitPath(m_File.GetCStr(), &path, &name, &ext);
   
 	wxString vmeName;
 	vmeName << name << "." << ext;
 
   albaNEW(m_Vme);
 	m_Vme->SetExtension(ext);
-	m_Vme->SetFileName(name.c_str());
-  m_Vme->SetCurrentPath(path.c_str());
-	m_Vme->SetName(vmeName.c_str());
+	m_Vme->SetFileName(name.char_str());
+  m_Vme->SetCurrentPath(path.char_str());
+	m_Vme->SetName(vmeName.char_str());
   m_Vme->ReparentTo(m_Input);
   m_Vme->Update();
 

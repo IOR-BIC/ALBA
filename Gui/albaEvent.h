@@ -37,6 +37,8 @@ class albaString;
   class vtkProp;  
 #endif
 
+	class wxUpdateUIEvent;
+
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
   EXPORT_STL_VECTOR(ALBA_EXPORT,albaVME *);

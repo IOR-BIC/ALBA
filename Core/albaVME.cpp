@@ -2075,7 +2075,7 @@ void albaVME::UpdateId()
 //-------------------------------------------------------------------------
 albaVME * albaVME::GetByPath(const char *path, bool onlyVisible /*=true*/)
 {
-	wxStringTokenizer tkz(wxT(path), wxT("/"));
+	wxStringTokenizer tkz(path, wxT("/"));
 
 	albaVME *currentNode = this;
 	albaVME *tmpParent;

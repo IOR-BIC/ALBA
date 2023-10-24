@@ -197,3 +197,9 @@ void albaGUIDialog::OnCancel(wxCommandEvent &event)
   Show(false);
 	Destroy();
 }
+
+//----------------------------------------------------------------------------
+void albaGUIDialog::OnCloseWindow(wxCloseEvent &event)
+{
+
+}

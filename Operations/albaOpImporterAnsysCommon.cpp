@@ -56,8 +56,7 @@ albaOp(label)
   m_NodesFileName = "";
   m_MaterialsFileName = "";
 
-	wxStandardPaths std_paths;
-	wxString userPath=std_paths.GetUserDataDir();
+	wxString userPath= wxStandardPaths::Get().GetUserDataDir();
 
 	m_DataDir = userPath + "\\Data";
   m_CacheDir = m_DataDir + "\\AnsysReaderCache";
@@ -99,7 +98,7 @@ void albaOpImporterAnsysCommon::OpRun()
   m_AnsysInputFileNameFullPath = "";
 
   wxString f;
-  f = albaGetOpenFile("", wildcard).c_str(); 
+  f = albaGetOpenFile("", wildcard).char_str(); 
   if(!f.IsEmpty() && wxFileExists(f))
   {
     m_AnsysInputFileNameFullPath = f;
@@ -142,21 +141,21 @@ int albaOpImporterAnsysCommon::Import()
   // Create tmp path
   mkdir(m_DataDir);
 	
-	if(!wxDirExists(m_DataDir))
+	if(!wxDirExists(m_DataDir.GetCStr()))
 	{
 		albaLogMessage("Cloud not create \"Data\" Directory");
 		return ALBA_ERROR;
 	}
 
 	mkdir(m_CacheDir);
-	if(!wxDirExists(m_DataDir))
+	if(!wxDirExists(m_DataDir.GetCStr()))
 	{
 		albaLogMessage("Cloud not create Read Cache Directory");
 		return ALBA_ERROR;
 	}
   
   // Parsing Ansys File
-  if(ParseAnsysFile(m_AnsysInputFileNameFullPath.c_str()) == ALBA_ERROR)
+  if(ParseAnsysFile(m_AnsysInputFileNameFullPath) == ALBA_ERROR)
   {
     return ALBA_ERROR;
   }
@@ -185,9 +184,9 @@ int albaOpImporterAnsysCommon::Import()
   for (int c=0; c<m_Components.size(); c++)
   {
     albaVMEMeshAnsysTextImporter *reader = new albaVMEMeshAnsysTextImporter;
-    reader->SetNodesFileName(m_NodesFileName.c_str());
+    reader->SetNodesFileName(m_NodesFileName.char_str());
 		if (m_Materials.size() > 0)
-			reader->SetMaterialsFileName(m_MaterialsFileName.c_str());
+			reader->SetMaterialsFileName(m_MaterialsFileName.char_str());
 		else
 			reader->SetMode(albaVMEMeshAnsysTextImporter::WITHOUT_MAT_MODE);
 		
@@ -494,7 +493,7 @@ int albaOpImporterAnsysCommon::WriteMaterials()
 	FILE *materialsFile = fopen(m_MaterialsFileName, "w");
 	if (!materialsFile)
 	{
-		albaLogMessage("Cannot Open: %s", m_MaterialsFileName.c_str());
+		albaLogMessage("Cannot Open: %s", m_MaterialsFileName.char_str());
 		return ALBA_ERROR;
 	}
 	for (int i = 0; i < m_Materials.size(); i++)

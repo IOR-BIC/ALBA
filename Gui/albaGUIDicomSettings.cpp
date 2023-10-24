@@ -155,7 +155,7 @@ void albaGUIDicomSettings::InitializeSettings()
 	if(m_Config->Read("LastDicomDir", &string_item))
 		m_LastDicomDir=string_item.c_str();
 	else
-		m_Config->Write("LastDicomDir",m_LastDicomDir.c_str());
+		m_Config->Write("LastDicomDir",m_LastDicomDir);
 	
 	if(m_Config->Read("AutoVMEType", &long_item))
 		m_AutoVMEType=long_item;
@@ -209,7 +209,7 @@ void albaGUIDicomSettings::SetLastDicomDir( wxString lastDicomDir )
 {
   m_LastDicomDir = lastDicomDir;
   assert(m_Config);
-  m_Config->Write("LastDicomDir",m_LastDicomDir.c_str());
+  m_Config->Write("LastDicomDir",m_LastDicomDir);
 
 }
 

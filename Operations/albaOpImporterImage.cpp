@@ -41,6 +41,7 @@
 
 #include <algorithm>
 #include "albaProgressBarHelper.h"
+#include "wx/filename.h"
 
 //----------------------------------------------------------------------------
 // Global Function (locale to this file) to sort the filenames
@@ -85,7 +86,7 @@ albaOp(label)
   m_ImportedImage = NULL;
   m_ImportedImageAsVolume = NULL;
 
-  m_FileDirectory = albaGetLastUserFolder().c_str();
+  m_FileDirectory = albaGetLastUserFolder();
 }
 //----------------------------------------------------------------------------
 albaOpImporterImage::~albaOpImporterImage()
@@ -117,8 +118,13 @@ void albaOpImporterImage::OpRun()
   {
     m_Files.clear();
 	  m_Gui = new albaGUI(this);
+
+		std::vector<wxString> files;
+
+		for (int i = 0; i < m_Files.size(); i++)
+			files.push_back(m_Files[i].c_str());
   
-    albaGetOpenMultiFiles(m_FileDirectory.c_str(),wildc.GetCStr(),m_Files);
+		albaGetOpenMultiFiles((const char *)m_FileDirectory.char_str(), wildc.GetCStr(), files);
   }
 
   m_NumFiles = m_Files.size();

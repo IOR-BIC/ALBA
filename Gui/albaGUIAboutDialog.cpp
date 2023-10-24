@@ -110,7 +110,7 @@ void albaGUIAboutDialog::OnEvent(albaEventBase *alba_event)
 
 void albaGUIAboutDialog::SetBuildNum(wxString revision)
 {
-	albaString tmp = revision.c_str();
+	albaString tmp = revision;
 	tmp.Replace('_', ' ');
 	m_BuildNum = tmp.GetCStr();
 }

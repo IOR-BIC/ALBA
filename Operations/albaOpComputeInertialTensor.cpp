@@ -480,14 +480,14 @@ int albaOpComputeInertialTensor::ComputeLocalInertialTensor(albaVME* node, int c
 		lit._density = m_DefaultDensity;
 
 		std::ostringstream stringStream;
-		stringStream << DENSITY_TAG_NAME.c_str() << " tag not found. Using default density value ie " << lit._density << std::endl;          			
+		stringStream << DENSITY_TAG_NAME << " tag not found. Using default density value ie " << lit._density << std::endl;          			
 		albaLogMessage(stringStream.str().c_str());
 
 	}
 	else
 	{
 		std::ostringstream stringStream;
-		stringStream << DENSITY_TAG_NAME.c_str() << " tag found. Using value " << lit._density << std::endl;          			
+		stringStream << DENSITY_TAG_NAME << " tag found. Using value " << lit._density << std::endl;          			
 		albaLogMessage(stringStream.str().c_str());
 	}
 
@@ -626,7 +626,7 @@ int albaOpComputeInertialTensor::ComputeInertialTensorFromGroup()
   {
     wxString s;
     s << "Found " << n_of_surfaces << " surfaces: applying operation on all of them ..";
-    albaLogMessage(s.c_str());
+    albaLogMessage(s.char_str());
   }
   else
   {
@@ -644,7 +644,7 @@ int albaOpComputeInertialTensor::ComputeInertialTensorFromGroup()
 	  
 	  wxString s;
 	  s << "Computing Inertial tensor for: " << childSurface->GetName();
-	  albaLogMessage(s.c_str());      
+	  albaLogMessage(s.char_str());      
 	  ComputeLocalInertialTensor(childSurface,i+1,n_of_surfaces);
     }
   }
@@ -664,7 +664,7 @@ double albaOpComputeInertialTensor::GetDensity( albaVME* node)
 	double density = DENSITY_NOT_FOUND;
 
 	albaTagItem *densityTagItem = NULL;
-	densityTagItem = node->GetTagArray()->GetTag(DENSITY_TAG_NAME.c_str());
+	densityTagItem = node->GetTagArray()->GetTag(DENSITY_TAG_NAME.char_str());
 
 	if (densityTagItem != NULL)
 	{
@@ -686,7 +686,7 @@ double albaOpComputeInertialTensor::GetMass( albaVME* node)
 	wxString massTagName = "SURFACE_MASS";
 
 	albaTagItem *massTagItem = NULL;
-	massTagItem = node->GetTagArray()->GetTag(massTagName.c_str());
+	massTagItem = node->GetTagArray()->GetTag(massTagName.char_str());
 
 	if (massTagItem != NULL)
 	{

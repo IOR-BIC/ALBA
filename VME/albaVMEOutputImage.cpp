@@ -109,7 +109,7 @@ void albaVMEOutputImage::Update()
 		m_ImageBounds[2] = "";
 		m_ImageBounds[2] << " zmin: " << wxString::Format("%g", RoundValue(b[4])).c_str() << "   zmax: " << wxString::Format("%g", RoundValue(b[5])).c_str();
 
-		m_ImageSize = wxString::Format("%g x %g", RoundValue(b[1] - b[0]), RoundValue(b[3] - b[2])).c_str();
+		m_ImageSize = wxString::Format("%g x %g", RoundValue(b[1] - b[0]), RoundValue(b[3] - b[2]));
 	}
 
 	if (m_Gui)

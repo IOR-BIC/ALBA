@@ -48,6 +48,8 @@
 #include "vtkRectilinearGridReader.h"
 #include "vtkUnstructuredGridReader.h"
 
+#include "wx\filename.h"
+
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpImporterVTK);
 //----------------------------------------------------------------------------
@@ -71,7 +73,7 @@ albaOp(label)
   m_VmeMesh     = NULL;
   m_VmeGeneric  = NULL;
 
-  m_FileDir = albaGetLastUserFolder().c_str();
+  m_FileDir = albaGetLastUserFolder();
 }
 //----------------------------------------------------------------------------
 albaOpImporterVTK::~albaOpImporterVTK()
@@ -103,7 +105,7 @@ void albaOpImporterVTK::OpRun()
   albaString f;
   if (m_File.IsEmpty())
   {
-    f = albaGetOpenFile(m_FileDir, wildc, _("Choose VTK file")).c_str();
+    f = albaGetOpenFile(m_FileDir, wildc, _("Choose VTK file"));
     m_File = f;
   }
 
@@ -163,7 +165,7 @@ int albaOpImporterVTK::ImportVTK()
 	if (preader->GetNumberOfOutputs() > 0)
 	{
 		wxString path, name, ext;
-		wxFileName::SplitPath(m_File.c_str(), &path, &name, &ext);
+		wxFileName::SplitPath(m_File, &path, &name, &ext);
 
 		vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
 		if (data)
@@ -221,7 +223,7 @@ int albaOpImporterVTK::ImportVTK()
 			tag_Nature.SetValue("NATURAL");
 			m_Output->GetTagArray()->SetTag(tag_Nature);
 			m_Output->ReparentTo(m_Input);
-			m_Output->SetName(name.c_str());
+			m_Output->SetName(name.char_str());
 
 			success = true;
 		}

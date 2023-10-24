@@ -15,6 +15,7 @@
 =========================================================================*/
 
 #include <cppunit/config/SourcePrefix.h>
+#include <cppunit/TestAssert.h>
 
 #include "vtkALBASmartPointer.h"
 #include "vtkSphereSource.h"
@@ -22,7 +23,6 @@
 #include "vtkALBALandmarkCloudOutlineCornerFilter.h"
 #include "vtkALBALandmarkCloudOutlineCornerFilterTest.h"
 
-#include <assert.h>
 #include "vtkPointSetSource.h"
 #include "vtkCellArray.h"
 

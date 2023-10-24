@@ -630,10 +630,11 @@ bool albaGPUOGL::CreateRenderingWindow(wxString* err)
     wc.hInstance		  = GetModuleHandle(NULL);
 		
 		int len = MultiByteToWideChar(CP_ACP, 0, RW_CLASSNAME, -1, NULL, 0);
-		wchar_t* myWideString = new wchar_t[len];
-		MultiByteToWideChar(CP_ACP, 0, RW_CLASSNAME, -1, myWideString, len);
+// 		LPCSTR myWideString = new CHAR[len];
+// 		LPWSTR tmp;
+// 		MultiByteToWideChar(CP_ACP, 0, RW_CLASSNAME, -1, myWideString, len);
 
-    wc.lpszClassName	= myWideString;
+    wc.lpszClassName	= RW_CLASSNAME;
 
     if (RegisterClass(&wc))
       m_bUnregWndClass = true;
@@ -729,11 +730,11 @@ void albaGPUOGL::DestroyRenderingWindow()
 
   if (m_bUnregWndClass) 
   {
-		int len = MultiByteToWideChar(CP_ACP, 0, RW_CLASSNAME, -1, NULL, 0);
+	/*	int len = MultiByteToWideChar(CP_ACP, 0, RW_CLASSNAME, -1, NULL, 0);
 		wchar_t* myWideString = new wchar_t[len];
 		MultiByteToWideChar(CP_ACP, 0, RW_CLASSNAME, -1, myWideString, len);
-
-    UnregisterClass(myWideString, ::GetModuleHandle(NULL));
+		*/
+    UnregisterClass(RW_CLASSNAME, ::GetModuleHandle(NULL));
     m_bUnregWndClass = false;
   }
 }

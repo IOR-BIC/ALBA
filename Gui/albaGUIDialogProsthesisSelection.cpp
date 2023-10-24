@@ -33,6 +33,8 @@ PURPOSE. See the above copyright notice for more information.
 #include "wx\image.h"
 #include "wx\statline.h"
 #include "wx\window.h"
+#include "wx\filename.h"
+
 //#include "vtkPNGReader.h"
 
 enum PRODUCER_DIALOG_ID
@@ -291,7 +293,7 @@ void albaGUIDialogProsthesisSelection::UpdateDialog()
 		{
 			if (m_ProducerImageButton != NULL)
 			{
-				m_ProducerImageSizer->Remove(m_ProducerImageButton);
+				m_ProducerImageSizer->Remove((wxSizer *)m_ProducerImageButton);
 				delete m_ProducerImageButton;
 			}
 
@@ -327,7 +329,7 @@ void albaGUIDialogProsthesisSelection::UpdateDialog()
 			}
 
 			wxBitmap *previewBitmap;
-			previewBitmap = new wxBitmap(previewImage);
+			previewBitmap = new wxBitmap(*previewImage);
 
 			m_ProducerImageButton = new albaGUIPicButton(this, previewBitmap, -1);
 			m_ProducerImageSizer->Add(m_ProducerImageButton, 0, wxALL | wxALIGN_CENTER, 0);

@@ -50,7 +50,7 @@ albaTest::albaTest()
 	m_Renderer = NULL;
 	m_RenderWindow = NULL;
 
-	m_WorkingDir = wxGetWorkingDirectory();
+	m_WorkingDir = wxGetCwd();
 }
 
 //--------------------------------------------------------------------------------

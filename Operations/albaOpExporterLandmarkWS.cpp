@@ -71,13 +71,13 @@ albaOp* albaOpExporterLandmarkWS::Copy()
 void albaOpExporterLandmarkWS::OpRun()   
 //----------------------------------------------------------------------------
 {
-  wxString proposed = albaGetLastUserFolder().c_str();
+  wxString proposed = albaGetLastUserFolder();
   proposed += m_Input->GetName();
   proposed += "_TRAJECTORIES";
 	proposed += ".csv";
 	
   wxString wildc = "ASCII CSV file (*.csv)|*.csv";
-	wxString f = albaGetSaveFile(proposed,wildc).c_str(); 
+	wxString f = albaGetSaveFile(proposed,wildc).char_str(); 
 
 	int result = OP_RUN_CANCEL;
 	if(!f.IsEmpty())
@@ -115,7 +115,7 @@ void albaOpExporterLandmarkWS::Write()
   double ori[3] = {0.0,0.0,0.0};
   double t;
   
-  std::ofstream f_Out(m_File);
+  std::ofstream f_Out(m_File.char_str());
   if (!f_Out.bad())
   {
     // Add TRAJECTORIES tag

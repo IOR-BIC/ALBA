@@ -41,6 +41,7 @@
 
 #include <iostream>
 #include <fstream>
+#include "wx/filename.h"
 using namespace std;
 
 //----------------------------------------------------------------------------
@@ -60,7 +61,7 @@ albaOp(label)
 	m_OpType	= OPTYPE_IMPORTER;
 	m_Canundo	= true;
 	m_File		= "";
-	m_FileDir = albaGetLastUserFolder().c_str();
+	m_FileDir = albaGetLastUserFolder();
 	
 	m_VmeCloud		= NULL;
   m_Start = 1;
@@ -97,7 +98,7 @@ void albaOpImporterLandmarkTXT::OpRun()
   wxString f;
   if (!m_TestMode)
   {
-    f = albaGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
+    f = albaGetOpenFile(m_FileDir,pgd_wildc).char_str(); 
   }
 	
 	if(!f.IsEmpty() && wxFileExists(f))
@@ -157,7 +158,7 @@ void albaOpImporterLandmarkTXT::Read()
   albaNEW(m_VmeCloud);
 
   wxString path, name, ext;
-  wxFileName::SplitPath(m_File.c_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.char_str(),&path,&name,&ext);
   m_VmeCloud->SetName(name);
 
   albaTagItem tag_Nature;
@@ -203,15 +204,15 @@ void albaOpImporterLandmarkTXT::Read()
     {
       skipc=tkz.GetNextToken();
     }
-    time = tkz.GetNextToken().c_str();
+    time = tkz.GetNextToken();
     
     long counter = 0;
 
     while (tkz.HasMoreTokens())
     {
-      x = tkz.GetNextToken().c_str();
-      y = tkz.GetNextToken().c_str();
-      z = tkz.GetNextToken().c_str();
+      x = tkz.GetNextToken();
+      y = tkz.GetNextToken();
+      z = tkz.GetNextToken();
       xval = atof(x);
       yval = atof(y);
       zval = atof(z);

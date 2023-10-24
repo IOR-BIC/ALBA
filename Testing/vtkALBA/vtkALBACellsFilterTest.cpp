@@ -21,7 +21,7 @@
 #include "vtkALBACellsFilter.h"
 #include "vtkALBACellsFilterTest.h"
 
-#include <assert.h>
+//#include <assert.h>
 
 void vtkALBACellsFilterTest::TestFixture()
 {

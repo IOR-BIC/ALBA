@@ -509,7 +509,7 @@ void albaPipeVectorFieldGlyphs::InitFilterList(int nScalars)
 			FILTER_ITEM* pItem = new FILTER_ITEM;
 			memset(pItem, 0, sizeof(FILTER_ITEM));
 
-			wxStringTokenizer tkz(wxT(linkName.GetCStr()), wxT(":"));
+			wxStringTokenizer tkz(linkName.GetCStr(), wxT(":"));
 			int j=0;
 			while ( tkz.HasMoreTokens() )
 			{
@@ -546,7 +546,7 @@ void albaPipeVectorFieldGlyphs::InitFilterList(int nScalars)
 			FILTER_ITEM* pItem = new FILTER_ITEM;
 			memset(pItem, 0, sizeof(FILTER_ITEM));
 
-			wxStringTokenizer tkz(wxT(linkName.GetCStr()), wxT(":"));
+			wxStringTokenizer tkz(linkName.GetCStr(), wxT(":"));
 			int j=0;
 			while ( tkz.HasMoreTokens() )
 			{

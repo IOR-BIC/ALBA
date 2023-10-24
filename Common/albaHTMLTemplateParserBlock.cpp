@@ -29,7 +29,7 @@
 #include "albaDecl.h"
 #include "vtkImageData.h"
 #include "vtkJPEGWriter.h"
-#include "wx\mac\carbon\bitmap.h"
+#include "wx\bitmap.h"
 #include "wx\image.h"
 #include "vtkImageFlip.h"
 
@@ -659,7 +659,6 @@ int albaHTMLTemplateParserBlock::SubStringCompare( wxString *input, char *subStr
 
 //----------------------------------------------------------------------------
 int albaHTMLTemplateParserBlock::PreParseTag( wxString *inputTemplate, int &parsingPos )
-//----------------------------------------------------------------------------
 {
   int templateSize=inputTemplate->size();
   wxString tagName;
@@ -671,29 +670,29 @@ int albaHTMLTemplateParserBlock::PreParseTag( wxString *inputTemplate, int &pars
     
     int subPos;
 
-    parsingPos+=Strlen(alba_HMTL_TAG_OPENING);
+    parsingPos+=strlen(alba_HMTL_TAG_OPENING);
     //cheking the opening tag type
     if (SubStringCompare(inputTemplate,alba_HTML_TAG_VARIABLE,parsingPos))
     {
       substitutionType=alba_HTML_SUBSTITUTION_VARIABLE;
-      parsingPos+=Strlen(alba_HTML_TAG_VARIABLE);
+      parsingPos+=strlen(alba_HTML_TAG_VARIABLE);
     }
     else if (SubStringCompare(inputTemplate,alba_HTML_TAG_LOOP,parsingPos))
     {
       substitutionType=alba_HTML_SUBSTITUTION_BLOCK;
-      parsingPos+=Strlen(alba_HTML_TAG_LOOP);
+      parsingPos+=strlen(alba_HTML_TAG_LOOP);
     }
     else if (SubStringCompare(inputTemplate,alba_HTML_TAG_IF,parsingPos))
     {
       substitutionType=alba_HTML_SUBSTITUTION_BLOCK;
-      parsingPos+=Strlen(alba_HTML_TAG_IF);
+      parsingPos+=strlen(alba_HTML_TAG_IF);
     }
     else if (SubStringCompare(inputTemplate,alba_HTML_TAG_ELSE,parsingPos))
     {
       //if I find a else tag I update local variables and continue parsing inside this block
       if (m_BlockType!=alba_HTML_TEMPLATE_IF)
         albaLogMessage("albaHTMLTemplateParserBlock: [ALBAElse] found inside a non [ALBAIf] block ");
-      parsingPos+=Strlen(alba_HTML_TAG_ELSE);
+      parsingPos+=strlen(alba_HTML_TAG_ELSE);
 
       ReadTagName(inputTemplate,parsingPos,tagName);
 
@@ -746,17 +745,17 @@ int albaHTMLTemplateParserBlock::PreParseTag( wxString *inputTemplate, int &pars
   //CLOSING TAG
   else if (SubStringCompare(inputTemplate,alba_HTML_TAG_CLOSING,parsingPos)) 
   {
-    parsingPos+=Strlen(alba_HTML_TAG_CLOSING);
+    parsingPos+=strlen(alba_HTML_TAG_CLOSING);
 
     if (SubStringCompare(inputTemplate,alba_HTML_TAG_LOOP,parsingPos))
     {
-      parsingPos+=Strlen(alba_HTML_TAG_LOOP);
+      parsingPos+=strlen(alba_HTML_TAG_LOOP);
       if (m_BlockType!=alba_HTML_TEMPLATE_LOOP)
         albaLogMessage("albaHTMLTemplateParserBlock: Invalid closing TAG Type");
     }
     else if (SubStringCompare(inputTemplate,alba_HTML_TAG_IF,parsingPos))
     {
-      parsingPos+=Strlen(alba_HTML_TAG_IF);
+      parsingPos+=strlen(alba_HTML_TAG_IF);
       if (m_BlockType!=alba_HTML_TEMPLATE_IF)
         albaLogMessage("albaHTMLTemplateParserBlock: Invalid closing TAG Type");
       //if there is not an ELSE TAG the if char are all chars now

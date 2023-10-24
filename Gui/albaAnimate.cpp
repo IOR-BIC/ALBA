@@ -209,7 +209,7 @@ void albaAnimate::OnEvent(albaEventBase *alba_event)
         EnableWidgets();
         break;
       case ID_IMPORT:
-        fileName = albaGetOpenFile(lastFolder, wildcard).c_str();
+        fileName = albaGetOpenFile(lastFolder, wildcard);
         if (fileName != "")
         {
           LoadPoseFromFile(fileName);
@@ -217,7 +217,7 @@ void albaAnimate::OnEvent(albaEventBase *alba_event)
         }
       break;
       case ID_EXPORT:
-        fileName = albaGetSaveFile(lastFolder, wildcard).c_str();
+        fileName = albaGetSaveFile(lastFolder, wildcard);
         if (fileName != "")
           StorePoseToFile(fileName);
       break;

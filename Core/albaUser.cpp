@@ -135,22 +135,22 @@ void albaUser::InitializeUserInformations()
     albaString useProxy;
     
     wxStringTokenizer tkz(credentials, "\n");
-    usr = tkz.GetNextToken().c_str();
+    usr = tkz.GetNextToken();
     if (tkz.HasMoreTokens())
     {
-      pwd = tkz.GetNextToken().c_str();
+      pwd = tkz.GetNextToken();
     }
     if (tkz.HasMoreTokens())
     {
-      proxyHost = tkz.GetNextToken().c_str();
+      proxyHost = tkz.GetNextToken();
     }
     if (tkz.HasMoreTokens())
     {
-      proxyPort = tkz.GetNextToken().c_str();
+      proxyPort = tkz.GetNextToken();
     }
     if (tkz.HasMoreTokens())
     {
-      useProxy = tkz.GetNextToken().c_str();
+      useProxy = tkz.GetNextToken();
     }
 
     m_Username = usr;
@@ -162,7 +162,7 @@ void albaUser::InitializeUserInformations()
   }
   else
   {
-    m_Username = wxGetUserName().c_str();
+    m_Username = wxGetUserName();
     m_Password = "";
     m_RememberCredentials = 0;
   }
@@ -294,8 +294,8 @@ void albaUser::UpdateUserCredentialsFile()
 void albaUser::InitUserInfoHome()
 //----------------------------------------------------------------------------
 {
-  wxStandardPaths std_paths;
-  m_UserHome = std_paths.GetUserLocalDataDir().c_str();
+  
+  m_UserHome = wxStandardPaths::Get().GetUserLocalDataDir();
   if (!wxDirExists(m_UserHome.GetCStr()))
   {
     wxMkdir(m_UserHome.GetCStr());

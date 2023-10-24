@@ -334,11 +334,11 @@ void albaVMEMesh::OnEvent(albaEventBase *alba_event)
 		if (e->GetId() == ID_SAVE)
 		{
 			albaString initialFileName;
-			initialFileName = albaGetDocumentsDirectory().c_str();
+			initialFileName = albaGetDocumentsDirectory();
 			initialFileName.Append("\\newConfigurationFile.xml");
 
 			albaString wildc = "configuration xml file (*.xml)|*.xml";
-			albaString newFileName = albaGetSaveFile(initialFileName.GetCStr(), wildc).c_str();
+			albaString newFileName = albaGetSaveFile(initialFileName.GetCStr(), wildc);
 
 			if (newFileName != "")
 				SaveConfigurationFile(m_Configuration, newFileName);

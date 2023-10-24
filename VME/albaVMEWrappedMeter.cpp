@@ -1780,7 +1780,7 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 
 				SetMeterLink(n->GetName(), n);
 
-				albaString t;
+				wxString t;
 				t = n->GetName();
 				m_ListBox->Append(_(t));
 				m_ListBox->SetStringSelection(_(t));

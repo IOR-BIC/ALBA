@@ -34,6 +34,8 @@
 #include "albaVMEIterator.h"
 #include "albaAbsLogicManager.h"
 
+#include "wx/filename.h"
+
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -48,7 +50,7 @@ albaOp(label)
   m_Canundo = true;
 
   m_MSFFile    = "";
-  m_MSFFileDir = albaGetLastUserFolder().c_str();
+  m_MSFFileDir = albaGetLastUserFolder();
 
 }
 //----------------------------------------------------------------------------
@@ -88,7 +90,7 @@ void albaOpExporterMSF::OpRun()
 	albaString f;
   if (m_MSFFile.IsEmpty())
   {
-    f = albaGetSaveFile(m_MSFFileDir.GetCStr(),wildc.GetCStr()).c_str(); 
+    f = albaGetSaveFile(m_MSFFileDir.GetCStr(),wildc.GetCStr()); 
     m_MSFFile = f;
   }
 

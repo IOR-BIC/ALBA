@@ -166,11 +166,11 @@ void albaOpVolumeMeasure::OnEvent(albaEventBase *alba_event)
     break;
     case ID_STORE_MEASURE:
     {
-      m_MeasureText = wxGetTextFromUser("",_("Insert measure description"), _(m_MeasureText));
+      m_MeasureText = wxGetTextFromUser("","Insert measure description", m_MeasureText.GetCStr());
       if(m_MeasureText == "") break;
       albaString t;
-        t = m_VolumeMeasure + _(" ") + m_SurfaceArea + " " + m_NormalizedShapeIndex + " " + m_MeasureText;
-      m_MeasureList->Append(_(t));
+        t = m_VolumeMeasure + " " + m_SurfaceArea + " " + m_NormalizedShapeIndex + " " + m_MeasureText;
+      m_MeasureList->Append(t.GetCStr());
       m_MeasureText = "";
       m_Gui->Enable(ID_REMOVE_MEASURE,true);
       //m_gui->Enable(ID_ADD_TO_VME_TREE,true);
@@ -209,7 +209,7 @@ void albaOpVolumeMeasure::OpStop(int result)
 		measure_item.SetNumberOfComponents(c);
 
 		for (int i = 0; i < c; i++)
-			measure_item.SetComponent(m_MeasureList->GetString(i).c_str(), i);
+			measure_item.SetComponent(m_MeasureList->GetString(i), i);
 
 		albaVME *root = m_Input->GetRoot();
 

@@ -86,7 +86,7 @@ void albaOpOpenExternalFile::OpRun()
 	if (filetype->GetOpenCommand(&command2execute, wxFileType::MessageParameters(file, mime)))
 	{
     command2execute.Replace("/", "\\");
-    albaLogMessage( _T("Executing command: '%s'"), command2execute.c_str() );
+    albaLogMessage("Executing command: '%s'", command2execute.char_str());
 		m_Pid = wxExecute(command2execute); //,FALSE
 		cppDEL(filetype);
 		albaEventMacro(albaEvent(this,OP_RUN_OK));

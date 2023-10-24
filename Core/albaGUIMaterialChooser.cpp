@@ -82,7 +82,7 @@ albaGUIMaterialChooser::albaGUIMaterialChooser(wxString dialog_title)
 	m_Actor						= NULL;
 	
 
-  m_Filename = albaGetAppDataDirectory().c_str();
+  m_Filename = albaGetAppDataDirectory();
   m_Filename += "/mat_library.xml";
   
   //initialize first material 
@@ -192,7 +192,7 @@ void albaGUIMaterialChooser::CreateGUI()
   int x_pos,y_pos,w,h;
   albaGetFrame()->GetPosition(&x_pos,&y_pos);
   m_Dialog = new wxDialog(albaGetFrame(),-1,"Choose Material",
-	wxDefaultPosition,wxDefaultSize,wxDIALOG_MODAL | wxCAPTION | wxTHICK_FRAME );
+	wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE  | wxCAPTION | wxRESIZE_BORDER);
   m_Dialog->GetSize(&w,&h);
   m_Dialog->SetSize(x_pos+5,y_pos+5,w,h);
   //m_Dialog->SetMinSize(wxSize(w,h));

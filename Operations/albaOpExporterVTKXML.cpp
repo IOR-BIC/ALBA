@@ -61,7 +61,7 @@ albaOp(label)
 	m_Binary        = 1;
 	m_ABSMatrixFlag = 0;
 
-	m_FileDir = albaGetLastUserFolder().c_str();
+	m_FileDir = albaGetLastUserFolder();
   m_ForceUnsignedShortScalarOutputForStructuredPoints = FALSE;
 }
 //----------------------------------------------------------------------------

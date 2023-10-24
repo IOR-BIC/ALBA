@@ -36,6 +36,7 @@
 #include "albaVMELandmark.h"
 #include "albaTagArray.h"
 #include "albaSmartPointer.h"
+#include "wx/filename.h"
 
 #include <iostream>
 
@@ -47,7 +48,7 @@ albaOp(label)
 	m_OpType	= OPTYPE_IMPORTER;
 	m_Canundo	= true;
 	m_File		= "";
-	m_FileDir = albaGetLastUserFolder().c_str();
+	m_FileDir = albaGetLastUserFolder();
 	m_VmeCloud		= NULL;
 }
 //----------------------------------------------------------------------------
@@ -80,7 +81,7 @@ void albaOpImporterLandmarkWS::OpRun()
   wxString f;
   if (!m_TestMode)
     {
-      f = albaGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
+      f = albaGetOpenFile(m_FileDir,pgd_wildc).char_str(); 
     }
 	if(!f.IsEmpty() && wxFileExists(f))
 	 {
@@ -101,7 +102,7 @@ void albaOpImporterLandmarkWS::Read()
   }
   albaNEW(m_VmeCloud);
   wxString path, name, ext;
-  wxFileName::SplitPath(m_File.c_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File,&path,&name,&ext);
   m_VmeCloud->SetName(name);
 
   albaTagItem tag_Nature;
@@ -129,7 +130,7 @@ void albaOpImporterLandmarkWS::Read()
 
   //check if file starts with the string "ANALOG"
   line = text.ReadLine(); //Ignore 4 lines of textual information
-  if (line.CompareTo("TRAJECTORIES")!= 0)
+  if (line.CompareTo(wxString("TRAJECTORIES"))!= 0)
   {
     albaErrorMessage("Invalid file format!");
     return;
@@ -141,7 +142,7 @@ void albaOpImporterLandmarkWS::Read()
   int comma = line.Find(',');
   wxString freq = line.SubString(0,comma - 1);
   double freq_val;
-  freq_val = atof(freq.c_str());
+  freq_val = atof(freq.char_str());
 
   //Put the signals names in a vector of string
   line = text.ReadLine();
@@ -185,7 +186,7 @@ void albaOpImporterLandmarkWS::Read()
   do 
   {
     wxStringTokenizer tkz(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
-    time = tkz.GetNextToken().c_str();
+    time = tkz.GetNextToken();
     long counter = 0;
     int counterAL = 0;
     int indexCounter = 0;
@@ -193,9 +194,9 @@ void albaOpImporterLandmarkWS::Read()
 
     while (tkz.HasMoreTokens())
     {
-      x = tkz.GetNextToken().c_str();
-      y = tkz.GetNextToken().c_str();
-      z = tkz.GetNextToken().c_str();
+      x = tkz.GetNextToken();
+      y = tkz.GetNextToken();
+      z = tkz.GetNextToken();
       xval = atof(x);
       yval = atof(y);
       zval = atof(z);

@@ -113,7 +113,7 @@ void albaOpExporterLandmark::OpRun()
   int result = OP_RUN_CANCEL;
   int errors = 0;
   wxString f;
-  wxString proposed = albaGetLastUserFolder().c_str();
+  wxString proposed = albaGetLastUserFolder();
 
   albaString info;
   info = "Exporting LC ";
@@ -130,14 +130,14 @@ void albaOpExporterLandmark::OpRun()
       proposed += cloud->GetName();
 	    proposed += ".txt";
       wxString wildc = "ascii file (*.txt)|*.txt";
-	    f = albaGetSaveFile(proposed,wildc).c_str(); 
+	    f = albaGetSaveFile(proposed,wildc).char_str(); 
     }
     // SECOND CASE: Many LC to export
     else
     {
       if (m_FileDir.length()==0)
       {
-        wxDirDialog dialog(NULL, "Choose directory where to save files:", proposed.c_str(), wxRESIZE_BORDER);
+        wxDirDialog dialog(NULL, "Choose directory where to save files:", proposed.char_str(), wxRESIZE_BORDER);
 			  dialog.SetReturnCode(wxID_OK);
 			  int ret_code = dialog.ShowModal();
 			  if (ret_code == wxID_OK)
@@ -205,7 +205,7 @@ void albaOpExporterLandmark::ExportLandmark(albaVMELandmarkCloud* cloud)
     cloud = (albaVMELandmarkCloud*) m_Input;
   }
 
-  std::ofstream f_Out(m_File);
+  std::ofstream f_Out(m_File.char_str());
   if (!f_Out.bad())
   {
     int numberLandmark = cloud->GetNumberOfLandmarks();

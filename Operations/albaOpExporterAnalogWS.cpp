@@ -74,12 +74,12 @@ albaOp* albaOpExporterAnalogWS::Copy()
 void albaOpExporterAnalogWS::OpRun()   
 //----------------------------------------------------------------------------
 {
-	wxString proposed = albaGetLastUserFolder().c_str();
+	wxString proposed = albaGetLastUserFolder();
 	proposed += m_Input->GetName();
 	proposed += ".csv";
 	
   wxString wildc = "ASCII CSV file (*.csv)|*.csv";
-	wxString f = albaGetSaveFile(proposed,wildc).c_str(); 
+	wxString f = albaGetSaveFile(proposed,wildc).char_str(); 
 
 	int result = OP_RUN_CANCEL;
 	if(!f.IsEmpty())
@@ -104,7 +104,7 @@ void albaOpExporterAnalogWS::Write()
 
   albaString empty("");
 
-  std::ofstream f_Out(m_File.c_str());
+  std::ofstream f_Out(m_File.char_str());
   if (!f_Out.bad())
   {
     // Add ANALOG tag

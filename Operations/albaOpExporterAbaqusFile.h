@@ -46,7 +46,7 @@ public:
 
   /** Set/Get output file name*/
   void SetOutputFileName(const char *outputFileName) {m_AbaqusOutputFileNameFullPath = outputFileName;};
-  const char *GetOutputFileName() {return m_AbaqusOutputFileNameFullPath.c_str();};
+  const char *GetOutputFileName() {return m_AbaqusOutputFileNameFullPath.char_str();};
 
   /** Export the input mesh by writing it in Abaqus .inp format */
   int Write();

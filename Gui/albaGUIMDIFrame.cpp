@@ -34,7 +34,7 @@
 #ifdef __WIN32__
 #include <malloc.h>
 #endif
-
+#include "wx/filename.h"
 
 #ifdef ALBA_USE_VTK //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   #include "vtkVersion.h"
@@ -243,7 +243,7 @@ void albaGUIMDIFrame::OnDropFile(wxDropFilesEvent &event)
   file_list = event.GetFiles();
   for (int i=0; i< num_files; i++)
   {
-    file_to_open = file_list[i].c_str();
+    file_to_open = file_list[i];
 
     wxFileName::SplitPath(file_list[i],&path, &name, &ext);
 

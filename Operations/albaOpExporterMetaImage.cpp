@@ -96,7 +96,7 @@ void albaOpExporterMetaImage::OpRun()
 
 	albaString wildc = "Meta Data Image (*.mha)|*.mha";
 
-	m_FileDir = albaGetLastUserFolder().c_str();
+	m_FileDir = albaGetLastUserFolder();
 	m_File = m_FileDir + "\\" + m_Input->GetName() + ".mha";
 
 	m_Gui = new albaGUI(this);

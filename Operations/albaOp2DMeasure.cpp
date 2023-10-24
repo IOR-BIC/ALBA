@@ -151,7 +151,7 @@ void albaOp2DMeasure::OpRun()
     {
       albaString value;
       value = measure_item->GetComponent(i);
-      m_MeasureList->Append(_(value));
+      m_MeasureList->Append(value.GetCStr());
     }
   }
 
@@ -459,7 +459,7 @@ void albaOp2DMeasure::OnEvent(albaEventBase *alba_event)
         break;
         case ID_STORE_MEASURE:
         {         
-          m_MeasureText = wxGetTextFromUser("",_("Insert measure description"), _(m_MeasureText));
+          m_MeasureText = wxGetTextFromUser("","Insert measure description", m_MeasureText.GetCStr());
           if(m_MeasureText == "") break;
           albaString t;
           if(m_MeasureType == 0 || m_MeasureType == 1)
@@ -475,7 +475,7 @@ void albaOp2DMeasure::OnEvent(albaEventBase *alba_event)
             t += "° (";
             t += m_MeasureText;
           }
-          m_MeasureList->Append(_(t));
+          m_MeasureList->Append(t.GetCStr());
           m_MeasureText = "";
           m_Gui->Enable(ID_REMOVE_MEASURE,true);
         }

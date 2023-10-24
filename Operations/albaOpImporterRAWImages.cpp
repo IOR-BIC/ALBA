@@ -22,8 +22,6 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
 #include "wx/busyinfo.h"
 #include "wx/dir.h"
 
@@ -62,7 +60,7 @@
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkDoubleArray.h"
-
+#include "wx/filename.h"
 
 
 #include "albaMemDbg.h"
@@ -78,7 +76,7 @@ albaOpImporterRAWImages::albaOpImporterRAWImages(wxString label) : albaOp(label)
 {
   m_OpType					= OPTYPE_IMPORTER;
   m_Canundo					= true;
-  m_RawDirectory		= albaGetLastUserFolder().c_str();
+  m_RawDirectory		= albaGetLastUserFolder();
   m_VtkRawDirectory	= NULL;
   m_Output					= NULL;
 
@@ -486,9 +484,9 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
     case ID_COORD:
       {	
         m_Gui->Enable(ID_SPC_Z, true);
-        wxString rect_dir = albaGetLastUserFolder().c_str();
+        wxString rect_dir = albaGetLastUserFolder();
         wxString rect_wildc = _("Z_coordinates (*.txt)|*.txt");
-        wxString file = albaGetOpenFile(rect_dir,rect_wildc,_("Open Z coordinates file")).c_str();
+        wxString file = albaGetOpenFile(rect_dir,rect_wildc,_("Open Z coordinates file")).char_str();
         if (file != "")
         {
           m_CoordFile = file;
@@ -506,8 +504,7 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
 
           if (strcmp (title,"Z coordinates:") != 0)
           {
-            wxMessageDialog dialog( NULL,
-              "This is not a Z coordinates file!","",wxOK|wxICON_ERROR);	
+            wxMessageDialog dialog( NULL,"This is not a Z coordinates file!","",wxOK|wxICON_ERROR);	
             dialog.ShowModal();
             f_in.close();						
             m_Gui->Enable(ID_SPC_Z, true);
@@ -525,8 +522,7 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
 
           if (j != m_Dimension[2])
           {
-            wxMessageDialog dialog( NULL,
-              "z dimension is not correct!","",wxOK|wxICON_ERROR);
+            wxMessageDialog dialog( NULL,"z dimension is not correct!","",wxOK|wxICON_ERROR);
             dialog.ShowModal();
             m_Dimension[2] = j;
             m_Gui->Update();      
@@ -779,7 +775,7 @@ void albaOpImporterRAWImages::	UpdateReader()
   m_Reader->SetFilePrefix(prefix);
 
   wxString pattern = m_Pattern + m_Extension;
-  m_Reader->SetFilePattern(pattern.c_str());
+  m_Reader->SetFilePattern(pattern.char_str());
 
   m_Reader->SetDataScalarType(GetVTKDataType());
   m_Reader->SetNumberOfScalarComponents(1);
@@ -886,7 +882,7 @@ bool albaOpImporterRAWImages::Import()
   wxString pattern = m_Pattern + m_Extension;
   vtkALBASmartPointer< vtkImageReader > r;
   r->SetFilePrefix(prefix);
-  r->SetFilePattern(pattern.c_str());
+  r->SetFilePattern(pattern.char_str());
 
   r->SetDataScalarType(GetVTKDataType());
   r->SetNumberOfScalarComponents(1);
@@ -927,7 +923,7 @@ bool albaOpImporterRAWImages::Import()
 
   wxString slice_name = m_RawDirectory;
   wxString path, name, ext;
-  wxFileName::SplitPath(slice_name.c_str(),&path,&name,&ext);
+	wxFileName::SplitPath(slice_name, &path, &name, &ext);
 
   vtkALBASmartPointer<vtkImageToStructuredPoints> convert;
 
@@ -1069,7 +1065,7 @@ bool albaOpImporterRAWImages::Import()
    tag_Nature.SetName(_("VME_NATURE"));
    tag_Nature.SetValue(_("NATURAL"));
 
-   m_Output->SetName(name.c_str());
+   m_Output->SetName(name.char_str());
    m_Output->ReparentTo(m_Input);
 
    m_Output->GetTagArray()->SetTag(tag_Nature);
@@ -1125,7 +1121,7 @@ void albaOpImporterRAWImages::OnOpenDir()
 
   vtkNEW(m_VtkRawDirectory);
   if (m_VtkRawDirectory->Open(m_RawDirectory) == 0)
-    wxLogMessage("Directory <%s> can not be opened", m_RawDirectory);
+    albaLogMessage("Directory <%s> can not be opened", m_RawDirectory);
 
   if(!this->m_TestMode)
   {
@@ -1157,7 +1153,7 @@ bool albaOpImporterRAWImages::ControlFilenameList()
   const wxString FileSpec = "*" + m_Extension;
   const int flags = wxDIR_FILES;
 
-  if (m_RawDirectory.GetCStr() != wxEmptyString && wxDirExists(m_RawDirectory.GetCStr()))
+  if (m_RawDirectory != wxEmptyString && wxDirExists(m_RawDirectory.GetCStr()))
   {
     // Get all .zip files
     wxDir::GetAllFiles(m_RawDirectory.GetCStr(), &SkinFiles, FileSpec, flags);
@@ -1167,7 +1163,7 @@ bool albaOpImporterRAWImages::ControlFilenameList()
   wxString numbers = m_Pattern.AfterLast('%');
   numbers = numbers.Mid(0,numbers.Length()-1);
 
-  int n = atoi(numbers.c_str());
+  int n = atoi(numbers.char_str());
 
   for(long number = m_Offset,  j =0; number<m_Offset+SkinFiles.GetCount()*m_FileSpacing;number = number + m_FileSpacing, j++)
   {
