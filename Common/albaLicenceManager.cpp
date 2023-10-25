@@ -654,7 +654,6 @@ void albaLicenceManager::OnEvent(albaEventBase *alba_event)
 			}
 		}
 		break;
-#ifdef _DEBUG
 		case ID_GENERATE_KEY:
 		{
 			int result;
@@ -675,7 +674,6 @@ void albaLicenceManager::OnEvent(albaEventBase *alba_event)
 			wxMessageBox(resutlMessage, "Result", wxOK, NULL);
 		}
 		break;
-#endif
 		default:
 			albaEventMacro(*e);
 			break;
