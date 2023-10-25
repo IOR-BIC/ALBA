@@ -283,7 +283,7 @@ wxString albaLicenceManager::DecryptStr(wxString plainStr)
 	return decStr.c_str();
 }
 
-#ifdef _DEBUG
+
 //----------------------------------------------------------------------------
 albaLicenceManager::CreateNewLicenceStatuses albaLicenceManager::CreateNewTimeLicence(wxString RegCode, wxDateTime expirationDate, wxString &newLicence)
 {
@@ -366,7 +366,6 @@ albaLicenceManager::CreateNewLicenceStatuses albaLicenceManager::CreateNewBinary
 	return LICENCE_CREATED;
 }
 
-#endif
 
 //GUI - Show Licence Dialog
 //----------------------------------------------------------------------------
@@ -667,9 +666,9 @@ void albaLicenceManager::OnEvent(albaEventBase *alba_event)
 
 			wxString resutlMessage = "";
 			if (result == CreateNewLicenceStatuses::LICENCE_CREATED) resutlMessage = "Licence Created";
-			else if (result == CreateNewLicenceStatuses::WRONG_BASE_STRING) resutlMessage = "Wrong Base String";
-			else if (result == CreateNewLicenceStatuses::WRONG_FULL_STRING) resutlMessage = "Wrong Full String";
-			else if (result == CreateNewLicenceStatuses::WRONG_SECS_IN_MILLENNIUM) resutlMessage = "Wrong Secs in Millennium";
+			else if (result == CreateNewLicenceStatuses::WRONG_BASE_STRING) resutlMessage = "Wrong Personal key, check it\n cause: Wong Base String";
+			else if (result == CreateNewLicenceStatuses::WRONG_FULL_STRING) resutlMessage = "Wrong Personal key, check it\n cause: Wrong Full String";
+			else if (result == CreateNewLicenceStatuses::WRONG_SECS_IN_MILLENNIUM) resutlMessage = "Wrong Personal key, check it\n cause: Wrong Secs in Millennium";
 
 			wxMessageBox(resutlMessage, "Result", wxOK, NULL);
 		}
