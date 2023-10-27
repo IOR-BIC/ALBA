@@ -180,7 +180,7 @@ void albaAnimate::OnEvent(albaEventBase *alba_event)
   {
     wxString wildcard = "xml file (*.xml)|*.xml|all files (*.*)|*.*";
     albaString fileName = "";
-    wxString lastFolder = albaGetLastUserFolder().c_str();
+    wxString lastFolder = albaGetLastUserFolder().char_str();
 
     switch(e->GetId())
     {
@@ -293,9 +293,9 @@ void albaAnimate::FlyTo()
   assert(m_Tags && m_Renderer && m_PositionList);
   m_SelectedPosition = m_PositionList->GetStringSelection();
   wxString flyto_tagName = "FLY_TO_" + m_SelectedPosition;
-  albaTagItem *item = m_Tags->GetTag(flyto_tagName.c_str());
+  albaTagItem *item = m_Tags->GetTag(flyto_tagName.char_str());
   if(item == NULL)
-    item = m_Tags->GetTag(m_SelectedPosition.c_str()); // support old style
+    item = m_Tags->GetTag(m_SelectedPosition.char_str()); // support old style
 
   vtkCamera *camera = m_Renderer->GetActiveCamera();
 
@@ -380,14 +380,14 @@ void albaAnimate::StoreViewPoint()
 	
 	// test if is it unique -----------------------
   wxString flyto_tagName = "FLY_TO_" + name;
-	if(m_Tags->IsTagPresent(flyto_tagName.c_str()))
+	if(m_Tags->IsTagPresent(flyto_tagName.char_str()))
 	{
 		wxString msg = "this name is already used, do you want to overwrite it ?";
 		int res = wxMessageBox(msg,"Store Camera Position", wxOK|wxCANCEL|wxICON_QUESTION, NULL);
 		if(res == wxCANCEL) return;
 
     //remove item to be overwritten
-		m_Tags->DeleteTag(flyto_tagName.c_str());
+		m_Tags->DeleteTag(flyto_tagName.char_str());
 		m_PositionList->Delete(m_PositionList->FindString(name));
 	}
   
@@ -402,7 +402,7 @@ void albaAnimate::StoreViewPoint()
   par_scale = camera->GetParallelScale();
 	
 	albaTagItem item;
-	item.SetName(flyto_tagName.c_str());
+	item.SetName(flyto_tagName.char_str());
 	item.SetNumberOfComponents(10);
 	item.SetComponent(fp[0],0);
 	item.SetComponent(fp[1],1);
@@ -436,24 +436,24 @@ void albaAnimate::RenameViewPoint()
 
   // test if is it unique -----------------------
 	wxString flyto_tagName = "FLY_TO_" + name;
-  if(m_Tags->IsTagPresent(flyto_tagName.c_str()))
+  if(m_Tags->IsTagPresent(flyto_tagName.char_str()))
 	{
 		wxString msg = "this name is already used, do you want to overwrite it ?";
 		int res = wxMessageBox(msg,"Rename Camera Position", wxOK|wxCANCEL|wxICON_QUESTION, NULL);
 		if(res == wxCANCEL) return;
 
     //remove item to be overwritten
-		m_Tags->DeleteTag(flyto_tagName.c_str());
+		m_Tags->DeleteTag(flyto_tagName.char_str());
 		m_PositionList->Delete(m_PositionList->FindString(name));
 	}
 
 	wxString flyto_oldTagName = "FLY_TO_" + m_SelectedPosition;
-  albaTagItem *item = m_Tags->GetTag(flyto_oldTagName.c_str());
+  albaTagItem *item = m_Tags->GetTag(flyto_oldTagName.char_str());
   assert(item  && item->GetNumberOfComponents() == 10);
 
   albaTagItem itemNew;
   itemNew.DeepCopy(item);
-	itemNew.SetName(flyto_tagName.c_str());	
+	itemNew.SetName(flyto_tagName.char_str());
   m_Tags->DeleteTag(flyto_oldTagName);
   m_Tags->SetTag(itemNew);
 

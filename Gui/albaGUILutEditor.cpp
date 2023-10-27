@@ -95,22 +95,22 @@ albaGUILutEditor::albaGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoin
   m_NewUserLutName = "New User Preset";
   m_Info = "" ;
   
-  m_UserLutLibraryDir = (albaGetAppDataDirectory()+"\\UserDefinedLookupTables\\").c_str();
+  m_UserLutLibraryDir = (albaGetAppDataDirectory()+"\\UserDefinedLookupTables\\");
 
-  if (wxDirExists(m_UserLutLibraryDir.c_str()))
+  if (wxDirExists(m_UserLutLibraryDir))
   {
     albaLogMessage("User lut library found! Loading...");
   } 
   else
   {
     albaLogMessage("User lut library not found! Creating new one...");
-    wxMkdir(m_UserLutLibraryDir.c_str());
+    wxMkdir(m_UserLutLibraryDir);
   }
 
-  assert(wxDirExists(m_UserLutLibraryDir.c_str()));
+  assert(wxDirExists(m_UserLutLibraryDir));
 
   m_UserLutLibrary = new albaLUTLibrary;
-  m_UserLutLibrary->SetDir(m_UserLutLibraryDir.c_str());
+  m_UserLutLibrary->SetDir(m_UserLutLibraryDir);
   m_UserLutLibrary->Load();
 
 	wxArrayString presetsLutNames;
@@ -345,8 +345,8 @@ void albaGUILutEditor::OnEvent(albaEventBase *alba_event)
       case ID_ADD_TO_ULIB:
       {
         albaLogMessage("ID_ADD_TO_ULIB");
-        m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.c_str());
-        int id = m_UserPresetCombo->FindString(m_NewUserLutName.c_str());
+        m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.char_str());
+        int id = m_UserPresetCombo->FindString(m_NewUserLutName.char_str());
         if (id != -1)
         {
           // the item  already exists and it will not be added to the combo
@@ -365,11 +365,11 @@ void albaGUILutEditor::OnEvent(albaEventBase *alba_event)
         }
 
         albaLogMessage("ID_REMOVE_FROM_ULIB");
-        m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.c_str());
+        m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.char_str());
         int id = m_UserPresetCombo->GetSelection();
         wxString sel = m_UserPresetCombo->GetString(id) ;
         m_UserPresetCombo->Delete(id);
-        m_UserLutLibrary->Remove(sel.c_str());
+        m_UserLutLibrary->Remove(sel.char_str());
 
       }
       break;
@@ -384,14 +384,14 @@ void albaGUILutEditor::OnEvent(albaEventBase *alba_event)
         albaLogMessage("ID_USER_PRESET");
         int id = m_UserPresetCombo->GetSelection();
         wxString sel = m_UserPresetCombo->GetString(id) ;
-        albaLogMessage(sel.c_str());
+        albaLogMessage(sel.char_str());
 				double range[2];
 				range[0]=m_Lut->GetRange()[0];
 				range[1]=m_Lut->GetRange()[1];
-				m_Lut->DeepCopy(m_UserLutLibrary->GetLutByName(sel.c_str()));
+				m_Lut->DeepCopy(m_UserLutLibrary->GetLutByName(sel.char_str()));
 				m_Lut->SetRange(range);
 				
-        m_NewUserLutName = sel.c_str();
+        m_NewUserLutName = sel.char_str();
         UpdateWidgetsOnLutChange();
       }
       break;

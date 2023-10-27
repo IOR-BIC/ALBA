@@ -32,8 +32,8 @@ albaStorage::albaStorage()
   m_ErrorCode       = 0;
 	
   //Creating user app data directory if does not exist
-  if(!wxDirExists(albaGetAppDataDirectory().c_str()))
-    wxMkdir(albaGetAppDataDirectory().c_str());
+  if(!wxDirExists(albaGetAppDataDirectory().char_str()))
+    wxMkdir(albaGetAppDataDirectory().char_str());
 
   //Creating user app tmp directory if does not exist
 	m_TmpFolder=(albaGetAppDataDirectory()+"\\tmp");

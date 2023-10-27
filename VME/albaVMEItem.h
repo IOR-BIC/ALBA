@@ -306,7 +306,7 @@ protected:
   int           m_Id;         ///< the id assigned to the dataset/file to be stored in the MSF
   bool          m_Crypting;   ///< this flags specify if encryption should be used when saving data
 
-  std::string   m_DecryptedFileString; ///< String containing the decrypted file in memory
+  std::string  m_DecryptedFileString; ///< String containing the decrypted file in memory
   albaString     m_URL;        ///< the URL of the data file for this dataset
   albaTimeStamp  m_TimeStamp;  ///< time stamp of this dataset
   albaString     m_DataType;   ///< the dataset type expressed as a string 

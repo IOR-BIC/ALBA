@@ -98,7 +98,7 @@ bool AlbaViewer::OnInit()
 	// Splash Screen
 	albaString splashImageName = "AlbaViewerSplash.bmp";
 
-	wxString splashDir = appUtils::GetConfigDirectory().c_str();
+	wxString splashDir = appUtils::GetConfigDirectory().char_str();
 	wxBitmap splashBitmap;
 	splashBitmap.LoadFile(splashDir + "\\" + splashImageName, wxBITMAP_TYPE_BMP);
 	// m_Logic->ShowSplashScreen(splashBitmap); // Uncomment to show SplashScreen

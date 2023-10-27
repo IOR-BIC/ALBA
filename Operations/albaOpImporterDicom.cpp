@@ -227,13 +227,11 @@ void albaOpImporterDicom::OpRun()
 	m_Wizard = new albaGUIWizard(_("DICOM Importer"));
 	m_Wizard->SetListener(this);
 
-/*
-	TODO RESTORE SET BUTTON STRING OPTION
-	if (!GetSetting()->GetSkipCrop())
-		m_Wizard->SetButtonString("Crop >");
-	else
-		m_Wizard->SetButtonString("Finish");
-*/		
+
+	//TODO RESTORE SET BUTTON STRING OPTION
+
+		
+		
 	wxString lastDicomDir = GetSetting()->GetLastDicomDir();
 		
 	if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
@@ -248,6 +246,8 @@ void albaOpImporterDicom::OpRun()
 		CreateSliceVTKPipeline(); 
 		
 		CreateLoadPage();
+
+
 		if (!GetSetting()->GetSkipCrop())
 		{
 			CreateCropPage();
@@ -258,6 +258,14 @@ void albaOpImporterDicom::OpRun()
 		wxString path = dialog.GetPath();
 		GetSetting()->SetLastDicomDir(path);
 		GuiUpdate();
+
+		wxWindow* NextButton = m_Wizard->FindWindowById(wxID_FORWARD);
+
+		wxString tmp=NextButton->GetLabel();
+		if (!GetSetting()->GetSkipCrop())
+			NextButton->SetLabel("&Crop >");
+		else
+			NextButton->SetLabel("Finish");
 
 		if (OpenDir(path))
 		{
@@ -653,13 +661,23 @@ void albaOpImporterDicom::OnEvent(albaEventBase *alba_event)
 				OnWizardChangePage(e);
 			break;
 			case albaGUIWizard::ALBA_WIZARD_CHANGED_PAGE:
+			{
 				/* This is a ack, because that "genius" of wx  send the change event
 				before page show, so we need to duplicate the code here in order to
 				manage the camera update */
 				m_Wizard->GetCurrentPage()->Show();
 				m_Wizard->GetCurrentPage()->SetFocus();
 				m_Wizard->GetCurrentPage()->Update();
-				CameraReset();
+
+				wxWindow* NextButton = m_Wizard->FindWindowById(wxID_FORWARD);
+				wxString tmp = NextButton->GetLabel();
+
+				if (!GetSetting()->GetSkipCrop())
+					NextButton->SetLabel("&Crop >");
+				else
+					NextButton->SetLabel("Finish");
+				CameraReset(); 
+			}
 			break;
 			case ID_STUDY_SELECT:
 				OnStudySelect();
@@ -1357,7 +1375,8 @@ void albaOpImporterDicom::OnWizardChangePage( albaEvent * e )
 		m_DicomInteractor->PlaneVisibilityOff();
 
 		//TODO RESTORE THIS
-		//m_Wizard->SetButtonString("Crop >");
+		wxWindow* NextButton = m_Wizard->FindWindowById(wxID_FORWARD);
+		NextButton->SetLabel("Crop >");
 	}
 	
 	CameraReset();

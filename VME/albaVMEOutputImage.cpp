@@ -103,11 +103,11 @@ void albaVMEOutputImage::Update()
 		double b[6];
 		m_VME->GetOutput()->GetVMELocalBounds(b);
 		m_ImageBounds[0] = "";
-		m_ImageBounds[0] << " xmin: " << wxString::Format("%g", RoundValue(b[0])).c_str() << "   xmax: " << wxString::Format("%g", RoundValue(b[1])).c_str();
+		m_ImageBounds[0] << " xmin: " << wxString::Format("%g", RoundValue(b[0])).char_str() << "   xmax: " << wxString::Format("%g", RoundValue(b[1])).char_str();
 		m_ImageBounds[1] = "";
-		m_ImageBounds[1] << " ymin: " << wxString::Format("%g", RoundValue(b[2])).c_str() << "   ymax: " << wxString::Format("%g", RoundValue(b[3])).c_str();
+		m_ImageBounds[1] << " ymin: " << wxString::Format("%g", RoundValue(b[2])).char_str() << "   ymax: " << wxString::Format("%g", RoundValue(b[3])).char_str();
 		m_ImageBounds[2] = "";
-		m_ImageBounds[2] << " zmin: " << wxString::Format("%g", RoundValue(b[4])).c_str() << "   zmax: " << wxString::Format("%g", RoundValue(b[5])).c_str();
+		m_ImageBounds[2] << " zmin: " << wxString::Format("%g", RoundValue(b[4])).char_str() << "   zmax: " << wxString::Format("%g", RoundValue(b[5])).char_str();
 
 		m_ImageSize = wxString::Format("%g x %g", RoundValue(b[1] - b[0]), RoundValue(b[3] - b[2]));
 	}

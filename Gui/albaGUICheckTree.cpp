@@ -330,14 +330,14 @@ void albaGUICheckTree::ViewDeleted(albaView *view)
 int albaGUICheckTree::ClassNameToIcon(wxString classname)
 //----------------------------------------------------------------------------
 {
-  MapClassNameToIcon::iterator it = m_MapClassNameToIcon.find(classname.c_str());
+  MapClassNameToIcon::iterator it = m_MapClassNameToIcon.find(classname.char_str());
   if (it != m_MapClassNameToIcon.end())
     return int((*it).second);
   else
   {
     // search superclass's icon
     // if also this icon is not present, "Unknown" icon is used
-    wxLogMessage("albaPictureFactory::ClassNameToIcon: cant find = %s ",classname.c_str());
+    albaLogMessage("albaPictureFactory::ClassNameToIcon: cant find = %s ",classname.char_str());
     return 0;
   }
 }

@@ -206,12 +206,12 @@ void albaPictureFactory::Add(wxString id,char** xpm)
 wxBitmap albaPictureFactory::GetBmp(wxString id)
 //----------------------------------------------------------------------------
 {
-  albaPicMap::iterator it = m_PictureMaps->map.find(id.c_str());
+  albaPicMap::iterator it = m_PictureMaps->map.find(id.char_str());
   if (it != m_PictureMaps->map.end())
     return wxBitmap((*it).second);
   else
   {
-    albaLogMessage("albaPictureFactory: bmp with id = %s not found",id.c_str());
+    albaLogMessage("albaPictureFactory: bmp with id = %s not found",id.char_str());
     return wxNullBitmap;
   }
 }
@@ -219,12 +219,12 @@ wxBitmap albaPictureFactory::GetBmp(wxString id)
 wxImage albaPictureFactory::GetImg(wxString id)
 //----------------------------------------------------------------------------
 {
-  albaPicMap::iterator it = m_PictureMaps->map.find(id.c_str());
+  albaPicMap::iterator it = m_PictureMaps->map.find(id.char_str());
   if (it != m_PictureMaps->map.end())
     return (*it).second;
   else
   {
-    albaLogMessage("albaPictureFactory: img with id = %s not found",id.c_str());
+    albaLogMessage("albaPictureFactory: img with id = %s not found",id.char_str());
     return wxNullImage;
   }
 }
@@ -232,7 +232,7 @@ wxImage albaPictureFactory::GetImg(wxString id)
 wxIcon albaPictureFactory::GetIcon(wxString id)
 //----------------------------------------------------------------------------
 {
-  albaPicMap::iterator it = m_PictureMaps->map.find(id.c_str());
+  albaPicMap::iterator it = m_PictureMaps->map.find(id.char_str());
   if (it != m_PictureMaps->map.end())
   {
     wxBitmap bmp = wxBitmap((*it).second);
@@ -242,7 +242,7 @@ wxIcon albaPictureFactory::GetIcon(wxString id)
   }
   else
   {
-    albaLogMessage("albaPictureFactory: icon with id = %s not found",id.c_str());
+    albaLogMessage("albaPictureFactory: icon with id = %s not found",id.char_str());
     return wxNullIcon;
   }
 }
@@ -250,18 +250,18 @@ wxIcon albaPictureFactory::GetIcon(wxString id)
 void albaPictureFactory::AddVmePic(wxString id,char** xpm)
 //----------------------------------------------------------------------------
 {
-  m_PictureMaps->vme_map[id.c_str()] = wxImage(xpm);
+  m_PictureMaps->vme_map[id.char_str()] = wxImage(xpm);
 }
 //----------------------------------------------------------------------------
 wxBitmap albaPictureFactory::GetVmePic(wxString id)
 //----------------------------------------------------------------------------
 {
-  albaPicMap::iterator it = m_PictureMaps->vme_map.find(id.c_str());
+  albaPicMap::iterator it = m_PictureMaps->vme_map.find(id.char_str());
   if (it != m_PictureMaps->vme_map.end())
     return wxBitmap((*it).second);
   else
   {
-    albaLogMessage("albaPictureFactory: vme-pic with id = %s not found",id.c_str());
+    albaLogMessage("albaPictureFactory: vme-pic with id = %s not found",id.char_str());
     return wxNullBitmap;
   }
 }
@@ -272,7 +272,7 @@ void albaPictureFactory::GetVmeNames( std::vector<wxString>& v )
   v.clear();
   for (albaPicMap::iterator it = m_PictureMaps->vme_map.begin(); it != m_PictureMaps->vme_map.end(); it++)
   {
-    wxString s = ((*it).first).c_str();
+    wxString s = ((*it).first).char_str();
     v.push_back(s);
   }
 }
@@ -306,10 +306,10 @@ int foo = albaAddPic(vme_xpm);  //correct, but will be called before ThePicMap h
     vtkImageData* albaPictureFactory::GetVTKImg(wxString id)
     //----------------------------------------------------------------------------
     {
-      albaPicMap::iterator it = m_PictureMaps->map.find(id.c_str());
+      albaPicMap::iterator it = m_PictureMaps->map.find(id.char_str());
       if (it == m_PictureMaps->map.end())
       {
-        albaLogMessage("albaPictureFactory: icon with id = %s not found",id.c_str());
+        albaLogMessage("albaPictureFactory: icon with id = %s not found",id.char_str());
         return NULL;
       }
 

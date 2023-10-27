@@ -91,7 +91,7 @@ void albaWizardBlockFileExistCheck::ExcutionBegin()
 
   //Select the input VME for the operation
   if (m_SelectedVME)
-    m_SelectedVME=m_SelectedVME->GetByPath(m_VmeSelect.c_str());
+    m_SelectedVME=m_SelectedVME->GetByPath(m_VmeSelect.char_str());
   else
     return; 
 
@@ -99,7 +99,7 @@ void albaWizardBlockFileExistCheck::ExcutionBegin()
     albaEventMacro(albaEvent(this,VME_SELECT,m_SelectedVME));
   
     for (int i=0;i<m_AcceptedVmes.size();i++)
-      if (m_SelectedVME->IsA(m_AcceptedVmes[i].c_str()))
+      if (m_SelectedVME->IsA(m_AcceptedVmes[i].char_str()))
         m_TestPassed=true;
   }
 

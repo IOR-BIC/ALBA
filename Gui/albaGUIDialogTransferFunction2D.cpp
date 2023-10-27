@@ -825,7 +825,7 @@ void albaGUIDialogTransferFunction2D::OnEvent(albaEventBase *alba_event)
 			wxString string =	m_Vme->GetTagArray()->GetTag("VOLUME_TRANSFER_FUNCTION")->GetValue();
       vtkALBATransferFunction2D *newf = vtkALBATransferFunction2D::New();
 			newf->DeepCopy(this->m_TransferFunction);
-			if (newf->LoadFromString(string.c_str()))
+			if (newf->LoadFromString(string.char_str()))
 				this->m_TransferFunction->DeepCopy(newf);
 			newf->Delete();
 			}
@@ -1035,7 +1035,7 @@ void albaGUIDialogTransferFunction2D::LoadTransferFunction()
 	wxString string =	m_Vme->GetTagArray()->GetTag("VOLUME_TRANSFER_FUNCTION")->GetValue();
   vtkALBATransferFunction2D *newf = vtkALBATransferFunction2D::New();
 	newf->DeepCopy(this->m_TransferFunction);
-	if (newf->LoadFromString(string.c_str()))
+	if (newf->LoadFromString(string.char_str()))
 		this->m_TransferFunction->DeepCopy(newf);
 	newf->Delete();
 

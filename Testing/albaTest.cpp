@@ -117,11 +117,11 @@ void albaTest::CompareImage(albaString suiteName, albaString imageName, int inde
 	albaString imageFileBase;
 	if (index >= 0)
 	{
-		imageFileBase.Printf("%s\\%s%d", imageFolder.c_str(), imageName.GetCStr(), index);
+		imageFileBase.Printf("%s\\%s%d", imageFolder.char_str(), imageName.GetCStr(), index);
 	}
 	else
 	{
-		imageFileBase.Printf("%s\\%s", imageFolder.c_str(), imageName.GetCStr());
+		imageFileBase.Printf("%s\\%s", imageFolder.char_str(), imageName.GetCStr());
 	}
 
 	wxString ext = ".png";

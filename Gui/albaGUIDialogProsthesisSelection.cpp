@@ -155,7 +155,7 @@ void albaGUIDialogProsthesisSelection::CreateDialog()
 			m_ProducerImageFullName = DBDir + m_CurrentProducer->GetImgFileName();
 		}
 
-		wxString imagesPath = albaGetConfigDirectory().c_str();
+		wxString imagesPath = albaGetConfigDirectory().char_str();
 		wxString imgPath = imagesPath + "/Wizard/Producer.bmp"; // Default
 
 		if (wxFileExists(m_ProducerImageFullName))
@@ -170,7 +170,7 @@ void albaGUIDialogProsthesisSelection::CreateDialog()
 		wxImage *previewImage = new wxImage(400,140);
 		if (wxFileExists(imgPath))
 		{
-			previewImage->LoadFile(imgPath.c_str(), wxBITMAP_TYPE_ANY);
+			previewImage->LoadFile(imgPath.char_str(), wxBITMAP_TYPE_ANY);
 		}
 	
 		wxBitmap *previewBitmap = new wxBitmap(*previewImage);

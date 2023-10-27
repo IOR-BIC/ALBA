@@ -553,7 +553,7 @@ void albaGUIImageViewer::SaveImageAs()
 		albaString fileNameFullPath = albaGetDocumentsDirectory();
 		fileNameFullPath.Append(fileName);
 		albaString wildc = "PNG (*.png)|*.png; |JPEG (*.jpg)|*.jpg; |Bitmap (*.bmp)|*.bmp";
-		wxString newFileName = albaGetSaveFile(fileNameFullPath.GetCStr(), wildc, "Save Image as").c_str();
+		wxString newFileName = albaGetSaveFile(fileNameFullPath.GetCStr(), wildc, "Save Image as").char_str();
 
 		if (m_ImagesGroup)
 		{

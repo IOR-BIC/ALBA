@@ -92,9 +92,9 @@ void albaGUIDictionaryWidget::LoadDictionary()
 //----------------------------------------------------------------------------
 {
   wxString wild_dict	= "Dictionary file (*.dic)|*.dic|All files (*.*)|*.*";
-  wxString m_dict		  = albaGetApplicationDirectory().c_str();
+  wxString m_dict		  = albaGetApplicationDirectory().char_str();
   m_dict = m_dict + "\\Config\\Dictionary\\";
-	wxString file       = albaGetOpenFile(m_dict,wild_dict,"Choose Dictionary File",m_List).c_str(); 
+	wxString file       = albaGetOpenFile(m_dict,wild_dict,"Choose Dictionary File",m_List).char_str();
 	if(file != "") LoadDictionary(file);
 }
 //----------------------------------------------------------------------------

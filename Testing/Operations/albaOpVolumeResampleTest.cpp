@@ -163,7 +163,7 @@ void albaOpVolumeResampleTest::WriteVTKDatasetToFile( vtkDataSet * outputVolumeV
 
   cout << fullPathOutputFilename;
 
-  writer->SetFileName(fullPathOutputFilename.c_str());
+  writer->SetFileName(fullPathOutputFilename.char_str());
   writer->SetFileTypeToASCII();
   writer->Write();
 

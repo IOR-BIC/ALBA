@@ -22,7 +22,7 @@ wxString exAppUtils::GetApplicationDirectory()
 {
 #ifndef _DEBUG
 	// RELEASE 
-	wxString applicationDirectory = albaGetApplicationDirectory().c_str();
+	wxString applicationDirectory = albaGetApplicationDirectory().char_str();
 	return applicationDirectory;
 
 #else
@@ -44,7 +44,7 @@ wxString exAppUtils::GetApplicationDirectory()
 wxString exAppUtils::GetConfigDirectory()
 {
 	//getting the Config directory
-	wxString config_dir = albaGetApplicationDirectory().c_str();
+	wxString config_dir = albaGetApplicationDirectory().char_str();
 
 #ifdef _DEBUG
 	config_dir = ALBA_SOURCE_DIR;

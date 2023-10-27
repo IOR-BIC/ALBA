@@ -237,7 +237,7 @@ void albaVMEManagerTest::ZIPOpenTest()
 
   m_Manager->MSFOpen(msfFile);
 
-  m_Manager->m_TmpDir = albaString(path.c_str());
+  m_Manager->m_TmpDir = albaString(path.char_str());
 
   // check added vme
   albaVMERoot *root = m_Manager->GetRoot();

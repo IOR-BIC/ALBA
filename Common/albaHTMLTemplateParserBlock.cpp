@@ -133,7 +133,7 @@ void albaHTMLTemplateParserBlock::AddImageVar(wxString name, albaView *view, wxS
 //----------------------------------------------------------------------------
 {
 	// Write Image
-	wxString logPath = albaGetAppDataDirectory().c_str();
+	wxString logPath = albaGetAppDataDirectory();
 	wxString imagePath = logPath + "\\imm.jpg";
 
 	view->CameraUpdate();
@@ -154,7 +154,7 @@ void albaHTMLTemplateParserBlock::AddImageVar(wxString name, wxString imagePath,
 {
 	wxImage *previewImage;
 	previewImage = new wxImage();
-	previewImage->LoadFile(imagePath.c_str(), wxBITMAP_TYPE_ANY);
+	previewImage->LoadFile(imagePath.char_str(), wxBITMAP_TYPE_ANY);
 
 	int width = previewImage->GetWidth();
 	int height = previewImage->GetHeight();
@@ -171,7 +171,7 @@ void albaHTMLTemplateParserBlock::AddImageVar(wxString name, vtkImageData *image
 //----------------------------------------------------------------------------
 {
 	// Write Image
-	wxString logPath = albaGetAppDataDirectory().c_str();
+	wxString logPath = albaGetAppDataDirectory().char_str();
 	wxString imagePath = logPath + "\\imm.jpg";
 
 	vtkJPEGWriter *imageJPEGWriter;
@@ -207,7 +207,7 @@ void albaHTMLTemplateParserBlock::PushImageVar(wxString name, wxString imagePath
 {
 	wxImage *previewImage;
 	previewImage = new wxImage();
-	previewImage->LoadFile(imagePath.c_str(), wxBITMAP_TYPE_ANY);
+	previewImage->LoadFile(imagePath.char_str(), wxBITMAP_TYPE_ANY);
 
 	int width = previewImage->GetWidth();
 	int height = previewImage->GetHeight();
@@ -222,7 +222,7 @@ void albaHTMLTemplateParserBlock::PushImageVar(wxString name, albaView *view, wx
 //----------------------------------------------------------------------------
 {
 	// Write Image
-	wxString logPath = albaGetAppDataDirectory().c_str();
+	wxString logPath = albaGetAppDataDirectory().char_str();
 	wxString imagePath = logPath + "\\imm.jpg";
 
 	view->CameraUpdate();
@@ -240,7 +240,7 @@ void albaHTMLTemplateParserBlock::PushImageVar(wxString name, vtkImageData *imag
 //----------------------------------------------------------------------------
 {
 	// Write Image
-	wxString logPath = albaGetAppDataDirectory().c_str();
+	wxString logPath = albaGetAppDataDirectory().char_str();
 	wxString imagePath = logPath + "\\imm.jpg";
 
 	vtkJPEGWriter *imageJPEGWriter;
@@ -799,7 +799,7 @@ int albaHTMLTemplateParserBlock::ConsistenceCheck()
     //m_LoopsNumber must be set for loop blocks
     if (m_LoopsNumber<0)
     {
-       albaLogMessage("albaHTMLTemplateParserBlock: loops number is not set for:%s",m_BlockName.c_str());
+       albaLogMessage("albaHTMLTemplateParserBlock: loops number is not set for:%s",m_BlockName.char_str());
        return false;
     }
     for (int i=0;i<m_VariablesArray.size();i++)
@@ -807,7 +807,7 @@ int albaHTMLTemplateParserBlock::ConsistenceCheck()
       //Each variable array must contain exactly m_LoopsNumber Elements
       if (m_VariablesArray[i].size()!=m_LoopsNumber)
       {
-        albaLogMessage("albaHTMLTemplateParserBlock: wrong variable number for:%s Block",m_BlockName.c_str());
+        albaLogMessage("albaHTMLTemplateParserBlock: wrong variable number for:%s Block",m_BlockName.char_str());
         return false;
       }
     }
@@ -816,7 +816,7 @@ int albaHTMLTemplateParserBlock::ConsistenceCheck()
       //Each Sub-Blocks array must contain exactly m_LoopsNumber Elements
       if (m_SubBlocksArray[i].size()!=m_LoopsNumber)
       {
-        albaLogMessage("albaHTMLTemplateParserBlock: wrong Sub-Blocks number for:%s Block",m_BlockName.c_str());
+        albaLogMessage("albaHTMLTemplateParserBlock: wrong Sub-Blocks number for:%s Block",m_BlockName.char_str());
         return false;
       }
     }
@@ -963,7 +963,7 @@ albaHTMLTemplateParserBlock * albaHTMLTemplateParserBlock::GetBlock( wxString na
     return GetNthBlock(name);
 
   //block not found
-  albaLogMessage("albaHTMLTemplateParserBlock: Block: '%s' not found!",name.c_str());
+  albaLogMessage("albaHTMLTemplateParserBlock: Block: '%s' not found!",name.char_str());
   return NULL;
 
 }
@@ -984,7 +984,7 @@ albaHTMLTemplateParserBlock * albaHTMLTemplateParserBlock::GetNthBlock( wxString
       {
         if (pos>elements)
         {
-           albaLogMessage("albaHTMLTemplateParserBlock: Block: '%s' wrong pos!",name.c_str());
+           albaLogMessage("albaHTMLTemplateParserBlock: Block: '%s' wrong pos!",name.char_str());
            return NULL;
         }
         return m_SubBlocksArray[i][pos];
@@ -997,7 +997,7 @@ albaHTMLTemplateParserBlock * albaHTMLTemplateParserBlock::GetNthBlock( wxString
   }
 
   //block not found
-  albaLogMessage("albaHTMLTemplateParserBlock: Block: '%s' not found!",name.c_str());
+  albaLogMessage("albaHTMLTemplateParserBlock: Block: '%s' not found!",name.char_str());
   return NULL;
 
 }
@@ -1059,7 +1059,7 @@ wxString albaHTMLTemplateParserBlock::GetVar( wxString name )
   //if pos < 0 the substitution was not found
   if (pos<0)
   {
-    albaLogMessage("albaHTMLTemplateParserBlock: Variable: '%s' not found!",name.c_str());
+    albaLogMessage("albaHTMLTemplateParserBlock: Variable: '%s' not found!",name.char_str());
     return "Error";
   }
 
@@ -1067,7 +1067,7 @@ wxString albaHTMLTemplateParserBlock::GetVar( wxString name )
   else if (m_SubstitutionTable[pos].Type!=alba_HTML_SUBSTITUTION_VARIABLE)
   {
     //block not found
-    albaLogMessage("albaHTMLTemplateParserBlock: Variable: '%s' wrong type!",name.c_str());
+    albaLogMessage("albaHTMLTemplateParserBlock: Variable: '%s' wrong type!",name.char_str());
     return "Error";
   }
   //Return the variable
@@ -1088,7 +1088,7 @@ wxString albaHTMLTemplateParserBlock::GetNthVar( wxString name, int arrayPos/*=-
   //if pos < 0 the substitution was not found
   if (pos<0)
   {
-    albaLogMessage("albaHTMLTemplateParserBlock: Variable Array: '%s' not found!",name.c_str());
+    albaLogMessage("albaHTMLTemplateParserBlock: Variable Array: '%s' not found!",name.char_str());
     return "Error";
   }
 
@@ -1096,7 +1096,7 @@ wxString albaHTMLTemplateParserBlock::GetNthVar( wxString name, int arrayPos/*=-
   else if (m_SubstitutionTable[pos].Type!=alba_HTML_SUBSTITUTION_VARIABLE_ARRAY)
   {
     //block not found
-    albaLogMessage("albaHTMLTemplateParserBlock: Variable Array: '%s' wrong type!",name.c_str());
+    albaLogMessage("albaHTMLTemplateParserBlock: Variable Array: '%s' wrong type!",name.char_str());
     return "Error";
   }
 
@@ -1109,7 +1109,7 @@ wxString albaHTMLTemplateParserBlock::GetNthVar( wxString name, int arrayPos/*=-
     if (arrayPos>arraySize-1)
     {
       //block not found
-      albaLogMessage("albaHTMLTemplateParserBlock: Variable Array: '%s', there are few element in the array",name.c_str());
+      albaLogMessage("albaHTMLTemplateParserBlock: Variable Array: '%s', there are few element in the array",name.char_str());
       return "Error";
     }
     

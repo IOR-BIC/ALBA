@@ -69,7 +69,7 @@ albaString::albaString(const double &num):m_CStr(NULL),m_ConstCStr(""),m_Size(0)
 albaString::albaString(const wxString& str):m_CStr(NULL),m_ConstCStr(""),m_Size(0)
 //----------------------------------------------------------------------------
 {
-  Copy(str.c_str());
+  Copy(str.char_str());
 }
 #endif
 
@@ -99,7 +99,7 @@ albaString &albaString::operator=(const double &num)
 albaString &albaString::operator=(const wxString &src)
 //----------------------------------------------------------------------------
 {
-  Copy(src.c_str());
+  Copy(src.char_str());
   return *this;
 }
 #endif
@@ -119,7 +119,7 @@ void albaString::operator>>(std::istream &is)
 {
   std::string tmp;
   is >> tmp;
-  *this=tmp.c_str();
+  *this=tmp.char_str();
 }
 */
 

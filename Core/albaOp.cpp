@@ -111,7 +111,7 @@ void albaOp::OpRun()
 //----------------------------------------------------------------------------
 void albaOp::OpDo()
 {
-	albaLogMessage("Op Do :%s", m_Label.c_str());
+	albaLogMessage("Op Do :%s", m_Label.char_str());
 
   if (m_Output)
   {
@@ -177,7 +177,8 @@ void albaOp::ShowGui()
   m_Guih->Put(m_Gui);
 	
   wxString menu_codes=wxStripMenuCodes(m_Label);
-  wxString title = wxString::Format(" %s parameters:",menu_codes.c_str());
+	wxString title=" ";
+	title	+= menu_codes +" parameters:";
   m_Guih->SetTitle(title);
   albaEventMacro(albaEvent(this,OP_SHOW_GUI,(wxWindow *)m_Guih));
 }
@@ -220,7 +221,7 @@ void albaOp::SetMouse(albaDeviceButtonsPadMouse *mouse)
 //----------------------------------------------------------------------------
 void albaOp::OpStop(int result)
 {
-	albaLogMessage("Stopping Op :%s", m_Label.c_str());
+	albaLogMessage("Stopping Op :%s\n", m_Label.char_str());
   HideGui();
   albaEventMacro(albaEvent(this,result));        
 }

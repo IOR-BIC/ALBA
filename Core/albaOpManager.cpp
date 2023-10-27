@@ -304,7 +304,7 @@ void albaOpManager::SetAccelerator(albaOp *op)
     else if(extra_flag == "Shift")
       flag_num |= wxACCEL_SHIFT;
 
-    m_OpAccelEntries[m_NumOfAccelerators++].Set(flag_num,  (int) *key_code.c_str(), op->m_Id);
+    m_OpAccelEntries[m_NumOfAccelerators++].Set(flag_num,  (int) key_code.char_str()[0], op->m_Id);
   }
 }
 //----------------------------------------------------------------------------
@@ -754,11 +754,11 @@ void albaOpManager::OpDo(albaOp *op)
  
   if (in_node != NULL)
   {
-    albaLogMessage("executing operation '%s' on input data: %s",op->m_Label.c_str(), in_node->GetName());
+    albaLogMessage("executing operation '%s' on input data: %s",op->m_Label.char_str(), in_node->GetName());
   }
   else
   {
-    albaLogMessage("executing operation '%s'",op->m_Label.c_str());
+    albaLogMessage("executing operation '%s'",op->m_Label.char_str());
   }
  
 	if (op->GetType() != OPTYPE_EDIT)
@@ -773,7 +773,7 @@ void albaOpManager::OpDo(albaOp *op)
 		if (op->GetType() != OPTYPE_EDIT)
 			FillTraceabilityAttribute(op, NULL, out_node);
 
-		albaLogMessage("operation '%s' generate %s as output", op->m_Label.c_str(), out_node->GetName());
+		albaLogMessage("operation '%s' generate %s as output", op->m_Label.char_str(), out_node->GetName());
 	}
 	
   if(op->CanUndo()) 
@@ -883,7 +883,7 @@ void albaOpManager::FillTraceabilityAttribute(albaOp *op, albaVME *in_node, alba
           int count = singleParameter.find_first_of('=');
           wxString par = singleParameter.Mid(0, count);
           singleParameter = singleParameter.AfterFirst('=');
-          count = singleParameter.Find(par.c_str());
+          count = singleParameter.Find(par.char_str());
           par.Append("=");
           par.Append(singleParameter.substr(0, count-2));
           singleParameter = singleParameter.Mid(count);
@@ -909,7 +909,7 @@ void albaOpManager::OpUndo()
   albaVME *out_node = op->GetOutput();
   if (in_node != NULL)
   {
-    albaLogMessage("undo = %s on input data: %s",op->m_Label.c_str(), in_node->GetName());
+    albaLogMessage("undo = %s on input data: %s",op->m_Label.char_str(), in_node->GetName());
     albaAttributeTraceability *traceability = (albaAttributeTraceability *)in_node->GetAttribute("TrialAttribute");
     if (traceability != NULL)
     {
@@ -921,7 +921,7 @@ void albaOpManager::OpUndo()
   }
   else
   {
-    albaLogMessage("undo = %s",op->m_Label.c_str());
+    albaLogMessage("undo = %s",op->m_Label.char_str());
   }
 
   if (out_node != NULL)
@@ -962,11 +962,11 @@ void albaOpManager::OpRedo()
   albaString parameters = op->GetParameters();
   if (in_node != NULL)
   {
-    albaLogMessage("redo = %s on input data: %s",op->m_Label.c_str(), in_node->GetName());
+    albaLogMessage("redo = %s on input data: %s",op->m_Label.char_str(), in_node->GetName());
   }
   else
   {
-    albaLogMessage("redo = %s",op->m_Label.c_str());
+    albaLogMessage("redo = %s",op->m_Label.char_str());
   }
 	op->OpDo();
   

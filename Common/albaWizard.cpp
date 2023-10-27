@@ -255,12 +255,12 @@ void albaWizard::BlockExecutionEnd()
   }
   else
   {
-    m_CurrentBlock=GetBlockByName(nextBlock.c_str());
+    m_CurrentBlock=GetBlockByName(nextBlock.char_str());
 
     //if the next block is undefined we abort the wizard execution
     if (m_CurrentBlock==NULL)
     {
-      albaLogMessage("Wizard Error: undefined block :'%s'",nextBlock.c_str());
+      albaLogMessage("Wizard Error: undefined block :'%s'",nextBlock.char_str());
       AbortWizard();
     }
     //else we start the execution of the next block to continue wizard flow

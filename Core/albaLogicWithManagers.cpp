@@ -452,7 +452,7 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 	m_AboutDialog->SetTitle(m_AppTitle);
 	m_AboutDialog->SetBuildNum(m_BuildNum.GetCStr());
 	m_AboutDialog->SetVersion("0.1");
-	wxString imagePath = albaGetApplicationDirectory().c_str();
+	wxString imagePath = albaGetApplicationDirectory().char_str();
 	imagePath += "\\Config\\AlbaMasterAbout.bmp";
 	m_AboutDialog->SetImagePath(imagePath);
 
@@ -561,7 +561,7 @@ void albaLogicWithManagers::Show()
 	FillMenus();
 	CreateToolBarsAndPanels();
 
-	m_AppTitle = m_Win->GetTitle().c_str();
+	m_AppTitle = m_Win->GetTitle().char_str();
 
 	RestoreLayout();
 
@@ -582,7 +582,7 @@ void albaLogicWithManagers::PlugProsthesisDBManager(albaString passPhrase /*= ""
 
 	m_ProsthesisDBManager->LoadDB();
 
-	wxString imagesPath = albaGetConfigDirectory().c_str();
+	wxString imagesPath = albaGetConfigDirectory().char_str();
 }
 
 // Plug
@@ -1393,8 +1393,8 @@ void albaLogicWithManagers::OnFileOpen(const char *file_to_open)
 			}
 			else
 			{
-				wxString lastFolder = albaGetLastUserFolder().c_str();
-				file = albaGetOpenFile(lastFolder, wildc).c_str();
+				wxString lastFolder = albaGetLastUserFolder().char_str();
+				file = albaGetOpenFile(lastFolder, wildc).char_str();
 			}
 			
 			if (file.IsEmpty() && m_WizardManager && m_WizardRunning)
@@ -2650,22 +2650,22 @@ void albaLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage, wxString mes
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::ShowWebSite(wxString url)
 {
-	albaLogMessage("Opening %s", url.c_str());
+	albaLogMessage("Opening %s", url.char_str());
 
 	//WXwidget does not manage urls that contains anchor
 	//in this case we need to create a temp file which redirect to the correct url 
 	//and open this file
 	if (url.Contains("#"))
 	{
-		wxString tmpHtmlFileName = albaGetAppDataDirectory().c_str();
+		wxString tmpHtmlFileName = albaGetAppDataDirectory().char_str();
 		tmpHtmlFileName += "/loadPage.html";
 
-		FILE *tmpHtmlFile = fopen(tmpHtmlFileName.c_str(), "w");
+		FILE *tmpHtmlFile = fopen(tmpHtmlFileName.char_str(), "w");
 
 		fprintf(tmpHtmlFile, "<html>\n");
 		fprintf(tmpHtmlFile, "<head>\n");
 		fprintf(tmpHtmlFile, "	<meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\" />\n");
-		fprintf(tmpHtmlFile, "	<meta http-equiv=\"refresh\" content=\"1;url=%s\" />\n", url.c_str());
+		fprintf(tmpHtmlFile, "	<meta http-equiv=\"refresh\" content=\"1;url=%s\" />\n", url.char_str());
 		fprintf(tmpHtmlFile, "<title></title>\n");
 		fprintf(tmpHtmlFile, "</head>\n");
 		fprintf(tmpHtmlFile, "<body/>\n");
@@ -2755,7 +2755,7 @@ void albaLogicWithManagers::StoreLayout()
 		root->Initialize();
 		xmlStorage->SetDocument(root);
 
-		wxString layout_file = albaGetAppDataDirectory().c_str();
+		wxString layout_file = albaGetAppDataDirectory().char_str();
 		layout_file << "\\layout.mly";
 
 		wxFrame *frame = (wxFrame *)albaGetFrame();
@@ -2798,7 +2798,7 @@ void albaLogicWithManagers::RestoreLayout()
 	root->Initialize();
 	xmlStorage->SetDocument(root);
 
-	wxString layout_file  = albaGetAppDataDirectory().c_str();
+	wxString layout_file  = albaGetAppDataDirectory().char_str();
 	layout_file << "\\layout.mly";
 	xmlStorage->SetURL(layout_file);
 	if(wxFileExists(layout_file) && xmlStorage->Restore()==ALBA_OK)

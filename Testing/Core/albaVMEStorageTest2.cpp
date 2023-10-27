@@ -375,7 +375,7 @@ void albaVMEStorageTest2::TestStoreRestoreTagArray()
   std::string tagValue;
   ta->GetTag("pippo")->GetValueAsSingleString(tagValue);
 
-  CPPUNIT_ASSERT(strcmp(tagValue.c_str(),"(\"pluto\")") == 0);
+  CPPUNIT_ASSERT(strcmp(tagValue.char_str(),"(\"pluto\")") == 0);
   
   // current time for test
   m_CurrentTime = 0.0;
@@ -423,7 +423,7 @@ void albaVMEStorageTest2::TestStoreRestoreTagArray()
   std::string reloadTagValue;
   reloadTA->GetTag("pippo")->GetValueAsSingleString(reloadTagValue);
   
-  CPPUNIT_ASSERT(strcmp(reloadTagValue.c_str(),"(\"pluto\")") == 0);
+  CPPUNIT_ASSERT(strcmp(reloadTagValue.char_str(),"(\"pluto\")") == 0);
 
   // cleanup created directories   
   bool removeSuccessful = true;

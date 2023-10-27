@@ -84,32 +84,32 @@ void albaLUTLibraryTest::TestSetGetDir()
 
 		std::string dirPrefix = GET_TEST_DATA_DIR() + "\\";
 
-		CPPUNIT_ASSERT(wxDirExists(dirPrefix.c_str()));
+		CPPUNIT_ASSERT(wxDirExists(dirPrefix.char_str()));
 
 		std::string fileName = dirPrefix;
 		fileName += "albaLUTStorageTestLog.txt";
 
 		std::ofstream output;
 
-		output.open(fileName.c_str());
+		output.open(fileName.char_str());
 		output << stringStream.str();
 		output.close();
 
-		CPPUNIT_ASSERT(wxFileExists(fileName.c_str()));
+		CPPUNIT_ASSERT(wxFileExists(fileName.char_str()));
 	}
 
   // store lookup table to file
   std::string dirPrefix = ALBA_DATA_ROOT;
   dirPrefix  +=  "/Test_LUTStorage/";
 
-  CPPUNIT_ASSERT(wxDirExists(dirPrefix.c_str()));
+  CPPUNIT_ASSERT(wxDirExists(dirPrefix.char_str()));
 
   std::string libDir = dirPrefix;
   libDir += "/LUTLib/";
 
-  CPPUNIT_ASSERT(wxDirExists(libDir.c_str()));
+  CPPUNIT_ASSERT(wxDirExists(libDir.char_str()));
   
-  lutLib->SetDir(libDir.c_str());
+  lutLib->SetDir(libDir.char_str());
   lutLib->Add(m_LutDefault, "lutDefault");
   lutLib->Add(m_LutEField, "lutEField");
   lutLib->Add(m_LutGlow, "lutGlow");
@@ -129,11 +129,11 @@ void albaLUTLibraryTest::TestAdd()
 
 	std::string oldDir = dirPrefix  + "LUTLib/";
   
-  lutLib->SetDir(oldDir.c_str());
+  lutLib->SetDir(oldDir.char_str());
   lutLib->Load();
 
   string newDir = dirPrefix  + "TestAddLutToLibraryDir/";
-  lutLib->SetDir(newDir.c_str());
+  lutLib->SetDir(newDir.char_str());
   lutLib->Save();
 
   vtkALBASmartPointer<vtkLookupTable> anotherLUT;
@@ -153,7 +153,7 @@ void albaLUTLibraryTest::TestRemove()
 
   string oldDir = dirPrefix  + "LUTLib/";
 
-  lutLib->SetDir(oldDir.c_str());
+  lutLib->SetDir(oldDir.char_str());
 
   lutLib->Load();
 
@@ -171,7 +171,7 @@ void albaLUTLibraryTest::TestLoadSave()
 
   string oldDir = dirPrefix  + "LUTLib/";
 
-  lutLib->SetDir(oldDir.c_str());
+  lutLib->SetDir(oldDir.char_str());
 
   lutLib->Load();
 
@@ -182,7 +182,7 @@ void albaLUTLibraryTest::TestLoadSave()
 
   string newDir = newDirPrefix  + "TestSave/";
   
-  lutLib->SetDir(newDir.c_str());
+  lutLib->SetDir(newDir.char_str());
   lutLib->Save();
 
   cppDEL(lutLib);
@@ -197,7 +197,7 @@ void albaLUTLibraryTest::TestGetNumberOfLuts()
 
   string oldDir = dirPrefix  + "LUTLib/";
 
-  lutLib->SetDir(oldDir.c_str());
+  lutLib->SetDir(oldDir.char_str());
   lutLib->Load();
   int num = lutLib->GetNumberOfLuts();
   CPPUNIT_ASSERT(num == 3);
@@ -214,7 +214,7 @@ void albaLUTLibraryTest::TestGetLutNames()
 
   string oldDir = dirPrefix  + "LUTLib/";
 
-  lutLib->SetDir(oldDir.c_str());
+  lutLib->SetDir(oldDir.char_str());
   lutLib->Load();
 
   vector<string> lutNames;
@@ -239,7 +239,7 @@ void albaLUTLibraryTest::TestGetLutByName()
 
   string oldDir = dirPrefix  + "LUTLib/";
 
-  lutLib->SetDir(oldDir.c_str());
+  lutLib->SetDir(oldDir.char_str());
   lutLib->Load();
 
   vtkLookupTable *lut = lutLib->GetLutByName("lutDefault");
@@ -261,7 +261,7 @@ void albaLUTLibraryTest::TestHasLut()
 
   string oldDir = dirPrefix  + "LUTLib/";
 
-  lutLib->SetDir(oldDir.c_str());
+  lutLib->SetDir(oldDir.char_str());
   lutLib->Load();
 
   bool ret = lutLib->HasLut("lutDefault");

@@ -37,7 +37,7 @@ albaGUISettings(Listener, label)
 
 	//creating user app directory if does not exist
   if(!wxDirExists(albaGetAppDataDirectory()))
-    wxMkdir(albaGetAppDataDirectory().c_str());
+    wxMkdir(albaGetAppDataDirectory().char_str());
 
   //creating Logs directory if does not exist
   if(!wxDirExists(m_LogFolder.GetCStr()))

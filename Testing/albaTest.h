@@ -45,8 +45,8 @@ public:
 
 DECLARE_APP(TestApp)
 
-#define COMPARE_IMAGES(imageName, ...) CompareImage(getTestNamer__().getFixtureName().c_str(), imageName, ##__VA_ARGS__)
-#define GET_TEST_DATA_DIR() GetTestDataDir(getTestNamer__().getFixtureName().c_str())
+#define COMPARE_IMAGES(imageName, ...) CompareImage(getTestNamer__().getFixtureName().char_str(), imageName, ##__VA_ARGS__)
+#define GET_TEST_DATA_DIR() GetTestDataDir(getTestNamer__().getFixtureName().char_str())
 
 class albaTest : public CPPUNIT_NS::TestFixture
 {

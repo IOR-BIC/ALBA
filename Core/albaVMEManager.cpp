@@ -171,7 +171,7 @@ void albaVMEManager::RemoveTempDirectory()
   if (m_TmpDir != "")
   {
     wxString working_dir;
-    working_dir = albaGetAppDataDirectory().c_str();
+    working_dir = albaGetAppDataDirectory().char_str();
     wxSetWorkingDirectory(working_dir);
     if(::wxDirExists(m_TmpDir.GetCStr())) //remove tmp directory due to zip extraction or compression
     {
@@ -626,7 +626,7 @@ int albaVMEManager::MSFSave()
     // ask for the new file name.
     wxString wildc = _("Project file (*."+ m_MsfFileExtension +")|*."
 		              + m_MsfFileExtension +"|Compressed file (*.z"+ m_MsfFileExtension +")|*.z" + m_MsfFileExtension + "");
-    albaString file = albaGetSaveFile(m_MSFDir, wildc.c_str());
+    albaString file = albaGetSaveFile(m_MSFDir, wildc.char_str());
     if(file.IsEmpty())
       return ALBA_ERROR;
    

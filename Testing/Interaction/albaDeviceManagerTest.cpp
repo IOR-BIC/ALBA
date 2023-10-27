@@ -90,7 +90,7 @@ void albaDeviceManagerTest::TestGetDevice()
   albaDevice *dummyDevice = albaDevice::New();
 
   std::string dummyDeviceName = "dummyDevice" ;
-  dummyDevice->SetName(dummyDeviceName.c_str());
+  dummyDevice->SetName(dummyDeviceName.char_str());
 
   deviceManager->AddDevice(dummyDevice);
   
@@ -98,7 +98,7 @@ void albaDeviceManagerTest::TestGetDevice()
   
   CPPUNIT_ASSERT(numberOfDevices == 1);
 
-  albaDevice *returnedDevice = deviceManager->GetDevice(dummyDeviceName.c_str());
+  albaDevice *returnedDevice = deviceManager->GetDevice(dummyDeviceName.char_str());
   CPPUNIT_ASSERT(returnedDevice == dummyDevice);
 
   deviceManager->Delete();

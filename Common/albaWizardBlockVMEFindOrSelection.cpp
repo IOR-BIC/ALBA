@@ -62,7 +62,7 @@ void albaWizardBlockVMEFindOrSelection::ExcutionBegin()
   globalVMEAccept=m_AcceptedVME;
 
   if (m_SelectedVME)
-	  m_SelectedVME=m_SelectedVME->GetByPath(m_VmeParentSelect.c_str());
+	  m_SelectedVME=m_SelectedVME->GetByPath(m_VmeParentSelect.char_str());
 
   if (m_SelectedVME)
   {

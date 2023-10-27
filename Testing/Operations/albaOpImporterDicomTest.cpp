@@ -90,7 +90,7 @@ void albaOpImporterDicomTest::TestCreateVolume()
 	
 	    wxString dicomPath = dirName + dicomDir;
 	    importer->CreateSliceVTKPipeline();
-	    importer->OpenDir(dicomPath.c_str());
+	    importer->OpenDir(dicomPath.char_str());
 	    importer->ImportDicomTags();
 			importer->CalculateCropExtent();
 	    importer->BuildVMEVolumeGrayOutput();
@@ -160,7 +160,7 @@ void albaOpImporterDicomTest::TestCompareDicomImage()
 	    importer->TestModeOn();
 	    
 	    importer->CreateSliceVTKPipeline();
-	    importer->OpenDir(dicomPath.c_str());
+	    importer->OpenDir(dicomPath.char_str());
 	    importer->GenerateSliceTexture(0);
 	
 	    wxSplitPath(txtFilePath, &path, &short_name, &ext);
@@ -176,7 +176,7 @@ void albaOpImporterDicomTest::TestCompareDicomImage()
 	
 	      while (tkz.HasMoreTokens())
 	      {
-	        pixelValue = atof(tkz.GetNextToken().c_str());
+	        pixelValue = atof(tkz.GetNextToken().char_str());
 	        pixelVector.push_back(pixelValue);
 	      }
 	      line = text.ReadLine();

@@ -57,7 +57,7 @@ void vtkALBAVolumeResampleTest::TestResampleInternal( const char *inFileName , c
 
   vtkRectilinearGridReader *reader = vtkRectilinearGridReader::New();
 
-  reader->SetFileName(absPathFilename.c_str());
+  reader->SetFileName(absPathFilename.char_str());
   reader->Update();
 
   double inputDataSpacing[3];
@@ -164,7 +164,7 @@ void vtkALBAVolumeResampleTest::WriteVTKDatasetToFile( vtkDataSet * outputVolume
   fullPathOutputFilename.append(outputFilename);
   cout << fullPathOutputFilename;
 
-  writer->SetFileName(fullPathOutputFilename.c_str());
+  writer->SetFileName(fullPathOutputFilename.char_str());
   writer->SetFileTypeToASCII();
   writer->Write();
 }

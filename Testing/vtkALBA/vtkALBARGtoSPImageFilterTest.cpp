@@ -44,7 +44,7 @@ void vtkALBARGtoSPImageFilterTest::FilterTest()
 
 	vtkRectilinearGridReader *reader = vtkRectilinearGridReader::New();
 
-	reader->SetFileName(absPathFilename.c_str());
+	reader->SetFileName(absPathFilename.char_str());
 	reader->Update();
 
 	vtkDataSet *input = reader->GetOutput();

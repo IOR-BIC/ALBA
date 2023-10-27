@@ -77,8 +77,8 @@ void appLogic::Init(int argc, char **argv)
 	albaLogicWithManagers::Init(argc, argv);
 	m_Win->ShowDockPane("logbar", false);
 
-	if (!wxDirExists(albaGetAppDataDirectory().c_str()))
-		wxMkDir(albaGetAppDataDirectory().c_str());
+	if (!wxDirExists(albaGetAppDataDirectory().char_str()))
+		wxMkDir(albaGetAppDataDirectory().char_str());
 
 	InitAboutDialog();
 
@@ -101,7 +101,7 @@ void appLogic::InitAboutDialog()
 
 	// About Image
 	wxString imageName = "AlbaViewerAbout";
-	wxString imagesPath = appUtils::GetConfigDirectory().c_str();
+	wxString imagesPath = appUtils::GetConfigDirectory().char_str();
 	m_AboutDialog->SetImagePath(imagesPath + "/" + imageName + ".bmp");
 }
 
@@ -274,8 +274,8 @@ void appLogic::OnFileOpen(const char *file_to_open)
 		}
 		else
 		{
-			wxString lastFolder = albaGetLastUserFolder().c_str();
-			file = albaGetOpenFile(lastFolder, wildc).c_str();
+			wxString lastFolder = albaGetLastUserFolder().char_str();
+			file = albaGetOpenFile(lastFolder, wildc).char_str();
 		}
 
 		if (file.IsEmpty())

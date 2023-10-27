@@ -79,7 +79,8 @@ wxString albaGetOpenFile(const char *initial, const char * wild, const char * ti
 	else
 		wxFileName::SplitPath(initial,&path,&name,&ext);
 
-  if(name != "" && ext != "") name = wxString::Format("%s.%s",name.c_str(),ext.c_str());
+	if (name != "" && ext != "") 
+		name = name + "." + ext;
 
   wxString wildcard=wild;
   wildcard+="|All Files (*.*)|*.*";
@@ -127,7 +128,7 @@ wxString albaGetSaveFile(const char * initial, const char * wild, const char * t
 	wxFileName::SplitPath(initial,&path,&name,&ext);
 	if (name != "" && ext != "")
 	{
-		name = wxString::Format("%s.%s", name.c_str(), ext.c_str());
+		name = name + "." + ext;
 		defaultname = name;
 	}
   
@@ -187,7 +188,7 @@ wxString albaGetAppDataDirectory()
 	wxStandardPaths &std = wxStandardPaths::Get();
 	wxString appData_dir = std.GetUserDataDir();
 
-  return appData_dir.c_str();
+  return appData_dir.char_str();
 }
 //----------------------------------------------------------------------------
 wxString albaGetDocumentsDirectory()
@@ -209,9 +210,9 @@ wxString albaGetLastUserFolder()
 
   // Return last User Folder if exists, else Documents folder
   if(!config->Read("LastUserFolder", &lastUserFolder))
-    lastUserFolder = albaGetDocumentsDirectory().c_str();
+    lastUserFolder = albaGetDocumentsDirectory().char_str();
 
-  return lastUserFolder.c_str();
+  return lastUserFolder.char_str();
 }
 
 
@@ -225,7 +226,7 @@ ALBA_EXPORT void albaSetAppDebugDir(wxString ddir)
 ALBA_EXPORT wxString albaGetConfigDirectory()
 {
 	//getting the Config directory
-	wxString config_dir = albaGetApplicationDirectory().c_str();
+	wxString config_dir = albaGetApplicationDirectory().char_str();
 
 	//if the debug directory is set we need to add "Installer" to the PATH
 	if(!GLO_appDebugDir.empty())
@@ -598,7 +599,7 @@ wxString  albaIdString(int id)
       s << id;
      break;
     }
-    return s.c_str(); 
+    return s.char_str();
 }
 //----------------------------------------------------------------------------
 int* GetALBAExpertMode()

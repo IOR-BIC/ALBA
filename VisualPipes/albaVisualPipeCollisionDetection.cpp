@@ -314,9 +314,9 @@ void albaVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
       poly->DeepCopy(vtkPolyData::SafeDownCast(m_SurfacesToCollide[i]->GetOutput()->GetVTKData()));
       poly->Update();
       vtkDataArray *array1 = m_CollisionFilter->GetOutput(1)->GetFieldData()->GetArray("ContactCells");
-      vtkDataArray *arrayToExclude1 = poly->GetCellData()->GetArray(m_ScalarNameToExclude.c_str());
+      vtkDataArray *arrayToExclude1 = poly->GetCellData()->GetArray(m_ScalarNameToExclude.char_str());
       vtkDataArray *array0 = m_CollisionFilter->GetOutput(0)->GetFieldData()->GetArray("ContactCells");
-      vtkDataArray *arrayToExclude0 = m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetArray(m_ScalarNameToExclude.c_str());
+      vtkDataArray *arrayToExclude0 = m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetArray(m_ScalarNameToExclude.char_str());
       if (array0 != NULL)
       {
         for (int i=0;i<array0->GetNumberOfTuples();i++)
@@ -369,7 +369,7 @@ void albaVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
         }        
 
 //         vtkDataArray *array1 = m_CollisionFilter->GetOutput(1)->GetFieldData()->GetArray("ContactCells");
-//         vtkDataArray *arrayToExclude1 = poly->GetCellData()->GetArray(m_ScalarNameToExclude.c_str());
+//         vtkDataArray *arrayToExclude1 = poly->GetCellData()->GetArray(m_ScalarNameToExclude.char_str());
         if (array1 != NULL)
         {
           for (int j=0;j<array1->GetNumberOfTuples();j++)
