@@ -13,11 +13,12 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "albaDefines.h"
 
+#include <cppunit/config/SourcePrefix.h>
 
 #include "VMEPoseTest.h"
 #include "albaVMERoot.h"
-#include <cppunit/config/SourcePrefix.h>
 #include "albaVMEOutputVTK.h"
 #include "albaMatrixPipe.h"
 #include "albaTransform.h"

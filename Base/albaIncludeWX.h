@@ -23,9 +23,9 @@
 #ifdef ALBA_USE_WX
   
 //#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
+//#ifndef WX_PRECOMP
 #include "wx/wx.h"
-#endif
+//#endif
 #endif
 
 #endif

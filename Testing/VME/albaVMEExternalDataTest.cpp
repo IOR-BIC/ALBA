@@ -155,7 +155,7 @@ void albaVMEExternalDataTest::TestGetAbsoluteFileName()
   albaString slash = "\\"; /** ??? */
   std::string inABSFileName = slash.Append(inLocalFileNameWithoutExtension.Append(".bmp"));
 
-  int result = outputABSFileNameWithExtension.Equals(inABSFileName.char_str());
+  int result = outputABSFileNameWithExtension.Equals(inABSFileName.c_str());
   CPPUNIT_ASSERT(result == TRUE);
 }
 

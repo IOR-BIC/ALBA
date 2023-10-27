@@ -3,7 +3,7 @@ PROJECT (albaDataPipesTests)
 IF(ALBA_BUILD_ALBADLL)
   SET(PROJECT_LIBS albaDLL vtkALBA albaTests) 
 ELSE(ALBA_BUILD_ALBADLL)
-  SET(PROJECT_LIBS albaTests albaCore vtkALBA albaService)
+  SET(PROJECT_LIBS albaTests albaCore vtkALBA albaService albaViews albaVisualPipes)
 ENDIF(ALBA_BUILD_ALBADLL)
 
 

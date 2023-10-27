@@ -13,10 +13,10 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
-#include "albaProgressBarHelperTest.h"
+#include "albaDefines.h"
 
 #include <cppunit/config/SourcePrefix.h>
+#include "albaProgressBarHelperTest.h"
 #include "albaProgressBarHelper.h"
 
 //----------------------------------------------------------------------------

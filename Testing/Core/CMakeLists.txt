@@ -3,7 +3,7 @@ PROJECT (albaCoreTests)
 IF(ALBA_BUILD_ALBADLL)
   SET(PROJECT_LIBS albaDLL vtkALBA albaTests)
 ELSE(ALBA_BUILD_ALBADLL)
-  SET(PROJECT_LIBS albaTests albaCore albaVME albaService)
+  SET(PROJECT_LIBS albaTests albaCore albaVME albaViews albaVisualPipes albaService) 
 ENDIF(ALBA_BUILD_ALBADLL)
 
 # Set your list of sources here.

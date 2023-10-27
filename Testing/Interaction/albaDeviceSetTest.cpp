@@ -43,7 +43,7 @@ void albaDeviceSetTest::TestGetDeviceByIndex()
   std::string dummyDeviceName = "Dummy Device";
 
   albaDevice *dummyDevice = albaDevice::New();
-  dummyDevice->SetName(dummyDeviceName.char_str());
+  dummyDevice->SetName(dummyDeviceName.c_str());
   dummyDevice->SetID(dummyDeviceID);
 
   // index 0 since it's the first device added
@@ -71,7 +71,7 @@ void albaDeviceSetTest::TestGetDeviceByName()
   std::string dummyDeviceName = "Dummy Device";
 
   albaDevice *dummyDevice = albaDevice::New();
-  dummyDevice->SetName(dummyDeviceName.char_str());
+  dummyDevice->SetName(dummyDeviceName.c_str());
   dummyDevice->SetID(dummyDeviceID);
 
   deviceSet->AddDevice(dummyDevice);
@@ -80,10 +80,10 @@ void albaDeviceSetTest::TestGetDeviceByName()
   albaDevice *getDevice = NULL;
   
   std::string nonExistentName = "IDoNotExist";
-  getDevice = deviceSet->GetDevice(nonExistentName.char_str());
+  getDevice = deviceSet->GetDevice(nonExistentName.c_str());
   CPPUNIT_ASSERT_EQUAL(getDevice, nullDevice);
 
-  getDevice = deviceSet->GetDevice(dummyDeviceName.char_str());
+  getDevice = deviceSet->GetDevice(dummyDeviceName.c_str());
   
   std::string getDeviceName = getDevice->GetName();
 
@@ -115,7 +115,7 @@ void albaDeviceSetTest::TestGetNumberOfDevices()
   std::string dummyDeviceName = "Dummy Device";
 
   albaDevice *dummyDevice = albaDevice::New();
-  dummyDevice->SetName(dummyDeviceName.char_str());
+  dummyDevice->SetName(dummyDeviceName.c_str());
   dummyDevice->SetID(dummyDeviceID);
 
   deviceSet->AddDevice(dummyDevice);
@@ -141,7 +141,7 @@ void albaDeviceSetTest::TestGetDeviceByID()
   std::string dummyDeviceName = "Dummy Device";
 
   albaDevice *dummyDevice = albaDevice::New();
-  dummyDevice->SetName(dummyDeviceName.char_str());
+  dummyDevice->SetName(dummyDeviceName.c_str());
   dummyDevice->SetID(dummyDeviceID);
 
   deviceSet->AddDevice(dummyDevice);
@@ -172,7 +172,7 @@ void albaDeviceSetTest::TestRemoveDeviceByIndex()
   std::string dummyDeviceName = "Dummy Device";
 
   albaDevice *dummyDevice = albaDevice::New();
-  dummyDevice->SetName(dummyDeviceName.char_str());
+  dummyDevice->SetName(dummyDeviceName.c_str());
   dummyDevice->SetID(dummyDeviceID);
 
   deviceSet->AddDevice(dummyDevice);
@@ -210,7 +210,7 @@ void albaDeviceSetTest::TestRemoveDeviceByID()
   std::string dummyDeviceName = "Dummy Device";
 
   albaDevice *dummyDevice = albaDevice::New();
-  dummyDevice->SetName(dummyDeviceName.char_str());
+  dummyDevice->SetName(dummyDeviceName.c_str());
   dummyDevice->SetID(dummyDeviceID);
 
   deviceSet->AddDevice(dummyDevice);
@@ -242,7 +242,7 @@ void albaDeviceSetTest::TestRemoveDeviceByName()
   std::string dummyDeviceName = "Dummy Device";
 
   albaDevice *dummyDevice = albaDevice::New();
-  dummyDevice->SetName(dummyDeviceName.char_str());
+  dummyDevice->SetName(dummyDeviceName.c_str());
   dummyDevice->SetID(dummyDeviceID);
 
   deviceSet->AddDevice(dummyDevice);
@@ -250,7 +250,7 @@ void albaDeviceSetTest::TestRemoveDeviceByName()
   numberOfDevices = deviceSet->GetNumberOfDevices();
   CPPUNIT_ASSERT_EQUAL(numberOfDevices, 1);
 
-  int returnValue = deviceSet->RemoveDevice(dummyDeviceName.char_str());
+  int returnValue = deviceSet->RemoveDevice(dummyDeviceName.c_str());
   CPPUNIT_ASSERT_EQUAL(returnValue, (int)ALBA_OK);
 
   numberOfDevices = deviceSet->GetNumberOfDevices();
@@ -275,7 +275,7 @@ void albaDeviceSetTest::TestRemoveDeviceByPointer()
   std::string dummyDeviceName = "Dummy Device";
 
   albaDevice *dummyDevice = albaDevice::New();
-  dummyDevice->SetName(dummyDeviceName.char_str());
+  dummyDevice->SetName(dummyDeviceName.c_str());
   dummyDevice->SetID(dummyDeviceID);
 
   deviceSet->AddDevice(dummyDevice);
@@ -307,7 +307,7 @@ void albaDeviceSetTest::TestRemoveAllDevices()
   std::string deviceOneName = "Device One";
 
   albaDevice *deviceOne = albaDevice::New();
-  deviceOne->SetName(deviceOneName.char_str());
+  deviceOne->SetName(deviceOneName.c_str());
   deviceOne->SetID(deviceOneID);
 
   deviceSet->AddDevice(deviceOne);
@@ -319,7 +319,7 @@ void albaDeviceSetTest::TestRemoveAllDevices()
   std::string deviceTwoName = "Device Two";
 
   albaDevice *deviceTwo = albaDevice::New();
-  deviceTwo->SetName(deviceTwoName.char_str());
+  deviceTwo->SetName(deviceTwoName.c_str());
   deviceTwo->SetID(deviceTwoID);
 
   deviceSet->AddDevice(deviceTwo);
@@ -351,7 +351,7 @@ void albaDeviceSetTest::TestGetDevices()
   std::string deviceOneName = "Device One";
 
   albaDevice *deviceOne = albaDevice::New();
-  deviceOne->SetName(deviceOneName.char_str());
+  deviceOne->SetName(deviceOneName.c_str());
   deviceOne->SetID(deviceOneID);
 
   deviceSet->AddDevice(deviceOne);
@@ -363,7 +363,7 @@ void albaDeviceSetTest::TestGetDevices()
   std::string deviceTwoName = "Device Two";
 
   albaDevice *deviceTwo = albaDevice::New();
-  deviceTwo->SetName(deviceTwoName.char_str());
+  deviceTwo->SetName(deviceTwoName.c_str());
   deviceTwo->SetID(deviceTwoID);
 
   deviceSet->AddDevice(deviceTwo);

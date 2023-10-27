@@ -33,7 +33,7 @@ SET(PROJECT_SRCS
 )
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS albaVME albaInteraction albaCore Libraries::wx::net Libraries::wx::core Libraries::wx::base)
+SET(PROJECT_LIBS albaVME albaInteraction albaCore Libraries::wx::net Libraries::wx::core Libraries::wx::base Libraries::wx::html)
 
 SET(PROJECT_LIBS ${PROJECT_LIBS} vtkALBA)
 

@@ -92,7 +92,7 @@ int	main( int argc, char* argv[] )
 	// Create log of VTK error messages
 	vtkALBASmartPointer<vtkFileOutputWindow> log;
 	vtkFileOutputWindow::SetInstance(log);
-	albaString logPath = wxGetWorkingDirectory();
+	albaString logPath = wxGetCwd();
 	logPath << "\\VTKTest.log";
 	log->SetFileName(logPath);
 

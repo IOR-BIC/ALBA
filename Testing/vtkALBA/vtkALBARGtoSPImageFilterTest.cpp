@@ -12,6 +12,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "albaDefines.h"
 
 #include "vtkALBARGtoSPImageFilterTest.h"
 #include "vtkALBARGtoSPImageFilter.h"
@@ -44,7 +45,7 @@ void vtkALBARGtoSPImageFilterTest::FilterTest()
 
 	vtkRectilinearGridReader *reader = vtkRectilinearGridReader::New();
 
-	reader->SetFileName(absPathFilename.char_str());
+	reader->SetFileName(absPathFilename.c_str());
 	reader->Update();
 
 	vtkDataSet *input = reader->GetOutput();

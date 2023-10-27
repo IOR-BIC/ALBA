@@ -193,11 +193,11 @@ void albaRelationalDatabaseAbstractConnectorTest::TestSetGetRelationalDatabaseIn
 
     const albaRelationalDatabaseInformation compareInfo = rdc.GetRelationalDatabaseInformation();
 
-    CPPUNIT_ASSERT( albaString(info.m_Url.char_str()).Equals(compareInfo.m_Url.char_str()) &&
-                    albaString(info.m_Username.char_str()).Equals(compareInfo.m_Username.char_str()) &&
-                    albaString(info.m_Password.char_str()).Equals(compareInfo.m_Password.char_str()) &&
-                    albaString(info.m_Certificate.char_str()).Equals(compareInfo.m_Certificate.char_str()) &&
-                    albaString(info.m_ConfName.char_str()).Equals(compareInfo.m_ConfName.char_str()));
+    CPPUNIT_ASSERT( albaString(info.m_Url.c_str()).Equals(compareInfo.m_Url.c_str()) &&
+                    albaString(info.m_Username.c_str()).Equals(compareInfo.m_Username.c_str()) &&
+                    albaString(info.m_Password.c_str()).Equals(compareInfo.m_Password.c_str()) &&
+                    albaString(info.m_Certificate.c_str()).Equals(compareInfo.m_Certificate.c_str()) &&
+                    albaString(info.m_ConfName.c_str()).Equals(compareInfo.m_ConfName.c_str()));
 }
 
 //----------------------------------------------------------------------------

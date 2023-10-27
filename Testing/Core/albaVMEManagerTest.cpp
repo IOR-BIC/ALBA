@@ -231,13 +231,13 @@ void albaVMEManagerTest::ZIPOpenTest()
 
   wxString path,name,ext;
 
-  wxSplitPath(msfFile.GetCStr(),&path,&name,&ext);
+	wxFileName::SplitPath(msfFile.GetCStr(),&path,&name,&ext);
   
   m_Manager->m_TmpDir = ""; // workaround
 
   m_Manager->MSFOpen(msfFile);
 
-  m_Manager->m_TmpDir = albaString(path.char_str());
+  m_Manager->m_TmpDir = albaString(path);
 
   // check added vme
   albaVMERoot *root = m_Manager->GetRoot();

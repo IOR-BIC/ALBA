@@ -42,6 +42,7 @@
 #include "vtkDirectory.h"
 
 #include <wx/dir.h>
+#include "wx/filename.h"
 
 
 
@@ -163,7 +164,7 @@ void albaOpImporterDicomTest::TestCompareDicomImage()
 	    importer->OpenDir(dicomPath.char_str());
 	    importer->GenerateSliceTexture(0);
 	
-	    wxSplitPath(txtFilePath, &path, &short_name, &ext);
+	    wxFileName::SplitPath(txtFilePath, &path, &short_name, &ext);
 	    vtkImageData  *imageImported = importer->GetSliceInCurrentSeries(0);
 	   
 	    wxFileInputStream inputFile( txtFilePath );

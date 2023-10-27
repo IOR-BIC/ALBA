@@ -98,10 +98,10 @@ void vtkALBATextActorMeterTest::TestTextPos1()
   text += " ";
   text += ConvertDouble(position[2]);
 
-  SetText(actor, text.char_str(), position);
+  SetText(actor, text.c_str(), position);
 
   //test GetText
-  CPPUNIT_ASSERT(strcmp(actor->GetText(),text.char_str())==0);
+  CPPUNIT_ASSERT(strcmp(actor->GetText(),text.c_str())==0);
 
   RenderData(actor, "TestTextPos1");
   actor->Delete();
@@ -122,10 +122,10 @@ void vtkALBATextActorMeterTest::TestTextPos2()
   text += " ";
   text += ConvertDouble(position[2]);
 
-  SetText(actor, text.char_str(), position);
+  SetText(actor, text.c_str(), position);
 
   //test GetText
-  CPPUNIT_ASSERT(strcmp(actor->GetText(),text.char_str())==0);
+  CPPUNIT_ASSERT(strcmp(actor->GetText(),text.c_str())==0);
 
   RenderData(actor, "TestTextPos2");
   actor->Delete();
@@ -146,7 +146,7 @@ void vtkALBATextActorMeterTest::TestTextColor()
   text += " ";
   text += ConvertDouble(position[2]);
 
-  SetText(actor, text.char_str(), position);
+  SetText(actor, text.c_str(), position);
   actor->SetColor(1.0, 0.0, 0.0);
 
   RenderData(actor, "TestTextColor");
