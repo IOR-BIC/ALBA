@@ -442,7 +442,7 @@ void albaViewRXCT::OnEventBalanceSlices()
 	step = (lastCenter[2] - firstCenter[2]) / (double)(CT_CHILD_VIEWS_NUMBER-1);
 
 	//First and last slices does not need a position update
-	for (int currChildCTView = 1; currChildCTView < CT_CHILD_VIEWS_NUMBER-1; currChildCTView++)
+	for (int currChildCTView = 0; currChildCTView < CT_CHILD_VIEWS_NUMBER; currChildCTView++)
 	{
 		if (m_GizmoSlice[currChildCTView])
 		{
