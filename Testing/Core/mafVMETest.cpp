@@ -739,8 +739,8 @@ void mafVMETest::TestIsValid()
 
 	// Destroy the node and so it will become invalid.
 	root->RemoveChild(na);
-	na->Delete();
 	result = !na->IsValid();
+	na->Delete();
 	TEST_RESULT;
 }
 //----------------------------------------------------------------------------

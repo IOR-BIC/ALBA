@@ -352,8 +352,8 @@ int mafVME::SetParent(mafVME *parent)
 			InvokeEvent(this, NODE_DETACHED_FROM_TREE);
 
 			m_Parent = parent;
-			Modified();
 
+			SetId(-1);
 		}
 		return MAF_OK;
 	}
@@ -1032,6 +1032,7 @@ void mafVME::SetVisualMode(int mode)
 void mafVME::SetId(mafID id)
 //------------------------------------------------------------------------------
 {
+	
 	m_Id = id;
 	Modified();
 }

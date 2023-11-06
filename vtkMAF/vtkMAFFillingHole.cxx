@@ -280,6 +280,7 @@ vtkMAFFillingHole::vtkMAFFillingHole()
   SmoothThinPlateSteps = 500; //large number of steps
   LastPatch = vtkPolyData::New();
 
+	NumOfPatchVertex = NumOfPatchTriangle = NumOfPatchEdge = NumOfVertex = NumOfTriangle = NumOfEdge = 0;
 }
 
 //----------------------------------------------------------------------------

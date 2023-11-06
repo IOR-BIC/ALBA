@@ -167,7 +167,10 @@ int	main( int argc, char* argv[] )
 
 	// Print test in a compiler compatible format.
 	CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
-	outputter.write(); 
+	outputter.write();
+
+	int x = 0;
+	scanf("%d",&x);
 	
 	cppDEL(logic);
 

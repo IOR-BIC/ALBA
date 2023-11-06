@@ -228,6 +228,10 @@ int
 	// Print test in a compiler compatible format.
 	CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
 	outputter.write(); 
+
+	int x;
+
+	scanf("%d", &x);
  	return result.wasSuccessful() ? 0 : 1;
 }
 

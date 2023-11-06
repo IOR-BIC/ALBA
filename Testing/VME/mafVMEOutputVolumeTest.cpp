@@ -233,12 +233,14 @@ void mafVMEOutputVolumeTest::TestSetGetVolumeMaterial()
   mafVMEOutputVolume *outputVolume = vmeVolume->GetVolumeOutput();
   mmaVolumeMaterial *material;
 
-  m_Result = vmeVolume->GetMaterial() == outputVolume->GetMaterial();
+	mmaVolumeMaterial * volumeMaterial = vmeVolume->GetMaterial();
+	mmaVolumeMaterial * otuputMaterial = outputVolume->GetMaterial();
+  m_Result =volumeMaterial == otuputMaterial;
   TEST_RESULT;
-  material = outputVolume->GetMaterial();
+  material = otuputMaterial;
 
 
-  m_Result = outputVolume->GetMaterial() == material && vmeVolume->GetMaterial() == material;
+  m_Result = otuputMaterial == material && volumeMaterial == material;
   TEST_RESULT;
   
 
