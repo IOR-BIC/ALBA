@@ -67,6 +67,8 @@ public:
 	/** Test specific stuff executed after each test */
 	virtual void AfterTest() {};
 
+	static void PauseBeforeExit();
+
 protected:
 	void CompareImage(albaString suiteName, albaString imageName, int index = -1);
 	

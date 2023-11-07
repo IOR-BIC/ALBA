@@ -99,6 +99,14 @@ void albaTest::tearDown()
 }
 
 //----------------------------------------------------------------------------
+void albaTest::PauseBeforeExit()
+{
+	int x;
+	scanf("%d", &x);
+	return;
+}
+
+//----------------------------------------------------------------------------
 void albaTest::CompareImage(albaString suiteName, albaString imageName, int index)
 {
 	if (!m_RenderWindow) 
