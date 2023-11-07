@@ -744,7 +744,7 @@ int albaVMEMesh::SaveConfigurationFile(BonematConfiguration configuration, const
 
 	XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Terminate();
 
-	albaLogMessage(wxString::Format("New configuration file has been written %s", fileName.GetCStr()));
+	albaLogMessage(albaString::Format("New configuration file has been written %s", fileName.GetCStr()));
 
 	return ALBA_OK;
 }

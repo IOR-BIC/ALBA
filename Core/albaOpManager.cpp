@@ -808,7 +808,7 @@ void albaOpManager::FillTraceabilityAttribute(albaOp *op, albaVME *in_node, alba
   parameters = op->GetParameters();
 
   wxDateTime time = wxDateTime::UNow();
-  dateAndTime  = wxString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth()+1, time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());
+  dateAndTime  = albaString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth()+1, time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());
 
   if (m_User != NULL && m_User->IsAuthenticated())
       userID = m_User->GetName();

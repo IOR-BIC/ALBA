@@ -25,6 +25,9 @@
 #include <wx/string.h>
 #include <string>
 
+#define STRING_BUFFER_DIMENSION 4096
+
+static char glo_AlbaStringBuffer[STRING_BUFFER_DIMENSION];
 
 //----------------------------------------------------------------------------
 albaString::~albaString()
@@ -830,6 +833,13 @@ void albaString::Printf(const char *format, ...)
   SetSize(2048); // Preallocate space. Sorry, maximum output string size is 2048...
   ALBA_PRINT_MACRO(format,m_CStr,2048);
   SetCStr(Duplicate(),true); // release extra memory
+}
+
+//----------------------------------------------------------------------------
+wxString albaString::Format(const char *format, ...)
+{
+	ALBA_PRINT_MACRO(format,glo_AlbaStringBuffer,ALBA_STRING_BUFFER_SIZE);
+	return wxString(glo_AlbaStringBuffer);
 }
 
 //----------------------------------------------------------------------------

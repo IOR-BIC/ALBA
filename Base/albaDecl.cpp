@@ -302,7 +302,7 @@ void albaFormatDataSize( long long size, albaString& szOut )
     idx++;
   }
 
-  szOut = wxString::Format("%g %s", RoundValue(nsize), SZUN[idx]);
+  szOut = albaString::Format("%g %s", RoundValue(nsize), SZUN[idx]);
 }
 //----------------------------------------------------------------------------
 wxBitmap albaWhiteFade(wxBitmap bmp,double level)

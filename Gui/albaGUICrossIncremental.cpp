@@ -182,12 +182,12 @@ void albaGUICrossIncremental::CreateWidgetTextEntry(double min , double max )
 	//w_id = ((albaGUI *) parent)->GetWidgetId(w_id);
   if(m_Digits != 0)
   {
-    m_StepText = new wxTextCtrl  (this, ID_STEP_ENTRY/*w_id*/, wxString::Format("%.1f", *m_StepVariable)   , dp, wxSize(EW,BH)/*, m_EntryStyle  */);
+    m_StepText = new wxTextCtrl  (this, ID_STEP_ENTRY/*w_id*/, albaString::Format("%.1f", *m_StepVariable)   , dp, wxSize(EW,BH)/*, m_EntryStyle  */);
     m_StepText->SetValidator( albaGUIValidator(this,ID_STEP_ENTRY/*w_id*/,m_StepText,m_StepVariable,min,max,m_Digits)  );
   }
   else
   {
-    m_StepText = new wxTextCtrl  (this, ID_STEP_ENTRY/*w_id*/, wxString::Format("%.0f", *m_StepVariable)   , dp, wxSize(EW,BH)/*, m_EntryStyle  */);
+    m_StepText = new wxTextCtrl  (this, ID_STEP_ENTRY/*w_id*/, albaString::Format("%.0f", *m_StepVariable)   , dp, wxSize(EW,BH)/*, m_EntryStyle  */);
     m_StepText->SetValidator( albaGUIValidator(this,ID_STEP_ENTRY/*w_id*/,m_StepText,m_StepVariable,min,max,m_Digits)  );
   }
 	
@@ -524,11 +524,11 @@ void albaGUICrossIncremental::SetStepVariable(double step)
     *m_StepVariable = step;
     if(m_Digits != 0)
     {
-      m_StepText->SetValue(wxString::Format("%.1f", *m_StepVariable));
+      m_StepText->SetValue(albaString::Format("%.1f", *m_StepVariable));
     }
     else
     {
-      m_StepText->SetValue(wxString::Format("%.0f", *m_StepVariable));
+      m_StepText->SetValue(albaString::Format("%.0f", *m_StepVariable));
     }
     
   }

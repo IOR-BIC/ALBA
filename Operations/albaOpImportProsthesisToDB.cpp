@@ -94,7 +94,7 @@ void albaOpImportProsthesisToDB::OpRun()
 		nProducer = m_ProsthesesDBManager->GetProducers().size() - nProducer;
 		nType = m_ProsthesesDBManager->GetTypes().size() - nType;
 
-		wxString message = wxString::Format("Added %d Prostheses, %d Producers, %d Types\nUpdated %d Prostheses", nProsthesis, nProducer, nType, m_UpdatedProthesesNum);
+		wxString message = albaString::Format("Added %d Prostheses, %d Producers, %d Types\nUpdated %d Prostheses", nProsthesis, nProducer, nType, m_UpdatedProthesesNum);
 		albaMessage(message);
 	}
 

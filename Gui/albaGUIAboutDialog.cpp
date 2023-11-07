@@ -284,7 +284,7 @@ wxString albaGUIAboutDialog::GetBuildDate()
 		if (!strcmp(temp, months[i]))
 		{
 			month = i + 1;
-			wxString date = wxString::Format(" %d/%d/%d ", day, month, year);
+			wxString date = albaString::Format(" %d/%d/%d ", day, month, year);
 			return date;
 		}
 	}

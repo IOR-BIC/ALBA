@@ -13,7 +13,9 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "albaDefines.h"
 
+#include "albaString.h"
 #include <wx/wx.h>
 #include <wx/minifram.h>
 #include <wx/image.h>
@@ -1464,22 +1466,22 @@ wxString wxFrameManager::SavePerspective()
         result += EscapeDelimiters(pane.m_Caption);
         result += wxT(";");
         
-        result += wxString::Format(wxT("state=%u;"), pane.m_State);
-        result += wxString::Format(wxT("dir=%d;"), pane.m_DockDirection);
-        result += wxString::Format(wxT("layer=%d;"), pane.m_DockLayer);
-        result += wxString::Format(wxT("row=%d;"), pane.m_DockRow);
-        result += wxString::Format(wxT("pos=%d;"), pane.m_DockPos);
-        result += wxString::Format(wxT("prop=%d;"), pane.m_DockProportion);
-        result += wxString::Format(wxT("bestw=%d;"), pane.m_BestSize.x);
-        result += wxString::Format(wxT("besth=%d;"), pane.m_BestSize.y);
-        result += wxString::Format(wxT("minw=%d;"), pane.m_MinSize.x);
-        result += wxString::Format(wxT("minh=%d;"), pane.m_MinSize.y);
-        result += wxString::Format(wxT("maxw=%d;"), pane.m_MaxSize.x);
-        result += wxString::Format(wxT("maxh=%d;"), pane.m_MaxSize.y);
-        result += wxString::Format(wxT("floatx=%d;"), pane.m_FloatingPos.x);
-        result += wxString::Format(wxT("floaty=%d;"), pane.m_FloatingPos.y);
-        result += wxString::Format(wxT("floatw=%d;"), pane.m_FloatingSize.x);
-        result += wxString::Format(wxT("floath=%d"), pane.m_FloatingSize.y);
+        result += albaString::Format(wxT("state=%u;"), pane.m_State);
+        result += albaString::Format(wxT("dir=%d;"), pane.m_DockDirection);
+        result += albaString::Format(wxT("layer=%d;"), pane.m_DockLayer);
+        result += albaString::Format(wxT("row=%d;"), pane.m_DockRow);
+        result += albaString::Format(wxT("pos=%d;"), pane.m_DockPos);
+        result += albaString::Format(wxT("prop=%d;"), pane.m_DockProportion);
+        result += albaString::Format(wxT("bestw=%d;"), pane.m_BestSize.x);
+        result += albaString::Format(wxT("besth=%d;"), pane.m_BestSize.y);
+        result += albaString::Format(wxT("minw=%d;"), pane.m_MinSize.x);
+        result += albaString::Format(wxT("minh=%d;"), pane.m_MinSize.y);
+        result += albaString::Format(wxT("maxw=%d;"), pane.m_MaxSize.x);
+        result += albaString::Format(wxT("maxh=%d;"), pane.m_MaxSize.y);
+        result += albaString::Format(wxT("floatx=%d;"), pane.m_FloatingPos.x);
+        result += albaString::Format(wxT("floaty=%d;"), pane.m_FloatingPos.y);
+        result += albaString::Format(wxT("floatw=%d;"), pane.m_FloatingSize.x);
+        result += albaString::Format(wxT("floath=%d"), pane.m_FloatingSize.y);
         result += wxT("|");
     }
     
@@ -1488,7 +1490,7 @@ wxString wxFrameManager::SavePerspective()
     {
         wxDockInfo& dock = m_Docks.Item(dock_i);
         
-        result += wxString::Format(wxT("dock_size(%d,%d,%d)=%d|"),
+        result += albaString::Format(wxT("dock_size(%d,%d,%d)=%d|"),
                                    dock.m_DockDirection, dock.m_DockLayer,
                                    dock.m_DockRow, dock.m_Size);
     }

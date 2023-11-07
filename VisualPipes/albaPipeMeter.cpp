@@ -171,7 +171,7 @@ void albaPipeMeter::Create(albaSceneNode *n/*, bool use_axes*/)
   m_Caption->SetWidth(0.35);
   m_Caption->BorderOff();
   wxString dis;
-  dis = wxString::Format("%.2f",m_MeterVME->GetDistance());
+  dis = albaString::Format("%.2f",m_MeterVME->GetDistance());
   m_Caption->SetCaption(dis.char_str());
 
   if(m_MeterVME->GetMeterMode() == albaVMEMeter::LINE_ANGLE)
@@ -385,7 +385,7 @@ void albaPipeMeter::UpdateProperty(bool fromTag)
   if(m_MeterVME->GetMeterMode() == albaVMEMeter::LINE_ANGLE) distance_value = m_MeterVME->GetAngle();
   distance_value = RoundValue(distance_value);
   wxString dis;
-  dis = wxString::Format("%.2f",distance_value);
+  dis = albaString::Format("%.2f",distance_value);
   m_Caption->SetCaption(dis.char_str());
   m_Caption->SetVisibility(m_MeterVME->GetMeterAttributes()->m_LabelVisibility);
 

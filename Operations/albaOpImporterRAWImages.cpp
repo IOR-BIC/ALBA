@@ -286,8 +286,8 @@ void albaOpImporterRAWImages::CreateGui()
     m_Gui->Label(_("DimX:"), &m_DimXCrop);
     m_Gui->Label(_("DimY:"), &m_DimYCrop);
 
-    m_DimXCrop = wxString::Format("%d", 0);
-    m_DimYCrop = wxString::Format("%d", 0);
+    m_DimXCrop = albaString::Format("%d", 0);
+    m_DimYCrop = albaString::Format("%d", 0);
 
 		//////////////////////////////////////////////////////////////////////////
 		m_Gui->Label("");
@@ -535,7 +535,7 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
     case ID_SLICE:
       {
         m_SliceSlider->SetValue(m_CurrentSlice);
-        m_SliceText->SetLabel(wxString::Format("%d",m_CurrentSlice));
+        m_SliceText->SetLabel(albaString::Format("%d",m_CurrentSlice));
         //throw down
       }
     case ID_LOOKUPTABLE:
@@ -662,8 +662,8 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
           m_Dialog->GetRWI()->CameraUpdate();
 
 
-          m_DimXCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
-          m_DimYCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
+          m_DimXCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
+          m_DimYCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
           m_Gui->Update();
         }
       }
@@ -724,8 +724,8 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
           }
         }
         m_Dialog->GetRWI()->CameraUpdate();
-        m_DimXCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
-        m_DimYCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
+        m_DimXCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
+        m_DimYCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
         m_Gui->Update();
       }
       break;
@@ -744,8 +744,8 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
         m_ROI_2D[2] = b[2];
         m_ROI_2D[3] = b[3];
       }
-      m_DimXCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
-      m_DimYCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
+      m_DimXCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
+      m_DimYCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
       m_Gui->Update();
       break;
     case wxOK:
@@ -1106,7 +1106,7 @@ void albaOpImporterRAWImages::OnStringPrefix()
     m_SliceSlider->SetRange(0,m_NumberSlices - 1);
     m_CurrentSlice = m_NumberSlices/2;	
     m_SliceSlider->SetValue(m_CurrentSlice);
-    m_SliceText->SetLabel(wxString::Format("%d",m_CurrentSlice));
+    m_SliceText->SetLabel(albaString::Format("%d",m_CurrentSlice));
     m_Actor->VisibilityOn();
     m_Dialog->GetRWI()->CameraReset();    	 
     m_Gui->Update();
@@ -1172,7 +1172,7 @@ bool albaOpImporterRAWImages::ControlFilenameList()
     fileName = fileName.BeforeLast('.');
 
     wxString search;
-    search = wxString::Format("%ld",number);
+    search = albaString::Format("%ld",number);
 
     wxString final;
     for(int i=0; i< n; i++)

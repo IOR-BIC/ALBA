@@ -573,7 +573,7 @@ albaGUI* albaPipeGraph::CreateGui()
     }
     else
     {
-      name = m_ItemName + wxString::Format("%d", n);
+      name = m_ItemName + albaString::Format("%d", n);
       tag_Signals->SetValue(name, n);
     }
      m_CheckBox->AddItem(n , name, checked);

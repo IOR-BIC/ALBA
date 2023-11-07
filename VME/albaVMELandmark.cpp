@@ -370,9 +370,9 @@ albaGUI* albaVMELandmark::CreateGui()
 	double xyz[3],rxyz[3];
   this->GetOutput()->GetAbsPose(xyz,rxyz);
   m_Gui->Label("Abs pose:", true);
-  m_Position[0] = wxString::Format("%f",xyz[0]);
-  m_Position[1] = wxString::Format("%f",xyz[1]);
-  m_Position[2] = wxString::Format("%f",xyz[2]);
+  m_Position[0] = albaString::Format("%f",xyz[0]);
+  m_Position[1] = albaString::Format("%f",xyz[1]);
+  m_Position[2] = albaString::Format("%f",xyz[2]);
 
   m_Gui->Label("x:", &m_Position[0]);
   m_Gui->Label("y:", &m_Position[1]);
@@ -421,9 +421,9 @@ void albaVMELandmark::SetTimeStamp(albaTimeStamp t)
   this->GetOutput()->Update();
   double xyz[3],rxyz[3];
   this->GetOutput()->GetAbsPose(xyz,rxyz);  
-  m_Position[0] = wxString::Format("x: %f",xyz[0]);
-  m_Position[1] = wxString::Format("y: %f",xyz[1]);
-  m_Position[2] = wxString::Format("z: %f",xyz[2]);
+  m_Position[0] = albaString::Format("x: %f",xyz[0]);
+  m_Position[1] = albaString::Format("y: %f",xyz[1]);
+  m_Position[2] = albaString::Format("z: %f",xyz[2]);
   if(m_Gui)
     m_Gui->Update();
 }
@@ -434,9 +434,9 @@ void albaVMELandmark::InternalUpdate()
   double xyz[3],rxyz[3];
   this->GetOutput()->GetAbsPose(xyz,rxyz);
 
-  m_Position[0] = wxString::Format("x: %f",xyz[0]);
-  m_Position[1] = wxString::Format("y: %f",xyz[1]);
-  m_Position[2] = wxString::Format("z: %f",xyz[2]);
+  m_Position[0] = albaString::Format("x: %f",xyz[0]);
+  m_Position[1] = albaString::Format("y: %f",xyz[1]);
+  m_Position[2] = albaString::Format("z: %f",xyz[2]);
 
   if(m_Gui)
     m_Gui->Update();

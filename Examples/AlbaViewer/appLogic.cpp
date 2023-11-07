@@ -262,11 +262,11 @@ void appLogic::OnFileOpen(const char *file_to_open)
 
 		albaString wildc;
 		const	char *ext = m_Extension;
-		wildc = wxString::Format("All Supported File (*.%s;*.z%s;msf;zmsf)|*.%s;*.%s;*.msf;*.zmsf", ext, ext, ext, ext);
-		wildc += wxString::Format("|Alba Project File (*.%s)|*.%s", ext, ext);
-		wildc += wxString::Format("|Alba Compressed File (*.z%s)|*.z%s", ext, ext);
-		wildc += wxString::Format("|MAF Project File (*.msf)|*.msf");
-		wildc += wxString::Format("|MAF Compressed File (*.zmsf)|*.zmsf", ext, ext);
+		wildc = albaString::Format("All Supported File (*.%s;*.z%s;msf;zmsf)|*.%s;*.%s;*.msf;*.zmsf", ext, ext, ext, ext);
+		wildc += albaString::Format("|Alba Project File (*.%s)|*.%s", ext, ext);
+		wildc += albaString::Format("|Alba Compressed File (*.z%s)|*.z%s", ext, ext);
+		wildc += albaString::Format("|MAF Project File (*.msf)|*.msf");
+		wildc += albaString::Format("|MAF Compressed File (*.zmsf)|*.zmsf", ext, ext);
 
 		if (file_to_open != NULL)
 		{

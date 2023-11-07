@@ -773,7 +773,7 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
       vtkRenderer *ren = rc->GetNextItem();
       if(ren)
       {
-        //wxMessageBox(wxString::Format("%d", ren->GetActiveCamera()->GetParallelProjection()));
+        //wxMessageBox(albaString::Format("%d", ren->GetActiveCamera()->GetParallelProjection()));
         double wp0x[4], wp1x[4];
         ren->SetDisplayPoint(0,0,0); //x
         ren->DisplayToWorld();
@@ -786,7 +786,7 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
         double pixelSpacingX = sqrt(vtkMath::Distance2BetweenPoints(wp1x,wp0x))/10;
         double meter = 1000; //millimeters
         pixelXMeterX = meter/pixelSpacingX;
-        //wxMessageBox(wxString::Format("pixelXMeter = %f", meter/pixelSpacingX));
+        //wxMessageBox(albaString::Format("pixelXMeter = %f", meter/pixelSpacingX));
 
         double wp0y[4], wp1y[4];
         ren->SetDisplayPoint(0,0,0); //y
@@ -909,7 +909,7 @@ void albaRWIBase::SaveImageRecursive(albaString filename, albaViewCompound *v,in
   {
     //wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
     wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg|Image (*.png)|*.png|Image (*.ps)|*.ps|Image (*.tiff)|*.tiff";
-    wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
+    wxString file = albaString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
   
 		//albaString file ;
     if(!wxDirExists(path))
@@ -971,7 +971,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
       wxString temp, pathName, fileName, extension;
       temp.Append(filename);
       wxFileName::SplitPath(temp,&pathName,&fileName,&extension);
-      fileName.Append(wxString::Format("_%d", i));
+      fileName.Append(albaString::Format("_%d", i));
       temp.Clear();
       temp.Append(pathName);
       temp.Append("\\");
@@ -993,7 +993,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
           vtkRenderer *ren = rc->GetNextItem();
           if(ren)
           {
-            //wxMessageBox(wxString::Format("%d", ren->GetActiveCamera()->GetParallelProjection()));
+            //wxMessageBox(albaString::Format("%d", ren->GetActiveCamera()->GetParallelProjection()));
             double wp0x[4], wp1x[4];
             ren->SetDisplayPoint(0,0,0); //x
             ren->DisplayToWorld();
@@ -1006,7 +1006,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
             double pixelSpacingX = sqrt(vtkMath::Distance2BetweenPoints(wp1x,wp0x))/10;
             double meter = 1000; //millimeters
             pixelXMeterX = meter/pixelSpacingX;
-            //wxMessageBox(wxString::Format("pixelXMeter = %f", meter/pixelSpacingX));
+            //wxMessageBox(albaString::Format("pixelXMeter = %f", meter/pixelSpacingX));
 
             double wp0y[4], wp1y[4];
             ren->SetDisplayPoint(0,0,0); //y
@@ -1267,7 +1267,7 @@ void albaRWIBase::GenerateStereoFrames()
   albaString filename;
   filename = m_StereoMovieDir;
   filename += "\\movie_";
-  filename += wxString::Format("%05d",m_StereoMovieFrameCounter);
+  filename += albaString::Format("%05d",m_StereoMovieFrameCounter);
   filename += ".png";
   m_StereoMoviewFrameWriter->SetFileName(filename.GetCStr());
   m_StereoMoviewFrameWriter->Write();

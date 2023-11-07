@@ -247,8 +247,8 @@ void albaGUILutSlider::MoveButton(int id, int pos)
 
       if(false == m_FixedText)
       {
-	    m_MinButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue));
-		  m_MaxButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));
+	    m_MinButton->SetLabel(albaString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue));
+		  m_MaxButton->SetLabel(albaString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));
       }
 		
 			m_MinLabel->SetSize(0,0,x1,BUTT_H);
@@ -334,8 +334,8 @@ void albaGUILutSlider::SetSubRange(double  low, double  hi )
 
   if(false == m_FixedText)
   {
-    m_MinButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue));	
-    m_MaxButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));	
+    m_MinButton->SetLabel(albaString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue));	
+    m_MaxButton->SetLabel(albaString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));	
   }
   
   UpdateButtons();
@@ -382,8 +382,8 @@ void albaGUILutSlider::ShowEntry(int id)
 		case 1: //min
 		{
       if(true == m_FixedText) return;
-			msg = wxString::Format(m_FloatingPointText?"Enter a value in [%.1f .. %.1f]":"Enter a value in [%.0f .. %.0f]",m_MinValue, m_HighValue);
-			s = wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue);
+			msg = albaString::Format(m_FloatingPointText?"Enter a value in [%.1f .. %.1f]":"Enter a value in [%.0f .. %.0f]",m_MinValue, m_HighValue);
+			s = albaString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue);
 			s = wxGetTextFromUser(msg, "Lookup table Minimum",s,this);
       if( s.ToLong(&val) ) 
 			{
@@ -398,8 +398,8 @@ void albaGUILutSlider::ShowEntry(int id)
 		case 2: //max
 		{
       if(true == m_FixedText) return;
-      msg = wxString::Format(m_FloatingPointText?"Enter a value in [%.1f .. %.1f]":"Enter a value in [%.0f .. %.0f]",m_LowValue, m_MaxValue);
-			s = wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue);
+      msg = albaString::Format(m_FloatingPointText?"Enter a value in [%.1f .. %.1f]":"Enter a value in [%.0f .. %.0f]",m_LowValue, m_MaxValue);
+			s = albaString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue);
 			s = wxGetTextFromUser(msg, "Lookup table Maximum",s,this);
       if( s.ToLong(&val) ) 
 			{

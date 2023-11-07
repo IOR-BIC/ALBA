@@ -210,7 +210,7 @@ void albaOpExporterBmp::SaveBmp()
   scalarSliceIn->SetNumberOfTuples(size);
 
   wxString prefix;
-			prefix = wxString::Format("%s%s_%dx%d",path,name,xdim,ydim);
+			prefix = albaString::Format("%s%s_%dx%d",path,name,xdim,ydim);
 
 
   if (m_Bit8 == 0)
@@ -272,7 +272,7 @@ void albaOpExporterBmp::SaveBmp()
 
       int fileNumber = z + m_Offset;
 
-      fileName = wxString::Format("%s_%04d.bmp",prefix, fileNumber);
+      fileName = albaString::Format("%s_%04d.bmp",prefix, fileNumber);
 
       
       WriteImageDataAsMonocromeBitmap(imageSlice, fileName);

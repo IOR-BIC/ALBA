@@ -187,7 +187,7 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
 							  {	
                   double surplusDistance = distance;
   								
-                  //albaLogMessage(wxString::Format("IN-VERSUS%.2f", acc));
+                  //albaLogMessage(albaString::Format("IN-VERSUS%.2f", acc));
                   distance = m_MinimumHandleSize - currentDistance;
 
                   surplusDistance -= distance;
@@ -213,8 +213,8 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
                 }
                 /*else //only for log
                 {
-                  albaLogMessage(wxString::Format("distance%.2f", distance));
-                  albaLogMessage(wxString::Format("acc%.2f", m_Accumulator));
+                  albaLogMessage(albaString::Format("distance%.2f", distance));
+                  albaLogMessage(albaString::Format("acc%.2f", m_Accumulator));
                 }*/
 
   							
@@ -230,7 +230,7 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
                 {	
                   double surplusDistance = distance;
 
-                  //albaLogMessage(wxString::Format("IN-VERSUS%.2f", acc));
+                  //albaLogMessage(albaString::Format("IN-VERSUS%.2f", acc));
                   distance = m_MinimumHandleSize - currentDistance;
 
                   surplusDistance -= distance;
@@ -256,8 +256,8 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
                 }
                 /*else //only for log
                 {
-                albaLogMessage(wxString::Format("distance%.2f", distance));
-                albaLogMessage(wxString::Format("acc%.2f", m_Accumulator));
+                albaLogMessage(albaString::Format("distance%.2f", distance));
+                albaLogMessage(albaString::Format("acc%.2f", m_Accumulator));
                 }*/
 						  }
 						  else if(m_ActiveGizmoComponent == 4 || m_ActiveGizmoComponent == 5)
@@ -271,7 +271,7 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
                 {	
                   double surplusDistance = distance;
 
-                  //albaLogMessage(wxString::Format("IN-VERSUS%.2f", acc));
+                  //albaLogMessage(albaString::Format("IN-VERSUS%.2f", acc));
                   distance = m_MinimumHandleSize - currentDistance;
 
                   surplusDistance -= distance;
@@ -297,8 +297,8 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
                 }
                 /*else //only for log
                 {
-                albaLogMessage(wxString::Format("distance%.2f", distance));
-                albaLogMessage(wxString::Format("acc%.2f", m_Accumulator));
+                albaLogMessage(albaString::Format("distance%.2f", distance));
+                albaLogMessage(albaString::Format("acc%.2f", m_Accumulator));
                 }*/
 						  }
 

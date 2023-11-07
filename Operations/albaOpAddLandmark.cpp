@@ -565,7 +565,7 @@ void albaOpAddLandmark::RestoreLandmarkVect(std::vector<albaVMELandmark*> &landm
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::AddLandmark(double pos[3])
  {
-	wxString landmarkName = wxString::Format("New_Landmark_%d", m_LandmarkNameVect.size() + 1);
+	wxString landmarkName = albaString::Format("New_Landmark_%d", m_LandmarkNameVect.size() + 1);
 
 	if (m_Gui && !GetTestMode() && !m_AddLandmarkFromDef)
 	{
@@ -1153,7 +1153,7 @@ int albaOpAddLandmark::SaveLandmarksDefinitions(const char *landmarksFileName)
 
 	XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Terminate();
 
-	albaLogMessage(wxString::Format("Landmarks Dictionary has been written %s", fileName.GetCStr()));
+	albaLogMessage(albaString::Format("Landmarks Dictionary has been written %s", fileName.GetCStr()));
 
 	return ALBA_OK;
 }

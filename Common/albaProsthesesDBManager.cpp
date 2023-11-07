@@ -230,7 +230,7 @@ int albaProsthesesDBManager::SaveDB()
 
 	XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Terminate();
 
-	albaLogMessage(wxString::Format("New DB has been written %s", m_DBFilename.GetCStr()));
+	albaLogMessage(albaString::Format("New DB has been written %s", m_DBFilename.GetCStr()));
 
 	return ALBA_OK;
 }

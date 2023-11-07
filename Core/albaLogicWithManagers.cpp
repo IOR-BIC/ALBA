@@ -1381,11 +1381,11 @@ void albaLogicWithManagers::OnFileOpen(const char *file_to_open)
 
 			albaString wildc;
 			const	char *ext = m_Extension;
-			wildc = wxString::Format("All Supported File (*.%s;*.z%s;msf;zmsf)|*.%s;*.%s;*.msf;*.zmsf", ext, ext, ext, ext);
-			wildc += wxString::Format("|Alba Project File (*.%s)|*.%s", ext, ext);
-			wildc += wxString::Format("|Alba Compressed File (*.z%s)|*.z%s", ext, ext);
-			wildc += wxString::Format("|MAF Project File (*.msf)|*.msf");
-			wildc += wxString::Format("|MAF Compressed File (*.zmsf)|*.zmsf", ext, ext);
+			wildc = albaString::Format("All Supported File (*.%s;*.z%s;msf;zmsf)|*.%s;*.%s;*.msf;*.zmsf", ext, ext, ext, ext);
+			wildc += albaString::Format("|Alba Project File (*.%s)|*.%s", ext, ext);
+			wildc += albaString::Format("|Alba Compressed File (*.z%s)|*.z%s", ext, ext);
+			wildc += albaString::Format("|MAF Project File (*.msf)|*.msf");
+			wildc += albaString::Format("|MAF Compressed File (*.zmsf)|*.zmsf", ext, ext);
 
 			if (file_to_open != NULL)
 			{
@@ -2716,11 +2716,11 @@ void albaLogicWithManagers::CreateLogPanel()
 		wxDateTime log_time = wxDateTime::Now();
 		s += "\\";
 		s += m_Win->GetTitle();
-		s += wxString::Format("_%02d_%02d_%d_%02d_%2d", log_time.GetYear(), log_time.GetMonth() + 1, log_time.GetDay(), log_time.GetHour(), log_time.GetMinute());
+		s += albaString::Format("_%02d_%02d_%d_%02d_%2d", log_time.GetYear(), log_time.GetMonth() + 1, log_time.GetDay(), log_time.GetHour(), log_time.GetMinute());
 		s += ".log";
 		if (m_Logger->SetFileName(s) == ALBA_ERROR)
 		{
-			wxMessageBox(wxString::Format("Unable to create log file %s!!", s), "Warning", wxOK | wxICON_WARNING);
+			wxMessageBox(albaString::Format("Unable to create log file %s!!", s), "Warning", wxOK | wxICON_WARNING);
 		}
 	}
 

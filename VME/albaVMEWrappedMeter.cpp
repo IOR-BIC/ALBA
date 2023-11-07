@@ -1759,7 +1759,7 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 				if (n == NULL) return;
 
 				wxString nameProfile = "";
-				//albaString idNumber = wxString::Format(_("%d"),id);
+				//albaString idNumber = albaString::Format(_("%d"),id);
 				nameProfile = n->GetName();
 
 				if (wxNOT_FOUND != m_ListBox->FindString(n->GetName()))

@@ -228,7 +228,7 @@ void albaVMEManager::AddCreationDate(albaVME *vme)
 {
   wxString dateAndTime;
   wxDateTime time = wxDateTime::UNow(); // get time with millisecond precision
-  dateAndTime  = wxString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth()+1, time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());
+  dateAndTime  = albaString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth()+1, time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());
  
   albaTagItem tag_creationDate;
   tag_creationDate.SetName("Creation_Date");

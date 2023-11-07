@@ -640,11 +640,11 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::FittingLM()
 
   wxString command = "python.exe lm.py";
   command.Append(" ");
-  command.Append(wxString::Format("%.3f",boneParameters[0]));
+  command.Append(albaString::Format("%.3f",boneParameters[0]));
   command.Append(" ");
-  command.Append(wxString::Format("%.3f",boneParameters[1]));
+  command.Append(albaString::Format("%.3f",boneParameters[1]));
   command.Append(" ");
-  command.Append(wxString::Format("%.3f",boneParameters[2]));
+  command.Append(albaString::Format("%.3f",boneParameters[2]));
   
   WriteHistogramFiles();
 
@@ -653,11 +653,11 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::FittingLM()
 
   command = "python.exe lm.py";
   command.Append(" ");
-  command.Append(wxString::Format("%.3f",softIssueParameters[0]));
+  command.Append(albaString::Format("%.3f",softIssueParameters[0]));
   command.Append(" ");
-  command.Append(wxString::Format("%.3f",softIssueParameters[1]));
+  command.Append(albaString::Format("%.3f",softIssueParameters[1]));
   command.Append(" ");
-  command.Append(wxString::Format("%.3f",softIssueParameters[2]));
+  command.Append(albaString::Format("%.3f",softIssueParameters[2]));
 
   albaLogMessage(command.char_str());
   //wxExecute(command,wxEXEC_SYNC);
@@ -680,13 +680,13 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
 
       if (m_CurrentPoint % 4 == 0)
       {
-        m_Point1 = wxString::Format("Bone Peak : %d",hisctogramValue);
+        m_Point1 = albaString::Format("Bone Peak : %d",hisctogramValue);
         m_Point1Value = scalar;
         m_Point1HistogramValue = hisctogramValue;
       }
       if (m_CurrentPoint % 4 == 1)
       {
-        m_Point2 = wxString::Format("Soft Peak : %d",hisctogramValue);
+        m_Point2 = albaString::Format("Soft Peak : %d",hisctogramValue);
         m_Point2Value = scalar;
         m_Point2HistogramValue = hisctogramValue;
         //ComputeParam();
@@ -694,12 +694,12 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
       }
       if (m_CurrentPoint % 4 == 2)
       {
-        m_Point3 = wxString::Format("Bone Base : %.2f",scalar);
+        m_Point3 = albaString::Format("Bone Base : %.2f",scalar);
         m_Point3Value = scalar;
       }
       if (m_CurrentPoint % 4 == 3)
       {
-        m_Point4 = wxString::Format("Soft Base : %.2f",scalar);
+        m_Point4 = albaString::Format("Soft Base : %.2f",scalar);
         m_Point4Value = scalar;
 
         ComputeParam();

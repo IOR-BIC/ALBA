@@ -78,11 +78,11 @@ void albaOpImporterMSF::OpRun()
 		albaString wildc;
 		const	char *ext = GetLogicManager()->GetMsfFileExtension();
 
-		wildc = wxString::Format("All Supported File (*.%s;*.z%s;msf;zmsf)|*.%s;*.%s;*.msf;*.zmsf", ext, ext, ext, ext);
-		wildc += wxString::Format("|Alba Project File (*.%s)|*.%s", ext, ext);
-		wildc += wxString::Format("|Alba Compressed File (*.z%s)|*.z%s", ext, ext);
-		wildc += wxString::Format("|MAF Project File (*.msf)|*.msf");
-		wildc += wxString::Format("|MAF Compressed File (*.zmsf)|*.zmsf", ext, ext);
+		wildc = albaString::Format("All Supported File (*.%s;*.z%s;msf;zmsf)|*.%s;*.%s;*.msf;*.zmsf", ext, ext, ext, ext);
+		wildc += albaString::Format("|Alba Project File (*.%s)|*.%s", ext, ext);
+		wildc += albaString::Format("|Alba Compressed File (*.z%s)|*.z%s", ext, ext);
+		wildc += albaString::Format("|MAF Project File (*.msf)|*.msf");
+		wildc += albaString::Format("|MAF Compressed File (*.zmsf)|*.zmsf", ext, ext);
 
     m_File = albaGetOpenFile(fileDir, wildc, _("Choose Project file"));
   }
@@ -151,7 +151,7 @@ int albaOpImporterMSF::ImportMSF()
     //return ALBA_ERROR;
   }
       
-  wxString group_name = wxString::Format("imported from %s.%s",name,ext);
+  wxString group_name = albaString::Format("imported from %s.%s",name,ext);
  
   albaNEW(m_Group);
   m_Group->SetName(group_name);

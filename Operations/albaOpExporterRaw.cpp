@@ -158,7 +158,7 @@ void albaOpExporterRAW::SaveVolume()
 		//if the data RAW are saved in a single file
 		if (m_SingleFile)
 		{
-			prefix = wxString::Format("%s%s_%dx%dx%d",path,name,xdim,ydim,zdim);
+			prefix = albaString::Format("%s%s_%dx%dx%d",path,name,xdim,ydim,zdim);
 			
 			exporter->SetFileDimensionality(3); 
 			exporter->SetFilePattern("%s.raw");					
@@ -168,7 +168,7 @@ void albaOpExporterRAW::SaveVolume()
 		//if the data RAW are saved in a different file for each slice
 		else 
 		{
-			prefix = wxString::Format("%s%s_%dx%d",path,name,xdim,ydim);
+			prefix = albaString::Format("%s%s_%dx%d",path,name,xdim,ydim);
 
 			exporter->SetFileDimensionality(2); // the writer will create a number of 2D images
 			exporter->SetFilePattern("%s_%04d.raw");
@@ -207,7 +207,7 @@ void albaOpExporterRAW::SaveVolume()
 						val = val + m_Offset;
 						int value = (int)val;
 						wxString new_numeration;
-						new_numeration = wxString::Format("%04d",value);
+						new_numeration = albaString::Format("%04d",value);
 						name_file.Replace(numeration, new_numeration);	
 						new_name = path + name_file;
 
@@ -323,7 +323,7 @@ void albaOpExporterRAW::SaveVolume()
 			int a[3];
 			StructuredPoints->GetDimensions(a);
 
-			wxString filename = wxString::Format("%s%s_%dx%dx%d.raw",path,name,xdim,ydim,zdim);							
+			wxString filename = albaString::Format("%s%s_%dx%dx%d.raw",path,name,xdim,ydim,zdim);							
 			exporter->SetFileName(filename);
 			exporter->SetFileDimensionality(3);
 
@@ -422,7 +422,7 @@ void albaOpExporterRAW::SaveVolume()
 				StructuredPoints->Update();
 				exporter->Modified();								
 								
-				wxString filename = wxString::Format("%s%s_%dx%d_%04d.raw",path,name,xdim,ydim,i);							
+				wxString filename = albaString::Format("%s%s_%dx%d_%04d.raw",path,name,xdim,ydim,i);							
 				exporter->SetFileName(filename);
 
 				exporter->Write();
@@ -458,7 +458,7 @@ void albaOpExporterRAW::SaveVolume()
 							val = val + m_Offset;
 							int value = (int)val;
 							wxString new_numeration;
-							new_numeration = wxString::Format("%04d",value);
+							new_numeration = albaString::Format("%04d",value);
 							name_file.Replace(numeration, new_numeration);	
 							new_name = path + name_file;
 

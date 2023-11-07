@@ -369,7 +369,7 @@ void albaAnimate::StoreViewPoint()
 	int counter = 1;
   wxString name = "camera position 1";
 	while(m_PositionList->FindString(name) != -1 && counter < 50)
-		name = wxString::Format("camera position %d", ++counter);
+		name = albaString::Format("camera position %d", ++counter);
 
 	// prompt user for a name -----------------------
 	wxTextEntryDialog *dlg = new wxTextEntryDialog(NULL,"please enter a name", "Store Camera Position", name );

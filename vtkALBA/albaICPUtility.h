@@ -743,7 +743,7 @@ inline void albaICPUtility::Rotation_classif(vcl_multimap<double,int>& mm,const 
 
 	for(int i=0; i<index.size();i++){
 		//vcl_cout << "i vale " << i << '\n';
-		//wxLogMessage(wxString::Format("%d",i));
+		//wxLogMessage(albaString::Format("%d",i));
 		switch(index[i]){
 		case 1:
 			DS_temp=Rz*DS_temp;

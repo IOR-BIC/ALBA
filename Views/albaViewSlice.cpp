@@ -169,15 +169,15 @@ void albaViewSlice::UpdateText(int ID)
 			{
 				case CAMERA_OS_X:
 					m_Text = "X = ";
-					m_Text += wxString::Format("%.1f", m_Slice[0]);
+					m_Text += albaString::Format("%.1f", m_Slice[0]);
 					break;
 				case CAMERA_OS_Y:
 					m_Text = "Y = ";
-					m_Text += wxString::Format("%.1f", m_Slice[1]);
+					m_Text += albaString::Format("%.1f", m_Slice[1]);
 					break;
 				case CAMERA_OS_Z:
 					m_Text = "Z = ";
-					m_Text += wxString::Format("%.1f", m_Slice[2]);
+					m_Text += albaString::Format("%.1f", m_Slice[2]);
 					break;
 				default:
 					break;

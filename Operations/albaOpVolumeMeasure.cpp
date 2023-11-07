@@ -237,9 +237,9 @@ void albaOpVolumeMeasure::VolumeCompute(albaVME *vme)
 {
 	if (vme == NULL)
 	{
-		m_NormalizedShapeIndex = wxString::Format(_("Impossible compute the N.S.I."));
-		m_SurfaceArea = wxString::Format(_("Impossible compute the surface area"));
-		m_VolumeMeasure = wxString::Format(_("Impossible compute the surface volume"));
+		m_NormalizedShapeIndex = albaString::Format(_("Impossible compute the N.S.I."));
+		m_SurfaceArea = albaString::Format(_("Impossible compute the surface area"));
+		m_VolumeMeasure = albaString::Format(_("Impossible compute the surface volume"));
 	}
 	else
 	{
@@ -251,8 +251,8 @@ void albaOpVolumeMeasure::VolumeCompute(albaVME *vme)
 		m_MassProperties->SetInput(m_TriangleFilter->GetOutput());
 		m_MassProperties->Update();
 
-		m_NormalizedShapeIndex = wxString::Format(_("%g"),m_MassProperties->GetNormalizedShapeIndex());
-		m_SurfaceArea = wxString::Format(_("%g"),m_MassProperties->GetSurfaceArea());
-		m_VolumeMeasure = wxString::Format(_("%g"), m_MassProperties->GetVolume());
+		m_NormalizedShapeIndex = albaString::Format(_("%g"),m_MassProperties->GetNormalizedShapeIndex());
+		m_SurfaceArea = albaString::Format(_("%g"),m_MassProperties->GetSurfaceArea());
+		m_VolumeMeasure = albaString::Format(_("%g"), m_MassProperties->GetVolume());
 	}
 }

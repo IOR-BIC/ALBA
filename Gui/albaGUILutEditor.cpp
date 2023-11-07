@@ -475,11 +475,11 @@ void albaGUILutEditor::UpdateInfo()
   }
   else if (min == max) // single selection
   {
-    m_Info = wxString::Format( " index= %d value= %g", min, v1 );
+    m_Info = albaString::Format( " index= %d value= %g", min, v1 );
   }
   else // multiple selection
   {
-    m_Info = wxString::Format( " index= %d value= %g ... index= %d value= %g", min, v1, max, v2 );
+    m_Info = albaString::Format( " index= %d value= %g ... index= %d value= %g", min, v1, max, v2 );
   }
   TransferDataToWindow();  
 }

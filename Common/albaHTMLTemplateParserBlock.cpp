@@ -99,14 +99,14 @@ void albaHTMLTemplateParserBlock::AddVar( wxString name, double varValue )
 //----------------------------------------------------------------------------
 {
   //Formatting the double var using m_Doubleformat ("%.3f") 
-  AddVar(name,wxString::Format(m_DoubleFormat,varValue));
+  AddVar(name,albaString::Format(m_DoubleFormat,varValue));
 }
 
 //----------------------------------------------------------------------------
 void albaHTMLTemplateParserBlock::AddVar( wxString name, int varValue )
 //----------------------------------------------------------------------------
 {
-  AddVar(name,wxString::Format("%d",varValue));
+  AddVar(name,albaString::Format("%d",varValue));
 }
 
 //----------------------------------------------------------------------------
@@ -265,14 +265,14 @@ void albaHTMLTemplateParserBlock::PushImageVar(wxString name, vtkImageData *imag
 void albaHTMLTemplateParserBlock::PushVar( wxString name, double varValue )
 //----------------------------------------------------------------------------
 {
-  PushVar(name,wxString::Format(m_DoubleFormat,varValue));
+  PushVar(name,albaString::Format(m_DoubleFormat,varValue));
 }
 
 //----------------------------------------------------------------------------
 void albaHTMLTemplateParserBlock::PushVar( wxString name, int varValue )
 //----------------------------------------------------------------------------
 {
-  PushVar(name,wxString::Format("%d",varValue));
+  PushVar(name,albaString::Format("%d",varValue));
 }
 
 //----------------------------------------------------------------------------

@@ -239,7 +239,7 @@ void albaOpLabelExtractor::OnEvent(albaEventBase *alba_event)
 				  OpStop(OP_RUN_OK);
 			  else
 			  {
-				  wxString msg = wxString::Format("Label %d not found!", m_ValLabel);
+				  wxString msg = albaString::Format("Label %d not found!", m_ValLabel);
 				  wxMessageBox(msg,"Warning");
 				  OpStop(OP_RUN_CANCEL);
 			  }

@@ -207,6 +207,8 @@ public:
       that of vsprintf function */
   void Printf(const char *format, ...);
 
+	static wxString Format(const char *format, ...);
+
   /** like Printf but faster (you can specify output string size) */ 
   void NPrintf(unsigned long size, const char *format, ...);
 

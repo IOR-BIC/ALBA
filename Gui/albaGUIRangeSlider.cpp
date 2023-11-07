@@ -332,7 +332,7 @@ void albaGUIRangeSlider::OnMouse(wxMouseEvent &event)
 void albaGUIRangeSlider::DrawLabel(int x, int y, double val)
 //----------------------------------------------------------------------------
 {
-  m_ValueString = wxString::Format("%g", val);
+  m_ValueString = albaString::Format("%g", val);
   m_RangeValueLabel->SetLabel(m_ValueString);
   int pos_end = m_LineStartX + m_LineWidth + m_BorderWidgetRadius;
   wxSize lab_size = m_RangeValueLabel->GetSize();

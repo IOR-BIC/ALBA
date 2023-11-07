@@ -189,7 +189,7 @@ void albaOp2DMeasure::OnEvent(albaEventBase *alba_event)
 						m_DistanceInteractor2D->SetListener(this);
 
 						if(m_DistanceInteractor2D->SizeMeasureVector() != 0)
-							m_DistanceMeasure = albaString(wxString::Format("%.2f" ,RoundValue(m_DistanceInteractor2D->GetLastDistance())));
+							m_DistanceMeasure = albaString(albaString::Format("%.2f" ,RoundValue(m_DistanceInteractor2D->GetLastDistance())));
 						else
 							m_DistanceMeasure = albaString("0");
 
@@ -216,7 +216,7 @@ void albaOp2DMeasure::OnEvent(albaEventBase *alba_event)
 						m_AngleInteractor2D->SetListener(this);
 
 						if(m_AngleInteractor2D->SizeMeasureVector() != 0)
-							m_AcuteAngle = albaString(wxString::Format("%.2f" ,RoundValue(m_AngleInteractor2D->GetLastAngle())));
+							m_AcuteAngle = albaString(albaString::Format("%.2f" ,RoundValue(m_AngleInteractor2D->GetLastAngle())));
 						else
 							m_AcuteAngle = albaString("0");
 
@@ -507,7 +507,7 @@ void albaOp2DMeasure::OnEvent(albaEventBase *alba_event)
         case albaInteractor2DDistance::ID_RESULT_MEASURE:
         {
           double measure = RoundValue(e->GetDouble());
-          m_DistanceMeasure = wxString::Format("%g", measure);
+          m_DistanceMeasure = albaString::Format("%g", measure);
           m_AcuteAngle = "0";
           m_ObtuseAngle = "0";
           m_Gui->Enable(ID_UNDO_MEASURE, m_AngleInteractor2D->SizeMeasureVector() != 0 || m_DistanceInteractor2D->SizeMeasureVector() != 0 || m_IndicatorInteractor2D->SizeMeasureVector() != 0);        
@@ -530,8 +530,8 @@ void albaOp2DMeasure::OnEvent(albaEventBase *alba_event)
           m_Gui->Enable(ID_MANUAL_ANGLE, m_AngleInteractor2D->SizeMeasureVector() != 0);
           m_Gui->Enable(ID_MANUAL_DISTANCE, false);
           m_Gui->Enable(ID_MANUAL_INDICATOR,false);
-          m_AcuteAngle = wxString::Format("%g",measure);
-          m_ObtuseAngle = wxString::Format("%g", 180.0 - measure);
+          m_AcuteAngle = albaString::Format("%g",measure);
+          m_ObtuseAngle = albaString::Format("%g", 180.0 - measure);
 					if(m_AngleInteractor2D->GetRegisterMeasure())
 					{
 						m_InteractorType.push_back(ID_ANGLE_TYPE);

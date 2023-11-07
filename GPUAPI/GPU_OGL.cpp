@@ -600,7 +600,7 @@ void albaGPUOGL::GetResult(void* pBuffer, GLenum data_type, bool bGetVector)
   assert(err == GL_NO_ERROR);
 
   //static int nCurImage = 0;
-  //gltWriteTGA(wxString::Format("g:\\pokus_%02d_GPU.tga", nCurImage), 0);
+  //gltWriteTGA(albaString::Format("g:\\pokus_%02d_GPU.tga", nCurImage), 0);
   //if (++nCurImage == 100)
   //  nCurImage = 0;  //wrap
 #endif // _DEBUG
