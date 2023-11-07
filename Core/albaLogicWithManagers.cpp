@@ -2720,7 +2720,7 @@ void albaLogicWithManagers::CreateLogPanel()
 		s += ".log";
 		if (m_Logger->SetFileName(s) == ALBA_ERROR)
 		{
-			wxMessageBox(albaString::Format("Unable to create log file %s!!", s), "Warning", wxOK | wxICON_WARNING);
+			wxMessageBox(albaString::Format("Unable to create log file %s!!", s.char_str()), "Warning", wxOK | wxICON_WARNING);
 		}
 	}
 

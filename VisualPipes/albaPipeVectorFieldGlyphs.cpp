@@ -753,9 +753,9 @@ void albaPipeVectorFieldGlyphs::StoreFilterLinks()
 			szName += ":";
 			szName += itemName;
 			szName += ":";
-			szName +=   albaString::Format("%.4f",pItem->value[0]);//albaString::Format("%.3f%d",szName,pItem->value[0]);
+			szName +=   albaString::Format("%.4f",pItem->value[0]);
 			szName += ":";
-			szName +=  albaString::Format("%.4f",pItem->value[1]);//albaString::Format("%s%.3f",szName,pItem->value[1]);
+			szName +=  albaString::Format("%.4f",pItem->value[1]);
 			
 			m_Vme->SetLink(szName,m_Vme);
 		}
@@ -799,9 +799,9 @@ void albaPipeVectorFieldGlyphs::StoreFilterLinks2()
 			szName += ":";
 			szName += itemName;
 			szName += ":";
-			szName +=   albaString::Format("%.4f",pItem->value[0]);//albaString::Format("%.3f%d",szName,pItem->value[0]);
+			szName +=   albaString::Format("%.4f",pItem->value[0]);
 			szName += ":";
-			szName +=  albaString::Format("%.4f",pItem->value[1]);//albaString::Format("%s%.3f",szName,pItem->value[1]);
+			szName +=  albaString::Format("%.4f",pItem->value[1]);
 
 			m_Vme->SetLink(szName,m_Vme);
 		}

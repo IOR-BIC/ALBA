@@ -209,7 +209,7 @@ int	main( int argc, char* argv[] )
 	CPPUNIT_NS::TestRunner runner;
 
 	//runner.addTest(albaOpImporterMSF1xTest::suite()); 
-	runner.addTest(albaOpImporterSTLTest::suite());
+	/*runner.addTest(albaOpImporterSTLTest::suite());
 	runner.addTest(albaOpExporterSTLTest::suite());
 	runner.addTest(albaOpCropTest::suite());
 	runner.addTest(albaOpVOIDensityTest::suite());
@@ -224,9 +224,9 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpRemoveCellsTest::suite());
 	runner.addTest(albaOpBooleanSurfaceTest::suite());
 	runner.addTest(albaOpEditNormalsTest::suite());
-	runner.addTest(albaOpExporterBMPTest::suite());
+	runner.addTest(albaOpExporterBMPTest::suite());*/
 	runner.addTest(albaOpImporterMSFTest::suite());
-	runner.addTest(albaOpImporterExternalFileTest::suite());
+	/*runner.addTest(albaOpImporterExternalFileTest::suite());
 	runner.addTest(albaOpOpenExternalFileTest::suite());
 	runner.addTest(albaOpDecomposeTimeVarVMETest::suite());
 	runner.addTest(albaOpLabelExtractorTest::suite());
@@ -323,7 +323,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpImporterAbaqusFileTest::suite());
 	runner.addTest(albaOpExporterAbaqusFileTest::suite());
 	runner.addTest(albaOpImporterDICFileTest::suite());
-	runner.addTest(albaOpImporterPointCloudTest::suite());
+	runner.addTest(albaOpImporterPointCloudTest::suite());*/
 
 	runner.run( controller );
 

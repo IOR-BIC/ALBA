@@ -1477,7 +1477,7 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
           }
         }
 
-        vme->SetName(albaString::Format(wxT("%s_%cC#%d"), szOldName, chLabels[i], j));
+        vme->SetName(albaString::Format(wxT("%s_%cC#%d"), szOldName.char_str(), chLabels[i], j));
         vme->SetData(m_Curves[j]->pPolys[i], 0, albaVMEGeneric::ALBA_VME_REFERENCE_DATA);
 
         albaDEL(pCVMEs[i][j]);    //remove the previous VME

@@ -151,7 +151,7 @@ int albaOpImporterMSF::ImportMSF()
     //return ALBA_ERROR;
   }
       
-  wxString group_name = albaString::Format("imported from %s.%s",name,ext);
+  wxString group_name = albaString::Format("imported from %s.%s",name.char_str(),ext.char_str());
  
   albaNEW(m_Group);
   m_Group->SetName(group_name);

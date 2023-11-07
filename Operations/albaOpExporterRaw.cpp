@@ -158,7 +158,7 @@ void albaOpExporterRAW::SaveVolume()
 		//if the data RAW are saved in a single file
 		if (m_SingleFile)
 		{
-			prefix = albaString::Format("%s%s_%dx%dx%d",path,name,xdim,ydim,zdim);
+			prefix = albaString::Format("%s%s_%dx%dx%d",path.char_str(),name.char_str(),xdim,ydim,zdim);
 			
 			exporter->SetFileDimensionality(3); 
 			exporter->SetFilePattern("%s.raw");					
@@ -168,7 +168,7 @@ void albaOpExporterRAW::SaveVolume()
 		//if the data RAW are saved in a different file for each slice
 		else 
 		{
-			prefix = albaString::Format("%s%s_%dx%d",path,name,xdim,ydim);
+			prefix = albaString::Format("%s%s_%dx%d",path.char_str(),name.char_str(),xdim,ydim);
 
 			exporter->SetFileDimensionality(2); // the writer will create a number of 2D images
 			exporter->SetFilePattern("%s_%04d.raw");
@@ -323,7 +323,7 @@ void albaOpExporterRAW::SaveVolume()
 			int a[3];
 			StructuredPoints->GetDimensions(a);
 
-			wxString filename = albaString::Format("%s%s_%dx%dx%d.raw",path,name,xdim,ydim,zdim);							
+			wxString filename = albaString::Format("%s%s_%dx%dx%d.raw",path.char_str(),name.char_str(),xdim,ydim,zdim);							
 			exporter->SetFileName(filename);
 			exporter->SetFileDimensionality(3);
 
@@ -422,7 +422,7 @@ void albaOpExporterRAW::SaveVolume()
 				StructuredPoints->Update();
 				exporter->Modified();								
 								
-				wxString filename = albaString::Format("%s%s_%dx%d_%04d.raw",path,name,xdim,ydim,i);							
+				wxString filename = albaString::Format("%s%s_%dx%d_%04d.raw",path.char_str(),name.char_str(),xdim,ydim,i);							
 				exporter->SetFileName(filename);
 
 				exporter->Write();

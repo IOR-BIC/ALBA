@@ -83,7 +83,7 @@ ALBA_EXPORT extern void albaCalculateteSHA256(const char *filename, std::string 
 	}
 	catch (...)
 	{
-		wxString msg = albaString::Format(_("Problem on calculating SHA256 on file %s !!"), filename);
+		wxString msg = albaString::Format(_("Problem on calculating SHA256 on file %s !!"), filename.char_str());
 		wxMessageBox(msg, _("Error"));
 	}
 
@@ -259,7 +259,7 @@ void albaCalculateteChecksum(const char *filename, std::string &checksum_result)
   }
   catch (...)
   {
-    wxString msg = albaString::Format(_("Problem on calculating Checksum on file %s !!"), filename);
+    wxString msg = albaString::Format(_("Problem on calculating Checksum on file %s !!"), filename.char_str());
     wxMessageBox(msg, _("Error"));
   }
 }
