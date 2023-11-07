@@ -75,12 +75,6 @@ albaOpExporterAnsysCommon::~albaOpExporterAnsysCommon()
 }
 
 //----------------------------------------------------------------------------
-void albaOpExporterAnsysCommon::OpRun()   
-{
-	Init();
-  CreateGui();
-}
-//----------------------------------------------------------------------------
 void albaOpExporterAnsysCommon::OnOK()
 {
   albaString wildcard = GetWildcard();
@@ -102,30 +96,7 @@ void albaOpExporterAnsysCommon::OpStop(int result)
   albaEventMacro(albaEvent(this,result));        
 }
 
-//---------------------------------------------------------------------------
-void albaOpExporterAnsysCommon::Init()
-{
-  albaVMEMesh *input = albaVMEMesh::SafeDownCast(m_Input);
-  assert(input);
 
-  vtkUnstructuredGrid *inputUGrid = input->GetUnstructuredGridOutput()->GetUnstructuredGridData();
-
-  if(inputUGrid != NULL)
-  {
-    // Calculate Num of Elements
-    m_TotalElements = inputUGrid->GetNumberOfPoints(); // Points
-
-    m_TotalElements += inputUGrid->GetNumberOfCells(); // Elements
-
-    vtkDataArray *materialsIDArray = NULL;
-    materialsIDArray = inputUGrid->GetCellData()->GetArray("EX");
-
-		if (materialsIDArray != NULL)
-		{
-			m_TotalElements += materialsIDArray->GetNumberOfTuples(); // Materials
-		}
-  }
-}
 //----------------------------------------------------------------------------
 int albaOpExporterAnsysCommon::compareElem(const void *p1, const void *p2) 
 {

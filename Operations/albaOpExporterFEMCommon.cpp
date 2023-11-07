@@ -218,6 +218,39 @@ void albaOpExporterFEMCommon::UpdateGui()
 }
 
 //----------------------------------------------------------------------------
+void albaOpExporterFEMCommon::OpRun()
+{
+	Init();
+	CreateGui();
+}
+//---------------------------------------------------------------------------
+void albaOpExporterFEMCommon::Init()
+{
+	albaVMEMesh *input = albaVMEMesh::SafeDownCast(m_Input);
+	assert(input);
+
+	vtkUnstructuredGrid *inputUGrid = input->GetUnstructuredGridOutput()->GetUnstructuredGridData();
+
+
+	if (inputUGrid != NULL)
+	{
+		inputUGrid->Update();
+
+		// Calculate Num of Elements
+		m_TotalElements = inputUGrid->GetNumberOfPoints(); // Points
+
+		m_TotalElements += inputUGrid->GetNumberOfCells(); // Elements
+
+		vtkDataArray *materialsIDArray = NULL;
+		materialsIDArray = inputUGrid->GetCellData()->GetArray("EX");
+
+		if (materialsIDArray != NULL)
+		{
+			m_TotalElements += materialsIDArray->GetNumberOfTuples(); // Materials
+		}
+	}
+}
+//----------------------------------------------------------------------------
 void albaOpExporterFEMCommon::OnEvent(albaEventBase *alba_event)
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))

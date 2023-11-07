@@ -51,9 +51,6 @@ public:
   /** Export the input mesh by writing it in Abaqus .inp format */
   int Write();
 
-  /** Builds operation's interface. */
-	void OpRun();
-
 protected:
 
   albaString GetWildcard();
