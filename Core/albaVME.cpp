@@ -351,6 +351,7 @@ int albaVME::SetParent(albaVME *parent)
 			InvokeEvent(this, NODE_DETACHED_FROM_TREE);
 
 			m_Parent = parent;
+			SetId(-1);
 			Modified();
 		}
 		return ALBA_OK;

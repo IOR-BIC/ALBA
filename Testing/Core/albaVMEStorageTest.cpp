@@ -434,7 +434,6 @@ void albaVMEStorageTest::TestSaveAndReload()
 }
 //----------------------------------------------------------------------------
 void albaVMEStorageTest::TestTreeEditAndGarbageCollection()
-//----------------------------------------------------------------------------
 {
   // save the tree to test to disk
   CPPUNIT_ASSERT(m_Storage->Store()==ALBA_OK);
