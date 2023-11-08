@@ -47,8 +47,8 @@ albaOp(label)
 	m_Canundo	= false;
 	m_File		= "";
 	m_Dict		= "";
-	m_FileDir = (albaGetApplicationDirectory() + "/Data/External/").char_str();
-	m_DictDir = (albaGetApplicationDirectory() + "/Config/Dictionary/").char_str();
+	m_FileDir = (albaGetApplicationDirectory() + "/Data/External/").ToAscii();
+	m_DictDir = (albaGetApplicationDirectory() + "/Config/Dictionary/").ToAscii();
 
 	m_Vme		= NULL;
 	
@@ -129,7 +129,7 @@ void albaOpImporterRawMotionData::OpDo()
 	m_Vme = reader;
 
   wxString path, name, ext;
-  wxFileName::SplitPath(m_File.char_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.ToAscii(),&path,&name,&ext);
   m_Vme->SetName(name);
 	
 	albaTagItem tag_Nature;

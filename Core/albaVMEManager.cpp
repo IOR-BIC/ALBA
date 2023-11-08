@@ -171,7 +171,7 @@ void albaVMEManager::RemoveTempDirectory()
   if (m_TmpDir != "")
   {
     wxString working_dir;
-    working_dir = albaGetAppDataDirectory().char_str();
+    working_dir = albaGetAppDataDirectory().ToAscii();
     wxSetWorkingDirectory(working_dir);
     if(::wxDirExists(m_TmpDir.GetCStr())) //remove tmp directory due to zip extraction or compression
     {
@@ -481,11 +481,11 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
   if(ext.IsSameAs(m_MsfFileExtension,true)) 
   {
     m_MSFFile = out_file; // the file to extract is the msf
-    out_file_stream.open(out_file.char_str(), std::ios_base::out);
+    out_file_stream.open(out_file.ToAscii(), std::ios_base::out);
   }
   else
   {
-    out_file_stream.open(out_file.char_str(), std::ios_base::binary); // the file to extract is a binary
+    out_file_stream.open(out_file.ToAscii(), std::ios_base::binary); // the file to extract is a binary
   }
   s_size = zip_is->GetSize();
   buf = new char[s_size];
@@ -515,10 +515,10 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
 	if(ext.IsSameAs(m_MsfFileExtension,true))
     {
       m_MSFFile = out_file; // The file to extract is an msf
-      out_file_stream.open(out_file.char_str(), std::ios_base::out);
+      out_file_stream.open(out_file.ToAscii(), std::ios_base::out);
     }
     else
-      out_file_stream.open(out_file.char_str(), std::ios_base::binary); // The file to extract is a binary
+      out_file_stream.open(out_file.ToAscii(), std::ios_base::binary); // The file to extract is a binary
     s_size = zip_is->GetSize();
     buf = new char[s_size];
     zip_is->Read(buf,s_size);
@@ -626,7 +626,7 @@ int albaVMEManager::MSFSave()
     // ask for the new file name.
     wxString wildc = _("Project file (*."+ m_MsfFileExtension +")|*."
 		              + m_MsfFileExtension +"|Compressed file (*.z"+ m_MsfFileExtension +")|*.z" + m_MsfFileExtension + "");
-    albaString file = albaGetSaveFile(m_MSFDir, wildc.char_str());
+    albaString file = albaGetSaveFile(m_MSFDir, wildc.ToAscii());
     if(file.IsEmpty())
       return ALBA_ERROR;
    

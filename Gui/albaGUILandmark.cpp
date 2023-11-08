@@ -340,7 +340,7 @@ void albaGUILandmark::OnVmePicked(albaEvent& e)
 
     //m_Landmark = albaVMELandmark::New();//we have a reference on the vme (we can call vtkDEL in the UNDO)
     albaNEW(m_Landmark);
-    m_Landmark->SetName(name.char_str());
+    m_Landmark->SetName(name.ToAscii());
     m_Landmark->ReparentTo(m_LMCloud);
 
     m_Landmark->Update(); 
@@ -549,7 +549,7 @@ void albaGUILandmark::SpawnLandmark()
 
   //m_Landmark = albaVMELandmark::New();//we have a reference on the vme (we can call vtkDEL in the UNDO)
   albaNEW(m_Landmark);
-  m_Landmark->SetName(name.char_str());
+  m_Landmark->SetName(name.ToAscii());
   m_Landmark->ReparentTo(m_LMCloud);
   m_Landmark->Update(); 
 

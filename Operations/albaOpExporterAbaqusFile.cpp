@@ -110,7 +110,7 @@ void albaOpExporterAbaqusFile::OnOK()
   m_AbaqusOutputFileNameFullPath = "";
 
   wxString f;
-  f = albaGetSaveFile("",wildcard).char_str(); 
+  f = albaGetSaveFile("",wildcard).ToAscii(); 
   if(!f.IsEmpty())
   {
     m_AbaqusOutputFileNameFullPath = f;
@@ -155,7 +155,7 @@ int albaOpExporterAbaqusFile::compareElem(const void *p1, const void *p2)
 int albaOpExporterAbaqusFile::Write()
 {
   FILE *outFile;
-  outFile = fopen(m_AbaqusOutputFileNameFullPath.char_str(), "w");
+  outFile = fopen(m_AbaqusOutputFileNameFullPath.ToAscii(), "w");
 
   albaVMEMesh *input = albaVMEMesh::SafeDownCast(m_Input);
 

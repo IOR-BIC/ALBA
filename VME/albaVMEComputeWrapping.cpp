@@ -5787,11 +5787,11 @@ void albaVMEComputeWrapping::SaveInFile()
 //-------------------------------------------------------------------------
 {
 	/*albaString initialFileName;
-	initialFileName = albaGetApplicationDirectory().char_str();
+	initialFileName = albaGetApplicationDirectory().ToAscii();
 	initialFileName.Append("\\WrapperMeter.txt");
 
 	albaString wildc = "configuration file (*.txt)|*.txt";
-	albaString newFileName = albaGetSaveFile(initialFileName.GetCStr(), wildc).char_str();
+	albaString newFileName = albaGetSaveFile(initialFileName.GetCStr(), wildc).ToAscii();
 
 	if (newFileName == "") return;
 

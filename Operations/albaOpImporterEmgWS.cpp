@@ -116,7 +116,7 @@ void albaOpImporterEmgWS::Read()
   line = text.ReadLine();
   int comma = line.Find(wxT(','));
   wxString freq = line.SubString(0,comma - 1); 
-  double freq_val = atof(freq.char_str());
+  double freq_val = atof(freq.ToAscii());
 
   ////////////////// Read signals names //////////////////
   line = text.ReadLine();
@@ -149,7 +149,7 @@ void albaOpImporterEmgWS::Read()
     wxStringTokenizer tkz(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
     /// First token is time stamp
     t_str = tkz.GetNextToken();
-    t = atof(t_str.char_str()) / freq_val;
+    t = atof(t_str.ToAscii()) / freq_val;
     i = 0;
     while (tkz.HasMoreTokens())
     {

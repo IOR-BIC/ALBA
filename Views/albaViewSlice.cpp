@@ -137,7 +137,7 @@ void albaViewSlice::Create()
   // text stuff
   m_Text = "";
   m_TextMapper = vtkTextMapper::New();
-  m_TextMapper->SetInput(m_Text.char_str());
+  m_TextMapper->SetInput(m_Text.ToAscii());
   m_TextMapper->GetTextProperty()->AntiAliasingOff();
 
   m_TextActor = vtkActor2D::New();
@@ -182,13 +182,13 @@ void albaViewSlice::UpdateText(int ID)
 				default:
 					break;
 			}
-			m_TextMapper->SetInput(m_Text.char_str());
+			m_TextMapper->SetInput(m_Text.ToAscii());
 			m_TextMapper->Modified();
 		}
 		else
 		{
 			m_Text = "";
-			m_TextMapper->SetInput(m_Text.char_str());
+			m_TextMapper->SetInput(m_Text.ToAscii());
 			m_TextMapper->Modified();
 		}
 	}

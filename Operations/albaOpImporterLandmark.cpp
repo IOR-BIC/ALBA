@@ -131,7 +131,7 @@ void albaOpImporterLandmark::OpDo()
   Read();
 
   wxString path, name, ext;
-  wxFileName::SplitPath(m_File.char_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.ToAscii(),&path,&name,&ext);
   m_VmeCloud->SetName(name);
 	
 	albaTagItem tag_Nature;
@@ -152,7 +152,7 @@ void albaOpImporterLandmark::OpStop(int result)
 void albaOpImporterLandmark::Read()   
 {
   // need the number of landmarks for the progress bar
-  std::ifstream  landmarkNumberPromptFileStream(m_File.char_str());
+  std::ifstream  landmarkNumberPromptFileStream(m_File.ToAscii());
   int numberOfLines = 0;
 	char line[512], separator;
 	double x = 0, y = 0, z = 0, t = 0;
@@ -173,7 +173,7 @@ void albaOpImporterLandmark::Read()
 	  m_VmeCloud->TestModeOn();
   }
 
-  std::ifstream  landmarkFileStream(m_File.char_str());
+  std::ifstream  landmarkFileStream(m_File.ToAscii());
  
   albaProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
@@ -217,7 +217,7 @@ void albaOpImporterLandmark::Read()
 		{      
 			ConvertLine(line, counter, separator, name, x, y, z);
      
-			if (m_VmeCloud->GetLandmarkIndex(name.char_str()) == -1)
+			if (m_VmeCloud->GetLandmarkIndex(name.ToAscii()) == -1)
 			{
 				//New Landmark
 				m_VmeCloud->AppendLandmark(x, y, z, name);

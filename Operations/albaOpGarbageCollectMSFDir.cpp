@@ -134,15 +134,15 @@ int albaOpGarbageCollectMSFDir::GetFilesToRemove( set<wxString> &filesToRemoveSe
     wxString msfXMLFileABSFileName = GetMSFXMLFileAbsFileName(m_Input);
 
     assert(wxFileExists(msfXMLFileABSFileName));
-    msfTreeFiles.insert(msfXMLFileABSFileName.char_str());
+    msfTreeFiles.insert(msfXMLFileABSFileName.ToAscii());
 
     // add the backup file if present:
     wxString msfXMLBackupFile = msfXMLFileABSFileName.Append(".bak");
     msfXMLBackupFile.Replace("/","\\");
 
-    if (wxFileExists(msfXMLBackupFile.char_str()))
+    if (wxFileExists(msfXMLBackupFile.ToAscii()))
     {
-      msfTreeFiles.insert(msfXMLBackupFile.char_str());
+      msfTreeFiles.insert(msfXMLBackupFile.ToAscii());
     }
 
     filesToRemoveSet = SetDifference(msfDirFiles, msfTreeFiles);
@@ -203,9 +203,9 @@ set<wxString> albaOpGarbageCollectMSFDir::GetMSFDirABSFileNamesSet()
     {
       continue;
     }
-    else if (wxFileExists(absFileName.char_str()))
+    else if (wxFileExists(absFileName.ToAscii()))
     {     
-      m_MSFDirABSFileNamesSet.insert(absFileName.char_str());
+      m_MSFDirABSFileNamesSet.insert(absFileName.ToAscii());
     }
   }
   

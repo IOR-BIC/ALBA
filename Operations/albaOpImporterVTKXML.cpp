@@ -136,7 +136,7 @@ void albaOpImporterVTKXML::OpRun()
       tag_Nature.SetValue("NATURAL");
       m_Output->GetTagArray()->SetTag(tag_Nature);
       m_Output->ReparentTo(m_Input);
-      m_Output->SetName(name.char_str());
+      m_Output->SetName(name.ToAscii());
 
       result = OP_RUN_OK;
     }

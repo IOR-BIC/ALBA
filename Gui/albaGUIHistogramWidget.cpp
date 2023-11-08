@@ -325,18 +325,18 @@ void albaGUIHistogramWidget::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::ExportData()
 {
-	wxString proposed = albaGetLastUserFolder().char_str();
+	wxString proposed = albaGetLastUserFolder().ToAscii();
 	proposed += m_Data->GetName();
 	proposed += ".csv";
 
 	wxString wildc = "ASCII CSV file (*.csv)|*.csv";
-	wxString f = albaGetSaveFile(proposed, wildc).char_str();
+	wxString f = albaGetSaveFile(proposed, wildc).ToAscii();
 
 	int result = OP_RUN_CANCEL;
 	if (!f.IsEmpty())
 	{
 		FILE *outFile;
-		outFile = fopen(f.char_str(), "w");
+		outFile = fopen(f.ToAscii(), "w");
 		//Header
 		fprintf(outFile, "%s;\n",m_Data->GetName());
 

@@ -77,7 +77,7 @@ public:
 	void SetFileName(const char *ansysInputFileNameFullPath) {m_AnsysInputFileNameFullPath = ansysInputFileNameFullPath;};
 	
   /** Get the input Ansys file */
-  wxString GetFileName() {return m_AnsysInputFileNameFullPath.char_str();};
+  wxString GetFileName() {return m_AnsysInputFileNameFullPath.ToAscii();};
 
   /** Builds operation's interface. */
   void OpRun();

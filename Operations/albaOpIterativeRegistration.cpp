@@ -112,7 +112,7 @@ void albaOpIterativeRegistration::OpRun()
 {
   // progress bar stuff
   wxString progress_string("creating gui...");
-  wxBusyInfo wait(progress_string.char_str());
+  wxBusyInfo wait(progress_string.ToAscii());
 
   m_UndoSourceAbsPose = vtkMatrix4x4::New();
   m_RegistrationMatrix = vtkMatrix4x4::New();
@@ -185,7 +185,7 @@ void albaOpIterativeRegistration::OpStop(int result)
 {   
   // progress bar stuff
   wxString progress_string("destroying gui...");
-  wxBusyInfo wait(progress_string.char_str());
+  wxBusyInfo wait(progress_string.ToAscii());
 
   cppDEL(m_GuiLandmark[SOURCE]);
   cppDEL(m_GuiLandmark[TARGET]);

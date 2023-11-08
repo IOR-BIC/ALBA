@@ -940,7 +940,7 @@ void albaOpExtractIsosurface::ExtractSurface()
 
 		albaVMESurface *vme_surf;
 		albaNEW(vme_surf);
-		vme_surf->SetName(name.char_str());
+		vme_surf->SetName(name.ToAscii());
 		//vme_surf->SetDataByDetaching(surface,0);
 		vme_surf->SetData(surface, 0);
 		vme_surf->GetOutput()->Update();

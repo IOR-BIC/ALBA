@@ -434,38 +434,38 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 			{
 				if(m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0)
 				{
-					wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].char_str();
+					wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].ToAscii();
 					vtkDataArray *scalarsArray = outputVTK->GetPointData()->GetArray(scalarsToActivate);
 
 					if (scalarsArray == NULL)
 					{
 						std::ostringstream stringStream;
-						stringStream << scalarsToActivate.char_str() << " POINT_DATA array does not exist for timestamp " \
+						stringStream << scalarsToActivate.ToAscii() << " POINT_DATA array does not exist for timestamp " \
 							<< item->GetTimeStamp() << " . Skipping SetActiveScalars for this timestamp" << std::endl;
 						albaLogMessage(stringStream.str().c_str());
 						continue;
 					}
 
-					outputVTK->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].char_str());
+					outputVTK->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].ToAscii());
 					outputVTK->GetPointData()->GetScalars()->Modified();
 					outputVTK->GetCellData()->SetActiveScalars("");
 				}
 				else if(m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation >0))
 				{
-					wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].char_str();
+					wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].ToAscii();
 					vtkDataArray *scalarsArray = outputVTK->GetCellData()->GetArray(scalarsToActivate);
         
 					if (scalarsArray == NULL)
 					{
 						std::ostringstream stringStream;
-						stringStream << scalarsToActivate.char_str() << "  CELL_DATA array does not exist for timestamp " \
+						stringStream << scalarsToActivate.ToAscii() << "  CELL_DATA array does not exist for timestamp " \
 						<< item->GetTimeStamp() << " . Skipping SetActiveScalars for this timestamp" << std::endl;
 						albaLogMessage(stringStream.str().c_str());
 						continue;
 					}
         
 
-					outputVTK->GetCellData()->SetActiveScalars(scalarsToActivate.char_str());
+					outputVTK->GetCellData()->SetActiveScalars(scalarsToActivate.ToAscii());
 					outputVTK->GetCellData()->GetScalars()->Modified();
 					outputVTK->GetPointData()->SetActiveScalars("");
 				}
@@ -481,13 +481,13 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 		vtkData->Update();
 		if (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0)
 		{
-			vtkData->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].char_str());
+			vtkData->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].ToAscii());
 			vtkData->GetPointData()->GetScalars()->Modified();
 			vtkData->GetCellData()->SetActiveScalars("");
 		}
 		else if (m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation > 0))
 		{
-			vtkData->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].char_str());
+			vtkData->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].ToAscii());
 			vtkData->GetCellData()->GetScalars()->Modified();
 			vtkData->GetPointData()->SetActiveScalars("");
 		}

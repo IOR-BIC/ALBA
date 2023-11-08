@@ -81,7 +81,7 @@ void albaOpImporterLandmarkWS::OpRun()
   wxString f;
   if (!m_TestMode)
     {
-      f = albaGetOpenFile(m_FileDir,pgd_wildc).char_str(); 
+      f = albaGetOpenFile(m_FileDir,pgd_wildc).ToAscii(); 
     }
 	if(!f.IsEmpty() && wxFileExists(f))
 	 {
@@ -142,7 +142,7 @@ void albaOpImporterLandmarkWS::Read()
   int comma = line.Find(',');
   wxString freq = line.SubString(0,comma - 1);
   double freq_val;
-  freq_val = atof(freq.char_str());
+  freq_val = atof(freq.ToAscii());
 
   //Put the signals names in a vector of string
   line = text.ReadLine();

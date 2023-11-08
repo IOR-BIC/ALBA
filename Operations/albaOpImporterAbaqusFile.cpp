@@ -121,7 +121,7 @@ void albaOpImporterAbaqusFile::OpRun()
   m_AbaqusInputFileNameFullPath = "";
 
   wxString f;
-  f = albaGetOpenFile("", wildcard).char_str(); 
+  f = albaGetOpenFile("", wildcard).ToAscii(); 
   if(!f.IsEmpty() && wxFileExists(f))
   {
     m_AbaqusInputFileNameFullPath = f;
@@ -164,7 +164,7 @@ int albaOpImporterAbaqusFile::Import()
   m_MatIDMap.clear();
 	m_Parts.clear();
 
-  albaLogMessage("Current working directory is: '%s' ", wxGetCwd().char_str());
+  albaLogMessage("Current working directory is: '%s' ", wxGetCwd().ToAscii());
 
   // Create tmp path
   mkdir(m_DataDir);

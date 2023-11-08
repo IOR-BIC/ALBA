@@ -2744,7 +2744,7 @@ albaRWI* albaOpMML::CreateParameterViewalbaRWI(wxString lab, float r, float g, f
   vtkTextSource *ts = vtkTextSource::New();
   ts->SetForegroundColor(r,g,b);
   ts->BackingOff(); // no background drawn with text
-  ts->SetText(lab.char_str());
+  ts->SetText(lab.ToAscii());
 
   vtkPolyDataMapper2D *mapper = vtkPolyDataMapper2D::New();
   mapper->SetInput(ts->GetOutput());

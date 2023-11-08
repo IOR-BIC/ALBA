@@ -85,7 +85,7 @@ public:
   
   void SetResultsFileName(const char *name);
   
-  const char *GetResultsFileName() {return this->ResultsFile.char_str(); }
+  const char *GetResultsFileName() {return this->ResultsFile.ToAscii(); }
 
   vtkSetMacro(Convergence, float);
   vtkGetMacro(Convergence, float);

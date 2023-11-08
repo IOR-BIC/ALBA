@@ -124,7 +124,7 @@ void albaOpImporterImage::OpRun()
 		for (int i = 0; i < m_Files.size(); i++)
 			files.push_back(m_Files[i].c_str());
   
-		albaGetOpenMultiFiles((const char *)m_FileDirectory.char_str(), wildc.GetCStr(), files);
+		albaGetOpenMultiFiles((const char *)m_FileDirectory.ToAscii(), wildc.GetCStr(), files);
   }
 
   m_NumFiles = m_Files.size();

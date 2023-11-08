@@ -98,7 +98,7 @@ void albaOpImporterAnsysCommon::OpRun()
   m_AnsysInputFileNameFullPath = "";
 
   wxString f;
-  f = albaGetOpenFile("", wildcard).char_str(); 
+  f = albaGetOpenFile("", wildcard).ToAscii(); 
   if(!f.IsEmpty() && wxFileExists(f))
   {
     m_AnsysInputFileNameFullPath = f;
@@ -184,9 +184,9 @@ int albaOpImporterAnsysCommon::Import()
   for (int c=0; c<m_Components.size(); c++)
   {
     albaVMEMeshAnsysTextImporter *reader = new albaVMEMeshAnsysTextImporter;
-    reader->SetNodesFileName(m_NodesFileName.char_str());
+    reader->SetNodesFileName(m_NodesFileName.ToAscii());
 		if (m_Materials.size() > 0)
-			reader->SetMaterialsFileName(m_MaterialsFileName.char_str());
+			reader->SetMaterialsFileName(m_MaterialsFileName.ToAscii());
 		else
 			reader->SetMode(albaVMEMeshAnsysTextImporter::WITHOUT_MAT_MODE);
 		
@@ -493,7 +493,7 @@ int albaOpImporterAnsysCommon::WriteMaterials()
 	FILE *materialsFile = fopen(m_MaterialsFileName, "w");
 	if (!materialsFile)
 	{
-		albaLogMessage("Cannot Open: %s", m_MaterialsFileName.char_str());
+		albaLogMessage("Cannot Open: %s", m_MaterialsFileName.ToAscii());
 		return ALBA_ERROR;
 	}
 	for (int i = 0; i < m_Materials.size(); i++)

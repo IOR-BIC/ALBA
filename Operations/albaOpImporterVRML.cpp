@@ -195,7 +195,7 @@ void  albaOpImporterVRML::ImportVRML()
   wxFileName::SplitPath(m_File.GetCStr(),&path,&name,&ext);
 
   albaNEW(m_Group);
-  m_Group->SetName(name.char_str());
+  m_Group->SetName(name.ToAscii());
 
   vtkALBASmartPointer<vtkRenderWindow> rw;
 
@@ -232,7 +232,7 @@ void  albaOpImporterVRML::ImportVRML()
       albaTimeStamp t;
       t = m_Input->GetTimeStamp();
       albaSmartPointer<albaVMESurface> surface;
-      surface->SetName(name.char_str());
+      surface->SetName(name.ToAscii());
       vtkPolyData *data = (vtkPolyData *)actor->GetMapper()->GetInput();
       data->Update();
       if(data->GetNumberOfPolys() != 0)

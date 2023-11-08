@@ -102,7 +102,7 @@ void albaOpExporterMSFTest::TestExportMSF1()
 	msfFileNameOut << "/MSF_TEST_OUT.msf";
 
   //Restore the input MSF
-  storageExport->SetURL(msfFileNameIn.char_str());
+  storageExport->SetURL(msfFileNameIn.ToAscii());
   CPPUNIT_ASSERT ( storageExport->Restore() == ALBA_OK );
 
   albaOpExporterMSF *op = new albaOpExporterMSF();
@@ -111,7 +111,7 @@ void albaOpExporterMSFTest::TestExportMSF1()
   CPPUNIT_ASSERT ( op->Accept(storageExport->GetRoot()->GetFirstChild()) );
   op->TestModeOn();
   op->SetInput(storageExport->GetRoot()->GetFirstChild());
-  op->SetFileName(msfFileNameOut.char_str());
+  op->SetFileName(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( op->ExportMSF() == ALBA_OK );
 
   albaVMEStorage *storageImport;
@@ -125,7 +125,7 @@ void albaOpExporterMSFTest::TestExportMSF1()
   msfFileNameOut = GET_TEST_DATA_DIR();
 	msfFileNameOut << "/MSF_TEST_OUT/MSF_TEST_OUT.msf";
 
-  storageImport->SetURL(msfFileNameOut.char_str());
+  storageImport->SetURL(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( storageImport->Restore() == ALBA_OK );
 
   //Check of the vme type inside the tree
@@ -185,7 +185,7 @@ void albaOpExporterMSFTest::TestExportMSF2()
 	msfFileNameOut << "/MSF_TEST_OUT.msf";
 
   //Restore the input MSF
-  storageExport->SetURL(msfFileNameIn.char_str());
+  storageExport->SetURL(msfFileNameIn.ToAscii());
   CPPUNIT_ASSERT ( storageExport->Restore() == ALBA_OK );
 
   albaOpExporterMSF *op = new albaOpExporterMSF();
@@ -194,7 +194,7 @@ void albaOpExporterMSFTest::TestExportMSF2()
   CPPUNIT_ASSERT ( op->Accept(storageExport->GetRoot()->GetFirstChild()->GetChild(1)) );
   op->TestModeOn();
   op->SetInput(storageExport->GetRoot()->GetFirstChild()->GetChild(1));
-  op->SetFileName(msfFileNameOut.char_str());
+  op->SetFileName(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( op->ExportMSF() == ALBA_OK );
 
   albaVMEStorage *storageImport;
@@ -208,7 +208,7 @@ void albaOpExporterMSFTest::TestExportMSF2()
   msfFileNameOut = GET_TEST_DATA_DIR();
   msfFileNameOut<<"/MSF_TEST_OUT/MSF_TEST_OUT.msf";
 
-  storageImport->SetURL(msfFileNameOut.char_str());
+  storageImport->SetURL(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( storageImport->Restore() == ALBA_OK );
 
   //Check of the vme type inside the tree

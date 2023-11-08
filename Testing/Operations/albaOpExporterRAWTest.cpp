@@ -96,7 +96,7 @@ void albaOpExporterRAWTest::Test()
 	wxString path,name,ext;
 	wxFileName::SplitPath(FilenameExporter.GetCStr(),&path,&name,&ext);
 	path+= "/";
-	wxString FilenameCHECK = albaString::Format("%s%s_%dx%dx%d.raw",path.char_str(),name.char_str(),Dimensions[0],Dimensions[1],Dimensions[2]);
+	wxString FilenameCHECK = albaString::Format("%s%s_%dx%dx%d.raw",path.ToAscii(),name.ToAscii(),Dimensions[0],Dimensions[1],Dimensions[2]);
 	importer2->SetFileName(FilenameCHECK);
 	importer2->SetDataDimensions(Dimensions);
 	importer2->SetDataSpacing(Spacing);
@@ -221,7 +221,7 @@ void albaOpExporterRAWTest::TestRG()
 	wxString path,name,ext;
 	wxFileName::SplitPath(FilenameExporter.GetCStr(),&path,&name,&ext);
 	path+= "/";
-	wxString FilenameCHECK = albaString::Format("%s%s_%dx%dx%d.raw",path.char_str(),name.char_str(),Dimensions[0],Dimensions[1],Dimensions[2]);
+	wxString FilenameCHECK = albaString::Format("%s%s_%dx%dx%d.raw",path.ToAscii(),name.ToAscii(),Dimensions[0],Dimensions[1],Dimensions[2]);
 	importer->SetFileName(FilenameCHECK);
 	importer->SetDataDimensions(Dimensions);
 	importer->SetDataSpacing(Spacing);

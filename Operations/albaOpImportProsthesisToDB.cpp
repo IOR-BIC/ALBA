@@ -84,7 +84,7 @@ void albaOpImportProsthesisToDB::OpRun()
 
 	// Select File
 	albaString wildc = "ZIP file (*.zip)|*.zip|XML file (*.xml)|*.xml";
-	wxString prosthesisFile = albaGetOpenFile(albaGetLastUserFolder(), wildc, "Select file").char_str();
+	wxString prosthesisFile = albaGetOpenFile(albaGetLastUserFolder(), wildc, "Select file").ToAscii();
 
 	int result = ImportDB(prosthesisFile);
 

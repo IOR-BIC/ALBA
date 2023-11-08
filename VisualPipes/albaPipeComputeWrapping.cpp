@@ -175,7 +175,7 @@ void albaPipeComputeWrapping::Create(albaSceneNode *n/*, bool use_axes*/)
   m_Caption->BorderOff();
   wxString dis;
   dis = albaString::Format("%.2f",m_WrappedMeterVME->GetDistance());
-  m_Caption->SetCaption(dis.char_str());
+  m_Caption->SetCaption(dis.ToAscii());
 
  /* if(m_WrappedMeterVME->GetMeterMode() == medVMEComputeWrapping::LINE_ANGLE)
     m_Caption->SetVisibility((m_WrappedMeterVME->GetAngle() != 0) && m_WrappedMeterVME->GetMeterAttributes()->m_LabelVisibility);
@@ -349,7 +349,7 @@ void albaPipeComputeWrapping::UpdateProperty(bool fromTag)
   distance_value = RoundValue(distance_value);
   wxString dis;
   dis = albaString::Format("%.2f",distance_value);
-  m_Caption->SetCaption(dis.char_str());
+  m_Caption->SetCaption(dis.ToAscii());
   m_Caption->SetVisibility(m_WrappedMeterVME->GetMeterAttributes()->m_LabelVisibility);
 
   double rgb[3];

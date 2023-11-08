@@ -301,7 +301,7 @@ void albaOpImporterRAWVolume::	OnEvent(albaEventBase *alba_event)
 			{
 				wxString dir = albaGetLastUserFolder();
 				wxString wildc =_("Z_coordinates (*.txt)|*.txt");
-				wxString file = albaGetOpenFile(dir,wildc,_("Open Z coordinates file")).char_str();
+				wxString file = albaGetOpenFile(dir,wildc,_("Open Z coordinates file")).ToAscii();
 				if(!file.IsEmpty())
 				{
 					m_CoordFile = file;
@@ -582,7 +582,7 @@ bool albaOpImporterRAWVolume::Import()
 
 	wxString name, ext, path;
   wxFileName::SplitPath(m_RawFile.GetCStr(),&path,&name,&ext);
-  m_Output->SetName(name.char_str());
+  m_Output->SetName(name.ToAscii());
   m_Output->GetTagArray()->SetTag(tag_Nature);
   m_Output->ReparentTo(m_Input);
 	return true;

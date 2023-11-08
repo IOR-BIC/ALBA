@@ -72,7 +72,7 @@ void albaOpImporterAnalogWS::OpRun()
 	m_File = "";
 	wxString pgd_wildc	= "EMG File (*.*)|*.*";
   wxString f;
-  f = albaGetOpenFile(m_FileDir,pgd_wildc).char_str(); 
+  f = albaGetOpenFile(m_FileDir,pgd_wildc).ToAscii(); 
 	if(!f.IsEmpty() && wxFileExists(f))
 	{
 	  m_File = f;
@@ -122,7 +122,7 @@ void albaOpImporterAnalogWS::Read()
   int comma = line.Find(',');
   wxString freq = line.SubString(0,comma - 1); //Read frequency 
   double freq_val;
-  freq_val = atof(freq.char_str());
+  freq_val = atof(freq.ToAscii());
 
   //Put the signals names in a vector of string
   int num_tk;

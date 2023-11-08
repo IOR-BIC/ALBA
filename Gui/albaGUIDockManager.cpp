@@ -1430,7 +1430,7 @@ static wxString EscapeDelimiters(const wxString& s)
 {
     wxString result;
     result.Alloc(s.Length());
-    const wxChar* ch = s.char_str();
+    const wxChar* ch = s.ToAscii();
     while (*ch)
     {
         if (*ch == wxT(';') || *ch == wxT('|'))
@@ -1584,37 +1584,37 @@ bool wxFrameManager::LoadPerspective(const wxString& layout, bool update)
             else if (val_name == wxT("caption"))
                 pane.m_Caption = value;
             else if (val_name == wxT("state"))
-                pane.m_State = (unsigned int)wxAtoi(value.char_str());
+                pane.m_State = (unsigned int)wxAtoi(value.ToAscii());
             else if (val_name == wxT("dir"))
-                pane.m_DockDirection = wxAtoi(value.char_str());
+                pane.m_DockDirection = wxAtoi(value.ToAscii());
             else if (val_name == wxT("layer"))
-                pane.m_DockLayer = wxAtoi(value.char_str());
+                pane.m_DockLayer = wxAtoi(value.ToAscii());
             else if (val_name == wxT("row"))
-                pane.m_DockRow = wxAtoi(value.char_str());
+                pane.m_DockRow = wxAtoi(value.ToAscii());
             else if (val_name == wxT("pos"))
-                pane.m_DockPos = wxAtoi(value.char_str());
+                pane.m_DockPos = wxAtoi(value.ToAscii());
             else if (val_name == wxT("prop"))
-                pane.m_DockProportion = wxAtoi(value.char_str());
+                pane.m_DockProportion = wxAtoi(value.ToAscii());
             else if (val_name == wxT("bestw"))
-                pane.m_BestSize.x = wxAtoi(value.char_str());
+                pane.m_BestSize.x = wxAtoi(value.ToAscii());
             else if (val_name == wxT("besth"))
-                pane.m_BestSize.y = wxAtoi(value.char_str());
+                pane.m_BestSize.y = wxAtoi(value.ToAscii());
             else if (val_name == wxT("minw"))
-                pane.m_MinSize.x = wxAtoi(value.char_str());
+                pane.m_MinSize.x = wxAtoi(value.ToAscii());
             else if (val_name == wxT("minh"))
-                pane.m_MinSize.y = wxAtoi(value.char_str());
+                pane.m_MinSize.y = wxAtoi(value.ToAscii());
             else if (val_name == wxT("maxw"))
-                pane.m_MaxSize.x = wxAtoi(value.char_str());
+                pane.m_MaxSize.x = wxAtoi(value.ToAscii());
             else if (val_name == wxT("maxh"))
-                pane.m_MaxSize.y = wxAtoi(value.char_str());
+                pane.m_MaxSize.y = wxAtoi(value.ToAscii());
             else if (val_name == wxT("floatx"))
-                pane.m_FloatingPos.x = wxAtoi(value.char_str());
+                pane.m_FloatingPos.x = wxAtoi(value.ToAscii());
             else if (val_name == wxT("floaty"))
-                pane.m_FloatingPos.y = wxAtoi(value.char_str());
+                pane.m_FloatingPos.y = wxAtoi(value.ToAscii());
             else if (val_name == wxT("floatw"))
-                pane.m_FloatingSize.x = wxAtoi(value.char_str());
+                pane.m_FloatingSize.x = wxAtoi(value.ToAscii());
             else if (val_name == wxT("floath"))
-                pane.m_FloatingSize.y = wxAtoi(value.char_str());
+                pane.m_FloatingSize.y = wxAtoi(value.ToAscii());
             else {
                 wxFAIL_MSG(wxT("Bad Perspective String"));
             }

@@ -123,7 +123,7 @@ albaAxes::albaAxes(vtkRenderer *ren, albaVME* vme, int axesType)
 
 		wxString headABSFileName = m_GlobalAxesPolydataActor->GetABSFileName().c_str();
 
-		bool exists = wxFileExists(headABSFileName.char_str());
+		bool exists = wxFileExists(headABSFileName.ToAscii());
 		assert(exists);
 
 		if (exists)
@@ -133,7 +133,7 @@ albaAxes::albaAxes(vtkRenderer *ren, albaVME* vme, int axesType)
 		else
 		{
 			wxString tmp = "Head VTK file not found: ";
-			tmp.Append(headABSFileName.char_str());
+			tmp.Append(headABSFileName.ToAscii());
 			tmp.Append(" cannot create 3d head marker");
 			wxMessageBox(tmp);
 			return;
@@ -157,7 +157,7 @@ albaAxes::albaAxes(vtkRenderer *ren, albaVME* vme, int axesType)
 
 		wxString bodyABSFileName = m_GlobalAxesPolydataActor->GetABSFileName().c_str();
 
-		bool exists = wxFileExists(bodyABSFileName.char_str());
+		bool exists = wxFileExists(bodyABSFileName.ToAscii());
 		assert(exists);
 
 		if (exists)
@@ -167,7 +167,7 @@ albaAxes::albaAxes(vtkRenderer *ren, albaVME* vme, int axesType)
 		else
 		{
 			wxString tmp = "Body VTK file not found: ";
-			tmp.Append(bodyABSFileName.char_str());
+			tmp.Append(bodyABSFileName.ToAscii());
 			tmp.Append(" cannot create 3d body marker");
 			wxMessageBox(tmp);
 			return;

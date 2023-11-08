@@ -95,7 +95,7 @@ void albaOpExporterRAW::OpRun()
 	if(!m_TestMode)
 	{
 		wxString wildc = "raw file (*.raw)|*.raw";
-		wxString file = albaGetSaveFile(m_ProposedDirectory,wildc).char_str(); 
+		wxString file = albaGetSaveFile(m_ProposedDirectory,wildc).ToAscii(); 
 		m_FileName = file;
 
 		//Crete GUI
@@ -158,7 +158,7 @@ void albaOpExporterRAW::SaveVolume()
 		//if the data RAW are saved in a single file
 		if (m_SingleFile)
 		{
-			prefix = albaString::Format("%s%s_%dx%dx%d",path.char_str(),name.char_str(),xdim,ydim,zdim);
+			prefix = albaString::Format("%s%s_%dx%dx%d",path.ToAscii(),name.ToAscii(),xdim,ydim,zdim);
 			
 			exporter->SetFileDimensionality(3); 
 			exporter->SetFilePattern("%s.raw");					
@@ -168,13 +168,13 @@ void albaOpExporterRAW::SaveVolume()
 		//if the data RAW are saved in a different file for each slice
 		else 
 		{
-			prefix = albaString::Format("%s%s_%dx%d",path.char_str(),name.char_str(),xdim,ydim);
+			prefix = albaString::Format("%s%s_%dx%d",path.ToAscii(),name.ToAscii(),xdim,ydim);
 
 			exporter->SetFileDimensionality(2); // the writer will create a number of 2D images
 			exporter->SetFilePattern("%s_%04d.raw");
 		}
 		
-		char *c_prefix = (char*)( prefix.char_str()); 
+		char *c_prefix = (char*)( prefix.ToAscii()); 
 		exporter->SetFilePrefix(c_prefix);
 		exporter->Write();
 
@@ -282,7 +282,7 @@ void albaOpExporterRAW::SaveVolume()
 				proposed += m_Input->GetName();
 				proposed += _(".txt");
 				wxString wildc = _("txt file (*.txt)|*.txt");
-				wxString file = albaGetSaveFile(proposed,wildc).char_str();   
+				wxString file = albaGetSaveFile(proposed,wildc).ToAscii();   
 				nome = (file);
 				f_out.open(nome);
 			}
@@ -323,7 +323,7 @@ void albaOpExporterRAW::SaveVolume()
 			int a[3];
 			StructuredPoints->GetDimensions(a);
 
-			wxString filename = albaString::Format("%s%s_%dx%dx%d.raw",path.char_str(),name.char_str(),xdim,ydim,zdim);							
+			wxString filename = albaString::Format("%s%s_%dx%dx%d.raw",path.ToAscii(),name.ToAscii(),xdim,ydim,zdim);							
 			exporter->SetFileName(filename);
 			exporter->SetFileDimensionality(3);
 
@@ -370,7 +370,7 @@ void albaOpExporterRAW::SaveVolume()
 				proposed += m_Input->GetName();
 				proposed += _(".txt");
 				wxString wildc = _("txt file (*.txt)|*.txt");
-				wxString file = albaGetSaveFile(proposed,wildc).char_str();   
+				wxString file = albaGetSaveFile(proposed,wildc).ToAscii();   
 				nome = (file);
 				std::ofstream f_out;
 				f_out.open(nome);
@@ -422,7 +422,7 @@ void albaOpExporterRAW::SaveVolume()
 				StructuredPoints->Update();
 				exporter->Modified();								
 								
-				wxString filename = albaString::Format("%s%s_%dx%d_%04d.raw",path.char_str(),name.char_str(),xdim,ydim,i);							
+				wxString filename = albaString::Format("%s%s_%dx%d_%04d.raw",path.ToAscii(),name.ToAscii(),xdim,ydim,i);							
 				exporter->SetFileName(filename);
 
 				exporter->Write();

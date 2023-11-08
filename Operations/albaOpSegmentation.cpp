@@ -314,7 +314,7 @@ void albaOpSegmentation::OpDo()
 
   //Generating Surface VME
   albaNEW(m_OutputSurface);
-  m_OutputSurface->SetName(albaString::Format("Segmentation Surface (%s)",m_Volume->GetName()).char_str());
+  m_OutputSurface->SetName(albaString::Format("Segmentation Surface (%s)",m_Volume->GetName()).ToAscii());
   m_OutputSurface->SetData(surface,albaVMEVolumeGray::SafeDownCast(m_Input)->GetTimeStamp());
   m_OutputSurface->ReparentTo(m_Input);
   m_OutputSurface->Modified();
@@ -410,7 +410,7 @@ void albaOpSegmentation::InitSegmentationVolume()
 	albaNEW(m_SegmentationVolume);
 	glo_CurrSeg = m_SegmentationVolume;
 
-	m_SegmentationVolume->SetName(albaString::Format("Segmentation Output (%s)", m_Volume->GetName()).char_str());
+	m_SegmentationVolume->SetName(albaString::Format("Segmentation Output (%s)", m_Volume->GetName()).ToAscii());
 	//lutPreset(4, m_SegmentationVolume->GetMaterial()->m_ColorLut);
 	/*
 	m_SegmentationVolume->GetMaterial()->m_ColorLut->SetTableRange(0, 255);

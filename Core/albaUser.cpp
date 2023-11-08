@@ -274,7 +274,7 @@ void albaUser::UpdateUserCredentialsFile()
     credentials << m_ProxyFlag;
 #ifdef ALBA_USE_CRYPTO
     bool encrypt_success = false;
-    encrypt_success = albaDefaultEncryptFileFromMemory(credentials.char_str(), credentials.Length(), m_UserInfoFile.GetCStr());
+    encrypt_success = albaDefaultEncryptFileFromMemory(credentials.ToAscii(), credentials.Length(), m_UserInfoFile.GetCStr());
     if (!encrypt_success)
     {
       albaLogMessage(_("Error on Encryption!!"));

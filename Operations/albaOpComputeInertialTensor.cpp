@@ -626,7 +626,7 @@ int albaOpComputeInertialTensor::ComputeInertialTensorFromGroup()
   {
     wxString s;
     s << "Found " << n_of_surfaces << " surfaces: applying operation on all of them ..";
-    albaLogMessage(s.char_str());
+    albaLogMessage(s.ToAscii());
   }
   else
   {
@@ -644,7 +644,7 @@ int albaOpComputeInertialTensor::ComputeInertialTensorFromGroup()
 	  
 	  wxString s;
 	  s << "Computing Inertial tensor for: " << childSurface->GetName();
-	  albaLogMessage(s.char_str());      
+	  albaLogMessage(s.ToAscii());      
 	  ComputeLocalInertialTensor(childSurface,i+1,n_of_surfaces);
     }
   }
@@ -664,7 +664,7 @@ double albaOpComputeInertialTensor::GetDensity( albaVME* node)
 	double density = DENSITY_NOT_FOUND;
 
 	albaTagItem *densityTagItem = NULL;
-	densityTagItem = node->GetTagArray()->GetTag(DENSITY_TAG_NAME.char_str());
+	densityTagItem = node->GetTagArray()->GetTag(DENSITY_TAG_NAME.ToAscii());
 
 	if (densityTagItem != NULL)
 	{
@@ -686,7 +686,7 @@ double albaOpComputeInertialTensor::GetMass( albaVME* node)
 	wxString massTagName = "SURFACE_MASS";
 
 	albaTagItem *massTagItem = NULL;
-	massTagItem = node->GetTagArray()->GetTag(massTagName.char_str());
+	massTagItem = node->GetTagArray()->GetTag(massTagName.ToAscii());
 
 	if (massTagItem != NULL)
 	{

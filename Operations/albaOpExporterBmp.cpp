@@ -210,7 +210,7 @@ void albaOpExporterBmp::SaveBmp()
   scalarSliceIn->SetNumberOfTuples(size);
 
   wxString prefix;
-			prefix = albaString::Format("%s%s_%dx%d",path.char_str(),name.char_str(),xdim,ydim);
+			prefix = albaString::Format("%s%s_%dx%d",path.ToAscii(),name.ToAscii(),xdim,ydim);
 
 
   if (m_Bit8 == 0)
@@ -245,7 +245,7 @@ void albaOpExporterBmp::SaveBmp()
     exporter->SetInput(imageFlip->GetOutput());
     exporter->SetFileDimensionality(2); // the writer will create a number of 2D images
     exporter->SetFilePattern("%s_%04d.bmp");
-    exporter->SetFilePrefix(prefix.char_str());
+    exporter->SetFilePrefix((char*)prefix.ToAscii());
      
     exporter->Write();
   }
@@ -272,7 +272,7 @@ void albaOpExporterBmp::SaveBmp()
 
       int fileNumber = z + m_Offset;
 
-      fileName = albaString::Format("%s_%04d.bmp",prefix.char_str(), fileNumber);
+      fileName = albaString::Format("%s_%04d.bmp",prefix.ToAscii(), fileNumber);
 
       
       WriteImageDataAsMonocromeBitmap(imageSlice, fileName);

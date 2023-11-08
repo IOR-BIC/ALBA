@@ -560,7 +560,7 @@ void albaOpLabelExtractor::ExtractLabel()
 
   albaNEW(m_Vme);
 	m_Vme->SetData(surface, 0.0);
-  m_Vme->SetName(m_SurfaceName.char_str());
+  m_Vme->SetName(m_SurfaceName.ToAscii());
   m_Vme->Update();
   m_Output = m_Vme;
 }

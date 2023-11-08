@@ -50,7 +50,7 @@ void albaHTMLTemplateParser::SetTemplateFromFile( wxString filename )
 
   char *fileString;
 
-  templateFile=fopen(filename.char_str(),"r");
+  templateFile=fopen(filename.ToAscii(),"r");
   if (templateFile!=NULL)
   {
 
@@ -79,7 +79,7 @@ void albaHTMLTemplateParser::SetTemplateFromFile( wxString filename )
   }
   else
   {
-    albaLogMessage("albaHTMLTemplateParser: Cannot open File: %s",filename.char_str());
+    albaLogMessage("albaHTMLTemplateParser: Cannot open File: %s",filename.ToAscii());
   }
   
 }
@@ -103,10 +103,10 @@ void albaHTMLTemplateParser::WriteOutputFile(wxString filename)
 {
   FILE *outputFile;
   //You must call this function after parsing
-  outputFile=fopen(filename.char_str(),"w");
+  outputFile=fopen(filename.ToAscii(),"w");
   if (outputFile)
   {
-    fwrite(m_Output.char_str(),sizeof(char),m_Output.size(),outputFile);
+    fwrite(m_Output.ToAscii(),sizeof(char),m_Output.size(),outputFile);
     fclose(outputFile);
   }
 }

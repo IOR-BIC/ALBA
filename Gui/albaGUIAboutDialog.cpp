@@ -178,7 +178,7 @@ void albaGUIAboutDialog::CreateDialog()
 
 			// Load and show the image
 			m_PreviewImage = new wxImage();
-			m_PreviewImage->LoadFile(m_ImagePath.char_str(), wxBITMAP_TYPE_ANY);
+			m_PreviewImage->LoadFile(m_ImagePath.ToAscii(), wxBITMAP_TYPE_ANY);
 
 			previewBitmap = new wxBitmap(*m_PreviewImage);
 			previewImageButton = new albaGUIPicButton(m_AboutDialog, previewBitmap, -1);

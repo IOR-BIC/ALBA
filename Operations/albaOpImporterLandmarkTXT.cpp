@@ -98,7 +98,7 @@ void albaOpImporterLandmarkTXT::OpRun()
   wxString f;
   if (!m_TestMode)
   {
-    f = albaGetOpenFile(m_FileDir,pgd_wildc).char_str(); 
+    f = albaGetOpenFile(m_FileDir,pgd_wildc).ToAscii(); 
   }
 	
 	if(!f.IsEmpty() && wxFileExists(f))
@@ -158,7 +158,7 @@ void albaOpImporterLandmarkTXT::Read()
   albaNEW(m_VmeCloud);
 
   wxString path, name, ext;
-  wxFileName::SplitPath(m_File.char_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.ToAscii(),&path,&name,&ext);
   m_VmeCloud->SetName(name);
 
   albaTagItem tag_Nature;

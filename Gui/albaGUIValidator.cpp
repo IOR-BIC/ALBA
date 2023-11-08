@@ -848,7 +848,7 @@ bool albaGUIValidator::TransferFromWindow(void)
       if (m_MafStringVar)
       {
         s = m_TextCtrl->GetValue();
-        res = !m_MafStringVar->Equals(s.char_str());
+        res = !m_MafStringVar->Equals(s.ToAscii());
         if (res)
         {
           *m_MafStringVar = s;

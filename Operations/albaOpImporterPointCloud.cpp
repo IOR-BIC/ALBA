@@ -227,7 +227,7 @@ int albaOpImporterPointCloud::Import(void)
 	if (!GetTestMode())
 	{
 		wxString f;
-		f = albaGetOpenFile("", wildcard).char_str();
+		f = albaGetOpenFile("", wildcard).ToAscii();
 		if (!f.IsEmpty() && wxFileExists(f))
 			SetFileName(f);
 		else

@@ -69,6 +69,6 @@ int albaWXLog::SetFileName(wxString filename)
 {
  	if(m_Fp) fclose(m_Fp);
   m_Fp = NULL;
-  m_Fp = fopen(filename.char_str(),"w");
+  m_Fp = fopen(filename.ToAscii(),"w");
   return m_Fp != NULL ? ALBA_OK : ALBA_ERROR;
 }

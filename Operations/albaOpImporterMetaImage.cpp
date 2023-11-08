@@ -123,7 +123,7 @@ int albaOpImporterMetaImage::ImportMetaImage()
 	using ReaderType = itk::ImageFileReader<InputImageTypeFloat>;
 	ReaderType::Pointer  reader = ReaderType::New();
 
-	reader->SetFileName(m_File.char_str());
+	reader->SetFileName(m_File.ToAscii());
 	reader->Update();
 	InputImageTypeFloat *itkImage=reader->GetOutput();
 	
@@ -131,7 +131,7 @@ int albaOpImporterMetaImage::ImportMetaImage()
 	if (itkImage != NULL)
 	{
 		wxString path, name, ext;
-		wxFileName::SplitPath(m_File.char_str(), &path, &name, &ext);
+		wxFileName::SplitPath(m_File.ToAscii(), &path, &name, &ext);
 
 		ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
 		itkTOvtk->SetInput(itkImage);
@@ -202,7 +202,7 @@ int albaOpImporterMetaImage::ImportMetaImage()
 			tag_Nature.SetValue("NATURAL");
 			m_Output->GetTagArray()->SetTag(tag_Nature);
 			m_Output->ReparentTo(m_Input);
-			m_Output->SetName(name.char_str());
+			m_Output->SetName(name.ToAscii());
 
 			success = true;
 		}

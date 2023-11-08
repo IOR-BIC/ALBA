@@ -180,9 +180,9 @@ int albaOpValidateTree::ValidateTree()
         absFilename << extension;
         absFilename.Replace("/","\\");
 
-        if (!wxFileExists(absFilename.char_str()))
+        if (!wxFileExists(absFilename.ToAscii()))
         {
-          ErrorLog(albaOpValidateTree::BINARY_FILE_NOT_PRESENT, absFilename.char_str());
+          ErrorLog(albaOpValidateTree::BINARY_FILE_NOT_PRESENT, absFilename.ToAscii());
           result = albaOpValidateTree::VALIDATE_ERROR;
         }
         else
@@ -256,14 +256,14 @@ int albaOpValidateTree::ValidateTree()
                 absFilename << urlString;
               }
 
-              if (!wxFileExists(absFilename.char_str()))
+              if (!wxFileExists(absFilename.ToAscii()))
               {
-                ErrorLog(albaOpValidateTree::BINARY_FILE_NOT_PRESENT, absFilename.char_str());
+                ErrorLog(albaOpValidateTree::BINARY_FILE_NOT_PRESENT, absFilename.ToAscii());
                 result = albaOpValidateTree::VALIDATE_ERROR;
               }
               else
               {
-                m_MSFTreeAbsFileNamesSet.insert(absFilename.char_str());
+                m_MSFTreeAbsFileNamesSet.insert(absFilename.ToAscii());
               }
             } // item != NULL
           } // for() on items

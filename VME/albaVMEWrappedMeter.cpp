@@ -2098,11 +2098,11 @@ void albaVMEWrappedMeter::SaveInFile()
 //-------------------------------------------------------------------------
 {
 	/*albaString initialFileName;
-	initialFileName = albaGetDocumentsDirectory().char_str();
+	initialFileName = albaGetDocumentsDirectory().ToAscii();
 	initialFileName.Append("\\WrapperMeter.txt");
 
 	albaString wildc = "configuration file (*.txt)|*.txt";
-	albaString newFileName = albaGetSaveFile(initialFileName.GetCStr(), wildc).char_str();
+	albaString newFileName = albaGetSaveFile(initialFileName.GetCStr(), wildc).ToAscii();
 
   if (newFileName == "") return;
 

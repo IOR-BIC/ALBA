@@ -102,7 +102,7 @@ void albaOpExporterSTL::OnEvent(albaEventBase *alba_event)
     {
       case wxOK:
 				/*{
-					//albaString FileDir = albaGetApplicationDirectory().char_str();
+					//albaString FileDir = albaGetApplicationDirectory().ToAscii();
 					//FileDir<<"\\";
           albaString name = m_Input->GetName();
           if (name.FindChr('\\') != -1 || name.FindChr('/') != -1 || name.FindChr(':') != -1 || 
@@ -117,7 +117,7 @@ void albaOpExporterSTL::OnEvent(albaEventBase *alba_event)
             m_FileDir << this->m_Input->GetName();
             m_FileDir << ".stl";
             albaString wildc = "STL (*.stl)|*.stl";
-            m_File = albaGetSaveFile(m_FileDir.GetCStr(), wildc.GetCStr()).char_str();
+            m_File = albaGetSaveFile(m_FileDir.GetCStr(), wildc.GetCStr()).ToAscii();
           }
 
 					if(m_File.IsEmpty())

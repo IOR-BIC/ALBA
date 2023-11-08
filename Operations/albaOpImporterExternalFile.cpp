@@ -94,9 +94,9 @@ void albaOpImporterExternalFile::ImportExternalFile()
 
   albaNEW(m_Vme);
 	m_Vme->SetExtension(ext);
-	m_Vme->SetFileName(name.char_str());
-  m_Vme->SetCurrentPath(path.char_str());
-	m_Vme->SetName(vmeName.char_str());
+	m_Vme->SetFileName(name.ToAscii());
+  m_Vme->SetCurrentPath(path.ToAscii());
+	m_Vme->SetName(vmeName.ToAscii());
   m_Vme->ReparentTo(m_Input);
   m_Vme->Update();
 

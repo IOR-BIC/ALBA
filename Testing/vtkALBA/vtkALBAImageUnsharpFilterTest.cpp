@@ -218,9 +218,9 @@ void vtkMEDImageUnsharpFilterTest::CompareImages(vtkRenderWindow * renwin)
 
 
   albaString controlOriginFile;
-  controlOriginFile<<path.char_str();
+  controlOriginFile<<path.ToAscii();
   controlOriginFile<<"\\";
-  controlOriginFile<<name.char_str();
+  controlOriginFile<<name.ToAscii();
   controlOriginFile<<"_";
   controlOriginFile<<"image";
   controlOriginFile<<m_TestNumber;
@@ -246,17 +246,17 @@ void vtkMEDImageUnsharpFilterTest::CompareImages(vtkRenderWindow * renwin)
 
   if(!controlStream)
   {
-    imageFile<<path.char_str();
+    imageFile<<path.ToAscii();
     imageFile<<"\\";
-    imageFile<<name.char_str();
+    imageFile<<name.ToAscii();
     imageFile<<"_";
     imageFile<<"image";
   }
   else
   {
-    imageFile<<path.char_str();
+    imageFile<<path.ToAscii();
     imageFile<<"\\";
-    imageFile<<name.char_str();
+    imageFile<<name.ToAscii();
     imageFile<<"_";
     imageFile<<"comp";
   }
@@ -279,9 +279,9 @@ void vtkMEDImageUnsharpFilterTest::CompareImages(vtkRenderWindow * renwin)
   vtkJPEGReader *rO;
   vtkNEW(rO);
   albaString imageFileOrig="";
-  imageFileOrig<<path.char_str();
+  imageFileOrig<<path.ToAscii();
   imageFileOrig<<"\\";
-  imageFileOrig<<name.char_str();
+  imageFileOrig<<name.ToAscii();
   imageFileOrig<<"_";
   imageFileOrig<<"image";
   imageFileOrig<<m_TestNumber;

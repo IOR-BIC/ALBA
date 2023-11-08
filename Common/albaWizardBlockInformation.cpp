@@ -38,7 +38,7 @@ albaWizardBlockInformation::albaWizardBlockInformation(const char *name):albaWiz
 {
   //setting image on top by default
   m_HorizontalImage=true;
-  m_ImagesPath=(albaGetApplicationDirectory() + "\\WizardImages\\").char_str();
+  m_ImagesPath=(albaGetApplicationDirectory() + "\\WizardImages\\").ToAscii();
 }
 
 //----------------------------------------------------------------------------
@@ -109,7 +109,7 @@ void albaWizardBlockInformation::ExcutionBegin()
       previewImage=new wxImage();
       wxString imgPath=m_ImagesPath;
       imgPath=imgPath+m_ImageFilename;
-      previewImage->LoadFile(imgPath.char_str(), wxBITMAP_TYPE_ANY );
+      previewImage->LoadFile(imgPath.ToAscii(), wxBITMAP_TYPE_ANY );
 
       previewBitmap=new wxBitmap(*previewImage);
       previewImageButton=new albaGUIPicButton(dialog,previewBitmap,-1);
@@ -127,7 +127,7 @@ void albaWizardBlockInformation::ExcutionBegin()
     //fixedFont.SetFaceName("Courier");
     guiLabel->SetFont(fixedFont);
     
-    const char *charPointer=m_Description.char_str();
+    const char *charPointer=m_Description.ToAscii();
     int xsize=0,ysize=0,currentX;
     int x,y;
   

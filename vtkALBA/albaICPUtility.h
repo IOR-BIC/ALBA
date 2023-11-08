@@ -722,7 +722,7 @@ inline void albaICPUtility::Rotation_classif(vcl_multimap<double,int>& mm,const 
 	const int DS_temp_cols=DS_temp.columns();
 
 	vnl_vector<int> index;
-	vcl_ifstream ml_rot_fixed(this->RotationFixedIndexFile.char_str(), std::ios::in);//Changed from "Rot_fixed_index.txt"
+	vcl_ifstream ml_rot_fixed(this->RotationFixedIndexFile.ToAscii(), std::ios::in);//Changed from "Rot_fixed_index.txt"
 	index.read_ascii(ml_rot_fixed);
 	//vcl_cout << "There are  " << index.size() << "  to be tested\n";
 
@@ -813,7 +813,7 @@ inline albaICPUtility::RegResult albaICPUtility::ICP_vtkPointLocator(vnl_matrix<
 	vnl_matrix<double> Min;
 	vnl_matrix<double> DS_R(DS.rows(),DS.columns());//3xn
 	
-	vcl_ifstream ml_rot_fixed(this->RotationFixedFile.char_str(), std::ios::in); //Changed from Rotation_fixed.txt
+	vcl_ifstream ml_rot_fixed(this->RotationFixedFile.ToAscii(), std::ios::in); //Changed from Rotation_fixed.txt
 	if(ml_rot_fixed.is_open() == 0) 
 	{
 		//vcl_cout << "File rotazioni RAR2 inesistente: impossibile proseguire" <<'\n';

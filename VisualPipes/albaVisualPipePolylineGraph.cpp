@@ -684,12 +684,12 @@ void albaVisualPipePolylineGraph::UpdateScalars()
 
   if(m_ActiveScalarType == POINT_TYPE)
   {
-    m_Vme->GetOutput()->GetVTKData()->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].char_str());
+    m_Vme->GetOutput()->GetVTKData()->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].ToAscii());
     m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->Modified();
   }
   else if(m_ActiveScalarType == CELL_TYPE)
   {
-    m_Vme->GetOutput()->GetVTKData()->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].char_str());
+    m_Vme->GetOutput()->GetVTKData()->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].ToAscii());
     m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars()->Modified();
   }
   m_Vme->Modified();
@@ -707,12 +707,12 @@ void albaVisualPipePolylineGraph::UpdateScalars()
     {
       if(m_ActiveScalarType == POINT_TYPE)
       {
-        outputVTK->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].char_str());
+        outputVTK->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].ToAscii());
         outputVTK->GetPointData()->GetScalars()->Modified();
       }
       else if(m_ActiveScalarType == CELL_TYPE)
       {
-        outputVTK->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].char_str());
+        outputVTK->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].ToAscii());
         outputVTK->GetCellData()->GetScalars()->Modified();
       }
       outputVTK->Modified();
@@ -743,7 +743,7 @@ void albaVisualPipePolylineGraph::UpdatePipeFromScalars()
   m_Table->AddRGBPoint(sr[1],1.0,0.0,0.0);
   m_Table->Build();
 
-  m_Glyph->SelectInputScalars(m_ScalarsName[m_ScalarIndex].char_str());
+  m_Glyph->SelectInputScalars(m_ScalarsName[m_ScalarIndex].ToAscii());
   m_Glyph->SetRange(sr);
   m_Glyph->Update();
 

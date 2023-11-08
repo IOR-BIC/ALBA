@@ -1415,9 +1415,9 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
     wxT("Deformation done. Volume shrinkage: %.4f (Orig = %.2f, New = %.2f)\n"),
     dblNewVolume / dblOrigVolume, dblOrigVolume, dblNewVolume);
 
-  albaLogMessage(szMsg.char_str());
+  albaLogMessage(szMsg.ToAscii());
 #ifdef _RPT0
-  _RPT0(_CRT_WARN, szMsg.char_str());
+  _RPT0(_CRT_WARN, szMsg.ToAscii());
 #endif
 #endif
 
@@ -1477,7 +1477,7 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
           }
         }
 
-        vme->SetName(albaString::Format(wxT("%s_%cC#%d"), szOldName.char_str(), chLabels[i], j));
+        vme->SetName(albaString::Format(wxT("%s_%cC#%d"), szOldName.ToAscii(), chLabels[i], j));
         vme->SetData(m_Curves[j]->pPolys[i], 0, albaVMEGeneric::ALBA_VME_REFERENCE_DATA);
 
         albaDEL(pCVMEs[i][j]);    //remove the previous VME

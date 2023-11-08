@@ -177,7 +177,7 @@ void albaOpImporterDicFile::OpRun()
 	m_FileName = "";
 
 	wxString f;
-	f = albaGetOpenFile("", wildcard).char_str(); 
+	f = albaGetOpenFile("", wildcard).ToAscii(); 
 	if(!f.IsEmpty() && wxFileExists(f))
 	{
 		m_FileName = f;

@@ -111,7 +111,7 @@ void albaGetOpenMultiFiles(const char * path, const char * wild, std::vector<wxS
   wxArrayString wxfiles;
 	(result == wxID_OK) ? dialog.GetPaths(wxfiles) : wxfiles.Empty();
 	for (int i=0;i<wxfiles.GetCount();i++)
-	  files.push_back((char *)wxfiles[i].char_str());
+	  files.push_back((char *)wxfiles[i].ToAscii());
 	if (wxfiles.GetCount() > 0)
 	{
 		wxString newPath, name, ext;
@@ -188,7 +188,7 @@ wxString albaGetAppDataDirectory()
 	wxStandardPaths &std = wxStandardPaths::Get();
 	wxString appData_dir = std.GetUserDataDir();
 
-  return appData_dir.char_str();
+  return appData_dir.ToAscii();
 }
 //----------------------------------------------------------------------------
 wxString albaGetDocumentsDirectory()
@@ -210,9 +210,9 @@ wxString albaGetLastUserFolder()
 
   // Return last User Folder if exists, else Documents folder
   if(!config->Read("LastUserFolder", &lastUserFolder))
-    lastUserFolder = albaGetDocumentsDirectory().char_str();
+    lastUserFolder = albaGetDocumentsDirectory().ToAscii();
 
-  return lastUserFolder.char_str();
+  return lastUserFolder.ToAscii();
 }
 
 
@@ -226,7 +226,7 @@ ALBA_EXPORT void albaSetAppDebugDir(wxString ddir)
 ALBA_EXPORT wxString albaGetConfigDirectory()
 {
 	//getting the Config directory
-	wxString config_dir = albaGetApplicationDirectory().char_str();
+	wxString config_dir = albaGetApplicationDirectory().ToAscii();
 
 	//if the debug directory is set we need to add "Installer" to the PATH
 	if(!GLO_appDebugDir.empty())
@@ -599,7 +599,7 @@ wxString  albaIdString(int id)
       s << id;
      break;
     }
-    return s.char_str();
+    return s.ToAscii();
 }
 //----------------------------------------------------------------------------
 int* GetALBAExpertMode()

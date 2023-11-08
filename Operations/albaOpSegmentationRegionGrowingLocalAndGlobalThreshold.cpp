@@ -530,7 +530,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles
   accumulate->SetComponentSpacing(1,0,0); // bins maps all the Scalars Range
   accumulate->Update();
 
-  wxString newDir = (albaGetApplicationDirectory()).char_str();
+  wxString newDir = (albaGetApplicationDirectory()).ToAscii();
   wxString oldDir = wxGetCwd();
   wxSetWorkingDirectory(newDir);
 
@@ -634,7 +634,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::FittingLM()
   accumulate->SetComponentSpacing(1,0,0); // bins maps all the Scalars Range
   accumulate->Update();
 
-  wxString newDir = (albaGetApplicationDirectory()).char_str();
+  wxString newDir = (albaGetApplicationDirectory()).ToAscii();
   wxString oldDir = wxGetCwd();
   wxSetWorkingDirectory(newDir);
 
@@ -648,7 +648,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::FittingLM()
   
   WriteHistogramFiles();
 
-  albaLogMessage(command.char_str());
+  albaLogMessage(command.ToAscii());
   wxExecute(command,wxEXEC_SYNC);
 
   command = "python.exe lm.py";
@@ -659,7 +659,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::FittingLM()
   command.Append(" ");
   command.Append(albaString::Format("%.3f",softIssueParameters[2]));
 
-  albaLogMessage(command.char_str());
+  albaLogMessage(command.ToAscii());
   //wxExecute(command,wxEXEC_SYNC);
 
   wxSetWorkingDirectory(oldDir);

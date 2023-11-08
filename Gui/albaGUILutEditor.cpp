@@ -345,8 +345,8 @@ void albaGUILutEditor::OnEvent(albaEventBase *alba_event)
       case ID_ADD_TO_ULIB:
       {
         albaLogMessage("ID_ADD_TO_ULIB");
-        m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.char_str());
-        int id = m_UserPresetCombo->FindString(m_NewUserLutName.char_str());
+        m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.ToAscii());
+        int id = m_UserPresetCombo->FindString(m_NewUserLutName.ToAscii());
         if (id != -1)
         {
           // the item  already exists and it will not be added to the combo
@@ -365,11 +365,11 @@ void albaGUILutEditor::OnEvent(albaEventBase *alba_event)
         }
 
         albaLogMessage("ID_REMOVE_FROM_ULIB");
-        m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.char_str());
+        m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.ToAscii());
         int id = m_UserPresetCombo->GetSelection();
         wxString sel = m_UserPresetCombo->GetString(id) ;
         m_UserPresetCombo->Delete(id);
-        m_UserLutLibrary->Remove(sel.char_str());
+        m_UserLutLibrary->Remove(sel.ToAscii());
 
       }
       break;
@@ -384,14 +384,14 @@ void albaGUILutEditor::OnEvent(albaEventBase *alba_event)
         albaLogMessage("ID_USER_PRESET");
         int id = m_UserPresetCombo->GetSelection();
         wxString sel = m_UserPresetCombo->GetString(id) ;
-        albaLogMessage(sel.char_str());
+        albaLogMessage(sel.ToAscii());
 				double range[2];
 				range[0]=m_Lut->GetRange()[0];
 				range[1]=m_Lut->GetRange()[1];
-				m_Lut->DeepCopy(m_UserLutLibrary->GetLutByName(sel.char_str()));
+				m_Lut->DeepCopy(m_UserLutLibrary->GetLutByName(sel.ToAscii()));
 				m_Lut->SetRange(range);
 				
-        m_NewUserLutName = sel.char_str();
+        m_NewUserLutName = sel.ToAscii();
         UpdateWidgetsOnLutChange();
       }
       break;

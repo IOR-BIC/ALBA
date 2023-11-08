@@ -486,7 +486,7 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
         m_Gui->Enable(ID_SPC_Z, true);
         wxString rect_dir = albaGetLastUserFolder();
         wxString rect_wildc = _("Z_coordinates (*.txt)|*.txt");
-        wxString file = albaGetOpenFile(rect_dir,rect_wildc,_("Open Z coordinates file")).char_str();
+        wxString file = albaGetOpenFile(rect_dir,rect_wildc,_("Open Z coordinates file")).ToAscii();
         if (file != "")
         {
           m_CoordFile = file;
@@ -775,7 +775,7 @@ void albaOpImporterRAWImages::	UpdateReader()
   m_Reader->SetFilePrefix(prefix);
 
   wxString pattern = m_Pattern + m_Extension;
-  m_Reader->SetFilePattern(pattern.char_str());
+  m_Reader->SetFilePattern(pattern.ToAscii());
 
   m_Reader->SetDataScalarType(GetVTKDataType());
   m_Reader->SetNumberOfScalarComponents(1);
@@ -882,7 +882,7 @@ bool albaOpImporterRAWImages::Import()
   wxString pattern = m_Pattern + m_Extension;
   vtkALBASmartPointer< vtkImageReader > r;
   r->SetFilePrefix(prefix);
-  r->SetFilePattern(pattern.char_str());
+  r->SetFilePattern(pattern.ToAscii());
 
   r->SetDataScalarType(GetVTKDataType());
   r->SetNumberOfScalarComponents(1);
@@ -1065,7 +1065,7 @@ bool albaOpImporterRAWImages::Import()
    tag_Nature.SetName(_("VME_NATURE"));
    tag_Nature.SetValue(_("NATURAL"));
 
-   m_Output->SetName(name.char_str());
+   m_Output->SetName(name.ToAscii());
    m_Output->ReparentTo(m_Input);
 
    m_Output->GetTagArray()->SetTag(tag_Nature);
@@ -1163,7 +1163,7 @@ bool albaOpImporterRAWImages::ControlFilenameList()
   wxString numbers = m_Pattern.AfterLast('%');
   numbers = numbers.Mid(0,numbers.Length()-1);
 
-  int n = atoi(numbers.char_str());
+  int n = atoi(numbers.ToAscii());
 
   for(long number = m_Offset,  j =0; number<m_Offset+SkinFiles.GetCount()*m_FileSpacing;number = number + m_FileSpacing, j++)
   {

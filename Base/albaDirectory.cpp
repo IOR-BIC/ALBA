@@ -121,5 +121,5 @@ const char* albaDirectory::GetFile(int index)
     return 0;
   }
   
-  return m_Files[index].char_str();
+  return m_Files[index].ToAscii();
 }

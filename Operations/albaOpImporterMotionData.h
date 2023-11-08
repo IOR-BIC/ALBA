@@ -52,8 +52,8 @@ public:
     m_Canundo	= true;
     m_File		= "";
     m_Dict		= "";
-    m_FileDir = (albaGetApplicationDirectory() + "/Data/External/").char_str();
-    m_DictDir = (albaGetApplicationDirectory() + "/Config/Dictionary/").char_str();
+    m_FileDir = (albaGetApplicationDirectory() + "/Data/External/").ToAscii();
+    m_DictDir = (albaGetApplicationDirectory() + "/Config/Dictionary/").ToAscii();
 
     m_Vme		= NULL;
 

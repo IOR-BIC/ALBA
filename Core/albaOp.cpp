@@ -111,7 +111,7 @@ void albaOp::OpRun()
 //----------------------------------------------------------------------------
 void albaOp::OpDo()
 {
-	albaLogMessage("Op Do :%s", m_Label.char_str());
+	albaLogMessage("Op Do :%s", m_Label.ToAscii());
 
   if (m_Output)
   {
@@ -221,7 +221,7 @@ void albaOp::SetMouse(albaDeviceButtonsPadMouse *mouse)
 //----------------------------------------------------------------------------
 void albaOp::OpStop(int result)
 {
-	albaLogMessage("Stopping Op :%s\n", m_Label.char_str());
+	albaLogMessage("Stopping Op :%s\n", m_Label.ToAscii());
   HideGui();
   albaEventMacro(albaEvent(this,result));        
 }

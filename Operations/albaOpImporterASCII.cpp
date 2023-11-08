@@ -122,7 +122,7 @@ void albaOpImporterASCII::FillFileList(const char *file_pattern)
   wxDir::GetAllFiles(wxGetCwd(), &files, file_pattern);
   for (int f = 0; f < files.GetCount(); f++)
   {
-    m_Files.insert(m_Files.end(), files[f].char_str());
+    m_Files.insert(m_Files.end(), files[f].ToAscii());
   }
 }
 //----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ void albaOpImporterASCII::OnEvent(albaEventBase *alba_event)
       case ID_ASCII_FILE:
       {
         wxString wildc = "(*.*)|*.*";
-        albaGetOpenMultiFiles(m_FileDir.GetCStr(),wildc.char_str(),m_Files);
+        albaGetOpenMultiFiles(m_FileDir.GetCStr(),wildc.ToAscii(),m_Files);
       }
       break;
       case wxOK:
@@ -210,7 +210,7 @@ int albaOpImporterASCII::ImportASCII()
   albaASCIIImporterUtility utility;
   for (int t=0; t<m_Files.size(); t++)
   {
-    if(utility.ReadFile(m_Files[t].char_str()) == ALBA_OK)
+    if(utility.ReadFile(m_Files[t].ToAscii()) == ALBA_OK)
     {
       import_result = ALBA_OK;
       m_ScalarData->SetData(utility.GetMatrix(),t);

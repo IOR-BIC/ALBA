@@ -153,7 +153,7 @@ void albaGUIDicomSettings::InitializeSettings()
 		m_Config->Write("StepOfBuild",m_Step);
 
 	if(m_Config->Read("LastDicomDir", &string_item))
-		m_LastDicomDir=string_item.char_str();
+		m_LastDicomDir=string_item.ToAscii();
 	else
 		m_Config->Write("LastDicomDir",m_LastDicomDir);
 	

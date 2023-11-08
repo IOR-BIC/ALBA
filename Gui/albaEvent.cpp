@@ -89,7 +89,7 @@ void albaEvent::Log()
 {
   albaString s = "[EV]";
                s << " sender= "<< (long)m_Sender;
-               s << " ID= "    << albaIdString(m_Id).char_str();
+               s << " ID= "    << albaIdString(m_Id).ToAscii();
   if(m_Arg)    s << " arg= "   << m_Arg;
   if(m_Bool)   s << " bool= "  << (int)m_Bool;
   if(m_Double)  s << " double= " << m_Double;

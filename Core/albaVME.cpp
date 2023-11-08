@@ -1926,7 +1926,7 @@ void albaVME::NodeOnEvent(albaEventBase *e)
 					for (int pos = message.Find('\n'); pos >= 0; pos = message.Find('\n'))
 					{
 						wxString tmp = message.Mid(0, pos);
-						albaLogMessage(tmp.char_str());
+						albaLogMessage(tmp.ToAscii());
 						message = message.Mid(pos + 1);
 					}
 #else

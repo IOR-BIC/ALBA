@@ -213,7 +213,7 @@ void albaViewSliceGlobal::UpdateText(int ID)
     m_Text="";
   }
 
-  m_TextMapper->SetInput(m_Text.char_str());
+  m_TextMapper->SetInput(m_Text.ToAscii());
   m_TextMapper->Modified();
 }
 

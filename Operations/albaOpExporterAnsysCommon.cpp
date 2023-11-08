@@ -82,7 +82,7 @@ void albaOpExporterAnsysCommon::OnOK()
   m_AnsysOutputFileNameFullPath = "";
 
   wxString f;
-  f = albaGetSaveFile("",wildcard).char_str(); 
+  f = albaGetSaveFile("",wildcard).ToAscii(); 
   if(!f.IsEmpty())
   {
     m_AnsysOutputFileNameFullPath = f;

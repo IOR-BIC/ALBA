@@ -234,7 +234,7 @@ bool Wiimote::NoButtonsPressed()
 
 void Wiimote::ButtonPressed(Button & b)
 {
-	odprintf("Button pressed: %s", b.GetName().char_str());
+	odprintf("Button pressed: %s", b.GetName().ToAscii());
 	SetLEDs(1, 0, 1, 0);
 
 	SetRumble(true);
@@ -242,7 +242,7 @@ void Wiimote::ButtonPressed(Button & b)
 
 void Wiimote::ButtonReleased(Button & b)
 {
-	odprintf("Button released: %s", b.GetName().char_str());
+	odprintf("Button released: %s", b.GetName().ToAscii());
 	SetLEDs(0, 0, 0, 0);
 
 	if (NoButtonsPressed())

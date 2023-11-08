@@ -94,7 +94,7 @@ std::vector<albaString> ZIPOpen(albaString file)
 	int s_size;
 	std::ofstream out_file_stream;
 
-	out_file_stream.open(out_file.char_str(), std::ios_base::binary);
+	out_file_stream.open(out_file.ToAscii(), std::ios_base::binary);
 
 	s_size = zip_is->GetSize();
 	buf = new char[s_size];
@@ -120,7 +120,7 @@ std::vector<albaString> ZIPOpen(albaString file)
 			complete_name = complete_name.Mid(length_header_name);
 		out_file = tmpDir + "\\" + complete_name;
 
-		out_file_stream.open(out_file.char_str(), std::ios_base::binary); // The file to extract is a binary
+		out_file_stream.open(out_file.ToAscii(), std::ios_base::binary); // The file to extract is a binary
 		s_size = zip_is->GetSize();
 		buf = new char[s_size];
 		zip_is->Read(buf, s_size);

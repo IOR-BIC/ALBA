@@ -79,7 +79,7 @@ void albaOpExporterAnalogWS::OpRun()
 	proposed += ".csv";
 	
   wxString wildc = "ASCII CSV file (*.csv)|*.csv";
-	wxString f = albaGetSaveFile(proposed,wildc).char_str(); 
+	wxString f = albaGetSaveFile(proposed,wildc).ToAscii(); 
 
 	int result = OP_RUN_CANCEL;
 	if(!f.IsEmpty())
@@ -104,7 +104,7 @@ void albaOpExporterAnalogWS::Write()
 
   albaString empty("");
 
-  std::ofstream f_Out(m_File.char_str());
+  std::ofstream f_Out(m_File.ToAscii());
   if (!f_Out.bad())
   {
     // Add ANALOG tag

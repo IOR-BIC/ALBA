@@ -85,7 +85,7 @@ int albaOpImporterAnsysInputFile::ParseAnsysFile(albaString fileName)
 	nodesFile = fopen(m_NodesFileName, "w");
 	if (!nodesFile)
 	{
-		albaLogMessage("Cannot Open: %s",m_NodesFileName.char_str());
+		albaLogMessage("Cannot Open: %s",m_NodesFileName.ToAscii());
 		ReadFinalize();
 		return ALBA_ERROR;
 	}

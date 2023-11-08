@@ -808,7 +808,7 @@ int albaPolylineGraph::Branch::GetNumberOfEdges() const
 const char* albaPolylineGraph::Branch::GetName() const
 //-------------------------------------------------------------------------
 {
-  return m_Name.char_str();
+  return m_Name.ToAscii();
 }
 
 //-------------------------------------------------------------------------

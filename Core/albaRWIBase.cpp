@@ -116,7 +116,7 @@ albaRWIBase::albaRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
 {
   m_Hidden = true;
   this->Show(false);
-	//m_SaveDir = ::wxGetHomeDir().char_str(); 
+	//m_SaveDir = ::wxGetHomeDir().ToAscii(); 
   m_SaveDir = "";
   m_Width = m_Height = 10;
   
@@ -743,7 +743,7 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
     wxString file = "";
 
     file.Append(filename);
-    file = albaGetSaveFile(file,wildc).char_str(); 
+    file = albaGetSaveFile(file,wildc).ToAscii(); 
     if(file.IsEmpty()) 
       return;
     filename = file;
@@ -920,7 +920,7 @@ void albaRWIBase::SaveImageRecursive(albaString filename, albaViewCompound *v,in
     }
 
     file.Append(filename);
-    file = albaGetSaveFile(file,wildc).char_str(); 
+    file = albaGetSaveFile(file,wildc).ToAscii(); 
     if(file.IsEmpty()) 
       return;
     filename = file;
@@ -1035,7 +1035,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
       {
         vtkALBASmartPointer<vtkBMPWriter> w;
         w->SetInput(w2i->GetOutput());
-        w->SetFileName(temp.char_str());
+        w->SetFileName(temp.ToAscii());
         w->Write();
 
         // bitmap header
@@ -1062,13 +1062,13 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
         */
 #ifdef WIN32
         //open file
-        fstream myFile (temp.char_str(), ios::in | ios::out | ios::binary);
+        fstream myFile (temp.ToAscii(), ios::in | ios::out | ios::binary);
         myFile.seekp (38);
         myFile.write ((char*)&pixelXMeterX, 4);
         myFile.write ((char*)&pixelXMeterY, 4);
         myFile.close();
 
-        FILE *fp = fopen(temp.char_str(), "rb");
+        FILE *fp = fopen(temp.ToAscii(), "rb");
         if(!fp) return ;
 
         BITMAPFILEHEADER bmfh={0};
@@ -1085,21 +1085,21 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
       {
         vtkALBASmartPointer<vtkJPEGWriter> w;
         w->SetInput(w2i->GetOutput());
-        w->SetFileName(temp.char_str());
+        w->SetFileName(temp.ToAscii());
         w->Write();
       }
       else if (extension == "tiff")
       {
         vtkALBASmartPointer<vtkTIFFWriter> w;
         w->SetInput(w2i->GetOutput());
-        w->SetFileName(temp.char_str());
+        w->SetFileName(temp.ToAscii());
         w->Write();
       }
       else if (extension == "ps")
       {
         vtkALBASmartPointer<vtkPostScriptWriter> w;
         w->SetInput(w2i->GetOutput());
-        w->SetFileName(temp.char_str());
+        w->SetFileName(temp.ToAscii());
         w->Write();
       }
       else if (extension == "png")
@@ -1108,7 +1108,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
         w->SetInput(w2i->GetOutput());
         w->SetPixelPerMeterX(pixelXMeterX);
         w->SetPixelPerMeterY(pixelXMeterY);
-        w->SetFileName(temp.char_str());
+        w->SetFileName(temp.ToAscii());
         w->Write();
       }
       else

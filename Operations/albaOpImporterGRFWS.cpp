@@ -186,7 +186,7 @@ void albaOpImporterGRFWS::ReadForcePlates()
   int comma = line.Find(',');
   wxString freq = line.SubString(0,comma - 1); //Read frequency 
   double freq_val;
-  freq_val = atof(freq.char_str());
+  freq_val = atof(freq.ToAscii());
 
   line = text.ReadLine(); //Skip textual lines
   line = text.ReadLine();
@@ -514,7 +514,7 @@ void albaOpImporterGRFWS::ReadSingleVector()
   int comma = line.Find(',');
   wxString freq = line.SubString(0,comma - 1); //Read frequency 
   double freq_val;
-  freq_val = atof(freq.char_str());
+  freq_val = atof(freq.ToAscii());
 
   line = text.ReadLine(); 
   line = text.ReadLine();
