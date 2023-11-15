@@ -2122,7 +2122,12 @@ public:
 		m_ppElements=NULL;
 	};
   /** overloaded constructor */
-	SparseMatrix( int rows ){Resize(rows);};
+	SparseMatrix( int r ){
+		rows = 0;
+		rowSizes = NULL;
+		m_ppElements = NULL;
+		Resize(r);
+	};
   /** resize the matrix*/
 	void Resize( int r ){
 		int i;
@@ -2159,6 +2164,9 @@ public:
 
   /** overloaded constructor */
 	SparseMatrix( const SparseMatrix& M ){
+		rows = 0;
+		rowSizes = NULL;
+		m_ppElements = NULL;
 		Resize(M.rows);
 		for (int i=0; i<rows; i++){
 			SetRowSize(i,M.rowSizes[i]);
