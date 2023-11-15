@@ -44,7 +44,7 @@ static const int SamplingTableSize = 64000;
 vtkALBAVolumeSlicer::vtkALBAVolumeSlicer() 
 //----------------------------------------------------------------------------
 {
-  PlaneOrigin[0] = PlaneOrigin[1] = PlaneOrigin[2] = 0.f;
+	PlaneOrigin[0] = PlaneOrigin[1] = PlaneOrigin[2] = 0.f;
   PlaneAxisX[0] = 1.f;
   PlaneAxisX[1] = PlaneAxisX[2] = 0.f;
   PlaneAxisY[0] = PlaneAxisY[2] = 0.f;
@@ -55,9 +55,12 @@ vtkALBAVolumeSlicer::vtkALBAVolumeSlicer()
   GlobalPlaneAxisX[1] = GlobalPlaneAxisX[2] = 0.f;
   GlobalPlaneAxisY[0] = GlobalPlaneAxisY[2] = 0.f;
   GlobalPlaneAxisY[1]  = 1.f;
+	GlobalPlaneAxisZ[0] = GlobalPlaneAxisZ[1] = 0.f;
+	GlobalPlaneAxisZ[2] = 1.f;
 
   TransformSlice = NULL;
 
+	Window = Level = 0;
  
   this->AutoSpacing = 1;    //Autospacing is enabled by the default
   this->LastGPUEnabled = this->GPUEnabled = 1;     //GPU is enabled by the default
@@ -66,6 +69,10 @@ vtkALBAVolumeSlicer::vtkALBAVolumeSlicer()
   {
     this->StIndices[i] = NULL;
     this->StOffsets[i] = NULL;
+		DataOrigin[i]=0;
+		DataBounds[i][0] = DataBounds[i][1] = 0;
+		DataDimensions[3] = 0;
+		SamplingTableMultiplier[3] = 0;
   }  
 
   LastPreprocessedInput = NULL; 
@@ -137,7 +144,7 @@ void vtkALBAVolumeSlicer::SetPlaneAxisY(float axis[3])
 void vtkALBAVolumeSlicer::SetPlaneOrigin(double origin[3])
 //----------------------------------------------------------------------------
 {
-  memcpy(PlaneOrigin, origin, sizeof(PlaneOrigin));
+	memcpy(PlaneOrigin, origin, sizeof(PlaneOrigin));
   if (TransformSlice)
   {
     TransformSlice->TransformPoint(PlaneOrigin, GlobalPlaneOrigin);
@@ -669,7 +676,7 @@ void vtkALBAVolumeSlicer::ExecuteDataHotFix(vtkDataObject *outputData)
   outputObject->SetExtent(extent);
   outputObject->SetNumberOfScalarComponents(this->NumComponents);
   outputObject->AllocateScalars();  
- 
+	
   if (BNoIntersection)
   {
     //there is no intersection with data => black texture
@@ -751,7 +758,7 @@ void vtkALBAVolumeSlicer::ExecuteDataHotFix(vtkDataObject *outputData)
 #ifdef _WIN32
   if (GPUEnabled)
 		m_bGPUProcessing = m_TextureHelper->InitializeTexture(input,output);
- 
+
   if (!m_bGPUProcessing)
   {      
 #endif
