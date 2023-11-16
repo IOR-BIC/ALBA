@@ -42,6 +42,8 @@ public:
   /** Remove filename to history. */
   virtual void RemoveFileFromHistory(int i);
 
+	void UpdateMenuLabels(wxMenu* menu);
+
   /** Add filename item to men. */
   virtual void AddFilesToMenu();
 

@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaGUIFileHistory
- Authors: Silvano Imboden
+ Authors: Silvano Imboden, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -59,31 +59,17 @@ void albaGUIFileHistory::AddFileToHistory(const wxString& file)
 	if (m_fileHistory.size() == m_fileMaxFiles)
 		m_fileHistory.pop_back();
 
-
-	wxNode* node = m_fileMenus.GetFirst();
-	while (node)
-	{
-		wxMenu* menu = (wxMenu*)node->GetData();
-		menu->Append(wxID_FILE1 + m_fileHistory.size(), _("[EMPTY]"));
-		node = node->GetNext();
-	}
-
 	// Shuffle filenames down
 	m_fileHistory.Insert(file, 0);
 
-
-	//Update menu entries
-	for (i = 0; i < m_fileHistory.size(); i++)
+	wxNode* node = m_fileMenus.GetFirst();
+	if (node)
 	{
-		wxString buf;
-		buf.Printf(s_MRUEntryFormat, i + 1, m_fileHistory[i]);
-		wxNode* node = m_fileMenus.GetFirst();
-		while (node)
-		{
-			wxMenu* menu = (wxMenu*)node->GetData();
-			menu->SetLabel(wxID_FILE1 + i, buf);
-			node = node->GetNext();
-		}
+		wxMenu* menu = (wxMenu*)node->GetData();
+
+		menu->Append(wxID_FILE1 + m_fileHistory.size()-1, _("[EMPTY]"));
+
+		UpdateMenuLabels(menu);
 	}
 }
 //----------------------------------------------------------------------------
@@ -93,28 +79,33 @@ void albaGUIFileHistory::RemoveFileFromHistory(int i)
   wxCHECK_RET( i < m_fileHistory.size(), _("invalid index in albaGUIFileHistory::RemoveFileFromHistory") );
 
   wxNode* node = m_fileMenus.GetFirst();
-  while ( node )
+  if ( node )
   {
     wxMenu* menu = (wxMenu*) node->GetData();
 
     // delete the element from the array (could use memmove() too...)
     m_fileHistory.RemoveAt(i);
 
+		// delete the last menu item which is unused now
+		menu->Delete(wxID_FILE1 + m_fileHistory.size());
     
-    // shuffle filenames up
-    wxString buf;
-    for(int j = i; j < m_fileHistory.size() - 1; j++ )
-    {
-      buf.Printf(s_MRUEntryFormat, j + 1, m_fileHistory[j]);
-      menu->SetLabel(wxID_FILE1 + j, buf);
-    }
-
-    node = node->GetNext();
-
-    // delete the last menu item which is unused now
-    menu->Delete(wxID_FILE1 + m_fileHistory.size() - 1);
+		//Update the menu labels
+		UpdateMenuLabels(menu);   
   }
 }
+
+//----------------------------------------------------------------------------
+void albaGUIFileHistory::UpdateMenuLabels(wxMenu* menu)
+{
+	// shuffle filenames up
+	wxString buf;
+	for (int j = 0; j < m_fileHistory.size(); j++)
+	{
+		buf.Printf(s_MRUEntryFormat, j + 1, m_fileHistory[j]);
+		menu->SetLabel(wxID_FILE1 + j, buf);
+	}
+}
+
 //----------------------------------------------------------------------------
 void albaGUIFileHistory::AddFilesToMenu()
 //----------------------------------------------------------------------------
@@ -122,20 +113,10 @@ void albaGUIFileHistory::AddFilesToMenu()
   if (m_fileHistory.size() > 0)
   {
     wxNode* node = m_fileMenus.GetFirst();
-    while(node)
+    if(node)
     {
       wxMenu* menu = (wxMenu*) node->GetData();
-      int i;
-			for (i = 0; i < m_fileHistory.size(); i++)
-			{
-				wxString buf;
-				buf.Printf(s_MRUEntryFormat, i + 1, m_fileHistory[i]);
-				if (menu->FindItem(buf) == -1)
-				{
-					menu->Append(wxID_FILE1 + i, buf);
-				}
-			}
-      node = node->GetNext();
+			AddFilesToMenu(menu);
     }
   }
 }
