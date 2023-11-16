@@ -849,7 +849,7 @@ void albaOpSegmentation::CreateInitSegmentationGui()
 	wxString choices[4] = { _("Global"),_("Z-Split"), _("Load"), _("Mask") };
 	int w_id = currentGui->GetWidgetId(ID_INIT_MODALITY);
 
-	m_InitModalityRadioBox = new wxRadioBox(currentGui, w_id, "", wxDefaultPosition, wxSize(200, -1), 4, choices, 2, wxRA_SPECIFY_COLS | wxSUNKEN_BORDER | wxTAB_TRAVERSAL);
+	m_InitModalityRadioBox = new wxRadioBox(currentGui, w_id, "", wxDefaultPosition, wxSize(200, -1), 4, choices, 2, wxRA_SPECIFY_COLS | wxTAB_TRAVERSAL);
 	m_InitModalityRadioBox->SetValidator(albaGUIValidator(currentGui, w_id, m_InitModalityRadioBox, &m_InitModality));
 
 	wxBoxSizer *thresholdTypeLabSizer = new wxBoxSizer(wxHORIZONTAL);

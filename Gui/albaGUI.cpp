@@ -1338,10 +1338,8 @@ void albaGUI::Radio(int id, wxString label, int* var, int numchoices, const wxSt
 
 		w_id = GetWidgetId(id);
 		if(style== wxRA_SPECIFY_COLS)
-			radio = new wxRadioBox(this, w_id, "", dp, wxSize(DW, -1), numchoices, choices, dim, style | m_EntryStyle | wxTAB_TRAVERSAL);
-		else
-			radio = new wxRadioBox(this, w_id, "", dp, wxSize(DW, -1), numchoices, choices, dim, style | wxTAB_TRAVERSAL);
-
+			radio = new wxRadioBox(this, w_id, "", dp, wxSize(DW, -1), numchoices, choices, dim, style | wxBORDER_NONE | wxTAB_TRAVERSAL);
+	
 		sizer->Add(lab, 0, wxRIGHT, LM);
 		sizer->Add(radio, 0, wxRIGHT, HM);
 		Add(sizer, 0, wxALL, M);
