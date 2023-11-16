@@ -352,7 +352,6 @@ int albaVME::SetParent(albaVME *parent)
 
 			m_Parent = parent;
 			SetId(-1);
-			Modified();
 		}
 		return ALBA_OK;
 	}

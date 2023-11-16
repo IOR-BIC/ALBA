@@ -97,6 +97,7 @@ albaViewOrthoSlice::albaViewOrthoSlice(wxString label)
 
 	m_Root = NULL;
 
+	m_Decimals = 2;
 }
 //----------------------------------------------------------------------------
 albaViewOrthoSlice::~albaViewOrthoSlice()
@@ -118,8 +119,19 @@ albaView *albaViewOrthoSlice::Copy(albaObserver *Listener, bool lightCopyEnabled
   }
   v->m_NumOfPluggedChildren = m_NumOfPluggedChildren;
   v->Create();
-  return v;
+
+	return v;
 }
+
+//----------------------------------------------------------------------------
+void albaViewOrthoSlice::Create()
+{
+	Superclass::Create();
+
+	for (int i = 0; i < VIEWS_NUMBER; i++)
+		m_Views[i] = (albaViewSlice *)m_ChildViewList[i];
+}
+
 //----------------------------------------------------------------------------
 void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
 //----------------------------------------------------------------------------
@@ -175,18 +187,23 @@ void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
       double bounds[6], edges[3], vol, nPoints;
       vtkDataSet *volOutput;
       volOutput=vme->GetOutput()->GetVTKData();
+			if (volOutput == NULL)
+				return;
       volOutput->GetBounds(bounds);
       nPoints=volOutput->GetNumberOfPoints();
       edges[0]=bounds[1]-bounds[0];
       edges[1]=bounds[3]-bounds[2];
       edges[2]=bounds[5]-bounds[4];
       vol=edges[0]*edges[1]*edges[2];
-      m_PolylineRadiusSize=pow(vol/nPoints,1.0/3.0)/2.0;
+			m_XSliceSlider->SetRange(bounds[0], bounds[1]);
+			m_YSliceSlider->SetRange(bounds[2], bounds[3]);
+			m_ZSliceSlider->SetRange(bounds[4], bounds[5]);
+			m_PolylineRadiusSize = pow(vol / nPoints, 1.0 / 3.0) / 2.0;
 		}
 		else
 		{
 			m_CurrentVolume = NULL;
-      DestroyOrthoSlicesAndGizmos();
+      RemoveVolumeFromGizmo();
     }
 	}
 	else
@@ -232,7 +249,7 @@ void albaViewOrthoSlice::VmeRemove(albaVME *vme)
     // Disable ChildViews
     for(int j=1; j<m_NumOfChildView; j++) 
       m_ChildViewList[j]->VmeShow(vme, false);
-    DestroyOrthoSlicesAndGizmos();
+    RemoveVolumeFromGizmo();
     EnableWidgets(false);
   }
   // Remove node from list
@@ -263,75 +280,90 @@ void albaViewOrthoSlice::CreateGuiView()
 void albaViewOrthoSlice::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
-  if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-  {
-    switch(e->GetId()) 
-    {
-  		case ID_BORDER_CHANGE:
+	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
+	{
+		switch (e->GetId())
+		{
+			case ID_BORDER_CHANGE:
 			{
 				OnEventSetThickness();
 			}
 			break;
 			case ID_ALL_SURFACE:
 			{
-				if(m_AllSurface)
+				if (m_AllSurface)
 				{
-					albaVME* vme=GetSceneGraph()->GetSelectedVme();
+					albaVME* vme = GetSceneGraph()->GetSelectedVme();
 					SetThicknessForAllSurfaceSlices(m_Root);
 				}
 			}
 			break;
-      case ID_LUT_CHOOSER:
-      {
-        mmaVolumeMaterial *currentVolumeMaterial = ((albaVMEOutputVolume *)m_CurrentVolume->GetOutput())->GetMaterial();
-        currentVolumeMaterial->UpdateFromTables();
-        for(int i=0; i<m_NumOfChildView; i++)
-        {
-          albaPipeVolumeOrthoSlice *p = (albaPipeVolumeOrthoSlice *)((albaViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
-          p->SetColorLookupTable(m_ColorLUT);
-        }
-        double *sr;
-        sr = m_ColorLUT->GetRange();
-        m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
-        CameraUpdate();
-      }
-      break;
-      case ID_RANGE_MODIFIED:
-      {
-        if(((albaViewSlice *)m_ChildViewList[0])->VolumeIsVisible())
-        {
-          double low, hi;
-          m_LutSlider->GetSubRange(&low,&hi);
-          m_ColorLUT->SetTableRange(low,hi);
-          mmaVolumeMaterial *currentVolumeMaterial = ((albaVMEOutputVolume *)m_CurrentVolume->GetOutput())->GetMaterial();
-          currentVolumeMaterial->UpdateFromTables();
-          CameraUpdate();
-        }
-      }
-      break;
-      case MOUSE_UP:
-      case MOUSE_MOVE:
-      {
-        // get the gizmo that is being moved
-        long gizmoId = e->GetArg();
-        vtkPoints *p = (vtkPoints *)e->GetVtkObj();
-        if(p == NULL) return;
-        this->SetSlicePosition(gizmoId, p);
-      }
-      break;
+			case ID_X_SLIDER:
+			case ID_Y_SLIDER:
+			case ID_Z_SLIDER:
+			{
+				double direction[] = { albaGizmoSlice::GIZMO_SLICE_X,albaGizmoSlice::GIZMO_SLICE_Y,albaGizmoSlice::GIZMO_SLICE_Z };
+
+				for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
+					m_Gizmo[gizmoId]->UpdateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], m_GizmoHandlePosition[gizmoId]);
+
+				for (int i = 0; i < VIEWS_NUMBER; i++)
+					m_Views[i]->SetSlice(m_GizmoHandlePosition);
+
+				CameraUpdate();
+			}
+			break;
+			case ID_LUT_CHOOSER:
+			{
+				mmaVolumeMaterial *currentVolumeMaterial = ((albaVMEOutputVolume *)m_CurrentVolume->GetOutput())->GetMaterial();
+				currentVolumeMaterial->UpdateFromTables();
+				for (int i = 0; i < m_NumOfChildView; i++)
+				{
+					albaPipeVolumeOrthoSlice *p = (albaPipeVolumeOrthoSlice *)m_Views[i]->GetNodePipe(m_CurrentVolume);
+					p->SetColorLookupTable(m_ColorLUT);
+				}
+				double *sr;
+				sr = m_ColorLUT->GetRange();
+				m_LutSlider->SetSubRange((long)sr[0], (long)sr[1]);
+				CameraUpdate();
+			}
+			break;
+			case ID_RANGE_MODIFIED:
+			{
+				if (m_Views[0]->VolumeIsVisible())
+				{
+					double low, hi;
+					m_LutSlider->GetSubRange(&low, &hi);
+					m_ColorLUT->SetTableRange(low, hi);
+					mmaVolumeMaterial *currentVolumeMaterial = ((albaVMEOutputVolume *)m_CurrentVolume->GetOutput())->GetMaterial();
+					currentVolumeMaterial->UpdateFromTables();
+					CameraUpdate();
+				}
+			}
+			break;
+			case MOUSE_UP:
+			case MOUSE_MOVE:
+			{
+				// get the gizmo that is being moved
+				long gizmoId = e->GetArg();
+				vtkPoints *p = (vtkPoints *)e->GetVtkObj();
+				if (p == NULL) return;
+				this->SetSlicePosition(gizmoId, p);
+			}
+			break;
 			case ID_SNAP:
 			{
-				if(this->m_CurrentVolume==NULL && m_Snap)
+				if (this->m_CurrentVolume == NULL && m_Snap)
 				{
 					wxMessageBox("You can't switch to snap modality!");
-					m_Snap=0;
+					m_Snap = 0;
 					m_Gui->Update();
 				}
 				else
 				{
-					for(int i=GIZMO_XN; i<GIZMOS_NUMBER; i++)
+					for (int i = GIZMO_XN; i < GIZMOS_NUMBER; i++)
 					{
-						if(m_Snap==1)
+						if (m_Snap == 1)
 							m_Gizmo[i]->SetGizmoMovingModalityToSnap();
 						else
 							m_Gizmo[i]->SetGizmoMovingModalityToBound();
@@ -339,33 +371,39 @@ void albaViewOrthoSlice::OnEvent(albaEventBase *alba_event)
 				}
 			}
 			break;
-      case ID_RESET_SLICES:
-      {
-        assert(m_CurrentVolume);
-        this->ResetSlicesPosition(m_CurrentVolume);
-      }
-      break;
-      case ID_TRILINEAR_INTERPOLATION:
-        {
-          if (m_CurrentVolume)
-          {
-            for(int i=0; i<m_NumOfChildView; i++)
-            {
-              albaPipeVolumeOrthoSlice *p = NULL;
-              p = albaPipeVolumeOrthoSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
-              if (p)
-              {
-                p->SetInterpolation(m_TrilinearInterpolationOn);
-              }
-            }
-            this->CameraUpdate();
-          }
-        }
-        break;
-      default:
-        albaViewCompound::OnEvent(alba_event);
-    }
-  }
+			case ID_RESET_SLICES:
+			{
+				assert(m_CurrentVolume);
+				this->ResetSlicesPosition(m_CurrentVolume);
+			}
+			break;
+			case ID_TRILINEAR_INTERPOLATION:
+			{
+				if (m_CurrentVolume)
+				{
+					for (int i = 0; i < m_NumOfChildView; i++)
+					{
+						albaPipeVolumeOrthoSlice *p = NULL;
+						p = albaPipeVolumeOrthoSlice::SafeDownCast(m_Views[i]->GetNodePipe(m_CurrentVolume));
+						if (p)
+						{
+							p->SetInterpolation(m_TrilinearInterpolationOn);
+						}
+					}
+					this->CameraUpdate();
+				}
+			}
+			break;
+			case ID_DECIMALS:
+			{
+				for (int i = XN_VIEW; i < VIEWS_NUMBER; i++)
+					m_Views[i]->SetDecimals(m_Decimals);
+			}
+			break;
+			default:
+				albaViewCompound::OnEvent(alba_event);
+		}
+	}
 }
 //-------------------------------------------------------------------------
 albaGUI* albaViewOrthoSlice::CreateGui()
@@ -377,6 +415,7 @@ albaGUI* albaViewOrthoSlice::CreateGui()
 	m_Gui = albaView::CreateGui();
 
   m_Gui->Combo(ID_LAYOUT_CHOOSER,"Layout",&m_LayoutConfiguration,3,layout_choices);
+	m_Gui->Slider(ID_DECIMALS, "Decimals", &m_Decimals, 0, 8);
   m_Gui->Divider();
   m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
   m_Gui->Divider(2);
@@ -386,11 +425,17 @@ albaGUI* albaViewOrthoSlice::CreateGui()
 
 	m_Gui->Bool(ID_SNAP,"Snap on grid",&m_Snap,1);
 
+	m_XSliceSlider = m_Gui->FloatSlider(ID_X_SLIDER, "X Slice:", &m_GizmoHandlePosition[0], VTK_FLOAT_MIN, VTK_FLOAT_MAX);
+	m_YSliceSlider = m_Gui->FloatSlider(ID_Y_SLIDER, "Y Slice:", &m_GizmoHandlePosition[1], VTK_FLOAT_MIN, VTK_FLOAT_MAX);
+	m_ZSliceSlider = m_Gui->FloatSlider(ID_Z_SLIDER, "Z Slice:", &m_GizmoHandlePosition[2], VTK_FLOAT_MIN, VTK_FLOAT_MAX);
+	
   m_Gui->Button(ID_RESET_SLICES,"Reset slices","");
   m_Gui->Divider();
 
 	m_Gui->Bool(ID_ALL_SURFACE,"All Surface",&m_AllSurface);
 	m_Gui->FloatSlider(ID_BORDER_CHANGE,"Border",&m_Border,1.0,5.0);
+
+
 
   EnableWidgets(m_CurrentVolume != NULL);
   for(int i=1; i<m_NumOfChildView; i++)
@@ -403,7 +448,7 @@ albaGUI* albaViewOrthoSlice::CreateGui()
     for (int i=0; i<m_NumOfChildView; i++)
     {
       albaPipeVolumeOrthoSlice *p = NULL;
-      p = albaPipeVolumeOrthoSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
+      p = albaPipeVolumeOrthoSlice::SafeDownCast(m_Views[i]->GetNodePipe(m_CurrentVolume));
       if (p)
       {
         p->SetInterpolation(m_TrilinearInterpolationOn);
@@ -527,7 +572,7 @@ void albaViewOrthoSlice::CreateGizmo()
 		if (m_CurrentVolume)
 		{
 			albaPipeVolumeOrthoSlice *p = NULL;
-			p = albaPipeVolumeOrthoSlice::SafeDownCast(((albaViewSlice *)((albaViewCompound *)m_ChildViewList[0]))->GetNodePipe(m_CurrentVolume));
+			p = albaPipeVolumeOrthoSlice::SafeDownCast(m_Views[0]->GetNodePipe(m_CurrentVolume));
 			double normal[3];
 			p->GetSlice(sliceOrigin, normal);
 		}
@@ -621,19 +666,19 @@ void albaViewOrthoSlice::SetSlicePosition(long activeGizmoId, vtkPoints *p)
     case (GIZMO_XN)	:
     {
       // update the X normal child view
-      ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSlice(m_GizmoHandlePosition);
+      m_Views[CHILD_XN_VIEW]->SetSlice(m_GizmoHandlePosition);
     }
     break;
     case (GIZMO_YN)	:
     {
       // update the Y normal child view
-      ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSlice(m_GizmoHandlePosition);    
+      m_Views[CHILD_YN_VIEW]->SetSlice(m_GizmoHandlePosition);    
     }
     break;
     case (GIZMO_ZN)	:
     {
       // update the Z normal child view
-      ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSlice(m_GizmoHandlePosition);
+      m_Views[CHILD_ZN_VIEW]->SetSlice(m_GizmoHandlePosition);
     }
     break;
   }
@@ -649,10 +694,11 @@ void albaViewOrthoSlice::SetSlicePosition(long activeGizmoId, vtkPoints *p)
   }
 
   // always update the child perspective view
-  ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_PERSPECTIVE_VIEW]))->SetSlice(m_GizmoHandlePosition);
+  m_Views[CHILD_PERSPECTIVE_VIEW]->SetSlice(m_GizmoHandlePosition);
   
 
   this->CameraUpdate();
+	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
 void albaViewOrthoSlice::OnEventSetThickness()
@@ -721,6 +767,8 @@ void albaViewOrthoSlice::CreateOrthoslicesAndGizmos(albaVME *vme)
 	mmaVolumeMaterial *currentVolumeMaterial = ((albaVMEOutputVolume *)m_CurrentVolume->GetOutput())->GetMaterial();
 	double sr[2],vtkDataCenter[3];
 	vtkDataSet *vtkData = m_CurrentVolume->GetOutput()->GetVTKData();
+	if (vtkData == NULL)
+		return;
 	vtkData->Update();
 	vtkData->GetCenter(vtkDataCenter);
 	vtkData->GetCenter(m_GizmoHandlePosition);
@@ -731,7 +779,7 @@ void albaViewOrthoSlice::CreateOrthoslicesAndGizmos(albaVME *vme)
 	m_LutSlider->SetSubRange((long)currentVolumeMaterial->GetTableRange()[0],(long)currentVolumeMaterial->GetTableRange()[1]);
 	for(int i=0; i<m_NumOfChildView; i++)
 	{
-		albaPipeVolumeOrthoSlice *p = (albaPipeVolumeOrthoSlice *)((albaViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
+		albaPipeVolumeOrthoSlice *p = (albaPipeVolumeOrthoSlice *)m_Views[i]->GetNodePipe(m_CurrentVolume);
     p->SetInterpolation(m_TrilinearInterpolationOn);
 		p->SetColorLookupTable(m_ColorLUT);
 	}
@@ -747,19 +795,19 @@ void albaViewOrthoSlice::CreateOrthoslicesAndGizmos(albaVME *vme)
 	double forceOrigin[3] = { VTK_DOUBLE_MAX,VTK_DOUBLE_MAX,VTK_DOUBLE_MAX };
 
 	rot.MultiplyPoint(xNormal,normal);
-	albaViewSlice * xSlice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_XN_VIEW]);
+	albaViewSlice * xSlice = m_Views[CHILD_XN_VIEW];
 	xSlice->SetSlice(forceOrigin, normal);
 	xSlice->SetSlice(m_GizmoHandlePosition,normal);
   xSlice->SetTextColor(colorsX);
 
 	rot.MultiplyPoint(yNormal, normal);
-	albaViewSlice * ySlice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_YN_VIEW]);
+	albaViewSlice * ySlice = m_Views[CHILD_YN_VIEW];
 	ySlice->SetSlice(forceOrigin, normal);
 	ySlice->SetSlice(m_GizmoHandlePosition, normal);
   ySlice->SetTextColor(colorsY);
 
 	rot.MultiplyPoint(zNormal, normal);
-	albaViewSlice * zSlice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]);
+	albaViewSlice * zSlice = m_Views[CHILD_ZN_VIEW];
 	zSlice->SetSlice(forceOrigin, normal);
 	zSlice->SetSlice(m_GizmoHandlePosition, normal);
   zSlice->SetTextColor(colorsZ);
@@ -772,7 +820,7 @@ void albaViewOrthoSlice::CreateOrthoslicesAndGizmos(albaVME *vme)
 	if (m_CurrentVolume)
 	{
 		albaPipeVolumeOrthoSlice *p = NULL;
-		p = albaPipeVolumeOrthoSlice::SafeDownCast(((albaViewSlice *)((albaViewCompound *)m_ChildViewList[0]))->GetNodePipe(m_CurrentVolume));
+		p = albaPipeVolumeOrthoSlice::SafeDownCast(m_Views[0]->GetNodePipe(m_CurrentVolume));
 		double normal[3];
 		p->GetSlice(sliceOrigin, normal);
 	}
@@ -785,7 +833,7 @@ void albaViewOrthoSlice::CreateOrthoslicesAndGizmos(albaVME *vme)
 	GizmoShow();
 }
 //-------------------------------------------------------------------------
-void albaViewOrthoSlice::DestroyOrthoSlicesAndGizmos()
+void albaViewOrthoSlice::RemoveVolumeFromGizmo()
 //-------------------------------------------------------------------------
 {
 	for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
@@ -836,23 +884,8 @@ bool albaViewOrthoSlice::IsPickedSliceView()
   albaRWIBase *rwi = m_Mouse->GetRWI();
   if (rwi)
   {
-    for(int i=0; i<m_NumOfChildView; i++)
-    {
-      if (m_ChildViewList[i]->IsALBAType(albaViewSlice))
-      {
-        if(((albaViewSlice *)m_ChildViewList[i])->GetRWI()==rwi && ((albaViewSlice *)m_ChildViewList[i])->GetRWI()->GetCamera()->GetParallelProjection())
-          return true;
-      }
-      else if (m_ChildViewList[i]->IsALBAType(albaViewCompound))
-      {
-        if(((albaViewCompound *)m_ChildViewList[i])->GetSubView()->GetRWI()==rwi)
-          return false;
-      }
-      else if (((albaViewVTK *)m_ChildViewList[i])->GetRWI() == rwi)
-      {
-        return false;
-      }
-    }
+     if(m_Views[0]->GetRWI()!=rwi)
+        return true;
   }
   return false;
 }
@@ -865,7 +898,7 @@ void albaViewOrthoSlice::ApplyViewSettings(albaVME *vme)
   {
     for (int i=CHILD_ZN_VIEW;i<=CHILD_YN_VIEW;i++)
     {
-      albaPipePolylineSlice *pipeSlice = albaPipePolylineSlice::SafeDownCast(((albaViewSlice *)((albaViewCompound *)m_ChildViewList[i]))->GetNodePipe(vme));
+      albaPipePolylineSlice *pipeSlice = albaPipePolylineSlice::SafeDownCast(m_Views[i]->GetNodePipe(vme));
       if(pipeSlice) 
       {
         if(!vme->IsA("albaVMEMeter"))
@@ -910,9 +943,9 @@ void albaViewOrthoSlice::UpdateGizmoBounds(bool show)
 
 	double gizmoBounds[6] = { minVert[0],maxVert[0],minVert[1],maxVert[1],minVert[2],maxVert[2] };
 
-
-	double direction[] = { albaGizmoSlice::GIZMO_SLICE_X,albaGizmoSlice::GIZMO_SLICE_Y,albaGizmoSlice::GIZMO_SLICE_Z };
-
+	m_XSliceSlider->SetRange(gizmoBounds[0], gizmoBounds[1]);
+	m_YSliceSlider->SetRange(gizmoBounds[2], gizmoBounds[3]);
+	m_ZSliceSlider->SetRange(gizmoBounds[4], gizmoBounds[5]);
 
 	bool firstVMEshowed = show && m_VMElist.size() == 1;
 	if(!firstVMEshowed)
@@ -927,17 +960,17 @@ void albaViewOrthoSlice::UpdateGizmoBounds(bool show)
 	if (firstVMEshowed ||m_GizmoHandlePosition[2]<gizmoBounds[4] || m_GizmoHandlePosition[4]>gizmoBounds[4])
 		m_GizmoHandlePosition[2] = (gizmoBounds[4] + gizmoBounds[5]) / 2.0;
 
+	double direction[] = { albaGizmoSlice::GIZMO_SLICE_X,albaGizmoSlice::GIZMO_SLICE_Y,albaGizmoSlice::GIZMO_SLICE_Z };
+
 	for (int gizmoId = GIZMO_XN; gizmoId < GIZMOS_NUMBER; gizmoId++)
 	{
 		m_Gizmo[gizmoId]->SetBounds(gizmoBounds);
 		m_Gizmo[gizmoId]->UpdateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], m_GizmoHandlePosition[gizmoId]);
 	}
 
-	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSlice(m_GizmoHandlePosition);
-	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSlice(m_GizmoHandlePosition);
-	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSlice(m_GizmoHandlePosition);
-	((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CHILD_PERSPECTIVE_VIEW]))->SetSlice(m_GizmoHandlePosition);
-
+	for(int i=0;i<VIEWS_NUMBER;i++)
+		m_Views[i]->SetSlice(m_GizmoHandlePosition);
+	
 	if (firstVMEshowed)
 		CameraReset();
 	else

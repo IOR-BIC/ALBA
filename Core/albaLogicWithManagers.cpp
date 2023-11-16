@@ -162,6 +162,7 @@
 #include "albaOpComputeWrapping.h"
 #include "albaOpConnectivitySurface.h"
 #include "albaOpCreateAverageLandmark.h"
+#include "albaOpCreateAveragePlane.h"
 #include "albaOpCreateEditSkeleton.h"
 #include "albaOpCreateGroup.h"
 #include "albaOpCreateLabeledVolume.h"
@@ -189,6 +190,7 @@
 #include "albaOpFillHoles.h"
 #include "albaOpFilterSurface.h"
 #include "albaOpFilterVolume.h"
+#include "albaOpFilterImage.h"
 #include "albaOpFlipNormals.h"
 #include "albaOpFreezeVME.h"
 #include "albaOpInteractiveClipSurface.h"
@@ -282,7 +284,7 @@
 #include "albaViewSlicer.h"
 #include "albaViewVTK.h"
 #include "albaViewVTKCompound.h"
-
+#include "albaViewVirtualRX.h"
 
 
 #define IDM_WINDOWNEXT 4004
@@ -2038,6 +2040,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpCreateVolume("Create Volume"), _("Create"));
 	Plug(new albaOpAddLandmark("Add Landmark  \tCtrl+A"), _("Create"));
 	Plug(new albaOpCreateAverageLandmark("Create Average Landmark"), _("Create"));
+	Plug(new albaOpCreateAveragePlane("Create Average Plane"), _("Create"));
 	Plug(new albaOpCreateGroup("Group"), _("Create"));
 	Plug(new albaOpCreateMeter("Meter"), _("Create"));
 	Plug(new albaOpCreateRefSys("RefSys"), _("Create"));
@@ -2064,6 +2067,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpClipSurface("Clip Surface"), _("Modify"));
 	Plug(new albaOpFilterSurface("Filter Surface"), _("Modify"));
 	Plug(new albaOpFilterVolume("Filter Volume"), _("Modify"));
+	Plug(new albaOpFilterImage("Filter Image"), _("Modify"));
 	Plug(new albaOpDecimateSurface("Decimate Surface"), _("Modify"));
 	Plug(new albaOpConnectivitySurface("Connectivity Surface"), _("Modify"));
 	Plug(new albaOpEditNormals("Edit Normals"), _("Modify"));
@@ -2151,6 +2155,11 @@ void albaLogicWithManagers::PlugStandardViews()
 	albaViewRXCompound *vrx = new albaViewRXCompound("RX");
 	vrx->PackageView();
 	Plug(vrx);
+
+	//View RX Compound
+	albaViewVirtualRX *vvrx = new albaViewVirtualRX("Virtual RX");
+	vvrx->PackageView();
+	Plug(vvrx);
 
 	//View Isosurface
 	albaViewVTK *viso = new albaViewVTK("Isosurface");

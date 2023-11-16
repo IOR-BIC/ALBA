@@ -41,6 +41,7 @@ class albaOpPaste;
 class albaOpRename;
 class albaOpReparentTo;
 class albaOpCreateGroup;
+class albaOpShowHistory;
 class vtkMatrix4x4;
 class albaDeviceButtonsPadMouse;
 class albaGUISettings;
@@ -107,6 +108,7 @@ public:
 	void RunOpDelete();
 	void RunOpRename();
 	void RunOpReparentTo();
+	void RunOpShowHistory();
 
 	/** Execute the operation 'op' and warn the user if the operation is undoable. */
   virtual void OpExec		(albaOp *op);
@@ -223,7 +225,8 @@ protected:
   albaOpRename		*m_OpRename; ///< Pointer to the (always available) operation for reparenting VMEs
 	albaOpReparentTo		*m_OpReparent; ///< Pointer to the (always available) operation for reparenting VMEs
 	albaOpCreateGroup	*m_OpAddGroup; ///< Pointer to the (always available) operation for Adding Group VMEs
-  wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menù
+	albaOpShowHistory *m_OpShowHistory;
+	wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menù
 	wxToolBar         *m_ToolBar; ///< Pointer to the application's Toolbal
 	albaString				 m_BuildNum;
 

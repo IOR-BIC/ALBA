@@ -48,6 +48,7 @@
 #include "albaVMEGenericAbstract.h"
 #include "albaOpReparentTo.h"
 #include "albaOpCreateGroup.h"
+#include "albaOpShowHistory.h"
 
 //------------------------------------------------------------------------------
 // Events
@@ -105,6 +106,7 @@ albaOpManager::albaOpManager()
 	m_OpPaste = new albaOpPaste();
 	m_OpRename = new albaOpRename();
 	m_OpReparent = new albaOpReparentTo();
+	m_OpShowHistory = new albaOpShowHistory();
 	m_OpAddGroup = new albaOpCreateGroup();
 	//m_optransform = new albaOpTransform();
 
@@ -146,6 +148,7 @@ albaOpManager::~albaOpManager()
 	cppDEL(m_OpRename);
 	cppDEL(m_OpReparent);
 	cppDEL(m_OpAddGroup);
+	cppDEL(m_OpShowHistory);
 	cppDEL(m_User);
 }
 //----------------------------------------------------------------------------
@@ -431,6 +434,7 @@ void albaOpManager::EnableContextualMenu(albaGUITreeContextualMenu *contextualMe
 			contextualMenu->FindItem(RMENU_DELETE)->Enable(false);
 			contextualMenu->FindItem(RMENU_RENAME)->Enable(false);
 			contextualMenu->FindItem(RMENU_REPARENT)->Enable(false);
+			contextualMenu->FindItem(RMENU_SHOW_HISTORY)->Enable(false);
 		}
 		else
 		{
@@ -442,6 +446,7 @@ void albaOpManager::EnableContextualMenu(albaGUITreeContextualMenu *contextualMe
 			contextualMenu->FindItem(RMENU_DELETE)->Enable(m_OpCut->Accept(node));
 			contextualMenu->FindItem(RMENU_RENAME)->Enable(m_OpRename->Accept(node));
 			contextualMenu->FindItem(RMENU_REPARENT)->Enable(m_OpReparent->Accept(node));
+			contextualMenu->FindItem(RMENU_SHOW_HISTORY)->Enable(m_OpShowHistory->Accept(node));
 		}
 	}
 }
@@ -680,6 +685,11 @@ void albaOpManager::RunOpReparentTo()
 {
 	OpRun(m_OpReparent);
 }
+//----------------------------------------------------------------------------
+void albaOpManager::RunOpShowHistory()
+{
+	OpRun(m_OpShowHistory);
+}
 
 //----------------------------------------------------------------------------
 void albaOpManager::OpRunOk(albaOp *op)
@@ -749,41 +759,41 @@ void albaOpManager::OpExec(albaOp *op)
 //----------------------------------------------------------------------------
 void albaOpManager::OpDo(albaOp *op)
 {
-  m_Context.Redo_Clear();
-  albaVME *in_node = op->GetInput();
- 
-  if (in_node != NULL)
-  {
+	m_Context.Redo_Clear();
+	albaVME *in_node = op->GetInput();
+
+	if (in_node != NULL)
+	{
     albaLogMessage("executing operation '%s' on input data: %s",op->m_Label.ToAscii(), in_node->GetName());
-  }
-  else
-  {
+	}
+	else
+	{
     albaLogMessage("executing operation '%s'",op->m_Label.ToAscii());
-  }
- 
+	}
+
 	if (op->GetType() != OPTYPE_EDIT)
-		FillTraceabilityAttribute(op, in_node, NULL);
+	FillTraceabilityAttribute(op, in_node, NULL);
 
 	op->OpDo();
 
-	
+
 	albaVME *out_node = op->GetOutput();
 	if (out_node != NULL)
 	{
 		if (op->GetType() != OPTYPE_EDIT)
-			FillTraceabilityAttribute(op, NULL, out_node);
+		FillTraceabilityAttribute(op, NULL, out_node);
 
 		albaLogMessage("operation '%s' generate %s as output", op->m_Label.ToAscii(), out_node->GetName());
 	}
-	
-  if(op->CanUndo()) 
-  {
-	  m_Context.Undo_Push(op);
-  }
-  else
-  {
-	  m_Context.Undo_Clear();
-  }
+
+	if (op->CanUndo())
+	{
+		m_Context.Undo_Push(op);
+	}
+	else
+	{
+		m_Context.Undo_Clear();
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -795,17 +805,34 @@ void albaOpManager::SetMafUser(albaUser *user)
 //----------------------------------------------------------------------------
 void albaOpManager::FillTraceabilityAttribute(albaOp *op, albaVME *in_node, albaVME *out_node)
 {
-  albaString trialEvent = "Modify";
-  albaString operationName;
-  albaString parameters;
-  albaString appStamp;
-  albaString userID;
-  albaString isNatural = "false";
-  wxString revision;
-  wxString dateAndTime;
+	albaString trialEvent = "Modify";
+	albaString operationName;
+	albaString parameters;
+	albaString appStamp;
+	albaString userID;
+	albaString isNatural = "false";
+	wxString revision;
+	wxString dateAndTime;
 
-  operationName = op->GetTypeName();
-  parameters = op->GetParameters();
+	operationName = op->GetTypeName();
+	parameters = op->GetParameters();
+
+	if (op->GetType() == OPTYPE_EDIT)
+	{
+		if (op->m_Label == "Rename" && m_Selected)
+		{
+			in_node = m_Selected;
+
+			trialEvent = "Rename";
+			operationName = "albaOpRaname";
+			parameters = "Old Name: ";
+			parameters += m_Selected->GetName();
+		}
+		else
+		{
+			return;
+		}
+	}
 
   wxDateTime time = wxDateTime::UNow();
   dateAndTime  = albaString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth()+1, time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());

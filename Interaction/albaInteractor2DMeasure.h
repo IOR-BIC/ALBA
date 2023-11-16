@@ -186,6 +186,9 @@ public:
 
 	void SetUpdateDistance(int dist/*Default = 4*/);
 
+	/** Set Measure Action (None, Add, Edit, Move) and Update mouse Cursor */
+	void SetAction(MEASURE_ACTIONS action);
+	
 protected:
 
 	struct Measure2D
@@ -235,8 +238,8 @@ protected:
 	virtual void ShowEditLineActors() {};
 	virtual void HideEditActors() {};
 
-	/** Set Measure Action (None, Add, Edit, Move) and Update mouse Cursor */
-	void SetAction(MEASURE_ACTIONS action);
+// 	/** Set Measure Action (None, Add, Edit, Move) and Update mouse Cursor */
+// 	void SetAction(MEASURE_ACTIONS action);
 
 	void SetColor(vtkActor2D *actor, Color *color);
 

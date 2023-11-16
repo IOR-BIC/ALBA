@@ -40,6 +40,8 @@
 #include "vtkPNGReader.h"
 #include "vtkBMPReader.h"
 #include "vtkBMPWriter.h"
+#include "vtkALBASmartPointer.h"
+#include "vtkImageCast.h"
 
 
 IMPLEMENT_APP(TestApp)
@@ -121,6 +123,34 @@ void albaTest::CompareImage(albaString suiteName, albaString imageName, int inde
 	windowToImage->Update();
 	m_RenderWindow->OffScreenRenderingOff();
 
+	vtkImageData *imDataComp = windowToImage->GetOutput();
+
+	CompareVTKImage(imDataComp, suiteName, imageName, index);
+
+	vtkDEL(windowToImage);
+}
+
+//----------------------------------------------------------------------------
+void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, albaString imageName, int index)
+{
+	vtkImageData *imgToComp;
+	vtkALBASmartPointer<vtkImageCast> vtkImageToUChar;
+
+
+	if (imDataComp->GetScalarType() != VTK_UNSIGNED_CHAR)
+	{
+		albaLogMessage("Converting image tho unsigned short in order to save it as PNG format");
+		vtkImageToUChar->SetOutputScalarTypeToUnsignedChar();
+		vtkImageToUChar->SetInput(imDataComp);
+		vtkImageToUChar->Modified();
+		vtkImageToUChar->Update();
+		imgToComp = vtkImageToUChar->GetOutput();
+	}
+	else
+	{
+		imgToComp = imDataComp;
+	}
+
 	wxString imageFolder = GetTestDataDir(suiteName);
 	albaString imageFileBase;
 	if (index >= 0)
@@ -135,7 +165,7 @@ void albaTest::CompareImage(albaString suiteName, albaString imageName, int inde
 	wxString ext = ".png";
 	vtkPNGWriter *imageWriter;
 	vtkNEW(imageWriter);
-	
+
 	// Write comparing image
 	wxString imageFileStored = imageFileBase + ext;
 
@@ -148,12 +178,11 @@ void albaTest::CompareImage(albaString suiteName, albaString imageName, int inde
 		imageReader->Update();
 		vtkImageData *imDataOrig = imageReader->GetOutput();
 
-		vtkImageData *imDataComp = windowToImage->GetOutput(); // imageReader2->GetOutput();
 
 		// Compare
 		vtkImageMathematics *imageMath = vtkImageMathematics::New();
 		imageMath->SetInput1(imDataOrig);
-		imageMath->SetInput2(imDataComp);
+		imageMath->SetInput2(imgToComp);
 		imageMath->SetOperationToSubtract();
 		imageMath->Update();
 
@@ -169,13 +198,13 @@ void albaTest::CompareImage(albaString suiteName, albaString imageName, int inde
 			wxRemoveFile(imageFileDiff);
 		if (wxFileExists(imageFileNew))
 			wxRemoveFile(imageFileNew);
-		
+
 		if (!result)
 		{
 			imageWriter->SetInput(imageMath->GetOutput());
 			imageWriter->SetFileName(imageFileDiff);
 			imageWriter->Write();
-			imageWriter->SetInput(imDataComp);
+			imageWriter->SetInput(imgToComp);
 			imageWriter->SetFileName(imageFileNew);
 			imageWriter->Write();
 
@@ -191,14 +220,13 @@ void albaTest::CompareImage(albaString suiteName, albaString imageName, int inde
 	else
 	{
 		//First run storing file
-		imageWriter->SetInput(windowToImage->GetOutput());
+		imageWriter->SetInput(imgToComp);
 		imageWriter->SetFileName(imageFileStored);
 		imageWriter->Write();
 		return;
 	}
 
 	vtkDEL(imageWriter);
-	vtkDEL(windowToImage);
 }
 
 //----------------------------------------------------------------------------

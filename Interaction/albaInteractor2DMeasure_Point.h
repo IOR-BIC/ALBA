@@ -45,6 +45,8 @@ public:
 
 	virtual void SetPointSize(double size);
 
+	virtual void Show(bool show);
+
 	/** Get point coordinate*/
 	void GetMeasurePoint(int index, double *point);
 

@@ -69,6 +69,7 @@ public:
 	void GetCenter(int index, double *center);
 
 	virtual void Show(bool show);
+
 	void ShowPoints(bool show);
 	void ShowTexture(bool show);
 

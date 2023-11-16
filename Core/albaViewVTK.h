@@ -181,6 +181,6 @@ protected:
   virtual void OnPostResetCamera();
 
   /** Return the visual pipe's name.*/
-  void GetVisualPipeName(albaVME *node, albaString &pipe_name);
+  virtual void GetVisualPipeName(albaVME *node, albaString &pipe_name);
 };
 #endif

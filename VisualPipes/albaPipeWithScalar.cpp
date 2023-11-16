@@ -83,6 +83,7 @@ albaPipeWithScalar::albaPipeWithScalar()
 	m_ScalarBarLabNum = 2;
 	m_Histogram = NULL;
 	m_Dialog = NULL;
+	m_DensityFilter = NULL;
 }
 //----------------------------------------------------------------------------
 albaPipeWithScalar::~albaPipeWithScalar()
@@ -739,6 +740,8 @@ void albaPipeWithScalar::SetDensityVolume(albaVME *vol)
 	else
 	{
 		m_DensVolName = m_DensityVolume ? m_DensityVolume->GetName() : "";
+		if(m_DensityFilter)
+			m_DensityFilter->SetSource(m_DensityVolume ? m_DensityVolume->GetOutput()->GetVTKData() :NULL);
 		UpdateActiveScalarsInVMEDataVectorItems();
 	}
 

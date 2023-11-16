@@ -28,8 +28,9 @@ SET(PROJECT_SRCS
   albaViewArbitraryOrthoSlice.cpp	albaViewArbitraryOrthoSlice.h
   albaViewSliceBlendRX.cpp					albaViewSliceBlendRX.h
   albaViewSliceBlend.cpp						albaViewSliceBlend.h
-	albaViewSliceSegmentation.cpp		albaViewSliceSegmentation.h
+  albaViewSliceSegmentation.cpp		albaViewSliceSegmentation.h
   albaViewIsosurfaceCompound.cpp		albaViewIsosurfaceCompound.h
+  albaViewVirtualRX.cpp					albaViewVirtualRX.h
 )
 
 # List libraries that are needed by this project.

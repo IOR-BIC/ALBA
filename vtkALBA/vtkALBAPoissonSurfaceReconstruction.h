@@ -2125,7 +2125,7 @@ public:
 	SparseMatrix(int nrows) {
 		rows = 0;
 		rowSizes = NULL;
-		m_ppElements = NULL; 
+		m_ppElements = NULL;
 		Resize(nrows);
 	};
   /** resize the matrix*/

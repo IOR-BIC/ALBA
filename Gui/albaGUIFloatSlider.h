@@ -53,10 +53,13 @@ public:
   /** Set the slider value. */
 	void SetValue(double value);
   
-  /** Get the slider value. */
+  /** Get the current value. */
   double GetValue();
   
-  /** Set the slider range and value. */
+	/** Get the slider Value */
+	double GetSliderValue();
+
+	/** Set the slider range and value. */
 	void SetRange(double min,double max,double value);
   
   /** Set the slider range. */

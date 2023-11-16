@@ -112,6 +112,7 @@ albaViewArbitraryOrthoSlice::albaViewArbitraryOrthoSlice(wxString label, albaAxe
 	m_InputVolume   = NULL;
 	m_CameraToSlicer[0] = m_CameraToSlicer[1] = m_CameraToSlicer[2] = NULL;
 	m_SlicingOrigin[0] = m_SlicingOrigin[1] = m_SlicingOrigin[2] = 0.0;
+	m_SlicingOrigin[3] = 1;
 	m_SlicingOriginGUI[0] = m_SlicingOriginGUI[1] = m_SlicingOriginGUI[2] = 0.0;
 	m_SlicingOriginReset[0] = m_SlicingOriginReset[1] = m_SlicingOriginReset[2] = 0.0;
 	m_CameraConeVME[0] = m_CameraConeVME[1] = m_CameraConeVME[2] = NULL;
@@ -412,8 +413,11 @@ void albaViewArbitraryOrthoSlice::SetSlices()
 	{
 		m_SlicingOriginGUI[i] = m_SlicingOrigin[i];
 
-		double normal[3];
+		double normal[4];
+		normal[3] = 1;
+
 		((albaViewSlice*)m_ChildViewList[AsixToView(i)])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+
 
 		albaVMEIterator *iter = root->NewIterator();
 		for (albaVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
@@ -820,10 +824,13 @@ void albaViewArbitraryOrthoSlice::ShowVolume( albaVME * vme, bool show )
 	
 		
 	double sr[2],volumeVTKDataCenterLocalCoords[3];
+	
+	vtkDataSet *volumeVTKData = vme->GetOutput()->GetVTKData();
+	if (volumeVTKData == NULL)
+		return;
 
 	EnableWidgets(true);
 
-	vtkDataSet *volumeVTKData = vme->GetOutput()->GetVTKData();
 	volumeVTKData->Update();
 	volumeVTKData->GetCenter(volumeVTKDataCenterLocalCoords);
 	volumeVTKData->GetScalarRange(sr);
@@ -974,25 +981,19 @@ void albaViewArbitraryOrthoSlice::ShowSlicers(albaVME * vmeVolume, bool show)
 	{
 		int currentView = AsixToView(i);
 		m_ChildViewList[currentView]->VmeShow(m_InputVolume, show);
-		m_CameraToSlicer[i] = new albaAttachCamera(m_Gui, ((albaViewVTK*)m_ChildViewList[currentView])->m_Rwi, this);
-		m_CameraToSlicer[i]->SetStartingMatrix(m_SlicingResetMatrix[i]);
-		m_CameraToSlicer[i]->SetAttachedMatrix(m_SlicingMatrix[i]->GetVTKMatrix());
-		m_CameraToSlicer[i]->SetAttachedMatrix(m_SlicingMatrix[i]->GetVTKMatrix());
-		m_CameraToSlicer[i]->SetAttachedMatrix(m_SlicingMatrix[i]->GetVTKMatrix());
-		m_CameraToSlicer[i]->SetAttachedMatrix(m_SlicingMatrix[i]->GetVTKMatrix());
-		m_CameraToSlicer[i]->EnableAttachCamera();
+		if (m_CameraToSlicer[i] == NULL)
+			CreateAttachCamera(i, currentView);
 
-		albaPipeVolumeArbSlice* pipeVolSlice = albaPipeVolumeArbSlice::SafeDownCast(m_ChildViewList[currentView]->GetNodePipe(m_InputVolume));
-		if (pipeVolSlice)
-			pipeVolSlice->SetEnableSliceViewCorrection(true);
-		
+		m_CameraToSlicer[i]->SetAttachedMatrix(m_SlicingMatrix[i]->GetVTKMatrix());
+
+	
 		BuildCameraConeVME(i);
 	}
 
 	SetEnableGPU();
 	ResetCameraToSlices();
 	SetSlices();
-		
+
 	for (int i = X; i <= Z; i++)
 	{
 		if(m_GizmoRT[i]==NULL)
@@ -1019,6 +1020,21 @@ void albaViewArbitraryOrthoSlice::ShowSlicers(albaVME * vmeVolume, bool show)
 	CreateViewCameraNormalFeedbackActors();
 
 	m_IsShowingSlicerGizmo = false;
+}
+
+//----------------------------------------------------------------------------
+void albaViewArbitraryOrthoSlice::CreateAttachCamera(int i, int currentView)
+{
+	vtkALBASmartPointer<vtkTransform> slicerTransform;
+	m_CameraToSlicer[i] = new albaAttachCamera(m_Gui, ((albaViewVTK*)m_ChildViewList[currentView])->m_Rwi, this);
+	if (i == X)
+		slicerTransform->RotateY(89.999);
+	else if (i == Y)
+		slicerTransform->RotateX(90);
+	slicerTransform->Update();
+
+	m_CameraToSlicer[i]->SetStartingMatrix(slicerTransform->GetMatrix());
+	m_CameraToSlicer[i]->EnableAttachCamera();
 }
 
 //----------------------------------------------------------------------------

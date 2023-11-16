@@ -119,13 +119,13 @@ albaViewArbitrarySlice::albaViewArbitrarySlice(wxString label, bool show_ruler)
 	m_SliceCenterSurface[0] = 0.0;
 	m_SliceCenterSurface[1] = 0.0;
 	m_SliceCenterSurface[2] = 0.0;
-	m_SliceCenterSurface[2] = 1.0;
+	m_SliceCenterSurface[3] = 1.0;
 
 
 	m_SliceCenterSurfaceReset[0] = 0.0;
 	m_SliceCenterSurfaceReset[1] = 0.0;
 	m_SliceCenterSurfaceReset[2] = 0.0;
-	m_SliceCenterSurfaceReset[2] = 1.0;
+	m_SliceCenterSurfaceReset[3] = 1.0;
 
 	m_TypeGizmo = GIZMO_TRANSLATE;
 
@@ -205,6 +205,8 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 
 				// get the VTK volume
 				vtkDataSet *data = vme->GetOutput()->GetVTKData();
+				if (data == NULL)
+					return;
 				data->Update();
 				//Get center of Volume to can the reset
 				data->GetCenter(sliceCenterVolumeReset);
@@ -234,7 +236,7 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 
 				m_AttachCamera->DisableAttachCamera();
 				((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraSet(CAMERA_OS_Z);
-				m_AttachCamera->SetStartingMatrix(m_MatrixReset);
+				m_AttachCamera->SetStartingMatrix(m_MatrixReset->GetVTKMatrix());
 				m_SlicingMatrix->DeepCopy(m_MatrixReset);
 				m_AttachCamera->SetAttachedMatrix(m_SlicingMatrix->GetVTKMatrix());
 				m_AttachCamera->EnableAttachCamera();
@@ -280,6 +282,9 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 	{
 		if(vme->GetOutput()->IsA("albaVMEOutputVolume"))
 		{
+			if (m_AttachCamera == NULL)
+				return;
+
 			m_AttachCamera->SetAttachedMatrix(NULL);
 
 			DestroyGizmos();
@@ -518,6 +523,9 @@ void albaViewArbitrarySlice::SetGizmo(int typeGizmo)
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::OnReset()
 {
+	if (m_MatrixReset == NULL)
+		return;
+
 	m_GizmoRotate->SetAbsPose(m_MatrixReset);
 	m_GizmoTranslate->SetAbsPose(m_MatrixReset);
 	m_SlicingMatrix->DeepCopy(m_MatrixReset);
@@ -535,8 +543,7 @@ void albaViewArbitrarySlice::OnReset()
 void albaViewArbitrarySlice::SetSlices()
 {
 	//update the normal of the cutter plane of the surface
-	double normal[4], volNormal[4], volCenter[4];
-	normal[3] = 1;
+	double normal[3];
 	GetSlicingNormal(normal);
 	albaVME *root = m_InputVolume->GetRoot();
 	albaVMEIterator *iter = root->NewIterator();
@@ -551,21 +558,14 @@ void albaViewArbitrarySlice::SetSlices()
 	}
 	iter->Delete();
 
-	albaMatrix inverseVol;
-	inverseVol.DeepCopy(m_InputVolume->GetOutput()->GetAbsMatrix());
-	inverseVol.Invert();
-	albaMatrix inverseRot;
-	inverseRot.CopyRotation(inverseVol);
-	inverseRot.MultiplyPoint(normal, volNormal);
-	inverseVol.MultiplyPoint(m_SliceCenterSurface, volCenter);
 
 	albaPipeSlice *pipeSlice = albaPipeSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(m_InputVolume));
 	if (pipeSlice)
-		pipeSlice->SetSlice(volCenter, volNormal);
+		pipeSlice->SetSlice(m_SliceCenterSurface, normal);
 	
 	pipeSlice = albaPipeSlice::SafeDownCast(((albaViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(m_InputVolume));
 	if (pipeSlice)
-		pipeSlice->SetSlice(volCenter, volNormal);
+		pipeSlice->SetSlice(m_SliceCenterSurface, normal);
 
 	CameraUpdate();
 }

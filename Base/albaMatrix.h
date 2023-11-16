@@ -28,6 +28,7 @@ typedef double (*albaMatrixElements)[4];
 #ifdef ALBA_USE_VTK
 class vtkMatrix4x4;
 #endif
+class albaVect3d;
 
 
 /** albaMatrix - Time stamped 4x4 Matrix.
@@ -118,6 +119,9 @@ public:
   void Identity() { albaMatrix::Identity(*GetElements()); Modified();}
   static void Identity(double elements[16]);
 
+	/** Return true if is an Identity Matrix */
+	bool IsIdentity();
+
   /**
     Matrix Inversion (adapted from Richard Carling in "Graphics Gems," 
     Academic Press, 1990). static version.*/
@@ -153,6 +157,12 @@ public:
     The in[4] and out[4] can be the same array. */
   void MultiplyPoint(const double in[4], double out[4]) const
     {albaMatrix::MultiplyPoint(*GetElements(),in,out); }
+
+	/**
+	Multiply an albaVect3d to this matrix, i.e. out = A*in. */
+	albaVect3d MultiplyPoint(albaVect3d point);
+
+
   /**
     Multiply a homogeneous coordinate by this matrix, i.e. out = A*in.
     The in[4] and out[4] can be the same array. */

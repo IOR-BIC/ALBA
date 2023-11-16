@@ -38,6 +38,8 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
 #include "albaComputeHausdorffDistance.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkTransform.h"
 
 //-------------------------------------------------------------------------
 // Widget enumeration:
@@ -308,12 +310,29 @@ int albaOpComputeHausdorffDistance::ComputeDistance()
   m_SurfaceInput2->GetSurfaceOutput()->Update();
   vtkPolyData *inputData1 = (vtkPolyData *)(m_SurfaceInput1->GetSurfaceOutput()->GetVTKData());
   vtkPolyData *inputData2 = (vtkPolyData *)(m_SurfaceInput2->GetSurfaceOutput()->GetVTKData());
+
+	vtkALBASmartPointer<vtkTransform> input1Tra, input2Tra;
+	vtkALBASmartPointer<vtkTransformPolyDataFilter> input1TraFilter, input2TraFilter;
+
+	albaMatrix *input1Matr = m_SurfaceInput1->GetOutput()->GetAbsMatrix();
+	input1Tra->SetMatrix(input1Matr->GetVTKMatrix());
+	input1TraFilter->SetInput(inputData1);
+	input1TraFilter->SetTransform(input1Tra);
+	input1TraFilter->Update();
+
+	albaMatrix *input2Matr = m_SurfaceInput2->GetOutput()->GetAbsMatrix();
+	input2Tra->SetMatrix(input2Matr->GetVTKMatrix());
+	input2TraFilter->SetInput(inputData2);
+	input2TraFilter->SetTransform(input2Tra);
+	input2TraFilter->Update();
+
+
   vtkPolyData *outputData;
   albaLogMessage("albaOpComputeHausdorffDistance: Creating Hausdorff Distance filter...");
   albaComputeHausdorffDistance *filter = new albaComputeHausdorffDistance();
   albaLogMessage("Created.");
   albaLogMessage("Set input");
-  filter->SetData(inputData1, inputData2);
+  filter->SetData(input1TraFilter->GetOutput(), input2TraFilter->GetOutput());
   filter->SetListener(m_Listener);
   albaLogMessage("Get Output");
   outputData = filter->GetOutput();

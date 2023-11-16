@@ -50,6 +50,8 @@ public:
 	/** Select a Measure*/
 	virtual void SelectMeasure(int index);
 
+	virtual void Show(bool show);
+
 	virtual void SetPointSize(double size);
 	void SetCenterPointSize(double size);
 	virtual void SetLineWidth(double width);

@@ -67,6 +67,13 @@ public:
 	/** Sets the range of projection, the range is expressed like volume dims*/
 	void SetProjectionRange(int range[2]);
 
+	void GetProjectionRange(int *range);
+
+	/** Sets projection modality, 0 ToMean, 1 ToMax*/
+	void SetProjectionModality(int modality);
+
+	vtkALBAProjectVolume*  GetFilter() { return m_ProjectFilter; };
+
   /** Set Tick Actor Visibility */
   void TickActorVisibilityOn();
   void TickActorVisibilityOff();

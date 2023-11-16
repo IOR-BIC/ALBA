@@ -279,9 +279,7 @@ vtkALBAFillingHole::vtkALBAFillingHole()
   SmoothThinPlateSteps = 500; //large number of steps
   LastPatch = vtkPolyData::New();
 
-	NumOfVertex = 0;
-	NumOfTriangle = 0;
-	NumOfEdge = 0;
+	NumOfPatchVertex = NumOfPatchTriangle = NumOfPatchEdge = NumOfVertex = NumOfTriangle = NumOfEdge = 0;
 }
 
 //----------------------------------------------------------------------------
