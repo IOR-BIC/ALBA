@@ -1301,7 +1301,7 @@ void albaOpImporterDicom::SelectSeries(albaDicomSeries * selectedSeries)
 			{
 				m_OutputType = 0;
 				wxString typeArrayVolumeImage[2] = { _("Volume"),_("Images") };
-				m_LoadGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArrayVolumeImage, 1, "");
+				m_LoadGuiCenter->Radio(ID_VME_TYPE, "VME", &m_OutputType, 2, typeArrayVolumeImage, 1, "", wxBORDER_NONE);
 			}
 			else if (numberOfSlices == 1 || GetSetting()->GetOutputType() == TYPE_IMAGE)
 			{

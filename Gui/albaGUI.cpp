@@ -125,7 +125,7 @@ albaGUI::albaGUI(albaObserver *listener) :
 	m_BackgroundColor = wxColour(251, 251, 253);
 	if (m_UseBackgroundColor) this->SetBackgroundColour(m_BackgroundColor);
 
-	m_EntryStyle = wxSUNKEN_BORDER /*| wxTE_PROCESS_TAB*/;
+	m_EntryStyle = wxBORDER_SIMPLE /*| wxTE_PROCESS_TAB*/;
 
 	m_Sizer = new wxBoxSizer(wxVERTICAL);
 	this->SetAutoLayout(TRUE);
@@ -1337,7 +1337,10 @@ void albaGUI::Radio(int id, wxString label, int* var, int numchoices, const wxSt
 		lab->SetFont(m_Font);
 
 		w_id = GetWidgetId(id);
-		radio = new wxRadioBox(this, w_id, "", dp, wxSize(DW, -1), numchoices, choices, dim, style | m_EntryStyle | wxTAB_TRAVERSAL);
+		if(style== wxRA_SPECIFY_COLS)
+			radio = new wxRadioBox(this, w_id, "", dp, wxSize(DW, -1), numchoices, choices, dim, style | m_EntryStyle | wxTAB_TRAVERSAL);
+		else
+			radio = new wxRadioBox(this, w_id, "", dp, wxSize(DW, -1), numchoices, choices, dim, style | wxTAB_TRAVERSAL);
 
 		sizer->Add(lab, 0, wxRIGHT, LM);
 		sizer->Add(radio, 0, wxRIGHT, HM);
