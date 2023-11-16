@@ -2006,7 +2006,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpExporterSTL("STL"));
 	Plug(new albaOpExporterPLY("PLY"));
 	Plug(new albaOpExporterVTK("VTK"));
-	Plug(new albaOpExporterVTKXML("VTK"));
+	Plug(new albaOpExporterVTKXML("VTK xml"));
 	Plug(new albaOpExporterMetaImage("ITK MetaImage"));
 #ifdef ALBA_USE_GDCM
 	Plug(new albaOpExporterDicom("Dicom"), "", true, dicomSettings);
