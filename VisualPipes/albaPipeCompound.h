@@ -31,6 +31,7 @@ class vtkVolume;
 class vtkLookupTable;
 class vtkImageResample;
 class albaGUIFloatSlider;
+class wxNotebook;
 
 /**
     class name: albaPipeCompound

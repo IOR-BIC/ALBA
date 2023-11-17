@@ -10,6 +10,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
+
+#include "albaDefines.h"
 #include "albaOpImporterDicomSliceAccHelper.h"
 #include "vtkDoubleArray.h"
 #include "vtkUnsignedShortArray.h"
@@ -22,7 +24,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
-#include "albaDefines.h"
 
 #define EPISLON 0.0001
 

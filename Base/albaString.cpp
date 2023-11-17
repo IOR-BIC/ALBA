@@ -25,6 +25,9 @@
 #include <wx/string.h>
 #include <string>
 
+#define STRING_BUFFER_DIMENSION 4096
+
+static char glo_AlbaStringBuffer[STRING_BUFFER_DIMENSION];
 
 //----------------------------------------------------------------------------
 albaString::~albaString()
@@ -69,7 +72,7 @@ albaString::albaString(const double &num):m_CStr(NULL),m_ConstCStr(""),m_Size(0)
 albaString::albaString(const wxString& str):m_CStr(NULL),m_ConstCStr(""),m_Size(0)
 //----------------------------------------------------------------------------
 {
-  Copy(str.c_str());
+  Copy(str.ToAscii());
 }
 #endif
 
@@ -99,7 +102,7 @@ albaString &albaString::operator=(const double &num)
 albaString &albaString::operator=(const wxString &src)
 //----------------------------------------------------------------------------
 {
-  Copy(src.c_str());
+  Copy(src.ToAscii());
   return *this;
 }
 #endif
@@ -119,7 +122,7 @@ void albaString::operator>>(std::istream &is)
 {
   std::string tmp;
   is >> tmp;
-  *this=tmp.c_str();
+  *this=tmp.ToAscii();
 }
 */
 
@@ -716,20 +719,7 @@ const char *albaString::BaseName(const char *filename)
 void albaString::ExtractPathName()
 //----------------------------------------------------------------------------
 {
-  //wxString path, s;
-  *this = wxPathOnly(GetCStr()).c_str();
-  //Set(path.c_str());
-
-/*  int idx=FindLastChr('/');
-
-  if (idx>=0)
-  { 
-    Erase(idx+1,-1);
-  }
-  else
-  {
-    Set("");
-  }*/
+  *this = wxPathOnly(GetCStr());
 }
 
 //----------------------------------------------------------------------------
@@ -843,6 +833,13 @@ void albaString::Printf(const char *format, ...)
   SetSize(2048); // Preallocate space. Sorry, maximum output string size is 2048...
   ALBA_PRINT_MACRO(format,m_CStr,2048);
   SetCStr(Duplicate(),true); // release extra memory
+}
+
+//----------------------------------------------------------------------------
+wxString albaString::Format(const char *format, ...)
+{
+	ALBA_PRINT_MACRO(format,glo_AlbaStringBuffer,ALBA_STRING_BUFFER_SIZE);
+	return wxString(glo_AlbaStringBuffer);
 }
 
 //----------------------------------------------------------------------------

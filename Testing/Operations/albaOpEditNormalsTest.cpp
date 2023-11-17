@@ -209,22 +209,21 @@ void albaOpEditNormalsTest::TestUndo2()
 	vtkALBASmartPointer<vtkPolyData>resultPolydata2;
 	resultPolydata2->DeepCopy(vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData()));
 	resultPolydata2->Update();
-
 	resultPolydata2->GetPointData()->Update();
 	originalPolydata->GetPointData()->Update();
 
 	vtkFloatArray *pointNormalsResult2=vtkFloatArray::SafeDownCast(resultPolydata2->GetPointData()->GetNormals());
 	vtkFloatArray *pointNormalsOriginal2=vtkFloatArray::SafeDownCast(originalPolydata->GetPointData()->GetNormals());
 	
-	float *v1,*v2;
+	double *v1,*v2;
 	bool vectorEquals=true;
-	for(int i=0; i< pointNormalsResult2->GetSize()-1; i++)
+	for(int i=0; i< pointNormalsResult2->GetNumberOfTuples()-1; i++)
 	{
-		v1=pointNormalsResult2->GetPointer(i);
-		v2=pointNormalsOriginal2->GetPointer(i);
+		v1=pointNormalsResult2->GetTuple(i);
+		v2=pointNormalsOriginal2->GetTuple(i);
 		if(v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2])
 		{
-			albaLogMessage("Different vector  num:%d/%d  v1[%f,%f,%f]  v2[%f,%f,%f]",i,pointNormalsResult2->GetSize(), v1[0],v1[1],v1[2], v2[0],v2[1],v2[2]);
+			albaLogMessage("Different vector  num:%d/%d  v1[%f,%f,%f]  v2[%f,%f,%f]",i, pointNormalsResult2->GetNumberOfTuples(), v1[0],v1[1],v1[2], v2[0],v2[1],v2[2]);
 			vectorEquals=false;
 			break;
 		}

@@ -37,7 +37,7 @@ public:
 
 private:
   /** Implement sink function. */
-  virtual void DoLogString(const wxChar *szString, time_t t);
+  virtual void DoLogText(const wxString& msg);
 
   // the control we use
   wxTextCtrl *m_PTextCtrl;

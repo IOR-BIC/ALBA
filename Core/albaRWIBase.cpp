@@ -76,6 +76,8 @@
 #include "vtkImageAppend.h"
 #include "vtkBMPReader.h"
 #include "vtkMath.h"
+#include "wx/filename.h"
+
 
 #include <fstream>
 //----------------------------------------------------------------------------
@@ -114,7 +116,7 @@ albaRWIBase::albaRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
 {
   m_Hidden = true;
   this->Show(false);
-	//m_SaveDir = ::wxGetHomeDir().c_str(); 
+	//m_SaveDir = ::wxGetHomeDir().ToAscii(); 
   m_SaveDir = "";
   m_Width = m_Height = 10;
   
@@ -724,7 +726,7 @@ wxBitmap *albaRWIBase::GetImage(int magnification)
 
   //translate to a wxBitmap
   wxImage  *img = new wxImage(dim[0],dim[1],buffer,TRUE);
-  wxBitmap *bmp = new wxBitmap(img,24);
+  wxBitmap *bmp = new wxBitmap(*img,24);
   delete img;
   delete buffer;
   return bmp;
@@ -734,17 +736,17 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
 //---------------------------------------------------------------------------
 {
   wxString path, name, ext;
-  wxSplitPath(filename.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
   if (filename.IsEmpty() || ext.IsEmpty())
   {
     wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg|Image (*.png)|*.png|Image (*.ps)|*.ps|Image (*.tiff)|*.tiff";
     wxString file = "";
 
     file.Append(filename);
-    file = albaGetSaveFile(file,wildc).c_str(); 
+    file = albaGetSaveFile(file,wildc).ToAscii(); 
     if(file.IsEmpty()) 
       return;
-    filename = file.c_str();
+    filename = file;
   }
 
   wxString temporary = filename.GetCStr();
@@ -771,7 +773,7 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
       vtkRenderer *ren = rc->GetNextItem();
       if(ren)
       {
-        //wxMessageBox(wxString::Format("%d", ren->GetActiveCamera()->GetParallelProjection()));
+        //wxMessageBox(albaString::Format("%d", ren->GetActiveCamera()->GetParallelProjection()));
         double wp0x[4], wp1x[4];
         ren->SetDisplayPoint(0,0,0); //x
         ren->DisplayToWorld();
@@ -784,7 +786,7 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
         double pixelSpacingX = sqrt(vtkMath::Distance2BetweenPoints(wp1x,wp0x))/10;
         double meter = 1000; //millimeters
         pixelXMeterX = meter/pixelSpacingX;
-        //wxMessageBox(wxString::Format("pixelXMeter = %f", meter/pixelSpacingX));
+        //wxMessageBox(albaString::Format("pixelXMeter = %f", meter/pixelSpacingX));
 
         double wp0y[4], wp1y[4];
         ren->SetDisplayPoint(0,0,0); //y
@@ -807,7 +809,7 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
   w2i->SetMagnification(magnification);
   w2i->Update();
   
-  wxSplitPath(filename.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
   ext.MakeLower();
   if (ext == "bmp")
   {
@@ -902,26 +904,26 @@ void albaRWIBase::SaveImageRecursive(albaString filename, albaViewCompound *v,in
   if(v == NULL) return;
 
   wxString path, name, ext;
-  wxSplitPath(filename.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
   if (filename.IsEmpty() || ext.IsEmpty())
   {
     //wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
     wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg|Image (*.png)|*.png|Image (*.ps)|*.ps|Image (*.tiff)|*.tiff";
-    wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
+    wxString file = albaString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
   
 		//albaString file ;
     if(!wxDirExists(path))
     {
       file = m_SaveDir;
       file +=  "\\";
-      filename = name.c_str();
+      filename = name;
     }
 
     file.Append(filename);
-    file = albaGetSaveFile(file,wildc).c_str(); 
+    file = albaGetSaveFile(file,wildc).ToAscii(); 
     if(file.IsEmpty()) 
       return;
-    filename = file.c_str();
+    filename = file;
   }
   
   wxString temporary = filename.GetCStr();
@@ -950,7 +952,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
       wxString subViewString;
       subViewString.Append(filename);
       wxString pathName, fileName, extension;
-      wxSplitPath(subViewString,&pathName,&fileName,&extension);
+      wxFileName::SplitPath(subViewString,&pathName,&fileName,&extension);
 
       subViewString.Clear();
       subViewString.Append(pathName);
@@ -968,8 +970,8 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
       ///////////////////////////////////
       wxString temp, pathName, fileName, extension;
       temp.Append(filename);
-      wxSplitPath(temp,&pathName,&fileName,&extension);
-      fileName.Append(wxString::Format("_%d", i));
+      wxFileName::SplitPath(temp,&pathName,&fileName,&extension);
+      fileName.Append(albaString::Format("_%d", i));
       temp.Clear();
       temp.Append(pathName);
       temp.Append("\\");
@@ -991,7 +993,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
           vtkRenderer *ren = rc->GetNextItem();
           if(ren)
           {
-            //wxMessageBox(wxString::Format("%d", ren->GetActiveCamera()->GetParallelProjection()));
+            //wxMessageBox(albaString::Format("%d", ren->GetActiveCamera()->GetParallelProjection()));
             double wp0x[4], wp1x[4];
             ren->SetDisplayPoint(0,0,0); //x
             ren->DisplayToWorld();
@@ -1004,7 +1006,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
             double pixelSpacingX = sqrt(vtkMath::Distance2BetweenPoints(wp1x,wp0x))/10;
             double meter = 1000; //millimeters
             pixelXMeterX = meter/pixelSpacingX;
-            //wxMessageBox(wxString::Format("pixelXMeter = %f", meter/pixelSpacingX));
+            //wxMessageBox(albaString::Format("pixelXMeter = %f", meter/pixelSpacingX));
 
             double wp0y[4], wp1y[4];
             ren->SetDisplayPoint(0,0,0); //y
@@ -1033,7 +1035,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
       {
         vtkALBASmartPointer<vtkBMPWriter> w;
         w->SetInput(w2i->GetOutput());
-        w->SetFileName(temp.c_str());
+        w->SetFileName(temp.ToAscii());
         w->Write();
 
         // bitmap header
@@ -1060,13 +1062,13 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
         */
 #ifdef WIN32
         //open file
-        fstream myFile (temp.c_str(), ios::in | ios::out | ios::binary);
+        fstream myFile (temp.ToAscii(), ios::in | ios::out | ios::binary);
         myFile.seekp (38);
         myFile.write ((char*)&pixelXMeterX, 4);
         myFile.write ((char*)&pixelXMeterY, 4);
         myFile.close();
 
-        FILE *fp = fopen(temp.c_str(), "rb");
+        FILE *fp = fopen(temp.ToAscii(), "rb");
         if(!fp) return ;
 
         BITMAPFILEHEADER bmfh={0};
@@ -1083,21 +1085,21 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
       {
         vtkALBASmartPointer<vtkJPEGWriter> w;
         w->SetInput(w2i->GetOutput());
-        w->SetFileName(temp.c_str());
+        w->SetFileName(temp.ToAscii());
         w->Write();
       }
       else if (extension == "tiff")
       {
         vtkALBASmartPointer<vtkTIFFWriter> w;
         w->SetInput(w2i->GetOutput());
-        w->SetFileName(temp.c_str());
+        w->SetFileName(temp.ToAscii());
         w->Write();
       }
       else if (extension == "ps")
       {
         vtkALBASmartPointer<vtkPostScriptWriter> w;
         w->SetInput(w2i->GetOutput());
-        w->SetFileName(temp.c_str());
+        w->SetFileName(temp.ToAscii());
         w->Write();
       }
       else if (extension == "png")
@@ -1106,7 +1108,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
         w->SetInput(w2i->GetOutput());
         w->SetPixelPerMeterX(pixelXMeterX);
         w->SetPixelPerMeterY(pixelXMeterY);
-        w->SetFileName(temp.c_str());
+        w->SetFileName(temp.ToAscii());
         w->Write();
       }
       else
@@ -1127,7 +1129,7 @@ void albaRWIBase::SaveAllImages(albaString filename, albaViewCompound *v)
 {
   if(v == NULL) return;
   wxString path, name, ext;
-  wxSplitPath(filename,&path,&name,&ext);
+  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
   if (filename.IsEmpty() || ext.IsEmpty())
   {
     albaString wildc = "Image (*.jpg)|*.jpg|Image (*.bmp)|*.bmp|Image (*.png)|*.png";
@@ -1139,7 +1141,7 @@ void albaRWIBase::SaveAllImages(albaString filename, albaViewCompound *v)
       filename = albaString(name);
     }
     file.Append(filename);
-    file = albaGetSaveFile(file,wildc).c_str(); 
+    file = albaGetSaveFile(file,wildc); 
     if(file.IsEmpty())
       return;
     filename = file;
@@ -1160,7 +1162,7 @@ void albaRWIBase::SaveAllImages(albaString filename, albaViewCompound *v)
   wxBitmap imageBitmap;
   v->GetImage(imageBitmap);
 
-  wxSplitPath(filename,&path,&name,&ext);
+  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
   ext.MakeLower();
   if (ext == "bmp")
   {
@@ -1265,7 +1267,7 @@ void albaRWIBase::GenerateStereoFrames()
   albaString filename;
   filename = m_StereoMovieDir;
   filename += "\\movie_";
-  filename += wxString::Format("%05d",m_StereoMovieFrameCounter);
+  filename += albaString::Format("%05d",m_StereoMovieFrameCounter);
   filename += ".png";
   m_StereoMoviewFrameWriter->SetFileName(filename.GetCStr());
   m_StereoMoviewFrameWriter->Write();

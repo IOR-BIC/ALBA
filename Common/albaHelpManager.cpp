@@ -37,7 +37,7 @@ albaHelpManager::albaHelpManager()
 {
 	wxString appName = wxApp::GetInstance()->GetAppName();
 		
-	m_HelpFileName = (albaGetApplicationDirectory()).c_str();
+	m_HelpFileName = (albaGetApplicationDirectory());
 	m_HelpFileName += "\\Help\\";
 	m_HelpFileName += appName;
 	m_HelpFileName += "_help.html";

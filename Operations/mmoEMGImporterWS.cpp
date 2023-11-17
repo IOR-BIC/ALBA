@@ -42,7 +42,7 @@ albaOp(label)
 	m_OpType	= OPTYPE_IMPORTER;
 	m_Canundo	= true;
 	m_File		= "";
-	m_FileDir = (albaGetApplicationDirectory() + "/Data/External/").c_str();
+	m_FileDir = (albaGetApplicationDirectory() + "/Data/External/").ToAscii();
 
   m_EmgScalar = NULL;
 }
@@ -69,7 +69,7 @@ void mmoEMGImporterWS::OpRun()
 	m_File = "";
 	wxString pgd_wildc	= "EMG File (*.*)|*.*";
   wxString f;
-  f = albaGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
+  f = albaGetOpenFile(m_FileDir,pgd_wildc).ToAscii(); 
 	if(!f.IsEmpty() && wxFileExists(f))
 	{
 	  m_File = f;
@@ -88,7 +88,7 @@ void mmoEMGImporterWS::Read()
   
   albaNEW(m_EmgScalar);
   wxString path, name, ext;
-  wxSplitPath(m_File.c_str(),&path,&name,&ext);
+  wxSplitPath(m_File.ToAscii(),&path,&name,&ext);
   m_EmgScalar->SetName(name);
 
   albaTagItem tag_Nature;
@@ -117,7 +117,7 @@ void mmoEMGImporterWS::Read()
   int comma = line.Find(',');
   wxString freq = line.SubString(0,comma - 1); //Read frequency 
   double freq_val;
-  freq_val = atof(freq.c_str());
+  freq_val = atof(freq.ToAscii());
   
   line = text.ReadLine();
   line = text.ReadLine();

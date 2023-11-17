@@ -48,6 +48,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkImageData.h"
 #include "vtkDoubleArray.h"
+#include "wx\filename.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpImporterRAWVolume);
@@ -59,7 +60,7 @@ albaOpImporterRAWVolume::albaOpImporterRAWVolume(const wxString &label) : albaOp
 {
 	m_OpType			= OPTYPE_IMPORTER;
 	m_Canundo			= true;
-	m_RawFile			= albaGetLastUserFolder().c_str();
+	m_RawFile			= albaGetLastUserFolder();
 	m_VolumeGray	= NULL;
   m_VolumeRGB   = NULL;
   m_GuiSlider   = NULL;
@@ -298,9 +299,9 @@ void albaOpImporterRAWVolume::	OnEvent(albaEventBase *alba_event)
       break;
 	    case ID_COORD:
 			{
-				wxString dir = albaGetLastUserFolder().c_str();
+				wxString dir = albaGetLastUserFolder();
 				wxString wildc =_("Z_coordinates (*.txt)|*.txt");
-				wxString file = albaGetOpenFile(dir,wildc,_("Open Z coordinates file")).c_str();
+				wxString file = albaGetOpenFile(dir,wildc,_("Open Z coordinates file")).ToAscii();
 				if(!file.IsEmpty())
 				{
 					m_CoordFile = file;
@@ -580,8 +581,8 @@ bool albaOpImporterRAWVolume::Import()
 	tag_Nature.SetValue("NATURAL");
 
 	wxString name, ext, path;
-  wxSplitPath(m_RawFile.GetCStr(),&path,&name,&ext);
-  m_Output->SetName(name.c_str());
+  wxFileName::SplitPath(m_RawFile.GetCStr(),&path,&name,&ext);
+  m_Output->SetName(name.ToAscii());
   m_Output->GetTagArray()->SetTag(tag_Nature);
   m_Output->ReparentTo(m_Input);
 	return true;

@@ -512,7 +512,7 @@ void albaOpDecomposeTimeVarVME::CreateStaticVME(albaTimeStamp timeSt)
  
   //Add the timestamp information to the name
   vme_name = oldVme->GetName();   
-  timeStr = wxString::Format("_%.3f", oldTime);
+  timeStr = albaString::Format("_%.3f", oldTime);
   newName = vme_name;
   newName << timeStr;
   newVme->SetName(newName.GetCStr());  

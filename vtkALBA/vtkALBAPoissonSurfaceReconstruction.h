@@ -2122,11 +2122,11 @@ public:
 		m_ppElements=NULL;
 	};
   /** overloaded constructor */
-	SparseMatrix( int r ){
+	SparseMatrix(int nrows) {
 		rows = 0;
 		rowSizes = NULL;
 		m_ppElements = NULL;
-		Resize(r);
+		Resize(nrows);
 	};
   /** resize the matrix*/
 	void Resize( int r ){

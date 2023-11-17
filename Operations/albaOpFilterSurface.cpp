@@ -521,35 +521,35 @@ albaString albaOpFilterSurface::GetParameters()
   wxString parameter;
 
   parameter.Append("n.iteraction = ");
-  parameter.Append(wxString::Format("%i", m_Iterations));
+  parameter.Append(albaString::Format("%i", m_Iterations));
   parameter.Append(", ");
   parameter.Append("preserve topology = ");
-  parameter.Append(wxString::Format("%i", m_TopologyFlag));
+  parameter.Append(albaString::Format("%i", m_TopologyFlag));
 
   parameter.Append(", ");
   parameter.Append("reduc. to % = ");
-  parameter.Append(wxString::Format("%i", m_Reduction));
+  parameter.Append(albaString::Format("%i", m_Reduction));
   parameter.Append(", ");
   parameter.Append("angle = ");
-  parameter.Append(wxString::Format("%i", m_Angle));
+  parameter.Append(albaString::Format("%i", m_Angle));
   parameter.Append(", ");
   parameter.Append("edge splitting = ");
-  parameter.Append(wxString::Format("%i", m_EdgeSplit));
+  parameter.Append(albaString::Format("%i", m_EdgeSplit));
   parameter.Append(", ");
   parameter.Append("flip normals = ");
-  parameter.Append(wxString::Format("%i", m_FlipNormals));
+  parameter.Append(albaString::Format("%i", m_FlipNormals));
   parameter.Append(", ");
   parameter.Append("strip = ");
-  parameter.Append(wxString::Format("%i", m_StripFlag));
+  parameter.Append(albaString::Format("%i", m_StripFlag));
   parameter.Append(", ");
   parameter.Append("triangulate = ");
-  parameter.Append(wxString::Format("%i", m_TriangulateFlag));
+  parameter.Append(albaString::Format("%i", m_TriangulateFlag));
   parameter.Append(", ");
   parameter.Append("clean = ");
-  parameter.Append(wxString::Format("%i", m_CleanFlag));
+  parameter.Append(albaString::Format("%i", m_CleanFlag));
   parameter.Append(", ");
   parameter.Append("connectivity = ");
-  parameter.Append(wxString::Format("%i", m_ConnectivityFlag));
+  parameter.Append(albaString::Format("%i", m_ConnectivityFlag));
 
   return parameter;
 }

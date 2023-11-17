@@ -174,8 +174,8 @@ void albaPipeWrappedMeter::Create(albaSceneNode *n/*, bool use_axes*/)
   m_Caption->SetWidth(0.35);
   m_Caption->BorderOff();
   wxString dis;
-  dis = wxString::Format("%.2f",m_WrappedMeterVME->GetDistance());
-  m_Caption->SetCaption(dis.c_str());
+  dis = albaString::Format("%.2f",m_WrappedMeterVME->GetDistance());
+  m_Caption->SetCaption(dis.ToAscii());
 
  /* if(m_WrappedMeterVME->GetMeterMode() == albaVMEWrappedMeter::LINE_ANGLE)
     m_Caption->SetVisibility((m_WrappedMeterVME->GetAngle() != 0) && m_WrappedMeterVME->GetMeterAttributes()->m_LabelVisibility);
@@ -346,8 +346,8 @@ void albaPipeWrappedMeter::UpdateProperty(bool fromTag)
  // if(m_WrappedMeterVME->GetMeterMode() == albaVMEWrappedMeter::LINE_ANGLE) distance_value = m_WrappedMeterVME->GetAngle();
   distance_value = RoundValue(distance_value);
   wxString dis;
-  dis = wxString::Format("%.2f",distance_value);
-  m_Caption->SetCaption(dis.c_str());
+  dis = albaString::Format("%.2f",distance_value);
+  m_Caption->SetCaption(dis.ToAscii());
   m_Caption->SetVisibility(m_WrappedMeterVME->GetMeterAttributes()->m_LabelVisibility);
 
   double rgb[3];

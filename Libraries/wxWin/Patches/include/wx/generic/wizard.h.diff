@@ -1,3 +1,0 @@
-75a76,77
->     void SetButtonString(wxString buttonString){m_btnNext->SetLabel(buttonString);};
-> 

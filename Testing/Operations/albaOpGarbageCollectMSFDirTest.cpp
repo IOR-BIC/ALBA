@@ -69,7 +69,7 @@ void albaOpGarbageCollectMSFDirTest::TestOpRun()
   msfFileNameOut<<"\\Test_GarbageCollectMSFDir\\TestMSF\\TestMSF.msf";
 
   msfFileNameOut.Replace("/","\\");
-  storageImport->SetURL(msfFileNameOut.c_str());
+  storageImport->SetURL(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( storageImport->Restore() == ALBA_OK );
 
   albaOpGarbageCollectMSFDir *op = new albaOpGarbageCollectMSFDir();
@@ -122,7 +122,7 @@ void albaOpGarbageCollectMSFDirTest::TestGarbageCollect()
   CPPUNIT_ASSERT(wxFileExists(msfFileNameOut));
 
   msfFileNameOut.Replace("/","\\");
-  storageImport->SetURL(msfFileNameOut.c_str());
+  storageImport->SetURL(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( storageImport->Restore() == ALBA_OK );
 
   albaOpGarbageCollectMSFDir *op = new albaOpGarbageCollectMSFDir();

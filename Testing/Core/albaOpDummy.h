@@ -59,7 +59,7 @@ protected:
   /*virtual*/ void OpStop(int result);
 };
 //----------------------------------------------------------------------------
-albaOpDummy::albaOpDummy(wxString label,  bool canundo, int opType, bool inputPreserving)
+albaOpDummy::albaOpDummy(wxString label,  bool canundo, int opType, bool inputPreserving):albaOp(label)
 //----------------------------------------------------------------------------
 {
 

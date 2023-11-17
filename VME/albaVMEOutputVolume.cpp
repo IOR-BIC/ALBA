@@ -138,15 +138,15 @@ void albaVMEOutputVolume::Update()
     double b[6];
     m_VME->GetOutput()->GetVMELocalBounds(b);
     m_VolumeBounds[0] = "";
-    m_VolumeBounds[0] << " xmin: " << wxString::Format("%g",RoundValue(b[0])).c_str() << "   xmax: " << wxString::Format("%g",RoundValue(b[1])).c_str();
+    m_VolumeBounds[0] << " xmin: " << albaString::Format("%g",RoundValue(b[0])).ToAscii() << "   xmax: " << albaString::Format("%g",RoundValue(b[1])).ToAscii();
     m_VolumeBounds[1] = "";
-    m_VolumeBounds[1] << " ymin: " << wxString::Format("%g",RoundValue(b[2])).c_str() << "   ymax: " << wxString::Format("%g",RoundValue(b[3])).c_str();
+    m_VolumeBounds[1] << " ymin: " << albaString::Format("%g",RoundValue(b[2])).ToAscii() << "   ymax: " << albaString::Format("%g",RoundValue(b[3])).ToAscii();
     m_VolumeBounds[2] = "";
-    m_VolumeBounds[2] << " zmin: " << wxString::Format("%g",RoundValue(b[4])).c_str() << "   zmax: " << wxString::Format("%g",RoundValue(b[5])).c_str();
+    m_VolumeBounds[2] << " zmin: " << albaString::Format("%g",RoundValue(b[4])).ToAscii() << "   zmax: " << albaString::Format("%g",RoundValue(b[5])).ToAscii();
     double srange[2];
     this->GetVTKData()->Update();
     this->GetVTKData()->GetScalarRange(srange);
-    m_ScaralRangeString = wxString::Format("min: %6.2f max: %6.2f", srange[0], srange[1]);;
+    m_ScaralRangeString = albaString::Format("min: %6.2f max: %6.2f", srange[0], srange[1]);;
     //m_ScaralRangeString << " min: " << srange[0] << "    max: " << srange[1];
   }
   

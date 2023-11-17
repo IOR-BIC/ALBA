@@ -116,6 +116,12 @@ public:
 	/** Sets Configuration */
 	void SetConfiguration(BonematConfiguration configuration) { m_Configuration = configuration; }
 
+	/* Inits variables for progress bar management */
+	void Init();
+
+	/** Builds operation's interface. */
+	void OpRun();
+
 protected:
 
 	/** Return true for the acceptable vme type. */

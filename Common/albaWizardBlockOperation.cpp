@@ -173,7 +173,7 @@ void albaWizardBlockOperation::ExcutionBegin()
   ///////////////////////
   //Select the input VME for the operation
   if (m_SelectedVME)
-    m_SelectedVME=m_SelectedVME->GetByPath(m_VmeSelect.c_str());
+    m_SelectedVME=m_SelectedVME->GetByPath(m_VmeSelect.ToAscii());
   
   if (m_SelectedVME)
   {
@@ -184,7 +184,7 @@ void albaWizardBlockOperation::ExcutionBegin()
   else 
   {
     //If we cannot select the correct vme we need to abort the wizard
-    albaLogMessage("Wizard Error: unable to select VME, path:\"%s\" base:\"%s\"",m_VmeSelect.c_str(),m_SelectedVME->GetName());
+    albaLogMessage("Wizard Error: unable to select VME, path:\"%s\" base:\"%s\"",m_VmeSelect.ToAscii(),m_SelectedVME->GetName());
     Abort();
     //we stop execution now
     return;
@@ -203,7 +203,7 @@ void albaWizardBlockOperation::ExcutionBegin()
     for(int i=0;i<m_VmeShow.size();i++)
     {
       //detecting all other vme starting on selected vme and show it
-      albaVME *toShow=m_SelectedVME->GetByPath(m_VmeShow[i].c_str());
+      albaVME *toShow=m_SelectedVME->GetByPath(m_VmeShow[i].ToAscii());
       if (toShow != NULL)
         GetLogicManager()->VmeShow(toShow, true);
     }

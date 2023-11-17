@@ -28,6 +28,7 @@
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>
 #include <wx/sstream.h>
+#include "wx/filename.h"
 
 #include "albaGUI.h"
 
@@ -69,8 +70,8 @@ void albaOpImporterEmgWS::OpRun()
 	int result = OP_RUN_CANCEL;
 	m_File = "";
 	albaString pgd_wildc	= "EMG File (*.*)|*.*";
-  albaString fileDir = (albaGetApplicationDirectory() + "/Data/External/").c_str();
-  albaString f = albaGetOpenFile(fileDir, pgd_wildc).c_str(); 
+  albaString fileDir = (albaGetApplicationDirectory() + "/Data/External/");
+  albaString f = albaGetOpenFile(fileDir, pgd_wildc); 
 	if(!f.IsEmpty() && wxFileExists(f.GetCStr()))
 	{
 	  m_File = f;
@@ -89,7 +90,7 @@ void albaOpImporterEmgWS::Read()
   
   albaNEW(m_Group);
   wxString path, name, ext;
-  wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.GetCStr(),&path,&name,&ext);
   m_Group->SetName(name);
 
   albaTagItem tag_Nature;
@@ -105,7 +106,7 @@ void albaOpImporterEmgWS::Read()
   /////////////////////////////////////////////////////////////
   // Check if file starts with the string "ANALOG"
   line = text.ReadLine(); 
-  if (line.CompareTo("ANALOG") != 0)
+  if (line.CompareTo(wxString("ANALOG")) != 0)
   {
     albaErrorMessage(_("Invalid file format!"));
     return;
@@ -115,7 +116,7 @@ void albaOpImporterEmgWS::Read()
   line = text.ReadLine();
   int comma = line.Find(wxT(','));
   wxString freq = line.SubString(0,comma - 1); 
-  double freq_val = atof(freq.c_str());
+  double freq_val = atof(freq.ToAscii());
 
   ////////////////// Read signals names //////////////////
   line = text.ReadLine();
@@ -148,7 +149,7 @@ void albaOpImporterEmgWS::Read()
     wxStringTokenizer tkz(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
     /// First token is time stamp
     t_str = tkz.GetNextToken();
-    t = atof(t_str.c_str()) / freq_val;
+    t = atof(t_str.ToAscii()) / freq_val;
     i = 0;
     while (tkz.HasMoreTokens())
     {

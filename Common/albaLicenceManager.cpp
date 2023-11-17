@@ -70,7 +70,7 @@ albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 		//use first run time to obtain an value that bind licence to the current user
 		unsigned long secs = SecondsInThisMillennium();
 
-		sprintf(tmp, "%s-code:%lu", m_AppName.c_str(), secs);
+		sprintf(tmp, "%s-code:%lu", m_AppName.ToAscii(), secs);
 					
 		wxString cryptedCode = EncryptStr(tmp);
 		
@@ -79,7 +79,7 @@ albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 		bool created = RegKey.Create();
 		
 		if(created)
-			RegKey.SetValue("LocalKey", cryptedCode.c_str());
+			RegKey.SetValue("LocalKey", cryptedCode.ToAscii());
 		wxLog::EnableLogging(true);
 		
 		
@@ -175,7 +175,7 @@ void albaLicenceManager::AddTimeLicence(wxDateTime expireDate)
 	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
 	wxRegKey RegKey(regKeyStr);
 	RegKey.Create();
-	RegKey.SetValue("Registered", cryptedDate.c_str());
+	RegKey.SetValue("Registered", cryptedDate.ToAscii());
 }
 
 //----------------------------------------------------------------------------
@@ -186,7 +186,7 @@ void albaLicenceManager::AddBinaryLicence()
 	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
 	wxRegKey RegKey(regKeyStr);
 	RegKey.Create();
-	RegKey.SetValue("Registered", criptedReg.c_str());
+	RegKey.SetValue("Registered", criptedReg.ToAscii());
 }
 
 //----------------------------------------------------------------------------
@@ -207,7 +207,7 @@ albaLicenceManager::addLicenceStatuses albaLicenceManager::CheckCreateLicence(wx
 	RegKey.QueryValue("LocalKey", localKey);
 
 	//if the decrypted key is empty is possible to have a manumission and we must return wrong licence
-	decriptedKey = DecryptStr(localKey.c_str());
+	decriptedKey = DecryptStr(localKey.ToAscii());
 	if (decriptedKey.empty())
 	{
 		return WRONG_LICENCE;
@@ -217,7 +217,7 @@ albaLicenceManager::addLicenceStatuses albaLicenceManager::CheckCreateLicence(wx
 	int licLen = decripRegString.length();
 
 	//check base licence if does not match the licence was created for another computer/user
-	if (strncmp(decriptedKey.c_str(), decripRegString.c_str(), locKeyLen))
+	if (strncmp(decriptedKey.ToAscii(), decripRegString.ToAscii(), locKeyLen))
 	{
 		return WRONG_LICENCE;
 	}
@@ -233,7 +233,7 @@ albaLicenceManager::addLicenceStatuses albaLicenceManager::CheckCreateLicence(wx
 		wxString dateString = decripRegString.substr(locKeyLen + 1, licLen);
 		wxDateTime RegDate, currentExpDate, currentDate;
 
-		RegDate.ParseDate(dateString.c_str());
+		RegDate.ParseDate(dateString);
 		currentDate.SetToCurrent();
 
 		//check dates 
@@ -249,7 +249,7 @@ albaLicenceManager::addLicenceStatuses albaLicenceManager::CheckCreateLicence(wx
 	else //BINARY_LICENCE
 	{
 		wxString regString = decripRegString.substr(locKeyLen + 1, licLen);
-		if (strcmp(regString.c_str(), "REGISTERED"))
+		if (strcmp(regString.ToAscii(), "REGISTERED"))
 			return WRONG_LICENCE;
 
 		AddBinaryLicence();
@@ -263,9 +263,9 @@ wxString albaLicenceManager::EncryptStr(wxString plainStr)
 	std::string encStr;
 
 	if (m_CryptKey == "")
-		albaDefaultEncryptFromMemory(plainStr.c_str(), encStr);
+		albaDefaultEncryptFromMemory(plainStr.ToAscii(), encStr);
 	else
-		albaEncryptFromMemory(plainStr.c_str(), encStr, m_CryptKey.c_str());
+		albaEncryptFromMemory(plainStr.ToAscii(), encStr, m_CryptKey.ToAscii());
 
 	return encStr.c_str();
 }
@@ -276,9 +276,9 @@ wxString albaLicenceManager::DecryptStr(wxString plainStr)
 	std::string decStr;
 
 	if (m_CryptKey == "")
-		albaDefaultDecryptInMemory(plainStr.c_str(), decStr);
+		albaDefaultDecryptInMemory(plainStr.ToAscii(), decStr);
 	else
-		albaDecryptInMemory(plainStr.c_str(), decStr, m_CryptKey.c_str());
+		albaDecryptInMemory(plainStr.ToAscii(), decStr, m_CryptKey.ToAscii());
 
 	return decStr.c_str();
 }
@@ -296,17 +296,17 @@ albaLicenceManager::CreateNewLicenceStatuses albaLicenceManager::CreateNewTimeLi
 	}
 		
 	char tmp[255];
-	sprintf(tmp, "%s-code:", m_AppName.c_str());
+	sprintf(tmp, "%s-code:", m_AppName.ToAscii());
 	int baseRegLen = strlen(tmp);
 	
 	wxString baseRegCode = decriptedRegCode.substr(0, baseRegLen);
 	wxString secsInMillennium = decriptedRegCode.substr(baseRegLen);
 
-	if (strncmp(tmp, baseRegCode.c_str(), baseRegLen))
+	if (strncmp(tmp, baseRegCode.ToAscii(), baseRegLen))
 		return WRONG_BASE_STRING;
 
 	unsigned long secsInMil;
-	sscanf(secsInMillennium.c_str(), "%ud", &secsInMil);
+	sscanf(secsInMillennium.ToAscii(), "%ud", &secsInMil);
 
 	if (secsInMil < 0 || secsInMil > SecondsInThisMillennium())
 		return WRONG_SECS_IN_MILLENNIUM;
@@ -314,11 +314,11 @@ albaLicenceManager::CreateNewLicenceStatuses albaLicenceManager::CreateNewTimeLi
 	char fullCheckStr[255];
 	sprintf(fullCheckStr, "%s%lu", tmp, secsInMil);
 
-	if (strcmp(fullCheckStr, decriptedRegCode.c_str()))
+	if (strcmp(fullCheckStr, decriptedRegCode.ToAscii()))
 		return WRONG_FULL_STRING;
 
 	char licence[255];
-	sprintf(licence, "%s|%s", decriptedRegCode.c_str(), expirationDate.FormatISODate().c_str());
+	sprintf(licence, "%s|%s", decriptedRegCode.ToAscii(), expirationDate.FormatISODate().ToAscii());
 
 	newLicence = EncryptStr(licence);
 
@@ -337,17 +337,17 @@ albaLicenceManager::CreateNewLicenceStatuses albaLicenceManager::CreateNewBinary
 	}
 
 	char tmp[255];
-	sprintf(tmp, "%s-code:", m_AppName.c_str());
+	sprintf(tmp, "%s-code:", m_AppName.ToAscii());
 	int baseRegLen = strlen(tmp);
 
 	wxString baseRegCode = decriptedRegCode.substr(0, baseRegLen);
 	wxString secsInMillennium = decriptedRegCode.substr(baseRegLen);
 
-	if (strncmp(tmp, baseRegCode.c_str(), baseRegLen))
+	if (strncmp(tmp, baseRegCode.ToAscii(), baseRegLen))
 		return WRONG_BASE_STRING;
 
 	unsigned long secsInMil;
-	sscanf(secsInMillennium.c_str(), "%ud", &secsInMil);
+	sscanf(secsInMillennium.ToAscii(), "%ud", &secsInMil);
 
 	if (secsInMil < 0 || secsInMil > SecondsInThisMillennium())
 		return WRONG_SECS_IN_MILLENNIUM;
@@ -355,11 +355,11 @@ albaLicenceManager::CreateNewLicenceStatuses albaLicenceManager::CreateNewBinary
 	char fullCheckStr[255];
 	sprintf(fullCheckStr, "%s%lu", tmp, secsInMil);
 
-	if (strcmp(fullCheckStr, decriptedRegCode.c_str()))
+	if (strcmp(fullCheckStr, decriptedRegCode.ToAscii()))
 		return WRONG_FULL_STRING;
 
 	char licence[255];
-	sprintf(licence, "%s|REGISTERED", decriptedRegCode.c_str());
+	sprintf(licence, "%s|REGISTERED", decriptedRegCode.ToAscii());
 
 	newLicence = EncryptStr(licence);
 
@@ -399,7 +399,7 @@ void albaLicenceManager::ShowRegistrationDialog()
 
 			// Load and show the image
 			m_PreviewImage = new wxImage();
-			m_PreviewImage->LoadFile(imgPath.c_str(), wxBITMAP_TYPE_ANY);
+			m_PreviewImage->LoadFile(imgPath.ToAscii(), wxBITMAP_TYPE_ANY);
 
 			previewBitmap = new wxBitmap(*m_PreviewImage);
 			albaGUIPicButton *previewImageButton = new albaGUIPicButton(m_RegistrationDialog, previewBitmap, -1);

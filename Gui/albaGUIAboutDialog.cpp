@@ -110,7 +110,7 @@ void albaGUIAboutDialog::OnEvent(albaEventBase *alba_event)
 
 void albaGUIAboutDialog::SetBuildNum(wxString revision)
 {
-	albaString tmp = revision.c_str();
+	albaString tmp = revision;
 	tmp.Replace('_', ' ');
 	m_BuildNum = tmp.GetCStr();
 }
@@ -178,7 +178,7 @@ void albaGUIAboutDialog::CreateDialog()
 
 			// Load and show the image
 			m_PreviewImage = new wxImage();
-			m_PreviewImage->LoadFile(m_ImagePath.c_str(), wxBITMAP_TYPE_ANY);
+			m_PreviewImage->LoadFile(m_ImagePath.ToAscii(), wxBITMAP_TYPE_ANY);
 
 			previewBitmap = new wxBitmap(*m_PreviewImage);
 			previewImageButton = new albaGUIPicButton(m_AboutDialog, previewBitmap, -1);
@@ -284,7 +284,7 @@ wxString albaGUIAboutDialog::GetBuildDate()
 		if (!strcmp(temp, months[i]))
 		{
 			month = i + 1;
-			wxString date = wxString::Format(" %d/%d/%d ", day, month, year);
+			wxString date = albaString::Format(" %d/%d/%d ", day, month, year);
 			return date;
 		}
 	}

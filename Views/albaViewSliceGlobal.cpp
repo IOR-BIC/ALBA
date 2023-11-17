@@ -200,12 +200,12 @@ void albaViewSliceGlobal::UpdateText(int ID)
 
     if(m_TextMode == SLICES_AND_FRAMES_LABEL)
     {
-      m_Text = wxString::Format("SLICE %d of %d FRAME: %d of %d",m_SliceIndex+1, numberOfSlices, m_FrameIndex+1, m_NumberOfFrames);
+      m_Text = albaString::Format("SLICE %d of %d FRAME: %d of %d",m_SliceIndex+1, numberOfSlices, m_FrameIndex+1, m_NumberOfFrames);
     }
     else
     {
       if((m_CameraPositionId != CAMERA_ARB) && (m_CameraPositionId != CAMERA_PERSPECTIVE))
-        m_Text = wxString::Format("o = [%.1f %.1f %.1f]  n = [%.1f %.1f %.1f]",m_Slice[0],m_Slice[1],m_Slice[2],m_SliceNormal[0],m_SliceNormal[1],m_SliceNormal[2]);
+        m_Text = albaString::Format("o = [%.1f %.1f %.1f]  n = [%.1f %.1f %.1f]",m_Slice[0],m_Slice[1],m_Slice[2],m_SliceNormal[0],m_SliceNormal[1],m_SliceNormal[2]);
     }
   }
   else
@@ -213,7 +213,7 @@ void albaViewSliceGlobal::UpdateText(int ID)
     m_Text="";
   }
 
-  m_TextMapper->SetInput(m_Text.c_str());
+  m_TextMapper->SetInput(m_Text.ToAscii());
   m_TextMapper->Modified();
 }
 

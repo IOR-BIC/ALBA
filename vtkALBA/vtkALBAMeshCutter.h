@@ -18,6 +18,7 @@
 #ifndef __vtkALBAMeshCutter_h
 #define __vtkALBAMeshCutter_h
 
+#define _WINSOCKAPI_ 
 //---------------------------------------------
 // includes:
 //---------------------------------------------

@@ -82,7 +82,7 @@ public:
   void SetFileName(const char *abaqusFileNameFullPath) {m_AbaqusInputFileNameFullPath = abaqusFileNameFullPath;};
 
   /** Get the input Abaqus file */
-  wxString GetFileName() {return m_AbaqusInputFileNameFullPath.c_str();};
+  wxString GetFileName() {return m_AbaqusInputFileNameFullPath.ToAscii();};
 
   /** Builds operation's interface. */
   void OpRun();

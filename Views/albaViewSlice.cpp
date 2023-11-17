@@ -139,7 +139,7 @@ void albaViewSlice::Create()
   // text stuff
   m_Text = "";
   m_TextMapper = vtkTextMapper::New();
-  m_TextMapper->SetInput(m_Text.c_str());
+  m_TextMapper->SetInput(m_Text.ToAscii());
   m_TextMapper->GetTextProperty()->AntiAliasingOff();
 
   m_TextActor = vtkActor2D::New();
@@ -171,26 +171,26 @@ void albaViewSlice::UpdateText(int ID)
 			{
 				case CAMERA_OS_X:
 					m_Text = "X = ";
-					m_Text += wxString::Format(m_TextFormat, m_Slice[0]);
+					m_Text += albaString::Format(m_TextFormat, m_Slice[0]);
 					break;
 				case CAMERA_OS_Y:
 					m_Text = "Y = ";
-					m_Text += wxString::Format(m_TextFormat, m_Slice[1]);
+					m_Text += albaString::Format(m_TextFormat, m_Slice[1]);
 					break;
 				case CAMERA_OS_Z:
 					m_Text = "Z = ";
-					m_Text += wxString::Format(m_TextFormat, m_Slice[2]);
+					m_Text += albaString::Format(m_TextFormat, m_Slice[2]);
 					break;
 				default:
 					break;
 			}
-			m_TextMapper->SetInput(m_Text.c_str());
+			m_TextMapper->SetInput(m_Text.ToAscii());
 			m_TextMapper->Modified();
 		}
 		else
 		{
 			m_Text = "";
-			m_TextMapper->SetInput(m_Text.c_str());
+			m_TextMapper->SetInput(m_Text.ToAscii());
 			m_TextMapper->Modified();
 		}
 	}

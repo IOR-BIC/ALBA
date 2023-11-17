@@ -13,6 +13,7 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "albaDefines.h"
 
 #include "albaViewVTKTest.h"
 #include "albaViewVTK.h"

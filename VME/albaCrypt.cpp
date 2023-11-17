@@ -17,6 +17,7 @@
 #include "randpool.h"
 #include "ida.h"
 #include "socketft.h"
+#include "albaString.h"
 #include <base64.h>
 
 #include <iostream>
@@ -82,7 +83,7 @@ ALBA_EXPORT extern void albaCalculateteSHA256(const char *filename, std::string 
 	}
 	catch (...)
 	{
-		wxString msg = wxString::Format(_("Problem on calculating SHA256 on file %s !!"), filename);
+		wxString msg = albaString::Format(_("Problem on calculating SHA256 on file %s !!"), filename);
 		wxMessageBox(msg, _("Error"));
 	}
 
@@ -258,7 +259,7 @@ void albaCalculateteChecksum(const char *filename, std::string &checksum_result)
   }
   catch (...)
   {
-    wxString msg = wxString::Format(_("Problem on calculating Checksum on file %s !!"), filename);
+    wxString msg = albaString::Format(_("Problem on calculating Checksum on file %s !!"), filename);
     wxMessageBox(msg, _("Error"));
   }
 }

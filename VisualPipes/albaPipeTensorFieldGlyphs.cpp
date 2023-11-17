@@ -473,7 +473,7 @@ void albaPipeTensorFieldGlyphs::InitFilterList(int nScalars){
 			FILTER_ITEM* pItem = new FILTER_ITEM;
 			memset(pItem, 0, sizeof(FILTER_ITEM));
 
-			wxStringTokenizer tkz(wxT(linkName.GetCStr()), wxT(":"));
+			wxStringTokenizer tkz(linkName.GetCStr(), wxT(":"));
 			int j=0;
 			while ( tkz.HasMoreTokens() )
 			{
@@ -509,7 +509,7 @@ void albaPipeTensorFieldGlyphs::InitFilterList(int nScalars){
 			FILTER_ITEM* pItem = new FILTER_ITEM;
 			memset(pItem, 0, sizeof(FILTER_ITEM));
 
-			wxStringTokenizer tkz(wxT(linkName.GetCStr()), wxT(":"));
+			wxStringTokenizer tkz(linkName.GetCStr(), wxT(":"));
 			int j=0;
 			while ( tkz.HasMoreTokens() )
 			{
@@ -590,13 +590,13 @@ void albaPipeTensorFieldGlyphs::StoreFilterLinks2(){
 			itemName = m_RangeCtrl2->GetItemText(i);
 			FILTER_ITEM* pItem = (FILTER_ITEM*)m_RangeCtrl2->GetItemData(i);
 			albaString szName;
-			szName = wxString::Format("%s%d",FILTER_LINK_NAME2,i);
+			szName = albaString::Format("%s%d",FILTER_LINK_NAME2,i);
 			szName += ":";
 			szName += itemName;
 			szName += ":";
-			szName +=   wxString::Format("%.4f",pItem->value[0]);//wxString::Format("%.3f%d",szName,pItem->value[0]);
+			szName +=   albaString::Format("%.4f",pItem->value[0]);
 			szName += ":";
-			szName +=  wxString::Format("%.4f",pItem->value[1]);//wxString::Format("%s%.3f",szName,pItem->value[1]);
+			szName +=  albaString::Format("%.4f",pItem->value[1]);
 
 			m_Vme->SetLink(szName,m_Vme);
 		}
@@ -635,13 +635,13 @@ void albaPipeTensorFieldGlyphs::StoreFilterLinks(){
 			itemName = m_RangeCtrl->GetItemText(i);
 			FILTER_ITEM* pItem = (FILTER_ITEM*)m_RangeCtrl->GetItemData(i);
 			albaString szName;
-			szName = wxString::Format("%s%d",FILTER_LINK_NAME,i);
+			szName = albaString::Format("%s%d",FILTER_LINK_NAME,i);
 			szName += ":";
 			szName += itemName;
 			szName += ":";
-			szName +=   wxString::Format("%.4f",pItem->value[0]);//wxString::Format("%.3f%d",szName,pItem->value[0]);
+			szName +=   albaString::Format("%.4f",pItem->value[0]);
 			szName += ":";
-			szName +=  wxString::Format("%.4f",pItem->value[1]);//wxString::Format("%s%.3f",szName,pItem->value[1]);
+			szName +=  albaString::Format("%.4f",pItem->value[1]);
 
 			m_Vme->SetLink(szName,m_Vme);
 		}
@@ -849,8 +849,8 @@ void albaPipeTensorFieldGlyphs::CreateAddItemDlg(int idx){
 
 	if(idx==1){
 		dlgName = "magnitude filter editor";
-		m_FilterValue1 = wxString::Format("%.4f",m_Sr[0]);
-		m_FilterValue2 = wxString::Format("%.4f",m_Sr[1]);
+		m_FilterValue1 = albaString::Format("%.4f",m_Sr[0]);
+		m_FilterValue2 = albaString::Format("%.4f",m_Sr[1]);
 		okBtn = ID_ITEM_OK;
 		canBtn = ID_ITEM_CANCEL;
 		rName = ID_RANGE_NAME;
@@ -860,8 +860,8 @@ void albaPipeTensorFieldGlyphs::CreateAddItemDlg(int idx){
 	}else if (idx==2)
 	{
 		dlgName = "scalar filter editor";
-		m_FilterValue1 = wxString::Format("%.4f",m_Sr2[0]);
-		m_FilterValue2 = wxString::Format("%.4f",m_Sr2[1]);
+		m_FilterValue1 = albaString::Format("%.4f",m_Sr2[0]);
+		m_FilterValue2 = albaString::Format("%.4f",m_Sr2[1]);
 		okBtn = ID_ITEM_OK2;
 		canBtn = ID_ITEM_CANCEL2;
 		rName = ID_RANGE_NAME2;

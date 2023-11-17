@@ -102,7 +102,7 @@ void albaOpExporterVTK::OpRun()
 
 	albaString wildc = "vtk Data (*.vtk)|*.vtk";
 
-	m_FileDir = albaGetLastUserFolder().c_str();
+	m_FileDir = albaGetLastUserFolder();
 	m_File = m_FileDir + "\\" + m_Input->GetName() + ".vtk";
 
 	m_Gui = new albaGUI(this);

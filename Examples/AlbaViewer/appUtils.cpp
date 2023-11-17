@@ -32,7 +32,7 @@ wxString appUtils::GetApplicationDirectory()
 {
 #ifndef _DEBUG
 	// RELEASE 
-	wxString applicationDirectory = albaGetApplicationDirectory().c_str();
+	wxString applicationDirectory = albaGetApplicationDirectory().ToAscii();
 	return applicationDirectory;
 
 #else
@@ -54,7 +54,7 @@ wxString appUtils::GetApplicationDirectory()
 wxString appUtils::GetConfigDirectory()
 {
 	//getting the Config directory
-	wxString config_dir = albaGetApplicationDirectory().c_str();
+	wxString config_dir = albaGetApplicationDirectory().ToAscii();
 
 #ifdef _DEBUG
 	config_dir = ALBA_SOURCE_DIR;

@@ -33,7 +33,7 @@ IF (ALBA_USE_XercesC)
     mmuXMLDOM.h
     mmuXMLDOMElement.h
   )
-  SET(PROJECT_LIBS ${PROJECT_LIBS} XercesC)
+  SET(PROJECT_LIBS ${PROJECT_LIBS} XercesC Libraries::wx::net Libraries::wx::core Libraries::wx::base)
 ENDIF (ALBA_USE_XercesC)
 
 IF (ALBA_USE_VTK)

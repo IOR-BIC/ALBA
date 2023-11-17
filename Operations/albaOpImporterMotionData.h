@@ -52,8 +52,8 @@ public:
     m_Canundo	= true;
     m_File		= "";
     m_Dict		= "";
-    m_FileDir = (albaGetApplicationDirectory() + "/Data/External/").c_str();
-    m_DictDir = (albaGetApplicationDirectory() + "/Config/Dictionary/").c_str();
+    m_FileDir = (albaGetApplicationDirectory() + "/Data/External/").ToAscii();
+    m_DictDir = (albaGetApplicationDirectory() + "/Config/Dictionary/").ToAscii();
 
     m_Vme		= NULL;
 
@@ -93,11 +93,11 @@ public:
     m_File = "";
     m_Dict = "";
 
-    albaString f = albaGetOpenFile(m_FileDir,m_PgdWildc).c_str(); 
+    albaString f = albaGetOpenFile(m_FileDir,m_PgdWildc); 
     if(f != "")
     {
       m_File = f;
-      f = albaGetOpenFile(m_DictDir,m_DicWildc,"Open Dictionary").c_str(); 
+      f = albaGetOpenFile(m_DictDir,m_DicWildc,"Open Dictionary"); 
       if(f != "")
       {
         m_Dict = f;
@@ -138,7 +138,7 @@ public:
     m_Vme = reader;
 
     wxString path, name, ext;
-    wxSplitPath(m_File.c_str(),&path,&name,&ext);
+    wxFileName::SplitPath(m_File,&path,&name,&ext);
     m_Vme->SetName(name);
 
     albaTagItem tag_Nature;

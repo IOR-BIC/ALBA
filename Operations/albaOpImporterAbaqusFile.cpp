@@ -66,8 +66,7 @@ albaOp(label)
   m_ImportedVmeMesh = NULL;
   m_Output=NULL;
 
-  wxStandardPaths std_paths;
-  wxString userPath=std_paths.GetUserDataDir();
+  wxString userPath= wxStandardPaths::Get().GetUserDataDir();
 
   m_DataDir = userPath + "\\Data";
   m_CacheDir = m_DataDir + "\\AbaqusReaderCache";
@@ -122,7 +121,7 @@ void albaOpImporterAbaqusFile::OpRun()
   m_AbaqusInputFileNameFullPath = "";
 
   wxString f;
-  f = albaGetOpenFile("", wildcard).c_str(); 
+  f = albaGetOpenFile("", wildcard).ToAscii(); 
   if(!f.IsEmpty() && wxFileExists(f))
   {
     m_AbaqusInputFileNameFullPath = f;
@@ -165,26 +164,26 @@ int albaOpImporterAbaqusFile::Import()
   m_MatIDMap.clear();
 	m_Parts.clear();
 
-  albaLogMessage( _T("Current working directory is: '%s' "), wxGetCwd().c_str() );
+  albaLogMessage("Current working directory is: '%s' ", wxGetCwd().ToAscii());
 
   // Create tmp path
   mkdir(m_DataDir);
 
-  if(!wxDirExists(m_DataDir))
+  if(!wxDirExists(m_DataDir.GetCStr()))
   {
     albaLogMessage("Cloud not create \"Data\" Directory");
     return ALBA_ERROR;
   }
 
   mkdir(m_CacheDir);
-  if(!wxDirExists(m_CacheDir))
+  if(!wxDirExists(m_CacheDir.GetCStr()))
   {
     albaLogMessage("Cloud not create Read Cache Directory");
     return ALBA_ERROR;
   }
 
   // Parsing Abaqus File
-  if(ParseAbaqusFile(m_AbaqusInputFileNameFullPath.c_str()) == ALBA_ERROR)
+  if(ParseAbaqusFile(m_AbaqusInputFileNameFullPath) == ALBA_ERROR)
   {
     return ALBA_ERROR;
   }
@@ -219,7 +218,7 @@ int albaOpImporterAbaqusFile::Import()
       albaNEW(m_ImportedVmeMesh);
 
       if(m_Parts[p].name.length()>0)
-        name = name + "-" + m_Parts[p].name.c_str();
+        name = name + "-" + m_Parts[p].name;
 
       m_ImportedVmeMesh->SetName(name);
       m_ImportedVmeMesh->SetDataByDetaching(reader->GetOutput()->GetUnstructuredGridOutput()->GetVTKData(),0);
@@ -700,7 +699,7 @@ int albaOpImporterAbaqusFile::ReadElset()
   std::string matName ="";
 
   if(pos < line.length())
-    matName = line.substr(pos+9).c_str();
+    matName = line.substr(pos+9);
 
   AbaqusElset elset;
   elset.name=elsetName;
@@ -727,7 +726,7 @@ int albaOpImporterAbaqusFile::ReadSolid()
   std::string matName ="";
 
   if(pos < line.length())
-    matName = line.substr(pos+9).c_str();  
+    matName = line.substr(pos+9);  
   int res=0;
 
   // Assign matName at Elset
@@ -738,7 +737,7 @@ int albaOpImporterAbaqusFile::ReadSolid()
 		if (cmpName.size() > 0 && cmpName[cmpName.size() - 1] == '\n')
 			cmpName = cmpName.substr(0, cmpName.size() - 1);
 			
-    int equalRes = cmpName.compare(elsetName.c_str());
+    int equalRes = cmpName.compare(elsetName);
 
     if(equalRes==0)
     {
@@ -757,7 +756,7 @@ int albaOpImporterAbaqusFile::ReadMaterials(FILE *outFile)
 	// *Material, name=Mat_1
 	std::string line = m_Line;
 	std::size_t pos = line.find("NAME=");
-	std::string matName = line.substr(pos + 5).c_str();
+	std::string matName = line.substr(pos + 5);
 
 	while (GetLine(true) != 0)
 	{
@@ -824,7 +823,7 @@ int albaOpImporterAbaqusFile::ReadInstance()
 
     std::string line = m_Line;
     std::size_t pos = line.find("PART=");
-    std::string partName = line.substr(pos+5).c_str();
+    std::string partName = line.substr(pos+5);
 
     GetLine(true);
 

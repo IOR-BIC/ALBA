@@ -451,16 +451,16 @@ ALBA_EXPORT void albaYield();
 ALBA_EXPORT void albaEnableYielding(bool enable=true);
 
 /** show the Dir Selection Dialog Box */
-ALBA_EXPORT std::string  albaGetDirName(const char * initial, const char * title = "Select Directory", wxWindow *parent = NULL);
+ALBA_EXPORT wxString  albaGetDirName(const char * initial, const char * title = "Select Directory", wxWindow *parent = NULL);
 
 /** show the File Open Dialog Box */
-ALBA_EXPORT std::string  albaGetOpenFile(const char * initial, const char * wildcard, const char * title = "Open File", wxWindow *parent = NULL);
+ALBA_EXPORT wxString  albaGetOpenFile(const char * initial, const char * wildcard, const char * title = "Open File", wxWindow *parent = NULL);
 
 /** show the File Open Dialog Box for multiple file selection */
-ALBA_EXPORT void albaGetOpenMultiFiles(const char * path, const char * wildcard, std::vector<std::string> &files, const char * title = "Open Files", wxWindow *parent = NULL);
+ALBA_EXPORT void albaGetOpenMultiFiles(const char * path, const char * wildcard, std::vector<wxString> &files, const char * title = "Open Files", wxWindow *parent = NULL);
 
 /** show the File Save Dialog Box */
-ALBA_EXPORT std::string  albaGetSaveFile(const char * initial, const char * wildcard, const char * title = "Save File", wxWindow *parent = NULL, bool warnOverWrite=true);
+ALBA_EXPORT wxString  albaGetSaveFile(const char * initial, const char * wildcard, const char * title = "Save File", wxWindow *parent = NULL, bool warnOverWrite=true);
 
 /** Resets the Random Color Selection used for test repeatability */
 ALBA_EXPORT void albaResetRandomColor();
@@ -475,28 +475,28 @@ ALBA_EXPORT wxBitmap albaWhiteFade(wxBitmap bmp,double level=0.5);
 ALBA_EXPORT wxBitmap albaBlueScale(wxBitmap bmp);
 
 /** return the application start-up directory */
-ALBA_EXPORT std::string  albaGetApplicationDirectory();
+ALBA_EXPORT wxString  albaGetApplicationDirectory();
 
 /** return the WorkingData directory */
-ALBA_EXPORT std::string  albaGetAppDataDirectory();
+ALBA_EXPORT wxString  albaGetAppDataDirectory();
 
 /** return the Documents directory */
-ALBA_EXPORT std::string albaGetDocumentsDirectory();
+ALBA_EXPORT wxString albaGetDocumentsDirectory();
 
 /** return the Last User directory */
-ALBA_EXPORT std::string albaGetLastUserFolder();
+ALBA_EXPORT wxString albaGetLastUserFolder();
 
 /** return the Last User directory */
-ALBA_EXPORT void albaSetAppDebugDir(std::string ddir);
+ALBA_EXPORT void albaSetAppDebugDir(wxString ddir);
 
 /** return the config directory */
-ALBA_EXPORT std::string albaGetConfigDirectory();
+ALBA_EXPORT wxString albaGetConfigDirectory();
 
 /** Set the Last User directory */
 ALBA_EXPORT void albaSetLastUserFolder(albaString folder);
 
 /** translate an event-id into a readable string */
-ALBA_EXPORT std::string  albaIdString(int id);
+ALBA_EXPORT wxString  albaIdString(int id);
 
 ALBA_EXPORT float RoundValue(float f_in, int decimal_digits = 2);
 ALBA_EXPORT double RoundValue(double d_in, int decimal_digits = 2);

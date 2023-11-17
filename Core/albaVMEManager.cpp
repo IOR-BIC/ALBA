@@ -58,7 +58,7 @@ albaVMEManager::albaVMEManager()
   m_LoadingFlag = false;
   m_FileHistoryIdx = -1;
 
-	m_MSFDir   = albaGetLastUserFolder().c_str();;
+	m_MSFDir   = albaGetLastUserFolder();
 	m_MSFFile  = "";
 	m_ZipFile  = "";
   m_TmpDir   = "";
@@ -171,9 +171,9 @@ void albaVMEManager::RemoveTempDirectory()
   if (m_TmpDir != "")
   {
     wxString working_dir;
-    working_dir = albaGetAppDataDirectory().c_str();
+    working_dir = albaGetAppDataDirectory().ToAscii();
     wxSetWorkingDirectory(working_dir);
-    if(::wxDirExists(m_TmpDir)) //remove tmp directory due to zip extraction or compression
+    if(::wxDirExists(m_TmpDir.GetCStr())) //remove tmp directory due to zip extraction or compression
     {
       wxString file_match = m_TmpDir + "/*.*";
       wxString f = wxFindFirstFile(file_match);
@@ -228,7 +228,7 @@ void albaVMEManager::AddCreationDate(albaVME *vme)
 {
   wxString dateAndTime;
   wxDateTime time = wxDateTime::UNow(); // get time with millisecond precision
-  dateAndTime  = wxString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth()+1, time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());
+  dateAndTime  = albaString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth()+1, time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());
  
   albaTagItem tag_creationDate;
   tag_creationDate.SetName("Creation_Date");
@@ -241,7 +241,7 @@ int  albaVMEManager::MSFOpen(int file_id)
 //----------------------------------------------------------------------------
 {
   m_FileHistoryIdx = file_id - wxID_FILE1;
-	albaString file = m_FileHistory.GetHistoryFile(m_FileHistoryIdx).c_str(); // get the filename from history
+	albaString file = m_FileHistory.GetHistoryFile(m_FileHistoryIdx); // get the filename from history
 	return MSFOpen(file);
 }
 //----------------------------------------------------------------------------
@@ -285,7 +285,7 @@ int albaVMEManager::MSFOpen(albaString filename)
   albaString unixname = filename;
   
   wxString path, name, ext;
-  wxSplitPath(filename.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
 
 	if(ext.IsSameAs("z" + m_MsfFileExtension,true)) 
   {
@@ -419,7 +419,7 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
   zip_cache += "/";
   zip_cache = wxFileName::CreateTempFileName(zip_cache.GetCStr()); // used to get a valid temporary name for cache directory
   wxRemoveFile(zip_cache.GetCStr());
-  wxSplitPath(zip_cache.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(zip_cache.GetCStr(),&path,&name,&ext);
   zip_cache = path + "/" + name + ext;
   zip_cache.ParsePathName();
   
@@ -428,7 +428,7 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
   m_TmpDir = zip_cache;
 
   wxString complete_name, zfile, out_file;
-  wxSplitPath(m_ZipFile.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(m_ZipFile.GetCStr(),&path,&name,&ext);
   complete_name = name + "." + ext;
   
   wxFSFile *zfileStream;
@@ -441,7 +441,7 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
   
   if(m_ZipHandler == NULL)
   {
-    m_ZipHandler = new wxZipFSHandler();
+    m_ZipHandler = new wxArchiveFSHandler();
     m_FileSystem->AddHandler(m_ZipHandler); // add the handler that manage zip protocol
     // (the handler to manage the local files protocol is already added to wxFileSystem)
   }
@@ -461,7 +461,7 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
     RemoveTempDirectory(); // remove the temporary directory
     return "";
   }
-  wxSplitPath(zfile,&path,&name,&ext);
+  wxFileName::SplitPath(zfile,&path,&name,&ext);
   complete_name = name + "." + ext;
   if (enable_mid)
     complete_name = complete_name.Mid(length_header_name);
@@ -481,11 +481,11 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
   if(ext.IsSameAs(m_MsfFileExtension,true)) 
   {
     m_MSFFile = out_file; // the file to extract is the msf
-    out_file_stream.open(out_file, std::ios_base::out);
+    out_file_stream.open(out_file.ToAscii(), std::ios_base::out);
   }
   else
   {
-    out_file_stream.open(out_file, std::ios_base::binary); // the file to extract is a binary
+    out_file_stream.open(out_file.ToAscii(), std::ios_base::binary); // the file to extract is a binary
   }
   s_size = zip_is->GetSize();
   buf = new char[s_size];
@@ -506,7 +506,7 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
       return "";
     }
     zip_is = (wxZlibInputStream *)zfileStream->GetStream();
-    wxSplitPath(zfile,&path,&name,&ext);
+    wxFileName::SplitPath(zfile,&path,&name,&ext);
     complete_name = name + "." + ext;
     if (enable_mid)
       complete_name = complete_name.Mid(length_header_name);
@@ -515,10 +515,10 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
 	if(ext.IsSameAs(m_MsfFileExtension,true))
     {
       m_MSFFile = out_file; // The file to extract is an msf
-      out_file_stream.open(out_file, std::ios_base::out);
+      out_file_stream.open(out_file.ToAscii(), std::ios_base::out);
     }
     else
-      out_file_stream.open(out_file, std::ios_base::binary); // The file to extract is a binary
+      out_file_stream.open(out_file.ToAscii(), std::ios_base::binary); // The file to extract is a binary
     s_size = zip_is->GetSize();
     buf = new char[s_size];
     zip_is->Read(buf,s_size);
@@ -574,7 +574,7 @@ bool albaVMEManager::MakeZip(const albaString &zipname, wxArrayString *files)
   for (size_t i = 0; i < files->GetCount(); i++)
   {
     name = files->Item(i);
-    wxSplitPath(name, &path, &short_name, &ext);
+    wxFileName::SplitPath(name, &path, &short_name, &ext);
     short_name += ".";
     short_name += ext;
 
@@ -626,12 +626,12 @@ int albaVMEManager::MSFSave()
     // ask for the new file name.
     wxString wildc = _("Project file (*."+ m_MsfFileExtension +")|*."
 		              + m_MsfFileExtension +"|Compressed file (*.z"+ m_MsfFileExtension +")|*.z" + m_MsfFileExtension + "");
-    albaString file = albaGetSaveFile(m_MSFDir, wildc.c_str()).c_str();
+    albaString file = albaGetSaveFile(m_MSFDir, wildc.ToAscii());
     if(file.IsEmpty())
       return ALBA_ERROR;
    
     wxString path, name, ext, file_dir;
-    wxSplitPath(file.GetCStr(),&path,&name,&ext);
+    wxFileName::SplitPath(file.GetCStr(),&path,&name,&ext);
 
 		if (!wxFileExists(file.GetCStr()))
 		{

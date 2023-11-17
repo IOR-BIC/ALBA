@@ -978,7 +978,7 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
         else
         {
           //error => display an error and continue
-          if (wxMessageBox(wxString::Format(
+          if (wxMessageBox(albaString::Format(
             _("The %s curve does not contain vertex with index %d.\n"
             "Do you want to ignore this problem?"),
             ((i % 2) == 0 ? _("original") : _("deformed")), ids[i]),
@@ -1170,11 +1170,11 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
       {
         vtkDataArray* pDA = pPoly->GetPointData()->GetScalars();
         if (pDA == NULL)        
-          m_EditModeInfo->SetLabel(wxString::Format(_("Selected vertex: #%d [%g, %g, %g]"),
+          m_EditModeInfo->SetLabel(albaString::Format(_("Selected vertex: #%d [%g, %g, %g]"),
           ptID, pcoords[0], pcoords[1], pcoords[2]));
         else
         {          
-          m_EditModeInfo->SetLabel(wxString::Format(_("Selected vertex: #%d [%g, %g, %g] PD: %g"),
+          m_EditModeInfo->SetLabel(albaString::Format(_("Selected vertex: #%d [%g, %g, %g] PD: %g"),
           ptID, pcoords[0], pcoords[1], pcoords[2], pDA->GetTuple1(ptID)));
         }
       }
@@ -1411,13 +1411,11 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
   double dblNewVolume = props->GetVolume();
   props->Delete();
 
-  wxString szMsg = wxString::Format(
-    wxT("Deformation done. Volume shrinkage: %.4f (Orig = %.2f, New = %.2f)\n"),
-    dblNewVolume / dblOrigVolume, dblOrigVolume, dblNewVolume);
+  wxString szMsg = albaString::Format("Deformation done. Volume shrinkage: %.4f (Orig = %.2f, New = %.2f)\n", dblNewVolume / dblOrigVolume, dblOrigVolume, dblNewVolume);
 
-  albaLogMessage(szMsg.c_str());
+  albaLogMessage(szMsg.ToAscii());
 #ifdef _RPT0
-  _RPT0(_CRT_WARN, szMsg.c_str());
+  _RPT0(_CRT_WARN, szMsg.ToAscii());
 #endif
 #endif
 
@@ -1435,7 +1433,7 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
   albaVMESurface* surface;
 
   albaNEW(surface);
-  surface->SetName(wxString::Format(wxT("Deformed %s"), m_Input->GetName()));
+  surface->SetName(albaString::Format("Deformed %s", m_Input->GetName()));
   surface->SetData(m_Meshes[1]->pPoly, 0, albaVMEGeneric::ALBA_VME_REFERENCE_DATA);
 
   albaDEL(m_Output);
@@ -1477,7 +1475,7 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
           }
         }
 
-        vme->SetName(wxString::Format(wxT("%s_%cC#%d"), szOldName, chLabels[i], j));
+        vme->SetName(albaString::Format(wxT("%s_%cC#%d"), szOldName.ToAscii(), chLabels[i], j));
         vme->SetData(m_Curves[j]->pPolys[i], 0, albaVMEGeneric::ALBA_VME_REFERENCE_DATA);
 
         albaDEL(pCVMEs[i][j]);    //remove the previous VME
@@ -2675,7 +2673,7 @@ void albaOpMeshDeformation::UpdateSelectionVisibility()
     m_EditModeInfo->SetLabel(wxEmptyString);
   else
   {
-    m_EditModeInfo->SetLabel(wxString::Format(_("Selected point: #%d [%g, %g, %g]"),
+    m_EditModeInfo->SetLabel(albaString::Format(_("Selected point: #%d [%g, %g, %g]"),
       m_SelectedObjId, coords[0], coords[1], coords[2]));
     m_SelPointGlyph->SetCenter(coords);
     m_Rwi->m_RenFront->AddActor(m_SelPointActor);

@@ -80,6 +80,7 @@ void albaOpExporterAbaqusFileTest::Check_AbaqusFile(albaString fileName)
 
   exporter->SetOutputFileName((filePath << "/exported_" << fileName).GetCStr());
   exporter->SetInput(importedData);
+	exporter->Init();
   int result = exporter->Write();
 
   CPPUNIT_ASSERT(result == ALBA_OK);

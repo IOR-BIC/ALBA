@@ -131,7 +131,6 @@ void albaGUIRangeSlider::OnPaint(wxPaintEvent &event)
 {
   wxPaintDC dc(this);
   PrepareDC(dc);
-  dc.BeginDrawing();
   dc.Clear();
   const wxSize size = this->GetClientSize();
 
@@ -160,7 +159,6 @@ void albaGUIRangeSlider::OnPaint(wxPaintEvent &event)
   dc.DrawCircle(lineX + lineWidth + m_BorderWidgetRadius, lineY, m_BorderWidgetRadius);
 
   this->RedrawWidgets(dc);
-  dc.EndDrawing();
 }
 //----------------------------------------------------------------------------
 void albaGUIRangeSlider::RedrawWidgets(wxDC &dc, bool eraseWidgets) 
@@ -229,13 +227,11 @@ void albaGUIRangeSlider::OnMouse(wxMouseEvent &event)
 
       wxClientDC dc(this);
       PrepareDC(dc);
-      dc.BeginDrawing();
 
       this->RedrawWidgets(dc, true);
       this->m_Value[this->m_SelectedTriangleWidget] = newVal;
 
       this->RedrawWidgets(dc);
-      dc.EndDrawing();
       
       DrawLabel(x,y,this->m_Value[this->m_SelectedTriangleWidget]);
 
@@ -336,7 +332,7 @@ void albaGUIRangeSlider::OnMouse(wxMouseEvent &event)
 void albaGUIRangeSlider::DrawLabel(int x, int y, double val)
 //----------------------------------------------------------------------------
 {
-  m_ValueString = wxString::Format("%g", val);
+  m_ValueString = albaString::Format("%g", val);
   m_RangeValueLabel->SetLabel(m_ValueString);
   int pos_end = m_LineStartX + m_LineWidth + m_BorderWidgetRadius;
   wxSize lab_size = m_RangeValueLabel->GetSize();

@@ -130,7 +130,7 @@ void albaTextKit::OnEvent(albaEventBase *alba_event)
 			dlg.Add(text, 1);
 			int answer = dlg.ShowModal();
 			wxString s = text->GetValue();
-			m_TextInView = s.c_str();
+			m_TextInView = s;
 			m_TextMapper->SetInput(m_TextInView.GetCStr());
 		}
 		break;

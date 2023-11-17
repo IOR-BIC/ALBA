@@ -56,7 +56,6 @@
 
 #include <assert.h>
 #include "wx\event.h"
-#include "wx\generic\panelg.h"
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractorPERBrushFeedback)
 

@@ -453,7 +453,7 @@ void albaInteractor2DAngle::DrawMeasureTool(double x, double y)
     {
       CalculateMeasure();
       albaString as;
-      as = wxString::Format(_("%.2f"), m_Angle);
+      as = albaString::Format(_("%.2f"), m_Angle);
       m_MeterVector[m_MeterVector.size()-1]->SetText(as);
       m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
       m_CurrentRenderer->AddActor2D(m_MeterVector[m_MeterVector.size()-1]);
@@ -475,7 +475,7 @@ void albaInteractor2DAngle::DrawMeasureTool(double x, double y)
     m_Line2->GetPoint2(tmp_pos2_2);
 
     albaString as;
-    as = wxString::Format(_("%.2f deg"), m_Angle);
+    as = albaString::Format(_("%.2f deg"), m_Angle);
     m_MeterVector[m_MeterVector.size()-1]->SetText(as);
     m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos2_2);
     m_CurrentRenderer->AddActor2D(m_MeterVector[m_MeterVector.size()-1]);
@@ -1245,7 +1245,7 @@ void albaInteractor2DAngle::SetManualAngle(double manualAngle)
 
     albaString ds;
     albaString degree = "°";
-    ds = wxString::Format(_("%.2f")  , manualAngle);
+    ds = albaString::Format(_("%.2f")  , manualAngle);
     ds.Append(degree);
     if (!m_TestMode)
     {

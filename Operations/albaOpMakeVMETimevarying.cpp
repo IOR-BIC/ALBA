@@ -182,7 +182,7 @@ void albaOpMakeVMETimevarying::CreateGui()
   m_Gui->Double(ID_TIMESTAMP_TEXTBOX,_("User input"),&m_CurrentVMETimeStamp);
   wxBoxSizer * hszVMETimeStampFromVME = new wxBoxSizer(wxHORIZONTAL);
   m_LblVMETimeStampFromVME = new wxStaticText(m_Gui,ID_TIMESTAMP_FROM_VME_LABEL,_("From VME"),wxDefaultPosition,wxSize(55,17),wxALIGN_RIGHT);
-  m_LblVMETimeStampFromVMEData = new wxStaticText(m_Gui,ID_TIMESTAMP_FROM_VME_LABEL_DATA,wxString::Format("%f",m_CurrentVMETimeStampFromVME),wxDefaultPosition,wxSize(100,17));
+  m_LblVMETimeStampFromVMEData = new wxStaticText(m_Gui,ID_TIMESTAMP_FROM_VME_LABEL_DATA,albaString::Format("%f",m_CurrentVMETimeStampFromVME),wxDefaultPosition,wxSize(100,17));
   m_LblVMETimeStampFromVME->Enable(false);
   m_LblVMETimeStampFromVMEData->Enable(false);
 	hszVMETimeStampFromVME->Add(m_LblVMETimeStampFromVME,0,wxRIGHT, 5);
@@ -264,7 +264,7 @@ void albaOpMakeVMETimevarying::OnEvent(albaEventBase *alba_event)
             else
               m_CurrentVMETimeStampFromVME = 0;
             //m_Gui->Update();
-            m_LblVMETimeStampFromVMEData->SetLabel(wxString::Format("%f",m_CurrentVMETimeStampFromVME));
+            m_LblVMETimeStampFromVMEData->SetLabel(albaString::Format("%f",m_CurrentVMETimeStampFromVME));
             //TransferDataToWindow(); //Manually forces GUI update for custom created control
             //Update GUI
             if(0 == m_CurrentVMETimestampModality)
@@ -548,7 +548,7 @@ void albaOpMakeVMETimevarying::UpdateAddedVMEsListBox()//GUI
   {
     wxString newListBoxItem;
     newListBoxItem = wxString("t = ");
-    newListBoxItem.Append(wxString::Format("%f",(* AddedVMEsIter)->m_TimeStamp));
+    newListBoxItem.Append(albaString::Format("%f",(* AddedVMEsIter)->m_TimeStamp));
     newListBoxItem.Append(wxString(" - "));
     newListBoxItem.Append(wxString((* AddedVMEsIter)->m_VME->GetName()));
     m_AddedVMEsListBox->Append(newListBoxItem);

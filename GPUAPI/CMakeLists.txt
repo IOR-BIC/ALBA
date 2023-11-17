@@ -17,11 +17,10 @@ SET(PROJECT_SRCS
 )
 
 # List libraries that are needed by this project.
-# SET(PROJECT_LIBS "albaVME" "albaInteraction" "vtkALBA")
 
-# SET(PROJECT_LIBS ${PROJECT_LIBS} vtkALBA)
+SET(PROJECT_LIBS ${PROJECT_LIBS} Libraries::wx::net Libraries::wx::core Libraries::wx::base)
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
-# TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 
