@@ -7,7 +7,7 @@
 # Description:
 # Project file of the Multimod Fundation Layer.
 
-MESSAGE("Configuring wxWidgets")
+MESSAGE(STATUS "Configuring wxWidgets")
 
 INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 
@@ -56,7 +56,7 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
     # Configuring the WXWIN library    
     FILE(MAKE_DIRECTORY "${WXWIN_BINARY_PATH}")
 	
-    # Run configuration of WXWIN library
+	# Run configuration of WXWIN library
     MESSAGE(STATUS "WXWIN: Configuring external wxWidgets project")
     EXEC_PROGRAM(${CMAKE_COMMAND} "${WXWIN_BINARY_PATH}" ARGS "${WXWIN_SOURCE_PATH}" 
       -G"${CMAKE_GENERATOR}" 
@@ -72,6 +72,7 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
   
     # Write configure log file
     FILE(WRITE ${WXWIN_BINARY_DIR}/CMake-Log.txt "CMake configure output ${CMAKE_OUTPUT}" )
-
+		
+		SET(wxUSE_UNICODE FALSE CACHE BOOL "do not use unicode in WX")
   ENDIF(WXWIN_FORCE_CONFIGURE OR NOT EXISTS ${WXWIN_BINARY_PATH}/wxUse.cmake) 
  ENDIF (WXWIN_SOURCE_PATH) 
