@@ -201,7 +201,7 @@ void albaGizmoPath::SetCurvilinearAbscissa( double s )
 
   m_VmeGizmoPath->SetTextPosition(pos);
   
-  m_VmeGizmoPath->SetTextValue(wxString::Format("%.1f", m_CurvilinearAbscissa>0?albaRoundToPrecision(m_CurvilinearAbscissa,1):0.0));
+  m_VmeGizmoPath->SetTextValue(albaString::Format("%.1f", m_CurvilinearAbscissa>0?albaRoundToPrecision(m_CurvilinearAbscissa,1):0.0));
   
 }
 

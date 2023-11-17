@@ -98,7 +98,7 @@ albaInteractorDICOMImporter::albaInteractorDICOMImporter()
 
 	m_RWIbase = NULL;
 	m_Renderer = NULL;
-	m_CurrentArrow = -1;
+	m_CurrentArrow = wxCURSOR_NONE;
 }
 
 //------------------------------------------------------------------------------
@@ -208,7 +208,7 @@ void albaInteractorDICOMImporter::OnMouseMove()
 		else if (m_GizmoStatus == NORMAL_MODALITY)
 		{
 			CalculateSideDragged(pos);
-			int newArrow;
+			wxStockCursor newArrow;
 			switch (m_SideToBeDragged)
 			{
 				case UP_SIDE:
@@ -240,6 +240,7 @@ void albaInteractorDICOMImporter::OnMouseMove()
 			if (newArrow != m_CurrentArrow)
 			{
 				m_CurrentArrow = newArrow;
+				//TODO FIX THIS
 				wxCursor cursor = wxCursor(m_CurrentArrow);
 				m_RWIbase->SetCursor(cursor);
 			}

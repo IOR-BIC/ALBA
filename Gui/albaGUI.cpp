@@ -125,7 +125,7 @@ albaGUI::albaGUI(albaObserver *listener) :
 	m_BackgroundColor = wxColour(251, 251, 253);
 	if (m_UseBackgroundColor) this->SetBackgroundColour(m_BackgroundColor);
 
-	m_EntryStyle = wxSUNKEN_BORDER /*| wxTE_PROCESS_TAB*/;
+	m_EntryStyle = wxBORDER_SIMPLE /*| wxTE_PROCESS_TAB*/;
 
 	m_Sizer = new wxBoxSizer(wxVERTICAL);
 	this->SetAutoLayout(TRUE);
@@ -1337,8 +1337,9 @@ void albaGUI::Radio(int id, wxString label, int* var, int numchoices, const wxSt
 		lab->SetFont(m_Font);
 
 		w_id = GetWidgetId(id);
-		radio = new wxRadioBox(this, w_id, "", dp, wxSize(DW, -1), numchoices, choices, dim, style | m_EntryStyle | wxTAB_TRAVERSAL);
-
+		if(style== wxRA_SPECIFY_COLS)
+			radio = new wxRadioBox(this, w_id, "", dp, wxSize(DW, -1), numchoices, choices, dim, style | wxBORDER_NONE | wxTAB_TRAVERSAL);
+	
 		sizer->Add(lab, 0, wxRIGHT, LM);
 		sizer->Add(radio, 0, wxRIGHT, HM);
 		Add(sizer, 0, wxALL, M);
@@ -1868,7 +1869,8 @@ wxGrid *albaGUI::Grid(int id, wxString label, int height, int row, int cols, wxS
 
 	grid->EnableEditing(false);
 	grid->SetColLabelSize(LH);
-	grid->SetLabelSize(wxVERTICAL, LW);
+	grid->SetRowLabelSize(wxVERTICAL);
+	grid->SetColLabelSize(LW);
 	grid->SetColSize(0, EW);
 	grid->SetColSize(1, EW);
 
@@ -2060,7 +2062,7 @@ void albaGUI::AddMenuItem(wxMenu *menu, int id, wxString label, char **icon/*=NU
 	//menu icons does not work on this version of wxwindows under winxp
 	if (icon != NULL && osVersion > 5)
 	{
-		wxMenuItem *menuItem = new wxMenuItem(menu, id, label, label, false);
+		wxMenuItem *menuItem = new wxMenuItem(menu, id, label, label);
 		menuItem->SetBitmap(wxImage(icon));
 		menu->Append(menuItem);
 		menu->UpdateUI();

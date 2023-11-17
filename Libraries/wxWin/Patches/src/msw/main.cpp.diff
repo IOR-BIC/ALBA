@@ -1,8 +1,0 @@
-157c157
-< #ifndef WXMAKINGDLL
----
-> #if !(defined WXMAKINGDLL || defined WXMAKINGDLL_CORE)
-414c414
-< #ifndef WXMAKINGDLL
----
-> #if !(defined WXMAKINGDLL || defined WXMAKINGDLL_CORE)

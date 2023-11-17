@@ -55,7 +55,7 @@ int	main( int argc, char* argv[] )
 	// Create log of VTK error messages
 	vtkALBASmartPointer<vtkFileOutputWindow> log;
 	vtkOutputWindow::SetInstance(log);
-	albaString logPath = wxGetWorkingDirectory();
+	albaString logPath = wxGetCwd();
 	logPath << "\\vtkLog.txt";
 	log->SetFileName(logPath);
 
@@ -98,6 +98,8 @@ int	main( int argc, char* argv[] )
 	// Print test in a compiler compatible format.
 	CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
 	outputter.write(); 
+
+	albaTest::PauseBeforeExit();
 
 	return result.wasSuccessful() ? 0 : 1;
 }

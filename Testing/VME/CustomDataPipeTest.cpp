@@ -14,6 +14,8 @@
 
 =========================================================================*/
 // Test albaVMEGeneric class
+#include "albaDefines.h"
+
 #include "CustomDataPipeTest.h"
 #include "albaVME.h"
 #include "albaDataPipeCustom.h"

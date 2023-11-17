@@ -300,8 +300,8 @@ void albaPrintManager::OnPrintSetup()
   wxPrintDialogData printDialogData(*m_PrintData);
   wxPrintDialog printerDialog(albaGetFrame(), & printDialogData);
 
-  printerDialog.GetPrintDialogData().SetSetupDialog(TRUE);
-  printerDialog.ShowModal();
+  printerDialog.GetPrintDialogData().EnablePrintToFile(true);
+	printerDialog.ShowModal();
 
   (*m_PrintData) = printerDialog.GetPrintDialogData().GetPrintData();
 }

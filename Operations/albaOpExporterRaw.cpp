@@ -47,6 +47,8 @@
 #include "vtkShortArray.h"
 #include "vtkDataSet.h"
 
+#include "wx\filename.h"
+
 #include <fstream>
 
 //----------------------------------------------------------------------------
@@ -62,7 +64,7 @@ albaOp(label)
 	m_SingleFile = 1;
 	m_Offset = 0;
 
-  m_ProposedDirectory = albaGetLastUserFolder().c_str();
+  m_ProposedDirectory = albaGetLastUserFolder();
 }
 //----------------------------------------------------------------------------
 albaOpExporterRAW::~albaOpExporterRAW()
@@ -93,7 +95,7 @@ void albaOpExporterRAW::OpRun()
 	if(!m_TestMode)
 	{
 		wxString wildc = "raw file (*.raw)|*.raw";
-		wxString file = albaGetSaveFile(m_ProposedDirectory,wildc).c_str(); 
+		wxString file = albaGetSaveFile(m_ProposedDirectory,wildc).ToAscii(); 
 		m_FileName = file;
 
 		//Crete GUI
@@ -130,7 +132,7 @@ void albaOpExporterRAW::SaveVolume()
 //----------------------------------------------------------------------------
 {
 	wxString path,name,ext;
-	::wxSplitPath(m_FileName,&path,&name,&ext);
+	wxFileName::SplitPath(m_FileName.GetCStr(),&path,&name,&ext);
 	path+= _("\\");
 	if(!m_TestMode)
 		wxBusyInfo wait("Please wait, working...");
@@ -156,7 +158,7 @@ void albaOpExporterRAW::SaveVolume()
 		//if the data RAW are saved in a single file
 		if (m_SingleFile)
 		{
-			prefix = wxString::Format("%s%s_%dx%dx%d",path,name,xdim,ydim,zdim);
+			prefix = albaString::Format("%s%s_%dx%dx%d",path.ToAscii(),name.ToAscii(),xdim,ydim,zdim);
 			
 			exporter->SetFileDimensionality(3); 
 			exporter->SetFilePattern("%s.raw");					
@@ -166,13 +168,13 @@ void albaOpExporterRAW::SaveVolume()
 		//if the data RAW are saved in a different file for each slice
 		else 
 		{
-			prefix = wxString::Format("%s%s_%dx%d",path,name,xdim,ydim);
+			prefix = albaString::Format("%s%s_%dx%d",path.ToAscii(),name.ToAscii(),xdim,ydim);
 
 			exporter->SetFileDimensionality(2); // the writer will create a number of 2D images
 			exporter->SetFilePattern("%s_%04d.raw");
 		}
 		
-		char *c_prefix = (char*)( prefix.c_str() ); 
+		char *c_prefix = (char*)( prefix.ToAscii()); 
 		exporter->SetFilePrefix(c_prefix);
 		exporter->Write();
 
@@ -205,7 +207,7 @@ void albaOpExporterRAW::SaveVolume()
 						val = val + m_Offset;
 						int value = (int)val;
 						wxString new_numeration;
-						new_numeration = wxString::Format("%04d",value);
+						new_numeration = albaString::Format("%04d",value);
 						name_file.Replace(numeration, new_numeration);	
 						new_name = path + name_file;
 
@@ -275,12 +277,12 @@ void albaOpExporterRAW::SaveVolume()
 			if(!m_TestMode)
 			{
 				//saving the z coordinates in a file
-        wxString proposed = albaGetLastUserFolder().c_str();
+        wxString proposed = albaGetLastUserFolder();
 				proposed += _("Z_coordinates_");
 				proposed += m_Input->GetName();
 				proposed += _(".txt");
 				wxString wildc = _("txt file (*.txt)|*.txt");
-				wxString file = albaGetSaveFile(proposed,wildc).c_str();   
+				wxString file = albaGetSaveFile(proposed,wildc).ToAscii();   
 				nome = (file);
 				f_out.open(nome);
 			}
@@ -321,7 +323,7 @@ void albaOpExporterRAW::SaveVolume()
 			int a[3];
 			StructuredPoints->GetDimensions(a);
 
-			wxString filename = wxString::Format("%s%s_%dx%dx%d.raw",path,name,xdim,ydim,zdim);							
+			wxString filename = albaString::Format("%s%s_%dx%dx%d.raw",path.ToAscii(),name.ToAscii(),xdim,ydim,zdim);							
 			exporter->SetFileName(filename);
 			exporter->SetFileDimensionality(3);
 
@@ -363,12 +365,12 @@ void albaOpExporterRAW::SaveVolume()
 			if(!m_TestMode)
 			{
 				//saving the z coordinates in a file
-        wxString proposed = albaGetLastUserFolder().c_str();
+        wxString proposed = albaGetLastUserFolder();
 				proposed += _("Z_coordinates_");
 				proposed += m_Input->GetName();
 				proposed += _(".txt");
 				wxString wildc = _("txt file (*.txt)|*.txt");
-				wxString file = albaGetSaveFile(proposed,wildc).c_str();   
+				wxString file = albaGetSaveFile(proposed,wildc).ToAscii();   
 				nome = (file);
 				std::ofstream f_out;
 				f_out.open(nome);
@@ -420,7 +422,7 @@ void albaOpExporterRAW::SaveVolume()
 				StructuredPoints->Update();
 				exporter->Modified();								
 								
-				wxString filename = wxString::Format("%s%s_%dx%d_%04d.raw",path,name,xdim,ydim,i);							
+				wxString filename = albaString::Format("%s%s_%dx%d_%04d.raw",path.ToAscii(),name.ToAscii(),xdim,ydim,i);							
 				exporter->SetFileName(filename);
 
 				exporter->Write();
@@ -456,7 +458,7 @@ void albaOpExporterRAW::SaveVolume()
 							val = val + m_Offset;
 							int value = (int)val;
 							wxString new_numeration;
-							new_numeration = wxString::Format("%04d",value);
+							new_numeration = albaString::Format("%04d",value);
 							name_file.Replace(numeration, new_numeration);	
 							new_name = path + name_file;
 

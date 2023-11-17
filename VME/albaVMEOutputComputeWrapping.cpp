@@ -72,9 +72,9 @@ albaGUI *albaVMEOutputComputeWrapping::CreateGui()
   }*/
 
   if(coordinateFIRST != NULL)
-    m_MiddlePoints[0] = wxString::Format("%.2f %.2f %.2f", coordinateFIRST[0], coordinateFIRST[1], coordinateFIRST[2]);
+    m_MiddlePoints[0] = albaString::Format("%.2f %.2f %.2f", coordinateFIRST[0], coordinateFIRST[1], coordinateFIRST[2]);
   if(coordinateLAST != NULL)
-    m_MiddlePoints[m_MiddlePoints.size()-1] = wxString::Format("%.2f %.2f %.2f", coordinateLAST[0], coordinateLAST[1], coordinateLAST[2]);
+    m_MiddlePoints[m_MiddlePoints.size()-1] = albaString::Format("%.2f %.2f %.2f", coordinateLAST[0], coordinateLAST[1], coordinateLAST[2]);
 
   
 	m_Gui->Label(_("First mp:"), &m_MiddlePoints[0], true);
@@ -117,9 +117,9 @@ void albaVMEOutputComputeWrapping::Update()
 
 		
 		if(coordinateFIRST != NULL)
-			m_MiddlePoints[0] = wxString::Format("%.2f %.2f %.2f", coordinateFIRST[0], coordinateFIRST[1], coordinateFIRST[2]);
+			m_MiddlePoints[0] = albaString::Format("%.2f %.2f %.2f", coordinateFIRST[0], coordinateFIRST[1], coordinateFIRST[2]);
 		if(coordinateLAST != NULL)
-			m_MiddlePoints[m_MiddlePoints.size()-1] = wxString::Format("%.2f %.2f %.2f", coordinateLAST[0], coordinateLAST[1], coordinateLAST[2]);
+			m_MiddlePoints[m_MiddlePoints.size()-1] = albaString::Format("%.2f %.2f %.2f", coordinateLAST[0], coordinateLAST[1], coordinateLAST[2]);
 
 		m_Angle ="";
   }

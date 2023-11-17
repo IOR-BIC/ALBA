@@ -95,22 +95,22 @@ albaGUILutEditor::albaGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoin
   m_NewUserLutName = "New User Preset";
   m_Info = "" ;
   
-  m_UserLutLibraryDir = (albaGetAppDataDirectory()+"\\UserDefinedLookupTables\\").c_str();
+  m_UserLutLibraryDir = (albaGetAppDataDirectory()+"\\UserDefinedLookupTables\\");
 
-  if (wxDirExists(m_UserLutLibraryDir.c_str()))
+  if (wxDirExists(m_UserLutLibraryDir))
   {
     albaLogMessage("User lut library found! Loading...");
   } 
   else
   {
     albaLogMessage("User lut library not found! Creating new one...");
-    wxMkdir(m_UserLutLibraryDir.c_str());
+    wxMkdir(m_UserLutLibraryDir);
   }
 
-  assert(wxDirExists(m_UserLutLibraryDir.c_str()));
+  assert(wxDirExists(m_UserLutLibraryDir));
 
   m_UserLutLibrary = new albaLUTLibrary;
-  m_UserLutLibrary->SetDir(m_UserLutLibraryDir.c_str());
+  m_UserLutLibrary->SetDir(m_UserLutLibraryDir);
   m_UserLutLibrary->Load();
 
 	wxArrayString presetsLutNames;
@@ -150,7 +150,7 @@ albaGUILutEditor::albaGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoin
   albaGUIButton    *butt;
   
   lab = new wxStaticText(this, -1, _("Presets LUT"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
-	m_PresetCombo = new wxComboBox(this, ID_PRESET, "", dp, wxSize(DW,-1), lutPresetNum+1, presetsLutNames.GetStringArray(), wxCB_READONLY);
+	m_PresetCombo = new wxComboBox(this, ID_PRESET, "", dp, wxSize(DW,-1),  presetsLutNames, wxCB_READONLY);
   sz = new wxBoxSizer(wxHORIZONTAL);
   sz->Add( lab,  1, wxRIGHT, LM);
 	sz->Add( m_PresetCombo,0, wxRIGHT, HM);
@@ -203,7 +203,7 @@ albaGUILutEditor::albaGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoin
   buttonRemoveFromUserLUTS->SetValidator( albaGUIValidator(this,ID_REMOVE_FROM_ULIB,buttonRemoveFromUserLUTS) );  
 
   wxStaticText *staticTextSelectUserLut = new wxStaticText (this, -1, _("select user LUT"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
-  m_UserPresetCombo = new wxComboBox  (this, ID_USER_PRESET, "", dp, wxSize(DW,-1), userLutPresetNum, userLutNames.GetStringArray(), wxCB_READONLY);
+  m_UserPresetCombo = new wxComboBox(this, ID_USER_PRESET, "", dp, wxSize(DW,-1), userLutNames, wxCB_READONLY);
 
   wxBoxSizer   *selectUserLutsHSizer;
 
@@ -345,8 +345,8 @@ void albaGUILutEditor::OnEvent(albaEventBase *alba_event)
       case ID_ADD_TO_ULIB:
       {
         albaLogMessage("ID_ADD_TO_ULIB");
-        m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.c_str());
-        int id = m_UserPresetCombo->FindString(m_NewUserLutName.c_str());
+        m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.ToAscii());
+        int id = m_UserPresetCombo->FindString(m_NewUserLutName.ToAscii());
         if (id != -1)
         {
           // the item  already exists and it will not be added to the combo
@@ -365,11 +365,11 @@ void albaGUILutEditor::OnEvent(albaEventBase *alba_event)
         }
 
         albaLogMessage("ID_REMOVE_FROM_ULIB");
-        m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.c_str());
+        m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.ToAscii());
         int id = m_UserPresetCombo->GetSelection();
         wxString sel = m_UserPresetCombo->GetString(id) ;
         m_UserPresetCombo->Delete(id);
-        m_UserLutLibrary->Remove(sel.c_str());
+        m_UserLutLibrary->Remove(sel.ToAscii());
 
       }
       break;
@@ -384,14 +384,14 @@ void albaGUILutEditor::OnEvent(albaEventBase *alba_event)
         albaLogMessage("ID_USER_PRESET");
         int id = m_UserPresetCombo->GetSelection();
         wxString sel = m_UserPresetCombo->GetString(id) ;
-        albaLogMessage(sel.c_str());
+        albaLogMessage(sel.ToAscii());
 				double range[2];
 				range[0]=m_Lut->GetRange()[0];
 				range[1]=m_Lut->GetRange()[1];
-				m_Lut->DeepCopy(m_UserLutLibrary->GetLutByName(sel.c_str()));
+				m_Lut->DeepCopy(m_UserLutLibrary->GetLutByName(sel.ToAscii()));
 				m_Lut->SetRange(range);
 				
-        m_NewUserLutName = sel.c_str();
+        m_NewUserLutName = sel.ToAscii();
         UpdateWidgetsOnLutChange();
       }
       break;
@@ -438,16 +438,14 @@ void albaGUILutEditor::OnEvent(albaEventBase *alba_event)
         if(m_parent->IsKindOf(CLASSINFO(wxDialog)))
         {
           wxDialog *dlg = (wxDialog *)m_parent;
-					wxCommandEvent cmd(0, wxID_OK);
-          dlg->OnOK( cmd );
+			    dlg->EndModal(wxID_OK);
         }
       break; 
       case ID_CANCEL:
         if(m_parent->IsKindOf(CLASSINFO(wxDialog)))
         {
           wxDialog *dlg = (wxDialog *)m_parent;
-					wxCommandEvent cmd(0, wxID_CANCEL);
-          dlg->OnCancel( cmd );
+					dlg->EndModal(wxID_CANCEL);
         }
       break; 
       case ID_APPLY:
@@ -477,11 +475,11 @@ void albaGUILutEditor::UpdateInfo()
   }
   else if (min == max) // single selection
   {
-    m_Info = wxString::Format( " index= %d value= %g", min, v1 );
+    m_Info = albaString::Format( " index= %d value= %g", min, v1 );
   }
   else // multiple selection
   {
-    m_Info = wxString::Format( " index= %d value= %g ... index= %d value= %g", min, v1, max, v2 );
+    m_Info = albaString::Format( " index= %d value= %g ... index= %d value= %g", min, v1, max, v2 );
   }
   TransferDataToWindow();  
 }

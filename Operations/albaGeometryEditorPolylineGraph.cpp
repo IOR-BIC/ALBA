@@ -469,7 +469,7 @@ void albaGeometryEditorPolylineGraph::VmePicked(albaEvent *e)
         MovePoint(vertexCoord);
 
         #ifndef _DEBUG
-          albaLogMessage(wxString::Format("%.3f %.3f %.3f",vertexCoord[0],vertexCoord[1],vertexCoord[2]));
+          albaLogMessage(albaString::Format("%.3f %.3f %.3f",vertexCoord[0],vertexCoord[1],vertexCoord[2]));
         #endif
 			}
 			else if(m_PointTool==ID_SELECT_POINT)
@@ -524,7 +524,7 @@ void albaGeometryEditorPolylineGraph::VmePicked(albaEvent *e)
 
 				SelectBranch(pos);
 
-        albaLogMessage(wxString::Format("Branch Select = %d",m_CurrentBranch));
+        albaLogMessage(albaString::Format("Branch Select = %d",m_CurrentBranch));
 
 				m_Gui->Enable(ID_BUTTON_BRANCH_DELETE,m_Action==ID_BRANCH_ACTION && m_SelectedBranch!=UNDEFINED_BRANCH_ID);
 			}
@@ -562,7 +562,7 @@ void albaGeometryEditorPolylineGraph::VmePicked(albaEvent *e)
 		}
 	}
 	GetLogicManager()->CameraUpdate();
-	//albaLogMessage(wxString::Format("current branch %d di %d",m_CurrentBranch,m_PolylineGraph->GetNumberOfBranches()));
+	//albaLogMessage(albaString::Format("current branch %d di %d",m_CurrentBranch,m_PolylineGraph->GetNumberOfBranches()));
 }
 //----------------------------------------------------------------------------
 int albaGeometryEditorPolylineGraph::InsertPoint(double position[3])
@@ -936,8 +936,8 @@ void albaGeometryEditorPolylineGraph::SelectBranch(double position[3])
 	vtkALBASmartPointer<vtkIdList> idlist;
 
 	vtkIdList *IDS=poly->GetCell(CellID)->GetPointIds();
-  albaLogMessage(wxString::Format("Points %.3f %.3f %.3f",position[0],position[1],position[2])),
-  albaLogMessage(wxString::Format("CellID %d N* Points %d",CellID,IDS->GetNumberOfIds()));
+  albaLogMessage(albaString::Format("Points %.3f %.3f %.3f",position[0],position[1],position[2])),
+  albaLogMessage(albaString::Format("CellID %d N* Points %d",CellID,IDS->GetNumberOfIds()));
 	for(int i=0;i<IDS->GetNumberOfIds();i++)
 	{
 		int ID=IDS->GetId(i);

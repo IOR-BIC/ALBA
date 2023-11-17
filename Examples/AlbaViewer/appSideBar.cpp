@@ -56,7 +56,7 @@ appSideBar::appSideBar(albaGUIMDIFrame* parent, int id, albaObserver *Listener)
   m_Notebook->SetFont(wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)));
 	
 	//Splitted panel  
-	m_SideSplittedPanel = new wxSplitterWindow(m_Notebook, -1, wxDefaultPosition, wxSize(-1, -1),/*wxSP_3DSASH |*/ wxSP_FULLSASH);
+	m_SideSplittedPanel = new wxSplitterWindow(m_Notebook, -1, wxDefaultPosition, wxSize(-1, -1),/*wxSP_3DSASH |*/ wxSP_3D | wxSP_LIVE_UPDATE);
 
 	// Tree
 	m_Tree = new albaGUICheckTree(m_SideSplittedPanel, -1, false, true);

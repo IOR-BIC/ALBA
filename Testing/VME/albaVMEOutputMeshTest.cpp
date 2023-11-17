@@ -135,7 +135,9 @@ void albaVMEOutputMeshTest::TestSetGetMaterial()
   albaVMEOutputMesh *outputMesh = (albaVMEOutputMesh*)vmeMesh->GetOutput();
   mmaMaterial *material;
 
-  m_Result = vmeMesh->GetMaterial() == outputMesh->GetMaterial();
+	material = vmeMesh->GetMaterial();
+
+  m_Result = material == outputMesh->GetMaterial();
   TEST_RESULT;
   material = outputMesh->GetMaterial();
 

@@ -117,7 +117,7 @@ void albaOpExporterDicom::OpRun()
 	wxString lastDicomDir = GetSetting()->GetLastDicomDir();
 
 	if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
-		lastDicomDir = albaGetLastUserFolder().c_str();
+		lastDicomDir = albaGetLastUserFolder();
 
 	wxDirDialog dialog(NULL, "Choose directory where to save files:", lastDicomDir, wxDD_DEFAULT_STYLE);
 	dialog.SetReturnCode(wxID_OK);

@@ -61,7 +61,7 @@ void albaWizardBlockVMESelection::ExcutionBegin()
   //Setting global variable witch can be referred by static function
   globalAccept=m_AcceptedVME;
 
-  albaString title = m_Title.c_str();
+  albaString title = m_Title;
   albaEvent e(this,VME_CHOOSE);
   e.SetString(&title);
   e.SetPointer(&VMEAccept); 

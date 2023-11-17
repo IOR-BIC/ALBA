@@ -415,7 +415,7 @@ void albaVMEPolylineSpline::SplinePolyline(vtkPolyData *polyline)
 
   for(int i=0 ; i<pts->GetNumberOfPoints(); i++)
   {
-    //albaLogMessage(wxString::Format(_("old %d : %f %f %f"), i, pts->GetPoint(i)[0],pts->GetPoint(i)[1],pts->GetPoint(i)[2] ));
+    //albaLogMessage(albaString::Format(_("old %d : %f %f %f"), i, pts->GetPoint(i)[0],pts->GetPoint(i)[1],pts->GetPoint(i)[2] ));
     splineX->AddPoint(i, pts->GetPoint(i)[0]);
     splineY->AddPoint(i, pts->GetPoint(i)[1]);
     splineZ->AddPoint(i, pts->GetPoint(i)[2]);

@@ -169,9 +169,9 @@ albaGUI* albaVMEStent::CreateGui()
     //m_Gui->Combo(CHANGE_STENT_TYPE, "Type", &m_Id_Stent_Type, 3, stentType);
 
 
-    m_Gui->Double(CHANGED_STENT_PARAM,_("Diameter"), &m_Stent_Diameter, 0, 10000,-1,_("The length of the stent (mm)"));
-    m_Gui->Double(CHANGED_STENT_PARAM,_("Crown Len"), &m_Crown_Length, 0, 10000,-1,_("The length of the Crown (mm)"));
-    m_Gui->Integer(CHANGED_STENT_PARAM,_("Crown num"), &m_NumberOfCrowns, 0, 10000,-1,_("The number of the Crowns"));
+    m_Gui->Double(CHANGED_STENT_PARAM,_("Diameter"), &m_Stent_Diameter, 0, 10000,-1,"The length of the stent (mm)");
+    m_Gui->Double(CHANGED_STENT_PARAM,_("Crown Len"), &m_Crown_Length, 0, 10000,-1,"The length of the Crown (mm)");
+    m_Gui->Integer(CHANGED_STENT_PARAM,_("Crown num"), &m_NumberOfCrowns, 0, 10000,-1,"The number of the Crowns");
     //m_Gui->Double(CHANGED_STENT_PARAM,_("Angle"), &m_Strut_Angle,0,360,-1,_("strut angle (deg)"));
     //m_Gui->Double(CHANGED_STENT_PARAM,_("Thickness"), &m_Strut_Thickness,0,10,-1,_("strut thickness (mm)"));
 

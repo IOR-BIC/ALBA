@@ -97,11 +97,6 @@ albaOp* albaOpExporterAbaqusFile::Copy()
 }
 
 //----------------------------------------------------------------------------
-void albaOpExporterAbaqusFile::OpRun()   
-{
-  CreateGui();
-}
-//----------------------------------------------------------------------------
 albaString albaOpExporterAbaqusFile::GetWildcard()
 {
   return "inp files (*.inp)|*.inp|All Files (*.*)|*.*";
@@ -115,7 +110,7 @@ void albaOpExporterAbaqusFile::OnOK()
   m_AbaqusOutputFileNameFullPath = "";
 
   wxString f;
-  f = albaGetSaveFile("",wildcard).c_str(); 
+  f = albaGetSaveFile("",wildcard).ToAscii(); 
   if(!f.IsEmpty())
   {
     m_AbaqusOutputFileNameFullPath = f;
@@ -160,7 +155,7 @@ int albaOpExporterAbaqusFile::compareElem(const void *p1, const void *p2)
 int albaOpExporterAbaqusFile::Write()
 {
   FILE *outFile;
-  outFile = fopen(m_AbaqusOutputFileNameFullPath.c_str(), "w");
+  outFile = fopen(m_AbaqusOutputFileNameFullPath.ToAscii(), "w");
 
   albaVMEMesh *input = albaVMEMesh::SafeDownCast(m_Input);
 
@@ -309,7 +304,7 @@ int albaOpExporterAbaqusFile::WriteNodesFile(FILE *file)
 
   for (int rowID = 0 ; rowID < rowsNumber ; rowID++)
   {
-    float nodProgress = rowID / m_TotalElements;
+    float nodProgress = rowID / rowsNumber;
     m_ProgressHelper->UpdateProgressBar(nodProgress * 100);
 
     pointsToBeExported->GetPoint(rowID, pointCoordinates);
@@ -330,7 +325,7 @@ int albaOpExporterAbaqusFile::WriteNodesFile(FILE *file)
   return ALBA_OK;
 }
 //---------------------------------------------------------------------------
-int albaOpExporterAbaqusFile::WriteElementsFile(FILE *file)
+int albaOpExporterAbaqusFile::WriteElementsFile(FILE *file) 
 {
   albaVMEMesh *input = albaVMEMesh::SafeDownCast(m_Input);
   assert(input);
@@ -355,9 +350,9 @@ int albaOpExporterAbaqusFile::WriteElementsFile(FILE *file)
   vtkIntArray *realArray = input->GetElementsRealArray();
 
   ExportElement *exportVector = new ExportElement[rowsNumber];
-
+	int rowID;
   
-  for (int rowID = 0 ; rowID < rowsNumber ; rowID++)
+  for (rowID = 0 ; rowID < rowsNumber ; rowID++)
   {
     exportVector[rowID].elementID = elementIdArray ? elementIdArray->GetValue(rowID) : rowID+1;
     exportVector[rowID].matID = GetMatIdArray() ? GetMatIdArray()[rowID] : 1;
@@ -395,7 +390,7 @@ int albaOpExporterAbaqusFile::WriteElementsFile(FILE *file)
   char printStr2[10];
   sprintf(printStr2,"\t%%%dd",m_IntCharSize);
 
-  for (int rowID = 0 ; rowID < rowsNumber ; rowID++)
+  for (rowID = 0 ; rowID < rowsNumber ; rowID++)
   {
     float elemProgress = (m_CurrentProgress + (float)rowID) / m_TotalElements;
     m_ProgressHelper->UpdateProgressBar(elemProgress * 100);

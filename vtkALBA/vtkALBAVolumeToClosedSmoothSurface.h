@@ -17,12 +17,15 @@
 #ifndef __vtkALBAVolumeToClosedSmoothSurface_H__
 #define __vtkALBAVolumeToClosedSmoothSurface_H__
 
+#define _WINSOCKAPI_ 
+
 #include "albaConfigure.h"
 #include "vtkALBAContourVolumeMapper.h"
 #include "vtkMatrix4x4.h"
 class vtkImageData;
-class vtkImageData;
+class vtkRectilinearGrid;
 class vtkDataArray;
+
 
 
 /** vtkALBAVolumeToClosedSmoothSurface: This filter is an extension of vtkALBAContourVolumeMapper

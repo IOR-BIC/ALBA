@@ -97,7 +97,7 @@ void albaOpExporterAnsysInputFile::AddSpecificGui()
 int albaOpExporterAnsysInputFile::Write()
 {
   FILE *outFile;
-  outFile = fopen(m_AnsysOutputFileNameFullPath.c_str(), "w");
+  outFile = fopen(m_AnsysOutputFileNameFullPath.ToAscii(), "w");
 
   albaVMEMesh *input = albaVMEMesh::SafeDownCast(m_Input);
 
@@ -307,9 +307,9 @@ int albaOpExporterAnsysInputFile::WriteMaterialsFile(FILE *file)
       for (int j = 0; j < numberOfMaterialProperties; j++)
       {
         wxString arrayName = materialProperties[j];
-        vtkDataArray *array = materialData->GetArray(arrayName.c_str());
+        vtkDataArray *array = materialData->GetArray(arrayName.ToAscii());
 
-        fprintf(file,"MP,%s,%d,             %.8lf\n",arrayName.c_str(), materialID, array->GetTuple(i)[0]);
+        fprintf(file,"MP,%s,%d,             %.8lf\n",arrayName.ToAscii(), materialID, array->GetTuple(i)[0]);
       }
 
       fprintf(file,"\n");

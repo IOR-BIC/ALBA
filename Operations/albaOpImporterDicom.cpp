@@ -226,15 +226,16 @@ void albaOpImporterDicom::OpRun()
 {
 	m_Wizard = new albaGUIWizard(_("DICOM Importer"));
 	m_Wizard->SetListener(this);
-	if (!GetSetting()->GetSkipCrop())
-		m_Wizard->SetButtonString("Crop >");
-	else
-		m_Wizard->SetButtonString("Finish");
+
+
+	//TODO RESTORE SET BUTTON STRING OPTION
+
+		
 		
 	wxString lastDicomDir = GetSetting()->GetLastDicomDir();
 		
 	if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
-		lastDicomDir = albaGetLastUserFolder().c_str();		
+		lastDicomDir = albaGetLastUserFolder();		
 			
 	wxDirDialog dialog(m_Wizard->GetParent(),"", lastDicomDir, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER, m_Wizard->GetPosition());
 	dialog.SetReturnCode(wxID_OK);
@@ -245,6 +246,8 @@ void albaOpImporterDicom::OpRun()
 		CreateSliceVTKPipeline(); 
 		
 		CreateLoadPage();
+
+
 		if (!GetSetting()->GetSkipCrop())
 		{
 			CreateCropPage();
@@ -256,7 +259,15 @@ void albaOpImporterDicom::OpRun()
 		GetSetting()->SetLastDicomDir(path);
 		GuiUpdate();
 
-		if (OpenDir(path.c_str()))
+		wxWindow* NextButton = m_Wizard->FindWindowById(wxID_FORWARD);
+
+		wxString tmp=NextButton->GetLabel();
+		if (!GetSetting()->GetSkipCrop())
+			NextButton->SetLabel("&Crop >");
+		else
+			NextButton->SetLabel("Finish");
+
+		if (OpenDir(path))
 		{
 			int wizardResult = RunWizard();
 			OpStop(wizardResult);
@@ -360,7 +371,7 @@ int albaOpImporterDicom::BuildVMEImagesOutput()
 
 	albaNEW(imagesGroupOuput);
 
-	imagesGroupOuput->SetName(wxString::Format("%s images",m_VMEName.GetCStr()));
+	imagesGroupOuput->SetName(albaString::Format("%s images",m_VMEName.GetCStr()));
 	imagesGroupOuput->ReparentTo(m_Input);
 
 	int parsedSlices = 0;
@@ -650,13 +661,23 @@ void albaOpImporterDicom::OnEvent(albaEventBase *alba_event)
 				OnWizardChangePage(e);
 			break;
 			case albaGUIWizard::ALBA_WIZARD_CHANGED_PAGE:
+			{
 				/* This is a ack, because that "genius" of wx  send the change event
 				before page show, so we need to duplicate the code here in order to
 				manage the camera update */
 				m_Wizard->GetCurrentPage()->Show();
 				m_Wizard->GetCurrentPage()->SetFocus();
 				m_Wizard->GetCurrentPage()->Update();
-				CameraReset();
+
+				wxWindow* NextButton = m_Wizard->FindWindowById(wxID_FORWARD);
+				wxString tmp = NextButton->GetLabel();
+
+				if (!GetSetting()->GetSkipCrop())
+					NextButton->SetLabel("&Crop >");
+				else
+					NextButton->SetLabel("Finish");
+				CameraReset(); 
+			}
 			break;
 			case ID_STUDY_SELECT:
 				OnStudySelect();
@@ -827,7 +848,7 @@ bool albaOpImporterDicom::LoadDicomFromDir(const char *dicomDirABSPath)
 		
 	for (int i = 0; i < fileNumber; i++)
 	{
-		albaDicomSlice *slice= ReadDicomFile((allFiles[i]).c_str());
+		albaDicomSlice *slice= ReadDicomFile(allFiles[i]);
 		if (slice)
 			m_StudyList->AddSlice(slice);
 		progressHelper.UpdateProgressBar( i*100 / fileNumber);
@@ -1280,7 +1301,7 @@ void albaOpImporterDicom::SelectSeries(albaDicomSeries * selectedSeries)
 			{
 				m_OutputType = 0;
 				wxString typeArrayVolumeImage[2] = { _("Volume"),_("Images") };
-				m_LoadGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArrayVolumeImage, 1, "");
+				m_LoadGuiCenter->Radio(ID_VME_TYPE, "VME", &m_OutputType, 2, typeArrayVolumeImage, 1, "");
 			}
 			else if (numberOfSlices == 1 || GetSetting()->GetOutputType() == TYPE_IMAGE)
 			{
@@ -1352,7 +1373,10 @@ void albaOpImporterDicom::OnWizardChangePage( albaEvent * e )
 		//get the current windowing in order to maintain subrange thought the wizard pages 
 		m_CropPage->GetWindowing(m_SliceRange, m_SliceSubRange);
 		m_DicomInteractor->PlaneVisibilityOff();
-		m_Wizard->SetButtonString("Crop >");
+
+		//TODO RESTORE THIS
+		wxWindow* NextButton = m_Wizard->FindWindowById(wxID_FORWARD);
+		NextButton->SetLabel("Crop >");
 	}
 	
 	CameraReset();

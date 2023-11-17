@@ -44,9 +44,7 @@ public:
   void SetListener  (albaObserver *listener)   {m_Listener = listener;}; 
 
 protected:  
-	/** Called to set the button as default. */
-  virtual void SetDefault() {};
-  
+	  
 	/** Overriden function member to intercept event generation and forward it to the Listener. */
   virtual void Command(wxCommandEvent& event);
   

@@ -17,6 +17,7 @@
 #ifndef __albaXMLString_h__
 #define __albaXMLString_h__
 
+#include "albaDefines.h"
 #include "albaConfigure.h"
 
 
@@ -42,6 +43,8 @@ public:
 	albaXMLString(XMLCh *wstr);
 	albaXMLString(const XMLCh *wstr);
 	albaXMLString(const albaXMLString &copy);
+	albaXMLString(wxString str);
+
 	~albaXMLString();
 	bool Append(const XMLCh *tail);
 	bool Erase(const XMLCh *head, const XMLCh *tail);

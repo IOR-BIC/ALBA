@@ -13,11 +13,11 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "albaDefines.h"
+#include <cppunit/config/SourcePrefix.h>
 
 #include "TimeSetTest.h"
-#include <cppunit/config/SourcePrefix.h>
 #include "mmuTimeSet.h"
-#include "albaDefines.h"
 #include <iostream>
 
 void TimeSetTest::TimeSetMainTest()

@@ -465,7 +465,7 @@ void albaInteractor2DDistance::DrawMeasureTool(double x, double y)
         double tmp_pos[3];
         m_Line->GetPoint2(tmp_pos);
         albaString ds;
-        ds = wxString::Format(_("%.2f") , m_Distance);
+        ds = albaString::Format(_("%.2f") , m_Distance);
         m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
         m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
         m_DisableUndoAndOkCancel = true;
@@ -475,7 +475,7 @@ void albaInteractor2DDistance::DrawMeasureTool(double x, double y)
         double tmp_pos[3];
         m_Line2->GetPoint2(tmp_pos);
         albaString ds;
-        ds = wxString::Format(_("%.2f") , m_Distance);
+        ds = albaString::Format(_("%.2f") , m_Distance);
         m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
         m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
         m_DisableUndoAndOkCancel = false;
@@ -558,7 +558,7 @@ void albaInteractor2DDistance::DrawMeasureTool(double x, double y)
 //       double tmp_pos[3];
 //       m_Line->GetPoint2(tmp_pos);
 //       albaString ds;
-//       ds = wxString::Format(_("%.2f") , m_Distance);
+//       ds = albaString::Format(_("%.2f") , m_Distance);
 //       m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
 //       m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
 //       m_DisableUndoAndOkCancel = true;
@@ -568,7 +568,7 @@ void albaInteractor2DDistance::DrawMeasureTool(double x, double y)
 //       double tmp_pos[3];
 //       m_Line2->GetPoint2(tmp_pos);
 //       albaString ds;
-//       ds = wxString::Format(_("%.2f") , m_Distance);
+//       ds = albaString::Format(_("%.2f") , m_Distance);
 //       m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
 //       m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
 //       m_DisableUndoAndOkCancel = false;
@@ -593,7 +593,7 @@ void albaInteractor2DDistance::DrawMeasureTool(double x, double y)
     tmp_pos[1] =  ((tmp_pos1_1[1] + tmp_pos2_1[1])/2 + (tmp_pos1_2[1] + tmp_pos2_2[1])/2)/2;
     tmp_pos[2] =  ((tmp_pos1_1[2] + tmp_pos2_1[2])/2 + (tmp_pos1_2[2] + tmp_pos2_2[2])/2)/2;
     albaString ds;
-    ds = wxString::Format(_("%.2f"), m_Distance);
+    ds = albaString::Format(_("%.2f"), m_Distance);
     m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
     if(m_Distance > 0.15)
     {
@@ -992,7 +992,7 @@ void albaInteractor2DDistance::SetManualDistance(double manualDistance)
 		*/
 
     albaString ds;
-    ds = wxString::Format(_("%.2f") , manualDistance);
+    ds = albaString::Format(_("%.2f") , manualDistance);
     if (!m_TestMode)
     {
     	m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
@@ -1032,7 +1032,7 @@ void albaInteractor2DDistance::SetManualDistance(double manualDistance)
     m_LineSourceVector2[m_LineSourceVector2.size()-1]->Update();
 
     albaString ds;
-    ds = wxString::Format(_("%.2f") , manualDistance);
+    ds = albaString::Format(_("%.2f") , manualDistance);
     if (!m_TestMode)
     {
     	m_MeterVector[m_MeterVector.size()-1]->SetText(ds);

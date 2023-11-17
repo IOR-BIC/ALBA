@@ -69,6 +69,7 @@
 #include "vtkALBAImageMapToWidgetColors.h"
 #include "vtkALBAAdaptiveVolumeMapper.h"
 #include "vtkImageCast.h"
+#include "wx/slider.h"
 
 template<typename type> static inline type clip(type x, type xmin, type xmax) { if (x < xmin) return xmin; if (x > xmax) return xmax; return x; }
 
@@ -110,7 +111,7 @@ enum TRANSFER_FUNCTION_DIALOG_ID
 
 //----------------------------------------------------------------------------
 albaGUIDialogTransferFunction2D::albaGUIDialogTransferFunction2D() :
-  albaGUIDialog("Choose Transfer Function", wxDIALOG_MODAL | wxCAPTION | wxTHICK_FRAME )
+  albaGUIDialog("Choose Transfer Function", wxDEFAULT_DIALOG_STYLE  | wxCAPTION | wxRESIZE_BORDER)
 //----------------------------------------------------------------------------
 {
 }
@@ -259,7 +260,7 @@ void albaGUIDialogTransferFunction2D::CreateGUI()
   // first page: slice preview
   wxPanel *previewPage = new wxPanel(this->m_PreviewBook);
   this->m_PreviewBook->AddPage(previewPage, "XY");
-  wxFlexGridSizer *gridSizer = new wxFlexGridSizer(2, 2);
+	wxFlexGridSizer *gridSizer = new wxFlexGridSizer(2, 2, 0, 0);
   gridSizer->AddGrowableCol(0);
   gridSizer->AddGrowableRow(0);
   previewPage->SetAutoLayout(TRUE);
@@ -824,7 +825,7 @@ void albaGUIDialogTransferFunction2D::OnEvent(albaEventBase *alba_event)
 			wxString string =	m_Vme->GetTagArray()->GetTag("VOLUME_TRANSFER_FUNCTION")->GetValue();
       vtkALBATransferFunction2D *newf = vtkALBATransferFunction2D::New();
 			newf->DeepCopy(this->m_TransferFunction);
-			if (newf->LoadFromString(string.c_str()))
+			if (newf->LoadFromString(string.ToAscii()))
 				this->m_TransferFunction->DeepCopy(newf);
 			newf->Delete();
 			}
@@ -1034,7 +1035,7 @@ void albaGUIDialogTransferFunction2D::LoadTransferFunction()
 	wxString string =	m_Vme->GetTagArray()->GetTag("VOLUME_TRANSFER_FUNCTION")->GetValue();
   vtkALBATransferFunction2D *newf = vtkALBATransferFunction2D::New();
 	newf->DeepCopy(this->m_TransferFunction);
-	if (newf->LoadFromString(string.c_str()))
+	if (newf->LoadFromString(string.ToAscii()))
 		this->m_TransferFunction->DeepCopy(newf);
 	newf->Delete();
 

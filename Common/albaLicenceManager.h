@@ -55,7 +55,6 @@ public:
 		ALREADY_REGISTERED,
 	};
 
-#ifdef _DEBUG
 	enum CreateNewLicenceStatuses
 	{
 		WRONG_BASE_STRING,
@@ -63,7 +62,6 @@ public:
 		WRONG_SECS_IN_MILLENNIUM,
 		LICENCE_CREATED,
 	};
-#endif
 
 	//----------------------------------------------------------------------------
 	// Widgets ID's
@@ -83,7 +81,7 @@ public:
 	/*Hide Gui Dialog for Registration Licence*/
 	void HideRegistrationDialog();
 
-	/*Show Gui Dialog for Generation Licence (Debug Mode)*/
+	/*Show Gui Dialog for Generation Licence */
 	void ShowGenerateLicenceDialog();
 
 	/** on event function */
@@ -124,14 +122,13 @@ protected:
 	/** decrypts the input string, return empty string if the input is not correctly encrypted */
 	wxString DecryptStr(wxString plainStr);
 
-#ifdef _DEBUG
+
 
 	/** creates a new licence string */
 	CreateNewLicenceStatuses CreateNewTimeLicence(wxString RegCode, wxDateTime expirationDate, wxString &newLicence);
 
 	/** creates a new licence string */
 	CreateNewLicenceStatuses CreateNewBinaryLicence(wxString RegCode, wxString &newLicence);
-#endif
 	
 	/** check a new licence and add is to the current user */
 	addLicenceStatuses CheckCreateLicence(wxString registrationString);

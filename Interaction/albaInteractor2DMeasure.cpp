@@ -125,7 +125,12 @@ void albaInteractor2DMeasure::InitRenderer(albaEventInteraction *e)
 			m_Mouse = mouse;
 		}
 
-		m_CurrentRwi = m_Mouse->GetRWI();
+		albaRWIBase * mouseRWI = m_Mouse->GetRWI();
+
+		if (m_CurrentRwi == mouseRWI)
+			return;
+
+		m_CurrentRwi = mouseRWI;
 		m_Renderer = m_Mouse->GetRenderer();
 
 		double *normal = m_Renderer->GetActiveCamera()->GetViewPlaneNormal();
@@ -683,6 +688,12 @@ void albaInteractor2DMeasure::ScreenToWorld(double screen[2], double world[3])
 	world[X] = wp[X];
 	world[Y] = wp[Y];
 	world[Z] = wp[Z];
+
+	//This is an hack to stabilize the Interactor, VTK uses the camera perspective matrix to calcuate the
+	//world coordinate, this return may lead in changes of the view plane coordinate output after show or hide 
+	//stuffs.
+	//This hack fix the plane coordinate to zero, witch is correct for a 2d measure.
+	world[2 - m_CurrPlane] = 0;
 
 	m_Renderer->GetActiveCamera()->SetViewPlaneNormal(0, 0, -1);
 

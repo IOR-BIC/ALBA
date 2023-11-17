@@ -65,6 +65,6 @@ void albaVTKLog::DisplayText(const char* text)
       message.RemoveLast();
     }
 
-    albaLogMessage(message.c_str());
+    albaLogMessage(message.ToAscii());
   }
 }

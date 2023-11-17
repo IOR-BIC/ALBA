@@ -17,6 +17,8 @@
 #ifndef __vtkALBARayCastCleaner_H__
 #define __vtkALBARayCastCleaner_H__
 
+#define _WINSOCKAPI_ 
+
 #include "albaConfigure.h"
 #include "vtkStructuredPointsToStructuredPointsFilter.h"
 

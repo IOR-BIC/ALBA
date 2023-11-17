@@ -1759,7 +1759,7 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 				if (n == NULL) return;
 
 				wxString nameProfile = "";
-				//albaString idNumber = wxString::Format(_("%d"),id);
+				//albaString idNumber = albaString::Format(_("%d"),id);
 				nameProfile = n->GetName();
 
 				if (wxNOT_FOUND != m_ListBox->FindString(n->GetName()))
@@ -1780,7 +1780,7 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 
 				SetMeterLink(n->GetName(), n);
 
-				albaString t;
+				wxString t;
 				t = n->GetName();
 				m_ListBox->Append(_(t));
 				m_ListBox->SetStringSelection(_(t));
@@ -2098,11 +2098,11 @@ void albaVMEWrappedMeter::SaveInFile()
 //-------------------------------------------------------------------------
 {
 	/*albaString initialFileName;
-	initialFileName = albaGetDocumentsDirectory().c_str();
+	initialFileName = albaGetDocumentsDirectory().ToAscii();
 	initialFileName.Append("\\WrapperMeter.txt");
 
 	albaString wildc = "configuration file (*.txt)|*.txt";
-	albaString newFileName = albaGetSaveFile(initialFileName.GetCStr(), wildc).c_str();
+	albaString newFileName = albaGetSaveFile(initialFileName.GetCStr(), wildc).ToAscii();
 
   if (newFileName == "") return;
 

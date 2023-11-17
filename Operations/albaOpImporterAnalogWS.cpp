@@ -34,6 +34,8 @@
 
 #include <iostream>
 #include "albaProgressBarHelper.h"
+#include "wx/filename.h"
+
 
 //----------------------------------------------------------------------------
 albaOpImporterAnalogWS::albaOpImporterAnalogWS(const wxString &label) :
@@ -43,7 +45,7 @@ albaOp(label)
 	m_OpType	= OPTYPE_IMPORTER;
 	m_Canundo	= true;
 	m_File		= "";
-	m_FileDir = albaGetLastUserFolder().c_str();
+	m_FileDir = albaGetLastUserFolder();
 
   m_EmgScalar = NULL;
 }
@@ -70,7 +72,7 @@ void albaOpImporterAnalogWS::OpRun()
 	m_File = "";
 	wxString pgd_wildc	= "EMG File (*.*)|*.*";
   wxString f;
-  f = albaGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
+  f = albaGetOpenFile(m_FileDir,pgd_wildc).ToAscii(); 
 	if(!f.IsEmpty() && wxFileExists(f))
 	{
 	  m_File = f;
@@ -90,7 +92,7 @@ void albaOpImporterAnalogWS::Read()
   
   albaNEW(m_EmgScalar);
   wxString path, name, ext;
-  wxSplitPath(m_File.c_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File,&path,&name,&ext);
   m_EmgScalar->SetName(name);
 
   albaTagItem tag_Nature;
@@ -110,7 +112,7 @@ void albaOpImporterAnalogWS::Read()
 
   //check if file starts with the string "ANALOG"
   line = text.ReadLine(); 
-  if (line.CompareTo("ANALOG")!= 0)
+  if (line.CompareTo(wxString("ANALOG"))!= 0)
   {
     albaErrorMessage("Invalid file format!");
     return;
@@ -120,7 +122,7 @@ void albaOpImporterAnalogWS::Read()
   int comma = line.Find(',');
   wxString freq = line.SubString(0,comma - 1); //Read frequency 
   double freq_val;
-  freq_val = atof(freq.c_str());
+  freq_val = atof(freq.ToAscii());
 
   //Put the signals names in a vector of string
   int num_tk;

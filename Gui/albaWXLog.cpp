@@ -40,15 +40,16 @@ albaWXLog::~albaWXLog()
   if(m_Fp) fclose(m_Fp);
 }
 // ----------------------------------------------------------------------------
-void albaWXLog::DoLogString(const wxChar *szString, time_t WXUNUSED(t))
+void albaWXLog::DoLogText(const wxString& msg)
 // ----------------------------------------------------------------------------
 {
-  wxString msg;
+  wxString printMsg;
   //TimeStamp(&msg);
   wxDateTime log_time = wxDateTime::UNow();
-  msg = wxString::Format("%02d:%02d:%02d:%03d ",log_time.GetHour(), log_time.GetMinute(),log_time.GetSecond(), log_time.GetMillisecond());
-  msg << szString << wxT('\n');
-  m_PTextCtrl->AppendText(msg);
+	printMsg.Format("%02d:%02d:%02d:%03d ",log_time.GetHour(), log_time.GetMinute(),log_time.GetSecond(), log_time.GetMillisecond());
+	printMsg += msg;
+
+	m_PTextCtrl->AppendText(printMsg);
     
   if(m_Fp && m_LogToFile)
   {
@@ -68,6 +69,6 @@ int albaWXLog::SetFileName(wxString filename)
 {
  	if(m_Fp) fclose(m_Fp);
   m_Fp = NULL;
-  m_Fp = fopen(filename.c_str(),"w");
+  m_Fp = fopen(filename.ToAscii(),"w");
   return m_Fp != NULL ? ALBA_OK : ALBA_ERROR;
 }

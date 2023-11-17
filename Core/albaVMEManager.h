@@ -27,7 +27,7 @@
 // Forward References :
 //----------------------------------------------------------------------------
 class albaVMEStorage;
-class wxZipFSHandler;
+class wxArchiveFSHandler;
 class wxFileSystem;
 
 /** albaVMEManager : Class managing VMEs inside a ALBA application.
@@ -155,7 +155,7 @@ protected:
 
   albaObserver*        m_Listener;         ///< Register the event receiver object
   wxConfigBase*       m_Config;           ///< Application configuration for file history management
-  wxZipFSHandler      *m_ZipHandler;      ///< Handler for zip archive (used to open zmsf files)
+	wxArchiveFSHandler  *m_ZipHandler;      ///< Handler for zip archive (used to open zmsf files)
   wxFileSystem        *m_FileSystem;      ///< File system manager
   albaGUIFileHistory	  m_FileHistory;      ///< Used to hold recently opened files
   int                 m_FileHistoryIdx;   ///< Identifier of the file to open

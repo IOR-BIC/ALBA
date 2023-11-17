@@ -44,6 +44,7 @@
 
 #include <fstream>
 #include "albaProgressBarHelper.h"
+#include "wx\filename.h"
 
 //----------------------------------------------------------------------------
 albaOpExporterBmp::albaOpExporterBmp(const wxString &label) :
@@ -130,7 +131,7 @@ void albaOpExporterBmp::SaveBmp()
   assert(m_DirName != "");
  
   wxString path,name,ext;
-  ::wxSplitPath(m_DirName,&path,&name,&ext);
+	wxFileName::SplitPath(m_DirName.GetCStr(),&path,&name,&ext);
   path+= _("\\");
   path+= name;
   path+= _("\\");
@@ -209,7 +210,7 @@ void albaOpExporterBmp::SaveBmp()
   scalarSliceIn->SetNumberOfTuples(size);
 
   wxString prefix;
-			prefix = wxString::Format("%s%s_%dx%d",path,name,xdim,ydim);
+			prefix = albaString::Format("%s%s_%dx%d",path.ToAscii(),name.ToAscii(),xdim,ydim);
 
 
   if (m_Bit8 == 0)
@@ -244,7 +245,7 @@ void albaOpExporterBmp::SaveBmp()
     exporter->SetInput(imageFlip->GetOutput());
     exporter->SetFileDimensionality(2); // the writer will create a number of 2D images
     exporter->SetFilePattern("%s_%04d.bmp");
-    exporter->SetFilePrefix((char*)prefix.c_str());
+    exporter->SetFilePrefix((char*)prefix.ToAscii());
      
     exporter->Write();
   }
@@ -271,10 +272,10 @@ void albaOpExporterBmp::SaveBmp()
 
       int fileNumber = z + m_Offset;
 
-      fileName = wxString::Format("%s_%04d.bmp",prefix, fileNumber);
+      fileName = albaString::Format("%s_%04d.bmp",prefix.ToAscii(), fileNumber);
 
       
-      WriteImageDataAsMonocromeBitmap(imageSlice, fileName.c_str());
+      WriteImageDataAsMonocromeBitmap(imageSlice, fileName);
       scalarSliceIn->Reset();
     }
   }

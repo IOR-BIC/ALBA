@@ -66,7 +66,7 @@ void albaOpValidateTreeTest::TestOpRun()
   msfFileNameOut<<"\\Test_ValidateTree\\MSF_TEST\\MSF_TEST.msf";
 
   msfFileNameOut.Replace("/","\\");
-  storageImport->SetURL(msfFileNameOut.c_str());
+  storageImport->SetURL(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( storageImport->Restore() == ALBA_OK );
 
   albaOpValidateTree *op = new albaOpValidateTree();
@@ -97,7 +97,7 @@ void albaOpValidateTreeTest::TestValidateTree_ValidTree()
   msfFileNameOut<<"\\Test_ValidateTree\\MSF_TEST\\MSF_TEST.msf";
 
   msfFileNameOut.Replace("/","\\");
-  storageImport->SetURL(msfFileNameOut.c_str());
+  storageImport->SetURL(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( storageImport->Restore() == ALBA_OK );
 
   albaOpValidateTree *op = new albaOpValidateTree();
@@ -130,7 +130,7 @@ void albaOpValidateTreeTest::TestValidateTree_InvalidNode()
   msfFileNameOut<<"\\Test_ValidateTree\\MSF_TEST\\MSF_TEST_INVALID_NODE.msf";
 
   msfFileNameOut.Replace("/","\\");
-  storageImport->SetURL(msfFileNameOut.c_str());
+  storageImport->SetURL(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( storageImport->Restore() == ALBA_OK );
 
   albaOpValidateTree *op = new albaOpValidateTree();
@@ -165,7 +165,7 @@ void albaOpValidateTreeTest::TestValidateTree_LinkNotPresent()
   msfFileNameOut<<"\\Test_ValidateTree\\MSF_TEST\\MSF_TEST.msf";
 
   msfFileNameOut.Replace("/","\\");
-  storageImport->SetURL(msfFileNameOut.c_str());
+  storageImport->SetURL(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( storageImport->Restore() == ALBA_OK );
 
 
@@ -204,7 +204,7 @@ void albaOpValidateTreeTest::TestValidateTree_LinkNull()
   msfFileNameOut<<"\\Test_ValidateTree\\MSF_TEST\\MSF_TEST.msf";
 
   msfFileNameOut.Replace("/","\\");
-  storageImport->SetURL(msfFileNameOut.c_str());
+  storageImport->SetURL(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( storageImport->Restore() == ALBA_OK );
 
  
@@ -242,7 +242,7 @@ void albaOpValidateTreeTest::TestValidateTree_BinaryFileNotPresent()
   msfFileNameOut<<"\\Test_ValidateTree\\MSF_TEST\\MSF_TEST_BINARY_FILE_NOT_PRESENT.msf";
 
   msfFileNameOut.Replace("/","\\");
-  storageImport->SetURL(msfFileNameOut.c_str());
+  storageImport->SetURL(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( storageImport->Restore() == ALBA_OK );
 
   albaOpValidateTree *op = new albaOpValidateTree();
@@ -275,7 +275,7 @@ void albaOpValidateTreeTest::TestValidateTree_UrlEmpty()
   msfFileNameOut<<"\\Test_ValidateTree\\MSF_TEST\\MSF_TEST_URL_EMPTY.msf";
 
   msfFileNameOut.Replace("/","\\");
-  storageImport->SetURL(msfFileNameOut.c_str());
+  storageImport->SetURL(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( storageImport->Restore() == ALBA_OK );
 
   albaOpValidateTree *op = new albaOpValidateTree();
@@ -315,7 +315,7 @@ void albaOpValidateTreeTest::TestValidateTree_MaxItemIdPatched()
   msfFileNameOut<<"\\Test_ValidateTree\\MSF_TEST\\MSF_TEST.msf";
 
   msfFileNameOut.Replace("/","\\");
-  storageImport->SetURL(msfFileNameOut.c_str());
+  storageImport->SetURL(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( storageImport->Restore() == ALBA_OK );
 
   //set a link not parented inside tree
@@ -354,7 +354,7 @@ void albaOpValidateTreeTest::TestValidateTree_ArchiveFileNotPresent()
   msfFileNameOut<<"\\Test_ValidateTree\\MSF_TEST\\MSF_TEST.msf";
 
   msfFileNameOut.Replace("/","\\");
-  storageImport->SetURL(msfFileNameOut.c_str());
+  storageImport->SetURL(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( storageImport->Restore() == ALBA_OK );
 
   //set a link not parented inside tree

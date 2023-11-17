@@ -180,7 +180,7 @@ void albaAnimate::OnEvent(albaEventBase *alba_event)
   {
     wxString wildcard = "xml file (*.xml)|*.xml|all files (*.*)|*.*";
     albaString fileName = "";
-    wxString lastFolder = albaGetLastUserFolder().c_str();
+    wxString lastFolder = albaGetLastUserFolder().ToAscii();
 
     switch(e->GetId())
     {
@@ -209,7 +209,7 @@ void albaAnimate::OnEvent(albaEventBase *alba_event)
         EnableWidgets();
         break;
       case ID_IMPORT:
-        fileName = albaGetOpenFile(lastFolder, wildcard).c_str();
+        fileName = albaGetOpenFile(lastFolder, wildcard);
         if (fileName != "")
         {
           LoadPoseFromFile(fileName);
@@ -217,7 +217,7 @@ void albaAnimate::OnEvent(albaEventBase *alba_event)
         }
       break;
       case ID_EXPORT:
-        fileName = albaGetSaveFile(lastFolder, wildcard).c_str();
+        fileName = albaGetSaveFile(lastFolder, wildcard);
         if (fileName != "")
           StorePoseToFile(fileName);
       break;
@@ -293,9 +293,9 @@ void albaAnimate::FlyTo()
   assert(m_Tags && m_Renderer && m_PositionList);
   m_SelectedPosition = m_PositionList->GetStringSelection();
   wxString flyto_tagName = "FLY_TO_" + m_SelectedPosition;
-  albaTagItem *item = m_Tags->GetTag(flyto_tagName.c_str());
+  albaTagItem *item = m_Tags->GetTag(flyto_tagName.ToAscii());
   if(item == NULL)
-    item = m_Tags->GetTag(m_SelectedPosition.c_str()); // support old style
+    item = m_Tags->GetTag(m_SelectedPosition.ToAscii()); // support old style
 
   vtkCamera *camera = m_Renderer->GetActiveCamera();
 
@@ -369,7 +369,7 @@ void albaAnimate::StoreViewPoint()
 	int counter = 1;
   wxString name = "camera position 1";
 	while(m_PositionList->FindString(name) != -1 && counter < 50)
-		name = wxString::Format("camera position %d", ++counter);
+		name = albaString::Format("camera position %d", ++counter);
 
 	// prompt user for a name -----------------------
 	wxTextEntryDialog *dlg = new wxTextEntryDialog(NULL,"please enter a name", "Store Camera Position", name );
@@ -380,14 +380,14 @@ void albaAnimate::StoreViewPoint()
 	
 	// test if is it unique -----------------------
   wxString flyto_tagName = "FLY_TO_" + name;
-	if(m_Tags->IsTagPresent(flyto_tagName.c_str()))
+	if(m_Tags->IsTagPresent(flyto_tagName.ToAscii()))
 	{
 		wxString msg = "this name is already used, do you want to overwrite it ?";
 		int res = wxMessageBox(msg,"Store Camera Position", wxOK|wxCANCEL|wxICON_QUESTION, NULL);
 		if(res == wxCANCEL) return;
 
     //remove item to be overwritten
-		m_Tags->DeleteTag(flyto_tagName.c_str());
+		m_Tags->DeleteTag(flyto_tagName.ToAscii());
 		m_PositionList->Delete(m_PositionList->FindString(name));
 	}
   
@@ -402,7 +402,7 @@ void albaAnimate::StoreViewPoint()
   par_scale = camera->GetParallelScale();
 	
 	albaTagItem item;
-	item.SetName(flyto_tagName.c_str());
+	item.SetName(flyto_tagName.ToAscii());
 	item.SetNumberOfComponents(10);
 	item.SetComponent(fp[0],0);
 	item.SetComponent(fp[1],1);
@@ -436,24 +436,24 @@ void albaAnimate::RenameViewPoint()
 
   // test if is it unique -----------------------
 	wxString flyto_tagName = "FLY_TO_" + name;
-  if(m_Tags->IsTagPresent(flyto_tagName.c_str()))
+  if(m_Tags->IsTagPresent(flyto_tagName.ToAscii()))
 	{
 		wxString msg = "this name is already used, do you want to overwrite it ?";
 		int res = wxMessageBox(msg,"Rename Camera Position", wxOK|wxCANCEL|wxICON_QUESTION, NULL);
 		if(res == wxCANCEL) return;
 
     //remove item to be overwritten
-		m_Tags->DeleteTag(flyto_tagName.c_str());
+		m_Tags->DeleteTag(flyto_tagName.ToAscii());
 		m_PositionList->Delete(m_PositionList->FindString(name));
 	}
 
 	wxString flyto_oldTagName = "FLY_TO_" + m_SelectedPosition;
-  albaTagItem *item = m_Tags->GetTag(flyto_oldTagName.c_str());
+  albaTagItem *item = m_Tags->GetTag(flyto_oldTagName.ToAscii());
   assert(item  && item->GetNumberOfComponents() == 10);
 
   albaTagItem itemNew;
   itemNew.DeepCopy(item);
-	itemNew.SetName(flyto_tagName.c_str());	
+	itemNew.SetName(flyto_tagName.ToAscii());
   m_Tags->DeleteTag(flyto_oldTagName);
   m_Tags->SetTag(itemNew);
 

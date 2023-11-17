@@ -42,6 +42,7 @@
 #include "vtkDirectory.h"
 
 #include <wx/dir.h>
+#include "wx/filename.h"
 
 
 
@@ -90,7 +91,7 @@ void albaOpImporterDicomTest::TestCreateVolume()
 	
 	    wxString dicomPath = dirName + dicomDir;
 	    importer->CreateSliceVTKPipeline();
-	    importer->OpenDir(dicomPath.c_str());
+	    importer->OpenDir(dicomPath.ToAscii());
 	    importer->ImportDicomTags();
 			importer->CalculateCropExtent();
 	    importer->BuildVMEVolumeGrayOutput();
@@ -160,10 +161,10 @@ void albaOpImporterDicomTest::TestCompareDicomImage()
 	    importer->TestModeOn();
 	    
 	    importer->CreateSliceVTKPipeline();
-	    importer->OpenDir(dicomPath.c_str());
+	    importer->OpenDir(dicomPath.ToAscii());
 	    importer->GenerateSliceTexture(0);
 	
-	    wxSplitPath(txtFilePath, &path, &short_name, &ext);
+	    wxFileName::SplitPath(txtFilePath, &path, &short_name, &ext);
 	    vtkImageData  *imageImported = importer->GetSliceInCurrentSeries(0);
 	   
 	    wxFileInputStream inputFile( txtFilePath );
@@ -176,7 +177,7 @@ void albaOpImporterDicomTest::TestCompareDicomImage()
 	
 	      while (tkz.HasMoreTokens())
 	      {
-	        pixelValue = atof(tkz.GetNextToken().c_str());
+	        pixelValue = atof(tkz.GetNextToken().ToAscii());
 	        pixelVector.push_back(pixelValue);
 	      }
 	      line = text.ReadLine();

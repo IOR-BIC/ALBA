@@ -54,18 +54,13 @@ public:
 		
   /** Set/Get output file name*/
   void SetOutputFileName(const char *outputFileName) {m_AnsysOutputFileNameFullPath = outputFileName;};
-  const char *GetOutputFileName() {return m_AnsysOutputFileNameFullPath.c_str();};
+  const char *GetOutputFileName() {return m_AnsysOutputFileNameFullPath.ToAscii();};
 
   /** Export the input mesh by writing it in Ansys .inp format */
   virtual int Write() = 0;
 	  
-  /** Builds operation's interface. */
-	void OpRun();
-	
 protected:	
   virtual albaString GetWildcard() = 0;
-
-	void Init();
 	
 	void OpStop(int result);
 

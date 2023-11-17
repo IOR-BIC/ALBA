@@ -781,7 +781,7 @@ void albaViewGlobalSlice::SetSlice(double origin[3], double dn)
 void albaViewGlobalSlice::UpdateText()
 //----------------------------------------------------------------------------
 {
-	m_Text = wxString::Format("o = [%.1f %.1f %.1f]  n = [%.1f %.1f %.1f]",m_SliceOrigin[0],m_SliceOrigin[1],m_SliceOrigin[2],m_SliceNormal[0],m_SliceNormal[1],m_SliceNormal[2]);
+	m_Text = albaString::Format("o = [%.1f %.1f %.1f]  n = [%.1f %.1f %.1f]",m_SliceOrigin[0],m_SliceOrigin[1],m_SliceOrigin[2],m_SliceNormal[0],m_SliceNormal[1],m_SliceNormal[2]);
 	m_TextMapper->SetInput(m_Text.GetCStr());
 	m_TextMapper->Modified();
 }

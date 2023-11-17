@@ -390,7 +390,7 @@ void albaInteractor2DMeasure_Template::AddMeasure(double * pointUL, double * poi
 	texture->RepeatOff();
 	texture->InterpolateOff();
 
-	wxString configDir = GetConfigDirectory().c_str();
+	wxString configDir = GetConfigDirectory().ToAscii();
 
 	if (!m_ConfigDir.IsEmpty())
 		configDir = m_ConfigDir;	
@@ -1035,7 +1035,7 @@ bool albaInteractor2DMeasure_Template::Save(albaVME *input, wxString tag)
 wxString albaInteractor2DMeasure_Template::GetConfigDirectory()
 {
 	//getting the Config directory
-	wxString config_dir = albaGetApplicationDirectory().c_str();
+	wxString config_dir = albaGetApplicationDirectory().ToAscii();
 
 #ifdef _DEBUG
 	config_dir = ALBA_SOURCE_DIR;

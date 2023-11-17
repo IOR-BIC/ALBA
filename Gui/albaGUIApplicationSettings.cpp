@@ -30,17 +30,17 @@ albaGUISettings(Listener, label)
 {
   // Default values for the application.
   m_LogToFile   = 1; //logging enabled for correcting bug #820
-  m_LogFolder = (albaGetAppDataDirectory() + "\\Logs").c_str();
+  m_LogFolder = (albaGetAppDataDirectory() + "\\Logs");
 
   m_WarnUserFlag = true;
 	m_AutoSaveProject = 0;
 
 	//creating user app directory if does not exist
-  if(!wxDirExists(albaGetAppDataDirectory().c_str()))
-    wxMkdir(albaGetAppDataDirectory().c_str());
+  if(!wxDirExists(albaGetAppDataDirectory()))
+    wxMkdir(albaGetAppDataDirectory().ToAscii());
 
   //creating Logs directory if does not exist
-  if(!wxDirExists(m_LogFolder))
+  if(!wxDirExists(m_LogFolder.GetCStr()))
     wxMkdir(m_LogFolder.GetCStr());
 
   InitializeSettings();
@@ -125,7 +125,7 @@ void albaGUIApplicationSettings::InitializeSettings()
 
 	if(m_Config->Read("LogFolder", &string_item))
   {
-    m_LogFolder = string_item.c_str();
+    m_LogFolder = string_item;
   }
   else
   {

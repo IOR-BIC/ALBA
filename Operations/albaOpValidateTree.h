@@ -61,7 +61,7 @@ public:
   If the tree is valid return ALBA_OK and fills fileNamesSet with the absolute file names of 
   data belonging to vme's in vme tree. These are all the files that need to be copied in order
   to replicate the entire msf. Otherwise it returns ALBA_ERROR and an empty set*/
-  int GetMSFTreeABSFileNamesSet(set<string> &fileNamesSet);;
+  int GetMSFTreeABSFileNamesSet(set<wxString> &fileNamesSet);;
  
   /** values returned by ValidateTree() */
   enum VALIDATE_RETURN_VALUES
@@ -106,7 +106,7 @@ protected:
 
   // extract
   /** files linked to vme in trees */
-  set<string> m_MSFTreeAbsFileNamesSet;
+  set<wxString> m_MSFTreeAbsFileNamesSet;
 
 };
 #endif

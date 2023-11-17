@@ -56,8 +56,6 @@ public:
   void SetBitmap(wxString BitmapId, wxWindowID id = 0); 
 
 protected:  
-  virtual void SetDefault() {};
-
   /** Overriden function member to intercept event generation and forward it to the Listener. */
   virtual void Command(wxCommandEvent& event);
 

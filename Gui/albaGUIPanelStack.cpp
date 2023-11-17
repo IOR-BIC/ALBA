@@ -124,5 +124,5 @@ void albaGUIPanelStack::DoLayout()
 //----------------------------------------------------------------------------
 {
   wxSizeEvent e;
-	wxPanel::OnSize(e);
+	wxPanel::Layout();
 }

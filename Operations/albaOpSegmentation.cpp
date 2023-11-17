@@ -106,7 +106,7 @@
 #include "vtkMaskPolyDataFilter.h"
 
 #include "wx/busyinfo.h"
-#include "wx/mac/classic/bitmap.h"
+#include "wx/bitmap.h"
 #include "wx/sizer.h"
 #include "wx/window.h"
 
@@ -314,7 +314,7 @@ void albaOpSegmentation::OpDo()
 
   //Generating Surface VME
   albaNEW(m_OutputSurface);
-  m_OutputSurface->SetName(wxString::Format("Segmentation Surface (%s)",m_Volume->GetName()).c_str());
+  m_OutputSurface->SetName(albaString::Format("Segmentation Surface (%s)",m_Volume->GetName()).ToAscii());
   m_OutputSurface->SetData(surface,albaVMEVolumeGray::SafeDownCast(m_Input)->GetTimeStamp());
   m_OutputSurface->ReparentTo(m_Input);
   m_OutputSurface->Modified();
@@ -410,7 +410,7 @@ void albaOpSegmentation::InitSegmentationVolume()
 	albaNEW(m_SegmentationVolume);
 	glo_CurrSeg = m_SegmentationVolume;
 
-	m_SegmentationVolume->SetName(wxString::Format("Segmentation Output (%s)", m_Volume->GetName()).c_str());
+	m_SegmentationVolume->SetName(albaString::Format("Segmentation Output (%s)", m_Volume->GetName()).ToAscii());
 	//lutPreset(4, m_SegmentationVolume->GetMaterial()->m_ColorLut);
 	/*
 	m_SegmentationVolume->GetMaterial()->m_ColorLut->SetTableRange(0, 255);
@@ -549,7 +549,7 @@ void albaOpSegmentation::InitRanges()
 
 		m_RangesVector.push_back(range);
 
-		m_RangesGuiList->Append(wxString::Format("[%d,%d] low:%.1f high:%.1f", range.m_StartSlice, range.m_EndSlice, m_Threshold[0], m_Threshold[1]));
+		m_RangesGuiList->Append(albaString::Format("[%d,%d] low:%.1f high:%.1f", range.m_StartSlice, range.m_EndSlice, m_Threshold[0], m_Threshold[1]));
 		m_RangesGuiList->Select(0);
 	}
 }
@@ -643,7 +643,7 @@ void albaOpSegmentation::CreateOpDialog()
 	// Label to indicate the current slice
 
 	vtkNEW(m_AutomaticSliceTextMapper);
-	wxString text = wxString::Format("Slice = %d of %d", m_GUISliceIndex, m_VolumeDims[m_SlicePlane]);
+	wxString text = albaString::Format("Slice = %d of %d", m_GUISliceIndex, m_VolumeDims[m_SlicePlane]);
 
 	m_AutomaticSliceTextMapper->SetInput(text);
 	m_AutomaticSliceTextMapper->GetTextProperty()->SetColor(1.0, 1.0, 0.0);
@@ -849,7 +849,7 @@ void albaOpSegmentation::CreateInitSegmentationGui()
 	wxString choices[4] = { _("Global"),_("Z-Split"), _("Load"), _("Mask") };
 	int w_id = currentGui->GetWidgetId(ID_INIT_MODALITY);
 
-	m_InitModalityRadioBox = new wxRadioBox(currentGui, w_id, "", wxDefaultPosition, wxSize(200, -1), 4, choices, 2, wxRA_SPECIFY_COLS | wxSUNKEN_BORDER | wxTAB_TRAVERSAL);
+	m_InitModalityRadioBox = new wxRadioBox(currentGui, w_id, "", wxDefaultPosition, wxSize(200, -1), 4, choices, 2, wxRA_SPECIFY_COLS | wxTAB_TRAVERSAL);
 	m_InitModalityRadioBox->SetValidator(albaGUIValidator(currentGui, w_id, m_InitModalityRadioBox, &m_InitModality));
 
 	wxBoxSizer *thresholdTypeLabSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -1210,7 +1210,7 @@ void albaOpSegmentation::UpdateSlice()
 void albaOpSegmentation::UpdateSliceLabel()
 {
 	// Update slice text actor   
-	wxString text = wxString::Format("Slice = %d of %d", m_SliceIndex, m_VolumeDims[m_SlicePlane]);
+	wxString text = albaString::Format("Slice = %d of %d", m_SliceIndex, m_VolumeDims[m_SlicePlane]);
 	m_AutomaticSliceTextMapper->SetInput(text);
 }
 //----------------------------------------------------------------------------
@@ -1218,7 +1218,7 @@ void albaOpSegmentation::UpdateThresholdLabel()
 {
 	if (m_CurrentPhase == INIT_SEGMENTATION && (m_InitModality != LOADSEGM_INIT))
 	{
-		albaString text = wxString::Format("Threshold low:%.1f high:%.1f", m_Threshold[0], m_Threshold[1]);
+		albaString text = albaString::Format("Threshold low:%.1f high:%.1f", m_Threshold[0], m_Threshold[1]);
 		m_AutomaticThresholdTextMapper->SetInput(text.GetCStr());
 	}
 	else
@@ -1417,7 +1417,7 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 			if (e->GetSender() == m_InitPER)
 			{
 				m_AutomaticMouseThreshold = e->GetDouble();
-				albaString text = wxString::Format("Scalar = %.3f", m_AutomaticMouseThreshold);
+				albaString text = albaString::Format("Scalar = %.3f", m_AutomaticMouseThreshold);
 				m_AutomaticScalarTextMapper->SetInput(text.GetCStr());
 			}
 			else if (e->GetSender() == m_EditPER)
@@ -1878,7 +1878,7 @@ void albaOpSegmentation::OnThresholdUpate(int eventID)
 	{
 		m_RangesVector[m_CurrentRange].m_Threshold[0] = m_Threshold[0];
 		m_RangesVector[m_CurrentRange].m_Threshold[1] = m_Threshold[1];
-		m_RangesGuiList->SetString(m_CurrentRange, wxString::Format("[%d,%d] low:%.1f high:%.1f", m_RangesVector[m_CurrentRange].m_StartSlice, m_RangesVector[m_CurrentRange].m_EndSlice, m_Threshold[0], m_Threshold[1]));
+		m_RangesGuiList->SetString(m_CurrentRange, albaString::Format("[%d,%d] low:%.1f high:%.1f", m_RangesVector[m_CurrentRange].m_StartSlice, m_RangesVector[m_CurrentRange].m_EndSlice, m_Threshold[0], m_Threshold[1]));
 	}
 
 	UpdateThresholdLabel();
@@ -1897,11 +1897,11 @@ void albaOpSegmentation::OnSplitRange()
 
 	//update current range
 	m_RangesVector[m_CurrentRange].m_EndSlice = m_SliceIndex;
-	m_RangesGuiList->SetString(m_CurrentRange, wxString::Format("[%d,%d] low:%.1f high:%.1f", m_RangesVector[m_CurrentRange].m_StartSlice, m_RangesVector[m_CurrentRange].m_EndSlice, m_Threshold[0], m_Threshold[1]));
+	m_RangesGuiList->SetString(m_CurrentRange, albaString::Format("[%d,%d] low:%.1f high:%.1f", m_RangesVector[m_CurrentRange].m_StartSlice, m_RangesVector[m_CurrentRange].m_EndSlice, m_Threshold[0], m_Threshold[1]));
 
 	//insert new range
 	m_RangesVector.insert(m_RangesVector.begin() + m_CurrentRange + 1, range);
-	m_RangesGuiList->Insert(wxString::Format("[%d,%d] low:%.1f high:%.1f", range.m_StartSlice, range.m_EndSlice, m_Threshold[0], m_Threshold[1]), m_CurrentRange + 1);
+	m_RangesGuiList->Insert(albaString::Format("[%d,%d] low:%.1f high:%.1f", range.m_StartSlice, range.m_EndSlice, m_Threshold[0], m_Threshold[1]), m_CurrentRange + 1);
 
 	m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
 	EnableDisableGuiRange();
@@ -1925,7 +1925,7 @@ void albaOpSegmentation::OnRemoveRange()
 	}
 
 	m_ThresholdSlider->SetSubRange(m_RangesVector[m_CurrentRange].m_Threshold);
-	m_RangesGuiList->SetString(m_CurrentRange, wxString::Format("[%d,%d] low:%.1f high:%.1f", m_RangesVector[m_CurrentRange].m_StartSlice, m_RangesVector[m_CurrentRange].m_EndSlice, m_Threshold[0], m_Threshold[1]));
+	m_RangesGuiList->SetString(m_CurrentRange, albaString::Format("[%d,%d] low:%.1f high:%.1f", m_RangesVector[m_CurrentRange].m_StartSlice, m_RangesVector[m_CurrentRange].m_EndSlice, m_Threshold[0], m_Threshold[1]));
 	m_SegmentationOperationsGui[INIT_SEGMENTATION]->Update();
 	EnableDisableGuiRange();
 	OnThresholdUpate();

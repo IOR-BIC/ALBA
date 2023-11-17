@@ -121,6 +121,10 @@ public:
   /** return all the array of values */
   const std::vector<albaString> *GetComponents() const {return &m_Components;};
 
+	/** return vector of values as doubles*/
+	std::vector<double> GetComponentsAsDoubles() const;;
+
+
   /**
     return the array of values as a single string, representing
     the array of components as a tuple of the form:

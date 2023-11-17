@@ -464,7 +464,7 @@ void albaPipeTensorFieldSurface:: EigenVectors3x3(double A[3][3], double lambda[
     {
       int nComps = da->GetNumberOfComponents();
       for (int i = 0; i < nComps; i++){
-        m_ComboColorBy->Append(wxString::Format("%d", i));
+        m_ComboColorBy->Append(albaString::Format("%d", i));
       }
     }
   } //end if [valid selection of tensor field]
