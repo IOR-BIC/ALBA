@@ -239,7 +239,7 @@ void albaOpLabelExtractor::OnEvent(albaEventBase *alba_event)
 				  OpStop(OP_RUN_OK);
 			  else
 			  {
-				  wxString msg = wxString::Format("Label %d not found!", m_ValLabel);
+				  wxString msg = albaString::Format("Label %d not found!", m_ValLabel);
 				  wxMessageBox(msg,"Warning");
 				  OpStop(OP_RUN_CANCEL);
 			  }
@@ -308,16 +308,16 @@ void albaOpLabelExtractor::GenerateLabeledVolume()
     {
       wxString label = m_LabelNameVector.at(c);
       wxStringTokenizer tkz(label,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
-      albaString labelName = tkz.GetNextToken().c_str();
-      albaString labelIntStr = tkz.GetNextToken().c_str();
+      albaString labelName = tkz.GetNextToken();
+      albaString labelIntStr = tkz.GetNextToken();
       int labelIntValue = atoi(labelIntStr);
       labelIntVector.push_back(labelIntValue);
       //Set the label value for vtkImageThreshold
       m_ValLabel = labelIntValue;
-      albaString minStr = tkz.GetNextToken().c_str();
+      albaString minStr = tkz.GetNextToken();
       int minValue = atof(minStr);
       minVector.push_back(minValue);
-      albaString maxStr = tkz.GetNextToken().c_str();
+      albaString maxStr = tkz.GetNextToken();
       int mxValue = atof(maxStr);
       maxVector.push_back(mxValue);
       counter++;
@@ -560,7 +560,7 @@ void albaOpLabelExtractor::ExtractLabel()
 
   albaNEW(m_Vme);
 	m_Vme->SetData(surface, 0.0);
-  m_Vme->SetName(m_SurfaceName.c_str());
+  m_Vme->SetName(m_SurfaceName.ToAscii());
   m_Vme->Update();
   m_Output = m_Vme;
 }

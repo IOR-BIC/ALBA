@@ -441,7 +441,7 @@ void albaInteractorSlider::UpdatePadPosition(double pos)
 			textPos[1] = pos;
 		}
 
-		m_TextValueActor->SetInput(wxString::Format(_("%.2f"), m_Value));
+		m_TextValueActor->SetInput(albaString::Format(_("%.2f"), m_Value));
 		m_TextValueActor->SetPosition(textPos[0], textPos[1]);
 		m_TextValueActor->Modified();
 	}
@@ -731,7 +731,7 @@ void albaInteractorSlider::ShowSlider(bool show)
 				textPos[0] += TEXT_OFFSET;
 			}
 
-			m_TextMinActor->SetInput(wxString::Format(_("%.2f"), m_MinValue));
+			m_TextMinActor->SetInput(albaString::Format(_("%.2f"), m_MinValue));
 			m_TextMinActor->SetPosition(textPos[0], textPos[1]);
 			m_TextMinActor->Modified();
 
@@ -752,7 +752,7 @@ void albaInteractorSlider::ShowSlider(bool show)
 				textPos[0] += TEXT_OFFSET;
 			}
 
-			m_TextMaxActor->SetInput(wxString::Format(_("%.2f"), m_MaxValue));
+			m_TextMaxActor->SetInput(albaString::Format(_("%.2f"), m_MaxValue));
 			m_TextMaxActor->SetPosition(textPos[0], textPos[1]);
 			m_TextMaxActor->Modified();
 

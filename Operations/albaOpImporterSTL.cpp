@@ -36,6 +36,8 @@
 #include "vtkSTLReader.h"
 #include "vtkPolyData.h"
 
+#include "wx\filename.h"
+
 #include <fstream>
 
 //----------------------------------------------------------------------------
@@ -77,19 +79,19 @@ albaOp* albaOpImporterSTL::Copy()
 void albaOpImporterSTL::OpRun()   
 //----------------------------------------------------------------------------
 {
-	albaString	fileDir = albaGetLastUserFolder().c_str();
+	albaString	fileDir = albaGetLastUserFolder();
 
   if (!m_TestMode && m_Files.size() == 0)
   {
     albaString wildc = "Stereo Litography (*.stl)|*.stl";
-    std::vector<std::string> files;
+    std::vector<wxString> files;
     albaString f;
 
     m_Files.clear();
     albaGetOpenMultiFiles(fileDir.GetCStr(),wildc.GetCStr(), files);
     for(unsigned i = 0; i < files.size(); i++)
     {
-      f = files[i].c_str();
+      f = files[i];
       m_Files.push_back(f);
     }
   }
@@ -264,7 +266,7 @@ void albaOpImporterSTL::ImportSTL()
 	  reader->Update();
 
     wxString path, name, ext;
-    wxSplitPath(fn.GetCStr(),&path,&name,&ext);
+    wxFileName::SplitPath(fn.GetCStr(),&path,&name,&ext);
 
     albaVMESurface *importedSTL;
     albaNEW(importedSTL);

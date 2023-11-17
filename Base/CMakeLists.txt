@@ -59,10 +59,10 @@ IF (ALBA_USE_VTK)
 ENDIF (ALBA_USE_VTK)
 
 # List libraries that are needed by this project.
-#SET(PROJECT_LIBS "" )
+SET(PROJECT_LIBS Libraries::wx::net Libraries::wx::core Libraries::wx::base )
 
 IF (ALBA_USE_VTK)
-  SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)
+  SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon )
 ENDIF (ALBA_USE_VTK)
 
 # Create the library.

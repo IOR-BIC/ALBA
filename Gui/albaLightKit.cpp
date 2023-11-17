@@ -233,7 +233,7 @@ void albaLightKit::AddLight()
 	Light->SetIntensity(m_LightIntensity);
 	
 	//name of the light
-	wxString light_name = "light " + wxString::Format("%d",m_LightCounter);
+	wxString light_name = "light " + albaString::Format("%d",m_LightCounter);
 	
 	//build LightItem and add it to the list
 	m_SelectedLight = new LightItem(light_name,m_LightOnOff,m_LightAzimuth,m_LightElevation,m_LightIntensity,m_LightColor,Light);

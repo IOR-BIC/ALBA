@@ -936,11 +936,11 @@ void albaOpExtractIsosurface::ExtractSurface()
 		}
 		m_ContourVolumeMapper->Update();
 
-		wxString name = wxString::Format("%s Isosurface %g", m_Input->GetName(), m_IsoValue);
+		wxString name = albaString::Format("%s Isosurface %g", m_Input->GetName(), m_IsoValue);
 
 		albaVMESurface *vme_surf;
 		albaNEW(vme_surf);
-		vme_surf->SetName(name.c_str());
+		vme_surf->SetName(name.ToAscii());
 		//vme_surf->SetDataByDetaching(surface,0);
 		vme_surf->SetData(surface, 0);
 		vme_surf->GetOutput()->Update();
@@ -970,7 +970,7 @@ albaString albaOpExtractIsosurface::GetParameters()
   for (int contour = 0; contour < m_NumberOfContours; contour++)
   {
     parameter.Append("Contour value = ");
-    parameter.Append(wxString::Format("%f", m_IsoValueVector[contour]));
+    parameter.Append(albaString::Format("%f", m_IsoValueVector[contour]));
     parameter.Append(", ");
   }
   parameter.RemoveLast(2);

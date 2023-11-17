@@ -191,14 +191,14 @@ void albaGUISaveRestorePose::StorePose()
   wxString AbsPos_tagName = "STORED_ABS_POS_" + pose_name;
 
   albaTagArray *tagArray = m_InputVME->GetTagArray();
-  if(tagArray->IsTagPresent(AbsPos_tagName.c_str())) 
+  if(tagArray->IsTagPresent(AbsPos_tagName.ToAscii()))
   {
 		wxString msg = "this name is already used, do you want to overwrite it ?";
 		int res = wxMessageBox(msg,"Store Position", wxOK|wxCANCEL|wxICON_QUESTION, NULL);
 		if(res == wxCANCEL) return;
 
     //remove item to be overwritten
-		tagArray->DeleteTag(AbsPos_tagName.c_str());
+		tagArray->DeleteTag(AbsPos_tagName.ToAscii());
 	}
 	
   StorePoseHelper(AbsPos_tagName);
@@ -256,9 +256,9 @@ void albaGUISaveRestorePose::RestorePoseHelper( albaString pose_name )
   wxString AbsPos_tagName = "STORED_ABS_POS_" + pose_name;
   int comp = 0;
   albaMatrix abs_pose;
-  if (m_InputVME->GetTagArray()->IsTagPresent(AbsPos_tagName.c_str()))
+  if (m_InputVME->GetTagArray()->IsTagPresent(AbsPos_tagName.ToAscii()))
   {
-    albaTagItem *item = m_InputVME->GetTagArray()->GetTag(AbsPos_tagName.c_str());
+    albaTagItem *item = m_InputVME->GetTagArray()->GetTag(AbsPos_tagName.ToAscii());
     for (int r=0; r<4; r++)
       for (int c=0; c<4; c++)
         abs_pose.SetElement(r,c,item->GetComponentAsDouble(comp++));

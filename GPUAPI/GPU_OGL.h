@@ -28,6 +28,7 @@
 #define GPU_OGL_h__
 
 #include <wx/string.h>
+#include <Windows.h>
 
 
 #ifdef _WIN32

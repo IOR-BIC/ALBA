@@ -105,7 +105,7 @@ protected:
 	double m_SliceSize[2];
 	double m_Delta;
 	albaRWIBase *m_RWIbase;
-	int m_CurrentArrow;
+	wxStockCursor m_CurrentArrow;
   
 private:
   albaInteractorDICOMImporter(const albaInteractorDICOMImporter&);  // Not implemented.

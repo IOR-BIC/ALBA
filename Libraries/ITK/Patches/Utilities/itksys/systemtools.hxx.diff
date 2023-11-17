@@ -1,0 +1,4 @@
+48c48
+< typedef unsigned short mode_t;
+---
+> typedef int mode_t;

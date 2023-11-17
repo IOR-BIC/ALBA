@@ -57,7 +57,8 @@
 #include "vtkUnsignedCharArray.h"
 
 #include "wx\image.h"
-#include "wx\mac\carbon\bitmap.h"
+#include "wx\bitmap.h"
+#include "wx\filename.h"
 
 #define DIALOG_W 800
 #define DIALOG_H 480
@@ -445,7 +446,7 @@ int albaGUIImageViewer::SaveVMEImage(albaVMEImage *image, wxString imageFileName
 	if (image && imageFileName != "")
 	{
 		wxString pathName, fileName, extension;
-		wxSplitPath(imageFileName, &pathName, &fileName, &extension);
+		wxFileName::SplitPath(imageFileName, &pathName, &fileName, &extension);
 
 		// Flip y axis
 		vtkALBASmartPointer<vtkImageFlip> imageFlipFilter;
@@ -549,10 +550,10 @@ void albaGUIImageViewer::SaveImageAs()
 		fileName += GetSelectedImageName();
 		fileName += ".png";
 
-		albaString fileNameFullPath = albaGetDocumentsDirectory().c_str();
+		albaString fileNameFullPath = albaGetDocumentsDirectory();
 		fileNameFullPath.Append(fileName);
 		albaString wildc = "PNG (*.png)|*.png; |JPEG (*.jpg)|*.jpg; |Bitmap (*.bmp)|*.bmp";
-		wxString newFileName = albaGetSaveFile(fileNameFullPath.GetCStr(), wildc, "Save Image as").c_str();
+		wxString newFileName = albaGetSaveFile(fileNameFullPath.GetCStr(), wildc, "Save Image as").ToAscii();
 
 		if (m_ImagesGroup)
 		{
@@ -570,8 +571,8 @@ void albaGUIImageViewer::SaveAllImages()
 {
 	if (m_ImageSelection >= 0 && m_ImageSelection < m_ImagesList.size())
 	{
-		albaString fileNameFullPath = albaGetDocumentsDirectory().c_str();
-		wxString newdir = albaGetDirName(fileNameFullPath.GetCStr()).c_str();
+		albaString fileNameFullPath = albaGetDocumentsDirectory();
+		wxString newdir = albaGetDirName(fileNameFullPath);
 		
 		if (m_ImagesGroup)
 		{
@@ -614,7 +615,7 @@ void albaGUIImageViewer::AddImage(wxBitmap &bitmap, wxString name = "")
 
 	if (&bitmap)
 	{
-		img = &bitmap.ConvertToImage();
+		img = bitmap.ConvertToImage();
 	}
 
 	// Generate Snapshot name

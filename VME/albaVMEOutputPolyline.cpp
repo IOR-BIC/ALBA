@@ -92,7 +92,7 @@ albaGUI* albaVMEOutputPolyline::CreateGui()
 
   m_Gui->Label(_("Vtk type:"), &m_VtkDataType, true, false, false, 0.35);
   
-  //m_Length = albaString(wxString::Format(_("%.2f"),CalculateLength()));
+  //m_Length = albaString(albaString::Format(_("%.2f"),CalculateLength()));
   m_Gui->Label(_("Length:"), &m_Length ,true);
 
   m_NumberOfPoints = albaString(((vtkPolyData *)m_VME->GetOutput()->GetVTKData())->GetNumberOfPoints());
@@ -119,7 +119,7 @@ void albaVMEOutputPolyline::Update()
   m_VME->Update();
   if (m_VME && m_VME->GetDataPipe() && m_VME->GetDataPipe()->GetVTKData())
   {
-  	m_Length = albaString(wxString::Format(_("%.2f"),CalculateLength()));  
+  	m_Length = albaString(albaString::Format(_("%.2f"),CalculateLength()));  
     m_NumberOfPoints = albaString(((vtkPolyData *)m_VME->GetOutput()->GetVTKData())->GetNumberOfPoints());
   }
   

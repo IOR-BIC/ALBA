@@ -81,7 +81,7 @@ protected:
     COLUMN_DAtA
   };
 
-  std::vector<std::string> m_Files; ///< List of files representing the scalar data.
+  std::vector<wxString> m_Files; ///< List of files representing the scalar data.
   albaString m_FileDir; ///< Directory where are located the files.
 
   albaVMEScalarMatrix *m_ScalarData;

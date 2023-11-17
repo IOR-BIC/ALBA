@@ -79,7 +79,8 @@ void albaOpExporterAnsysInputFileTest::Check_INPFile(albaString fileName)
 
   exporter->SetOutputFileName((filePath << "/exported_" << fileName).GetCStr());
   exporter->SetInput(importedData);
-  int result = exporter->Write();
+	exporter->Init();
+	int result = exporter->Write();
 
   CPPUNIT_ASSERT(result == ALBA_OK);
 
@@ -128,6 +129,7 @@ void albaOpExporterAnsysInputFileTest::CompareINPFilesData(albaString fileName)
 
   exporter->SetOutputFileName((filePath << "/exported2_" << fileName).GetCStr());
   exporter->SetInput(importedData);
+	exporter->Init();
   int result = exporter->Write();
 
   CPPUNIT_ASSERT(result == ALBA_OK);

@@ -1,4 +1,0 @@
-806c806
-<     long data = ListBox_GetItemData(GetHwnd(), pStruct->itemID);
----
->     long long data = ListBox_GetItemData(GetHwnd(), pStruct->itemID);

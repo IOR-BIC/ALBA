@@ -120,7 +120,7 @@ bool AlbaMaster::OnInit()
 	// Splash Screen
 	albaString splashImageName = "AlbaMasterSplash.bmp";
 
-	wxString splashDir = albaGetApplicationDirectory().c_str();
+	wxString splashDir = albaGetApplicationDirectory().ToAscii();
 	wxBitmap splashBitmap;
 	splashBitmap.LoadFile(splashDir + "\\Config\\" + splashImageName, wxBITMAP_TYPE_BMP);
 	m_Logic->ShowSplashScreen(splashBitmap);

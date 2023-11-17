@@ -98,7 +98,7 @@ void albaOpClassicICPRegistration::CreateGui()
 //----------------------------------------------------------------------------
 {
 	wxString wildcard = _("Report log (*.log)|*.log");
-	wxString dir = albaGetLastUserFolder().c_str();
+	wxString dir = albaGetLastUserFolder();
 	if(!wxDirExists(dir)) dir = "";
 	m_ReportFilename = dir + _("report.log");
 	
@@ -216,7 +216,7 @@ void albaOpClassicICPRegistration::OpDo()
 
 	albaMatrix::Multiply4x4(*icp_matrix, *inputMatr, *final_matrix);
 
-  wxString name = wxString::Format(_("%s registered on %s"),m_Input->GetName(), m_Target->GetName());
+  wxString name = albaString::Format(_("%s registered on %s"),m_Input->GetName(), m_Target->GetName());
 
 	if (m_CopySubTree)
 	{

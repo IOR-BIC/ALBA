@@ -88,8 +88,7 @@ albaViewManager::~albaViewManager()
   {
     v = m_ViewList;
     m_ViewList = v->m_Next;
-    v->SetMouse(NULL); // dereference the mouse before destroy the view
-    cppDEL(v);
+		((albaGUIMDIChild *)v->GetFrame())->Close();
   }
 
   for(int i=0; i<m_TemplateNum; i++) // destroy all template views

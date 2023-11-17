@@ -1,6 +1,0 @@
-643,644c645,646
-<         else
-<             m_btnNext->SetLabel(_("&Next >"));
----
->         //else
->             //m_btnNext->SetLabel(_("&Next >"));

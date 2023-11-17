@@ -334,11 +334,11 @@ void albaVMEMesh::OnEvent(albaEventBase *alba_event)
 		if (e->GetId() == ID_SAVE)
 		{
 			albaString initialFileName;
-			initialFileName = albaGetDocumentsDirectory().c_str();
+			initialFileName = albaGetDocumentsDirectory();
 			initialFileName.Append("\\newConfigurationFile.xml");
 
 			albaString wildc = "configuration xml file (*.xml)|*.xml";
-			albaString newFileName = albaGetSaveFile(initialFileName.GetCStr(), wildc).c_str();
+			albaString newFileName = albaGetSaveFile(initialFileName.GetCStr(), wildc);
 
 			if (newFileName != "")
 				SaveConfigurationFile(m_Configuration, newFileName);
@@ -744,7 +744,7 @@ int albaVMEMesh::SaveConfigurationFile(BonematConfiguration configuration, const
 
 	XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Terminate();
 
-	albaLogMessage(wxString::Format("New configuration file has been written %s", fileName.GetCStr()));
+	albaLogMessage(albaString::Format("New configuration file has been written %s", fileName.GetCStr()));
 
 	return ALBA_OK;
 }

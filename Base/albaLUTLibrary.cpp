@@ -49,7 +49,7 @@ void albaLUTLibrary::Clear(bool removeLibraryFromDisk)
     vtkLookupTable *lut = (*it).second;
     if (DEBUG_MODE)
       {
-	std::string lutName = (*it).first;
+				std::string lutName = (*it).first;
         std::ostringstream stringStream;
         stringStream << "destroying lut:" << lutName << " at " << lut << std::endl;
         albaLogMessage(stringStream.str().c_str());
@@ -100,11 +100,9 @@ void albaLUTLibrary::SaveLUT( vtkLookupTable *inLut, const char *outFileName)
   assert(inLut);
   vtkLookupTable *lut = inLut;
 
-  std::string fileName = outFileName;
-
   std::ofstream output;
 
-  output.open(fileName.c_str());
+  output.open(outFileName);
 
   double range[2];
   lut->GetTableRange(range);
@@ -130,7 +128,7 @@ void albaLUTLibrary::SaveLUT( vtkLookupTable *inLut, const char *outFileName)
 
   output.close();
 
-  assert(wxFileExists(fileName.c_str()));
+  assert(wxFileExists(outFileName));
 
 }
 
@@ -139,11 +137,9 @@ void albaLUTLibrary::LoadLUT( const char *lutFileName, vtkLookupTable *targetLut
   assert(targetLut);
   vtkLookupTable *lut = targetLut;
 
-  std::string fileName = lutFileName;
-
   std::ifstream input;
 
-  input.open(fileName.c_str());
+  input.open(lutFileName);
 
   std::string tmp;
   double range[2];
@@ -224,7 +220,7 @@ void albaLUTLibrary::LoadLUT( const char *lutFileName, vtkLookupTable *targetLut
 
   input.close();
 
-  assert(wxFileExists(fileName.c_str()));
+  assert(wxFileExists(lutFileName));
 
 }
 

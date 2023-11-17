@@ -1,1 +1,1 @@
-copy .\ALBA_ITK_Parabuild\Libraries\wxWin\Build\bin\debug\*.dll .\ALBA_ITK_Parabuild\bin\debug\
+copy .\ALBA_ITK_Parabuild\Libraries\wxWidgets\Build\bin\debug\*.dll .\ALBA_ITK_Parabuild\bin\debug\

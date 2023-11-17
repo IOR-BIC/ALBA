@@ -34,7 +34,7 @@
 #ifdef __WIN32__
 #include <malloc.h>
 #endif
-
+#include "wx/filename.h"
 
 #ifdef ALBA_USE_VTK //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   #include "vtkVersion.h"
@@ -243,9 +243,9 @@ void albaGUIMDIFrame::OnDropFile(wxDropFilesEvent &event)
   file_list = event.GetFiles();
   for (int i=0; i< num_files; i++)
   {
-    file_to_open = file_list[i].c_str();
+    file_to_open = file_list[i];
 
-    wxSplitPath(file_list[i],&path, &name, &ext);
+    wxFileName::SplitPath(file_list[i],&path, &name, &ext);
 
 		albaString zippedExt;
 		const char *archExt = GetLogicManager()->GetMsfFileExtension();
@@ -478,7 +478,7 @@ void albaGUIMDIFrame::ProgressBarSetVal(int progress)
   if (m_PBCalls.size()>0 && (m_PBCalls.at((m_PBCalls.size()-1)) == m_ID_PBCall) )
   {
     m_Gauge->SetValue(progress);
-    SetStatusText(wxString::Format(" %d%% ",progress),3);
+    SetStatusText(albaString::Format(" %d%% ",progress),3);
     ::wxSafeYield(NULL,true); //fix on bug #2082
   }
 }

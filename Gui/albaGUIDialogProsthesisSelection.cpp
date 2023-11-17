@@ -33,6 +33,8 @@ PURPOSE. See the above copyright notice for more information.
 #include "wx\image.h"
 #include "wx\statline.h"
 #include "wx\window.h"
+#include "wx\filename.h"
+
 //#include "vtkPNGReader.h"
 
 enum PRODUCER_DIALOG_ID
@@ -153,7 +155,7 @@ void albaGUIDialogProsthesisSelection::CreateDialog()
 			m_ProducerImageFullName = DBDir + m_CurrentProducer->GetImgFileName();
 		}
 
-		wxString imagesPath = albaGetConfigDirectory().c_str();
+		wxString imagesPath = albaGetConfigDirectory().ToAscii();
 		wxString imgPath = imagesPath + "/Wizard/Producer.bmp"; // Default
 
 		if (wxFileExists(m_ProducerImageFullName))
@@ -168,7 +170,7 @@ void albaGUIDialogProsthesisSelection::CreateDialog()
 		wxImage *previewImage = new wxImage(400,140);
 		if (wxFileExists(imgPath))
 		{
-			previewImage->LoadFile(imgPath.c_str(), wxBITMAP_TYPE_ANY);
+			previewImage->LoadFile(imgPath.ToAscii(), wxBITMAP_TYPE_ANY);
 		}
 	
 		wxBitmap *previewBitmap = new wxBitmap(*previewImage);
@@ -291,7 +293,7 @@ void albaGUIDialogProsthesisSelection::UpdateDialog()
 		{
 			if (m_ProducerImageButton != NULL)
 			{
-				m_ProducerImageSizer->Remove(m_ProducerImageButton);
+				m_ProducerImageSizer->Remove((wxSizer *)m_ProducerImageButton);
 				delete m_ProducerImageButton;
 			}
 
@@ -299,7 +301,7 @@ void albaGUIDialogProsthesisSelection::UpdateDialog()
 			wxImage *previewImage = new wxImage();
 
 			wxString path, name, ext;
-			wxSplitPath(m_ProducerImageFullName, &path, &name, &ext);
+			wxFileName::SplitPath(m_ProducerImageFullName, &path, &name, &ext);
 						
 			if (ext == "png") // NOT USED
 			{
@@ -327,7 +329,7 @@ void albaGUIDialogProsthesisSelection::UpdateDialog()
 			}
 
 			wxBitmap *previewBitmap;
-			previewBitmap = new wxBitmap(previewImage);
+			previewBitmap = new wxBitmap(*previewImage);
 
 			m_ProducerImageButton = new albaGUIPicButton(this, previewBitmap, -1);
 			m_ProducerImageSizer->Add(m_ProducerImageButton, 0, wxALL | wxALIGN_CENTER, 0);

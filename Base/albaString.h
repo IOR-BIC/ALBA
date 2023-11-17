@@ -20,6 +20,7 @@
 #include "albaDefines.h"
 #include "albaBase.h" 
 #include <string.h>
+#include "wx/string.h"
 
 //----------------------------------------------------------
 // forward references:
@@ -205,6 +206,8 @@ public:
   /** Format given arguments according to format string. Format string format is
       that of vsprintf function */
   void Printf(const char *format, ...);
+
+	static wxString Format(const char *format, ...);
 
   /** like Printf but faster (you can specify output string size) */ 
   void NPrintf(unsigned long size, const char *format, ...);

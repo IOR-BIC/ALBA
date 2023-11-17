@@ -1,4 +1,0 @@
-314c314
-<                                 wxDynamicLibraryDetailsCreator::EnumModulesProc,
----
->                                 (PENUMLOADED_MODULES_CALLBACK)&wxDynamicLibraryDetailsCreator::EnumModulesProc,

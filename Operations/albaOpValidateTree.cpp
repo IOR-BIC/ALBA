@@ -180,14 +180,14 @@ int albaOpValidateTree::ValidateTree()
         absFilename << extension;
         absFilename.Replace("/","\\");
 
-        if (!wxFileExists(absFilename.c_str()))
+        if (!wxFileExists(absFilename.ToAscii()))
         {
-          ErrorLog(albaOpValidateTree::BINARY_FILE_NOT_PRESENT, absFilename.c_str());
+          ErrorLog(albaOpValidateTree::BINARY_FILE_NOT_PRESENT, absFilename.ToAscii());
           result = albaOpValidateTree::VALIDATE_ERROR;
         }
         else
         {
-          m_MSFTreeAbsFileNamesSet.insert(absFilename.c_str());
+          m_MSFTreeAbsFileNamesSet.insert(absFilename);
         }
       }
       else if (vme != NULL ) // any other vme type
@@ -256,14 +256,14 @@ int albaOpValidateTree::ValidateTree()
                 absFilename << urlString;
               }
 
-              if (!wxFileExists(absFilename.c_str()))
+              if (!wxFileExists(absFilename.ToAscii()))
               {
-                ErrorLog(albaOpValidateTree::BINARY_FILE_NOT_PRESENT, absFilename.c_str());
+                ErrorLog(albaOpValidateTree::BINARY_FILE_NOT_PRESENT, absFilename.ToAscii());
                 result = albaOpValidateTree::VALIDATE_ERROR;
               }
               else
               {
-                m_MSFTreeAbsFileNamesSet.insert(absFilename.c_str());
+                m_MSFTreeAbsFileNamesSet.insert(absFilename.ToAscii());
               }
             } // item != NULL
           } // for() on items
@@ -315,7 +315,7 @@ void albaOpValidateTree::ErrorLog(int error_num, const char *node_name, const ch
   }
 }
 
-int albaOpValidateTree::GetMSFTreeABSFileNamesSet( set<string> &fileNamesSet )
+int albaOpValidateTree::GetMSFTreeABSFileNamesSet( set<wxString> &fileNamesSet )
 {
   int result = this->ValidateTree(); // needed to fill m_MSFTreeBinaryFilesSet ivar
   

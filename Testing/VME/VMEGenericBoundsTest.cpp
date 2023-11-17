@@ -14,6 +14,8 @@
 
 =========================================================================*/
 // Test albaVMEGeneric class
+#include "albaDefines.h"
+
 #include "VMEGenericBoundsTest.h"
 #include "albaVMETests.h"
 
@@ -21,11 +23,7 @@
 #include "albaVMERoot.h"
 #include "albaTransform.h"
 #include "albaVMEOutput.h"
-//#include "albaDataVector.h"
-//#include "albaMatrixVector.h"
 #include "albaVMEIterator.h"
-//#include "albaTagArray.h"
-//#include "albaTagItem.h"
 #include "albaOBB.h"
 
 #include "vtkALBASmartPointer.h"
@@ -34,14 +32,9 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-//#include "vtkSphereSource.h"
 #include "vtkCubeSource.h"
-//#include "vtkConeSource.h"
-//#include "vtkCylinderSource.h"
-//#include "vtkAxes.h"
 #include "vtkDataSetMapper.h"
 #include "vtkPolyData.h"
-//#include "vtkGlyph3D.h"
 #include "vtkOutlineSource.h"
 #include "vtkCamera.h"
 #include "vtkProperty.h"

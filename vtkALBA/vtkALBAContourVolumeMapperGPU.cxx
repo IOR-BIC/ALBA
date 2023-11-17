@@ -823,7 +823,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
     DWORD	i[5] = { 0, 0, 0x27, 0, 0 };
     DWORD	o[5] = { 0, 0, 0, 0, 0 };
 
-    HDC hdc = CreateDC("DISPLAY", 0, 0, 0);
+    HDC hdc = CreateDCA("DISPLAY", nullptr, nullptr, nullptr);
 
     if (hdc == NULL) {
       return 0;

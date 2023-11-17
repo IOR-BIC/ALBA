@@ -120,15 +120,15 @@ void albaOpConnectivitySurface::CreateGui()
   m_Gui->Label("Input bounds dimensions:",true);
 
   albaString labelX;
-  labelX.Append(wxString::Format(_("DimX:  %.2f"),(bounds[1]-bounds[0])));
+  labelX.Append(albaString::Format(_("DimX:  %.2f"),(bounds[1]-bounds[0])));
   m_Gui->Label(labelX);
 
   albaString labelY;
-  labelY.Append(wxString::Format(_("DimY:  %.2f"),(bounds[3]-bounds[2])));
+  labelY.Append(albaString::Format(_("DimY:  %.2f"),(bounds[3]-bounds[2])));
   m_Gui->Label(labelY);
 
   albaString labelZ;
-  labelZ.Append(wxString::Format(_("DimZ:  %.2f"),(bounds[5]-bounds[4])));
+  labelZ.Append(albaString::Format(_("DimZ:  %.2f"),(bounds[5]-bounds[4])));
   m_Gui->Label(labelZ);
 
 
@@ -149,7 +149,7 @@ void albaOpConnectivitySurface::CreateGui()
   connectivityFilter->Update();
 
   int regionNumbers = connectivityFilter->GetNumberOfExtractedRegions();
-  m_NumberOfExtractedSurfaces = wxString::Format("%d", regionNumbers);
+  m_NumberOfExtractedSurfaces = albaString::Format("%d", regionNumbers);
 
   if(regionNumbers > 100)
   {
@@ -219,7 +219,7 @@ void albaOpConnectivitySurface::OnEvent(albaEventBase *alba_event)
 					connectivityFilter->Update();
 					regionNumbers = connectivityFilter->GetNumberOfExtractedRegions();
 				}
-				m_NumberOfExtractedSurfaces = wxString::Format("%d", regionNumbers);
+				m_NumberOfExtractedSurfaces = albaString::Format("%d", regionNumbers);
 				m_Gui->Update();
 			}
 			break;
@@ -327,12 +327,12 @@ void albaOpConnectivitySurface::OnVtkConnect()
 			albaVMESurface *surf;
 			albaNEW(surf);
 			surf->SetData(clean->GetOutput(),surf->GetTimeStamp());
-			surf->SetName(wxString::Format("%d_extr",region));
+			surf->SetName(albaString::Format("%d_extr",region));
 			m_ExtractedVmes.push_back(surf);
 		}
 	}
 
-  m_NumberOfExtractedSurfaces = wxString::Format("%d", m_ExtractedVmes.size());
+  m_NumberOfExtractedSurfaces = albaString::Format("%d", m_ExtractedVmes.size());
 
   if(regionNumbers > 100)
   {

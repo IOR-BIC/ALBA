@@ -66,7 +66,7 @@ void mmoCreateGenericVme::OpDo()
 
   albaNEW(m_vme);
   static int counter = 0;
-  wxString name = wxString::Format("vme generic %d",counter++);
+  wxString name = albaString::Format("vme generic %d",counter++);
   m_vme->SetName(name);
   m_vme->ReparentTo(m_Input);
   albaEventMacro(albaEvent(this,VME_ADD,m_vme));

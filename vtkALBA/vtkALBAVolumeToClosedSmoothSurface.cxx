@@ -16,6 +16,7 @@
 
 
 
+#define _WINSOCKAPI_ 
 
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"

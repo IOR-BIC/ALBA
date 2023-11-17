@@ -23,7 +23,6 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpImporterMetaImage.h"
-#include <wx/busyinfo.h>
 #include "albaEvent.h"
 
 #include "albaVME.h"
@@ -43,6 +42,8 @@
 #include "itkImageToVTKImageFilter.h"
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
+#include "wx/busyinfo.h"
+#include "wx/filename.h"
 
 
 //----------------------------------------------------------------------------
@@ -67,13 +68,14 @@ albaOp(label)
   m_VmeImage    = NULL;
   m_VmeGrayVol  = NULL;
 
-  m_FileDir = albaGetLastUserFolder().c_str();
+  m_FileDir = albaGetLastUserFolder();
 }
 //----------------------------------------------------------------------------
 albaOpImporterMetaImage::~albaOpImporterMetaImage()
 {
   albaDEL(m_VmeImage);
   albaDEL(m_VmeGrayVol);
+	mode_t tmp;
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpImporterMetaImage::Copy()   
@@ -89,7 +91,7 @@ void albaOpImporterMetaImage::OpRun()
   albaString f;
   if (m_File.IsEmpty())
   {
-    f = albaGetOpenFile(m_FileDir, wildc, _("Choose VTK file")).c_str();
+    f = albaGetOpenFile(m_FileDir, wildc, _("Choose VTK file"));
     m_File = f;
   }
 
@@ -121,7 +123,7 @@ int albaOpImporterMetaImage::ImportMetaImage()
 	using ReaderType = itk::ImageFileReader<InputImageTypeFloat>;
 	ReaderType::Pointer  reader = ReaderType::New();
 
-	reader->SetFileName(m_File.c_str());
+	reader->SetFileName(m_File.ToAscii());
 	reader->Update();
 	InputImageTypeFloat *itkImage=reader->GetOutput();
 	
@@ -129,7 +131,7 @@ int albaOpImporterMetaImage::ImportMetaImage()
 	if (itkImage != NULL)
 	{
 		wxString path, name, ext;
-		wxSplitPath(m_File.c_str(), &path, &name, &ext);
+		wxFileName::SplitPath(m_File.ToAscii(), &path, &name, &ext);
 
 		ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
 		itkTOvtk->SetInput(itkImage);
@@ -200,7 +202,7 @@ int albaOpImporterMetaImage::ImportMetaImage()
 			tag_Nature.SetValue("NATURAL");
 			m_Output->GetTagArray()->SetTag(tag_Nature);
 			m_Output->ReparentTo(m_Input);
-			m_Output->SetName(name.c_str());
+			m_Output->SetName(name.ToAscii());
 
 			success = true;
 		}

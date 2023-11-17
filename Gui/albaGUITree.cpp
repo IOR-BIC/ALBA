@@ -395,7 +395,7 @@ bool albaGUITree::SelectNode(long long node_id)
 void albaGUITree::OnSize(wxSizeEvent& event)
 //----------------------------------------------------------------------------
 {
-	albaGUINamedPanel::OnSize(event);
+	albaGUINamedPanel::Layout();
   m_NodeTree->Refresh();
 }
 //----------------------------------------------------------------------------

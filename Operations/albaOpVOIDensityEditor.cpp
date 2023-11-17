@@ -171,15 +171,9 @@ void albaOpVOIDensityEditor::OnEvent(albaEventBase *alba_event)
 void albaOpVOIDensityEditor::EditVolumeScalars()
 //----------------------------------------------------------------------------
 {
-  wxInfoFrame *wait;
+  wxBusyInfo *wait;
   if(!m_TestMode)
-  {
-    wait = new wxInfoFrame(m_Gui, "Editing VME volume density...");
-    wait->SetWindowStyleFlag(wxSTAY_ON_TOP); //to keep wait message on top
-    wait->Show(true);
-    wait->Refresh();
-    wait->Update();
-  }
+    wait = new wxBusyInfo("Editing VME volume density...",m_Gui);
 
   double b[6];
   double point[3];

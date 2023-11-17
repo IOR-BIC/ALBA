@@ -13,7 +13,9 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "albaDefines.h"
 
+#include "albaString.h"
 #include <wx/wx.h>
 #include <wx/minifram.h>
 #include <wx/image.h>
@@ -1153,7 +1155,7 @@ wxDockUIPart* wxFrameManager::HitTest(int x, int y)
             continue;
            
         // if the point is inside the rectangle, we have a hit
-        if (item->m_Rect.Inside(x,y))
+        if (item->m_Rect.Contains(x,y))
             result = item;
     }
     
@@ -1192,7 +1194,7 @@ void wxFrameManager::SetFrame(wxFrame* frame)
     if (frame->IsKindOf(CLASSINFO(wxMDIParentFrame)))
     {
         wxMDIParentFrame* mdi_frame = (wxMDIParentFrame*)frame;
-        wxMDIClientWindow* client_window = mdi_frame->GetClientWindow();
+				wxMDIClientWindow* client_window = dynamic_cast<wxMDIClientWindow*>(mdi_frame->GetClientWindow());
 
         wxASSERT_MSG(client_window, wxT("Client window is NULL!"));
 
@@ -1228,7 +1230,7 @@ void wxFrameManager::ProcessMgrEvent(wxFrameManagerEvent& event)
     // first, give the owner frame a chance to override
     if (m_Frame)
     {
-        if (m_Frame->ProcessEvent(event))
+        if (m_Frame->ProcessWindowEvent(event))
             return;
     }
 
@@ -1428,7 +1430,7 @@ static wxString EscapeDelimiters(const wxString& s)
 {
     wxString result;
     result.Alloc(s.Length());
-    const wxChar* ch = s.c_str();
+    const wxChar* ch = s.ToAscii();
     while (*ch)
     {
         if (*ch == wxT(';') || *ch == wxT('|'))
@@ -1464,22 +1466,22 @@ wxString wxFrameManager::SavePerspective()
         result += EscapeDelimiters(pane.m_Caption);
         result += wxT(";");
         
-        result += wxString::Format(wxT("state=%u;"), pane.m_State);
-        result += wxString::Format(wxT("dir=%d;"), pane.m_DockDirection);
-        result += wxString::Format(wxT("layer=%d;"), pane.m_DockLayer);
-        result += wxString::Format(wxT("row=%d;"), pane.m_DockRow);
-        result += wxString::Format(wxT("pos=%d;"), pane.m_DockPos);
-        result += wxString::Format(wxT("prop=%d;"), pane.m_DockProportion);
-        result += wxString::Format(wxT("bestw=%d;"), pane.m_BestSize.x);
-        result += wxString::Format(wxT("besth=%d;"), pane.m_BestSize.y);
-        result += wxString::Format(wxT("minw=%d;"), pane.m_MinSize.x);
-        result += wxString::Format(wxT("minh=%d;"), pane.m_MinSize.y);
-        result += wxString::Format(wxT("maxw=%d;"), pane.m_MaxSize.x);
-        result += wxString::Format(wxT("maxh=%d;"), pane.m_MaxSize.y);
-        result += wxString::Format(wxT("floatx=%d;"), pane.m_FloatingPos.x);
-        result += wxString::Format(wxT("floaty=%d;"), pane.m_FloatingPos.y);
-        result += wxString::Format(wxT("floatw=%d;"), pane.m_FloatingSize.x);
-        result += wxString::Format(wxT("floath=%d"), pane.m_FloatingSize.y);
+        result += albaString::Format(wxT("state=%u;"), pane.m_State);
+        result += albaString::Format(wxT("dir=%d;"), pane.m_DockDirection);
+        result += albaString::Format(wxT("layer=%d;"), pane.m_DockLayer);
+        result += albaString::Format(wxT("row=%d;"), pane.m_DockRow);
+        result += albaString::Format(wxT("pos=%d;"), pane.m_DockPos);
+        result += albaString::Format(wxT("prop=%d;"), pane.m_DockProportion);
+        result += albaString::Format(wxT("bestw=%d;"), pane.m_BestSize.x);
+        result += albaString::Format(wxT("besth=%d;"), pane.m_BestSize.y);
+        result += albaString::Format(wxT("minw=%d;"), pane.m_MinSize.x);
+        result += albaString::Format(wxT("minh=%d;"), pane.m_MinSize.y);
+        result += albaString::Format(wxT("maxw=%d;"), pane.m_MaxSize.x);
+        result += albaString::Format(wxT("maxh=%d;"), pane.m_MaxSize.y);
+        result += albaString::Format(wxT("floatx=%d;"), pane.m_FloatingPos.x);
+        result += albaString::Format(wxT("floaty=%d;"), pane.m_FloatingPos.y);
+        result += albaString::Format(wxT("floatw=%d;"), pane.m_FloatingSize.x);
+        result += albaString::Format(wxT("floath=%d"), pane.m_FloatingSize.y);
         result += wxT("|");
     }
     
@@ -1488,7 +1490,7 @@ wxString wxFrameManager::SavePerspective()
     {
         wxDockInfo& dock = m_Docks.Item(dock_i);
         
-        result += wxString::Format(wxT("dock_size(%d,%d,%d)=%d|"),
+        result += albaString::Format(wxT("dock_size(%d,%d,%d)=%d|"),
                                    dock.m_DockDirection, dock.m_DockLayer,
                                    dock.m_DockRow, dock.m_Size);
     }
@@ -1582,37 +1584,37 @@ bool wxFrameManager::LoadPerspective(const wxString& layout, bool update)
             else if (val_name == wxT("caption"))
                 pane.m_Caption = value;
             else if (val_name == wxT("state"))
-                pane.m_State = (unsigned int)wxAtoi(value.c_str());
+                pane.m_State = (unsigned int)wxAtoi(value.ToAscii());
             else if (val_name == wxT("dir"))
-                pane.m_DockDirection = wxAtoi(value.c_str());
+                pane.m_DockDirection = wxAtoi(value.ToAscii());
             else if (val_name == wxT("layer"))
-                pane.m_DockLayer = wxAtoi(value.c_str());
+                pane.m_DockLayer = wxAtoi(value.ToAscii());
             else if (val_name == wxT("row"))
-                pane.m_DockRow = wxAtoi(value.c_str());
+                pane.m_DockRow = wxAtoi(value.ToAscii());
             else if (val_name == wxT("pos"))
-                pane.m_DockPos = wxAtoi(value.c_str());
+                pane.m_DockPos = wxAtoi(value.ToAscii());
             else if (val_name == wxT("prop"))
-                pane.m_DockProportion = wxAtoi(value.c_str());
+                pane.m_DockProportion = wxAtoi(value.ToAscii());
             else if (val_name == wxT("bestw"))
-                pane.m_BestSize.x = wxAtoi(value.c_str());
+                pane.m_BestSize.x = wxAtoi(value.ToAscii());
             else if (val_name == wxT("besth"))
-                pane.m_BestSize.y = wxAtoi(value.c_str());
+                pane.m_BestSize.y = wxAtoi(value.ToAscii());
             else if (val_name == wxT("minw"))
-                pane.m_MinSize.x = wxAtoi(value.c_str());
+                pane.m_MinSize.x = wxAtoi(value.ToAscii());
             else if (val_name == wxT("minh"))
-                pane.m_MinSize.y = wxAtoi(value.c_str());
+                pane.m_MinSize.y = wxAtoi(value.ToAscii());
             else if (val_name == wxT("maxw"))
-                pane.m_MaxSize.x = wxAtoi(value.c_str());
+                pane.m_MaxSize.x = wxAtoi(value.ToAscii());
             else if (val_name == wxT("maxh"))
-                pane.m_MaxSize.y = wxAtoi(value.c_str());
+                pane.m_MaxSize.y = wxAtoi(value.ToAscii());
             else if (val_name == wxT("floatx"))
-                pane.m_FloatingPos.x = wxAtoi(value.c_str());
+                pane.m_FloatingPos.x = wxAtoi(value.ToAscii());
             else if (val_name == wxT("floaty"))
-                pane.m_FloatingPos.y = wxAtoi(value.c_str());
+                pane.m_FloatingPos.y = wxAtoi(value.ToAscii());
             else if (val_name == wxT("floatw"))
-                pane.m_FloatingSize.x = wxAtoi(value.c_str());
+                pane.m_FloatingSize.x = wxAtoi(value.ToAscii());
             else if (val_name == wxT("floath"))
-                pane.m_FloatingSize.y = wxAtoi(value.c_str());
+                pane.m_FloatingSize.y = wxAtoi(value.ToAscii());
             else {
                 wxFAIL_MSG(wxT("Bad Perspective String"));
             }
@@ -3110,7 +3112,7 @@ void wxFrameManager::ShowHint(const wxRect& rect)
     // go ahead and use a transparent hint
     
     if ((m_Flags & wxAUI_MGR_TRANSPARENT_HINT) != 0 &&
-        os_type == wxWINDOWS_NT && ver_major >= 5)
+        os_type == wxOS_WINDOWS_NT && ver_major >= 5)
     {
         if (m_LastHint == rect)
             return;

@@ -1,3 +1,0 @@
-170a171,172
-> 		#elif defined(_MSC_VER) && _MSC_VER >= 1900
-> 				#define WX_TIMEZONE _timezone

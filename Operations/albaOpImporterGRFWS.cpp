@@ -45,6 +45,8 @@
 
 #include <iostream>
 #include "albaProgressBarHelper.h"
+#include "wx/filename.h"
+
 
 #define DELTA 5.0
 
@@ -56,7 +58,7 @@ albaOp(label)
 	m_OpType       	= OPTYPE_IMPORTER;
 	m_Canundo	      = true;
 	m_File		      = "";
-	m_FileDir       = albaGetLastUserFolder().c_str();
+	m_FileDir       = albaGetLastUserFolder();
   m_Output        = NULL;
   m_PlatformLeft  = NULL;
   m_PlatformRight = NULL;
@@ -107,7 +109,7 @@ void albaOpImporterGRFWS::OpRun()
   int result = OP_RUN_CANCEL;
   wxString pgd_wildc	= "GRF File (*.*)|*.*";
   wxString f;
-  f = albaGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
+  f = albaGetOpenFile(m_FileDir,pgd_wildc); 
   if(!f.IsEmpty() && wxFileExists(f))
   {
     m_File = f;
@@ -126,11 +128,11 @@ void albaOpImporterGRFWS::Read()
   wxString line;
   line = text.ReadLine(); 
 
-  if (line.CompareTo("FORCE PLATES")== 0)
+  if (line.CompareTo(wxString("FORCE PLATES"))== 0)
   {
     ReadForcePlates();
   }
-  else if (line.CompareTo("VECTOR")== 0)
+  else if (line.CompareTo(wxString("VECTOR"))== 0)
   {
     ReadSingleVector();
   }
@@ -150,7 +152,7 @@ void albaOpImporterGRFWS::ReadForcePlates()
 
 
   wxString path, name, ext;
-  wxSplitPath(m_File.c_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File,&path,&name,&ext);
 
   albaTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");
@@ -184,7 +186,7 @@ void albaOpImporterGRFWS::ReadForcePlates()
   int comma = line.Find(',');
   wxString freq = line.SubString(0,comma - 1); //Read frequency 
   double freq_val;
-  freq_val = atof(freq.c_str());
+  freq_val = atof(freq.ToAscii());
 
   line = text.ReadLine(); //Skip textual lines
   line = text.ReadLine();
@@ -195,7 +197,7 @@ void albaOpImporterGRFWS::ReadForcePlates()
   albaString junk = corners1.GetNextToken(); //Value to ignore
   for (int i = 0 ; i < 12 ; i++)
   {
-    platform1St[i] = corners1.GetNextToken().c_str();
+    platform1St[i] = corners1.GetNextToken();
     platform1[i] = atof(platform1St[i]);
   }
   
@@ -205,7 +207,7 @@ void albaOpImporterGRFWS::ReadForcePlates()
   junk = corners2.GetNextToken(); //Value to ignore
   for (int i = 0 ; i < 12 ; i++)
   {
-    platform2St[i] = corners2.GetNextToken().c_str();
+    platform2St[i] = corners2.GetNextToken();
     platform2[i] = atof(platform2St[i]);
   }
 
@@ -287,22 +289,22 @@ void albaOpImporterGRFWS::ReadForcePlates()
   {
     line = text.ReadLine();
     wxStringTokenizer tkz(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
-    timeSt = tkz.GetNextToken().c_str();
+    timeSt = tkz.GetNextToken();
     time = atof(timeSt)/freq_val; 
    
     //Values of the first platform
-    cop1StX = tkz.GetNextToken().c_str();
-    cop1StY = tkz.GetNextToken().c_str();
-    cop1StZ = tkz.GetNextToken().c_str();
-    ref1StX = tkz.GetNextToken().c_str();
-    ref1StY = tkz.GetNextToken().c_str();
-    ref1StZ = tkz.GetNextToken().c_str();
-    force1StX = tkz.GetNextToken().c_str();
-    force1StY = tkz.GetNextToken().c_str();
-    force1StZ = tkz.GetNextToken().c_str();
-    moment1StX = tkz.GetNextToken().c_str();
-    moment1StY = tkz.GetNextToken().c_str();
-    moment1StZ = tkz.GetNextToken().c_str();
+    cop1StX = tkz.GetNextToken();
+    cop1StY = tkz.GetNextToken();
+    cop1StZ = tkz.GetNextToken();
+    ref1StX = tkz.GetNextToken();
+    ref1StY = tkz.GetNextToken();
+    ref1StZ = tkz.GetNextToken();
+    force1StX = tkz.GetNextToken();
+    force1StY = tkz.GetNextToken();
+    force1StZ = tkz.GetNextToken();
+    moment1StX = tkz.GetNextToken();
+    moment1StY = tkz.GetNextToken();
+    moment1StZ = tkz.GetNextToken();
 
     double cop1X = atof(cop1StX);
     double cop1Y = atof(cop1StY);
@@ -370,18 +372,18 @@ void albaOpImporterGRFWS::ReadForcePlates()
     }
 
     //Values of the second platform
-    cop2StX = tkz.GetNextToken().c_str();
-    cop2StY = tkz.GetNextToken().c_str();
-    cop2StZ = tkz.GetNextToken().c_str();
-    ref2StX = tkz.GetNextToken().c_str();
-    ref2StY = tkz.GetNextToken().c_str();
-    ref2StZ = tkz.GetNextToken().c_str();
-    force2StX = tkz.GetNextToken().c_str();
-    force2StY = tkz.GetNextToken().c_str();
-    force2StZ = tkz.GetNextToken().c_str();
-    moment2StX = tkz.GetNextToken().c_str();
-    moment2StY = tkz.GetNextToken().c_str();
-    moment2StZ = tkz.GetNextToken().c_str();
+    cop2StX = tkz.GetNextToken();
+    cop2StY = tkz.GetNextToken();
+    cop2StZ = tkz.GetNextToken();
+    ref2StX = tkz.GetNextToken();
+    ref2StY = tkz.GetNextToken();
+    ref2StZ = tkz.GetNextToken();
+    force2StX = tkz.GetNextToken();
+    force2StY = tkz.GetNextToken();
+    force2StZ = tkz.GetNextToken();
+    moment2StX = tkz.GetNextToken();
+    moment2StY = tkz.GetNextToken();
+    moment2StZ = tkz.GetNextToken();
 
     double cop2X = atof(cop2StX);
     double cop2Y = atof(cop2StY);
@@ -484,7 +486,7 @@ void albaOpImporterGRFWS::ReadSingleVector()
 	progressHelper.InitProgressBar();
 
   wxString path, name, ext;
-  wxSplitPath(m_File.c_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File,&path,&name,&ext);
 
   albaTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");
@@ -512,7 +514,7 @@ void albaOpImporterGRFWS::ReadSingleVector()
   int comma = line.Find(',');
   wxString freq = line.SubString(0,comma - 1); //Read frequency 
   double freq_val;
-  freq_val = atof(freq.c_str());
+  freq_val = atof(freq.ToAscii());
 
   line = text.ReadLine(); 
   line = text.ReadLine();
@@ -541,19 +543,19 @@ void albaOpImporterGRFWS::ReadSingleVector()
   {
     line = text.ReadLine();
     wxStringTokenizer tkz(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
-    timeSt = tkz.GetNextToken().c_str();
+    timeSt = tkz.GetNextToken();
     time = atof(timeSt)/freq_val; 
    
     //Values of the first platform
-    cop1StX = tkz.GetNextToken().c_str();
-    cop1StY = tkz.GetNextToken().c_str();
-    cop1StZ = tkz.GetNextToken().c_str();
-    ref1StX = tkz.GetNextToken().c_str();
-    ref1StY = tkz.GetNextToken().c_str();
-    ref1StZ = tkz.GetNextToken().c_str();
-    force1StX = tkz.GetNextToken().c_str();
-    force1StY = tkz.GetNextToken().c_str();
-    force1StZ = tkz.GetNextToken().c_str();
+    cop1StX = tkz.GetNextToken();
+    cop1StY = tkz.GetNextToken();
+    cop1StZ = tkz.GetNextToken();
+    ref1StX = tkz.GetNextToken();
+    ref1StY = tkz.GetNextToken();
+    ref1StZ = tkz.GetNextToken();
+    force1StX = tkz.GetNextToken();
+    force1StY = tkz.GetNextToken();
+    force1StZ = tkz.GetNextToken();
 
     double cop1X = atof(cop1StX);
     double cop1Y = atof(cop1StY);

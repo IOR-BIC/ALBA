@@ -49,6 +49,8 @@
 #include "vtkCallbackCommand.h"
 #include "vtkXMLStructuredGridReader.h"
 #include "vtkALBASmartPointer.h"
+#include "wx/filename.h"
+
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpImporterVTKXML);
@@ -118,7 +120,7 @@ void albaOpImporterVTKXML::OpRun()
   albaString f;
   if (m_File.IsEmpty())
   {
-    f = albaGetOpenFile(m_FileDir, GetWildCard(), _("Choose VTK XML file")).c_str();
+    f = albaGetOpenFile(m_FileDir, GetWildCard(), _("Choose VTK XML file"));
     m_File = f;
   }
 
@@ -128,13 +130,13 @@ void albaOpImporterVTKXML::OpRun()
     if (ImportVTKXML() == ALBA_OK)
     {
       wxString path, name, ext;
-      wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
+      wxFileName::SplitPath(m_File.GetCStr(),&path,&name,&ext);
       albaTagItem tag_Nature;
       tag_Nature.SetName("VME_NATURE");
       tag_Nature.SetValue("NATURAL");
       m_Output->GetTagArray()->SetTag(tag_Nature);
       m_Output->ReparentTo(m_Input);
-      m_Output->SetName(name.c_str());
+      m_Output->SetName(name.ToAscii());
 
       result = OP_RUN_OK;
     }
@@ -191,7 +193,7 @@ int albaOpImporterVTKXML::ImportVTKXML()
   albaNEW(m_VmeGeneric);
 
 	wxString path, name, ext;
-	wxSplitPath(m_File, &path, &name, &ext);
+	wxFileName::SplitPath(m_File.GetCStr(), &path, &name, &ext);
 
 	if (ext == "vti")
 	{

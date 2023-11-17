@@ -167,7 +167,7 @@ void albaGUILutSwatch::OnMouseMotion(wxMouseEvent &event)
 	{
 		double *range = m_Lut->GetRange();
 		double v = range[0] + ((range[1] - range[0]) * x) / w;
-		m_Tip = wxString::Format(" value=%g ", v);
+		m_Tip = albaString::Format(" value=%g ", v);
 		m_MouseX = x;
 		Refresh();
 	}

@@ -38,29 +38,11 @@ static char albaLogBuffer[BUFFER_DIMENSION];
 void albaLogMessage(const char *format, ...)
 //------------------------------------------------------------------------------
 {
-  
   albaLogMutex.Lock();
-  ALBA_PRINT_MACRO(format,albaLogBuffer,sizeof(albaLogBuffer));
 
-#ifdef ALBA_USE_WX
-  wxString logStr;
-  logStr.Append(wxString::Format("%s", format));
-  if(logStr.size()<sizeof(albaLogBuffer))
-    wxLogMessage(albaLogBuffer);
-  else
-  {
-    long times;
-    times = logStr.size()/BUFFER_DIMENSION;
-    for(int count = 0; count <times+1; count++)
-    {
-      wxString temporary;
-      temporary.Append(logStr.SubString(count * BUFFER_DIMENSION, (count+1)*BUFFER_DIMENSION));
-      wxLogMessage(temporary);
-    }
-  }
-#else
-  cerr << albaLogBuffer;    
-#endif
+	ALBA_PRINT_MACRO(format,albaLogBuffer,sizeof(albaLogBuffer));
+  wxLogMessage(albaLogBuffer);
+	wxLogMessage("\n");
   
   albaLogMutex.Unlock();
 }

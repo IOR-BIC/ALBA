@@ -22,8 +22,6 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
 #include "wx/busyinfo.h"
 #include "wx/dir.h"
 
@@ -62,7 +60,7 @@
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkDoubleArray.h"
-
+#include "wx/filename.h"
 
 
 #include "albaMemDbg.h"
@@ -78,7 +76,7 @@ albaOpImporterRAWImages::albaOpImporterRAWImages(wxString label) : albaOp(label)
 {
   m_OpType					= OPTYPE_IMPORTER;
   m_Canundo					= true;
-  m_RawDirectory		= albaGetLastUserFolder().c_str();
+  m_RawDirectory		= albaGetLastUserFolder();
   m_VtkRawDirectory	= NULL;
   m_Output					= NULL;
 
@@ -288,8 +286,8 @@ void albaOpImporterRAWImages::CreateGui()
     m_Gui->Label(_("DimX:"), &m_DimXCrop);
     m_Gui->Label(_("DimY:"), &m_DimYCrop);
 
-    m_DimXCrop = wxString::Format("%d", 0);
-    m_DimYCrop = wxString::Format("%d", 0);
+    m_DimXCrop = albaString::Format("%d", 0);
+    m_DimYCrop = albaString::Format("%d", 0);
 
 		//////////////////////////////////////////////////////////////////////////
 		m_Gui->Label("");
@@ -486,9 +484,9 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
     case ID_COORD:
       {	
         m_Gui->Enable(ID_SPC_Z, true);
-        wxString rect_dir = albaGetLastUserFolder().c_str();
+        wxString rect_dir = albaGetLastUserFolder();
         wxString rect_wildc = _("Z_coordinates (*.txt)|*.txt");
-        wxString file = albaGetOpenFile(rect_dir,rect_wildc,_("Open Z coordinates file")).c_str();
+        wxString file = albaGetOpenFile(rect_dir,rect_wildc,_("Open Z coordinates file")).ToAscii();
         if (file != "")
         {
           m_CoordFile = file;
@@ -506,8 +504,7 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
 
           if (strcmp (title,"Z coordinates:") != 0)
           {
-            wxMessageDialog dialog( NULL,
-              "This is not a Z coordinates file!","",wxOK|wxICON_ERROR);	
+            wxMessageDialog dialog( NULL,"This is not a Z coordinates file!","",wxOK|wxICON_ERROR);	
             dialog.ShowModal();
             f_in.close();						
             m_Gui->Enable(ID_SPC_Z, true);
@@ -525,8 +522,7 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
 
           if (j != m_Dimension[2])
           {
-            wxMessageDialog dialog( NULL,
-              "z dimension is not correct!","",wxOK|wxICON_ERROR);
+            wxMessageDialog dialog( NULL,"z dimension is not correct!","",wxOK|wxICON_ERROR);
             dialog.ShowModal();
             m_Dimension[2] = j;
             m_Gui->Update();      
@@ -539,7 +535,7 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
     case ID_SLICE:
       {
         m_SliceSlider->SetValue(m_CurrentSlice);
-        m_SliceText->SetLabel(wxString::Format("%d",m_CurrentSlice));
+        m_SliceText->SetLabel(albaString::Format("%d",m_CurrentSlice));
         //throw down
       }
     case ID_LOOKUPTABLE:
@@ -666,8 +662,8 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
           m_Dialog->GetRWI()->CameraUpdate();
 
 
-          m_DimXCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
-          m_DimYCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
+          m_DimXCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
+          m_DimYCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
           m_Gui->Update();
         }
       }
@@ -728,8 +724,8 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
           }
         }
         m_Dialog->GetRWI()->CameraUpdate();
-        m_DimXCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
-        m_DimYCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
+        m_DimXCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
+        m_DimYCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
         m_Gui->Update();
       }
       break;
@@ -748,8 +744,8 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
         m_ROI_2D[2] = b[2];
         m_ROI_2D[3] = b[3];
       }
-      m_DimXCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
-      m_DimYCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
+      m_DimXCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
+      m_DimYCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
       m_Gui->Update();
       break;
     case wxOK:
@@ -779,7 +775,7 @@ void albaOpImporterRAWImages::	UpdateReader()
   m_Reader->SetFilePrefix(prefix);
 
   wxString pattern = m_Pattern + m_Extension;
-  m_Reader->SetFilePattern(pattern.c_str());
+  m_Reader->SetFilePattern(pattern.ToAscii());
 
   m_Reader->SetDataScalarType(GetVTKDataType());
   m_Reader->SetNumberOfScalarComponents(1);
@@ -886,7 +882,7 @@ bool albaOpImporterRAWImages::Import()
   wxString pattern = m_Pattern + m_Extension;
   vtkALBASmartPointer< vtkImageReader > r;
   r->SetFilePrefix(prefix);
-  r->SetFilePattern(pattern.c_str());
+  r->SetFilePattern(pattern.ToAscii());
 
   r->SetDataScalarType(GetVTKDataType());
   r->SetNumberOfScalarComponents(1);
@@ -927,7 +923,7 @@ bool albaOpImporterRAWImages::Import()
 
   wxString slice_name = m_RawDirectory;
   wxString path, name, ext;
-  wxSplitPath(slice_name.c_str(),&path,&name,&ext);
+	wxFileName::SplitPath(slice_name, &path, &name, &ext);
 
   vtkALBASmartPointer<vtkImageToStructuredPoints> convert;
 
@@ -1069,7 +1065,7 @@ bool albaOpImporterRAWImages::Import()
    tag_Nature.SetName(_("VME_NATURE"));
    tag_Nature.SetValue(_("NATURAL"));
 
-   m_Output->SetName(name.c_str());
+   m_Output->SetName(name.ToAscii());
    m_Output->ReparentTo(m_Input);
 
    m_Output->GetTagArray()->SetTag(tag_Nature);
@@ -1110,7 +1106,7 @@ void albaOpImporterRAWImages::OnStringPrefix()
     m_SliceSlider->SetRange(0,m_NumberSlices - 1);
     m_CurrentSlice = m_NumberSlices/2;	
     m_SliceSlider->SetValue(m_CurrentSlice);
-    m_SliceText->SetLabel(wxString::Format("%d",m_CurrentSlice));
+    m_SliceText->SetLabel(albaString::Format("%d",m_CurrentSlice));
     m_Actor->VisibilityOn();
     m_Dialog->GetRWI()->CameraReset();    	 
     m_Gui->Update();
@@ -1125,7 +1121,7 @@ void albaOpImporterRAWImages::OnOpenDir()
 
   vtkNEW(m_VtkRawDirectory);
   if (m_VtkRawDirectory->Open(m_RawDirectory) == 0)
-    wxLogMessage("Directory <%s> can not be opened", m_RawDirectory);
+    albaLogMessage("Directory <%s> can not be opened", m_RawDirectory);
 
   if(!this->m_TestMode)
   {
@@ -1157,7 +1153,7 @@ bool albaOpImporterRAWImages::ControlFilenameList()
   const wxString FileSpec = "*" + m_Extension;
   const int flags = wxDIR_FILES;
 
-  if (m_RawDirectory.GetCStr() != wxEmptyString && wxDirExists(m_RawDirectory.GetCStr()))
+  if (m_RawDirectory != wxEmptyString && wxDirExists(m_RawDirectory.GetCStr()))
   {
     // Get all .zip files
     wxDir::GetAllFiles(m_RawDirectory.GetCStr(), &SkinFiles, FileSpec, flags);
@@ -1167,7 +1163,7 @@ bool albaOpImporterRAWImages::ControlFilenameList()
   wxString numbers = m_Pattern.AfterLast('%');
   numbers = numbers.Mid(0,numbers.Length()-1);
 
-  int n = atoi(numbers.c_str());
+  int n = atoi(numbers.ToAscii());
 
   for(long number = m_Offset,  j =0; number<m_Offset+SkinFiles.GetCount()*m_FileSpacing;number = number + m_FileSpacing, j++)
   {
@@ -1176,7 +1172,7 @@ bool albaOpImporterRAWImages::ControlFilenameList()
     fileName = fileName.BeforeLast('.');
 
     wxString search;
-    search = wxString::Format("%ld",number);
+    search = albaString::Format("%ld",number);
 
     wxString final;
     for(int i=0; i< n; i++)

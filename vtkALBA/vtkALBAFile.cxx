@@ -11,7 +11,8 @@
   =========================================================================
 */
 
-#include "albaDefines.h" 
+#include "albaDefines.h"
+#include "albaString.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -108,7 +109,7 @@ void vtkALBAFile2::Create(const char* fname) throw(...)
   if (!vtkALBAFile::Create(fname))
   {
     throw std::ios::failure(
-      (const char*)wxString::Format(_("Cannot create '%s'. Error: %d"), fname, errno));
+      (const char*)albaString::Format(_("Cannot create '%s'. Error: %d"), fname, errno));
   }
 }
 
@@ -119,7 +120,7 @@ void vtkALBAFile2::Open(const char* fname, bool bRO) throw(...)
   if (!vtkALBAFile::Open(fname))
   {
     throw std::ios::failure(
-      (const char*)wxString::Format(_("Cannot open '%s'. Error: %d"), fname, errno));
+      (const char*)albaString::Format(_("Cannot open '%s'. Error: %d"), fname, errno));
   }
 }
 

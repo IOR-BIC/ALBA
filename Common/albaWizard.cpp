@@ -249,18 +249,18 @@ void albaWizard::BlockExecutionEnd()
     else 
     {
       //getting the wizard substring
-      albaString wizardName = nextBlock.SubString(7,nextBlock.size()-2).c_str();
+      albaString wizardName = nextBlock.SubString(7,nextBlock.size()-2);
       albaEventMacro(albaEvent(this,WIZARD_SWITCH,&wizardName));
     }
   }
   else
   {
-    m_CurrentBlock=GetBlockByName(nextBlock.c_str());
+    m_CurrentBlock=GetBlockByName(nextBlock.ToAscii());
 
     //if the next block is undefined we abort the wizard execution
     if (m_CurrentBlock==NULL)
     {
-      albaLogMessage("Wizard Error: undefined block :'%s'",nextBlock.c_str());
+      albaLogMessage("Wizard Error: undefined block :'%s'",nextBlock.ToAscii());
       AbortWizard();
     }
     //else we start the execution of the next block to continue wizard flow
