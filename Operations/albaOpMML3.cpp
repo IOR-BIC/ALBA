@@ -451,9 +451,9 @@ void albaOpMML3::CreateInputsDlg()
 
   // Default slice direction x, y or z
   wxArrayString radioStrings ;
-  radioStrings.Add(wxT("x")) ;
-  radioStrings.Add(wxT("y")) ;
-  radioStrings.Add(wxT("z")) ;
+  radioStrings.Add("x") ;
+  radioStrings.Add("y") ;
+  radioStrings.Add("z") ;
   m_Radio_slicexyz = new wxRadioBox(m_InputsDlg, ID_INPUTS_SLICEXYZ, "Default direction", wxPoint(0,0), wxSize(150,50), radioStrings, 1, wxRA_SPECIFY_ROWS) ;
   m_Radio_slicexyz->SetValidator(albaGUIValidator(this, ID_INPUTS_SLICEXYZ, m_Radio_slicexyz, &m_Slicexyz));
   wxBoxSizer *sliceXYZHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -944,7 +944,7 @@ void albaOpMML3::CreateNonUniformSlicesDlg()
 
   // number of slices entry widgets (stacked in reverse order)
   for (int i = m_NumberOfNonUniformSections-1 ;  i >= 0 ;  i--){
-    wxString label = albaString::Format(wxT("%d"),i);
+    wxString label = albaString::Format("%d",i);
 
     m_NumSlicesLabel[i] = new wxStaticText(m_NonUniformSlicesDlg, wxID_ANY, label, wxPoint(0,0), wxSize(25,textCtrlHeight));
     m_NumSlicesEntry[i] = new wxTextCtrl(m_NonUniformSlicesDlg , wxID_ANY, "", wxPoint(0,0), wxSize(50,textCtrlHeight), wxNO_BORDER);
