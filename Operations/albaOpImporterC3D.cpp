@@ -131,7 +131,7 @@ albaOpImporterC3D::albaOpImporterC3D(const wxString &label) :
 	m_OpType = OPTYPE_IMPORTER;
 	m_Canundo = true;
 
-	m_FileDir = (albaGetApplicationDirectory() + "/Data/External/").c_str();
+	m_FileDir = (albaGetApplicationDirectory() + "/Data/External/");
 	m_DictionaryFileName = "";
 
 	//gui
@@ -232,13 +232,13 @@ bool albaOpImporterC3D::LoadDictionary()
 	while (dictionaryInputStream >> landmarkName)
 	{
 		dictionaryInputStream >> segmentName;
-		std::map<albaString, albaString>::iterator it = m_dictionaryStruct.find(landmarkName.c_str());
+		std::map<albaString, albaString>::iterator it = m_dictionaryStruct.find(albaString(landmarkName));
 		if (it != m_dictionaryStruct.end())
 		{
 			m_dictionaryStruct.clear();
 			return false;
 		}
-		m_dictionaryStruct[landmarkName.c_str()] = segmentName.c_str();
+		m_dictionaryStruct[albaString(landmarkName)] = segmentName;
 	}
 	return true;
 }
@@ -860,7 +860,7 @@ void albaOpImporterC3D::CreateGui()
 //----------------------------------------------------------------------------
 {
 	albaString wildcard = "c3d files (*.c3d)|*.c3d";
-	std::vector<std::string> files;
+	std::vector<wxString> files;
 	albaString f;
 
 	m_C3DInputFileNameFullPaths.clear();
@@ -868,7 +868,7 @@ void albaOpImporterC3D::CreateGui()
 		albaGetOpenMultiFiles(m_FileDir, wildcard, files);
 		for (unsigned i = 0; i < files.size(); i++)
 		{
-			f = files[i].c_str();
+			f = files[i];
 			m_C3DInputFileNameFullPaths.push_back(f);
 		}
 	}

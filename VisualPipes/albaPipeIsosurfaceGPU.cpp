@@ -255,10 +255,10 @@ void albaPipeIsosurfaceGPU::ExctractIsosurface()
 	m_ContourMapper->GetOutput(0, surface);
 	m_ContourMapper->Update();
 
-	wxString name = wxString::Format(_("Isosurface %g"),m_ContourValue);
+	wxString name = albaString::Format(_("Isosurface %g"),m_ContourValue);
 
 	albaNEW(m_IsosurfaceVme);
-	m_IsosurfaceVme->SetName(name.c_str());
+	m_IsosurfaceVme->SetName(name.ToAscii());
 	m_IsosurfaceVme->SetDataByDetaching(surface,0);
 
 	m_IsosurfaceVme->ReparentTo(m_Vme);

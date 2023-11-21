@@ -591,15 +591,15 @@ void albaOpRegisterClusters::OpRun()
 	albaVMELandmarkCloud* target = GetTarget();
 
 	albaNEW(m_Result);	
-	m_Result->SetName(wxString::Format("%s registered into %s", source->GetName(), m_Target->GetName()));
+	m_Result->SetName(albaString::Format("%s registered into %s", source->GetName(), m_Target->GetName()));
 	GetLogicManager()->VmeAdd(m_Result);
 		
 	albaNEW(m_Info);	
-	m_Info->SetName(wxString::Format("Info for registration %s into %s",source->GetName(), target->GetName()));
+	m_Info->SetName(albaString::Format("Info for registration %s into %s",source->GetName(), target->GetName()));
 	GetLogicManager()->VmeAdd(m_Info);
 	m_Info->ReparentTo(m_Result);
 
-	wxString name = wxString::Format("%s registered on %s",source->GetName(), target->GetName());
+	wxString name = albaString::Format("%s registered on %s",source->GetName(), target->GetName());
 	albaNEW(m_Registered);
 	m_Registered->DeepCopy(source);
 	m_Registered->CopyLandmarks(source);
@@ -612,7 +612,7 @@ void albaOpRegisterClusters::OpRun()
 		albaNEW(m_RegisteredFollower);
 		m_RegisteredFollower->DeepCopy(m_Follower);		
 		m_RegisteredFollower->SetName(name);
-		wxString name = wxString::Format("%s registered on %s",m_Follower->GetName(), target->GetName());
+		wxString name = albaString::Format("%s registered on %s",m_Follower->GetName(), target->GetName());
 		GetLogicManager()->VmeAdd(m_RegisteredFollower);
 		m_RegisteredFollower->ReparentTo(m_Result);
 	}

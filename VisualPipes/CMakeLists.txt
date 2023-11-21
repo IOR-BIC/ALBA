@@ -85,11 +85,11 @@ ENDIF(WIN32)
 
 
 IF (ALBA_USE_CRYPTO)
-  SET(PROJECT_LIBS ${PROJECT_LIBS} Crypto)
+  SET(PROJECT_LIBS ${PROJECT_LIBS} Crypto )
 ENDIF (ALBA_USE_CRYPTO)
 
 IF (ALBA_USE_VTK)
-  SET(PROJECT_LIBS ${PROJECT_LIBS} albaVME vtkIO vtkRendering vtkGraphics vtkHybrid albaDataPipes)
+  SET(PROJECT_LIBS ${PROJECT_LIBS} albaVME vtkIO vtkRendering vtkGraphics vtkHybrid albaDataPipes ${wxWidgets_LIBRARIES})
 ENDIF (ALBA_USE_VTK)
 
 # Create the library.

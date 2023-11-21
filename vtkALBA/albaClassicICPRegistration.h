@@ -85,7 +85,7 @@ public:
   
   void SetResultsFileName(const char *name);
   
-  const char *GetResultsFileName() {return this->ResultsFile.c_str(); }
+  const char *GetResultsFileName() {return this->ResultsFile.ToAscii(); }
 
   vtkSetMacro(Convergence, float);
   vtkGetMacro(Convergence, float);
@@ -140,7 +140,7 @@ protected:
   float Convergence;
   
   int SaveResults;
-  std::string ResultsFile;
+  wxString ResultsFile;
 
   albaICPUtility *ICPUtil;
 

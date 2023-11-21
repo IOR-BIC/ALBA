@@ -117,7 +117,7 @@ void albaOpExporterDicom::OpRun()
 	wxString lastDicomDir = GetSetting()->GetLastDicomDir();
 
 	if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
-		lastDicomDir = albaGetLastUserFolder().c_str();
+		lastDicomDir = albaGetLastUserFolder();
 
 	wxDirDialog dialog(NULL, "Choose directory where to save files:", lastDicomDir, wxDD_DEFAULT_STYLE);
 	dialog.SetReturnCode(wxID_OK);
@@ -575,6 +575,8 @@ albaString albaOpExporterDicom::GetIthFilename(int i)
 	name.Replace('.', '_');
 	name.Replace(',', '_');
 	name.Replace(':', '_');
+	name.Replace('/', '_');
+	name.Replace('\\', '_');
 	filename.Printf("%s/%s.%d.dcm", m_Folder.GetCStr(), name.GetCStr(), i);
 	return filename;
 }

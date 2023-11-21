@@ -928,7 +928,7 @@ void albaViewSliceOnCurve::Print(std::ostream& os, const int tabs)// const
     albaTransform::GetPosition(*gmat, pos);    //get the position
 
     //update text
-    wxString szText = wxString::Format("X = %.2f, Y = %.2f, Z = %.2f", pos[0], pos[1], pos[2]);
+    wxString szText = albaString::Format("X = %.2f, Y = %.2f, Z = %.2f", pos[0], pos[1], pos[2]);
     UpdateGizmoStatusText(szText);
   }
 }

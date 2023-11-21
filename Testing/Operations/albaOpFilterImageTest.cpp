@@ -112,6 +112,17 @@ void albaOpFilterImageTest::TestThresholdBinary()
 }
 
 //----------------------------------------------------------------------------
+void albaOpFilterImageTest::TestOtsu()
+{
+	albaVMEImage *imgout = albaVMEImage::SafeDownCast(m_TestOp->GetOutput());
+
+	m_TestOp->RunFilter(albaOpFilterImage::OTSU_THRESHOLD_FILTER);
+
+	COMPARE_VTK_IMAGES((vtkImageData *)imgout->GetOutput()->GetVTKData(), "OTSU_THRESHOLD_FILTER");
+
+}
+
+//----------------------------------------------------------------------------
 void albaOpFilterImageTest::TestGradientMagnitude()
 {
 	albaVMEImage *imgout = albaVMEImage::SafeDownCast(m_TestOp->GetOutput());

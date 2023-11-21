@@ -632,6 +632,23 @@ void albaInteractor2DMeasure_Angle::SetLineWidth(double width)
 	Render();
 }
 
+//---------------------------------------------------------------------------
+void albaInteractor2DMeasure_Angle::Show(bool show)
+{
+	for (int i = 0; i < GetMeasureCount(); i++)
+	{
+		m_PointsStackVectorOri[i]->SetVisibility(show);
+		m_PointsStackVectorA[i]->SetVisibility(show);
+		m_PointsStackVectorB[i]->SetVisibility(show);
+		m_LineStackVectorOA[i]->SetVisibility(show);
+		m_LineStackVectorOB[i]->SetVisibility(show);
+		m_CircleStackVector[i]->SetVisibility(show);
+		m_TextActorVector[i]->SetVisibility(show && m_ShowText);
+	}
+
+	Render();
+}
+
 /// UTILS ///////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
 void albaInteractor2DMeasure_Angle::GetMeasureLinePoints(int index, double *point1, double *point2, double *point3)
@@ -642,7 +659,7 @@ void albaInteractor2DMeasure_Angle::GetMeasureLinePoints(int index, double *poin
 		vtkPointSource* pointSourceO = (vtkPointSource*)m_PointsStackVectorOri[index]->GetSource();
 		vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[index]->GetSource();
 		vtkPointSource* pointSourceB = (vtkPointSource*)m_PointsStackVectorB[index]->GetSource();
-
+		
 		pointSourceO->GetCenter(point1);
 		pointSourceA->GetCenter(point2);
 		pointSourceB->GetCenter(point3);

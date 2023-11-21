@@ -422,6 +422,22 @@ void albaInteractor2DMeasure_MidPoint::SelectMeasure(int index)
 	}
 }
 
+//----------------------------------------------------------------------------
+void albaInteractor2DMeasure_MidPoint::Show(bool show)
+{
+	for (int i = 0; i < GetMeasureCount(); i++)
+	{
+		m_LineStackVector[i]->SetVisibility(show);
+		m_PointsStackVectorR[i]->SetVisibility(show);
+		m_PointsStackVectorL[i]->SetVisibility(show);
+		m_MidPointsStackVector[i]->SetVisibility(show);
+
+		m_TextActorVector[i]->SetVisibility(show && m_ShowText);
+	}
+
+	Render();
+}
+
 // SET/GET
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_MidPoint::SetPointSize(double size)

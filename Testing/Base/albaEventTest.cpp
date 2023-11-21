@@ -13,6 +13,8 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "albaDefines.h"
+
 #include "albaEventTest.h"
 #include "albaBaseTests.h"
 #include "albaEventBase.h"

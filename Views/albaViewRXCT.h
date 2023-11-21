@@ -72,6 +72,15 @@ public:
   /** Create visual pipe and initialize them to build a RXCT view */
   void PackageView();
   
+	/** Views IDs */
+	enum RXCT_SUBVIEW_ID
+	{
+		RX_FRONT_VIEW = 0,
+		RX_SIDE_VIEW,
+		CT_COMPOUND_VIEW,
+		VIEWS_NUMBER,
+	};
+
   /** IDs for the GUI */
   enum VIEW_RXCT_WIDGET_ID
   {
@@ -81,6 +90,7 @@ public:
 		ID_RIGHT_OR_LEFT,
     ID_SNAP,
     ID_ADJUST_SLICES,
+		ID_BALANCE_SLICES,
     ID_BORDER_CHANGE,
     ID_ALL_SURFACE,
     ID_RESET_SLICES,
@@ -99,6 +109,10 @@ public:
 
 	/** return an xpm-icon that can be used to represent this view */
 	char ** GetIcon();
+
+	/** Sets the height of a slicer, use -1 as slicer id to set the nearest slicer
+			Returns the index of the updated slicer */
+	int SetSlicerHeight(double zPos, int slicerId = -1);
 
 protected:
   /**
@@ -147,6 +161,8 @@ protected:
 	void OnEventRangeModified(albaEventBase *alba_event);
   /** Precess events coming from other objects */
 	void OnEventSortSlices(albaVME *vme = NULL);
+	/** Put slices at constant distance */
+	void OnEventBalanceSlices();
   /** Precess events coming from other objects */
 	void OnEventSetThickness();
 
@@ -154,6 +170,8 @@ protected:
 	void SetBorder(albaPipe * p);
 	/** Precess events coming from other objects */
   void OnEventMouseMove(albaEvent *e);
+
+
   int			m_Sort[6];
   double	m_Pos[6];
 

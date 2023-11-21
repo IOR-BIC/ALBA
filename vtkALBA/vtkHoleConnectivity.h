@@ -19,6 +19,8 @@ under ALBA
 #ifndef __vtkHoleConnectivity_h
 #define __vtkHoleConnectivity_h
 
+#define _WINSOCKAPI_ 
+
 #include "vtkPolyDataToPolyDataFilter.h"
 #include "albaConfigure.h"
 /**

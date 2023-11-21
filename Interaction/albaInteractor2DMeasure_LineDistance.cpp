@@ -575,6 +575,24 @@ void albaInteractor2DMeasure_LineDistance::SetLineWidth(double width)
 	Render();
 }
 
+//---------------------------------------------------------------------------
+void albaInteractor2DMeasure_LineDistance::Show(bool show)
+{
+	for (int i = 0; i < GetMeasureCount(); i++)
+	{
+		m_LineStackVector[i]->SetVisibility(show);
+		m_LineStackVectorB[i]->SetVisibility(show);
+
+		m_PointsStackVectorR[i]->SetVisibility(show);
+		m_PointsStackVectorL[i]->SetVisibility(show);
+		m_LineStackVectorPerp[i]->SetVisibility(show);
+
+		m_TextActorVector[i]->SetVisibility(show && m_ShowText);
+	}
+
+	Render();
+}
+
 /// UTILS ///////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
 void albaInteractor2DMeasure_LineDistance::GetMeasureLinePoints(int index, double *point1, double *point2)

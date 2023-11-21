@@ -239,11 +239,10 @@ void albaViewManagerTest::ViewCreateTest()
   CPPUNIT_ASSERT(m_Manager->GetList() == createdView1); // check if the created view is inside the view list
   CPPUNIT_ASSERT(m_EventResult == VIEW_CREATED); // check if the raised event is view creation
 
-  // Must delete all to remove leaks
+  // Must close all to remove leaks
   wxFrame *frame = createdView1->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
 
   // Test create by view type name
   // Create a view from the template array
@@ -252,11 +251,10 @@ void albaViewManagerTest::ViewCreateTest()
   CPPUNIT_ASSERT(m_Manager->GetList()->m_Next == createdView2); // check if the created view is inside the view list
   CPPUNIT_ASSERT(m_EventResult == VIEW_CREATED); // check if the raised event is view creation
 
-  // Must delete all to remove leaks
+  // Must close all to remove leaks
   frame = createdView2->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
 }
 //----------------------------------------------------------------------------
 void albaViewManagerTest::ViewDeleteTest()
@@ -289,15 +287,13 @@ void albaViewManagerTest::GetViewTest()
 
   CPPUNIT_ASSERT(m_Manager->GetView(createdView1->m_Id,createdView1->m_Mult) == createdView1); // check that the first view is the same created in the fist position of the view matrix
 
-  // Must delete all to remove leaks
+  // Must close all to remove leaks
   wxFrame *frame = createdView1->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
   frame = createdView2->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
 }
 //----------------------------------------------------------------------------
 void albaViewManagerTest::GetListTest()
@@ -382,16 +378,13 @@ void albaViewManagerTest::VmeAddTest()
   CPPUNIT_ASSERT(view2->GetVME(0) == root);
   CPPUNIT_ASSERT(view2->GetVME(1) == vme);
 
-  // Must delete all to remove leaks
+  // Must close all to remove leaks
   wxFrame *frame = view1->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
   frame = view2->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
-
 
   albaDEL(root);
   albaDEL(vme);
@@ -424,15 +417,13 @@ void albaViewManagerTest::VmeRemoveTest()
   CPPUNIT_ASSERT(view1->GetVME(1) == NULL);
   CPPUNIT_ASSERT(view2->GetVME(1) == NULL);
 
-  // Must delete all to remove leaks
+  // Must close all to remove leaks
   wxFrame *frame = view1->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
   frame = view2->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
 
   albaDEL(root);
   albaDEL(vme);
@@ -466,15 +457,13 @@ void albaViewManagerTest::VmeSelectTest()
   CPPUNIT_ASSERT(view1->GetSelectedVME() == vme);
   CPPUNIT_ASSERT(view2->GetSelectedVME() == vme);
 
-  // Must delete all to remove leaks
+  // Must close all to remove leaks
   wxFrame *frame = view1->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
   frame = view2->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
 
   albaDEL(root);
   albaDEL(vme);
@@ -509,15 +498,13 @@ void albaViewManagerTest::VmeShowTest()
   CPPUNIT_ASSERT(view1->GetShownVME() == vme);
   CPPUNIT_ASSERT(view2->GetShownVME() == NULL); // only affect selected view!
 
-  // Must delete all to remove leaks
+  // Must close all to remove leaks
   wxFrame *frame = view1->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
   frame = view2->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
 
   albaDEL(root);
   albaDEL(vme);
@@ -552,15 +539,13 @@ void albaViewManagerTest::CameraResetTest()
   CPPUNIT_ASSERT(view1->GetCameraReset() == true);
   CPPUNIT_ASSERT(view2->GetCameraReset() == false); // only affect selected view!
 
-  // Must delete all to remove leaks
+  // Must close all to remove leaks
   wxFrame *frame = view1->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
   frame = view2->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
 
   albaDEL(root);
   albaDEL(vme);
@@ -600,15 +585,13 @@ void albaViewManagerTest::CameraUpdateTest()
   CPPUNIT_ASSERT(view1->GetCameraUpdate() == true);
   CPPUNIT_ASSERT(view2->GetCameraUpdate() == true);
 
-  // Must delete all to remove leaks
+  // Must close all to remove leaks
   wxFrame *frame = view1->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
   frame = view2->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
 
   albaDEL(root);
   albaDEL(vme);
@@ -643,15 +626,13 @@ void albaViewManagerTest::PropertyUpdateTest()
   CPPUNIT_ASSERT(view1->GetUpdatedVME() == vme);
   CPPUNIT_ASSERT(view2->GetUpdatedVME() == vme);
 
-  // Must delete all to remove leaks
+  // Must close all to remove leaks
   wxFrame *frame = view1->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
   frame = view2->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
 
   albaDEL(root);
   albaDEL(vme);
@@ -681,15 +662,13 @@ void albaViewManagerTest::GetCurrentRootTest()
 
   CPPUNIT_ASSERT(m_Manager->GetCurrentRoot() == root);
 
-  // Must delete all to remove leaks
+  // Must close all to remove leaks
   wxFrame *frame = view1->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
   frame = view2->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
 
   albaDEL(root);
   albaDEL(vme);
@@ -710,11 +689,10 @@ void albaViewManagerTest::SetMouseTest()
 
   CPPUNIT_ASSERT(m_Manager->m_Mouse == mouse);
 
-  // Must delete all to remove leaks
+  // Must close all to remove leaks
   wxFrame *frame = view1->GetFrame();
   frame->Show(false);
   frame->Close(true);
-  delete frame;
   albaDEL(mouse);
 }
 

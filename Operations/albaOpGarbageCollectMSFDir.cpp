@@ -98,7 +98,7 @@ Proceed?";
   albaEventMacro(albaEvent(this,OP_RUN_OK));
 }
 
-int albaOpGarbageCollectMSFDir::GetFilesToRemove( set<string> &filesToRemoveSet )
+int albaOpGarbageCollectMSFDir::GetFilesToRemove( set<wxString> &filesToRemoveSet )
 {
   assert(m_Input);
   albaOpValidateTree* validateTree = new albaOpValidateTree();
@@ -123,26 +123,26 @@ int albaOpGarbageCollectMSFDir::GetFilesToRemove( set<string> &filesToRemoveSet 
     return ALBA_ERROR;
   }
   
-  set<string> msfTreeFiles;
+  set<wxString> msfTreeFiles;
   result = validateTree->GetMSFTreeABSFileNamesSet(msfTreeFiles);
 
   if (result == ALBA_OK)
   {
-    set<string> msfDirFiles = this->GetMSFDirABSFileNamesSet();
+    set<wxString> msfDirFiles = this->GetMSFDirABSFileNamesSet();
 
     // add the msf file name:
     wxString msfXMLFileABSFileName = GetMSFXMLFileAbsFileName(m_Input);
 
     assert(wxFileExists(msfXMLFileABSFileName));
-    msfTreeFiles.insert(msfXMLFileABSFileName.c_str());
+    msfTreeFiles.insert(msfXMLFileABSFileName.ToAscii());
 
     // add the backup file if present:
     wxString msfXMLBackupFile = msfXMLFileABSFileName.Append(".bak");
     msfXMLBackupFile.Replace("/","\\");
 
-    if (wxFileExists(msfXMLBackupFile.c_str()))
+    if (wxFileExists(msfXMLBackupFile.ToAscii()))
     {
-      msfTreeFiles.insert(msfXMLBackupFile.c_str());
+      msfTreeFiles.insert(msfXMLBackupFile.ToAscii());
     }
 
     filesToRemoveSet = SetDifference(msfDirFiles, msfTreeFiles);
@@ -158,9 +158,9 @@ int albaOpGarbageCollectMSFDir::GetFilesToRemove( set<string> &filesToRemoveSet 
   return ALBA_OK;
 }
 
-void albaOpGarbageCollectMSFDir::PrintSet( set<string> inputSet )
+void albaOpGarbageCollectMSFDir::PrintSet( set<wxString> inputSet )
 {
-  set<string>::iterator iter;
+  set<wxString>::iterator iter;
   iter = inputSet.begin();
 
   ostringstream stringStream;
@@ -175,13 +175,13 @@ void albaOpGarbageCollectMSFDir::PrintSet( set<string> inputSet )
   albaLogMessage(stringStream.str().c_str());
 }
 
-set<string> albaOpGarbageCollectMSFDir::GetMSFDirABSFileNamesSet()
+set<wxString> albaOpGarbageCollectMSFDir::GetMSFDirABSFileNamesSet()
 {
   assert(m_Input);
   albaString msfABSPath = GetMSFDirAbsPath(m_Input);
   
   assert(msfABSPath.IsEmpty() == false);
-  assert(wxDirExists(msfABSPath));
+  assert(wxDirExists(msfABSPath.GetCStr()));
 
   m_MSFDirABSFileNamesSet.clear();
 
@@ -203,9 +203,9 @@ set<string> albaOpGarbageCollectMSFDir::GetMSFDirABSFileNamesSet()
     {
       continue;
     }
-    else if (wxFileExists(absFileName.c_str()))
+    else if (wxFileExists(absFileName.ToAscii()))
     {     
-      m_MSFDirABSFileNamesSet.insert(absFileName.c_str());
+      m_MSFDirABSFileNamesSet.insert(absFileName.ToAscii());
     }
   }
   
@@ -213,9 +213,9 @@ set<string> albaOpGarbageCollectMSFDir::GetMSFDirABSFileNamesSet()
   return m_MSFDirABSFileNamesSet;
 }
 
-set<string> albaOpGarbageCollectMSFDir::SetDifference( set<string> &s1, set<string> &s2 )
+set<wxString> albaOpGarbageCollectMSFDir::SetDifference( set<wxString> &s1, set<wxString> &s2 )
 {
-  set<string> result;
+  set<wxString> result;
   set_difference(s1.begin(), s1.end(), \
     s2.begin(), s2.end(),
     inserter(result, result.end()));
@@ -267,10 +267,10 @@ albaString albaOpGarbageCollectMSFDir::GetMSFXMLFileAbsFileName(albaVME *anyTree
 
 int albaOpGarbageCollectMSFDir::GarbageCollect()
 {
-  set<string> filesToRemove;
+  set<wxString> filesToRemove;
   int errorCode = GetFilesToRemove(filesToRemove);
   
-  set<string>::iterator iter;
+  set<wxString>::iterator iter;
   iter = filesToRemove.begin();
 
   ostringstream stringStream;

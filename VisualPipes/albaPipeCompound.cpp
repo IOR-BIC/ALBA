@@ -184,7 +184,7 @@ albaGUI *albaPipeCompound::CreateGui()
 #pragma region GUI Controls
   m_SbMainSizer = new wxBoxSizer( wxVERTICAL );
   m_Notebook = new wxNotebook( m_Gui, ID_TABCTRL, 
-    wxDefaultPosition, wxDefaultSize, wxNB_TOP | wxNB_FLAT );
+    wxDefaultPosition, wxDefaultSize, wxNB_TOP);
 
   m_SbMainSizer->Add( m_Notebook, 1, wxEXPAND | wxALL, 0 );
   m_Gui->Add(m_SbMainSizer, 1, wxEXPAND);  

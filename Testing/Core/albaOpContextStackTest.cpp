@@ -13,10 +13,13 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "albaDefines.h"
+
+#include <cppunit/config/SourcePrefix.h>
 
 #include "albaOpContextStackTest.h"
 #include "albaOpContextStack.h"
-#include <cppunit/config/SourcePrefix.h>
+
 
 #include "albaOpReparentTo.h"
 

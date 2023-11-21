@@ -72,7 +72,7 @@
 //----------------------------------------------------------------------------
 albaProsthesesDBManager::albaProsthesesDBManager()
 {
-	m_DBDir = (albaGetAppDataDirectory()).c_str();
+	m_DBDir = (albaGetAppDataDirectory());
 	m_DBDir += "\\ProsthesesDB\\";
 
 	if(!wxDir::Exists(m_DBDir.GetCStr()))
@@ -93,6 +93,8 @@ albaProsthesesDBManager::~albaProsthesesDBManager()
 //----------------------------------------------------------------------------
 int albaProsthesesDBManager::LoadDB()
 {
+	albaLogMessage("Proshesys File: %s", m_DBFilename.GetCStr());
+	
 	if (!wxFileExists(m_DBFilename.GetCStr()))
 		return ALBA_OK;
 
@@ -230,7 +232,7 @@ int albaProsthesesDBManager::SaveDB()
 
 	XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Terminate();
 
-	albaLogMessage(wxString::Format("New DB has been written %s", m_DBFilename.GetCStr()));
+	albaLogMessage(albaString::Format("New DB has been written %s", m_DBFilename.GetCStr()));
 
 	return ALBA_OK;
 }

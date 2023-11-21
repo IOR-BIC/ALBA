@@ -96,9 +96,10 @@ void albaVMEOutputPointSetTest::TestSetGetMaterial()
   outputPointSet = (albaVMEOutputPointSet*)landmark->GetOutput();
 
 
-  mmaMaterial *material;
+  mmaMaterial *material= landmark->GetMaterial();
+	
 
-  m_Result = landmark->GetMaterial() == outputPointSet->GetMaterial();
+  m_Result = material == outputPointSet->GetMaterial();
   TEST_RESULT;
   material = outputPointSet->GetMaterial();
 

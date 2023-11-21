@@ -113,11 +113,11 @@ void albaOpExporterWrappedMeter::OnEvent(albaEventBase *alba_event)
       case wxOK:
 				{
 				  albaString initialFileName;
-          initialFileName = albaGetLastUserFolder().c_str();
+          initialFileName = albaGetLastUserFolder();
           initialFileName.Append("\\ActionLine.txt");
 
 				  albaString wildc = "configuration file (*.txt)|*.txt";
-				  m_File = albaGetSaveFile(initialFileName.GetCStr(), wildc).c_str();
+				  m_File = albaGetSaveFile(initialFileName.GetCStr(), wildc);
 
 				  if (m_File == "") return;
 

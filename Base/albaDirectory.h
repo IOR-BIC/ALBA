@@ -55,8 +55,8 @@ public:
 protected:
   //template class ALBA_EXPORT std::allocator<std::string>;
   //template class ALBA_EXPORT std::vector<std::string, std::allocator<std::string>>;
-  std::vector<std::string> m_Files; // Array of Files
-  std::string m_Path;               // Path to Open'ed directory
+  std::vector<wxString> m_Files; // Array of Files
+	wxString m_Path;               // Path to Open'ed directory
 private:
   albaDirectory(const albaDirectory&); //purposely not implemented
   void operator=(const albaDirectory&); //purposely not implemented

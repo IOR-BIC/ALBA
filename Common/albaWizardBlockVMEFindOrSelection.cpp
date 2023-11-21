@@ -62,7 +62,7 @@ void albaWizardBlockVMEFindOrSelection::ExcutionBegin()
   globalVMEAccept=m_AcceptedVME;
 
   if (m_SelectedVME)
-	  m_SelectedVME=m_SelectedVME->GetByPath(m_VmeParentSelect.c_str());
+	  m_SelectedVME=m_SelectedVME->GetByPath(m_VmeParentSelect.ToAscii());
 
   if (m_SelectedVME)
   {
@@ -85,7 +85,7 @@ void albaWizardBlockVMEFindOrSelection::ExcutionBegin()
 	  // if there are many acceptable volume we tell the user to select it
 	  if (VMENumber > 1)
 	  {
-		  albaString title = m_Title.c_str();
+		  albaString title = m_Title;
 		  albaEvent e(this,VME_CHOOSE);
 		  e.SetString(&title);
 		  e.SetPointer(&VMEAccept); 

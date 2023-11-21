@@ -117,7 +117,7 @@ void albaVMEItemVTK::DeepCopyVmeLarge(albaVMEItem *a)
 
       vtk_item->ReleaseData();
 
-      albaString filename = albaGetAppDataDirectory().c_str();
+      albaString filename = albaGetAppDataDirectory();
       filename<<"/TMP.vtk";
       albaLogMessage("<<<<<Creating temp file : %s",filename);
       this->ReadData(filename);
@@ -645,11 +645,14 @@ int albaVMEItemVTK::InternalStoreData(const char *url)
           {
             return ALBA_ERROR;
           }
+#ifndef _DEBUG
+		  //file check is really slow in debug so is disabled
           int chk_res = CheckFile(filename);
           if (chk_res != ALBA_OK)
           {
             return ALBA_ERROR;
           }
+#endif
         }
       }
       //writer->RemoveObserver(tag);

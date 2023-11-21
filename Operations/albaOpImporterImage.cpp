@@ -41,6 +41,7 @@
 
 #include <algorithm>
 #include "albaProgressBarHelper.h"
+#include "wx/filename.h"
 
 //----------------------------------------------------------------------------
 // Global Function (locale to this file) to sort the filenames
@@ -51,8 +52,8 @@ bool CompareNumber(std::string first, std::string second)
 	wxString second_path, second_name, second_ext;
 	long first_num, second_num;
 
-	wxSplitPath(first.c_str(),&first_path,&first_name,&first_ext);
-	wxSplitPath(second.c_str(),&second_path,&second_name,&second_ext);
+	wxFileName::SplitPath(first.c_str(),&first_path,&first_name,&first_ext);
+	wxFileName::SplitPath(second.c_str(),&second_path,&second_name,&second_ext);
 
 	first_name.ToLong(&first_num);
 	second_name.ToLong(&second_num);
@@ -85,7 +86,7 @@ albaOp(label)
   m_ImportedImage = NULL;
   m_ImportedImageAsVolume = NULL;
 
-  m_FileDirectory = albaGetLastUserFolder().c_str();
+  m_FileDirectory = albaGetLastUserFolder();
 }
 //----------------------------------------------------------------------------
 albaOpImporterImage::~albaOpImporterImage()
@@ -117,8 +118,13 @@ void albaOpImporterImage::OpRun()
   {
     m_Files.clear();
 	  m_Gui = new albaGUI(this);
+
+		std::vector<wxString> files;
+
+		for (int i = 0; i < m_Files.size(); i++)
+			files.push_back(m_Files[i].c_str());
   
-    albaGetOpenMultiFiles(m_FileDirectory.c_str(),wildc.GetCStr(),m_Files);
+		albaGetOpenMultiFiles((const char *)m_FileDirectory.ToAscii(), wildc.GetCStr(), files);
   }
 
   m_NumFiles = m_Files.size();
@@ -129,7 +135,7 @@ void albaOpImporterImage::OpRun()
   }
   else
   {
-    wxSplitPath(m_Files[0].c_str(),&m_FileDirectory,&m_FilePrefix,&m_FileExtension);
+    wxFileName::SplitPath(m_Files[0].c_str(),&m_FileDirectory,&m_FilePrefix,&m_FileExtension);
     
     if (!m_TestMode)
     {
@@ -236,7 +242,7 @@ void albaOpImporterImage::BuildImageSequence()
 
 	albaNEW(m_ImportedImage);
   
-  wxSplitPath(m_Files[0].c_str(),&path,&name,&ext);
+  wxFileName::SplitPath(m_Files[0].c_str(),&path,&name,&ext);
   if(name.IsNumber())
     std::sort(m_Files.begin(),m_Files.end(),CompareNumber);
   else
@@ -252,7 +258,7 @@ void albaOpImporterImage::BuildImageSequence()
 	{
     progressHelper.UpdateProgressBar((i*100)/m_NumFiles);
 
-    wxSplitPath(m_Files[i].c_str(),&path,&name,&ext);
+    wxFileName::SplitPath(m_Files[i].c_str(),&path,&name,&ext);
 		ext.MakeUpper();
 		if(name.IsNumber())
 			name.ToLong(&time);

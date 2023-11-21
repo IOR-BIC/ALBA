@@ -67,7 +67,7 @@ void mmoCreateVmeSurface::OpDo()
 
   albaNEW(m_vme);
   static int counter = 0;
-  wxString name = wxString::Format("vme surface %d",counter++);
+  wxString name = albaString::Format("vme surface %d",counter++);
   m_vme->SetName(name);
   m_vme->ReparentTo( (albaVME*)m_Input);
 

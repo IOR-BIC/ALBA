@@ -351,7 +351,7 @@ void albaInteractor2DIndicator::DrawMeasureTool(double x, double y)
 			double tmp_pos[3];
 			m_Line->GetPoint2(tmp_pos);
 			albaString ds;
-      ds = wxString::Format(_("Label"));
+      ds = albaString::Format(_("Label"));
 		  m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
 			m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
       m_DisableUndoAndOkCancel = true;
@@ -361,7 +361,7 @@ void albaInteractor2DIndicator::DrawMeasureTool(double x, double y)
 			double tmp_pos[3];
 			m_Line2->GetPoint2(tmp_pos);
 			albaString ds;
-      ds = wxString::Format(_("Label"));
+      ds = albaString::Format(_("Label"));
 		  m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
 			m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
       m_DisableUndoAndOkCancel = false;

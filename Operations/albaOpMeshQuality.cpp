@@ -259,9 +259,9 @@ void albaOpMeshQuality::CreatePolydataPipeline()
 
   if(!m_TestMode)
   {
-	  m_LabelAverageAspectRatio->SetLabel(wxString::Format(" average : %.3lf",averageRatio));
-	  m_LabelMaxAspectRatio->SetLabel(wxString::Format(" max : %.3lf",maxRatio));
-	  m_LabelMinAspectRatio->SetLabel(wxString::Format(" min : %.3lf",minRatio));
+	  m_LabelAverageAspectRatio->SetLabel(albaString::Format(" average : %.3lf",averageRatio));
+	  m_LabelMaxAspectRatio->SetLabel(albaString::Format(" max : %.3lf",maxRatio));
+	  m_LabelMinAspectRatio->SetLabel(albaString::Format(" min : %.3lf",minRatio));
   
 
 	  double BoundingBox[6];

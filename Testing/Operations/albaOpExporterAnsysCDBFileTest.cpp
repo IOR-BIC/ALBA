@@ -86,6 +86,7 @@ void albaOpExporterAnsysCDBFileTest::Check_CDBFile(albaString fileName)
 
   exporter->SetOutputFileName((filePath << "/exported_" << fileName).GetCStr());
   exporter->SetInput(importedData);
+	exporter->Init();
   int result = exporter->Write();
 
   CPPUNIT_ASSERT(result == ALBA_OK);
@@ -135,6 +136,7 @@ void albaOpExporterAnsysCDBFileTest::CompareCDBFilesData(albaString fileName)
 
 	exporter->SetOutputFileName((filePath << "/exported2_" << fileName).GetCStr());
 	exporter->SetInput(importedData);
+	exporter->Init();
 	int result = exporter->Write();
 
 	CPPUNIT_ASSERT(result == ALBA_OK);

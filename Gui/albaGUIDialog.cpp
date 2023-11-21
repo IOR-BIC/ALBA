@@ -32,7 +32,6 @@
 // Event Table:
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(albaGUIDialog, wxDialog)
-  EVT_CLOSE(albaGUIDialog::nvOnCloseWindow)
   EVT_BUTTON(wxID_OK, albaGUIDialog::nvOnOK)
   EVT_BUTTON(wxID_CANCEL, albaGUIDialog::nvOnCancel)
   EVT_BUTTON(wxID_CLOSE, albaGUIDialog::nvOnClose)
@@ -162,35 +161,7 @@ void albaGUIDialog::OnEvent(albaEventBase *alba_event)
     }
   }
 }
-//----------------------------------------------------------------------------
-void albaGUIDialog::OnCloseWindow(wxCloseEvent &event)
-//----------------------------------------------------------------------------
-{
-  // --- note about wxDialog::OnCloseWindow
-  
-  // We'll send a Cancel message by default, which may close the dialog.
-  // Check for looping if the Cancel event handler calls Close().
 
-  // Note that if a cancel button and handler aren't present in the dialog,
-  // nothing will happen when you close the dialog via the window manager, or
-  // via Close(). We wouldn't want to destroy the dialog by default, since
-  // the dialog may have been created on the stack. However, this does mean
-  // that calling dialog->Close() won't delete the dialog unless the handler
-  // for wxID_CANCEL does so. So use Destroy() if you want to be sure to
-  // destroy the dialog. The default OnCancel (above) simply ends a modal
-  // dialog, and hides a modeless dialog.
-
-  //SIL. 20-4-2005: 
-  //So, in normal windows the close buttons destroy the window (Close -> CloseWindow -> Destroy )
-  //in dialogs the close button calls Show(false) and don't call Destroy by default.
-  //This is reasonable, because the user can call dlg.Show again.
-
-  //So, The close button should call Cancel
-  //Cancel should not destroy the window - just hide it
-  //To know when the window is destroyed - override Destroy.
-
-  wxDialog::OnCloseWindow(event);
-}
 //----------------------------------------------------------------------------
 void albaGUIDialog::OnOK(wxCommandEvent &event)
 //----------------------------------------------------------------------------
@@ -222,10 +193,13 @@ void albaGUIDialog::OnOK(wxCommandEvent &event)
 void albaGUIDialog::OnCancel(wxCommandEvent &event)
 //----------------------------------------------------------------------------
 {
-  wxDialog::OnCancel(event);
-  /* --- this is what wxDialog::OnCancel does
   SetReturnCode(wxID_CANCEL);
   Show(false);
-  Note that the Window just hidden, is not destroyed.  
-  */
+	Destroy();
+}
+
+//----------------------------------------------------------------------------
+void albaGUIDialog::OnCloseWindow(wxCloseEvent &event)
+{
+
 }

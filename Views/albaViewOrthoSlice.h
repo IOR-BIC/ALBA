@@ -64,6 +64,10 @@ public:
   /** Create the GUI on the bottom of the compounded view. */
   virtual void CreateGuiView();
 
+	/**
+	Create the plugged sub-view and call virtual method CreateGuiView() */
+	virtual void Create();
+
   /** Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(albaVME *vme, bool show);
 
@@ -71,7 +75,7 @@ public:
 	void ApplySliceSetting(int view, albaVME * vme);
 
   /** Remove Gizmos, Observers from the volume */
-  void DestroyOrthoSlicesAndGizmos();
+  void RemoveVolumeFromGizmo();
 
   /** generate gizmos and pose them in the right position*/
   void CreateOrthoslicesAndGizmos(albaVME *vme);
@@ -89,10 +93,14 @@ public:
     ID_LUT_CHOOSER = Superclass::ID_LAST,
     ID_SIDE_ORTHO,
 		ID_SNAP,
+		ID_X_SLIDER,
+		ID_Y_SLIDER,
+		ID_Z_SLIDER,
     ID_RESET_SLICES,
 		ID_ALL_SURFACE,
 		ID_BORDER_CHANGE,
     ID_TRILINEAR_INTERPOLATION,
+		ID_DECIMALS,
     ID_LAST
   };
 
@@ -193,6 +201,10 @@ protected:
 
   double m_GizmoHandlePosition[3];
 
+	albaGUIFloatSlider *m_XSliceSlider;
+	albaGUIFloatSlider *m_YSliceSlider;
+	albaGUIFloatSlider *m_ZSliceSlider;
+
   albaVME *m_CurrentVolume; ///< Current visualized volume
   
   albaGUILutSlider *m_LutSlider; ///< Double slider used to change brightness and contrast of the image
@@ -201,6 +213,7 @@ protected:
   albaViewSlice *m_Views[4]; ///< Child views
   int	m_Side; ///< change Azimuth of the camera
 	int m_Snap; ///<change modality of gizmo to snap on grid
+	int m_Decimals;
   double m_PolylineRadiusSize;
 
   bool m_CanPlugVisualPipes; ///< true if u can plug visual pipes

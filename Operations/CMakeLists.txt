@@ -173,6 +173,7 @@ IF (ALBA_USE_VTK)
 	albaOpImporterEmgWS.cpp albaOpImporterEmgWS.h
 	albaOpImporterRawMotionData.cpp albaOpImporterRawMotionData.h
 	albaOpInteractorSliderSample.cpp albaOpInteractorSliderSample.h
+	albaOpShowHistory.cpp	albaOpShowHistory.h
   )
 ENDIF (ALBA_USE_VTK)
 
@@ -215,11 +216,12 @@ IF (ALBA_USE_ITK)
     albaOpExporterMeters.cpp			albaOpExporterMeters.h
     albaOpInteractionDebugger.cpp	albaOpInteractionDebugger.h
 	albaOpFilterImage.cpp			albaOpFilterImage.h
+	albaOpCreateAveragePlane.cpp	albaOpCreateAveragePlane.h
   )
 ENDIF (ALBA_USE_ITK)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS "albaVME" "albaInteraction")
+SET(PROJECT_LIBS "albaVME" "albaInteraction" ${wxWidgets_LIBRARIES})
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})

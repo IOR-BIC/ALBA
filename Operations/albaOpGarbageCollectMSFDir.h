@@ -19,7 +19,6 @@
 
 #include "albaOp.h"
 #include <set>
-#include <xstring>
 
 using namespace std;
 //----------------------------------------------------------------------------
@@ -73,15 +72,15 @@ protected:
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node) { return true; };
 
-  int GetFilesToRemove(set<string> &filesToRemoveSet);
+  int GetFilesToRemove(set<wxString> &filesToRemoveSet);
 
   /** 
   Return s1 - s2 */
-  set<string> SetDifference( set<string> &s1, set<string> &s2 );
+  set<wxString> SetDifference( set<wxString> &s1, set<wxString> &s2 );
  
-  set<string> GetMSFDirABSFileNamesSet();
+  set<wxString> GetMSFDirABSFileNamesSet();
 
-  void PrintSet(set<string> inputSet);
+  void PrintSet(set<wxString> inputSet);
 
   /** Log errors into the log area according to the error number reported.*/
   void ErrorLog(int error_num, const char *node_name, const char *description = NULL);
@@ -91,7 +90,7 @@ protected:
   albaString GetMSFXMLFileAbsFileName(albaVME *anyTreeNode);
  
   /** files linked to vme in trees */
-  set<string> m_MSFTreeBinaryFilesSet;
-  set<string> m_MSFDirABSFileNamesSet;
+  set<wxString> m_MSFTreeBinaryFilesSet;
+  set<wxString> m_MSFDirABSFileNamesSet;
 };
 #endif

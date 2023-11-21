@@ -34,6 +34,8 @@
 #include "albaVMEIterator.h"
 #include "albaAbsLogicManager.h"
 
+#include "wx/filename.h"
+
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -48,7 +50,7 @@ albaOp(label)
   m_Canundo = true;
 
   m_MSFFile    = "";
-  m_MSFFileDir = albaGetLastUserFolder().c_str();
+  m_MSFFileDir = albaGetLastUserFolder();
 
 }
 //----------------------------------------------------------------------------
@@ -88,7 +90,7 @@ void albaOpExporterMSF::OpRun()
 	albaString f;
   if (m_MSFFile.IsEmpty())
   {
-    f = albaGetSaveFile(m_MSFFileDir.GetCStr(),wildc.GetCStr()).c_str(); 
+    f = albaGetSaveFile(m_MSFFileDir.GetCStr(),wildc.GetCStr()); 
     m_MSFFile = f;
   }
 
@@ -115,7 +117,7 @@ int albaOpExporterMSF::ExportMSF()
 	if(!wxFileExists(wxString(m_MSFFile)))
 	{
 		wxString path, name, ext, dir2;
-		wxSplitPath(m_MSFFile.GetCStr(),&path,&name,&ext);
+		wxFileName::SplitPath(m_MSFFile.GetCStr(),&path,&name,&ext);
 		dir2 = path + "\\" + name;
 		if(!wxDirExists(dir2))
 			wxMkdir(dir2);

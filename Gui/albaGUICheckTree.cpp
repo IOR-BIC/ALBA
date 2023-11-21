@@ -330,14 +330,14 @@ void albaGUICheckTree::ViewDeleted(albaView *view)
 int albaGUICheckTree::ClassNameToIcon(wxString classname)
 //----------------------------------------------------------------------------
 {
-  MapClassNameToIcon::iterator it = m_MapClassNameToIcon.find(classname.c_str());
+  MapClassNameToIcon::iterator it = m_MapClassNameToIcon.find(classname.ToAscii());
   if (it != m_MapClassNameToIcon.end())
     return int((*it).second);
   else
   {
     // search superclass's icon
     // if also this icon is not present, "Unknown" icon is used
-    wxLogMessage("albaPictureFactory::ClassNameToIcon: cant find = %s ",classname.c_str());
+    albaLogMessage("albaPictureFactory::ClassNameToIcon: cant find = %s ",classname.ToAscii());
     return 0;
   }
 }
@@ -378,7 +378,6 @@ void albaGUICheckTree::InitializeImageList()
   //get icon size 
   //I assume all vme-icon to have the same size
   wxBitmap bmp = albaPictureFactory::GetPictureFactory()->GetVmePic(v[0]);
-  assert(bmp != wxNullBitmap);
   int w = bmp.GetWidth();
   int h = bmp.GetHeight();
   assert(w>0 && h>0);

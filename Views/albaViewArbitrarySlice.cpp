@@ -205,6 +205,8 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 
 				// get the VTK volume
 				vtkDataSet *data = vme->GetOutput()->GetVTKData();
+				if (data == NULL)
+					return;
 				data->Update();
 				//Get center of Volume to can the reset
 				data->GetCenter(sliceCenterVolumeReset);
@@ -234,7 +236,7 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 
 				m_AttachCamera->DisableAttachCamera();
 				((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraSet(CAMERA_OS_Z);
-				m_AttachCamera->SetStartingMatrix(m_MatrixReset);
+				m_AttachCamera->SetStartingMatrix(m_MatrixReset->GetVTKMatrix());
 				m_SlicingMatrix->DeepCopy(m_MatrixReset);
 				m_AttachCamera->SetAttachedMatrix(m_SlicingMatrix->GetVTKMatrix());
 				m_AttachCamera->EnableAttachCamera();
@@ -280,6 +282,9 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 	{
 		if(vme->GetOutput()->IsA("albaVMEOutputVolume"))
 		{
+			if (m_AttachCamera == NULL)
+				return;
+
 			m_AttachCamera->SetAttachedMatrix(NULL);
 
 			DestroyGizmos();
@@ -518,6 +523,9 @@ void albaViewArbitrarySlice::SetGizmo(int typeGizmo)
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::OnReset()
 {
+	if (m_MatrixReset == NULL)
+		return;
+
 	m_GizmoRotate->SetAbsPose(m_MatrixReset);
 	m_GizmoTranslate->SetAbsPose(m_MatrixReset);
 	m_SlicingMatrix->DeepCopy(m_MatrixReset);

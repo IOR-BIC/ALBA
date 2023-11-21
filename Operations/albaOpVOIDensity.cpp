@@ -492,17 +492,17 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 	if (!this->m_TestMode)
 	{
 		m_Gui->Update();
-		albaLogMessage(wxString::Format("\nn,m,max,min,stdev,median\n%d,%.3lf,%.3lf,%.3lf,%.3lf,%3lf", m_NumberOfScalars, m_MeanScalar, m_MaxScalar, m_MinScalar, m_StandardDeviation,m_Median));
+		albaLogMessage(albaString::Format("\nn,m,max,min,stdev,median\n%d,%.3lf,%.3lf,%.3lf,%.3lf,%3lf", m_NumberOfScalars, m_MeanScalar, m_MaxScalar, m_MinScalar, m_StandardDeviation,m_Median));
 	}
 }
 
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::UpdateStrings()
 {
-	m_NumberOfScalarsString = albaString(wxString::Format("%d", m_NumberOfScalars));
-	m_MeanScalarString = albaString(wxString::Format("%f", m_MeanScalar));
-	m_MaxScalarString = albaString(wxString::Format("%f", m_MaxScalar));
-	m_MinScalarString = albaString(wxString::Format("%f", m_MinScalar));
-	m_StandardDeviationString = albaString(wxString::Format("%f", m_StandardDeviation));
-	m_MedianString = albaString(wxString::Format("%f", m_Median));
+	m_NumberOfScalarsString = albaString(albaString::Format("%d", m_NumberOfScalars));
+	m_MeanScalarString = albaString(albaString::Format("%f", m_MeanScalar));
+	m_MaxScalarString = albaString(albaString::Format("%f", m_MaxScalar));
+	m_MinScalarString = albaString(albaString::Format("%f", m_MinScalar));
+	m_StandardDeviationString = albaString(albaString::Format("%f", m_StandardDeviation));
+	m_MedianString = albaString(albaString::Format("%f", m_Median));
 }

@@ -45,7 +45,7 @@ albaOp(label)
 	m_Canundo = true;
 	m_File    = "";
 
-  m_FileDir = albaGetLastUserFolder().c_str();
+  m_FileDir = albaGetLastUserFolder();
 }
 //----------------------------------------------------------------------------
 albaOpImporterMSF1x::~albaOpImporterMSF1x( ) 
@@ -69,7 +69,7 @@ void albaOpImporterMSF1x::OpRun()
 	albaString f;
   if(m_File.IsEmpty())
 	{
-		f = albaGetOpenFile(m_FileDir, wildc.GetCStr(), "Choose MSF file").c_str();
+		f = albaGetOpenFile(m_FileDir, wildc.GetCStr(), "Choose MSF file");
 		m_File = f;
 	}
 

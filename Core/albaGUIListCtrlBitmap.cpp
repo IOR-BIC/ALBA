@@ -181,7 +181,7 @@ void albaGUIListCtrlBitmap::OnSelectionChanged(wxListEvent& event)
   if(m_PreventNotify) 
     return;
    
-  albaString s = m_List->GetItemText(event.GetIndex()).c_str();
+  albaString s = m_List->GetItemText(event.GetIndex());
   long item_id = event.GetData();
   long icon = event.GetImage();
 

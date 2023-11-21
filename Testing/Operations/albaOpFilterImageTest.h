@@ -33,6 +33,7 @@ public:
 	CPPUNIT_TEST(TestGaussianDiscrete);
 	CPPUNIT_TEST(TestThreshold);
 	CPPUNIT_TEST(TestThresholdBinary);
+	CPPUNIT_TEST(TestOtsu);
 	CPPUNIT_TEST(TestGradientMagnitude);
 	CPPUNIT_TEST(TestSobel);
 	CPPUNIT_TEST(TestCanny);
@@ -55,6 +56,7 @@ public:
 		void TestGaussianDiscrete();
 		void TestThreshold();
 		void TestThresholdBinary();
+		void TestOtsu();
 		void TestGradientMagnitude();
 		void TestSobel();
 		void TestCanny();

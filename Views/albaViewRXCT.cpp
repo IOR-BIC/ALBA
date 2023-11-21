@@ -50,17 +50,10 @@ PURPOSE. See the above copyright notice for more information.
 // constants:
 //----------------------------------------------------------------------------
 
-const int CT_CHILD_VIEWS_NUMBER  = 6;
+#define CT_CHILD_VIEWS_NUMBER 6
 
 #define SLICES_BORDER (1.0/50.0)
 
-enum RXCT_SUBVIEW_ID
-{
-  RX_FRONT_VIEW = 0,
-  RX_SIDE_VIEW,
-  CT_COMPOUND_VIEW,
-  VIEWS_NUMBER,
-};
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaViewRXCT);
@@ -197,6 +190,10 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
 
 			// set the range for every slider widget
 			albaVMEOutputVolume *volumeOutput = albaVMEOutputVolume::SafeDownCast(vme->GetOutput());
+			vtkDataSet * vtkOut = volumeOutput->GetVTKData();
+			if (vtkOut == NULL)
+				return;
+
 			for (int childID = RX_FRONT_VIEW; childID < CT_COMPOUND_VIEW; childID++)
 			{
 				double advLow, advHigh;
@@ -209,7 +206,7 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
 					vtkLookupTable *cl = volumeOutput->GetMaterial()->m_ColorLut;
 
 					double volRange[2];
-					volumeOutput->GetVTKData()->GetScalarRange(volRange);
+					vtkOut->GetScalarRange(volRange);
 
 					const double * tableRange = volumeOutput->GetMaterial()->GetTableRange();
 					if (tableRange[1] < tableRange[0])
@@ -429,6 +426,42 @@ void albaViewRXCT::OnEventSnapModality()
     }
   }
 }
+
+//----------------------------------------------------------------------------
+void albaViewRXCT::OnEventBalanceSlices()
+{
+	double firstCenter[3], lastCenter[3], currCenter[3], step;
+	albaViewSlice * firstSlice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0);
+	firstSlice->GetSlice(firstCenter);
+	
+	albaViewSlice * lastSlice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(CT_CHILD_VIEWS_NUMBER-1);
+	lastSlice->GetSlice(lastCenter);
+
+	currCenter[0] = firstCenter[0];
+	currCenter[1] = firstCenter[1];
+	step = (lastCenter[2] - firstCenter[2]) / (double)(CT_CHILD_VIEWS_NUMBER-1);
+
+	//First and last slices does not need a position update
+	for (int currChildCTView = 0; currChildCTView < CT_CHILD_VIEWS_NUMBER; currChildCTView++)
+	{
+		if (m_GizmoSlice[currChildCTView])
+		{
+			currCenter[2] = firstCenter[2] + (step*currChildCTView);
+			m_GizmoSlice[currChildCTView]->UpdateGizmoSliceInLocalPositionOnAxis(currChildCTView, albaGizmoSlice::GIZMO_SLICE_Z, currCenter[2]);
+			m_Pos[currChildCTView] = currCenter[2];
+			m_Sort[currChildCTView] = currChildCTView;
+			albaViewSlice * slice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView);
+			slice->SetSlice(currCenter);
+			slice->SetTextColor(m_BorderColor[currChildCTView]);
+			slice->UpdateText();
+			slice->BorderCreate(m_BorderColor[currChildCTView]);
+			slice->CameraUpdate();
+		}
+	}
+
+	m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
+	m_ChildViewList[RX_SIDE_VIEW]->CameraUpdate();
+}
 //----------------------------------------------------------------------------
 void albaViewRXCT::OnEventSortSlices(albaVME *vme /*=NULL*/)
 {
@@ -473,11 +506,12 @@ void albaViewRXCT::OnEventSortSlices(albaVME *vme /*=NULL*/)
 				m_GizmoSlice[currChildCTView]->UpdateGizmoSliceInLocalPositionOnAxis(currChildCTView, albaGizmoSlice::GIZMO_SLICE_Z, center[2]);
 				m_Pos[currChildCTView] = center[2];
 				m_Sort[currChildCTView] = currChildCTView;
-				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetSlice(center);
-				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->SetTextColor(m_BorderColor[currChildCTView]);
-				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->UpdateText();
-				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->BorderCreate(m_BorderColor[currChildCTView]);
-				((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView))->CameraUpdate();
+				albaViewSlice * slice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currChildCTView);
+				slice->SetSlice(center);
+				slice->SetTextColor(m_BorderColor[currChildCTView]);
+				slice->UpdateText();
+				slice->BorderCreate(m_BorderColor[currChildCTView]);
+				slice->CameraUpdate();
 				center[2] -= step;
 			}
 		}
@@ -532,19 +566,20 @@ void albaViewRXCT::OnEventMouseMove( albaEvent *e )
   if (m_MoveAllSlices)
   {
     double oldSliceLocalOrigin[3], delta[3], b[CT_CHILD_VIEWS_NUMBER];
-    ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(movingSliceId))->GetSlice(oldSliceLocalOrigin);
+		albaViewCompound * slicesView = (albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW];
+    ((albaViewSlice *)slicesView->GetSubView(movingSliceId))->GetSlice(oldSliceLocalOrigin);
     delta[0] = newSliceLocalOrigin[0] - oldSliceLocalOrigin[0];
     delta[1] = newSliceLocalOrigin[1] - oldSliceLocalOrigin[1];
     delta[2] = newSliceLocalOrigin[2] - oldSliceLocalOrigin[2];
 
-    for (int currSubView = 0; currSubView<((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetNumberOfSubView(); currSubView++)
+    for (int currSubView = 0; currSubView<slicesView->GetNumberOfSubView(); currSubView++)
     {
       m_CurrentVolume->GetOutput()->GetVMEBounds(b);
 
       int i=0;
       while (currSubView!=m_Sort[i]) i++;
 
-      ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currSubView))->GetSlice(oldSliceLocalOrigin);
+      ((albaViewSlice *)slicesView->GetSubView(currSubView))->GetSlice(oldSliceLocalOrigin);
       newSliceLocalOrigin[0] = oldSliceLocalOrigin[0] + delta[0];
       newSliceLocalOrigin[1] = oldSliceLocalOrigin[1] + delta[1];
       newSliceLocalOrigin[2] = oldSliceLocalOrigin[2] + delta[2];
@@ -554,8 +589,8 @@ void albaViewRXCT::OnEventMouseMove( albaEvent *e )
 
       m_Pos[currSubView]=newSliceLocalOrigin[2];
 
-      ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currSubView))->SetSlice(newSliceLocalOrigin);
-      ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(currSubView))->CameraUpdate();
+      ((albaViewSlice *)slicesView->GetSubView(currSubView))->SetSlice(newSliceLocalOrigin);
+      ((albaViewSlice *)slicesView->GetSubView(currSubView))->CameraUpdate();
     }
   }
   else
@@ -572,6 +607,9 @@ void albaViewRXCT::OnEventMouseMove( albaEvent *e )
   m_ChildViewList[RX_FRONT_VIEW]->CameraUpdate();
   m_ChildViewList[RX_SIDE_VIEW]->CameraUpdate();
 }
+
+
+
 //----------------------------------------------------------------------------
 void albaViewRXCT::OnEvent(albaEventBase *alba_event)
 {
@@ -618,11 +656,17 @@ void albaViewRXCT::OnEvent(albaEventBase *alba_event)
       break;
 
       case ID_ADJUST_SLICES:
-        {
-          OnEventSortSlices();
-        }
-        break;
-       
+      {
+				OnEventSortSlices();
+      }
+      break;
+
+			case ID_BALANCE_SLICES:
+			{
+				OnEventBalanceSlices();
+			}
+			break;
+				
 			case ID_ALL_SURFACE:
       case ID_BORDER_CHANGE:
       {
@@ -722,6 +766,8 @@ albaGUI* albaViewRXCT::CreateGui()
   m_Gui->Bool(ID_MOVE_ALL_SLICES,"Move all",&m_MoveAllSlices,1);
 
   m_Gui->Button(ID_ADJUST_SLICES,"Adjust Slices");
+	m_Gui->Button(ID_BALANCE_SLICES, "Balance Slices");
+
 
   m_Gui->Divider(1);
 
@@ -992,4 +1038,43 @@ char ** albaViewRXCT::GetIcon()
 {
 #include "pic/VIEW_RXCT.xpm"
 	return VIEW_RXCT_xpm;
+}
+
+//----------------------------------------------------------------------------
+int albaViewRXCT::SetSlicerHeight(double zPos, int slicerId /*= -1*/)
+{
+	albaViewCompound * slicesView = (albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW];
+
+	if (slicerId < 0 || slicerId >= CT_CHILD_VIEWS_NUMBER)
+	{
+		//getting the index of the nearest slicer
+		double sliceOrigin[3];
+		slicerId = 0;
+		((albaViewSlice *)slicesView->GetSubView(0))->GetSlice(sliceOrigin);
+		int minDifference = std::abs(sliceOrigin[2] - zPos);
+
+		for (int i = 1; i < CT_CHILD_VIEWS_NUMBER; ++i) {
+			((albaViewSlice *)slicesView->GetSubView(i))->GetSlice(sliceOrigin);
+			int currentDifference = std::abs(sliceOrigin[2] - zPos);
+			if (currentDifference < minDifference) {
+				minDifference = currentDifference;
+				slicerId = i;
+			}
+		}
+	}
+
+	m_GizmoSlice[slicerId]->UpdateGizmoSliceInLocalPositionOnAxis(slicerId, albaGizmoSlice::GIZMO_SLICE_Z, zPos);
+
+	albaViewSlice * slice = (albaViewSlice *)slicesView->GetSubView(slicerId);
+	double sliceOrigin[3];
+	slice->GetSlice(sliceOrigin);
+	sliceOrigin[2] = zPos;
+
+	slice->SetSlice(sliceOrigin);
+	slice->CameraUpdate();
+
+	SortSlices();
+	CameraUpdate();
+	
+	return slicerId;
 }

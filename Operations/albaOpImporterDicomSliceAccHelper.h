@@ -13,12 +13,10 @@ PURPOSE. See the above copyright notice for more information.
 #ifndef __albaOpImporterDicomSliceAccHelper_h
 #define __albaOpImporterDicomSliceAccHelper_h
 
-#include <memory.h>
 
 #include "albaConfigure.h"
 #include <vtkRectilinearGridSource.h>
 #include "vtkRectilinearGrid.h"
-#include <vtkImageData.h>
 #include <vtkImageData.h>
 
 class ALBA_EXPORT albaOpImporterDicomSliceAccHelper

@@ -36,6 +36,7 @@
 #include "albaMatrix.h"
 #include "albaMatrixVector.h"
 #include "albaSmartPointer.h"
+#include "wx/filename.h"
 
 #include <iostream>
 #include <fstream>
@@ -59,7 +60,7 @@ albaOp(label)
 	m_OpType	= OPTYPE_OP;
 	m_Canundo	= true;
 	m_File		= "";
-	m_FileDir = (albaGetApplicationDirectory() + "/Data/").c_str();
+	m_FileDir = (albaGetApplicationDirectory() + "/Data/");
   m_OriginalMatrix = NULL;
   m_VME = NULL;
 }
@@ -269,7 +270,7 @@ int albaOpApplyTrajectory::Read()
   m_OriginalMatrix->DeepCopy(m_Input->GetOutput()->GetAbsMatrix());
 
   wxString path, name, ext;
-  wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.GetCStr(),&path,&name,&ext);
 
   double time;
   double newPosition[3];
@@ -287,15 +288,15 @@ int albaOpApplyTrajectory::Read()
     line.Replace(" ","\t");
     wxStringTokenizer tkz(line,wxT("\t"),wxTOKEN_RET_EMPTY_ALL);
 
-    time = atof(tkz.GetNextToken().c_str());
-    newPosition[0] = atof(tkz.GetNextToken().c_str());
-    newPosition[1] = atof(tkz.GetNextToken().c_str());
-    newPosition[2] = atof(tkz.GetNextToken().c_str());
-    newOrientation[0] = atof(tkz.GetNextToken().c_str());
-    newOrientation[1] = atof(tkz.GetNextToken().c_str());
-    newOrientation[2] = atof(tkz.GetNextToken().c_str());
+    time = atof(tkz.GetNextToken());
+    newPosition[0] = atof(tkz.GetNextToken());
+    newPosition[1] = atof(tkz.GetNextToken());
+    newPosition[2] = atof(tkz.GetNextToken());
+    newOrientation[0] = atof(tkz.GetNextToken());
+    newOrientation[1] = atof(tkz.GetNextToken());
+    newOrientation[2] = atof(tkz.GetNextToken());
     
-    wxString token = tkz.GetNextToken().c_str();
+    wxString token = tkz.GetNextToken();
     if (!token.IsEmpty())
     {
       if(!this->m_TestMode)

@@ -162,6 +162,7 @@
 #include "albaOpComputeWrapping.h"
 #include "albaOpConnectivitySurface.h"
 #include "albaOpCreateAverageLandmark.h"
+#include "albaOpCreateAveragePlane.h"
 #include "albaOpCreateEditSkeleton.h"
 #include "albaOpCreateGroup.h"
 #include "albaOpCreateLabeledVolume.h"
@@ -283,7 +284,7 @@
 #include "albaViewSlicer.h"
 #include "albaViewVTK.h"
 #include "albaViewVTKCompound.h"
-
+#include "albaViewVirtualRX.h"
 
 
 #define IDM_WINDOWNEXT 4004
@@ -301,7 +302,7 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 
 	m_Win->SetListener(this);
 
-	m_ChildFrameStyle = 0; wxCAPTION | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER; //wxTHICK_FRAME; // Default style
+	m_ChildFrameStyle = 0; 
 	m_ApplicationSettings = new albaGUIApplicationSettings(this);
 	m_TimeBarSettings = NULL;
 
@@ -453,7 +454,7 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 	m_AboutDialog->SetTitle(m_AppTitle);
 	m_AboutDialog->SetBuildNum(m_BuildNum.GetCStr());
 	m_AboutDialog->SetVersion("0.1");
-	wxString imagePath = albaGetApplicationDirectory().c_str();
+	wxString imagePath = albaGetApplicationDirectory().ToAscii();
 	imagePath += "\\Config\\AlbaMasterAbout.bmp";
 	m_AboutDialog->SetImagePath(imagePath);
 
@@ -562,7 +563,7 @@ void albaLogicWithManagers::Show()
 	FillMenus();
 	CreateToolBarsAndPanels();
 
-	m_AppTitle = m_Win->GetTitle().c_str();
+	m_AppTitle = m_Win->GetTitle().ToAscii();
 
 	RestoreLayout();
 
@@ -583,7 +584,7 @@ void albaLogicWithManagers::PlugProsthesisDBManager(albaString passPhrase /*= ""
 
 	m_ProsthesisDBManager->LoadDB();
 
-	wxString imagesPath = albaGetConfigDirectory().c_str();
+	wxString imagesPath = albaGetConfigDirectory().ToAscii();
 }
 
 // Plug
@@ -1382,11 +1383,11 @@ void albaLogicWithManagers::OnFileOpen(const char *file_to_open)
 
 			albaString wildc;
 			const	char *ext = m_Extension;
-			wildc = wxString::Format("All Supported File (*.%s;*.z%s;msf;zmsf)|*.%s;*.%s;*.msf;*.zmsf", ext, ext, ext, ext);
-			wildc += wxString::Format("|Alba Project File (*.%s)|*.%s", ext, ext);
-			wildc += wxString::Format("|Alba Compressed File (*.z%s)|*.z%s", ext, ext);
-			wildc += wxString::Format("|MAF Project File (*.msf)|*.msf");
-			wildc += wxString::Format("|MAF Compressed File (*.zmsf)|*.zmsf", ext, ext);
+			wildc = albaString::Format("All Supported File (*.%s;*.z%s;msf;zmsf)|*.%s;*.%s;*.msf;*.zmsf", ext, ext, ext, ext);
+			wildc += albaString::Format("|Alba Project File (*.%s)|*.%s", ext, ext);
+			wildc += albaString::Format("|Alba Compressed File (*.z%s)|*.z%s", ext, ext);
+			wildc += albaString::Format("|MAF Project File (*.msf)|*.msf");
+			wildc += albaString::Format("|MAF Compressed File (*.zmsf)|*.zmsf", ext, ext);
 
 			if (file_to_open != NULL)
 			{
@@ -1394,8 +1395,8 @@ void albaLogicWithManagers::OnFileOpen(const char *file_to_open)
 			}
 			else
 			{
-				wxString lastFolder = albaGetLastUserFolder().c_str();
-				file = albaGetOpenFile(lastFolder, wildc).c_str();
+				wxString lastFolder = albaGetLastUserFolder().ToAscii();
+				file = albaGetOpenFile(lastFolder, wildc).ToAscii();
 			}
 			
 			if (file.IsEmpty() && m_WizardManager && m_WizardRunning)
@@ -1427,7 +1428,7 @@ void albaLogicWithManagers::OnFileSave()
 {
   if(m_VMEManager)
   {
-		albaString save_default_folder = albaGetLastUserFolder().c_str();
+		albaString save_default_folder = albaGetLastUserFolder();
 	  save_default_folder.ParsePathName();
 	  m_VMEManager->SetDirName(save_default_folder);
 	  int saved=m_VMEManager->MSFSave();
@@ -1442,7 +1443,7 @@ void albaLogicWithManagers::OnFileSaveAs()
 {
   if(m_VMEManager) 
   {
-	  albaString save_default_folder = albaGetLastUserFolder().c_str();
+	  albaString save_default_folder = albaGetLastUserFolder();
 	  save_default_folder.ParsePathName();
 	  m_VMEManager->SetDirName(save_default_folder);
 	  int saved=m_VMEManager->MSFSaveAs();
@@ -2007,7 +2008,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpExporterSTL("STL"));
 	Plug(new albaOpExporterPLY("PLY"));
 	Plug(new albaOpExporterVTK("VTK"));
-	Plug(new albaOpExporterVTKXML("VTK"));
+	Plug(new albaOpExporterVTKXML("VTK xml"));
 	Plug(new albaOpExporterMetaImage("ITK MetaImage"));
 #ifdef ALBA_USE_GDCM
 	Plug(new albaOpExporterDicom("Dicom"), "", true, dicomSettings);
@@ -2039,6 +2040,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpCreateVolume("Create Volume"), _("Create"));
 	Plug(new albaOpAddLandmark("Add Landmark  \tCtrl+A"), _("Create"));
 	Plug(new albaOpCreateAverageLandmark("Create Average Landmark"), _("Create"));
+	Plug(new albaOpCreateAveragePlane("Create Average Plane"), _("Create"));
 	Plug(new albaOpCreateGroup("Group"), _("Create"));
 	Plug(new albaOpCreateMeter("Meter"), _("Create"));
 	Plug(new albaOpCreateRefSys("RefSys"), _("Create"));
@@ -2153,6 +2155,11 @@ void albaLogicWithManagers::PlugStandardViews()
 	albaViewRXCompound *vrx = new albaViewRXCompound("RX");
 	vrx->PackageView();
 	Plug(vrx);
+
+	//View RX Compound
+	albaViewVirtualRX *vvrx = new albaViewVirtualRX("Virtual RX");
+	vvrx->PackageView();
+	Plug(vvrx);
 
 	//View Isosurface
 	albaViewVTK *viso = new albaViewVTK("Isosurface");
@@ -2425,34 +2432,34 @@ void albaLogicWithManagers::CreateToolbar()
 	m_ToolBar->SetMargins(0, 0);
 	m_ToolBar->SetToolSeparation(2);
 	m_ToolBar->SetToolBitmapSize(wxSize(20, 20));
-	m_ToolBar->AddTool(MENU_FILE_NEW, albaPictureFactory::GetPictureFactory()->GetBmp("FILE_NEW"), _("New " + m_Extension + " storage file"));
-	m_ToolBar->AddTool(MENU_FILE_OPEN, albaPictureFactory::GetPictureFactory()->GetBmp("FILE_OPEN"), _("Open " + m_Extension + " storage file"));
-	m_ToolBar->AddTool(MENU_FILE_SAVE, albaPictureFactory::GetPictureFactory()->GetBmp("FILE_SAVE"), _("Save current " + m_Extension + " storage file"));
+	m_ToolBar->AddTool(MENU_FILE_NEW, "New " + m_Extension + " storage file", albaPictureFactory::GetPictureFactory()->GetBmp("FILE_NEW"));
+	m_ToolBar->AddTool(MENU_FILE_OPEN, _("Open " + m_Extension + " storage file"), albaPictureFactory::GetPictureFactory()->GetBmp("FILE_OPEN"));
+	m_ToolBar->AddTool(MENU_FILE_SAVE, _("Save current " + m_Extension + " storage file"), albaPictureFactory::GetPictureFactory()->GetBmp("FILE_SAVE"));
 	m_ToolBar->AddSeparator();
 
-	m_ToolBar->AddTool(MENU_FILE_PRINT, albaPictureFactory::GetPictureFactory()->GetBmp("PRINT"), _("Print the selected view"));
-	m_ToolBar->AddTool(MENU_FILE_PRINT_PREVIEW, albaPictureFactory::GetPictureFactory()->GetBmp("PRINT_PREVIEW"), _("Show the print preview for the selected view"));
+	m_ToolBar->AddTool(MENU_FILE_PRINT, _("Print the selected view"), albaPictureFactory::GetPictureFactory()->GetBmp("PRINT"));
+	m_ToolBar->AddTool(MENU_FILE_PRINT_PREVIEW, _("Show the print preview for the selected view"), albaPictureFactory::GetPictureFactory()->GetBmp("PRINT_PREVIEW"));
 	m_ToolBar->AddSeparator();
 
-	m_ToolBar->AddTool(OP_UNDO, albaPictureFactory::GetPictureFactory()->GetBmp("OP_UNDO"), _("Undo (ctrl+z)"));
-	m_ToolBar->AddTool(OP_REDO, albaPictureFactory::GetPictureFactory()->GetBmp("OP_REDO"), _("Redo (ctrl+shift+z)"));
+	m_ToolBar->AddTool(OP_UNDO, _("Undo (ctrl+z)"), albaPictureFactory::GetPictureFactory()->GetBmp("OP_UNDO"));
+	m_ToolBar->AddTool(OP_REDO, _("Redo (ctrl+shift+z)"), albaPictureFactory::GetPictureFactory()->GetBmp("OP_REDO"));
 	m_ToolBar->AddSeparator();
 
-	m_ToolBar->AddTool(OP_CUT, albaPictureFactory::GetPictureFactory()->GetBmp("OP_CUT"), _("Cut selected vme (ctrl+x)"));
-	m_ToolBar->AddTool(OP_COPY, albaPictureFactory::GetPictureFactory()->GetBmp("OP_COPY"), _("Copy selected vme (ctrl+c)"));
-	m_ToolBar->AddTool(OP_PASTE, albaPictureFactory::GetPictureFactory()->GetBmp("OP_PASTE"), _("Paste vme (ctrl+v)"));
+	m_ToolBar->AddTool(OP_CUT, _("Cut selected vme (ctrl+x)"), albaPictureFactory::GetPictureFactory()->GetBmp("OP_CUT"));
+	m_ToolBar->AddTool(OP_COPY, _("Copy selected vme (ctrl+c)"), albaPictureFactory::GetPictureFactory()->GetBmp("OP_COPY"));
+	m_ToolBar->AddTool(OP_PASTE, _("Paste vme (ctrl+v)"), albaPictureFactory::GetPictureFactory()->GetBmp("OP_PASTE"));
 	//m_ToolBar->AddTool(OP_RENAME, albaPictureFactory::GetPictureFactory()->GetBmp("OP_RENAME"), _("Rename vme (ctrl+n)"));
 	m_ToolBar->AddSeparator();
 
-	m_ToolBar->AddTool(CAMERA_RESET, albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_ALL"), _("Reset camera to fit all (ctrl+f)"));
-	m_ToolBar->AddTool(CAMERA_FIT, albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"), _("Reset camera to fit selected object (ctrl+shift+f)"));
-	m_ToolBar->AddTool(CAMERA_FLYTO, albaPictureFactory::GetPictureFactory()->GetBmp("FLYTO"), _("Fly to object under mouse"));
+	m_ToolBar->AddTool(CAMERA_RESET, _("Reset camera to fit all (ctrl+f)"), albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_ALL"));
+	m_ToolBar->AddTool(CAMERA_FIT, _("Reset camera to fit selected object (ctrl+shift+f)"), albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"));
+	m_ToolBar->AddTool(CAMERA_FLYTO, _("Fly to object under mouse"), albaPictureFactory::GetPictureFactory()->GetBmp("FLYTO"));
 	
 	if (m_UseSnapshotManager)
 	{
 		m_ToolBar->AddSeparator();
-		m_ToolBar->AddTool(MENU_FILE_SNAPSHOT, albaPictureFactory::GetPictureFactory()->GetBmp("CAMERA"), _("Create Snapshot"));
-		m_ToolBar->AddTool(MENU_FILE_MANAGE_SNAPSHOT, albaPictureFactory::GetPictureFactory()->GetBmp("IMAGE_PREVIEW"), _("Manage Snapshots"));
+		m_ToolBar->AddTool(MENU_FILE_SNAPSHOT, _("Create Snapshot"), albaPictureFactory::GetPictureFactory()->GetBmp("CAMERA"));
+		m_ToolBar->AddTool(MENU_FILE_MANAGE_SNAPSHOT, _("Manage Snapshots"), albaPictureFactory::GetPictureFactory()->GetBmp("IMAGE_PREVIEW"));
 	}
 
 	EnableItem(CAMERA_RESET, false);
@@ -2652,22 +2659,22 @@ void albaLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage, wxString mes
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::ShowWebSite(wxString url)
 {
-	albaLogMessage("Opening %s", url.c_str());
+	albaLogMessage("Opening %s", url.ToAscii());
 
 	//WXwidget does not manage urls that contains anchor
 	//in this case we need to create a temp file which redirect to the correct url 
 	//and open this file
 	if (url.Contains("#"))
 	{
-		wxString tmpHtmlFileName = albaGetAppDataDirectory().c_str();
+		wxString tmpHtmlFileName = albaGetAppDataDirectory().ToAscii();
 		tmpHtmlFileName += "/loadPage.html";
 
-		FILE *tmpHtmlFile = fopen(tmpHtmlFileName.c_str(), "w");
+		FILE *tmpHtmlFile = fopen(tmpHtmlFileName.ToAscii(), "w");
 
 		fprintf(tmpHtmlFile, "<html>\n");
 		fprintf(tmpHtmlFile, "<head>\n");
 		fprintf(tmpHtmlFile, "	<meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\" />\n");
-		fprintf(tmpHtmlFile, "	<meta http-equiv=\"refresh\" content=\"1;url=%s\" />\n", url.c_str());
+		fprintf(tmpHtmlFile, "	<meta http-equiv=\"refresh\" content=\"1;url=%s\" />\n", url.ToAscii());
 		fprintf(tmpHtmlFile, "<title></title>\n");
 		fprintf(tmpHtmlFile, "</head>\n");
 		fprintf(tmpHtmlFile, "<body/>\n");
@@ -2678,7 +2685,7 @@ void albaLogicWithManagers::ShowWebSite(wxString url)
 	}
 
 	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
-	command = command + "\"" + url.c_str() + "/\"";
+	command = command + "\"" + url + "/\"";
 	wxExecute(command);
 }
 
@@ -2718,11 +2725,11 @@ void albaLogicWithManagers::CreateLogPanel()
 		wxDateTime log_time = wxDateTime::Now();
 		s += "\\";
 		s += m_Win->GetTitle();
-		s += wxString::Format("_%02d_%02d_%d_%02d_%2d", log_time.GetYear(), log_time.GetMonth() + 1, log_time.GetDay(), log_time.GetHour(), log_time.GetMinute());
+		s += albaString::Format("_%02d_%02d_%d_%02d_%2d", log_time.GetYear(), log_time.GetMonth() + 1, log_time.GetDay(), log_time.GetHour(), log_time.GetMinute());
 		s += ".log";
 		if (m_Logger->SetFileName(s) == ALBA_ERROR)
 		{
-			wxMessageBox(wxString::Format("Unable to create log file %s!!", s), "Warning", wxOK | wxICON_WARNING);
+			wxMessageBox(albaString::Format("Unable to create log file %s!!", s.ToAscii()), "Warning", wxOK | wxICON_WARNING);
 		}
 	}
 
@@ -2757,7 +2764,7 @@ void albaLogicWithManagers::StoreLayout()
 		root->Initialize();
 		xmlStorage->SetDocument(root);
 
-		wxString layout_file = albaGetAppDataDirectory().c_str();
+		wxString layout_file = albaGetAppDataDirectory().ToAscii();
 		layout_file << "\\layout.mly";
 
 		wxFrame *frame = (wxFrame *)albaGetFrame();
@@ -2800,7 +2807,7 @@ void albaLogicWithManagers::RestoreLayout()
 	root->Initialize();
 	xmlStorage->SetDocument(root);
 
-	wxString layout_file  = albaGetAppDataDirectory().c_str();
+	wxString layout_file  = albaGetAppDataDirectory().ToAscii();
 	layout_file << "\\layout.mly";
 	xmlStorage->SetURL(layout_file);
 	if(wxFileExists(layout_file) && xmlStorage->Restore()==ALBA_OK)
@@ -2874,7 +2881,7 @@ void albaLogicWithManagers::UpdateMeasureUnit()
 void albaLogicWithManagers::ImportExternalFile(albaString &filename)
 {
 	wxString path, name, ext;
-	wxSplitPath(filename.GetCStr(), &path, &name, &ext);
+	wxFileName::SplitPath(filename.GetCStr(), &path, &name, &ext);
 	ext.MakeLower();
 	if (ext == "vtk")
 	{

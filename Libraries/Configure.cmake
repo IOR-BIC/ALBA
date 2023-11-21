@@ -1,4 +1,3 @@
-#
 # Program:   ALBA (Agile Library for Biomedical Applications)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
@@ -77,9 +76,15 @@ ENDIF (ALBA_USE_ITK)
 # wxWindows Library
 #
 IF (ALBA_USE_WX)
-  MFL_SUBPROJECT(WXWIN wxWin)
-ENDIF (ALBA_USE_WX)
+ SET(wxBUILD_SHARED FALSE)
 
+ ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/Libraries/wxWidgets)
+ 
+ SET(wxWidgets_USE_STATIC TRUE)
+ find_package(wxWidgets REQUIRED COMPONENTS net core base html)
+ include(${wxWidgets_USE_FILE})
+ENDIF (ALBA_USE_WX) 
+ 
 #
 # XercesC Library
 #

@@ -371,6 +371,15 @@ void albaTagItem::SetNumberOfComponents(int n)
   m_Components.resize(n);  
 }
 
+//----------------------------------------------------------------------------
+std::vector<double> albaTagItem::GetComponentsAsDoubles() const
+{
+	std::vector<double> values;
+	for (int i = 0; i < m_Components.size(); i++)
+		values.push_back(GetComponentAsDouble(i));
+	return values;
+}
+
 //-------------------------------------------------------------------------
 void albaTagItem::GetValueAsSingleString(albaString &str) const
 //-------------------------------------------------------------------------

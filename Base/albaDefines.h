@@ -293,17 +293,6 @@ ALBA_EXPORT void albaSleep(int msec);
   albaMessage(msg.str().c_str());\
 }
 
-#ifdef ALBA_USE_WX
-/** 
-  Macro for formatted printing to string (adapted from wxWidgets IMPLEMENT_LOG_FUNCTION)
-  To use it you will need to include wx/wx.h */
-#define ALBA_PRINT_MACRO(format,buffer,size) \
-  va_list argptr; \
-  va_start(argptr, format); \
-  wxVsnprintf(buffer, size, format, argptr); \
-  va_end(argptr);
-
-#else
 /** 
   Macro for formatted printing to string (adapted from wxWidgets IMPLEMENT_LOG_FUNCTION)
   To use it you will need to include <stdio.h>, <stdarg.h> and <varargs.h>
@@ -311,9 +300,7 @@ ALBA_EXPORT void albaSleep(int msec);
 #define ALBA_PRINT_MACRO(format,buffer,size) \
   va_list argptr; \
   va_start(argptr, format); \
-  vsprintf(buffer, format, argptr); \
+  vsnprintf(buffer,(const size_t)size, format, argptr); \
   va_end(argptr);
-
-#endif
 
 #endif

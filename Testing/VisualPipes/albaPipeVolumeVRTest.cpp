@@ -158,7 +158,7 @@ void medPipeVolumeVRTest::CompareImages(int scalarIndex)
 
   albaString controlOriginFile=MED_DATA_ROOT;
   controlOriginFile<<"/Test_PipeVolumeVR/";
-  controlOriginFile<<name.c_str();
+  controlOriginFile<<name.ToAscii();
   controlOriginFile<<"_";
   controlOriginFile<<"image";
   controlOriginFile<<scalarIndex;
@@ -185,14 +185,14 @@ void medPipeVolumeVRTest::CompareImages(int scalarIndex)
   if(!controlStream)
   {
     imageFile<<"/Test_PipeVolumeVR/";
-    imageFile<<name.c_str();
+    imageFile<<name.ToAscii();
     imageFile<<"_";
     imageFile<<"image";
   }
   else
   {
     imageFile<<"/Test_PipeVolumeVR/";
-    imageFile<<name.c_str();
+    imageFile<<name.ToAscii();
     imageFile<<"_";
     imageFile<<"comp";
   }
@@ -217,7 +217,7 @@ void medPipeVolumeVRTest::CompareImages(int scalarIndex)
   vtkNEW(rO);
   albaString imageFileOrig=MED_DATA_ROOT;
   imageFileOrig<<"/Test_PipeVolumeVR/";
-  imageFileOrig<<name.c_str();
+  imageFileOrig<<name.ToAscii();
   imageFileOrig<<"_";
   imageFileOrig<<"image";
   imageFileOrig<<scalarIndex;

@@ -48,6 +48,8 @@ public:
 	virtual void SetPointSize(double size);
 	virtual void SetLineWidth(double width);
 
+	virtual void Show(bool show);
+
 	void SetLineExtensionLength(double length) { m_LineExtensionLength = length; };
 	void SetLineStipplePattern(int lp) { m_LineStipplePattern = lp; };
 

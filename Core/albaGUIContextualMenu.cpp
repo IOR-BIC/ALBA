@@ -279,9 +279,9 @@ void albaGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 		break;
     case CONTEXTUAL_MENU_EXPORT_AS_VRML:
     {
-			albaString file_dir  = albaGetLastUserFolder().c_str();
+			albaString file_dir  = albaGetLastUserFolder();
 			albaString wildc     = "VRML (*.wrl)|*.wrl";
-			albaString file      = albaGetSaveFile(file_dir,wildc).c_str();
+			albaString file      = albaGetSaveFile(file_dir,wildc);
 			if (!file.IsEmpty())
 			{
 				vtkRenderWindow *renwin = m_ViewActive->GetRWI()->GetRenderWindow();

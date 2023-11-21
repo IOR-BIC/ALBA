@@ -93,10 +93,7 @@ int albaGPU3DTextureProviderHelper::InitializeTexture(vtkImageData *volume, vtkI
 	//Check data types
 	if (!(nComps == 1 || nComps == 3))
 		return false;
-
-	int maxDimGL;
-	glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &maxDimGL);
-
+	
 	int *dims = volume->GetDimensions();
 	double *spacing = volume->GetSpacing();
 
@@ -104,11 +101,13 @@ int albaGPU3DTextureProviderHelper::InitializeTexture(vtkImageData *volume, vtkI
 	for (int i = 0; i < 3; i++)
 		tItem.m_DataDims[i] = spacing[i]*(dims[i]-1);
 
-	if (maxDimGL < max(dims[0], max(dims[1], dims[2])))
-		return false; //unfortunately, 3D textures of this size are not supported
-
 	//we need to create texture
 	gpuProvider->EnableRenderingContext();
+
+	GLint  maxDimGL;
+	glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &maxDimGL);
+	if (maxDimGL < max(dims[0], max(dims[1], dims[2])))
+		return false; //unfortunately, 3D textures of this size are not supported
 
 	//Unregister current texture if exist 
 	UnregisterTexture();

@@ -114,7 +114,7 @@ SUBDIRS(DataPipes)
 
 # List libraries that are needed by this project.
 #SET(PROJECT_LIBS albaCore vtkALBA)
-SET(PROJECT_LIBS albaDataPipes)
+SET(PROJECT_LIBS albaDataPipes ${wxWidgets_LIBRARIES})
 
 IF (ALBA_USE_CRYPTO)
   SET(PROJECT_LIBS ${PROJECT_LIBS} Crypto)

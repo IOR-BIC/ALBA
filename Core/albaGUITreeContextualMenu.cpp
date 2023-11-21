@@ -60,6 +60,7 @@
 #include "pic/menu/EDIT_DELETE.xpm"
 #include "pic/menu/EDIT_RENAME.xpm"
 #include "pic/menu/EDIT_REPARENT.xpm"
+#include "pic/menu/EDIT_SHOW_HISTORY.xpm"
 #include "pic/menu/EDIT_EXPAND_TREE.xpm"
 #include "pic/menu/EDIT_COLLAPSE_TREE.xpm"
 #include "pic/menu/EDIT_ADD_GROUP.xpm"
@@ -205,6 +206,7 @@ void albaGUITreeContextualMenu::CreateContextualMenu(albaGUICheckTree *tree, alb
 		albaGUI::AddMenuItem(this, RMENU_DELETE, "Delete", EDIT_DELETE_xpm);
 		albaGUI::AddMenuItem(this, RMENU_RENAME, "Rename", EDIT_RENAME_xpm);
 		albaGUI::AddMenuItem(this, RMENU_REPARENT, "Reparent to...", EDIT_REPARENT_xpm);
+		albaGUI::AddMenuItem(this, RMENU_SHOW_HISTORY, "History", EDIT_SHOW_HISTORY_xpm);
 
 		m_OpManager->EnableContextualMenu(this, m_NodeActive);
 
@@ -299,7 +301,10 @@ void albaGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 		break;
 	case RMENU_REPARENT:
 		m_OpManager->RunOpReparentTo();
-		break;;
+		break;
+	case RMENU_SHOW_HISTORY:
+		m_OpManager->RunOpShowHistory();
+		break;
 
 	  case RMENU_SHOW_VME:
 		{
@@ -313,7 +318,7 @@ void albaGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 			
 			wxString text = "Show";
 			if (!show) text = "Hide";
-			m_DisplaySubMenu->FindItem(RMENU_SHOW_VME)->SetText(text);
+			m_DisplaySubMenu->FindItem(RMENU_SHOW_VME)->SetItemLabel(text);
 
 			GetLogicManager()->VmeShow(m_VmeActive, show);
     }

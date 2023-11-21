@@ -179,7 +179,7 @@ void albaPipeDensityDistance::Create(albaSceneNode *n/*, bool use_axes*/)
 		mass->Update();
 		area = (mass->GetSurfaceArea() / total_area) * 100.0;
 
-		message= wxString::Format("From infinity To %d\t%.3lf %" , m_MaxDistance,area);
+		message= albaString::Format("From infinity To %d\t%.3lf %" , m_MaxDistance,area);
 		albaLogMessage(message);
 	
 		vtkALBASmartPointer<vtkClipPolyData> clip_old;
@@ -199,7 +199,7 @@ void albaPipeDensityDistance::Create(albaSceneNode *n/*, bool use_axes*/)
 			mass->Update();
 			area = (mass->GetSurfaceArea() / total_area) * 100.0;
 
-			message= wxString::Format("From %.3lf To %.3lf\t%.3lf %" , i+step,i,area);
+			message= albaString::Format("From %.3lf To %.3lf\t%.3lf %" , i+step,i,area);
 			albaLogMessage(message);
 		}
 
@@ -208,7 +208,7 @@ void albaPipeDensityDistance::Create(albaSceneNode *n/*, bool use_axes*/)
 		mass_final->Update();
 		area = (mass_final->GetSurfaceArea() / total_area) * 100.0;
 
-		message= wxString::Format("From %d To -infinity\t%.3lf %" , -m_MaxDistance,area);
+		message= albaString::Format("From %d To -infinity\t%.3lf %" , -m_MaxDistance,area);
 		albaLogMessage(message);*/
 
 		int i;
@@ -268,11 +268,11 @@ void albaPipeDensityDistance::Create(albaSceneNode *n/*, bool use_axes*/)
 		m_AreaDistance[2] = (mass_high->GetSurfaceArea() / total_area) * 100.0;
 
 		/*albaString message;
-		message= wxString::Format("From %d To infinity\t%.3lf %" , m_MaxDistance,area[2]);
+		message= albaString::Format("From %d To infinity\t%.3lf %" , m_MaxDistance,area[2]);
 		albaLogMessage(message);
-		message= wxString::Format("From %d To %d\t%.3lf %" , -m_MaxDistance,m_MaxDistance,area[1]);
+		message= albaString::Format("From %d To %d\t%.3lf %" , -m_MaxDistance,m_MaxDistance,area[1]);
 		albaLogMessage(message);
-		message= wxString::Format("From %d To -infinity\t%.3lf %" , m_MaxDistance,area[0]);
+		message= albaString::Format("From %d To -infinity\t%.3lf %" , m_MaxDistance,area[0]);
 		albaLogMessage(message);*/
   }
   else
@@ -669,7 +669,7 @@ void albaPipeDensityDistance::UpdatePipeline()
 		  mass->Update();
 		  area = (mass->GetSurfaceArea() / total_area) * 100.0;
 
-		  message= wxString::Format("From infinity To %d\t%.3lf %" , m_MaxDistance,area);
+		  message= albaString::Format("From infinity To %d\t%.3lf %" , m_MaxDistance,area);
 		  albaLogMessage(message);
   	
 		  vtkALBASmartPointer<vtkClipPolyData> clip_old;
@@ -689,7 +689,7 @@ void albaPipeDensityDistance::UpdatePipeline()
 			  mass->Update();
 			  area = (mass->GetSurfaceArea() / total_area) * 100.0;
 
-			  message= wxString::Format("From %.3lf To %.3lf\t%.3lf %" , i+step,i,area);
+			  message= albaString::Format("From %.3lf To %.3lf\t%.3lf %" , i+step,i,area);
 			  albaLogMessage(message);
 		  }
 
@@ -698,7 +698,7 @@ void albaPipeDensityDistance::UpdatePipeline()
 		  mass_final->Update();
 		  area = (mass_final->GetSurfaceArea() / total_area) * 100.0;
 
-		  message= wxString::Format("From %d To -infinity\t%.3lf %" , -m_MaxDistance,area);
+		  message= albaString::Format("From %d To -infinity\t%.3lf %" , -m_MaxDistance,area);
 		  albaLogMessage(message);*/
   		
 		  int i;

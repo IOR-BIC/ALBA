@@ -137,7 +137,7 @@ SET(vtkALBA_FULL_SRCS
 
 
 # List the kits from VTK that are needed by this project.
-SET(vtkALBA_LIBS vtkCommon  vtkRendering  vtkFiltering  vtkGraphics  vtkHybrid)
+SET(vtkALBA_LIBS vtkCommon  vtkRendering  vtkFiltering  vtkGraphics  vtkHybrid ${wxWidgets_LIBRARIES})
 
 IF(WIN32)
 SET(vtkALBA_LIBS
@@ -170,10 +170,7 @@ ENDIF (NOT VTK_FOUND)
 # configuration header.
 IF(ALBA_BUILD_ALBADLL)
   IF(WIN32)
-  SET(vtkALBA_LIBS
-    ${vtkALBA_LIBS}
-    GPUAPI
-    )
+	SET(vtkALBA_LIBS ${vtkALBA_LIBS} GPUAPI)
   ENDIF(WIN32)
   SET(BUILD_SHARED_LIBS 1)
   SET(VTKLOCAL_BUILD_SHARED_LIBS_CONFIG 1)

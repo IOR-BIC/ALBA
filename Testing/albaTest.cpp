@@ -52,7 +52,7 @@ albaTest::albaTest()
 	m_Renderer = NULL;
 	m_RenderWindow = NULL;
 
-	m_WorkingDir = wxGetWorkingDirectory();
+	m_WorkingDir = wxGetCwd();
 }
 
 //--------------------------------------------------------------------------------
@@ -98,6 +98,14 @@ void albaTest::tearDown()
 		
 	cppDEL(m_App);  // Destroy the application
 	wxAppConsole::SetInstance(NULL);	
+}
+
+//----------------------------------------------------------------------------
+void albaTest::PauseBeforeExit()
+{
+	int x;
+	scanf("%d", &x);
+	return;
 }
 
 //----------------------------------------------------------------------------
@@ -147,11 +155,11 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 	albaString imageFileBase;
 	if (index >= 0)
 	{
-		imageFileBase.Printf("%s\\%s%d", imageFolder.c_str(), imageName.GetCStr(), index);
+		imageFileBase.Printf("%s\\%s%d", imageFolder.ToAscii(), imageName.GetCStr(), index);
 	}
 	else
 	{
-		imageFileBase.Printf("%s\\%s", imageFolder.c_str(), imageName.GetCStr());
+		imageFileBase.Printf("%s\\%s", imageFolder.ToAscii(), imageName.GetCStr());
 	}
 
 	wxString ext = ".png";

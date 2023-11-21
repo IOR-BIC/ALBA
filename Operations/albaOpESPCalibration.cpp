@@ -1350,11 +1350,11 @@ bool albaOpESPCalibration::SaveCalibration()
 
 
 	albaString initialFileName;
-	initialFileName = albaGetDocumentsDirectory().c_str();
+	initialFileName = albaGetDocumentsDirectory();
 	initialFileName.Append("\\ESPcalibration.xml");
 
 	albaString wildc = "Calibration xml file (*.xml)|*.xml";
-	albaString calbrationFilename = albaGetSaveFile(initialFileName.GetCStr(), wildc).c_str();
+	albaString calbrationFilename = albaGetSaveFile(initialFileName.GetCStr(), wildc);
 	
 	if (wxFileExists(calbrationFilename.GetCStr()))
 	{

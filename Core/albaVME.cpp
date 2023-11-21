@@ -351,7 +351,7 @@ int albaVME::SetParent(albaVME *parent)
 			InvokeEvent(this, NODE_DETACHED_FROM_TREE);
 
 			m_Parent = parent;
-			Modified();
+			SetId(-1);
 		}
 		return ALBA_OK;
 	}
@@ -1925,7 +1925,7 @@ void albaVME::NodeOnEvent(albaEventBase *e)
 					for (int pos = message.Find('\n'); pos >= 0; pos = message.Find('\n'))
 					{
 						wxString tmp = message.Mid(0, pos);
-						albaLogMessage(tmp.c_str());
+						albaLogMessage(tmp.ToAscii());
 						message = message.Mid(pos + 1);
 					}
 #else
@@ -2075,7 +2075,7 @@ void albaVME::UpdateId()
 //-------------------------------------------------------------------------
 albaVME * albaVME::GetByPath(const char *path, bool onlyVisible /*=true*/)
 {
-	wxStringTokenizer tkz(wxT(path), wxT("/"));
+	wxStringTokenizer tkz(path, wxT("/"));
 
 	albaVME *currentNode = this;
 	albaVME *tmpParent;

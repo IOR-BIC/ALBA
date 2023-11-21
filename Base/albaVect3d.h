@@ -98,6 +98,9 @@ public:
   /** Return a pointer to the vector of double */
   inline double* GetVect(){return (double*)this;};
 
+	/** Return a pointer to the vector of double */
+	inline void GetVect(double *vect) { vect[0] = m_X; vect[1] = m_Y; vect[2] = m_Z; };
+
   /** Operator: Return true if the vectors are equals */
   int operator==(albaVect3d &vect);
 
@@ -145,7 +148,7 @@ public:
   double& operator[](int pos);
 
   /** Returns the angle between two vectors */
-  double AngleBetweenVectors( albaVect3d &vect );
+  double AngleBetweenVectors( albaVect3d &vect, bool getMinAngle=true );
 
 	/** Do a spherical linear interpolation of two vectors*/
 	static albaVect3d Slerp(albaVect3d start, albaVect3d end, double percent);

@@ -193,7 +193,7 @@ void albaOpTransformInterface::OpDo()
       if (!m_TestMode)
       {
         wxString progress_string("Applying scaling to data...");
-        wxBusyInfo wait(progress_string.c_str());
+        wxBusyInfo wait(progress_string.ToAscii());
       }
 
       albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,tPDF.GetPointer()));
@@ -215,7 +215,7 @@ void albaOpTransformInterface::OpDo()
 
       // progress bar stuff
       wxString progress_string("Applying scaling to data...");
-      wxBusyInfo wait(progress_string.c_str());
+      wxBusyInfo wait(progress_string.ToAscii());
 
       albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,tf.GetPointer()));
       tf->Update();

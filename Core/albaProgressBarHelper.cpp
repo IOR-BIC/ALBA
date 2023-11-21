@@ -84,6 +84,12 @@ void albaProgressBarHelper::CloseProgressBar()
 //----------------------------------------------------------------------------
 void albaProgressBarHelper::UpdateProgressBar(long progress)
 {
+	if (progress > 100)
+	{
+		albaErrorMacro("Wrong progress");
+		return;
+	}
+
 	if (m_TextMode == false)
 	{
 		if(progress != m_Progress)

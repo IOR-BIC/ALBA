@@ -95,7 +95,7 @@ albaInteractionManager::albaInteractionManager()
   m_CurrentRenderer   = NULL;
   m_ActionsList       = NULL;
   m_Bindings          = NULL;
-  m_SettingFileName = albaGetLastUserFolder().c_str();
+  m_SettingFileName = albaGetLastUserFolder();
   
   albaNEW(m_DeviceManager);
   m_DeviceManager->SetListener(this);

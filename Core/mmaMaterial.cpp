@@ -204,7 +204,7 @@ wxBitmap *mmaMaterial::MakeIcon()
 
 	//translate to a wxBitmap
 	wxImage  *img = new wxImage(dim[0],dim[1],buffer,TRUE);
-	wxBitmap *bmp = new wxBitmap(img);
+	wxBitmap *bmp = new wxBitmap(*img);
   delete img;
 
   cppDEL(m_Icon);

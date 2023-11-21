@@ -248,7 +248,7 @@ void albaPipeIsosurface::ExctractIsosurface(albaVMESurface *isoSurface /* = NULL
 
   if(m_ExtractIsosurfaceName.Equals(""))
   {
-    wxString name = wxString::Format(_("Isosurface %g"),m_ContourValue);
+    wxString name = albaString::Format(_("Isosurface %g"),m_ContourValue);
     m_ExtractIsosurfaceName = name;
   }
 	

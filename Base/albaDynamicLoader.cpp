@@ -152,7 +152,7 @@ const char* albaDynamicLoader::LastError()
 LibHandle albaDynamicLoader::OpenLibrary(const char* libname )
 //----------------------------------------------------------------------------
 {
-  return LoadLibrary(libname);
+  return LoadLibraryA(libname);
 }
 
 //----------------------------------------------------------------------------

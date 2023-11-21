@@ -33,6 +33,8 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
+#include "wx/filename.h"
+
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpImporterDicFile);
@@ -71,7 +73,7 @@ int albaOpImporterDicFile::Import(void)
 
 	wxString path, name, ext;
 
-	wxSplitPath(m_FileName, &path, &name, &ext);
+	wxFileName::SplitPath(m_FileName.GetCStr(), &path, &name, &ext);
 
 	
 	albaVMEPointCloud *pointCloudVME;
@@ -175,7 +177,7 @@ void albaOpImporterDicFile::OpRun()
 	m_FileName = "";
 
 	wxString f;
-	f = albaGetOpenFile("", wildcard).c_str(); 
+	f = albaGetOpenFile("", wildcard).ToAscii(); 
 	if(!f.IsEmpty() && wxFileExists(f))
 	{
 		m_FileName = f;

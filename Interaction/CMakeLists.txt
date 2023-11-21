@@ -137,7 +137,7 @@ ENDIF (WIN32)
 #ENDIF (WIN32)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS albaBase albaIO albaGui vtkALBA)
+SET(PROJECT_LIBS albaBase albaIO albaGui vtkALBA ${wxWidgets_LIBRARIES})
 
 # currently special drivers only supported under WIN32
 #IF (WIN32)

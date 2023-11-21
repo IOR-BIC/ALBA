@@ -13,6 +13,7 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "albaDefines.h"
 
 #include <cppunit/config/SourcePrefix.h>
 
@@ -21,7 +22,7 @@
 #include "vtkALBACellsFilter.h"
 #include "vtkALBACellsFilterTest.h"
 
-#include <assert.h>
+//#include <assert.h>
 
 void vtkALBACellsFilterTest::TestFixture()
 {

@@ -20,7 +20,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestResult.h>
 
-#include "albaIncludeWX.h"
+
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkImageData.h"
@@ -67,6 +67,8 @@ public:
 
 	/** Test specific stuff executed after each test */
 	virtual void AfterTest() {};
+
+	static void PauseBeforeExit();
 
 protected:
 	void CompareImage(albaString suiteName, albaString imageName, int index = -1);

@@ -21,6 +21,7 @@
 #include "albaDecl.h"
 #include "albaPipeCompoundVolumeFixedScalars.h"
 #include "albaGUIDynamicVP.h"
+#include "wx/notebook.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeCompoundVolumeFixedScalars);

@@ -73,18 +73,18 @@ void albaOpImporterMSF::OpRun()
 {
   if (!m_TestMode)
   {
-    albaString fileDir = albaGetLastUserFolder().c_str();
+    albaString fileDir = albaGetLastUserFolder();
 		
 		albaString wildc;
 		const	char *ext = GetLogicManager()->GetMsfFileExtension();
 
-		wildc = wxString::Format("All Supported File (*.%s;*.z%s;msf;zmsf)|*.%s;*.%s;*.msf;*.zmsf", ext, ext, ext, ext);
-		wildc += wxString::Format("|Alba Project File (*.%s)|*.%s", ext, ext);
-		wildc += wxString::Format("|Alba Compressed File (*.z%s)|*.z%s", ext, ext);
-		wildc += wxString::Format("|MAF Project File (*.msf)|*.msf");
-		wildc += wxString::Format("|MAF Compressed File (*.zmsf)|*.zmsf", ext, ext);
+		wildc = albaString::Format("All Supported File (*.%s;*.z%s;msf;zmsf)|*.%s;*.%s;*.msf;*.zmsf", ext, ext, ext, ext);
+		wildc += albaString::Format("|Alba Project File (*.%s)|*.%s", ext, ext);
+		wildc += albaString::Format("|Alba Compressed File (*.z%s)|*.z%s", ext, ext);
+		wildc += albaString::Format("|MAF Project File (*.msf)|*.msf");
+		wildc += albaString::Format("|MAF Compressed File (*.zmsf)|*.zmsf", ext, ext);
 
-    m_File = albaGetOpenFile(fileDir, wildc, _("Choose Project file")).c_str();
+    m_File = albaGetOpenFile(fileDir, wildc, _("Choose Project file"));
   }
 
   int result = OP_RUN_CANCEL;
@@ -103,7 +103,7 @@ int albaOpImporterMSF::ImportMSF()
 {
   albaString unixname = m_File;
   wxString path, name, ext;
-  wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(m_File.GetCStr(),&path,&name,&ext);
 
 	albaString zippedExt;
 	const char *archExt = GetLogicManager()->GetMsfFileExtension();
@@ -151,7 +151,7 @@ int albaOpImporterMSF::ImportMSF()
     //return ALBA_ERROR;
   }
       
-  wxString group_name = wxString::Format("imported from %s.%s",name,ext);
+  wxString group_name = albaString::Format("imported from %s.%s",name.ToAscii(),ext.ToAscii());
  
   albaNEW(m_Group);
   m_Group->SetName(group_name);
@@ -188,7 +188,7 @@ const char *albaOpImporterMSF::ZIPOpen(albaString m_File)
   albaString zip_cache = wxPathOnly(m_File.GetCStr());
   if (zip_cache.IsEmpty())
   {
-    zip_cache = albaGetAppDataDirectory().c_str();
+    zip_cache = albaGetAppDataDirectory();
   }
   zip_cache = zip_cache + "\\~TmpData";
   if (!wxDirExists(zip_cache.GetCStr()))
@@ -196,7 +196,7 @@ const char *albaOpImporterMSF::ZIPOpen(albaString m_File)
   m_TmpDir = zip_cache;
 
   wxString path, name, ext, complete_name, zfile, out_file;
-  wxSplitPath(ZipFile.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(ZipFile.GetCStr(),&path,&name,&ext);
   complete_name = name + "." + ext;
 
   wxFSFile *zfileStream;
@@ -221,7 +221,7 @@ const char *albaOpImporterMSF::ZIPOpen(albaString m_File)
     RemoveTempDirectory();
     return "";
   }
-  wxSplitPath(zfile,&path,&name,&ext);
+  wxFileName::SplitPath(zfile,&path,&name,&ext);
   complete_name = name + "." + ext;
   if (enable_mid)
     complete_name = complete_name.Mid(length_header_name);
@@ -241,11 +241,11 @@ const char *albaOpImporterMSF::ZIPOpen(albaString m_File)
   if(ext == "msf")
   {
     m_MSFFile = out_file;
-    out_file_stream.open(out_file, std::ios_base::out);
+    out_file_stream.open(out_file.ToAscii(), std::ios_base::out);
   }
   else
   {
-    out_file_stream.open(out_file, std::ios_base::binary);
+    out_file_stream.open(out_file.ToAscii(), std::ios_base::binary);
   }
   s_size = zip_is->GetSize();
   buf = new char[s_size];
@@ -267,7 +267,7 @@ const char *albaOpImporterMSF::ZIPOpen(albaString m_File)
       return "";
     }
     zip_is = (wxZlibInputStream *)zfileStream->GetStream();
-    wxSplitPath(zfile,&path,&name,&ext);
+    wxFileName::SplitPath(zfile,&path,&name,&ext);
     complete_name = name + "." + ext;
     if (enable_mid)
       complete_name = complete_name.Mid(length_header_name);
@@ -275,10 +275,10 @@ const char *albaOpImporterMSF::ZIPOpen(albaString m_File)
     if(ext == "msf")
     {
       m_MSFFile = out_file;
-      out_file_stream.open(out_file, std::ios_base::out);
+      out_file_stream.open(out_file.ToAscii(), std::ios_base::out);
     }
     else
-      out_file_stream.open(out_file, std::ios_base::binary);
+      out_file_stream.open(out_file.ToAscii(), std::ios_base::binary);
     s_size = zip_is->GetSize();
     buf = new char[s_size];
     zip_is->Read(buf,s_size);
@@ -308,10 +308,10 @@ void albaOpImporterMSF::RemoveTempDirectory()
   if (m_TmpDir != "")
   {
     wxString working_dir;
-    working_dir = albaGetAppDataDirectory().c_str();
+    working_dir = albaGetAppDataDirectory().ToAscii();
     wxSetWorkingDirectory(working_dir);
     //remove tmp directory due to zip extraction or compression
-    if(::wxDirExists(m_TmpDir))
+    if(::wxDirExists(m_TmpDir.GetCStr()))
     {
       wxString file_match = m_TmpDir + "/*.*";
       wxString f = wxFindFirstFile(file_match);

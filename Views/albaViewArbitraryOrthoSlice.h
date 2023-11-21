@@ -194,7 +194,10 @@ protected:
 	void StoreCameraParametersForAllSubviews();
 
 	void ShowSlicers( albaVME * vmeVolume, bool show );
-	
+
+	void CreateAttachCamera(int i, int currentView);
+
+
 	void ResetCameraToSlices();
 
 	void UpdateConesPosition();
@@ -270,7 +273,7 @@ protected:
 	albaAttachCamera		*m_CameraToSlicer[3];
 
 	double	m_SlicingOriginGUI[3];
-	double	m_SlicingOrigin[3];
+	double	m_SlicingOrigin[4];
 	double	m_SlicingOriginReset[3];
 	double	m_VolumeVTKDataABSOrientation[3];
 	
