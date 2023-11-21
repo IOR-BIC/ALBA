@@ -26,7 +26,7 @@ SET(PROJECT_SRCS
 	)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS Libraries::wx::net Libraries::wx::core Libraries::wx::base )
+SET(PROJECT_LIBS ${wxWidgets_LIBRARIES} )
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})

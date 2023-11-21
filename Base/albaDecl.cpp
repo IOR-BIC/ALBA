@@ -13,10 +13,10 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "albaDefines.h"
 
 #include "albaDecl.h"
 #include <wx/uri.h>
-#include "albaIncludeWX.h"
 #include "wx/filename.h"
 
 #include "mmuIdFactory.h"
@@ -263,7 +263,7 @@ void albaSetLastUserFolder(albaString folder)
 				return;
 		}
 
-    config->Write("LastUserFolder", folder);
+    config->Write("LastUserFolder", folder.GetCStr());
     delete config;
   }
 }
