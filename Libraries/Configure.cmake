@@ -80,6 +80,7 @@ IF (ALBA_USE_WX)
 
  ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/Libraries/wxWidgets)
  
+ SET(wxWidgets_USE_STATIC TRUE)
  find_package(wxWidgets REQUIRED COMPONENTS net core base html)
  include(${wxWidgets_USE_FILE})
 ENDIF (ALBA_USE_WX) 
