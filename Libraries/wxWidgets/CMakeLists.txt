@@ -46,25 +46,25 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
  # Configuring WXWIN
  IF (WXWIN_SOURCE_PATH)
   MESSAGE(STATUS "WXWIN: Configuring wxWidgets")
-  
-  message("OutPath =${LIBRARY_OUTPUT_PATH}")
-  
+    
   SET (WXWIN_BINARY_PATH "${WXWIN_BINARY_DIR}/Build" )
   OPTION (WXWIN_FORCE_CONFIGURE "Weither to force configuration of wxWidgets" FALSE)
  
   # Check if already configured
-  IF (WXWIN_FORCE_CONFIGURE OR NOT EXISTS ${WXWIN_BINARY_PATH})
+  IF (WXWIN_FORCE_CONFIGURE OR NOT EXISTS ${WXWIN_BINARY_PATH}/wxUse.cmake)
   
     # Configuring the WXWIN library    
     FILE(MAKE_DIRECTORY "${WXWIN_BINARY_PATH}")
+	
+	
+	set(wxWidgets_ROOT_DIR "${PROJECT_BINARY_DIR}/wxWidgets" CACHE PATH "wxWidgets base/installation directory")
 	
 	# Run configuration of WXWIN library
     MESSAGE(STATUS "WXWIN: Configuring external wxWidgets project")
     EXEC_PROGRAM(${CMAKE_COMMAND} "${WXWIN_BINARY_PATH}" ARGS "${WXWIN_SOURCE_PATH}" 
       -G"${CMAKE_GENERATOR}" 
-      -DwxUSE_SOCKETS:BOOL=FALSE
       -DwxUSE_UNICODE:BOOL=FALSE
-	  -DCMAKE_INSTALL_PREFIX:PATH="${PROJECT_BINARY_DIR}/wxWidgets"
+	  -DCMAKE_INSTALL_PREFIX:PATH="${wxWidgets_ROOT_DIR}"
       -DLIBRARY_OUTPUT_PATH:PATH="${LIBRARY_OUTPUT_PATH}" 
       -DEXECUTABLE_OUTPUT_PATH:PATH="${EXECUTABLE_OUTPUT_PATH}" 
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
@@ -72,10 +72,84 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
       -DwxUSE_HTML:BOOL=TRUE
       OUTPUT_VARIABLE CMAKE_OUTPUT 
       RETURN_VALUE CMAKE_RETURN)
+	  
+	
   
     # Write configure log file
     FILE(WRITE ${WXWIN_BINARY_DIR}/CMake-Log.txt "CMake configure output ${CMAKE_OUTPUT}" )
-			
-	SET(ALBA_USE_WX TRUE CACHE BOOL "Alba uses WX")
-  ENDIF(WXWIN_FORCE_CONFIGURE OR NOT EXISTS ${WXWIN_BINARY_PATH}) 
+	
+	
+	#---------------CMAKE SUCCESS IF-----------------
+	IF (CMAKE_RETURN)
+      # in case of error prompt an error dialog
+      MESSAGE("CMake configure returned value = ${CMAKE_RETURN}")
+      MESSAGE(FATAL_ERROR "${SUBPROJECT_NAME} configure error, cmake output = ${CMAKE_OUTPUT}")     
+    ELSE (CMAKE_RETURN)
+	
+	  MESSAGE(STATUS "WXWIN: Compiling external wxWidgets project")
+		
+	  # load WXWIN build command from cmake's cache
+      LOAD_CACHE(${WXWIN_BINARY_PATH} READ_WITH_PREFIX WXWIN_ MAKECOMMAND)
+      
+      #Split space separated arguments into a semi-colon separated list. Necessary for correct command line generation
+      SEPARATE_ARGUMENTS(WXWIN_MAKECOMMAND)
+      IF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.0)
+      	STRING (REPLACE "\\" "\\\\"  WXWIN_MAKECOMMAND "${WXWIN_MAKECOMMAND}")
+      ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.0)
+	  STRING (REPLACE ";" " " WXWIN_MAKECOMMAND "${WXWIN_MAKECOMMAND}")
+	  
+	  STRING(APPEND WXWIN_MAKECOMMAND " --target Install")
+	 
+	  EXEC_PROGRAM(${WXWIN_MAKECOMMAND} ${WXWIN_BINARY_PATH}
+	    OUTPUT_VARIABLE BUILD_OUTPUT
+	    RETURN_VALUE BUILD_RETURN)
+	  
+	  #---------------BUILD SUCCESS IF-----------------
+	  IF (BUILD_RETURN)
+		# in case of error prompt an error dialog
+        MESSAGE("CMake configure returned value = ${BUILD_RETURN}")
+        MESSAGE(FATAL_ERROR "${SUBPROJECT_NAME} configure error, cmake output = ${BUILD_OUTPUT}")
+	  ELSE (BUILD_RETURN)
+		MESSAGE(STATUS "WXWIN: Compiling external wxWidgets project in Debug mode")
+		
+		STRING (REPLACE "\"Release\""  "\"DEBUG\"" WXWIN_MAKEDEBUGCOMMAND ${WXWIN_MAKECOMMAND})
+	
+		EXEC_PROGRAM(${WXWIN_MAKEDEBUGCOMMAND} ${WXWIN_BINARY_PATH}
+	      OUTPUT_VARIABLE DEBUG_OUTPUT
+	      RETURN_VALUE DEBUG_RETURN)
+		   
+		#---------------DEBUG SUCCESS IF-----------------
+	    IF (DEBUG_RETURN)
+		  # in case of error prompt an error dialog
+          MESSAGE("CMake configure returned value = ${DEBUG_RETURN}")
+          MESSAGE(FATAL_ERROR "${SUBPROJECT_NAME} configure error, cmake output = ${DEBUG_OUTPUT}")
+	    ELSE (DEBUG_RETURN)
+		
+		  MESSAGE(STATUS "Creating file ${WXWIN_BINARY_PATH}/wxUse.cmake")
+    	CONFIGURE_FILE("${WXWIN_SOURCE_DIR}/wxUse.cmake.in" "${WXWIN_BINARY_PATH}/wxUse.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
+		
+		  MESSAGE(STATUS "WXWIN: Installed!!!")
+		ENDIF(DEBUG_RETURN)
+	  ENDIF (BUILD_RETURN)
+	
+	  SET(ALBA_USE_WX TRUE CACHE BOOL "Alba uses WX")
+	  
+
+    ENDIF (CMAKE_RETURN)
+	
+				
+  ENDIF(WXWIN_FORCE_CONFIGURE OR NOT EXISTS ${WXWIN_BINARY_PATH}/wxUse.cmake) 
  ENDIF (WXWIN_SOURCE_PATH) 
+ 
+
+#--------------------------------------------------------------------------------------------------------
+# Write the list of variables and their values that are defined by CMake when running this CMakeList file
+#--------------------------------------------------------------------------------------------------------
+IF (DEBUG_MESSAGES)
+  FILE(WRITE ${WXWIN_BINARY_DIR}/AllVariables.txt "")
+  GET_CMAKE_PROPERTY(VARS VARIABLES)
+  FOREACH(var ${VARS})
+  	FILE(APPEND ${WXWIN_BINARY_DIR}/AllVariables.txt 
+  							"${var} \"${${var}}\"\n")
+  ENDFOREACH(var ${VARS})
+ENDIF (DEBUG_MESSAGES)

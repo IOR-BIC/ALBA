@@ -82,7 +82,6 @@ IF (ALBA_USE_WX)
  
  find_package(wxWidgets REQUIRED COMPONENTS net core base html)
  include(${wxWidgets_USE_FILE})
- 
 ENDIF (ALBA_USE_WX) 
  
 #
