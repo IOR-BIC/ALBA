@@ -47,12 +47,14 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
  IF (WXWIN_SOURCE_PATH)
   MESSAGE(STATUS "WXWIN: Configuring wxWidgets")
   
+  message("OutPath =${LIBRARY_OUTPUT_PATH}")
+  
   SET (WXWIN_BINARY_PATH "${WXWIN_BINARY_DIR}/Build" )
   OPTION (WXWIN_FORCE_CONFIGURE "Weither to force configuration of wxWidgets" FALSE)
  
   # Check if already configured
-  IF (WXWIN_FORCE_CONFIGURE OR NOT EXISTS ${WXWIN_BINARY_PATH}/wxUse.cmake)
-    
+  IF (WXWIN_FORCE_CONFIGURE OR NOT EXISTS ${WXWIN_BINARY_PATH})
+  
     # Configuring the WXWIN library    
     FILE(MAKE_DIRECTORY "${WXWIN_BINARY_PATH}")
 	
@@ -62,6 +64,7 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
       -G"${CMAKE_GENERATOR}" 
       -DwxUSE_SOCKETS:BOOL=FALSE
       -DwxUSE_UNICODE:BOOL=FALSE
+	  -DCMAKE_INSTALL_PREFIX:PATH="${PROJECT_BINARY_DIR}/wxWidgets"
       -DLIBRARY_OUTPUT_PATH:PATH="${LIBRARY_OUTPUT_PATH}" 
       -DEXECUTABLE_OUTPUT_PATH:PATH="${EXECUTABLE_OUTPUT_PATH}" 
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
@@ -72,7 +75,7 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
   
     # Write configure log file
     FILE(WRITE ${WXWIN_BINARY_DIR}/CMake-Log.txt "CMake configure output ${CMAKE_OUTPUT}" )
-		
-		SET(wxUSE_UNICODE FALSE CACHE BOOL "do not use unicode in WX")
-  ENDIF(WXWIN_FORCE_CONFIGURE OR NOT EXISTS ${WXWIN_BINARY_PATH}/wxUse.cmake) 
+			
+	SET(ALBA_USE_WX TRUE CACHE BOOL "Alba uses WX")
+  ENDIF(WXWIN_FORCE_CONFIGURE OR NOT EXISTS ${WXWIN_BINARY_PATH}) 
  ENDIF (WXWIN_SOURCE_PATH) 

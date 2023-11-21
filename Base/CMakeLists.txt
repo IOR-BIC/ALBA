@@ -59,7 +59,7 @@ IF (ALBA_USE_VTK)
 ENDIF (ALBA_USE_VTK)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS Libraries::wx::net Libraries::wx::core Libraries::wx::base )
+SET(PROJECT_LIBS ${wxWidgets_LIBRARIES})
 
 IF (ALBA_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon )

@@ -110,7 +110,7 @@ ENDIF(WITH_OPENSSL)
 
 
 # List the kits from VTK that are needed by this project.
-SET(PROJECT_LIBS albaBase XercesC Libraries::wx::net Libraries::wx::core Libraries::wx::base GPUAPI)
+SET(PROJECT_LIBS albaBase XercesC ${wxWidgets_LIBRARIES} GPUAPI)
 
 #........................................................
 #solo la vtkCommon e' linkata per default

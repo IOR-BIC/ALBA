@@ -137,7 +137,7 @@ SET(vtkALBA_FULL_SRCS
 
 
 # List the kits from VTK that are needed by this project.
-SET(vtkALBA_LIBS vtkCommon  vtkRendering  vtkFiltering  vtkGraphics  vtkHybrid Libraries::wx::net Libraries::wx::core Libraries::wx::base)
+SET(vtkALBA_LIBS vtkCommon  vtkRendering  vtkFiltering  vtkGraphics  vtkHybrid ${wxWidgets_LIBRARIES})
 
 IF(WIN32)
 SET(vtkALBA_LIBS
