@@ -14,7 +14,7 @@ SET(PROJECT_SRCS
 	albaAbsLogicManager.h
 )
 
-SET(PROJECT_LIBS Libraries::wx::net Libraries::wx::core Libraries::wx::base)
+SET(PROJECT_LIBS ${wxWidgets_LIBRARIES})
 
 
 # Create the library.

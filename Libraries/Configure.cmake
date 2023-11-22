@@ -79,12 +79,10 @@ IF (ALBA_USE_WX)
  SET(wxBUILD_SHARED FALSE)
 
  ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/Libraries/wxWidgets)
- ADD_SUBDIRECTORY(${PROJECT_BINARY_DIR}/Libraries/wxWidgets/Sources build)
-
- ADD_LIBRARY(Libraries::wx::net ALIAS wxnet)
- ADD_LIBRARY(Libraries::wx::base ALIAS wxbase)
- ADD_LIBRARY(Libraries::wx::core ALIAS wxcore)
- ADD_LIBRARY(Libraries::wx::html ALIAS wxhtml)
+ 
+ SET(wxWidgets_USE_STATIC TRUE)
+ find_package(wxWidgets REQUIRED COMPONENTS net core base html)
+ include(${wxWidgets_USE_FILE})
 ENDIF (ALBA_USE_WX) 
  
 #
