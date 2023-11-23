@@ -1,0 +1,5 @@
+
+set(wxWidgets_ROOT_DIR "@wxWidgets_ROOT_DIR@" CACHE PATH "wxWidgets base/installation directory")
+
+find_package(wxWidgets REQUIRED COMPONENTS net core base html)
+include(${wxWidgets_USE_FILE})

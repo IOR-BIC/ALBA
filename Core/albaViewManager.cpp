@@ -88,7 +88,9 @@ albaViewManager::~albaViewManager()
   {
     v = m_ViewList;
     m_ViewList = v->m_Next;
-		((albaGUIMDIChild *)v->GetFrame())->Close();
+		albaGUIMDIChild * frame = (albaGUIMDIChild *)v->GetFrame();
+		if(frame)
+			frame->Close();
   }
 
   for(int i=0; i<m_TemplateNum; i++) // destroy all template views

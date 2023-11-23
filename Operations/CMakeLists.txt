@@ -221,7 +221,7 @@ IF (ALBA_USE_ITK)
 ENDIF (ALBA_USE_ITK)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS "albaVME" "albaInteraction" Libraries::wx::net Libraries::wx::core Libraries::wx::base)
+SET(PROJECT_LIBS "albaVME" "albaInteraction" ${wxWidgets_LIBRARIES})
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
