@@ -1411,9 +1411,7 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
   double dblNewVolume = props->GetVolume();
   props->Delete();
 
-  wxString szMsg = albaString::Format(
-    wxT("Deformation done. Volume shrinkage: %.4f (Orig = %.2f, New = %.2f)\n"),
-    dblNewVolume / dblOrigVolume, dblOrigVolume, dblNewVolume);
+  wxString szMsg = albaString::Format("Deformation done. Volume shrinkage: %.4f (Orig = %.2f, New = %.2f)\n", dblNewVolume / dblOrigVolume, dblOrigVolume, dblNewVolume);
 
   albaLogMessage(szMsg.ToAscii());
 #ifdef _RPT0
@@ -1435,7 +1433,7 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
   albaVMESurface* surface;
 
   albaNEW(surface);
-  surface->SetName(albaString::Format(wxT("Deformed %s"), m_Input->GetName()));
+  surface->SetName(albaString::Format("Deformed %s", m_Input->GetName()));
   surface->SetData(m_Meshes[1]->pPoly, 0, albaVMEGeneric::ALBA_VME_REFERENCE_DATA);
 
   albaDEL(m_Output);
