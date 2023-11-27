@@ -57,7 +57,9 @@ void albaGUIFileHistory::AddFileToHistory(const wxString& file)
 
 	// First delete filename that has popped off the end of the array (if any)
 	if (m_fileHistory.size() == m_fileMaxFiles)
-		m_fileHistory.pop_back();
+	{
+		RemoveFileFromHistory(m_fileMaxFiles-1);
+	}
 
 	// Shuffle filenames down
 	m_fileHistory.Insert(file, 0);
