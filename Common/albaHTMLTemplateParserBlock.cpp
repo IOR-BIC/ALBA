@@ -609,10 +609,10 @@ void albaHTMLTemplateParserBlock::PreParse( wxString *inputTemplate, int &parsin
     stdHTMLtoCopy=0;
     //we start parsing outside from ALBAtags 
     //we search the next tag inside the input and parse it
-    while (parsingPos+stdHTMLtoCopy<templateSize && inputTemplate->GetChar(parsingPos+stdHTMLtoCopy)!='[')
+    while (parsingPos+stdHTMLtoCopy<templateSize && inputTemplate->ToAscii()[parsingPos+stdHTMLtoCopy]!='[')
       stdHTMLtoCopy++;
 
-    if (inputTemplate->GetChar(parsingPos)=='[')
+    if (inputTemplate->ToAscii()[parsingPos]=='[')
       stdHTMLtoCopy--;
 
     //coping stdHtml to preParsedHTML
@@ -621,7 +621,7 @@ void albaHTMLTemplateParserBlock::PreParse( wxString *inputTemplate, int &parsin
 
     parsingPos+=stdHTMLtoCopy;
 
-    if (inputTemplate->GetChar(parsingPos)=='[')
+    if (inputTemplate->ToAscii()[parsingPos]=='[')
       continueParsing=PreParseTag(inputTemplate,parsingPos);
   }
   //continueParsing is true only if we reach the end of template and not find the end tag
@@ -841,7 +841,8 @@ void albaHTMLTemplateParserBlock::SkipInputSpaces( wxString *inputTemplate, int 
 //----------------------------------------------------------------------------
 {
   //add more white spaces chars here if necessary
-  while ( inputTemplate->GetChar(parsingPos) == ' ')
+	const char * asciiStr = inputTemplate->ToAscii();
+  while ( asciiStr[parsingPos] == ' ')
     parsingPos++;
 }
 
@@ -855,7 +856,8 @@ void albaHTMLTemplateParserBlock::ReadTagName( wxString *inputTemplate, int &par
   nameStart=parsingPos;
 
   //reads textual char (stopping on spaces or tag end)
-  while ( inputTemplate->GetChar(parsingPos) != ' ' &&  inputTemplate->GetChar(parsingPos) != ']' )
+	const char * asciiStr = inputTemplate->ToAscii();
+  while ( asciiStr[parsingPos] != ' ' &&  asciiStr[parsingPos] != ']' )
     parsingPos++;
 
 
@@ -865,7 +867,7 @@ void albaHTMLTemplateParserBlock::ReadTagName( wxString *inputTemplate, int &par
   SkipInputSpaces(inputTemplate,parsingPos);
 
   //read closing char ']'
-  if (inputTemplate->GetChar(parsingPos)!=']')
+  if (inputTemplate->ToAscii()[parsingPos]!=']')
     albaLogMessage("albaHTMLTemplateParserBlock: Expected tag end:']'");
   else parsingPos++; 
 }
