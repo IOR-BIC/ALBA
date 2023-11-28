@@ -41,8 +41,13 @@ void albaLogMessage(const char *format, ...)
   albaLogMutex.Lock();
 
 	ALBA_PRINT_MACRO(format,albaLogBuffer,sizeof(albaLogBuffer));
-  wxLogMessage(albaLogBuffer);
-	wxLogMessage("\n");
+	
+	wxString logStr = albaLogBuffer;
+	
+	//The print macro removes the double %% so we need to reintroduce them before call wxLogMessage
+	logStr.Replace("%", "%%");
+	logStr << "\n";
+  wxLogMessage(logStr);
   
   albaLogMutex.Unlock();
 }
