@@ -122,9 +122,12 @@ bool AlbaMaster::OnInit()
 
 	wxString splashDir = albaGetApplicationDirectory().ToAscii();
 	wxBitmap splashBitmap;
-	splashBitmap.LoadFile(splashDir + "\\Config\\" + splashImageName, wxBITMAP_TYPE_BMP);
-	m_Logic->ShowSplashScreen(splashBitmap);
-
+	wxString splashFileName = splashDir + "\\Config\\" + splashImageName;
+	if (wxFileExists(splashFileName))
+	{
+		splashBitmap.LoadFile(splashFileName, wxBITMAP_TYPE_BMP);
+		m_Logic->ShowSplashScreen(splashBitmap);
+	}
 	//////////////////////////////////////////////////////////////////////////
 	wxHandleFatalExceptions();
 

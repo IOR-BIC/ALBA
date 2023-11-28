@@ -34,6 +34,7 @@
 #include <wx/fs_zip.h>
 #include <wx/dir.h>
 #include <wx/filename.h>
+#include <wx/config.h>
 
 #include "albaDecl.h"
 #include "albaVME.h"
@@ -66,7 +67,7 @@ albaVMEManager::albaVMEManager()
 
   m_SingleBinaryFile = false;
 
-  m_Config = wxConfigBase::Get();
+	m_Config = new wxConfig(wxEmptyString);
   m_ZipHandler = NULL;
   m_FileSystem = NULL;
 

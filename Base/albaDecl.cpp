@@ -26,7 +26,7 @@
 #include "albaLogicWithManagers.h"
 #include "albaColor.h"
 #include "wx/confbase.h"
-
+#include "wx/config.h"
 
 
 // int ALBAExpertMode = TRUE;
@@ -206,13 +206,15 @@ wxString albaGetLastUserFolder()
 {  
   wxString lastUserFolder;
 
-	wxConfigBase* config = wxConfigBase::Get();
+	wxConfigBase* config = new wxConfig(wxEmptyString);
 
   // Return last User Folder if exists, else Documents folder
   if(!config->Read("LastUserFolder", &lastUserFolder))
     lastUserFolder = albaGetDocumentsDirectory().ToAscii();
 
   return lastUserFolder.ToAscii();
+
+	cppDEL(config);
 }
 
 
@@ -250,7 +252,7 @@ void albaSetLastUserFolder(albaString folder)
   if(folder!="")
   {
     wxString appName = wxApp::GetInstance()->GetAppName();
-		wxConfigBase* config = wxConfigBase::Get();
+		wxConfigBase* config = new wxConfig(wxEmptyString);
 		
 
 		if (!wxDirExists(folder.GetCStr()))
@@ -264,7 +266,8 @@ void albaSetLastUserFolder(albaString folder)
 		}
 
     config->Write("LastUserFolder", folder.GetCStr());
-    delete config;
+    
+		cppDEL(config);
   }
 }
 

@@ -397,7 +397,7 @@ albaGUI* albaViewVirtualRX::CreateGui()
 // 	m_Gui->Add(m_ProjectionRangeGuiSliderZ);
 
 	wxString prjChoices[2]{ "Mean", "Max" };
-	m_Gui->Radio(ID_PROJECTION_MODE, "Mode", &m_ProjectionMode, 2, prjChoices, 2, "Projection Modality",1);
+	m_Gui->Radio(ID_PROJECTION_MODE, "Mode", &m_ProjectionMode, 2, prjChoices, 2, "Projection Modality");
 
 	m_Gui->Label("");
 	m_Gui->Button(ID_PROJECTION_RESET, "Reset");
