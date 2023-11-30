@@ -243,7 +243,12 @@ public:
 	/** Plugs a list of standard operations, importer and exporters included */
 	void PlugStandardViews();
 
-	
+	/** Returns AboutImage */
+	albaString GetAboutImage() const { return m_AboutImage; }
+
+	/** Sets AboutImage */
+	void SetAboutImage(albaString aboutImage) { m_AboutImage = aboutImage; }
+
 protected:
 	//---------------------------------------------------------
 	// Description:
@@ -467,6 +472,7 @@ protected:
 	wxString					m_LastSelectedPanel;
 	albaGUITimeBar			*m_TimePanel;
 	wxString					m_AppTitle;
+	albaString				m_AboutImage;
 
 	bool							m_LogToFile;
 	albaWXLog          *m_Logger;
