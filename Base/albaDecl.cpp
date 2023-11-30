@@ -228,7 +228,7 @@ ALBA_EXPORT void albaSetAppDebugDir(wxString ddir)
 ALBA_EXPORT wxString albaGetConfigDirectory()
 {
 	//getting the Config directory
-	wxString config_dir = albaGetApplicationDirectory().ToAscii();
+	wxString config_dir = albaGetApplicationDirectory();
 
 	//if the debug directory is set we need to add "Installer" to the PATH
 	if(!GLO_appDebugDir.empty())

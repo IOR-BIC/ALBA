@@ -370,6 +370,8 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_SkipCameraUpdate = false;
 
 	m_AppLayout = NULL;
+
+	m_AboutImage = "AlbaMasterAbout.bmp";
 }
 //----------------------------------------------------------------------------
 albaLogicWithManagers::~albaLogicWithManagers()
@@ -454,8 +456,10 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 	m_AboutDialog->SetTitle(m_AppTitle);
 	m_AboutDialog->SetBuildNum(m_BuildNum.GetCStr());
 	m_AboutDialog->SetVersion("0.1");
-	wxString imagePath = albaGetApplicationDirectory().ToAscii();
-	imagePath += "\\Config\\AlbaMasterAbout.bmp";
+	m_AboutDialog->SetWebSite("https://github.com/IOR-BIC/ALBA");
+
+	wxString imagePath = albaGetConfigDirectory().ToAscii();
+	imagePath += "\\" + m_AboutImage;
 	m_AboutDialog->SetImagePath(imagePath);
 
 	// Create and Open View
