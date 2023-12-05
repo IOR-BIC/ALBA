@@ -806,10 +806,13 @@ int albaVME::InternalStore(albaStorageElement *parent)
 	for (albaLinksMap::iterator links_it = m_Links.begin(); links_it != m_Links.end(); links_it++)
 	{
 		albaVMELink &link = links_it->second;
-		albaStorageElement *link_item_element = links_element->AppendChild("Link");
-		link_item_element->SetAttribute("Name", links_it->first);
-		link_item_element->SetAttribute("NodeId", link.m_Node->GetId());
-		link_item_element->SetAttribute("linkType", (albaID)link.m_Type);
+		if (link.m_Node)
+		{
+			albaStorageElement *link_item_element = links_element->AppendChild("Link");
+			link_item_element->SetAttribute("Name", links_it->first);
+			link_item_element->SetAttribute("NodeId", link.m_Node->GetId());
+			link_item_element->SetAttribute("linkType", (albaID)link.m_Type);
+		}
 	}
 
 	// store the visible children into a tmp array
