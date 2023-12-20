@@ -118,9 +118,12 @@ void albaInteractor2DMeasure_Line::MoveMeasure(int index, double * point)
 
 	m_MeasureValue = DistanceBetweenPoints(tmp_pos1, tmp_pos2);
 
+	// Line
 	UpdateLineActors(tmp_pos1, tmp_pos2);
 	// Points
 	UpdatePointsActor(tmp_pos1, tmp_pos2);
+	// Text
+	UpdateTextActor(tmp_pos1, tmp_pos2);
 
 	//called on mouse up  
 	if (!m_DraggingLeft)
@@ -336,7 +339,7 @@ void albaInteractor2DMeasure_Line::AddMeasure(double *point1, double *point2)
 	int index = m_Measure2DVector.size() - 1;
 
 	albaString text;
-	text.Printf("Distance %.2f mm", DistanceBetweenPoints(point1, point2));
+	text.Printf("%.2f mm", DistanceBetweenPoints(point1, point2));
 	m_Measure2DVector[index].Text = text;
 	
 	// Update Edit Actors
@@ -379,6 +382,7 @@ void albaInteractor2DMeasure_Line::AddMeasure(double *point1, double *point2)
 
 	UpdateLineActors(point1, point2);
 	UpdatePointsActor(point1, point2);
+	UpdateTextActor(point1, point2);
 
 	//////////////////////////////////////////////////////////////////////////
 	albaEventMacro(albaEvent(this, ID_MEASURE_ADDED, GetMeasureText(GetMeasureCount() - 1)));
