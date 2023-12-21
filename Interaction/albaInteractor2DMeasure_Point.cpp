@@ -394,6 +394,14 @@ void albaInteractor2DMeasure_Point::LockPointOnLine(double *lineP1, double *line
 	m_ConstrLineP2[X] = lineP2[X];
 	m_ConstrLineP2[Y] = lineP2[Y];
 	m_ConstrLineP2[Z] = lineP2[Z];
+
+	double point[3];
+	//update existing point to the constraint
+	for (int i = 0; i < m_PointsStackVector.size();i++)
+	{
+		GetMeasurePoint(i, point);
+		EditMeasure(0, point);
+	}
 }
 //---------------------------------------------------------------------------
 void albaInteractor2DMeasure_Point::GetPointOnLine(double *point)
