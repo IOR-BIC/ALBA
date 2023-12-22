@@ -493,5 +493,6 @@ protected:
 	bool m_ShowStorageSettings; ///<Flag to show storage setting default is false.
 	bool m_ShowInteractionSettings; ///<Flag to show storage setting default is false.
 	bool m_FatalExptionOccurred;
+	bool m_OpeningMSF;
 };
 #endif

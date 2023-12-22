@@ -369,6 +369,8 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 
 	m_SkipCameraUpdate = false;
 
+	m_OpeningMSF = false;
+
 	m_AppLayout = NULL;
 
 	m_AboutImage = "AlbaMasterAbout.bmp";
@@ -1381,6 +1383,7 @@ void albaLogicWithManagers::OnFileOpen(const char *file_to_open)
 {
 	if (m_VMEManager)
 	{
+		m_OpeningMSF = true;
 		if (m_VMEManager->AskConfirmAndSave())
 		{
 			wxString file;
@@ -1413,6 +1416,7 @@ void albaLogicWithManagers::OnFileOpen(const char *file_to_open)
 			if (m_WizardManager && m_WizardRunning)
 				m_WizardManager->WizardContinue(opened != ALBA_ERROR);
 		}
+		m_OpeningMSF = false;
 	}
 }
 //----------------------------------------------------------------------------
@@ -1420,11 +1424,13 @@ void albaLogicWithManagers::OnFileHistory(int menuId)
 {
 	if(m_VMEManager) 
   {
+		m_OpeningMSF = true;
     if(m_VMEManager->AskConfirmAndSave())
     {
       m_VMEManager->MSFOpen(menuId);
       UpdateFrameTitle();
     }
+		m_OpeningMSF = false;
   }
 }
 //----------------------------------------------------------------------------
@@ -1802,7 +1808,7 @@ void albaLogicWithManagers::OpRunTerminated(int runOk)
   if(m_SideBar)
     m_SideBar->EnableSelect(true);
 
-	if(m_ApplicationSettings->IsAutoSaveOn())
+	if(m_ApplicationSettings->IsAutoSaveOn() && !m_OpeningMSF)
 		OnFileSave();
 }
 //----------------------------------------------------------------------------
