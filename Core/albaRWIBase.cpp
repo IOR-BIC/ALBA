@@ -101,6 +101,7 @@ BEGIN_EVENT_TABLE(albaRWIBase, wxWindow)
   EVT_CHAR(albaRWIBase::OnChar)
   EVT_SIZE(albaRWIBase::OnSize)
   EVT_IDLE(albaRWIBase::OnIdle)
+	EVT_MOUSE_CAPTURE_LOST(albaRWIBase::OnMouseCaptureLost)
 END_EVENT_TABLE()
 //----------------------------------------------------------------------------
 albaRWIBase::albaRWIBase() : wxWindow(), vtkRenderWindowInteractor(), m_Timer(this, ID_albaRWIBase_TIMER)
@@ -656,6 +657,16 @@ void albaRWIBase::OnIdle(wxIdleEvent& event)
   //   this->Show(true);
   //}
 }
+
+//----------------------------------------------------------------------------
+void albaRWIBase::OnMouseCaptureLost(wxMouseCaptureLostEvent& WXUNUSED(evt))
+{
+	wxMouseEvent evt = wxMouseEvent();
+	evt.SetX(m_LastX);
+	evt.SetY(m_LastY);
+	OnLeftMouseButtonUp(evt);
+}
+
 //----------------------------------------------------------------------------
 void albaRWIBase::NotifyClick()
 //----------------------------------------------------------------------------
