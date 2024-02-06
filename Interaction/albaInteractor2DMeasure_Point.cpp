@@ -396,12 +396,15 @@ void albaInteractor2DMeasure_Point::LockPointOnLine(double *lineP1, double *line
 	m_ConstrLineP2[Z] = lineP2[Z];
 
 	double point[3];
+	int measure = m_CurrMeasure;
 	//update existing point to the constraint
 	for (int i = 0; i < m_PointsStackVector.size();i++)
 	{
+		m_CurrMeasure = i;
 		GetMeasurePoint(i, point);
-		EditMeasure(0, point);
+		EditMeasure(i, point);
 	}
+	m_CurrMeasure = measure;
 }
 //---------------------------------------------------------------------------
 void albaInteractor2DMeasure_Point::GetPointOnLine(double *point)
