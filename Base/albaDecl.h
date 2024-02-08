@@ -26,30 +26,34 @@
 
 #include <vector>
 
-
+< b>ALBA< /b>
 /**
 @mainpage
-**ALBA: Agile Library for Biomedical Applications**
+< b>ALBA: Agile Library for Biomedical Applications< /b>
 
-**ALBA** is a versatile library designed to facilitate the rapid development of specialised applications for the management, visualization, and manipulation of biomedical data. Specifically designed for biomedical/biomechanical applications, **ALBA** smoothly handles various data types, including medical images (CT scans, X-rays, MRIs, etc.), surfaces, and finite element meshes among others.
+< b>ALBA< /b> is a versatile library designed to facilitate the rapid development of specialised applications for the management, visualization, and manipulation of biomedical data. Specifically designed for biomedical/biomechanical applications, < b>ALBA< /b> smoothly handles various data types, including medical images (CT scans, X-rays, MRIs, etc.), surfaces, and finite element meshes among others.
 
 Written in C++, based on VTK, ITK, DCDM, wxWidget and Xerces libraries.
 
-**Key Features:**
+< b>Key Features:< /b>
 
-**Diverse Data Support:**
-**ALBA** offers reliable support for a range of biomedical data formats, making it a practical solution for researchers and healthcare professionals dealing with different types of data. From intricate 3D meshes to detailed medical images, **ALBA** streamlines the management of diverse data types.
-**Efficient Data Handling:**
-**ALBA** simplifies the manipulation of biomedical data, allowing users to perform tasks like segmentation, registration, and spatial transformation with ease.
-**Interactive Visualization:**
+< b>Diverse Data Support:< /b>
+< b>ALBA< /b> offers reliable support for a range of biomedical data formats, making it a practical solution for researchers and healthcare professionals dealing with different types of data. From intricate 3D meshes to detailed medical images, < b>ALBA< /b> streamlines the management of diverse data types.
+
+< b>Efficient Data Handling:< /b>
+< b>ALBA< /b> simplifies the manipulation of biomedical data, allowing users to perform tasks like segmentation, registration, and spatial transformation with ease.
+
+< b>Interactive Visualization:< /b>
 The library provides interactive visualization tools for exploring 3D structures, making it easier for users to analyse and visually interpret their data.
-**Scalability and Performance:**
-Engineered for efficiency, **ALBA** meets the demands of both small-scale research projects and larger biomedical applications, ensuring swift data processing and analysis.
-**Open Source Collaboration:**
-**ALBA** is an open-source initiative that encourages collaboration within the biomedical community. Researchers and developers can contribute to its development, ensuring continuous improvement and adaptation to evolving biomedical challenges.
-Whether you are involved in medical research, diagnostic imaging, or clinical applications, **ALBA** serves as a flexible and practical solution for advancing biomedical data management and analysis.
 
-Explore the capabilities of **ALBA** today to enhance your biomedical applications effectively.
+< b>Scalability and Performance:< /b>
+Engineered for efficiency, < b>ALBA< /b> meets the demands of both small-scale research projects and larger biomedical applications, ensuring swift data processing and analysis.
+
+< b>Open Source Collaboration:< /b>
+< b>ALBA< /b> is an open-source initiative that encourages collaboration within the biomedical community. Researchers and developers can contribute to its development, ensuring continuous improvement and adaptation to evolving biomedical challenges.
+Whether you are involved in medical research, diagnostic imaging, or clinical applications, < b>ALBA< /b> serves as a flexible and practical solution for advancing biomedical data management and analysis.
+
+Explore the capabilities of < b>ALBA< /b> today to enhance your biomedical applications effectively.
 
 */
 
