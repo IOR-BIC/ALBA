@@ -122,7 +122,8 @@ vtkPolyData* albaPipeMeshSlice::GetInputAsPolyData()
     
     UpdateActiveScalarsInVMEDataVectorItems();
     
-    m_NormalsFilter->Update();
+		if(m_NormalsFilter)
+			m_NormalsFilter->Update();
 	}
 
   /*if (true == DEBUG_MODE && NULL != m_Mapper)
