@@ -245,14 +245,9 @@ void albaViewOrthoSlice::VmeRemove(albaVME *vme)
 //----------------------------------------------------------------------------
 {
   if (m_CurrentVolume && vme == m_CurrentVolume) 
-  {
-    // Disable ChildViews
-    for(int j=1; j<m_NumOfChildView; j++) 
-      m_ChildViewList[j]->VmeShow(vme, false);
-    RemoveVolumeFromGizmo();
-    EnableWidgets(false);
-  }
-  // Remove node from list
+		VmeShow(m_CurrentVolume, false);
+
+	// Remove node from list
   int pos=-1;
   for (int i=0; i<m_VMElist.size(); i++)
     if(vme==m_VMElist[i])
