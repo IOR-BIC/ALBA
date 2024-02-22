@@ -1,8 +1,0 @@
-174a175,178
-> 	vtkSetMacro(NormalizeScaling,int);
-> 	vtkBooleanMacro(NormalizeScaling,int);
-> 	vtkGetMacro(NormalizeScaling,int);
-> 
-252a257,258
-> 
-> 	int NormalizeScaling;

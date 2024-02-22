@@ -1,4 +1,0 @@
-689c689
-<   if (this->Inputs && this->Inputs[0])
----
->   if (this->Inputs && this->NumberOfInputs>0 && this->Inputs[0])

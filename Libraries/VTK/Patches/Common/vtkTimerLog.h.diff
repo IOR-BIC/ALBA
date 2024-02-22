@@ -1,4 +1,0 @@
-170c170
-<   ~vtkTimerLog() {};
----
->   ~vtkTimerLog();

@@ -1,6 +1,0 @@
-377,378c377,378
-<     struct stat fs;
-<     if (stat(this->FileName, &fs) != 0) 
----
->     struct _stat64 fs;
->     if (_stat64(this->FileName, &fs) != 0) 

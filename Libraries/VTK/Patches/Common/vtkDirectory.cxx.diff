@@ -1,4 +1,0 @@
-113c113
-<   long srchHandle = _findfirst(buf, &data);
----
-> 	intptr_t srchHandle = _findfirst(buf, &data);
