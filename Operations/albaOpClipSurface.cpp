@@ -82,7 +82,7 @@ albaOp(label)
   
   m_ClipInside      = 0;
 	m_UseGizmo			=	1;
-	m_ClipBoundBox	= 1;
+	m_ClipBoundBox	= false;
   m_ClipModality  = MODE_IMPLICIT_FUNCTION;
 	m_GizmoType			= GIZMO_TRANSLATE;
 
@@ -145,6 +145,7 @@ enum CLIP_SURFACE_ID
   ID_CLIP_BY,
 	ID_GEOMETRY_MOD,
   ID_CLIP_INSIDE,
+	ID_CLIP_PLANE_BBOX,
 	ID_GENERATE_CLIPPED_OUTPUT,
 	ID_PLANE_WIDTH,
 	ID_PLANE_HEIGHT,
@@ -207,7 +208,9 @@ void albaOpClipSurface::CreateGui()
 	m_Gui->Button(ID_CHOOSE_SURFACE,_("clipper surface"));
 	wxString geomModality[2] = { "Convex","Concave" };
 	m_Gui->Radio(ID_GEOMETRY_MOD, "", &m_GeometryModality, 2, geomModality);
-	m_Gui->Bool(ID_CLIP_INSIDE,_("reverse clipping"),&m_ClipInside,1);
+	m_Gui->Bool(ID_CLIP_INSIDE,_("Reverse clipping"),&m_ClipInside,1);
+	m_Gui->Bool(ID_CLIP_PLANE_BBOX, _("Clip Plane Bound Box"), &m_ClipBoundBox, 1,"Disable to clip the entire plane");
+	
 	double b[6];
 	m_Input->GetOutput()->GetVMEBounds(b);
 	// bounding box dim
@@ -220,6 +223,7 @@ void albaOpClipSurface::CreateGui()
 	m_Gui->OkCancel();
 
 	m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
+	m_Gui->Enable(ID_CLIP_PLANE_BBOX, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 	m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
 	m_Gui->Enable(ID_GEOMETRY_MOD, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
 	m_Gui->Enable(wxOK,m_ResultPolyData != NULL);
@@ -257,6 +261,7 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 		case ID_CLIP_BY:
 			m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
 			m_Gui->Enable(ID_GEOMETRY_MOD, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
+			m_Gui->Enable(ID_CLIP_PLANE_BBOX, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 			m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);
 			m_Gui->Enable(ID_USE_GIZMO,m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 			m_Gui->Enable(wxOK,m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
@@ -290,6 +295,7 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 				else if(m_UseGizmo)
 					m_ImplicitPlaneGizmo->SetBehavior(NULL);
 
+				m_Gui->Enable(ID_CLIP_PLANE_BBOX, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 				m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);
 				
 				ChangeGizmo();
