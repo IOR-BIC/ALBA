@@ -19,29 +19,33 @@
 #include "vtkMath.h"
 
 #include "albaDbg.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
 
-vtkCxxRevisionMacro(vtkALBAErythrocyteSource, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkALBAErythrocyteSource);
 
 vtkALBAErythrocyteSource::vtkALBAErythrocyteSource(void)
 {
   this->Radius = 0.1;
   this->ThetaResolution = this->PhiResolution = 8;
+	this->SetNumberOfInputPorts(0);
 }
 
 
 //------------------------------------------------------------------------
 //This method is the one that should be used by subclasses, right now the 
 //default implementation is to call the backwards compatibility method
-/*virtual*/void vtkALBAErythrocyteSource::ExecuteData(vtkDataObject *output)
+/*virtual*/int vtkALBAErythrocyteSource::RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 //------------------------------------------------------------------------
 {
-  vtkPolyData* out_poly = vtkPolyData::SafeDownCast(output);
-  if (out_poly == NULL)
+	vtkInformation* outInfo = outputVector->GetInformationObject(0);
+	vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  if (output == NULL)
   {
     vtkErrorMacro(<< "Output polydata cannot be NULL.");
-    return;
+    return 0;
   }
 
   //the model is based on: 
@@ -72,7 +76,7 @@ vtkALBAErythrocyteSource::vtkALBAErythrocyteSource(void)
 
   //scaling
   double scale = 2*this->Radius / l_2;  //e6 because l_2 is given in micrometers
-  double dblMaxT = 2*vtkMath::DoublePi();
+  double dblMaxT = 2*vtkMath::Pi();
   double t_step = dblMaxT / this->ThetaResolution;
   //double u_step = U / this->PhiResolution;
 
@@ -284,11 +288,13 @@ vtkALBAErythrocyteSource::vtkALBAErythrocyteSource(void)
         
   cells->Squeeze();
   
-  out_poly->SetPoints(points);
-  out_poly->SetPolys(cells);
+  output->SetPoints(points);
+  output->SetPolys(cells);
 
   points->Delete();
   cells->Delete();
+
+	return 1;
 }
 
 

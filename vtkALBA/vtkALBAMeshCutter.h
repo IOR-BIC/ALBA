@@ -22,7 +22,7 @@
 //---------------------------------------------
 // includes:
 //---------------------------------------------
-#include "vtkUnstructuredGridToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 #include "albaConfigure.h"
 #include "assert.h"
 #include <vector>
@@ -36,6 +36,7 @@
 class vtkIdList;
 class vtkCell;
 class vtkMatrix4x4;
+class vtkUnstructuredGrid;
 
 /** 
 
@@ -59,19 +60,23 @@ edges cut by the plane, although their endpoints are.
 3) No cells of lower order than triangles are created.
 Therefore if the plane cuts exactly through an isolated edge or vertex, the output
 polydata will contain the points, but no cell will be created.*/
-class ALBA_EXPORT vtkALBAMeshCutter : public vtkUnstructuredGridToPolyDataFilter
+
+class ALBA_EXPORT vtkALBAMeshCutter : public vtkPolyDataAlgorithm
 {
 public:
   /** RTTI macro*/
-  vtkTypeRevisionMacro(vtkALBAMeshCutter,vtkUnstructuredGridToPolyDataFilter);
+  vtkTypeMacro(vtkALBAMeshCutter,vtkPolyDataAlgorithm);
   /** return object instance */
   static vtkALBAMeshCutter *New() ;
   /** print object information */
   void PrintSelf(ostream& os, vtkIndent indent);                                ///< print self
 
+	/** Set Input port information to accept the right type */
+	int FillInputPortInformation(int, vtkInformation *info);
+
    /** Overload standard modified time function. If cut function is modified,
   then this object is modified as well. */
-  unsigned long GetMTime();
+	vtkMTimeType GetMTime();
 
   /** Set the cutting plane (but does not register the object) */
   void SetCutFunction(vtkPlane *P) ;
@@ -112,8 +117,8 @@ protected:
   /** destructor */                                                           
   ~vtkALBAMeshCutter() ;                                                             
 
-  /** execute method */
-  void Execute();
+  /** Execute method */
+  int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
 
   // edge described by id's of endpoints

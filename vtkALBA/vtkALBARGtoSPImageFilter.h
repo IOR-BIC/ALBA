@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef __vtkALBARGtoSPImageFilter_h
 #define __vtkALBARGtoSPImageFilter_h
 
-#include "vtkDataSetToDataSetFilter.h"
+#include "vtkDataSetAlgorithm.h"
 #include "albaConfigure.h"
 
 #define ORTHOSLICER_X_SLICE 0
@@ -61,44 +61,44 @@ Class Name: vtkALBARGtoSPImageFilter.
  Typical applications of this filter are to produce an image from a volume
  for image processing or visualization.
 */
-class ALBA_EXPORT vtkALBARGtoSPImageFilter : public vtkDataSetToDataSetFilter
+class ALBA_EXPORT vtkALBARGtoSPImageFilter : public vtkDataSetAlgorithm
 {
 public:
   /** RTTI Macro */
-  vtkTypeRevisionMacro(vtkALBARGtoSPImageFilter, vtkDataSetToDataSetFilter);
+  vtkTypeMacro(vtkALBARGtoSPImageFilter, vtkDataSetAlgorithm);
   
   /** Static Function for object instantiation */
   static vtkALBARGtoSPImageFilter *New();
-
-	/** Updated function to avoid extent propagation */
-	virtual void PropagateUpdateExtent(vtkDataObject *output);
 
 protected:
   /** constructor */
   vtkALBARGtoSPImageFilter();
   /** destructor */
 	~vtkALBARGtoSPImageFilter() {};
+		
+	/** specialize output information type */
+	virtual int FillOutputPortInformation(int port, vtkInformation* info);
+		
  /** copy constructor not implemented*/
   vtkALBARGtoSPImageFilter(const vtkALBARGtoSPImageFilter&);
   /** assign operator not implemented*/
   void operator=(const vtkALBARGtoSPImageFilter&);
 
   /** Update dimensions and whole extents */
-  void ExecuteInformation();
+	int RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+
   /** Execute the projection and fill output scalars */
-  void Execute();
+	virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
 	template<typename DataType>
 	void FillSP(vtkRectilinearGrid * input, vtkImageData * output, DataType *inputScalars, DataType *outScalars);
-
-	template<typename DataType, typename CoordDataType>
-	void FillSP(vtkRectilinearGrid * input, vtkImageData * output, DataType *inputScalars, DataType *outScalars, CoordDataType *xCoord, CoordDataType *yCoord);
-
 
 	/** Gets the best spacing for Rectilinear Grid probing*/
 	void GetBestSpacing(vtkRectilinearGrid* rGrid, double * bestSpacing);
 
 private:
+
+	int OutputExtent[6];
 };
 
 

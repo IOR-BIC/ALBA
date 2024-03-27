@@ -28,14 +28,16 @@
 #include "vtkPolyData.h"
 #include "vtkTransform.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
-vtkCxxRevisionMacro(vtkALBAExtendedGlyph3D, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkALBAExtendedGlyph3D);
 
 // Construct object with scaling on, scaling mode is by scalar value,
 // scale factor = 1.0, the range is (0,1), orient geometry is on, and
 // orientation is by vector. Clamping and indexing are turned off. No
 // initial sources are defined.
+//------------------------------------------------------------------------------
 vtkALBAExtendedGlyph3D::vtkALBAExtendedGlyph3D()
 {
   this->Scaling = 0;
@@ -49,7 +51,8 @@ vtkALBAExtendedGlyph3D::vtkALBAExtendedGlyph3D()
   this->VectorMode = VTK_USE_VECTOR;
   this->Clamping = 0;
   this->IndexMode = VTK_INDEXING_OFF;
-  this->NumberOfRequiredInputs = 1;
+	//At least one input, one source
+	this->SetNumberOfInputPorts(2);
   this->GeneratePointIds = 0;
   this->PointIdsName = NULL;
   this->SetPointIdsName("InputPointIds");
@@ -58,6 +61,7 @@ vtkALBAExtendedGlyph3D::vtkALBAExtendedGlyph3D()
   this->InputNormalsSelection = NULL;
 }
 
+//------------------------------------------------------------------------------
 vtkALBAExtendedGlyph3D::~vtkALBAExtendedGlyph3D()
 {
   if (this->PointIdsName)
@@ -69,8 +73,17 @@ vtkALBAExtendedGlyph3D::~vtkALBAExtendedGlyph3D()
   this->SetInputNormalsSelection(NULL);
 }
 
-void vtkALBAExtendedGlyph3D::Execute()
+//------------------------------------------------------------------------------
+int vtkALBAExtendedGlyph3D::RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	// Initialize some frequently used values.
+	vtkDataSet  *input = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   vtkPointData *pd;
   vtkDataArray *inScalars;
   vtkDataArray *inVectors;
@@ -93,9 +106,9 @@ void vtkALBAExtendedGlyph3D::Execute()
   vtkIdType ptIncr, cellId;
   int haveVectors, haveNormals;
   double scalex,scaley,scalez, den;
-  vtkPolyData *output = this->GetOutput();
+  
   vtkPointData *outputPD = output->GetPointData();
-  vtkDataSet *input = this->GetInput();
+  
   int numberOfSources = this->GetNumberOfSources();
   vtkPolyData *defaultSource = NULL;
   vtkIdTypeArray *pointIds=0;
@@ -108,7 +121,7 @@ void vtkALBAExtendedGlyph3D::Execute()
   if (!input)
     {
     vtkErrorMacro(<<"No input");
-    return;
+    return 1;
     }
 
   pd = input->GetPointData();
@@ -131,7 +144,7 @@ void vtkALBAExtendedGlyph3D::Execute()
     inGhostLevels = ((vtkUnsignedCharArray*)temp)->GetPointer(0);
     }
 
-  requestedGhostLevel = output->GetUpdateGhostLevel();
+  requestedGhostLevel = output->GetGhostLevel();
   
   
   numPts = input->GetNumberOfPoints();
@@ -140,7 +153,7 @@ void vtkALBAExtendedGlyph3D::Execute()
     vtkDebugMacro(<<"No points to glyph!");
     pts->Delete();
     trans->Delete();
-    return;
+    return 1;
     }
 
   // Check input for consistency
@@ -170,7 +183,7 @@ void vtkALBAExtendedGlyph3D::Execute()
       vtkErrorMacro(<<"Indexing on but don't have data to index with");
       pts->Delete();
       trans->Delete();
-      return;
+      return 1;
       }
     else
       {
@@ -198,7 +211,7 @@ void vtkALBAExtendedGlyph3D::Execute()
     defaultPointIds[1] = 1;
     defaultSource->SetPoints(defaultPoints);
     defaultSource->InsertNextCell(VTK_LINE, 2, defaultPointIds);
-    defaultSource->SetUpdateExtent(0, 1, 0);
+    this->SetUpdateExtent(0, 1, 0);
     this->SetSource(defaultSource);
     defaultSource->Delete();
     defaultSource = NULL;
@@ -583,37 +596,43 @@ void vtkALBAExtendedGlyph3D::Execute()
   output->Squeeze();
   trans->Delete();
   pts->Delete();
+
+	return 1;
 }
 
 //----------------------------------------------------------------------------
 // Since indexing determines size of outputs, EstimatedWholeMemorySize is
 // truly an estimate.  Ignore Indexing (although for a best estimate we
 // should average the size of the sources instead of using 0).
-void vtkALBAExtendedGlyph3D::ExecuteInformation()
+int vtkALBAExtendedGlyph3D::RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
   if (this->GetInput() == NULL)
     {
     vtkErrorMacro("Missing input");
-    return;
+    return 1;
     }
+	return 1;
 }
 
 
 // Set the number of source objects in the glyph table. This should be
 // done prior to specifying more than one source.
+//------------------------------------------------------------------------------
 void vtkALBAExtendedGlyph3D::SetNumberOfSources(int num)
 {
   // one more because input has index 0.
-  this->SetNumberOfInputs(num+1);
+  this->SetNumberOfInputPorts(num+1);
 }
 
+//------------------------------------------------------------------------------
 int vtkALBAExtendedGlyph3D::GetNumberOfSources()
 {
   // one less because input has index 0.
-  return this->NumberOfInputs - 1;
+  return this->GetNumberOfInputPorts() - 1;
 }
 
 // Specify a source object at a specified table location.
+//------------------------------------------------------------------------------
 void vtkALBAExtendedGlyph3D::SetSource(int id, vtkPolyData *pd)
 {
   if (id < 0)
@@ -621,10 +640,11 @@ void vtkALBAExtendedGlyph3D::SetSource(int id, vtkPolyData *pd)
     vtkErrorMacro("Bad index " << id << " for source.");
     return;
     }
-  this->vtkProcessObject::SetNthInput(id + 1, pd);
+  this->SetInputData(id + 1, pd);
 }
 
 // Get a pointer to a source object at a specified table location.
+//------------------------------------------------------------------------------
 vtkPolyData *vtkALBAExtendedGlyph3D::GetSource(int id)
 {
   if ( id < 0 || id >= this->GetNumberOfSources() )
@@ -633,10 +653,11 @@ vtkPolyData *vtkALBAExtendedGlyph3D::GetSource(int id)
     }
   else
     {
-    return (vtkPolyData *)this->Inputs[id+1];
+    return (vtkPolyData *)this->GetInput(id+1);
     }
 }
 
+//------------------------------------------------------------------------------
 void vtkALBAExtendedGlyph3D::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -708,24 +729,35 @@ void vtkALBAExtendedGlyph3D::PrintSelf(ostream& os, vtkIndent indent)
      << (this->InputNormalsSelection ? this->InputNormalsSelection : "(none)") << "\n";
 }
 
-void vtkALBAExtendedGlyph3D::ComputeInputUpdateExtents( vtkDataObject *output )
+//------------------------------------------------------------------------------
+int vtkALBAExtendedGlyph3D::FillInputPortInformation(int, vtkInformation *info)
 {
+	info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+	return 1;
+}
+
+//------------------------------------------------------------------------------
+int	vtkALBAExtendedGlyph3D::RequestUpdateExtent( vtkInformation *request, vtkInformationVector **inputVector,	vtkInformationVector *outputVector)
+{
+	this->vtkPolyDataAlgorithm::RequestUpdateExtent(request, inputVector,	outputVector);
+	
   vtkPolyData *outPd;
 
   if (this->GetInput() == NULL)
     {
     vtkErrorMacro("Missing input");
-    return;
+    return 0;
     }
 
-  output = output;
+ 
   outPd = this->GetOutput();
   if (this->GetSource())
     {
-    this->GetSource()->SetUpdateExtent(0, 1, 0);
+    this->SetUpdateExtent(0, 1, 0);
     }
-  this->GetInput()->SetUpdateExtent(outPd->GetUpdatePiece(),
-                                    outPd->GetUpdateNumberOfPieces(),
-                                    outPd->GetUpdateGhostLevel());
-  this->GetInput()->RequestExactExtentOn();
+  this->SetUpdateExtent(outPd->GetPiece(),
+                                    outPd->GetNumberOfPieces(),
+                                    outPd->GetGhostLevel());
+  
+	return 1;
 }

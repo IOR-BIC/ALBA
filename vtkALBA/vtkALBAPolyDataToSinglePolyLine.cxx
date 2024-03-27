@@ -30,11 +30,12 @@
 #include "vtkPolyLine.h"
 #include "vtkSplineFilter.h"
 #include "vtkCardinalSpline.h"
-//vtkCxxRevisionMacro(vtkALBAFixedCutter, "$Revision: 1.2 $");
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 vtkStandardNewMacro(vtkALBAPolyDataToSinglePolyLine);
 
 //----------------------------------------------------------------------------
-vtkALBAPolyDataToSinglePolyLine::vtkALBAPolyDataToSinglePolyLine() : vtkPolyDataToPolyDataFilter()
+vtkALBAPolyDataToSinglePolyLine::vtkALBAPolyDataToSinglePolyLine() : vtkPolyDataAlgorithm()
 //----------------------------------------------------------------------------
 {
 }
@@ -44,15 +45,23 @@ vtkALBAPolyDataToSinglePolyLine::~vtkALBAPolyDataToSinglePolyLine()
 {
 }
 //----------------------------------------------------------------------------
-void vtkALBAPolyDataToSinglePolyLine::Execute()
+int vtkALBAPolyDataToSinglePolyLine::RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 //----------------------------------------------------------------------------
 {
-	vtkPoints* InPts = this->GetInput()->GetPoints();
-	vtkPolyData* InPD = this->GetInput();
-	vtkPolyData *output = this->GetOutput();
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
-	int numLines = this->GetInput()->GetNumberOfLines();
-  if(numLines == 0) return;
+	// Initialize some frequently used values.
+	vtkPolyData  *input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+
+	vtkPoints* InPts = input->GetPoints();
+	
+
+	int numLines = input->GetNumberOfLines();
+  if(numLines == 0) return 1;
 	int numPts = numLines+1;
 	double /*x[3],*/ tc[3]/*, v[3]*/;
 	int i/*, j*/;
@@ -110,4 +119,6 @@ void vtkALBAPolyDataToSinglePolyLine::Execute()
 
   if(output->GetPointData()->GetScalars())
     output->GetPointData()->SetScalars(vtkFloatArray::New());
+
+	return 1;
 }

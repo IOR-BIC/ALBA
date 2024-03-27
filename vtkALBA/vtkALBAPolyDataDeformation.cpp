@@ -20,7 +20,6 @@ See the COPYINGS file for license details
 #include "vtkCellLocator.h"
 #include "vtkGenericCell.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkUnstructuredGridToPolyDataFilter.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkIntArray.h"
@@ -35,11 +34,12 @@ See the COPYINGS file for license details
 
 
 
-vtkCxxRevisionMacro(vtkALBAPolyDataDeformation, "$Revision: 1.1.2.6 $");
 vtkStandardNewMacro(vtkALBAPolyDataDeformation);
 
 #include "albaMemDbg.h"
 #include "albaDbg.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
 #pragma region //Nested Classes
 
@@ -622,13 +622,13 @@ vtkALBAPolyDataDeformation::~vtkALBAPolyDataDeformation()
 
 //------------------------------------------------------------------------
 //Return this object's modified time.
-/*virtual*/ unsigned long int vtkALBAPolyDataDeformation::GetMTime()
+/*virtual*/ vtkMTimeType vtkALBAPolyDataDeformation::GetMTime()
 //------------------------------------------------------------------------
 {
-  unsigned long mtime = Superclass::GetMTime();
+	vtkMTimeType mtime = Superclass::GetMTime();
   for (int i = 0; i < NumberOfSkeletons; i++)
   {
-    unsigned long t1;
+		vtkMTimeType t1;
     if (Skeletons[i].pPolyLines[0] != NULL)
     {
       t1 = Skeletons[i].pPolyLines[0]->GetMTime();
@@ -657,15 +657,19 @@ vtkALBAPolyDataDeformation::~vtkALBAPolyDataDeformation()
 //------------------------------------------------------------------------
 //By default, UpdateInformation calls this method to copy information
 //unmodified from the input to the output.
-/*virtual*/void vtkALBAPolyDataDeformation::ExecuteInformation()
+/*virtual*/int vtkALBAPolyDataDeformation::RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 //------------------------------------------------------------------------
 {
-  //check input
-  vtkPolyData* input = GetInput();
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	
+	// Initialize some frequently used values.
+	vtkPolyData  *input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   if (input == NULL)
   {
     vtkErrorMacro(<< "Invalid input for vtkALBAPolyDataDeformation.");
-    return;   //we have no input
+    return 1;   //we have no input
   }
 
   //check output
@@ -674,7 +678,7 @@ vtkALBAPolyDataDeformation::~vtkALBAPolyDataDeformation()
     SetOutput(vtkPolyData::New());
 
   //copy input to output
-  Superclass::ExecuteInformation();  
+  return Superclass::RequestInformation(request,inputVector,outputVector);  
 }
 
 //------------------------------------------------------------------------
@@ -683,7 +687,7 @@ vtkALBAPolyDataDeformation::~vtkALBAPolyDataDeformation()
 /*virtual*/void vtkALBAPolyDataDeformation::ExecuteData(vtkDataObject *output)
 {
   //check whether output is valid
-  vtkPolyData* input = GetInput();
+  vtkPolyData* input = vtkPolyData::SafeDownCast(GetInput());
   if (input == NULL)
     return;
 
@@ -1791,7 +1795,7 @@ double vtkALBAPolyDataDeformation::GetDistance( vtkIdType nPtStartId,
 //------------------------------------------------------------------------
 {
   const static double dblStep = 0.01;   //constant sampling
-  vtkPolyData* input = GetInput();
+  vtkPolyData* input = vtkPolyData::SafeDownCast(GetInput());
 
   double ptStart[3];
   input->GetPoint(nPtStartId, ptStart);
@@ -1887,7 +1891,7 @@ double vtkALBAPolyDataDeformation::GetPathLength(vtkIdType nPtFrom,
                                       vtkIdType nPtTo, double dblMaxDist)
 //------------------------------------------------------------------------
 {
-  vtkPolyData* input = GetInput();
+  vtkPolyData* input = vtkPolyData::SafeDownCast(GetInput());
   int nPoints = input->GetNumberOfPoints();
 
   //initialize path distance
@@ -2058,7 +2062,7 @@ void vtkALBAPolyDataDeformation
 void vtkALBAPolyDataDeformation::ComputeMeshParametrization()
 //------------------------------------------------------------------------
 { 
-  vtkPolyData* input = GetInput();    
+  vtkPolyData* input = vtkPolyData::SafeDownCast(GetInput());    
   int nPoints = input->GetNumberOfPoints();
   int nCount = (int)SuperSkeleton->POCSkel->Edges.size();
 
@@ -2452,7 +2456,7 @@ double vtkALBAPolyDataDeformation::ComputeInputMeshAvgEdgeLength()
   double dblEdgeLen = 0.0;
   int nEdges = 0;
 
-  vtkPolyData* input = GetInput();
+  vtkPolyData* input = vtkPolyData::SafeDownCast(GetInput());
   input->BuildCells();  //just for sure
 
   int nCells = input->GetNumberOfCells();

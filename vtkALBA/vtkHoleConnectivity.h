@@ -20,20 +20,19 @@ under ALBA
 #define __vtkHoleConnectivity_h
 
 #define _WINSOCKAPI_ 
-
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataConnectivityFilter.h"
 #include "albaConfigure.h"
 /**
   class name: vtkHoleConnectivity
   This filter uses vtkPolyDataConnectivityFilter in order to extract the Closest Point Region
   after pass it the coordinates of the point.
 */
-class ALBA_EXPORT vtkHoleConnectivity : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkHoleConnectivity : public vtkPolyDataConnectivityFilter
 {
 public:
 
   /** RTTI macro */
-  vtkTypeMacro(vtkHoleConnectivity,vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkHoleConnectivity,vtkPolyDataConnectivityFilter);
 
   /** retrieve class name */
 	const char *GetClassName() {return "vtkHoleConnectivity";};
@@ -59,7 +58,7 @@ protected:
 	~vtkHoleConnectivity();
 
   /** execute the filter */
-	void Execute();
+	int RequestData(vtkInformation *request,	vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
 
 	vtkIdType PointID;
 	double Point[3];

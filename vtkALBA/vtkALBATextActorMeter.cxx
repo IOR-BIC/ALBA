@@ -27,7 +27,8 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 
-vtkCxxRevisionMacro(vtkALBATextActorMeter, "$Revision: 1.1.2.1 $");
+
+
 vtkStandardNewMacro(vtkALBATextActorMeter);
 //------------------------------------------------------------------------------
 vtkALBATextActorMeter::vtkALBATextActorMeter()
@@ -85,7 +86,7 @@ void vtkALBATextActorMeter::MeterUpdate(vtkRenderer *ren)
   ren->GetDisplayPoint(dp);
   
   TextActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
-  TextActor->SetPosition(dp[0] ,dp[1]);  
+  TextActor->SetPosition(dp[0] ,dp[1]);
 }
 
 //----------------------------------------------------------------------------
@@ -97,9 +98,4 @@ double *vtkALBATextActorMeter::GetTextPosition()
 void vtkALBATextActorMeter::SetColor(double r,double g,double b)
 {
   TextActor->GetTextProperty()->SetColor(r,g,b);
-}
-//----------------------------------------------------------------------------
-void vtkALBATextActorMeter::SetOpacity(double opacity)
-{
-	TextActor->GetTextProperty()->SetOpacity(opacity);
 }

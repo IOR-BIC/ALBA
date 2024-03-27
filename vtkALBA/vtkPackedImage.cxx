@@ -12,7 +12,6 @@
 #include "vtkPackedImage.h"
 
 
-vtkCxxRevisionMacro(vtkPackedImage, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkPackedImage);
 
 //----------------------------------------------------------------------------

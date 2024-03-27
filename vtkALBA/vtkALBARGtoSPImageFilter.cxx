@@ -25,54 +25,60 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkProbeFilter.h"
 #include "vtkDataSetWriter.h"
 #include "vtkMath.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
-vtkCxxRevisionMacro(vtkALBARGtoSPImageFilter, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkALBARGtoSPImageFilter);
 
 #define EPSILON 1e-3
 
 //----------------------------------------------------------------------------
-void vtkALBARGtoSPImageFilter::PropagateUpdateExtent(vtkDataObject *output)
+int vtkALBARGtoSPImageFilter::FillOutputPortInformation(int port, vtkInformation* info)
 {
+	// now add our info
+	info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkImageData");
+	return 1;
 }
 
-//=========================================================================
+//--------------------------------------------------------------------------------------
 vtkALBARGtoSPImageFilter::vtkALBARGtoSPImageFilter()
 {
-	vtkSource::SetNthOutput(0, vtkImageData::New());
-	// Releasing data
-	Outputs[0]->ReleaseData();
-	Outputs[0]->Delete();
 }
 
-//=========================================================================
-void vtkALBARGtoSPImageFilter::ExecuteInformation()
+//--------------------------------------------------------------------------------------
+int vtkALBARGtoSPImageFilter::RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
-	vtkRectilinearGrid *input = vtkRectilinearGrid::SafeDownCast(GetInput());
-	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	// Initialize some frequently used values.
+	vtkRectilinearGrid  *input = vtkRectilinearGrid::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkImageData *output = vtkImageData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+	
   int dims[3], outDims[3], extent[6];
 	double bestSpacing[3], outputSpacing[3],bounds[6];
   
 	if (input == NULL)
 	{
 		vtkErrorMacro("Missing input");
-		return;
+		return 0;
 	}
 
 	if (output == NULL)
 	{
 		vtkErrorMacro("Output error");
-		return;
+		return 0;
 	}
 	
 	input->GetDimensions(dims);
 	if (dims[2] != 1)
 	{
 		vtkErrorMacro("Wrong input type");
-		return;
+		return 0;
 	}
 		
-	input->GetWholeExtent(extent);
+	input->GetExtent(extent);
 	input->GetBounds(bounds);
 	GetBestSpacing(input, bestSpacing);
 
@@ -89,17 +95,18 @@ void vtkALBARGtoSPImageFilter::ExecuteInformation()
 	output->SetOrigin(bounds[0], bounds[2], bounds[4]);
 
 	
-	extent[0] = 0;
-	extent[1] = outDims[0]-1;
-	extent[2] = 0;
-	extent[3] = outDims[1]-1;
-	extent[4] = 0;
-	extent[5] = outDims[2]-1;
-  output->SetWholeExtent(extent);
+	OutputExtent[0] = 0;
+	OutputExtent[1] = outDims[0]-1;
+	OutputExtent[2] = 0;
+	OutputExtent[3] = outDims[1]-1;
+	OutputExtent[4] = 0;
+	OutputExtent[5] = outDims[2]-1;
+
+	return 1;
 }
 
 //=========================================================================
-void vtkALBARGtoSPImageFilter::Execute()
+int vtkALBARGtoSPImageFilter::RequestData(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
 	int outDims[3];
 	vtkRectilinearGrid *input = vtkRectilinearGrid::SafeDownCast(GetInput());
@@ -109,15 +116,13 @@ void vtkALBARGtoSPImageFilter::Execute()
 	vtkDataArray 			*inputScalars = inputPd->GetScalars();
 	vtkDataArray 			*outScalars = inputPd->GetScalars()->NewInstance();
 
-	output->SetExtent(output->GetWholeExtent());
+	output->SetExtent(OutputExtent);
 
 	output->GetDimensions(outDims);
 	outScalars->SetNumberOfTuples(outDims[0] * outDims[1]);
 
 	void *inputPointer = inputScalars->GetVoidPointer(0);
 	void *outputPointer = outScalars->GetVoidPointer(0);
-
-//	outputPointer = new int[outDims[0] * outDims[1]];
 
 	switch (inputScalars->GetDataType())
 	{
@@ -147,10 +152,12 @@ void vtkALBARGtoSPImageFilter::Execute()
 			break;
 		default:
 			vtkErrorMacro(<< "vtkALBAVolumeSlicer: Scalar type is not supported");
-			return;
+			return 0;
 	}
 	output->GetPointData()->SetScalars(outScalars);
 	vtkDEL(outScalars);
+
+	return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -278,7 +285,6 @@ void vtkALBARGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData *
 			}
 		}
 	}
-
 }
 
 //=========================================================================

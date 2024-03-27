@@ -41,7 +41,7 @@ class ALBA_EXPORT vtkALBAImageMapToWidgetColors : public vtkImageMapToColors
 {
 public:
   static vtkALBAImageMapToWidgetColors *New();
-  vtkTypeRevisionMacro(vtkALBAImageMapToWidgetColors,vtkImageMapToColors);
+  vtkTypeMacro(vtkALBAImageMapToWidgetColors,vtkImageMapToColors);
 
   /**
   Set / Get transfer function*/
@@ -67,14 +67,14 @@ public:
   vtkSetMacro( Level, double );
   vtkGetMacro( Level, double );
   
-  unsigned long GetMTime();
+	vtkMTimeType GetMTime();
 
 protected:
   vtkALBAImageMapToWidgetColors();
   ~vtkALBAImageMapToWidgetColors();
 
   void ExecuteInformation(vtkImageData *inData, vtkImageData *outData);
-  void ExecuteInformation(){this->vtkImageMapToColors::ExecuteInformation();};
+
   void ThreadedExecute(vtkImageData *inData, vtkImageData *outData,
                        int extent[6], int id);
   void ExecuteData(vtkDataObject *output);

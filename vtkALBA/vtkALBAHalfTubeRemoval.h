@@ -15,7 +15,7 @@ University of Bedfordshire
 #define __vtkALBAHalfTubeRemoval_h
 
 #include "albaConfigure.h"
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 #include "vtkPolyData.h"
 #include "vtkALBAPolyDataNavigator.h"
 
@@ -33,15 +33,15 @@ University of Bedfordshire
 //
 // Version 5.12.13
 //------------------------------------------------------------------------------
-class ALBA_EXPORT vtkALBAHalfTubeRemoval : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkALBAHalfTubeRemoval : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkALBAHalfTubeRemoval,vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkALBAHalfTubeRemoval,vtkPolyDataAlgorithm);
   static vtkALBAHalfTubeRemoval *New();
   void PrintSelf(ostream& os, vtkIndent indent) const {}
 
   /// Overload standard modified time function. 
-  unsigned long GetMTime();
+	vtkMTimeType GetMTime();
 
   /// Set the center line which defines the boundary between front and back
   void SetCenterLine(vtkPolyData* centerline) ;
@@ -66,7 +66,8 @@ protected:
   vtkALBAHalfTubeRemoval();
   ~vtkALBAHalfTubeRemoval();
 
-  void Execute();
+	/** Execute method */
+  int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   vtkPolyData *m_Input ;
   vtkPolyData *m_Output ;

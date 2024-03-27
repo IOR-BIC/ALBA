@@ -71,7 +71,7 @@ struct tfWidget {
 class ALBA_EXPORT vtkALBATransferFunction2D : public vtkDataObject {
   public:
     static vtkALBATransferFunction2D *New();
-    vtkTypeRevisionMacro(vtkALBATransferFunction2D,vtkDataObject);
+    vtkTypeMacro(vtkALBATransferFunction2D,vtkDataObject);
     
     void Initialize();
     void DeepCopy( vtkDataObject *f ) { this->ShallowCopy(f); }
@@ -174,12 +174,12 @@ class ALBA_EXPORT vtkALBATransferFunction2D : public vtkDataObject {
 class ALBA_EXPORT vtkVolumeProperty2 : public vtkVolumeProperty {
   public:
     static vtkVolumeProperty2 *New();
-    vtkTypeRevisionMacro(vtkVolumeProperty2, vtkVolumeProperty);
+    vtkTypeMacro(vtkVolumeProperty2, vtkVolumeProperty);
 
     void SetTransferFunction2D(vtkALBATransferFunction2D *function);
     vtkALBATransferFunction2D *GetTransferFunction2D() const { return this->TransferFunction2D; }
 
-    unsigned long int GetMTime();
+		vtkMTimeType GetMTime();
 
     void DeepCopy(vtkVolumeProperty *f );
     void ShallowCopy(vtkVolumeProperty *f );

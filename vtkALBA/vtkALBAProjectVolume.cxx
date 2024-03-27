@@ -25,8 +25,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkProbeFilter.h"
 #include "vtkDataSetWriter.h"
 #include "vtkALBARGtoSPImageFilter.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
-vtkCxxRevisionMacro(vtkALBAProjectVolume, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkALBAProjectVolume);
 
 #define AIR_LIMIT -500
@@ -38,46 +39,52 @@ void vtkALBAProjectVolume::PropagateUpdateExtent(vtkDataObject *output)
 {
 }
 
-//=========================================================================
+//----------------------------------------------------------------------------
 vtkALBAProjectVolume::vtkALBAProjectVolume()
 {
   ProjectionSide = VTK_PROJECT_FROM_X;
 	ProjectionModality = VTK_PROJECT_MEAN;
 	ProjectSubRange = false;
-	vtkSource::SetNthOutput(0, vtkImageData::New());
-	// Releasing data
-	Outputs[0]->ReleaseData();
-	Outputs[0]->Delete();
+	
 }
 
-//=========================================================================
-void vtkALBAProjectVolume::ExecuteInformation()
+
+//----------------------------------------------------------------------------
+int vtkALBAProjectVolume::FillOutputPortInformation(int port, vtkInformation* info)
+{
+	// now add our info
+	info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkImageData");
+	return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkALBAProjectVolume::RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
 	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
 	vtkImageData *inputID = vtkImageData::SafeDownCast(GetInput());
 	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
-  int dims[3], outDims[3], wholeExtent[6];
+  int dims[3], outDims[3], extent[6];
   
 	if (inputID == NULL && inputRG == NULL)
 	{
 		vtkErrorMacro("Missing input");
-		return;
+		return 0;
 	}
 
 	if (output == NULL)
 	{
 		vtkErrorMacro("Output error");
-		return;
+		return 0;
 	}
 
 	if (inputRG)
-		inputRG->GetWholeExtent(wholeExtent);
+		inputRG->GetExtent(extent);
 	else
-		inputID->GetWholeExtent(wholeExtent);
+		inputID->GetExtent(extent);
 
-	dims[0] = wholeExtent[1] - wholeExtent[0] + 1;
-	dims[1] = wholeExtent[3] - wholeExtent[2] + 1;
-	dims[2] = wholeExtent[5] - wholeExtent[4] + 1;
+	dims[0] = extent[1] - extent[0] + 1;
+	dims[1] = extent[3] - extent[2] + 1;
+	dims[2] = extent[5] - extent[4] + 1;
 
 	switch (this->ProjectionSide) {
 		case VTK_PROJECT_FROM_X:
@@ -96,24 +103,30 @@ void vtkALBAProjectVolume::ExecuteInformation()
 			outDims[2] = 1;
 	}
 
-	wholeExtent[0] = 0;
-	wholeExtent[1] = outDims[0] - 1;
-	wholeExtent[2] = 0;
-	wholeExtent[3] = outDims[1] - 1;
-	wholeExtent[4] = 0;
-	wholeExtent[5] = outDims[2] - 1;
-  output->SetWholeExtent( wholeExtent );
+	extent[0] = 0;
+	extent[1] = outDims[0] - 1;
+	extent[2] = 0;
+	extent[3] = outDims[1] - 1;
+	extent[4] = 0;
+	extent[5] = outDims[2] - 1;
+  output->SetExtent( extent );
+
+	return 1;
 }
 
-//=========================================================================
-void vtkALBAProjectVolume::Execute()
+//----------------------------------------------------------------------------
+int vtkALBAProjectVolume::RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
 	int inputDims[3], projectedDims[3];
 
-	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
-	vtkImageData *inputID = vtkImageData::SafeDownCast(GetInput());
-	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
+	// Initialize some frequently used values.
+	vtkRectilinearGrid  *inputRG = vtkRectilinearGrid::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkImageData  *inputID = vtkImageData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkImageData *output = vtkImageData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
 	vtkPointData 			*inputPd = inputRG ? inputRG->GetPointData() : inputID->GetPointData();
 	vtkDataArray 			*inputScalars = inputPd->GetScalars();
@@ -171,15 +184,17 @@ void vtkALBAProjectVolume::Execute()
 			break;
 		default:
 			vtkErrorMacro(<< "vtkALBAVolumeSlicer: Scalar type is not supported");
-			return;
+			return 0;
 	}
 
 	if (inputRG)
-		GenerateOutputFromRG(inputRG, projectedDims, projScalars);
+		GenerateOutputFromRG(request, inputRG, projectedDims, projScalars);
 	else
-		GenerateOutputFromID(inputID, projectedDims, projScalars);
+		GenerateOutputFromID(request, inputID, projectedDims, projScalars);
 
 	vtkDEL(projScalars);
+
+	return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -277,7 +292,7 @@ void vtkALBAProjectVolume::ProjectScalars(int * inputDims, DataType * inputScala
 }
 
 //----------------------------------------------------------------------------
-void vtkALBAProjectVolume::GenerateOutputFromID(vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars)
+void vtkALBAProjectVolume::GenerateOutputFromID(vtkInformation *request, vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars)
 {
 	double inputSpacing[3];
 	double outputSpacing[3];
@@ -301,19 +316,20 @@ void vtkALBAProjectVolume::GenerateOutputFromID(vtkImageData * inputSP, int * pr
 			outputSpacing[2] = 1;
 	}
 
-	output->SetScalarType(inputSP->GetScalarType());
-	output->SetNumberOfScalarComponents(inputSP->GetNumberOfScalarComponents());
+	output->SetScalarType(inputSP->GetScalarType(),request);
+	output->SetNumberOfScalarComponents(inputSP->GetNumberOfScalarComponents(),request);
 	output->SetDimensions(projectedDims);
 	output->SetSpacing(outputSpacing);
 	output->GetPointData()->SetScalars(projScalars);
 }
 
 //----------------------------------------------------------------------------
-void vtkALBAProjectVolume::GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars)
+void vtkALBAProjectVolume::GenerateOutputFromRG(vtkInformation *request, vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars)
 {
 	//Generate temporary rectilinear grid output
 	vtkRectilinearGrid *rgOut = vtkRectilinearGrid::New();
 	vtkDataArray 			*XCoordinates, *YCoordinates, *ZCoordinates;
+
 
 	rgOut->SetDimensions(projectedDims);
 
@@ -353,7 +369,7 @@ void vtkALBAProjectVolume::GenerateOutputFromRG(vtkRectilinearGrid * inputRG, in
 	
 	
 	vtkALBARGtoSPImageFilter *rgtosoFilter = vtkALBARGtoSPImageFilter::New();
-	rgtosoFilter->SetInput(rgOut);
+	rgtosoFilter->SetInputData(rgOut);
 	rgtosoFilter->Update();
 	
 	GetOutput()->DeepCopy(rgtosoFilter->GetOutput());

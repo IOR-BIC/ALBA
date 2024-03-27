@@ -22,7 +22,7 @@ class vtkIdList;
 class ALBA_EXPORT vtkALBADataArrayDescriptor : public vtkObject 
 {
 public:
-	vtkTypeRevisionMacro(vtkALBADataArrayDescriptor,vtkObject);
+	vtkTypeMacro(vtkALBADataArrayDescriptor,vtkObject);
 	void PrintSelf(ostream& os, vtkIndent indent);
 	static vtkALBADataArrayDescriptor* New();
 
@@ -46,7 +46,7 @@ public:
 
 	// Description:
 	// Set/Get the dimension (n) of the components. Must be >= 1. 
-	vtkSetClampMacro(NumberOfComponents,int,1,VTK_LARGE_INTEGER);
+	vtkSetClampMacro(NumberOfComponents,int,1,VTK_INT_MAX);
 	int GetNumberOfComponents() {
 		return this->NumberOfComponents;
 	};

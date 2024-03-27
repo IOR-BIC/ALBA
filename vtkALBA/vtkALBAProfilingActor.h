@@ -53,7 +53,7 @@ class ALBA_EXPORT vtkALBAProfilingActor : public vtkActor2D
 {
  public:
   /** RTTI Macro */
-  vtkTypeRevisionMacro(vtkALBAProfilingActor,vtkActor2D);
+  vtkTypeMacro(vtkALBAProfilingActor,vtkActor2D);
   /** Print Object Information */
   void PrintSelf(ostream& os, vtkIndent indent);
   /** create an instance of the object */

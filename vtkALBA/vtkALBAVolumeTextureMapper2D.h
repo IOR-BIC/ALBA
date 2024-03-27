@@ -36,7 +36,7 @@ public:
   /** create object  instance. */
   static vtkALBAVolumeTextureMapper2D *New();
   /**  RTTI Macro. */
-  vtkTypeRevisionMacro(vtkALBAVolumeTextureMapper2D, vtkOpenGLVolumeTextureMapper2D);	
+  vtkTypeMacro(vtkALBAVolumeTextureMapper2D, vtkVolumeTextureMapper2D);
 
 public:
   /** WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE. Initialize rendering for this volume. */

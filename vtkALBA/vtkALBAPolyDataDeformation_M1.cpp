@@ -20,11 +20,12 @@ See the COPYINGS file for license details
 #include "vtkCellLocator.h"
 #include "vtkGenericCell.h"
 
-vtkCxxRevisionMacro(vtkALBAPolyDataDeformation_M1, "$Revision: 1.1.2.5 $");
 vtkStandardNewMacro(vtkALBAPolyDataDeformation_M1);
 
 #include "albaMemDbg.h"
 #include "albaDbg.h"
+#include "vtkInformationVector.h"
+#include "vtkInformation.h"
 
 #pragma region //Nested Classes
 //Returns length of the edge. 
@@ -573,13 +574,13 @@ void vtkALBAPolyDataDeformation_M1::PrintSelf(ostream& os, vtkIndent indent)
 
 //------------------------------------------------------------------------
 //Return this object's modified time.
-/*virtual*/ unsigned long int vtkALBAPolyDataDeformation_M1::GetMTime()
+/*virtual*/ vtkMTimeType vtkALBAPolyDataDeformation_M1::GetMTime()
 //------------------------------------------------------------------------
 {
-  unsigned long mtime = Superclass::GetMTime();
+	vtkMTimeType mtime = Superclass::GetMTime();
   for (int i = 0; i < m_NumberOfSkeletons; i++)
   {
-    unsigned long t1;
+		vtkMTimeType t1;
     if (m_Skeletons[i].pPolyLines[0] != NULL)
     {
       t1 = m_Skeletons[i].pPolyLines[0]->GetMTime();
@@ -608,15 +609,19 @@ void vtkALBAPolyDataDeformation_M1::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------
 //By default, UpdateInformation calls this method to copy information
 //unmodified from the input to the output.
-/*virtual*/void vtkALBAPolyDataDeformation_M1::ExecuteInformation()
+/*virtual*/int vtkALBAPolyDataDeformation_M1::RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 //------------------------------------------------------------------------
 {
-  //check input
-  vtkPolyData* input = GetInput();
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+
+	// Initialize some frequently used values.
+	vtkPolyData  *input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   if (input == NULL)
   {
     vtkErrorMacro(<< "Invalid input for vtkALBAPolyDataDeformation_M1.");
-    return;   //we have no input
+    return 1;   //we have no input
   }
 
   //check output
@@ -625,7 +630,7 @@ void vtkALBAPolyDataDeformation_M1::PrintSelf(ostream& os, vtkIndent indent)
     SetOutput(vtkPolyData::New());
 
   //copy input to output
-  Superclass::ExecuteInformation();  
+  return Superclass::RequestInformation(request,inputVector,outputVector);  
 }
 
 #ifdef DEBUG_vtkALBAPolyDataDeformation_M1
@@ -639,7 +644,7 @@ void vtkALBAPolyDataDeformation_M1::PrintSelf(ostream& os, vtkIndent indent)
 /*virtual*/void vtkALBAPolyDataDeformation_M1::ExecuteData(vtkDataObject *output)
 {
   //check whether output is valid
-  vtkPolyData* input = GetInput();
+  vtkPolyData* input = vtkPolyData::SafeDownCast(GetInput());
   if (input == NULL)
     return;
 
@@ -682,7 +687,7 @@ void vtkALBAPolyDataDeformation_M1::PrintSelf(ostream& os, vtkIndent indent)
   //this will need cell locator
   //octree based locator for cells of the input mesh should be enough
   vtkCellLocator* cellLocator = vtkCellLocator::New();    
-  cellLocator->SetDataSet(GetInput());
+  cellLocator->SetDataSet(vtkDataSet::SafeDownCast(GetInput()));
   cellLocator->Update();
 
   nCount = (int)m_SuperSkeleton->m_pOC_Skel->Edges.size();
@@ -1660,7 +1665,8 @@ void vtkALBAPolyDataDeformation_M1::ComputeLFS(CSkeletonVertex* pOC)
 void vtkALBAPolyDataDeformation_M1::ComputeROI(CSkeletonEdge* pEdge)
 //------------------------------------------------------------------------
 {
-  vtkPoints* input = GetInput()->GetPoints();
+
+	vtkDataSet* input = vtkDataSet::SafeDownCast(GetInput());
   int nPoints = input->GetNumberOfPoints();
   
   pEdge->m_ROI.clear();           //clear previous data (if present)
@@ -1691,7 +1697,7 @@ void vtkALBAPolyDataDeformation_M1::ComputeROI(CSkeletonEdge* pEdge)
 void vtkALBAPolyDataDeformation_M1::RefineCurveROIs(vtkCellLocator* locator)
 //------------------------------------------------------------------------
 {
-  vtkPoints* input = GetInput()->GetPoints();
+  vtkPoints* input = vtkPolyData::SafeDownCast(GetInput())->GetPoints();
   int nPoints = input->GetNumberOfPoints(); 
 
   //number of edges to which points are mapped at present
@@ -1847,7 +1853,7 @@ void vtkALBAPolyDataDeformation_M1::RefineCurveROIs(vtkCellLocator* locator)
     CSkeletonEdge* pEdge = m_SuperSkeleton->m_pOC_Skel->Edges[i];
     int nCount = (int)pEdge->m_ROI.size();
 
-    vtkstd::vector< vtkIdType > newROI;
+    std::vector< vtkIdType > newROI;
     newROI.reserve(pEdge->m_ROI.size());
 
     for (int j = 0; j < nCount; j++)
@@ -1979,7 +1985,7 @@ bool vtkALBAPolyDataDeformation_M1::CheckSelfIntersection(CSkeletonEdge* pEdge1,
   //that contain all projected points
   double rk[2] = {0.0, 0.0};
 
-  vtkPoints* input = GetInput()->GetPoints();
+  vtkPoints* input = vtkPolyData::SafeDownCast(GetInput())->GetPoints();
   CSkeletonEdge* pCurEdge = pEdge1;
   for (int i = 0; i < 2; i++)
   {
@@ -2167,14 +2173,14 @@ void vtkALBAPolyDataDeformation_M1
 //This function is (see Blanco's paper): e^-(dist2(x,skelvertex)/sigma2).
 //sigma2 should be 2*dist2(skelvertex,centroid(skelvertex))
 void vtkALBAPolyDataDeformation_M1
-    ::ComputeParametrization(vtkstd::vector< vtkIdType >& points, 
+    ::ComputeParametrization(std::vector< vtkIdType >& points, 
                             CSkeletonEdge* pEdge, int iWSkelEdge, double sigma2)
     //::ComputeParametrization(CSkeletonEdge* pNextEdge, 
     //  CSkeletonEdge* pEdge, int iWSkelEdge)
 //------------------------------------------------------------------------
 { 
   /*double uu1[3], uu2[3];
-  vtkstd::vector< vtkIdType >& points = pNextEdge->m_ROI;
+  std::vector< vtkIdType >& points = pNextEdge->m_ROI;
   if (iWSkelEdge >= 0 && pEdge->m_Verts[0] != NULL &&
     pEdge->m_Verts[1] != NULL && pNextEdge->m_Verts[0] != NULL &&
     pNextEdge->m_Verts[1] != NULL)
@@ -2200,7 +2206,7 @@ void vtkALBAPolyDataDeformation_M1
 
 
 
-  vtkPolyData* input = GetInput();
+  vtkPolyData* input = vtkPolyData::SafeDownCast(GetInput());
 
   CSkeletonVertex* pSkelVert1 = pEdge->Verts[0]; 
   CSkeletonVertex* pSkelVert2 = pEdge->Verts[1];
@@ -2361,7 +2367,7 @@ void vtkALBAPolyDataDeformation_M1
 //this struct is used in ComputeMeshParametrization
 typedef struct vtkALBAPolyDataDeformation_M1::JOIN_VERTEX
 {    
-  vtkstd::vector< CSkeletonVertex* > vertices;
+  std::vector< CSkeletonVertex* > vertices;
 
   double centroid[3]; //centroid for this join vertex
 } JOIN_VERTEX; 
@@ -2372,7 +2378,7 @@ typedef struct vtkALBAPolyDataDeformation_M1::JOIN_VERTEX
 void vtkALBAPolyDataDeformation_M1::ComputeMeshParametrization()
 //------------------------------------------------------------------------
 { 
-  vtkPolyData* input = GetInput();
+  vtkPolyData* input = vtkPolyData::SafeDownCast(GetInput());
 
   //points that belong to an edge of one curve that si connected to 
   //another edge of another curve must be influenced by both edges
@@ -2382,7 +2388,7 @@ void vtkALBAPolyDataDeformation_M1::ComputeMeshParametrization()
   //edges of one curve because it could deform the skeleton totally
 
   //so first, we need to find connection points for all curves
-  vtkstd::vector< JOIN_VERTEX* > joints;
+  std::vector< JOIN_VERTEX* > joints;
 
   int nSkelPoints = (int)m_SuperSkeleton->m_pDC_Skel->Vertices.size();
   for (int i = 0; i < nSkelPoints; i++)
@@ -2719,7 +2725,7 @@ double vtkALBAPolyDataDeformation_M1::ComputeInputMeshAvgEdgeLength()
   double dblEdgeLen = 0.0;
   int nEdges = 0;
 
-  vtkPolyData* input = GetInput();
+  vtkPolyData* input = vtkPolyData::SafeDownCast(GetInput());
   input->BuildCells();  //just for sure
 
   int nCells = input->GetNumberOfCells();

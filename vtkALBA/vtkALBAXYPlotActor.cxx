@@ -15,6 +15,7 @@
 =========================================================================*/
 #include "vtkALBAXYPlotActor.h"
 
+#include "vtkIdList.h"
 #include "vtkAppendPolyData.h"
 #include "vtkAxisActor2D.h"
 #include "vtkCellArray.h"
@@ -41,7 +42,6 @@
 
 #define VTK_MAX_PLOTS 50
 
-vtkCxxRevisionMacro(vtkALBAXYPlotActor, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkALBAXYPlotActor);
 
 vtkCxxSetObjectMacro(vtkALBAXYPlotActor,TitleTextProperty,vtkTextProperty);
@@ -488,7 +488,6 @@ int vtkALBAXYPlotActor::RenderOpaqueGeometry(vtkViewport *viewport)
     for (mtime=0, this->InputList->InitTraversal(); 
          (ds = this->InputList->GetNextItem()); )
       {
-      ds->Update();
       dsMtime = ds->GetMTime();
       if ( dsMtime > mtime )
         {
@@ -502,7 +501,6 @@ int vtkALBAXYPlotActor::RenderOpaqueGeometry(vtkViewport *viewport)
     for (mtime=0, this->DataObjectInputList->InitTraversal(); 
          (dobj = this->DataObjectInputList->GetNextItem()); )
       {
-      dobj->Update();
       dsMtime = dobj->GetMTime();
       if ( dsMtime > mtime )
         {
@@ -727,8 +725,8 @@ int vtkALBAXYPlotActor::RenderOpaqueGeometry(vtkViewport *viewport)
           this->TitleTextProperty);
         }
 
-      vtkAxisActor2D::SetFontSize(viewport, 
-                                  this->TitleMapper, 
+      vtkAxisActor2D::SetMultipleFontSize(viewport, 
+                                  &this->TitleMapper,1, 
                                   size, 
                                   1.0,
                                   stringSize);
@@ -817,9 +815,9 @@ void vtkALBAXYPlotActor::ReleaseGraphicsResources(vtkWindow *win)
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkALBAXYPlotActor::GetMTime()
+vtkMTimeType vtkALBAXYPlotActor::GetMTime()
 {
-  unsigned long mtime, mtime2;
+	vtkMTimeType mtime, mtime2;
   mtime = this->vtkActor2D::GetMTime();
 
   if (this->Legend)
@@ -1126,7 +1124,7 @@ void vtkALBAXYPlotActor::ComputeDORange(double xrange[2], double yrange[2],
     lengths[doNum] = 0.0;
     field = dobj->GetFieldData();
     numColumns = field->GetNumberOfComponents(); //number of "columns"
-    for (numRows = VTK_LARGE_ID, i=0; i<field->GetNumberOfArrays(); i++)
+    for (numRows = VTK_INT_MAX, i=0; i<field->GetNumberOfArrays(); i++)
       {
       array = field->GetArray(i);
       numTuples = array->GetNumberOfTuples();
@@ -1146,11 +1144,11 @@ void vtkALBAXYPlotActor::ComputeDORange(double xrange[2], double yrange[2],
         {
         if ( this->DataObjectPlotMode == VTK_XYPLOT_ROW )
           {
-          x = field->GetComponent(this->XComponent->GetValue(doNum), ptId);
+						x = field->GetArray(this->XComponent->GetValue(doNum))->GetTuple(ptId)[0];
           }
         else //if ( this->DataObjectPlotMode == VTK_XYPLOT_COLUMN )
           {
-          x = field->GetComponent(ptId, this->XComponent->GetValue(doNum));
+						field->GetArray(this->XComponent->GetValue(ptId))->GetTuple(doNum)[0];
           }
         if ( ptId == 0 )
           {
@@ -1207,11 +1205,11 @@ void vtkALBAXYPlotActor::ComputeDORange(double xrange[2], double yrange[2],
       {
       if ( this->DataObjectPlotMode == VTK_XYPLOT_ROW )
         {
-        y = field->GetComponent(this->YComponent->GetValue(doNum), ptId);
+					y = field->GetArray(this->YComponent->GetValue(doNum))->GetTuple(ptId)[0];
         }
       else //if ( this->DataObjectPlotMode == VTK_XYPLOT_COLUMN )
         {
-        y = field->GetComponent(ptId, this->YComponent->GetValue(doNum));
+					y = field->GetArray(this->YComponent->GetValue(ptId))->GetTuple(doNum)[0];
         }
       if ( y < yrange[0] )
         {
@@ -1282,19 +1280,19 @@ void vtkALBAXYPlotActor::CreatePlotData(int *pos, int *pos2, double xRange[2],
     {
     this->PlotData[i] = vtkPolyData::New();
     this->PlotGlyph[i] = vtkGlyph2D::New();
-    this->PlotGlyph[i]->SetInput(this->PlotData[i]);
+    this->PlotGlyph[i]->SetInputData(this->PlotData[i]);
     this->PlotGlyph[i]->SetScaleModeToDataScalingOff();
     this->PlotAppend[i] = vtkAppendPolyData::New();
-    this->PlotAppend[i]->AddInput(this->PlotData[i]);
+    this->PlotAppend[i]->AddInputData(this->PlotData[i]);
     if ( this->LegendActor->GetEntrySymbol(i) != NULL &&
          this->LegendActor->GetEntrySymbol(i) != this->GlyphSource->GetOutput() )
       {
-      this->PlotGlyph[i]->SetSource(this->LegendActor->GetEntrySymbol(i));
+      this->PlotGlyph[i]->SetSourceData(this->LegendActor->GetEntrySymbol(i));
       this->PlotGlyph[i]->SetScaleFactor(this->ComputeGlyphScale(i,pos,pos2));
-      this->PlotAppend[i]->AddInput(this->PlotGlyph[i]->GetOutput());
+      this->PlotAppend[i]->AddInputData(this->PlotGlyph[i]->GetOutput());
       }
     this->PlotMapper[i] = vtkPolyDataMapper2D::New();
-    this->PlotMapper[i]->SetInput(this->PlotAppend[i]->GetOutput());
+    this->PlotMapper[i]->SetInputData(this->PlotAppend[i]->GetOutput());
     this->PlotMapper[i]->ScalarVisibilityOff();
     this->PlotActor[i] = vtkActor2D::New();
     this->PlotActor[i]->SetMapper(this->PlotMapper[i]);
@@ -1441,7 +1439,7 @@ void vtkALBAXYPlotActor::CreatePlotData(int *pos, int *pos2, double xRange[2],
       // determine the shape of the field
       field = dobj->GetFieldData();
       numColumns = field->GetNumberOfComponents(); //number of "columns"
-      for (numRows = VTK_LARGE_ID, i=0; i<field->GetNumberOfArrays(); i++)
+      for (numRows = VTK_INT_MAX, i=0; i<field->GetNumberOfArrays(); i++)
         {
         array = field->GetArray(i);
         numTuples = array->GetNumberOfTuples();
@@ -1463,13 +1461,13 @@ void vtkALBAXYPlotActor::CreatePlotData(int *pos, int *pos2, double xRange[2],
         {
         if ( this->DataObjectPlotMode == VTK_XYPLOT_ROW )
           {
-          x[0] = field->GetComponent(this->XComponent->GetValue(doNum),ptId);
-          xyz[1] = field->GetComponent(this->YComponent->GetValue(doNum),ptId);
+          x[0] = field->GetArray(this->XComponent->GetValue(doNum))->GetTuple(ptId)[0];
+          xyz[1] = field->GetArray(this->YComponent->GetValue(doNum))->GetTuple(ptId)[0];
           }
         else //if ( this->DataObjectPlotMode == VTK_XYPLOT_COLUMN )
           {
-          x[0] = field->GetComponent(ptId, this->XComponent->GetValue(doNum));
-          xyz[1] = field->GetComponent(ptId, this->YComponent->GetValue(doNum));
+          x[0] = field->GetArray(this->XComponent->GetValue(ptId))->GetTuple(doNum)[0];
+          xyz[1] = field->GetArray(this->YComponent->GetValue(ptId))->GetTuple(doNum)[0];
           }
 
         switch (this->XValues)
@@ -1630,13 +1628,11 @@ void vtkALBAXYPlotActor::PlaceAxes(vtkViewport *viewport, int *size,
   // Estimate the padding around the X and Y axes
   tprop->ShallowCopy(axisX->GetTitleTextProperty());
   textMapper->SetInput(axisX->GetTitle());
-  vtkAxisActor2D::SetFontSize(
-    viewport, textMapper, size, fontFactorX, titleSizeX);
+  vtkAxisActor2D::SetMultipleFontSize(  viewport, &textMapper,1, size, fontFactorX, titleSizeX);
 
   tprop->ShallowCopy(axisY->GetTitleTextProperty());
   textMapper->SetInput(axisY->GetTitle());
-  vtkAxisActor2D::SetFontSize(
-    viewport, textMapper, size, fontFactorY, titleSizeY);
+  vtkAxisActor2D::SetMultipleFontSize(  viewport, &textMapper,1, size, fontFactorY, titleSizeY);
 
   // At this point the thing to do would be to actually ask the Y axis
   // actor to return the largest label.
@@ -1645,16 +1641,14 @@ void vtkALBAXYPlotActor::PlaceAxes(vtkViewport *viewport, int *size,
   sprintf(str2, axisY->GetLabelFormat(), axisY->GetAdjustedRange()[1]);
   tprop->ShallowCopy(axisY->GetLabelTextProperty());
   textMapper->SetInput(strlen(str1) > strlen(str2) ? str1 : str2);
-  vtkAxisActor2D::SetFontSize(
-    viewport, textMapper, size, labelFactorY * fontFactorY, labelSizeY);
+  vtkAxisActor2D::SetMultipleFontSize(  viewport, &textMapper,1, size, labelFactorY * fontFactorY, labelSizeY);
 
   // We do only care of the height of the label in the X axis, so let's
   // use the min for example
   sprintf(str1, axisX->GetLabelFormat(), axisX->GetAdjustedRange()[0]);
   tprop->ShallowCopy(axisX->GetLabelTextProperty());
   textMapper->SetInput(str1);
-  vtkAxisActor2D::SetFontSize(
-    viewport, textMapper, size, labelFactorX * fontFactorX, labelSizeX);
+  vtkAxisActor2D::SetMultipleFontSize(  viewport, &textMapper,1, size, labelFactorX * fontFactorX, labelSizeX);
 
   tickOffsetX = axisX->GetTickOffset();
   tickOffsetY = axisY->GetTickOffset();
@@ -1876,7 +1870,6 @@ void vtkALBAXYPlotActor::GenerateClipPlanes(int *pos, int *pos2)
 double vtkALBAXYPlotActor::ComputeGlyphScale(int i, int *pos, int *pos2)
 {
   vtkPolyData *pd=this->LegendActor->GetEntrySymbol(i);
-  pd->Update();
   double length=pd->GetLength();
   double sf = this->GlyphSize * sqrt((double)(pos[0]-pos2[0])*(pos[0]-pos2[0]) + 
                                     (pos[1]-pos2[1])*(pos[1]-pos2[1])) / length;

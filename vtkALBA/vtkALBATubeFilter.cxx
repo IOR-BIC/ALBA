@@ -15,15 +15,17 @@ Copyright (c) 2012
 #include "vtkCellData.h"
 #include "vtkFloatArray.h"
 #include "vtkMath.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolyLine.h"
-
-vtkCxxRevisionMacro(vtkALBATubeFilter, "$Revision: 1.80 $");
-vtkStandardNewMacro(vtkALBATubeFilter);
+#include <algorithm>
 
 #define EPSILON 1e-8
+
+vtkStandardNewMacro(vtkALBATubeFilter);
 
 // Construct object with radius 0.5, radius variation turned off, the number 
 // of sides set to 3, and radius factor of 10.
@@ -45,20 +47,36 @@ vtkALBATubeFilter::vtkALBATubeFilter()
 
 	this->GenerateTCoords = VTK_TCOORDS_OFF;
 	this->TextureLength = 1.0;
+
+  this->OutputPointsPrecision = vtkAlgorithm::DEFAULT_PRECISION;
+
+  // by default process active point scalars
+  this->SetInputArrayToProcess(0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,
+                               vtkDataSetAttributes::SCALARS);
+
+  // by default process active point vectors
+  this->SetInputArrayToProcess(1,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,
+                               vtkDataSetAttributes::VECTORS);
 }
 
-void vtkALBATubeFilter::Execute()
+int vtkALBATubeFilter::RequestData(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
-	vtkPolyData *input = this->GetInput();
-	vtkPolyData *output = this->GetOutput();
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	// Initialize some frequently used values.
+	vtkPolyData  *input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
 	vtkPointData *pd = input->GetPointData();
 	vtkPointData *outPD = output->GetPointData();
 	vtkCellData *cd = input->GetCellData();
 	vtkCellData *outCD = output->GetCellData();
 	vtkCellArray *inLines = NULL;
 	vtkDataArray *inNormals;
-	vtkDataArray *inScalars = pd->GetScalars();
-	vtkDataArray *inVectors = pd->GetVectors();
+  vtkDataArray *inScalars=this->GetInputArrayToProcess(0,inputVector);
+  vtkDataArray *inVectors=this->GetInputArrayToProcess(1,inputVector);
 
 	vtkPoints *inPts;
 	vtkIdType numPts = 0;
@@ -86,12 +104,27 @@ void vtkALBATubeFilter::Execute()
 		!(inLines = input->GetLines()) ||
 		(numLines = inLines->GetNumberOfCells()) < 1)
 	{
-		return;
+    return 1;
 	}
 
 	// Create the geometry and topology
 	numNewPts = numPts * this->NumberOfSides;
 	newPts = vtkPoints::New();
+
+  // Set the desired precision for the points in the output.
+  if(this->OutputPointsPrecision == vtkAlgorithm::DEFAULT_PRECISION)
+  {
+    newPts->SetDataType(inPts->GetDataType());
+  }
+  else if(this->OutputPointsPrecision == vtkAlgorithm::SINGLE_PRECISION)
+  {
+    newPts->SetDataType(VTK_FLOAT);
+  }
+  else if(this->OutputPointsPrecision == vtkAlgorithm::DOUBLE_PRECISION)
+  {
+    newPts->SetDataType(VTK_DOUBLE);
+  }
+
 	newPts->Allocate(numNewPts);
 	newNormals = vtkFloatArray::New();
 	newNormals->SetName("TubeNormals");
@@ -171,15 +204,16 @@ void vtkALBATubeFilter::Execute()
 	//
 	numNewCells = inLines->GetNumberOfCells() * this->NumberOfSides + 2;
 	outCD->CopyNormalsOff();
-	outPD->CopyAllocate(pd, numNewCells);
+  outCD->CopyAllocate(cd,numNewCells);
 
 	//  Create points along each polyline that are connected into NumberOfSides
 	//  triangle strips. Texture coordinates are optionally generated.
 	//
 	this->Theta = 2.0*vtkMath::Pi() / this->NumberOfSides;
 	vtkPolyLine *lineNormalGenerator = vtkPolyLine::New();
-	for (inCellId = 0, inLines->InitTraversal();
-	inLines->GetNextCell(npts, pts) && !abort; inCellId++)
+  // the line cellIds start after the last vert cellId
+  inCellId = input->GetNumberOfVerts();
+  for (inLines->InitTraversal(); inLines->GetNextCell(npts, pts) && !abort; inCellId++)
 	{
 		this->UpdateProgress((double)inCellId / numLines);
 		abort = this->GetAbortExecute();
@@ -199,13 +233,8 @@ void vtkALBATubeFilter::Execute()
 		if (generateNormals)
 		{
 			singlePolyline->Reset(); //avoid instantiation
-			singlePolyline->InsertNextCell(cleanNpts, cleanPts);
-			if (!lineNormalGenerator->GenerateSlidingNormals(inPts, singlePolyline,
-				inNormals))
-			{
-				vtkWarningMacro(<< "No normals for line!");
-				continue; //skip tubing this polyline
-			}
+      singlePolyline->InsertNextCell(npts,pts);
+      lineNormalGenerator->GenerateSlidingNormals(inPts,singlePolyline, inNormals);
 		}
 
 		// Generate the points around the polyline. The tube is not stripped
@@ -308,7 +337,7 @@ int vtkALBATubeFilter::GeneratePoints(vtkIdType offset,
 	int i, k;
 	double p[3];
 	double pNext[3];
-	double sNext[3];
+  double sNext[3] = {0.0, 0.0, 0.0};
 	double sPrev[3];
 	double startCapNorm[3], endCapNorm[3];
 	double n[3];
@@ -810,4 +839,6 @@ void vtkALBATubeFilter::PrintSelf(ostream& os, vtkIndent indent)
 	os << indent << "Generate TCoords: "
 		<< this->GetGenerateTCoordsAsString() << endl;
 	os << indent << "Texture Length: " << this->TextureLength << endl;
+  os << indent << "Output Points Precision: " << this->OutputPointsPrecision
+     << endl;
 }

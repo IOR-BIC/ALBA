@@ -23,7 +23,6 @@
 #include "vtkPoints.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkWeightedLandmarkTransform, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkWeightedLandmarkTransform);
 
 //----------------------------------------------------------------------------
@@ -426,4 +425,3 @@ void vtkWeightedLandmarkTransform::SetWeights(double	*w, int number)
 
 
 }
-//----------------------------------------------------------------------------

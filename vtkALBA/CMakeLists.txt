@@ -5,6 +5,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 # project set here.
 PROJECT(vtkALBA)
 
+MESSAGE(STATUS "ALBA: Configuring vtkALBA")
+
 # Set your list of sources here.  Do not change the name of the
 # vtkALBA_SRCS variable.
 SET(vtkALBA_SRCS
@@ -64,7 +66,6 @@ SET(vtkALBA_SRCS
   vtkALBAInteractorStyleEnableRotation.cxx  				vtkALBAInteractorStyleEnableRotation.h
   vtkALBASubdividePolylines.cxx  						vtkALBASubdividePolylines.h
   vtkALBALandmarkCloudPolydataFilter.cxx  				vtkALBALandmarkCloudPolydataFilter.h
-  vtkBox.cxx  											vtkBox.h
   vtkMaskPolyDataFilter.cxx  							vtkMaskPolyDataFilter.h
   vtkHoleConnectivity.cxx  								vtkHoleConnectivity.h
   vtkPatchLine.h  										vtkPatchLine.cpp
@@ -126,7 +127,6 @@ ENDIF (ALBA_USE_ITK)
 SET(vtkALBA_FULL_SRCS
 	${vtkALBA_SRCS}
   vtkALBAAbstractPointsSource.cpp 						vtkALBAAbstractPointsSource.h
-  vtkBoundingBox.cxx  									vtkBoundingBox.h
   vtkALBAPastValuesList.cpp  							vtkALBAPastValuesList.h
   vtkALBAStentModelSource.cpp  							vtkALBAStentModelSource.h
   vtkALBADeformableSimplexMeshFilter.h
@@ -138,6 +138,11 @@ SET(vtkALBA_FULL_SRCS
 
 # List the kits from VTK that are needed by this project.
 SET(vtkALBA_LIBS vtkCommon  vtkRendering  vtkFiltering  vtkGraphics  vtkHybrid ${wxWidgets_LIBRARIES})
+
+
+find_package(VTK 7.1 REQUIRED NO_MODULE)
+include(${VTK_USE_FILE})
+SET(vtkALBA_LIBS ${VTK_LIBRARIES})
 
 IF(WIN32)
 SET(vtkALBA_LIBS
@@ -206,20 +211,7 @@ IF(VTK_FOUND)
     ENDIF (USE_VTK_OUTPUT_PATHS)
   ENDIF (EXISTS ${VTK_DIR}/bin)
 
-  # Create the header to configure the classes.
-  # CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/albaConfigure.h.in
-  #                ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Configure.h
-  #                @ONLY IMMEDIATE)
-				 
-
-  # Create the instantiator for these classes.
-  SET(VTK_USE_INSTANTIATOR_NEW 1)
-  VTK_MAKE_INSTANTIATOR2("${PROJECT_NAME}Instantiator" vtkALBAInstantiator_SRCS
-                         ${vtkALBA_SRCS}
-                         EXPORT_MACRO "ALBA_EXPORT"
-                         HEADER_LOCATION ${PROJECT_BINARY_DIR}
-                         INCLUDES "albaConfigure.h")
-
+ 
   # Create the library.
   ADD_LIBRARY(${PROJECT_NAME} ${vtkALBA_FULL_SRCS} ${vtkALBAInstantiator_SRCS})
   TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${vtkALBA_LIBS})

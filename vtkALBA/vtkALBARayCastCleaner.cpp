@@ -23,6 +23,8 @@
 #include "vtkPointData.h"
 #include "vtkALBASmartPointer.h"
 #include "albaDefines.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
 enum RAY_CAST_MODALITY
 {
@@ -30,7 +32,6 @@ enum RAY_CAST_MODALITY
   MR_MODALITY,
 };
 
-vtkCxxRevisionMacro(vtkALBARayCastCleaner, "$Revision: 1.0 $");
 vtkStandardNewMacro(vtkALBARayCastCleaner);
 
 //----------------------------------------------------------------------------
@@ -59,30 +60,33 @@ vtkALBARayCastCleaner::~vtkALBARayCastCleaner()
 
 
 //------------------------------------------------------------------------------
-void vtkALBARayCastCleaner::Execute()
+int vtkALBARayCastCleaner::RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 //------------------------------------------------------------------------------
 {
-  vtkImageData *outputImage = (vtkImageData *)this->GetOutput();
-  this->GetInput()->Update();
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	// Initialize some frequently used values.
+	vtkImageData  *input = vtkImageData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkImageData *output = vtkImageData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   double range[2];
   double newValue, boneValue;
   //generating a copy of the input 
-  outputImage->DeepCopy(this->GetInput());
-  outputImage->UpdateData();
-  outputImage->Update();
+  output->DeepCopy(input);
 
   //getting image dimension for neighbors calculation  
-  outputImage->GetDimensions(VolumeDimension);
+  output->GetDimensions(VolumeDimension);
   
 
   //Creating a copy of data array 
   //(proximity checks need to be done with unmodified original values)
-  vtkDataArray* imgScalars = (vtkDataArray*)outputImage->GetPointData()->GetScalars();
+  vtkDataArray* imgScalars = (vtkDataArray*)output->GetPointData()->GetScalars();
   vtkUnsignedShortArray * newScalars;
   vtkNEW(newScalars);
   
-  int nPoints=outputImage->GetNumberOfPoints();
+  int nPoints=output->GetNumberOfPoints();
 
   imgScalars->GetRange(range);
   
@@ -120,14 +124,13 @@ void vtkALBARayCastCleaner::Execute()
   }
 
   //settings new scalar values to output volume
-  outputImage->GetPointData()->SetScalars(newScalars);
-  outputImage->GetPointData()->Modified();
-  outputImage->GetPointData()->Update();
-  outputImage->UpdateData();
-  outputImage->Update();
-  this->SetOutput((vtkStructuredPoints*)outputImage);
+  output->GetPointData()->SetScalars(newScalars);
+  output->GetPointData()->Modified();
+  output->GetPointData()->Update();
 
   vtkDEL(newScalars);
+
+	return 1;
 }
 
 #define SP_COORD_TO_ID(x,y,z)  z*(VolumeDimension[0])*(VolumeDimension[1]) + y*(VolumeDimension[0]) + x;

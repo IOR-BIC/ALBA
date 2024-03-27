@@ -55,12 +55,6 @@ Then Render()
 
 #include "vtkALBAContourVolumeMapper.h"
 
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
-
 #include "albaConfigure.h"
 
 //------------------------------------------------------------------------------
@@ -79,7 +73,7 @@ public:
   /** create an instance of the object */
   static vtkALBAContourVolumeMapperAdv *New();
   /** RTTI Macro */
-  vtkTypeRevisionMacro(vtkALBAContourVolumeMapperAdv, vtkALBAContourVolumeMapper);
+  vtkTypeMacro(vtkALBAContourVolumeMapperAdv, vtkALBAContourVolumeMapper);
 
 protected:
   /** constructor */
@@ -252,3 +246,5 @@ public:
 };
 
 #endif
+
+

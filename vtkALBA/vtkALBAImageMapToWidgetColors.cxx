@@ -15,7 +15,6 @@
 #include "vtkALBAImageMapToWidgetColors.h"
 
 
-vtkCxxRevisionMacro(vtkALBAImageMapToWidgetColors, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkALBAImageMapToWidgetColors);
 
 template<typename type> static inline type clip(type x, type xmin, type xmax) { if (x < xmin) return xmin; if (x > xmax) return xmax; return x; }
@@ -51,7 +50,7 @@ void vtkALBAImageMapToWidgetColors::ExecuteData(vtkDataObject *output)
 
   // prepare gradients
   int extent[6];
-  output->GetUpdateExtent(extent);
+  outData->GetExtent(extent);
   const int sx = extent[1] - extent[0] + 1, sy = extent[3] - extent[2] + 1, sz = extent[5] - extent[4] + 1;
   const int newCacheSize = sx * sy * sz;
   bool  newCache = false;
@@ -67,8 +66,9 @@ void vtkALBAImageMapToWidgetColors::ExecuteData(vtkDataObject *output)
   if (newCache || this->GradientCacheMTime < this->GetInput()->GetMTime() || memcmp(this->GradientExtent, extent, sizeof(extent)) != 0) 
   {
     memcpy(this->GradientExtent, extent, sizeof(extent));
-    void *inPtr = this->GetInput()->GetScalarPointerForExtent(this->GradientExtent);
-    switch (this->GetInput()->GetScalarType()) 
+		vtkImageData *input=vtkImageData::SafeDownCast(this->GetInput());
+    void *inPtr = input->GetScalarPointerForExtent(this->GradientExtent);
+    switch (input->GetScalarType()) 
     {
       case VTK_CHAR:
         this->UpdateGradientCache((char*)inPtr);
@@ -89,13 +89,13 @@ void vtkALBAImageMapToWidgetColors::ExecuteData(vtkDataObject *output)
     this->GradientCacheMTime.Modified();
   }
 
-  this->vtkImageToImageFilter::ExecuteData(output);
+  this->vtkImageMapToColors::ExecuteData(output);
 }
 
 //----------------------------------------------------------------------------
 template<class T> void vtkALBAImageMapToWidgetColors::UpdateGradientCache(T *dataPointer) 
 {
-  vtkImageData *imageData = this->GetInput();
+  vtkImageData *imageData = vtkImageData::SafeDownCast(this->GetInput());
 
   int inDims[3], outDims[3] = { this->GradientExtent[1] - this->GradientExtent[0] + 1, this->GradientExtent[3] - this->GradientExtent[2] + 1, this->GradientExtent[5] - this->GradientExtent[4] + 1};
   imageData->GetDimensions(inDims);
@@ -142,12 +142,12 @@ template<class T> void vtkALBAImageMapToWidgetColors::UpdateGradientCache(T *dat
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkALBAImageMapToWidgetColors::GetMTime() 
+vtkMTimeType vtkALBAImageMapToWidgetColors::GetMTime()
 {
-  unsigned long t1 = this->vtkImageToImageFilter::GetMTime();
+	vtkMTimeType t1 = this->vtkImageMapToColors::GetMTime();
   if (this->TransferFunction) 
   {
-    unsigned long t2 = this->TransferFunction->GetMTime();
+		vtkMTimeType t2 = this->TransferFunction->GetMTime();
     if (t2 > t1)
       t1 = t2;
   }
@@ -157,8 +157,7 @@ unsigned long vtkALBAImageMapToWidgetColors::GetMTime()
 //----------------------------------------------------------------------------
 void vtkALBAImageMapToWidgetColors::ExecuteInformation(vtkImageData *inData, vtkImageData *outData) 
 {
-  outData->SetScalarType(VTK_UNSIGNED_CHAR);
-  outData->SetNumberOfScalarComponents(3);
+  outData->AllocateScalars(VTK_UNSIGNED_CHAR,3);
 }
 
 //----------------------------------------------------------------------------
@@ -258,3 +257,6 @@ template<class T> void vtkALBAImageMapToWidgetColors::Execute(vtkImageData *inDa
     iptr += inIncZ;
   }
 }
+
+
+

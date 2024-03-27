@@ -59,13 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkCamera.h"
 
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
+#include "vtkgl.h"
 
 #define MaxNumberOfMipmapLevels 3
 #define MaxNumberOfRenderings   360
@@ -78,7 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class ALBA_EXPORT vtkXRayVolumeMapper : public vtkVolumeMapper {
   public:
     static vtkXRayVolumeMapper *New();
-    vtkTypeRevisionMacro(vtkXRayVolumeMapper, vtkVolumeMapper);
+    vtkTypeMacro(vtkXRayVolumeMapper, vtkVolumeMapper);
     
     // standard vtkVolumeMapper only accept vtkImageData. Overwrite input functions
     void  SetInput(vtkDataSet *input);
@@ -205,5 +199,3 @@ class ALBA_EXPORT vtkXRayVolumeMapper : public vtkVolumeMapper {
 
 
 #endif
-
-

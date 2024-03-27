@@ -12,9 +12,7 @@
 
 #include "vtkALBATransferFunction2D.h"
 
-vtkCxxRevisionMacro(vtkALBATransferFunction2D, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkALBATransferFunction2D);
-vtkCxxRevisionMacro(vtkVolumeProperty2, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkVolumeProperty2);
 
 typedef unsigned char u_char;
@@ -628,14 +626,14 @@ void vtkVolumeProperty2::SetTransferFunction2D(vtkALBATransferFunction2D *functi
 }
 
 //-----------------------------------------------------------------
-unsigned long int vtkVolumeProperty2::GetMTime() 
+vtkMTimeType vtkVolumeProperty2::GetMTime()
 //-----------------------------------------------------------------
 {
-  unsigned long mTime = vtkVolumeProperty::GetMTime();
+	vtkMTimeType mTime = vtkVolumeProperty::GetMTime();
   
   if (this->TransferFunction2D) 
   {
-    unsigned long  mTimeTF = this->TransferFunction2D->GetMTime();
+		vtkMTimeType  mTimeTF = this->TransferFunction2D->GetMTime();
     mTime = max(mTime, mTimeTF);
   }
   

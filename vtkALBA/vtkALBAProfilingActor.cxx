@@ -20,7 +20,6 @@
 #include "vtkTimerLog.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkALBAProfilingActor, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkALBAProfilingActor);
 
 #define MAXIMUM_FPS 120.

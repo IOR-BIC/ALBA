@@ -20,8 +20,9 @@
 #include "vtkPolydata.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
-vtkCxxRevisionMacro(vtkALBAPolyDataNormals, "$Revision: 1.0 $");
 vtkStandardNewMacro(vtkALBAPolyDataNormals);
 
 vtkALBAPolyDataNormals::vtkALBAPolyDataNormals()
@@ -29,13 +30,20 @@ vtkALBAPolyDataNormals::vtkALBAPolyDataNormals()
 	this->m_LastUpdateTime = 0;
 }
 
-/*virtual*/ void vtkALBAPolyDataNormals::UpdateData(vtkDataObject *output)
+/*virtual*/ int vtkALBAPolyDataNormals::RequestData(vtkInformation *request,	vtkInformationVector **inputVector,	vtkInformationVector *outputVector)
 {		
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	// Initialize some frequently used values.
+	vtkPolyData  *input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
 	//strategy: if our settings has not changed, and our input has the same geometry,
 	//then reuse already calculated normal vectors, otherwise, perform full calculation
 	unsigned long tm = this->GetMTime();	
 	
-	vtkPolyData* input = this->GetInput();
 	if (input->GetPoints() != NULL) {
 		tm += input->GetPoints()->GetMTime();
 	}
@@ -49,10 +57,10 @@ vtkALBAPolyDataNormals::vtkALBAPolyDataNormals()
 	}
 
 	vtkPolyData* outp = this->GetOutput();
-	if (outp == NULL || tm > this->m_LastUpdateTime || this->FlipNormals)
+	if (outp == NULL || tm > this->m_LastUpdateTime)
 	{
 		//perform full update
-		Superclass::UpdateData(output);		
+		Superclass::RequestData(request,inputVector,outputVector);
 	}
 	else
 	{
@@ -83,7 +91,7 @@ vtkALBAPolyDataNormals::vtkALBAPolyDataNormals()
 		int saveCN = this->ComputeCellNormals;
 		this->ComputeCellNormals = 0;
 
-		Superclass::UpdateData(output);		
+		Superclass::RequestData(request,inputVector,outputVector);
 
 		this->ComputePointNormals = savePN;
 		this->ComputeCellNormals = saveCN;		
@@ -104,4 +112,6 @@ vtkALBAPolyDataNormals::vtkALBAPolyDataNormals()
 	
 	
 	this->m_LastUpdateTime = tm;
+
+	return 1;
 }

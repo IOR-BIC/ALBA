@@ -32,7 +32,7 @@ public:
   /** create object  instance. */
   static vtkALBACellLocator *New();
   /**  RTTI Macro. */
-  vtkTypeRevisionMacro(vtkALBACellLocator, vtkCellLocator);	
+  vtkTypeMacro(vtkALBACellLocator, vtkCellLocator);	
 
 public:
 
@@ -54,3 +54,4 @@ protected:
 };
 
 #endif // vtkALBACellLocator_h__
+

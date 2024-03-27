@@ -56,7 +56,7 @@ class ALBA_EXPORT vtkALBAMatrixVectorMath : public vtkObject
 {
 public:
   static vtkALBAMatrixVectorMath *New();
-  vtkTypeRevisionMacro(vtkALBAMatrixVectorMath, vtkObject);
+  vtkTypeMacro(vtkALBAMatrixVectorMath, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) {} ;
 
 

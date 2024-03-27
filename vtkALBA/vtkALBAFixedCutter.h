@@ -27,7 +27,7 @@ that is the center of the input.
 class ALBA_EXPORT vtkALBAFixedCutter : public vtkCutter
 {
 public:
-  vtkTypeRevisionMacro(vtkALBAFixedCutter,vtkCutter);
+  vtkTypeMacro(vtkALBAFixedCutter,vtkCutter);
   /** constructor */
            vtkALBAFixedCutter();
   /** destructor */
@@ -37,7 +37,7 @@ public:
 
 protected:
   /** reimplement execute fixing the algorithm when the number of points of the cutter output is zero.*/
-  void Execute();
+  int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
 private:
     /** Copy Constructor , not implemented */

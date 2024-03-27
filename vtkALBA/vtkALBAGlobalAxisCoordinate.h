@@ -35,7 +35,7 @@ class name: vtkALBAGlobalAxisCoordinate.
 class ALBA_EXPORT  vtkALBAGlobalAxisCoordinate : public vtkCoordinate
 {
 public:
-  //vtkTypeRevisionMacro(vtkALBAGlobalAxisCoordinate,vtkCoordinate);
+  //vtkTypeMacro(vtkALBAGlobalAxisCoordinate,vtkCoordinate);
   /** destructor */
   virtual ~vtkALBAGlobalAxisCoordinate();
   /** create an instance of the object */
@@ -59,5 +59,3 @@ private:
   void operator=(const vtkALBAGlobalAxisCoordinate&);
 };
 #endif
-
-

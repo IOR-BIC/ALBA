@@ -41,7 +41,7 @@ class ALBA_EXPORT vtkALBATextActorMeter : public vtkActor2D
 {
  public:
   /** RTTI macro. */
-  vtkTypeRevisionMacro(vtkALBATextActorMeter,vtkActor2D);
+  vtkTypeMacro(vtkALBATextActorMeter,vtkActor2D);
   /** Print useful information. */
   void PrintSelf(ostream& os, vtkIndent indent);
   /** Create an instance of the object. */
@@ -66,11 +66,6 @@ class ALBA_EXPORT vtkALBATextActorMeter : public vtkActor2D
   /** Modify text actor color. */
   void SetColor(double r,double g,double b);
 	
-	/** Modify text actor color. */
-	void SetOpacity(double opacity);
-
-	vtkTextActor *GetTextActor() { return TextActor; }
-
 protected:
   /** constructor. */
 	vtkALBATextActorMeter();

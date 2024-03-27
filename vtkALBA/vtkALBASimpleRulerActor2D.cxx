@@ -38,7 +38,6 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkALBASimpleRulerActor2D, "$Revision: 1.3.2.2 $");
 vtkStandardNewMacro(vtkALBASimpleRulerActor2D);
 //------------------------------------------------------------------------------
 vtkALBASimpleRulerActor2D::vtkALBASimpleRulerActor2D()
@@ -242,7 +241,7 @@ void vtkALBASimpleRulerActor2D::RulerCreate()
 	tick_pd->SetLines(tick_cell);
 
   vtkPolyDataMapper2D *tick_pdm = vtkPolyDataMapper2D::New();
-  tick_pdm->SetInput(tick_pd);
+  tick_pdm->SetInputData(tick_pd);
 
   vtkProperty2D *tick_p = vtkProperty2D::New();
   tick_p->SetColor(1,0,0);
@@ -271,7 +270,7 @@ void vtkALBASimpleRulerActor2D::RulerCreate()
   axis_pd->SetLines(axis_cell);
 
   vtkPolyDataMapper2D *axis_pdm = vtkPolyDataMapper2D::New();
-  axis_pdm->SetInput(axis_pd);
+  axis_pdm->SetInputData(axis_pd);
 
   vtkProperty2D *axis_p = vtkProperty2D::New();
   axis_p->SetColor(1,0.0,0.0);
@@ -290,31 +289,28 @@ void vtkALBASimpleRulerActor2D::RulerCreate()
 		//Label //////////////////////////
   ScaleLabel = vtkTextActor::New();
 	ScaleLabel->GetProperty()->SetColor(1,0,0);
-  ScaleLabel->GetTextProperty()->AntiAliasingOff();
   ScaleLabel->GetTextProperty()->SetFontSize(12);
   ScaleLabel->GetTextProperty()->SetFontFamilyToArial();
   ScaleLabel->GetTextProperty()->SetJustificationToLeft();
-	ScaleLabel->ScaledTextOff();
+	ScaleLabel->SetTextScaleModeToNone();
 	ScaleLabel->SetDisplayPosition(Position[0] + Margin + 4, Position[1] + Margin + 4);
 	ScaleLabel->SetInput("");
 
   HorizontalAxesLabel = vtkTextActor::New();
   HorizontalAxesLabel->GetProperty()->SetColor(1,0,0);
-  HorizontalAxesLabel->GetTextProperty()->AntiAliasingOff();
   HorizontalAxesLabel->GetTextProperty()->SetFontSize(12);
   HorizontalAxesLabel->GetTextProperty()->SetFontFamilyToArial();
   HorizontalAxesLabel->GetTextProperty()->SetJustificationToRight();
-  HorizontalAxesLabel->ScaledTextOff();
+  HorizontalAxesLabel->SetTextScaleModeToNone();
 	HorizontalAxesLabel->SetDisplayPosition(Position[0], Position[1]);
   HorizontalAxesLabel->SetInput("");
 
   VerticalAxesLabel = vtkTextActor::New();
   VerticalAxesLabel->GetProperty()->SetColor(1,0,0);
-  VerticalAxesLabel->GetTextProperty()->AntiAliasingOff();
   VerticalAxesLabel->GetTextProperty()->SetFontSize(12);
   VerticalAxesLabel->GetTextProperty()->SetFontFamilyToArial();
   VerticalAxesLabel->GetTextProperty()->SetJustificationToLeft();
-  VerticalAxesLabel->ScaledTextOff();
+  VerticalAxesLabel->SetTextScaleModeToNone();
   VerticalAxesLabel->SetDisplayPosition(Position[0],Position[1]);
   VerticalAxesLabel->SetInput("");
 
@@ -351,7 +347,7 @@ void vtkALBASimpleRulerActor2D::CreateFixedTick()
 	fixedTick_PolyData->SetLines(fixedTick_CellArray);
 
 	vtkPolyDataMapper2D *fixedTick_PolyDataMapper = vtkPolyDataMapper2D::New();
-	fixedTick_PolyDataMapper->SetInput(fixedTick_PolyData);
+	fixedTick_PolyDataMapper->SetInputData(fixedTick_PolyData);
 
 	vtkProperty2D *fixedTick_Property2D = vtkProperty2D::New();
 	fixedTick_Property2D->SetColor(1, 0, 0);
@@ -370,11 +366,10 @@ void vtkALBASimpleRulerActor2D::CreateFixedTick()
 	//Label //////////////////////////
 	FixedTickLabel = vtkTextActor::New();
 	FixedTickLabel->GetProperty()->SetColor(1, 0, 0);
-	FixedTickLabel->GetTextProperty()->AntiAliasingOff();
 	FixedTickLabel->GetTextProperty()->SetFontSize(12);
 	FixedTickLabel->GetTextProperty()->SetFontFamilyToArial();
 	FixedTickLabel->GetTextProperty()->SetJustificationToCentered();
-	FixedTickLabel->ScaledTextOff();
+	FixedTickLabel->SetTextScaleModeToNone();
 	FixedTickLabel->SetDisplayPosition(Position[0] + Margin + 4, Position[1] + RwHeight - Margin);
 	FixedTickLabel->SetInput("Cm");
 }

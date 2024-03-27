@@ -58,7 +58,7 @@ class ALBA_EXPORT vtkALBAHistogram : public vtkActor2D
 {
  public:
   /** RTTI macro */
-  vtkTypeRevisionMacro(vtkALBAHistogram, vtkActor2D);
+  vtkTypeMacro(vtkALBAHistogram, vtkActor2D);
   /** Print Object Information*/
   void PrintSelf(ostream& os, vtkIndent indent);
   /** Function that create an instance of the object*/

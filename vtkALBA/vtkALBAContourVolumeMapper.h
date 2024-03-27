@@ -55,13 +55,6 @@ Then Render()
 
 #include "vtkVolumeMapper.h"
 #include "vtkPolyData.h"
-
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
-
 #include "albaConfigure.h"
 
 //------------------------------------------------------------------------------
@@ -70,6 +63,7 @@ Then Render()
 class Idepth ;
 class Polyline2D;
 class ListOfPolyline2D;
+class vtkRectilinearGrid;
 
 
 /**
@@ -139,14 +133,22 @@ public:
   /** create an instance of the object */
   static vtkALBAContourVolumeMapper *New();
   /** RTTI Macro */
-  vtkTypeRevisionMacro(vtkALBAContourVolumeMapper, vtkVolumeMapper);
+  vtkTypeMacro(vtkALBAContourVolumeMapper, vtkVolumeMapper);
   /** Print Object Information */
   void PrintSelf( ostream& os, vtkIndent index );
 
   /** The input should be either vtkImageData or vtkRectilinearGrid */
   void  SetInput(vtkDataSet *input);
+
+	/** Set/Get the input data */
+	void SetInputData( vtkImageData *input );
+	/** Set/Get the input data */
+	void SetInputData( vtkDataSet *genericInput );
+	/** Set/Get the input data */
+	void SetInputData( vtkRectilinearGrid *input );
+
   /** Retrieve the input */
-  vtkDataSet*  GetInput() { return (vtkDataSet*)vtkVolumeMapper::GetInput(); }
+	vtkDataSet*  GetInput();
 
   /** 
   Render the isosurface.
@@ -199,7 +201,8 @@ public:
   /**  Get number of triangles in the extracted surface. This method can be used during extraction too! */
   unsigned int GetCurrentNumberOfTriangles() const { return this->CreatedTriangles; }
 
-  /**
+
+	/**
   This is the first function to be called before Render()
   It is used by albaPipeIsosurface::Create() to set the initial contour to an acceptable value.
   If the value is close to 1 than the surface will contain too much noise.

@@ -20,8 +20,9 @@
 #include "vtkPoints.h"
 #include "vtkPointData.h"
 #include "vtkCellArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
-vtkCxxRevisionMacro(vtkALBAPolyDataSingleSourceShortestPath, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkALBAPolyDataSingleSourceShortestPath);
 
 //----------------------------------------------------------------------------
@@ -65,17 +66,22 @@ vtkALBAPolyDataSingleSourceShortestPath::~vtkALBAPolyDataSingleSourceShortestPat
 	DeleteAdjacency();
 }
 
-unsigned long vtkALBAPolyDataSingleSourceShortestPath::GetMTime()
+vtkMTimeType vtkALBAPolyDataSingleSourceShortestPath::GetMTime()
 {
-	unsigned long mTime=this->MTime.GetMTime();
+	vtkMTimeType mTime=this->MTime.GetMTime();
 	
 	return mTime;
 }
 
-void vtkALBAPolyDataSingleSourceShortestPath::Execute()
+int vtkALBAPolyDataSingleSourceShortestPath::RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
-	vtkPolyData *input = this->GetInput();
-	vtkPolyData *output = this->GetOutput();
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	// Initialize some frequently used values.
+	vtkPolyData  *input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 	
 	vtkDebugMacro(<< "vtkALBAPolyDataSingleSourceShortestPath finding shortest path");
 	
@@ -85,15 +91,16 @@ void vtkALBAPolyDataSingleSourceShortestPath::Execute()
 	
 	TraceShortestPath(input, output, this->StartVertex, this->EndVertex);
 	
+	return 1;
 }
 
 void vtkALBAPolyDataSingleSourceShortestPath::Init()
 {
-	BuildAdjacency(this->GetInput());
+	BuildAdjacency(vtkPolyData::SafeDownCast(this->GetInput()));
 	
 	IdList->Reset();
 	
-	this->N = this->GetInput()->GetNumberOfPoints();
+	this->N = vtkPolyData::SafeDownCast(this->GetInput())->GetNumberOfPoints();
 	
 	this->D->SetNumberOfComponents(1);
 	this->D->SetNumberOfTuples(this->N);
@@ -299,7 +306,7 @@ void vtkALBAPolyDataSingleSourceShortestPath::ShortestPath(int startv, int endv)
 			if (!this->S->GetValue(v))
 			{
 				// Only relax edges where the end is not in s and edge is in the front set
-				double w = EdgeCost(this->GetInput(), u, v);
+				double w = EdgeCost(vtkPolyData::SafeDownCast(this->GetInput()), u, v);
 				
 				if (this->F->GetValue(v))
 				{
@@ -418,7 +425,7 @@ void vtkALBAPolyDataSingleSourceShortestPath::HeapDecreaseKey(int v)
 
 void vtkALBAPolyDataSingleSourceShortestPath::PrintSelf(ostream& os, vtkIndent indent)
 {
-	vtkPolyDataToPolyDataFilter::PrintSelf(os,indent);
+	vtkPolyDataAlgorithm::PrintSelf(os,indent);
 
 	// Add all members later...
 }

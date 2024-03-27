@@ -17,7 +17,6 @@ University of Bedfordshire
 #include "albaConfigure.h"
 #include "vtkObject.h"
 #include "vtkPolyData.h"
-#include "vtkIdType.h"
 #include "vtkIdList.h"
 #include <vector>
 #include <map>
@@ -61,7 +60,7 @@ class ALBA_EXPORT vtkALBAPolyDataNavigator : public vtkObject
 {
 public:
   static vtkALBAPolyDataNavigator *New();
-  vtkTypeRevisionMacro(vtkALBAPolyDataNavigator, vtkObject);
+  vtkTypeMacro(vtkALBAPolyDataNavigator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) {} ;
 
 

@@ -31,11 +31,11 @@
 #ifndef __vtkALBAVolumeSlicer_h
 #define __vtkALBAVolumeSlicer_h
 
-
-#include "vtkDataSetToDataSetFilter.h"
-#include "vtkPolyData.h"
-#include "vtkImageData.h"
 #include "albaConfigure.h"
+#include "vtkDataSetAlgorithm.h"
+#include "vtkImageData.h"
+#include "vtkPolyData.h"
+
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -51,11 +51,11 @@ class albaGPU3DTextureProviderHelper;
 #endif
 
 
-class ALBA_EXPORT vtkALBAVolumeSlicer : public vtkDataSetToDataSetFilter {
+class ALBA_EXPORT vtkALBAVolumeSlicer : public vtkDataSetAlgorithm {
 public:
   static vtkALBAVolumeSlicer *New();
+  vtkTypeMacro(vtkALBAVolumeSlicer, vtkDataSetAlgorithm);
 
-  vtkTypeRevisionMacro(vtkALBAVolumeSlicer, vtkDataSetToDataSetFilter);
 
   /**
   Specify a point defining the origin of the plane.*/
@@ -92,6 +92,10 @@ public:
   vtkSetMacro( AutoSpacing, int );
   vtkGetMacro( AutoSpacing, int );
 
+	/** Set / Get Output Spacing*/
+	vtkGetVectorMacro(OutputSpacing, double, 3);
+	vtkSetVector3Macro(OutputSpacing, double);
+
   /** Set/get whether GPU should be used for slicing. 
   If GPU processing is enabled and it is available for the given input/output on the 
   current computer platform, it will be used instead of CPU. Currently, only gray-scale
@@ -111,53 +115,51 @@ public:
   /** Set tri-linear interpolation */
   void SetTrilinearInterpolation(bool on){m_TriLinearInterpolationOn = on;};
 
-
-  void SetOutput(vtkImageData *data) { 
-    vtkDataSetSource::SetOutput(data); 
-  }
-  
-  void SetOutput(vtkPolyData  *data) { 
-    vtkDataSetSource::SetOutput(data); 
-  }
-
-  /**
+	/**
   specify the image to be used for texturing output polydata object*/
-  void SetTexture(vtkImageData *data) {
-    this->SetNthInput(1, (vtkDataObject*)data);
-  };
+  void SetTexture(vtkImageData *data) {this->SetInputData(1, data);};
+	void SetTextureConnection(vtkAlgorithmOutput *connection) {this->SetInputConnection(1, connection);};
+	 
   vtkImageData *GetTexture() { 
-    return vtkImageData::SafeDownCast(this->Inputs[1]);
+    return vtkImageData::SafeDownCast(this->GetInputDataObject(1,0));
   };
 
   /** 
   Transform slicer plane according to the given transformation before slicing.*/
   void SetSliceTransform(vtkLinearTransform *trans);
 
+	void SetOutputType(char *vtkType);
+
+	void SetOutputTypeToImageData();
+
+	void SetOutputTypeToPolyData();
+
 protected:
   vtkALBAVolumeSlicer();
   ~vtkALBAVolumeSlicer();
 
   /** Return this object's modified time. */  
-  /*virtual*/ unsigned long int GetMTime();
+  /*virtual*/ vtkMTimeType GetMTime();
 
   /** By default copy the output update extent to the input. */
-  /*virtual*/ void ComputeInputUpdateExtents(vtkDataObject *output);
+	int RequestUpdateExtent( vtkInformation *request, vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
+
 
   /** 
   By default, UpdateInformation calls this method to copy information
   unmodified from the input to the output.*/
-  /*virtual*/void ExecuteInformation();
+  /*virtual*/int RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   /**
   This method is the one that should be used by subclasses, right now the 
   default implementation is to call the backwards compatibility method */
-  /*virtual*/void ExecuteData(vtkDataObject *output);
+	/*virtual*/	int RequestData(vtkInformation *request,	vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
 
   /** Create geometry for the slice. */
-  virtual void ExecuteData(vtkPolyData *output);
+  virtual void RequestData(vtkInformation *outInfo,vtkPolyData *output);
 
   /** Create texture for the slice. */
-  virtual void ExecuteData(vtkImageData *output);
+  virtual void RequestData(vtkInformation *outInfo,vtkImageData *output);
 
 
   /** Prepares internal data structure for the given input data.
@@ -177,10 +179,10 @@ protected:
   virtual void PrepareVolume(vtkRectilinearGrid* input, vtkImageData* output);
 
 protected:  
-  /** BES: 15.12.2008 - when using albaOpCrop in albaViewOrthoSlice, the input
+  /** BES: 15.12.2008 - when using mafOpCrop in mafViewOrthoSlice, the input
   dimensions change between ExecuteInformation and ExecuteData 
   This routine is supposed to be called from ExecuteData and it fixes this problem */
-  void ExecuteDataHotFix(vtkDataObject *outputData);
+  void RequestDataHotFix(vtkInformation *request,	vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
 
   /** Calculates the coordinates for the given point and texture denoted by its size and spacing.
   Texture is considered to have an origin at GlobalPlaneOrigin, to be oriented according to GlobalPlaneAxisX
@@ -202,6 +204,10 @@ protected:
   template<typename InputDataType, typename OutputDataType> 
   void CreateImage(const InputDataType *input, OutputDataType *output, vtkImageData *outputObject);
 
+	/** specialize output information type */
+	virtual int FillOutputPortInformation(int port, vtkInformation* info);
+
+	char OutputVtkType[100];
 
   int   NumComponents;
   // plane coordinates
@@ -231,8 +237,12 @@ protected:
   double DataBounds[3][2];
   int    DataDimensions[3];
   double SamplingTableMultiplier[3];  
-
-  //look-up table that maps fine samples to voxel indices - see CreateImage  
+	
+	//output generation
+	int			OutputDimentions[3];
+	double	OutputSpacing[3];
+  
+	//look-up table that maps fine samples to voxel indices - see CreateImage  
   int* StIndices[3];
   float* StOffsets[3];
 
@@ -246,8 +256,7 @@ protected:
   bool m_bGPUProcessing;        //<true, if GPU processing will be used in ExecuteData
   albaGPU3DTextureProviderHelper *m_TextureHelper;
   
-  //float m_GPUDataDimensions[3]; //<area covered by input data (in mm)
-
+ 
   bool m_TriLinearInterpolationOn; //<define if tri-linear interpolation is performed or not on slice's texture
 #endif  
 

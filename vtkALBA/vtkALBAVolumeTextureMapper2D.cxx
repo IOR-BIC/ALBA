@@ -20,9 +20,8 @@ See the COPYINGS file for license details
 #include "vtkPlane.h"
 #include "vtkImageData.h"
 #include "vtkVolumeProperty.h"
-#include "gl/gl.h"
+#include "vtkgl.h"
 
-vtkCxxRevisionMacro(vtkALBAVolumeTextureMapper2D, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkALBAVolumeTextureMapper2D);
 
 #include "albaMemDbg.h"

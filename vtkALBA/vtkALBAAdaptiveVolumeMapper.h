@@ -56,16 +56,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkALBAAdaptiveVolumeMapper_h
 #define __vtkALBAAdaptiveVolumeMapper_h
 
+//------------------------------------------------------------------------------
+// Includes:
+//------------------------------------------------------------------------------
+#include "albaConfigure.h"
+
+
 #include "vtkMultiThreader.h" 
 #include "vtkCriticalSection.h" 
 
 #include "vtkVolumeMapper.h"
-
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
 
 /**
 name space name: namespace vtkALBAAdaptiveVolumeMapperNamespace
@@ -79,10 +79,6 @@ namespace vtkALBAAdaptiveVolumeMapperNamespace
   const int MaxNumOfRenderingPortions = 16;
 };
 
-//------------------------------------------------------------------------------
-// Includes:
-//------------------------------------------------------------------------------
-#include "albaConfigure.h"
 
 //------------------------------------------------------------------------------
 // forward declarations
@@ -114,9 +110,9 @@ public:
   vtkBooleanMacro(EnableAutoLOD, int)
 
   /** Retrieve interpolation of the volume mapper */
-  static bool GetInterpolation();
+  static bool GetInterpolation() { return vtkALBAAdaptiveVolumeMapper::Interpolation; }
   /** Set interpolation of the volume mapper */
-  static void SetInterpolation(bool val);
+  static void SetInterpolation(bool val) { vtkALBAAdaptiveVolumeMapper::Interpolation = val; }
 
   /** Update the mapper */
   void Update();
@@ -369,3 +365,4 @@ private:
   void operator=(const vtkALBAAdaptiveVolumeMapper&);
 };
 #endif
+

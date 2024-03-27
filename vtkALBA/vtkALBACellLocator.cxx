@@ -36,7 +36,6 @@ See the COPYINGS file for license details
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkALBACellLocator, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkALBACellLocator);
 
 
@@ -234,3 +233,4 @@ void vtkALBACellLocator::FindCellsAlongLine(double p1[3], double p2[3], double v
       }
     }
 }
+

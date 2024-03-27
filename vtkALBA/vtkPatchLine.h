@@ -14,20 +14,20 @@ See the COPYINGS file for license details
 #define __vtkPatchLine_h
 
 #include "albaConfigure.h"
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 
-class ALBA_EXPORT vtkPatchLine : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkPatchLine : public vtkPolyDataAlgorithm
 {
 	public:
 	/** RTTI macro*/
-	vtkTypeRevisionMacro(vtkPatchLine, vtkPolyDataToPolyDataFilter);
+	vtkTypeMacro(vtkPatchLine, vtkPolyDataAlgorithm);
 
 	/** return object instance */
 		static vtkPatchLine *New();
 
 public:		
 	/** execute method */
-	/*virtual*/ void ExecuteData(vtkDataObject *output);
+	int RequestData(vtkInformation *vtkNotUsed(request),	vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
 
 protected:  
 	vtkPatchLine() {};

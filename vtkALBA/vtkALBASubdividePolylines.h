@@ -15,7 +15,7 @@ University of Bedfordshire
 #define __vtkALBASubdividePolylines_h
 
 #include "albaConfigure.h"
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 #include "vtkPolyData.h"
 #include "vtkALBAPolyDataNavigator.h"
 
@@ -34,10 +34,10 @@ University of Bedfordshire
 //
 // Version 19.2.14
 //------------------------------------------------------------------------------
-class ALBA_EXPORT vtkALBASubdividePolylines : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkALBASubdividePolylines : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkALBASubdividePolylines,vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkALBASubdividePolylines,vtkPolyDataAlgorithm);
   static vtkALBASubdividePolylines *New();
   void PrintSelf(ostream& os, vtkIndent indent) const ;
 
@@ -53,7 +53,8 @@ protected:
   vtkALBASubdividePolylines();
   ~vtkALBASubdividePolylines();
 
-  void Execute();
+	/** Execute method */
+  int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   vtkALBAPolyDataNavigator* m_Nav ;
 

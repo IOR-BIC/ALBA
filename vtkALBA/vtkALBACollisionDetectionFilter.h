@@ -3,7 +3,7 @@
   Program:   Visualization Toolkit
   Module:    vtkALBACollisionDetectionFilter.h
   Language:  C++
-  RCS:   $Id: vtkALBACollisionDetectionFilter.h,v 1.1.2.2 2012-02-22 12:53:16 ior02 Exp $
+  RCS:   $Id$
 
   Copyright (c) 2003 and onwards, Goodwin Lawlor
   All rights reserved.
@@ -38,7 +38,7 @@
 #ifndef __vtkALBACollisionDetectionFilter_h
 #define __vtkALBACollisionDetectionFilter_h
 
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 #include "albaConfigure.h" // Include configuration header.
 
 #include "vtkLinearTransform.h"
@@ -50,10 +50,10 @@ class vtkPolyData;
 class vtkPoints;
 class vtkMatrix4x4;
 
-class ALBA_EXPORT vtkALBACollisionDetectionFilter : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkALBACollisionDetectionFilter : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkALBACollisionDetectionFilter, vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkALBACollisionDetectionFilter, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX
@@ -108,7 +108,8 @@ public:
 
   // Description:
   // Get the output with the points where the contacting cells intersect. This method is
-  // is equivalent to GetOutput(2) 
+  // is equivalent to GetOutputPort(2)/GetOutput(2) 
+  vtkAlgorithmOutput *GetContactsOutputPort() {return this->GetOutputPort(2);}
   vtkPolyData *GetContactsOutput() {return this->GetOutput(2);}
 
   // Description:
@@ -141,7 +142,8 @@ public:
   
   //Description:
   // Get the number of contacting cell pairs
-  int GetNumberOfContacts();
+  int GetNumberOfContacts() 
+    {return this->GetOutput(0)->GetFieldData()->GetArray("ContactCells")->GetNumberOfTuples();}
   
   //Description:
   // Get the number of box tests
@@ -149,8 +151,8 @@ public:
     
   //Description:
   // Set and Get the number of cells in each OBB. Default is 2
-  vtkSetMacro(NumberOfCellsPerBucket, int);
-  vtkGetMacro(NumberOfCellsPerBucket, int);
+  vtkSetMacro(NumberOfCellsPerNode, int);
+  vtkGetMacro(NumberOfCellsPerNode, int);
   
   //Description:
   // Set and Get the opacity of the polydata output when a collision takes place.
@@ -160,21 +162,21 @@ public:
 
   // Description:
   // Return the MTime also considering the transform.
-  unsigned long GetMTime();
+	vtkMTimeType GetMTime();
 
 protected:
   vtkALBACollisionDetectionFilter();
   ~vtkALBACollisionDetectionFilter();
 
   // Usual data generation method
-  void Execute();
-
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  
   vtkLinearTransform *Transform[2];
   vtkMatrix4x4 *Matrix[2];
   
   int NumberOfBoxTests;
   
-  int NumberOfCellsPerBucket;
+  int NumberOfCellsPerNode;
   
   int GenerateScalars;
   
@@ -184,8 +186,7 @@ protected:
   
   int CollisionMode;
   vtkOBBTree *Tree[2]; 
-
-
+	
 private:  
 
   vtkALBACollisionDetectionFilter(const vtkALBACollisionDetectionFilter&);  // Not implemented.
@@ -212,3 +213,4 @@ inline const char *vtkALBACollisionDetectionFilter::GetCollisionModeAsString(voi
 
 //ETX
 #endif
+

@@ -30,7 +30,6 @@
 
 #define PENINSULA_CORNER_MAXIMUM_NUMBER_OF_PIXELS 1
 
-vtkCxxRevisionMacro(vtkALBAImageFillHolesRemoveIslands, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkALBAImageFillHolesRemoveIslands);
 
 //----------------------------------------------------------------------------
@@ -71,18 +70,20 @@ void vtkALBAImageFillHolesRemoveIslands::SetAlgorithm(int algorithm)
 }
 
 //------------------------------------------------------------------------------
-void vtkALBAImageFillHolesRemoveIslands::Execute()
+int vtkALBAImageFillHolesRemoveIslands::RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 //------------------------------------------------------------------------------
 {
-  // get input
-  vtkImageData *input = (vtkImageData*)this->GetInput();
-  input->Update();
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
-  // prepare output
-  vtkImageData *output = (vtkImageData *)this->GetOutput();
+	// Initialize some frequently used values.
+	vtkImageData  *input = vtkImageData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkImageData *output = vtkImageData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+
   output->DeepCopy(input);
-  output->UpdateData();
-  output->Update();
+
 
   int recognitionSquareEdge = EdgeSize + 2; // Number of pixels of the recognition square
 
@@ -91,7 +92,7 @@ void vtkALBAImageFillHolesRemoveIslands::Execute()
   
   // Flood fill external region of the shape to allow fill big holes inside the shape
   vtkALBABinaryImageFloodFill *flood_fill = vtkALBABinaryImageFloodFill::New();
-  flood_fill->SetInput(input);
+  flood_fill->SetInputData(input);
   flood_fill->Update();
 
   // get flood fill scalars
@@ -185,7 +186,6 @@ void vtkALBAImageFillHolesRemoveIslands::Execute()
   output->GetPointData()->Update();
   output->GetPointData()->Modified();
   flood_fill->Delete();
-  output->UpdateData();
-  output->Update();
-  this->SetOutput((vtkStructuredPoints*)output);
+ 
+	return 1;
 }

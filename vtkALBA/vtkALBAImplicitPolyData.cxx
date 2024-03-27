@@ -13,7 +13,6 @@ ToDo:
 #include "vtkALBAImplicitPolyData.h"
 #include "vtkPolygon.h"
 
-vtkCxxRevisionMacro(vtkALBAImplicitPolyData, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkALBAImplicitPolyData);
 
 // Constructor
@@ -49,7 +48,7 @@ void vtkALBAImplicitPolyData::SetInput(vtkPolyData *input)
 		  this->Tri->PassVertsOff();
 		  this->Tri->PassLinesOff();
     }
-	  this->Tri->SetInput( input );
+	  this->Tri->SetInputData( input );
     this->Tri->Update();
 
     this->Input = this->Tri->GetOutput();
@@ -72,15 +71,14 @@ void vtkALBAImplicitPolyData::SetInput(vtkPolyData *input)
 // used to extend bounds of point locator
 
 //----------------------------------------------------------------------------
-unsigned long vtkALBAImplicitPolyData::GetMTime()
+vtkMTimeType vtkALBAImplicitPolyData::GetMTime()
 //----------------------------------------------------------------------------
 {
-  unsigned long mTime = this->vtkImplicitFunction::GetMTime();
-  unsigned long inputMTime;
+	vtkMTimeType mTime = this->vtkImplicitFunction::GetMTime();
+	vtkMTimeType inputMTime;
 
   if ( this->Input != NULL )
   {
-    this->Input->Update ();
     inputMTime = this->Input->GetMTime();
     mTime = ( inputMTime > mTime ? inputMTime : mTime );
   }

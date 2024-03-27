@@ -34,7 +34,7 @@ but unlike vtkPolyDataNormals, it does not recalculate them when nothing has cha
 class ALBA_EXPORT  vtkALBAPolyDataNormals : public vtkPolyDataNormals
 {
 public:
-  vtkTypeRevisionMacro(vtkALBAPolyDataNormals, vtkPolyDataNormals);  
+  vtkTypeMacro(vtkALBAPolyDataNormals, vtkPolyDataNormals);  
   static vtkALBAPolyDataNormals *New();
 
 protected:
@@ -44,8 +44,7 @@ protected:
   vtkALBAPolyDataNormals();
 	
 	//this is update method to avoid recalculation of things
-	/*virtual*/ void UpdateData(vtkDataObject *outputo);
-
+	/*virtual*/ int RequestData(vtkInformation *request,	vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
 private:
   vtkALBAPolyDataNormals(const vtkALBAPolyDataNormals&);  // Not implemented.
   void operator=(const vtkALBAPolyDataNormals&);					// Not implemented.

@@ -18,7 +18,7 @@
 #define __vvtkALBABinaryImageFloodFill_H__
 
 #include "albaConfigure.h"
-#include "vtkStructuredPointsToStructuredPointsFilter.h"
+#include "vtkALBAStructuredPointsAlgorithm.h"
 
 class vtkImageData;
 class vtkImageData;
@@ -30,13 +30,13 @@ class vtkImageData;
     This filter operate on binary images and fill/erease the area identified by the specified seed.
 */
 //---------------------------------------------------------------------------
-class ALBA_EXPORT vtkALBABinaryImageFloodFill : public vtkStructuredPointsToStructuredPointsFilter
+class ALBA_EXPORT vtkALBABinaryImageFloodFill : public vtkALBAStructuredPointsAlgorithm
 //---------------------------------------------------------------------------
 {
 public:
 
   /** Add collect revision method */
-  vtkTypeRevisionMacro(vtkALBABinaryImageFloodFill,vtkStructuredPointsToStructuredPointsFilter);
+  vtkTypeMacro(vtkALBABinaryImageFloodFill,vtkALBAStructuredPointsAlgorithm);
 
   /** Dynamic ctor */
   static vtkALBABinaryImageFloodFill *New();
@@ -65,7 +65,7 @@ public:
 protected:
 
   /** Execute this filter */
-  void Execute();
+  int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   unsigned char ReplaceValue; //> ON_PIXEL
   unsigned char Threshold[2]; //> Threshold for connectivity threshold filter
@@ -91,3 +91,4 @@ private:
 };
 
 #endif
+

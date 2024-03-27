@@ -24,7 +24,6 @@
 #define __vtkALBALineStripSource_h
 
 #include "vtkALBAAbstractPointsSource.h"
-#include "albaConfigure.h"
 
 class vtkPoints;
 class vtkPolyData;
@@ -34,7 +33,7 @@ class ALBA_EXPORT vtkALBALineStripSource : public vtkALBAAbstractPointsSource
 {
 public:
   static vtkALBALineStripSource *New();
-  vtkTypeRevisionMacro(vtkALBALineStripSource,vtkALBAAbstractPointsSource);
+  vtkTypeMacro(vtkALBALineStripSource,vtkALBAAbstractPointsSource);
 
 protected:
   vtkALBALineStripSource();

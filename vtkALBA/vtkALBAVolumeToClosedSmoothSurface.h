@@ -27,7 +27,6 @@ class vtkRectilinearGrid;
 class vtkDataArray;
 
 
-
 /** vtkALBAVolumeToClosedSmoothSurface: This filter is an extension of vtkALBAContourVolumeMapper
 The original mapper generates an contour surface from a volume, this extension add the possibility
 of getting an closed or smoothed surface.
@@ -41,7 +40,7 @@ class ALBA_EXPORT vtkALBAVolumeToClosedSmoothSurface : public vtkALBAContourVolu
 public:
   
   /** Add collect revision method */
-  vtkTypeRevisionMacro(vtkALBAVolumeToClosedSmoothSurface,vtkALBAContourVolumeMapper);
+  vtkTypeMacro(vtkALBAVolumeToClosedSmoothSurface,vtkALBAContourVolumeMapper);
 
   
   /**

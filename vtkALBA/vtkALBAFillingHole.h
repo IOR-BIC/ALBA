@@ -21,10 +21,9 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "albaConfigure.h"
-#include "vtkstd/vector"
 #include "vtkCellArray.h"
 #include "vtkPointLocator.h"
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 #include <cmath>
 #include <algorithm>
 
@@ -37,7 +36,7 @@
   class name: vtkALBAFillingHole
   Filter which fill holes of a vtkPolydata
 */
-class ALBA_EXPORT vtkALBAFillingHole : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkALBAFillingHole : public vtkPolyDataAlgorithm
 {
 public:
 #pragma region Nested classes
@@ -53,10 +52,10 @@ public:
       double  DWeight,DOneRingEdgeLength;
       bool    BMarked;
       bool    BBoundary;
-      vtkstd::vector<int> OneRingTriangle;
-      vtkstd::vector<int> OneRingEdge;
-      vtkstd::vector<int> OneRingVertex;
-      vtkstd::vector<int> TwoRingVertex;
+      std::vector<int> OneRingTriangle;
+      std::vector<int> OneRingEdge;
+      std::vector<int> OneRingVertex;
+      std::vector<int> TwoRingVertex;
 
       /** constructor */
       CVertex(double *pCoord);
@@ -76,8 +75,8 @@ public:
     public:
       bool  BDeleted;
       bool  BMarked;
-			vtkIdType   AVertex[3];
-			vtkIdType   AEdge[3];
+      int   AVertex[3];
+      int   AEdge[3];
       int   Id;
     public:
       /** constructor */
@@ -146,7 +145,7 @@ public:
   static vtkALBAFillingHole *New();
 
   /** RTTI macro */
-  vtkTypeRevisionMacro(vtkALBAFillingHole,vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkALBAFillingHole,vtkPolyDataAlgorithm);
   /** print information of the class */
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -191,17 +190,17 @@ protected:
 
   int		**Lambda;
   
-  vtkstd::vector<CVertex*>    PatchVertexes;        ///< list of vertices of a patch for one hole
-  vtkstd::vector<CTriangle*>  PatchTriangles;       ///< list of triangles of a patch for one hole
-  vtkstd::vector<CEdge*>      PatchEdges;           ///< list of edges of a patch for one hole
-  vtkstd::vector<CLaplacian*> PatchLaplacian;       ///< list of laplacian of a patch for one hole
+  std::vector<CVertex*>    PatchVertexes;        ///< list of vertices of a patch for one hole
+  std::vector<CTriangle*>  PatchTriangles;       ///< list of triangles of a patch for one hole
+  std::vector<CEdge*>      PatchEdges;           ///< list of edges of a patch for one hole
+  std::vector<CLaplacian*> PatchLaplacian;       ///< list of laplacian of a patch for one hole
 
-  vtkstd::vector<CVertex*>    Vertexes;             ///< list of vertices of the mesh
-  vtkstd::vector<CTriangle*>  Triangles;            ///< list of triangles of the mesh
-  vtkstd::vector<CEdge*>      Edges;                ///< list of edge of the mesh
+  std::vector<CVertex*>    Vertexes;             ///< list of vertices of the mesh
+  std::vector<CTriangle*>  Triangles;            ///< list of triangles of the mesh
+  std::vector<CEdge*>      Edges;                ///< list of edge of the mesh
 
-  vtkstd::vector<int>         HolePointIDs;         ///< list of vertices of a hole in order
-  vtkstd::vector<int>         HoleEdgeIDs;          ///< list of edges of a hole in order
+  std::vector<int>         HolePointIDs;         ///< list of vertices of a hole in order
+  std::vector<int>         HoleEdgeIDs;          ///< list of edges of a hole in order
 
   int NumOfPatchVertex;         ///< the number of all vertices of a patch for one hole  
   int NumOfPatchTriangle;       ///< the number of triangles of a patch for one hole
@@ -309,7 +308,7 @@ protected:
   /** Build internal mesh. It suppose that the input mesh is manifold */
   void InitMesh();
   /** filter execution */
-  void Execute();
+  int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
   /** mesh allocation */
   void DoneMesh();
 

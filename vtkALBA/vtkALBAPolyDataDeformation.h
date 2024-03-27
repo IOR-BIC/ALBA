@@ -53,7 +53,7 @@
 
 #pragma warning(push)
 #pragma warning(disable:4996)
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 #pragma warning(pop)
 
 //#define DEBUG_vtkALBAPolyDataDeformation
@@ -68,13 +68,13 @@ class vtkCellLocator;
 // EXPORT_STL_VECTOR(ALBA_EXPORT,CSkeletonEdge*);
 // EXPORT_STL_VECTOR(ALBA_EXPORT,CSkeletonVertex*);
 
-class ALBA_EXPORT vtkALBAPolyDataDeformation : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkALBAPolyDataDeformation : public vtkPolyDataAlgorithm
 {
 
 public:
   static vtkALBAPolyDataDeformation *New();
 
-  vtkTypeRevisionMacro(vtkALBAPolyDataDeformation, vtkPolyDataToPolyDataFilter);  
+  vtkTypeMacro(vtkALBAPolyDataDeformation, vtkPolyDataAlgorithm);  
 
   friend class CMatrixTest;
   friend class CSkeletonEdgeTest;
@@ -106,7 +106,7 @@ protected:
     }
   };
 
-  typedef vtkstd::vector< CMeshVertexParametrization > CMeshVertex;
+  typedef std::vector< CMeshVertexParametrization > CMeshVertex;
 
   //internal structure for one vertex in the skeleton
   class ALBA_EXPORT CSkeletonVertex
@@ -307,7 +307,7 @@ protected:
 
   private:
     inline bool FindUncoveredInMatrix(double,int&,int&);
-    inline bool PairInList(const vtkstd::pair<int,int> &, const vtkstd::list<std::pair<int,int> > &);
+    inline bool PairInList(const std::pair<int,int> &, const std::list<std::pair<int,int> > &);
     int Step1(void);
     int Step2(void);
     int Step3(void);
@@ -417,12 +417,12 @@ public:
     double* original_rso = NULL, double* modified_rso = NULL);
 
   /** Return this object's modified time. */  
-  /*virtual*/ unsigned long int GetMTime();
+  /*virtual*/ vtkMTimeType GetMTime();
 protected:
   /** 
   By default, UpdateInformation calls this method to copy information
   unmodified from the input to the output.*/
-  /*virtual*/void ExecuteInformation();
+  /*virtual*/int RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   /**
   This method is the one that should be used by subclasses, right now the 
@@ -637,8 +637,8 @@ CMunkres::FindUncoveredInMatrix(double item, int &row, int &col)
 }
 
 inline bool vtkALBAPolyDataDeformation::
-CMunkres::PairInList(const vtkstd::pair<int,int> &needle, 
-                       const vtkstd::list<std::pair<int,int> > &haystack) 
+CMunkres::PairInList(const std::pair<int,int> &needle, 
+                       const std::list<std::pair<int,int> > &haystack) 
 {
   for (std::list<std::pair<int,int> >::const_iterator i = haystack.begin(); i != haystack.end() ; i++)
   {

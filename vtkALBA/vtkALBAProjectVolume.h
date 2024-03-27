@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef __vtkALBAProjectVolume_h
 #define __vtkALBAProjectVolume_h
 
-#include "vtkDataSetToDataSetFilter.h"
+#include "vtkDataSetAlgorithm.h"
 #include "albaConfigure.h"
 
 #define VTK_PROJECT_FROM_X 1
@@ -64,16 +64,16 @@ Class Name: vtkALBAProjectVolume.
  Typical applications of this filter are to produce an image from a volume
  for image processing or visualization.
 */
-class ALBA_EXPORT vtkALBAProjectVolume : public vtkDataSetToDataSetFilter
+class ALBA_EXPORT vtkALBAProjectVolume : public vtkDataSetAlgorithm
 {
 public:
 	/** RTTI Macro */
-	vtkTypeRevisionMacro(vtkALBAProjectVolume, vtkDataSetToDataSetFilter);
+  vtkTypeMacro(vtkALBAProjectVolume, vtkDataSetAlgorithm);
+  
+  /** Static Function for object instantiation */
+  static vtkALBAProjectVolume *New();
 
-	/** Static Function for object instantiation */
-	static vtkALBAProjectVolume *New();
-
-	/** Set Projection Direction to X */
+  /** Set Projection Direction to X */
 	void SetProjectionSideToX()
 	{
 		this->SetProjectionSide(VTK_PROJECT_FROM_X);
@@ -149,17 +149,21 @@ protected:
   /** assign operator not implemented*/
   void operator=(const vtkALBAProjectVolume&);
 
+	/** specialize output information type */
+	int FillOutputPortInformation(int port, vtkInformation* info);
+	
   /** Update dimensions and whole extents */
-  void ExecuteInformation();
+	int RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+
   /** Execute the projection and fill output scalars */
-  void Execute();
+	int RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
 	template<typename DataType>
 	void ProjectScalars(int * inputDims, DataType * inputScalars, DataType * projScalars);
 
-	void GenerateOutputFromID(vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars);
+	void GenerateOutputFromID(vtkInformation *request, vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars);
 
-	void GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars);
+	void GenerateOutputFromRG(vtkInformation *request, vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars);
 
 	int  ProjectionSide;
 	int	 ProjectionModality;

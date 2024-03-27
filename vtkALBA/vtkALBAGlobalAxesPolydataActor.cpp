@@ -85,7 +85,7 @@ void vtkALBAGlobalAxesPolydataActor::SetType(int type)
 
 	vtkPolyDataMapper *headMapper = vtkPolyDataMapper::New();
 	this->Actor = vtkActor::New();
-	headMapper->SetInput(this->Reader->GetOutput());
+	headMapper->SetInputConnection( this->Reader->GetOutputPort() );
 	this->Actor->SetMapper(headMapper);
 	this->Actor->SetVisibility(1);
 	headMapper->Delete();
@@ -282,12 +282,11 @@ void vtkALBAGlobalAxesPolydataActor::SetInitialPose(vtkMatrix4x4* initMatrix)
   transformer = vtkTransformPolyDataFilter::New();
 
   initTransform->SetMatrix(initMatrix);
-  transformer->SetInput(data);
+  transformer->SetInputData(data);
   transformer->SetTransform(initTransform);
   transformer->Update();
 
   data->DeepCopy(transformer->GetOutput());
-  data->Update();
   data->Modified();
   ((vtkPolyDataMapper*)this->Actor->GetMapper())->Update();
   ((vtkPolyDataMapper*)this->Actor->GetMapper())->Modified();

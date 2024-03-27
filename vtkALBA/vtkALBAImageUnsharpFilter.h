@@ -21,16 +21,16 @@
 #define __vtkALBAImageUnsharpFilter_h
 
 #include "albaConfigure.h"
-#include "vtkImageToImageFilter.h"
+#include "vtkImageAlgorithm.h"
 /**
 class name : vtkALBAImageUnsharpFilter.
 Filter for applying unsharp to an image
 */
-class ALBA_EXPORT vtkALBAImageUnsharpFilter : public vtkImageToImageFilter
+class ALBA_EXPORT vtkALBAImageUnsharpFilter : public vtkImageAlgorithm
 {
 public:
   /** RTTI macro*/
-  vtkTypeRevisionMacro(vtkALBAImageUnsharpFilter,vtkImageToImageFilter);
+  vtkTypeMacro(vtkALBAImageUnsharpFilter,vtkImageAlgorithm);
   /** print information */
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -55,13 +55,3 @@ private:
 };
 
 #endif
-
-
-
-
-
-
-
-
-
-

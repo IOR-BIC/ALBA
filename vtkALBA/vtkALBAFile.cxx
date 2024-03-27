@@ -12,7 +12,6 @@
 */
 
 #include "albaDefines.h"
-#include "albaString.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -26,10 +25,8 @@
   #include <share.h>
 #endif
 
-vtkCxxRevisionMacro(vtkALBAFile, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkALBAFile);
 
-vtkCxxRevisionMacro(vtkALBAFile2, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkALBAFile2);
 
 //creates a new file
