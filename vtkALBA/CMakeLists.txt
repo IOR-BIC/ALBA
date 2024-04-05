@@ -34,7 +34,6 @@ SET(vtkALBA_SRCS
   vtkALBAPolyDataSingleSourceShortestPath.cxx  			vtkALBAPolyDataSingleSourceShortestPath.h
   vtkALBAProjectVolume.cxx  									vtkALBAProjectVolume.h
   vtkALBARayCast3DPicker.cxx  							vtkALBARayCast3DPicker.h
-  vtkALBARectilinearGridToRectilinearGridFilter.cxx  	vtkALBARectilinearGridToRectilinearGridFilter.h
   vtkALBARulerActor2D.cxx  								vtkALBARulerActor2D.h
   vtkALBASimpleRulerActor2D.cxx  						vtkALBASimpleRulerActor2D.h
   vtkALBATextActorMeter.cxx  							vtkALBATextActorMeter.h
@@ -76,7 +75,6 @@ SET(vtkALBA_SRCS
   vtkALBAFile.cxx  										vtkALBAFile.h	
   
   ###############################################
-  vtkALBAVolumeRayCastMapper.cxx  						vtkALBAVolumeRayCastMapper.h
   vtkALBAVolumeTextureMapper2D.cxx  						vtkALBAVolumeTextureMapper2D.h
   vtkALBAVolumeSlicer.cxx  								vtkALBAVolumeSlicer.h
 	vtkALBAVolumeOrthoSlicer.cxx 			vtkALBAVolumeOrthoSlicer.h
@@ -106,6 +104,8 @@ SET(vtkALBA_SRCS
   vtkALBALandmarkCloudOutlineCornerFilter.cxx 			vtkALBALandmarkCloudOutlineCornerFilter.h
   
 	vtkALBACircleSource.cxx								vtkALBACircleSource.h
+	
+  vtkALBAStructuredPointsAlgorithm.cxx vtkALBAStructuredPointsAlgorithm.h
 )
 
 IF(WIN32)

@@ -38,7 +38,7 @@ class ALBA_EXPORT vtkALBAToLinearTransform : public vtkLinearTransform
 {
  public:
   static vtkALBAToLinearTransform *New();
-  vtkTypeRevisionMacro(vtkALBAToLinearTransform,vtkLinearTransform);
+	vtkTypeMacro(vtkALBAToLinearTransform,vtkLinearTransform);
   void PrintSelf (ostream& os, vtkIndent indent);
   
   /** 
@@ -63,7 +63,7 @@ class ALBA_EXPORT vtkALBAToLinearTransform : public vtkLinearTransform
   void Inverse();
 
   /** Get the MTime: this is the bit of magic that makes everything work. */
-  unsigned long GetMTime();
+	vtkMTimeType GetMTime();
 
   /** Make a new transform of the same type. */
   vtkAbstractTransform *MakeTransform();

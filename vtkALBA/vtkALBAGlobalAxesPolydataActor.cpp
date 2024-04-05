@@ -36,7 +36,6 @@
 #include "vtkDirectory.h"
 #include "vtkTransformPolydataFilter.h"
 
-vtkCxxRevisionMacro(vtkALBAGlobalAxesPolydataActor, "$Revision: 1.1.2.5 $");
 vtkStandardNewMacro(vtkALBAGlobalAxesPolydataActor);
 
 #include "albaConfigure.h"
@@ -188,7 +187,7 @@ double *vtkALBAGlobalAxesPolydataActor::GetBounds()
 }
 
 //-------------------------------------------------------------------------
-unsigned long int vtkALBAGlobalAxesPolydataActor::GetMTime()
+vtkMTimeType vtkALBAGlobalAxesPolydataActor::GetMTime()
 {
   return this->Assembly->GetMTime();
 }

@@ -175,7 +175,6 @@ void vtkALBAHistogram::HistogramCreate()
   TextMapper = vtkTextMapper::New();
   TextMapper->SetInput("");
 	vtkTextProperty * textProperty = TextMapper->GetTextProperty();
-  textProperty->AntiAliasingOff();
   textProperty->SetFontFamily(VTK_TIMES);
   textProperty->SetColor(1,1,1);
   textProperty->SetLineOffset(0.5);

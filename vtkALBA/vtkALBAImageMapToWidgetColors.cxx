@@ -100,9 +100,9 @@ template<class T> void vtkALBAImageMapToWidgetColors::UpdateGradientCache(T *dat
   int inDims[3], outDims[3] = { this->GradientExtent[1] - this->GradientExtent[0] + 1, this->GradientExtent[3] - this->GradientExtent[2] + 1, this->GradientExtent[5] - this->GradientExtent[4] + 1};
   imageData->GetDimensions(inDims);
   const int lastIndex[3] = { inDims[0] - 1, inDims[1] - 1, inDims[2] - 1};
-  int contIncrementX, contIncrementY, contIncrementZ;
+  vtkIdType contIncrementX, contIncrementY, contIncrementZ;
   imageData->GetContinuousIncrements(this->GradientExtent, contIncrementX, contIncrementY, contIncrementZ);
-  const int* inc = imageData->GetIncrements();
+  const vtkIdType* inc = imageData->GetIncrements();
   const int numberOfInputComponents  = imageData->GetNumberOfScalarComponents();
 
   double ispacing[3];
@@ -212,8 +212,8 @@ template<class T> void vtkALBAImageMapToWidgetColors::Execute(vtkImageData *inDa
   const int extZ = outExt[5] - outExt[4] + 1;
 
   // Get increments to march through data 
-  int inIncX, inIncY, inIncZ;
-  int outIncX, outIncY, outIncZ;
+  vtkIdType inIncX, inIncY, inIncZ;
+  vtkIdType outIncX, outIncY, outIncZ;
   inData->GetContinuousIncrements(outExt, inIncX, inIncY, inIncZ);
   outData->GetContinuousIncrements(outExt, outIncX, outIncY, outIncZ);
   const int numberOfInputComponents  = inData->GetNumberOfScalarComponents();

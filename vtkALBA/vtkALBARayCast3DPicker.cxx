@@ -22,7 +22,6 @@
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkGenericCell.h"
-#include "vtkIdType.h"
 #include "vtkImageData.h"
 #include "vtkLODProp3D.h"
 #include "vtkMapper.h"
@@ -212,7 +211,7 @@ int vtkALBARayCast3DPicker::Pick(double *p1, double *p2, vtkRenderer *renderer)
   }
   else 
   {
-    props = renderer->GetProps();
+    props = renderer->GetViewProps();
   }
 
   vtkActor *actor;

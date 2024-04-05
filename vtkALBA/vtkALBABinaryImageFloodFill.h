@@ -19,6 +19,9 @@
 
 #include "albaConfigure.h"
 #include "vtkALBAStructuredPointsAlgorithm.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+
 
 class vtkImageData;
 class vtkImageData;

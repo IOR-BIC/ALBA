@@ -26,6 +26,8 @@
 #include "vtkPointData.h"
 
 #include <cassert>
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
 
 #define PENINSULA_CORNER_MAXIMUM_NUMBER_OF_PIXELS 1

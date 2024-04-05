@@ -14,7 +14,6 @@ University of Bedfordshire
 #include "vtkObjectFactory.h"
 #include "vtkObject.h"
 #include "vtkPolyData.h"
-#include "vtkIdType.h"
 #include "vtkIdList.h"
 #include "vtkCell.h"
 #include "vtkCellArray.h"

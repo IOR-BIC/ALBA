@@ -110,7 +110,7 @@ double vtkALBAImplicitPolyData::EvaluateFunction(double x[3])
 
 	int cellNum, pid;
 	vtkCell *cell;
-	double dot, ret = ConcaveMode ? VTK_LARGE_FLOAT : -VTK_LARGE_FLOAT, cNormal[3], closestPoint[3];
+	double dot, ret = ConcaveMode ? VTK_FLOAT_MAX : -VTK_FLOAT_MAX, cNormal[3], closestPoint[3];
 
     // get point id of closest point in data set
 	pid = this->Locator->FindClosestPoint( x );
@@ -133,8 +133,8 @@ double vtkALBAImplicitPolyData::EvaluateFunction(double x[3])
 			else if (!ConcaveMode && dot > ret) ret = dot;
     }
   }
-  if(ConcaveMode && ret == VTK_LARGE_FLOAT ) ret = NoValue;
-	else if (!ConcaveMode && ret == -VTK_LARGE_FLOAT) ret = NoValue;
+  if(ConcaveMode && ret == VTK_FLOAT_MAX) ret = NoValue;
+	else if (!ConcaveMode && ret == -VTK_FLOAT_MAX) ret = NoValue;
   
 	return ret;
 }
@@ -154,7 +154,7 @@ void vtkALBAImplicitPolyData::EvaluateGradient( double x[3], double n[3] )
 
 	int cellNum, pid;
 	vtkCell *cell;
-	double dot, ret = -VTK_LARGE_FLOAT, cNormal[3], closestPoint[3];
+	double dot, ret = -VTK_FLOAT_MAX, cNormal[3], closestPoint[3];
 
     // get point id of closest point in data set
 	pid = this->Locator->FindClosestPoint( x );
@@ -177,7 +177,7 @@ void vtkALBAImplicitPolyData::EvaluateGradient( double x[3], double n[3] )
         for( i=0; i<3; i++ ) n[i] = cNormal[i];
     }
   }
-  if( ret == -VTK_LARGE_FLOAT ) 
+  if( ret == -VTK_FLOAT_MAX)
     for( i=0; i<3; i++ ) n[i] = this->NoGradient[i];
 }
 //----------------------------------------------------------------------------

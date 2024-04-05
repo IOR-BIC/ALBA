@@ -397,7 +397,7 @@ void vtkALBAExtrudeToCircle::CalcHoleParameters(vtkPolyData *hole)
   // In this example data, the polydata circulates around the hole centre c, such that for each polyline cell,
   // with endpoints p0 and p1, the cross product (p1-c)^(p0-c) points in the direction of the outward normal.
   // Therefore we use the median cross product to define the normal.
-  int numPtsInCell ;
+	vtkIdType numPtsInCell ;
   vtkIdType *ptlist ;
   double pt0[3], pt1[3] ;
   vtkALBAPastValuesList vecProd0(1000), vecProd1(1000), vecProd2(1000) ;

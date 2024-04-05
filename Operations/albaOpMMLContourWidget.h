@@ -128,7 +128,7 @@ public:
   // Instantiate the object.
   static albaOpMMLContourWidget *New();
 
-  vtkTypeRevisionMacro(albaOpMMLContourWidget,vtkPolyDataSourceWidget);
+  vtkTypeMacro(albaOpMMLContourWidget,vtkPolyDataSourceWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

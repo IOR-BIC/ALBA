@@ -38,7 +38,7 @@ class ALBA_EXPORT vtkALBAAssembly : public vtkProp3D
 public:
   static vtkALBAAssembly *New();
 
-  vtkTypeRevisionMacro(vtkALBAAssembly,vtkProp3D);
+  vtkTypeMacro(vtkALBAAssembly,vtkProp3D);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**

@@ -60,7 +60,7 @@ vtkALBACollisionDetectionFilter::vtkALBACollisionDetectionFilter()
   this->NumberOfBoxTests = 0;
   this->BoxTolerance = 0.0;
   this->CellTolerance = 0.0;
-  this->NumberOfCellsPerBucket = 10;
+  this->NumberOfCellsPerNode = 10;
   this->GenerateScalars = 0;
   this->CollisionMode = VTK_ALL_CONTACTS;
   this->Opacity = 1.0;

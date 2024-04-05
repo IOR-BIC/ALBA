@@ -28,7 +28,6 @@
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
 #include "vtkPoints.h"
-#include "vtkIdType.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
 #include "vtkTextActor.h"

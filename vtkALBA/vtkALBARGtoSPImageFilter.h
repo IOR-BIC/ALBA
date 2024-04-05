@@ -93,6 +93,10 @@ protected:
 	template<typename DataType>
 	void FillSP(vtkRectilinearGrid * input, vtkImageData * output, DataType *inputScalars, DataType *outScalars);
 
+	template<typename DataType, typename CoordDataType>
+	void FillSP(vtkRectilinearGrid * input, vtkImageData * output, DataType *inputScalars, DataType *outScalars, CoordDataType *xCoord, CoordDataType *yCoord);
+
+
 	/** Gets the best spacing for Rectilinear Grid probing*/
 	void GetBestSpacing(vtkRectilinearGrid* rGrid, double * bestSpacing);
 

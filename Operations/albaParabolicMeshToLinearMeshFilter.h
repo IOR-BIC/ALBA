@@ -31,7 +31,7 @@ class ALBA_EXPORT albaParabolicMeshToLinearMeshFilter : public vtkUnstructuredGr
 
 public:
   
-  vtkTypeRevisionMacro(albaParabolicMeshToLinearMeshFilter,vtkUnstructuredGridToUnstructuredGridFilter);
+  vtkTypeMacro(albaParabolicMeshToLinearMeshFilter,vtkUnstructuredGridToUnstructuredGridFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static albaParabolicMeshToLinearMeshFilter *New();

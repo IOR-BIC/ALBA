@@ -65,7 +65,7 @@ class ALBA_EXPORT albaClassicICPRegistration : public vtkIterativeClosestPointTr
 {
 public:
   static albaClassicICPRegistration *New();
-	vtkTypeRevisionMacro(albaClassicICPRegistration, vtkIterativeClosestPointTransform);
+	vtkTypeMacro(albaClassicICPRegistration, vtkIterativeClosestPointTransform);
   //vtkTypeMacro(mflClassicICPRegistration,vtkIterativeClosestPointTransform);
   //void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -85,7 +85,7 @@ public:
   
   void SetResultsFileName(const char *name);
   
-  const char *GetResultsFileName() {return this->ResultsFile.ToAscii(); }
+	const char *GetResultsFileName() { return this->ResultsFile.c_str(); }
 
   vtkSetMacro(Convergence, float);
   vtkGetMacro(Convergence, float);
@@ -122,7 +122,7 @@ protected:
 
   /**
   Get the MTime of this object also considering the locator.*/
-  unsigned long int GetMTime();
+  vtkMTimeType GetMTime();
 
   albaClassicICPRegistration();
   ~albaClassicICPRegistration();
@@ -140,7 +140,7 @@ protected:
   float Convergence;
   
   int SaveResults;
-  wxString ResultsFile;
+  std::string ResultsFile;
 
   albaICPUtility *ICPUtil;
 

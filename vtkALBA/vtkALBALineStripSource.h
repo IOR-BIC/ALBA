@@ -24,6 +24,7 @@
 #define __vtkALBALineStripSource_h
 
 #include "vtkALBAAbstractPointsSource.h"
+#include "albaConfigure.h"
 
 class vtkPoints;
 class vtkPolyData;

@@ -18,13 +18,13 @@ PURPOSE.  See the above copyright notice for more information.
 #define __vtkALBACircleSource_h
 
 #include "albaConfigure.h"
-#include "vtkPolyDataSource.h"
+#include "vtkPolyDataAlgorithm.h"
 
-class ALBA_EXPORT vtkALBACircleSource : public vtkPolyDataSource
+class ALBA_EXPORT vtkALBACircleSource : public vtkPolyDataAlgorithm
 {
 public:
   static vtkALBACircleSource *New();
-  vtkTypeRevisionMacro(vtkALBACircleSource,vtkPolyDataSource);
+  vtkTypeMacro(vtkALBACircleSource, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -44,7 +44,7 @@ public:
 
   // Description:
   // Divide line into resolution number of pieces.
-  vtkSetClampMacro(Resolution,int,1,VTK_LARGE_INTEGER);
+  vtkSetClampMacro(Resolution,int,1,VTK_INT_MAX);
   vtkGetMacro(Resolution,int);
 
 	/* 0=XY, 1=YZ, 2=XZ*/
@@ -54,8 +54,10 @@ protected:
   vtkALBACircleSource(int res=1);
   ~vtkALBACircleSource() {};
 
-  void Execute();
-  double Center[3];
+	/** re-implement execute fixing the algorithm when the number of points of the cutter output is zero.*/
+	int RequestData(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+	
+	double Center[3];
 
 	double AngleRange[2];
 

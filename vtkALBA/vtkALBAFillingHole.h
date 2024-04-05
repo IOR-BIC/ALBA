@@ -75,8 +75,8 @@ public:
     public:
       bool  BDeleted;
       bool  BMarked;
-      int   AVertex[3];
-      int   AEdge[3];
+      vtkIdType  AVertex[3];
+			vtkIdType   AEdge[3];
       int   Id;
     public:
       /** constructor */
