@@ -393,8 +393,6 @@ void albaCurvilinearAbscissaOnSkeletonHelper::SetConstraintPolylineGraph( albaVM
   vtkPolyData *pd = vtkPolyData::SafeDownCast(m_ConstraintVMEPolylineGraph->GetOutput()->GetVTKData());
   assert(pd);
 
-  pd->Update();
-
   m_ConstraintPolylineGraph->Clear();
   m_ConstraintPolylineGraph->CopyFromPolydata(pd);
   m_ConstraintPolylineGraph->MergeSimpleJoinedBranches();   //BES 1.5.2008 - added to support "not correct" polylines
