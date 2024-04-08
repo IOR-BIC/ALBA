@@ -91,7 +91,7 @@ void vtkALBAVolumeTextureMapper2DTest::TestPipeExecution()
 
   vtkALBAVolumeTextureMapper2D *volumeMapper;
   vtkNEW(volumeMapper);
-  volumeMapper->SetInput(vtkImageData::SafeDownCast(Importer->GetOutput()));
+  volumeMapper->SetInputConnection(Importer->GetOutputPort());
 
   volumeMapper->SetMaximumNumberOfPlanes(100);
   volumeMapper->SetTargetTextureSize(512,512);
@@ -147,7 +147,7 @@ void vtkALBAVolumeTextureMapper2DTest::TestPipeExecution()
   volume->PickableOff();
 
   m_Renderer->AddVolume(volume);
-  //m_RenderWindow->Render();
+	m_Renderer->ResetCamera(volume->GetBounds());
 
   vtkCamera *camera = m_Renderer->GetActiveCamera();
   camera->Azimuth(60);

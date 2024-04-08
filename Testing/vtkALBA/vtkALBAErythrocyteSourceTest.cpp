@@ -45,7 +45,6 @@ void vtkALBAErythrocyteSourceTest::TestExecuteData()
 {
   vtkALBAErythrocyteSource *source = vtkALBAErythrocyteSource::New();
 
-  //source->ExecuteData(cube);
   source->Update();
   vtkALBASmartPointer<vtkPolyData> poly = source->GetOutput();
   CPPUNIT_ASSERT(poly != NULL);

@@ -223,6 +223,6 @@ void vtkALBARulerActor2DTest::TestPrintSelf()
 {
   vtkALBARulerActor2D *actor;
   actor = vtkALBARulerActor2D::New();
-  actor->PrintSelf(std::cout, 3);
+  actor->PrintSelf(std::cout, vtkIndent(3));
   actor->Delete();
 }

@@ -231,6 +231,6 @@ void vtkALBASimpleRulerActor2DTest::TestPrintSelf()
 {
   vtkALBASimpleRulerActor2D *actor;
   actor = vtkALBASimpleRulerActor2D::New();
-  actor->PrintSelf(std::cout, 3);
+  actor->PrintSelf(std::cout, vtkIndent(3));
   actor->Delete();
 }

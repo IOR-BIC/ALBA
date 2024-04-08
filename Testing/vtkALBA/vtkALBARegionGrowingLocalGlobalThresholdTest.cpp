@@ -44,7 +44,6 @@ void vtkALBARegionGrowingLocalGlobalThresholdTest::BeforeTest()
 
   m_Image->SetDimensions(X_DIM,Y_DIM,Z_DIM);
   m_Image->SetSpacing(1.0,1.0,1.0);
-  m_Image->Update();
 
   vtkDoubleArray *scalars = vtkDoubleArray::New();
   scalars->SetNumberOfTuples(4*3*2);
@@ -57,7 +56,6 @@ void vtkALBARegionGrowingLocalGlobalThresholdTest::BeforeTest()
 
   m_Image->GetPointData()->AddArray(scalars);
   m_Image->GetPointData()->SetActiveScalars("Scalars");
-  m_Image->Update();
 
   scalars->Delete();
 }
@@ -83,7 +81,6 @@ void vtkALBARegionGrowingLocalGlobalThresholdTest::TestExecute()
 
   imageToExecute->SetDimensions(X_DIM,Y_DIM,Z_DIM);
   imageToExecute->SetSpacing(1.0,1.0,1.0);
-  imageToExecute->Update();
 
   vtkDoubleArray *scalars = vtkDoubleArray::New();
   scalars->SetNumberOfTuples(4*3*2);
@@ -104,7 +101,6 @@ void vtkALBARegionGrowingLocalGlobalThresholdTest::TestExecute()
 
   imageToExecute->GetPointData()->AddArray(scalars);
   imageToExecute->GetPointData()->SetActiveScalars("Scalars");
-  imageToExecute->Update();
 
   m_Filter = vtkALBARegionGrowingLocalGlobalThreshold::New();
   m_Filter->SetInput(imageToExecute);
@@ -164,9 +160,9 @@ void vtkALBARegionGrowingLocalGlobalThresholdTest::TestComputeStandardDeviation(
   m_Filter->SetInput(m_Image);
   m_Filter->BorderCreate(imBordered);
   m_Filter->ComputeIndexNearstPoints(0,indexNearest,error,imBordered);
-  CPPUNIT_ASSERT( error == FALSE );
+  CPPUNIT_ASSERT( error == false );
   double mean = m_Filter->ComputeMeanValue(0,indexNearest,error,imBordered);
-  CPPUNIT_ASSERT( error == FALSE );
+  CPPUNIT_ASSERT( error == false );
   double stdDev = m_Filter->ComputeStandardDeviation(0,indexNearest,mean,error,imBordered);
 
   CPPUNIT_ASSERT ( stdDev < (5.95 + DELTA) && stdDev > (5.95 - DELTA) );
@@ -186,11 +182,11 @@ void vtkALBARegionGrowingLocalGlobalThresholdTest::TestComputeMeanValue()
   m_Filter->SetInput(m_Image);
   m_Filter->BorderCreate(imBordered);
   m_Filter->ComputeIndexNearstPoints(30,indexNearest,error,imBordered);
-  CPPUNIT_ASSERT( error == TRUE );
+  CPPUNIT_ASSERT( error == true );
   m_Filter->ComputeIndexNearstPoints(0,indexNearest,error,imBordered);
-  CPPUNIT_ASSERT( error == FALSE );
+  CPPUNIT_ASSERT( error == false );
   double mean = m_Filter->ComputeMeanValue(0,indexNearest,error,imBordered);
-  CPPUNIT_ASSERT( error == FALSE && mean == (153.0/26.0));
+  CPPUNIT_ASSERT( error == false && mean == (153.0/26.0));
 
   m_Filter->Delete();
   imBordered->Delete();

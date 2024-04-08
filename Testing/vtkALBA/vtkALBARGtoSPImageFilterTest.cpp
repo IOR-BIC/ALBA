@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaDefines.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRectilinearGridReader.h"
+#include "vtkDataArray.h"
 
 //----------------------------------------------------------------------------
 void vtkALBARGtoSPImageFilterTest::BeforeTest()
@@ -53,7 +54,7 @@ void vtkALBARGtoSPImageFilterTest::FilterTest()
 	// Use Filter 
 	vtkALBARGtoSPImageFilter *RGtoSPImageFilter;
 	vtkNEW(RGtoSPImageFilter);
-	RGtoSPImageFilter->SetInput(input);
+	RGtoSPImageFilter->SetInputConnection(reader->GetOutputPort());
 	RGtoSPImageFilter->Update();
 
 	vtkDataSet *output = RGtoSPImageFilter->GetOutput();
@@ -102,7 +103,7 @@ void vtkALBARGtoSPImageFilterTest::FilterTest()
 void vtkALBARGtoSPImageFilterTest::TestPrintSelf()
 {
 	vtkALBARGtoSPImageFilter *filter = vtkALBARGtoSPImageFilter::New();
-	filter->PrintSelf(std::cout, 3);
+	filter->PrintSelf(std::cout, vtkIndent(3));
 	filter->Delete();
 }
 

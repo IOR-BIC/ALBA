@@ -67,7 +67,7 @@ void vtkALBACollisionDetectionFilterTest::BeforeTest()
 void vtkALBACollisionDetectionFilterTest::AfterTest()
 //-------------------------------------------------------------------------
 {
-	m_Renderer->RemoveAllProps();
+	m_Renderer->RemoveAllViewProps();
 	vtkDEL(m_Renderer);
 	vtkDEL(m_RenderWindow);
 	vtkDEL(m_RenderWindowInteractor);
@@ -121,7 +121,7 @@ void vtkALBACollisionDetectionFilterTest::Test()
 
   vtkALBASmartPointer<vtkPolyData> output0;
   output0->DeepCopy(filter->GetOutput(0));
-  output0->Update();
+ 
   vtkALBASmartPointer<vtkDoubleArray> contactScalars;
   contactScalars->SetName("CONTACT");
   contactScalars->SetNumberOfTuples(filter->GetOutput(0)->GetNumberOfCells());
@@ -139,13 +139,13 @@ void vtkALBACollisionDetectionFilterTest::Test()
   output0->GetCellData()->AddArray(contactScalars);
 
   vtkALBASmartPointer<vtkPolyDataWriter> w;
-  w->SetInput(output0);
+  w->SetInputConnection(filter->GetOutputPort(0));
   w->SetFileName("test0.vtk");
   w->Write();
 
   return;
 
-  w->SetInput(filter->GetOutput(1));
+  w->SetInputConnection(filter->GetOutputPort(1));
   w->SetFileName("test1.vtk");
   w->Write();
 
@@ -178,7 +178,7 @@ void vtkALBACollisionDetectionFilterTest::AddPolydataToVisualize(vtkPolyData *da
 //-------------------------------------------------------------------------
 {
   vtkALBASmartPointer<vtkPolyDataMapper> mapper;
-  mapper->SetInput(data);
+  mapper->SetInputData(data);
   mapper->Update();
 
   vtkALBASmartPointer<vtkActor> actor;

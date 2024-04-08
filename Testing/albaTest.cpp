@@ -28,8 +28,6 @@
 
 #include "vtkWindowToImageFilter.h"
 #include "vtkImageMathematics.h"
-#include "vtkImageSource.h"
-
 #include "vtkDataSet.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDataArray.h"
@@ -42,6 +40,7 @@
 #include "vtkBMPWriter.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkImageCast.h"
+
 
 
 IMPLEMENT_APP(TestApp)
@@ -141,7 +140,7 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 	{
 		albaLogMessage("Converting image tho unsigned short in order to save it as PNG format");
 		vtkImageToUChar->SetOutputScalarTypeToUnsignedChar();
-		vtkImageToUChar->SetInput(imDataComp);
+		vtkImageToUChar->SetInputData(imDataComp);
 		vtkImageToUChar->Modified();
 		vtkImageToUChar->Update();
 		imgToComp = vtkImageToUChar->GetOutput();
@@ -181,8 +180,8 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 
 		// Compare
 		vtkImageMathematics *imageMath = vtkImageMathematics::New();
-		imageMath->SetInput1(imDataOrig);
-		imageMath->SetInput2(imgToComp);
+		imageMath->SetInput1Data(imDataOrig);
+		imageMath->SetInput2Data(imgToComp);
 		imageMath->SetOperationToSubtract();
 		imageMath->Update();
 
@@ -201,10 +200,10 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 
 		if (!result)
 		{
-			imageWriter->SetInput(imageMath->GetOutput());
+			imageWriter->SetInputData(imageMath->GetOutput());
 			imageWriter->SetFileName(imageFileDiff);
 			imageWriter->Write();
-			imageWriter->SetInput(imgToComp);
+			imageWriter->SetInputData(imgToComp);
 			imageWriter->SetFileName(imageFileNew);
 			imageWriter->Write();
 
@@ -220,7 +219,7 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 	else
 	{
 		//First run storing file
-		imageWriter->SetInput(imgToComp);
+		imageWriter->SetInputData(imgToComp);
 		imageWriter->SetFileName(imageFileStored);
 		imageWriter->Write();
 		return;

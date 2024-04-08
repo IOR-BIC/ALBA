@@ -33,7 +33,7 @@
 #include "albaVMEVolumeGray.h"
 #include "vtkPolyDataNormals.h"
 #include "vtkALBASmartPointer.h"
-
+#include "vtkDataSetReader.h"
 
 //-----------------------------------------------------------
 void vtkALBADistanceFilterTest::TestDynamicAllocation()
@@ -48,18 +48,18 @@ void vtkALBADistanceFilterTest::TestInput()
 {
 	vtkALBASmartPointer<vtkALBADistanceFilter> filter;
 
-	CPPUNIT_ASSERT(filter->GetNumberOfInputs() == 0);
+	CPPUNIT_ASSERT(filter->GetTotalNumberOfInputConnections() == 0);
 
 	vtkALBASmartPointer<vtkSphereSource> sphere;
 	sphere->Update();
 
 	vtkALBASmartPointer<vtkPolyDataNormals> normals;
-	normals->SetInput(sphere->GetOutput());
+	normals->SetInputConnection(sphere->GetOutputPort());
 
-	filter->SetInput((vtkDataSet *)normals->GetOutput());
+	filter->SetInputConnection(normals->GetOutputPort());
 	filter->Update();
 
-	CPPUNIT_ASSERT(filter->GetNumberOfInputs() == 1);
+	CPPUNIT_ASSERT(filter->GetTotalNumberOfInputConnections() == 1);
 }
 
 //----------------------------------------------------------------------------
@@ -116,14 +116,11 @@ void vtkALBADistanceFilterTest::TestFilter_Scalar_Density()
 	volume->Update();
 	
 	vtkALBASmartPointer<vtkSphereSource> sphere;
-// 	sphere->SetThetaResolution(6);
-// 	sphere->SetPhiResolution(6);
-// 	sphere->SetCenter(0, 0, 0);
-// 	sphere->SetRadius(1.0);
+
 	sphere->Update();
 
 	vtkALBASmartPointer<vtkPolyDataNormals> normals;
-	normals->SetInput(sphere->GetOutput());
+	normals->SetInputConnection(sphere->GetOutputPort());
 
 	// Create Filter
 	vtkALBASmartPointer<vtkALBADistanceFilter> filter;
@@ -132,7 +129,7 @@ void vtkALBADistanceFilterTest::TestFilter_Scalar_Density()
 	filter->SetFilterModeToDensity();
 
 	filter->SetSource(volume->GetOutput()->GetVTKData());
-	filter->SetInput((vtkDataSet *)normals->GetOutput());
+	filter->SetInputConnection(normals->GetOutputPort());
 	filter->Update();
 
 	//	

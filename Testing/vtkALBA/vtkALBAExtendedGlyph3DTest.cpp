@@ -70,7 +70,6 @@ void vtkALBAExtendedGlyph3DTest::AfterTest()
 
   m_Points->Delete();
 
-  vtkTimerLog::CleanupLog();
 }
 //-----------------------------------------------------------
 void vtkALBAExtendedGlyph3DTest::TestFixture()
@@ -126,7 +125,7 @@ void vtkALBAExtendedGlyph3DTest::CreatePointsSet()
 //   pts->InsertNextPoint(0,0,1);
 
   m_Points->SetPoints(pts);
-  m_Points->Update();
+  
 
   pts->Delete();
 
@@ -170,21 +169,21 @@ void vtkALBAExtendedGlyph3DTest::TestSetScaling()
   scalars->SetName("SCALARS");
 
   m_Points->GetPointData()->SetScalars(scalars);
-  m_Points->Update();
+  
 
   filter->SetSource(sphere->GetOutput());
-  filter->SetInput(m_Points);
+  filter->SetInputData(m_Points);
   filter->ScalingOff();
   filter->Update();
 
-  CPPUNIT_ASSERT( filter->GetScaling() == FALSE );
+  CPPUNIT_ASSERT( filter->GetScaling() == false );
 
   CPPUNIT_ASSERT( filter->GetOutput()->GetScalarRange()[0] == scalars->GetRange()[0] );
   CPPUNIT_ASSERT( filter->GetOutput()->GetScalarRange()[1] == scalars->GetRange()[1] );
 
   // create pipe
   vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
-  mapper->SetInput(filter->GetOutput());
+  mapper->SetInputConnection(filter->GetOutputPort());
   vtkActor *actor = vtkActor::New();
   actor->SetMapper(mapper);
 
@@ -198,7 +197,7 @@ void vtkALBAExtendedGlyph3DTest::TestSetScaling()
   filter->ScalingOn();
   filter->Update();
 
-  CPPUNIT_ASSERT( filter->GetScaling() == TRUE );
+  CPPUNIT_ASSERT( filter->GetScaling() == true );
 
 	m_RenderWindow->Render();
 
@@ -229,10 +228,10 @@ void vtkALBAExtendedGlyph3DTest::TestSetScaleFactor()
   scalars->SetName("SCALARS");
 
   m_Points->GetPointData()->SetScalars(scalars);
-  m_Points->Update();
+  
 
   filter->SetSource(sphere->GetOutput());
-  filter->SetInput(m_Points);
+  filter->SetInputData(m_Points);
   filter->SetScaleFactor(2.0);
   filter->ScalingOn();
   filter->Update();
@@ -241,7 +240,7 @@ void vtkALBAExtendedGlyph3DTest::TestSetScaleFactor()
 
   // create pipe
   vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
-  mapper->SetInput(filter->GetOutput());
+  mapper->SetInputConnection(filter->GetOutputPort());
   vtkActor *actor = vtkActor::New();
   actor->SetMapper(mapper);
 
@@ -276,10 +275,10 @@ void vtkALBAExtendedGlyph3DTest::TestSetRange()
 
   m_Points->GetPointData()->AddArray(scalars);
   m_Points->GetPointData()->SetActiveScalars("SCALARS");
-  m_Points->Update();
+  
 
   filter->SetSource(sphere->GetOutput());
-  filter->SetInput(m_Points);
+  filter->SetInputData(m_Points);
   filter->SetRange(15.0,20.0);
   filter->Update();  
 
@@ -298,10 +297,8 @@ void vtkALBAExtendedGlyph3DTest::TestSetGeneratePointIds()
   vtkSphereSource *sphere = vtkSphereSource::New();
   sphere->Update();
 
-  m_Points->Update();
-
   filter->SetSource(sphere->GetOutput());
-  filter->SetInput(m_Points);
+  filter->SetInputData(m_Points);
   filter->GeneratePointIdsOn();
   filter->Update();
 
@@ -319,10 +316,8 @@ void vtkALBAExtendedGlyph3DTest::TestSetPointIdsName()
   vtkSphereSource *sphere = vtkSphereSource::New();
   sphere->Update();
 
-  m_Points->Update();
-
   filter->SetSource(sphere->GetOutput());
-  filter->SetInput(m_Points);
+  filter->SetInputData(m_Points);
   filter->GeneratePointIdsOn();
   filter->SetPointIdsName("TEST");
   filter->Update();
@@ -349,17 +344,16 @@ void vtkALBAExtendedGlyph3DTest::TestSetScalarVisibility()
 
   m_Points->GetPointData()->AddArray(scalars);
   m_Points->GetPointData()->SetActiveScalars("SCALARS");
-  m_Points->Update();
 
   filter->SetSource(sphere->GetOutput());
-  filter->SetInput(m_Points);
+  filter->SetInputData(m_Points);
   filter->ScalarVisibilityOn();
   filter->Update();  
 
   // create pipe
   vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
-  mapper->SetInput(filter->GetOutput());
-  mapper->SetScalarVisibility(TRUE);
+  mapper->SetInputConnection(filter->GetOutputPort());
+  mapper->SetScalarVisibility(true);
   mapper->SetScalarModeToUsePointData();
   mapper->SetScalarRange(filter->GetOutput()->GetScalarRange()[0],filter->GetOutput()->GetScalarRange()[1]);
   mapper->Update();
@@ -399,19 +393,18 @@ void vtkALBAExtendedGlyph3DTest::TestSetOrient()
 
   m_Points->GetPointData()->AddArray(normals);
   m_Points->GetPointData()->SetActiveNormals("NORMALS");
-  m_Points->Update();
 
   vtkDataArray *n = m_Points->GetPointData()->GetNormals();
 
   filter->SetSource(arrow->GetOutput());
-  filter->SetInput(m_Points);
+  filter->SetInputData(m_Points);
   filter->SetVectorModeToUseNormal();
   filter->OrientOn();
   filter->Update();  
 
   // create pipe
   vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
-  mapper->SetInput(filter->GetOutput());
+  mapper->SetInputConnection(filter->GetOutputPort());
   mapper->Update();
 
   vtkActor *actor = vtkActor::New();
@@ -419,7 +412,7 @@ void vtkALBAExtendedGlyph3DTest::TestSetOrient()
 
   m_Renderer->AddActor(actor);
   m_Renderer->ResetCamera(filter->GetOutput()->GetBounds());
-	m_RenderWindow->Render();
+  m_RenderWindow->Render();
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
 	COMPARE_IMAGES("TestSetOrient", m_TestNumber);
@@ -448,10 +441,9 @@ void vtkALBAExtendedGlyph3DTest::TestSetClamping()
 
   m_Points->GetPointData()->AddArray(scalars);
   m_Points->GetPointData()->SetActiveScalars("SCALARS");
-  m_Points->Update();
 
   filter->SetSource(sphere->GetOutput());
-  filter->SetInput(m_Points);
+  filter->SetInputData(m_Points);
   filter->SetRange(15.0,20.0);
   filter->ClampingOn();//Clamping normalize to [0,1] the scale values
   filter->Update();  
@@ -463,8 +455,8 @@ void vtkALBAExtendedGlyph3DTest::TestSetClamping()
 
   // create pipe
   vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
-  mapper->SetInput(filter->GetOutput());
-  mapper->SetScalarVisibility(TRUE);
+  mapper->SetInputConnection(filter->GetOutputPort());
+  mapper->SetScalarVisibility(true);
   mapper->SetScalarModeToUsePointData();
   mapper->SetScalarRange(filter->GetOutput()->GetScalarRange()[0],filter->GetOutput()->GetScalarRange()[1]);
   mapper->Update();

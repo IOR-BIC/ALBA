@@ -81,7 +81,6 @@ void vtkALBAImageFillHolesRemoveIslandsTest::RenderData(vtkActor *actor)
 	COMPARE_IMAGES(m_TestName);
 
   renderWindowInteractor->Delete();
-  vtkTimerLog::CleanupLog();
 }
 
 //------------------------------------------------------------
@@ -128,7 +127,7 @@ void vtkALBAImageFillHolesRemoveIslandsTest::TestAlgorithm()
   originalImage->SetSpacing(r->GetOutput()->GetSpacing());
   originalImage->SetDimensions(r->GetOutput()->GetDimensions());
   //originalImage->AllocateScalars();
-  originalImage->SetScalarTypeToUnsignedChar();
+  originalImage->AllocateScalars(VTK_UNSIGNED_CHAR,1);
 
   // and scalar
   vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::New();
@@ -139,19 +138,17 @@ void vtkALBAImageFillHolesRemoveIslandsTest::TestAlgorithm()
     scalars->InsertNextTuple1(r->GetOutput()->GetPointData()->GetScalars()->GetTuple(i)[0]);
   }
   originalImage->GetPointData()->SetScalars(scalars);
-  originalImage->Update();
 
   r->Delete();
 
   vtkALBAImageFillHolesRemoveIslands *filter = vtkALBAImageFillHolesRemoveIslands::New();
-  filter->SetInput(originalImage);
+  filter->SetInputData(originalImage);
   filter->SetEdgeSize(1);
   filter->SetAlgorithm(m_Algorithm);
   filter->Update();
 
   vtkImageData *outputImage = vtkImageData::New();
-  outputImage->DeepCopy((vtkImageData *)filter->GetOutput());
-  outputImage->Update();
+  outputImage->DeepCopy(filter->GetOutput());
 
   vtkPlaneSource *imagePlane = vtkPlaneSource::New();
   imagePlane->SetOrigin(0.,0.,0.);
@@ -173,13 +170,15 @@ void vtkALBAImageFillHolesRemoveIslandsTest::TestAlgorithm()
   imageTexture->RepeatOff();
   imageTexture->InterpolateOn();
   imageTexture->SetQualityTo32Bit();
-  imageTexture->SetInput(outputImage);
+  imageTexture->SetInputConnection(filter->GetOutputPort());
+
+
   imageTexture->SetLookupTable(imageLUT);
   imageTexture->MapColorScalarsThroughLookupTableOn();
   imageTexture->Modified();
 
   vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
-  mapper->SetInput(imagePlane->GetOutput());
+  mapper->SetInputConnection(imagePlane->GetOutputPort());
   mapper->ImmediateModeRenderingOff();
 
   vtkActor *actor = vtkActor::New();

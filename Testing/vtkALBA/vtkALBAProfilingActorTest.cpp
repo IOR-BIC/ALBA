@@ -30,7 +30,6 @@
 class vtkALBAProfilingActorDummy : public vtkALBAProfilingActor
 {
   public:
-    //vtkTypeRevisionMacro(vtkALBAProfilingActorDummy,vtkALBAProfilingActor);
     
     static vtkALBAProfilingActorDummy *New()
     {
@@ -140,6 +139,6 @@ void vtkALBAProfilingActorTest::TestPrintSelf()
 {
   vtkALBAProfilingActor *actor;
   actor = vtkALBAProfilingActor::New();
-  actor->PrintSelf(std::cout, 3);
+  actor->PrintSelf(std::cout, vtkIndent(2));
   actor->Delete();
 }

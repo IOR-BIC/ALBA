@@ -27,6 +27,9 @@
 #include "vtkActor.h"
 #include "vtkCamera.h"
 #include "vtkPointData.h"
+#include "vtkImageAlgorithm.h"
+#include "vtkDataSetAttributes.h"
+#include "vtkDataArray.h"
 
 //----------------------------------------------------------------------------
 void vtkALBAGridActorTest::BeforeTest()
@@ -128,6 +131,6 @@ void vtkALBAGridActorTest::TestPrintSelf()
 {
   vtkALBAGridActor *actor;
   actor = vtkALBAGridActor::New();
-  actor->PrintSelf(std::cout, 3);
+  actor->PrintSelf(std::cout, vtkIndent(3));
   actor->Delete();
 }

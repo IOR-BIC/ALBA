@@ -40,7 +40,7 @@ void vtkALBAFixedCutterTest::TestExecute()
   vtkALBASmartPointer<vtkPlane> plane;
   vtkALBASmartPointer<vtkCubeSource> cube;
 
-  filter->SetInput((vtkDataSet*)cube->GetOutput());
+  filter->SetInputConnection(cube->GetOutputPort());
   filter->SetCutFunction(plane);
   filter->Update();
 

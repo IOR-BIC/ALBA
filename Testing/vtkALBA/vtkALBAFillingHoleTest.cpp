@@ -56,11 +56,11 @@ void vtkALBAFillingHoleTest::TestSetFillAHole()
   r->Update();
 
   vtkALBASmartPointer<vtkFeatureEdges> fEdge;
-  fEdge->SetInput(r->GetOutput());
-  fEdge->SetBoundaryEdges(TRUE);
-  fEdge->SetManifoldEdges(FALSE);
-  fEdge->SetNonManifoldEdges(FALSE);
-  fEdge->SetFeatureEdges(FALSE);
+  fEdge->SetInputConnection(r->GetOutputPort());
+  fEdge->SetBoundaryEdges(true);
+  fEdge->SetManifoldEdges(false);
+  fEdge->SetNonManifoldEdges(false);
+  fEdge->SetFeatureEdges(false);
   fEdge->Update();
 
   //Testing data has 2 holes with 16 boundary lines and 16 boundary points
@@ -68,11 +68,11 @@ void vtkALBAFillingHoleTest::TestSetFillAHole()
   CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfPoints() == 16 );
 
   vtkALBASmartPointer<vtkALBAFillingHole> filter;
-  filter->SetInput(r->GetOutput());
+  filter->SetInputConnection(r->GetOutputPort());
   filter->SetFillAHole(10);
   filter->Update();
 
-  fEdge->SetInput(filter->GetOutput());
+  fEdge->SetInputConnection(filter->GetOutputPort());
   fEdge->Update();
 
   //The Id of the boundary point set in the filter method isn't an Id of a boundary point of an edge
@@ -82,7 +82,7 @@ void vtkALBAFillingHoleTest::TestSetFillAHole()
   filter->SetFillAHole(0);
   filter->Update();
 
-  fEdge->SetInput(filter->GetOutput());
+  fEdge->SetInputConnection(filter->GetOutputPort());
   fEdge->Update();
 
   //The Id of the boundary point set in the filter method is an Id of a boundary point of an edge
@@ -101,11 +101,11 @@ void vtkALBAFillingHoleTest::TestSetFillAllHole()
   r->Update();
 
   vtkALBASmartPointer<vtkFeatureEdges> fEdge;
-  fEdge->SetInput(r->GetOutput());
-  fEdge->SetBoundaryEdges(TRUE);
-  fEdge->SetManifoldEdges(FALSE);
-  fEdge->SetNonManifoldEdges(FALSE);
-  fEdge->SetFeatureEdges(FALSE);
+  fEdge->SetInputConnection(r->GetOutputPort());
+  fEdge->SetBoundaryEdges(true);
+  fEdge->SetManifoldEdges(false);
+  fEdge->SetNonManifoldEdges(false);
+  fEdge->SetFeatureEdges(false);
   fEdge->Update();
 
   //Testing data has 2 holes with 16 boundary lines and 16 boundary points
@@ -113,11 +113,11 @@ void vtkALBAFillingHoleTest::TestSetFillAllHole()
   CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfPoints() == 16 );
 
   vtkALBASmartPointer<vtkALBAFillingHole> filter;
-  filter->SetInput(r->GetOutput());
+  filter->SetInputConnection(r->GetOutputPort());
   filter->SetFillAllHole();
   filter->Update();
 
-  fEdge->SetInput(filter->GetOutput());
+  fEdge->SetInputConnection(filter->GetOutputPort());
   fEdge->Update();
 
   //The Id of the boundary point set in the filter method isn't an Id of a boundary point of an edge
@@ -135,11 +135,11 @@ void vtkALBAFillingHoleTest::TestGetLastPatch()
   r->Update();
 
   vtkALBASmartPointer<vtkFeatureEdges> fEdge;
-  fEdge->SetInput(r->GetOutput());
-  fEdge->SetBoundaryEdges(TRUE);
-  fEdge->SetManifoldEdges(FALSE);
-  fEdge->SetNonManifoldEdges(FALSE);
-  fEdge->SetFeatureEdges(FALSE);
+  fEdge->SetInputConnection(r->GetOutputPort());
+  fEdge->SetBoundaryEdges(true);
+  fEdge->SetManifoldEdges(false);
+  fEdge->SetNonManifoldEdges(false);
+  fEdge->SetFeatureEdges(false);
   fEdge->Update();
 
   //Testing data has 2 holes with 16 boundary lines and 16 boundary points
@@ -147,23 +147,20 @@ void vtkALBAFillingHoleTest::TestGetLastPatch()
   CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfPoints() == 16 );
 
   vtkALBASmartPointer<vtkALBAFillingHole> filter;
-  filter->SetInput(r->GetOutput());
+  filter->SetInputConnection(r->GetOutputPort());
   filter->SetFillAHole(0);
   filter->Update();
 
   vtkPolyData *patch = filter->GetLastPatch();
-  patch->Update();
-
   vtkPolyData *closedSphere = filter->GetOutput();
-  closedSphere->Update();
 
   vtkALBASmartPointer<vtkAppendPolyData> append;
-  append->SetInput(r->GetOutput());
-  append->AddInput(patch);
+  append->SetInputConnection(r->GetOutputPort());
+  append->AddInputData(patch);
   append->Update();
 
   vtkALBASmartPointer<vtkCleanPolyData> clean;
-  clean->SetInput(append->GetOutput());
+  clean->SetInputConnection(append->GetOutputPort());
   clean->Update();
 
   CPPUNIT_ASSERT( clean->GetOutput()->GetNumberOfPoints() == filter->GetOutput()->GetNumberOfPoints() );

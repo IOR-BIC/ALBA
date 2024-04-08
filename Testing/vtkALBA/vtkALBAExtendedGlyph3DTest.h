@@ -52,7 +52,6 @@ protected:
   void CreatePointsSet();
 
 	void TestFixture();
-
   void TestStaticAllocation();
   void TestDynamicAllocation();
   void TestSetNumberOfSources();

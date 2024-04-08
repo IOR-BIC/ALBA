@@ -125,9 +125,9 @@ void vtkALBAContourVolumeMapperTest::TestRectilinearGrid()
 
 
   vtkOutlineCornerFilter *filter = vtkOutlineCornerFilter::New();
-  filter->SetInput(mapper->GetInput());
+  filter->SetInputData(mapper->GetInput());
   vtkPolyDataMapper *omapper = vtkPolyDataMapper::New();
-  omapper->SetInput(filter->GetOutput());
+  omapper->SetInputConnection(filter->GetOutputPort());
   vtkActor *oactor = vtkActor::New();
   oactor->SetMapper(omapper);
   oactor->VisibilityOn();
@@ -142,7 +142,7 @@ void vtkALBAContourVolumeMapperTest::TestRectilinearGrid()
 
   mapper->SetEnableContourAnalysis(CleanModel);
 
-  renderer->GetActiveCamera()->SetViewAngle(vtkMath::RadiansToDegrees() * 2.f * atan(renWin->GetSize()[1] * 0.27 / (2.f * 700.f)));
+  renderer->GetActiveCamera()->SetViewAngle(vtkMath::DegreesFromRadians(2.f * atan(renWin->GetSize()[1] * 0.27 / (2.f * 700.f))));
   renderer->GetActiveCamera()->SetEyeAngle(2.5);
   renderer->ResetCamera();
   vtkCamera *camera = renderer->GetActiveCamera();
@@ -184,7 +184,7 @@ void vtkALBAContourVolumeMapperTest::TestRectilinearGrid()
   if (ExtractModel && filename) {
     vtkPolyDataWriter *writer = vtkPolyDataWriter::New();
     vtkPolyData *polydata = mapper->GetOutput(0);
-    writer->SetInput(polydata);
+    writer->SetInputConnection(mapper->GetOutputPort());
     char newfilename[512];
     sprintf(newfilename, "%s.polydata", filename);
     writer->SetFileName(newfilename);
@@ -247,9 +247,9 @@ void vtkALBAContourVolumeMapperTest::TestImageData()
   CPPUNIT_ASSERT(m_ImageData->GetNumberOfPoints()==(dims[0] * dims[1] * dims[2]));
 
   vtkOutlineCornerFilter *filter = vtkOutlineCornerFilter::New();
-  filter->SetInput(mapper->GetInput());
+  filter->SetInputData(mapper->GetInput());
   vtkPolyDataMapper *omapper = vtkPolyDataMapper::New();
-  omapper->SetInput(filter->GetOutput());
+  omapper->SetInputConnection(filter->GetOutputPort());
   vtkActor *oactor = vtkActor::New();
   oactor->SetMapper(omapper);
   oactor->VisibilityOn();
@@ -264,7 +264,7 @@ void vtkALBAContourVolumeMapperTest::TestImageData()
 
   mapper->SetEnableContourAnalysis(CleanModel);
 
-  renderer->GetActiveCamera()->SetViewAngle(vtkMath::RadiansToDegrees() * 2.f * atan(renWin->GetSize()[1] * 0.27 / (2.f * 700.f)));
+  renderer->GetActiveCamera()->SetViewAngle(vtkMath::DegreesFromRadians(2.f * atan(renWin->GetSize()[1] * 0.27 / (2.f * 700.f))));
   renderer->GetActiveCamera()->SetEyeAngle(2.5);
   renderer->ResetCamera();
   vtkCamera *camera = renderer->GetActiveCamera();
@@ -303,7 +303,7 @@ void vtkALBAContourVolumeMapperTest::TestImageData()
   if (ExtractModel && filename) {
     vtkPolyDataWriter *writer = vtkPolyDataWriter::New();
     vtkPolyData *polydata = mapper->GetOutput(0);
-    writer->SetInput(polydata);
+    writer->SetInputConnection(mapper->GetOutputPort());
     char newfilename[512];
     sprintf(newfilename, "%s.polydata", filename);
     writer->SetFileName(newfilename);

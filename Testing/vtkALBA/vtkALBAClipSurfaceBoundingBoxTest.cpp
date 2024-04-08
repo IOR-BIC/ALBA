@@ -25,6 +25,8 @@
 #include "vtkPlaneSource.h"
 
 #include "vtkPolyDataMapper.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkActor.h"
@@ -94,23 +96,23 @@ void vtkALBAClipSurfaceBoundingBoxTest::TestSetGetClipInside()
 //--------------------------------------------------
 {
   vtkALBASmartPointer<vtkALBAClipSurfaceBoundingBox> filter;
-  filter->SetClipInside(TRUE);
+  filter->SetClipInside(true);
 
-  CPPUNIT_ASSERT(filter->GetClipInside() == TRUE);  
-  filter->SetClipInside(FALSE);
-  CPPUNIT_ASSERT(filter->GetClipInside() == FALSE);  
+  CPPUNIT_ASSERT(filter->GetClipInside() == true);  
+  filter->SetClipInside(false);
+  CPPUNIT_ASSERT(filter->GetClipInside() == false);  
 }
 //--------------------------------------------------
 void vtkALBAClipSurfaceBoundingBoxTest::TestExecutionClipInsideOff()
 //--------------------------------------------------
 {
-  TestExecution(FALSE);
+  TestExecution(false);
 }
 //--------------------------------------------------
 void vtkALBAClipSurfaceBoundingBoxTest::TestExecutionClipInsideOn()
 //--------------------------------------------------
 {
-  TestExecution(TRUE);
+  TestExecution(true);
 }
 //--------------------------------------------------
 void vtkALBAClipSurfaceBoundingBoxTest::TestExecution(int clipInside)
@@ -131,19 +133,18 @@ void vtkALBAClipSurfaceBoundingBoxTest::TestExecution(int clipInside)
   m_PlaneMask->Update();
 
   vtkALBASmartPointer<vtkALBAClipSurfaceBoundingBox> filter;
-  filter->SetInput(m_SphereInput->GetOutput());
+  filter->SetInputConnection(m_SphereInput->GetOutputPort());
   filter->SetMask(m_PlaneMask->GetOutput());
   filter->SetClipInside(clipInside);
   filter->Update();
 
-  vtkPolyData *result = filter->GetOutput();
 
   vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
-  mapper->SetInput(result);
+  mapper->SetInputConnection( filter->GetOutputPort());
   mapper->Update();
 
   vtkPolyDataMapper *mapperMask = vtkPolyDataMapper::New();
-  mapperMask->SetInput(m_PlaneMask->GetOutput());
+  mapperMask->SetInputConnection(m_PlaneMask->GetOutputPort());
   mapperMask->Update();
 
   vtkActor *actor;

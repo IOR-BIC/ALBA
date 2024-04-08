@@ -159,7 +159,7 @@ void vtkALBATextActorMeterTest::TestPrintSelf()
 {
   vtkALBATextActorMeter *actor;
   actor = vtkALBATextActorMeter::New();
-  actor->PrintSelf(std::cout, 3);
+  actor->PrintSelf(std::cout, vtkIndent(3));
   actor->Delete();
 }
 

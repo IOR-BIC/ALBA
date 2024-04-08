@@ -42,14 +42,13 @@ void vtkMaskPolyDataFilterTest::TestStructuredPoints()
 	volume->SetDimensions(3,3,3);
 	volume->SetSpacing(2,2,2);
 	volume->SetOrigin(0.0,0.0,0.0);
-	volume->AllocateScalars();
+	volume->AllocateScalars(VTK_DOUBLE,1);
 
 	for(int count = 0; count < volume->GetNumberOfPoints(); count++)
 	{
     volume->GetPointData()->GetScalars()->SetTuple1(count, 10);
 	}
-	volume->Update();
-
+	
 	
 	vtkCylinderSource   *cylinder;
 	vtkNEW(cylinder);
@@ -66,7 +65,7 @@ void vtkMaskPolyDataFilterTest::TestStructuredPoints()
 	vtkMaskPolyDataFilter *maskPolydataFilter;
 	vtkNEW(maskPolydataFilter);
 
-	maskPolydataFilter->SetInput(volume);
+	maskPolydataFilter->SetInputData(volume);
 	maskPolydataFilter->SetDistance(0.0);
 	maskPolydataFilter->SetInsideValue(-5);
 	maskPolydataFilter->SetInsideOut(0);
@@ -122,7 +121,6 @@ void vtkMaskPolyDataFilterTest::TestRectilinearGrid()
 	}
 	volume->GetPointData()->AddArray(scalars);
 	volume->GetPointData()->SetScalars(scalars);
-	volume->Update();
 
 
 	vtkCylinderSource   *cylinder;
@@ -140,7 +138,7 @@ void vtkMaskPolyDataFilterTest::TestRectilinearGrid()
 	vtkMaskPolyDataFilter *maskPolydataFilter;
 	vtkNEW(maskPolydataFilter);
 
-	maskPolydataFilter->SetInput(volume);
+	maskPolydataFilter->SetInputData(volume);
 	maskPolydataFilter->SetDistance(0.0);
 	maskPolydataFilter->SetInsideValue(-5);
 	maskPolydataFilter->SetInsideOut(0);
