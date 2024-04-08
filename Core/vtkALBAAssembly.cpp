@@ -250,11 +250,11 @@ double *vtkALBAAssembly::GetBounds()
 }
 
 //----------------------------------------------------------------------------
-unsigned long int vtkALBAAssembly::GetMTime()
+vtkMTimeType vtkALBAAssembly::GetMTime()
 //----------------------------------------------------------------------------
 {
-  unsigned long mTime=this->vtkProp3D::GetMTime();
-  unsigned long time;
+	vtkMTimeType mTime=this->vtkProp3D::GetMTime();
+	vtkMTimeType time;
   vtkProp3D *prop;
 
   for (this->m_Parts->InitTraversal(); (prop = this->m_Parts->GetNextProp3D()); )

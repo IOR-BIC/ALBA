@@ -177,7 +177,7 @@ bool albaMatrix::operator==(vtkMatrix4x4 *mat) const
 #endif
 
 //------------------------------------------------------------------------------
-unsigned long albaMatrix::GetMTime() const
+vtkMTimeType albaMatrix::GetMTime() const
 //------------------------------------------------------------------------------
 {
 #ifdef ALBA_USE_VTK

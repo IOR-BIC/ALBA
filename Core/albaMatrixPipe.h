@@ -60,7 +60,7 @@ public:
   albaTimeStamp GetTimeStamp();
   
   /** Get the MTime: this is the bit of magic that makes everything work. */
-  virtual unsigned long GetMTime();
+  virtual vtkMTimeType GetMTime();
   
   /** This function returns true if given VME is accepted by this Pipe. */
   virtual bool Accept(albaVME *vme) {return true;}

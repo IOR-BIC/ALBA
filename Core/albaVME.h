@@ -472,7 +472,7 @@ public:
 
 	/**
 	Return the modification time.*/
-	virtual unsigned long GetMTime();
+	virtual vtkMTimeType GetMTime();
 
 	/**
 	Turn on the flag to calculate the timestamp considering also the linked nodes*/

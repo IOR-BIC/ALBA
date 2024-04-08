@@ -28,14 +28,7 @@
 #include "albaGUIFrame.h"
 #include "albaDecl.h"
 #include "albaView.h"
-//#include "mflAssembly.h"
-//#include "albaSceneNode.h"
-//#include "albaSceneGraph.h"
 #include "albaGUILab.h"
-//#include "albaGUIPicButton.h"  //SIL. 7-4-2005: -- seems not required
-//#include "albaPipe.h"
-
-//#include "albaVME.h"
 #include "albaPics.h" // frame icon
 //----------------------------------------------------------------------------
 // const

@@ -74,7 +74,7 @@ public:
 
   /**
   Return the modification time.*/
-  virtual unsigned long GetMTime();
+  virtual vtkMTimeType GetMTime();
 
   /**
   Add a new landmark an returns its index. BEWARE: landmark is added to all the

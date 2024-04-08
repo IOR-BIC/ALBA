@@ -49,7 +49,6 @@
 #include "vtkPlaneSource.h"
 #include "vtkPointData.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkPolyDataSource.h"
 #include "vtkProbeFilter.h"
 #include "vtkRenderer.h"
 #include "vtkImageData.h"
@@ -216,7 +215,7 @@ void albaGUIImageViewer::ShowImageDialog(albaVMEGroup *group, int selection)
 		vtkNEW(m_Actor);
 
 		m_Texture->InterpolateOff();
-		m_DataMapper->SetInput(m_PlaneSource->GetOutput());
+		m_DataMapper->SetInputConnection(m_PlaneSource->GetOutputPort());
 		m_Actor->SetMapper(m_DataMapper);
 		m_Actor->SetTexture(m_Texture);
 		
@@ -414,7 +413,7 @@ void albaGUIImageViewer::UpdateSelectionDialog(int selection)
 		albaVMEImage*vmeImage = albaVMEImage::SafeDownCast(m_ImagesGroup->FindInTreeByName(imageName));
 		if (vmeImage)
 		{
-			m_Texture->SetInput((vtkImageData*)vmeImage->GetOutput()->GetVTKData());
+			m_Texture->SetInputData((vtkImageData*)vmeImage->GetOutput()->GetVTKData());
 			m_Texture->Modified();
 
 			double b[6];
@@ -451,10 +450,10 @@ int albaGUIImageViewer::SaveVMEImage(albaVMEImage *image, wxString imageFileName
 		// Flip y axis
 		vtkALBASmartPointer<vtkImageFlip> imageFlipFilter;
 		imageFlipFilter->SetFilteredAxis(1);
-		imageFlipFilter->SetInput((vtkImageData*)image->GetOutput()->GetVTKData());
+		imageFlipFilter->SetInputData((vtkImageData*)image->GetOutput()->GetVTKData());
 		imageFlipFilter->Update();
 
-		vtkImageData *imageData = imageFlipFilter->GetOutput();
+		vtkAlgorithm* algorithm = imageFlipFilter;
 		vtkALBASmartPointer<vtkProbeFilter> probeFilter;
 
 		if (scale)
@@ -480,11 +479,11 @@ int albaGUIImageViewer::SaveVMEImage(albaVMEImage *image, wxString imageFileName
 			SP->SetDimensions(DIALOG_W, DIALOG_H, 1);
 			SP->SetSpacing(scaling, scaling, 1);
 
-			probeFilter->SetInput(SP);
-			probeFilter->SetSource(imageFlipFilter->GetOutput());
+			probeFilter->SetInputData(SP);
+			probeFilter->SetSourceConnection(imageFlipFilter->GetOutputPort());
 			probeFilter->Update();
 
-			imageData = (vtkImageData*)probeFilter->GetOutput();
+			algorithm = probeFilter;
 
 			SP->Delete();
 		}
@@ -497,7 +496,7 @@ int albaGUIImageViewer::SaveVMEImage(albaVMEImage *image, wxString imageFileName
 			vtkNEW(imageBMPWriter);
 
 			// Save image
-			imageBMPWriter->SetInput(imageData);
+			imageBMPWriter->SetInputConnection(algorithm->GetOutputPort());
 			imageBMPWriter->SetFileName(imageFileName);
 			imageBMPWriter->Write();
 
@@ -511,7 +510,7 @@ int albaGUIImageViewer::SaveVMEImage(albaVMEImage *image, wxString imageFileName
 			vtkNEW(imageWriter);
 
 			// Save image
-			imageWriter->SetInput(imageData);
+			imageWriter->SetInputConnection(algorithm->GetOutputPort());
 			imageWriter->SetFileName(imageFileName);
 			// 			int q = imageWriter->GetQuality()
 			// 			imageWriter->SetQuality(95);
@@ -527,7 +526,7 @@ int albaGUIImageViewer::SaveVMEImage(albaVMEImage *image, wxString imageFileName
 			vtkNEW(pngWriter);
 
 			// Save image
-			pngWriter->SetInput(imageData);
+			pngWriter->SetInputConnection(algorithm->GetOutputPort());
 // 			pngWriter->SetPixelPerMeterX(pixelXMeterX);
 // 			pngWriter->SetPixelPerMeterY(pixelXMeterY);
 			pngWriter->SetFileName(imageFileName);
@@ -656,10 +655,8 @@ void albaGUIImageViewer::AddImage(wxBitmap &bitmap, wxString name = "")
 
 	vtkImageData *vtkimg;
 	vtkNEW(vtkimg);
-	vtkimg->SetNumberOfScalarComponents(NumberOfComponents);
-	vtkimg->SetScalarTypeToUnsignedChar();
+	vtkimg->AllocateScalars(VTK_UNSIGNED_CHAR,NumberOfComponents);
 	vtkimg->SetDimensions(img.GetWidth(), img.GetHeight(), 1);
-	vtkimg->SetUpdateExtentToWholeExtent();
 	assert(vtkimg->GetPointData());
 	vtkimg->GetPointData()->SetScalars(buffer);
 

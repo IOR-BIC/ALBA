@@ -19,6 +19,7 @@
 
 #include "albaConfigure.h"
 #include "albaBase.h" 
+#include "vtkType.h"
 
 #ifdef ALBA_USE_VTK
 class vtkTimeStamp;

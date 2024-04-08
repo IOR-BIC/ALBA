@@ -34,7 +34,6 @@
 #include <assert.h>
 #include "vtkCellArray.h"
 #include "vtkPolyData.h"
-#include "vtkIdType.h"
 #include "vtkPointData.h"
 
 #include "vtkALBAStentModelSource.h"

@@ -263,7 +263,7 @@ void albaGUIDialogTransferFunction2D::CreateGUI()
 	wxFlexGridSizer *gridSizer = new wxFlexGridSizer(2, 2, 0, 0);
   gridSizer->AddGrowableCol(0);
   gridSizer->AddGrowableRow(0);
-  previewPage->SetAutoLayout(TRUE);
+  previewPage->SetAutoLayout(true);
   previewPage->SetSizer(gridSizer);
   gridSizer->Fit(previewPage);
   gridSizer->SetSizeHints(previewPage);
@@ -308,7 +308,7 @@ void albaGUIDialogTransferFunction2D::CreateGUI()
   previewPage = new wxPanel(this->m_PreviewBook);
   this->m_PreviewBook->AddPage(previewPage, "3D");
   wxBoxSizer *tabSizer = new wxBoxSizer(wxVERTICAL);
-  previewPage->SetAutoLayout(TRUE);
+  previewPage->SetAutoLayout(true);
   previewPage->SetSizer(tabSizer);
   tabSizer->Fit(previewPage);
   tabSizer->SetSizeHints(previewPage);
@@ -484,7 +484,7 @@ void albaGUIDialogTransferFunction2D::CreateGUI()
   bottomPane->Add(this->m_StatusBar, 1, wxEXPAND | wxALIGN_RIGHT, 0);
 
   // switch auto-layout
-  this->SetAutoLayout( TRUE );
+  this->SetAutoLayout( true );
   this->SetSizer(mainSizer);
   mainSizer->Fit(this);
   mainSizer->SetSizeHints(this);
@@ -627,7 +627,14 @@ void albaGUIDialogTransferFunction2D::SetControlsRange()
 
   wxSlider *slider = (wxSlider*)this->FindWindow(ID_SLICE_NUMBER);
   int extent[6];
-  this->m_Vme->GetOutput()->GetVTKData()->GetWholeExtent(extent);
+	vtkRectilinearGrid *rg=vtkRectilinearGrid::SafeDownCast(this->m_Vme->GetOutput()->GetVTKData());
+	vtkImageData *id=vtkImageData::SafeDownCast(this->m_Vme->GetOutput()->GetVTKData());
+
+	if(rg)		
+		rg->GetExtent(extent);
+	else if(id)
+		id->GetExtent(extent);
+	
   slider->SetRange(0, extent[5] - extent[4]);
 }
 
@@ -684,7 +691,6 @@ VTK_THREAD_RETURN_TYPE albaGUIDialogTransferFunction2D::CreatePipe(void *argDial
     imageData = vtkImageData::New();
     imageData->ShallowCopy(gridData);
     imageData->SetDimensions(gridData->GetDimensions());
-    imageData->SetNumberOfScalarComponents(gridData->GetPointData()->GetNumberOfComponents());
     double offset[3], spacing[3];
     offset[0] = gridData->GetXCoordinates()->GetTuple(0)[0];
     offset[1] = gridData->GetYCoordinates()->GetTuple(0)[0];
@@ -697,17 +703,17 @@ VTK_THREAD_RETURN_TYPE albaGUIDialogTransferFunction2D::CreatePipe(void *argDial
     // set type
     vtkDataArray *data = gridData->GetPointData()->GetArray(0);
     if (data->IsA("vtkUnsignedShortArray"))
-      imageData->SetScalarType(VTK_UNSIGNED_SHORT);
+      imageData->AllocateScalars(VTK_UNSIGNED_SHORT,gridData->GetPointData()->GetNumberOfComponents());
     else if (data->IsA("vtkShortArray"))
-      imageData->SetScalarType(VTK_SHORT);
+      imageData->AllocateScalars(VTK_SHORT,gridData->GetPointData()->GetNumberOfComponents());
     else if (data->IsA("vtkCharArray"))
-      imageData->SetScalarType(VTK_CHAR);
+      imageData->AllocateScalars(VTK_CHAR,gridData->GetPointData()->GetNumberOfComponents());
     else if (data->IsA("vtkUnsignedCharArray"))
-      imageData->SetScalarType(VTK_UNSIGNED_CHAR);
+      imageData->AllocateScalars(VTK_UNSIGNED_CHAR,gridData->GetPointData()->GetNumberOfComponents());
     else if (data->IsA("vtkFloatArray"))
-      imageData->SetScalarType(VTK_FLOAT);
+      imageData->AllocateScalars(VTK_FLOAT,gridData->GetPointData()->GetNumberOfComponents());
     else if (data->IsA("vtkDoubleArray"))
-      imageData->SetScalarType(VTK_DOUBLE);
+      imageData->AllocateScalars(VTK_DOUBLE,gridData->GetPointData()->GetNumberOfComponents());
     else 
 		{
       imageData->Delete();
@@ -721,13 +727,13 @@ VTK_THREAD_RETURN_TYPE albaGUIDialogTransferFunction2D::CreatePipe(void *argDial
     scalars->GetDataType() != VTK_CHAR ||
     scalars->GetDataType() != VTK_UNSIGNED_CHAR)
   {
-    chardata->SetInput(imageData);
+    chardata->SetInputData(imageData);
     chardata->Update();
-    dialog->m_Mapper3D->SetInput(chardata->GetOutput());
+    dialog->m_Mapper3D->SetInputConnection(chardata->GetOutputPort());
   }
   else
   {
-    dialog->m_Mapper3D->SetInput((vtkDataSet *)data);
+    dialog->m_Mapper3D->SetInputData((vtkDataSet *)data);
   }
   dialog->m_Mapper3D->Update();
   dialog->m_Volume3D->SetMapper(dialog->m_Mapper3D);
@@ -749,7 +755,7 @@ VTK_THREAD_RETURN_TYPE albaGUIDialogTransferFunction2D::CreatePipe(void *argDial
 
   // filter
   dialog->m_SliceFilter = vtkALBAImageMapToWidgetColors::New();
-  dialog->m_SliceFilter->SetInput(imageData);
+  dialog->m_SliceFilter->SetInputData(imageData);
   if (gridData && imageData)
     imageData->Delete();
   dialog->m_SliceWinowing = dialog->m_DataRange[1] - dialog->m_DataRange[0];
@@ -762,12 +768,12 @@ VTK_THREAD_RETURN_TYPE albaGUIDialogTransferFunction2D::CreatePipe(void *argDial
   // resample image
   dialog->m_SliceResampler = vtkImageResample::New();
   dialog->m_SliceResampler->SetNumberOfThreads(1);
-  dialog->m_SliceResampler->SetInput(dialog->m_SliceFilter->GetOutput());
+  dialog->m_SliceResampler->SetInputConnection(dialog->m_SliceFilter->GetOutputPort());
   dialog->m_SliceResampler->InterpolateOn();
 
   // mapper
   dialog->m_SliceMapper = vtkImageMapper::New();
-  dialog->m_SliceMapper->SetInput(dialog->m_SliceResampler->GetOutput());
+  dialog->m_SliceMapper->SetInputConnection(dialog->m_SliceResampler->GetOutputPort());
   dialog->m_SliceMapper->SetColorWindow(255.f);
   dialog->m_SliceMapper->SetColorLevel(127.5f);
   dialog->m_SliceActor->SetMapper(dialog->m_SliceMapper);
@@ -1013,8 +1019,15 @@ void albaGUIDialogTransferFunction2D::ResizePreviewWindow()
   if (this->m_Vme && this->m_SlicePipeStatus >= PipeReady) 
 	{
     int extent[6];
-    this->m_Vme->GetOutput()->GetVTKData()->GetWholeExtent(extent);
-    double zoom = MIN(m_SliceRwi->GetClientSize().x / double(extent[1] - extent[0]), m_SliceRwi->GetClientSize().y / double(extent[3] - extent[2]));
+		vtkRectilinearGrid *rg=vtkRectilinearGrid::SafeDownCast(this->m_Vme->GetOutput()->GetVTKData());
+		vtkImageData *id=vtkImageData::SafeDownCast(this->m_Vme->GetOutput()->GetVTKData());
+
+		if(rg)		
+			rg->GetExtent(extent);
+		else if(id)
+			id->GetExtent(extent);
+		
+		double zoom = MIN(m_SliceRwi->GetClientSize().x / double(extent[1] - extent[0]), m_SliceRwi->GetClientSize().y / double(extent[3] - extent[2]));
     this->m_SliceResampler->SetAxisMagnificationFactor(0, zoom);
     this->m_SliceResampler->SetAxisMagnificationFactor(1, zoom);
 

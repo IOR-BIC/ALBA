@@ -96,6 +96,10 @@ public:
 	vtkGetVectorMacro(OutputSpacing, double, 3);
 	vtkSetVector3Macro(OutputSpacing, double);
 
+	/** Set / Get Output Dimensions*/
+	vtkGetVectorMacro(OutputDimentions, int, 3);
+	vtkSetVector3Macro(OutputDimentions, int);
+
   /** Set/get whether GPU should be used for slicing. 
   If GPU processing is enabled and it is available for the given input/output on the 
   current computer platform, it will be used instead of CPU. Currently, only gray-scale

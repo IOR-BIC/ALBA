@@ -37,8 +37,8 @@
 #include "wx/filename.h"
 
 #ifdef ALBA_USE_VTK //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	#include "vtkAlgorithm.h"
   #include "vtkVersion.h"
-  #include "vtkProcessObject.h"
   #include "vtkViewport.h"
   #include "vtkCommand.h"
 
@@ -56,7 +56,7 @@ class albaGUIMDIFrameCallback : public vtkCommand
       assert(m_Frame);
       if(caller->IsA("vtkProcessObject"))
       {
-        vtkProcessObject *po = (vtkProcessObject*)caller;
+        vtkAlgorithm *po = (vtkAlgorithm*)caller;
 
         if(m_mode==0) // ProgressEvent-Callback
         {
@@ -92,7 +92,7 @@ class albaGUIMDIFrameCallback : public vtkCommand
     int m_mode;
     albaGUIMDIFrame *m_Frame;
 };
-#endif //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#endif 
 
 //----------------------------------------------------------------------------
 // albaGUIMDIFrame
@@ -278,10 +278,10 @@ void albaGUIMDIFrame::CreateStatusbar()
   // Paolo 10 Jul 2006: due to position correctly the progress bar.
 	wxRect pr;
   m_frameStatusBar->GetFieldRect(4,pr);
-  m_Busy=FALSE;
+  m_Busy=false;
 	m_Gauge = new wxGauge(m_frameStatusBar, -1, 100,pr.GetPosition(),pr.GetSize(),wxGA_SMOOTH);
 	m_Gauge->SetForegroundColour( *wxRED );
-  m_Gauge->Show(FALSE);
+  m_Gauge->Show(false);
 }
 
 #ifdef __WIN32__
@@ -422,9 +422,9 @@ void albaGUIMDIFrame::Busy()
 {
   SetStatusText("Busy",2);
   SetStatusText("",3);
-  m_Gauge->Show(TRUE);
+  m_Gauge->Show(true);
   m_Gauge->SetValue(0);
-  Refresh(FALSE);
+  Refresh(false);
 }
 //-----------------------------------------------------------
 void albaGUIMDIFrame::Ready()
@@ -432,8 +432,8 @@ void albaGUIMDIFrame::Ready()
 {
   SetStatusText("",2);
   SetStatusText("",3);
-  m_Gauge->Show(FALSE);
-  Refresh(FALSE);
+  m_Gauge->Show(false);
+  Refresh(false);
 }
 //-----------------------------------------------------------
 void albaGUIMDIFrame::ProgressBarShow()
@@ -509,13 +509,13 @@ void albaGUIMDIFrame::BindToProgressBar(vtkObject* vtkobj)
 {
 	if(vtkobj->IsA("vtkViewport")) 
 		BindToProgressBar((vtkViewport*)vtkobj);
-  else if(vtkobj->IsA("vtkProcessObject")) 
-		BindToProgressBar((vtkProcessObject*)vtkobj);
+  else if(vtkobj->IsA("vtkAlgorithm")) 
+		BindToProgressBar((vtkAlgorithm*)vtkobj);
 	else 
     albaLogMessage("wrong vtkObject passed to BindToProgressBar");
 }
 //-----------------------------------------------------------
-void albaGUIMDIFrame::BindToProgressBar(vtkProcessObject* filter)
+void albaGUIMDIFrame::BindToProgressBar(vtkAlgorithm* filter)
 //-----------------------------------------------------------
 {
   filter->AddObserver(vtkCommand::ProgressEvent,m_ProgressCallback);

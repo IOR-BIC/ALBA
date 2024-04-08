@@ -238,14 +238,14 @@ void albaTransformFrame::InternalUpdate()
 }
 
 //----------------------------------------------------------------------------
-unsigned long albaTransformFrame::GetMTime()
+vtkMTimeType albaTransformFrame::GetMTime()
 //----------------------------------------------------------------------------
 {
-  unsigned long mtime = Superclass::GetMTime();
+	vtkMTimeType mtime = Superclass::GetMTime();
 
   if (m_Input)
   {
-    unsigned long matrixMTime = m_Input->GetMTime();
+		vtkMTimeType matrixMTime = m_Input->GetMTime();
     if (matrixMTime > mtime)
     {
       mtime = matrixMTime;
@@ -254,7 +254,7 @@ unsigned long albaTransformFrame::GetMTime()
   
   if (m_InputFrame)
   {
-    unsigned long matrixMTime = m_InputFrame->GetMTime();
+		vtkMTimeType matrixMTime = m_InputFrame->GetMTime();
     if (matrixMTime > mtime)
     {
       mtime = matrixMTime;
@@ -263,7 +263,7 @@ unsigned long albaTransformFrame::GetMTime()
 
   if (m_TargetFrame)
   {
-    unsigned long matrixMTime = m_TargetFrame->GetMTime();
+		vtkMTimeType matrixMTime = m_TargetFrame->GetMTime();
     if (matrixMTime > mtime)
     {
       mtime = matrixMTime;

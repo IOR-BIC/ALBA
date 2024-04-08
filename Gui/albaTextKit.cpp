@@ -51,7 +51,6 @@ albaTextKit::albaTextKit(wxWindow* parent, vtkRenderer *renderer, albaObserver *
   
   vtkNEW(m_TextMapper);
   m_TextMapper->SetInput(m_TextInView.GetCStr());
-  m_TextMapper->GetTextProperty()->AntiAliasingOn();
   m_TextMapper->GetTextProperty()->SetFontFamily(VTK_ARIAL);
   m_TextMapper->GetTextProperty()->SetLineOffset(0.5);
   m_TextMapper->GetTextProperty()->SetLineSpacing(1.5);

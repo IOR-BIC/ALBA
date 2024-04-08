@@ -83,7 +83,7 @@ public:
   albaTimeStamp GetTimeStamp() {return m_CurrentTime;}
 
   /** return modification time */
-  virtual unsigned long GetMTime();
+  virtual vtkMTimeType GetMTime();
 
   /** This function returns true if the VME is accepted by this Pipe. */
   virtual bool Accept(albaVME *vme) {return vme!=NULL;}
