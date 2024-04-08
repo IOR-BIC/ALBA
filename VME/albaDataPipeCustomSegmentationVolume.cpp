@@ -187,10 +187,8 @@ void albaDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
 
   m_Volume->GetOutput()->Update();
   vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
-  volumeData->Update();
 
   vtkDataSet *maskVolumeData = m_ManualVolumeMask->GetOutput()->GetVTKData();
-  maskVolumeData->Update();
 
   if (maskVolumeData==NULL || maskVolumeData->GetNumberOfPoints() != volumeData->GetNumberOfPoints() || maskVolumeData->GetPointData()->GetScalars()==NULL)
   {
@@ -203,7 +201,6 @@ void albaDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
   
   if(maskVolumeData->IsA("vtkRectilinearGrid")) 
   {
-    m_RegionGrowingRG->Update();
     if (m_RegionGrowingRG->GetPointData()->GetScalars() == NULL)
     {
       return;
@@ -216,7 +213,6 @@ void albaDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
   }
   else if (maskVolumeData->IsA("vtkImageData"))
   {
-    m_RegionGrowingSP->Update();
     if (m_RegionGrowingSP->GetPointData()->GetScalars() == NULL)
     {
       return;
@@ -255,31 +251,22 @@ void albaDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
   {
     vtkALBASmartPointer<vtkImageData> newSP;
     newSP->CopyStructure(vtkImageData::SafeDownCast(volumeData));
-    newSP->Update();
     newSP->GetPointData()->AddArray(newScalars);
     newSP->GetPointData()->SetActiveScalars("SCALARS");
-    newSP->SetScalarTypeToUnsignedChar();
-    newSP->Update();
-
+    
     m_ManualSP->DeepCopy(newSP);
-    m_ManualSP->Update();
     m_SP->DeepCopy(newSP);
-    m_SP->Update();
   }
   else
   {
     vtkALBASmartPointer<vtkRectilinearGrid> newRG;
     newRG->CopyStructure(vtkRectilinearGrid::SafeDownCast(volumeData));
-    newRG->Update();
     newRG->GetPointData()->AddArray(newScalars);
     newRG->GetPointData()->SetActiveScalars("SCALARS");
-    newRG->Update();
 
     m_ManualRG->DeepCopy(newRG);
-    m_ManualRG->Update();
 
     m_RG->DeepCopy(newRG);
-    m_RG->Update();
   }
 }
 //------------------------------------------------------------------------------
@@ -288,7 +275,6 @@ void albaDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
 {
   m_Volume->GetOutput()->Update();
   vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
-  volumeData->Update();
 
   int volumeDimensions[3];
   if(volumeData->IsA("vtkRectilinearGrid")) {
@@ -375,25 +361,19 @@ void albaDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
   {
     vtkALBASmartPointer<vtkImageData> newSP;
     newSP->CopyStructure(vtkImageData::SafeDownCast(volumeData));
-    newSP->Update();
     newSP->GetPointData()->AddArray(newScalars);
     newSP->GetPointData()->SetActiveScalars("SCALARS");
     //newSP->SetScalarTypeToShort();
-    newSP->Update();
 
     m_AutomaticSP->DeepCopy(newSP);
-    m_AutomaticSP->Update();
     m_SP->DeepCopy(newSP); 
-    m_SP->Update();
   }
   else
   {
     vtkALBASmartPointer<vtkRectilinearGrid> newRG;
     newRG->CopyStructure(vtkRectilinearGrid::SafeDownCast(volumeData));
-    newRG->Update();
     newRG->GetPointData()->AddArray(newScalars);
     newRG->GetPointData()->SetActiveScalars("SCALARS");
-    newRG->Update();
 
     double sr[2];
     int n;
@@ -402,9 +382,7 @@ void albaDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
     n = x->GetNumberOfTuples();
 
     m_AutomaticRG->DeepCopy(newRG);
-    m_AutomaticRG->Update();
     m_RG->DeepCopy(newRG);
-    m_RG->Update();
   }
 }
 //------------------------------------------------------------------------------
@@ -418,10 +396,9 @@ void albaDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
 
   m_Volume->GetOutput()->Update();
   vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
-  volumeData->Update();
 
+	m_RefinementVolumeMask->GetOutput()->Update();
   vtkDataSet *maskVolumeData = m_RefinementVolumeMask->GetOutput()->GetVTKData();
-  maskVolumeData->Update();
 
   if (maskVolumeData==NULL || maskVolumeData->GetNumberOfPoints() != volumeData->GetNumberOfPoints() || maskVolumeData->GetPointData()->GetScalars()==NULL)
   {
@@ -439,7 +416,6 @@ void albaDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
       return;
     }
 
-    m_ManualRG->Update();
     if (m_ManualRG->GetPointData()->GetScalars() == NULL)
     {
       return;
@@ -457,7 +433,6 @@ void albaDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
       return;
     }
 
-    m_ManualSP->Update();
     if (m_ManualSP->GetPointData()->GetScalars() == NULL)
     {
       return;
@@ -498,30 +473,21 @@ void albaDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
   {
     vtkALBASmartPointer<vtkImageData> newSP;
     newSP->CopyStructure(vtkImageData::SafeDownCast(volumeData));
-    newSP->Update();
     newSP->GetPointData()->AddArray(newScalars);
     newSP->GetPointData()->SetActiveScalars("SCALARS");
-    newSP->SetScalarTypeToUnsignedChar();
-    newSP->Update();
 
     m_RefinementSP->DeepCopy(newSP);
-    m_RefinementSP->Update();
     m_SP->DeepCopy(newSP);
-    m_SP->Update();
   }
   else
   {
     vtkALBASmartPointer<vtkRectilinearGrid> newRG;
     newRG->CopyStructure(vtkRectilinearGrid::SafeDownCast(volumeData));
-    newRG->Update();
     newRG->GetPointData()->AddArray(newScalars);
     newRG->GetPointData()->SetActiveScalars("SCALARS");
-    newRG->Update();
 
     m_RefinementRG->DeepCopy(newRG);
-    m_RefinementRG->Update();
     m_RG->DeepCopy(newRG);
-    m_RG->Update();
   }
 
 }
@@ -537,23 +503,18 @@ void albaDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
 
   m_Volume->GetOutput()->Update();
   vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
-  volumeData->Update();
 
   if (m_RegionGrowingSeeds.size()==0)
   {
     if (volumeData->IsA("vtkImageData"))
     {
       m_RegionGrowingSP->DeepCopy(m_AutomaticSP);
-      m_RegionGrowingSP->Update();
       m_SP->DeepCopy(m_RegionGrowingSP);
-      m_SP->Update();
     }
     else if (volumeData->IsA("vtkRectilinearGrid"))
     {
       m_RegionGrowingRG->DeepCopy(m_AutomaticRG);
-      m_RegionGrowingRG->Update();
       m_RG->DeepCopy(m_RegionGrowingRG);
-      m_RG->Update();
     }
      
     return;
@@ -566,7 +527,6 @@ void albaDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
   if (volumeData->IsA("vtkImageData"))
   {
     spInputOfRegionGrowing->DeepCopy(vtkImageData::SafeDownCast(volumeData));
-    spInputOfRegionGrowing->Update();
 
     automaticData = m_AutomaticSP;
   }
@@ -586,7 +546,6 @@ void albaDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
     spInputOfRegionGrowing->SetSpacing(1.0,1.0,1.0);
     spInputOfRegionGrowing->GetPointData()->AddArray(oldScalars);
     spInputOfRegionGrowing->GetPointData()->SetActiveScalars("SCALARS");
-    spInputOfRegionGrowing->Update();
 
     automaticData = m_AutomaticRG;
     
@@ -596,7 +555,7 @@ void albaDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
 
   vtkALBASmartPointer<vtkImageCast> vtkImageToFloat;
   vtkImageToFloat->SetOutputScalarTypeToDouble();
-  vtkImageToFloat->SetInput(spInputOfRegionGrowing);
+  vtkImageToFloat->SetInputData(spInputOfRegionGrowing);
   vtkImageToFloat->Modified();
   vtkImageToFloat->Update();
 
@@ -639,7 +598,6 @@ void albaDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
   itkTOvtk->Update();
 
   vtkImageData *spOutputRegionGrowing = ((vtkImageData*)itkTOvtk->GetOutput());
-  spOutputRegionGrowing->Update();
 
   progressHelper.UpdateProgressBar(65);
 
@@ -718,21 +676,16 @@ void albaDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
     m_RegionGrowingSP->CopyStructure(vtkImageData::SafeDownCast(volumeData));
     m_RegionGrowingSP->GetPointData()->AddArray(newScalars);
     m_RegionGrowingSP->GetPointData()->SetActiveScalars("SCALARS");
-    m_RegionGrowingSP->SetScalarTypeToUnsignedChar();
-    m_RegionGrowingSP->Update();
     
     m_SP->DeepCopy(m_RegionGrowingSP);
-    m_SP->Update();
   }
   else if (volumeData->IsA("vtkRectilinearGrid"))
   {
     m_RegionGrowingRG->CopyStructure(vtkRectilinearGrid::SafeDownCast(volumeData));
     m_RegionGrowingRG->GetPointData()->AddArray(newScalars);
     m_RegionGrowingRG->GetPointData()->SetActiveScalars("SCALARS");
-    m_RegionGrowingRG->Update();
 
     m_RG->DeepCopy(m_RegionGrowingRG);
-    m_RG->Update();
   }
 }
 //------------------------------------------------------------------------------
@@ -894,7 +847,6 @@ vtkDataSet *albaDataPipeCustomSegmentationVolume::GetAutomaticOutput()
     vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
     if(volumeData)
     {
-      volumeData->Update();
       if(volumeData->IsA("vtkRectilinearGrid"))
       {
         return m_AutomaticRG;
@@ -918,7 +870,6 @@ vtkDataSet *albaDataPipeCustomSegmentationVolume::GetManualOutput()
     vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
     if(volumeData)
     {
-      volumeData->Update();
       if(volumeData->IsA("vtkRectilinearGrid"))
       {
         return m_ManualRG;
@@ -942,7 +893,6 @@ vtkDataSet *albaDataPipeCustomSegmentationVolume::GetRefinementOutput()
     vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
     if(volumeData)
     {
-      volumeData->Update();
       if(volumeData->IsA("vtkRectilinearGrid"))
       {
         return m_RefinementRG;
@@ -966,7 +916,6 @@ vtkDataSet *albaDataPipeCustomSegmentationVolume::GetRegionGrowingOutput()
     vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
     if(volumeData)
     {
-      volumeData->Update();
       if(volumeData->IsA("vtkRectilinearGrid"))
       {
         return m_RegionGrowingRG;
@@ -998,8 +947,6 @@ bool albaDataPipeCustomSegmentationVolume::CheckNumberOfThresholds()
     vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
     if(volumeData)
     {
-      volumeData->Update();
-
       int volumeDimensions[3];
       if(volumeData->IsA("vtkRectilinearGrid")) {
         vtkRectilinearGrid *rectilinearGrid=vtkRectilinearGrid::SafeDownCast(volumeData);

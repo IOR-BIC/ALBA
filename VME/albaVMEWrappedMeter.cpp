@@ -89,8 +89,9 @@ albaVMEWrappedMeter::albaVMEWrappedMeter()
   //vtkNEW(m_LineSourceMiddle);
   vtkNEW(m_Goniometer);
 
-  m_Goniometer->AddInput(m_LineSource->GetOutput());
-  m_Goniometer->AddInput(m_LineSource2->GetOutput());
+  m_Goniometer->AddInputConnection(m_LineSource->GetOutputPort());
+  m_Goniometer->AddInputConnection(m_LineSource2->GetOutputPort());
+	m_Goniometer->Update();
 
   albaNEW(m_TmpTransform);
 
@@ -332,12 +333,12 @@ void albaVMEWrappedMeter::InternalUpdateAutomatedIOR()
     // create ordered list of tangent point (2) real algorithm
     vtkALBASmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
     transformFirstDataInput->SetTransform((vtkAbstractTransform *)wrapped_vme->GetAbsMatrixPipe()->GetVTKTransform());
-    transformFirstDataInput->SetInput((vtkPolyData *)wrapped_vme->GetOutput()->GetVTKData());
+    transformFirstDataInput->SetInputData((vtkPolyData *)wrapped_vme->GetOutput()->GetVTKData());
     transformFirstDataInput->Update();
 
     vtkALBASmartPointer<vtkTransformPolyDataFilter> transformFirstData;
     transformFirstData->SetTransform((vtkAbstractTransform *)m_TmpTransform->GetVTKTransform());
-    transformFirstData->SetInput((vtkPolyData *)transformFirstDataInput->GetOutput());
+    transformFirstData->SetInputConnection(transformFirstDataInput->GetOutputPort());
     transformFirstData->Update(); 
 
     // here REAL ALGORITHM //////////////////////////////
@@ -469,7 +470,7 @@ void albaVMEWrappedMeter::InternalUpdateAutomatedIOR()
     m_PlaneCutter->SetNormal(m_PlaneSource->GetNormal());
 
 
-    m_Cutter->SetInput(transformFirstData->GetOutput());
+    m_Cutter->SetInputConnection(transformFirstData->GetOutputPort());
     m_Cutter->SetCutFunction(m_PlaneCutter);
 
     double midPoint[3];
@@ -541,7 +542,7 @@ void albaVMEWrappedMeter::InternalUpdateAutomatedIOR()
     m_PlaneClip->SetNormal(normal);
 
 
-    m_Clip->SetInput(m_Cutter->GetOutput());
+    m_Clip->SetInputConnection(m_Cutter->GetOutputPort());
     m_Clip->SetClipFunction(m_PlaneClip);
 
     double clipLength = 0;
@@ -570,11 +571,11 @@ void albaVMEWrappedMeter::InternalUpdateAutomatedIOR()
     m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
     m_LineSource->SetPoint2(pointTangent1[0],pointTangent1[1],pointTangent1[2]);
 
-    m_Goniometer->AddInput(m_LineSource->GetOutput());
-    m_Goniometer->AddInput(m_LineSource2->GetOutput());
+    m_Goniometer->AddInputConnection(m_LineSource->GetOutputPort());
+    m_Goniometer->AddInputConnection(m_LineSource2->GetOutputPort());
     //m_Goniometer->AddInput(m_LineSourceMiddle->GetOutput());
-    m_Goniometer->AddInput(m_Clip->GetOutput());
-
+    m_Goniometer->AddInputConnection(m_Clip->GetOutputPort());
+		m_Goniometer->Update();
 
     InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
     GetWrappedMeterOutput()->Update(); 
@@ -752,7 +753,8 @@ void albaVMEWrappedMeter::AvoidWrapping(double *local_start, double *local_end)
   //if there is no intersection with geometry
   m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
   m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
-  m_Goniometer->AddInput(m_LineSource->GetOutput());
+  m_Goniometer->AddInputConnection(m_LineSource->GetOutputPort());
+	m_Goniometer->Update();
   
   m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
 
@@ -846,12 +848,12 @@ void albaVMEWrappedMeter::InternalUpdateAutomated()
     // create ordered list of tangent point (2) real algorithm
     vtkALBASmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
     transformFirstDataInput->SetTransform((vtkAbstractTransform *)wrapped_vme->GetAbsMatrixPipe()->GetVTKTransform());
-    transformFirstDataInput->SetInput((vtkPolyData *)wrapped_vme->GetOutput()->GetVTKData());
+    transformFirstDataInput->SetInputData((vtkPolyData *)wrapped_vme->GetOutput()->GetVTKData());
     transformFirstDataInput->Update();
 
     vtkALBASmartPointer<vtkTransformPolyDataFilter> transformFirstData;
     transformFirstData->SetTransform((vtkAbstractTransform *)m_TmpTransform->GetVTKTransform());
-    transformFirstData->SetInput((vtkPolyData *)transformFirstDataInput->GetOutput());
+    transformFirstData->SetInputConnection(transformFirstDataInput->GetOutputPort());
     transformFirstData->Update(); 
 
     // here REAL ALGORITHM //////////////////////////////
@@ -866,7 +868,7 @@ void albaVMEWrappedMeter::InternalUpdateAutomated()
      //if one point is inside connect start and end
      m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
      m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
-     m_Goniometer->AddInput(m_LineSource->GetOutput());
+     m_Goniometer->AddInputConnection(m_LineSource->GetOutputPort());
 
      m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
 
@@ -909,7 +911,7 @@ void albaVMEWrappedMeter::InternalUpdateAutomated()
        //if there is no intersection with geometry
        m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
        m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
-       m_Goniometer->AddInput(m_LineSource->GetOutput());
+       m_Goniometer->AddInputConnection(m_LineSource->GetOutputPort());
        
        m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
  
@@ -947,7 +949,7 @@ void albaVMEWrappedMeter::InternalUpdateAutomated()
          //if there is no intersection with geometry
          m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
          m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
-         m_Goniometer->AddInput(m_LineSource->GetOutput());
+         m_Goniometer->AddInputConnection(m_LineSource->GetOutputPort());
 
          m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
 
@@ -1099,7 +1101,7 @@ void albaVMEWrappedMeter::InternalUpdateAutomated()
     m_PlaneCutter->SetNormal(m_PlaneSource->GetNormal());
 
     
-    m_Cutter->SetInput(transformFirstData->GetOutput());
+    m_Cutter->SetInputConnection(transformFirstData->GetOutputPort());
     m_Cutter->SetCutFunction(m_PlaneCutter);
 
     double midPoint[3];
@@ -1118,8 +1120,9 @@ void albaVMEWrappedMeter::InternalUpdateAutomated()
     m_PlaneClip->SetNormal(normal);
 
     
-    m_Clip->SetInput(m_Cutter->GetOutput());
+    m_Clip->SetInputConnection(m_Cutter->GetOutputPort());
     m_Clip->SetClipFunction(m_PlaneClip);
+		m_Clip->Update();
 
     double clipLength = 0;
 		double numberOfCells = m_Clip->GetOutput()->GetNumberOfCells();
@@ -1147,10 +1150,11 @@ void albaVMEWrappedMeter::InternalUpdateAutomated()
     m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
     m_LineSource->SetPoint2(pointTangent1[0],pointTangent1[1],pointTangent1[2]);
 
-    m_Goniometer->AddInput(m_LineSource->GetOutput());
-    m_Goniometer->AddInput(m_LineSource2->GetOutput());
+    m_Goniometer->AddInputConnection(m_LineSource->GetOutputPort());
+    m_Goniometer->AddInputConnection(m_LineSource2->GetOutputPort());
     //m_Goniometer->AddInput(m_LineSourceMiddle->GetOutput());
-    m_Goniometer->AddInput(m_Clip->GetOutput());
+    m_Goniometer->AddInputConnection(m_Clip->GetOutputPort());
+		m_Goniometer->Update();
 
 
     InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
@@ -1299,15 +1303,15 @@ void albaVMEWrappedMeter::InternalUpdateManual()
         m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
         m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
 				
-        m_Goniometer->AddInput(m_LineSource->GetOutput());
-        m_Goniometer->AddInput(m_LineSource2->GetOutput());
+        m_Goniometer->AddInputConnection(m_LineSource->GetOutputPort());
+        m_Goniometer->AddInputConnection(m_LineSource2->GetOutputPort());
 
       }
 
       for(int j=0; j<m_MiddlePointList.size(); j++)
       {    
         m_LineSourceList.push_back(vtkLineSource::New());
-        m_Goniometer->AddInput(m_LineSourceList[m_LineSourceList.size()-1]->GetOutput());
+        m_Goniometer->AddInputConnection(m_LineSourceList[m_LineSourceList.size()-1]->GetOutputPort());
         if(j==0)
         {        
           m_LineSourceList[m_LineSourceList.size()-1]->SetPoint1(local_start[0],local_start[1],local_start[2]);
@@ -1323,7 +1327,7 @@ void albaVMEWrappedMeter::InternalUpdateManual()
         if(j == m_MiddlePointList.size()-1)
         {
           m_LineSourceList.push_back(vtkLineSource::New());
-          m_Goniometer->AddInput(m_LineSourceList[m_LineSourceList.size()-1]->GetOutput());
+          m_Goniometer->AddInputConnection(m_LineSourceList[m_LineSourceList.size()-1]->GetOutputPort());
        
           m_LineSourceList[m_LineSourceList.size()-1]->SetPoint1(localMiddlePointList[j][0],localMiddlePointList[j][1],localMiddlePointList[j][2]);
           m_LineSourceList[m_LineSourceList.size()-1]->SetPoint2(local_end[0],local_end[1],local_end[2]);
@@ -1331,6 +1335,7 @@ void albaVMEWrappedMeter::InternalUpdateManual()
       }
 
       m_Goniometer->Modified();
+			m_Goniometer->Update();
     }
     else
       m_Distance = -1;

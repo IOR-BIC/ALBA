@@ -68,21 +68,17 @@ albaVMESlicer::albaVMESlicer()
   m_TextureRes = 512;
   m_Xspc = m_Yspc = 0.3;
 
-  vtkALBASmartPointer<vtkImageData> image;
-  image->SetExtent(0, m_TextureRes - 1, 0, m_TextureRes - 1, 0, 0);
-  image->SetUpdateExtent(0, m_TextureRes - 1, 0, m_TextureRes - 1, 0, 0);
-  image->SetSpacing(m_Xspc, m_Yspc, 1.f);
-
-  vtkALBASmartPointer<vtkPolyData> slice;
-
   vtkNEW(m_PSlicer);
   vtkNEW(m_ISlicer);
-  m_PSlicer->SetOutput(slice);
-  m_PSlicer->SetTexture(image);
-  m_ISlicer->SetOutput(image);
+	m_PSlicer->SetOutputTypeToPolyData();
+
+	m_ISlicer->SetOutputDimentions(m_TextureRes,m_TextureRes,1);
+	m_ISlicer->SetOutputSpacing(m_Xspc, m_Yspc, 1.0f);
+
+  m_PSlicer->SetTextureConnection(m_ISlicer->GetOutputPort());
   
   vtkNEW(m_BackTransform);
-  m_BackTransform->SetInput(slice);
+  m_BackTransform->SetInputConnection(m_PSlicer->GetOutputPort());
 
   DependsOnLinkedNodeOn();
 
@@ -90,9 +86,6 @@ albaVMESlicer::albaVMESlicer()
   albaDataPipeCustom *dpipe = albaDataPipeCustom::New();
   dpipe->SetDependOnAbsPose(true);
   SetDataPipe(dpipe);
-
-  dpipe->SetInput(m_BackTransform->GetOutput());
-  dpipe->SetNthInput(1,image);
 
   // set the texture in the output, must do it here, after setting slicer filter's input
   GetSurfaceOutput()->SetTexture((vtkImageData *)((albaDataPipeCustom *)GetDataPipe())->GetVTKDataPipe()->GetOutput(1));
@@ -310,7 +303,7 @@ void albaVMESlicer::InternalPreUpdate()
 			vtkMath::Cross(n, vectX, vectY);
 			vtkMath::Normalize(vectY);
 
-			vtkdata->Update();
+
 			vtkDataArray *scalars = vtkdata->GetPointData()->GetScalars();
 			if (scalars == NULL)
 			{
@@ -318,9 +311,9 @@ void albaVMESlicer::InternalPreUpdate()
 			}
 
 			vtkImageData *texture = m_PSlicer->GetTexture();
-			texture->SetScalarType(scalars->GetDataType());
-			texture->SetNumberOfScalarComponents(scalars->GetNumberOfComponents());
+			texture->AllocateScalars(scalars->GetDataType(), scalars->GetNumberOfComponents());
 			texture->Modified();
+
 
 			mmaMaterial * material = GetMaterial();
 			material->SetMaterialTexture(texture);
@@ -339,21 +332,37 @@ void albaVMESlicer::InternalPreUpdate()
 			if (m_UpdateVTKPropertiesFromMaterial)
 				material->UpdateProp();
 
-			m_PSlicer->SetInput(vtkdata);
+			m_PSlicer->SetInputData(vtkdata);
 			m_PSlicer->SetPlaneOrigin(pos);
 			m_PSlicer->SetPlaneAxisX(vectX);
 			m_PSlicer->SetPlaneAxisY(vectY);
+			m_PSlicer->Update();
+			
+      m_ISlicer->SetInputData(vtkdata);
+      m_ISlicer->SetPlaneOrigin(pos);
+      m_ISlicer->SetPlaneAxisX(vectX);
+      m_ISlicer->SetPlaneAxisY(vectY);
+			m_ISlicer->Update();
 
-			m_ISlicer->SetInput(vtkdata);
-			m_ISlicer->SetPlaneOrigin(pos);
-			m_ISlicer->SetPlaneAxisX(vectX);
-			m_ISlicer->SetPlaneAxisY(vectY);
-
-			m_BackTransform->SetTransform(m_CopyTransform->GetVTKTransform()->GetInverse());
+      m_BackTransform->SetTransform(m_CopyTransform->GetVTKTransform()->GetInverse());
 			m_BackTransform->Update();
-		}
-	}
 
+			texture->AllocateScalars(scalars->GetDataType(),scalars->GetNumberOfComponents());
+			texture->Modified();
+
+			GetMaterial()->SetMaterialTexture(texture);
+			texture->GetScalarRange(GetMaterial()->m_TableRange);
+      /*m_BackTransformParent->SetTransform(transform->GetInverse());
+      m_BackTransform->SetInput(m_BackTransformParent->GetOutput());
+      m_BackTransform->Update();*/
+
+
+			albaDataPipeCustom *dpipe = albaDataPipeCustom::SafeDownCast(GetDataPipe());
+
+			dpipe->SetInput(m_BackTransform->GetOutput());
+			dpipe->SetNthInput(1,m_ISlicer->GetOutput());
+    }
+  }
   m_SlicedName = vol ? vol->GetName() : _("none");
 }
 
@@ -368,6 +377,7 @@ void albaVMESlicer::InternalUpdate()
 		{
 			m_PSlicer->Update();
 			m_ISlicer->Update();
+			m_BackTransform->Update();
 
 			vtkDataArray *scalars = vtkdata->GetPointData()->GetScalars();
 			if (scalars == NULL)

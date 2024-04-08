@@ -630,7 +630,6 @@ void albaVMESurfaceParametric::CreateTruncatedCone()
 	}
 
 	polyData->SetPolys(polys);
-	polyData->Update();
 
 	// Transform
 	vtkALBASmartPointer<vtkTransform> t;
@@ -654,14 +653,13 @@ void albaVMESurfaceParametric::CreateTruncatedCone()
 	
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> ptf;
 	ptf->SetTransform(t);
-	ptf->SetInput(polyData);
+	ptf->SetInputData(polyData);
 	ptf->Update();
 
 	vtkDEL(polys);
 	vtkDEL(polyData);
 
 	m_PolyData->DeepCopy(ptf->GetOutput());
-	m_PolyData->Update();
 
  	m_DataPipe->Update();
 }
@@ -696,11 +694,10 @@ void albaVMESurfaceParametric::CreateEllipsoid()
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> ptf;
 	ptf->SetTransform(t);
-	ptf->SetInput(surf->GetOutput());
+	ptf->SetInputData(surf->GetOutput());
 	ptf->Update();
 
 	m_PolyData->DeepCopy(ptf->GetOutput());
-	m_PolyData->Update();
 }
 //-----------------------------------------------------------------------
 void albaVMESurfaceParametric::CreatePlane()
@@ -713,10 +710,9 @@ void albaVMESurfaceParametric::CreatePlane()
 	surf->SetPoint2(m_PlanePoint2);
 	surf->Update();
 	vtkALBASmartPointer<vtkTriangleFilter> triangle;
-	triangle->SetInput(surf->GetOutput());
+	triangle->SetInputData(surf->GetOutput());
 	triangle->Update();
 	m_PolyData->DeepCopy(triangle->GetOutput());
-	m_PolyData->Update();
 }
 //-----------------------------------------------------------------------
 void albaVMESurfaceParametric::CreateCube()
@@ -727,7 +723,6 @@ void albaVMESurfaceParametric::CreateCube()
 	surf->SetYLength(m_CubeZLength);
 	surf->Update();
 	m_PolyData->DeepCopy(surf->GetOutput());
-	m_PolyData->Update();
 }
 //-----------------------------------------------------------------------
 void albaVMESurfaceParametric::CreateCylinder()
@@ -759,11 +754,10 @@ void albaVMESurfaceParametric::CreateCylinder()
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> ptf;
 	ptf->SetTransform(t);
-	ptf->SetInput(surf->GetOutput());
+	ptf->SetInputConnection(surf->GetOutputPort());
 	ptf->Update();
 
 	m_PolyData->DeepCopy(ptf->GetOutput());
-	m_PolyData->Update();
 }
 //-----------------------------------------------------------------------
 void albaVMESurfaceParametric::CreateCone()
@@ -796,11 +790,10 @@ void albaVMESurfaceParametric::CreateCone()
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> ptf;
 	ptf->SetTransform(t);
-	ptf->SetInput(surf->GetOutput());
+	ptf->SetInputConnection(surf->GetOutputPort());
 	ptf->Update();
 
 	m_PolyData->DeepCopy(ptf->GetOutput());
-	m_PolyData->Update();
 }
 //-----------------------------------------------------------------------
 void albaVMESurfaceParametric::CreateSphere()
@@ -811,7 +804,6 @@ void albaVMESurfaceParametric::CreateSphere()
 	surf->SetThetaResolution(m_SphereTheRes);
 	surf->Update();
 	m_PolyData->DeepCopy(surf->GetOutput());
-	m_PolyData->Update();
 }
 //-------------------------------------------------------------------------
 void albaVMESurfaceParametric::CreateEllipticCylinder()
@@ -890,7 +882,6 @@ void albaVMESurfaceParametric::CreateEllipticCylinder()
 	}
 
 	polyData->SetPolys(polys);
-	polyData->Update();
 
 	// Transform
 	vtkALBASmartPointer<vtkTransform> t;
@@ -914,15 +905,13 @@ void albaVMESurfaceParametric::CreateEllipticCylinder()
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> ptf;
 	ptf->SetTransform(t);
-	ptf->SetInput(polyData);
+	ptf->SetInputData(polyData);
 	ptf->Update();
 
 	vtkDEL(polys);
 	vtkDEL(polyData);
 
 	m_PolyData->DeepCopy(ptf->GetOutput());
-	m_PolyData->Update();
-
 	m_DataPipe->Update();
 }
 

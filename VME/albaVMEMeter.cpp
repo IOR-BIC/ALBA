@@ -86,8 +86,8 @@ albaVMEMeter::albaVMEMeter()
   vtkNEW(m_PolyData);
   
 
-  m_Goniometer->AddInput(m_LineSource->GetOutput());
-  m_Goniometer->AddInput(m_LineSource2->GetOutput());
+  m_Goniometer->AddInputConnection(m_LineSource->GetOutputPort());
+  m_Goniometer->AddInputConnection(m_LineSource2->GetOutputPort());
 
   m_PolyData->DeepCopy(m_Goniometer->GetOutput());
 
@@ -456,7 +456,7 @@ void albaVMEMeter::InternalUpdate()
       s = vtkMath::Dot(v1,v2);
       if(vn1 != 0 && vn2 != 0)
       {
-        m_Angle = acos(s / (vn1 * vn2)) * vtkMath::RadiansToDegrees();
+        m_Angle = vtkMath::DegreesFromRadians(acos(s / (vn1 * vn2)));
         if(GetMeterMeasureType() == albaVMEMeter::RELATIVE_MEASURE)
           m_Angle -= GetMeterAttributes()->m_InitMeasure;
       }
@@ -511,7 +511,6 @@ void albaVMEMeter::InternalUpdate()
 
   m_PolyData->SetPoints(m_Goniometer->GetOutput()->GetPoints());
   m_PolyData->SetLines(cellArray);
-  m_PolyData->Update();
 
 }
 //-----------------------------------------------------------------------
@@ -921,7 +920,6 @@ void albaVMEMeter::CreateHistogram()
   if (m_ProbedVME != NULL)
   {
     vtkDataSet *probed_data = m_ProbedVME->GetOutput()->GetVTKData();
-    probed_data->Update();
 		    
     m_PlotActor->SetXRange(0,m_Distance);
     double srY[2];
@@ -938,14 +936,14 @@ void albaVMEMeter::CreateHistogram()
     m_ProbingLine->Update();
 
     vtkALBASmartPointer<vtkProbeFilter> prober;
-    prober->SetInput(m_ProbingLine->GetOutput());
-    prober->SetSource(probed_data);
+    prober->SetInputConnection(m_ProbingLine->GetOutputPort());
+    prober->SetSourceData(probed_data);
     prober->Update();
 
-    m_PlotActor->RemoveAllInputs();
+    m_PlotActor->RemoveAllDataSetInputConnections();
 
     vtkPolyData *probimg_result = prober->GetPolyDataOutput();
-    m_PlotActor->AddInput(probimg_result);
+    m_PlotActor->AddDataSetInput(probimg_result);
     if(m_HistogramRWI) m_HistogramRWI->m_RwiBase->Render();
   }
 }

@@ -132,7 +132,6 @@ protected:
   /** update the output data structure */
   virtual void InternalUpdate();
 
-
   /** used to initialize and create the material attribute if not yet present */
   virtual int InternalInitialize();
 

@@ -33,6 +33,7 @@
 #include "albaEventBase.h"
 
 #include <assert.h>
+#include "vtkDataSet.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaDataPipeInterpolatorVTK)
@@ -64,9 +65,9 @@ bool albaDataPipeInterpolatorVTK::Accept(albaVME *vme)
 vtkDataSet *albaDataPipeInterpolatorVTK::GetVTKData()
 //------------------------------------------------------------------------------
 {
-  m_VTKDataPipe->UpdateInformation();
-  vtkDataSet *data = m_VTKDataPipe->GetInput();
-  return (data != NULL) ? m_VTKDataPipe->GetOutput() : NULL;
+	m_VTKDataPipe->UpdateInformation();
+  m_VTKDataPipe->Update();
+  return m_VTKDataPipe->GetOutput();
 }
 
 //----------------------------------------------------------------------------

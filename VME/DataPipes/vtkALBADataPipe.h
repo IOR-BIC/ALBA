@@ -19,7 +19,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "albaObserver.h"
-#include "vtkDataSetToDataSetFilter.h"
+#include "vtkDataSetAlgorithm.h"
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
@@ -34,21 +34,19 @@ class vtkDataSet;
   @todo
   -
 */
-class ALBA_EXPORT vtkALBADataPipe : public vtkDataSetToDataSetFilter
+class ALBA_EXPORT vtkALBADataPipe : public vtkDataSetAlgorithm 
 {
 public:
-  vtkTypeMacro(vtkALBADataPipe,vtkDataSetToDataSetFilter);
+  vtkTypeMacro(vtkALBADataPipe,vtkDataSetAlgorithm );
 
   static vtkALBADataPipe *New();
 
   /** Set the dataset to be reported as output of the VTK data pipe */
   virtual void SetNthInput(int num, vtkDataSet *input);
 
-  virtual vtkDataSet *GetOutput(int idx);
-  virtual vtkDataSet *GetOutput();
 
   /** A bit of magic making this filter to take into consideration VME data pipe MTime */
-  virtual unsigned long GetMTime();
+	vtkMTimeType GetMTime();
 
   /** return the modification time for internally stored information */
   virtual unsigned long GetInformationTime();
@@ -68,8 +66,8 @@ protected:
   vtkALBADataPipe();
   virtual ~vtkALBADataPipe();
 
-  virtual void ExecuteInformation();
-  virtual void Execute();
+  virtual int RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+  int RequestData(vtkInformation *vtkNotUsed(request),	vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
 
   albaDataPipe *m_DataPipe; ///< the data pipe this object is linked to
 

@@ -31,6 +31,9 @@
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkPointData.h"
+#include "vtkDataSetAttributes.h"
+#include "vtkDataArray.h"
+#include "vtkDataSet.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEVolumeGray)
@@ -60,9 +63,8 @@ int albaVMEVolumeGray::SetData(vtkDataSet *data, albaTimeStamp t, int mode)
   assert(data);
   if (data->IsA("vtkImageData")||data->IsA("vtkRectilinearGrid"))
   {
-    data->Update();
     if (data->GetPointData()&&data->GetPointData()->GetScalars() != NULL &&
-      data->GetPointData()->GetScalars()->GetNumberOfComponents()==1) //BES: 28.5.2009 - GetNumberOfComponents must be called on scalars
+      data->GetPointData()->GetScalars()->GetNumberOfComponents()==1)
       return Superclass::SetData(data,t,mode);
   }
   

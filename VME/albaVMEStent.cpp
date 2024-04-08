@@ -48,7 +48,7 @@ University of Bedfordshire, UK
 #include "vtkCellData.h"
 
 #include "itkCellInterface.h"
-
+#include "itkVTKImageToImageFilter.h"
 #include <iostream>
 #include <time.h>
 
@@ -812,7 +812,7 @@ void albaVMEStent::UpdateStentPolydataFromSimplex_Simple()
     int pointCount =0;
     for(SimplexMeshType::PointsContainer::Iterator pointIndex = sPoints->Begin(); pointIndex != sPoints->End(); ++pointIndex){
       int idx = pointIndex->Index();
-      vtkFloatingPointType * pp = pointIndex->Value().GetDataPointer();
+      double * pp = pointIndex->Value().GetDataPointer();
       vpoints->SetPoint(idx,pp);
       pointCount++;
     }
@@ -914,7 +914,7 @@ void albaVMEStent::UpdateStentPolydataFromSimplex_Abbott()
     int pointCount =0;
     for(SimplexMeshType::PointsContainer::Iterator pointIndex = sPoints->Begin(); pointIndex != sPoints->End(); ++pointIndex){
       int idx = pointIndex->Index();
-      vtkFloatingPointType * pp = pointIndex->Value().GetDataPointer();
+      double * pp = pointIndex->Value().GetDataPointer();
       vpoints->SetPoint(idx,pp);
       pointCount++;
     }
@@ -1122,7 +1122,7 @@ void albaVMEStent::UpdateStentPolydataFromSimplex_ViewAsSimplex()
     for(SimplexMeshType::PointsContainer::Iterator pointIndex = sPoints->Begin(); pointIndex != sPoints->End(); pointIndex++)
     {
       int idx = pointIndex->Index();
-      vtkFloatingPointType * pp = pointIndex->Value().GetDataPointer();
+      double * pp = pointIndex->Value().GetDataPointer();
       vpoints->SetPoint(idx,pp);
     }
     vpoints->Squeeze() ;
@@ -1195,7 +1195,6 @@ void albaVMEStent::SetVesselCenterLine(albaVME* node)
     m_CenterLineNodeID = node->GetId() ;
     m_CenterLineVMEDefined = true ;
     vtkPolyData *polyLine =vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData());
-    polyLine->Update();
     SetVesselCenterLine(polyLine);
   }
 }
@@ -1220,7 +1219,6 @@ void albaVMEStent::SetVesselSurface(albaVME* node)
     m_VesselNodeID = node->GetId() ;
     m_VesselVMEDefined = true ;
     vtkPolyData *polySurface = vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData());
-    polySurface->Update();
     SetVesselSurface(polySurface) ;
   }
 }
@@ -2073,7 +2071,6 @@ void albaVMEStent::SetDeployedPolydataVME(albaVME* inputNode)
   m_DeployedPolydataVME = albaVMEPolyline::SafeDownCast(inputNode) ;
   m_DeployedPolydataNodeID = inputNode->GetId() ;
   vtkPolyData *pd = vtkPolyData::SafeDownCast(m_DeployedPolydataVME->GetOutput()->GetVTKData()) ;
-  pd->Update() ;
   SetStentPolyData(pd) ;
   m_DeployedPolydataStatus = DEPLOYED_PD_OK ;
 }

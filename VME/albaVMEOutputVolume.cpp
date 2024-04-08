@@ -144,7 +144,6 @@ void albaVMEOutputVolume::Update()
     m_VolumeBounds[2] = "";
     m_VolumeBounds[2] << " zmin: " << albaString::Format("%g",RoundValue(b[4])).ToAscii() << "   zmax: " << albaString::Format("%g",RoundValue(b[5])).ToAscii();
     double srange[2];
-    this->GetVTKData()->Update();
     this->GetVTKData()->GetScalarRange(srange);
     m_ScaralRangeString = albaString::Format("min: %6.2f max: %6.2f", srange[0], srange[1]);;
     //m_ScaralRangeString << " min: " << srange[0] << "    max: " << srange[1];
