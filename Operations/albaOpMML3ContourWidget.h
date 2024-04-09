@@ -80,6 +80,8 @@ public:
   virtual void SetEnabled(int);
   virtual void PlaceWidget(double bounds[6]);
 
+	virtual vtkPolyDataAlgorithm* GetPolyDataAlgorithm();
+
 
   //----------------------------------------------------------------------------
   // Methods which set parameter and model view classes
@@ -317,7 +319,7 @@ protected:
   /// PolyData.  Make changes to this before calling the initial PlaceWidget() \n
   /// to have the initial placement follow suit.  Or, make changes after the \n
   /// widget has been initialised and call UpdatePlacement() to realise.
-  vtkPolyDataSource* GetPolyDataSource() {return m_PlaneSource ;}
+  vtkPolyDataAlgorithm* GetPolyDataSource() {return m_PlaneSource ;}
 
   /// Satisfies superclass API.  This will change the state of the widget to \n
   /// match changes that have been made to the underlying PolyDataSource

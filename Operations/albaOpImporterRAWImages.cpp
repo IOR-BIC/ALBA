@@ -185,12 +185,12 @@ void albaOpImporterRAWImages::CreatePipeline()
   vtkNEW(m_BlueImage);
 
   vtkNEW(m_AppendComponents);
-  m_AppendComponents->AddInput(m_BlueImage->GetOutput());
-  m_AppendComponents->AddInput(m_GreenImage->GetOutput());
+  m_AppendComponents->AddInputConnection(m_BlueImage->GetOutputPort());
+  m_AppendComponents->AddInputConnection(m_GreenImage->GetOutputPort());
 
   vtkNEW(m_InterleavedImage);
-  m_InterleavedImage->AddInput(m_AppendComponents->GetOutput());
-  m_InterleavedImage->AddInput(m_RedImage->GetOutput());
+  m_InterleavedImage->AddInputConnection(m_AppendComponents->GetOutputPort());
+  m_InterleavedImage->AddInputConnection(m_RedImage->GetOutputPort());
 
   vtkNEW(m_Texture);
   //  texture input will be set according to update
@@ -205,7 +205,7 @@ void albaOpImporterRAWImages::CreatePipeline()
   vtkNEW(m_Plane);
 
   vtkNEW(m_Mapper);
-  m_Mapper->SetInput(m_Plane->GetOutput());
+  m_Mapper->SetInputConnection(m_Plane->GetOutputPort());
 
   vtkNEW(m_Actor);
   m_Actor->SetMapper(m_Mapper);
@@ -216,10 +216,10 @@ void albaOpImporterRAWImages::CreatePipeline()
   vtkNEW(m_GizmoPlane);
 
   vtkALBASmartPointer<vtkOutlineFilter> outlineFilter;
-  outlineFilter->SetInput(((vtkDataSet *)(m_GizmoPlane->GetOutput())));
+  outlineFilter->SetInputConnection(m_GizmoPlane->GetOutputPort());
 
   vtkALBASmartPointer<vtkPolyDataMapper> polyDataMapper;
-  polyDataMapper->SetInput(outlineFilter->GetOutput());
+  polyDataMapper->SetInputConnection(outlineFilter->GetOutputPort());
 
   vtkNEW(m_GizmoActor);
   m_GizmoActor->GetProperty()->SetColor(0.8,0,0);
@@ -347,7 +347,7 @@ void albaOpImporterRAWImages::CreateGui()
     m_Dialog->SetSize(x_init+10,y_init+10,w,h);
 
     //m_Dialog->SetSizer(h_sizer);    
-    //m_Dialog->SetAutoLayout(TRUE);	
+    //m_Dialog->SetAutoLayout(true);	
     //h_sizer->Fit(m_Dialog);	
 
     //show the dialog (show return when the user choose ok or cancel ) ++++++++
@@ -856,13 +856,13 @@ void albaOpImporterRAWImages::	UpdateReader()
     m_AppendComponents->Update();
     m_InterleavedImage->Modified();
     m_InterleavedImage->Update();
-    m_Texture->SetInput(m_InterleavedImage->GetOutput());
-    m_Texture->SetInput(m_AppendComponents->GetOutput());
+    m_Texture->SetInputConnection(m_InterleavedImage->GetOutputPort());
+    m_Texture->SetInputConnection(m_AppendComponents->GetOutputPort());
     m_Texture->Modified();
   }
   else
   {
-    m_Texture->SetInput(m_Reader->GetOutput());
+    m_Texture->SetInputConnection(m_Reader->GetOutputPort());
   }
 
   m_Reader->Update();
@@ -973,11 +973,11 @@ bool albaOpImporterRAWImages::Import()
 
     m_AppendComponents->Modified();
     m_InterleavedImage->Modified();
-    convert->SetInput(r->GetOutput());
+    convert->SetInputConnection(r->GetOutputPort());
   }
   else
   {
-    convert->SetInput(r->GetOutput());
+    convert->SetInputConnection(r->GetOutputPort());
   }
 
   convert->Update();

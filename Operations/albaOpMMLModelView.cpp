@@ -64,7 +64,7 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	m_PSlicesm = vtkMatrix4x4::New();
 
 	//
-	m_ScalingOccured = FALSE;
+	m_ScalingOccured = false;
 
 	//
 	m_PRenderer = ren;
@@ -196,9 +196,9 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// east contour axis
 	m_PContourPosXAxisLineSource = vtkLineSource::New();
 	m_PContourPosXAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_PContourPosXAxisAxesTubeFilter->SetInput(m_PContourPosXAxisLineSource->GetOutput());
+	m_PContourPosXAxisAxesTubeFilter->SetInputConnection(m_PContourPosXAxisLineSource->GetOutputPort());
 	m_PContourPosXAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_PContourPosXAxisPolyDataMapper->SetInput(m_PContourPosXAxisAxesTubeFilter->GetOutput());
+	m_PContourPosXAxisPolyDataMapper->SetInputConnection(m_PContourPosXAxisAxesTubeFilter->GetOutputPort());
 	m_PContourPosXAxisActor = vtkActor::New();
 	m_PContourPosXAxisActor->SetMapper(m_PContourPosXAxisPolyDataMapper);
 	m_PRenderer->AddActor(m_PContourPosXAxisActor);
@@ -207,9 +207,9 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// north contour axis
 	m_PContourPosYAxisLineSource = vtkLineSource::New();
 	m_PContourPosYAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_PContourPosYAxisAxesTubeFilter->SetInput(m_PContourPosYAxisLineSource->GetOutput());
+	m_PContourPosYAxisAxesTubeFilter->SetInputConnection(m_PContourPosYAxisLineSource->GetOutputPort());
 	m_PContourPosYAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_PContourPosYAxisPolyDataMapper->SetInput(m_PContourPosYAxisAxesTubeFilter->GetOutput());
+	m_PContourPosYAxisPolyDataMapper->SetInputConnection(m_PContourPosYAxisAxesTubeFilter->GetOutputPort());
 	m_PContourPosYAxisActor = vtkActor::New();
 	m_PContourPosYAxisActor->SetMapper(m_PContourPosYAxisPolyDataMapper);
 	m_PRenderer->AddActor(m_PContourPosYAxisActor);
@@ -218,9 +218,9 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// west contour axis
 	m_PContourNegXAxisLineSource = vtkLineSource::New();
 	m_PContourNegXAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_PContourNegXAxisAxesTubeFilter->SetInput(m_PContourNegXAxisLineSource->GetOutput());
+	m_PContourNegXAxisAxesTubeFilter->SetInputConnection(m_PContourNegXAxisLineSource->GetOutputPort());
 	m_PContourNegXAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_PContourNegXAxisPolyDataMapper->SetInput(m_PContourNegXAxisAxesTubeFilter->GetOutput());
+	m_PContourNegXAxisPolyDataMapper->SetInputConnection(m_PContourNegXAxisAxesTubeFilter->GetOutputPort());
 	m_PContourNegXAxisActor = vtkActor::New();
 	m_PContourNegXAxisActor->SetMapper(m_PContourNegXAxisPolyDataMapper);
 	m_PRenderer->AddActor(m_PContourNegXAxisActor);
@@ -229,9 +229,9 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// south contour axis
 	m_PContourNegYAxisLineSource = vtkLineSource::New();
 	m_PContourNegYAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_PContourNegYAxisAxesTubeFilter->SetInput(m_PContourNegYAxisLineSource->GetOutput());
+	m_PContourNegYAxisAxesTubeFilter->SetInputConnection(m_PContourNegYAxisLineSource->GetOutputPort());
 	m_PContourNegYAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_PContourNegYAxisPolyDataMapper->SetInput(m_PContourNegYAxisAxesTubeFilter->GetOutput());
+	m_PContourNegYAxisPolyDataMapper->SetInputConnection(m_PContourNegYAxisAxesTubeFilter->GetOutputPort());
 	m_PContourNegYAxisActor = vtkActor::New();
 	m_PContourNegYAxisActor->SetMapper(m_PContourNegYAxisPolyDataMapper);
 	m_PRenderer->AddActor(m_PContourNegYAxisActor);
@@ -240,9 +240,9 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// east global axis
 	m_PPosXAxisLineSource = vtkLineSource::New();
 	m_PPosXAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_PPosXAxisAxesTubeFilter->SetInput(m_PPosXAxisLineSource->GetOutput());
+	m_PPosXAxisAxesTubeFilter->SetInputConnection(m_PPosXAxisLineSource->GetOutputPort());
 	m_PPosXAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_PPosXAxisPolyDataMapper->SetInput(m_PPosXAxisAxesTubeFilter->GetOutput());
+	m_PPosXAxisPolyDataMapper->SetInputConnection(m_PPosXAxisAxesTubeFilter->GetOutputPort());
 	m_PPosXAxisActor = vtkActor::New();
 	m_PPosXAxisActor->SetMapper(m_PPosXAxisPolyDataMapper);
 	m_PRenderer->AddActor(m_PPosXAxisActor);
@@ -251,9 +251,9 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// north global axis
 	m_PPosYAxisLineSource = vtkLineSource::New();
 	m_PPosYAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_PPosYAxisAxesTubeFilter->SetInput(m_PPosYAxisLineSource->GetOutput());
+	m_PPosYAxisAxesTubeFilter->SetInputConnection(m_PPosYAxisLineSource->GetOutputPort());
 	m_PPosYAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_PPosYAxisPolyDataMapper->SetInput(m_PPosYAxisAxesTubeFilter->GetOutput());
+	m_PPosYAxisPolyDataMapper->SetInputConnection(m_PPosYAxisAxesTubeFilter->GetOutputPort());
 	m_PPosYAxisActor = vtkActor::New();
 	m_PPosYAxisActor->SetMapper(m_PPosYAxisPolyDataMapper);
 	m_PRenderer->AddActor(m_PPosYAxisActor);
@@ -262,9 +262,9 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// west global axis
 	m_PNegXAxisLineSource = vtkLineSource::New();
 	m_PNegXAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_PNegXAxisAxesTubeFilter->SetInput(m_PNegXAxisLineSource->GetOutput());
+	m_PNegXAxisAxesTubeFilter->SetInputConnection(m_PNegXAxisLineSource->GetOutputPort());
 	m_PNegXAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_PNegXAxisPolyDataMapper->SetInput(m_PNegXAxisAxesTubeFilter->GetOutput());
+	m_PNegXAxisPolyDataMapper->SetInputConnection(m_PNegXAxisAxesTubeFilter->GetOutputPort());
 	m_PNegXAxisActor = vtkActor::New();
 	m_PNegXAxisActor->SetMapper(m_PNegXAxisPolyDataMapper);
 	m_PRenderer->AddActor(m_PNegXAxisActor);
@@ -273,9 +273,9 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// south global axis
 	m_PNegYAxisLineSource = vtkLineSource::New();
 	m_PNegYAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_PNegYAxisAxesTubeFilter->SetInput(m_PNegYAxisLineSource->GetOutput());
+	m_PNegYAxisAxesTubeFilter->SetInputConnection(m_PNegYAxisLineSource->GetOutputPort());
 	m_PNegYAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_PNegYAxisPolyDataMapper->SetInput(m_PNegYAxisAxesTubeFilter->GetOutput());
+	m_PNegYAxisPolyDataMapper->SetInputConnection(m_PNegYAxisAxesTubeFilter->GetOutputPort());
 	m_PNegYAxisActor = vtkActor::New();
 	m_PNegYAxisActor->SetMapper(m_PNegYAxisPolyDataMapper);
 	m_PRenderer->AddActor(m_PNegYAxisActor);
@@ -285,7 +285,7 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// 1st landmark
 	m_PLandmark1SphereSource = vtkSphereSource::New();
 	m_PLandmark1PolyDataMapper = vtkPolyDataMapper::New();
-	m_PLandmark1PolyDataMapper->SetInput(m_PLandmark1SphereSource->GetOutput());
+	m_PLandmark1PolyDataMapper->SetInputConnection(m_PLandmark1SphereSource->GetOutputPort());
 	m_PLandmark1Actor = vtkActor::New();
 	m_PLandmark1Actor->SetMapper(m_PLandmark1PolyDataMapper);
 	m_PLandmark1Actor->VisibilityOff();
@@ -294,7 +294,7 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// 2nd landmark
 	m_PLandmark2SphereSource = vtkSphereSource::New();
 	m_PLandmark2PolyDataMapper = vtkPolyDataMapper::New();
-	m_PLandmark2PolyDataMapper->SetInput(m_PLandmark2SphereSource->GetOutput());
+	m_PLandmark2PolyDataMapper->SetInputConnection(m_PLandmark2SphereSource->GetOutputPort());
 	m_PLandmark2Actor = vtkActor::New();
 	m_PLandmark2Actor->SetMapper(m_PLandmark2PolyDataMapper);
 	m_PLandmark2Actor->VisibilityOff();
@@ -303,7 +303,7 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// 3rd landmark
 	m_PLandmark3SphereSource = vtkSphereSource::New();
 	m_PLandmark3PolyDataMapper = vtkPolyDataMapper::New();
-	m_PLandmark3PolyDataMapper->SetInput(m_PLandmark3SphereSource->GetOutput());
+	m_PLandmark3PolyDataMapper->SetInputConnection(m_PLandmark3SphereSource->GetOutputPort());
 	m_PLandmark3Actor = vtkActor::New();
 	m_PLandmark3Actor->SetMapper(m_PLandmark3PolyDataMapper);
 	m_PLandmark3Actor->VisibilityOff();
@@ -312,7 +312,7 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// 4th landmark
 	m_PLandmark4SphereSource = vtkSphereSource::New();
 	m_PLandmark4PolyDataMapper = vtkPolyDataMapper::New();
-	m_PLandmark4PolyDataMapper->SetInput(m_PLandmark4SphereSource->GetOutput());
+	m_PLandmark4PolyDataMapper->SetInputConnection(m_PLandmark4SphereSource->GetOutputPort());
 	m_PLandmark4Actor = vtkActor::New();
 	m_PLandmark4Actor->SetMapper(m_PLandmark4PolyDataMapper);
 	m_PLandmark4Actor->VisibilityOff();
@@ -321,9 +321,9 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// L1 to L2 line (action)
 	m_PL1L2LineSource = vtkLineSource::New();
 	m_PL1L2TubeFilter = vtkTubeFilter::New();
-	m_PL1L2TubeFilter->SetInput(m_PL1L2LineSource->GetOutput());
+	m_PL1L2TubeFilter->SetInputConnection(m_PL1L2LineSource->GetOutputPort());
 	m_PL1L2PolyDataMapper = vtkPolyDataMapper::New();
-	m_PL1L2PolyDataMapper->SetInput(m_PL1L2TubeFilter->GetOutput());
+	m_PL1L2PolyDataMapper->SetInputConnection(m_PL1L2TubeFilter->GetOutputPort());
 	m_PL1L2Actor = vtkActor::New();
 	m_PL1L2Actor->SetMapper(m_PL1L2PolyDataMapper);
 	m_PL1L2Actor->VisibilityOff();
@@ -332,9 +332,9 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// L2 to L3 line
 	m_PL2L3LineSource = vtkLineSource::New();
 	m_PL2L3TubeFilter = vtkTubeFilter::New();
-	m_PL2L3TubeFilter->SetInput(m_PL2L3LineSource->GetOutput());
+	m_PL2L3TubeFilter->SetInputConnection(m_PL2L3LineSource->GetOutputPort());
 	m_PL2L3PolyDataMapper = vtkPolyDataMapper::New();
-	m_PL2L3PolyDataMapper->SetInput(m_PL2L3TubeFilter->GetOutput());
+	m_PL2L3PolyDataMapper->SetInputConnection(m_PL2L3TubeFilter->GetOutputPort());
 	m_PL2L3Actor = vtkActor::New();
 	m_PL2L3Actor->SetMapper(m_PL2L3PolyDataMapper);
 	m_PL2L3Actor->VisibilityOff();
@@ -343,9 +343,9 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// positive z global axis
 	m_PPosZAxisLineSource = vtkLineSource::New();
 	m_PPosZAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_PPosZAxisAxesTubeFilter->SetInput(m_PPosZAxisLineSource->GetOutput());
+	m_PPosZAxisAxesTubeFilter->SetInputConnection(m_PPosZAxisLineSource->GetOutputPort());
 	m_PPosZAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_PPosZAxisPolyDataMapper->SetInput(m_PPosZAxisAxesTubeFilter->GetOutput());
+	m_PPosZAxisPolyDataMapper->SetInputConnection(m_PPosZAxisAxesTubeFilter->GetOutputPort());
 	m_PPosZAxisActor = vtkActor::New();
 	m_PPosZAxisActor->SetMapper(m_PPosZAxisPolyDataMapper);
 	m_PRenderer->AddActor(m_PPosZAxisActor);
@@ -354,9 +354,9 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	// negative z global axis
 	m_PNegZAxisLineSource = vtkLineSource::New();
 	m_PNegZAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_PNegZAxisAxesTubeFilter->SetInput(m_PNegZAxisLineSource->GetOutput());
+	m_PNegZAxisAxesTubeFilter->SetInputConnection(m_PNegZAxisLineSource->GetOutputPort());
 	m_PNegZAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_PNegZAxisPolyDataMapper->SetInput(m_PNegZAxisAxesTubeFilter->GetOutput());
+	m_PNegZAxisPolyDataMapper->SetInputConnection(m_PNegZAxisAxesTubeFilter->GetOutputPort());
 	m_PNegZAxisActor = vtkActor::New();
 	m_PNegZAxisActor->SetMapper(m_PNegZAxisPolyDataMapper);
 	m_PRenderer->AddActor(m_PNegZAxisActor);
@@ -367,17 +367,17 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   // Transform1 -> Transform2 -> Normals -> Mapper
 	m_PMuscleTransform1 = vtkTransform::New();
 	m_PMuscleTransform1PolyDataFilter = vtkTransformPolyDataFilter::New();
-	m_PMuscleTransform1PolyDataFilter->SetInput(muscle);
+	m_PMuscleTransform1PolyDataFilter->SetInputData(muscle);
 	m_PMuscleTransform1PolyDataFilter->SetTransform(m_PMuscleTransform1);
 	m_PMuscleTransform2 = vtkTransform::New();
 	m_PMuscleTransform2PolyDataFilter = vtkTransformPolyDataFilter::New();
-	m_PMuscleTransform2PolyDataFilter->SetInput(m_PMuscleTransform1PolyDataFilter->GetOutput());
+	m_PMuscleTransform2PolyDataFilter->SetInputConnection(m_PMuscleTransform1PolyDataFilter->GetOutputPort());
 	m_PMuscleTransform2PolyDataFilter->SetTransform(m_PMuscleTransform2);
 	m_PMusclePolyDataNormals = vtkPolyDataNormals::New();
-	m_PMusclePolyDataNormals->SetInput(m_PMuscleTransform2PolyDataFilter->GetOutput());
+	m_PMusclePolyDataNormals->SetInputConnection(m_PMuscleTransform2PolyDataFilter->GetOutputPort());
 	m_PMusclePolyDataNormals->FlipNormalsOn();
 	m_PMusclePolyDataMapper = vtkPolyDataMapper::New();
-	m_PMusclePolyDataMapper->SetInput(m_PMusclePolyDataNormals->GetOutput());
+	m_PMusclePolyDataMapper->SetInputConnection(m_PMusclePolyDataNormals->GetOutputPort());
 	m_PMuscleLODActor = vtkLODActor::New();
 	m_PMuscleLODActor->SetMapper(m_PMusclePolyDataMapper);
 	m_PRenderer->AddActor(m_PMuscleLODActor);
@@ -402,20 +402,20 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	m_PContourPlane = vtkPlane::New();
 	m_PContourCutter = vtkCutter::New();
 	m_PContourCutter->SetCutFunction(m_PContourPlane);
-	m_PContourCutter->SetInput(m_PMuscleTransform2PolyDataFilter->GetOutput());
+	m_PContourCutter->SetInputConnection(m_PMuscleTransform2PolyDataFilter->GetOutputPort());
 
 	m_PContourCutterTransform = vtkTransform::New(); //to put back to z=0 plane
 	m_PContourCutterTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-	m_PContourCutterTransformPolyDataFilter->SetInput(m_PContourCutter->GetOutput());
+	m_PContourCutterTransformPolyDataFilter->SetInputConnection(m_PContourCutter->GetOutputPort());
 	m_PContourCutterTransformPolyDataFilter->SetTransform(m_PContourCutterTransform);
 
 	m_PContourTubeFilter = vtkTubeFilter::New();
 	m_PContourTubeFilter->SetRadius(m_TubeFilterRadius);
     m_PContourTubeFilter->SetNumberOfSides(12);
-	m_PContourTubeFilter->SetInput(m_PContourCutterTransformPolyDataFilter->GetOutput());
+	m_PContourTubeFilter->SetInputConnection(m_PContourCutterTransformPolyDataFilter->GetOutputPort());
 	
 	m_PContourPolyDataMapper = vtkPolyDataMapper::New();
-	m_PContourPolyDataMapper->SetInput(m_PContourTubeFilter->GetOutput());
+	m_PContourPolyDataMapper->SetInputConnection(m_PContourTubeFilter->GetOutputPort());
 	
 	m_PContourActor = vtkActor::New();
 	m_PContourActor->SetMapper(m_PContourPolyDataMapper);
@@ -457,21 +457,21 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	m_PNEContourPolyDataMapper = vtkPolyDataMapper::New();
 	m_PNEContourActor = vtkActor::New();
 	
-	m_PNEContourX0ZPlaneClipPolyData->SetInput(m_PContourCutter->GetOutput()); // first cut plane
+	m_PNEContourX0ZPlaneClipPolyData->SetInputConnection(m_PContourCutter->GetOutputPort()); // first cut plane
 	m_PNEContourX0ZPlaneClipPolyData->SetClipFunction(m_PX0ZNPlane);
 	m_PNEContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 	
-	m_PNEContourY0ZPlaneClipPolyData->SetInput(m_PNEContourX0ZPlaneClipPolyData->GetOutput()); // second cut plane
+	m_PNEContourY0ZPlaneClipPolyData->SetInputConnection(m_PNEContourX0ZPlaneClipPolyData->GetOutputPort()); // second cut plane
 	m_PNEContourY0ZPlaneClipPolyData->SetClipFunction(m_PY0ZEPlane);
 	m_PNEContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 	
-	m_PNEContourTransformPolyDataFilter->SetInput(m_PNEContourY0ZPlaneClipPolyData->GetOutput());
+	m_PNEContourTransformPolyDataFilter->SetInputConnection(m_PNEContourY0ZPlaneClipPolyData->GetOutputPort());
 
 	m_PNEContourTubeFilter->SetRadius(m_TubeFilterRadius);
     m_PNEContourTubeFilter->SetNumberOfSides(12);
-	m_PNEContourTubeFilter->SetInput(m_PNEContourTransformPolyDataFilter->GetOutput());
+	m_PNEContourTubeFilter->SetInputConnection(m_PNEContourTransformPolyDataFilter->GetOutputPort());
 
-	m_PNEContourPolyDataMapper->SetInput(m_PNEContourTubeFilter->GetOutput());
+	m_PNEContourPolyDataMapper->SetInputConnection(m_PNEContourTubeFilter->GetOutputPort());
 	m_PNEContourActor->SetMapper(m_PNEContourPolyDataMapper);
 	m_PRenderer->AddActor(m_PNEContourActor);
 	m_PNEContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
@@ -485,21 +485,21 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	m_PNWContourPolyDataMapper = vtkPolyDataMapper::New();
 	m_PNWContourActor = vtkActor::New();
 
-	m_PNWContourX0ZPlaneClipPolyData->SetInput(m_PContourCutter->GetOutput());
+	m_PNWContourX0ZPlaneClipPolyData->SetInputConnection(m_PContourCutter->GetOutputPort());
 	m_PNWContourX0ZPlaneClipPolyData->SetClipFunction(m_PX0ZNPlane);
 	m_PNWContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 
-	m_PNWContourY0ZPlaneClipPolyData->SetInput(m_PNWContourX0ZPlaneClipPolyData->GetOutput());
+	m_PNWContourY0ZPlaneClipPolyData->SetInputConnection(m_PNWContourX0ZPlaneClipPolyData->GetOutputPort());
 	m_PNWContourY0ZPlaneClipPolyData->SetClipFunction(m_PY0ZWPlane);
 	m_PNWContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 
-	m_PNWContourTransformPolyDataFilter->SetInput(m_PNWContourY0ZPlaneClipPolyData->GetOutput());
+	m_PNWContourTransformPolyDataFilter->SetInputConnection(m_PNWContourY0ZPlaneClipPolyData->GetOutputPort());
 
 	m_PNWContourTubeFilter->SetRadius(m_TubeFilterRadius);
     m_PNWContourTubeFilter->SetNumberOfSides(12);
-	m_PNWContourTubeFilter->SetInput(m_PNWContourTransformPolyDataFilter->GetOutput());
+	m_PNWContourTubeFilter->SetInputConnection(m_PNWContourTransformPolyDataFilter->GetOutputPort());
 
-	m_PNWContourPolyDataMapper->SetInput(m_PNWContourTubeFilter->GetOutput());
+	m_PNWContourPolyDataMapper->SetInputConnection(m_PNWContourTubeFilter->GetOutputPort());
 	m_PNWContourActor->SetMapper(m_PNWContourPolyDataMapper);
 	m_PRenderer->AddActor(m_PNWContourActor);
 	m_PNWContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
@@ -513,21 +513,21 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	m_PSEContourPolyDataMapper = vtkPolyDataMapper::New();
 	m_PSEContourActor = vtkActor::New();
 	
-	m_PSEContourX0ZPlaneClipPolyData->SetInput(m_PContourCutter->GetOutput());
+	m_PSEContourX0ZPlaneClipPolyData->SetInputConnection(m_PContourCutter->GetOutputPort());
 	m_PSEContourX0ZPlaneClipPolyData->SetClipFunction(m_PX0ZSPlane);
 	m_PSEContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 	
-	m_PSEContourY0ZPlaneClipPolyData->SetInput(m_PSEContourX0ZPlaneClipPolyData->GetOutput());
+	m_PSEContourY0ZPlaneClipPolyData->SetInputConnection(m_PSEContourX0ZPlaneClipPolyData->GetOutputPort());
 	m_PSEContourY0ZPlaneClipPolyData->SetClipFunction(m_PY0ZEPlane);
 	m_PSEContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 	
-	m_PSEContourTransformPolyDataFilter->SetInput(m_PSEContourY0ZPlaneClipPolyData->GetOutput());
+	m_PSEContourTransformPolyDataFilter->SetInputConnection(m_PSEContourY0ZPlaneClipPolyData->GetOutputPort());
 
 	m_PSEContourTubeFilter->SetRadius(m_TubeFilterRadius);
     m_PSEContourTubeFilter->SetNumberOfSides(12);
-	m_PSEContourTubeFilter->SetInput(m_PSEContourTransformPolyDataFilter->GetOutput());
+	m_PSEContourTubeFilter->SetInputConnection(m_PSEContourTransformPolyDataFilter->GetOutputPort());
 
-	m_PSEContourPolyDataMapper->SetInput(m_PSEContourTubeFilter->GetOutput());
+	m_PSEContourPolyDataMapper->SetInputConnection(m_PSEContourTubeFilter->GetOutputPort());
 	m_PSEContourActor->SetMapper(m_PSEContourPolyDataMapper);
 	m_PRenderer->AddActor(m_PSEContourActor);
 	m_PSEContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
@@ -541,21 +541,21 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	m_PSWContourPolyDataMapper = vtkPolyDataMapper::New();
 	m_PSWContourActor = vtkActor::New();
 	
-	m_PSWContourX0ZPlaneClipPolyData->SetInput(m_PContourCutter->GetOutput());
+	m_PSWContourX0ZPlaneClipPolyData->SetInputConnection(m_PContourCutter->GetOutputPort());
 	m_PSWContourX0ZPlaneClipPolyData->SetClipFunction(m_PX0ZSPlane);
 	m_PSWContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 	
-	m_PSWContourY0ZPlaneClipPolyData->SetInput(m_PSWContourX0ZPlaneClipPolyData->GetOutput());
+	m_PSWContourY0ZPlaneClipPolyData->SetInputConnection(m_PSWContourX0ZPlaneClipPolyData->GetOutputPort());
 	m_PSWContourY0ZPlaneClipPolyData->SetClipFunction(m_PY0ZWPlane);
 	m_PSWContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 	
-	m_PSWContourTransformPolyDataFilter->SetInput(m_PSWContourY0ZPlaneClipPolyData->GetOutput());
+	m_PSWContourTransformPolyDataFilter->SetInputConnection(m_PSWContourY0ZPlaneClipPolyData->GetOutputPort());
 
 	m_PSWContourTubeFilter->SetRadius(m_TubeFilterRadius);
     m_PSWContourTubeFilter->SetNumberOfSides(12);
-	m_PSWContourTubeFilter->SetInput(m_PSWContourTransformPolyDataFilter->GetOutput());
+	m_PSWContourTubeFilter->SetInputConnection(m_PSWContourTransformPolyDataFilter->GetOutputPort());
 
-	m_PSWContourPolyDataMapper->SetInput(m_PSWContourTubeFilter->GetOutput());
+	m_PSWContourPolyDataMapper->SetInputConnection(m_PSWContourTubeFilter->GetOutputPort());
 	m_PSWContourActor->SetMapper(m_PSWContourPolyDataMapper);
 	m_PRenderer->AddActor(m_PSWContourActor);
 	m_PSWContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
@@ -1069,7 +1069,7 @@ void albaOpMMLModelView::SetUpSyntheticScans()
 		
 		// plane source transformation matrix
 		m_PSyntheticScansPlaneSourceTransform[i]->SetMatrix(this->GetPlaneSourceTransformOfSyntheticScans(i));
-		m_PSyntheticScansPlaneSourceTransformPolyDataFilter[i]->SetInput(m_PSyntheticScansPlaneSource[i]->GetOutput());
+		m_PSyntheticScansPlaneSourceTransformPolyDataFilter[i]->SetInputConnection(m_PSyntheticScansPlaneSource[i]->GetOutputPort());
 		m_PSyntheticScansPlaneSourceTransformPolyDataFilter[i]->SetTransform(m_PSyntheticScansPlaneSourceTransform[i]);
 		
 		// actor transformation matrix
@@ -1080,8 +1080,8 @@ void albaOpMMLModelView::SetUpSyntheticScans()
 		m_PRenderer->AddActor(m_PSyntheticScansActor[i]);
 
 		// probe
-		m_PSyntheticScansProbeFilter[i]->SetInput(m_PSyntheticScansPlaneSourceTransformPolyDataFilter[i]->GetOutput());
-		m_PSyntheticScansProbeFilter[i]->SetSource(m_Scans);
+		m_PSyntheticScansProbeFilter[i]->SetInputConnection(m_PSyntheticScansPlaneSourceTransformPolyDataFilter[i]->GetOutputPort());
+		m_PSyntheticScansProbeFilter[i]->SetSourceData(m_Scans);
 		m_PSyntheticScansProbeFilter[i]->Update();
 
 		// asjust min/max scalar values
@@ -1092,7 +1092,7 @@ void albaOpMMLModelView::SetUpSyntheticScans()
 			m_SyntheticScansMaxScalarValue = scalars[1];
 
 		// probe mapper 
-		m_PSyntheticScansPolyDataMapper[i]->SetInput(m_PSyntheticScansProbeFilter[i]->GetPolyDataOutput());
+		m_PSyntheticScansPolyDataMapper[i]->SetInputData(m_PSyntheticScansProbeFilter[i]->GetPolyDataOutput());
 		
 		// i-th scan: handles large datasets
 		// at the expense of slower rendering

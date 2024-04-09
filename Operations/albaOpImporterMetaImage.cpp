@@ -148,9 +148,7 @@ int albaOpImporterMetaImage::ImportMetaImage()
 
 			vtkALBASmartPointer<vtkImageData> imOut;
 			imOut->DeepCopy(data);
-			imOut->Update();
 
-		
 
 			if (m_VmeImage->SetDataByDetaching(imOut, 0) == ALBA_OK)
 			{

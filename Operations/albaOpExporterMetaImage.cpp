@@ -152,7 +152,7 @@ void albaOpExporterMetaImage::ExportMetaImage()
 	//Generate image output
 	vtkALBASmartPointer<vtkImageCast> vtkImageToFloat;
 	vtkImageToFloat->SetOutputScalarTypeToFloat();
-	vtkImageToFloat->SetInput(inputData);
+	vtkImageToFloat->SetInputData(inputData);
 	vtkImageToFloat->Modified();
 	vtkImageToFloat->Update();
 

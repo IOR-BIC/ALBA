@@ -234,8 +234,6 @@ void albaOpExporterFEMCommon::Init()
 
 	if (inputUGrid != NULL)
 	{
-		inputUGrid->Update();
-
 		// Calculate Num of Elements
 		m_TotalElements = inputUGrid->GetNumberOfPoints(); // Points
 

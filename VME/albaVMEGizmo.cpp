@@ -59,7 +59,7 @@ albaVMEGizmo::albaVMEGizmo()
   SetVisibleToTraverse(false);
 
   m_TextValue = "";
-  m_TextVisibility = FALSE;
+  m_TextVisibility = false;
 
   m_TextColour[0] = m_TextColour[1] = m_TextColour[2] = 1.0;
 }

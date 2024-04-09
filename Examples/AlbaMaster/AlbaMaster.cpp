@@ -144,7 +144,7 @@ bool AlbaMaster::OnInit()
 
 	m_LogicInitialized = true;
 
-	return TRUE;
+	return true;
 }
 //--------------------------------------------------------------------------------
 int AlbaMaster::OnExit()

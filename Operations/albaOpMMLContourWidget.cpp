@@ -45,7 +45,6 @@
 #include "vtkProperty2D.h"
 #include <algorithm>
 
-vtkCxxRevisionMacro(albaOpMMLContourWidget, "$Revision: 1.3 $");
 vtkStandardNewMacro(albaOpMMLContourWidget);
 vtkCxxSetObjectMacro(albaOpMMLContourWidget, m_PlaneProperty, vtkProperty);
 
@@ -55,10 +54,10 @@ albaOpMMLContourWidget::albaOpMMLContourWidget()
 //----------------------------------------------------------------------------
 {
   this->m_OperationID = 0; // first operation id is 0
-  this->m_BCenterMode = FALSE; // center mode off
-  this->m_BScalingMode = FALSE; // scaling mode off
-  this->m_BRotatingMode = FALSE; // rotating mode off
-  this->m_BTranslatingMode = FALSE; // translating mode off
+  this->m_BCenterMode = false; // center mode off
+  this->m_BScalingMode = false; // scaling mode off
+  this->m_BRotatingMode = false; // rotating mode off
+  this->m_BTranslatingMode = false; // translating mode off
   this->m_State = albaOpMMLContourWidget::Start;
   this->EventCallbackCommand->SetCallback(albaOpMMLContourWidget::ProcessEvents);
   
@@ -79,7 +78,7 @@ albaOpMMLContourWidget::albaOpMMLContourWidget()
   this->m_PlaneSource->SetYResolution(4);
   this->m_PlaneOutline = vtkPolyData::New();
   this->m_PlaneOutlineTubes = vtkTubeFilter::New(); // MK
-  this->m_PlaneOutlineTubes->SetInput(this->m_PlaneOutline); // Mk
+  this->m_PlaneOutlineTubes->SetInputData(this->m_PlaneOutline); // Mk
   
   vtkPoints *pts = vtkPoints::New();
   pts->SetNumberOfPoints(4);
@@ -95,7 +94,7 @@ albaOpMMLContourWidget::albaOpMMLContourWidget()
   outline->Delete();
   
   this->m_PlaneMapper = vtkPolyDataMapper::New();
-  this->m_PlaneMapper->SetInput(this->m_PlaneSource->GetOutput());
+  this->m_PlaneMapper->SetInputConnection(this->m_PlaneSource->GetOutputPort());
   this->m_PlaneActor = vtkActor::New();
   this->m_PlaneActor->SetMapper(this->m_PlaneMapper);
 
@@ -109,7 +108,7 @@ albaOpMMLContourWidget::albaOpMMLContourWidget()
     this->m_HandleGeometry[i]->SetThetaResolution(16);
     this->m_HandleGeometry[i]->SetPhiResolution(8);
     this->m_HandleMapper[i] = vtkPolyDataMapper::New();
-    this->m_HandleMapper[i]->SetInput(this->m_HandleGeometry[i]->GetOutput());
+    this->m_HandleMapper[i]->SetInputConnection(this->m_HandleGeometry[i]->GetOutputPort());
     this->m_Handle[i] = vtkActor::New();
     this->m_Handle[i]->SetMapper(this->m_HandleMapper[i]);
     }
@@ -126,7 +125,7 @@ albaOpMMLContourWidget::albaOpMMLContourWidget()
   this->m_RotationalHandleGeometry = vtkSphereSource::New();
   this->m_RotationalHandleGeometry->SetThetaResolution(16);
   this->m_RotationalHandleGeometry->SetPhiResolution(8);
-  this->m_RotationalHandleMapper->SetInput(this->m_RotationalHandleGeometry->GetOutput());
+  this->m_RotationalHandleMapper->SetInputConnection(this->m_RotationalHandleGeometry->GetOutputPort());
   this->m_RotationalHandle = vtkActor::New();
   this->m_RotationalHandle->SetMapper(this->m_RotationalHandleMapper);
 
@@ -139,7 +138,7 @@ albaOpMMLContourWidget::albaOpMMLContourWidget()
   this->m_CenterHandleGeometry = vtkSphereSource::New();
   this->m_CenterHandleGeometry->SetThetaResolution(16);
   this->m_CenterHandleGeometry->SetPhiResolution(8);
-  this->m_CenterHandleMapper->SetInput(this->m_CenterHandleGeometry->GetOutput());
+  this->m_CenterHandleMapper->SetInputConnection(this->m_CenterHandleGeometry->GetOutputPort());
   this->m_CenterHandle = vtkActor::New();
   this->m_CenterHandle->SetMapper(this->m_CenterHandleMapper);
 
@@ -150,7 +149,7 @@ albaOpMMLContourWidget::albaOpMMLContourWidget()
   this->m_LineSource = vtkLineSource::New();
   this->m_LineSource->SetResolution(1);
   this->m_LineMapper = vtkPolyDataMapper::New();
-  this->m_LineMapper->SetInput(this->m_LineSource->GetOutput());
+  this->m_LineMapper->SetInputConnection(this->m_LineSource->GetOutputPort());
   this->m_LineActor = vtkActor::New();
   this->m_LineActor->SetMapper(this->m_LineMapper);
 
@@ -158,7 +157,7 @@ albaOpMMLContourWidget::albaOpMMLContourWidget()
   this->m_ConeSource->SetResolution(12);
   this->m_ConeSource->SetAngle(25.0);
   this->m_ConeMapper = vtkPolyDataMapper::New();
-  this->m_ConeMapper->SetInput(this->m_ConeSource->GetOutput());
+  this->m_ConeMapper->SetInputConnection(this->m_ConeSource->GetOutputPort());
   this->m_ConeActor = vtkActor::New();
   this->m_ConeActor->SetMapper(this->m_ConeMapper);
 
@@ -166,7 +165,7 @@ albaOpMMLContourWidget::albaOpMMLContourWidget()
   this->m_LineSource2 = vtkLineSource::New();
   this->m_LineSource2->SetResolution(1);
   this->m_LineMapper2 = vtkPolyDataMapper::New();
-  this->m_LineMapper2->SetInput(this->m_LineSource2->GetOutput());
+  this->m_LineMapper2->SetInputConnection(this->m_LineSource2->GetOutputPort());
   this->m_LineActor2 = vtkActor::New();
   this->m_LineActor2->SetMapper(this->m_LineMapper2);
 
@@ -174,7 +173,7 @@ albaOpMMLContourWidget::albaOpMMLContourWidget()
   this->m_ConeSource2->SetResolution(12);
   this->m_ConeSource2->SetAngle(25.0);
   this->m_ConeMapper2 = vtkPolyDataMapper::New();
-  this->m_ConeMapper2->SetInput(this->m_ConeSource2->GetOutput());
+  this->m_ConeMapper2->SetInputConnection(this->m_ConeSource2->GetOutputPort());
   this->m_ConeActor2 = vtkActor::New();
   this->m_ConeActor2->SetMapper(this->m_ConeMapper2);
 
@@ -674,7 +673,7 @@ void albaOpMMLContourWidget::OnLeftButtonDown()
   if ( path != NULL )
     {
     this->m_State = albaOpMMLContourWidget::Moving;
-    this->HighlightHandle(path->GetFirstNode()->GetProp());
+    this->HighlightHandle(path->GetFirstNode()->GetViewProp());
 
 	if (GetScalingMode())
 	{
@@ -713,7 +712,7 @@ void albaOpMMLContourWidget::OnLeftButtonDown()
     path = this->m_PlanePicker->GetPath();
     if ( path != NULL )
       {
-      vtkProp *prop = path->GetFirstNode()->GetProp();
+      vtkProp *prop = path->GetFirstNode()->GetViewProp();
       if (/* prop == this->ConeActor || prop == this->LineActor ||
            prop == this->ConeActor2 || prop == this->LineActor2*/
 		   prop == this->m_RotationalHandle)
@@ -814,7 +813,7 @@ void albaOpMMLContourWidget::OnLeftButtonUp()
 						M->ScalingFlagStack->SetTuple(params[0], &flag);*/
 						if (!m_M->m_ScalingOccured)
 						{
-							m_M->m_ScalingOccured = TRUE;
+							m_M->m_ScalingOccured = true;
 							m_M->m_ScalingOccuredOperationId = GetNextOperationId();
 
 							// grey out twist, h/v translation views
@@ -852,7 +851,7 @@ void albaOpMMLContourWidget::OnLeftButtonUp()
 						M->ScalingFlagStack->SetTuple(params[0], &flag);*/
 						if (!m_M->m_ScalingOccured)
 						{
-							m_M->m_ScalingOccured = TRUE;
+							m_M->m_ScalingOccured = true;
 							m_M->m_ScalingOccuredOperationId = GetNextOperationId();
 
 							// grey out twist, h/v translation views
@@ -889,7 +888,7 @@ void albaOpMMLContourWidget::OnLeftButtonUp()
 						M->ScalingFlagStack->SetTuple(params[0], &flag);*/
 						if (!m_M->m_ScalingOccured)
 						{
-							m_M->m_ScalingOccured = TRUE;
+							m_M->m_ScalingOccured = true;
 							m_M->m_ScalingOccuredOperationId = GetNextOperationId();
 
 							// grey out twist, h/v translation views
@@ -926,7 +925,7 @@ void albaOpMMLContourWidget::OnLeftButtonUp()
 						M->ScalingFlagStack->SetTuple(params[0], &flag);*/
 						if (!m_M->m_ScalingOccured)
 						{
-							m_M->m_ScalingOccured = TRUE;
+							m_M->m_ScalingOccured = true;
 							m_M->m_ScalingOccuredOperationId = GetNextOperationId();
 
 							// grey out twist, h/v translation views
@@ -1323,7 +1322,7 @@ void albaOpMMLContourWidget::PlaceWidget(double bds[6])
 
   this->AdjustBounds(bds, bounds, center);
 
-  if (this->Input || this->Prop3D)
+  if (this->GetInput() || this->Prop3D)
     {
     if ( this->m_NormalToYAxis )
       {
@@ -1356,7 +1355,7 @@ void albaOpMMLContourWidget::PlaceWidget(double bds[6])
     }
   
 
-  if (this->Input || this->Prop3D)
+  if (this->GetInput() || this->Prop3D)
     {
     this->InitialLength = sqrt((bounds[1]-bounds[0])*(bounds[1]-bounds[0]) +
                                (bounds[3]-bounds[2])*(bounds[3]-bounds[2]) +
@@ -1364,7 +1363,7 @@ void albaOpMMLContourWidget::PlaceWidget(double bds[6])
     }
   else
     {
-    // this means we have to make use of the PolyDataSource, so
+    // this means we have to make use of the vtkPolyDataAlgorithm, so
     // we just calculate the magnitude of the longest diagonal on
     // the plane and use that as InitialLength
     double origin[3], point1[3], point2[3];
@@ -1384,6 +1383,12 @@ void albaOpMMLContourWidget::PlaceWidget(double bds[6])
   // Set the radius on the sphere handles
   this->SizeHandles();
 }
+
+vtkPolyDataAlgorithm* albaOpMMLContourWidget::GetPolyDataAlgorithm()
+{
+	return NULL;
+}
+
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::SizeHandles()
 //----------------------------------------------------------------------------
@@ -1428,21 +1433,21 @@ void albaOpMMLContourWidget::SelectRepresentation()
     //this->PlaneOutlineTubes->SetNumberOfSides(6);
 	//this->PlaneMapper->SetInput( this->PlaneOutlineTubes->GetOutput());
 
-    this->m_PlaneMapper->SetInput( this->m_PlaneOutline);
+    this->m_PlaneMapper->SetInputData( this->m_PlaneOutline);
 	this->m_PlaneActor->GetProperty()->SetRepresentationToWireframe();
     }
   else if ( this->m_Representation == VTK_PLANE_SURFACE )
     {
     this->CurrentRenderer->RemoveActor(this->m_PlaneActor);
     this->CurrentRenderer->AddActor(this->m_PlaneActor);
-    this->m_PlaneMapper->SetInput( this->m_PlaneSource->GetOutput() );
+    this->m_PlaneMapper->SetInputConnection( this->m_PlaneSource->GetOutputPort() );
     this->m_PlaneActor->GetProperty()->SetRepresentationToSurface();
     }
   else //( this->Representation == VTK_PLANE_WIREFRAME )
     {
     this->CurrentRenderer->RemoveActor(this->m_PlaneActor);
     this->CurrentRenderer->AddActor(this->m_PlaneActor);
-    this->m_PlaneMapper->SetInput( this->m_PlaneSource->GetOutput() );
+    this->m_PlaneMapper->SetInputConnection( this->m_PlaneSource->GetOutputPort() );
     this->m_PlaneActor->GetProperty()->SetRepresentationToWireframe();
     }
 }
@@ -1610,12 +1615,7 @@ void albaOpMMLContourWidget::GetPolyData(vtkPolyData *pd)
 { 
   pd->ShallowCopy(this->m_PlaneSource->GetOutput()); 
 }
-//----------------------------------------------------------------------------
-vtkPolyDataSource *albaOpMMLContourWidget::GetPolyDataSource()
-//----------------------------------------------------------------------------
-{
-  return this->m_PlaneSource;
-}
+
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::GetPlane(vtkPlane *plane)
 //----------------------------------------------------------------------------
@@ -1679,27 +1679,27 @@ void albaOpMMLContourWidget::GetMotionVector(float xyz[3])
 void albaOpMMLContourWidget::TranslationModeOn()
 //----------------------------------------------------------------------------
 {
-  this->m_BTranslatingMode = TRUE;
+  this->m_BTranslatingMode = true;
 }
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::TranslationModeOff()
 //----------------------------------------------------------------------------
 {
-  this->m_BTranslatingMode = FALSE;
+  this->m_BTranslatingMode = false;
 }
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::CenterModeOn()
 //----------------------------------------------------------------------------
 {
   //this->CenterHandle->VisibilityOn();
-  this->m_BCenterMode = TRUE;
+  this->m_BCenterMode = true;
 }
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::CenterModeOff()
 //----------------------------------------------------------------------------
 {
   //this->CenterHandle->VisibilityOff();
-  this->m_BCenterMode = FALSE;
+  this->m_BCenterMode = false;
 }
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::RotationModeOn()
@@ -1707,46 +1707,26 @@ void albaOpMMLContourWidget::RotationModeOn()
 {
   //this->m_RotationalHandle->VisibilityOn();
   //this->Setm_RotationalHandle(50.0, 0.0, 0.0);
-  this->m_BRotatingMode = TRUE;
+  this->m_BRotatingMode = true;
 }
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::RotationModeOff()
 //----------------------------------------------------------------------------
 {
   //this->m_RotationalHandle->VisibilityOff();
-  this->m_BRotatingMode = FALSE;
+  this->m_BRotatingMode = false;
 }
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::ScalingModeOn()
 //----------------------------------------------------------------------------
 {
-  this->m_BScalingMode = TRUE;
-  //this->ScalingHandlesOn();
-
-  // 
-  //this->SetRepresentationToWireframe();
-  //this->GetPlaneProperty()->SetOpacity(1.0);
-  //this->GetSelectedPlaneProperty()->SetOpacity(1.0);
-
-  //
-  //this->PlanePicker->DeletePickList(this->PlaneActor);
+  this->m_BScalingMode = true;
 }
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::ScalingModeOff()
 //----------------------------------------------------------------------------
 {
-  this->m_BScalingMode = FALSE;
-
-  //
-  //this->ScalingHandlesOff();
-
-  // 
-  //this->SetRepresentationToOutline();
-  //this->GetPlaneProperty()->SetOpacity(1.0);
-  //this->GetSelectedPlaneProperty()->SetOpacity(1.0);
-
-  //
-  //this->PlanePicker->AddPickList(this->PlaneActor);
+  this->m_BScalingMode = false;
 }
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::SetHandle0(double *xyz)

@@ -138,6 +138,8 @@ public:
   void PlaceWidget()
     {this->Superclass::PlaceWidget();}
 
+	virtual vtkPolyDataAlgorithm* GetPolyDataAlgorithm();
+
   // Description:
   // Set/Get the resolution (number of subdivisions) of the plane.
   void SetResolution(int r);
@@ -244,12 +246,6 @@ public:
   // selection of data.
   void GetPlane(vtkPlane *plane);
 
-  // Description:
-  // Satisfies superclass API.  This returns a pointer to the underlying
-  // PolyData.  Make changes to this before calling the initial PlaceWidget()
-  // to have the initial placement follow suit.  Or, make changes after the
-  // widget has been initialised and call UpdatePlacement() to realise.
-  vtkPolyDataSource* GetPolyDataSource();
    
   // Description:
   // Satisfies superclass API.  This will change the state of the widget to

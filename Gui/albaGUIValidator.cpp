@@ -233,7 +233,7 @@ bool albaGUIValidator::Copy(const albaGUIValidator& val)
   m_WidgetData.iValue = val.m_WidgetData.iValue;
   m_WidgetData.sValue = val.m_WidgetData.sValue;
 
-  return TRUE;
+  return true;
 }
 //----------------------------------------------------------------------------
 albaGUIValidator::albaGUIValidator(albaObserver* listener, int mid, wxStaticText *win,albaString* var) //String
@@ -749,7 +749,7 @@ bool albaGUIValidator::TransferToWindow(void)
       m_TextCtrl->Refresh();
     break;
   }
-  return TRUE;
+  return true;
 }
 /*//----------------------------------------------------------------------------
 float albaGUIValidator::RoundValue(float f_in)
@@ -912,7 +912,7 @@ bool albaGUIValidator::TransferFromWindow(void)
 			*m_ColorVar = m_TextCtrl->GetBackgroundColour();
     break;
   }
-  return TRUE;
+  return true;
 }
 //----------------------------------------------------------------------------
 void albaGUIValidator::OnChar(wxKeyEvent& event)

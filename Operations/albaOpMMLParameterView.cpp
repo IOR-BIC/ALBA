@@ -47,13 +47,13 @@ albaOpMMLParameterView::albaOpMMLParameterView(vtkRenderWindow *rw, vtkRenderer 
 	m_PDataPointsPolyData->SetPoints(m_PDataPointsPolyDataPoints);
 	m_PDataPointsGlyphSource2D = vtkGlyphSource2D::New();
 	m_PDataPointsGlyph2D = vtkGlyph2D::New();
-	m_PDataPointsGlyph2D->SetInput(m_PDataPointsPolyData);
-	m_PDataPointsGlyph2D->SetSource(m_PDataPointsGlyphSource2D->GetOutput());
+	m_PDataPointsGlyph2D->SetInputData(m_PDataPointsPolyData);
+	m_PDataPointsGlyph2D->SetSourceConnection(m_PDataPointsGlyphSource2D->GetOutputPort());
 	m_PDataPointsGlyphSource2D->SetGlyphTypeToSquare();
 	m_PDataPointsGlyphSource2D->SetScale(8);
 	m_PDataPointsGlyphSource2D->FilledOn();
 	m_PDataPointsPolyDataMapper2D = vtkPolyDataMapper2D::New();
-	m_PDataPointsPolyDataMapper2D->SetInput(m_PDataPointsGlyph2D->GetOutput());
+	m_PDataPointsPolyDataMapper2D->SetInputConnection(m_PDataPointsGlyph2D->GetOutputPort());
 	m_PDataPointsActor2D = vtkActor2D::New();
 	m_PDataPointsActor2D->SetMapper(m_PDataPointsPolyDataMapper2D);
 	m_PRenderer->AddActor(m_PDataPointsActor2D);
@@ -69,7 +69,7 @@ albaOpMMLParameterView::albaOpMMLParameterView(vtkRenderWindow *rw, vtkRenderer 
 	m_PSplinePolyData->SetPoints(m_PSplinePolyDataPoints);
 	m_PSplinePolyData->SetLines(m_PSplinePolyDataLines);
 	m_PSplinePolyDataMapper2D = vtkPolyDataMapper2D::New();
-	m_PSplinePolyDataMapper2D->SetInput(m_PSplinePolyData);
+	m_PSplinePolyDataMapper2D->SetInputData(m_PSplinePolyData);
 	m_PSplineActor2D = vtkActor2D::New();
 	m_PSplineActor2D->SetMapper(m_PSplinePolyDataMapper2D);
 	m_PRenderer->AddActor(m_PSplineActor2D);
@@ -77,7 +77,7 @@ albaOpMMLParameterView::albaOpMMLParameterView(vtkRenderWindow *rw, vtkRenderer 
 	// vertical line
 	m_PLineSource = vtkLineSource::New();
 	m_PLinePolyDataMapper2D = vtkPolyDataMapper2D::New();
-	m_PLinePolyDataMapper2D->SetInput(m_PLineSource->GetOutput());
+	m_PLinePolyDataMapper2D->SetInputConnection(m_PLineSource->GetOutputPort());
 	m_PLineActor2D = vtkActor2D::New();
 	m_PLineActor2D->SetMapper(m_PLinePolyDataMapper2D);
 	m_PRenderer->AddActor(m_PLineActor2D);
@@ -85,7 +85,7 @@ albaOpMMLParameterView::albaOpMMLParameterView(vtkRenderWindow *rw, vtkRenderer 
 	// horizontal line
 	m_PHorizontalLineSource = vtkLineSource::New();
 	m_PHorizontalLinePolyDataMapper2D = vtkPolyDataMapper2D::New();
-	m_PHorizontalLinePolyDataMapper2D->SetInput(m_PHorizontalLineSource->GetOutput());
+	m_PHorizontalLinePolyDataMapper2D->SetInputConnection(m_PHorizontalLineSource->GetOutputPort());
 	m_PHorizontalLineActor2D = vtkActor2D::New();
 	m_PHorizontalLineActor2D->SetMapper(m_PHorizontalLinePolyDataMapper2D);
 	m_PRenderer->AddActor(m_PHorizontalLineActor2D);

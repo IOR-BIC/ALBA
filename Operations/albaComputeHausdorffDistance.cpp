@@ -860,25 +860,21 @@ vtkPolyData *albaComputeHausdorffDistance::GetOutput()
 
   long progress = 0;
 
-  cleaner->SetInput(m_Mesh1);
+  cleaner->SetInputData(m_Mesh1);
   cleaner->ConvertPolysToLinesOff();
-  cleaner->GetOutput()->Update();
-  triangulator->SetInput(cleaner->GetOutput());
+  triangulator->SetInputConnection(cleaner->GetOutputPort());
   triangulator->Update();
   m_CleanMesh1->DeepCopy(triangulator->GetOutput());
   m_CleanMesh1->Modified();
-  m_CleanMesh1->Update();
 
   progress+=FILTER_PERC/2.0;
   
-  cleaner->SetInput(m_Mesh2);
+  cleaner->SetInputData(m_Mesh2);
   cleaner->ConvertPolysToLinesOff();
-  cleaner->GetOutput()->Update();
-  triangulator->SetInput(cleaner->GetOutput());
+  triangulator->SetInputConnection(cleaner->GetOutputPort());
   triangulator->Update();
   m_CleanMesh2->DeepCopy(triangulator->GetOutput());
   m_CleanMesh2->Modified();
-  m_CleanMesh2->Update();
 
   progress+=FILTER_PERC/2.0;
 	m_ProgBarHelper->UpdateProgressBar(progress);

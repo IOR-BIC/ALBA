@@ -62,7 +62,7 @@ albaOp(label)
 	m_Binary        = 1;
 	m_ABSMatrixFlag = 0;
 
-	m_ForceUnsignedShortScalarOutputForStructuredPoints = FALSE;
+	m_ForceUnsignedShortScalarOutputForStructuredPoints = false;
 }
 //----------------------------------------------------------------------------
 albaOpExporterVTK::~albaOpExporterVTK()
@@ -198,7 +198,7 @@ void albaOpExporterVTK::SaveVTKData()
   
   if (m_ForceUnsignedShortScalarOutputForStructuredPoints)
   {    
-    imageCast->SetInput(vtkImageData::SafeDownCast(inputData));
+    imageCast->SetInputData(vtkImageData::SafeDownCast(inputData));
     imageCast->SetOutputScalarTypeToUnsignedShort();
     imageCast->Update();
     writerInput = imageCast->GetOutput();
@@ -218,23 +218,23 @@ void albaOpExporterVTK::SaveVTKData()
 		if(m_Input->IsA("albaVMEMesh"))
 		{
 			vtkALBASmartPointer<vtkTransformFilter> v_tpdf;
-			v_tpdf->SetInput((vtkUnstructuredGrid *)m_Input->GetOutput()->GetVTKData());
+			v_tpdf->SetInputData((vtkUnstructuredGrid *)m_Input->GetOutput()->GetVTKData());
 			v_tpdf->SetTransform(tra);
 			v_tpdf->Update();
-			writer->SetInput(v_tpdf->GetOutput());
+			writer->SetInputConnection(v_tpdf->GetOutputPort());
 		}
 		else
 		{
 			vtkALBASmartPointer<vtkTransformPolyDataFilter> v_tpdf;
-			v_tpdf->SetInput((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
+			v_tpdf->SetInputData((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
 			v_tpdf->SetTransform(tra);
 			v_tpdf->Update();
-			writer->SetInput(v_tpdf->GetOutput());
+			writer->SetInputConnection(v_tpdf->GetOutputPort());
 		}
   }
   else
   {
-    writer->SetInput(writerInput);
+    writer->SetInputData(writerInput);
   }
 
   if (this->m_Binary)

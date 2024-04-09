@@ -225,7 +225,7 @@ void albaOpDecimateSurface::OnDecimate()
 	}
 
 	vtkALBASmartPointer<vtkDecimatePro> decimate;
-	decimate->SetInput(m_ResultPolydata);
+	decimate->SetInputData(m_ResultPolydata);
 	decimate->SetPreserveTopology(m_TopologyFlag); 
 	decimate->SetTargetReduction(m_Reduction/100.0);
 	decimate->Update();

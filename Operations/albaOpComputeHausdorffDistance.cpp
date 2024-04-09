@@ -316,13 +316,13 @@ int albaOpComputeHausdorffDistance::ComputeDistance()
 
 	albaMatrix *input1Matr = m_SurfaceInput1->GetOutput()->GetAbsMatrix();
 	input1Tra->SetMatrix(input1Matr->GetVTKMatrix());
-	input1TraFilter->SetInput(inputData1);
+	input1TraFilter->SetInputData(inputData1);
 	input1TraFilter->SetTransform(input1Tra);
 	input1TraFilter->Update();
 
 	albaMatrix *input2Matr = m_SurfaceInput2->GetOutput()->GetAbsMatrix();
 	input2Tra->SetMatrix(input2Matr->GetVTKMatrix());
-	input2TraFilter->SetInput(inputData2);
+	input2TraFilter->SetInputData(inputData2);
 	input2TraFilter->SetTransform(input2Tra);
 	input2TraFilter->Update();
 

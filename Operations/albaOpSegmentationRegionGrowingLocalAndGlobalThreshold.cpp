@@ -92,7 +92,7 @@ albaOp(label)
   m_LowerLabel = -1;
   m_UpperLabel = 1;
   m_SphereRadius = 1;
-  m_ApplyConnectivityFilter = FALSE;
+  m_ApplyConnectivityFilter = false;
 
   m_VolumeOutputMorpho = NULL;
   m_VolumeOutputRegionGrowing = NULL;
@@ -113,7 +113,7 @@ albaOp(label)
 
   m_CurrentPoint = 0;
 
-  m_EliminateHistogramValues = TRUE;
+  m_EliminateHistogramValues = true;
   m_ValuesToEliminate = -500;
 
   m_Threshold = 0.0;
@@ -189,14 +189,13 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
     m_ComputedMedianFilter = true;
 
     vtkALBASmartPointer<vtkImageMedian3D> median;
-    median->SetInput(vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData()));
+    median->SetInputData(vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData()));
     median->SetKernelSize(3,3,3);
     median->Update();
 
     albaVMEVolumeGray *volMediano;
     albaNEW(volMediano);
     vtkDataSet *d = median->GetOutput();
-    d->Update();
     int k = d->GetNumberOfPoints();
     double sr[2];
     d->GetPointData()->GetScalars()->GetRange(sr);
@@ -204,9 +203,9 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
     name<<" - Applied Median Filter";
     volMediano->SetName(name);
     vtkALBASmartPointer<vtkImageToStructuredPoints> f;
-    f->SetInput(median->GetOutput());
+    f->SetInputConnection(median->GetOutputPort());
     f->Update();
-    volMediano->SetData((vtkImageData *)f->GetOutput(),m_VolumeInput->GetTimeStamp());
+    volMediano->SetData(f->GetOutput(),m_VolumeInput->GetTimeStamp());
     volMediano->ReparentTo(m_VolumeInput);
     volMediano->Update();
 
@@ -265,7 +264,6 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::MorphologicalMathem
   progressHelper.UpdateProgressBar(100);
 
   m_MorphoImage->DeepCopy(itkTOvtk->GetOutput());
-  m_MorphoImage->Update();
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::RegionGrowing()
@@ -277,7 +275,6 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::RegionGrowing()
 	
   //Get the vtk data from the input
   vtkImageData *imageData = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-  imageData->Update();
 
   //Get the thresholds values selected by the user
   //double lower,upper;
@@ -295,7 +292,6 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::RegionGrowing()
 
   //Save the result of the region growing
   m_SegmentedImage->DeepCopy(localFilter->GetOutput());
-  m_SegmentedImage->Update();
 
 }
 //----------------------------------------------------------------------------
@@ -354,7 +350,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
   m_Gui->Label(&m_SoftParam3,false,true);
   m_Gui->Bool(ID_ELIMINATE_HISTOGRAM_VALUES,_("Eliminate Values"),&m_EliminateHistogramValues,1);
   m_Gui->Double(ID_VALUES_TO_ELIMINATE,_(""),&m_ValuesToEliminate);
-  m_Gui->Enable(ID_VALUES_TO_ELIMINATE,m_EliminateHistogramValues == TRUE);
+  m_Gui->Enable(ID_VALUES_TO_ELIMINATE,m_EliminateHistogramValues == true);
   //m_Gui->Button(ID_FITTING,_("Fitting"));
   m_Gui->Divider(1);
 
@@ -406,11 +402,10 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::HistogramEqualizati
 //----------------------------------------------------------------------------
 {
   vtkImageData *im = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-  im->Update();
 
   vtkALBASmartPointer<vtkImageCast> vtkImageToFloat;
   vtkImageToFloat->SetOutputScalarTypeToFloat ();
-  vtkImageToFloat->SetInput(im);
+  vtkImageToFloat->SetInputData(im);
   vtkImageToFloat->Modified();
   vtkImageToFloat->Update();
 
@@ -444,7 +439,6 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::HistogramEqualizati
   vtkImageData *imout;
   vtkNEW(imout);
   imout->DeepCopy(itkTOvtk->GetOutput());
-  imout->Update();
 
   albaVMEVolumeGray *v;
   albaNEW(v);
@@ -464,7 +458,6 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateHistogramDial
   m_Histogram = new albaGUIHistogramWidget(m_Gui,-1,wxPoint(0,0),wxSize(400,500),wxTAB_TRAVERSAL);
   m_Histogram->SetListener(this);
   vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-  hd->Update();
   m_Histogram->SetData(hd->GetPointData()->GetScalars());
 
   albaGUI *gui = new albaGUI(this);
@@ -511,20 +504,18 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles
 //----------------------------------------------------------------------------
 {
   vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-  hd->Update();
   double sr[2];
   hd->GetScalarRange(sr);
   double srw = sr[1]-sr[0];
 
   vtkALBASmartPointer<vtkImageData> imageData;
   imageData->SetDimensions(hd->GetPointData()->GetScalars()->GetNumberOfTuples(),1,1);
-  imageData->SetScalarType(hd->GetPointData()->GetScalars()->GetDataType());
+  imageData->AllocateScalars(hd->GetPointData()->GetScalars()->GetDataType(),1);
   imageData->GetPointData()->SetScalars(hd->GetPointData()->GetScalars());
-  imageData->Update();
   imageData->GetScalarRange(sr);
 
   vtkALBASmartPointer<vtkImageAccumulate> accumulate;
-  accumulate->SetInput(imageData);
+  accumulate->SetInputData(imageData);
   accumulate->SetComponentOrigin(sr[0],0,0);  
   accumulate->SetComponentExtent(0,srw,0,0,0,0);
   accumulate->SetComponentSpacing(1,0,0); // bins maps all the Scalars Range
@@ -539,7 +530,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles
   int startIndex = -1;
   int numOfTuples = accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples();
   double step = (double)(srw+1)/numOfTuples;
-  if (m_EliminateHistogramValues == TRUE)
+  if (m_EliminateHistogramValues == true)
   {
     for (int i=0;i<accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples();i++)
     {
@@ -615,20 +606,18 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::FittingLM()
   softIssueParameters[2] = sqrt(2.0)*softIssueStDev;
 
   vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-  hd->Update();
   double sr[2];
   hd->GetScalarRange(sr);
   double srw = sr[1]-sr[0];
 
   vtkALBASmartPointer<vtkImageData> imageData;
   imageData->SetDimensions(hd->GetPointData()->GetScalars()->GetNumberOfTuples(),1,1);
-  imageData->SetScalarType(hd->GetPointData()->GetScalars()->GetDataType());
+  imageData->AllocateScalars(hd->GetPointData()->GetScalars()->GetDataType(),1);
   imageData->GetPointData()->SetScalars(hd->GetPointData()->GetScalars());
-  imageData->Update();
   imageData->GetScalarRange(sr);
 
   vtkALBASmartPointer<vtkImageAccumulate> accumulate;
-  accumulate->SetInput(imageData);
+  accumulate->SetInputData(imageData);
   accumulate->SetComponentOrigin(sr[0],0,0);  
   accumulate->SetComponentExtent(0,srw,0,0,0,0);
   accumulate->SetComponentSpacing(1,0,0); // bins maps all the Scalars Range
@@ -720,7 +709,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
     {
     case ID_ELIMINATE_HISTOGRAM_VALUES:
       {
-        m_Gui->Enable(ID_VALUES_TO_ELIMINATE,m_EliminateHistogramValues == TRUE);
+        m_Gui->Enable(ID_VALUES_TO_ELIMINATE,m_EliminateHistogramValues == true);
       }
       break;
     case ID_DIALOG_OK:
@@ -744,7 +733,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
 
         //Convert the output of the region growing into structured points
         vtkALBASmartPointer<vtkImageToStructuredPoints> filter;
-        filter->SetInput(m_SegmentedImage);
+        filter->SetInputData(m_SegmentedImage);
         filter->Update();
 
         //Generate the vme output of the region growing
@@ -770,7 +759,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
 
         //Convert the output of the region growing into structured points
         vtkALBASmartPointer<vtkImageToStructuredPoints> filter;
-        filter->SetInput(m_MorphoImage);
+        filter->SetInputData(m_MorphoImage);
         filter->Update();
 
         //Generate the vme output of the morphological closing
@@ -786,9 +775,9 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
 
         vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
         int result = ALBA_OK;
-        if (m_ApplyConnectivityFilter == TRUE)
+        if (m_ApplyConnectivityFilter == true)
         {
-          connectivityFilter->SetInput(extractIsosurface->GetOutput());
+          connectivityFilter->SetInputData(extractIsosurface->GetOutput());
           connectivityFilter->SetExtractionModeToLargestRegion();
           connectivityFilter->Update();
 

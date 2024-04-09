@@ -91,20 +91,20 @@ public:
 	void ShowAxisOff(){m_ShowAxis = 0;m_Axes->SetVisibility(m_Selected&&m_ShowAxis);};
 
   /** Turn Off the selection visibility.*/
-  void SelectionActorOff(){m_SelectionVisibility = FALSE;};
+  void SelectionActorOff(){m_SelectionVisibility = false;};
 
   /** Turn Off the selection visibility.*/
-  void SelectionActorOn(){m_SelectionVisibility = TRUE;};
+  void SelectionActorOn(){m_SelectionVisibility = true;};
 
 	/** Get assembly front/back */
 	virtual vtkALBAAssembly *GetAssemblyFront(){return m_AssemblyFront;};
 	virtual vtkALBAAssembly *GetAssemblyBack(){return m_AssemblyBack;};
 
-	void SetScalarVisibilityOn(){m_ScalarVisibility = TRUE;};
-	void SetScalarVisibilityOff(){m_ScalarVisibility = FALSE;};
+	void SetScalarVisibilityOn(){m_ScalarVisibility = true;};
+	void SetScalarVisibilityOff(){m_ScalarVisibility = false;};
 
-	void SetUseVtkPropertyOn(){m_UseVTKProperty = TRUE;};
-	void SetUseVtkPropertyOff(){m_UseVTKProperty = FALSE;};
+	void SetUseVtkPropertyOn(){m_UseVTKProperty = true;};
+	void SetUseVtkPropertyOff(){m_UseVTKProperty = false;};
 
 protected:
   vtkTexture              *m_Texture;

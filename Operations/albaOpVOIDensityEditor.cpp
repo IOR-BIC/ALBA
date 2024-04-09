@@ -133,7 +133,7 @@ void albaOpVOIDensityEditor::OnEvent(albaEventBase *alba_event)
 					return;
 				m_Surface->Update();
 				vtkALBASmartPointer<vtkFeatureEdges> FE;
-				FE->SetInput((vtkPolyData *)(m_Surface->GetOutput()->GetVTKData()));
+				FE->SetInputData((vtkPolyData *)(m_Surface->GetOutput()->GetVTKData()));
 				FE->SetFeatureAngle(30);
 				FE->SetBoundaryEdges(1);
 				FE->SetColoring(0);
@@ -188,7 +188,7 @@ void albaOpVOIDensityEditor::EditVolumeScalars()
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> transformDataClipper;
   transformDataClipper->SetTransform(transform);
-  transformDataClipper->SetInput(polydata);
+  transformDataClipper->SetInputData(polydata);
   transformDataClipper->Update();
 
 	vtkALBASmartPointer<vtkALBAImplicitPolyData> implicitSurface;
@@ -199,7 +199,6 @@ void albaOpVOIDensityEditor::EditVolumeScalars()
 	implicitBox->Modified();
 
   vtkDataSet *volumeData = m_Input->GetOutput()->GetVTKData();
-  volumeData->Update();
   
   if (volumeData->IsA("vtkImageData"))
   {
@@ -225,13 +224,12 @@ void albaOpVOIDensityEditor::EditVolumeScalars()
       {
         //edit the corresponding point's scalar value
         pointId = volumeData->FindPoint(point);
-        volumeData->GetPointData()->SetTuple(pointId, &m_ScalarValue);
+        volumeData->GetPointData()->GetScalars()->SetTuple(pointId, &m_ScalarValue);
       }
     }
   }
 
   volumeData->GetPointData()->GetScalars()->Modified();
-  volumeData->Update();
 
   if (!m_TestMode)
   {

@@ -211,7 +211,7 @@ void albaOpVolumeResample::CreateGizmos()
 	transform->SetMatrix(inputVolume->GetOutput()->GetMatrix()->GetVTKMatrix());
 	transform->Update();
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> transformFilter;
-	transformFilter->SetInput(polydata);
+	transformFilter->SetInputData(polydata);
 	transformFilter->SetTransform(transform);
 	transformFilter->Update();
 	transformFilter->GetOutput()->GetCenter(m_VolumeCenterPosition);
@@ -486,13 +486,6 @@ void albaOpVolumeResample::Resample()
         volumeResampleFilter->SetVolumeAxisX(xAxis);
         volumeResampleFilter->SetVolumeAxisY(yAxis);
         
-        vtkALBASmartPointer<vtkImageData> outputSPVtkData;
-        outputSPVtkData->SetSpacing(m_VolumeSpacing);
-        outputSPVtkData->SetScalarType(inputData->GetPointData()->GetScalars()->GetDataType());
-        outputSPVtkData->SetExtent(outputSPExtent);
-        outputSPVtkData->SetUpdateExtent(outputSPExtent);
-
-        vtkDoubleArray *scalar = vtkDoubleArray::SafeDownCast(outputSPVtkData->GetPointData()->GetScalars());
         
         inputData->GetScalarRange(sr);
 
@@ -501,23 +494,21 @@ void albaOpVolumeResample::Resample()
 
         volumeResampleFilter->SetWindow(w);
         volumeResampleFilter->SetLevel(l);
-        volumeResampleFilter->SetInput(inputData);
-        volumeResampleFilter->SetOutput(outputSPVtkData);
+        volumeResampleFilter->SetInputData(inputData);
+				volumeResampleFilter->SetOutputSpacing(m_VolumeSpacing);
+				volumeResampleFilter->SetOutputExtent(outputSPExtent);
         volumeResampleFilter->AutoSpacingOff();
         volumeResampleFilter->Update();
         
         std::ostringstream stringStream;
-        volumeResampleFilter->PrintSelf(stringStream,NULL);
+        volumeResampleFilter->PrintSelf(stringStream,vtkIndent(0));
         albaLogMessage(stringStream.str().c_str());
 
         stringStream.str("");
         this->PrintSelf(stringStream);
         albaLogMessage(stringStream.str().c_str());
 
-        outputSPVtkData->SetSource(NULL);
-        outputSPVtkData->SetOrigin(m_VolumeBounds[0],m_VolumeBounds[2],m_VolumeBounds[4]);
-
-        m_ResampledVme->SetDataByDetaching(outputSPVtkData, input_item->GetTimeStamp());
+        m_ResampledVme->SetDataByDetaching(volumeResampleFilter->GetOutput(), input_item->GetTimeStamp());
         m_ResampledVme->Update();
       }
     }
@@ -1128,7 +1119,6 @@ void albaOpVolumeResample::ShiftCenterResampled()
 
 	vtkALBASmartPointer<vtkPolyData> poly;
 	poly->SetPoints(points);
-	poly->Update();
 
 	vtkALBASmartPointer<vtkTransform> t;
 	t->RotateX(m_ROIOrientation[0]);
@@ -1138,7 +1128,7 @@ void albaOpVolumeResample::ShiftCenterResampled()
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> ptf;
 	ptf->SetTransform(t);
-	ptf->SetInput(poly);
+	ptf->SetInputData(poly);
 	ptf->Update();
 
 	double pt[3];
@@ -1293,7 +1283,6 @@ void albaOpVolumeResample::PrintInt3( ostream& os, int array[3], const char *log
 void albaOpVolumeResample::PrintVolume( ostream& os , albaVME *volume , const char *logMessage /*= NULL*/ )
 {
   albaVMEVolumeGray *input = albaVMEVolumeGray::SafeDownCast(volume);
-  input->GetOutput()->GetVTKData()->Update();
   vtkDataSet *inputDataSet = input->GetOutput()->GetVTKData();
   if (logMessage) os << logMessage << std::endl;
   os << "data is: ";

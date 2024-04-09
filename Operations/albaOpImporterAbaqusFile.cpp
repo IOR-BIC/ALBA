@@ -940,7 +940,7 @@ albaMatrix albaOpImporterAbaqusFile::RotationMatrixUnnormalizedDirVector(double 
   double v= e-b;
   double w= f-c;
 
-  double thetaRad=vtkMath::DegreesToRadians()*theta;
+  double thetaRad=vtkMath::RadiansFromDegrees(theta);
 
   double l = sqrt(u*u + v*v + w*w);
 

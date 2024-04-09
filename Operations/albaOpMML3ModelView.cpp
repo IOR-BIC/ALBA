@@ -416,11 +416,10 @@ void albaOpMML3ModelView::FindSizeAndResolutionOfScans()
   tr->SetMatrix(m_SlicePoseInvMat[0]) ;
 
   vtkTransformPolyDataFilter *tpdf = vtkTransformPolyDataFilter::New() ;
-  tpdf->SetInput(m_MuscleInput) ;
+  tpdf->SetInputData(m_MuscleInput) ;
   tpdf->SetTransform(tr) ;
 
   double bounds[6];
-  tpdf->GetOutput()->Update() ;
   tpdf->GetOutput()->GetBounds(bounds) ;
 
   tr->Delete() ;
@@ -1956,10 +1955,9 @@ void albaOpMML3ModelView::CalculateCenterOfVtkPlane(double sizx, double sizy, do
   t->Scale(sizx, sizy, 1) ;
 
   vtkTransformPolyDataFilter *tpdf = vtkTransformPolyDataFilter::New() ;
-  tpdf->SetInput(plane->GetOutput()) ;
+  tpdf->SetInputConnection(plane->GetOutputPort()) ;
   tpdf->SetTransform(t) ;
 
-  tpdf->GetOutput()->Update() ;
   tpdf->GetOutput()->GetCenter(p) ;
   double b[6] ;
   tpdf->GetOutput()->GetBounds(b) ;

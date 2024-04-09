@@ -194,10 +194,10 @@ int albaVMELandmarkCloud::SetData(vtkDataSet *data, albaTimeStamp t, int mode)
   return ALBA_ERROR;
 }
 //-------------------------------------------------------------------------
-unsigned long albaVMELandmarkCloud::GetMTime()
+vtkMTimeType albaVMELandmarkCloud::GetMTime()
 {
-  unsigned long mtime = Superclass::GetMTime();
-  unsigned long mtimelm;
+	vtkMTimeType mtime = Superclass::GetMTime();
+	vtkMTimeType mtimelm;
   for (int i = 0; i < GetNumberOfChildren(); i++)
   {
     albaVMELandmark *vme = albaVMELandmark::SafeDownCast(GetChild(i));

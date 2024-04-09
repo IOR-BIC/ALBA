@@ -186,7 +186,7 @@ void albaOpTransformInterface::OpDo()
       pd->DeepCopy(currentPD);
 
       vtkALBASmartPointer<vtkTransformPolyDataFilter> tPDF;
-      tPDF->SetInput(pd);
+      tPDF->SetInputData(pd);
       tPDF->SetTransform(scaleTransform);
 
       // progress bar stuff
@@ -210,7 +210,7 @@ void albaOpTransformInterface::OpDo()
       ug->DeepCopy(currentUG);
 
       vtkALBASmartPointer<vtkTransformFilter> tf;
-      tf->SetInput(ug);
+      tf->SetInputData(ug);
       tf->SetTransform(scaleTransform);
 
       // progress bar stuff

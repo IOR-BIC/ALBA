@@ -93,7 +93,7 @@ albaViewOrthoSlice::albaViewOrthoSlice(wxString label)
 
   m_CanPlugVisualPipes=true;
 
-  m_TrilinearInterpolationOn = TRUE;
+  m_TrilinearInterpolationOn = true;
 
 	m_Root = NULL;
 

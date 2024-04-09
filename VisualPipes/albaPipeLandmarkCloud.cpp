@@ -69,7 +69,7 @@ albaPipeLandmarkCloud::albaPipeLandmarkCloud()
 	m_CloundCornerFilter = NULL;
 
   m_Radius = 1.0;
-  m_ScalarVisibility = FALSE;
+  m_ScalarVisibility = false;
   m_RenderingDisplayListFlag = 0;
 }
 //----------------------------------------------------------------------------

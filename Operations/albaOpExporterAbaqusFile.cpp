@@ -161,7 +161,6 @@ int albaOpExporterAbaqusFile::Write()
 
   input->Update();
   input->GetUnstructuredGridOutput()->Update();
-  input->GetUnstructuredGridOutput()->GetVTKData()->Update();
 
   // Init ProgressBar
   m_ProgressHelper = new albaProgressBarHelper(m_Listener);
@@ -277,7 +276,7 @@ int albaOpExporterAbaqusFile::WriteNodesFile(FILE *file)
     inUGDeepCopy = vtkUnstructuredGrid::New();
     inUGDeepCopy->DeepCopy(inputUGrid);
 
-    transformFilter->SetInput(inUGDeepCopy);
+    transformFilter->SetInputData(inUGDeepCopy);
     transformFilter->SetTransform(transform);
     transformFilter->Update();
 

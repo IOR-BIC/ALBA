@@ -135,7 +135,7 @@ void albaOpImporterRAWVolume::OpRun()
 	vtkNEW(m_LookupTable);
 
   vtkALBASmartPointer<vtkTexture> texture;
-	texture->SetInput(m_Reader->GetOutput());
+	texture->SetInputConnection(m_Reader->GetOutputPort());
 	texture->InterpolateOn();
   texture->MapColorScalarsThroughLookupTableOn();
   texture->SetLookupTable((vtkLookupTable *)m_LookupTable);
@@ -143,7 +143,7 @@ void albaOpImporterRAWVolume::OpRun()
 	vtkALBASmartPointer<vtkPlaneSource> plane;
 
 	vtkALBASmartPointer<vtkPolyDataMapper> mapper;
-	mapper ->SetInput(plane->GetOutput());
+	mapper ->SetInputConnection(plane->GetOutputPort());
 
 	vtkNEW(m_Actor);
 	m_Actor->SetMapper(mapper);
@@ -478,7 +478,7 @@ bool albaOpImporterRAWVolume::Import()
 	reader->Update();
 
   vtkALBASmartPointer<vtkImageToStructuredPoints> image_to_sp;
-  image_to_sp->SetInput(reader->GetOutput());
+  image_to_sp->SetInputConnection(reader->GetOutputPort());
   image_to_sp->Update();
 
 	if(m_BuildRectilinearGrid)

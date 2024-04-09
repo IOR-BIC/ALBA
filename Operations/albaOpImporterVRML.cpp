@@ -234,7 +234,6 @@ void  albaOpImporterVRML::ImportVRML()
       albaSmartPointer<albaVMESurface> surface;
       surface->SetName(name.ToAscii());
       vtkPolyData *data = (vtkPolyData *)actor->GetMapper()->GetInput();
-      data->Update();
       if(data->GetNumberOfPolys() != 0)
       {
         surface->SetData(data,t);

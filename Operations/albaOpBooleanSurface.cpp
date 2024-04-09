@@ -328,7 +328,7 @@ void albaOpBooleanSurface::Clip()
 
 	m_ClipperPlane->SetTransform(tr);
 	vtkALBASmartPointer<vtkClipPolyData>clipper;
-	clipper->SetInput(vtkPolyData::SafeDownCast(m_FirstOperatorVME->GetOutput()->GetVTKData()));
+	clipper->SetInputData(vtkPolyData::SafeDownCast(m_FirstOperatorVME->GetOutput()->GetVTKData()));
 	clipper->SetClipFunction(m_ClipperPlane);
 	tr->Delete();
 	mat->Delete();
@@ -341,7 +341,6 @@ void albaOpBooleanSurface::Clip()
 	vtkPolyData *resultPolydata;
 	vtkNEW(resultPolydata);
 	resultPolydata->DeepCopy(clipper->GetOutput());
-	resultPolydata->Update();
 
 	int result=m_FirstOperatorVME->SetData(resultPolydata,0);
 
@@ -393,24 +392,24 @@ void albaOpBooleanSurface::Union()
 		{
 			vtkALBASmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
 			transformFirstDataInput->SetTransform((vtkAbstractTransform *)m_FirstOperatorVME->GetAbsMatrixPipe()->GetVTKTransform());
-			transformFirstDataInput->SetInput((vtkPolyData *)m_FirstOperatorVME->GetOutput()->GetVTKData());
+			transformFirstDataInput->SetInputData((vtkPolyData *)m_FirstOperatorVME->GetOutput()->GetVTKData());
 			transformFirstDataInput->Update();
 
 			vtkALBASmartPointer<vtkTransformPolyDataFilter> transformSecondDataInput;
 			transformSecondDataInput->SetTransform((vtkAbstractTransform *)m_SecondOperatorVME->GetAbsMatrixPipe()->GetVTKTransform());
-			transformSecondDataInput->SetInput((vtkPolyData *)m_SecondOperatorVME->GetOutput()->GetVTKData());
+			transformSecondDataInput->SetInputData((vtkPolyData *)m_SecondOperatorVME->GetOutput()->GetVTKData());
 			transformSecondDataInput->Update();
 
 			//Union
 			vtkALBASmartPointer<vtkAppendPolyData> append;
-			append->SetInput(transformFirstDataInput->GetOutput());
-			append->AddInput(transformSecondDataInput->GetOutput());
+			append->SetInputConnection(transformFirstDataInput->GetOutputPort());
+			append->AddInputConnection(transformSecondDataInput->GetOutputPort());
 			append->Update();
 			//End Union
 
 			vtkALBASmartPointer<vtkTransformPolyDataFilter> transformResultDataInput;
 			transformResultDataInput->SetTransform((vtkAbstractTransform *)m_FirstOperatorVME->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
-			transformResultDataInput->SetInput(append->GetOutput());
+			transformResultDataInput->SetInputConnection(append->GetOutputPort());
 			transformResultDataInput->Update();
 
 			vtkPolyData *resultPolydata;
@@ -445,13 +444,13 @@ void albaOpBooleanSurface::Intersection()
 			vtkTransformPolyDataFilter *transformFirstDataInput;
 			vtkNEW(transformFirstDataInput);
 			transformFirstDataInput->SetTransform((vtkAbstractTransform *)m_FirstOperatorVME->GetAbsMatrixPipe()->GetVTKTransform());
-			transformFirstDataInput->SetInput((vtkPolyData *)m_FirstOperatorVME->GetOutput()->GetVTKData());
+			transformFirstDataInput->SetInputData((vtkPolyData *)m_FirstOperatorVME->GetOutput()->GetVTKData());
 			transformFirstDataInput->Update();
 
 			vtkTransformPolyDataFilter *transformSecondDataInput;
 			vtkNEW(transformSecondDataInput);
 			transformSecondDataInput->SetTransform((vtkAbstractTransform *)m_SecondOperatorVME->GetAbsMatrixPipe()->GetVTKTransform());
-			transformSecondDataInput->SetInput((vtkPolyData *)m_SecondOperatorVME->GetOutput()->GetVTKData());
+			transformSecondDataInput->SetInputData((vtkPolyData *)m_SecondOperatorVME->GetOutput()->GetVTKData());
 			transformSecondDataInput->Update();
 
 			//Intersection
@@ -460,13 +459,13 @@ void albaOpBooleanSurface::Intersection()
 			// triangulate input for subdivision filter
 			vtkTriangleFilter *triangles;
 			vtkNEW(triangles);
-			triangles->SetInput(transformFirstDataInput->GetOutput());
+			triangles->SetInputConnection(transformFirstDataInput->GetOutputPort());
 			triangles->Update();
 
 			// subdivide triangles in sphere 1 to get better clipping
 			vtkLinearSubdivisionFilter *subdivider;
 			vtkNEW(subdivider);
-			subdivider->SetInput(triangles->GetOutput());
+			subdivider->SetInputConnection(triangles->GetOutputPort());
 			subdivider->SetNumberOfSubdivisions(m_Subdivision);   //  use  this  (0-3+)  to  see improvement in clipping
 			subdivider->Update();
 
@@ -476,7 +475,7 @@ void albaOpBooleanSurface::Intersection()
 
 			vtkClipPolyData *clipper;
 			vtkNEW(clipper);
-			clipper->SetInput(subdivider->GetOutput());
+			clipper->SetInputConnection(subdivider->GetOutputPort());
 			clipper->SetClipFunction(implicitPolyData);
 
 			clipper->SetGenerateClipScalars(0); // 0 outputs input data scalars, 1 outputs implicit function values
@@ -489,13 +488,12 @@ void albaOpBooleanSurface::Intersection()
 			vtkTransformPolyDataFilter *transformResultDataInput;
 			vtkNEW(transformResultDataInput);
 			transformResultDataInput->SetTransform((vtkAbstractTransform *)m_FirstOperatorVME->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
-			transformResultDataInput->SetInput(clipper->GetOutput());
+			transformResultDataInput->SetInputConnection(clipper->GetOutputPort());
 			transformResultDataInput->Update();
 
 			vtkPolyData *resultPolydata;
 			vtkNEW(resultPolydata);
 			resultPolydata->DeepCopy(transformResultDataInput->GetOutput());
-			resultPolydata->Update();
 
 			int result=m_FirstOperatorVME->SetData(resultPolydata,m_Input->GetTimeStamp());
 
@@ -564,8 +562,8 @@ void albaOpBooleanSurface::ShowClipPlane(bool show)
 			arrow_shape->SetTipResolution(40);
 
 			//vtkNEW(m_Arrow);
-			m_Arrow->SetInput(m_PlaneSource->GetOutput());
-			m_Arrow->SetSource(arrow_shape->GetOutput());
+			m_Arrow->SetInputConnection(m_PlaneSource->GetOutputPort());
+			m_Arrow->SetSourceConnection(arrow_shape->GetOutputPort());
 			m_Arrow->SetVectorModeToUseNormal();
 
 			int clip_sign = m_ClipInside ? 1 : -1;
@@ -574,8 +572,8 @@ void albaOpBooleanSurface::ShowClipPlane(bool show)
 			m_Arrow->Update();
 
 			vtkALBASmartPointer<vtkAppendPolyData> gizmo;
-			gizmo->AddInput(m_PlaneSource->GetOutput());
-			gizmo->AddInput(m_Arrow->GetOutput());
+			gizmo->AddInputConnection(m_PlaneSource->GetOutputPort());
+			gizmo->AddInputConnection(m_Arrow->GetOutputPort());
 			gizmo->Update();
 
 			//albaNEW(m_ImplicitPlaneGizmo);
@@ -665,13 +663,13 @@ void albaOpBooleanSurface::Difference()
 			vtkTransformPolyDataFilter *transformFirstDataInput;
 			vtkNEW(transformFirstDataInput);
 			transformFirstDataInput->SetTransform((vtkAbstractTransform *)m_FirstOperatorVME->GetAbsMatrixPipe()->GetVTKTransform());
-			transformFirstDataInput->SetInput((vtkPolyData *)m_FirstOperatorVME->GetOutput()->GetVTKData());
+			transformFirstDataInput->SetInputData((vtkPolyData *)m_FirstOperatorVME->GetOutput()->GetVTKData());
 			transformFirstDataInput->Update();
 
 			vtkTransformPolyDataFilter *transformSecondDataInput;
 			vtkNEW(transformSecondDataInput);
 			transformSecondDataInput->SetTransform((vtkAbstractTransform *)m_SecondOperatorVME->GetAbsMatrixPipe()->GetVTKTransform());
-			transformSecondDataInput->SetInput((vtkPolyData *)m_SecondOperatorVME->GetOutput()->GetVTKData());
+			transformSecondDataInput->SetInputData((vtkPolyData *)m_SecondOperatorVME->GetOutput()->GetVTKData());
 			transformSecondDataInput->Update();
 
 			//Intersection
@@ -680,13 +678,13 @@ void albaOpBooleanSurface::Difference()
 			// triangulate input for subdivision filter
 			vtkTriangleFilter *triangles;
 			vtkNEW(triangles);
-			triangles->SetInput(transformFirstDataInput->GetOutput());
+			triangles->SetInputConnection(transformFirstDataInput->GetOutputPort());
 			triangles->Update();
 
 			// subdivide triangles in sphere 1 to get better clipping
 			vtkLinearSubdivisionFilter *subdivider;
 			vtkNEW(subdivider);
-			subdivider->SetInput(triangles->GetOutput());
+			subdivider->SetInputConnection(triangles->GetOutputPort());
 			subdivider->SetNumberOfSubdivisions(m_Subdivision);   //  use  this  (0-3+)  to  see improvement in clipping
 			subdivider->Update();
 
@@ -696,7 +694,7 @@ void albaOpBooleanSurface::Difference()
 
 			vtkClipPolyData *clipper;
 			vtkNEW(clipper);
-			clipper->SetInput(subdivider->GetOutput());
+			clipper->SetInputConnection(subdivider->GetOutputPort());
 			clipper->SetClipFunction(implicitPolyData);
 
 			clipper->SetGenerateClipScalars(0); // 0 outputs input data scalars, 1 outputs implicit function values
@@ -709,7 +707,7 @@ void albaOpBooleanSurface::Difference()
 			vtkTransformPolyDataFilter *transformResultDataInput;
 			vtkNEW(transformResultDataInput);
 			transformResultDataInput->SetTransform((vtkAbstractTransform *)m_FirstOperatorVME->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
-			transformResultDataInput->SetInput(clipper->GetOutput());
+			transformResultDataInput->SetInputConnection(clipper->GetOutputPort());
 			transformResultDataInput->Update();
 
 			vtkPolyData *resultPolydata;
@@ -719,10 +717,7 @@ void albaOpBooleanSurface::Difference()
 			int result=m_FirstOperatorVME->SetData(resultPolydata,m_Input->GetTimeStamp());
 			if(result == ALBA_ERROR)
 			{
-				if (!m_TestMode)
-					albaMessage(_("The result surface hasn't any points"), _("Warning"), wxICON_EXCLAMATION);
-				else
-					albaLogMessage("Warning: The result surface hasn't any points");
+				albaMessage(_("The result surface hasn't any points"),_("Warning"),wxICON_EXCLAMATION);
 				albaDEL(resultPolydata);
 			}
 			else
@@ -761,7 +756,7 @@ void albaOpBooleanSurface::VmeChoose(albaString title,albaEvent *e)
   {
     vtkALBASmartPointer<vtkTransformPolyDataFilter> transformSecondDataInput;
     transformSecondDataInput->SetTransform((vtkAbstractTransform *)e->GetVme()->GetAbsMatrixPipe()->GetVTKTransform());
-    transformSecondDataInput->SetInput((vtkPolyData *)e->GetVme()->GetOutput()->GetVTKData());
+    transformSecondDataInput->SetInputData((vtkPolyData *)e->GetVme()->GetOutput()->GetVTKData());
     transformSecondDataInput->Update();
 
     albaNEW(m_SecondOperatorFromParametric);

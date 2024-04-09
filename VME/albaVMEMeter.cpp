@@ -853,7 +853,7 @@ void albaVMEMeter::OnEvent(albaEventBase *alba_event)
           m_HistogramRWI->SetSize(0,0,width,height);
 
           m_HistogramDialog->SetSize(x_init,y_init,width,height);
-          m_HistogramDialog->Show(FALSE);
+          m_HistogramDialog->Show(false);
         }
         
         GenerateHistogram(m_GenerateHistogram);

@@ -134,7 +134,7 @@ albaViewArbitrarySlice::albaViewArbitrarySlice(wxString label, bool show_ruler)
 	m_AllSurface = 0;
 	m_Border = 1;
 
-	m_TrilinearInterpolationOn = TRUE;
+	m_TrilinearInterpolationOn = true;
 	m_CameraFollowGizmo = false;
 	m_EnableGPU = true;
 	m_SkipCameraUpdate = 0;

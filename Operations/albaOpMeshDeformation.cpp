@@ -958,12 +958,10 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
             
       _VERIFY_RET(NULL != (pPoly = vtkPolyData::SafeDownCast(
         m_OCToAdd->GetOutput()->GetVTKData()))); 
-      pPoly->Update();
       VertCount[0] = pPoly->GetPoints()->GetNumberOfPoints();
       
       _VERIFY_RET(NULL != (pPoly = vtkPolyData::SafeDownCast(
         m_DCToAdd->GetOutput()->GetVTKData())));
-      pPoly->Update();
       VertCount[1] = pPoly->GetPoints()->GetNumberOfPoints();
 
       pCC = vtkIdList::New();
@@ -1324,7 +1322,6 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
   UpdateControlCurve(pCurve, CHANGE_ALL);
   UpdateControlCurveVisibility(pCurve);
 */
-  m_Meshes[0]->pPoly->Update();
   vtkCharArray* scalars = vtkCharArray::SafeDownCast(
     m_Meshes[0]->pPoly->GetPointData()->GetScalars());
   if (scalars != NULL)
@@ -1404,10 +1401,10 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
 //Volume preservation feature
 #ifdef DEBUG_albaOpMeshDeformation
   vtkMassProperties* props = vtkMassProperties::New();
-  props->SetInput(m_Meshes[0]->pPoly); //GetVolume calls Update    
+  props->SetInputData(m_Meshes[0]->pPoly); //GetVolume calls Update    
   double dblOrigVolume = props->GetVolume();
 
-  props->SetInput(m_Meshes[1]->pPoly);  //GetVolume calls Update      
+  props->SetInputData(m_Meshes[1]->pPoly);  //GetVolume calls Update      
   double dblNewVolume = props->GetVolume();
   props->Delete();
 
@@ -2197,8 +2194,8 @@ void albaOpMeshDeformation::DeformMeshT()
 {
   vtkALBASmartPointer< T > md;
 
-  md->SetInput(m_Meshes[0]->pPoly);    
-  md->SetOutput(m_Meshes[1]->pPoly);
+  md->SetInputData(m_Meshes[0]->pPoly);    
+ 
 
   int nCount = (int)m_Curves.size();
   md->SetNumberOfSkeletons(nCount);
@@ -2209,7 +2206,9 @@ void albaOpMeshDeformation::DeformMeshT()
   }
 
   md->Update();
-  md->SetOutput(NULL);    //disconnect output from the filter
+
+	m_Meshes[1]->pPoly->DeepCopy(md->GetOutput());
+
 }
 
 //------------------------------------------------------------------------
@@ -2252,7 +2251,7 @@ void albaOpMeshDeformation::DeformMeshT()
 
   vtkNEW(m_SelPointGlyph);
   vtkPolyDataMapper* pMapper = vtkPolyDataMapper::New();
-  pMapper->SetInput(m_SelPointGlyph->GetOutput());
+  pMapper->SetInputConnection(m_SelPointGlyph->GetOutputPort());
 
   vtkNEW(m_SelPointActor);
   m_SelPointActor->SetMapper(pMapper);
@@ -2342,7 +2341,6 @@ albaPolylineGraph* albaOpMeshDeformation::CreatePolylineGraph(albaVME* vme)
     vme->GetOutput()->GetVTKData());  
 
   _VERIFY_RETVAL(NULL != pPoly, NULL);  
-  pPoly->Update();  //to force construction of vtkPoints
 
   albaPolylineGraph* pRet = new albaPolylineGraph();
   if (pRet->CopyFromPolydata(pPoly))
@@ -2430,21 +2428,21 @@ albaOpMeshDeformation::CONTROL_CURVE* albaOpMeshDeformation::
     {
       //correspondences are just tubes no spheres
       pRet->pTubes[i]->SetRadius(m_Spheres[0]->GetRadius() / 4);
-      pMapper->SetInput(pRet->pTubes[i]->GetOutput());
+      pMapper->SetInputConnection(pRet->pTubes[i]->GetOutputPort());
     }
     else
     {
       pRet->pTubes[i]->SetRadius(m_Spheres[i]->GetRadius() / 2);
 
       pRet->pGlyphs[i] = vtkGlyph3D::New();
-      pRet->pGlyphs[i]->SetSource(m_Spheres[i]->GetOutput());
+      pRet->pGlyphs[i]->SetSourceConnection(m_Spheres[i]->GetOutputPort());
       pRet->pGlyphs[i]->SetScaleModeToDataScalingOff();
       pRet->pGlyphs[i]->SetRange(0.0,1.0);
 
       vtkAppendPolyData* pAppendPoly = vtkAppendPolyData::New();
-      pAppendPoly->AddInput(pRet->pTubes[i]->GetOutput());
-      pAppendPoly->AddInput(pRet->pGlyphs[i]->GetOutput());
-      pMapper->SetInput(pAppendPoly->GetOutput());
+      pAppendPoly->AddInputConnection(pRet->pTubes[i]->GetOutputPort());
+      pAppendPoly->AddInputConnection(pRet->pGlyphs[i]->GetOutputPort());
+      pMapper->SetInputConnection(pAppendPoly->GetOutputPort());
       pAppendPoly->Delete();  //this is no longer needed
     }
 
@@ -2471,7 +2469,7 @@ void albaOpMeshDeformation::UpdateMesh(MESH* pMesh)
     pMesh->pActor->SetVisibility(0);
   else
   {
-    pMesh->pMapper->SetInput(pMesh->pPoly);
+    pMesh->pMapper->SetInputData(pMesh->pPoly);
     pMesh->pMapper->Update();
 
     pMesh->pActor->SetVisibility(1);
@@ -2574,8 +2572,8 @@ void albaOpMeshDeformation::UpdateControlCurve(CONTROL_CURVE* pCurve, int flags)
     {
       //set tubes and glyphs      
       if (i != 2)
-        pCurve->pGlyphs[i]->SetInput(pCurve->pPolys[i]);
-      pCurve->pTubes[i]->SetInput(pCurve->pPolys[i]);
+        pCurve->pGlyphs[i]->SetInputData(pCurve->pPolys[i]);
+      pCurve->pTubes[i]->SetInputData(pCurve->pPolys[i]);
       pCurve->pActors[i]->GetMapper()->Update();      
       pCurve->pActors[i]->SetVisibility(1);
     }

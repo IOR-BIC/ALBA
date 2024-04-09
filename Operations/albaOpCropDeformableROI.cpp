@@ -208,7 +208,7 @@ void albaOpCropDeformableROI::Algorithm(albaVME *vme)
 			// to delete
 			transformFilter = vtkTransformFilter::New();
 			
-			transformFilter->SetInput(maskPolydata);
+			transformFilter->SetInputData(maskPolydata);
 			transformFilter->SetTransform(transform);
 			transformFilter->Update();
 
@@ -218,7 +218,7 @@ void albaOpCropDeformableROI::Algorithm(albaVME *vme)
 
 		vtkNEW(m_MaskPolydataFilter);
 		albaVMEVolumeGray *volume = albaVMEVolumeGray::SafeDownCast(m_Input);
-		m_MaskPolydataFilter->SetInput(volume->GetOutput()->GetVTKData());
+		m_MaskPolydataFilter->SetInputData(volume->GetOutput()->GetVTKData());
 		m_MaskPolydataFilter->SetDistance(m_Distance);
 		m_MaskPolydataFilter->SetTriplePass(m_TriplePass);
 		m_MaskPolydataFilter->SetInsideValue(m_InsideValue);

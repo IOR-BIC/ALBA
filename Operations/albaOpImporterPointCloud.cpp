@@ -370,7 +370,6 @@ int albaOpImporterPointCloud::Import(void)
 	vtkDEL(polys);
 
 	polydata->Modified();
-	polydata->Update();
 	pointCloudVME->SetData(polydata,0);
 	vtkDEL(polydata);
 

@@ -282,7 +282,7 @@ albaGUILutEditor::albaGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoin
     sizer->Add(sz,0,wxALL, M);
   }
 
-  this->SetAutoLayout( TRUE );
+  this->SetAutoLayout( true );
   this->SetSizer( sizer );
   sizer->Fit(this);
   sizer->SetSizeHints(this);

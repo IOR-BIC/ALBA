@@ -142,7 +142,7 @@ albaGUIMDIFrame::albaGUIMDIFrame(const wxString& title, const wxPoint& pos, cons
   Centre();
 
 #ifdef __WIN32__
-  ((wxWindow *)this)->DragAcceptFiles(TRUE);
+  ((wxWindow *)this)->DragAcceptFiles(true);
 #endif
 
   wxIconBundle ib;

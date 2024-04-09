@@ -18,7 +18,7 @@
 #define __albaParabolicMeshToLinearMeshFilter_h
 
 #include "albaDefines.h"
-#include "vtkUnstructuredGridToUnstructuredGridFilter.h"
+#include "vtkUnstructuredGridAlgorithm.h"
 
 /**
  albaParabolicMeshToLinearMeshFilter is a filter to linearize a mesh made of parabolic elements.
@@ -26,12 +26,12 @@
  Currently supported cells are 10 nodes tetra and 20 nodes hexa.
  If the input mesh is already linear or made of unsupported type elements the filter is simply bypassed.
 */
-class ALBA_EXPORT albaParabolicMeshToLinearMeshFilter : public vtkUnstructuredGridToUnstructuredGridFilter
+class ALBA_EXPORT albaParabolicMeshToLinearMeshFilter : public vtkUnstructuredGridAlgorithm
 {
 
 public:
   
-  vtkTypeMacro(albaParabolicMeshToLinearMeshFilter,vtkUnstructuredGridToUnstructuredGridFilter);
+  vtkTypeMacro(albaParabolicMeshToLinearMeshFilter,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static albaParabolicMeshToLinearMeshFilter *New();
@@ -41,7 +41,7 @@ protected:
   albaParabolicMeshToLinearMeshFilter();
   ~albaParabolicMeshToLinearMeshFilter();
 
-  void Execute();
+	int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
 private:
 

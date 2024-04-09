@@ -401,7 +401,7 @@ vtkImageData *albaOpExtractImageFromArbitraryView::GetSliceImageData()
 	transform->Translate(-center[0], -center[1], -center[2]);
 
 		// Reslice does all of the work
-	m_Reslice->SetInput(imageData);
+	m_Reslice->SetInputData(imageData);
 	m_Reslice->SetResliceTransform(transform);
 	m_Reslice->SetInterpolationModeToCubic();
 	m_Reslice->SetOutputSpacing(imageData->GetSpacing());

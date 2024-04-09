@@ -47,7 +47,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkImageFlip.h"
 #include "vtkImageResample.h"
 #include "vtkPointData.h"
-#include "vtkDataSetToDataSetFilter.h"
 #include "albaVMEIterator.h"
 #include "albaVME.h"
 
@@ -294,7 +293,6 @@ void albaOpInteractorSliderSample::UpdateVolumeSlice()
 		if (m_Volume->GetOutput()->GetVTKData()->IsA("vtkImageData"))
 		{
 			vtkImageData *sp = vtkImageData::SafeDownCast(m_Volume->GetOutput()->GetVTKData());
-			sp->Update();
 			double spc[3];
 			sp->GetSpacing(spc);
 			sp->GetOrigin(origin);
@@ -310,7 +308,6 @@ void albaOpInteractorSliderSample::UpdateVolumeSlice()
 		else
 		{
 			vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(m_Volume->GetOutput()->GetVTKData());
-			rg->Update();
 			origin[0] = rg->GetXCoordinates()->GetTuple1(0);
 			origin[1] = rg->GetYCoordinates()->GetTuple1(0);
 			origin[2] = rg->GetZCoordinates()->GetTuple1(0);

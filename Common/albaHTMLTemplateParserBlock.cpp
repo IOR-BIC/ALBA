@@ -544,7 +544,7 @@ void albaHTMLTemplateParserBlock::GenerateOutput( wxString *outputHTML )
       //The if-block is composed of both if and else chars 
       //when the variable is true we consider the chars from 0 to m_IfChars 
       //when the variable is false we consider the chars from m_ifChars to end
-      //[-----TRUE-----]m_ifChars[----FALSE----]
+      //[-----true-----]m_ifChars[----false----]
       if (m_IfCondition) 
         totalChars=m_IfChars;
       else 

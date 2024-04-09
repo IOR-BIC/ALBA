@@ -151,7 +151,7 @@ void albaOpInteractionDebugger::OnEvent(albaEventBase *alba_event)
         {
           OnChooseConstrainVme(vme);
 
-          assert(TRUE);
+          assert(true);
         }
       }
       break;
@@ -275,7 +275,6 @@ void albaOpInteractionDebugger::BuildVMEPolyline( vtkPoints * in_points, albaVME
   in_data->SetPoints(in_points);
   in_data->SetLines(in_cells);
   in_data->Modified();
-  in_data->Update();
 
 
   // try to set this data to the volume
@@ -343,7 +342,6 @@ void albaOpInteractionDebugger::AddalbaVMEPolylineGraphTestConstrain1ToTree()
   albaNEW(polyline);
   
   polyline->SetData(pd, -1);
-  polyline->GetOutput()->GetVTKData()->Update();
   polyline->Update();
 
   polyline->SetName("test graph");

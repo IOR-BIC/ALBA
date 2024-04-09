@@ -30,6 +30,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkPointData.h"
 #include "vtkImageData.h"
 #include "vtkImageToStructuredPoints.h"
+#include "vtkDataArray.h"
 
 #include "itkVTKImageToImageFilter.h"
 #include "itkImageToVTKImageFilter.h"
@@ -98,11 +99,10 @@ void albaOpFilterImage::OpRun()
 	if (m_ImgOut == NULL)
 	{
 		vtkImageData *im = vtkImageData::SafeDownCast(m_Input->GetOutput()->GetVTKData());
-		im->Update();
 
 		vtkALBASmartPointer<vtkImageCast> vtkImageToFloat;
 		vtkImageToFloat->SetOutputScalarTypeToFloat();
-		vtkImageToFloat->SetInput(im);
+		vtkImageToFloat->SetInputData(im);
 		vtkImageToFloat->Modified();
 		vtkImageToFloat->Update();
 
@@ -120,9 +120,7 @@ void albaOpFilterImage::OpRun()
 			vtkImageData *outputImageData;
 			vtkNEW(outputImageData);
 			outputImageData->SetDimensions(inputDimensions[0], inputDimensions[1], inputDimensions[2]);
-			outputImageData->SetNumberOfScalarComponents(1);
-			outputImageData->SetScalarType(vtkImageToFloat->GetOutput()->GetScalarType());
-			outputImageData->AllocateScalars();
+			outputImageData->AllocateScalars(vtkImageToFloat->GetOutput()->GetScalarType(),1);
 
 
 			vtkDataArray *outScalars=outputImageData->GetPointData()->GetScalars();
@@ -305,10 +303,9 @@ void albaOpFilterImage::RunFilter(FilterTypes filterType)
 
 	vtkALBASmartPointer<vtkImageData> imOut;
 	imOut->DeepCopy(itkTOvtk->GetOutput());
-	imOut->Update();
 
 	vtkALBASmartPointer<vtkImageToStructuredPoints> imTosp;
-	imTosp->SetInput(imOut);
+	imTosp->SetInputData(imOut);
 	imTosp->Update();
 
 	m_ImgOut->SetData((vtkImageData *)imTosp->GetOutput(), m_Input->GetTimeStamp());

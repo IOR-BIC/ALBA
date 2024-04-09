@@ -810,7 +810,6 @@ void albaOpRegisterClusters::OpUndo()
 				points->InsertNextPoint(coords);
 			}
 			data->SetPoints(points);
-			data->Update();
 						
 			matrix->Identity();
 			m_Registered->SetPose(*matrix,cTime);
@@ -835,7 +834,6 @@ void albaOpRegisterClusters::OpUndo()
 			points->InsertNextPoint(coords);
 		}
 		data->SetPoints(points);
-		data->Update();
 		
 		matrix->Identity();
 		m_Registered->SetMatrix(*matrix);
@@ -1022,7 +1020,7 @@ void albaOpRegisterClusters::OnChooseVme(albaVME *vme)
 	m_GuiSetWeights->Update();
 
 	m_Dialog->Add(m_GuiSetWeights,1,wxEXPAND);
-	m_Dialog->SetAutoLayout(TRUE);
+	m_Dialog->SetAutoLayout(true);
 
 	m_Dialog->ShowModal();
 }

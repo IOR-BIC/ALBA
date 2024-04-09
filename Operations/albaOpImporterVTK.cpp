@@ -162,12 +162,12 @@ int albaOpImporterVTK::ImportVTK()
 	preader->SetFileName(m_File);
 	preader->Update();
 
-	if (preader->GetNumberOfOutputs() > 0)
+  if (preader->GetNumberOfOutputPorts()>0)
 	{
 		wxString path, name, ext;
 		wxFileName::SplitPath(m_File, &path, &name, &ext);
 
-		vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
+    vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputDataObject(0));
 		if (data)
 		{
 			albaNEW(m_VmeLandmarkCloud);

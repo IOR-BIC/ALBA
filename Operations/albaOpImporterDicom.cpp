@@ -472,13 +472,11 @@ int albaOpImporterDicom::BuildVMEVolumeGrayOutput()
 
 		vtkDataSet *acc_out;
 		acc_out = accumulate.GetNewOutput(); 
-		acc_out->Update();
 
 		if (GetSetting()->GetAutoResample() && vtkRectilinearGrid::SafeDownCast(acc_out))
 		{
 			vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(acc_out);
-			vtkALBASmartPointer<vtkALBAVolumeResample> resample = vtkALBAVolumeResample::New();
-			vtkALBASmartPointer<vtkImageData> sp;
+			vtkALBASmartPointer<vtkALBAVolumeResample> resampler = vtkALBAVolumeResample::New();
 
 			double inputDataOrigin[3];
 			inputDataOrigin[0] = rg->GetXCoordinates()->GetComponent(0, 0);
@@ -523,23 +521,18 @@ int albaOpImporterDicom::BuildVMEVolumeGrayOutput()
 			output_extent[4] = 0;
 			output_extent[5] = (bounds[5] - bounds[4]) / volSpacing[2];
 
-			sp->SetSpacing(volSpacing);
-			sp->SetOrigin(inputDataOrigin);
-			sp->SetScalarType(rg->GetPointData()->GetScalars()->GetDataType());
-			sp->SetExtent(output_extent);
-			sp->SetUpdateExtent(output_extent);
+			resampler->SetVolumeOrigin(inputDataOrigin);
+			resampler->SetZeroValue(0);
+			resampler->SetWindow(w);
+			resampler->SetLevel(l);
+			resampler->SetInputData(acc_out);			
+			resampler->SetOutputExtent(output_extent);
+			resampler->SetOutputSpacing(volSpacing);
 
-			resample->SetVolumeOrigin(inputDataOrigin);
-			resample->SetZeroValue(0);
-			resample->SetWindow(w);
-			resample->SetLevel(l);
-			resample->SetInput(acc_out);
-			resample->SetOutput(sp);
-			resample->AutoSpacingOff();
-			resample->Update();
-			resample->GetOutput()->Update();
+			resampler->AutoSpacingOff();
+			resampler->Update();
 
-			VolumeOut->SetDataByDetaching(resample->GetOutput(), triggerTime);
+			VolumeOut->SetDataByDetaching(resampler->GetOutput(), triggerTime);
 		}
 		else
 		{
@@ -772,13 +765,12 @@ void albaOpImporterDicom::CreateSliceVTKPipeline()
 	vtkNEW(m_SliceActor);
 
 	m_SliceTexture->InterpolateOn();
-	m_SliceMapper->SetInput(m_SlicePlane->GetOutput());
+	m_SliceMapper->SetInputConnection(m_SlicePlane->GetOutputPort());
 	m_SliceActor->SetMapper(m_SliceMapper);
 	m_SliceActor->SetTexture(m_SliceTexture); 
 	
 	// text stuff
 	m_TextMapper = vtkTextMapper::New();
-	m_TextMapper->GetTextProperty()->AntiAliasingOn();
 
 	m_TextActor = vtkActor2D::New();
 	m_TextActor->GetProperty()->SetColor(0.8,0,0);
@@ -1082,7 +1074,6 @@ void albaOpImporterDicom::GenerateSliceTexture(int imageID)
 	assert(slice);
 
 	m_CurrentSliceID = slice->GetNewVTKImageData();
-	m_CurrentSliceID->Update();
 	m_CurrentSliceID->GetBounds(m_SliceBounds);
 	
 	//Setting ranges, range should be the range of current slice and subrange should be inside current range
@@ -1099,7 +1090,7 @@ void albaOpImporterDicom::GenerateSliceTexture(int imageID)
 	m_TextMapper->Modified();
 
 	m_CurrentSliceID->GetScalarRange(range);
-	m_SliceTexture->SetInput(m_CurrentSliceID);
+	m_SliceTexture->SetInputData(m_CurrentSliceID);
 	m_SliceTexture->Modified();
 		
 	//Invert gray scale for Photometric Interpretation MONOCHROME1
@@ -1119,10 +1110,7 @@ void albaOpImporterDicom::GenerateSliceTexture(int imageID)
 void albaOpImporterDicom::Crop(vtkImageData *slice)
 {
 	if (m_CropEnabled)
-	{
-		slice->SetUpdateExtent(m_CropExtent);
-		slice->Crop();
-	}
+		slice->Crop(m_CropExtent);
 }
 
 //----------------------------------------------------------------------------
@@ -1680,10 +1668,7 @@ vtkImageData* albaDicomSlice::GetNewVTKImageData()
 	vtkImageData *imageData;
 	vtkNEW(imageData);
 	imageData->SetDimensions(m_SliceSize[0], m_SliceSize[1], 1);
-	imageData->SetWholeExtent(0, m_SliceSize[0] - 1, 0, m_SliceSize[1] - 1, 0, 0);
-	imageData->SetUpdateExtent(0, m_SliceSize[0] - 1, 0, m_SliceSize[1] - 1, 0, 0);
-	imageData->SetExtent(imageData->GetUpdateExtent());
-	imageData->SetNumberOfScalarComponents(1);
+	imageData->SetExtent(imageData->GetExtent());
 	imageData->SetSpacing(dcmPixelSpacing[0],dcmPixelSpacing[1],dcmPixelSpacing[2]);
 	imageData->SetOrigin(m_ImagePositionPatient);
 
@@ -1694,8 +1679,7 @@ vtkImageData* albaDicomSlice::GetNewVTKImageData()
 		albaLogMessage("Unsupported pixel scalar format: ", m_SliceABSFileName.GetCStr());
 		return NULL;
 	}
-	imageData->SetScalarType(computeVTKScalarType);
-	imageData->AllocateScalars();
+	imageData->AllocateScalars(computeVTKScalarType,1);
 	imageData->GetPointData()->GetScalars()->SetName("Scalars");
 
 	char *scalarPointer = (char *)imageData->GetPointData()->GetScalars()->GetVoidPointer(0);
@@ -1720,7 +1704,6 @@ vtkImageData* albaDicomSlice::GetNewVTKImageData()
 		dcmImage.GetBuffer(scalarPointer);
 	}
 	
-	imageData->Update();
 	return imageData;
 }
 

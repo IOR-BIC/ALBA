@@ -80,7 +80,7 @@ albaOpSegmentationRegionGrowingConnectedThreshold::albaOpSegmentationRegionGrowi
   m_NumIter = 5;// this is used in smoothing
   m_TimeStep = 0.0125;// this is used in smoothing
   m_Conductance = 1.0; // this is used in smoothing
-  m_UseSpacing = TRUE;// this is used in smoothing
+  m_UseSpacing = true;// this is used in smoothing
 
   m_Picker = NULL;
   m_OldBehavior = NULL;
@@ -142,7 +142,8 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpRun()
 	  m_Sphere->ReparentTo(m_ResampleInput->GetParent());
 
 	  vtkNEW(m_SphereVTK);
-    double bounds[6];m_ResampleInput->GetOutput()->GetBounds(bounds);
+    double bounds[6];
+		m_ResampleInput->GetOutput()->GetBounds(bounds);
 	  m_SphereVTK->SetRadius((bounds[5]-bounds[4])/256);
     albaLogMessage("Sphere radius = %f",(bounds[5]-bounds[4])/256);
 	  m_SphereVTK->Update();
@@ -256,7 +257,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   
   vtkALBASmartPointer<vtkImageCast> vtkImageToFloat;
   vtkImageToFloat->SetOutputScalarTypeToFloat ();
-  vtkImageToFloat->SetInput(im);
+  vtkImageToFloat->SetInputData(im);
   vtkImageToFloat->Modified();
   vtkImageToFloat->Update();
 
@@ -281,7 +282,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   //ConnectedThresholdParams->timeStep = m_TimeStep;
   //ConnectedThresholdParams->conductance = m_Conductance;
 
-  if (m_UseSpacing == TRUE)
+  if (m_UseSpacing == true)
   {
     //ConnectedThresholdParams->useImageSpacing = true;
   } 
@@ -313,11 +314,9 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   m_VolumeOut->SetName("Connected Threshold");
 
   vtkImageData *image = ((vtkImageData*)itkTOvtk->GetOutput());
-  image->Update();
-
 
   vtkALBASmartPointer<vtkImageToStructuredPoints> image_to_sp;
-  image_to_sp->SetInput(image);
+  image_to_sp->SetInputData(image);
   image_to_sp->Update();
   m_VolumeOut->SetData((vtkImageData*)image_to_sp->GetOutput(),m_ResampleInput->GetTimeStamp());
 
@@ -378,7 +377,6 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OnEvent(albaEventBase *a
         albaVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetBounds(b);
 
         vtkImageData *sp = vtkImageData::SafeDownCast(albaVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
-        sp->Update();
 
         sp->GetSpacing(spacing);
         sp->GetOrigin(origin);
@@ -416,7 +414,6 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OnEvent(albaEventBase *a
 					GetLogicManager()->CameraUpdate();
 
           vtkImageData *sp = vtkImageData::SafeDownCast(albaVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
-          sp->Update();
 
           int id;
           id = e->GetArg();
@@ -514,7 +511,6 @@ int albaOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
     m_Resample->Resample();
      
     albaVME *Output = m_Resample->GetOutput();
-    Output->GetOutput()->GetVTKData()->Update();
     m_ResampleInput=albaVMEVolumeGray::SafeDownCast(Output);
     m_ResampleInput->Update();
 

@@ -464,7 +464,7 @@ int albaDataVector::InternalRestore(albaStorageElement *node)
     )
   {
     SetItemTypeName(item_type);
-    SetSingleFileMode(single_file == "true" || single_file == "True" || single_file == "TRUE");
+    SetSingleFileMode(single_file == "true" || single_file == "True" || single_file == "true");
     if (m_SingleFileMode)
     {
       node->GetAttribute("ArchiveFileName", m_ArchiveName);

@@ -58,7 +58,7 @@ albaOp(label)
   m_File    = "";
   m_CurrentVme = NULL;
   m_CurrentTime = -1;
-  m_SubTreeExportMeter = FALSE;
+  m_SubTreeExportMeter = false;
 
   m_ExportRadio = VME_ALL_METERS;
   m_Meters.clear();
@@ -218,7 +218,7 @@ void albaOpExporterMeters::ExportTypeOfMeters()
 {
   //must be a cicle in all vme of a msf
   albaVMEIterator *iter = NULL;
-  if(m_SubTreeExportMeter == TRUE)
+  if(m_SubTreeExportMeter == true)
   {
     iter = m_Input->NewIterator();
   }
@@ -304,7 +304,6 @@ void albaOpExporterMeters::ExportClassicMeterCoordinates(int index, int indexTim
   //classic meter
   albaVMEMeter *vmeMeter =  albaVMEMeter::SafeDownCast(m_CurrentVme);
   vmeMeter->GetOutput()->GetVTKData()->Modified();
-  vmeMeter->GetOutput()->GetVTKData()->Update();
   vmeMeter->Modified();
   vmeMeter->Update();
   vmeMeter->Update();
@@ -338,7 +337,6 @@ void albaOpExporterMeters::ExportWrappedMeterCoordinates(int index, int indexTim
   //wrapped meter
   albaVMEWrappedMeter *vmeWrappedMeter =  albaVMEWrappedMeter::SafeDownCast(m_CurrentVme);
   vmeWrappedMeter->GetOutput()->GetVTKData()->Modified();
-  vmeWrappedMeter->GetOutput()->GetVTKData()->Update();
   vmeWrappedMeter->Modified();
   vmeWrappedMeter->Update();
   

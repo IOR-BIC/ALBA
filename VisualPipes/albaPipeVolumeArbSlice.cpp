@@ -121,7 +121,7 @@ albaPipeVolumeArbSlice::albaPipeVolumeArbSlice()
 	m_ShowTICKs	 = false;
   m_EnableGPU = true;
   m_Interpolate = true;
-  m_TrilinearInterpolationOn = TRUE;
+  m_TrilinearInterpolationOn = true;
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeArbSlice::InitializeSliceParameters(bool show_vol_bbox, bool show_bounds/* =false */, bool interpolate/* =true */)

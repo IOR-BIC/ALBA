@@ -42,6 +42,8 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaTagArray.h"
 #include "wx/busyinfo.h"
 #include "vtkStructuredPoints.h"
+#include "vtkPointData.h"
+#include "vtkDataArray.h"
 
 #include <xercesc/util/XercesDefs.hpp>
 #include <xercesc/dom/DOM.hpp>
@@ -179,7 +181,7 @@ int albaOpESPCalibration::Calibrate()
 
 	vtkALBAProjectVolume *projectFilterX;
 	vtkNEW(projectFilterX);
-	projectFilterX->SetInput(volumeData);
+	projectFilterX->SetInputData(volumeData);
 	projectFilterX->SetProjectionModalityToMax();
 	projectFilterX->SetProjectionSideToX();
 	projectFilterX->Update();
@@ -194,7 +196,7 @@ int albaOpESPCalibration::Calibrate()
 
 	vtkALBAProjectVolume *projectFilterY;
 	vtkNEW(projectFilterY);
-	projectFilterY->SetInput(volumeData);
+	projectFilterY->SetInputData(volumeData);
 	projectFilterY->SetProjectionModalityToMax();
 	projectFilterY->SetProjectionSideToY();
 	projectFilterY->Update();
@@ -209,7 +211,7 @@ int albaOpESPCalibration::Calibrate()
 
 	vtkALBAProjectVolume *projectFilterYX;
 	vtkNEW(projectFilterYX);
-	projectFilterYX->SetInput(projectFilterY->GetOutput());
+	projectFilterYX->SetInputConnection(projectFilterY->GetOutputPort());
 	projectFilterYX->SetProjectionModalityToMax();
 	projectFilterYX->SetProjectionSideToY();
 	projectFilterYX->Update();
@@ -224,7 +226,7 @@ int albaOpESPCalibration::Calibrate()
 
 	vtkALBAProjectVolume *projectFilterXY;
 	vtkNEW(projectFilterXY);
-	projectFilterXY->SetInput(projectFilterX->GetOutput());
+	projectFilterXY->SetInputConnection(projectFilterX->GetOutputPort());
 	projectFilterXY->SetProjectionModalityToMax();
 	projectFilterXY->SetProjectionSideToY();
 	projectFilterXY->Update();
@@ -307,7 +309,7 @@ int albaOpESPCalibration::Calibrate()
 			projectFilterY->SetProjectSubRange(true);
 			projectFilterY->SetProjectionRange(0, rearWall);
 			projectFilterY->Update();
-			projectFilterYZ->SetInput(projectFilterY->GetOutput());
+			projectFilterYZ->SetInputConnection(projectFilterY->GetOutputPort());
 			projectFilterYZ->SetProjectSubRange(false);
 			projectFilterYZ->SetProjectionRange(0, xWingsRange.l + (xBodyRange.l - xWingsRange.l)*3/4);
 		}

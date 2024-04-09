@@ -58,8 +58,6 @@ void albaOpSegmentationHelper::SetSlices(vtkImageData *volumeSlice, vtkImageData
 //----------------------------------------------------------------------------
 void albaOpSegmentationHelper::SliceThreshold(double *threshold)
 {
-	m_VolumeSlice->Update();
-	m_SegmetationSlice->Update();
 	vtkDataArray 			*inputScalars = m_VolumeSlice->GetPointData()->GetScalars();
 	void *inputPointer = inputScalars->GetVoidPointer(0);
 	vtkDataArray *outputScalars = m_SegmetationSlice->GetPointData()->GetScalars();
@@ -91,7 +89,6 @@ void albaOpSegmentationHelper::VolumeThreshold(double *threshold)
 void albaOpSegmentationHelper::VolumeThreshold(std::vector<AutomaticInfoRange> *rangesVector)
 {
 	vtkRectilinearGrid *volRG;
-	m_VolumeSlice->Update();
 	vtkDataSet * segmentation = m_Segmentation->GetOutput()->GetVTKData();
 	vtkDataSet * volumeVtkData = m_Volume->GetOutput()->GetVTKData();
 	vtkDataArray 	*inputScalars =volumeVtkData->GetPointData()->GetScalars();
@@ -472,7 +469,6 @@ void albaOpSegmentationHelper::GetSlicePoint(int slicePlane, double * pos, int *
 void albaOpSegmentationHelper::Connectivity3d(double * pos, int slicePlane, int currentSlice)
 {
 	unsigned char background, fillValue;
-	m_VolumeSlice->Update();
 	int point[2],  dims[3];
 
 	vtkImageData * segmentation = vtkImageData::SafeDownCast(m_Segmentation->GetOutput()->GetVTKData());
@@ -567,7 +563,6 @@ void albaOpSegmentationHelper::Connectivity3d(double * pos, int slicePlane, int 
 	segmentation->Modified();
 	m_Segmentation->Modified();
 	m_SegmetationSlice->Modified();
-	m_SegmetationSlice->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -649,7 +644,6 @@ void albaOpSegmentationHelper::EndDrawing(int autofill)
 		}
 		
 		m_SegmetationSlice->Modified();
-		m_SegmetationSlice->Update();
 	}
 }
 
@@ -682,7 +676,6 @@ void albaOpSegmentationHelper::InternalReverseFill(int x, int y, int *dims, int 
 //----------------------------------------------------------------------------
 void albaOpSegmentationHelper::Fill(double *pos, int slicePlane, double thresholdPerc, bool erase)
 {
-	m_VolumeSlice->Update();
 
 	int fillValue, point[2];
 	fillValue = erase ? EMPTY_VALUE : FULL_VALUE;
@@ -690,7 +683,7 @@ void albaOpSegmentationHelper::Fill(double *pos, int slicePlane, double threshol
 
 	double *scalarRange = vol->GetScalarRange();
 	double theshExtention = (scalarRange[1] - scalarRange[0])*thresholdPerc / 100.0;
-	double pickedValue=vol->GetPointData()->GetTuple(vol->FindPoint(pos))[0];
+	double pickedValue=vol->GetPointData()->GetScalars()->GetTuple(vol->FindPoint(pos))[0];
 	double minValue = MAX(scalarRange[0], pickedValue - theshExtention);
 	double maxValue = MIN(scalarRange[1], pickedValue + theshExtention);
 

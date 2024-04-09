@@ -97,7 +97,6 @@ int albaVMEDataSetAttributesImporter::Read()
   }
 
   vtkDataSet *data = m_Input->GetOutput()->GetVTKData();
-  data->Update();
 
   if (data == NULL)
   {

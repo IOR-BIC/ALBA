@@ -122,7 +122,6 @@ void albaOpVOIDensity::OpRun()
 	if(!this->m_TestMode)
 	{
 		vtkALBASmartPointer<vtkDataSet> VolumeData = m_Input->GetOutput()->GetVTKData();
-		VolumeData->Update();
 
 		VolumeData->GetPointData()->GetScalars()->GetRange(m_SubRange);
 
@@ -266,7 +265,6 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 	vtkDEL(polys);
 
 	polydata->Modified();
-	polydata->Update();
 	pointCloudVME->SetData(polydata, 0);
 	vtkDEL(polydata);
 
@@ -315,7 +313,7 @@ int albaOpVOIDensity::SetSurface(albaVME *surface)
 		return ALBA_ERROR;
 	m_Surface->Update();
 	vtkALBASmartPointer<vtkFeatureEdges> FE;
-	FE->SetInput((vtkPolyData *)(m_Surface->GetOutput()->GetVTKData()));
+	FE->SetInputData((vtkPolyData *)(m_Surface->GetOutput()->GetVTKData()));
 	FE->SetFeatureAngle(30);
 	FE->SetBoundaryEdges(1);
 	FE->SetColoring(0);
@@ -420,7 +418,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> TransformDataFilter;
 	TransformDataFilter->SetTransform(transform);
-	TransformDataFilter->SetInput(polydata);
+	TransformDataFilter->SetInputData(polydata);
 	TransformDataFilter->Update();
 
 	vtkALBASmartPointer<vtkALBAImplicitPolyData> ImplicitSurface;
@@ -433,7 +431,6 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 	ImplicitBox->Modified();
 
 	vtkALBASmartPointer<vtkDataSet> VolumeData = m_Input->GetOutput()->GetVTKData();
-	VolumeData->Update();
 	NumberVoxels = VolumeData->GetNumberOfPoints();
 
 	albaProgressBarHelper progressHelper(m_Listener);
@@ -453,7 +450,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 			{
 				//store the corresponding point's scalar value
 				PointId = VolumeData->FindPoint(Point);
-				InsideScalar = VolumeData->GetPointData()->GetTuple(PointId)[0];
+				InsideScalar = VolumeData->GetPointData()->GetScalars()->GetTuple(PointId)[0];
 				if (!m_EvaluateInSubRange || (InsideScalar >= m_SubRange[0] && InsideScalar <= m_SubRange[1]))
 				{
 					SumScalars += InsideScalar;

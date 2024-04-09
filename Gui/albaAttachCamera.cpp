@@ -197,12 +197,12 @@ albaObserver * albaAttachCamera::GetListener()
 //----------------------------------------------------------------------------
 void albaAttachCamera::EnableAttachCamera()
 {
-  m_EnableAttachCamera = TRUE;
+  m_EnableAttachCamera = true;
 }
 //----------------------------------------------------------------------------
 void albaAttachCamera::DisableAttachCamera()
 {
-  m_EnableAttachCamera = FALSE;
+  m_EnableAttachCamera = false;
 }
 //----------------------------------------------------------------------------
 int albaAttachCamera::GetEnableAttachCamera()
