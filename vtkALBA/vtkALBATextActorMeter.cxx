@@ -99,3 +99,8 @@ void vtkALBATextActorMeter::SetColor(double r,double g,double b)
 {
   TextActor->GetTextProperty()->SetColor(r,g,b);
 }
+
+void vtkALBATextActorMeter::SetOpacity(double opacity)
+{
+	TextActor->GetTextProperty()->SetOpacity(opacity);
+}

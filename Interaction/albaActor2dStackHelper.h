@@ -25,7 +25,7 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 // Forward references :
 //----------------------------------------------------------------------------
-class vtkPolyDataSource;
+class vtkPolyDataAlgorithm;
 class vtkPolyDataMapper2D;
 class vtkActor2D;
 class vtkRenderer;
@@ -43,11 +43,11 @@ class ALBA_EXPORT albaActor2dStackHelper
 {
 public:
 	albaActor2dStackHelper();
-	albaActor2dStackHelper(vtkPolyDataSource *source, vtkRenderer *renderer);
+	albaActor2dStackHelper(vtkPolyDataAlgorithm *source, vtkRenderer *renderer);
 	virtual ~albaActor2dStackHelper();
 
 	/** Returns the PolyDataSource*/
-	vtkPolyDataSource * GetSource() const { return m_Source; }
+	vtkPolyDataAlgorithm * GetSourceAlgorithm() const { return m_Source; }
 
 	/** Returns the Mapper 2D*/
 	vtkPolyDataMapper2D * GetMapper() const { return m_Mapper; }
@@ -68,7 +68,7 @@ public:
 	void SetRenderer(vtkRenderer * val) { m_Renderer = val; }
 
 protected:
-	vtkPolyDataSource		*m_Source;
+	vtkPolyDataAlgorithm*m_Source;
 	vtkPolyDataMapper2D	*m_Mapper;
 	vtkActor2D					*m_Actor;
 	vtkRenderer					*m_Renderer;

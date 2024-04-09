@@ -81,7 +81,7 @@ void albaInteractor2DMeasure_Distance::MoveMeasure(int index, double * point)
 	double linePoint1[3];
 	double linePoint2[3];
 
-	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSource();
+	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSourceAlgorithm();
 	lineSource->GetPoint1(linePoint1);
 	lineSource->GetPoint2(linePoint2);
 
@@ -138,7 +138,7 @@ void albaInteractor2DMeasure_Distance::EditMeasure(int index, double *point)
 	double point1[3];
 	double point2[3];
 
-	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSource();
+	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSourceAlgorithm();
 	lineSource->GetPoint1(point1);
 	lineSource->GetPoint2(point2);
 
@@ -199,7 +199,7 @@ void albaInteractor2DMeasure_Distance::FindAndHighlight(double * point)
 
 			double linePoint1[3], linePoint2[3];
 
-			vtkLineSource* lineSource = (vtkLineSource*)lineStackVector->GetSource();
+			vtkLineSource* lineSource = (vtkLineSource*)lineStackVector->GetSourceAlgorithm();
 
 			lineSource->GetPoint1(linePoint1);
 			lineSource->GetPoint2(linePoint2);
@@ -252,7 +252,7 @@ void albaInteractor2DMeasure_Distance::FindAndHighlight(double * point)
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Distance::UpdateLineActors(double * point1, double * point2)
 {
-	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[m_CurrMeasure]->GetSource();
+	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[m_CurrMeasure]->GetSourceAlgorithm();
 
 	lineSource->SetPoint1(point1);
 	lineSource->SetPoint2(point2);
@@ -292,12 +292,12 @@ void albaInteractor2DMeasure_Distance::UpdateLineTickActor(double * point1, doub
 // 	m_TickStackVectorL[m_CurrMeasure]->SetColor(blue);
 // 	m_TickStackVectorR[m_CurrMeasure]->SetColor(red);
 
-	vtkLineSource* tickSourceL = (vtkLineSource*)m_TickStackVectorL[m_CurrMeasure]->GetSource();
+	vtkLineSource* tickSourceL = (vtkLineSource*)m_TickStackVectorL[m_CurrMeasure]->GetSourceAlgorithm();
 	tickSourceL->SetPoint1(tick1Point1);
 	tickSourceL->SetPoint2(tick1Point2);
 	tickSourceL->Update();
 	
-	vtkLineSource* tickSourceR = (vtkLineSource*)m_TickStackVectorR[m_CurrMeasure]->GetSource();
+	vtkLineSource* tickSourceR = (vtkLineSource*)m_TickStackVectorR[m_CurrMeasure]->GetSourceAlgorithm();
 	tickSourceR->SetPoint1(tick2Point1);
 	tickSourceR->SetPoint2(tick2Point2);
 	tickSourceR->Update();
@@ -496,7 +496,7 @@ void albaInteractor2DMeasure_Distance::GetMeasureLinePoints(int index, double *p
 	// Return line points values
 	if (index >= 0 && index < GetMeasureCount())
 	{
-		vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSource();
+		vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSourceAlgorithm();
 		lineSource->GetPoint1(point1);
 		lineSource->GetPoint2(point2);
 	}

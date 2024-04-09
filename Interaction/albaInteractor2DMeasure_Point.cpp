@@ -118,7 +118,7 @@ void albaInteractor2DMeasure_Point::FindAndHighlight(double *point)
 
 			double tmpPoint[3];
 
-			vtkPointSource* pointSource = (vtkPointSource*)pointsStackVector->GetSource();
+			vtkPointSource* pointSource = (vtkPointSource*)pointsStackVector->GetSourceAlgorithm();
 			pointSource->GetCenter(tmpPoint);
 
 			if (DistanceBetweenPoints(point, tmpPoint) < POINT_UPDATE_DISTANCE)
@@ -152,7 +152,7 @@ void albaInteractor2DMeasure_Point::ReDrawAll()
 
 	for (int i = 0; i < m_Measure2DVector.size(); i++)
 	{
-		vtkPointSource* pointSource = (vtkPointSource*)m_PointsStackVector[i]->GetSource();
+		vtkPointSource* pointSource = (vtkPointSource*)m_PointsStackVector[i]->GetSourceAlgorithm();
 		pointSource->GetCenter(point);
 
 		UpdatePointActor(point);
@@ -164,7 +164,7 @@ void albaInteractor2DMeasure_Point::ReDrawAll()
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Point::UpdatePointsActor(double * point, double * point2)
 {
-	vtkPointSource* pointSource = (vtkPointSource*)m_PointsStackVector[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSource = (vtkPointSource*)m_PointsStackVector[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSource->SetCenter(point);
 	pointSource->Update();
 }
@@ -290,7 +290,7 @@ void albaInteractor2DMeasure_Point::GetMeasurePoint(int index, double *point)
 	// Return point value
 	if (index >= 0 && index < GetMeasureCount())
 	{
-		vtkPointSource *pointSource = (vtkPointSource*)m_PointsStackVector[index]->GetSource();
+		vtkPointSource *pointSource = (vtkPointSource*)m_PointsStackVector[index]->GetSourceAlgorithm();
 		pointSource->GetCenter(point);
 	}
 }

@@ -31,7 +31,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkObjectFactory.h"
 #include "vtkPointSource.h"
 #include "vtkPolyDataMapper2D.h"
-#include "vtkPolyDataSource.h"
 #include "vtkProperty2D.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -689,13 +688,14 @@ void albaInteractor2DMeasure::ScreenToWorld(double screen[2], double world[3])
 	world[Y] = wp[Y];
 	world[Z] = wp[Z];
 
-	//This is an hack to stabilize the Interactor, VTK uses the camera perspective matrix to calcuate the
+	//This is an hack to stabilize the Interactor, VTK uses the camera perspective matrix to calculate the
 	//world coordinate, this return may lead in changes of the view plane coordinate output after show or hide 
 	//stuffs.
 	//This hack fix the plane coordinate to zero, witch is correct for a 2d measure.
 	world[2 - m_CurrPlane] = 0;
 
-	m_Renderer->GetActiveCamera()->SetViewPlaneNormal(0, 0, -1);
+	/* TODO VTK 7 Reenable this */
+	//m_Renderer->GetActiveCamera()->SetViewPlaneNormal(0, 0, -1);
 
 	//albaLogMessage("StoW (%f, %f) -> (%f, %f, %f, %f)", screen[X], screen[Y], wp[X], wp[Y], wp[Z], wp[3]);
 }

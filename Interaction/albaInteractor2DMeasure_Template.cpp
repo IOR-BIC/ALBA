@@ -37,7 +37,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkPointSource.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper2D.h"
-#include "vtkPolyDataSource.h"
 #include "vtkPolygon.h"
 #include "vtkProbeFilter.h"
 #include "vtkProperty.h"
@@ -248,22 +247,22 @@ void albaInteractor2DMeasure_Template::FindAndHighlight(double * point)
 void albaInteractor2DMeasure_Template::UpdatePointsActor(double * pointUL, double * pointUR, double * pointDR, double * pointDL)
 {
 	// Up Left
-	vtkPointSource* pointSourceUL = (vtkPointSource*)m_PointsStackVectorUL[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceUL = (vtkPointSource*)m_PointsStackVectorUL[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceUL->SetCenter(pointUL);
 	pointSourceUL->Update();
 
 	// Up Right
-	vtkPointSource* pointSourceUR = (vtkPointSource*)m_PointsStackVectorUR[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceUR = (vtkPointSource*)m_PointsStackVectorUR[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceUR->SetCenter(pointUR);
 	pointSourceUR->Update();
 
 	// Down Right
-	vtkPointSource* pointSourceDR = (vtkPointSource*)m_PointsStackVectorDR[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceDR = (vtkPointSource*)m_PointsStackVectorDR[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceDR->SetCenter(pointDR);
 	pointSourceDR->Update();
 	
 	// Down Left
-	vtkPointSource* pointSourceDL = (vtkPointSource*)m_PointsStackVectorDL[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceDL = (vtkPointSource*)m_PointsStackVectorDL[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceDL->SetCenter(pointDL);
 	pointSourceDL->Update();
 
@@ -271,7 +270,7 @@ void albaInteractor2DMeasure_Template::UpdatePointsActor(double * pointUL, doubl
 	double pointC[3];
 	GetCenter(m_CurrMeasure, pointC);
 
-	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceC->SetCenter(pointC);
 	pointSourceC->Update();
 }
@@ -291,7 +290,6 @@ void albaInteractor2DMeasure_Template::UpdateTexureActor(double * pointUL, doubl
 	m_QuadVector[m_CurrMeasure]->GetPoints()->SetPoint(3, pointDR);
 	m_QuadVector[m_CurrMeasure]->GetPoints()->SetPoint(4, pointDL);
 	m_QuadVector[m_CurrMeasure]->GetPoints()->SetPoint(5, pointUL);
-	m_QuadVector[m_CurrMeasure]->Update();
 
 	m_Renderer->AddActor(m_TexturedQuadVector[m_CurrMeasure]);
 }
@@ -402,12 +400,12 @@ void albaInteractor2DMeasure_Template::AddMeasure(double * pointUL, double * poi
 	imageReader->SetFileName(configDir + "\\Templates\\" + m_TextureName + ".png");
 	imageReader->Update();
 
-	texture->SetInput(imageReader->GetOutput());
+	texture->SetInputConnection(imageReader->GetOutputPort());
 
 	// Mapper
 	vtkPolyDataMapper *quadMapper;
 	vtkNEW(quadMapper);
-	quadMapper->SetInput(m_QuadVector[index]);
+	quadMapper->SetInputData(m_QuadVector[index]);
 
 	// Actor
 	m_TexturedQuadVector.push_back(vtkActor::New());
@@ -504,7 +502,6 @@ void albaInteractor2DMeasure_Template::EditTextureCoord(int index, double * poin
 
 	// PolyData - Quad
 	m_QuadVector[index]->GetPointData()->SetTCoords(textureCoordinates);
-	m_QuadVector[m_CurrMeasure]->Update();
 
 	vtkDEL(textureCoordinates);
 
@@ -621,7 +618,7 @@ void albaInteractor2DMeasure_Template::SetTexture(vtkImageData *imageData)
 		texture->SetLookupTable((vtkLookupTable *)m_TemplateLookupTable);
 	}
 
-	texture->SetInput(imageData);
+	texture->SetInputData(imageData);
 	
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
@@ -656,19 +653,19 @@ void albaInteractor2DMeasure_Template::GetMeasurePoints(int index, double * poin
 	if (index >= 0 && index < GetMeasureCount())
 	{
 		// Up Left
-		vtkPointSource* pointSourceUL = (vtkPointSource*)m_PointsStackVectorUL[m_CurrMeasure]->GetSource();
+		vtkPointSource* pointSourceUL = (vtkPointSource*)m_PointsStackVectorUL[m_CurrMeasure]->GetSourceAlgorithm();
 		pointSourceUL->GetCenter(pointUL);
 
 		// Up Right
-		vtkPointSource* pointSourceUR = (vtkPointSource*)m_PointsStackVectorUR[m_CurrMeasure]->GetSource();
+		vtkPointSource* pointSourceUR = (vtkPointSource*)m_PointsStackVectorUR[m_CurrMeasure]->GetSourceAlgorithm();
 		pointSourceUR->GetCenter(pointUR);
 
 		// Down Right
-		vtkPointSource* pointSourceDR = (vtkPointSource*)m_PointsStackVectorDR[m_CurrMeasure]->GetSource();
+		vtkPointSource* pointSourceDR = (vtkPointSource*)m_PointsStackVectorDR[m_CurrMeasure]->GetSourceAlgorithm();
 		pointSourceDR->GetCenter(pointDR);
 
 		// Down Left
-		vtkPointSource* pointSourceDL = (vtkPointSource*)m_PointsStackVectorDL[m_CurrMeasure]->GetSource();
+		vtkPointSource* pointSourceDL = (vtkPointSource*)m_PointsStackVectorDL[m_CurrMeasure]->GetSourceAlgorithm();
 		pointSourceDL->GetCenter(pointDL);
 	}
 }
@@ -681,11 +678,11 @@ void albaInteractor2DMeasure_Template::GetCenter(int index, double *center)
 		double pointUL[3], pointDR[3];
 
 		// Up Left
-		vtkPointSource* pointSourceUL = (vtkPointSource*)m_PointsStackVectorUL[m_CurrMeasure]->GetSource();
+		vtkPointSource* pointSourceUL = (vtkPointSource*)m_PointsStackVectorUL[m_CurrMeasure]->GetSourceAlgorithm();
 		pointSourceUL->GetCenter(pointUL);
 
 		// Down Right
-		vtkPointSource* pointSourceDR = (vtkPointSource*)m_PointsStackVectorDR[m_CurrMeasure]->GetSource();
+		vtkPointSource* pointSourceDR = (vtkPointSource*)m_PointsStackVectorDR[m_CurrMeasure]->GetSourceAlgorithm();
 		pointSourceDR->GetCenter(pointDR);
 
 		center[X] = (pointUL[X] + pointDR[X]) / 2;
@@ -773,7 +770,6 @@ void albaInteractor2DMeasure_Template::CropImage(albaVMEImage *vmeImage, double 
 		vtkImageData *inputSP;
 		vtkNEW(inputSP);
 		inputSP->DeepCopy(vtkImageData::SafeDownCast(vmeImage->GetOutput()->GetVTKData()));
-		inputSP->Update();
 
 		int voi_dim[6];
 		int original_vol_dim[6];
@@ -864,14 +860,13 @@ void albaInteractor2DMeasure_Template::CropImage(albaVMEImage *vmeImage, double 
 		v_esp->Modified();
 
 		vtkALBASmartPointer<vtkProbeFilter> probeFilter;
-		probeFilter->SetInput(v_esp);
-		probeFilter->SetSource(inputSP);
+		probeFilter->SetInputData(v_esp);
+		probeFilter->SetSourceData(inputSP);
 		probeFilter->Update();
 
 		vtkImageData *outputSP;
 		vtkNEW(outputSP);
 		outputSP->DeepCopy(probeFilter->GetOutput());
-		outputSP->Update();
 		
 		// Updated LookupTable
 		if (m_TemplateLookupTable == NULL)

@@ -158,7 +158,7 @@ void albaGizmoScaleAxis::CreatePipeline()
   cylInitTr->RotateZ(-90);	
   
   vtkTransformPolyDataFilter *cylInitTrPDF = vtkTransformPolyDataFilter::New();
-  cylInitTrPDF->SetInput(m_Cylinder->GetOutput());
+  cylInitTrPDF->SetInputConnection(m_Cylinder->GetOutputPort());
   cylInitTrPDF->SetTransform(cylInitTr);
 
   /*
@@ -186,11 +186,11 @@ void albaGizmoScaleAxis::CreatePipeline()
 
   // create cube translation transform pdf
   m_TranslatePDF[CUBE] = vtkTransformPolyDataFilter::New();
-  m_TranslatePDF[CUBE]->SetInput(m_Cube->GetOutput());
+  m_TranslatePDF[CUBE]->SetInputConnection(m_Cube->GetOutputPort());
   
   // create cylinder translation transform
   m_TranslatePDF[CYLINDER] = vtkTransformPolyDataFilter::New();
-  m_TranslatePDF[CYLINDER]->SetInput(cylInitTrPDF->GetOutput());
+  m_TranslatePDF[CYLINDER]->SetInputConnection(cylInitTrPDF->GetOutputPort());
 
   //-----------------
   // update translate transform
@@ -230,8 +230,8 @@ void albaGizmoScaleAxis::CreatePipeline()
   m_RotatePDF[CYLINDER]->SetTransform(m_RotationTr);
   m_RotatePDF[CUBE]->SetTransform(m_RotationTr);
 
-  m_RotatePDF[CYLINDER]->SetInput(m_TranslatePDF[CYLINDER]->GetOutput());
-  m_RotatePDF[CUBE]->SetInput(m_TranslatePDF[CUBE]->GetOutput());
+  m_RotatePDF[CYLINDER]->SetInputConnection(m_TranslatePDF[CYLINDER]->GetOutputPort());
+  m_RotatePDF[CUBE]->SetInputConnection(m_TranslatePDF[CUBE]->GetOutputPort());
 
   m_RotatePDF[CYLINDER]->Update();
   m_RotatePDF[CYLINDER]->Update();

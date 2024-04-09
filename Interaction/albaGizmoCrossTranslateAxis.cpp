@@ -151,7 +151,7 @@ albaGizmoCrossTranslateAxis::~albaGizmoCrossTranslateAxis()
 	m_TranslationCylinderGizmo->ReparentTo(NULL);
 
 	// clean up translation feedback stuff
-	//vtkDEL(m_TranslationFeedbackGizmo);
+	vtkDEL(m_TranslationFeedbackGizmo);
 	vtkDEL(m_FeedbackConeSource);
 	vtkDEL(m_LeftUpFeedbackConeTransform);
 	vtkDEL(m_LeftDownFeedbackConeTransform);
@@ -201,7 +201,7 @@ void albaGizmoCrossTranslateAxis::CreateTranslationGizmoPipeline()
 	rightCylinderInitialTr->RotateZ(-90);	
 
 	vtkTransformPolyDataFilter *rightCylinderInitialTrPDF = vtkTransformPolyDataFilter::New();
-	rightCylinderInitialTrPDF->SetInput(m_RightCylinder->GetOutput());
+	rightCylinderInitialTrPDF->SetInputConnection(m_RightCylinder->GetOutputPort());
 	rightCylinderInitialTrPDF->SetTransform(rightCylinderInitialTr);
 
 	// create the translation transform
@@ -210,7 +210,7 @@ void albaGizmoCrossTranslateAxis::CreateTranslationGizmoPipeline()
 
 	// create cylinder translation transform
 	m_RightTranslatePDF = vtkTransformPolyDataFilter::New();
-	m_RightTranslatePDF->SetInput(rightCylinderInitialTrPDF->GetOutput());
+	m_RightTranslatePDF->SetInputConnection(rightCylinderInitialTrPDF->GetOutputPort());
 
 	// translate transform setting
 	m_RightTranslatePDF->SetTransform(m_RightTranslateTr);
@@ -222,7 +222,7 @@ void albaGizmoCrossTranslateAxis::CreateTranslationGizmoPipeline()
 
 	m_RightCylinderRotatePDF->SetTransform(m_RightCylinderRotationTr);
 
-	m_RightCylinderRotatePDF->SetInput(m_RightTranslatePDF->GetOutput());
+	m_RightCylinderRotatePDF->SetInputConnection(m_RightTranslatePDF->GetOutputPort());
 
 	m_RightCylinderRotatePDF->Update();
 	m_RightCylinderRotatePDF->Update();
@@ -236,7 +236,7 @@ void albaGizmoCrossTranslateAxis::CreateTranslationGizmoPipeline()
 	LeftCylinderInitialTr->RotateZ(-90);	
 
 	vtkTransformPolyDataFilter *LeftCylinderInitialTrPDF = vtkTransformPolyDataFilter::New();
-	LeftCylinderInitialTrPDF->SetInput(m_LeftCylinder->GetOutput());
+	LeftCylinderInitialTrPDF->SetInputConnection(m_LeftCylinder->GetOutputPort());
 	LeftCylinderInitialTrPDF->SetTransform(LeftCylinderInitialTr);
 
 	// create the translation transform
@@ -245,7 +245,7 @@ void albaGizmoCrossTranslateAxis::CreateTranslationGizmoPipeline()
 
 	// create cylinder translation transform
 	m_LeftTranslatePDF = vtkTransformPolyDataFilter::New();
-	m_LeftTranslatePDF->SetInput(LeftCylinderInitialTrPDF->GetOutput());
+	m_LeftTranslatePDF->SetInputConnection(LeftCylinderInitialTrPDF->GetOutputPort());
 
 	// place the cylinder before the cone; default cylinder length is 1/4 of vme bb diagonal
 	this->SetCylinderLength(boundingBoxDiagonal / 16);
@@ -259,15 +259,15 @@ void albaGizmoCrossTranslateAxis::CreateTranslationGizmoPipeline()
 	m_LeftCylinderRotationTr->Identity(); 
 
 	m_LeftCylinderRotatePDF->SetTransform(m_LeftCylinderRotationTr);
-	m_LeftCylinderRotatePDF->SetInput(m_LeftTranslatePDF->GetOutput());
+	m_LeftCylinderRotatePDF->SetInputConnection(m_LeftTranslatePDF->GetOutputPort());
 	m_LeftCylinderRotatePDF->Update();
 
 	// place the cylinder before the cone; default cylinder length is 1/4 of vme bb diagonal
 	this->SetCylinderLength(boundingBoxDiagonal / 16);
 
 	m_Append = vtkAppendPolyData::New();
-	m_Append->SetInput(m_RightCylinderRotatePDF->GetOutput());
-	m_Append->AddInput(m_LeftCylinderRotatePDF->GetOutput());
+	m_Append->SetInputConnection(m_RightCylinderRotatePDF->GetOutputPort());
+	m_Append->AddInputConnection(m_LeftCylinderRotatePDF->GetOutputPort());
 	m_Append->Update();
 
 	//clean up
@@ -535,31 +535,31 @@ void albaGizmoCrossTranslateAxis::CreateFeedbackGizmoPipeline()
 	m_FeedbackCylinderSource->SetRadius(coneRadius / 2);
 	m_FeedbackCylinderSource->Update();
 
-	m_LeftFeedbackCylinderTransformPDF->SetInput(m_FeedbackCylinderSource->GetOutput());
+	m_LeftFeedbackCylinderTransformPDF->SetInputConnection(m_FeedbackCylinderSource->GetOutputPort());
 	m_LeftFeedbackCylinderTransformPDF->SetTransform(m_LeftFeedbackCylinderTransform);
 
-	m_RightFeedbackCylinderTransformPDF->SetInput(m_FeedbackCylinderSource->GetOutput());
+	m_RightFeedbackCylinderTransformPDF->SetInputConnection(m_FeedbackCylinderSource->GetOutputPort());
 	m_RightFeedbackCylinderTransformPDF->SetTransform(m_RightFeedbackCylinderTransform);
 
-	m_LeftUpFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+	m_LeftUpFeedbackConeTransformPDF->SetInputConnection(m_FeedbackConeSource->GetOutputPort());
 	m_LeftUpFeedbackConeTransformPDF->SetTransform(m_LeftUpFeedbackConeTransform);
 
-	m_LeftDownFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+	m_LeftDownFeedbackConeTransformPDF->SetInputConnection(m_FeedbackConeSource->GetOutputPort());
 	m_LeftDownFeedbackConeTransformPDF->SetTransform(m_LeftDownFeedbackConeTransform);
 
-	m_RightUpFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+	m_RightUpFeedbackConeTransformPDF->SetInputConnection(m_FeedbackConeSource->GetOutputPort());
 	m_RightUpFeedbackConeTransformPDF->SetTransform(m_RightUpFeedbackConeTransform);
 
-	m_RightDownFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+	m_RightDownFeedbackConeTransformPDF->SetInputConnection(m_FeedbackConeSource->GetOutputPort());
 	m_RightDownFeedbackConeTransformPDF->SetTransform(m_RightDownFeedbackConeTransform);
 
 	m_FeedbackStuffAppendPolydata = vtkAppendPolyData::New();
-	m_FeedbackStuffAppendPolydata->AddInput(m_LeftUpFeedbackConeTransformPDF->GetOutput());
-	m_FeedbackStuffAppendPolydata->AddInput(m_LeftDownFeedbackConeTransformPDF->GetOutput());
-	m_FeedbackStuffAppendPolydata->AddInput(m_RightUpFeedbackConeTransformPDF->GetOutput());
-	m_FeedbackStuffAppendPolydata->AddInput(m_RightDownFeedbackConeTransformPDF->GetOutput());
-	m_FeedbackStuffAppendPolydata->AddInput(m_LeftFeedbackCylinderTransformPDF->GetOutput());
-	m_FeedbackStuffAppendPolydata->AddInput(m_RightFeedbackCylinderTransformPDF->GetOutput());
+	m_FeedbackStuffAppendPolydata->AddInputConnection(m_LeftUpFeedbackConeTransformPDF->GetOutputPort());
+	m_FeedbackStuffAppendPolydata->AddInputConnection(m_LeftDownFeedbackConeTransformPDF->GetOutputPort());
+	m_FeedbackStuffAppendPolydata->AddInputConnection(m_RightUpFeedbackConeTransformPDF->GetOutputPort());
+	m_FeedbackStuffAppendPolydata->AddInputConnection(m_RightDownFeedbackConeTransformPDF->GetOutputPort());
+	m_FeedbackStuffAppendPolydata->AddInputConnection(m_LeftFeedbackCylinderTransformPDF->GetOutputPort());
+	m_FeedbackStuffAppendPolydata->AddInputConnection(m_RightFeedbackCylinderTransformPDF->GetOutputPort());
 	m_FeedbackStuffAppendPolydata->Update();
 
 	m_TranslationFeedbackGizmo->SetName("AxisTranslationFeedbackGizmo");

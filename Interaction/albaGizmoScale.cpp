@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program: ALBA
+Program: ALBA (Agile Library for Biomedical Applications)
 Module: albaGizmoScale
 Authors: Stefano Perticoni
 

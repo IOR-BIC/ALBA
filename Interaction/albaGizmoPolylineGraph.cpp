@@ -151,7 +151,7 @@ void albaGizmoPolylineGraph::DestroyVMEGizmo()
 { 
   m_AppendPolyData = vtkAppendPolyData::New();  
   m_SphereSource = vtkSphereSource::New();
-  m_AppendPolyData->SetInput(m_SphereSource->GetOutput());
+  m_AppendPolyData->SetInputConnection(m_SphereSource->GetOutputPort());
 
   if(m_ShowOnlyDirectionAxis == false)
   {
@@ -173,25 +173,25 @@ void albaGizmoPolylineGraph::DestroyVMEGizmo()
       trans->RotateY(-90);
 
     vtkTransformPolyDataFilter* PDF = vtkTransformPolyDataFilter::New();
-    PDF->SetInput(m_AxisSource[i]->GetOutput());
+    PDF->SetInputConnection(m_AxisSource[i]->GetOutputPort());
     PDF->SetTransform(trans);
     trans->Delete();
 
     //Scaling (to be set in SetLength)
     trans = vtkTransform::New();
     m_Axis[i] = vtkTransformPolyDataFilter::New();
-    m_Axis[i]->SetInput(PDF->GetOutput());
+    m_Axis[i]->SetInputConnection(PDF->GetOutputPort());
     m_Axis[i]->SetTransform(trans);
     trans->Delete();
     PDF->Delete();
 
-    m_AppendPolyData->AddInput(m_Axis[i]->GetOutput());
+    m_AppendPolyData->AddInputConnection(m_Axis[i]->GetOutputPort());
 
   
     }
 
   m_PlaneSource = vtkPlaneSource::New();
-  m_AppendPolyData->AddInput(m_PlaneSource->GetOutput());  
+  m_AppendPolyData->AddInputConnection(m_PlaneSource->GetOutputPort());  
   }
   else
   {
@@ -207,19 +207,19 @@ void albaGizmoPolylineGraph::DestroyVMEGizmo()
     trans->RotateY(-90);
 
     vtkTransformPolyDataFilter* PDF = vtkTransformPolyDataFilter::New();
-    PDF->SetInput(m_AxisSource[2]->GetOutput());
+    PDF->SetInputConnection(m_AxisSource[2]->GetOutputPort());
     PDF->SetTransform(trans);
     trans->Delete();
 
     //Scaling (to be set in SetLength)
     trans = vtkTransform::New();
     m_Axis[2] = vtkTransformPolyDataFilter::New();
-    m_Axis[2]->SetInput(PDF->GetOutput());
+    m_Axis[2]->SetInputConnection(PDF->GetOutputPort());
     m_Axis[2]->SetTransform(trans);
     trans->Delete();
     PDF->Delete();
 
-    m_AppendPolyData->AddInput(m_Axis[2]->GetOutput());
+    m_AppendPolyData->AddInputConnection(m_Axis[2]->GetOutputPort());
   }
    
   m_AppendPolyData->Update();
@@ -231,7 +231,7 @@ void albaGizmoPolylineGraph::DestroyVMEGizmo()
 //----------------------------------------------------------------------------
 {
 	m_SphereSource->Delete();
-	if (m_ShowOnlyDirectionAxis == false)
+  if(m_ShowOnlyDirectionAxis == false)
 	{
 		for (int i = 0; i < 3; i++)
 		{

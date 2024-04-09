@@ -228,24 +228,24 @@ void albaGizmoCrossRotateAxis::CreatePipeline()
 
 	if (m_GizmoDirection = EW)
 	{
-		m_LinesAppendPolyData->AddInput(m_LineSourceEast->GetOutput());
-		m_LinesAppendPolyData->AddInput(m_LineSourceWest->GetOutput());
+		m_LinesAppendPolyData->AddInputConnection(m_LineSourceEast->GetOutputPort());
+		m_LinesAppendPolyData->AddInputConnection(m_LineSourceWest->GetOutputPort());
 	}
 	else if (m_GizmoDirection = NS)
 	{
-		m_LinesAppendPolyData->AddInput(m_LineSourceNorth->GetOutput());
-		m_LinesAppendPolyData->AddInput(m_LineSourceSouth->GetOutput());
+		m_LinesAppendPolyData->AddInputConnection(m_LineSourceNorth->GetOutputPort());
+		m_LinesAppendPolyData->AddInputConnection(m_LineSourceSouth->GetOutputPort());
 	}
 
 	m_Radius = boundingBoxDiagonal / 2;
 
 	// clean the circle polydata
 	m_LinesCleanCircle = vtkCleanPolyData::New();
-	m_LinesCleanCircle->SetInput(m_LinesAppendPolyData->GetOutput());
+	m_LinesCleanCircle->SetInputConnection(m_LinesAppendPolyData->GetOutputPort());
 
 	// tube filter the circle 
 	m_LinesTubeFilter = vtkTubeFilter::New();
-	m_LinesTubeFilter->SetInput(m_LinesCleanCircle->GetOutput());
+	m_LinesTubeFilter->SetInputConnection(m_LinesCleanCircle->GetOutputPort());
 
 	double tubeRadius = boundingBoxDiagonal / 250;
 
@@ -258,7 +258,7 @@ void albaGizmoCrossRotateAxis::CreatePipeline()
 
 	m_LinesRotatePDF = vtkTransformPolyDataFilter::New();
 	m_LinesRotatePDF->SetTransform(m_LinesRotationTransform);
-	m_LinesRotatePDF->SetInput(m_LinesTubeFilter->GetOutput());
+	m_LinesRotatePDF->SetInputConnection(m_LinesTubeFilter->GetOutputPort());
 
 }
 //----------------------------------------------------------------------------
@@ -507,16 +507,16 @@ void albaGizmoCrossRotateAxis::CreateFeedbackGizmoPipeline()
 	m_FeedbackConeSource->SetRadius(coneRadius);
 	m_FeedbackConeSource->Update();
 
-	m_LeftUpFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+	m_LeftUpFeedbackConeTransformPDF->SetInputConnection(m_FeedbackConeSource->GetOutputPort());
 	m_LeftUpFeedbackConeTransformPDF->SetTransform(m_LeftUpFeedbackConeTransform);
 
-	m_LeftDownFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+	m_LeftDownFeedbackConeTransformPDF->SetInputConnection(m_FeedbackConeSource->GetOutputPort());
 	m_LeftDownFeedbackConeTransformPDF->SetTransform(m_LeftDownFeedbackConeTransform);
 
-	m_RightUpFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+	m_RightUpFeedbackConeTransformPDF->SetInputConnection(m_FeedbackConeSource->GetOutputPort());
 	m_RightUpFeedbackConeTransformPDF->SetTransform(m_RightUpFeedbackConeTransform);
 
-	m_RightDownFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+	m_RightDownFeedbackConeTransformPDF->SetInputConnection(m_FeedbackConeSource->GetOutputPort());
 	m_RightDownFeedbackConeTransformPDF->SetTransform(m_RightDownFeedbackConeTransform);
 
 	// create circle
@@ -527,11 +527,11 @@ void albaGizmoCrossRotateAxis::CreateFeedbackGizmoPipeline()
 
 	// clean the circle polydata
 	m_FGCleanCircle = vtkCleanPolyData::New();
-	m_FGCleanCircle->SetInput(m_FGCircle->GetOutput());
+	m_FGCleanCircle->SetInputConnection(m_FGCircle->GetOutputPort());
 
 	// tube filter the circle 
 	m_FGCircleTF = vtkTubeFilter::New();
-	m_FGCircleTF->SetInput(m_FGCleanCircle->GetOutput());
+	m_FGCircleTF->SetInputConnection(m_FGCleanCircle->GetOutputPort());
 	m_FGCircleTF->SetRadius(x / 8);
 	m_FGCircleTF->SetNumberOfSides(20);
 
@@ -541,14 +541,10 @@ void albaGizmoCrossRotateAxis::CreateFeedbackGizmoPipeline()
 
 	m_FGRotatePDF = vtkTransformPolyDataFilter::New();
 	m_FGRotatePDF->SetTransform(m_FGRotationTr);
-	m_FGRotatePDF->SetInput(m_FGCircleTF->GetOutput());
+	m_FGRotatePDF->SetInputConnection(m_FGCircleTF->GetOutputPort());
 
 	m_FeedbackStuffAppendPolydata = vtkAppendPolyData::New();
-	//   m_FeedbackStuffAppendPolydata->AddInput(m_LeftUpFeedbackConeTransformPDF->GetOutput());
-	//   m_FeedbackStuffAppendPolydata->AddInput(m_LeftDownFeedbackConeTransformPDF->GetOutput());
-	//   m_FeedbackStuffAppendPolydata->AddInput(m_RightUpFeedbackConeTransformPDF->GetOutput());
-	//   m_FeedbackStuffAppendPolydata->AddInput(m_RightDownFeedbackConeTransformPDF->GetOutput());
-	m_FeedbackStuffAppendPolydata->AddInput(m_FGRotatePDF->GetOutput());
+	m_FeedbackStuffAppendPolydata->AddInputConnection(m_FGRotatePDF->GetOutputPort());
 	m_FeedbackStuffAppendPolydata->Update();
 
 	m_RotationFeedbackGizmo = albaVMEGizmo::New();
@@ -589,13 +585,13 @@ void albaGizmoCrossRotateAxis::SetGizmoDirection(int direction)
 
 	if (m_GizmoDirection == EW)
 	{
-		m_LinesAppendPolyData->AddInput(m_LineSourceEast->GetOutput());
-		m_LinesAppendPolyData->AddInput(m_LineSourceWest->GetOutput());
+		m_LinesAppendPolyData->AddInputConnection(m_LineSourceEast->GetOutputPort());
+		m_LinesAppendPolyData->AddInputConnection(m_LineSourceWest->GetOutputPort());
 	}
 	else if (m_GizmoDirection == NS)
 	{
-		m_LinesAppendPolyData->AddInput(m_LineSourceNorth->GetOutput());
-		m_LinesAppendPolyData->AddInput(m_LineSourceSouth->GetOutput());
+		m_LinesAppendPolyData->AddInputConnection(m_LineSourceNorth->GetOutputPort());
+		m_LinesAppendPolyData->AddInputConnection(m_LineSourceSouth->GetOutputPort());
 	}
 
 	m_LinesAppendPolyData->Update();

@@ -89,14 +89,14 @@ int albaCameraTransform::DeepCopy(albaCameraTransform *trans)
 
 //----------------------------------------------------------------------------
 // Get the MTime. Take in consideration m_Renderer, m_Camera and m_Bounds modification time
-unsigned long albaCameraTransform::GetMTime()
+vtkMTimeType albaCameraTransform::GetMTime()
 //------------------------------------------------------------------------------
 {
-  unsigned long mtime = this->Superclass::GetMTime();
+	vtkMTimeType mtime = this->Superclass::GetMTime();
 
   if (m_Camera)
   {
-    unsigned long cameraMTime = m_Camera->GetMTime();
+		vtkMTimeType cameraMTime = m_Camera->GetMTime();
     if (cameraMTime > mtime)
       mtime=cameraMTime;
   }
@@ -120,7 +120,7 @@ unsigned long albaCameraTransform::GetMTime()
 
   if (m_Bounds)
   {
-    unsigned long boundsMTime = m_Bounds->GetMTime();
+		vtkMTimeType boundsMTime = m_Bounds->GetMTime();
     if (boundsMTime > mtime)
       mtime=boundsMTime;
   }
@@ -447,7 +447,7 @@ void albaCameraTransform::AutoFitting2(albaMatrix *matrix,albaOBB *tracked_bound
   double vangle;
   vangle=camera->GetViewAngle(); // field of view Y Angle
   
-  double c=tan(vangle/2*vtkMath::DegreesToRadians());
+  double c=tan(vtkMath::RadiansFromDegrees(vangle/2));
 
   double d=camera->GetDistance();
   

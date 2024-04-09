@@ -31,7 +31,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkPointSource.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper2D.h"
-#include "vtkPolyDataSource.h"
 #include "vtkProperty.h"
 #include "vtkProperty2D.h"
 #include "vtkRenderWindow.h"
@@ -92,7 +91,7 @@ void albaInteractor2DMeasure_CenterPoint::MoveMeasure(int index, double * point)
 	double linePoint1[3];
 	double linePoint2[3];
 
-	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSource();
+	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSourceAlgorithm();
 	lineSource->GetPoint1(linePoint1);
 	lineSource->GetPoint2(linePoint2);
 
@@ -153,7 +152,7 @@ void albaInteractor2DMeasure_CenterPoint::EditMeasure(int index, double *point)
 	double point1[3];
 	double point2[3];
 
-	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSource();
+	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSourceAlgorithm();
 	lineSource->GetPoint1(point1);
 	lineSource->GetPoint2(point2);
 
@@ -210,7 +209,7 @@ void albaInteractor2DMeasure_CenterPoint::FindAndHighlight(double * point)
 
 			double linePoint1[3], linePoint2[3];
 
-			vtkLineSource* lineSource = (vtkLineSource*)lineStackVector->GetSource();
+			vtkLineSource* lineSource = (vtkLineSource*)lineStackVector->GetSourceAlgorithm();
 			lineSource->GetPoint1(linePoint1);
 			lineSource->GetPoint2(linePoint2);
 
@@ -273,12 +272,12 @@ void albaInteractor2DMeasure_CenterPoint::FindAndHighlight(double * point)
 void albaInteractor2DMeasure_CenterPoint::UpdatePointsActor(double * point1, double * point2)
 {
 	// Left
-	vtkPointSource* pointSourceL = (vtkPointSource*)m_PointsStackVectorL[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceL = (vtkPointSource*)m_PointsStackVectorL[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceL->SetCenter(point1);
 	pointSourceL->Update();
 
 	// Right
-	vtkPointSource* pointSourceR = (vtkPointSource*)m_PointsStackVectorR[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceR = (vtkPointSource*)m_PointsStackVectorR[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceR->SetCenter(point2);
 	pointSourceR->Update();
 
@@ -286,14 +285,14 @@ void albaInteractor2DMeasure_CenterPoint::UpdatePointsActor(double * point1, dou
 	double pointC[3];
 	GetMidPoint(pointC, point1, point2);
 
-	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceC->SetCenter(pointC);
 	pointSourceC->Update();
 }
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_CenterPoint::UpdateLineActors(double * point1, double * point2)
 {
-	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[m_CurrMeasure]->GetSource();
+	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[m_CurrMeasure]->GetSourceAlgorithm();
 	lineSource->SetPoint1(point1);
 	lineSource->SetPoint2(point2);
 	lineSource->Update();
@@ -306,7 +305,7 @@ void albaInteractor2DMeasure_CenterPoint::UpdateCircleActor(double * point1, dou
 	double midPoint[3]; 
 	GetMidPoint(midPoint, point1, point2);
 
-	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[m_CurrMeasure]->GetSource();
+	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[m_CurrMeasure]->GetSourceAlgorithm();
 	circleSource->SetPlane(m_CurrPlane);
 	circleSource->SetRadius(radius);
 	circleSource->SetCenter(midPoint);
@@ -394,7 +393,7 @@ void albaInteractor2DMeasure_CenterPoint::AddMeasure(double *point1, double *poi
 	m_CircleStackVector[index]->GetProperty()->SetLineWidth(m_LineWidth);
 	m_CircleStackVector[index]->SetColor(m_Colors[col]);
 
-	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[index]->GetSource();
+	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[index]->GetSourceAlgorithm();
 	circleSource->SetResolution(60);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -536,7 +535,7 @@ void albaInteractor2DMeasure_CenterPoint::GetMeasureLinePoints(int index, double
 	// Return line points values
 	if (index >= 0 && index < GetMeasureCount())
 	{
-		vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSource();
+		vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSourceAlgorithm();
 		lineSource->GetPoint1(point1);
 		lineSource->GetPoint2(point2);
 	}
@@ -547,7 +546,7 @@ void albaInteractor2DMeasure_CenterPoint::GetCenter(int index, double *center)
 	// Return center points values
 	if (index >= 0 && index < GetMeasureCount())
 	{
-		vtkALBACircleSource* circleSource = (vtkALBACircleSource*)m_CircleStackVector[index]->GetSource();
+		vtkALBACircleSource* circleSource = (vtkALBACircleSource*)m_CircleStackVector[index]->GetSourceAlgorithm();
 		circleSource->GetCenter(center);
 	}
 }

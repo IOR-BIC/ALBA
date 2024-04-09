@@ -105,7 +105,7 @@ albaAvatar3D::albaAvatar3D()
   vtkNEW(m_WorkingBox); // use a member var to be able change size
 
   vtkALBASmartPointer<vtkPolyDataMapper> wb_mapper;
-  wb_mapper->SetInput(m_WorkingBox->GetOutput());
+  wb_mapper->SetInputConnection(m_WorkingBox->GetOutputPort());
   wb_actor->SetMapper(wb_mapper);
   wb_actor->SetPickable(0);
 
@@ -113,7 +113,7 @@ albaAvatar3D::albaAvatar3D()
   vtkALBASmartPointer<vtkPolyDataMapper> axes_mapper;
   vtkALBASmartPointer<vtkActor> axes_actor;
   axes->SetScaleFactor(.5); // Set fixed dimensions...
-  axes_mapper->SetInput(axes->GetOutput());
+  axes_mapper->SetInputConnection(axes->GetOutputPort());
   axes_actor->SetMapper(axes_mapper);
   axes_actor->GetProperty()->SetInterpolationToFlat();
   axes_actor->SetPickable(0);

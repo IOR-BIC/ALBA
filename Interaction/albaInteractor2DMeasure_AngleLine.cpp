@@ -25,7 +25,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkLineSource.h"
 #include "vtkMath.h"
 #include "vtkPolyDataMapper2D.h"
-#include "vtkPolyDataSource.h"
 #include "vtkProperty2D.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
@@ -104,10 +103,10 @@ void albaInteractor2DMeasure_AngleLine::MoveMeasure(int index, double *point)
 
 	double pointA[3], pointB[3], pointC[3], pointD[3];
 
-	vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[index]->GetSource();
-	vtkPointSource* pointSourceB = (vtkPointSource*)m_PointsStackVectorB[index]->GetSource();
-	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[index]->GetSource();
-	vtkPointSource* pointSourceD = (vtkPointSource*)m_PointsStackVectorD[index]->GetSource();
+	vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[index]->GetSourceAlgorithm();
+	vtkPointSource* pointSourceB = (vtkPointSource*)m_PointsStackVectorB[index]->GetSourceAlgorithm();
+	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[index]->GetSourceAlgorithm();
+	vtkPointSource* pointSourceD = (vtkPointSource*)m_PointsStackVectorD[index]->GetSourceAlgorithm();
 
 	pointSourceC->GetCenter(pointC);
 	pointSourceA->GetCenter(pointA);
@@ -187,10 +186,10 @@ void albaInteractor2DMeasure_AngleLine::EditMeasure(int index, double *point)
 
 	double pointA[3], pointB[3], pointC[3], pointD[3];
 	
-	vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[index]->GetSource();
-	vtkPointSource* pointSourceB = (vtkPointSource*)m_PointsStackVectorB[index]->GetSource();
-	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[index]->GetSource();
-	vtkPointSource* pointSourceD = (vtkPointSource*)m_PointsStackVectorD[index]->GetSource();
+	vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[index]->GetSourceAlgorithm();
+	vtkPointSource* pointSourceB = (vtkPointSource*)m_PointsStackVectorB[index]->GetSourceAlgorithm();
+	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[index]->GetSourceAlgorithm();
+	vtkPointSource* pointSourceD = (vtkPointSource*)m_PointsStackVectorD[index]->GetSourceAlgorithm();
 
 	pointSourceA->GetCenter(pointA);
 	pointSourceB->GetCenter(pointB);
@@ -277,10 +276,10 @@ void albaInteractor2DMeasure_AngleLine::FindAndHighlight(double * point)
 
 			double pointA[3], pointB[3], pointC[3], pointD[3];
 
-			vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[i]->GetSource();
-			vtkPointSource* pointSourceB = (vtkPointSource*)m_PointsStackVectorB[i]->GetSource();
-			vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[i]->GetSource();
-			vtkPointSource* pointSourceD = (vtkPointSource*)m_PointsStackVectorD[i]->GetSource();
+			vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[i]->GetSourceAlgorithm();
+			vtkPointSource* pointSourceB = (vtkPointSource*)m_PointsStackVectorB[i]->GetSourceAlgorithm();
+			vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[i]->GetSourceAlgorithm();
+			vtkPointSource* pointSourceD = (vtkPointSource*)m_PointsStackVectorD[i]->GetSourceAlgorithm();
 			
 			pointSourceA->GetCenter(pointA);
 			pointSourceB->GetCenter(pointB);
@@ -379,7 +378,7 @@ void albaInteractor2DMeasure_AngleLine::FindAndHighlight(double * point)
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_AngleLine::UpdateMeasure(int index, double measure)
 {
-	double angleDegree = measure * vtkMath::RadiansToDegrees();
+	double angleDegree = vtkMath::DegreesFromRadians(measure);
 	angleDegree = abs((angleDegree <= 180.0) ? angleDegree : 360.0 - angleDegree);
 
 	albaString text;
@@ -392,30 +391,30 @@ void albaInteractor2DMeasure_AngleLine::UpdateMeasure(int index, double measure)
 void albaInteractor2DMeasure_AngleLine::UpdatePointsActor(double * point1, double * point2, double * point3, double * point4)
 {
 	//Point A
-	vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceA->SetCenter(point1);
 	pointSourceA->Update();
 
 	//Point B
-	vtkPointSource* pointSourceB = (vtkPointSource*)m_PointsStackVectorB[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceB = (vtkPointSource*)m_PointsStackVectorB[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceB->SetCenter(point2);
 	pointSourceB->Update();
 
 	//Point C
-	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceC->SetCenter(point3);
 	pointSourceC->Update();
 
 	//Point D
-	vtkPointSource* pointSourceD = (vtkPointSource*)m_PointsStackVectorD[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceD = (vtkPointSource*)m_PointsStackVectorD[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceD->SetCenter(point4);
 	pointSourceD->Update();
 }
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_AngleLine::UpdateLineActors(double * point1, double * point2, double * point3, double * point4)
 {
-	vtkLineSource* lineSourceAB = (vtkLineSource*)m_LineStackVectorAB[m_CurrMeasure]->GetSource();
-	vtkLineSource* lineSourceCD = (vtkLineSource*)m_LineStackVectorCD[m_CurrMeasure]->GetSource();
+	vtkLineSource* lineSourceAB = (vtkLineSource*)m_LineStackVectorAB[m_CurrMeasure]->GetSourceAlgorithm();
+	vtkLineSource* lineSourceCD = (vtkLineSource*)m_LineStackVectorCD[m_CurrMeasure]->GetSourceAlgorithm();
 	
 	lineSourceAB->SetPoint1(point1);
 	lineSourceAB->SetPoint2(point2);
@@ -428,7 +427,7 @@ void albaInteractor2DMeasure_AngleLine::UpdateLineActors(double * point1, double
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_AngleLine::UpdateCircleActor(double * point, double angle, double radius)
 {
-	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[m_CurrMeasure]->GetSource();
+	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[m_CurrMeasure]->GetSourceAlgorithm();
 	circleSource->SetPlane(m_CurrPlane);
 	circleSource->SetRadius(radius);
 	circleSource->SetCenter(point);
@@ -440,7 +439,7 @@ void albaInteractor2DMeasure_AngleLine::UpdateCircleActor(double * point, double
 		angle = 180.00;
 	}
 
-	circleSource->SetAngleRange(0, angle*vtkMath::DegreesToRadians());
+	circleSource->SetAngleRange(0, vtkMath::RadiansFromDegrees(angle));
 }
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_AngleLine::UpdateTextActor(double * point1, double * point2)
@@ -588,7 +587,7 @@ void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point
 		m_CircleStackVector[index]->SetColor(m_ColorAux);
 		m_CircleStackVector[index]->GetProperty()->SetLineStipplePattern(0xf0f0);
 
-		vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[index]->GetSource();
+		vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[index]->GetSourceAlgorithm();
 		circleSource->SetResolution(60);
 
 		m_CurrMeasure = index;
@@ -742,10 +741,10 @@ void albaInteractor2DMeasure_AngleLine::GetMeasureLinePoints(int index, double *
 	// Return line points values
 	if (index >= 0 && index < GetMeasureCount())
 	{
-		vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[index]->GetSource();
-		vtkPointSource* pointSourceB = (vtkPointSource*)m_PointsStackVectorB[index]->GetSource();
-		vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[index]->GetSource();
-		vtkPointSource* pointSourceD = (vtkPointSource*)m_PointsStackVectorD[index]->GetSource();
+		vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[index]->GetSourceAlgorithm();
+		vtkPointSource* pointSourceB = (vtkPointSource*)m_PointsStackVectorB[index]->GetSourceAlgorithm();
+		vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[index]->GetSourceAlgorithm();
+		vtkPointSource* pointSourceD = (vtkPointSource*)m_PointsStackVectorD[index]->GetSourceAlgorithm();
 
 		pointSourceA->GetCenter(point1);
 		pointSourceB->GetCenter(point2);
@@ -759,7 +758,7 @@ void albaInteractor2DMeasure_AngleLine::GetCenter(int index, double *center)
 	// Return center points values
 	if (index >= 0 && index < GetMeasureCount())
 	{
-		vtkALBACircleSource* circleSource = (vtkALBACircleSource*)m_CircleStackVector[index]->GetSource();
+		vtkALBACircleSource* circleSource = (vtkALBACircleSource*)m_CircleStackVector[index]->GetSourceAlgorithm();
 		circleSource->GetCenter(center);
 	}
 }

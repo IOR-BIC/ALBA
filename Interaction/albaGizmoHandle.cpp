@@ -220,7 +220,7 @@ void albaGizmoHandle::CreatePipeline()
 
   // create box translation transform PolyDataFilter
   m_TranslateBoxPolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_TranslateBoxPolyDataFilter->SetInput(m_Cube->GetOutput());
+  m_TranslateBoxPolyDataFilter->SetInputConnection(m_Cube->GetOutputPort());
   m_TranslateBoxPolyDataFilter->SetTransform(m_TranslateBoxTr);
 
   // box rotation transform
@@ -228,13 +228,13 @@ void albaGizmoHandle::CreatePipeline()
   
   // create rotation transform and rotation TPolyDataFilter 
   m_RotateBoxPolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_RotateBoxPolyDataFilter->SetInput(m_TranslateBoxPolyDataFilter->GetOutput());
+  m_RotateBoxPolyDataFilter->SetInputConnection(m_TranslateBoxPolyDataFilter->GetOutputPort());
   m_RotateBoxPolyDataFilter->SetTransform(m_RotateBoxTr);
 
 	m_TranslateBoxTrEnd = vtkTransform::New();
 
 	m_TranslateBoxPolyDataFilterEnd = vtkTransformPolyDataFilter::New();
-	m_TranslateBoxPolyDataFilterEnd->SetInput(m_RotateBoxPolyDataFilter->GetOutput());
+	m_TranslateBoxPolyDataFilterEnd->SetInputConnection(m_RotateBoxPolyDataFilter->GetOutputPort());
 	m_TranslateBoxPolyDataFilterEnd->SetTransform(m_TranslateBoxTrEnd);
 
   SetLength(m_CubeSize);
@@ -251,17 +251,17 @@ void albaGizmoHandle::CreatePipeline()
 
   m_TranslateShadingPlaneTr = vtkTransform::New();
   m_TranslateShadingPlanePolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_TranslateShadingPlanePolyDataFilter->SetInput(m_PlaneSource->GetOutput());
+  m_TranslateShadingPlanePolyDataFilter->SetInputConnection(m_PlaneSource->GetOutputPort());
   m_TranslateShadingPlanePolyDataFilter->SetTransform(m_TranslateShadingPlaneTr);
 
   m_RotateShadingPlaneTr = vtkTransform::New();
   m_RotateShadingPlanePolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_RotateShadingPlanePolyDataFilter->SetInput(m_TranslateShadingPlanePolyDataFilter->GetOutput());
+  m_RotateShadingPlanePolyDataFilter->SetInputConnection(m_TranslateShadingPlanePolyDataFilter->GetOutputPort());
   m_RotateShadingPlanePolyDataFilter->SetTransform(m_RotateShadingPlaneTr);
 
   m_TranslateShadingPlaneTrEnd = vtkTransform::New();
   m_TranslateShadingPlanePolyDataFilterEnd = vtkTransformPolyDataFilter::New();
-  m_TranslateShadingPlanePolyDataFilterEnd->SetInput(m_RotateShadingPlanePolyDataFilter->GetOutput());
+  m_TranslateShadingPlanePolyDataFilterEnd->SetInputConnection(m_RotateShadingPlanePolyDataFilter->GetOutputPort());
   m_TranslateShadingPlanePolyDataFilterEnd->SetTransform(m_TranslateShadingPlaneTrEnd);
 }
 

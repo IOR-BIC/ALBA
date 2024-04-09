@@ -283,8 +283,8 @@ void albaInteractorCameraMove::Spin()
     atan2((double)m_LastMousePose[1] - (double)center[1],
           (double)m_LastMousePose[0] - (double)center[0]);
   
-  newAngle *= vtkMath::RadiansToDegrees();
-  oldAngle *= vtkMath::RadiansToDegrees();
+  newAngle = vtkMath::DegreesFromRadians(newAngle);
+  oldAngle = vtkMath::DegreesFromRadians(newAngle);
 
 	double rollAngle;
 	double angleDiff = newAngle - oldAngle;
@@ -448,11 +448,11 @@ void albaInteractorCameraMove::ResetClippingRange()
 		rFR->ComputeVisiblePropBounds(b1);
 		rAV->ComputeVisiblePropBounds(b2);
 
-		if(b1[0] == VTK_LARGE_FLOAT && b2[0] == VTK_LARGE_FLOAT)
+		if(b1[0] == VTK_FLOAT_MAX && b2[0] == VTK_FLOAT_MAX)
 		{
 			rFR->ResetCameraClippingRange();
 		} 
-		else if (b1[0] == VTK_LARGE_FLOAT )
+		else if (b1[0] == VTK_FLOAT_MAX )
 		{
 			rFR->ResetCameraClippingRange(b2);
 		}
@@ -491,7 +491,7 @@ void albaInteractorCameraMove::ResetClippingRange()
   	{
 	  	rBR->ComputeVisiblePropBounds(b3);
 
-		  if (b3[0] == VTK_LARGE_FLOAT )
+		  if (b3[0] == VTK_FLOAT_MAX )
 		  {
         // do nothing
 			}

@@ -162,7 +162,6 @@ albaGizmoCrossTranslatePlane::~albaGizmoCrossTranslatePlane()
 	// set gizmo behavior to NULL
 	m_Gizmo[S0]->SetBehavior(NULL);
 	m_Gizmo[S1]->SetBehavior(NULL);
-	//m_Gizmo[NUM_GIZMO_PARTS]->SetBehavior(NULL);
 
 	vtkDEL(m_Line[S0]);
 	vtkDEL(m_Line[S1]);
@@ -184,7 +183,7 @@ albaGizmoCrossTranslatePlane::~albaGizmoCrossTranslatePlane()
 		m_Gizmo[i]->ReparentTo(NULL);
 	}
 
-	//vtkDEL(m_TranslationFeedbackGizmo);
+	vtkDEL(m_TranslationFeedbackGizmo);
 
 	vtkDEL(m_FeedbackConeSource);
 
@@ -259,7 +258,7 @@ void albaGizmoCrossTranslatePlane::CreatePipeline()
 	for (i = 0; i < NUM_GIZMO_PARTS; i++)
 	{
 		m_LineTF[i] = vtkTubeFilter::New();
-		m_LineTF[i]->SetInput(m_Line[i]->GetOutput());
+		m_LineTF[i]->SetInputConnection(m_Line[i]->GetOutputPort());
 
 		double tubeRadius = boundingBoxDiagonal/250;
 		m_LineTF[i]->SetRadius(tubeRadius);
@@ -280,7 +279,7 @@ void albaGizmoCrossTranslatePlane::CreatePipeline()
 	{
 		m_RotatePDF[i] = vtkTransformPolyDataFilter::New();
 		m_RotatePDF[i]->SetTransform(m_RotationTr);
-		m_RotatePDF[i]->SetInput(m_LineTF[i]->GetOutput());
+		m_RotatePDF[i]->SetInputConnection(m_LineTF[i]->GetOutputPort());
 	}
 }
 
@@ -593,29 +592,29 @@ void albaGizmoCrossTranslatePlane::CreateFeedbackGizmoPipeline()
 	m_FeedbackCylinderSource->SetRadius(coneRadius / 2);
 	m_FeedbackCylinderSource->Update();
 
-	m_VerticalFeedbackCylinderTransformPDF->SetInput(m_FeedbackCylinderSource->GetOutput());
+	m_VerticalFeedbackCylinderTransformPDF->SetInputConnection(m_FeedbackCylinderSource->GetOutputPort());
 	m_VerticalFeedbackCylinderTransformPDF->SetTransform(m_HorizontalFeedbackCylinderTransform);
 
-	m_HorizontalFeedbackCylinderTransformPDF->SetInput(m_FeedbackCylinderSource->GetOutput());
+	m_HorizontalFeedbackCylinderTransformPDF->SetInputConnection(m_FeedbackCylinderSource->GetOutputPort());
 	m_HorizontalFeedbackCylinderTransformPDF->SetTransform(m_VerticalFeedbackCylinderTransform);
 
-	m_LeftFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+	m_LeftFeedbackConeTransformPDF->SetInputConnection(m_FeedbackConeSource->GetOutputPort());
 	m_LeftFeedbackConeTransformPDF->SetTransform(m_LeftFeedbackConeTransform);
 
-	m_RightFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+	m_RightFeedbackConeTransformPDF->SetInputConnection(m_FeedbackConeSource->GetOutputPort());
 	m_RightFeedbackConeTransformPDF->SetTransform(m_RightFeedbackConeTransform);
 
-	m_UpFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+	m_UpFeedbackConeTransformPDF->SetInputConnection(m_FeedbackConeSource->GetOutputPort());
 	m_UpFeedbackConeTransformPDF->SetTransform(m_DownFeedbackConeTransform);
 
-	m_DownFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+	m_DownFeedbackConeTransformPDF->SetInputConnection(m_FeedbackConeSource->GetOutputPort());
 	m_DownFeedbackConeTransformPDF->SetTransform(m_UpFeedbackConeTransform);
 
 	m_FeedbackStuffAppendPolydata = vtkAppendPolyData::New();
-	m_FeedbackStuffAppendPolydata->AddInput(m_LeftFeedbackConeTransformPDF->GetOutput());
-	m_FeedbackStuffAppendPolydata->AddInput(m_RightFeedbackConeTransformPDF->GetOutput());
-	m_FeedbackStuffAppendPolydata->AddInput(m_UpFeedbackConeTransformPDF->GetOutput());
-	m_FeedbackStuffAppendPolydata->AddInput(m_DownFeedbackConeTransformPDF->GetOutput());
+	m_FeedbackStuffAppendPolydata->AddInputConnection(m_LeftFeedbackConeTransformPDF->GetOutputPort());
+	m_FeedbackStuffAppendPolydata->AddInputConnection(m_RightFeedbackConeTransformPDF->GetOutputPort());
+	m_FeedbackStuffAppendPolydata->AddInputConnection(m_UpFeedbackConeTransformPDF->GetOutputPort());
+	m_FeedbackStuffAppendPolydata->AddInputConnection(m_DownFeedbackConeTransformPDF->GetOutputPort());
 	m_FeedbackStuffAppendPolydata->Update();
 
 	m_TranslationFeedbackGizmo->SetName("PlaneTranslationFeedbackGizmo");

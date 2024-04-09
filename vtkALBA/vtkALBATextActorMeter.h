@@ -66,6 +66,8 @@ class ALBA_EXPORT vtkALBATextActorMeter : public vtkActor2D
   /** Modify text actor color. */
   void SetColor(double r,double g,double b);
 	
+	/** Modify text actor opacity. */
+	void SetOpacity(double opacity);
 protected:
   /** constructor. */
 	vtkALBATextActorMeter();

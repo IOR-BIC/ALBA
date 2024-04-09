@@ -162,10 +162,7 @@ void albaGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int
 	vtkDataSet *VolumeVTKData = m_InputVME ? m_InputVME->GetOutput()->GetVTKData() : NULL;
 
 	if (VolumeVTKData)
-	{
-		VolumeVTKData->Update();
 		VolumeVTKData->GetBounds(m_Bounds);
-	}
 
 	double wx = m_Bounds[1] - m_Bounds[0];
 	double wy = m_Bounds[3] - m_Bounds[2];
@@ -247,20 +244,20 @@ void albaGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int
 		break;
 	}
 
-	vtkDataSetToPolyDataFilter *cornerFilter;
+    vtkPolyDataAlgorithm *cornerFilter;
 
 	if (m_CentralClipFactor == 0)
 	{
 		// create the gizmo outline 
 		cornerFilter = vtkOutlineFilter::New();
-		cornerFilter->SetInput(ps->GetOutput());
+      cornerFilter->SetInputConnection(ps->GetOutputPort());
 		cornerFilter->Update();
 	}
 	else
 	{
 		// create the gizmo outline 
 		cornerFilter = vtkOutlineCornerFilter::New();
-		cornerFilter->SetInput(ps->GetOutput());
+      cornerFilter->SetInputConnection(ps->GetOutputPort());
 		((vtkOutlineCornerFilter*)cornerFilter)->SetCornerFactor(m_CentralClipFactor);
 		cornerFilter->Update();
 	}
@@ -275,9 +272,9 @@ void albaGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int
 
 	// append outline and handle
 	vtkALBASmartPointer<vtkAppendPolyData> apd;
-	if (visibleCubeHandler == true)
-		apd->AddInput(cs->GetOutput());
-	apd->AddInput(cornerFilter->GetOutput());
+    if(visibleCubeHandler == true)
+      apd->AddInputConnection(cs->GetOutputPort());
+	  apd->AddInputConnection(cornerFilter->GetOutputPort());
 	apd->Update();
 
 	m_VmeGizmo->SetData(apd->GetOutput());
@@ -285,8 +282,6 @@ void albaGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int
 	m_VmeGizmo->Update();
 	m_VmeGizmo->GetSurfaceOutput()->Update();
 	m_VmeGizmo->GetSurfaceOutput()->GetVTKData()->Modified();
-	m_VmeGizmo->GetSurfaceOutput()->GetVTKData()->Update();
-	m_VmeGizmo->GetSurfaceOutput()->GetVTKData()->UpdateData();
 
 	cornerFilter->Delete();
 
@@ -351,7 +346,6 @@ void albaGizmoSlice::InitSnapArray(albaVME *vol, int axis)
 		if (vtkDataSet *vol_data = vol->GetOutput()->GetVTKData())
 		{
 			double b[6];
-			vol_data->Update();
 			vol_data->GetBounds(b);
 			
 			if(axis == GIZMO_SLICE_X)
@@ -393,7 +387,6 @@ void albaGizmoSlice::InitSnapArray(albaVME *vol, int axis)
   if (vol_data)
   {
     double b[6], z;
-    vol_data->Update();
     vol_data->GetBounds(b);
     if(vol_data->IsA("vtkRectilinearGrid"))
     {

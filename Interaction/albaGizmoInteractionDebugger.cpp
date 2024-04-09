@@ -142,9 +142,9 @@ void albaGizmoInteractionDebugger::CreateGizmoVTKData()
   m_PlaneSource = vtkPlaneSource::New();
  
   m_AppendPolyData = vtkAppendPolyData::New();
-  m_AppendPolyData->SetInput(m_LineSource->GetOutput());
-  m_AppendPolyData->AddInput(m_SphereSource->GetOutput());
-  m_AppendPolyData->AddInput(m_PlaneSource->GetOutput());
+  m_AppendPolyData->SetInputConnection(m_LineSource->GetOutputPort());
+  m_AppendPolyData->AddInputConnection(m_SphereSource->GetOutputPort());
+  m_AppendPolyData->AddInputConnection(m_PlaneSource->GetOutputPort());
   m_AppendPolyData->Update();
 }
 

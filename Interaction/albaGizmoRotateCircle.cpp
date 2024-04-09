@@ -150,11 +150,11 @@ void albaGizmoRotateCircle::CreatePipeline()
 
   // clean the circle polydata
   m_CleanCircle = vtkCleanPolyData::New();
-	m_CleanCircle->SetInput(m_Circle->GetOutput());
+	m_CleanCircle->SetInputConnection(m_Circle->GetOutputPort());
 
   // tube filter the circle 
   m_CircleTF = vtkTubeFilter::New();
-  m_CircleTF->SetInput(m_CleanCircle->GetOutput());
+  m_CircleTF->SetInputConnection(m_CleanCircle->GetOutputPort());
   m_CircleTF->SetRadius(d / 200);
   m_CircleTF->SetNumberOfSides(20);
   
@@ -164,7 +164,7 @@ void albaGizmoRotateCircle::CreatePipeline()
 
   m_RotatePDF = vtkTransformPolyDataFilter::New();
   m_RotatePDF->SetTransform(m_RotationTr);
-  m_RotatePDF->SetInput(m_CircleTF->GetOutput());
+  m_RotatePDF->SetInputConnection(m_CircleTF->GetOutputPort());
 
 }
 //----------------------------------------------------------------------------

@@ -112,7 +112,7 @@ int albaDeviceButtonsPadTrackerP5Glove::InternalInitialize()
 	  SetPinkySensitivity(nBendSensitivity[P5_PINKY]);
 
     // disable Mouse modality for P5 0
-		m_P5->P5_SetMouseState(0, FALSE);
+		m_P5->P5_SetMouseState(0, false);
 
     albaLogMessage("P5 Tracker Found & Initialized");
 	}

@@ -57,6 +57,7 @@ albaGizmoBoundingBox::albaGizmoBoundingBox(albaVME *input, albaObserver *listene
 
   m_BoxOutline = vtkOutlineSource::New();
   m_BoxOutline->SetBounds(m_InputVme->GetOutput()->GetVTKData()->GetBounds());
+	m_BoxOutline->Update();
 
   // create the gizmo
   m_BoxGizmo = albaVMEGizmo::New();  
@@ -166,7 +167,6 @@ void albaGizmoBoundingBox::SetInput(albaVME *vme)
 double *albaGizmoBoundingBox::GetBounds()
 //----------------------------------------------------------------------------
 {
-  m_BoxGizmo->GetOutput()->GetVTKData()->Update();
   return m_BoxGizmo->GetOutput()->GetVTKData()->GetBounds();
 }
 
@@ -190,7 +190,7 @@ void albaGizmoBoundingBox::SetBounds(double bounds[6])
 //----------------------------------------------------------------------------
 {
   m_BoxOutline->SetBounds(bounds);
-  m_BoxGizmo->GetOutput()->GetVTKData()->Update();
+	m_BoxOutline->Update();
 }
 //----------------------------------------------------------------------------
 albaMatrix * albaGizmoBoundingBox::GetPose()

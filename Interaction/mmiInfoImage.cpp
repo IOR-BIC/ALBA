@@ -41,6 +41,7 @@
 
 #include "vtkDataSet.h"
 #include "vtkPointData.h"
+#include "vtkDataArray.h"
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
 #include <assert.h>
