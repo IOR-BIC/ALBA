@@ -57,7 +57,6 @@ void albaAttributeTraceability::AddTraceabilityEvent(albaString trialEvent, alba
 	traceability.m_BuildNum = buildNum;
   traceability.m_OperatorID = operatorID;
   traceability.m_IsNatural = isNatural;
-	
   m_TraceabilityVector.push_back(traceability);
 }
 

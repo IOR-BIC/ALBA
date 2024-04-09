@@ -306,7 +306,7 @@ void albaGUIMaterialChooser::CreatePipe()
 	m_Sphere->SetThetaResolution(20);
 	
 	m_Mapper = vtkPolyDataMapper::New();
-	m_Mapper->SetInput(m_Sphere->GetOutput());
+	m_Mapper->SetInputConnection(m_Sphere->GetOutputPort());
 	m_Mapper->SetImmediateModeRendering(0);
 	m_Mapper->SetScalarVisibility(1);
   m_Mapper->SetColorMode(0);     

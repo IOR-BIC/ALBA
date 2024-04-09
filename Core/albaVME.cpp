@@ -1829,7 +1829,7 @@ bool albaVME::WillBeRemovedWithDependencies(albaVME *vme)
 }
 
 //-------------------------------------------------------------------------
-unsigned long albaVME::GetMTime()
+vtkMTimeType albaVME::GetMTime()
 {
 	unsigned long mtime = this->albaTimeStamped::GetMTime();
 	if (m_DependsOnLinkedNode)

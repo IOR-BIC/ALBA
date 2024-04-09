@@ -76,7 +76,7 @@ public:
   assemblies; that is, assemblies that only serve to group and transform
   its parts.*/
   int RenderOpaqueGeometry(vtkViewport *ren);
-  int RenderTranslucentGeometry(vtkViewport *ren);
+  int RenderTranslucentPolygonalGeometry(vtkViewport *ren);
 
   /**
   Release any graphics resources that are being consumed by this actor.
@@ -121,6 +121,11 @@ public:
   with transformations properly concatenated.*/
   void BuildPaths(vtkAssemblyPaths *paths, vtkAssemblyPath *path);
 //ETX  
+
+	/** Does this prop have some translucent polygonal geometry?
+	 This method is called during the rendering process to know if there is
+	 some translucent polygonal geometry. */
+	virtual int HasTranslucentPolygonalGeometry();
 
 protected:
   vtkALBAAssembly();

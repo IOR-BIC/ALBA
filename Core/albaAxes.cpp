@@ -84,7 +84,7 @@ albaAxes::albaAxes(vtkRenderer *ren, albaVME* vme, int axesType)
 		m_AxesLUT->SetTableValue(2,0,0,1,1);
 
 		m_AxesMapper2D = vtkPolyDataMapper2D::New();
-		m_AxesMapper2D->SetInput(m_TriadAxes->GetOutput());
+		m_AxesMapper2D->SetInputConnection(m_TriadAxes->GetOutputPort());
 		m_AxesMapper2D->SetScalarModeToUsePointData();
 
 		m_AxesMapper2D->SetTransformCoordinate(m_Coord);
@@ -117,7 +117,6 @@ albaAxes::albaAxes(vtkRenderer *ren, albaVME* vme, int axesType)
 		m_GlobalAxesPolydataActor = vtkALBAGlobalAxesPolydataActor::New();
 		m_GlobalAxesPolydataActor->SetType(vtkALBAGlobalAxesPolydataActor::HEAD);
     m_OrientationMarkerWidget = vtkALBAOrientationMarkerWidget::New();
-
     if(m_Vme)
       m_GlobalAxesPolydataActor->SetInitialPose(m_Vme->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix());
 

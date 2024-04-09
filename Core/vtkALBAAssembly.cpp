@@ -33,7 +33,6 @@
 #include "vtkActor.h"
 #include "vtkVolume.h"
 
-vtkCxxRevisionMacro(vtkALBAAssembly, "$Revision: 1.5.2.2 $");
 vtkStandardNewMacro(vtkALBAAssembly);
 
 // Construct object with no children.
@@ -118,7 +117,7 @@ void vtkALBAAssembly::GetActors(vtkPropCollection *ac)
   this->UpdatePaths();
   for ( this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); )
   {
-    prop3D = (vtkProp3D *)path->GetLastNode()->GetProp();
+    prop3D = (vtkProp3D *)path->GetLastNode()->GetViewProp();
     if ( (actor = vtkActor::SafeDownCast(prop3D)) != NULL )
     {
       ac->AddItem(actor);
@@ -137,7 +136,7 @@ void vtkALBAAssembly::GetVolumes(vtkPropCollection *ac)
   this->UpdatePaths();
   for ( this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); )
   {
-    prop3D = (vtkProp3D *)path->GetLastNode()->GetProp();
+    prop3D = (vtkProp3D *)path->GetLastNode()->GetViewProp();
     if ( (volume = vtkVolume::SafeDownCast(prop3D)) != NULL )
     {
       ac->AddItem(volume);
@@ -197,7 +196,7 @@ double *vtkALBAAssembly::GetBounds()
 
   for ( this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); )
   {
-    prop3D = (vtkProp3D *)path->GetLastNode()->GetProp();
+    prop3D = (vtkProp3D *)path->GetLastNode()->GetViewProp();
     if ( prop3D->GetVisibility() )
     {
       propVisible = 1;
@@ -280,13 +279,16 @@ void vtkALBAAssembly::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //-----------------------------------------------------------------------------
-int vtkALBAAssembly::RenderTranslucentGeometry(vtkViewport *ren) 
+int vtkALBAAssembly::RenderTranslucentPolygonalGeometry(vtkViewport *ren)
 {
 	int renderedSomething = 0;
 
 	if (GetVisibility())
 	{
 		vtkAssemblyPath *path;
+
+		if (!Paths)
+			UpdatePaths();
 
 		// for allocating render time between components
 		const float fraction = this->AllocatedRenderTime
@@ -295,12 +297,12 @@ int vtkALBAAssembly::RenderTranslucentGeometry(vtkViewport *ren)
 		// render the Paths
 		for (this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); )
 		{
-			vtkProp3D *prop3D = (vtkProp3D *)path->GetLastNode()->GetProp();
-			if (prop3D->GetVisibility())
+    vtkProp3D *prop3D = (vtkProp3D *)path->GetLastNode()->GetViewProp();
+    if ( prop3D->GetVisibility()) 
 			{
 				prop3D->SetAllocatedRenderTime(fraction, ren);
 				prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
-				renderedSomething += prop3D->RenderTranslucentGeometry(ren);
+	      renderedSomething += prop3D->RenderTranslucentPolygonalGeometry(ren);
 				prop3D->PokeMatrix(NULL);
 			}
 		}
@@ -321,6 +323,9 @@ int vtkALBAAssembly::RenderOpaqueGeometry(vtkViewport *ren)
 	{
 		vtkAssemblyPath *path;
 
+		if (!Paths)
+			UpdatePaths();
+
 		// for allocating render time between components
 		const float fraction = this->AllocatedRenderTime
 			/ (float)(this->Paths->GetNumberOfItems() > 0 ? this->Paths->GetNumberOfItems() : 1);
@@ -328,8 +333,8 @@ int vtkALBAAssembly::RenderOpaqueGeometry(vtkViewport *ren)
 		// render the Paths
 		for (this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); )
 		{
-			vtkProp3D *prop3D = (vtkProp3D *)path->GetLastNode()->GetProp();
-			if (prop3D->GetVisibility())
+	    vtkProp3D *prop3D = (vtkProp3D *)path->GetLastNode()->GetViewProp();
+    	if (prop3D->GetVisibility()) 
 			{
 				prop3D->SetAllocatedRenderTime(fraction, ren);
 				prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
@@ -416,4 +421,17 @@ void vtkALBAAssembly::BuildPaths(vtkAssemblyPaths *paths, vtkAssemblyPath *path)
 			}
 		}
 	}
+}
+
+//----------------------------------------------------------------------------
+int vtkALBAAssembly::HasTranslucentPolygonalGeometry()
+//----------------------------------------------------------------------------
+{
+	vtkProp3D *prop3D;
+	for ( this->m_Parts->InitTraversal();  (prop3D = this->m_Parts->GetNextProp3D()); )
+	{
+		if (prop3D->HasTranslucentPolygonalGeometry())
+			return true;
+	}
+	return false;
 }

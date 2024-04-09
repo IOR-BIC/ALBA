@@ -106,10 +106,10 @@ int albaDataPipe::DeepCopy(albaDataPipe *pipe)
 
 //----------------------------------------------------------------------------
 // Get the MTime. Take in consideration also modifications to the Input Array
-unsigned long albaDataPipe::GetMTime()
+vtkMTimeType albaDataPipe::GetMTime()
 //------------------------------------------------------------------------------
 {
-  unsigned long mtime = this->albaTimeStamped::GetMTime();
+	vtkMTimeType mtime = this->albaTimeStamped::GetMTime();
 
   //if (m_Bounds.GetMTime() > mtime)
   //{

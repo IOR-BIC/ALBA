@@ -270,7 +270,7 @@ albaRWI::~albaRWI()
 
 	if(m_RenFront) 
 	{
-		m_RenFront->RemoveAllProps();
+		m_RenFront->RemoveAllViewProps();
 		m_RenderWindow->RemoveRenderer(m_RenFront);
 	}
 	vtkDEL(m_ProfilingActor);
@@ -279,7 +279,7 @@ albaRWI::~albaRWI()
 
 	if(m_RenBack)
 	{
-		m_RenBack->RemoveAllProps();
+		m_RenBack->RemoveAllViewProps();
 		m_RenderWindow->RemoveRenderer(m_RenBack);
 	}
 
@@ -287,7 +287,7 @@ albaRWI::~albaRWI()
 
 	if(m_AlwaysVisibleRenderer)
 	{
-		m_AlwaysVisibleRenderer->RemoveAllProps();
+		m_AlwaysVisibleRenderer->RemoveAllViewProps();
 		m_RenderWindow->RemoveRenderer(m_AlwaysVisibleRenderer);
 	}
 
@@ -634,11 +634,11 @@ void albaRWI::ResetCameraClippingRange()
 		rFR->ComputeVisiblePropBounds(b1);
 		rAV->ComputeVisiblePropBounds(b2);
 
-		if(b1[0] == VTK_LARGE_FLOAT && b2[0] == VTK_LARGE_FLOAT)
+		if(b1[0] == VTK_FLOAT_MAX && b2[0] == VTK_FLOAT_MAX)
 		{
 			rFR->ResetCameraClippingRange();
 		} 
-		else if (b1[0] == VTK_LARGE_FLOAT )
+		else if (b1[0] == VTK_FLOAT_MAX )
 		{
 			rFR->ResetCameraClippingRange(b2);
 		}
@@ -677,7 +677,7 @@ void albaRWI::ResetCameraClippingRange()
   	{
 	  	rBR->ComputeVisiblePropBounds(b3);
 
-		  if (b3[0] == VTK_LARGE_FLOAT )
+		  if (b3[0] == VTK_FLOAT_MAX )
 		  {
         // do nothing
 			}

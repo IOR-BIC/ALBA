@@ -87,7 +87,7 @@ void albaPipeBox::Create(albaSceneNode *n/*, bool use_axes*/)
   m_Box->SetBounds(b);
 
   vtkNEW(m_Mapper);
-	m_Mapper->SetInput(m_Box->GetOutput());
+	m_Mapper->SetInputConnection(m_Box->GetOutputPort());
   
 	if(m_Vme->IsAnimated())
 		m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
@@ -101,10 +101,10 @@ void albaPipeBox::Create(albaSceneNode *n/*, bool use_axes*/)
 
   // selection highlight
 	vtkNEW(m_OutlineBox);
-	m_OutlineBox->SetInput(m_Box->GetOutput());
+	m_OutlineBox->SetInputConnection(m_Box->GetOutputPort());
 
 	vtkNEW(m_OutlineMapper);
-	m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
+	m_OutlineMapper->SetInputConnection(m_OutlineBox->GetOutputPort());
 
 	vtkNEW(m_OutlineProperty);
 	m_OutlineProperty->SetColor(1,1,1);

@@ -51,12 +51,12 @@ albaAbsMatrixPipe::~albaAbsMatrixPipe()
 }
 
 //----------------------------------------------------------------------------
-unsigned long albaAbsMatrixPipe::GetMTime()
+vtkMTimeType albaAbsMatrixPipe::GetMTime()
 //----------------------------------------------------------------------------
 {
-  unsigned long mtime = this->Superclass::GetMTime();
+	vtkMTimeType mtime = this->Superclass::GetMTime();
 
-  unsigned long transMTime = m_Transform->GetMTime();
+	vtkMTimeType transMTime = m_Transform->GetMTime();
   if (transMTime > mtime)
   {
     return transMTime;
