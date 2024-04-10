@@ -140,7 +140,6 @@ void albaViewSlice::Create()
   m_Text = "";
   m_TextMapper = vtkTextMapper::New();
   m_TextMapper->SetInput(m_Text.ToAscii());
-  m_TextMapper->GetTextProperty()->AntiAliasingOff();
 
   m_TextActor = vtkActor2D::New();
   m_TextActor->SetMapper(m_TextMapper);
@@ -265,7 +264,6 @@ void albaViewSlice::VmeCreatePipe(albaVME *vme)
         int slice_mode;
         vtkDataSet *data = vme->GetOutput()->GetVTKData();
         assert(data);
-        data->Update();
         switch(m_CameraPositionId)
         {
         case CAMERA_OS_X:
@@ -306,7 +304,6 @@ void albaViewSlice::VmeCreatePipe(albaVME *vme)
 				int slice_mode;
 				vtkDataSet *data = vme->GetOutput()->GetVTKData();
 				assert(data);
-				data->Update();
 				if (m_SliceInitialized)
 				{
 					((albaPipeVolumeArbSlice *)pipe)->InitializeSliceParameters(m_Slice, false, false, m_TextureInterpolate);
@@ -588,14 +585,14 @@ void albaViewSlice::BorderCreate(double col[3])
   ps->SetPoint2(0, size[1]-1, 0);
 
   vtkOutlineFilter *of = vtkOutlineFilter::New();
-  of->SetInput((vtkDataSet *)ps->GetOutput());
+  of->SetInputConnection(ps->GetOutputPort());
 
   vtkCoordinate *coord = vtkCoordinate::New();
   coord->SetCoordinateSystemToDisplay();
   coord->SetValue(size[0]-1, size[1]-1, 0);
 
   vtkPolyDataMapper2D *pdmd = vtkPolyDataMapper2D::New();
-  pdmd->SetInput(of->GetOutput());
+  pdmd->SetInputConnection(of->GetOutputPort());
   pdmd->SetTransformCoordinate(coord);
 
   vtkProperty2D *pd = vtkProperty2D::New();

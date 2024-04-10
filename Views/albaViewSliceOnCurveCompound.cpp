@@ -563,7 +563,6 @@ void albaViewSliceOnCurveCompound::OnEvent(albaEventBase *alba_event)
 
     vtkPolyData* pdata = vtkPolyData::SafeDownCast(polyline->GetOutput()->GetVTKData());
     polyline_gr->SetData(pdata, 0);
-    polyline_gr->GetOutput()->GetVTKData()->Update();  //to force construction of output
     polyline_gr->Update();                   //to confirm data, data now goes to output
   }
 

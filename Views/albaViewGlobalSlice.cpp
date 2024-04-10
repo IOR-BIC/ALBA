@@ -221,7 +221,6 @@ void albaViewGlobalSlice::Create()
 	m_Text = "";
 	m_TextMapper = vtkTextMapper::New();
 	m_TextMapper->SetInput(m_Text.GetCStr());
-	m_TextMapper->GetTextProperty()->AntiAliasingOff();
 
 	m_TextActor = vtkActor2D::New();
 	m_TextActor->SetMapper(m_TextMapper);
@@ -249,11 +248,11 @@ void albaViewGlobalSlice::InizializePlane()
 
 	vtkOutlineCornerFilter* boundsOutlineBox;
   vtkNEW(boundsOutlineBox);
-	boundsOutlineBox->SetInput(boundsPlane->GetOutput());  
+	boundsOutlineBox->SetInputConnection(boundsPlane->GetOutputPort());  
 
 	vtkPolyDataMapper* boundsOutlineMapper;
   vtkNEW(boundsOutlineMapper);
-	boundsOutlineMapper->SetInput(boundsOutlineBox->GetOutput());
+	boundsOutlineMapper->SetInputConnection(boundsOutlineBox->GetOutputPort());
 
 	vtkProperty* boundsOutlineProperty;
   vtkNEW(boundsOutlineProperty);

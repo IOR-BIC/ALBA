@@ -792,7 +792,6 @@ void albaViewArbitraryOrthoSlice::VolumeWindowing(albaVME *volume)
 {
 	double sr[2];
 	vtkDataSet *data = volume->GetOutput()->GetVTKData();
-	data->Update();
 	data->GetScalarRange(sr);
 
 	mmaVolumeMaterial *currentVolumeMaterial = ((albaVMEOutputVolume *)m_InputVolume->GetOutput())->GetMaterial();
@@ -831,7 +830,6 @@ void albaViewArbitraryOrthoSlice::ShowVolume( albaVME * vme, bool show )
 
 	EnableWidgets(true);
 
-	volumeVTKData->Update();
 	volumeVTKData->GetCenter(volumeVTKDataCenterLocalCoords);
 	volumeVTKData->GetScalarRange(sr);
 	
@@ -854,7 +852,7 @@ void albaViewArbitraryOrthoSlice::ShowVolume( albaVME * vme, bool show )
 
 	vtkTransformPolyDataFilter *localToABSTPDF;
 	vtkNEW(localToABSTPDF);
-	localToABSTPDF->SetInput(sliceCenterLocalCoordsPolydata);
+	localToABSTPDF->SetInputData(sliceCenterLocalCoordsPolydata);
 	localToABSTPDF->SetTransform(sliceCenterLocalCoordsToABSCoordsTransform);
 	localToABSTPDF->Update();
 	localToABSTPDF->GetOutput()->GetCenter(m_SlicingOrigin);
@@ -1196,7 +1194,7 @@ void albaViewArbitraryOrthoSlice::CreateViewCameraNormalFeedbackActors()
 		coord->SetValue(size[0] - 1, size[1] - 1, 0);
 
 		vtkPolyDataMapper2D *pdmd = vtkPolyDataMapper2D::New();
-		pdmd->SetInput(ss->GetOutput());
+		pdmd->SetInputConnection(ss->GetOutputPort());
 		pdmd->SetTransformCoordinate(coord);
 
 		vtkProperty2D *pd = vtkProperty2D::New();

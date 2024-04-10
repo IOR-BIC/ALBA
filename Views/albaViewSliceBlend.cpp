@@ -165,7 +165,6 @@ void albaViewSliceBlend::VmeCreatePipe(albaVME *vme)
         int slice_mode;
         vtkDataSet *data = vme->GetOutput()->GetVTKData();
         assert(data);
-        data->Update();
         // check the type of camera
         switch(m_CameraPositionId)
         {
@@ -408,14 +407,14 @@ void albaViewSliceBlend::BorderCreate(double col[3])
   ps->SetPoint2(0, 1, 0);
 
   vtkOutlineFilter *of = vtkOutlineFilter::New();
-  of->SetInput((vtkDataSet *)ps->GetOutput());
+  of->SetInputConnection(ps->GetOutputPort());
 
   vtkCoordinate *coord = vtkCoordinate::New();
   coord->SetCoordinateSystemToNormalizedViewport();
   coord->SetValue(1, 1, 0);
 
   vtkPolyDataMapper2D *pdmd = vtkPolyDataMapper2D::New();
-  pdmd->SetInput(of->GetOutput());
+  pdmd->SetInputConnection(of->GetOutputPort());
   pdmd->SetTransformCoordinate(coord);
 
   vtkProperty2D *pd = vtkProperty2D::New();

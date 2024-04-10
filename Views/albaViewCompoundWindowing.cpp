@@ -220,7 +220,6 @@ void albaViewCompoundWindowing::ImageWindowing(albaVMEImage *image)
 {
   double sr[2];
   vtkDataSet *data = image->GetOutput()->GetVTKData();
-  data->Update();
 
   //Get scalar range of the image
   data->GetScalarRange(sr);

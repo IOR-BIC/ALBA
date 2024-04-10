@@ -764,7 +764,6 @@ void albaViewOrthoSlice::CreateOrthoslicesAndGizmos(albaVME *vme)
 	vtkDataSet *vtkData = m_CurrentVolume->GetOutput()->GetVTKData();
 	if (vtkData == NULL)
 		return;
-	vtkData->Update();
 	vtkData->GetCenter(vtkDataCenter);
 	vtkData->GetCenter(m_GizmoHandlePosition);
 	vtkData->GetScalarRange(sr);
