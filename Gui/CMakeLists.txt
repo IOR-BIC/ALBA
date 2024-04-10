@@ -112,35 +112,6 @@ ENDIF(WITH_OPENSSL)
 # List the kits from VTK that are needed by this project.
 SET(PROJECT_LIBS albaBase XercesC ${wxWidgets_LIBRARIES} GPUAPI)
 
-#........................................................
-#solo la vtkCommon e' linkata per default
-#per linkare altre lib inserirle qui di seguito
-#
-#  # VTK specific classes
-#  IF (ALBA_USE_VTK)
-#  SET(PROJECT_LIBS ${PROJECT_LIBS} 
-#    ...... place libname here .....     
-#  )
-#
-#  SET(PROJECT_SRCS
-#    ${PROJECT_SRCS}
-#    ...... place source filenames here .....     
-#  )
-#ENDIF (ALBA_USE_VTK)
-#........................................................
-
-#--------------------------------------------------------
-# Do not change anything below this line.
-
-##### SIL ------------ IF (NOT WIN32)
-##### SIL ------------   #INCLUDE (${ALBA_SOURCE_DIR}/modules/FindGTK20.cmake)
-##### SIL ------------ INCLUDE (${CMAKE_ROOT}/Modules/FindGTK.cmake)
-##### SIL ------------   INCLUDE_DIRECTORIES(${GTK_gtk_INCLUDE_PATH})
-##### SIL ------------   INCLUDE_DIRECTORIES(${GTK_glib_INCLUDE_PATH})
-##### SIL ------------   INCLUDE_DIRECTORIES(${GTK_glibconfig_INCLUDE_PATH})
-##### SIL ------------   #INCLUDE_DIRECTORIES(${GTK_gtkgl_INCLUDE_PATH})
-##### SIL ------------ ENDIF (NOT WIN32)
-
 # Need to include class headers and the configuration header.
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR})

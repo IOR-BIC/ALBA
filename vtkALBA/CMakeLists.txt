@@ -137,12 +137,12 @@ SET(vtkALBA_FULL_SRCS
 
 
 # List the kits from VTK that are needed by this project.
-SET(vtkALBA_LIBS vtkCommon  vtkRendering  vtkFiltering  vtkGraphics  vtkHybrid ${wxWidgets_LIBRARIES})
+SET(vtkALBA_LIBS ${VTK_LIBRARIES})
 
 
 find_package(VTK 7.1 REQUIRED NO_MODULE)
 include(${VTK_USE_FILE})
-SET(vtkALBA_LIBS ${VTK_LIBRARIES})
+
 
 IF(WIN32)
 SET(vtkALBA_LIBS

@@ -1162,3 +1162,11 @@ void vtkALBAVolumeSlicer::SetOutputTypeToPolyData()
 {
 	SetOutputType("vtkPolyData");
 }
+
+//----------------------------------------------------------------------------
+int vtkALBAVolumeSlicer::FillOutputPortInformation(int port, vtkInformation* info)
+{
+	// now add our info
+	info->Set(vtkDataObject::DATA_TYPE_NAME(), OutputVtkType); 
+	return 1;
+}

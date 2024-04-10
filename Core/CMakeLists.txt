@@ -73,7 +73,7 @@ ENDIF (ALBA_USE_VTK)
 SET(PROJECT_LIBS albaBase albaIO albaGui albaInteraction albaOperations curl ${wxWidgets_LIBRARIES})
 
 IF (ALBA_USE_VTK)
-  SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)
+  SET(PROJECT_LIBS ${PROJECT_LIBS} ${VTK_LIBRARIES})
 ENDIF (ALBA_USE_VTK)
 
 # ------------------------------------

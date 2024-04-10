@@ -10,7 +10,7 @@ ADD_DEFINITIONS(-DALBA_EXPORTS -UPROJ_SAX2 -UPROJ_XMLPARSER -UPROJ_XMLUTIL -UPRO
 
 ############################## 
 # LINKED LIBRARIES 
-SET(PROJECT_LIBS glu32 opengl32 vtkHybrid vtkIO vtkRendering vtkGraphics vtkFiltering vtkImaging vtkCommon vtkftgl vtkfreetype curl Crypto vtkALBA GPUAPI)
+SET(PROJECT_LIBS glu32 opengl32 ${VTK_LIBRARIES} curl Crypto vtkALBA GPUAPI)
 
 IF (ALBA_USE_XercesC)
   SET(PROJECT_LIBS ${PROJECT_LIBS} XercesC)
@@ -1139,7 +1139,6 @@ ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 
 IF (ALBA_USE_VTK)
-  # SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon vtkIO vtkRendering vtkGraphics vtkHybrid)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_VTK_LIBRARY)
 ENDIF (ALBA_USE_VTK)
 
