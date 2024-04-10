@@ -124,7 +124,6 @@ void albaPipeVolumeArbOrthoSlice::Create(albaSceneNode *n)
   vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
   double b[6];
   m_Vme->GetOutput()->Update();
-  data->Update();
   m_Vme->GetOutput()->GetVMELocalBounds(b);
 
   mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
@@ -175,10 +174,10 @@ void albaPipeVolumeArbOrthoSlice::Create(albaSceneNode *n)
 	CreateTICKs();
 
   vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInput(data);
+	corner->SetInputData(data);
 
 	vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
-	corner_mapper->SetInput(corner->GetOutput());
+	corner_mapper->SetInputConnection(corner->GetOutputPort());
 
 	vtkNEW(m_VolumeBoxActor);
 	m_VolumeBoxActor->SetMapper(corner_mapper);
@@ -198,7 +197,7 @@ void albaPipeVolumeArbOrthoSlice::Create(albaSceneNode *n)
 		vtkNEW(m_Box);
 		m_Box->SetBounds(bounds);
 		vtkNEW(m_Mapper);
-		m_Mapper->SetInput(m_Box->GetOutput());
+		m_Mapper->SetInputConnection(m_Box->GetOutputPort());
 		vtkNEW(m_Actor);
 		m_Actor->SetMapper(m_Mapper);
 		m_AssemblyUsed->AddPart(m_Actor);
@@ -226,7 +225,6 @@ void albaPipeVolumeArbOrthoSlice::CreateTICKs()
 	int	counter = 0;
 
 	vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
-	vtk_data->Update();
 
 	double bounds[6];
 	vtk_data->GetBounds(bounds);
@@ -297,7 +295,7 @@ void albaPipeVolumeArbOrthoSlice::CreateTICKs()
 
 	//Add tick to scene
 	vtkPolyDataMapper *TickMapper = vtkPolyDataMapper::New();
-	TickMapper->SetInput(CTLinesPD);
+	TickMapper->SetInputData(CTLinesPD);
 
 	vtkProperty	*TickProperty = vtkProperty::New();
 	TickProperty->SetColor(1,0,0);

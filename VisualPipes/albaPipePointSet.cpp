@@ -65,7 +65,7 @@ void albaPipePointSet::Create(albaSceneNode *n)
   assert(data);
 
   m_PointSetMapper = vtkPolyDataMapper::New();
-	m_PointSetMapper->SetInput(data);
+	m_PointSetMapper->SetInputData(data);
 	m_PointSetMapper->ScalarVisibilityOff();
   if(m_Vme->IsAnimated())				
     m_PointSetMapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
@@ -81,10 +81,10 @@ void albaPipePointSet::Create(albaSceneNode *n)
 
   // selection hilight
 	m_OutlineFilter = vtkOutlineCornerFilter::New();
-	m_OutlineFilter->SetInput(data);
+	m_OutlineFilter->SetInputData(data);
 
 	m_OutlineMapper = vtkPolyDataMapper::New();
-	m_OutlineMapper->SetInput(m_OutlineFilter->GetOutput());
+	m_OutlineMapper->SetInputConnection(m_OutlineFilter->GetOutputPort());
 
 	m_OutlineProperty = vtkProperty::New();
 	m_OutlineProperty->SetColor(1,1,1);

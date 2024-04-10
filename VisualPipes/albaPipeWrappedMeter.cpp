@@ -99,7 +99,7 @@ void albaPipeWrappedMeter::Create(albaSceneNode *n/*, bool use_axes*/)
 
   vtkNEW(m_Tube);
   m_Tube->UseDefaultNormalOff();
-  m_Tube->SetInput(data);
+  m_Tube->SetInputData(data);
   m_Tube->SetRadius(m_WrappedMeterVME->GetMeterRadius());
   m_Tube->SetCapping(m_WrappedMeterVME->GetMeterCapping());
   m_Tube->SetNumberOfSides(20);
@@ -116,11 +116,11 @@ void albaPipeWrappedMeter::Create(albaSceneNode *n/*, bool use_axes*/)
 
   vtkNEW(m_DataMapper);
   if (m_WrappedMeterVME->GetMeterRepresentation() == albaVMEWrappedMeter::LINE_REPRESENTATION)
-    m_DataMapper->SetInput(data);
+    m_DataMapper->SetInputData(data);
   else
   {
     m_Tube->Update();
-    m_DataMapper->SetInput(m_Tube->GetOutput());
+    m_DataMapper->SetInputConnection(m_Tube->GetOutputPort());
   }
     
 	m_DataMapper->ImmediateModeRenderingOff();
@@ -135,10 +135,10 @@ void albaPipeWrappedMeter::Create(albaSceneNode *n/*, bool use_axes*/)
 
   // selection hilight
 	vtkNEW(m_SelectionBox);
-	m_SelectionBox->SetInput(data);  
+	m_SelectionBox->SetInputData(data);  
 
 	vtkNEW(m_SelectionMapper);
-	m_SelectionMapper->SetInput(m_SelectionBox->GetOutput());
+	m_SelectionMapper->SetInputConnection(m_SelectionBox->GetOutputPort());
 
 	vtkNEW(m_SelectionProperty);
 	m_SelectionProperty->SetColor(1,1,1);
@@ -333,13 +333,12 @@ void albaPipeWrappedMeter::UpdateProperty(bool fromTag)
 
   
 	vtkPolyData *data =vtkPolyData::SafeDownCast(m_WrappedMeterVME->GetWrappedMeterOutput()->GetVTKData());
-  data->Update();
   if (m_WrappedMeterVME->GetMeterRepresentation() == albaVMEWrappedMeter::LINE_REPRESENTATION)
-    m_DataMapper->SetInput(data);
+    m_DataMapper->SetInputData(data);
   else
   {
     m_Tube->Update();
-    m_DataMapper->SetInput(m_Tube->GetOutput());
+    m_DataMapper->SetInputConnection(m_Tube->GetOutputPort());
   }
 
   double distance_value = m_WrappedMeterVME->GetDistance();
@@ -383,7 +382,7 @@ void albaPipeWrappedMeter::UpdateProperty(bool fromTag)
 
   GetGui()->Update();
 
-  m_SelectionBox->SetInput(data); 
+  m_SelectionBox->SetInputData(data); 
   m_SelectionBox->Update();
 
 }

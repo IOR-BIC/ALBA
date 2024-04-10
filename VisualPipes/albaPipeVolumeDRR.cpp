@@ -121,7 +121,7 @@ void albaPipeVolumeDRR::Create(albaSceneNode *n)
 	vtkNEW(m_VolumeMapper);
 	if(vtkImageData::SafeDownCast(data))
 	{
-		m_ResampleFilter->SetInput((vtkImageData*)data);
+		m_ResampleFilter->SetInputData((vtkImageData*)data);
 		for(int i=0;i<3;i++)
 			m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
 		m_ResampleFilter->Update();
@@ -130,31 +130,7 @@ void albaPipeVolumeDRR::Create(albaSceneNode *n)
 	else
 		m_VolumeMapper->SetInput(data);
 
-  //m_VolumeMapper->SetVolumeRayCastFunction(m_MIPFunction);
   m_VolumeMapper->SetCroppingRegionPlanes(0, 1, 0, 1, 0, 1);
-//  m_VolumeMapper->SetImageSampleDistance(1);
-//  m_VolumeMapper->SetMaximumImageSampleDistance(10);
-//  m_VolumeMapper->SetMinimumImageSampleDistance(1);
-//  m_VolumeMapper->SetNumberOfThreads(1);
-//  m_VolumeMapper->SetSampleDistance(1);
-
-  /*vtkNEW(m_VolumeMapperLow);
-  m_VolumeMapperLow->SetInput(m_Caster->GetOutput());
-  m_VolumeMapperLow->SetVolumeRayCastFunction(m_MIPFunction);
-  m_VolumeMapperLow->SetCroppingRegionPlanes(0, 1, 0, 1, 0, 1);
-  m_VolumeMapperLow->SetImageSampleDistance(5);
-  m_VolumeMapperLow->SetMaximumImageSampleDistance(10);
-  m_VolumeMapperLow->SetMinimumImageSampleDistance(5);
-  m_VolumeMapperLow->SetNumberOfThreads(1);
-  m_VolumeMapperLow->SetSampleDistance(5);
-
-  vtkNEW(m_VolumeLOD);
-  m_VolumeLOD->AddLOD(m_VolumeMapperLow, m_VolumeProperty,0);
-  m_VolumeLOD->AddLOD(m_VolumeMapper, m_VolumeProperty,0);
-  m_VolumeLOD->PickableOff();
-
-  m_AssemblyFront->AddPart(m_VolumeLOD);
-  */
   vtkNEW(m_Volume);
   m_Volume->SetMapper(m_VolumeMapper);
   m_Volume->PickableOff();
@@ -162,10 +138,10 @@ void albaPipeVolumeDRR::Create(albaSceneNode *n)
   m_AssemblyFront->AddPart(m_Volume);
   
   vtkALBASmartPointer<vtkOutlineCornerFilter> selection_filter;
-  selection_filter->SetInput(data);  
+  selection_filter->SetInputData(data);  
 
   vtkALBASmartPointer<vtkPolyDataMapper> selection_papper;
-  selection_papper->SetInput(selection_filter->GetOutput());
+  selection_papper->SetInputConnection(selection_filter->GetOutputPort());
 
   vtkALBASmartPointer<vtkProperty> selection_property;
   selection_property->SetColor(1,1,1);

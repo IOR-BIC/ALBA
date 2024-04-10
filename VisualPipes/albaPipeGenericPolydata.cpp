@@ -118,7 +118,6 @@ void albaPipeGenericPolydata::Create(albaSceneNode *n)
 void albaPipeGenericPolydata::ExecutePipe()
 {
   m_Vme->Update();
-  m_Vme->GetOutput()->GetVTKData()->Update();
 
 
 	albaVMEOutput *vmeOutput = m_Vme->GetOutput();
@@ -126,7 +125,6 @@ void albaPipeGenericPolydata::ExecutePipe()
 	vmeOutput->Update();
 	vtkDataSet *dataSet = vtkDataSet::SafeDownCast(vmeOutput->GetVTKData());
 	assert(dataSet);
-	dataSet->Update();
 
 	vtkNEW(m_Mapper);
 	m_Mapper->ImmediateModeRenderingOn();
@@ -137,7 +135,7 @@ void albaPipeGenericPolydata::ExecutePipe()
 
 	if (m_SkipNormalFilter)
 	{
-		m_Mapper->SetInput(polyData);
+		m_Mapper->SetInputData(polyData);
 	}
 	else
 	{
@@ -145,15 +143,18 @@ void albaPipeGenericPolydata::ExecutePipe()
 		m_NormalsFilter->SetFlipNormals(m_FlipNormals);
 		m_NormalsFilter->SetComputePointNormals(!m_ShowCellsNormals);
 		m_NormalsFilter->SetComputeCellNormals(m_ShowCellsNormals);
-		m_NormalsFilter->SetInput(polyData);
-		m_Mapper->SetInput(m_NormalsFilter->GetOutput());
+		m_NormalsFilter->SetInputData(polyData);
+		m_Mapper->SetInputConnection(m_NormalsFilter->GetOutputPort());
 	}
 
   m_Mapper->Update();
 	m_Mapper->SetResolveCoincidentTopologyToPolygonOffset();
 
   vtkNEW(m_MapperWired);
-  m_MapperWired->SetInput(m_SkipNormalFilter ? polyData : m_NormalsFilter->GetOutput());
+  if(m_SkipNormalFilter)
+  	m_MapperWired->SetInputData(polyData);
+  else
+    m_MapperWired->SetInputConnection(m_NormalsFilter->GetOutputPort());
   m_MapperWired->SetScalarRange(0,0);
   m_MapperWired->ScalarVisibilityOff();
 
@@ -195,10 +196,10 @@ void albaPipeGenericPolydata::ExecutePipe()
   
   // selection highlight
   vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInput(polyData);  
+	corner->SetInputData(polyData);  
 
   vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
-	corner_mapper->SetInput(corner->GetOutput());
+	corner_mapper->SetInputConnection(corner->GetOutputPort());
 
   vtkALBASmartPointer<vtkProperty> corner_props;
 	corner_props->SetColor(1,1,1);

@@ -124,7 +124,6 @@ void albaPipeVolumeSliceBlend::Create(albaSceneNode *n)
   double b[6];
   //Update input data
   m_Vme->GetOutput()->Update();
-  m_Vme->GetOutput()->GetVTKData()->Update();
   m_Vme->GetOutput()->GetVMELocalBounds(b);
 
   mmaVolumeMaterial *material = ((albaVMEVolume *)m_Vme)->GetMaterial();
@@ -158,10 +157,10 @@ void albaPipeVolumeSliceBlend::Create(albaSceneNode *n)
 
   //Create selection actor
   vtkNEW(m_VolumeBox);
-  m_VolumeBox->SetInput(m_Vme->GetOutput()->GetVTKData());
+  m_VolumeBox->SetInputData(m_Vme->GetOutput()->GetVTKData());
 
   vtkNEW(m_VolumeBoxMapper);
-  m_VolumeBoxMapper->SetInput(m_VolumeBox->GetOutput());
+  m_VolumeBoxMapper->SetInputConnection(m_VolumeBox->GetOutputPort());
 
   vtkNEW(m_VolumeBoxActor);
   m_VolumeBoxActor->SetMapper(m_VolumeBoxMapper);
@@ -181,7 +180,7 @@ void albaPipeVolumeSliceBlend::Create(albaSceneNode *n)
     vtkNEW(m_Box);
     m_Box->SetBounds(bounds);
     vtkNEW(m_Mapper);
-    m_Mapper->SetInput(m_Box->GetOutput());
+    m_Mapper->SetInputConnection(m_Box->GetOutputPort());
     vtkNEW(m_Actor);
     m_Actor->SetMapper(m_Mapper);
     m_AssemblyUsed->AddPart(m_Actor);
@@ -211,7 +210,6 @@ void albaPipeVolumeSliceBlend::CreateSlice(int direction)
 	double xmin, xmax, ymin, ymax, zmin, zmax;
 
   vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
-  vtk_data->Update();
  	vtk_data->GetBounds(bounds);
 		
 	xmin = bounds[0];
@@ -225,7 +223,7 @@ void albaPipeVolumeSliceBlend::CreateSlice(int direction)
     vtkNEW(m_Slicer[i][direction]);
 		m_Slicer[i][direction]->SetSclicingMode(direction);
     m_Slicer[i][direction]->SetPlaneOrigin(m_Origin[i]);
-    m_Slicer[i][direction]->SetInput(vtk_data);
+    m_Slicer[i][direction]->SetInputData(vtk_data);
 
 
 
@@ -233,7 +231,7 @@ void albaPipeVolumeSliceBlend::CreateSlice(int direction)
     m_Texture[i][direction]->RepeatOff();
     m_Texture[i][direction]->InterpolateOn();
     m_Texture[i][direction]->SetQualityTo32Bit();
-    m_Texture[i][direction]->SetInput((vtkImageData*)m_Slicer[i][direction]->GetOutput());
+    m_Texture[i][direction]->SetInputConnection(m_Slicer[i][direction]->GetOutputPort());
     m_Texture[i][direction]->SetLookupTable(m_ColorLUT);
     m_Texture[i][direction]->MapColorScalarsThroughLookupTableOn();
 
@@ -262,7 +260,7 @@ void albaPipeVolumeSliceBlend::CreateSlice(int direction)
 
 
 		vtkNEW(m_SliceMapper[i][direction]);
-		m_SliceMapper[i][direction]->SetInput(m_SlicePlane[i][direction]->GetOutput());
+    m_SliceMapper[i][direction]->SetInputConnection(m_SlicePlane[i][direction]->GetOutputPort());
     m_SliceMapper[i][direction]->ScalarVisibilityOff();
 
     vtkNEW(m_SliceActor[i][direction]);

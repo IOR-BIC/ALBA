@@ -84,7 +84,7 @@ void albaPipeGizmo::Create(albaSceneNode *n)
 	m_Vme->AddObserver(this);
 
 	m_Mapper = vtkPolyDataMapper::New();
-	m_Mapper->SetInput(data);
+	m_Mapper->SetInputData(data);
 	m_Mapper->ImmediateModeRenderingOff();
 
 	m_GizmoActor = vtkActor::New();
@@ -127,10 +127,10 @@ void albaPipeGizmo::Create(albaSceneNode *n)
 
 	// selection highlight
 	vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInput(data);  
+	corner->SetInputData(data);  
 
 	vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
-	corner_mapper->SetInput(corner->GetOutput());
+	corner_mapper->SetInputConnection(corner->GetOutputPort());
 
 	vtkALBASmartPointer<vtkProperty> corner_props;
 	corner_props->SetColor(1,1,1);
@@ -152,7 +152,6 @@ void albaPipeGizmo::Create(albaSceneNode *n)
 	//m_CaptionActor->GetCaptionTextProperty()->SetFontFamilyToTimes();
 	m_CaptionActor->GetCaptionTextProperty()->SetFontFamilyToArial();
 	m_CaptionActor->GetCaptionTextProperty()->BoldOn();
-	m_CaptionActor->GetCaptionTextProperty()->AntiAliasingOn();
 	m_CaptionActor->GetCaptionTextProperty()->ItalicOff();
 	m_CaptionActor->GetCaptionTextProperty()->ShadowOn();
 	m_CaptionActor->SetPadding(0);

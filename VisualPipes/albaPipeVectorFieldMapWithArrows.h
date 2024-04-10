@@ -36,6 +36,7 @@ class vtkDataSet;
 class vtkLookupTable;
 class vtkActor;
 class vtkScalarBarActor;
+class vtkAssignAttribute;
 
 /** Displays the surface of input VME using vector or scalar fields.
 - SCALARS: surface color is mapped according to the scalar value (selected in the gui); arrows length and color are mapped according to scalar value; arrows direction is normal to the point or cell.
@@ -119,6 +120,7 @@ protected:
   vtkArrowSource *m_Arrow;            ///< Arrow glyph representing a vector
 
   vtkGlyph3D* m_Glyph;                ///< Glyph3D filter
+	vtkAssignAttribute *m_AttributeAssigner; ////< Attribute Assigner for vector selection
   vtkPolyDataMapper* m_GlyphMapper;   ///< Mapper for glyphs
   vtkActor* m_GlyphActor;             ///< Actor for glyphs  
 

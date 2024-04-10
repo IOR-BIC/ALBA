@@ -202,7 +202,6 @@ void albaPipeVolumeArbSlice::Create(albaSceneNode *n)
   vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
   double b[6];
   m_Vme->GetOutput()->Update();
-  data->Update();
   m_Vme->GetOutput()->GetVMELocalBounds(b);
 
   mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
@@ -235,10 +234,10 @@ void albaPipeVolumeArbSlice::Create(albaSceneNode *n)
 	CreateTICKs();
 
   vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInput(data);
+	corner->SetInputData(data);
 
   vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
-	corner_mapper->SetInput(corner->GetOutput());
+	corner_mapper->SetInputConnection(corner->GetOutputPort());
 
 	vtkNEW(m_VolumeBoxActor);
 	m_VolumeBoxActor->SetMapper(corner_mapper);
@@ -258,7 +257,7 @@ void albaPipeVolumeArbSlice::Create(albaSceneNode *n)
 		vtkNEW(m_Box);
 		m_Box->SetBounds(bounds);
 		vtkNEW(m_Mapper);
-		m_Mapper->SetInput(m_Box->GetOutput());
+		m_Mapper->SetInputConnection(m_Box->GetOutputPort());
 		vtkNEW(m_Actor);
 		m_Actor->SetMapper(m_Mapper);
 		m_AssemblyUsed->AddPart(m_Actor);
@@ -290,7 +289,6 @@ void albaPipeVolumeArbSlice::CreateTICKs()
 	int	counter = 0;
 
 	vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
-	vtk_data->Update();
 
 	double bounds[6];
 	vtk_data->GetBounds(bounds);
@@ -361,7 +359,7 @@ void albaPipeVolumeArbSlice::CreateTICKs()
 
 	//Add tick to scene
 	vtkPolyDataMapper *TickMapper = vtkPolyDataMapper::New();
-	TickMapper->SetInput(CTLinesPD);
+	TickMapper->SetInputData(CTLinesPD);
 
 	vtkProperty	*TickProperty = vtkProperty::New();
 	TickProperty->SetColor(1,0,0);
@@ -392,7 +390,6 @@ void albaPipeVolumeArbSlice::CreateSlice()
 	double xspc = 0.33, yspc = 0.33, zspc = 1.0;
 
   vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
-  vtk_data->Update();
   if(vtk_data->IsA("vtkImageData") || vtk_data->IsA("vtkImageData"))
   {
     ((vtkImageData *)vtk_data)->GetSpacing(xspc,yspc,zspc);
@@ -406,17 +403,12 @@ void albaPipeVolumeArbSlice::CreateSlice()
 	m_SlicerImage->SetPlaneAxisY(m_YVector);
 	m_SlicerPolygonal->SetPlaneAxisX(m_XVector);
 	m_SlicerPolygonal->SetPlaneAxisY(m_YVector);
-	m_SlicerImage->SetInput(vtk_data);
-	m_SlicerPolygonal->SetInput(vtk_data);
+	m_SlicerImage->SetInputData(vtk_data);
+	m_SlicerPolygonal->SetInputData(vtk_data);
   
-	vtkNEW(m_Image);
-  m_Image->SetScalarType(vtk_data->GetPointData()->GetScalars()->GetDataType());
-	m_Image->SetNumberOfScalarComponents(vtk_data->GetPointData()->GetScalars()->GetNumberOfComponents());
-	m_Image->SetExtent(0, m_TextureRes - 1, 0, m_TextureRes - 1, 0, 0);
-	m_Image->SetSpacing(xspc, yspc, zspc);
-
-	m_SlicerImage->SetOutput(m_Image);
-  m_SlicerImage->SetGPUEnabled(m_EnableGPU);
+	m_SlicerImage->SetOutputDimentions(m_TextureRes,m_TextureRes,1);
+	m_SlicerImage->SetOutputSpacing(xspc, yspc, zspc);
+	m_SlicerImage->SetGPUEnabled(m_EnableGPU);
   m_SlicerImage->Update();
 
 	vtkNEW(m_Texture);
@@ -430,13 +422,13 @@ void albaPipeVolumeArbSlice::CreateSlice()
     m_Texture->InterpolateOff();
   }
 	m_Texture->SetQualityTo32Bit();
-	m_Texture->SetInput(m_Image);
+	m_Texture->SetInputConnection(m_SlicerImage->GetOutputPort());
   m_Texture->SetLookupTable(m_ColorLUT);
   m_Texture->MapColorScalarsThroughLookupTableOn();
 
-  vtkNEW(m_SlicePolydata);
-	m_SlicerPolygonal->SetOutput(m_SlicePolydata);
-	m_SlicerPolygonal->SetTexture(m_Image);
+	m_SlicerPolygonal->SetOutputTypeToPolyData();
+	m_SlicerPolygonal->SetTextureConnection(m_SlicerImage->GetOutputPort());
+
   m_SlicerPolygonal->SetGPUEnabled(m_EnableGPU);
 	m_SlicerPolygonal->Update();
 
@@ -446,16 +438,16 @@ void albaPipeVolumeArbSlice::CreateSlice()
 	// to delete
 	vtkNEW(m_NormalTranformFilter);
 
-	m_NormalTranformFilter->SetInput(m_SlicePolydata);
+	m_NormalTranformFilter->SetInputData(m_SlicePolydata);
 	m_NormalTranformFilter->SetTransform(m_NormalTranform);
 	m_NormalTranformFilter->Update();
 
 
 	vtkNEW(m_SliceMapper);
 	if (m_EnableSliceViewCorrection)
-		m_SliceMapper->SetInput(m_NormalTranformFilter->GetPolyDataOutput());
+		m_SliceMapper->SetInputConnection(m_NormalTranformFilter->GetOutputPort());
 	else
-		m_SliceMapper->SetInput(m_SlicePolydata);
+		m_SliceMapper->SetInputData(m_SlicePolydata);
 
 	m_SliceMapper->ScalarVisibilityOff();
 
@@ -820,7 +812,7 @@ void albaPipeVolumeArbSlice::SetEnableSliceViewCorrection(bool val)
 	m_EnableSliceViewCorrection = val;
 
 	if (m_EnableSliceViewCorrection)
-		m_SliceMapper->SetInput(m_NormalTranformFilter->GetPolyDataOutput());
+		m_SliceMapper->SetInputConnection(m_NormalTranformFilter->GetOutputPort());
 	else
-		m_SliceMapper->SetInput(m_SlicePolydata);
+		m_SliceMapper->SetInputData(m_SlicePolydata);
 }

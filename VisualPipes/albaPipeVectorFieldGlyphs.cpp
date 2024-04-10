@@ -60,12 +60,7 @@
 #include "albaGUIValidator.h"
 #include "albaGUIButton.h"
 #include "vtkRectilinearGrid.h"
-
 #include "vtkImageData.h"
-//#include "vtkStructuredPointsToPolyDataFilter.h"
-//#include "medPointsFilter.h"
-
-
 #include "wx/busyinfo.h"
 #include <wx/tokenzr.h>
 #include <wx/slider.h>
@@ -699,7 +694,7 @@ void albaPipeVectorFieldGlyphs::OnEvent(albaEventBase *alba_event)
 	  {
 		  if (m_ShowAll)
 		  {
-			  m_Glyphs->SetInput(m_Vme->GetOutput()->GetVTKData());
+			  m_Glyphs->SetInputData(m_Vme->GetOutput()->GetVTKData());
 		  }
 	  }else if (e->GetId()==ID_CHOOSE_ANDOR)
 	  {
@@ -1232,7 +1227,7 @@ void albaPipeVectorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ra
 						if (DoCondition(mode,tmpVectorValue,tmpScaleValue,rangeValue,rangeValue2))//tmpScale>=dMin && tmpScale<=dMax
 						{
 
-							pCoord = allPoints->GetTuple(idx);
+							pCoord = allPoints->GetScalars()->GetTuple(idx);
 
 							pCoord[0] = xCoord->GetTuple1(ix);
 							pCoord[1] = yCoord->GetTuple1(iy);
@@ -1255,7 +1250,8 @@ void albaPipeVectorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ra
 	{
 		vtkImageData *orgDataS =vtkImageData::SafeDownCast(orgData) ;
 		double origin[3],spacing[3];
-		int dim[3],increment[3];
+		int dim[3];
+		vtkIdType increment[3];
 		orgDataS->GetOrigin(origin) ;
 		orgDataS->GetSpacing(spacing) ;
 		orgDataS->GetDimensions(dim);
@@ -1278,7 +1274,7 @@ void albaPipeVectorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ra
 					{
 						idx = ix+iy*dim[0]+iz*dim[0]*dim[1];//position in whole image
 						//double tmpScale = old_scalars->GetTuple1(idx);
-						pCoord = allPoints->GetTuple(idx);
+						pCoord = allPoints->GetScalars()->GetTuple(idx);
 						//double tmpScale =  sqrt(pCoord[0]*pCoord[0]+pCoord[1]*pCoord[1]+pCoord[2]*pCoord[2]);	 
 						double *vet = old_vectors->GetTuple3(idx);
 						double tmpVectorValue =  sqrt(vet[0]*vet[0]+vet[1]*vet[1]+vet[2]*vet[2]);
@@ -1324,30 +1320,8 @@ void albaPipeVectorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ra
 	m_Output->GetPointData()->SetScalars(scalars) ;
 	m_Output->GetPointData()->SetVectors(vectors) ;
 	m_Output->GetPointData()->SetTensors(tensors);
-	//m_Output->GetPointData()->SetActiveScalars("scalars1");
-	m_Output->Update();
 
-	m_Glyphs->SetInput(m_Output);
-	//m_Glyphs->SelectInputScalars("scalars1");
-	//m_Glyphs->Update();
-	
-   /* vtkGlyph3D *test_Glyphs = vtkGlyph3D::New();
-	test_Glyphs->SetInput(m_Output);
-	test_Glyphs->SetScaleModeToScaleByVector();
-	//test_Glyphs->SetScaleModeToScaleByScalar();
-	test_Glyphs->GetOutput()->GetPointData()->SetScalars(scalars);
-	test_Glyphs->Update();
-	vtkDataArray *testScalars3 = test_Glyphs->GetOutput()->GetPointData()->GetScalars();
-	double sr2[2],sr3[2];
-	testScalars3->GetRange(sr2);
-
-	m_Output->GetScalarRange(sr3);
-
-
-	vtkDataArray *testScalars2 = m_Glyphs->GetOutput()->GetPointData()->GetScalars();
-	double sr[2];
-	testScalars2->GetRange(sr);*/
-
+	m_Glyphs->SetInputData(m_Output);
 }
 
 //------------------------------------------------------------------------
@@ -1386,10 +1360,8 @@ vtkImageData* albaPipeVectorFieldGlyphs::GetImageData(vtkRectilinearGrid* pInput
 	pRet->SetSpacing(sp);
 
 	vtkDataArray *scalars = pInput->GetPointData()->GetScalars();
-	pRet->SetNumberOfScalarComponents(scalars->GetNumberOfComponents());
-	pRet->SetScalarType(scalars->GetDataType());
+	pRet->AllocateScalars(scalars->GetDataType(),scalars->GetNumberOfComponents());
 	pRet->GetPointData()->SetScalars(scalars);
-	pRet->SetUpdateExtentToWholeExtent();
 
 	return pRet;
 }
@@ -1457,12 +1429,12 @@ bool albaPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pO
 
   m_Glyphs = vtkGlyph3D::New();
 
-  m_Glyphs->SetInput(m_Vme->GetOutput()->GetVTKData());
+  m_Glyphs->SetInputData(m_Vme->GetOutput()->GetVTKData());
 
   m_Glyphs->SetVectorModeToUseVector();
 
   m_GlyphsMapper = vtkPolyDataMapper::New();
-  m_GlyphsMapper->SetInput(m_Glyphs->GetOutput());
+  m_GlyphsMapper->SetInputConnection(m_Glyphs->GetOutputPort());
   m_GlyphsMapper->ImmediateModeRenderingOn();
   m_GlyphsMapper->SetScalarModeToUsePointData();
   m_GlyphsMapper->SetColorModeToMapScalars();
@@ -1497,11 +1469,7 @@ bool albaPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pO
 
   if (m_GlyphType == GLYPH_LINES)
   {
-    //m_GlyphLine->SetRadius(m_GlyphRadius);
-    //m_GlyphLine->SetHeight(m_GlyphLength);
-    //m_GlyphLine->SetResolution(m_GlyphRes);
-    //
-    m_Glyphs->SetSource(m_GlyphLine->GetOutput());
+    m_Glyphs->SetSourceConnection(m_GlyphLine->GetOutputPort());
   }
   else if (m_GlyphType == GLYPH_CONES)
   {
@@ -1509,7 +1477,7 @@ bool albaPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pO
     m_GlyphCone->SetHeight(m_GlyphLength);
     m_GlyphCone->SetResolution(m_GlyphRes);
 
-    m_Glyphs->SetSource(m_GlyphCone->GetOutput());
+    m_Glyphs->SetSourceConnection(m_GlyphCone->GetOutputPort());
   }
   else
   {
@@ -1519,7 +1487,7 @@ bool albaPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pO
     m_GlyphArrow->SetTipRadius(m_GlyphRadius);    
     m_GlyphArrow->SetTipResolution(m_GlyphRes);
     
-    m_Glyphs->SetSource(m_GlyphArrow->GetOutput());
+    m_Glyphs->SetSourceConnection(m_GlyphArrow->GetOutputPort());
   }
 
   if (m_GlyphScaling == SCALING_OFF)
@@ -1530,8 +1498,8 @@ bool albaPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pO
     m_Glyphs->SetScaleModeToScaleByScalar();
 
   if (m_ShowAll){
-	m_Glyphs->SetInput(m_Vme->GetOutput()->GetVTKData());
-	m_Glyphs->SelectInputScalars(GetScalarFieldName(m_ScalarFieldIndex));
+	m_Glyphs->SetInputData(m_Vme->GetOutput()->GetVTKData());
+	m_GlyphsMapper->ColorByArrayComponent(GetScalarFieldName(m_ScalarFieldIndex),1);
   }
   
   if (m_UseSFColorMapping == 0)

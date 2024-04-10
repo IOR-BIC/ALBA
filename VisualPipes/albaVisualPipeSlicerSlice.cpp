@@ -128,7 +128,6 @@ void albaVisualPipeSlicerSlice::Create(albaSceneNode *n/*, bool use_axes*/)
     assert(surface_output);
     surface_output->Update();
     data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
-    data->Update();
     material = surface_output->GetMaterial();
   }
   
@@ -156,11 +155,11 @@ void albaVisualPipeSlicerSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 	m_Plane1->SetTransform(m_VTKTransform);
   m_Plane2->SetTransform(m_VTKTransform);
 
-	m_Cutter1->SetInput(data);
+	m_Cutter1->SetInputData(data);
 	m_Cutter1->SetCutFunction(m_Plane1);
 	m_Cutter1->Update();
 
-  m_Cutter2->SetInput(data);
+  m_Cutter2->SetInputData(data);
   m_Cutter2->SetCutFunction(m_Plane2);
   m_Cutter2->Update();
 
@@ -185,7 +184,7 @@ void albaVisualPipeSlicerSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 
   
   m_SphereMapper = vtkPolyDataMapper::New();
-  m_SphereMapper->SetInput(m_Sphere->GetOutput());
+  m_SphereMapper->SetInputConnection(m_Sphere->GetOutputPort());
   
   m_SphereActor = vtkActor::New();
   m_SphereActor->SetProperty(material->m_Prop);
@@ -194,12 +193,12 @@ void albaVisualPipeSlicerSlice::Create(albaSceneNode *n/*, bool use_axes*/)
   m_AssemblyFront->AddPart(m_SphereActor);
 
   m_Mapper1 = vtkPolyDataMapper::New();
-  m_Mapper1->SetInput(m_Cutter1->GetOutput());
+  m_Mapper1->SetInputConnection(m_Cutter1->GetOutputPort());
   m_Mapper1->SetScalarVisibility(m_ScalarVisibility);
   m_Mapper1->SetScalarRange(sr);
 
   m_Mapper2 = vtkPolyDataMapper::New();
-  m_Mapper2->SetInput(m_Cutter2->GetOutput());
+  m_Mapper2->SetInputConnection(m_Cutter2->GetOutputPort());
   m_Mapper2->SetScalarVisibility(m_ScalarVisibility);
   m_Mapper2->SetScalarRange(sr);
   
@@ -242,10 +241,10 @@ void albaVisualPipeSlicerSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 
   // selection highlight
   m_OutlineBox = vtkOutlineCornerFilter::New();
-	m_OutlineBox->SetInput(data);  
+	m_OutlineBox->SetInputData(data);  
 
 	m_OutlineMapper = vtkPolyDataMapper::New();
-	m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
+	m_OutlineMapper->SetInputConnection(m_OutlineBox->GetOutputPort());
 
 	m_OutlineProperty = vtkProperty::New();
 	m_OutlineProperty->SetColor(1,1,1);

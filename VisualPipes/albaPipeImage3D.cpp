@@ -90,7 +90,6 @@ void albaPipeImage3D::Create(albaSceneNode *n)
   // image pipeline
   m_Vme->GetOutput()->Update();
   vtkImageData *image_data = (vtkImageData *)m_Vme->GetOutput()->GetVTKData();
-  image_data->Update();
 
   double b[6];
   image_data->GetBounds(b);
@@ -103,7 +102,7 @@ void albaPipeImage3D::Create(albaSceneNode *n)
   m_ImageTexture->RepeatOff();
   m_ImageTexture->InterpolateOn();
   m_ImageTexture->SetQualityTo32Bit();
-  m_ImageTexture->SetInput(image_data);
+  m_ImageTexture->SetInputData(image_data);
   
   if(IsGrayImage())
   {
@@ -119,7 +118,7 @@ void albaPipeImage3D::Create(albaSceneNode *n)
   m_ImageTexture->Modified();
 
   m_ImageMapper = vtkPolyDataMapper::New();
-	m_ImageMapper->SetInput(m_ImagePlane->GetOutput());
+	m_ImageMapper->SetInputConnection(m_ImagePlane->GetOutputPort());
 	m_ImageMapper->ScalarVisibilityOff();
 	if(m_Vme->IsAnimated())
 		m_ImageMapper->ImmediateModeRenderingOn();
@@ -134,10 +133,10 @@ void albaPipeImage3D::Create(albaSceneNode *n)
 
   // selection highlight
 	m_SelectionFilter = vtkOutlineCornerFilter::New();
-	m_SelectionFilter->SetInput(m_Vme->GetOutput()->GetVTKData());  
+	m_SelectionFilter->SetInputData(m_Vme->GetOutput()->GetVTKData());  
 
 	m_SelectionMapper = vtkPolyDataMapper::New();
-	m_SelectionMapper->SetInput(m_SelectionFilter->GetOutput());
+	m_SelectionMapper->SetInputConnection(m_SelectionFilter->GetOutputPort());
 
 	m_SelectionProperty = vtkProperty::New();
 	m_SelectionProperty->SetColor(1,1,1);

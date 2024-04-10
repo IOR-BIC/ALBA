@@ -39,7 +39,7 @@
 #include "vtkALBAAssembly.h"
 #include "vtkRenderer.h"
 
-#include "vtkPolyDataMapper.h"
+#include "vtkDataSetMapper.h"
 #include "vtkTextProperty.h"
 #include "vtkCubeAxesActor2D.h"
 #include "vtkPolyData.h"
@@ -71,8 +71,8 @@ void albaPipeScalarMatrix::Create(albaSceneNode *n)
   tprop->SetColor(1, 1, 1);
   tprop->ShadowOn();
 
-  vtkALBASmartPointer<vtkPolyDataMapper> mapper;
-  mapper->SetInput((vtkPolyData *)ds);
+  vtkALBASmartPointer<vtkDataSetMapper> mapper;
+  mapper->SetInputData(ds);
   mapper->ScalarVisibilityOn();
   mapper->SetScalarRange(ds->GetScalarRange());
 
@@ -82,7 +82,7 @@ void albaPipeScalarMatrix::Create(albaSceneNode *n)
   m_AssemblyFront->AddPart(m_Actor);
 
   vtkNEW(m_CubeAxes);
-  m_CubeAxes->SetInput(ds);
+  m_CubeAxes->SetInputData(ds);
   m_CubeAxes->SetCamera(m_RenFront->GetActiveCamera());
   m_CubeAxes->SetLabelFormat("%6.4g");
   m_CubeAxes->SetNumberOfLabels(5);

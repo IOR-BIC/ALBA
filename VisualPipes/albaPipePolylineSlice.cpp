@@ -42,7 +42,6 @@
 #include "vtkCellArray.h"
 #include "vtkClipPolyData.h"
 #include "vtkCubeSource.h"
-#include "vtkDataSetToPolyDataFilter.h"
 #include "vtkGlyph3D.h"
 #include "vtkKochanekSpline.h"
 #include "vtkALBAAssembly.h"
@@ -136,12 +135,11 @@ void albaPipePolylineSlice::Create(albaSceneNode *n)
 	polyline_output->Update();
 
 	vtkPolyData *data = vtkPolyData::SafeDownCast(polyline_output->GetVTKData());
-	data->Update();
 	assert(data);
 
 	//////////////////////////////////
 	vtkNEW(m_PolydataToPolylineFilter);
-	m_PolydataToPolylineFilter->SetInput(data);
+	m_PolydataToPolylineFilter->SetInputData(data);
 	m_PolydataToPolylineFilter->Update();
 
 	//////////////////////////////////
@@ -152,8 +150,8 @@ void albaPipePolylineSlice::Create(albaSceneNode *n)
 
 	//////////////////////////////////
 	vtkNEW(m_Glyph);
-	m_Glyph->SetInput(data);
-	m_Glyph->SetSource(m_Sphere->GetOutput());
+	m_Glyph->SetInputData(data);
+	m_Glyph->SetSourceConnection(m_Sphere->GetOutputPort());
 	m_Glyph->SetScaleModeToDataScalingOff();
 
   vtkDataArray *scalars = data->GetPointData()->GetScalars();
@@ -172,7 +170,7 @@ void albaPipePolylineSlice::Create(albaSceneNode *n)
 	vtkNEW(m_SplineFilter);
 	m_SplineFilter->SetSubdivideToLength();
 	m_SplineFilter->SetLength(5.0);
-	m_SplineFilter->SetInput(m_PolydataToPolylineFilter->GetOutput());
+	m_SplineFilter->SetInputConnection(m_PolydataToPolylineFilter->GetOutputPort());
 	m_SplineFilter->SetSpline(spline);
 /*	m_SplineFilter->Update();*/
 
@@ -232,11 +230,11 @@ void albaPipePolylineSlice::Create(albaSceneNode *n)
 
 	// Selection highlight
 	m_OutlineBox = vtkOutlineCornerFilter::New();
-	m_OutlineBox->SetInput(data);
+	m_OutlineBox->SetInputData(data);
 
 	//////////////////////////////////
 	m_OutlineMapper = vtkPolyDataMapper::New();
-	m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
+	m_OutlineMapper->SetInputConnection(m_OutlineBox->GetOutputPort());
 
 	m_OutlineProperty = vtkProperty::New();
 	m_OutlineProperty->SetColor(1, 1, 1);
@@ -508,7 +506,6 @@ void albaPipePolylineSlice::UpdateProperty()
 	vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
 	if (data == NULL) return;
 	data->Modified();
-	data->Update();
 
 	//////////////////////////////////	
 	if (m_Mapper)
@@ -522,13 +519,13 @@ void albaPipePolylineSlice::UpdateProperty()
 
 		if (m_Representation == TUBES)
 		{
-			m_Tube->SetInput(data);
-			m_AppendPolyData->AddInput(m_Tube->GetOutput());
+			m_Tube->SetInputData(data);
+			m_AppendPolyData->AddInputConnection(m_Tube->GetOutputPort());
 		}
 
 		if (m_Representation == LINES)
 		{
-			m_AppendPolyData->AddInput(data);
+			m_AppendPolyData->AddInputData(data);
 		}
 
 		if (m_ShowSpheres)
@@ -536,7 +533,7 @@ void albaPipePolylineSlice::UpdateProperty()
 			m_Glyph->Update();
 			m_Glyph->Modified();
 
-			m_AppendPolyData->AddInput(m_Glyph->GetOutput());
+			m_AppendPolyData->AddInputConnection(m_Glyph->GetOutputPort());
 		}
 	}
 
@@ -544,7 +541,7 @@ void albaPipePolylineSlice::UpdateProperty()
 	m_AppendPolyData->Update();
 
 	//////////////////////////////////
-	m_Cutter->SetInput(m_AppendPolyData->GetOutput());
+	m_Cutter->SetInputConnection(m_AppendPolyData->GetOutputPort());
 	m_Cutter->Update();
 
 	if (m_Fill)
@@ -552,7 +549,7 @@ void albaPipePolylineSlice::UpdateProperty()
 	else
 		m_PolyData = m_Cutter->GetOutput();
 		
-	m_Mapper->SetInput(m_PolyData);
+	m_Mapper->SetInputData(m_PolyData);
 	m_Mapper->Update();
 
 	if (m_Actor)
@@ -764,7 +761,7 @@ vtkPolyData *albaPipePolylineSlice::RegionsCapping(vtkPolyData* inputBorder)
 	m_CappingPolyData->RemoveAllInputs();
 
   vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
-  connectivityFilter->SetInput(inputBorder);
+  connectivityFilter->SetInputData(inputBorder);
   connectivityFilter->SetExtractionModeToSpecifiedRegions();
   connectivityFilter->Update();
   int regionNumbers = connectivityFilter->GetNumberOfExtractedRegions();
@@ -774,7 +771,6 @@ vtkPolyData *albaPipePolylineSlice::RegionsCapping(vtkPolyData* inputBorder)
     connectivityFilter->InitializeSpecifiedRegionList();
     connectivityFilter->AddSpecifiedRegion(region);
     connectivityFilter->Update();
-    connectivityFilter->GetOutput()->Update();
 
     vtkALBASmartPointer<vtkPolyData> p;
 
@@ -782,7 +778,6 @@ vtkPolyData *albaPipePolylineSlice::RegionsCapping(vtkPolyData* inputBorder)
 
     p->SetPoints(connectivityFilter->GetOutput()->GetPoints());
     p->SetLines(connectivityFilter->GetOutput()->GetLines());
-    p->Update();
     /*albaString filename1 = "C:\\conn_";
     filename1 << region;
     filename1 << ".vtk";
@@ -803,7 +798,7 @@ vtkPolyData *albaPipePolylineSlice::RegionsCapping(vtkPolyData* inputBorder)
     pdWriter->Update();*/
     //end write polydata
 
-    m_CappingPolyData->AddInput(p);
+    m_CappingPolyData->AddInputData(p);
 		m_CappingPolyData->Update();
   }
 
@@ -814,7 +809,6 @@ vtkPolyData *albaPipePolylineSlice::CappingFilter(vtkPolyData* inputBorder)
 //----------------------------------------------------------------------------
 {
   int i, iCell;
-  inputBorder->Update();
   // prerequisites: connected polydata with line cells that represent the edge of the hole to be capped. 
   // search average point
   double averagePoint[3] = {0.0,0.0,0.0};
@@ -857,7 +851,6 @@ vtkPolyData *albaPipePolylineSlice::CappingFilter(vtkPolyData* inputBorder)
   }
   // set the cell array to the polydata
   output->SetPolys(outputCellArray);
-  output->Update();
 
   return output;
 }

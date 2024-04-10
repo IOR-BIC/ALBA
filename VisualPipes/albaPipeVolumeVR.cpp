@@ -135,10 +135,9 @@ void albaPipeVolumeVR::Create(albaSceneNode *n)
 
     m_StructuredImage->SetSpacing(spaceInt_x,spaceInt_y,spaceInt_z);
 
-    m_StructuredImage->Update();
 
-    m_Probe->SetInput(m_StructuredImage);
-    m_Probe->SetSource(m_Vme->GetOutput()->GetVTKData());
+    m_Probe->SetInputData(0,m_StructuredImage);
+    m_Probe->SetInputData(1,m_Vme->GetOutput()->GetVTKData());
 
     m_Probe->Update();
 
@@ -186,17 +185,17 @@ void albaPipeVolumeVR::Create(albaSceneNode *n)
     m_ImageShift = vtkImageShiftScale::New();
 
     if (!m_IsStructured){
-      m_ImageShift->SetInput((vtkImageData *)m_Probe->GetOutput());
+      m_ImageShift->SetInputConnection(m_Probe->GetOutputPort());
     }
     else 
     {
       vtkDataSet* data = m_Vme->GetOutput()->GetVTKData();
       vtkNEW(m_ResampleFilter);
-      m_ResampleFilter->SetInput((vtkImageData*)data);
+      m_ResampleFilter->SetInputData(data);
       for(int i=0;i<3;i++)
         m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
       m_ResampleFilter->Update();
-      m_ImageShift->SetInput((vtkImageData *)m_ResampleFilter->GetOutput());
+      m_ImageShift->SetInputConnection(m_ResampleFilter->GetOutputPort());
 
     }
 
@@ -206,8 +205,8 @@ void albaPipeVolumeVR::Create(albaSceneNode *n)
 
     m_ImageShift->Update();
 
-    m_VolumeTextureMapperHigh->SetInput((vtkImageData *)m_ImageShift->GetOutput());
-    m_VolumeTextureMapperLow->SetInput((vtkImageData *)m_ImageShift->GetOutput());
+    m_VolumeTextureMapperHigh->SetInputConnection(m_ImageShift->GetOutputPort());
+    m_VolumeTextureMapperLow->SetInputConnection(m_ImageShift->GetOutputPort());
 
     ((vtkImageData *)m_ImageShift->GetOutput())->GetScalarRange(m_UnsignRange);
   }
@@ -215,8 +214,8 @@ void albaPipeVolumeVR::Create(albaSceneNode *n)
   {
     if (!m_IsStructured)
     {
-      m_VolumeTextureMapperHigh->SetInput((vtkImageData *)m_Probe->GetOutput());
-      m_VolumeTextureMapperLow->SetInput((vtkImageData *)m_Probe->GetOutput());
+      m_VolumeTextureMapperHigh->SetInputConnection(m_Probe->GetOutputPort());
+      m_VolumeTextureMapperLow->SetInputConnection(m_Probe->GetOutputPort());
 
       ((vtkImageData *)m_Probe->GetOutput())->GetScalarRange(m_UnsignRange);
     }
@@ -224,15 +223,14 @@ void albaPipeVolumeVR::Create(albaSceneNode *n)
     else 
     {
       vtkDataSet* data = m_Vme->GetOutput()->GetVTKData();
-      data->Update();
       vtkNEW(m_ResampleFilter);
-      m_ResampleFilter->SetInput((vtkImageData*)data);
+      m_ResampleFilter->SetInputData(data);
       for(int i=0;i<3;i++)
         m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
       m_ResampleFilter->Update();
 
-      m_VolumeTextureMapperHigh->SetInput((vtkImageData *)m_ResampleFilter->GetOutput());
-      m_VolumeTextureMapperLow->SetInput((vtkImageData *)m_ResampleFilter->GetOutput());
+      m_VolumeTextureMapperHigh->SetInputConnection(m_ResampleFilter->GetOutputPort());
+      m_VolumeTextureMapperLow->SetInputConnection(m_ResampleFilter->GetOutputPort());
 
       ((vtkImageData *)m_ResampleFilter->GetOutput())->GetScalarRange(m_UnsignRange);
     }    
@@ -446,15 +444,13 @@ void albaPipeVolumeVR::SetNumberPoints(int n)
   m_StructuredImage->SetDimensions(dim[0],dim[1],dim_z);
   m_StructuredImage->SetSpacing(spaceInt_x,spaceInt_y,spaceInt_z);
 
-  //m_StructuredImage->Modified();
-  m_StructuredImage->Update();
 
   if(m_Probe) m_Probe->Delete();
 
   m_Probe = vtkProbeFilter::New();
 
-  m_Probe->SetInput(m_StructuredImage);
-  m_Probe->SetSource(m_Vme->GetOutput()->GetVTKData());
+  m_Probe->SetInputData(0,m_StructuredImage);
+  m_Probe->SetInputData(1,m_Vme->GetOutput()->GetVTKData());
 
   m_Probe->Update();	
 }
@@ -488,8 +484,8 @@ void albaPipeVolumeVR::SetResampleFactor(double value)
     vtkNEW(m_VolumeTextureMapperHigh);
     vtkNEW(m_VolumeTextureMapperLow);
 
-    m_VolumeTextureMapperHigh->SetInput(m_ResampleFilter->GetOutput());
-    m_VolumeTextureMapperLow->SetInput(m_ResampleFilter->GetOutput());
+    m_VolumeTextureMapperHigh->SetInputConnection(m_ResampleFilter->GetOutputPort());
+    m_VolumeTextureMapperLow->SetInputConnection(m_ResampleFilter->GetOutputPort());
 
     m_VolumeTextureMapperHigh->SetMaximumNumberOfPlanes(1024);
     m_VolumeTextureMapperHigh->SetTargetTextureSize(512,512);

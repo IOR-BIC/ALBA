@@ -96,7 +96,7 @@ void albaPipeMeter::Create(albaSceneNode *n/*, bool use_axes*/)
 
   vtkNEW(m_Tube);
   m_Tube->UseDefaultNormalOff();
-  m_Tube->SetInput(data);
+  m_Tube->SetInputData(data);
   m_Tube->SetRadius(m_MeterVME->GetMeterRadius());
   m_Tube->SetCapping(m_MeterVME->GetMeterCapping());
   m_Tube->SetNumberOfSides(20);
@@ -113,11 +113,11 @@ void albaPipeMeter::Create(albaSceneNode *n/*, bool use_axes*/)
 
   vtkNEW(m_DataMapper);
   if (m_MeterVME->GetMeterRepresentation() == albaVMEMeter::LINE_REPRESENTATION)
-    m_DataMapper->SetInput(data);
+    m_DataMapper->SetInputData(data);
   else
   {
     m_Tube->Update();
-    m_DataMapper->SetInput(m_Tube->GetOutput());
+    m_DataMapper->SetInputConnection(m_Tube->GetOutputPort());
   }
     
 	m_DataMapper->ImmediateModeRenderingOff();
@@ -132,10 +132,10 @@ void albaPipeMeter::Create(albaSceneNode *n/*, bool use_axes*/)
 
   // selection hilight
 	vtkNEW(m_SelectionBox);
-	m_SelectionBox->SetInput(data);  
+	m_SelectionBox->SetInputData(data);  
 
 	vtkNEW(m_SelectionMapper);
-	m_SelectionMapper->SetInput(m_SelectionBox->GetOutput());
+	m_SelectionMapper->SetInputConnection(m_SelectionBox->GetOutputPort());
 
 	vtkNEW(m_SelectionProperty);
 	m_SelectionProperty->SetColor(1,1,1);
@@ -373,12 +373,12 @@ void albaPipeMeter::UpdateProperty(bool fromTag)
   vtkPolyData *data = m_MeterVME->GetPolylineOutput()->GetPolylineData();
   if (m_MeterVME->GetMeterRepresentation() == albaVMEMeter::LINE_REPRESENTATION)
   {
-    m_DataMapper->SetInput(data);
+    m_DataMapper->SetInputData(data);
   }
   else
   {
     m_Tube->Update();
-    m_DataMapper->SetInput(m_Tube->GetOutput());
+    m_DataMapper->SetInputConnection(m_Tube->GetOutputPort());
   }
 
   double distance_value = m_MeterVME->GetDistance();

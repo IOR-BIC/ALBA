@@ -983,7 +983,8 @@ void albaPipeTensorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ra
 	
 
 	double origin[3],spacing[3];
-	int dim[3],increment[3];
+	int dim[3];
+	vtkIdType increment[3];
 	m_Output = vtkPolyData::New();
 	m_Output->Initialize();
 	vtkPoints *points = vtkPoints::New() ;// Create points and attribute arrays (vector or tensor as requested by user)
@@ -1131,7 +1132,7 @@ void albaPipeTensorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ra
 								}
 								if (DoCondition(mode,tensorScale,pointScale,rangeValue,rangeValue2))//in range
 								{
-									pCoord = allPoints->GetTuple(idxPoints);
+									pCoord = allPoints->GetScalars()->GetTuple(idxPoints);
 
 									pCoord[0] = origin[0] + ix * spacing[0];
 									pCoord[1] = origin[1] + iy * spacing[1];
@@ -1171,8 +1172,7 @@ void albaPipeTensorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ra
 		m_Output->GetPointData()->SetVectors(vectors) ;
 		m_Output->GetPointData()->SetTensors(tensors);
 			
-		m_Output->Update();
-		m_Glyphs->SetInput(m_Output);
+		m_Glyphs->SetInputData(m_Output);
 		m_Glyphs->Update();
 		//outputFile2<< "  sr[0]="<<sr[0]<<"  sr[1]="<<sr[1]<<std::endl;//if debug
 		//outputFile2.close();//if debug
@@ -1392,7 +1392,7 @@ void albaPipeTensorFieldGlyphs::OnEvent(albaEventBase *alba_event)
 		{
 			if (m_ShowAll)
 			{
-				m_Glyphs->SetInput(m_Vme->GetOutput()->GetVTKData());
+				m_Glyphs->SetInputData(m_Vme->GetOutput()->GetVTKData());
 			}
 		}else if (e->GetId()==ID_CHOOSE_ANDOR)
 		{
@@ -1452,14 +1452,14 @@ void albaPipeTensorFieldGlyphs::OnEvent(albaEventBase *alba_event)
   m_GlyphArrow->SetTipLength(0.5);     
 
   m_Glyphs = vtkTensorGlyph::New();
-  m_Glyphs->SetInput(m_Vme->GetOutput()->GetVTKData());  
+  m_Glyphs->SetInputData(m_Vme->GetOutput()->GetVTKData());  
   m_Glyphs->SetScaleFactor(1.0);
   m_Glyphs->ClampScalingOff();
   m_Glyphs->SymmetricOff();  
  
 
   m_GlyphsMapper = vtkPolyDataMapper::New();
-  m_GlyphsMapper->SetInput(m_Glyphs->GetOutput());
+  m_GlyphsMapper->SetInputConnection(m_Glyphs->GetOutputPort());
   m_GlyphsMapper->ImmediateModeRenderingOn();
   m_GlyphsMapper->SetScalarModeToUsePointData();
   m_GlyphsMapper->SetColorModeToMapScalars();
@@ -1499,7 +1499,7 @@ void albaPipeTensorFieldGlyphs::OnEvent(albaEventBase *alba_event)
   if (m_GlyphType == GLYPH_AXES)
   {
 	  //m_GlyphAxes
-	  m_Glyphs->SetSource(m_GlyphAxes->GetOutput());
+	  m_Glyphs->SetSourceConnection(m_GlyphAxes->GetOutputPort());
 	  m_Glyphs->ThreeGlyphsOff();
   }
   else if (m_GlyphType == GLYPH_ELLIPSOID)
@@ -1508,7 +1508,7 @@ void albaPipeTensorFieldGlyphs::OnEvent(albaEventBase *alba_event)
     m_GlyphEllipsoid->SetPhiResolution(m_GlyphRes);
     m_GlyphEllipsoid->SetThetaResolution(m_GlyphRes);
 
-    m_Glyphs->SetSource(m_GlyphEllipsoid->GetOutput());
+    m_Glyphs->SetSourceConnection(m_GlyphEllipsoid->GetOutputPort());
     m_Glyphs->ThreeGlyphsOff();
 	 
   }  
@@ -1520,7 +1520,7 @@ void albaPipeTensorFieldGlyphs::OnEvent(albaEventBase *alba_event)
     m_GlyphArrow->SetTipRadius(m_GlyphRadius);    
     m_GlyphArrow->SetTipResolution(m_GlyphRes);
     
-    m_Glyphs->SetSource(m_GlyphArrow->GetOutput());
+    m_Glyphs->SetSourceConnection(m_GlyphArrow->GetOutputPort());
     m_Glyphs->ThreeGlyphsOn();
   }
   

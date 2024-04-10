@@ -121,7 +121,7 @@ void albaPipeCompound::AddActor(){
 	vtkNEW(m_VolumeMapper);
 	if(vtkImageData::SafeDownCast(data))
 	{
-		m_ResampleFilter->SetInput((vtkImageData*)data);
+		m_ResampleFilter->SetInputData((vtkImageData*)data);
 		for(int i=0;i<3;i++)
 			m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
 		m_ResampleFilter->Update();

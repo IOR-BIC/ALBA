@@ -195,10 +195,10 @@ void albaPipeTensorFieldSurface::OnEvent(albaEventBase *alba_event)
   m_ColorMappingLUT->Build(); 
 
   vtkGeometryFilter* filter = vtkGeometryFilter::New();
-  filter->SetInput(m_Vme->GetOutput()->GetVTKData());
+  filter->SetInputData(m_Vme->GetOutput()->GetVTKData());
 
   m_SurfaceMapper = vtkPolyDataMapper::New();
-  m_SurfaceMapper->SetInput(filter->GetOutput());
+  m_SurfaceMapper->SetInputConnection(filter->GetOutputPort());
   m_SurfaceMapper->ImmediateModeRenderingOn();
   m_SurfaceMapper->SetScalarModeToUsePointFieldData();// PointData();
   m_SurfaceMapper->SetColorModeToMapScalars();
@@ -398,7 +398,6 @@ bool albaPipeTensorFieldSurface::ComputeEigenvalues(vtkImageData* tensorVolume,d
 	tensorVolume->GetPointData()->SetVectors(eigenvalueArray);
 	tensorVolume->GetPointData()->SetTensors(eigenvalueArray);
 	tensorVolume->GetPointData()->SetScalars(scalars) ;
-	tensorVolume->Update();
 	eigenvalueArray->Delete();
 	return true;
 }

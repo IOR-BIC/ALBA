@@ -84,7 +84,6 @@ void albaVisualPipeVolumeRayCasting::Create(albaSceneNode *n)
   // rendering pipeline
   albaVMEOutputVolume *out_data = albaVMEOutputVolume::SafeDownCast(m_Vme->GetOutput());
   vtkDataSet *data = this->m_Vme->GetOutput()->GetVTKData();
-  data->Update();
   this->m_Mapper = vtkALBAAdaptiveVolumeMapper::New();
 
   vtkALBASmartPointer<vtkImageCast> chardata;
@@ -103,7 +102,6 @@ void albaVisualPipeVolumeRayCasting::Create(albaSceneNode *n)
     imageData = vtkImageData::New();
     imageData->ShallowCopy(gridData);
     imageData->SetDimensions(gridData->GetDimensions());
-    imageData->SetNumberOfScalarComponents(gridData->GetPointData()->GetNumberOfComponents());
     double offset[3], spacing[3];
     offset[0] = gridData->GetXCoordinates()->GetTuple(0)[0];
     offset[1] = gridData->GetYCoordinates()->GetTuple(0)[0];
@@ -116,17 +114,17 @@ void albaVisualPipeVolumeRayCasting::Create(albaSceneNode *n)
     // set type
     vtkDataArray *data = gridData->GetPointData()->GetArray(0);
     if (data->IsA("vtkUnsignedShortArray"))
-      imageData->SetScalarType(VTK_UNSIGNED_SHORT);
+      imageData->AllocateScalars(VTK_UNSIGNED_SHORT,gridData->GetPointData()->GetNumberOfComponents());
     else if (data->IsA("vtkShortArray"))
-      imageData->SetScalarType(VTK_SHORT);
+      imageData->AllocateScalars(VTK_SHORT,gridData->GetPointData()->GetNumberOfComponents());
     else if (data->IsA("vtkCharArray"))
-      imageData->SetScalarType(VTK_CHAR);
+      imageData->AllocateScalars(VTK_CHAR,gridData->GetPointData()->GetNumberOfComponents());
     else if (data->IsA("vtkUnsignedCharArray"))
-      imageData->SetScalarType(VTK_UNSIGNED_CHAR);
+      imageData->AllocateScalars(VTK_UNSIGNED_CHAR,gridData->GetPointData()->GetNumberOfComponents());
     else if (data->IsA("vtkFloatArray"))
-      imageData->SetScalarType(VTK_FLOAT);
+      imageData->AllocateScalars(VTK_FLOAT,gridData->GetPointData()->GetNumberOfComponents());
     else if (data->IsA("vtkDoubleArray"))
-      imageData->SetScalarType(VTK_DOUBLE);
+      imageData->AllocateScalars(VTK_DOUBLE,gridData->GetPointData()->GetNumberOfComponents());
     else 
     {
       imageData->Delete();
@@ -141,7 +139,7 @@ void albaVisualPipeVolumeRayCasting::Create(albaSceneNode *n)
      scalars->GetDataType() != VTK_CHAR ||
      scalars->GetDataType() != VTK_UNSIGNED_CHAR)
   {
-    chardata->SetInput(imageData);
+    chardata->SetInputData(imageData);
     chardata->Update();
     this->m_Mapper->SetInput((vtkDataSet*)(chardata->GetOutput()));
   }
@@ -182,10 +180,10 @@ void albaVisualPipeVolumeRayCasting::Create(albaSceneNode *n)
 
   // selection box
   vtkALBASmartPointer<vtkOutlineCornerFilter> outlineFilter;
-  outlineFilter->SetInput(data);
+  outlineFilter->SetInputData(data);
 
   vtkALBASmartPointer<vtkPolyDataMapper> outlineMapper;
-  outlineMapper->SetInput(outlineFilter->GetOutput());
+  outlineMapper->SetInputConnection(outlineFilter->GetOutputPort());
 
   this->m_Box = vtkActor::New();
   this->m_Box->SetMapper(outlineMapper);

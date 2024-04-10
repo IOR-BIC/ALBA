@@ -92,7 +92,6 @@ void albaPipeVector::Create(albaSceneNode *n)
   assert(out_polyline);
   m_Data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
   assert(m_Data);
-  m_Data->Update(); 
 
   m_Vector = albaVMEVector::SafeDownCast(m_Vme);
   m_Vector->GetTimeStamps(m_TimeVector);
@@ -114,11 +113,12 @@ void albaPipeVector::Create(albaSceneNode *n)
 
   m_Sphere->Update();
   m_Apd = vtkAppendPolyData::New();
-  m_Apd->AddInput(m_Data);
-  m_Apd->AddInput(m_Sphere->GetOutput());
-  m_Apd->AddInput(m_ArrowTip->GetOutput());
+	m_Apd->AddInputData(m_Data);
+	//Here AddInputData is used because we need to remove the input
+	m_Apd->AddInputData(m_Sphere->GetOutput());
+  m_Apd->AddInputData(m_ArrowTip->GetOutput());
   m_Apd->Update();
-  m_Mapper->SetInput(m_Apd->GetOutput());
+  m_Mapper->SetInputConnection(m_Apd->GetOutputPort());
  
 
   int renderingDisplayListFlag = m_Vme->IsAnimated() ? 1 : 0;
@@ -139,10 +139,10 @@ void albaPipeVector::Create(albaSceneNode *n)
   m_AssemblyFront->AddPart(m_ActorBunch);
 
   vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-  corner->SetInput(m_Data);  
+  corner->SetInputData(m_Data);  
 
   vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
-  corner_mapper->SetInput(corner->GetOutput());
+  corner_mapper->SetInputConnection(corner->GetOutputPort());
 
   vtkALBASmartPointer<vtkProperty> corner_props;
   corner_props->SetColor(1,1,1);
@@ -192,7 +192,6 @@ void albaPipeVector::Select(bool sel)
 void albaPipeVector::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 { 
-  m_Data->Update();
 
   double pointCop[3];
   m_Data->GetPoint(0,pointCop);
@@ -263,12 +262,12 @@ void albaPipeVector::AllVector(bool fromTag)
       line->SetPoint1(point1);
       line->SetPoint2(point2);
  
-      m_Bunch->AddInput(line->GetOutput());
+      m_Bunch->AddInputConnection(line->GetOutputPort());
     } 
 
-    if (m_Bunch->GetNumberOfInputs() == 0)
+    if (m_Bunch->GetTotalNumberOfInputConnections() == 0)
     {
-      m_MapperBunch->SetInput(m_Bunch->GetOutput());
+      m_MapperBunch->SetInputConnection(m_Bunch->GetOutputPort());
     }
   }
 }
@@ -324,13 +323,13 @@ void albaPipeVector::OnEvent(albaEventBase *alba_event)
       case ID_USE_ARROW:
         if (m_UseArrow == false)
         {
-          m_Apd->RemoveInput(m_ArrowTip->GetOutput());
+          m_Apd->RemoveInputData(m_ArrowTip->GetOutput());
           m_Apd->Update();
         }
         else
         {
           UpdateProperty();
-          m_Apd->AddInput(m_ArrowTip->GetOutput());
+          m_Apd->AddInputData(m_ArrowTip->GetOutput());
           m_Apd->Update();
         }
 				GetLogicManager()->CameraUpdate();
@@ -338,13 +337,13 @@ void albaPipeVector::OnEvent(albaEventBase *alba_event)
       case ID_USE_SPHERE:
         if (m_UseSphere == false)
         {
-          m_Apd->RemoveInput(m_Sphere->GetOutput());
+          m_Apd->RemoveInputData(m_Sphere->GetOutput());
           m_Apd->Update();
         }
         else
         {
           UpdateProperty();
-          m_Apd->AddInput(m_Sphere->GetOutput());
+					m_Apd->AddInputData(m_Sphere->GetOutput());
           m_Apd->Update();
         }
 				GetLogicManager()->CameraUpdate();

@@ -56,7 +56,6 @@ vtkPolyData *albaPipeSurface::GetInputAsPolyData()
 		surface_output->Update();
 		m_InputAsPolydata = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
 		assert(m_InputAsPolydata);
-		m_InputAsPolydata->Update();
 	}
 
 	return m_InputAsPolydata;

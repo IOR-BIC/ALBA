@@ -55,9 +55,12 @@ class ALBA_EXPORT vtkALBADistanceFilter : public vtkDataSetAlgorithm  {
     
     /**   Specify the point locations used to Distance input. Any geometry  can be used.*/
     void SetSource(vtkDataSet *data);
-    /** Retireve the Source pointer */
+    /** Retrieve the Source pointer */
     vtkDataSet *GetSource();
     
+		/** Retrieve the Input pointer */
+		vtkDataSet *GetInput();
+
     /**   Set Macro, Specify the transformation matrix that should be applied to input points prior to rendering*/
     vtkSetObjectMacro(InputMatrix, vtkMatrix4x4);
     /**  Get Macro,Specify the transformation matrix that should be applied to input points prior to rendering*/

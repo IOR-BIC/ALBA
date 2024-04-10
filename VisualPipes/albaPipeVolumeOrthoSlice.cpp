@@ -60,7 +60,6 @@
 albaCxxTypeMacro(albaPipeVolumeOrthoSlice);
 
 #include "albaMemDbg.h"
-#include "vtkDataSetToDataSetFilter.h"
 
 //----------------------------------------------------------------------------
 albaPipeVolumeOrthoSlice::albaPipeVolumeOrthoSlice():albaPipeSlice()
@@ -135,7 +134,6 @@ void albaPipeVolumeOrthoSlice::Create(albaSceneNode *n)
   vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
   double b[6];
   m_Vme->GetOutput()->Update();
-  data->Update();
   m_Vme->GetOutput()->GetVMELocalBounds(b);
 
   mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
@@ -159,10 +157,10 @@ void albaPipeVolumeOrthoSlice::Create(albaSceneNode *n)
 	CreateTICKs();
 
   vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInput(data);
+	corner->SetInputData(data);
 
   vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
-	corner_mapper->SetInput(corner->GetOutput());
+	corner_mapper->SetInputConnection(corner->GetOutputPort());
 
 	vtkNEW(m_VolumeBoxActor);
 	m_VolumeBoxActor->SetMapper(corner_mapper);
@@ -182,7 +180,7 @@ void albaPipeVolumeOrthoSlice::Create(albaSceneNode *n)
 		vtkNEW(m_Box);
 		m_Box->SetBounds(bounds);
 		vtkNEW(m_Mapper);
-		m_Mapper->SetInput(m_Box->GetOutput());
+		m_Mapper->SetInputConnection(m_Box->GetOutputPort());
 		vtkNEW(m_Actor);
 		m_Actor->SetMapper(m_Mapper);
 		m_AssemblyUsed->AddPart(m_Actor);
@@ -214,7 +212,6 @@ void albaPipeVolumeOrthoSlice::CreateTICKs()
 	int	counter = 0;
 
 	vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
-	vtk_data->Update();
 
 	double bounds[6];
 	vtk_data->GetBounds(bounds);
@@ -285,7 +282,7 @@ void albaPipeVolumeOrthoSlice::CreateTICKs()
 
 	//Add tick to scene
 	vtkPolyDataMapper *TickMapper = vtkPolyDataMapper::New();
-	TickMapper->SetInput(CTLinesPD);
+	TickMapper->SetInputData(CTLinesPD);
 
 	vtkProperty	*TickProperty = vtkProperty::New();
 	TickProperty->SetColor(1,0,0);
@@ -317,19 +314,18 @@ void albaPipeVolumeOrthoSlice::CreateSlice()
 		{
 			double bounds[6];
 			vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
-			vtk_data->Update();
 
 			vtkNEW(m_Slicer[i]);
 			m_Slicer[i]->SetSclicingMode(i);
 			m_Slicer[i]->SetPlaneOrigin(m_Origin);
-			m_Slicer[i]->SetInput(vtk_data);
+			m_Slicer[i]->SetInputData(vtk_data);
 
 
 			vtkNEW(m_Texture[i]);
 			m_Texture[i]->RepeatOff();
 			m_Texture[i]->SetInterpolate(m_Interpolate);
 			m_Texture[i]->SetQualityTo32Bit();
-			m_Texture[i]->SetInput((vtkImageData*)m_Slicer[i]->GetOutput());
+			m_Texture[i]->SetInputConnection(m_Slicer[i]->GetOutputPort());
 			m_Texture[i]->SetLookupTable(m_ColorLUT);
 			m_Texture[i]->MapColorScalarsThroughLookupTableOn();
 
@@ -365,7 +361,7 @@ void albaPipeVolumeOrthoSlice::CreateSlice()
 			}
 
 			vtkNEW(m_SliceMapper[i]);
-			m_SliceMapper[i]->SetInput(m_SlicePlane[i]->GetOutput());
+			m_SliceMapper[i]->SetInputConnection(m_SlicePlane[i]->GetOutputPort());
 			m_SliceMapper[i]->ScalarVisibilityOff();
 
 			vtkNEW(m_SliceActor[i]);

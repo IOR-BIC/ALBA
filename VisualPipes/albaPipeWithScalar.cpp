@@ -202,13 +202,13 @@ void albaPipeWithScalar::CreateDensityMapStack()
 	
 	m_DensityFilter->SetDistanceModeToScalar();
 	m_DensityFilter->SetSource(m_DensityVolume->GetOutput()->GetVTKData());
-	m_DensityFilter->SetInput(m_Mapper->GetInput());
+	m_DensityFilter->SetInputData(m_Mapper->GetInput());
 	m_DensityFilter->SetFilterModeToDensity();
 	m_DensityFilter->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 	m_DensityFilter->SetOutOfBoundsDensity(-9999);
 	m_DensityFilter->Update();
 
-	m_Mapper->SetInput(m_DensityFilter->GetOutput());
+	m_Mapper->SetInputConnection(m_DensityFilter->GetOutputPort());
 
 	m_MapsGenActive = true;
 
@@ -339,7 +339,7 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 void albaPipeWithScalar::DestroyDensityMapStack()
 {
 	//restore old mapper input
-	m_Mapper->SetInput(m_DensityFilter->GetInput());
+	m_Mapper->SetInputData(m_DensityFilter->GetInput());
 
 	m_Mapper->SetScalarVisibility(m_ScalarMapActive);
 	if (m_ScalarBarActor)
@@ -418,7 +418,6 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 	if (m_MapsGenActive)
 	{
 		vtkDataSet * vtkData = m_DensityFilter->GetOutput();
-		vtkData->Update();
 		vtkData->GetPointData()->SetActiveScalars(DISTANCE_FILTER_SCALARS_NAME);
 		vtkData->GetPointData()->GetScalars()->Modified();
 		vtkData->GetCellData()->SetActiveScalars("");
@@ -471,7 +470,6 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 					outputVTK->GetPointData()->SetActiveScalars("");
 				}
 				outputVTK->Modified();
-				outputVTK->Update();
 
 			}
 		}
@@ -479,7 +477,6 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 	else
 	{
 		vtkDataSet * vtkData = m_Vme->GetOutput()->GetVTKData();
-		vtkData->Update();
 		if (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0)
 		{
 			vtkData->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].ToAscii());
@@ -506,7 +503,6 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 		return;
 
   vtkDataSet *data = m_Mapper->GetInput();
-  data->Update();
 
   double sr[2]={0,1};
 	if (m_MapsGenActive || (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0))

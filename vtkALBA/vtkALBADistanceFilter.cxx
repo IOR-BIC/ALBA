@@ -76,6 +76,13 @@ vtkDataSet *vtkALBADistanceFilter::GetSource()
 {
 	return (vtkDataSet *)(this->GetExecutive()->GetInputData(1,0));
 }
+
+//----------------------------------------------------------------------------
+vtkDataSet * vtkALBADistanceFilter::GetInput()
+{
+	return (vtkDataSet *)(this->GetExecutive()->GetInputData(0, 0));
+}
+
 //----------------------------------------------------------------------------
 vtkMTimeType vtkALBADistanceFilter::GetMTime()
 //----------------------------------------------------------------------------

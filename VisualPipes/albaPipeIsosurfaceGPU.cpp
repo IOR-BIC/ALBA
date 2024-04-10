@@ -79,7 +79,6 @@ void albaPipeIsosurfaceGPU::Create(albaSceneNode *n)
   m_Vme->AddObserver(this);
 
 	vtkDataSet *dataset = m_Vme->GetOutput()->GetVTKData();
-	dataset->Update();
 
 	// contour pipeline
 	vtkNEW(m_ContourMapper);
@@ -104,10 +103,10 @@ void albaPipeIsosurfaceGPU::Create(albaSceneNode *n)
 
 	// selection box
 	vtkNEW(m_OutlineBox);
-	m_OutlineBox->SetInput(dataset);
+	m_OutlineBox->SetInputData(dataset);
 
 	vtkNEW(m_OutlineMapper);
-	m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
+	m_OutlineMapper->SetInputConnection(m_OutlineBox->GetOutputPort());
 
 	vtkNEW(m_OutlineActor);
 	m_OutlineActor->SetMapper(m_OutlineMapper);
@@ -238,7 +237,6 @@ void albaPipeIsosurfaceGPU::UpdateFromData()
   vtkDataSet *dataset = m_Vme->GetOutput()->GetVTKData();
   if(dataset)
   {
-    dataset->Update();
 
     if (m_ContourMapper != NULL)
     {
@@ -252,8 +250,8 @@ void albaPipeIsosurfaceGPU::ExctractIsosurface()
 //----------------------------------------------------------------------------
 {
 	vtkPolyData *surface = vtkPolyData::New();
-	m_ContourMapper->GetOutput(0, surface);
 	m_ContourMapper->Update();
+	m_ContourMapper->GetOutput(0, surface);
 
 	wxString name = albaString::Format(_("Isosurface %g"),m_ContourValue);
 

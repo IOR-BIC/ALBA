@@ -27,6 +27,7 @@
 
 #include "vtkDataSet.h"
 #include "vtkPointData.h"
+#include "vtkDataArray.h"
 
 #include "albaDbg.h"
 
@@ -80,7 +81,6 @@ void albaPipeVectorField::Create(albaSceneNode *n)
   //The default implementation is to update VME
   
   vtkDataSet* ds = m_Vme->GetOutput()->GetVTKData();
-  ds->Update(); //force its update
 }
 
 //------------------------------------------------------------------------

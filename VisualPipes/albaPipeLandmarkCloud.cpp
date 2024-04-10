@@ -213,11 +213,11 @@ void albaPipeLandmarkCloud::CreateCloudPipe(vtkDataSet *data, double radius, dou
   m_SphereSource->Update();
 
   vtkNEW(m_Normals);
-  m_Normals->SetInput(m_SphereSource->GetOutput());
+  m_Normals->SetInputConnection(m_SphereSource->GetOutputPort());
   m_Normals->Update();
 
   vtkNEW(m_Glyph);
-  m_Glyph->SetInput(data);
+  m_Glyph->SetInputData(data);
   m_Glyph->SetSource(m_Normals->GetOutput());
   m_Glyph->OrientOff();
   m_Glyph->ScalingOff();
@@ -225,7 +225,7 @@ void albaPipeLandmarkCloud::CreateCloudPipe(vtkDataSet *data, double radius, dou
   m_Glyph->Update();
 
   vtkNEW(m_CloudMapper);
-  m_CloudMapper->SetInput(m_Glyph->GetOutput());
+  m_CloudMapper->SetInputConnection(m_Glyph->GetOutputPort());
   m_CloudMapper->ScalarVisibilityOff();
   if(m_Vme->IsAnimated())				
     m_CloudMapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
@@ -255,11 +255,11 @@ void albaPipeLandmarkCloud::CreateCloudPipe(vtkDataSet *data, double radius, dou
 
   // selection highlight
   vtkNEW(m_CloundCornerFilter);
-  m_CloundCornerFilter->SetInput(data);
+  m_CloundCornerFilter->SetInputData(data);
 	m_CloundCornerFilter->SetCloudRadius(radius);
 
   vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
-  corner_mapper->SetInput(m_CloundCornerFilter->GetOutput());
+  corner_mapper->SetInputConnection(m_CloundCornerFilter->GetOutputPort());
 
   vtkALBASmartPointer<vtkProperty> corner_props;
   corner_props->SetColor(1,1,1);

@@ -93,13 +93,11 @@ void albaPipeVolumeProjected::Create(albaSceneNode *n)
 	vtkTexture         *RXTexture			= NULL;
 		
   vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
-  vtk_data->Update();
 
   double range[2]; // used with lut
 	double bounds[6];
   vtk_data->GetBounds(bounds);
 	
-
 	double xmin, xmax, ymin, ymax, zmin, zmax;
 	xmin = bounds[0];
 	xmax = bounds[1];
@@ -130,7 +128,7 @@ void albaPipeVolumeProjected::Create(albaSceneNode *n)
 	}
 
 	RXPlaneMapper = vtkPolyDataMapper::New();
-	RXPlaneMapper->SetInput(RXPlane->GetOutput());
+	RXPlaneMapper->SetInputConnection(RXPlane->GetOutputPort());
 
 	RXTexture = vtkTexture::New();
 	RXTexture->SetInterpolate(1);
@@ -145,7 +143,7 @@ void albaPipeVolumeProjected::Create(albaSceneNode *n)
 		dims[0]=0;
 	}
 
-	m_ProjectFilter->SetInput(vtk_data); 
+	m_ProjectFilter->SetInputData(vtk_data); 
 	if (m_CamPosition == CAMERA_RX_FRONT )
 			m_ProjectFilter->SetProjectionSideToY();
 	else
@@ -155,7 +153,7 @@ void albaPipeVolumeProjected::Create(albaSceneNode *n)
 	m_ProjectFilter->Update();
 	
 	m_ProjectFilter->GetOutput()->GetScalarRange(range);
-	RXTexture->SetInput((vtkImageData*)m_ProjectFilter->GetOutput());
+	RXTexture->SetInputConnection(m_ProjectFilter->GetOutputPort());
 
 	m_Lut->SetTableRange(range[0], range[1]);
 	m_Lut->SetWindow(range[1] - range[0]);
@@ -232,7 +230,7 @@ void albaPipeVolumeProjected::Create(albaSceneNode *n)
 
 	//Add tick to scene
   vtkPolyDataMapper *TickMapper = vtkPolyDataMapper::New();
-  TickMapper->SetInput(CTLinesPD);
+  TickMapper->SetInputData(CTLinesPD);
 
 	vtkProperty	*TickProperty = vtkProperty::New();
 	TickProperty->SetColor(1,0,0);
@@ -252,10 +250,10 @@ void albaPipeVolumeProjected::Create(albaSceneNode *n)
 
   // selection pipeline ////////////////////////////////
 	vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInput(m_Vme->GetOutput()->GetVTKData());
+	corner->SetInputData(m_Vme->GetOutput()->GetVTKData());
 
 	vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
-	corner_mapper->SetInput(corner->GetOutput());
+	corner_mapper->SetInputConnection(corner->GetOutputPort());
 
 	vtkNEW(m_VolumeBoxActor);
 	m_VolumeBoxActor->SetMapper(corner_mapper);

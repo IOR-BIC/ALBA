@@ -24,6 +24,9 @@
 
 #include "vtkDataSet.h"
 #include "vtkPointData.h"
+#include "vtkFieldData.h"
+#include "vtkAbstractArray.h"
+#include "vtkDataArray.h"
 
 
 ///visual pipes for volumes
@@ -84,7 +87,6 @@ albaCxxTypeMacro(albaPipeCompoundVolume);
   vtkDataSet* ds = m_Vme->GetOutput()->GetVTKData();
   if (ds != NULL)
   {
-    ds->Update();
 
     vtkPointData* pd = ds->GetPointData();
     if (pd != NULL && pd->GetScalars() != NULL) {
@@ -104,7 +106,6 @@ albaCxxTypeMacro(albaPipeCompoundVolume);
   vtkDataSet* ds = m_Vme->GetOutput()->GetVTKData();
   if (ds != NULL)
   {
-    ds->Update();
 
     vtkPointData* pd = ds->GetPointData();
     if (pd != NULL)
@@ -142,7 +143,6 @@ albaCxxTypeMacro(albaPipeCompoundVolume);
   vtkDataSet* ds = m_Vme->GetOutput()->GetVTKData();
   if (ds != NULL)
   {
-    ds->Update();
 
     vtkPointData* pd = ds->GetPointData();
     if (pd != NULL)
