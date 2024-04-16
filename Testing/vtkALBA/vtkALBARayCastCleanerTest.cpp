@@ -31,6 +31,7 @@
 #include "vtkStructuredPointsReader.h"
 #include "vtkStructuredPointsWriter.h"
 #include "vtkImageData.h"
+#include "vtkStructuredPoints.h"
 #include "vtkDataArray.h"
 #include "vtkPointData.h"
 
@@ -75,7 +76,7 @@ void vtkALBARayCastCleanerTest::TestFilter()
   filter->Update();
   
   //getting output
-  oldOutput=r2->GetOutput();
+  oldOutput= vtkImageData::SafeDownCast(r2->GetOutput());
   newOutput=vtkImageData::SafeDownCast(filter->GetOutput());
   
   //base tests

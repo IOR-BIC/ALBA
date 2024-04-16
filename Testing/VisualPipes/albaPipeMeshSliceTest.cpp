@@ -866,7 +866,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
     vtkActor *meshActor;
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
     CPPUNIT_ASSERT(meshActor != NULL);
-    CPPUNIT_ASSERT(meshActor->GetPickable() == FALSE);
+    CPPUNIT_ASSERT(meshActor->GetPickable() == false);
 
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();

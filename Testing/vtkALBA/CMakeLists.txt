@@ -29,8 +29,6 @@ SET(PROJECT_SRCS
 	vtkALBAGridActorTest.h vtkALBAGridActorTest.cpp
 	vtkALBAProjectVolumeTest.h vtkALBAProjectVolumeTest.cpp
 	vtkALBAClipSurfaceBoundingBoxTest.h vtkALBAClipSurfaceBoundingBoxTest.cpp
-	vtkALBARectilinearGridToRectilinearGridFilterTest.h vtkALBARectilinearGridToRectilinearGridFilterTest.cpp
-	vtkALBADummyRectilinearGridToRectilinearGridFilter.h vtkALBADummyRectilinearGridToRectilinearGridFilter.cpp
 	vtkALBAProfilingActorTest.h vtkALBAProfilingActorTest.cpp
 	vtkALBARulerActor2DTest.h vtkALBARulerActor2DTest.cpp
 	vtkALBASimpleRulerActor2DTest.h vtkALBASimpleRulerActor2DTest.cpp
@@ -48,7 +46,6 @@ SET(PROJECT_SRCS
 	vtkALBARegionGrowingLocalGlobalThresholdTest.h vtkALBARegionGrowingLocalGlobalThresholdTest.cpp
 	vtkImageUnPackerTest.h vtkImageUnPackerTest.cpp
 	vtkPackedImageTest.h vtkPackedImageTest.cpp
-	vtkALBAVolumeRayCastMapperTest.h vtkALBAVolumeRayCastMapperTest.cpp
 	vtkXRayVolumeMapperTest.h vtkXRayVolumeMapperTest.cpp
 	vtkALBAVolumeTextureMapper2DTest.h vtkALBAVolumeTextureMapper2DTest.cpp
 	vtkALBADataArrayDescriptorTest.h vtkALBADataArrayDescriptorTest.cpp

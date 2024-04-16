@@ -111,7 +111,6 @@ void vtkALBADistanceFilterTest::TestFilter_Scalar_Density()
 	importer->OpRun();
 
 	albaVMEVolumeGray *volume = albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
-	volume->GetOutput()->GetVTKData()->Update();
 	volume->ReparentTo(root);
 	volume->Update();
 	
@@ -133,31 +132,32 @@ void vtkALBADistanceFilterTest::TestFilter_Scalar_Density()
 	filter->Update();
 
 	//	
-	CPPUNIT_ASSERT(filter->GetOutput()->GetNumberOfPoints() == 66);
-	CPPUNIT_ASSERT(filter->GetOutput()->GetNumberOfCells() == 96);
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetNumberOfTuples() == 66);
+	vtkDataSet *filterOutput = filter->GetOutput();
+	CPPUNIT_ASSERT(filterOutput->GetNumberOfPoints() == 66);
+	CPPUNIT_ASSERT(filterOutput->GetNumberOfCells() == 96);
+	CPPUNIT_ASSERT(filterOutput->GetPointData()->GetNumberOfTuples() == 66);
 	
-	vtkDataArray *vectors = filter->GetOutput()->GetPointData()->GetVectors();
-	vtkDataArray *scalars = filter->GetOutput()->GetPointData()->GetScalars();
+	vtkDataArray *vectors = filterOutput->GetPointData()->GetVectors();
+	vtkDataArray *scalars = filterOutput->GetPointData()->GetScalars();
 	
   CPPUNIT_ASSERT(vectors == NULL && scalars != NULL);
 
 	double val = 0.88789987564086914;
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(5)[1] == val);   // 0.88789987564086914
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(10)[1] == val);  // 0.88789987564086914
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(57)[1] == -val); //-0.88789987564086914
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(22)[2] == val);  // 0.88789987564086914
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(55)[2] == val);  // 0.88789987564086914
+	CPPUNIT_ASSERT(scalars->GetTuple(5)[1] == val);   // 0.88789987564086914
+	CPPUNIT_ASSERT(scalars->GetTuple(10)[1] == val);  // 0.88789987564086914
+	CPPUNIT_ASSERT(scalars->GetTuple(57)[1] == -val); //-0.88789987564086914
+	CPPUNIT_ASSERT(scalars->GetTuple(22)[2] == val);  // 0.88789987564086914
+	CPPUNIT_ASSERT(scalars->GetTuple(55)[2] == val);  // 0.88789987564086914
 
 	val = 0.88789993524551392;
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(28)[1] == -val); //-0.88789993524551392
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(50)[1] == val);  // 0.88789993524551392
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(16)[2] == val);  // 0.88789993524551392
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(40)[2] == -val); //-0.88789993524551392
+	CPPUNIT_ASSERT(scalars->GetTuple(28)[1] == -val); //-0.88789993524551392
+	CPPUNIT_ASSERT(scalars->GetTuple(50)[1] == val);  // 0.88789993524551392
+	CPPUNIT_ASSERT(scalars->GetTuple(16)[2] == val);  // 0.88789993524551392
+	CPPUNIT_ASSERT(scalars->GetTuple(40)[2] == -val); //-0.88789993524551392
 
 	val = 0.88789981603622437;
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(34)[1] == -val); //-0.88789981603622437
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(46)[2] == -val); //-0.88789981603622437
+	CPPUNIT_ASSERT(scalars->GetTuple(34)[1] == -val); //-0.88789981603622437
+	CPPUNIT_ASSERT(scalars->GetTuple(46)[2] == -val); //-0.88789981603622437
 
 	//
 	volume->ReparentTo(NULL);
@@ -184,7 +184,6 @@ void vtkALBADistanceFilterTest::TestFilter_Vector_Distance()
 	importer->OpRun();
 
 	albaVMEVolumeGray *volume = albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
-	volume->GetOutput()->GetVTKData()->Update();
 	volume->ReparentTo(root);
 	volume->Update();
 
@@ -192,7 +191,7 @@ void vtkALBADistanceFilterTest::TestFilter_Vector_Distance()
 	sphere->Update();
 
 	vtkALBASmartPointer<vtkPolyDataNormals> normals;
-	normals->SetInput(sphere->GetOutput());
+	normals->SetInputConnection(sphere->GetOutputPort());
 
 	// Create Filter
 	vtkALBASmartPointer<vtkALBADistanceFilter> filter;
@@ -201,7 +200,7 @@ void vtkALBADistanceFilterTest::TestFilter_Vector_Distance()
 	filter->SetFilterModeToDistance();
 
 	filter->SetSource(volume->GetOutput()->GetVTKData());
-	filter->SetInput((vtkDataSet *)normals->GetOutput());
+	filter->SetInputConnection(normals->GetOutputPort());
 	filter->Update();
 
 	//	

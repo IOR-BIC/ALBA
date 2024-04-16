@@ -407,20 +407,23 @@ void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
 }
 //----------------------------------------------------------------------------
 void vtkALBAHistogram::UpdateLines(double range[2])
-//----------------------------------------------------------------------------
+{
+	UpdateLines(range[0], range[1]);
+}
+void vtkALBAHistogram::UpdateLines(double low, double hi)
 {
   double sr[2],rangeSize,scaledRange[2];
 	int line1X, line2X;
 
-	CurrRange[0] = range[0];
-	CurrRange[1] = range[1];
+	CurrRange[0] = low;
+	CurrRange[1] = hi;
 
   InputData->GetRange(sr);
 
 	rangeSize = sr[1] - sr[0];
   
-  scaledRange[0] = range[0]-sr[0];
-  scaledRange[1] = range[1]-sr[0];
+  scaledRange[0] = low-sr[0];
+  scaledRange[1] = hi-sr[0];
 
   line1X = ((scaledRange[0]/rangeSize) * (RenderWidth-1))+1;
   line2X = ((scaledRange[1]/rangeSize) * (RenderWidth-1))+1;

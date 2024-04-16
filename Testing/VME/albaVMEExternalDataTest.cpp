@@ -47,7 +47,7 @@ bool RemoveDir(const char *dirName)
     wxRemoveFile(filenameArray.Item(index));
   }
 
-  bool result = TRUE;
+  bool result = true;
 
   result = wxRmdir(dirName);
   if (result == false)
@@ -156,7 +156,7 @@ void albaVMEExternalDataTest::TestGetAbsoluteFileName()
   std::string inABSFileName = slash.Append(inLocalFileNameWithoutExtension.Append(".bmp"));
 
   int result = outputABSFileNameWithExtension.Equals(inABSFileName.c_str());
-  CPPUNIT_ASSERT(result == TRUE);
+  CPPUNIT_ASSERT(result == true);
 }
 
 void albaVMEExternalDataTest::TestSetCurrentPath()

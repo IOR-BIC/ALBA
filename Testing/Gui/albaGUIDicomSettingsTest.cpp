@@ -122,23 +122,23 @@ void albaGUIDicomSettingsTest::TestAutoVMEType()
   //Test default value
   //////////////////////////////////////////////////////////////////////////
   int autoVMEType = settings->GetAutoVMEType();
-  m_Result = autoVMEType == FALSE;
+  m_Result = autoVMEType == false;
 
   TEST_RESULT;
   //////////////////////////////////////////////////////////////////////////
   //Test read value
   //////////////////////////////////////////////////////////////////////////
-  config->Write("AutoVMEType",TRUE);
+  config->Write("AutoVMEType",true);
   settings->InitializeSettings();
   autoVMEType = settings->GetAutoVMEType();
-  m_Result = autoVMEType == TRUE;
+  m_Result = autoVMEType == true;
 
   TEST_RESULT;
 
-  config->Write("AutoVMEType",FALSE);
+  config->Write("AutoVMEType",false);
   settings->InitializeSettings();
   autoVMEType = settings->GetAutoVMEType();
-  m_Result = autoVMEType == FALSE;
+  m_Result = autoVMEType == false;
 
   TEST_RESULT;
   //////////////////////////////////////////////////////////////////////////
@@ -147,17 +147,17 @@ void albaGUIDicomSettingsTest::TestAutoVMEType()
   albaEvent e;
   e.SetId(albaGUIDicomSettings::ID_AUTO_VME_TYPE);
 
-  settings->m_AutoVMEType = TRUE;
+  settings->m_AutoVMEType = true;
   settings->OnEvent(&e);
   config->Read("AutoVMEType",&autoVMEType);
-  m_Result = autoVMEType == TRUE;
+  m_Result = autoVMEType == true;
 
   TEST_RESULT;
 
-  settings->m_AutoVMEType = FALSE;
+  settings->m_AutoVMEType = false;
   settings->OnEvent(&e);
   config->Read("AutoVMEType",&autoVMEType);
-  m_Result = autoVMEType == FALSE;
+  m_Result = autoVMEType == false;
 
   TEST_RESULT;
   //////////////////////////////////////////////////////////////////////////

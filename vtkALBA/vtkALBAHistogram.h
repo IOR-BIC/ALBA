@@ -131,8 +131,11 @@ class ALBA_EXPORT vtkALBAHistogram : public vtkActor2D
  	vtkGetMacro(NumberOfBins, int);
 
 
-  /** Update the position of the gizmos */
-  void UpdateLines(double range[2]);
+	/** Update the position of the gizmos */
+	void UpdateLines(double range[2]);
+
+	/** Update the position of the gizmos */
+	void UpdateLines(double low, double hi);
 
   /** retrieve histogram value (count) from x*/
   long int GetHistogramValue(int x, int y);

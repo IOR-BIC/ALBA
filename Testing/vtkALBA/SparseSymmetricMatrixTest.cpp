@@ -34,7 +34,7 @@ void SparseSymmetricMatrixTest::TestDynamicAllocation()
 {
     SparseSymmetricMatrix<double> *matrix1 = new SparseSymmetricMatrix<double>();
 
-    CPPUNIT_ASSERT( matrix1->UseAllocator() == FALSE );
+    CPPUNIT_ASSERT( matrix1->UseAllocator() == false );
     CPPUNIT_ASSERT( matrix1->rows == 0 );
 
     delete matrix1;
@@ -45,7 +45,7 @@ void SparseSymmetricMatrixTest::TestStaticAllocation()
 {
     SparseSymmetricMatrix<double> matrix1;
 
-    CPPUNIT_ASSERT( matrix1.UseAllocator() == FALSE );
+    CPPUNIT_ASSERT( matrix1.UseAllocator() == false );
     CPPUNIT_ASSERT( matrix1.rows == 0 );
 }
 //-------------------------------------------------------------------------

@@ -136,7 +136,7 @@ bool RemoveDir(const char *dirName)
 		wxRemoveFile(filenameArray.Item(index));
 	}
 
-	bool result = TRUE;
+	bool result = true;
 
 	result = wxRmdir(dirName);
 	if (result == false)

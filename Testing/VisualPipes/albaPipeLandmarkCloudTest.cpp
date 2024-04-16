@@ -144,7 +144,7 @@ void albaPipeLandmarkCloudTest::TestPipeExecution()
   m_Renderer->RemoveAllProps();
   m_RenderWindow->Render();
 	
-  pipe->SetScalarVisibility(TRUE);
+  pipe->SetScalarVisibility(true);
   pipe->OnEvent(&albaEvent(this,albaPipeLandmarkCloud::ID_SCALAR_VISIBILITY));
   actorList->RemoveAllItems();
   pipe->GetAssemblyFront()->GetActors(actorList);
@@ -167,7 +167,7 @@ void albaPipeLandmarkCloudTest::TestPipeExecution()
   m_Renderer->RemoveAllProps();
   m_RenderWindow->Render();
 
-  pipe->SetScalarVisibility(FALSE);
+  pipe->SetScalarVisibility(false);
   pipe->OnEvent(&albaEventBase(this,albaPipeLandmarkCloud::ID_SCALAR_VISIBILITY));
 
   actorList->RemoveAllItems();
