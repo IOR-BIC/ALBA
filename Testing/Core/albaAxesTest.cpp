@@ -79,7 +79,7 @@ void albaAxesTest::RenderData( vtkDataSet *data )
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   vtkALBASmartPointer<vtkDataSetMapper> mapper;
-  mapper->SetInput(data);
+  mapper->SetInputData(data);
   mapper->ScalarVisibilityOn();
   
   vtkALBASmartPointer<vtkActor> actor;

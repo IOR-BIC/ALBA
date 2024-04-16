@@ -33,7 +33,7 @@ public:
   CPPUNIT_TEST( GetActorsTest );
   CPPUNIT_TEST( GetVolumesTest );
   CPPUNIT_TEST( RenderOpaqueGeometryTest );
-  CPPUNIT_TEST( RenderTranslucentGeometry );
+  CPPUNIT_TEST( RenderTranslucentPolygonalGeometryTest );
   CPPUNIT_TEST( InitPathTraversalTest );
   CPPUNIT_TEST( GetNextPathTest );
   CPPUNIT_TEST( GetNumberOfPathsTest );
@@ -52,7 +52,7 @@ protected:
   void GetActorsTest();
   void GetVolumesTest();
   void RenderOpaqueGeometryTest();
-  void RenderTranslucentGeometry();
+  void RenderTranslucentPolygonalGeometryTest();
   void InitPathTraversalTest();
   void GetNextPathTest();
   void GetNumberOfPathsTest();

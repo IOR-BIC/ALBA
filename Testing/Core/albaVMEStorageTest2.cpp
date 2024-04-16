@@ -133,19 +133,14 @@ void albaVMEStorageTest2::BeforeTest()
   // if you remove comments from next line the next assert will fail
   // vmeSphereOutput->Update();
 
-  // this looks strange but...
   CPPUNIT_ASSERT(vtkSphereOutput->GetNumberOfPoints()  == m_SphereSource->GetOutput()->GetNumberOfPoints());
-  // ... if you update the VTK output...
-  vtkSphereOutput->Update();
-  // ... everything works
+
   CPPUNIT_ASSERT(vtkSphereOutput->GetNumberOfPoints() == polyDataSphereSource->GetNumberOfPoints());
 
   CPPUNIT_ASSERT(vtkSphereOutput->GetNumberOfCells() == polyDataSphereSource->GetNumberOfCells());
 
   // getting VTK data from albaVMEOutput
   vtkPolyData* polyDataFromVMEOutput = vtkPolyData::SafeDownCast(vmeSphereOutput->GetVTKData());
-
-  polyDataFromVMEOutput->Update();
 
   CPPUNIT_ASSERT(polyDataFromVMEOutput->GetNumberOfPolys());
 
@@ -156,11 +151,6 @@ void albaVMEStorageTest2::BeforeTest()
   vtkPolyData* polyDataFromVMEOutputSurface = vtkPolyData::SafeDownCast(outputSurface->GetSurfaceData());
 
   CPPUNIT_ASSERT(polyDataFromVMEOutputSurface);
-
-
-  // if I don`t call this update ...
-  polyDataFromVMEOutputSurface->Update();
-  // ...this assert will fail
   CPPUNIT_ASSERT(polyDataFromVMEOutputSurface->GetNumberOfPolys() == m_SphereSource->GetOutput()->GetNumberOfPolys());
 
   m_Storage1Root->AddChild(vmeSphere);
@@ -280,8 +270,6 @@ void albaVMEStorageTest2::TestRestoreOnNewStorage()
   vtkDataSet* shouldBeTheVTKSphere = shouldBeTheVmeSphere->GetOutput()->GetVTKData();
   CPPUNIT_ASSERT(shouldBeTheVTKSphere);
 
-  CPPUNIT_ASSERT(shouldBeTheVTKSphere->GetNumberOfPoints() == 0);
-  shouldBeTheVTKSphere->Update();
   CPPUNIT_ASSERT(shouldBeTheVTKSphere->GetNumberOfPoints());
 
   CPPUNIT_ASSERT(shouldBeTheVTKSphere->GetNumberOfCells() == m_SphereSource->GetOutput()->GetNumberOfCells());
@@ -326,9 +314,6 @@ void albaVMEStorageTest2::TestRestoreOnSameStorage()
 
   vtkDataSet* shouldBeTheVTKSphere = shouldBeTheVmeSphere->GetOutput()->GetVTKData();
   CPPUNIT_ASSERT(shouldBeTheVTKSphere);
-
-  CPPUNIT_ASSERT(shouldBeTheVTKSphere->GetNumberOfPoints() == 0);
-  shouldBeTheVTKSphere->Update();
   CPPUNIT_ASSERT(shouldBeTheVTKSphere->GetNumberOfPoints());
 
   CPPUNIT_ASSERT(shouldBeTheVTKSphere->GetNumberOfCells() == m_SphereSource->GetOutput()->GetNumberOfCells());
