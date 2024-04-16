@@ -96,12 +96,10 @@ void albaDataPipeCustomTest::TestGetVTKData()
 
   albaSmartPointer<albaDataPipeCustom> di;
 
-  di->GetVTKDataPipe()->SetInput(sphere->GetOutput());
-  di->GetVTKDataPipe()->GetOutput()->Update();
+  di->GetVTKDataPipe()->SetInputData(sphere->GetOutput());
 
   vtkDataSet *dataset;
   dataset = di->GetVTKData();
-  dataset->Update();
 
   double numberOfPoints = dataset->GetNumberOfPoints();
 
@@ -132,7 +130,7 @@ void albaDataPipeCustomTest::TestUpdate()
 
   albaSmartPointer<albaDataPipeCustom> di;
 
-  di->GetVTKDataPipe()->SetInput(sphere->GetOutput());
+  di->GetVTKDataPipe()->SetInputData(sphere->GetOutput());
 
   vtkDataSet *dataset;
   dataset = di->GetVTKData();
@@ -170,8 +168,7 @@ void albaDataPipeCustomTest::TestUpdateBounds()
   surfaceTest->Update();
 
   albaSmartPointer<albaDataPipeCustom> di;
-  di->GetVTKDataPipe()->SetInput(sphere->GetOutput());
-  di->GetVTKDataPipe()->GetOutput()->Update();
+  di->GetVTKDataPipe()->SetInputData(sphere->GetOutput());
   di->UpdateBounds();
 
   albaOBB *bounds;
@@ -214,7 +211,6 @@ void albaDataPipeCustomTest::TestSetInput()
 
   vtkDataSet *dataset;
   dataset = di->GetVTKData();
-  dataset->Update();
 
   double numberOfPoints = dataset->GetNumberOfPoints();
   result =  numberOfPoints == sphere->GetOutput()->GetNumberOfPoints();
@@ -252,11 +248,8 @@ void albaDataPipeCustomTest::TestSetNthInput()
   di->Update();
 
   vtkPolyData *dataset1 = (vtkPolyData *)di->GetVTKDataPipe()->GetOutput(0);
-  dataset1->Update();
   vtkPolyData *dataset2 = (vtkPolyData *)di->GetVTKDataPipe()->GetOutput(1);
-  dataset2->Update();
   vtkPolyData *dataset3 = (vtkPolyData *)di->GetVTKDataPipe()->GetOutput(2);
-  dataset3->Update();
 
   double numberOfPoints1 = dataset1->GetNumberOfPoints();
   result =  numberOfPoints1 == sphere1->GetOutput()->GetNumberOfPoints();

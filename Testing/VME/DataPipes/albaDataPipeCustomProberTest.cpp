@@ -107,7 +107,6 @@ void albaDataPipeCustomProberTest::TestExecute()
   probingDataPipe->OnEvent(&albaEventBase(probingDataPipe->GetVTKDataPipe(),VME_OUTPUT_DATA_PREUPDATE));
 
   double range[2];
-  probingDataPipe->GetVTKData()->Update();
   probingDataPipe->GetVTKData()->GetScalarRange(range);
 
   result = (rangeVol[0] <= range[0] && rangeVol[1] >= range[1]);
