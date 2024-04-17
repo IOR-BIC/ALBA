@@ -109,7 +109,6 @@ void albaGizmoPathTest::CreateTestData()
   polydata->SetPoints(points);
   polydata->SetLines(cells);
   polydata->Modified();
-  polydata->Update();
 
   // try to set this data to the volume
   int returnValue = -1;
@@ -145,7 +144,6 @@ void albaGizmoPathTest::TestSetCurvilinearAbscissa()
   // CPPUNIT_ASSERT(npoints == 5);
   
   // it needs an update to succeed!
-  vtkData->Update();
   
   npoints = vtkData->GetNumberOfPoints();
   CPPUNIT_ASSERT(npoints == 5);

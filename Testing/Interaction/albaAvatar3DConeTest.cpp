@@ -106,7 +106,7 @@ void albaAvatar3DConeTest::TestPick()
   disk->SetRadialResolution(80);
   disk->Update();
   vtkALBASmartPointer<vtkPolyDataMapper> mapper;
-  mapper->SetInput(disk->GetOutput());
+  mapper->SetInputConnection(disk->GetOutputPort());
   vtkALBASmartPointer<vtkActor> actor;
   actor->SetMapper(mapper);
   actor->SetPosition(0,0,0);
