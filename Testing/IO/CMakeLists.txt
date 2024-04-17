@@ -3,7 +3,7 @@ PROJECT (albaIOTests)
 IF(ALBA_BUILD_ALBADLL)
   SET(PROJECT_LIBS XercesC albaDLL vtkALBA albaTests) #to solve linking problems XercesC libs must be added before albaDLL
 ELSE(ALBA_BUILD_ALBADLL)
-  SET(PROJECT_LIBS albaTests albaBase albaGui albaIO vtkRendering)
+  SET(PROJECT_LIBS albaTests albaBase albaGui albaIO ${VTK_LIBRARIES})
 ENDIF(ALBA_BUILD_ALBADLL)
 
 #-----------------------------------------------------------------------------
