@@ -42,7 +42,6 @@ void albaGUILandmarkTest::TestDynamicAllocation()
   surfaceParametric->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_SPHERE);
   surfaceParametric->SetSphereRadius(5.);
   surfaceParametric->Update();
-  surfaceParametric->GetOutput()->GetVTKData()->Update();
 
   albaVMESurface *surface;
   albaNEW(surface);
@@ -67,7 +66,6 @@ void albaGUILandmarkTest::TestVmeAccept()
   surfaceParametric->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_SPHERE);
   surfaceParametric->SetSphereRadius(5.);
   surfaceParametric->Update();
-  surfaceParametric->GetOutput()->GetVTKData()->Update();
 
   albaVMESurface *surface;
   albaNEW(surface);
