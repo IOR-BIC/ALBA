@@ -81,7 +81,6 @@ void albaVMEOutputPolylineTest::TestUpdate()
   vtkALBASmartPointer<vtkPolyData> polylineVTK;
   polylineVTK->SetPoints(pts);
   polylineVTK->SetLines(cells);
-  polylineVTK->Update();
 
 
   albaVMEPolyline *polyline;
@@ -90,7 +89,6 @@ void albaVMEOutputPolylineTest::TestUpdate()
   polyline->Modified();
   polyline->Update();
 
-  polyline->GetOutput()->GetVTKData()->Update();
 
   albaVMEOutputPolyline *outputPolyline = albaVMEOutputPolyline::SafeDownCast(polyline->GetOutput());
   outputPolyline->Update();
@@ -130,7 +128,6 @@ void albaVMEOutputPolylineTest::TestCalculateLength()
   vtkALBASmartPointer<vtkPolyData> polylineVTK;
   polylineVTK->SetPoints(pts);
   polylineVTK->SetLines(cells);
-  polylineVTK->Update();
 
 
   albaVMEPolyline *polyline;
@@ -139,7 +136,6 @@ void albaVMEOutputPolylineTest::TestCalculateLength()
   polyline->Modified();
   polyline->Update();
 
-  polyline->GetOutput()->GetVTKData()->Update();
 
   albaVMEOutputPolyline *outputPolyline = albaVMEOutputPolyline::SafeDownCast(polyline->GetOutput());
   outputPolyline->Update();
@@ -182,7 +178,6 @@ void albaVMEOutputPolylineTest::TestGetPolylineData()
   vtkALBASmartPointer<vtkPolyData> polylineVTK;
   polylineVTK->SetPoints(pts);
   polylineVTK->SetLines(cells);
-  polylineVTK->Update();
 
 
   albaVMEPolyline *polyline;
@@ -190,8 +185,6 @@ void albaVMEOutputPolylineTest::TestGetPolylineData()
   polyline->SetData(polylineVTK,0.0);
   polyline->Modified();
   polyline->Update();
-
-  polyline->GetOutput()->GetVTKData()->Update();
 
   albaVMEOutputPolyline *outputPolyline = albaVMEOutputPolyline::SafeDownCast(polyline->GetOutput());
   outputPolyline->Update();
@@ -244,7 +237,6 @@ void albaVMEOutputPolylineTest::TestGetMaterial()
   vtkALBASmartPointer<vtkPolyData> polylineVTK;
   polylineVTK->SetPoints(pts);
   polylineVTK->SetLines(cells);
-  polylineVTK->Update();
 
 
   albaVMEPolyline *polyline;
@@ -252,8 +244,6 @@ void albaVMEOutputPolylineTest::TestGetMaterial()
   polyline->SetData(polylineVTK,0.0);
   polyline->Modified();
   polyline->Update();
-
-  polyline->GetOutput()->GetVTKData()->Update();
 
   albaVMEOutputPolyline *outputPolyline = albaVMEOutputPolyline::SafeDownCast(polyline->GetOutput());
   outputPolyline->Update();

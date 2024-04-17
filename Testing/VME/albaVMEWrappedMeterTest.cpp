@@ -61,13 +61,11 @@ void albaVMEWrappedMeterTest::TestWithGenericVME()
 	//create a parametric surface
 	albaVMESurfaceParametric *vmeParametricSurfaceSTART;
 	albaNEW(vmeParametricSurfaceSTART);	
-	vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
 	vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceSTART->Update();
 
 	albaVMESurfaceParametric *vmeParametricSurfaceEND1;
 	albaNEW(vmeParametricSurfaceEND1);	
-	vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
 	vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceEND1->Update();
 
@@ -83,7 +81,6 @@ void albaVMEWrappedMeterTest::TestWithGenericVME()
 	wrappedMeter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
 	wrappedMeter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
 	wrappedMeter->ReparentTo(storage->GetRoot());
-	wrappedMeter->GetOutput()->GetVTKData()->Update();
 	wrappedMeter->Modified();
 	wrappedMeter->Update();
 
@@ -118,20 +115,17 @@ void albaVMEWrappedMeterTest::TestWithGenericVMEWithMiddlePoints()
 	//create a parametric surface
 	albaVMESurfaceParametric *vmeParametricSurfaceSTART;
 	albaNEW(vmeParametricSurfaceSTART);	
-	vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
 	vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceSTART->Update();
 
 	albaVMESurfaceParametric *vmeParametricSurfaceEND1;
 	albaNEW(vmeParametricSurfaceEND1);	
-	vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
 	vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceEND1->Update();
 
 	albaVMESurfaceParametric *vmeParametricSurfaceMiddlePoint;
 	albaNEW(vmeParametricSurfaceMiddlePoint);
 	vmeParametricSurfaceMiddlePoint->SetName("MiddlePoint");
-	vmeParametricSurfaceMiddlePoint->GetOutput()->GetVTKData()->Update();
 	vmeParametricSurfaceMiddlePoint->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceMiddlePoint->Update();
 
@@ -152,7 +146,6 @@ void albaVMEWrappedMeterTest::TestWithGenericVMEWithMiddlePoints()
 	//wrappedMeter->PushIdVector(vmeParametricSurfaceMiddlePoint->GetId()); //this is for the vector syncronized with the gui widget, that is not used in gui test
 	
 	wrappedMeter->ReparentTo(storage->GetRoot());
-	wrappedMeter->GetOutput()->GetVTKData()->Update();
 	wrappedMeter->Modified();
 	wrappedMeter->Update();
 
@@ -208,7 +201,6 @@ void albaVMEWrappedMeterTest::TestWithGenericLandmark()
 	wrappedMeter->SetMeterLink("EndVME1",cloud->GetLandmark(1));
 
 	wrappedMeter->ReparentTo(storage->GetRoot());
-	wrappedMeter->GetOutput()->GetVTKData()->Update();
 	wrappedMeter->Modified();
 	wrappedMeter->Update();
 
@@ -269,7 +261,6 @@ void albaVMEWrappedMeterTest::TestWithGenericLandmarkWithMiddlePoints()
 
 
 	wrappedMeter->ReparentTo(storage->GetRoot());
-	wrappedMeter->GetOutput()->GetVTKData()->Update();
 	wrappedMeter->Modified();
 	wrappedMeter->Update();
 
@@ -314,19 +305,16 @@ void albaVMEWrappedMeterTest::TestWrappedGeometry()
   //create a parametric surface
   albaVMESurfaceParametric *vmeParametricSurfaceSTART;
   albaNEW(vmeParametricSurfaceSTART);	
-  vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   albaVMESurfaceParametric *vmeParametricSurfaceEND1;
   albaNEW(vmeParametricSurfaceEND1);	
-  vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
 
   albaVMESurfaceParametric *vmeParametricSurfaceWrapped;
   albaNEW(vmeParametricSurfaceWrapped);	
-  vmeParametricSurfaceWrapped->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceWrapped->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceWrapped->Update();
 
@@ -353,7 +341,6 @@ void albaVMEWrappedMeterTest::TestWrappedGeometry()
   wrappedMeter->SetWrappedMode(albaVMEWrappedMeter::AUTOMATED_WRAP);
   wrappedMeter->ReparentTo(storage->GetRoot());
   
-  wrappedMeter->GetOutput()->GetVTKData()->Update();
   wrappedMeter->Modified();
   wrappedMeter->Update();
 
@@ -380,7 +367,6 @@ void albaVMEWrappedMeterTest::TestWrappedGeometry()
   wrappedMeter2->ReparentTo(storage->GetRoot());
 
   wrappedMeter2->SetWrapSide(1);
-  wrappedMeter2->GetOutput()->GetVTKData()->Update();
   wrappedMeter2->Modified();
   wrappedMeter2->Update();
 

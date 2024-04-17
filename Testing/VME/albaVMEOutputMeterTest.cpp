@@ -72,21 +72,18 @@ void albaVMEOutputMeterTest::TestUpdate()
 	albaVMESurfaceParametric *vmeParametricSurfaceSTART;
 	albaNEW(vmeParametricSurfaceSTART);
 	vmeParametricSurfaceSTART->ReparentTo(root);
-	vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
 	vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceSTART->Update();
 
 	albaVMESurfaceParametric *vmeParametricSurfaceEND1;
 	albaNEW(vmeParametricSurfaceEND1);	
 	vmeParametricSurfaceEND1->ReparentTo(root);
-	vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
 	vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceEND1->Update();
 
 	albaVMESurfaceParametric *vmeParametricSurfaceEND2;
 	albaNEW(vmeParametricSurfaceEND2);	
 	vmeParametricSurfaceEND2->ReparentTo(root);
-	vmeParametricSurfaceEND2->GetOutput()->GetVTKData()->Update();
 	vmeParametricSurfaceEND2->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceEND2->Update();
 
@@ -110,7 +107,6 @@ void albaVMEOutputMeterTest::TestUpdate()
 	meter->Modified();
 	meter->Update();
 
-	meter->GetOutput()->GetVTKData()->Update();
 
 	albaVMEOutputMeter *outputMeter = albaVMEOutputMeter::SafeDownCast(meter->GetOutput());
 	outputMeter->Update();
@@ -123,7 +119,6 @@ void albaVMEOutputMeterTest::TestUpdate()
 	meter->SetMeterMode(albaVMEMeter::LINE_ANGLE);
 	meter->Modified();
 	meter->Update();
-	meter->GetOutput()->GetVTKData()->Update();
 
 	outputMeter->Update();
 	albaString angleString = outputMeter->GetAngle();

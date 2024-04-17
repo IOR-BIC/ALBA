@@ -66,7 +66,6 @@ void albaVMESurfaceEditorTest::TestSetData()
   importer1->ImportVTK();
   albaSmartPointer<albaVMESurface> surface = albaVMESurface::SafeDownCast(importer1->GetOutput());
   surface->Update();
-  surface->GetOutput()->GetVTKData()->Update();
 
   albaVMESurfaceEditor *editor = NULL;
   albaNEW(editor);
@@ -80,7 +79,6 @@ void albaVMESurfaceEditorTest::TestSetData()
 
   vtkALBASmartPointer<vtkPolyData> outputPolydata=vtkPolyData::SafeDownCast(editor->GetOutput()->GetVTKData());
   outputPolydata->Modified();
-  outputPolydata->Update();
   int pointsNumberOut = outputPolydata->GetNumberOfPoints();
 
   m_Result = pointsNumberIn == pointsNumberOut;

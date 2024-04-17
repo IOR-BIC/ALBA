@@ -106,7 +106,6 @@ void albaVMEGenericTest::TestSetData()
 
   vtkALBASmartPointer<vtkRectilinearGrid> rectilinearGridA;
   rectilinearGridA = (vtkRectilinearGrid*)vmeGeneric->GetOutput()->GetVTKData();
-  rectilinearGridA->Update();
 
   result = true;
   for (int i = 0 ; i < 5; i++)
@@ -124,7 +123,6 @@ void albaVMEGenericTest::TestSetData()
 
   vtkALBASmartPointer<vtkRectilinearGrid> rectilinearGridB;
   rectilinearGridB = (vtkRectilinearGrid*)vmeGeneric->GetOutput()->GetVTKData();
-  rectilinearGridB->Update();
 
   result = true;
   for (int i = 0 ; i < 5; i++)
@@ -141,7 +139,6 @@ void albaVMEGenericTest::TestSetData()
 
   vtkALBASmartPointer<vtkRectilinearGrid> rectilinearGridC;
   rectilinearGridC = (vtkRectilinearGrid*)vmeGeneric->GetOutput()->GetVTKData();
-  rectilinearGridC->Update();
 
   result = true;
   for (int i = 0 ; i < 5; i++)

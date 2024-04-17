@@ -69,7 +69,9 @@ albaTestVME::albaTestVME():m_PreUpdateConunter(0),m_UpdateConunter(0),m_Type(0),
 {
   albaNEW(m_Transform);
   vtkNEW(m_Sphere);
+	m_Sphere->Update();
   vtkNEW(m_Cone);
+	m_Cone->Update();
   SetDataPipe(albaDataPipeCustom::New());
   SetOutput(albaVMEOutputSurface::New());
   GetOutput()->SetTransform(m_Transform);
@@ -94,12 +96,12 @@ void albaTestVME::InternalPreUpdate()
   {
     case 0: 
     {
-      dpipe->GetVTKDataPipe()->SetInput(m_Cone->GetOutput());
+      dpipe->GetVTKDataPipe()->SetInputConnection(m_Cone->GetOutputPort());
     }
     break;
     case 1: 
     {
-      dpipe->GetVTKDataPipe()->SetInput(m_Sphere->GetOutput());
+      dpipe->GetVTKDataPipe()->SetInputConnection(m_Sphere->GetOutputPort());
     }
     break;
   }
@@ -113,7 +115,9 @@ void albaTestVME::InternalUpdate()
   m_UpdateConunter++; // increment the counter
   // set vtk filters radius before of their execution
   m_Sphere->SetRadius(m_Radius);
+	m_Sphere->Update();
   m_Cone->SetRadius(m_Radius);
+	m_Cone->Update();
 }
 //-------------------------------------------------------------------------
 void CustomDataPipeTest::CustomDataPipeMainTest()
@@ -133,14 +137,13 @@ void CustomDataPipeTest::CustomDataPipeMainTest()
   CPPUNIT_ASSERT(vme->m_UpdateConunter==0);
 
 
-  surface->Update();
   CPPUNIT_ASSERT(vme->m_PreUpdateConunter==1);
   CPPUNIT_ASSERT(vme->m_UpdateConunter==1);
   CPPUNIT_ASSERT(vme->m_Sphere->GetRadius()==1);
   CPPUNIT_ASSERT(vme->m_Cone->GetRadius()==1);
 
   vme->SetRadius(2);
-  surface->Update();
+	vme->GetOutput()->Update();
   CPPUNIT_ASSERT(vme->m_PreUpdateConunter==2);
   CPPUNIT_ASSERT(vme->m_UpdateConunter==2);
 
@@ -149,11 +152,11 @@ void CustomDataPipeTest::CustomDataPipeMainTest()
   CPPUNIT_ASSERT(vme->m_PreUpdateConunter==3);
   CPPUNIT_ASSERT(vme->m_UpdateConunter==2);
   
-  surface->Update();
   CPPUNIT_ASSERT(vme->m_PreUpdateConunter==3);
   CPPUNIT_ASSERT(vme->m_UpdateConunter==3);
   
-  surface->Update();
+	vme->GetOutput()->Update();
+  
   CPPUNIT_ASSERT(vme->m_PreUpdateConunter==3);
   CPPUNIT_ASSERT(vme->m_UpdateConunter==3);
   

@@ -138,7 +138,7 @@ void albaVMEImageTest::TestVMEImageVisualization()
 
   imageVME->SetData(imageData,-1);
 
-  mapper->SetInput(imageVME->GetImageOutput()->GetVTKData());
+  mapper->SetInputData(imageVME->GetImageOutput()->GetVTKData());
   mapper->SetScalarModeToDefault();
   mapper->SetScalarRange(scalars->GetRange());
 
@@ -203,7 +203,7 @@ int albaVMEImageTest::PlayTree(albaVMERoot *root, bool ignoreVisibleToTraverse)
       {
         vtkDataSet *vmedata=node->GetOutput()->GetVTKData();
         vtkALBASmartPointer<vtkDataSetMapper> mapper;
-        mapper->SetInput((vtkPolyData *)vmedata);
+        mapper->SetInputData((vtkPolyData *)vmedata);
         mapper->SetScalarModeToDefault();
         mapper->SetScalarRange(0,100);
 

@@ -80,10 +80,7 @@ void albaVMEPointCloudTest::TestSetData()
   vtkDataSet *data = pointsVTK;
   CPPUNIT_ASSERT(data);
 
-  // update the data... 
-  data->Update();
-  // ... otherwise this will fail!
-  CPPUNIT_ASSERT_EQUAL(25, data->GetNumberOfCells());
+  CPPUNIT_ASSERT_EQUAL(vtkIdType(25), data->GetNumberOfCells());
 
   // destroy vme
   albaDEL(vmePointCloud);

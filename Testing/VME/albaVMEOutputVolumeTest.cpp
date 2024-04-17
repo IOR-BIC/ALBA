@@ -85,12 +85,10 @@ void albaVMEOutputVolumeTest::TestGetStructuredData()
   imageData->SetSpacing(1.,1.,1.);
   imageData->GetPointData()->AddArray(array);
   imageData->GetPointData()->SetActiveScalars("scalars");
-  imageData->UpdateData();
 
   albaVMEVolumeGray *vmeVolume = NULL;
   albaNEW(vmeVolume);
   vmeVolume->SetData(imageData, 0.);
-  vmeVolume->GetOutput()->GetVTKData()->Update();
   vmeVolume->Update();
 
   albaVMEOutputVolume *outputVolume = NULL;
@@ -150,12 +148,10 @@ void albaVMEOutputVolumeTest::TestGetRectilinearData()
 
   rectilinearGrid->GetPointData()->AddArray(array);
   rectilinearGrid->Modified();
-  rectilinearGrid->Update();
 
   albaVMEVolumeGray *vmeVolume = NULL;
   albaNEW(vmeVolume);
   vmeVolume->SetData(rectilinearGrid, 0.);
-  vmeVolume->GetOutput()->GetVTKData()->Update();
   vmeVolume->Update();
 
   albaVMEOutputVolume *outputVolume = NULL;
@@ -197,7 +193,6 @@ void albaVMEOutputVolumeTest::TestGetUnstructuredData()
   albaVMEVolumeGray *vmeVolume = NULL;
   albaNEW(vmeVolume);
   vmeVolume->albaVMEVolume::SetData(aVoxelGrid, 0.);
-  vmeVolume->GetOutput()->GetVTKData()->Update();
   vmeVolume->Update();
 
   albaVMEOutputVolume *outputVolume = NULL;
@@ -229,12 +224,10 @@ void albaVMEOutputVolumeTest::TestSetGetVolumeMaterial()
   imageData->SetSpacing(1.,1.,1.);
   imageData->GetPointData()->AddArray(array);
   imageData->GetPointData()->SetActiveScalars("scalars");
-  imageData->UpdateData();
 
   albaVMEVolumeGray *vmeVolume = NULL;
   albaNEW(vmeVolume);
   vmeVolume->SetData(imageData, 0.);
-  vmeVolume->GetOutput()->GetVTKData()->Update();
   vmeVolume->Update();
 
   albaVMEOutputVolume *outputVolume = vmeVolume->GetVolumeOutput();
@@ -271,12 +264,10 @@ void albaVMEOutputVolumeTest::TestGetVTKDataTypeAsString_Update()
   imageData->SetSpacing(1.,1.,1.);
   imageData->GetPointData()->AddArray(array);
   imageData->GetPointData()->SetActiveScalars("scalars");
-  imageData->UpdateData();
 
   albaVMEVolumeGray *vmeVolume = NULL;
   albaNEW(vmeVolume);
   vmeVolume->SetData(imageData, 0.);
-  vmeVolume->GetOutput()->GetVTKData()->Update();
   vmeVolume->Update();
 
   albaString className = vmeVolume->GetOutput()->GetVTKData()->GetClassName();

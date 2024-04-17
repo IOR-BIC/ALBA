@@ -66,7 +66,6 @@ void albaVMEOutputSurfaceTest::TestGetSurfaceData()
   //create a parametric surface
   albaVMESurfaceParametric *vmeParametricSurface;
   albaNEW(vmeParametricSurface);
-  vmeParametricSurface->GetOutput()->GetVTKData()->Update();
   vmeParametricSurface->Update();
 
   albaVMEOutputSurface *outputSurface = NULL;
@@ -84,7 +83,6 @@ void albaVMEOutputSurfaceTest::TestSetGetTexture()
   //create a parametric surface
   albaVMESurfaceParametric *vmeParametricSurface;
   albaNEW(vmeParametricSurface);
-  vmeParametricSurface->GetOutput()->GetVTKData()->Update();
   vmeParametricSurface->Update();
 
   vtkIntArray *array;
@@ -101,7 +99,6 @@ void albaVMEOutputSurfaceTest::TestSetGetTexture()
   imageData->SetDimensions(dimensions);
   
   imageData->GetPointData()->SetScalars(array);
-  imageData->Update();
 
   albaVMEOutputSurface *surfaceOutput;
   surfaceOutput = vmeParametricSurface->GetSurfaceOutput();
@@ -127,7 +124,6 @@ void albaVMEOutputSurfaceTest::TestSetGetMaterial()
   //create a parametric surface
   albaVMESurfaceParametric *vmeParametricSurface;
   albaNEW(vmeParametricSurface);
-  vmeParametricSurface->GetOutput()->GetVTKData()->Update();
   vmeParametricSurface->Update();
 
   albaVMEOutputSurface *outputSurface = vmeParametricSurface->GetSurfaceOutput();
@@ -151,7 +147,6 @@ void albaVMEOutputSurfaceTest::TestGetNumberOfTrainglesUpdate()
 	//create a parametric surface
 	albaVMESurfaceParametric *vmeParametricSurface;
 	albaNEW(vmeParametricSurface);
-	vmeParametricSurface->GetOutput()->GetVTKData()->Update();
 	vmeParametricSurface->Update();
   int controlNumberOfPolys = vtkPolyData::SafeDownCast(vmeParametricSurface->GetOutput()->GetVTKData())->GetNumberOfPolys();
 
