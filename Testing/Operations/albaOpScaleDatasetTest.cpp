@@ -57,7 +57,6 @@ void albaOpScaleDatasetTest::TestOpDoVolume()
   sp->SetOrigin(0.0,0.0,0.0);
   sp->SetSpacing(1.0,1.0,1.0);
   sp->SetDimensions(5,10,6);
-  sp->Update();
 
   vtkALBASmartPointer<vtkDoubleArray> scalars;
   scalars->SetNumberOfTuples(300);
@@ -66,7 +65,6 @@ void albaOpScaleDatasetTest::TestOpDoVolume()
     scalars->SetTuple1(i,0.0);
   }
   sp->GetPointData()->SetScalars(scalars);
-  sp->Update();
 
   double startPoint[3];
   sp->GetPoint(0,startPoint);
@@ -96,7 +94,6 @@ void albaOpScaleDatasetTest::TestOpDoVolume()
   volumeOutput->Update();
 
   vtkImageData *spOutput = vtkImageData::SafeDownCast(volumeOutput->GetOutput()->GetVTKData());
-  spOutput->Update();
 
   double endPoint[3];
   spOutput->GetPoint(0,endPoint);
@@ -142,7 +139,6 @@ void albaOpScaleDatasetTest::TestOpDoSurface()
   surfaceOutput->Update();
 
   vtkPolyData *cubeOutput = vtkPolyData::SafeDownCast(surfaceOutput->GetOutput()->GetVTKData());
-  cubeOutput->Update();
   
   double endPoint[3];
   cubeOutput->GetPoint(0,endPoint);
@@ -188,7 +184,6 @@ void albaOpScaleDatasetTest::TestReset()
   surfaceOutput->Update();
 
   vtkPolyData *cubeOutput = vtkPolyData::SafeDownCast(surfaceOutput->GetOutput()->GetVTKData());
-  cubeOutput->Update();
 
   double endPoint[3];
   cubeOutput->GetPoint(0,endPoint);

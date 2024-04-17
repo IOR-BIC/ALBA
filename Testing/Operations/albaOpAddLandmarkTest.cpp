@@ -74,7 +74,6 @@ void albaOpAddLandmarkTest::TestOpUndo()
   sphere->Update();
 
   surface->SetData(sphere->GetOutput(),0.0);
-  surface->GetOutput()->GetVTKData()->Update();
   surface->GetOutput()->Update();
   surface->Update();
 
@@ -176,7 +175,6 @@ void albaOpAddLandmarkTest::TestAddLandmark()
   sphere->Update();
 
   surface->SetData(sphere->GetOutput(),0.0);
-  surface->GetOutput()->GetVTKData()->Update();
   surface->GetOutput()->Update();
   surface->Update();
 
@@ -297,7 +295,6 @@ void albaOpAddLandmarkTest::TestOpRun()
   sphere->Update();
 
   surface->SetData(sphere->GetOutput(),0.0);
-  surface->GetOutput()->GetVTKData()->Update();
   surface->GetOutput()->Update();
   surface->Update();
 

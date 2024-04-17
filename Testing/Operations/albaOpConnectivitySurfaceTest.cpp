@@ -54,7 +54,6 @@ void albaOpConnectivitySurfaceTest::Test()
   std::vector<albaVMESurface*> importedSTL;
   Importer->GetImportedSTL(importedSTL);
   albaVMESurface *Data = importedSTL[0];
-  Data->GetOutput()->GetVTKData()->Update();
 	Data->Update();
 
 	albaOpConnectivitySurface *connectSurface = new albaOpConnectivitySurface;

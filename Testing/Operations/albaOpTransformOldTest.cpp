@@ -190,7 +190,6 @@ void albaOpTransformOldTest::TestOnEventGizmoScale()
   output->Update();
 
   vtkPolyData *polydataOutput = vtkPolyData::SafeDownCast(output->GetOutput()->GetVTKData());
-  polydataOutput->Update();
   for (int i=0;i<cube->GetOutput()->GetNumberOfPoints();i++)
   {
     double b = cube->GetOutput()->GetPoint(i)[0];

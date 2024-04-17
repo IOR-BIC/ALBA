@@ -52,14 +52,13 @@ void albaOpCleanSurfaceTest::TestOpRun()
   vtkSphereSource *sphere2=vtkSphereSource::New();
   sphere2->Update();
   vtkAppendPolyData *append=vtkAppendPolyData::New();
-  append->SetInput(sphere1->GetOutput());
-  append->AddInput(sphere2->GetOutput());
+  append->SetInputConnection(sphere1->GetOutputPort());
+  append->AddInputConnection(sphere2->GetOutputPort());
   append->Update();
 
   albaVMESurface *surfaceInput;
   albaNEW(surfaceInput);
   surfaceInput->SetData(append->GetOutput(),0.0);
-  surfaceInput->GetOutput()->GetVTKData()->Update();
   surfaceInput->GetOutput()->Update();
   surfaceInput->Update();
 
@@ -72,7 +71,6 @@ void albaOpCleanSurfaceTest::TestOpRun()
   clean->OnClean();
   clean->OpDo();
 
-  surfaceInput->GetOutput()->GetVTKData()->Update();
   surfaceInput->GetOutput()->Update();
   surfaceInput->Update();
 

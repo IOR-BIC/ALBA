@@ -106,7 +106,6 @@ void albaOpSmoothSurfaceCellsTest::TestOpRun()
 
   albaSmartPointer<albaVMESurface> input;
   input->SetData(sphere->GetOutput(),0.0);
-  input->GetOutput()->GetVTKData()->Update();
   input->GetOutput()->Update();
   input->Update();
 
@@ -146,7 +145,6 @@ void albaOpSmoothSurfaceCellsTest::TestMarkCells()
 
   albaSmartPointer<albaVMESurface> input;
   input->SetData(sphere->GetOutput(),0.0);
-  input->GetOutput()->GetVTKData()->Update();
   input->GetOutput()->Update();
   input->Update();
 
@@ -186,7 +184,6 @@ void albaOpSmoothSurfaceCellsTest::TestSmoothCells()
 
   albaSmartPointer<albaVMESurface> input;
   input->SetData(sphere->GetOutput(),0.0);
-  input->GetOutput()->GetVTKData()->Update();
   input->GetOutput()->Update();
   input->Update();
 
@@ -208,16 +205,15 @@ void albaOpSmoothSurfaceCellsTest::TestSmoothCells()
   op->OpDo();
 
   vtkPolyData *output = vtkPolyData::SafeDownCast(albaVMESurface::SafeDownCast(op->GetInput())->GetOutput()->GetVTKData());
-  output->Update();
 
   //////////////////////////////////////////////////////////////////////////
   //Extract the marked cell
   //////////////////////////////////////////////////////////////////////////
   vtkALBASmartPointer<vtkALBARemoveCellsFilter> cellFilter1;
   vtkALBASmartPointer<vtkALBARemoveCellsFilter> cellFilter2;
-  cellFilter1->SetInput(sphere->GetOutput());
+  cellFilter1->SetInputConnection(sphere->GetOutputPort());
   cellFilter1->Update();
-  cellFilter2->SetInput(sphere->GetOutput());
+  cellFilter2->SetInputConnection(sphere->GetOutputPort());
   cellFilter2->Update();
   for (int j=0;j<sphere->GetOutput()->GetNumberOfCells();j++)
   {
@@ -234,7 +230,6 @@ void albaOpSmoothSurfaceCellsTest::TestSmoothCells()
 
   vtkALBASmartPointer<vtkPolyData> toSmoothPolyData;
   toSmoothPolyData->DeepCopy(cellFilter1->GetOutput());
-  toSmoothPolyData->Update();
 
   cellFilter2->ReverseRemoveOff();
   cellFilter2->RemoveMarkedCells();
@@ -242,10 +237,9 @@ void albaOpSmoothSurfaceCellsTest::TestSmoothCells()
 
   vtkALBASmartPointer<vtkPolyData> polyData;
   polyData->DeepCopy(cellFilter2->GetOutput());
-  polyData->Update();
 
   vtkALBASmartPointer<vtkSmoothPolyDataFilter> smoothFilter;
-  smoothFilter->SetInput(toSmoothPolyData);
+  smoothFilter->SetInputData(toSmoothPolyData);
   smoothFilter->SetNumberOfIterations(op->GetNumberOfInteractions());
   smoothFilter->BoundarySmoothingOff();//always true
   smoothFilter->FeatureEdgeSmoothingOn();
@@ -253,18 +247,17 @@ void albaOpSmoothSurfaceCellsTest::TestSmoothCells()
   smoothFilter->Update();
 
   vtkALBASmartPointer<vtkAppendPolyData> appendFilter; 
-  appendFilter->AddInput(smoothFilter->GetOutput());
-  appendFilter->AddInput(polyData);
+  appendFilter->AddInputConnection(smoothFilter->GetOutputPort());
+  appendFilter->AddInputData(polyData);
   appendFilter->Update();
 
   vtkALBASmartPointer<vtkCleanPolyData> cleanFilter; 
-  cleanFilter->SetInput(appendFilter->GetOutput());
+  cleanFilter->SetInputConnection(appendFilter->GetOutputPort());
   cleanFilter->Update();
 
   vtkALBASmartPointer<vtkPolyData> outputFilter;
   outputFilter->DeepCopy(cleanFilter->GetOutput());
-  outputFilter->Update();
-
+  
   vtkDataArray *n1 = outputFilter->GetCellData()->GetNormals();
   vtkDataArray *n2 = output->GetCellData()->GetNormals();
 

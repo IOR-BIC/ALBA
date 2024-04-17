@@ -50,7 +50,6 @@ void albaOpCreateSurfaceTest::TestOpRun()
 	surfaceParametric->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_SPHERE);
 	surfaceParametric->SetSphereRadius(5.);
 	surfaceParametric->Update();
-	surfaceParametric->GetOutput()->GetVTKData()->Update();
 
   albaVMESurface *surfaceOutput;
   int numberOfPointsBefore=surfaceParametric->GetOutput()->GetVTKData()->GetNumberOfPoints();
@@ -62,7 +61,6 @@ void albaOpCreateSurfaceTest::TestOpRun()
 
 
 	surfaceOutput = albaVMESurface::SafeDownCast(create->GetOutput());
-  surfaceOutput->GetOutput()->GetVTKData()->Update();
   surfaceOutput->GetOutput()->Update();
   surfaceOutput->Update();
 

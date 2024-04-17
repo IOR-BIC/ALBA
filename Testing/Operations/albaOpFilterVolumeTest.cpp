@@ -56,7 +56,6 @@ void albaOpFilterVolumeTest::CreateDataTest()
   }
   scalarsIM->SetName("SCALARS");
   m_InputIM->GetPointData()->SetScalars(scalarsIM);
-  m_InputIM->Update();
 
   vtkNEW(m_InputRG);
   m_InputRG->SetDimensions(5,10,15);
@@ -95,7 +94,6 @@ void albaOpFilterVolumeTest::CreateDataTest()
   scalarsRG->SetName("SCALARS");
 
   m_InputRG->GetPointData()->SetScalars(scalarsRG);
-  m_InputRG->Update();
 
 }
 //----------------------------------------------------------------------------
@@ -169,7 +167,6 @@ void albaOpFilterVolumeTest::TestOnSmooth()
 {
   albaSmartPointer<albaVMEVolumeGray> volumeIM;
   volumeIM->SetData(m_InputIM,0.0);
-  volumeIM->GetOutput()->GetVTKData()->Update();
   volumeIM->GetOutput()->Update();
   volumeIM->Update();
 
@@ -186,10 +183,9 @@ void albaOpFilterVolumeTest::TestOnSmooth()
   op->OpDo();
 
   vtkImageData *outputIM = (vtkImageData*)albaVMEVolumeGray::SafeDownCast(op->GetInput())->GetOutput()->GetVTKData();
-  outputIM->Update();
 
   vtkALBASmartPointer<vtkImageGaussianSmooth> filterSmooth;
-  filterSmooth->SetInput(m_InputIM);
+  filterSmooth->SetInputData(m_InputIM);
   filterSmooth->SetStandardDeviations(stDev);
   filterSmooth->SetRadiusFactors(radius);
   filterSmooth->Update();
@@ -211,7 +207,6 @@ void albaOpFilterVolumeTest::TestOnClear()
 {
   albaSmartPointer<albaVMEVolumeGray> volumeIM;
   volumeIM->SetData(m_InputIM,0.0);
-  volumeIM->GetOutput()->GetVTKData()->Update();
   volumeIM->GetOutput()->Update();
   volumeIM->Update();
 
@@ -227,7 +222,6 @@ void albaOpFilterVolumeTest::TestOnClear()
   op->OpDo();
 
   vtkImageData *outputIM = (vtkImageData*)albaVMEVolumeGray::SafeDownCast(op->GetInput())->GetOutput()->GetVTKData();
-  outputIM->Update();
 
   m_Result = outputIM->GetNumberOfPoints() == m_InputIM->GetNumberOfPoints();
   TEST_RESULT;
@@ -246,7 +240,6 @@ void albaOpFilterVolumeTest::TestApplyFiltersToInputData()
 {
   albaSmartPointer<albaVMEVolumeGray> volumeIM;
   volumeIM->SetData(m_InputIM,0.0);
-  volumeIM->GetOutput()->GetVTKData()->Update();
   volumeIM->GetOutput()->Update();
   volumeIM->Update();
 
@@ -267,16 +260,15 @@ void albaOpFilterVolumeTest::TestApplyFiltersToInputData()
   op->OpUndo();
 
   vtkImageData *outputIM = (vtkImageData*)albaVMEVolumeGray::SafeDownCast(op->GetInput())->GetOutput()->GetVTKData();
-  outputIM->Update();
 
   vtkALBASmartPointer<vtkImageGaussianSmooth> filterSmooth;
-  filterSmooth->SetInput(m_InputIM);
+  filterSmooth->SetInputData(m_InputIM);
   filterSmooth->SetStandardDeviations(stDev);
   filterSmooth->SetRadiusFactors(radius);
   filterSmooth->Update();
 
   vtkALBASmartPointer<vtkImageMedian3D> filterMedian;
-  filterMedian->SetInput(filterSmooth->GetOutput());
+  filterMedian->SetInputConnection(filterSmooth->GetOutputPort());
   filterMedian->SetKernelSize(kernelSize[0],kernelSize[1],kernelSize[2]);
   filterMedian->Update();
 
@@ -297,7 +289,6 @@ void albaOpFilterVolumeTest::TestUndo()
 {
   albaSmartPointer<albaVMEVolumeGray> volumeIM;
   volumeIM->SetData(m_InputIM,0.0);
-  volumeIM->GetOutput()->GetVTKData()->Update();
   volumeIM->GetOutput()->Update();
   volumeIM->Update();
 
@@ -314,7 +305,6 @@ void albaOpFilterVolumeTest::TestUndo()
 
 
   vtkImageData *outputIM = (vtkImageData*)albaVMEVolumeGray::SafeDownCast(op->GetInput())->GetOutput()->GetVTKData();
-  outputIM->Update();
 
   for (int i=0;i<outputIM->GetNumberOfPoints();i++)
   {
@@ -330,7 +320,6 @@ void albaOpFilterVolumeTest::TestOnMedian()
 {
   albaSmartPointer<albaVMEVolumeGray> volumeIM;
   volumeIM->SetData(m_InputIM,0.0);
-  volumeIM->GetOutput()->GetVTKData()->Update();
   volumeIM->GetOutput()->Update();
   volumeIM->Update();
 
@@ -345,10 +334,9 @@ void albaOpFilterVolumeTest::TestOnMedian()
   op->OpDo();
 
   vtkImageData *outputIM = (vtkImageData*)albaVMEVolumeGray::SafeDownCast(op->GetInput())->GetOutput()->GetVTKData();
-  outputIM->Update();
 
   vtkALBASmartPointer<vtkImageMedian3D> filterMedian;
-  filterMedian->SetInput(m_InputIM);
+  filterMedian->SetInputData(m_InputIM);
   filterMedian->SetKernelSize(kernelSize[0],kernelSize[1],kernelSize[2]);
   filterMedian->Update();
 

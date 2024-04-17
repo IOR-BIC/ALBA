@@ -75,7 +75,6 @@ void albaOpExtrusionHolesTest::TestExtractFreeEdge()
 	importer->SetFileName(filename.GetCStr());
 	importer->OpRun();
 	albaVMESurface *cube=albaVMESurface::SafeDownCast(importer->GetOutput());
-	cube->GetOutput()->GetVTKData()->Update();
 	cube->Update();
 
 	albaOpExtrusionHoles *extrusion = new albaOpExtrusionHoles();
@@ -111,13 +110,11 @@ void albaOpExtrusionHolesTest::TestExtrude()
 	importer->SetFileName(filename.GetCStr());
 	importer->OpRun();
 	albaVMESurface *cube=albaVMESurface::SafeDownCast(importer->GetOutput());
-	cube->GetOutput()->GetVTKData()->Update();
 	cube->Update();
 
 	double bounds[6];
 
 	vtkPolyData *polydata = vtkPolyData::SafeDownCast(cube->GetOutput()->GetVTKData());
-	polydata->Update();
 	
 	polydata->GetBounds(bounds);
 
@@ -132,7 +129,6 @@ void albaOpExtrusionHolesTest::TestExtrude()
 	extrusion->Extrude();
 	extrusion->SaveExtrusion();
 	vtkPolyData *resultPolydata=extrusion->GetExtrutedSurface();
-	resultPolydata->Update();
 
 	resultPolydata->GetBounds(bounds);
 

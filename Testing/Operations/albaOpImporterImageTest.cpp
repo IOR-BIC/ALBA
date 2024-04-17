@@ -56,7 +56,6 @@ void albaOpImporterImageTest::Test_Single()
 	
 	CPPUNIT_ASSERT(node->IsA("albaVMEImage"));
 	vtkDataSet *data=node->GetOutput()->GetVTKData();
-	data->Update();
   albaString name = node->GetName();
   CPPUNIT_ASSERT(!name.Compare("imageTest")); //compare returns 0 if equal
 
@@ -92,7 +91,6 @@ void albaOpImporterImageTest::Test_Multi_No_Volume()
 	
 	CPPUNIT_ASSERT(node->IsA("albaVMEImage"));
 	vtkDataSet *data=node->GetOutput()->GetVTKData();
-	data->Update();
   albaString name = node->GetName();
   CPPUNIT_ASSERT(!name.Compare("Imported Images")); //compare returns 0 if equal*/
 
@@ -140,7 +138,6 @@ void albaOpImporterImageTest::Test_Multi_Volume()
 	
 	CPPUNIT_ASSERT(node->IsA("albaVMEVolumeRGB"));
 	vtkDataSet *data=node->GetOutput()->GetVTKData();
-	data->Update();
   albaString name = node->GetName();
   CPPUNIT_ASSERT(!name.Compare("Imported Volume")); //compare returns 0 if equal
 

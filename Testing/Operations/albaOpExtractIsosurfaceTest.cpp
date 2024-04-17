@@ -35,6 +35,8 @@
 #include "albaVMEVolumeGray.h"
 #include "albaVMEGenericAbstract.h"
 #include "vtkALBASmartPointer.h"
+#include "vtkStructuredPoints.h"
+#include "vtkRectilinearGrid.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
@@ -63,12 +65,11 @@ void albaOpExtractIsosurfaceTest::TestExtractRG()
   preader->SetFileName(filename);
   preader->Update();
 
-  vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
+  vtkRectilinearGrid *data = preader->GetOutput();
 
   albaSmartPointer<albaVMEVolumeGray> Input;
   Input->SetDataByDetaching(data,0);
   Input->Update();
-  Input->GetOutput()->GetVTKData()->Update();
 
   //clean on, triangulate on
   albaOpExtractIsosurface *extract = new albaOpExtractIsosurface();
@@ -139,12 +140,11 @@ void albaOpExtractIsosurfaceTest::TestExtractSP()
   preader->SetFileName(filename);
   preader->Update();
 
-  vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
+  vtkImageData *data = preader->GetOutput();
 
   albaSmartPointer<albaVMEVolumeGray> Input;
   Input->SetDataByDetaching(data,0);
   Input->Update();
-  Input->GetOutput()->GetVTKData()->Update();
 
   //clean on, triangulate on
   albaOpExtractIsosurface *extract = new albaOpExtractIsosurface();
@@ -218,12 +218,11 @@ void albaOpExtractIsosurfaceTest::TestExtractConnectivity()
 	preader->SetFileName(filename);
 	preader->Update();
 
-	vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
+	vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutput());
 
 	albaSmartPointer<albaVMEVolumeGray> Input;
 	Input->SetDataByDetaching(data, 0);
 	Input->Update();
-	Input->GetOutput()->GetVTKData()->Update();
 
 	//clean on, triangulate on
 	albaOpExtractIsosurface *extract = new albaOpExtractIsosurface();

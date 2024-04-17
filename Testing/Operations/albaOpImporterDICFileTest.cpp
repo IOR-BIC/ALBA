@@ -72,7 +72,6 @@ void albaOpImporterDICFileTest::Test()
 
 	node->GetOutput()->Update();
 	vtkPolyData *polyData = vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData());
-	polyData->Update();
 
 	double scalarValue = polyData->GetPointData()->GetScalars("DIC")->GetTuple1(19);
 

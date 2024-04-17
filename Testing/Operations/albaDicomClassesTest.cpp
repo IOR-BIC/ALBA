@@ -168,7 +168,6 @@ void albaDicomClassesTest::TestSliceGetVTKImageData()
 	
 	vtkImageData* sliceImageData = sliceDicom->GetNewVTKImageData();
 	vtkImageData* readerOutput = vtkImageData::SafeDownCast(reader->GetOutput());
-	readerOutput->Update();
 	
 	double *sliceSpacing = sliceImageData->GetSpacing();
 	double *readerSpacing = readerOutput->GetSpacing();

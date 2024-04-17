@@ -193,7 +193,6 @@ void albaGeometryEditorPolylineGraphTest::TestAddNewVertex2()
 	albaVMEPolylineGraph *polyline;
 	albaNEW(polyline);
 	polyline->SetData(m_Graph,0.0);
-	polyline->GetOutput()->GetVTKData()->Update();
 	polyline->Update();
 
 	albaGeometryEditorPolylineGraph *PolylineGraph = new albaGeometryEditorPolylineGraph(NULL,NULL,polyline,true);
@@ -250,7 +249,6 @@ void albaGeometryEditorPolylineGraphTest::TestSelectPoint()
 	albaVMEPolylineGraph *polyline;
 	albaNEW(polyline);
 	polyline->SetData(m_Graph,0.0);
-	polyline->GetOutput()->GetVTKData()->Update();
 	polyline->Update();
 
 	albaGeometryEditorPolylineGraph *PolylineGraph = new albaGeometryEditorPolylineGraph(NULL,NULL,polyline,true);
@@ -274,7 +272,6 @@ void albaGeometryEditorPolylineGraphTest::TestDeletePoint()
 	albaVMEPolylineGraph *polyline;
 	albaNEW(polyline);
 	polyline->SetData(m_Graph,0.0);
-	polyline->GetOutput()->GetVTKData()->Update();
 	polyline->Update();
 
 	albaGeometryEditorPolylineGraph *PolylineGraph = new albaGeometryEditorPolylineGraph(NULL,NULL,polyline,true);
@@ -297,7 +294,6 @@ void albaGeometryEditorPolylineGraphTest::TestSelectBranch()
 	albaVMEPolylineGraph *polyline;
 	albaNEW(polyline);
 	polyline->SetData(m_Graph,0.0);
-	polyline->GetOutput()->GetVTKData()->Update();
 	polyline->Update();
 
 	albaGeometryEditorPolylineGraph *PolylineGraph = new albaGeometryEditorPolylineGraph(NULL,NULL,polyline,true);
@@ -316,7 +312,6 @@ void albaGeometryEditorPolylineGraphTest::TestInsertPoint()
 	albaVMEPolylineGraph *polyline;
 	albaNEW(polyline);
 	polyline->SetData(m_Graph,0.0);
-	polyline->GetOutput()->GetVTKData()->Update();
 	polyline->Update();
 
 	albaGeometryEditorPolylineGraph *PolylineGraph = new albaGeometryEditorPolylineGraph(NULL,NULL,polyline,true);

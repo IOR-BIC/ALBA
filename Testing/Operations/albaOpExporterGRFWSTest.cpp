@@ -96,6 +96,8 @@ void albaOpExporterGRFWSTest::TestWrite()
 	vtkALBASmartPointer<vtkCubeSource> platformRight;
 	platformLeft->SetBounds(0, 10, 0, 50, 0, 5);
 	platformRight->SetBounds(0, 10, 0, 50, 0, 5);
+	platformLeft->Update();
+	platformRight->Update();
 	platform1->SetData(platformLeft->GetOutput(), 0);
 	platform2->SetData(platformRight->GetOutput(), 0);
 
@@ -114,32 +116,24 @@ void albaOpExporterGRFWSTest::TestWrite()
 		cellArray->InsertNextCell(2, pointId);
 		force->SetPoints(points);
 		force->SetLines(cellArray);
-		force->Update();
 
 		forceL->SetData(force, i);
 		forceL->Update();
-		forceL->GetOutput()->GetVTKData()->Update();
 
 		points->InsertPoint(1, 10 * (i + 1), 10 * (i + 1), 10 * (i + 1));
-		force->Update();
 
 		forceR->SetData(force, i);
 		forceR->Update();
-		forceR->GetOutput()->GetVTKData()->Update();
 
 		points->InsertPoint(1, 100 + i, 100 + i, 100 + i);
-		force->Update();
 
 		momentL->SetData(force, i);
 		momentL->Update();
 
 		points->InsertPoint(1, 200 + i, 200 + i, 200 + i);
-		force->Update();
 
-		momentL->GetOutput()->GetVTKData()->Update();
 		momentR->SetData(force, i);
 		momentR->Update();
-		momentR->GetOutput()->GetVTKData()->Update();
 	}
 
 	// Execute Exporter
@@ -263,6 +257,8 @@ void albaOpExporterGRFWSTest::TestWriteFast()
 	vtkALBASmartPointer<vtkCubeSource> platformRight;
 	platformLeft->SetBounds(0, 10, 0, 50, 0, 5);
 	platformRight->SetBounds(0, 10, 0, 50, 0, 5);
+	platformLeft->Update();
+	platformRight->Update();
 	platform1->SetData(platformLeft->GetOutput(), 0);
 	platform2->SetData(platformRight->GetOutput(), 0);
 
@@ -281,32 +277,25 @@ void albaOpExporterGRFWSTest::TestWriteFast()
 		cellArray->InsertNextCell(2, pointId);
 		force->SetPoints(points);
 		force->SetLines(cellArray);
-		force->Update();
 
 		forceL->SetData(force, i);
 		forceL->Update();
-		forceL->GetOutput()->GetVTKData()->Update();
 
 		points->InsertPoint(1, 10, 5 - (5 * i), 10);
-		force->Update();
 
 		forceR->SetData(force, i);
 		forceR->Update();
-		forceR->GetOutput()->GetVTKData()->Update();
 
 		points->InsertPoint(1, 10, 10, 5 - (5 * i));
-		force->Update();
 
 		momentL->SetData(force, i);
 		momentL->Update();
-		momentL->GetOutput()->GetVTKData()->Update();
 
 		points->InsertPoint(1, 200 + i, 200 + i, 200 + i);
-		force->Update();
 
 		momentR->SetData(force, i);
 		momentR->Update();
-		momentR->GetOutput()->GetVTKData()->Update();
+
 	}
 
 	// Execute Exporter
@@ -447,11 +436,9 @@ void albaOpExporterGRFWSTest::TestWriteSingleVector()
 		cellArray->InsertNextCell(2, pointId);
 		force->SetPoints(points);
 		force->SetLines(cellArray);
-		force->Update();
 
 		vector->SetData(force, i);
 		vector->Update();
-		vector->GetOutput()->GetVTKData()->Update();
 	}
 
 	// Execute Exporter
@@ -537,11 +524,9 @@ void albaOpExporterGRFWSTest::TestWriteSingleVectorFast()
 		cellArray->InsertNextCell(2, pointId);
 		force->SetPoints(points);
 		force->SetLines(cellArray);
-		force->Update();
 
 		vector->SetData(force, i);
 		vector->Update();
-		vector->GetOutput()->GetVTKData()->Update();
 	}
 
 	// Execute Exporter

@@ -34,6 +34,7 @@
 #include "vtkDataSetWriter.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
+#include "vtkDataArray.h"
 
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
@@ -129,7 +130,7 @@ void albaOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithm()
   r->Update();
 
   vtkALBASmartPointer<vtkImageCast> imageToFloat;
-  imageToFloat->SetInput(vtkImageData::SafeDownCast(r->GetOutput()));
+  imageToFloat->SetInputConnection(r->GetOutputPort());
   imageToFloat->SetOutputScalarTypeToFloat();
   imageToFloat->Update();
 
@@ -218,10 +219,8 @@ void albaOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithm()
   //Compare the two results
   vtkALBASmartPointer<vtkImageData> imITK;
   imITK->DeepCopy(vtkImageData::SafeDownCast(r->GetOutput()));
-  imITK->Update();
   vtkALBASmartPointer<vtkImageData> imOP;
   imOP->DeepCopy(vtkImageData::SafeDownCast(volumeOperationOutput->GetOutput()->GetVTKData()));
-  imOP->Update();
 
   CompareImageData(imITK,imOP);
 
@@ -252,7 +251,6 @@ void albaOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithmRG()
   inputVolume->ReparentTo(storage->GetRoot());
   inputVolume->Update();
   inputVolume->GetOutput()->Update();
-  inputVolume->GetOutput()->GetVTKData()->Update();
   int k=inputVolume->GetOutput()->GetVTKData()->GetNumberOfPoints();
 
 
@@ -280,10 +278,8 @@ void albaOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithmRG()
   //Compare the two results
   vtkALBASmartPointer<vtkImageData> imFile;
   imFile->DeepCopy(vtkImageData::SafeDownCast(outputRead->GetOutput()));
-  imFile->Update();
   vtkALBASmartPointer<vtkImageData> imOP;
   imOP->DeepCopy(vtkImageData::SafeDownCast(volumeOperationOutput->GetOutput()->GetVTKData()));
-  imOP->Update();
 
   CompareImageData(imFile,imOP);
 

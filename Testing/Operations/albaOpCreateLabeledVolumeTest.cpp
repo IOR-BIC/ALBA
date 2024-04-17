@@ -57,7 +57,6 @@ void albaOpCreateLabeledVolumeTest::TestOpRun()
   array->Allocate(10*10*10);
 
   data->GetPointData()->AddArray(array);
-  data->Update();
 
   albaSmartPointer<albaVMEVolumeGray> volume;
   volume->SetData(data.GetPointer(), 0.0);
@@ -113,7 +112,6 @@ void albaOpCreateLabeledVolumeTest::TestOpDo()
   array->Allocate(10*10*10);
 
   data->GetPointData()->AddArray(array);
-  data->Update();
 
   albaSmartPointer<albaVMEVolumeGray> volume;
   volume->SetData(data.GetPointer(), 0.0);

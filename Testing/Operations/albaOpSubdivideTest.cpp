@@ -48,13 +48,13 @@ void albaOpSubdivideTest::TestOpRun()
 {
 	vtkPolyData *testPolyData;
   vtkALBASmartPointer<vtkSphereSource> sphere;
+	sphere->Update();
+
   testPolyData = sphere->GetOutput();
-  testPolyData->Update();
 
   albaVMESurface *vmeSurface;
   albaNEW(vmeSurface);
   vmeSurface->SetData(testPolyData, 0);
-	vmeSurface->GetOutput()->GetVTKData()->Update();
   vmeSurface->Update();
   	
 	albaOpSubdivide *subdivideOp=new albaOpSubdivide("Subdivide");
@@ -68,7 +68,6 @@ void albaOpSubdivideTest::TestOpRun()
   subdivideOp->OnEvent(&albaEvent(this, albaOpSubdivide::ID_SUBDIVIDE));
 	subdivideOp->OpDo();
 	
-	vmeSurface->GetOutput()->GetVTKData()->Update();
 	vmeSurface->Update();
 
 	vtkPoints *pointsSubdivide = vtkPolyData::SafeDownCast(albaVMESurface::SafeDownCast(subdivideOp->GetInput())->GetOutput()->GetVTKData())->GetPoints();

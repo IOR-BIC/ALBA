@@ -64,13 +64,9 @@ void albaOpSurfaceMirrorTest::TestOpRun()
 	pointId[2] = 2;
 	cellArray->InsertNextCell(3 , pointId);
 
-	testPolyData->Update();
-
-  	
   albaVMESurface *vmeSurface;
   albaNEW(vmeSurface);
   vmeSurface->SetData(testPolyData, 0);
-	vmeSurface->GetOutput()->GetVTKData()->Update();
   vmeSurface->Update();
   	
 	albaOpSurfaceMirror *surfaceMirrorOp=new albaOpSurfaceMirror("Surface Mirror");
@@ -82,7 +78,6 @@ void albaOpSurfaceMirrorTest::TestOpRun()
   surfaceMirrorOp->OpRun();
 	surfaceMirrorOp->OpDo();
 	
-	vmeSurface->GetOutput()->GetVTKData()->Update();
 	vmeSurface->Update();
 
 	

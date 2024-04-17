@@ -145,7 +145,6 @@ void albaOpCropDeformableROITest::TestOpExecute()
 
   albaSmartPointer<albaVMESurface>surface;
   surface->SetData(reader->GetOutput(),0.0);
-  surface->GetOutput()->GetVTKData()->Update();
   surface->Update();
   CPPUNIT_ASSERT(surface);
 
@@ -158,14 +157,13 @@ void albaOpCropDeformableROITest::TestOpExecute()
 
   albaSmartPointer<albaVMEVolumeGray> volume;
   volume->SetData((vtkImageData*)volumeReader->GetOutput(),0.0);
-  volume->GetOutput()->GetVTKData()->Update();
   volume->Update();
   CPPUNIT_ASSERT(volume);
 
   // test filtering
   vtkMaskPolyDataFilter *filter;
   vtkNEW(filter);
-  filter->SetInput(volume->GetOutput()->GetVTKData());
+  filter->SetInputData(volume->GetOutput()->GetVTKData());
   filter->SetDistance(distance);
   filter->SetInsideValue(fillValue);
   filter->SetInsideOut(insideOut);

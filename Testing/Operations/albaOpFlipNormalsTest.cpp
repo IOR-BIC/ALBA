@@ -79,7 +79,6 @@ void albaOpFlipNormalsTest::TestOpRun()
 
   albaSmartPointer<albaVMESurface> surface;
   surface->SetData(sphere->GetOutput(),0.0);
-  surface->GetOutput()->GetVTKData()->Update();
   surface->GetOutput()->Update();
   surface->Update();
 
@@ -127,7 +126,6 @@ void albaOpFlipNormalsTest::TestFlipNormals()
 
   albaSmartPointer<albaVMESurface> surface;
   surface->SetData(sphere->GetOutput(),0.0);
-  surface->GetOutput()->GetVTKData()->Update();
   surface->GetOutput()->Update();
   surface->Update();
 
@@ -138,7 +136,6 @@ void albaOpFlipNormalsTest::TestFlipNormals()
 
   vtkALBASmartPointer<vtkPolyData> polydataInput;
   polydataInput->DeepCopy(albaVMESurface::SafeDownCast(flip->GetInput())->GetOutput()->GetVTKData());
-  polydataInput->Update();
 
   flip->SetSeed(0);
   flip->SetDiameter(0.01);
@@ -148,7 +145,6 @@ void albaOpFlipNormalsTest::TestFlipNormals()
 
   vtkALBASmartPointer<vtkPolyData> polydataOutput;
   polydataOutput->DeepCopy(albaVMESurface::SafeDownCast(flip->GetInput())->GetOutput()->GetVTKData());
-  polydataOutput->Update();
   
   for (int i=0;i<albaVMESurface::SafeDownCast(flip->GetInput())->GetOutput()->GetVTKData()->GetNumberOfCells();i++)
   {
@@ -188,7 +184,6 @@ void albaOpFlipNormalsTest::TestModifyAllNormal()
 
   albaSmartPointer<albaVMESurface> surface;
   surface->SetData(sphere->GetOutput(),0.0);
-  surface->GetOutput()->GetVTKData()->Update();
   surface->GetOutput()->Update();
   surface->Update();
 
@@ -199,7 +194,6 @@ void albaOpFlipNormalsTest::TestModifyAllNormal()
 
   vtkALBASmartPointer<vtkPolyData> polydataInput;
   polydataInput->DeepCopy(albaVMESurface::SafeDownCast(flip->GetInput())->GetOutput()->GetVTKData());
-  polydataInput->Update();
 
   flip->SetSeed(0);
   flip->SetDiameter(1);
@@ -210,7 +204,6 @@ void albaOpFlipNormalsTest::TestModifyAllNormal()
 
   vtkALBASmartPointer<vtkPolyData> polydataOutput;
   polydataOutput->DeepCopy(albaVMESurface::SafeDownCast(flip->GetInput())->GetOutput()->GetVTKData());
-  polydataOutput->Update();
 
   for (int i=0;i<albaVMESurface::SafeDownCast(flip->GetInput())->GetOutput()->GetVTKData()->GetNumberOfCells();i++)
   {

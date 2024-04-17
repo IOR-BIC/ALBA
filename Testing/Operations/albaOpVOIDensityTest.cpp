@@ -67,7 +67,6 @@ void albaOpVOIDensityTest::Test()
 	albaVMEVolumeGray *Volume = albaVMEVolumeGray::SafeDownCast(importerVTK->GetOutput());
 	Volume->Update();
 	vtkDataSet *VolumeData = Volume->GetOutput()->GetVTKData();
-	VolumeData->Update();
   //Create operation VOI Density and initialize it
 	albaOpVOIDensity *VOIDensity=new albaOpVOIDensity("VOI Density");
 	VOIDensity->TestModeOn();
@@ -147,7 +146,6 @@ void albaOpVOIDensityTest::TestNotAlignedVolume()
 
 	Volume->Update();
 	vtkDataSet *VolumeData = Volume->GetOutput()->GetVTKData();
-	VolumeData->Update();
 
 	//Create operation VOI Density and initialize it
 	albaOpVOIDensity *VOIDensity = new albaOpVOIDensity("VOI Density");

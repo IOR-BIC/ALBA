@@ -110,7 +110,6 @@ void OpEqualizeHistogramDerivedTestClass::ExecuteOpRun()
   op->TestModeOn();
 
   vtkDataSet *inputDataSet = m_VolumeInput->GetOutput()->GetVTKData();
-  inputDataSet->Update();
 
   double outputSpacing[3];
   double inputDataOrigin[3];

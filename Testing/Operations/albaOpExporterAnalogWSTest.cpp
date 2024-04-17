@@ -155,7 +155,7 @@ void albaOpExporterAnalogWSTest::TestWrite()
   tkzName4.GetNextToken();
   wxString st4 = tkzName4.GetNextToken();
   CPPUNIT_ASSERT( st4.Cmp("30") == 0);
-  
+
   albaDEL(analog_test);
   
   delete Exporter;

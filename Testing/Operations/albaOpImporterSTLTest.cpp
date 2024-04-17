@@ -60,7 +60,6 @@ void albaOpImporterSTLTest::Test()
 	
 	CPPUNIT_ASSERT(node->IsA("albaVMESurface"));
 	vtkDataSet *data = node->GetOutput()->GetVTKData();
-	data->Update();
 	int cells = data->GetNumberOfCells();
 	CPPUNIT_ASSERT(cells == 4);
 	int points=data->GetNumberOfPoints();
@@ -78,7 +77,6 @@ void albaOpImporterSTLTest::Test()
 
 	CPPUNIT_ASSERT(node->IsA("albaVMESurface"));
 	data = node->GetOutput()->GetVTKData();
-	data->Update();
 	cells = data->GetNumberOfCells();
 	CPPUNIT_ASSERT(cells == 4);
 	points = data->GetNumberOfPoints();
