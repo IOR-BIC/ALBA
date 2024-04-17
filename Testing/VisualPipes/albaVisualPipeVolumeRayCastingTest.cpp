@@ -88,7 +88,6 @@ void albaVisualPipeVolumeRayCastingTest::TestPipeExecution()
   albaVMEVolumeGray *volume;
   albaNEW(volume);
   volume->SetData((vtkImageData*)importer->GetOutput(),0.0);
-  volume->GetOutput()->GetVTKData()->Update();
   volume->GetOutput()->Update();
   volume->Update();
 

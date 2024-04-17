@@ -83,7 +83,6 @@ void albaVisualPipeSlicerSliceTest::TestPipeExecution()
 	importer->OpRun();
 
   albaVMEVolumeGray *volume = albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
-	volume->GetOutput()->GetVTKData()->Update();
 	volume->ReparentTo(root);
 	volume->Update();
 

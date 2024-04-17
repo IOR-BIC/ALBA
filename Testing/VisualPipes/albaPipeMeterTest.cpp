@@ -97,16 +97,13 @@ void albaPipeMeterTest::TestPipeExecution()
 	////// Create VME ////////////////////
   albaVMESurfaceParametric *vmeParametricSurfaceSTART;
   albaNEW(vmeParametricSurfaceSTART);	
-  vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   albaVMESurfaceParametric *vmeParametricSurfaceEND1;
   albaNEW(vmeParametricSurfaceEND1);	
-  vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
-
 
 	albaMatrix matrix;
   matrix.SetElement(0,3,4); //set a translation value on x axis of 4.0
@@ -117,7 +114,6 @@ void albaPipeMeterTest::TestPipeExecution()
   meter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
   meter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
   meter->ReparentTo(storage->GetRoot());
-  meter->GetOutput()->GetVTKData()->Update();
   meter->Modified();
   meter->Update();
 

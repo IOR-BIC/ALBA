@@ -138,8 +138,6 @@ void albaPipeVectorFieldSliceTest::TestCreate()
 
 	image->GetPointData()->SetActiveVectors("velocity");
 
-	image->Update();
-
 	double bb[6];
 	image->GetBounds(bb);
 

@@ -94,15 +94,12 @@ void albaPipeVectorTest::TestPipeExecution()
   cellArray1->InsertNextCell(2, pointId1);  
   poly->SetPoints(points1);
   poly->SetLines(cellArray1);
-  poly->Update();
 
   albaVMEVector *vector;
   albaNEW(vector);
   vector->SetData(poly, 0);
   vector->Modified();
   vector->Update();
-  vector->GetOutput()->GetVTKData()->Update();
-  vector->GetMaterial();
   vector->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
   vector->SetTimeStamp(0);
 

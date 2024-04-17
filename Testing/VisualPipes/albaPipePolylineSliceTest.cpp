@@ -150,7 +150,7 @@ void albaPipePolylineSliceTest::TestPipeExecution()
 
 			COMPARE_IMAGES("TestPipeExecution_TestRadius");
 
-			m_Renderer->RemoveAllProps();
+			m_Renderer->RemoveAllViewProps();
 		}
 		else if (i == TEST_THICKNESS)
 		{
@@ -169,7 +169,7 @@ void albaPipePolylineSliceTest::TestPipeExecution()
 
 			COMPARE_IMAGES("TestPipeExecution_TestThickness");
 
-			m_Renderer->RemoveAllProps();
+			m_Renderer->RemoveAllViewProps();
 		}
 		else if (i == TEST_SPHERES)
 		{
@@ -193,7 +193,7 @@ void albaPipePolylineSliceTest::TestPipeExecution()
 
 			COMPARE_IMAGES("TestPipeExecution_TestSpheres");
 
-			m_Renderer->RemoveAllProps();
+			m_Renderer->RemoveAllViewProps();
 		}
 		else if (i == TEST_RESOLUTION)
 		{
@@ -215,7 +215,7 @@ void albaPipePolylineSliceTest::TestPipeExecution()
 
 			COMPARE_IMAGES("TestPipeExecution_TestResolution");
 
-			m_Renderer->RemoveAllProps();
+			m_Renderer->RemoveAllViewProps();
 		}
 		else if (i == TEST_FILL)
 		{
@@ -236,7 +236,7 @@ void albaPipePolylineSliceTest::TestPipeExecution()
 
 			COMPARE_IMAGES("TestPipeExecution_TestFill");
 
-			m_Renderer->RemoveAllProps();
+			m_Renderer->RemoveAllViewProps();
 		}
 	}
 

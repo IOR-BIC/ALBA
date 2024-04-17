@@ -111,10 +111,9 @@ void albaPipePointSetTest::TestPipeExecution()
   vtkPolyData *polyData = vtkPolyData::New();
   polyData->SetPoints(points);
   //polyData->SetLines(cellArray);
-  polyData->Update();
 
   vtkDelaunay2D *delaunay = vtkDelaunay2D::New();
-  delaunay->SetInput(polyData);
+  delaunay->SetInputData(polyData);
   delaunay->SetAlpha(5);
   delaunay->SetTolerance(2);
   delaunay->Update();
@@ -122,7 +121,6 @@ void albaPipePointSetTest::TestPipeExecution()
   albaVMEPointSet *pointsetInput;
   albaNEW(pointsetInput);
   pointsetInput->SetData(delaunay->GetOutput(),0);
-  pointsetInput->GetOutput()->GetVTKData()->Update();
   pointsetInput->GetOutput()->Update();
 	
 	//Setting standard material to avoid random color selection
@@ -182,7 +180,7 @@ void albaPipePointSetTest::TestPipeExecution()
   
   
 
-  m_Renderer->RemoveAllProps();
+  m_Renderer->RemoveAllViewProps();
 
   delete sceneNode;
   albaDEL(pointsetInput);

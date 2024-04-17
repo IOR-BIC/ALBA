@@ -106,26 +106,25 @@ void albaPipePolylineGraphEditorTest::TestPipeExecution()
 
   m_Polydata->GetPointData()->AddArray(scalars);
   m_Polydata->GetPointData()->SetActiveScalars("SCALARS");
-  m_Polydata->Update();
 
   vtkALBASmartPointer<vtkSphereSource> sphere;
   sphere->SetRadius(0.5);
   sphere->Update();
   vtkALBASmartPointer<vtkGlyph3D> glyph;
-  glyph->SetInput(m_Polydata);
-  glyph->SetSource(sphere->GetOutput());
+  glyph->SetInputData(m_Polydata);
+  glyph->SetSourceConnection(sphere->GetOutputPort());
   glyph->SetScaleModeToDataScalingOff();//without this with a scalar value equal to 0 the sphere disappears
   glyph->Update();
 
   vtkALBASmartPointer<vtkTubeFilter> tube;
-  tube->SetInput(m_Polydata);
+  tube->SetInputData(m_Polydata);
   tube->SetRadius(0.2);
   tube->Update();
 
   int n = glyph->GetOutput()->GetNumberOfPoints();
   vtkALBASmartPointer<vtkAppendPolyData> append;
-  append->SetInput(glyph->GetOutput());
-  append->AddInput(tube->GetOutput());
+  append->SetInputConnection(glyph->GetOutputPort());
+  append->AddInputConnection(tube->GetOutputPort());
   append->Update();
 
   albaSmartPointer<albaVMEPolylineEditor> surface;
@@ -185,14 +184,13 @@ void albaPipePolylineGraphEditorTest::TestPipeExecution()
 
       m_Polydata->GetPointData()->AddArray(scalars);
       m_Polydata->GetPointData()->SetActiveScalars("SCALARS");
-      m_Polydata->Update();
 
       vtkALBASmartPointer<vtkSphereSource> sphere;
       sphere->SetRadius(0.5);
       sphere->Update();
       vtkALBASmartPointer<vtkGlyph3D> glyph;
-      glyph->SetInput(m_Polydata);
-      glyph->SetSource(sphere->GetOutput());
+      glyph->SetInputData(m_Polydata);
+      glyph->SetSourceConnection(sphere->GetOutputPort());
       glyph->SetScaleModeToDataScalingOff();//without this with a scalar value equal to 0 the sphere disappears
       glyph->Update();
 
@@ -223,10 +221,9 @@ void albaPipePolylineGraphEditorTest::TestPipeExecution()
 
       m_Polydata->GetPointData()->AddArray(scalars);
       m_Polydata->GetPointData()->SetActiveScalars("SCALARS");
-      m_Polydata->Update();
 
       vtkALBASmartPointer<vtkTubeFilter> tube;
-      tube->SetInput(m_Polydata);
+      tube->SetInputData(m_Polydata);
       tube->SetRadius(0.5);
       tube->Update();
 

@@ -202,7 +202,7 @@ void albaPipePointCloudTest::TestPipeExecution()
 		pipePointCloud->GetAssemblyFront()->GetActors(actorList);
 		actorList->InitTraversal();
 		vtkProp *actor = actorList->GetNextProp();
-		m_Renderer->RemoveAllProps();
+		m_Renderer->RemoveAllViewProps();
 		while (actor)
 		{
 			m_Renderer->AddActor(actor);
@@ -345,7 +345,7 @@ void albaPipePointCloudTest::TestScalarActorPos()
 		pipePointCloud->GetAssemblyFront()->GetActors(actorList);
 		actorList->InitTraversal();
 		vtkProp *actor = actorList->GetNextProp();
-		m_Renderer->RemoveAllProps();
+		m_Renderer->RemoveAllViewProps();
 		while (actor)
 		{
 			m_Renderer->AddActor(actor);

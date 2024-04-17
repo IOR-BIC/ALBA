@@ -238,7 +238,6 @@ void albaPipePolylineTest::TestPipeDensityMap()
 	albaVMEVolumeGray *volumeInput;
 	albaNEW(volumeInput);
 	volumeInput->SetData((vtkImageData*)volumeImporter->GetOutput(), 0.0);
-	volumeInput->GetOutput()->GetVTKData()->Update();
 	volumeInput->GetOutput()->Update();
 	volumeInput->Update();
 

@@ -90,7 +90,6 @@ void albaPipeIsosurfaceTest::TestPipeExecution()
   albaVMEVolumeGray *volumeInput;
   albaNEW(volumeInput);
   volumeInput->SetData((vtkRectilinearGrid*)Importer->GetOutput(),0.0);
-  volumeInput->GetOutput()->GetVTKData()->Update();
   volumeInput->GetOutput()->Update();
   volumeInput->Update();
 
@@ -136,7 +135,7 @@ void albaPipeIsosurfaceTest::TestPipeExecution()
 
 		COMPARE_IMAGES("TestPipeExecution", v);
 
-    m_Renderer->RemoveAllProps();
+    m_Renderer->RemoveAllViewProps();
 		sceneNode->DeletePipe();
   }
 

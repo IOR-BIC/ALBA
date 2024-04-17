@@ -95,7 +95,6 @@ void albaPipeIsosurfaceGPUTest::TestPipeExecutionCountour()
   albaVMEVolumeGray *volumeInput;
   albaNEW(volumeInput);
   volumeInput->SetData((vtkRectilinearGrid*)Importer->GetOutput(),0.0);
-  volumeInput->GetOutput()->GetVTKData()->Update();
   volumeInput->GetOutput()->Update();
   volumeInput->Update();
 
@@ -142,7 +141,7 @@ void albaPipeIsosurfaceGPUTest::TestPipeExecutionCountour()
 
 		COMPARE_IMAGES("TestPipeExecutionCountour", v + ID_CONTOUR_COMPARING);
 
-    m_Renderer->RemoveAllProps();
+    m_Renderer->RemoveAllViewProps();
 		sceneNode->DeletePipe();
   }
 
@@ -166,7 +165,6 @@ void albaPipeIsosurfaceGPUTest::TestPipeExecutionOpacity()
   albaVMEVolumeGray *volumeInput;
   albaNEW(volumeInput);
   volumeInput->SetData((vtkRectilinearGrid*)Importer->GetOutput(),0.0);
-  volumeInput->GetOutput()->GetVTKData()->Update();
   volumeInput->GetOutput()->Update();
   volumeInput->Update();
 
@@ -214,7 +212,7 @@ void albaPipeIsosurfaceGPUTest::TestPipeExecutionOpacity()
 
 		COMPARE_IMAGES("TestPipeExecutionOpacity", v + ID_OPACITY_COMPARING);
 
-    m_Renderer->RemoveAllProps();
+    m_Renderer->RemoveAllViewProps();
 		sceneNode->DeletePipe();
   }
 
@@ -237,7 +235,6 @@ void albaPipeIsosurfaceGPUTest::TestExtractIsosurface()
   albaVMEVolumeGray *volumeInput;
   albaNEW(volumeInput);
   volumeInput->SetData((vtkRectilinearGrid*)Importer->GetOutput(),0.0);
-  volumeInput->GetOutput()->GetVTKData()->Update();
   volumeInput->GetOutput()->Update();
   volumeInput->Update();
 
@@ -285,11 +282,10 @@ void albaPipeIsosurfaceGPUTest::TestExtractIsosurface()
     pipeIso->ExctractIsosurface();
 
     vtkPolyData *isoSurface = vtkPolyData::SafeDownCast(volumeInput->GetChild(0)->GetOutput()->GetVTKData());
-    isoSurface->Update();
 
     CPPUNIT_ASSERT(isoSurface && isoSurface->GetNumberOfPoints() != 0);
 
-    m_Renderer->RemoveAllProps();
+    m_Renderer->RemoveAllViewProps();
 		sceneNode->DeletePipe();
   }
 
