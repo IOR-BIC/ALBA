@@ -716,6 +716,8 @@ wxBitmap *albaRWIBase::GetImage(int magnification)
 //----------------------------------------------------------------------------
 {
 	int dim[3];
+	vtkRendererCollection * renderers = GetRenderWindow()->GetRenderers();
+
   GetRenderWindow()->OffScreenRenderingOn();
 	  vtkALBASmartPointer<vtkWindowToImageFilter> w2i;
 	  w2i->SetInput(GetRenderWindow());
@@ -723,6 +725,16 @@ wxBitmap *albaRWIBase::GetImage(int magnification)
 	  w2i->Update();
     w2i->GetOutput()->GetDimensions(dim);
   GetRenderWindow()->OffScreenRenderingOff();
+
+	vtkRenderer * renderer;
+	vtkCollectionSimpleIterator rsit;
+	renderers->InitTraversal(rsit);
+	renderer = renderers->GetNextRenderer(rsit);
+	while (renderer)
+	{
+		renderer->SetRenderWindow(GetRenderWindow());
+		renderer = renderers->GetNextRenderer(rsit);
+	}
 
   assert( dim[0]>0 && dim[1]>0 );
   unsigned char *buffer = new unsigned char [dim[0]*dim[1]*3];

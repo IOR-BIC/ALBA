@@ -40,6 +40,8 @@
 #include "vtkBMPWriter.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkImageCast.h"
+#include "vtkTimerLog.h"
+#include "vtkRendererCollection.h"
 
 
 
@@ -82,6 +84,8 @@ void albaTest::setUp()
 
 	//NOTE, wxLog produces some memory leaks, set false during test
 	wxLog::EnableLogging(true);
+	vtkTimerLog::AllocateLog();
+	
 
 	//Resets Random Color for test repeatability
 	albaResetRandomColor();
@@ -95,6 +99,8 @@ void albaTest::tearDown()
 	//Clean Test Spefic Stuff
 	AfterTest();
 		
+	vtkTimerLog::CleanupLog();
+
 	cppDEL(m_App);  // Destroy the application
 	wxAppConsole::SetInstance(NULL);	
 }
@@ -114,19 +120,29 @@ void albaTest::CompareImage(albaString suiteName, albaString imageName, int inde
 		return;
 
 	// Visualization control
+	void * genericDisplayId = m_RenderWindow->GetGenericDisplayId();
+	vtkRendererCollection * renderers = m_RenderWindow->GetRenderers();
 	m_RenderWindow->OffScreenRenderingOn();
 	vtkWindowToImageFilter *windowToImage;
 	vtkNEW(windowToImage);
 	windowToImage->SetInput(m_RenderWindow);
 	//w2i->SetMagnification(magnification);
 	windowToImage->Update();
-	m_RenderWindow->OffScreenRenderingOff();
-
 	vtkImageData *imDataComp = windowToImage->GetOutput();
-
 	CompareVTKImage(imDataComp, suiteName, imageName, index);
-
 	vtkDEL(windowToImage);
+
+	m_RenderWindow->OffScreenRenderingOff();
+	
+	vtkRenderer * renderer;
+	vtkCollectionSimpleIterator rsit;
+	renderers->InitTraversal(rsit);
+	renderer = renderers->GetNextRenderer(rsit);
+	while (renderer)
+	{
+		renderer->SetRenderWindow(m_RenderWindow);
+		renderer = renderers->GetNextRenderer(rsit);
+	}
 }
 
 //----------------------------------------------------------------------------
