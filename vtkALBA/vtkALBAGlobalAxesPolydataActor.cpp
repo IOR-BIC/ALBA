@@ -151,7 +151,6 @@ int vtkALBAGlobalAxesPolydataActor::RenderTranslucentPolygonalGeometry(vtkViewpo
 
   //return this->Assembly->RenderTranslucentPolygonalGeometry( vp );
 
-  assert(false);
   return false;
 }
 
@@ -163,7 +162,6 @@ int vtkALBAGlobalAxesPolydataActor::HasTranslucentPolygonalGeometry()
   this->UpdateProps();
 
   //return this->Assembly->HasTranslucentPolygonalGeometry();
-  assert(false);
   return false;
 }
 

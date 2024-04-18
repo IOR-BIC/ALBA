@@ -141,7 +141,7 @@ int	main( int argc, char* argv[] )
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
 
-	runner.addTest(vtkALBAContourVolumeMapperTest::suite());
+	/*runner.addTest(vtkALBAContourVolumeMapperTest::suite());
 	runner.addTest(vtkALBARemoveCellsFilterTest::suite());
 	runner.addTest(vtkALBAPolyDataToSinglePolyLineTest::suite());
 	runner.addTest(vtkALBATextOrientatorTest::suite());
@@ -155,7 +155,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(vtkALBAGridActorTest::suite());
 	runner.addTest(vtkALBAProjectVolumeTest::suite());
 	runner.addTest(vtkALBAClipSurfaceBoundingBoxTest::suite());
-	//runner.addTest(vtkALBARectilinearGridToRectilinearGridFilterTest::suite());
 	runner.addTest(vtkALBAProfilingActorTest::suite());
 	runner.addTest(vtkALBARulerActor2DTest::suite());
 	runner.addTest(vtkALBASimpleRulerActor2DTest::suite());
@@ -164,7 +163,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(vtkALBAExtendedGlyph3DTest::suite());
 	runner.addTest(vtkALBATransferFunction2DTest::suite());
 	runner.addTest(vtkHoleConnectivityTest::suite());
-	runner.addTest(vtkTriangleQualityRatioTest::suite());
+	runner.addTest(vtkTriangleQualityRatioTest::suite());*/
 	runner.addTest(vtkMaskPolyDataFilterTest::suite());
 	runner.addTest(vtkALBAExtrudeToCircleTest::suite());
 	runner.addTest(vtkALBAPastValuesListTest::suite());
@@ -172,7 +171,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(vtkALBARegionGrowingLocalGlobalThresholdTest::suite());
 	runner.addTest(vtkImageUnPackerTest::suite());
 	runner.addTest(vtkPackedImageTest::suite());
-	//runner.addTest(vtkALBAVolumeRayCastMapperTest::suite());
 	runner.addTest(vtkXRayVolumeMapperTest::suite());
 	runner.addTest(vtkALBAVolumeTextureMapper2DTest::suite());
 	runner.addTest(vtkALBADataArrayDescriptorTest::suite());

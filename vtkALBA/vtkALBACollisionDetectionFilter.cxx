@@ -64,9 +64,6 @@ vtkALBACollisionDetectionFilter::vtkALBACollisionDetectionFilter()
   this->GenerateScalars = 0;
   this->CollisionMode = VTK_ALL_CONTACTS;
   this->Opacity = 1.0;
-  this->Tree[0] = NULL;
-  this->Tree[1] = NULL;
-
   this->Tree[0] = vtkOBBTree::New();
   this->Tree[1] = vtkOBBTree::New();
 }
@@ -103,12 +100,7 @@ vtkALBACollisionDetectionFilter::~vtkALBACollisionDetectionFilter()
     this->Transform[1]->UnRegister(this);
     this->Transform[1] = NULL;
     }
-
-  Tree[0]->Delete();
-  Tree[1]->Delete();
-
 }
-
 
 // Description:
 // Set and Get the input data...

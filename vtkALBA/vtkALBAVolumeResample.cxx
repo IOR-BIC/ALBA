@@ -320,13 +320,14 @@ int	vtkALBAVolumeResample::RequestUpdateExtent( vtkInformation *request, vtkInfo
 void vtkALBAVolumeResample::RequestData(vtkInformation* request, vtkImageData *outputObject) 
 {
 	vtkDataSet *input =	vtkDataSet::SafeDownCast(this->GetInput());
-
-
 	vtkDataArray* inputScalars = input->GetPointData()->GetScalars();
 	const void *inputPointer = inputScalars->GetVoidPointer(0);
 
-	vtkDataArray *outputScalars = outputObject->GetPointData()->GetScalars();
-
+	int *dims = outputObject->GetDimensions();
+	vtkDataArray 			*outputScalars = inputScalars->NewInstance();
+	outputScalars->SetNumberOfTuples(dims[0] * dims[1] * dims[2]);
+	void *outputPointer = outputScalars->GetVoidPointer(0);
+	
 	switch (inputScalars->GetDataType())
 	{
 		case VTK_CHAR:
@@ -365,7 +366,7 @@ void vtkALBAVolumeResample::RequestData(vtkInformation* request, vtkImageData *o
 template<typename InputDataType>
 void vtkALBAVolumeResample::CreateImage(const InputDataType *input, vtkDataArray *outputScalars, vtkImageData *outputObject)
 {
-	const void *outputPointer = outputObject->GetPointData()->GetScalars()->GetVoidPointer(0);
+	const void *outputPointer = outputScalars->GetVoidPointer(0);
 	switch (outputScalars->GetDataType())
 	{
 		case VTK_CHAR:

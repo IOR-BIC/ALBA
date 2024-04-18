@@ -68,14 +68,14 @@ vtkMaskPolyDataFilter::vtkMaskPolyDataFilter(vtkPolyData *mask)
   this->Distance = 0;
   this->InsideOut = this->Binarize = this->TriplePass = 0;
   this->InsideValue=this->OutsideValue=0.0;
-
+	this->IdConversionTable = NULL;
 }
 
 vtkMaskPolyDataFilter::~vtkMaskPolyDataFilter()
 {
 	vtkDEL(this->CurrentSliceMask);
 	delete [] IdConversionTable;
-  this->SetMask(NULL);  
+	IdConversionTable = NULL;
 }
 
 

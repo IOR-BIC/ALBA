@@ -78,8 +78,6 @@ void vtkMaskPolyDataFilterTest::TestStructuredPoints()
 	vtkDEL(maskPolydataFilter);
 	vtkDEL(volume);
 	vtkDEL(cylinder);
-	
-
 }
 //-----------------------------------------------------------
 void vtkMaskPolyDataFilterTest::TestRectilinearGrid() 
