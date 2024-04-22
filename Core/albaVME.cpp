@@ -879,7 +879,12 @@ int albaVME::InternalRestore(albaStorageElement *node)
 		links_element->GetAttribute("NumberOfLinks", num_links);
 		int n = (int)atof(num_links);
 		albaStorageElement::ChildrenVector links_vector = links_element->GetChildren();
-		assert(links_vector.size() == n);
+		if (links_vector.size() != n)
+		{
+			albaWarningMessage("There is a problem with this file.\nThe link number of %s is wrong, this may lead in loosing of data.\n", GetName());
+			n = links_vector.size();
+		}
+
 		unsigned int i;
 		for (i = 0; i < n; i++)
 		{
