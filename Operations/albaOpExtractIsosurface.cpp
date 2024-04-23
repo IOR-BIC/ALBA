@@ -159,7 +159,6 @@ albaOp(label)
   m_IsoValueVector.clear();
 
   m_TrilinearInterpolationOn = true;
-
 }
 //----------------------------------------------------------------------------
 albaOpExtractIsosurface::~albaOpExtractIsosurface()

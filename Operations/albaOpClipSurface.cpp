@@ -630,14 +630,14 @@ int albaOpClipSurface::Clip()
 		else
 		{
 			vtkMatrix4x4 *mat = vtkMatrix4x4::New();
-			mat->DeepCopy(m_Input->GetAbsMatrixPipe()->GetMatrixPointer()->GetVTKMatrix());
+			mat->DeepCopy(m_Input->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 			mat->Invert();
 			mat->Modified();
 
 			// clip input surface by an implicit plane
 			vtkTransform *tr = vtkTransform::New();
 			tr->Concatenate(mat);
-			tr->Concatenate(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix());
+			tr->Concatenate(m_ImplicitPlaneGizmo->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 			tr->Inverse();
 			tr->Update();
 

@@ -63,7 +63,6 @@
 #include "albaVMEStorageTest.h"
 #include "albaVMEStorageTest2.h"
 #include "albaVMETest.h"
-#include "albaVMETest.h"
 #include "albaViewHTMLTest.h"
 #include "albaViewManagerTest.h"
 #include "albaViewPlotTest.h"
