@@ -169,8 +169,8 @@ void vtkALBAHistogramTest::TestHistogramLogaritmicProperties()
   actor->LabelVisibilityOn();
   actor->SetLabel("TEST LOGARITMIC PROPERTIES");
 
-  actor->SetLogHistogram(TRUE);
-  actor->SetLogScaleConstant(TRUE);
+  actor->SetLogHistogram(true);
+  actor->SetLogScaleConstant(true);
 
   RenderData(actor, "TestHistogramLogaritmicProperties");
   actor->Delete();

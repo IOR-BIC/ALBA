@@ -122,7 +122,7 @@ albaInteractor2DDistance::albaInteractor2DDistance(bool testMode /* = false */)
 	  m_HistogramRWI->SetSize(0,0,width,height);
 	  
 	  m_HistogramDialog->SetSize(x_init,y_init,width,height);
-		m_HistogramDialog->Show(FALSE);
+		m_HistogramDialog->Show(false);
 	}
 
   m_CurrentRwi = NULL;

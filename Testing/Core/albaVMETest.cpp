@@ -732,14 +732,13 @@ void albaVMETest::TestIsValid()
 	albaNEW(na);
 
 	root->AddChild(na);
-	na->UpdateId();
 
-	result = na->IsValid();
+	result = na->IsOnVMETree();
 	TEST_RESULT;
 
 	// Destroy the node and so it will become invalid.
 	root->RemoveChild(na);
-	result = !na->IsValid();
+	result = !na->IsOnVMETree();
 	na->Delete();
 
 	TEST_RESULT;

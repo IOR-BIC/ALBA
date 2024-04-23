@@ -109,7 +109,7 @@ bool AlbaViewer::OnInit()
 	m_Logic->Show();
 	m_Logic->Init(argc, argv); // Calls FileNew - which create the root
 
-	return TRUE;
+	return true;
 }
 
 //--------------------------------------------------------------------------------

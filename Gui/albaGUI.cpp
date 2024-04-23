@@ -128,7 +128,7 @@ albaGUI::albaGUI(albaObserver *listener) :
 	m_EntryStyle = wxBORDER_SIMPLE /*| wxTE_PROCESS_TAB*/;
 
 	m_Sizer = new wxBoxSizer(wxVERTICAL);
-	this->SetAutoLayout(TRUE);
+	this->SetAutoLayout(true);
 	this->SetSizer(m_Sizer);
 	m_Sizer->Fit(this);
 	m_Sizer->SetSizeHints(this);

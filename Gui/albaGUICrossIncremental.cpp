@@ -104,7 +104,7 @@ albaGUICrossIncremental::albaGUICrossIncremental(wxWindow* parent, wxWindowID id
 
   LayoutStyle(label);
   
-	this->SetAutoLayout( TRUE );
+	this->SetAutoLayout( true );
 	this->SetSizer( m_Sizer );
 	m_Sizer->Fit(this);
 	m_Sizer->SetSizeHints(this);

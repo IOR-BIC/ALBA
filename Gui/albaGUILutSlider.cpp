@@ -55,7 +55,7 @@ public:
 
 protected:  
   void OnMouse(wxMouseEvent &event);
-  void OnSetFocus(wxFocusEvent& event) {}; 
+//  void OnSetFocus(wxFocusEvent& event) {}; 
   int m_X0;
   bool m_EnableIgnoreLeftDown;
 
@@ -71,7 +71,7 @@ BEGIN_EVENT_TABLE(albaGUILutButt,wxButton)
   EVT_LEFT_UP(albaGUILutButt::OnMouse)
   EVT_RIGHT_DOWN(albaGUILutButt::OnMouse)
   EVT_MOTION(albaGUILutButt::OnMouse)
-  EVT_SET_FOCUS(albaGUILutButt::OnSetFocus) 
+//  EVT_SET_FOCUS(albaGUILutButt::OnSetFocus) 
   EVT_LEFT_DCLICK(albaGUILutButt::OnMouse)
 END_EVENT_TABLE()
 //----------------------------------------------------------------------------

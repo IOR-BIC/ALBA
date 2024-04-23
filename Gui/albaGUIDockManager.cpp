@@ -162,7 +162,7 @@ wxDefaultDockArt::wxDefaultDockArt()
 #ifdef __WXMAC__
     m_CaptionFont = *wxSMALL_FONT;
 #else
-    m_CaptionFont = wxFont(8, wxDEFAULT, wxNORMAL, wxNORMAL, FALSE);
+    m_CaptionFont = wxFont(8, wxDEFAULT, wxNORMAL, wxNORMAL, false);
 #endif
 
     // some built in bitmaps

@@ -151,7 +151,7 @@ void albaOpInteractionDebugger::OnEvent(albaEventBase *alba_event)
         {
           OnChooseConstrainVme(vme);
 
-          assert(TRUE);
+          assert(true);
         }
       }
       break;

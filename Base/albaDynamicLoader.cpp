@@ -93,7 +93,7 @@ LibHandle albaDynamicLoader::OpenLibrary(const char* libname )
   NSObjectFileImage image;
   
   rc = NSCreateObjectFileImageFromFile(libname, &image);
-  return NSLinkModule(image, libname, TRUE);
+  return NSLinkModule(image, libname, true);
 }
 
 //----------------------------------------------------------------------------

@@ -164,9 +164,9 @@ void vtkALBARegionGrowingLocalGlobalThresholdTest::TestComputeStandardDeviation(
   m_Filter->SetInput(m_Image);
   m_Filter->BorderCreate(imBordered);
   m_Filter->ComputeIndexNearstPoints(0,indexNearest,error,imBordered);
-  CPPUNIT_ASSERT( error == FALSE );
+  CPPUNIT_ASSERT( error == false );
   double mean = m_Filter->ComputeMeanValue(0,indexNearest,error,imBordered);
-  CPPUNIT_ASSERT( error == FALSE );
+  CPPUNIT_ASSERT( error == false );
   double stdDev = m_Filter->ComputeStandardDeviation(0,indexNearest,mean,error,imBordered);
 
   CPPUNIT_ASSERT ( stdDev < (5.95 + DELTA) && stdDev > (5.95 - DELTA) );
@@ -186,11 +186,11 @@ void vtkALBARegionGrowingLocalGlobalThresholdTest::TestComputeMeanValue()
   m_Filter->SetInput(m_Image);
   m_Filter->BorderCreate(imBordered);
   m_Filter->ComputeIndexNearstPoints(30,indexNearest,error,imBordered);
-  CPPUNIT_ASSERT( error == TRUE );
+  CPPUNIT_ASSERT( error == true );
   m_Filter->ComputeIndexNearstPoints(0,indexNearest,error,imBordered);
-  CPPUNIT_ASSERT( error == FALSE );
+  CPPUNIT_ASSERT( error == false );
   double mean = m_Filter->ComputeMeanValue(0,indexNearest,error,imBordered);
-  CPPUNIT_ASSERT( error == FALSE && mean == (153.0/26.0));
+  CPPUNIT_ASSERT( error == false && mean == (153.0/26.0));
 
   m_Filter->Delete();
   imBordered->Delete();

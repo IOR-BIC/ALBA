@@ -46,7 +46,7 @@ albaGUIListCtrl::albaGUIListCtrl( wxWindow* parent,wxWindowID id, bool CloseButt
    
   m_Listener = NULL;
 
-  m_Images = new wxImageList(15,15,FALSE,4);
+  m_Images = new wxImageList(15,15,false,4);
   m_Images->Add(albaPictureFactory::GetPictureFactory()->GetBmp("NODE_YELLOW"));
   m_Images->Add(albaPictureFactory::GetPictureFactory()->GetBmp("NODE_GRAY"));
   m_Images->Add(albaPictureFactory::GetPictureFactory()->GetBmp("NODE_RED"));

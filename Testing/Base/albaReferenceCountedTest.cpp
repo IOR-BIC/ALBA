@@ -65,9 +65,9 @@ void albaReferenceCountedTest::TestRegister()
   // create an object on the Heap with reference count set to 1 and set
   // its flag reference to the "flag" variable.
   albaReferenceCounted *obj=CreateSmartObject(flag);
-  CPPUNIT_ASSERT(flag==TRUE);
+  CPPUNIT_ASSERT(flag==true);
   obj->UnRegister(0);
-  CPPUNIT_ASSERT(flag==FALSE);
+  CPPUNIT_ASSERT(flag==false);
 }
 //----------------------------------------------------------------------------
 void albaReferenceCountedTest::TestGetReferenceCount()
@@ -80,7 +80,7 @@ void albaReferenceCountedTest::TestGetReferenceCount()
   CPPUNIT_ASSERT(obj->GetReferenceCount()==10);
   obj->SetReferenceCount(1);
   obj->Delete();
-  CPPUNIT_ASSERT(flag==FALSE);
+  CPPUNIT_ASSERT(flag==false);
 }
 //----------------------------------------------------------------------------
 void albaReferenceCountedTest::TestDelete()
@@ -93,6 +93,6 @@ void albaReferenceCountedTest::TestDelete()
   obj->Delete();
   CPPUNIT_ASSERT(obj->GetReferenceCount()==1);
   obj->Delete();
-  CPPUNIT_ASSERT(flag==FALSE);
+  CPPUNIT_ASSERT(flag==false);
 
 }

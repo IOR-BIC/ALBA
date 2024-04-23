@@ -158,7 +158,7 @@ albaOp(label)
   m_DensityPicker  = NULL;
   m_IsoValueVector.clear();
 
-  m_TrilinearInterpolationOn = TRUE;
+  m_TrilinearInterpolationOn = true;
 }
 //----------------------------------------------------------------------------
 albaOpExtractIsosurface::~albaOpExtractIsosurface()
@@ -775,7 +775,7 @@ void albaOpExtractIsosurface::OnEvent(albaEventBase *alba_event)
       break;
     case ID_TRILINEAR_INTERPOLATION_ON:
       {
-        m_VolumeSlicer->SetTrilinearInterpolation(m_TrilinearInterpolationOn == TRUE);
+        m_VolumeSlicer->SetTrilinearInterpolation(m_TrilinearInterpolationOn == true);
         m_Rwi->CameraUpdate();
       }
     default:

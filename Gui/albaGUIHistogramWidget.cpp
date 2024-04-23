@@ -120,7 +120,7 @@ albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /
   sizerV->Layout();           // resize & fit the contents
   sizerV->SetSizeHints(this); // resize the dialog accordingly 
 
-  SetAutoLayout(TRUE);
+  SetAutoLayout(true);
   sizerV->Fit(this);
 
 //  CreateGui();

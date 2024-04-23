@@ -33,14 +33,14 @@ void SparseMatrixTest::TestDynamicAllocation()
 {
   SparseMatrix<double> *matrix1 = new SparseMatrix<double>();
 
-  CPPUNIT_ASSERT( matrix1->UseAllocator() == FALSE );
+  CPPUNIT_ASSERT( matrix1->UseAllocator() == false );
   CPPUNIT_ASSERT( matrix1->rows == 0 );
 
   delete matrix1;
 
   SparseMatrix<double> *matrix2 = new SparseMatrix<double>(5);
 
-  CPPUNIT_ASSERT( matrix2->UseAllocator() == FALSE );
+  CPPUNIT_ASSERT( matrix2->UseAllocator() == false );
   CPPUNIT_ASSERT( matrix2->rows == 5 );
 
   delete matrix2;
@@ -51,12 +51,12 @@ void SparseMatrixTest::TestStaticAllocation()
 {
   SparseMatrix<double> matrix1;
 
-  CPPUNIT_ASSERT( matrix1.UseAllocator() == FALSE );
+  CPPUNIT_ASSERT( matrix1.UseAllocator() == false );
   CPPUNIT_ASSERT( matrix1.rows == 0 );
 
   SparseMatrix<double> matrix2 = SparseMatrix<double>(5);
 
-  CPPUNIT_ASSERT( matrix2.UseAllocator() == FALSE );
+  CPPUNIT_ASSERT( matrix2.UseAllocator() == false );
   CPPUNIT_ASSERT( matrix2.rows == 5 );
 }
 //-------------------------------------------------------------------------
@@ -67,7 +67,7 @@ void SparseMatrixTest::TestSetAllocator()
 
   matrix.SetAllocator(1000);
 
-  CPPUNIT_ASSERT( matrix.UseAllocator() == TRUE );
+  CPPUNIT_ASSERT( matrix.UseAllocator() == true );
 }
 //-------------------------------------------------------------------------
 void SparseMatrixTest::TestResize()

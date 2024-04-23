@@ -72,7 +72,7 @@ void vtkALBARegionGrowingLocalGlobalThreshold::ComputeIndexNearstPoints(int inde
   }
   else
   {
-    error = TRUE;
+    error = true;
     return;
   }
 
@@ -86,7 +86,7 @@ void vtkALBARegionGrowingLocalGlobalThreshold::ComputeIndexNearstPoints(int inde
   //Check if the index no excede the max value
   if (index > dims[0]*dims[1]*dims[2] )
   {
-    error = TRUE;
+    error = true;
     return;
   }
 
@@ -98,7 +98,7 @@ void vtkALBARegionGrowingLocalGlobalThreshold::ComputeIndexNearstPoints(int inde
 
   if( x>dims[0] || y>dims[1] || z>dims[2] )
   {
-    error = TRUE;
+    error = true;
     // albaLogMessage("Error in the computing of the coordinates!");
     return;
   }
@@ -109,7 +109,7 @@ void vtkALBARegionGrowingLocalGlobalThreshold::ComputeIndexNearstPoints(int inde
 
   if( xBordered>dims[0] || yBordered>dims[1] || zBordered>dims[2] )
   {
-    error = TRUE;
+    error = true;
     // albaLogMessage("Error in the computing of the coordinates!");
     return;
   }
@@ -117,7 +117,7 @@ void vtkALBARegionGrowingLocalGlobalThreshold::ComputeIndexNearstPoints(int inde
   //Check if the index isn't a point at the border of the ImBordered
   if (zBordered==0 || zBordered==dimsBordered[2]-1 || yBordered==0 || yBordered==dimsBordered[1]-1 || xBordered==0 || xBordered==dimsBordered[0]-1)
   {
-    error = TRUE;
+    error = true;
     return;
   }
 
@@ -154,7 +154,7 @@ void vtkALBARegionGrowingLocalGlobalThreshold::ComputeIndexNearstPoints(int inde
   indexNearest[24] = value+(dimsBordered[0]*(yBordered+1))+xBordered-1;
   indexNearest[25] = value+(dimsBordered[0]*(yBordered-1))+xBordered+1;
 
-  error = FALSE;
+  error = false;
 }
 //----------------------------------------------------------------------------
 double vtkALBARegionGrowingLocalGlobalThreshold::ComputeStandardDeviation(int index, int indexNearest[26] , double mean, int &error, vtkImageData *imBordered)
@@ -167,7 +167,7 @@ double vtkALBARegionGrowingLocalGlobalThreshold::ComputeStandardDeviation(int in
   }
   else
   {
-    error = TRUE;
+    error = true;
     return 0.0;
   }
 
@@ -183,7 +183,7 @@ double vtkALBARegionGrowingLocalGlobalThreshold::ComputeStandardDeviation(int in
   stdDev /= 26;
   stdDev = sqrt(stdDev);
 
-  error = FALSE;
+  error = false;
 
   return stdDev;
 }
@@ -198,7 +198,7 @@ double vtkALBARegionGrowingLocalGlobalThreshold::ComputeMeanValue(int index, int
   }
   else
   {
-    error = TRUE;
+    error = true;
     return 0.0;
   }
 
@@ -214,7 +214,7 @@ double vtkALBARegionGrowingLocalGlobalThreshold::ComputeMeanValue(int index, int
 
   means /= 26;
 
-  error = FALSE;
+  error = false;
   return means;
 }
 //----------------------------------------------------------------------------
@@ -411,22 +411,22 @@ void vtkALBARegionGrowingLocalGlobalThreshold::Update()
 
       if (scalarValue > LowerThreshold && scalarValue < UpperThreshold)
       {
-        int error = FALSE;
+        int error = false;
         int indexNearest[26];
         double mean = 0.0;
         double stdDev = 0.0;
         ComputeIndexNearstPoints(i,indexNearest,error,imBordered);
-        if (error == TRUE)
+        if (error == true)
         {
           return;
         }
         mean = ComputeMeanValue(i,indexNearest,error,imBordered);
-        if (error == TRUE)
+        if (error == true)
         {
           return;
         }
         stdDev = ComputeStandardDeviation(i,indexNearest,mean,error,imBordered);
-        if (error == TRUE)
+        if (error == true)
         {
           return;
         }

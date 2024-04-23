@@ -42,7 +42,7 @@ albaAgentThreaded::albaAgentThreaded()
   SetDispatchModeToSelfProcess();
 
 #ifdef _WIN32
-  m_MessageSignal = CreateEvent(0, FALSE, FALSE, 0);
+  m_MessageSignal = CreateEvent(0, false, false, 0);
 #else
   m_Gate = new albaMutexLock;
   m_Gate->Lock();

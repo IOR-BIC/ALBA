@@ -200,7 +200,7 @@ albaGUI * albaVMEMesh::CreateGui()
 		// Young's modulus
 		m_GuiBonematConfig->Divider();
 		const wxString choices[] = { "HU integration", "E integration" };
-		m_GuiBonematConfig->Label("Bonemat integration parameter", "", TRUE);
+		m_GuiBonematConfig->Label("Bonemat integration parameter", "", true);
 		m_GuiBonematConfig->Combo(ID_DISABLED, "", &m_Configuration.m_YoungModuleCalculationModality, 2, choices);
 		//m_GuiBonematConfig->Label("Integration steps:");
 		m_GuiBonematConfig->Integer(ID_DISABLED, "Integration steps:", &m_Configuration.m_IntegrationSteps, MININT, MAXINT, "", false, 0.50);
@@ -209,7 +209,7 @@ albaGUI * albaVMEMesh::CreateGui()
 
 		//////////////////////////////////////////////////////////////////////////
 		// Advanced 
-		m_GuiBonematConfig->Label("Advanced Configuration", TRUE);
+		m_GuiBonematConfig->Label("Advanced Configuration", true);
 		const wxString choices3[] = { "rhoQCT", "rhoAsh", "rhoWet" };
 
 		m_GuiBonematConfig->Bool(ID_DISABLED, "Apply E bounds on Integration:", &m_Configuration.m_ElasticityBoundsOnInteg, 1);
