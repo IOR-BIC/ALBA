@@ -79,7 +79,7 @@ void albaGeometryUtils::GetMidPoint(double(&midPoint)[3], double *point1, double
 //----------------------------------------------------------------------------
 double albaGeometryUtils::DistancePointToLine(double * point, double * lineP1, double * lineP2, int plane)
 {
-	return sqrt(vtkLine::DistanceToLine(point, lineP1, lineP2));
+	return sqrt(abs(vtkLine::DistanceToLine(point, lineP1, lineP2)));
 }
 
 //----------------------------------------------------------------------------
