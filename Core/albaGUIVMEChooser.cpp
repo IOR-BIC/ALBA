@@ -52,10 +52,11 @@ albaGUIVMEChooser::albaGUIVMEChooser(albaGUICheckTree *tree, wxString dialog_tit
   m_ChooserTree->SetTitle("");
 	m_ChooserTree->SetMinSize(wxSize(100, 200));
 
-	LoadLayout();
 
   Add(m_ChooserTree,1,wxEXPAND);
   m_OkButton->Enable(false);
+
+	LoadLayout();
 }
 
 //----------------------------------------------------------------------------
@@ -111,12 +112,12 @@ void albaGUIVMEChooser::LoadLayout()
 		int pos[2], size[2];
 		layout->GetVMEChooserInfo(pos, size);
 
-		m_ChooserTree->SetSize(wxSize(size[0], size[1]));
-		SetSize(wxSize(size[0], size[1]));
-		SetMinSize(wxSize(MAX(100, size[0]), MAX(200, size[1])));
+		m_ChooserTree->SetSize(wxSize(MAX(150, size[0]), MAX(250, size[1])));
+		SetSize(wxSize(MAX(150,size[0]), MAX(250,size[1])));
+		SetMinSize(wxSize(150,250));
 
 		if (pos[0] > 0 && pos[1] > 0) // else centered
-			SetPosition(wxPoint(MAX(0, pos[0]), MAX(0, pos[1])));
+			SetPosition(wxPoint(pos[0], pos[1]));
 	}
 }
 //----------------------------------------------------------------------------
