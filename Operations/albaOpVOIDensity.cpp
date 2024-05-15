@@ -46,8 +46,10 @@
 #include "albaTagArray.h"
 #include "albaTagItem.h"
 #include "albaVMEPointCloud.h"
+#include "albaVMEVolumeGray.h"
 #include "vtkCellArray.h"
 #include "vtkTransform.h"
+#include "vtkImageData.h"
 
 
 //----------------------------------------------------------------------------
@@ -72,6 +74,8 @@ albaOpVOIDensity::albaOpVOIDensity(const wxString &label)
   m_StandardDeviation = 0.0;
 	m_Median = 0.0;
 
+	m_CreateSegOutput = m_CreatePointCloudOutput = true;
+
 	UpdateStrings();
 
 	m_EvaluateInSubRange = false;
@@ -84,6 +88,7 @@ albaOpVOIDensity::~albaOpVOIDensity()
 	m_Surface = NULL;
 	vtkDEL(m_VOIScalars);
 	m_VOICoords.clear();
+	m_VOIIds.clear();
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpVOIDensity::Copy()
@@ -115,6 +120,8 @@ enum VOI_DENSITY_WIDGET_ID
 	ID_MEDIAN,
 	ID_VOXEL_LIST,
 	ID_EXPORT_REPORT,
+	ID_CREATE_SEGMENTATION_OUTPUT,
+	ID_CREATE_CLOUD_POINT_OUTPUT,
 };
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::OpRun()   
@@ -123,10 +130,12 @@ void albaOpVOIDensity::OpRun()
   vtkNEW(m_VOIScalars);
 	if(!this->m_TestMode)
 	{
-		vtkALBASmartPointer<vtkDataSet> VolumeData = m_Input->GetOutput()->GetVTKData();
-		VolumeData->Update();
+		vtkALBASmartPointer<vtkDataSet> volumeData = m_Input->GetOutput()->GetVTKData();
+		volumeData->Update();
 
-		VolumeData->GetPointData()->GetScalars()->GetRange(m_SubRange);
+		volumeData->GetPointData()->GetScalars()->GetRange(m_SubRange);
+
+		m_ImagedataVol = vtkImageData::SafeDownCast(volumeData) ? true : false;
 
 		CreateGui();
 
@@ -197,7 +206,11 @@ void albaOpVOIDensity::OpStop(int result)
 		SetDoubleTag("StandardDeviation", m_StandardDeviation);
 		SetDoubleTag("Median:", m_Median);
 
-		CreatePointSamplingOutput();
+		if(m_CreatePointCloudOutput)
+			CreatePointSamplingOutput();
+		
+		if (m_CreateSegOutput)
+			CreateSegmentationOutput();
 	}
 
 	Superclass::OpStop(result);
@@ -283,6 +296,58 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 
 	albaDEL(pointCloudVME);
 }
+
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::CreateSegmentationOutput()
+{
+
+	albaString name = m_Surface->GetName();
+	name += " segmentation";
+
+	albaVMEVolumeGray *segmentationVME;
+	albaNEW(segmentationVME);
+	segmentationVME->SetName(name);
+
+	vtki
+
+	for (int i = 0; i < nPoints; i++)
+	{
+		newArray->InsertNextValue(m_VOIScalars->GetTuple1(i));
+
+		newPoints->InsertNextPoint(m_VOICoords[i].GetVect());
+
+		polys->InsertNextCell(3);
+		polys->InsertCellPoint(i);
+		polys->InsertCellPoint(i);
+		polys->InsertCellPoint(i);
+	}
+
+
+	vtkPointData *outPointData = polydata->GetPointData();
+
+	outPointData->AddArray(newArray);
+	vtkDEL(newArray);
+
+
+	polydata->SetPoints(newPoints);
+	vtkDEL(newPoints);
+
+	polydata->SetPolys(polys);
+	vtkDEL(polys);
+
+	polydata->Modified();
+	polydata->Update();
+	segmentationVME->SetData(polydata, 0);
+	vtkDEL(polydata);
+
+	segmentationVME->ReparentTo(m_Surface);
+
+	albaMatrix identityM;
+	segmentationVME->SetAbsMatrix(identityM);
+
+	albaDEL(segmentationVME);
+}
+
 
 //----------------------------------------------------------------------------
 double albaOpVOIDensity::GetMedian(vtkDoubleArray *valuesArray)
@@ -411,6 +476,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 	m_MinScalar = 99999.0;
 	m_VOIScalars->Reset();
 	m_VOICoords.clear();
+	m_VOIIds.clear();
 
 	albaMatrix inputMeshABSMatrix = m_Surface->GetAbsMatrixPipe()->GetMatrix();
 	albaMatrix inputVolumeABSMatrix = m_Input->GetAbsMatrixPipe()->GetMatrix();
@@ -452,7 +518,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 
 	vtkDEL(transform);
 
-	for (int voxel = 0; voxel < NumberVoxels; voxel++)
+	for (vtkIdType voxel = 0; voxel < NumberVoxels; voxel++)
 	{
 		VolumeData->GetPoint(voxel, Point);
 		if (ImplicitBox->EvaluateFunction(Point) < 0)
@@ -473,6 +539,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 					m_VOIScalars->InsertNextTuple(&InsideScalar);
 					albaVect3d vPos(Point);
 					m_VOICoords.push_back(vPos);
+					m_VOIIds.push_back(voxel);
 				}
 			}
 		}
