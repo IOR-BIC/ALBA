@@ -130,7 +130,7 @@ albaViewGlobalSlice::albaViewGlobalSlice(wxString label, int camera_position, bo
 	m_BoundsOutlineActor.clear();
 	m_BoundsOutlineMapper.clear();
 
-  m_TrilinearInterpolationOn = TRUE;
+  m_TrilinearInterpolationOn = true;
 
 }
 //----------------------------------------------------------------------------

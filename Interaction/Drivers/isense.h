@@ -80,9 +80,9 @@
 /* Do not change anything below this line */
 /* -------------------------------------- */
 
-#ifndef TRUE
-#define TRUE    1
-#define FALSE   0
+#ifndef true
+#define true    1
+#define false   0
 #endif
 
 #if defined UNIX
@@ -209,7 +209,7 @@ typedef struct
 
 
 /* ISD_STATION_INFO_TYPE can only be used with IS Precision Series tracking devices.
-   If passed to ISD_SetStationConfig or ISD_GetStationConfig with InterTrax, FALSE is returned. */
+   If passed to ISD_SetStationConfig or ISD_GetStationConfig with InterTrax, false is returned. */
 
 typedef struct
 {
@@ -217,7 +217,7 @@ typedef struct
                                passed to the ISD_SetStationConfig and ISD_GetStationConfig   
                                functions and can be 1 to ISD_MAX_STATIONS */
 
-    BOOL    State;          /* TRUE if ON, FALSE if OFF */
+    BOOL    State;          /* true if ON, false if OFF */
 
     BOOL    Compass;        /* 0, 1 or 2 for OFF, PARTIAL and FULL. Older versions of tracker
                                firmware supported only 0 and 1, which stood for ON or OFF. Please
@@ -234,10 +234,10 @@ typedef struct
     DWORD   Prediction;     /* 0 to 50 ms */
     DWORD   AngleFormat;    /* ISD_EULER or ISD_QUATERNION */
     
-    BOOL    TimeStamped;    /* TRUE if time stamp is requested */
-    BOOL    GetButtons;     /* TRUE if wand or stylus button state is requested */
-    BOOL    GetCameraDataRaw;  /* TRUE if encoder data is requested */
-    BOOL    GetCameraDataComputed;  /* TRUE if encoder data is requested */
+    BOOL    TimeStamped;    /* true if time stamp is requested */
+    BOOL    GetButtons;     /* true if wand or stylus button state is requested */
+    BOOL    GetCameraDataRaw;  /* true if encoder data is requested */
+    BOOL    GetCameraDataComputed;  /* true if encoder data is requested */
 
     DWORD   CoordFrame;     /* coord frame in which position and orientation data is reported */ 
     DWORD   dwReserved2;    /* reserved for future use */
@@ -249,7 +249,7 @@ typedef struct
     float   fReserved3;
     float   fReserved4;
 
-    BOOL    GetAnalogData;  /* TRUE if analog joystick data is requested */
+    BOOL    GetAnalogData;  /* true if analog joystick data is requested */
     BOOL    bReserved2;     
     BOOL    bReserved3;
     BOOL    bReserved4;

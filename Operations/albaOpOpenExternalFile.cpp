@@ -87,7 +87,7 @@ void albaOpOpenExternalFile::OpRun()
 	{
     command2execute.Replace("/", "\\");
     albaLogMessage("Executing command: '%s'", command2execute.ToAscii());
-		m_Pid = wxExecute(command2execute); //,FALSE
+		m_Pid = wxExecute(command2execute); //,false
 		cppDEL(filetype);
 		albaEventMacro(albaEvent(this,OP_RUN_OK));
 	}

@@ -184,8 +184,8 @@ public:
 
 
 	/** Set ALBA Expert Mode*/
-	void ALBAExpertModeOn() { (*GetALBAExpertMode()) = TRUE; };
-	void ALBAExpertModeOff() { (*GetALBAExpertMode()) = FALSE; };
+	void ALBAExpertModeOn() { (*GetALBAExpertMode()) = true; };
+	void ALBAExpertModeOff() { (*GetALBAExpertMode()) = false; };
 	void SetALBAExpertMode(int value) { (*GetALBAExpertMode()) = value; };
 
 	/** Set the file extension */

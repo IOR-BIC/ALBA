@@ -128,7 +128,7 @@ albaGUI::albaGUI(albaObserver *listener) :
 	m_EntryStyle = wxBORDER_SIMPLE /*| wxTE_PROCESS_TAB*/;
 
 	m_Sizer = new wxBoxSizer(wxVERTICAL);
-	this->SetAutoLayout(TRUE);
+	this->SetAutoLayout(true);
 	this->SetSizer(m_Sizer);
 	m_Sizer->Fit(this);
 	m_Sizer->SetSizeHints(this);
@@ -790,7 +790,7 @@ void albaGUI::String(int id, wxString label, wxString* var, wxString tooltip, bo
 		wxTextCtrl *text = NULL;
 
 		text = new wxTextCtrl(this, w_id, "", dp, wxSize(fw, lh), e_style);
-		text->SetValidator(albaGUIValidator(this, w_id, text, var,interactive));
+		text->SetValidator(albaGUIValidator(this, w_id, text, var,interactive,multiline));
 		text->SetFont(m_Font);
 
 		if (tooltip != "")
@@ -807,7 +807,7 @@ void albaGUI::String(int id, wxString label, wxString* var, wxString tooltip, bo
 		int w_id = GetWidgetId(id);
 		wxTextCtrl *text = NULL;
 		text = new wxTextCtrl(this, w_id, "", dp, wxSize(dw, lh), e_style);
-		text->SetValidator(albaGUIValidator(this, w_id, text, var, interactive));
+		text->SetValidator(albaGUIValidator(this, w_id, text, var, interactive,multiline));
 		text->SetFont(m_Font);
 
 		if (tooltip != "")
@@ -828,12 +828,15 @@ void albaGUI::String(int id, albaString label, albaString *var, albaString toolt
 	int dw = DW;
 
 	long e_style = m_EntryStyle;
+
+	e_style |= wxTE_PROCESS_ENTER;
+
 	if (multiline)
 	{
 		lh *= 5;
 		e_style |= wxTE_MULTILINE | wxTE_WORDWRAP;
 	}
-
+	
 	if (password)
 		e_style |= wxTE_PASSWORD;
 
@@ -852,7 +855,7 @@ void albaGUI::String(int id, albaString label, albaString *var, albaString toolt
 		int w_id = GetWidgetId(id);
 		wxTextCtrl  *text = NULL;
 		text = new wxTextCtrl(this, w_id, "", dp, wxSize(FW, lh), e_style);
-		text->SetValidator(albaGUIValidator(this, w_id, text, var, interactive));
+		text->SetValidator(albaGUIValidator(this, w_id, text, var, interactive, multiline));
 		text->SetFont(m_Font);
 
 		if (!tooltip.IsEmpty())
@@ -870,7 +873,7 @@ void albaGUI::String(int id, albaString label, albaString *var, albaString toolt
 		int w_id = GetWidgetId(id);
 		wxTextCtrl  *text = NULL;
 		text = new wxTextCtrl(this, w_id, "", dp, wxSize(dw, lh), e_style);
-		text->SetValidator(albaGUIValidator(this, w_id, text, var,interactive));
+		text->SetValidator(albaGUIValidator(this, w_id, text, var,interactive,multiline));
 		text->SetFont(m_Font);
 
 		if (!tooltip.IsEmpty())

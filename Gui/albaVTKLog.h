@@ -39,10 +39,10 @@ public:
   int GetEnabled(){return m_Enabled;};
 
   /** Enable log message displaying. */
-  void EnabledOn(){this->SetEnabled(TRUE);};
+  void EnabledOn(){this->SetEnabled(true);};
 
   /** Disable log message displaying. */
-  void EnabledOff(){this->SetEnabled(FALSE);};
+  void EnabledOff(){this->SetEnabled(false);};
 
   /** Put the text into the log file. New lines are converted to carriage return new lines. */
   virtual void DisplayText(const char*);

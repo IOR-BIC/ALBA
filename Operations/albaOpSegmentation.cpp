@@ -224,7 +224,7 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_MajorityThreshold = 9;
 
 	m_BrushFillErase = 0;
-	m_AutofillOnRelease = TRUE;
+	m_AutofillOnRelease = true;
 
 
   m_SliceBackup = NULL;
@@ -233,7 +233,7 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_OldAutomaticThreshold = MAXINT;
   m_OldAutomaticUpperThreshold = MAXINT;
 
-  m_RemovePeninsulaRegions = FALSE;
+  m_RemovePeninsulaRegions = false;
 
   m_ManualSegmentationTools  = DRAW_EDIT;
   m_ManualBucketActions = 0;
@@ -1239,7 +1239,7 @@ bool albaOpSegmentation::ApplyRefinementFilter2(vtkImageData *inputImage, vtkIma
   vtkALBAImageFillHolesRemoveIslands *filter = vtkALBAImageFillHolesRemoveIslands::New();
   filter->SetInput(inputImage);
   filter->SetEdgeSize(m_RefinementRegionsSize);
-  filter->SetRemovePeninsulaRegions(m_RemovePeninsulaRegions == TRUE);
+  filter->SetRemovePeninsulaRegions(m_RemovePeninsulaRegions == true);
   if(m_RefinementSegmentationAction == ID_REFINEMENT_HOLES_FILL)
   {
     filter->SetAlgorithmToFillHoles();

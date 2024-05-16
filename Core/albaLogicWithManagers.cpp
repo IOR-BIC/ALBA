@@ -573,7 +573,7 @@ void albaLogicWithManagers::Show()
 
 	RestoreLayout();
 
-	m_Win->Show(TRUE);
+	m_Win->Show(true);
 
 	// must be after the albaLogicWithGUI::Show(); because in that method is set the m_AppTitle var
 	SetApplicationStamp((albaString)m_AppTitle);

@@ -144,7 +144,7 @@ void albaVMESurfaceTest::TestTimeVaryingVMESurfaceTree()
 //----------------------------------------------------------------------------
 {
   CreateVMETestTree();
-  PlayTree(m_VmeRoot, FALSE);
+  PlayTree(m_VmeRoot, false);
 }
 
 

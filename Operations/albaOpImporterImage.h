@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 class albaEvent;
 class albaVMEImage;
-class albaVMEVolumeRGB;
+class albaVMEVolumeGray;
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
@@ -82,7 +82,7 @@ protected:
   void BuildVolume();
 
   albaVMEImage     *m_ImportedImage;
-  albaVMEVolumeRGB *m_ImportedImageAsVolume;
+  albaVMEVolumeGray *m_ImportedImageAsVolume;
 
   std::vector<std::string>	m_Files;
 	wxString      m_FileDirectory;

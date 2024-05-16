@@ -302,7 +302,7 @@ public:
 	bool IsEmpty() const { return GetNumberOfChildren() == 0; }
 
 	/** Valid VMEs have m_ID >= 0. The root has m_Id = 0, other VMEs have m_Id > 0.*/
-	bool IsValid() { return m_Id >= 0; };
+	bool IsOnVMETree() { return m_Parent !=NULL; };
 
 	/** Return the number of children of this node
 	If only visible is true return the number visible to traverse nodes */

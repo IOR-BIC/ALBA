@@ -63,7 +63,6 @@
 #include "albaVMEStorageTest.h"
 #include "albaVMEStorageTest2.h"
 #include "albaVMETest.h"
-#include "albaVMETest.h"
 #include "albaViewHTMLTest.h"
 #include "albaViewManagerTest.h"
 #include "albaViewPlotTest.h"
@@ -136,7 +135,7 @@ bool RemoveDir(const char *dirName)
 		wxRemoveFile(filenameArray.Item(index));
 	}
 
-	bool result = TRUE;
+	bool result = true;
 
 	result = wxRmdir(dirName);
 	if (result == false)

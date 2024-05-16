@@ -62,7 +62,7 @@ albaOp(label)
 	m_Binary        = 1;
 	m_ABSMatrixFlag = 0;
 
-	m_ForceUnsignedShortScalarOutputForStructuredPoints = FALSE;
+	m_ForceUnsignedShortScalarOutputForStructuredPoints = false;
 }
 //----------------------------------------------------------------------------
 albaOpExporterVTK::~albaOpExporterVTK()

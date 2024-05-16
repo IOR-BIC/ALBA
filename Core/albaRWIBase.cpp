@@ -256,7 +256,7 @@ int albaRWIBase::CreateTimer(int timertype)
 //----------------------------------------------------------------------------
 {
   // it's a one shot timer
-  if (!m_Timer.Start(10, TRUE))
+  if (!m_Timer.Start(10, true))
     assert(false);
   return 1;
 }
@@ -736,7 +736,7 @@ wxBitmap *albaRWIBase::GetImage(int magnification)
   ie->Export();
 
   //translate to a wxBitmap
-  wxImage  *img = new wxImage(dim[0],dim[1],buffer,TRUE);
+  wxImage  *img = new wxImage(dim[0],dim[1],buffer,true);
   wxBitmap *bmp = new wxBitmap(*img,24);
   delete img;
   delete buffer;

@@ -36,13 +36,13 @@ albaGUISettings(Listener, label)
 {
 	// m_Dictionary = "";
 
-  m_CheckNameCompositor[ID_PATIENT_NAME] = TRUE;
-  m_CheckNameCompositor[ID_BIRTHDATE] = FALSE;
-  m_CheckNameCompositor[ID_NUM_SLICES] = TRUE;
-  m_CheckNameCompositor[ID_DESCRIPTION] = TRUE; 
-  m_CheckNameCompositor[ID_SERIES] = TRUE;
+  m_CheckNameCompositor[ID_PATIENT_NAME] = true;
+  m_CheckNameCompositor[ID_BIRTHDATE] = false;
+  m_CheckNameCompositor[ID_NUM_SLICES] = true;
+  m_CheckNameCompositor[ID_DESCRIPTION] = true; 
+  m_CheckNameCompositor[ID_SERIES] = true;
 	  
-  m_AutoResample = m_AutoVMEType = m_SkipCrop = FALSE;
+  m_AutoResample = m_AutoVMEType = m_SkipCrop = false;
   m_OutputType = 0;
   m_LastDicomDir = "UNEDFINED_m_LastDicomDir";
   m_Step = ID_1X;

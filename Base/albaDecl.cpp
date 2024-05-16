@@ -29,7 +29,7 @@
 #include "wx/config.h"
 
 
-// int ALBAExpertMode = TRUE;
+// int ALBAExpertMode = true;
 
 static long GLO_randCol = 117;
 static bool GLO_yelding;
@@ -608,6 +608,6 @@ wxString  albaIdString(int id)
 int* GetALBAExpertMode()
 //----------------------------------------------------------------------------
 {
-  static int ALBAExpertMode = TRUE;
+  static int ALBAExpertMode = true;
   return &ALBAExpertMode;
 }

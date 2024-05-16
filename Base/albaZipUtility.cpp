@@ -134,7 +134,7 @@ std::vector<albaString> ZIPOpen(albaString file)
 		delete zfileStream;
 	}
 
-	fileSystem->ChangePathTo(tmpDir.GetCStr(), TRUE);
+	fileSystem->ChangePathTo(tmpDir.GetCStr(), true);
 
   return filesCreated;
 }

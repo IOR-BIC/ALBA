@@ -80,6 +80,12 @@ public:
 
 protected:
 
+	void WriteReport();
+
+	void CreateCSVFile(albaString file);
+
+	void GetTags();
+
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node);
 
@@ -111,5 +117,12 @@ protected:
 	wxListBox			 *m_VoxelList;
 	int							m_EvaluateInSubRange;
 	double							m_SubRange[2];
+
+	albaString m_PatientName;
+	albaString m_PatientSurname;
+	albaString m_PatientCode;
+	albaString m_PatientBirthdate;
+	albaString m_PatientCenter;
+	albaString m_PatientExamDate;
 };
 #endif

@@ -123,7 +123,7 @@ int albaGUIDialog::ShowModal()
     // to allow the user to Add other gui in the meanwhile
     
     m_DialogSizer->Layout();           // resize & fit the contents
-    m_DialogSizer->SetSizeHints(this); // resize the dialog accordingly 
+		m_DialogSizer->SetMinSize(GetMinSize());
     m_DialogInitialized = true;
   }
   return wxDialog::ShowModal();

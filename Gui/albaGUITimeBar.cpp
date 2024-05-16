@@ -66,7 +66,7 @@ m_Timer(NULL, ID_TIMER)
   m_Timer.SetOwner(this, ID_TIMER);
   
   m_Sizer =  new wxBoxSizer( wxHORIZONTAL );
-  this->SetAutoLayout( TRUE );
+  this->SetAutoLayout( true );
   this->SetSizer( m_Sizer );
   m_Sizer->Fit(this);
   m_Sizer->SetSizeHints(this);

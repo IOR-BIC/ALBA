@@ -129,11 +129,15 @@ bool albaGUIValidator::IsValid()
     break;
     case VAL_STRING:
 		case VAL_INTERACTIVE_STRING:
+		case VAL_MULTILINE_STRING:
+		case VAL_MULTILINE_INTERACTIVE_STRING:
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
       if ( !m_StringVar ) return false;
     break;
     case VAL_ALBA_STRING:
 		case VAL_ALBA_INTERACTIVE_STRING:
+		case VAL_ALBA_MULTILINE_INTERACTIVE_STRING:
+		case VAL_ALBA_MULTILINE_STRING:
       if ( !(m_TextCtrl && m_TextCtrl->IsKindOf(CLASSINFO(wxTextCtrl)))  ) return false;
       if ( !m_MafStringVar ) return false;
     break;
@@ -233,7 +237,7 @@ bool albaGUIValidator::Copy(const albaGUIValidator& val)
   m_WidgetData.iValue = val.m_WidgetData.iValue;
   m_WidgetData.sValue = val.m_WidgetData.sValue;
 
-  return TRUE;
+  return true;
 }
 //----------------------------------------------------------------------------
 albaGUIValidator::albaGUIValidator(albaObserver* listener, int mid, wxStaticText *win,albaString* var) //String
@@ -260,26 +264,35 @@ albaGUIValidator::albaGUIValidator(albaObserver* listener, int mid, wxStaticText
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-albaGUIValidator::albaGUIValidator(albaObserver* listener, int mid, wxTextCtrl *win, wxString *var, bool interactive) //String
+albaGUIValidator::albaGUIValidator(albaObserver* listener, int mid, wxTextCtrl *win, wxString *var, bool interactive, bool multiline) //String
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);
-	m_Mode = (interactive) ? VAL_INTERACTIVE_STRING : VAL_STRING;
-
-  m_TextCtrl  = win; 
+	
+	if(multiline)
+		m_Mode = (interactive) ? VAL_MULTILINE_INTERACTIVE_STRING : VAL_MULTILINE_STRING;
+	else
+		m_Mode = (interactive) ? VAL_INTERACTIVE_STRING : VAL_STRING;
+	
+	m_TextCtrl  = win; 
   m_StringVar = var;
   m_WidgetData.dType  = STRING_DATA;
   m_WidgetData.sValue = var->char_str();
   assert(IsValid());
 }
 //----------------------------------------------------------------------------
-albaGUIValidator::albaGUIValidator(albaObserver* listener, int mid, wxTextCtrl *win, albaString* var, bool interactive) //String
+albaGUIValidator::albaGUIValidator(albaObserver* listener, int mid, wxTextCtrl *win, albaString* var, bool interactive, bool multiline) //String
 //----------------------------------------------------------------------------
 {
   Init(listener,mid,win);  
-	m_Mode = (interactive) ? VAL_ALBA_INTERACTIVE_STRING : VAL_ALBA_STRING;
-  m_TextCtrl    = win; 
-  m_MafStringVar= var;     
+	
+	if (multiline)
+		m_Mode = (interactive) ? VAL_ALBA_MULTILINE_INTERACTIVE_STRING : VAL_ALBA_MULTILINE_STRING;
+	else
+		m_Mode = (interactive) ? VAL_ALBA_INTERACTIVE_STRING : VAL_ALBA_STRING; 
+	
+	m_TextCtrl = win;
+	m_MafStringVar= var;     
   m_WidgetData.dType  = STRING_DATA;
   m_WidgetData.sValue = var->GetCStr();
   assert(IsValid());
@@ -666,10 +679,14 @@ bool albaGUIValidator::TransferToWindow(void)
     break;
     case VAL_STRING:
 		case VAL_INTERACTIVE_STRING:
+		case VAL_MULTILINE_STRING:
+		case VAL_MULTILINE_INTERACTIVE_STRING:
       if (m_StringVar) m_TextCtrl->SetValue(*m_StringVar);
     break;
     case VAL_ALBA_STRING:
 		case VAL_ALBA_INTERACTIVE_STRING:
+		case VAL_ALBA_MULTILINE_STRING:
+		case VAL_ALBA_MULTILINE_INTERACTIVE_STRING:
       if (m_MafStringVar) m_TextCtrl->SetValue(wxString(m_MafStringVar->GetCStr()));
     break;
     case VAL_SLIDER:
@@ -749,7 +766,7 @@ bool albaGUIValidator::TransferToWindow(void)
       m_TextCtrl->Refresh();
     break;
   }
-  return TRUE;
+  return true;
 }
 /*//----------------------------------------------------------------------------
 float albaGUIValidator::RoundValue(float f_in)
@@ -838,6 +855,8 @@ bool albaGUIValidator::TransferFromWindow(void)
     break;
     case VAL_STRING:
 		case VAL_INTERACTIVE_STRING:
+		case VAL_MULTILINE_STRING:
+		case VAL_MULTILINE_INTERACTIVE_STRING:
       if (m_StringVar)  
       {
         s = m_TextCtrl->GetValue();
@@ -851,6 +870,9 @@ bool albaGUIValidator::TransferFromWindow(void)
     break;
     case VAL_ALBA_STRING:
 		case VAL_ALBA_INTERACTIVE_STRING:
+		case VAL_ALBA_MULTILINE_STRING:
+		case VAL_ALBA_MULTILINE_INTERACTIVE_STRING:
+
       if (m_MafStringVar)
       {
         s = m_TextCtrl->GetValue();
@@ -912,7 +934,7 @@ bool albaGUIValidator::TransferFromWindow(void)
 			*m_ColorVar = m_TextCtrl->GetBackgroundColour();
     break;
   }
-  return TRUE;
+  return true;
 }
 //----------------------------------------------------------------------------
 void albaGUIValidator::OnChar(wxKeyEvent& event)
@@ -922,7 +944,8 @@ void albaGUIValidator::OnChar(wxKeyEvent& event)
   int keyCode = (int)event.GetKeyCode();
 
   if (((keyCode == WXK_RETURN || keyCode == WXK_TAB) &&
-      (m_Mode == VAL_STRING  || m_Mode == VAL_ALBA_STRING || 
+      (m_Mode == VAL_STRING  || m_Mode == VAL_ALBA_STRING ||
+				m_Mode == VAL_MULTILINE_STRING || m_Mode == VAL_ALBA_MULTILINE_STRING ||
        m_Mode == VAL_INTEGER || m_Mode == VAL_FLOAT || 
        m_Mode == VAL_DOUBLE  || m_Mode == VAL_FLOAT_SLIDER_2)))     
   {
@@ -930,7 +953,10 @@ void albaGUIValidator::OnChar(wxKeyEvent& event)
     // i.e. console widget
     TransferFromWindow();
     albaEventMacro(albaEvent(m_TextCtrl, m_ModuleId));
-    return; // eat message
+		if (m_Mode == VAL_MULTILINE_STRING || m_Mode == VAL_ALBA_MULTILINE_STRING)
+			event.Skip();
+		else
+	    return; // eat message
   }
 
   // don't filter special keys and Delete
@@ -956,7 +982,7 @@ void albaGUIValidator::OnChar(wxKeyEvent& event)
 void albaGUIValidator::OnKeyUp(wxKeyEvent& event)
 //----------------------------------------------------------------------------
 {
-	if(m_Mode == VAL_ALBA_INTERACTIVE_STRING || m_Mode == VAL_INTERACTIVE_STRING)
+	if(m_Mode == VAL_ALBA_INTERACTIVE_STRING || m_Mode == VAL_INTERACTIVE_STRING || m_Mode == VAL_MULTILINE_INTERACTIVE_STRING || m_Mode == VAL_ALBA_MULTILINE_INTERACTIVE_STRING)
 	{
 		// Return is received only from widget with the wxTE_PROCESS_ENTER style flag enabled
 		// i.e. console widget

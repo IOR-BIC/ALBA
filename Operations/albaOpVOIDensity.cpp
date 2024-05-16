@@ -44,6 +44,7 @@
 #include "vtkTransformPolyDataFilter.h"
 #include "albaProgressBarHelper.h"
 #include "albaTagArray.h"
+#include "albaTagItem.h"
 #include "albaVMEPointCloud.h"
 #include "vtkCellArray.h"
 #include "vtkTransform.h"
@@ -113,6 +114,7 @@ enum VOI_DENSITY_WIDGET_ID
 	ID_STANDARD_DEVIATION,
 	ID_MEDIAN,
 	ID_VOXEL_LIST,
+	ID_EXPORT_REPORT,
 };
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::OpRun()   
@@ -157,6 +159,9 @@ void albaOpVOIDensity::CreateGui()
 	//m_VoxelList=m_Gui->ListBox(ID_VOXEL_LIST);
 
 	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Divider(1);
+	m_Gui->Label("");
+	m_Gui->Button(ID_EXPORT_REPORT, "Export Report");
 	m_Gui->Label("");
 	m_Gui->Divider(1);
 	m_Gui->OkCancel();
@@ -164,6 +169,7 @@ void albaOpVOIDensity::CreateGui()
 
 	m_Gui->Enable(ID_EVALUATE_DENSITY, false);
 	m_Gui->Enable(ID_RANGE_UPDATED, false);
+	m_Gui->Enable(ID_EXPORT_REPORT, false);
 	m_Gui->Enable(wxOK, false);
 	m_Gui->Update();
 }
@@ -370,7 +376,11 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 				break;
 			case ID_EVALUATE_DENSITY:
 				ExtractVolumeScalars();
+				m_Gui->Enable(ID_EXPORT_REPORT, true);
 				m_Gui->Enable(wxOK, true);
+			break;
+			case ID_EXPORT_REPORT:
+				WriteReport();
 			break;
 			case wxOK:
 				OpStop(OP_RUN_OK);
@@ -505,4 +515,169 @@ void albaOpVOIDensity::UpdateStrings()
 	m_MinScalarString = albaString(albaString::Format("%f", m_MinScalar));
 	m_StandardDeviationString = albaString(albaString::Format("%f", m_StandardDeviation));
 	m_MedianString = albaString(albaString::Format("%f", m_Median));
+}
+
+
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::WriteReport()
+{
+	albaString fileNameFullPath = albaGetDocumentsDirectory();
+	fileNameFullPath.Append("\\NewReport.csv");
+
+	albaString wildc = "Report file (*.csv)|*.csv";
+	albaString newFileName = albaGetSaveFile(fileNameFullPath.GetCStr(), wildc, "Save Report", 0, false);
+
+	//////////////////////////////////////////////////////////////////////////
+	if (newFileName == "") return;
+
+	// Calculate Date-Time Report
+	time_t rawtime;
+	struct tm * timeinfo;  time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	//////////////////////////////////////////////////////////////////////////
+	CreateCSVFile(newFileName);
+
+	//////////////////////////////////////////////////////////////////////////
+	// Open Report File
+	wxString url = "file:///";
+	url = url + newFileName.GetCStr();
+	url.Replace("\\", "/");
+	albaLogMessage("Opening %f", url.ToAscii());
+	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
+	command = command + url;
+	wxExecute(command);
+}
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::CreateCSVFile(albaString file)
+{
+	bool firstAcces = !wxFileExists(file.GetCStr());
+
+	FILE * pFile;
+	pFile = fopen(file, "a+");
+
+	GetTags();
+
+	if (pFile != NULL)
+	{
+
+		if (firstAcces) // Header
+		{
+			// Patient Info
+			fprintf(pFile, "PZName;PZSurname;PZCode;PZBirthdate;PZCenter;PZExamDate;");
+
+			// Main scores 
+			fprintf(pFile, "NumberOfScalars;MeanScalar;MaxScalar;MinScalar;StandardDeviation;Median");
+		}
+
+		
+
+		// Patient Info
+		fprintf(pFile, "\n%s;%s;%s;%s;%s;%s;", m_PatientName.GetCStr(), m_PatientSurname.GetCStr(), m_PatientCode.GetCStr(), m_PatientBirthdate.GetCStr(), m_PatientCenter.GetCStr(), m_PatientExamDate.GetCStr());
+
+		// Main scores 
+		fprintf(pFile, "%s;%s;%s;%s;%s;%s;", m_NumberOfScalarsString.GetCStr(), m_MeanScalarString.GetCStr(), m_MaxScalarString.GetCStr(), m_MinScalarString.GetCStr(), m_StandardDeviationString.GetCStr(), m_MedianString.GetCStr());
+
+		
+		fclose(pFile);
+	}
+	else
+	{
+		albaErrorMessage("Cannot open CSV file, it can be opened by an another application.\nPlease close the application or select another file.");
+	}
+}
+
+void albaOpVOIDensity::GetTags()
+{
+	// Patient Name Surname
+	albaTagArray * tagArray = m_Input->GetTagArray();
+	albaTagItem *tag = tagArray->GetTag("PatientsName");
+
+	if (tag)
+	{
+		albaString tmp;
+		tag->GetValueAsSingleString(tmp);
+		wxString tmp2 = tmp.GetCStr();
+
+		tmp2.Replace("(\"", "");
+		tmp2.Replace("\")", "");
+		tmp2.Replace("\"", "");
+		tmp2.Replace("^", " ");
+		tmp2.Replace("_", " ");
+
+		m_PatientName = tmp2.BeforeLast(' ');
+		m_PatientSurname = tmp2.AfterLast(' ');
+	}
+
+	// Patient Code
+	tag = tagArray->GetTag("PatientID");
+
+	if (tag)
+	{
+		albaString tmp;
+		tag->GetValueAsSingleString(tmp);
+		wxString tmp2 = tmp.GetCStr();
+
+		tmp2.Replace("(\"", "");
+		tmp2.Replace("\")", "");
+		tmp2.Replace("\"", "");
+		tmp2.Replace("^", " ");
+		tmp2.Replace("_", " ");
+
+		m_PatientCode = tmp2;
+	}
+
+	// Patients BirthDate
+	tag = tagArray->GetTag("PatientsBirthDate");
+
+	if (tag)
+	{
+		albaString tmp;
+		tag->GetValueAsSingleString(tmp);
+		wxString tmp2 = tmp.GetCStr();
+
+		tmp2.Replace("(\"", "");
+		tmp2.Replace("\")", "");
+		tmp2.Replace("\"", "");
+		tmp2.Replace("^", " ");
+		tmp2.Replace("_", " ");
+
+		m_PatientBirthdate = "" + tmp2.SubString(6, 7) + "-" + tmp2.SubString(4, 5) + "-" + tmp2.SubString(0, 3);
+	}
+
+	// Center
+	tag = tagArray->GetTag("InstitutionName");
+
+	if (tag)
+	{
+		albaString tmp;
+		tag->GetValueAsSingleString(tmp);
+		wxString tmp2 = tmp.GetCStr();
+
+		tmp2.Replace("(\"", "");
+		tmp2.Replace("\")", "");
+		tmp2.Replace("\"", "");
+		tmp2.Replace("^", " ");
+		tmp2.Replace("_", " ");
+
+		m_PatientCenter = tmp2;
+	}
+
+	// Exam date
+	tag = tagArray->GetTag("AcquisitionDate");
+
+	if (tag)
+	{
+		albaString tmp;
+		tag->GetValueAsSingleString(tmp);
+		wxString tmp2 = tmp.GetCStr();
+
+		tmp2.Replace("(\"", "");
+		tmp2.Replace("\")", "");
+		tmp2.Replace("\"", "");
+		tmp2.Replace("^", " ");
+		tmp2.Replace("_", " ");
+
+		m_PatientExamDate = "" + tmp2.SubString(6, 7) + "-" + tmp2.SubString(4, 5) + "-" + tmp2.SubString(0, 3);
+	}
 }

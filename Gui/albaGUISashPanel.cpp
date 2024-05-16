@@ -48,25 +48,25 @@ albaGUISashPanel::albaGUISashPanel (wxWindow* parent,wxWindowID id, wxDirection 
 		case wxRIGHT:
 			SetAlignment(wxLAYOUT_RIGHT);
 			SetOrientation(wxLAYOUT_VERTICAL);
-			SetSashVisible(wxSASH_LEFT, TRUE);
+			SetSashVisible(wxSASH_LEFT, true);
   		SetDefaultSize(wxSize(defaultsize, 1000));
 		break;
 		case wxLEFT:
 			SetAlignment(wxLAYOUT_LEFT);
 			SetOrientation(wxLAYOUT_VERTICAL);
-			SetSashVisible(wxSASH_RIGHT, TRUE);
+			SetSashVisible(wxSASH_RIGHT, true);
   		SetDefaultSize(wxSize(defaultsize, 1000));
 		break;
 		case wxTOP:
 			SetAlignment(wxLAYOUT_TOP);
 			SetOrientation(wxLAYOUT_HORIZONTAL);
-			SetSashVisible(wxSASH_BOTTOM, TRUE);
+			SetSashVisible(wxSASH_BOTTOM, true);
   		SetDefaultSize(wxSize(1000, defaultsize));
 		break;
 		case wxBOTTOM:
 			SetAlignment(wxLAYOUT_BOTTOM);
 			SetOrientation(wxLAYOUT_HORIZONTAL);
-			SetSashVisible(wxSASH_TOP, TRUE);
+			SetSashVisible(wxSASH_TOP, true);
   		SetDefaultSize(wxSize(1000, defaultsize));
 		break;
 		default:
@@ -76,10 +76,10 @@ albaGUISashPanel::albaGUISashPanel (wxWindow* parent,wxWindowID id, wxDirection 
 
   if(!sizable)
   {
-    SetSashVisible(wxSASH_LEFT,  FALSE);
-    SetSashVisible(wxSASH_RIGHT, FALSE);
-    SetSashVisible(wxSASH_BOTTOM,FALSE);
-    SetSashVisible(wxSASH_TOP,   FALSE);
+    SetSashVisible(wxSASH_LEFT,  false);
+    SetSashVisible(wxSASH_RIGHT, false);
+    SetSashVisible(wxSASH_BOTTOM,false);
+    SetSashVisible(wxSASH_TOP,   false);
   }
 
   // store the menu in m_MenuBar;

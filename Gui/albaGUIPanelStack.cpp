@@ -47,7 +47,7 @@ albaGUIPanelStack::albaGUIPanelStack(wxWindow* parent, wxWindowID id, const wxPo
 
   Push(new albaGUIPanel(this,-1));
 
-  this->SetAutoLayout( TRUE );
+  this->SetAutoLayout( true );
   this->SetSizer( m_Sizer );
   m_Sizer->Fit(this);
   m_Sizer->SetSizeHints(this);

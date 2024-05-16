@@ -55,10 +55,10 @@ albaOpMMLContourWidget::albaOpMMLContourWidget()
 //----------------------------------------------------------------------------
 {
   this->m_OperationID = 0; // first operation id is 0
-  this->m_BCenterMode = FALSE; // center mode off
-  this->m_BScalingMode = FALSE; // scaling mode off
-  this->m_BRotatingMode = FALSE; // rotating mode off
-  this->m_BTranslatingMode = FALSE; // translating mode off
+  this->m_BCenterMode = false; // center mode off
+  this->m_BScalingMode = false; // scaling mode off
+  this->m_BRotatingMode = false; // rotating mode off
+  this->m_BTranslatingMode = false; // translating mode off
   this->m_State = albaOpMMLContourWidget::Start;
   this->EventCallbackCommand->SetCallback(albaOpMMLContourWidget::ProcessEvents);
   
@@ -814,7 +814,7 @@ void albaOpMMLContourWidget::OnLeftButtonUp()
 						M->ScalingFlagStack->SetTuple(params[0], &flag);*/
 						if (!m_M->m_ScalingOccured)
 						{
-							m_M->m_ScalingOccured = TRUE;
+							m_M->m_ScalingOccured = true;
 							m_M->m_ScalingOccuredOperationId = GetNextOperationId();
 
 							// grey out twist, h/v translation views
@@ -852,7 +852,7 @@ void albaOpMMLContourWidget::OnLeftButtonUp()
 						M->ScalingFlagStack->SetTuple(params[0], &flag);*/
 						if (!m_M->m_ScalingOccured)
 						{
-							m_M->m_ScalingOccured = TRUE;
+							m_M->m_ScalingOccured = true;
 							m_M->m_ScalingOccuredOperationId = GetNextOperationId();
 
 							// grey out twist, h/v translation views
@@ -889,7 +889,7 @@ void albaOpMMLContourWidget::OnLeftButtonUp()
 						M->ScalingFlagStack->SetTuple(params[0], &flag);*/
 						if (!m_M->m_ScalingOccured)
 						{
-							m_M->m_ScalingOccured = TRUE;
+							m_M->m_ScalingOccured = true;
 							m_M->m_ScalingOccuredOperationId = GetNextOperationId();
 
 							// grey out twist, h/v translation views
@@ -926,7 +926,7 @@ void albaOpMMLContourWidget::OnLeftButtonUp()
 						M->ScalingFlagStack->SetTuple(params[0], &flag);*/
 						if (!m_M->m_ScalingOccured)
 						{
-							m_M->m_ScalingOccured = TRUE;
+							m_M->m_ScalingOccured = true;
 							m_M->m_ScalingOccuredOperationId = GetNextOperationId();
 
 							// grey out twist, h/v translation views
@@ -1679,27 +1679,27 @@ void albaOpMMLContourWidget::GetMotionVector(float xyz[3])
 void albaOpMMLContourWidget::TranslationModeOn()
 //----------------------------------------------------------------------------
 {
-  this->m_BTranslatingMode = TRUE;
+  this->m_BTranslatingMode = true;
 }
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::TranslationModeOff()
 //----------------------------------------------------------------------------
 {
-  this->m_BTranslatingMode = FALSE;
+  this->m_BTranslatingMode = false;
 }
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::CenterModeOn()
 //----------------------------------------------------------------------------
 {
   //this->CenterHandle->VisibilityOn();
-  this->m_BCenterMode = TRUE;
+  this->m_BCenterMode = true;
 }
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::CenterModeOff()
 //----------------------------------------------------------------------------
 {
   //this->CenterHandle->VisibilityOff();
-  this->m_BCenterMode = FALSE;
+  this->m_BCenterMode = false;
 }
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::RotationModeOn()
@@ -1707,20 +1707,20 @@ void albaOpMMLContourWidget::RotationModeOn()
 {
   //this->m_RotationalHandle->VisibilityOn();
   //this->Setm_RotationalHandle(50.0, 0.0, 0.0);
-  this->m_BRotatingMode = TRUE;
+  this->m_BRotatingMode = true;
 }
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::RotationModeOff()
 //----------------------------------------------------------------------------
 {
   //this->m_RotationalHandle->VisibilityOff();
-  this->m_BRotatingMode = FALSE;
+  this->m_BRotatingMode = false;
 }
 //----------------------------------------------------------------------------
 void albaOpMMLContourWidget::ScalingModeOn()
 //----------------------------------------------------------------------------
 {
-  this->m_BScalingMode = TRUE;
+  this->m_BScalingMode = true;
   //this->ScalingHandlesOn();
 
   // 
@@ -1735,7 +1735,7 @@ void albaOpMMLContourWidget::ScalingModeOn()
 void albaOpMMLContourWidget::ScalingModeOff()
 //----------------------------------------------------------------------------
 {
-  this->m_BScalingMode = FALSE;
+  this->m_BScalingMode = false;
 
   //
   //this->ScalingHandlesOff();

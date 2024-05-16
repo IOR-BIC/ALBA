@@ -56,7 +56,7 @@ void vtkImageUnPackerTest::TestExecute()
     ptr[i] = 0;
   }
 
-  input->SetArray(ptr,100,TRUE);
+  input->SetArray(ptr,100,true);
 
   m_Filter->SetInput(input);
   m_Filter->Update();

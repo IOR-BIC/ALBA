@@ -62,7 +62,7 @@ albaOp(label)
 	m_ABSMatrixFlag = 0;
 
 	m_FileDir = albaGetLastUserFolder();
-  m_ForceUnsignedShortScalarOutputForStructuredPoints = FALSE;
+  m_ForceUnsignedShortScalarOutputForStructuredPoints = false;
 }
 //----------------------------------------------------------------------------
 albaOpExporterVTKXML::~albaOpExporterVTKXML()

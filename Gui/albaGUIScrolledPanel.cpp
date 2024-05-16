@@ -43,7 +43,7 @@ albaGUIScrolledPanel::albaGUIScrolledPanel(wxWindow* parent,wxWindowID id)
   this->SetScrollbars(0, 10, 0, 100); 
   this->EnableScrolling(0,1);         
 
-  this->SetAutoLayout( TRUE );
+  this->SetAutoLayout( true );
   this->SetSizer( m_Sizer );
   m_Sizer->Fit(this);
   m_Sizer->SetSizeHints(this);

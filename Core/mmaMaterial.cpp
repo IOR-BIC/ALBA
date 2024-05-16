@@ -203,7 +203,7 @@ wxBitmap *mmaMaterial::MakeIcon()
 	ie->Export();
 
 	//translate to a wxBitmap
-	wxImage  *img = new wxImage(dim[0],dim[1],buffer,TRUE);
+	wxImage  *img = new wxImage(dim[0],dim[1],buffer,true);
 	wxBitmap *bmp = new wxBitmap(*img);
   delete img;
 

@@ -1637,7 +1637,7 @@ albaVME *albaVME::GetLink(const char *name)
 		// Check node validity instead of checking 'm_NodeId'
 		// then if m_NodeId is different from m_Id, the link will
 		// be updated.
-		if (it->second.m_Node != NULL && it->second.m_Node->IsValid())
+		if (it->second.m_Node != NULL)
 		{
 			if (it->second.m_NodeId != it->second.m_Node->GetId())
 			{

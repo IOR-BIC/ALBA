@@ -135,10 +135,10 @@ albaOpImporterC3D::albaOpImporterC3D(const wxString &label) :
 	m_DictionaryFileName = "";
 
 	//gui
-	m_ImportTrajectoriesFlag = TRUE;
-	m_ImportAnalogFlag = TRUE;
-	m_ImportPlatformFlag = TRUE;
-	m_ImportEventFlag = FALSE;
+	m_ImportTrajectoriesFlag = true;
+	m_ImportAnalogFlag = true;
+	m_ImportPlatformFlag = true;
+	m_ImportEventFlag = false;
 }
 
 //----------------------------------------------------------------------------

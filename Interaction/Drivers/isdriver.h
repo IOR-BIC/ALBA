@@ -58,8 +58,8 @@
 
 #define PI      3.14159265359f
 
-#define PASS    TRUE
-#define FAIL    FALSE
+#define PASS    true
+#define FAIL    false
 
 #define OK      1
 #define ERROR   0

@@ -84,18 +84,18 @@ void albaAttachCameraTest::TestRenderStuff()
 void albaAttachCameraTest::TestEnableDisableAttachCamera()
 {
   albaAttachCamera *attachCamera=new albaAttachCamera(NULL, NULL, NULL);
-  CPPUNIT_ASSERT(attachCamera->GetEnableAttachCamera() == FALSE);
+  CPPUNIT_ASSERT(attachCamera->GetEnableAttachCamera() == false);
   attachCamera->EnableAttachCamera();
-  CPPUNIT_ASSERT(attachCamera->GetEnableAttachCamera() == TRUE);
+  CPPUNIT_ASSERT(attachCamera->GetEnableAttachCamera() == true);
   cppDEL(attachCamera);
 }
 
 void albaAttachCameraTest::TestSetGetEnableAttachCamera()
 {
   albaAttachCamera *attachCamera=new albaAttachCamera(NULL, NULL, NULL);
-  CPPUNIT_ASSERT(attachCamera->GetEnableAttachCamera() == FALSE);
-  attachCamera->SetEnableAttachCamera(TRUE);
-  CPPUNIT_ASSERT(attachCamera->GetEnableAttachCamera() == TRUE);
+  CPPUNIT_ASSERT(attachCamera->GetEnableAttachCamera() == false);
+  attachCamera->SetEnableAttachCamera(true);
+  CPPUNIT_ASSERT(attachCamera->GetEnableAttachCamera() == true);
   cppDEL(attachCamera);
 }
 
