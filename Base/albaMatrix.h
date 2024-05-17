@@ -129,7 +129,7 @@ public:
   /**
     Matrix Inversion (adapted from Richard Carling in "Graphics Gems," 
     Academic Press, 1990). */
-  void Invert() { albaMatrix::Invert(*this,*this); }
+	albaMatrix *Invert() { albaMatrix::Invert(*this, *this); return this; }
   /**
     Matrix Inversion, (adapted from Richard Carling in "Graphics Gems," 
     Academic Press, 1990). static version.*/
@@ -181,6 +181,11 @@ public:
 
   /** bracket operator to access single elements */
   const double *operator[](unsigned int i) const { return &(GetElements()[i][0]); }  
+
+	//// Conversion operator from albaMatrix to vtkMatrix
+	operator vtkMatrix4x4*() const {
+		return GetVTKMatrix();
+	}
 
   //double *operator[][](const unsigned int i,const unsigned int j) {return &(GetElements()[i][j]);}
   

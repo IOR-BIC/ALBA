@@ -626,7 +626,7 @@ void albaOpVOIDensity::CreateCSVFile(albaString file)
 		if (firstAcces) // Header
 		{
 			// Patient Info
-			fprintf(pFile, "PZName;PZSurname;PZCode;PZBirthdate;PZCenter;PZExamDate;");
+			fprintf(pFile, "PZName;PZCode;PZBirthdate;PZCenter;PZExamDate;");
 
 			// Main scores 
 			fprintf(pFile, "NumberOfScalars;MeanScalar;MaxScalar;MinScalar;StandardDeviation;Median");
@@ -635,7 +635,7 @@ void albaOpVOIDensity::CreateCSVFile(albaString file)
 		
 
 		// Patient Info
-		fprintf(pFile, "\n%s;%s;%s;%s;%s;%s;", m_PatientName.GetCStr(), m_PatientSurname.GetCStr(), m_PatientCode.GetCStr(), m_PatientBirthdate.GetCStr(), m_PatientCenter.GetCStr(), m_PatientExamDate.GetCStr());
+		fprintf(pFile, "\n%s;%s;%s;%s;%s;", m_PatientName.GetCStr(), m_PatientCode.GetCStr(), m_PatientBirthdate.GetCStr(), m_PatientCenter.GetCStr(), m_PatientExamDate.GetCStr());
 
 		// Main scores 
 		fprintf(pFile, "%s;%s;%s;%s;%s;%s;", m_NumberOfScalarsString.GetCStr(), m_MeanScalarString.GetCStr(), m_MaxScalarString.GetCStr(), m_MinScalarString.GetCStr(), m_StandardDeviationString.GetCStr(), m_MedianString.GetCStr());
@@ -651,7 +651,7 @@ void albaOpVOIDensity::CreateCSVFile(albaString file)
 
 void albaOpVOIDensity::GetTags()
 {
-	// Patient Name Surname
+	// Patient Name 
 	albaTagArray * tagArray = m_Input->GetTagArray();
 	albaTagItem *tag = tagArray->GetTag("PatientsName");
 
@@ -667,8 +667,7 @@ void albaOpVOIDensity::GetTags()
 		tmp2.Replace("^", " ");
 		tmp2.Replace("_", " ");
 
-		m_PatientName = tmp2.BeforeLast(' ');
-		m_PatientSurname = tmp2.AfterLast(' ');
+		m_PatientName = tmp2;
 	}
 
 	// Patient Code

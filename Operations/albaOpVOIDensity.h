@@ -125,7 +125,6 @@ protected:
 	bool					m_ImagedataVol;
 
 	albaString m_PatientName;
-	albaString m_PatientSurname;
 	albaString m_PatientCode;
 	albaString m_PatientBirthdate;
 	albaString m_PatientCenter;
