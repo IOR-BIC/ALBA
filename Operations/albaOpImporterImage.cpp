@@ -346,7 +346,7 @@ void albaOpImporterImage::BuildVolume()
     r->Update();
 
 		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
-		extractComponents->SetInput(r->GetOutput());
+		extractComponents->SetInputData(r->GetOutput());
 		extractComponents->SetComponents(0, 1, 2); // RGB channels
 		extractComponents->Update();
     
