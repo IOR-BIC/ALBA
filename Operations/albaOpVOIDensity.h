@@ -80,6 +80,12 @@ public:
 
 protected:
 
+	void WriteReport();
+
+	void CreateCSVFile(albaString file);
+
+	void GetTags();
+
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node);
 
@@ -88,6 +94,8 @@ protected:
 
 	void CreatePointSamplingOutput();
 
+	void CreateSegmentationOutput();
+
 	double GetMedian(vtkDoubleArray *valuesArray);
 	
 	static int Cmpfunc(const void * a, const void * b);
@@ -95,21 +103,31 @@ protected:
 
   albaVME        *m_Surface;
   vtkDoubleArray *m_VOIScalars;
+	std::vector<unsigned int> m_VOIIds;
 	std::vector<albaVect3d> m_VOICoords;
-  albaString       m_NumberOfScalarsString;
-  int             m_NumberOfScalars;
-  albaString       m_MeanScalarString;
-  double          m_MeanScalar;
-  albaString       m_MaxScalarString;
-  albaString       m_MinScalarString;
-  double          m_MaxScalar;
-  double          m_MinScalar;
-  albaString       m_StandardDeviationString;
-  double          m_StandardDeviation;
-	albaString       m_MedianString;
-	double					m_Median;
-	wxListBox			 *m_VoxelList;
-	int							m_EvaluateInSubRange;
-	double							m_SubRange[2];
+  albaString    m_NumberOfScalarsString;
+  int           m_NumberOfScalars;
+  albaString    m_MeanScalarString;
+  double        m_MeanScalar;
+  albaString    m_MaxScalarString;
+  albaString    m_MinScalarString;
+  double        m_MaxScalar;
+  double        m_MinScalar;
+  albaString    m_StandardDeviationString;
+  double        m_StandardDeviation;
+	albaString    m_MedianString;
+	double				m_Median;
+	wxListBox			*m_VoxelList;
+	int						m_EvaluateInSubRange;
+	double				m_SubRange[2];
+	int						m_CreateSegOutput;
+	int						m_CreatePointCloudOutput;
+	bool					m_ImagedataVol;
+
+	albaString m_PatientName;
+	albaString m_PatientCode;
+	albaString m_PatientBirthdate;
+	albaString m_PatientCenter;
+	albaString m_PatientExamDate;
 };
 #endif

@@ -44,9 +44,12 @@
 #include "vtkTransformPolyDataFilter.h"
 #include "albaProgressBarHelper.h"
 #include "albaTagArray.h"
+#include "albaTagItem.h"
 #include "albaVMEPointCloud.h"
+#include "albaVMEVolumeGray.h"
 #include "vtkCellArray.h"
 #include "vtkTransform.h"
+#include "vtkImageData.h"
 
 
 //----------------------------------------------------------------------------
@@ -71,6 +74,9 @@ albaOpVOIDensity::albaOpVOIDensity(const wxString &label)
   m_StandardDeviation = 0.0;
 	m_Median = 0.0;
 
+	m_CreateSegOutput = false;
+	m_CreatePointCloudOutput = true;
+
 	UpdateStrings();
 
 	m_EvaluateInSubRange = false;
@@ -83,6 +89,7 @@ albaOpVOIDensity::~albaOpVOIDensity()
 	m_Surface = NULL;
 	vtkDEL(m_VOIScalars);
 	m_VOICoords.clear();
+	m_VOIIds.clear();
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpVOIDensity::Copy()
@@ -113,6 +120,9 @@ enum VOI_DENSITY_WIDGET_ID
 	ID_STANDARD_DEVIATION,
 	ID_MEDIAN,
 	ID_VOXEL_LIST,
+	ID_EXPORT_REPORT,
+	ID_CREATE_SEGMENTATION_OUTPUT,
+	ID_CREATE_CLOUD_POINT_OUTPUT,
 };
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::OpRun()   
@@ -121,9 +131,10 @@ void albaOpVOIDensity::OpRun()
   vtkNEW(m_VOIScalars);
 	if(!this->m_TestMode)
 	{
-		vtkALBASmartPointer<vtkDataSet> VolumeData = m_Input->GetOutput()->GetVTKData();
+		vtkALBASmartPointer<vtkDataSet> volumeData = m_Input->GetOutput()->GetVTKData();
+		volumeData->GetPointData()->GetScalars()->GetRange(m_SubRange);
 
-		VolumeData->GetPointData()->GetScalars()->GetRange(m_SubRange);
+		m_ImagedataVol = vtkImageData::SafeDownCast(volumeData) ? true : false;
 
 		CreateGui();
 
@@ -156,6 +167,14 @@ void albaOpVOIDensity::CreateGui()
 	//m_VoxelList=m_Gui->ListBox(ID_VOXEL_LIST);
 
 	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Divider(1);
+	m_Gui->Label("");
+	m_Gui->Bool(ID_CREATE_SEGMENTATION_OUTPUT, "Create Segmentation Output", &m_CreateSegOutput, true);
+	m_Gui->Bool(ID_CREATE_CLOUD_POINT_OUTPUT, "Create Cloud Point Output", &m_CreatePointCloudOutput, true);
+	m_Gui->Label("");
+	m_Gui->Divider(1);
+	m_Gui->Label("");
+	m_Gui->Button(ID_EXPORT_REPORT, "Export Report");
 	m_Gui->Label("");
 	m_Gui->Divider(1);
 	m_Gui->OkCancel();
@@ -163,6 +182,7 @@ void albaOpVOIDensity::CreateGui()
 
 	m_Gui->Enable(ID_EVALUATE_DENSITY, false);
 	m_Gui->Enable(ID_RANGE_UPDATED, false);
+	m_Gui->Enable(ID_EXPORT_REPORT, false);
 	m_Gui->Enable(wxOK, false);
 	m_Gui->Update();
 }
@@ -190,7 +210,11 @@ void albaOpVOIDensity::OpStop(int result)
 		SetDoubleTag("StandardDeviation", m_StandardDeviation);
 		SetDoubleTag("Median:", m_Median);
 
+		if(m_CreatePointCloudOutput)
 		CreatePointSamplingOutput();
+		
+		if (m_CreateSegOutput)
+			CreateSegmentationOutput();
 	}
 
 	Superclass::OpStop(result);
@@ -275,6 +299,47 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 
 	albaDEL(pointCloudVME);
 }
+
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::CreateSegmentationOutput()
+{
+	vtkDataSet * vtkData = m_Input->GetOutput()->GetVTKData();
+
+	albaString name = m_Surface->GetName();
+	name += " segmentation";
+
+	albaVMEVolumeGray *segmentationVME;
+	albaNEW(segmentationVME);
+	segmentationVME->DeepCopy(m_Input);
+	segmentationVME->SetName(name);
+
+
+	vtkUnsignedCharArray *segScalars;
+	vtkNEW(segScalars);
+	vtkIdType scalarNum = vtkData->GetNumberOfPoints();
+	segScalars->SetNumberOfTuples(scalarNum);
+	
+	for (int i = 0; i < scalarNum; i++)
+		segScalars->SetTuple1(i, 0);
+
+	int nPoints = m_VOICoords.size();
+	for (int i = 0; i < nPoints; i++)
+		segScalars->SetTuple1(m_VOIIds[i],255);
+
+	vtkImageData *segImDa;
+	vtkNEW(segImDa);
+
+	segImDa->DeepCopy(vtkData);
+	segImDa->GetPointData()->SetScalars(segScalars);
+
+	segmentationVME->SetData(segImDa, segmentationVME->GetTimeStamp());
+	
+	segmentationVME->ReparentTo(m_Surface);
+	segmentationVME->SetAbsMatrix(*m_Input->GetOutput()->GetAbsMatrix(),m_Input->GetTimeStamp());
+
+	albaDEL(segmentationVME);
+}
+
 
 //----------------------------------------------------------------------------
 double albaOpVOIDensity::GetMedian(vtkDoubleArray *valuesArray)
@@ -368,7 +433,11 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 				break;
 			case ID_EVALUATE_DENSITY:
 				ExtractVolumeScalars();
+				m_Gui->Enable(ID_EXPORT_REPORT, true);
 				m_Gui->Enable(wxOK, true);
+			break;
+			case ID_EXPORT_REPORT:
+				WriteReport();
 			break;
 			case wxOK:
 				OpStop(OP_RUN_OK);
@@ -399,6 +468,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 	m_MinScalar = 99999.0;
 	m_VOIScalars->Reset();
 	m_VOICoords.clear();
+	m_VOIIds.clear();
 
 	albaMatrix inputMeshABSMatrix = m_Surface->GetAbsMatrixPipe()->GetMatrix();
 	albaMatrix inputVolumeABSMatrix = m_Input->GetAbsMatrixPipe()->GetMatrix();
@@ -439,7 +509,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 
 	vtkDEL(transform);
 
-	for (int voxel = 0; voxel < NumberVoxels; voxel++)
+	for (vtkIdType voxel = 0; voxel < NumberVoxels; voxel++)
 	{
 		VolumeData->GetPoint(voxel, Point);
 		if (ImplicitBox->EvaluateFunction(Point) < 0)
@@ -460,6 +530,7 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 					m_VOIScalars->InsertNextTuple(&InsideScalar);
 					albaVect3d vPos(Point);
 					m_VOICoords.push_back(vPos);
+					m_VOIIds.push_back(voxel);
 				}
 			}
 		}
@@ -502,4 +573,168 @@ void albaOpVOIDensity::UpdateStrings()
 	m_MinScalarString = albaString(albaString::Format("%f", m_MinScalar));
 	m_StandardDeviationString = albaString(albaString::Format("%f", m_StandardDeviation));
 	m_MedianString = albaString(albaString::Format("%f", m_Median));
+}
+
+
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::WriteReport()
+{
+	albaString fileNameFullPath = albaGetDocumentsDirectory();
+	fileNameFullPath.Append("\\NewReport.csv");
+
+	albaString wildc = "Report file (*.csv)|*.csv";
+	albaString newFileName = albaGetSaveFile(fileNameFullPath.GetCStr(), wildc, "Save Report", 0, false);
+
+	//////////////////////////////////////////////////////////////////////////
+	if (newFileName == "") return;
+
+	// Calculate Date-Time Report
+	time_t rawtime;
+	struct tm * timeinfo;  time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	//////////////////////////////////////////////////////////////////////////
+	CreateCSVFile(newFileName);
+
+	//////////////////////////////////////////////////////////////////////////
+	// Open Report File
+	wxString url = "file:///";
+	url = url + newFileName.GetCStr();
+	url.Replace("\\", "/");
+	albaLogMessage("Opening %f", url.ToAscii());
+	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
+	command = command + url;
+	wxExecute(command);
+}
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::CreateCSVFile(albaString file)
+{
+	bool firstAcces = !wxFileExists(file.GetCStr());
+
+	FILE * pFile;
+	pFile = fopen(file, "a+");
+
+	GetTags();
+
+	if (pFile != NULL)
+	{
+
+		if (firstAcces) // Header
+		{
+			// Patient Info
+			fprintf(pFile, "PZName;PZCode;PZBirthdate;PZCenter;PZExamDate;");
+
+			// Main scores 
+			fprintf(pFile, "NumberOfScalars;MeanScalar;MaxScalar;MinScalar;StandardDeviation;Median");
+		}
+
+		
+
+		// Patient Info
+		fprintf(pFile, "\n%s;%s;%s;%s;%s;", m_PatientName.GetCStr(), m_PatientCode.GetCStr(), m_PatientBirthdate.GetCStr(), m_PatientCenter.GetCStr(), m_PatientExamDate.GetCStr());
+
+		// Main scores 
+		fprintf(pFile, "%s;%s;%s;%s;%s;%s;", m_NumberOfScalarsString.GetCStr(), m_MeanScalarString.GetCStr(), m_MaxScalarString.GetCStr(), m_MinScalarString.GetCStr(), m_StandardDeviationString.GetCStr(), m_MedianString.GetCStr());
+
+		
+		fclose(pFile);
+	}
+	else
+	{
+		albaErrorMessage("Cannot open CSV file, it can be opened by an another application.\nPlease close the application or select another file.");
+	}
+}
+
+void albaOpVOIDensity::GetTags()
+{
+	// Patient Name 
+	albaTagArray * tagArray = m_Input->GetTagArray();
+	albaTagItem *tag = tagArray->GetTag("PatientsName");
+
+	if (tag)
+	{
+		albaString tmp;
+		tag->GetValueAsSingleString(tmp);
+		wxString tmp2 = tmp.GetCStr();
+
+		tmp2.Replace("(\"", "");
+		tmp2.Replace("\")", "");
+		tmp2.Replace("\"", "");
+		tmp2.Replace("^", " ");
+		tmp2.Replace("_", " ");
+
+		m_PatientName = tmp2;
+	}
+
+	// Patient Code
+	tag = tagArray->GetTag("PatientID");
+
+	if (tag)
+	{
+		albaString tmp;
+		tag->GetValueAsSingleString(tmp);
+		wxString tmp2 = tmp.GetCStr();
+
+		tmp2.Replace("(\"", "");
+		tmp2.Replace("\")", "");
+		tmp2.Replace("\"", "");
+		tmp2.Replace("^", " ");
+		tmp2.Replace("_", " ");
+
+		m_PatientCode = tmp2;
+	}
+
+	// Patients BirthDate
+	tag = tagArray->GetTag("PatientsBirthDate");
+
+	if (tag)
+	{
+		albaString tmp;
+		tag->GetValueAsSingleString(tmp);
+		wxString tmp2 = tmp.GetCStr();
+
+		tmp2.Replace("(\"", "");
+		tmp2.Replace("\")", "");
+		tmp2.Replace("\"", "");
+		tmp2.Replace("^", " ");
+		tmp2.Replace("_", " ");
+
+		m_PatientBirthdate = "" + tmp2.SubString(6, 7) + "-" + tmp2.SubString(4, 5) + "-" + tmp2.SubString(0, 3);
+	}
+
+	// Center
+	tag = tagArray->GetTag("InstitutionName");
+
+	if (tag)
+	{
+		albaString tmp;
+		tag->GetValueAsSingleString(tmp);
+		wxString tmp2 = tmp.GetCStr();
+
+		tmp2.Replace("(\"", "");
+		tmp2.Replace("\")", "");
+		tmp2.Replace("\"", "");
+		tmp2.Replace("^", " ");
+		tmp2.Replace("_", " ");
+
+		m_PatientCenter = tmp2;
+	}
+
+	// Exam date
+	tag = tagArray->GetTag("AcquisitionDate");
+
+	if (tag)
+	{
+		albaString tmp;
+		tag->GetValueAsSingleString(tmp);
+		wxString tmp2 = tmp.GetCStr();
+
+		tmp2.Replace("(\"", "");
+		tmp2.Replace("\")", "");
+		tmp2.Replace("\"", "");
+		tmp2.Replace("^", " ");
+		tmp2.Replace("_", " ");
+
+		m_PatientExamDate = "" + tmp2.SubString(6, 7) + "-" + tmp2.SubString(4, 5) + "-" + tmp2.SubString(0, 3);
+	}
 }
