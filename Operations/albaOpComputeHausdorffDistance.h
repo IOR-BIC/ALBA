@@ -54,6 +54,8 @@ public:
   /** Precess events coming from other objects */
   /*virtual*/ void OnEvent(albaEventBase *alba_event);
 
+	void SetSurfaceInput1(albaVME * vme);
+
   /** RTTI macro */
   albaTypeMacro(albaOpComputeHausdorffDistance, albaOp);
 

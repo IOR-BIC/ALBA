@@ -114,9 +114,9 @@ albaOp *albaOpComputeHausdorffDistance::Copy()
 //----------------------------------------------------------------------------
 void albaOpComputeHausdorffDistance::OpRun()   
 {
-  //m_SurfaceInput = albaVMESurface::SafeDownCast(m_Input);
+  albaVME *vme = albaVMESurface::SafeDownCast(m_Input);
 
-  //m_SurfaceInput->Update();
+	SetSurfaceInput1(vme);
 
   CreateGui();
 }
@@ -192,14 +192,8 @@ void albaOpComputeHausdorffDistance::OnEvent(albaEventBase *alba_event)
         albaEventMacro(e);
         albaVME *vme = (albaVME *)e.GetVme();
 
-        if(vme)
-        {
-          m_SurfaceInput1 = albaVMESurface::SafeDownCast(vme);
-          m_VMEName1->Copy(vme->GetName());
-          if(m_SurfaceInput1 && m_SurfaceInput2)
-            m_Gui->Enable(ID_OP_OK, true);
-          m_Gui->Update();
-        }
+				SetSurfaceInput1(vme);
+
       }
       break;
     case ID_SELECT_SURFACE2:
@@ -272,6 +266,24 @@ void albaOpComputeHausdorffDistance::OnEvent(albaEventBase *alba_event)
     }
   }
 }
+
+//----------------------------------------------------------------------------
+void albaOpComputeHausdorffDistance::SetSurfaceInput1(albaVME * vme)
+{
+	albaVMESurface* surfVME = albaVMESurface::SafeDownCast(vme);
+	if (surfVME)
+	{
+		m_SurfaceInput1 = surfVME;
+		m_VMEName1->Copy(vme->GetName());
+		if (m_Gui)
+		{
+			if (m_SurfaceInput1 && m_SurfaceInput2)
+				m_Gui->Enable(ID_OP_OK, true);
+			m_Gui->Update();
+		}
+	}
+}
+
 //----------------------------------------------------------------------------
 void albaOpComputeHausdorffDistance::OpStop(int result)
 {
@@ -344,8 +356,15 @@ int albaOpComputeHausdorffDistance::ComputeDistance()
   m_SurfaceOutput->SetDataByDetaching(outputData, 0);
   m_SurfaceOutput->Modified();
 
-  m_SurfaceOutput->SetName("Hausdorff Distance Output");
-  m_SurfaceOutput->ReparentTo(m_Input);
+	albaString outName;
+	outName.Printf("H. dist [%s to %s]", m_VMEName1->GetCStr(), m_VMEName2->GetCStr());
+  m_SurfaceOutput->SetName(outName.GetCStr());
+	
+	if (m_Input->GetRoot()->FindInTreeById(m_SurfaceInput1->GetId()))
+		m_SurfaceOutput->ReparentTo(m_SurfaceInput1);
+	else
+		m_SurfaceOutput->ReparentTo(m_Input);
+
   m_SurfaceOutput->Update();
 
   lutPreset(14, m_SurfaceOutput->GetMaterial()->m_ColorLut);
