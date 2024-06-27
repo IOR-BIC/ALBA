@@ -1881,13 +1881,12 @@ void albaVME::OnNodeAttachedToTree(albaEventBase *e)
 //-------------------------------------------------------------------------
 void albaVME::OnNodeDestroyed(albaEventBase *e)
 {
-	for (albaLinksMap::iterator it = m_Links.begin(); it != m_Links.end(); it++)
+	for (albaLinksMap::iterator it = m_Links.begin(); it != m_Links.end();)
 	{
 		if (it->second.m_Node == e->GetSender())
-		{
-			it->second.m_NodeId = -1; // reset Id value
-			it->second.m_Node = NULL; // set VME pointer to NULL
-		}
+			it = m_Links.erase(it);
+		else
+			++it;
 	}
 }
 

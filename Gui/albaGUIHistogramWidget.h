@@ -33,6 +33,7 @@
 class albaRWI;
 class vtkDataArray;
 class albaGUI;
+class albaVME;
 class vtkImageData;
 class albaGUIRangeSlider;
 class albaGUILutSlider;
@@ -64,13 +65,14 @@ public:
     ID_RANGE_SLICER,
     ID_SLIDER_THRESHOLD,
 		ID_EXPORT_DATA,
+		ID_EXPORT_STATS,
   };
 
 	/** Set a pre-calculated histogram, just visualize it instead calculate. It is used like a cache.*/
 	void SetHistogramData(vtkImageData *histogram);
 
   /** Input data from which generate histogram.*/
-  void SetData(vtkDataArray *data);
+	void SetData(vtkDataArray *data, albaVME *vme = NULL);
 
   /** Enable/disable logarithmic scale for histogram.*/
   void LogarithmicScale(int enable = 1);
@@ -136,10 +138,12 @@ protected:
   
   vtkLookupTable*m_Lut;
   vtkDataArray  *m_Data;
+	albaVME *m_VME;
   albaRWI        *m_HistogramRWI;
   vtkALBAHistogram  *m_Histogram;
 	vtkImageData  *m_HistogramData;
 private:
 	void ExportData();
+	void ExportStats();
 };
 #endif

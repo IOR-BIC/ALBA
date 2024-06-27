@@ -214,25 +214,32 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 			lineSourceB->GetPoint1(lineBPoint1);
 			lineSourceB->GetPoint2(lineBPoint2);
 
-			if (DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
+			double l1Dist = DistancePointToLine(point, linePoint1, linePoint2);
+			double l2Dist = DistancePointToLine(point, lineBPoint1, lineBPoint2);
+			if ((l1Dist < l2Dist) && (l1Dist < POINT_UPDATE_DISTANCE))
 			{
 				SelectMeasure(i);
 
 				if (m_Measure2DVector[i].Active)
 				{
-					if (vtkMath::Distance2BetweenPoints(linePoint2, point) < POINT_UPDATE_DISTANCE_2)
-					{
-						SetAction(ACTION_EDIT_MEASURE);
-						m_CurrMeasure = i;
-						m_CurrPoint = POINT_2;
-						m_PointsStackVectorR[i]->SetColor(m_Colors[COLOR_EDIT]);
-					}
-					else if (vtkMath::Distance2BetweenPoints(linePoint1, point) < POINT_UPDATE_DISTANCE_2)
+					double p1Dist = DistanceBetweenPoints(point,linePoint1);
+					double p2Dist = DistanceBetweenPoints(point,linePoint2);
+					double p1p2Dist = DistanceBetweenPoints(linePoint1, linePoint2);
+					double minDist = MIN(POINT_UPDATE_DISTANCE, (p1p2Dist/3.0));
+
+					if ((p1Dist < p2Dist) && (p1Dist <= minDist))
 					{
 						SetAction(ACTION_EDIT_MEASURE);
 						m_CurrMeasure = i;
 						m_CurrPoint = POINT_1;
 						m_PointsStackVectorL[i]->SetColor(m_Colors[COLOR_EDIT]);
+					}
+					else if (p2Dist <= minDist)
+					{
+						SetAction(ACTION_EDIT_MEASURE);
+						m_CurrMeasure = i;
+						m_CurrPoint = POINT_2;
+						m_PointsStackVectorR[i]->SetColor(m_Colors[COLOR_EDIT]);
 					}
 					else
 					{
@@ -250,7 +257,7 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 				Render();
 				return;
 			}
-			else if (DistancePointToLine(point, lineBPoint1, lineBPoint2) < POINT_UPDATE_DISTANCE)
+			else if (l2Dist < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
@@ -369,7 +376,7 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 
 		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
 
-		if (DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
+		if (DistancePointToLine(point1,oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
 		{
 			if (!hasSameRenderer) return;
 

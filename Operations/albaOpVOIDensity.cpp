@@ -622,7 +622,7 @@ void albaOpVOIDensity::CreateCSVFile(albaString file)
 		if (firstAcces) // Header
 		{
 			// Patient Info
-			fprintf(pFile, "PZName;PZCode;PZBirthdate;PZCenter;PZExamDate;");
+			fprintf(pFile, "PZName;PZCode;PZBirthdate;PZCenter;PZExamDate;SurfaceName;");
 
 			// Main scores 
 			fprintf(pFile, "NumberOfScalars;MeanScalar;MaxScalar;MinScalar;StandardDeviation;Median");
@@ -631,7 +631,7 @@ void albaOpVOIDensity::CreateCSVFile(albaString file)
 		
 
 		// Patient Info
-		fprintf(pFile, "\n%s;%s;%s;%s;%s;", m_PatientName.GetCStr(), m_PatientCode.GetCStr(), m_PatientBirthdate.GetCStr(), m_PatientCenter.GetCStr(), m_PatientExamDate.GetCStr());
+		fprintf(pFile, "\n%s;%s;%s;%s;%s;%s;", m_PatientName.GetCStr(), m_PatientCode.GetCStr(), m_PatientBirthdate.GetCStr(), m_PatientCenter.GetCStr(), m_PatientExamDate.GetCStr(), m_Surface->GetName());
 
 		// Main scores 
 		fprintf(pFile, "%s;%s;%s;%s;%s;%s;", m_NumberOfScalarsString.GetCStr(), m_MeanScalarString.GetCStr(), m_MaxScalarString.GetCStr(), m_MinScalarString.GetCStr(), m_StandardDeviationString.GetCStr(), m_MedianString.GetCStr());

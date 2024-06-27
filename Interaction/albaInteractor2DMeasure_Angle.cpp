@@ -225,35 +225,43 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 			if (m_Renderer != pointStackVector->GetRenderer())
 				continue;
 
-			double pointO[3], pointA[3], pointB[3];
+			double point1[3], point2[3], point3[3];
 
 			vtkPointSource* pointSourceO = (vtkPointSource*)m_PointsStackVectorOri[i]->GetSourceAlgorithm();
 			vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[i]->GetSourceAlgorithm();
 			vtkPointSource* pointSourceB = (vtkPointSource*)m_PointsStackVectorB[i]->GetSourceAlgorithm();
 
-			pointSourceO->GetCenter(pointO);
-			pointSourceA->GetCenter(pointA);
-			pointSourceB->GetCenter(pointB);
+			pointSourceO->GetCenter(point1);
+			pointSourceA->GetCenter(point2);
+			pointSourceB->GetCenter(point3);
 
-			if (DistancePointToLine(point, pointO, pointA) < POINT_UPDATE_DISTANCE)
+
+			double l1Dist = DistancePointToLine(point, point1, point2);
+			double l2Dist = DistancePointToLine(point, point1, point3);
+			if ((l1Dist < l2Dist) && (l1Dist < POINT_UPDATE_DISTANCE))
 			{
 				SelectMeasure(i);
 
 				if (m_Measure2DVector[i].Active)
 				{
-					if (vtkMath::Distance2BetweenPoints(pointA, point) < POINT_UPDATE_DISTANCE_2)
-					{
-						SetAction(ACTION_EDIT_MEASURE);
-						m_CurrMeasure = i;
-						m_CurrPoint = POINT_2;
-						m_PointsStackVectorA[i]->SetColor(m_Colors[COLOR_EDIT]);
-					}
-					else if (vtkMath::Distance2BetweenPoints(pointO, point) < POINT_UPDATE_DISTANCE_2)
+					double p1Dist = DistanceBetweenPoints(point, point1);
+					double p2Dist = DistanceBetweenPoints(point, point2);
+					double p1p2Dist = DistanceBetweenPoints(point1, point2);
+					double minDist = MIN(POINT_UPDATE_DISTANCE, (p1p2Dist / 3.0));
+
+					if ((p1Dist < p2Dist) && (p1Dist <= minDist))
 					{
 						SetAction(ACTION_EDIT_MEASURE);
 						m_CurrMeasure = i;
 						m_CurrPoint = POINT_1;
 						m_PointsStackVectorOri[i]->SetColor(m_Colors[COLOR_EDIT]);
+					}
+					else if ((p2Dist <= minDist)) 
+					{
+						SetAction(ACTION_EDIT_MEASURE);
+						m_CurrMeasure = i;
+						m_CurrPoint = POINT_2;
+						m_PointsStackVectorA[i]->SetColor(m_Colors[COLOR_EDIT]);
 					}
 					else
 					{
@@ -271,13 +279,13 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 				Render();
 				return;
 			}
-			else if (DistancePointToLine(point, pointO, pointB) < POINT_UPDATE_DISTANCE)
+			else if (l2Dist < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
 				if (m_Measure2DVector[i].Active)
 				{
-					if (vtkMath::Distance2BetweenPoints(pointB, point) < POINT_UPDATE_DISTANCE_2)
+					if (vtkMath::Distance2BetweenPoints(point3, point) < POINT_UPDATE_DISTANCE_2)
 					{
 						SetAction(ACTION_EDIT_MEASURE);
 						m_CurrMeasure = i;
