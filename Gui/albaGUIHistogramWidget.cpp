@@ -356,7 +356,15 @@ void albaGUIHistogramWidget::ExportData()
 		fclose(outFile);
 	}
 
-
+	//////////////////////////////////////////////////////////////////////////
+	// Open Report File
+	wxString url = "file:///";
+	url = url + f;
+	url.Replace("\\", "/");
+	albaLogMessage("Opening %f", url.ToAscii());
+	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
+	command = command + url;
+	wxExecute(command);
 }
 
 //----------------------------------------------------------------------------
@@ -380,7 +388,7 @@ void albaGUIHistogramWidget::ExportStats()
 
 		if (firstAcces) // Header
 		{
-			printf("VME Name;Scalar Name;Mean;Min;Max;STD Error;");
+			fprintf(pFile,"VME Name;Scalar Name;Mean;Min;Max;STD Error;");
 		}
 
 		albaString vmeName = m_VME ? m_VME->GetName() : "";
@@ -414,6 +422,16 @@ void albaGUIHistogramWidget::ExportStats()
 		
 		fclose(pFile);
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	// Open Report File
+	wxString url = "file:///";
+	url = url + f;
+	url.Replace("\\", "/");
+	albaLogMessage("Opening %f", url.ToAscii());
+	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
+	command = command + url;
+	wxExecute(command);
 }
 
 //----------------------------------------------------------------------------

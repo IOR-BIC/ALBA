@@ -114,9 +114,7 @@ albaOp *albaOpComputeHausdorffDistance::Copy()
 //----------------------------------------------------------------------------
 void albaOpComputeHausdorffDistance::OpRun()   
 {
-  albaVME *vme = albaVMESurface::SafeDownCast(m_Input);
-
-	SetSurfaceInput1(vme);
+	SetSurfaceInput1(m_Input);
 
   CreateGui();
 }
@@ -134,10 +132,10 @@ void albaOpComputeHausdorffDistance::CreateGui()
   m_Gui->Label("Surface 1", true);
   wxString choices[2];
   choices[0] = "Select a Surface";
-  choices[1] = "Import a STL file";
+  choices[1] = "Import a STL";
   m_Gui->Radio(ID_VME_OR_STL1,"", &m_VmeOrSTL1, 2, choices, 2);
   m_Gui->Button(ID_SELECT_SURFACE1, m_VMEName1,"Select", "");
-  m_Gui->FileOpen(ID_STL1, "Import STL", m_FilenameSTL1);
+  m_Gui->FileOpen(ID_STL1, "File:", m_FilenameSTL1);
 
   m_Gui->Enable(ID_STL1, false);
   //////////////////////////////////////////////////////////////////////////
@@ -148,7 +146,7 @@ void albaOpComputeHausdorffDistance::CreateGui()
   m_Gui->Label("Surface 2", true);
   m_Gui->Radio(ID_VME_OR_STL2,"", &m_VmeOrSTL2, 2, choices, 2);
   m_Gui->Button(ID_SELECT_SURFACE2, m_VMEName2, "Select","");
-  m_Gui->FileOpen(ID_STL2, "Import STL", m_FilenameSTL2);
+  m_Gui->FileOpen(ID_STL2, "File:", m_FilenameSTL2);
 
   m_Gui->Enable(ID_STL2, false);
   //////////////////////////////////////////////////////////////////////////
@@ -188,8 +186,8 @@ void albaOpComputeHausdorffDistance::OnEvent(albaEventBase *alba_event)
         albaString title = albaString("Select a surface:");
         albaEvent e(this,VME_CHOOSE);
         e.SetString(&title);
-        e.SetArg((long)(&albaOpComputeHausdorffDistance::SurfaceAccept)); // accept only albaVMESurface
-        albaEventMacro(e);
+				e.SetPointer(&SurfaceAccept);
+				albaEventMacro(e);
         albaVME *vme = (albaVME *)e.GetVme();
 
 				SetSurfaceInput1(vme);
@@ -201,13 +199,13 @@ void albaOpComputeHausdorffDistance::OnEvent(albaEventBase *alba_event)
         albaString title = albaString("Select a surface:");
         albaEvent e(this,VME_CHOOSE);
         e.SetString(&title);
-        e.SetArg((long)(&albaOpComputeHausdorffDistance::SurfaceAccept)); // accept only albaVMESurface
+        e.SetPointer(&SurfaceAccept); 
         albaEventMacro(e);
         albaVME *vme = (albaVME *)e.GetVme();
 
         if(vme)
         {
-          m_SurfaceInput2 = albaVMESurface::SafeDownCast(vme);
+          m_SurfaceInput2 = vme;
           m_VMEName2->Copy(vme->GetName());
           if(m_SurfaceInput1 && m_SurfaceInput2)
             m_Gui->Enable(ID_OP_OK, true);
@@ -270,10 +268,9 @@ void albaOpComputeHausdorffDistance::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 void albaOpComputeHausdorffDistance::SetSurfaceInput1(albaVME * vme)
 {
-	albaVMESurface* surfVME = albaVMESurface::SafeDownCast(vme);
-	if (surfVME)
+	if (SurfaceAccept(vme))
 	{
-		m_SurfaceInput1 = surfVME;
+		m_SurfaceInput1 = vme;
 		m_VMEName1->Copy(vme->GetName());
 		if (m_Gui)
 		{
@@ -299,6 +296,13 @@ void albaOpComputeHausdorffDistance::OpUndo()
     m_SurfaceOutput->ReparentTo(NULL);
   }
 }
+
+//----------------------------------------------------------------------------
+bool albaOpComputeHausdorffDistance::SurfaceAccept(albaVME* node)
+{
+	return(node && node->GetOutput() && vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData()));
+}
+
 //----------------------------------------------------------------------------
 void albaOpComputeHausdorffDistance::OpDo()
 {
@@ -310,6 +314,7 @@ void albaOpComputeHausdorffDistance::OpDo()
   if (m_SurfaceOutput != NULL)
   {
     m_SurfaceOutput->ReparentTo(m_Input);
+		m_SurfaceOutput->SetAbsMatrix(albaMatrix(),m_SurfaceInput1->GetMTime());
   }
 }
 
@@ -318,10 +323,10 @@ void albaOpComputeHausdorffDistance::OpDo()
 //----------------------------------------------------------------------------
 int albaOpComputeHausdorffDistance::ComputeDistance()
 {
-  m_SurfaceInput1->GetSurfaceOutput()->Update();
-  m_SurfaceInput2->GetSurfaceOutput()->Update();
-  vtkPolyData *inputData1 = (vtkPolyData *)(m_SurfaceInput1->GetSurfaceOutput()->GetVTKData());
-  vtkPolyData *inputData2 = (vtkPolyData *)(m_SurfaceInput2->GetSurfaceOutput()->GetVTKData());
+  m_SurfaceInput1->GetOutput()->Update();
+  m_SurfaceInput2->GetOutput()->Update();
+  vtkPolyData *inputData1 = vtkPolyData::SafeDownCast(m_SurfaceInput1->GetOutput()->GetVTKData());
+  vtkPolyData *inputData2 = vtkPolyData::SafeDownCast(m_SurfaceInput2->GetOutput()->GetVTKData());
 
 	vtkALBASmartPointer<vtkTransform> input1Tra, input2Tra;
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> input1TraFilter, input2TraFilter;

@@ -70,7 +70,7 @@ public:
   /** Makes the undo for the operation. */
   /*virtual*/ void OpUndo();
 
-  static bool SurfaceAccept(albaVME* node) { return(node != NULL && node->IsA("albaVMESurface"));};
+  static bool SurfaceAccept(albaVME* node);;
 
 protected:
 
@@ -93,8 +93,8 @@ protected:
 
   int m_VmeOrSTL1, m_VmeOrSTL2;
 
-  albaVMESurface *m_SurfaceInput1;
-  albaVMESurface *m_SurfaceInput2;
+  albaVME *m_SurfaceInput1;
+  albaVME *m_SurfaceInput2;
   albaVMESurface *m_SurfaceOutput;
 
   albaOpImporterSTL *m_STLImporter;
