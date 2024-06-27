@@ -200,24 +200,29 @@ void albaInteractor2DMeasure_MidPoint::FindAndHighlight(double * point)
 			vtkLineSource* lineSource = (vtkLineSource*)lineStackVector->GetSource();
 			lineSource->GetPoint1(linePoint1);
 			lineSource->GetPoint2(linePoint2);
-
+			
 			if (DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
 			{
 				SelectMeasure(i);
 
-				if (vtkMath::Distance2BetweenPoints(linePoint2, point) < POINT_UPDATE_DISTANCE_2)
-				{
-					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
-					m_CurrPoint = POINT_2;
-					m_PointsStackVectorR[i]->SetColor(m_Colors[COLOR_EDIT]);
-				}
-				else if (vtkMath::Distance2BetweenPoints(linePoint1, point) < POINT_UPDATE_DISTANCE_2)
+				double p1Dist = DistanceBetweenPoints(point,linePoint1);
+				double p2Dist = DistanceBetweenPoints(point,linePoint2);
+				double p1p2Dist = DistanceBetweenPoints(linePoint1, linePoint2);
+				double minDist = MIN(POINT_UPDATE_DISTANCE, (p1p2Dist/3.0));
+
+				if ((p1Dist < p2Dist) && (p1Dist <= minDist))
 				{
 					SetAction(ACTION_EDIT_MEASURE);
 					m_CurrMeasure = i;
 					m_CurrPoint = POINT_1;
 					m_PointsStackVectorL[i]->SetColor(m_Colors[COLOR_EDIT]);
+				}
+				else if ((p2Dist <= minDist))
+				{
+					SetAction(ACTION_EDIT_MEASURE);
+					m_CurrMeasure = i;
+					m_CurrPoint = POINT_2;
+					m_PointsStackVectorR[i]->SetColor(m_Colors[COLOR_EDIT]);
 				}
 				else
 				{
