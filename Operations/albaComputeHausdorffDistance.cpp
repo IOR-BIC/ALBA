@@ -194,7 +194,7 @@ void albaComputeHausdorffDistance::ComputeHausdorffDistance()
   double dist = 0, prevDist = 0;
   double vertex[3],prevVertex[3];
 
-  int step = totVertex/(100-(FILTER_PERC + GRID_PERC));
+	int step = MAX(1, totVertex / (100 - (FILTER_PERC + GRID_PERC)));
   prevVertex[0] = prevVertex[1] = prevVertex[2] = 0.0;
   for(int vertexID=0; vertexID<totVertex; vertexID++)
   {

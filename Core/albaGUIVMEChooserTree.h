@@ -58,6 +58,8 @@ protected:
   /** Return the status of the node according to the vme visibility. */
   int GetVmeStatus(albaVME *node);
 
+	void VmeUpdateIcon(albaVME *vme);
+
   void InitializeImageList();
 
   /** clone in tree a subtree of source_item */

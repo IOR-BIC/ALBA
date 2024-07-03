@@ -406,10 +406,10 @@ void albaGUICheckTree::InitializeImageList()
 			else
 			{
 				missingData = vmeico = albaPictureFactory::GetPictureFactory()->GetVmePic(name);
-				missingData=albaWhiteFade(missingData,0.75);
+				missingData = albaWhiteFade(missingData, 0.75);
+				vmeico = albaBlueScale(vmeico);
 			}
 
-			vmeico=albaBlueScale(vmeico);
 			vmeico = MergeIcons(state_ico[s],vmeico);
 			imgs->Add(vmeico);
 
