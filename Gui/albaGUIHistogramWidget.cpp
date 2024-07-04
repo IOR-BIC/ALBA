@@ -388,7 +388,7 @@ void albaGUIHistogramWidget::ExportStats()
 
 		if (firstAcces) // Header
 		{
-			fprintf(pFile,"VME Name;Scalar Name;Mean;Min;Max;STD Error;");
+			fprintf(pFile,"VME Name;Scalar Name;Mean;Min;Max;STD Error;\n");
 		}
 
 		albaString vmeName = m_VME ? m_VME->GetName() : "";
@@ -418,7 +418,7 @@ void albaGUIHistogramWidget::ExportStats()
 
 		double stdDev = sqrt(errSq / (double)nValues);
 
-		fprintf(pFile, "%s;%s;%.2f;%.2f;%.2f;%.2f;", vmeName.GetCStr(), m_Data->GetName(), mean, min, max, stdDev);
+		fprintf(pFile, "%s;%s;%.2f;%.2f;%.2f;%.2f;\n", vmeName.GetCStr(), m_Data->GetName(), mean, min, max, stdDev);
 		
 		fclose(pFile);
 	}
