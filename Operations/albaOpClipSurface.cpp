@@ -541,13 +541,20 @@ void albaOpClipSurface::OpDo()
 	albaString name;
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_output;
-	transform_output->SetTransform((vtkAbstractTransform *)m_Input->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
-	transform_output->SetInput(m_ResultPolyData);
-	transform_output->Update();
+	if (!m_ClipBoundBox)
+	{
+		transform_output->SetTransform((vtkAbstractTransform *)m_Input->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
+		transform_output->SetInput(m_ResultPolyData);
+		transform_output->Update();
+	}
 
 	name.Printf("Clipped %s", m_Input->GetName());
 	albaNEW(m_ClippedVME);
-	m_ClippedVME->SetData(transform_output->GetOutput(), m_Input->GetTimeStamp());
+	if(m_ClipBoundBox)
+		m_ClippedVME->SetData(transform_output->GetOutput(), m_Input->GetTimeStamp());
+	else 
+		m_ClippedVME->SetData(m_ResultPolyData, m_Input->GetTimeStamp());
+
 	m_ClippedVME->SetName(name);
 	m_ClippedVME->Update();
 	m_ClippedVME->ReparentTo(m_Input);
@@ -557,13 +564,20 @@ void albaOpClipSurface::OpDo()
 	if(m_GenerateClippedOutput)
 	{
 		vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_clipped_output;
-		transform_clipped_output->SetTransform((vtkAbstractTransform *)m_Input->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
-		transform_clipped_output->SetInput(m_ClippedPolyData);
-		transform_clipped_output->Update();
+		if (!m_ClipBoundBox)
+		{
+			transform_clipped_output->SetTransform((vtkAbstractTransform *)m_Input->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
+			transform_clipped_output->SetInput(m_ClippedPolyData);
+			transform_clipped_output->Update();
+		}
 
 		name.Printf("Reverse clipped %s", m_Input->GetName());
 		albaNEW(m_ReverseClippedVME);
-		m_ReverseClippedVME->SetData(transform_clipped_output->GetOutput(),m_Input->GetTimeStamp());
+		if(m_ClipBoundBox)
+			m_ReverseClippedVME->SetData(transform_clipped_output->GetOutput(),m_Input->GetTimeStamp());
+		else
+			m_ReverseClippedVME->SetData(m_ClippedPolyData, m_Input->GetTimeStamp());
+
 		m_ReverseClippedVME->SetName(name);
 		m_ReverseClippedVME->Update();
 
