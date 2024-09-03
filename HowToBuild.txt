@@ -1,7 +1,22 @@
-ALBA is continously building on
+How to Build ALBA
+Prerequisites
+To build ALBA, you need the following software installed:
 
+Operating System: Windows 7 or later (64-bit).
+Compiler: Visual Studio 2015 (64-bit).
+Build System: CMake 3.10 (64-bit).
 
+Build Instructions
+Clone the Repository:
+git clone https://github.com/IOR-BIC/ALBA.git
 
-CMake version on the build server is 2.8.3.
+Open CMake (64-bit) and set the source code directory to the cloned repository.
+Set the build directory to a preferred location.
+Configure the project for Visual Studio 2015 (64-bit).
+Click "Generate" to create the Visual Studio solution.
+Build the Project:
 
-On Windows Vista and Windows 7 you must run CMake as Administrator in order for the Configure process to succeed.
+Open the generated .sln file in Visual Studio 2015.
+Select the desired build configuration (e.g., Debug or Release).
+Build the solution.
+

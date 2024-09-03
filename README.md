@@ -7,7 +7,7 @@ ALBA is a software library designed to support the development of biomedical app
 ## Features
 - **Modular Architecture**: Easily extensible modules for different biomedical functionalities.
 - **High Performance**: Optimized for handling large datasets.
--- **Community Driven**: Contributions and collaboration from the open-source community.
+- **Community Driven**: Contributions and collaboration from the open-source community.
 
 ## Installation
 To install ALBA, follow these steps:
@@ -40,7 +40,7 @@ We encourage community contributions! To contribute:
 Ensure that your code complies with the project's coding standards.
 
 ## License
-ALBA is released under the [MIT License](./LICENSE), allowing for wide usage and modification.
+ALBA is released under the [LGPL License](./LICENSE.txt), allowing for wide usage and modification.
 
 ## Support
 If you encounter any issues or have questions, please open an issue in the repository or reach out to the maintainers.
