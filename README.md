@@ -40,7 +40,7 @@ We encourage community contributions! To contribute:
 Ensure that your code complies with the project's coding standards.
 
 ## License
-ALBA is released under the [LGPL License](./LICENSE.txt), allowing for wide usage and modification.
+ALBA is released under the [LGPL License](./license.txt), allowing for wide usage and modification.
 
 ## Support
 If you encounter any issues or have questions, please open an issue in the repository or reach out to the maintainers.
