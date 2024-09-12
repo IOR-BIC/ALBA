@@ -129,9 +129,6 @@ public:
   /** Enable/Disable min button */
   void EnableMinButton(bool enable);
 
-  /** */
-  void DoubleLeftButton(int id);
-
 protected:  
   /** Update slider's cursors. */
   void OnSize(wxSizeEvent &event);
