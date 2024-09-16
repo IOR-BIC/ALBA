@@ -347,7 +347,7 @@ void albaOpImporterImage::BuildVolume()
 
 		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
 		extractComponents->SetInput(r->GetOutput());
-		extractComponents->SetComponents(0, 1, 2); // RGB channels
+		extractComponents->SetComponents(0); //only R channel
 		extractComponents->Update();
     
     m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(),m_Input->GetTimeStamp());
@@ -373,7 +373,12 @@ void albaOpImporterImage::BuildVolume()
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
     
-    m_ImportedImageAsVolume->SetData(r->GetOutput(),m_Input->GetTimeStamp());
+		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
+		extractComponents->SetInput(r->GetOutput());
+		extractComponents->SetComponents(0); //only R channel
+		extractComponents->Update();
+
+		m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(), m_Input->GetTimeStamp());
     
     r->Delete();
 	}
@@ -397,27 +402,12 @@ void albaOpImporterImage::BuildVolume()
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
 
-		vtkImageData *impOut=r->GetOutput();
+		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
+		extractComponents->SetInput(r->GetOutput());
+		extractComponents->SetComponents(0); //only R channel
+		extractComponents->Update();
 
-		vtkImageData *outNormal;
-		vtkNEW(outNormal);
-		outNormal->SetDimensions(impOut->GetDimensions());
-		outNormal->SetSpacing(impOut->GetSpacing());
-		outNormal->SetOrigin(impOut->GetOrigin());
-		outNormal->SetScalarTypeToUnsignedChar();
-		vtkUnsignedCharArray* scalars;
-		vtkNEW(scalars);
-
-		vtkDataArray* impScalars=impOut->GetPointData()->GetScalars();
-
-		int numberOfTuples = impScalars->GetSize()/ impScalars->GetNumberOfComponents();
-		scalars->SetNumberOfValues(numberOfTuples);
-		for (int i = 0; i < numberOfTuples; i++)
-			scalars->SetTuple1(i, impScalars->GetTuple(i)[0]);
-		
-		outNormal->GetPointData()->SetScalars(scalars);
-
-		m_ImportedImageAsVolume->SetData(outNormal, m_Input->GetTimeStamp());
+		m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(), m_Input->GetTimeStamp());
 		    
     r->Delete();
 	}
@@ -440,7 +430,12 @@ void albaOpImporterImage::BuildVolume()
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
     
-    m_ImportedImageAsVolume->SetData(r->GetOutput(),m_Input->GetTimeStamp());
+		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
+		extractComponents->SetInput(r->GetOutput());
+		extractComponents->SetComponents(0); //only R channel
+		extractComponents->Update();
+
+		m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(), m_Input->GetTimeStamp());
 
     r->Delete();
 	}
