@@ -571,8 +571,8 @@ void albaOpTransform::SelectRefSys()
 			albaMatrix mtr;
 			mtr.CopyRotation(*m_RelativeRefSysVME->GetOutput()->GetAbsMatrix());
 			albaTransform tra;
-			tra.SetMatrix(mtr);
 			tra.Translate((bounds[0] + bounds[1]) / 2.0, (bounds[2] + bounds[3]) / 2.0, (bounds[4] + bounds[5]) / 2.0, false);
+			tra.Concatenate(mtr, true);
 			tra.Update();
 
 			m_RelativeCenterRefSysVME->SetAbsMatrix(tra.GetMatrix());
@@ -658,7 +658,14 @@ void albaOpTransform::UpdateReferenceSystem()
 	{
 		double bounds[6];
 		m_RelativeRefSysVME->GetOutput()->GetVMEBounds(bounds);
-		m_RelativeCenterRefSysVME->SetAbsPose((bounds[0] + bounds[1]) / 2.0, (bounds[2] + bounds[3]) / 2.0, (bounds[4] + bounds[5]) / 2.0, 0, 0, 0, m_CurrentTime);
+		albaMatrix mtr;
+		mtr.CopyRotation(*m_RelativeRefSysVME->GetOutput()->GetAbsMatrix());
+		albaTransform tra;
+		tra.Translate((bounds[0] + bounds[1]) / 2.0, (bounds[2] + bounds[3]) / 2.0, (bounds[4] + bounds[5]) / 2.0, false);
+		tra.Concatenate(mtr, true);
+		tra.Update();
+
+		m_RelativeCenterRefSysVME->SetAbsMatrix(tra.GetMatrix());
 
 		SetRefSysVME(m_RelativeCenterRefSysVME);
 	}

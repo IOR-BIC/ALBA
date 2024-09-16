@@ -54,7 +54,14 @@ public:
   /** Precess events coming from other objects */
   /*virtual*/ void OnEvent(albaEventBase *alba_event);
 
+	albaVME *ChooseSurface();
+
 	void SetSurfaceInput1(albaVME * vme);
+
+	void SetSurfaceInput2(albaVME * vme);
+
+	/** Compute H. Distance. */
+	int ComputeDistance();
 
   /** RTTI macro */
   albaTypeMacro(albaOpComputeHausdorffDistance, albaOp);
@@ -70,15 +77,12 @@ public:
   /** Makes the undo for the operation. */
   /*virtual*/ void OpUndo();
 
-  static bool SurfaceAccept(albaVME* node);;
+  static bool SurfaceAccept(albaVME* node);
 
 protected:
 
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   /*virtual*/ void OpStop(int result);
-
-  /** Compute H. Distance. */
-  int ComputeDistance();
 
   /** Create the operation GUI. */
   void CreateGui();

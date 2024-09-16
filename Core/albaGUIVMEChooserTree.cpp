@@ -179,8 +179,10 @@ void albaGUIVMEChooserTree::InitializeImageList()
     for( int s=0; s<num_of_status; s++)
     {
       wxBitmap vmeico = albaPictureFactory::GetPictureFactory()->GetVmePic(name);
-      if(s==0) vmeico = albaWhiteFade(vmeico);
-			else vmeico = albaBlueScale(vmeico);
+      if(s==0) 
+				vmeico = albaWhiteFade(vmeico);
+			else 
+				vmeico = albaBlueScale(vmeico);
       imgs->Add(vmeico);
     }
   }
@@ -224,7 +226,14 @@ void albaGUIVMEChooserTree::OnSelectionChanged(wxTreeEvent& event)
 void albaGUIVMEChooserTree::OnIconClick(wxTreeItemId item)
 //----------------------------------------------------------------------------
 {
-// overrided albaGUICheckTree this version must do nothing
+	if (m_MultipleSelection == false)
+		return;
+	
+	albaVME* vme = (albaVME *)NodeFromItem(item);
+	VmeUpdateIcon(vme);
+
+	bool enable_ok = GetChoosedNode().size() > 0;
+  albaEventMacro(albaEvent(this, VME_SELECTED, enable_ok));
 }
 //----------------------------------------------------------------------------
 void albaGUIVMEChooserTree::ShowContextualMenu(wxMouseEvent& event)
@@ -287,4 +296,60 @@ void albaGUIVMEChooserTree::CloneSubTree(albaGUICheckTree *source_tree, wxTreeIt
   }
   albaGUITreeTableElement *el = new albaGUITreeTableElement( current_item );  
   m_NodeTable->Put(node, el);
+}
+
+//----------------------------------------------------------------------------
+void albaGUIVMEChooserTree::VmeUpdateIcon(albaVME *vme)
+{
+	int dataStatus = 1;
+	int icon_index;
+	int nodeSatus;
+
+	//When root VME is checked, all the sub-tree will be checked.
+	if (vme->IsA("albaVMERoot"))
+	{
+		bool checked = IsIconChecked(ItemFromNode((long)vme));
+		albaVMEIterator *iter = vme->NewIterator();
+		for (albaVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+		{
+			if (!checked)
+			{
+				nodeSatus = NODE_VISIBLE_ON * 2;
+				icon_index = ClassNameToIcon(node->GetTypeName()) + nodeSatus;
+				m_CheckedNode.push_back(node);
+			}
+			else
+			{
+				nodeSatus = NODE_VISIBLE_ON;
+				icon_index = ClassNameToIcon(node->GetTypeName()) + nodeSatus;
+				std::vector<albaVME *>::iterator found = std::find(m_CheckedNode.begin(), m_CheckedNode.end(), node);
+				if (found != m_CheckedNode.end())
+				{
+					m_CheckedNode.erase(found);
+				}
+			}
+			SetNodeIcon((long)node, icon_index);
+		}
+	}
+	else
+	{
+		bool checked = IsIconChecked(ItemFromNode((long)vme));
+		if (!checked)
+		{
+			nodeSatus = NODE_VISIBLE_ON * 2;
+			icon_index = ClassNameToIcon(vme->GetTypeName()) + nodeSatus;
+			m_CheckedNode.push_back(vme);
+		}
+		else
+		{
+			nodeSatus = NODE_VISIBLE_ON;
+			icon_index = ClassNameToIcon(vme->GetTypeName()) + nodeSatus;
+			std::vector<albaVME *>::iterator found = std::find(m_CheckedNode.begin(), m_CheckedNode.end(), vme);
+			if (found != m_CheckedNode.end())
+			{
+				m_CheckedNode.erase(found);
+			}
+		}
+		SetNodeIcon((long)vme, icon_index);
+	}
 }

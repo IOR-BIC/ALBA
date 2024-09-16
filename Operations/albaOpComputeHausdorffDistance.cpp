@@ -183,34 +183,12 @@ void albaOpComputeHausdorffDistance::OnEvent(albaEventBase *alba_event)
       break;
     case ID_SELECT_SURFACE1:
       {
-        albaString title = albaString("Select a surface:");
-        albaEvent e(this,VME_CHOOSE);
-        e.SetString(&title);
-				e.SetPointer(&SurfaceAccept);
-				albaEventMacro(e);
-        albaVME *vme = (albaVME *)e.GetVme();
-
-				SetSurfaceInput1(vme);
-
+				SetSurfaceInput1(ChooseSurface());
       }
       break;
     case ID_SELECT_SURFACE2:
       {
-        albaString title = albaString("Select a surface:");
-        albaEvent e(this,VME_CHOOSE);
-        e.SetString(&title);
-        e.SetPointer(&SurfaceAccept); 
-        albaEventMacro(e);
-        albaVME *vme = (albaVME *)e.GetVme();
-
-        if(vme)
-        {
-          m_SurfaceInput2 = vme;
-          m_VMEName2->Copy(vme->GetName());
-          if(m_SurfaceInput1 && m_SurfaceInput2)
-            m_Gui->Enable(ID_OP_OK, true);
-          m_Gui->Update();
-        }
+				SetSurfaceInput2(ChooseSurface());
       }
       break;
     case ID_STL1:
@@ -266,12 +244,40 @@ void albaOpComputeHausdorffDistance::OnEvent(albaEventBase *alba_event)
 }
 
 //----------------------------------------------------------------------------
+albaVME *albaOpComputeHausdorffDistance::ChooseSurface()
+{
+	albaString title = albaString("Select a surface:");
+	albaEvent e(this, VME_CHOOSE);
+	e.SetString(&title);
+	e.SetPointer(&SurfaceAccept);
+	albaEventMacro(e);
+	albaVME *vme = (albaVME *)e.GetVme();
+	return vme;
+}
+
+//----------------------------------------------------------------------------
 void albaOpComputeHausdorffDistance::SetSurfaceInput1(albaVME * vme)
 {
 	if (SurfaceAccept(vme))
 	{
 		m_SurfaceInput1 = vme;
 		m_VMEName1->Copy(vme->GetName());
+		if (m_Gui)
+		{
+			if (m_SurfaceInput1 && m_SurfaceInput2)
+				m_Gui->Enable(ID_OP_OK, true);
+			m_Gui->Update();
+		}
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaOpComputeHausdorffDistance::SetSurfaceInput2(albaVME * vme)
+{
+	if (vme)
+	{
+		m_SurfaceInput2 = vme;
+		m_VMEName2->Copy(vme->GetName());
 		if (m_Gui)
 		{
 			if (m_SurfaceInput1 && m_SurfaceInput2)
@@ -300,7 +306,7 @@ void albaOpComputeHausdorffDistance::OpUndo()
 //----------------------------------------------------------------------------
 bool albaOpComputeHausdorffDistance::SurfaceAccept(albaVME* node)
 {
-	return(node && node->GetOutput() && vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData()));
+	return(node && (node->IsA("albaVMESurface") || node->IsA("albaVMESurfaceParametric")));
 }
 
 //----------------------------------------------------------------------------
