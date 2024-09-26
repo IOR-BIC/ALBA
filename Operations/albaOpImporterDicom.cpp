@@ -1617,7 +1617,7 @@ void albaDicomSlice::GetDicomSpacing(gdcm::DataSet &dcmDataSet, double * dcmPixe
 	//Try to get Imager pixel spacing as spacing used on CR/Xray/DX calculated on front plane of the detector
 	else if (dcmDataSet.FindDataElement(TAG_ImagerPixelSpacing))
 	{
-		gdcm::Attribute ATTRIBUTE_PixelSpacing at;
+		gdcm::Attribute ATTRIBUTE_ImagerPixelSpacing at;
 		at.SetFromDataSet(dcmDataSet);
 
 		dcmPixelSpacing[0] = at.GetValue(0);
