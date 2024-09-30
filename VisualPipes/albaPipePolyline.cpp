@@ -583,6 +583,7 @@ void albaPipePolyline::SetRadius(double radius)
 	m_SphereRadius = radius;
 
 	m_Sphere->SetRadius(m_SphereRadius);
+	m_Tube->SetRadius(m_TubeRadius);
 	albaTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RADIUS");
 	item->SetValue(m_SphereRadius);
   item = m_Vme->GetTagArray()->GetTag("TUBE_RADIUS");
