@@ -184,7 +184,7 @@ public:
 	// Update and Draw All Measure
 	virtual void ReDrawAll() {};
 
-	void SetUpdateDistance(int dist/*Default = 4*/);
+	void SetUpdateDistance(double  dist);
 
 	/** Set Measure Action (None, Add, Edit, Move) and Update mouse Cursor */
 	void SetAction(MEASURE_ACTIONS action);
@@ -251,6 +251,7 @@ protected:
 	/// Utilities
 	bool IsInBound(double *pos);
 	void ScreenToWorld(double screen[2], double world[3]);
+	double PixelSizeInWorld();
 	void WorldToScreen(double world[3], double screen[2]);
 	
 	//vtkPointSource produces a random-distributed pointCloud, use this method to obtain a fixed position single point output
@@ -322,8 +323,8 @@ protected:
 	double m_LineWidth;
 	int m_TextSide;
 
-	int POINT_UPDATE_DISTANCE = 4;
-	int POINT_UPDATE_DISTANCE_2 = (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE);
+	double m_PointUpdateDist;
+	double m_PointUpdateDist2;
 
 private:
 

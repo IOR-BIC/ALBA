@@ -202,6 +202,8 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 
 	if (m_EditMeasureEnable)
 	{
+		SetUpdateDistance(PixelSizeInWorld()*4.0);
+
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
 			double linePoint1[3], linePoint2[3];
@@ -217,7 +219,7 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 
 			double l1Dist = DistancePointToLine(point, linePoint1, linePoint2);
 			double l2Dist = DistancePointToLine(point, lineBPoint1, lineBPoint2);
-			if ((l1Dist < l2Dist) && (l1Dist < POINT_UPDATE_DISTANCE))
+			if ((l1Dist < l2Dist) && (l1Dist < m_PointUpdateDist))
 			{
 				SelectMeasure(i);
 
@@ -226,7 +228,7 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 					double p1Dist = DistanceBetweenPoints(point,linePoint1);
 					double p2Dist = DistanceBetweenPoints(point,linePoint2);
 					double p1p2Dist = DistanceBetweenPoints(linePoint1, linePoint2);
-					double minDist = MIN(POINT_UPDATE_DISTANCE, (p1p2Dist/3.0));
+					double minDist = MIN(m_PointUpdateDist, (p1p2Dist/3.0));
 
 					if ((p1Dist < p2Dist) && (p1Dist <= minDist))
 					{
@@ -258,7 +260,7 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 				Render();
 				return;
 			}
-			else if (l2Dist < POINT_UPDATE_DISTANCE)
+			else if (l2Dist < m_PointUpdateDist)
 			{
 				SelectMeasure(i);
 
@@ -377,7 +379,7 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 
 		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
 
-		if (DistancePointToLine(point1,oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
+		if (DistancePointToLine(point1,oldPoint1, oldPoint2) < m_PointUpdateDist)
 		{
 			if (!hasSameRenderer) return;
 

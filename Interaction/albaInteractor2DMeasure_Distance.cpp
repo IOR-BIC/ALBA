@@ -192,6 +192,8 @@ void albaInteractor2DMeasure_Distance::FindAndHighlight(double * point)
 
 	if (m_EditMeasureEnable)
 	{
+		SetUpdateDistance(PixelSizeInWorld()*4.0);
+
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
 			albaActor2dStackHelper *lineStackVector = m_LineStackVector[i];
@@ -207,14 +209,14 @@ void albaInteractor2DMeasure_Distance::FindAndHighlight(double * point)
 			double dis = DistancePointToLine(point, linePoint1, linePoint2);
 			//albaLogMessage("Dist %f", dis);
 
-			if (DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
+			if (DistancePointToLine(point, linePoint1, linePoint2) < m_PointUpdateDist)
 			{
 				SelectMeasure(i);
 
 				double p1Dist = DistanceBetweenPoints(point,linePoint1);
 				double p2Dist = DistanceBetweenPoints(point,linePoint2);
 				double p1p2Dist = DistanceBetweenPoints(linePoint1, linePoint2);
-				double minDist = MIN(POINT_UPDATE_DISTANCE, (p1p2Dist/3.0));
+				double minDist = MIN(m_PointUpdateDist, (p1p2Dist/3.0));
 				
 				if ((p1Dist < p2Dist) && (p1Dist <= minDist))
 				{
@@ -330,7 +332,7 @@ void albaInteractor2DMeasure_Distance::AddMeasure(double *point1, double *point2
 
 		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
 
-		if (DistanceBetweenPoints(oldPoint1, oldPoint2)<POINT_UPDATE_DISTANCE)
+		if (DistanceBetweenPoints(oldPoint1, oldPoint2)<m_PointUpdateDist)
 		{
 			if (!hasSameRenderer) return;
 

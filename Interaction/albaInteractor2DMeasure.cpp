@@ -39,6 +39,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkRendererCollection.h"
 #include "vtkMath.h"
 #include "vtkLine.h"
+#include "albaVect3d.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractor2DMeasure)
@@ -197,17 +198,12 @@ void albaInteractor2DMeasure::Render()
 	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
 }
 
-//----------------------------------------------------------------------------
-void albaInteractor2DMeasure::SetCurrPlane(int plane)
-{
-	m_CurrPlane = plane;
-}
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::SetUpdateDistance(int dist)
+void albaInteractor2DMeasure::SetUpdateDistance(double dist)
 {
-	POINT_UPDATE_DISTANCE = dist;
-	POINT_UPDATE_DISTANCE_2 = (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE);
+	m_PointUpdateDist = dist;
+	m_PointUpdateDist2 = (dist * dist);
 }
 
 /// MOUSE EVENTS /////////////////////////////////////////////////////////////
@@ -566,7 +562,7 @@ void albaInteractor2DMeasure::SetAction(MEASURE_ACTIONS action)
 	{
 		// Set Mouse Cursor
 		wxCursor cursor = wxCursor(wxCURSOR_ARROW);
-
+		
 		switch (m_Action)
 		{
 		case ACTION_ADD_MEASURE:
@@ -705,11 +701,21 @@ void albaInteractor2DMeasure::ScreenToWorld(double screen[2], double world[3])
 	if (m_CurrPlane == 2) world[1] = 0;
 	else if (m_CurrPlane == 1) world[0] = 0;
 	else world[2] = 0;
-
-	m_Renderer->GetActiveCamera()->SetViewPlaneNormal(0, 0, -1);
-
-	//albaLogMessage("StoW (%f, %f) -> (%f, %f, %f, %f)", screen[X], screen[Y], wp[X], wp[Y], wp[Z], wp[3]);
 }
+
+//----------------------------------------------------------------------------
+double albaInteractor2DMeasure::PixelSizeInWorld()
+{
+	double p1[2] = { 0,0 };
+	double p2[2] = { 0,1 };
+	albaVect3d w1, w2;
+
+	ScreenToWorld(p1, w1.GetVect());
+	ScreenToWorld(p2, w2.GetVect());
+
+	return w1.Distance(w2);
+}
+
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure::WorldToScreen(double world[3], double screen[2])
 {

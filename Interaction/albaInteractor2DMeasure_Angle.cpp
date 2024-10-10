@@ -220,6 +220,8 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 
 	if (m_EditMeasureEnable)
 	{
+		SetUpdateDistance(PixelSizeInWorld()*4.0);
+
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
 			albaActor2dStackHelper *pointStackVector = m_PointsStackVectorOri[i];
@@ -239,7 +241,7 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 
 			double l1Dist = DistancePointToLine(point, point1, point2);
 			double l2Dist = DistancePointToLine(point, point1, point3);
-			if ((l1Dist < l2Dist) && (l1Dist < POINT_UPDATE_DISTANCE))
+			if ((l1Dist < l2Dist) && (l1Dist < m_PointUpdateDist))
 			{
 				SelectMeasure(i);
 
@@ -248,7 +250,7 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 					double p1Dist = DistanceBetweenPoints(point, point1);
 					double p2Dist = DistanceBetweenPoints(point, point2);
 					double p1p2Dist = DistanceBetweenPoints(point1, point2);
-					double minDist = MIN(POINT_UPDATE_DISTANCE, (p1p2Dist / 3.0));
+					double minDist = MIN(m_PointUpdateDist, (p1p2Dist / 3.0));
 
 					if ((p1Dist < p2Dist) && (p1Dist <= minDist))
 					{
@@ -280,13 +282,13 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 				Render();
 				return;
 			}
-			else if (l2Dist < POINT_UPDATE_DISTANCE)
+			else if (l2Dist < m_PointUpdateDist)
 			{
 				SelectMeasure(i);
 
 				if (m_Measure2DVector[i].Active)
 				{
-					if (vtkMath::Distance2BetweenPoints(point3, point) < POINT_UPDATE_DISTANCE_2)
+					if (vtkMath::Distance2BetweenPoints(point3, point) < m_PointUpdateDist2)
 					{
 						SetAction(ACTION_EDIT_MEASURE);
 						m_CurrMeasure = i;
@@ -422,7 +424,7 @@ void albaInteractor2DMeasure_Angle::AddMeasure(double *point1, double *point2, d
 
 		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
 
-		if (DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
+		if (DistanceBetweenPoints(oldPoint1, oldPoint2) < m_PointUpdateDist)
 		{
 			if (!hasSameRenderer) return;
 
@@ -430,12 +432,8 @@ void albaInteractor2DMeasure_Angle::AddMeasure(double *point1, double *point2, d
 			m_CurrPoint = POINT_2;
 			EditMeasure(index, point2);
 
-			if (m_AddModeCompleted == false)
-			{
-				//RemoveMeasure(GetMeasureCount() - 1);
-				m_AddModeCompleted = true;
-			}
-
+			m_AddModeCompleted = true;
+					
 			ActivateMeasure(-1, true);
 
 			return;

@@ -110,6 +110,8 @@ void albaInteractor2DMeasure_Point::FindAndHighlight(double *point)
 
 	if (m_EditMeasureEnable)
 	{
+		SetUpdateDistance(PixelSizeInWorld()*4.0);
+
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
 			albaActor2dStackHelper *pointsStackVector = m_PointsStackVector[i];
@@ -121,7 +123,7 @@ void albaInteractor2DMeasure_Point::FindAndHighlight(double *point)
 			vtkPointSource* pointSource = (vtkPointSource*)pointsStackVector->GetSource();
 			pointSource->GetCenter(tmpPoint);
 
-			if (DistanceBetweenPoints(point, tmpPoint) < POINT_UPDATE_DISTANCE)
+			if (DistanceBetweenPoints(point, tmpPoint) < m_PointUpdateDist)
 			{
 				m_CurrMeasure = i;
 

@@ -262,6 +262,8 @@ void albaInteractor2DMeasure_AngleLine::FindAndHighlight(double * point)
 
 	if (m_EditMeasureEnable)
 	{
+		SetUpdateDistance(PixelSizeInWorld()*4.0);
+
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
 			albaActor2dStackHelper *pointStackVectorA = m_PointsStackVectorA[i];
@@ -289,7 +291,7 @@ void albaInteractor2DMeasure_AngleLine::FindAndHighlight(double * point)
 
 			double l1Dist = DistancePointToLine(point, pointA, pointB);
 			double l2Dist = DistancePointToLine(point, pointC, pointD);
-			if ((l1Dist < l2Dist) && (l1Dist < POINT_UPDATE_DISTANCE))
+			if ((l1Dist < l2Dist) && (l1Dist < m_PointUpdateDist))
 			{
 				SelectMeasure(i);
 
@@ -298,7 +300,7 @@ void albaInteractor2DMeasure_AngleLine::FindAndHighlight(double * point)
 					double p1Dist = DistanceBetweenPoints(point, pointA);
 					double p2Dist = DistanceBetweenPoints(point, pointB);
 					double p1p2Dist = DistanceBetweenPoints(pointA, pointB);
-					double minDist = MIN(POINT_UPDATE_DISTANCE, (p1p2Dist / 3.0));
+					double minDist = MIN(m_PointUpdateDist, (p1p2Dist / 3.0));
 
 					if ((p1Dist < p2Dist) && (p1Dist <= minDist))
 					{
@@ -331,20 +333,20 @@ void albaInteractor2DMeasure_AngleLine::FindAndHighlight(double * point)
 				Render();
 				return;
 			}
-			else if (l2Dist < POINT_UPDATE_DISTANCE)
+			else if (l2Dist < m_PointUpdateDist)
 			{
 				SelectMeasure(i);
 
 				if (m_Measure2DVector[i].Active)
 				{
-					if (vtkMath::Distance2BetweenPoints(pointC, point) < POINT_UPDATE_DISTANCE_2)
+					if (vtkMath::Distance2BetweenPoints(pointC, point) < m_PointUpdateDist2)
 					{
 						SetAction(ACTION_EDIT_MEASURE);
 						m_CurrMeasure = i;
 						m_CurrPoint = POINT_3;
 						m_PointsStackVectorC[i]->SetColor(m_Colors[COLOR_EDIT]);
 					}
-					else if (vtkMath::Distance2BetweenPoints(pointD, point) < POINT_UPDATE_DISTANCE_2)
+					else if (vtkMath::Distance2BetweenPoints(pointD, point) < m_PointUpdateDist2)
 					{
 						SetAction(ACTION_EDIT_MEASURE);
 						m_CurrMeasure = i;
@@ -474,7 +476,7 @@ void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point
 
 		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
 
-		if (DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
+		if (DistanceBetweenPoints(oldPoint1, oldPoint2) < m_PointUpdateDist)
 		{
 			if (!hasSameRenderer) return;
 
@@ -494,7 +496,7 @@ void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point
 		}
 		else
 		{
-			if (DistanceBetweenPoints(oldPoint3, oldPoint4) > POINT_UPDATE_DISTANCE)
+			if (DistanceBetweenPoints(oldPoint3, oldPoint4) > m_PointUpdateDist)
 				m_SecondLineP2Added[index] = true;
 
 			if (m_SecondLineP1Added[index] == false)

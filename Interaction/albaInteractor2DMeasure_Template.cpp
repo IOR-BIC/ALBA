@@ -175,6 +175,8 @@ void albaInteractor2DMeasure_Template::FindAndHighlight(double * point)
 
 	if (m_EditMeasureEnable)
 	{
+		SetUpdateDistance(PixelSizeInWorld()*4.0);
+
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
 			double pointUL[3], pointUR[3], pointDR[3], pointDL[3];
@@ -184,7 +186,7 @@ void albaInteractor2DMeasure_Template::FindAndHighlight(double * point)
 			{
 				//SelectMeasure(i);
 
-				if (vtkMath::Distance2BetweenPoints(pointUL, point) < POINT_UPDATE_DISTANCE_2)
+				if (vtkMath::Distance2BetweenPoints(pointUL, point) < m_PointUpdateDist2)
 				{
 					SelectMeasure(i);
 
@@ -193,7 +195,7 @@ void albaInteractor2DMeasure_Template::FindAndHighlight(double * point)
 					m_CurrPoint = POINT_1;
 					m_PointsStackVectorUL[i]->SetColor(m_Colors[COLOR_EDIT]);
 				}
-				else if (vtkMath::Distance2BetweenPoints(pointUR, point) < POINT_UPDATE_DISTANCE_2)
+				else if (vtkMath::Distance2BetweenPoints(pointUR, point) < m_PointUpdateDist2)
 				{
 					SelectMeasure(i);
 
@@ -202,7 +204,7 @@ void albaInteractor2DMeasure_Template::FindAndHighlight(double * point)
 					m_CurrPoint = POINT_2;
 					m_PointsStackVectorUR[i]->SetColor(m_Colors[COLOR_EDIT]);
 				}
-				else if (vtkMath::Distance2BetweenPoints(pointDR, point) < POINT_UPDATE_DISTANCE_2)
+				else if (vtkMath::Distance2BetweenPoints(pointDR, point) < m_PointUpdateDist2)
 				{
 					SelectMeasure(i);
 
@@ -211,7 +213,7 @@ void albaInteractor2DMeasure_Template::FindAndHighlight(double * point)
 					m_CurrPoint = POINT_3;
 					m_PointsStackVectorDR[i]->SetColor(m_Colors[COLOR_EDIT]);
 				}
-				else if (vtkMath::Distance2BetweenPoints(pointDL, point) < POINT_UPDATE_DISTANCE_2)
+				else if (vtkMath::Distance2BetweenPoints(pointDL, point) < m_PointUpdateDist2)
 				{
 					SelectMeasure(i);
 
@@ -306,7 +308,7 @@ void albaInteractor2DMeasure_Template::AddMeasure(double * pointUL, double * poi
 		double oldPoint1[3], oldPoint2[3], oldPoint3[3], oldPoint4[3];
 		GetMeasurePoints(index, oldPoint1, oldPoint2, oldPoint3, oldPoint4);
 
-		if (DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
+		if (DistanceBetweenPoints(oldPoint1, oldPoint2) < m_PointUpdateDist)
 		{
 			m_CurrMeasure = index;
 			m_CurrPoint = POINT_2;
