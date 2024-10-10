@@ -141,6 +141,8 @@ void albaInteractor2DMeasure::InitRenderer(albaEventInteraction *e)
 		if (m_ViewPlaneNormal[X] != 0) m_CurrPlane = 1;// YZ;
 		if (m_ViewPlaneNormal[Y] != 0) m_CurrPlane = 2;// XZ;
 		if (m_ViewPlaneNormal[Z] != 0) m_CurrPlane = 0;// XY;
+	
+		albaLogMessage("new plane %d", m_CurrPlane);
 
 		//albaLogMessage("ViewPlaneNormal (%.2f, %.2f, %.2f)", m_ViewPlaneNormal[X], m_ViewPlaneNormal[Y], m_ViewPlaneNormal[Z]);
 
@@ -193,6 +195,12 @@ void albaInteractor2DMeasure::Render()
 	}
 
 	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
+}
+
+//----------------------------------------------------------------------------
+void albaInteractor2DMeasure::SetCurrPlane(int plane)
+{
+	m_CurrPlane = plane;
 }
 
 //----------------------------------------------------------------------------
@@ -692,8 +700,11 @@ void albaInteractor2DMeasure::ScreenToWorld(double screen[2], double world[3])
 	//This is an hack to stabilize the Interactor, VTK uses the camera perspective matrix to calcuate the
 	//world coordinate, this return may lead in changes of the view plane coordinate output after show or hide 
 	//stuffs.
-	//This hack fix the plane coordinate to zero, witch is correct for a 2d measure.
-	world[2 - m_CurrPlane] = 0;
+	//This hack fix the plane coordinate to zero, witch is correct for a 2d measure
+
+	if (m_CurrPlane == 2) world[1] = 0;
+	else if (m_CurrPlane == 1) world[0] = 0;
+	else world[2] = 0;
 
 	m_Renderer->GetActiveCamera()->SetViewPlaneNormal(0, 0, -1);
 
