@@ -74,6 +74,10 @@ void albaOpNearestLandmark::OpRun()
 	e.SetPointer(&SurfaceAccept);
 	albaEventMacro(e);
 	albaVME *surface = (albaVME *)e.GetVme();
+	
+	if (surface == NULL)
+		OpStop(OP_RUN_CANCEL);
+	
 	surface->GetOutput()->Update();
 	surface->GetOutput()->GetVTKData()->Update();
 
