@@ -303,6 +303,18 @@ int albaVMELandmarkCloud::AppendLandmark(double x, double y, double z, const cha
 
 }
 
+//----------------------------------------------------------------------------
+int albaVMELandmarkCloud::AppendAbsoluteLandmark(double x, double y, double z, const char *name)
+{
+	double lm[4] = { x,y,z,1 }, abslm[4];
+
+	albaMatrix mtr = *GetOutput()->GetAbsMatrix();
+	mtr.Invert();
+	mtr.MultiplyPoint(lm, abslm);
+
+	return AppendLandmark(abslm, name);
+}
+
 //-------------------------------------------------------------------------
 int albaVMELandmarkCloud::SetLandmark(int idx, double x, double y, double z, albaTimeStamp t)
 {

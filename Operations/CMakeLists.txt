@@ -174,6 +174,7 @@ IF (ALBA_USE_VTK)
 	albaOpImporterRawMotionData.cpp albaOpImporterRawMotionData.h
 	albaOpInteractorSliderSample.cpp albaOpInteractorSliderSample.h
 	albaOpShowHistory.cpp	albaOpShowHistory.h
+	albaOpNearestLandmark.cpp  albaOpNearestLandmark.h
   )
 ENDIF (ALBA_USE_VTK)
 
