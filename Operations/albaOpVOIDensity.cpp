@@ -50,6 +50,9 @@
 #include "vtkCellArray.h"
 #include "vtkTransform.h"
 #include "vtkImageData.h"
+#include "vtkCleanPolyData.h"
+#include "vtkGenericCell.h"
+#include "vtkTriangle.h"
 
 
 //----------------------------------------------------------------------------
@@ -109,7 +112,6 @@ bool albaOpVOIDensity::InternalAccept(albaVME* Node)
 enum VOI_DENSITY_WIDGET_ID
 {
 	ID_CHOOSE_SURFACE = MINID,
-	ID_EVALUATE_DENSITY,
 	ID_ENABLE_RANGE,
 	ID_RANGE_UPDATED,
   ID_NUMBER_OF_VOXEL_IN_VOI,
@@ -119,6 +121,7 @@ enum VOI_DENSITY_WIDGET_ID
 	ID_MAX_SCALAR,
 	ID_STANDARD_DEVIATION,
 	ID_MEDIAN,
+	ID_SURFACE_AREA,
 	ID_VOXEL_LIST,
 	ID_EXPORT_REPORT,
 	ID_CREATE_SEGMENTATION_OUTPUT,
@@ -153,7 +156,6 @@ void albaOpVOIDensity::CreateGui()
 
 	m_Gui->Divider();
 	m_Gui->Button(ID_CHOOSE_SURFACE, _("VOI surface"));
-	m_Gui->Button(ID_EVALUATE_DENSITY, _("Evaluate"), "", _("Evaluate density inside the choosed surface"));
 	m_Gui->Divider();
 	m_Gui->Bool(ID_ENABLE_RANGE, "Evaluate only in subrange", &m_EvaluateInSubRange, true);
 	m_Gui->VectorN(ID_RANGE_UPDATED, "Range:", m_SubRange, 2, m_SubRange[0], m_SubRange[1]);
@@ -163,6 +165,7 @@ void albaOpVOIDensity::CreateGui()
 	m_Gui->Label(_("Voxels's scalar mean inside the VOI"));
 	m_Gui->String(ID_MEAN_SCALAR, "Mean=", &m_MeanScalarString, "");
 	m_Gui->String(ID_MEDIAN, "Median=", &m_MedianString, "");
+	m_Gui->String(ID_SURFACE_AREA, "Area=", &m_SurfaceAreaString, "");
 	m_Gui->String(ID_MIN_SCALAR, "Min=", &m_MinScalarString, "");
 	m_Gui->String(ID_MAX_SCALAR, "Max=", &m_MaxScalarString, "");
 	m_Gui->String(ID_STANDARD_DEVIATION, "Std dev=", &m_StandardDeviationString, "");
@@ -182,7 +185,6 @@ void albaOpVOIDensity::CreateGui()
 	m_Gui->OkCancel();
 	m_Gui->Label("");
 
-	m_Gui->Enable(ID_EVALUATE_DENSITY, false);
 	m_Gui->Enable(ID_RANGE_UPDATED, false);
 	m_Gui->Enable(ID_EXPORT_REPORT, false);
 	m_Gui->Enable(wxOK, false);
@@ -211,6 +213,7 @@ void albaOpVOIDensity::OpStop(int result)
 		SetDoubleTag("MinScalar", m_MinScalar);
 		SetDoubleTag("StandardDeviation", m_StandardDeviation);
 		SetDoubleTag("Median:", m_Median);
+		SetDoubleTag("Area:", m_SurfaceArea);
 
 		if(m_CreatePointCloudOutput)
 			CreatePointSamplingOutput();
@@ -304,6 +307,50 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 }
 
 //----------------------------------------------------------------------------
+void albaOpVOIDensity::CalculateSurfaceArea()
+{
+	vtkCleanPolyData *cleaner = vtkCleanPolyData::New();
+	vtkTriangleFilter *triangulator = vtkTriangleFilter::New();
+
+	m_SurfaceArea = 0;
+
+	vtkPolyData *surface = vtkPolyData::SafeDownCast(m_Surface->GetOutput()->GetVTKData());
+	if (surface == NULL)
+		return;
+
+	cleaner->SetInput(surface);
+	cleaner->ConvertPolysToLinesOff();
+	cleaner->GetOutput()->Update();
+	triangulator->SetInput(cleaner->GetOutput());
+	triangulator->Update();
+	vtkPolyData *triSurface=triangulator->GetOutput();
+
+	int TrianglesNum = triSurface->GetNumberOfCells();
+	for (int i = 0; i < TrianglesNum; i++)
+	{
+		if (triSurface->GetCellType(i) == VTK_TRIANGLE)
+		{
+			vtkGenericCell *triangle = vtkGenericCell::New();
+			triSurface->GetCell(i, triangle);
+
+			vtkPoints *points = triangle->GetPoints();
+			double a[3], b[3], c[3];
+
+			points->GetPoint(0, a);
+			points->GetPoint(1, b);
+			points->GetPoint(2, c);
+
+			double area = vtkTriangle::TriangleArea(a, b, c);
+
+			//area is used to estimate the cell size;
+			m_SurfaceArea += area;
+		}
+		else
+			albaErrorMacro("Wrong CELL data Type!");
+	}
+}
+
+//----------------------------------------------------------------------------
 void albaOpVOIDensity::CreateSegmentationOutput()
 {
 	vtkDataSet * vtkData = m_Input->GetOutput()->GetVTKData();
@@ -376,9 +423,10 @@ int albaOpVOIDensity::Cmpfunc(const void * a, const void * b)
 //----------------------------------------------------------------------------
 int albaOpVOIDensity::SetSurface(albaVME *surface)
 {
-	m_Surface = surface;
-	if (m_Surface == NULL)
+	if (surface == NULL)
 		return ALBA_ERROR;
+
+	m_Surface = surface;
 	m_Surface->Update();
 	vtkALBASmartPointer<vtkFeatureEdges> FE;
 	FE->SetInput((vtkPolyData *)(m_Surface->GetOutput()->GetVTKData()));
@@ -416,11 +464,12 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 				event.SetPointer(&albaOpVOIDensity::OutputSurfaceAccept);
 				albaEventMacro(event);
 
-				if (SetSurface(event.GetVme())==ALBA_ERROR)
-					return;
-				
-				m_Gui->Enable(ID_EVALUATE_DENSITY, true);
-				m_Gui->Enable(wxOK, false);
+				if (SetSurface(event.GetVme()) != ALBA_ERROR)
+				{
+					EvaluateSurface();
+					m_Gui->Enable(ID_EXPORT_REPORT, true);
+					m_Gui->Enable(wxOK, true);
+				}
 			}
 			break;
 			case ID_ENABLE_RANGE:
@@ -434,11 +483,6 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 					m_SubRange[1] = m_SubRange[0];
 				m_Gui->Update();
 				break;
-			case ID_EVALUATE_DENSITY:
-				ExtractVolumeScalars();
-				m_Gui->Enable(ID_EXPORT_REPORT, true);
-				m_Gui->Enable(wxOK, true);
-			break;
 			case ID_EXPORT_REPORT:
 				WriteReport();
 			break;
@@ -455,7 +499,7 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpVOIDensity::ExtractVolumeScalars()
+void albaOpVOIDensity::EvaluateSurface()
 //----------------------------------------------------------------------------
 {
 	if (!this->m_TestMode)
@@ -559,6 +603,8 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 
 	m_Median = GetMedian(m_VOIScalars);
 
+	CalculateSurfaceArea();
+
 	UpdateStrings();
 
 	if (!this->m_TestMode)
@@ -571,12 +617,13 @@ void albaOpVOIDensity::ExtractVolumeScalars()
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::UpdateStrings()
 {
-	m_NumberOfScalarsString = albaString(albaString::Format("%d", m_NumberOfScalars));
-	m_MeanScalarString = albaString(albaString::Format("%f", m_MeanScalar));
-	m_MaxScalarString = albaString(albaString::Format("%f", m_MaxScalar));
-	m_MinScalarString = albaString(albaString::Format("%f", m_MinScalar));
-	m_StandardDeviationString = albaString(albaString::Format("%f", m_StandardDeviation));
-	m_MedianString = albaString(albaString::Format("%f", m_Median));
+	m_NumberOfScalarsString = albaString::Format("%d", m_NumberOfScalars);
+	m_MeanScalarString = albaString::Format("%f", m_MeanScalar);
+	m_MaxScalarString = albaString::Format("%f", m_MaxScalar);
+	m_MinScalarString = albaString::Format("%f", m_MinScalar);
+	m_StandardDeviationString = albaString::Format("%f", m_StandardDeviation);
+	m_MedianString = albaString::Format("%f", m_Median);
+	m_SurfaceAreaString = albaString::Format("%f", m_SurfaceArea);
 }
 
 
@@ -629,7 +676,7 @@ void albaOpVOIDensity::CreateCSVFile(albaString file)
 			fprintf(pFile, "PZName;PZCode;PZBirthdate;PZCenter;PZExamDate;SurfaceName;");
 
 			// Main scores 
-			fprintf(pFile, "NumberOfScalars;MeanScalar;MaxScalar;MinScalar;StandardDeviation;Median");
+			fprintf(pFile, "NumberOfScalars;MeanScalar;MaxScalar;MinScalar;StandardDeviation;Median;SurfaceArea");
 		}
 
 		
@@ -638,7 +685,7 @@ void albaOpVOIDensity::CreateCSVFile(albaString file)
 		fprintf(pFile, "\n%s;%s;%s;%s;%s;%s;", m_PatientName.GetCStr(), m_PatientCode.GetCStr(), m_PatientBirthdate.GetCStr(), m_PatientCenter.GetCStr(), m_PatientExamDate.GetCStr(), m_Surface->GetName());
 
 		// Main scores 
-		fprintf(pFile, "%s;%s;%s;%s;%s;%s;", m_NumberOfScalarsString.GetCStr(), m_MeanScalarString.GetCStr(), m_MaxScalarString.GetCStr(), m_MinScalarString.GetCStr(), m_StandardDeviationString.GetCStr(), m_MedianString.GetCStr());
+		fprintf(pFile, "%s;%s;%s;%s;%s;%s;%s", m_NumberOfScalarsString.GetCStr(), m_MeanScalarString.GetCStr(), m_MaxScalarString.GetCStr(), m_MinScalarString.GetCStr(), m_StandardDeviationString.GetCStr(), m_MedianString.GetCStr(), m_SurfaceAreaString.GetCStr());
 
 		
 		fclose(pFile);

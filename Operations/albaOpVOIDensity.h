@@ -69,7 +69,7 @@ public:
 	double GetStandardDeviation(){return m_StandardDeviation;};
 
 	/** Extract scalars from input volume that are inside the choosed surface. */
-	void ExtractVolumeScalars();
+	void EvaluateSurface();
 
 	void UpdateStrings();
 
@@ -94,6 +94,8 @@ protected:
 
 	void CreatePointSamplingOutput();
 
+	void CalculateSurfaceArea();
+
 	void CreateSegmentationOutput();
 
 	double GetMedian(vtkDoubleArray *valuesArray);
@@ -117,6 +119,8 @@ protected:
   double        m_StandardDeviation;
 	albaString    m_MedianString;
 	double				m_Median;
+	albaString		m_SurfaceAreaString;
+	double				m_SurfaceArea;
 	wxListBox			*m_VoxelList;
 	int						m_EvaluateInSubRange;
 	double				m_SubRange[2];
