@@ -128,21 +128,21 @@ enum VOI_DENSITY_WIDGET_ID
 	ID_CREATE_CLOUD_POINT_OUTPUT,
 };
 //----------------------------------------------------------------------------
-void albaOpVOIDensity::OpRun()   
+void albaOpVOIDensity::OpRun()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_VOIScalars);
-	if(!this->m_TestMode)
+	vtkNEW(m_VOIScalars);
+
+	vtkALBASmartPointer<vtkDataSet> volumeData = m_Input->GetOutput()->GetVTKData();
+	volumeData->Update();
+
+	volumeData->GetPointData()->GetScalars()->GetRange(m_SubRange);
+
+	m_ImagedataVol = vtkImageData::SafeDownCast(volumeData) ? true : false;
+
+	if (!this->m_TestMode)
 	{
-		vtkALBASmartPointer<vtkDataSet> volumeData = m_Input->GetOutput()->GetVTKData();
-		volumeData->Update();
-
-		volumeData->GetPointData()->GetScalars()->GetRange(m_SubRange);
-
-		m_ImagedataVol = vtkImageData::SafeDownCast(volumeData) ? true : false;
-
 		CreateGui();
-
 		ShowGui();
 	}
 }
@@ -441,7 +441,9 @@ int albaOpVOIDensity::SetSurface(albaVME *surface)
 	if (FE->GetOutput()->GetNumberOfCells() != 0)
 	{
 		//open polydata
-		albaMessage(_("Open surface choosed!!"), _("Warning"));
+		albaString openStr;
+		openStr.Printf("%s is an Open Surface",surface->GetName());
+		albaMessage(openStr.GetCStr(), _("Warning"));
 		m_Surface = NULL;
 		return ALBA_ERROR;
 	}

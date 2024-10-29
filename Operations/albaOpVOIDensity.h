@@ -68,7 +68,7 @@ public:
 	/**	Return Standard Deviation*/
 	double GetStandardDeviation(){return m_StandardDeviation;};
 
-	/** Extract scalars from input volume that are inside the choosed surface. */
+	/** Extract scalars from input volume that are inside the chosen surface. */
 	void EvaluateSurface();
 
 	void UpdateStrings();
@@ -78,12 +78,20 @@ public:
 	
  	static bool OutputSurfaceAccept(albaVME* Node) {return(Node != NULL && (Node->GetOutput()->IsA("albaVMEOutputSurface")));};
 
+	void CreateCSVFile(albaString file);
+
+
+	/** Returns CreatePointCloudOutput */
+	int GetCreatePointCloudOutput() const { return m_CreatePointCloudOutput; }
+
+	/** Sets CreatePointCloudOutput */
+	void SetCreatePointCloudOutput(int createPointCloudOutput) { m_CreatePointCloudOutput = createPointCloudOutput; }
+
 protected:
 
 	void WriteReport();
 
-	void CreateCSVFile(albaString file);
-
+	
 	void GetTags();
 
 	/** Return true for the acceptable vme type. */
