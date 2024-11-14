@@ -75,8 +75,6 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 		m_CurrPoint = (m_CurrPoint == POINT_1) ? POINT_2 : POINT_1;
 	}
 
-	double minLenght = 5.0;
-
 	if (m_CurrPoint == POINT_1)
 	{
 		double dist1 = DistanceBetweenPoints(point1, point);
@@ -90,7 +88,7 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 		double newPoint[3];
 		FindPointOnLine(newPoint, point1, point2, dist*sign);
 
-		if (newPoint[X] < point2[X] - minLenght)
+		if (newPoint[X] < point2[X])
 		{
 			point1[X] = newPoint[X];
 			point1[Y] = newPoint[Y];
@@ -111,7 +109,7 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 		double newPoint[3];
 		FindPointOnLine(newPoint, point1, point2, dist*sign);
 
-		if (newPoint[X] > point1[X] + minLenght)
+		if (newPoint[X] > point1[X])
 		{
 			point2[X] = newPoint[X];
 			point2[Y] = newPoint[Y];
