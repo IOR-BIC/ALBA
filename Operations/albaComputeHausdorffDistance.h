@@ -60,7 +60,10 @@ public:
  
   vtkPolyData *GetOutput();
 
-private:
+	//return the the area of the second Surf
+	double GetTotalAreaSurf2() { return m_TotalAreaSurf2; }
+
+protected:
 
 	/** Computes HaudforffDistance */
   void ComputeHausdorffDistance();
@@ -75,9 +78,9 @@ private:
 
   void ComputeCellAndGridSize();
 
-  vtkPolyData *m_Mesh1, *m_Mesh2;
-  vtkPolyData *m_CleanMesh1, *m_CleanMesh2;
-  vtkPolyData *m_OutputMesh;
+  vtkPolyData *m_Surf1, *m_Surf2;
+  vtkPolyData *m_CleanSurf1, *m_CleanSurf2;
+  vtkPolyData *m_OutputSurf;
 
 	albaObserver *m_Listener;
 
@@ -105,7 +108,7 @@ private:
   double m_MinDist;
   double m_MaxDist;
 
-  double m_TotalAreaMesh2;
+  double m_TotalAreaSurf2;
 
   vtkFloatArray *m_VertexErrorValues;
 	albaProgressBarHelper *m_ProgBarHelper;
