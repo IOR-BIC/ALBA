@@ -102,7 +102,7 @@ albaComputeHausdorffDistance::albaComputeHausdorffDistance()
   
   m_OverallDistance = 0.0;
 
-  m_TotalAreaSurf2=0.0;
+	m_TotalAreaSurf1= m_TotalAreaSurf2=0.0;
 
 }
 
@@ -170,8 +170,29 @@ void albaComputeHausdorffDistance::ComputeHausdorffDistance()
       m_TotalAreaSurf2 += area;
     }
   }
-  //////////////////////////////////////////////////////////////////////////
 
+  //////////////////////////////////////////////////////////////////////////
+	numberOfSurfCells = m_CleanSurf1->GetNumberOfCells();
+	for (int i = 0; i < numberOfSurfCells; i++)
+	{
+		if (m_CleanSurf1->GetCellType(i) == VTK_TRIANGLE)
+		{
+			vtkGenericCell *triangle = vtkGenericCell::New();
+			m_CleanSurf1->GetCell(i, triangle);
+
+			vtkPoints *points = triangle->GetPoints();
+			double a[3], b[3], c[3];
+
+			points->GetPoint(0, a);
+			points->GetPoint(1, b);
+			points->GetPoint(2, c);
+
+			double area = vtkTriangle::TriangleArea(a, b, c);
+			
+			//area is used to estimate the cell size;
+			m_TotalAreaSurf1 += area;
+		}
+	}
 
   ComputeCellAndGridSize();
 

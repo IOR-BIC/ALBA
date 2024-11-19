@@ -60,7 +60,9 @@ public:
  
   vtkPolyData *GetOutput();
 
-	//return the the area of the second Surf
+	//return the the area of the first Surface
+	double GetTotalAreaSurf1() { return m_TotalAreaSurf1; }
+	//return the the area of the second Surface
 	double GetTotalAreaSurf2() { return m_TotalAreaSurf2; }
 
 protected:
@@ -108,7 +110,8 @@ protected:
   double m_MinDist;
   double m_MaxDist;
 
-  double m_TotalAreaSurf2;
+	double m_TotalAreaSurf1;
+	double m_TotalAreaSurf2;
 
   vtkFloatArray *m_VertexErrorValues;
 	albaProgressBarHelper *m_ProgBarHelper;
