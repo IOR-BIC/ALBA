@@ -272,13 +272,13 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 	{
 		newArray->InsertNextValue(m_VOIScalars->GetTuple1(i));
 
-		newPoints->InsertNextPoint(m_VOICoords[i].GetVect());
+			newPoints->InsertNextPoint(m_VOICoords[i].GetVect());
 
-		polys->InsertNextCell(3);
-		polys->InsertCellPoint(i);
-		polys->InsertCellPoint(i);
-		polys->InsertCellPoint(i);
-	}
+			polys->InsertNextCell(3);
+			polys->InsertCellPoint(i);
+			polys->InsertCellPoint(i);
+			polys->InsertCellPoint(i);
+		}
 
 
 	vtkPointData *outPointData = polydata->GetPointData();
@@ -478,12 +478,8 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 				m_Gui->Enable(ID_RANGE_UPDATED, m_EvaluateInSubRange);
 				break;
 			case ID_RANGE_UPDATED:
-				m_Gui->Update();
-				if (m_SubRange[0] > m_SubRange[1])
-					m_SubRange[1] = m_SubRange[0];
-				else if (m_SubRange[1] < m_SubRange[0])
-					m_SubRange[1] = m_SubRange[0];
-				m_Gui->Update();
+				SortSubRange();
+
 				break;
 			case ID_EXPORT_REPORT:
 				WriteReport();
@@ -500,6 +496,18 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 		}
 	}
 }
+
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::SortSubRange()
+{
+	if (m_SubRange[0] > m_SubRange[1])
+		m_SubRange[1] = m_SubRange[0];
+	else if (m_SubRange[1] < m_SubRange[0])
+		m_SubRange[1] = m_SubRange[0];
+	if(m_Gui)
+		m_Gui->Update();
+}
+
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::EvaluateSurface()
 //----------------------------------------------------------------------------
@@ -508,8 +516,8 @@ void albaOpVOIDensity::EvaluateSurface()
 		wxBusyCursor wait;
 
 	double b[6];
-	double Point[3], InsideScalar = 0.0, SumScalars = 0.0;
-	int NumberVoxels, PointId;
+	double point[3], insideScalar = 0.0, sumScalars = 0.0;
+	int numberVoxels, pointId;
 
 	// Reset parameters
 	m_NumberOfScalars = 0;
@@ -551,7 +559,7 @@ void albaOpVOIDensity::EvaluateSurface()
 
 	vtkALBASmartPointer<vtkDataSet> VolumeData = m_Input->GetOutput()->GetVTKData();
 	VolumeData->Update();
-	NumberVoxels = VolumeData->GetNumberOfPoints();
+	numberVoxels = VolumeData->GetNumberOfPoints();
 
 	albaProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
@@ -559,32 +567,32 @@ void albaOpVOIDensity::EvaluateSurface()
 
 	vtkDEL(transform);
 
-	for (vtkIdType voxel = 0; voxel < NumberVoxels; voxel++)
+	for (vtkIdType voxel = 0; voxel < numberVoxels; voxel++)
 	{
-		VolumeData->GetPoint(voxel, Point);
-		if (ImplicitBox->EvaluateFunction(Point) < 0)
+		VolumeData->GetPoint(voxel, point);
+		if (ImplicitBox->EvaluateFunction(point) < 0)
 		{
 			//point is inside the bounding box of the surface: check
 			//if the point is also inside the surface.
-			if (ImplicitSurface->EvaluateFunction(Point) < 0)
+			if (ImplicitSurface->EvaluateFunction(point) < 0)
 			{
 				//store the corresponding point's scalar value
-				PointId = VolumeData->FindPoint(Point);
-				InsideScalar = VolumeData->GetPointData()->GetTuple(PointId)[0];
-				if (!m_EvaluateInSubRange || (InsideScalar >= m_SubRange[0] && InsideScalar <= m_SubRange[1]))
+				pointId = VolumeData->FindPoint(point);
+				insideScalar = VolumeData->GetPointData()->GetTuple(pointId)[0];
+				if (!m_EvaluateInSubRange || (insideScalar >= m_SubRange[0] && insideScalar <= m_SubRange[1]))
 				{
-					SumScalars += InsideScalar;
-					m_MaxScalar = MAX(InsideScalar, m_MaxScalar);
-					m_MinScalar = MIN(InsideScalar, m_MinScalar);
+					sumScalars += insideScalar;
+					m_MaxScalar = MAX(insideScalar, m_MaxScalar);
+					m_MinScalar = MIN(insideScalar, m_MinScalar);
 					m_NumberOfScalars++;
-					m_VOIScalars->InsertNextTuple(&InsideScalar);
-					albaVect3d vPos(Point);
+					m_VOIScalars->InsertNextTuple(&insideScalar);
+					albaVect3d vPos(point);
 					m_VOICoords.push_back(vPos);
 					m_VOIIds.push_back(voxel);
 				}
 			}
 		}
-		progressHelper.UpdateProgressBar(voxel*100.0 / NumberVoxels);
+		progressHelper.UpdateProgressBar(voxel*100.0 / numberVoxels);
 	}
 	if (m_NumberOfScalars == 0)
 	{
@@ -592,7 +600,7 @@ void albaOpVOIDensity::EvaluateSurface()
 	}
 	else
 	{
-		m_MeanScalar = SumScalars / m_NumberOfScalars;
+		m_MeanScalar = sumScalars / m_NumberOfScalars;
 		double Sum = 0.0;
 		double s;
 		for (int i = 0; i < m_NumberOfScalars; i++)
@@ -696,6 +704,12 @@ void albaOpVOIDensity::CreateCSVFile(albaString file)
 	{
 		albaErrorMessage("Cannot open CSV file, it can be opened by an another application.\nPlease close the application or select another file.");
 	}
+}
+
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::SetSubRange(double subRangeA, double subRangeB)
+{
+	m_SubRange[0] = subRangeA; m_SubRange[1] = subRangeB; SortSubRange();
 }
 
 void albaOpVOIDensity::GetTags()

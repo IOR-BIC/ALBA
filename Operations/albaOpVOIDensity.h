@@ -35,7 +35,9 @@ public:
 	albaOpVOIDensity(const wxString &label = "VOIDensity");
 	~albaOpVOIDensity(); 
 	virtual void OnEvent(albaEventBase *alba_event);
-	
+
+	void SortSubRange();
+
   albaTypeMacro(albaOpVOIDensity, albaOp);
 
   /** return a copy of itself, this needs to put the operation into the undo stack. */
@@ -86,6 +88,18 @@ public:
 
 	/** Sets CreatePointCloudOutput */
 	void SetCreatePointCloudOutput(int createPointCloudOutput) { m_CreatePointCloudOutput = createPointCloudOutput; }
+
+
+	/** Returns EvaluateInSubRange */
+	int GetEvaluateInSubRange() const { return m_EvaluateInSubRange; }
+
+	/** Sets EvaluateInSubRange */
+	void SetEvaluateInSubRange(int evaluateInSubRange) { m_EvaluateInSubRange = evaluateInSubRange; }
+	
+	/** Sets SubRange */
+	void SetSubRange(double subRangeA, double subRangeB);
+
+	void GetSubRange(double *subRange) { subRange[0] = m_SubRange[0]; subRange[1] = m_SubRange[1]; }
 
 protected:
 
