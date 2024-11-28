@@ -125,6 +125,8 @@ protected:
 	static int Cmpfunc(const void * a, const void * b);
 	virtual void CreateGui();
 
+	void EnableDisableGUI(int surfaceEvalued);
+
   albaVME        *m_Surface;
   vtkDoubleArray *m_VOIScalars;
 	std::vector<unsigned int> m_VOIIds;

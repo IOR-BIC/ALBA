@@ -57,12 +57,10 @@
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpVOIDensity);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 albaOpVOIDensity::albaOpVOIDensity(const wxString &label) 
 : albaOp(label)
-//----------------------------------------------------------------------------
 {
 	m_OpType	= OPTYPE_OP;
 	m_Canundo	= true;
@@ -87,7 +85,6 @@ albaOpVOIDensity::albaOpVOIDensity(const wxString &label)
 }
 //----------------------------------------------------------------------------
 albaOpVOIDensity::~albaOpVOIDensity()
-//----------------------------------------------------------------------------
 {
 	m_Surface = NULL;
 	vtkDEL(m_VOIScalars);
@@ -96,22 +93,20 @@ albaOpVOIDensity::~albaOpVOIDensity()
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpVOIDensity::Copy()
-//----------------------------------------------------------------------------
 {
 	return (new albaOpVOIDensity(m_Label));
 }
 //----------------------------------------------------------------------------
 bool albaOpVOIDensity::InternalAccept(albaVME* Node)
-//----------------------------------------------------------------------------
 {
 	return (Node != NULL && Node->IsA("albaVMEVolumeGray"));
 }
 //----------------------------------------------------------------------------
 // Widgets ID's
-//----------------------------------------------------------------------------
 enum VOI_DENSITY_WIDGET_ID
 {
 	ID_CHOOSE_SURFACE = MINID,
+	ID_EVALUATE_DENSITY,
 	ID_ENABLE_RANGE,
 	ID_RANGE_UPDATED,
   ID_NUMBER_OF_VOXEL_IN_VOI,
@@ -127,9 +122,9 @@ enum VOI_DENSITY_WIDGET_ID
 	ID_CREATE_SEGMENTATION_OUTPUT,
 	ID_CREATE_CLOUD_POINT_OUTPUT,
 };
+
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::OpRun()
-//----------------------------------------------------------------------------
 {
 	vtkNEW(m_VOIScalars);
 
@@ -156,6 +151,7 @@ void albaOpVOIDensity::CreateGui()
 
 	m_Gui->Divider();
 	m_Gui->Button(ID_CHOOSE_SURFACE, _("VOI surface"));
+	m_Gui->Button(ID_EVALUATE_DENSITY, _("Evaluate"), "", _("Evaluate density inside the choosed surface"));
 	m_Gui->Divider();
 	m_Gui->Bool(ID_ENABLE_RANGE, "Evaluate only in subrange", &m_EvaluateInSubRange, true);
 	m_Gui->VectorN(ID_RANGE_UPDATED, "Range:", m_SubRange, 2, m_SubRange[0], m_SubRange[1]);
@@ -185,20 +181,39 @@ void albaOpVOIDensity::CreateGui()
 	m_Gui->OkCancel();
 	m_Gui->Label("");
 
-	m_Gui->Enable(ID_RANGE_UPDATED, false);
-	m_Gui->Enable(ID_EXPORT_REPORT, false);
-	m_Gui->Enable(wxOK, false);
+	EnableDisableGUI(false);
+}
+
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::EnableDisableGUI(int surfaceEvalued)
+{
+	m_Gui->Enable(ID_RANGE_UPDATED, m_EvaluateInSubRange);
+
+	m_Gui->Enable(ID_EVALUATE_DENSITY, m_Surface && !surfaceEvalued );
+
+	if (!surfaceEvalued)
+	{
+		m_NumberOfScalarsString = m_MeanScalarString = m_MedianString = m_SurfaceAreaString = m_MinScalarString = m_MaxScalarString = m_StandardDeviationString = "";
+	}
+	m_Gui->Enable(ID_NUM_SCALARS, surfaceEvalued);
+	m_Gui->Enable(ID_MEAN_SCALAR, surfaceEvalued);
+	m_Gui->Enable(ID_MEDIAN, surfaceEvalued);
+	m_Gui->Enable(ID_SURFACE_AREA, surfaceEvalued);
+	m_Gui->Enable(ID_MIN_SCALAR, surfaceEvalued);
+	m_Gui->Enable(ID_MAX_SCALAR, surfaceEvalued);
+	m_Gui->Enable(ID_STANDARD_DEVIATION, surfaceEvalued);
+	m_Gui->Enable(ID_EXPORT_REPORT, surfaceEvalued);
+	m_Gui->Enable(wxOK, surfaceEvalued);
+
 	m_Gui->Update();
 }
 
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::OpDo()
-//----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::OpUndo()
-//----------------------------------------------------------------------------
 {
 }
 
@@ -453,7 +468,6 @@ int albaOpVOIDensity::SetSurface(albaVME *surface)
 
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
@@ -469,17 +483,22 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 				if (SetSurface(event.GetVme()) != ALBA_ERROR)
 				{
 					EvaluateSurface();
-					m_Gui->Enable(ID_EXPORT_REPORT, true);
-					m_Gui->Enable(wxOK, true);
+					EnableDisableGUI(true);
 				}
 			}
 			break;
+			case ID_EVALUATE_DENSITY:
+			{
+				EvaluateSurface();
+				EnableDisableGUI(true);
+			}
+			break;
 			case ID_ENABLE_RANGE:
-				m_Gui->Enable(ID_RANGE_UPDATED, m_EvaluateInSubRange);
+				EnableDisableGUI(false);
 				break;
 			case ID_RANGE_UPDATED:
 				SortSubRange();
-
+				EnableDisableGUI(false);
 				break;
 			case ID_EXPORT_REPORT:
 				WriteReport();
@@ -510,7 +529,6 @@ void albaOpVOIDensity::SortSubRange()
 
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::EvaluateSurface()
-//----------------------------------------------------------------------------
 {
 	if (!this->m_TestMode)
 		wxBusyCursor wait;
@@ -712,6 +730,7 @@ void albaOpVOIDensity::SetSubRange(double subRangeA, double subRangeB)
 	m_SubRange[0] = subRangeA; m_SubRange[1] = subRangeB; SortSubRange();
 }
 
+//----------------------------------------------------------------------------
 void albaOpVOIDensity::GetTags()
 {
 	// Patient Name 
