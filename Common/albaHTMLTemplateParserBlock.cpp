@@ -134,7 +134,7 @@ void albaHTMLTemplateParserBlock::AddImageVar(wxString name, albaView *view, wxS
 {
 	// Write Image
 	wxString logPath = albaGetAppDataDirectory();
-	wxString imagePath = logPath + "\\imm.jpg";
+	wxString imagePath = logPath + "\\imm.png";
 
 	view->CameraUpdate();
 	view->GetRWI()->Update();
