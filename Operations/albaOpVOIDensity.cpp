@@ -520,9 +520,11 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 void albaOpVOIDensity::SortSubRange()
 {
 	if (m_SubRange[0] > m_SubRange[1])
-		m_SubRange[1] = m_SubRange[0];
-	else if (m_SubRange[1] < m_SubRange[0])
-		m_SubRange[1] = m_SubRange[0];
+	{
+		double tmp = m_SubRange[0];
+		m_SubRange[0] = m_SubRange[1];
+		m_SubRange[1] = tmp;
+	}
 	if(m_Gui)
 		m_Gui->Update();
 }
