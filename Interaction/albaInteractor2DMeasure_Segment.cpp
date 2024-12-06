@@ -44,7 +44,7 @@ albaInteractor2DMeasure_Segment::albaInteractor2DMeasure_Segment() : albaInterac
 
 	Color color{ 1, 0.4, 1, 1.0 };
 
-	SetColorDefault(color.R, color.G, color.B, 0.85);
+	SetColorDefault(color.R, color.G, color.B, 0.65);
 	SetColorSelection(color.R, color.G, color.B, 1.0);
 	SetColorDisable(color.R, color.G, color.B, 0.3);
 	SetColorText(color.R, color.G, color.B, 0.5);

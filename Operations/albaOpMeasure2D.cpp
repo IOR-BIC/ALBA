@@ -109,8 +109,8 @@ void albaOpMeasure2D::OpRun()
 		
 		if (view)
 		{
-// 			for (int i = 0; i < m_InteractorVector.size(); i++)
-// 				m_InteractorVector[i]->SetRendererByView(view);
+ 			for (int i = 0; i < m_InteractorVector.size(); i++)
+ 				m_InteractorVector[i]->SetRendererByView(view);
 
 			//Load();
 		}
@@ -282,6 +282,7 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 				int selection = m_MeasureListBox->GetSelection();
 				m_InteractorVector[m_CurrentInteractor]->SelectMeasure(selection);
 				m_Gui->Update();
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 
@@ -359,24 +360,32 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 			case albaInteractor2DMeasure::ID_MEASURE_CHANGED:
 			{
 				// Update Measure Gui Entry
-				m_SelectedMeasure = m_InteractorVector[m_CurrentInteractor]->GetSelectedMeasureIndex();
+				m_SelectedMeasure = m_InteractorVector[m_CurrentInteractor]->GetSelectedMeasure();
 				m_Measure = m_InteractorVector[m_CurrentInteractor]->GetMeasureText(m_SelectedMeasure);
 				m_MeasureLabel = m_InteractorVector[m_CurrentInteractor]->GetMeasureLabel(m_SelectedMeasure);
 
 				UpdateMeasureList();
-				//m_Gui->Update();
+				if (m_SelectedMeasure >= 0 && m_SelectedMeasure < m_MeasureListBox->GetCount())
+				{
+					m_MeasureListBox->SetSelection(m_SelectedMeasure);
+					((albaGUIValidator *)m_MeasureListBox->GetValidator())->TransferFromWindow();
+					m_Gui->Update();
+				}
 			}
 			break;
 			case albaInteractor2DMeasure::ID_MEASURE_SELECTED:
 			{				
 				// Update Measure Gui Entry
-				m_SelectedMeasure = m_InteractorVector[m_CurrentInteractor]->GetSelectedMeasureIndex();
+				m_SelectedMeasure = m_InteractorVector[m_CurrentInteractor]->GetSelectedMeasure();
 				m_Measure = m_InteractorVector[m_CurrentInteractor]->GetMeasureText(m_SelectedMeasure);
 				m_MeasureLabel = m_InteractorVector[m_CurrentInteractor]->GetMeasureLabel(m_SelectedMeasure);
 
-				m_MeasureListBox->SetSelection(m_SelectedMeasure);
-				((albaGUIValidator *)m_MeasureListBox->GetValidator())->TransferFromWindow();
-				m_Gui->Update();
+				if (m_SelectedMeasure >= 0 && m_SelectedMeasure < m_MeasureListBox->GetCount())
+				{
+					m_MeasureListBox->SetSelection(m_SelectedMeasure);
+					((albaGUIValidator *)m_MeasureListBox->GetValidator())->TransferFromWindow();
+					m_Gui->Update();
+				}
 			}
 			break;
 			}
