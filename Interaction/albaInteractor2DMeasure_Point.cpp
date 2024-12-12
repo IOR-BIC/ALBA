@@ -41,7 +41,7 @@ albaInteractor2DMeasure_Point::albaInteractor2DMeasure_Point() : albaInteractor2
 
 	Color color{ 0.4, 0.0, 1, 1.0 };
 
-	SetColorDefault(color.R, color.G, color.B, 0.65);
+	SetColorDefault(color.R, color.G, color.B, 0.5);
 	SetColorSelection(color.R, color.G, color.B, 1.0);
 	SetColorDisable(color.R, color.G, color.B, 0.3);
 	SetColorText(color.R, color.G, color.B, 0.5);
