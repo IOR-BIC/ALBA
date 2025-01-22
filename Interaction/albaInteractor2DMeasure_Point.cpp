@@ -41,7 +41,7 @@ albaInteractor2DMeasure_Point::albaInteractor2DMeasure_Point() : albaInteractor2
 
 	Color color{ 0.4, 0.0, 1, 1.0 };
 
-	SetColorDefault(color.R, color.G, color.B, 0.85);
+	SetColorDefault(color.R, color.G, color.B, 0.5);
 	SetColorSelection(color.R, color.G, color.B, 1.0);
 	SetColorDisable(color.R, color.G, color.B, 0.3);
 	SetColorText(color.R, color.G, color.B, 0.5);
@@ -125,7 +125,7 @@ void albaInteractor2DMeasure_Point::FindAndHighlight(double *point)
 
 			if (DistanceBetweenPoints(point, tmpPoint) < m_PointUpdateDist)
 			{
-				m_CurrMeasure = i;
+				SelectMeasure(i);
 
 				if (m_MoveMeasureEnable)
 				{
@@ -141,7 +141,6 @@ void albaInteractor2DMeasure_Point::FindAndHighlight(double *point)
 		if (m_CurrMeasure >= 0)
 		{
 			SelectMeasure(-1);
-			m_CurrMeasure = -1;
 			Render();
 		}
 	}
@@ -207,7 +206,7 @@ void albaInteractor2DMeasure_Point::AddMeasure(double *point)
 	m_PointsStackVector[index]->GetProperty()->SetPointSize(m_PointSize);
 	m_PointsStackVector[index]->SetColor(m_Colors[col]);
 
-	m_CurrMeasure = index;
+	SelectMeasure(index);
 
 	UpdatePointsActor(point);
 
@@ -236,8 +235,11 @@ void albaInteractor2DMeasure_Point::RemoveMeasure(int index)
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Point::SelectMeasure(int index)
 {
-	if (GetMeasureCount() > 0)
+	if (index != m_CurrMeasure && GetMeasureCount() > 0)
 	{
+		m_CurrMeasure = index;
+		m_LastEditing = -1;
+
 		// Deselect all
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
@@ -254,9 +256,6 @@ void albaInteractor2DMeasure_Point::SelectMeasure(int index)
 
 			albaEventMacro(albaEvent(this, ID_MEASURE_SELECTED));
 		}
-
-		m_LastSelection = index;
-		m_LastEditing = -1;
 	}
 }
 
@@ -398,8 +397,10 @@ void albaInteractor2DMeasure_Point::LockPointOnLine(double *lineP1, double *line
 	m_ConstrLineP2[Z] = lineP2[Z];
 
 	double point[3];
+
+	//update existing point to the constraint 
+	//SeletcMeasure is't used because the Current Measure does is restored after the cycle
 	int measure = m_CurrMeasure;
-	//update existing point to the constraint
 	for (int i = 0; i < m_PointsStackVector.size();i++)
 	{
 		m_CurrMeasure = i;

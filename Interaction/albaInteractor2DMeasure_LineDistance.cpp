@@ -51,7 +51,7 @@ albaInteractor2DMeasure_LineDistance::albaInteractor2DMeasure_LineDistance() : a
 
 	Color color{ 0.4, 0.4, 1, 1.0 };
 
-	SetColorDefault(color.R, color.G, color.B, 0.85);
+	SetColorDefault(color.R, color.G, color.B, 0.65);
 	SetColorSelection(color.R, color.G, color.B, 1.0);
 	SetColorDisable(color.R, color.G, color.B, 0.3);
 	SetColorText(color.R, color.G, color.B, 0.5);
@@ -128,7 +128,7 @@ void albaInteractor2DMeasure_LineDistance::MoveMeasure(int index, double * point
 		m_Distances[index] = DistancePointToLine(point, linePoint1, linePoint2);
 		m_Distances[index] *= PointUpDownLine(point, linePoint1, linePoint2);
 
-		m_CurrMeasure = index;
+		SelectMeasure(index);
 		UpdateLineActors(linePoint1, linePoint2);
 	}
 
@@ -233,20 +233,17 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 					if ((p1Dist < p2Dist) && (p1Dist <= minDist))
 					{
 						SetAction(ACTION_EDIT_MEASURE);
-						m_CurrMeasure = i;
 						m_CurrPoint = POINT_1;
 						m_PointsStackVectorL[i]->SetColor(m_Colors[COLOR_EDIT]);
 					}
 					else if (p2Dist <= minDist)
 					{
 						SetAction(ACTION_EDIT_MEASURE);
-						m_CurrMeasure = i;
 						m_CurrPoint = POINT_2;
 						m_PointsStackVectorR[i]->SetColor(m_Colors[COLOR_EDIT]);
 					}
 					else
 					{
-						m_CurrMeasure = i;
 						if (m_MoveMeasureEnable)
 						{
 							m_LineStackVector[i]->SetColor(m_Colors[COLOR_EDIT]);
@@ -266,7 +263,6 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 
 				if (m_Measure2DVector[i].Active)
 				{
-					m_CurrMeasure = i;
 					if (m_MoveMeasureEnable)
 					{
 						m_LineStackVectorB[i]->SetColor(m_Colors[COLOR_EDIT]);
@@ -285,7 +281,6 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 		if (m_CurrMeasure >= 0)
 		{
 			SelectMeasure(-1);
-			m_CurrMeasure = -1;
 			m_CurrPoint = NO_POINT;
 			Render();
 		}
@@ -383,7 +378,7 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 		{
 			if (!hasSameRenderer) return;
 
-			m_CurrMeasure = index;
+			SelectMeasure(index);
 			m_CurrPoint = POINT_2;
 			EditMeasure(index, point2);
 
@@ -414,10 +409,10 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 			m_Distances[index] = DistancePointToLine(point1, l1P1.GetVect(), l1P2.GetVect());
 			m_Distances[index] *= PointUpDownLine(point1, l1P1.GetVect(), l1P2.GetVect());
 
-			m_CurrMeasure = index;
+			SelectMeasure(index);
 			UpdateLineActors(l1P1.GetVect(), l1P2.GetVect());
 
-			m_CurrMeasure = -1;
+			SelectMeasure(-1);
 			m_AddModeCompleted = true;
 			ActivateMeasure(-1, true);
 			return;
@@ -475,7 +470,7 @@ void albaInteractor2DMeasure_LineDistance::AddMeasure(double *point1, double *po
 		m_PointsStackVectorR[index]->GetProperty()->SetPointSize(m_PointSize);
 		m_PointsStackVectorR[index]->SetColor(m_Colors[col]);
 
-		m_CurrMeasure = index;
+		SelectMeasure(index);
 		m_AddModeCompleted = false;
 
 		ActivateMeasure(-1, false);
@@ -525,8 +520,11 @@ void albaInteractor2DMeasure_LineDistance::RemoveMeasure(int index)
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_LineDistance::SelectMeasure(int index)
 {
-	if (GetMeasureCount() > 0)
+	if (index != m_CurrMeasure && GetMeasureCount() > 0)
 	{
+		m_CurrMeasure = index;
+		m_LastEditing = -1;
+
 		// Deselect all
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
@@ -551,9 +549,6 @@ void albaInteractor2DMeasure_LineDistance::SelectMeasure(int index)
 
 			albaEventMacro(albaEvent(this, ID_MEASURE_SELECTED));
 		}
-
-		m_LastSelection = index;
-		m_LastEditing = -1;
 	}
 }
 
@@ -652,7 +647,7 @@ bool albaInteractor2DMeasure_LineDistance::Load(albaVME *input, wxString tag)
 			m_SecondLineAdded[m_CurrMeasure] = true;
 			m_Distances[m_CurrMeasure] = measureLineDistanceTag->GetValueAsDouble(i);
 			UpdateLineActors(point1, point2);
-			m_CurrMeasure = -1;
+			SelectMeasure(-1);
 			SetMeasureLabel(i, measureLabel);
 		}
 

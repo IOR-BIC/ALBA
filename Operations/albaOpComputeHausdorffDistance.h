@@ -79,7 +79,15 @@ public:
 
   static bool SurfaceAccept(albaVME* node);
 
-	double GetSurface2Area()  { return m_Surface2Area; }
+	double GetSurface2Area() { return m_Surface2Area; }
+	double GetSurface1Area() { return m_Surface1Area; }
+
+
+	/** Returns SurfaceInput1 */
+	albaVME * GetSurfaceInput1() const { return m_SurfaceInput1; }
+
+	/** Returns SurfaceInput2 */
+	albaVME * GetSurfaceInput2() const { return m_SurfaceInput2; }
 
 protected:
 
@@ -99,6 +107,7 @@ protected:
 
   int m_VmeOrSTL1, m_VmeOrSTL2;
 
+	double m_Surface1Area;
 	double m_Surface2Area;
 
   albaVME *m_SurfaceInput1;
