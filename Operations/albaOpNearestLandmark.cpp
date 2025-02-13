@@ -79,7 +79,6 @@ void albaOpNearestLandmark::OpRun()
 		OpStop(OP_RUN_CANCEL);
 	
 	surface->GetOutput()->Update();
-	surface->GetOutput()->GetVTKData()->Update();
 
 	albaVMELandmark *lm = albaVMELandmark::SafeDownCast(m_Input);
 	double point[3];
@@ -89,7 +88,7 @@ void albaOpNearestLandmark::OpRun()
 	tra->SetMatrix(surface->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> v_tpdf;
-	v_tpdf->SetInput((vtkPolyData *)surface->GetOutput()->GetVTKData());
+	v_tpdf->SetInputData((vtkPolyData *)surface->GetOutput()->GetVTKData());
 	v_tpdf->SetTransform(tra);
 	v_tpdf->Update();
 	vtkPolyData *tranPoly=v_tpdf->GetOutput();

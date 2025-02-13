@@ -330,10 +330,10 @@ void albaOpVOIDensity::CalculateSurfaceArea()
 	if (surface == NULL)
 		return;
 
-	cleaner->SetInput(surface);
+	cleaner->SetInputData(surface);
 	cleaner->ConvertPolysToLinesOff();
-	cleaner->GetOutput()->Update();
-	triangulator->SetInput(cleaner->GetOutput());
+	cleaner->Update();
+	triangulator->SetInputConnection(cleaner->GetOutputPort());
 	triangulator->Update();
 	vtkPolyData *triSurface=triangulator->GetOutput();
 
@@ -593,13 +593,13 @@ void albaOpVOIDensity::EvaluateSurface()
 			if (ImplicitSurface->EvaluateFunction(point) < 0)
 			{
 				//store the corresponding point's scalar value
-				PointId = VolumeData->FindPoint(Point);
-				InsideScalar = VolumeData->GetPointData()->GetScalars()->GetTuple(pointId)[0];
-				if (!m_EvaluateInSubRange || (InsideScalar >= m_SubRange[0] && InsideScalar <= m_SubRange[1]))
+				pointId = VolumeData->FindPoint(point);
+				insideScalar = VolumeData->GetPointData()->GetScalars()->GetTuple(pointId)[0];
+				if (!m_EvaluateInSubRange || (insideScalar >= m_SubRange[0] && insideScalar <= m_SubRange[1]))
 				{
-					SumScalars += InsideScalar;
-					m_MaxScalar = MAX(InsideScalar, m_MaxScalar);
-					m_MinScalar = MIN(InsideScalar, m_MinScalar);
+					sumScalars += insideScalar;
+					m_MaxScalar = MAX(insideScalar, m_MaxScalar);
+					m_MinScalar = MIN(insideScalar, m_MinScalar);
 					m_NumberOfScalars++;
 					m_VOIScalars->InsertNextTuple(&insideScalar);
 					albaVect3d vPos(point);
