@@ -73,7 +73,11 @@
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpExporterDicom);
 //----------------------------------------------------------------------------
-
+enum EXPORT_DICOM_IDS
+{
+	ID_TEXT_ENTRIES = MINID,
+	ID_ANONYMIZE,
+};
 
 //----------------------------------------------------------------------------
 albaOpExporterDicom::albaOpExporterDicom(const wxString &label) :
@@ -85,6 +89,7 @@ albaOp(label)
   m_Input   = NULL;
 
 	m_ABSMatrixFlag = 0;
+	m_Anonymize = false;
 
 }
 //----------------------------------------------------------------------------
@@ -143,20 +148,21 @@ void albaOpExporterDicom::OpRun()
 
 		m_Gui->Label("");
 		m_Gui->Label("Patient:", true);
-		m_Gui->String(-1, "Name:", &m_PatientsName, "", false);
-		m_Gui->String(-1, "Sex:", &m_PatientsSex, "", false);
-		m_Gui->String(-1, "Birth date:", &m_PatientsBirthDate, "", false);
-		m_Gui->String(-1, "Weight:", &m_PatientsWeight, "", false);
-		m_Gui->String(-1, "Age:", &m_PatientsAge, "", false);
-		m_Gui->String(-1, "ID:", &m_PatientID, "", false);
+		m_Gui->String(ID_TEXT_ENTRIES, "Name:", &m_PatientsName, "", false);
+		m_Gui->String(ID_TEXT_ENTRIES, "Sex:", &m_PatientsSex, "", false);
+		m_Gui->String(ID_TEXT_ENTRIES, "Birth date:", &m_PatientsBirthDate, "", false);
+		m_Gui->String(ID_TEXT_ENTRIES, "Weight:", &m_PatientsWeight, "", false);
+		m_Gui->String(ID_TEXT_ENTRIES, "Age:", &m_PatientsAge, "", false);
+		m_Gui->String(ID_TEXT_ENTRIES, "ID:", &m_PatientID, "", false);
 		m_Gui->Label("");
 		m_Gui->Label("Others:", true);
-		m_Gui->String(-1, "Institution:", &m_InstitutionName, "", false);
-		m_Gui->String(-1, "Acq. Date:", &m_AcquisitionDate, "", false);
-		m_Gui->String(-1, "Protocol:", &m_ProtocolName, "", false);
-		m_Gui->String(-1, "Model:", &m_ManufacturersModelName, "", false);
+		m_Gui->String(ID_TEXT_ENTRIES, "Institution:", &m_InstitutionName, "", false);
+		m_Gui->String(ID_TEXT_ENTRIES, "Acq. Date:", &m_AcquisitionDate, "", false);
+		m_Gui->String(ID_TEXT_ENTRIES, "Protocol:", &m_ProtocolName, "", false);
+		m_Gui->String(ID_TEXT_ENTRIES, "Model:", &m_ManufacturersModelName, "", false);
 		
 		m_Gui->Label("");
+		m_Gui->Bool(ID_ANONYMIZE, "Anonymize", &m_Anonymize, true);
 
 		m_Gui->OkCancel();
 		m_Gui->Enable(wxOK, !m_Folder.IsEmpty());
@@ -178,6 +184,9 @@ void albaOpExporterDicom::OnEvent(albaEventBase *alba_event)
 	{
     switch(e->GetId())
     {
+			case ID_ANONYMIZE:
+				m_Gui->Enable(ID_TEXT_ENTRIES, !m_Anonymize);
+				break;
       case wxOK:
         ExportDicom();
         OpStop(OP_RUN_OK);
@@ -520,6 +529,8 @@ void albaOpExporterDicom::ExportDicom()
 		dcmDataSet.Replace(studyDE);
 		dcmDataSet.Replace(seriesDE);
 
+		if (!m_Anonymize)
+		{
 		DEFINE_TAG(PatientsName);
 		DEFINE_TAG(PatientsSex);
 		DEFINE_TAG(PatientsBirthDate);
@@ -532,7 +543,7 @@ void albaOpExporterDicom::ExportDicom()
 		DEFINE_TAG(AcquisitionDate);
 		DEFINE_TAG(ProtocolName);
 		DEFINE_TAG(ManufacturersModelName);
-
+		}
 		DefineAppSpecificTags(dcmDataSet);
 
 		albaString filename=GetIthFilename(i);
@@ -571,12 +582,17 @@ void albaOpExporterDicom::DefineAppSpecificTags(gdcm::DataSet & dcmDataSet)
 albaString albaOpExporterDicom::GetIthFilename(int i)
 {
 	albaString filename, name;
+	if (m_Anonymize)
+	{
+		name = "AnonymizedPatient";
+	}
+	else
+	{
 	name = m_Input->GetName();
 	name.Replace('.', '_');
 	name.Replace(',', '_');
 	name.Replace(':', '_');
-	name.Replace('/', '_');
-	name.Replace('\\', '_');
+	}
 	filename.Printf("%s/%s.%d.dcm", m_Folder.GetCStr(), name.GetCStr(), i);
 	return filename;
 }

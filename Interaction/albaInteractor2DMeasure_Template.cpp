@@ -68,7 +68,7 @@ albaInteractor2DMeasure_Template::albaInteractor2DMeasure_Template() : albaInter
 
 	Color color{ 0.6, 0.0, 0.6, 1.0 };
 
-	SetColorDefault(color.R, color.G, color.B, 0.85);
+	SetColorDefault(color.R, color.G, color.B, 0.65);
 	SetColorSelection(color.R, color.G, color.B, 1.0);
 	SetColorDisable(color.R, color.G, color.B, 0.3);
 	SetColorText(color.R, color.G, color.B, 0.5);
@@ -174,6 +174,8 @@ void albaInteractor2DMeasure_Template::FindAndHighlight(double * point)
 
 	if (m_EditMeasureEnable)
 	{
+		SetUpdateDistance(PixelSizeInWorld()*4.0);
+
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
 			double pointUL[3], pointUR[3], pointDR[3], pointDL[3];
@@ -183,39 +185,31 @@ void albaInteractor2DMeasure_Template::FindAndHighlight(double * point)
 			{
 				//SelectMeasure(i);
 
-				if (vtkMath::Distance2BetweenPoints(pointUL, point) < POINT_UPDATE_DISTANCE_2)
+				if (vtkMath::Distance2BetweenPoints(pointUL, point) < m_PointUpdateDist2)
 				{
 					SelectMeasure(i);
-
 					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
 					m_CurrPoint = POINT_1;
 					m_PointsStackVectorUL[i]->SetColor(m_Colors[COLOR_EDIT]);
 				}
-				else if (vtkMath::Distance2BetweenPoints(pointUR, point) < POINT_UPDATE_DISTANCE_2)
+				else if (vtkMath::Distance2BetweenPoints(pointUR, point) < m_PointUpdateDist2)
 				{
 					SelectMeasure(i);
-
 					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
 					m_CurrPoint = POINT_2;
 					m_PointsStackVectorUR[i]->SetColor(m_Colors[COLOR_EDIT]);
 				}
-				else if (vtkMath::Distance2BetweenPoints(pointDR, point) < POINT_UPDATE_DISTANCE_2)
+				else if (vtkMath::Distance2BetweenPoints(pointDR, point) < m_PointUpdateDist2)
 				{
 					SelectMeasure(i);
-
 					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
 					m_CurrPoint = POINT_3;
 					m_PointsStackVectorDR[i]->SetColor(m_Colors[COLOR_EDIT]);
 				}
-				else if (vtkMath::Distance2BetweenPoints(pointDL, point) < POINT_UPDATE_DISTANCE_2)
+				else if (vtkMath::Distance2BetweenPoints(pointDL, point) < m_PointUpdateDist2)
 				{
 					SelectMeasure(i);
-
 					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
 					m_CurrPoint = POINT_4;
 					m_PointsStackVectorDL[i]->SetColor(m_Colors[COLOR_EDIT]);
 				}
@@ -235,7 +229,6 @@ void albaInteractor2DMeasure_Template::FindAndHighlight(double * point)
 		if (m_CurrMeasure >= 0)
 		{
 			SelectMeasure(-1);
-			m_CurrMeasure = -1;
 			m_CurrPoint = NO_POINT;
 			Render();
 		}
@@ -304,9 +297,9 @@ void albaInteractor2DMeasure_Template::AddMeasure(double * pointUL, double * poi
 		double oldPoint1[3], oldPoint2[3], oldPoint3[3], oldPoint4[3];
 		GetMeasurePoints(index, oldPoint1, oldPoint2, oldPoint3, oldPoint4);
 
-		if (DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
+		if (DistanceBetweenPoints(oldPoint1, oldPoint2) < m_PointUpdateDist)
 		{
-			m_CurrMeasure = index;
+			SelectMeasure(index);
 			m_CurrPoint = POINT_2;
 			EditMeasure(index, pointUL);
 			return;
@@ -449,7 +442,7 @@ void albaInteractor2DMeasure_Template::AddMeasure(double * pointUL, double * poi
 
 	//////////////////////////////////////////////////////////////////////////
 
-	m_CurrMeasure = index;
+	SelectMeasure(index);
 
 	ShowPoints(false);
 
@@ -556,8 +549,11 @@ void albaInteractor2DMeasure_Template::RemoveMeasure(int index)
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Template::SelectMeasure(int index)
 {
-	if (GetMeasureCount() > 0)
+	if (index != GetMeasureCount() > 0)
 	{
+		m_CurrMeasure = index;
+		m_LastEditing = -1;
+
 		// Deselect all
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
@@ -580,9 +576,6 @@ void albaInteractor2DMeasure_Template::SelectMeasure(int index)
 
 			albaEventMacro(albaEvent(this, ID_MEASURE_SELECTED));
 		}
-
-		m_LastSelection = index;
-		m_LastEditing = -1;
 	}
 }
 

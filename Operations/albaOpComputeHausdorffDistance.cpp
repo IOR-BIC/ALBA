@@ -385,6 +385,9 @@ int albaOpComputeHausdorffDistance::ComputeDistance()
 
   m_Output = m_SurfaceOutput;
 
+	m_Surface1Area = filter->GetTotalAreaSurf1();
+	m_Surface2Area = filter->GetTotalAreaSurf2();
+	
   //m_SurfaceData->Delete();
   cppDEL(filter);
 

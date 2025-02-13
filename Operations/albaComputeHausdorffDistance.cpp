@@ -74,11 +74,11 @@ albaComputeHausdorffDistance::albaComputeHausdorffDistance()
   m_OverallDistance = 0;
   m_SamplingDensity = 1;
 
-  m_Mesh1 = NULL;
-  m_Mesh2 = NULL;
-  m_CleanMesh1 = NULL;
-  m_CleanMesh2 = NULL;
-  m_OutputMesh = NULL;
+  m_Surf1 = NULL;
+  m_Surf2 = NULL;
+  m_CleanSurf1 = NULL;
+  m_CleanSurf2 = NULL;
+  m_OutputSurf = NULL;
 
   
   m_NumberOfTriangles1 = m_NumberOfTriangles2 = 0;
@@ -102,16 +102,16 @@ albaComputeHausdorffDistance::albaComputeHausdorffDistance()
   
   m_OverallDistance = 0.0;
 
-  m_TotalAreaMesh2=0.0;
+	m_TotalAreaSurf1= m_TotalAreaSurf2=0.0;
 
 }
 
 //----------------------------------------------------------------------------
 albaComputeHausdorffDistance::~albaComputeHausdorffDistance()
 {
-  vtkDEL(m_OutputMesh);
-  vtkDEL(m_CleanMesh1);
-  vtkDEL(m_CleanMesh2);
+  vtkDEL(m_OutputSurf);
+  vtkDEL(m_CleanSurf1);
+  vtkDEL(m_CleanSurf2);
 
   for(int i=0;i<m_ListOfTriangles2.size();i++)
     vtkDEL(m_ListOfTriangles2[i]);
@@ -132,27 +132,27 @@ void albaComputeHausdorffDistance::ComputeHausdorffDistance()
   //////////////////////////////////////////////////////////////////////////
   //initialize list of Triangles
   //////////////////////////////////////////////////////////////////////////
-  int numberOfMeshCells = m_CleanMesh1->GetNumberOfCells();
+  int numberOfSurfCells = m_CleanSurf1->GetNumberOfCells();
 
   
  
-  for(int i=0;i<numberOfMeshCells;i++)
+  for(int i=0;i<numberOfSurfCells;i++)
   {
-    if(m_CleanMesh1->GetCellType(i) == VTK_TRIANGLE)
+    if(m_CleanSurf1->GetCellType(i) == VTK_TRIANGLE)
     {
       vtkGenericCell *triangle = vtkGenericCell::New();
-      m_CleanMesh1->GetCell(i, triangle);
+      m_CleanSurf1->GetCell(i, triangle);
       m_NumberOfTriangles1++;
     }
   }
 
-  numberOfMeshCells = m_CleanMesh2->GetNumberOfCells();
-  for(int i=0;i<numberOfMeshCells;i++)
+  numberOfSurfCells = m_CleanSurf2->GetNumberOfCells();
+  for(int i=0;i<numberOfSurfCells;i++)
   {
-    if(m_CleanMesh2->GetCellType(i) == VTK_TRIANGLE)
+    if(m_CleanSurf2->GetCellType(i) == VTK_TRIANGLE)
     {
       vtkGenericCell *triangle= vtkGenericCell::New();
-      m_CleanMesh2->GetCell(i, triangle);
+      m_CleanSurf2->GetCell(i, triangle);
       m_NumberOfTriangles2++;
 
       vtkPoints *points = triangle->GetPoints();
@@ -167,11 +167,32 @@ void albaComputeHausdorffDistance::ComputeHausdorffDistance()
       double area = vtkTriangle::TriangleArea(a,b,c);
 
       //area is used to estimate the cell size;
-      m_TotalAreaMesh2 += area;
+      m_TotalAreaSurf2 += area;
     }
   }
-  //////////////////////////////////////////////////////////////////////////
 
+  //////////////////////////////////////////////////////////////////////////
+	numberOfSurfCells = m_CleanSurf1->GetNumberOfCells();
+	for (int i = 0; i < numberOfSurfCells; i++)
+	{
+		if (m_CleanSurf1->GetCellType(i) == VTK_TRIANGLE)
+		{
+			vtkGenericCell *triangle = vtkGenericCell::New();
+			m_CleanSurf1->GetCell(i, triangle);
+
+			vtkPoints *points = triangle->GetPoints();
+			double a[3], b[3], c[3];
+
+			points->GetPoint(0, a);
+			points->GetPoint(1, b);
+			points->GetPoint(2, c);
+
+			double area = vtkTriangle::TriangleArea(a, b, c);
+
+			//area is used to estimate the cell size;
+			m_TotalAreaSurf1 += area;
+		}
+	}
 
   ComputeCellAndGridSize();
 
@@ -184,11 +205,11 @@ void albaComputeHausdorffDistance::ComputeHausdorffDistance()
 
   
   
-  //For each triangle in mesh1, sample and compute error
+  //For each triangle in Surf1, sample and compute error
 
   m_VertexErrorValues = vtkFloatArray::New();
 
-  vtkPoints *points = m_CleanMesh1->GetPoints();
+  vtkPoints *points = m_CleanSurf1->GetPoints();
   int totVertex=points->GetNumberOfPoints();
  
   double dist = 0, prevDist = 0;
@@ -845,11 +866,11 @@ double albaComputeHausdorffDistance::ComputePointToCellSqrDistance(double point[
 //----------------------------------------------------------------------------
 vtkPolyData *albaComputeHausdorffDistance::GetOutput()
 {
-  vtkNEW(m_OutputMesh);
-  vtkNEW(m_CleanMesh1);
-  vtkNEW(m_CleanMesh2);
+  vtkNEW(m_OutputSurf);
+  vtkNEW(m_CleanSurf1);
+  vtkNEW(m_CleanSurf2);
 
-  // glue the bridge to the mesh by merging the coincident points
+  // glue the bridge to the surface by merging the coincident points
   vtkCleanPolyData *cleaner = vtkCleanPolyData::New();
   vtkTriangleFilter *triangulator = vtkTriangleFilter::New();
   
@@ -860,27 +881,27 @@ vtkPolyData *albaComputeHausdorffDistance::GetOutput()
 
   long progress = 0;
 
-  cleaner->SetInputData(m_Mesh1);
+  cleaner->SetInputData(m_Surf1);
   cleaner->ConvertPolysToLinesOff();
   triangulator->SetInputConnection(cleaner->GetOutputPort());
   triangulator->Update();
-  m_CleanMesh1->DeepCopy(triangulator->GetOutput());
-  m_CleanMesh1->Modified();
+  m_CleanSurf1->DeepCopy(triangulator->GetOutput());
+  m_CleanSurf1->Modified();
 
   progress+=FILTER_PERC/2.0;
   
-  cleaner->SetInputData(m_Mesh2);
+  cleaner->SetInputData(m_Surf2);
   cleaner->ConvertPolysToLinesOff();
   triangulator->SetInputConnection(cleaner->GetOutputPort());
   triangulator->Update();
-  m_CleanMesh2->DeepCopy(triangulator->GetOutput());
-  m_CleanMesh2->Modified();
+  m_CleanSurf2->DeepCopy(triangulator->GetOutput());
+  m_CleanSurf2->Modified();
 
   progress+=FILTER_PERC/2.0;
 	m_ProgBarHelper->UpdateProgressBar(progress);
 
   
-  m_OutputMesh->DeepCopy(m_CleanMesh1);
+  m_OutputSurf->DeepCopy(m_CleanSurf1);
 
   albaLogMessage("albaComputeHausdorffDistance: computing Hausdorff distance...");
   ComputeHausdorffDistance();
@@ -912,14 +933,14 @@ vtkPolyData *albaComputeHausdorffDistance::GetOutput()
 
   m_VertexErrorValues->SetName("Vertices Hausdorff Distance");
 
-  m_OutputMesh->GetPointData()->AddArray(m_VertexErrorValues);
+  m_OutputSurf->GetPointData()->AddArray(m_VertexErrorValues);
 
-  m_OutputMesh->GetPointData()->SetActiveScalars("Vertices Hausdorff Distance");
+  m_OutputSurf->GetPointData()->SetActiveScalars("Vertices Hausdorff Distance");
 
 	m_ProgBarHelper->CloseProgressBar();
 	cppDEL(m_ProgBarHelper);
 
-  return m_OutputMesh;
+  return m_OutputSurf;
   
 }
 
@@ -927,8 +948,8 @@ vtkPolyData *albaComputeHausdorffDistance::GetOutput()
 //----------------------------------------------------------------------------
 void albaComputeHausdorffDistance::SetData(vtkPolyData *data1, vtkPolyData *data2)
 {
-  m_Mesh1 = data1;
-  m_Mesh2 = data2;
+  m_Surf1 = data1;
+  m_Surf2 = data2;
 }
 
 
@@ -938,8 +959,8 @@ void albaComputeHausdorffDistance::ComputeCellAndGridSize()
   //get bounding box
   double bb1[6], bb2[6];
 
-  m_CleanMesh1->GetBounds(bb1);
-  m_CleanMesh2->GetBounds(bb2);
+  m_CleanSurf1->GetBounds(bb1);
+  m_CleanSurf2->GetBounds(bb2);
 
   m_BBoxMin[0] = min(bb1[0], bb2[0]);
   m_BBoxMin[1] = min(bb1[2], bb2[2]);
@@ -949,7 +970,7 @@ void albaComputeHausdorffDistance::ComputeCellAndGridSize()
   m_BBoxMax[1] = max(bb1[3], bb2[3]);
   m_BBoxMax[2] = max(bb1[5], bb2[5]);
 
-  m_CellSize = 0.707 * sqrt(m_TotalAreaMesh2/m_NumberOfTriangles2*4/sqrt(3.0));
+  m_CellSize = 0.707 * sqrt(m_TotalAreaSurf2/m_NumberOfTriangles2*4/sqrt(3.0));
 
   //Avoid values that can overflow or underflow
   if (m_CellSize < DBL_MIN*DMARGIN)

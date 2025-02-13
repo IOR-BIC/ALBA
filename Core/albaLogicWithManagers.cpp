@@ -285,6 +285,7 @@
 #include "albaViewVTK.h"
 #include "albaViewVTKCompound.h"
 #include "albaViewVirtualRX.h"
+#include "albaOpNearestLandmark.h"
 
 
 #define IDM_WINDOWNEXT 4004
@@ -2072,6 +2073,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpSegmentationRegionGrowingConnectedThreshold(), _("Create"));
 	Plug(new albaOpSegmentationRegionGrowingLocalAndGlobalThreshold(), _("Create"));
 	Plug(new albaOpSegmentation(), _("Create"));
+	Plug(new albaOpNearestLandmark(), _("Create"));
 
 
 	Plug(new albaOpClipSurface("Clip Surface"), _("Modify"));

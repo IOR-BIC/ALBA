@@ -35,7 +35,9 @@ public:
 	albaOpVOIDensity(const wxString &label = "VOIDensity");
 	~albaOpVOIDensity(); 
 	virtual void OnEvent(albaEventBase *alba_event);
-	
+
+	void SortSubRange();
+
   albaTypeMacro(albaOpVOIDensity, albaOp);
 
   /** return a copy of itself, this needs to put the operation into the undo stack. */
@@ -68,8 +70,8 @@ public:
 	/**	Return Standard Deviation*/
 	double GetStandardDeviation(){return m_StandardDeviation;};
 
-	/** Extract scalars from input volume that are inside the choosed surface. */
-	void ExtractVolumeScalars();
+	/** Extract scalars from input volume that are inside the chosen surface. */
+	void EvaluateSurface();
 
 	void UpdateStrings();
 
@@ -78,12 +80,32 @@ public:
 	
  	static bool OutputSurfaceAccept(albaVME* Node) {return(Node != NULL && (Node->GetOutput()->IsA("albaVMEOutputSurface")));};
 
+	void CreateCSVFile(albaString file);
+
+
+	/** Returns CreatePointCloudOutput */
+	int GetCreatePointCloudOutput() const { return m_CreatePointCloudOutput; }
+
+	/** Sets CreatePointCloudOutput */
+	void SetCreatePointCloudOutput(int createPointCloudOutput) { m_CreatePointCloudOutput = createPointCloudOutput; }
+
+
+	/** Returns EvaluateInSubRange */
+	int GetEvaluateInSubRange() const { return m_EvaluateInSubRange; }
+
+	/** Sets EvaluateInSubRange */
+	void SetEvaluateInSubRange(int evaluateInSubRange) { m_EvaluateInSubRange = evaluateInSubRange; }
+	
+	/** Sets SubRange */
+	void SetSubRange(double subRangeA, double subRangeB);
+
+	void GetSubRange(double *subRange) { subRange[0] = m_SubRange[0]; subRange[1] = m_SubRange[1]; }
+
 protected:
 
 	void WriteReport();
 
-	void CreateCSVFile(albaString file);
-
+	
 	void GetTags();
 
 	/** Return true for the acceptable vme type. */
@@ -94,12 +116,16 @@ protected:
 
 	void CreatePointSamplingOutput();
 
+	void CalculateSurfaceArea();
+
 	void CreateSegmentationOutput();
 
 	double GetMedian(vtkDoubleArray *valuesArray);
 	
 	static int Cmpfunc(const void * a, const void * b);
 	virtual void CreateGui();
+
+	void EnableDisableGUI(int surfaceEvalued);
 
   albaVME        *m_Surface;
   vtkDoubleArray *m_VOIScalars;
@@ -117,6 +143,8 @@ protected:
   double        m_StandardDeviation;
 	albaString    m_MedianString;
 	double				m_Median;
+	albaString		m_SurfaceAreaString;
+	double				m_SurfaceArea;
 	wxListBox			*m_VoxelList;
 	int						m_EvaluateInSubRange;
 	double				m_SubRange[2];

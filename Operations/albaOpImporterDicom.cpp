@@ -1495,9 +1495,11 @@ void albaDicomStudy::AddSlice(albaDicomSlice *slice)
 	albaString serieID = slice->GetSeriesID();
 	albaString acqusitionNumber = slice->GetAcquisitionNumber();
 	albaString imageType = slice->GetImageType();
+	int *sliceDim = slice->GetSliceSize();
 
 	for (int i = 0; i < m_Series.size() && !series; i++)
-		if (serieID == m_Series[i]->GetSerieID() && m_Series[i]->GetAcquisitionNumber() == acqusitionNumber && m_Series[i]->GetImageType() == imageType)
+		if (serieID == m_Series[i]->GetSerieID() && m_Series[i]->GetAcquisitionNumber() == acqusitionNumber && m_Series[i]->GetImageType() == imageType && 
+				sliceDim[0] == m_Series[i]->GetDimensions()[0] && sliceDim[1] == m_Series[i]->GetDimensions()[1])
 		{
 			series = m_Series[i];
 			break;
@@ -1546,17 +1548,6 @@ void albaDicomSeries::AddSlice(albaDicomSlice *slice)
 		m_Dimensions[2] = 1;
 
 		m_CardiacImagesNum = slice->GetNumberOfCardiacImages();
-	}
-	else
-	{
-		int *dim = slice->GetSliceSize();
-		
-		//Check dimension
-		if ( (dim[0] != m_Dimensions[0]) && (dim[1] != m_Dimensions[1]) )
-		{
-			albaLogMessage("Image :%s\nhave different size than other images in the same series and will be skipped", slice->GetSliceABSFileName());
-			return;
-		}
 	}
 	
 	m_IsRotated = IsRotated(slice->GetDcmImageOrientationPatient());
@@ -1614,7 +1605,7 @@ void albaDicomSlice::GetDicomSpacing(gdcm::DataSet &dcmDataSet, double * dcmPixe
 	//Try to get Imager pixel spacing as spacing used on CR/Xray/DX calculated on front plane of the detector
 	else if (dcmDataSet.FindDataElement(TAG_ImagerPixelSpacing))
 	{
-		gdcm::Attribute ATTRIBUTE_PixelSpacing at;
+		gdcm::Attribute ATTRIBUTE_ImagerPixelSpacing at;
 		at.SetFromDataSet(dcmDataSet);
 
 		dcmPixelSpacing[0] = at.GetValue(0);
