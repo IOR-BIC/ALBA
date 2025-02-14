@@ -310,6 +310,12 @@ void albaVMESlicer::InternalPreUpdate()
 				return;
 			}
 
+			m_ISlicer->SetInputData(vtkdata);
+			m_ISlicer->SetPlaneOrigin(pos);
+			m_ISlicer->SetPlaneAxisX(vectX);
+			m_ISlicer->SetPlaneAxisY(vectY);
+			m_ISlicer->Update();
+
 			vtkImageData *texture = m_PSlicer->GetTexture();
 			texture->AllocateScalars(scalars->GetDataType(), scalars->GetNumberOfComponents());
 			texture->Modified();
@@ -337,12 +343,6 @@ void albaVMESlicer::InternalPreUpdate()
 			m_PSlicer->SetPlaneAxisX(vectX);
 			m_PSlicer->SetPlaneAxisY(vectY);
 			m_PSlicer->Update();
-			
-      m_ISlicer->SetInputData(vtkdata);
-      m_ISlicer->SetPlaneOrigin(pos);
-      m_ISlicer->SetPlaneAxisX(vectX);
-      m_ISlicer->SetPlaneAxisY(vectY);
-			m_ISlicer->Update();
 
       m_BackTransform->SetTransform(m_CopyTransform->GetVTKTransform()->GetInverse());
 			m_BackTransform->Update();
@@ -352,10 +352,6 @@ void albaVMESlicer::InternalPreUpdate()
 
 			GetMaterial()->SetMaterialTexture(texture);
 			texture->GetScalarRange(GetMaterial()->m_TableRange);
-      /*m_BackTransformParent->SetTransform(transform->GetInverse());
-      m_BackTransform->SetInput(m_BackTransformParent->GetOutput());
-      m_BackTransform->Update();*/
-
 
 			albaDataPipeCustom *dpipe = albaDataPipeCustom::SafeDownCast(GetDataPipe());
 
