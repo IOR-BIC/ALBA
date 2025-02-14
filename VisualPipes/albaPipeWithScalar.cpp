@@ -446,7 +446,7 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 						continue;
 					}
 
-					outputVTK->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].ToAscii());
+					int retValue= outputVTK->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].ToAscii());
 					outputVTK->GetPointData()->GetScalars()->Modified();
 					outputVTK->GetCellData()->SetActiveScalars("");
 				}
@@ -465,7 +465,7 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 					}
         
 
-					outputVTK->GetCellData()->SetActiveScalars(scalarsToActivate.ToAscii());
+					int retValue = outputVTK->GetCellData()->SetActiveScalars(scalarsToActivate.ToAscii());
 					outputVTK->GetCellData()->GetScalars()->Modified();
 					outputVTK->GetPointData()->SetActiveScalars("");
 				}
@@ -501,8 +501,12 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 
 	if (m_ScalarMapActive == false && m_MapsGenActive == false)
 		return;
-
-  vtkDataSet *data = m_Mapper->GetInput();
+	
+	vtkDataSet *data;
+	if (m_MapsGenActive)
+		data = m_DensityFilter->GetOutput();
+	else 
+		data = m_Vme->GetOutput()->GetVTKData();
 
   double sr[2]={0,1};
 	if (m_MapsGenActive || (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0))
