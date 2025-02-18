@@ -347,7 +347,7 @@ void albaOpImporterImage::BuildVolume()
 
 		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
 		extractComponents->SetInputConnection(r->GetOutputPort());
-		extractComponents->SetComponents(0, 1, 2); // RGB channels
+		extractComponents->SetComponents(0); //only R channel
 		extractComponents->Update();
     
     m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(),m_Input->GetTimeStamp());
@@ -375,7 +375,7 @@ void albaOpImporterImage::BuildVolume()
     
 		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
 		extractComponents->SetInputConnection(r->GetOutputPort());
-		extractComponents->SetComponents(0, 1, 2); // RGB channels
+		extractComponents->SetComponents(0); //only R channel
 		extractComponents->Update();
 
 		m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(), m_Input->GetTimeStamp());
@@ -404,7 +404,7 @@ void albaOpImporterImage::BuildVolume()
 
 		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
 		extractComponents->SetInputConnection(r->GetOutputPort());
-		extractComponents->SetComponents(0, 1, 2); // RGB channels
+		extractComponents->SetComponents(0); //only R channel
 		extractComponents->Update();
 
 		m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(), m_Input->GetTimeStamp());

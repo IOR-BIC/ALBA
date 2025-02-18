@@ -222,6 +222,7 @@ void  albaOpImporterVRML::ImportVRML()
   for (int i = 0; i < num_actors; i++)
   {
     vtkActor *actor = ac->GetNextActor();
+		actor->GetMapper()->Update();
     matrix.DeepCopy(actor->GetMatrix());
 
     if (actor->GetMapper() != NULL && actor->GetMapper()->GetInput() != NULL)

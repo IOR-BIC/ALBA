@@ -310,6 +310,12 @@ void albaVMESlicer::InternalPreUpdate()
 				return;
 			}
 
+			m_ISlicer->SetInputData(vtkdata);
+			m_ISlicer->SetPlaneOrigin(pos);
+			m_ISlicer->SetPlaneAxisX(vectX);
+			m_ISlicer->SetPlaneAxisY(vectY);
+			m_ISlicer->Update();
+
 			vtkImageData *texture = m_PSlicer->GetTexture();
 			texture->AllocateScalars(scalars->GetDataType(), scalars->GetNumberOfComponents());
 			texture->Modified();
@@ -338,11 +344,7 @@ void albaVMESlicer::InternalPreUpdate()
 			m_PSlicer->SetPlaneAxisY(vectY);
 			m_PSlicer->Update();
 			
-      m_ISlicer->SetInputData(vtkdata);
-      m_ISlicer->SetPlaneOrigin(pos);
-      m_ISlicer->SetPlaneAxisX(vectX);
-      m_ISlicer->SetPlaneAxisY(vectY);
-			m_ISlicer->Update();
+   
 
       m_BackTransform->SetTransform(m_CopyTransform->GetVTKTransform()->GetInverse());
 			m_BackTransform->Update();
@@ -361,6 +363,7 @@ void albaVMESlicer::InternalPreUpdate()
 
 			dpipe->SetInput(m_BackTransform->GetOutput());
 			dpipe->SetNthInput(1,m_ISlicer->GetOutput());
+			GetSurfaceOutput()->SetTexture((vtkImageData *)((albaDataPipeCustom *)GetDataPipe())->GetVTKDataPipe()->GetOutput(1));
     }
   }
   m_SlicedName = vol ? vol->GetName() : _("none");
