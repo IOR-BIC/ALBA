@@ -170,6 +170,7 @@ void albaDataPipeCustomProber::PreExecute()
       albaMatrix tmp_matrix = maps_to_volume->GetMatrix();
 
       m_Prober->SetInputMatrix(tmp_matrix.GetVTKMatrix());
+			m_Prober->Update();
     }
   }
   else

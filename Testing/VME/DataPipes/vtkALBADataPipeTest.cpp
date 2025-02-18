@@ -35,19 +35,15 @@
 #include "vtkCubeSource.h"
 #include "vtkPolyData.h"
 
-#define TEST_RESULT CPPUNIT_ASSERT(result);
-
 
 
 
 //----------------------------------------------------------------------------
 void vtkALBADataPipeTest::TestFixture()
-//----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 void vtkALBADataPipeTest::TestDynamicAllocation()
-//----------------------------------------------------------------------------
 {
   vtkALBASmartPointer<vtkALBADataPipe> dp;
 
@@ -57,7 +53,6 @@ void vtkALBADataPipeTest::TestDynamicAllocation()
 }
 //----------------------------------------------------------------------------
 void vtkALBADataPipeTest::TestSetNthInput()
-//----------------------------------------------------------------------------
 {
 	vtkPolyData *poly0 = vtkPolyData::New();
 	vtkPolyData *poly1 = vtkPolyData::New();
@@ -65,14 +60,13 @@ void vtkALBADataPipeTest::TestSetNthInput()
 	dp->SetNthInput(0, poly0);
 	dp->SetNthInput(1, poly1);
 
-	result = 2 == dp->GetNumberOfInputPorts();
-	TEST_RESULT;
+	CPPUNIT_ASSERT(dp->GetNumberOfInputPorts() == 2);
+	
 	poly0->Delete();
 	poly1->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkALBADataPipeTest::TestGetOutput()
-//----------------------------------------------------------------------------
 {
 	vtkCubeSource *poly0 = vtkCubeSource::New();
 	poly0->Update();
@@ -84,20 +78,17 @@ void vtkALBADataPipeTest::TestGetOutput()
 
   pDataSet = vdp->GetOutput();
 
-	result = NULL != pDataSet;
-	TEST_RESULT;
+	CPPUNIT_ASSERT(pDataSet != NULL);
+	
 
 	pDataSet = vdp->GetOutput(0);
 
-	result = NULL != pDataSet;
-	TEST_RESULT;
+	CPPUNIT_ASSERT(pDataSet != NULL);
 
-	poly0->Delete();
-
+	vtkDEL(poly0);
 }
 //----------------------------------------------------------------------------
 void vtkALBADataPipeTest::TestGetMTime()
-//----------------------------------------------------------------------------
 {
 	vtkALBASmartPointer<vtkALBADataPipe> dp;
 	
@@ -108,8 +99,8 @@ void vtkALBADataPipeTest::TestGetMTime()
 	dp->Update();
 	time2 = dp->GetMTime();
 
-	result = time2 > time1;
-  TEST_RESULT;
+	CPPUNIT_ASSERT(time2 > time1);
+  
 
 	//m_DataPipe != NULL
 	albaSmartPointer<albaDataPipe> mdp;
@@ -119,40 +110,37 @@ void vtkALBADataPipeTest::TestGetMTime()
 	dp->Update();
 	time2 = dp->GetMTime();
 
-	result = time2 > time1;
-	TEST_RESULT;
-
-
+	CPPUNIT_ASSERT(time2 > time1);
 }
 //----------------------------------------------------------------------------
 void vtkALBADataPipeTest::TestGetInformationTime()
-//----------------------------------------------------------------------------
 {
+	vtkCubeSource *poly0 = vtkCubeSource::New();
+	poly0->Update();
+
 	vtkALBASmartPointer<vtkALBADataPipe> dp;
+	dp->SetInputConnection(poly0->GetOutputPort());
+
   long time1, time2;
 	time1 = dp->GetInformationTime();
 	dp->UpdateInformation();
 	time2 = dp->GetInformationTime();
 
-	result = time2 > time1;
-	TEST_RESULT;
+	CPPUNIT_ASSERT (time2 > time1);
+	vtkDEL(poly0);
 }
 //----------------------------------------------------------------------------
 void vtkALBADataPipeTest::TestSetGetDataPipe()
-//----------------------------------------------------------------------------
-{
+	{
 	vtkALBASmartPointer<vtkALBADataPipe> vdp;
   albaSmartPointer<albaDataPipe> mdp;
 
 	vdp->SetDataPipe(mdp);
 
-	result = vdp->GetDataPipe() == mdp.GetPointer();
-  
-	TEST_RESULT;
+	CPPUNIT_ASSERT (vdp->GetDataPipe() == mdp.GetPointer());
 }
 //----------------------------------------------------------------------------
 void vtkALBADataPipeTest::TestUpdateInformation()
-//----------------------------------------------------------------------------
 {
 	//catch event inside vme
 
@@ -165,11 +153,7 @@ void vtkALBADataPipeTest::TestUpdateInformation()
 	vdp->SetDataPipe(dp);
   vdp->UpdateInformation();
 
-	result = vmeTest->Name.Equals("CATCHED");
-	TEST_RESULT;
-
+	CPPUNIT_ASSERT (vmeTest->Name.Equals("CATCHED"));
+	
 	albaDEL(vmeTest);
-
-
-	TEST_RESULT;
 }

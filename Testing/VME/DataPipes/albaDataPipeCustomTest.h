@@ -50,9 +50,6 @@ private:
   void TestUpdateBounds();
   void TestSetInput();
   void TestSetNthInput();
-	
-
-  bool result;
 };
 
 #endif

@@ -46,9 +46,6 @@ private:
 	void TestGetInformationTime();
 	void TestSetGetDataPipe();
 	void TestUpdateInformation();
-	
-
-  bool result;
 };
 
 #endif

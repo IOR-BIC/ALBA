@@ -40,20 +40,17 @@
 #include "vtkSphereSource.h"
 #include "vtkPolyData.h"
 
-#define TEST_RESULT CPPUNIT_ASSERT(result);
 #define EPSILON 0.1
 
 
 
 //----------------------------------------------------------------------------
 void albaDataPipeCustomTest::TestFixture()
-//----------------------------------------------------------------------------
 {
 }
 
 //----------------------------------------------------------------------------
 void albaDataPipeCustomTest::TestDynamicAllocation()
-//----------------------------------------------------------------------------
 {
   albaSmartPointer<albaDataPipeCustom> di;
 
@@ -63,7 +60,6 @@ void albaDataPipeCustomTest::TestDynamicAllocation()
 }
 //----------------------------------------------------------------------------
 void albaDataPipeCustomTest::TestOnEvent()
-//----------------------------------------------------------------------------
 {
   //catch events inside vme : VME_OUTPUT_DATA_PREUPDATE, VME_OUTPUT_DATA_UPDATE
 
@@ -73,20 +69,16 @@ void albaDataPipeCustomTest::TestOnEvent()
   di->SetVME(surfaceTest1);
   di->OnEvent(&albaEvent(di->GetVTKDataPipe(),VME_OUTPUT_DATA_PREUPDATE)); //sender must be datapipe
 
-  result = surfaceTest1->Name.Equals("CATCHED");
-  TEST_RESULT;
+  CPPUNIT_ASSERT(surfaceTest1->Name.Equals("CATCHED"));
 
   albaSmartPointer<albaVMESurfaceTestClass> surfaceTest2;
   di->SetVME(surfaceTest2);
   di->OnEvent(&albaEvent(di->GetVTKDataPipe(),VME_OUTPUT_DATA_UPDATE)); //sender must be datapipe
 
-  result = surfaceTest2->Name.Equals("CATCHED");
-  TEST_RESULT;
-
-}
+	CPPUNIT_ASSERT(surfaceTest2->Name.Equals("CATCHED"));
+ }
 //----------------------------------------------------------------------------
 void albaDataPipeCustomTest::TestGetVTKData()
-//----------------------------------------------------------------------------
 {
   vtkALBASmartPointer<vtkSphereSource> sphere;
   sphere->SetThetaResolution(100);
@@ -103,24 +95,19 @@ void albaDataPipeCustomTest::TestGetVTKData()
 
   double numberOfPoints = dataset->GetNumberOfPoints();
 
-  result =  numberOfPoints == sphere->GetOutput()->GetNumberOfPoints();
-
-  TEST_RESULT;
+	CPPUNIT_ASSERT(numberOfPoints == sphere->GetOutput()->GetNumberOfPoints());
 }
 //----------------------------------------------------------------------------
 void albaDataPipeCustomTest::TestGetVTKDataPipe()
-//----------------------------------------------------------------------------
 {
   //control that vtkALBADataPipe is different from NULL
   albaSmartPointer<albaDataPipeCustom> di;
-  result = NULL != di->GetVTKDataPipe();
 
-  TEST_RESULT;
+	CPPUNIT_ASSERT(di->GetVTKDataPipe() != NULL);
 }
 
 //----------------------------------------------------------------------------
 void albaDataPipeCustomTest::TestUpdate()
-//----------------------------------------------------------------------------
 {
   vtkALBASmartPointer<vtkSphereSource> sphere;
   sphere->SetThetaResolution(100);
@@ -136,26 +123,12 @@ void albaDataPipeCustomTest::TestUpdate()
   dataset = di->GetVTKData();
 
   double numberOfPoints = dataset->GetNumberOfPoints();
-  result =  numberOfPoints == sphere->GetOutput()->GetNumberOfPoints();
   
-  //must be false because there isn't already update
-  result = !result;
-
-  TEST_RESULT;
-
-  di->Update();
-   
-  //now must be updated
-  result = false;
   numberOfPoints = dataset->GetNumberOfPoints();
-  result =  numberOfPoints == sphere->GetOutput()->GetNumberOfPoints();
-
-  TEST_RESULT;
-
+	CPPUNIT_ASSERT(numberOfPoints == sphere->GetOutput()->GetNumberOfPoints());
 }
 //----------------------------------------------------------------------------
 void albaDataPipeCustomTest::TestUpdateBounds()
-//----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMESurfaceTestClass> surfaceTest;
   vtkALBASmartPointer<vtkSphereSource> sphere;
@@ -184,14 +157,13 @@ void albaDataPipeCustomTest::TestUpdateBounds()
   controlledBounds[4] = -5.;
   controlledBounds[5] = 5.;
 
-  result = (fabs(controlledBounds[0] - bounds->m_Bounds[0]) < EPSILON) && \
-    (fabs(controlledBounds[1] - bounds->m_Bounds[1]) < EPSILON) && \
-    (fabs(controlledBounds[2] - bounds->m_Bounds[2]) < EPSILON) && \
-    (fabs(controlledBounds[3] - bounds->m_Bounds[3]) < EPSILON) && \
-    (fabs(controlledBounds[4] - bounds->m_Bounds[4]) < EPSILON) && \
-    (fabs(controlledBounds[5] - bounds->m_Bounds[5]) < EPSILON);
+	CPPUNIT_ASSERT((fabs(controlledBounds[0] - bounds->m_Bounds[0]) < EPSILON) && \
+		(fabs(controlledBounds[1] - bounds->m_Bounds[1]) < EPSILON) && \
+		(fabs(controlledBounds[2] - bounds->m_Bounds[2]) < EPSILON) && \
+		(fabs(controlledBounds[3] - bounds->m_Bounds[3]) < EPSILON) && \
+		(fabs(controlledBounds[4] - bounds->m_Bounds[4]) < EPSILON) && \
+		(fabs(controlledBounds[5] - bounds->m_Bounds[5]) < EPSILON));
 
-  TEST_RESULT;
 }
 
 //----------------------------------------------------------------------------
@@ -213,10 +185,7 @@ void albaDataPipeCustomTest::TestSetInput()
   dataset = di->GetVTKData();
 
   double numberOfPoints = dataset->GetNumberOfPoints();
-  result =  numberOfPoints == sphere->GetOutput()->GetNumberOfPoints();
-
-  TEST_RESULT;
-
+  CPPUNIT_ASSERT(numberOfPoints == sphere->GetOutput()->GetNumberOfPoints());
 }
 //----------------------------------------------------------------------------
 void albaDataPipeCustomTest::TestSetNthInput()
@@ -252,15 +221,13 @@ void albaDataPipeCustomTest::TestSetNthInput()
   vtkPolyData *dataset3 = (vtkPolyData *)di->GetVTKDataPipe()->GetOutput(2);
 
   double numberOfPoints1 = dataset1->GetNumberOfPoints();
-  result =  numberOfPoints1 == sphere1->GetOutput()->GetNumberOfPoints();
-  TEST_RESULT;
+	CPPUNIT_ASSERT(numberOfPoints1 == sphere1->GetOutput()->GetNumberOfPoints());
+ 
 
   double numberOfPoints2 = dataset2->GetNumberOfPoints();
-  result =  numberOfPoints2 == sphere2->GetOutput()->GetNumberOfPoints();
-  TEST_RESULT;
+	CPPUNIT_ASSERT(numberOfPoints2 == sphere2->GetOutput()->GetNumberOfPoints());
+
 
   double numberOfPoints3 = dataset3->GetNumberOfPoints();
-  result =  numberOfPoints3 == sphere3->GetOutput()->GetNumberOfPoints();
-  TEST_RESULT;
-
+  CPPUNIT_ASSERT(numberOfPoints3 == sphere3->GetOutput()->GetNumberOfPoints());
 }

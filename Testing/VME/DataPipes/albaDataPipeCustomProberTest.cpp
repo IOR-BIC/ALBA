@@ -40,18 +40,13 @@
 #include "vtkALBASmartPointer.h"
 #include "albaSmartPointer.h"
 
-#define TEST_RESULT CPPUNIT_ASSERT(result);
-
-
 //----------------------------------------------------------------------------
 void albaDataPipeCustomProberTest::TestFixture()
-//----------------------------------------------------------------------------
 {
 }
 
 //----------------------------------------------------------------------------
 void albaDataPipeCustomProberTest::TestDynamicAllocation()
-//----------------------------------------------------------------------------
 {
   albaSmartPointer<albaDataPipeCustomProber> di;
 
@@ -62,7 +57,6 @@ void albaDataPipeCustomProberTest::TestDynamicAllocation()
 
 //----------------------------------------------------------------------------
 void albaDataPipeCustomProberTest::TestExecute()
-//----------------------------------------------------------------------------
 {
   //Create storage
   albaVMEStorage *storage = albaVMEStorage::New();
@@ -108,19 +102,14 @@ void albaDataPipeCustomProberTest::TestExecute()
 
   double range[2];
   probingDataPipe->GetVTKData()->GetScalarRange(range);
-
-  result = (rangeVol[0] <= range[0] && rangeVol[1] >= range[1]);
-  TEST_RESULT;
+  CPPUNIT_ASSERT((rangeVol[0] <= range[0] && rangeVol[1] >= range[1]));
 
   albaDEL(storage);
   albaDEL(importer);
   albaDEL(importer1);
-  
-
 }
 //----------------------------------------------------------------------------
 void albaDataPipeCustomProberTest::TestSetSurface()
-//----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMESurface> surfaceIN;
   albaVME *node;
@@ -130,13 +119,10 @@ void albaDataPipeCustomProberTest::TestSetSurface()
   node = probingDataPipe->GetSurface();
   albaSmartPointer<albaVMESurface> surfaceOUT = albaVMESurface::SafeDownCast(node);
 
-  result = surfaceIN->Equals(surfaceOUT);
-  TEST_RESULT;
-
+  CPPUNIT_ASSERT(surfaceIN->Equals(surfaceOUT));
 }
 //----------------------------------------------------------------------------
 void albaDataPipeCustomProberTest::TestSetVolume()
-//----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEVolumeGray> volumeIN;
   albaVME *node;
@@ -146,57 +132,39 @@ void albaDataPipeCustomProberTest::TestSetVolume()
   node = probingDataPipe->GetSurface();
   albaSmartPointer<albaVMEVolumeGray> volumeOUT = albaVMEVolumeGray::SafeDownCast(node);
 
-  result = volumeIN->Equals(volumeOUT);
-  TEST_RESULT;
-
+  CPPUNIT_ASSERT(volumeIN->Equals(volumeOUT));
 }
 //----------------------------------------------------------------------------
 void albaDataPipeCustomProberTest::TestSetGet()
-//----------------------------------------------------------------------------
 {
   //SetMode
   int modeIN = albaDataPipeCustomProber::DISTANCE_MODE;
   albaSmartPointer<albaDataPipeCustomProber>  probingDataPipe;
   probingDataPipe->SetMode(modeIN);
   int modeOUT = probingDataPipe->GetMode();
-
-  result = modeIN == modeOUT;
-  TEST_RESULT;
-
+  CPPUNIT_ASSERT(modeIN == modeOUT);
 
   //SetDistanceThreshold
   float thrIN = 0.2;
   probingDataPipe->SetDistanceThreshold(thrIN);
   float thrOUT = probingDataPipe->GetDistanceThreshold();
-
-  result = albaEquals(thrIN, thrOUT);
-  TEST_RESULT;
-
+	CPPUNIT_ASSERT(albaEquals(thrIN, thrOUT));
 
   //SetMaxDistance
   float distanceIN = 15.1;
   probingDataPipe->SetMaxDistance(distanceIN);
   float distanceOUT = probingDataPipe->GetMaxDistance();
-
-  result = albaEquals(distanceIN, distanceOUT);
-  TEST_RESULT;
-
+  CPPUNIT_ASSERT(albaEquals(distanceIN, distanceOUT));
 
   //SetHighDensity
   float densityIN = 12.6;
   probingDataPipe->SetHighDensity(densityIN);
   float densityOUT = probingDataPipe->GetHighDensity();
-
-  result = albaEquals(densityIN, densityOUT);
-  TEST_RESULT;
-
+  CPPUNIT_ASSERT(albaEquals(densityIN, densityOUT));
 
   //SetLowDensity
   float lowDensityIN = 25.3;
   probingDataPipe->SetLowDensity(lowDensityIN);
   float lowDensityOUT = probingDataPipe->GetLowDensity();
-
-  result = albaEquals(lowDensityIN, lowDensityOUT);
-  TEST_RESULT;
-
+  CPPUNIT_ASSERT(albaEquals(lowDensityIN, lowDensityOUT));
 }
