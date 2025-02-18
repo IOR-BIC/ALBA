@@ -345,7 +345,6 @@ void albaVMESlicer::InternalPreUpdate()
 			m_PSlicer->Update();
 			
    
-
       m_BackTransform->SetTransform(m_CopyTransform->GetVTKTransform()->GetInverse());
 			m_BackTransform->Update();
 
@@ -354,10 +353,6 @@ void albaVMESlicer::InternalPreUpdate()
 
 			GetMaterial()->SetMaterialTexture(texture);
 			texture->GetScalarRange(GetMaterial()->m_TableRange);
-      /*m_BackTransformParent->SetTransform(transform->GetInverse());
-      m_BackTransform->SetInput(m_BackTransformParent->GetOutput());
-      m_BackTransform->Update();*/
-
 
 			albaDataPipeCustom *dpipe = albaDataPipeCustom::SafeDownCast(GetDataPipe());
 
