@@ -44,10 +44,10 @@ void albaVMERawMotionDataTest::Test()
   int returnValue = 1;
 
   albaString filename=ALBA_DATA_ROOT;
-  filename<<"/RAW_MAL/Fprg3bsi_NOT_USED.man";
+  filename<<"/RAW_MAL/Fprg3bsi.man";
 
   albaString fileDict=ALBA_DATA_ROOT;
-  fileDict<<"/RAW_MAL/DICT_FPRG3BSL_421_NOT_USED.TXT";
+  fileDict<<"/RAW_MAL/DICT_FPRG3BSL_421.TXT";
 
   vmeRawMotionData->DictionaryOn();
 
@@ -57,11 +57,6 @@ void albaVMERawMotionDataTest::Test()
   // read control
   returnValue = vmeRawMotionData->Read();
   CPPUNIT_ASSERT(returnValue == ALBA_OK);  // 0 if read is ok
-
-  /*returnValue = -1;
-  vmeRawMotionData->DictionaryOff();
-  returnValue = vmeRawMotionData->Read();
-  CPPUNIT_ASSERT(returnValue == ALBA_OK);*/
 
   //child control
   long n = vmeRawMotionData->GetNumberOfChildren();
