@@ -1,0 +1,60 @@
+203,210c203,207
+<   // If a reference is available from the garbage collector, use it.
+<   // Otherwise create a new reference by incrementing the reference
+<   // count.
+<   if(!(check &&
+<        vtkObjectBaseToGarbageCollectorFriendship::TakeReference(this)))
+<   {
+<     this->ReferenceCount++;
+<   }
+---
+> 	this->ReferenceCount++;
+> 	if (this->ReferenceCount <= 0)
+> 	{
+> 		delete this;
+> 	}
+216,236c213,214
+<   // If the garbage collector accepts a reference, do not decrement
+<   // the count.
+<   if(check && this->ReferenceCount > 1 &&
+<      vtkObjectBaseToGarbageCollectorFriendship::GiveReference(this))
+<   {
+<     return;
+<   }
+< 
+<   // Decrement the reference count, delete object if count goes to zero.
+<   if(--this->ReferenceCount <= 0)
+<   {
+<     // Clear all weak pointers to the object before deleting it.
+<     if (this->WeakPointers)
+<     {
+<       vtkWeakPointerBase **p = this->WeakPointers;
+<       while (*p)
+<       {
+<         vtkObjectBaseToWeakPointerBaseFriendship::ClearPointer(*p++);
+<       }
+<       delete [] this->WeakPointers;
+<     }
+---
+> 	if (--this->ReferenceCount <= 0)
+> 	{
+238c216
+<     vtkDebugLeaks::DestructClass(this->GetClassName());
+---
+> 		vtkDebugLeaks::DestructClass(this->GetClassName());
+240,249c218,221
+<     delete this;
+<   }
+<   else if(check)
+<   {
+<     // The garbage collector did not accept the reference, but the
+<     // object still exists and is participating in garbage collection.
+<     // This means either that delayed garbage collection is disabled
+<     // or the collector has decided it is time to do a check.
+<     vtkGarbageCollector::Collect(this);
+<   }
+---
+> 		// invoke the delete method
+> 		// Here we should call delete method
+> 		delete this;
+> 	}
