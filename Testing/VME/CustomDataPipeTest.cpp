@@ -134,27 +134,25 @@ void CustomDataPipeTest::CustomDataPipeMainTest()
   vtkPolyData *surface=(vtkPolyData *)data;
 
   CPPUNIT_ASSERT(vme->m_PreUpdateConunter==1);
-  CPPUNIT_ASSERT(vme->m_UpdateConunter==0);
-
-
-  CPPUNIT_ASSERT(vme->m_PreUpdateConunter==1);
   CPPUNIT_ASSERT(vme->m_UpdateConunter==1);
+
+
   CPPUNIT_ASSERT(vme->m_Sphere->GetRadius()==1);
   CPPUNIT_ASSERT(vme->m_Cone->GetRadius()==1);
 
+	//Update after set Radius, the VME has changed and the output should be updated.
   vme->SetRadius(2);
 	vme->GetOutput()->Update();
   CPPUNIT_ASSERT(vme->m_PreUpdateConunter==2);
   CPPUNIT_ASSERT(vme->m_UpdateConunter==2);
 
-  vme->SetTypeToSphere();
+	//Update after set type to Sphere, the VME has changed and the output should be updated.
+	vme->SetTypeToSphere();
   CPPUNIT_ASSERT(vme->GetOutput()->GetVTKData()==surface);
-  CPPUNIT_ASSERT(vme->m_PreUpdateConunter==3);
-  CPPUNIT_ASSERT(vme->m_UpdateConunter==2);
-  
   CPPUNIT_ASSERT(vme->m_PreUpdateConunter==3);
   CPPUNIT_ASSERT(vme->m_UpdateConunter==3);
   
+	//Update whiteout VME changes, the VME should not be updated to avoid resource consuming tasks
 	vme->GetOutput()->Update();
   
   CPPUNIT_ASSERT(vme->m_PreUpdateConunter==3);

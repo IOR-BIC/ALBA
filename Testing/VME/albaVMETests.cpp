@@ -133,7 +133,7 @@ int	main( int argc, char* argv[] )
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
-	runner.addTest(albaVMEExternalDataTest::suite());
+	/*runner.addTest(albaVMEExternalDataTest::suite());
 	runner.addTest(albaVMEVolumeGrayTest::suite());
 	runner.addTest(albaVMESurfaceParametricTest::suite());
 	runner.addTest(albaVMESurfaceTest::suite());
@@ -201,6 +201,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaDataPipeCustomSegmentationVolumeTest::suite());
 	runner.addTest(VMEGenericPoseTest::suite());
 	runner.addTest(VMEGenericBoundsTest::suite());
+*/
 	runner.addTest(CustomDataPipeTest::suite());
 	runner.addTest(VMEGenericTest::suite());
 

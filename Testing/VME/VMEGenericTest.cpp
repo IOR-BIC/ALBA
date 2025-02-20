@@ -49,6 +49,9 @@
 #include "vtkProperty.h"
 
 #include <iostream>
+#include "albaVMEStorage.h"
+#include "albaDataPipeInterpolatorVTK.h"
+#include "vtkALBADataPipe.h"
 
 
 //-------------------------------------------------------------------------
@@ -355,9 +358,11 @@ void VMEGenericTest::VMEGenericMainTest()
 
         CPPUNIT_ASSERT(data->IsA("vtkPolyData")!=0);
 
-        vtkPolyDataMapper *mapper=vtkPolyDataMapper::New();
+				albaDataPipeInterpolatorVTK *interpolator = albaDataPipeInterpolatorVTK::SafeDownCast(node->GetDataPipe());
 
-        mapper->SetInputData((vtkPolyData *)data);
+				vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
+
+				mapper->SetInputConnection(interpolator->GetVTKDataPipe()->GetOutputPort());
   
         vtkALBASmartPointer<vtkActor> vmeact;
         vmeact->GetProperty()->SetColor(0,1,0);
@@ -570,8 +575,8 @@ void VMEGenericTest::VMEGenericMainTest()
     root->SetTreeTime(t);
 
     renderer->ResetCameraClippingRange();
-    renderer->GetActiveCamera()->Azimuth(1);
-    renWin->Render();
+		renderer->GetActiveCamera()->Azimuth(1);
+		renWin->Render();
 
     root->GetOutput()->GetBounds(treeBounds);
     //vtitle->GetOutput()->GetBounds(treeBounds);
@@ -584,7 +589,7 @@ void VMEGenericTest::VMEGenericMainTest()
     asmBoundsBox->SetBounds(asmBounds);    
 
     CPPUNIT_ASSERT(treeBounds.Equals(asmBounds));
-  
+	
   }
 
 

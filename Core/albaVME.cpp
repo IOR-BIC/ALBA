@@ -371,8 +371,11 @@ int albaVME::SetParent(albaVME *parent)
   // pipes to allow multiple pipes contemporary 
   // working at different times
   // 
-  if (m_DataPipe)
-    m_DataPipe->SetTimeStamp(t);
+	if (m_DataPipe)
+	{
+		m_DataPipe->SetTimeStamp(t);
+		m_DataPipe->Update();
+	}
 
   if (m_MatrixPipe)
     m_MatrixPipe->SetTimeStamp(t);
