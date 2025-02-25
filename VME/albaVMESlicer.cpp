@@ -284,7 +284,8 @@ void albaVMESlicer::InternalPreUpdate()
 			slicedVMETransform->Update();
 
 			albaSmartPointer<albaTransform> parentTransform;
-			parentTransform->SetMatrix(GetParent()->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+			if (GetParent() != NULL)
+				parentTransform->SetMatrix(GetParent()->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 			parentTransform->Update();
 
 			parentTransform->Concatenate(slicedVMETransform, 0);
