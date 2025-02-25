@@ -193,7 +193,6 @@ protected:
   vtkActor               *m_VolumeBoxActor;
 	vtkActor							 *m_TickActor;
 
-  vtkActor               *m_GhostActor;
 
 	vtkOutlineSource       *m_Box;
   vtkPolyDataMapper	     *m_Mapper;

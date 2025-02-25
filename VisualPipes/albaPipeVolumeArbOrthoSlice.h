@@ -150,7 +150,6 @@ protected:
   albaGUIFloatSlider *m_SliceSlider[3]; ///< Sliders used to move the cutting plane along the normals
   vtkActor               *m_VolumeBoxActor;
 	vtkActor							 *m_TickActor;
-  vtkActor               *m_GhostActor;
 	vtkOutlineSource       *m_Box;
   vtkPolyDataMapper	     *m_Mapper;
   albaLODActor            *m_Actor;

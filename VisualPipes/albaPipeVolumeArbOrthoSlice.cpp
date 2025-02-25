@@ -78,7 +78,6 @@ albaPipeVolumeArbOrthoSlice::albaPipeVolumeArbOrthoSlice():albaPipe()
 	m_Box = NULL;
 	m_Mapper = NULL;
 	m_Actor = NULL;
-	m_GhostActor = NULL;
 
 	m_TickActor = NULL;
 
@@ -338,10 +337,6 @@ albaPipeVolumeArbOrthoSlice::~albaPipeVolumeArbOrthoSlice()
 	vtkDEL(m_VolumeBoxActor);
 	vtkDEL(m_Actor);
 	vtkDEL(m_TickActor);
-
-  if(m_GhostActor) 
-    m_AssemblyFront->RemovePart(m_GhostActor);
-  vtkDEL(m_GhostActor);
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeArbOrthoSlice::SetLutRange(double low, double high)

@@ -185,21 +185,6 @@ void albaPipeVolumeOrthoSlice::Create(albaSceneNode *n)
 		m_Actor->SetMapper(m_Mapper);
 		m_AssemblyUsed->AddPart(m_Actor);
 	}
-
-	// if the actor is in the background renderer
-	// create something invisible in the front renderer so that ResetCamera will work
-  m_GhostActor = NULL;
-  if(m_AssemblyBack != NULL)
-	{
-		int mapperNum = (m_SliceDirection < 3) ? m_SliceDirection : 0;
-		vtkNEW(m_GhostActor);
-		m_GhostActor->SetMapper(m_SliceMapper[mapperNum]);
-		m_GhostActor->PickableOff();
-		m_GhostActor->GetProperty()->SetOpacity(0);
-		m_GhostActor->GetProperty()->SetRepresentationToPoints();
-		m_GhostActor->GetProperty()->SetInterpolationToFlat();
-		m_AssemblyFront->AddPart(m_GhostActor);
-  }
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeOrthoSlice::CreateTICKs()
@@ -424,10 +409,6 @@ albaPipeVolumeOrthoSlice::~albaPipeVolumeOrthoSlice()
 	vtkDEL(m_VolumeBoxActor);
 	vtkDEL(m_Actor);
 	vtkDEL(m_TickActor);
-
-  if(m_GhostActor) 
-    m_AssemblyFront->RemovePart(m_GhostActor);
-  vtkDEL(m_GhostActor);
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeOrthoSlice::SetLutRange(double low, double high)
