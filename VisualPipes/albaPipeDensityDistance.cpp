@@ -293,7 +293,7 @@ void albaPipeDensityDistance::Create(albaSceneNode *n/*, bool use_axes*/)
   m_ScalarBar->SetWidth(0.8);
   m_ScalarBar->SetHeight(0.17);
   m_ScalarBar->SetTitle("Distance");
-  m_ScalarBar->SetMaximumNumberOfColors(3);
+  m_ScalarBar->SetMaximumNumberOfColors(m_MaxDistance*8);
 	m_ScalarBar->SetLabelFormat("%-#6.0f");
 
   m_AssemblyFront->AddPart(m_Actor);
@@ -556,7 +556,7 @@ void albaPipeDensityDistance::OnEvent(albaEventBase *alba_event)
 					m_AreaDistance[1] = (mass_mid->GetSurfaceArea() / total_area) * 100.0;
 					m_AreaDistance[2] = (mass_high->GetSurfaceArea() / total_area) * 100.0;
 
-					m_ScalarBar->SetMaximumNumberOfColors(3);
+					m_ScalarBar->SetMaximumNumberOfColors(m_MaxDistance*8);
 					m_ScalarBar->Modified();
 
           m_Gui->Enable(ID_DENSITY_DISTANCE,true);
