@@ -290,26 +290,6 @@ void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
   ImageData->GetScalarRange(sr);
   double srw = sr[1]-sr[0]+1;
 	
-  if (ImageData->GetScalarType() == VTK_CHAR || ImageData->GetScalarType() == VTK_UNSIGNED_CHAR )
-  {
-    // NumberOfBins  is 256 at most --- HistogramBins coincide with Scalars Values 
-    NumberOfBins = srw; 
-  }
-  else if ( ImageData->GetScalarType() >= VTK_SHORT && ImageData->GetScalarType() <= VTK_UNSIGNED_INT )
-  {
-    // NumberOfBins  can be >> 256 --- HistogramBins << Scalars Values 
-    NumberOfBins = srw;
-    int i=1;
-    while(NumberOfBins > 500 )
-    {
-      NumberOfBins = srw / i++;
-    }
-  }
-  else 
-  {
-    NumberOfBins = ( srw > 500 ) ? 500 : srw ; 
-  }
-
   Accumulate->SetInputData(ImageData);
   Accumulate->SetComponentOrigin(sr[0],0,0);  
   Accumulate->SetComponentExtent(0,NumberOfBins,0,0,0,0);
@@ -322,11 +302,15 @@ void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
     double m = VTK_DOUBLE_MIN;
     double as;
     vtkDataArray *arr = Accumulate->GetOutput()->GetPointData()->GetScalars();
+		printf("\n");
     for (int s = 1; s < arr->GetNumberOfTuples(); s++)
     {
       arr->GetTuple(s,&as);
+			printf("%.4f, ", as);
       m = as>m ? as : m;
     }
+		printf("\n");
+
     double mean = m;
     if (mean < 0) mean = -mean;
     
