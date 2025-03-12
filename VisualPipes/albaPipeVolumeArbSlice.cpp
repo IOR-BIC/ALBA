@@ -79,7 +79,6 @@ albaPipeVolumeArbSlice::albaPipeVolumeArbSlice()
   m_SlicerImage			= NULL;
   m_Image           = NULL;
   m_Texture		      = NULL;
-  m_SlicePolydata		= NULL;
   m_SliceMapper		  = NULL;
   m_SliceActor      = NULL;
 
@@ -438,7 +437,7 @@ void albaPipeVolumeArbSlice::CreateSlice()
 	// to delete
 	vtkNEW(m_NormalTranformFilter);
 
-	m_NormalTranformFilter->SetInputData(m_SlicePolydata);
+	m_NormalTranformFilter->SetInputConnection(m_SlicerPolygonal->GetOutputPort());
 	m_NormalTranformFilter->SetTransform(m_NormalTranform);
 	m_NormalTranformFilter->Update();
 
@@ -447,7 +446,7 @@ void albaPipeVolumeArbSlice::CreateSlice()
 	if (m_EnableSliceViewCorrection)
 		m_SliceMapper->SetInputConnection(m_NormalTranformFilter->GetOutputPort());
 	else
-		m_SliceMapper->SetInputData(m_SlicePolydata);
+		m_SliceMapper->SetInputConnection(m_SlicerPolygonal->GetOutputPort());
 
 	m_SliceMapper->ScalarVisibilityOff();
 
@@ -489,7 +488,6 @@ albaPipeVolumeArbSlice::~albaPipeVolumeArbSlice()
 	vtkDEL(m_Image);
 	vtkDEL(m_Texture);
 	vtkDEL(m_SliceMapper);
-	vtkDEL(m_SlicePolydata);
 	vtkDEL(m_NormalTranform);
 	vtkDEL(m_NormalTranformFilter);
 	vtkDEL(m_SliceActor);
@@ -814,5 +812,5 @@ void albaPipeVolumeArbSlice::SetEnableSliceViewCorrection(bool val)
 	if (m_EnableSliceViewCorrection)
 		m_SliceMapper->SetInputConnection(m_NormalTranformFilter->GetOutputPort());
 	else
-		m_SliceMapper->SetInputData(m_SlicePolydata);
+		m_SliceMapper->SetInputConnection(m_SlicerPolygonal->GetOutputPort());
 }

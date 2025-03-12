@@ -199,7 +199,7 @@ protected:
   vtkLookupTable         *m_ColorLUT;
   vtkLookupTable         *m_CustomColorLUT;
   vtkPolyDataMapper			 *m_SliceMapper;
-	vtkPolyData						 *m_SlicePolydata;
+	//vtkPolyData						 *m_SlicePolydata;
   vtkActor               *m_SliceActor;
 	
   vtkActor               *m_VolumeBoxActor;
