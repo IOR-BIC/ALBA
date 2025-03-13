@@ -890,7 +890,7 @@ void albaPipeMeshSliceTest::ProceduralControl(double controlRangeMapper[2],vtkPr
   //procedural control
   double sr[2];
   ((vtkActor* )propToControl)->GetMapper()->GetScalarRange(sr);
-  CPPUNIT_ASSERT(sr[0] == controlRangeMapper[0] && sr[1] == controlRangeMapper[1] || 1);
+  CPPUNIT_ASSERT(sr[0] == controlRangeMapper[0] && sr[1] == controlRangeMapper[1]);
   //end procedural control
 }
 //----------------------------------------------------------------------------
