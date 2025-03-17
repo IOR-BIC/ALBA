@@ -26,6 +26,7 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class vtkPolyData;
+class vtkAlgorithmOutput;
 class albaTransform;
 class albaVMEOutputSurface;
 class mmaMaterial;
@@ -49,7 +50,12 @@ public:
   For VME Gizmo it is allowed to directly set the Data to be used
   to display the node.*/
   void SetData(vtkPolyData *data);
-  
+
+	/**
+	For VME Gizmo it is allowed to directly set the Data to be used
+	to display the node.*/
+	void SetDataConnection(vtkAlgorithmOutput *intput);
+
   /** return the polydata used to display this gizmo */
   vtkPolyData *GetData() {return m_GizmoData;}
   
@@ -125,6 +131,7 @@ protected:
 
   albaTransform *m_Transform; ///< pose matrix for the slicer plane
   vtkPolyData  *m_GizmoData;
+	vtkAlgorithmOutput *m_InputConnection;
 
   albaString m_TextValue;
   double m_TextPosition[3];

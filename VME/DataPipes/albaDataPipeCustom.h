@@ -23,6 +23,7 @@
 // forward declarations
 //----------------------------------------------------------------------------
 class vtkALBADataPipe;
+class vtkAlgorithmOutput;
 
 /** a data pipe which simply forwards VTK update events to the VME.
   This data pipe creates an internal vtkSource objects and links to it to 
@@ -54,6 +55,12 @@ public:
 
   /** sets the N-th input of the datapipe */
   void SetNthInput(int n, vtkDataSet *input_dataset);
+
+	/** sets the first input connection of the datapipe */
+	void SetInputConnection(vtkAlgorithmOutput *input);
+
+	/** sets the N-th input connection of the datapipe */
+	void SetInputConnection(int n, vtkAlgorithmOutput *input);
 
 protected:
   albaDataPipeCustom();

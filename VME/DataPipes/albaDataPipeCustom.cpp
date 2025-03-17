@@ -123,3 +123,16 @@ void albaDataPipeCustom::SetNthInput(int n, vtkDataSet *input_dataset)
 	vtkALBADataPipe * vtkDataPipe = GetVTKDataPipe();
   vtkDataPipe->SetNthInput(n,input_dataset);
 }
+
+//----------------------------------------------------------------------------
+void albaDataPipeCustom::SetInputConnection(vtkAlgorithmOutput *input)
+{
+	SetInputConnection(0, input);
+}
+
+//----------------------------------------------------------------------------
+void albaDataPipeCustom::SetInputConnection(int n, vtkAlgorithmOutput *input)
+{
+	vtkALBADataPipe * vtkDataPipe = GetVTKDataPipe();
+	vtkDataPipe->SetInputConnection(n, input);
+}
