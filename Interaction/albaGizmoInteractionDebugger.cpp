@@ -233,7 +233,7 @@ void albaGizmoInteractionDebugger::CreateVMEGizmo()
   albaNEW(m_VmeGizmo);
   m_VmeGizmo->SetName(m_Name);
   m_VmeGizmo->ReparentTo(root); 
-  m_VmeGizmo->SetData(m_AppendPolyData->GetOutput());  
+  m_VmeGizmo->SetDataConnection(m_AppendPolyData->GetOutputPort());  
   assert(m_VmeGizmo->GetData()->GetNumberOfPoints());
 
   CreateInteractor();

@@ -86,8 +86,8 @@ albaGizmoTranslatePlane::albaGizmoTranslatePlane(albaVME *input, albaObserver *l
     vmeName = "part";
     vmeName << i;
     m_Gizmo[i]->SetName(vmeName.GetCStr());
-    m_Gizmo[i]->SetData(m_RotatePDF[i]->GetOutput());
-	m_Gizmo[i]->SetMediator(m_Listener);
+    m_Gizmo[i]->SetDataConnection(m_RotatePDF[i]->GetOutputPort());
+		m_Gizmo[i]->SetMediator(m_Listener);
   }
 
   // assign isa to S1 and S2;

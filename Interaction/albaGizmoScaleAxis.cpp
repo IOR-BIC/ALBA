@@ -73,13 +73,13 @@ albaGizmoScaleAxis::albaGizmoScaleAxis(albaVME *input, albaObserver *listener)
   // cylinder gizmo
   m_CylGizmo = albaVMEGizmo::New();
   m_CylGizmo->SetName("CylGizmo");
-  m_CylGizmo->SetData(m_RotatePDF[CYLINDER]->GetOutput());
+  m_CylGizmo->SetDataConnection(m_RotatePDF[CYLINDER]->GetOutputPort());
   m_CylGizmo->SetMediator(m_Listener);
 
   // cube gizmo
   m_CubeGizmo = albaVMEGizmo::New();  
   m_CubeGizmo->SetName("CubeGizmo");
-  m_CubeGizmo->SetData(m_RotatePDF[CUBE]->GetOutput());
+  m_CubeGizmo->SetDataConnection(m_RotatePDF[CUBE]->GetOutputPort());
   m_CubeGizmo->SetMediator(m_Listener);
 
   // assign isa to cylinder and cube

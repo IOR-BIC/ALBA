@@ -64,7 +64,7 @@ albaGizmoBoundingBox::albaGizmoBoundingBox(albaVME *input, albaObserver *listene
   m_BoxGizmo->SetName("BoxGizmo");
   
   // since i'm working in local mode i reparent to input vme the gizmo
-  m_BoxGizmo->SetData(m_BoxOutline->GetOutput());
+  m_BoxGizmo->SetDataConnection(m_BoxOutline->GetOutputPort());
 	m_BoxGizmo->GetOutput()->GetVTKData()->ComputeBounds();
 	if(parent)
 		m_BoxGizmo->ReparentTo(parent);

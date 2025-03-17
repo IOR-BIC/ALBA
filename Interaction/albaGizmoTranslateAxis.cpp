@@ -79,7 +79,7 @@ albaGizmoTranslateAxis::albaGizmoTranslateAxis(albaVME *input, albaObserver *lis
   } else {
 	  m_CylGizmo->SetName(name);
   }
-  m_CylGizmo->SetData(m_RotatePDF[CYLINDER]->GetOutput());
+  m_CylGizmo->SetDataConnection(m_RotatePDF[CYLINDER]->GetOutputPort());
   m_CylGizmo->SetMediator(m_Listener);
 
   // cone gizmo
@@ -89,7 +89,7 @@ albaGizmoTranslateAxis::albaGizmoTranslateAxis(albaVME *input, albaObserver *lis
   } else {
      m_ConeGizmo->SetName(name);
   }
-  m_ConeGizmo->SetData(m_RotatePDF[CONE]->GetOutput());
+  m_ConeGizmo->SetDataConnection(m_RotatePDF[CONE]->GetOutputPort());
   m_ConeGizmo->SetMediator(m_Listener);
 
   // assign isa to cylinder and cone

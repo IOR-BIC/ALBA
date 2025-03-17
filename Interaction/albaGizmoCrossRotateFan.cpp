@@ -74,7 +74,7 @@ albaGizmoCrossRotateFan::albaGizmoCrossRotateFan(albaVME *input, albaObserver *l
   // the circle gizmo
   m_Gizmo = albaVMEGizmo::New();
   m_Gizmo->SetName("fan");
-  m_Gizmo->SetData(m_ChangeFanAxisTPDF->GetOutput());
+  m_Gizmo->SetDataConnection(m_ChangeFanAxisTPDF->GetOutputPort());
   m_Gizmo->SetMediator(m_Listener);
   this->SetMediator(m_Listener);
 

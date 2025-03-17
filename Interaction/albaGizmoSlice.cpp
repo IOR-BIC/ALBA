@@ -277,7 +277,7 @@ void albaGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int
 	  apd->AddInputConnection(cornerFilter->GetOutputPort());
 	apd->Update();
 
-	m_VmeGizmo->SetData(apd->GetOutput());
+	m_VmeGizmo->SetDataConnection(apd->GetOutputPort());
 	m_VmeGizmo->Modified();
 	m_VmeGizmo->Update();
 	m_VmeGizmo->GetSurfaceOutput()->Update();

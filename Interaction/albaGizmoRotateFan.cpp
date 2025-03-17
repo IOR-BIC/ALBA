@@ -77,7 +77,7 @@ albaGizmoRotateFan::albaGizmoRotateFan(albaVME *input, albaObserver *listener)
   // the circle gizmo
   m_GizmoFan = albaVMEGizmo::New();
   m_GizmoFan->SetName("fan");
-  m_GizmoFan->SetData(m_ChangeFanAxisTPDF->GetOutput());
+  m_GizmoFan->SetDataConnection(m_ChangeFanAxisTPDF->GetOutputPort());
   
   // set the default axis to X axis
   this->SetAxis(m_ActiveAxis);

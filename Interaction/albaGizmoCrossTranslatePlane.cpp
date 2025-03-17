@@ -136,7 +136,7 @@ albaGizmoCrossTranslatePlane::albaGizmoCrossTranslatePlane(albaVME *input, albaO
 		vmeName = "part";
 		vmeName << i;
 		m_Gizmo[i]->SetName(vmeName.GetCStr());
-		m_Gizmo[i]->SetData(m_RotatePDF[i]->GetOutput());
+		m_Gizmo[i]->SetDataConnection(m_RotatePDF[i]->GetOutputPort());
 		m_Gizmo[i]->SetMediator(m_Listener);
 	}
 	// assign isa to S1 and S2;
@@ -619,7 +619,7 @@ void albaGizmoCrossTranslatePlane::CreateFeedbackGizmoPipeline()
 
 	m_TranslationFeedbackGizmo->SetName("PlaneTranslationFeedbackGizmo");
 	m_TranslationFeedbackGizmo->SetMediator(m_Listener);
-	m_TranslationFeedbackGizmo->SetData(m_FeedbackStuffAppendPolydata->GetOutput());
+	m_TranslationFeedbackGizmo->SetDataConnection(m_FeedbackStuffAppendPolydata->GetOutputPort());
 	assert(m_InputVme);
 
 	m_TranslationFeedbackGizmo->GetMaterial()->m_Prop->SetColor(1,1,0);

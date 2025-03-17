@@ -81,7 +81,7 @@ albaGizmoRotateCircle::albaGizmoRotateCircle(albaVME *input, albaObserver *liste
   // build the circle gizmo
   m_GizmoCircle = albaVMEGizmo::New();
   m_GizmoCircle->SetName(name);
-  m_GizmoCircle->SetData(m_RotatePDF->GetOutput());
+  m_GizmoCircle->SetDataConnection(m_RotatePDF->GetOutputPort());
   m_GizmoCircle->SetMediator(m_Listener);
 
   // assign isa to S1 and S2;

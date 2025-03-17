@@ -116,7 +116,7 @@ albaGizmoCrossRotateAxis::albaGizmoCrossRotateAxis(albaVME *input, albaObserver 
 	// the circle gizmo
 	m_GizmoCross = albaVMEGizmo::New();
 	m_GizmoCross->SetName("rotate cross");
-	m_GizmoCross->SetData(m_LinesRotatePDF->GetOutput());
+	m_GizmoCross->SetDataConnection(m_LinesRotatePDF->GetOutputPort());
 
 	albaGizmoCrossRotateFan *rotateFan = NULL;
 	rotateFan = dynamic_cast<albaGizmoCrossRotateFan *>(m_Listener);
@@ -554,7 +554,7 @@ void albaGizmoCrossRotateAxis::CreateFeedbackGizmoPipeline()
 	rotateFan = dynamic_cast<albaGizmoCrossRotateFan *>(m_Listener);
 
 	m_RotationFeedbackGizmo->SetMediator(rotateFan->GetMediator());
-	m_RotationFeedbackGizmo->SetData(m_FeedbackStuffAppendPolydata->GetOutput());
+	m_RotationFeedbackGizmo->SetDataConnection(m_FeedbackStuffAppendPolydata->GetOutputPort());
 	//  m_RotationFeedbackGizmo->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 1));
 	assert(m_InputVme);
 

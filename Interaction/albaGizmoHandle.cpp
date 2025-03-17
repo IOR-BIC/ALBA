@@ -91,13 +91,13 @@ albaGizmoHandle::albaGizmoHandle(albaVME *input, albaObserver *listener /* = NUL
   m_BoxGizmo->SetName("BoxGizmo");
   
   // since i'm working in local mode i reparent to input vme the gizmo
-  m_BoxGizmo->SetData(m_TranslateBoxPolyDataFilterEnd->GetOutput());
+  m_BoxGizmo->SetDataConnection(m_TranslateBoxPolyDataFilterEnd->GetOutputPort());
 	if(parent)
 		m_BoxGizmo->ReparentTo(parent);
 	else
 		m_BoxGizmo->ReparentTo(m_InputVme);
 
-  m_ShadingPlaneGizmo->SetData(m_TranslateShadingPlanePolyDataFilterEnd->GetOutput());
+  m_ShadingPlaneGizmo->SetDataConnection(m_TranslateShadingPlanePolyDataFilterEnd->GetOutputPort());
   if(parent)
     m_ShadingPlaneGizmo->ReparentTo(parent);
   else

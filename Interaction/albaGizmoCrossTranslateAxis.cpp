@@ -107,7 +107,7 @@ albaGizmoCrossTranslateAxis::albaGizmoCrossTranslateAxis(albaVME *input, albaObs
 	m_TranslationCylinderGizmo = albaVMEGizmo::New();
 	//  m_TranslationCylinderGizmo->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 1));
 	m_TranslationCylinderGizmo->SetName("AxisTranslationGizmo");
-	m_TranslationCylinderGizmo->SetData(m_Append->GetOutput());
+	m_TranslationCylinderGizmo->SetDataConnection(m_Append->GetOutputPort());
 	m_TranslationCylinderGizmo->SetMediator(m_Listener);
 	// cone gizmo
 
@@ -564,7 +564,7 @@ void albaGizmoCrossTranslateAxis::CreateFeedbackGizmoPipeline()
 
 	m_TranslationFeedbackGizmo->SetName("AxisTranslationFeedbackGizmo");
 	m_TranslationFeedbackGizmo->SetMediator(m_Listener);
-	m_TranslationFeedbackGizmo->SetData(m_FeedbackStuffAppendPolydata->GetOutput());
+	m_TranslationFeedbackGizmo->SetDataConnection(m_FeedbackStuffAppendPolydata->GetOutputPort());
 	//  m_TranslationFeedbackGizmo->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 1));
 	assert(m_InputVme);
 
