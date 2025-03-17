@@ -194,8 +194,8 @@ void albaRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use
 		m_RenBack->LightFollowCameraOn(); 
 
 		m_RenFront->SetLayer(1); 
-		m_RenBack->SetLayer(2); 
-		m_AlwaysVisibleRenderer->SetLayer(0);
+		m_RenBack->SetLayer(0); 
+		m_AlwaysVisibleRenderer->SetLayer(2);
 
     m_RenderWindow->SetNumberOfLayers(3);
     m_RenderWindow->AddRenderer(m_AlwaysVisibleRenderer);
@@ -205,9 +205,9 @@ void albaRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use
 	}
 	else
 	{
-		m_RenFront->SetLayer(1); 
+		m_RenFront->SetLayer(0); 
 		assert(m_RenBack == NULL);
-		m_AlwaysVisibleRenderer->SetLayer(0);
+		m_AlwaysVisibleRenderer->SetLayer(1);
 
 		m_RenderWindow->SetNumberOfLayers(2);
     m_RenderWindow->AddRenderer(m_AlwaysVisibleRenderer);
@@ -218,7 +218,7 @@ void albaRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use
   m_RwiBase->SetRenderWindow(m_RenderWindow);
   m_RwiBase->Initialize();
 
-  //assert(m_AlwaysVisibleRenderer->Transparent()	== true);
+	assert(m_AlwaysVisibleRenderer->Transparent()	== true);
 
 	m_ShowOrientator = show_orientator;
 
