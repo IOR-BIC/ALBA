@@ -417,7 +417,8 @@ void albaOpMeasure2D::UpdateMeasureList()
 {
 	if (m_MeasureListBox)
 	{
-		m_MeasureListBox->Select(0);
+		if(m_MeasureListBox->GetCount()>0)
+			m_MeasureListBox->Select(0);
 		m_MeasureListBox->Clear();
 		
 		if (m_InteractorVector.size() > 0)
