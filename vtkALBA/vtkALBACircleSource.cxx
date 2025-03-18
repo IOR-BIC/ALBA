@@ -41,6 +41,8 @@ vtkALBACircleSource::vtkALBACircleSource(int res)
   this->Resolution = (res < 3 ? 3 : res);
 
 	m_Plane = 0;
+
+	this->SetNumberOfInputPorts(0);
 }
 
 int vtkALBACircleSource::RequestData(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)

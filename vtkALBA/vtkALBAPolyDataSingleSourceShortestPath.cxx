@@ -43,6 +43,7 @@ vtkALBAPolyDataSingleSourceShortestPath::vtkALBAPolyDataSingleSourceShortestPath
 	this->Adj = NULL;
 	this->N = 0;
 	this->AdjacencyGraphSize = 0;
+	this->SetNumberOfInputPorts(0);
 }
 
 
