@@ -148,10 +148,12 @@ albaGizmoCrossTranslateAxis::~albaGizmoCrossTranslateAxis()
 	//----------------------
 	vtkDEL(m_IsaComp); 
 
-	m_TranslationCylinderGizmo->ReparentTo(NULL);
-
 	// clean up translation feedback stuff
 	vtkDEL(m_TranslationFeedbackGizmo);
+
+	m_TranslationCylinderGizmo->ReparentTo(NULL);
+
+
 	vtkDEL(m_FeedbackConeSource);
 	vtkDEL(m_LeftUpFeedbackConeTransform);
 	vtkDEL(m_LeftDownFeedbackConeTransform);
