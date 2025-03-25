@@ -50,7 +50,6 @@ SET(vtkALBA_SRCS
   vtkXRayVolumeMapper.cxx    							vtkXRayVolumeMapper.h
   vtkWeightedLandmarkTransform.cxx    					vtkWeightedLandmarkTransform.h
   vtkTriangleQualityRatio.cxx  							vtkTriangleQualityRatio.h
-  vtkALBACellLocator.cxx  								vtkALBACellLocator.h
   vtkALBAAddScalarsFilter.cxx  							vtkALBAAddScalarsFilter.h
   vtkALBAExtrudeToCircle.cxx  							vtkALBAExtrudeToCircle.h
   vtkALBAFillingHole.cxx  								vtkALBAFillingHole.h
