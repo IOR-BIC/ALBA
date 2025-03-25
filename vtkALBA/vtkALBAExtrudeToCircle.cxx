@@ -25,6 +25,7 @@
 #include "vtkALBAExtrudeToCircle.h"
 #include "vtkMath.h"
 #include <assert.h>
+#include "vtkIdList.h"
 
 #ifndef vtkMath::Pi()
   #define _USE_MATH_DEFINES
@@ -397,8 +398,8 @@ void vtkALBAExtrudeToCircle::CalcHoleParameters(vtkPolyData *hole)
   // In this example data, the polydata circulates around the hole centre c, such that for each polyline cell,
   // with endpoints p0 and p1, the cross product (p1-c)^(p0-c) points in the direction of the outward normal.
   // Therefore we use the median cross product to define the normal.
-	vtkIdType numPtsInCell ;
-  vtkIdType *ptlist ;
+  vtkIdType numPtsInCell ;
+  vtkNew<vtkIdList> ptlist;
   double pt0[3], pt1[3] ;
   vtkALBAPastValuesList vecProd0(1000), vecProd1(1000), vecProd2(1000) ;
 
@@ -408,11 +409,12 @@ void vtkALBAExtrudeToCircle::CalcHoleParameters(vtkPolyData *hole)
     m_BuiltCells = true ;
   }
 
-  for (int i = 0 ;  i < m_Input->GetNumberOfCells() ;  i++){
-    m_Input->GetCellPoints(i, numPtsInCell, ptlist) ;
+  for (vtkIdType  i = 0 ;  i < m_Input->GetNumberOfCells() ;  i++){
+    m_Input->GetCellPoints(i, ptlist);
+    numPtsInCell = ptlist->GetNumberOfIds();
     if (numPtsInCell == 2){
-      m_Input->GetPoint(ptlist[0], pt0) ;
-      m_Input->GetPoint(ptlist[1], pt1) ;
+      m_Input->GetPoint(ptlist->GetId(0), pt0);
+      m_Input->GetPoint(ptlist->GetId(1), pt1) ;
       SubtractVector(pt0, m_HoleCentre, pt0) ;
       SubtractVector(pt1, m_HoleCentre, pt1) ;
 
@@ -882,92 +884,95 @@ void vtkALBAExtrudeToCircle::GetMatRotArrowToAxis(vtkMatrix4x4 *mat, const doubl
 
 //------------------------------------------------------------------------------
 // List points around hole in order
-void vtkALBAExtrudeToCircle::GetPointsAroundHole(vtkPolyData *hole, vtkIdList *pts) const 
+void vtkALBAExtrudeToCircle::GetPointsAroundHole(vtkPolyData* hole, vtkIdList* pts) const
 //------------------------------------------------------------------------------
 {
-  int i ;
-  vtkIdType numPtsInCell ;
-  unsigned short numCellsOnPt ;
-  vtkIdType *ptlist ;
-  vtkIdType *cellList ;
+  int i;
+  vtkIdType numPtsInCell;
+  vtkIdType numCellsOnPt;
+  vtkNew<vtkIdList> ptlist;
+  vtkNew<vtkIdList> cellList;
 
   // check that all the cells have two points
-  hole->BuildCells() ;
-  hole->BuildLinks() ;
-  for (i = 0 ;  i < hole->GetNumberOfCells() ;  i++){
-    hole->GetCellPoints(i, numPtsInCell, ptlist) ;
-    if (numPtsInCell != 2){
-      std::cout << "cell " << i << " found with " << numPtsInCell << " pts" << std::endl ;
-      assert(false) ;
+  hole->BuildCells();
+  hole->BuildLinks();
+  for (i = 0; i < hole->GetNumberOfCells(); i++) {
+    hole->GetCellPoints(i, ptlist);
+    numPtsInCell = ptlist->GetNumberOfIds();
+    if (numPtsInCell != 2) {
+      std::cout << "cell " << i << " found with " << numPtsInCell << " pts" << std::endl;
+      assert(false);
     }
   }
 
   // check that all the points have two cells
-  for (i = 0 ;  i < hole->GetNumberOfPoints() ;  i++){
-    hole->GetPointCells(i, numCellsOnPt, cellList) ;
-    if (numCellsOnPt != 2){
-      std::cout << "point " << i << " found with " << numCellsOnPt << " cells" << std::endl ;
-      assert(false) ;
+  for (i = 0; i < hole->GetNumberOfPoints(); i++) {
+    hole->GetPointCells(i, cellList);
+    numCellsOnPt = cellList->GetNumberOfIds();
+    if (numCellsOnPt != 2) {
+      std::cout << "point " << i << " found with " << numCellsOnPt << " cells" << std::endl;
+      assert(false);
     }
   }
 
   // trace points in order around the hole
-  int icell = 0 ;
-  int lastPt = -1 ;
-  bool istop = false ;
-  int ilo ;
-  int ihi ;
-  pts->Initialize() ;
-  while (pts->GetNumberOfIds() < hole->GetNumberOfPoints() && !istop){
+  int icell = 0;
+  int lastPt = -1;
+  bool istop = false;
+  int ilo;
+  int ihi;
+  pts->Initialize();
+  while (pts->GetNumberOfIds() < hole->GetNumberOfPoints() && !istop) {
     // get points in icell
-    hole->GetCellPoints(icell, numPtsInCell, ptlist) ;
-
-    if (lastPt == -1){
+    hole->GetCellPoints(icell, ptlist);
+    numPtsInCell = ptlist->GetNumberOfIds();
+    if (lastPt == -1) {
       // first cell so put both points in list
-      ilo = 0 ;
-      ihi = 1 ;
-      pts->InsertNextId(ptlist[ilo]) ;
-      pts->InsertNextId(ptlist[ihi]) ;
-      lastPt = ptlist[ihi] ;
+      ilo = 0;
+      ihi = 1;
+      pts->InsertNextId(ptlist->GetId(ilo));
+      pts->InsertNextId(ptlist->GetId(ihi));
+      lastPt = ptlist->GetId(ihi);
     }
-    else{
-      // set ihi such that ptlist[ilo] is the previous point and ptlist[ihi] is the new point
-      if ((ptlist[0] == lastPt) && (ptlist[1] != lastPt)){
-        ilo = 0 ;
-        ihi = 1 ;
+    else {
+      // set ihi such that ptlist->GetId(ilo] is the previous point and ptlist->GetId(ihi] is the new point
+      if ((ptlist->GetId(0) == lastPt) && (ptlist->GetId(1) != lastPt)) {
+        ilo = 0;
+        ihi = 1;
       }
-      else if ((ptlist[1] == lastPt) && (ptlist[0] != lastPt)){
-        ilo = 1 ;
-        ihi = 0 ;
+      else if ((ptlist->GetId(1) == lastPt) && (ptlist->GetId(0) != lastPt)) {
+        ilo = 1;
+        ihi = 0;
       }
-      else{
-        std::cout << "problem with pt indices in GetPointsAroundHole()" << std::endl ;
-        assert(false) ;
+      else {
+        std::cout << "problem with pt indices in GetPointsAroundHole()" << std::endl;
+        assert(false);
       }
 
-      if (ptlist[ihi] != pts->GetId(0)){
+      if (ptlist->GetId(ihi) != pts->GetId(0)) {
         // add point to list
-        pts->InsertNextId(ptlist[ihi]) ;
-        lastPt = ptlist[ihi] ;
+        pts->InsertNextId(ptlist->GetId(ihi));
+        lastPt = ptlist->GetId(ihi);
       }
-      else{
+      else {
         // stop when we get back to the first point
-        istop = true ;
+        istop = true;
       }
     }
 
 
     // get cells attached to new point
-    hole->GetPointCells(ptlist[ihi], numCellsOnPt, cellList) ;
+    hole->GetPointCells(ptlist->GetId(ihi), cellList);
+
 
     // set next cell to the one which is not the current cell
-    if ((cellList[0] == icell) && (cellList[1] != icell))
-      icell = cellList[1] ;
-    else if ((cellList[1] == icell) && (cellList[0] != icell))
-      icell = cellList[0] ;
-    else{
-      std::cout << "problem with cell indices in GetPointsAroundHole()" << std::endl ;
-      assert(false) ;
+    if ((cellList->GetId(0) == icell) && (cellList->GetId(1) != icell))
+      icell = cellList->GetId(1);
+    else if ((cellList->GetId(1) == icell) && (cellList->GetId(0) != icell))
+      icell = cellList->GetId(0);
+    else {
+      std::cout << "problem with cell indices in GetPointsAroundHole()" << std::endl;
+      assert(false);
     }
   }
 }
