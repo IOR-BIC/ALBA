@@ -92,7 +92,7 @@ albaOp(label)
   m_LowerLabel = -1;
   m_UpperLabel = 1;
   m_SphereRadius = 1;
-  m_ApplyConnectivityFilter = FALSE;
+  m_ApplyConnectivityFilter = false;
 
   m_VolumeOutputMorpho = NULL;
   m_VolumeOutputRegionGrowing = NULL;
@@ -113,7 +113,7 @@ albaOp(label)
 
   m_CurrentPoint = 0;
 
-  m_EliminateHistogramValues = TRUE;
+  m_EliminateHistogramValues = true;
   m_ValuesToEliminate = -500;
 
   m_Threshold = 0.0;
@@ -354,7 +354,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
   m_Gui->Label(&m_SoftParam3,false,true);
   m_Gui->Bool(ID_ELIMINATE_HISTOGRAM_VALUES,_("Eliminate Values"),&m_EliminateHistogramValues,1);
   m_Gui->Double(ID_VALUES_TO_ELIMINATE,_(""),&m_ValuesToEliminate);
-  m_Gui->Enable(ID_VALUES_TO_ELIMINATE,m_EliminateHistogramValues == TRUE);
+  m_Gui->Enable(ID_VALUES_TO_ELIMINATE,m_EliminateHistogramValues == true);
   //m_Gui->Button(ID_FITTING,_("Fitting"));
   m_Gui->Divider(1);
 
@@ -539,7 +539,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles
   int startIndex = -1;
   int numOfTuples = accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples();
   double step = (double)(srw+1)/numOfTuples;
-  if (m_EliminateHistogramValues == TRUE)
+  if (m_EliminateHistogramValues == true)
   {
     for (int i=0;i<accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples();i++)
     {
@@ -720,7 +720,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
     {
     case ID_ELIMINATE_HISTOGRAM_VALUES:
       {
-        m_Gui->Enable(ID_VALUES_TO_ELIMINATE,m_EliminateHistogramValues == TRUE);
+        m_Gui->Enable(ID_VALUES_TO_ELIMINATE,m_EliminateHistogramValues == true);
       }
       break;
     case ID_DIALOG_OK:
@@ -786,7 +786,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
 
         vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
         int result = ALBA_OK;
-        if (m_ApplyConnectivityFilter == TRUE)
+        if (m_ApplyConnectivityFilter == true)
         {
           connectivityFilter->SetInput(extractIsosurface->GetOutput());
           connectivityFilter->SetExtractionModeToLargestRegion();

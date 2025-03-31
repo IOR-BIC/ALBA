@@ -186,7 +186,7 @@ void albaGUISaveRestorePose::StorePose()
   }
   
   pose_name.Trim();
-  pose_name.Trim(FALSE);
+  pose_name.Trim(false);
 
   wxString AbsPos_tagName = "STORED_ABS_POS_" + pose_name;
 

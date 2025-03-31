@@ -262,7 +262,7 @@ void albaVMELabeledVolumeTest::TestSetLabelTag()
   int newValue = 500;
 
   wxString labelNew = "testLabelNew 500 0 1000";
-  labeled->ModifyLabelVector(0, labelNew, TRUE);
+  labeled->ModifyLabelVector(0, labelNew, true);
   labeled->GenerateLabeledVolume();
 
 

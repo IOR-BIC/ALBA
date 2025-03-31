@@ -111,7 +111,7 @@ bool albaPrintout::OnPrintPage(int page)
 	else
 		Print(m_Image);
 
-  return TRUE;
+  return true;
 }
 //----------------------------------------------------------------------------
 void albaPrintout::GetPageInfo(int *minPage, int *maxPage, int *selPageFrom, int *selPageTo)
@@ -244,7 +244,7 @@ void albaPrintManager::OnPrintPreview(albaView *v)
   wxPreviewFrame *frame = new wxPreviewFrame(preview, (wxFrame *)albaGetFrame(), "Print Preview", wxPoint(100, 100), wxSize(600, 650));
   frame->Centre(wxBOTH);
   frame->Initialize();
-  frame->Show(TRUE);
+  frame->Show(true);
 }
 //----------------------------------------------------------------------------
 void albaPrintManager::OnPrint(albaView *v)
@@ -259,7 +259,7 @@ void albaPrintManager::OnPrint(albaView *v)
 
   
   albaPrintout printout(v,margins);
-  if (!printer.Print( albaGetFrame(), &printout, TRUE))
+  if (!printer.Print( albaGetFrame(), &printout, true))
   {
     if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
       wxMessageBox("There was a problem printing.\nPerhaps your current printer is not set correctly?", "Printing", wxOK);
@@ -283,7 +283,7 @@ void albaPrintManager::OnPrint(albaVMEImage *img)
 
 
 	albaPrintout printout(img, margins);
-	if (!printer.Print(albaGetFrame(), &printout, TRUE))
+	if (!printer.Print(albaGetFrame(), &printout, true))
 	{
 		if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
 			wxMessageBox("There was a problem printing.\nPerhaps your current printer is not set correctly?", "Printing", wxOK);

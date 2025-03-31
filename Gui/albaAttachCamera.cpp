@@ -62,7 +62,7 @@ albaAttachCamera::albaAttachCamera(wxWindow* parent, albaRWI *rwi, albaObserver 
 albaAttachCamera::~albaAttachCamera() 
 {
   vtkDEL(m_CurrentMatrix);
-  if (m_AttachedVme && m_AttachedVme->IsValid())
+  if (m_AttachedVme && m_AttachedVme->IsOnVMETree())
   {
     m_AttachedVme->RemoveObserver(this);
   }
@@ -197,12 +197,12 @@ albaObserver * albaAttachCamera::GetListener()
 //----------------------------------------------------------------------------
 void albaAttachCamera::EnableAttachCamera()
 {
-  m_EnableAttachCamera = TRUE;
+  m_EnableAttachCamera = true;
 }
 //----------------------------------------------------------------------------
 void albaAttachCamera::DisableAttachCamera()
 {
-  m_EnableAttachCamera = FALSE;
+  m_EnableAttachCamera = false;
 }
 //----------------------------------------------------------------------------
 int albaAttachCamera::GetEnableAttachCamera()

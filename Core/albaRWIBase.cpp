@@ -101,6 +101,7 @@ BEGIN_EVENT_TABLE(albaRWIBase, wxWindow)
   EVT_CHAR(albaRWIBase::OnChar)
   EVT_SIZE(albaRWIBase::OnSize)
   EVT_IDLE(albaRWIBase::OnIdle)
+	EVT_MOUSE_CAPTURE_LOST(albaRWIBase::OnMouseCaptureLost)
 END_EVENT_TABLE()
 //----------------------------------------------------------------------------
 albaRWIBase::albaRWIBase() : wxWindow(), vtkRenderWindowInteractor(), m_Timer(this, ID_albaRWIBase_TIMER)
@@ -255,7 +256,7 @@ int albaRWIBase::CreateTimer(int timertype)
 //----------------------------------------------------------------------------
 {
   // it's a one shot timer
-  if (!m_Timer.Start(10, TRUE))
+  if (!m_Timer.Start(10, true))
     assert(false);
   return 1;
 }
@@ -656,6 +657,16 @@ void albaRWIBase::OnIdle(wxIdleEvent& event)
   //   this->Show(true);
   //}
 }
+
+//----------------------------------------------------------------------------
+void albaRWIBase::OnMouseCaptureLost(wxMouseCaptureLostEvent& WXUNUSED(evt))
+{
+	wxMouseEvent evt = wxMouseEvent();
+	evt.SetX(m_LastX);
+	evt.SetY(m_LastY);
+	OnLeftMouseButtonUp(evt);
+}
+
 //----------------------------------------------------------------------------
 void albaRWIBase::NotifyClick()
 //----------------------------------------------------------------------------
@@ -725,7 +736,7 @@ wxBitmap *albaRWIBase::GetImage(int magnification)
   ie->Export();
 
   //translate to a wxBitmap
-  wxImage  *img = new wxImage(dim[0],dim[1],buffer,TRUE);
+  wxImage  *img = new wxImage(dim[0],dim[1],buffer,true);
   wxBitmap *bmp = new wxBitmap(*img,24);
   delete img;
   delete buffer;

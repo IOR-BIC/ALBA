@@ -135,6 +135,7 @@ void albaOpCreateAveragePlane::OpDo()
 	outPlane->SetPlanePoint2(outP2.GetVect());
 	outPlane->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_PLANE);
 	outPlane->ReparentTo(m_Input);
+	outPlane->SetAbsMatrix(albaMatrix());
 	m_Output = outPlane;
 	albaDEL(outPlane);
 			

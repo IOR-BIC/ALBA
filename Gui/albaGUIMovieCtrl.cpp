@@ -77,7 +77,7 @@ m_Timer(NULL, ID_TIMER)
     m_Sizer->Add(m_TimeBarButtons[i],0,0);
   m_Sizer->Add(m_LoopCheck,0,wxLEFT,5);
 
-  this->SetAutoLayout( TRUE );
+  this->SetAutoLayout( true );
   this->SetSizer( m_Sizer );
   m_Sizer->Fit(this);
   m_Sizer->SetSizeHints(this);

@@ -68,10 +68,10 @@ public:
   int GetEnableFadingMaxValue(){return 1;};
 
   /** Enable fade out and fade in for the actor when it switch between one LOD to another.*/
-  void EnableFadingOn(){this->SetEnableFading(TRUE);};
+  void EnableFadingOn(){this->SetEnableFading(true);};
 
   /** Disable fade out and fade in for the actor when it switch between one LOD to another.*/
-  void EnableFadingOff(){this->SetEnableFading(FALSE);};
+  void EnableFadingOff(){this->SetEnableFading(false);};
 
   /** Return the status of the fading flag.*/
   int GetEnableFading(){return m_EnableFading;};
@@ -86,10 +86,10 @@ public:
   int GetEnableHighThresholdMaxValue(){return 1;};
 
   /** Enable high threshold LOD.*/
-  void EnableHighThresholdOn(){this->SetEnableHighThreshold(TRUE);};
+  void EnableHighThresholdOn(){this->SetEnableHighThreshold(true);};
 
   /** Disable high threshold LOD.*/
-  void EnableHighThresholdOff(){this->SetEnableHighThreshold(FALSE);};
+  void EnableHighThresholdOff(){this->SetEnableHighThreshold(false);};
 
   /** Return the status of the high threshold LOD flag.*/
   int GetEnableHighThreshold(){return m_EnableHighThreshold;};

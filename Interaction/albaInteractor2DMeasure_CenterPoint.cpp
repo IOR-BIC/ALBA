@@ -56,7 +56,7 @@ albaInteractor2DMeasure_CenterPoint::albaInteractor2DMeasure_CenterPoint() : alb
 
 	Color color{ 0.6, 0.0, 0.6, 1.0 };
 
-	SetColorDefault(color.R, color.G, color.B, 0.85);
+	SetColorDefault(color.R, color.G, color.B, 0.65);
 	SetColorSelection(color.R, color.G, color.B, 1.0);
 	SetColorDisable(color.R, color.G, color.B, 0.3);
 	SetColorText(color.R, color.G, color.B, 0.5);
@@ -202,6 +202,8 @@ void albaInteractor2DMeasure_CenterPoint::FindAndHighlight(double * point)
 
 	if (m_EditMeasureEnable)
 	{
+		SetUpdateDistance(PixelSizeInWorld()*4.0);
+		
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
 			albaActor2dStackHelper *lineStackVector = m_LineStackVector[i];
@@ -219,28 +221,30 @@ void albaInteractor2DMeasure_CenterPoint::FindAndHighlight(double * point)
 
 			double radius = vtkMath::Distance2BetweenPoints(linePoint2, centerPoint);
 
-			if (DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
+			if (DistancePointToLine(point, linePoint1, linePoint2) < m_PointUpdateDist)
 			{
-				SelectMeasure(i);
+				SelectMeasure(i); 
 
-				if (vtkMath::Distance2BetweenPoints(linePoint2, point) < POINT_UPDATE_DISTANCE_2)
+				double p1Dist = DistanceBetweenPoints(point,linePoint1);
+				double p2Dist = DistanceBetweenPoints(point,linePoint2);
+				double p1p2Dist = DistanceBetweenPoints(linePoint1, linePoint2);
+				double minDist = MIN(m_PointUpdateDist, (p1p2Dist/3.0));
+				
+				if ((p1Dist < p2Dist) && (p1Dist <= minDist))
 				{
 					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
-					m_CurrPoint = POINT_2;
-					m_PointsStackVectorR[i]->SetColor(m_Colors[COLOR_EDIT]);
-				}
-				else if (vtkMath::Distance2BetweenPoints(linePoint1, point) < POINT_UPDATE_DISTANCE_2)
-				{
-					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
 					m_CurrPoint = POINT_1;
 					m_PointsStackVectorL[i]->SetColor(m_Colors[COLOR_EDIT]);
 				}
-				else if (vtkMath::Distance2BetweenPoints(centerPoint, point) < POINT_UPDATE_DISTANCE_2)
+				else if (p2Dist <= minDist)
+				{
+					SetAction(ACTION_EDIT_MEASURE);
+					m_CurrPoint = POINT_2;
+					m_PointsStackVectorR[i]->SetColor(m_Colors[COLOR_EDIT]);
+				}
+				else if (vtkMath::Distance2BetweenPoints(centerPoint, point) < m_PointUpdateDist2)
 				{
 					SetAction(ACTION_MOVE_MEASURE);
-					m_CurrMeasure = i;
 					m_CurrPoint = POINT_1;
 					m_PointsStackVectorC[i]->SetColor(m_Colors[COLOR_EDIT]);
 				}
@@ -261,7 +265,6 @@ void albaInteractor2DMeasure_CenterPoint::FindAndHighlight(double * point)
 		if (m_CurrMeasure >= 0)
 		{
 			SelectMeasure(-1);
-			m_CurrMeasure = -1;
 			m_CurrPoint = NO_POINT;
 			Render();
 		}
@@ -334,11 +337,11 @@ void albaInteractor2DMeasure_CenterPoint::AddMeasure(double *point1, double *poi
 
 		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
 
-		if (DistanceBetweenPoints(oldPoint1, oldPoint2)<POINT_UPDATE_DISTANCE)
+		if (DistanceBetweenPoints(oldPoint1, oldPoint2)<m_PointUpdateDist)
 		{
 			if (!hasSameRenderer) return;
 
-			m_CurrMeasure = index;
+			SelectMeasure(index);
 			m_CurrPoint = POINT_2;
 			EditMeasure(index, point2);
 			return;
@@ -399,7 +402,7 @@ void albaInteractor2DMeasure_CenterPoint::AddMeasure(double *point1, double *poi
 
 	//////////////////////////////////////////////////////////////////////////
 
-	m_CurrMeasure = index;
+	SelectMeasure(index);
 
 	UpdateLineActors(point1, point2);
 	UpdatePointsActor(point1, point2);
@@ -443,8 +446,11 @@ void albaInteractor2DMeasure_CenterPoint::RemoveMeasure(int index)
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_CenterPoint::SelectMeasure(int index)
 {
-	if (GetMeasureCount() > 0)
+	if (index != m_CurrMeasure && GetMeasureCount() > 0)
 	{
+		m_CurrMeasure = index;
+		m_LastEditing = -1;
+
 		// Deselect all
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
@@ -469,9 +475,6 @@ void albaInteractor2DMeasure_CenterPoint::SelectMeasure(int index)
 
 			albaEventMacro(albaEvent(this, ID_MEASURE_SELECTED));
 		}
-
-		m_LastSelection = index;
-		m_LastEditing = -1;
 	}
 }
 

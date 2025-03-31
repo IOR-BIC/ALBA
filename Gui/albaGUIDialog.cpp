@@ -123,9 +123,8 @@ int albaGUIDialog::ShowModal()
     // to allow the user to Add other gui in the meanwhile
     
     m_DialogSizer->Layout();           // resize & fit the contents
-    m_DialogSizer->SetSizeHints(this); // resize the dialog accordingly 
-    m_DialogInitialized = true;
-  }
+		m_DialogSizer->SetSizeHints(this); // resize the dialog accordingly
+    }
   return wxDialog::ShowModal();
 }
 //--------------------------------------------------------------------------------
@@ -160,6 +159,37 @@ void albaGUIDialog::OnEvent(albaEventBase *alba_event)
         albaEventMacro(*e);
     }
   }
+}
+
+//----------------------------------------------------------------------------
+void albaGUIDialog::WXSetInitialFittingClientSize(int flags, wxSizer* sizer /*= NULL*/)
+{
+	wxSize curSize = GetSize();
+	wxSize minSize = GetMinSize();
+	
+
+	// Use the window sizer by default.
+	if (!sizer)
+	{
+		sizer = GetSizer();
+
+		// If there is none, we can't compute the fitting size.
+		if (!sizer)
+			return;
+	}
+
+	wxSize size = sizer->ComputeFittingClientSize(static_cast<wxWindow *>(this));
+
+	size.Set(MAX(size.x, curSize.x), MAX(size.y, curSize.y));
+
+	// It is important to set the min client size before changing the size
+	// itself as the existing size hints could prevent SetClientSize() from
+	// working otherwise.
+	if (flags & wxSIZE_SET_MIN)
+		SetMinClientSize(minSize);
+
+	if (flags & wxSIZE_SET_CURRENT)
+			SetClientSize(size);
 }
 
 //----------------------------------------------------------------------------

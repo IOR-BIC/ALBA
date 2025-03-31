@@ -88,7 +88,12 @@ public:
 	int AppendLandmark(double *pos, const char *name) {return AppendLandmark(pos[0], pos[1], pos[2], name); }
 	int AppendLandmark(const char *name) { return AppendLandmark(0,0,0,name); }
 
-  
+
+	/** similar to Append Landmark but add the landmark in is absolute position (the lm position does not change after the append)*/
+	int AppendAbsoluteLandmark(double x, double y, double z, const char *name);
+	int AppendAbsoluteLandmark(double *pos, const char *name) { return AppendAbsoluteLandmark(pos[0], pos[1], pos[2], name); }
+	int AppendAbsoluteLandmark(const char *name) { return AppendAbsoluteLandmark(0, 0, 0, name); }
+
   /** Set/Get a landmark. In case the specified idx is invalid return ALBA_ERROR*/
   int SetLandmark(int idx,double x,double y,double z,albaTimeStamp t=0);
 	int SetLandmark(const char *name, double x, double y, double z, albaTimeStamp t = 0) { return this->SetLandmark(this->GetLandmarkIndex(name), x, y, z, t); }

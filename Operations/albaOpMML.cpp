@@ -855,7 +855,7 @@ void albaOpMML::OnUndo()
   {
     if (m_Model->m_ScalingOccuredOperationId == m_Widget->GetNextOperationId())
     {
-      m_Model->m_ScalingOccured = FALSE;
+      m_Model->m_ScalingOccured = false;
 
       // re-draw curves
       m_PH->GetSplineActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
@@ -2216,7 +2216,7 @@ void albaOpMML::CreateRegistrationDlg()
   //m_radio = new wxRadioBox(m_op_dlg, ID_STATE, "", wxPoint(0,0), wxSize(500,40), 4,choices,4,wxRA_SPECIFY_COLS|wxNO_BORDER|wxTAB_TRAVERSAL);
   //m_radio->SetValidator( albaGUIValidator(this,ID_STATE,m_radio,&m_state) );
   //if (m_3dflag == 0)
-  //	m_radio->Enable(TRUE);
+  //	m_radio->Enable(true);
   //LeftVerticalBoxSizer->Add(m_radio,0,wxLEFT,5);
 
 
@@ -2608,7 +2608,7 @@ bool albaOpMML::SetUpParameterViews()
       // is the operation a scaling?
       if (params[2] == 3 || params[2] == 4 || params[2] == 5 || params[2] == 6)
       {
-        m_Model->m_ScalingOccured = TRUE;
+        m_Model->m_ScalingOccured = true;
         m_Model->m_ScalingOccuredOperationId = NextOperationId;
 
         // grey out twist, h/v translation views

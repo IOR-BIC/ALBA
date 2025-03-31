@@ -548,7 +548,7 @@ albaGUI* albaPipeGraph::CreateGui()
   m_Gui->Divider(1);
 
   wxString name;
-  bool checked = FALSE;
+  bool checked = false;
 
   m_Gui->Label("Item");
 	m_CheckBox = m_Gui->CheckList(ID_CHECK_BOX,_(""),200,_("Choose item to plot"));
@@ -637,12 +637,12 @@ void albaPipeGraph::OnEvent(albaEventBase *alba_event)
       {
         switch (m_Legend)
         {
-        case TRUE:
+        case true:
           {
             m_PlotActor->LegendOn();
           }
           break;
-        case FALSE:
+        case false:
           {
             m_PlotActor->LegendOff();
           } 

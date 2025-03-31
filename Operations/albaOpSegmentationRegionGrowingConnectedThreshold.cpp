@@ -80,7 +80,7 @@ albaOpSegmentationRegionGrowingConnectedThreshold::albaOpSegmentationRegionGrowi
   m_NumIter = 5;// this is used in smoothing
   m_TimeStep = 0.0125;// this is used in smoothing
   m_Conductance = 1.0; // this is used in smoothing
-  m_UseSpacing = TRUE;// this is used in smoothing
+  m_UseSpacing = true;// this is used in smoothing
 
   m_Picker = NULL;
   m_OldBehavior = NULL;
@@ -281,7 +281,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   //ConnectedThresholdParams->timeStep = m_TimeStep;
   //ConnectedThresholdParams->conductance = m_Conductance;
 
-  if (m_UseSpacing == TRUE)
+  if (m_UseSpacing == true)
   {
     //ConnectedThresholdParams->useImageSpacing = true;
   } 

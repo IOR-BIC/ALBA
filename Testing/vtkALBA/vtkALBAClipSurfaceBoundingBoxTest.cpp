@@ -94,23 +94,23 @@ void vtkALBAClipSurfaceBoundingBoxTest::TestSetGetClipInside()
 //--------------------------------------------------
 {
   vtkALBASmartPointer<vtkALBAClipSurfaceBoundingBox> filter;
-  filter->SetClipInside(TRUE);
+  filter->SetClipInside(true);
 
-  CPPUNIT_ASSERT(filter->GetClipInside() == TRUE);  
-  filter->SetClipInside(FALSE);
-  CPPUNIT_ASSERT(filter->GetClipInside() == FALSE);  
+  CPPUNIT_ASSERT(filter->GetClipInside() == true);  
+  filter->SetClipInside(false);
+  CPPUNIT_ASSERT(filter->GetClipInside() == false);  
 }
 //--------------------------------------------------
 void vtkALBAClipSurfaceBoundingBoxTest::TestExecutionClipInsideOff()
 //--------------------------------------------------
 {
-  TestExecution(FALSE);
+  TestExecution(false);
 }
 //--------------------------------------------------
 void vtkALBAClipSurfaceBoundingBoxTest::TestExecutionClipInsideOn()
 //--------------------------------------------------
 {
-  TestExecution(TRUE);
+  TestExecution(true);
 }
 //--------------------------------------------------
 void vtkALBAClipSurfaceBoundingBoxTest::TestExecution(int clipInside)

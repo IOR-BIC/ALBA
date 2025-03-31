@@ -82,9 +82,7 @@ protected:
 	/* Initialize About Dialog */
 	void InitAboutDialog();
 
-  bool m_OpeningMSF;
-
-	// Operations
+  	// Operations
 	albaOpImporterDicom	*m_OpImporterDicom;
 
 private:

@@ -108,6 +108,8 @@ protected:
 	albaString m_ProtocolName;
 	albaString m_ManufacturersModelName;
 
+	int m_Anonymize;
+
 	
 private:
 

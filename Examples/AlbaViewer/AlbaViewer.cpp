@@ -43,6 +43,32 @@ PURPOSE. See the above copyright notice for more information.
 #include "appWizardSample.h"
 #endif
 #include "albaOpTransform.h"
+#include "albaOpImporterImage.h"
+#include "albaOpImporterRAWVolume.h"
+#include "albaOpImporterRAWImages.h"
+#include "albaOpImporterSTL.h"
+#include "albaOpImporterPLY.h"
+#include "albaOpImporterVRML.h"
+#include "albaOpImporterVTK.h"
+#include "albaOpImporterVTKXML.h"
+#include "albaOpImporterMetaImage.h"
+#include "albaOpImporterMSF.h"
+#include "albaOpImporterMSF1x.h"
+#include "albaOpImporterAnsysCDBFile.h"
+#include "albaOpImporterAnsysInputFile.h"
+#include "albaOpImporterAbaqusFile.h"
+#include "albaOpImporterMesh.h"
+#include "albaOpImporterASCII.h"
+#include "albaGUIDicomSettings.h"
+#include "albaOpImporterDicom.h"
+#include "albaOpImporterLandmark.h"
+#include "albaOpImporterLandmarkTXT.h"
+#include "albaOpImporterLandmarkWS.h"
+#include "albaOpImporterC3D.h"
+#include "albaOpImporterAnalogWS.h"
+#include "albaOpImporterGRFWS.h"
+#include "albaOpImporterDicFile.h"
+#include "albaOpImporterPointCloud.h"
 
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -81,17 +107,39 @@ bool AlbaViewer::OnInit()
 	//////////////////////////////////////////////////////////////////////////
 	//Views
 
-	// VTK View (Surface)
-	m_Logic->Plug(new albaViewVTK("Surface"));	
+	m_Logic->PlugStandardViews();
 
-	// View Orthoslice
-	albaViewOrthoSlice *vortho = new albaViewOrthoSlice("Orthoslice");
-	vortho->PackageView();
-	m_Logic->Plug(vortho);
 
-	//////////////////////////////////////////////////////////////////////////
-	//Operations
-	m_Logic->Plug(new albaOpTransform("Transform \tCtrl+t"));
+		Plug(new albaOpImporterImage("Images"));
+		Plug(new albaOpImporterRAWVolume("RAW Volume"));
+		Plug(new albaOpImporterRAWImages("RAW Images"));
+		Plug(new albaOpImporterSTL("STL"));
+		Plug(new albaOpImporterPLY("PLY"));
+		Plug(new albaOpImporterVRML("VRML"));
+		Plug(new albaOpImporterVTK("VTK"));
+		Plug(new albaOpImporterVTKXML("VTK xml"));
+		Plug(new albaOpImporterMetaImage("ITK MetaImage"));
+		Plug(new albaOpImporterMSF("ALBA"));
+		Plug(new albaOpImporterMSF1x("MSF 1.x"));
+		Plug(new albaOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
+		Plug(new albaOpImporterAnsysInputFile("Ansys Input File"), "Finite Element");
+		Plug(new albaOpImporterAbaqusFile("Abaqus File"), "Finite Element");
+		Plug(new albaOpImporterMesh("Generic Mesh"), "Finite Element");
+		Plug(new albaOpImporterASCII("ASCII"));
+
+	#ifdef ALBA_USE_GDCM
+		albaGUIDicomSettings *dicomSettings = new albaGUIDicomSettings(NULL, "DICOM");
+		Plug(new albaOpImporterDicom("DICOM"), "", true, dicomSettings);
+	#endif
+		Plug(new albaOpImporterLandmark("Landmark"), "Landmark Suite");
+		Plug(new albaOpImporterLandmarkTXT("Landmark TXT"), "Landmark Suite");
+		Plug(new albaOpImporterLandmarkWS("Landmark WS"), "Landmark Suite");
+		Plug(new albaOpImporterC3D("C3D"), "Landmark Suite");
+		Plug(new albaOpImporterAnalogWS("EMG"));
+		Plug(new albaOpImporterGRFWS("GRF"));
+		Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
+		Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
+
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -109,7 +157,7 @@ bool AlbaViewer::OnInit()
 	m_Logic->Show();
 	m_Logic->Init(argc, argv); // Calls FileNew - which create the root
 
-	return TRUE;
+	return true;
 }
 
 //--------------------------------------------------------------------------------

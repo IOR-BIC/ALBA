@@ -61,8 +61,9 @@ public:
 
 protected:
   albaString m_VtkDataType;
-  albaString m_VolumeBounds[3];
-  albaString m_ScaralRangeString;
+	albaString m_VolumeBounds[3];
+	albaString m_VolumeDims;
+	albaString m_ScaralRangeString;
   mmaVolumeMaterial *m_Material;
 
   albaGUI *CreateGui();

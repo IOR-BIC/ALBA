@@ -109,7 +109,7 @@ int albaOpValidateTree::ValidateTree()
     for (node = iter->GetFirstNode(); node; node = iter->GetNextNode())
     {
       // check node ID
-      bool valid = node->IsValid();
+      bool valid = node->IsOnVMETree() && node->GetId()!=-1;
       if (!valid && !node->IsALBAType(albaVMERoot))
       {
         ErrorLog(albaOpValidateTree::INVALID_NODE, node->GetName());
@@ -138,7 +138,7 @@ int albaOpValidateTree::ValidateTree()
             ErrorLog(albaOpValidateTree::LINK_NOT_PRESENT, lnk_it->second.m_Node->GetName());
             result = albaOpValidateTree::VALIDATE_ERROR;
           }
-          valid = lnk_it->second.m_Node->IsValid();
+          valid = lnk_it->second.m_Node->IsOnVMETree();
           if (!valid && !lnk_it->second.m_Node->IsALBAType(albaVMERoot))
           {
             ErrorLog(albaOpValidateTree::INVALID_NODE, lnk_it->second.m_Node->GetName());

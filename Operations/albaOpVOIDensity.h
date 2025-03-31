@@ -35,7 +35,9 @@ public:
 	albaOpVOIDensity(const wxString &label = "VOIDensity");
 	~albaOpVOIDensity(); 
 	virtual void OnEvent(albaEventBase *alba_event);
-	
+
+	void SortSubRange();
+
   albaTypeMacro(albaOpVOIDensity, albaOp);
 
   /** return a copy of itself, this needs to put the operation into the undo stack. */
@@ -68,8 +70,8 @@ public:
 	/**	Return Standard Deviation*/
 	double GetStandardDeviation(){return m_StandardDeviation;};
 
-	/** Extract scalars from input volume that are inside the choosed surface. */
-	void ExtractVolumeScalars();
+	/** Extract scalars from input volume that are inside the chosen surface. */
+	void EvaluateSurface();
 
 	void UpdateStrings();
 
@@ -78,7 +80,33 @@ public:
 	
  	static bool OutputSurfaceAccept(albaVME* Node) {return(Node != NULL && (Node->GetOutput()->IsA("albaVMEOutputSurface")));};
 
+	void CreateCSVFile(albaString file);
+
+
+	/** Returns CreatePointCloudOutput */
+	int GetCreatePointCloudOutput() const { return m_CreatePointCloudOutput; }
+
+	/** Sets CreatePointCloudOutput */
+	void SetCreatePointCloudOutput(int createPointCloudOutput) { m_CreatePointCloudOutput = createPointCloudOutput; }
+
+
+	/** Returns EvaluateInSubRange */
+	int GetEvaluateInSubRange() const { return m_EvaluateInSubRange; }
+
+	/** Sets EvaluateInSubRange */
+	void SetEvaluateInSubRange(int evaluateInSubRange) { m_EvaluateInSubRange = evaluateInSubRange; }
+	
+	/** Sets SubRange */
+	void SetSubRange(double subRangeA, double subRangeB);
+
+	void GetSubRange(double *subRange) { subRange[0] = m_SubRange[0]; subRange[1] = m_SubRange[1]; }
+
 protected:
+
+	void WriteReport();
+
+	
+	void GetTags();
 
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node);
@@ -88,28 +116,46 @@ protected:
 
 	void CreatePointSamplingOutput();
 
+	void CalculateSurfaceArea();
+
+	void CreateSegmentationOutput();
+
 	double GetMedian(vtkDoubleArray *valuesArray);
 	
 	static int Cmpfunc(const void * a, const void * b);
 	virtual void CreateGui();
 
+	void EnableDisableGUI(int surfaceEvalued);
+
   albaVME        *m_Surface;
   vtkDoubleArray *m_VOIScalars;
+	std::vector<unsigned int> m_VOIIds;
 	std::vector<albaVect3d> m_VOICoords;
-  albaString       m_NumberOfScalarsString;
-  int             m_NumberOfScalars;
-  albaString       m_MeanScalarString;
-  double          m_MeanScalar;
-  albaString       m_MaxScalarString;
-  albaString       m_MinScalarString;
-  double          m_MaxScalar;
-  double          m_MinScalar;
-  albaString       m_StandardDeviationString;
-  double          m_StandardDeviation;
-	albaString       m_MedianString;
-	double					m_Median;
-	wxListBox			 *m_VoxelList;
-	int							m_EvaluateInSubRange;
-	double							m_SubRange[2];
+  albaString    m_NumberOfScalarsString;
+  int           m_NumberOfScalars;
+  albaString    m_MeanScalarString;
+  double        m_MeanScalar;
+  albaString    m_MaxScalarString;
+  albaString    m_MinScalarString;
+  double        m_MaxScalar;
+  double        m_MinScalar;
+  albaString    m_StandardDeviationString;
+  double        m_StandardDeviation;
+	albaString    m_MedianString;
+	double				m_Median;
+	albaString		m_SurfaceAreaString;
+	double				m_SurfaceArea;
+	wxListBox			*m_VoxelList;
+	int						m_EvaluateInSubRange;
+	double				m_SubRange[2];
+	int						m_CreateSegOutput;
+	int						m_CreatePointCloudOutput;
+	bool					m_ImagedataVol;
+
+	albaString m_PatientName;
+	albaString m_PatientCode;
+	albaString m_PatientBirthdate;
+	albaString m_PatientCenter;
+	albaString m_PatientExamDate;
 };
 #endif

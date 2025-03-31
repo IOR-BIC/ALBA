@@ -64,7 +64,7 @@ albaOpMMLModelView::albaOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 	m_PSlicesm = vtkMatrix4x4::New();
 
 	//
-	m_ScalingOccured = FALSE;
+	m_ScalingOccured = false;
 
 	//
 	m_PRenderer = ren;

@@ -129,9 +129,9 @@ void albaDataPipeTest::TestGetMTime()
 
 	//if it not depends from anything
 	albaSmartPointer<albaDataPipe> dp;
-	dp->SetDependOnVMETime(FALSE);
-	dp->SetDependOnAbsPose(FALSE);
-	dp->SetDependOnPose(FALSE);
+	dp->SetDependOnVMETime(false);
+	dp->SetDependOnAbsPose(false);
+	dp->SetDependOnPose(false);
 	dp->Modified();
 	firstTime = dp->GetMTime();
 	dp->Modified();
@@ -142,9 +142,9 @@ void albaDataPipeTest::TestGetMTime()
 	//if it depends on vme time
 	albaSmartPointer<albaDataPipe> dp2;
 	dp2->SetVME(surface);
-	dp2->SetDependOnVMETime(TRUE);
-	dp2->SetDependOnAbsPose(FALSE);
-	dp2->SetDependOnPose(FALSE);
+	dp2->SetDependOnVMETime(true);
+	dp2->SetDependOnAbsPose(false);
+	dp2->SetDependOnPose(false);
 
 	surface->Modified();
 
@@ -156,9 +156,9 @@ void albaDataPipeTest::TestGetMTime()
 	//if it depends on vme abs pose
 	albaSmartPointer<albaDataPipe> dp3;
 	dp3->SetVME(surface);
-	dp3->SetDependOnVMETime(FALSE);
-	dp3->SetDependOnAbsPose(TRUE);
-	dp3->SetDependOnPose(FALSE);
+	dp3->SetDependOnVMETime(false);
+	dp3->SetDependOnAbsPose(true);
+	dp3->SetDependOnPose(false);
 
 	surface->Modified();
 
@@ -170,9 +170,9 @@ void albaDataPipeTest::TestGetMTime()
 	//if it depends on vme pose
 	albaSmartPointer<albaDataPipe> dp4;
 	dp4->SetVME(surface);
-	dp4->SetDependOnVMETime(FALSE);
-	dp4->SetDependOnAbsPose(FALSE);
-	dp4->SetDependOnPose(TRUE);
+	dp4->SetDependOnVMETime(false);
+	dp4->SetDependOnAbsPose(false);
+	dp4->SetDependOnPose(true);
 
 	surface->Modified();
 
@@ -253,12 +253,12 @@ void albaDataPipeTest::TestSetGetDependOnPose()
 //----------------------------------------------------------------------------
 {
 	albaSmartPointer<albaDataPipe> dp;
-	dp->SetDependOnPose(TRUE);
-	result = dp->GetDependOnPose() == TRUE;
+	dp->SetDependOnPose(true);
+	result = dp->GetDependOnPose() == true;
 	TEST_RESULT;
 
-	dp->SetDependOnPose(FALSE);
-	result = dp->GetDependOnPose() == FALSE;
+	dp->SetDependOnPose(false);
+	result = dp->GetDependOnPose() == false;
 	TEST_RESULT;
 }
 //----------------------------------------------------------------------------
@@ -266,12 +266,12 @@ void albaDataPipeTest::TestSetGetDependOnVMETime()
 //----------------------------------------------------------------------------
 {
 	albaSmartPointer<albaDataPipe> dp;
-	dp->SetDependOnVMETime(TRUE);
-	result = dp->GetDependOnVMETime() == TRUE;
+	dp->SetDependOnVMETime(true);
+	result = dp->GetDependOnVMETime() == true;
 	TEST_RESULT;
 
-	dp->SetDependOnVMETime(FALSE);
-	result = dp->GetDependOnVMETime() == FALSE;
+	dp->SetDependOnVMETime(false);
+	result = dp->GetDependOnVMETime() == false;
 	TEST_RESULT;
 }
 //----------------------------------------------------------------------------
@@ -279,12 +279,12 @@ void albaDataPipeTest::TestSetGetDependOnAbsPose()
 //----------------------------------------------------------------------------
 {
 	albaSmartPointer<albaDataPipe> dp;
-	dp->SetDependOnAbsPose(TRUE);
-	result = dp->GetDependOnAbsPose() == TRUE;
+	dp->SetDependOnAbsPose(true);
+	result = dp->GetDependOnAbsPose() == true;
 	TEST_RESULT;
 
-	dp->SetDependOnAbsPose(FALSE);
-	result = dp->GetDependOnAbsPose() == FALSE;
+	dp->SetDependOnAbsPose(false);
+	result = dp->GetDependOnAbsPose() == false;
 	TEST_RESULT;
 }
 //----------------------------------------------------------------------------

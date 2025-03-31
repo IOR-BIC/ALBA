@@ -199,9 +199,9 @@ static BOOL ISD_resetInterTrax(InterSenseTrackerType *tracker)
     for(pass = 0; pass < 1; pass++)
     {
         /* Toggle RTS line */
-        rs232SetRTSState(port, FALSE);
+        rs232SetRTSState(port, false);
         tdelay(0.15f);
-        rs232SetRTSState(port, TRUE);
+        rs232SetRTSState(port, true);
         tdelay(0.1f);
 
         rs232PutChar(port,  'c');
@@ -481,7 +481,7 @@ void ISD_initTracker(InterSenseTrackerType *tracker)
 
     /* init variables */
     tracker->hardware = ISD_NONE;
-    tracker->applyPSEConfigPending = FALSE;
+    tracker->applyPSEConfigPending = false;
 
     itComLogClear( tracker );
 }
@@ -502,13 +502,13 @@ BOOL ISD_openTracker(InterSenseTrackerType *tracker,
     WORD i;
     BOOL status;
     ISD_STATION_INFO_TYPE Station;
-    static int init = FALSE;
+    static int init = false;
 
     if(!init)
     {
         ISD_printf(tracker, "InterSense Driver Ver. %.2f\n", ISLIB_VERSION);
         ISD_printf(tracker, "Copyright 1998-2000 InterSense Inc.\n");
-        init = TRUE;
+        init = true;
         initTimer();
     }
 
@@ -538,27 +538,27 @@ BOOL ISD_openTracker(InterSenseTrackerType *tracker,
     itSendCommand(tracker, "c");
 
     /* set default station configuration */
-    for (i = 1, status = TRUE; i <= ISD_MAX_STATIONS && status;  i++)
+    for (i = 1, status = true; i <= ISD_MAX_STATIONS && status;  i++)
     {
         if(tracker->state.hardwareVersion == IS900)
         {
-            Station.GetAnalogData = TRUE;
-            Station.GetButtons = TRUE;
+            Station.GetAnalogData = true;
+            Station.GetButtons = true;
         }
         else
         {
-            Station.GetAnalogData = FALSE;
-            Station.GetButtons = FALSE;
+            Station.GetAnalogData = false;
+            Station.GetButtons = false;
         }
 
         /* no time stamp unless requested by application */
-        Station.TimeStamped = FALSE;
+        Station.TimeStamped = false;
 
         Station.AngleFormat = ISD_EULER;
 
         /* no camera tracker encoder data */
-        Station.GetCameraDataRaw = FALSE;        
-        Station.GetCameraDataComputed = FALSE;        
+        Station.GetCameraDataRaw = false;        
+        Station.GetCameraDataComputed = false;        
 
         /* set frame to default */
         Station.CoordFrame = ISD_DEFAULT_FRAME;
@@ -730,7 +730,7 @@ BOOL ISD_getStationConfig( InterSenseTrackerType *tracker,
                            ISD_STATION_INFO_TYPE *Station,
                            WORD stationNum, BOOL verbose )
 {
-    BOOL status = TRUE;
+    BOOL status = true;
     int i;
 
     if(wsockIsClient(tracker))
@@ -742,12 +742,12 @@ BOOL ISD_getStationConfig( InterSenseTrackerType *tracker,
     memset((void *) Station, 0, sizeof(ISD_STATION_INFO_TYPE));
 
     Station->ID                     = stationNum;
-    Station->GetButtons             = FALSE;
-    Station->GetAnalogData          = FALSE;
-    Station->TimeStamped            = FALSE;
+    Station->GetButtons             = false;
+    Station->GetAnalogData          = false;
+    Station->TimeStamped            = false;
     Station->AngleFormat            = ISD_EULER;
-    Station->GetCameraDataRaw       = FALSE;
-    Station->GetCameraDataComputed  = FALSE;
+    Station->GetCameraDataRaw       = false;
+    Station->GetCameraDataComputed  = false;
     Station->CoordFrame             = ISD_DEFAULT_FRAME;
     Station->InertiaCube            = 1;
     Station->Sensitivity            = 3;
@@ -777,10 +777,10 @@ BOOL ISD_getStationConfig( InterSenseTrackerType *tracker,
                     Station->CoordFrame = ISD_VSET_FRAME;
                     break;
                 case 21:
-                    Station->TimeStamped = TRUE;
+                    Station->TimeStamped = true;
                     break;
                 case 22:
-                    Station->GetButtons = TRUE;
+                    Station->GetButtons = true;
                     break;
                 case 4:
                     Station->AngleFormat = ISD_EULER;
@@ -789,12 +789,12 @@ BOOL ISD_getStationConfig( InterSenseTrackerType *tracker,
                     Station->AngleFormat = ISD_QUATERNION;
                     break;
                 case 23:
-                    Station->GetAnalogData = TRUE;
+                    Station->GetAnalogData = true;
                     break;
                 case 43:
                 case 44:
                 case 45:
-                    Station->GetCameraDataRaw = TRUE;
+                    Station->GetCameraDataRaw = true;
                     break;
                 case 41:
                 case 42:
@@ -802,7 +802,7 @@ BOOL ISD_getStationConfig( InterSenseTrackerType *tracker,
                 case 47:
                 case 48:
                 case 49:
-                    Station->GetCameraDataComputed = TRUE;
+                    Station->GetCameraDataComputed = true;
                     break;
             }
         }
@@ -927,7 +927,7 @@ BOOL ISD_setOutputRecordList ( InterSenseTrackerType *tracker,
             Station->AngleFormat == ISD_QUATERNION ? 11 : 4);
     }
 
-    return TRUE;
+    return true;
 }
 
 
@@ -958,7 +958,7 @@ BOOL ISD_setStationConfig ( InterSenseTrackerType *tracker,
     }
 
     /* start by obtaining current state of the station */
-    if(ISD_getStationConfig(tracker, &PrevStationState, stationNum, FALSE))
+    if(ISD_getStationConfig(tracker, &PrevStationState, stationNum, false))
     {
         /* check if any changes are requested */
         if(memcmp((void *)&PrevStationState, 
@@ -1002,7 +1002,7 @@ BOOL ISD_setStationConfig ( InterSenseTrackerType *tracker,
                     }
                     else
                     {
-                        tracker->applyPSEConfigPending = TRUE;
+                        tracker->applyPSEConfigPending = true;
                     }
                 }
                 if(Station->InertiaCube > 0)
@@ -1016,7 +1016,7 @@ BOOL ISD_setStationConfig ( InterSenseTrackerType *tracker,
                     }
                     else
                     {
-                        tracker->applyPSEConfigPending = TRUE;
+                        tracker->applyPSEConfigPending = true;
                     }
                 }
             }
@@ -1087,7 +1087,7 @@ BOOL ISD_configureTracker( InterSenseTrackerType *tracker, BOOL verbose )
     /* Get system status parameters so that data records can be
        correctly interpreted */
 
-    status = ISD_getTrackerConfig(tracker, &Tracker, FALSE);
+    status = ISD_getTrackerConfig(tracker, &Tracker, false);
 
     if(verbose)
         ISD_printf(tracker, "%s\n", status == PASS ? "done" : "failed");
@@ -1164,10 +1164,10 @@ BOOL ISD_allowUserCommand ( char *cmd )
         case 'o':   /* communication parameters */
         case 'U':   /* units inches */
         case 'u':   /* units centimeters */
-            return FALSE;
+            return false;
 
         default:
-            return TRUE;
+            return true;
     }
 }
 

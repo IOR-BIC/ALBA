@@ -151,7 +151,7 @@ inline int vtkALBAFile::Write(void* buffer, int count)
 inline bool vtkALBAFile::Seek(long long pos, int origin)
 {
 #ifdef _WIN32  
-  return FALSE != SetFilePointerEx(m_HFile, 
+  return false != SetFilePointerEx(m_HFile, 
       *((LARGE_INTEGER*)&pos), NULL, (DWORD)origin);  
 #else
   return fseeko64( PFile, (off64_t)pos, origin ) >= 0;  
@@ -164,7 +164,7 @@ inline long long vtkALBAFile::GetCurrentPos() throw(...)
 #ifdef _WIN32
   LARGE_INTEGER liCurPos;
   liCurPos.QuadPart = 0;
-  if (FALSE == SetFilePointerEx(m_HFile, liCurPos, &liCurPos, FILE_CURRENT))
+  if (false == SetFilePointerEx(m_HFile, liCurPos, &liCurPos, FILE_CURRENT))
     return (long long)-1;  //error
 
   return (long long)liCurPos.QuadPart;

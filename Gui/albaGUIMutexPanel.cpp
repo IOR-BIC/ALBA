@@ -39,7 +39,7 @@ albaGUIMutexPanel::albaGUIMutexPanel(wxWindow* parent,wxWindowID id)
 //----------------------------------------------------------------------------
 {
   m_Sizer =  new wxBoxSizer( wxVERTICAL );
-  this->SetAutoLayout( TRUE );
+  this->SetAutoLayout( true );
   this->SetSizer( m_Sizer );
   //m_Sizer->Fit(this);
   //m_Sizer->SetSizeHints(this);

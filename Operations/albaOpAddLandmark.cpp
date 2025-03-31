@@ -55,7 +55,7 @@ albaCxxTypeMacro(albaOpAddLandmark);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-albaOpAddLandmark::albaOpAddLandmark(const wxString &label, const wxString dictionary, const wxString cloudName) :
+albaOpAddLandmark::albaOpAddLandmark(const wxString &label, const wxString dictionary, const wxString cloudName, ADD_LM_LINK_TYPE linkType) :
 albaOp(label)
 {
 	m_OpType = OPTYPE_OP;
@@ -99,6 +99,7 @@ albaOp(label)
 	m_FirstOpDo = true;
 	m_DictionaryLoaded = false;
 	m_Dictionary = dictionary;
+	m_LinkType = linkType;
 }
 //----------------------------------------------------------------------------
 albaOpAddLandmark::~albaOpAddLandmark()
@@ -136,7 +137,9 @@ albaOp* albaOpAddLandmark::Copy()
 	albaOpAddLandmark *op = new albaOpAddLandmark(m_Label);
 	op->m_OpType = m_OpType;
 	op->m_Canundo = m_Canundo;
+	op->m_CloudName = m_CloudName;
 	op->m_Dictionary = m_Dictionary;
+	op->m_LinkType = m_LinkType;
 	return op;
 }
 //----------------------------------------------------------------------------
@@ -304,6 +307,10 @@ void albaOpAddLandmark::OpDo()
 			RestoreLandmarkVect(m_LandmarkRedoVect);
 		}
 	}
+	if (m_LinkType == LM_MANDATORY_LINK)
+		m_Cloud->SetMandatoryLink("PICKED_VME", m_PickedVme);
+	else if (m_LinkType == LM_NORMAL_LINK)
+		m_Cloud->SetLink("PICKED_VME", m_PickedVme);
 
 	m_FirstOpDo = false;
 }

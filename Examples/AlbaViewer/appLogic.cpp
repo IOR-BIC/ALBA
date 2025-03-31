@@ -53,8 +53,6 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 appLogic::appLogic() : albaLogicWithManagers()
 {
-	m_OpeningMSF = false;
-
 	// Init Operations to plug in Toolbar 
 	m_OpImporterDicom = new albaOpImporterDicom("DICOM", true);
 
@@ -141,10 +139,7 @@ void appLogic::OnEvent(albaEventBase *alba_event)
 		case wxID_FILE8:
 		case wxID_FILE9:
 		{
-			m_OpeningMSF = true;
 			OnFileHistory(e->GetId());
-			m_OpeningMSF = false;
-
 			ShowVMEOnView();
 		}
 		break;

@@ -89,9 +89,9 @@ BOOL  ISD_CloseTracker( ISD_TRACKER_HANDLE handle )
         {
             ISD_closeTracker( &ISD_tracker[ i ] ); 
         }
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 
@@ -118,7 +118,7 @@ BOOL  ISD_NumOpenTrackers( WORD *num )
             *num += 1;
         }
     }
-    return TRUE;
+    return true;
 }
 
 
@@ -140,7 +140,7 @@ BOOL ISD_GetCommInfo( ISD_TRACKER_HANDLE handle, ISD_TRACKER_INFO_TYPE *Tracker 
     {
         return ISD_getCommInfo( &ISD_tracker[ handle - 1 ], Tracker );
     }
-    return FALSE;
+    return false;
 }
 
 
@@ -161,7 +161,7 @@ BOOL ISD_GetTrackerConfig( ISD_TRACKER_HANDLE handle,
     {
         return ISD_getTrackerConfig( &ISD_tracker[ handle - 1 ], Tracker, verbose );
     }
-    return FALSE;
+    return false;
 }
 
 
@@ -181,7 +181,7 @@ BOOL ISD_SetTrackerConfig( ISD_TRACKER_HANDLE handle,
     {
         return ISD_setTrackerConfig( &ISD_tracker[ handle - 1 ], Tracker, verbose );
     }
-    return FALSE;
+    return false;
 }
 
 
@@ -201,9 +201,9 @@ BOOL ISD_SetStationConfig( ISD_TRACKER_HANDLE handle,
     if( handle > 0 && handle <= ISD_MAX_TRACKERS)
     {
         return ISD_setStationConfig( &ISD_tracker[ handle - 1 ], Station, 
-                                     stationNum, verbose, TRUE );
+                                     stationNum, verbose, true );
     }
-    return FALSE;
+    return false;
 }
 
 
@@ -225,7 +225,7 @@ BOOL ISD_GetStationConfig( ISD_TRACKER_HANDLE handle,
         return ISD_getStationConfig( &ISD_tracker[ handle - 1 ], Station, 
                                       stationNum, verbose );
     }
-    return FALSE;
+    return false;
 }
 
 
@@ -270,11 +270,11 @@ BOOL ISD_GetTrackerData( ISD_TRACKER_HANDLE handle, ISD_DATA_TYPE *Data )
             memcpy((void *)Data->Station[i].AnalogData, (void *)tracker->station[i].AnalogData, 
                 sizeof(Data->Station[i].AnalogData));
 
-            tracker->station[i].NewData = FALSE;
+            tracker->station[i].NewData = false;
         }
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 
@@ -312,11 +312,11 @@ BOOL ISD_GetCameraData( ISD_TRACKER_HANDLE handle, ISD_CAMERA_DATA_TYPE *Data )
             Data->Camera[i].FOV                 = tracker->station[i].FOV;
             Data->Camera[i].NodalPoint          = tracker->station[i].NodalPoint;
 
-            tracker->station[i].NewCameraData = FALSE;
+            tracker->station[i].NewCameraData = false;
         }
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 
@@ -340,7 +340,7 @@ BOOL ISD_SendScript( ISD_TRACKER_HANDLE handle, char *script )
     char command[120];
     InterSenseTrackerType *tracker;
     unsigned int i, len;
-    int stringReady = FALSE;
+    int stringReady = false;
 
     if( handle > 0 && handle <= ISD_MAX_TRACKERS )
     {
@@ -353,7 +353,7 @@ BOOL ISD_SendScript( ISD_TRACKER_HANDLE handle, char *script )
             /* time to send the command */
             if(script[i] == '\n' || script[i] == '\r' || script[i] == '\0')
             {
-                stringReady = TRUE;
+                stringReady = true;
             }
             /* skip the white space */
             else if(script[i] != ' ' && script[i] != '\t')
@@ -374,12 +374,12 @@ BOOL ISD_SendScript( ISD_TRACKER_HANDLE handle, char *script )
                     ISD_sendCommand( tracker, command );
                 }
                 buf = command;
-                stringReady = FALSE;
+                stringReady = false;
             }
         }
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 

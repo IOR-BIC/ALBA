@@ -351,7 +351,7 @@ int albaVME::SetParent(albaVME *parent)
 			InvokeEvent(this, NODE_DETACHED_FROM_TREE);
 
 			m_Parent = parent;
-			SetId(-1);
+			Modified();
 		}
 		return ALBA_OK;
 	}
@@ -806,10 +806,13 @@ int albaVME::InternalStore(albaStorageElement *parent)
 	for (albaLinksMap::iterator links_it = m_Links.begin(); links_it != m_Links.end(); links_it++)
 	{
 		albaVMELink &link = links_it->second;
-		albaStorageElement *link_item_element = links_element->AppendChild("Link");
-		link_item_element->SetAttribute("Name", links_it->first);
-		link_item_element->SetAttribute("NodeId", link.m_Node->GetId());
-		link_item_element->SetAttribute("linkType", (albaID)link.m_Type);
+		if (link.m_Node)
+		{
+			albaStorageElement *link_item_element = links_element->AppendChild("Link");
+			link_item_element->SetAttribute("Name", links_it->first);
+			link_item_element->SetAttribute("NodeId", link.m_Node->GetId());
+			link_item_element->SetAttribute("linkType", (albaID)link.m_Type);
+		}
 	}
 
 	// store the visible children into a tmp array
@@ -876,7 +879,12 @@ int albaVME::InternalRestore(albaStorageElement *node)
 		links_element->GetAttribute("NumberOfLinks", num_links);
 		int n = (int)atof(num_links);
 		albaStorageElement::ChildrenVector links_vector = links_element->GetChildren();
-		assert(links_vector.size() == n);
+		if (links_vector.size() != n)
+		{
+			albaWarningMessage("There is a problem with this file.\nThe link number of %s is wrong, this may lead in loosing of data.\n", GetName());
+			n = links_vector.size();
+		}
+
 		unsigned int i;
 		for (i = 0; i < n; i++)
 		{
@@ -1629,7 +1637,7 @@ albaVME *albaVME::GetLink(const char *name)
 		// Check node validity instead of checking 'm_NodeId'
 		// then if m_NodeId is different from m_Id, the link will
 		// be updated.
-		if (it->second.m_Node != NULL && it->second.m_Node->IsValid())
+		if (it->second.m_Node != NULL)
 		{
 			if (it->second.m_NodeId != it->second.m_Node->GetId())
 			{
@@ -1873,13 +1881,12 @@ void albaVME::OnNodeAttachedToTree(albaEventBase *e)
 //-------------------------------------------------------------------------
 void albaVME::OnNodeDestroyed(albaEventBase *e)
 {
-	for (albaLinksMap::iterator it = m_Links.begin(); it != m_Links.end(); it++)
+	for (albaLinksMap::iterator it = m_Links.begin(); it != m_Links.end();)
 	{
 		if (it->second.m_Node == e->GetSender())
-		{
-			it->second.m_NodeId = -1; // reset Id value
-			it->second.m_Node = NULL; // set VME pointer to NULL
-		}
+			it = m_Links.erase(it);
+		else
+			++it;
 	}
 }
 

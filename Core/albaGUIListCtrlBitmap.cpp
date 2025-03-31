@@ -44,7 +44,7 @@ albaGUIListCtrlBitmap::albaGUIListCtrlBitmap( wxWindow* parent,wxWindowID id, bo
    
   m_Listener = NULL;
 
-  m_Images = new wxImageList(25,25,FALSE,4);
+  m_Images = new wxImageList(25,25,false,4);
   m_List = new wxListCtrl(this,ID_LIST,wxDefaultPosition,wxSize(100,100) ,wxLC_SMALL_ICON | wxLC_SINGLE_SEL | wxLC_AUTOARRANGE);
 
   m_Sizer->Add(m_List,1,wxEXPAND);

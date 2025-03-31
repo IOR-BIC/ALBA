@@ -125,10 +125,10 @@ albaGUI::albaGUI(albaObserver *listener) :
 	m_BackgroundColor = wxColour(251, 251, 253);
 	if (m_UseBackgroundColor) this->SetBackgroundColour(m_BackgroundColor);
 
-	m_EntryStyle = wxBORDER_SIMPLE /*| wxTE_PROCESS_TAB*/;
+	m_EntryStyle = wxBORDER_SIMPLE | wxTE_PROCESS_ENTER;
 
 	m_Sizer = new wxBoxSizer(wxVERTICAL);
-	this->SetAutoLayout(TRUE);
+	this->SetAutoLayout(true);
 	this->SetSizer(m_Sizer);
 	m_Sizer->Fit(this);
 	m_Sizer->SetSizeHints(this);
@@ -790,7 +790,7 @@ void albaGUI::String(int id, wxString label, wxString* var, wxString tooltip, bo
 		wxTextCtrl *text = NULL;
 
 		text = new wxTextCtrl(this, w_id, "", dp, wxSize(fw, lh), e_style);
-		text->SetValidator(albaGUIValidator(this, w_id, text, var,interactive));
+		text->SetValidator(albaGUIValidator(this, w_id, text, var,interactive,multiline));
 		text->SetFont(m_Font);
 
 		if (tooltip != "")
@@ -807,7 +807,7 @@ void albaGUI::String(int id, wxString label, wxString* var, wxString tooltip, bo
 		int w_id = GetWidgetId(id);
 		wxTextCtrl *text = NULL;
 		text = new wxTextCtrl(this, w_id, "", dp, wxSize(dw, lh), e_style);
-		text->SetValidator(albaGUIValidator(this, w_id, text, var, interactive));
+		text->SetValidator(albaGUIValidator(this, w_id, text, var, interactive,multiline));
 		text->SetFont(m_Font);
 
 		if (tooltip != "")
@@ -828,12 +828,13 @@ void albaGUI::String(int id, albaString label, albaString *var, albaString toolt
 	int dw = DW;
 
 	long e_style = m_EntryStyle;
+
 	if (multiline)
 	{
 		lh *= 5;
 		e_style |= wxTE_MULTILINE | wxTE_WORDWRAP;
 	}
-
+	
 	if (password)
 		e_style |= wxTE_PASSWORD;
 
@@ -852,7 +853,7 @@ void albaGUI::String(int id, albaString label, albaString *var, albaString toolt
 		int w_id = GetWidgetId(id);
 		wxTextCtrl  *text = NULL;
 		text = new wxTextCtrl(this, w_id, "", dp, wxSize(FW, lh), e_style);
-		text->SetValidator(albaGUIValidator(this, w_id, text, var, interactive));
+		text->SetValidator(albaGUIValidator(this, w_id, text, var, interactive, multiline));
 		text->SetFont(m_Font);
 
 		if (!tooltip.IsEmpty())
@@ -870,7 +871,7 @@ void albaGUI::String(int id, albaString label, albaString *var, albaString toolt
 		int w_id = GetWidgetId(id);
 		wxTextCtrl  *text = NULL;
 		text = new wxTextCtrl(this, w_id, "", dp, wxSize(dw, lh), e_style);
-		text->SetValidator(albaGUIValidator(this, w_id, text, var,interactive));
+		text->SetValidator(albaGUIValidator(this, w_id, text, var,interactive,multiline));
 		text->SetFont(m_Font);
 
 		if (!tooltip.IsEmpty())
@@ -1164,7 +1165,7 @@ albaGUIFloatSlider *albaGUI::FloatSlider(int id, wxString label, double *var, do
 		int text_w = EW * 0.8;
 		int slider_w = FW - text_w;
 		w_id_text = GetWidgetId(id);
-		text = new wxTextCtrl(this, w_id_text, "", dp, wxSize(text_w, LH), m_EntryStyle/*|wxTE_READONLY*/);
+		text = new wxTextCtrl(this, w_id_text, "", dp, wxSize(text_w, LH), m_EntryStyle);
 		text->SetFont(m_Font);
 		text->Enable(textBoxEnable);
 
@@ -1187,7 +1188,7 @@ albaGUIFloatSlider *albaGUI::FloatSlider(int id, wxString label, double *var, do
 		lab->SetFont(m_Font);
 
 		w_id_text = GetWidgetId(id);
-		text = new wxTextCtrl(this, w_id_text, "", dp, wxSize(text_w, LH), m_EntryStyle/*|wxTE_READONLY*/);
+		text = new wxTextCtrl(this, w_id_text, "", dp, wxSize(text_w, LH), m_EntryStyle);
 		text->SetFont(m_Font);
 		text->Enable(textBoxEnable);
 		w_id_sli = GetWidgetId(id);
@@ -1225,7 +1226,7 @@ albaGUIFloatSlider *albaGUI::FloatExpandedSlider(int id, wxString label, double 
 		int text_w = EW * 0.8;
 		int slider_w = FW - text_w;
 		w_id_text = GetWidgetId(id);
-		text = new wxTextCtrl(this, w_id_text, "", dp, wxSize(text_w, LH), m_EntryStyle/*|wxTE_READONLY*/);
+		text = new wxTextCtrl(this, w_id_text, "", dp, wxSize(text_w, LH), m_EntryStyle);
 		text->SetFont(m_Font);
 		text->Enable(textBoxEnable);
 
@@ -1248,7 +1249,7 @@ albaGUIFloatSlider *albaGUI::FloatExpandedSlider(int id, wxString label, double 
 		lab->SetFont(m_Font);
 
 		w_id_text = GetWidgetId(id);
-		text = new wxTextCtrl(this, w_id_text, "", dp, wxSize(text_w, LH), m_EntryStyle/*|wxTE_READONLY*/);
+		text = new wxTextCtrl(this, w_id_text, "", dp, wxSize(text_w, LH), m_EntryStyle);
 		text->SetFont(m_Font);
 		text->Enable(textBoxEnable);
 
@@ -1300,7 +1301,7 @@ albaGUIFloatSlider *albaGUI::FloatSlider(int id, double *var, double min, double
 		sli->SetBackgroundColour(m_BackgroundColor);
 
 	int w_id_text = GetWidgetId(id);
-	text = new wxTextCtrl(this, w_id_text, "", dp, wxSize(text_w, LH), m_EntryStyle/*|wxTE_READONLY*/);
+	text = new wxTextCtrl(this, w_id_text, "", dp, wxSize(text_w, LH), m_EntryStyle);
 	text->SetFont(m_Font);
 	text->Enable(textBoxEnable);
 
@@ -1792,7 +1793,7 @@ wxListBox *albaGUI::ListBox(int id, wxString label, int height, wxString tooltip
 		width = (label == "") ? FW : DW;
 
 	int w_id = GetWidgetId(id);
-	wxListBox *lb = new wxListBox(this, w_id, dp, wxSize(width, height), 0, NULL, lbox_style | m_EntryStyle);  // wxSUNKEN_BORDER non funzia - aggiunge anche il bordino nero
+	wxListBox *lb = new wxListBox(this, w_id, dp, wxSize(width, height), 0, NULL, lbox_style | m_EntryStyle);  
 	lb->SetValidator(albaGUIValidator(this, w_id, lb));
 	lb->SetFont(m_Font);
 	if (tooltip != "") lb->SetToolTip(tooltip);
@@ -1826,7 +1827,7 @@ wxListCtrl *albaGUI::ListCtrl(int id, wxString label, int height, wxString toolt
 		width = (label == "") ? FW : DW;
 
 	int w_id = GetWidgetId(id);
-	wxListCtrl *lb = new wxListCtrl(this, w_id, dp, wxSize(width, height), lbox_style | m_EntryStyle);  // wxSUNKEN_BORDER non funzia - aggiunge anche il bordino nero
+	wxListCtrl *lb = new wxListCtrl(this, w_id, dp, wxSize(width, height), lbox_style | m_EntryStyle);
 	lb->SetValidator(albaGUIValidator(this, w_id, lb));
 	lb->SetFont(m_Font);
 	if (tooltip != "") lb->SetToolTip(tooltip);

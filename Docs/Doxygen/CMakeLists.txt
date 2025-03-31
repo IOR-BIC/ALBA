@@ -7,9 +7,9 @@ DBG_MESSAGE("Configuring project albaDoxygen")
 
 INCLUDE (${CMAKE_ROOT}/Modules/Documentation.cmake OPTIONAL)
 
-SET (DOXYFILE ${PROJECT_BINARY_DIR}/alba_doxyfile)
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/alba_doxyfile.in
-		 ${PROJECT_BINARY_DIR}/alba_doxyfile
+SET (DOXYFILE ${PROJECT_BINARY_DIR}/Doxyfile)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Doxyfile.in
+		 ${PROJECT_BINARY_DIR}/Doxyfile
 		 @ONLY)
 IF (WIN32)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/makedoc.bat.in

@@ -47,10 +47,10 @@ albaOpMML3ContourWidget::albaOpMML3ContourWidget()
 //----------------------------------------------------------------------------
 {
   this->m_OperationID = albaOpMML3ContourWidget::NoOp;
-  this->m_PlaceMode = FALSE; // center mode off
-  this->m_ScalingMode = FALSE; // scaling mode off
-  this->m_RotatingMode = FALSE; // rotating mode off
-  this->m_TranslationMode = FALSE; // translating mode off
+  this->m_PlaceMode = false; // center mode off
+  this->m_ScalingMode = false; // scaling mode off
+  this->m_RotatingMode = false; // rotating mode off
+  this->m_TranslationMode = false; // translating mode off
   this->m_State = albaOpMML3ContourWidget::Start;
   this->EventCallbackCommand->SetCallback(albaOpMML3ContourWidget::ProcessEvents);
 
@@ -1697,10 +1697,10 @@ void albaOpMML3ContourWidget::GetMotionVector(float xyz[3])
 void albaOpMML3ContourWidget::TranslationModeOn()
 //----------------------------------------------------------------------------
 {
-  this->m_PlaceMode = FALSE;
-  this->m_ScalingMode = FALSE ;
-  this->m_RotatingMode = FALSE ;
-  this->m_TranslationMode = TRUE;
+  this->m_PlaceMode = false;
+  this->m_ScalingMode = false ;
+  this->m_RotatingMode = false ;
+  this->m_TranslationMode = true;
 }
 
 
@@ -1709,7 +1709,7 @@ void albaOpMML3ContourWidget::TranslationModeOn()
 void albaOpMML3ContourWidget::TranslationModeOff()
 //----------------------------------------------------------------------------
 {
-  this->m_TranslationMode = FALSE;
+  this->m_TranslationMode = false;
 }
 
 
@@ -1719,10 +1719,10 @@ void albaOpMML3ContourWidget::PlaceModeOn()
 //----------------------------------------------------------------------------
 {
   //this->CenterHandle->VisibilityOn();
-  this->m_PlaceMode = TRUE;
-  this->m_ScalingMode = FALSE ;
-  this->m_RotatingMode = FALSE ;
-  this->m_TranslationMode = FALSE ;
+  this->m_PlaceMode = true;
+  this->m_ScalingMode = false ;
+  this->m_RotatingMode = false ;
+  this->m_TranslationMode = false ;
 }
 
 
@@ -1732,7 +1732,7 @@ void albaOpMML3ContourWidget::PlaceModeOff()
 //----------------------------------------------------------------------------
 {
   //this->CenterHandle->VisibilityOff();
-  this->m_PlaceMode = FALSE;
+  this->m_PlaceMode = false;
 }
 
 
@@ -1743,10 +1743,10 @@ void albaOpMML3ContourWidget::RotationModeOn()
 {
   //this->m_RotationalHandleActor->VisibilityOn();
   //this->Setm_RotationalHandle(50.0, 0.0, 0.0);
-  this->m_PlaceMode = FALSE;
-  this->m_ScalingMode = FALSE ;
-  this->m_RotatingMode = TRUE ;
-  this->m_TranslationMode = FALSE ;
+  this->m_PlaceMode = false;
+  this->m_ScalingMode = false ;
+  this->m_RotatingMode = true ;
+  this->m_TranslationMode = false ;
 }
 
 
@@ -1756,7 +1756,7 @@ void albaOpMML3ContourWidget::RotationModeOff()
 //----------------------------------------------------------------------------
 {
   //this->m_RotationalHandleActor->VisibilityOff();
-  this->m_RotatingMode = FALSE;
+  this->m_RotatingMode = false;
 }
 
 
@@ -1765,10 +1765,10 @@ void albaOpMML3ContourWidget::RotationModeOff()
 void albaOpMML3ContourWidget::ScalingModeOn()
 //----------------------------------------------------------------------------
 {
-  this->m_PlaceMode = FALSE;
-  this->m_ScalingMode = TRUE ;
-  this->m_RotatingMode = FALSE ;
-  this->m_TranslationMode = FALSE ;
+  this->m_PlaceMode = false;
+  this->m_ScalingMode = true ;
+  this->m_RotatingMode = false ;
+  this->m_TranslationMode = false ;
 
   //this->ScalingHandlesOn();
 
@@ -1787,7 +1787,7 @@ void albaOpMML3ContourWidget::ScalingModeOn()
 void albaOpMML3ContourWidget::ScalingModeOff()
 //----------------------------------------------------------------------------
 {
-  this->m_ScalingMode = FALSE;
+  this->m_ScalingMode = false;
 
   //
   //this->ScalingHandlesOff();

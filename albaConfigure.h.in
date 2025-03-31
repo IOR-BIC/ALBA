@@ -66,5 +66,6 @@
 // Data root used to reach data for testing
 //--------------------------------------------------------------------------
 #define ALBA_DATA_ROOT "@ALBA_DATA_ROOT@"
+#define ALBA_SOURCE_DIR "@ALBA_SOURCE_DIR@"
 
 #endif // __albaConfigure_h
