@@ -116,10 +116,8 @@ void vtkALBADistanceFilterTest::TestFilter_Scalar_Density()
 	volume->Update();
 	
 	vtkALBASmartPointer<vtkSphereSource> sphere;
-// 	sphere->SetThetaResolution(6);
-// 	sphere->SetPhiResolution(6);
-// 	sphere->SetCenter(0, 0, 0);
-// 	sphere->SetRadius(1.0);
+ 	sphere->SetCenter(60, 60, 50);
+	sphere->SetRadius(4.0);
 	sphere->Update();
 
 	vtkALBASmartPointer<vtkPolyDataNormals> normals;
@@ -145,22 +143,12 @@ void vtkALBADistanceFilterTest::TestFilter_Scalar_Density()
 	
   CPPUNIT_ASSERT(vectors == NULL && scalars != NULL);
 
-	double val = 0.88789987564086914;
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(5)[1] == val);   // 0.88789987564086914
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(10)[1] == val);  // 0.88789987564086914
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(57)[1] == -val); //-0.88789987564086914
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(22)[2] == val);  // 0.88789987564086914
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(55)[2] == val);  // 0.88789987564086914
-
-	val = 0.88789993524551392;
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(28)[1] == -val); //-0.88789993524551392
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(50)[1] == val);  // 0.88789993524551392
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(16)[2] == val);  // 0.88789993524551392
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(40)[2] == -val); //-0.88789993524551392
-
-	val = 0.88789981603622437;
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(34)[1] == -val); //-0.88789981603622437
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetTuple(46)[2] == -val); //-0.88789981603622437
+	CPPUNIT_ASSERT(scalars->GetTuple1(5) == 18614.150390625);
+	CPPUNIT_ASSERT(scalars->GetTuple1(10) == 20783.19921875);  
+	CPPUNIT_ASSERT(scalars->GetTuple1(25) == 18030.525390625);
+	CPPUNIT_ASSERT(scalars->GetTuple1(55) == 17102.619140625);
+	CPPUNIT_ASSERT(scalars->GetTuple1(59) == 17728.1796875);
+	CPPUNIT_ASSERT(scalars->GetTuple1(64) == 17306.53125);
 
 	//
 	volume->ReparentTo(NULL);
