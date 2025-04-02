@@ -20,7 +20,15 @@ See the COPYINGS file for license details
 #include "vtkPlane.h"
 #include "vtkImageData.h"
 #include "vtkVolumeProperty.h"
-#include "vtkgl.h"
+#ifdef _WIN32
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
+    #include <gl/GL.h>
+#else
+    #include <GL/gl.h>
+#endif
+
+#include <vtkOpenGLHelper.h>
 
 vtkStandardNewMacro(vtkALBAVolumeTextureMapper2D);
 
@@ -61,7 +69,7 @@ vtkStandardNewMacro(vtkALBAVolumeTextureMapper2D);
   this->Timer->StartTimer();
 
   // Let the superclass take care of some initialization
-  this->vtkVolumeTextureMapper2D::InitializeRender( ren, vol );
+  this->PreRender(ren, vol, NULL, NULL,0,0);
 
   // build transformation 
   vol->GetMatrix(matrix);
@@ -120,12 +128,13 @@ vtkStandardNewMacro(vtkALBAVolumeTextureMapper2D);
   //BES: GenerateTexturesAndRenderQuads checks Shade to decide whether to create a texture or not
   //and after that it calls once again initialization (which sets Shade back to original value)
   //so the rendering is not affected by this hack
-  int nOldShade = this->Shade;    
-  this->Shade = 0;  
 
-  this->GenerateTexturesAndRenderQuads( ren, vol ); 
+  bool oldShade = vol->GetProperty()->GetShade();
+  vol->GetProperty()->SetShade(false);
 
-  this->Shade = nOldShade;
+  this->GPURender(ren, vol);
+
+  vol->GetProperty()->SetShade(oldShade);
 
 #pragma region VTK Code(rendering)  
   // pop transformation matrix

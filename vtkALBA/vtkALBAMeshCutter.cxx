@@ -299,13 +299,11 @@ int vtkALBAMeshCutter::GetIntersectionOfLineWithPlane(const double *p0, const do
 // Get list of cells which are adjoined to point
 void vtkALBAMeshCutter::GetCellNeighboursOfPoint(vtkIdType idpt, vtkIdList *idlist) const 
 //-----------------------------------------------------------------------------
-{
-  // get cell neighbours of point
-  vtkCellLinks::Link& lnk = UnstructGrid->GetCellLinks()->GetLink(idpt);
-  vtkIdType* dstList = idlist->WritePointer(0, lnk.ncells);
-  
-  // copy cell id's to idlist
-  memcpy(dstList, lnk.cells, lnk.ncells*sizeof(vtkIdType));  
+{  // Get cell neighbours of point
+  if (!UnstructGrid) 
+    return;
+
+  UnstructGrid->GetPointCells(idpt, idlist);
 }
 
 //-----------------------------------------------------------------------------

@@ -21,6 +21,7 @@ Copyright (c) 2012
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolyLine.h"
+#include "vtkCellArrayIterator.h"
 #include <algorithm>
 
 #define EPSILON 1e-8
@@ -212,16 +213,22 @@ int vtkALBATubeFilter::RequestData(vtkInformation *vtkNotUsed(request), vtkInfor
 	this->Theta = 2.0*vtkMath::Pi() / this->NumberOfSides;
 	vtkPolyLine *lineNormalGenerator = vtkPolyLine::New();
   // the line cellIds start after the last vert cellId
-  inCellId = input->GetNumberOfVerts();
-  for (inLines->InitTraversal(); inLines->GetNextCell(npts, pts) && !abort; inCellId++)
+	vtkSmartPointer<vtkCellArrayIterator> it = inLines->NewIterator();
+	inCellId = input->GetNumberOfVerts();
+
+	for (; !it->IsDoneWithTraversal() && !abort; inCellId++, it->GoToNextCell())
 	{
-		this->UpdateProgress((double)inCellId / numLines);
+		this->UpdateProgress(static_cast<double>(inCellId) / numLines);
 		abort = this->GetAbortExecute();
-		
-		vtkIdType cleanNpts = 0, *cleanPts = NULL;
-		
-		this->CleanLine(inPts, npts, pts, cleanNpts, cleanPts);
-				
+
+		vtkIdList* pts = it->GetCurrentCell();  // Ottieni gli ID della cella corrente
+		vtkIdType npts = pts->GetNumberOfIds(); // Numero di punti nella cella
+
+		vtkIdType cleanNpts = 0;
+		vtkIdType* cleanPts = nullptr;
+
+		this->CleanLine(inPts, npts, pts->GetPointer(0), cleanNpts, cleanPts);
+
 		if (cleanNpts < 2)
 		{
 			vtkWarningMacro(<< "Less than two points in line!");
@@ -233,8 +240,8 @@ int vtkALBATubeFilter::RequestData(vtkInformation *vtkNotUsed(request), vtkInfor
 		if (generateNormals)
 		{
 			singlePolyline->Reset(); //avoid instantiation
-      singlePolyline->InsertNextCell(npts,pts);
-      lineNormalGenerator->GenerateSlidingNormals(inPts,singlePolyline, inNormals);
+			singlePolyline->InsertNextCell(pts);
+			lineNormalGenerator->GenerateSlidingNormals(inPts, singlePolyline, inNormals);
 		}
 
 		// Generate the points around the polyline. The tube is not stripped

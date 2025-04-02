@@ -19,11 +19,11 @@
 #include "vtkImplicitFunction.h"
 #include "vtkTriangleFilter.h"
 #include "vtkIdList.h"
+#include "vtkPointLocator.h"
+#include "albaConfigure.h"
 
 #define PointLocator vtkPointLocator
-#include "vtkPointLocator.h"
-
-#include "albaConfigure.h"
+class vtkPolygon;
 
 class ALBA_EXPORT vtkALBAImplicitPolyData : public vtkImplicitFunction
 {

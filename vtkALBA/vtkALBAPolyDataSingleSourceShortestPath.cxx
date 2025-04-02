@@ -192,19 +192,22 @@ void vtkALBAPolyDataSingleSourceShortestPath::BuildAdjacency(vtkPolyData *pd)
 		// TODO: All types
 		if (ctype == VTK_POLYGON || ctype == VTK_TRIANGLE || ctype == VTK_LINE)
 		{
-			vtkIdType *pts;
+			vtkNew<vtkIdList> pts;
 			vtkIdType npts;
-			pd->GetCellPoints (i, npts, pts);
-			
-			vtkIdType u = pts[0];
-			vtkIdType v = pts[npts-1];
-			
+			pd->GetCellPoints(i, pts);
+
+			npts = pts->GetNumberOfIds();
+
+			vtkIdType u = pts->GetId(0);
+			vtkIdType v = pts->GetId(npts - 1);
+
 			Adj[u]->InsertUniqueId(v);
 			Adj[v]->InsertUniqueId(u);
-			for (int j = 0; j < npts-1; j++)
+
+			for (int j = 0; j < npts - 1; j++)
 			{
-				vtkIdType u = pts[j];
-				vtkIdType v = pts[j+1];
+				vtkIdType u = pts->GetId(j);
+				vtkIdType v = pts->GetId(j + 1);
 				Adj[u]->InsertUniqueId(v);
 				Adj[v]->InsertUniqueId(u);
 			}

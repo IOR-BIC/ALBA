@@ -24,6 +24,7 @@
 #include "vtkInformation.h"
 #include "vtkAlgorithm.h"
 #include "vtkExecutive.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkALBAVolumeResample);
 
@@ -149,11 +150,13 @@ int vtkALBAVolumeResample::RequestInformation(vtkInformation *vtkNotUsed(request
       vtkImageData *output = (vtkImageData*)this->GetOutput(i);
       
       int dims[3];
-			this->SetUpdateExtent(OutputExtent);
 			output->SetExtent(OutputExtent);
       output->GetDimensions(dims); // this is the number of pixels in each direction...
       
-			this->SetUpdateExtentToWholeExtent();
+      vtkInformation* outInfo = this->GetOutputInformation(0);
+      int wholeExtent[6];
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
+      outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), wholeExtent[0], wholeExtent[1], wholeExtent[2], wholeExtent[3], wholeExtent[4], wholeExtent[5]);
 
       if (this->AutoSpacing) { // select spacing
         this->PrepareVolume();
@@ -306,14 +309,17 @@ void vtkALBAVolumeResample::PrepareVolume() {
 
 
 //----------------------------------------------------------------------------
-int	vtkALBAVolumeResample::RequestUpdateExtent( vtkInformation *request, vtkInformationVector **inputVector,	vtkInformationVector *outputVector)
+int	vtkALBAVolumeResample::RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-	this->vtkDataSetAlgorithm::RequestUpdateExtent(request, inputVector,	outputVector);
+  this->vtkDataSetAlgorithm::RequestUpdateExtent(request, inputVector, outputVector);
 
-  this->SetUpdateExtentToWholeExtent();
-	
-	return 1;
-  }
+  vtkInformation* outInfo = this->GetOutputInformation(0);
+  int wholeExtent[6];
+  outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), wholeExtent[0], wholeExtent[1], wholeExtent[2], wholeExtent[3], wholeExtent[4], wholeExtent[5]);
+
+  return 1;
+}
 
 
 //----------------------------------------------------------------------------

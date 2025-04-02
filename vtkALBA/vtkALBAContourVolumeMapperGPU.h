@@ -56,7 +56,15 @@ Then Render()
 #include "vtkVolumeMapper.h"
 #include "vtkPolyData.h"
 #include "vtkMatrix4x4.h"
-#include "vtkgl.h"
+#ifdef _WIN32
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
+    #include <gl/GL.h>
+#else
+    #include <GL/gl.h>
+#endif
+
+#include <vtkOpenGLHelper.h>
 
 #include "albaConfigure.h"
 /**
@@ -65,71 +73,73 @@ namespace name: Baoquan
 // namespace Baoquan
 //{
 
-  //------------------------------------------------------------------------------
-  // Forward declarations
-  //------------------------------------------------------------------------------
-  class Idepth ;
-  class Polyline2DGPU;
-  class ListOfPolyline2DGPU;
+//------------------------------------------------------------------------------
+// Forward declarations
+//------------------------------------------------------------------------------
+class Idepth ;
+class Polyline2DGPU;
+class ListOfPolyline2DGPU;
 
 
-  /**
-        namespace name: vtkALBAContourVolumeMapperGPU
-    */
-  //------------------------------------------------------------------------------
-  namespace vtkALBAContourVolumeMapperNamespace 
-  {
-    // Defines block as 8x8x8 cube.  
-    // VoxelBlockSizeLog = 3, VoxelBlockSize = 8, VoxelsInBlock = 8^3
-    static const int VoxelBlockSizeLog = 3 ; 
-    static const int VoxelBlockSize = 1 << VoxelBlockSizeLog; 
-    static const int VoxelsInBlock = VoxelBlockSize * VoxelBlockSize * VoxelBlockSize; 
+/**
+      namespace name: vtkALBAContourVolumeMapperGPU
+*/
+//------------------------------------------------------------------------------
+namespace vtkALBAContourVolumeMapperNamespace
+{
+  // Defines block as 8x8x8 cube.  
+  // VoxelBlockSizeLog = 3, VoxelBlockSize = 8, VoxelsInBlock = 8^3
+  static const int VoxelBlockSizeLog = 3;
+  static const int VoxelBlockSize = 1 << VoxelBlockSizeLog;
+  static const int VoxelsInBlock = VoxelBlockSize * VoxelBlockSize * VoxelBlockSize;
 
-    // define vertices and edges of a cube
-    static const int unitCubeVertsXYZ[8][3] = {{0, 0, 0}, {1, 0, 0}, { 1, 1, 0}, { 0, 1, 0}, {0, 0, 1}, {1, 0, 1}, { 1, 1, 1}, { 0, 1, 1}};
-    static const int edgeOffsets[12][2] = {{0, 1}, {1, 2}, {3, 2}, {0, 3}, {4, 5}, {5, 6}, {7, 6}, {4, 7}, {0,4}, {1, 5}, {3, 7}, {2, 6} };
-    static const int edgeAxis[12] = {0, 1, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2};
+  // define vertices and edges of a cube
+  static const int unitCubeVertsXYZ[8][3] = { {0, 0, 0}, {1, 0, 0}, { 1, 1, 0}, { 0, 1, 0}, {0, 0, 1}, {1, 0, 1}, { 1, 1, 1}, { 0, 1, 1} };
+  static const int edgeOffsets[12][2] = { {0, 1}, {1, 2}, {3, 2}, {0, 3}, {4, 5}, {5, 6}, {7, 6}, {4, 7}, {0,4}, {1, 5}, {3, 7}, {2, 6} };
+  static const int edgeAxis[12] = { 0, 1, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2 };
 
-    // max no. of triangles before LOD required
-    static const int MaxTrianglesNotOptimized = 2000000 ;
+  // max no. of triangles before LOD required
+  static const int MaxTrianglesNotOptimized = 2000000;
 
-    // approx. ratio of time to draw between DrawCache() and RenderMCubes()
-    static const float TimeCacheToMCubesRatio = 0.2 ;
+  // approx. ratio of time to draw between DrawCache() and RenderMCubes()
+  static const float TimeCacheToMCubesRatio = 0.2;
 
-    // no. of levels of detail allowed (1, 2, 3 or 4)
-    static const int NumberOfLods = 4 ;
+  // no. of levels of detail allowed (1, 2, 3 or 4)
+  static const int NumberOfLods = 4;
 
-    // Empirical constant: approx no. of triangles for every voxel in a block containing contour
-    // This is used in RenderMCubes() to calculate the default lod.
-    // Too low and RenderMCubes will underestimate the render time, 
-    // too high and the rendering will flicker down to low resolution too much.
-    // Actual value is about 0.5, but the contour slider is very sticky at this value.
-    const float triangles_per_voxel = 2.0 ;
+  // Empirical constant: approx no. of triangles for every voxel in a block containing contour
+  // This is used in RenderMCubes() to calculate the default lod.
+  // Too low and RenderMCubes will underestimate the render time, 
+  // too high and the rendering will flicker down to low resolution too much.
+  // Actual value is about 0.5, but the contour slider is very sticky at this value.
+  const float triangles_per_voxel = 2.0;
 
-    // Transparency constant: defines fraction of triangles which are actually sorted on each render.
-    // eg if SortFraction = 10, then 1/10 of triangles sorted per render, takes 2*10-1 = 19 renders to complete
-    // Should be as large as possible without creating artefacts.
-    static const int SortFraction = 10 ;
+  // Transparency constant: defines fraction of triangles which are actually sorted on each render.
+  // eg if SortFraction = 10, then 1/10 of triangles sorted per render, takes 2*10-1 = 19 renders to complete
+  // Should be as large as possible without creating artefacts.
+  static const int SortFraction = 10;
 
-  };
+};
 
 
 /*
 Class Name: Idepth.
-  Container type for sorting depth values
+Container type for sorting depth values
 */
-  class Idepth
-  {
-  public:
-    float depth ;
-    int index ;
-    /** redefine < operator in order to check depth variable. */
-    bool operator < (const Idepth &b) const {return this->depth < b.depth ;}
-  };
+class Idepth
+{
+public:
+  float depth ;
+  int index ;
+  /** redefine < operator in order to check depth variable. */
+  bool operator < (const Idepth &b) const {return this->depth < b.depth ;}
+};
 
 
 
-  using namespace vtkALBAContourVolumeMapperNamespace ;
+using namespace vtkALBAContourVolumeMapperNamespace ;
+
+#define EDGE_LIST int
 
 /**
 class name: vtkALBAContourVolumeMapperGPU.
@@ -583,7 +593,7 @@ these classes are used for optimizing the surface by analyzing 2D contours
   Class Name:ListOfPolyline2DGPU.
   This is a std::vector of polyline pointers, with 3 extra functions.
 */
-  class ListOfPolyline2DGPU : public std::vector<Polyline2DGPU*> 
+  class ListOfPolyline2DGPU : public std::vector<Polyline2DGPU*>
   {
   public:
     /** Clear the list of polylines. */
@@ -591,7 +601,7 @@ these classes are used for optimizing the surface by analyzing 2D contours
     /** check if point is inside the contour */
     bool IsInside(int x, int y, int polylineLengthThreshold);
     /** retrieve contour polyline */
-    Polyline2DGPU *FindContour(int x, int y, int polylineLengthThreshold, int distance = 1);
+    Polyline2DGPU* FindContour(int x, int y, int polylineLengthThreshold, int distance = 1);
   };
 //}//end baoquan space
 #endif

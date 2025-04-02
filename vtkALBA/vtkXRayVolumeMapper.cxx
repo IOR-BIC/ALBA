@@ -66,6 +66,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPointData.h"
 #include "vtkTransform.h"
 #include "vtkTimerLog.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkInformation.h"
 
 
 #include <assert.h>
@@ -1261,13 +1263,16 @@ int vtkXRayVolumeMapper::FindColorResolution() {
 
 //-------------------------------------------------------------------
 void vtkXRayVolumeMapper::Update() {
-  if (vtkImageData::SafeDownCast(this->GetInput()) != NULL || 
-      vtkRectilinearGrid::SafeDownCast(this->GetInput()) != NULL) {
+  if (vtkImageData::SafeDownCast(this->GetInput()) != NULL ||
+    vtkRectilinearGrid::SafeDownCast(this->GetInput()) != NULL) {
     this->UpdateInformation();
-    this->SetUpdateExtentToWholeExtent();
+    vtkInformation* outInfo = this->GetOutputInformation(0);
+    int wholeExtent[6];
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), wholeExtent[0], wholeExtent[1], wholeExtent[2], wholeExtent[3], wholeExtent[4], wholeExtent[5]);
     this->vtkVolumeMapper::Update();
-    }
   }
+}
 
 
 //-------------------------------------------------------------------

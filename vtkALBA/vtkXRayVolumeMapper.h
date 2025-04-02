@@ -59,7 +59,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkCamera.h"
 
-#include "vtkgl.h"
+#ifdef _WIN32
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
+    #include <gl/GL.h>
+#else
+    #include <GL/gl.h>
+#endif
+
+#include <vtkOpenGLHelper.h>
 
 #define MaxNumberOfMipmapLevels 3
 #define MaxNumberOfRenderings   360

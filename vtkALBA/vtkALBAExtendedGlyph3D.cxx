@@ -30,6 +30,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkALBAExtendedGlyph3D);
 
@@ -211,7 +212,8 @@ int vtkALBAExtendedGlyph3D::RequestData( vtkInformation *vtkNotUsed(request), vt
     defaultPointIds[1] = 1;
     defaultSource->SetPoints(defaultPoints);
     defaultSource->InsertNextCell(VTK_LINE, 2, defaultPointIds);
-    this->SetUpdateExtent(0, 1, 0);
+    vtkInformation* outInfo = this->GetOutputInformation(0);
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), 0, 1, 0); 
     this->SetSource(defaultSource);
     defaultSource->Delete();
     defaultSource = NULL;
@@ -751,13 +753,9 @@ int	vtkALBAExtendedGlyph3D::RequestUpdateExtent( vtkInformation *request, vtkInf
 
  
   outPd = this->GetOutput();
-  if (this->GetSource())
-    {
-    this->SetUpdateExtent(0, 1, 0);
-    }
-  this->SetUpdateExtent(outPd->GetPiece(),
-                                    outPd->GetNumberOfPieces(),
-                                    outPd->GetGhostLevel());
+
+  vtkInformation* outInfo = this->GetOutputInformation(0);
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), outPd->GetPiece(), outPd->GetNumberOfPieces(), outPd->GetGhostLevel());
   
 	return 1;
 }

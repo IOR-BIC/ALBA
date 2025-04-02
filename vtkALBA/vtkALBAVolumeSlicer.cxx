@@ -187,27 +187,30 @@ void vtkALBAVolumeSlicer::SetPlaneOrigin(double x, double y, double z)
 
 //----------------------------------------------------------------------------
 //By default copy the output update extent to the input.
-int	vtkALBAVolumeSlicer::RequestUpdateExtent( vtkInformation *request, vtkInformationVector **inputVector,	vtkInformationVector *outputVector)
+int	vtkALBAVolumeSlicer::RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-	this->vtkDataSetAlgorithm::RequestUpdateExtent(request, inputVector,	outputVector);
+  this->vtkDataSetAlgorithm::RequestUpdateExtent(request, inputVector, outputVector);
 
-  vtkDataObject *input = this->GetInput();
-  this->SetUpdateExtentToWholeExtent();
+  vtkDataObject* input = this->GetInput();
+  vtkInformation* outInfo = this->GetOutputInformation(0);
+  int wholeExtent[6];
+  outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), wholeExtent[0], wholeExtent[1], wholeExtent[2], wholeExtent[3], wholeExtent[4], wholeExtent[5]);
 
-	return 1;
+  return 1;
 }
 
 //----------------------------------------------------------------------------
 //By default, UpdateInformation calls this method to copy information
 //unmodified from the input to the output.
-/*virtual*/ int vtkALBAVolumeSlicer::RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
+/*virtual*/ int vtkALBAVolumeSlicer::RequestInformation(vtkInformation* vtkNotUsed(request), vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 //----------------------------------------------------------------------------
 {
-	vtkDataSet* input = vtkDataSet::SafeDownCast(GetInput());
-	if (input == NULL || this->GetNumberOfOutputPorts() == 0)
+  vtkDataSet* input = vtkDataSet::SafeDownCast(GetInput());
+  if (input == NULL || this->GetNumberOfOutputPorts() == 0)
     return 1; //nothing to cut, or we have no output -> exit
-  
-  this->NumComponents = input->GetPointData()->GetScalars()->GetNumberOfComponents();  
+
+  this->NumComponents = input->GetPointData()->GetScalars()->GetNumberOfComponents();
 
   //first, perform transformation of Plane
   if (TransformSlice)
@@ -231,8 +234,8 @@ int	vtkALBAVolumeSlicer::RequestUpdateExtent( vtkInformation *request, vtkInform
   vtkMath::Normalize(this->GlobalPlaneAxisZ);
 
   //now copy the important information from input, e.g., bounding box
-  vtkImageData* imageData = vtkImageData::SafeDownCast(input);  
-  if (imageData != NULL) 
+  vtkImageData* imageData = vtkImageData::SafeDownCast(input);
+  if (imageData != NULL)
   {
     //regular grid, it is a bit easier    
     imageData->GetDimensions(this->DataDimensions);
@@ -245,14 +248,14 @@ int	vtkALBAVolumeSlicer::RequestUpdateExtent( vtkInformation *request, vtkInform
       dataSpacing[i] *= (this->DataDimensions[i] - 1);
       this->DataBounds[i][0] = this->DataOrigin[i];
       this->DataBounds[i][1] = this->DataOrigin[i] + dataSpacing[i];
-    } 
+    }
   }
   else
   {
     vtkRectilinearGrid* gridData = vtkRectilinearGrid::SafeDownCast(input);
     if (gridData == NULL)
     {
-      vtkDebugMacro("Invalid input for vtkALBAVolumeSlicer");      
+      vtkDebugMacro("Invalid input for vtkALBAVolumeSlicer");
       return 1;
     }
 
@@ -262,48 +265,51 @@ int	vtkALBAVolumeSlicer::RequestUpdateExtent( vtkInformation *request, vtkInform
     this->DataOrigin[1] = gridData->GetYCoordinates()->GetTuple(0)[0];
     this->DataOrigin[2] = gridData->GetZCoordinates()->GetTuple(0)[0];
 
-    this->DataBounds[0][0] = min(this->DataOrigin[0], 
+    this->DataBounds[0][0] = min(this->DataOrigin[0],
       gridData->GetXCoordinates()->GetTuple(this->DataDimensions[0] - 1)[0]);
-    this->DataBounds[0][1] = max(this->DataOrigin[0], 
+    this->DataBounds[0][1] = max(this->DataOrigin[0],
       gridData->GetXCoordinates()->GetTuple(this->DataDimensions[0] - 1)[0]);
 
-    this->DataBounds[1][0] = min(this->DataOrigin[1], 
+    this->DataBounds[1][0] = min(this->DataOrigin[1],
       gridData->GetYCoordinates()->GetTuple(this->DataDimensions[1] - 1)[0]);
-    this->DataBounds[1][1] = max(this->DataOrigin[1], 
+    this->DataBounds[1][1] = max(this->DataOrigin[1],
       gridData->GetYCoordinates()->GetTuple(this->DataDimensions[1] - 1)[0]);
 
-    this->DataBounds[2][0] = min(this->DataOrigin[2], 
+    this->DataBounds[2][0] = min(this->DataOrigin[2],
       gridData->GetZCoordinates()->GetTuple(this->DataDimensions[2] - 1)[0]);
-    this->DataBounds[2][1] = max(this->DataOrigin[2], 
+    this->DataBounds[2][1] = max(this->DataOrigin[2],
       gridData->GetZCoordinates()->GetTuple(this->DataDimensions[2] - 1)[0]);
   }
 
-  for (int i = 0; i < this->GetNumberOfOutputPorts(); i++) 
+  for (int i = 0; i < this->GetNumberOfOutputPorts(); i++)
   {
     vtkImageData* output = vtkImageData::SafeDownCast(this->GetOutput(i));
-    if (output != NULL) 
-    {            
-      this->SetUpdateExtentToWholeExtent();
+    if (output != NULL)
+    {
+      vtkInformation* outInfo = this->GetOutputInformation(0);
+      int wholeExtent[6];
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
+      outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), wholeExtent[0], wholeExtent[1], wholeExtent[2], wholeExtent[3], wholeExtent[4], wholeExtent[5]);
 
 
       //if the cut should fill the whole output, we will need to get intersections
       if (this->AutoSpacing)
-      { 
+      {
         //intersect the cutting plane ax + by + cz + d = 0, where (a,b,c) is normal GlobalPlaneAxisZ
         //and d can is computed so the plane goes through GlobalPlaneOrigin with the bounding box
-        const float d = -(this->GlobalPlaneAxisZ[0] * this->GlobalPlaneOrigin[0] + 
-          this->GlobalPlaneAxisZ[1] * this->GlobalPlaneOrigin[1] + 
+        const float d = -(this->GlobalPlaneAxisZ[0] * this->GlobalPlaneOrigin[0] +
+          this->GlobalPlaneAxisZ[1] * this->GlobalPlaneOrigin[1] +
           this->GlobalPlaneAxisZ[2] * this->GlobalPlaneOrigin[2]);
 
         //set initial spacing to 1,1,1
-        double spacing[3] = {1.0f, 1.0f, 1.0f};
+        double spacing[3] = { 1.0f, 1.0f, 1.0f };
         float minT = VTK_FLOAT_MAX, maxT = VTK_FLOAT_MIN, minS = VTK_FLOAT_MAX, maxS = VTK_FLOAT_MIN;
         int numberOfPoints = 0;
 
         //bounding box is symmetric => we will compute intersections
         //for every rotation of the coordinate system [i, j, k]
         //i.e., for [0,1,2], [1,2,0], [2,0,1], i.e., [x,y,z],[y,z,x],[z,x,y]
-        for (int i = 0; i < 3; i++) 
+        for (int i = 0; i < 3; i++)
         {
           //check if the i-axis is not parallel to the plane
           if (fabs(this->GlobalPlaneAxisZ[i]) < 1.e-10)
@@ -313,17 +319,17 @@ int	vtkALBAVolumeSlicer::RequestUpdateExtent( vtkInformation *request, vtkInform
           //the box has 4 edges parallel to this axis, 2 of them intersect j-axis and 2 k-axis,
           //thus we will compute P[i, 0, 0], P[i, 0, bbox corner on k-axis], 
           //P[i, bbox corner on j-axis, 0] and P[i, bbox corner on j-axis, bbox corner on k-axis]
-          const int j = (i + 1) % 3, k = (i + 2) % 3;       
-          for (int jj = 0; jj < 2; jj++) 
+          const int j = (i + 1) % 3, k = (i + 2) % 3;
+          for (int jj = 0; jj < 2; jj++)
           {
-            for (int kk = 0; kk < 2; kk++) 
+            for (int kk = 0; kk < 2; kk++)
             {
               //compute intersection of the bounding box edge denoted by i, j, k coordinate system and
               //the index (jj, kk) with the cutting plane
               float p[3];
               p[j] = this->DataBounds[j][jj];
               p[k] = this->DataBounds[k][kk];
-              p[i] = -(d + this->GlobalPlaneAxisZ[j] * p[j] + this->GlobalPlaneAxisZ[k] * p[k]) / 
+              p[i] = -(d + this->GlobalPlaneAxisZ[j] * p[j] + this->GlobalPlaneAxisZ[k] * p[k]) /
                 this->GlobalPlaneAxisZ[i];
 
               // check that p[i] is in inside the box
@@ -347,7 +353,7 @@ int	vtkALBAVolumeSlicer::RequestUpdateExtent( vtkInformation *request, vtkInform
               if (ts[1] > maxS)
                 maxS = ts[1];
               if (ts[1] < minS)
-                minS = ts[1];            
+                minS = ts[1];
             }
           }
         }
@@ -365,7 +371,7 @@ int	vtkALBAVolumeSlicer::RequestUpdateExtent( vtkInformation *request, vtkInform
           // http://bugzilla.hpc.cineca.it/show_bug.cgi?id=1427
           // Totally heuristic bug fix: magicNumber was 1.e-3 before.
           const float magicNumber = 1.e-5;
-          if (fabs(minT) > magicNumber || fabs(minS) > magicNumber) 
+          if (fabs(minT) > magicNumber || fabs(minS) > magicNumber)
           {
             this->GlobalPlaneOrigin[0] += minT * this->GlobalPlaneAxisX[0] * OutputDimentions[0] + minS * this->GlobalPlaneAxisY[0] * OutputDimentions[1];
             this->GlobalPlaneOrigin[1] += minT * this->GlobalPlaneAxisX[1] * OutputDimentions[0] + minS * this->GlobalPlaneAxisY[1] * OutputDimentions[1];
@@ -378,7 +384,7 @@ int	vtkALBAVolumeSlicer::RequestUpdateExtent( vtkInformation *request, vtkInform
     }
   }
 
-	return 1;
+  return 1;
 }
 
 //------------------------------------------------------------------------

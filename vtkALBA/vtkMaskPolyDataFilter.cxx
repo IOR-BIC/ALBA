@@ -511,20 +511,25 @@ void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double value, int plane)
 	//Searching cells that intersect current z-plane
 	for(int i=0;i<nCell;i++)
 	{
-		polys->GetCell(cellId,cellNPoints,cellIds);
-		cellId+=cellNPoints+1;
-		pointOverBound=pointUnderBound=0;
-	
-		//If there is at least one point under current z value and a point over
-		//the cell will intersect the plane
-		for(int j=0;j<cellNPoints;j++)
+		vtkCellArray* polys;
+		vtkIdType cellNPoints;
+		vtkSmartPointer<vtkIdList> cellIds = vtkSmartPointer<vtkIdList>::New();
+
+		polys->GetCellAtId(cellId, cellIds);
+		cellNPoints = cellIds->GetNumberOfIds();
+		cellId += cellNPoints + 1;
+		pointOverBound = pointUnderBound = 0;
+
+		// If there is at least one point under current z value and a point over
+		// the cell will intersect the plane
+		for (int j = 0; j < cellNPoints; j++)
 		{
-			double *point=Mask->GetPoint(cellIds[j]);
-			if(point[plane]<=value)
-				pointUnderBound=true;
-			if(point[plane]>=value)
-				pointOverBound=true;
-			if(pointUnderBound && pointOverBound)
+			double* point = Mask->GetPoint(cellIds->GetId(j));
+			if (point[plane] <= value)
+				pointUnderBound = true;
+			if (point[plane] >= value)
+				pointOverBound = true;
+			if (pointUnderBound && pointOverBound)
 				break;
 		}
 
@@ -537,7 +542,7 @@ void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double value, int plane)
 			for(int j=0;j<cellNPoints;j++)
 			{
 				//get the Mask point Id
-				int pointId=cellIds[j];
+				int pointId=cellIds->GetId(j);
 				
 				//if the conversion table of that point is < 0 the point is not inserted to the new points
 				if(IdConversionTable[pointId]<0)

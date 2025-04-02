@@ -18,7 +18,15 @@ PURPOSE.  See the above copyright notice for more information.
 #include <assert.h>
 #include <vector>
 
-#include "vtkgl.h"
+#ifdef _WIN32
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
+    #include <gl/GL.h>
+#else
+    #include <GL/gl.h>
+#endif
+
+#include <vtkOpenGLHelper.h>
 
 #include "vtkObjectFactory.h"
 #include "vtkMatrix4x4.h"
@@ -46,6 +54,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include <fstream>
 #include "vtkAlgorithm.h"
 #include "vtkExecutive.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkInformation.h"
 
 
 static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCubesTriangleCases::GetCases();
@@ -587,12 +597,14 @@ void vtkALBAContourVolumeMapper::EnableClipPlanes(bool enable)
 void vtkALBAContourVolumeMapper::Update()
 //------------------------------------------------------------------------------
 {
-  if (vtkImageData::SafeDownCast(this->GetInput()) != NULL || 
-    vtkRectilinearGrid::SafeDownCast(this->GetInput()) != NULL) {
-      this->UpdateInformation();
-      this->SetUpdateExtentToWholeExtent();
-      this->vtkVolumeMapper::Update();
-    }
+  if (vtkImageData::SafeDownCast(this->GetInput()) != NULL || vtkRectilinearGrid::SafeDownCast(this->GetInput()) != NULL) {
+    this->UpdateInformation();
+    vtkInformation* outInfo = this->GetOutputInformation(0);
+    int wholeExtent[6];
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), wholeExtent[0], wholeExtent[1], wholeExtent[2], wholeExtent[3], wholeExtent[4], wholeExtent[5]);
+    this->vtkVolumeMapper::Update();
+  }
 }
 
 

@@ -25,6 +25,7 @@
 #include "vtkMath.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 
 vtkStandardNewMacro(vtkALBAPoissonSurfaceReconstruction);
@@ -127,8 +128,9 @@ int	vtkALBAPoissonSurfaceReconstruction::RequestUpdateExtent( vtkInformation *re
     ++ghostLevels;
     }
 
-  this->SetUpdateExtent(piece, numPieces, ghostLevels);
-
+	// Aggiorna l'extent utilizzando vtkStreamingDemandDrivenPipeline
+	vtkInformation* outInfo = this->GetOutputInformation(0);
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(),piece, numPieces, ghostLevels); 
 	return 1;
 }
 

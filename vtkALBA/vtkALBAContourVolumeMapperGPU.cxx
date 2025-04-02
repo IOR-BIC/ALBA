@@ -41,12 +41,14 @@
 #include "vtkMarchingCubesTriangleCases.h"
 #include "vtkMarchingSquaresLineCases.h"
 #include "vtkALBAContourVolumeMapperGPU.h"
-
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkInformation.h"
 
 
 #include <iostream>
 #include <cmath>
 #include <sstream>
+#include <fstream>
 #include <string>
 #include <algorithm>
 #include "vtkAlgorithm.h"
@@ -124,12 +126,8 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
   //  } 
   //#define CHECK_GL CHECK_GL_2(__LINE__)
 #endif
+#define log2(val) (log(val) / log(2.0))
 
-
-  static inline double log2( double val )
-  {
-    return log(val) / log(2.0);	
-  }
   GLint
     getUniformLocation( GLuint program, const std::string& name )
   {
@@ -141,7 +139,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
   std::string
     snarfFile( const std::string& filename )
   {
-    ifstream file( filename.c_str() );
+    std::ifstream file( filename.c_str() );
     if(!file)
       std::cerr << "WARNING: Failed to locate shader file: '" << filename << "'\n";
 
@@ -1748,11 +1746,14 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
   void vtkALBAContourVolumeMapperGPU::Update()
     //------------------------------------------------------------------------------
   {
-    if (vtkImageData::SafeDownCast(this->GetInput()) != NULL || 
+    if (vtkImageData::SafeDownCast(this->GetInput()) != NULL ||
       vtkRectilinearGrid::SafeDownCast(this->GetInput()) != NULL) {
-        this->UpdateInformation();
-        this->SetUpdateExtentToWholeExtent();
-        this->vtkVolumeMapper::Update();
+      this->UpdateInformation();
+      vtkInformation* outInfo = this->GetOutputInformation(0);
+      int wholeExtent[6];
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
+      outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), wholeExtent[0], wholeExtent[1], wholeExtent[2], wholeExtent[3], wholeExtent[4], wholeExtent[5]);
+      this->vtkVolumeMapper::Update();
     }
   }
 

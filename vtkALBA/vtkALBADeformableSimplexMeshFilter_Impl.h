@@ -12,6 +12,7 @@
 #include "vtkCellArray.h"
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
+#include "vtkCellArrayIterator.h"
 
 
 
@@ -87,34 +88,47 @@ namespace itk
 
     /*loop strut first */
     //set strut neighbor: [0] & [1]
-    for ( strut->InitTraversal(); strut->GetNextCell(npts,pts); ){
+
+    vtkSmartPointer<vtkCellArrayIterator> strutIterator = strut->NewIterator();
+
+    for (strutIterator->GoToFirstCell(); !strutIterator->IsDoneWithTraversal(); strutIterator->GoToNextCell())
+    {
+      vtkIdType npts;
+      const vtkIdType* pts;
+      strutIterator->GetCurrentCell(npts, pts);
 
       start = pts[0];
       end = pts[1];
-      if(m_StrutNeighbors[start][0] == -1)
+
+      if (m_StrutNeighbors[start][0] == -1)
         m_StrutNeighbors[start][0] = end;
-      else 
-        if(m_StrutNeighbors[start][0]!= end && m_StrutNeighbors[start][1] == -1)
-          m_StrutNeighbors[start][1] = end;
+      else if (m_StrutNeighbors[start][0] != end && m_StrutNeighbors[start][1] == -1)
+        m_StrutNeighbors[start][1] = end;
 
-      if(m_StrutNeighbors[end][0] == -1)
+      if (m_StrutNeighbors[end][0] == -1)
         m_StrutNeighbors[end][0] = start;
-      else 
-        if(m_StrutNeighbors[end][0]!= start && m_StrutNeighbors[end][1] == -1)
-          m_StrutNeighbors[end][1] = start;
-
+      else if (m_StrutNeighbors[end][0] != start && m_StrutNeighbors[end][1] == -1)
+        m_StrutNeighbors[end][1] = start;
     }
-    /*loop link next*/
-    // set link neighbor: [2]
-    for ( link->InitTraversal(); link->GetNextCell(npts,pts); ){
+
+    // Loop per il link
+    vtkSmartPointer<vtkCellArrayIterator> linkIterator = link->NewIterator();
+
+    for (linkIterator->GoToFirstCell(); !linkIterator->IsDoneWithTraversal(); linkIterator->GoToNextCell())
+    {
+      vtkIdType npts;
+      const vtkIdType* pts;
+      linkIterator->GetCurrentCell(npts, pts);
+
       start = pts[0];
       end = pts[1];
 
-      if(m_StrutNeighbors[start][2] == -1)
+      if (m_StrutNeighbors[start][2] == -1)
         m_StrutNeighbors[start][2] = end;
-      if(m_StrutNeighbors[end][2] == -1)
-        m_StrutNeighbors[end][2] = start;		
+      if (m_StrutNeighbors[end][2] == -1)
+        m_StrutNeighbors[end][2] = start;
     }
+
 
   }
 

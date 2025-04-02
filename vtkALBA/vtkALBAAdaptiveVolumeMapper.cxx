@@ -63,7 +63,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkALBAContourVolumeMapper.h"
 #include "vtkALBAAdaptiveVolumeMapper.h"
-#include "vtkgl.h"
+#ifdef _WIN32
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
+    #include <gl/GL.h>
+#else
+    #include <GL/gl.h>
+#endif
+
+#include <vtkOpenGLHelper.h>
 
 ////////////////////////////////////////// constant expressions
 const int VoxelBlockMask  = (~0) << vtkALBAAdaptiveVolumeMapperNamespace::VoxelBlockSizeLog; 
@@ -138,9 +146,7 @@ vtkALBAAdaptiveVolumeMapper::vtkALBAAdaptiveVolumeMapper()
   // multi-processing
   this->NumProcesses = 0;
   this->Controller = (vtkMultiThreader::GetGlobalDefaultNumberOfThreads() > 1) ? vtkMultiThreader::New() : NULL;
-  this->RenderingQueueCS = (this->Controller == NULL) ? NULL : vtkCriticalSection::New();
-  this->ThreadLockCS = this->Controller ? vtkCriticalSection::New() : NULL;
-
+  
   this->AuxTimer = vtkTimerLog::New();
   this->DataPreprocessed = false;
 }
@@ -159,19 +165,13 @@ vtkALBAAdaptiveVolumeMapper::~vtkALBAAdaptiveVolumeMapper()
   delete [] this->DataToTFLookUpTableRealPointer;
   delete [] this->GradientToTFLookUpTable;
 
-  if (this->ThreadLockCS) 
+  if (this->Controller) 
   {
     this->NumProcesses = 0; // flag to stop the process
-    this->ThreadLockCS->Unlock();
     this->Controller->TerminateThread(0);
-    this->ThreadLockCS->Delete();
+    this->Controller->Delete();
   }
   
-  if (this->RenderingQueueCS)
-    this->RenderingQueueCS->Delete();
-
-  if (this->Controller)
-    this->Controller->Delete();
 
   this->AuxTimer->Delete();
 }
@@ -237,7 +237,7 @@ void vtkALBAAdaptiveVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volum
   this->UpdateProgress(0.f);
   if (this->Controller && this->NumProcesses == 0) 
   {
-    this->ThreadLockCS->Lock(); // pause other processes
+    this->ThreadLockCS.lock(); // pause other processes
     this->Controller->SpawnThread(&RenderProcess, this);
     this->NumProcesses++;
   }
@@ -280,22 +280,22 @@ void vtkALBAAdaptiveVolumeMapper::RenderServer(vtkRenderer *renderer, vtkVolume 
     this->NumOfRenderingPortionsLeft = this->NumOfRenderingPortions;
 
     // resume the other thread
-    this->ThreadLockCS->Unlock();
+    this->ThreadLockCS.unlock();
 
     while (this->NumOfRenderingPortionsLeft >= 0) 
     {
-      this->RenderingQueueCS->Lock();
+      this->RenderingQueueCS.lock();
 
       const int portion = this->NumOfRenderingPortions - this->NumOfRenderingPortionsLeft;
       this->NumOfRenderingPortionsLeft--;
-      this->RenderingQueueCS->Unlock();
+      this->RenderingQueueCS.unlock();
       
       if (portion < this->NumOfRenderingPortions)
         this->RenderRegion(this->ViewportBBoxPortions[portion]);
     }
     
     // wait for other processes to finish the job and stop them
-    this->ThreadLockCS->Lock();
+    this->ThreadLockCS.lock();
   }
   else 
   {
@@ -786,21 +786,21 @@ VTK_THREAD_RETURN_TYPE vtkALBAAdaptiveVolumeMapper::RenderProcess(void *pThreadI
   
   while (mapper->NumProcesses) 
   {
-    mapper->ThreadLockCS->Lock(); // continue the thread
+    mapper->ThreadLockCS.lock(); // continue the thread
 
     while (mapper->NumOfRenderingPortionsLeft > 0) 
     {
-      mapper->RenderingQueueCS->Lock();
+      mapper->RenderingQueueCS.lock();
       const int portion = mapper->NumOfRenderingPortions - mapper->NumOfRenderingPortionsLeft;
       if (mapper->NumOfRenderingPortionsLeft > 0)
         mapper->NumOfRenderingPortionsLeft--;
-      mapper->RenderingQueueCS->Unlock();
+      mapper->RenderingQueueCS.unlock();
       
       if (portion < mapper->NumOfRenderingPortions)
         mapper->RenderRegion(mapper->ViewportBBoxPortions[portion]);
     }
 
-    mapper->ThreadLockCS->Unlock();
+    mapper->ThreadLockCS.unlock();
   }
   return VTK_THREAD_RETURN_VALUE;
 }
@@ -1883,7 +1883,6 @@ void vtkALBAAdaptiveVolumeMapper::Update()
       vtkRectilinearGrid::SafeDownCast(this->GetInput()) != NULL) 
   {
     this->UpdateInformation();
-    this->SetUpdateExtentToWholeExtent();
 		this->vtkVolumeMapper::Update();
     this->PrepareVolumeForRendering();
   }

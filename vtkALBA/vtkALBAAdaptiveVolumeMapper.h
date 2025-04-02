@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "vtkMultiThreader.h" 
-#include "vtkCriticalSection.h" 
+#include <mutex>
 
 #include "vtkVolumeMapper.h"
 
@@ -352,8 +352,8 @@ protected:
   // multi-threading
   int                    NumProcesses;
   vtkMultiThreader      *Controller;
-  vtkCriticalSection    *RenderingQueueCS;
-  vtkCriticalSection    *ThreadLockCS;
+  std::mutex RenderingQueueCS;
+  std::mutex ThreadLockCS;
 
   /** Render Process handling multithread */
   static VTK_THREAD_RETURN_TYPE RenderProcess(void *pThreadInfoStruct);

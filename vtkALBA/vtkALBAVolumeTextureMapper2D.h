@@ -19,7 +19,7 @@
 #define vtkALBAVolumeTextureMapper2D_h__
 
 #include "albaConfigure.h"
-#include "vtkOpenGLVolumeTextureMapper2D.h"
+#include "vtkOpenGLGPUVolumeRayCastMapper.h"
 
 class vtkRenderer;
 class vtkVolume;
@@ -27,7 +27,7 @@ class vtkVolume;
     class name: vtkALBAVolumeTextureMapper2D
     Mapper class used by texture 2D volume pipe.
 */
-class ALBA_EXPORT vtkALBAVolumeTextureMapper2D : public vtkOpenGLVolumeTextureMapper2D
+class ALBA_EXPORT vtkALBAVolumeTextureMapper2D : public vtkOpenGLGPUVolumeRayCastMapper
 {
 protected:
   unsigned long LastCheckSum;   ///<Here is stored CheckSum used to detect if Casting needs to be reexecuted
@@ -36,7 +36,7 @@ public:
   /** create object  instance. */
   static vtkALBAVolumeTextureMapper2D *New();
   /**  RTTI Macro. */
-  vtkTypeMacro(vtkALBAVolumeTextureMapper2D, vtkVolumeTextureMapper2D);
+  vtkTypeMacro(vtkALBAVolumeTextureMapper2D, vtkOpenGLGPUVolumeRayCastMapper);
 
 public:
   /** WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE. Initialize rendering for this volume. */

@@ -24,6 +24,7 @@
 #include "vtkExecutive.h"
 #include "vtkInformationVector.h"
 #include "vtkInformation.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 
 vtkStandardNewMacro(vtkALBADistanceFilter);
@@ -106,7 +107,12 @@ int	vtkALBADistanceFilter::RequestUpdateExtent( vtkInformation *request, vtkInfo
 
   vtkDataObject *source = this->GetSource();
   if (source)
-    this->SetUpdateExtentToWholeExtent();
+  {
+    vtkInformation* outInfo = this->GetOutputInformation(0);
+    int wholeExtent[6];
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), wholeExtent[0], wholeExtent[1], wholeExtent[2], wholeExtent[3], wholeExtent[4], wholeExtent[5]); 
+  }
 
 	return 1;
   }

@@ -38,7 +38,7 @@ class vtkALBATubeFilter : public vtkPolyDataAlgorithm
 {
 public:
 	vtkTypeMacro(vtkALBATubeFilter, vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   /**
    * Construct object with radius 0.5, radius variation turned off, the
    * number of sides set to 3, and radius factor of 10.

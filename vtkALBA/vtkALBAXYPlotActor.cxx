@@ -1888,7 +1888,7 @@ void vtkALBAXYPlotActor::ClipPlotData(int *pos, int *pos2, vtkPolyData *pd)
   vtkIdType numPts=pd->GetNumberOfPoints();
   vtkIdType npts = 0;
   vtkIdType newPts[2];
-  vtkIdType *pts=0;
+  vtkSmartPointer<vtkIdList> pts = vtkSmartPointer<vtkIdList>::New();
   vtkIdType i, id;
   int j;
   int added;
@@ -1910,32 +1910,35 @@ void vtkALBAXYPlotActor::ClipPlotData(int *pos, int *pos2, vtkPolyData *pd)
     pointMap[i] = -1;
     }
   
-  //Loop over polyverts eliminating those that are outside
-  for ( lines->InitTraversal(); lines->GetNextCell(npts,pts); )
-    {
-    //loop over verts keeping only those that are not clipped
-    for (i=0; i<npts; i++)
-      {
-      points->GetPoint(pts[i], x1);
 
-      if (x1[0] >= p1[0] && x1[0] <= p2[0] && x1[1] >= p1[1] && x1[1] <= p2[1] )
-        {
+  // Loop over polyverts eliminating those that are outside
+  for (lines->InitTraversal(); lines->GetNextCell(pts); )
+  {
+    // Loop over verts keeping only those that are not clipped
+    npts = pts->GetNumberOfIds();
+    for (i = 0; i < npts; i++)
+    {
+      points->GetPoint(pts->GetId(i), x1);
+
+      if (x1[0] >= p1[0] && x1[0] <= p2[0] && x1[1] >= p1[1] && x1[1] <= p2[1])
+      {
         id = newPoints->InsertNextPoint(x1);
         pointMap[i] = id;
         newPts[0] = id;
-        newVerts->InsertNextCell(1,newPts);
-        }
+        newVerts->InsertNextCell(1, newPts);
       }
     }
+  }
 
   //Loop over polylines clipping each line segment
-  for ( lines->InitTraversal(); lines->GetNextCell(npts,pts); )
+  for ( lines->InitTraversal(); lines->GetNextCell(pts); )
     {
     //loop over line segment making up the polyline
+    npts = pts->GetNumberOfIds();
     for (i=0; i<(npts-1); i++)
       {
-      points->GetPoint(pts[i], x1);
-      points->GetPoint(pts[i+1], x2);
+      points->GetPoint(pts->GetId(i), x1);
+      points->GetPoint(pts->GetId(i+1), x2);
 
       //intersect each segment with the four planes
       if ( (x1[0] < p1[0] && x2[0] < p1[0]) || (x1[0] > p2[0] && x2[0] > p2[0]) ||
@@ -1946,8 +1949,8 @@ void vtkALBAXYPlotActor::ClipPlotData(int *pos, int *pos2, vtkPolyData *pd)
       else if (x1[0] >= p1[0] && x2[0] >= p1[0] && x1[0] <= p2[0] && x2[0] <= p2[0] &&
                x1[1] >= p1[1] && x2[1] >= p1[1] && x1[1] <= p2[1] && x2[1] <= p2[1] )
         {//trivial acceptance
-        newPts[0] = pointMap[pts[i]];
-        newPts[1] = pointMap[pts[i+1]];
+        newPts[0] = pointMap[pts->GetId(i)];
+        newPts[1] = pointMap[pts->GetId(i+1)];
         newLines->InsertNextCell(2,newPts);
         }
       else
@@ -1955,12 +1958,12 @@ void vtkALBAXYPlotActor::ClipPlotData(int *pos, int *pos2, vtkPolyData *pd)
         added = 0;
         if (x1[0] >= p1[0] && x1[0] <= p2[0] && x1[1] >= p1[1] && x1[1] <= p2[1] )
         {//first point in
-          newPts[0] = pointMap[pts[i]];
+          newPts[0] = pointMap[pts->GetId(i)];
           added=1;
         }
         else if (x2[0] >= p1[0] && x2[0] <= p2[0] && x2[1] >= p1[1] && x2[1] <= p2[1] )
         {//second point in
-          newPts[0] = pointMap[pts[i+1]];
+          newPts[0] = pointMap[pts->GetId(i+1)];
           added=1;
         }
 

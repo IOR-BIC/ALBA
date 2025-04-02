@@ -2694,9 +2694,9 @@ vtkALBAPolyDataDeformation_M1::CreateSkeleton(vtkPolyData* pPoly)
   int nEdgeId = 0;
   for (int i = 0; i < nCells; i++)
   {
-    vtkIdType* pIds;
-    vtkIdType nCount;    
-    pPoly->GetCellPoints(i, nCount, pIds);
+    vtkNew<vtkIdList> pIds;
+    pPoly->GetCellPoints(i, pIds);
+    vtkIdType nCount = pIds->GetNumberOfIds();
 
     //create edges
     for (int j = 1; j < nCount; j++)
@@ -2704,8 +2704,8 @@ vtkALBAPolyDataDeformation_M1::CreateSkeleton(vtkPolyData* pPoly)
       //get the next edge
       CSkeletonEdge* pEdge = new CSkeletonEdge();
       pEdge->Id = nEdgeId++;
-      pEdge->Verts[0] = pSkel->Vertices[pIds[j - 1]];
-      pEdge->Verts[1] = pSkel->Vertices[pIds[j]];
+      pEdge->Verts[0] = pSkel->Vertices[pIds->GetId(j - 1)];
+      pEdge->Verts[1] = pSkel->Vertices[pIds->GetId(j)];
 
       pEdge->Verts[0]->m_OneRingEdges.push_back(pEdge);
       pEdge->Verts[1]->m_OneRingEdges.push_back(pEdge);
@@ -2731,13 +2731,15 @@ double vtkALBAPolyDataDeformation_M1::ComputeInputMeshAvgEdgeLength()
   int nCells = input->GetNumberOfCells();
   for (int i = 0; i < nCells; i++)
   {
-    vtkIdType nPoints, *ptIds;
-    input->GetCellPoints(i, nPoints, ptIds);
+    vtkNew<vtkIdList> ptIds;
+    input->GetCellPoints(i, ptIds);
+    vtkIdType nPoints = ptIds->GetNumberOfIds();
+
     for (int j = 0; j < nPoints; j++)
     {
       double coords1[3], coords2[3];
-      input->GetPoint(ptIds[j], coords1);
-      input->GetPoint(ptIds[(j + 1) % nPoints], coords2);
+      input->GetPoint(ptIds->GetId(j), coords1);
+      input->GetPoint(ptIds->GetId((j + 1) % nPoints), coords2);
 
       dblEdgeLen += sqrt(vtkMath::Distance2BetweenPoints(coords1, coords2));
     }

@@ -58,8 +58,11 @@ Then Render()
 #include "albaConfigure.h"
 
 //------------------------------------------------------------------------------
-// Forward declarations
+// Forward definitions
+#define EDGE_LIST int
+
 //------------------------------------------------------------------------------
+// Forward declarations
 class Idepth ;
 class Polyline2D;
 class ListOfPolyline2D;
