@@ -769,7 +769,6 @@ void albaVMELabeledVolume::CreateSlicePipeline()
   m_Texture = vtkTexture::New();	
   m_Texture->SetInputConnection( m_ProbeFilter->GetOutputPort() );
   m_Texture->InterpolateOn();
-  m_Texture->MapColorScalarsThroughLookupTableOn();//
   m_Texture->SetLookupTable( m_LookUpTable );
 
   vtkPlaneSource * planeSource = vtkPlaneSource::New();
