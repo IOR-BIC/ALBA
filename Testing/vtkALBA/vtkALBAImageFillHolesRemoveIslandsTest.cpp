@@ -174,13 +174,11 @@ void vtkALBAImageFillHolesRemoveIslandsTest::TestAlgorithm()
 
 
   imageTexture->SetLookupTable(imageLUT);
-  imageTexture->MapColorScalarsThroughLookupTableOn();
   imageTexture->Modified();
 
   vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(imagePlane->GetOutputPort());
-  mapper->ImmediateModeRenderingOff();
-
+  
   vtkActor *actor = vtkActor::New();
   actor->SetMapper(mapper);
   actor->SetTexture(imageTexture);

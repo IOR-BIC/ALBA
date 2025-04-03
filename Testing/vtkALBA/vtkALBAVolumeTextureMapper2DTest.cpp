@@ -93,9 +93,9 @@ void vtkALBAVolumeTextureMapper2DTest::TestPipeExecution()
   vtkNEW(volumeMapper);
   volumeMapper->SetInputConnection(Importer->GetOutputPort());
 
-  volumeMapper->SetMaximumNumberOfPlanes(100);
-  volumeMapper->SetTargetTextureSize(512,512);
-  volumeMapper->SetMaximumStorageSize(64*1024*1024);  //BES 2.6.2008 - enable texture saving using up to 64 MB
+  volumeMapper->SetMaxMemoryInBytes(64 * 1024 * 1024);
+  volumeMapper->SetMaxMemoryFraction(0.5);
+  volumeMapper->SetSampleDistance(0.5);
 
   volumeMapper->Update();	
 
