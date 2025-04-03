@@ -721,7 +721,7 @@ wxBitmap *albaRWIBase::GetImage(int magnification)
   GetRenderWindow()->OffScreenRenderingOn();
 	  vtkALBASmartPointer<vtkWindowToImageFilter> w2i;
 	  w2i->SetInput(GetRenderWindow());
-    w2i->SetMagnification(magnification);
+    w2i->SetScale(magnification, magnification);
 	  w2i->Update();
     w2i->GetOutput()->GetDimensions(dim);
   GetRenderWindow()->OffScreenRenderingOff();
@@ -828,7 +828,7 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
 
   vtkALBASmartPointer<vtkWindowToImageFilter> w2i;
   w2i->SetInput(GetRenderWindow());
-  w2i->SetMagnification(magnification);
+  w2i->SetScale(magnification,magnification);
   w2i->Update();
   
   wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
@@ -1046,7 +1046,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
       currentView->GetRWI()->GetRenderWindow()->OffScreenRenderingOn();
       vtkALBASmartPointer<vtkWindowToImageFilter> w2i;
       w2i->SetInput(currentView->GetRWI()->GetRenderWindow());
-      w2i->SetMagnification(magnification);
+      w2i->SetScale(magnification,magnification);
       w2i->Update();
       currentView->GetRWI()->GetRenderWindow()->OffScreenRenderingOff();
       

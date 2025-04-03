@@ -47,6 +47,7 @@
 #include "wx\tokenzr.h"
 #include "albaVMELandmarkCloud.h"
 #include "albaVMEFactory.h"
+#include <strstream>
 
 //-------------------------------------------------------------------------
 albaCxxAbstractTypeMacro(albaVME)

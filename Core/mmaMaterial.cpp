@@ -165,8 +165,7 @@ wxBitmap *mmaMaterial::MakeIcon()
   
   vtkALBASmartPointer<vtkPolyDataMapper> pdm;
 	pdm->SetInputConnection(ss->GetOutputPort());
-	pdm->SetImmediateModeRendering(0);
-
+	
 	vtkALBASmartPointer<vtkActor> actor;
   actor->SetMapper(pdm);
   if (m_MaterialType == USE_VTK_PROPERTY)

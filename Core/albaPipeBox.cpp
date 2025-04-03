@@ -88,12 +88,7 @@ void albaPipeBox::Create(albaSceneNode *n/*, bool use_axes*/)
 
   vtkNEW(m_Mapper);
 	m_Mapper->SetInputConnection(m_Box->GetOutputPort());
-  
-	if(m_Vme->IsAnimated())
-		m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
-	else
-		m_Mapper->ImmediateModeRenderingOff();
-
+  	
   vtkNEW(m_Actor);
 	m_Actor->SetMapper(m_Mapper);
 
