@@ -514,8 +514,8 @@ void albaGPUOGL::SetParameter(const char* paramname, int ivector[3])
 
   glMatrixMode(GL_PROJECTION);  
   glLoadIdentity();
-  //gluOrtho2D(0.0, m_TargetSizeCx, 0.0, m_TargetSizeCy);  
-  gluOrtho2D(-1, 1, -1, 1);
+
+  glOrtho(-1, 1, -1, 1, -1, 1);
 
   glMatrixMode(GL_MODELVIEW);  
   glLoadIdentity();
