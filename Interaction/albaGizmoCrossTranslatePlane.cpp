@@ -15,16 +15,6 @@
 =========================================================================*/
 
 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-
 #include "albaDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
@@ -176,6 +166,8 @@ albaGizmoCrossTranslatePlane::~albaGizmoCrossTranslatePlane()
 	}
 
 	m_PivotTransform->Delete();
+	vtkDEL(m_TranslationFeedbackGizmo);
+
 
 	for (i = 0; i < NUM_GIZMO_PARTS; i++)
 	{
@@ -183,7 +175,6 @@ albaGizmoCrossTranslatePlane::~albaGizmoCrossTranslatePlane()
 		m_Gizmo[i]->ReparentTo(NULL);
 	}
 
-	vtkDEL(m_TranslationFeedbackGizmo);
 
 	vtkDEL(m_FeedbackConeSource);
 

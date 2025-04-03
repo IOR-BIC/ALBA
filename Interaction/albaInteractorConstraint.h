@@ -17,12 +17,11 @@
 #define __albaInteractorConstraint_h
 
 #include "vtkALBASmartPointer.h"
-
+#include "vtkDoubleArray.h"
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class albaRefSys;
-class vtkDoubleArray;
 
 //----------------------------------------------------------------------------
 

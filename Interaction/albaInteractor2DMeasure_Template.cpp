@@ -606,10 +606,7 @@ void albaInteractor2DMeasure_Template::SetTexture(vtkImageData *imageData)
 	texture->InterpolateOff();
 
 	if (m_TemplateLookupTable)
-	{
-		texture->MapColorScalarsThroughLookupTableOn();
 		texture->SetLookupTable((vtkLookupTable *)m_TemplateLookupTable);
-	}
 
 	texture->SetInputData(imageData);
 	
