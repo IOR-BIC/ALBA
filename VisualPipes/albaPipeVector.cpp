@@ -121,9 +121,6 @@ void albaPipeVector::Create(albaSceneNode *n)
   m_Mapper->SetInputConnection(m_Apd->GetOutputPort());
  
 
-  int renderingDisplayListFlag = m_Vme->IsAnimated() ? 1 : 0;
-  m_Mapper->SetImmediateModeRendering(renderingDisplayListFlag);
-
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_Mapper);
   m_Material = out_polyline->GetMaterial();

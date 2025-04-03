@@ -112,7 +112,6 @@ void albaPipeImage3D::Create(albaSceneNode *n)
 		output->GetVTKData()->GetScalarRange(sr);
 		m_ImageLUT->SetRange(sr);
     m_ImageTexture->SetLookupTable(m_ImageLUT);
-    m_ImageTexture->MapColorScalarsThroughLookupTableOn();
   }
 
   m_ImageTexture->Modified();
@@ -120,10 +119,6 @@ void albaPipeImage3D::Create(albaSceneNode *n)
   m_ImageMapper = vtkPolyDataMapper::New();
 	m_ImageMapper->SetInputConnection(m_ImagePlane->GetOutputPort());
 	m_ImageMapper->ScalarVisibilityOff();
-	if(m_Vme->IsAnimated())
-		m_ImageMapper->ImmediateModeRenderingOn();
-	else
-		m_ImageMapper->ImmediateModeRenderingOff();
 
   m_ImageActor = vtkActor::New();
 	m_ImageActor->SetMapper(m_ImageMapper);

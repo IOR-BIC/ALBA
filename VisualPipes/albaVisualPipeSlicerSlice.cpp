@@ -98,7 +98,6 @@ albaVisualPipeSlicerSlice::albaVisualPipeSlicerSlice()
   m_Normal[2] = 1;
 
   m_ScalarVisibility = 0;
-  m_RenderingDisplayListFlag = 0;
   m_Border=1;
 
 	m_ShowSelection = false;
@@ -202,21 +201,6 @@ void albaVisualPipeSlicerSlice::Create(albaSceneNode *n/*, bool use_axes*/)
   m_Mapper2->SetScalarVisibility(m_ScalarVisibility);
   m_Mapper2->SetScalarRange(sr);
   
-	if(m_Vme->IsAnimated())
-  {
-    m_RenderingDisplayListFlag = 1;
-    m_Mapper1->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
-    m_Mapper2->ImmediateModeRenderingOn();
-  }
-	else
-  {
-    m_RenderingDisplayListFlag = 0;
-    m_Mapper1->ImmediateModeRenderingOff();
-    m_Mapper2->ImmediateModeRenderingOff();
-  }
-
-  
- 
   m_Actor1 = vtkActor::New();
   m_Actor1->SetMapper(m_Mapper1);
   //if (material->m_MaterialType == mmaMaterial::USE_VTK_PROPERTY)

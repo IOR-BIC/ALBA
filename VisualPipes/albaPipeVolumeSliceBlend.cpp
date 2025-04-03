@@ -233,7 +233,6 @@ void albaPipeVolumeSliceBlend::CreateSlice(int direction)
     m_Texture[i][direction]->SetQualityTo32Bit();
     m_Texture[i][direction]->SetInputConnection(m_Slicer[i][direction]->GetOutputPort());
     m_Texture[i][direction]->SetLookupTable(m_ColorLUT);
-    m_Texture[i][direction]->MapColorScalarsThroughLookupTableOn();
 
 		//---- pipeline for the Plane --------------------------
 		m_SlicePlane[i][direction] = vtkPlaneSource::New();

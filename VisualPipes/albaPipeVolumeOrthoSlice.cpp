@@ -312,7 +312,6 @@ void albaPipeVolumeOrthoSlice::CreateSlice()
 			m_Texture[i]->SetQualityTo32Bit();
 			m_Texture[i]->SetInputConnection(m_Slicer[i]->GetOutputPort());
 			m_Texture[i]->SetLookupTable(m_ColorLUT);
-			m_Texture[i]->MapColorScalarsThroughLookupTableOn();
 
 			vtkNEW(m_SlicePlane[i]);
 			vtk_data->GetBounds(bounds);

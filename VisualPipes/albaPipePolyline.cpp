@@ -150,11 +150,7 @@ void albaPipePolyline::Create(albaSceneNode *n)
 	vtkNEW(m_Mapper);
 	m_AppendPolyData = vtkAppendPolyData::New();
 
-	if (m_Vme->IsAnimated())
-		m_Mapper->ImmediateModeRenderingOn();
-	else
-		m_Mapper->ImmediateModeRenderingOff();
-
+	
 	m_Mapper->SetInputConnection(m_AppendPolyData->GetOutputPort());
 
 	ManageScalarOnExecutePipe(data);

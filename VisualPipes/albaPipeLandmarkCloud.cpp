@@ -139,7 +139,6 @@ albaGUI *albaPipeLandmarkCloud::CreateGui()
 		m_Gui->Divider();
 		m_MaterialButton = new albaGUIMaterialButton(m_Vme,this);
 		m_Gui->AddGui(m_MaterialButton->GetGui());
-		m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,_("display list"),&m_RenderingDisplayListFlag,0,_("turn on/off \nrendering displaylist calculation"));
 		m_Gui->Divider();
 	}
 
@@ -171,10 +170,6 @@ void albaPipeLandmarkCloud::OnEvent(albaEventBase *alba_event)
         }
 				GetLogicManager()->CameraUpdate();
       }
-      break;
-      case ID_RENDERING_DISPLAY_LIST:
-        m_CloudMapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
-				GetLogicManager()->CameraUpdate();
       break;
       default:
         albaEventMacro(*e);
@@ -227,11 +222,7 @@ void albaPipeLandmarkCloud::CreateCloudPipe(vtkDataSet *data, double radius, dou
   vtkNEW(m_CloudMapper);
   m_CloudMapper->SetInputConnection(m_Glyph->GetOutputPort());
   m_CloudMapper->ScalarVisibilityOff();
-  if(m_Vme->IsAnimated())				
-    m_CloudMapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
-  else
-    m_CloudMapper->ImmediateModeRenderingOff();
-
+ 
   vtkNEW(m_CloudActor);
   if (m_Cloud)
   {

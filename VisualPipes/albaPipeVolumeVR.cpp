@@ -272,14 +272,15 @@ void albaPipeVolumeVR::Create(albaSceneNode *n)
   m_ColorTransferFunction->AddRGBPoint((41843 / 65535.0)*MaxR, 1.00, 1.00, 1.00);
   m_ColorTransferFunction->AddRGBPoint((65535 / 65535.0)*MaxR, 1.00, 1.00, 1.00); 
 
-  m_VolumeTextureMapperHigh->SetMaximumNumberOfPlanes(1024);
-  m_VolumeTextureMapperHigh->SetTargetTextureSize(512,512);
-  m_VolumeTextureMapperHigh->SetMaximumStorageSize(64*1024*1024);  //BES 2.6.2008 - enable texture saving using up to 64 MB
+  m_VolumeTextureMapperHigh->SetMaxMemoryInBytes(64 * 1024 * 1024); // 64 MB
+  m_VolumeTextureMapperHigh->SetMaxMemoryFraction(0.5);
+  m_VolumeTextureMapperHigh->SetSampleDistance(0.5); // hi quality, slower
 
-  m_VolumeTextureMapperLow->SetMaximumNumberOfPlanes(128);
-  m_VolumeTextureMapperLow->SetTargetTextureSize(32, 32);
-  m_VolumeTextureMapperLow->SetMaximumStorageSize(8*1024*1024);   //BES 2.6.2008 - enable texture saving using up to 8 MB
+  m_VolumeTextureMapperLow->SetMaxMemoryInBytes(8 * 1024 * 1024);   // 8 MB
+  m_VolumeTextureMapperLow->SetMaxMemoryFraction(0.2);
+	m_VolumeTextureMapperLow->SetSampleDistance(2.0);  // low quality, faster
 
+  
 
   //BES 25.4.2008 - with texture saving, we are enable to render High and Low in zero time
   //=> as VTK selects LOD from first index, high must go first
@@ -487,11 +488,14 @@ void albaPipeVolumeVR::SetResampleFactor(double value)
     m_VolumeTextureMapperHigh->SetInputConnection(m_ResampleFilter->GetOutputPort());
     m_VolumeTextureMapperLow->SetInputConnection(m_ResampleFilter->GetOutputPort());
 
-    m_VolumeTextureMapperHigh->SetMaximumNumberOfPlanes(1024);
-    m_VolumeTextureMapperHigh->SetTargetTextureSize(512,512);
+    m_VolumeTextureMapperHigh->SetMaxMemoryInBytes(64 * 1024 * 1024); // 64 MB
+    m_VolumeTextureMapperHigh->SetMaxMemoryFraction(0.5);
+    m_VolumeTextureMapperHigh->SetSampleDistance(0.5); // hi quality, slower
 
-    m_VolumeTextureMapperLow->SetMaximumNumberOfPlanes(128);
-    m_VolumeTextureMapperLow->SetTargetTextureSize(32, 32);
+    m_VolumeTextureMapperLow->SetMaxMemoryInBytes(8 * 1024 * 1024);   // 8 MB
+    m_VolumeTextureMapperLow->SetMaxMemoryFraction(0.2);
+    m_VolumeTextureMapperLow->SetSampleDistance(2.0);  // low quality, faster
+
 
     vtkNEW(m_ActorLOD);
 

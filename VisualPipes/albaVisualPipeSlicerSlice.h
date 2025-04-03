@@ -116,7 +116,6 @@ protected:
   double	m_Normal[3];
 
   int m_ScalarVisibility;
-  int m_RenderingDisplayListFlag;
   albaGUIMaterialButton *m_MaterialButton;
 
 };  

@@ -132,7 +132,6 @@ protected:
 
 
   int m_ScalarVisibility;
-  int m_RenderingDisplayListFlag;
   albaGUIMaterialButton *m_MaterialButton;
 
 	vtkALBAToLinearTransform* m_VTKTransform;

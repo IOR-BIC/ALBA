@@ -83,7 +83,6 @@ albaPipeSurfaceSlice::albaPipeSurfaceSlice()
   
 
   m_ScalarVisibility = 0;
-  m_RenderingDisplayListFlag = 0;
   m_Border=1;
 	m_Pickable = true;
 
@@ -211,17 +210,7 @@ void albaPipeSurfaceSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 	m_Mapper->SetScalarVisibility(m_ScalarVisibility);
 	//m_Mapper->SetScalarRange(sr);
 
-	if (m_Vme->IsAnimated())
-	{
-		m_RenderingDisplayListFlag = 1;
-		m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
-	}
-	else
-	{
-		m_RenderingDisplayListFlag = 0;
-		m_Mapper->ImmediateModeRenderingOff();
-	}
-
+	
 	m_Texture = vtkTexture::New();
 	m_Texture->SetQualityTo32Bit();
 	m_Texture->InterpolateOn();

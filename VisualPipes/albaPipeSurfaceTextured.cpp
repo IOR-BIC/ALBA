@@ -138,7 +138,6 @@ void albaPipeSurfaceTextured::Create(albaSceneNode *n/*, bool use_axes*/)
   }
   
   m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 1 : 0;
-  m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
 
   vtkNEW(m_Texture);
@@ -331,7 +330,6 @@ albaGUI *albaPipeSurfaceTextured::CreateGui()
 
   assert(m_Gui == NULL);
   m_Gui = new albaGUI(this);
-  m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"Display list",&m_RenderingDisplayListFlag,0,"Turn on/off \nrendering display list calculation");
   m_Gui->Bool(ID_SCALAR_VISIBILITY,"Scalar vis.", &m_ScalarVisibility,0,"Turn on/off the scalar visibility");
   m_Gui->Divider();
   m_Gui->Bool(ID_USE_VTK_PROPERTY,"Property",&m_UseVTKProperty);
@@ -453,10 +451,6 @@ void albaPipeSurfaceTextured::OnEvent(albaEventBase *alba_event)
 		break;
 		case ID_TEXTURE_MAPPING_MODE:
 			GenerateTextureMapCoordinate();
-			GetLogicManager()->CameraUpdate();
-			break;
-		case ID_RENDERING_DISPLAY_LIST:
-			m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
 			GetLogicManager()->CameraUpdate();
 			break;
 		default:

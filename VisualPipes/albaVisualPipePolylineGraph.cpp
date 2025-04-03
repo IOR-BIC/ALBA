@@ -227,7 +227,6 @@ void albaVisualPipePolylineGraph::ExecutePipe()
   }
 
 
-  m_Mapper->ImmediateModeRenderingOn();
   m_Mapper->SetColorModeToMapScalars();
   m_Mapper->SetLookupTable(m_Table);
   m_Mapper->SetScalarRange(sr);

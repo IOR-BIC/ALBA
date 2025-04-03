@@ -64,7 +64,6 @@ public:
   enum PIPE_LM_CLOUD_WIDGET_ID
   {
     ID_SCALAR_VISIBILITY = Superclass::ID_LAST,
-    ID_RENDERING_DISPLAY_LIST,
     ID_LAST
   };
 

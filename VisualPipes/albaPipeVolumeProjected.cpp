@@ -132,7 +132,6 @@ void albaPipeVolumeProjected::Create(albaSceneNode *n)
 
 	RXTexture = vtkTexture::New();
 	RXTexture->SetInterpolate(1);
-	RXTexture->SetMapColorScalarsThroughLookupTable(1);
 
 	m_ProjectFilter = vtkALBAProjectVolume::New();
 

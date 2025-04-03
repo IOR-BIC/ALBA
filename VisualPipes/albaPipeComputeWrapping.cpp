@@ -123,7 +123,6 @@ void albaPipeComputeWrapping::Create(albaSceneNode *n/*, bool use_axes*/)
     m_DataMapper->SetInputConnection(m_Tube->GetOutputPort());
   }
     
-	m_DataMapper->ImmediateModeRenderingOff();
   if(m_WrappedMeterVME->GetMeterColorMode() == albaVMEComputeWrapping::RANGE_COLOR)
     m_DataMapper->SetLookupTable(m_Lut);
 

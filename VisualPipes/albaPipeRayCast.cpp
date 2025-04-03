@@ -44,8 +44,7 @@
 #include "vtkDataSet.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkColorTransferFunction.h"
-#include "vtkVolumeRayCastMapper.h"
-#include "vtkVolumeRayCastCompositeFunction.h"
+#include "vtkGPUVolumeRayCastMapper.h"
 #include "vtkVolumeProperty.h"
 #include "vtkImageCast.h"
 #include "vtkImageData.h"
@@ -428,17 +427,13 @@ void albaPipeRayCast::UpdateFromData()
     vtkDEL(resampleFilter);
 
   //Create Raycast Mapper and relative functions
-  if (m_RayCastMapper==NULL)
-    vtkNEW(m_RayCastMapper);
+  if (m_RayCastMapper == NULL)
+    m_RayCastMapper = vtkGPUVolumeRayCastMapper::New();
   if (m_ColorFunction==NULL)
     vtkNEW(m_ColorFunction);
   if (m_OpacityFunction==NULL)
     vtkNEW(m_OpacityFunction);
 
-  //The ray cast function know how to render the data
-  vtkALBASmartPointer<vtkVolumeRayCastCompositeFunction> compositeFunction;
-  compositeFunction->SetCompositeMethodToClassifyFirst();
-  m_RayCastMapper->SetVolumeRayCastFunction(compositeFunction);
   m_RayCastMapper->SetInputConnection(m_RayCastCleaner->GetOutputPort());
   
   //Create a empty volume to manage the mapper

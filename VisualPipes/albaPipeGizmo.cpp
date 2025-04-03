@@ -85,7 +85,6 @@ void albaPipeGizmo::Create(albaSceneNode *n)
 
 	m_Mapper = vtkPolyDataMapper::New();
 	m_Mapper->SetInputData(data);
-	m_Mapper->ImmediateModeRenderingOff();
 
 	m_GizmoActor = vtkActor::New();
 	m_GizmoActor->SetMapper(m_Mapper);

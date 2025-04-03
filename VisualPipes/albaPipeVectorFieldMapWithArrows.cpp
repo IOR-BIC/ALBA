@@ -500,7 +500,6 @@ void albaPipeVectorFieldMapWithArrows::CreateVTKPipe()
   // build surface mapper
   m_SurfaceMapper = vtkPolyDataMapper::New();
   m_SurfaceMapper->SetInputConnection(filter->GetOutputPort());
-  m_SurfaceMapper->ImmediateModeRenderingOn();
 
   // assign right mapping mode
   if (m_DataType==POINT_DATA) {
@@ -651,7 +650,6 @@ void albaPipeVectorFieldMapWithArrows::CreateVTKPipe()
   // build mapper  
   m_GlyphMapper = vtkPolyDataMapper::New();
   m_GlyphMapper->SetInputConnection(m_Glyph->GetOutputPort());
-  m_GlyphMapper->ImmediateModeRenderingOn();
   m_GlyphMapper->SetScalarRange(m_SurfaceMapper->GetLookupTable()->GetRange());
   m_GlyphMapper->SetLookupTable(m_ColorMappingLUT);
 

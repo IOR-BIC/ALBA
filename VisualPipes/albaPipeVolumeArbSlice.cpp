@@ -423,7 +423,6 @@ void albaPipeVolumeArbSlice::CreateSlice()
 	m_Texture->SetQualityTo32Bit();
 	m_Texture->SetInputConnection(m_SlicerImage->GetOutputPort());
   m_Texture->SetLookupTable(m_ColorLUT);
-  m_Texture->MapColorScalarsThroughLookupTableOn();
 
 	m_SlicerPolygonal->SetOutputTypeToPolyData();
 	m_SlicerPolygonal->SetTextureConnection(m_SlicerImage->GetOutputPort());

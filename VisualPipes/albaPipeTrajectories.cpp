@@ -106,11 +106,6 @@ void albaPipeTrajectories::Create(albaSceneNode *n)
   m_Mapper = vtkPolyDataMapper::New();
   m_Mapper->SetInputConnection(m_Traj->GetOutputPort());
   
-  if(m_Vme->IsAnimated())				
-    m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
-  else
-    m_Mapper->ImmediateModeRenderingOff();
-
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_Mapper);
   mmaMaterial *material = m_Landmark->GetMaterial();

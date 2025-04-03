@@ -1460,7 +1460,6 @@ void albaPipeTensorFieldGlyphs::OnEvent(albaEventBase *alba_event)
 
   m_GlyphsMapper = vtkPolyDataMapper::New();
   m_GlyphsMapper->SetInputConnection(m_Glyphs->GetOutputPort());
-  m_GlyphsMapper->ImmediateModeRenderingOn();
   m_GlyphsMapper->SetScalarModeToUsePointData();
   m_GlyphsMapper->SetColorModeToMapScalars();
   m_GlyphsMapper->SetLookupTable(m_ColorMappingLUT);

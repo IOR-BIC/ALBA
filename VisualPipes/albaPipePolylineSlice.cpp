@@ -207,15 +207,6 @@ void albaPipePolylineSlice::Create(albaSceneNode *n)
 	m_Mapper->SetScalarVisibility(m_ScalarVisibility);
 	m_Mapper->SetScalarRange(sr);
 
-	if (m_Vme->IsAnimated())
-	{
-		m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
-	}
-	else
-	{
-		m_Mapper->ImmediateModeRenderingOff();
-	}
-
 	//////////////////////////////////
 	m_Actor = vtkActor::New();
 	m_Actor->SetMapper(m_Mapper);

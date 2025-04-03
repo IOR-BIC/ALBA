@@ -67,11 +67,7 @@ void albaPipePointSet::Create(albaSceneNode *n)
   m_PointSetMapper = vtkPolyDataMapper::New();
 	m_PointSetMapper->SetInputData(data);
 	m_PointSetMapper->ScalarVisibilityOff();
-  if(m_Vme->IsAnimated())				
-    m_PointSetMapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
-  else
-    m_PointSetMapper->ImmediateModeRenderingOff();
-
+  
   m_PointSetActor = vtkActor::New();
 	m_PointSetActor->SetProperty(pointset_output->GetMaterial()->m_Prop);
 	m_PointSetActor->GetProperty()->SetInterpolationToGouraud();

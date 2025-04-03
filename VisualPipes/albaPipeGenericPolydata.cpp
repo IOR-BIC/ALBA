@@ -127,7 +127,6 @@ void albaPipeGenericPolydata::ExecutePipe()
 	assert(dataSet);
 
 	vtkNEW(m_Mapper);
-	m_Mapper->ImmediateModeRenderingOn();
 	
 	ManageScalarOnExecutePipe(dataSet);
 	

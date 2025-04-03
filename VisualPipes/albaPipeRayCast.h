@@ -30,7 +30,7 @@ class albaGUIFloatSlider;
 class albaEventBase;
 class vtkPiecewiseFunction;
 class vtkColorTransferFunction;
-class vtkVolumeRayCastMapper;
+class vtkGPUVolumeRayCastMapper;
 class vtkImageCast;
 class vtkPolyDataMapper;
 class vtkOutlineCornerFilter;
@@ -129,7 +129,7 @@ protected:
 
   vtkPiecewiseFunction     *m_OpacityFunction;
   vtkColorTransferFunction *m_ColorFunction;
-	vtkVolumeRayCastMapper   *m_RayCastMapper;
+  vtkGPUVolumeRayCastMapper *m_RayCastMapper;
   vtkALBARayCastCleaner     *m_RayCastCleaner;
   vtkVolume                *m_Volume;
   

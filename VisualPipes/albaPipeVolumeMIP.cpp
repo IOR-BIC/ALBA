@@ -40,7 +40,6 @@
 #include "vtkImageCast.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkVolumeProperty.h"
-#include "vtkVolumeRayCastMIPFunction.h"
 #include "vtkLODProp3D.h"
 #include "vtkPlaneSource.h"
 #include "vtkPolyDataMapper.h"
@@ -55,7 +54,7 @@
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineSource.h"
-#include "vtkVolumeRayCastMapper.h"
+#include "vtkGPUVolumeRayCastMapper.h"
 #include "vtkAlgorithm.h"
 
 //----------------------------------------------------------------------------
@@ -70,7 +69,6 @@ albaPipeVolumeMIP::albaPipeVolumeMIP()
   //m_ColorTransferFunction = NULL;
   m_OpacityTransferFunction = NULL;
   m_VolumeProperty    = NULL;
-  m_MIPFunction       = NULL;
   m_VolumeMapper      = NULL;
   m_Volume	         = NULL;
   m_ResampleFactor = 0.5;
@@ -110,11 +108,6 @@ void albaPipeVolumeMIP::Create(albaSceneNode *n)
 
     vtkNEW(m_Mapper);
     m_Mapper->SetInputConnection(m_Box->GetOutputPort());
-
-    if(m_Vme->IsAnimated())
-      m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
-    else
-      m_Mapper->ImmediateModeRenderingOff();
 
     vtkNEW(m_Actor);
     m_Actor->SetMapper(m_Mapper);
@@ -167,13 +160,11 @@ void albaPipeVolumeMIP::Create(albaSceneNode *n)
   m_VolumeProperty->SetScalarOpacity(m_OpacityTransferFunction);
   m_VolumeProperty->SetInterpolationTypeToLinear();
 
-  vtkNEW(m_MIPFunction);
-  m_MIPFunction->SetMaximizeMethodToOpacity();
 
   vtkNEW(m_VolumeMapper);
   m_VolumeMapper->SetInputConnection(m_Caster->GetOutputPort());
 
-  m_VolumeMapper->SetVolumeRayCastFunction(m_MIPFunction);
+  m_VolumeMapper->SetBlendModeToMaximumIntensity();
   m_VolumeMapper->SetCroppingRegionPlanes(0, 1, 0, 1, 0, 1);
   m_VolumeMapper->SetImageSampleDistance(1/m_ResampleFactor);
   m_VolumeMapper->SetMaximumImageSampleDistance(10);
@@ -210,7 +201,6 @@ albaPipeVolumeMIP::~albaPipeVolumeMIP()
   vtkDEL(m_ResampleFilter);
   vtkDEL(m_VolumeProperty);
   vtkDEL(m_ColorLUT);
-  vtkDEL(m_MIPFunction);
   vtkDEL(m_VolumeMapper);
   vtkDEL(m_Volume);
   vtkDEL(m_Caster);
