@@ -21,12 +21,7 @@
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
 
-
-//SIL. 24-12-2004: begin
-#ifdef VTK_USE_ANSI_STDLIB
 #include <sstream>
-#endif
-//SIL. 24-12-2004: end
 
 
 
@@ -3070,29 +3065,22 @@ void albaOpMMLModelView::Switch3dDisplayOn()
 
 //SIL. 24-12-2004: begin
 //----------------------------------------------------------------------------
-void albaOpMMLModelView::Print(vtkObject *obj, wxString msg)
+void albaOpMMLModelView::Print(vtkObject* obj, wxString msg)
 //----------------------------------------------------------------------------
 {
-		wxLogMessage("%s",msg);
-    #ifdef VTK_USE_ANSI_STDLIB
-			std::stringstream ss1;
+	wxLogMessage("%s", msg);
+	std::stringstream ss1;
 
-			obj->Print(ss1);
-      wxString message=ss1.str().c_str();
-      wxLogMessage("[%s PRINTOUT:]\n", obj->GetClassName());
- 
-      for (int pos=message.Find('\n');pos>=0;pos=message.Find('\n'))
-      {
-        wxString tmp=message.Mid(0,pos);
-        wxLogMessage(tmp);
-        message=message.Mid(pos+1);
-      }
-		#else
-			strstream ss1,ss2;
-			obj->Print(ss1);
-      wxLogMessage("[%s PRINTOUT:]\n", obj->GetClassName());
-			wxLogMessage("%s\n", ss1.str()); 
-		#endif
+	obj->Print(ss1);
+	wxString message = ss1.str().c_str();
+	wxLogMessage("[%s PRINTOUT:]\n", obj->GetClassName());
+
+	for (int pos = message.Find('\n'); pos >= 0; pos = message.Find('\n'))
+	{
+		wxString tmp = message.Mid(0, pos);
+		wxLogMessage(tmp);
+		message = message.Mid(pos + 1);
+	}
 
 }
 //SIL. 24-12-2004: end

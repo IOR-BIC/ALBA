@@ -443,45 +443,50 @@ void albaOpRemoveCells::ExecuteMark( double radius )
     for ( idCellInWave=0; idCellInWave < numIds; idCellInWave++ )
     {
       cellId = m_Wave->GetId(idCellInWave);
-      if ( m_VisitedCells[cellId] < 0 )
+      if (m_VisitedCells[cellId] < 0)
       {
         // mark it as visited
         m_VisitedCells[cellId] = m_RegionNumber;
-        
-        double currentCellCenter[3] = {0,0,0};
+
+        double currentCellCenter[3] = { 0,0,0 };
         FindTriangleCellCenter(cellId, currentCellCenter);
 
         // mark the cell if the distance criterion is ok
         if (vtkMath::Distance2BetweenPoints(seedCenter, currentCellCenter)
-          < (m_Diameter*m_Diameter / 4))
+          < (m_Diameter * m_Diameter / 4))
         {
           m_UnselectCells ? m_Rcf->UnmarkCell(cellId) : m_Rcf->MarkCell(cellId);
         }
 
         // get its points
-        m_Mesh->GetCellPoints(cellId, numCellPoints, cellPointsList);
+        vtkNew<vtkIdList> cellPointsList;
+        m_Mesh->GetCellPoints(cellId, cellPointsList);
+        numCellPoints = cellPointsList->GetNumberOfIds();
 
         // for each cell point
-        for (idPoint=0; idPoint < numCellPoints; idPoint++) 
+        for (idPoint = 0; idPoint < numCellPoints; idPoint++)
         {
           // if the point has not been yet visited
-          if ( m_VisitedPoints[ptId=cellPointsList[idPoint]] < 0 )
+          ptId = cellPointsList->GetId(idPoint);
+          if (m_VisitedPoints[ptId] < 0)
           {
             // mark it as visited
             m_VisitedPoints[ptId] = m_PointNumber++;
           }
 
           // get neighbor cells from cell point
-          m_Mesh->GetPointCells(ptId,ncells,cellsFromPoint);
+          vtkNew<vtkIdList> cellsFromPoint;
+          m_Mesh->GetPointCells(ptId, cellsFromPoint);
+          ncells = cellsFromPoint->GetNumberOfIds();
 
           // check connectivity criterion (geometric + distance)
-          for (k=0; k < ncells; k++)
+          for (k = 0; k < ncells; k++)
           {
-            cellId = cellsFromPoint[k];
-            
-            FindTriangleCellCenter(cellId,currentCellCenter);
+            cellId = cellsFromPoint->GetId(k);
+
+            FindTriangleCellCenter(cellId, currentCellCenter);
             if (vtkMath::Distance2BetweenPoints(seedCenter, currentCellCenter)
-              < (m_Diameter*m_Diameter / 4))
+              < (m_Diameter * m_Diameter / 4))
             {
               // insert next cells to be visited in the other wave
               m_Wave2->InsertNextId(cellId);

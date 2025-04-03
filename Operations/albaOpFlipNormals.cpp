@@ -582,26 +582,31 @@ void albaOpFlipNormals::TraverseMeshAndMark( double radius )
 					m_UnselectCells ? m_CellFilter->UnmarkCell(cellId) : m_CellFilter->MarkCell(cellId);
 				}
 
-				// get its points
-				m_Mesh->GetCellPoints(cellId, numCellPoints, cellPointsList);
+				vtkNew<vtkIdList> cellPointsList;  // Lista dei punti della cella
+				vtkNew<vtkIdList> cellsFromPoint;  // Lista delle celle che condividono un punto
 
-				// for each cell point
-				for (idPoint=0; idPoint < numCellPoints; idPoint++) 
+				// Get cell points
+				m_Mesh->GetCellPoints(cellId, cellPointsList);
+
+				// Loop through each cell point
+				for (vtkIdType idPoint = 0; idPoint < cellPointsList->GetNumberOfIds(); idPoint++)
 				{
-					// if the point has not been yet visited
-					if ( m_VisitedPoints[ptId=cellPointsList[idPoint]] < 0 )
+					vtkIdType ptId = cellPointsList->GetId(idPoint); // Ottieni ID del punto
+
+					// If the point has not been visited
+					if (m_VisitedPoints[ptId] < 0)
 					{
-						// mark it as visited
+						// Mark it as visited
 						m_VisitedPoints[ptId] = m_PointNumber++;
 					}
 
-					// get neighbor cells from cell point
-					m_Mesh->GetPointCells(ptId,ncells,cellsFromPoint);
+					// Get neighbor cells from this point
+					m_Mesh->GetPointCells(ptId, cellsFromPoint);
 
-					// check connectivity criterion (geometric + distance)
+					// Check connectivity criterion (geometric + distance)
 					for (k=0; k < ncells; k++)
 					{
-						cellId = cellsFromPoint[k];
+						cellId = cellsFromPoint->GetId(k);
 
 						FindTriangleCellCenter(cellId,currentCellCenter);
 						if (vtkMath::Distance2BetweenPoints(seedCenter, currentCellCenter)

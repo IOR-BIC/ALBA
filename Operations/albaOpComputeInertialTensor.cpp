@@ -41,12 +41,11 @@ using namespace std;
 #include "vtkUnstructuredGrid.h"
 #include "vtkMassProperties.h"
 #include "vtkGeometryFilter.h"
-#include "vtkALBACellLocator.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkTransform.h"
-
+#include "vtkIdList.h"
 
 #include "albaDecl.h"
 #include "albaEvent.h"
@@ -404,26 +403,42 @@ int albaOpComputeInertialTensor::ComputeLocalInertialTensor(albaVME* node, int c
     int cellId = i;
     vtkCell* cell = ds->GetCell(cellId);
     int type = cell->GetCellType();
-    
     vtkIdType numPts = 0;
-    vtkIdType *ptIds = 0;
+    vtkNew<vtkIdList> ptIds;
 
-    // get cell points
+    // Get cell points based on dataset type
     switch (ds->GetDataObjectType())
-      {
-      case VTK_POLY_DATA:
-        ((vtkPolyData *)ds)->GetCellPoints( cellId, numPts, ptIds );
-        break;
-      case VTK_UNSTRUCTURED_GRID:
-        ((vtkUnstructuredGrid *)ds)->GetCellPoints( cellId, numPts, ptIds );
-        break;
-      default:
-        break;
-      }
+    {
+    case VTK_POLY_DATA:
+      ((vtkPolyData*)ds)->GetCellPoints(cellId, ptIds);
+      break;
+    case VTK_UNSTRUCTURED_GRID:
+      ((vtkUnstructuredGrid*)ds)->GetCellPoints(cellId, ptIds);
+      break;
+    default:
+      break;
+    }
+
+    // Retrieve the number of points
+    numPts = ptIds->GetNumberOfIds();
+
     for (int j=0; j<numPts-2; j++ )
     {
-      // trianglize cells
-      vtkCELLTRIANGLES( ptIds, type, j, pId, qId, rId );
+      vtkNew<vtkIdList> triangleIds;
+      vtkNew<vtkPoints> trianglePoints;
+
+      vtkCell* cell = ds->GetCell(cellId);  
+
+      if (cell->Triangulate(0, triangleIds, trianglePoints))
+      {
+        for (vtkIdType j = 0; j < triangleIds->GetNumberOfIds(); j += 3)
+        {
+          vtkIdType pId = triangleIds->GetId(j);
+          vtkIdType qId = triangleIds->GetId(j + 1);
+          vtkIdType rId = triangleIds->GetId(j + 2);
+        }
+      }
+      
       if ( pId < 0 )
         {
         continue;

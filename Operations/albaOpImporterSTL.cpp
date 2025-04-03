@@ -211,13 +211,13 @@ void albaOpImporterSTL::ImportSTL()
 	  { //swapping the file
 		  std::ifstream f_in;
       albaString swapped;				
-		  f_in.open (m_Files[kk].GetCStr(), ifstream::in| ifstream::binary);
+		  f_in.open (m_Files[kk].GetCStr(), std::ifstream::in| std::ifstream::binary);
 		  int dot_pos = m_Files[kk].FindLastChr('.');
       swapped.NCopy(m_Files[kk].GetCStr(),dot_pos);
 		  swapped = swapped + "_swapped";
 		  swapped = swapped + ".stl";
 		  std::ofstream f_out;
-		  f_out.open(swapped.GetCStr(), ofstream::out | ofstream::binary);
+		  f_out.open(swapped.GetCStr(), std::ofstream::out | std::ofstream::binary);
   		
 		  char ch;
 		  unsigned int number = 0, v = 0;

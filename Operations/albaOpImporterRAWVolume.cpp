@@ -137,7 +137,6 @@ void albaOpImporterRAWVolume::OpRun()
   vtkALBASmartPointer<vtkTexture> texture;
 	texture->SetInputConnection(m_Reader->GetOutputPort());
 	texture->InterpolateOn();
-  texture->MapColorScalarsThroughLookupTableOn();
   texture->SetLookupTable((vtkLookupTable *)m_LookupTable);
 
 	vtkALBASmartPointer<vtkPlaneSource> plane;
@@ -592,7 +591,7 @@ int albaOpImporterRAWVolume::GetFileLength(const char * filename)
 //----------------------------------------------------------------------------
 {
 	int l,m,len;
-	ifstream file (filename, ios::in|ios::binary);
+	std::ifstream file (filename, ios::in|ios::binary);
 	l = file.tellg();
 	file.seekg (0, ios::end);
 	m = file.tellg();

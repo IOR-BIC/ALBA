@@ -1368,7 +1368,6 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
     
     for (int i = 0; i < 2; i++)
     {
-      m_Meshes[i]->pMapper->ImmediateModeRenderingOn();
       m_Meshes[i]->pMapper->ScalarVisibilityOn();
       m_Meshes[i]->pMapper->SetColorModeToMapScalars();
       m_Meshes[i]->pMapper->SetScalarModeToUsePointData();  

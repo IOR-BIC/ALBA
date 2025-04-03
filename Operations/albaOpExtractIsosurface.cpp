@@ -544,7 +544,6 @@ void albaOpExtractIsosurface::CreateSlicePipeline()
   m_SliceTexture->InterpolateOn();
   m_SliceTexture->SetQualityTo32Bit();
   m_SliceTexture->SetLookupTable(material->m_ColorLut);
-  m_SliceTexture->MapColorScalarsThroughLookupTableOn();
   m_SliceTexture->SetInputData(m_SliceImage);
 
   m_Polydata	= vtkPolyData::New();

@@ -199,7 +199,6 @@ void albaOpImporterRAWImages::CreatePipeline()
 
   vtkNEW(m_LookupTable);
 
-  m_Texture->MapColorScalarsThroughLookupTableOn();
   m_Texture->SetLookupTable((vtkLookupTable *)m_LookupTable);
 
   vtkNEW(m_Plane);
@@ -551,13 +550,11 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
     case ID_HEADER:
       if(m_Bit == 3)
       {
-        m_Texture->MapColorScalarsThroughLookupTableOff();
         m_Texture->SetLookupTable(NULL);
         m_Gui->Enable(ID_RGB_TYPE,true);
       }
       else
       {
-        m_Texture->MapColorScalarsThroughLookupTableOn();
         m_Texture->SetLookupTable((vtkLookupTable *)m_LookupTable);
         m_Gui->Enable(ID_RGB_TYPE,false);
       }
@@ -568,8 +565,7 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
         m_UseLookupTable = m_Bit != 3;
         m_GuiSlider->Update();
       }
-      else
-        m_Texture->SetMapColorScalarsThroughLookupTable(m_UseLookupTable);
+
       m_SliceSlider->SetRange(0,m_NumberSlices - 1);
       m_Gui->Update();
       UpdateReader();
@@ -1078,7 +1074,7 @@ int albaOpImporterRAWImages::GetFileLength(const char * filename)
 //----------------------------------------------------------------------------
 {
   int l,m,len;
-  ifstream file (filename, ios::in|ios::binary);
+  std::ifstream file (filename, ios::in|ios::binary);
   l = file.tellg();
   file.seekg (0, ios::end);
   m = file.tellg();

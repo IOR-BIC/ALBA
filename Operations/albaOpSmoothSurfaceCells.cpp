@@ -533,32 +533,34 @@ void albaOpSmoothSurfaceCells::TraverseMeshAndMark( double radius )
           m_UnselectCells ? m_RemoveUnSelectedCells->UnmarkCell(cellId) : m_RemoveUnSelectedCells->MarkCell(cellId);
 				}
 
-				// get its points
-				m_Mesh->GetCellPoints(cellId, numCellPoints, cellPointsList);
+				vtkNew<vtkIdList> cellPointsList;  // Lista dei punti della cella
+				vtkNew<vtkIdList> cellsFromPoint;  // Lista delle celle che condividono un punto
 
-				// for each cell point
-				for (idPoint=0; idPoint < numCellPoints; idPoint++) 
+				// Get cell points
+				m_Mesh->GetCellPoints(cellId, cellPointsList);
+
+				// Loop through each cell point
+				for (vtkIdType idPoint = 0; idPoint < cellPointsList->GetNumberOfIds(); idPoint++)
 				{
-					// if the point has not been yet visited
-					ptId=cellPointsList[idPoint];
-					
-					// get neighbor cells from cell point
-					m_Mesh->GetPointCells(ptId,ncells,cellsFromPoint);
+					vtkIdType ptId = cellPointsList->GetId(idPoint); // Ottieni ID del punto
 
-					// check connectivity criterion (geometric + distance)
-					for (k=0; k < ncells; k++)
+					// Get neighbor cells from this point
+					m_Mesh->GetPointCells(ptId, cellsFromPoint);
+
+					// Check connectivity criterion (geometric + distance)
+					for (vtkIdType k = 0; k < cellsFromPoint->GetNumberOfIds(); k++)
 					{
-						cellId = cellsFromPoint[k];
+						vtkIdType neighborCellId = cellsFromPoint->GetId(k);
 
-						FindTriangleCellCenter(cellId,currentCellCenter);
+						FindTriangleCellCenter(neighborCellId, currentCellCenter);
 						if (vtkMath::Distance2BetweenPoints(seedCenter, currentCellCenter)
-							< (m_Diameter*m_Diameter / 4))
+							< (m_Diameter * m_Diameter / 4))
 						{
-							// insert next cells to be visited in the other wave
-							m_Wave2->InsertNextId(cellId);
+							// Insert next cells to be visited in the other wave
+							m_Wave2->InsertNextId(neighborCellId);
 						}
-					}//for all cells using this point
-				}//for all points of this cell
+					} // for all cells using this point
+				}
 			}//if cell not yet visited
 		}//for all cells in this wave
 

@@ -1972,13 +1972,11 @@ void albaOpMML3ModelView::CalculateCenterOfVtkPlane(double sizx, double sizy, do
 
 
 
-//SIL. 24-12-2004: begin
 //----------------------------------------------------------------------------
 void albaOpMML3ModelView::Print(vtkObject *obj, wxString msg) const
 //----------------------------------------------------------------------------
 {
   wxLogMessage("%s",msg);
-#ifdef VTK_USE_ANSI_STDLIB
   std::stringstream ss1;
 
   obj->Print(ss1);
@@ -1991,15 +1989,8 @@ void albaOpMML3ModelView::Print(vtkObject *obj, wxString msg) const
     wxLogMessage(tmp);
     message=message.Mid(pos+1);
   }
-#else
-  strstream ss1,ss2;
-  obj->Print(ss1);
-  wxLogMessage("[%s PRINTOUT:]\n", obj->GetClassName());
-  wxLogMessage("%s\n", ss1.str()); 
-#endif
 
 }
-//SIL. 24-12-2004: end
 
 
 

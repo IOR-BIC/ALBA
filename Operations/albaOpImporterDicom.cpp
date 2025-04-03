@@ -1102,7 +1102,6 @@ void albaOpImporterDicom::GenerateSliceTexture(int imageID)
 	m_SliceLookupTable->SetTableRange(range);
 	m_SliceLookupTable->Build();
 
-	m_SliceTexture->MapColorScalarsThroughLookupTableOn();
 	m_SliceTexture->SetLookupTable((vtkLookupTable *)m_SliceLookupTable);
 }
 

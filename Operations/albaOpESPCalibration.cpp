@@ -1000,8 +1000,15 @@ bool albaOpESPCalibration::CalculateTailDensityInfo(vtkImageData *rg)
 double albaOpESPCalibration::GetTailCenter(vtkImageData *rg, TailPosition tailPos, double x, double y, double z)
 {
 	vtkDataArray* scalars = rg->GetPointData()->GetScalars();
+	int ijk[3];
+	double pcoords[3];
+	vtkIdType startCenter;
+	double xyz[3] = { x, y, z };
+	if (rg->ComputeStructuredCoordinates(xyz, ijk, pcoords))
+		startCenter = rg->ComputePointId(ijk);
+	else
+		vtkIdType startCenter = -1; // Se il punto non è all'interno della griglia
 
-	vtkIdType startCenter = rg->FindPoint(x, y, z);
 	double *origin = rg->GetOrigin();
 	double *spacing = rg->GetSpacing();
 
@@ -1071,8 +1078,16 @@ void albaOpESPCalibration::GetBoneCenter(vtkImageData *rg, TailPosition tailPos,
 		x += 4;
 	else
 		x -= 4;
+	vtkIdType startCenter;
 
-	vtkIdType startCenter = rg->FindPoint(x, y, z);
+	int ijk[3];
+	double pcoords[3];
+	double xyz[3] = { x, y, z };
+	if (rg->ComputeStructuredCoordinates(xyz, ijk, pcoords))
+		startCenter = rg->ComputePointId(ijk);
+	else
+		startCenter = -1; // Se il punto non è all'interno della griglia
+
 	double *origin = rg->GetOrigin();
 	double *spacing = rg->GetSpacing();
 
