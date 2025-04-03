@@ -64,12 +64,12 @@
 #include "vtkImageMapper.h"
 #include "vtkImageResample.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkCriticalSection.h"
 #include "vtkMultiThreader.h"
 #include "vtkALBAImageMapToWidgetColors.h"
 #include "vtkALBAAdaptiveVolumeMapper.h"
 #include "vtkImageCast.h"
 #include "wx/slider.h"
+
 
 template<typename type> static inline type clip(type x, type xmin, type xmax) { if (x < xmin) return xmin; if (x > xmax) return xmax; return x; }
 
@@ -168,8 +168,6 @@ void albaGUIDialogTransferFunction2D::ShowModal(albaVME *vme)
   this->m_CurrentWidget = 0;
   this->m_Filename = "";
 
-  this->m_CriticalSection = vtkCriticalSection::New();
-
   //initialize widget properties
   strcpy(this->m_Widget.Name, "new");
 
@@ -197,8 +195,8 @@ void albaGUIDialogTransferFunction2D::ShowModal(albaVME *vme)
   this->wxDialog::ShowModal();
 
   ///////////////////// free memory
-  this->m_CriticalSection->Lock(); // wait for thread to finish
-  this->m_CriticalSection->Unlock();
+  this->m_CriticalSection.lock(); // wait for thread to finish
+  this->m_CriticalSection.unlock();
 
   vtkDEL(this->m_VolumeProperty);
   
@@ -228,7 +226,6 @@ void albaGUIDialogTransferFunction2D::ShowModal(albaVME *vme)
   cppDEL(this->m_Rwi3D);
   cppDEL(this->m_GraphRwi);
 
-  vtkDEL(this->m_CriticalSection);
   threader->Delete();
 }
 //----------------------------------------------------------------------------
@@ -667,7 +664,7 @@ VTK_THREAD_RETURN_TYPE albaGUIDialogTransferFunction2D::CreatePipe(void *argDial
 {
   albaGUIDialogTransferFunction2D *dialog = (albaGUIDialogTransferFunction2D*)(((ThreadInfoStruct *)argDialog)->UserData);
 
-  dialog->m_CriticalSection->Lock();
+  dialog->m_CriticalSection.lock();
 
   // 3d pipe
   dialog->m_Volume3D = vtkVolume::New();
@@ -785,7 +782,7 @@ VTK_THREAD_RETURN_TYPE albaGUIDialogTransferFunction2D::CreatePipe(void *argDial
   dialog->Enable();
   dialog->m_SlicePipeStatus = PipeReady;
 
-  dialog->m_CriticalSection->Unlock();
+  dialog->m_CriticalSection.unlock();
   
   return VTK_THREAD_RETURN_VALUE;
 }
