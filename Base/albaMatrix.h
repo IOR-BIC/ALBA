@@ -19,6 +19,7 @@
 
 #include "albaReferenceCounted.h"
 #include "albaMTime.h"
+#include "vtkType.h"
 
 typedef double (*albaMatrixElements)[4];
 

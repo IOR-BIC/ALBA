@@ -56,17 +56,17 @@ public:
   void Modified();
 
   /** Return this object's Modified time. */
-  unsigned long int GetMTime() const;
+  vtkMTimeType GetMTime() const;
 
   /** Support comparisons of time stamp objects directly. */
   int operator>(albaMTime& ts) {return (GetMTime() > ts.GetMTime());};
   int operator<(albaMTime& ts) {return (GetMTime() < ts.GetMTime());};
 
   /** Allow for typecasting to unsigned long. */
-  operator unsigned long() {return GetMTime();};
+  operator vtkMTimeType() {return GetMTime();};
 
 private:
-  unsigned long m_ModifiedTime;
+  vtkMTimeType m_ModifiedTime;
 };
 
 #endif
