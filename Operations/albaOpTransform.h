@@ -134,5 +134,8 @@ protected:
 	/** Postmultiply event matrix to vme abs matrix; also update Redo ivar m_NewAbsMatrix */;
 	virtual void PostMultiplyMatrix(albaMatrix *matrix);
 	
+private:
+	void SaveToFile();
+	void LoadFromFile();
 };
 #endif
