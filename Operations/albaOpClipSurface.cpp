@@ -52,6 +52,7 @@
 #include "vtkGlyph3D.h"
 #include "vtkAppendPolyData.h"
 #include "vtkALBAClipSurfaceBoundingBox.h"
+#include "albaTransform.h"
 
 
 //----------------------------------------------------------------------------
@@ -601,30 +602,35 @@ void albaOpClipSurface::OpUndo()
 int albaOpClipSurface::Clip()
 //----------------------------------------------------------------------------
 {
+	albaTransform targetSurfTra;
+
+	wxBusyCursor *wait_cursor=NULL;
+
 	if(!m_TestMode)
-	{
-    wxBusyCursor wait;
-	}
+		wait_cursor = new wxBusyCursor();
 
   if(m_ClipModality == albaOpClipSurface::MODE_SURFACE)
 	{
     if(m_ClipperVME == NULL)
+		{
+			cppDEL(wait_cursor);
       return ALBA_ERROR;
+		}
 
-    vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_data_input;
-    transform_data_input->SetTransform((vtkAbstractTransform *)m_Input->GetAbsMatrixPipe()->GetVTKTransform());
-    transform_data_input->SetInputData((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
-    transform_data_input->Update();
+
+		targetSurfTra.Concatenate(*m_Input->GetOutput()->GetAbsMatrix()->Invert(),true);
+		targetSurfTra.Concatenate(*m_ClipperVME->GetOutput()->GetAbsMatrix(), true);
+		targetSurfTra.Update();
 
     // clip input surface by another surface
     // triangulate input for subdivision filter
 		vtkALBASmartPointer<vtkTriangleFilter> triangles;
-		triangles->SetInputConnection(transform_data_input->GetOutputPort());
+		triangles->SetInputData((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
     triangles->Update();
 		
     m_ClipperVME->Update();
     vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_data_clipper;
-    transform_data_clipper->SetTransform((vtkAbstractTransform *)m_ClipperVME->GetAbsMatrixPipe()->GetVTKTransform());
+    transform_data_clipper->SetTransform(targetSurfTra);
     transform_data_clipper->SetInputData((vtkPolyData *)m_ClipperVME->GetOutput()->GetVTKData());
     transform_data_clipper->Update();
 
@@ -639,6 +645,7 @@ int albaOpClipSurface::Clip()
 		if(m_ClipBoundBox)
 		{
 			ClipBoundingBox();
+			cppDEL(wait_cursor);
 			return ALBA_OK;
 		}
 		else

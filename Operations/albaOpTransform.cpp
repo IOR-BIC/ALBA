@@ -74,6 +74,8 @@ enum TRANSFORMTEXTENTRIES_ID
 	ID_TEXT_SCALE,
 	ID_RESET,
 	ID_LOAD_FROM,
+	ID_LOAD_FROM_FILE,
+	ID_SAVE_TO_FILE,
 	ID_IDENTITY,
 };
 
@@ -294,6 +296,8 @@ void albaOpTransform::CreateGui()
 	// Reset Button
 	m_Gui->Button(ID_RESET, "Reset", "", "Cancel the transformation.");
 	m_Gui->Button(ID_LOAD_FROM, "Load From...", "", "Load matrix from another VME");
+	m_Gui->Button(ID_LOAD_FROM_FILE, "Load From file", "", "Load matrix from a csv file");
+	m_Gui->Button(ID_SAVE_TO_FILE, "Save to file", "", "Save matrix to a csv file");
 	m_Gui->Button(ID_IDENTITY, "Identity", "", "Set Identity Matrix");
 
 	m_Gui->Divider();
@@ -484,6 +488,20 @@ void albaOpTransform::OnEvent(albaEventBase *alba_event)
 		LoadFrom();
 		UpdateTransformTextEntries();
 		GetLogicManager()->CameraUpdate();
+	}
+	break;
+
+	case ID_LOAD_FROM_FILE: // load from file
+	{
+		LoadFromFile();
+		UpdateTransformTextEntries();
+		GetLogicManager()->CameraUpdate();
+	}
+	break;
+
+	case ID_SAVE_TO_FILE: // save to file
+	{
+		SaveToFile();
 	}
 	break;
 
@@ -710,6 +728,8 @@ void albaOpTransform::PostMultiplyMatrix(albaMatrix *matrix)
 }
 
 
+
+
 //----------------------------------------------------------------------------
 void albaOpTransform::OnEventTransformText()
 {
@@ -811,6 +831,88 @@ void albaOpTransform::LoadFrom()
 	m_TransformVME->SetAbsMatrix(targetMtr, m_CurrentTime);
 
 	SelectRefSys();
+}
+
+//----------------------------------------------------------------------------
+void albaOpTransform::LoadFromFile()
+{
+	wxString proposed = albaGetLastUserFolder();
+	wxString wildc = "ASCII CSV file (*.csv)|*.csv";
+	wxString f = albaGetOpenFile(proposed, wildc).ToAscii();
+
+	albaMatrix loadmatrix;
+
+	if (!f.IsEmpty())
+	{
+		FILE *inFile;
+		inFile = fopen(f.ToAscii(), "r");
+		if (inFile == NULL)
+		{
+			albaMessage("Error: cloud not open file!");
+			return;
+		}
+	
+		//Content
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				double value;
+				int ret = fscanf(inFile, "%lf;", &value);
+				if(ret!=1)
+				{
+					albaMessage("Error, cloud not read file or wrong file format!");
+					fclose(inFile);
+					return;
+				}
+				loadmatrix.SetElement(i, j,value);
+			}
+		}
+		fclose(inFile);
+	}
+
+	m_Input->SetAbsMatrix(loadmatrix, m_CurrentTime);
+	m_TransformVME->SetAbsMatrix(loadmatrix, m_CurrentTime);
+
+	SelectRefSys();
+}
+
+//----------------------------------------------------------------------------
+void albaOpTransform::SaveToFile()
+{
+	wxString proposed = albaGetLastUserFolder();
+	proposed += m_Input->GetName();
+	proposed += "_matrix.csv";
+	wxString wildc = "ASCII CSV file (*.csv)|*.csv";
+	wxString f = albaGetSaveFile(proposed, wildc).ToAscii();
+
+	if (!f.IsEmpty())
+	{
+		FILE *outFile;
+		outFile = fopen(f.ToAscii(), "w");
+		if (outFile==NULL)
+		{
+			albaMessage("Error: cloud not open file!");
+			fclose(outFile);
+			return;
+		}
+
+		albaMatrix saveMtr;
+		saveMtr.DeepCopy(m_Input->GetOutput()->GetAbsMatrix());
+		
+
+		//Content
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				double value = saveMtr.GetElement(i, j);
+				fprintf(outFile, "%lf;", value);
+			}
+			fprintf(outFile, "\n");
+		}
+		fclose(outFile);
+	}
 }
 
 
