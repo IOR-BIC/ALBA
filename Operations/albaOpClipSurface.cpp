@@ -55,6 +55,8 @@
 #include "albaTransform.h"
 
 
+albaVME *currentVME=NULL;
+
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpClipSurface);
 //----------------------------------------------------------------------------
@@ -241,15 +243,8 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 		{
 		case ID_CHOOSE_SURFACE:
 			{
-				albaString title = "Choose m_Clipper Surface";
-        e->SetPointer(&albaOpClipSurface::SurfaceAccept);
-				e->SetString(&title);
-				e->SetId(VME_CHOOSE);
-				albaEventMacro(*e);
-				m_ClipperVME = e->GetVme();
-				if(m_ClipperVME == NULL)
-					return;
-				m_Gui->Enable(wxOK,true);
+			ChooseSurface();
+			return;
 			}
 			break;
 		case ID_CLIP_INSIDE:
@@ -266,6 +261,8 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 			m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);
 			m_Gui->Enable(ID_USE_GIZMO,m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 			m_Gui->Enable(wxOK,m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
+			if (m_ClipModality == albaOpClipSurface::MODE_SURFACE && m_ClipperVME == NULL)
+				ChooseSurface();
 			m_ClipInside = m_ClipModality;
 			m_Gui->Update();
 			ShowClipPlane(m_ClipModality != albaOpClipSurface::MODE_SURFACE);
@@ -324,6 +321,24 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 		}
 	}
 }
+
+//----------------------------------------------------------------------------
+void albaOpClipSurface::ChooseSurface()
+{
+	currentVME = m_Input;
+	albaEvent e;
+	albaString title = "Choose m_Clipper Surface";
+	e.SetPointer(&albaOpClipSurface::SurfaceAccept);
+	e.SetString(&title);
+	e.SetId(VME_CHOOSE);
+	albaEventMacro(e);
+	m_ClipperVME = e.GetVme();
+	currentVME = NULL;
+	if (m_ClipperVME == NULL)
+		return;
+	m_Gui->Enable(wxOK, true);
+}
+
 //----------------------------------------------------------------------------
 void albaOpClipSurface::ClipBoundingBox()
 //----------------------------------------------------------------------------
@@ -694,6 +709,7 @@ int albaOpClipSurface::Clip()
 	if(!m_TestMode) 
 		m_Gui->Enable(wxOK,true);
 
+	cppDEL(wait_cursor);
   return ALBA_OK;
 }
 //----------------------------------------------------------------------------
@@ -859,7 +875,7 @@ void albaOpClipSurface::UpdateISARefSys()
 //----------------------------------------------------------------------------
 bool albaOpClipSurface::SurfaceAccept(albaVME*node)
 {
-	return (node != NULL && (node->IsALBAType(albaVMESurface) || node->IsALBAType(albaVMESurfaceParametric)));
+	return (node != NULL && node != currentVME && (node->IsALBAType(albaVMESurface) || node->IsALBAType(albaVMESurfaceParametric)));
 }
 
 //----------------------------------------------------------------------------
