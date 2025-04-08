@@ -98,7 +98,7 @@ albaViewRXCT::albaViewRXCT(wxString label)
 
 	m_IsSubViewMaximized = false;
 
-  m_TrilinearInterpolationOn = TRUE;
+  m_TrilinearInterpolationOn = true;
 }
 //----------------------------------------------------------------------------
 albaViewRXCT::~albaViewRXCT()

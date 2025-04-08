@@ -145,7 +145,7 @@ int albaVMESlicer::DeepCopy(albaVME *a)
     albaVME *linked_node = slicer->GetSlicedVMELink();
     if (linked_node)
     {
-      this->SetLink("SlicedVME", linked_node);
+      this->SetMandatoryLink("SlicedVME", linked_node);
     }
 
     m_Transform->SetMatrix(slicer->m_Transform->GetMatrix());

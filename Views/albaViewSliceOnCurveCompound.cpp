@@ -95,7 +95,7 @@ albaViewSliceOnCurveCompound::albaViewSliceOnCurveCompound(wxString label) : alb
   m_OldPos[0] = m_OldPos[1] = m_OldPos[2] = 0.;
 
   // Added by Losi 11.25.2009
-  m_EnableGPU=FALSE;
+  m_EnableGPU=false;
 }
 
 #include "albaVMERoot.h"

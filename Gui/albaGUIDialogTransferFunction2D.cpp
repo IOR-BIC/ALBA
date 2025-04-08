@@ -263,7 +263,7 @@ void albaGUIDialogTransferFunction2D::CreateGUI()
 	wxFlexGridSizer *gridSizer = new wxFlexGridSizer(2, 2, 0, 0);
   gridSizer->AddGrowableCol(0);
   gridSizer->AddGrowableRow(0);
-  previewPage->SetAutoLayout(TRUE);
+  previewPage->SetAutoLayout(true);
   previewPage->SetSizer(gridSizer);
   gridSizer->Fit(previewPage);
   gridSizer->SetSizeHints(previewPage);
@@ -308,7 +308,7 @@ void albaGUIDialogTransferFunction2D::CreateGUI()
   previewPage = new wxPanel(this->m_PreviewBook);
   this->m_PreviewBook->AddPage(previewPage, "3D");
   wxBoxSizer *tabSizer = new wxBoxSizer(wxVERTICAL);
-  previewPage->SetAutoLayout(TRUE);
+  previewPage->SetAutoLayout(true);
   previewPage->SetSizer(tabSizer);
   tabSizer->Fit(previewPage);
   tabSizer->SetSizeHints(previewPage);
@@ -484,7 +484,7 @@ void albaGUIDialogTransferFunction2D::CreateGUI()
   bottomPane->Add(this->m_StatusBar, 1, wxEXPAND | wxALIGN_RIGHT, 0);
 
   // switch auto-layout
-  this->SetAutoLayout( TRUE );
+  this->SetAutoLayout( true );
   this->SetSizer(mainSizer);
   mainSizer->Fit(this);
   mainSizer->SetSizeHints(this);

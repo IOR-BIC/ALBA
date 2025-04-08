@@ -39,6 +39,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkRendererCollection.h"
 #include "vtkMath.h"
 #include "vtkLine.h"
+#include "albaVect3d.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractor2DMeasure)
@@ -89,7 +90,6 @@ albaInteractor2DMeasure::albaInteractor2DMeasure()
 
 	m_AddMeasurePhase_Counter = 0;
 
-	m_LastSelection = -1;
 	m_MeasureValue = 0;
 	
 	SetColorDefault(1.0, 0.0, 1.0);
@@ -141,6 +141,8 @@ void albaInteractor2DMeasure::InitRenderer(albaEventInteraction *e)
 		if (m_ViewPlaneNormal[X] != 0) m_CurrPlane = 1;// YZ;
 		if (m_ViewPlaneNormal[Y] != 0) m_CurrPlane = 2;// XZ;
 		if (m_ViewPlaneNormal[Z] != 0) m_CurrPlane = 0;// XY;
+	
+		albaLogMessage("new plane %d", m_CurrPlane);
 
 		//albaLogMessage("ViewPlaneNormal (%.2f, %.2f, %.2f)", m_ViewPlaneNormal[X], m_ViewPlaneNormal[Y], m_ViewPlaneNormal[Z]);
 
@@ -195,11 +197,12 @@ void albaInteractor2DMeasure::Render()
 	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
 }
 
+
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::SetUpdateDistance(int dist)
+void albaInteractor2DMeasure::SetUpdateDistance(double dist)
 {
-	POINT_UPDATE_DISTANCE = dist;
-	POINT_UPDATE_DISTANCE_2 = (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE);
+	m_PointUpdateDist = dist;
+	m_PointUpdateDist2 = (dist * dist);
 }
 
 /// MOUSE EVENTS /////////////////////////////////////////////////////////////
@@ -459,16 +462,16 @@ void albaInteractor2DMeasure::RemoveAllMeasures()
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure::SelectMeasure(int index)
 {
-	if (index >= 0 && index < m_Measure2DVector.size())
+	if (index != m_CurrMeasure && index < m_Measure2DVector.size())
 	{
-		m_Renderer = m_CurrentRenderer = m_Measure2DVector[index].Renderer;
-
-		m_LastSelection = index;
+		m_CurrMeasure = index;
 		m_LastEditing = -1;
+
+		if(index >= 0)
+			m_Renderer = m_CurrentRenderer = m_Measure2DVector[index].Renderer;
 
 		Update();
 		Render();
-
 		albaEventMacro(albaEvent(this, ID_MEASURE_SELECTED));
 	}
 }
@@ -558,7 +561,7 @@ void albaInteractor2DMeasure::SetAction(MEASURE_ACTIONS action)
 	{
 		// Set Mouse Cursor
 		wxCursor cursor = wxCursor(wxCURSOR_ARROW);
-
+		
 		switch (m_Action)
 		{
 		case ACTION_ADD_MEASURE:
@@ -647,7 +650,7 @@ void albaInteractor2DMeasure::UpdateTextActor(int index, double *text_pos)
 		m_TextActorVector[index]->SetText(text);
 		m_TextActorVector[index]->SetTextPosition(text_pos);
 
-		Color color = m_Colors[(m_LastSelection == index) ? COLOR_SELECTION : COLOR_TEXT];
+		Color color = m_Colors[(m_CurrMeasure == index) ? COLOR_SELECTION : COLOR_TEXT];
 		if (!m_Measure2DVector[index].Active) color = m_Colors[COLOR_DISABLE];
 
 		m_TextActorVector[index]->SetColor(color.R, color.G, color.B);
@@ -689,16 +692,29 @@ void albaInteractor2DMeasure::ScreenToWorld(double screen[2], double world[3])
 	world[Y] = wp[Y];
 	world[Z] = wp[Z];
 
-	//This is an hack to stabilize the Interactor, VTK uses the camera perspective matrix to calcuate the
+	//This is an hack to stabilize the Interactor, VTK uses the camera perspective matrix to calculate the
 	//world coordinate, this return may lead in changes of the view plane coordinate output after show or hide 
 	//stuffs.
-	//This hack fix the plane coordinate to zero, witch is correct for a 2d measure.
-	world[2 - m_CurrPlane] = 0;
+	//This hack fix the plane coordinate to zero, witch is correct for a 2d measure
 
-	m_Renderer->GetActiveCamera()->SetViewPlaneNormal(0, 0, -1);
-
-	//albaLogMessage("StoW (%f, %f) -> (%f, %f, %f, %f)", screen[X], screen[Y], wp[X], wp[Y], wp[Z], wp[3]);
+	if (m_CurrPlane == 2) world[1] = 0;
+	else if (m_CurrPlane == 1) world[0] = 0;
+	else world[2] = 0;
 }
+
+//----------------------------------------------------------------------------
+double albaInteractor2DMeasure::PixelSizeInWorld()
+{
+	double p1[2] = { 0,0 };
+	double p2[2] = { 0,1 };
+	albaVect3d w1, w2;
+
+	ScreenToWorld(p1, w1.GetVect());
+	ScreenToWorld(p2, w2.GetVect());
+
+	return w1.Distance(w2);
+}
+
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure::WorldToScreen(double world[3], double screen[2])
 {

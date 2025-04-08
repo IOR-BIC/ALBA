@@ -46,7 +46,7 @@ albaGUISplittedPanel::albaGUISplittedPanel(wxWindow* parent, wxWindowID id, int 
   m_Bottom->SetDefaultSize(wxSize(1000, size));
   m_Bottom->SetOrientation(wxLAYOUT_HORIZONTAL);
   m_Bottom->SetAlignment(wxLAYOUT_BOTTOM);
-  m_Bottom->SetSashVisible(wxSASH_TOP, TRUE);
+  m_Bottom->SetSashVisible(wxSASH_TOP, true);
   m_Bottom->SetExtraBorderSize(0);
 
   m_BottomPanel    = NULL;

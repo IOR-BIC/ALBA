@@ -132,7 +132,7 @@ public:
 	/** Returns the last Edited Measure index*/
 	int GetLastEditedMeasureIndex() { return m_LastEditing; }
 	/** Returns the Current Measure Selected index*/
-	int GetSelectedMeasureIndex() { return m_LastSelection; }
+	inline int GetSelectedMeasure() { return m_CurrMeasure; }
 	/** Measure Interactor Is Enabled */
 	bool IsEnabled() { return m_IsEnabled; };
 		
@@ -171,9 +171,6 @@ public:
 	/* Call Rendering and Camera Update */
 	void Render();
 
-	/** Returns current measure index */
-	int GetCurreasureIdx() const { return m_CurrMeasure; }
-
 	/** return the current rwi */
 	albaRWIBase* GetCurrentRwi() { return m_CurrentRwi; }
 	albaRWIBase* GetCurrentRwi(int m) {	return m_Measure2DVector[m].Rwi; }
@@ -184,7 +181,7 @@ public:
 	// Update and Draw All Measure
 	virtual void ReDrawAll() {};
 
-	void SetUpdateDistance(int dist/*Default = 4*/);
+	void SetUpdateDistance(double  dist);
 
 	/** Set Measure Action (None, Add, Edit, Move) and Update mouse Cursor */
 	void SetAction(MEASURE_ACTIONS action);
@@ -251,6 +248,7 @@ protected:
 	/// Utilities
 	bool IsInBound(double *pos);
 	void ScreenToWorld(double screen[2], double world[3]);
+	double PixelSizeInWorld();
 	void WorldToScreen(double world[3], double screen[2]);
 	
 	//vtkPointSource produces a random-distributed pointCloud, use this method to obtain a fixed position single point output
@@ -284,7 +282,6 @@ protected:
 
 	Color m_Colors[5];
 
-	int m_CurrMeasure;
 	int m_CurrPoint;
 
 	double m_OldLineP1[3];
@@ -302,11 +299,12 @@ protected:
 	int m_CurrPlane;
 	double m_ParallelScale_OnStart;
 
+	int m_CurrMeasure;
+
 	long m_AddMeasurePhase_Counter;
 	bool m_ActorAdded;
 
 	double m_MeasureValue;
-	int m_LastSelection;
 	int m_LastEditing;
 
 	bool m_IsEnabled;
@@ -322,10 +320,11 @@ protected:
 	double m_LineWidth;
 	int m_TextSide;
 
-	int POINT_UPDATE_DISTANCE = 4;
-	int POINT_UPDATE_DISTANCE_2 = (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE);
+	double m_PointUpdateDist;
+	double m_PointUpdateDist2;
 
 private:
+
 
 	MEASURE_ACTIONS m_Action; // Measure Action
 	

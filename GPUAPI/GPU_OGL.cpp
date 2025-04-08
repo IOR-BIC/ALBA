@@ -402,7 +402,7 @@ bool albaGPUOGL::BeginExecute(wxString* err)
   GetWindowRect(m_hRWnd, &rw);
   rw.right = m_TargetWidth + rw.right - rc.right;
   rw.bottom = m_TargetHeight + rw.bottom - rc.bottom;
-  MoveWindow(m_hRWnd, 0, 0, rw.right, rw.bottom, FALSE);
+  MoveWindow(m_hRWnd, 0, 0, rw.right, rw.bottom, false);
 
   //bind the texture into which we will render
   glBindTexture(GL_TEXTURE_2D, m_TextureId);

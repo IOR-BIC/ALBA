@@ -204,7 +204,7 @@ void albaOpImporterLandmarkWS::Read()
 
       if (!indexSplitCopy.empty()) //true if AL is split in columns
       {
-        if ( counter == indexSplitCopy[indexCounter]) //If TRUE this AL already exists
+        if ( counter == indexSplitCopy[indexCounter]) //If true this AL already exists
         {
           if(!x.IsEmpty() && !y.IsEmpty() && !z.IsEmpty() )
           {

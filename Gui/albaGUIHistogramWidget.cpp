@@ -27,6 +27,7 @@
 #include "albaDecl.h"
 #include "albaRWI.h"
 #include "albaGUI.h"
+#include "albaVME.h"
 #include "albaGUIRangeSlider.h"
 #include "albaGUILutSlider.h"
 
@@ -57,6 +58,7 @@ albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /
 	m_HistogramData = NULL;
   m_Gui         = NULL;
   m_Data        = NULL;
+	m_VME = NULL;
   m_Lut         = NULL;
   m_Slider      = NULL;
   m_SliderThresholds = NULL;
@@ -120,7 +122,7 @@ albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /
   sizerV->Layout();           // resize & fit the contents
   sizerV->SetSizeHints(this); // resize the dialog accordingly 
 
-  SetAutoLayout(TRUE);
+  SetAutoLayout(true);
   sizerV->Fit(this);
 
 //  CreateGui();
@@ -190,7 +192,8 @@ void albaGUIHistogramWidget::CreateGui()
 	m_Gui->Slider(ID_NUMBER_OF_BIN, "Bin #:", &m_NumberOfBins, 10, 500, "Sets the number of bins of the Histogream");
   m_Gui->Bool(ID_LOGSCALE,"Log Scale",&m_LogHistogramFlag,0,"Enable/Disable log scale for histogram");
 	m_Gui->Button(ID_EXPORT_DATA, "Export Data");
-  m_Gui->Divider();
+	m_Gui->Button(ID_EXPORT_STATS, "Export Stats");
+	m_Gui->Divider();
 
   EnableWidgets(m_Data != NULL);
 }
@@ -223,6 +226,9 @@ void albaGUIHistogramWidget::OnEvent( albaEventBase *event )
 				break;
 			case ID_EXPORT_DATA:
 				ExportData();
+				break;
+			case ID_EXPORT_STATS:
+				ExportStats();
 				break;
 			default:
 				e->Log();
@@ -261,10 +267,11 @@ void albaGUIHistogramWidget::UpdateGui()
   }
 }
 //----------------------------------------------------------------------------
-void albaGUIHistogramWidget::SetData(vtkDataArray *data)
+void albaGUIHistogramWidget::SetData(vtkDataArray *data, albaVME *vme)
 //----------------------------------------------------------------------------
 {
   m_Data = data;
+	m_VME = vme;
   m_Histogram->SetInputData(m_Data);
   double sr[2];
   m_Data->GetRange(sr);
@@ -348,6 +355,83 @@ void albaGUIHistogramWidget::ExportData()
 		}
 		fclose(outFile);
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	// Open Report File
+	wxString url = "file:///";
+	url = url + f;
+	url.Replace("\\", "/");
+	albaLogMessage("Opening %f", url.ToAscii());
+	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
+	command = command + url;
+	wxExecute(command);
+}
+
+//----------------------------------------------------------------------------
+void albaGUIHistogramWidget::ExportStats()
+{
+
+	wxString proposed = albaGetLastUserFolder().ToAscii();
+	proposed += m_Data->GetName();
+	proposed += ".csv";
+
+	wxString wildc = "ASCII CSV file (*.csv)|*.csv";
+	wxString f = albaGetSaveFile(proposed, wildc).ToAscii();
+
+	bool firstAcces = !wxFileExists(f.ToAscii());
+
+	FILE * pFile;
+	pFile = fopen(f.ToAscii(), "a+");
+
+	if (pFile != NULL)
+	{
+
+		if (firstAcces) // Header
+		{
+			fprintf(pFile,"VME Name;Scalar Name;Mean;Min;Max;STD Error;\n");
+		}
+
+		albaString vmeName = m_VME ? m_VME->GetName() : "";
+
+		double sumValues = 0;
+		double min = VTK_DOUBLE_MAX;
+		double max = VTK_DOUBLE_MIN;
+		int nValues = m_Data->GetNumberOfTuples();
+
+		//Values are on Squared Dist
+		for (int i = 0; i < nValues; i++)
+		{
+			double value = m_Data->GetTuple1(i);
+			sumValues += value;
+			min = MIN(min, value);
+			max = MAX(max, value);
+		}
+
+		double mean = sumValues / (double)nValues;
+		double errSq = 0;
+
+		for (int i = 0; i < nValues; i++)
+		{
+			double err = mean - m_Data->GetTuple1(i);
+			errSq += err*err;
+		}
+
+		double stdDev = sqrt(errSq / (double)nValues);
+
+		fprintf(pFile, "%s;%s;%.2f;%.2f;%.2f;%.2f;\n", vmeName.GetCStr(), m_Data->GetName(), mean, min, max, stdDev);
+		
+		fclose(pFile);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	// Open Report File
+	wxString url = "file:///";
+	url = url + f;
+	url.Replace("\\", "/");
+	albaLogMessage("Opening %f", url.ToAscii());
+	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
+	command = command + url;
+	wxExecute(command);
 }
 
 //----------------------------------------------------------------------------

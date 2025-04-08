@@ -72,6 +72,13 @@ bool AlbaMaster::OnInit()
 #include "pic/GIZMO_ROTATE_ICON.xpm"
 	albaADDPIC(GIZMO_ROTATE_ICON);
 
+	albaString debDir = ALBA_SOURCE_DIR;
+	debDir += "/Examples/AlbaMaster/";
+
+#ifdef _DEBUG
+	albaSetAppDebugDir(debDir.GetCStr());
+#endif
+
 	int result;
 	result = albaVMEFactory::Initialize();
 	assert(result==ALBA_OK);
@@ -120,9 +127,9 @@ bool AlbaMaster::OnInit()
 	// Splash Screen
 	albaString splashImageName = "AlbaMasterSplash.bmp";
 
-	wxString splashDir = albaGetApplicationDirectory().ToAscii();
+	wxString splashDir = albaGetConfigDirectory().ToAscii();
 	wxBitmap splashBitmap;
-	wxString splashFileName = splashDir + "\\Config\\" + splashImageName;
+	wxString splashFileName = splashDir + "\\" + splashImageName;
 	if (wxFileExists(splashFileName))
 	{
 		splashBitmap.LoadFile(splashFileName, wxBITMAP_TYPE_BMP);
@@ -137,7 +144,7 @@ bool AlbaMaster::OnInit()
 
 	m_LogicInitialized = true;
 
-	return TRUE;
+	return true;
 }
 //--------------------------------------------------------------------------------
 int AlbaMaster::OnExit()

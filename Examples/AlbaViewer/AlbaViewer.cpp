@@ -43,6 +43,32 @@ PURPOSE. See the above copyright notice for more information.
 #include "appWizardSample.h"
 #endif
 #include "albaOpTransform.h"
+#include "albaOpImporterImage.h"
+#include "albaOpImporterRAWVolume.h"
+#include "albaOpImporterRAWImages.h"
+#include "albaOpImporterSTL.h"
+#include "albaOpImporterPLY.h"
+#include "albaOpImporterVRML.h"
+#include "albaOpImporterVTK.h"
+#include "albaOpImporterVTKXML.h"
+#include "albaOpImporterMetaImage.h"
+#include "albaOpImporterMSF.h"
+#include "albaOpImporterMSF1x.h"
+#include "albaOpImporterAnsysCDBFile.h"
+#include "albaOpImporterAnsysInputFile.h"
+#include "albaOpImporterAbaqusFile.h"
+#include "albaOpImporterMesh.h"
+#include "albaOpImporterASCII.h"
+#include "albaGUIDicomSettings.h"
+#include "albaOpImporterDicom.h"
+#include "albaOpImporterLandmark.h"
+#include "albaOpImporterLandmarkTXT.h"
+#include "albaOpImporterLandmarkWS.h"
+#include "albaOpImporterC3D.h"
+#include "albaOpImporterAnalogWS.h"
+#include "albaOpImporterGRFWS.h"
+#include "albaOpImporterDicFile.h"
+#include "albaOpImporterPointCloud.h"
 
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -54,9 +80,9 @@ IMPLEMENT_APP(AlbaViewer)
 bool AlbaViewer::OnInit()
 {
 	InitializeIcons();
-	
+
 	int result;
-  result = albaVMEFactory::Initialize();
+	result = albaVMEFactory::Initialize();
 	assert(result == ALBA_OK);
 
 	result = albaPipeFactoryVME::Initialize();
@@ -68,11 +94,11 @@ bool AlbaViewer::OnInit()
 	m_Logic->GetTopWin()->SetTitle("AlbaViewer");
 
 #ifdef USE_WIZARD
-	m_Logic->PlugWizardManager(true);
+	m_Logic->m_Logic->PlugWizardManager(true);
 #endif
 
-	// Plug and Enable Snapshot Manager
-	m_Logic->PlugSnapshotManager(true);
+	// m_Logic->Plug and Enable Snapshot Manager
+	m_Logic->m_Logic->PlugSnapshotManager(true);
 
 	m_Logic->Configure();
 
@@ -81,17 +107,39 @@ bool AlbaViewer::OnInit()
 	//////////////////////////////////////////////////////////////////////////
 	//Views
 
-	// VTK View (Surface)
-	m_Logic->Plug(new albaViewVTK("Surface"));	
+	m_Logic->m_Logic->PlugStandardViews();
 
-	// View Orthoslice
-	albaViewOrthoSlice *vortho = new albaViewOrthoSlice("Orthoslice");
-	vortho->PackageView();
-	m_Logic->Plug(vortho);
 
-	//////////////////////////////////////////////////////////////////////////
-	//Operations
-	m_Logic->Plug(new albaOpTransform("Transform \tCtrl+t"));
+	m_Logic->Plug(new albaOpImporterImage("Images"));
+	m_Logic->Plug(new albaOpImporterRAWVolume("RAW Volume"));
+	m_Logic->Plug(new albaOpImporterRAWImages("RAW Images"));
+	m_Logic->Plug(new albaOpImporterSTL("STL"));
+	m_Logic->Plug(new albaOpImporterPLY("PLY"));
+	m_Logic->Plug(new albaOpImporterVRML("VRML"));
+	m_Logic->Plug(new albaOpImporterVTK("VTK"));
+	m_Logic->Plug(new albaOpImporterVTKXML("VTK xml"));
+	m_Logic->Plug(new albaOpImporterMetaImage("ITK MetaImage"));
+	m_Logic->Plug(new albaOpImporterMSF("ALBA"));
+	m_Logic->Plug(new albaOpImporterMSF1x("MSF 1.x"));
+	m_Logic->Plug(new albaOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
+	m_Logic->Plug(new albaOpImporterAnsysInputFile("Ansys Input File"), "Finite Element");
+	m_Logic->Plug(new albaOpImporterAbaqusFile("Abaqus File"), "Finite Element");
+	m_Logic->Plug(new albaOpImporterMesh("Generic Mesh"), "Finite Element");
+	m_Logic->Plug(new albaOpImporterASCII("ASCII"));
+
+#ifdef ALBA_USE_GDCM
+	albaGUIDicomSettings *dicomSettings = new albaGUIDicomSettings(NULL, "DICOM");
+	m_Logic->Plug(new albaOpImporterDicom("DICOM"), "", true, dicomSettings);
+#endif
+	m_Logic->Plug(new albaOpImporterLandmark("Landmark"), "Landmark Suite");
+	m_Logic->Plug(new albaOpImporterLandmarkTXT("Landmark TXT"), "Landmark Suite");
+	m_Logic->Plug(new albaOpImporterLandmarkWS("Landmark WS"), "Landmark Suite");
+	m_Logic->Plug(new albaOpImporterC3D("C3D"), "Landmark Suite");
+	m_Logic->Plug(new albaOpImporterAnalogWS("EMG"));
+	m_Logic->Plug(new albaOpImporterGRFWS("GRF"));
+	m_Logic->Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
+	m_Logic->Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
+
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -109,7 +157,7 @@ bool AlbaViewer::OnInit()
 	m_Logic->Show();
 	m_Logic->Init(argc, argv); // Calls FileNew - which create the root
 
-	return TRUE;
+	return true;
 }
 
 //--------------------------------------------------------------------------------

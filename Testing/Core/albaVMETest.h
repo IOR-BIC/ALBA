@@ -26,18 +26,18 @@ public:
 
   // CPPUNIT test suite
   CPPUNIT_TEST_SUITE( albaVMETest );
-//   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
-//   CPPUNIT_TEST(TestDynamicAllocation);
-//   CPPUNIT_TEST(TestAllConstructor);
-//   CPPUNIT_TEST(TestCanReparentTo);
-// 
-//   CPPUNIT_TEST(TestSetTimeStamp);
-// 
-//   CPPUNIT_TEST(TestSetAbsMatrix);
-//   CPPUNIT_TEST(TestSetAbsPose);
-//   CPPUNIT_TEST(TestApplyAbsMatrix);
-// 
-//   CPPUNIT_TEST(TestEquals);
+  CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
+  CPPUNIT_TEST(TestDynamicAllocation);
+  CPPUNIT_TEST(TestAllConstructor);
+  CPPUNIT_TEST(TestCanReparentTo);
+
+  CPPUNIT_TEST(TestSetTimeStamp);
+
+  CPPUNIT_TEST(TestSetAbsMatrix);
+  CPPUNIT_TEST(TestSetAbsPose);
+  CPPUNIT_TEST(TestApplyAbsMatrix);
+
+  CPPUNIT_TEST(TestEquals);
   CPPUNIT_TEST(TestDeepCopy);
   CPPUNIT_TEST(TestShallowCopy);
   CPPUNIT_TEST(TestIsAnimated);

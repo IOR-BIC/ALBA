@@ -75,7 +75,7 @@ void albaOpVOIDensityTest::Test()
 	VOIDensity->SetSurface(Surface);
 	VOIDensity->OpRun();
 	//Start VOI Density operation
-	VOIDensity->ExtractVolumeScalars();
+	VOIDensity->EvaluateSurface();
 	//Check output value
 	double MinScalar=VOIDensity->GetMinScalar();
 	CPPUNIT_ASSERT(MinScalar==6.0);
@@ -157,7 +157,7 @@ void albaOpVOIDensityTest::TestNotAlignedVolume()
 	VOIDensity->OpRun();
 
 	//Start VOI Density operation
-	VOIDensity->ExtractVolumeScalars();
+	VOIDensity->EvaluateSurface();
 
 	//Check output value
 	double MinScalar = VOIDensity->GetMinScalar();

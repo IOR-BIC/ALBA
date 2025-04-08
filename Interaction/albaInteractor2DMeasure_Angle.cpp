@@ -51,7 +51,7 @@ albaInteractor2DMeasure_Angle::albaInteractor2DMeasure_Angle() : albaInteractor2
 
 	Color color{ 0.4, 0.4, 1, 1.0 };
 
-	SetColorDefault(color.R, color.G, color.B, 0.85);
+	SetColorDefault(color.R, color.G, color.B, 0.65);
 	SetColorSelection(color.R, color.G, color.B, 1.0);
 	SetColorDisable(color.R, color.G, color.B, 0.3);
 	SetColorText(color.R, color.G, color.B, 0.5);
@@ -220,45 +220,52 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 
 	if (m_EditMeasureEnable)
 	{
+		SetUpdateDistance(PixelSizeInWorld()*4.0);
+
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
 			albaActor2dStackHelper *pointStackVector = m_PointsStackVectorOri[i];
 			if (m_Renderer != pointStackVector->GetRenderer())
 				continue;
 
-			double pointO[3], pointA[3], pointB[3];
+			double point1[3], point2[3], point3[3];
 
 			vtkPointSource* pointSourceO = (vtkPointSource*)m_PointsStackVectorOri[i]->GetSource();
 			vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[i]->GetSource();
 			vtkPointSource* pointSourceB = (vtkPointSource*)m_PointsStackVectorB[i]->GetSource();
 
-			pointSourceO->GetCenter(pointO);
-			pointSourceA->GetCenter(pointA);
-			pointSourceB->GetCenter(pointB);
+			pointSourceO->GetCenter(point1);
+			pointSourceA->GetCenter(point2);
+			pointSourceB->GetCenter(point3);
 
-			if (DistancePointToLine(point, pointO, pointA) < POINT_UPDATE_DISTANCE)
+
+			double l1Dist = DistancePointToLine(point, point1, point2);
+			double l2Dist = DistancePointToLine(point, point1, point3);
+			if ((l1Dist < l2Dist) && (l1Dist < m_PointUpdateDist))
 			{
 				SelectMeasure(i);
 
 				if (m_Measure2DVector[i].Active)
 				{
-					if (vtkMath::Distance2BetweenPoints(pointA, point) < POINT_UPDATE_DISTANCE_2)
+					double p1Dist = DistanceBetweenPoints(point, point1);
+					double p2Dist = DistanceBetweenPoints(point, point2);
+					double p1p2Dist = DistanceBetweenPoints(point1, point2);
+					double minDist = MIN(m_PointUpdateDist, (p1p2Dist / 3.0));
+
+					if ((p1Dist < p2Dist) && (p1Dist <= minDist))
 					{
 						SetAction(ACTION_EDIT_MEASURE);
-						m_CurrMeasure = i;
-						m_CurrPoint = POINT_2;
-						m_PointsStackVectorA[i]->SetColor(m_Colors[COLOR_EDIT]);
-					}
-					else if (vtkMath::Distance2BetweenPoints(pointO, point) < POINT_UPDATE_DISTANCE_2)
-					{
-						SetAction(ACTION_EDIT_MEASURE);
-						m_CurrMeasure = i;
 						m_CurrPoint = POINT_1;
 						m_PointsStackVectorOri[i]->SetColor(m_Colors[COLOR_EDIT]);
 					}
+					else if ((p2Dist <= minDist)) 
+					{
+						SetAction(ACTION_EDIT_MEASURE);
+						m_CurrPoint = POINT_2;
+						m_PointsStackVectorA[i]->SetColor(m_Colors[COLOR_EDIT]);
+					}
 					else
 					{
-						m_CurrMeasure = i;
 						if (m_MoveMeasureEnable)
 						{
 							m_LineStackVectorOA[i]->SetColor(m_Colors[COLOR_EDIT]);
@@ -272,22 +279,20 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 				Render();
 				return;
 			}
-			else if (DistancePointToLine(point, pointO, pointB) < POINT_UPDATE_DISTANCE)
+			else if (l2Dist < m_PointUpdateDist)
 			{
 				SelectMeasure(i);
 
 				if (m_Measure2DVector[i].Active)
 				{
-					if (vtkMath::Distance2BetweenPoints(pointB, point) < POINT_UPDATE_DISTANCE_2)
+					if (vtkMath::Distance2BetweenPoints(point3, point) < m_PointUpdateDist2)
 					{
 						SetAction(ACTION_EDIT_MEASURE);
-						m_CurrMeasure = i;
 						m_CurrPoint = POINT_3;
 						m_PointsStackVectorB[i]->SetColor(m_Colors[COLOR_EDIT]);
 					}
 					else
 					{
-						m_CurrMeasure = i;
 						if (m_MoveMeasureEnable)
 						{
 							m_LineStackVectorOB[i]->SetColor(m_Colors[COLOR_EDIT]);
@@ -307,7 +312,6 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 		if (m_CurrMeasure >= 0)
 		{
 			SelectMeasure(-1);
-			m_CurrMeasure = -1;
 			m_CurrPoint = NO_POINT;
 			Render();
 		}
@@ -414,20 +418,16 @@ void albaInteractor2DMeasure_Angle::AddMeasure(double *point1, double *point2, d
 
 		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
 
-		if (DistanceBetweenPoints(oldPoint1, oldPoint2) < POINT_UPDATE_DISTANCE)
+		if (DistanceBetweenPoints(oldPoint1, oldPoint2) < m_PointUpdateDist)
 		{
 			if (!hasSameRenderer) return;
 
-			m_CurrMeasure = index;
+			SelectMeasure(index);
 			m_CurrPoint = POINT_2;
 			EditMeasure(index, point2);
 
-			if (m_AddModeCompleted == false)
-			{
-				//RemoveMeasure(GetMeasureCount() - 1);
-				m_AddModeCompleted = true;
-			}
-
+			m_AddModeCompleted = true;
+					
 			ActivateMeasure(-1, true);
 
 			return;
@@ -439,7 +439,7 @@ void albaInteractor2DMeasure_Angle::AddMeasure(double *point1, double *point2, d
 			//Adding the second line no need to add a new measure.
 			m_SecondLineAdded[index] = true;
 
-			m_CurrMeasure = index;
+			SelectMeasure(index);
 			m_CurrPoint = POINT_3;
 			EditMeasure(index, point3);
 
@@ -514,7 +514,7 @@ void albaInteractor2DMeasure_Angle::AddMeasure(double *point1, double *point2, d
 		vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[index]->GetSource();
 		circleSource->SetResolution(60);
 
-		m_CurrMeasure = index;
+		SelectMeasure(index);
 		m_AddModeCompleted = false;
 
 		ActivateMeasure(-1, false);
@@ -570,8 +570,11 @@ void albaInteractor2DMeasure_Angle::RemoveMeasure(int index)
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Angle::SelectMeasure(int index)
 {
-	if (GetMeasureCount() > 0)
+	if (index != m_CurrMeasure && GetMeasureCount() > 0)
 	{
+		m_CurrMeasure = index;
+		m_LastEditing = -1;
+
 		// Deselect all
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
@@ -598,9 +601,6 @@ void albaInteractor2DMeasure_Angle::SelectMeasure(int index)
 
 			albaEventMacro(albaEvent(this, ID_MEASURE_SELECTED));
 		}
-
-		m_LastSelection = index;
-		m_LastEditing = -1;
 	}
 }
 
@@ -717,7 +717,7 @@ bool albaInteractor2DMeasure_Angle::Load(albaVME *input, wxString tag)
 			m_SecondLineAdded[m_CurrMeasure] = true;
 			m_Angles[m_CurrMeasure] = measureAngleTag->GetValueAsDouble(i);
 			UpdateLineActors(point1, point2, point3);
-			m_CurrMeasure = -1;
+			SelectMeasure(-1);
 			SetMeasureLabel(i, measureLabel);
 		}
 

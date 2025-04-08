@@ -87,7 +87,7 @@ albaViewSlice::albaViewSlice(wxString label /* =  */, int camera_position /* = C
 
   m_ShowVolumeTICKs = showTICKs;
 	  
-  m_TrilinearInterpolationOn = TRUE;
+  m_TrilinearInterpolationOn = true;
   m_TextureInterpolate = textureInterpolate;
 
 	SetDecimals(2);

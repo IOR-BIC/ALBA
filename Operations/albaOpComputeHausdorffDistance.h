@@ -54,6 +54,15 @@ public:
   /** Precess events coming from other objects */
   /*virtual*/ void OnEvent(albaEventBase *alba_event);
 
+	albaVME *ChooseSurface();
+
+	void SetSurfaceInput1(albaVME * vme);
+
+	void SetSurfaceInput2(albaVME * vme);
+
+	/** Compute H. Distance. */
+	int ComputeDistance();
+
   /** RTTI macro */
   albaTypeMacro(albaOpComputeHausdorffDistance, albaOp);
 
@@ -68,15 +77,22 @@ public:
   /** Makes the undo for the operation. */
   /*virtual*/ void OpUndo();
 
-  static bool SurfaceAccept(albaVME* node) { return(node != NULL && node->IsA("albaVMESurface"));};
+  static bool SurfaceAccept(albaVME* node);
+
+	double GetSurface2Area() { return m_Surface2Area; }
+	double GetSurface1Area() { return m_Surface1Area; }
+
+
+	/** Returns SurfaceInput1 */
+	albaVME * GetSurfaceInput1() const { return m_SurfaceInput1; }
+
+	/** Returns SurfaceInput2 */
+	albaVME * GetSurfaceInput2() const { return m_SurfaceInput2; }
 
 protected:
 
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   /*virtual*/ void OpStop(int result);
-
-  /** Compute H. Distance. */
-  int ComputeDistance();
 
   /** Create the operation GUI. */
   void CreateGui();
@@ -91,8 +107,11 @@ protected:
 
   int m_VmeOrSTL1, m_VmeOrSTL2;
 
-  albaVMESurface *m_SurfaceInput1;
-  albaVMESurface *m_SurfaceInput2;
+	double m_Surface1Area;
+	double m_Surface2Area;
+
+  albaVME *m_SurfaceInput1;
+  albaVME *m_SurfaceInput2;
   albaVMESurface *m_SurfaceOutput;
 
   albaOpImporterSTL *m_STLImporter;

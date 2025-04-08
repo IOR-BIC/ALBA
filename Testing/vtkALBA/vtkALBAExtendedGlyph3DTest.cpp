@@ -177,7 +177,7 @@ void vtkALBAExtendedGlyph3DTest::TestSetScaling()
   filter->ScalingOff();
   filter->Update();
 
-  CPPUNIT_ASSERT( filter->GetScaling() == FALSE );
+  CPPUNIT_ASSERT( filter->GetScaling() == false );
 
   CPPUNIT_ASSERT( filter->GetOutput()->GetScalarRange()[0] == scalars->GetRange()[0] );
   CPPUNIT_ASSERT( filter->GetOutput()->GetScalarRange()[1] == scalars->GetRange()[1] );
@@ -198,7 +198,7 @@ void vtkALBAExtendedGlyph3DTest::TestSetScaling()
   filter->ScalingOn();
   filter->Update();
 
-  CPPUNIT_ASSERT( filter->GetScaling() == TRUE );
+  CPPUNIT_ASSERT( filter->GetScaling() == true );
 
 	m_RenderWindow->Render();
 
@@ -359,7 +359,7 @@ void vtkALBAExtendedGlyph3DTest::TestSetScalarVisibility()
   // create pipe
   vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
   mapper->SetInput(filter->GetOutput());
-  mapper->SetScalarVisibility(TRUE);
+  mapper->SetScalarVisibility(true);
   mapper->SetScalarModeToUsePointData();
   mapper->SetScalarRange(filter->GetOutput()->GetScalarRange()[0],filter->GetOutput()->GetScalarRange()[1]);
   mapper->Update();
@@ -464,7 +464,7 @@ void vtkALBAExtendedGlyph3DTest::TestSetClamping()
   // create pipe
   vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
   mapper->SetInput(filter->GetOutput());
-  mapper->SetScalarVisibility(TRUE);
+  mapper->SetScalarVisibility(true);
   mapper->SetScalarModeToUsePointData();
   mapper->SetScalarRange(filter->GetOutput()->GetScalarRange()[0],filter->GetOutput()->GetScalarRange()[1]);
   mapper->Update();

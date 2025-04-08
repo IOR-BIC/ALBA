@@ -62,7 +62,7 @@ int rs232InitCommunications(COMM_PORT *port, DWORD comPort, DWORD baudRate)
 
     if(port->portHandle == INVALID_HANDLE_VALUE)
     {
-        return FALSE;
+        return false;
     }
 
     if (!GetCommTimeouts(port->portHandle,&timeout))
@@ -70,7 +70,7 @@ int rs232InitCommunications(COMM_PORT *port, DWORD comPort, DWORD baudRate)
         errorMessage( "Could not get timeout info" );
         CloseHandle(port->portHandle);
         port->portHandle = NULL;
-        return FALSE;
+        return false;
     }
 
     timeout.ReadIntervalTimeout = MAXDWORD;
@@ -84,7 +84,7 @@ int rs232InitCommunications(COMM_PORT *port, DWORD comPort, DWORD baudRate)
         errorMessage( "Could not set timeout info");
         CloseHandle(port->portHandle);
         port->portHandle = NULL;
-        return FALSE;
+        return false;
     }
 
     FillMemory(&dcb, sizeof(dcb), 0);
@@ -95,7 +95,7 @@ int rs232InitCommunications(COMM_PORT *port, DWORD comPort, DWORD baudRate)
         errorMessage( "Failed to get communications state");
         CloseHandle(port->portHandle);
         port->portHandle = NULL;
-        return FALSE;
+        return false;
     }
     
     dcb.Parity = NOPARITY;
@@ -104,33 +104,33 @@ int rs232InitCommunications(COMM_PORT *port, DWORD comPort, DWORD baudRate)
     dcb.DCBlength = sizeof(dcb);
     
     dcb.BaudRate = baudRate;
-    dcb.fNull = FALSE;
-    dcb.fBinary = TRUE;
-    dcb.fAbortOnError = FALSE;
+    dcb.fNull = false;
+    dcb.fBinary = true;
+    dcb.fAbortOnError = false;
     
-    dcb.fOutX = FALSE;
-    dcb.fInX = FALSE;
+    dcb.fOutX = false;
+    dcb.fInX = false;
     dcb.fRtsControl = RTS_CONTROL_DISABLE;
     dcb.fDtrControl = DTR_CONTROL_DISABLE;
-    dcb.fOutxCtsFlow = FALSE;
-    dcb.fOutxDsrFlow = FALSE;
+    dcb.fOutxCtsFlow = false;
+    dcb.fOutxDsrFlow = false;
     
     if (!SetCommState(port->portHandle, &dcb))
     {
         errorMessage( "Failed to set communications state");
         CloseHandle(port->portHandle);
         port->portHandle = NULL;
-        return FALSE;
+        return false;
     }
 
     port->rx_bufsize = RX_BUFFER_SIZE;
     port->dwRead = 0;
     port->dwReturned = 0;
-    port->fWaitingOnRead = FALSE;
+    port->fWaitingOnRead = false;
     port->portNumber = (WORD) comPort;
 
 
-    return TRUE;
+    return true;
 }
 
 
@@ -143,7 +143,7 @@ int rs232DeinitCommunications(COMM_PORT *port)
         CloseHandle(port->portHandle);
         port->portHandle = NULL;
     }
-    return TRUE;
+    return true;
 }
 
 
@@ -157,7 +157,7 @@ static BOOL setCommStateBYTE(COMM_PORT *port, DCB *dcb, BYTE *target, BYTE value
     if (!GetCommState(port->portHandle, dcb))     /* get current DCB */
     {
         errorMessage( "Failed to set control byte");
-        return FALSE;
+        return false;
     }
     *target = value;
 
@@ -167,9 +167,9 @@ static BOOL setCommStateBYTE(COMM_PORT *port, DCB *dcb, BYTE *target, BYTE value
     if (!fSuccess)
     {
          errorMessage( "Failed to set control byte");
-         return FALSE;
+         return false;
     }
-    return TRUE;
+    return true;
 }
 
 
@@ -183,7 +183,7 @@ static BOOL setCommStateDWORD(COMM_PORT *port, DCB *dcb, DWORD *target, DWORD va
     if (!GetCommState(port->portHandle, dcb))     /* get current DCB */
     {
         errorMessage( "Failed to set control word");
-        return FALSE;
+        return false;
     }
     *target = value;
 
@@ -193,9 +193,9 @@ static BOOL setCommStateDWORD(COMM_PORT *port, DCB *dcb, DWORD *target, DWORD va
     if (!fSuccess)
     {
          errorMessage( "Failed to set control word");
-         return FALSE;
+         return false;
     }
-    return TRUE;
+    return true;
 }
 
 
@@ -212,9 +212,9 @@ int rs232RxFlush(COMM_PORT *port, WORD numBytes)
 {
     port->dwRead = 0;
     port->dwReturned = 0;
-    if(port->fWaitingOnRead == TRUE)  /* waiting for read to compete */
+    if(port->fWaitingOnRead == true)  /* waiting for read to compete */
     {
-        port->fWaitingOnRead = FALSE;
+        port->fWaitingOnRead = false;
         CloseHandle(port->osReader.hEvent);
     }
 
@@ -263,9 +263,9 @@ int rs232InChar(COMM_PORT *port, char *c, int flush)
     {
         port->dwRead = 0;
         port->dwReturned = 0;
-        if(port->fWaitingOnRead == TRUE)  /* waiting for read to compete */
+        if(port->fWaitingOnRead == true)  /* waiting for read to compete */
         {
-            port->fWaitingOnRead = FALSE;
+            port->fWaitingOnRead = false;
             CloseHandle(port->osReader.hEvent);
         }
     }
@@ -277,13 +277,13 @@ int rs232InChar(COMM_PORT *port, char *c, int flush)
         return 1;
     }
 
-    if(port->fWaitingOnRead == FALSE)
+    if(port->fWaitingOnRead == false)
     {
         /* Create the overlapped event. Must be closed before exiting
          to avoid a handle leak */
 
         FillMemory(&(port->osReader), sizeof(port->osReader), 0);
-        port->osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+        port->osReader.hEvent = CreateEvent(NULL, true, false, NULL);
         port->dwReturned = 0;
         port->dwRead = 0;
 
@@ -302,7 +302,7 @@ int rs232InChar(COMM_PORT *port, char *c, int flush)
             }
             else
             {
-                port->fWaitingOnRead = TRUE;
+                port->fWaitingOnRead = true;
             }
         }
         else  /* read completed */
@@ -311,25 +311,25 @@ int rs232InChar(COMM_PORT *port, char *c, int flush)
         }
     }
 
-    if(port->fWaitingOnRead == TRUE)  /* waiting for read to compete */
+    if(port->fWaitingOnRead == true)  /* waiting for read to compete */
     {
         dwRes = WaitForSingleObject(port->osReader.hEvent, 0);
         switch(dwRes)
         {
             case WAIT_OBJECT_0:
-                if (!GetOverlappedResult(port->portHandle, &(port->osReader), &(port->dwRead), FALSE))
+                if (!GetOverlappedResult(port->portHandle, &(port->osReader), &(port->dwRead), false))
                 {
                     /* function failed */
                     if (GetLastError() != ERROR_IO_INCOMPLETE) /* comm error; abort */
                     {
-                        port->fWaitingOnRead = FALSE;
+                        port->fWaitingOnRead = false;
                         CloseHandle(port->osReader.hEvent);
                         port->dwRead = 0;
                     }
                 }
                 else
                 {
-                    port->fWaitingOnRead = FALSE;
+                    port->fWaitingOnRead = false;
                     CloseHandle(port->osReader.hEvent);
                 }
                 break;
@@ -343,7 +343,7 @@ int rs232InChar(COMM_PORT *port, char *c, int flush)
                 /* Error in the WaitForSingleObject; abort.
                    This indicates a problem with the OVERLAPPED structure's
                    event handle. */
-                port->fWaitingOnRead = FALSE;
+                port->fWaitingOnRead = false;
                 CloseHandle(port->osReader.hEvent);
                 port->dwRead = 0;
         }
@@ -384,7 +384,7 @@ BOOL rs232SetRTSState(COMM_PORT *port, DWORD value)
     if (!GetCommState(port->portHandle, &dcb))     /* get current DCB */
     {
         errorMessage( "Failed to set RTS line state" );
-        return FALSE;
+        return false;
     }
     dcb.fRtsControl = value;
 
@@ -394,9 +394,9 @@ BOOL rs232SetRTSState(COMM_PORT *port, DWORD value)
     if (!fSuccess)
     {
          errorMessage( "Failed to set RTS line state" );
-         return FALSE;
+         return false;
     }
-    return TRUE;
+    return true;
 }
 
 #endif
@@ -459,7 +459,7 @@ int rs232InitCommunications(COMM_PORT *port, DWORD comPort, DWORD baudRate)
     if ( port->desc <= 0)
     {
         perror("Open port:");
-        return FALSE;
+        return false;
     }
 
     rs232SetSpeed(port, baudRate);
@@ -471,7 +471,7 @@ int rs232InitCommunications(COMM_PORT *port, DWORD comPort, DWORD baudRate)
     if( ioctl(port->desc, SIOC_ITIMER, 0 ) == -1 )
     {
         perror( "Setting up real-time serial port access" );
-        return FALSE;
+        return false;
     }
 #endif
 
@@ -479,23 +479,23 @@ int rs232InitCommunications(COMM_PORT *port, DWORD comPort, DWORD baudRate)
     if (fcntl(port->desc, F_SETFL, O_NDELAY) < 0)
     {
         perror( "Tracker-Port Setup");
-        return FALSE;
+        return false;
     }
 #else
     if (fcntl(port->desc, F_SETFL, FNDELAY) < 0)
     {
         perror( "Tracker-Port Setup");
-        return FALSE;
+        return false;
     }
 #endif     
     
     if( tcflush(port->desc, TCIOFLUSH ) == -1 )
     {
         perror( "Flushing Port for InterSense Tracker" );
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 
@@ -507,7 +507,7 @@ int rs232SetSpeed(COMM_PORT *port, DWORD baudRate)
     if( ioctl(port->desc, TCGETA, &terminfo ) == -1 )
     {
         perror( "Configuring Port for InterSense Tracker" );
-        return FALSE;
+        return false;
     }
 
     terminfo.c_iflag = 0;
@@ -547,18 +547,18 @@ int rs232SetSpeed(COMM_PORT *port, DWORD baudRate)
     if( ioctl(port->desc, TCSETA, &terminfo ) == -1 )
     {
         perror( "Configuring Port for InterSense Tracker" );
-        return FALSE;
+        return false;
     }
 
     if( tcflush(port->desc, TCIOFLUSH ) == -1 )
     {
         perror( "Flushing Port for InterSense Tracker" );
-        return FALSE;
+        return false;
     }
 
-    rs232SetRTSState(port, TRUE);
+    rs232SetRTSState(port, true);
 
-    return TRUE;
+    return true;
 }
 
 
@@ -571,7 +571,7 @@ BOOL rs232SetRTSState(COMM_PORT *port, DWORD value)
     if(ioctl(port->desc, TIOCMGET, &status) == -1)
     {
         perror( "Get RTS state" );
-        return FALSE;
+        return false;
     }
 
     if(value)
@@ -582,12 +582,12 @@ BOOL rs232SetRTSState(COMM_PORT *port, DWORD value)
     if(ioctl(port->desc, TIOCMSET, &status) == -1)
     {
         perror( "Set RTS state" );
-        return FALSE;
+        return false;
     }
     rs232RxFlush(port, 1);
 #endif
 
-	return TRUE;
+	return true;
 }
 
 
@@ -599,7 +599,7 @@ int rs232RxFlush(COMM_PORT *port, WORD numBytes)
     if( tcflush(port->desc, TCIFLUSH ) == -1 )
     {
         perror( "Flushing Port for InterSense Tracker" );
-        return FALSE;
+        return false;
     }
     return 1;
 }
@@ -613,7 +613,7 @@ int rs232DeinitCommunications(COMM_PORT *port)
         close(port->desc);
     }
     port->desc = 0;
-    return TRUE;
+    return true;
 }
 
 /****************************************************************************/
@@ -682,14 +682,14 @@ BOOL waitForChar( COMM_PORT *port, char *ch )
 {
     float startTime = timeNow();
 
-    while(rs232InChar(port, ch, TRUE) == EOF)
+    while(rs232InChar(port, ch, true) == EOF)
     {
         if( ( timeNow() - startTime ) > 0.4 ) /* time out */
         {
-            return FALSE;
+            return false;
         }
     }
-    return TRUE;
+    return true;
 }
 
 
@@ -702,16 +702,16 @@ BOOL waitForShort( COMM_PORT *port, short *num )
     } bytesToWord;
 
 #if defined REVERSE_BYTE_ORDER
-    if( !waitForChar( port, &bytesToWord.bytes[1] ))  return FALSE;
-    if( !waitForChar( port, &bytesToWord.bytes[0] ))  return FALSE;
+    if( !waitForChar( port, &bytesToWord.bytes[1] ))  return false;
+    if( !waitForChar( port, &bytesToWord.bytes[0] ))  return false;
 #else
-    if( !waitForChar( port, &bytesToWord.bytes[0] ))  return FALSE;
-    if( !waitForChar( port, &bytesToWord.bytes[1] ))  return FALSE;
+    if( !waitForChar( port, &bytesToWord.bytes[0] ))  return false;
+    if( !waitForChar( port, &bytesToWord.bytes[1] ))  return false;
 #endif
 
     *num = bytesToWord.word;
 
-    return TRUE;
+    return true;
 }
 
 

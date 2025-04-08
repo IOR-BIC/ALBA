@@ -34,7 +34,6 @@
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEVolumeGray)
-//-------------------------------------------------------------------------
 albaVMEVolumeGray::albaVMEVolumeGray()
 {
 }
@@ -81,7 +80,6 @@ albaGUI* albaVMEVolumeGray::CreateGui()
 }
 //-------------------------------------------------------------------------
 void albaVMEVolumeGray::OnEvent(albaEventBase *alba_event)
-//-------------------------------------------------------------------------
 {
   // events to be sent up or down in the tree are simply forwarded
   albaEvent *e = albaEvent::SafeDownCast(alba_event);

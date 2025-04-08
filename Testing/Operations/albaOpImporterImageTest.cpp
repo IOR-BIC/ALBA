@@ -138,7 +138,7 @@ void albaOpImporterImageTest::Test_Multi_Volume()
   importer->ImportImage();
 	albaVME *node=importer->GetOutput();
 	
-	CPPUNIT_ASSERT(node->IsA("albaVMEVolumeRGB"));
+	CPPUNIT_ASSERT(node->IsA("albaVMEVolumeGray"));
 	vtkDataSet *data=node->GetOutput()->GetVTKData();
 	data->Update();
   albaString name = node->GetName();

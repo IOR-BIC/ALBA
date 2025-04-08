@@ -435,7 +435,7 @@ void albaGizmoTranslatePlane::Show(bool show)
 void albaGizmoTranslatePlane::ShowSquare(bool show)
 //----------------------------------------------------------------------------
 {
-  double opacity = ((show == TRUE) ? 0.5 : 0);
+  double opacity = ((show == true) ? 0.5 : 0);
   m_Gizmo[SQ]->GetMaterial()->m_Prop->SetOpacity(opacity);
 }
 //----------------------------------------------------------------------------

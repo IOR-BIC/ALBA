@@ -90,7 +90,7 @@ albaVisualPipePolylineGraph::albaVisualPipePolylineGraph()
 
   m_Representation = TUBE;
 
-  m_ShowBranchId = FALSE;
+  m_ShowBranchId = false;
 
 }
 //----------------------------------------------------------------------------
@@ -275,7 +275,7 @@ void albaVisualPipePolylineGraph::ExecutePipe()
 
   vtkNEW(m_ActorBranchId);
   m_ActorBranchId->SetMapper(mapperLabel);
-  m_ActorBranchId->SetVisibility(m_ShowBranchId==TRUE);
+  m_ActorBranchId->SetVisibility(m_ShowBranchId==true);
 }
 //----------------------------------------------------------------------------
 void albaVisualPipePolylineGraph::InitializeFromTag()
@@ -573,7 +573,7 @@ void albaVisualPipePolylineGraph::OnEvent(albaEventBase *alba_event)
     {
     case ID_SHOW_BRANCH_ID:
       {
-        m_ActorBranchId->SetVisibility(m_ShowBranchId==TRUE);
+        m_ActorBranchId->SetVisibility(m_ShowBranchId==true);
 				GetLogicManager()->CameraUpdate();
       }
       break;

@@ -235,7 +235,7 @@ void albaGUIAboutDialog::CreateDialog()
 		mainSizer->Add(AddText(m_AboutDialog, spacing, panelWidth - (buttonWidth * 2) - borderSize, wxALIGN_RIGHT), 0, wxALL | wxALIGN_LEFT, 0);
 		buttonSizer->Add(AddText(m_AboutDialog, spacing, panelWidth - (buttonWidth * 2) - borderSize, wxALIGN_RIGHT), 0, wxALL | wxALIGN_LEFT, 0);
 
-		buttonSizer->Add(okButton, 0, wxALIGN_RIGHT, 0);
+		buttonSizer->Add(okButton, 0, wxALIGN_BOTTOM, 0);
 		mainSizer->Add(buttonSizer, 0, wxALL, 5);
 
 		m_AboutDialog->Add(mainSizer, 0, wxALL);

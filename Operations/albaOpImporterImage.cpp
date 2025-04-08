@@ -29,6 +29,7 @@
 
 #include "albaTagArray.h"
 #include "albaVMEVolumeRGB.h"
+#include "albaVMEVolumeGray.h"
 #include "albaVMEImage.h"
 #include "albaVMEItem.h"
 
@@ -38,10 +39,15 @@
 #include "vtkJPEGReader.h"
 #include "vtkPNGReader.h"
 #include "vtkTIFFReader.h"
+#include "vtkImageExtractComponents.h"
 
 #include <algorithm>
 #include "albaProgressBarHelper.h"
 #include "wx/filename.h"
+#include "vtkDataSet.h"
+#include "vtkPointData.h"
+#include "vtkDataSetAttributes.h"
+#include "vtkUnsignedCharArray.h"
 
 //----------------------------------------------------------------------------
 // Global Function (locale to this file) to sort the filenames
@@ -59,6 +65,7 @@ bool CompareNumber(std::string first, std::string second)
 	second_name.ToLong(&second_num);
 
   return (first_num - second_num) < 0;   // compare number
+
 }
 
 //----------------------------------------------------------------------------
@@ -120,11 +127,11 @@ void albaOpImporterImage::OpRun()
 	  m_Gui = new albaGUI(this);
 
 		std::vector<wxString> files;
-
-		for (int i = 0; i < m_Files.size(); i++)
-			files.push_back(m_Files[i].c_str());
-  
+			
 		albaGetOpenMultiFiles((const char *)m_FileDirectory.ToAscii(), wildc.GetCStr(), files);
+
+		for (int i = 0; i < files.size(); i++)
+			m_Files.push_back(files[i].ToAscii());
   }
 
   m_NumFiles = m_Files.size();
@@ -337,8 +344,13 @@ void albaOpImporterImage::BuildVolume()
     r->SetDataOrigin(0, 0, m_FileOffset);
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
+
+		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
+		extractComponents->SetInput(r->GetOutput());
+		extractComponents->SetComponents(0); //only R channel
+		extractComponents->Update();
     
-    m_ImportedImageAsVolume->SetData(r->GetOutput(),m_Input->GetTimeStamp());
+    m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(),m_Input->GetTimeStamp());
     
     r->Delete();
 	} 
@@ -361,7 +373,12 @@ void albaOpImporterImage::BuildVolume()
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
     
-    m_ImportedImageAsVolume->SetData(r->GetOutput(),m_Input->GetTimeStamp());
+		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
+		extractComponents->SetInput(r->GetOutput());
+		extractComponents->SetComponents(0); //only R channel
+		extractComponents->Update();
+
+		m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(), m_Input->GetTimeStamp());
     
     r->Delete();
 	}
@@ -372,6 +389,7 @@ void albaOpImporterImage::BuildVolume()
     r->UpdateInformation();
     r->GetDataExtent(extent);
     r->Delete();
+
 		r = vtkPNGReader::New();
     albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,r));
     r->SetFileDimensionality(2);
@@ -384,8 +402,13 @@ void albaOpImporterImage::BuildVolume()
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
 
-    m_ImportedImageAsVolume->SetData(r->GetOutput(),m_Input->GetTimeStamp());
-    
+		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
+		extractComponents->SetInput(r->GetOutput());
+		extractComponents->SetComponents(0); //only R channel
+		extractComponents->Update();
+
+		m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(), m_Input->GetTimeStamp());
+		    
     r->Delete();
 	}
 	else if (m_FileExtension.Upper() == "TIF" || m_FileExtension.Upper() == "TIFF" )
@@ -407,7 +430,12 @@ void albaOpImporterImage::BuildVolume()
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
     
-    m_ImportedImageAsVolume->SetData(r->GetOutput(),m_Input->GetTimeStamp());
+		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
+		extractComponents->SetInput(r->GetOutput());
+		extractComponents->SetComponents(0); //only R channel
+		extractComponents->Update();
+
+		m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(), m_Input->GetTimeStamp());
 
     r->Delete();
 	}

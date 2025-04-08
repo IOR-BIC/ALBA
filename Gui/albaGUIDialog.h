@@ -102,6 +102,10 @@ public:
   void EnableCancel(bool enable) {if(m_CancelButton) m_CancelButton->Enable(enable);};
   void EnableClose(bool enable)  {if(m_CloseButton)  m_CloseButton->Enable(enable);};
 
+
+	virtual void WXSetInitialFittingClientSize(int flags, wxSizer* sizer = NULL);
+
+
   /** 
   Virtual functions called to terminate ShowModal - these can be redefined without providing the Event Table. 
   called when a ShowModal stage end with ok - in general is called by an 'OK' button -- */

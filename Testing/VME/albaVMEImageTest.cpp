@@ -150,7 +150,7 @@ void albaVMEImageTest::TestTimeVaryingVMEImageTree()
 //----------------------------------------------------------------------------
 {
   CreateVMETestTree();
-  PlayTree(m_VmeRoot, FALSE);
+  PlayTree(m_VmeRoot, false);
 }
 
 

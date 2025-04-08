@@ -28,6 +28,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkViewport.h"
+#include "albaVect3d.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractor2DMeasure_Distance)
@@ -43,11 +44,11 @@ albaInteractor2DMeasure_Distance::albaInteractor2DMeasure_Distance() : albaInter
 	m_CurrPoint = NO_POINT;
 	m_MinDistance = 0.0;
 	m_LineTickWidth = 2.0;
-	m_TickLenght = -1.0;
+	m_TickLenght = -1;
 
 	Color color{ 0.4, 0.4, 1, 1.0 };
 
-	SetColorDefault(color.R, color.G, color.B, 0.85);
+	SetColorDefault(color.R, color.G, color.B, 0.65);
 	SetColorSelection(color.R, color.G, color.B, 1.0);
 	SetColorDisable(color.R, color.G, color.B, 0.3);
 	SetColorText(color.R, color.G, color.B, 0.5);
@@ -191,6 +192,8 @@ void albaInteractor2DMeasure_Distance::FindAndHighlight(double * point)
 
 	if (m_EditMeasureEnable)
 	{
+		SetUpdateDistance(PixelSizeInWorld()*4.0);
+
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
 			albaActor2dStackHelper *lineStackVector = m_LineStackVector[i];
@@ -206,27 +209,29 @@ void albaInteractor2DMeasure_Distance::FindAndHighlight(double * point)
 			double dis = DistancePointToLine(point, linePoint1, linePoint2);
 			//albaLogMessage("Dist %f", dis);
 
-			if (DistancePointToLine(point, linePoint1, linePoint2) < POINT_UPDATE_DISTANCE)
+			if (DistancePointToLine(point, linePoint1, linePoint2) < m_PointUpdateDist)
 			{
 				SelectMeasure(i);
 
-				if (vtkMath::Distance2BetweenPoints(linePoint2, point) < POINT_UPDATE_DISTANCE_2)
+				double p1Dist = DistanceBetweenPoints(point,linePoint1);
+				double p2Dist = DistanceBetweenPoints(point,linePoint2);
+				double p1p2Dist = DistanceBetweenPoints(linePoint1, linePoint2);
+				double minDist = MIN(m_PointUpdateDist, (p1p2Dist/3.0));
+				
+				if ((p1Dist < p2Dist) && (p1Dist <= minDist))
 				{
 					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
-					m_CurrPoint = POINT_2;
-					m_TickStackVectorR[i]->SetColor(m_Colors[COLOR_EDIT]);
-				}
-				else if (vtkMath::Distance2BetweenPoints(linePoint1, point) < POINT_UPDATE_DISTANCE_2)
-				{
-					SetAction(ACTION_EDIT_MEASURE);
-					m_CurrMeasure = i;
 					m_CurrPoint = POINT_1;
 					m_TickStackVectorL[i]->SetColor(m_Colors[COLOR_EDIT]);
 				}
+				else if (p2Dist <= minDist)
+				{
+					SetAction(ACTION_EDIT_MEASURE);
+					m_CurrPoint = POINT_2;
+					m_TickStackVectorR[i]->SetColor(m_Colors[COLOR_EDIT]);
+				}
 				else
 				{
-					m_CurrMeasure = i;
 					if (m_MoveMeasureEnable)
 					{
 						lineStackVector->SetColor(m_Colors[COLOR_EDIT]);
@@ -241,7 +246,6 @@ void albaInteractor2DMeasure_Distance::FindAndHighlight(double * point)
 		if (m_CurrMeasure >= 0)
 		{
 			SelectMeasure(-1);
-			m_CurrMeasure = -1;
 			m_CurrPoint = NO_POINT;
 			Render();
 		}
@@ -261,24 +265,22 @@ void albaInteractor2DMeasure_Distance::UpdateLineActors(double * point1, double 
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Distance::UpdateLineTickActor(double * point1, double * point2)
 {
-	double tickLenght = DistanceBetweenPoints(point1, point2) * 0.05;
-	tickLenght = tickLenght == 0.0 ? 0.5 : tickLenght;
+	double tickLenght = 0.1;
+	albaVect3d  pDiff = { (point2[X] - point1[X])*tickLenght, (point2[Y] - point1[Y])*tickLenght, (point2[Z] - point1[Z])*tickLenght };
 
-	if (m_TickLenght > 0.0) tickLenght = m_TickLenght;
-
-	//////////////////////////////////////////////////////////////////////////
-
-	tickLenght = 0.1;
-
-	double  pDiff[3] = { point2[X] - point1[X], point2[Y] - point1[Y], point2[Z] - point1[Z] };
-
+	if (m_TickLenght > 0)
+	{
+		pDiff.Normalize();
+		pDiff *= m_TickLenght;
+	}
+	
 	// tickL
-	double tick1Point1[3]{ point1[X] - pDiff[X] * tickLenght, point1[Y] - pDiff[Y] * tickLenght,  point1[Z] - pDiff[Z] * tickLenght };
-	double tick1Point2[3]{ point1[X] + pDiff[X] * tickLenght, point1[Y] + pDiff[Y] * tickLenght,  point1[Z] + pDiff[Z] * tickLenght };
+	double tick1Point1[3]{ point1[X] - pDiff[X] , point1[Y] - pDiff[Y],  point1[Z] - pDiff[Z] };
+	double tick1Point2[3]{ point1[X] + pDiff[X] , point1[Y] + pDiff[Y],  point1[Z] + pDiff[Z] };
 
 	// tickR
-	double tick2Point1[3]{ point2[X] - pDiff[X] * tickLenght, point2[Y] - pDiff[Y] * tickLenght,  point2[Z] - pDiff[Z] * tickLenght };
-	double tick2Point2[3]{ point2[X] + pDiff[X] * tickLenght, point2[Y] + pDiff[Y] * tickLenght,  point2[Z] + pDiff[Z] * tickLenght };
+	double tick2Point1[3]{ point2[X] - pDiff[X], point2[Y] - pDiff[Y],  point2[Z] - pDiff[Z] };
+	double tick2Point2[3]{ point2[X] + pDiff[X], point2[Y] + pDiff[Y],  point2[Z] + pDiff[Z] };
 
 	double angle = (M_PI / 2) - GetAngle(tick1Point1, point2, point1);
 
@@ -326,11 +328,11 @@ void albaInteractor2DMeasure_Distance::AddMeasure(double *point1, double *point2
 
 		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
 
-		if (DistanceBetweenPoints(oldPoint1, oldPoint2)<POINT_UPDATE_DISTANCE)
+		if (DistanceBetweenPoints(oldPoint1, oldPoint2)<m_PointUpdateDist)
 		{
 			if (!hasSameRenderer) return;
 
-			m_CurrMeasure = index;
+			SelectMeasure(index);
 			m_CurrPoint = POINT_2;
 			EditMeasure(index, point2);
 			return;
@@ -376,7 +378,7 @@ void albaInteractor2DMeasure_Distance::AddMeasure(double *point1, double *point2
 	m_TickStackVectorL[index]->GetProperty()->SetPointSize(10.0);
 	m_TickStackVectorL[index]->GetProperty()->SetLineWidth(m_LineTickWidth);
 
-	m_CurrMeasure = index;
+	SelectMeasure(index);
 
 	UpdateLineActors(point1, point2);
 	UpdateLineTickActor(point1, point2);
@@ -410,8 +412,11 @@ void albaInteractor2DMeasure_Distance::RemoveMeasure(int index)
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Distance::SelectMeasure(int index)
 {
-	if (GetMeasureCount() > 0)
+	if (index != m_CurrMeasure && GetMeasureCount() > 0)
 	{
+		m_CurrMeasure = index;
+		m_LastEditing = -1;
+		
 		// Deselect all
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
@@ -432,9 +437,6 @@ void albaInteractor2DMeasure_Distance::SelectMeasure(int index)
 
 			albaEventMacro(albaEvent(this, ID_MEASURE_SELECTED));
 		}
-
-		m_LastSelection = index;
-		m_LastEditing = -1;
 	}
 }
 

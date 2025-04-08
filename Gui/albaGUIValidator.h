@@ -40,6 +40,10 @@ enum VALIDATOR_MODES
 	VAL_INTERACTIVE_STRING,  //TEXT
 	VAL_ALBA_STRING,  //TEXT
 	VAL_ALBA_INTERACTIVE_STRING,  //TEXT
+	VAL_MULTILINE_STRING,  //TEXT
+	VAL_MULTILINE_INTERACTIVE_STRING,  //TEXT
+	VAL_ALBA_MULTILINE_STRING,  //TEXT
+	VAL_ALBA_MULTILINE_INTERACTIVE_STRING,  //TEXT
   VAL_INTEGER, //TEXT 
   VAL_FLOAT,   //TEXT
 	VAL_DOUBLE,  //TEXT
@@ -66,8 +70,8 @@ class ALBA_EXPORT albaGUIValidator : public wxValidator
 public:
   albaGUIValidator (albaObserver* listener,int mid,wxStaticText *win, wxString* var);   //String
   albaGUIValidator (albaObserver* listener,int mid,wxStaticText *win, albaString* var);  //String
-  albaGUIValidator (albaObserver* listener,int mid,wxTextCtrl   *win, albaString* var, bool interactive = false);  //String
-  albaGUIValidator (albaObserver* listener,int mid,wxTextCtrl   *win,wxString* var, bool interactive = false);   //String
+  albaGUIValidator (albaObserver* listener,int mid,wxTextCtrl   *win, albaString* var, bool interactive = false, bool multiline=false);  //String
+  albaGUIValidator (albaObserver* listener,int mid,wxTextCtrl   *win,wxString* var, bool interactive = false, bool multiline=false);   //String
   albaGUIValidator (albaObserver* listener,int mid,wxTextCtrl   *win,   int*		var, int		min=-2147483647-1,			 int		max=2147483647);     //Integer
   albaGUIValidator (albaObserver* listener,int mid,wxTextCtrl   *win,   float*	var, float	min=-1.0e+38F, float	max=1.0e+38F, int dec_digits = 2);//Float
   albaGUIValidator (albaObserver* listener,int mid,wxTextCtrl   *win,   double* var, double min=-1.0e+299, double max=1.0e+299, int dec_digits = 2);//Double

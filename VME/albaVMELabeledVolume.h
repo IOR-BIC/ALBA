@@ -69,7 +69,7 @@ public:
   /*virtual*/ bool IsDataAvailable();
 
   /** Fill the vector of label. */
-  void FillLabelVector(wxString name, bool checked = TRUE);
+  void FillLabelVector(wxString name, bool checked = true);
 
    /** Modify the vector of label. */
   void ModifyLabelVector(int n, wxString name, bool checked);

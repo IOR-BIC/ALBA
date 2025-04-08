@@ -57,10 +57,10 @@ void vtkALBAFillingHoleTest::TestSetFillAHole()
 
   vtkALBASmartPointer<vtkFeatureEdges> fEdge;
   fEdge->SetInput(r->GetOutput());
-  fEdge->SetBoundaryEdges(TRUE);
-  fEdge->SetManifoldEdges(FALSE);
-  fEdge->SetNonManifoldEdges(FALSE);
-  fEdge->SetFeatureEdges(FALSE);
+  fEdge->SetBoundaryEdges(true);
+  fEdge->SetManifoldEdges(false);
+  fEdge->SetNonManifoldEdges(false);
+  fEdge->SetFeatureEdges(false);
   fEdge->Update();
 
   //Testing data has 2 holes with 16 boundary lines and 16 boundary points
@@ -102,10 +102,10 @@ void vtkALBAFillingHoleTest::TestSetFillAllHole()
 
   vtkALBASmartPointer<vtkFeatureEdges> fEdge;
   fEdge->SetInput(r->GetOutput());
-  fEdge->SetBoundaryEdges(TRUE);
-  fEdge->SetManifoldEdges(FALSE);
-  fEdge->SetNonManifoldEdges(FALSE);
-  fEdge->SetFeatureEdges(FALSE);
+  fEdge->SetBoundaryEdges(true);
+  fEdge->SetManifoldEdges(false);
+  fEdge->SetNonManifoldEdges(false);
+  fEdge->SetFeatureEdges(false);
   fEdge->Update();
 
   //Testing data has 2 holes with 16 boundary lines and 16 boundary points
@@ -136,10 +136,10 @@ void vtkALBAFillingHoleTest::TestGetLastPatch()
 
   vtkALBASmartPointer<vtkFeatureEdges> fEdge;
   fEdge->SetInput(r->GetOutput());
-  fEdge->SetBoundaryEdges(TRUE);
-  fEdge->SetManifoldEdges(FALSE);
-  fEdge->SetNonManifoldEdges(FALSE);
-  fEdge->SetFeatureEdges(FALSE);
+  fEdge->SetBoundaryEdges(true);
+  fEdge->SetManifoldEdges(false);
+  fEdge->SetNonManifoldEdges(false);
+  fEdge->SetFeatureEdges(false);
   fEdge->Update();
 
   //Testing data has 2 holes with 16 boundary lines and 16 boundary points

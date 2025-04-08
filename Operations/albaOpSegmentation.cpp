@@ -224,7 +224,7 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_MajorityThreshold = 9;
 
 	m_BrushFillErase = 0;
-	m_AutofillOnRelease = TRUE;
+	m_AutofillOnRelease = true;
 
 
   m_SliceBackup = NULL;
@@ -233,7 +233,7 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_OldAutomaticThreshold = MAXINT;
   m_OldAutomaticUpperThreshold = MAXINT;
 
-  m_RemovePeninsulaRegions = FALSE;
+  m_RemovePeninsulaRegions = false;
 
   m_ManualSegmentationTools  = DRAW_EDIT;
   m_ManualBucketActions = 0;
@@ -587,9 +587,9 @@ void albaOpSegmentation::CreateOpDialog()
 	//Change default frame to our dialog
 	wxWindow* oldFrame = albaGetFrame();
 
-	int fw, fh;
-	oldFrame->GetSize(&fw, &fh);
-	int dialogSize[2] = { 850, fh };
+ 	int fw, fh;
+ 	oldFrame->GetSize(&fw, &fh);
+	int dialogSize[2] = { 100, 100 };
 
 	albaSetFrame(m_Dialog);
 
@@ -603,7 +603,7 @@ void albaOpSegmentation::CreateOpDialog()
 
 	albaSetFrame(oldFrame);
 	int offset = 200;
-	int viewSize[2] = { dialogSize[1] - offset, dialogSize[1] - offset }; // 650x650
+	int viewSize[2] = { 800, 800 }; // 650x650
 
 	if (viewSize[0] < dialogSize[0] - 200)
 		viewSize[0] = dialogSize[0] - 200;
@@ -767,6 +767,7 @@ void albaOpSegmentation::CreateOpDialog()
 	int y_pos = (fh - dialogSize[1]) / 2;
 
 	m_Dialog->SetSize(x_pos, y_pos, dialogSize[0], dialogSize[1]);
+	m_Dialog->SetMinSize(wxSize(dialogSize[0], dialogSize[1]));
 
 	m_ProgressBar->Show(true);
 	m_GuiDialog->Update();
@@ -1239,7 +1240,7 @@ bool albaOpSegmentation::ApplyRefinementFilter2(vtkImageData *inputImage, vtkIma
   vtkALBAImageFillHolesRemoveIslands *filter = vtkALBAImageFillHolesRemoveIslands::New();
   filter->SetInput(inputImage);
   filter->SetEdgeSize(m_RefinementRegionsSize);
-  filter->SetRemovePeninsulaRegions(m_RemovePeninsulaRegions == TRUE);
+  filter->SetRemovePeninsulaRegions(m_RemovePeninsulaRegions == true);
   if(m_RefinementSegmentationAction == ID_REFINEMENT_HOLES_FILL)
   {
     filter->SetAlgorithmToFillHoles();

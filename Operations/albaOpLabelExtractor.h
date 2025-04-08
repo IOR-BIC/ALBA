@@ -62,7 +62,7 @@ public:
   bool RetrieveTag();
 
   /** Fill the vector of label. */
-  void FillLabelVector(wxString name, bool checked = TRUE);
+  void FillLabelVector(wxString name, bool checked = true);
 
   // Set the label value
   void SetLabel(double labelValue);

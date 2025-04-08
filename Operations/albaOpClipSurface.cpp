@@ -52,6 +52,7 @@
 #include "vtkGlyph3D.h"
 #include "vtkAppendPolyData.h"
 #include "vtkALBAClipSurfaceBoundingBox.h"
+#include "albaTransform.h"
 
 
 //----------------------------------------------------------------------------
@@ -82,7 +83,7 @@ albaOp(label)
   
   m_ClipInside      = 0;
 	m_UseGizmo			=	1;
-	m_ClipBoundBox	= 1;
+	m_ClipBoundBox	= false;
   m_ClipModality  = MODE_IMPLICIT_FUNCTION;
 	m_GizmoType			= GIZMO_TRANSLATE;
 
@@ -145,6 +146,7 @@ enum CLIP_SURFACE_ID
   ID_CLIP_BY,
 	ID_GEOMETRY_MOD,
   ID_CLIP_INSIDE,
+	ID_CLIP_PLANE_BBOX,
 	ID_GENERATE_CLIPPED_OUTPUT,
 	ID_PLANE_WIDTH,
 	ID_PLANE_HEIGHT,
@@ -207,7 +209,9 @@ void albaOpClipSurface::CreateGui()
 	m_Gui->Button(ID_CHOOSE_SURFACE,_("clipper surface"));
 	wxString geomModality[2] = { "Convex","Concave" };
 	m_Gui->Radio(ID_GEOMETRY_MOD, "", &m_GeometryModality, 2, geomModality);
-	m_Gui->Bool(ID_CLIP_INSIDE,_("reverse clipping"),&m_ClipInside,1);
+	m_Gui->Bool(ID_CLIP_INSIDE,_("Reverse clipping"),&m_ClipInside,1);
+	m_Gui->Bool(ID_CLIP_PLANE_BBOX, _("Clip Plane Bound Box"), &m_ClipBoundBox, 1,"Disable to clip the entire plane");
+	
 	double b[6];
 	m_Input->GetOutput()->GetVMEBounds(b);
 	// bounding box dim
@@ -220,6 +224,7 @@ void albaOpClipSurface::CreateGui()
 	m_Gui->OkCancel();
 
 	m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
+	m_Gui->Enable(ID_CLIP_PLANE_BBOX, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 	m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
 	m_Gui->Enable(ID_GEOMETRY_MOD, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
 	m_Gui->Enable(wxOK,m_ResultPolyData != NULL);
@@ -257,6 +262,7 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 		case ID_CLIP_BY:
 			m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
 			m_Gui->Enable(ID_GEOMETRY_MOD, m_ClipModality == albaOpClipSurface::MODE_SURFACE);
+			m_Gui->Enable(ID_CLIP_PLANE_BBOX, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 			m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);
 			m_Gui->Enable(ID_USE_GIZMO,m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 			m_Gui->Enable(wxOK,m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
@@ -290,6 +296,7 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 				else if(m_UseGizmo)
 					m_ImplicitPlaneGizmo->SetBehavior(NULL);
 
+				m_Gui->Enable(ID_CLIP_PLANE_BBOX, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 				m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);
 				
 				ChangeGizmo();
@@ -535,13 +542,20 @@ void albaOpClipSurface::OpDo()
 	albaString name;
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_output;
-	transform_output->SetTransform((vtkAbstractTransform *)m_Input->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
-	transform_output->SetInput(m_ResultPolyData);
-	transform_output->Update();
+	if (!m_ClipBoundBox)
+	{
+		transform_output->SetTransform((vtkAbstractTransform *)m_Input->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
+		transform_output->SetInput(m_ResultPolyData);
+		transform_output->Update();
+	}
 
 	name.Printf("Clipped %s", m_Input->GetName());
 	albaNEW(m_ClippedVME);
-	m_ClippedVME->SetData(transform_output->GetOutput(), m_Input->GetTimeStamp());
+	if(m_ClipBoundBox)
+		m_ClippedVME->SetData(transform_output->GetOutput(), m_Input->GetTimeStamp());
+	else 
+		m_ClippedVME->SetData(m_ResultPolyData, m_Input->GetTimeStamp());
+
 	m_ClippedVME->SetName(name);
 	m_ClippedVME->Update();
 	m_ClippedVME->ReparentTo(m_Input);
@@ -551,13 +565,20 @@ void albaOpClipSurface::OpDo()
 	if(m_GenerateClippedOutput)
 	{
 		vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_clipped_output;
-		transform_clipped_output->SetTransform((vtkAbstractTransform *)m_Input->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
-		transform_clipped_output->SetInput(m_ClippedPolyData);
-		transform_clipped_output->Update();
+		if (!m_ClipBoundBox)
+		{
+			transform_clipped_output->SetTransform((vtkAbstractTransform *)m_Input->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
+			transform_clipped_output->SetInput(m_ClippedPolyData);
+			transform_clipped_output->Update();
+		}
 
 		name.Printf("Reverse clipped %s", m_Input->GetName());
 		albaNEW(m_ReverseClippedVME);
-		m_ReverseClippedVME->SetData(transform_clipped_output->GetOutput(),m_Input->GetTimeStamp());
+		if(m_ClipBoundBox)
+			m_ReverseClippedVME->SetData(transform_clipped_output->GetOutput(),m_Input->GetTimeStamp());
+		else
+			m_ReverseClippedVME->SetData(m_ClippedPolyData, m_Input->GetTimeStamp());
+
 		m_ReverseClippedVME->SetName(name);
 		m_ReverseClippedVME->Update();
 
@@ -583,30 +604,35 @@ void albaOpClipSurface::OpUndo()
 int albaOpClipSurface::Clip()
 //----------------------------------------------------------------------------
 {
-	if(!m_TestMode)
-	{
-    wxBusyCursor wait;
-	}
+	albaTransform targetSurfTra;
+
+	wxBusyCursor *wait_cursor=NULL;
+
+	if (!m_TestMode) 
+		wait_cursor = new wxBusyCursor();
 
   if(m_ClipModality == albaOpClipSurface::MODE_SURFACE)
 	{
-    if(m_ClipperVME == NULL)
-      return ALBA_ERROR;
+		if (m_ClipperVME == NULL)
+		{
+			cppDEL(wait_cursor);
+			return ALBA_ERROR;
+		}
 
-    vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_data_input;
-    transform_data_input->SetTransform((vtkAbstractTransform *)m_Input->GetAbsMatrixPipe()->GetVTKTransform());
-    transform_data_input->SetInput((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
-    transform_data_input->Update();
+		
+		targetSurfTra.Concatenate(*m_Input->GetOutput()->GetAbsMatrix()->Invert(),true);
+		targetSurfTra.Concatenate(*m_ClipperVME->GetOutput()->GetAbsMatrix(), true);
+		targetSurfTra.Update();
 
     // clip input surface by another surface
     // triangulate input for subdivision filter
 		vtkALBASmartPointer<vtkTriangleFilter> triangles;
-		triangles->SetInput(transform_data_input->GetOutput());
+		triangles->SetInput((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
     triangles->Update();
 		
     m_ClipperVME->Update();
     vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_data_clipper;
-    transform_data_clipper->SetTransform((vtkAbstractTransform *)m_ClipperVME->GetAbsMatrixPipe()->GetVTKTransform());
+    transform_data_clipper->SetTransform(targetSurfTra);
     transform_data_clipper->SetInput((vtkPolyData *)m_ClipperVME->GetOutput()->GetVTKData());
     transform_data_clipper->Update();
 
@@ -621,19 +647,20 @@ int albaOpClipSurface::Clip()
 		if(m_ClipBoundBox)
 		{
 			ClipBoundingBox();
+			cppDEL(wait_cursor);
 			return ALBA_OK;
 		}
 		else
 		{
 			vtkMatrix4x4 *mat = vtkMatrix4x4::New();
-			mat->DeepCopy(m_Input->GetAbsMatrixPipe()->GetMatrixPointer()->GetVTKMatrix());
+			mat->DeepCopy(m_Input->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 			mat->Invert();
 			mat->Modified();
 
 			// clip input surface by an implicit plane
 			vtkTransform *tr = vtkTransform::New();
 			tr->Concatenate(mat);
-			tr->Concatenate(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix());
+			tr->Concatenate(m_ImplicitPlaneGizmo->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 			tr->Inverse();
 			tr->Update();
 

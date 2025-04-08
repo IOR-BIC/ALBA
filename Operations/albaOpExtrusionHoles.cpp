@@ -83,7 +83,7 @@ albaOp(label)
 
 	m_MaxBounds = VTK_DOUBLE_MAX;
 
-  m_ReverseExtrusion = FALSE;
+  m_ReverseExtrusion = false;
 
   m_NumVertices = 50;
 }

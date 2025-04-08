@@ -76,7 +76,14 @@ public:
 		ID_SHOW_LANDMARK_GROUP,
 	};
 
-	albaOpAddLandmark(const wxString &label = "AddLandmark  \tCtrl+A", const wxString dictionary = "", const wxString cloudName = "New landmark cloud");
+	enum ADD_LM_LINK_TYPE
+	{
+		LM_NO_LINK,
+		LM_NORMAL_LINK,
+		LM_MANDATORY_LINK
+	};
+
+	albaOpAddLandmark(const wxString &label = "AddLandmark  \tCtrl+A", const wxString dictionary = "", const wxString cloudName = "New landmark cloud", ADD_LM_LINK_TYPE linkType=LM_NO_LINK);
 	~albaOpAddLandmark();
 
 	virtual void OnEvent(albaEventBase *alba_event);
@@ -189,6 +196,7 @@ protected:
 	albaString m_RemoveMessage;
 	albaString m_DictMessage;
 	albaString m_Dictionary;
+	ADD_LM_LINK_TYPE m_LinkType;
 
 	albaInteractorPERPicker	*m_LandmarkPicker;
 

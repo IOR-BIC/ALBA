@@ -32,17 +32,14 @@
 #define BUTT_H 20
 #define BUTT_W 5 // min size of mid button
 
-#define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
-
 //----------------------------------------------------------------------------
 // albaGUILutButt 
-//----------------------------------------------------------------------------
 class albaGUILutButt : public wxButton
 {
 public:
   albaGUILutButt() { };
 
-  albaGUILutButt(wxWindow *parent, wxWindowID id,
+	albaGUILutButt(wxWindow *parent, wxWindowID id,
         const wxString& label,
         const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize,
@@ -50,97 +47,94 @@ public:
   {
     Create(parent, id, label, pos, size, style);
     m_X0 = 0;
-    m_EnableIgnoreLeftDown = false;
   };
 
 protected:  
   void OnMouse(wxMouseEvent &event);
-  void OnSetFocus(wxFocusEvent& event) {}; 
+	void OnMouseCaptureLost(wxMouseCaptureLostEvent& WXUNUSED(evt));
+	//  void OnSetFocus(wxFocusEvent& event) {}; 
   int m_X0;
-  bool m_EnableIgnoreLeftDown;
 
 DECLARE_EVENT_TABLE()
 };
 
 //----------------------------------------------------------------------------
 // albaGUILutButt EVENT_TABLE
-//----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(albaGUILutButt,wxButton)
-	//EVT_MOUSE_EVENTS(albaGUILutButt::OnMouse)
   EVT_LEFT_DOWN(albaGUILutButt::OnMouse)
   EVT_LEFT_UP(albaGUILutButt::OnMouse)
   EVT_RIGHT_DOWN(albaGUILutButt::OnMouse)
   EVT_MOTION(albaGUILutButt::OnMouse)
-  EVT_SET_FOCUS(albaGUILutButt::OnSetFocus) 
+	EVT_MOUSE_CAPTURE_LOST(albaGUILutButt::OnMouseCaptureLost)
   EVT_LEFT_DCLICK(albaGUILutButt::OnMouse)
 END_EVENT_TABLE()
 //----------------------------------------------------------------------------
 void albaGUILutButt::OnMouse(wxMouseEvent &event)
-//----------------------------------------------------------------------------
 {
 	if(event.RightDown())
 	{
 		((albaGUILutSlider*)GetParent())->ShowEntry(GetId());
-		return;
 	}
-	if(event.LeftDown())
+	else if(event.LeftDown())
 	{
-    /*if( GetCapture() == this )
-      albaLogMessage("mouse already captured !! - strange");
-    else*/
-      CaptureMouse();
+    CaptureMouse();
     m_X0 = event.GetX();
-		return;
 	}
-	if(event.LeftUp())
+	else if(event.LeftUp())
 	{
 		if( GetCapture() == this )
     {
       ReleaseMouse();
       ((albaGUILutSlider*)GetParent())->ReleaseButton();
-      //albaLogMessage("mouse Released");
     }
-		return;
 	}
-  
-  if (event.ButtonDClick(wxMOUSE_BTN_LEFT))
+	else if (event.ButtonDClick(wxMOUSE_BTN_LEFT))
   {
-    //albaLogMessage("--DCLICK--");
-    ((albaGUILutSlider*)GetParent())->DoubleLeftButton(GetId());
     ReleaseMouse();
-    m_EnableIgnoreLeftDown = true;
     return;
   }
-
-  if(event.LeftIsDown()&& !m_EnableIgnoreLeftDown)
+	else if(event.LeftIsDown())
 	{
+		//workaround to avoid mouse events lost 
+		if (GetCapture() != this)
+			CaptureMouse();
+
 		int sx = event.GetX() - m_X0,sy = 0;
 		ClientToScreen(&sx,&sy);
 		GetParent()->ScreenToClient(&sx,&sy);
 		((albaGUILutSlider*)GetParent())->MoveButton(GetId(),sx);
+		SetFocus();
 	}
   else
   {
-    m_EnableIgnoreLeftDown = m_EnableIgnoreLeftDown ? false : true;
     if( GetCapture() == this )
     {
       //the mouse is captured and the button isn't pressed anymore -- so we lost a LeftMouseUp
       // >> force ReleaseMouse
       ReleaseMouse();
-      //albaLogMessage("mouse Released (forced)");
     }
   }
 }
 //----------------------------------------------------------------------------
-// albaGUILutSlider EVENT_TABLE
+void albaGUILutButt::OnMouseCaptureLost(wxMouseCaptureLostEvent& WXUNUSED(evt))
+{
+	wxMouseEvent evt = wxMouseEvent();
+	evt.SetEventType(wxEVT_LEFT_UP);
+	OnMouse(evt);
+}
+
 //----------------------------------------------------------------------------
+// albaGUILutSlider Class Begin
+
+
+//----------------------------------------------------------------------------
+// albaGUILutSlider EVENT_TABLE
 BEGIN_EVENT_TABLE(albaGUILutSlider,wxPanel)
   EVT_SIZE(albaGUILutSlider::OnSize)
 END_EVENT_TABLE()
 //----------------------------------------------------------------------------
 albaGUILutSlider::albaGUILutSlider(wxWindow *parent, wxWindowID id, const wxPoint& pos /* = wxDefaultPosition */, const wxSize& size /* = wxDefaultSize */, long style /* = 0 */, const char* middleButtonTitle /* = "windowing" */)
 :wxPanel(parent,id,pos,size, style )
-//----------------------------------------------------------------------------
 {
   m_Listener = NULL;
   m_MinValue = 0;
@@ -162,21 +156,10 @@ albaGUILutSlider::albaGUILutSlider(wxWindow *parent, wxWindowID id, const wxPoin
 }
 //----------------------------------------------------------------------------
 albaGUILutSlider::~albaGUILutSlider()
-//----------------------------------------------------------------------------
 {
-}
-//----------------------------------------------------------------------------
-void albaGUILutSlider::DoubleLeftButton(int id)
-//----------------------------------------------------------------------------
-{
-  albaEvent event;
-  event = albaEvent(this,ID_MOUSE_D_CLICK_LEFT);
-  event.SetArg(id);
-  albaEventMacro(event);
 }
 //----------------------------------------------------------------------------
 void albaGUILutSlider::MoveButton(int id, int pos)
-//----------------------------------------------------------------------------
 {
 	int x1=0,y1=0,w1=0,h1=0;
   int x2=0,y2=0,w2=0,h2=0;
@@ -257,6 +240,9 @@ void albaGUILutSlider::MoveButton(int id, int pos)
 		}
 		break;
   }
+
+	albaYield();
+
   albaEvent event;
   event = albaEvent(this,ID_RANGE_MODIFIED,(wxObject *)this);
   event.SetArg(ID_MOUSE_MOVE);
@@ -264,7 +250,6 @@ void albaGUILutSlider::MoveButton(int id, int pos)
 }
 //----------------------------------------------------------------------------
 void albaGUILutSlider::ReleaseButton()
-//----------------------------------------------------------------------------
 {
   albaEvent event;
   event = albaEvent(this,ID_RANGE_MODIFIED,(wxObject *)this);
@@ -273,7 +258,6 @@ void albaGUILutSlider::ReleaseButton()
 }
 //----------------------------------------------------------------------------
 void albaGUILutSlider::SetText(long i, wxString text)
-//----------------------------------------------------------------------------
 {
 	switch(i)
 	{
@@ -290,7 +274,6 @@ void albaGUILutSlider::SetText(long i, wxString text)
 }
 //----------------------------------------------------------------------------
 void albaGUILutSlider::SetColour(long i, wxColour colour)
-//----------------------------------------------------------------------------
 {
 	switch(i)
 	{
@@ -307,7 +290,6 @@ void albaGUILutSlider::SetColour(long i, wxColour colour)
 }
 //----------------------------------------------------------------------------
 void albaGUILutSlider::SetRange(double rmin, double rmax )
-//----------------------------------------------------------------------------
 {
   m_MinValue = rmin;
   m_MaxValue = rmax;
@@ -320,7 +302,6 @@ void albaGUILutSlider::SetRange(double rmin, double rmax )
 }
 //----------------------------------------------------------------------------
 void albaGUILutSlider::SetSubRange(double  low, double  hi )
-//----------------------------------------------------------------------------
 {
   
   m_LowValue = low;
@@ -342,7 +323,6 @@ void albaGUILutSlider::SetSubRange(double  low, double  hi )
 }
 //----------------------------------------------------------------------------
 void albaGUILutSlider::UpdateButtons()
-//----------------------------------------------------------------------------
 {
 	int w=0,h=0;
   GetSize(&w,&h); w -=6;
@@ -365,13 +345,11 @@ void albaGUILutSlider::UpdateButtons()
 }
 //----------------------------------------------------------------------------
 void albaGUILutSlider::OnSize(wxSizeEvent &event)
-//----------------------------------------------------------------------------
 {
   UpdateButtons();
 }
 //----------------------------------------------------------------------------
 void albaGUILutSlider::ShowEntry(int id)
-//----------------------------------------------------------------------------
 {
   wxString s;
   wxString msg;
@@ -413,49 +391,33 @@ void albaGUILutSlider::ShowEntry(int id)
 		break;
 	}
 }
-
 //----------------------------------------------------------------------------
 void albaGUILutSlider::SetFixedTextMinButton(const char* label)
-//----------------------------------------------------------------------------
 {
-  if(NULL != m_MinButton)
-  {
+  if(m_MinButton)
     m_MinButton->SetLabel(label);
-  }
 }
 //----------------------------------------------------------------------------
 void albaGUILutSlider::SetFixedTextMaxButton(const char* label)
-//----------------------------------------------------------------------------
 {
-  if(NULL != m_MaxButton)
-  {
+  if(m_MaxButton)
     m_MaxButton->SetLabel(label);
-  }
 }
 //----------------------------------------------------------------------------
 void albaGUILutSlider::EnableMiddleButton(bool enable)
-//----------------------------------------------------------------------------
 {
-  if(NULL != m_MiddleButton)
-  {
+  if(m_MiddleButton)
     m_MiddleButton->Enable(enable);
-  }
 }
 //----------------------------------------------------------------------------
 void albaGUILutSlider::EnableMaxButton(bool enable)
-//----------------------------------------------------------------------------
 {
-  if(NULL != m_MaxButton)
-  {
+  if(m_MaxButton)
     m_MaxButton->Enable(enable);
-  }
 }
 //----------------------------------------------------------------------------
 void albaGUILutSlider::EnableMinButton(bool enable)
-//----------------------------------------------------------------------------
 {
-  if(NULL != m_MinButton)
-  {
+  if(m_MinButton)
     m_MinButton->Enable(enable);
-  }
 }

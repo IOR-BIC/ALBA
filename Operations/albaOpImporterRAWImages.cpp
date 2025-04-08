@@ -347,7 +347,7 @@ void albaOpImporterRAWImages::CreateGui()
     m_Dialog->SetSize(x_init+10,y_init+10,w,h);
 
     //m_Dialog->SetSizer(h_sizer);    
-    //m_Dialog->SetAutoLayout(TRUE);	
+    //m_Dialog->SetAutoLayout(true);	
     //h_sizer->Fit(m_Dialog);	
 
     //show the dialog (show return when the user choose ok or cancel ) ++++++++

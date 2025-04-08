@@ -218,7 +218,7 @@ void albaGUICheckListBox::OnCheck(wxCommandEvent &event)
 	{
     //for(int i=0; i<m_CheckListBox->Number(); i++)
 	  for(int i=0; i<m_CheckListBox->GetCount(); i++)
-	    m_CheckListBox->Check(i,FALSE);
+	    m_CheckListBox->Check(i,false);
 		m_CheckListBox->Check(index);
 	}
 

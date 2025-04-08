@@ -130,7 +130,7 @@ albaViewGlobalSlice::albaViewGlobalSlice(wxString label, int camera_position, bo
 	m_BoundsOutlineActor.clear();
 	m_BoundsOutlineMapper.clear();
 
-  m_TrilinearInterpolationOn = TRUE;
+  m_TrilinearInterpolationOn = true;
 
 }
 //----------------------------------------------------------------------------
@@ -297,8 +297,6 @@ void albaViewGlobalSlice::VmeSelect(albaVME *vme,bool select)
       {
         m_Opacity = volSlicePipe->GetSliceOpacity();
         m_Gui->Enable(ID_OPACITY_SLIDER,true);
-        (volSlicePipe)->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
-        m_Gui->Enable(ID_TRILINEAR_INTERPOLATION_ON,true);
       }
       m_Gui->Update();
     }
@@ -341,7 +339,7 @@ void albaViewGlobalSlice::VmeCreatePipe(albaVME *vme)
 	
 	vtkTransform *transform;
 	vtkNEW(transform);
-	transform->SetMatrix(vme->GetOutput()->GetMatrix()->GetVTKMatrix());
+	transform->SetMatrix(vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 	transform->Inverse();
 	transform->Update();
 	new_point=transform->TransformDoublePoint(m_SliceOrigin);
@@ -480,12 +478,7 @@ void albaViewGlobalSlice::OnEvent(albaEventBase *alba_event)
       break;
       case ID_TRILINEAR_INTERPOLATION_ON:
       {
-        albaPipeVolumeArbSlice* pipe = (albaPipeVolumeArbSlice *)m_SelectedVolume->GetPipe();
-        if (pipe)
-        {
-          pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
-					GetLogicManager()->CameraUpdate();
-        }
+				UpdateSlice();
       }
 			break;
 			case ID_POS_SLIDER:
@@ -646,7 +639,7 @@ void albaViewGlobalSlice::UpdateSlice()
 			vtkTransform *transform;
 			vtkNEW(transform);
 			transform->Identity();
-			transform->SetMatrix(vme->GetOutput()->GetMatrix()->GetVTKMatrix());
+			transform->SetMatrix(vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 			transform->Inverse();
 			transform->Update();
 			new_point=transform->TransformDoublePoint(m_SliceOrigin);
