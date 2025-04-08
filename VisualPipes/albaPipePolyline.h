@@ -144,6 +144,7 @@ public:
 		ID_SHOW_SPHERES,
 		ID_SPLINE,
 		ID_SPLINE_PARAMETERS,
+		ID_CREATE_VME,
 		ID_LAST
 	};
 
@@ -188,5 +189,7 @@ protected:
 	virtual albaGUI  *CreateGui();
 
 	void EnableDisableGui();
+private:
+	void CreateVMEFromVisualization();
 };
 #endif // __albaPipePolyline_H__
