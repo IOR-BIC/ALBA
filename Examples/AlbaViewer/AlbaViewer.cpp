@@ -98,7 +98,7 @@ bool AlbaViewer::OnInit()
 #endif
 
 	// m_Logic->Plug and Enable Snapshot Manager
-	m_Logic->m_Logic->PlugSnapshotManager(true);
+	m_Logic->PlugSnapshotManager(true);
 
 	m_Logic->Configure();
 
@@ -107,7 +107,7 @@ bool AlbaViewer::OnInit()
 	//////////////////////////////////////////////////////////////////////////
 	//Views
 
-	m_Logic->m_Logic->PlugStandardViews();
+	m_Logic->PlugStandardViews();
 
 
 	m_Logic->Plug(new albaOpImporterImage("Images"));
