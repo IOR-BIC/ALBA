@@ -84,7 +84,6 @@ void albaTest::setUp()
 
 	//NOTE, wxLog produces some memory leaks, set false during test
 	wxLog::EnableLogging(true);
-	vtkTimerLog::AllocateLog();
 	
 
 	//Resets Random Color for test repeatability

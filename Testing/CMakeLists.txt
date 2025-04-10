@@ -26,7 +26,7 @@ SET(PROJECT_SRCS
 	)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS ${wxWidgets_LIBRARIES} )
+SET(PROJECT_LIBS ${wxWidgets_LIBRARIES} ${VTK_LIBRARIES})
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})

@@ -1,7 +1,5 @@
 PROJECT (vtkALBATests)
 
-find_package(VTK 7.1 REQUIRED NO_MODULE)
-include(${VTK_USE_FILE})
 
 IF(ALBA_BUILD_ALBADLL)
   SET(PROJECT_LIBS albaDLL vtkALBA albaTests)

@@ -35,6 +35,8 @@
 #include "vtkCellArray.h"
 #include "vtkPolyData.h"
 #include "vtkMath.h"
+#include "vtkCellArrayIterator.h"
+#include "vtkSmartPointer.h"
 
 #include <iostream>
 
@@ -110,12 +112,18 @@ void albaVMEPolylineSplineTest::TestSetData()
   polylineSpline->OrderPolyline(in_data);
   vtkCellArray *cellArray = in_data->GetLines();
   int num;
-  vtkIdType *id;
-  vtkIdType ntps;
-  for(int i=0 ; i<cellArray->GetNumberOfCells(); i++)
+  vtkSmartPointer<vtkCellArrayIterator> it = vtk::TakeSmartPointer(cellArray->NewIterator());
+
+  for (it->GoToFirstCell(); !it->IsDoneWithTraversal(); it->GoToNextCell())
   {
-    num = cellArray->GetNextCell(ntps,id);
-    printf("\t%d", (*id));
+    vtkIdType npts;
+    const vtkIdType* pts = nullptr;
+
+    it->GetCurrentCell(npts, pts);
+
+    if (npts > 0) {
+      printf("\t%lld\n", static_cast<long long>(pts[0]));  // stampo il primo punto della cella
+    }
   }
   
   // spline test

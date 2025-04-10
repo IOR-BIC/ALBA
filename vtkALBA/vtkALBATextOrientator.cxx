@@ -122,7 +122,6 @@ int vtkALBATextOrientator::RenderOpaqueGeometry(vtkViewport *viewport)
 	vtkRenderer *ren = static_cast<vtkRenderer *>(viewport);
 
 	OrientatorUpdate(ren);
-	this->Modified();
 
   if(TextSourceLeftActor->GetVisibility())
     TextSourceLeftActor->RenderOpaqueGeometry(viewport);
