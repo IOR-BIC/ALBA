@@ -687,6 +687,8 @@ int albaOpClipSurface::Clip()
 		}
 	}
 
+	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, m_Clipper));
+
 	m_Clipper->SetGenerateClipScalars(0); // 0 outputs input data scalars, 1 outputs implicit function values
 	m_Clipper->SetInsideOut(m_ClipInside);  // use 0/1 to reverse sense of clipping
 	m_Clipper->SetValue(0);               // use this to control clip distance from clipper function to surface
