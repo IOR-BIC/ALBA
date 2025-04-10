@@ -78,6 +78,7 @@ albaVMEPolylineSpline::albaVMEPolylineSpline()
 	m_SplineCoefficient = 100;
   m_OrderByAxisMode   = AXIS_NONE;
 
+	m_ClosePolyline = false;
   //m_MinimumSpacing = 0.;
 }
 //-------------------------------------------------------------------------
@@ -213,6 +214,17 @@ void albaVMEPolylineSpline::InternalUpdate() //Multi
 			}
 		}
 
+		if (m_ClosePolyline)
+		{
+			double point[3], rot[3];
+			vmeLC->GetChild(0)->GetOutput()->GetPose(point, rot);
+			in_points->InsertNextPoint(point);
+
+				pointId[0] = vmeLC->GetNumberOfChildren() - 1;
+				pointId[1] = 0;
+				in_cells->InsertNextCell(2, pointId);
+		}
+
 		in_points->Modified();
 
 		poly->SetPoints(in_points);
@@ -242,15 +254,13 @@ void albaVMEPolylineSpline::InternalPreUpdate()
 //-----------------------------------------------------------------------
 int albaVMEPolylineSpline::InternalStore(albaStorageElement *parent)
 {  
-  if (Superclass::InternalStore(parent)==ALBA_OK)
-  {
+	if (Superclass::InternalStore(parent) == ALBA_OK)
+	{
 		if (parent->StoreMatrix("Transform", &m_Transform->GetMatrix()) == ALBA_OK &&
-			parent->StoreInteger("AxisReorder", m_OrderByAxisMode) == ALBA_OK)
-		{
-			GetLogicManager()->CameraUpdate();
+			parent->StoreInteger("AxisReorder", m_OrderByAxisMode) == ALBA_OK &&
+			parent->StoreInteger("ClosePolyline", m_ClosePolyline) == ALBA_OK)
 			return ALBA_OK;
-		}
-  }
+	}
   return ALBA_ERROR;
 }
 //-----------------------------------------------------------------------
@@ -261,7 +271,8 @@ int albaVMEPolylineSpline::InternalRestore(albaStorageElement *node)
     albaMatrix matrix;
     if (node->RestoreMatrix("Transform",&matrix)==ALBA_OK)
     {
-      node->RestoreInteger("AxisReorder",m_OrderByAxisMode);
+			node->RestoreInteger("AxisReorder", m_OrderByAxisMode);
+			node->RestoreInteger("ClosePolyline", m_ClosePolyline);
       m_Transform->SetMatrix(matrix);
 			GetLogicManager()->CameraUpdate();
       return ALBA_OK;
@@ -314,7 +325,7 @@ albaGUI* albaVMEPolylineSpline::CreateGui()
 	albaVME *polyline_vme = GetPolylineLink();
   m_PolylineLinkName = polyline_vme ? polyline_vme->GetName() : _("none");
   m_Gui->Button(ID_LINK_POLYLINE,&m_PolylineLinkName,_("Polyline / Landmark Cloud"), _("Select the Polyline or Landmark Cloud to create the Spline"));
-
+	m_Gui->Bool(ID_CLOSE_POLYLINE, "Close Polyline", &m_ClosePolyline, 1);
 	m_Gui->Update();
 	//this->InternalUpdate();
 
@@ -349,6 +360,7 @@ void albaVMEPolylineSpline::OnEvent(albaEventBase *alba_event)
         }
       }
       break;
+			case ID_CLOSE_POLYLINE:
 			case ID_NUMBER_NODES:
 				{
 					InternalUpdate();

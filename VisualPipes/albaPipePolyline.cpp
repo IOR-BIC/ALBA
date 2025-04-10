@@ -66,6 +66,7 @@
 #include "vtkTextProperty.h"
 #include "vtkSplineFilter.h"
 #include "vtkPolyDataMapper.h"
+#include "albaVMESurface.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipePolyline);
@@ -267,7 +268,10 @@ albaGUI *albaPipePolyline::CreateGui()
 	m_Gui->Divider();
   m_MaterialButton = new albaGUIMaterialButton(m_Vme,this);
   m_Gui->AddGui(m_MaterialButton->GetGui());
-  m_Gui->Divider();
+  m_Gui->Divider(1);
+
+	m_Gui->Button(ID_CREATE_VME, "Exoport to VME");
+	m_Gui->Divider();
 
 	CreateScalarsGui(m_Gui);
 
@@ -289,6 +293,21 @@ void albaPipePolyline::EnableDisableGui()
 		m_Gui->Enable(ID_SPHERE_RESOLUTION, m_ShowSpheres || m_Representation == SPHERES);
 		m_Gui->Enable(ID_SPLINE_PARAMETERS, m_SplineMode);
 	}
+}
+
+//----------------------------------------------------------------------------
+void albaPipePolyline::CreateVMEFromVisualization()
+{
+	albaVMESurface *surface;
+	albaString name = m_Vme->GetName();
+	name += " Visualization";
+
+	albaNEW(surface);
+	surface->SetData(m_AppendPolyData->GetOutput(), 0.0);
+	surface->GetMaterial()->DeepCopy(m_ObjectMaterial);
+	surface->SetName(name.GetCStr());
+	surface->ReparentTo(m_Vme);
+	albaDEL(surface);
 }
 
 //----------------------------------------------------------------------------
@@ -373,6 +392,11 @@ void albaPipePolyline::OnEvent(albaEventBase *alba_event)
 			m_SplineFilter->Update();
 			UpdateProperty();
 			GetLogicManager()->CameraUpdate();
+		}
+		break;
+		case ID_CREATE_VME:
+		{
+			CreateVMEFromVisualization();
 		}
 		break;
 		default:

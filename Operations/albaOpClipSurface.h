@@ -125,6 +125,9 @@ protected:
 	void ChangeGizmo();
 
 	void OnEventThis(albaEventBase *alba_event);
+
+	void ChooseSurface();
+
 	void OnEventGizmoTranslate(albaEventBase *alba_event);
 	void OnEventGizmoRotate(albaEventBase *alba_event);
 	void OnEventGizmoScale(albaEventBase *alba_event);
