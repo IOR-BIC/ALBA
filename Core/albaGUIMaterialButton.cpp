@@ -31,6 +31,7 @@
 #include "albaGUIPicButton.h"
 
 #include "albaVME.h"
+#include "vtkProperty.h"
 
 //#include "albaMemDbg.h"
 
@@ -39,7 +40,8 @@
 //----------------------------------------------------------------------------
 enum MATERIAL_BUTTON_WIDGET_ID
 {
-  ID_MATERIAL = MINID
+	ID_MATERIAL = MINID,
+	ID_OPACITY
 };
 
 //----------------------------------------------------------------------------
@@ -86,7 +88,7 @@ void albaGUIMaterialButton::CreateGui()
 	m_Gui = new albaGUI(this);
 	m_Gui->Show(true);
 
-  wxStaticText *lab = new wxStaticText(m_Gui, -1, "Material", wxDefaultPosition, wxSize(60,16), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+	wxStaticText *lab = new wxStaticText(m_Gui, -1, "Material", wxDefaultPosition, wxSize(60, 16), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
   
   m_Material->MakeIcon();
   m_MaterialButton = new albaGUIPicButton(m_Gui, m_Material->m_Icon, ID_MATERIAL, this);
@@ -101,7 +103,9 @@ void albaGUIMaterialButton::CreateGui()
   sizer->Add( m_MaterialLabel,  0, wxALIGN_CENTRE|wxLEFT, 5  );
 
   m_Gui->Add(sizer,0,wxLEFT, 5);
+	m_Gui->FloatSlider(ID_OPACITY, "Opacity:", &m_Material->m_Opacity, 0, 1);
 	m_Gui->Divider();
+
 	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
@@ -118,6 +122,10 @@ void albaGUIMaterialButton::OnEvent(albaEventBase *alba_event)
         UpdateMaterialIcon();
 				GetLogicManager()->CameraUpdate();
       break;
+			case ID_OPACITY:
+				m_Material->m_Prop->SetOpacity(m_Material->m_Opacity);
+				UpdateMaterialIcon();
+				GetLogicManager()->CameraUpdate();
       default:
         e->Log();
     }
@@ -140,5 +148,6 @@ void albaGUIMaterialButton::Enable(bool enable)
 //----------------------------------------------------------------------------
 {
   m_MaterialButton->Enable(enable);
+	m_Gui->Enable(ID_OPACITY, enable);
   m_Gui->Update();
 }
