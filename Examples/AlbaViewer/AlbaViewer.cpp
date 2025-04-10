@@ -80,9 +80,9 @@ IMPLEMENT_APP(AlbaViewer)
 bool AlbaViewer::OnInit()
 {
 	InitializeIcons();
-	
+
 	int result;
-  result = albaVMEFactory::Initialize();
+	result = albaVMEFactory::Initialize();
 	assert(result == ALBA_OK);
 
 	result = albaPipeFactoryVME::Initialize();
@@ -94,10 +94,10 @@ bool AlbaViewer::OnInit()
 	m_Logic->GetTopWin()->SetTitle("AlbaViewer");
 
 #ifdef USE_WIZARD
-	m_Logic->PlugWizardManager(true);
+	m_Logic->m_Logic->PlugWizardManager(true);
 #endif
 
-	// Plug and Enable Snapshot Manager
+	// m_Logic->Plug and Enable Snapshot Manager
 	m_Logic->PlugSnapshotManager(true);
 
 	m_Logic->Configure();
@@ -110,35 +110,35 @@ bool AlbaViewer::OnInit()
 	m_Logic->PlugStandardViews();
 
 
-		Plug(new albaOpImporterImage("Images"));
-		Plug(new albaOpImporterRAWVolume("RAW Volume"));
-		Plug(new albaOpImporterRAWImages("RAW Images"));
-		Plug(new albaOpImporterSTL("STL"));
-		Plug(new albaOpImporterPLY("PLY"));
-		Plug(new albaOpImporterVRML("VRML"));
-		Plug(new albaOpImporterVTK("VTK"));
-		Plug(new albaOpImporterVTKXML("VTK xml"));
-		Plug(new albaOpImporterMetaImage("ITK MetaImage"));
-		Plug(new albaOpImporterMSF("ALBA"));
-		Plug(new albaOpImporterMSF1x("MSF 1.x"));
-		Plug(new albaOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
-		Plug(new albaOpImporterAnsysInputFile("Ansys Input File"), "Finite Element");
-		Plug(new albaOpImporterAbaqusFile("Abaqus File"), "Finite Element");
-		Plug(new albaOpImporterMesh("Generic Mesh"), "Finite Element");
-		Plug(new albaOpImporterASCII("ASCII"));
+	m_Logic->Plug(new albaOpImporterImage("Images"));
+	m_Logic->Plug(new albaOpImporterRAWVolume("RAW Volume"));
+	m_Logic->Plug(new albaOpImporterRAWImages("RAW Images"));
+	m_Logic->Plug(new albaOpImporterSTL("STL"));
+	m_Logic->Plug(new albaOpImporterPLY("PLY"));
+	m_Logic->Plug(new albaOpImporterVRML("VRML"));
+	m_Logic->Plug(new albaOpImporterVTK("VTK"));
+	m_Logic->Plug(new albaOpImporterVTKXML("VTK xml"));
+	m_Logic->Plug(new albaOpImporterMetaImage("ITK MetaImage"));
+	m_Logic->Plug(new albaOpImporterMSF("ALBA"));
+	m_Logic->Plug(new albaOpImporterMSF1x("MSF 1.x"));
+	m_Logic->Plug(new albaOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
+	m_Logic->Plug(new albaOpImporterAnsysInputFile("Ansys Input File"), "Finite Element");
+	m_Logic->Plug(new albaOpImporterAbaqusFile("Abaqus File"), "Finite Element");
+	m_Logic->Plug(new albaOpImporterMesh("Generic Mesh"), "Finite Element");
+	m_Logic->Plug(new albaOpImporterASCII("ASCII"));
 
-	#ifdef ALBA_USE_GDCM
-		albaGUIDicomSettings *dicomSettings = new albaGUIDicomSettings(NULL, "DICOM");
-		Plug(new albaOpImporterDicom("DICOM"), "", true, dicomSettings);
-	#endif
-		Plug(new albaOpImporterLandmark("Landmark"), "Landmark Suite");
-		Plug(new albaOpImporterLandmarkTXT("Landmark TXT"), "Landmark Suite");
-		Plug(new albaOpImporterLandmarkWS("Landmark WS"), "Landmark Suite");
-		Plug(new albaOpImporterC3D("C3D"), "Landmark Suite");
-		Plug(new albaOpImporterAnalogWS("EMG"));
-		Plug(new albaOpImporterGRFWS("GRF"));
-		Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
-		Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
+#ifdef ALBA_USE_GDCM
+	albaGUIDicomSettings *dicomSettings = new albaGUIDicomSettings(NULL, "DICOM");
+	m_Logic->Plug(new albaOpImporterDicom("DICOM"), "", true, dicomSettings);
+#endif
+	m_Logic->Plug(new albaOpImporterLandmark("Landmark"), "Landmark Suite");
+	m_Logic->Plug(new albaOpImporterLandmarkTXT("Landmark TXT"), "Landmark Suite");
+	m_Logic->Plug(new albaOpImporterLandmarkWS("Landmark WS"), "Landmark Suite");
+	m_Logic->Plug(new albaOpImporterC3D("C3D"), "Landmark Suite");
+	m_Logic->Plug(new albaOpImporterAnalogWS("EMG"));
+	m_Logic->Plug(new albaOpImporterGRFWS("GRF"));
+	m_Logic->Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
+	m_Logic->Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
 
 
 	//////////////////////////////////////////////////////////////////////////
