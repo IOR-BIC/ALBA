@@ -130,6 +130,13 @@ void albaTagArray::SetTag(const char *name, const char *value,int type)
   m_Tags[name]=tmp;
 }
 
+//----------------------------------------------------------------------------
+void albaTagArray::SetTag(const char *name, double value)
+{
+	albaTagItem tmp(name, value);
+	m_Tags[name] = tmp;
+}
+
 //-------------------------------------------------------------------------
 void albaTagArray::DeleteTag(const char *name)
 //-------------------------------------------------------------------------
