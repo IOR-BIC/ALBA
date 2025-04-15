@@ -76,6 +76,12 @@ public:
     strings are copied and not referenced */
   void SetTag(const char *name, const char *value,int type=ALBA_MISSING_TAG);
 
+	/**
+	This function searches for an item with given name and if it doesn't exist
+	append a new one to the Array, setting the value to the given value. */
+	void SetTag(const char *name, double value);
+
+
   /** Remove an item from the array */
   void DeleteTag(const char *name);
   
