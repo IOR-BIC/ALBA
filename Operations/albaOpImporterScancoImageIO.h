@@ -188,12 +188,12 @@ public:
 	/** Sets FileName */
 	void SetFileName(albaString fileName) { m_FileName = fileName; }
 
+	/** Return true for the acceptable vme type. */
+	bool InternalAccept(albaVME*node) { return true; };
+
 protected:
 
 	int ImportFile();
-
-	/** Return true for the acceptable vme type. */
-	bool InternalAccept(albaVME*node) { return true; };
 
 	/** Check the file header to see what type of file it is.
 	 *
