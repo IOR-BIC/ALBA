@@ -195,9 +195,6 @@ protected:
 
 	int ImportFile();
 
-	/** Return true for the acceptable vme type. */
-	bool InternalAccept(albaVME*node) { return true; };
-
 	/** Check the file header to see what type of file it is.
 	 *
 	 *  Return values are: 0 if unrecognized, 1 if ISQ/RAD,

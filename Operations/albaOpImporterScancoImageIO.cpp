@@ -63,6 +63,7 @@ albaOpImporterScancoImageIO::albaOpImporterScancoImageIO(const wxString &label)
 	m_OpType = OPTYPE_IMPORTER;
 	m_Label = label;
 	m_Canundo = true;
+	m_EnableAccept = true;
 	m_HeaderInitialized = false;
 	m_HeaderSize = 0;
 	m_RawHeader = NULL;
