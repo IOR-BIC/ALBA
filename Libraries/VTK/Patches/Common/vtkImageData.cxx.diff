@@ -1,0 +1,8 @@
+1686,1688c1686,1688
+<     SetNumberOfTuples((this->Extent[1] - this->Extent[0] + 1)*
+<                       (this->Extent[3] - this->Extent[2] + 1)*
+<                       (this->Extent[5] - this->Extent[4] + 1));
+---
+>     SetNumberOfTuples((vtkIdType)(this->Extent[1] - this->Extent[0] + 1)*
+>                       (vtkIdType)(this->Extent[3] - this->Extent[2] + 1)*
+>                       (vtkIdType)(this->Extent[5] - this->Extent[4] + 1));
