@@ -83,7 +83,7 @@ void albaVMEPointCloudTest::TestSetData()
   // update the data... 
   data->Update();
   // ... otherwise this will fail!
-  CPPUNIT_ASSERT_EQUAL(25, data->GetNumberOfCells());
+  CPPUNIT_ASSERT_EQUAL(25, (int)data->GetNumberOfCells());
 
   // destroy vme
   albaDEL(vmePointCloud);
