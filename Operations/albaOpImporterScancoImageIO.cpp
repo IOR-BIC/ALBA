@@ -1135,7 +1135,7 @@ int albaOpImporterScancoImageIO::ImportFile()
 
 	vtkDataArray *scalars;
 
-	data->SetDimensions(m_Dims);
+	data->SetDimensions(m_Dims[0],m_Dims[1],m_Dims[2]);
 	data->SetOrigin(m_Origin);
 	data->SetSpacing(m_Spacing);
 
@@ -1234,7 +1234,7 @@ void albaOpImporterScancoImageIO::Read(void * buffer)
   if (shortread != 0)
   {
 		infile.close();
-    albaErrorMacro("File is truncated, " << shortread << " bytes are missing");
+    albaErrorMessageMacro("File is truncated, " << shortread << " bytes are missing");
 		return;
   }
 
