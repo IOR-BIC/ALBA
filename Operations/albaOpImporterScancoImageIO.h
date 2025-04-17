@@ -71,6 +71,7 @@ This file is an adaption to ALBA/VTK of https://github.com/KitwareMedical/ITKIOS
 
 #include <fstream>
 #include "albaOp.h"
+#include "vtkSystemIncludes.h"
 class albaTagArray;
 
 class albaOpImporterScancoImageIO : public albaOp
@@ -277,7 +278,7 @@ protected:
 
 	long  m_HeaderSize;
 
-	int m_Dims[3];
+	vtkIdType m_Dims[3];
 	double m_Spacing[3];
 	double m_Origin[3];
 	int m_ScalarsType;
