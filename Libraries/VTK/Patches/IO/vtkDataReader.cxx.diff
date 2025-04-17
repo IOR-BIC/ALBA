@@ -1,3 +1,9 @@
+353,354c353,354
+<                                 this->InputArray->GetNumberOfTuples()*
+<         this->InputArray->GetNumberOfComponents());
+---
+>                                 (int)this->InputArray->GetNumberOfTuples()*
+>        (int) this->InputArray->GetNumberOfComponents());
 377,378c377,378
 <     struct stat fs;
 <     if (stat(this->FileName, &fs) != 0) 
