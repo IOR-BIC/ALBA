@@ -1051,6 +1051,8 @@ int albaOpImporterScancoImageIO::ReadImageInformation()
   }
 
   this->PopulateMetaDataDictionary();
+
+	return ALBA_OK;
 }
 
 //----------------------------------------------------------------------------
