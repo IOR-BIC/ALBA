@@ -72,8 +72,19 @@ This file is an adaption to ALBA/VTK of https://github.com/KitwareMedical/ITKIOS
 #include <fstream>
 #include "albaOp.h"
 #include "vtkSystemIncludes.h"
+ 
+//----------------------------------------------------------------------------
+// forward declarations
 class albaTagArray;
+class albaProgressBarHelper;
 
+
+//----------------------------------------------------------------------------
+// albaOpImporterScancoImageIO :
+//----------------------------------------------------------------------------
+/**
+Perform ScancoIO ISQ and AIM importer.
+*/
 class albaOpImporterScancoImageIO : public albaOp
 {
 public:
@@ -196,6 +207,8 @@ protected:
 
 	int ImportFile();
 
+	template <typename TBufferType> void RescaleToHU(TBufferType * buffer, size_t size, double slope, double intercept);
+
 	/** Check the file header to see what type of file it is.
 	 *
 	 *  Return values are: 0 if unrecognized, 1 if ISQ/RAD,
@@ -282,10 +295,10 @@ protected:
 	double m_Spacing[3];
 	double m_Origin[3];
 	int m_ScalarsType;
+	
 	albaTagArray *m_TagArray;
-
-
 	albaString m_FileName;
+	albaProgressBarHelper *m_PBHelper;
 };
 
 #endif // albaOpImporterScancoImageIO

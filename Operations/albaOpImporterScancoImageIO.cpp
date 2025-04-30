@@ -46,6 +46,7 @@ This file is an adaption to ALBA/VTK of https://github.com/KitwareMedical/ITKIOS
 =========================================================================*/
 
 #include "albaOpImporterScancoImageIO.h"
+#include "albaProgressBarHelper.h"
 #include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "albaTagArray.h"
@@ -1126,8 +1127,19 @@ size_t albaOpImporterScancoImageIO::GetScalarSize()
 //----------------------------------------------------------------------------
 int albaOpImporterScancoImageIO::ImportFile()
 {
+
+	m_PBHelper = new albaProgressBarHelper(this);
+
+
+	m_PBHelper->InitProgressBar("Reading File...");
+
 	if (ReadImageInformation() == ALBA_ERROR)
+	{
+		cppDEL(m_PBHelper);
 		return ALBA_ERROR;
+	}
+
+	m_PBHelper->UpdateProgressBar(10);
 
 	albaVMEVolumeGray *volume;
 	albaNEW(volume);
@@ -1159,15 +1171,17 @@ int albaOpImporterScancoImageIO::ImportFile()
 	vtkDEL(data);
 	albaDEL(volume);
 	albaDEL(m_TagArray);
-
+	cppDEL(m_PBHelper);
 	return ALBA_OK;
 }
 
 //----------------------------------------------------------------------------
-template <typename TBufferType> void RescaleToHU(TBufferType * buffer, size_t size, double slope, double intercept)
+template <typename TBufferType> void albaOpImporterScancoImageIO::RescaleToHU(TBufferType * buffer, size_t size, double slope, double intercept)
 {
+	m_PBHelper->SetBarText("Rescale scalars...");
   for (size_t i = 0; i < size; i++)
   {
+		m_PBHelper->UpdateProgressBar(60 + (40 * i / size));
     float bufferValue = static_cast<float>(buffer[i]);
     bufferValue = bufferValue * slope + intercept;
     buffer[i] = static_cast<TBufferType>(bufferValue);
@@ -1242,6 +1256,8 @@ void albaOpImporterScancoImageIO::Read(void * buffer)
 
   // Close the file
   infile.close();
+
+	m_PBHelper->UpdateProgressBar(60);
 
   auto * dataPtr = reinterpret_cast<unsigned char *>(buffer);
 
