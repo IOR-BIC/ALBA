@@ -173,14 +173,17 @@ protected:
 
   int                      m_PointCellArraySeparation;
   int                      m_ScalarIndex;
+	int											 m_OldScalarIndex;
   int                      m_NumberOfArrays;
   int                      m_ActiveScalarType;
+	int											 m_OldActiveScalarType;
 	int                      m_ScalarMapActive;  //Gui option to enable scalar maps generation to be active a volume must be selected
 	int                      m_DensisyMapActive;
 	int											 m_ShowScalarBar;
 	int											 m_ScalarBarLabNum;
 	int											 m_ScalarBarPos;
 	int											 m_MapsGenActive;  //True when the maps generation is active (not gui option)
+	int											 m_OldMapsGenActive;  //True when the maps generation is active (not gui option)
 
 	albaString							 m_DensVolName;
 
