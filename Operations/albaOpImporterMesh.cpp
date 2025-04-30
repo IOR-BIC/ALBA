@@ -117,7 +117,20 @@ int albaOpImporterMesh::Read()
   else if (returnValue == ALBA_OK)
   {
     albaNEW(m_ImportedVmeMesh);
-    m_ImportedVmeMesh->SetName("Imported Mesh");
+		albaString tmp, name;
+		name = m_NodesFileName.BaseName();
+		
+		tmp = wxString(name.GetCStr()).MakeUpper().ToAscii();
+		int extFirst, first;
+		extFirst = first = tmp.FindFirst(".");
+		first = MIN(first, tmp.FindFirst("NODES"));
+		first = MIN(first, tmp.FindFirst("_"));
+		if (first != 0)
+			name.Erase(first);
+		else
+			name.Erase(extFirst);
+
+    m_ImportedVmeMesh->SetName(name.GetCStr());
 	  m_ImportedVmeMesh->SetDataByDetaching(reader->GetOutput()->GetUnstructuredGridOutput()->GetVTKData(),0);
 
     albaTagItem tag_Nature;
