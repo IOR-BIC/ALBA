@@ -28,6 +28,8 @@
 #include "vtkIdType.h"
 #include "vtkIdList.h"
 #include "vtkMatrix4x4.h"
+#include <unordered_map>
+#include <unordered_set>
 
 #include <ostream>
 #include "albaDefines.h"
@@ -45,6 +47,7 @@ vtkCxxRevisionMacro(vtkALBAMeshCutter, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkALBAMeshCutter);
 //------------------------------------------------------------------------------
 #include "albaMemDbg.h"
+#include "vtkALBASmartPointer.h"
 
 //------------------------------------------------------------------------------
 // Constructor
@@ -113,9 +116,12 @@ void vtkALBAMeshCutter::Execute()
   {
     // Make a copy of the input data and build links
     // Can't just set a pointer because BuildLinks() would change the input.
-    UnstructGrid->Initialize() ;
-    UnstructGrid->DeepCopy(input) ;
-    UnstructGrid->BuildLinks() ;
+		UnstructGrid->Initialize() ;
+		//UnstructGrid->DeepCopy(input) ;
+		vtkUnstructuredGrid * cleanedMesh = RemoveUnusedPoints(input);
+    UnstructGrid->DeepCopy(cleanedMesh);
+		vtkDEL(cleanedMesh);
+    UnstructGrid->BuildLinks();
 
     //and now get points (so we can avoid calling slow GetPoint later)
     if (BReleasePointsCoords) {
@@ -164,7 +170,55 @@ void vtkALBAMeshCutter::Execute()
   CreateSlice() ;  
 }
 
+//------------------------------------------------------------------------------
+vtkUnstructuredGrid * vtkALBAMeshCutter::RemoveUnusedPoints(vtkUnstructuredGrid* input)
+{
+	// Set of used point IDs
+	std::unordered_set<int> usedPointIds;
 
+	// Step 1: collect used point IDs
+	for (vtkIdType i = 0; i < input->GetNumberOfCells(); ++i) {
+		vtkCell *cell = input->GetCell(i);
+		for (vtkIdType j = 0; j < cell->GetNumberOfPoints(); ++j) {
+			usedPointIds.insert(cell->GetPointId(j));
+		}
+	}
+
+	// Step 2: map old point IDs to new ones
+	std::unordered_map<vtkIdType, vtkIdType> oldToNewIdMap;
+	vtkALBASmartPointer<vtkPoints> newPoints;
+	for (vtkIdType oldId = 0, newId = 0; oldId < input->GetNumberOfPoints(); ++oldId) {
+		if (usedPointIds.count(oldId)) {
+			double p[3];
+			input->GetPoint(oldId, p);
+			newPoints->InsertNextPoint(p);
+			oldToNewIdMap[oldId] = newId++;
+		}
+	}
+
+	// Step 3: create new unstructured grid
+	vtkUnstructuredGrid *output;
+	vtkNEW(output);
+	output->SetPoints(newPoints);
+
+	for (vtkIdType i = 0; i < input->GetNumberOfCells(); ++i) {
+		vtkCell *cell = input->GetCell(i);
+		vtkALBASmartPointer<vtkIdList> ids;
+		for (vtkIdType j = 0; j < cell->GetNumberOfPoints(); ++j) {
+			ids->InsertNextId(oldToNewIdMap[cell->GetPointId(j)]);
+		}
+		output->InsertNextCell(cell->GetCellType(), ids);
+	}
+
+	// Optional: copy point data and cell data
+	output->GetPointData()->CopyAllocate(input->GetPointData());
+	for (const auto& pair : oldToNewIdMap) {
+		output->GetPointData()->CopyData(input->GetPointData(), pair.first, pair.second);
+	}
+	output->GetCellData()->ShallowCopy(input->GetCellData());
+
+	return output;
+}
 //------------------------------------------------------------------------------
 // Set cutting plane
 void vtkALBAMeshCutter::SetCutFunction(vtkPlane *P)
