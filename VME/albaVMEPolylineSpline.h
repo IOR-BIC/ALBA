@@ -113,6 +113,7 @@ public:
   {
     ID_LINK_POLYLINE = Superclass::ID_LAST,
 		ID_NUMBER_NODES,
+		ID_CLOSE_POLYLINE,
     ID_LAST
   };
 
@@ -158,7 +159,7 @@ protected:
 
 	albaString					m_PolylineLinkName;
   int               m_OrderByAxisMode;
-
+	int							m_ClosePolyline;
 
 private:
   albaVMEPolylineSpline(const albaVMEPolylineSpline&); // Not implemented

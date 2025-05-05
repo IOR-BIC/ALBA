@@ -127,6 +127,7 @@
 #include "albaOpImporterAbaqusFile.h"
 #include "albaOpImporterDicFile.h"
 #include "albaOpImporterPointCloud.h"
+#include "albaOpImporterScancoImageIO.h"
 
 //EXPORTERS
 #include "albaOpExporterAnsysCDBFile.h"
@@ -2010,6 +2011,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpImporterGRFWS("GRF"));
 	Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
 	Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
+	Plug(new albaOpImporterScancoImageIO("Scanco IO"));
 
 	//------------------------------------------------------------
 	// Exporter Menu:

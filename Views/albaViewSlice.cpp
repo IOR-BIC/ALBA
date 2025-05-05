@@ -341,7 +341,7 @@ void albaViewSlice::VmeCreatePipe(albaVME *vme)
 					else if (meshPipe = albaPipeMeshSlice::SafeDownCast(pipe))
 					{
 						if  (m_CameraPositionId == CAMERA_OS_X)
-							meshPipe->SetFlipNormalOff();
+							meshPipe->SetFlipNormalOn();
 					}
           //common stuff
 					m_SlicingVector.push_back(n);
