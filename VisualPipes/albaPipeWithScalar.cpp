@@ -520,11 +520,13 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 		}
 	}
 
+	if (m_OldMapsGenActive != m_ScalarMapActive || m_OldActiveScalarType != m_OldActiveScalarType || m_OldScalarIndex != m_ScalarIndex)
+		UpdateVisualizationWithNewSelectedScalars();
+
 	m_OldMapsGenActive = m_ScalarMapActive;
 	m_OldActiveScalarType = m_OldActiveScalarType;
 	m_OldScalarIndex = m_ScalarIndex;
 
-  UpdateVisualizationWithNewSelectedScalars();  
 }
 //----------------------------------------------------------------------------
 void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
