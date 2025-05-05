@@ -174,25 +174,45 @@ void vtkALBAMeshCutter::Execute()
 vtkUnstructuredGrid * vtkALBAMeshCutter::RemoveUnusedPoints(vtkUnstructuredGrid* input)
 {
 	// Set of used point IDs
-	std::unordered_set<int> usedPointIds;
+	bool *usedPoints;
+
+	vtkIdType numberOfPoints = input->GetNumberOfPoints();
+	usedPoints = new bool[numberOfPoints];
+	memset(usedPoints, 0, sizeof(bool)*numberOfPoints);
+
+	vtkIdType numOfOutPoints = 0;
 
 	// Step 1: collect used point IDs
-	for (vtkIdType i = 0; i < input->GetNumberOfCells(); ++i) {
+	for (vtkIdType i = 0; i < input->GetNumberOfCells(); ++i)
+	{
 		vtkCell *cell = input->GetCell(i);
-		for (vtkIdType j = 0; j < cell->GetNumberOfPoints(); ++j) {
-			usedPointIds.insert(cell->GetPointId(j));
+		for (vtkIdType j = 0; j < cell->GetNumberOfPoints(); ++j) 
+		{
+			vtkIdType pointId = cell->GetPointId(j);
+			
+			//add only one time for each point
+			if (!usedPoints[pointId])
+				numOfOutPoints++;
+			usedPoints[pointId]=true;
 		}
 	}
 
 	// Step 2: map old point IDs to new ones
-	std::unordered_map<vtkIdType, vtkIdType> oldToNewIdMap;
+	vtkIdType *oldToNewIdMap, *newToOldIdMap;
+	oldToNewIdMap = new vtkIdType[numberOfPoints];
+	newToOldIdMap = new vtkIdType[numOfOutPoints];
+
+
 	vtkALBASmartPointer<vtkPoints> newPoints;
-	for (vtkIdType oldId = 0, newId = 0; oldId < input->GetNumberOfPoints(); ++oldId) {
-		if (usedPointIds.count(oldId)) {
+	newPoints->Allocate(numOfOutPoints);
+	for (vtkIdType oldId = 0, newId = 0; oldId <numberOfPoints; ++oldId) {
+		if (usedPoints[oldId]) {
 			double p[3];
 			input->GetPoint(oldId, p);
 			newPoints->InsertNextPoint(p);
-			oldToNewIdMap[oldId] = newId++;
+			oldToNewIdMap[oldId] = newId;
+			newToOldIdMap[newId] = oldId;
+			newId++;
 		}
 	}
 
@@ -212,11 +232,14 @@ vtkUnstructuredGrid * vtkALBAMeshCutter::RemoveUnusedPoints(vtkUnstructuredGrid*
 
 	// Optional: copy point data and cell data
 	output->GetPointData()->CopyAllocate(input->GetPointData());
-	for (const auto& pair : oldToNewIdMap) {
-		output->GetPointData()->CopyData(input->GetPointData(), pair.first, pair.second);
+	for (int i = 0; i < numOfOutPoints; i++) {
+		output->GetPointData()->CopyData(input->GetPointData(), newToOldIdMap[i], i);
 	}
 	output->GetCellData()->ShallowCopy(input->GetCellData());
 
+	delete[] usedPoints;
+	delete[] oldToNewIdMap;
+	delete[] newToOldIdMap;
 	return output;
 }
 //------------------------------------------------------------------------------
@@ -568,123 +591,123 @@ void vtkALBAMeshCutter::FindPointsInPlane()
 
   //check if the plane cuts the bounding box
   double ptsInter[3];
-  if (GetIntersectionOfBoundsWithPlane(origin, normal, ptsInter))
-  {
-    //bounding box is intersected by the cutting plane and we have the coordinates of the
-    //intersection of one of bounding edges with the plane
-    //we can assume that at least one cell intersected by the plane will lie in the proximity of this point
+	if (GetIntersectionOfBoundsWithPlane(origin, normal, ptsInter))
+	{
+		//bounding box is intersected by the cutting plane and we have the coordinates of the
+		//intersection of one of bounding edges with the plane
+		//we can assume that at least one cell intersected by the plane will lie in the proximity of this point
 
-    //TODO: BES: 13.5.2009 - The following algorithm does not work correctly if the plane separates the
-    //input into several components. To fix it, we need to repeat GetFirstIntersectedCell as
-    //long as it returns >= 0 (and we need to mark cells that were processed) 
+		//TODO: BES: 13.5.2009 - The following algorithm does not work correctly if the plane separates the
+		//input into several components. To fix it, we need to repeat GetFirstIntersectedCell as
+		//long as it returns >= 0 (and we need to mark cells that were processed) 
 
-    //get the closest mesh point and find the first intersected cell searching from that point
-    vtkIdType ptsCellId = UnstructGrid->FindPoint(ptsInter);
-    vtkIdType cellId = GetFirstIntersectedCell(ptsCellId >= 0 ? ptsCellId : 0);            
-    if (cellId >= 0)
-    {        
-      //set cellId bit to 1 -> set cellId % sizeof(byte) bit of cellId / sizeof(byte) byte to 1
-      //as sizeof(byte) == 8, we can make the computation easier
-      cellStatus[cellId >> 3] |= 1 << (cellId & 0x7);
-      stckTocheck[SP++] = cellId;
+		//get the closest mesh point and find the first intersected cell searching from that point
+		vtkIdType ptsCellId = UnstructGrid->FindPoint(ptsInter);
+		vtkIdType cellId = GetFirstIntersectedCell(ptsCellId >= 0 ? ptsCellId : 0);
+		if (cellId >= 0)
+		{
+			//set cellId bit to 1 -> set cellId % sizeof(byte) bit of cellId / sizeof(byte) byte to 1
+			//as sizeof(byte) == 8, we can make the computation easier
+			cellStatus[cellId >> 3] |= 1 << (cellId & 0x7);
+			stckTocheck[SP++] = cellId;
 
-      while (SP != 0)
-      {
-        //get the cell to be checked and remove it from the stack
-        cellId = stckTocheck[--SP];      
-        bool found = false;
+			while (SP != 0)
+			{
+				//get the cell to be checked and remove it from the stack
+				cellId = stckTocheck[--SP];
+				bool found = false;
 
-        vtkCell* cell = UnstructGrid->GetCell(cellId);
-        int ne = cell->GetNumberOfEdges() ;
-        for (int j = 0; j < ne ; j++)
-        {
-          vtkCell* edgecell = cell->GetEdge(j) ;
-          vtkIdType id0 =  edgecell->GetPointId(0) ;
-          vtkIdType id1 =  edgecell->GetPointId(1) ;
+				vtkCell* cell = UnstructGrid->GetCell(cellId);
+				int ne = cell->GetNumberOfEdges();
+				for (int j = 0; j < ne; j++)
+				{
+					vtkCell* edgecell = cell->GetEdge(j);
+					vtkIdType id0 = edgecell->GetPointId(0);
+					vtkIdType id1 = edgecell->GetPointId(1);
 
-          // find if and where edge crosses plane
-          double coords[3], lambda ;
-          vtkIdType idout, idtemp ;
-          double lamtemp ;
-          int itype = GetIntersectionOfLineWithPlane(&PointsCoords[3*id0], 
-            &PointsCoords[3*id1], origin, normal, coords, &lambda);
+					// find if and where edge crosses plane
+					double coords[3], lambda;
+					vtkIdType idout, idtemp;
+					double lamtemp;
+					int itype = GetIntersectionOfLineWithPlane(&PointsCoords[3 * id0],
+						&PointsCoords[3 * id1], origin, normal, coords, &lambda);
 
-          if (itype != NO_INTERSECTION)
-          {
-            switch(itype){        
-        case INTERSECTS_LINE:
-          if (!GetOutputPointWhichCutsEdge(id0, id1, &idtemp, &lamtemp)){
-            // if edge has not been visited before, add point to the array and map it to the edge
-            idout = points->InsertNextPoint(coords) ;
+					if (itype != NO_INTERSECTION)
+					{
+						switch (itype) {
+							case INTERSECTS_LINE:
+								if (!GetOutputPointWhichCutsEdge(id0, id1, &idtemp, &lamtemp)) {
+									// if edge has not been visited before, add point to the array and map it to the edge
+									idout = points->InsertNextPoint(coords);
 
-            Edge edge = {id0, id1};
-            AddMapping(idout, edge, lambda) ;
-          }
-          found = true ;
-          break ;
-        case INTERSECTS_POINT0:
-          if (!GetOutputPointWhichCutsPoint(id0, &idtemp)){
-            // if input point has not been visited before, add point to the array and map it to the single point id0
-            idout = points->InsertNextPoint(coords) ;
-            AddMapping(idout, id0, 0.0) ;
-          }
-          found = true ;
-          break ;
-        case INTERSECTS_POINT1:
-          if (!GetOutputPointWhichCutsPoint(id1, &idtemp)){
-            // if input point has not been visited before, add point to the array and map it to the single point id1
-            idout = points->InsertNextPoint(coords) ;
-            AddMapping(idout, id1, 0.0) ;
-          }
-          found = true ;
-          break ;
-        case LINE_IN_PLANE:
-          // When the input edge {id0,id1} is exactly in the plane, we just list the endpoints as separate points,
-          // without noting that they are joined by an edge.  (Otherwise things get very complicated).
-          // This means that the edge only touches the plane at the endpoints.
-          // Here we add both the endpoints to the array and map them to the ends of the edge.
-          if (!GetOutputPointWhichCutsPoint(id0, &idtemp)){
-            idout = points->InsertNextPoint(&PointsCoords[3*id0]);              
-            AddMapping(idout, id0, 1.0) ;
-          }
-          if (!GetOutputPointWhichCutsPoint(id1, &idtemp)){
-            idout = points->InsertNextPoint(&PointsCoords[3*id1]) ;
-            AddMapping(idout, id1, 1.0) ;
-          }
-          found = true ;
-          break ;          
-            } //end switch
+									Edge edge = { id0, id1 };
+									AddMapping(idout, edge, lambda);
+								}
+								found = true;
+								break;
+							case INTERSECTS_POINT0:
+								if (!GetOutputPointWhichCutsPoint(id0, &idtemp)) {
+									// if input point has not been visited before, add point to the array and map it to the single point id0
+									idout = points->InsertNextPoint(coords);
+									AddMapping(idout, id0, 0.0);
+								}
+								found = true;
+								break;
+							case INTERSECTS_POINT1:
+								if (!GetOutputPointWhichCutsPoint(id1, &idtemp)) {
+									// if input point has not been visited before, add point to the array and map it to the single point id1
+									idout = points->InsertNextPoint(coords);
+									AddMapping(idout, id1, 0.0);
+								}
+								found = true;
+								break;
+							case LINE_IN_PLANE:
+								// When the input edge {id0,id1} is exactly in the plane, we just list the endpoints as separate points,
+								// without noting that they are joined by an edge.  (Otherwise things get very complicated).
+								// This means that the edge only touches the plane at the endpoints.
+								// Here we add both the endpoints to the array and map them to the ends of the edge.
+								if (!GetOutputPointWhichCutsPoint(id0, &idtemp)) {
+									idout = points->InsertNextPoint(&PointsCoords[3 * id0]);
+									AddMapping(idout, id0, 1.0);
+								}
+								if (!GetOutputPointWhichCutsPoint(id1, &idtemp)) {
+									idout = points->InsertNextPoint(&PointsCoords[3 * id1]);
+									AddMapping(idout, id1, 1.0);
+								}
+								found = true;
+								break;
+						} //end switch
 
-            //add also all adjacent cells sharing the current edge into the stack,
-            //these cells are also intersected        
-            edgesIdsPtr[0] = id0;
-            edgesIdsPtr[1] = id1;
+						//add also all adjacent cells sharing the current edge into the stack,
+						//these cells are also intersected        
+						edgesIdsPtr[0] = id0;
+						edgesIdsPtr[1] = id1;
 
-            UnstructGrid->GetCellNeighbors(cellId, edgeIds, cellsIds);
-            int nac = cellsIds->GetNumberOfIds();
-            vtkIdType* pCellIdsPtr = cellsIds->GetPointer(0);
+						UnstructGrid->GetCellNeighbors(cellId, edgeIds, cellsIds);
+						int nac = cellsIds->GetNumberOfIds();
+						vtkIdType* pCellIdsPtr = cellsIds->GetPointer(0);
             for (int k = 0; k < nac; k++)
-            {
-              //push all yet not processed cells into the stack
-              //checking the appropriate bit in the bit array (using masking trick)
-              vtkIdType acellId = pCellIdsPtr[k];
-              unsigned char mask = 1 << (acellId & 0x7);                        
-              if ((cellStatus[acellId >> 3] & mask) == 0)
-              {
-                cellStatus[acellId >> 3] |= mask;
-                stckTocheck[SP++] = acellId;              
-              }
-            } //end for
-          } //end if (itype != NO_INTERSECTION)
-        } //end for
+						{
+							//push all yet not processed cells into the stack
+							//checking the appropriate bit in the bit array (using masking trick)
+							vtkIdType acellId = pCellIdsPtr[k];
+							unsigned char mask = 1 << (acellId & 0x7);
+							if ((cellStatus[acellId >> 3] & mask) == 0)
+							{
+								cellStatus[acellId >> 3] |= mask;
+								stckTocheck[SP++] = acellId;
+							}
+						} //end for
+					} //end if (itype != NO_INTERSECTION)
+				} //end for
 
-        if (found){
-          // note that cell i has been intersected
-          IntersectedCells.push_back(cellId) ;
-        }
-      } //end while
-    }
-  }
+				if (found) {
+					// note that cell i has been intersected
+					IntersectedCells.push_back(cellId);
+				}
+			} //end while
+		}
+	}
 
   points->Squeeze();
   Polydata->SetPoints(points) ;
