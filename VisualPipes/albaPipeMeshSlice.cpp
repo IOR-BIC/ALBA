@@ -50,7 +50,6 @@ albaPipeMeshSlice::albaPipeMeshSlice()
 //----------------------------------------------------------------------------
 {
 	m_BorderElementsWiredActor = 1;
-	m_FlipNormals = true;
   m_Plane           = NULL;
   m_Cutter          = NULL;
 }

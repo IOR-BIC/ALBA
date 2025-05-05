@@ -984,7 +984,7 @@ bool vtkALBAMeshCutter::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList *p
   CalculatePolygonNormal(polygon, normply) ;
   double dotprod = normply[0]*CutTranformedNormal[0] + normply[1]*CutTranformedNormal[1] + normply[2]*CutTranformedNormal[2] ;
 
-  if (dotprod < 0.0)
+  if (dotprod > 0.0)
   {
     // polygon is winding the wrong way - need to reverse it
     vtkIdType* polyPtr = polygon->GetPointer(0);
