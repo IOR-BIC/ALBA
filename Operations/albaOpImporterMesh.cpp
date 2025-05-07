@@ -126,8 +126,8 @@ int albaOpImporterMesh::Read()
 		first = tmp.FindFirst(".");
 		if(tmp.FindFirst("NODES")>0)
 			first = MIN(first, tmp.FindFirst("NODES"));
-		if(tmp.FindFirst("_") >0)
-			first = MIN(first, tmp.FindFirst("_"));
+		if(tmp.FindFirst("_NODES") >0)
+			first = MIN(first, tmp.FindFirst("_NODES"));
 		
 		name.Erase(first);
 	
