@@ -892,9 +892,11 @@ void albaOpClipSurface::SetClippingModality(int mode)
   m_ClipModality = mode;
 }
 //----------------------------------------------------------------------------
-void albaOpClipSurface::SetClippingSurface(albaVMESurface *surface)
+void albaOpClipSurface::SetClippingSurface(albaVME *surface)
 //----------------------------------------------------------------------------
 {
+	if (!SurfaceAccept(surface))
+		return;
   m_ClipperVME = surface;
 }
 //----------------------------------------------------------------------------
