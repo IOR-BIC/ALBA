@@ -93,6 +93,55 @@ Deleting an item destroy all the sub-items,leaving the m_NodeTable inconsistent.
 To correctly implement the operation, DeleteNode must call itself recursively on the 
 item subtree, then Delete the item and remove the corresponding m_NodeTable entry. 
 */
+
+//----------------------------------------------------------------------------
+// albaGUITreeItemData :
+/// Data to be attached to an item of albaGUITree, holds the reference to a node_id 
+//----------------------------------------------------------------------------
+class albaGUITreeItemData : public wxTreeItemData {
+public:
+	albaGUITreeItemData(long long node_id, bool expanded) { m_NodeId = node_id; m_Expanded = expanded; };
+
+	/** Returns NodeId*/
+	long long GetNode() { return m_NodeId; };
+
+	/** Returns Expanded virtual node state, when a node has no child it result not expanded in any case,
+	but we need a status information also for those nodes*/
+	bool GetExpanded() const { return m_Expanded; }
+
+	/** Sets Expanded virtual node state, , when a node has no child it result not expanded in any case,
+	but we need a status information also for those nodes */
+	void SetExpanded(bool expanded) { m_Expanded = expanded; }
+
+protected:
+	long long m_NodeId;
+	bool m_Expanded;
+};
+
+
+class albaTreeCtrl : public wxTreeCtrl
+{
+public: 
+	albaTreeCtrl(wxWindow *parent, wxWindowID id = wxID_ANY,
+		const wxPoint& pos = wxDefaultPosition,
+		const wxSize& size = wxDefaultSize,
+		long style = wxTR_HAS_BUTTONS | wxTR_LINES_AT_ROOT,
+		const wxValidator& validator = wxDefaultValidator,
+		const wxString& name = wxASCII_STR(wxTreeCtrlNameStr));
+
+	virtual bool IsExpanded(const wxTreeItemId& item);
+
+	virtual bool MSWOnNotify(int idCtrl, WXLPARAM lParam, WXLPARAM *result);
+
+	wxTreeItemId AppendItem(const wxTreeItemId& parent, const wxString& text, int image = -1, int selImage = -1, wxTreeItemData *data = NULL);
+
+	virtual void Expand(const wxTreeItemId& item);
+	virtual void Collapse(const wxTreeItemId& item);
+	virtual void CollapseAndReset(const wxTreeItemId& item);
+	virtual void Toggle(const wxTreeItemId& item);
+};
+
+
 class ALBA_EXPORT albaGUITree: public albaGUINamedPanel, public albaServiceClient
 {
 public:
@@ -105,7 +154,7 @@ public:
 	/** Create a new tree item with the specified parent,label and icon. 
       Set parent = 0 to create the root. 0 is not a valid node_id.
   */
-	bool AddNode(long long node_id, long long parent_id , wxString label, int icon = 0);
+	bool AddNode(long long node_id, long long parent_id , wxString label, bool expanded, int icon = 0);
   
 	/** Delete the specified node, and its subtree. */
 	bool DeleteNode(long long node_id);
@@ -170,8 +219,7 @@ public:
 
   /** Return node id from node item. */
 	long long NodeFromItem(wxTreeItemId& item);
-  
-  
+  	
   void SetTreeStyle(long style) {m_NodeTree->SetWindowStyle(style);};
   long GetTreeStyle()           {return m_NodeTree->GetWindowStyle();};
 
@@ -199,22 +247,11 @@ protected:
   bool               m_PreventNotify;
   bool               m_Autosort;
 	long long          m_NodeRoot;
-  wxTreeCtrl        *m_NodeTree;         
+	albaTreeCtrl      *m_NodeTree;
   wxImageList       *m_NodeImages;       
   wxHashTable       *m_NodeTable;        
   albaObserver       *m_Listener;     
 
-	//----------------------------------------------------------------------------
-	// albaGUITreeItemData :
-	/// Data to be attached to an item of albaGUITree, holds the reference to a node_id 
-	//----------------------------------------------------------------------------
-	class albaGUITreeItemData: public wxTreeItemData{
-	public:
-			albaGUITreeItemData(long long node_id) {m_NodeId = node_id; };
-			long long GetNode()                {return m_NodeId;};
-	protected:
-			long long m_NodeId;
-	};
 	//----------------------------------------------------------------------------
 	// albaGUITreeTableElement:
 	/// specialized HashTable element used in albaGUITree to store a reference to a wxTreeItemId 

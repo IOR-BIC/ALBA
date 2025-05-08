@@ -129,7 +129,8 @@ void albaGUISettingsDialog::AddRoot()
   page->ui = new albaGUI(this);
   m_List.push_back(page);
 
-  m_Tree->AddNode((long long)page,0,page->label,0);
+	//Root should be expanded
+  m_Tree->AddNode((long long)page,0,page->label,true,0);
 }
 //----------------------------------------------------------------------------
 void albaGUISettingsDialog::AddPage(albaGUI *ui, wxString label, wxString parent_label)
@@ -146,7 +147,8 @@ void albaGUISettingsDialog::AddPage(albaGUI *ui, wxString label, wxString parent
   page->ui = ui;
   m_List.push_back(page);
   
-  m_Tree->AddNode((long long)page,(long long)parent,label,0);
+	//pages should be expanded
+  m_Tree->AddNode((long long)page,(long long)parent,label,true,0);
 }
 //----------------------------------------------------------------------------
 void albaGUISettingsDialog::RemovePage(wxString label)

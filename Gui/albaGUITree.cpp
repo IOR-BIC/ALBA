@@ -29,6 +29,7 @@
 #include "albaGUITree.h"
 #include "albaDecl.h"
 #include "albaPics.h"
+#include <commctrl.h>
 //----------------------------------------------------------------------------
 // EVENT_TABLE
 //----------------------------------------------------------------------------
@@ -38,6 +39,90 @@ BEGIN_EVENT_TABLE(albaGUITree,wxPanel)
     EVT_SIZE(albaGUITree::OnSize)
 END_EVENT_TABLE()
 
+//----------------------------------------------------------------------------
+albaTreeCtrl::albaTreeCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxValidator& validator, const wxString& name) : wxTreeCtrl(parent, id, pos, size, style, validator, name)
+{
+
+}
+
+
+//----------------------------------------------------------------------------
+bool albaTreeCtrl::MSWOnNotify(int idCtrl, WXLPARAM lParam, WXLPARAM *result)
+{
+	NMHDR *hdr = (NMHDR *)lParam;
+
+	switch (hdr->code)
+	{
+		case TVN_ITEMEXPANDED:
+		{
+			NM_TREEVIEW *tv = (NM_TREEVIEW*)lParam;
+
+			bool expanded = tv->action == TVE_EXPAND;
+			albaGUITreeItemData *nd = (albaGUITreeItemData*)GetItemData(tv->itemNew.hItem);
+			nd->SetExpanded(expanded);
+		}
+		break;
+	}
+	return wxTreeCtrl::MSWOnNotify(idCtrl, lParam, result);
+}
+
+//----------------------------------------------------------------------------
+bool albaTreeCtrl::IsExpanded(const wxTreeItemId& item)
+{
+	albaGUITreeItemData *nd = (albaGUITreeItemData*)GetItemData(item);
+
+	//expanded by default
+	if (nd == NULL) return true;
+
+	//return node virtual expanded status
+	return nd->GetExpanded();
+}
+
+//----------------------------------------------------------------------------
+wxTreeItemId albaTreeCtrl::AppendItem(const wxTreeItemId& parent, const wxString& text, int image, int selImage , wxTreeItemData *data)
+{
+	wxTreeItemId retItem;
+	retItem=wxTreeCtrl::AppendItem(parent, text, image, selImage, data);
+	if (IsExpanded(parent)&&!wxTreeCtrl::IsExpanded(parent))
+		Expand(parent);
+
+	return retItem;
+}
+
+//----------------------------------------------------------------------------
+void albaTreeCtrl::Expand(const wxTreeItemId& item)
+{
+	albaGUITreeItemData *nd = (albaGUITreeItemData*)GetItemData(item);
+	nd->SetExpanded(true);
+	wxTreeCtrl::Expand(item);
+}
+
+//----------------------------------------------------------------------------
+void albaTreeCtrl::Collapse(const wxTreeItemId& item)
+{
+	albaGUITreeItemData *nd = (albaGUITreeItemData*)GetItemData(item);
+	nd->SetExpanded(false);
+	wxTreeCtrl::Collapse(item);
+}
+
+//----------------------------------------------------------------------------
+void albaTreeCtrl::CollapseAndReset(const wxTreeItemId& item)
+{
+	albaGUITreeItemData *nd = (albaGUITreeItemData*)GetItemData(item);
+	nd->SetExpanded(false);
+	wxTreeCtrl::CollapseAndReset(item);
+}
+
+//----------------------------------------------------------------------------
+void albaTreeCtrl::Toggle(const wxTreeItemId& item)
+{
+	albaGUITreeItemData *nd = (albaGUITreeItemData*)GetItemData(item);
+	nd->SetExpanded(wxTreeCtrl::IsExpanded(item));
+	wxTreeCtrl::Expand(item);
+}
+
+//----------------------------------------------------------------------------
+//--------------------------------albaGUITree---------------------------------
 //----------------------------------------------------------------------------
 albaGUITree::albaGUITree( wxWindow* parent,wxWindowID id, bool CloseButton, bool HideTitle)
 :albaGUINamedPanel(parent,id,CloseButton,HideTitle)
@@ -49,7 +134,7 @@ albaGUITree::albaGUITree( wxWindow* parent,wxWindowID id, bool CloseButton, bool
   m_PreventNotify = false;
   m_Autosort	    = false;
 
-  m_NodeTree = new wxTreeCtrl(this,ID_TREE,wxDefaultPosition,wxSize(100,100),wxNO_BORDER | wxTR_HAS_BUTTONS );
+  m_NodeTree = new albaTreeCtrl(this,ID_TREE,wxDefaultPosition,wxSize(100,100),wxNO_BORDER | wxTR_HAS_BUTTONS );
   m_Sizer->Add(m_NodeTree,1,wxEXPAND);
 
   //default image list
@@ -90,7 +175,7 @@ void albaGUITree::Reset()
   m_NodeRoot  = 0;
 }
 //----------------------------------------------------------------------------
-bool albaGUITree::AddNode (long long node_id, long long parent_id , wxString label, int icon)
+bool albaGUITree::AddNode (long long node_id, long long parent_id , wxString label, bool expanded, int icon)
 //----------------------------------------------------------------------------
 {
 	/*
@@ -110,7 +195,7 @@ bool albaGUITree::AddNode (long long node_id, long long parent_id , wxString lab
 
 	if( parent_id == 0 && m_NodeRoot == 0 ) 
 	{
-		item = m_NodeTree->AddRoot(label, icon, icon, new albaGUITreeItemData(node_id));
+		item = m_NodeTree->AddRoot(label, icon, icon, new albaGUITreeItemData(node_id,expanded));
 		m_NodeRoot = node_id;
 	}
   else
@@ -118,14 +203,13 @@ bool albaGUITree::AddNode (long long node_id, long long parent_id , wxString lab
     if(!NodeExist(parent_id) ) return false;
     parent_item = ItemFromNode(parent_id);
     //insert normally
-    item = m_NodeTree->AppendItem(parent_item,label,icon,icon,new albaGUITreeItemData(node_id));
+    item = m_NodeTree->AppendItem(parent_item,label,icon,icon,new albaGUITreeItemData(node_id,expanded));
     // expand parent node
     if (m_Autosort)
     {
       m_NodeTree->SortChildren(parent_item);
     }
     m_NodeTree->SetItemHasChildren(parent_item,true);
-    m_NodeTree->Expand(parent_item);
   }
 
   //insert [node_id -> item] in the table
@@ -307,10 +391,11 @@ void albaGUITree::SetNodeParent2(long long node_id, long long parent_id )
 	*/
 
   wxTreeItemId item        = ItemFromNode(node_id);
+	bool				 expanded = IsNodeExpanded(node_id);
   wxTreeItemId parent_item = ItemFromNode(parent_id);
   int          icon        = m_NodeTree->GetItemImage(item);
   wxString     label       = m_NodeTree->GetItemText(item);
-  wxTreeItemId new_item    = m_NodeTree->AppendItem(parent_item,label,icon,icon,new albaGUITreeItemData(node_id));
+  wxTreeItemId new_item    = m_NodeTree->AppendItem(parent_item,label,icon,icon,new albaGUITreeItemData(node_id,expanded));
   bool         HasChildren = m_NodeTree->ItemHasChildren(item);
   bool         IsExpanded  = m_NodeTree->IsExpanded(item);
 
@@ -473,7 +558,7 @@ void albaGUITree::ExpandNode(long long node_id)
   wxTreeItemId  item;
   item = ItemFromNode(node_id);
   if(!item.IsOk()) return;
-  m_NodeTree->Expand(item);
+	m_NodeTree->Expand(item);
 }
 
 //----------------------------------------------------------------------------
@@ -482,7 +567,8 @@ bool albaGUITree::IsNodeExpanded(long long node_id)
 	if (!NodeExist(node_id)) return false;
 
 	wxTreeItemId item = ItemFromNode(node_id);
-	if (!item.IsOk()) return false;
+	//expanded by default
+	if (!item.IsOk()) return true;
 
 	bool isExpanded = m_NodeTree->IsExpanded(item);
 	return isExpanded;

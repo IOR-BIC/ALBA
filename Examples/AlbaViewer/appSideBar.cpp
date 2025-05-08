@@ -34,6 +34,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaPipe.h"
 #include "albaTransform.h"
 #include "albaVME.h"
+#include "albaTagArray.h"
 #include "albaVMEIterator.h"
 #include "albaVMEOutput.h"
 #include "albaVMERoot.h"
@@ -74,10 +75,7 @@ appSideBar::appSideBar(albaGUIMDIFrame* parent, int id, albaObserver *Listener)
   m_ViewPropertyPanel->SetTitle(_("No view selected:"));
 	m_VmeNotebook->AddPage(m_ViewPropertyPanel,_("View settings"));
 
-	//VME panel
-	//m_VmePanel = new albaGUIHolder(m_VmeNotebook, -1, false, true);
-	//m_VmeNotebook->AddPage(m_VmePanel, _("VME"));
-
+	
 	m_SideSplittedPanel->SetMinimumPaneSize(50);
 	m_SideSplittedPanel->SplitHorizontally(m_Tree, m_VmeNotebook);
 
@@ -100,11 +98,6 @@ appSideBar::~appSideBar()
 void appSideBar::OpShowGui(bool push_gui, albaGUIPanel *panel)
 {
 	m_Notebook->Show(true);
-// 	if(push_gui)
-// 	{
-// 		m_Notebook->SetSelection(2);
-// 		m_OpPanel->Push(panel);
-// 	}
 }
 //----------------------------------------------------------------------------
 void appSideBar::OpHideGui(bool view_closed)
@@ -117,7 +110,7 @@ void appSideBar::OpHideGui(bool view_closed)
 	}
 	else
 	{
-		//m_OpPanel->Pop();
+		
 		m_Notebook->SetSelection(0);
 	}
 }
@@ -144,8 +137,6 @@ void appSideBar::ViewSelect(albaView *view)
 	}
 
 	m_SelectedView = view;
-	//UpdateVmePanel();
-	//m_Notebook->SetSelection(1);
 }
 //----------------------------------------------------------------------------
 void appSideBar::ViewDeleted(albaView *view)
@@ -162,34 +153,47 @@ void appSideBar::EnableSelect(bool enable)
 void appSideBar::VmeAdd(albaVME *vme)
 {
 	m_Tree->VmeAdd(vme);
-	//UpdateVmePanel();
 }
 //----------------------------------------------------------------------------
 void appSideBar::VmeRemove(albaVME *vme)
 {
 	m_Tree->VmeRemove(vme);
-	//UpdateVmePanel();
 }
 //----------------------------------------------------------------------------
 void appSideBar::VmeModified(albaVME *vme)
 {
 	m_Tree->VmeModified(vme);
-	//UpdateVmePanel();
 }
 //----------------------------------------------------------------------------
 void appSideBar::VmeShow(albaVME *vme, bool visibility)
 {
 	m_Tree->VmeShow(vme, visibility);
-	//UpdateVmePanel();
 }
 //----------------------------------------------------------------------------
 void appSideBar::VmeSelected(albaVME *vme)
 {
    m_SelectedVme = vme;
-//   UpdateVmePanel();
 
 	m_Tree->VmeSelected(vme);
 	m_Tree->SetFocus();
+}
+
+//----------------------------------------------------------------------------
+bool appSideBar::IsVMEExpanded(albaVME *vme)
+{
+	return m_Tree->IsVMEExpanded(vme);
+}
+
+//----------------------------------------------------------------------------
+void appSideBar::CollapseVME(albaVME *vme)
+{
+	m_Tree->CollapseVME(vme);
+}
+
+//----------------------------------------------------------------------------
+void appSideBar::ExpandVME(albaVME *vme)
+{
+	m_Tree->ExpandVME(vme);
 }
 
 //----------------------------------------------------------------------------
