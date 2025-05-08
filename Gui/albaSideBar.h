@@ -56,58 +56,59 @@ public:
     DOUBLE_NOTEBOOK
   };
 
-  // Description:
-	// Add a new vme into the tree.
-	void VmeAdd(albaVME *vme);
+	/** Add a new vme into the tree. */
+	virtual void VmeAdd(albaVME *vme);
 
-	// Description:
-	// Remove a vme from the tree.
-	void VmeRemove(albaVME *vme);
+	/** Remove a vme from the tree. */
+	virtual void VmeRemove(albaVME *vme);
 
-	// Description:
-	// Notify to the tree that a vme is modified.
-	void VmeModified(albaVME *vme);
+	/** Notify to the tree that a vme is modified. */
+	virtual void VmeModified(albaVME *vme);
 
-	// Description:
-	// Notify to the tree the visibility of the vme.
-	void VmeShow(albaVME *vme, bool visibility);
+	/** Notify to the tree the visibility of the vme. */
+	virtual void VmeShow(albaVME *vme, bool visibility);
 
-	// Description:
-	// Notify to the tree that the vme has been selected.
-	void VmeSelected(albaVME *vme);
-		
-	// Description:
-	// Show the operation's parameters gui on the tabbed panel.
-	void OpShowGui(bool push_gui, albaGUIPanel *panel);
+	/** Notify to the tree that the vme has been selected. */
+	virtual void VmeSelected(albaVME *vme);
 
-	// Description:
-	// Hide the view/operation's gui from the tabbed panel.
-	void OpHideGui(bool view_closed);
+	/** Return True if the VME is Expanded on Tree */
+	virtual bool IsVMEExpanded(albaVME *vme);
 
-	// Description:
-	// Plug the view settings on the tabbed panel.
-	void ViewSelect(albaView *view);
+	/** Collapse the VME on the Tree */
+	virtual void CollapseVME(albaVME *vme);
 
-	// Description:
-	// Notify to the tree that a view has been deleted.
-	void ViewDeleted(albaView *view);
+	/** Expand the VME on the Tree  */
+	virtual void ExpandVME(albaVME *vme);
 
-	// Description:
-	// Enable/Disable the vme selection when an operation ends/start.
-	void EnableSelect(bool enable);
+	/** Show the operation's parameters gui on the tabbed panel. */
+	virtual void OpShowGui(bool push_gui, albaGUIPanel *panel);
 
-	// Description:
-	// Switch the visibility of the panel.
-	void Show();
+	/** Hide the view/operation's gui from the tabbed panel. */
+	virtual void OpHideGui(bool view_closed);
 
-	bool IsShown() {return m_Notebook->IsShown();};
-  void Show(bool show) {m_Notebook->Show(show);};
+	/** Plug the view settings on the tabbed panel. */
+	virtual void ViewSelect(albaView *view);
 
-	/** Respond to a VME_CHOOSE evt. Build a dialog containing the vme tree and return the vme choosed from the user. */
-	std::vector<albaVME*> VmeChoose(void *vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, albaString title = "Choose Node", bool multiSelect = false, albaVME *vme = NULL);
+	/** Notify to the tree that a view has been deleted. */
+	virtual void ViewDeleted(albaView *view);
 
-	/** Open a Find VME dialog.*/
-	void FindVME();
+	/** Enable/Disable the vme selection when an operation ends/start. */
+	virtual void EnableSelect(bool enable);
+
+	/** Switch the visibility of the panel. */
+	virtual void Show();
+
+	/** Return true if the panel is showed. */
+	virtual bool IsShown();
+
+	/** Sets the visibility of the panel. */
+	virtual void Show(bool show);
+
+	/** * Respond to a VME_CHOOSE evt. Build a dialog containing the vme tree and return the vme choosed from the user. */
+	virtual 	std::vector<albaVME*> VmeChoose(void *vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, albaString title = "Choose Node", bool multiSelect = false, albaVME *vme = NULL);
+
+	/** Open a Find VME dialog. */
+	virtual void FindVME();
 
 protected:
   void UpdateVmePanel();  

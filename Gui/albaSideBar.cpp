@@ -234,11 +234,42 @@ void albaSideBar::VmeSelected(albaVME *vme)
 }
 
 //----------------------------------------------------------------------------
+bool albaSideBar::IsVMEExpanded(albaVME *vme)
+{
+	return m_Tree->IsVMEExpanded(vme);
+}
+
+//----------------------------------------------------------------------------
+void albaSideBar::CollapseVME(albaVME *vme)
+{
+	m_Tree->CollapseVME(vme);
+}
+
+//----------------------------------------------------------------------------
+void albaSideBar::ExpandVME(albaVME *vme)
+{
+	m_Tree->ExpandVME(vme);
+}
+
+//----------------------------------------------------------------------------
 void albaSideBar::Show()
 //----------------------------------------------------------------------------
 {
 	m_Notebook->Show(!m_Notebook->IsShown());
 }
+
+//----------------------------------------------------------------------------
+void albaSideBar::Show(bool show)
+{
+	m_Notebook->Show(show);
+}
+
+//----------------------------------------------------------------------------
+bool albaSideBar::IsShown()
+{
+	return m_Notebook->IsShown();
+}
+
 //----------------------------------------------------------------------------
 void albaSideBar::UpdateVmePanel()
 //----------------------------------------------------------------------------

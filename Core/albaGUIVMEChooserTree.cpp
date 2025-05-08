@@ -254,20 +254,20 @@ void albaGUIVMEChooserTree::CloneSubTree(albaGUICheckTree *source_tree, wxTreeIt
   if (dest_parent_item == NULL)
   {
     m_NodeTree->DeleteAllItems();
-    current_item = m_NodeTree->AddRoot(text,image,image, new albaGUITreeItemData(node));
+    current_item = m_NodeTree->AddRoot(text,image,image, new albaGUITreeItemData(node, expanded));
   }
   else
   {
     if (m_ChooserTreeStyle == REPRESENTATION_AS_TREE)
     {
-      current_item = m_NodeTree->AppendItem(*dest_parent_item,text,image,image, new albaGUITreeItemData(node));
+      current_item = m_NodeTree->AppendItem(*dest_parent_item,text,image,image, new albaGUITreeItemData(node,expanded));
     }
     else 
     {
       // Flat tree of acceptable VMEs
       if (image == NODE_VISIBLE_ON)
       {
-        m_NodeTree->AppendItem(m_NodeTree->GetRootItem(),text,image,image, new albaGUITreeItemData(node));
+        m_NodeTree->AppendItem(m_NodeTree->GetRootItem(),text,image,image, new albaGUITreeItemData(node,expanded));
       }
       current_item = m_NodeTree->GetRootItem();
     }
