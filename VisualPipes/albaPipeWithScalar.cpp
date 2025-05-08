@@ -455,7 +455,7 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 							continue;
 						}
 
-						if (pointData->GetScalars() == NULL || scalarsToActivate != pointData->GetScalars()->GetName())
+						if (pointData->GetScalars() == NULL || scalarsToActivate != pointData->GetScalars()->GetName() || m_OldActiveScalarType != m_ActiveScalarType)
 						{
 							pointData->SetActiveScalars(scalarsToActivate.ToAscii());
 							pointData->GetScalars()->Modified();
@@ -479,7 +479,7 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 							continue;
 						}
 
-						if (cellData->GetScalars() == NULL || scalarsToActivate != cellData->GetScalars()->GetName())
+						if (cellData->GetScalars() == NULL || scalarsToActivate != cellData->GetScalars()->GetName() || m_OldActiveScalarType != m_ActiveScalarType)
 						{
 							cellData->SetActiveScalars(scalarsToActivate.ToAscii());
 							cellData->GetScalars()->Modified();
@@ -520,11 +520,13 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 		}
 	}
 
+	if (m_OldMapsGenActive != m_ScalarMapActive || m_OldActiveScalarType != m_ActiveScalarType || m_OldScalarIndex != m_ScalarIndex)
+		UpdateVisualizationWithNewSelectedScalars();
+
 	m_OldMapsGenActive = m_ScalarMapActive;
 	m_OldActiveScalarType = m_OldActiveScalarType;
 	m_OldScalarIndex = m_ScalarIndex;
 
-  UpdateVisualizationWithNewSelectedScalars();  
 }
 //----------------------------------------------------------------------------
 void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()

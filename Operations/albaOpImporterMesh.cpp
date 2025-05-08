@@ -121,15 +121,16 @@ int albaOpImporterMesh::Read()
 		name = m_NodesFileName.BaseName();
 		
 		tmp = wxString(name.GetCStr()).MakeUpper().ToAscii();
-		int extFirst, first;
-		extFirst = first = tmp.FindFirst(".");
-		first = MIN(first, tmp.FindFirst("NODES"));
-		first = MIN(first, tmp.FindFirst("_"));
-		if (first != 0)
-			name.Erase(first);
-		else
-			name.Erase(extFirst);
-
+		
+		int first;
+		first = tmp.FindFirst(".");
+		if(tmp.FindFirst("NODES")>0)
+			first = MIN(first, tmp.FindFirst("NODES"));
+		if(tmp.FindFirst("_NODES") >0)
+			first = MIN(first, tmp.FindFirst("_NODES"));
+		
+		name.Erase(first);
+	
     m_ImportedVmeMesh->SetName(name.GetCStr());
 	  m_ImportedVmeMesh->SetDataByDetaching(reader->GetOutput()->GetUnstructuredGridOutput()->GetVTKData(),0);
 

@@ -94,6 +94,15 @@ public:
 
 	virtual void DisableCameraUpdateSkip() override;
 
+
+	virtual bool IsVMEExpanded(albaVME *vme) override;
+
+
+	virtual void CollapseVME(albaVME *vme) override;
+
+
+	virtual void ExpandVME(albaVME *vme) override;
+
 protected:
 	
 	std::vector<calls> m_Calls;
