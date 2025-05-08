@@ -63,6 +63,16 @@ public:
 
 	virtual void PrintImage(albaVMEImage *img) = 0;
 
+	//Tree 
+	/** Return True if the VME is Expanded on Tree */
+	virtual bool IsVMEExpanded(albaVME *vme) = 0;
+
+	/** Collapse the VME on the Tree */
+	virtual void CollapseVME(albaVME *vme) = 0;
+
+	/** Expand the VME on the Tree  */
+	virtual void ExpandVME(albaVME *vme) = 0;
+
 	//Managers
 	virtual albaOpManager * GetOpManager() const = 0;
 

@@ -137,6 +137,25 @@ void albaGUICheckTree::EnableSelect(bool enable)
 {
   m_CanSelect = enable;
 }
+
+//----------------------------------------------------------------------------
+bool albaGUICheckTree::IsVMEExpanded(albaVME * vme)
+{
+	return IsNodeExpanded((long long)vme);
+}
+
+//----------------------------------------------------------------------------
+void albaGUICheckTree::CollapseVME(albaVME * vme)
+{
+	CollapseNode((long long)vme);
+}
+
+//----------------------------------------------------------------------------
+void albaGUICheckTree::ExpandVME(albaVME * vme)
+{
+	ExpandNode((long long)vme);
+}
+
 //----------------------------------------------------------------------------
 void albaGUICheckTree::OnMouseDown( wxMouseEvent& event )
 //----------------------------------------------------------------------------
@@ -223,7 +242,7 @@ bool albaGUICheckTree::IsIconChecked(wxTreeItemId item)
 void albaGUICheckTree::VmeAdd(albaVME *vme)   
 //----------------------------------------------------------------------------
 {
-  AddNode((long long)vme,(long long)vme->GetParent(), vme->GetName(), 0);
+  AddNode((long long)vme,(long long)vme->GetParent(), vme->GetName(), vme->WasVMEExpandedWhenStored(), 0);
 	VmeUpdateIcon(vme);
 }
 //----------------------------------------------------------------------------

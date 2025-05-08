@@ -249,6 +249,14 @@ public:
 	/** Sets AboutImage */
 	void SetAboutImage(albaString aboutImage) { m_AboutImage = aboutImage; }
 
+	/** Return True if the VME is Expanded on Tree */
+	virtual bool IsVMEExpanded(albaVME *vme);
+
+	/** Collapse the VME on the Tree */
+	virtual void CollapseVME(albaVME *vme);
+
+	/** Expand the VME on the Tree  */
+	virtual void ExpandVME(albaVME *vme);
 protected:
 	//---------------------------------------------------------
 	// Description:
