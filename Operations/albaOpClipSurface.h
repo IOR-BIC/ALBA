@@ -82,7 +82,7 @@ public:
   void SetClippingModality(int mode = albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
 
   /** Set the surface VME to use to clip the input surface. It is used only in MODE_SURFACE modality clip*/
-  void SetClippingSurface(albaVMESurface *surface);
+  void SetClippingSurface(albaVME *surface);
 
   /** Set the absolute position for the implicit plane used to clip the input surface*/
   void SetImplicitPlanePosition(albaMatrix &matrix);
@@ -95,7 +95,21 @@ public:
 	vtkPolyData *GetResultPolyData(){return m_ResultPolyData;};
 	vtkPolyData *GetClippedPolyData(){return m_ClippedPolyData;};
 
-protected: 
+
+	/** Returns ClippedVME */
+	albaVMESurface * GetClippedVME() const { return m_ClippedVME; }
+
+	/** Returns ReverseClippedVME */
+	albaVMESurface * GetReverseClippedVME() const { return m_ReverseClippedVME; }
+
+
+	/** Returns GenerateClippedOutput */
+	int GetGenerateClippedOutput() const { return m_GenerateClippedOutput; }
+
+	/** Sets GenerateClippedOutput */
+	void SetGenerateClippedOutput(int generateClippedOutput) { m_GenerateClippedOutput = generateClippedOutput; }
+
+protected:
 
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node);
