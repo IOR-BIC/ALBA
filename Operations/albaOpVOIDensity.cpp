@@ -751,7 +751,7 @@ void albaOpVOIDensity::CreateCSVFile(albaString file)
 	bool firstAcces = !wxFileExists(file.GetCStr());
 
 	FILE * pFile;
-	pFile = fopen(file, "a+");
+	pFile = albaTryOpenFile(file, "a+");
 
 	GetTags();
 

@@ -1832,7 +1832,7 @@ void albaOpMMLModelView::WriteMatrix(char *pch, vtkMatrix4x4 *m)
 	// copy
 	strcpy(FileName, pch);
 
-	stream = fopen( FileName, "w" );
+	stream = albaTryOpenFile( FileName, "w" );
 
     if( stream == NULL )
 		exit(0);

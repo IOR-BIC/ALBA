@@ -38,7 +38,6 @@ static wxString GLO_appDebugDir;
 
 //----------------------------------------------------------------------------
 void albaYield()
-//----------------------------------------------------------------------------
 {
    if(GLO_yieldEnabled && !GLO_yelding)
    {
@@ -56,7 +55,6 @@ ALBA_EXPORT void albaEnableYielding(bool enable/*=true*/)
 
 //----------------------------------------------------------------------------
 wxString  albaGetDirName(const char * initial, const char * title, wxWindow *parent)
-//----------------------------------------------------------------------------
 {
   wxDirDialog dialog(parent, title, initial, wxDD_DEFAULT_STYLE | wxDD_NEW_DIR_BUTTON);
 
@@ -71,7 +69,6 @@ wxString  albaGetDirName(const char * initial, const char * title, wxWindow *par
 
 //----------------------------------------------------------------------------
 wxString albaGetOpenFile(const char *initial, const char * wild, const char * title, wxWindow *parent)
-//----------------------------------------------------------------------------
 {
   wxString path, name, ext;
 	if (wxDirExists(initial))
@@ -98,7 +95,6 @@ wxString albaGetOpenFile(const char *initial, const char * wild, const char * ti
 
 //----------------------------------------------------------------------------
 void albaGetOpenMultiFiles(const char * path, const char * wild, std::vector<wxString> &files, const char * title, wxWindow *parent)
-//----------------------------------------------------------------------------
 {  
   wxString wildcard = wild;
   wildcard += "|All Files (*.*)|*.*";
@@ -121,7 +117,6 @@ void albaGetOpenMultiFiles(const char * path, const char * wild, std::vector<wxS
 }
 //----------------------------------------------------------------------------
 wxString albaGetSaveFile(const char * initial, const char * wild, const char * title, wxWindow *parent, bool warnOverWrite)
-//----------------------------------------------------------------------------
 {
   wxString path, name, ext;
 	wxString defaultname = "NewFile";
@@ -153,7 +148,6 @@ wxString albaGetSaveFile(const char * initial, const char * wild, const char * t
 }
 //----------------------------------------------------------------------------
 wxString albaGetApplicationDirectory()
-//----------------------------------------------------------------------------
 {
 
 	if (GLO_appDebugDir.empty())
@@ -182,7 +176,6 @@ wxString albaGetApplicationDirectory()
 }
 //----------------------------------------------------------------------------
 wxString albaGetAppDataDirectory()
-//----------------------------------------------------------------------------
 {
   //getting user app directory
 	wxStandardPaths &std = wxStandardPaths::Get();
@@ -192,7 +185,6 @@ wxString albaGetAppDataDirectory()
 }
 //----------------------------------------------------------------------------
 wxString albaGetDocumentsDirectory()
-//----------------------------------------------------------------------------
 {
   //getting the Documents directory
   wxString home_dir =  wxGetHomeDir();
@@ -202,7 +194,6 @@ wxString albaGetDocumentsDirectory()
 }
 //----------------------------------------------------------------------------
 wxString albaGetLastUserFolder()
-//----------------------------------------------------------------------------
 {  
   wxString lastUserFolder;
 
@@ -247,7 +238,6 @@ ALBA_EXPORT wxString albaGetConfigDirectory()
 
 //----------------------------------------------------------------------------
 void albaSetLastUserFolder(albaString folder)
-//----------------------------------------------------------------------------
 {
   if(folder!="")
   {
@@ -273,7 +263,6 @@ void albaSetLastUserFolder(albaString folder)
 
 //----------------------------------------------------------------------------
 float RoundValue(float f_in, int decimal_digits)
-//----------------------------------------------------------------------------
 {
   float f_tmp = f_in * pow((double)10,(double)decimal_digits);
   int b = ( f_tmp >= 0 ) ? static_cast<int>( f_tmp + .5):static_cast<int>( f_tmp - .5);
@@ -281,7 +270,6 @@ float RoundValue(float f_in, int decimal_digits)
 }
 //----------------------------------------------------------------------------
 double RoundValue(double d_in, int decimal_digits)
-//----------------------------------------------------------------------------
 {
   double d_tmp = d_in * pow((double)10,(double)decimal_digits);
   int b = ( d_tmp >= 0 ) ? static_cast<int>( d_tmp + .5):static_cast<int>( d_tmp - .5);
@@ -289,7 +277,6 @@ double RoundValue(double d_in, int decimal_digits)
 }
 //----------------------------------------------------------------------------
 void albaFormatDataSize( long long size, albaString& szOut )
-//----------------------------------------------------------------------------
 {
   const char* SZUN[] = {"B", "KB", "MB", "GB", NULL};
   const int LIMITS[] = { 16384, 4096, 1024, INT_MAX};
@@ -309,7 +296,6 @@ void albaFormatDataSize( long long size, albaString& szOut )
 }
 //----------------------------------------------------------------------------
 wxBitmap albaWhiteFade(wxBitmap bmp,double level)
-//----------------------------------------------------------------------------
 {
   wxImage img = bmp.ConvertToImage();
   unsigned char *p = img.GetData();
@@ -329,7 +315,6 @@ wxBitmap albaWhiteFade(wxBitmap bmp,double level)
 }
 //----------------------------------------------------------------------------
 wxBitmap albaBlueScale(wxBitmap bmp)
-//----------------------------------------------------------------------------
 {
   wxImage img = bmp.ConvertToImage();
   unsigned char *p = img.GetData();
@@ -364,7 +349,6 @@ void albaResetRandomColor()
 }
 //----------------------------------------------------------------------------
 wxColour albaRandomColor()
-//----------------------------------------------------------------------------
 {
 	GLO_randCol = (GLO_randCol*13)%16+1;
   switch( GLO_randCol )
@@ -389,7 +373,6 @@ wxColour albaRandomColor()
 }
 //----------------------------------------------------------------------------
 wxString  albaIdString(int id)
-//----------------------------------------------------------------------------
 {
     wxString s;
     switch(id)
@@ -606,8 +589,24 @@ wxString  albaIdString(int id)
 }
 //----------------------------------------------------------------------------
 int* GetALBAExpertMode()
-//----------------------------------------------------------------------------
 {
   static int ALBAExpertMode = true;
   return &ALBAExpertMode;
+}
+//----------------------------------------------------------------------------
+FILE *albaTryOpenFile(const char *filename, const char *mode)
+{
+	FILE * pFile = NULL;
+	while (pFile == NULL)
+	{
+		pFile = fopen(filename, mode);
+		if (pFile == NULL)
+		{
+			wxMessageDialog dialog(albaGetFrame(), "File opening failed, the file can be opened in another application.\n\nTry Again?", _("Warning"), wxYES_NO | wxYES_DEFAULT);
+			if (dialog.ShowModal() != wxID_YES)
+				continue;
+		}
+		else continue;
+	}
+	return pFile;
 }

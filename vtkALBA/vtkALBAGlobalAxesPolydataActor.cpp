@@ -40,6 +40,7 @@ vtkCxxRevisionMacro(vtkALBAGlobalAxesPolydataActor, "$Revision: 1.1.2.5 $");
 vtkStandardNewMacro(vtkALBAGlobalAxesPolydataActor);
 
 #include "albaConfigure.h"
+#include "wx\filefn.h"
 //-------------------------------------------------------------------------
 vtkALBAGlobalAxesPolydataActor::vtkALBAGlobalAxesPolydataActor(int type /*=HEAD*/)
 {
@@ -256,17 +257,7 @@ using namespace std;
 //-------------------------------------------------------------------------
 bool vtkALBAGlobalAxesPolydataActor::FileExists(const char* filename)
 {
-	FILE* fp = NULL;
-
-	fp = fopen(filename, "r");
-
-	if(fp != NULL)
-	{
-		fclose(fp);
-		return true;
-	}
-
-	return false;
+	return wxFileExists(filename);
 }
 
 //-------------------------------------------------------------------------

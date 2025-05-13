@@ -320,7 +320,7 @@ bool albaOpExporterBmp::WriteImageDataAsMonocromeBitmap(vtkImageData *img, albaS
 #ifdef WIN32
   // check filename
   if( !filename ) return false;
-  FILE *f = fopen( filename, "wb");
+  FILE *f = albaTryOpenFile( filename, "wb");
   if(!f) return false;
   fclose(f); // to be reopended later
 
@@ -442,7 +442,7 @@ bool albaOpExporterBmp::WriteImageDataAsMonocromeBitmap(vtkImageData *img, albaS
   }
 
   //write the image
-  f = fopen( filename, "wb");
+  f = albaTryOpenFile( filename, "wb");
   fwrite(&hdr,1,sizeof (BITMAPFILEHEADER),f);
 
   int chunksize  = 10000;

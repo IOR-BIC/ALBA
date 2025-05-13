@@ -20,6 +20,7 @@
 #endif // _WIN32
 #include "GPU_OGL.h"
 #include "albaDefines.h"
+#include "albaDecl.h"
 
 /*static*/bool albaGPUOGL::glo_bGPUOGLSupported = false;
 /*static*/bool albaGPUOGL::glo_bGPUOGLInitialized = false;
@@ -99,7 +100,7 @@ GLint gltWriteTGA(const char *szFileName, GLenum gltyp)
 #pragma warning(push)
 #pragma warning(disable: 4996)
   // Attempt to open the file
-  pFile = fopen(szFileName, "wb");
+  pFile = albaTryOpenFile(szFileName, "wb");
   if(pFile == NULL)
   {
     free(pBits);    // Free buffer and return error

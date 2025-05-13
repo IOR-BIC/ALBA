@@ -343,17 +343,20 @@ void albaGUIHistogramWidget::ExportData()
 	if (!f.IsEmpty())
 	{
 		FILE *outFile;
-		outFile = fopen(f.ToAscii(), "w");
-		//Header
-		fprintf(outFile, "%s;\n",m_Data->GetName());
+		outFile = albaTryOpenFile(f.ToAscii(), "w");
 
-		//Content
-		for (int i = 0; i < m_Data->GetNumberOfTuples(); i++)
-		{
-			double value = m_Data->GetTuple1(i);
-			fprintf(outFile,"%f;\n", value);
+		if (outFile != NULL)
+		{//Header
+			fprintf(outFile, "%s;\n", m_Data->GetName());
+
+			//Content
+			for (int i = 0; i < m_Data->GetNumberOfTuples(); i++)
+			{
+				double value = m_Data->GetTuple1(i);
+				fprintf(outFile, "%f;\n", value);
+			}
+			fclose(outFile);
 		}
-		fclose(outFile);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -381,7 +384,7 @@ void albaGUIHistogramWidget::ExportStats()
 	bool firstAcces = !wxFileExists(f.ToAscii());
 
 	FILE * pFile;
-	pFile = fopen(f.ToAscii(), "a+");
+	pFile = albaTryOpenFile(f.ToAscii(), "a+");
 
 	if (pFile != NULL)
 	{
