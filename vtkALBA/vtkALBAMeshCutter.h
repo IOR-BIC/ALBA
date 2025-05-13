@@ -120,6 +120,8 @@ protected:
   /** Execute method */
   int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
+	/** Produces a cleaned mesh by removing all the points not linked by any cell*/
+	vtkUnstructuredGrid * RemoveUnusedPoints(vtkUnstructuredGrid* input);
 
   // edge described by id's of endpoints
   typedef struct{

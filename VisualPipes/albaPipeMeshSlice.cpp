@@ -50,7 +50,6 @@ albaPipeMeshSlice::albaPipeMeshSlice()
 //----------------------------------------------------------------------------
 {
 	m_BorderElementsWiredActor = 1;
-	m_FlipNormals = true;
   m_Plane           = NULL;
   m_Cutter          = NULL;
 }
@@ -118,24 +117,8 @@ vtkPolyData* albaPipeMeshSlice::GetInputAsPolyData()
 		m_Cutter->SetCutFunction(m_Plane);
 		m_Cutter->Update();
     
-    UpdateActiveScalarsInVMEDataVectorItems();
-    
 		if(m_NormalsFilter)
 			m_NormalsFilter->Update();
 	}
-
-  /*if (true == DEBUG_MODE && NULL != m_Mapper)
-  {
-    int scalarVisibility = m_Mapper->GetScalarVisibility();
-    m_Mapper->SetScalarVisibility(m_ScalarMapActive);
-
-    std::ostringstream stringStream;
-    stringStream << "scalar visibility:" << (scalarVisibility ? "true" : "false")  << std::endl;
-    
-    double tr[2];
-    m_Table->GetTableRange(tr);
-    stringStream << "LUT sr: " << "[" << tr[0] << " , " << tr[1] << "]"  << std::endl;
-
-    albaLogMessage(stringStream.str().c_str());
-  }*/
+	
 }

@@ -100,11 +100,10 @@ int albaParabolicMeshToLinearMeshFilter::RequestData( vtkInformation *vtkNotUsed
     }
     default:
     {
+    	//Mesh is already linear or made of unsupported type elements! Bypassing the filter
       output->DeepCopy(input);
-
-      albaLogMessage("Mesh is already linear or made of unsupported type elements! Bypassing the filter");
-      return 0;
     }
+		return 1;
   }  
 
   //-----------------------

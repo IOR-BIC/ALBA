@@ -46,8 +46,10 @@ This file is an adaption to ALBA/VTK of https://github.com/KitwareMedical/ITKIOS
 =========================================================================*/
 
 #include "albaOpImporterScancoImageIO.h"
+#include "albaProgressBarHelper.h"
 #include "vtkImageData.h"
 #include "vtkPointData.h"
+#include "vtkDataArray.h"
 #include "albaTagArray.h"
 #include "albaVMEVolumeGray.h"
 #include "wx\filename.h"
@@ -1051,6 +1053,8 @@ int albaOpImporterScancoImageIO::ReadImageInformation()
   }
 
   this->PopulateMetaDataDictionary();
+
+	return ALBA_OK;
 }
 
 //----------------------------------------------------------------------------
@@ -1124,8 +1128,19 @@ size_t albaOpImporterScancoImageIO::GetScalarSize()
 //----------------------------------------------------------------------------
 int albaOpImporterScancoImageIO::ImportFile()
 {
+
+	m_PBHelper = new albaProgressBarHelper(this);
+
+
+	m_PBHelper->InitProgressBar("Reading File...");
+
 	if (ReadImageInformation() == ALBA_ERROR)
+	{
+		cppDEL(m_PBHelper);
 		return ALBA_ERROR;
+	}
+
+	m_PBHelper->UpdateProgressBar(10);
 
 	albaVMEVolumeGray *volume;
 	albaNEW(volume);
@@ -1135,12 +1150,11 @@ int albaOpImporterScancoImageIO::ImportFile()
 
 	vtkDataArray *scalars;
 
-	data->SetDimensions(m_Dims);
+	data->SetDimensions(m_Dims[0],m_Dims[1],m_Dims[2]);
 	data->SetOrigin(m_Origin);
 	data->SetSpacing(m_Spacing);
 
-	data->SetScalarType(m_ScalarsType);
-	data->AllocateScalars();
+	data->AllocateScalars(m_ScalarsType,1);
 	data->GetPointData()->GetScalars()->SetName("Scalars");
 
 	Read(data->GetPointData()->GetScalars()->GetVoidPointer(0));
@@ -1148,7 +1162,6 @@ int albaOpImporterScancoImageIO::ImportFile()
 	wxString path, name, ext;
 	wxFileName::SplitPath(m_FileName.GetCStr(), &path, &name, &ext);
 	
-	data->Update();
 	volume->SetName(name.c_str());
 	volume->SetData(data, 0);
 	volume->GetTagArray()->DeepCopy(m_TagArray);
@@ -1157,15 +1170,17 @@ int albaOpImporterScancoImageIO::ImportFile()
 	vtkDEL(data);
 	albaDEL(volume);
 	albaDEL(m_TagArray);
-
+	cppDEL(m_PBHelper);
 	return ALBA_OK;
 }
 
 //----------------------------------------------------------------------------
-template <typename TBufferType> void RescaleToHU(TBufferType * buffer, size_t size, double slope, double intercept)
+template <typename TBufferType> void albaOpImporterScancoImageIO::RescaleToHU(TBufferType * buffer, size_t size, double slope, double intercept)
 {
+	m_PBHelper->SetBarText("Rescale scalars...");
   for (size_t i = 0; i < size; i++)
   {
+		m_PBHelper->UpdateProgressBar(60 + (40 * i / size));
     float bufferValue = static_cast<float>(buffer[i]);
     bufferValue = bufferValue * slope + intercept;
     buffer[i] = static_cast<TBufferType>(bufferValue);
@@ -1234,12 +1249,14 @@ void albaOpImporterScancoImageIO::Read(void * buffer)
   if (shortread != 0)
   {
 		infile.close();
-    albaErrorMacro("File is truncated, " << shortread << " bytes are missing");
+    albaErrorMessageMacro("File is truncated, " << shortread << " bytes are missing");
 		return;
   }
 
   // Close the file
   infile.close();
+
+	m_PBHelper->UpdateProgressBar(60);
 
   auto * dataPtr = reinterpret_cast<unsigned char *>(buffer);
 
