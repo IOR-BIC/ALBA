@@ -146,3 +146,21 @@ void albaFakeLogicForTest::DisableCameraUpdateSkip()
 {
 	return;
 }
+
+//----------------------------------------------------------------------------
+bool albaFakeLogicForTest::IsVMEExpanded(albaVME *vme)
+{
+	return true;
+}
+
+//----------------------------------------------------------------------------
+void albaFakeLogicForTest::CollapseVME(albaVME *vme)
+{
+	return;
+}
+
+//----------------------------------------------------------------------------
+void albaFakeLogicForTest::ExpandVME(albaVME *vme)
+{
+	return;
+}

@@ -67,6 +67,15 @@ public:
 
 	// Notify to the tree that the vme has been selected.
 	void VmeSelected(albaVME *vme);
+
+	/** Return True if the VME is Expanded on Tree */
+	virtual bool IsVMEExpanded(albaVME *vme);
+
+	/** Collapse the VME on the Tree */
+	virtual void CollapseVME(albaVME *vme);
+
+	/** Expand the VME on the Tree  */
+	virtual void ExpandVME(albaVME *vme);
 		
 	// Show the operation's parameters gui on the tabbed panel.
 	void OpShowGui(bool push_gui, albaGUIPanel *panel);

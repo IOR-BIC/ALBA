@@ -903,7 +903,7 @@ void albaInteractionManager::AddDeviceToTree(albaDevice *device,albaDeviceSet *p
 {
   assert(device);
   albaID parent_id=(parent?parent->GetID():0);
-  m_DeviceTree->AddNode(device->GetID(),parent_id,device->GetName());
+  m_DeviceTree->AddNode(device->GetID(),parent_id,device->GetName(),true);
   //m_DeviceTree->Update();
 }
 

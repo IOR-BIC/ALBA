@@ -73,6 +73,7 @@ albaVME::albaVME()
 
   m_CurrentTime   = 0.0;
   m_Crypting      = 0;
+	m_VMEExpandedWhenStored = true;
 
   m_VisualMode = DEFAULT_VISUAL_MODE;
 }
@@ -832,6 +833,9 @@ int albaVME::InternalStore(albaStorageElement *parent)
 	parent->StoreObjectVector("Children", nodes_to_store, "Node");
 
   parent->SetAttribute("Crypting",albaString(m_Crypting));
+
+	parent->SetAttribute("ExpandedVME", albaString(GetLogicManager()->IsVMEExpanded(this)));
+
   return ALBA_OK;
 }
 
@@ -929,6 +933,10 @@ int albaVME::InternalRestore(albaStorageElement *node)
 		albaErrorMacro("Problems restoring children for node " << GetName());
 		return ALBA_ERROR;
 	}
+
+	node->GetAttributeAsInteger("ExpandedVME", m_VMEExpandedWhenStored);
+
+
 	for (int i = 0; i < children.size(); i++)
 	{
 		albaVME *node = albaVME::SafeDownCast(children[i]);

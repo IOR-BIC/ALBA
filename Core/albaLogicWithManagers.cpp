@@ -2281,6 +2281,24 @@ void albaLogicWithManagers::PlugStandardViews()
 }
 
 //----------------------------------------------------------------------------
+bool albaLogicWithManagers::IsVMEExpanded(albaVME *vme)
+{
+	return m_SideBar->IsVMEExpanded(vme);
+}
+
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::CollapseVME(albaVME *vme)
+{
+	m_SideBar->CollapseVME(vme);
+}
+
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::ExpandVME(albaVME *vme)
+{
+	m_SideBar->ExpandVME(vme);
+}
+
+//----------------------------------------------------------------------------
 void albaLogicWithManagers::ConfigureWizardManager()
 {
 	//Setting wizard specific data
