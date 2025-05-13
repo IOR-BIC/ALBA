@@ -25,6 +25,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 class vtkDoubleArray;
+class vtkALBAFillingHole;
 
 //----------------------------------------------------------------------------
 // albaOpVOIDensity :
@@ -77,7 +78,10 @@ public:
 
 	/** Set Surface */
 	int SetSurface(albaVME *surface);
-	
+
+	int CheckSurface();
+
+
  	static bool OutputSurfaceAccept(albaVME* Node) {return(Node != NULL && (Node->GetOutput()->IsA("albaVMEOutputSurface")));};
 
 	void CreateCSVFile(albaString file);
@@ -151,6 +155,10 @@ protected:
 	int						m_CreateSegOutput;
 	int						m_CreatePointCloudOutput;
 	bool					m_ImagedataVol;
+
+	vtkALBAFillingHole *m_FillHoleFilter;
+	int						m_FillHoles;
+	int						m_AddlHolesArea;
 
 	albaString m_PatientName;
 	albaString m_PatientCode;
