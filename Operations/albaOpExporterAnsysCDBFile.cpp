@@ -90,7 +90,7 @@ albaString albaOpExporterAnsysCDBFile::GetWildcard()
 int albaOpExporterAnsysCDBFile::Write()
 {
   FILE *outFile;
-  outFile = fopen(m_AnsysOutputFileNameFullPath.ToAscii(), "w");
+  outFile = albaTryOpenFile(m_AnsysOutputFileNameFullPath.ToAscii(), "w");
 
   albaVMEMesh *input = albaVMEMesh::SafeDownCast(m_Input);
 

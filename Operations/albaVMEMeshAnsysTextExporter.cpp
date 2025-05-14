@@ -162,7 +162,7 @@ int albaVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGri
 
   double pointCoordinates[3] = {-9999, -9999, -9999};
 
-	FILE *file=fopen(outputFileName,"w");
+	FILE *file= albaTryOpenFile(outputFileName,"w");
 
   for (int rowID = 0 ; rowID < rowsNumber ; rowID++)
   {
@@ -285,7 +285,7 @@ int albaVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputU
     materialArray = syntheticMaterialArray;
   }
 
-	FILE *file=fopen(outputFileName,"w");
+	FILE *file= albaTryOpenFile(outputFileName,"w");
 		
   for (int rowID = 0 ; rowID < rowsNumber ; rowID++)
   {		
