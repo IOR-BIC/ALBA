@@ -36,7 +36,6 @@ static char albaLogBuffer[BUFFER_DIMENSION];
 
 //------------------------------------------------------------------------------
 void albaLogMessage(const char *format, ...)
-//------------------------------------------------------------------------------
 {
   albaLogMutex.Lock();
 
@@ -54,7 +53,6 @@ void albaLogMessage(const char *format, ...)
 //------------------------------------------------------------------------------
 // open a warning dialog and write a message
 void albaWarningMessage(const char *format, ...)
-//------------------------------------------------------------------------------
 {
   albaLogMutex.Lock();
   ALBA_PRINT_MACRO(format,albaLogBuffer,sizeof(albaLogBuffer));
@@ -71,7 +69,6 @@ void albaWarningMessage(const char *format, ...)
 //------------------------------------------------------------------------------
 // open an error dialog and write a message
 void albaErrorMessage(const char *format, ...)
-//------------------------------------------------------------------------------
 {
   albaLogMutex.Lock();
   ALBA_PRINT_MACRO(format,albaLogBuffer,sizeof(albaLogBuffer));
@@ -88,7 +85,6 @@ void albaErrorMessage(const char *format, ...)
 //------------------------------------------------------------------------------
 // open a message dialog and write a message
 void albaMessage(const char *format, ...)
-//------------------------------------------------------------------------------
 {
   albaLogMutex.Lock();
   ALBA_PRINT_MACRO(format,albaLogBuffer,sizeof(albaLogBuffer));
@@ -105,7 +101,6 @@ void albaMessage(const char *format, ...)
 
 //------------------------------------------------------------------------------
 bool albaEquals(double x, double y)
-//------------------------------------------------------------------------------
 {
    double diff=fabs(x - y);
    double max_err=fabs(x / pow((double)10,(double)15));
@@ -116,7 +111,6 @@ bool albaEquals(double x, double y)
 
 //------------------------------------------------------------------------------
 bool albaFloatEquals(float x, float y)
-//------------------------------------------------------------------------------
 {
    float diff=fabs(x - y);
    float max_err=fabs(x / pow((double)10,(double)7));
@@ -124,14 +118,12 @@ bool albaFloatEquals(float x, float y)
 }
 //------------------------------------------------------------------------------
 double albaRoundToPrecision(double val, unsigned prec)
-//------------------------------------------------------------------------------
 {
   double k = pow((double)10,(double)prec);
   return floor(val*k+0.5)/k; 
 } 
 //------------------------------------------------------------------------------
 void albaSleep(int msec)
-//------------------------------------------------------------------------------
 {
 #ifdef WIN32
   Sleep(msec);
@@ -142,7 +134,6 @@ void albaSleep(int msec)
 }
 //------------------------------------------------------------------------------
 bool albaIsLittleEndian(void)
-//------------------------------------------------------------------------------
 { 
   /* 
    * Variables definition 
@@ -154,3 +145,5 @@ bool albaIsLittleEndian(void)
   test = (ptr[1]<<8) + (ptr[0]&0xFF); /* build value byte by byte */ 
   return (magic == test);             /* if the same is little endian */  
 }
+
+

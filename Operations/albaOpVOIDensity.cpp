@@ -53,6 +53,7 @@
 #include "vtkCleanPolyData.h"
 #include "vtkGenericCell.h"
 #include "vtkTriangle.h"
+#include "vtkALBAFillingHole.h"
 
 
 //----------------------------------------------------------------------------
@@ -78,6 +79,11 @@ albaOpVOIDensity::albaOpVOIDensity(const wxString &label)
 	m_CreateSegOutput = false;
 	m_CreatePointCloudOutput = true;
 
+	m_FillHoles = false;
+	m_AddlHolesArea = true;
+	m_FillHoleFilter = NULL;
+	m_PointCloud = NULL;
+
 	UpdateStrings();
 
 	m_EvaluateInSubRange = false;
@@ -88,6 +94,7 @@ albaOpVOIDensity::~albaOpVOIDensity()
 {
 	m_Surface = NULL;
 	vtkDEL(m_VOIScalars);
+	albaDEL(m_PointCloud);
 	m_VOICoords.clear();
 	m_VOIIds.clear();
 }
@@ -108,6 +115,8 @@ enum VOI_DENSITY_WIDGET_ID
 	ID_CHOOSE_SURFACE = MINID,
 	ID_EVALUATE_DENSITY,
 	ID_ENABLE_RANGE,
+	ID_ENABLE_FILL_HOLES,
+	ID_ADD_HOLES_AREA,
 	ID_RANGE_UPDATED,
   ID_NUMBER_OF_VOXEL_IN_VOI,
 	ID_NUM_SCALARS,
@@ -118,6 +127,7 @@ enum VOI_DENSITY_WIDGET_ID
 	ID_MEDIAN,
 	ID_SURFACE_AREA,
 	ID_VOXEL_LIST,
+	ID_EXPORT_SCALARS,
 	ID_EXPORT_REPORT,
 	ID_CREATE_SEGMENTATION_OUTPUT,
 	ID_CREATE_CLOUD_POINT_OUTPUT,
@@ -155,6 +165,9 @@ void albaOpVOIDensity::CreateGui()
 	m_Gui->Divider();
 	m_Gui->Bool(ID_ENABLE_RANGE, "Evaluate only in subrange", &m_EvaluateInSubRange, true);
 	m_Gui->VectorN(ID_RANGE_UPDATED, "Range:", m_SubRange, 2, m_SubRange[0], m_SubRange[1]);
+	m_Gui->Divider();
+	m_Gui->Bool(ID_ENABLE_FILL_HOLES, "Fill Holes", &m_FillHoles, true);
+	m_Gui->Bool(ID_ADD_HOLES_AREA, "Add Holes in Surface Area", &m_AddlHolesArea, true);
 	m_Gui->Divider(2);
 	m_Gui->Label(_("Number of voxel inside the VOI"));
 	m_Gui->String(ID_NUM_SCALARS, "Num=", &m_NumberOfScalarsString, "");
@@ -175,6 +188,7 @@ void albaOpVOIDensity::CreateGui()
 	m_Gui->Label("");
 	m_Gui->Divider(1);
 	m_Gui->Label("");
+	m_Gui->Button(ID_EXPORT_SCALARS, "Export Scalars");
 	m_Gui->Button(ID_EXPORT_REPORT, "Export Report");
 	m_Gui->Label("");
 	m_Gui->Divider(1);
@@ -187,9 +201,10 @@ void albaOpVOIDensity::CreateGui()
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::EnableDisableGUI(int surfaceEvalued)
 {
+	surfaceEvalued = surfaceEvalued && (m_Surface != NULL);
 	m_Gui->Enable(ID_RANGE_UPDATED, m_EvaluateInSubRange);
-
 	m_Gui->Enable(ID_EVALUATE_DENSITY, m_Surface && !surfaceEvalued );
+	m_Gui->Enable(ID_ADD_HOLES_AREA, m_FillHoles);
 
 	if (!surfaceEvalued)
 	{
@@ -203,6 +218,7 @@ void albaOpVOIDensity::EnableDisableGUI(int surfaceEvalued)
 	m_Gui->Enable(ID_MAX_SCALAR, surfaceEvalued);
 	m_Gui->Enable(ID_STANDARD_DEVIATION, surfaceEvalued);
 	m_Gui->Enable(ID_EXPORT_REPORT, surfaceEvalued);
+	m_Gui->Enable(ID_EXPORT_SCALARS, surfaceEvalued);
 	m_Gui->Enable(wxOK, surfaceEvalued);
 
 	m_Gui->Update();
@@ -260,9 +276,8 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 	albaString name = m_Surface->GetName();
 	name += " sampling";
 
-	albaVMEPointCloud *pointCloudVME;
-	albaNEW(pointCloudVME);
-	pointCloudVME->SetName(name);
+	albaNEW(m_PointCloud);
+	m_PointCloud->SetName(name);
 
 	vtkPolyData * polydata;
 	vtkNEW(polydata);
@@ -310,35 +325,39 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 
 	polydata->Modified();
 	polydata->Update();
-	pointCloudVME->SetData(polydata, 0);
+	m_PointCloud->SetData(polydata, 0);
 	vtkDEL(polydata);
 
-	pointCloudVME->ReparentTo(m_Surface);
+	m_PointCloud->ReparentTo(m_Surface);
 
 	albaMatrix identityM;
-	pointCloudVME->SetAbsMatrix(identityM);
+	m_PointCloud->SetAbsMatrix(identityM);
 
-	albaDEL(pointCloudVME);
 }
 
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::CalculateSurfaceArea()
 {
-	vtkCleanPolyData *cleaner = vtkCleanPolyData::New();
-	vtkTriangleFilter *triangulator = vtkTriangleFilter::New();
-
 	m_SurfaceArea = 0;
 
-	vtkPolyData *surface = vtkPolyData::SafeDownCast(m_Surface->GetOutput()->GetVTKData());
+	vtkPolyData *surface = NULL;
+
+	if (m_FillHoles && m_FillHoleFilter && m_AddlHolesArea)
+		surface = vtkPolyData::SafeDownCast(m_FillHoleFilter->GetOutput());
+	else
+		surface = vtkPolyData::SafeDownCast(m_Surface->GetOutput()->GetVTKData());
+
 	if (surface == NULL)
 		return;
 
+	vtkCleanPolyData *cleaner = vtkCleanPolyData::New();
+	vtkTriangleFilter *triangulator = vtkTriangleFilter::New();
 	cleaner->SetInput(surface);
 	cleaner->ConvertPolysToLinesOff();
 	cleaner->GetOutput()->Update();
 	triangulator->SetInput(cleaner->GetOutput());
 	triangulator->Update();
-	vtkPolyData *triSurface=triangulator->GetOutput();
+	vtkPolyData *triSurface = triangulator->GetOutput();
 
 	int TrianglesNum = triSurface->GetNumberOfCells();
 	for (int i = 0; i < TrianglesNum; i++)
@@ -442,28 +461,44 @@ int albaOpVOIDensity::SetSurface(albaVME *surface)
 		return ALBA_ERROR;
 
 	m_Surface = surface;
-	m_Surface->Update();
-	vtkALBASmartPointer<vtkFeatureEdges> FE;
-	FE->SetInput((vtkPolyData *)(m_Surface->GetOutput()->GetVTKData()));
-	FE->SetFeatureAngle(30);
-	FE->SetBoundaryEdges(1);
-	FE->SetColoring(0);
-	FE->SetFeatureEdges(0);
-	FE->SetManifoldEdges(0);
-	FE->SetNonManifoldEdges(0);
-	FE->Update();
+	return CheckSurface();
 
-	if (FE->GetOutput()->GetNumberOfCells() != 0)
+}
+
+//----------------------------------------------------------------------------
+int albaOpVOIDensity::CheckSurface()
+{
+	if (!m_FillHoles)
 	{
-		//open polydata
-		albaString openStr;
-		openStr.Printf("%s is an Open Surface",surface->GetName());
-		albaMessage(openStr.GetCStr(), _("Warning"));
-		m_Surface = NULL;
-		return ALBA_ERROR;
-	}
+		m_Surface->Update();
+		vtkALBASmartPointer<vtkFeatureEdges> FE;
+		FE->SetInput((vtkPolyData *)(m_Surface->GetOutput()->GetVTKData()));
+		FE->SetFeatureAngle(30);
+		FE->SetBoundaryEdges(1);
+		FE->SetColoring(0);
+		FE->SetFeatureEdges(0);
+		FE->SetManifoldEdges(0);
+		FE->SetNonManifoldEdges(0);
+		FE->Update();
 
+		if (FE->GetOutput()->GetNumberOfCells() != 0)
+		{
+			//open polydata
+			albaString openStr;
+			openStr.Printf("%s is an Open Surface\nEnable Fill Holes?", m_Surface->GetName());
+			int res = wxMessageBox(openStr.GetCStr(), "Enable Fill Holes?", wxYES_NO | wxYES_DEFAULT | wxICON_QUESTION | wxCENTRE | wxSTAY_ON_TOP);
+
+			if (res != wxYES)
+			{
+				m_Surface = NULL;
+				return ALBA_ERROR;
+			}
+
+			m_FillHoles = true;
+		}
+	}
 	return ALBA_OK;
+
 }
 
 //----------------------------------------------------------------------------
@@ -493,6 +528,21 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 				EnableDisableGUI(true);
 			}
 			break;
+			case ID_ENABLE_FILL_HOLES:
+				SetSurface(m_Surface);
+				EnableDisableGUI(true);
+				break;
+			case ID_ADD_HOLES_AREA:
+			{
+				albaProgressBarHelper progressHelper(m_Listener);
+				progressHelper.SetTextMode(m_TestMode);
+				progressHelper.InitProgressBar("Updating Area...");
+				CalculateSurfaceArea();
+				UpdateStrings();
+				if(!m_TestMode)
+					m_Gui->Update();
+			}
+				break;
 			case ID_ENABLE_RANGE:
 				EnableDisableGUI(false);
 				break;
@@ -502,7 +552,10 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 				break;
 			case ID_EXPORT_REPORT:
 				WriteReport();
-			break;
+				break; 
+			case ID_EXPORT_SCALARS:
+				WriteScalars();
+				break;
 			case wxOK:
 				OpStop(OP_RUN_OK);
 			break;
@@ -562,6 +615,17 @@ void albaOpVOIDensity::EvaluateSurface()
 	vtkPolyData *polydata;
 	m_Surface->Update();
 	polydata = (vtkPolyData *)m_Surface->GetOutput()->GetVTKData();
+
+	if (m_FillHoles)
+	{
+		if (m_FillHoleFilter == NULL)
+			vtkNEW(m_FillHoleFilter);
+
+		m_FillHoleFilter->SetInput(polydata);
+		m_FillHoleFilter->SetFillAllHole();
+		m_FillHoleFilter->Update();
+		polydata = m_FillHoleFilter->GetOutput();
+	}
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> TransformDataFilter;
 	TransformDataFilter->SetTransform(transform);
@@ -656,9 +720,8 @@ void albaOpVOIDensity::UpdateStrings()
 	m_SurfaceAreaString = albaString::Format("%f", m_SurfaceArea);
 }
 
-
 //----------------------------------------------------------------------------
-void albaOpVOIDensity::WriteReport()
+void albaOpVOIDensity::WriteScalars()
 {
 	albaString fileNameFullPath = albaGetDocumentsDirectory();
 	fileNameFullPath.Append("\\NewReport.csv");
@@ -666,18 +729,24 @@ void albaOpVOIDensity::WriteReport()
 	albaString wildc = "Report file (*.csv)|*.csv";
 	albaString newFileName = albaGetSaveFile(fileNameFullPath.GetCStr(), wildc, "Save Report", 0, false);
 
-	//////////////////////////////////////////////////////////////////////////
-	if (newFileName == "") return;
+	if (newFileName == "")
+		return;
 
-	// Calculate Date-Time Report
-	time_t rawtime;
-	struct tm * timeinfo;  time(&rawtime);
-	timeinfo = localtime(&rawtime);
+	FILE *outFile = albaTryOpenFile(newFileName.GetCStr(), "w");
 
-	//////////////////////////////////////////////////////////////////////////
-	CreateCSVFile(newFileName);
+	if (outFile != NULL)
+	{//Header
+		fprintf(outFile, "%s;\n", m_Surface->GetName());
 
-	//////////////////////////////////////////////////////////////////////////
+		//Content
+		for (int i = 0; i < m_VOIScalars->GetNumberOfTuples(); i++)
+		{
+			double value = m_VOIScalars->GetTuple1(i);
+			fprintf(outFile, "%f;\n", value);
+		}
+		fclose(outFile);
+	}
+
 	// Open Report File
 	wxString url = "file:///";
 	url = url + newFileName.GetCStr();
@@ -687,13 +756,39 @@ void albaOpVOIDensity::WriteReport()
 	command = command + url;
 	wxExecute(command);
 }
+
+
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::WriteReport()
+{
+	albaString fileNameFullPath = albaGetDocumentsDirectory();
+	fileNameFullPath.Append("\\NewReport.csv");
+
+	albaString wildc = "Report file (*.csv)|*.csv";
+	albaString newFileName = albaGetSaveFile(fileNameFullPath.GetCStr(), wildc, "Save Report", 0, false);
+	
+	if (newFileName == "") 
+		return;
+
+	CreateCSVFile(newFileName);
+
+	// Open Report File
+	wxString url = "file:///";
+	url = url + newFileName.GetCStr();
+	url.Replace("\\", "/");
+	albaLogMessage("Opening %f", url.ToAscii());
+	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
+	command = command + url;
+	wxExecute(command);
+}
+
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::CreateCSVFile(albaString file)
 {
 	bool firstAcces = !wxFileExists(file.GetCStr());
 
 	FILE * pFile;
-	pFile = fopen(file, "a+");
+	pFile = albaTryOpenFile(file, "a+");
 
 	GetTags();
 

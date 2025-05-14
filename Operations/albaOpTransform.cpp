@@ -845,7 +845,7 @@ void albaOpTransform::LoadFromFile()
 	if (!f.IsEmpty())
 	{
 		FILE *inFile;
-		inFile = fopen(f.ToAscii(), "r");
+		inFile = albaTryOpenFile(f.ToAscii(), "r");
 		if (inFile == NULL)
 		{
 			albaMessage("Error: cloud not open file!");
@@ -889,7 +889,7 @@ void albaOpTransform::SaveToFile()
 	if (!f.IsEmpty())
 	{
 		FILE *outFile;
-		outFile = fopen(f.ToAscii(), "w");
+		outFile = albaTryOpenFile(f.ToAscii(), "w");
 		if (outFile==NULL)
 		{
 			albaMessage("Error: cloud not open file!");

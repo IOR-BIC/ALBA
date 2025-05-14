@@ -307,7 +307,7 @@ bool albaOpImporterSTL::IsFileBinary(const char *name_file)
 
   bool binary = true;
   FILE * pFile;
-  pFile = fopen(name_file,"r"); 
+  pFile = albaTryOpenFile(name_file,"r");
 
   // From Wikipedia: A binary STL file has an 80 character header 
   // (which is generally ignored - but which should never begin with 'solid' 
