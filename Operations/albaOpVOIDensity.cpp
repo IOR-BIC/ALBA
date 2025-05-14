@@ -82,6 +82,7 @@ albaOpVOIDensity::albaOpVOIDensity(const wxString &label)
 	m_FillHoles = false;
 	m_AddlHolesArea = true;
 	m_FillHoleFilter = NULL;
+	m_PointCloud = NULL;
 
 	UpdateStrings();
 
@@ -93,6 +94,7 @@ albaOpVOIDensity::~albaOpVOIDensity()
 {
 	m_Surface = NULL;
 	vtkDEL(m_VOIScalars);
+	albaDEL(m_PointCloud);
 	m_VOICoords.clear();
 	m_VOIIds.clear();
 }
@@ -125,6 +127,7 @@ enum VOI_DENSITY_WIDGET_ID
 	ID_MEDIAN,
 	ID_SURFACE_AREA,
 	ID_VOXEL_LIST,
+	ID_EXPORT_SCALARS,
 	ID_EXPORT_REPORT,
 	ID_CREATE_SEGMENTATION_OUTPUT,
 	ID_CREATE_CLOUD_POINT_OUTPUT,
@@ -185,6 +188,7 @@ void albaOpVOIDensity::CreateGui()
 	m_Gui->Label("");
 	m_Gui->Divider(1);
 	m_Gui->Label("");
+	m_Gui->Button(ID_EXPORT_SCALARS, "Export Scalars");
 	m_Gui->Button(ID_EXPORT_REPORT, "Export Report");
 	m_Gui->Label("");
 	m_Gui->Divider(1);
@@ -214,6 +218,7 @@ void albaOpVOIDensity::EnableDisableGUI(int surfaceEvalued)
 	m_Gui->Enable(ID_MAX_SCALAR, surfaceEvalued);
 	m_Gui->Enable(ID_STANDARD_DEVIATION, surfaceEvalued);
 	m_Gui->Enable(ID_EXPORT_REPORT, surfaceEvalued);
+	m_Gui->Enable(ID_EXPORT_SCALARS, surfaceEvalued);
 	m_Gui->Enable(wxOK, surfaceEvalued);
 
 	m_Gui->Update();
@@ -271,9 +276,8 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 	albaString name = m_Surface->GetName();
 	name += " sampling";
 
-	albaVMEPointCloud *pointCloudVME;
-	albaNEW(pointCloudVME);
-	pointCloudVME->SetName(name);
+	albaNEW(m_PointCloud);
+	m_PointCloud->SetName(name);
 
 	vtkPolyData * polydata;
 	vtkNEW(polydata);
@@ -321,15 +325,14 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 
 	polydata->Modified();
 	polydata->Update();
-	pointCloudVME->SetData(polydata, 0);
+	m_PointCloud->SetData(polydata, 0);
 	vtkDEL(polydata);
 
-	pointCloudVME->ReparentTo(m_Surface);
+	m_PointCloud->ReparentTo(m_Surface);
 
 	albaMatrix identityM;
-	pointCloudVME->SetAbsMatrix(identityM);
+	m_PointCloud->SetAbsMatrix(identityM);
 
-	albaDEL(pointCloudVME);
 }
 
 //----------------------------------------------------------------------------
@@ -549,7 +552,10 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 				break;
 			case ID_EXPORT_REPORT:
 				WriteReport();
-			break;
+				break; 
+			case ID_EXPORT_SCALARS:
+				WriteScalars();
+				break;
 			case wxOK:
 				OpStop(OP_RUN_OK);
 			break;
@@ -714,9 +720,8 @@ void albaOpVOIDensity::UpdateStrings()
 	m_SurfaceAreaString = albaString::Format("%f", m_SurfaceArea);
 }
 
-
 //----------------------------------------------------------------------------
-void albaOpVOIDensity::WriteReport()
+void albaOpVOIDensity::WriteScalars()
 {
 	albaString fileNameFullPath = albaGetDocumentsDirectory();
 	fileNameFullPath.Append("\\NewReport.csv");
@@ -724,18 +729,24 @@ void albaOpVOIDensity::WriteReport()
 	albaString wildc = "Report file (*.csv)|*.csv";
 	albaString newFileName = albaGetSaveFile(fileNameFullPath.GetCStr(), wildc, "Save Report", 0, false);
 
-	//////////////////////////////////////////////////////////////////////////
-	if (newFileName == "") return;
+	if (newFileName == "")
+		return;
 
-	// Calculate Date-Time Report
-	time_t rawtime;
-	struct tm * timeinfo;  time(&rawtime);
-	timeinfo = localtime(&rawtime);
+	FILE *outFile = albaTryOpenFile(newFileName.GetCStr(), "w");
 
-	//////////////////////////////////////////////////////////////////////////
-	CreateCSVFile(newFileName);
+	if (outFile != NULL)
+	{//Header
+		fprintf(outFile, "%s;\n", m_Surface->GetName());
 
-	//////////////////////////////////////////////////////////////////////////
+		//Content
+		for (int i = 0; i < m_VOIScalars->GetNumberOfTuples(); i++)
+		{
+			double value = m_VOIScalars->GetTuple1(i);
+			fprintf(outFile, "%f;\n", value);
+		}
+		fclose(outFile);
+	}
+
 	// Open Report File
 	wxString url = "file:///";
 	url = url + newFileName.GetCStr();
@@ -745,6 +756,32 @@ void albaOpVOIDensity::WriteReport()
 	command = command + url;
 	wxExecute(command);
 }
+
+
+//----------------------------------------------------------------------------
+void albaOpVOIDensity::WriteReport()
+{
+	albaString fileNameFullPath = albaGetDocumentsDirectory();
+	fileNameFullPath.Append("\\NewReport.csv");
+
+	albaString wildc = "Report file (*.csv)|*.csv";
+	albaString newFileName = albaGetSaveFile(fileNameFullPath.GetCStr(), wildc, "Save Report", 0, false);
+	
+	if (newFileName == "") 
+		return;
+
+	CreateCSVFile(newFileName);
+
+	// Open Report File
+	wxString url = "file:///";
+	url = url + newFileName.GetCStr();
+	url.Replace("\\", "/");
+	albaLogMessage("Opening %f", url.ToAscii());
+	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
+	command = command + url;
+	wxExecute(command);
+}
+
 //----------------------------------------------------------------------------
 void albaOpVOIDensity::CreateCSVFile(albaString file)
 {

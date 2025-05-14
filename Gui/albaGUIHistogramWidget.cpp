@@ -342,8 +342,7 @@ void albaGUIHistogramWidget::ExportData()
 	int result = OP_RUN_CANCEL;
 	if (!f.IsEmpty())
 	{
-		FILE *outFile;
-		outFile = albaTryOpenFile(f.ToAscii(), "w");
+		FILE *outFile = albaTryOpenFile(f.ToAscii(), "w");
 
 		if (outFile != NULL)
 		{//Header

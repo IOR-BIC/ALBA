@@ -1356,8 +1356,9 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		break;
 
 		default:
+#ifdef _DEBUG
 			e->Log();
-			break;
+#endif 
 			break;
 		} // end switch case
 	} // end if SafeDowncast

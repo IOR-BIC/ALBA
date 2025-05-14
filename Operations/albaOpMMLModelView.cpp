@@ -15,7 +15,7 @@
 =========================================================================*/
 
 #include "albaDefines.h"
-
+#include "albaDecl.h"
 #include "albaOpMMLModelView.h"
 #include "albaSmartPointer.h"
 #include "vtkPolyData.h"

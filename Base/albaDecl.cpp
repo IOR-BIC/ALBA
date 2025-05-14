@@ -602,7 +602,13 @@ FILE *albaTryOpenFile(const char *filename, const char *mode)
 		pFile = fopen(filename, mode);
 		if (pFile == NULL)
 		{
-			wxMessageDialog dialog(albaGetFrame(), "File opening failed, the file can be opened in another application.\n\nTry Again?", _("Warning"), wxYES_NO | wxYES_DEFAULT);
+			albaString message;
+			albaString fileStr = filename;
+			albaString path = filename;
+			path.ExtractPathName();
+			
+			message.Printf("File: %s\nIn: %s\n\nThe file can be opened in another application.\n\nTry Again ?",fileStr.BaseName(),path.GetCStr());
+			wxMessageDialog dialog(albaGetFrame(),message.GetCStr(), _("File opening failed."), wxYES_NO | wxYES_DEFAULT);
 			if (dialog.ShowModal() != wxID_YES)
 				continue;
 		}
