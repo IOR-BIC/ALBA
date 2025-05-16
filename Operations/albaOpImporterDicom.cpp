@@ -1430,10 +1430,10 @@ int albaOpImporterDicom::SelectSeriesWithMoreSlices()
 	
 	albaDicomSeries * seriesToSelect = NULL;
 	int maxSlices = VTK_INT_MIN;
-	for (int i = 0; i < m_StudyList.GetStudiesNum(); i++)
+	for (int i = 0; i < m_StudyList->GetStudiesNum(); i++)
 	{
 		albaDicomStudy * study = m_StudyList->GetStudy(i);
-		for (int j = 0; j<study.GetSeriesNum();j++)
+		for (int j = 0; j<study->GetSeriesNum();j++)
 		{
 			albaDicomSeries * series = study->GetSeries(j);
 
