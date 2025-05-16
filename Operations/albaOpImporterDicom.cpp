@@ -1425,6 +1425,35 @@ void albaOpImporterDicom::OnChangeSlice()
 }
 
 //----------------------------------------------------------------------------
+int albaOpImporterDicom::SelectSeriesWithMoreSlices()
+{
+	
+	albaDicomSeries * seriesToSelect = NULL;
+	int maxSlices = VTK_INT_MIN;
+	for (int i = 0; i < m_StudyList.GetStudiesNum(); i++)
+	{
+		albaDicomStudy * study = m_StudyList->GetStudy(i);
+		for (int j = 0; j<study.GetSeriesNum();j++)
+		{
+			albaDicomSeries * series = study->GetSeries(j);
+
+			if(series->GetSlicesNum()>maxSlices)
+			{
+				seriesToSelect = series;
+				maxSlices = series->GetSlicesNum();
+			}
+		};
+	}
+
+	if (seriesToSelect == NULL)
+		return ALBA_ERROR;
+
+	SelectSeries(seriesToSelect);
+
+	return ALBA_OK;
+}
+
+//----------------------------------------------------------------------------
 char ** albaOpImporterDicom::GetIcon()
 {
 #include "pic/MENU_IMPORT_DICOM.xpm"
