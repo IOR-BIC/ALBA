@@ -800,35 +800,41 @@ void albaOpImporterDicom::CreateSliceVTKPipeline()
 void albaOpImporterDicom::FillStudyListBox()
 {
 	albaString studyName;
-	for (int n = 0; n < m_StudyList->GetStudiesNum(); n++)
+	if (m_StudyListbox)
 	{
-		studyName.Printf("Study %d", n);
-		m_StudyListbox->Append(studyName.GetCStr());
+		for (int n = 0; n < m_StudyList->GetStudiesNum(); n++)
+		{
+			studyName.Printf("Study %d", n);
+			m_StudyListbox->Append(studyName.GetCStr());
+		}
+		m_StudyListbox->SetSelection(0);
 	}
-	m_StudyListbox->SetSelection(0);
 }
 //----------------------------------------------------------------------------
 void albaOpImporterDicom::FillSeriesListBox()
 {
-	int counter = 0;
-	m_SeriesListbox->Clear();
-
-	albaDicomStudy *study = m_StudyList->GetStudy(m_SelectedStudy);
-	albaString seriesName;
-
-	for (int i = 0; i < study->GetSeriesNum(); i++)
+	if (m_SeriesListbox)
 	{
-		albaDicomSeries *series = study->GetSeries(i);
+		int counter = 0;
+		m_SeriesListbox->Clear();
 
-		const int *dim=series->GetDimensions();
-		int framesNum = series->GetCardiacImagesNum();
-		
-		if (framesNum > 1)
-			seriesName.Printf("Series %dx%dx%d f%d", dim[0], dim[1], framesNum / series->GetSlicesNum(), framesNum);
-		else
-			seriesName.Printf("Series %dx%dx%d", dim[0], dim[1], series->GetSlicesNum());
+		albaDicomStudy *study = m_StudyList->GetStudy(m_SelectedStudy);
+		albaString seriesName;
 
-		m_SeriesListbox->Append(seriesName.GetCStr());
+		for (int i = 0; i < study->GetSeriesNum(); i++)
+		{
+			albaDicomSeries *series = study->GetSeries(i);
+
+			const int *dim = series->GetDimensions();
+			int framesNum = series->GetCardiacImagesNum();
+
+			if (framesNum > 1)
+				seriesName.Printf("Series %dx%dx%d f%d", dim[0], dim[1], framesNum / series->GetSlicesNum(), framesNum);
+			else
+				seriesName.Printf("Series %dx%dx%d", dim[0], dim[1], series->GetSlicesNum());
+
+			m_SeriesListbox->Append(seriesName.GetCStr());
+		}
 	}
 }
 //----------------------------------------------------------------------------
@@ -1265,12 +1271,15 @@ void albaOpImporterDicom::ImportDicomTags()
 //----------------------------------------------------------------------------
 void albaOpImporterDicom::OnStudySelect()
 {
-	if (m_SelectedStudy != m_StudyListbox->GetSelection())
+	if (m_StudyListbox)
 	{
-		m_SelectedStudy = m_StudyListbox->GetSelection();
-		FillSeriesListBox();
-		m_SeriesListbox->Select(0);
-		SelectSeries(m_StudyList->GetStudy(m_SelectedStudy)->GetSeries(0));
+		if (m_SelectedStudy != m_StudyListbox->GetSelection())
+		{
+			m_SelectedStudy = m_StudyListbox->GetSelection();
+			FillSeriesListBox();
+			m_SeriesListbox->Select(0);
+			SelectSeries(m_StudyList->GetStudy(m_SelectedStudy)->GetSeries(0));
+		}
 	}
 }
 //----------------------------------------------------------------------------
@@ -1294,35 +1303,38 @@ void albaOpImporterDicom::SelectSeries(albaDicomSeries * selectedSeries)
 		{
 			CreateSliders();
 
-			m_LoadPage->RemoveGuiLowerCenter(m_LoadGuiCenter);
-			m_LoadGuiCenter = new albaGUI(this);
-			m_LoadGuiCenter->Divider();
-
-			if (numberOfSlices > 1 && GetSetting() && !GetSetting()->GetAutoVMEType())
+			if (m_LoadPage)
 			{
-				m_OutputType = 0;
-				wxString typeArrayVolumeImage[2] = { _("Volume"),_("Images") };
-				m_LoadGuiCenter->Radio(ID_VME_TYPE, "VME", &m_OutputType, 2, typeArrayVolumeImage, 1, "");
-			}
-			else if (numberOfSlices == 1 || (GetSetting() && GetSetting()->GetOutputType() == TYPE_IMAGE))
-			{
-				m_LoadGuiCenter->Label("Output type: Image");
-				m_LoadGuiCenter->Label("");
-				m_LoadGuiCenter->Label("");
-				m_OutputType = TYPE_IMAGE;
-			}
-			else
-			{
-				m_LoadGuiCenter->Label("Output type: Volume");
-				m_OutputType = TYPE_VOLUME;
-			}
+				m_LoadPage->RemoveGuiLowerCenter(m_LoadGuiCenter);
+				m_LoadGuiCenter = new albaGUI(this);
+				m_LoadGuiCenter->Divider();
 
-			m_LoadPage->AddGuiLowerCenter(m_LoadGuiCenter);
-			m_LoadPage->Update();
+				if (numberOfSlices > 1 && GetSetting() && !GetSetting()->GetAutoVMEType())
+				{
+					m_OutputType = 0;
+					wxString typeArrayVolumeImage[2] = { _("Volume"),_("Images") };
+					m_LoadGuiCenter->Radio(ID_VME_TYPE, "VME", &m_OutputType, 2, typeArrayVolumeImage, 1, "");
+				}
+				else if (numberOfSlices == 1 || (GetSetting() && GetSetting()->GetOutputType() == TYPE_IMAGE))
+				{
+					m_LoadGuiCenter->Label("Output type: Image");
+					m_LoadGuiCenter->Label("");
+					m_LoadGuiCenter->Label("");
+					m_OutputType = TYPE_IMAGE;
+				}
+				else
+				{
+					m_LoadGuiCenter->Label("Output type: Volume");
+					m_OutputType = TYPE_VOLUME;
+				}
 
-			//Set Z Bounds in Crop page
-			if (!this->m_TestMode && m_CropPage)
-				m_CropPage->SetZCropBounds(m_ZCropBounds[0], m_ZCropBounds[1]);
+				m_LoadPage->AddGuiLowerCenter(m_LoadGuiCenter);
+				m_LoadPage->Update();
+
+				//Set Z Bounds in Crop page
+				if (!this->m_TestMode && m_CropPage)
+					m_CropPage->SetZCropBounds(m_ZCropBounds[0], m_ZCropBounds[1]);
+			}
 		}
 
 		GenerateSliceTexture(0);
