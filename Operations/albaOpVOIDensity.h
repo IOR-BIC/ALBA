@@ -25,6 +25,8 @@
 // forward references :
 //----------------------------------------------------------------------------
 class vtkDoubleArray;
+class vtkALBAFillingHole;
+class albaVMEPointCloud;
 
 //----------------------------------------------------------------------------
 // albaOpVOIDensity :
@@ -77,7 +79,10 @@ public:
 
 	/** Set Surface */
 	int SetSurface(albaVME *surface);
-	
+
+	int CheckSurface();
+
+
  	static bool OutputSurfaceAccept(albaVME* Node) {return(Node != NULL && (Node->GetOutput()->IsA("albaVMEOutputSurface")));};
 
 	void CreateCSVFile(albaString file);
@@ -101,10 +106,29 @@ public:
 
 	void GetSubRange(double *subRange) { subRange[0] = m_SubRange[0]; subRange[1] = m_SubRange[1]; }
 
+
+	/** Returns FillHoles */
+	int GetFillHoles() const { return m_FillHoles; }
+
+	/** Sets FillHoles */
+	void SetFillHoles(int fillHoles) { m_FillHoles = fillHoles; }
+
+
+	/** Returns AddlHolesArea */
+	int GetAddlHolesArea() const { return m_AddlHolesArea; }
+
+	/** Sets AddlHolesArea */
+	void SetAddlHolesArea(int addlHolesArea) { m_AddlHolesArea = addlHolesArea; }
+
+
+	/** Returns PointCloud */
+	albaVMEPointCloud * GetPointCloud() const { return m_PointCloud; }
+
 protected:
 
 	void WriteReport();
 
+	void WriteScalars();
 	
 	void GetTags();
 
@@ -129,6 +153,7 @@ protected:
 
   albaVME        *m_Surface;
   vtkDoubleArray *m_VOIScalars;
+	albaVMEPointCloud *m_PointCloud;
 	std::vector<unsigned int> m_VOIIds;
 	std::vector<albaVect3d> m_VOICoords;
   albaString    m_NumberOfScalarsString;
@@ -152,10 +177,16 @@ protected:
 	int						m_CreatePointCloudOutput;
 	bool					m_ImagedataVol;
 
+	vtkALBAFillingHole *m_FillHoleFilter;
+	int						m_FillHoles;
+	int						m_AddlHolesArea;
+
 	albaString m_PatientName;
 	albaString m_PatientCode;
 	albaString m_PatientBirthdate;
 	albaString m_PatientCenter;
 	albaString m_PatientExamDate;
+private:
+	
 };
 #endif

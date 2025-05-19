@@ -667,6 +667,10 @@ public:
   /** Get TestMode*/
   bool GetTestMode(){return m_TestMode;};
 
+
+	/** Returns if VME Was expanded when stored last time. return true for non stored VME*/
+	bool WasVMEExpandedWhenStored() const { return m_VMEExpandedWhenStored; }
+
 protected:
   albaVME(); // to be allocated with New()
 	virtual ~albaVME(); // to be deleted with Delete()
@@ -771,6 +775,8 @@ protected:
   albaInteractor*  m_Behavior;     ///< the interactor representing the behavior of this VME
 
   int             m_VisualMode; ///< Store the visual mode to allow the visual pipe to choose the right visual pipe to render the VME
+
+	albaID		m_VMEExpandedWhenStored;
   
 	typedef struct
 	{

@@ -155,7 +155,7 @@ int albaOpExporterAbaqusFile::compareElem(const void *p1, const void *p2)
 int albaOpExporterAbaqusFile::Write()
 {
   FILE *outFile;
-  outFile = fopen(m_AbaqusOutputFileNameFullPath.ToAscii(), "w");
+  outFile = albaTryOpenFile(m_AbaqusOutputFileNameFullPath.ToAscii(), "w");
 
   albaVMEMesh *input = albaVMEMesh::SafeDownCast(m_Input);
 

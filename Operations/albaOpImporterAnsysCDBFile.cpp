@@ -80,7 +80,7 @@ int albaOpImporterAnsysCDBFile::ParseAnsysFile(albaString fileName)
 	}
 
   FILE *nodesFile;
-  nodesFile = fopen(m_NodesFileName, "w");
+  nodesFile = albaTryOpenFile(m_NodesFileName, "w");
 	if (!nodesFile)
 	{
 		albaLogMessage("Cannot Open: %s",m_NodesFileName.ToAscii());

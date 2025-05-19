@@ -447,7 +447,7 @@ int albaOpImporterAnsysCommon::WriteElements(int comp)
   albaString elementsfileName = m_CacheDir + "\\elements_part"<<comp<<".lis";
   m_Components[comp].ElementsFileName = elementsfileName;
 
-  FILE* elementsFile = fopen(elementsfileName, "w");
+  FILE* elementsFile = albaTryOpenFile(elementsfileName, "w");
   if (!elementsFile)
   {
     albaLogMessage("Cannot Open: %s",elementsfileName);
@@ -490,7 +490,7 @@ int albaOpImporterAnsysCommon::WriteElements(int comp)
 //----------------------------------------------------------------------------
 int albaOpImporterAnsysCommon::WriteMaterials()
 {
-	FILE *materialsFile = fopen(m_MaterialsFileName, "w");
+	FILE *materialsFile = albaTryOpenFile(m_MaterialsFileName, "w");
 	if (!materialsFile)
 	{
 		albaLogMessage("Cannot Open: %s", m_MaterialsFileName.ToAscii());

@@ -87,6 +87,14 @@ public:
   /** Retrieve wxwindows widget pointer of the tree.*/
   wxTreeCtrl *GetTree() {return m_NodeTree;};
   
+	/** Return True if the VME is Expanded on Tree */
+	virtual bool IsVMEExpanded(albaVME *vme);
+
+	/** Collapse the VME on the Tree */
+	virtual void CollapseVME(albaVME *vme);
+
+	/** Expand the VME on the Tree  */
+	virtual void ExpandVME(albaVME *vme);
 protected:
   /** Update the vme nodes icon. */
   void VmeUpdateIcon(albaVME *vme);

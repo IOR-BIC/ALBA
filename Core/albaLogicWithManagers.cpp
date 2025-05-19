@@ -1356,8 +1356,9 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		break;
 
 		default:
+#ifdef _DEBUG
 			e->Log();
-			break;
+#endif 
 			break;
 		} // end switch case
 	} // end if SafeDowncast
@@ -2278,6 +2279,24 @@ void albaLogicWithManagers::PlugStandardViews()
 	//vHtml->PackageView();
 	Plug(vHtml);
 
+}
+
+//----------------------------------------------------------------------------
+bool albaLogicWithManagers::IsVMEExpanded(albaVME *vme)
+{
+	return m_SideBar->IsVMEExpanded(vme);
+}
+
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::CollapseVME(albaVME *vme)
+{
+	m_SideBar->CollapseVME(vme);
+}
+
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::ExpandVME(albaVME *vme)
+{
+	m_SideBar->ExpandVME(vme);
 }
 
 //----------------------------------------------------------------------------
