@@ -231,10 +231,11 @@ void albaOpImporterDicom::OpRun()
 	//TODO RESTORE SET BUTTON STRING OPTION
 
 		
+	wxString lastDicomDir;
+	if(GetSetting())
+		lastDicomDir = GetSetting()->GetLastDicomDir();
 		
-	wxString lastDicomDir = GetSetting()->GetLastDicomDir();
-		
-	if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
+	if (lastDicomDir == "UNEDFINED_m_LastDicomDir" || lastDicomDir.empty())
 		lastDicomDir = albaGetLastUserFolder();		
 			
 	wxDirDialog dialog(m_Wizard->GetParent(),"", lastDicomDir, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER, m_Wizard->GetPosition());
@@ -248,7 +249,7 @@ void albaOpImporterDicom::OpRun()
 		CreateLoadPage();
 
 
-		if (!GetSetting()->GetSkipCrop())
+		if (GetSetting() && !GetSetting()->GetSkipCrop())
 		{
 			CreateCropPage();
 			m_LoadPage->SetNextPage(m_CropPage);
@@ -426,7 +427,7 @@ int albaOpImporterDicom::BuildVMEVolumeGrayOutput()
 	albaDicomSlice* firstSlice = m_SelectedSeries->GetSlice(0);
 	
 	int nFrames = m_SelectedSeries->GetCardiacImagesNum();
-	int step = m_TestMode ? 1 : GetSetting()->GetBuildStep() + 1;
+	int step = (m_TestMode || !GetSetting()) ? 1 : GetSetting()->GetBuildStep() + 1;
 	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
 	int SlicesPerFrame = (cropInterval / step);
 	
@@ -474,7 +475,7 @@ int albaOpImporterDicom::BuildVMEVolumeGrayOutput()
 		acc_out = accumulate.GetNewOutput(); 
 		acc_out->Update();
 
-		if (GetSetting()->GetAutoResample() && vtkRectilinearGrid::SafeDownCast(acc_out))
+		if (GetSetting() && GetSetting()->GetAutoResample() && vtkRectilinearGrid::SafeDownCast(acc_out))
 		{
 			vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(acc_out);
 			vtkALBASmartPointer<vtkALBAVolumeResample> resample = vtkALBAVolumeResample::New();
@@ -672,7 +673,7 @@ void albaOpImporterDicom::OnEvent(albaEventBase *alba_event)
 				wxWindow* NextButton = m_Wizard->FindWindowById(wxID_FORWARD);
 				wxString tmp = NextButton->GetLabel();
 
-				if (!GetSetting()->GetSkipCrop())
+				if (GetSetting() && !GetSetting()->GetSkipCrop())
 					NextButton->SetLabel("&Crop >");
 				else
 					NextButton->SetLabel("Finish");
@@ -856,7 +857,7 @@ bool albaOpImporterDicom::LoadDicomFromDir(const char *dicomDirABSPath)
 		
 	progressHelper.CloseProgressBar();
 
-	if(GetSetting()->GetAutoVMEType() && GetSetting()->GetOutputType() == TYPE_VOLUME)
+	if(GetSetting() && GetSetting()->GetAutoVMEType() && GetSetting()->GetOutputType() == TYPE_VOLUME)
 		m_StudyList->RemoveSingleImagesFromList();
 	
 	// start handling files
@@ -946,7 +947,7 @@ albaDicomSlice *albaOpImporterDicom::ReadDicomFile(albaString fileName)
 	}
 	else
 	{
-		if (GetSetting()->GetDCMImagePositionPatientExceptionHandling() == albaGUIDicomSettings::APPLY_DEFAULT_POSITION)
+		if (GetSetting() && GetSetting()->GetDCMImagePositionPatientExceptionHandling() == albaGUIDicomSettings::APPLY_DEFAULT_POSITION)
 		{
 			albaLogMessage("Cannot read Dicom tag ImagePositionPatient on %s\nUse default position.", fileName.GetCStr());
 		}
@@ -1297,13 +1298,13 @@ void albaOpImporterDicom::SelectSeries(albaDicomSeries * selectedSeries)
 			m_LoadGuiCenter = new albaGUI(this);
 			m_LoadGuiCenter->Divider();
 
-			if (numberOfSlices > 1 && !GetSetting()->GetAutoVMEType())
+			if (numberOfSlices > 1 && GetSetting() && !GetSetting()->GetAutoVMEType())
 			{
 				m_OutputType = 0;
 				wxString typeArrayVolumeImage[2] = { _("Volume"),_("Images") };
 				m_LoadGuiCenter->Radio(ID_VME_TYPE, "VME", &m_OutputType, 2, typeArrayVolumeImage, 1, "");
 			}
-			else if (numberOfSlices == 1 || GetSetting()->GetOutputType() == TYPE_IMAGE)
+			else if (numberOfSlices == 1 || (GetSetting() && GetSetting()->GetOutputType() == TYPE_IMAGE))
 			{
 				m_LoadGuiCenter->Label("Output type: Image");
 				m_LoadGuiCenter->Label("");
