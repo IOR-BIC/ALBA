@@ -53,6 +53,10 @@ public:
 	/** process events coming from Gui */
 	virtual void OnEvent(albaEventBase *alba_event);
 
+	void SetScalarBarLabelsNum(int num);
+
+	void SetScalarRange(double * sr);
+
 	/**Set the scalar bar position */
 	void SetScalarBarPos(int pos);
 
@@ -128,6 +132,11 @@ public:
 	
 	int IsDensisyMapActive() const { return m_DensisyMapActive; }
 	void SetDensisyMapActive(int val);
+
+	/** Creates/Show the Histogram */
+	void CreateHistogramDialog();
+
+
 protected:
 	
   vtkLookupTable  *m_Table;
@@ -156,9 +165,6 @@ protected:
 
 	/** Destroys the Density Map Stack */
 	void DestroyDensityMapStack();
-
-	/** Creates/Show the Histogram */
-	void CreateHistogramDialog();
 
   wxString                *m_ScalarsInComboBoxNames;
   wxString                *m_ScalarsVTKName;

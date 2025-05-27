@@ -85,6 +85,8 @@ albaPipeWithScalar::albaPipeWithScalar()
 	m_Histogram = NULL;
 	m_Dialog = NULL;
 	m_DensityFilter = NULL;
+
+	m_ShowScalarBar = 0;
 }
 //----------------------------------------------------------------------------
 albaPipeWithScalar::~albaPipeWithScalar()
@@ -238,19 +240,14 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 			{
 				double sr[2];
 				m_Table->GetTableRange(sr);
-				m_Mapper->SetScalarRange(sr);
-				if (m_LutSlider)
-					m_LutSlider->SetSubRange(sr);
-				GetLogicManager()->CameraUpdate();
+				SetScalarRange(sr);
 			}
 			break;
 			case ID_RANGE_MODIFIED:
 			{
 				double sr[2];
 				m_LutSlider->GetSubRange(sr);
-				m_Table->SetTableRange(sr);
-				m_Mapper->SetScalarRange(sr);
-				GetLogicManager()->CameraUpdate();
+				SetScalarRange(sr);
 			}
 			break;
 			case ID_SCALAR_MAP_ACTIVE:
@@ -283,11 +280,6 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 					return;
 
 				SetDensityVolume(vme);
-				m_Mapper->SetScalarVisibility(m_MapsGenActive);
-				EnableDisableGuiComponents();
-				UpdateActiveScalarsInVMEDataVectorItems();
-				GetLogicManager()->CameraUpdate();
-
 			}
 			break;
 			case ID_ENABLE_SCALAR_BAR:
@@ -301,17 +293,14 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 
 			case ID_SCALAR_BAR_LAB_N:
 			{
-				if (m_ScalarBarActor)
-					m_ScalarBarActor->SetNumberOfLabels(m_ScalarBarLabNum + 3);
-
+				SetScalarBarLabelsNum(m_ScalarBarLabNum + 3);
 				GetLogicManager()->CameraUpdate();
 			}
 			break;
 
 			case ID_SCALAR_BAR_POS:
 			{
-				int pos = m_ScalarBarPos;
-				SetScalarBarPos(pos);
+				SetScalarBarPos(m_ScalarBarPos);
 				GetLogicManager()->CameraUpdate();
 			}
 			break;
@@ -335,6 +324,24 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 }
 
 
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::SetScalarBarLabelsNum(int num)
+{
+	if (m_ScalarBarActor)
+		m_ScalarBarActor->SetNumberOfLabels(num);
+}
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::SetScalarRange(double * sr)
+{
+	m_Table->SetTableRange(sr);
+	m_Mapper->SetScalarRange(sr);
+	if (m_LutSlider)
+		m_LutSlider->SetSubRange(sr);
+
+	GetLogicManager()->CameraUpdate();
+}
 
 //----------------------------------------------------------------------------
 void albaPipeWithScalar::DestroyDensityMapStack()
@@ -775,7 +782,10 @@ void albaPipeWithScalar::SetDensityVolume(albaVME *vol)
 		UpdateActiveScalarsInVMEDataVectorItems();
 	}
 
+	m_Mapper->SetScalarVisibility(m_MapsGenActive);
 	EnableDisableGuiComponents();
+	UpdateActiveScalarsInVMEDataVectorItems();
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
