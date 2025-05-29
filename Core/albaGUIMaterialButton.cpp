@@ -29,6 +29,8 @@
 #include "albaGUIValidator.h"
 #include "mmaMaterial.h"
 #include "albaGUIPicButton.h"
+#include "albaViewManager.h"
+
 
 #include "albaVME.h"
 #include "vtkProperty.h"
@@ -125,6 +127,8 @@ void albaGUIMaterialButton::OnEvent(albaEventBase *alba_event)
 			case ID_OPACITY:
 				m_Material->m_Prop->SetOpacity(m_Material->m_Opacity);
 				UpdateMaterialIcon();
+				GetLogicManager()->GetViewManager()->PropertyUpdate();
+
 				GetLogicManager()->CameraUpdate();
       default:
         e->Log();
