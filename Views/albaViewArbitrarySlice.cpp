@@ -315,7 +315,7 @@ void albaViewArbitrarySlice::GetSlicingNormal(double * normal)
 void albaViewArbitrarySlice::VmeSelect(albaVME *node, bool select)
 {
 	m_ChildViewList[ARBITRARY_VIEW]->VmeSelect(node, select);
-
+	m_ChildViewList[SLICE_VIEW]->VmeSelect(node, select);
 
 	if (!m_AllSurface)
 	{
