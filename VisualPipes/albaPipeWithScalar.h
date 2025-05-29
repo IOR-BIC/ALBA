@@ -71,7 +71,6 @@ public:
 		ID_SCALAR_MAP_ACTIVE,
 		ID_ENABLE_SCALAR_BAR,
 		ID_SHOW_HISTOGRAM,
-		ID_CLOSE_HISTOGRAM,
 		ID_SCALAR_BAR_LAB_N,
 		ID_SCALAR_BAR_POS,
 		ID_LAST,
@@ -188,7 +187,7 @@ protected:
 	int											 m_ShowScalarBar;
 	int											 m_ScalarBarLabNum;
 	int											 m_ScalarBarPos;
-	int											 m_MapsGenActive;  //True when the maps generation is active (not gui option)
+	int											 m_MapsStackActive;  //True when the maps generation is active (not gui option)
 	int											 m_OldMapsGenActive;  //True when the maps generation is active (not gui option)
 
 	albaString							 m_DensVolName;
