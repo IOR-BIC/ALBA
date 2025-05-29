@@ -126,7 +126,7 @@ void albaOpImporterPLY::OpUndo()
 }
 
 //----------------------------------------------------------------------------
-void albaOpImporterPLY::ImportPLY()
+int albaOpImporterPLY::ImportPLY()
 {
   if (!m_TestMode)
   {
@@ -164,6 +164,8 @@ void albaOpImporterPLY::ImportPLY()
 	  
     m_ImportedPLYs.push_back(importedPLY);
   }
+
+	return ALBA_OK;
 }
 
 //----------------------------------------------------------------------------

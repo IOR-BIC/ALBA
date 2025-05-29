@@ -64,7 +64,7 @@ public:
   void OpDo();
 
   /** Import the file. */
-	void ImportPLY();
+	int ImportPLY();
 
   /** Used to retrieve imported data. It is useful when the operation is executed from code.*/
   void GetImportedPLY(std::vector<albaVMESurface*> &importedPLY);
