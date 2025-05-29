@@ -75,9 +75,9 @@ Example:
 class ALBA_EXPORT albaGUIDialog : public wxDialog, public albaObserver, public albaServiceClient  
 {
 public:
-	albaGUIDialog (const wxString& title,	long style = albaCLOSEWINDOW | albaRESIZABLE | albaCLOSE);
+	albaGUIDialog (const wxString& title,	long style = albaCLOSEWINDOW | albaRESIZABLE | albaCLOSE, albaObserver *listener=NULL);
 	virtual ~albaGUIDialog (); 
-  void SetListener(albaObserver *Listener) {m_Listener = Listener;};
+  void SetListener(albaObserver *listener) {m_Listener = listener;};
   void OnEvent(albaEventBase *alba_event);
 
   /** Add a widget to the dialog. */
