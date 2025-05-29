@@ -95,8 +95,11 @@ public:
   /** Set the position of the slider's cursors and send the event foe range modified. */
   void ReleaseButton();
 
-  /** Show an entry to insert a numerical values from keyboard. */
-	void ShowEntry(int id);
+  /** Show an entry to insert a Range numerical values from keyboard. */
+	void ShowRangeEntry(int id);
+
+	/** Show an entry to insert a Sub Range numerical values from keyboard. */
+	void ShowSubRangeEntry(int id);
 
   /** Set the label text. */
 	void SetText(long i, wxString text);
