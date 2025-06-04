@@ -78,13 +78,15 @@ albaPipeWithScalar::albaPipeWithScalar()
 	m_ScalarComboBox = NULL;
 	m_DensityVolume = NULL;
 
-	m_MapsGenActive = m_DensisyMapActive = m_ScalarMapActive   = m_ShowScalarBar = 0;
+	m_MapsStackActive = m_DensisyMapActive = m_ScalarMapActive   = m_ShowScalarBar = 0;
 	m_ScalarBarPos = SB_ON_RIGHT;
 	m_ScalarBarActor = NULL;
 	m_ScalarBarLabNum = 2;
 	m_Histogram = NULL;
 	m_Dialog = NULL;
 	m_DensityFilter = NULL;
+
+	m_ShowScalarBar = 0;
 }
 //----------------------------------------------------------------------------
 albaPipeWithScalar::~albaPipeWithScalar()
@@ -154,12 +156,12 @@ void albaPipeWithScalar::ManageScalarOnExecutePipe(vtkDataSet * dataSet)
 	m_Mapper->SetLookupTable(m_Table);
 	m_Mapper->SetScalarRange(sr);
 
-	if (m_MapsGenActive || m_ActiveScalarType == POINT_TYPE)
+	if (m_MapsStackActive || m_ActiveScalarType == POINT_TYPE)
 		m_Mapper->SetScalarModeToUsePointData();
 	else if (m_ActiveScalarType == CELL_TYPE)
 		m_Mapper->SetScalarModeToUseCellData();
 
-	if (m_MapsGenActive || m_ScalarMapActive)
+	if (m_MapsStackActive || m_ScalarMapActive)
 		m_Mapper->ScalarVisibilityOn();
 	else
 		m_Mapper->ScalarVisibilityOff();
@@ -176,14 +178,16 @@ void albaPipeWithScalar::CreateScalarsGui(albaGUI *gui)
 	gui->Divider();
 	gui->Bool(ID_DENSITY_MAPS, _("Enable Density Maps"), &m_DensisyMapActive, 1);
 	gui->Button(ID_SELECT_DENS_VME, &m_DensVolName, "Select Volume...","Select Density Volume"),
-	gui->Divider();
+	gui->Divider(1);
 	
+
+	m_LutSwatch = gui->Lut(ID_LUT, "Lut", m_Table);
+
 	m_LutSlider = new albaGUILutSlider(gui, ID_LUT_SLIDER, wxPoint(0, 0), wxSize(304, 22), wxBORDER_NONE);
 	m_LutSlider->SetListener(this);
 	m_LutSlider->SetFloatingPointTextOn();
 	gui->Add(m_LutSlider);
 
-  m_LutSwatch=gui->Lut(ID_LUT,"Lut",m_Table);
 	gui->Button(ID_SHOW_HISTOGRAM, "Show Histogram");
 
 	wxString numStrs[] = { "Three","Four","Five","Six","Seven","Eight","Nine","Ten" };
@@ -210,8 +214,9 @@ void albaPipeWithScalar::CreateDensityMapStack()
 	m_DensityFilter->Update();
 
 	m_Mapper->SetInputConnection(m_DensityFilter->GetOutputPort());
+	m_Mapper->SetScalarVisibility(true);
+	m_MapsStackActive = true;
 
-	m_MapsGenActive = true;
 
 	UpdateActiveScalarsInVMEDataVectorItems();
 }
@@ -238,19 +243,14 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 			{
 				double sr[2];
 				m_Table->GetTableRange(sr);
-				m_Mapper->SetScalarRange(sr);
-				if (m_LutSlider)
-					m_LutSlider->SetSubRange(sr);
-				GetLogicManager()->CameraUpdate();
+				SetScalarRange(sr);
 			}
 			break;
 			case ID_RANGE_MODIFIED:
 			{
 				double sr[2];
 				m_LutSlider->GetSubRange(sr);
-				m_Table->SetTableRange(sr);
-				m_Mapper->SetScalarRange(sr);
-				GetLogicManager()->CameraUpdate();
+				SetScalarRange(sr);
 			}
 			break;
 			case ID_SCALAR_MAP_ACTIVE:
@@ -283,11 +283,6 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 					return;
 
 				SetDensityVolume(vme);
-				m_Mapper->SetScalarVisibility(m_MapsGenActive);
-				EnableDisableGuiComponents();
-				UpdateActiveScalarsInVMEDataVectorItems();
-				GetLogicManager()->CameraUpdate();
-
 			}
 			break;
 			case ID_ENABLE_SCALAR_BAR:
@@ -301,26 +296,19 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 
 			case ID_SCALAR_BAR_LAB_N:
 			{
-				if (m_ScalarBarActor)
-					m_ScalarBarActor->SetNumberOfLabels(m_ScalarBarLabNum + 3);
-
+				SetScalarBarLabelsNum(m_ScalarBarLabNum + 3);
 				GetLogicManager()->CameraUpdate();
 			}
 			break;
 
 			case ID_SCALAR_BAR_POS:
 			{
-				int pos = m_ScalarBarPos;
-				SetScalarBarPos(pos);
+				SetScalarBarPos(m_ScalarBarPos);
 				GetLogicManager()->CameraUpdate();
 			}
 			break;
 			case ID_SHOW_HISTOGRAM:
 				CreateHistogramDialog();
-				break;
-			case ID_CLOSE_HISTOGRAM:
-				m_Dialog->Close(); 
-				DeleteHistogramDialog();
 				break;
 			default:
 				albaEventMacro(*e);
@@ -334,7 +322,24 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
   }
 }
 
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::SetScalarBarLabelsNum(int num)
+{
+	m_ScalarBarLabNum = num - 3;
+	if (m_ScalarBarActor)
+		m_ScalarBarActor->SetNumberOfLabels(num);
+}
 
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::SetScalarRange(double * sr)
+{
+	m_Table->SetTableRange(sr);
+	m_Mapper->SetScalarRange(sr);
+	if (m_LutSlider)
+		m_LutSlider->SetSubRange(sr);
+
+	GetLogicManager()->CameraUpdate();
+}
 
 //----------------------------------------------------------------------------
 void albaPipeWithScalar::DestroyDensityMapStack()
@@ -350,38 +355,30 @@ void albaPipeWithScalar::DestroyDensityMapStack()
 	}
 
 	vtkDEL(m_DensityFilter);
-	m_MapsGenActive = false;
+	m_MapsStackActive = false;
 }
 
 //----------------------------------------------------------------------------
 void albaPipeWithScalar::CreateHistogramDialog()
 {
-	if (m_Dialog == NULL)
-	{
-		m_Dialog = new albaGUIDialog("Histogram", albaRESIZABLE);
+	DeleteHistogramDialog();
+	m_Dialog = new albaGUIDialog("Histogram", albaRESIZABLE | albaCLOSEWINDOW, this);
+	albaGUI *gui = new albaGUI(this);
+	m_Histogram = new albaGUIHistogramWidget(gui, -1, wxPoint(0, 0), wxSize(630, 660), wxTAB_TRAVERSAL, true);
+	m_Histogram->SetListener(this);
+	gui->Add(m_Histogram, 1);
+	gui->AddGui(m_Histogram->GetGui());
+	gui->FitGui();
+	gui->Update();
 
-		
+	m_Dialog->Add(gui, 1);
+	m_Dialog->SetMinSize(wxSize(630, 660));
+	m_Dialog->SetSize(wxSize(630, 660));
+	m_Dialog->Show();
+	m_Dialog->Fit();
+	m_Dialog->FitInside();
 
-		albaGUI *gui = new albaGUI(this);
-
-		m_Histogram = new albaGUIHistogramWidget(gui, -1, wxPoint(0, 0), wxSize(400, 500), wxTAB_TRAVERSAL, true);
-		m_Histogram->SetListener(this);
-		UpdateVisualizationWithNewSelectedScalars();
-
-		gui->Add(m_Histogram, 1);
-		gui->AddGui(m_Histogram->GetGui());
-		gui->Button(ID_CLOSE_HISTOGRAM, _("Close"));
-		gui->FitGui();
-		gui->Update();
-
-		m_Dialog->Add(gui, 1);
-		m_Dialog->SetMinSize(wxSize(600, 600));
-		m_Dialog->Show();
-		m_Dialog->Fit();
-		m_Dialog->FitInside();
-	}
-	else 
-		m_Dialog->Show();
+	UpdateVisualizationWithNewSelectedScalars();
 }
 
 //----------------------------------------------------------------------------
@@ -396,9 +393,9 @@ void albaPipeWithScalar::EnableDisableGuiComponents()
 {
 	if (m_Gui)
 	{
-		bool scalarMangement = m_ScalarMapActive || (m_DensisyMapActive && m_DensityVolume);
-		m_Gui->Enable(ID_SCALAR_MAP_ACTIVE, m_NumberOfArrays > 0);
-		m_Gui->Enable(ID_SCALARS, m_ScalarMapActive);
+		bool scalarMangement = (m_ScalarMapActive && !m_DensisyMapActive) || (m_DensisyMapActive && m_DensityVolume);
+		m_Gui->Enable(ID_SCALAR_MAP_ACTIVE, m_NumberOfArrays > 0 && !m_DensisyMapActive);
+		m_Gui->Enable(ID_SCALARS, m_ScalarMapActive && !m_DensisyMapActive);
 		m_Gui->Enable(ID_SELECT_DENS_VME, m_DensisyMapActive);
 		m_Gui->Enable(ID_LUT, scalarMangement);
 		m_LutSlider->Enable(scalarMangement);
@@ -417,7 +414,7 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 	m_Vme->Update();
 	
 	
-	if (m_MapsGenActive && !m_OldMapsGenActive)
+	if (m_MapsStackActive && !m_OldMapsGenActive)
 	{
 		//run only on first activation
 		vtkDataSet * vtkData = m_DensityFilter->GetOutput();
@@ -425,7 +422,7 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 		vtkData->GetPointData()->GetScalars()->Modified();
 		vtkData->GetCellData()->SetActiveScalars("");
 	}
-	else if (!m_MapsGenActive && (m_OldActiveScalarType != m_OldActiveScalarType ||	m_OldScalarIndex != m_ScalarIndex))
+	else if (!m_MapsStackActive && (m_OldActiveScalarType != m_OldActiveScalarType ||	m_OldScalarIndex != m_ScalarIndex))
 	{
 		wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].ToAscii();
 
@@ -518,19 +515,19 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 {
 
-	if (m_ScalarMapActive == false && m_MapsGenActive == false)
+	if (m_ScalarMapActive == false && m_MapsStackActive == false)
 		return;
 	
 	vtkDataSet *data;
-	if (m_MapsGenActive)
+	if (m_MapsStackActive)
 		data = m_DensityFilter->GetOutput();
 	else 
 		data = m_Vme->GetOutput()->GetVTKData();
 
   double sr[2]={0,1};
-	if (m_MapsGenActive || (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0))
+	if (m_MapsStackActive || (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0))
 	{
-		if (m_MapsGenActive)
+		if (m_MapsStackActive)
 		{
 			sr[0] = 0;
 			sr[1] = 700;
@@ -561,7 +558,7 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
   m_ObjectMaterial->UpdateFromLut();
 
 
-  if(m_MapsGenActive || m_ActiveScalarType == POINT_TYPE)
+  if(m_MapsStackActive || m_ActiveScalarType == POINT_TYPE)
     m_Mapper->SetScalarModeToUsePointData();
   else if(m_ActiveScalarType == CELL_TYPE)
     m_Mapper->SetScalarModeToUseCellData();
@@ -653,7 +650,7 @@ void albaPipeWithScalar::SetLookupTableToMapper()
 //----------------------------------------------------------------------------
 void albaPipeWithScalar::UpdateProperty(bool fromTag)
 {
-	if (m_MapsGenActive)
+	if (m_MapsStackActive)
 	{
 		m_DensityFilter->GetOutput()->GetPointData()->GetScalars()->Modified();
 	}
@@ -743,7 +740,7 @@ void albaPipeWithScalar::SetScalarBarPos(int pos)
 void albaPipeWithScalar::ShowScalarBarActor(bool show /*= true*/)
 {
 	m_ShowScalarBar = show;
-	m_ScalarBarActor->SetVisibility(m_Selected && m_ScalarMapActive && show);
+	m_ScalarBarActor->SetVisibility(m_Selected && (m_ScalarMapActive || m_MapsStackActive) && show);
 }
 
 //----------------------------------------------------------------------------
@@ -751,20 +748,24 @@ void albaPipeWithScalar::SetDensityVolume(albaVME *vol)
 {
 	m_DensityVolume = vol;
 
+	m_DensVolName = m_DensityVolume ? m_DensityVolume->GetName() : "";
+
 	//need to create the density stack
-	if (vol && !m_MapsGenActive)
+	if (vol && !m_MapsStackActive)
 	{
 		CreateDensityMapStack();
 	}
 	else
 	{
-		m_DensVolName = m_DensityVolume ? m_DensityVolume->GetName() : "";
 		if(m_DensityFilter)
 			m_DensityFilter->SetSource(m_DensityVolume ? m_DensityVolume->GetOutput()->GetVTKData() :NULL);
 		UpdateActiveScalarsInVMEDataVectorItems();
 	}
 
+	m_Mapper->SetScalarVisibility(m_MapsStackActive);
 	EnableDisableGuiComponents();
+	UpdateActiveScalarsInVMEDataVectorItems();
+	GetLogicManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -779,15 +780,18 @@ void albaPipeWithScalar::SetDensisyMapActive(int val)
 	m_DensisyMapActive = val;
 
 	//need to disable density filter
-	if (m_MapsGenActive && !m_DensisyMapActive)
+	if (m_MapsStackActive && !m_DensisyMapActive)
 		DestroyDensityMapStack();
-	if (m_DensisyMapActive && m_DensityVolume)
+	else if (m_DensisyMapActive && m_DensityVolume)
 		CreateDensityMapStack();
-
-	m_Mapper->SetScalarVisibility(m_MapsGenActive);
+	else if(m_DensisyMapActive && !m_MapsStackActive && m_ScalarMapActive)
+		m_Mapper->SetScalarVisibility(false);
+	else
+		m_Mapper->SetScalarVisibility(m_ScalarMapActive);
 
 	EnableDisableGuiComponents();
-	UpdateActiveScalarsInVMEDataVectorItems();
+	if(m_Mapper->GetScalarVisibility())
+		UpdateActiveScalarsInVMEDataVectorItems();
 	GetLogicManager()->CameraUpdate();
  
 }

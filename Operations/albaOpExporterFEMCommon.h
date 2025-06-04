@@ -109,7 +109,13 @@ public:
 
 	/** Sets EnableBackCalculation */
 	void SetEnableBackCalculation(int enableBackCalculation) { m_EnableBackCalculation = enableBackCalculation; }
-	
+
+	/** Returns Egap */
+	double GetEgap() const { return m_Egap; }
+
+	/** Sets Egap */
+	void SetEgap(double egap) { m_Egap = egap; }
+
 	/** Returns Configuration */
 	BonematConfiguration GetConfiguration() const { return m_Configuration; }
 
@@ -121,7 +127,7 @@ public:
 
 	/** Builds operation's interface. */
 	void OpRun();
-
+		
 protected:
 
 	/** Return true for the acceptable vme type. */
@@ -151,7 +157,6 @@ protected:
 	/** extend this function to add exporter specific GUI */
 	virtual void AddSpecificGui() {};
 
-	int m_EnableBackCalculation;
 	bool m_HasConfiguration;
 
 	albaGUIRollOut *m_BackPropRollOut;
@@ -171,6 +176,7 @@ protected:
 	vtkFieldData *m_MaterialData;
 	vtkIdType *m_MatIdArray;
 
+	int m_EnableBackCalculation;
 	double m_Egap;
 
 	int m_ABSMatrixFlag;

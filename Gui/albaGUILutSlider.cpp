@@ -73,7 +73,8 @@ void albaGUILutButt::OnMouse(wxMouseEvent &event)
 {
 	if(event.RightDown())
 	{
-		((albaGUILutSlider*)GetParent())->ShowEntry(GetId());
+		((albaGUILutSlider*)GetParent())->ShowRangeEntry(GetId()); 
+		return;
 	}
 	else if(event.LeftDown())
 	{
@@ -90,7 +91,7 @@ void albaGUILutButt::OnMouse(wxMouseEvent &event)
 	}
 	else if (event.ButtonDClick(wxMOUSE_BTN_LEFT))
   {
-    ReleaseMouse();
+		((albaGUILutSlider*)GetParent())->ShowSubRangeEntry(GetId());
     return;
   }
 	else if(event.LeftIsDown())
@@ -230,8 +231,8 @@ void albaGUILutSlider::MoveButton(int id, int pos)
 
       if(false == m_FixedText)
       {
-	    m_MinButton->SetLabel(albaString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue));
-		  m_MaxButton->SetLabel(albaString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));
+	    m_MinButton->SetLabel(albaString::Format(m_FloatingPointText?"%.2f":"%.0f",m_LowValue));
+		  m_MaxButton->SetLabel(albaString::Format(m_FloatingPointText?"%.2f":"%.0f",m_HighValue));
       }
 		
 			m_MinLabel->SetSize(0,0,x1,BUTT_H);
@@ -315,8 +316,8 @@ void albaGUILutSlider::SetSubRange(double  low, double  hi )
 
   if(false == m_FixedText)
   {
-    m_MinButton->SetLabel(albaString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue));	
-    m_MaxButton->SetLabel(albaString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));	
+    m_MinButton->SetLabel(albaString::Format(m_FloatingPointText?"%.2f":"%.0f",m_LowValue));	
+    m_MaxButton->SetLabel(albaString::Format(m_FloatingPointText?"%.2f":"%.0f",m_HighValue));	
   }
   
   UpdateButtons();
@@ -348,22 +349,67 @@ void albaGUILutSlider::OnSize(wxSizeEvent &event)
 {
   UpdateButtons();
 }
+
 //----------------------------------------------------------------------------
-void albaGUILutSlider::ShowEntry(int id)
+void albaGUILutSlider::ShowRangeEntry(int id)
+{
+
+	wxString s;
+	wxString msg;
+	double val;
+
+	switch (id)
+	{
+		case 1: //min
+		{
+			if (true == m_FixedText) return;
+			msg = albaString::Format(m_FloatingPointText ? "Enter a value < %.2f" : "Enter a value < %.0f]", m_MaxValue);
+			s = albaString::Format(m_FloatingPointText ? "%.2f" : "%.0f", m_MinValue);
+			s = wxGetTextFromUser(msg, "Lookup Table Limit Minimum", s, this);
+			if (s.ToDouble(&val) && val < m_MaxValue)
+			{
+				SetRange(val, m_MaxValue);
+				SetSubRange(m_LowValue, m_HighValue);
+				albaEvent event = albaEvent(this, ID_RANGE_MODIFIED, this);
+				albaEventMacro(event);
+			}
+		}
+		break;
+		case 2: //max
+		{
+			msg = albaString::Format(m_FloatingPointText ? "Enter a value > %.2f" : "Enter a value > %.0f]", m_MinValue);
+			s = albaString::Format(m_FloatingPointText ? "%.2f" : "%.0f", m_MaxValue);
+			s = wxGetTextFromUser(msg, "Lookup Table Limit Maximum", s, this);
+			if (s.ToDouble(&val) && val > m_MinValue)
+			{
+				SetRange(m_MinValue, val);
+				SetSubRange(m_LowValue, m_HighValue);
+				albaEvent event = albaEvent(this, ID_RANGE_MODIFIED, this);
+				albaEventMacro(event);
+			}
+		}
+		break;
+	}
+}
+
+
+
+//----------------------------------------------------------------------------
+void albaGUILutSlider::ShowSubRangeEntry(int id)
 {
   wxString s;
   wxString msg;
-	long val;
+	double val;
 
 	switch(id)
 	{
 		case 1: //min
 		{
       if(true == m_FixedText) return;
-			msg = albaString::Format(m_FloatingPointText?"Enter a value in [%.1f .. %.1f]":"Enter a value in [%.0f .. %.0f]",m_MinValue, m_HighValue);
-			s = albaString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue);
-			s = wxGetTextFromUser(msg, "Lookup table Minimum",s,this);
-      if( s.ToLong(&val) ) 
+			msg = albaString::Format(m_FloatingPointText?"Enter a value in [%.2f .. %.2f]":"Enter a value in [%.0f .. %.0f]",m_MinValue, m_HighValue);
+			s = albaString::Format(m_FloatingPointText?"%.2f":"%.0f",m_LowValue);
+			s = wxGetTextFromUser(msg, "Lookup Table Minimum",s,this);
+      if( s.ToDouble(&val) )
 			{
 				val = (val>=m_MinValue) ? val : m_MinValue;
 				val = (val< m_HighValue)  ? val : m_HighValue;
@@ -376,10 +422,10 @@ void albaGUILutSlider::ShowEntry(int id)
 		case 2: //max
 		{
       if(true == m_FixedText) return;
-      msg = albaString::Format(m_FloatingPointText?"Enter a value in [%.1f .. %.1f]":"Enter a value in [%.0f .. %.0f]",m_LowValue, m_MaxValue);
-			s = albaString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue);
-			s = wxGetTextFromUser(msg, "Lookup table Maximum",s,this);
-      if( s.ToLong(&val) ) 
+      msg = albaString::Format(m_FloatingPointText?"Enter a value in [%.2f .. %.2f]":"Enter a value in [%.0f .. %.0f]",m_LowValue, m_MaxValue);
+			s = albaString::Format(m_FloatingPointText?"%.2f":"%.0f",m_HighValue);
+			s = wxGetTextFromUser(msg, "Lookup Table Maximum",s,this);
+      if( s.ToDouble(&val) ) 
 			{
 				val = (val> m_LowValue) ? val : m_LowValue;
 				val = (val<=m_MaxValue) ? val : m_MaxValue;

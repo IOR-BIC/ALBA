@@ -264,7 +264,7 @@ int albaOpImporterAbaqusFile::ParseAbaqusFile(albaString fileName)
   FILE *nodesFile=NULL, *partNodesFile=NULL, *materialsFile=NULL;
   
   albaString nodesFileName = m_CacheDir + "\\nodes_part0.lis";
-  nodesFile = fopen(nodesFileName, "w");
+  nodesFile = albaTryOpenFile(nodesFileName, "w");
   if (!nodesFile)
   {
     albaLogMessage("Cannot Open: %s",*nodesFileName);
@@ -272,7 +272,7 @@ int albaOpImporterAbaqusFile::ParseAbaqusFile(albaString fileName)
   }
 
   albaString materialsFileName =  m_CacheDir + "\\materials.lis";
-  materialsFile = fopen(materialsFileName, "w");
+  materialsFile = albaTryOpenFile(materialsFileName, "w");
   if (!materialsFile)
   {
     albaLogMessage("Cannot Open: %s",*materialsFileName);
@@ -301,7 +301,7 @@ int albaOpImporterAbaqusFile::ParseAbaqusFile(albaString fileName)
       
       // Open files
       albaString partNodesFileName =  m_CacheDir + "\\nodes_part"<<currentPart<<".lis";
-      partNodesFile = fopen(partNodesFileName, "w");
+      partNodesFile = albaTryOpenFile(partNodesFileName, "w");
       if (!partNodesFile)
       {
         albaLogMessage("Cannot Open: %s",*partNodesFileName);
@@ -880,7 +880,7 @@ int albaOpImporterAbaqusFile::WriteElements()
 
     albaString elementsfileName = m_CacheDir + "\\elements_part"<<p<<".lis";
 
-    elementsPartFile = fopen(elementsfileName, "w");
+    elementsPartFile = albaTryOpenFile(elementsfileName, "w");
 
     if (!elementsPartFile)
     {

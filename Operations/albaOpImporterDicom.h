@@ -130,8 +130,12 @@ public:
 	/** method allows to handle events from other objects*/
 	virtual void OnEvent(albaEventBase *alba_event);
 	
-	/*Set JustOnce Import Mode*/
+	/** Set JustOnce Import Mode*/
 	void SetJustOnceImport(bool justOnce) { m_JustOnceImport = justOnce; };
+
+
+	/** Select the Series whit more slices among all the studies */
+	int SelectSeriesWithMoreSlices();
 
 	/** Return an xpm-icon that can be used to represent this operation */
 	virtual char ** GetIcon();

@@ -32,9 +32,12 @@
 // Event Table:
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(albaGUIDialog, wxDialog)
+	EVT_CLOSE(albaGUIDialog::nvOnCloseWindow)
+
   EVT_BUTTON(wxID_OK, albaGUIDialog::nvOnOK)
   EVT_BUTTON(wxID_CANCEL, albaGUIDialog::nvOnCancel)
-  EVT_BUTTON(wxID_CLOSE, albaGUIDialog::nvOnClose)
+	EVT_BUTTON(wxID_CLOSE, albaGUIDialog::nvOnClose)
+
   EVT_BUTTON(wxOK, albaGUIDialog::nvOnOK)
   EVT_BUTTON(wxCANCEL, albaGUIDialog::nvOnCancel)
   EVT_SIZE(albaGUIDialog::OnSize)
@@ -50,11 +53,11 @@ BEGIN_EVENT_TABLE(albaGUIDialog, wxDialog)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
-albaGUIDialog::albaGUIDialog(const wxString& title,long style)
+albaGUIDialog::albaGUIDialog(const wxString& title,long style, albaObserver *listener)
 : wxDialog()
 //----------------------------------------------------------------------------
 {
-  m_Listener = NULL;
+  m_Listener = listener;
   m_DialogInitialized = false;
   
   long s = wxCAPTION;
@@ -215,8 +218,11 @@ void albaGUIDialog::OnOK(wxCommandEvent &event)
   if ( Validate()  )
   {
     TransferDataFromWindow();
-    SetReturnCode(wxID_OK);  
+    SetReturnCode(wxID_OK);
     Show(false);
+
+		if (m_Listener)
+			albaEventMacro(albaEvent(this, wxID_OK));
   }
 }
 //----------------------------------------------------------------------------
@@ -225,11 +231,18 @@ void albaGUIDialog::OnCancel(wxCommandEvent &event)
 {
   SetReturnCode(wxID_CANCEL);
   Show(false);
-	Destroy();
+
+	if (m_Listener)
+		albaEventMacro(albaEvent(this, wxID_CANCEL));
+
 }
 
 //----------------------------------------------------------------------------
 void albaGUIDialog::OnCloseWindow(wxCloseEvent &event)
 {
+	SetReturnCode(wxID_CLOSE);
+	Show(false);
 
+	if (m_Listener)
+		albaEventMacro(albaEvent(this, wxID_CLOSE));
 }

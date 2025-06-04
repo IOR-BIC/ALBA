@@ -15,7 +15,7 @@
 =========================================================================*/
 
 #include "albaDefines.h"
-
+#include "albaDecl.h"
 #include "albaOpMMLModelView.h"
 #include "albaSmartPointer.h"
 #include "vtkPolyData.h"
@@ -1827,7 +1827,7 @@ void albaOpMMLModelView::WriteMatrix(char *pch, vtkMatrix4x4 *m)
 	// copy
 	strcpy(FileName, pch);
 
-	stream = fopen( FileName, "w" );
+	stream = albaTryOpenFile( FileName, "w" );
 
     if( stream == NULL )
 		exit(0);

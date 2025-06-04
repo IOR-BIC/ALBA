@@ -535,4 +535,8 @@ ALBA_EXPORT void albaFormatDataSize(long long size, albaString& szOut);
 
 ALBA_EXPORT int* GetALBAExpertMode();
 
+/** Tries to open the files and ask the user for try again*/
+ALBA_EXPORT FILE *albaTryOpenFile(const char *filename, const char *mode);
+
+
 #endif

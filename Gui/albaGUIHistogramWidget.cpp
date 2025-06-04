@@ -72,6 +72,8 @@ albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /
   
   m_LogHistogramFlag   = false;
   m_ShowText           = true;
+
+	m_NumberOfBins = 100;
   //////////////////////////////////////////////////////////////////////////
 
   vtkNEW(m_Histogram);
@@ -97,6 +99,7 @@ albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /
   {
 	  wxBoxSizer *sizerH1 = new wxBoxSizer(wxHORIZONTAL);
 	  m_SliderThresholds = new albaGUILutSlider(this,ID_SLIDER_THRESHOLD ,wxPoint(0,0),wxSize(10,24), 0, "Thresholds");
+		m_SliderThresholds->SetFloatingPointTextOn();
 	  m_SliderThresholds->SetListener(this);
 	  m_SliderThresholds->SetSize(5,24);
 	  m_SliderThresholds->SetMinSize(wxSize(5,24));
@@ -151,7 +154,8 @@ void albaGUIHistogramWidget::UpdateLines(int min,int max)
 albaGUI *albaGUIHistogramWidget::GetGui()
 //----------------------------------------------------------------------------
 {
-  if (m_Gui == NULL)
+
+	if (m_Gui == NULL)
   {
     CreateGui();
   }
@@ -273,7 +277,7 @@ void albaGUIHistogramWidget::SetData(vtkDataArray *data, albaVME *vme)
   m_Data = data;
 	m_VME = vme;
   m_Histogram->SetInputData(m_Data);
-  double sr[2];
+	double sr[2];
   m_Data->GetRange(sr);
 
 	if (m_Lut)
@@ -286,8 +290,11 @@ void albaGUIHistogramWidget::SetData(vtkDataArray *data, albaVME *vme)
 	  m_SliderThresholds->SetRange(sr[0],sr[1]);
 	  m_SliderThresholds->SetSubRange(m_Threshold);
   }
+	m_Histogram->SetNumberOfBins(m_NumberOfBins);
   m_Histogram->UpdateLines(m_Threshold);
+	m_Histogram->Modified();
   UpdateGui();
+	m_HistogramRWI->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -342,18 +349,20 @@ void albaGUIHistogramWidget::ExportData()
 	int result = OP_RUN_CANCEL;
 	if (!f.IsEmpty())
 	{
-		FILE *outFile;
-		outFile = fopen(f.ToAscii(), "w");
-		//Header
-		fprintf(outFile, "%s;\n",m_Data->GetName());
+		FILE *outFile = albaTryOpenFile(f.ToAscii(), "w");
 
-		//Content
-		for (int i = 0; i < m_Data->GetNumberOfTuples(); i++)
-		{
-			double value = m_Data->GetTuple1(i);
-			fprintf(outFile,"%f;\n", value);
+		if (outFile != NULL)
+		{//Header
+			fprintf(outFile, "%s;\n", m_Data->GetName());
+
+			//Content
+			for (int i = 0; i < m_Data->GetNumberOfTuples(); i++)
+			{
+				double value = m_Data->GetTuple1(i);
+				fprintf(outFile, "%f;\n", value);
+			}
+			fclose(outFile);
 		}
-		fclose(outFile);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -381,7 +390,7 @@ void albaGUIHistogramWidget::ExportStats()
 	bool firstAcces = !wxFileExists(f.ToAscii());
 
 	FILE * pFile;
-	pFile = fopen(f.ToAscii(), "a+");
+	pFile = albaTryOpenFile(f.ToAscii(), "a+");
 
 	if (pFile != NULL)
 	{

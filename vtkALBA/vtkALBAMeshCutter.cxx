@@ -206,6 +206,17 @@ vtkUnstructuredGrid * vtkALBAMeshCutter::RemoveUnusedPoints(vtkUnstructuredGrid*
 		}
 	}
 
+
+	//when the outputs
+	if (numberOfPoints == numOfOutPoints)
+	{
+		vtkUnstructuredGrid *output;
+		vtkNEW(output);
+		output->DeepCopy(input);
+		delete[] usedPoints;
+		return output;
+	}
+
 	// Step 2: map old point IDs to new ones
 	vtkIdType *oldToNewIdMap, *newToOldIdMap;
 	oldToNewIdMap = new vtkIdType[numberOfPoints];

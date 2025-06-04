@@ -870,7 +870,7 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
     myFile.write ((char*)&pixelXMeterY, 4);
     myFile.close();
 
-    FILE *fp = fopen(filename.GetCStr(), "rb");
+    FILE *fp = albaTryOpenFile(filename.GetCStr(), "rb");
     if(!fp) return ;
 
     BITMAPFILEHEADER bmfh={0};
@@ -1088,7 +1088,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
         myFile.write ((char*)&pixelXMeterY, 4);
         myFile.close();
 
-        FILE *fp = fopen(temp.ToAscii(), "rb");
+        FILE *fp = albaTryOpenFile(temp.ToAscii(), "rb");
         if(!fp) return ;
 
         BITMAPFILEHEADER bmfh={0};
