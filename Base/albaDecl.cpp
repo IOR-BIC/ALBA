@@ -210,6 +210,19 @@ wxString albaGetLastUserFolder()
 
 
 //----------------------------------------------------------------------------
+ALBA_EXPORT void albaOpenWithDefaultApp(const char *filename)
+{
+	// Open Report File
+	wxString url = "file:///";
+	url = url + filename;
+	url.Replace("\\", "/");
+	albaLogMessage("Opening %f", url.ToAscii());
+	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
+	command = command + url;
+	wxExecute(command);
+}
+
+//----------------------------------------------------------------------------
 ALBA_EXPORT void albaSetAppDebugDir(wxString ddir)
 {
 	GLO_appDebugDir = ddir;
@@ -597,6 +610,13 @@ int* GetALBAExpertMode()
 FILE *albaTryOpenFile(const char *filename, const char *mode)
 {
 	FILE * pFile = NULL;
+
+	if (albaString("filename").IsEmpty())
+		return NULL;
+
+	if ((albaString("r").Equals(mode) || albaString("r+").Equals(mode)) && !wxFileExists(filename))
+		return NULL;
+
 	while (pFile == NULL)
 	{
 		pFile = fopen(filename, mode);
@@ -609,10 +629,10 @@ FILE *albaTryOpenFile(const char *filename, const char *mode)
 			
 			message.Printf("File: %s\nIn: %s\n\nThe file can be opened in another application.\n\nTry Again ?",fileStr.BaseName(),path.GetCStr());
 			wxMessageDialog dialog(albaGetFrame(),message.GetCStr(), _("File opening failed."), wxYES_NO | wxYES_DEFAULT);
-			if (dialog.ShowModal() != wxID_YES)
-				continue;
+			int showModal = dialog.ShowModal();
+			if (showModal != wxID_YES)
+				break;
 		}
-		else continue;
 	}
 	return pFile;
 }
