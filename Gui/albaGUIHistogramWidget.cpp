@@ -345,35 +345,28 @@ void albaGUIHistogramWidget::ExportData()
 
 	wxString wildc = "ASCII CSV file (*.csv)|*.csv";
 	wxString f = albaGetSaveFile(proposed, wildc).ToAscii();
+	FILE *outFile = NULL;
 
 	int result = OP_RUN_CANCEL;
+
 	if (!f.IsEmpty())
-	{
-		FILE *outFile = albaTryOpenFile(f.ToAscii(), "w");
+		outFile = albaTryOpenFile(f.ToAscii(), "w");
 
-		if (outFile != NULL)
-		{//Header
-			fprintf(outFile, "%s;\n", m_Data->GetName());
+	if (outFile != NULL)
+	{//Header
+		fprintf(outFile, "%s;\n", m_Data->GetName());
 
-			//Content
-			for (int i = 0; i < m_Data->GetNumberOfTuples(); i++)
-			{
-				double value = m_Data->GetTuple1(i);
-				fprintf(outFile, "%f;\n", value);
-			}
-			fclose(outFile);
+		//Content
+		for (int i = 0; i < m_Data->GetNumberOfTuples(); i++)
+		{
+			double value = m_Data->GetTuple1(i);
+			fprintf(outFile, "%f;\n", value);
 		}
-	}
+		fclose(outFile);
 
-	//////////////////////////////////////////////////////////////////////////
-	// Open Report File
-	wxString url = "file:///";
-	url = url + f;
-	url.Replace("\\", "/");
-	albaLogMessage("Opening %f", url.ToAscii());
-	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
-	command = command + url;
-	wxExecute(command);
+
+		albaOpenWithDefaultApp(f.ToAscii());
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -390,15 +383,16 @@ void albaGUIHistogramWidget::ExportStats()
 	bool firstAcces = !wxFileExists(f.ToAscii());
 
 	FILE * pFile;
-	pFile = albaTryOpenFile(f.ToAscii(), "a+");
+
+	if (!f.IsEmpty())
+		pFile = albaTryOpenFile(f.ToAscii(), "a+");
 
 	if (pFile != NULL)
 	{
 
+
 		if (firstAcces) // Header
-		{
 			fprintf(pFile,"VME Name;Scalar Name;Mean;Min;Max;STD Error;\n");
-		}
 
 		albaString vmeName = m_VME ? m_VME->GetName() : "";
 
@@ -430,17 +424,9 @@ void albaGUIHistogramWidget::ExportStats()
 		fprintf(pFile, "%s;%s;%.2f;%.2f;%.2f;%.2f;\n", vmeName.GetCStr(), m_Data->GetName(), mean, min, max, stdDev);
 		
 		fclose(pFile);
-	}
 
-	//////////////////////////////////////////////////////////////////////////
-	// Open Report File
-	wxString url = "file:///";
-	url = url + f;
-	url.Replace("\\", "/");
-	albaLogMessage("Opening %f", url.ToAscii());
-	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
-	command = command + url;
-	wxExecute(command);
+		albaOpenWithDefaultApp(f.ToAscii());
+	}
 }
 
 //----------------------------------------------------------------------------

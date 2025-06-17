@@ -515,6 +515,9 @@ ALBA_EXPORT wxString albaGetDocumentsDirectory();
 /** return the Last User directory */
 ALBA_EXPORT wxString albaGetLastUserFolder();
 
+/** Open the file whit the system default application*/
+ALBA_EXPORT void albaOpenWithDefaultApp(const char *filename);
+
 /** return the Last User directory */
 ALBA_EXPORT void albaSetAppDebugDir(wxString ddir);
 
