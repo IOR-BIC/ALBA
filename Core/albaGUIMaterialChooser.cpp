@@ -26,7 +26,7 @@
 #include "albaGUIMaterialChooser.h"
 
 #include <wx/event.h>
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include <wx/settings.h>
 #include <wx/laywin.h>
 #include <wx/treectrl.h>
@@ -129,7 +129,7 @@ bool albaGUIMaterialChooser::ShowChooserDialog(albaVME *vme, bool remember_last_
 	
   if(m_List.empty())
 	{
-    wxBusyInfo wait("Creating material library: Please wait");
+    albaGUIBusyInfo wait("Creating material library: Please wait");
 	  CreateDefaultLibrary();
 	}
 

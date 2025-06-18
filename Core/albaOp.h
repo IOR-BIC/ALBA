@@ -139,7 +139,7 @@ public:
 	albaDeviceButtonsPadMouse *GetMouse() { return m_Mouse; };
 
 	/** Turn On m_TestMode flag.
-	The m_TestMode flag is used to exclude the execution of splash screen or wxBusyInfo that conflicts with test machine.*/
+	The m_TestMode flag is used to exclude the execution of GUI components that conflicts with test machine.*/
 	void TestModeOn() { m_TestMode = true; };
 
 	/** Used to turn off m_TestMode flag.*/

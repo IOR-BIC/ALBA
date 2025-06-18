@@ -39,7 +39,7 @@
 #include "vtkImageData.h"
 #include "vtkTransform.h"
 #include "vtkTransformFilter.h"
-#include "wx\busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpCropDeformableROI);
@@ -159,11 +159,8 @@ void albaOpCropDeformableROI::Algorithm(albaVME *vme)
 {
 	if(vme)
 	{
-		wxBusyInfo *busyInfo=NULL;;
-		if(GetTestMode() == false)
-		{
-				busyInfo = new wxBusyInfo("Please Wait...");
-		}
+		albaGUIBusyInfo busyInfo("Please Wait...", m_TestMode);
+	
 		vtkPolyData *maskPolydata=NULL;
 		vtkPolyData *transformedMaskPolydata=NULL;
 		vtkTransform *transform = NULL;
@@ -253,7 +250,6 @@ void albaOpCropDeformableROI::Algorithm(albaVME *vme)
 
 		vtkDEL(transform);
 		vtkDEL(transformFilter);
-		cppDEL(busyInfo);
 	}
 }
 

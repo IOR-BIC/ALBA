@@ -24,7 +24,7 @@
 
 #include "albaOpImporterMesh.h" 
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 #include "albaGUI.h"
@@ -86,11 +86,8 @@ void albaOpImporterMesh::OpRun()
 //----------------------------------------------------------------------------
 int albaOpImporterMesh::Read()
 {
-  if (!m_TestMode)
-  {
-    wxBusyInfo wait(_("Loading file: ..."));
-  }
-	
+  albaGUIBusyInfo wait(_("Loading file: ..."),m_TestMode);
+  	
   albaVMEMeshAnsysTextImporter *reader = new albaVMEMeshAnsysTextImporter;
 	reader->SetNodesFileName(m_NodesFileName.GetCStr());
   reader->SetElementsFileName(m_ElementsFileName.GetCStr());

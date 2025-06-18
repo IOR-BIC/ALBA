@@ -2013,6 +2013,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
 	Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
 	Plug(new albaOpImporterScancoImageIO("Scanco IO"));
+	Plug(new albaOpImporterScancoImageIO("Scanco IO")); 
 
 	//------------------------------------------------------------
 	// Exporter Menu:

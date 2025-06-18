@@ -29,7 +29,7 @@ using namespace std;
 #include "albaOpComputeInertialTensor.h"
 
 #include "vnl/vnl_cross.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "vtkCell.h"
 #include "vtkIdList.h"

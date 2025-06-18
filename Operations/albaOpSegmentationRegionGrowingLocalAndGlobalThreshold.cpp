@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpSegmentationRegionGrowingLocalAndGlobalThreshold.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 #include "albaGUI.h"
@@ -165,7 +165,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
       OpStop(OP_RUN_CANCEL);
       return;
     }
-    wxBusyInfo wait_info1("Resampling...");
+    albaGUIBusyInfo wait_info1("Resampling...", m_TestMode);
     albaOpVolumeResample *op = new albaOpVolumeResample();
     op->SetInput(m_VolumeInput);
     op->TestModeOn();

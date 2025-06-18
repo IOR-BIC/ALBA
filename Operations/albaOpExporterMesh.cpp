@@ -24,7 +24,7 @@
 
 #include "albaOpExporterMesh.h"
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 
@@ -113,11 +113,8 @@ void albaOpExporterMesh::OnOK()
 //----------------------------------------------------------------------------
 int albaOpExporterMesh::Write()
 {
-  if (!m_TestMode)
-  {
-    wxBusyInfo wait(_("Writing file ..."));
-  }
-	
+	albaGUIBusyInfo wait(_("Writing file ..."),m_TestMode);
+  
   // Create the writer and pass the file name
   albaVMEMeshAnsysTextExporter *writer = new albaVMEMeshAnsysTextExporter;
   writer->SetInput((vtkUnstructuredGrid*)m_Input->GetOutput()->GetVTKData());

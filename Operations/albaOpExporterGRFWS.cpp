@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 #include "albaOpExporterGRFWS.h"
 
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
 
@@ -364,7 +364,6 @@ int albaOpExporterGRFWS::LoadVMEs(albaVME* node)
 void albaOpExporterGRFWS::Write()   
 //----------------------------------------------------------------------------
 {
-  wxBusyInfo *wait = NULL;
   albaString info = "Loading data from files";
 	albaProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
@@ -1136,13 +1135,12 @@ void albaOpExporterGRFWS::WriteSingleVectorFast()
 void albaOpExporterGRFWS::CalculateTresholds()
 //----------------------------------------------------------------------------
 {
-  wxBusyInfo *wait = NULL;
+  albaGUIBusyInfo wait("Calculating tresholds...", m_TestMode);
+
   if (!m_TestMode)
-  {
     wxSetCursor(wxCursor(wxCURSOR_WAIT));
-    wait = new wxBusyInfo("Calculating tresholds...");
-  }
-  // Calculate tresholds
+  
+	// Calculate tresholds
   if (m_ForceLeft)
   {
     m_Treshold.at(0) = CalculateTreshold(m_ForceLeft);
@@ -1164,7 +1162,6 @@ void albaOpExporterGRFWS::CalculateTresholds()
   {
     m_AdvanceSettings->Update();  
     wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
-    cppDEL(wait);
   }
 }
 //----------------------------------------------------------------------------

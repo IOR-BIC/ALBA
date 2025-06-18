@@ -50,7 +50,7 @@
 
 //#include "vtkArrayCalculator.h"
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include <float.h>
 
 

@@ -23,7 +23,7 @@ PURPOSE. See the above copyright notice for more information.
 
 #include "albaOpImporterDicFile.h"
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 #include "albaGUI.h"

@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpApplyTrajectory.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>
@@ -261,11 +261,8 @@ void albaOpApplyTrajectory::OnEvent(albaEventBase *alba_event)
 int albaOpApplyTrajectory::Read()   
 //----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
-  {
-    wxBusyInfo wait("Working, please wait ..");
-  }
-
+	albaGUIBusyInfo wait("Working, please wait ..", m_TestMode);
+  
   albaNEW(m_OriginalMatrix);
   m_OriginalMatrix->DeepCopy(m_Input->GetOutput()->GetAbsMatrix());
 
@@ -325,11 +322,8 @@ int albaOpApplyTrajectory::ApplyTrajectoriesFromVME()
 {
   assert(m_VME);
 
-  if (!m_TestMode)
-  {
-    wxBusyInfo wait("Please wait, working...");
-  }
-
+	albaGUIBusyInfo wait("Please wait, working...", m_TestMode);
+  
   albaNEW(m_OriginalMatrix);
   m_OriginalMatrix->DeepCopy(m_Input->GetOutput()->GetAbsMatrix());
 

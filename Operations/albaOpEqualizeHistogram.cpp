@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpEqualizeHistogram.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include "albaVME.h"
 #include "albaGUI.h"
 #include "albaGUIDialog.h"
@@ -120,7 +120,7 @@ void albaOpEqualizeHistogram::OpRun()
       OpStop(OP_RUN_CANCEL);
       return;
     }
-    wxBusyInfo wait_info1("Resampling...");
+		albaGUIBusyInfo wait_info1("Resampling...");
     albaOpVolumeResample *op = new albaOpVolumeResample();
     op->SetInput(m_VolumeInput);
     op->TestModeOn();

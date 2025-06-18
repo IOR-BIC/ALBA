@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaDefines
- Authors: Marco Petrone
+ Authors: Marco Petrone, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -15,6 +15,7 @@
 =========================================================================*/
 #include "albaDefines.h"
 #include "albaMutexLock.h"
+#include "albaGUIBusyInfo.h"
 
 #include "wx/string.h"
 #include "albaIncludeWIN32.h"
@@ -54,6 +55,7 @@ void albaLogMessage(const char *format, ...)
 // open a warning dialog and write a message
 void albaWarningMessage(const char *format, ...)
 {
+	albaGUIBusyInfo::HideAll();
   albaLogMutex.Lock();
   ALBA_PRINT_MACRO(format,albaLogBuffer,sizeof(albaLogBuffer));
 
@@ -64,12 +66,14 @@ void albaWarningMessage(const char *format, ...)
 #endif
   
   albaLogMutex.Unlock();
+	albaGUIBusyInfo::ShowAll();
 }
 
 //------------------------------------------------------------------------------
 // open an error dialog and write a message
 void albaErrorMessage(const char *format, ...)
 {
+	albaGUIBusyInfo::HideAll();
   albaLogMutex.Lock();
   ALBA_PRINT_MACRO(format,albaLogBuffer,sizeof(albaLogBuffer));
 
@@ -80,12 +84,14 @@ void albaErrorMessage(const char *format, ...)
 #endif
   
   albaLogMutex.Unlock();
+	albaGUIBusyInfo::ShowAll();
 }
 
 //------------------------------------------------------------------------------
 // open a message dialog and write a message
 void albaMessage(const char *format, ...)
 {
+	albaGUIBusyInfo::HideAll();
   albaLogMutex.Lock();
   ALBA_PRINT_MACRO(format,albaLogBuffer,sizeof(albaLogBuffer));
 
@@ -96,6 +102,7 @@ void albaMessage(const char *format, ...)
 #endif
   
   albaLogMutex.Unlock();
+	albaGUIBusyInfo::ShowAll();
 }
 
 

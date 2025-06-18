@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpExporterBmp.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 #include "albaGUI.h"
@@ -135,11 +135,6 @@ void albaOpExporterBmp::SaveBmp()
   path+= _("\\");
   path+= name;
   path+= _("\\");
-  /*
-#ifndef TEST_MODE
-    wxBusyInfo wait(_("Please wait, working..."));
-#endif TEST_MODE
-    */
 
   albaVMEVolumeGray *volume=albaVMEVolumeGray::SafeDownCast(m_Input);
   volume->Update();

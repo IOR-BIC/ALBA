@@ -35,7 +35,7 @@
 #include "albaVME.h"
 #include "albaVMEVolumeGray.h"
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "vtkALBAAssembly.h"
 #include "vtkALBASmartPointer.h"
@@ -344,15 +344,12 @@ void albaPipeRayCast::UpdateFromData()
   //If input is a Rectilinear grid this pipe need a Resample
   if (vtkRectilinearGrid *rgrid = vtkRectilinearGrid::SafeDownCast(dataset))
   {
-    wxBusyInfo *info;
-    wxBusyCursor *wait;
-
-    if (!m_TestMode)
-    {
+		albaGUIBusyInfo busy(_("Resampling..."));
+    wxBusyCursor *wait=NULL;
+		if (!m_TestMode)
       wait = new wxBusyCursor;
-      info = new wxBusyInfo(_("Resampling..."));
-    }
-
+      
+    
     resampled=true;
 
 
@@ -404,25 +401,17 @@ void albaPipeRayCast::UpdateFromData()
     resampleFilter->AutoSpacingOff();
     resampleFilter->Update();
 
-    if(!m_TestMode)
-    {
-      delete wait;
-      delete info;
-    }
+		cppDEL(wait);
   }
   //Else if input is an Structured Point we use it directly
   else 
     volume=vtkImageData::SafeDownCast(dataset);
 
-  wxBusyInfo *info;
-  wxBusyCursor *wait;
+  wxBusyCursor *wait=NULL;
 
   if (!m_TestMode)
-  {
     wait = new wxBusyCursor;
-   // info = new wxBusyInfo(_("Volume filtering..."));
-  }
-
+  
   //RayCast Cleaner removes border effects from bones
   //(bone sanding) and produces in output a volume whit unsigned short 
   //scalars shifted by - lower range 
@@ -470,11 +459,7 @@ void albaPipeRayCast::UpdateFromData()
   m_Volume->PickableOff();
   m_AssemblyFront->AddPart(m_Volume);
 
-  if(!m_TestMode)
-  {
-    delete wait;
-    //delete info;
-  }
+  cppDEL(wait);
 }
 
 //----------------------------------------------------------------------------
