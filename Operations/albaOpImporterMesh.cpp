@@ -159,7 +159,7 @@ enum Mesh_Importer_ID
 //----------------------------------------------------------------------------
 void albaOpImporterMesh::CreateGui()
 {
-	albaString wildcard = "lis files (*.lis)|*.lis|txt files (*.txt)|*.txt|All Files (*.*)|*.*";
+	albaString wildcard = "Lis and TXT files (*.lis;*.txt)|*.lis;*.txt|Lis files (*.lis)|*.lis|TXT files (*.txt)|*.txt|All Files (*.*)|*.*";
 
   m_Gui = new albaGUI(this);
   m_Gui->SetListener(this);

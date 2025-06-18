@@ -748,14 +748,7 @@ void albaOpVOIDensity::WriteScalars()
 		fclose(outFile);
 	}
 
-	// Open Report File
-	wxString url = "file:///";
-	url = url + newFileName.GetCStr();
-	url.Replace("\\", "/");
-	albaLogMessage("Opening %f", url.ToAscii());
-	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
-	command = command + url;
-	wxExecute(command);
+	albaOpenWithDefaultApp(newFileName);
 }
 
 
@@ -773,14 +766,7 @@ void albaOpVOIDensity::WriteReport()
 
 	CreateCSVFile(newFileName);
 
-	// Open Report File
-	wxString url = "file:///";
-	url = url + newFileName.GetCStr();
-	url.Replace("\\", "/");
-	albaLogMessage("Opening %f", url.ToAscii());
-	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
-	command = command + url;
-	wxExecute(command);
+	albaOpenWithDefaultApp(newFileName);
 }
 
 //----------------------------------------------------------------------------
