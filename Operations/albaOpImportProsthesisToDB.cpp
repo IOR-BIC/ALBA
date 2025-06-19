@@ -28,7 +28,7 @@ PURPOSE. See the above copyright notice for more information.
 
 #include "wx/wfstream.h"
 #include "wx/zipstrm.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include <wx/fs_zip.h>
 #include <wx/zstream.h>
 #include <fstream>

@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <algorithm>
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include "wx/listctrl.h"
 #include "wx/dir.h"
 

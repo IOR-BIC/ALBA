@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpFlipNormals.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 
@@ -753,11 +753,8 @@ void albaOpFlipNormals::FlipNormals()
 //----------------------------------------------------------------------------
 {
 	// perform cells removing...
-	if (m_TestMode == false)
-	{
-		wxBusyInfo("Flip normals...");
-	}
-
+	albaGUIBusyInfo("Flip normals...",m_TestMode);
+	
 	for(int i=0;i<m_CellFilter->GetNumberOfMarkedCells();i++)
 	{
 		int j=0;

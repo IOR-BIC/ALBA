@@ -203,9 +203,11 @@ public:
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node) { return true; };
 
-protected:
-
+	/** Imports the Scanco file*/
 	int ImportFile();
+
+
+protected:
 
 	template <typename TBufferType> void RescaleToHU(TBufferType * buffer, size_t size, double slope, double intercept);
 

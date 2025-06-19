@@ -47,7 +47,7 @@ void albaVMERawMotionDataTest::Test()
   filename<<"/RAW_MAL/Fprg3bsi.man";
 
   albaString fileDict=ALBA_DATA_ROOT;
-  fileDict<<"/RAW_MAL/DICT_FPRG3BSL_421.TXT";
+	fileDict << "/RAW_MAL/DICT_FPRG3BSL_421.TXT";
 
   vmeRawMotionData->DictionaryOn();
 

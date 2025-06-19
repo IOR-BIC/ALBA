@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpImporterASCII.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include <wx/tokenzr.h>
 #include <wx/dir.h>
 
@@ -195,8 +195,7 @@ void albaOpImporterASCII::OnEvent(albaEventBase *alba_event)
 int albaOpImporterASCII::ImportASCII()
 //----------------------------------------------------------------------------
 {
-  if(!this->m_TestMode)
-	  wxBusyInfo wait(_("Loading file/s: ..."));
+  albaGUIBusyInfo wait(_("Loading file/s: ..."),m_TestMode);
   albaNEW(m_ScalarData);
   m_ScalarData->SetName("scalar");
 

@@ -20,7 +20,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 
 #include "albaOpComputeHausdorffDistance.h"
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaEvent.h"
 #include "albaGUI.h"

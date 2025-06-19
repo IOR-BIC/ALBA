@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpImporterSTL.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 #include "albaTagItem.h"
@@ -124,11 +124,8 @@ void albaOpImporterSTL::CheckSwap(const char *file_name, int &swapFlag)
 
     //check if the file needs swapping
     //reading the header
-    if (!m_TestMode)
-    {
-      wxBusyInfo wait("Checking if the file needs swapping: ...");
-    }
-
+    albaGUIBusyInfo wait("Checking if the file needs swapping: ...",m_TestMode);
+    
     char ch;
     unsigned int number, v;
     number = 0;
@@ -193,11 +190,8 @@ void albaOpImporterSTL::OpUndo()
 void albaOpImporterSTL::ImportSTL()
 //----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
-  {
-    wxBusyInfo wait("Loading file: ...");  
-  }
-
+  albaGUIBusyInfo wait("Loading file: ...",m_TestMode);  
+  
   unsigned int i;
   for(i = 0; i < m_ImportedSTLs.size(); i++)
     albaDEL(m_ImportedSTLs[i]);

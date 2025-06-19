@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpImporterVTKXML.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 
 #include "albaVMEPolylineGraph.h"
 

@@ -26,7 +26,7 @@
 
 #include "albaOpTransformOld.h"
 
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 
 #include "albaDecl.h"
 #include "albaGUI.h"
@@ -123,11 +123,8 @@ void albaOpTransformOld::OpRun()
 //----------------------------------------------------------------------------
 {
   // progress bar stuff
-  if (!m_TestMode)
-  {
-  	wxBusyInfo wait("creating gui...");
-  }
-
+ 	albaGUIBusyInfo wait("creating gui...",m_TestMode);
+ 
   assert(m_Input);
   m_CurrentTime = m_Input->GetTimeStamp();
 
@@ -205,7 +202,7 @@ void albaOpTransformOld::OpStop(int result)
 //----------------------------------------------------------------------------
 {  
   // progress bar stuff
-  wxBusyInfo wait("destroying gui...");
+  albaGUIBusyInfo wait("destroying gui...",m_TestMode);
 
   m_GizmoTranslate->Show(false);
   cppDEL(m_GizmoTranslate);

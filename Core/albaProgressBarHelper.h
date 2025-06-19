@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 // forward declarations
 class albaObserver;
-class wxBusyInfo;
+class albaGUIBusyInfo;
 
 /** albaProgressBarHelper Is an helper for manage progress bar advance
   */
@@ -61,7 +61,7 @@ protected:
 	bool m_TextMode;
 	bool m_Inited;
 	long m_Progress;
-	wxBusyInfo *m_BusyInfo;
+	albaGUIBusyInfo *m_BusyInfo;
 	wxBusyCursor *m_BusyCursor;
 	albaObserver    *m_Listener;
 	

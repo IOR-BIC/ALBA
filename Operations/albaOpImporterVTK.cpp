@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpImporterVTK.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include "albaEvent.h"
 
 #include "albaVME.h"
@@ -130,8 +130,7 @@ int albaOpImporterVTK::ImportVTK()
 //----------------------------------------------------------------------------
 {
 	bool success = false;
-	if (!this->m_TestMode)
-		wxBusyInfo wait(_("Loading file: ..."));
+	albaGUIBusyInfo wait(_("Loading file: ..."),m_TestMode);
 
 	vtkALBASmartPointer<vtkDataSetReader> reader;
 	reader->SetFileName(m_File);

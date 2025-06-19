@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpImporterMSF1x.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include "albaEvent.h"
 
 #include "albaVME.h"
@@ -87,7 +87,6 @@ void albaOpImporterMSF1x::ImportMSF()
 //----------------------------------------------------------------------------
 {
   bool success = false;
-//	wxBusyInfo wait("Loading file: ...");
   
   m_Importer = new albaMSFImporter;
   m_Importer->SetURL(m_File);

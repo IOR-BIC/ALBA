@@ -68,13 +68,13 @@ SET(PROJECT_SRCS
   albaGUIDynamicVP.cpp  				albaGUIDynamicVP.h
   albaGUILutHistogramSwatch.cpp  	albaGUILutHistogramSwatch.h
   albaGUILutHistogramEditor.cpp  	albaGUILutHistogramEditor.h
-	albaGUIImageViewer.cpp							albaGUIImageViewer.h
-	albaGUIAboutDialog.cpp				albaGUIAboutDialog.h
-	albaGUISplashScreen.cpp				albaGUISplashScreen.h
-	albaGUIDialogProsthesisSelection.cpp	albaGUIDialogProsthesisSelection.h
-	albaGUIHyperLink.cpp					albaGUIHyperLink.h
-	
-	albaGUITransformMouseFloatVME.cpp	albaGUITransformMouseFloatVME.h
+  albaGUIImageViewer.cpp							albaGUIImageViewer.h
+  albaGUIAboutDialog.cpp				albaGUIAboutDialog.h
+  albaGUISplashScreen.cpp				albaGUISplashScreen.h
+  albaGUIDialogProsthesisSelection.cpp	albaGUIDialogProsthesisSelection.h
+  albaGUIHyperLink.cpp					albaGUIHyperLink.h
+  albaGUITransformMouseFloatVME.cpp	albaGUITransformMouseFloatVME.h
+  albaGUIBusyInfo.cpp albaGUIBusyInfo.h
 )
 
 IF (ALBA_USE_VTK)

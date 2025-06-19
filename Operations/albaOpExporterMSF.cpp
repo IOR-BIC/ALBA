@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpExporterMSF.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 #include "albaEvent.h"
@@ -108,11 +108,9 @@ void albaOpExporterMSF::OpRun()
 //----------------------------------------------------------------------------
 int albaOpExporterMSF::ExportMSF()
 {					
-  if (!m_TestMode)
-  {
-  	wxBusyInfo wait("Saving Project: Please wait");
-  }
-  assert(m_MSFFile != "");
+ 	albaGUIBusyInfo wait("Saving Project: Please wait",m_TestMode);
+
+	assert(m_MSFFile != "");
 
 	if(!wxFileExists(wxString(m_MSFFile)))
 	{
