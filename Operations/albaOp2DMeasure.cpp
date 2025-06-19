@@ -31,7 +31,7 @@
 #include "albaInteractor2DDistance.h"
 #include "albaInteractor2DAngle.h"
 #include "albaInteractor2DIndicator.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 
 #include "albaDecl.h"
 #include "albaEvent.h"

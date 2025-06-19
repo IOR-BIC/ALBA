@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpImporterRawMotionData.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 
 
 #include "albaDecl.h"
@@ -112,8 +112,7 @@ void albaOpImporterRawMotionData::OpDo()
 {
 	assert(!m_Vme);
 	
-	//modified by Stefano. 18-9-2003
-	wxBusyInfo wait("Please wait, working...");
+	albaGUIBusyInfo wait("Please wait, working...",m_TestMode);
 
 	albaSmartPointer<albaVMERawMotionData> reader;
 	reader->SetFileName(m_File);

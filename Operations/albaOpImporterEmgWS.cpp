@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 #include "albaOpImporterEmgWS.h"
 
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>
@@ -85,8 +85,7 @@ void albaOpImporterEmgWS::OpRun()
 void albaOpImporterEmgWS::Read()
 //----------------------------------------------------------------------------
 {
-  //if (!m_TestMode)
-    wxBusyInfo wait("Importing data, please wait...");
+  albaGUIBusyInfo wait("Importing data, please wait...",m_TestMode);
   
   albaNEW(m_Group);
   wxString path, name, ext;

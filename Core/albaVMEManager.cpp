@@ -26,7 +26,7 @@
 
 #include "albaVMEManager.h"
 
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include <wx/zipstrm.h>
 #include <wx/zstream.h>
 #include <wx/ffile.h>
@@ -604,7 +604,6 @@ bool albaVMEManager::MakeZip(const albaString &zipname, wxArrayString *files)
 int albaVMEManager::MSFSave()
 //----------------------------------------------------------------------------
 {
-  wxBusyInfo *wait;
   int ret=ALBA_OK;
 
 	bool fromDifferentApp = false;
@@ -673,8 +672,7 @@ int albaVMEManager::MSFSave()
     wxRenameFile(m_MSFFile.GetCStr(), bak_filename.GetCStr());  // renaming the founded one
 	}
 	
-  if(!m_TestMode) 
-    wait=new wxBusyInfo(_("Saving Project: Please wait"));
+  albaGUIBusyInfo wait(_("Saving Project: Please wait"),m_TestMode);
   
 	//Update the application stamps
 	albaTagItem tag_appstamp;
@@ -702,8 +700,6 @@ int albaVMEManager::MSFSave()
 	m_FileHistory.Save(*m_Config);
   m_Modified = false;
 
-  if(!m_TestMode)
-    delete wait;
 
   return ret;
 }

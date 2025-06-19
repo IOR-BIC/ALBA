@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpSurfaceMirror.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 
 #include "albaDecl.h"
 #include "albaEvent.h"

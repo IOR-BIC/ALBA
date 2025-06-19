@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 #include "albaOpExporterAnalogWS.h"
 
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include "albaGUI.h"
 
 #include "albaTagArray.h"

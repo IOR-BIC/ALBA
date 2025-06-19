@@ -20,7 +20,6 @@
 #include "albaDefines.h"
 #include "albaOp.h"
 #include <vnl/vnl_matrix.h>
-#include "wx/busyinfo.h"
 #include "albaVMEIterator.h"
 #include <fstream>
 

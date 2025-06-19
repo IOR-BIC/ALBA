@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 #include "albaOpExporterLandmarkWS.h"
 
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 
 #include <fstream>
 #include <iostream>

@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 #include "albaOpImporterAnalogWS.h"
 
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>

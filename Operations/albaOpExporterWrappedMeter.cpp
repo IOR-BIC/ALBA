@@ -27,6 +27,7 @@
 #include "albaDecl.h"
 #include "albaEvent.h"
 #include "albaGUI.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaVMEWrappedMeter.h"
 #include "albaVMEOutputWrappedMeter.h"
@@ -152,11 +153,7 @@ void albaOpExporterWrappedMeter::Export()
 //----------------------------------------------------------------------------
 {
 
-	wxBusyInfo *wait;
-	if(!m_TestMode)
-	{
-		wait = new wxBusyInfo("Please wait, Exporting...");
-	}
+	albaGUIBusyInfo wait("Please wait, Exporting...");
 
 
 	m_OutputFile.open(m_File, std::ios::out);
@@ -184,12 +181,6 @@ void albaOpExporterWrappedMeter::Export()
 	}
 
 	m_Meters.clear();
-	if(!m_TestMode)
-	{
-		delete wait;
-	}
-
-
 }
 //----------------------------------------------------------------------------
 void albaOpExporterWrappedMeter::ExportWrappedMeter()

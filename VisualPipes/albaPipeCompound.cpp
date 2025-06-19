@@ -48,7 +48,7 @@
 
 #include "albaGUIDynamicVP.h"
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include "wx/notebook.h"
 #include <float.h>
 

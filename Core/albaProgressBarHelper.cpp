@@ -16,7 +16,7 @@
 
 #include "albaProgressBarHelper.h"
 #include "albaObserver.h"
-#include "wx\busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 
 //----------------------------------------------------------------------------
@@ -46,10 +46,11 @@ void albaProgressBarHelper::InitProgressBar(wxString label,bool showBusyCursor)
 	m_Progress = 0;
 	m_Inited=true;
 
+	if(!label.IsEmpty())
+		m_BusyInfo = new albaGUIBusyInfo(label,m_TextMode);
+	
 	if (m_TextMode == false)
 	{
-		if(!label.empty())
-			m_BusyInfo = new wxBusyInfo(label);
 		if(showBusyCursor)
 			m_BusyCursor = new wxBusyCursor(); //wxHOURGLASS_CURSOR
 		albaEventMacro(albaEvent(this,PROGRESSBAR_SHOW));
@@ -66,9 +67,10 @@ void albaProgressBarHelper::CloseProgressBar()
 {
 	UpdateProgressBar(100);
 
+	cppDEL(m_BusyInfo);
+
 	if (m_TextMode == false)
 	{
-		cppDEL(m_BusyInfo);
 		cppDEL(m_BusyCursor);
 		albaEventMacro(albaEvent(this,PROGRESSBAR_HIDE));
 	}

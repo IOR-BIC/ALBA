@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "wx/filename.h"
 #include "wx/stdpaths.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #define min(a,b)  (((a) < (b)) ? (a) : (b))
 
 //----------------------------------------------------------------------------
@@ -61,9 +61,7 @@ albaOp(label)
 	m_DataDir = userPath + "\\Data";
   m_CacheDir = m_DataDir + "\\AnsysReaderCache";
   m_AnsysInputFileNameFullPath		= "";
-  
-  m_BusyInfo = NULL;
-}
+ }
 
 //----------------------------------------------------------------------------
 albaOpImporterAnsysCommon::~albaOpImporterAnsysCommon()
@@ -160,11 +158,8 @@ int albaOpImporterAnsysCommon::Import()
     return ALBA_ERROR;
   }
 
-  if (GetTestMode() == false)
-  {
-    m_BusyInfo = new wxBusyInfo("Please wait importing VME Mesh AnsysText...");
-  }
-
+  albaGUIBusyInfo("Please wait importing VME Mesh AnsysText...",m_TestMode);
+  
   wxString name, path, ext;
   wxFileName::SplitPath(m_AnsysInputFileNameFullPath, &path, &name, &ext);
 
@@ -224,11 +219,6 @@ int albaOpImporterAnsysCommon::Import()
     delete reader;
   }
   
-  if (GetTestMode() == false)
-  {
-    cppDEL(m_BusyInfo);
-  }
- 
   return returnValue;
 }
 

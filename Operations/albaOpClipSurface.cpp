@@ -24,7 +24,7 @@
 
 
 #include "albaOpClipSurface.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaGUI.h"
 #include "albaRefSys.h"

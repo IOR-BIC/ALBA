@@ -22,7 +22,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 #include "albaOpExporterMeters.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 #include "albaEvent.h"
@@ -260,12 +260,8 @@ void albaOpExporterMeters::ExportSelectedMeter()
 void albaOpExporterMeters::ExportMeter()
 //----------------------------------------------------------------------------
 {
-  wxBusyInfo *wait;
-  if(!m_TestMode)
-  {
-    wait = new wxBusyInfo("Please wait, Exporting...");
-  }
-
+	albaGUIBusyInfo wait("Please wait, Exporting...",m_TestMode);
+  
   albaVMERoot *root = ((albaVMERoot*)m_Meters[0]->GetRoot());
   root->GetTimeStamps(m_Times);
 
@@ -291,11 +287,6 @@ void albaOpExporterMeters::ExportMeter()
   
   //write matrixes over file.
   WriteOnFile();
-
-  if(!m_TestMode)
-  {
-    delete wait;
-  }
 }
 //----------------------------------------------------------------------------
 void albaOpExporterMeters::ExportClassicMeterCoordinates(int index, int indexTime)

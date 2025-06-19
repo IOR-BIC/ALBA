@@ -21,7 +21,7 @@
 
 #include <wx/slider.h>
 #include <wx/defs.h>
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "vtkActor.h"
 #include "vtkPolyDataMapper.h"
