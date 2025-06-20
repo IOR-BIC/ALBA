@@ -1,9 +1,3 @@
-/*
-	Installer Common Script for ALBA based Applications
-	Author: Nicola Vanella
-	BIC-IOR 2019
-*/
-
 !ifndef ___InstallerCommon___
 !define ___InstallerCommon___
 
@@ -12,6 +6,7 @@
 !include Registry.nsh
 !include nsProcess.nsh
 !include EnumUsersReg.nsh
+!include AddToPathPage.nsh
 !include x64.nsh
 
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\${PRODUCT_EXE_NAME}"
@@ -127,6 +122,13 @@ FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Add to Path Page 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;    
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Setting Custom Pages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  
 !macro Init_MUI
@@ -137,6 +139,9 @@ FunctionEnd
 	!insertmacro MUI_PAGE_WELCOME
 	!insertmacro MUI_PAGE_LICENSE "${PRODUCT_INSTALLER_DIR_WIN}\${PRODUCT_NAME}Licence.rtf"
 	!insertmacro MUI_PAGE_DIRECTORY
+	!ifdef INSERT_ADD_PATH_PAGE
+		!insertmacro AddToPathPage
+	!endif
 	;!insertmacro MUI_PAGE_INSTFILES
 	;!insertmacro MUI_PAGE_FINISH
 
