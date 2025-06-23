@@ -175,7 +175,7 @@ Check_Main_Process:
 Check_Extra_Process:
    ${nsProcess::FindProcess} "${CHECK_EXTRA_PROCESS_ISRUNNING}" $R0
    ${If} $R0 == 0
-      MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${EXTRA_PRODUCT_EXE_NAME} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY Check_Extra_Process
+      MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${CHECK_EXTRA_PROCESS_ISRUNNING} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY Check_Extra_Process
       Quit
    ${EndIf}
 
@@ -193,7 +193,7 @@ Function un.CheckRunningProcesses
 Check_Extra_Process:
    ${nsProcess::FindProcess} "${CHECK_EXTRA_PROCESS_ISRUNNING}" $R0
    ${If} $R0 == 0
-      MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${EXTRA_PRODUCT_EXE_NAME} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY Check_Extra_Process
+      MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${CHECK_EXTRA_PROCESS_ISRUNNING} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY Check_Extra_Process
       Quit
    ${EndIf}
 
