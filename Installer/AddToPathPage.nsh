@@ -14,7 +14,7 @@ Function ShowAddToPathPage
     ${EndIf}
 
     ${NSD_CreateLabel} 0 0 100% 30u \
-        "Would you like to add '${PRODUCT_INSTALLER_DIR_WIN}\bin' to the system PATH?"
+        "Would you like to add '$INSTDIR\bin' to the system PATH?"
     Pop $1
 
     ${NSD_CreateCheckbox} 0 35u 100% 12u "Add to PATH"
@@ -30,7 +30,7 @@ Function LeaveAddToPathPage
 
 DoUpdate:
     ReadRegStr $1 HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "Path"
-    StrCpy $2 "${PRODUCT_INSTALLER_DIR_WIN}\bin"
+    StrCpy $2 "$INSTDIR\bin"
 
     ; Check if already present
     Push $1
