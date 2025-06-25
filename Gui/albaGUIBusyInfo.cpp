@@ -54,7 +54,18 @@ albaGUIBusyInfo::~albaGUIBusyInfo()
 void albaGUIBusyInfo::Show()
 {
 	if (m_TextMode)
-		printf(m_Message.ToAscii());
+	{
+		int size=m_Message.Length();
+		printf("%c", 218);
+		for (int i = 0; i < size + 2; i++)
+			printf("%c", 196);
+		printf("%c\n", 191);
+		printf("%c %s %c\n",179, m_Message.ToAscii(), 179);
+		printf("%c",192);
+		for (int i = 0; i < size + 2; i++)
+			printf("%c", 196);
+		printf("%c\n",217);
+	}
 	else if (m_WxBusy == NULL)
 			m_WxBusy = new wxBusyInfo(m_Message);
 }
@@ -70,13 +81,8 @@ void albaGUIBusyInfo::UpdateText(const wxString& message)
 {
 	m_Message = message;
 
-	if (m_TextMode)
-		printf(message.ToAscii());
-	else if (m_WxBusy)
-	{
-		Hide();
-		Show();
-	}
+	Hide();
+	Show();
 }
 
 //----------------------------------------------------------------------------
