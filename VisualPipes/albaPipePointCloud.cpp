@@ -80,6 +80,13 @@ void albaPipePointCloud::SetRepresentation(REPRESENTATIONS rep)
 }
 
 //----------------------------------------------------------------------------
+void albaPipePointCloud::UpdateProperty(bool fromTag /*= false*/)
+{
+	SetRepresentation((REPRESENTATIONS)m_Representation);
+	Superclass::UpdateProperty(fromTag);
+}
+
+//----------------------------------------------------------------------------
 vtkPolyData *albaPipePointCloud::GetInputAsPolyData()
 {
 	if (!m_InputAsPolydata)
