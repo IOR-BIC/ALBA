@@ -254,8 +254,8 @@ void albaPipePolylineTest::TestPipeDensityMap()
 
 	// Enable DensityMap
 	//pipePolyline->ManageScalarOnExecutePipe(polyline->GetOutput()->GetVTKData());
-	pipePolyline->SetDensityVolume(volumeInput);
-	pipePolyline->SetDensisyMapActive(true);
+	pipePolyline->SetProbeVolume(volumeInput);
+	pipePolyline->SetProbeMapActive(true);
 
 
 	////////// ACTORS List ///////////////
