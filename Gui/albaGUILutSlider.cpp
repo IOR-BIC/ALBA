@@ -316,8 +316,8 @@ void albaGUILutSlider::SetSubRange(double  low, double  hi )
 
   if(false == m_FixedText)
   {
-    m_MinButton->SetLabel(albaString::Format(m_FloatingPointText?"%.2f":"%.0f",m_LowValue));	
-    m_MaxButton->SetLabel(albaString::Format(m_FloatingPointText?"%.2f":"%.0f",m_HighValue));	
+		m_MinButton->SetLabel(albaString::Format((m_FloatingPointText && m_LowValue < 10000) ? "%.2f" : "%.0f", m_LowValue));
+		m_MaxButton->SetLabel(albaString::Format((m_FloatingPointText && m_HighValue < 10000) ? "%.2f" : "%.0f", m_HighValue));
   }
   
   UpdateButtons();
