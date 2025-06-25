@@ -76,15 +76,15 @@ albaPipeWithScalar::albaPipeWithScalar()
 	m_LutSwatch = NULL;
 	m_LutSlider = NULL;
 	m_ScalarComboBox = NULL;
-	m_DensityVolume = NULL;
+	m_ProbeVolume = NULL;
 
-	m_MapsStackActive = m_DensisyMapActive = m_ScalarMapActive   = m_ShowScalarBar = 0;
+	m_MapsStackActive = m_ProbeMapActive = m_ScalarMapActive   = m_ShowScalarBar = 0;
 	m_ScalarBarPos = SB_ON_RIGHT;
 	m_ScalarBarActor = NULL;
 	m_ScalarBarLabNum = 2;
 	m_Histogram = NULL;
 	m_Dialog = NULL;
-	m_DensityFilter = NULL;
+	m_ProbeFilter = NULL;
 
 	m_ShowScalarBar = 0;
 }
@@ -176,8 +176,8 @@ void albaPipeWithScalar::CreateScalarsGui(albaGUI *gui)
 	gui->Bool(ID_SCALAR_MAP_ACTIVE,_("Enable scalar field mapping"), &m_ScalarMapActive, 1);
 	m_ScalarComboBox=gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsInComboBoxNames);
 	gui->Divider();
-	gui->Bool(ID_DENSITY_MAPS, _("Enable Density Maps"), &m_DensisyMapActive, 1);
-	gui->Button(ID_SELECT_DENS_VME, &m_DensVolName, "Select Volume...","Select Density Volume"),
+	gui->Bool(ID_PROBE_MAPS, _("Enable Volume Scalar Probe Map"), &m_ProbeMapActive, 1);
+	gui->Button(ID_SELECT_PROBE_VME, &m_ProbeVolName, "Select Volume...","Select Scalar Source Volume"),
 	gui->Divider(1);
 	
 
@@ -186,6 +186,11 @@ void albaPipeWithScalar::CreateScalarsGui(albaGUI *gui)
 	m_LutSlider = new albaGUILutSlider(gui, ID_LUT_SLIDER, wxPoint(0, 0), wxSize(304, 22), wxBORDER_NONE);
 	m_LutSlider->SetListener(this);
 	m_LutSlider->SetFloatingPointTextOn();
+	if (m_Table)
+	{
+		m_LutSlider->SetRange(m_Table->GetRange());
+		m_LutSlider->SetSubRange(m_Table->GetRange());
+	}
 	gui->Add(m_LutSlider);
 
 	gui->Button(ID_SHOW_HISTOGRAM, "Show Histogram");
@@ -201,19 +206,19 @@ void albaPipeWithScalar::CreateScalarsGui(albaGUI *gui)
 }
 
 //----------------------------------------------------------------------------
-void albaPipeWithScalar::CreateDensityMapStack()
+void albaPipeWithScalar::CreateProbeMapStack()
 {
-	vtkNEW(m_DensityFilter);
+	vtkNEW(m_ProbeFilter);
 	
-	m_DensityFilter->SetDistanceModeToScalar();
-	m_DensityFilter->SetSource(m_DensityVolume->GetOutput()->GetVTKData());
-	m_DensityFilter->SetInput(m_Mapper->GetInput());
-	m_DensityFilter->SetFilterModeToDensity();
-	m_DensityFilter->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
-	m_DensityFilter->SetOutOfBoundsDensity(-9999);
-	m_DensityFilter->Update();
+	m_ProbeFilter->SetDistanceModeToScalar();
+	m_ProbeFilter->SetSource(m_ProbeVolume->GetOutput()->GetVTKData());
+	m_ProbeFilter->SetInput(m_Mapper->GetInput());
+	m_ProbeFilter->SetFilterModeToDensity();
+	m_ProbeFilter->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+	m_ProbeFilter->SetOutOfBoundsDensity(-9999);
+	m_ProbeFilter->Update();
 
-	m_Mapper->SetInput(m_DensityFilter->GetOutput());
+	m_Mapper->SetInput(m_ProbeFilter->GetOutput());
 	m_Mapper->SetScalarVisibility(true);
 	m_MapsStackActive = true;
 
@@ -265,14 +270,14 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 				UpdateActiveScalarsInVMEDataVectorItems();
 			}
 			break;
-			case ID_DENSITY_MAPS:
+			case ID_PROBE_MAPS:
 			{
-				SetDensisyMapActive(m_DensisyMapActive);
+				SetProbeMapActive(m_ProbeMapActive);
 			}
 			break;
-			case ID_SELECT_DENS_VME:
+			case ID_SELECT_PROBE_VME:
 			{
-				albaString s(_("Choose Density Volume"));
+				albaString s(_("Choose Probe Map Volume"));
 				albaEvent e(this, VME_CHOOSE, &s);
 				e.SetPointer(&albaPipeWithScalar::VolumeAccept);
 				albaEventMacro(e);
@@ -281,7 +286,7 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 				if (vme == NULL)
 					return;
 
-				SetDensityVolume(vme);
+				SetProbeVolume(vme);
 			}
 			break;
 			case ID_ENABLE_SCALAR_BAR:
@@ -341,10 +346,10 @@ void albaPipeWithScalar::SetScalarRange(double * sr)
 }
 
 //----------------------------------------------------------------------------
-void albaPipeWithScalar::DestroyDensityMapStack()
+void albaPipeWithScalar::DestroyProbeMapStack()
 {
 	//restore old mapper input
-	m_Mapper->SetInput(m_DensityFilter->GetInput());
+	m_Mapper->SetInput(m_ProbeFilter->GetInput());
 
 	m_Mapper->SetScalarVisibility(m_ScalarMapActive);
 	if (m_ScalarBarActor)
@@ -353,7 +358,7 @@ void albaPipeWithScalar::DestroyDensityMapStack()
 		ShowScalarBarActor(m_ShowScalarBar);
 	}
 
-	vtkDEL(m_DensityFilter);
+	vtkDEL(m_ProbeFilter);
 	m_MapsStackActive = false;
 }
 
@@ -392,10 +397,10 @@ void albaPipeWithScalar::EnableDisableGuiComponents()
 {
 	if (m_Gui)
 	{
-		bool scalarMangement = (m_ScalarMapActive && !m_DensisyMapActive) || (m_DensisyMapActive && m_DensityVolume);
-		m_Gui->Enable(ID_SCALAR_MAP_ACTIVE, m_NumberOfArrays > 0 && !m_DensisyMapActive);
-		m_Gui->Enable(ID_SCALARS, m_ScalarMapActive && !m_DensisyMapActive);
-		m_Gui->Enable(ID_SELECT_DENS_VME, m_DensisyMapActive);
+		bool scalarMangement = (m_ScalarMapActive && !m_ProbeMapActive) || (m_ProbeMapActive && m_ProbeVolume);
+		m_Gui->Enable(ID_SCALAR_MAP_ACTIVE, m_NumberOfArrays > 0 && !m_ProbeMapActive);
+		m_Gui->Enable(ID_SCALARS, m_ScalarMapActive && !m_ProbeMapActive);
+		m_Gui->Enable(ID_SELECT_PROBE_VME, m_ProbeMapActive);
 		m_Gui->Enable(ID_LUT, scalarMangement);
 		m_LutSlider->Enable(scalarMangement);
 		m_Gui->Enable(ID_ENABLE_SCALAR_BAR, scalarMangement);
@@ -416,7 +421,7 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 	if (m_MapsStackActive && !m_OldMapsGenActive)
 	{
 		//run only on first activation
-		vtkDataSet * vtkData = m_DensityFilter->GetOutput();
+		vtkDataSet * vtkData = m_ProbeFilter->GetOutput();
 		vtkData->Update();
 		vtkData->GetPointData()->SetActiveScalars(DISTANCE_FILTER_SCALARS_NAME);
 		vtkData->GetPointData()->GetScalars()->Modified();
@@ -531,7 +536,7 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 	if (m_ScalarMapActive == false && m_MapsStackActive == false)
 		return;
 
-  vtkDataSet *data = m_Mapper->GetInput();
+  vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
   data->Update();
 
   double sr[2]={0,1};
@@ -539,13 +544,17 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 	{
 		if (m_MapsStackActive)
 		{
-			sr[0] = 0;
-			sr[1] = 700;
+			m_ProbeVolume->GetOutput()->GetVTKData()->GetScalarRange(sr);
+			if (m_Histogram)
+				m_Histogram->SetData(m_Mapper->GetInput()->GetPointData()->GetScalars());
 		}
 		else
+		{
 			data->GetPointData()->GetScalars()->GetRange(sr);
-		if (m_Histogram)
-			m_Histogram->SetData(data->GetPointData()->GetScalars());
+			if (m_Histogram)
+				m_Histogram->SetData(data->GetPointData()->GetScalars());
+		}
+		
 	}
 	else if (m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation > 0))
 	{
@@ -662,7 +671,7 @@ void albaPipeWithScalar::UpdateProperty(bool fromTag)
 {
 	if (m_MapsStackActive)
 	{
-		m_DensityFilter->GetOutput()->GetPointData()->GetScalars()->Modified();
+		m_ProbeFilter->GetOutput()->GetPointData()->GetScalars()->Modified();
 	}
 	else if (m_ScalarMapActive)
 	{
@@ -754,21 +763,21 @@ void albaPipeWithScalar::ShowScalarBarActor(bool show /*= true*/)
 }
 
 //----------------------------------------------------------------------------
-void albaPipeWithScalar::SetDensityVolume(albaVME *vol)
+void albaPipeWithScalar::SetProbeVolume(albaVME *vol)
 {
-	m_DensityVolume = vol;
+	m_ProbeVolume = vol;
 
-	m_DensVolName = m_DensityVolume ? m_DensityVolume->GetName() : "";
+	m_ProbeVolName = m_ProbeVolume ? m_ProbeVolume->GetName() : "";
 
-	//need to create the density stack
+	//need to create the probe stack
 	if (vol && !m_MapsStackActive)
 	{
-		CreateDensityMapStack();
+		CreateProbeMapStack();
 	}
 	else
 	{
-		if(m_DensityFilter)
-			m_DensityFilter->SetSource(m_DensityVolume ? m_DensityVolume->GetOutput()->GetVTKData() :NULL);
+		if(m_ProbeFilter)
+			m_ProbeFilter->SetSource(m_ProbeVolume ? m_ProbeVolume->GetOutput()->GetVTKData() :NULL);
 		UpdateActiveScalarsInVMEDataVectorItems();
 	}
 
@@ -785,16 +794,16 @@ bool albaPipeWithScalar::VolumeAccept(albaVME *node)
 }
 
 //----------------------------------------------------------------------------
-void albaPipeWithScalar::SetDensisyMapActive(int val)
+void albaPipeWithScalar::SetProbeMapActive(int val)
 {
-	m_DensisyMapActive = val;
+	m_ProbeMapActive = val;
 
-	//need to disable density filter
-	if (m_MapsStackActive && !m_DensisyMapActive)
-		DestroyDensityMapStack();
-	else if (m_DensisyMapActive && m_DensityVolume)
-		CreateDensityMapStack();
-	else if(m_DensisyMapActive && !m_MapsStackActive && m_ScalarMapActive)
+	//need to disable probe filter
+	if (m_MapsStackActive && !m_ProbeMapActive)
+		DestroyProbeMapStack();
+	else if (m_ProbeMapActive && m_ProbeVolume)
+		CreateProbeMapStack();
+	else if(m_ProbeMapActive && !m_MapsStackActive && m_ScalarMapActive)
 		m_Mapper->SetScalarVisibility(false);
 	else
 		m_Mapper->SetScalarVisibility(m_ScalarMapActive);
