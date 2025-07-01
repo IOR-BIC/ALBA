@@ -382,7 +382,7 @@ void albaGUIHistogramWidget::ExportStats()
 
 	bool firstAcces = !wxFileExists(f.ToAscii());
 
-	FILE * pFile;
+	FILE * pFile=NULL;
 
 	if (!f.IsEmpty())
 		pFile = albaTryOpenFile(f.ToAscii(), "a+");

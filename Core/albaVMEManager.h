@@ -151,6 +151,8 @@ protected:
   /** Set tag with creation date for the node passed as argument.*/
   void AddCreationDate(albaVME *vme);
 
+	bool CheckFileUpdated(const wxString& filePath, const wxDateTime& previousModTime);
+
   bool                m_Modified;         ///< Used to known when the tree has been modified...
 
   albaObserver*        m_Listener;         ///< Register the event receiver object

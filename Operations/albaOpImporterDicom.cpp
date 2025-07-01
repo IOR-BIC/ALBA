@@ -1552,7 +1552,7 @@ void albaDicomStudy::AddSlice(albaDicomSlice *slice)
 	int *sliceDim = slice->GetSliceSize();
 
 	for (int i = 0; i < m_Series.size() && !series; i++)
-		if (serieID == m_Series[i]->GetSerieID() && m_Series[i]->GetAcquisitionNumber() == acqusitionNumber && m_Series[i]->GetImageType() == imageType && 
+		if (serieID == m_Series[i]->GetSerieID() && (true || m_Series[i]->GetAcquisitionNumber() == acqusitionNumber) && m_Series[i]->GetImageType() == imageType && 
 				sliceDim[0] == m_Series[i]->GetDimensions()[0] && sliceDim[1] == m_Series[i]->GetDimensions()[1])
 		{
 			series = m_Series[i];
