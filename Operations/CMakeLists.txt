@@ -176,6 +176,7 @@ IF (ALBA_USE_VTK)
 	albaOpShowHistory.cpp	albaOpShowHistory.h
 	albaOpNearestLandmark.cpp  albaOpNearestLandmark.h
 	albaOpImporterScancoImageIO.cpp albaOpImporterScancoImageIO.h
+	albaOpCreateCentroid.cpp albaOpCreateCentroid.h
   )
 ENDIF (ALBA_USE_VTK)
 

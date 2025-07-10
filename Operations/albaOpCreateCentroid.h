@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   HTO-Planner
-Module:    albaOpNearestLandmark.h
+Module:    albaOpCreateCentroid.h
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,8 +13,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#ifndef __albaOpNearestLandmark_H__
-#define __albaOpNearestLandmark_H__
+#ifndef __albaOpCreateCentroid_H__
+#define __albaOpCreateCentroid_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -24,24 +24,22 @@ PURPOSE. See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 // Forward references :
-class albaVMELandmarkCloud;
-class vtkPolyData;
-class albaVMELandmark;
+
 
 //----------------------------------------------------------------------------
-// Class Name: albaOpNearestLandmark
+// Class Name: albaOpCreateCentroid
 //----------------------------------------------------------------------------
-class ALBA_EXPORT albaOpNearestLandmark : public albaOp
+class ALBA_EXPORT albaOpCreateCentroid : public albaOp
 {
 public:
 	/** Constructor. */
-	albaOpNearestLandmark(wxString label = "Create Closest Landmark");
+	albaOpCreateCentroid(wxString label = "Create Centroid Landmark");
 
 	/** Destructor. */
-	~albaOpNearestLandmark();
+	~albaOpCreateCentroid();
 
 	/** RTTI macro. */
-	albaTypeMacro(albaOpNearestLandmark, albaOp);
+	albaTypeMacro(albaOpCreateCentroid, albaOp);
 
 	/** Return a copy of the operation */
 	/*virtual*/ albaOp* Copy();
@@ -49,18 +47,12 @@ public:
 	/** Builds operation's interface. */
 	/*virtual*/ void OpRun();
 
-	/** Create The closest Point*/
-	static albaVMELandmarkCloud *CreateClosestPoint(vtkPolyData * poly, albaVMELandmark * lm, albaVME * surface);
-	
 	/** Execute the operation. */
 	/*virtual*/ void OpDo();
 
 	/** Receive events coming from the user interface.*/
 	void OnEvent(albaEventBase *alba_event);
  
-	/**accept for surfaces and surface parametric*/
-	static bool SurfaceAccept(albaVME* node);
-
 protected:
 
 	/** Return true for the acceptable vme type. */
