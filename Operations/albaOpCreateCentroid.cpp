@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   Alba
-Module:    albaOpNearestLandmark.cpp
+Module:    albaOpCreateCentroid.cpp
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -19,7 +19,7 @@ PURPOSE. See the above copyright notice for more information.
 // This force to include Window, wxWidgets and VTK exactly in this order.
 //----------------------------------------------------------------------------
 
-#include "albaOpNearestLandmark.h"
+#include "albaOpCreateCentroid.h"
 #include "albaDecl.h"
 #include "albaGUI.h"
 #include "albaVME.h"
@@ -30,117 +30,92 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkCellLocator.h"
 #include "vtkPolyData.h"
 #include "albaVMELandmarkCloud.h"
+#include "albaOpNearestLandmark.h"
+#include "albaVect3d.h"
 
 
 //----------------------------------------------------------------------------
-albaCxxTypeMacro(albaOpNearestLandmark);
+albaCxxTypeMacro(albaOpCreateCentroid);
 
 //----------------------------------------------------------------------------
-albaOpNearestLandmark::albaOpNearestLandmark(wxString label) :albaOp(label)
+albaOpCreateCentroid::albaOpCreateCentroid(wxString label) :albaOp(label)
 {
 	m_OpType = OPTYPE_OP;
 	m_Canundo = true;
 }
 
 //----------------------------------------------------------------------------
-albaOpNearestLandmark::~albaOpNearestLandmark()
+albaOpCreateCentroid::~albaOpCreateCentroid()
 {
 }
 
 //----------------------------------------------------------------------------
-bool albaOpNearestLandmark::InternalAccept(albaVME *node)
-{
-	return node->IsA("albaVMELandmark");
-}
-
-//----------------------------------------------------------------------------
-bool albaOpNearestLandmark::SurfaceAccept(albaVME* node)
+bool albaOpCreateCentroid::InternalAccept(albaVME *node)
 {
 	return(node && (node->IsA("albaVMESurface") || node->IsA("albaVMESurfaceParametric")));
 }
 
+
 //----------------------------------------------------------------------------
-albaOp* albaOpNearestLandmark::Copy()
+albaOp* albaOpCreateCentroid::Copy()
 {
-	albaOpNearestLandmark *cp = new albaOpNearestLandmark(m_Label);
+	albaOpCreateCentroid *cp = new albaOpCreateCentroid(m_Label);
 	return cp;
 }
 //----------------------------------------------------------------------------
-void albaOpNearestLandmark::OpRun()
+void albaOpCreateCentroid::OpRun()
 {
-	albaString title = albaString("Select a surface:");
-	albaEvent e(this, VME_CHOOSE);
-	e.SetString(&title);
-	e.SetPointer(&SurfaceAccept);
-	albaEventMacro(e);
-	albaVME *surface = (albaVME *)e.GetVme();
 	
-	if (surface == NULL)
-		OpStop(OP_RUN_CANCEL);
-	
-	surface->GetOutput()->Update();
-	surface->GetOutput()->GetVTKData()->Update();
+	m_Input->GetOutput()->Update();
+	m_Input->GetOutput()->GetVTKData()->Update();
 
-	albaVMELandmark *lm = albaVMELandmark::SafeDownCast(m_Input);
+	albaVect3d centroid = { 0,0,0 };
 	
-
 	vtkALBASmartPointer <vtkTransform> tra;
-	tra->SetMatrix(surface->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+	tra->SetMatrix(m_Input->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> v_tpdf;
-	v_tpdf->SetInput((vtkPolyData *)surface->GetOutput()->GetVTKData());
+	v_tpdf->SetInput((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
 	v_tpdf->SetTransform(tra);
 	v_tpdf->Update();
 	vtkPolyData *tranPoly=v_tpdf->GetOutput();
 
+	vtkIdType nPoints = tranPoly->GetNumberOfPoints();
+	for (int i = 0; i < nPoints; i++)
+		centroid += tranPoly->GetPoint(i);
+	centroid /= nPoints;
 
-	albaVMELandmarkCloud *lmc=CreateClosestPoint(tranPoly, lm, surface);
+	albaString lmName;
+	lmName.Printf("Centroid of %s", m_Input->GetName());
+
+	albaVMELandmarkCloud *lmc;
+	albaNEW(lmc);
+	lmc->SetName("Centroid Cloud");
+	lmc->ReparentTo(m_Input);
+
+	lmc->AppendAbsoluteLandmark(centroid.GetVect(),lmName.GetCStr());
 	GetLogicManager()->VmeShow(lmc->GetLastChild(), true);
+	
+	albaVMELandmark * lm = lmc->GetLandmark(lmc->GetNumberOfLandmarks() - 1);
+	albaOpNearestLandmark::CreateClosestPoint(tranPoly, lm, m_Input);
+	GetLogicManager()->VmeShow(lmc->GetLastChild(), true);
+
 
 	OpStop(OP_RUN_OK);
 }
-
 //----------------------------------------------------------------------------
-albaVMELandmarkCloud *albaOpNearestLandmark::CreateClosestPoint(vtkPolyData * poly, albaVMELandmark * lm, albaVME * surface)
-{
-	vtkALBASmartPointer <vtkCellLocator> cellLocator;
-	cellLocator->SetDataSet(poly);
-	cellLocator->BuildLocator();
-
-	double closestPoint[3];
-	double closestPointDist2;
-	vtkIdType cellId;
-	int subId;
-	double point[3];
-	lm->GetPoint(point);
-
-	cellLocator->FindClosestPoint(point, closestPoint, cellId, subId, closestPointDist2);
-
-	albaVMELandmarkCloud *lmc = albaVMELandmarkCloud::SafeDownCast(lm->GetParent());
-
-	albaString lmName;
-	lmName.Printf("Closest %s on %s", lm->GetName(), surface->GetName());
-
-	lmc->AppendAbsoluteLandmark(closestPoint, lmName.GetCStr());
-
-	albaLogMessage("%s distance to %s: %f", lm->GetName(), surface->GetName(), sqrt(closestPointDist2));
-
-	return lmc;
-}
-
-//----------------------------------------------------------------------------
-void albaOpNearestLandmark::OpStop(int result)
+void albaOpCreateCentroid::OpStop(int result)
 {
 
 	albaEventMacro(albaEvent(this, result));
 }
 //----------------------------------------------------------------------------
-void albaOpNearestLandmark::OpDo()
+void albaOpCreateCentroid::OpDo()
 {
 }
 
 //----------------------------------------------------------------------------
-void albaOpNearestLandmark::OnEvent(albaEventBase *alba_event)
+void albaOpCreateCentroid::OnEvent(albaEventBase *alba_event)
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
