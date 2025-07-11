@@ -911,7 +911,6 @@ void albaViewArbitraryOrthoSlice::HideVolume()
 		m_CameraConeVME[i]->ReparentTo(NULL);
 		m_GizmoRT[i]->Show(false);
 
-		m_CameraToSlicer[i]->SetVme(NULL);
 		cppDEL(m_GizmoRT[i]);
 		albaDEL(m_CameraConeVME[i]);
 		albaDEL(m_SlicingResetMatrix[i]);
