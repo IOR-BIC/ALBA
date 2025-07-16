@@ -28,6 +28,7 @@
 #include "albaDecl.h"
 #include "albaGUI.h"
 #include "albaGUICheckListBox.h"
+#include "albaGUIDialogAskAndRemember.h"
 
 //----------------------------------------------------------------------------
 albaGUIDicomSettings::albaGUIDicomSettings(albaObserver *Listener, const albaString &label):
@@ -47,7 +48,8 @@ albaGUISettings(Listener, label)
   m_LastDicomDir = "UNEDFINED_m_LastDicomDir";
   m_Step = ID_1X;
   
-  m_DCM_ImagePositionPatientchoice = 0;
+  m_DCM_ImagePositionPatientchoice = ASK_USER_FOR_POSITION_HANDLING;
+	m_AcquisitionNumberStrategy = ID_ASK_STRATEGY_TO_THE_USER;
 
   m_Config->SetPath("Importer Dicom"); // Regiser key path Added by Losi 15.11.2009
 	InitializeSettings();
@@ -63,15 +65,20 @@ void albaGUIDicomSettings::CreateGui()
 {
 	m_Gui = new albaGUI(this);
 
-	wxString DCM_IMGchoices[2]={_("Skip All"),_("Set Default position")};
+	wxString DCM_IMGchoices[] = { "Skip All","Set Default position","Ask" };
+	wxString acquisitionNumChoices[] = { "Merge Series","Split Series","Ask" };
+
 	wxString typeArray[2] = { _("Volume"),_("Images") };
 	wxString SkipChoices[4] = { _("Load All"),_("load one in two"),_("load one in trhee"),_("load one in four") };
 	
 	m_Gui->Label("Dicom Settings", true);
 	m_Gui->Label("");
-  m_Gui->Label("Image position patient exception handling");
-  m_Gui->Combo(ID_DCM_POSITION_PATIENT_CHOICE,_("        "),&m_DCM_ImagePositionPatientchoice,2,DCM_IMGchoices);
-  m_Gui->Divider(1);
+	m_Gui->Label("Image position patient exception handling");
+	m_Gui->Combo(ID_DCM_POSITION_PATIENT_CHOICE, _("        "), &m_DCM_ImagePositionPatientchoice, 3, DCM_IMGchoices);
+	m_Gui->Label("");
+	m_Gui->Label("Series with different acquisition numbers");
+	m_Gui->Combo(ID_ACQUISITION_NUMBER_STRATEGY_CHOICE, _("        "), &m_AcquisitionNumberStrategy, 3, acquisitionNumChoices);
+	m_Gui->Divider(1);
   m_Gui->Bool(ID_AUTO_VME_TYPE,_("Auto VME Type"),&m_AutoVMEType,1);
   m_Gui->Radio(ID_SETTING_VME_TYPE, "VME output", &m_OutputType, 2, typeArray, 1, "");
 	m_Gui->Bool(ID_AUTORESAMPLE_OUTPUT, _("Auto Resample Volume"), &m_AutoResample, 1,"When the slicing space is not regular a resample filter is applied.");
@@ -132,6 +139,11 @@ void albaGUIDicomSettings::OnEvent(albaEventBase *alba_event)
 			m_Config->Write("DCM_ImagePositionPatientchoice", m_DCM_ImagePositionPatientchoice);
 		}
 		break;
+		case ID_ACQUISITION_NUMBER_STRATEGY_CHOICE:
+		{
+			m_Config->Write("AcquisitionNumberStrategy", m_AcquisitionNumberStrategy);
+		}
+		break;
 		default:
 			albaEventMacro(*alba_event);
 			break;
@@ -141,7 +153,6 @@ void albaGUIDicomSettings::OnEvent(albaEventBase *alba_event)
 }
 //----------------------------------------------------------------------------
 void albaGUIDicomSettings::InitializeSettings()
-//----------------------------------------------------------------------------
 {
 	wxString string_item;
 	long long_item;
@@ -182,6 +193,12 @@ void albaGUIDicomSettings::InitializeSettings()
   else
 	  m_Config->Write("DCM_ImagePositionPatientchoice", m_DCM_ImagePositionPatientchoice);
 
+	if (m_Config->Read("AcquisitionNumberStrategy", &long_item))
+		m_AcquisitionNumberStrategy = long_item;
+	else
+		m_Config->Write("AcquisitionNumberStrategy", m_AcquisitionNumberStrategy);
+
+
   if(m_Config->Read("NameCompositorPatientName", &long_item))
     m_CheckNameCompositor[ID_PATIENT_NAME] = long_item;
   else
@@ -204,7 +221,7 @@ void albaGUIDicomSettings::InitializeSettings()
 
 	m_Config->Flush();
 }
-
+//----------------------------------------------------------------------------
 void albaGUIDicomSettings::SetLastDicomDir( wxString lastDicomDir )
 {
   m_LastDicomDir = lastDicomDir;
@@ -213,10 +230,55 @@ void albaGUIDicomSettings::SetLastDicomDir( wxString lastDicomDir )
 
 }
 
+//----------------------------------------------------------------------------
 int albaGUIDicomSettings::GetEnabledCustomName(enum NAME_COMPOSITOR type)
 {
   if (type >= ID_DESCRIPTION && type<=ID_NUM_SLICES)
   {
     return m_CheckNameCompositor[type];
   }
+}
+
+//----------------------------------------------------------------------------
+int albaGUIDicomSettings::GetAcquisitionNumberStrategy()
+{
+	if (m_AcquisitionNumberStrategy == ID_ASK_STRATEGY_TO_THE_USER)
+	{
+		wxString title = "Different Acquisition Number in one Series";
+		wxString message = "There are two series with the same Id but different acquisition numbers.\nWhat would you like to do?";
+
+		wxString choices[] = { "Merge into a single series","Split into different series" };
+		
+		int choice = 0;
+		int remember = 0;
+		albaGUIDialogAskAndRemember* askAndRemember = new albaGUIDialogAskAndRemember(title, message, choices, 2, &choice, &remember);
+		askAndRemember->ShowModal();
+		if (remember)
+			SetAcquisitionNumberStrategy(choice);
+
+		return choice;
+	}
+
+	return m_AcquisitionNumberStrategy;
+}
+
+int albaGUIDicomSettings::GetDCMImagePositionPatientExceptionHandling()
+{
+	if (m_AcquisitionNumberStrategy == ASK_USER_FOR_POSITION_HANDLING)
+	{
+		wxString title = "Dicom Image without Patient Potition";
+		wxString message = "There is an image without Patient Position.\nWhat do you want to do?";
+		wxString choices[] = { "Skip Image","Apply Default Position" };
+
+		int choice = 0;
+		int remember = 0;
+		albaGUIDialogAskAndRemember* askAndRemember = new albaGUIDialogAskAndRemember(title, message, choices, 2, &choice, &remember);
+		askAndRemember->ShowModal();
+		if (remember)
+			SetDCMImagePositionPatientExceptionHandling(choice);
+
+		return choice;
+	}
+
+	return m_DCM_ImagePositionPatientchoice;
 }

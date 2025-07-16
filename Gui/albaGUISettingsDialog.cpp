@@ -94,6 +94,7 @@ albaGUISettingsDialog::~albaGUISettingsDialog()
 bool albaGUISettingsDialog::ShowModal()
 //----------------------------------------------------------------------------
 {
+  m_Guih->Update();
   return m_Dialog->ShowModal() != 0;
 }
 //----------------------------------------------------------------------------
