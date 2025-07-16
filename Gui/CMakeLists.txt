@@ -100,7 +100,8 @@ IF (ALBA_USE_VTK)
   albaGUILutSlider.cpp				  albaGUILutSlider.h
   albaGUILutSwatch.cpp				  albaGUILutSwatch.h
   albaGUILutWidget.cpp				  albaGUILutWidget.h
-  albaGUIHistogramWidget.cpp			  albaGUIHistogramWidget.h
+  albaGUIHistogramWidget.cpp		  albaGUIHistogramWidget.h
+  albaGUIDialogAskAndRemember.cpp 	  albaGUIDialogAskAndRemember.h
   )
 ENDIF (ALBA_USE_VTK)
 
