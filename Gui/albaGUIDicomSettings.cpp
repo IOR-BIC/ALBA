@@ -49,7 +49,7 @@ albaGUISettings(Listener, label)
   m_Step = ID_1X;
   
   m_DCM_ImagePositionPatientchoice = ASK_USER_FOR_POSITION_HANDLING;
-	m_AcquisitionNumberStrategy = ID_ASK_STRATEGY_TO_THE_USER;
+	m_AcquisitionNumberStrategy = ASK_STRATEGY_TO_THE_USER;
 
   m_Config->SetPath("Importer Dicom"); // Regiser key path Added by Losi 15.11.2009
 	InitializeSettings();
@@ -242,7 +242,7 @@ int albaGUIDicomSettings::GetEnabledCustomName(enum NAME_COMPOSITOR type)
 //----------------------------------------------------------------------------
 int albaGUIDicomSettings::GetAcquisitionNumberStrategy()
 {
-	if (m_AcquisitionNumberStrategy == ID_ASK_STRATEGY_TO_THE_USER)
+	if (m_AcquisitionNumberStrategy == ASK_STRATEGY_TO_THE_USER)
 	{
 		wxString title = "Different Acquisition Number in one Series";
 		wxString message = "There are two series with the same Id but different acquisition numbers.\nWhat would you like to do?";
