@@ -109,6 +109,11 @@ public:
 	/** Sets GenerateClippedOutput */
 	void SetGenerateClippedOutput(int generateClippedOutput) { m_GenerateClippedOutput = generateClippedOutput; }
 
+	/** Return true if connectivity filter is enabled */
+	int GetApplyConnectivity() const { return m_ApplyConnectivity; }
+
+	/** Set ApplyConnectivity to enable extraction of the largest area */
+	void SetApplyConnectivity(int val) { m_ApplyConnectivity = val; }
 protected:
 
 	/** Return true for the acceptable vme type. */
@@ -175,6 +180,7 @@ protected:
   int		m_ClipInside;
 	int   m_UseGizmo;
 	int		m_GenerateClippedOutput;
+	int   m_ApplyConnectivity;
 	int		m_ClipBoundBox;
   bool	m_PlaneCreated;
 
