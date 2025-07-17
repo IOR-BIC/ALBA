@@ -31,6 +31,8 @@
 #include "vtkMatrix4x4.h"
 #include "vtkImageReader.h"
 #include "vtkDataSetReader.h"
+#include "albaGUIDicomSettings.h"
+#include "albaSmartPointer.h"
 
 
 #define D_SliceABSFileName "DicomSlice.dcm"
@@ -511,32 +513,35 @@ void albaDicomClassesTest::TestStudyAddSlice()
 	sliceDicom3->SetSeriesID(D_NewDcmSeriesID);
 
 	albaDicomStudy *study = new albaDicomStudy(D_DcmStudyID);
+	albaGUIDicomSettings *settings=new albaGUIDicomSettings(NULL);
+	settings->SetAcquisitionNumberStrategy(albaGUIDicomSettings::SPLIT_DIFFERNT_ACQUISITION_NUMBER);
 
 	//first slice
-	study->AddSlice(sliceDicom);
+	study->AddSlice(sliceDicom,settings);
 	CPPUNIT_ASSERT(study->GetSeriesNum() == 1);
 	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlicesNum() == 1);
 	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlice(0) == sliceDicom);
 
 	//slice with new AcquisitionNumber
-	study->AddSlice(sliceDicom2);
+	study->AddSlice(sliceDicom2, settings);
 	CPPUNIT_ASSERT(study->GetSeriesNum() == 2);
 	CPPUNIT_ASSERT(study->GetSeries(1)->GetSlicesNum() == 1);
 	CPPUNIT_ASSERT(study->GetSeries(1)->GetSlice(0) == sliceDicom2);
 
 	//slice with new seriesID
-	study->AddSlice(sliceDicom3);
+	study->AddSlice(sliceDicom3, settings);
 	CPPUNIT_ASSERT(study->GetSeriesNum() == 3);
 	CPPUNIT_ASSERT(study->GetSeries(2)->GetSlicesNum() == 1);
 	CPPUNIT_ASSERT(study->GetSeries(2)->GetSlice(0) == sliceDicom3);
 
 	//slice with already know seriesID and AcquisitionNumber
-	study->AddSlice(sliceDicom4);
+	study->AddSlice(sliceDicom4, settings);
 	CPPUNIT_ASSERT(study->GetSeriesNum() == 3);
 	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlicesNum() == 2);
 	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlice(1) == sliceDicom4);
 
 	cppDEL(study);
+	cppDEL(settings);
 }
 
 //----------------------------------------------------------------------------
@@ -556,16 +561,21 @@ void albaDicomClassesTest::TestStudyGetSeriesNum()
 	albaDicomSlice *sliceDicom = CreateBaseSlice();
 	albaDicomSlice *sliceDicom2 = CreateBaseSlice();
 	albaDicomSlice *sliceDicom3 = CreateBaseSlice();
+	albaGUIDicomSettings *settings=new albaGUIDicomSettings(NULL);
+	settings->SetAcquisitionNumberStrategy(albaGUIDicomSettings::SPLIT_DIFFERNT_ACQUISITION_NUMBER);
 
 	sliceDicom2->SetSeriesID(D_NewDcmSeriesID);
 	albaDicomStudy *study = new albaDicomStudy(D_DcmStudyID);
 
-	study->AddSlice(sliceDicom);
+	study->AddSlice(sliceDicom, settings);
 	CPPUNIT_ASSERT(study->GetSeriesNum() == 1);
-	study->AddSlice(sliceDicom2);
+	study->AddSlice(sliceDicom2, settings);
 	CPPUNIT_ASSERT(study->GetSeriesNum() == 2);
-	study->AddSlice(sliceDicom3);
+	study->AddSlice(sliceDicom3, settings);
 	CPPUNIT_ASSERT(study->GetSeriesNum() == 2);
+
+	cppDEL(study);
+	cppDEL(settings);
 }
 
 //----------------------------------------------------------------------------
@@ -575,13 +585,15 @@ void albaDicomClassesTest::TestStudyGetSeries()
 	albaDicomSlice *sliceDicom = CreateBaseSlice();
 	albaDicomSlice *sliceDicom2 = CreateBaseSlice();
 	albaDicomSlice *sliceDicom3 = CreateBaseSlice();
+	albaGUIDicomSettings *settings=new albaGUIDicomSettings(NULL);
+	settings->SetAcquisitionNumberStrategy(albaGUIDicomSettings::SPLIT_DIFFERNT_ACQUISITION_NUMBER);
 
 	sliceDicom2->SetSeriesID(D_NewDcmSeriesID);
 	albaDicomStudy *study = new albaDicomStudy(D_DcmStudyID);
 
-	study->AddSlice(sliceDicom);
-	study->AddSlice(sliceDicom2);
-	study->AddSlice(sliceDicom3);
+	study->AddSlice(sliceDicom, settings);
+	study->AddSlice(sliceDicom2, settings);
+	study->AddSlice(sliceDicom3, settings);
 	
 	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlicesNum() == 2);
 	CPPUNIT_ASSERT(study->GetSeries(0)->GetSlice(0) == sliceDicom);
@@ -590,6 +602,7 @@ void albaDicomClassesTest::TestStudyGetSeries()
 	CPPUNIT_ASSERT(study->GetSeries(1)->GetSlice(0) == sliceDicom2);
 
 	cppDEL(study);
+	cppDEL(settings);
 }
 
 /////////////////////////////albaDicomStudyList////////////////////////////////
@@ -606,25 +619,28 @@ void albaDicomClassesTest::TestStudyListAddSlice()
 	albaDicomSlice *sliceDicom = CreateBaseSlice();
 	albaDicomSlice *sliceDicom2 = CreateBaseSlice();
 	albaDicomSlice *sliceDicom3 = CreateBaseSlice();
+	albaGUIDicomSettings *settings=new albaGUIDicomSettings(NULL);
+	settings->SetAcquisitionNumberStrategy(albaGUIDicomSettings::SPLIT_DIFFERNT_ACQUISITION_NUMBER);
+
 	sliceDicom2->SetSeriesID(D_NewDcmSeriesID);
 	sliceDicom3->SetStudyID(D_NewDcmStudyID);
 	
 	albaDicomStudyList *studyList = new albaDicomStudyList();
 
-	studyList->AddSlice(sliceDicom);
+	studyList->AddSlice(sliceDicom,settings);
 	CPPUNIT_ASSERT(studyList->GetStudiesNum() == 1);
 	CPPUNIT_ASSERT(studyList->GetSeriesTotalNum() == 1);
 	
-	studyList->AddSlice(sliceDicom2);
+	studyList->AddSlice(sliceDicom2, settings);
 	CPPUNIT_ASSERT(studyList->GetStudiesNum() == 1);
 	CPPUNIT_ASSERT(studyList->GetSeriesTotalNum() == 2);
 
-	studyList->AddSlice(sliceDicom3);
+	studyList->AddSlice(sliceDicom3, settings);
 	CPPUNIT_ASSERT(studyList->GetStudiesNum() == 2);
 	CPPUNIT_ASSERT(studyList->GetSeriesTotalNum() == 3);
 	
 	cppDEL(studyList);
-
+	cppDEL(settings);
 }
 
 //----------------------------------------------------------------------------
@@ -633,13 +649,16 @@ void albaDicomClassesTest::TestStudyListGetStudy()
 	albaDicomSlice *sliceDicom = CreateBaseSlice();
 	albaDicomSlice *sliceDicom2 = CreateBaseSlice();
 	albaDicomSlice *sliceDicom3 = CreateBaseSlice();
+	albaGUIDicomSettings *settings=new albaGUIDicomSettings(NULL);
+	settings->SetAcquisitionNumberStrategy(albaGUIDicomSettings::SPLIT_DIFFERNT_ACQUISITION_NUMBER);
+
 	sliceDicom2->SetSeriesID(D_NewDcmSeriesID);
 	sliceDicom3->SetStudyID(D_NewDcmStudyID);
 
 	albaDicomStudyList *studyList = new albaDicomStudyList();
-	studyList->AddSlice(sliceDicom);
-	studyList->AddSlice(sliceDicom2);
-	studyList->AddSlice(sliceDicom3);
+	studyList->AddSlice(sliceDicom, settings);
+	studyList->AddSlice(sliceDicom2, settings);
+	studyList->AddSlice(sliceDicom3, settings);
 
 	CPPUNIT_ASSERT(studyList->GetStudiesNum() == 2);
 	CPPUNIT_ASSERT(studyList->GetStudy(0)->GetSeriesNum() == 2);
@@ -647,6 +666,8 @@ void albaDicomClassesTest::TestStudyListGetStudy()
 	CPPUNIT_ASSERT(studyList->GetStudy(0)->GetSeries(1)->GetSlice(0) == sliceDicom2);
 	CPPUNIT_ASSERT(studyList->GetStudy(1)->GetSeries(0)->GetSlice(0) == sliceDicom3);
 	
+	cppDEL(studyList);
+	cppDEL(settings);
 }
 
 //----------------------------------------------------------------------------
@@ -655,16 +676,22 @@ void albaDicomClassesTest::TestStudyListGetStudiesNum()
 	albaDicomSlice *sliceDicom = CreateBaseSlice();
 	albaDicomSlice *sliceDicom2 = CreateBaseSlice();
 	albaDicomSlice *sliceDicom3 = CreateBaseSlice();
+	albaGUIDicomSettings *settings=new albaGUIDicomSettings(NULL);
+	settings->SetAcquisitionNumberStrategy(albaGUIDicomSettings::SPLIT_DIFFERNT_ACQUISITION_NUMBER);
+
 	sliceDicom2->SetSeriesID(D_NewDcmSeriesID);
 	sliceDicom3->SetStudyID(D_NewDcmStudyID);
 
 	albaDicomStudyList *studyList = new albaDicomStudyList();
-	studyList->AddSlice(sliceDicom);
+	studyList->AddSlice(sliceDicom,settings);
 	CPPUNIT_ASSERT(studyList->GetStudiesNum() == 1);
-	studyList->AddSlice(sliceDicom2);
+	studyList->AddSlice(sliceDicom2, settings);
 	CPPUNIT_ASSERT(studyList->GetStudiesNum() == 1);
-	studyList->AddSlice(sliceDicom3);
+	studyList->AddSlice(sliceDicom3, settings);
 	CPPUNIT_ASSERT(studyList->GetStudiesNum() == 2);
+
+	cppDEL(studyList);
+	cppDEL(settings);
 }
 
 //----------------------------------------------------------------------------
@@ -673,15 +700,21 @@ void albaDicomClassesTest::TestStudyListGetSeriesTotalNum()
 	albaDicomSlice *sliceDicom = CreateBaseSlice();
 	albaDicomSlice *sliceDicom2 = CreateBaseSlice();
 	albaDicomSlice *sliceDicom3 = CreateBaseSlice();
+	albaGUIDicomSettings *settings=new albaGUIDicomSettings(NULL);
+	settings->SetAcquisitionNumberStrategy(albaGUIDicomSettings::SPLIT_DIFFERNT_ACQUISITION_NUMBER);
+
 	sliceDicom2->SetSeriesID(D_NewDcmSeriesID);
 	sliceDicom3->SetStudyID(D_NewDcmStudyID);
 
 	albaDicomStudyList *studyList = new albaDicomStudyList();
-	studyList->AddSlice(sliceDicom);
+	studyList->AddSlice(sliceDicom, settings);
 	CPPUNIT_ASSERT(studyList->GetSeriesTotalNum() == 1);
-	studyList->AddSlice(sliceDicom2);
+	studyList->AddSlice(sliceDicom2, settings);
 	CPPUNIT_ASSERT(studyList->GetSeriesTotalNum() == 2);
-	studyList->AddSlice(sliceDicom3);
+	studyList->AddSlice(sliceDicom3, settings);
 	CPPUNIT_ASSERT(studyList->GetSeriesTotalNum() == 3);
+	
+	cppDEL(studyList);
+	cppDEL(settings);
 }
 
