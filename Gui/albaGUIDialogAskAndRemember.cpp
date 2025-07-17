@@ -39,8 +39,8 @@ albaGUIDialogAskAndRemember::albaGUIDialogAskAndRemember(const wxString& title, 
 {
 
   m_Gui = new albaGUI(this);
-  m_Gui->Label(message);
-
+  m_Gui->Label(message, true, true);
+  m_Gui->Divider();
   m_Gui->Combo(ID_CHOICE,"", choice, choicesNum,choices); 
   m_Gui->Label("");
   m_Gui->Bool(ID_REMEMBER, "Remember choice", remember, 1);
