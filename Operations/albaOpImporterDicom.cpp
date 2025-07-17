@@ -1558,15 +1558,15 @@ void albaDicomStudy::AddSlice(albaDicomSlice *slice, albaGUIDicomSettings* setti
 			if (m_Series[i]->GetAcquisitionNumber() != acqusitionNumber)
 				int x = 0;
 
-			if (m_Series[i]->GetAcquisitionNumber() == acqusitionNumber || m_AcquisitionNumberLastChoice == albaGUIDicomSettings::ID_MERGE_DIFFERNT_ACQUISITION_NUMBER)
+			if (m_Series[i]->GetAcquisitionNumber() == acqusitionNumber || m_AcquisitionNumberLastChoice == albaGUIDicomSettings::MERGE_DIFFERNT_ACQUISITION_NUMBER)
 			{
 				series = m_Series[i];
 				break;
 			}
-			else if (m_AcquisitionNumberLastChoice != albaGUIDicomSettings::ID_SPLIT_DIFFERNT_ACQUISITION_NUMBER)
+			else if (m_AcquisitionNumberLastChoice != albaGUIDicomSettings::SPLIT_DIFFERNT_ACQUISITION_NUMBER)
 			{
 				m_AcquisitionNumberLastChoice = settings->GetAcquisitionNumberStrategy();
-				if (m_AcquisitionNumberLastChoice == albaGUIDicomSettings::ID_MERGE_DIFFERNT_ACQUISITION_NUMBER)
+				if (m_AcquisitionNumberLastChoice == albaGUIDicomSettings::MERGE_DIFFERNT_ACQUISITION_NUMBER)
 				{
 					series = m_Series[i];
 					break;
