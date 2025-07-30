@@ -171,11 +171,12 @@ IF (ALBA_USE_VTK)
 	albaOpCreatePolyline.cpp	albaOpCreatePolyline.h
 	
 	albaOpImporterEmgWS.cpp albaOpImporterEmgWS.h
-	albaOpImporterRawMotionData.cpp albaOpImporterRawMotionData.h
+	albaOpImporterRawMotionData.cpp albaOpImporterRawMotionData.h albaOpImporterMotionData.h
 	albaOpInteractorSliderSample.cpp albaOpInteractorSliderSample.h
 	albaOpShowHistory.cpp	albaOpShowHistory.h
 	albaOpNearestLandmark.cpp  albaOpNearestLandmark.h
 	albaOpImporterScancoImageIO.cpp albaOpImporterScancoImageIO.h
+	albaOpCreateCentroid.cpp albaOpCreateCentroid.h
   )
 ENDIF (ALBA_USE_VTK)
 

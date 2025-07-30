@@ -24,7 +24,7 @@
 #include <wx/statline.h>
 
 #include "albaGUIWizard.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include "albaDecl.h"
 
 //----------------------------------------------------------------------------

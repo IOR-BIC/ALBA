@@ -24,7 +24,7 @@
 
 #include "albaOpImporterMesh.h" 
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 #include "albaGUI.h"
@@ -86,11 +86,8 @@ void albaOpImporterMesh::OpRun()
 //----------------------------------------------------------------------------
 int albaOpImporterMesh::Read()
 {
-  if (!m_TestMode)
-  {
-    wxBusyInfo wait(_("Loading file: ..."));
-  }
-	
+  albaGUIBusyInfo wait(_("Loading file: ..."),m_TestMode);
+  	
   albaVMEMeshAnsysTextImporter *reader = new albaVMEMeshAnsysTextImporter;
 	reader->SetNodesFileName(m_NodesFileName.GetCStr());
   reader->SetElementsFileName(m_ElementsFileName.GetCStr());
@@ -162,7 +159,7 @@ enum Mesh_Importer_ID
 //----------------------------------------------------------------------------
 void albaOpImporterMesh::CreateGui()
 {
-	albaString wildcard = "lis files (*.lis)|*.lis|txt files (*.txt)|*.txt|All Files (*.*)|*.*";
+	albaString wildcard = "Lis and TXT files (*.lis;*.txt)|*.lis;*.txt|Lis files (*.lis)|*.lis|TXT files (*.txt)|*.txt|All Files (*.*)|*.*";
 
   m_Gui = new albaGUI(this);
   m_Gui->SetListener(this);

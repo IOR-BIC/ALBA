@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpImporterLandmarkWS.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>
@@ -96,10 +96,7 @@ void albaOpImporterLandmarkWS::OpRun()
 void albaOpImporterLandmarkWS::Read()   
 //----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
-  {
-    wxBusyInfo wait("Please wait, working...");
-  }
+  albaGUIBusyInfo wait("Please wait, working...",m_TestMode);
   albaNEW(m_VmeCloud);
   wxString path, name, ext;
   wxFileName::SplitPath(m_File,&path,&name,&ext);

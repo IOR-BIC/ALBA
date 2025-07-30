@@ -42,7 +42,7 @@
 #include "itkImageToVTKImageFilter.h"
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include "wx/filename.h"
 
 
@@ -115,11 +115,9 @@ void albaOpImporterMetaImage::OpRun()
 int albaOpImporterMetaImage::ImportMetaImage()
 {
 	bool success = false;
-	if (!this->m_TestMode)
-		wxBusyInfo wait(_("Loading file: ..."));
+	albaGUIBusyInfo wait(_("Loading file: ..."),m_TestMode);
 
 
-	
 	using ReaderType = itk::ImageFileReader<InputImageTypeFloat>;
 	ReaderType::Pointer  reader = ReaderType::New();
 

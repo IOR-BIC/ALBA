@@ -21,7 +21,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 
 //----------------------------------------------------------------------------
 // Includes :
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include "albaComputeHausdorffDistance.h"
 #include "vtkCleanPolyData.h"
 #include "vtkALBASmartPointer.h"
@@ -874,7 +874,7 @@ vtkPolyData *albaComputeHausdorffDistance::GetOutput()
   vtkCleanPolyData *cleaner = vtkCleanPolyData::New();
   vtkTriangleFilter *triangulator = vtkTriangleFilter::New();
   
-  wxBusyInfo wait(_("albaComputeHausdorffDistance: computing Hausdorff distance..."));
+	albaGUIBusyInfo wait(_("albaComputeHausdorffDistance: computing Hausdorff distance..."));
 
 	m_ProgBarHelper = new albaProgressBarHelper(m_Listener);
 	m_ProgBarHelper->InitProgressBar();

@@ -53,7 +53,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include <iostream>
 #include <fstream>
-#include "wx\busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #define PLATFORM_THICKNESS 5.0
 #define albaMax(a, b) (((a) >= (b)) ? (a) : (b))
@@ -960,7 +960,7 @@ void albaOpImporterC3D::OnEvent(albaEventBase *alba_event)
 void albaOpImporterC3D::OpDo()
 //----------------------------------------------------------------------------
 {
-	wxBusyInfo wait("Please wait, create all VMEs in tree");
+	albaGUIBusyInfo wait("Please wait, create all VMEs in tree",m_TestMode);
 
 	for (unsigned i = 0; i < m_intData.size(); i++)
 	{

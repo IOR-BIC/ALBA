@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpExporterBmp.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 #include "albaGUI.h"
@@ -129,17 +129,14 @@ void albaOpExporterBmp::SaveBmp()
 //----------------------------------------------------------------------------
 {
   assert(m_DirName != "");
+
+	albaGUIBusyInfo busy("Exporting files...");
  
   wxString path,name,ext;
 	wxFileName::SplitPath(m_DirName.GetCStr(),&path,&name,&ext);
   path+= _("\\");
   path+= name;
   path+= _("\\");
-  /*
-#ifndef TEST_MODE
-    wxBusyInfo wait(_("Please wait, working..."));
-#endif TEST_MODE
-    */
 
   albaVMEVolumeGray *volume=albaVMEVolumeGray::SafeDownCast(m_Input);
   volume->Update();

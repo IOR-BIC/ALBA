@@ -26,7 +26,7 @@ bool DEBUG_MODE = true;
 
 
 #include "albaOpInteractiveClipSurface.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 #include "albaEvent.h"

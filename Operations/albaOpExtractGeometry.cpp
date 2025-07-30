@@ -24,7 +24,7 @@
 
 #include "albaOpExtractGeometry.h"
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaGUI.h"
 #include "albaGUIDialog.h"
@@ -637,7 +637,7 @@ int albaOpExtractGeometry::GenerateIsosurface()
   if(m_Connectivity)
     SurfaceConnectivity();
 
-  wxBusyInfo wait(_("Extracting Isosurface: please wait ..."));
+  albaGUIBusyInfo wait(_("Extracting Isosurface: please wait ..."));
 
   if (m_ProcessingType==0)
   {
@@ -704,7 +704,7 @@ int albaOpExtractGeometry::Resample()
     return ALBA_ERROR;
   }
   
-  wxBusyInfo wait_info1("Resampling...");
+  albaGUIBusyInfo wait_info1("Resampling...",m_TestMode);
   albaOpVolumeResample *op = new albaOpVolumeResample();
   op->SetInput(m_VolumeInput);
   op->TestModeOn();

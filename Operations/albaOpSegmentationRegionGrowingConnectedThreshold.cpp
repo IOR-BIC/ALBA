@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpSegmentationRegionGrowingConnectedThreshold.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaGUI.h"
 #include "albaVME.h"
@@ -238,14 +238,11 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
 void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()   
 //----------------------------------------------------------------------------
 {
-  wxBusyInfo *info;
-  wxBusyCursor *wait;
+  wxBusyCursor *wait=NULL;
+	albaGUIBusyInfo busy("Please wait", m_TestMode);
 
-  if (!m_TestMode)
-  {
+	if (!m_TestMode)
     wait = new wxBusyCursor;
-    info = new wxBusyInfo("Please wait");
-  }
 
   //in test mode resample is not created before algorithm call
   if (m_TestMode) CreateResample();
@@ -355,13 +352,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
 
   m_Output=m_SurfaceOut;
 
-  if(!m_TestMode)
-  {
-    delete wait;
-    delete info;
-  }
-
- 
+	cppDEL(wait);
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingConnectedThreshold::OnEvent(albaEventBase *alba_event)
@@ -482,8 +473,7 @@ int albaOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
   // if the volume is a rectilinear grid we resample it 
   if(m_Input->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
   { 
-    wxBusyInfo *info;
-    wxBusyCursor *wait;
+		wxBusyCursor *wait = NULL;
 
     m_Resample=new albaOpVolumeResample();
     m_Resample->SetInput(m_Input);
@@ -502,12 +492,12 @@ int albaOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
         return false;
       }
     }
+
     if(!m_TestMode)
-    {
       wait = new wxBusyCursor;
-      info = new wxBusyInfo("Waiting for volume to be resampled");
-    }
     
+		albaGUIBusyInfo busy("Waiting for volume to be resampled",m_TestMode);
+
     m_Resample->Resample();
      
     albaVME *Output = m_Resample->GetOutput();
@@ -519,11 +509,7 @@ int albaOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
     albaEventMacro(albaEvent(this, VME_SELECT, m_ResampleInput, true));
 		GetLogicManager()->CameraUpdate();
      
-    if(!m_TestMode)
-    {
-      delete wait;
-      delete info;
-    }
+    cppDEL(wait);
   }
   else 
   {

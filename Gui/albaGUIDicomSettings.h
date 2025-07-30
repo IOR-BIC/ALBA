@@ -58,6 +58,7 @@ public:
     ID_SETTING_VME_TYPE,
 		ID_AUTORESAMPLE_OUTPUT,
     ID_DCM_POSITION_PATIENT_CHOICE,
+		ID_ACQUISITION_NUMBER_STRATEGY_CHOICE,
 		ID_SKIP_CROP,
 		ID_SKIP_NAMING
 	};
@@ -82,7 +83,8 @@ public:
 	enum POSITION_EXEPTION_HANDLING
 	{
 		SKIP_ALL,
-		APPLY_DEFAULT_POSITION
+		APPLY_DEFAULT_POSITION,
+		ASK_USER_FOR_POSITION_HANDLING,
 	};
 
 	enum OUTPUT_TYPES
@@ -100,6 +102,13 @@ public:
 		ID_SERIES
   };
 
+	enum ACQUISITION_NUMBER
+	{
+		MERGE_DIFFERNT_ACQUISITION_NUMBER,
+		SPLIT_DIFFERNT_ACQUISITION_NUMBER,
+		ASK_STRATEGY_TO_THE_USER,
+	};
+
 	/** Answer to the messages coming from interface. */
 	void OnEvent(albaEventBase *alba_event);
 	  
@@ -114,8 +123,14 @@ public:
   /** Return if an element of custom name check list is checked */
   int GetEnabledCustomName(enum NAME_COMPOSITOR type);
 
+	/** Return the merge/split strategy for series with the same series ID and different acquisition number*/
+	int GetAcquisitionNumberStrategy();
+
+	/** Return the merge/split strategy for series with the same series ID and different acquisition number*/
+	void SetAcquisitionNumberStrategy(int strategy) { m_AcquisitionNumberStrategy = strategy; m_Config->Write("AcquisitionNumberStrategy", m_AcquisitionNumberStrategy); };
+
   /** Return the DCM_ImagePositionPatient choice */
-  int GetDCMImagePositionPatientExceptionHandling(){return m_DCM_ImagePositionPatientchoice;};
+  int GetDCMImagePositionPatientExceptionHandling();;
 
 	/** Sets the DCM_ImagePositionPatient choice */
 	void SetDCMImagePositionPatientExceptionHandling(int choice) { m_DCM_ImagePositionPatientchoice = choice; m_Config->Write("DCM_ImagePositionPatientchoice", m_DCM_ImagePositionPatientchoice);};
@@ -167,6 +182,7 @@ protected:
 	int m_SkipCrop;
 	wxString m_LastDicomDir;
   int m_DCM_ImagePositionPatientchoice;
+	int m_AcquisitionNumberStrategy;
 
   friend class albaGUIDicomSettingsTest;
 };

@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpVOIDensityEditor.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 
 #include "albaGUI.h"
 
@@ -171,9 +171,7 @@ void albaOpVOIDensityEditor::OnEvent(albaEventBase *alba_event)
 void albaOpVOIDensityEditor::EditVolumeScalars()
 //----------------------------------------------------------------------------
 {
-  wxBusyInfo *wait;
-  if(!m_TestMode)
-    wait = new wxBusyInfo("Editing VME volume density...",m_Gui);
+  albaGUIBusyInfo wait("Editing VME volume density...",m_Gui);
 
   double b[6];
   double point[3];
@@ -230,11 +228,6 @@ void albaOpVOIDensityEditor::EditVolumeScalars()
   }
 
   volumeData->GetPointData()->GetScalars()->Modified();
-
-  if (!m_TestMode)
-  {
-    cppDEL(wait);
-  }
 
   m_Input->GetOutput()->Update();
   

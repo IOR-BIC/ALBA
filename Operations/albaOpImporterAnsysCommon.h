@@ -30,7 +30,6 @@ PURPOSE.  See the above copyright notice for more information.
 class albaVME;
 class albaVMEMesh;
 class albaEvent;
-class wxBusyInfo;
 class albaProgressBarHelper;
 
 struct AnsysComponent
@@ -104,8 +103,6 @@ protected:
 
   void AddElement(int Id, int nNodes, int type, int matId, int *nodes);
   bool IsInRange(int elemId, int partId);
-
-  wxBusyInfo *m_BusyInfo;
 
 	wxString m_AnsysInputFileNameFullPath;
 

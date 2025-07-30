@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <algorithm>
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include "wx/listctrl.h"
 #include "wx/dir.h"
 
@@ -849,7 +849,7 @@ bool albaOpImporterDicom::LoadDicomFromDir(const char *dicomDirABSPath)
 	{
 		albaDicomSlice *slice= ReadDicomFile(allFiles[i]);
 		if (slice)
-			m_StudyList->AddSlice(slice);
+			m_StudyList->AddSlice(slice,GetSetting());
 		progressHelper.UpdateProgressBar( i*100 / fileNumber);
 	}
 		
@@ -1468,7 +1468,7 @@ albaDicomStudyList::~albaDicomStudyList()
 		cppDEL(m_Studies[i]);
 }
 //----------------------------------------------------------------------------
-void albaDicomStudyList::AddSlice(albaDicomSlice *slice)
+void albaDicomStudyList::AddSlice(albaDicomSlice *slice, albaGUIDicomSettings* settings)
 {
 	albaDicomStudy *study=NULL;
 
@@ -1487,7 +1487,7 @@ void albaDicomStudyList::AddSlice(albaDicomSlice *slice)
 		m_Studies.push_back(study);
 	}
 
-	study->AddSlice(slice);
+	study->AddSlice(slice, settings);
 }
 //----------------------------------------------------------------------------
 albaDicomStudy * albaDicomStudyList::GetStudy(int num)
@@ -1529,7 +1529,7 @@ albaDicomStudy::~albaDicomStudy()
 		cppDEL(m_Series[i]);
 }
 //----------------------------------------------------------------------------
-void albaDicomStudy::AddSlice(albaDicomSlice *slice)
+void albaDicomStudy::AddSlice(albaDicomSlice *slice, albaGUIDicomSettings* settings)
 {
 	albaDicomSeries *series = NULL;
 
@@ -1539,11 +1539,26 @@ void albaDicomStudy::AddSlice(albaDicomSlice *slice)
 	int *sliceDim = slice->GetSliceSize();
 
 	for (int i = 0; i < m_Series.size() && !series; i++)
-		if (serieID == m_Series[i]->GetSerieID() && m_Series[i]->GetAcquisitionNumber() == acqusitionNumber && m_Series[i]->GetImageType() == imageType && 
+		if (serieID == m_Series[i]->GetSerieID() && m_Series[i]->GetImageType() == imageType &&
 				sliceDim[0] == m_Series[i]->GetDimensions()[0] && sliceDim[1] == m_Series[i]->GetDimensions()[1])
 		{
-			series = m_Series[i];
-			break;
+			if (m_Series[i]->GetAcquisitionNumber() != acqusitionNumber)
+				int x = 0;
+
+			if (m_Series[i]->GetAcquisitionNumber() == acqusitionNumber || m_AcquisitionNumberLastChoice == albaGUIDicomSettings::MERGE_DIFFERNT_ACQUISITION_NUMBER)
+			{
+				series = m_Series[i];
+				break;
+			}
+			else if (m_AcquisitionNumberLastChoice != albaGUIDicomSettings::SPLIT_DIFFERNT_ACQUISITION_NUMBER)
+			{
+				m_AcquisitionNumberLastChoice = settings->GetAcquisitionNumberStrategy();
+				if (m_AcquisitionNumberLastChoice == albaGUIDicomSettings::MERGE_DIFFERNT_ACQUISITION_NUMBER)
+				{
+					series = m_Series[i];
+					break;
+				}
+			}
 		}
 
 	//if the study does not exist we create a new study and push it back on study vector

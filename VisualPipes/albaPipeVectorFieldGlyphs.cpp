@@ -61,7 +61,7 @@
 #include "albaGUIButton.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkImageData.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include <wx/tokenzr.h>
 #include <wx/slider.h>
 #include <wx/defs.h>

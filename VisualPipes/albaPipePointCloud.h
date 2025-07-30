@@ -44,6 +44,8 @@ public:
 	/** Set the representation Type possibility are Surface, Wireframe, Points */
 	virtual void SetRepresentation(REPRESENTATIONS rep);
 
+	/** Update the properties */
+	virtual void UpdateProperty(bool fromTag = false);
 protected:
 
 	vtkPolyData* GetInputAsPolyData();

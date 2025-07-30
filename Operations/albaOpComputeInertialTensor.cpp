@@ -29,7 +29,7 @@ using namespace std;
 #include "albaOpComputeInertialTensor.h"
 
 #include "vnl/vnl_cross.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "vtkCell.h"
 #include "vtkIdList.h"
@@ -55,6 +55,7 @@ using namespace std;
 #include "albaVMEOutput.h"
 #include "albaTagArray.h"
 #include "albaProgressBarHelper.h"
+#include "albaVMELandmarkCloud.h"
 
 
 //----------------------------------------------------------------------------
@@ -115,6 +116,10 @@ albaOp(label)
   m_CenterOfMass[1] = 0;
   m_CenterOfMass[2] = 0;
 
+	m_GenerateCenterOfMassLM = true;
+
+	m_Lmc = NULL;
+
 }
 //----------------------------------------------------------------------------
 albaOpComputeInertialTensor::~albaOpComputeInertialTensor( ) 
@@ -122,6 +127,8 @@ albaOpComputeInertialTensor::~albaOpComputeInertialTensor( )
 {
 	m_LocalInertiaTensors.clear();
 	m_NodeMassPairVector.clear();
+
+	albaDEL(m_Lmc);
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpComputeInertialTensor::Copy()   
@@ -136,7 +143,7 @@ albaOp* albaOpComputeInertialTensor::Copy()
 bool albaOpComputeInertialTensor::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
-  return ( (node && node->IsALBAType(albaVMESurface)) || (node && node->IsALBAType(albaVMEGroup)) );
+  return ( (node && node->GetOutput() && node->GetOutput()->IsA("albaVMEOutputSurface")) || (node && node->IsALBAType(albaVMEGroup)) );
 }
 //----------------------------------------------------------------------------
 void albaOpComputeInertialTensor::OpRun()   
@@ -181,6 +188,11 @@ void albaOpComputeInertialTensor::OpDo()
     }
   }
 
+	if (m_Lmc)
+	{
+		m_Lmc->ReparentTo(m_Input);
+		m_Lmc->SetAbsMatrix(albaMatrix());
+	}
 }
 //----------------------------------------------------------------------------
 void albaOpComputeInertialTensor::OpUndo()
@@ -195,6 +207,9 @@ void albaOpComputeInertialTensor::OpUndo()
   m_Input->GetTagArray()->DeleteTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS");
   m_Input->GetTagArray()->DeleteTag("INERTIAL_TENSOR_COMPONENTS");
   m_Input->GetTagArray()->DeleteTag("SURFACE_MASS");
+
+	if (m_Lmc)
+		m_Lmc->ReparentTo(NULL);
 }
 //----------------------------------------------------------------------------
 void albaOpComputeInertialTensor::OnEvent(albaEventBase *alba_event)
@@ -209,21 +224,18 @@ void albaOpComputeInertialTensor::OnEvent(albaEventBase *alba_event)
       {
         int result = OP_RUN_CANCEL;
 
-        if (m_Input->IsALBAType(albaVMESurface))
-        {
+				if (m_Input->IsALBAType(albaVMEGroup))
+					result = ComputeInertialTensorFromGroup();
+				else 
           result = ComputeInertialTensor(m_Input);
-        }
-        else if (m_Input->IsALBAType(albaVMEGroup))
-        {
-          result = ComputeInertialTensorFromGroup();
-        }
-				
-        if (result==OP_RUN_CANCEL)
-        {
-          OpStop(result);
-        }
+     	
+				if (result != OP_RUN_CANCEL)
+				{
+					AddAttributes();
+					if (m_GenerateCenterOfMassLM)
+						CreateLMC();
+				}
 
-        AddAttributes();
         OpStop(result);
       }
 			break;
@@ -323,10 +335,19 @@ void albaOpComputeInertialTensor::CreateGui()
   m_Gui->Divider(0);  
   m_Gui->Integer(ID_ACCURACY,_("Accuracy"),&m_Accuracy,0,100000);
   m_Gui->Divider(0);
-	  
+	m_Gui->Bool(ID_GEN_COM_LM, "Create Center of Mass Landmark", &m_GenerateCenterOfMassLM, 1);
+	m_Gui->Label("");
   m_Gui->OkCancel();
 }
 
+
+//----------------------------------------------------------------------------
+void albaOpComputeInertialTensor::CreateLMC()
+{
+	albaNEW(m_Lmc);
+	m_Lmc->SetName("Center Of Mass Cloud");
+	m_Lmc->AppendAbsoluteLandmark(m_CenterOfMass, "Center Of Mass");
+}
 
 //----------------------------------------------------------------------------
 int albaOpComputeInertialTensor::ComputeLocalInertialTensor(albaVME* node, int current_node, int n_of_nodes)
@@ -348,20 +369,17 @@ int albaOpComputeInertialTensor::ComputeLocalInertialTensor(albaVME* node, int c
 
   int result = OP_RUN_CANCEL;
 
-  if (!node->IsALBAType(albaVMESurface))
-  {
+  if (!(node && node->GetOutput() && node->GetOutput()->IsA("albaVMEOutputSurface")))
     return OP_RUN_CANCEL;
-  }
    
 	// get surface
-	albaVMESurface* surf = (albaVMESurface*) node;
-	if (surf->GetOutput() == NULL || surf->GetOutput()->GetVTKData() == NULL)
+	if (node->GetOutput() == NULL || node->GetOutput()->GetVTKData() == NULL)
 		return OP_RUN_CANCEL;
-	surf->GetOutput()->Update();
+	node->GetOutput()->Update();
 	
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> tranformFilter;
-  tranformFilter->SetInputData((vtkPolyData *)surf->GetOutput()->GetVTKData());
-  tranformFilter->SetTransform(surf->GetOutput()->GetTransform()->GetVTKTransform());
+  tranformFilter->SetInputData((vtkPolyData *)node->GetOutput()->GetVTKData());
+  tranformFilter->SetTransform(node->GetOutput()->GetTransform()->GetVTKTransform());
   tranformFilter->Update();
 
 	// get dataset

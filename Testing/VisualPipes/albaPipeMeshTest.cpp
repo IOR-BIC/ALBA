@@ -419,8 +419,8 @@ void albaPipeMeshTest::TestPipeDensityMap()
 
 	// Enable DensityMap
 	//pipeMesh->ManageScalarOnExecutePipe(polyline->GetOutput()->GetVTKData());
-	pipeMesh->SetDensityVolume(volumeInput);
-	pipeMesh->SetDensisyMapActive(true);
+	pipeMesh->SetProbeVolume(volumeInput);
+	pipeMesh->SetProbeMapActive(true);
 
 	////////// ACTORS List ///////////////
 	vtkPropCollection *actorList = vtkPropCollection::New();

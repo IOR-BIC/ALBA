@@ -44,7 +44,7 @@ PURPOSE. See the above copyright notice for more information.
 #include <iostream>
 #include <fstream>
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include "wx/filename.h"
 #include "wx/stdpaths.h"
 

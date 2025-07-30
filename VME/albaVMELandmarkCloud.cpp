@@ -50,7 +50,7 @@ const bool DEBUG_MODE = false;
 
 #include <vector>
 
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include "albaProgressBarHelper.h"
 #include "vtkMath.h"
 //------------------------------------------------------------------------------

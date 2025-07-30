@@ -25,7 +25,7 @@
 
 
 #include <wx/event.h>
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include <wx/settings.h>
 #include <wx/laywin.h>
 #include <wx/imaglist.h>
@@ -94,6 +94,7 @@ albaGUISettingsDialog::~albaGUISettingsDialog()
 bool albaGUISettingsDialog::ShowModal()
 //----------------------------------------------------------------------------
 {
+  m_Guih->Update();
   return m_Dialog->ShowModal() != 0;
 }
 //----------------------------------------------------------------------------

@@ -24,7 +24,7 @@
 
 #include "albaDecl.h"
 #include "albaOpVolumeUnion.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include "albaEvent.h"
 #include "albaGUI.h"
 

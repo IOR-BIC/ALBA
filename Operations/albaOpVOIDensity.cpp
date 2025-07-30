@@ -94,6 +94,7 @@ albaOpVOIDensity::~albaOpVOIDensity()
 {
 	m_Surface = NULL;
 	vtkDEL(m_VOIScalars);
+	vtkDEL(m_FillHoleFilter);
 	albaDEL(m_PointCloud);
 	m_VOICoords.clear();
 	m_VOIIds.clear();
@@ -327,8 +328,7 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 
 	m_PointCloud->ReparentTo(m_Surface);
 
-	albaMatrix identityM;
-	m_PointCloud->SetAbsMatrix(identityM);
+	m_PointCloud->SetAbsMatrix(*m_Input->GetOutput()->GetAbsMatrix());
 
 }
 
@@ -615,8 +615,8 @@ void albaOpVOIDensity::EvaluateSurface()
 
 	if (m_FillHoles)
 	{
-		if (m_FillHoleFilter == NULL)
-			vtkNEW(m_FillHoleFilter);
+		vtkDEL(m_FillHoleFilter);
+		vtkNEW(m_FillHoleFilter);
 
 		m_FillHoleFilter->SetInputData(polydata);
 		m_FillHoleFilter->SetFillAllHole();
@@ -743,14 +743,7 @@ void albaOpVOIDensity::WriteScalars()
 		fclose(outFile);
 	}
 
-	// Open Report File
-	wxString url = "file:///";
-	url = url + newFileName.GetCStr();
-	url.Replace("\\", "/");
-	albaLogMessage("Opening %f", url.ToAscii());
-	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
-	command = command + url;
-	wxExecute(command);
+	albaOpenWithDefaultApp(newFileName);
 }
 
 
@@ -768,14 +761,7 @@ void albaOpVOIDensity::WriteReport()
 
 	CreateCSVFile(newFileName);
 
-	// Open Report File
-	wxString url = "file:///";
-	url = url + newFileName.GetCStr();
-	url.Replace("\\", "/");
-	albaLogMessage("Opening %f", url.ToAscii());
-	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
-	command = command + url;
-	wxExecute(command);
+	albaOpenWithDefaultApp(newFileName);
 }
 
 //----------------------------------------------------------------------------

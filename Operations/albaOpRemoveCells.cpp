@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpRemoveCells.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 #include "albaGUI.h"
@@ -616,11 +616,8 @@ void albaOpRemoveCells::CreateHelperStructures()
 void albaOpRemoveCells::RemoveCells()
 {
   	// perform cells removing...
-    if (m_TestMode == false)
-    {
-      wxBusyInfo("removing cells...");
-    }
-
+    albaGUIBusyInfo("removing cells...",m_TestMode);
+    
     m_Rcf->RemoveMarkedCells();
     m_Rcf->Update();
 

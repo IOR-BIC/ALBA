@@ -1,9 +1,3 @@
-/*
-	Installer Common Script for ALBA based Applications
-	Author: Nicola Vanella
-	BIC-IOR 2019
-*/
-
 !ifndef ___InstallerCommon___
 !define ___InstallerCommon___
 
@@ -12,6 +6,7 @@
 !include Registry.nsh
 !include nsProcess.nsh
 !include EnumUsersReg.nsh
+!include AddToPathPage.nsh
 !include x64.nsh
 
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\${PRODUCT_EXE_NAME}"
@@ -127,6 +122,13 @@ FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Add to Path Page 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;    
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Setting Custom Pages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  
 !macro Init_MUI
@@ -137,6 +139,9 @@ FunctionEnd
 	!insertmacro MUI_PAGE_WELCOME
 	!insertmacro MUI_PAGE_LICENSE "${PRODUCT_INSTALLER_DIR_WIN}\${PRODUCT_NAME}Licence.rtf"
 	!insertmacro MUI_PAGE_DIRECTORY
+	!ifdef INSERT_ADD_PATH_PAGE
+		!insertmacro AddToPathPage
+	!endif
 	;!insertmacro MUI_PAGE_INSTFILES
 	;!insertmacro MUI_PAGE_FINISH
 
@@ -158,6 +163,41 @@ FunctionEnd
 
 !macroend
 
+Function CheckRunningProcesses
+
+Check_Main_Process:
+   ${nsProcess::FindProcess} "${PRODUCT_NAME}.exe" $R0
+   ${If} $R0 == 0
+      MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${PRODUCT_NAME} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY Check_Main_Process
+      Quit
+   ${EndIf}
+
+Check_Extra_Process:
+   ${nsProcess::FindProcess} "${CHECK_EXTRA_PROCESS_ISRUNNING}" $R0
+   ${If} $R0 == 0
+      MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${CHECK_EXTRA_PROCESS_ISRUNNING} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY Check_Extra_Process
+      Quit
+   ${EndIf}
+
+FunctionEnd
+
+Function un.CheckRunningProcesses
+	
+	Check_Main_Process:
+   ${nsProcess::FindProcess} "${PRODUCT_NAME}.exe" $R0
+   ${If} $R0 == 0
+      MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${PRODUCT_NAME} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY Check_Main_Process
+      Quit
+   ${EndIf}
+
+Check_Extra_Process:
+   ${nsProcess::FindProcess} "${CHECK_EXTRA_PROCESS_ISRUNNING}" $R0
+   ${If} $R0 == 0
+      MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${CHECK_EXTRA_PROCESS_ISRUNNING} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY Check_Extra_Process
+      Quit
+   ${EndIf}
+
+FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; onInit 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
@@ -179,23 +219,7 @@ Function .onInit
 		Quit
 	${EndIf}
 	
-App_Running_Check:
-   ;Chech if app.exe process running? result is stored in $R0
-   ${nsProcess::FindProcess} "${PRODUCT_NAME}.exe" $R0
-
-   ${If} $R0 == 0
-      MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${PRODUCT_NAME} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY App_Running_Check
-      Quit
-   ${EndIf}
-
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;Chech if Extra app.exe process running? result is stored in $R0
-   ${nsProcess::FindProcess} "${CHECK_EXTRA_PROCESS_ISRUNNING}" $R0
-
-   ${If} $R0 == 0
-      MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${EXTRA_PRODUCT_EXE_NAME} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY App_Running_Check
-      Quit
-   ${EndIf}
+	call CheckRunningProcesses
 
 FunctionEnd
 
@@ -204,24 +228,8 @@ FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
 Function un.onInit
 
-App_Running_Check:
-   ;Chech if app.exe process running? result is stored in $R0
-   ${nsProcess::FindProcess} "${PRODUCT_NAME}.exe" $R0
-
-   ${If} $R0 == 0
-      MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${PRODUCT_NAME} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY App_Running_Check
-      Quit
-   ${EndIf}
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;Chech if Extra app.exe process running? result is stored in $R0
-   ${nsProcess::FindProcess} "${CHECK_EXTRA_PROCESS_ISRUNNING}" $R0
-
-   ${If} $R0 == 0
-      MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "${EXTRA_PRODUCT_EXE_NAME} is currently running. Please stop it before continuing or exit." /SD IDCANCEL IDRETRY App_Running_Check
-      Quit
-   ${EndIf}
-   
+	call un.CheckRunningProcesses
+	
 FunctionEnd
 
 Var removeAllcheckbox

@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpImporterRAWVolume.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaGUI.h"
 #include "albaRWI.h"
@@ -422,8 +422,7 @@ void albaOpImporterRAWVolume::UpdateReader()
 bool albaOpImporterRAWVolume::Import()
 //----------------------------------------------------------------------------
 {
-	if(!m_TestMode)
-		wxBusyInfo wait(_("Importing RAW data, please wait..."));
+	albaGUIBusyInfo wait(_("Importing RAW data, please wait..."),m_TestMode);
 
  	vtkALBASmartPointer<vtkImageReader> reader;
 	reader->SetFileName(m_RawFile);  

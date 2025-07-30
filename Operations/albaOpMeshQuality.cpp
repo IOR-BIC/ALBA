@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpMeshQuality.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaGUIDialog.h"
 #include "albaRWIBase.h"

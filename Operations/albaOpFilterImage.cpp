@@ -48,7 +48,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "itkOtsuThresholdImageFilter.h"
 
 #include "vtkALBASmartPointer.h"
-#include "wx\busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 typedef itk::VTKImageToImageFilter< ImageType > ConvertervtkTOitk;
 typedef itk::ImageToVTKImageFilter< ImageType > ConverteritkTOvtk;
@@ -71,7 +71,6 @@ albaOpFilterImage::albaOpFilterImage(wxString label) :albaOp(label)
 	m_CannyThesholds[0] = 0;
 	m_CannyThesholds[1] = 10;
 	m_ThesholdBelow = true;
-
 }
 
 //----------------------------------------------------------------------------
@@ -237,14 +236,8 @@ void albaOpFilterImage::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 void albaOpFilterImage::RunFilter(FilterTypes filterType)
 {
-	wxBusyInfo *busy = NULL;
-	if (!m_TestMode)
-		busy=new wxBusyInfo("Applying filter...");
-	else
-		albaLogMessage("Applying filter...");
-
-
-	
+	albaGUIBusyInfo busy("Applying filter...",m_TestMode);
+		
 	ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New();
 	vtkImageData *newGrayImage = NULL;
 	vtkDataSet * imgSrc = m_ImgOut->GetOutput()->GetVTKData();
@@ -317,7 +310,6 @@ void albaOpFilterImage::RunFilter(FilterTypes filterType)
 		m_Gui->Enable(ID_UNDO, true);
 
 	vtkDEL(newGrayImage);
-	cppDEL(busy);
 }
 
 //----------------------------------------------------------------------------

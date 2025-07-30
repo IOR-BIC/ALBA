@@ -26,7 +26,7 @@
 
 #include "albaOpScaleDataset.h"
 
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 
 #include "albaDecl.h"
 #include "albaGUI.h"
@@ -96,11 +96,8 @@ albaOp* albaOpScaleDataset::Copy()
 void albaOpScaleDataset::OpRun()
 //----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
-  {
-    wxBusyInfo wait("creating gui...");
-  }
-
+  albaGUIBusyInfo wait("creating gui...",m_TestMode);
+  
   assert(m_Input);
   m_CurrentTime = m_Input->GetTimeStamp();
 
@@ -154,7 +151,7 @@ void albaOpScaleDataset::OpUndo()
 void albaOpScaleDataset::OpStop(int result)
 //----------------------------------------------------------------------------
 {  
-  wxBusyInfo wait("destroying gui...");
+	albaGUIBusyInfo wait("destroying gui...", m_TestMode);
 
   m_GizmoScale->Show(false);
   cppDEL(m_GizmoScale);

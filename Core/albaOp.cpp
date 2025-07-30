@@ -222,8 +222,10 @@ void albaOp::SetMouse(albaDeviceButtonsPadMouse *mouse)
 void albaOp::OpStop(int result)
 {
 	albaLogMessage("Stopping Op :%s\n", m_Label.ToAscii());
+	if (m_Gui)
+		m_Gui->DisableRecursive();
+	albaEventMacro(albaEvent(this, result));
   HideGui();
-  albaEventMacro(albaEvent(this,result));        
 }
 //----------------------------------------------------------------------------
 char ** albaOp::GetIcon()

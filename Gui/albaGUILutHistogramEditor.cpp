@@ -38,7 +38,7 @@
 #include "albaGUIHistogramWidget.h" 
 #include "vtkFloatArray.h"
 #include "albaGUILutHistogramSwatch.h"
-#include <wx/busyinfo.h>
+#include "albaGUIBusyInfo.h"
 
 
 #define SUB_SAMPLED_SIZE (64*64*64)
@@ -195,7 +195,7 @@ void albaGUILutHistogramEditor::OnEvent(albaEventBase *alba_event)
          if (m_FullSampling)
          {
            //Set busy info only on slow (full histogram) operation
-           wxBusyInfo wait(_("Updating Histogram ..."));
+           albaGUIBusyInfo wait(_("Updating Histogram ..."));
            m_Histogram->SetData(m_DataSet->GetPointData()->GetScalars());
          }
          else 

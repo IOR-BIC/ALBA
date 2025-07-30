@@ -322,7 +322,6 @@ void albaOpDecomposeTimeVarVME::SetPeriodicity(int period)
 int albaOpDecomposeTimeVarVME::UpdateFrames()
 //----------------------------------------------------------------------------
 {
-  //wxBusyInfo wait("Please wait, working...");
   std::vector<albaTimeStamp> kframes;
   albaVMEGenericAbstract *vme = albaVMEGenericAbstract::SafeDownCast(m_Input);
 

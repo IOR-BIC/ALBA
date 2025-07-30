@@ -25,7 +25,7 @@
 
 #include "albaDecl.h"
 #include "albaOpTransformInterface.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include "albaRefSys.h"
 #include "albaGUI.h"
 #include "albaGizmoTranslate.h"
@@ -189,12 +189,7 @@ void albaOpTransformInterface::OpDo()
       tPDF->SetInputData(pd);
       tPDF->SetTransform(scaleTransform);
 
-      // progress bar stuff
-      if (!m_TestMode)
-      {
-        wxString progress_string("Applying scaling to data...");
-        wxBusyInfo wait(progress_string.ToAscii());
-      }
+			albaGUIBusyInfo("Applying scaling to data...", m_TestMode);
 
       albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,tPDF.GetPointer()));
       tPDF->Update();
@@ -215,7 +210,7 @@ void albaOpTransformInterface::OpDo()
 
       // progress bar stuff
       wxString progress_string("Applying scaling to data...");
-      wxBusyInfo wait(progress_string.ToAscii());
+      albaGUIBusyInfo wait(progress_string.ToAscii(),m_TestMode);
 
       albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,tf.GetPointer()));
       tf->Update();
@@ -224,11 +219,8 @@ void albaOpTransformInterface::OpDo()
     }
     else if (dataSet->IsA("vtkImageData"))
     {
-      if (!m_TestMode)
-      {
-      	wxBusyInfo wait_info("Applying scaling to data...");
-      }
-
+      albaGUIBusyInfo wait_info("Applying scaling to data...",m_TestMode);
+      
       vtkImageData *currentSP = vtkImageData::SafeDownCast(m_Input->GetOutput()->GetVTKData());
       assert(currentSP);
  
@@ -249,12 +241,9 @@ void albaOpTransformInterface::OpDo()
     }
     else if (dataSet->IsA("vtkRectilinearGrid"))
     {
-	    if (!m_TestMode)
-	    {
-	    	wxBusyInfo wait_info("Applying scaling to data...");
-	    }
-  
-      long progress = 0;
+	    albaGUIBusyInfo wait_info("Applying scaling to data...", m_TestMode);
+	    
+			long progress = 0;
 
       vtkRectilinearGrid *currentRG = vtkRectilinearGrid::SafeDownCast(m_Input->GetOutput()->GetVTKData());
       assert(currentRG);

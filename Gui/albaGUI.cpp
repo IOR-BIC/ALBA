@@ -2015,6 +2015,26 @@ void albaGUI::OnMouseWheel(wxMouseEvent &event)
 {
   OnEvent(&albaEvent(this,MOUSE_WHEEL,(long) event.GetWheelRotation()));
 }
+
+//----------------------------------------------------------------------------
+void albaGUI::DisableRecursive()
+{
+	DisableRecursive(this);
+	Update();
+}
+
+//----------------------------------------------------------------------------
+void albaGUI::DisableRecursive(wxWindow* parent)
+{
+	parent->Disable();
+	wxWindowList& children = parent->GetChildren();
+	for (wxWindowList::iterator it = children.begin(); it != children.end(); ++it)
+	{
+		wxWindow* child = *it;
+		DisableRecursive(child); // Recursive call
+	}
+}
+
 //----------------------------------------------------------------------------
 void albaGUI::OnListBox (wxCommandEvent &event)
 //----------------------------------------------------------------------------

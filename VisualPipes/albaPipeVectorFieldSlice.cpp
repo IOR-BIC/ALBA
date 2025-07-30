@@ -36,7 +36,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkDataArray.h"
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include "wx/statline.h"
 #include <float.h>
 

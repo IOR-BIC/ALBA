@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpSmoothSurfaceCells.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 
@@ -698,11 +698,8 @@ void albaOpSmoothSurfaceCells::SmoothCells()
 //----------------------------------------------------------------------------
 {
 	// perform cells removing...
-	if (m_TestMode == false)
-	{
-		wxBusyInfo("Smooth selection...");
-	}
-
+	albaGUIBusyInfo("Smooth selection...",m_TestMode);
+	
   m_RemoveUnSelectedCells->ReverseRemoveOn();
   m_RemoveUnSelectedCells->RemoveMarkedCells();
   m_RemoveUnSelectedCells->Update();
@@ -761,7 +758,6 @@ void albaOpSmoothSurfaceCells::SmoothCells()
 	{
 		m_VisitedCells[i] = -1;
 	}
-
 }
 //----------------------------------------------------------------------------
 void albaOpSmoothSurfaceCells::MarkCells()

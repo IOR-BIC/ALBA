@@ -306,7 +306,7 @@ public:
 	~albaDicomStudyList();
 
 	/** Add a slice, if necessary creates a new study/series*/
-	void AddSlice(albaDicomSlice *slice);
+	void AddSlice(albaDicomSlice *slice, albaGUIDicomSettings *settings);
 
 	/** Get the num-th study*/
 	albaDicomStudy *GetStudy(int num);
@@ -330,12 +330,14 @@ class ALBA_EXPORT albaDicomStudy
 {
 public:
 
-	albaDicomStudy(albaString studyID) { m_StudyID = studyID; } 
+	albaDicomStudy(albaString studyID) {
+		m_StudyID = studyID; m_AcquisitionNumberLastChoice = -1;
+	}
 
 	~albaDicomStudy();
 
 	/** Add a slice, if necessary creates a new series */
-	void AddSlice(albaDicomSlice *slice);
+	void AddSlice(albaDicomSlice *slice, albaGUIDicomSettings* settings);
 	
 	/** Returns StudyID */
 	albaString GetStudyID() const { return m_StudyID; }
@@ -352,6 +354,7 @@ public:
 protected:
 	albaString m_StudyID;
 	std::vector<albaDicomSeries *> m_Series;
+	int m_AcquisitionNumberLastChoice;
 };
 
 //----------------------------------------------------------------------------

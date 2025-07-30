@@ -62,7 +62,7 @@
 #include "vtkFieldData.h"
 #include <vtkAssignAttribute.h>
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include <float.h>
 #include "vtkALBASmartPointer.h"
 

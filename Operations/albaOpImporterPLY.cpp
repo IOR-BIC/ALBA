@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpImporterPLY.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 #include "albaTagItem.h"
@@ -128,10 +128,7 @@ void albaOpImporterPLY::OpUndo()
 //----------------------------------------------------------------------------
 int albaOpImporterPLY::ImportPLY()
 {
-  if (!m_TestMode)
-  {
-    wxBusyInfo wait("Loading file: ...");  
-  }
+  albaGUIBusyInfo wait("Loading file: ...",m_TestMode);  
 
   unsigned int i;
   for(i = 0; i < m_ImportedPLYs.size(); i++)

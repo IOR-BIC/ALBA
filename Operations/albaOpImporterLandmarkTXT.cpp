@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpImporterLandmarkTXT.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>
@@ -151,10 +151,8 @@ void albaOpImporterLandmarkTXT::SetSkipColumn(int column)
 void albaOpImporterLandmarkTXT::Read()   
 //----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
-  {
-    wxBusyInfo wait("Please wait, working...");
-  }
+  albaGUIBusyInfo wait("Please wait, working...",m_TestMode);
+  
   albaNEW(m_VmeCloud);
 
   wxString path, name, ext;

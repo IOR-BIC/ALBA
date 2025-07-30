@@ -24,7 +24,7 @@
 
 #include "albaOpExporterRaw.h"
 #include "wx/wxprec.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 #include "albaString.h"
@@ -134,8 +134,8 @@ void albaOpExporterRAW::SaveVolume()
 	wxString path,name,ext;
 	wxFileName::SplitPath(m_FileName.GetCStr(),&path,&name,&ext);
 	path+= _("\\");
-	if(!m_TestMode)
-		wxBusyInfo wait("Please wait, working...");
+	
+	albaGUIBusyInfo wait("Please wait, working...",m_TestMode);
 	
 	albaVMEVolumeGray *volume=albaVMEVolumeGray::SafeDownCast(m_Input);
 	volume->Modified();

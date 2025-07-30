@@ -24,7 +24,7 @@
 
 #include "albaOpImporterVMEDataSetAttributes.h"
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaDecl.h"
 #include "albaTagItem.h"
@@ -94,12 +94,8 @@ void albaOpImporterVMEDataSetAttributes::OpRun()
 
 int albaOpImporterVMEDataSetAttributes::Read()
 {
+  albaGUIBusyInfo wait("Reading file: ...",m_TestMode);  
   
-  if (!m_TestMode)
-  {
-    wxBusyInfo wait("Reading file: ...");  
-  }
-
   albaVMEGeneric *input = albaVMEGeneric::SafeDownCast(m_Input);
 
   albaVMEDataSetAttributesImporter* attributesImporter = NULL;

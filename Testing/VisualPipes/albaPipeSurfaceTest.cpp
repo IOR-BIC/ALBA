@@ -315,8 +315,8 @@ void albaPipeSurfaceTest::TestPipeDensityMap()
 
 	// Enable DensityMap
 	//pipeSurface->ManageScalarOnExecutePipe(polyline->GetOutput()->GetVTKData());
-	pipeSurface->SetDensityVolume(volumeInput);
-	pipeSurface->SetDensisyMapActive(true);
+	pipeSurface->SetProbeVolume(volumeInput);
+	pipeSurface->SetProbeMapActive(true);
 
 	////////// ACTORS List ///////////////
 	vtkPropCollection *actorList = vtkPropCollection::New();

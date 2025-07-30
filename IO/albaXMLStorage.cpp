@@ -193,7 +193,8 @@ int albaXMLStorage::StoreToURL(const char * filename, const char * url)
   else
   {
     // remove old file if present
-    wxRemoveFile(url);
+		if(wxFileExists(url))
+			wxRemoveFile(url);
     // currently only local files are supported
     return wxRenameFile(filename,url)?ALBA_OK:ALBA_ERROR;
   } 

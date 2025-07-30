@@ -222,6 +222,7 @@
 #include "albaOpVolumeResample.h"
 #include "albaOpESPCalibration.h"
 #include "albaOpComputeHausdorffDistance.h"
+#include "albaOpCreateCentroid.h"
 
 //TMP
 #include "albaOpImporterEmgWS.h"
@@ -2013,6 +2014,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
 	Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
 	Plug(new albaOpImporterScancoImageIO("Scanco IO"));
+	Plug(new albaOpImporterScancoImageIO("Scanco IO")); 
 
 	//------------------------------------------------------------
 	// Exporter Menu:
@@ -2077,6 +2079,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpSegmentationRegionGrowingLocalAndGlobalThreshold(), _("Create"));
 	Plug(new albaOpSegmentation(), _("Create"));
 	Plug(new albaOpNearestLandmark(), _("Create"));
+	Plug(new albaOpCreateCentroid(), _("Create"));
 
 
 	Plug(new albaOpClipSurface("Clip Surface"), _("Modify"));

@@ -54,7 +54,7 @@
 #include "vtkAxes.h"
 #include "vtkFloatArray.h"
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include <float.h>
 #include <math.h>
 #include <wx/tokenzr.h>

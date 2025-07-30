@@ -40,7 +40,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkPointData.h"
 #include "vtkImageData.h"
 #include "albaTagArray.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include "vtkStructuredPoints.h"
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
@@ -129,7 +129,7 @@ albaOp* albaOpESPCalibration::Copy()
 //----------------------------------------------------------------------------
 void albaOpESPCalibration::OpRun()
 {
-	wxBusyInfo wait(_("Extracting calibration info.\nPlease wait..."));
+	albaGUIBusyInfo wait(_("Extracting calibration info.\nPlease wait..."),m_TestMode);
 	wxBusyCursor waitCursor;
 
 	m_Volume = albaVMEVolumeGray::SafeDownCast(m_Input);

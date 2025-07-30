@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpCrop.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include "albaEvent.h"
 #include "albaGUI.h"
 
@@ -279,11 +279,7 @@ void albaOpCrop::Crop()
 		v_esp->Modified();
 
 		// I'm using probe filter instead of ExtractVOI (see why before...)
-		wxBusyInfo *wait=NULL;
-		if (!m_TestMode)
-		{
-			wait=new wxBusyInfo(_("Please wait, cropping..."));
-		}
+		albaGUIBusyInfo wait(_("Please wait, cropping..."),m_TestMode);
     
 		vtkALBASmartPointer<vtkProbeFilter> probeFilter;
 		albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, probeFilter));
@@ -295,7 +291,6 @@ void albaOpCrop::Crop()
 		vtkNEW(m_OutputSP);
 		m_OutputSP->DeepCopy(probeFilter->GetOutput());
 
-		cppDEL(wait);
 	}
 }
 //----------------------------------------------------------------------------

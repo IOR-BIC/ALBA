@@ -64,8 +64,8 @@ public:
 	enum PIPE_WITH_SCALARS_WIDGET_ID
 	{
 		ID_SCALARS = albaPipe::ID_LAST,
-		ID_DENSITY_MAPS,
-		ID_SELECT_DENS_VME,
+		ID_PROBE_MAPS,
+		ID_SELECT_PROBE_VME,
 		ID_LUT,
 		ID_LUT_SLIDER,
 		ID_SCALAR_MAP_ACTIVE,
@@ -124,13 +124,13 @@ public:
 	int GetScalarBarLabNum() const { return m_ScalarBarLabNum+3; }
 	void SetScalarBarLabNum(int val) { m_ScalarBarLabNum = val-3; }
 
-	void SetDensityVolume(albaVME *vol);
+	void SetProbeVolume(albaVME *vol);
 
 	static bool VolumeAccept(albaVME *node);
 
 	
-	int IsDensisyMapActive() const { return m_DensisyMapActive; }
-	void SetDensisyMapActive(int val);
+	int IsProbeMapActive() const { return m_ProbeMapActive; }
+	void SetProbeMapActive(int val);
 
 	/** Creates/Show the Histogram */
 	void CreateHistogramDialog();
@@ -139,7 +139,7 @@ public:
 protected:
 	
   vtkLookupTable  *m_Table;
-	albaVME *m_DensityVolume;
+	albaVME *m_ProbeVolume;
 	
 	albaGUILutSwatch *m_LutSwatch;
 	albaGUILutSlider		*m_LutSlider;
@@ -159,11 +159,11 @@ protected:
 	/** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
 	void CreateScalarsGui(albaGUI *gui);
 
-	/** Creates the Stack for density maps visualization */
-	void CreateDensityMapStack();
+	/** Creates the Stack for probe maps visualization */
+	void CreateProbeMapStack();
 
 	/** Destroys the Density Map Stack */
-	void DestroyDensityMapStack();
+	void DestroyProbeMapStack();
 
   wxString                *m_ScalarsInComboBoxNames;
   wxString                *m_ScalarsVTKName;
@@ -172,7 +172,7 @@ protected:
 	vtkDataSetMapper        *m_Mapper; 
 	vtkActor                *m_Actor;
 	vtkScalarBarActor				*m_ScalarBarActor;
-	vtkALBADistanceFilter		*m_DensityFilter;
+	vtkALBADistanceFilter		*m_ProbeFilter;
 	albaGUIDialog						*m_Dialog;
 	albaGUIHistogramWidget  *m_Histogram;
 
@@ -183,14 +183,14 @@ protected:
   int                      m_ActiveScalarType;
 	int											 m_OldActiveScalarType;
 	int                      m_ScalarMapActive;  //Gui option to enable scalar maps generation to be active a volume must be selected
-	int                      m_DensisyMapActive;
+	int                      m_ProbeMapActive;
 	int											 m_ShowScalarBar;
 	int											 m_ScalarBarLabNum;
 	int											 m_ScalarBarPos;
 	int											 m_MapsStackActive;  //True when the maps generation is active (not gui option)
 	int											 m_OldMapsGenActive;  //True when the maps generation is active (not gui option)
 
-	albaString							 m_DensVolName;
+	albaString							 m_ProbeVolName;
 
 
 private:

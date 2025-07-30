@@ -23,7 +23,7 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 
 #include "albaOpIterativeRegistration.h"
 #include "albaGUILandmark.h"
@@ -112,7 +112,7 @@ void albaOpIterativeRegistration::OpRun()
 {
   // progress bar stuff
   wxString progress_string("creating gui...");
-  wxBusyInfo wait(progress_string.ToAscii());
+  albaGUIBusyInfo wait(progress_string.ToAscii(),m_TestMode);
 
   m_UndoSourceAbsPose = vtkMatrix4x4::New();
   m_RegistrationMatrix = vtkMatrix4x4::New();
@@ -185,7 +185,7 @@ void albaOpIterativeRegistration::OpStop(int result)
 {   
   // progress bar stuff
   wxString progress_string("destroying gui...");
-  wxBusyInfo wait(progress_string.ToAscii());
+  albaGUIBusyInfo wait(progress_string.ToAscii(),m_TestMode);
 
   cppDEL(m_GuiLandmark[SOURCE]);
   cppDEL(m_GuiLandmark[TARGET]);
