@@ -499,25 +499,22 @@ void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double value, int plane)
 	//reset conversion table values
 	memset(IdConversionTable,-1,sizeof(vtkIdType)*nPoints);
 	
-	vtkIdType cellId;
 	vtkIdType pointOverBound, pointUnderBound, cellNPoints, addedPoints;
 
-	cellId=addedPoints=0;
+	addedPoints=0;
 
 	vtkCellArray *polys;
 	polys=Mask->GetPolys();
 	int nCell=polys->GetNumberOfCells();
 	
 	//Searching cells that intersect current z-plane
-	for(int i=0;i<nCell;i++)
+	for(vtkIdType cellId =0; cellId <nCell; cellId++)
 	{
-		vtkCellArray* polys;
 		vtkIdType cellNPoints;
 		vtkSmartPointer<vtkIdList> cellIds = vtkSmartPointer<vtkIdList>::New();
 
 		polys->GetCellAtId(cellId, cellIds);
 		cellNPoints = cellIds->GetNumberOfIds();
-		cellId += cellNPoints + 1;
 		pointOverBound = pointUnderBound = 0;
 
 		// If there is at least one point under current z value and a point over

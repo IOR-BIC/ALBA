@@ -203,7 +203,7 @@ void vtkALBADistanceFilter::RequestData(vtkInformation* request, vtkPointSet *ou
 				case VTK_INT:						 distance = this->TraceRay(point, normal, (const int*)DataPointer); break;
 				case VTK_UNSIGNED_INT:   distance = this->TraceRay(point, normal, (const unsigned int*)DataPointer); break;
 			}
-      if (scalars)
+			if (scalars)
         scalars->SetTuple1(pi, distance);
       else
         vectors->SetTuple3(pi, distance * normal[0], distance * normal[1], distance * normal[2]);

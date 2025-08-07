@@ -198,11 +198,12 @@ void vtkALBADistanceFilterTest::TestFilter_Vector_Distance()
 	CPPUNIT_ASSERT(vectors != NULL && scalars == NULL);
 
 	double val = 8.8789987564086914;
-	CPPUNIT_ASSERT(vectors->GetTuple(28)[0] == -val); 
-	CPPUNIT_ASSERT(vectors->GetTuple3(50)[0] == val); 
-	CPPUNIT_ASSERT(vectors->GetTuple3(16)[1] == val); 
-	CPPUNIT_ASSERT(vectors->GetTuple3(40)[1] == -val);
-	CPPUNIT_ASSERT(vectors->GetTuple3(61)[1] == -val);
+	double res = vectors->GetTuple(50)[0];
+	CPPUNIT_ASSERT(vectors->GetTuple(29)[0] == -val); 
+	CPPUNIT_ASSERT(vectors->GetTuple3(51)[0] == val); 
+	CPPUNIT_ASSERT(vectors->GetTuple3(17)[1] == val); 
+	CPPUNIT_ASSERT(vectors->GetTuple3(41)[1] == -val);
+	CPPUNIT_ASSERT(vectors->GetTuple3(62)[1] == -val);
 	
 	CPPUNIT_ASSERT(vectors->GetTuple3(0)[2] == 10.0);
 	CPPUNIT_ASSERT(vectors->GetTuple3(1)[2] == -10.0);

@@ -1640,8 +1640,8 @@ void vtkALBAMeshCutterTest::TestUpdateChangeInput()
   // check no. of cells and type (should be one triangle and one quad)
   ncells = polydata->GetNumberOfCells() ;
   CPPUNIT_ASSERT(ncells == 2) ;
-  CPPUNIT_ASSERT(polydata->GetCell(0)->GetCellType() == VTK_TRIANGLE) ;
-  CPPUNIT_ASSERT(polydata->GetCell(1)->GetCellType() == VTK_QUAD) ;
+  CPPUNIT_ASSERT(polydata->GetCell(1)->GetCellType() == VTK_TRIANGLE) ;
+  CPPUNIT_ASSERT(polydata->GetCell(0)->GetCellType() == VTK_QUAD) ;
 
   // compare the bounds of the input and output
   UG->GetBounds(boundsin) ;

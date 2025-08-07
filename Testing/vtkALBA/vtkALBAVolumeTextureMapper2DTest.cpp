@@ -77,12 +77,12 @@ void vtkALBAVolumeTextureMapper2DTest::TestPipeExecution()
 //----------------------------------------------------------------------------
 {
   ////// import vtkData ////////////////////
-  vtkDataSetReader *Importer;
-  vtkNEW(Importer);
+  vtkDataSetReader *importer;
+  vtkNEW(importer);
   albaString filename=ALBA_DATA_ROOT;
   filename<<"/VTK_Volumes/volume.vtk";
-  Importer->SetFileName(filename);
-  Importer->Update();
+  importer->SetFileName(filename);
+  importer->Update();
   
   vtkVolumeProperty *volumeProperty = NULL;
   vtkNEW(volumeProperty);  
@@ -91,7 +91,7 @@ void vtkALBAVolumeTextureMapper2DTest::TestPipeExecution()
 
   vtkALBAVolumeTextureMapper2D *volumeMapper;
   vtkNEW(volumeMapper);
-  volumeMapper->SetInputConnection(Importer->GetOutputPort());
+  volumeMapper->SetInputConnection(importer->GetOutputPort());
 
   volumeMapper->SetMaxMemoryInBytes(64 * 1024 * 1024);
   volumeMapper->SetMaxMemoryFraction(0.5);
@@ -104,7 +104,7 @@ void vtkALBAVolumeTextureMapper2DTest::TestPipeExecution()
 
   double MaxR;
   double unsignRange[2];
-  Importer->GetOutput()->GetScalarRange(unsignRange);
+  importer->GetOutput()->GetScalarRange(unsignRange);
   if (unsignRange[1] < 256.0)
   {    
     piecewiseFunction->AddPoint(  0, 0.0);
@@ -162,7 +162,7 @@ void vtkALBAVolumeTextureMapper2DTest::TestPipeExecution()
   vtkDEL(colorTransferFunction);
   vtkDEL(piecewiseFunction);
   vtkDEL(volumeMapper);
-  vtkDEL(Importer);
+  vtkDEL(importer);
 }
 
 //----------------------------------------------------------------------------

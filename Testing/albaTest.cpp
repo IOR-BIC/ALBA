@@ -95,9 +95,10 @@ void albaTest::setUp()
 //----------------------------------------------------------------------------
 void albaTest::tearDown()
 {
-	//Clean Test Spefic Stuff
+	//Clean Test Specific Stuff
 	AfterTest();
 		
+	vtkTimerLog::ResetLog();
 	vtkTimerLog::CleanupLog();
 
 	cppDEL(m_App);  // Destroy the application
