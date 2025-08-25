@@ -82,8 +82,7 @@ void albaOpNearestLandmark::OpRun()
 	surface->GetOutput()->GetVTKData()->Update();
 
 	albaVMELandmark *lm = albaVMELandmark::SafeDownCast(m_Input);
-	double point[3];
-	lm->GetPoint(point);
+	
 
 	vtkALBASmartPointer <vtkTransform> tra;
 	tra->SetMatrix(surface->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
@@ -95,29 +94,40 @@ void albaOpNearestLandmark::OpRun()
 	vtkPolyData *tranPoly=v_tpdf->GetOutput();
 
 
+	albaVMELandmarkCloud *lmc=CreateClosestPoint(tranPoly, lm, surface);
+	GetLogicManager()->VmeShow(lmc->GetLastChild(), true);
+
+	OpStop(OP_RUN_OK);
+}
+
+//----------------------------------------------------------------------------
+albaVMELandmarkCloud *albaOpNearestLandmark::CreateClosestPoint(vtkPolyData * poly, albaVMELandmark * lm, albaVME * surface)
+{
 	vtkALBASmartPointer <vtkCellLocator> cellLocator;
-	cellLocator->SetDataSet(tranPoly);
+	cellLocator->SetDataSet(poly);
 	cellLocator->BuildLocator();
 
-	double closestPoint[3]; 
-	double closestPointDist2; 
-	vtkIdType cellId; 
+	double closestPoint[3];
+	double closestPointDist2;
+	vtkIdType cellId;
 	int subId;
-					
+	double point[3];
+	lm->GetPoint(point);
+
 	cellLocator->FindClosestPoint(point, closestPoint, cellId, subId, closestPointDist2);
 
 	albaVMELandmarkCloud *lmc = albaVMELandmarkCloud::SafeDownCast(lm->GetParent());
 
 	albaString lmName;
-	lmName.Printf("%s Closest on %s", lm->GetName(), surface->GetName());
+	lmName.Printf("Closest %s on %s", lm->GetName(), surface->GetName());
 
 	lmc->AppendAbsoluteLandmark(closestPoint, lmName.GetCStr());
 
 	albaLogMessage("%s distance to %s: %f", lm->GetName(), surface->GetName(), sqrt(closestPointDist2));
 
-	GetLogicManager()->VmeShow(lmc->GetLastChild(), true);
-	OpStop(OP_RUN_OK);
+	return lmc;
 }
+
 //----------------------------------------------------------------------------
 void albaOpNearestLandmark::OpStop(int result)
 {

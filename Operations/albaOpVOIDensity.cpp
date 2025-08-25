@@ -331,8 +331,7 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 
 	m_PointCloud->ReparentTo(m_Surface);
 
-	albaMatrix identityM;
-	m_PointCloud->SetAbsMatrix(identityM);
+	m_PointCloud->SetAbsMatrix(*m_Input->GetOutput()->GetAbsMatrix());
 
 }
 

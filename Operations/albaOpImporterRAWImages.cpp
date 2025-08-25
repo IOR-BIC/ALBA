@@ -22,7 +22,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include "wx/dir.h"
 
 #include "albaOpImporterRAWImages.h"
@@ -357,7 +357,7 @@ void albaOpImporterRAWImages::CreateGui()
     res = (m_Dialog->GetReturnCode() == wxID_OK) ? OP_RUN_OK : OP_RUN_CANCEL;
     if(res == OP_RUN_OK)
     { 
-      wxBusyInfo wait(_("Importing RAW data, please wait..."));
+      albaGUIBusyInfo wait(_("Importing RAW data, please wait..."),m_TestMode);
       wxBusyCursor waitCursor;
 
       if( !Import() ) res = OP_RUN_CANCEL; // se l'import fallisce devi ritornare OP_RUN_CANCEL, cosi non verra chiamato DO
@@ -1116,18 +1116,16 @@ void albaOpImporterRAWImages::OnStringPrefix()
 void albaOpImporterRAWImages::OnOpenDir() 
 //----------------------------------------------------------------------------
 {
-  if(!this->m_TestMode)
-    wxBusyInfo wait("Reading File, please wait...");
+  albaGUIBusyInfo wait("Reading File, please wait...",m_TestMode);
 
   vtkNEW(m_VtkRawDirectory);
   if (m_VtkRawDirectory->Open(m_RawDirectory) == 0)
     albaLogMessage("Directory <%s> can not be opened", m_RawDirectory);
 
+	albaGUIBusyInfo wait_info("Reading raw directory: please wait",m_TestMode);
+
   if(!this->m_TestMode)
-  {
-    wxBusyInfo wait_info("Reading raw directory: please wait");
     EnableWidgets(true);
-  }
 
   m_NumberFile = m_VtkRawDirectory->GetNumberOfFiles();
   m_NumberSlices = 0;

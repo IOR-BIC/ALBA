@@ -61,6 +61,7 @@ public:
 		ID_LUT_CHOOSER = Superclass::ID_LAST,
 		ID_REVERSE_LUT,
 		ID_VIEW_RULER,
+		ID_INTERPOLATE,
 		ID_LAST
 	};
 
@@ -124,5 +125,10 @@ protected:
 	bool m_ShowReverseLUTButton;
 	bool m_IsLutReversed;
 	int m_CurrentLUTPreset;
+
+	albaGUIPicButton* m_InterpolateButton;
+	bool m_ShowInterpolationButton;
+private:
+	void ChangeInterpolation();
 };
 #endif

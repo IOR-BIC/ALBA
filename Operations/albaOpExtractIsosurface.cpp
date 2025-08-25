@@ -22,7 +22,7 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 
 #include "albaOpExtractIsosurface.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include "wx\statline.h"
 
 #include "albaDecl.h"
@@ -865,11 +865,9 @@ void albaOpExtractIsosurface::UpdateSlice()
 // Called from OpRun()
 void albaOpExtractIsosurface::ExtractSurface()
 {
-	if (!m_TestMode)
-	{
-		wxBusyInfo wait(_("Extracting Isosurface: please wait ..."));
-	}
-
+	
+	albaGUIBusyInfo wait(_("Extracting Isosurface: please wait ..."),m_TestMode);
+	
 	m_ContourVolumeMapper->SetEnableContourAnalysis(m_Optimize != 0);
 
 	if (m_NumberOfContours > 1)

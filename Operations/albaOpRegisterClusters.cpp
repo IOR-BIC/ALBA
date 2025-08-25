@@ -25,7 +25,7 @@
 #include "albaOpRegisterClusters.h"
 
 #include "albaDecl.h"
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 
 #include "albaEvent.h"
 #include "albaGUI.h"
@@ -645,8 +645,7 @@ void albaOpRegisterClusters::OpRun()
 //----------------------------------------------------------------------------
 void albaOpRegisterClusters::OpDo()
 {	
-	if(!m_TestMode)
-		wxBusyInfo wait(_("Please wait, working..."));
+	albaGUIBusyInfo wait(_("Please wait, working..."),m_TestMode);
 		
 	//create result VMEs
 	CreateResultVMEs();

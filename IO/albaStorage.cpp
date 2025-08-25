@@ -151,7 +151,8 @@ void albaStorage::ReleaseTmpFile(const char *filename)
 
 #ifdef ALBA_USE_WX
   // remove file from disk if present
-  wxRemoveFile(filename);
+	if(wxFileExists(filename))
+  	wxRemoveFile(filename);
 #endif
 
 }

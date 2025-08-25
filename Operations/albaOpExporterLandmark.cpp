@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOpExporterLandmark.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include <wx/dirdlg.h>
 
 #include "albaDecl.h"
@@ -195,10 +195,7 @@ void albaOpExporterLandmark::OpRun()
 void albaOpExporterLandmark::ExportLandmark(albaVMELandmarkCloud* cloud)
 //----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
-  {
-    wxBusyInfo wait(_("Saving landmark position: Please wait"));
-  }
+  albaGUIBusyInfo wait(_("Saving landmark position: Please wait"),m_TestMode);
 
   if (cloud==NULL)
   {

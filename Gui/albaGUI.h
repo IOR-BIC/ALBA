@@ -315,7 +315,10 @@ public:
 
 	static void AddMenuItem(wxMenu *menu,int id, wxString label, char **icon=NULL);
 
+	void DisableRecursive();
+
 protected:
+
   albaObserver  *m_Listener;     
   wxBoxSizer   *m_Sizer;
 
@@ -349,6 +352,8 @@ protected:
   void OnCheckListBox (wxCommandEvent &event);
 	void OnRadioButton	(wxCommandEvent &event);
   void OnMouseWheel   (wxMouseEvent &event);
+
+	void DisableRecursive(wxWindow* parent);
 
 DECLARE_EVENT_TABLE()
 };

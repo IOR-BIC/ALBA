@@ -74,6 +74,7 @@ albaOp::albaOp()
 //----------------------------------------------------------------------------
 albaOp::~albaOp()
 {
+	HideGui();
   m_Output = NULL;
 }
 //----------------------------------------------------------------------------
@@ -222,8 +223,17 @@ void albaOp::SetMouse(albaDeviceButtonsPadMouse *mouse)
 void albaOp::OpStop(int result)
 {
 	albaLogMessage("Stopping Op :%s\n", m_Label.ToAscii());
-  HideGui();
-  albaEventMacro(albaEvent(this,result));        
+	if (m_Gui)
+		m_Gui->DisableRecursive();
+	if (result == OP_RUN_CANCEL || !CanUndo()) //on cancel or operation that cannot do undo the op will be deleted so the HideGui method will crash 
+	{
+		albaEventMacro(albaEvent(this, result));
+	}
+	else
+	{
+		albaEventMacro(albaEvent(this, result));
+		HideGui();
+	}
 }
 //----------------------------------------------------------------------------
 char ** albaOp::GetIcon()

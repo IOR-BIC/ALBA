@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaPipeVector.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaSceneNode.h"
 #include "albaGUI.h"
@@ -222,8 +222,7 @@ void albaPipeVector::UpdateProperty(bool fromTag)
 void albaPipeVector::AllVector(bool fromTag)
 //----------------------------------------------------------------------------
 {
-//  if(!m_TestMode)
-    wxBusyInfo wait(_("Creating Vectogram, please wait..."));
+  albaGUIBusyInfo wait(_("Creating Vectogram, please wait..."));
  
   m_MatrixVector = m_Vector->GetMatrixVector();
 

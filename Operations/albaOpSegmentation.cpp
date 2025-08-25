@@ -105,7 +105,7 @@
 #include "vtkTransformFilter.h"
 #include "vtkMaskPolyDataFilter.h"
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include "wx/bitmap.h"
 #include "wx/sizer.h"
 #include "wx/window.h"
@@ -294,7 +294,7 @@ void albaOpSegmentation::OpDo()
 {
 	//GENERATIN SURFACE OUTPUT
   wxBusyCursor wait_cursor;
-  wxBusyInfo wait(_("Wait! Generating Surface Output"));
+  albaGUIBusyInfo wait(_("Wait! Generating Surface Output"), m_TestMode);
 
 	if (m_CurrentPhase == INIT_SEGMENTATION)
 	{
@@ -1965,7 +1965,7 @@ void albaOpSegmentation::OnLoadMask()
 	if (!maskPolydata)
 		return;
 
-	wxBusyInfo wait("Masking: Please wait!");
+	albaGUIBusyInfo wait("Masking: Please wait!", m_TestMode);
 
 
 	vtkPolyData *transformedMaskPolydata = NULL;
@@ -2523,7 +2523,7 @@ void albaOpSegmentation::RestoreSliceBackup()
 bool albaOpSegmentation::Refinement()
 {
 	wxBusyCursor wait_cursor;
-	wxBusyInfo wait(_("Wait! The algorithm could take long time!"));
+	albaGUIBusyInfo wait(_("Wait! The algorithm could take long time!"),m_TestMode);
 
 	vtkDataSet *inputDataSet = vtkDataSet::SafeDownCast(albaVMEVolumeGray::SafeDownCast(m_SegmentationVolume)->GetOutput()->GetVTKData());
 
@@ -2688,7 +2688,7 @@ void albaOpSegmentation::SelectRangeByCurrentSlice()
 //----------------------------------------------------------------------------
 void albaOpSegmentation::Conntectivity3D(albaEvent * e)
 {
-	wxBusyInfo wait("3D Connectivity: Please wait");
+	albaGUIBusyInfo wait("3D Connectivity: Please wait", m_TestMode);
 	
 	AddFullVolumeUndoStep();
 	m_Helper.Connectivity3d((double *)e->GetPointer(), m_SlicePlane, m_SliceIndex-1);

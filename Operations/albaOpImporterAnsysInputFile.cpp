@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkALBASmartPointer.h"
 
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include <stdio.h>
 #include <stdlib.h>

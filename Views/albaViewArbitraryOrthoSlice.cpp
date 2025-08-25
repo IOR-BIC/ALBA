@@ -69,7 +69,7 @@
 #include "vtkDataSetWriter.h"
 #include "vtkUnsignedShortArray.h"
 #include "albaRWIBase.h"
-#include "wx\busyinfo.h"
+#include "albaGUIBusyInfo.h"
 #include "vtkPlaneSource.h"
 #include "vtkPolyDataMapper2D.h"
 #include "vtkProperty2D.h"
@@ -812,7 +812,7 @@ void albaViewArbitraryOrthoSlice::ShowVolume( albaVME * vme, bool show )
 
 	m_InputVolume = albaVMEVolumeGray::SafeDownCast(vme);
 
-	wxBusyInfo wait("please wait");
+	albaGUIBusyInfo wait("please wait");
 
 	for (int i = X; i <= Z; i++)
 	{
@@ -911,7 +911,6 @@ void albaViewArbitraryOrthoSlice::HideVolume()
 		m_CameraConeVME[i]->ReparentTo(NULL);
 		m_GizmoRT[i]->Show(false);
 
-		m_CameraToSlicer[i]->SetVme(NULL);
 		cppDEL(m_GizmoRT[i]);
 		albaDEL(m_CameraConeVME[i]);
 		albaDEL(m_SlicingResetMatrix[i]);

@@ -24,7 +24,7 @@
 
 
 #include "albaOpClipSurface.h"
-#include "wx/busyinfo.h"
+#include "albaGUIBusyInfo.h"
 
 #include "albaGUI.h"
 #include "albaRefSys.h"
@@ -53,6 +53,7 @@
 #include "vtkAppendPolyData.h"
 #include "vtkALBAClipSurfaceBoundingBox.h"
 #include "albaTransform.h"
+#include "vtkPolyDataConnectivityFilter.h"
 
 
 albaVME *currentVME=NULL;
@@ -105,6 +106,7 @@ albaOp(label)
 	m_GizmoScale			= NULL;
 
 	m_GenerateClippedOutput = true;
+	m_ApplyConnectivity = false;
 }
 
 //----------------------------------------------------------------------------
@@ -150,6 +152,7 @@ enum CLIP_SURFACE_ID
   ID_CLIP_INSIDE,
 	ID_CLIP_PLANE_BBOX,
 	ID_GENERATE_CLIPPED_OUTPUT,
+	ID_APPLY_CONNECTIVITY,
 	ID_PLANE_WIDTH,
 	ID_PLANE_HEIGHT,
 	ID_CHOOSE_GIZMO,
@@ -222,7 +225,9 @@ void albaOpClipSurface::CreateGui()
 	//m_Gui->Double(ID_PLANE_WIDTH,_("plane w."),&m_PlaneWidth,0.0);
 	//m_Gui->Double(ID_PLANE_HEIGHT,_("plane h."),&m_PlaneHeight,0.0);
 	//m_Gui->Divider();
-	m_Gui->Bool(ID_GENERATE_CLIPPED_OUTPUT,_("generate clipped output"),&m_GenerateClippedOutput,1);
+	m_Gui->Bool(ID_GENERATE_CLIPPED_OUTPUT, _("Generate clipped output"), &m_GenerateClippedOutput, 1);
+	m_Gui->Bool(ID_APPLY_CONNECTIVITY, _("Extract only the largest surface"), &m_ApplyConnectivity, 1);
+
 	m_Gui->OkCancel();
 
 	m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == albaOpClipSurface::MODE_IMPLICIT_FUNCTION);
@@ -555,6 +560,20 @@ void albaOpClipSurface::OpDo()
 //----------------------------------------------------------------------------
 {
 	albaString name;
+
+	if (m_ApplyConnectivity) {
+		vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
+		connectivityFilter->SetInput(m_ResultPolyData);
+		connectivityFilter->SetExtractionModeToLargestRegion();
+		connectivityFilter->Update();
+
+		m_ResultPolyData->DeepCopy(connectivityFilter->GetOutput());
+		if (m_GenerateClippedOutput) {
+			connectivityFilter->SetInput(m_ClippedPolyData);
+			connectivityFilter->Update();
+			m_ClippedPolyData->DeepCopy(connectivityFilter->GetOutput());
+		}
+	}
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_output;
 	if (!m_ClipBoundBox)

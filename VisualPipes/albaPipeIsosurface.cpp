@@ -47,12 +47,10 @@
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeIsosurface);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 albaPipeIsosurface::albaPipeIsosurface() 
 : albaPipe()
-//----------------------------------------------------------------------------
 {
 	m_Volume          = NULL;
 	m_OutlineActor    = NULL;
@@ -69,7 +67,6 @@ albaPipeIsosurface::albaPipeIsosurface()
 }
 //----------------------------------------------------------------------------
 void albaPipeIsosurface::Create(albaSceneNode *n)
-//----------------------------------------------------------------------------
 {
 	Superclass::Create(n);
 
@@ -125,7 +122,6 @@ void albaPipeIsosurface::Create(albaSceneNode *n)
 }
 //----------------------------------------------------------------------------
 albaPipeIsosurface::~albaPipeIsosurface()
-//----------------------------------------------------------------------------
 {
   m_Vme->RemoveObserver(this);
 
@@ -143,7 +139,6 @@ albaPipeIsosurface::~albaPipeIsosurface()
 
 //----------------------------------------------------------------------------
 void albaPipeIsosurface::Select(bool sel) 
-//----------------------------------------------------------------------------
 {
 	m_Selected = sel;
 	if (m_Volume->GetVisibility())
@@ -154,7 +149,6 @@ void albaPipeIsosurface::Select(bool sel)
 
 //----------------------------------------------------------------------------
 bool albaPipeIsosurface::SetContourValue(float value) 
-//----------------------------------------------------------------------------
 {
 	if (m_ContourMapper == NULL)
 		return false;
@@ -166,7 +160,6 @@ bool albaPipeIsosurface::SetContourValue(float value)
 
 //----------------------------------------------------------------------------
 float albaPipeIsosurface::GetContourValue() 
-//----------------------------------------------------------------------------
 {
 	if (m_ContourMapper == NULL)
 		return 0.;
@@ -174,7 +167,6 @@ float albaPipeIsosurface::GetContourValue()
 }
 //----------------------------------------------------------------------------
 albaGUI *albaPipeIsosurface::CreateGui()
-//----------------------------------------------------------------------------
 {
 	double range[2] = {0, 0};
 	m_Vme->GetOutput()->GetVTKData()->GetScalarRange(range);
@@ -188,7 +180,6 @@ albaGUI *albaPipeIsosurface::CreateGui()
 }
 //----------------------------------------------------------------------------
 void albaPipeIsosurface::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
@@ -224,7 +215,6 @@ void albaPipeIsosurface::OnEvent(albaEventBase *alba_event)
 }
 //----------------------------------------------------------------------------
 void albaPipeIsosurface::UpdateFromData()
-//----------------------------------------------------------------------------
 {
   vtkDataSet *dataset = m_Vme->GetOutput()->GetVTKData();
   if(dataset)
@@ -240,7 +230,6 @@ void albaPipeIsosurface::UpdateFromData()
 }
 //----------------------------------------------------------------------------
 void albaPipeIsosurface::ExctractIsosurface(albaVMESurface *isoSurface /* = NULL */)
-//----------------------------------------------------------------------------
 {
 	vtkPolyData *surface = vtkPolyData::New();
 	m_ContourMapper->GetOutput(0, surface);
@@ -266,13 +255,11 @@ void albaPipeIsosurface::ExctractIsosurface(albaVMESurface *isoSurface /* = NULL
 }
 //----------------------------------------------------------------------------
 void albaPipeIsosurface::EnableBoundingBoxVisibility(bool enable)
-//----------------------------------------------------------------------------
 {
 	m_BoundingBoxVisibility = enable;
 }
 //----------------------------------------------------------------------------
 void albaPipeIsosurface::SetAlphaValue(double value)
-//----------------------------------------------------------------------------
 {
 	m_AlphaValue=value;
 	m_ContourMapper->SetAlpha(m_AlphaValue);
@@ -281,14 +268,12 @@ void albaPipeIsosurface::SetAlphaValue(double value)
 }
 //----------------------------------------------------------------------------
 void albaPipeIsosurface::SetActorVisibility(int visibility)
-//----------------------------------------------------------------------------
 {
   m_Volume->SetVisibility(visibility);
   m_Volume->Modified();
 }
 //----------------------------------------------------------------------------
 void albaPipeIsosurface::SetEnableContourAnalysis( bool clean )
-//----------------------------------------------------------------------------
 {
   if (m_ContourMapper)
   {

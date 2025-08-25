@@ -24,7 +24,9 @@ PURPOSE. See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 // Forward references :
-
+class albaVMELandmarkCloud;
+class vtkPolyData;
+class albaVMELandmark;
 
 //----------------------------------------------------------------------------
 // Class Name: albaOpNearestLandmark
@@ -47,6 +49,9 @@ public:
 	/** Builds operation's interface. */
 	/*virtual*/ void OpRun();
 
+	/** Create The closest Point*/
+	static albaVMELandmarkCloud *CreateClosestPoint(vtkPolyData * poly, albaVMELandmark * lm, albaVME * surface);
+	
 	/** Execute the operation. */
 	/*virtual*/ void OpDo();
 

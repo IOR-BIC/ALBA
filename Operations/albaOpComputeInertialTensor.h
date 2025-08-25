@@ -36,6 +36,7 @@ using namespace std;
 class albaVMESurface;
 class albaGUI;
 class vtkCell;
+class albaVMELandmarkCloud;
 
 /** 
   class name: albaOpComputeInertialTensor
@@ -131,6 +132,7 @@ protected:
   enum GUI_METHOD_ID
   {
 	  ID_ACCURACY = MINID,
+		ID_GEN_COM_LM,
 	  ID_VTKCOMP,
     MINID,
   };	
@@ -153,11 +155,14 @@ protected:
 
   double m_CenterOfMass[3];
 
-
+	albaVMELandmarkCloud *m_Lmc;
 
   int m_Accuracy;
+	int m_GenerateCenterOfMassLM;
 
   vector<pair<albaVME * , double>> m_NodeMassPairVector;
 
+private:
+	void CreateLMC();
 };
 #endif

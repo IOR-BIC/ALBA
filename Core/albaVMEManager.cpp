@@ -26,7 +26,7 @@
 
 #include "albaVMEManager.h"
 
-#include <wx/busyinfo.h>
+#include <albaGUIBusyInfo.h>
 #include <wx/zipstrm.h>
 #include <wx/zstream.h>
 #include <wx/ffile.h>
@@ -235,6 +235,35 @@ void albaVMEManager::AddCreationDate(albaVME *vme)
   tag_creationDate.SetName("Creation_Date");
   tag_creationDate.SetValue(dateAndTime);
   vme->GetTagArray()->SetTag(tag_creationDate); // set creation date tag for the specified vme
+}
+
+//----------------------------------------------------------------------------
+bool albaVMEManager::CheckFileUpdated(const wxString& filePath, const wxDateTime& previousModTime)
+{
+	wxFileName fileName(filePath);
+
+	// Check if the file exists
+	if (!fileName.FileExists()) {
+		albaErrorMessage("Error Saving, file does not exist: %s", filePath);
+		return false;
+	}
+
+	// Get the current modification time
+	wxDateTime modTime;
+	if (!fileName.GetTimes(nullptr, &modTime, nullptr)) {
+		albaErrorMessage("Could not retrieve modification time for: %s", filePath);
+		return false;
+	}
+
+	// Compare modification times
+	if (modTime.IsLaterThan(previousModTime)) {
+		albaLogMessage("File was successfully updated.");
+		return true;
+	}
+	else {
+		albaErrorMessage("File was not updated, try to save to a differnt location");
+		return false;
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -604,7 +633,6 @@ bool albaVMEManager::MakeZip(const albaString &zipname, wxArrayString *files)
 int albaVMEManager::MSFSave()
 //----------------------------------------------------------------------------
 {
-  wxBusyInfo *wait;
   int ret=ALBA_OK;
 
 	bool fromDifferentApp = false;
@@ -673,8 +701,7 @@ int albaVMEManager::MSFSave()
     wxRenameFile(m_MSFFile.GetCStr(), bak_filename.GetCStr());  // renaming the founded one
 	}
 	
-  if(!m_TestMode) 
-    wait=new wxBusyInfo(_("Saving Project: Please wait"));
+  albaGUIBusyInfo wait(_("Saving Project: Please wait"),m_TestMode);
   
 	//Update the application stamps
 	albaTagItem tag_appstamp;
@@ -684,11 +711,18 @@ int albaVMEManager::MSFSave()
 	AddCreationDate(m_Storage->GetRoot());
 
   m_Storage->SetURL(m_MSFFile.GetCStr());
+
+	wxDateTime beforeSaveTime = wxDateTime::Now(); // Assume now if it doesn't exist yet
+
   if (m_Storage->Store() != ALBA_OK) // store the tree
   {
-    ret=false;
-    albaLogMessage(_("Error during saving"));
+    albaErrorMessage(_("Error during saving, try to save to another location"));
+		return false;
   }
+
+	if (!CheckFileUpdated(m_MSFFile.GetCStr(), beforeSaveTime))
+		return false;
+
   // add the msf (or zmsf) to the history
   if (!m_ZipFile.IsEmpty())
   {
@@ -702,8 +736,6 @@ int albaVMEManager::MSFSave()
 	m_FileHistory.Save(*m_Config);
   m_Modified = false;
 
-  if(!m_TestMode)
-    delete wait;
 
   return ret;
 }
