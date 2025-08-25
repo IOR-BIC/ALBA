@@ -44,7 +44,8 @@ void vtkALBAFixedCutterTest::TestExecute()
   filter->SetCutFunction(plane);
   filter->Update();
 
-  CPPUNIT_ASSERT( filter->GetOutput()->GetNumberOfPoints() == 4 );
+  int numberOfPoints = filter->GetOutput()->GetNumberOfPoints();
+  CPPUNIT_ASSERT( numberOfPoints == 8 );
 
   plane->SetOrigin(10,10,10);
 
