@@ -42,6 +42,7 @@
 #include "vtkImageData.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPointData.h"
+#include "albaGUI.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeImage3D);
@@ -64,6 +65,8 @@ albaPipeImage3D::albaPipeImage3D()
   m_SelectionActor    = NULL;
 
   m_GhostActor        = NULL;
+
+  m_Interpolation = true;
 }
 //----------------------------------------------------------------------------
 void albaPipeImage3D::Create(albaSceneNode *n)
@@ -100,7 +103,7 @@ void albaPipeImage3D::Create(albaSceneNode *n)
 
   m_ImageTexture = vtkTexture::New();
   m_ImageTexture->RepeatOff();
-  m_ImageTexture->InterpolateOn();
+  m_ImageTexture->SetInterpolate(m_Interpolation);
   m_ImageTexture->SetQualityTo32Bit();
   m_ImageTexture->SetInputData(image_data);
   
@@ -203,6 +206,40 @@ vtkProperty *albaPipeImage3D::GetProperty()
 {
   return m_ImageActor->GetProperty();
 }
+
+//----------------------------------------------------------------------------
+void albaPipeImage3D::OnEvent(albaEventBase* alba_event)
+{
+  if (albaEvent* e = albaEvent::SafeDownCast(alba_event))
+  {
+    switch (e->GetId())
+    {
+    case ID_INTERPOLATION:
+    {
+      SetInterpolation(m_Interpolation);
+      m_Gui->Update();
+    }
+    break;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void albaPipeImage3D::SetInterpolation(int val)
+{
+	m_Interpolation = val;
+	m_ImageTexture->SetInterpolate(m_Interpolation);
+	GetLogicManager()->CameraUpdate();
+}
+
+//----------------------------------------------------------------------------
+albaGUI* albaPipeImage3D::CreateGui()
+{
+	m_Gui = new albaGUI(this);
+  m_Gui->Bool(ID_INTERPOLATION, "Enable Interpolation", &m_Interpolation, true);
+  return m_Gui;
+}
+
 //----------------------------------------------------------------------------
 bool albaPipeImage3D::IsGrayImage()
 //----------------------------------------------------------------------------
