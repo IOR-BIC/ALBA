@@ -82,6 +82,8 @@ albaViewImageCompound::albaViewImageCompound( wxString label, int num_row, int n
 	m_ShowReverseLUTButton = true;
 	m_IsLutReversed = false;
 	m_CurrentLUTPreset = 4;
+
+	m_ShowInterpolationButton = true;
 }
 //----------------------------------------------------------------------------
 albaViewImageCompound::~albaViewImageCompound()
@@ -141,7 +143,18 @@ void albaViewImageCompound::CreateGuiView()
 	  m_ReverseLUTButton->SetListener(this);
 
 	  mainVertSizer->Add(m_ReverseLUTButton);
+		mainVertSizer->AddSpacer(2);
   }
+
+	if (m_ShowInterpolationButton)
+	{
+		m_InterpolateButton = new albaGUIPicButton(m_GuiView, "INTERPOLATE_ICON", ID_INTERPOLATE, this);
+		m_InterpolateButton->SetToolTip("Enable/Disable Interpolation");
+		m_InterpolateButton->SetListener(this);
+
+		mainVertSizer->Add(m_InterpolateButton);
+		mainVertSizer->AddSpacer(2);
+	}
 
   if (m_ShowRulerButton)
   {
@@ -150,6 +163,7 @@ void albaViewImageCompound::CreateGuiView()
 	  m_RulerButton->SetListener(this);
 
 	  mainVertSizer->Add(m_RulerButton);
+		mainVertSizer->AddSpacer(1);
   }
 
   m_GuiView->Add(mainVertSizer, 1, wxEXPAND);
@@ -194,6 +208,12 @@ void albaViewImageCompound::OnEvent(albaEventBase *alba_event)
 		case ID_VIEW_RULER:
 		{
 			ShowRuler(!m_ShowRuler);
+		}
+		break;
+
+		case ID_INTERPOLATE:
+		{
+			ChangeInterpolation();
 		}
 		break;
     default:
@@ -394,4 +414,13 @@ void albaViewImageCompound::SetRendererByView()
 	}
 
 	m_Renderer = newRenderer;
+}
+
+//----------------------------------------------------------------------------
+void albaViewImageCompound::ChangeInterpolation()
+{
+	albaPipeImage3D* pipe = (albaPipeImage3D*)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(m_CurrentImage);
+
+	if (pipe)
+		pipe->SetInterpolation(!pipe->GetInterpolation());
 }
