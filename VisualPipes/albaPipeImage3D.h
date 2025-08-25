@@ -48,8 +48,14 @@ public:
   /** RTTI macro.*/
   albaTypeMacro(albaPipeImage3D,albaPipe);
 
-   /** constructor. */
-           albaPipeImage3D();
+	/** IDs for the GUI */
+	enum PIPE_IMAGE3D_WIDGET_ID
+	{
+		ID_INTERPOLATION = Superclass::ID_LAST,
+	};
+
+  /** constructor. */
+  albaPipeImage3D();
 
   /** destructor. */
   virtual ~albaPipeImage3D ();
@@ -68,7 +74,18 @@ public:
 
   vtkProperty *GetProperty();
 
+	/** process events coming from Gui */
+	virtual void OnEvent(albaEventBase* alba_event);
+
+  /** Return current interpolation status */
+  int GetInterpolation() const { return m_Interpolation; }
+  /** Set interpolation and updates the pipe */
+  void SetInterpolation(int val);
 protected:
+
+	/** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
+	virtual albaGUI* CreateGui();
+
   vtkPlaneSource			      *m_ImagePlane;
   vtkTexture						    *m_ImageTexture;
   vtkLookupTable						*m_ImageLUT;
@@ -83,5 +100,7 @@ protected:
 
   vtkActor               *m_GhostActor;
   vtkALBAAssembly         *m_UsedAssembly;
+
+  int                    m_Interpolation;
 };
 #endif // __albaPipeImage3D_H__
