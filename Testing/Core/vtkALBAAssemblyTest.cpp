@@ -38,6 +38,10 @@
 #include "vtkAssemblyNode.h"
 #include "vtkCubeSource.h"
 
+//force moudule init to avoid a crash on shallowcopy
+#include <vtkAutoInit.h>
+VTK_MODULE_INIT(vtkRenderingOpenGL2);
+
 //----------------------------------------------------------------------------
 void vtkALBAAssemblyTest::TestFixture()
 //----------------------------------------------------------------------------
