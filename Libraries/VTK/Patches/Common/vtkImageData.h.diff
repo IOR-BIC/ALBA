@@ -1,0 +1,4 @@
+366c366
+<   return dims[0]*dims[1]*dims[2];
+---
+>   return (vtkIdType)dims[0]* (vtkIdType)dims[1]* (vtkIdType)dims[2];
