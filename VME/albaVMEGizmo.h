@@ -57,7 +57,7 @@ public:
 	void SetDataConnection(vtkAlgorithmOutput *intput);
 
   /** return the polydata used to display this gizmo */
-  vtkPolyData *GetData() {return m_GizmoData;}
+  vtkPolyData *GetData();
   
   /** Copy the contents of another VME-Gizmo into this one. */
   virtual int DeepCopy(albaVME *a);

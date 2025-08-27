@@ -33,6 +33,7 @@
 
 #include "vtkPolyData.h"
 #include "vtkALBADataPipe.h"
+#include "vtkAlgorithmOutput.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEGizmo)
@@ -137,12 +138,34 @@ void albaVMEGizmo::SetDataConnection(vtkAlgorithmOutput *input)
 	{
 		vtkDEL(m_GizmoData);
 
+    m_InputConnection = input;
+
 		// set data as input to VTK 
 		albaDataPipeCustom *dpipe = albaDataPipeCustom::SafeDownCast(GetDataPipe());
 		dpipe->SetInputConnection(0, input);
 
 		Modified();
 	}
+}
+
+vtkPolyData* albaVMEGizmo::GetData()
+{
+  if (m_GizmoData)
+    return m_GizmoData;
+  else if (m_InputConnection)
+  {
+    // Get the producer (the algorithm that generates the data)
+    vtkAlgorithm* producer = m_InputConnection->GetProducer();
+    producer->Update();
+
+    // Retrieve the data object from the producer using the port index
+    vtkDataObject* data = producer->GetOutputDataObject(m_InputConnection->GetIndex());
+
+    // Cast to the expected data type (vtkPolyData in this case)
+    return vtkPolyData::SafeDownCast(data);
+  }
+  else
+    return NULL;
 }
 
 //-------------------------------------------------------------------------
