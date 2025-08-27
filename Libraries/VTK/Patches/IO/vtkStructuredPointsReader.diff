@@ -1,0 +1,12 @@
+91c91
+<   int numPts=0, numCells=0;
+---
+>   vtkIdType numPts=0, numCells=0;
+93c93
+<   int npts, ncells;
+---
+>   vtkIdType npts, ncells;
+167c167
+<         numPts = dim[0] * dim[1] * dim[2];
+---
+>         numPts = (vtkIdType)dim[0] * (vtkIdType)dim[1] * (vtkIdType)dim[2];

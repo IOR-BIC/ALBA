@@ -1,0 +1,152 @@
+53,54c53,54
+<   static void Swap2LERange(char *c,int num);
+<   static void Swap2LERange(short *i,int num) 
+---
+>   static void Swap2LERange(char *c,vtkIdType num);
+>   static void Swap2LERange(short *i,vtkIdType num) 
+59,60c59,60
+<   static void Swap4LERange(char *c,int num);
+<   static void Swap4LERange(unsigned char *c,int num) 
+---
+>   static void Swap4LERange(char *c,vtkIdType num);
+>   static void Swap4LERange(unsigned char *c,vtkIdType num) 
+62c62
+<   static void Swap4LERange(float *p,int num) 
+---
+>   static void Swap4LERange(float *p,vtkIdType num) 
+64c64
+<   static void Swap4LERange(int *i,int num) 
+---
+>   static void Swap4LERange(int *i,vtkIdType num) 
+66c66
+<   static void Swap4LERange(unsigned int *i,int num) 
+---
+>   static void Swap4LERange(unsigned int *i,vtkIdType num) 
+68c68
+<   static void Swap4LERange(long *i,int num) 
+---
+>   static void Swap4LERange(long *i,vtkIdType num) 
+70c70
+<   static void Swap4LERange(unsigned long *i,int num) 
+---
+>   static void Swap4LERange(unsigned long *i,vtkIdType num) 
+76,77c76,77
+<   static void Swap8LERange(char *c, int num);
+<   static void Swap8LERange(double *d, int num) 
+---
+>   static void Swap8LERange(char *c, vtkIdType num);
+>   static void Swap8LERange(double *d, vtkIdType num) 
+105,106c105,106
+<   static void Swap2BERange(char *c,int num);
+<   static void Swap2BERange(short *i,int num) 
+---
+>   static void Swap2BERange(char *c,vtkIdType num);
+>   static void Swap2BERange(short *i,vtkIdType num) 
+111,112c111,112
+<   static void Swap4BERange(char *c,int num);
+<   static void Swap4BERange(float *p,int num) 
+---
+>   static void Swap4BERange(char *c,vtkIdType num);
+>   static void Swap4BERange(float *p,vtkIdType num) 
+114c114
+<   static void Swap4BERange(int *i,int num) 
+---
+>   static void Swap4BERange(int *i,vtkIdType num) 
+116c116
+<   static void Swap4BERange(unsigned int *i,int num) 
+---
+>   static void Swap4BERange(unsigned int *i,vtkIdType num) 
+118c118
+<   static void Swap4BERange(long *i,int num) 
+---
+>   static void Swap4BERange(long *i,vtkIdType num) 
+120c120
+<   static void Swap4BERange(unsigned long *i,int num) 
+---
+>   static void Swap4BERange(unsigned long *i,vtkIdType num) 
+124c124
+<   static void Swap4BERange(vtkIdType *i,int num) 
+---
+>   static void Swap4BERange(vtkIdType *i,vtkIdType num) 
+130,131c130,131
+<   static void Swap8BERange(char *c,int num);
+<   static void Swap8BERange(double *d,int num) 
+---
+>   static void Swap8BERange(char *c,vtkIdType num);
+>   static void Swap8BERange(double *d,vtkIdType num) 
+138,139c138,139
+<   static void SwapWrite2BERange(char *c,int num,FILE *fp);
+<   static void SwapWrite2BERange(short *i,int num, FILE *fp) 
+---
+>   static void SwapWrite2BERange(char *c,vtkIdType num,FILE *fp);
+>   static void SwapWrite2BERange(short *i,vtkIdType num, FILE *fp) 
+146,147c146,147
+<   static void SwapWrite4BERange(char *c,int num,FILE *fp);
+<   static void SwapWrite4BERange(float *p,int num, FILE *fp) 
+---
+>   static void SwapWrite4BERange(char *c,vtkIdType num,FILE *fp);
+>   static void SwapWrite4BERange(float *p,vtkIdType num, FILE *fp) 
+149c149
+<   static void SwapWrite4BERange(int *i,int num,FILE *fp) 
+---
+>   static void SwapWrite4BERange(int *i,vtkIdType num,FILE *fp) 
+151c151
+<   static void SwapWrite4BERange(unsigned int *i,int num,FILE *fp) 
+---
+>   static void SwapWrite4BERange(unsigned int *i,vtkIdType num,FILE *fp) 
+153c153
+<   static void SwapWrite4BERange(unsigned long *i,int num, FILE *fp) 
+---
+>   static void SwapWrite4BERange(unsigned long *i,vtkIdType num, FILE *fp) 
+155c155
+<   static void SwapWrite4BERange(long *i,int num, FILE *fp) 
+---
+>   static void SwapWrite4BERange(long *i,vtkIdType num, FILE *fp) 
+158c158
+<   static void SwapWrite4BERange(vtkIdType *i,int num, FILE *fp) 
+---
+>   static void SwapWrite4BERange(vtkIdType *i,vtkIdType num, FILE *fp) 
+165,166c165,166
+<   static void SwapWrite8BERange(char *c,int num,FILE *fp);
+<   static void SwapWrite8BERange(double *d,int num, FILE *fp) 
+---
+>   static void SwapWrite8BERange(char *c,vtkIdType num,FILE *fp);
+>   static void SwapWrite8BERange(double *d,vtkIdType num, FILE *fp) 
+173,174c173,174
+<   static void SwapWrite2BERange(char *c,int num, ostream *fp);
+<   static void SwapWrite2BERange(short *i,int num, ostream *fp) 
+---
+>   static void SwapWrite2BERange(char *c,vtkIdType num, ostream *fp);
+>   static void SwapWrite2BERange(short *i,vtkIdType num, ostream *fp) 
+181,182c181,182
+<   static void SwapWrite4BERange(char *c,int num, ostream *fp);
+<   static void SwapWrite4BERange(float *p,int num, ostream *fp) 
+---
+>   static void SwapWrite4BERange(char *c,vtkIdType num, ostream *fp);
+>   static void SwapWrite4BERange(float *p,vtkIdType num, ostream *fp) 
+184c184
+<   static void SwapWrite4BERange(int *i,int num, ostream *fp) 
+---
+>   static void SwapWrite4BERange(int *i,vtkIdType num, ostream *fp) 
+186c186
+<   static void SwapWrite4BERange(unsigned int *i,int num, ostream *fp) 
+---
+>   static void SwapWrite4BERange(unsigned int *i,vtkIdType num, ostream *fp) 
+188c188
+<   static void SwapWrite4BERange(unsigned long *i,int num, ostream *fp) 
+---
+>   static void SwapWrite4BERange(unsigned long *i,vtkIdType num, ostream *fp) 
+190c190
+<   static void SwapWrite4BERange(long *i,int num, ostream *fp) 
+---
+>   static void SwapWrite4BERange(long *i,vtkIdType num, ostream *fp) 
+193c193
+<   static void SwapWrite4BERange(vtkIdType *i,int num, ostream *fp) 
+---
+>   static void SwapWrite4BERange(vtkIdType *i,vtkIdType num, ostream *fp) 
+200,201c200,201
+<   static void SwapWrite8BERange(char *c,int num, ostream *fp);
+<   static void SwapWrite8BERange(double *d,int num, ostream *fp) 
+---
+>   static void SwapWrite8BERange(char *c,vtkIdType num, ostream *fp);
+>   static void SwapWrite8BERange(double *d,vtkIdType num, ostream *fp) 
