@@ -189,6 +189,8 @@ void albaPictureFactory::Initialize()
 		albaADDPIC(REVERSE_LUT_ICON);
 #include <pic/SHOW_RULER_ICON.xpm>
 		albaADDPIC(SHOW_RULER_ICON);		
+#include "pic/INTERPOLATE_ICON.xpm"
+    albaADDPIC(INTERPOLATE_ICON);
 }
 //----------------------------------------------------------------------------
 albaPictureFactory::~albaPictureFactory()
