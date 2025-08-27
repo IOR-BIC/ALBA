@@ -1,0 +1,120 @@
+66c66
+< void vtkByteSwap::Swap2BERange(char *,int) {}
+---
+> void vtkByteSwap::Swap2BERange(char *, vtkIdType) {}
+68c68
+< void vtkByteSwap::Swap2BERange(char *mem_ptr1,int num)
+---
+> void vtkByteSwap::Swap2BERange(char *mem_ptr1,vtkIdType num)
+71c71
+<   int i;
+---
+>   vtkIdType i;
+88c88
+< void vtkByteSwap::Swap4BERange(char *, int){}
+---
+> void vtkByteSwap::Swap4BERange(char *, vtkIdType){}
+90c90
+< void vtkByteSwap::Swap4BERange(char *mem_ptr1, int num)
+---
+> void vtkByteSwap::Swap4BERange(char *mem_ptr1, vtkIdType num)
+94c94
+<   int i;
+---
+>   vtkIdType i;
+109c109
+< void vtkByteSwap::Swap8BERange(char *,int){}
+---
+> void vtkByteSwap::Swap8BERange(char *, vtkIdType){}
+111c111
+< void vtkByteSwap::Swap8BERange(char *mem_ptr1, int num)
+---
+> void vtkByteSwap::Swap8BERange(char *mem_ptr1, vtkIdType num)
+115c115
+<   int i;
+---
+>   vtkIdType i;
+129c129
+< void vtkByteSwap::SwapWrite2BERange(char *mem_ptr1,int num, ostream *fp)
+---
+> void vtkByteSwap::SwapWrite2BERange(char *mem_ptr1,vtkIdType num, ostream *fp)
+133c133
+<   int i;
+---
+>   vtkIdType i;
+170c170
+< void vtkByteSwap::SwapWrite4BERange(char *mem_ptr1,int num, ostream *fp)
+---
+> void vtkByteSwap::SwapWrite4BERange(char *mem_ptr1,vtkIdType num, ostream *fp)
+174c174
+<   int i;
+---
+>   vtkIdType i;
+209c209
+< void vtkByteSwap::SwapWrite8BERange(char *mem_ptr1,int num, ostream *fp)
+---
+> void vtkByteSwap::SwapWrite8BERange(char *mem_ptr1,vtkIdType num, ostream *fp)
+213c213
+<   int i;
+---
+>   vtkIdType i;
+247c247
+< void vtkByteSwap::SwapWrite2BERange(char *mem_ptr1,int num, FILE *fp)
+---
+> void vtkByteSwap::SwapWrite2BERange(char *mem_ptr1,vtkIdType num, FILE *fp)
+251c251
+<   int i;
+---
+>   vtkIdType i;
+290c290
+< void vtkByteSwap::SwapWrite4BERange(char *mem_ptr1,int num, FILE *fp)
+---
+> void vtkByteSwap::SwapWrite4BERange(char *mem_ptr1,vtkIdType num, FILE *fp)
+294c294
+<   int i;
+---
+>   vtkIdType i;
+329c329
+< void vtkByteSwap::SwapWrite8BERange(char *mem_ptr1,int num, FILE *fp)
+---
+> void vtkByteSwap::SwapWrite8BERange(char *mem_ptr1,vtkIdType num, FILE *fp)
+333c333
+<   int i;
+---
+>   vtkIdType i;
+413c413
+< void vtkByteSwap::Swap2LERange(char *mem_ptr1, int num)
+---
+> void vtkByteSwap::Swap2LERange(char *mem_ptr1, vtkIdType num)
+416c416
+<   int i;
+---
+>   vtkIdType i;
+429c429
+< void vtkByteSwap::Swap2LERange(char *,int ){}
+---
+> void vtkByteSwap::Swap2LERange(char *, vtkIdType){}
+434c434
+< void vtkByteSwap::Swap4LERange(char *mem_ptr1, int num)
+---
+> void vtkByteSwap::Swap4LERange(char *mem_ptr1, vtkIdType num)
+437c437
+<   int i;
+---
+>   vtkIdType i;
+449c449
+< void vtkByteSwap::Swap4LERange(char *, int) {}
+---
+> void vtkByteSwap::Swap4LERange(char *, vtkIdType) {}
+454c454
+< void vtkByteSwap::Swap8LERange(char *mem_ptr1, int num)
+---
+> void vtkByteSwap::Swap8LERange(char *mem_ptr1, vtkIdType num)
+457c457
+<   int i;
+---
+>   vtkIdType i;
+469c469
+< void vtkByteSwap::Swap8LERange(char *, int) {}
+---
+> void vtkByteSwap::Swap8LERange(char *, vtkIdType) {}

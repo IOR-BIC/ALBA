@@ -245,7 +245,7 @@ void albaOpExporterDicom::ExportDicom()
 		zCoord = vtkDoubleArray::SafeDownCast(rg->GetZCoordinates());
 	}
 
-	int imgDim = dims[0] * dims[1];
+	vtkIdType imgDim = dims[0] * dims[1];
 
 	gdcm::UIDGenerator uid; // helper for uid generation
 	const char ReferencedSOPClassUID[] = "1.2.840.10008.5.1.4.1.1.7"; // Secondary Capture

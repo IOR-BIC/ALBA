@@ -874,6 +874,7 @@ bool vtkALBAMeshCutter::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList *p
   for (i = 0 ;  i < npts ;  i++)
     maptype[i] = NO_MAPPING ;
 
+  foundPtMapping = false;
   for (i = 0, foundEdgeMapping = false ;  i < npts ;  i++){
     vtkIdType ptId = pointslistref[i];
     if (GetInputEdgeCutByPoint(ptId, &id0, &id1, &lamtemp)){

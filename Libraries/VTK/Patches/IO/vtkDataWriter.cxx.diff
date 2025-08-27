@@ -1,2 +1,90 @@
+223c223
+<   int numCells;
+---
+>   vtkIdType numCells;
+318c318
+<   int numPts;
+---
+>   vtkIdType numPts;
+413c413
+<                        const char *format, int num, int numComp)
+---
+>                        const char *format, vtkIdType num, int numComp)
+415c415
+<   int i, j, idx, sizeT;
+---
+>   vtkIdType i, j, idx, sizeT;
+462c462
+<                               const char *format, int num, int numComp)
+---
+>                               const char *format, vtkIdType num, int numComp)
+464c464
+<   int i, j, idx;
+---
+>   vtkIdType i, j, idx;
+474c474
+<         int s;
+---
+>         vtkIdType s;
+586c586
+<       int size = data->GetNumberOfTuples();
+---
+>       vtkIdType size = data->GetNumberOfTuples();
+617c617
+<   int numPts;
+---
+>   vtkIdType numPts;
+634c634
+<   int ncoords=coords->GetNumberOfTuples();
+---
+>   vtkIdType ncoords=coords->GetNumberOfTuples();
+653c653
+< int vtkDataWriter::WriteScalarData(ostream *fp, vtkDataArray *scalars, int num)
+---
+> int vtkDataWriter::WriteScalarData(ostream *fp, vtkDataArray *scalars, vtkIdType num)
+655c655
+<   int i, j, size=0;
+---
+>   vtkIdType i, j, size=0;
 721a722
 >     delete[] scalarsName;
+777c778
+< int vtkDataWriter::WriteVectorData(ostream *fp, vtkDataArray *vectors, int num)
+---
+> int vtkDataWriter::WriteVectorData(ostream *fp, vtkDataArray *vectors, vtkIdType num)
+812c813
+< int vtkDataWriter::WriteNormalData(ostream *fp, vtkDataArray *normals, int num)
+---
+> int vtkDataWriter::WriteNormalData(ostream *fp, vtkDataArray *normals, vtkIdType num)
+846c847
+< int vtkDataWriter::WriteTCoordData(ostream *fp, vtkDataArray *tcoords, int num)
+---
+> int vtkDataWriter::WriteTCoordData(ostream *fp, vtkDataArray *tcoords, vtkIdType num)
+883c884
+< int vtkDataWriter::WriteTensorData(ostream *fp, vtkDataArray *tensors, int num)
+---
+> int vtkDataWriter::WriteTensorData(ostream *fp, vtkDataArray *tensors, vtkIdType num)
+919c920
+<   for(int i=0; i<numElem; i++)
+---
+>   for(vtkIdType i=0; i<numElem; i++)
+933c934
+<   int numComp, numTuples;
+---
+>   vtkIdType numComp, numTuples;
+1001c1002
+<   int ncells=cells->GetNumberOfCells();
+---
+>   vtkIdType ncells=cells->GetNumberOfCells();
+1013c1014
+<     int j;
+---
+>     vtkIdType j;
+1019c1020
+<       *fp << (int)npts << " ";
+---
+>       *fp << npts << " ";
+1023c1024
+<         *fp << (int)pts[j] << " ";
+---
+>         *fp << pts[j] << " ";
