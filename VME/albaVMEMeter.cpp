@@ -733,6 +733,7 @@ albaGUI* albaVMEMeter::CreateGui()
 	m_Gui->Divider();
 
   InternalUpdate();
+  GetOutput()->Update();
   GetPolylineOutput()->Update();
 
   return m_Gui;
@@ -791,9 +792,10 @@ void albaVMEMeter::OnEvent(albaEventBase *alba_event)
             SetLink("EndVME2", n);
             m_EndVme2Name = n->GetName();
           }
+					GetOutput()->Update();
+					GetLogicManager()->CameraUpdate();
           m_Gui->Update();
         }
-				GetLogicManager()->CameraUpdate();
       }
       break;
       case ID_PLOTTED_VME_LINK:
