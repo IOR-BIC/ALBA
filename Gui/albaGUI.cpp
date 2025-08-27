@@ -1217,25 +1217,23 @@ albaGUIFloatSlider *albaGUI::FloatExpandedSlider(int id, wxString label, double 
 	albaGUIFloatSlider *sli = NULL;
 	wxStaticText   *lab = NULL;
 
-	int w_id_text;
-	int w_id_sli;
+	int w_id;
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 
 	if (label == "")
 	{
 		int text_w = EW * 0.8;
 		int slider_w = FW - text_w;
-		w_id_text = GetWidgetId(id);
-		text = new wxTextCtrl(this, w_id_text, "", dp, wxSize(text_w, LH), m_EntryStyle);
+		w_id = GetWidgetId(id);
+		text = new wxTextCtrl(this, w_id, "", dp, wxSize(text_w, LH), m_EntryStyle);
 		text->SetFont(m_Font);
 		text->Enable(textBoxEnable);
 
-		w_id_sli = GetWidgetId(id);
-		sli = new albaGUIFloatSlider(this, w_id_sli, *var, min, max, dp, size);
+		sli = new albaGUIFloatSlider(this, w_id, *var, min, max, dp, size);
 		if (m_UseBackgroundColor)
 			sli->SetBackgroundColour(m_BackgroundColor);
-		text->SetValidator(albaGUIValidator(this, w_id_text, text, var, sli, min, max));
-		sli->SetValidator(albaGUIValidator(this, w_id_sli, sli, var, text));
+		text->SetValidator(albaGUIValidator(this, w_id, text, var, sli, min, max));
+		sli->SetValidator(albaGUIValidator(this, w_id, sli, var, text));
 		sizer->Add(text, 0);
 		sizer->Add(sli, wxEXPAND);
 	}
@@ -1248,18 +1246,17 @@ albaGUIFloatSlider *albaGUI::FloatExpandedSlider(int id, wxString label, double 
 			lab->SetBackgroundColour(m_BackgroundColor);
 		lab->SetFont(m_Font);
 
-		w_id_text = GetWidgetId(id);
-		text = new wxTextCtrl(this, w_id_text, "", dp, wxSize(text_w, LH), m_EntryStyle);
+		w_id = GetWidgetId(id);
+		text = new wxTextCtrl(this, w_id, "", dp, wxSize(text_w, LH), m_EntryStyle);
 		text->SetFont(m_Font);
 		text->Enable(textBoxEnable);
 
-		w_id_sli = GetWidgetId(id);
-		sli = new albaGUIFloatSlider(this, w_id_sli, *var, min, max, dp, size);
+		sli = new albaGUIFloatSlider(this, w_id, *var, min, max, dp, size);
 		if (m_UseBackgroundColor)
 			sli->SetBackgroundColour(m_BackgroundColor);
 
-		text->SetValidator(albaGUIValidator(this, w_id_text, text, var, sli, min, max));
-		sli->SetValidator(albaGUIValidator(this, w_id_sli, sli, var, text));
+		text->SetValidator(albaGUIValidator(this, w_id, text, var, sli, min, max));
+		sli->SetValidator(albaGUIValidator(this, w_id, sli, var, text));
 		sizer->Add(lab, 0, wxRIGHT, LM);
 		sizer->Add(text, 0);
 		sizer->Add(sli, wxEXPAND);
