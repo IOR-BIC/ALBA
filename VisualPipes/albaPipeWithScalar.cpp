@@ -111,7 +111,6 @@ void albaPipeWithScalar::ManageScalarOnExecutePipe(vtkDataSet * dataSet)
 		m_Vme->SetAttribute("MaterialAttributes", m_ObjectMaterial);
 	}
 
-	m_NumberOfArrays = m_PointCellArraySeparation + dataSet->GetCellData()->GetNumberOfArrays();
 
 	// point type scalars
 	vtkDataArray *scalars = dataSet->GetPointData()->GetScalars();
@@ -427,7 +426,7 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 		vtkData->GetPointData()->GetScalars()->Modified();
 		vtkData->GetCellData()->SetActiveScalars("");
 	}
-	else if (!m_MapsStackActive && (m_OldActiveScalarType != m_OldActiveScalarType ||	m_OldScalarIndex != m_ScalarIndex))
+	else if (!m_MapsStackActive && (m_NumberOfArrays > 0)  && (m_OldActiveScalarType != m_OldActiveScalarType ||	m_OldScalarIndex != m_ScalarIndex))
 	{
 		wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].ToAscii();
 
@@ -611,8 +610,7 @@ void albaPipeWithScalar::CreateFieldDataControlArrays()
       tempScalarsPointsName[count-1]=cellData->GetArrayName(cellArrayNumber);
     }
   }
-
-  m_ScalarsInComboBoxNames = new wxString[count];
+	m_ScalarsInComboBoxNames = new wxString[count];
   m_ScalarsVTKName = new wxString[count];
 
   for(int j=0;j<count;j++)
@@ -624,7 +622,9 @@ void albaPipeWithScalar::CreateFieldDataControlArrays()
       m_ScalarsInComboBoxNames[j]="[CELL] " + tempScalarsPointsName[j];
   }
 
-  m_PointCellArraySeparation = pointArrayNumber;
+  m_PointCellArraySeparation = numPointScalars;
+	m_NumberOfArrays = numPointScalars + numCellScalars;
+
 
   delete []tempScalarsPointsName;
 }
