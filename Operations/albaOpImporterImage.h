@@ -28,8 +28,9 @@
 // forward references :
 //----------------------------------------------------------------------------
 class albaEvent;
-class albaVMEImage;
+class albaVMEGroup;
 class albaVMEVolumeGray;
+class vtkImageData;
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
@@ -55,17 +56,12 @@ public:
   void OpRun();
 
   /** Set the filename for the .stl to import */
-  void SetFileName(const char *file_name);
+  void AddFileName(const char *file_name);
 	  
   void SetBuildVolumeFlag(bool buildVolumeFlag) {m_BuildVolumeFlag = buildVolumeFlag;};
-  void SetFilePrefix(albaString filePrefix){m_FilePrefix = filePrefix;};  
-  void SetFilePattern(albaString filePattern){m_FilePattern = filePattern;};  
-  void SetFileExtension(albaString fileExtension){m_FileExtension = fileExtension;};  
-  void SetFileOffset(int fileOffset){m_FileOffset = fileOffset;};  
-  void SetFileSpacing(int fileSpacing){m_FileSpacing = fileSpacing;};
-  void SetImageZSpacing(double imageZSpacing){m_ImageZSpacing = imageZSpacing;};
+  void SetSpacing(double *spacing);;
 
-  void ImportImage();
+  void Import();
 
 	/** Return an xpm-icon that can be used to represent this operation */
 	virtual char ** GetIcon();
@@ -77,22 +73,19 @@ protected:
 
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);
-	  
+
+	void AddImageToList(std::vector<vtkImageData*>& images, vtkImageData* image, const char* name);
+
   void BuildImageSequence();
   void BuildVolume();
 
-  albaVMEImage     *m_ImportedImage;
-  albaVMEVolumeGray *m_ImportedImageAsVolume;
+  albaVMEGroup     *m_ImportedGroup;
+  albaVMEVolumeGray *m_ImportedVolume;
 
   std::vector<std::string>	m_Files;
-	wxString      m_FileDirectory;
-  wxString      m_FilePrefix;
-  wxString      m_FilePattern;
-  wxString      m_FileExtension;
-  int           m_FileOffset;
-  int           m_FileSpacing;
-  int           m_NumFiles;
   int           m_BuildVolumeFlag;
-  double        m_ImageZSpacing;
+  double        m_Spacing[3];
+	int          m_SkipWrongSize;
+	int          m_SkipWrongType;
 };
 #endif

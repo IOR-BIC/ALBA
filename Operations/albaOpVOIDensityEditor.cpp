@@ -171,7 +171,7 @@ void albaOpVOIDensityEditor::OnEvent(albaEventBase *alba_event)
 void albaOpVOIDensityEditor::EditVolumeScalars()
 //----------------------------------------------------------------------------
 {
-  albaGUIBusyInfo wait("Editing VME volume density...",m_Gui);
+  albaGUIBusyInfo wait("Editing VME volume density...",m_TestMode);
 
   double b[6];
   double point[3];
