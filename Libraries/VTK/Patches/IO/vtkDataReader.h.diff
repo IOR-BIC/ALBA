@@ -1,0 +1,86 @@
+190c190
+<   int ReadCellData(vtkDataSet *ds, int numCells);
+---
+>   int ReadCellData(vtkDataSet *ds, vtkIdType numCells);
+196c196
+<   int ReadPointData(vtkDataSet *ds, int numPts);
+---
+>   int ReadPointData(vtkDataSet *ds, vtkIdType numPts);
+200c200
+<   int ReadPoints(vtkPointSet *ps, int numPts);
+---
+>   int ReadPoints(vtkPointSet *ps, vtkIdType numPts);
+204c204
+<   int ReadCells(int size, int *data);
+---
+>   int ReadCells(vtkIdType size, int *data);
+208c208
+<   int ReadCells(int size, int *data, int skip1, int read2, int skip3);
+---
+>   int ReadCells(vtkIdType size, int *data, int skip1, int read2, int skip3);
+217c217
+<   vtkDataArray *ReadArray(const char *dataType, int numTuples, int numComp);
+---
+>   vtkDataArray *ReadArray(const char *dataType, vtkIdType numTuples, int numComp);
+232a233
+>   int Read(vtkIdType*);
+285,289c286,290
+<   int ReadScalarData(vtkDataSetAttributes *a, int num);
+<   int ReadVectorData(vtkDataSetAttributes *a, int num);
+<   int ReadNormalData(vtkDataSetAttributes *a, int num);
+<   int ReadTensorData(vtkDataSetAttributes *a, int num);
+<   int ReadCoScalarData(vtkDataSetAttributes *a, int num);
+---
+>   int ReadScalarData(vtkDataSetAttributes *a, vtkIdType num);
+>   int ReadVectorData(vtkDataSetAttributes *a, vtkIdType num);
+>   int ReadNormalData(vtkDataSetAttributes *a, vtkIdType num);
+>   int ReadTensorData(vtkDataSetAttributes *a, vtkIdType num);
+>   int ReadCoScalarData(vtkDataSetAttributes *a, vtkIdType num);
+291c292
+<   int ReadTCoordsData(vtkDataSetAttributes *a, int num);
+---
+>   int ReadTCoordsData(vtkDataSetAttributes *a, vtkIdType num);
+296c297
+<   int  NumberOfScalarsInFile;
+---
+>   vtkIdType  NumberOfScalarsInFile;
+298,299c299,300
+<   int ScalarsNameAllocSize;
+<   int  NumberOfVectorsInFile;
+---
+>   vtkIdType ScalarsNameAllocSize;
+>   vtkIdType  NumberOfVectorsInFile;
+301,302c302,303
+<   int VectorsNameAllocSize;
+<   int  NumberOfTensorsInFile;
+---
+>   vtkIdType VectorsNameAllocSize;
+>   vtkIdType  NumberOfTensorsInFile;
+304,305c305,306
+<   int TensorsNameAllocSize;
+<   int  NumberOfTCoordsInFile;
+---
+>   vtkIdType TensorsNameAllocSize;
+>   vtkIdType  NumberOfTCoordsInFile;
+307,308c308,309
+<   int TCoordsNameAllocSize;
+<   int  NumberOfNormalsInFile;
+---
+>   vtkIdType TCoordsNameAllocSize;
+>   vtkIdType  NumberOfNormalsInFile;
+310,311c311,312
+<   int NormalsNameAllocSize;
+<   int  NumberOfFieldDataInFile;
+---
+>   vtkIdType NormalsNameAllocSize;
+>   vtkIdType  NumberOfFieldDataInFile;
+313c314
+<   int FieldDataNameAllocSize;
+---
+>   vtkIdType FieldDataNameAllocSize;
+318,319c319,320
+<   void CheckFor(const char* name, char *line, int &num, char** &array, 
+<                 int& allocSize);
+---
+>   void CheckFor(const char* name, char *line, vtkIdType&num, char** &array,
+>     vtkIdType& allocSize);

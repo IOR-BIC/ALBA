@@ -1,12 +1,105 @@
-353,354c353,354
+342a343,352
+> int vtkDataReader::Read(vtkIdType* result)
+> {
+> 	*this->IS >> *result;
+> 	if (this->IS->fail())
+> 	{
+> 		return 0;
+> 	}
+> 	return 1;
+> }
+> 
+353,354c363,364
 <                                 this->InputArray->GetNumberOfTuples()*
 <         this->InputArray->GetNumberOfComponents());
 ---
 >                                 (int)this->InputArray->GetNumberOfTuples()*
 >        (int) this->InputArray->GetNumberOfComponents());
-377,378c377,378
+377,378c387,388
 <     struct stat fs;
 <     if (stat(this->FileName, &fs) != 0) 
 ---
 >     struct _stat64 fs;
 >     if (_stat64(this->FileName, &fs) != 0) 
+548c558
+< int vtkDataReader::ReadCellData(vtkDataSet *ds, int numCells)
+---
+> int vtkDataReader::ReadCellData(vtkDataSet *ds, vtkIdType numCells)
+651c661
+<       int npts;
+---
+>       vtkIdType npts;
+676c686
+< int vtkDataReader::ReadPointData(vtkDataSet *ds, int numPts)
+---
+> int vtkDataReader::ReadPointData(vtkDataSet *ds, vtkIdType numPts)
+780c790
+<       int ncells;
+---
+>       vtkIdType ncells;
+803c813
+< int vtkReadBinaryData(istream *IS, T *data, int numTuples, int numComp)
+---
+> int vtkReadBinaryData(istream *IS, T *data, vtkIdType numTuples, int numComp)
+820c830
+< int vtkReadASCIIData(vtkDataReader *self, T *data, int numTuples, int numComp)
+---
+> int vtkReadASCIIData(vtkDataReader *self, T *data, vtkIdType numTuples, int numComp)
+822c832
+<   int i, j;
+---
+>   vtkIdType i, j;
+844c854
+< vtkDataArray *vtkDataReader::ReadArray(const char *dataType, int numTuples, int numComp)
+---
+> vtkDataArray *vtkDataReader::ReadArray(const char *dataType, vtkIdType numTuples, int numComp)
+871c881
+<       for (int i=0; i<numTuples; i++)
+---
+>       for (vtkIdType i=0; i<numTuples; i++)
+1061c1071
+< int vtkDataReader::ReadPoints(vtkPointSet *ps, int numPts)
+---
+> int vtkDataReader::ReadPoints(vtkPointSet *ps, vtkIdType numPts)
+1137c1147
+< int vtkDataReader::ReadScalarData(vtkDataSetAttributes *a, int numPts)
+---
+> int vtkDataReader::ReadScalarData(vtkDataSetAttributes *a, vtkIdType numPts)
+1222c1232
+< int vtkDataReader::ReadVectorData(vtkDataSetAttributes *a, int numPts)
+---
+> int vtkDataReader::ReadVectorData(vtkDataSetAttributes *a, vtkIdType numPts)
+1267c1277
+< int vtkDataReader::ReadNormalData(vtkDataSetAttributes *a, int numPts)
+---
+> int vtkDataReader::ReadNormalData(vtkDataSetAttributes *a, vtkIdType numPts)
+1312c1322
+< int vtkDataReader::ReadTensorData(vtkDataSetAttributes *a, int numPts)
+---
+> int vtkDataReader::ReadTensorData(vtkDataSetAttributes *a, vtkIdType numPts)
+1356c1366
+< int vtkDataReader::ReadCoScalarData(vtkDataSetAttributes *a, int numPts)
+---
+> int vtkDataReader::ReadCoScalarData(vtkDataSetAttributes *a, vtkIdType numPts)
+1358c1368
+<   int i, j, idx, numComp, skipScalar=0;
+---
+>   vtkIdType i, j, idx, numComp, skipScalar=0;
+1441c1451
+< int vtkDataReader::ReadTCoordsData(vtkDataSetAttributes *a, int numPts)
+---
+> int vtkDataReader::ReadTCoordsData(vtkDataSetAttributes *a, vtkIdType numPts)
+1564c1574
+< int vtkDataReader::ReadCells(int size, int *data)
+---
+> int vtkDataReader::ReadCells(vtkIdType size, int *data)
+1601c1611
+< int vtkDataReader::ReadCells(int size, int *data, 
+---
+> int vtkDataReader::ReadCells(vtkIdType size, int *data,
+1905,1906c1915,1916
+< void vtkDataReader::CheckFor(const char* name, char *line, int &num, 
+<                              char** &array, int &allocSize)
+---
+> void vtkDataReader::CheckFor(const char* name, char *line, vtkIdType&num,
+>                              char** &array, vtkIdType&allocSize)
