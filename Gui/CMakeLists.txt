@@ -102,6 +102,7 @@ IF (ALBA_USE_VTK)
   albaGUILutWidget.cpp				  albaGUILutWidget.h
   albaGUIHistogramWidget.cpp		  albaGUIHistogramWidget.h
   albaGUIDialogAskAndRemember.cpp 	  albaGUIDialogAskAndRemember.h
+  albaGUIDialogWarnAndSkipOthers.cpp  albaGUIDialogWarnAndSkipOthers.h
   )
 ENDIF (ALBA_USE_VTK)
 
