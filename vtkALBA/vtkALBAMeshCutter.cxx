@@ -840,8 +840,8 @@ bool vtkALBAMeshCutter::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList *p
   vtkIdType edgepts[8][2] ;
   int maptype[8] ;
   vtkIdType f, ilast, inext, istart ;
-  bool found, foundEdgeMapping, foundPtMapping, sstop ;
-  bool sameface = false ;
+  bool found, foundEdgeMapping,  sstop ;
+  bool sameface = false, foundPtMapping = false;
   double lamtemp ;
 
   vtkCell* cell = UnstructGrid->GetCell(cellid);
