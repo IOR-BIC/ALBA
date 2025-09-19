@@ -63,6 +63,8 @@ public:
 
   void Import();
 
+  void SetNaturalTag(albaVME* vme);
+
 	/** Return an xpm-icon that can be used to represent this operation */
 	virtual char ** GetIcon();
 
@@ -75,10 +77,7 @@ protected:
   void OpStop(int result);
 
 	void AddImageToList(std::vector<vtkImageData*>& images, vtkImageData* image, const char* name);
-
-  void BuildImageSequence();
-  void BuildVolume();
-
+    
   albaVMEGroup     *m_ImportedGroup;
   albaVMEVolumeGray *m_ImportedVolume;
 
@@ -87,5 +86,8 @@ protected:
   double        m_Spacing[3];
 	int          m_SkipWrongSize;
 	int          m_SkipWrongType;
+	int          m_XFlip;
+	int          m_YFlip;
+	int          m_ZFlip;
 };
 #endif

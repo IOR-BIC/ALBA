@@ -39,7 +39,7 @@
 #include "vtkBMPReader.h"
 #include "vtkJPEGReader.h"
 #include "vtkPNGReader.h"
-#include "vtkTIFFReader.h"
+#include "vtkALBATIFFReader.h"
 #include "vtkImageExtractComponents.h"
 #include "vtkImageLuminance.h"
 
@@ -52,6 +52,8 @@
 #include "vtkUnsignedCharArray.h"
 #include "albaOpImporterDicomSliceAccHelper.h"
 #include "albaGUIDialogWarnAndSkipOthers.h"
+#include "albaGUIBusyInfo.h"
+#include "vtkImageFlip.h"
 
 
 
@@ -67,11 +69,13 @@ albaOpImporterImage::albaOpImporterImage(const wxString& label) :
 	m_OpType = OPTYPE_IMPORTER;
 	m_Canundo = true;
 	m_Files.clear();
-	m_BuildVolumeFlag = 0;
+	m_BuildVolumeFlag = false;
 
 	m_Spacing[0] = m_Spacing[1] = m_Spacing[2] = 1.0;
 
 	m_SkipWrongType = m_SkipWrongSize = false;
+
+	m_ZFlip = m_XFlip = m_YFlip = false;
 
   m_ImportedGroup = NULL;
   m_ImportedVolume = NULL;
@@ -90,12 +94,15 @@ enum IMAGE_IMPORTER_ID
 {
   ID_BUILD_VOLUME = MINID,
   ID_SPACING,
+	ID_XFLIP,
+	ID_YFLIP,
+	ID_ZFLIP,
 };
 //----------------------------------------------------------------------------
 void albaOpImporterImage::OpRun()   
 //----------------------------------------------------------------------------
 {
-	albaString wildc = "Bitmap (*.bmp)|*.bmp|JPEG (*.jpg)|*.jpg|PNG (*.png)|*.png|TIFF (*.tif)|*.tif";
+	albaString wildc = "Images (*.bmp;*.jpg;*.jpeg;*.png;*.tif;*.tiff)| *.bmp;*.jpg;*.jpeg;*.png;*.tif;*.tiff|Bitmap (*.bmp)|*.bmp|JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|PNG (*.png)|*.png|TIFF (*.tif;*.tiff)|*.tif;*.tiff";
 	
   if (!m_TestMode)
   {
@@ -116,34 +123,33 @@ void albaOpImporterImage::OpRun()
   {
     OpStop(OP_RUN_CANCEL);
   }
-  else
-  {    
-    if (!m_TestMode)
-    {
-			const wxString outputTypes[] = { _("Images"), _("Volume")};
+	else
+	{
+		if (!m_TestMode)
+		{
+			const wxString outputTypes[] = { _("Images"), _("Volume") };
 
-			m_Gui->Radio(ID_BUILD_VOLUME, _("Output Type"), &m_BuildVolumeFlag, 2, outputTypes);
+			m_Gui->Label("");
 
-	    m_Gui->Vector(ID_SPACING,"Spacing:",m_Spacing,0);
-      m_Gui->Label("");
-      m_Gui->OkCancel();
+			if (numFiles > 1)
+				m_Gui->Radio(ID_BUILD_VOLUME, _("Output Type"), &m_BuildVolumeFlag, 2, outputTypes);
+			else
+				m_BuildVolumeFlag = false;
 
-      m_Gui->Update();
+			m_Gui->Vector(ID_SPACING, "Spacing:", m_Spacing, 0);
+			m_Gui->Label("");
+			m_Gui->Bool(ID_XFLIP, "Flip around X axis", &m_XFlip, 1);
+			m_Gui->Bool(ID_YFLIP, "Flip around Y axis", &m_YFlip, 1);
+			m_Gui->Bool(ID_ZFLIP, "Flip around Z axis", &m_ZFlip, 1);
+			
+			m_Gui->Label("");
+			m_Gui->OkCancel();
 
-			m_Gui->Divider();
+			m_Gui->Update();
 
-      ShowGui();
-    }
-
-    if(numFiles == 1)
-    {
-      Import();
-      if (!m_TestMode)
-      {
-        OpStop(OP_RUN_OK);
-      }
-    }
-  }
+			ShowGui();
+		}
+	}
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpImporterImage::Copy()   
@@ -166,11 +172,6 @@ void albaOpImporterImage::OnEvent(albaEventBase *alba_event)
   {
     switch(e->GetId())
     {
-      case ID_BUILD_VOLUME:
-        if (!m_TestMode)
-        {
-        }
-      break;
       case wxOK:
         Import();
         OpStop(OP_RUN_OK);
@@ -194,99 +195,10 @@ void albaOpImporterImage::SetSpacing(double* spacing)
 void albaOpImporterImage::Import()
 //----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
-  {
-    wxBusyCursor wait;
-  }
-  if(m_BuildVolumeFlag)
-    BuildVolume();        //Build volume
-  else
-    BuildImageSequence(); // Build image sequence
-
-  albaTagItem tag_Nature;
-  tag_Nature.SetName("VME_NATURE");
-  tag_Nature.SetValue("NATURAL");
-
-  m_Output->GetTagArray()->SetTag(tag_Nature);
-}
-//----------------------------------------------------------------------------
-void albaOpImporterImage::BuildImageSequence()
-//----------------------------------------------------------------------------
-{
 	wxString path, name, ext;
-
-	albaNEW(m_ImportedGroup);
-  
-	albaTimeStamp start_time = m_Input->GetRoot()->GetTimeStamp();
-	
-	albaProgressBarHelper progressHelper(m_Listener);
-	progressHelper.SetTextMode(m_TestMode);
-	progressHelper.InitProgressBar();
-
-  int numFiles = m_Files.size();
-
-  m_ImportedGroup->SetName("Imported Images");
-  m_ImportedGroup->ReparentTo(m_Input);
-
-  for(int i=0; i<numFiles; i++)
-	{
-    progressHelper.UpdateProgressBar((i*100)/numFiles);
-
-    wxFileName::SplitPath(m_Files[i].c_str(),&path,&name,&ext);
-		ext.MakeUpper();
-
-    albaSmartPointer <albaVMEImage> importedImage;
-		vtkImageReader2* reader=NULL; 
-
-		if(ext == "BMP")
-			reader = vtkBMPReader::New();
-		else if (ext == "JPG" || ext == "JPEG" )
-			reader = vtkJPEGReader::New();
-		else if (ext == "PNG")
-			reader = vtkPNGReader::New();
-		else if (ext == "TIF" || ext == "TIFF" )
-			reader = vtkTIFFReader::New();
-		else if (m_SkipWrongType == FALSE)
-		{
-			albaString msg;
-			msg.Printf("unable to import %s, unrecognized type", m_Files[i].c_str());
-			if (m_TestMode)
-			{
-				albaLogMessage(msg.GetCStr());
-			}
-			else
-			{
-				albaGUIDialogWarnAndSkipOthers* dialog = new albaGUIDialogWarnAndSkipOthers("Wrong image size", msg.GetCStr(), &m_SkipWrongType);
-				dialog->ShowModal();
-			}
-		}
-
-		if (reader)
-		{
-			reader->SetFileName(m_Files[i].c_str());
-			reader->SetDataSpacing(m_Spacing);
-			reader->Update();
-			vtkALBASmartPointer<vtkImageLuminance> lumFilter;
-			lumFilter->SetInput(reader->GetOutput());
-			lumFilter->Update();
-			importedImage->SetData(lumFilter->GetOutput(), start_time);
-			importedImage->SetName(name);
-			importedImage->ReparentTo(m_ImportedGroup);
-			vtkDEL(reader);
-		}
-	}
-
-  m_ImportedGroup->SetName("Imported Images");
-  m_ImportedGroup->ReparentTo(m_Input);
-  m_Output = m_ImportedGroup;
-}
-//----------------------------------------------------------------------------
-void albaOpImporterImage::BuildVolume()
-//----------------------------------------------------------------------------
-{
-	wxString path, name, ext;
-
 	std::vector<vtkImageData*> images;
+
+	albaGUIBusyInfo busy("Importing Images.\nPlease wait...", m_TestMode);
 
 	albaProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
@@ -294,15 +206,25 @@ void albaOpImporterImage::BuildVolume()
 	vtkImageReader2* reader = NULL;
 
 	int numFiles = m_Files.size();
+	if (!m_BuildVolumeFlag)
+	{
+		albaNEW(m_ImportedGroup);
+		m_ImportedGroup->SetName("Imported Images");
+		m_ImportedGroup->ReparentTo(m_Input);
+	}
 
 	for (int i = 0; i < numFiles; i++)
 	{
+		int index;
+		index = m_ZFlip ? numFiles - (i + 1) : i;
+
 		progressHelper.UpdateProgressBar((i * 100) / numFiles);
 
-		wxFileName::SplitPath(m_Files[i].c_str(), &path, &name, &ext);
+		wxFileName::SplitPath(m_Files[index].c_str(), &path, &name, &ext);
 		ext.MakeUpper();
 
-		vtkImageData* img;
+		albaSmartPointer <albaVMEImage> importedImage;
+
 
 		if (ext == "BMP")
 			reader = vtkBMPReader::New();
@@ -311,11 +233,11 @@ void albaOpImporterImage::BuildVolume()
 		else if (ext == "PNG")
 			reader = vtkPNGReader::New();
 		else if (ext == "TIF" || ext == "TIFF")
-			reader = vtkTIFFReader::New();
+			reader = vtkALBATIFFReader::New();
 		else if (m_SkipWrongType == FALSE)
 		{
 			albaString msg;
-			msg.Printf("unable to import %s, unrecognized type", m_Files[i].c_str());
+			msg.Printf("unable to import %s, unrecognized type", m_Files[index].c_str());
 			if (m_TestMode)
 			{
 				albaLogMessage(msg.GetCStr());
@@ -329,52 +251,110 @@ void albaOpImporterImage::BuildVolume()
 
 		if (reader)
 		{
-			reader->SetFileName(m_Files[i].c_str());
+			reader->SetFileName(m_Files[index].c_str());
 			reader->SetDataSpacing(m_Spacing);
-			reader->SetNumberOfScalarComponents(1);
 			reader->Update();
+
 			vtkALBASmartPointer<vtkImageLuminance> lumFilter;
-			lumFilter->SetInput(reader->GetOutput());
+			if (reader->GetOutput()->GetNumberOfScalarComponents() == 4)
+			{
+				vtkALBASmartPointer<vtkImageExtractComponents> extract;
+				extract->SetInput(reader->GetOutput());
+				extract->SetComponents(0, 1, 2);
+				extract->Update();
+				lumFilter->SetInput(extract->GetOutput());
+			}
+			else
+			{
+				lumFilter->SetInput(reader->GetOutput());
+			}
 			lumFilter->Update();
-			AddImageToList(images, lumFilter->GetOutput(), name.ToAscii());
+			vtkImageData* finalImage = lumFilter->GetOutput();
+			
+			vtkALBASmartPointer<vtkImageFlip> xFlipFilter;
+			if (m_XFlip)
+			{
+				xFlipFilter->SetInput(finalImage);
+				xFlipFilter->SetFilteredAxis(0); // X
+				xFlipFilter->Update();
+				finalImage = xFlipFilter->GetOutput();
+			}
+
+			vtkALBASmartPointer<vtkImageFlip> yFlipFilter;
+			if (m_YFlip)
+			{
+				yFlipFilter->SetInput(finalImage);
+				yFlipFilter->SetFilteredAxis(1); // Y
+				yFlipFilter->Update();
+				finalImage = yFlipFilter->GetOutput();
+			}
+
+
+			if (m_BuildVolumeFlag)
+			{
+				AddImageToList(images, finalImage, name.ToAscii());
+			}
+			else
+			{
+				importedImage->SetData(finalImage, m_Input->GetMTime());
+				importedImage->SetName(name);
+				SetNaturalTag(importedImage);
+				importedImage->ReparentTo(m_ImportedGroup);
+			}
 			vtkDEL(reader);
 		}
-
 	}
 
-	int sliceNum = images.size();
-
-
-	if (sliceNum < 2)
+	if (m_BuildVolumeFlag)
 	{
-		wxMessageBox("Unable to create a Volume, too few images");
-		for (int i = 0; i < sliceNum + 1; i++)
+		int sliceNum = images.size();
+
+
+		if (sliceNum < 2)
+		{
+			wxMessageBox("Unable to create a Volume, too few images");
+			for (int i = 0; i < sliceNum + 1; i++)
+				vtkDEL(images[i]);
+			return;
+		}
+
+		albaOpImporterDicomSliceAccHelper accumulate;
+		accumulate.SetNumOfSlices(sliceNum);
+
+		double origin[3] = { 0,0,0 };
+
+		//Loop for each slice
+		for (int i = 0; i < sliceNum; i++)
+		{
+			origin[2] = i * m_Spacing[2];
+			accumulate.SetSlice(i, images[i], origin);
 			vtkDEL(images[i]);
-		return;
+		}
+
+		vtkDataSet* acc_out;
+		acc_out = accumulate.GetNewOutput();
+		acc_out->Update();
+
+		albaNEW(m_ImportedVolume);
+		m_ImportedVolume->SetName("Imported Volume");
+		m_ImportedVolume->SetDataByDetaching(acc_out, m_Input->GetMTime());
+		SetNaturalTag(m_ImportedVolume);
+
+		m_Output = m_ImportedVolume;
 	}
-	
-	albaOpImporterDicomSliceAccHelper accumulate;
-	accumulate.SetNumOfSlices(sliceNum);
-
-	double origin[3] = { 0,0,0 };
-
-	//Loop foreach slice
-	for (int i = 0; i < sliceNum; i++)
+	else
 	{
-		origin[2] = i * m_Spacing[2];
-		accumulate.SetSlice(i, images[i], origin);
-		vtkDEL(images[i]);
+		m_Output = m_ImportedGroup;
 	}
+}
+//----------------------------------------------------------------------------
+void albaOpImporterImage::SetNaturalTag(albaVME* vme)
+{
+	albaTagItem tag_Nature;
+	tag_Nature.SetName("VME_NATURE");
+	tag_Nature.SetValue("NATURAL");
 
-	vtkDataSet* acc_out;
-	acc_out = accumulate.GetNewOutput();
-	acc_out->Update();
-
-	albaNEW(m_ImportedVolume);
-	m_ImportedVolume->SetName("Imported Volume");
-	m_ImportedVolume->SetDataByDetaching(acc_out, m_Input->GetMTime());
-
-  m_Output = m_ImportedVolume;
+	vme->GetTagArray()->SetTag(tag_Nature);
 }
 
 //----------------------------------------------------------------------------
