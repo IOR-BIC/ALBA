@@ -97,14 +97,12 @@ SET(vtkALBA_SRCS
   vtkALBACollisionDetectionFilter.cxx  					vtkALBACollisionDetectionFilter.h  
   vtkALBARayCastCleaner.cpp  							vtkALBARayCastCleaner.h  
   vtkALBAVolumeToClosedSmoothSurface.cxx  				vtkALBAVolumeToClosedSmoothSurface.h
-  
+
   ###############################################
-	
   vtkALBATubeFilter.cxx 									vtkALBATubeFilter.h
-	
   vtkALBALandmarkCloudOutlineCornerFilter.cxx 			vtkALBALandmarkCloudOutlineCornerFilter.h
-  
-	vtkALBACircleSource.cxx								vtkALBACircleSource.h
+  vtkALBACircleSource.cxx								vtkALBACircleSource.h
+  vtkALBATIFFReader.cxx									vtkALBATIFFReader.h
 )
 
 IF(WIN32)
@@ -293,3 +291,7 @@ IF(VTK_FOUND)
 ENDIF(VTK_FOUND)
 
 ADD_DEPENDENCIES(${PROJECT_NAME} albaService)
+
+IF (ALBA_USE_WX)
+  ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
+ENDIF (ALBA_USE_WX)
