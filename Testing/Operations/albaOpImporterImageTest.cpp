@@ -52,6 +52,7 @@ void albaOpImporterImageTest::Test_Single()
   filename<<"/Image/imageTest.jpg";
 	importer->AddFileName(filename.GetCStr());
 	importer->OpRun();
+  importer->Import();
 	albaVME *node=importer->GetOutput();
 	
 	CPPUNIT_ASSERT(node->IsA("albaVMEGroup"));
