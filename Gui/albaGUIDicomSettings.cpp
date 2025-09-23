@@ -264,7 +264,7 @@ int albaGUIDicomSettings::GetAcquisitionNumberStrategy()
 
 int albaGUIDicomSettings::GetDCMImagePositionPatientExceptionHandling()
 {
-	if (m_AcquisitionNumberStrategy == ASK_USER_FOR_POSITION_HANDLING)
+	if (m_DCM_ImagePositionPatientchoice == ASK_USER_FOR_POSITION_HANDLING)
 	{
 		wxString title = "Dicom Image without Patient Potition";
 		wxString message = "There is an image without Patient Position.\nWhat do you want to do?";
