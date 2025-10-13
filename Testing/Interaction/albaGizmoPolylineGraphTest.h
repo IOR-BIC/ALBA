@@ -64,10 +64,6 @@ class albaGizmoPolylineGraphTest : public albaTest
 
     void CreateRenderStuff(); 
       
-    vtkRenderer *m_Renderer;
-    vtkRenderWindow *m_RenderWindow;
-    vtkRenderWindowInteractor *m_RenderWindowInteractor;    
-    
 };
 
 #endif

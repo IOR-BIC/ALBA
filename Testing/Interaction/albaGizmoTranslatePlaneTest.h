@@ -75,12 +75,7 @@ class albaGizmoTranslatePlaneTest : public albaTest
     // move somewhere else... there should be a common class for testing facilities
     void RenderData(vtkDataSet *data);
 
-    void CreateRenderStuff(); 
-      
-    vtkRenderer *m_Renderer;
-    vtkRenderWindow *m_RenderWindow;
-    vtkRenderWindowInteractor *m_RenderWindowInteractor;    
-    
+    void CreateRenderStuff();     
 };
 
 

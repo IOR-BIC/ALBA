@@ -54,7 +54,7 @@
 
 #include "vtkALBAContourVolumeMapperTest.h"
 
-static bool ExtractModel   = true;
+static bool ExtractModel   = false;
 static bool CleanModel     = false;
 
 void vtkALBAContourVolumeMapperTest::BeforeTest()
@@ -176,6 +176,8 @@ void vtkALBAContourVolumeMapperTest::TestRectilinearGrid()
       polydata->Delete() ;
     }
   }
+
+  renWin->Render();
 
   // switch auto lod back on
   mapper->AutoLODCreateOn() ;

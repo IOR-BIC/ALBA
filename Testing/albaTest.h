@@ -80,6 +80,7 @@ protected:
 	TestApp *m_App;
 	vtkRenderer *m_Renderer;
 	vtkRenderWindow *m_RenderWindow;
+	vtkRenderWindowInteractor* m_RenderWindowInteractor;
 
 	albaString m_WorkingDir;
 };

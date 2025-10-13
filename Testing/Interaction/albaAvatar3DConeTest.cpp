@@ -36,26 +36,36 @@
 #include "vtkDiskSource.h"
 #include "vtkActor.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkPolyDataReader.h"
+#include "albaVMESurface.h"
+#include "albaSceneNode.h"
+#include "albaPipeBox.h"
+#include "vtkALBAAssembly.h"
+
+
 
 //----------------------------------------------------------------------------
 void albaAvatar3DConeTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
+	vtkNEW(m_Renderer);
+	vtkNEW(m_RenderWindow);
+	vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaAvatar3DConeTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
+	vtkDEL(m_Renderer);
+	vtkDEL(m_RenderWindow);
+	vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaAvatar3DConeTest::TestFixture()
 //----------------------------------------------------------------------------
 {
-
+	
 }
 //----------------------------------------------------------------------------
 void albaAvatar3DConeTest::TestConstructorDestructor()
@@ -78,10 +88,14 @@ void albaAvatar3DConeTest::TestPick()
   identity.Identity();
 
   // Render stuff
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(400, 400);
-  m_RenderWindow->SetPosition(400,0);
+
+	m_Renderer->SetBackground(0.1, 0.1, 0.1);
+
+	m_RenderWindow->AddRenderer(m_Renderer);
+	m_RenderWindow->SetSize(640, 480);
+	m_RenderWindow->SetPosition(200, 0);
+
+	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 
   vtkALBASmartPointer<vtkIdentityTransform> ctransform;
   m_Renderer->GetActiveCamera()->GetViewTransformObject()->SetInput(ctransform);
