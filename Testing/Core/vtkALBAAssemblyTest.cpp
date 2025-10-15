@@ -196,13 +196,11 @@ void vtkALBAAssemblyTest::RenderOpaqueGeometryTest()
 {
   vtkTimerLog::SetLogging(0); // Must shutdown logging otherwise it will generate leaks
 
-  vtkRenderer *renderer;
-  vtkRenderWindow *render_window;
+  vtkNEW(m_Renderer);
+  vtkNEW(m_RenderWindow);
+  
 
-  vtkNEW(renderer);
-  vtkNEW(render_window);
-
-  PrepareToRender(renderer,render_window);
+  PrepareToRender(m_Renderer,m_RenderWindow);
 
   vtkALBAAssembly *assembly = vtkALBAAssembly::New();
 
@@ -252,15 +250,15 @@ void vtkALBAAssemblyTest::RenderOpaqueGeometryTest()
   assembly->AddPart(sphere1);
   assembly->AddPart(sphere2);
 
-	renderer->AddActor(assembly);
+	m_Renderer->AddActor(assembly);
 	assembly->GetBounds();
 
-  CPPUNIT_ASSERT(assembly->RenderOpaqueGeometry((vtkViewport*)renderer) == 1);
-  render_window->Render();
+  CPPUNIT_ASSERT(assembly->RenderOpaqueGeometry((vtkViewport*)m_Renderer) == 1);
+  m_RenderWindow->Render();
 
 	COMPARE_IMAGES("RenderOpaqueGeometryTest");
 
-  assembly->ReleaseGraphicsResources(render_window);
+  assembly->ReleaseGraphicsResources(m_RenderWindow);
   assembly->RemovePart(sphere1);
   assembly->RemovePart(sphere2);
 
@@ -270,8 +268,8 @@ void vtkALBAAssemblyTest::RenderOpaqueGeometryTest()
   vtkDEL(sph_source2);
   vtkDEL(sphere2);
   vtkDEL(mapper2);
-  vtkDEL(renderer);
-  vtkDEL(render_window);
+  vtkDEL(m_Renderer);
+  vtkDEL(m_RenderWindow);
   vtkDEL(assembly);
 }
 //----------------------------------------------------------------------------
@@ -280,13 +278,10 @@ void vtkALBAAssemblyTest::RenderTranslucentGeometry()
 {
   vtkTimerLog::SetLogging(0); // Must shutdown logging otherwise it will generate leaks
 
-  vtkRenderer *renderer;
-  vtkRenderWindow *render_window;
+  vtkNEW(m_Renderer);
+  vtkNEW(m_RenderWindow);
 
-  vtkNEW(renderer);
-  vtkNEW(render_window);
-
-  PrepareToRender(renderer,render_window);
+  PrepareToRender(m_Renderer,m_RenderWindow);
 
   vtkALBAAssembly *assembly = vtkALBAAssembly::New();
   
@@ -307,8 +302,8 @@ void vtkALBAAssemblyTest::RenderTranslucentGeometry()
   vtkNEW(sphere1);
 
   sphere1->SetMapper(mapper1);
-  sphere1->GetProperty()->SetAmbient(1.f);
-  sphere1->GetProperty()->SetDiffuse(0.f);
+  sphere1->GetProperty()->SetAmbient(0.5f);
+  sphere1->GetProperty()->SetDiffuse(0.5f);
   sphere1->GetProperty()->SetOpacity(.5);
 
 
@@ -329,22 +324,22 @@ void vtkALBAAssemblyTest::RenderTranslucentGeometry()
   vtkNEW(sphere2);
 
   sphere2->SetMapper(mapper2);
-  sphere2->GetProperty()->SetAmbient(1.f);
-  sphere2->GetProperty()->SetDiffuse(0.f);
+  sphere2->GetProperty()->SetAmbient(0.5f);
+  sphere2->GetProperty()->SetDiffuse(0.5f);
   sphere2->GetProperty()->SetOpacity(1);
 
   assembly->AddPart(sphere1);
   assembly->AddPart(sphere2);
 
-  renderer->AddActor(assembly);
+  m_Renderer->AddActor(assembly);
 	assembly->GetBounds();
 
-  CPPUNIT_ASSERT(assembly->RenderTranslucentGeometry((vtkViewport*)renderer) == 1);
-  render_window->Render();
+  CPPUNIT_ASSERT(assembly->RenderTranslucentGeometry((vtkViewport*)m_Renderer) == 1);
+  m_RenderWindow->Render();
 
 	COMPARE_IMAGES("RenderTranslucentGeometry");
 
-	assembly->ReleaseGraphicsResources(render_window);
+	assembly->ReleaseGraphicsResources(m_RenderWindow);
   assembly->RemovePart(sphere1);
   assembly->RemovePart(sphere2);
 
@@ -354,8 +349,8 @@ void vtkALBAAssemblyTest::RenderTranslucentGeometry()
   vtkDEL(sph_source2);
   vtkDEL(sphere2);
   vtkDEL(mapper2);
-  vtkDEL(renderer);
-  vtkDEL(render_window);
+  vtkDEL(m_Renderer);
+  vtkDEL(m_RenderWindow);
   vtkDEL(assembly);
 }
 //----------------------------------------------------------------------------

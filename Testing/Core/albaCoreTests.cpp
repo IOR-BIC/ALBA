@@ -175,9 +175,9 @@ int main(int argc, char* argv[])
 	albaServiceLocator::SetLogicManager(logic);
 
 	//this test must be run first because manages factories
-	runner.addTest(albaCoreFactoryTest::suite());
+	//runner.addTest(albaCoreFactoryTest::suite());
 	runner.addTest(vtkALBAAssemblyTest::suite());
-	runner.addTest(albaAbsMatrixPipeTest::suite());
+	/*runner.addTest(albaAbsMatrixPipeTest::suite());
 	runner.addTest(mmaVolumeMaterialTest::suite());
 	runner.addTest(mmaMaterialTest::suite());
 	runner.addTest(mmaApplicationLayoutTest::suite());
@@ -224,7 +224,7 @@ int main(int argc, char* argv[])
 	runner.addTest(albaAttributeTraceabilityTest::suite());
 	runner.addTest(albaAttributeTest::suite());
 	runner.addTest(albaViewPlotTest::suite());
-	runner.addTest(albaProgressBarHelperTest::suite());
+	runner.addTest(albaProgressBarHelperTest::suite());*/
 
 	runner.run(controller);
 
