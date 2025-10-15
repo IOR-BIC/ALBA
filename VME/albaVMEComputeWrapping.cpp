@@ -739,7 +739,7 @@ double albaVMEComputeWrapping::GetDistanceValue(double *start,double *cCoord,dou
 void albaVMEComputeWrapping::WrapCylinderCylinderObstacleSet(){
 	double segLength1,segLength2;
 	int idx1,idx2;
-	double d1,d2;
+	double d1=0,d2=0;
 	double S[3],P[3];
 	double T[3],H[3],Tg[3],Hg[3];
 	double G[3],Q[3],Gg[3],Qg[3];
@@ -1137,7 +1137,7 @@ void albaVMEComputeWrapping::WrapCylinderOnly(int step){
 	double zValue1,zValue2;
 	double cCoordGlobal1[3],cCoordGlobal2[3],cCoordGlobal3[3],cCoordGlobal4[3];
 	double CIcurve,CIcurve1,CIcurve2 ;
-	double d1,d2;
+	double d1=0,d2=0;
 
 	vtkPolyData *hCurve;
 	vtkLineSource *Line1,*Line2;
@@ -2367,7 +2367,7 @@ void albaVMEComputeWrapping::GetOneSideTangentPointOnCylinder(double *startLocal
 
 	double Zl,Zh;//Zi,Zo,
 	double cCoord1_1[3],cCoord1_2[3],cCoordGlobal1[3],cCoordGlobal2[3],pointLocal[3];
-	double d1,d2;
+	double d1=0,d2=0;
 
 
 	GetCcoordinateForCylinder(endLocal,cCoord1_1,cCoord1_2,vmeIdx);//last parameter shows which vme object
@@ -2465,7 +2465,7 @@ void albaVMEComputeWrapping::GetCylinderCylinderWrap(const int step){
 	double p1[3],p2_1[3],p13[3],p4[3],p22[3],p3_2[3],p2Global[3],p1Global[3],p3Global[3],p4Global[3];
 	double flagP2[3];//testP2[3],testP3[3],
 	//double CIcurve ;//,CIcurve1,CIcurve2
-	double d1,d2,dCurve12,dCurve34;
+	double d1=0,d2=0,dCurve12,dCurve34;
 	double center1[3],center2[3];
 	bool stopFlag = false;
 	bool exchangeFlag = false;
@@ -2799,7 +2799,7 @@ void albaVMEComputeWrapping::GetSphereCylinderWrap(const int step,double *viaPoi
 	//const int step = 36;
 	clock_t startTime,finishTime;
 	double totalTime;
-	double dstep,d1,d2,y1,rm = 0;
+	double dstep,d1=0,d2=0,y1,rm = 0;
 	double y0 = 0;
 	double x0 = 0;
 	double aCoord[3],bCoord[3],bCoord2[3],bCoord1[3],cCoord1[3],cCoord2[3],cCoord[3],mCoord[3];
@@ -3229,7 +3229,7 @@ bool albaVMEComputeWrapping::CheckAlign(){
 int albaVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 	double startPoint[3],endPoint[3];
 	double tmpIntersect1[3],tmpIntersect2[3];
-	double d1,d2;
+	double d1=0,d2=0;
 	int rtn = NON_WRAP;
 	bool objFlag1 = false;
 	bool objFlag2 = false;
@@ -4045,7 +4045,7 @@ bool albaVMEComputeWrapping::IsEndPonintOnCylinder(double tolerance,double *endW
 	double newX[3],newY[3];	
 	double testValue ;
 	double r = GetCylinderRadius();
-	double d1,d2;
+	double d1=0,d2=0;
 	double sphereCenter[3],cylinderCenter[3],cylinderCenterLocal[3],sphereCenterLocal[3];
 
 	testValue = endWrapLocal[0] *endWrapLocal[0] + endWrapLocal[1]*endWrapLocal[1];

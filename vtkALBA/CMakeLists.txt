@@ -97,13 +97,11 @@ SET(vtkALBA_SRCS
   vtkALBAVolumeToClosedSmoothSurface.cxx  				vtkALBAVolumeToClosedSmoothSurface.h
   
   ###############################################
-	
   vtkALBATubeFilter.cxx 									vtkALBATubeFilter.h
-	
   vtkALBALandmarkCloudOutlineCornerFilter.cxx 			vtkALBALandmarkCloudOutlineCornerFilter.h
-  
-	vtkALBACircleSource.cxx								vtkALBACircleSource.h
-	
+  vtkALBACircleSource.cxx								vtkALBACircleSource.h
+  vtkALBATIFFReader.cxx									vtkALBATIFFReader.h
+
   vtkALBAStructuredPointsAlgorithm.cxx vtkALBAStructuredPointsAlgorithm.h
 )
 
@@ -280,3 +278,7 @@ IF(VTK_FOUND)
 ENDIF(VTK_FOUND)
 
 ADD_DEPENDENCIES(${PROJECT_NAME} albaService)
+
+IF (ALBA_USE_WX)
+  ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
+ENDIF (ALBA_USE_WX)

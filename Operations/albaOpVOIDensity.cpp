@@ -624,6 +624,13 @@ void albaOpVOIDensity::EvaluateSurface()
 		polydata = m_FillHoleFilter->GetOutput();
 	}
 
+	vtkALBASmartPointer<vtkCleanPolyData> cleanPolydata;
+	cleanPolydata->SetTolerance(0.0);
+	cleanPolydata->SetInputData(polydata);
+	cleanPolydata->Update();
+
+	polydata=cleanPolydata->GetOutput();
+
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> TransformDataFilter;
 	TransformDataFilter->SetTransform(transform);
 	TransformDataFilter->SetInputData(polydata);

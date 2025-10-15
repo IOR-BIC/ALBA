@@ -130,7 +130,7 @@ void albaOpExporterBmp::SaveBmp()
 {
   assert(m_DirName != "");
 
-	albaGUIBusyInfo busy("Exporting files...");
+	albaGUIBusyInfo busy("Exporting files...",m_TestMode);
  
   wxString path,name,ext;
 	wxFileName::SplitPath(m_DirName.GetCStr(),&path,&name,&ext);

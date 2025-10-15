@@ -30,6 +30,7 @@
 #include "albaTagArray.h"
 #include "albaVMEVolumeRGB.h"
 #include "albaVMEVolumeGray.h"
+#include "albaVMEGroup.h"
 #include "albaVMEImage.h"
 #include "albaVMEItem.h"
 
@@ -38,8 +39,9 @@
 #include "vtkBMPReader.h"
 #include "vtkJPEGReader.h"
 #include "vtkPNGReader.h"
-#include "vtkTIFFReader.h"
+#include "vtkALBATIFFReader.h"
 #include "vtkImageExtractComponents.h"
+#include "vtkImageLuminance.h"
 
 #include <algorithm>
 #include "albaProgressBarHelper.h"
@@ -48,25 +50,12 @@
 #include "vtkPointData.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkUnsignedCharArray.h"
+#include "albaOpImporterDicomSliceAccHelper.h"
+#include "albaGUIDialogWarnAndSkipOthers.h"
+#include "albaGUIBusyInfo.h"
+#include "vtkImageFlip.h"
 
-//----------------------------------------------------------------------------
-// Global Function (locale to this file) to sort the filenames
-//----------------------------------------------------------------------------
-bool CompareNumber(std::string first, std::string second)
-{
-	wxString first_path, first_name, first_ext;
-	wxString second_path, second_name, second_ext;
-	long first_num, second_num;
 
-	wxFileName::SplitPath(first.c_str(),&first_path,&first_name,&first_ext);
-	wxFileName::SplitPath(second.c_str(),&second_path,&second_name,&second_ext);
-
-	first_name.ToLong(&first_num);
-	second_name.ToLong(&second_num);
-
-  return (first_num - second_num) < 0;   // compare number
-
-}
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpImporterImage);
@@ -80,27 +69,23 @@ albaOp(label)
   m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
   m_Files.clear();
-  m_NumFiles = 0;
-  m_BuildVolumeFlag = 0;
+	m_BuildVolumeFlag = false;
 
-  m_FilePrefix    = "";
-  m_FilePattern   = "%s%04d";
-  m_FileExtension = "";
-  m_FileOffset    = 0;
-  m_FileSpacing = 1;
-  m_ImageZSpacing = 1.0;
+	m_Spacing[0] = m_Spacing[1] = m_Spacing[2] = 1.0;
 
-  m_ImportedImage = NULL;
-  m_ImportedImageAsVolume = NULL;
+	m_SkipWrongType = m_SkipWrongSize = false;
 
-  m_FileDirectory = albaGetLastUserFolder();
+	m_ZFlip = m_XFlip = m_YFlip = false;
+
+  m_ImportedGroup = NULL;
+  m_ImportedVolume = NULL;
 }
 //----------------------------------------------------------------------------
 albaOpImporterImage::~albaOpImporterImage()
 //----------------------------------------------------------------------------
 {
-  albaDEL(m_ImportedImage);
-  albaDEL(m_ImportedImageAsVolume);
+  albaDEL(m_ImportedGroup);
+  albaDEL(m_ImportedVolume);
 }
 //----------------------------------------------------------------------------
 // constant ID
@@ -108,18 +93,16 @@ albaOpImporterImage::~albaOpImporterImage()
 enum IMAGE_IMPORTER_ID
 {
   ID_BUILD_VOLUME = MINID,
-  ID_STRING_PREFIX,
-  ID_STRING_PATTERN,
-  ID_STRING_EXT,
-  ID_OFFSET,
   ID_SPACING,
-  ID_DATA_SPACING,
+	ID_XFLIP,
+	ID_YFLIP,
+	ID_ZFLIP,
 };
 //----------------------------------------------------------------------------
 void albaOpImporterImage::OpRun()   
 //----------------------------------------------------------------------------
 {
-	albaString wildc = "Images (*.bmp;*.jpg;*.png;*.tif)| *.bmp;*.jpg;*.png;*.tif";
+	albaString wildc = "Images (*.bmp;*.jpg;*.jpeg;*.png;*.tif;*.tiff)| *.bmp;*.jpg;*.jpeg;*.png;*.tif;*.tiff|Bitmap (*.bmp)|*.bmp|JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|PNG (*.png)|*.png|TIFF (*.tif;*.tiff)|*.tif;*.tiff";
 	
   if (!m_TestMode)
   {
@@ -128,53 +111,43 @@ void albaOpImporterImage::OpRun()
 
 		std::vector<wxString> files;
 			
-		albaGetOpenMultiFiles((const char *)m_FileDirectory.ToAscii(), wildc.GetCStr(), files);
+		albaGetOpenMultiFiles((const char *)albaGetLastUserFolder().ToAscii(), wildc.GetCStr(), files);
 
 		for (int i = 0; i < files.size(); i++)
 			m_Files.push_back(files[i].ToAscii());
   }
 
-  m_NumFiles = m_Files.size();
+  int numFiles = m_Files.size();
 
-  if(m_NumFiles == 0)
+  if(numFiles == 0)
   {
     OpStop(OP_RUN_CANCEL);
   }
   else
   {
-    wxFileName::SplitPath(m_Files[0].c_str(),&m_FileDirectory,&m_FilePrefix,&m_FileExtension);
-    
     if (!m_TestMode)
     {
-      m_Gui->Bool(ID_BUILD_VOLUME,"Volume",&m_BuildVolumeFlag,0,"Check to build volume, otherwise a sequence of image is generated!");
-	    m_Gui->String(ID_STRING_PREFIX,"file pref.", &m_FilePrefix);
-	    m_Gui->String(ID_STRING_PATTERN,"file patt.", &m_FilePattern);
-	    m_Gui->String(ID_STRING_EXT,"file ext.", &m_FileExtension);
-	    m_Gui->Integer(ID_OFFSET,"file offset:",&m_FileOffset,0, MAXINT,"set the first slice number in the files name");
-	    m_Gui->Integer(ID_SPACING,"file spc.:",&m_FileSpacing,1, MAXINT, "set the spacing between the slices in the files name");
-	    m_Gui->Double(ID_DATA_SPACING,"data spc.:",&m_ImageZSpacing,1);
+			const wxString outputTypes[] = { _("Images"), _("Volume") };
+
+			m_Gui->Label("");
+
+			if (numFiles > 1)
+				m_Gui->Radio(ID_BUILD_VOLUME, _("Output Type"), &m_BuildVolumeFlag, 2, outputTypes);
+			else
+				m_BuildVolumeFlag = false;
+
+			m_Gui->Vector(ID_SPACING, "Spacing:", m_Spacing, 0);
+			m_Gui->Label("");
+			m_Gui->Bool(ID_XFLIP, "Flip around X axis", &m_XFlip, 1);
+			m_Gui->Bool(ID_YFLIP, "Flip around Y axis", &m_YFlip, 1);
+			m_Gui->Bool(ID_ZFLIP, "Flip around Z axis", &m_ZFlip, 1);
+			
+			m_Gui->Label("");
       m_Gui->OkCancel();
 
-      m_Gui->Enable(ID_STRING_PREFIX,false);
-      m_Gui->Enable(ID_STRING_PATTERN,false);
-      m_Gui->Enable(ID_STRING_EXT,false);
-      m_Gui->Enable(ID_OFFSET,false);
-      m_Gui->Enable(ID_SPACING,false);
-      m_Gui->Enable(ID_DATA_SPACING,false);
       m_Gui->Update();
 
-			m_Gui->Divider();
-
       ShowGui();
-    }
-
-    if(m_NumFiles == 1)
-    {
-      ImportImage();
-      if (!m_TestMode)
-      {
-        OpStop(OP_RUN_OK);
-      }
     }
   }
 }
@@ -199,20 +172,8 @@ void albaOpImporterImage::OnEvent(albaEventBase *alba_event)
   {
     switch(e->GetId())
     {
-      case ID_BUILD_VOLUME:
-        if (!m_TestMode)
-        {
-          m_Gui->Enable(ID_STRING_PREFIX,m_BuildVolumeFlag != 0);
-          m_Gui->Enable(ID_STRING_PATTERN,m_BuildVolumeFlag != 0);
-          m_Gui->Enable(ID_STRING_EXT,m_BuildVolumeFlag != 0);
-          m_Gui->Enable(ID_OFFSET,m_BuildVolumeFlag != 0);
-          m_Gui->Enable(ID_SPACING,m_BuildVolumeFlag != 0);
-          m_Gui->Enable(ID_DATA_SPACING,m_BuildVolumeFlag != 0);
-          m_Gui->Update();
-        }
-      break;
       case wxOK:
-        ImportImage();
+        Import();
         OpStop(OP_RUN_OK);
       break;
       case wxCANCEL:
@@ -221,238 +182,224 @@ void albaOpImporterImage::OnEvent(albaEventBase *alba_event)
     }
   }
 }
+
 //----------------------------------------------------------------------------
-void albaOpImporterImage::ImportImage()
-//----------------------------------------------------------------------------
+void albaOpImporterImage::SetSpacing(double* spacing)
 {
-  if (!m_TestMode)
-  {
-    wxBusyCursor wait;
+	m_Spacing[0] = spacing[0];
+	m_Spacing[1] = spacing[1];
+	m_Spacing[2] = spacing[2];
   }
-  if(m_BuildVolumeFlag)
-    BuildVolume();        //Build volume
-  else
-    BuildImageSequence(); // Build image sequence
 
-  albaTagItem tag_Nature;
-  tag_Nature.SetName("VME_NATURE");
-  tag_Nature.SetValue("NATURAL");
-
-  m_Output->GetTagArray()->SetTag(tag_Nature);
-}
 //----------------------------------------------------------------------------
-void albaOpImporterImage::BuildImageSequence()
+void albaOpImporterImage::Import()
 //----------------------------------------------------------------------------
 {
-	long time;
   wxString path, name, ext;
+	std::vector<vtkImageData*> images;
 
-	albaNEW(m_ImportedImage);
-  
-  wxFileName::SplitPath(m_Files[0].c_str(),&path,&name,&ext);
-  if(name.IsNumber())
-    std::sort(m_Files.begin(),m_Files.end(),CompareNumber);
-  else
-    std::sort(m_Files.begin(),m_Files.end());
-
-	albaTimeStamp start_time = m_Input->GetRoot()->GetTimeStamp();
+	albaGUIBusyInfo busy("Importing Images.\nPlease wait...", m_TestMode);
 	
 	albaProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar();
+	vtkImageReader2* reader = NULL;
 
-  for(int i=0; i<m_NumFiles; i++)
+	int numFiles = m_Files.size();
+	if (!m_BuildVolumeFlag)
 	{
-    progressHelper.UpdateProgressBar((i*100)/m_NumFiles);
-
-    wxFileName::SplitPath(m_Files[i].c_str(),&path,&name,&ext);
-		ext.MakeUpper();
-		if(name.IsNumber())
-			name.ToLong(&time);
-		else
-			time = i;
-
-		if(ext == "BMP")
-		{
-			vtkALBASmartPointer<vtkBMPReader> r;
-			r->SetFileName(m_Files[i].c_str());
-			r->Update();
-      m_ImportedImage->SetData(r->GetOutput(),time);
-		} 
-		else if (ext == "JPG" || ext == "JPEG" )
-		{
-			vtkALBASmartPointer<vtkJPEGReader> r;
-			r->SetFileName(m_Files[i].c_str());
-			r->Update();
-      m_ImportedImage->SetData(r->GetOutput(),time);
-		}
-		else if (ext == "PNG")
-		{
-			vtkALBASmartPointer<vtkPNGReader> r;
-			r->SetFileName(m_Files[i].c_str());
-			r->Update();
-      m_ImportedImage->SetData(r->GetOutput(),time);
-		}
-		else if (ext == "TIF" || ext == "TIFF" )
-		{
-			vtkALBASmartPointer<vtkTIFFReader> r;
-			r->SetFileName(m_Files[i].c_str());
-			r->Update();
-      m_ImportedImage->SetData(r->GetOutput(),time);
-		}
-		else
-			wxMessageBox("unable to import %s, unrecognized type",m_Files[i].c_str());
+		albaNEW(m_ImportedGroup);
+		m_ImportedGroup->SetName("Imported Images");
+		m_ImportedGroup->ReparentTo(m_Input);
 	}
 
-  if(m_NumFiles > 1)
-    m_ImportedImage->SetName("Imported Images");
-  else
-    m_ImportedImage->SetName(name);
+	for (int i = 0; i < numFiles; i++)
+	{
+		int index;
+		index = m_ZFlip ? numFiles - (i + 1) : i;
 
-  m_ImportedImage->SetTimeStamp(start_time);
-  m_ImportedImage->ReparentTo(m_Input);
-  m_Output = m_ImportedImage;
+		progressHelper.UpdateProgressBar((i * 100) / numFiles);
+
+		wxFileName::SplitPath(m_Files[index].c_str(), &path, &name, &ext);
+		ext.MakeUpper();
+
+		albaSmartPointer <albaVMEImage> importedImage;
+
+
+		if (ext == "BMP")
+			reader = vtkBMPReader::New();
+		else if (ext == "JPG" || ext == "JPEG")
+			reader = vtkJPEGReader::New();
+		else if (ext == "PNG")
+			reader = vtkPNGReader::New();
+		else if (ext == "TIF" || ext == "TIFF")
+			reader = vtkALBATIFFReader::New();
+		else if (m_SkipWrongType == FALSE)
+		{
+			albaString msg;
+			msg.Printf("unable to import %s, unrecognized type", m_Files[index].c_str());
+			if (m_TestMode)
+			{
+				albaLogMessage(msg.GetCStr());
+			}
+		else
+			{
+				albaGUIDialogWarnAndSkipOthers* dialog = new albaGUIDialogWarnAndSkipOthers("Wrong image size", msg.GetCStr(), &m_SkipWrongType);
+				dialog->ShowModal();
+			}
+		}
+
+		if (reader)
+		{
+			reader->SetFileName(m_Files[index].c_str());
+			reader->SetDataSpacing(m_Spacing);
+			reader->Update();
+
+			vtkALBASmartPointer<vtkImageLuminance> lumFilter;
+			if (reader->GetOutput()->GetNumberOfScalarComponents() == 4)
+			{
+				vtkALBASmartPointer<vtkImageExtractComponents> extract;
+				extract->SetInputConnection(reader->GetOutputPort());
+				extract->SetComponents(0, 1, 2);
+				extract->Update();
+				lumFilter->SetInputConnection(extract->GetOutputPort());
+			}
+			else
+		{
+				lumFilter->SetInputConnection(reader->GetOutputPort());
+		} 
+			lumFilter->Update();
+			vtkImageData* finalImage = lumFilter->GetOutput();
+			
+			vtkALBASmartPointer<vtkImageFlip> xFlipFilter;
+			if (m_XFlip)
+		{
+				xFlipFilter->SetInputData(finalImage);
+				xFlipFilter->SetFilteredAxis(0); // X
+				xFlipFilter->Update();
+				finalImage = xFlipFilter->GetOutput();
+		}
+
+			vtkALBASmartPointer<vtkImageFlip> yFlipFilter;
+			if (m_YFlip)
+		{
+				yFlipFilter->SetInputData(finalImage);
+				yFlipFilter->SetFilteredAxis(1); // Y
+				yFlipFilter->Update();
+				finalImage = yFlipFilter->GetOutput();
+		}
+
+
+			if (m_BuildVolumeFlag)
+		{
+				AddImageToList(images, finalImage, name.ToAscii());
+		}
+		else
+			{
+				importedImage->SetData(finalImage, m_Input->GetMTime());
+				importedImage->SetName(name);
+				SetNaturalTag(importedImage);
+				importedImage->ReparentTo(m_ImportedGroup);
+			}
+			vtkDEL(reader);
+		}
+	}
+
+	if (m_BuildVolumeFlag)
+	{
+		int sliceNum = images.size();
+
+
+		if (sliceNum < 2)
+		{
+			wxMessageBox("Unable to create a Volume, too few images");
+			for (int i = 0; i < sliceNum + 1; i++)
+				vtkDEL(images[i]);
+			return;
+		}
+
+		albaOpImporterDicomSliceAccHelper accumulate;
+		accumulate.SetNumOfSlices(sliceNum);
+
+		double origin[3] = { 0,0,0 };
+
+		//Loop for each slice
+		for (int i = 0; i < sliceNum; i++)
+		{
+			origin[2] = i * m_Spacing[2];
+			accumulate.SetSlice(i, images[i], origin);
+			vtkDEL(images[i]);
+	}
+
+		vtkDataSet* acc_out;
+		acc_out = accumulate.GetNewOutput();
+
+		albaNEW(m_ImportedVolume);
+		m_ImportedVolume->SetName("Imported Volume");
+		m_ImportedVolume->SetDataByDetaching(acc_out, m_Input->GetMTime());
+		SetNaturalTag(m_ImportedVolume);
+
+		m_Output = m_ImportedVolume;
+	}
+  else
+	{
+		m_Output = m_ImportedGroup;
+	}
 }
 //----------------------------------------------------------------------------
-void albaOpImporterImage::BuildVolume()
-//----------------------------------------------------------------------------
+void albaOpImporterImage::SetNaturalTag(albaVME* vme)
 {
-  wxString prefix  = m_FileDirectory + "\\" + m_FilePrefix;
-  prefix.Replace("/", "\\");
-  wxString pattern = m_FilePattern  + "."  + m_FileExtension;
-  int extent[6];
+	albaTagItem tag_Nature;
+	tag_Nature.SetName("VME_NATURE");
+	tag_Nature.SetValue("NATURAL");
 
-  albaNEW(m_ImportedImageAsVolume);
-  m_ImportedImageAsVolume->SetName("Imported Volume");
+	vme->GetTagArray()->SetTag(tag_Nature);
+}
 
-  if(m_FileExtension.Upper() == "BMP")
+//----------------------------------------------------------------------------
+void albaOpImporterImage::AddImageToList(std::vector<vtkImageData*> &images, vtkImageData* image,const char *name)
+{
+	if (images.size() != 0)
 	{
-    vtkBMPReader *r = vtkBMPReader::New();
-    r->SetFileName(m_Files[0].c_str());
-    r->UpdateInformation();
-    r->GetDataExtent(extent);
-    r->Delete();
-    r = vtkBMPReader::New();
-    albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,r));
-    r->SetFileDimensionality(2);
-    r->SetFilePrefix(prefix);
-    r->SetFilePattern(pattern);
-    r->SetFileNameSliceSpacing(m_FileSpacing);
-    r->SetFileNameSliceOffset(m_FileOffset);
-    r->SetDataExtent(extent[0], extent[1], extent[2], extent[3], extent[4], m_NumFiles - 1);
-    r->SetDataVOI(extent[0], extent[1], extent[2], extent[3], extent[4], m_NumFiles - 1);
-    r->SetDataOrigin(0, 0, m_FileOffset);
-    r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
-    r->Update();
+		int *groupDims = images[0]->GetDimensions();
+		int* imageDims = image->GetDimensions();
+		vtkImageData* pushImg = NULL;
 
-		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
-		extractComponents->SetInputConnection(r->GetOutputPort());
-		extractComponents->SetComponents(0); //only R channel
-		extractComponents->Update();
-    
-    m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(),m_Input->GetTimeStamp());
-    
-    r->Delete();
-	} 
-	else if (m_FileExtension.Upper() == "JPG" || m_FileExtension.Upper() == "JPEG")
-	{
-		vtkJPEGReader *r = vtkJPEGReader::New();
-    r->SetFileName(m_Files[0].c_str());
-    r->UpdateInformation();
-    r->GetDataExtent(extent);
-    r->Delete();
-		r = vtkJPEGReader::New();
-    albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,r));
-    r->SetFileDimensionality(2);
-    r->SetFilePrefix(prefix);
-    r->SetFilePattern(pattern);
-    r->SetFileNameSliceSpacing(m_FileSpacing);
-    r->SetFileNameSliceOffset(m_FileOffset);
-    r->SetDataExtent(extent[0], extent[1], extent[2], extent[3], extent[4], m_NumFiles - 1);
-    r->SetDataOrigin(0, 0, m_FileOffset);
-    r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
-    r->Update();
-    
-		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
-		extractComponents->SetInputConnection(r->GetOutputPort());
-		extractComponents->SetComponents(0); //only R channel
-		extractComponents->Update();
-
-		m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(), m_Input->GetTimeStamp());
-    
-    r->Delete();
-	}
-	else if (m_FileExtension.Upper() == "PNG")
-	{
-		vtkPNGReader *r = vtkPNGReader::New();
-    r->SetFileName(m_Files[0].c_str());
-    r->UpdateInformation();
-    r->GetDataExtent(extent);
-    r->Delete();
-
-		r = vtkPNGReader::New();
-    albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,r));
-    r->SetFileDimensionality(2);
-    r->SetFilePrefix(prefix);
-    r->SetFilePattern(pattern);
-    r->SetFileNameSliceSpacing(m_FileSpacing);
-    r->SetFileNameSliceOffset(m_FileOffset);
-    r->SetDataExtent(extent[0], extent[1], extent[2], extent[3], extent[4], m_NumFiles - 1);
-    r->SetDataOrigin(0, 0, m_FileOffset);
-    r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
-    r->Update();
-
-		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
-		extractComponents->SetInputConnection(r->GetOutputPort());
-		extractComponents->SetComponents(0); //only R channel
-		extractComponents->Update();
-
-		m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(), m_Input->GetTimeStamp());
-		    
-    r->Delete();
-	}
-	else if (m_FileExtension.Upper() == "TIF" || m_FileExtension.Upper() == "TIFF" )
-	{
-		vtkTIFFReader *r = vtkTIFFReader::New();
-    r->SetFileName(m_Files[0].c_str());
-    r->UpdateInformation();
-    r->GetDataExtent(extent);
-    r->Delete();
-		r = vtkTIFFReader::New();
-    albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,r));
-    r->SetFileDimensionality(2);
-    r->SetFilePrefix(prefix);
-    r->SetFilePattern(pattern);
-    r->SetFileNameSliceSpacing(m_FileSpacing);
-    r->SetFileNameSliceOffset(m_FileOffset);
-    r->SetDataExtent(extent[0], extent[1], extent[2], extent[3], extent[4], m_NumFiles - 1);
-    r->SetDataOrigin(0, 0, m_FileOffset);
-    r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
-    r->Update();
-    
-		vtkALBASmartPointer<vtkImageExtractComponents> extractComponents;
-		extractComponents->SetInputConnection(r->GetOutputPort());
-		extractComponents->SetComponents(0); //only R channel
-		extractComponents->Update();
-
-		m_ImportedImageAsVolume->SetData(extractComponents->GetOutput(), m_Input->GetTimeStamp());
-
-    r->Delete();
+		if (groupDims[0] == imageDims[0] && groupDims[1] == imageDims[1] && groupDims[2] == imageDims[2])
+		{
+			vtkNEW(pushImg);
+			pushImg->DeepCopy(image);
+			images.push_back(pushImg);
+		}
+		else if (m_SkipWrongSize == FALSE)
+		{
+			albaString msg;
+			msg.Printf("Unable to import %s:\nImage dimensions are not consistent with the other images\n", name);
+			if (m_TestMode)
+			{
+				albaLogMessage(msg.GetCStr());
 	}
 	else
   {
-		albaLogMessage("unable to import %s, unrecognized type", m_Files[0].c_str());
-    albaDEL(m_ImportedImageAsVolume);
+				albaGUIDialogWarnAndSkipOthers* dialog = new albaGUIDialogWarnAndSkipOthers("Wrong image size", msg.GetCStr(), &m_SkipWrongSize);
+				dialog->ShowModal();
+			}
+		}
+	}
+	else
+	{
+		vtkImageData* pushImg = NULL;
+		vtkNEW(pushImg);
+		pushImg->DeepCopy(image);
+		images.push_back(pushImg);
   }
   
-  m_Output = m_ImportedImageAsVolume;
 }
+
 //----------------------------------------------------------------------------
-void albaOpImporterImage::SetFileName(const char *file_name)
-//----------------------------------------------------------------------------
+void albaOpImporterImage::AddFileName(const char *file_name)
 {
  m_Files.push_back(file_name);
- m_NumFiles = m_Files.size();
 }
 
 //----------------------------------------------------------------------------

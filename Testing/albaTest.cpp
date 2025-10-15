@@ -116,8 +116,7 @@ void albaTest::PauseBeforeExit()
 //----------------------------------------------------------------------------
 void albaTest::CompareImage(albaString suiteName, albaString imageName, int index)
 {
-	if (!m_RenderWindow) 
-		return;
+	CPPUNIT_ASSERT(m_RenderWindow);
 
 	// Visualization control
 	void * genericDisplayId = m_RenderWindow->GetGenericDisplayId();
