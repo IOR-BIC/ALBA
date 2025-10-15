@@ -300,6 +300,7 @@ int vtkALBAAssembly::RenderTranslucentPolygonalGeometry(vtkViewport *ren)
     vtkProp3D *prop3D = (vtkProp3D *)path->GetLastNode()->GetViewProp();
     if ( prop3D->GetVisibility()) 
 			{
+        prop3D->SetPropertyKeys(this->GetPropertyKeys());
 				prop3D->SetAllocatedRenderTime(fraction, ren);
 				prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
 	      renderedSomething += prop3D->RenderTranslucentPolygonalGeometry(ren);
