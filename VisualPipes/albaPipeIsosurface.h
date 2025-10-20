@@ -24,13 +24,16 @@
 //----------------------------------------------------------------------------
 class vtkActor;
 class vtkVolume;
-class vtkALBAContourVolumeMapper;
+class vtkSmartVolumeMapper;
 class vtkPolyDataMapper;
+class vtkVolumeProperty;
+class vtkPiecewiseFunction;
 class vtkOutlineCornerFilter;
 class albaVME;
 class albaGUIFloatSlider;
 class albaEventBase;
 class albaVMESurface;
+
 
 //----------------------------------------------------------------------------
 // albaPipeIsosurface :
@@ -100,8 +103,10 @@ protected:
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
 	virtual albaGUI  *CreateGui();
 
-	vtkALBAContourVolumeMapper   *m_ContourMapper; 
+	vtkSmartVolumeMapper     *m_ContourMapper;
 	vtkVolume                *m_Volume;
+	vtkVolumeProperty				 *m_VolumeProp;
+	vtkPiecewiseFunction		 *m_OpacityFunc;
 
 	vtkOutlineCornerFilter   *m_OutlineBox;
 	vtkPolyDataMapper        *m_OutlineMapper;
@@ -111,6 +116,7 @@ protected:
 	albaGUIFloatSlider  *m_AlphaSlider;
 	double m_ContourValue;
 	double m_AlphaValue;
+	double m_VolumeRange[2];
 
   bool m_BoundingBoxVisibility;
 

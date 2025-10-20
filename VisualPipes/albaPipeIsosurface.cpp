@@ -41,9 +41,12 @@
 #include "vtkProperty.h"
 #include "vtkActor.h"
 #include "vtkVolume.h"
-#include "vtkALBAContourVolumeMapper.h"
+#include "vtkContourValues.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineCornerFilter.h"
+#include "vtkSmartVolumeMapper.h"
+#include "vtkVolumeProperty.h"
+#include "vtkPiecewiseFunction.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeIsosurface);
@@ -78,22 +81,25 @@ void albaPipeIsosurface::Create(albaSceneNode *n)
 
 	// contour pipeline
 	vtkNEW(m_ContourMapper);
-	m_ContourMapper->SetInput(dataset);
-	m_ContourMapper->AutoLODRenderOn();
-	m_ContourMapper->SetAlpha(m_AlphaValue);
+	m_ContourMapper->SetBlendModeToIsoSurface();
+	m_ContourMapper->SetInputData(dataset);
+	m_ContourMapper->SetRequestedRenderModeToGPU();
+	
+	dataset->GetScalarRange(m_VolumeRange);
 
-	double range[2] = {0, 0};
-	dataset->GetScalarRange(range);
+  m_ContourValue = 0.5f * (m_VolumeRange[0] + m_VolumeRange[1]);
 
-	float value = 0.5f * (range[0] + range[1]);
-	while (value < range[1] && m_ContourMapper->EstimateRelevantVolume(value) > 0.3f)
-		value += 0.05f * (range[1] + range[0]) + 1.f;
-	m_ContourMapper->SetContourValue(value);
+	vtkNEW(m_VolumeProp);
+	m_VolumeProp->GetIsoSurfaceValues()->SetNumberOfContours(1);
+	m_VolumeProp->GetIsoSurfaceValues()->SetValue(0, m_ContourValue);
+	m_VolumeProp->ShadeOn();
 
-	m_ContourValue = m_ContourMapper->GetContourValue();
+	vtkNEW(m_OpacityFunc);
+	SetAlphaValue(m_AlphaValue);
 
   vtkNEW(m_Volume);
   m_Volume->SetMapper(m_ContourMapper);
+	m_Volume->SetProperty(m_VolumeProp);
   m_Volume->PickableOff();
   m_AssemblyFront->AddPart(m_Volume);
 
@@ -152,7 +158,8 @@ bool albaPipeIsosurface::SetContourValue(float value)
 	if (m_ContourMapper == NULL)
 		return false;
   m_ContourValue = value;
-	m_ContourMapper->SetContourValue(m_ContourValue);
+
+	m_VolumeProp->GetIsoSurfaceValues()->SetValue(0, m_ContourValue);
 	m_ContourMapper->Modified();
 	return true;
 }
@@ -160,9 +167,7 @@ bool albaPipeIsosurface::SetContourValue(float value)
 //----------------------------------------------------------------------------
 float albaPipeIsosurface::GetContourValue() 
 {
-	if (m_ContourMapper == NULL)
-		return 0.;
-	return m_ContourMapper->GetContourValue();
+	return (m_ContourMapper == NULL) ? 0 : m_ContourValue;
 }
 //----------------------------------------------------------------------------
 albaGUI *albaPipeIsosurface::CreateGui()
@@ -197,11 +202,7 @@ void albaPipeIsosurface::OnEvent(albaEventBase *alba_event)
 			}
 			break;
 		  case ID_ALPHA_VALUE:
-			{
-				m_ContourMapper->SetAlpha(m_AlphaValue);
-				m_ContourMapper->Modified();
-				m_Vme->ForwardUpEvent(&albaEvent(this,CAMERA_UPDATE));
-			}
+				SetAlphaValue(m_AlphaValue);
 			break;
 		  default:
 			break;
@@ -220,7 +221,7 @@ void albaPipeIsosurface::UpdateFromData()
   {
     if (m_ContourMapper != NULL)
     {
-      m_ContourMapper->SetInput(dataset);
+      m_ContourMapper->SetInputData(dataset);
       m_ContourMapper->Update();
     }
   }
@@ -229,7 +230,7 @@ void albaPipeIsosurface::UpdateFromData()
 void albaPipeIsosurface::ExctractIsosurface(albaVMESurface *isoSurface /* = NULL */)
 {
 	vtkPolyData *surface = vtkPolyData::New();
-	m_ContourMapper->GetOutput(0, surface);
+	//m_ContourMapper->GetOutput(0, surface);
 	m_ContourMapper->Update();
 
   if(m_ExtractIsosurfaceName.Equals(""))
@@ -259,7 +260,10 @@ void albaPipeIsosurface::EnableBoundingBoxVisibility(bool enable)
 void albaPipeIsosurface::SetAlphaValue(double value)
 {
 	m_AlphaValue=value;
-	m_ContourMapper->SetAlpha(m_AlphaValue);
+	m_OpacityFunc->RemoveAllPoints();
+	m_OpacityFunc->AddPoint(m_VolumeRange[0], m_AlphaValue);
+	m_OpacityFunc->AddPoint(m_VolumeRange[1], m_AlphaValue);
+
 	m_ContourMapper->Modified();
 	m_Vme->ForwardUpEvent(&albaEvent(this,CAMERA_UPDATE));
 }
@@ -274,7 +278,7 @@ void albaPipeIsosurface::SetEnableContourAnalysis( bool clean )
 {
   if (m_ContourMapper)
   {
-	  m_ContourMapper->SetEnableContourAnalysis(clean);
+	  //m_ContourMapper->SetEnableContourAnalysis(clean);
 	  m_ContourMapper->Update();
   }
 }
