@@ -47,6 +47,14 @@
 #include "vtkSmartVolumeMapper.h"
 #include "vtkVolumeProperty.h"
 #include "vtkPiecewiseFunction.h"
+#include "vtkColorTransferFunction.h"
+#include "vtkAssembly.h"
+
+
+#include <vtkAutoInit.h>
+
+VTK_MODULE_INIT(vtkRenderingOpenGL2);
+VTK_MODULE_INIT(vtkRenderingVolumeOpenGL2);
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeIsosurface);
@@ -84,18 +92,33 @@ void albaPipeIsosurface::Create(albaSceneNode *n)
 	m_ContourMapper->SetBlendModeToIsoSurface();
 	m_ContourMapper->SetInputData(dataset);
 	m_ContourMapper->SetRequestedRenderModeToGPU();
+	m_ContourMapper->SetSampleDistance(0.2);
 	
 	dataset->GetScalarRange(m_VolumeRange);
 
-  m_ContourValue = 0.5f * (m_VolumeRange[0] + m_VolumeRange[1]);
+  m_ContourValue = m_VolumeRange[0]*0.3 + m_VolumeRange[1]*0.7;
 
 	vtkNEW(m_VolumeProp);
 	m_VolumeProp->GetIsoSurfaceValues()->SetNumberOfContours(1);
 	m_VolumeProp->GetIsoSurfaceValues()->SetValue(0, m_ContourValue);
+
+	m_VolumeProp->SetAmbient(0.4);
+	m_VolumeProp->SetDiffuse(0.8);
+	m_VolumeProp->SetSpecular(0.1);
+	m_VolumeProp->SetSpecularPower(6.0);
 	m_VolumeProp->ShadeOn();
+
+	// Transfer function for colors
+	vtkNEW(m_ColorFunc);
+	m_ColorFunc->AddRGBPoint(0.0, 1, 1, 1);
+	m_ColorFunc->AddRGBPoint(255.0, 1, 1, 1);
+
 
 	vtkNEW(m_OpacityFunc);
 	SetAlphaValue(m_AlphaValue);
+
+	m_VolumeProp->SetColor(m_ColorFunc);
+	m_VolumeProp->SetScalarOpacity(m_OpacityFunc);
 
   vtkNEW(m_Volume);
   m_Volume->SetMapper(m_ContourMapper);
@@ -261,8 +284,8 @@ void albaPipeIsosurface::SetAlphaValue(double value)
 {
 	m_AlphaValue=value;
 	m_OpacityFunc->RemoveAllPoints();
-	m_OpacityFunc->AddPoint(m_VolumeRange[0], m_AlphaValue);
-	m_OpacityFunc->AddPoint(m_VolumeRange[1], m_AlphaValue);
+		m_OpacityFunc->AddPoint(m_VolumeRange[0], m_AlphaValue);
+		m_OpacityFunc->AddPoint(m_VolumeRange[1], m_AlphaValue);
 
 	m_ContourMapper->Modified();
 	m_Vme->ForwardUpEvent(&albaEvent(this,CAMERA_UPDATE));

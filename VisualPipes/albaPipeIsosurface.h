@@ -33,6 +33,7 @@ class albaVME;
 class albaGUIFloatSlider;
 class albaEventBase;
 class albaVMESurface;
+class vtkColorTransferFunction;
 
 
 //----------------------------------------------------------------------------
@@ -107,7 +108,8 @@ protected:
 	vtkVolume                *m_Volume;
 	vtkVolumeProperty				 *m_VolumeProp;
 	vtkPiecewiseFunction		 *m_OpacityFunc;
-
+	vtkColorTransferFunction *m_ColorFunc;
+	
 	vtkOutlineCornerFilter   *m_OutlineBox;
 	vtkPolyDataMapper        *m_OutlineMapper;
 	vtkActor                 *m_OutlineActor;
