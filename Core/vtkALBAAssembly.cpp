@@ -298,9 +298,10 @@ int vtkALBAAssembly::RenderTranslucentPolygonalGeometry(vtkViewport *ren)
 		for (this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); )
 		{
     vtkProp3D *prop3D = (vtkProp3D *)path->GetLastNode()->GetViewProp();
-    if ( prop3D->GetVisibility()) 
+    if (prop3D->GetVisibility() && prop3D->HasTranslucentPolygonalGeometry())
 			{
-				prop3D->SetAllocatedRenderTime(fraction, ren);
+  			prop3D->SetPropertyKeys(this->GetPropertyKeys());
+        prop3D->SetAllocatedRenderTime(fraction, ren);
 				prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
 	      renderedSomething += prop3D->RenderTranslucentPolygonalGeometry(ren);
 				prop3D->PokeMatrix(NULL);
@@ -334,8 +335,9 @@ int vtkALBAAssembly::RenderOpaqueGeometry(vtkViewport *ren)
 		for (this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); )
 		{
 	    vtkProp3D *prop3D = (vtkProp3D *)path->GetLastNode()->GetViewProp();
-    	if (prop3D->GetVisibility()) 
+    	if (prop3D->GetVisibility() && prop3D->HasOpaqueGeometry())
 			{
+				prop3D->SetPropertyKeys(this->GetPropertyKeys());
 				prop3D->SetAllocatedRenderTime(fraction, ren);
 				prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
 				renderedSomething += prop3D->RenderOpaqueGeometry(ren);
@@ -372,7 +374,7 @@ int vtkALBAAssembly::RenderVolumetricGeometry(vtkViewport* ren)
 	for (this->Paths->InitTraversal(sit); (path = this->Paths->GetNextPath(sit));)
 	{
 		vtkProp3D* prop3D = static_cast<vtkProp3D*>(path->GetLastNode()->GetViewProp());
-		if (prop3D->GetVisibility())
+		if (prop3D->GetVisibility() && vtkVolume::SafeDownCast(prop3D))
 		{
 			prop3D->SetPropertyKeys(this->GetPropertyKeys());
 			prop3D->SetAllocatedRenderTime(fraction, ren);
