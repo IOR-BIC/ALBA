@@ -80,45 +80,51 @@
 !define !defineifexist "!insertmacro !defineifexist"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Check If VS2015 Redistributable Package Is Already Installed
+;; Check If VS Redistributable Package Is Already Installed
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;    
-Function CheckIfVS2015RedistributablePackageIsAlreadyInstalled
-	;-------------------------
-	;Windows 7 64 Check
-	;-------------------------
-	${registry::Read} "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0\VC\Runtimes\@INSTALLER_ARCH@" "Installed" $R0 $R1
+!define VS_VER "14.0" ; Define Visual Studio Redistributable version
+!define MIN_MAJOR "14"
+!define MIN_MINOR "44" ; Minimal acceptable minor version (example: 14.44.xxxx.x)
 
-	IntCmp $R0 1 registry_key_present1 registry_key_not_found1
-	registry_key_present1:		 
-		;MessageBox MB_OK "registry key found Value=$R0"
-		;continue
-		return
-		 
-	registry_key_not_found1:		 
-		;MessageBox MB_OK "registry key not found Value=$R0"   
-		;continue the check for other windows version ...
-		 
-	;-------------------------
-	;Other Windows Check? (to be tested...)
-	;-------------------------
-	${registry::Read} "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\@INSTALLER_ARCH@" "Installed" $R0 $R1
+Function CheckIfVSRedistributablePackageIsAlreadyInstalled
+    ;----------------------------------
+    ; Windows Registry Check
+    ;----------------------------------
+    ; Read "Installed" value from registry
+    ${registry::Read} "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\${VS_VER}\VC\Runtimes\@INSTALLER_ARCH@" "Installed" $R0 $R1
 
-	IntCmp $R0 1 registry_key_present2 registry_key_not_found2
-	registry_key_present2:		 
-		;MessageBox MB_OK "registry key found Value=$R0"
-		;continue
-		return
-		 
-	registry_key_not_found2:		 
-		;MessageBox MB_OK "registry key not found Value=$R0"   
-		 
+    IntCmp $R0 1 registry_key_present install_redist
+
+    registry_key_present:
+        ; Check the version if installed
+        ${registry::Read} "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\${VS_VER}\VC\Runtimes\@INSTALLER_ARCH@" "Version" $R2 $R3
+        ; Example value: "v14.44.33130.0"
+
+        StrCpy $R4 $R2 2 1 ; Extract major (characters 2-3)
+        StrCpy $R5 $R2 2 4 ; Extract minor (characters 5-6)
+
+        ; Convert to integers
+        ${If} $R4 < ${MIN_MAJOR}
+            Goto install_redist
+        ${ElseIf} $R4 = ${MIN_MAJOR}
+            ${If} $R5 < ${MIN_MINOR}
+                Goto install_redist
+            ${EndIf}
+        ${EndIf}
+
+        ; Everything ok
+        ; MessageBox MB_OK "VS Redistributable version $R2 is recent enough"
+        Return
+
+    ; If key not found, install it
+    install_redist:
 		MessageBox MB_OK "\
-	Microsoft Visual C++ 2015 Redistributable Package is needed in order \
-	to install this application. The installer will now install them."
-		 
-		;ExecShell "open" "https://www.microsoft.com/en-us/download/details.aspx?id=30679"
+Microsoft Visual C++ Redistributable Package is required to install this application. \
+The installer will now install or update it."
 		ExecWait '"$INSTDIR\bin\vc_redist.@INSTALLER_ARCH@.exe"'
+		Return
 FunctionEnd
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
