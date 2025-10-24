@@ -125,10 +125,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 #endif
 
 
-  static inline double log2( double val )
-  {
-    return log(val) / log(2.0);	
-  }
+  
   GLint
     getUniformLocation( GLuint program, const std::string& name )
   {
