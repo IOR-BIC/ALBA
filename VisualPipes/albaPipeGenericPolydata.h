@@ -29,6 +29,7 @@
 class albaAxes;
 class albaGUIMaterialButton;
 class vtkALBAPolyDataNormals;
+class vtkAlgorithmOutput;
 class vtkPolyData;
 class vtkDataSet;
 
@@ -125,9 +126,9 @@ protected:
 	vtkActor                *m_OutlineActor;
 	vtkALBAPolyDataNormals  *m_NormalsFilter;
 	albaAxes                *m_Axes;
-	vtkPolyData							*m_InputAsPolydata;
+	vtkAlgorithmOutput			*m_PolydataConnection;
 
-	virtual vtkPolyData* GetInputAsPolyData() = 0;
+	virtual vtkAlgorithmOutput *GetPolyDataOutputPort() = 0;
 	
 
   albaGUIMaterialButton       *m_MaterialButton;
@@ -141,7 +142,10 @@ protected:
 	int											 m_ShowOutLine;
 	double				           m_Border;
 
+	/** Create Gui specific for Generic Polydata */
+	void CreateGenericPolydataGui(albaGUI* gui);
+
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
 	virtual albaGUI  *CreateGui();
-};  
+};
 #endif // __albaPipeGenericPolydata_H__

@@ -68,7 +68,7 @@ albaPipeGenericPolydata::albaPipeGenericPolydata()
 	m_ActorWired			= NULL;
 	m_MapperWired			= NULL;
 	m_Axes						= NULL;
-	m_InputAsPolydata = NULL;
+	m_PolydataConnection = NULL;
 	m_NormalsFilter   = NULL;
 
   m_UseVTKProperty  = 1;
@@ -130,11 +130,11 @@ void albaPipeGenericPolydata::ExecutePipe()
 	
 	ManageScalarOnExecutePipe(dataSet);
 	
-	vtkPolyData *polyData=GetInputAsPolyData();
+	vtkAlgorithmOutput *polyDataPort=GetPolyDataOutputPort();
 
 	if (m_SkipNormalFilter)
 	{
-		m_Mapper->SetInputData(polyData);
+		m_Mapper->SetInputConnection(polyDataPort);
 	}
 	else
 	{
@@ -142,23 +142,23 @@ void albaPipeGenericPolydata::ExecutePipe()
 		m_NormalsFilter->SetFlipNormals(m_FlipNormals);
 		m_NormalsFilter->SetComputePointNormals(!m_ShowCellsNormals);
 		m_NormalsFilter->SetComputeCellNormals(m_ShowCellsNormals);
-		m_NormalsFilter->SetInputData(polyData);
+		m_NormalsFilter->SetInputConnection(polyDataPort);
 		m_Mapper->SetInputConnection(m_NormalsFilter->GetOutputPort());
 	}
 
   m_Mapper->Update();
-	m_Mapper->SetResolveCoincidentTopologyToPolygonOffset();
+	m_Mapper->SetResolveCoincidentTopologyToOff();
 
   vtkNEW(m_MapperWired);
   if(m_SkipNormalFilter)
-  	m_MapperWired->SetInputData(polyData);
+  	m_MapperWired->SetInputConnection(polyDataPort);
   else
     m_MapperWired->SetInputConnection(m_NormalsFilter->GetOutputPort());
   m_MapperWired->SetScalarRange(0,0);
   m_MapperWired->ScalarVisibilityOff();
 
 	vtkNEW(m_Actor);
-	m_Actor->GetProperty()->BackfaceCullingOn();
+	//m_Actor->GetProperty()->BackfaceCullingOn();
 	m_Actor->SetMapper(m_Mapper);
 
   if (m_ObjectMaterial->m_MaterialType == mmaMaterial::USE_LOOKUPTABLE)
@@ -195,7 +195,7 @@ void albaPipeGenericPolydata::ExecutePipe()
   
   // selection highlight
   vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInputData(polyData);  
+	corner->SetInputConnection(polyDataPort);  
 
   vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
 	corner_mapper->SetInputConnection(corner->GetOutputPort());
@@ -253,34 +253,45 @@ albaGUI *albaPipeGenericPolydata::CreateGui()
 	assert(m_Gui == NULL);
 	m_Gui = new albaGUI(this);
   
-	m_Gui->Label("Representation:");
-	wxString representation[3] = { "Faces", "Wireframe", "Points" };
-	m_Gui->Combo(ID_REPRESENTATION,"", &m_Representation,3,representation);
-	m_Gui->FloatSlider(ID_THICKNESS,_("Thickness"),&m_Border,1.0,10.0);
-	SetRepresentation((REPRESENTATIONS) m_Representation);
-	m_Gui->Divider(2);
-	
-	wxString normalSelector[2] = { "Points Normals", "Cells Normals" };
-	m_Gui->Label("Lighting:");
-	m_Gui->Combo(ID_NORMALS_TYPE,"",&m_ShowCellsNormals,2,normalSelector);	
-	m_Gui->Divider(2);
-
-	m_Gui->Bool(ID_EDGE_VISIBILITY,_("Element Edges"), &m_BorderElementsWiredActor, 1);
-	m_Gui->Enable(ID_EDGE_VISIBILITY,m_Representation!=WIREFRAME_REP);
-
-	m_Gui->Divider(2);
-  m_Gui->Bool(ID_USE_VTK_PROPERTY,"Property",&m_UseVTKProperty, 1);
-  m_MaterialButton = new albaGUIMaterialButton(m_Vme,this);
-  m_Gui->AddGui(m_MaterialButton->GetGui());
-  m_MaterialButton->Enable(m_UseVTKProperty != 0);
+	CreateGenericPolydataGui(m_Gui);
 
 	CreateScalarsGui(m_Gui);
-  
-  m_Gui->Divider();
-  m_Gui->Label("");
-  m_Gui->Update();
+
+	m_Gui->Divider();
+	m_Gui->Label("");
+	m_Gui->Update();
+
 	return m_Gui;
 }
+
+//----------------------------------------------------------------------------
+void albaPipeGenericPolydata::CreateGenericPolydataGui(albaGUI *gui)
+{
+	gui->Label("Representation:");
+	wxString representation[3] = { "Faces", "Wireframe", "Points" };
+	gui->Combo(ID_REPRESENTATION, "", &m_Representation, 3, representation);
+	gui->FloatSlider(ID_THICKNESS, _("Thickness"), &m_Border, 1.0, 10.0);
+	SetRepresentation((REPRESENTATIONS)m_Representation);
+	gui->Divider(2);
+
+	if (!m_SkipNormalFilter)
+	{
+		wxString normalSelector[2] = { "Points Normals", "Cells Normals" };
+		gui->Label("Lighting:");
+		gui->Combo(ID_NORMALS_TYPE, "", &m_ShowCellsNormals, 2, normalSelector);
+		gui->Divider(2);
+	}
+
+	gui->Bool(ID_EDGE_VISIBILITY, _("Element Edges"), &m_BorderElementsWiredActor, 1);
+	gui->Enable(ID_EDGE_VISIBILITY, m_Representation != WIREFRAME_REP);
+
+	gui->Divider(2);
+	gui->Bool(ID_USE_VTK_PROPERTY, "Property", &m_UseVTKProperty, 1);
+	m_MaterialButton = new albaGUIMaterialButton(m_Vme, this);
+	gui->AddGui(m_MaterialButton->GetGui());
+	m_MaterialButton->Enable(m_UseVTKProperty != 0);
+}
+
 //----------------------------------------------------------------------------
 void albaPipeGenericPolydata::OnEvent(albaEventBase *alba_event)
 {
@@ -390,8 +401,6 @@ void albaPipeGenericPolydata::SetActorPicking(int enable)
 //----------------------------------------------------------------------------
 void albaPipeGenericPolydata::SetRepresentation(REPRESENTATIONS rep)
 {
-	vtkPolyData* inputAsPolyData = GetInputAsPolyData();
-
 	m_Representation = rep;
 
 	if (m_Actor)

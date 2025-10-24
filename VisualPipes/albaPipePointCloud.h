@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-
+class vtkTrivialProducer;
 
 //----------------------------------------------------------------------------
 // albaPipePointCloud :
@@ -48,6 +48,7 @@ public:
 	virtual void UpdateProperty(bool fromTag = false);
 protected:
 
-	vtkPolyData* GetInputAsPolyData();
-};  
+	vtkAlgorithmOutput *GetPolyDataOutputPort();
+	vtkTrivialProducer* m_TrivialProd;
+};
 #endif // __albaPipePointCloud_H__
