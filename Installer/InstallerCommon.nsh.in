@@ -325,7 +325,7 @@ FunctionEnd
 										 
 		SetOutPath "$INSTDIR\bin"
 							
-		Call CheckIfVS2015RedistributablePackageIsAlreadyInstalled
+		Call CheckIfVSRedistributablePackageIsAlreadyInstalled
 	
 	SectionEnd
 
