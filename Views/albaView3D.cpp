@@ -321,7 +321,7 @@ void albaView3D::VmeCreatePipe(albaVME *vme)
 			}
       if(pipe_name == "albaPipeIsosurface")
       {
-        ((albaPipeIsosurface *)pipe)->EnableBoundingBoxVisibility(false);
+        ((albaPipeIsosurface *)pipe)->SetShowOutLine(false);
       }
 			if(pipe_name == "albaPipeVolumeMIP")
 			{
