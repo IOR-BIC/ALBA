@@ -305,6 +305,8 @@ int vtkALBATubeFilter::RequestData(vtkInformation *vtkNotUsed(request), vtkInfor
 	lineNormalGenerator->Delete();
 
 	output->Squeeze();
+
+	return 1;
 }
 
 
