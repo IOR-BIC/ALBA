@@ -75,15 +75,6 @@ IF (ALBA_USE_VTK)
   )
 ENDIF (ALBA_USE_VTK)
 
-IF(WIN32)
-  SET(PROJECT_SRCS
-  ${PROJECT_SRCS}
-  albaPipeIsosurfaceGPU.cpp  				albaPipeIsosurfaceGPU.h
-  )
-ENDIF(WIN32)
-
-
-
 IF (ALBA_USE_CRYPTO)
   SET(PROJECT_LIBS ${PROJECT_LIBS} Crypto )
 ENDIF (ALBA_USE_CRYPTO)

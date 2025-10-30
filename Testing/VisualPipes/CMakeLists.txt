@@ -21,7 +21,6 @@ SET(PROJECT_SRCS
 	albaPipeIsosurfaceTest.h albaPipeIsosurfaceTest.cpp
 	albaPipePointSetTest.h albaPipePointSetTest.cpp
 	albaPipeFactoryVMETest.h albaPipeFactoryVMETest.cpp
-	albaPipeIsosurfaceGPUTest.h albaPipeIsosurfaceGPUTest.cpp
 	albaPipePolylineTest.h albaPipePolylineTest.cpp
 	albaPipeLandmarkCloudTest.h albaPipeLandmarkCloudTest.cpp
 	albaPipeVectorTest.h albaPipeVectorTest.cpp

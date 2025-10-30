@@ -18,8 +18,6 @@ SET(vtkALBA_SRCS
   vtkALBACellsFilter.cxx  								vtkALBACellsFilter.h  
   vtkALBARemoveCellsFilter.cxx  							vtkALBARemoveCellsFilter.h
   vtkALBAClipSurfaceBoundingBox.cxx  					vtkALBAClipSurfaceBoundingBox.h
-  vtkALBAContourVolumeMapper.cxx  						vtkALBAContourVolumeMapper.h
-  vtkALBAContourVolumeMapperAdv.cxx  					vtkALBAContourVolumeMapperAdv.h
   vtkALBADistanceFilter.cxx  							vtkALBADistanceFilter.h
   vtkALBADOFMatrix.cxx  									vtkALBADOFMatrix.h
   vtkALBAExtendedGlyph3D.cxx  							vtkALBAExtendedGlyph3D.h
@@ -107,12 +105,6 @@ SET(vtkALBA_SRCS
   vtkALBAStructuredPointsAlgorithm.cxx vtkALBAStructuredPointsAlgorithm.h
 )
 
-IF(WIN32)
-SET(vtkALBA_SRCS
-	${vtkALBA_SRCS}
-  vtkALBAContourVolumeMapperGPU.cxx  					vtkALBAContourVolumeMapperGPU.h
-  )
-ENDIF(WIN32)
 
 IF (ALBA_USE_ITK)
 SET(vtkALBA_SRCS  ${vtkALBA_SRCS}
