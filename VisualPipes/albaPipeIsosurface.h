@@ -28,6 +28,7 @@
 class vtkAlgorithmOutput;
 class vtkFlyingEdges3D;
 class albaVMESurface;
+class vtkPolyData;
 class vtkContourFilter;
 
 //----------------------------------------------------------------------------
@@ -58,7 +59,8 @@ public:
 
 	/** process events coming from Gui */
 	virtual void OnEvent(albaEventBase* alba_event);
-	void ExctractIsosurface(albaVMESurface *isoSurfaceVme = NULL);
+	void ExctractIsosurface(albaVMESurface* isoSurfaceVme = NULL);
+	void ExctractIsosurface(vtkPolyData* isoSurfacePD);
 
 
 	void SetAlphaValue(double value);

@@ -149,6 +149,18 @@ void albaPipeIsosurface::ExctractIsosurface(albaVMESurface* isoSurfaceVME /* = N
 	
 }
 
+void albaPipeIsosurface::ExctractIsosurface(vtkPolyData* isoSurfacePD)
+{
+	if (m_ContourFilter == NULL && m_RGContourFilter == NULL)
+		return;
+
+	vtkPolyDataAlgorithm* filter = (m_ContourFilter != NULL) ? (vtkPolyDataAlgorithm*)m_ContourFilter : m_RGContourFilter;
+	filter->Update();
+	vtkPolyData* surface = filter->GetOutput();
+
+	isoSurfacePD->DeepCopy(surface);
+}
+
 //----------------------------------------------------------------------------
 albaGUI* albaPipeIsosurface::CreateGui()
 {
