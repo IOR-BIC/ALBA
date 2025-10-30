@@ -57,8 +57,11 @@
 #include "vtkProperty.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineCornerFilter.h"
-#include "vtkImageData.h"
 #include "albaTagArray.h"
+
+#include <vtkAutoInit.h>
+VTK_MODULE_INIT(vtkRenderingOpenGL2);
+VTK_MODULE_INIT(vtkRenderingVolumeOpenGL2);
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeRayCast);

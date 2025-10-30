@@ -57,6 +57,10 @@
 #include "vtkGPUVolumeRayCastMapper.h"
 #include "vtkAlgorithm.h"
 
+//force moudule init to avoid a crash on shallowcopy
+#include <vtkAutoInit.h>
+VTK_MODULE_INIT(vtkRenderingOpenGL2);
+
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeVolumeMIP);
 //----------------------------------------------------------------------------
