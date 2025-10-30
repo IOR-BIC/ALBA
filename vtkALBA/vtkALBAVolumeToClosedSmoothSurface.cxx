@@ -23,7 +23,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkMatrix4x4.h"
 #include "vtkALBASmartPointer.h"
-#include "vtkALBAContourVolumeMapper.h"
+#include "vtkFlyingEdges3D.h"
+#include "vtkContourFilter.h"
 #include "vtkALBAFillingHole.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkTransform.h"
@@ -34,6 +35,10 @@
 
 #include "albaDefines.h"
 #include "vtkALBAVolumeToClosedSmoothSurface.h"
+#include "vtkInformationVector.h"
+#include "vtkInformation.h"
+#include "vtkPlaneCollection.h"
+#include "vtkClipClosedSurface.h"
 
 
 
@@ -45,8 +50,6 @@ vtkALBAVolumeToClosedSmoothSurface::vtkALBAVolumeToClosedSmoothSurface()
 //----------------------------------------------------------------------------
 {
   //Setting default values
-  BorderVolumeID=NULL;
-  BorderVolumeRG=NULL;
   FillHoles = true;
   SmoothSurface = true;
 }
@@ -55,9 +58,6 @@ vtkALBAVolumeToClosedSmoothSurface::vtkALBAVolumeToClosedSmoothSurface()
 vtkALBAVolumeToClosedSmoothSurface::~vtkALBAVolumeToClosedSmoothSurface()
 //----------------------------------------------------------------------------
 { 
-    //Deleting pre allocated structures
-    vtkDEL(BorderVolumeID);
-    vtkDEL(BorderVolumeRG);
 }
 
 
@@ -100,320 +100,158 @@ void vtkALBAVolumeToClosedSmoothSurface::GetTransformFactor( int toUnity,double 
 
 }
 
-//----------------------------------------------------------------------------
-vtkPolyData * vtkALBAVolumeToClosedSmoothSurface::GetOutput( int level /*= 0*/, vtkPolyData *data /*= NULL*/ )
-//----------------------------------------------------------------------------
-{
-  vtkPolyData *polydata=Superclass::GetOutput(level,data);
-
-  if (SmoothSurface)
-  {
-    //Smoothing Procedure
-    vtkALBASmartPointer<vtkWindowedSincPolyDataFilter> smoothFilter;
-
-    double bounds[6];
-    double traslation[3];
-    double scale[3];
-
-    //Transforming Surface in [-1,1],[-1,1],[-1,1] 
-    //To improve the numerical stability of the solution 
-    polydata->GetBounds(bounds);
-    GetTransformFactor(true,bounds,scale,traslation);
-    vtkALBASmartPointer<vtkTransform> transform;
-    transform->PostMultiply();
-    transform->Translate(traslation);
-    transform->Scale(scale);
-    vtkALBASmartPointer<vtkTransformPolyDataFilter> transformFilter;
-    transformFilter->SetTransform(transform);
-    transformFilter->SetInputData(polydata);
-    transformFilter->Update();
-
-    //Taubin Smooth filter apply
-    smoothFilter->SetInputConnection(transformFilter->GetOutputPort());
-    smoothFilter->SetFeatureAngle(30.0);
-    smoothFilter->SetBoundarySmoothing(0);
-    smoothFilter->SetNonManifoldSmoothing(0);
-    smoothFilter->SetFeatureEdgeSmoothing(0);
-    smoothFilter->SetNumberOfIterations(10);
-    smoothFilter->SetPassBand(0.1);
-    smoothFilter->Update();
-
-    //Re-Transforming smoothed output in [-1,1],[-1,1],[-1,1] 
-    //To remove filter scaling/traslation artifact
-    smoothFilter->GetOutput()->GetBounds(bounds);
-    GetTransformFactor(true,bounds,scale,traslation);
-    vtkALBASmartPointer<vtkTransform> transform2;
-    transform2->PostMultiply();
-    transform2->Translate(traslation);
-    transform2->Scale(scale);
-    vtkALBASmartPointer<vtkTransformPolyDataFilter> transformFilter2;
-    transformFilter2->SetTransform(transform2);
-    transformFilter2->SetInputConnection(smoothFilter->GetOutputPort());
-    transformFilter2->Update();
-
-
-    //inverse transform to align outputs to original bounds 
-    polydata->GetBounds(bounds);
-    GetTransformFactor(false,bounds,scale,traslation);
-    vtkALBASmartPointer<vtkTransform> transform3;
-    //in this case we need to scale first to obtain the surface 
-    //at the original size and then we translate it to the original pos
-    transform3->PostMultiply();
-    transform3->Scale(scale);
-    transform3->Translate(traslation);
-    vtkALBASmartPointer<vtkTransformPolyDataFilter> transformFilter3;
-    transformFilter3->SetTransform(transform3);
-    transformFilter3->SetInputConnection(transformFilter2->GetOutputPort());
-    transformFilter3->Update();
-
-    polydata->DeepCopy(transformFilter3->GetOutput());
-  }
-  if (FillHoles)
-  {
-    //When Fill holes is enabled the border on the volume,
-    //this generate a border outiside the volume in the output surface
-    //Here we remove that border
-    double pointCoords[3];
-
-    //this epsilon is needed to show the surface in first and last slice 
-    //this is need because there are some approximation problems
-    int nPoints;
-    vtkPoints *newPoints;
-    
-
-    //get number of points
-    nPoints=polydata->GetNumberOfPoints();
-    
-    vtkNEW(newPoints);
-    //new point array whitout border
-    newPoints->SetNumberOfPoints(nPoints);
-
-    double limits[6];
-
-    
-    limits[0]=InputBounds[0]+VoxelShift[0];
-    limits[1]=InputBounds[1]-VoxelShift[1];
-    limits[2]=InputBounds[2]+VoxelShift[2];
-    limits[3]=InputBounds[3]-VoxelShift[3];
-    limits[4]=InputBounds[4]+VoxelShift[4];
-    limits[5]=InputBounds[5]-VoxelShift[5];
-
-    for (int i=0;i<nPoints;i++)
-    {
-      //X coordinate
-      polydata->GetPoint(i,pointCoords);
-      if (pointCoords[0]<limits[0])
-        pointCoords[0]=InputBounds[0]-VoxelShift[0];
-      if (pointCoords[0]>limits[1])
-        pointCoords[0]=InputBounds[1]+VoxelShift[1];
-
-      //Y coordinate
-      if (pointCoords[1]<limits[2])
-        pointCoords[1]=InputBounds[2]-VoxelShift[2];
-      if (pointCoords[1]>limits[3])
-        pointCoords[1]=InputBounds[3]+VoxelShift[3];
-
-      //Z coordinate
-      if (pointCoords[2]<limits[4])
-        pointCoords[2]=InputBounds[4]-VoxelShift[4];
-      if (pointCoords[2]>limits[5])
-        pointCoords[2]=InputBounds[5]+VoxelShift[5];
-
-      newPoints->SetPoint(i,pointCoords);
-    }
-    
-    polydata->SetPoints(newPoints);
-    
-    vtkDEL(newPoints);
-  
-  }
-
-  return polydata;
-}
-
 //X,Y,Z to point ID define
 #define COORD_TO_ID(x,y,z)  (z)*(inputDimensions[0])*(inputDimensions[1]) + (y)*(inputDimensions[0]) + (x)
 
-//-------------------------------------------------------------------
-void vtkALBAVolumeToClosedSmoothSurface::Update()
-//------------------------------------------------------------------------------
+
+int vtkALBAVolumeToClosedSmoothSurface::RequestData(vtkInformation* vtkNotUsed(request), vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+	// get the info objects
+	vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  if (vtkImageData::SafeDownCast(this->GetInput()) != NULL || vtkRectilinearGrid::SafeDownCast(this->GetInput()) != NULL) 
-  {
+	// Initialize some frequently used values.
+	vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+	vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-    //common variables
-    double spacing[3],range[2],origin[3];
-    int inputDimensions[3],newDimension[3],x,y,z,rest;
-    vtkPointData *inputPD, *newPD;
-    vtkDataArray *inputScalars;
-    vtkDoubleArray *newScalars;
-    int newPoints;
+  if (vtkImageData::SafeDownCast(input) == NULL && vtkRectilinearGrid::SafeDownCast(input) == NULL)
+	{
+		vtkErrorMacro(<< "Bad inputm vtkImagedata or vtkRectilinearGrid are required");
+		return 0;
+	}
 
-    //IMAGE DATA
-    if (FillHoles && vtkImageData::SafeDownCast(this->GetInput()) != NULL)
-    {
-      //Create new image data with a border outside 
-      vtkImageData *inputVolume;
-      
-      inputVolume=vtkImageData::SafeDownCast(this->GetInput());
-
-      // Stores Input Bounds
-      inputVolume->GetBounds(InputBounds);
-      
-      //Get image data necessary information
-      inputVolume->GetSpacing(spacing);
-      inputVolume->GetDimensions(inputDimensions);
-      inputVolume->GetOrigin(origin);
-      inputVolume->GetScalarRange(range);
-      inputPD=inputVolume->GetPointData();
-      inputScalars=inputPD->GetScalars();
-
-      //Creating new imagedata with border outside
-      vtkNEW(BorderVolumeID);
-      BorderVolumeID->SetSpacing(spacing);
-      //New origin is in x-xSpacing,y-ySpacing,z-zSpacing 
-      //because we add a voxel outside the volume
-      BorderVolumeID->SetOrigin(origin[0]-spacing[0],origin[1]-spacing[1],origin[2]-spacing[2]);
-      newPD=BorderVolumeID->GetPointData();
-      
-      //Saving final filter info
-      VoxelShift[0]=VoxelShift[1]=spacing[0]/3.0;
-      VoxelShift[2]=VoxelShift[3]=spacing[1]/3.0;
-      VoxelShift[4]=VoxelShift[5]=spacing[2]/3.0;
-      
-    }
-    //RECTILINEAR GRID
-    else if (FillHoles)
-    {
-      
-      //Create new rectlinear with a border outside 
-      vtkRectilinearGrid *inputVolume;
-      int ncoord;
-      vtkDoubleArray *newXCoord,*newYCoord,*newZCoord;
-      vtkDataArray *inputXCoord,*inputYCoord,*inputZCoord;
-
-      inputVolume=vtkRectilinearGrid::SafeDownCast(this->GetInput());
-
-      // Stores Input Bounds
-      inputVolume->GetBounds(InputBounds);
-      
-      //Get rectilinear grid necessary information
-      inputVolume->GetDimensions(inputDimensions);
-      inputVolume->GetScalarRange(range);
-      inputPD=inputVolume->GetPointData();
-      inputScalars=inputPD->GetScalars();
+	vtkContourFilter* rgContourFilter = NULL;
+	vtkFlyingEdges3D* contourFilter = NULL;
+	vtkClipClosedSurface* fillHolesFilter = NULL;
+	vtkPolyData* polydata;
+	double volBounds[6];
 
 
-      vtkNEW(BorderVolumeRG);
-      newPD=BorderVolumeRG->GetPointData();
+	//EXTRACTING ISOSURFACE
+	if (vtkImageData::SafeDownCast(input))
+	{
+		vtkImageData::SafeDownCast(input)->GetBounds(volBounds);
 
-      //Create a new coordinate array with two voxel more
-      //One on the left and one on the right
-      inputXCoord=inputVolume->GetXCoordinates();
-      ncoord=inputXCoord->GetNumberOfTuples();
-      vtkNEW(newXCoord);
-      newXCoord->SetNumberOfComponents(1);
-      newXCoord->SetNumberOfTuples(ncoord+2);
-      //The size of the added left voxel  is the same of the first
-      newXCoord->SetTuple1(0,inputXCoord->GetTuple1(0)-(inputXCoord->GetTuple1(1)-inputXCoord->GetTuple1(0)));
-      VoxelShift[0]=(inputXCoord->GetTuple1(1)-inputXCoord->GetTuple1(0))/3.0;
-      for(int i=0;i<ncoord;i++)
-        newXCoord->SetTuple1(i+1,inputXCoord->GetTuple1(i));
-      //The size of the added right voxel is the same of the first
-      newXCoord->SetTuple1(ncoord+1,inputXCoord->GetTuple1(ncoord-1)+(inputXCoord->GetTuple1(ncoord-1)-inputXCoord->GetTuple1(ncoord-2)));
-      VoxelShift[1]=(inputXCoord->GetTuple1(ncoord-1)-inputXCoord->GetTuple1(ncoord-2))/3.0;
-      BorderVolumeRG->SetXCoordinates(newXCoord);
+		vtkNEW(contourFilter);
+		contourFilter->SetInputData(input);
+		contourFilter->SetComputeScalars(false);
+		contourFilter->SetComputeGradients(false);
+		contourFilter->SetComputeNormals(false);
+		contourFilter->SetValue(0, ContourValue);
+		contourFilter->Update();
 
-      //Create a new coordinate array with two voxel more
-      //One on the left and one on the right
-      inputYCoord=inputVolume->GetYCoordinates();
-      ncoord=inputYCoord->GetNumberOfTuples();
-      vtkNEW(newYCoord);
-      newYCoord->SetNumberOfComponents(1);
-      newYCoord->SetNumberOfTuples(ncoord+2);
-      //The size of the added left voxel  is the same of the first
-      newYCoord->SetTuple1(0,inputYCoord->GetTuple1(0)-(inputYCoord->GetTuple1(1)-inputYCoord->GetTuple1(0)));
-      VoxelShift[2]=(inputYCoord->GetTuple1(1)-inputYCoord->GetTuple1(0))/3.0;
-      for(int i=0;i<ncoord;i++)
-        newYCoord->SetTuple1(i+1,inputYCoord->GetTuple1(i));
-      newYCoord->SetTuple1(ncoord+1,inputYCoord->GetTuple1(ncoord-1)+(inputYCoord->GetTuple1(ncoord-1)-inputYCoord->GetTuple1(ncoord-2)));
-      VoxelShift[3]=(inputYCoord->GetTuple1(ncoord-1)-inputYCoord->GetTuple1(ncoord-2))/3.0;
-      BorderVolumeRG->SetYCoordinates(newYCoord);
+		polydata = contourFilter->GetOutput();
+	}
+	else //Rectilinear Grid
+	{
+		vtkRectilinearGrid::SafeDownCast(input)->GetBounds(volBounds);
 
-      //Create a new coordinate array with two voxel more
-      //One on the left and one on the right
-      inputZCoord=inputVolume->GetZCoordinates();
-      ncoord=inputZCoord->GetNumberOfTuples();
-      vtkNEW(newZCoord);
-      newZCoord->SetNumberOfComponents(1);
-      newZCoord->SetNumberOfTuples(ncoord+2);
-      //The size of the added left voxel  is the same of the first
-      newZCoord->SetTuple1(0,inputZCoord->GetTuple1(0)-(inputZCoord->GetTuple1(1)-inputZCoord->GetTuple1(0)));
-      VoxelShift[4]=(inputZCoord->GetTuple1(1)-inputZCoord->GetTuple1(0))/3.0;
-      for(int i=0;i<ncoord;i++)
-        newZCoord->SetTuple1(i+1,inputZCoord->GetTuple1(i));
-      //The size of the added right voxel is the same of the first
-      newZCoord->SetTuple1(ncoord+1,inputZCoord->GetTuple1(ncoord-1)+(inputZCoord->GetTuple1(ncoord-1)-inputZCoord->GetTuple1(ncoord-2)));
-      VoxelShift[5]=(inputZCoord->GetTuple1(ncoord-1)-inputZCoord->GetTuple1(ncoord-2))/3.0;
-      BorderVolumeRG->SetZCoordinates(newZCoord);
+		vtkNEW(rgContourFilter);
+		rgContourFilter->SetInputData(input);
+		rgContourFilter->SetComputeScalars(false);
+		rgContourFilter->SetComputeGradients(false);
+		rgContourFilter->SetComputeNormals(false);
+		rgContourFilter->SetValue(0, ContourValue);
+		rgContourFilter->Update();
 
-      vtkDEL(newXCoord);
-      vtkDEL(newYCoord);
-      vtkDEL(newZCoord);
-    }
-     
-    //COMMON PART
-    //both for RG and ID we need to create the news scalars
-
-    //calculating new dimensions and scalarnumbers
-    newDimension[0]=inputDimensions[0]+2;
-    newDimension[1]=inputDimensions[1]+2;
-    newDimension[2]=inputDimensions[2]+2;
-    newPoints=newDimension[0]*newDimension[1]*newDimension[2];
-
-    vtkNEW(newScalars);
-    newScalars->SetNumberOfComponents(1);
-    newScalars->SetNumberOfTuples(newPoints);
-
-    for (int i=0;i<newPoints;i++)
-    {
-      //Point coordinates subdivision
-      z=i/(newDimension[0]*newDimension[1]);
-      rest=i-(z*newDimension[0]*newDimension[1]);
-      y=rest/newDimension[0];
-      x=rest-(y*newDimension[0]);
-
-      //The voxels in the border is set to the lower range of the scalars
-      //If there is a voxel >= of the contour value at the border, we obtain a contour between
-      //that voxel and the contour
-      if (x==0 || y==0 || z == 0 || x>=newDimension[0]-1 || y >= newDimension[1]-1 || z >= newDimension[2]-1)
-        newScalars->SetTuple1(i,range[0]);
-      else
-        newScalars->SetTuple1(i, inputScalars->GetTuple1( COORD_TO_ID(x-1,y-1,z-1) ) );
-    }
-    newPD->SetScalars(newScalars);
-    newPD->Update();
-
-    if (BorderVolumeID)
-    {
-      //setting new dimensions and update
-      BorderVolumeID->SetDimensions(newDimension);
-
-      //set input is need for superclass execution 
-      SetInput(BorderVolumeID);
-    }
-    else
-    {
-      //setting new dimensions and update
-      BorderVolumeRG->SetDimensions(newDimension);
-
-      //set input is need for superclass execution 
-      SetInput(BorderVolumeRG);
-    }
-
-    Superclass::Update();
-  }
+		polydata = rgContourFilter->GetOutput();
+	}
   
+	if (FillHoles)
+	{
+		vtkALBASmartPointer<vtkPlaneCollection> planes;
+		double n[6][3] = { {-1,0,0},{1,0,0},{0,-1,0},{0,1,0},{0,0,-1},{0,0,1} };
+		double o[6][3] = {
+				{volBounds[0],0,0},{volBounds[1],0,0},
+				{0,volBounds[2],0},{0,volBounds[3],0},
+				{0,0,volBounds[4]},{0,0,volBounds[5]}
+		};
+		for (int i = 0; i < 6; i++) {
+			vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
+			plane->SetNormal(n[i]);
+			plane->SetOrigin(o[i]);
+			planes->AddItem(plane);
+		}
+
+		vtkNEW(fillHolesFilter);
+		fillHolesFilter->SetInputData(polydata);
+		fillHolesFilter->SetClippingPlanes(planes);
+		fillHolesFilter->GenerateFacesOn(); // chiude i bordi
+		fillHolesFilter->Update();
+
+		polydata = fillHolesFilter->GetOutput();
+	}
+
+
+	if (SmoothSurface)
+	{
+		//Smoothing Procedure
+		vtkALBASmartPointer<vtkWindowedSincPolyDataFilter> smoothFilter;
+
+		double bounds[6];
+		double traslation[3];
+		double scale[3];
+
+		//Transforming Surface in [-1,1],[-1,1],[-1,1] 
+		//To improve the numerical stability of the solution 
+		polydata->GetBounds(bounds);
+		GetTransformFactor(true, bounds, scale, traslation);
+		vtkALBASmartPointer<vtkTransform> transform;
+		transform->PostMultiply();
+		transform->Translate(traslation);
+		transform->Scale(scale);
+		vtkALBASmartPointer<vtkTransformPolyDataFilter> transformFilter;
+		transformFilter->SetTransform(transform);
+		transformFilter->SetInputData(polydata);
+		transformFilter->Update();
+
+		//Taubin Smooth filter apply
+		smoothFilter->SetInputConnection(transformFilter->GetOutputPort());
+		smoothFilter->SetFeatureAngle(30.0);
+		smoothFilter->SetBoundarySmoothing(0);
+		smoothFilter->SetNonManifoldSmoothing(0);
+		smoothFilter->SetFeatureEdgeSmoothing(0);
+		smoothFilter->SetNumberOfIterations(10);
+		smoothFilter->SetPassBand(0.1);
+		smoothFilter->Update();
+
+		//Re-Transforming smoothed output in [-1,1],[-1,1],[-1,1] 
+		//To remove filter scaling/traslation artifact
+		smoothFilter->GetOutput()->GetBounds(bounds);
+		GetTransformFactor(true, bounds, scale, traslation);
+		vtkALBASmartPointer<vtkTransform> transform2;
+		transform2->PostMultiply();
+		transform2->Translate(traslation);
+		transform2->Scale(scale);
+		vtkALBASmartPointer<vtkTransformPolyDataFilter> transformFilter2;
+		transformFilter2->SetTransform(transform2);
+		transformFilter2->SetInputConnection(smoothFilter->GetOutputPort());
+		transformFilter2->Update();
+
+
+		//inverse transform to align outputs to original bounds 
+		polydata->GetBounds(bounds);
+		GetTransformFactor(false, bounds, scale, traslation);
+		vtkALBASmartPointer<vtkTransform> transform3;
+		//in this case we need to scale first to obtain the surface 
+		//at the original size and then we translate it to the original pos
+		transform3->PostMultiply();
+		transform3->Scale(scale);
+		transform3->Translate(traslation);
+		vtkALBASmartPointer<vtkTransformPolyDataFilter> transformFilter3;
+		transformFilter3->SetTransform(transform3);
+		transformFilter3->SetInputConnection(transformFilter2->GetOutputPort());
+		transformFilter3->Update();
+
+		output->DeepCopy(transformFilter3->GetOutput());
+	}
+	else 
+	{
+		output->DeepCopy(polydata);
+	}
+
+	vtkDEL(contourFilter);
+	vtkDEL(rgContourFilter);
+	vtkDEL(fillHolesFilter);
 }
 

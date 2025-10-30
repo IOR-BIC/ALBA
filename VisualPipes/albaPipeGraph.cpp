@@ -356,24 +356,9 @@ void albaPipeGraph::UpdateGraph()
       rect_grid = vtkRectilinearGrid::New();
       rect_grid->SetDimensions(newTimeArray->GetNumberOfTuples(), 1, 1);
       rect_grid->SetXCoordinates(newTimeArray); 
-      rect_grid->GetPointData()->SetScalars(m_ScalarArray.at(c)); 
+      rect_grid->GetPointData()->SetScalars(scalar);
       m_VtkData.push_back(rect_grid);
-      m_PlotActor->AddDataSetInput(m_VtkData.at(c));
-    }
-    else
-    {
-      scalar = vtkDoubleArray::New();
-      fakeTimeArray->Resize(0);
-      scalar->InsertValue(0, scalarData);  //now scalarData is a fake value, already present in the plot
-      m_ScalarArray.push_back(scalar);
-
-      vtkRectilinearGrid *rect_grid;
-      rect_grid = vtkRectilinearGrid::New();
-      rect_grid->SetDimensions(fakeTimeArray->GetNumberOfTuples(), 1, 1);
-      rect_grid->SetXCoordinates(fakeTimeArray); 
-      rect_grid->GetPointData()->SetScalars(m_ScalarArray.at(c)); 
-      m_VtkData.push_back(rect_grid);
-      m_PlotActor->AddDataSetInput(m_VtkData.at(c));
+      m_PlotActor->AddDataSetInput(rect_grid);
     }
   }
 
@@ -442,7 +427,7 @@ void albaPipeGraph::UpdateGraph()
   vtkDEL(scalarArrayLine);
 
   m_VtkData.push_back(m_TimeLine);
-  m_PlotTimeLineActor->AddDataSetInput((vtkDataSet*)m_TimeLine);
+  m_PlotTimeLineActor->AddDataSetInput(m_TimeLine);
 
   m_RenFront->AddActor2D(m_PlotActor);
   //m_RenFront->AddActor2D(m_PlotTimeLineActor);

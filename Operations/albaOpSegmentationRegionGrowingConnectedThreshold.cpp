@@ -329,7 +329,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
 
   
   vtkALBASmartPointer<vtkALBAVolumeToClosedSmoothSurface> volToSurface;
-  volToSurface->SetInput(m_VolumeOut->GetOutput()->GetVTKData());
+  volToSurface->SetInputData(m_VolumeOut->GetOutput()->GetVTKData());
   volToSurface->SetContourValue(127.5);
   volToSurface->Update();
   vtkPolyData *surface=volToSurface->GetOutput();

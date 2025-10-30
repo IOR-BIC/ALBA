@@ -3,7 +3,7 @@ PROJECT (albaOperationsTests)
 IF(ALBA_BUILD_ALBADLL)
   SET(PROJECT_LIBS XercesC albaDLL vtkALBA albaTests) 
 ELSE(ALBA_BUILD_ALBADLL)
-  SET(PROJECT_LIBS albaTests albaOperations albaVME albaCommon albaService)
+  SET(PROJECT_LIBS albaTests albaOperations albaVisualPipes albaVME albaCommon albaService)
 ENDIF(ALBA_BUILD_ALBADLL)
 
 

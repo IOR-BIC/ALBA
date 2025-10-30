@@ -20,7 +20,6 @@
 //----------------------------------------------------------------------------
 #include "vtkALBATests.h"
 
-#include "vtkALBAContourVolumeMapperTest.h"
 #include "vtkALBARemoveCellsFilterTest.h"
 #include "vtkALBAPolyDataToSinglePolyLineTest.h"
 #include "vtkALBATextOrientatorTest.h"
@@ -141,7 +140,6 @@ int	main( int argc, char* argv[] )
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
 
-	runner.addTest(vtkALBAContourVolumeMapperTest::suite());
 	runner.addTest(vtkALBARemoveCellsFilterTest::suite());
 	runner.addTest(vtkALBAPolyDataToSinglePolyLineTest::suite()); 
 	runner.addTest(vtkALBATextOrientatorTest::suite());

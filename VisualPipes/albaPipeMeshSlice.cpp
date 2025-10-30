@@ -41,13 +41,10 @@ const bool DEBUG_MODE = true;
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeMeshSlice);
-//----------------------------------------------------------------------------
 
 
 //----------------------------------------------------------------------------
-albaPipeMeshSlice::albaPipeMeshSlice()
-:albaPipeGenericPolydata()
-//----------------------------------------------------------------------------
+albaPipeMeshSlice::albaPipeMeshSlice():albaPipeGenericPolydata()
 {
 	m_BorderElementsWiredActor = 1;
   m_Plane           = NULL;
@@ -62,9 +59,9 @@ albaPipeMeshSlice::~albaPipeMeshSlice()
 }
 
 //----------------------------------------------------------------------------
-vtkPolyData* albaPipeMeshSlice::GetInputAsPolyData()
+vtkAlgorithmOutput* albaPipeMeshSlice::GetPolyDataOutputPort()
 {
-	if (!m_InputAsPolydata)
+	if (!m_PolydataConnection)
 	{
 		assert(m_Vme->GetOutput()->IsALBAType(albaVMEOutputMesh));
 		albaVMEOutputMesh *mesh_output = albaVMEOutputMesh::SafeDownCast(m_Vme->GetOutput());
@@ -87,10 +84,10 @@ vtkPolyData* albaPipeMeshSlice::GetInputAsPolyData()
 		m_Cutter->SetCutFunction(m_Plane);
 		m_Cutter->Update();
 
-		m_InputAsPolydata = m_Cutter->GetOutput();
+		m_PolydataConnection = m_Cutter->GetOutputPort();
 	}
 
-	return m_InputAsPolydata;
+	return m_PolydataConnection;
 }
 
 //----------------------------------------------------------------------------

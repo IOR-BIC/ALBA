@@ -13,7 +13,6 @@ ENDIF(ALBA_BUILD_ALBADLL)
 #-----------------------------------------------------------------------------
 SET(PROJECT_SRCS 
 	vtkALBATests.h vtkALBATests.cpp
-	vtkALBAContourVolumeMapperTest.h vtkALBAContourVolumeMapperTest.cpp
 	vtkALBARemoveCellsFilterTest.h vtkALBARemoveCellsFilterTest.cpp
 	vtkALBAPolyDataToSinglePolyLineTest.h vtkALBAPolyDataToSinglePolyLineTest.cpp
 	vtkALBATextOrientatorTest.h vtkALBATextOrientatorTest.cpp

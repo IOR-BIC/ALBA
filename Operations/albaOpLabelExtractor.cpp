@@ -45,7 +45,7 @@
 #include "vtkExtractVOI.h"
 #include "vtkImageThreshold.h"
 #include "vtkMatrix4x4.h"
-#include "vtkALBAContourVolumeMapper.h"
+#include "vtkFlyingEdges3D.h"
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkALBASmartPointer.h"
@@ -544,12 +544,12 @@ void albaOpLabelExtractor::ExtractLabel()
   
   imageToSp->Update();
  
-  vtkALBASmartPointer<vtkALBAContourVolumeMapper> contourMapper;
-  contourMapper->SetInput((vtkDataSet *)imageToSp->GetOutput());
-  contourMapper->SetContourValue(m_ValLabel);
+  vtkALBASmartPointer<vtkFlyingEdges3D> contourMapper;
+  contourMapper->SetInputData((vtkDataSet *)imageToSp->GetOutput());
+  contourMapper->SetNumberOfContours(1);
+	contourMapper->SetValue(0,m_ValLabel);
 
-	vtkALBASmartPointer<vtkPolyData> surface;
-  contourMapper->GetOutput(0, surface);	
+  vtkPolyData *surface=contourMapper->GetOutput();	
 	contourMapper->Update();
 
   albaNEW(m_Vme);

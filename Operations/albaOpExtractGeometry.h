@@ -59,7 +59,6 @@ public:
     ID_DECIMATE_SURFACE,
     ID_DECIMATE_SURFACE_RATE,
     ID_DECIMATE_SURFACE_TOPOLOGY, 
-    ID_AUTO_CONTOUR_VALUE,
     ID_CONTOUR_VALUE,
     ID_PROCESSING_TYPE,
   };
@@ -136,8 +135,7 @@ protected:
   int m_SmoothSurfaceIterationsNumber;
   int m_VolumeSmoothingRepetitions;
   double m_SurfaceContourValue;
-  int m_AutoSurfaceContourValue;
-
+  
   albaVMEVolumeGray *m_VolumeInput;
   albaVMEVolumeGray *m_ResampledVolume;
   albaVMESurface *m_SurfaceOutput;

@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaPipeIsosurface
- Authors: Alexander Savenko  -  Paolo Quadrani
+ Authors: Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -14,9 +14,6 @@
 
 =========================================================================*/
 
-#if defined(WIN32)
-#pragma warning (disable : 4018)
-#endif
 
 #include "albaDefines.h" 
 //----------------------------------------------------------------------------
@@ -27,156 +24,77 @@
 //----------------------------------------------------------------------------
 
 #include "albaPipeIsosurface.h"
-#include "albaEvent.h"
-#include "albaSceneNode.h"
-#include "albaGUIFloatSlider.h"
-#include "albaGUI.h"
-
+#include "albaVMEOutputVolume.h"
 #include "albaVME.h"
-#include "albaVMEVolumeGray.h"
 #include "albaVMESurface.h"
+#include "vtkPolyData.h"
+#include "vtkFlyingEdges3D.h"
+#include "vtkContourFilter.h"
+#include "albaGUI.h"
+#include "vtkImageData.h"
 
-#include "vtkALBAAssembly.h"
-#include "vtkALBASmartPointer.h"
-#include "vtkProperty.h"
-#include "vtkActor.h"
-#include "vtkVolume.h"
-#include "vtkALBAContourVolumeMapper.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkOutlineCornerFilter.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeIsosurface);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-albaPipeIsosurface::albaPipeIsosurface() 
-: albaPipe()
-{
-	m_Volume          = NULL;
-	m_OutlineActor    = NULL;
-	m_ContourMapper   = NULL; 
-	m_OutlineBox      = NULL;
-	m_OutlineMapper   = NULL;
-	m_ContourSlider   = NULL;
-
-	m_ContourValue    = 300.0;
-
-	m_AlphaValue			= 1.0;
-
-  m_BoundingBoxVisibility = true;
-}
+albaPipeIsosurface::albaPipeIsosurface()
+:albaPipeGenericPolydata()
 //----------------------------------------------------------------------------
-void albaPipeIsosurface::Create(albaSceneNode *n)
 {
-	Superclass::Create(n);
-
-	assert(m_Vme->GetOutput()->IsA("albaVMEOutputVolume"));
-
-  m_Vme->AddObserver(this);
-
-	vtkDataSet *dataset = m_Vme->GetOutput()->GetVTKData();
-
-	// contour pipeline
-	vtkNEW(m_ContourMapper);
-	m_ContourMapper->SetInput(dataset);
-	m_ContourMapper->AutoLODRenderOn();
-	m_ContourMapper->SetAlpha(m_AlphaValue);
-
-	double range[2] = {0, 0};
-	dataset->GetScalarRange(range);
-
-	float value = 0.5f * (range[0] + range[1]);
-	while (value < range[1] && m_ContourMapper->EstimateRelevantVolume(value) > 0.3f)
-		value += 0.05f * (range[1] + range[0]) + 1.f;
-	m_ContourMapper->SetContourValue(value);
-
-	m_ContourValue = m_ContourMapper->GetContourValue();
-
-  vtkNEW(m_Volume);
-  m_Volume->SetMapper(m_ContourMapper);
-  m_Volume->PickableOff();
-  m_AssemblyFront->AddPart(m_Volume);
-
-	// selection box
-	vtkNEW(m_OutlineBox);
-	m_OutlineBox->SetInputData(dataset);
-
-	vtkNEW(m_OutlineMapper);
-	m_OutlineMapper->SetInputConnection(m_OutlineBox->GetOutputPort());
-
-	vtkNEW(m_OutlineActor);
-	m_OutlineActor->SetMapper(m_OutlineMapper);
-	m_OutlineActor->VisibilityOn();
-	m_OutlineActor->PickableOff();
-
-	vtkALBASmartPointer<vtkProperty> property;
-	property->SetColor(1,1,1);
-	property->SetAmbient(1);
-	property->SetRepresentationToWireframe();
-	property->SetInterpolationToFlat();
-	m_OutlineActor->SetProperty(property);
-
-  if(m_BoundingBoxVisibility)
-	  m_AssemblyFront->AddPart(m_OutlineActor);
+	m_ContourFilter = NULL;
+	m_RGContourFilter = NULL;
+	m_SkipNormalFilter = true;
 }
+
 //----------------------------------------------------------------------------
 albaPipeIsosurface::~albaPipeIsosurface()
+//----------------------------------------------------------------------------
 {
-  m_Vme->RemoveObserver(this);
-
-	m_AssemblyFront->RemovePart(m_Volume);
-	
-  if(m_BoundingBoxVisibility)
-    m_AssemblyFront->RemovePart(m_OutlineActor);
-
-	vtkDEL(m_Volume);
-	vtkDEL(m_OutlineActor);
-	vtkDEL(m_ContourMapper);
-	vtkDEL(m_OutlineBox);
-	vtkDEL(m_OutlineMapper);
+	vtkDEL(m_ContourFilter);
+	vtkDEL(m_RGContourFilter);
 }
 
 //----------------------------------------------------------------------------
-void albaPipeIsosurface::Select(bool sel) 
+bool albaPipeIsosurface::SetContourValue(float value)
 {
-	m_Selected = sel;
-	if (m_Volume->GetVisibility())
-	{
-		m_OutlineActor->SetVisibility(sel);
-	}
-}
-
-//----------------------------------------------------------------------------
-bool albaPipeIsosurface::SetContourValue(float value) 
-{
-	if (m_ContourMapper == NULL)
+	if (m_ContourFilter == NULL && m_RGContourFilter == NULL)
 		return false;
-  m_ContourValue = value;
-	m_ContourMapper->SetContourValue(m_ContourValue);
-	m_ContourMapper->Modified();
+
+	m_ContourValue = value;
+
+	if (m_OldContourValue == m_ContourValue)
+		return true;
+
+	if (m_ContourFilter)
+	{
+		m_ContourFilter->SetValue(0, m_ContourValue);
+		m_ContourFilter->Modified();
+	}
+	else
+	{
+		m_RGContourFilter->SetValue(0, m_ContourValue);
+		m_RGContourFilter->Modified();
+	}
+
+	m_OldContourValue = m_ContourValue;
 	return true;
 }
 
 //----------------------------------------------------------------------------
-float albaPipeIsosurface::GetContourValue() 
+float albaPipeIsosurface::GetContourValue()
 {
-	if (m_ContourMapper == NULL)
-		return 0.;
-	return m_ContourMapper->GetContourValue();
+	return m_ContourValue;
 }
-//----------------------------------------------------------------------------
-albaGUI *albaPipeIsosurface::CreateGui()
-{
-	double range[2] = {0, 0};
-	m_Vme->GetOutput()->GetVTKData()->GetScalarRange(range);
 
-	assert(m_Gui == NULL);
-	m_Gui = new albaGUI(this);
-	m_ContourSlider = m_Gui->FloatSlider(ID_CONTOUR_VALUE,_("contour"), &m_ContourValue,range[0],range[1]);
-	m_AlphaSlider = m_Gui->FloatSlider(ID_ALPHA_VALUE,_("alpha"), &m_AlphaValue,0.0,1.0);
-	//m_Gui->Button(ID_GENERATE_ISOSURFACE,"generate iso");
-	return m_Gui;
+//----------------------------------------------------------------------------
+void albaPipeIsosurface::SetAlphaValue(double value)
+{
+
 }
+
+
 //----------------------------------------------------------------------------
 void albaPipeIsosurface::OnEvent(albaEventBase *alba_event)
 {
@@ -196,85 +114,115 @@ void albaPipeIsosurface::OnEvent(albaEventBase *alba_event)
 				ExctractIsosurface();	
 			}
 			break;
-		  case ID_ALPHA_VALUE:
-			{
-				m_ContourMapper->SetAlpha(m_AlphaValue);
-				m_ContourMapper->Modified();
-				m_Vme->ForwardUpEvent(&albaEvent(this,CAMERA_UPDATE));
-			}
-			break;
 		  default:
+				Superclass::OnEvent(alba_event);
 			break;
 		}
 	}
-  if(alba_event->GetId() == VME_OUTPUT_DATA_UPDATE)
-  {
-    UpdateFromData();
-  }
 }
-//----------------------------------------------------------------------------
-void albaPipeIsosurface::UpdateFromData()
-{
-  vtkDataSet *dataset = m_Vme->GetOutput()->GetVTKData();
-  if(dataset)
-  {
-    if (m_ContourMapper != NULL)
-    {
-      m_ContourMapper->SetInput(dataset);
-      m_ContourMapper->Update();
-    }
-  }
-}
-//----------------------------------------------------------------------------
-void albaPipeIsosurface::ExctractIsosurface(albaVMESurface *isoSurface /* = NULL */)
-{
-	vtkPolyData *surface = vtkPolyData::New();
-	m_ContourMapper->GetOutput(0, surface);
-	m_ContourMapper->Update();
 
-  if(m_ExtractIsosurfaceName.Equals(""))
-  {
-    wxString name = albaString::Format(_("Isosurface %g"),m_ContourValue);
-    m_ExtractIsosurfaceName = name;
-  }
+//----------------------------------------------------------------------------
+void albaPipeIsosurface::ExctractIsosurface(albaVMESurface* isoSurfaceVME /* = NULL */)
+{
+	if (m_ContourFilter == NULL && m_RGContourFilter == NULL)
+		return;
+
+	vtkPolyDataAlgorithm* filter = (m_ContourFilter!=NULL) ? (vtkPolyDataAlgorithm *)m_ContourFilter : m_RGContourFilter;
+
+	
+	filter->Update();
+	vtkPolyData* surface = filter->GetOutput();
 	
 
-	if (isoSurface)
+	if (isoSurfaceVME == NULL)
 	{
-		isoSurface->SetName(m_ExtractIsosurfaceName.GetCStr());
-		isoSurface->SetData(surface,0);
-	
-		isoSurface->ReparentTo(m_Vme);
+		albaString name;
+		name.Printf("%s Isosurface %g", m_Vme->GetName(), m_ContourValue);
+
+		albaNEW(isoSurfaceVME);
+		isoSurfaceVME->SetName(name.GetCStr());
 	}
 
-	surface->Delete();
-  m_ExtractIsosurfaceName = "";
+	
+	isoSurfaceVME->SetData(surface,0);
+	isoSurfaceVME->ReparentTo(m_Vme);
+	
 }
-//----------------------------------------------------------------------------
-void albaPipeIsosurface::EnableBoundingBoxVisibility(bool enable)
+
+void albaPipeIsosurface::ExctractIsosurface(vtkPolyData* isoSurfacePD)
 {
-	m_BoundingBoxVisibility = enable;
+	if (m_ContourFilter == NULL && m_RGContourFilter == NULL)
+		return;
+
+	vtkPolyDataAlgorithm* filter = (m_ContourFilter != NULL) ? (vtkPolyDataAlgorithm*)m_ContourFilter : m_RGContourFilter;
+	filter->Update();
+	vtkPolyData* surface = filter->GetOutput();
+
+	isoSurfacePD->DeepCopy(surface);
 }
+
 //----------------------------------------------------------------------------
-void albaPipeIsosurface::SetAlphaValue(double value)
+albaGUI* albaPipeIsosurface::CreateGui()
 {
-	m_AlphaValue=value;
-	m_ContourMapper->SetAlpha(m_AlphaValue);
-	m_ContourMapper->Modified();
-	m_Vme->ForwardUpEvent(&albaEvent(this,CAMERA_UPDATE));
+	assert(m_Gui == NULL);
+	m_Gui = new albaGUI(this);
+
+	double range[2] = { 0, 0 };
+	m_Vme->GetOutput()->GetVTKData()->GetScalarRange(range);
+
+
+	m_Gui->FloatSlider(ID_CONTOUR_VALUE, _("Contour"), &m_ContourValue, range[0], range[1]);
+
+	CreateGenericPolydataGui(m_Gui);
+	
+	m_Gui->Label("");
+	m_Gui->Button(ID_GENERATE_ISOSURFACE, "Extract Isosurface");
+	m_Gui->Divider();
+	m_Gui->Update();
+
+	return m_Gui;
 }
+
+
 //----------------------------------------------------------------------------
-void albaPipeIsosurface::SetActorVisibility(int visibility)
+vtkAlgorithmOutput* albaPipeIsosurface::GetPolyDataOutputPort()
 {
-  m_Volume->SetVisibility(visibility);
-  m_Volume->Modified();
-}
-//----------------------------------------------------------------------------
-void albaPipeIsosurface::SetEnableContourAnalysis( bool clean )
-{
-  if (m_ContourMapper)
-  {
-	  m_ContourMapper->SetEnableContourAnalysis(clean);
-	  m_ContourMapper->Update();
-  }
+	if (!m_PolydataConnection)
+	{
+		assert(m_Vme->GetOutput()->IsALBAType(albaVMEOutputVolume));
+		albaVMEOutputVolume *vol_output = albaVMEOutputVolume::SafeDownCast(m_Vme->GetOutput());
+		assert(vol_output);
+		vol_output->Update();
+
+		vtkDataSet* volData = vol_output->GetVTKData();
+		volData->GetScalarRange(m_DataRange);
+
+		m_OldContourValue = m_ContourValue = m_DataRange[0] * 0.25 + m_DataRange[1] * 0.75;
+
+		if (vtkImageData::SafeDownCast(volData))
+		{
+			vtkNEW(m_ContourFilter);
+			m_ContourFilter->SetInputData(volData);
+			m_ContourFilter->SetComputeScalars(false);
+			m_ContourFilter->SetComputeGradients(false);
+			m_ContourFilter->SetComputeNormals(false);
+			m_ContourFilter->SetValue(0, m_ContourValue);
+
+			m_PolydataConnection = m_ContourFilter->GetOutputPort();
+
+		}
+		else //Rectilinear Grid
+		{
+			vtkNEW(m_RGContourFilter);
+			m_RGContourFilter->SetInputData(volData);
+			m_RGContourFilter->SetComputeScalars(false);
+			m_RGContourFilter->SetComputeGradients(false);
+			m_RGContourFilter->SetComputeNormals(false);
+			m_RGContourFilter->SetValue(0, m_ContourValue);
+
+			m_PolydataConnection = m_RGContourFilter->GetOutputPort();
+		}
+	}
+
+	return m_PolydataConnection;
 }

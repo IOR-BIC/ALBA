@@ -298,7 +298,7 @@ int vtkALBAAssembly::RenderTranslucentPolygonalGeometry(vtkViewport *ren)
 		for (this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); )
 		{
     vtkProp3D *prop3D = (vtkProp3D *)path->GetLastNode()->GetViewProp();
-    if ( prop3D->GetVisibility()) 
+    if (prop3D->GetVisibility() && prop3D->HasTranslucentPolygonalGeometry())
 			{
         prop3D->SetPropertyKeys(this->GetPropertyKeys());
 				prop3D->SetAllocatedRenderTime(fraction, ren);
@@ -335,8 +335,9 @@ int vtkALBAAssembly::RenderOpaqueGeometry(vtkViewport *ren)
 		for (this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); )
 		{
 	    vtkProp3D *prop3D = (vtkProp3D *)path->GetLastNode()->GetViewProp();
-    	if (prop3D->GetVisibility()) 
+    	if (prop3D->GetVisibility() && prop3D->HasOpaqueGeometry())
 			{
+				prop3D->SetPropertyKeys(this->GetPropertyKeys());
 				prop3D->SetAllocatedRenderTime(fraction, ren);
 				prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
 				renderedSomething += prop3D->RenderOpaqueGeometry(ren);
@@ -348,6 +349,43 @@ int vtkALBAAssembly::RenderOpaqueGeometry(vtkViewport *ren)
   return renderedSomething > 0;
 }
 
+
+// Render this assembly and all its Parts. The rendering process is recursive.
+// Note that a mapper need not be defined. If not defined, then no geometry
+// will be drawn for this assembly. This allows you to create "logical"
+// assemblies; that is, assemblies that only serve to group and transform
+// its Parts.
+
+//-----------------------------------------------------------------------------
+int vtkALBAAssembly::RenderVolumetricGeometry(vtkViewport* ren)
+{
+	this->UpdatePaths();
+
+	// for allocating render time between components
+	// simple equal allocation
+	double fraction =
+		this->AllocatedRenderTime / static_cast<double>(this->Paths->GetNumberOfItems());
+
+	int renderedSomething = 0;
+
+	// render the Paths
+	vtkAssemblyPath* path;
+	vtkCollectionSimpleIterator sit;
+	for (this->Paths->InitTraversal(sit); (path = this->Paths->GetNextPath(sit));)
+	{
+		vtkProp3D* prop3D = static_cast<vtkProp3D*>(path->GetLastNode()->GetViewProp());
+		if (prop3D->GetVisibility() && vtkVolume::SafeDownCast(prop3D))
+		{
+			prop3D->SetPropertyKeys(this->GetPropertyKeys());
+			prop3D->SetAllocatedRenderTime(fraction, ren);
+			prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
+			renderedSomething += prop3D->RenderVolumetricGeometry(ren);
+			prop3D->PokeMatrix(nullptr);
+		}
+	}
+
+	return (renderedSomething > 0) ? 1 : 0;
+}
 
 //-----------------------------------------------------------------------------
 // Build the assembly paths if necessary. UpdatePaths()

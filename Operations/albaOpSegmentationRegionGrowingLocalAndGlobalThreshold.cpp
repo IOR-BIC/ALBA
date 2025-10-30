@@ -48,7 +48,7 @@
 #include "vtkImageMedian3D.h"
 #include "vtkImageAccumulate.h"
 #include "vtkImageCast.h"
-#include "vtkALBAContourVolumeMapper.h"
+#include "vtkFlyingEdges3D.h"
 #include "vtkALBAHistogram.h"
 
 #include "itkVTKImageToImageFilter.h"
@@ -768,9 +768,10 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
         m_VolumeOutputMorpho->ReparentTo(m_VolumeInput);
         m_VolumeOutputMorpho->Update();
 
-        vtkALBASmartPointer<vtkALBAContourVolumeMapper> extractIsosurface;
-        extractIsosurface->SetInput((vtkImageData *)filter->GetOutput());
-        extractIsosurface->SetContourValue(m_UpperLabel);
+        vtkALBASmartPointer<vtkFlyingEdges3D> extractIsosurface;
+        extractIsosurface->SetInputConnection(filter->GetOutputPort());
+        extractIsosurface->SetNumberOfContours(1);
+        extractIsosurface->SetValue(0,m_UpperLabel);
         extractIsosurface->Update();
 
         vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;

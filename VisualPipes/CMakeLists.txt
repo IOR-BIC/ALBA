@@ -13,7 +13,6 @@ SET(PROJECT_SRCS
   albaPipeSurface.cpp 						albaPipeSurface.h
   albaPipeRefSys.cpp 						albaPipeRefSys.h
   albaPipeScalar.cpp  						albaPipeScalar.h
-  albaVisualPipeVolumeRayCasting.cpp  		albaVisualPipeVolumeRayCasting.h
   albaPipeVolumeMIP.cpp  					albaPipeVolumeMIP.h
   albaPipeDensityDistance.cpp  				albaPipeDensityDistance.h
   albaPipeTrajectories.cpp  					albaPipeTrajectories.h
@@ -74,15 +73,6 @@ IF (ALBA_USE_VTK)
   albaPipeGraph.cpp  						albaPipeGraph.h
   )
 ENDIF (ALBA_USE_VTK)
-
-IF(WIN32)
-  SET(PROJECT_SRCS
-  ${PROJECT_SRCS}
-  albaPipeIsosurfaceGPU.cpp  				albaPipeIsosurfaceGPU.h
-  )
-ENDIF(WIN32)
-
-
 
 IF (ALBA_USE_CRYPTO)
   SET(PROJECT_LIBS ${PROJECT_LIBS} Crypto )

@@ -305,7 +305,7 @@ void albaOpSegmentation::OpDo()
 	}
 	  
   vtkALBASmartPointer<vtkALBAVolumeToClosedSmoothSurface> volToSurface;
-  volToSurface->SetInput(m_SegmentationVolume->GetOutput()->GetVTKData());
+  volToSurface->SetInputData(m_SegmentationVolume->GetOutput()->GetVTKData());
   volToSurface->SetContourValue(127.5);
   volToSurface->Update();
   

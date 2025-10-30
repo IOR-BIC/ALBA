@@ -56,15 +56,15 @@ albaPipeMesh::~albaPipeMesh()
 }
 
 //----------------------------------------------------------------------------
-vtkPolyData * albaPipeMesh::GetInputAsPolyData()
+vtkAlgorithmOutput* albaPipeMesh::GetPolyDataOutputPort()
 {
-	if(!m_InputAsPolydata)
+	if (!m_PolydataConnection)
 	{
 		assert(m_Vme->GetOutput()->IsALBAType(albaVMEOutputMesh));
-		albaVMEOutputMesh *mesh_output = albaVMEOutputMesh::SafeDownCast(m_Vme->GetOutput());
+		albaVMEOutputMesh* mesh_output = albaVMEOutputMesh::SafeDownCast(m_Vme->GetOutput());
 		assert(mesh_output);
 		mesh_output->Update();
-		vtkUnstructuredGrid *data = vtkUnstructuredGrid::SafeDownCast(mesh_output->GetVTKData());
+		vtkUnstructuredGrid* data = vtkUnstructuredGrid::SafeDownCast(mesh_output->GetVTKData());
 		assert(data);
 
 		// create the linearization filter
@@ -76,9 +76,9 @@ vtkPolyData * albaPipeMesh::GetInputAsPolyData()
 		m_GeometryFilter->SetInputConnection(m_LinearizationFilter->GetOutputPort());
 		m_GeometryFilter->Update();
 
-		m_InputAsPolydata = m_GeometryFilter->GetOutput();
+		m_PolydataConnection = m_GeometryFilter->GetOutputPort();
 	}
-	
-	return 	m_InputAsPolydata;
+
+	return m_PolydataConnection;
 }
 
