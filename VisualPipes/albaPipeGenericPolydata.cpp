@@ -239,7 +239,7 @@ void albaPipeGenericPolydata::RemoveActorsFromAssembly(vtkALBAAssembly *assembly
 void albaPipeGenericPolydata::Select(bool sel)
 {
 	m_Selected = sel;
-	if(m_Actor->GetVisibility()) 
+	if(m_Actor && m_Actor->GetVisibility()) 
 	{
 		m_OutlineActor->SetVisibility(sel && m_ShowOutLine);
 
