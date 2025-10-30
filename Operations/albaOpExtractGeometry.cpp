@@ -85,7 +85,6 @@ albaOp(label)
   m_DecimatePreserveTopology = 0;
 
   m_VolumeSmoothingRepetitions = 1;
-  m_AutoSurfaceContourValue = 1;
   m_SurfaceContourValue = 0;
   m_SmoothSurfaceIterationsNumber = 50;
 
@@ -189,9 +188,7 @@ void albaOpExtractGeometry::CreateExtractSurfaceGui()
   m_ExtractSurfaceGui->Enable(ID_VOLUME_SMOOTHING_REPETITIONS, m_VolumeSmoothing>0);
   m_ExtractSurfaceGui->Divider();
 
-  m_ExtractSurfaceGui->Bool(ID_AUTO_CONTOUR_VALUE, _("Auto contour value"), &m_AutoSurfaceContourValue, 1);
   m_SurfaceContourValueSlider = m_ExtractSurfaceGui->FloatSlider(ID_CONTOUR_VALUE, _("Contour value"), &m_SurfaceContourValue, m_ScalarRange[0], m_ScalarRange[1]);
-  m_ExtractSurfaceGui->Enable(ID_CONTOUR_VALUE, m_AutoSurfaceContourValue<=0);
 
   //////////////////////////////////////////////////////////////////////////
   // Surface Processing
@@ -328,10 +325,6 @@ void albaOpExtractGeometry::OnEvent(albaEventBase *alba_event)
       {
         m_ExtractSurfaceGui->Enable(ID_VOLUME_SMOOTHING_REPETITIONS, m_VolumeSmoothing>0);
         break;
-      }
-    case ID_AUTO_CONTOUR_VALUE:
-      {
-        m_ExtractSurfaceGui->Enable(ID_CONTOUR_VALUE, m_AutoSurfaceContourValue<=0);
       }
     case ID_SMOOTH_SURFACE:
       {
@@ -607,27 +600,12 @@ int albaOpExtractGeometry::GenerateIsosurface()
   // VTKalbaContourVolumeMapper
 
   m_SurfaceExtractor = vtkALBAVolumeToClosedSmoothSurface::New();
-  m_SurfaceExtractor->SetInput(m_OriginalData);
-  m_SurfaceExtractor->AutoLODRenderOn();
-  m_SurfaceExtractor->AutoLODCreateOn();
-
-  m_SurfaceExtractor->SetEnableContourAnalysis(0);
-
+  m_SurfaceExtractor->SetInputData(m_OriginalData);
   m_SurfaceExtractor->SetFillHoles(m_ProcessingType==1);
   
 
-  // IMPORTANT, extract the isosurface from m_ContourVolumeMapper in this way
-  // and then call surface->Delete() when the VME is created
-
-  if(m_AutoSurfaceContourValue<0)
-  {
-    float value = 0.5f * (m_ScalarRange[0] + m_ScalarRange[1]);
-    while (value < m_ScalarRange[1] && m_SurfaceExtractor->EstimateRelevantVolume(value) > 0.3f)
-      value += 0.05f * (m_ScalarRange[1] + m_ScalarRange[0]) + 1.f;
-
-    m_SurfaceContourValue = value;
-
-  }
+  double* scalarRange = m_OriginalData->GetScalarRange();
+  m_SurfaceContourValue = (scalarRange[0] + scalarRange[1]) / 2.0;
   m_SurfaceExtractor->SetContourValue(m_SurfaceContourValue);
 
   m_SurfaceExtractor->Update();

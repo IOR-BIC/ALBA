@@ -28,12 +28,13 @@ PURPOSE. See the above copyright notice for more information.
 class albaGUIDialog;
 class albaGUIFloatSlider;
 class albaVMESurface;
+class albaSceneNode;
 class albaVMEGroup;
 class albaVME;
 class albaRWI;
 
 class vtkActor;
-class vtkALBAContourVolumeMapper;
+class albaPipeIsosurface; 
 class vtkPolyDataMapper;
 class vtkOutlineCornerFilter;
 class vtkRenderer;
@@ -46,6 +47,7 @@ class vtkALBAVolumeSlicer;
 class vtkALBAFixedCutter;
 class vtkPlane;
 class vtkVolume;
+
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
@@ -71,12 +73,12 @@ public:
   albaOp* Copy();
   void OnEvent(albaEventBase *alba_event);
 
+public:
+  void UpdateCutterInput();
+
 	/** Builds operation's interface by calling CreateOpDialog() method. */
   void OpRun();
-
-  /** Return parameters used by operation. */
-  albaString GetParameters();
-
+    
   /** Set iso value used by operation. */
   void SetIsoValue(double isoValue);
 
@@ -87,7 +89,7 @@ public:
   void CreateVolumePipeline();
 
   /** Re-generate the surface according to the new threshold value. */
-  void UpdateSurface(bool use_lod = false);
+  void UpdateSurface();
 
   /** Set the triangulate flag.*/
   void SetTriangulate(bool triangulate);
@@ -126,7 +128,6 @@ protected:
   float        m_SliceYVect[3];
   int m_TrilinearInterpolationOn;
 
-  std::vector<double> m_IsoValueVector;
 
   int m_MultiContoursFlag;
   int m_NumberOfContours;
@@ -136,10 +137,9 @@ protected:
   albaGUIFloatSlider *m_IsoSlider;
   albaGUIFloatSlider *m_SliceSlider;
   
-  //vtkPolyDataMapper       *m_ContourMapper;
-  vtkVolume                *m_ContourActor;
   vtkActor                *m_Box;
-  vtkALBAContourVolumeMapper  *m_ContourVolumeMapper; 
+  albaSceneNode         *m_VolNode;
+  albaPipeIsosurface    *m_PipeIso;
   vtkOutlineCornerFilter  *m_OutlineFilter;
   vtkPolyDataMapper       *m_OutlineMapper;
 
