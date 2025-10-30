@@ -27,7 +27,6 @@ SET(vtkALBA_SRCS
   vtkALBAHistogram.cxx  									vtkALBAHistogram.h
   vtkALBAImplicitPolyData.cxx  							vtkALBAImplicitPolyData.h
   vtkALBALocalAxisCoordinate.cxx  						vtkALBALocalAxisCoordinate.h
-  vtkALBAAdaptiveVolumeMapper.cxx  						vtkALBAAdaptiveVolumeMapper.h
   vtkALBAImageMapToWidgetColors.cxx  					vtkALBAImageMapToWidgetColors.h
   vtkALBAPolyDataSingleSourceShortestPath.cxx  			vtkALBAPolyDataSingleSourceShortestPath.h
   vtkALBAProjectVolume.cxx  									vtkALBAProjectVolume.h

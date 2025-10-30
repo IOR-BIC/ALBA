@@ -33,7 +33,6 @@
 #include "albaPipeGizmoTest.h"
 #include "albaPipeGraphTest.h"
 #include "albaPipeImage3DTest.h"
-#include "albaPipeIsosurfaceGPUTest.h"
 #include "albaPipeIsosurfaceTest.h"
 #include "albaPipeLandmarkCloudTest.h"
 #include "albaPipeMeshSliceTest.h"
@@ -71,7 +70,6 @@
 #include "albaServiceLocator.h"
 #include "albaVisualPipePolylineGraphTest.h"
 #include "albaVisualPipeSlicerSliceTest.h"
-#include "albaVisualPipeVolumeRayCastingTest.h"
 #include "albaPipePointCloudTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
@@ -112,7 +110,7 @@ int	main( int argc, char* argv[] )
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
-
+	
 	runner.addTest(albaPipeMeshTest::suite());
 	runner.addTest(albaPipeSurfaceTest::suite());
 	runner.addTest(albaPipePointCloudTest::suite());
@@ -124,14 +122,12 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipeIsosurfaceTest::suite());
 	runner.addTest(albaPipePointSetTest::suite());
 	runner.addTest(albaPipeFactoryVMETest::suite());
-	runner.addTest(albaPipeIsosurfaceGPUTest::suite());
 	runner.addTest(albaPipePolylineTest::suite());
 	runner.addTest(albaPipeLandmarkCloudTest::suite());
 	runner.addTest(albaPipeVectorTest::suite());
 	runner.addTest(albaPipeMeterTest::suite());
 	runner.addTest(albaPipeVolumeProjectedTest::suite());
 	runner.addTest(albaPipeScalarMatrixTest::suite());
-	runner.addTest(albaVisualPipeVolumeRayCastingTest::suite());
 	runner.addTest(albaPipeVolumeMIPTest::suite());
 	runner.addTest(albaPipeVolumeDRRTest::suite());
 	runner.addTest(albaPipePolylineGraphEditorTest::suite());
@@ -143,7 +139,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipeSliceTest::suite());
 	runner.addTest(albaPipePolylineSliceTest::suite());
 	runner.addTest(albaPipeWrappedMeterTest::suite());
-	runner.addTest(albaPipeDensityDistanceTest::suite());
+	runner.addTest(albaPipeDensityDistanceTest::suite()); 
 	runner.addTest(albaPipeGraphTest::suite());
 	runner.addTest(albaPipeCompoundTest::suite());
 	runner.addTest(albaPipeCompoundVolumeTest::suite());
@@ -164,7 +160,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipeCompoundVolumeMIPTest::suite());
 	runner.addTest(albaPipeCompoundVolumeDRRTest::suite());
 	runner.addTest(albaPipeCompoundVolumeIsosurfaceTest::suite());
-	runner.addTest(albaPipeRayCastTest::suite());
+	runner.addTest(albaPipeRayCastTest::suite()); /* */
 
 
 	runner.run( controller );

@@ -44,7 +44,6 @@
 #include "albaPipeVector.h"
 #include "albaPipeMesh.h"
 #include "albaPipeScalar.h"
-#include "albaVisualPipeVolumeRayCasting.h"
 
 #ifdef ALBA_USE_ITK
   #include "albaPipeScalarMatrix.h"
@@ -148,7 +147,6 @@ albaPipeFactoryVME::albaPipeFactoryVME()
   albaPlugPipeMacro(albaPipeImage3D,"Pipe for render images");
 	albaPlugPipeMacro(albaPipeMesh,"Pipe for render Mesh");
   albaPlugPipeMacro(albaPipeScalar,"Pipe for render scalar data");
-  albaPlugPipeMacro(albaVisualPipeVolumeRayCasting,"Pipe for render volume data with Ray Cast method.");
 
 #ifdef ALBA_USE_ITK
   albaPlugPipeMacro(albaPipeScalarMatrix,"Pipe for render matrix scalar data");
