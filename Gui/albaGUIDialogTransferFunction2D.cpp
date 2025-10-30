@@ -62,11 +62,12 @@
 #include "vtkActor2D.h"
 #include "vtkTextActor.h"
 #include "vtkImageMapper.h"
+#include "vtkSmartVolumeMapper.h"
 #include "vtkImageResample.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkMultiThreader.h"
 #include "vtkALBAImageMapToWidgetColors.h"
-#include "vtkALBAAdaptiveVolumeMapper.h"
+#include "vtkImageGradientMagnitude.h"
 #include "vtkImageCast.h"
 #include "wx/slider.h"
 
@@ -669,7 +670,7 @@ VTK_THREAD_RETURN_TYPE albaGUIDialogTransferFunction2D::CreatePipe(void *argDial
   // 3d pipe
   dialog->m_Volume3D = vtkVolume::New();
   dialog->m_Volume3D->SetProperty(dialog->m_VolumeProperty);
-  dialog->m_Mapper3D = vtkALBAAdaptiveVolumeMapper::New();
+  dialog->m_Mapper3D = vtkSmartVolumeMapper::New();
 
   vtkImageCast *chardata = vtkImageCast::New();
   chardata->SetOutputScalarTypeToShort();
@@ -738,11 +739,22 @@ VTK_THREAD_RETURN_TYPE albaGUIDialogTransferFunction2D::CreatePipe(void *argDial
   dialog->m_Renderer3D->GetActiveCamera()->SetPosition(0., 0., 0.);
   dialog->m_Renderer3D->GetActiveCamera()->SetFocalPoint(0., 0., 1.);
   dialog->m_Renderer3D->ResetCamera(dialog->m_Mapper3D->GetBounds());
-  const int *range = dialog->m_Mapper3D->GetDataRange();
-  dialog->m_DataRange[0] = double(range[0]);
-  dialog->m_DataRange[1] = double(range[1]);
+  double *range = data->GetScalarRange();
+  dialog->m_DataRange[0] = range[0];
+  dialog->m_DataRange[1] = range[1];
+
+	// Compute gradient magnitude of the input volume
+	vtkSmartPointer<vtkImageGradientMagnitude> gradientFilter =
+		vtkSmartPointer<vtkImageGradientMagnitude>::New();
+	gradientFilter->SetInputData(data);
+	gradientFilter->Update();
+	// Get the output (gradient magnitudes)
+	vtkImageData* gradientImage = gradientFilter->GetOutput();
+  // Get the scalar range (min, max of gradient magnitudes)
+	double *grandientRange=gradientImage->GetScalarRange();
+
   dialog->m_GradientRange[0] = 0.f;
-  dialog->m_GradientRange[1] = dialog->m_Mapper3D->GetGradientRange()[1];
+  dialog->m_GradientRange[1] = grandientRange[1];
   dialog->m_DataReady = true;
   dialog->m_PipeStatus3D = PipeReady;
 
