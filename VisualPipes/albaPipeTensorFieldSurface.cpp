@@ -194,16 +194,15 @@ void albaPipeTensorFieldSurface::OnEvent(albaEventBase *alba_event)
   lutPreset(12, m_ColorMappingLUT); //initialize LUT to SAR (it has index 12)  
   m_ColorMappingLUT->Build(); 
 
-  vtkGeometryFilter* filter = vtkGeometryFilter::New();
-  filter->SetInputData(m_Vme->GetOutput()->GetVTKData());
+  vtkNEW(m_GeometricFilter);
+  m_GeometricFilter->SetInputData(m_Vme->GetOutput()->GetVTKData());
 
   m_SurfaceMapper = vtkPolyDataMapper::New();
-  m_SurfaceMapper->SetInputConnection(filter->GetOutputPort());
+  m_SurfaceMapper->SetInputConnection(m_GeometricFilter->GetOutputPort());
   m_SurfaceMapper->SetScalarModeToUsePointFieldData();// PointData();
   m_SurfaceMapper->SetColorModeToMapScalars();
   m_SurfaceMapper->SetLookupTable(m_ColorMappingLUT);
 
-  filter->Delete(); //no longer needed
 
   m_SurfaceActor = vtkActor::New();
   m_SurfaceActor->SetMapper(m_SurfaceMapper);
