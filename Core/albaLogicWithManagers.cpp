@@ -448,7 +448,7 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 
 	// Init About Dialog
 	m_AboutDialog->SetTitle(m_AppTitle);
-	m_AboutDialog->SetBuildNum(m_AppBuildNum.GetCStr());
+	m_AboutDialog->SetAppBuildNum(m_AppBuildNum.GetCStr());
 	m_AboutDialog->SetAlbaBuildNum(m_AlbaBuildNum.GetCStr());
 	m_AboutDialog->SetVersion("0.1");
 	m_AboutDialog->SetWebSite("https://github.com/IOR-BIC/ALBA");
