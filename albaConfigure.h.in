@@ -51,7 +51,6 @@
 
 #define ALBA_MAJOR_VERSION @ALBA_MAJOR_VERSION@
 #define ALBA_MINOR_VERSION @ALBA_MINOR_VERSION@
-#define ALBA_BUILD_VERSION @ALBA_BUILD_VERSION@
 #define ALBA_VERSION "@ALBA_VERSION@"
 
 //--------------------------------------------------------------------------

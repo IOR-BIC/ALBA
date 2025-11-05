@@ -32,7 +32,6 @@ public:
 	CPPUNIT_TEST(TestGetALBAVersion);
 	CPPUNIT_TEST(TestGetALBAMajorVersion);
 	CPPUNIT_TEST(TestGetALBAMinorVersion);
-	CPPUNIT_TEST(TestGetALBABuildVersion);
 	CPPUNIT_TEST(TestGetALBASourceVersion);
 	CPPUNIT_TEST_SUITE_END();
 
@@ -43,7 +42,6 @@ private:
 	void TestGetALBAVersion();
 	void TestGetALBAMajorVersion();
 	void TestGetALBAMinorVersion();
-	void TestGetALBABuildVersion();
 	void TestGetALBASourceVersion();
 };
 

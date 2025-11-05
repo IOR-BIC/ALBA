@@ -103,6 +103,18 @@ public:
 
 	virtual void ExpandVME(albaVME *vme) override;
 
+
+	const char* GetAppBuildNum() override;
+
+
+	void SetAppBuildNum(char* buildNum) override;
+
+
+	const char* GetAlbaBuildNum() override;
+
+
+	void SetAlbaBuildNum(char *buildNum) override;
+
 protected:
 	
 	std::vector<calls> m_Calls;

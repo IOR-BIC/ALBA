@@ -51,12 +51,6 @@ void albaVersionTest::TestGetALBAMinorVersion()
 	CPPUNIT_ASSERT(albaVersion::GetALBAMinorVersion()==ALBA_MINOR_VERSION);
 }
 //----------------------------------------------------------------------------
-void albaVersionTest::TestGetALBABuildVersion()
-//----------------------------------------------------------------------------
-{
-	CPPUNIT_ASSERT(albaVersion::GetALBABuildVersion()==ALBA_BUILD_VERSION);
-}
-//----------------------------------------------------------------------------
 void albaVersionTest::TestGetALBASourceVersion()
 //----------------------------------------------------------------------------
 {

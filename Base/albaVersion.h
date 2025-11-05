@@ -44,7 +44,6 @@ public:
   static const char *GetALBAVersion() { return ALBA_VERSION; }
   static int GetALBAMajorVersion() { return ALBA_MAJOR_VERSION; }
   static int GetALBAMinorVersion() { return ALBA_MINOR_VERSION; }
-  static int GetALBABuildVersion() { return ALBA_BUILD_VERSION; }
   static const char *GetALBASourceVersion() { return ALBA_SOURCE_VERSION; }
 
 private:
