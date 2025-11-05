@@ -1,0 +1,7 @@
+#ifndef __albaVieverVerion_h
+#define __albaVieverVerion_h
+
+#define ALBA_BUILD "@CURRENT_BUILD_NUM@"
+#define APP_BUILD "@CURRENT_BUILD_NUM@"
+
+#endif
