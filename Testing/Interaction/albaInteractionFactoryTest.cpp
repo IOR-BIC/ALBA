@@ -28,7 +28,6 @@
 #include "albaInteractionFactory.h"
 #include "albaAvatar.h"
 #include "albaDevice.h"
-#include "albaVersion.h"
 #include <iostream>
 #include <iterator>
 
@@ -37,7 +36,6 @@
 //-------------------------------------------------------------------------
 /** a simple VME created just for testing purposes. */
 class albaDeviceCustom : public albaDevice
-  //-------------------------------------------------------------------------
 {
 public:
   albaTypeMacro(albaDeviceCustom,albaDevice);
@@ -53,36 +51,29 @@ private:
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaDeviceCustom);
-//-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 albaDeviceCustom::albaDeviceCustom()
-//-------------------------------------------------------------------------
 {
 
 }
 //-------------------------------------------------------------------------
 albaDeviceCustom::~albaDeviceCustom()
-//-------------------------------------------------------------------------
 {
 
 }
 
 //------------------------------------------------------------------------------
 // a custom plugger for the new factory
-template <class T>
-class albaPlugTestDevice
-  //------------------------------------------------------------------------------
+template <class T> class albaPlugTestDevice
 {
 public:
   albaPlugTestDevice(const char *description);
-
 };
 
 //------------------------------------------------------------------------------
 template <class T>
 albaPlugTestDevice<T>::albaPlugTestDevice(const char *description)
-//------------------------------------------------------------------------------
 { 
   albaInteractionFactory *factory=albaInteractionFactory::GetInstance();
   if (factory)
@@ -97,7 +88,6 @@ albaPlugTestDevice<T>::albaPlugTestDevice(const char *description)
 //-------------------------------------------------------------------------
 /** a simple VME created just for testing purposes. */
 class albaAvatarCustom : public albaAvatar
-  //-------------------------------------------------------------------------
 {
 public:
   albaTypeMacro(albaAvatarCustom,albaAvatar);
@@ -113,17 +103,14 @@ private:
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaAvatarCustom);
-//-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 albaAvatarCustom::albaAvatarCustom()
-//-------------------------------------------------------------------------
 {
 
 }
 //-------------------------------------------------------------------------
 albaAvatarCustom::~albaAvatarCustom()
-//-------------------------------------------------------------------------
 {
 
 }
@@ -132,7 +119,6 @@ albaAvatarCustom::~albaAvatarCustom()
 // a custom plugger for the new factory
 template <class T>
 class albaPlugTestAvatar
-  //------------------------------------------------------------------------------
 {
 public:
   albaPlugTestAvatar(const char *description);
@@ -142,7 +128,6 @@ public:
 //------------------------------------------------------------------------------
 template <class T>
 albaPlugTestAvatar<T>::albaPlugTestAvatar(const char *description)
-//------------------------------------------------------------------------------
 { 
   albaInteractionFactory *factory=albaInteractionFactory::GetInstance();
   if (factory)
@@ -153,21 +138,7 @@ albaPlugTestAvatar<T>::albaPlugTestAvatar(const char *description)
 }
 
 //-------------------------------------------------------------------------
-void albaInteractionFactoryTest::TestGetALBASourceVersion()
-//-------------------------------------------------------------------------
-{
-  albaInteractionFactory *interaction_factory = albaInteractionFactory::GetInstance();
-  CPPUNIT_ASSERT(interaction_factory!=NULL);
-  
-  std::string value1 = interaction_factory->GetALBASourceVersion();
-  std::string value2 = std::string(ALBA_SOURCE_VERSION);
-  
-  CPPUNIT_ASSERT( value1 == value2 );
-
-}
-//-------------------------------------------------------------------------
 void albaInteractionFactoryTest::TestGetDescription()
-//-------------------------------------------------------------------------
 {
   albaInteractionFactory *interaction_factory = albaInteractionFactory::GetInstance();
   CPPUNIT_ASSERT(interaction_factory!=NULL);
@@ -180,7 +151,6 @@ void albaInteractionFactoryTest::TestGetDescription()
 
 //-------------------------------------------------------------------------
 void albaInteractionFactoryTest::TestGetInstance()
-//-------------------------------------------------------------------------
 {
   albaInteractionFactory *interaction_factory = albaInteractionFactory::GetInstance();
   CPPUNIT_ASSERT(interaction_factory!=NULL);
@@ -188,7 +158,6 @@ void albaInteractionFactoryTest::TestGetInstance()
 
 //-------------------------------------------------------------------------
 void albaInteractionFactoryTest::TestInitialize()
-//-------------------------------------------------------------------------
 {
   albaInteractionFactory *interaction_factory = albaInteractionFactory::GetInstance();
 
@@ -200,7 +169,6 @@ void albaInteractionFactoryTest::TestInitialize()
 
 //-------------------------------------------------------------------------
 void albaInteractionFactoryTest::TestRegisterNewAvatar_CreateAvatarInstance()
-//-------------------------------------------------------------------------
 {
   albaInteractionFactory *interaction_factory = albaInteractionFactory::GetInstance();
   

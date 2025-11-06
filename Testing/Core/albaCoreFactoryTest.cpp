@@ -27,7 +27,6 @@
 
 #include "albaObject.h"
 #include "albaCoreFactory.h"
-#include "albaVersion.h"
 #include "mmaVolumeMaterial.h"
 #include <iostream>
 
@@ -39,7 +38,6 @@ public:
 	albaDummyFactory() {}
 	~albaDummyFactory() {}
 
-	virtual const char* GetALBASourceVersion() const {return ALBA_SOURCE_VERSION;};
 	virtual const char* GetDescription() const {return "Factory Dummy";};
 
 	void Print(std::ostream &out) {out<<"Dummy";}
@@ -71,20 +69,17 @@ albaCxxTypeMacro(albaDummyObject);
 
 //------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestStaticAllocation()
-//------------------------------------------------------------------------------
 {
 	albaDummyFactory factory;
 }
 //------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestDynamicAllocation()
-//------------------------------------------------------------------------------
 {
 	albaDummyFactory *factory=new albaDummyFactory();
 	delete factory;
 }
 //------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestCreateInstance()
-//------------------------------------------------------------------------------
 {
   // a couple of factories
   albaDummyFactory *first_factory = albaDummyFactory::New();
@@ -124,27 +119,8 @@ void albaCoreFactoryTest::TestCreateInstance()
   foo->Delete();
   dummy->Delete();
 }
-
-//------------------------------------------------------------------------------
-void albaCoreFactoryTest::TestGetSourceVersion()
-//------------------------------------------------------------------------------
-{
-  albaDummyFactory *factory=albaDummyFactory::New();
-  albaCoreFactory::RegisterFactory(factory);
-  factory->RegisterNewObject(albaDummyObject::GetStaticTypeName(),"TestObject",albaDummyObject::NewObject);
-
-  albaReferenceCounted *args=factory->GetArgs("Test");
-
-  albaString version = factory->GetALBASourceVersion();
-  version.Erase(16);
-
-  CPPUNIT_ASSERT(albaString::Compare(version,"alba version 2.2") == 0);
-}
-
-
 //------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestGetDescription()
-//------------------------------------------------------------------------------
 {
   albaDummyFactory *factory=albaDummyFactory::New();
   albaCoreFactory::RegisterFactory(factory);
@@ -156,10 +132,8 @@ void albaCoreFactoryTest::TestGetDescription()
 
   CPPUNIT_ASSERT(albaString::Compare(description, "Factory Dummy") == 0);
 }
-
 //------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestRegisterFactory()
-//------------------------------------------------------------------------------
 {
 	// a couple of factories
 	albaDummyFactory *first_factory = albaDummyFactory::New();
@@ -177,7 +151,6 @@ void albaCoreFactoryTest::TestRegisterFactory()
 }
 //------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestUnRegisterAllFactories()
-//------------------------------------------------------------------------------
 {
 	// a couple of factories
 	albaDummyFactory *first_factory = albaDummyFactory::New();
@@ -203,7 +176,6 @@ void albaCoreFactoryTest::TestUnRegisterAllFactories()
 }
 //------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestGetRegisteredFactories()
-//------------------------------------------------------------------------------
 {
 	// a couple of factories
 	albaDummyFactory *first_factory = albaDummyFactory::New();
@@ -232,9 +204,7 @@ void albaCoreFactoryTest::TestGetRegisteredFactories()
 }
 //------------------------------------------------------------------------------
 albaObject* FunctionDummy(){return new albaDummyObject();};
-//------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestRegisterOverride()
-//------------------------------------------------------------------------------
 {
   albaDummyFactory *factory=albaDummyFactory::New();
   albaCoreFactory::RegisterFactory(factory);
@@ -265,7 +235,6 @@ void albaCoreFactoryTest::TestRegisterOverride()
 }
 //------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestRegisterNewObject()
-//------------------------------------------------------------------------------
 {
   albaDummyFactory *factory=albaDummyFactory::New();
   albaCoreFactory::RegisterFactory(factory);
@@ -281,7 +250,6 @@ void albaCoreFactoryTest::TestRegisterNewObject()
 }
 //------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestDisable()
-//------------------------------------------------------------------------------
 {
   albaDummyFactory *factory=albaDummyFactory::New();
   albaCoreFactory::RegisterFactory(factory);
@@ -300,7 +268,6 @@ void albaCoreFactoryTest::TestDisable()
 }
 //------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestSetEnableFlag()
-//------------------------------------------------------------------------------
 {
   albaDummyFactory *factory=albaDummyFactory::New();
   albaCoreFactory::RegisterFactory(factory);
@@ -318,7 +285,6 @@ void albaCoreFactoryTest::TestSetEnableFlag()
 }
 //------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestUnRegisterFactory()
-//------------------------------------------------------------------------------
 {
   // a couple of factories
   albaDummyFactory *first_factory = albaDummyFactory::New();
@@ -341,7 +307,6 @@ void albaCoreFactoryTest::TestUnRegisterFactory()
 }
 //------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestGetArgs()
-//------------------------------------------------------------------------------
 {
   albaDummyFactory *factory=albaDummyFactory::New();
   albaCoreFactory::RegisterFactory(factory);
@@ -353,7 +318,6 @@ void albaCoreFactoryTest::TestGetArgs()
 }
 //------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestReHash()
-//------------------------------------------------------------------------------
 {
   albaDummyFactory *first_factory=albaDummyFactory::New();
   albaCoreFactory::RegisterFactory(first_factory);
@@ -374,7 +338,6 @@ void albaCoreFactoryTest::TestReHash()
 }
 //------------------------------------------------------------------------------
 void albaCoreFactoryTest::TestCreateAllInstance()
-//------------------------------------------------------------------------------
 {
   albaDummyFactory *factory=albaDummyFactory::New();
   albaCoreFactory::RegisterFactory(factory);
@@ -392,7 +355,7 @@ void albaCoreFactoryTest::TestCreateAllInstance()
     albaDummyObject::SafeDownCast(*i)->Delete();
   }
 }
-
+//------------------------------------------------------------------------------
 void albaCoreFactoryTest::AfterTest()
 {
 	 albaCoreFactory::UnRegisterAllFactories();

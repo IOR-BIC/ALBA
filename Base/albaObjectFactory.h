@@ -84,13 +84,6 @@ public:
    * do not remove items from this list! */
   static std::list<albaObjectFactory*> GetRegisteredFactories();
 
-  /** All sub-classes of albaObjectFactory should must return the version of 
-   * ALBA they were built with.  This should be implemented with the macro
-   * ALBA_SOURCE_VERSION and NOT a call to Version::GetALBASourceVersion.
-   * As the version needs to be compiled into the file as a string constant.
-   * This is critical to determine possible incompatible dynamic factory loads. */
-  virtual const char* GetALBASourceVersion(void) const = 0;
-
   /** Return a descriptive string describing the factory. */
   virtual const char* GetDescription(void) const = 0;
 

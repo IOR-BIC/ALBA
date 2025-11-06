@@ -16,7 +16,6 @@
 #include "albaDynamicLoader.h"
 #include "albaObjectFactory.h"
 #include "albaDirectory.h"
-#include "albaVersion.h"
 #include "albaIndent.h"
 #include <stdlib.h>
 #include <ctype.h>
@@ -342,19 +341,12 @@ albaObjectFactory::~albaObjectFactory()
 void albaObjectFactory::RegisterFactory(albaObjectFactory* factory)
 //------------------------------------------------------------------------------
 {
-  if ( factory->m_LibraryHandle == 0 )
-    {
-    const char* nonDynamicName = "Non-Dynamicly loaded factory";
-    factory->m_LibraryPath = nonDynamicName;
-    }
-  if ( strcmp(factory->GetALBASourceVersion(), 
-            albaVersion::GetALBASourceVersion()) != 0 )
-    {
-      albaWarningMacro(<< "Possible incompatible factory load:" 
-      << "\nRunning alba version :\n" << albaVersion::GetALBASourceVersion() 
-      << "\nLoaded Factory version:\n" << factory->GetALBASourceVersion()
-      << "\nLoading factory:\n" << factory->m_LibraryPath << "\n");
-    }
+	if (factory->m_LibraryHandle == 0)
+	{
+		const char* nonDynamicName = "Non-Dynamicly loaded factory";
+		factory->m_LibraryPath = nonDynamicName;
+	}
+  
   albaObjectFactory::Initialize();
   albaObjectFactory::m_RegisteredFactories->push_back(factory);
   factory->Register(0);

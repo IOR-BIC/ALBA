@@ -24,17 +24,13 @@
 
 #include <cppunit/config/SourcePrefix.h>
 #include "albaPipeFactoryVMETest.h"
-
 #include "albaPipe.h"
 #include "albaPipeFactoryVME.h"
-
-#include "albaVersion.h"
 #include <iostream>
 
 //-------------------------------------------------------------------------
 /** a simple VME created just for testing purposes. */
 class albaPipeCustom : public albaPipe
-	//-------------------------------------------------------------------------
 {
 public:
 	albaTypeMacro(albaPipeCustom,albaPipe);
@@ -50,17 +46,14 @@ private:
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeCustom);
-//-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 albaPipeCustom::albaPipeCustom()
-//-------------------------------------------------------------------------
 {
 
 }
 //-------------------------------------------------------------------------
 albaPipeCustom::~albaPipeCustom()
-//-------------------------------------------------------------------------
 {
 
 }
@@ -69,7 +62,6 @@ albaPipeCustom::~albaPipeCustom()
 // a custom plugger for the new factory
 template <class T>
 class albaPlugTestPipe
-	//------------------------------------------------------------------------------
 {
 public:
 	albaPlugTestPipe(const char *description);
@@ -79,7 +71,6 @@ public:
 //------------------------------------------------------------------------------
 template <class T>
 albaPlugTestPipe<T>::albaPlugTestPipe(const char *description)
-	//------------------------------------------------------------------------------
 { 
 	albaPipeFactoryVME *factory=albaPipeFactoryVME::GetInstance();
 	if (factory)
@@ -91,7 +82,6 @@ albaPlugTestPipe<T>::albaPlugTestPipe(const char *description)
 
 //-------------------------------------------------------------------------
 void albaPipeFactoryVMETest::TestGetInstance_Initialize()
-//-------------------------------------------------------------------------
 {
   // a couple of factories
   albaPipeFactoryVME *pipe_factory = albaPipeFactoryVME::GetInstance();
@@ -144,20 +134,9 @@ void albaPipeFactoryVMETest::TestGetInstance_Initialize()
 	pipe1->Delete();
 
 }
-//-------------------------------------------------------------------------
-void albaPipeFactoryVMETest::TestGetALBASourceVersion()
-//-------------------------------------------------------------------------
-{
-	albaPipeFactoryVME *pipe_factory = albaPipeFactoryVME::GetInstance();
-	CPPUNIT_ASSERT(pipe_factory!=NULL);
-	std::string value1 = pipe_factory->GetALBASourceVersion();
-	std::string value2 = std::string(ALBA_SOURCE_VERSION);
-	CPPUNIT_ASSERT( value1 == value2 );
 
-}
 //-------------------------------------------------------------------------
 void albaPipeFactoryVMETest::TestGetDescription()
-//-------------------------------------------------------------------------
 {
 	albaPipeFactoryVME *pipe_factory = albaPipeFactoryVME::GetInstance();
 	CPPUNIT_ASSERT(pipe_factory!=NULL);

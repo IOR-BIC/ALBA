@@ -44,7 +44,6 @@ class ALBA_EXPORT albaInteractionFactory : public albaObjectFactory
 {
 public: 
   albaTypeMacro(albaInteractionFactory,albaObjectFactory);
-  virtual const char* GetALBASourceVersion() const;
   virtual const char* GetDescription() const;
 
   /* Initialize the factory creating and registering a new instance */
@@ -97,8 +96,8 @@ protected:
 
   static bool m_Initialized;
   //static albaInteractionFactory *m_Instance;
-  static std::set<std::string> m_DeviceNames; 
-  static std::set<std::string> m_AvatarNames; 
+  static std::set<std::string> glo_DeviceNames; 
+  static std::set<std::string> glo_AvatarNames; 
   
 private:
   albaInteractionFactory(const albaInteractionFactory&);  // Not implemented.

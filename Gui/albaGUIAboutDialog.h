@@ -56,7 +56,6 @@ public:
 	void SetTitle(wxString title) { m_Title = title; };
 	void SetAlbaBuildNum(wxString revision);
 	void SetAppBuildNum(wxString revision);
-	void SetVersion(wxString ver) { m_Version = ver; };
 	void SetWebSite(wxString webSite);
 	void SetLicenseURL(wxString licenseURL);
 	void SetExtraMessage(wxString message);
@@ -76,7 +75,6 @@ protected:
 	wxString			m_AlbaBuildNum;
 	wxString			m_AppBuildNum;
 	wxString			m_BuildDate;
-	wxString			m_Version;
 	wxString			m_ImagePath;
 	wxString			m_WebSiteURL;
 	wxString			m_LicenseURL;

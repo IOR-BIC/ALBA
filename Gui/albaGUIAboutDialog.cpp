@@ -61,7 +61,6 @@ albaGUIAboutDialog::albaGUIAboutDialog(wxString dialog_title)
 	m_AppBuildNum = "";
 	m_AlbaBuildNum = "";
 	m_BuildDate = GetBuildDate();
-	m_Version = "";
 	m_ImagePath = "";	
 	m_WebSiteURL = "";
 	m_LicenseURL = "";
@@ -143,23 +142,18 @@ void albaGUIAboutDialog::SetExtraMessage(wxString message)
 //----------------------------------------------------------------------------
 void albaGUIAboutDialog::CreateDialog()
 {
-	wxString title = "About ";
-	title += m_Title;
+	wxString title = m_Title;
+	title += " About";
 
 	wxString description = m_Title;
-	description += "\n";
 	
 	// Build number
-	description += _("Build ") + m_AppBuildNum;
-
-	// Version
-	if (!m_Version.IsEmpty())
-		description += _(" - Version ") + m_Version;
+	description += _(" Build ") + m_AppBuildNum;
 
 	// Build Date
 	description += m_BuildDate;
 
-	description += _("\n Based on Alba ") + _(ALBA_VERSION) + _(" Build ") + m_AlbaBuildNum;
+	description += _("\n Based on ALBA Build ") + m_AlbaBuildNum;
 
 	// Copyright
 	wxString copyright;

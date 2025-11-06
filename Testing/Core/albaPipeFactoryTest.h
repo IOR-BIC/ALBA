@@ -23,13 +23,11 @@ class albaPipeFactoryTest : public albaTest
 {
   CPPUNIT_TEST_SUITE( albaPipeFactoryTest );
   CPPUNIT_TEST( TestGetInstance_Initialize_CreatePipeInstance_RegisterNewPipe_GetPipeNames );
-	CPPUNIT_TEST( TestGetALBASourceVersion );
 	CPPUNIT_TEST( TestGetDescription );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
     void TestGetInstance_Initialize_CreatePipeInstance_RegisterNewPipe_GetPipeNames();
-		void TestGetALBASourceVersion();
 		void TestGetDescription();
 };
 
