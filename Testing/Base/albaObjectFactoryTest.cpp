@@ -28,7 +28,6 @@
 
 #include "albaObject.h"
 #include "albaObjectFactory.h"
-#include "albaVersion.h"
 #include "mmaVolumeMaterial.h"
 #include <iostream>
 
@@ -40,7 +39,6 @@ public:
 	albaDummyFactory() {}
 	~albaDummyFactory() {}
 
-	virtual const char* GetALBASourceVersion() const {return ALBA_SOURCE_VERSION;};
 	virtual const char* GetDescription() const {return "Factory Dummy";};
 
 	void Print(std::ostream &out) {out<<"Dummy";}

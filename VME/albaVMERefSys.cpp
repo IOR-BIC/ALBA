@@ -53,7 +53,7 @@
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 
-const bool DEBUG_MODE = false;
+const bool DEBUG_MODE = TRUE;
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMERefSys)
@@ -427,10 +427,10 @@ void albaVMERefSys::OnEvent(albaEventBase *alba_event)
 				{
           // Normal RefSys
 
-					//Remove links
-					RemoveLink("OriginVME");
-					RemoveLink("Point1VME");
-					RemoveLink("Point2VME");
+					//Set all links to non mandatory
+					SetLinkToNonMandatory("OriginVME");
+          SetLinkToNonMandatory("Point1VME");
+          SetLinkToNonMandatory("Point2VME");
 					
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,false);
 					m_Gui->Enable(ID_POINT1,false);
@@ -441,10 +441,9 @@ void albaVMERefSys::OnEvent(albaEventBase *alba_event)
           // RefSys with Origin link
 
 					//Make origin link mandatory and remove other links
-					linkedVME = GetLink("OriginVME");
-					SetMandatoryLink("OriginVME", linkedVME);
-					RemoveLink("Point1VME");
-					RemoveLink("Point2VME");
+					SetLinkToMandatory("OriginVME");
+          SetLinkToNonMandatory("Point1VME");
+          SetLinkToNonMandatory("Point2VME");
 
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
 					m_Gui->Enable(ID_POINT1,false);
@@ -455,12 +454,9 @@ void albaVMERefSys::OnEvent(albaEventBase *alba_event)
           // RefSys with all the link enabled: originABSPosition, point1ABSPosition and point2ABSPosition
 
 					//Make all link mandatory
-					linkedVME = GetLink("OriginVME");
-					SetMandatoryLink("OriginVME", linkedVME);
-					linkedVME = GetLink("Point1VME");
-					SetMandatoryLink("Point1VME", linkedVME);
-					linkedVME = GetLink("Point2VME");
-					SetMandatoryLink("Point2VME", linkedVME);
+          SetLinkToMandatory("OriginVME");
+          SetLinkToMandatory("Point1VME");
+          SetLinkToMandatory("Point2VME");
 
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
 					m_Gui->Enable(ID_POINT1,true);
@@ -470,6 +466,7 @@ void albaVMERefSys::OnEvent(albaEventBase *alba_event)
 
 				//Workaround to update accept on move operations
 				GetLogicManager()->VmeModified(this);
+        GetLogicManager()->CameraUpdate();
 				m_Gui->Update();
 			}
 			break;

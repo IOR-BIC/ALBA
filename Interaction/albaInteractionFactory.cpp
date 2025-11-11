@@ -26,27 +26,23 @@
 #include "albaInteractionFactory.h"
 #include "albaDevice.h"
 #include "albaAvatar.h"
-#include "albaVersion.h"
 #include "albaIndent.h"
 #include <string>
 #include <ostream>
 
 //----------------------------------------------------------------------------
 // static variables
-//----------------------------------------------------------------------------
 bool albaInteractionFactory::m_Initialized=false;
 // albaInteractionFactory *albaInteractionFactory::m_Instance=NULL;
-std::set<std::string> albaInteractionFactory::m_DeviceNames; 
-std::set<std::string> albaInteractionFactory::m_AvatarNames;
+std::set<std::string> albaInteractionFactory::glo_DeviceNames; 
+std::set<std::string> albaInteractionFactory::glo_AvatarNames;
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractionFactory);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 // This is used to register the factory when linking statically
 int albaInteractionFactory::Initialize()
-//----------------------------------------------------------------------------
 {
   if (!m_Initialized)
   {
@@ -70,7 +66,6 @@ int albaInteractionFactory::Initialize()
 
 //------------------------------------------------------------------------
 albaInteractionFactory::albaInteractionFactory()
-//------------------------------------------------------------------------------
 {
   //m_Instance = NULL;
   
@@ -91,47 +86,36 @@ albaInteractionFactory::albaInteractionFactory()
   //albaPlugAvatarMacro(albaAvatar3DCone,"an avatar represented as a 3D cone");
 }
 
-//------------------------------------------------------------------------------
-const char* albaInteractionFactory::GetALBASourceVersion() const
-//------------------------------------------------------------------------------
-{
-  return ALBA_SOURCE_VERSION;
-}
 
 //------------------------------------------------------------------------------
 const char* albaInteractionFactory::GetDescription() const
-//------------------------------------------------------------------------------
 {
   return "Factory for ALBA Devices and Avatars";
 }
 
 //------------------------------------------------------------------------------
 albaDevice *albaInteractionFactory::CreateDeviceInstance(const char *type_name)
-//------------------------------------------------------------------------------
 {
   return albaDevice::SafeDownCast(Superclass::CreateInstance(type_name));
 }
 
 //------------------------------------------------------------------------------
 void albaInteractionFactory::RegisterNewDevice(const char* node_name, const char* description, albaCreateObjectFunction createFunction)
-//------------------------------------------------------------------------------
 {
-  m_DeviceNames.insert(node_name);
+  glo_DeviceNames.insert(node_name);
   RegisterNewObject(node_name,description,createFunction);
 }
 
 //------------------------------------------------------------------------------
 albaAvatar *albaInteractionFactory::CreateAvatarInstance(const char *type_name)
-//------------------------------------------------------------------------------
 {
   return albaAvatar::SafeDownCast(Superclass::CreateInstance(type_name));
 }
 
 //------------------------------------------------------------------------------
 void albaInteractionFactory::RegisterNewAvatar(const char* node_name, const char* description, albaCreateObjectFunction createFunction)
-//------------------------------------------------------------------------------
 {
-  m_AvatarNames.insert(node_name);
+  glo_AvatarNames.insert(node_name);
   RegisterNewObject(node_name,description,createFunction);
 }
 
@@ -140,7 +124,7 @@ const char *albaInteractionFactory::GetDeviceTypeName(const char *device_name)
 //------------------------------------------------------------------------------
 {
   // check if that device exists
-  if (m_DeviceNames.find(device_name)!=m_DeviceNames.end())
+  if (glo_DeviceNames.find(device_name)!=glo_DeviceNames.end())
   {
     mmuOverRideMap::iterator pos = m_OverrideMap->find(device_name);
     if ( pos != m_OverrideMap->end() )
@@ -157,7 +141,7 @@ const char *albaInteractionFactory::GetAvatarDescription(const char *avatar_name
 //------------------------------------------------------------------------------
 {
   // check if that device exists
-  if (m_AvatarNames.find(avatar_name)!=m_DeviceNames.end())
+  if (glo_AvatarNames.find(avatar_name)!=glo_DeviceNames.end())
   {
     mmuOverRideMap::iterator pos = m_OverrideMap->find(avatar_name);
     if ( pos != m_OverrideMap->end() )
@@ -173,35 +157,35 @@ const char *albaInteractionFactory::GetAvatarDescription(const char *avatar_name
 const std::set<std::string> *albaInteractionFactory::GetDeviceNames()
 //------------------------------------------------------------------------------ 
 {
-  return &m_DeviceNames;
+  return &glo_DeviceNames;
 }
 
 //------------------------------------------------------------------------------
 const std::set<std::string> *albaInteractionFactory::GetAvatarNames()
 //------------------------------------------------------------------------------
 {
-  return &m_AvatarNames;
+  return &glo_AvatarNames;
 }
 
 //------------------------------------------------------------------------------
 int albaInteractionFactory::GetNumberOfDevices()
 //------------------------------------------------------------------------------
 {
-  return m_DeviceNames.size();
+  return glo_DeviceNames.size();
 }
 
 //------------------------------------------------------------------------------
 int albaInteractionFactory::GetNumberOfAvatars()
 //------------------------------------------------------------------------------
 {
-  return m_AvatarNames.size();
+  return glo_AvatarNames.size();
 }
 
 //------------------------------------------------------------------------------
 const char *albaInteractionFactory::GetDeviceName(int idx)
 //------------------------------------------------------------------------------
 {
-  std::set<std::string>::iterator it = m_DeviceNames.begin();
+  std::set<std::string>::iterator it = glo_DeviceNames.begin();
   for (int i=0;i<idx;i++)
     it++;
   return it->c_str();
@@ -211,7 +195,7 @@ const char *albaInteractionFactory::GetDeviceName(int idx)
 const char *albaInteractionFactory::GetAvatarName(int idx)
 //------------------------------------------------------------------------------
 {
-  std::set<std::string>::iterator it = m_AvatarNames.begin();
+  std::set<std::string>::iterator it = glo_AvatarNames.begin();
   for (int i=0;i<idx;i++)
     it++;
   return it->c_str();

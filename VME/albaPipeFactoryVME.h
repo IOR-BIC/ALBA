@@ -33,7 +33,6 @@ class ALBA_EXPORT albaPipeFactoryVME : public albaPipeFactory
 {
 public: 
   albaTypeMacro(albaPipeFactoryVME,albaPipeFactory);
-  virtual const char* GetALBASourceVersion() const;
   virtual const char* GetDescription() const;
   
   static albaPipeFactoryVME *GetInstance(); //{if (!m_Instance) Initialize(); return m_Instance;}

@@ -81,9 +81,8 @@ MARK_AS_ADVANCED (
 #-----------------------------------------------------------------------------
 SET(ALBA_MAJOR_VERSION 2)
 SET(ALBA_MINOR_VERSION 2)
-SET(ALBA_BUILD_VERSION 0)
 SET(ALBA_VERSION
-    "${ALBA_MAJOR_VERSION}.${ALBA_MINOR_VERSION}.${ALBA_BUILD_VERSION}")
+    "${ALBA_MAJOR_VERSION}.${ALBA_MINOR_VERSION}")
 
 #-----------------------------------------------------------------------------
 # this is to enable precompiled headers under VC6.0
@@ -303,11 +302,7 @@ ENDIF(WIN32)
   ${ALBA_BINARY_DIR}/ALBALibraryDepends.cmake
   )
 
-  CONFIGURE_FILE(
-  ${ALBA_SOURCE_DIR}/ALBAConfig.cmake.in
-  ${ALBA_BINARY_DIR}/ALBAConfig.cmake
-  @ONLY IMMEDIATE
-  )
+  CONFIGURE_FILE( ${ALBA_SOURCE_DIR}/ALBAConfig.cmake.in ${ALBA_BINARY_DIR}/ALBAConfig.cmake @ONLY IMMEDIATE )
   
   #### Include directory for binary distribution of ALBA
   SET(ALBA_INSTALL_INCLUDE_DIRS ${INCLUDE_DIRS})

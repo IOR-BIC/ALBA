@@ -36,7 +36,6 @@
 #include "albaDirectoryTest.h"
 #include "albaTransformBaseTest.h"
 #include "albaObserverTest.h"
-#include "albaVersionTest.h"
 #include "mmuIdFactoryTest.h"
 #include "albaVectorTest.h"
 #include "albaObjectFactoryTest.h"
@@ -104,7 +103,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaDirectoryTest::suite());
 	runner.addTest(albaTransformBaseTest::suite());
 	runner.addTest(albaObserverTest::suite());
-	runner.addTest(albaVersionTest::suite());
 	runner.addTest(mmuIdFactoryTest::suite());
 	runner.addTest(albaVectorTest::suite());
 	runner.addTest(albaObjectFactoryTest::suite());
