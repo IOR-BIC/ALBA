@@ -438,15 +438,15 @@ void albaOpManager::EnableContextualMenu(albaGUITreeContextualMenu *contextualMe
 		}
 		else
 		{
-			contextualMenu->FindItem(RMENU_ADD_GROUP)->Enable(m_OpAddGroup->Accept(node));
-
-			contextualMenu->FindItem(RMENU_CUT)->Enable(m_OpCut->Accept(node));
-			contextualMenu->FindItem(RMENU_COPY)->Enable(m_OpCopy->Accept(node));
-			contextualMenu->FindItem(RMENU_PASTE)->Enable(m_OpPaste->Accept(node));
-			contextualMenu->FindItem(RMENU_DELETE)->Enable(m_OpCut->Accept(node));
-			contextualMenu->FindItem(RMENU_RENAME)->Enable(m_OpRename->Accept(node));
-			contextualMenu->FindItem(RMENU_REPARENT)->Enable(m_OpReparent->Accept(node));
-			contextualMenu->FindItem(RMENU_SHOW_HISTORY)->Enable(m_OpShowHistory->Accept(node));
+      bool enableOperations = m_RunningOp == NULL;
+			contextualMenu->FindItem(RMENU_ADD_GROUP)->Enable(enableOperations && m_OpAddGroup->Accept(node));
+			contextualMenu->FindItem(RMENU_CUT)->Enable(enableOperations && m_OpCut->Accept(node));
+			contextualMenu->FindItem(RMENU_COPY)->Enable(enableOperations && m_OpCopy->Accept(node));
+			contextualMenu->FindItem(RMENU_PASTE)->Enable(enableOperations && m_OpPaste->Accept(node));
+			contextualMenu->FindItem(RMENU_DELETE)->Enable(enableOperations && m_OpCut->Accept(node));
+			contextualMenu->FindItem(RMENU_RENAME)->Enable(enableOperations && m_OpRename->Accept(node));
+			contextualMenu->FindItem(RMENU_REPARENT)->Enable(enableOperations && m_OpReparent->Accept(node));
+			contextualMenu->FindItem(RMENU_SHOW_HISTORY)->Enable(enableOperations && m_OpShowHistory->Accept(node));
 		}
 	}
 }
