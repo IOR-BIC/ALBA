@@ -29,20 +29,38 @@ Function LeaveAddToPathPage
     IntCmp $0 1 DoUpdate SkipUpdate
 
 DoUpdate:
-    ReadRegStr $1 HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "Path"
-    StrCpy $2 "$INSTDIR\bin"
+	; Read the current PATH safely
+	ReadRegExpandStr $1 HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "Path"
+	${If} $1 == ""
+		; Fallback to user path
+		ReadRegExpandStr $1 HKCU "Environment" "Path"
+	${EndIf}
 
-    ; Check if already present
-    Push $1
-    Push $2
-    Call SubStrFound
-    Pop $3
-    StrCmp $3 "found" SkipUpdate
+	; Check that we actually got something
+	${If} $1 == ""
+		MessageBox MB_ICONSTOP "Cannot read current PATH. Aborting modification.\nYou should update it manually."
+		Return
+	${EndIf}
 
-    StrCpy $1 "$1;$2"
-    WriteRegExpandStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "Path" "$1"
+	; Append only if not already present
+	StrCpy $2 "$INSTDIR\bin"
+	Push $1
+	Push $2
+	Call SubStrFound
+	Pop $3
+	StrCmp $3 "found" SkipUpdate
 
-    System::Call 'user32::SendMessageTimeoutW(i 0xffff, i ${WM_SETTINGCHANGE}, i 0, w "Environment", i 0, i 5000, *i .r0)'
+	; Avoid double semicolon
+	StrCpy $4 $1 1 -1
+	StrCmp $4 ";" 0 +2
+	StrCpy $1 $1 -1
+	StrCpy $1 "$1;$2"
+
+	; Write back with same type (expand)
+	WriteRegExpandStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "Path" "$1"
+
+	; Broadcast change
+	System::Call 'user32::SendMessageTimeoutW(i 0xffff, i ${WM_SETTINGCHANGE}, i 0, w "Environment", i 0, i 5000, *i .r0)'
 
 SkipUpdate:
 FunctionEnd
