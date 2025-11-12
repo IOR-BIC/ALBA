@@ -25,7 +25,6 @@
 
 
 #include "albaPipeFactory.h"
-#include "albaVersion.h"
 #include "albaIndent.h"
 #include "albaPipe.h"
 #ifdef ALBA_USE_VTK
@@ -45,7 +44,6 @@ albaCxxTypeMacro(albaPipeFactory);
 //----------------------------------------------------------------------------
 // This is used to register the factory when linking statically
 int albaPipeFactory::Initialize()
-//----------------------------------------------------------------------------
 {
   if (!m_Initialized)
   {
@@ -69,7 +67,6 @@ int albaPipeFactory::Initialize()
 
 //------------------------------------------------------------------------
 albaPipeFactory::albaPipeFactory()
-//------------------------------------------------------------------------------
 {
   // m_Instance = NULL;
   
@@ -84,29 +81,19 @@ albaPipeFactory::albaPipeFactory()
 }
 
 //------------------------------------------------------------------------------
-const char* albaPipeFactory::GetALBASourceVersion() const
-//------------------------------------------------------------------------------
-{
-  return ALBA_SOURCE_VERSION;
-}
-
-//------------------------------------------------------------------------------
 const char* albaPipeFactory::GetDescription() const
-//------------------------------------------------------------------------------
 {
   return "Factory for ALBA Pipes";
 }
 
 //------------------------------------------------------------------------------
 albaPipe *albaPipeFactory::CreatePipeInstance(const char *type_name)
-//------------------------------------------------------------------------------
 {
   return albaPipe::SafeDownCast(Superclass::CreateInstance(type_name));
 }
 
 //------------------------------------------------------------------------------
 void albaPipeFactory::RegisterNewPipe(const char* pipe_name, const char* description, albaCreateObjectFunction createFunction)
-//------------------------------------------------------------------------------
 {
 	std::vector<std::string, std::allocator<std::string> >::const_iterator it = std::find(GetPipeNames().begin (), GetPipeNames().end (), std::string(pipe_name));
 	if(it != GetPipeNames().end() )
@@ -118,7 +105,6 @@ void albaPipeFactory::RegisterNewPipe(const char* pipe_name, const char* descrip
 }
 //------------------------------------------------------------------------------
 albaPipeFactory* albaPipeFactory::GetInstance()
-//------------------------------------------------------------------------------
 {
   static albaPipeFactory &istance = *(albaPipeFactory::New());
   Initialize();
@@ -126,7 +112,6 @@ albaPipeFactory* albaPipeFactory::GetInstance()
 }
 //------------------------------------------------------------------------------
 std::vector<std::string> &albaPipeFactory::GetPipeNames()
-//------------------------------------------------------------------------------
 {
   static std::vector<std::string> pipeNames;
   return pipeNames;

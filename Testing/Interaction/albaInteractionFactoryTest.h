@@ -36,13 +36,11 @@ class albaInteractionFactoryTest : public albaTest
   CPPUNIT_TEST( TestGetDeviceNames );
   CPPUNIT_TEST( TestGetDeviceName );
   CPPUNIT_TEST( TestGetDeviceDescription );
-  CPPUNIT_TEST( TestGetALBASourceVersion );
   CPPUNIT_TEST( TestGetDescription );
 
   CPPUNIT_TEST_SUITE_END();
 
 protected:
-  void TestGetALBASourceVersion();
   void TestGetDescription();
   void TestGetInstance();
   void TestInitialize();

@@ -25,20 +25,17 @@
 
 
 #include "albaCoreFactory.h"
-#include "albaVersion.h"
 #include "albaIndent.h"
 #include <string>
 #include <ostream>
 
 bool albaCoreFactory::m_Initialized=false;
-// albaCoreFactory *albaCoreFactory::m_Instance=NULL;
 
 albaCxxTypeMacro(albaCoreFactory);
 
 //----------------------------------------------------------------------------
 // This is used to register the factory when linking statically
 int albaCoreFactory::Initialize()
-//----------------------------------------------------------------------------
 {
   if (m_Initialized)
   {
@@ -61,7 +58,6 @@ int albaCoreFactory::Initialize()
 
 //------------------------------------------------------------------------
 albaCoreFactory::albaCoreFactory()
-//------------------------------------------------------------------------------
 {
   // m_Instance = NULL;
   
@@ -72,21 +68,12 @@ albaCoreFactory::albaCoreFactory()
 }
 
 //------------------------------------------------------------------------------
-const char* albaCoreFactory::GetALBASourceVersion() const
-//------------------------------------------------------------------------------
-{
-  return ALBA_SOURCE_VERSION;
-}
-
-//------------------------------------------------------------------------------
 const char* albaCoreFactory::GetDescription() const
-//------------------------------------------------------------------------------
 {
   return "ALBA-Core Object Factory";
 }
 //------------------------------------------------------------------------------
 albaCoreFactory* albaCoreFactory::GetInstance()
-//------------------------------------------------------------------------------
 {
   static albaCoreFactory &instance = *(albaCoreFactory::New());
   return &instance;

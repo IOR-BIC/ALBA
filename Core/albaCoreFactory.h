@@ -26,7 +26,6 @@ class ALBA_EXPORT albaCoreFactory : public albaObjectFactory
 {
 public: 
   albaTypeMacro(albaCoreFactory,albaObjectFactory);
-  virtual const char* GetALBASourceVersion() const;
   virtual const char* GetDescription() const;
 
   /* Initialize the factory creating and registering a new instance */

@@ -164,3 +164,21 @@ void albaFakeLogicForTest::ExpandVME(albaVME *vme)
 {
 	return;
 }
+
+const char* albaFakeLogicForTest::GetAppBuildNum()
+{
+	return "";
+}
+
+void albaFakeLogicForTest::SetAppBuildNum(char* buildNum)
+{
+}
+
+const char* albaFakeLogicForTest::GetAlbaBuildNum()
+{
+	return "";
+}
+
+void albaFakeLogicForTest::SetAlbaBuildNum(char *buildNum)
+{
+}

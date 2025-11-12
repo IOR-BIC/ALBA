@@ -76,6 +76,8 @@ int albaTextFileReaderHelper::GetLine(bool toUpper)
 
 	//Windows translate CR/LF into CR char we need to count a char more for each newline
 	m_BytesReaded += readedChars + 1;
+	m_CurrentLine++;
+
 	if(m_ProgressHelper)
 		m_ProgressHelper->UpdateProgressBar(((double)m_BytesReaded) * 100 / m_FileSize);
 
@@ -101,6 +103,8 @@ int albaTextFileReaderHelper::ReplaceInString(char *str, char from, char to)
 int albaTextFileReaderHelper::ReadInit(albaString &fileName, int textMode, int showProgressBar, albaString progressBarText, albaObserver *listener)
 {
 	m_FilePointer = fopen(fileName.GetCStr(), "r");
+
+	m_CurrentLine = 0;
 
 	if (m_FilePointer == NULL)
 	{

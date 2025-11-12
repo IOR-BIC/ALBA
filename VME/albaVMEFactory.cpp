@@ -24,7 +24,6 @@
 
 #include "albaVMEFactory.h"
 
-#include "albaVersion.h"
 #include "albaVMEExternalData.h"
 #include "albaVMEGeneric.h"
 #include "albaVMEGizmo.h"
@@ -181,12 +180,6 @@ albaVMEFactory::albaVMEFactory()
   albaPlugVMEMacro(albaVMEStent,"Stent");
 #endif
 
-}
-
-//------------------------------------------------------------------------------
-const char* albaVMEFactory::GetALBASourceVersion() const
-{
-  return ALBA_SOURCE_VERSION;
 }
 
 //------------------------------------------------------------------------------

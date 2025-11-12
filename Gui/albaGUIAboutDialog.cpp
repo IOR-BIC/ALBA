@@ -58,9 +58,9 @@ enum albaGUIAboutDialog_IDS
 albaGUIAboutDialog::albaGUIAboutDialog(wxString dialog_title)
 {  
 	m_Title = "";
-	m_BuildNum = "";
+	m_AppBuildNum = "";
+	m_AlbaBuildNum = "";
 	m_BuildDate = GetBuildDate();
-	m_Version = "";
 	m_ImagePath = "";	
 	m_WebSiteURL = "";
 	m_LicenseURL = "";
@@ -108,13 +108,20 @@ void albaGUIAboutDialog::OnEvent(albaEventBase *alba_event)
   }
 }
 
-void albaGUIAboutDialog::SetBuildNum(wxString revision)
+void albaGUIAboutDialog::SetAppBuildNum(wxString revision)
 {
 	albaString tmp = revision;
 	tmp.Replace('_', ' ');
-	m_BuildNum = tmp.GetCStr();
+	m_AppBuildNum = tmp.GetCStr();
 }
-	
+
+void albaGUIAboutDialog::SetAlbaBuildNum(wxString revision)
+{
+	albaString tmp = revision;
+	tmp.Replace('_', ' ');
+	m_AlbaBuildNum = tmp.GetCStr();
+}
+
 //----------------------------------------------------------------------------
 void albaGUIAboutDialog::SetWebSite(wxString webSite)
 {
@@ -135,21 +142,18 @@ void albaGUIAboutDialog::SetExtraMessage(wxString message)
 //----------------------------------------------------------------------------
 void albaGUIAboutDialog::CreateDialog()
 {
-	wxString title = "About ";
-	title += m_Title;
+	wxString title = m_Title;
+	title += " About";
 
 	wxString description = m_Title;
-	description += "\n";
 	
 	// Build number
-	description += m_BuildNum;
-
-	// Version
-	if (!m_Version.IsEmpty())
-		description += _(" - Version ") + m_Version;
+	description += _(" Build ") + m_AppBuildNum;
 
 	// Build Date
 	description += m_BuildDate;
+
+	description += _("\n Based on ALBA Build ") + m_AlbaBuildNum;
 
 	// Copyright
 	wxString copyright;

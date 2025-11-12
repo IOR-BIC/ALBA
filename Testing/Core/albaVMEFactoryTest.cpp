@@ -30,7 +30,6 @@
 #include "albaTransform.h"
 #include "albaVMEFactory.h"
 #include "albaVMEOutputNULL.h"
-#include "albaVersion.h"
 #include <iostream>
 
 
@@ -107,7 +106,6 @@ class albaVMEFactoryCustom : public albaVMEFactory
 {
 public: 
   albaTypeMacro(albaVMEFactoryCustom,albaVMEFactory);
-  virtual const char* GetALBASourceVersion() const {return ALBA_SOURCE_VERSION;}
   virtual const char* GetDescription() const {return "My own Node factory";}
 
   /* Initialize the factory creating and registering a new instance */
@@ -128,15 +126,12 @@ private:
 
 //----------------------------------------------------------------------------
 bool albaVMEFactoryCustom::m_Initialized=false;
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEFactoryCustom)
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 albaVMEFactoryCustom::albaVMEFactoryCustom()
-//----------------------------------------------------------------------------
 {
   // m_Instance = NULL;
   
@@ -146,7 +141,6 @@ albaVMEFactoryCustom::albaVMEFactoryCustom()
 }
 //----------------------------------------------------------------------------
 albaVMEFactoryCustom* albaVMEFactoryCustom::GetInstance()
-//----------------------------------------------------------------------------
 {
   static albaVMEFactoryCustom &istance = *(albaVMEFactoryCustom::New());;
   albaVMEFactoryCustom::Initialize();
@@ -155,7 +149,6 @@ albaVMEFactoryCustom* albaVMEFactoryCustom::GetInstance()
 //----------------------------------------------------------------------------
 // This is used to register the factory when linking statically
 int albaVMEFactoryCustom::Initialize()
-//----------------------------------------------------------------------------
 {
   if (!m_Initialized)
   {
@@ -179,7 +172,6 @@ int albaVMEFactoryCustom::Initialize()
 
 //-------------------------------------------------------------------------
 void albaVMEFactoryTest::TestCreateNodeInstance()
-//-------------------------------------------------------------------------
 {
   // a couple of factories
   albaVMEFactory *node_factory = albaVMEFactory::GetInstance();
@@ -230,5 +222,3 @@ void albaVMEFactoryTest::TestCreateNodeInstance()
   node1->Delete();
   node2->Delete();
 }
-
-  

@@ -25,7 +25,6 @@
 
 
 #include "albaPipeFactoryVME.h"
-#include "albaVersion.h"
 #include "albaIndent.h"
 
 #include "albaPipe.h"
@@ -105,7 +104,6 @@ albaCxxTypeMacro(albaPipeFactoryVME);
 //----------------------------------------------------------------------------
 // This is used to register the factory when linking statically
 int albaPipeFactoryVME::Initialize()
-//----------------------------------------------------------------------------
 {
   if (!m_Initialized)
   {
@@ -129,7 +127,6 @@ int albaPipeFactoryVME::Initialize()
 
 //------------------------------------------------------------------------
 albaPipeFactoryVME::albaPipeFactoryVME()
-//------------------------------------------------------------------------------
 {
   //m_Instance = NULL;
   
@@ -209,22 +206,14 @@ albaPipeFactoryVME::albaPipeFactoryVME()
   albaPlugPipeMacro(albaPipeRayCast, "Pipe for RayCast Volume rendering of bone-blood-muscle");
 }
 
-//------------------------------------------------------------------------------
-const char* albaPipeFactoryVME::GetALBASourceVersion() const
-//------------------------------------------------------------------------------
-{
-  return ALBA_SOURCE_VERSION;
-}
 
 //------------------------------------------------------------------------------
 const char* albaPipeFactoryVME::GetDescription() const
-//------------------------------------------------------------------------------
 {
   return "Factory for ALBA Pipes of VME library";
 }
 //------------------------------------------------------------------------------
 albaPipeFactoryVME* albaPipeFactoryVME::GetInstance()
-//------------------------------------------------------------------------------
 {
   static albaPipeFactoryVME &istance = *(albaPipeFactoryVME::New());
   Initialize();

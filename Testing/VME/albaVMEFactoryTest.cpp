@@ -28,7 +28,6 @@
 #include "albaVME.h"
 #include "albaVMEFactory.h"
 
-#include "albaVersion.h"
 #include <iostream>
 #include <algorithm>
 
@@ -36,7 +35,6 @@
 //-------------------------------------------------------------------------
 /** a simple VME created just for testing purposes. */
 class albaVMECustom : public albaVME
-//-------------------------------------------------------------------------
 {
 public:
   albaTypeMacro(albaVMECustom,albaVME);
@@ -54,23 +52,19 @@ private:
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMECustom);
-//-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 albaVMECustom::albaVMECustom()
-//-------------------------------------------------------------------------
 {
   
 }
 //-------------------------------------------------------------------------
 albaVMECustom::~albaVMECustom()
-//-------------------------------------------------------------------------
 {
   
 }
 //-------------------------------------------------------------------------
 void albaVMEFactoryTest::TestGetInstance()
-//-------------------------------------------------------------------------
 {
   albaVMEFactory *vme_factory = NULL;
   vme_factory = (albaVMEFactory*) albaVMEFactory::GetInstance();
@@ -78,7 +72,6 @@ void albaVMEFactoryTest::TestGetInstance()
 }
 //-------------------------------------------------------------------------
 void albaVMEFactoryTest::Initialize_CreateVMEInstance()
-//-------------------------------------------------------------------------
 {
   // this custom factory needs only to be initialized
   CPPUNIT_ASSERT(albaVMEFactory::Initialize()==ALBA_OK);
@@ -133,22 +126,7 @@ void albaVMEFactoryTest::Initialize_CreateVMEInstance()
   vme1->Delete();
 }
 //-------------------------------------------------------------------------
-void albaVMEFactoryTest::TestGetALBASourceVersion()
-//-------------------------------------------------------------------------
-{
-  CPPUNIT_ASSERT(albaVMEFactory::Initialize()==ALBA_OK);
-
-  albaVMEFactory *vme_factory = NULL;
-  vme_factory = (albaVMEFactory*)albaVMEFactory::GetInstance();
-	CPPUNIT_ASSERT(vme_factory!=NULL);
-	std::string value1 = vme_factory->GetALBASourceVersion();
-	std::string value2 = std::string(ALBA_SOURCE_VERSION);
-	CPPUNIT_ASSERT( value1 == value2 );
-
-}
-//-------------------------------------------------------------------------
 void albaVMEFactoryTest::TestGetDescription()
-//-------------------------------------------------------------------------
 {
   CPPUNIT_ASSERT(albaVMEFactory::Initialize()==ALBA_OK);
 

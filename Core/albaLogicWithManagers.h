@@ -257,6 +257,17 @@ public:
 
 	/** Expand the VME on the Tree  */
 	virtual void ExpandVME(albaVME *vme);
+	
+	
+	/** Get the App Build Number */
+	virtual const char* GetAppBuildNum();
+	/** Set the App Build Number */
+	virtual void SetAppBuildNum(char* buildNum);
+	/** Set Alba Build Number*/
+	virtual const char* GetAlbaBuildNum();
+	/** Get Alba Build Number*/
+	virtual void SetAlbaBuildNum(char* buildNum);
+
 protected:
 	//---------------------------------------------------------
 	// Description:
@@ -458,7 +469,8 @@ protected:
 	albaGUISettingsDialog	*m_SettingsDialog;
 	albaGUIAboutDialog			*m_AboutDialog;
 
-	albaString m_BuildNum;
+	albaString m_AlbaBuildNum;
+	albaString m_AppBuildNum;
 	albaString m_Extension;
 
 	albaUser *m_User; ///< Applications' user

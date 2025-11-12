@@ -27,7 +27,6 @@ public:
   CPPUNIT_TEST_SUITE( albaCoreFactoryTest );
 	CPPUNIT_TEST( TestStaticAllocation );
 	CPPUNIT_TEST( TestDynamicAllocation );
-  CPPUNIT_TEST( TestGetSourceVersion );
   CPPUNIT_TEST( TestGetDescription );
 	
 	// These tests play with the factory to check that everything is working as expected: 
@@ -46,7 +45,6 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
   protected:
-  void TestGetSourceVersion();
   void TestGetDescription();
   void TestCreateInstance();
 	void TestStaticAllocation();

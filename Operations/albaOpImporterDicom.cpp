@@ -940,6 +940,15 @@ albaDicomSlice *albaOpImporterDicom::ReadDicomFile(albaString fileName)
 	dcmSeriesInstanceUID = READTAG(TAG_SeriesInstanceUID);
 	dcmAcquisitionNumber = READTAG(TAG_AcquisitionNumber);
 	dcmImageType = READTAG(TAG_ImageType);
+
+	//Read the image size
+	imageSize[1] = GetAttributeValue ATTRIBUTE_Rows(dcmDataSet);
+	imageSize[0] = GetAttributeValue ATTRIBUTE_Columns(dcmDataSet);
+	if (imageSize[0] * imageSize[1] == 0)
+	{
+		albaLogMessage("Wrong slice size on %s\nSkip Slice.", fileName.GetCStr());
+		return NULL;
+	}
 	
 	//Try to read image position patient form Dicom
 	if (dcmDataSet.FindDataElement(TAG_ImagePositionPatient))
@@ -994,15 +1003,6 @@ albaDicomSlice *albaOpImporterDicom::ReadDicomFile(albaString fileName)
 	description = READTAG(TAG_SeriesDescription);
 	patientName = READTAG(TAG_PatientsName);
 	photometricInterpretation = READTAG(TAG_PhotometricInterpretation);
-
-	//Read the image size
- 	imageSize[1]= GetAttributeValue ATTRIBUTE_Rows(dcmDataSet);
- 	imageSize[0]= GetAttributeValue ATTRIBUTE_Columns(dcmDataSet);
-	if (imageSize[0] * imageSize[1] == 0)
-	{
-		albaLogMessage("Wrong slice size on %s\nSkip Slice.", fileName.GetCStr());
-		return NULL;
-	}
 	
 	//Create Slice
 	albaDicomSlice *newSlice = new albaDicomSlice(fileName, dcmImageOrientationPatient, dcmImagePositionPatient, description.c_str(), date.c_str(), patientName.c_str(), birthdate.c_str(), dcmCardiacNumberOfImages, dcmTriggerTime);
