@@ -28,8 +28,11 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaGUI.h"
 
 #include "vtkFloatArray.h"
+#include "vtkUnstructuredGrid.h"
 #include "vtkPointData.h"
-#include "vtkPolyData.h"
+#include "vtkCellData.h"
+#include <unordered_map>
+#include "vtkALBASmartPointer.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpMeshScarlarsImporter);
@@ -40,10 +43,12 @@ albaOpMeshScarlarsImporter::albaOpMeshScarlarsImporter(const wxString &label) :
 albaOp(label)
 { 
 	m_OpType = OPTYPE_IMPORTER;
+	m_DefaultValues = NULL;
 }
 //----------------------------------------------------------------------------
 albaOpMeshScarlarsImporter::~albaOpMeshScarlarsImporter()
 {
+	delete[] m_DefaultValues;
 }
 
 //----------------------------------------------------------------------------
@@ -54,7 +59,7 @@ albaOp* albaOpMeshScarlarsImporter::Copy()
 }
 
 //----------------------------------------------------------------------------
-int albaOpMeshScarlarsImporter::Import(void)
+int albaOpMeshScarlarsImporter::ImportFile(void)
 {
 
 	if (ReadInit(m_LisScalarFile, GetTestMode(), true, "Please wait parsing Lis File...", m_Listener) == ALBA_ERROR)
@@ -114,6 +119,7 @@ int albaOpMeshScarlarsImporter::Import(void)
 		}
 	}
 
+	ReadFinalize();
 
 	return ALBA_OK;
 }
@@ -122,6 +128,40 @@ int albaOpMeshScarlarsImporter::Import(void)
 bool albaOpMeshScarlarsImporter::InternalAccept(albaVME *node)
 { 
 	return (node && albaVMEMesh::SafeDownCast(node));
+}
+//----------------------------------------------------------------------------
+albaOpMeshScarlarsImporter::CheckIDResults albaOpMeshScarlarsImporter::IDsToIndexes()
+{
+	vtkUnstructuredGrid *mesh=vtkUnstructuredGrid::SafeDownCast(m_Input->GetOutput()->GetVTKData());
+	vtkIntArray* meshIDs;
+
+	if(m_ScalarScope==ELEMENT_SCALARS)
+		meshIDs = vtkIntArray::SafeDownCast(mesh->GetCellData()->GetScalars("Id"));
+	else //NODE_SCALARS
+		meshIDs = vtkIntArray::SafeDownCast(mesh->GetPointData()->GetScalars("Id"));
+	m_MeshScalarNum = meshIDs->GetNumberOfTuples();
+
+	// Build a map: ID -> index
+	std::unordered_map<int, vtkIdType> idToIndex;
+	idToIndex.reserve(m_MeshScalarNum); // optimization
+
+	for (vtkIdType i = 0; i < m_MeshScalarNum; i++)
+	{
+		int meshId = meshIDs->GetValue(i);
+		idToIndex[meshId] = i;
+	}
+	
+	//cycle on IDs loaded from file
+	for (vtkIdType i = 0; i < m_Ids.size(); i++) 
+	{
+		std::unordered_map<int, vtkIdType>::iterator it = idToIndex.find(m_Ids[i]);
+		if (it != idToIndex.end())
+			m_Ids[i] = it->second;
+		else
+			return WRONG_IDS;
+	}
+
+	return (m_MeshScalarNum == m_Ids.size()) ? PERFECT_MATCH_IDS : SUBGROUP_IDS;
 }
 
 //----------------------------------------------------------------------------
@@ -209,13 +249,113 @@ int albaOpMeshScarlarsImporter::ReadLine()
 
 	return ALBA_OK;
 }
+//----------------------------------------------------------------------------
+void albaOpMeshScarlarsImporter::CreateNewScalars()
+{
+	vtkUnstructuredGrid* mesh = vtkUnstructuredGrid::SafeDownCast(m_Input->GetOutput()->GetVTKData());
+	int idNum = m_Ids.size();
+
+
+	for (int i = 0; i < m_ScalarNames.size(); i++)
+	{
+
+		vtkDataArray* existingArray = NULL;
+		if (m_ScalarScope == ELEMENT_SCALARS)
+			existingArray = mesh->GetCellData()->GetArray(m_ScalarNames[i]);
+		else //NODE_SCALARS
+			existingArray = mesh->GetPointData()->GetArray(m_ScalarNames[i]);
+		
+		if (existingArray != NULL)
+		{
+			albaString message;
+			message.Printf("The mesh already has scalars named %s.\nDo you want to replace the current scalars with new ones?", m_ScalarNames[i].GetCStr());
+			wxMessageDialog dialog(NULL, message.GetCStr(), "Scalar already present", wxYES_NO | wxICON_QUESTION);
+			int answer = dialog.ShowModal();
+
+			if (answer == wxID_YES) 
+			{
+				if (m_ScalarScope == ELEMENT_SCALARS)
+					mesh->GetCellData()->RemoveArray(m_ScalarNames[i]);
+				else //NODE_SCALARS
+					mesh->GetPointData()->RemoveArray(m_ScalarNames[i]);
+			}
+			else 
+			{
+				continue;
+			}
+		}
+
+		vtkALBASmartPointer<vtkFloatArray> newArray;
+
+		newArray->SetName(m_ScalarNames[i]);
+		newArray->SetNumberOfValues(m_MeshScalarNum);
+
+		//fill with default value if necessary
+		if (m_DefaultValues != NULL)
+			std::fill_n(newArray->GetPointer(0), idNum, m_DefaultValues[i]);
+		
+		//setting values to the array
+		for (int j = 0; j < idNum; j++)
+			newArray->SetValue(m_Ids[j], m_Arrays[i]->GetValue(j));
+
+		if (m_ScalarScope == ELEMENT_SCALARS)
+			mesh->GetCellData()->AddArray(newArray);
+		else //NODE_SCALARS
+			mesh->GetPointData()->AddArray(newArray);
+	}
+
+	albaVMEMesh::SafeDownCast(m_Input)->SetData(mesh, 0);
+
+	GetLogicManager()->VmeVisualModeChanged(m_Input);
+}
+//----------------------------------------------------------------------------
+void albaOpMeshScarlarsImporter::OnEvent(albaEventBase* alba_event)
+{
+	if (albaEvent* e = albaEvent::SafeDownCast(alba_event))
+	{
+		switch (e->GetId())
+		{
+		case wxOK:
+			CreateNewScalars();
+			OpStop(OP_RUN_OK);
+			break;
+		case wxCANCEL:
+			OpStop(OP_RUN_CANCEL);
+			break;
+		}
+	}
+}
+
+
+//----------------------------------------------------------------------------
+void albaOpMeshScarlarsImporter::CreateGui()
+{
+	// interface:
+	m_Gui = new albaGUI(this);
+
+	m_Gui->Label("");
+
+	if (m_ScalarScope == ELEMENT_SCALARS)
+		m_Gui->Label("Some Elements have no scalar assigned.");
+	else
+		m_Gui->Label("Some Nodes have no scalar assigned.");
+
+	m_Gui->Label("	Please set default values.");
+	m_Gui->Label("");
+	
+	for (int i = 0; i < m_ScalarNames.size(); i++)
+		m_Gui->Float(-1, m_ScalarNames[i], m_DefaultValues + i);
+
+	m_Gui->OkCancel();
+
+	ShowGui();
+}
 
 //----------------------------------------------------------------------------
 void albaOpMeshScarlarsImporter::OpRun()
 {
 	albaString wildcard = "Scalar lis files (*.lis)|*.lis|All Files (*.*)|*.*";
 
-	int result = OP_RUN_CANCEL;
 	m_LisScalarFile = "";
 
 	wxString f;
@@ -223,8 +363,30 @@ void albaOpMeshScarlarsImporter::OpRun()
 	if(!f.IsEmpty() && wxFileExists(f))
 	{
 		m_LisScalarFile = f;
-		Import();
-		result = OP_RUN_OK;
+		
+		if (ImportFile() == ALBA_ERROR)
+		{
+			albaEventMacro(albaEvent(this, OP_RUN_CANCEL));
+			return;
+		}
+	
+		switch (IDsToIndexes())
+		{
+		case PERFECT_MATCH_IDS:
+			CreateNewScalars();
+			albaEventMacro(albaEvent(this, OP_RUN_OK));
+			return;
+			break;
+		case SUBGROUP_IDS:
+			m_DefaultValues = new float[m_ScalarNames.size()];
+			std::fill_n(m_DefaultValues, m_ScalarNames.size(), 0.0f);
+
+			CreateGui();
+			break;
+		case WRONG_IDS:
+			albaErrorMessage("Selected file contains IDs that are not present in the mesh.");
+			albaEventMacro(albaEvent(this, OP_RUN_CANCEL));
+			break;
+		}
 	}
-	albaEventMacro(albaEvent(this,result));  
 }

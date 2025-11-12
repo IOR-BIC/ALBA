@@ -1989,7 +1989,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpImporterAnsysInputFile("Ansys Input File"), "Finite Element");
 	Plug(new albaOpImporterAbaqusFile("Abaqus File"), "Finite Element");
 	Plug(new albaOpImporterMesh("Generic Mesh"), "Finite Element");
-	Plug(new albaOpMeshScarlarsImporter("Load Scalars from Lis files"), ("Finite Element"));
+	Plug(new albaOpMeshScarlarsImporter("Mesh Scalars from Lis files"), ("Finite Element"));
 	Plug(new albaOpImporterASCII("ASCII"));
 
 #ifdef ALBA_USE_GDCM

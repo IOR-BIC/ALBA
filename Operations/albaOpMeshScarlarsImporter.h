@@ -46,21 +46,36 @@ public:
 		ELEMENT_SCALARS,
 	};
 
+	enum CheckIDResults {
+		PERFECT_MATCH_IDS,
+		SUBGROUP_IDS,
+		WRONG_IDS,
+	};
+
 	/** Builds operation's interface. */
 	void OpRun();
 
 	albaOp* Copy();
 
 	/** imports Scalars from files */
-	int Import(void);
+	int ImportFile(void);
 	
+	/** Get the Scalar file name*/
 	albaString GetLisScalarFileName() const { return m_LisScalarFile; }
-	
+
+	/** Set the Scalar file name*/
 	void SetLisScalarFileName(albaString val) { m_LisScalarFile = val; }
+
+	/** Answer to the messages coming from interface. */
+	virtual void OnEvent(albaEventBase* alba_event);
+
 protected:
 
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME *node);
+
+	/** Create the dialog interface for the importer. */
+	void CreateGui();
 
 	albaString m_LisScalarFile;
 
@@ -69,9 +84,16 @@ protected:
 	std::vector<albaString> m_ScalarNames;
 	std::vector<vtkFloatArray*> m_Arrays;
 	std::vector<vtkIdType> m_Ids;
+	float* m_DefaultValues;
+
+	CheckIDResults IDsToIndexes();
+
+	vtkIdType m_MeshScalarNum;
 
 	void DeleteArrays();
 	int ReadHeader();
 	int ReadLine();
+private:
+	void CreateNewScalars();
 };
 #endif
