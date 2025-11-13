@@ -23,7 +23,6 @@ SET(PROJECT_SRCS
 	albaDirectoryTest.h 				albaDirectoryTest.cpp
 	albaTransformBaseTest.h 			albaTransformBaseTest.cpp
 	albaObserverTest.h 				albaObserverTest.cpp
-	albaVersionTest.h 				albaVersionTest.cpp
 	mmuIdFactoryTest.h 				mmuIdFactoryTest.cpp
 	albaVectorTest.h 				albaVectorTest.cpp
 	albaObjectFactoryTest.h 			albaObjectFactoryTest.cpp

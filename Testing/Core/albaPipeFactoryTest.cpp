@@ -24,11 +24,8 @@
 
 #include <cppunit/config/SourcePrefix.h>
 #include "albaPipeFactoryTest.h"
-
 #include "albaPipe.h"
 #include "albaPipeFactory.h"
-
-#include "albaVersion.h"
 #include <iostream>
 
 //-------------------------------------------------------------------------
@@ -50,17 +47,14 @@ private:
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeCustom);
-//-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 albaPipeCustom::albaPipeCustom()
-//-------------------------------------------------------------------------
 {
   
 }
 //-------------------------------------------------------------------------
 albaPipeCustom::~albaPipeCustom()
-//-------------------------------------------------------------------------
 {
   
 }
@@ -69,7 +63,6 @@ albaPipeCustom::~albaPipeCustom()
 // a custom plugger for the new factory
 template <class T>
 class albaPlugTestPipe
-//------------------------------------------------------------------------------
 {
   public:
   albaPlugTestPipe(const char *description);
@@ -79,7 +72,6 @@ class albaPlugTestPipe
 //------------------------------------------------------------------------------
 template <class T>
 albaPlugTestPipe<T>::albaPlugTestPipe(const char *description)
-//------------------------------------------------------------------------------
 { 
   albaPipeFactory *factory=albaPipeFactory::GetInstance();
   if (factory)
@@ -91,7 +83,6 @@ albaPlugTestPipe<T>::albaPlugTestPipe(const char *description)
 
 //-------------------------------------------------------------------------
 void albaPipeFactoryTest::TestGetInstance_Initialize_CreatePipeInstance_RegisterNewPipe_GetPipeNames()
-//-------------------------------------------------------------------------
 {
   // a couple of factories
   albaPipeFactory *pipe_factory = albaPipeFactory::GetInstance();
@@ -143,19 +134,7 @@ void albaPipeFactoryTest::TestGetInstance_Initialize_CreatePipeInstance_Register
   pipe1->Delete();
 }
 //-------------------------------------------------------------------------
-void albaPipeFactoryTest::TestGetALBASourceVersion()
-//-------------------------------------------------------------------------
-{
-	albaPipeFactory *pipe_factory = albaPipeFactory::GetInstance();
-	CPPUNIT_ASSERT(pipe_factory!=NULL);
-	std::string value1 = pipe_factory->GetALBASourceVersion();
-	std::string value2 = std::string(ALBA_SOURCE_VERSION);
-	CPPUNIT_ASSERT( value1 == value2 );
-
-}
-//-------------------------------------------------------------------------
 void albaPipeFactoryTest::TestGetDescription()
-//-------------------------------------------------------------------------
 {
 	albaPipeFactory *pipe_factory = albaPipeFactory::GetInstance();
 	CPPUNIT_ASSERT(pipe_factory!=NULL);

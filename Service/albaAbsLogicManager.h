@@ -79,5 +79,15 @@ public:
 	virtual albaViewManager *GetViewManager() = 0;
 
 	virtual albaProsthesesDBManager * GetProsthesesDBManager() = 0;
+
+	//Versioning
+	/** Get the App Build Number */
+	virtual const char* GetAppBuildNum() = 0;
+	/** Set the App Build Number */
+	virtual void SetAppBuildNum(char *buildNum) = 0;
+	/** Set Alba Build Number*/
+	virtual const char* GetAlbaBuildNum() = 0;
+	/** Get Alba Build Number*/
+	virtual void SetAlbaBuildNum(char *buildNum) = 0;
 };
 #endif

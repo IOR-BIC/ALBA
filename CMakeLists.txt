@@ -81,9 +81,8 @@ MARK_AS_ADVANCED (
 #-----------------------------------------------------------------------------
 SET(ALBA_MAJOR_VERSION 2)
 SET(ALBA_MINOR_VERSION 2)
-SET(ALBA_BUILD_VERSION 0)
 SET(ALBA_VERSION
-    "${ALBA_MAJOR_VERSION}.${ALBA_MINOR_VERSION}.${ALBA_BUILD_VERSION}")
+    "${ALBA_MAJOR_VERSION}.${ALBA_MINOR_VERSION}")
 
 #-----------------------------------------------------------------------------
 # this is to enable precompiled headers under VC6.0
@@ -154,6 +153,7 @@ else( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/AddToPathPage.nsh ${PROJECT_BINARY_DIR}/Installer/AddToPathPage.nsh @ONLY)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/EnvVarUpdate.nsh ${PROJECT_BINARY_DIR}/Installer/EnvVarUpdate.nsh @ONLY)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/EnumUsersReg.nsh ${PROJECT_BINARY_DIR}/Installer/EnumUsersReg.nsh @ONLY)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/InstallerCommon.nsh.in ${PROJECT_BINARY_DIR}/Installer/InstallerCommon.nsh @ONLY)
 			 
@@ -303,11 +303,7 @@ ENDIF(WIN32)
   ${ALBA_BINARY_DIR}/ALBALibraryDepends.cmake
   )
 
-  CONFIGURE_FILE(
-  ${ALBA_SOURCE_DIR}/ALBAConfig.cmake.in
-  ${ALBA_BINARY_DIR}/ALBAConfig.cmake
-  @ONLY IMMEDIATE
-  )
+  CONFIGURE_FILE( ${ALBA_SOURCE_DIR}/ALBAConfig.cmake.in ${ALBA_BINARY_DIR}/ALBAConfig.cmake @ONLY IMMEDIATE )
   
   #### Include directory for binary distribution of ALBA
   SET(ALBA_INSTALL_INCLUDE_DIRS ${INCLUDE_DIRS})

@@ -24,7 +24,6 @@ class albaVMEFactoryTest : public albaTest
   CPPUNIT_TEST_SUITE( albaVMEFactoryTest );
   CPPUNIT_TEST( TestGetInstance );
   CPPUNIT_TEST( Initialize_CreateVMEInstance );
-	CPPUNIT_TEST( TestGetALBASourceVersion );
 	CPPUNIT_TEST( TestGetDescription );
   CPPUNIT_TEST_SUITE_END();
 

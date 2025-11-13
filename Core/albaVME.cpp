@@ -1702,6 +1702,16 @@ void albaVME::SetMandatoryLink(const char *name, albaVME *node)
 		node->AddBackLink(name, this);
 	}
 }
+//----------------------------------------------------------------------------
+void albaVME::SetLinkToMandatory(char* link)
+{
+	SetMandatoryLink(link, GetLink(link));
+}
+//----------------------------------------------------------------------------
+void albaVME::SetLinkToNonMandatory(char* link)
+{
+	SetLink(link, GetLink(link));
+}
 
 //----------------------------------------------------------------------------
 void albaVME::AddBackLink(const char *name, albaVME *node)

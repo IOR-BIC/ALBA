@@ -41,7 +41,6 @@ albaTransform.cpp		albaTransform.h
 albaTransformBase.cpp	albaTransformBase.h
 albaTransformFrame.cpp	albaTransformFrame.h
 albaVector.h
-albaVersion.h
 mmuIdFactory.cpp		mmuIdFactory.h
 albaUtility.h
 vtkALBASmartPointer.h

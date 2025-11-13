@@ -125,6 +125,7 @@
 #include "albaOpImporterMetaImage.h"
 #include "albaOpImporterVTKXML.h"
 #include "albaOpImporterAbaqusFile.h"
+#include "albaOpMeshScarlarsImporter.h"
 #include "albaOpImporterDicFile.h"
 #include "albaOpImporterPointCloud.h"
 #include "albaOpImporterScancoImageIO.h"
@@ -400,18 +401,7 @@ albaLogicWithManagers::~albaLogicWithManagers()
 void albaLogicWithManagers::Init(int argc, char **argv)
 {
 
-	//Setting Build Version
-	wxString buildNum = "";
-	wxRegKey RegKey(wxString("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + m_AppTitle));
-	if (RegKey.Exists())
-	{
-		if (RegKey.HasValue(wxString("DisplayVersion")))
-			RegKey.QueryValue(wxString("DisplayVersion"), buildNum);
-		else
-			buildNum = "Unknown Build";
-	}
-	m_BuildNum = buildNum;
-
+	
 	if (m_WizardManager)
 	{
 		m_WizardManager->FillSettingDialog(m_SettingsDialog);
@@ -440,7 +430,7 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 	if (m_OpManager)
 	{
 		m_OpManager->FillSettingDialog(m_SettingsDialog);
-		m_OpManager->SetBuildNum(m_BuildNum);
+		m_OpManager->SetBuildNum(m_AppBuildNum);
 
 		if (argc > 1)
 		{
@@ -459,8 +449,8 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 
 	// Init About Dialog
 	m_AboutDialog->SetTitle(m_AppTitle);
-	m_AboutDialog->SetBuildNum(m_BuildNum.GetCStr());
-	m_AboutDialog->SetVersion("0.1");
+	m_AboutDialog->SetAppBuildNum(m_AppBuildNum.GetCStr());
+	m_AboutDialog->SetAlbaBuildNum(m_AlbaBuildNum.GetCStr());
 	m_AboutDialog->SetWebSite("https://github.com/IOR-BIC/ALBA");
 
 	wxString imagePath = albaGetConfigDirectory().ToAscii();
@@ -1999,6 +1989,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpImporterAnsysInputFile("Ansys Input File"), "Finite Element");
 	Plug(new albaOpImporterAbaqusFile("Abaqus File"), "Finite Element");
 	Plug(new albaOpImporterMesh("Generic Mesh"), "Finite Element");
+	Plug(new albaOpMeshScarlarsImporter("Mesh Scalars from Lis files"), ("Finite Element"));
 	Plug(new albaOpImporterASCII("ASCII"));
 
 #ifdef ALBA_USE_GDCM
@@ -2300,6 +2291,29 @@ void albaLogicWithManagers::CollapseVME(albaVME *vme)
 void albaLogicWithManagers::ExpandVME(albaVME *vme)
 {
 	m_SideBar->ExpandVME(vme);
+}
+
+//----------------------------------------------------------------------------
+const char* albaLogicWithManagers::GetAppBuildNum()
+{
+	return m_AppBuildNum;
+}
+
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::SetAppBuildNum(char* buildNum)
+{
+	m_AppBuildNum = buildNum;
+}
+
+//----------------------------------------------------------------------------
+const char* albaLogicWithManagers::GetAlbaBuildNum()
+{
+	return m_AlbaBuildNum;
+}
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::SetAlbaBuildNum(char* buildNum)
+{
+	m_AlbaBuildNum = buildNum;
 }
 
 //----------------------------------------------------------------------------
@@ -2683,7 +2697,7 @@ void albaLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage, wxString mes
 {
 	m_SplashScreen = new albaGUISplashScreen(splashImage, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 2000, NULL);
 
-	if (message.IsEmpty()) message = m_BuildNum;
+	if (message.IsEmpty()) message = m_AppBuildNum;
 
 	m_SplashScreen->SetText(message, x, y, color);
 	wxMilliSleep(1500);

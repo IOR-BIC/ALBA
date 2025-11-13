@@ -403,6 +403,11 @@ public:
 	/** set a link or a mandatory link to another node in the tree, if node is NULL current link is removed */
 	void SetLink(const char *name, albaVME *node, LinkType type);
 
+	/** Set an existing link to mandatory */
+	void SetLinkToMandatory(char* link);
+
+	/** Set an existing link to non mandatory */
+	void SetLinkToNonMandatory(char* link);
 
 	/** set a mandatory link to another node in the tree */
 	void AddBackLink(const char *name, albaVME *node);

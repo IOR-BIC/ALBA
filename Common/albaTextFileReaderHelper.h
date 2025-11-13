@@ -41,6 +41,7 @@ protected:
 	int m_BufferLeft;
 	int m_BufferPointer;
 	char m_Line[512];
+	int m_CurrentLine;
 	long m_FileSize;
 	long m_BytesReaded;
 

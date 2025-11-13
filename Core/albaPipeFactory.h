@@ -44,7 +44,6 @@ class ALBA_EXPORT albaPipeFactory : public albaObjectFactory
 {
 public: 
   albaTypeMacro(albaPipeFactory,albaObjectFactory);
-  virtual const char* GetALBASourceVersion() const;
   virtual const char* GetDescription() const;
 
   /* Initialize the factory creating and registering a new instance */
