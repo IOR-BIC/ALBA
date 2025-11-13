@@ -35,6 +35,7 @@ class albaVMEVolumeRGB;
 class albaVMEMesh;
 class albaVMEGeneric;
 class albaVMEImage;
+class vtkUnstructuredGrid;
 
 //----------------------------------------------------------------------------
 // albaOpImporterVTK :
@@ -88,5 +89,7 @@ protected:
 	albaVMEVolumeRGB *m_VmeRGBVol;
 	albaVMEMesh       *m_VmeMesh;
 	albaVMEGeneric    *m_VmeGeneric;
+private:
+	void CheckAndAddIDsToUnstructuredGrid(vtkUnstructuredGrid* ug);
 };
 #endif
