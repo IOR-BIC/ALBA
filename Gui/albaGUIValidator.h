@@ -104,7 +104,7 @@ public:
 
   void Init(albaObserver* listener, int mid, wxControl *win);
 	void OnChar(wxKeyEvent& event);
-	void OnKeyUp(wxKeyEvent& event);
+  void OnKeyUp(wxKeyEvent& event);
 	void OnKillFocus(wxFocusEvent& event);
   void OnScrollEvent(wxScrollEvent& event);
   void OnCommandEvent(wxCommandEvent& event);
