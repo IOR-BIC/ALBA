@@ -133,7 +133,7 @@ int albaOpImporterVTK::ImportVTK()
 //----------------------------------------------------------------------------
 {
 	bool success = false;
-	albaGUIBusyInfo wait(_("Loading file: ..."),m_TestMode);
+	albaGUIBusyInfo wait(_("Loading file..."),m_TestMode);
 
 	vtkALBASmartPointer<vtkDataSetReader> reader;
 	reader->SetFileName(m_File);
@@ -256,7 +256,18 @@ char ** albaOpImporterVTK::GetIcon()
 
 void albaOpImporterVTK::CheckAndAddIDsToUnstructuredGrid(vtkUnstructuredGrid* ug)
 {
-	if (!ug->GetCellData()->GetArray("Id"))
+
+	//setting case sensitive cases to correct name
+	vtkCellData* cellData = ug->GetCellData();
+	if (cellData->GetArray("ID"))
+		cellData->GetArray("ID")->SetName("Id");
+	else if (cellData->GetArray("id"))
+		cellData->GetArray("id")->SetName("Id");
+	else if (cellData->GetArray("iD"))
+		cellData->GetArray("iD")->SetName("Id");
+
+	//Creating Id array if not exist
+	if (!cellData->GetArray("Id"))
 	{
 		vtkALBASmartPointer<vtkIntArray> idArray;
 		idArray->SetName("Id");
@@ -264,10 +275,20 @@ void albaOpImporterVTK::CheckAndAddIDsToUnstructuredGrid(vtkUnstructuredGrid* ug
 		idArray->SetNumberOfTuples(ug->GetNumberOfCells());
 		for (vtkIdType i = 0; i < ug->GetNumberOfCells(); i++)
 			idArray->SetValue(i, i+1);
-		ug->GetCellData()->AddArray(idArray);
+		cellData->AddArray(idArray);
 	}
 
-	if (!ug->GetPointData()->GetArray("Id"))
+	//setting case sensitive cases to correct name
+	vtkPointData* pointData = ug->GetPointData();
+	if (pointData->GetArray("ID"))
+		pointData->GetArray("ID")->SetName("Id");
+	if (pointData->GetArray("id"))
+		pointData->GetArray("id")->SetName("Id");
+	if (pointData->GetArray("iD"))
+		pointData->GetArray("iD")->SetName("Id");
+
+	//Creating Id array if not exist
+	if (!pointData->GetArray("Id"))
 	{
 		vtkALBASmartPointer<vtkIntArray> idArray;
 		idArray->SetName("Id");
@@ -275,6 +296,6 @@ void albaOpImporterVTK::CheckAndAddIDsToUnstructuredGrid(vtkUnstructuredGrid* ug
 		idArray->SetNumberOfTuples(ug->GetNumberOfPoints());
 		for (vtkIdType i = 0; i < ug->GetNumberOfPoints(); i++)
 			idArray->SetValue(i, i+1);
-		ug->GetPointData()->AddArray(idArray);
+		pointData->AddArray(idArray);
 	}
 }
