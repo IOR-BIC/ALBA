@@ -376,8 +376,7 @@ void albaGUIDialogTransferFunction2D::CreateGUI()
 
   // colour
   this->m_WidgetColor.Set(this->m_Widget.Color[0] * 255, this->m_Widget.Color[1] * 255, this->m_Widget.Color[2] * 255);
-  wxString bmp_id = "";
-  bmp_id << MENU_FILE_OPEN;
+  wxString bmp_id = "NODE_BLUE";
   albaGUIPicButton *colorOpen = new albaGUIPicButton(this, bmp_id, ID_TF_COLOR);
 	wxTextCtrl   *colorBox = new wxTextCtrl  (this, ID_TF_COLOR, "", wxDefaultPosition, wxSize(-1,16), wxTE_READONLY|wxNO_BORDER);
   colorOpen->SetValidator( albaGUIValidator(this, ID_TF_COLOR, colorOpen, &this->m_WidgetColor, colorBox));

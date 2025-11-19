@@ -398,9 +398,12 @@ void vtkALBAVolumeToClosedSmoothSurface::Update()
       else
         newScalars->SetTuple1(i, inputScalars->GetTuple1( COORD_TO_ID(x-1,y-1,z-1) ) );
     }
-    newPD->SetScalars(newScalars);
-    newPD->Update();
 
+    if (FillHoles)
+    {
+      newPD->SetScalars(newScalars);
+      newPD->Update();
+    }
     if (BorderVolumeID)
     {
       //setting new dimensions and update
