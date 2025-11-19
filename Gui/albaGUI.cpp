@@ -125,7 +125,7 @@ albaGUI::albaGUI(albaObserver *listener) :
 	m_BackgroundColor = wxColour(251, 251, 253);
 	if (m_UseBackgroundColor) this->SetBackgroundColour(m_BackgroundColor);
 
-	m_EntryStyle = wxBORDER_SIMPLE | wxTE_PROCESS_ENTER;
+	m_EntryStyle = wxBORDER_SIMPLE;
 
 	m_Sizer = new wxBoxSizer(wxVERTICAL);
 	this->SetAutoLayout(true);

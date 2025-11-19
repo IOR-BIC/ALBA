@@ -49,6 +49,9 @@
 #include "vtkUnstructuredGridReader.h"
 
 #include "wx\filename.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkCellData.h"
+#include "vtkPointData.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpImporterVTK);
@@ -170,7 +173,6 @@ int albaOpImporterVTK::ImportVTK()
 		if (data)
 		{
 			albaNEW(m_VmeLandmarkCloud);
-			//albaNEW(m_VmePointSet);
 			albaNEW(m_VmePolyLine);
 			albaNEW(m_VmeSurface);
 			albaNEW(m_VmeImage);
@@ -178,6 +180,9 @@ int albaOpImporterVTK::ImportVTK()
 			albaNEW(m_VmeRGBVol);
 			albaNEW(m_VmeMesh);
 			albaNEW(m_VmeGeneric);
+
+			if(reader->ReadOutputType() == VTK_UNSTRUCTURED_GRID)
+				CheckAndAddIDsToUnstructuredGrid(vtkUnstructuredGrid::SafeDownCast(data));
 			//if (m_VmePointSet->SetDataByDetaching(data,0) == ALBA_OK)
 			//{
 			//  m_Output = m_VmePointSet;
@@ -247,4 +252,29 @@ char ** albaOpImporterVTK::GetIcon()
 {
 #include "pic/MENU_IMPORT_VTK.xpm"
 	return MENU_IMPORT_VTK_xpm;
+}
+
+void albaOpImporterVTK::CheckAndAddIDsToUnstructuredGrid(vtkUnstructuredGrid* ug)
+{
+	if (!ug->GetCellData()->GetArray("Id"))
+	{
+		vtkALBASmartPointer<vtkIntArray> idArray;
+		idArray->SetName("Id");
+		idArray->SetNumberOfComponents(1);
+		idArray->SetNumberOfTuples(ug->GetNumberOfCells());
+		for (vtkIdType i = 0; i < ug->GetNumberOfCells(); i++)
+			idArray->SetValue(i, i+1);
+		ug->GetCellData()->AddArray(idArray);
+	}
+
+	if (!ug->GetPointData()->GetArray("Id"))
+	{
+		vtkALBASmartPointer<vtkIntArray> idArray;
+		idArray->SetName("Id");
+		idArray->SetNumberOfComponents(1);
+		idArray->SetNumberOfTuples(ug->GetNumberOfPoints());
+		for (vtkIdType i = 0; i < ug->GetNumberOfPoints(); i++)
+			idArray->SetValue(i, i+1);
+		ug->GetPointData()->AddArray(idArray);
+	}
 }

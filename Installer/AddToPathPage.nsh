@@ -1,5 +1,16 @@
 !macro AddToPathPage
 
+;---------------------------
+; Include richiesto
+;---------------------------
+!include "EnvVarUpdate.nsh"
+!include "nsDialogs.nsh"
+!include "LogicLib.nsh"
+!include "WinMessages.nsh"
+
+;---------------------------
+; Pagina personalizzata
+;---------------------------
 Page custom ShowAddToPathPage LeaveAddToPathPage
 
 Var CHECKBOX
@@ -29,52 +40,13 @@ Function LeaveAddToPathPage
     IntCmp $0 1 DoUpdate SkipUpdate
 
 DoUpdate:
-    ReadRegStr $1 HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "Path"
-    StrCpy $2 "$INSTDIR\bin"
+    ; Add to system PATH safely (handles REG_EXPAND_SZ, duplicates, and length)
+    ${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR\bin"
 
-    ; Check if already present
-    Push $1
-    Push $2
-    Call SubStrFound
-    Pop $3
-    StrCmp $3 "found" SkipUpdate
-
-    StrCpy $1 "$1;$2"
-    WriteRegExpandStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "Path" "$1"
-
+    ; Notify the system of environment change
     System::Call 'user32::SendMessageTimeoutW(i 0xffff, i ${WM_SETTINGCHANGE}, i 0, w "Environment", i 0, i 5000, *i .r0)'
 
 SkipUpdate:
-FunctionEnd
-
-; Simple substring search function (minimal)
-Function SubStrFound
-    Exch $R1 ; needle
-    Exch
-    Exch $R0 ; haystack
-
-    Push $R2
-    Push $R3
-
-    StrLen $R2 $R1
-    StrCpy $R3 0
-
-Loop:
-    StrCpy $0 $R0 $R2 $R3
-    StrCmp $0 $R1 Found
-    IntOp $R3 $R3 + 1
-    StrLen $R4 $R0
-    IntCmp $R3 $R4 0 Loop
-    StrCpy $0 ""
-    Goto Done
-
-Found:
-    StrCpy $0 "found"
-
-Done:
-    Pop $R3
-    Pop $R2
-    Exch $0
 FunctionEnd
 
 !macroend
