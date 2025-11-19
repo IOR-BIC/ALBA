@@ -128,7 +128,7 @@ void albaOpImporterPLY::OpUndo()
 //----------------------------------------------------------------------------
 int albaOpImporterPLY::ImportPLY()
 {
-  albaGUIBusyInfo wait("Loading file: ...",m_TestMode);  
+  albaGUIBusyInfo wait("Loading file...",m_TestMode);  
 
   unsigned int i;
   for(i = 0; i < m_ImportedPLYs.size(); i++)

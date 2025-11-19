@@ -86,7 +86,7 @@ void albaOpImporterMesh::OpRun()
 //----------------------------------------------------------------------------
 int albaOpImporterMesh::Read()
 {
-  albaGUIBusyInfo wait(_("Loading file: ..."),m_TestMode);
+  albaGUIBusyInfo wait(_("Loading file..."),m_TestMode);
   	
   albaVMEMeshAnsysTextImporter *reader = new albaVMEMeshAnsysTextImporter;
 	reader->SetNodesFileName(m_NodesFileName.GetCStr());
