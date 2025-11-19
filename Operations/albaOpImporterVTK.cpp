@@ -263,7 +263,7 @@ void albaOpImporterVTK::CheckAndAddIDsToUnstructuredGrid(vtkUnstructuredGrid* ug
 		idArray->SetNumberOfComponents(1);
 		idArray->SetNumberOfTuples(ug->GetNumberOfCells());
 		for (vtkIdType i = 0; i < ug->GetNumberOfCells(); i++)
-			idArray->SetValue(i, i);
+			idArray->SetValue(i, i+1);
 		ug->GetCellData()->AddArray(idArray);
 	}
 
@@ -274,7 +274,7 @@ void albaOpImporterVTK::CheckAndAddIDsToUnstructuredGrid(vtkUnstructuredGrid* ug
 		idArray->SetNumberOfComponents(1);
 		idArray->SetNumberOfTuples(ug->GetNumberOfPoints());
 		for (vtkIdType i = 0; i < ug->GetNumberOfPoints(); i++)
-			idArray->SetValue(i, i);
+			idArray->SetValue(i, i+1);
 		ug->GetPointData()->AddArray(idArray);
 	}
 }
