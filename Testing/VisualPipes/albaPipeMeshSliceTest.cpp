@@ -158,14 +158,6 @@ void albaPipeMeshSliceTest::TestPipeExecution()
     actor = actorList->GetNextProp();
   }
 	
-	const char *strings[5];
-	strings[0] = "Id"; //point 
-
-	strings[1] = "Material"; //cell 
-	strings[2] = "EX";
-	strings[3] = "NUXY";
-	strings[4] = "DENS";
-
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
@@ -203,6 +195,7 @@ void albaPipeMeshSliceTest::TestPipeExecution()
       break;
     }
     pipeMeshSlice->SetActiveScalar(arrayIndex);
+    
     pipeMeshSlice->OnEvent(&albaEvent(this, albaPipeMeshSlice::ID_SCALARS));
 
     vtkActor *meshActor;
@@ -211,7 +204,7 @@ void albaPipeMeshSliceTest::TestPipeExecution()
 
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
-		printf("\n Visualization: %s \n", strings[arrayIndex]);
+		printf("\n Visualization: %s \n", pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
 
 		COMPARE_IMAGES("TestPipeExecution", ID_TEST_PIPEEXECUTION + arrayIndex);
   }
@@ -287,14 +280,6 @@ void albaPipeMeshSliceTest::TestPipeExecution_Wireframe()
     actor = actorList->GetNextProp();
   }
 
-  const char *strings[5];
-  strings[0] = "Id"; //point 
-
-  strings[1] = "Material"; //cell 
-  strings[2] = "EX";
-  strings[3] = "NUXY";
-  strings[4] = "DENS";
-
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
@@ -340,7 +325,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_Wireframe()
 
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
-    printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
+    printf("\n Current Array: %s \n", pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
 
 		COMPARE_IMAGES("TestPipeExecution_Wireframe", ID_TEST_PIPEEXECUTION_WIREFRAME + arrayIndex);
   }
@@ -417,14 +402,6 @@ void albaPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
     actor = actorList->GetNextProp();
   }
 
-  const char *strings[5];
-  strings[0] = "Id"; //point 
-
-  strings[1] = "Material"; //cell 
-  strings[2] = "EX";
-  strings[3] = "NUXY";
-  strings[4] = "DENS";
-
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
@@ -470,7 +447,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
 
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
-    printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
+    printf("\n Current Array: %s \n", pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
 
 		COMPARE_IMAGES("TestPipeExecution_WiredActorVisibility", ID_TEST_PIPEEXECUTION_WIRED_ACTOR_VISIBILITY + arrayIndex);
   }
@@ -547,14 +524,6 @@ void albaPipeMeshSliceTest::TestPipeExecution_FlipNormal()
     actor = actorList->GetNextProp();
   }
 
-  const char *strings[5];
-  strings[0] = "Id"; //point 
-
-  strings[1] = "Material"; //cell 
-  strings[2] = "EX";
-  strings[3] = "NUXY";
-  strings[4] = "DENS";
-
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
@@ -600,7 +569,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_FlipNormal()
 
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
-    printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
+    printf("\n Current Array: %s \n", pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
 
     COMPARE_IMAGES("TestPipeExecution_FlipNormal", ID_TEST_PIPEEXECUTION_FLIP_NORMAL+arrayIndex);
   }
@@ -683,14 +652,6 @@ void albaPipeMeshSliceTest::TestPipeExecution_UseVTKProperty()
     actor = actorList->GetNextProp();
   }
 
-  const char *strings[5];
-  strings[0] = "Id"; //point 
-
-  strings[1] = "Material"; //cell 
-  strings[2] = "EX";
-  strings[3] = "NUXY";
-  strings[4] = "DENS";
-
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
@@ -736,7 +697,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_UseVTKProperty()
 
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
-    printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
+    printf("\n Current Array: %s \n", pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
 
 		COMPARE_IMAGES("TestPipeExecution_UseVTKProperty", ID_TEST_PIPEEXECUTION_USE_VTK_PROPERTY + arrayIndex);
   }
@@ -816,14 +777,6 @@ void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
     actor = actorList->GetNextProp();
   }
 
-  const char *strings[5];
-  strings[0] = "Id"; //point 
-
-  strings[1] = "Material"; //cell 
-  strings[2] = "EX";
-  strings[3] = "NUXY";
-  strings[4] = "DENS";
-
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
@@ -870,7 +823,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
 
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
-    printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
+    printf("\n Current Array: %s \n", pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
 
 		COMPARE_IMAGES("TestPipeExecution_Thickness_PickActor", ID_TEST_PIPEEXECUTION_THICKNESS + arrayIndex);
   }

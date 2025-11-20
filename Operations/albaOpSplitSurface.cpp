@@ -99,6 +99,8 @@ albaOp(label)
 	m_Gizmo				= NULL;
 	m_ArrowShape	= NULL;
 
+	m_GenerateClippedOutput = true;
+
 	m_GizmoTranslate	= NULL;
 	m_GizmoRotate			= NULL;
 	m_GizmoScale			= NULL;
@@ -235,7 +237,7 @@ void albaOpSplitSurface::OnEventThis(albaEventBase *alba_event)
 		{
 		case ID_CHOOSE_SURFACE:
 			{
-				albaString title = "Choose m_Clipper Surface";
+				albaString title = "Choose Clipper Surface";
         e->SetPointer(&albaOpSplitSurface::SurfaceAccept);
 				e->SetString(&title);
 				e->SetId(VME_CHOOSE);
@@ -549,6 +551,8 @@ void albaOpSplitSurface::OpDo()
 		m_ClippedVME->SetData(transform_clipped_output->GetOutput(),m_Input->GetTimeStamp());
 		m_ClippedVME->SetName("clipped");
 		m_ClippedVME->Update();
+
+		printf("Generated clipped output: %s",m_ClippedVME->GetName());
 
 		m_ClippedVME->ReparentTo(m_Input->GetParent());
 	}

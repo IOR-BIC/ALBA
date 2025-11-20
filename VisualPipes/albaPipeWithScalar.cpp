@@ -385,6 +385,14 @@ void albaPipeWithScalar::CreateHistogramDialog()
 	UpdateVisualizationWithNewSelectedScalars();
 }
 
+wxString albaPipeWithScalar::GetScalarName(int id) const
+{
+	if (id < 0 || id >= m_NumberOfArrays)
+		return "";
+	else
+		return m_ScalarsVTKName[id];
+}
+
 //----------------------------------------------------------------------------
 void albaPipeWithScalar::DeleteHistogramDialog()
 {

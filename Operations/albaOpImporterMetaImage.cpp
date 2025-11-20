@@ -115,7 +115,7 @@ void albaOpImporterMetaImage::OpRun()
 int albaOpImporterMetaImage::ImportMetaImage()
 {
 	bool success = false;
-	albaGUIBusyInfo wait(_("Loading file: ..."),m_TestMode);
+	albaGUIBusyInfo wait(_("Loading file..."),m_TestMode);
 
 
 	using ReaderType = itk::ImageFileReader<InputImageTypeFloat>;

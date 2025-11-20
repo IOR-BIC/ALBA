@@ -190,7 +190,7 @@ void albaOpImporterSTL::OpUndo()
 void albaOpImporterSTL::ImportSTL()
 //----------------------------------------------------------------------------
 {
-  albaGUIBusyInfo wait("Loading file: ...",m_TestMode);  
+  albaGUIBusyInfo wait("Loading file...",m_TestMode);  
   
   unsigned int i;
   for(i = 0; i < m_ImportedSTLs.size(); i++)

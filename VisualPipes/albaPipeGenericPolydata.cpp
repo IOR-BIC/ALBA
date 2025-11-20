@@ -140,9 +140,9 @@ void albaPipeGenericPolydata::ExecutePipe()
 	{
 		vtkNEW(m_NormalsFilter);
 		m_NormalsFilter->SetFlipNormals(m_FlipNormals);
-		m_NormalsFilter->SetComputePointNormals(!m_ShowCellsNormals);
-		m_NormalsFilter->SetComputeCellNormals(m_ShowCellsNormals);
+		m_NormalsFilter->SetComputePointNormals(true);
 		m_NormalsFilter->SetInputConnection(polyDataPort);
+		m_NormalsFilter->AutoOrientNormalsOn();
 		m_Mapper->SetInputConnection(m_NormalsFilter->GetOutputPort());
 	}
 
@@ -151,7 +151,7 @@ void albaPipeGenericPolydata::ExecutePipe()
 
   vtkNEW(m_MapperWired);
   if(m_SkipNormalFilter)
-  	m_MapperWired->SetInputConnection(polyDataPort);
+		m_MapperWired->SetInputConnection(polyDataPort);
   else
     m_MapperWired->SetInputConnection(m_NormalsFilter->GetOutputPort());
   m_MapperWired->SetScalarRange(0,0);
@@ -440,12 +440,7 @@ void albaPipeGenericPolydata::SetRepresentation(REPRESENTATIONS rep)
 void albaPipeGenericPolydata::SetNormalsTypeToPoints()
 {
 	m_ShowCellsNormals=0;
-	if (m_NormalsFilter)
-	{
-		m_NormalsFilter->ComputeCellNormalsOff();
-		m_NormalsFilter->ComputePointNormalsOn();
-		m_NormalsFilter->Update();
-	}
+	m_Actor->GetProperty()->SetInterpolationToPhong(); 
 	GetLogicManager()->CameraUpdate();
 }
 
@@ -453,12 +448,7 @@ void albaPipeGenericPolydata::SetNormalsTypeToPoints()
 void albaPipeGenericPolydata::SetNormalsTypeToCells()
 {
 	m_ShowCellsNormals=1 ;
-	if (m_NormalsFilter)
-	{
-		m_NormalsFilter->ComputeCellNormalsOn();
-		m_NormalsFilter->ComputePointNormalsOff();
-		m_NormalsFilter->Update();
-	}
+	m_Actor->GetProperty()->SetInterpolationToFlat();
 	GetLogicManager()->CameraUpdate();
 }
 
@@ -467,20 +457,12 @@ void albaPipeGenericPolydata::SetFlipNormalOn()
 //----------------------------------------------------------------------------
 {
 	m_FlipNormals = true;
-	if (m_NormalsFilter)
-	{
-		m_NormalsFilter->FlipNormalsOn();
-	}
 }
 //----------------------------------------------------------------------------
 void albaPipeGenericPolydata::SetFlipNormalOff()
 //----------------------------------------------------------------------------
 {
 	m_FlipNormals = false;
-	if (m_NormalsFilter)
-	{
-		m_NormalsFilter->FlipNormalsOff();
-	}
 }
 
 //----------------------------------------------------------------------------

@@ -136,6 +136,8 @@ public:
 	void CreateHistogramDialog();
 
 
+	wxString GetScalarName(int id) const;
+
 protected:
 	
   vtkLookupTable  *m_Table;

@@ -155,7 +155,7 @@ int vtkALBAVolumeToClosedSmoothSurface::RequestData(vtkInformation* vtkNotUsed(r
 		rgContourFilter->Update();
 
 		polydata = rgContourFilter->GetOutput();
-	}
+    }
   
 	if (FillHoles)
 	{

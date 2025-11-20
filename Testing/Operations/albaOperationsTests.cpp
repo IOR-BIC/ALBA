@@ -208,7 +208,7 @@ int	main( int argc, char* argv[] )
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
-
+	/* */
 	//runner.addTest(albaOpImporterMSF1xTest::suite()); 
 	runner.addTest(albaOpImporterSTLTest::suite());
 	runner.addTest(albaOpExporterSTLTest::suite());
@@ -287,7 +287,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpScaleDatasetTest::suite());
 	runner.addTest(albaOpCreateLabeledVolumeTest::suite());
 	runner.addTest(albaOpComputeWrappingTest::suite());
-	runner.addTest(albaOpComputeInertialTensorTest::suite());
+	runner.addTest(albaOpComputeInertialTensorTest::suite()); 
 	runner.addTest(albaOpSplitSurfaceTest::suite());
 	runner.addTest(albaOpMML3Test::suite());
 	runner.addTest(albaOpExtractGeometryTest::suite());
@@ -325,7 +325,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpExporterAbaqusFileTest::suite());
 	runner.addTest(albaOpImporterDICFileTest::suite());
 	runner.addTest(albaOpImporterPointCloudTest::suite());
-	runner.addTest(albaOpFilterImageTest::suite());
+	runner.addTest(albaOpFilterImageTest::suite()); /* */
 
 	runner.run( controller );
 

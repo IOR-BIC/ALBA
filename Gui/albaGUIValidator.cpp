@@ -47,6 +47,8 @@ BEGIN_EVENT_TABLE (albaGUIValidator, wxValidator)
     EVT_SCROLL (albaGUIValidator::OnScrollEvent)
 END_EVENT_TABLE()
 
+#define K_NUMPAD_RETURN 370
+
 //----------------------------------------------------------------------------
 void albaGUIValidator::Init(albaObserver* listener, int mid, wxControl *win)
 //----------------------------------------------------------------------------
@@ -943,23 +945,7 @@ void albaGUIValidator::OnChar(wxKeyEvent& event)
   //Filter key for TextCtrl used for numeric input
   int keyCode = (int)event.GetKeyCode();
 
-  if (((keyCode == WXK_RETURN || keyCode == WXK_TAB) &&
-      (m_Mode == VAL_STRING  || m_Mode == VAL_ALBA_STRING ||
-				m_Mode == VAL_MULTILINE_STRING || m_Mode == VAL_ALBA_MULTILINE_STRING ||
-       m_Mode == VAL_INTEGER || m_Mode == VAL_FLOAT || 
-       m_Mode == VAL_DOUBLE  || m_Mode == VAL_FLOAT_SLIDER_2)))     
-  {
-    // Return is received only from widget with the wxTE_PROCESS_ENTER style flag enabled
-    // i.e. console widget
-    TransferFromWindow();
-    albaEventMacro(albaEvent(m_TextCtrl, m_ModuleId));
-		if (m_Mode == VAL_MULTILINE_STRING || m_Mode == VAL_ALBA_MULTILINE_STRING)
-			event.Skip();
-		else
-	    return; // eat message
-  }
-
-  // don't filter special keys and Delete
+	// don't filter special keys and Delete
   if (keyCode < WXK_SPACE || keyCode == WXK_DELETE || keyCode > WXK_START)
   {
 		event.Skip();
@@ -982,15 +968,30 @@ void albaGUIValidator::OnChar(wxKeyEvent& event)
 void albaGUIValidator::OnKeyUp(wxKeyEvent& event)
 //----------------------------------------------------------------------------
 {
-	if(m_Mode == VAL_ALBA_INTERACTIVE_STRING || m_Mode == VAL_INTERACTIVE_STRING || m_Mode == VAL_MULTILINE_INTERACTIVE_STRING || m_Mode == VAL_ALBA_MULTILINE_INTERACTIVE_STRING)
+	int keyCode = (int)event.GetKeyCode();
+	
+  //On TAB, RETURN or NUMPAD RETURN transfer to from win but not stop event chain 
+  if(((keyCode == WXK_RETURN || keyCode == WXK_TAB || keyCode == K_NUMPAD_RETURN) &&
+		( m_Mode == VAL_STRING || m_Mode == VAL_ALBA_STRING || m_Mode == VAL_MULTILINE_STRING || m_Mode == VAL_ALBA_MULTILINE_STRING ||
+      m_Mode == VAL_ALBA_INTERACTIVE_STRING || m_Mode == VAL_INTERACTIVE_STRING || m_Mode == VAL_MULTILINE_INTERACTIVE_STRING || m_Mode == VAL_ALBA_MULTILINE_INTERACTIVE_STRING ||
+			m_Mode == VAL_INTEGER || m_Mode == VAL_FLOAT || m_Mode == VAL_DOUBLE || m_Mode == VAL_FLOAT_SLIDER_2)))
 	{
-		// Return is received only from widget with the wxTE_PROCESS_ENTER style flag enabled
-		// i.e. console widget
+		//On TAB, RETURN or NUMPAD RETURN transfer to from win but not stop event chain 
 		TransferFromWindow();
 		albaEventMacro(albaEvent(m_TextCtrl, m_ModuleId));
-		return; // eat message
+		event.Skip();
 	}
-	event.Skip();
+	else if (m_Mode == VAL_ALBA_INTERACTIVE_STRING || m_Mode == VAL_INTERACTIVE_STRING || m_Mode == VAL_MULTILINE_INTERACTIVE_STRING || m_Mode == VAL_ALBA_MULTILINE_INTERACTIVE_STRING)
+	{
+		//On other keys on interactive string read the key and stop the event chain
+		TransferFromWindow();
+		albaEventMacro(albaEvent(m_TextCtrl, m_ModuleId));
+	}
+  else
+  {
+    //By default do not stop event chain
+    event.Skip();
+  }
 }
 
 //----------------------------------------------------------------------------

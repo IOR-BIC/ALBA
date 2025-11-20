@@ -116,6 +116,6 @@ vtkAlgorithmOutput* albaPipeMeshSlice::GetPolyDataOutputPort()
     
 		if(m_NormalsFilter)
 			m_NormalsFilter->Update();
-	}
+  }
 	
 }

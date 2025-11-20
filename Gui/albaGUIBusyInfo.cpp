@@ -56,7 +56,7 @@ void albaGUIBusyInfo::Show()
 	if (m_TextMode)
 	{
 		int size=m_Message.Length();
-		printf("%c", 218);
+		printf("\n%c", 218);
 		for (int i = 0; i < size + 2; i++)
 			printf("%c", 196);
 		printf("%c\n", 191);
