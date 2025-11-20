@@ -342,8 +342,6 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   m_SurfaceOut->Modified();
   m_SurfaceOut->Update();
 
-  vtkDEL(surface);
-  
   //Volume output is a child of surface out
   //The result tree is Input
   //                     |-Surface
