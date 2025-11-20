@@ -410,7 +410,11 @@ void albaOpExtractIsosurface::CreateOpDialog()
 void albaOpExtractIsosurface::CreateVolumePipeline()
 {
   vtkDataSet* dataset = m_Input->GetOutput()->GetVTKData();
-	m_VolNode = new albaSceneNode(NULL, NULL, m_Input, m_Rwi->m_RenFront);
+	if (!m_TestMode)
+		m_VolNode = new albaSceneNode(NULL, NULL, m_Input, m_Rwi->m_RenFront);
+  else
+		m_VolNode = new albaSceneNode(NULL, NULL, m_Input, NULL);
+
 
 	m_PipeIso = new albaPipeIsosurface;
   m_PipeIso->Create(m_VolNode);
@@ -809,7 +813,7 @@ void albaOpExtractIsosurface::ExtractSurface()
 	}
 
   if (m_MultiContoursFlag == 0)
-    m_NumberOfContours = 0;
+    m_NumberOfContours = 1;
 
 	// IMPORTANT, extract the isosurface from m_ContourVolumeMapper in this way
 	// and then call surface->Delete() when the VME is created

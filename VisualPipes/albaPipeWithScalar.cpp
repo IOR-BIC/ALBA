@@ -696,14 +696,15 @@ void albaPipeWithScalar::CreateScalarBarActor()
 
 	SetScalarBarPos(m_ScalarBarPos);
 	
-
-	m_RenFront->AddActor2D(m_ScalarBarActor);
+	if(m_RenFront)
+		m_RenFront->AddActor2D(m_ScalarBarActor);
 }
 
 //----------------------------------------------------------------------------
 void albaPipeWithScalar::DeleteScalarBarActor()
 {
-	m_RenFront->RemoveActor2D(m_ScalarBarActor);
+	if(m_RenFront)
+		m_RenFront->RemoveActor2D(m_ScalarBarActor);
 	vtkDEL(m_ScalarBarActor);
 }
 
