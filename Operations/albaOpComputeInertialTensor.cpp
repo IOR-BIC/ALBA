@@ -403,7 +403,7 @@ int albaOpComputeInertialTensor::ComputeLocalInertialTensor(albaVME* node, int c
 	progressHelper.SetBarText(str);
 
   // initialize variables
-  int pId, qId, rId;
+  int pId=0, qId=0, rId=0;
   double p[3],q[3],r[3];
 
 	LocalInertiaTensor lit; 
