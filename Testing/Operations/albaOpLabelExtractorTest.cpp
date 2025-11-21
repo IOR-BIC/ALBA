@@ -53,7 +53,7 @@ void albaOpLabelExtractorTest::TestLabelRG()
   albaVMEFactory::Initialize();
 
   albaString filename = ALBA_DATA_ROOT;
-  filename << "/Test_LabelExtractor/Test_LabelExtractor.msf";
+  filename << "/Test_LabelExtractor/Test_LabelExtractor.alba";
 
   //Initialize storage
   albaVMEStorage *storage = albaVMEStorage::New();
@@ -126,7 +126,7 @@ void albaOpLabelExtractorTest::TestLabelSP()
   albaVMEFactory::Initialize();
 
   albaString filename = ALBA_DATA_ROOT;
-  filename << "/Test_LabelExtractor/Test_LabelExtractor.msf";
+  filename << "/Test_LabelExtractor/Test_LabelExtractor.alba";
 
   //Initialize storage
   albaVMEStorage *storage = albaVMEStorage::New();
@@ -199,7 +199,7 @@ void albaOpLabelExtractorTest::TestLabelSmoothRG()
   albaVMEFactory::Initialize();
 
   albaString filename = ALBA_DATA_ROOT;
-  filename << "/Test_LabelExtractor/Test_LabelExtractor.msf";
+  filename << "/Test_LabelExtractor/Test_LabelExtractor.alba";
 
   //Initialize storage
   albaVMEStorage *storage = albaVMEStorage::New();
@@ -273,7 +273,7 @@ void albaOpLabelExtractorTest::TestLabelSmoothSP()
   albaVMEFactory::Initialize();
 
   albaString filename = ALBA_DATA_ROOT;
-  filename << "/Test_LabelExtractor/Test_LabelExtractor.msf";
+  filename << "/Test_LabelExtractor/Test_LabelExtractor.alba";
 
   //Initialize storage
   albaVMEStorage *storage = albaVMEStorage::New();
