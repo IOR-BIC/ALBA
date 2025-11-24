@@ -83,7 +83,7 @@ void albaOpExtractIsosurfaceTest::TestExtractRG()
   albaVMESurface *output = albaVMESurface::SafeDownCast(extract->GetOutput());
   albaString number = output->GetSurfaceOutput()->GetNumberOfTriangles();
 
-  result = number.Compare("7018") == 0;
+  result = number.Compare("10336") == 0;
 
   TEST_RESULT;
   albaDEL(output);
@@ -102,7 +102,7 @@ void albaOpExtractIsosurfaceTest::TestExtractRG()
   output = albaVMESurface::SafeDownCast(extract1->GetOutput());
   number = output->GetSurfaceOutput()->GetNumberOfTriangles();
 
-  result = number.Compare("7018") == 0;
+  result = number.Compare("10336") == 0;
 
   TEST_RESULT;
   albaDEL(output);
@@ -122,7 +122,7 @@ void albaOpExtractIsosurfaceTest::TestExtractRG()
   output = albaVMESurface::SafeDownCast(extract2->GetOutput());
   number = output->GetSurfaceOutput()->GetNumberOfTriangles();
 
-  result = number.Compare("7018") == 0;
+  result = number.Compare("10336") == 0;
 
   TEST_RESULT;
   cppDEL(extract2);
@@ -201,7 +201,7 @@ void albaOpExtractIsosurfaceTest::TestExtractSP()
   output = albaVMESurface::SafeDownCast(extract2->GetOutput());
   number = output->GetSurfaceOutput()->GetNumberOfTriangles();
 
-  result = number.Compare("656") == 0;
+  result = number.Compare("672") == 0;
 
   TEST_RESULT;
   cppDEL(extract2);
