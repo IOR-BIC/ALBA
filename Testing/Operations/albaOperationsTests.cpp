@@ -208,7 +208,7 @@ int	main( int argc, char* argv[] )
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
-	/* 
+	/* */
 	//runner.addTest(albaOpImporterMSF1xTest::suite()); 
 	runner.addTest(albaOpImporterSTLTest::suite());
 	runner.addTest(albaOpExporterSTLTest::suite());
@@ -235,7 +235,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpCreateVolumeTest::suite());
 	runner.addTest(albaOpVOIDensityEditorTestTest::suite());
 	runner.addTest(albaOpAddLandmarkTest::suite());
-	runner.addTest(albaOpApplyTrajectoryTest::suite()); 
+	runner.addTest(albaOpApplyTrajectoryTest::suite());
 	runner.addTest(albaOpExtractIsosurfaceTest::suite());
 	runner.addTest(albaOpImporterASCIITest::suite());
  	runner.addTest(albaOpExporterMSFTest::suite());
@@ -286,8 +286,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpSegmentationRegionGrowingConnectedThresholdTest::suite());
 	runner.addTest(albaOpScaleDatasetTest::suite());
 	runner.addTest(albaOpCreateLabeledVolumeTest::suite());
-	runner.addTest(albaOpComputeWrappingTest::suite()); */
-	runner.addTest(albaOpComputeInertialTensorTest::suite()); /*
+	runner.addTest(albaOpComputeWrappingTest::suite());
+	runner.addTest(albaOpComputeInertialTensorTest::suite()); 
 	runner.addTest(albaOpSplitSurfaceTest::suite());
 	runner.addTest(albaOpMML3Test::suite());
 	runner.addTest(albaOpExtractGeometryTest::suite());
