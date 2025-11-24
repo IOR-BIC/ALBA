@@ -379,7 +379,7 @@ int albaOpComputeInertialTensor::ComputeLocalInertialTensor(albaVME* node, int c
 	
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> tranformFilter;
   tranformFilter->SetInputData((vtkPolyData *)node->GetOutput()->GetVTKData());
-  tranformFilter->SetTransform(node->GetOutput()->GetTransform()->GetVTKTransform());
+  tranformFilter->SetTransform(node->GetOutput()->GetAbsTransform()->GetVTKTransform());
   tranformFilter->Update();
 
 	// get dataset
@@ -447,20 +447,17 @@ int albaOpComputeInertialTensor::ComputeLocalInertialTensor(albaVME* node, int c
 
       vtkCell* cell = ds->GetCell(cellId);  
 
-      if (cell->Triangulate(0, triangleIds, trianglePoints))
+			if (cell->Triangulate(0, triangleIds, trianglePoints))
+			{
+				pId = triangleIds->GetId(0);
+				qId = triangleIds->GetId(1);
+				rId = triangleIds->GetId(2);
+			}
+      else
       {
-        for (vtkIdType j = 0; j < triangleIds->GetNumberOfIds(); j += 3)
-        {
-          vtkIdType pId = triangleIds->GetId(j);
-          vtkIdType qId = triangleIds->GetId(j + 1);
-          vtkIdType rId = triangleIds->GetId(j + 2);
-        }
-      }
-      
-      if ( pId < 0 )
-        {
         continue;
-        }
+      }
+
       ds->GetPoint(pId, p);
       ds->GetPoint(qId, q);
       ds->GetPoint(rId, r);
