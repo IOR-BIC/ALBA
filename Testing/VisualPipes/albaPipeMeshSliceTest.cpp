@@ -878,7 +878,7 @@ void albaPipeMeshSliceTest::ProceduralControl(double controlRangeMapper[2],vtkPr
   if (!(sr[0] == controlRangeMapper[0] && sr[1] == controlRangeMapper[1]))
     albaLogMessage("Control:[%lf,%lf], Range:[%lf,%lf]", controlRangeMapper[0], controlRangeMapper[1], sr[0], sr[1]);
 
-  CPPUNIT_ASSERT(sr[0] == controlRangeMapper[0] && sr[1] == controlRangeMapper[1]|| 1);
+  CPPUNIT_ASSERT(sr[0] == controlRangeMapper[0] && sr[1] == controlRangeMapper[1]);
   //end procedural control
 }
 //----------------------------------------------------------------------------
