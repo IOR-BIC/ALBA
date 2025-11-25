@@ -57,12 +57,10 @@ enum PIPE_MESH_ACTORS
 
 //----------------------------------------------------------------------------
 void albaPipeMeshSliceTest::TestFixture()
-//----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 void albaPipeMeshSliceTest::BeforeTest()
-//----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
   vtkNEW(m_RenderWindow);
@@ -78,7 +76,6 @@ void albaPipeMeshSliceTest::BeforeTest()
 }
 //----------------------------------------------------------------------------
 void albaPipeMeshSliceTest::AfterTest()
-//----------------------------------------------------------------------------
 {
   vtkDEL(m_RenderWindowInteractor);
   vtkDEL(m_RenderWindow);
@@ -98,7 +95,6 @@ enum ID_TEST
 
 //----------------------------------------------------------------------------
 void albaPipeMeshSliceTest::TestPipeExecution()
-//----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
   albaVMEStorage *storage = albaVMEStorage::New();
@@ -161,38 +157,44 @@ void albaPipeMeshSliceTest::TestPipeExecution()
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
-    switch(arrayIndex)
+    switch (arrayIndex)
     {
     case 0:
-      {
-        controlValues[0] = 1.0;
-        controlValues[1] = 12.0;
-      }
-      break;
+    {
+      controlValues[0] = 1.0;
+      controlValues[1] = 12.0;
+    }
+    break;
     case 1:
-      {
-        controlValues[0] = 2.0; 
-        controlValues[1] = 3.0;
-      }
-      break;
+    {
+      controlValues[0] = 2.0;
+      controlValues[1] = 3.0;
+    }
+    break;
     case 2:
-      {
-        controlValues[0] = 1000.0;
-        controlValues[1] = 200000.0;
-      }
-      break;
+    {
+      controlValues[0] = 1000.0;
+      controlValues[1] = 200000.0;
+    }
+    break;
     case 3:
-      {
-        controlValues[0] = 0.33;
-        controlValues[1] =  0.39 ;
-      }
-      break;
+    {
+      controlValues[0] = 0.33;
+      controlValues[1] = 0.39;
+    }
+    break;
     case 4:
-      {
-        controlValues[0] = 0.107;
-        controlValues[1] = 1.07;
-      }
-      break;
+    {
+      controlValues[0] = 0.107;
+      controlValues[1] = 1.07;
+    }
+    break;
+    case 5:
+    {
+      controlValues[0] = 1.0;
+      controlValues[1] = 2.0;
+    }
+    break;
     }
     pipeMeshSlice->SetActiveScalar(arrayIndex);
     
@@ -202,10 +204,11 @@ void albaPipeMeshSliceTest::TestPipeExecution()
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
     CPPUNIT_ASSERT(meshActor != NULL);
 
-    ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
-		printf("\n Visualization: %s \n", pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
 
+		albaLogMessage("\n Current Array. index:%d name:%s \n", arrayIndex, pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());		
+    
+    ProceduralControl(controlValues, meshActor);
 		COMPARE_IMAGES("TestPipeExecution", ID_TEST_PIPEEXECUTION + arrayIndex);
   }
 
@@ -218,7 +221,6 @@ void albaPipeMeshSliceTest::TestPipeExecution()
 }
 //----------------------------------------------------------------------------
 void albaPipeMeshSliceTest::TestPipeExecution_Wireframe()
-//----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
   albaVMEStorage *storage = albaVMEStorage::New();
@@ -283,38 +285,44 @@ void albaPipeMeshSliceTest::TestPipeExecution_Wireframe()
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
-    switch(arrayIndex)
+    switch (arrayIndex)
     {
     case 0:
-      {
-        controlValues[0] = 1.0;
-        controlValues[1] = 12.0;
-      }
-      break;
+    {
+      controlValues[0] = 1.0;
+      controlValues[1] = 12.0;
+    }
+    break;
     case 1:
-      {
-        controlValues[0] = 2.0; 
-        controlValues[1] = 3.0;
-      }
-      break;
+    {
+      controlValues[0] = 2.0;
+      controlValues[1] = 3.0;
+    }
+    break;
     case 2:
-      {
-        controlValues[0] = 1000.0;
-        controlValues[1] = 200000.0;
-      }
-      break;
+    {
+      controlValues[0] = 1000.0;
+      controlValues[1] = 200000.0;
+    }
+    break;
     case 3:
-      {
-        controlValues[0] = 0.33;
-        controlValues[1] =  0.39 ;
-      }
-      break;
+    {
+      controlValues[0] = 0.33;
+      controlValues[1] = 0.39;
+    }
+    break;
     case 4:
-      {
-        controlValues[0] = 0.107;
-        controlValues[1] = 1.07;
-      }
-      break;
+    {
+      controlValues[0] = 0.107;
+      controlValues[1] = 1.07;
+    }
+    break;
+    case 5:
+    {
+      controlValues[0] = 1.0;
+      controlValues[1] = 2.0;
+    }
+    break;
     }
     pipeMeshSlice->SetActiveScalar(arrayIndex);
     pipeMeshSlice->OnEvent(&albaEvent(this, albaPipeMeshSlice::ID_SCALARS));
@@ -323,10 +331,11 @@ void albaPipeMeshSliceTest::TestPipeExecution_Wireframe()
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
     CPPUNIT_ASSERT(meshActor != NULL);
 
-    ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
-    printf("\n Current Array: %s \n", pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
 
+		albaLogMessage("\n Current Array. index:%d name:%s \n", arrayIndex, pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
+    
+    ProceduralControl(controlValues, meshActor);
 		COMPARE_IMAGES("TestPipeExecution_Wireframe", ID_TEST_PIPEEXECUTION_WIREFRAME + arrayIndex);
   }
 
@@ -340,7 +349,6 @@ void albaPipeMeshSliceTest::TestPipeExecution_Wireframe()
 }
 //----------------------------------------------------------------------------
 void albaPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
-//----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
   albaVMEStorage *storage = albaVMEStorage::New();
@@ -405,38 +413,44 @@ void albaPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
-    switch(arrayIndex)
+    switch (arrayIndex)
     {
     case 0:
-      {
-        controlValues[0] = 1.0;
-        controlValues[1] = 12.0;
-      }
-      break;
+    {
+      controlValues[0] = 1.0;
+      controlValues[1] = 12.0;
+    }
+    break;
     case 1:
-      {
-        controlValues[0] = 2.0; 
-        controlValues[1] = 3.0;
-      }
-      break;
+    {
+      controlValues[0] = 2.0;
+      controlValues[1] = 3.0;
+    }
+    break;
     case 2:
-      {
-        controlValues[0] = 1000.0;
-        controlValues[1] = 200000.0;
-      }
-      break;
+    {
+      controlValues[0] = 1000.0;
+      controlValues[1] = 200000.0;
+    }
+    break;
     case 3:
-      {
-        controlValues[0] = 0.33;
-        controlValues[1] =  0.39 ;
-      }
-      break;
+    {
+      controlValues[0] = 0.33;
+      controlValues[1] = 0.39;
+    }
+    break;
     case 4:
-      {
-        controlValues[0] = 0.107;
-        controlValues[1] = 1.07;
-      }
-      break;
+    {
+      controlValues[0] = 0.107;
+      controlValues[1] = 1.07;
+    }
+    break;
+    case 5:
+    {
+      controlValues[0] = 1.0;
+      controlValues[1] = 2.0;
+    }
+    break;
     }
     pipeMeshSlice->SetActiveScalar(arrayIndex);
     pipeMeshSlice->OnEvent(&albaEvent(this, albaPipeMeshSlice::ID_SCALARS));
@@ -445,10 +459,11 @@ void albaPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
     CPPUNIT_ASSERT(meshActor != NULL);
 
-    ProceduralControl(controlValues, meshActor);
-    m_RenderWindow->Render();
-    printf("\n Current Array: %s \n", pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
+		m_RenderWindow->Render();
 
+		albaLogMessage("\n Current Array. index:%d name:%s \n", arrayIndex, pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
+    
+    ProceduralControl(controlValues, meshActor);
 		COMPARE_IMAGES("TestPipeExecution_WiredActorVisibility", ID_TEST_PIPEEXECUTION_WIRED_ACTOR_VISIBILITY + arrayIndex);
   }
 
@@ -462,7 +477,6 @@ void albaPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
 }
 //----------------------------------------------------------------------------
 void albaPipeMeshSliceTest::TestPipeExecution_FlipNormal()
-//----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
   albaVMEStorage *storage = albaVMEStorage::New();
@@ -527,38 +541,44 @@ void albaPipeMeshSliceTest::TestPipeExecution_FlipNormal()
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
-    switch(arrayIndex)
+    switch (arrayIndex)
     {
     case 0:
-      {
-        controlValues[0] = 1.0;
-        controlValues[1] = 12.0;
-      }
-      break;
+    {
+      controlValues[0] = 1.0;
+      controlValues[1] = 12.0;
+    }
+    break;
     case 1:
-      {
-        controlValues[0] = 2.0; 
-        controlValues[1] = 3.0;
-      }
-      break;
+    {
+      controlValues[0] = 2.0;
+      controlValues[1] = 3.0;
+    }
+    break;
     case 2:
-      {
-        controlValues[0] = 1000.0;
-        controlValues[1] = 200000.0;
-      }
-      break;
+    {
+      controlValues[0] = 1000.0;
+      controlValues[1] = 200000.0;
+    }
+    break;
     case 3:
-      {
-        controlValues[0] = 0.33;
-        controlValues[1] =  0.39 ;
-      }
-      break;
+    {
+      controlValues[0] = 0.33;
+      controlValues[1] = 0.39;
+    }
+    break;
     case 4:
-      {
-        controlValues[0] = 0.107;
-        controlValues[1] = 1.07;
-      }
-      break;
+    {
+      controlValues[0] = 0.107;
+      controlValues[1] = 1.07;
+    }
+    break;
+    case 5:
+    {
+      controlValues[0] = 1.0;
+      controlValues[1] = 2.0;
+    }
+    break;
     }
     pipeMeshSlice->SetActiveScalar(arrayIndex);
     pipeMeshSlice->OnEvent(&albaEvent(this, albaPipeMeshSlice::ID_SCALARS));
@@ -566,11 +586,11 @@ void albaPipeMeshSliceTest::TestPipeExecution_FlipNormal()
     vtkActor *meshActor;
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
     CPPUNIT_ASSERT(meshActor != NULL);
+		m_RenderWindow->Render();
+
+		albaLogMessage("\n Current Array. index:%d name:%s \n", arrayIndex, pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
 
     ProceduralControl(controlValues, meshActor);
-    m_RenderWindow->Render();
-    printf("\n Current Array: %s \n", pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
-
     COMPARE_IMAGES("TestPipeExecution_FlipNormal", ID_TEST_PIPEEXECUTION_FLIP_NORMAL+arrayIndex);
   }
 
@@ -584,7 +604,6 @@ void albaPipeMeshSliceTest::TestPipeExecution_FlipNormal()
 }
 //----------------------------------------------------------------------------
 void albaPipeMeshSliceTest::TestPipeExecution_UseVTKProperty()
-//----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
   albaVMEStorage *storage = albaVMEStorage::New();
@@ -619,7 +638,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_UseVTKProperty()
   /////////// Pipe Instance and Creation ///////////
   albaPipeMeshSlice *pipeMeshSlice = new albaPipeMeshSlice;
 	pipeMeshSlice->m_RenFront = m_Renderer;
-  pipeMeshSlice->SetScalarMapActive(0);
+  pipeMeshSlice->SetScalarMapActive(1);
   
   double origin[3], normal[3];
 
@@ -655,38 +674,44 @@ void albaPipeMeshSliceTest::TestPipeExecution_UseVTKProperty()
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
-    switch(arrayIndex)
+    switch (arrayIndex)
     {
     case 0:
-      {
-        controlValues[0] = 1.0;
-        controlValues[1] = 12.0;
-      }
-      break;
+    {
+      controlValues[0] = 1.0;
+      controlValues[1] = 12.0;
+    }
+    break;
     case 1:
-      {
-        controlValues[0] = 2.0; 
-        controlValues[1] = 3.0;
-      }
-      break;
+    {
+      controlValues[0] = 2.0;
+      controlValues[1] = 3.0;
+    }
+    break;
     case 2:
-      {
-        controlValues[0] = 1000.0;
-        controlValues[1] = 200000.0;
-      }
-      break;
+    {
+      controlValues[0] = 1000.0;
+      controlValues[1] = 200000.0;
+    }
+    break;
     case 3:
-      {
-        controlValues[0] = 0.33;
-        controlValues[1] =  0.39 ;
-      }
-      break;
+    {
+      controlValues[0] = 0.33;
+      controlValues[1] = 0.39;
+    }
+    break;
     case 4:
-      {
-        controlValues[0] = 0.107;
-        controlValues[1] = 1.07;
-      }
-      break;
+    {
+      controlValues[0] = 0.107;
+      controlValues[1] = 1.07;
+    }
+    break;
+    case 5:
+    {
+      controlValues[0] = 1.0;
+      controlValues[1] = 2.0;
+    }
+    break;
     }
     pipeMeshSlice->SetActiveScalar(arrayIndex);
     pipeMeshSlice->OnEvent(&albaEvent(this, albaPipeMeshSlice::ID_SCALARS));
@@ -695,10 +720,11 @@ void albaPipeMeshSliceTest::TestPipeExecution_UseVTKProperty()
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
     CPPUNIT_ASSERT(meshActor != NULL);
 
-    ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
-    printf("\n Current Array: %s \n", pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
 
+    albaLogMessage("\n Current Array. index:%d name:%s \n", arrayIndex, pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
+
+		ProceduralControl(controlValues, meshActor);
 		COMPARE_IMAGES("TestPipeExecution_UseVTKProperty", ID_TEST_PIPEEXECUTION_USE_VTK_PROPERTY + arrayIndex);
   }
 
@@ -711,7 +737,6 @@ void albaPipeMeshSliceTest::TestPipeExecution_UseVTKProperty()
 }
 //----------------------------------------------------------------------------
 void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
-//----------------------------------------------------------------------------
 {
   ////// Create VME (import vtkData) ////////////////////
   albaVMEStorage *storage = albaVMEStorage::New();
@@ -780,38 +805,44 @@ void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
-    switch(arrayIndex)
+    switch (arrayIndex)
     {
     case 0:
-      {
-        controlValues[0] = 1.0;
-        controlValues[1] = 12.0;
-      }
-      break;
+    {
+      controlValues[0] = 1.0;
+      controlValues[1] = 12.0;
+    }
+    break;
     case 1:
-      {
-        controlValues[0] = 2.0; 
-        controlValues[1] = 3.0;
-      }
-      break;
+    {
+      controlValues[0] = 2.0;
+      controlValues[1] = 3.0;
+    }
+    break;
     case 2:
-      {
-        controlValues[0] = 1000.0;
-        controlValues[1] = 200000.0;
-      }
-      break;
+    {
+      controlValues[0] = 1000.0;
+      controlValues[1] = 200000.0;
+    }
+    break;
     case 3:
-      {
-        controlValues[0] = 0.33;
-        controlValues[1] =  0.39 ;
-      }
-      break;
+    {
+      controlValues[0] = 0.33;
+      controlValues[1] = 0.39;
+    }
+    break;
     case 4:
-      {
-        controlValues[0] = 0.107;
-        controlValues[1] = 1.07;
-      }
-      break;
+    {
+      controlValues[0] = 0.107;
+      controlValues[1] = 1.07;
+    }
+    break;
+    case 5:
+    {
+      controlValues[0] = 1.0;
+      controlValues[1] = 2.0;
+    }
+    break;
     }
     pipeMeshSlice->SetActiveScalar(arrayIndex);
     pipeMeshSlice->OnEvent(&albaEvent(this, albaPipeMeshSlice::ID_SCALARS));
@@ -821,10 +852,11 @@ void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
     CPPUNIT_ASSERT(meshActor != NULL);
     CPPUNIT_ASSERT(meshActor->GetPickable() == FALSE);
 
-    ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
-    printf("\n Current Array: %s \n", pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
-
+		
+    albaLogMessage("\n Current Array. index:%d name:%s \n", arrayIndex, pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
+		
+		ProceduralControl(controlValues, meshActor);
 		COMPARE_IMAGES("TestPipeExecution_Thickness_PickActor", ID_TEST_PIPEEXECUTION_THICKNESS + arrayIndex);
   }
 
@@ -838,17 +870,19 @@ void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
 
 //----------------------------------------------------------------------------
 void albaPipeMeshSliceTest::ProceduralControl(double controlRangeMapper[2],vtkProp *propToControl)
-//----------------------------------------------------------------------------
 {
   //procedural control
   double sr[2];
   ((vtkActor* )propToControl)->GetMapper()->GetScalarRange(sr);
-  CPPUNIT_ASSERT(sr[0] == controlRangeMapper[0] && sr[1] == controlRangeMapper[1] || 1);
+
+  if (!(sr[0] == controlRangeMapper[0] && sr[1] == controlRangeMapper[1]))
+    albaLogMessage("Control:[%lf,%lf], Range:[%lf,%lf]", controlRangeMapper[0], controlRangeMapper[1], sr[0], sr[1]);
+
+  CPPUNIT_ASSERT(sr[0] == controlRangeMapper[0] && sr[1] == controlRangeMapper[1]|| 1);
   //end procedural control
 }
 //----------------------------------------------------------------------------
 vtkProp *albaPipeMeshSliceTest::SelectActorToControl(vtkPropCollection *propList, int index)
-//----------------------------------------------------------------------------
 {
   propList->InitTraversal();
   vtkProp *actor = propList->GetNextProp();

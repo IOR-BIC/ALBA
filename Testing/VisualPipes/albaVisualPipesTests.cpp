@@ -112,11 +112,10 @@ int	main( int argc, char* argv[] )
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
-
+	/* */
 	runner.addTest(albaPipeMeshTest::suite());
 	runner.addTest(albaPipeSurfaceTest::suite());
 	runner.addTest(albaPipePointCloudTest::suite());
-
 	runner.addTest(albaPipeGizmoTest::suite());
 	runner.addTest(albaPipeSurfaceTexturedTest::suite());
 	runner.addTest(albaPipeScalarTest::suite());
@@ -164,7 +163,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipeCompoundVolumeMIPTest::suite());
 	runner.addTest(albaPipeCompoundVolumeDRRTest::suite());
 	runner.addTest(albaPipeCompoundVolumeIsosurfaceTest::suite());
-	runner.addTest(albaPipeRayCastTest::suite());
+	runner.addTest(albaPipeRayCastTest::suite()); /* */
 
 
 	runner.run( controller );
