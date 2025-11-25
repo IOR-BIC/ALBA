@@ -190,13 +190,6 @@ void albaOpIterativeRegistration::OpStop(int result)
   cppDEL(m_GuiLandmark[SOURCE]);
   cppDEL(m_GuiLandmark[TARGET]);
    
-  // HideGui seems not to work  with plugged guis :(; using it generate a SetFocusToChild
-  // error when operation tab is selected after the operation has ended
-  /*albaEventMacro(albaEvent(this,OP_HIDE_GUI,(wxWindow *)m_Gui->GetParent()));
-  cppDEL(m_Gui);*/
-  HideGui();
-
-
   albaEventMacro(albaEvent(this,result));   
 }
 

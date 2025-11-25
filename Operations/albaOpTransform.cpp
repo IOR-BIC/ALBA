@@ -242,7 +242,6 @@ void albaOpTransform::OpStop(int result)
 		m_GizmoScale->Show(false);
 
 		GetLogicManager()->CameraUpdate();
-		albaEventMacro(albaEvent(this, OP_HIDE_GUI, (wxWindow *)m_Gui->GetParent()));
 	}
 
 	m_TransformVME->ReparentTo(NULL);

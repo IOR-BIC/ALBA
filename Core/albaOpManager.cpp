@@ -693,7 +693,8 @@ void albaOpManager::RunOpShowHistory()
 
 //----------------------------------------------------------------------------
 void albaOpManager::OpRunOk(albaOp *op)
-{	
+{
+	op->HideGui();
   m_Context.Pop();
 	
   m_NaturalNode = NULL;
@@ -716,6 +717,8 @@ void albaOpManager::OpRunOk(albaOp *op)
 //----------------------------------------------------------------------------
 void albaOpManager::OpRunCancel(albaOp *op)
 {
+  op->HideGui();
+
   m_Context.Pop();
 		
   if (m_NaturalNode != NULL)
