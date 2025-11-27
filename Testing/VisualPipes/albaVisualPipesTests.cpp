@@ -110,11 +110,7 @@ int	main( int argc, char* argv[] )
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
-<<<<<<< HEAD
-	
-=======
 	/* */
->>>>>>> remotes/origin/master
 	runner.addTest(albaPipeMeshTest::suite());
 	runner.addTest(albaPipeSurfaceTest::suite());
 	runner.addTest(albaPipePointCloudTest::suite());
