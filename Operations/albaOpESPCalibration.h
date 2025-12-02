@@ -78,7 +78,7 @@ class ALBA_EXPORT albaOpESPCalibration : public albaOp
 {
 public:
 	/** Constructor. */
-	albaOpESPCalibration(wxString label = "Op Empty", bool enable = true);
+	albaOpESPCalibration(wxString label = "ESP Calibration", bool enable = true);
 
 	/** Destructor. */
 	~albaOpESPCalibration();

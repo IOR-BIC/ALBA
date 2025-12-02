@@ -289,6 +289,7 @@
 #include "albaViewVTKCompound.h"
 #include "albaViewVirtualRX.h"
 #include "albaOpNearestLandmark.h"
+#include "albaOpMeasureAxisRotations.h"
 
 
 #define IDM_WINDOWNEXT 4004
@@ -2116,6 +2117,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpMeshQuality("Mesh Quality"), "Measure");
 	Plug(new albaOpComputeInertialTensor(), "Measure");
 	Plug(new albaOpComputeHausdorffDistance(), "Measure");
+	Plug(new albaOpMeasureAxisRotations(), "Measure");
 
 	Plug(new albaOpIterativeRegistration(), _("Register"));
 	Plug(new albaOpRegisterClusters("Clusters"), _("Register"));
