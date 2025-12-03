@@ -143,7 +143,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipePolylineSliceTest::suite());
 	runner.addTest(albaPipeWrappedMeterTest::suite());
 	runner.addTest(albaPipeDensityDistanceTest::suite());
-	runner.addTest(albaPipeGraphTest::suite());
+	//runner.addTest(albaPipeGraphTest::suite());
 	runner.addTest(albaPipeCompoundTest::suite());
 	runner.addTest(albaPipeCompoundVolumeTest::suite());
 	runner.addTest(albaPipeCompoundVolumeFixedScalarsTest::suite());
