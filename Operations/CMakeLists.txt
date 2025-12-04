@@ -179,6 +179,7 @@ IF (ALBA_USE_VTK)
 	albaOpCreateCentroid.cpp albaOpCreateCentroid.h
 	albaOpMeshScarlarsImporter.cpp albaOpMeshScarlarsImporter.h
 	albaOpMeasureAxisRotations.cpp albaOpMeasureAxisRotations.cpp
+	albaOpTransformAtoB.cpp	albaOpTransformAtoB.h
   )
 ENDIF (ALBA_USE_VTK)
 
