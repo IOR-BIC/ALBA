@@ -81,7 +81,7 @@ void albaPipeGraphTest::BeforeTest()
 	m_AlwaysVisibleRenderer->SetBackground(0.1, 0.1, 0.1);
 
 	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
+	m_RenderWindow->SetSize(800, 600);
 	m_RenderWindow->SetPosition(600, 0);
 
 	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
@@ -104,16 +104,14 @@ void albaPipeGraphTest::TestPipeExecution()
   vnl_matrix<double> emgMatrix;
   int rows = 30;
   int nTimeStamps = 500;
-  emgMatrix.set_size(rows-1 , nTimeStamps);
-
-  int i=0;
-  int j=0;
+  emgMatrix.set_size(rows , nTimeStamps);
+   
   int count = 0;
-  for(;i<=rows;i++)
+  for (int i = 0; i < rows; i++)
   {
-    for(;j<nTimeStamps;j++)
+    for (int j = 0; j < nTimeStamps; j++)
     {
-      emgMatrix.put(i,j,count++);  //timeStamp is the first line-> 0 1 2
+      emgMatrix.put(i, j, count++);  //timeStamp is the first line-> 0 1 2
     }
   }
 
