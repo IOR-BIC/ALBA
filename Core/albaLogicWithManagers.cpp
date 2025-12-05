@@ -224,6 +224,7 @@
 #include "albaOpESPCalibration.h"
 #include "albaOpComputeHausdorffDistance.h"
 #include "albaOpCreateCentroid.h"
+#include "albaOpTransformAtoB.h"
 
 //TMP
 #include "albaOpImporterEmgWS.h"
@@ -289,6 +290,7 @@
 #include "albaViewVTKCompound.h"
 #include "albaViewVirtualRX.h"
 #include "albaOpNearestLandmark.h"
+#include "albaOpMeasureAxisRotations.h"
 
 
 #define IDM_WINDOWNEXT 4004
@@ -2108,6 +2110,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpMakeVMETimevarying(), _("Modify"));
 	Plug(new albaOpEqualizeHistogram(), _("Modify"));
 	Plug(new albaOpSmoothSurfaceCells(), _("Modify"));
+	Plug(new albaOpTransformAtoB(), "Modify");
 
 	Plug(new albaOpMeasure2D("2D Measure"), "Measure");
 	Plug(new albaOp2DMeasure("2D Measure (Old)"), "Measure");
@@ -2116,6 +2119,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpMeshQuality("Mesh Quality"), "Measure");
 	Plug(new albaOpComputeInertialTensor(), "Measure");
 	Plug(new albaOpComputeHausdorffDistance(), "Measure");
+	Plug(new albaOpMeasureAxisRotations(), "Measure");
 
 	Plug(new albaOpIterativeRegistration(), _("Register"));
 	Plug(new albaOpRegisterClusters("Clusters"), _("Register"));

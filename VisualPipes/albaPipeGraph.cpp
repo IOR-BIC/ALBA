@@ -113,6 +113,7 @@ albaPipeGraph::~albaPipeGraph()
   m_PlotActor->RemoveAllDataSetInputConnections();
   m_PlotTimeLineActor->RemoveAllDataSetInputConnections();
   vtkDEL(m_PlotActor);
+  
   vtkDEL(m_PlotTimeLineActor);
   }
 //----------------------------------------------------------------------------

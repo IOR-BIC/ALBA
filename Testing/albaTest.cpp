@@ -86,8 +86,14 @@ void albaTest::setUp()
 	wxLog::EnableLogging(true);
 	
 
-	//Resets Random Color for test repeatability
+	
+	//Reset Random Color for test repeatability
 	albaResetRandomColor();
+
+	//Reset C random number generator for test repeatability
+	// Use a fixed seed to ensure deterministic behavior across test runs.
+	// Choose an explicit constant (change if a different sequence is desired).
+	srand(12345);
 
 	//Run Test Specific Stuff
 	BeforeTest();

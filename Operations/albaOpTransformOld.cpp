@@ -215,9 +215,6 @@ void albaOpTransformOld::OpStop(int result)
 
   m_GuiTransform->DetachInteractorFromVme();
 
-  // HideGui seems not to work  with plugged guis :(; using it generate a SetFocusToChild
-  // error when operation tab is selected after the operation has ended
-  albaEventMacro(albaEvent(this,OP_HIDE_GUI,(wxWindow *)m_Gui->GetParent()));
   albaEventMacro(albaEvent(this,result));  
 }
 

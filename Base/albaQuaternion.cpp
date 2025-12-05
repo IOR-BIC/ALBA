@@ -58,43 +58,43 @@ albaQuaternion::albaQuaternion(double angle,  albaVect3d &axis)
 }
 
 //----------------------------------------------------------------------------
-albaQuaternion::albaQuaternion( albaMatrix &matr)
+albaQuaternion::albaQuaternion(albaMatrix& matr)
 {
 	// Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
 	// article "quaternion Calculus and Fast Animation".
 
-	double trace = matr.GetElement(1,1) + matr.GetElement(2,2) + matr.GetElement(3,3);
+	double trace = matr.GetElement(0, 0) + matr.GetElement(1, 1) + matr.GetElement(2, 2);
 
-	if (trace>0)
+	if (trace > 0)
 	{
 		// |w| > 1/2, may as well choose w > 1/2
 
 		double root = sqrt(trace + 1.0f);  // 2w
 		m_W = 0.5f * root;
 		root = 0.5f / root;  // 1/(4w)
-		m_X = (matr.GetElement(3,2)-matr.GetElement(2,3)) * root;
-		m_Y = (matr.GetElement(1,3)-matr.GetElement(3,1)) * root;
-		m_Z = (matr.GetElement(2,1)-matr.GetElement(1,2)) * root;
+		m_X = (matr.GetElement(2, 1) - matr.GetElement(1, 2)) * root;
+		m_Y = (matr.GetElement(0, 2) - matr.GetElement(2, 0)) * root;
+		m_Z = (matr.GetElement(1, 0) - matr.GetElement(0, 1)) * root;
 	}
 	else
 	{
 		// |w| <= 1/2
 
-		static int next[3] = { 2, 3, 1 };
+		static int next[3] = { 1, 2, 0 };
 
 		int i = 1;
-		if (matr.GetElement(2,2)>matr.GetElement(1,1))  i = 2;
-		if (matr.GetElement(3,3)>matr.GetElement(i,i)) i = 3;
+		if (matr.GetElement(1, 1) > matr.GetElement(0, 0))  i = 2;
+		if (matr.GetElement(2, 2) > matr.GetElement(i, i)) i = 2;
 		int j = next[i];
 		int k = next[j];
 
-		double root = sqrt(matr.GetElement(i,i)-matr.GetElement(j,j)-matr.GetElement(k,k) + 1.0f);
-		double *quaternion[3] = { &m_X, &m_Y, &m_Z };
+		double root = sqrt(matr.GetElement(i, i) - matr.GetElement(j, j) - matr.GetElement(k, k) + 1.0f);
+		double* quaternion[3] = { &m_X, &m_Y, &m_Z };
 		*quaternion[i] = 0.5f * root;
 		root = 0.5f / root;
-		m_W = (matr.GetElement(k,j)-matr.GetElement(j,k))*root;
-		*quaternion[j] = (matr.GetElement(j,i)+matr.GetElement(i,j))*root;
-		*quaternion[k] = (matr.GetElement(k,i)+matr.GetElement(i,k))*root;
+		m_W = (matr.GetElement(k, j) - matr.GetElement(j, k)) * root;
+		*quaternion[j] = (matr.GetElement(j, i) + matr.GetElement(i, j)) * root;
+		*quaternion[k] = (matr.GetElement(k, i) + matr.GetElement(i, k)) * root;
 	}
 }
 
@@ -128,13 +128,30 @@ albaMatrix albaQuaternion::ToMatrix()
 //----------------------------------------------------------------------------
 void albaQuaternion::AngleAxis(double &angle, albaVect3d &axis)
 {
-	double squareLength = m_X*m_X + m_Y*m_Y + m_Z*m_Z;
+	double squareLength = m_X * m_X + m_Y * m_Y + m_Z * m_Z;
 
-	angle = 2.0f * (double) acos(m_W);
-	double inverseLength = 1.0f / (double) pow(squareLength, 0.5f);
-	axis.SetX( m_X * inverseLength);
-	axis.SetY( m_Y * inverseLength);
-	axis.SetZ( m_Z * inverseLength);
+	// ---- safety check: avoid divide-by-zero for zero rotation ----
+	if (squareLength < 1e-12) {
+		angle = 0.0;
+		axis.SetX(1.0);
+		axis.SetY(0.0);
+		axis.SetZ(0.0);
+		return;
+	}
+
+	// ---- clamp W to valid acos domain for numerical stability ----
+	double clampedW = m_W;
+	if (clampedW > 1.0)  clampedW = 1.0;
+	if (clampedW < -1.0) clampedW = -1.0;
+
+	// ---- compute angle ----
+	angle = 2.0 * acos(clampedW);
+
+	// ---- normalize axis (using sqrt, not pow) ----
+	double inverseLength = 1.0 / sqrt(squareLength);
+	axis.SetX(m_X * inverseLength);
+	axis.SetY(m_Y * inverseLength);
+	axis.SetZ(m_Z * inverseLength);
 
 }
 
