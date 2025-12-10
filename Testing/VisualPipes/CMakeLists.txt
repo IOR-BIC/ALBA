@@ -57,7 +57,7 @@ SET(PROJECT_SRCS
 	albaPipePointCloudTest.cpp albaPipePointCloudTest.h
 )
 
-IF (DISABLE_GPU_VOLUME_RENDERING_TESTS)
+IF (NOT DISABLE_GPU_VOLUME_RENDERING_TESTS)
 SET(PROJECT_SRCS ${PROJECT_SRCS}
 	albaPipeVolumeDRRTest.h albaPipeVolumeDRRTest.cpp
 	albaPipeVolumeMIPTest.h albaPipeVolumeMIPTest.cpp
@@ -66,7 +66,7 @@ SET(PROJECT_SRCS ${PROJECT_SRCS}
 	albaPipeCompoundVolumeMIPTest.h albaPipeCompoundVolumeMIPTest.cpp
 	albaPipeCompoundVolumeVRTest.h albaPipeCompoundVolumeVRTest.cpp
 )
-ENDIF (DISABLE_GPU_VOLUME_RENDERING_TESTS)
+ENDIF (NOT DISABLE_GPU_VOLUME_RENDERING_TESTS)
 	
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})
