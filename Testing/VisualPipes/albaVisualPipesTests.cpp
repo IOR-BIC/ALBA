@@ -12,6 +12,7 @@
 =========================================================================*/
 
 #include "albaDefines.h"
+#include "albaTestDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -22,11 +23,8 @@
 
 #include "albaFakeLogicForTest.h"
 #include "albaPipeCompoundTest.h"
-#include "albaPipeCompoundVolumeDRRTest.h"
 #include "albaPipeCompoundVolumeIsosurfaceTest.h"
-#include "albaPipeCompoundVolumeMIPTest.h"
 #include "albaPipeCompoundVolumeTest.h"
-#include "albaPipeCompoundVolumeVRTest.h"
 #include "albaPipeCompoundVolumefixedScalarsTest.h"
 #include "albaPipeDensityDistanceTest.h"
 #include "albaPipeFactoryVMETest.h"
@@ -42,7 +40,6 @@
 #include "albaPipePolylineGraphEditorTest.h"
 #include "albaPipePolylineSliceTest.h"
 #include "albaPipePolylineTest.h"
-#include "albaPipeRayCastTest.h"
 #include "albaPipeScalarMatrixTest.h"
 #include "albaPipeScalarTest.h"
 #include "albaPipeSliceTest.h"
@@ -61,8 +58,6 @@
 #include "albaPipeVectorFieldSurfaceTest.h"
 #include "albaPipeVectorFieldTest.h"
 #include "albaPipeVectorTest.h"
-#include "albaPipeVolumeDRRTest.h"
-#include "albaPipeVolumeMIPTest.h"
 #include "albaPipeVolumeProjectedTest.h"
 #include "albaPipeVolumeArbSliceTest.h"
 #include "albaPipeVolumeOrthoSliceTest.h"
@@ -71,6 +66,15 @@
 #include "albaVisualPipePolylineGraphTest.h"
 #include "albaVisualPipeSlicerSliceTest.h"
 #include "albaPipePointCloudTest.h"
+
+#ifndef DISABLE_GPU_VOLUME_RENDERING_TESTS
+#include "albaPipeVolumeDRRTest.h"
+#include "albaPipeVolumeMIPTest.h"
+#include "albaPipeCompoundVolumeDRRTest.h"
+#include "albaPipeCompoundVolumeMIPTest.h"
+#include "albaPipeCompoundVolumeVRTest.h"
+#include "albaPipeRayCastTest.h"
+#endif
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -111,6 +115,14 @@ int	main( int argc, char* argv[] )
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
 	/* */
+#ifndef DISABLE_GPU_VOLUME_RENDERING_TESTS
+	runner.addTest(albaPipeVolumeMIPTest::suite());
+	runner.addTest(albaPipeVolumeDRRTest::suite());
+	runner.addTest(albaPipeCompoundVolumeVRTest::suite());
+	runner.addTest(albaPipeCompoundVolumeMIPTest::suite());
+	runner.addTest(albaPipeCompoundVolumeDRRTest::suite());
+	runner.addTest(albaPipeRayCastTest::suite());
+#endif
 	runner.addTest(albaPipeMeshTest::suite());
 	runner.addTest(albaPipeSurfaceTest::suite());
 	runner.addTest(albaPipePointCloudTest::suite());
@@ -127,8 +139,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipeMeterTest::suite());
 	runner.addTest(albaPipeVolumeProjectedTest::suite());
 	runner.addTest(albaPipeScalarMatrixTest::suite());
-	runner.addTest(albaPipeVolumeMIPTest::suite());
-	runner.addTest(albaPipeVolumeDRRTest::suite());
 	runner.addTest(albaPipePolylineGraphEditorTest::suite());
 	runner.addTest(albaPipeMeshSliceTest::suite());
 	runner.addTest(albaPipeSurfaceSliceTest::suite());
@@ -155,11 +165,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipeTensorFieldTest::suite());
 	runner.addTest(albaPipeVectorFieldTest::suite());
 	runner.addTest(albaVisualPipeSlicerSliceTest::suite());
-	runner.addTest(albaPipeCompoundVolumeVRTest::suite());
-	runner.addTest(albaPipeCompoundVolumeMIPTest::suite());
-	runner.addTest(albaPipeCompoundVolumeDRRTest::suite());
 	runner.addTest(albaPipeCompoundVolumeIsosurfaceTest::suite());
-	runner.addTest(albaPipeRayCastTest::suite()); /* */
+	/* */
 
 
 	runner.run( controller );

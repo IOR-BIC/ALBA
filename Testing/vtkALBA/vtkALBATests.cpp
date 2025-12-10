@@ -18,6 +18,7 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
+#include "albaTestDefines.h"
 #include "vtkALBATests.h"
 
 #include "vtkALBARemoveCellsFilterTest.h"
@@ -50,7 +51,6 @@
 #include "vtkImageUnPackerTest.h"
 #include "vtkPackedImageTest.h"
 #include "vtkXRayVolumeMapperTest.h"
-#include "vtkALBAVolumeTextureMapper2DTest.h"
 #include "vtkALBADataArrayDescriptorTest.h"
 #include "vtkALBAErythrocyteSourceTest.h"
 #include "vtkALBAMeshCutterTest.h"
@@ -103,6 +103,10 @@
 #include "vtkALBADistanceFilterTest.h"
 #include "vtkALBACircleSourceTest.h"
 
+#ifndef DISABLE_GPU_VOLUME_RENDERING_TESTS
+#include "vtkALBAVolumeTextureMapper2DTest.h"
+#endif
+
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
@@ -139,7 +143,10 @@ int	main( int argc, char* argv[] )
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
-
+	/* */
+#ifndef DISABLE_GPU_VOLUME_RENDERING_TESTS
+	runner.addTest(vtkALBAVolumeTextureMapper2DTest::suite());
+#endif
 	runner.addTest(vtkALBARemoveCellsFilterTest::suite());
 	runner.addTest(vtkALBAPolyDataToSinglePolyLineTest::suite()); 
 	runner.addTest(vtkALBATextOrientatorTest::suite());
@@ -170,7 +177,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(vtkImageUnPackerTest::suite());
 	runner.addTest(vtkPackedImageTest::suite()); 
 	runner.addTest(vtkXRayVolumeMapperTest::suite());
-	runner.addTest(vtkALBAVolumeTextureMapper2DTest::suite());
 	runner.addTest(vtkALBADataArrayDescriptorTest::suite());
 	runner.addTest(vtkALBAErythrocyteSourceTest::suite());
 	runner.addTest(vtkALBAMeshCutterTest::suite());

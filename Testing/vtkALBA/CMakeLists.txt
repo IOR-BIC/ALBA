@@ -44,7 +44,6 @@ SET(PROJECT_SRCS
 	vtkImageUnPackerTest.h vtkImageUnPackerTest.cpp
 	vtkPackedImageTest.h vtkPackedImageTest.cpp
 	vtkXRayVolumeMapperTest.h vtkXRayVolumeMapperTest.cpp
-	vtkALBAVolumeTextureMapper2DTest.h vtkALBAVolumeTextureMapper2DTest.cpp
 	vtkALBADataArrayDescriptorTest.h vtkALBADataArrayDescriptorTest.cpp
 	vtkALBAErythrocyteSourceTest.h vtkALBAErythrocyteSourceTest.cpp
 	vtkALBAMeshCutterTest.h vtkALBAMeshCutterTest.cpp
@@ -96,6 +95,13 @@ SET(PROJECT_SRCS
 	vtkALBADistanceFilterTest.h	vtkALBADistanceFilterTest.cpp
 	vtkALBACircleSourceTest.h	vtkALBACircleSourceTest.cpp
 )
+
+IF (DISABLE_GPU_VOLUME_RENDERING_TESTS)
+SET(PROJECT_SRCS ${PROJECT_SRCS}
+	vtkALBAVolumeTextureMapper2DTest.h vtkALBAVolumeTextureMapper2DTest.cpp
+)
+ENDIF (DISABLE_GPU_VOLUME_RENDERING_TESTS)
+	
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})

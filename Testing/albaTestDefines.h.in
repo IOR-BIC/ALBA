@@ -1,0 +1,6 @@
+#ifndef __albaTestDefines_h
+#define __albaTestDefines_h
+
+#cmakedefine DISABLE_GPU_VOLUME_RENDERING_TESTS
+ 
+#endif

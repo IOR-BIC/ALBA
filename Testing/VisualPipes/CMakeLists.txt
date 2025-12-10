@@ -27,8 +27,6 @@ SET(PROJECT_SRCS
 	albaPipeMeterTest.h albaPipeMeterTest.cpp
 	albaPipeVolumeProjectedTest.h albaPipeVolumeProjectedTest.cpp
 	albaPipeScalarMatrixTest.h albaPipeScalarMatrixTest.cpp
-	albaPipeVolumeMIPTest.h albaPipeVolumeMIPTest.cpp
-	albaPipeVolumeDRRTest.h albaPipeVolumeDRRTest.cpp
 	albaPipePolylineGraphEditorTest.h albaPipePolylineGraphEditorTest.cpp
 	albaPipeMeshSliceTest.h albaPipeMeshSliceTest.cpp
 	albaPipeSurfaceSliceTest.h albaPipeSurfaceSliceTest.cpp
@@ -55,13 +53,21 @@ SET(PROJECT_SRCS
 	albaPipeTensorFieldTest.h albaPipeTensorFieldTest.cpp
 	albaPipeVectorFieldTest.h albaPipeVectorFieldTest.cpp
 	albaVisualPipeSlicerSliceTest.h albaVisualPipeSlicerSliceTest.cpp
-	albaPipeCompoundVolumeVRTest.h albaPipeCompoundVolumeVRTest.cpp
-	albaPipeCompoundVolumeMIPTest.h albaPipeCompoundVolumeMIPTest.cpp
-	albaPipeCompoundVolumeDRRTest.h albaPipeCompoundVolumeDRRTest.cpp
 	albaPipeCompoundVolumeIsosurfaceTest.h albaPipeCompoundVolumeIsosurfaceTest.cpp
-	albaPipeRayCastTest.h albaPipeRayCastTest.cpp
 	albaPipePointCloudTest.cpp albaPipePointCloudTest.h
 )
+
+IF (DISABLE_GPU_VOLUME_RENDERING_TESTS)
+SET(PROJECT_SRCS ${PROJECT_SRCS}
+	albaPipeVolumeDRRTest.h albaPipeVolumeDRRTest.cpp
+	albaPipeVolumeMIPTest.h albaPipeVolumeMIPTest.cpp
+	albaPipeCompoundVolumeDRRTest.h albaPipeCompoundVolumeDRRTest.cpp
+	albaPipeRayCastTest.h albaPipeRayCastTest.cpp
+	albaPipeCompoundVolumeMIPTest.h albaPipeCompoundVolumeMIPTest.cpp
+	albaPipeCompoundVolumeVRTest.h albaPipeCompoundVolumeVRTest.cpp
+)
+ENDIF (DISABLE_GPU_VOLUME_RENDERING_TESTS)
+	
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
