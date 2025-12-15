@@ -36,6 +36,7 @@ class vtkDataSet;
 class vtkALBADistanceFilter;
 class albaGUIHistogramWidget;
 class albaGUIDialog;
+class vtkDataArray;
 
 //----------------------------------------------------------------------------
 // albaPipeWithScalar :
@@ -110,9 +111,6 @@ public:
   /** Gets the lookup table*/
 	vtkLookupTable *GetLookupTable(){return m_Table;};
 
-	/** Update the properties */
-	virtual void UpdateProperty(bool fromTag = false);
-
 	/** Create the ScalarBar Actor for Scalar show */
 	void CreateScalarBarActor();
 
@@ -174,6 +172,16 @@ protected:
 	
 	/** Updates the Component Management in GUI and set current component */
 	void UpdateComonentsMangaement();
+
+protected:
+	vtkDataArray *GetCurrentScalars();
+
+	/** Get the Component Name*/
+	albaString GetComponentName(vtkDataArray *scalars, int compNum);
+
+	/** Updates the scalar Bar Title */
+	void UpdateScalarBarTitle();
+
 
 
   wxString                *m_ScalarsInComboBoxNames;

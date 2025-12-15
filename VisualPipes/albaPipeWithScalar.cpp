@@ -240,16 +240,14 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 				m_ActiveScalarType = (m_ScalarIndex < m_PointCellArraySeparation) ? POINT_TYPE : CELL_TYPE;
 				UpdateActiveScalarsInVMEDataVectorItems();
 				UpdateComonentsMangaement();
-
-				if (m_ScalarBarActor)
-					m_ScalarBarActor->SetTitle(m_ScalarsVTKName[m_ScalarIndex]);
-
+				UpdateScalarBarTitle();
 				GetLogicManager()->CameraUpdate();
 			}
 			break;
 			case ID_COMPONENTS:
 			{
 				UpdateVisualizationWithNewSelectedScalars();
+				UpdateScalarBarTitle();
 				GetLogicManager()->CameraUpdate();
 			}
 			break;
@@ -333,7 +331,6 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
   else if(alba_event->GetId() == VME_TIME_SET)
   {
     UpdateActiveScalarsInVMEDataVectorItems();
-    UpdateProperty();
   }
 }
 
@@ -419,7 +416,7 @@ void albaPipeWithScalar::EnableDisableGuiComponents()
 		bool scalarMangement = (m_ScalarMapActive && !m_ProbeMapActive) || (m_ProbeMapActive && m_ProbeVolume);
 		m_Gui->Enable(ID_SCALAR_MAP_ACTIVE, m_NumberOfArrays > 0 && !m_ProbeMapActive);
 		m_Gui->Enable(ID_SCALARS, m_ScalarMapActive && !m_ProbeMapActive);
-		m_Gui->Enable(ID_COMPONENTS, m_ScalarMapActive && !m_ProbeMapActive && m_NumberOfComponents > 0);
+		m_Gui->Enable(ID_COMPONENTS, m_ScalarMapActive && !m_ProbeMapActive && m_NumberOfComponents > 1);
 		m_Gui->Enable(ID_SELECT_PROBE_VME, m_ProbeMapActive);
 		m_Gui->Enable(ID_LUT, scalarMangement);
 		m_LutSlider->Enable(scalarMangement);
@@ -437,110 +434,6 @@ void albaPipeWithScalar::UpdateActiveScalarsInVMEDataVectorItems()
 
 	m_Vme->Update();
 	
-	
-	if (m_MapsStackActive && !m_OldMapsGenActive)
-	{
-		//run only on first activation
-		vtkDataSet * vtkData = m_ProbeFilter->GetOutput();
-		vtkData->Update();
-		vtkData->GetPointData()->SetActiveScalars(DISTANCE_FILTER_SCALARS_NAME);
-		vtkData->GetPointData()->GetScalars()->Modified();
-		vtkData->GetCellData()->SetActiveScalars("");
-	}
-	else if (!m_MapsStackActive && (m_NumberOfArrays > 0)  && (m_OldActiveScalarType != m_OldActiveScalarType ||	m_OldScalarIndex != m_ScalarIndex))
-	{
-		wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].ToAscii();
-
-		//run only when maps generation is off and scalartype or scalar index is changed 
-		if (albaVMEGeneric::SafeDownCast(m_Vme) && ((albaVMEGeneric *)m_Vme)->GetDataVector())
-		{
-			for (albaDataVector::Iterator it = ((albaVMEGeneric *)m_Vme)->GetDataVector()->Begin(); it != ((albaVMEGeneric *)m_Vme)->GetDataVector()->End(); it++)
-			{
-				albaVMEItemVTK *item = albaVMEItemVTK::SafeDownCast(it->second);
-				assert(item);
-
-				vtkDataSet *outputVTK = vtkDataSet::SafeDownCast(item->GetData());
-				if (outputVTK)
-				{
-					if (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0)
-					{
-						vtkPointData * pointData = outputVTK->GetPointData();
-						vtkDataArray *scalarsArray = pointData->GetArray(scalarsToActivate);
-
-						if (scalarsArray == NULL)
-						{
-							std::ostringstream stringStream;
-							stringStream << scalarsToActivate.ToAscii() << " POINT_DATA array does not exist for timestamp " \
-								<< item->GetTimeStamp() << " . Skipping SetActiveScalars for this timestamp" << std::endl;
-							albaLogMessage(stringStream.str().c_str());
-							continue;
-						}
-
-						if (pointData->GetScalars() == NULL || scalarsToActivate != pointData->GetScalars()->GetName() || m_OldActiveScalarType != m_ActiveScalarType)
-						{
-							pointData->SetActiveScalars(scalarsToActivate.ToAscii());
-							pointData->GetScalars()->Modified();
-							outputVTK->GetCellData()->SetActiveScalars("");
-							outputVTK->Modified();
-							outputVTK->Update();
-						}
-					}
-					else if (m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation > 0))
-					{
-						
-						vtkCellData * cellData = outputVTK->GetCellData();
-						vtkDataArray *scalarsArray = cellData->GetArray(scalarsToActivate);
-
-						if (scalarsArray == NULL)
-						{
-							std::ostringstream stringStream;
-							stringStream << scalarsToActivate.ToAscii() << "  CELL_DATA array does not exist for timestamp " \
-								<< item->GetTimeStamp() << " . Skipping SetActiveScalars for this timestamp" << std::endl;
-							albaLogMessage(stringStream.str().c_str());
-							continue;
-						}
-
-						if (cellData->GetScalars() == NULL || scalarsToActivate != cellData->GetScalars()->GetName() || m_OldActiveScalarType != m_ActiveScalarType)
-						{
-							cellData->SetActiveScalars(scalarsToActivate.ToAscii());
-							cellData->GetScalars()->Modified();
-							outputVTK->GetPointData()->SetActiveScalars("");
-							outputVTK->Modified();
-							outputVTK->Update();
-						}
-					}
-
-
-				}
-			}
-		}
-		else
-		{
-			vtkDataSet * vtkData = m_Vme->GetOutput()->GetVTKData();
-			vtkData->Update();
-			if (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0)
-			{
-				vtkPointData * pointData = vtkData->GetPointData();
-				if (pointData->GetScalars() == NULL || scalarsToActivate != pointData->GetScalars()->GetName())
-				{
-					pointData->SetActiveScalars(scalarsToActivate.ToAscii());
-					pointData->GetScalars()->Modified();
-					vtkData->GetCellData()->SetActiveScalars("");
-				}
-			}
-			else if (m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation > 0))
-			{
-				vtkCellData * cellData = vtkData->GetCellData();
-				if (cellData->GetScalars() == NULL || scalarsToActivate != cellData->GetScalars()->GetName())
-				{
-					cellData->SetActiveScalars(scalarsToActivate.ToAscii());
-					cellData->GetScalars()->Modified();
-					vtkData->GetPointData()->SetActiveScalars("");
-				}
-			}
-		}
-	}
-
 	if (m_OldMapsGenActive != m_ScalarMapActive || m_OldActiveScalarType != m_ActiveScalarType || m_OldScalarIndex != m_ScalarIndex)
 		UpdateVisualizationWithNewSelectedScalars();
 
@@ -565,19 +458,22 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 		if (m_MapsStackActive)
 		{
 			m_ProbeVolume->GetOutput()->GetVTKData()->GetScalarRange(sr);
-			scalars = m_Mapper->GetInput()->GetPointData()->GetScalars();
+			scalars = m_Mapper->GetInput()->GetPointData()->GetScalars(DISTANCE_FILTER_SCALARS_NAME);
 		}
 		else
 		{
-			scalars = data->GetPointData()->GetScalars();
+			scalars = data->GetPointData()->GetScalars(m_ScalarsVTKName[m_ScalarIndex]);
 			scalars->GetRange(sr, m_ComponentIndex);
 		}
 	}
 	else if (m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation > 0))
 	{
-		scalars = data->GetCellData()->GetScalars();
+		scalars = data->GetCellData()->GetScalars(m_ScalarsVTKName[m_ScalarIndex]);
 		scalars->GetRange(sr, m_ComponentIndex);
 	}
+
+	if (!scalars)
+		return;
 
 	if (m_Histogram)
 	{
@@ -598,9 +494,9 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 
 
   if(m_MapsStackActive || m_ActiveScalarType == POINT_TYPE)
-    m_Mapper->SetScalarModeToUsePointData();
+    m_Mapper->SetScalarModeToUsePointFieldData();
   else if(m_ActiveScalarType == CELL_TYPE)
-    m_Mapper->SetScalarModeToUseCellData();
+    m_Mapper->SetScalarModeToUseCellFieldData();
 
 	m_Mapper->ColorByArrayComponent(scalars->GetName(), m_ComponentIndex);
 
@@ -611,8 +507,6 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
   m_Actor->Modified();
   if(m_ScalarBarActor)
 		m_ScalarBarActor->Modified();
-
-  UpdateProperty();
 }
 
 //----------------------------------------------------------------------------
@@ -620,15 +514,12 @@ void albaPipeWithScalar::UpdateComonentsMangaement()
 {
 	if (m_Gui)
 	{
-		vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
+		vtkDataArray *scalars=GetCurrentScalars();
 
-		if (m_ProbeMapActive)
+		if(scalars)
+			m_NumberOfComponents = scalars->GetNumberOfComponents();
+		else
 			m_NumberOfComponents = 0;
-		else if (m_ActiveScalarType == POINT_TYPE)
-			m_NumberOfComponents = data->GetPointData()->GetScalars()->GetNumberOfComponents();
-		else if (m_ActiveScalarType == CELL_TYPE)
-			m_NumberOfComponents = data->GetCellData()->GetScalars()->GetNumberOfComponents();
-
 
 		m_ComponentIndex = 0;
 
@@ -636,15 +527,59 @@ void albaPipeWithScalar::UpdateComonentsMangaement()
 		m_ComponentsComboBox->Clear();
 
 		for (int i = 0; i < m_NumberOfComponents; i++)
-		{
-			wxString compStr;
-			compStr.Printf("%d", i);
-			m_ComponentsComboBox->Append(compStr);
-		}
+			m_ComponentsComboBox->Append(GetComponentName(scalars, i).GetCStr());
+		
 		// update items
 		m_ComponentsComboBox->Thaw();
 
 		EnableDisableGuiComponents();
+	}
+}
+
+//----------------------------------------------------------------------------
+vtkDataArray *albaPipeWithScalar::GetCurrentScalars()
+{
+	vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
+
+	if (m_MapsStackActive || (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0))
+	{
+		if (m_MapsStackActive)
+			return m_Mapper->GetInput()->GetPointData()->GetScalars(DISTANCE_FILTER_SCALARS_NAME);
+		else
+			return data->GetPointData()->GetScalars(m_ScalarsVTKName[m_ScalarIndex]);
+	}
+	else if (m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation > 0))
+		return data->GetCellData()->GetScalars(m_ScalarsVTKName[m_ScalarIndex]);
+
+	return NULL;
+}
+
+//----------------------------------------------------------------------------
+albaString albaPipeWithScalar::GetComponentName(vtkDataArray *scalars, int compNum)
+{
+	albaString compStr;
+	compStr.Printf("Comp %d", compNum + 1);
+	return compStr;
+}
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::UpdateScalarBarTitle()
+{
+	if (m_ScalarBarActor)
+	{
+		vtkDataArray *scalars = GetCurrentScalars();
+
+		if (!scalars)
+			return;
+
+		if (scalars->GetNumberOfComponents() <= 1)
+			m_ScalarBarActor->SetTitle(m_ScalarsVTKName[m_ScalarIndex]);
+		else
+		{
+			albaString title;
+			title.Printf("%s\n%s", m_ScalarsVTKName[m_ScalarIndex].ToAscii(), GetComponentName(scalars,m_ComponentIndex).GetCStr());
+			m_ScalarBarActor->SetTitle(title);
+		}
 	}
 }
 
@@ -720,22 +655,6 @@ void albaPipeWithScalar::SetLookupTable(vtkLookupTable *table)
 void albaPipeWithScalar::SetLookupTableToMapper()
 {
 	m_Mapper->SetLookupTable(m_Table);
-}
-
-//----------------------------------------------------------------------------
-void albaPipeWithScalar::UpdateProperty(bool fromTag)
-{
-	if (m_MapsStackActive)
-	{
-		m_ProbeFilter->GetOutput()->GetPointData()->GetScalars()->Modified();
-	}
-	else if (m_ScalarMapActive)
-	{
-		if (m_ActiveScalarType == POINT_TYPE)
-			m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->Modified();
-		else if (m_ActiveScalarType == CELL_TYPE)
-			m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars()->Modified();
-	}
 }
 
 
