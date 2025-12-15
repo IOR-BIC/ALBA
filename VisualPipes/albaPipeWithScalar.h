@@ -64,6 +64,7 @@ public:
 	enum PIPE_WITH_SCALARS_WIDGET_ID
 	{
 		ID_SCALARS = albaPipe::ID_LAST,
+		ID_COMPONENTS,
 		ID_PROBE_MAPS,
 		ID_SELECT_PROBE_VME,
 		ID_LUT,
@@ -146,6 +147,7 @@ protected:
 	albaGUILutSwatch *m_LutSwatch;
 	albaGUILutSlider		*m_LutSlider;
 	wxComboBox *m_ScalarComboBox;
+	wxComboBox *m_ComponentsComboBox;
 
   void CreateFieldDataControlArrays();
 	
@@ -166,10 +168,17 @@ protected:
 
 	/** Destroys the Density Map Stack */
 	void DestroyProbeMapStack();
+	
+	/** Deletes the Histogram Dialog */
+	void DeleteHistogramDialog();
+	
+	/** Updates the Component Management in GUI and set current component */
+	void UpdateComonentsMangaement();
+
 
   wxString                *m_ScalarsInComboBoxNames;
   wxString                *m_ScalarsVTKName;
-	
+
 	mmaMaterial             *m_ObjectMaterial;
 	vtkDataSetMapper        *m_Mapper; 
 	vtkActor                *m_Actor;
@@ -182,6 +191,8 @@ protected:
   int                      m_ScalarIndex;
 	int											 m_OldScalarIndex;
   int                      m_NumberOfArrays;
+	int 									   m_ComponentIndex;
+	int											 m_NumberOfComponents;
   int                      m_ActiveScalarType;
 	int											 m_OldActiveScalarType;
 	int                      m_ScalarMapActive;  //Gui option to enable scalar maps generation to be active a volume must be selected
@@ -193,9 +204,5 @@ protected:
 	int											 m_OldMapsGenActive;  //True when the maps generation is active (not gui option)
 
 	albaString							 m_ProbeVolName;
-
-
-private:
-	void DeleteHistogramDialog();
 };
 #endif // __albaPipeWithScalar_H__

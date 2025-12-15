@@ -66,6 +66,7 @@ albaPipeWithScalar::albaPipeWithScalar()
 	m_ScalarIndex = 0;
 	m_NumberOfArrays = 0;
 	m_OldScalarIndex = m_OldActiveScalarType = m_OldMapsGenActive = -1;
+	m_NumberOfComponents = 0;
 	m_Table = NULL;
 
 	m_ActiveScalarType = POINT_TYPE;
@@ -76,6 +77,7 @@ albaPipeWithScalar::albaPipeWithScalar()
 	m_LutSwatch = NULL;
 	m_LutSlider = NULL;
 	m_ScalarComboBox = NULL;
+	m_ComponentsComboBox = NULL;
 	m_ProbeVolume = NULL;
 
 	m_MapsStackActive = m_ProbeMapActive = m_ScalarMapActive   = m_ShowScalarBar = 0;
@@ -174,6 +176,8 @@ void albaPipeWithScalar::CreateScalarsGui(albaGUI *gui)
   gui->Divider(2);
 	gui->Bool(ID_SCALAR_MAP_ACTIVE,_("Enable scalar field mapping"), &m_ScalarMapActive, 1);
 	m_ScalarComboBox=gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsInComboBoxNames);
+	m_ComponentsComboBox = gui->Combo(ID_COMPONENTS, "", &m_ComponentIndex, m_NumberOfComponents, NULL);
+
 	gui->Divider();
 	gui->Bool(ID_PROBE_MAPS, _("Enable Volume Scalar Probe Map"), &m_ProbeMapActive, 1);
 	gui->Button(ID_SELECT_PROBE_VME, &m_ProbeVolName, "Select Volume...","Select Scalar Source Volume"),
@@ -235,10 +239,17 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 			{
 				m_ActiveScalarType = (m_ScalarIndex < m_PointCellArraySeparation) ? POINT_TYPE : CELL_TYPE;
 				UpdateActiveScalarsInVMEDataVectorItems();
+				UpdateComonentsMangaement();
 
 				if (m_ScalarBarActor)
 					m_ScalarBarActor->SetTitle(m_ScalarsVTKName[m_ScalarIndex]);
 
+				GetLogicManager()->CameraUpdate();
+			}
+			break;
+			case ID_COMPONENTS:
+			{
+				UpdateVisualizationWithNewSelectedScalars();
 				GetLogicManager()->CameraUpdate();
 			}
 			break;
@@ -267,6 +278,7 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 
 				EnableDisableGuiComponents();
 				UpdateActiveScalarsInVMEDataVectorItems();
+				UpdateComonentsMangaement();
 			}
 			break;
 			case ID_PROBE_MAPS:
@@ -407,6 +419,7 @@ void albaPipeWithScalar::EnableDisableGuiComponents()
 		bool scalarMangement = (m_ScalarMapActive && !m_ProbeMapActive) || (m_ProbeMapActive && m_ProbeVolume);
 		m_Gui->Enable(ID_SCALAR_MAP_ACTIVE, m_NumberOfArrays > 0 && !m_ProbeMapActive);
 		m_Gui->Enable(ID_SCALARS, m_ScalarMapActive && !m_ProbeMapActive);
+		m_Gui->Enable(ID_COMPONENTS, m_ScalarMapActive && !m_ProbeMapActive && m_NumberOfComponents > 0);
 		m_Gui->Enable(ID_SELECT_PROBE_VME, m_ProbeMapActive);
 		m_Gui->Enable(ID_LUT, scalarMangement);
 		m_LutSlider->Enable(scalarMangement);
@@ -545,30 +558,30 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 
   vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
   data->Update();
-
+	vtkDataArray *scalars;
   double sr[2]={0,1};
 	if (m_MapsStackActive || (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0))
 	{
 		if (m_MapsStackActive)
 		{
 			m_ProbeVolume->GetOutput()->GetVTKData()->GetScalarRange(sr);
-			if (m_Histogram)
-				m_Histogram->SetData(m_Mapper->GetInput()->GetPointData()->GetScalars());
+			scalars = m_Mapper->GetInput()->GetPointData()->GetScalars();
 		}
 		else
 		{
-			data->GetPointData()->GetScalars()->GetRange(sr);
-			if (m_Histogram)
-				m_Histogram->SetData(data->GetPointData()->GetScalars());
+			scalars = data->GetPointData()->GetScalars();
+			scalars->GetRange(sr, m_ComponentIndex);
 		}
-		
 	}
 	else if (m_ActiveScalarType == CELL_TYPE && (m_NumberOfArrays - m_PointCellArraySeparation > 0))
 	{
-		vtkDataArray* scalars = data->GetCellData()->GetScalars();
-		scalars->GetRange(sr);
-		if (m_Histogram)
-			m_Histogram->SetData(scalars);
+		scalars = data->GetCellData()->GetScalars();
+		scalars->GetRange(sr, m_ComponentIndex);
+	}
+
+	if (m_Histogram)
+	{
+		m_Histogram->SetData(scalars);
 	}
 
   m_Table->SetTableRange(sr);
@@ -589,15 +602,50 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
   else if(m_ActiveScalarType == CELL_TYPE)
     m_Mapper->SetScalarModeToUseCellData();
 
+	m_Mapper->ColorByArrayComponent(scalars->GetName(), m_ComponentIndex);
+
   m_Mapper->SetLookupTable(m_Table);
   m_Mapper->SetScalarRange(sr);
   m_Mapper->Update();
 
   m_Actor->Modified();
   if(m_ScalarBarActor)
-	m_ScalarBarActor->Modified();
+		m_ScalarBarActor->Modified();
 
   UpdateProperty();
+}
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::UpdateComonentsMangaement()
+{
+	if (m_Gui)
+	{
+		vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
+
+		if (m_ProbeMapActive)
+			m_NumberOfComponents = 0;
+		else if (m_ActiveScalarType == POINT_TYPE)
+			m_NumberOfComponents = data->GetPointData()->GetScalars()->GetNumberOfComponents();
+		else if (m_ActiveScalarType == CELL_TYPE)
+			m_NumberOfComponents = data->GetCellData()->GetScalars()->GetNumberOfComponents();
+
+
+		m_ComponentIndex = 0;
+
+		m_ComponentsComboBox->Freeze();
+		m_ComponentsComboBox->Clear();
+
+		for (int i = 0; i < m_NumberOfComponents; i++)
+		{
+			wxString compStr;
+			compStr.Printf("%d", i);
+			m_ComponentsComboBox->Append(compStr);
+		}
+		// update items
+		m_ComponentsComboBox->Thaw();
+
+		EnableDisableGuiComponents();
+	}
 }
 
 //----------------------------------------------------------------------------
