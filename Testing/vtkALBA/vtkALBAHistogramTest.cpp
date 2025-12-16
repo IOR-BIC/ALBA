@@ -86,7 +86,7 @@ void vtkALBAHistogramTest::TestHistogramPointRepresentation()
   actor = vtkALBAHistogram::New();
   vtkDataArray *data = reader->GetOutput()->GetPointData()->GetScalars();
 
-  actor->SetInputData(data);
+  actor->SetInputData(data,0);
   actor->SetHisctogramRepresentation(vtkALBAHistogram::POINT_REPRESENTATION);
 
   actor->LabelVisibilityOn();
@@ -113,7 +113,7 @@ void vtkALBAHistogramTest::TestHistogramLineRepresentation()
   actor = vtkALBAHistogram::New();
   vtkDataArray *data = reader->GetOutput()->GetPointData()->GetScalars();
 
-  actor->SetInputData(data);
+  actor->SetInputData(data,0);
   actor->SetHisctogramRepresentation(vtkALBAHistogram::LINE_REPRESENTATION);
 
   actor->LabelVisibilityOn();
@@ -140,7 +140,7 @@ void vtkALBAHistogramTest::TestHistogramBarRepresentation()
   actor = vtkALBAHistogram::New();
   vtkDataArray *data = reader->GetOutput()->GetPointData()->GetScalars();
 
-  actor->SetInputData(data);
+  actor->SetInputData(data, 0);
   actor->SetHisctogramRepresentation(vtkALBAHistogram::BAR_REPRESENTATION);
 
   actor->LabelVisibilityOn();
@@ -167,7 +167,7 @@ void vtkALBAHistogramTest::TestHistogramLogaritmicProperties()
   actor = vtkALBAHistogram::New();
   vtkDataArray *data = reader->GetOutput()->GetPointData()->GetScalars();
 
-  actor->SetInputData(data);
+  actor->SetInputData(data,0);
   actor->SetHisctogramRepresentation(vtkALBAHistogram::BAR_REPRESENTATION);
 
   actor->LabelVisibilityOn();
@@ -197,7 +197,7 @@ void vtkALBAHistogramTest::TestHistogramScaleFactorColorProperties()
   actor = vtkALBAHistogram::New();
   vtkDataArray *data = reader->GetOutput()->GetPointData()->GetScalars();
 
-  actor->SetInputData(data);
+  actor->SetInputData(data, 0);
   actor->SetHisctogramRepresentation(vtkALBAHistogram::BAR_REPRESENTATION);
 
   actor->LabelVisibilityOn();
@@ -229,7 +229,7 @@ void vtkALBAHistogramTest::TestHistogramGetAttributesAndUpdateLines()
   actor = vtkALBAHistogram::New();
   vtkDataArray *data = reader->GetOutput()->GetPointData()->GetScalars();
 
-  actor->SetInputData(data);
+  actor->SetInputData(data, 0);
   actor->SetHisctogramRepresentation(vtkALBAHistogram::BAR_REPRESENTATION);
 
   actor->LabelVisibilityOn();
