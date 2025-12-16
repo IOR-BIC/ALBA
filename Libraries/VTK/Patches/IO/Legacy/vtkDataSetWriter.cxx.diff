@@ -1,0 +1,2 @@
+82a83
+>   writer->SetWriteArrayMetaData(this->WriteArrayMetaData);
