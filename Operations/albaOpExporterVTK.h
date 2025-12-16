@@ -75,6 +75,7 @@ protected:
   albaVME   *m_Vme; 
 	int				m_Binary;
 	int				m_ABSMatrixFlag;
+	int       m_LegacyMode;
   int       m_ForceUnsignedShortScalarOutputForStructuredPoints;
 };
 #endif
