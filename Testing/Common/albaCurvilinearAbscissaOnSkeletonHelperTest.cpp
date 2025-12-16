@@ -121,7 +121,6 @@ void albaCurvilinearAbscissaOnSkeletonHelperTest::SetGetCurvilinearAbscissa()
   vtkNEW(lines);
 
   pts_arr->SetNumberOfComponents(3);
-  pts_arr->SetNumberOfTuples(3);
   pts_arr->InsertNextTuple3(1,1,1);
   pts_arr->InsertNextTuple3(0,0,0);
   pts_arr->InsertNextTuple3(-1,-1,-1);
@@ -146,7 +145,7 @@ void albaCurvilinearAbscissaOnSkeletonHelperTest::SetGetCurvilinearAbscissa()
   ////
   helper->SetConstraintPolylineGraph(input);
   helper->SetCurvilinearAbscissa(0,1.);
-  CPPUNIT_ASSERT(helper->GetCurvilinearAbscissa() == 0);
+  CPPUNIT_ASSERT(helper->GetCurvilinearAbscissa() == 1);
 
   albaDEL(input);
   cppDEL(helper);

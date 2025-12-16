@@ -81,11 +81,23 @@ void albaTest::setUp()
 	m_App->argv = NULL;     // set to NULL the input argument's parameters
 	wxTheApp->SetAppName("albaUserTest"); // Set the name for the application
 
+	// Direct wx logging to stdout
+	static wxLogStream logStream(&std::cout);
+	wxLog::SetActiveTarget(&logStream);
+
 	//NOTE, wxLog produces some memory leaks, set false during test
 	wxLog::EnableLogging(true);
 
-	//Resets Random Color for test repeatability
+	//add return line to avoid wrong log info
+	printf("\n");
+
+	//Reset Random Color for test repeatability
 	albaResetRandomColor();
+
+	//Reset C random number generator for test repeatability
+	// Use a fixed seed to ensure deterministic behavior across test runs.
+	// Choose an explicit constant (change if a different sequence is desired).
+	srand(12345);
 
 	//Run Test Specific Stuff
 	BeforeTest();

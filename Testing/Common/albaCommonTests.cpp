@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
-
+	/* */
 	runner.addTest(albaQueryObjectTest::suite());
 	runner.addTest(albaResultQueryAbstractHandlerTest::suite());
 	runner.addTest(albaRelationalDatabaseAbstractConnectorTest::suite());
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 	runner.addTest(albaWizardSettingsTest::suite());
 	runner.addTest(albaWizardWaitOpTest::suite());
 	runner.addTest(albaWizardTest::suite());
-
+	/* */
 	runner.run(controller);
 
 	// Print test in a compiler compatible format.
