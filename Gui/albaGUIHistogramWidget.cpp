@@ -145,7 +145,12 @@ albaGUIHistogramWidget::~albaGUIHistogramWidget()
 albaString albaGUIHistogramWidget::GetComponentName(vtkDataArray *scalars, int compNum)
 {
 	albaString compStr;
-	compStr.Printf("Comp %d", compNum + 1);
+
+	if (scalars->HasAComponentName())
+		compStr = scalars->GetComponentName(compNum);
+	else
+		compStr.Printf("Comp %d", compNum + 1);
+
 	return compStr;
 }
 //----------------------------------------------------------------------------

@@ -50,9 +50,6 @@ public:
   /** Destructor. */
   virtual ~albaGUIHistogramWidget();
 
-  /** Returns the component name */
-  albaString GetComponentName(vtkDataArray *scalars, int compNum);
- 
   /** Set the listener for the widget */
   virtual void SetListener(albaObserver *Listener) {m_Listener = Listener;};
   
@@ -116,6 +113,9 @@ public:
   /** Update position of the gizmo lines */
   void UpdateLines(int min,int max);
 protected:
+
+	/** Returns the component name */
+	albaString GetComponentName(vtkDataArray *scalars, int compNum);
 
   /** Create GUI for histogram widget.*/
   void CreateGui();
