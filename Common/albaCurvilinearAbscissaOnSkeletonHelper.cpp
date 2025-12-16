@@ -369,6 +369,7 @@ albaCurvilinearAbscissaOnSkeletonHelper::albaCurvilinearAbscissaOnSkeletonHelper
   m_GUIActiveBranchId = m_ActiveBranchId;
 
   m_CurvilinearAbscissa = 0;
+  albaLogMessage("TMP: Creator Set Curvilinear Abiscissa at 0");
   m_GUICurvilinearAbscissa = m_CurvilinearAbscissa;
 
   m_Listener = listener;
@@ -456,6 +457,7 @@ int albaCurvilinearAbscissaOnSkeletonHelper::SetCurvilinearAbscissa( vtkIdType b
     return ALBA_ERROR;
   }
 
+	albaLogMessage("TMP: Creator Set Curvilinear Abiscissa at %lf",m_CurvilinearAbscissa);
   m_CurvilinearAbscissa = s;
   m_ActiveBranchId = branchId;
 

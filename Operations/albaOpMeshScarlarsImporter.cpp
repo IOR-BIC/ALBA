@@ -72,31 +72,27 @@ int albaOpMeshScarlarsImporter::ImportFile(void)
 	bool headerReaded = false;
 
 	char firstWord[100];
+	double tmpDouble;
 
-	albaString printStr = "PRINT";
 	albaString nodeStr = "NODE";
 	albaString elementStr = "ELEM";
-	albaString statStr = "STAT";
-	albaString emptyStr = "";
-
+	
 	while ((lineLenght = GetLine(true)) != 0)
 	{
 		//skip empty lines
-		if (m_Line[0]=='\n')
+		if (sscanf(m_Line, "%s", firstWord) != 1)
 			continue;
 
-		if (sscanf(m_Line, "%s", firstWord) != 1)
+		int isNumber = sscanf(firstWord, "%f", &tmpDouble);
+		
+		if(isNumber == 1 && !headerReaded)
 		{
-			albaErrorMessage("General Error");
+			albaErrorMessage("Header not found");
 			ReadFinalize();
 			return ALBA_ERROR;
 		}
-
-		//Skip lines 
-		if (printStr.Equals(firstWord) || statStr.Equals(firstWord) || (headerReaded && nodeStr.Equals(firstWord)) || (headerReaded && elementStr.Equals(firstWord)))
-			continue;
-
-		if (!headerReaded)
+		
+		if (!headerReaded && (nodeStr.Equals(firstWord) || elementStr.Equals(firstWord)))
 		{
 			if (ReadHeader() == ALBA_ERROR)
 			{
@@ -107,6 +103,11 @@ int albaOpMeshScarlarsImporter::ImportFile(void)
 			headerReaded = true;
 			continue;
 		}
+
+		//Skip text lines and repeated headers
+		if (isNumber != 1)
+			continue;
+
 		else
 		{
 			if (ReadLine() == ALBA_ERROR)
