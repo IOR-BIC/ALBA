@@ -67,6 +67,7 @@ albaPipeWithScalar::albaPipeWithScalar()
 	m_NumberOfArrays = 0;
 	m_OldScalarIndex = m_OldActiveScalarType = m_OldMapsGenActive = -1;
 	m_NumberOfComponents = 0;
+	m_ComponentIndex = 0;
 	m_Table = NULL;
 
 	m_ActiveScalarType = POINT_TYPE;
@@ -239,8 +240,8 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 			case ID_SCALARS:
 			{
 				m_ActiveScalarType = (m_ScalarIndex < m_PointCellArraySeparation) ? POINT_TYPE : CELL_TYPE;
-				UpdateActiveScalarsInVMEDataVectorItems();
 				UpdateComonentsMangaement();
+				UpdateActiveScalarsInVMEDataVectorItems();
 				UpdateScalarBarTitle();
 				GetLogicManager()->CameraUpdate();
 			}
@@ -275,8 +276,8 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 					ShowScalarBarActor(m_ShowScalarBar);
 				}
 
-				UpdateActiveScalarsInVMEDataVectorItems();
 				UpdateComonentsMangaement();
+				UpdateActiveScalarsInVMEDataVectorItems();
 				UpdateScalarBarTitle();
 				GetLogicManager()->CameraUpdate();
 			}
