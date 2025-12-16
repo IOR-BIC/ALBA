@@ -50,6 +50,9 @@ public:
   /** Destructor. */
   virtual ~albaGUIHistogramWidget();
 
+  /** Returns the component name */
+  albaString GetComponentName(vtkDataArray *scalars, int compNum);
+ 
   /** Set the listener for the widget */
   virtual void SetListener(albaObserver *Listener) {m_Listener = Listener;};
   
@@ -72,7 +75,7 @@ public:
 	void SetHistogramData(vtkImageData *histogram);
 
   /** Input data from which generate histogram.*/
-	void SetData(vtkDataArray *data, albaVME *vme = NULL);
+  void SetData(vtkDataArray *data, int component = 0, albaVME *vme = NULL);
 
   /** Enable/disable logarithmic scale for histogram.*/
   void LogarithmicScale(int enable = 1);
@@ -123,12 +126,23 @@ protected:
   /** Enable/disable view widgets.*/
   void EnableWidgets(bool enable = true);
 
+	/** Exports Input Data as CSV file*/
+  void ExportData();
+
+  /** Exports Input Data statsistics as CSV file*/
+  void ExportStats();
+
+	/** Return a proposed name for CSV file export */
+	wxString GetProposedCSVNane();
+
+
   albaObserver   *m_Listener;
   int            m_HisctogramValue;
   int            m_NumberOfBins;
   int            m_LogHistogramFlag;
   double         m_Threshold[2];
   int            m_ShowText;
+  int            m_Component;
 
   albaGUI        *m_Gui;
 
@@ -142,8 +156,5 @@ protected:
   albaRWI        *m_HistogramRWI;
   vtkALBAHistogram  *m_Histogram;
 	vtkImageData  *m_HistogramData;
-private:
-	void ExportData();
-	void ExportStats();
 };
 #endif
