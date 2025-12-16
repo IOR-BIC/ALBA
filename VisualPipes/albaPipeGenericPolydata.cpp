@@ -145,6 +145,7 @@ void albaPipeGenericPolydata::ExecutePipe()
 		m_NormalsFilter->SetFlipNormals(m_FlipNormals);
 		m_NormalsFilter->SetComputePointNormals(!m_ShowCellsNormals);
 		m_NormalsFilter->SetComputeCellNormals(m_ShowCellsNormals);
+		m_NormalsFilter->SetFeatureAngle(91);
 		m_NormalsFilter->SetInput(polyData);
 		m_Mapper->SetInput(m_NormalsFilter->GetOutput());
 	}
