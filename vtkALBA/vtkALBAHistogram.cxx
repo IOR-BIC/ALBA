@@ -61,6 +61,9 @@ vtkALBAHistogram::vtkALBAHistogram()
   PointsRepresentation  = NULL;
   LineRepresentation    = NULL;
 
+  LastInputData = ExtractedCompArray = NULL;
+	LastComponent = -1;
+	
   HisctogramRepresentation = BAR_REPRESENTATION;
 
   Color[0] = Color[1] = Color[2] = 1.0;
@@ -98,20 +101,33 @@ vtkALBAHistogram::~vtkALBAHistogram()
   if(PointsRepresentation) PointsRepresentation->Delete();
   if(LineRepresentation)   LineRepresentation->Delete();
   if (InputData) InputData->UnRegister(this);
+	vtkDEL(ExtractedCompArray);
 }
 //------------------------------------------------------------------------------
-void vtkALBAHistogram::SetInputData(vtkDataArray* inputData)
+void vtkALBAHistogram::SetInputData(vtkDataArray* inputData, int component)
 //------------------------------------------------------------------------------
 {
+  if(InputData != inputData || Component !=component) 
+  {
   if (InputData != inputData)
   {
-    if (this->InputData != NULL) { this->InputData->UnRegister(this); }
+      if (this->InputData != NULL)
+      {
+        this->InputData->UnRegister(this);
+      }
+
     this->InputData = inputData;
-    if (this->InputData != NULL) { this->InputData->Register(this); }
-    this->Modified();
+
+      if (this->InputData != NULL)
+      {
+        this->InputData->Register(this);
+      }
+    }
+    Component = component;
+    ExtractComponent();
 
     double sr[2];
-		InputData->GetRange(sr);
+		ExtractedCompArray->GetRange(sr);
 		UpdateLines(sr);
 		double srw = sr[1] - sr[0] + 1;
 		NumberOfBins = MIN(srw, 100);
@@ -143,7 +159,7 @@ void vtkALBAHistogram::PrintSelf(ostream& os, vtkIndent indent)
 int vtkALBAHistogram::RenderOverlay(vtkViewport *viewport)
 //------------------------------------------------------------------------------
 {
-  if (InputData == NULL) {return 0;};
+  if (ExtractedCompArray == NULL) {return 0;};
 
   vtkRenderer *ren = static_cast<vtkRenderer *>(viewport);
   HistogramUpdate(ren);
@@ -161,16 +177,14 @@ int vtkALBAHistogram::RenderOverlay(vtkViewport *viewport)
 }
 //----------------------------------------------------------------------------
 int vtkALBAHistogram::RenderOpaqueGeometry(vtkViewport *viewport)
-//----------------------------------------------------------------------------
 {
-  if (InputData == NULL) {return 0;};
+  if (ExtractedCompArray == NULL) {return 0;};
 
   if (LabelVisibility) TextActor->RenderOpaqueGeometry(viewport);
   return 0;
 }
 //----------------------------------------------------------------------------
 void vtkALBAHistogram::HistogramCreate()
-//----------------------------------------------------------------------------
 {
   TextMapper = vtkTextMapper::New();
   TextMapper->SetInput("");
@@ -268,25 +282,56 @@ void vtkALBAHistogram::HistogramCreate()
   mapperLine1->Delete();
   mapperLine2->Delete();
 
-	if (InputData)
+	if (ExtractedCompArray)
 	{
 		double sr[2];
-		ImageData->GetScalarRange(sr);
+    ExtractedCompArray->GetRange(sr);
 		double srw = sr[1] - sr[0] + 1;
 		NumberOfBins = MIN(srw, 100);
 	}
 
 }
+
+//----------------------------------------------------------------------------
+void vtkALBAHistogram::ExtractComponent()
+{
+  if(InputData == NULL)
+  {
+		LastInputData = NULL;
+		vtkDEL(ExtractedCompArray);
+    return;
+	}
+
+  if(LastInputData != InputData)
+  {
+		LastInputData = InputData;
+		vtkDEL(ExtractedCompArray);
+		ExtractedCompArray = InputData->NewInstance();
+    ExtractedCompArray->SetNumberOfComponents(1);
+    ExtractedCompArray->SetNumberOfTuples(InputData->GetNumberOfTuples());
+		LastComponent = -1;
+	}
+
+  if(LastComponent != Component)
+  {
+    LastComponent = Component;
+    for(vtkIdType i=0; i < InputData->GetNumberOfTuples(); i++)
+      ExtractedCompArray->SetComponent(i,0, InputData->GetComponent(i, Component));
+    ExtractedCompArray->Modified();
+    this->Modified();
+	}
+}
 //----------------------------------------------------------------------------
 void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
-//----------------------------------------------------------------------------
 {
-  if (InputData == NULL) {return;}
+  if (ExtractedCompArray == NULL) {return;}
+
+  ExtractComponent();
 
   double sr[2];
   ImageData->SetDimensions(InputData->GetNumberOfTuples(),1,1);
   ImageData->AllocateScalars(InputData->GetDataType(),1);
-  ImageData->GetPointData()->SetScalars(InputData);
+  ImageData->GetPointData()->SetScalars(ExtractedCompArray);
   ImageData->GetScalarRange(sr);
   double srw = sr[1]-sr[0]+1;
 	
@@ -385,7 +430,7 @@ void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
   OriginX = ren->GetOrigin()[0];
   OriginY = ren->GetOrigin()[1];
 
-  InputData->GetRange(sr);
+  ExtractedCompArray->GetRange(sr);
 
 	UpdateLines(CurrRange);
 }
@@ -402,7 +447,7 @@ void vtkALBAHistogram::UpdateLines(double low, double hi)
 	CurrRange[0] = low;
 	CurrRange[1] = hi;
 
-  InputData->GetRange(sr);
+  ExtractedCompArray->GetRange(sr);
 
 	rangeSize = sr[1] - sr[0];
   
@@ -429,7 +474,7 @@ double vtkALBAHistogram::GetScalarValue(int x, int y)
 {
   int idx = (x /(RenderWidth *1.0)) * NumberOfBins;
   double sr[2];
-  InputData->GetRange(sr);
+  ExtractedCompArray->GetRange(sr);
 
   double value = (double)idx*(sr[1]-sr[0])/NumberOfBins;
   double shift = sr[0]>=0 ? 0 : -sr[0];

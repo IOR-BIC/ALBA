@@ -142,6 +142,7 @@ void albaPipeGenericPolydata::ExecutePipe()
 		m_NormalsFilter->SetFlipNormals(m_FlipNormals);
 		m_NormalsFilter->SetComputePointNormals(true);
 		m_NormalsFilter->SetInputConnection(polyDataPort);
+		m_NormalsFilter->SetFeatureAngle(91);
 		m_NormalsFilter->AutoOrientNormalsOn();
 		m_Mapper->SetInputConnection(m_NormalsFilter->GetOutputPort());
 	}
@@ -158,7 +159,7 @@ void albaPipeGenericPolydata::ExecutePipe()
   m_MapperWired->ScalarVisibilityOff();
 
 	vtkNEW(m_Actor);
-	//m_Actor->GetProperty()->BackfaceCullingOn();
+	m_Actor->GetProperty()->BackfaceCullingOn();
 	m_Actor->SetMapper(m_Mapper);
 
   if (m_ObjectMaterial->m_MaterialType == mmaMaterial::USE_LOOKUPTABLE)

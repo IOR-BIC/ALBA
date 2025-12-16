@@ -51,7 +51,6 @@ ALBA_ID_IMP(albaGUIHistogramWidget::RANGE_MODIFIED);
 //----------------------------------------------------------------------------
 albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /* = -1 */, const wxPoint& pos /* = wxDefaultPosition */, const wxSize& size /* = wxSize */,long style /* = wxTAB_TRAVERSAL */, bool showThresholds /* = false */)
 :albaGUIPanel(parent,id,pos,size,style)
-//----------------------------------------------------------------------------
 {
 	m_Listener    = NULL;
   m_Histogram   = NULL;
@@ -69,7 +68,8 @@ albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /
 
   m_Threshold[0] = 0;
   m_Threshold[1] = 1;
-  
+	m_Component = -1;
+
   m_LogHistogramFlag   = false;
   m_ShowText           = true;
 
@@ -134,16 +134,22 @@ albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /
 }
 //----------------------------------------------------------------------------
 albaGUIHistogramWidget::~albaGUIHistogramWidget() 
-//----------------------------------------------------------------------------
 {
   m_HistogramRWI->m_RenFront->RemoveActor(m_Histogram);
   cppDEL(m_Slider);
   vtkDEL(m_Histogram);
   cppDEL(m_HistogramRWI);
 }
+
+//----------------------------------------------------------------------------
+albaString albaGUIHistogramWidget::GetComponentName(vtkDataArray *scalars, int compNum)
+{
+	albaString compStr;
+	compStr.Printf("Comp %d", compNum + 1);
+	return compStr;
+}
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::UpdateLines(int min,int max)
-//----------------------------------------------------------------------------
 {
   m_Threshold[0]=min;
   m_Threshold[1]=max;
@@ -152,7 +158,6 @@ void albaGUIHistogramWidget::UpdateLines(int min,int max)
 }
 //----------------------------------------------------------------------------
 albaGUI *albaGUIHistogramWidget::GetGui()
-//----------------------------------------------------------------------------
 {
 
 	if (m_Gui == NULL)
@@ -163,14 +168,12 @@ albaGUI *albaGUIHistogramWidget::GetGui()
 }
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::GetThresholds(double *lower, double *upper)
-//----------------------------------------------------------------------------
 {
   *lower=m_Threshold[0];
   *upper=m_Threshold[1];
 }
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::CreateGui()
-//----------------------------------------------------------------------------
 {
   wxString represent[3] = {"points", "lines", "bar"};
   m_Gui = new albaGUI(this);
@@ -182,7 +185,7 @@ void albaGUIHistogramWidget::CreateGui()
     m_Slider->SetListener(this);
     m_Slider->EnableCenterWidget(false);
     m_Slider->EnableBoundaryHandles(false);
-    m_Data->GetRange(m_SelectedRange);
+    m_Data->GetRange(m_SelectedRange,m_Component);
     m_Slider->SetRange(m_SelectedRange);
     m_Lut->GetTableRange(m_SelectedRange);
     m_Slider->SetValue(0, m_SelectedRange[0]);
@@ -203,7 +206,6 @@ void albaGUIHistogramWidget::CreateGui()
 }
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::OnEvent( albaEventBase *event )
-//----------------------------------------------------------------------------
 {
   if (albaEvent *e = albaEvent::SafeDownCast(event))
   {
@@ -259,7 +261,6 @@ void albaGUIHistogramWidget::OnEvent( albaEventBase *event )
 }
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::UpdateGui()
-//----------------------------------------------------------------------------
 {
   m_HistogramRWI->CameraUpdate();
 	m_NumberOfBins = m_Histogram->GetNumberOfBins();
@@ -271,23 +272,19 @@ void albaGUIHistogramWidget::UpdateGui()
   }
 }
 //----------------------------------------------------------------------------
-void albaGUIHistogramWidget::SetData(vtkDataArray *data, albaVME *vme)
-//----------------------------------------------------------------------------
+void albaGUIHistogramWidget::SetData(vtkDataArray *data, int component,  albaVME *vme)
 {
   m_Data = data;
+	m_Component = component;
 	m_VME = vme;
-  m_Histogram->SetInputData(m_Data);
-	double sr[2];
-  m_Data->GetRange(sr);
+  m_Histogram->SetInputData(m_Data,component);
 
-	if (m_Lut)
-		m_Lut->GetTableRange(m_Threshold);
-	else
-		m_Data->GetRange(m_Threshold);
+  
+	m_Data->GetRange(m_Threshold,component);
 
   if (m_SliderThresholds != NULL)
   {
-	  m_SliderThresholds->SetRange(sr[0],sr[1]);
+	  m_SliderThresholds->SetRange(m_Threshold);
 	  m_SliderThresholds->SetSubRange(m_Threshold);
   }
 	m_Histogram->SetNumberOfBins(m_NumberOfBins);
@@ -299,12 +296,11 @@ void albaGUIHistogramWidget::SetData(vtkDataArray *data, albaVME *vme)
 
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::SetLut(vtkLookupTable *lut)
-//----------------------------------------------------------------------------
 {
   m_Lut=lut;
   double sr[2];
   if(m_Data)
-    m_Data->GetRange(sr);
+    m_Data->GetRange(sr,m_Component);
   else 
     lut->GetTableRange(sr);
   lut->GetTableRange(m_Threshold);
@@ -320,7 +316,6 @@ void albaGUIHistogramWidget::SetLut(vtkLookupTable *lut)
 
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::LogarithmicScale(int enable)
-//----------------------------------------------------------------------------
 {
   m_Histogram->SetLogHistogram(enable);
   UpdateGui();
@@ -330,7 +325,6 @@ void albaGUIHistogramWidget::LogarithmicScale(int enable)
 
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::EnableWidgets(bool enable)
-//----------------------------------------------------------------------------
 {
 	m_Gui->Enable(albaGUIHistogramWidget::ID_NUMBER_OF_BIN, enable);
 	m_Gui->Enable(albaGUIHistogramWidget::ID_LOGSCALE, enable);
@@ -339,9 +333,7 @@ void albaGUIHistogramWidget::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::ExportData()
 {
-	wxString proposed = albaGetLastUserFolder().ToAscii();
-	proposed += m_Data->GetName();
-	proposed += ".csv";
+	wxString proposed = GetProposedCSVNane();
 
 	wxString wildc = "ASCII CSV file (*.csv)|*.csv";
 	wxString f = albaGetSaveFile(proposed, wildc).ToAscii();
@@ -353,13 +345,17 @@ void albaGUIHistogramWidget::ExportData()
 		outFile = albaTryOpenFile(f.ToAscii(), "w");
 
 	if (outFile != NULL)
-	{//Header
-		fprintf(outFile, "%s;\n", m_Data->GetName());
+	{	
+		//Header
+		if(m_Data->GetNumberOfComponents()<2)
+			fprintf(outFile, "%s;\n", m_Data->GetName());
+		else
+			fprintf(outFile, "%s %s;\n", m_Data->GetName(), GetComponentName(m_Data,m_Component).GetCStr());
 
 		//Content
 		for (int i = 0; i < m_Data->GetNumberOfTuples(); i++)
 		{
-			double value = m_Data->GetTuple1(i);
+			double value = m_Data->GetComponent(i,m_Component);
 			fprintf(outFile, "%f;\n", value);
 		}
 		fclose(outFile);
@@ -372,10 +368,7 @@ void albaGUIHistogramWidget::ExportData()
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::ExportStats()
 {
-
-	wxString proposed = albaGetLastUserFolder().ToAscii();
-	proposed += m_Data->GetName();
-	proposed += ".csv";
+	wxString proposed=GetProposedCSVNane();
 
 	wxString wildc = "ASCII CSV file (*.csv)|*.csv";
 	wxString f = albaGetSaveFile(proposed, wildc).ToAscii();
@@ -404,7 +397,7 @@ void albaGUIHistogramWidget::ExportStats()
 		//Values are on Squared Dist
 		for (int i = 0; i < nValues; i++)
 		{
-			double value = m_Data->GetTuple1(i);
+			double value = m_Data->GetComponent(i,m_Component);
 			sumValues += value;
 			min = MIN(min, value);
 			max = MAX(max, value);
@@ -415,11 +408,14 @@ void albaGUIHistogramWidget::ExportStats()
 
 		for (int i = 0; i < nValues; i++)
 		{
-			double err = mean - m_Data->GetTuple1(i);
+			double err = mean - m_Data->GetComponent(i,m_Component);
 			errSq += err*err;
 		}
 
 		double stdDev = sqrt(errSq / (double)nValues);
+
+		albaString scalarName;
+		scalarName.Printf("%s %s", m_Data->GetName(), GetComponentName(m_Data, m_Component).GetCStr());
 
 		fprintf(pFile, "%s;%s;%.2f;%.2f;%.2f;%.2f;\n", vmeName.GetCStr(), m_Data->GetName(), mean, min, max, stdDev);
 		
@@ -429,9 +425,22 @@ void albaGUIHistogramWidget::ExportStats()
 	}
 }
 
+wxString albaGUIHistogramWidget::GetProposedCSVNane()
+{
+	wxString proposed = albaGetLastUserFolder().ToAscii();
+	proposed += m_Data->GetName();
+	if (m_Data->GetNumberOfComponents() > 1)
+	{
+		proposed += "_";
+		proposed += GetComponentName(m_Data, m_Component).GetCStr();
+	}
+	proposed += ".csv";
+
+	return proposed;
+}
+
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::ShowLines(int value)
-//----------------------------------------------------------------------------
 {
   if (value)
     m_Histogram->ShowLinesOn();
@@ -439,22 +448,18 @@ void albaGUIHistogramWidget::ShowLines(int value)
     m_Histogram->ShowLinesOff();
 }
 
-
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::SetHistogramData(vtkImageData *histogram)
-//----------------------------------------------------------------------------
 {
 	m_HistogramData = histogram;
 }
 //----------------------------------------------------------------------------
 double albaGUIHistogramWidget::GetHistogramScalarValue(int x, int y)
-//----------------------------------------------------------------------------
 {
   return m_Histogram->GetScalarValue(x,y);
 }
 //----------------------------------------------------------------------------
 long int albaGUIHistogramWidget::GetHistogramValue(int x, int y)
-//----------------------------------------------------------------------------
 {
   return m_Histogram->GetHistogramValue(x,y);
 }
