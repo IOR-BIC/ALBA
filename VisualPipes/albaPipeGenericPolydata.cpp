@@ -159,7 +159,8 @@ void albaPipeGenericPolydata::ExecutePipe()
   m_MapperWired->ScalarVisibilityOff();
 
 	vtkNEW(m_Actor);
-	m_Actor->GetProperty()->BackfaceCullingOn();
+	m_Actor->GetProperty()->BackfaceCullingOff();
+
 	m_Actor->SetMapper(m_Mapper);
 
   if (m_ObjectMaterial->m_MaterialType == mmaMaterial::USE_LOOKUPTABLE)
