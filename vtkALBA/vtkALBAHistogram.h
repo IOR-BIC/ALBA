@@ -73,7 +73,7 @@ class ALBA_EXPORT vtkALBAHistogram : public vtkActor2D
   };
 
 	/** Set the vtkImageData on which make the histogram. */
-  void SetInputData(vtkDataArray* inputData);
+  void SetInputData(vtkDataArray* inputData, int component);
   //vtkSetObjectMacro(InputData, vtkDataArray);
   /** Get the vtkImageData on which make the histogram. */
   vtkGetObjectMacro(InputData, vtkDataArray);
@@ -130,6 +130,8 @@ class ALBA_EXPORT vtkALBAHistogram : public vtkActor2D
 	/** Set/Get the number of bins.*/
  	vtkGetMacro(NumberOfBins, int);
 
+	/** Set/Get the number of bins.*/
+	vtkGetMacro(Component, int);
 
   /** Update the position of the gizmos */
   void UpdateLines(double range[2]);
@@ -164,6 +166,9 @@ protected:
   /** Update the histogram during rendering. */
   void HistogramUpdate(vtkRenderer *ren);
 
+  /** Extract the selected Component */
+  void ExtractComponent();
+
   double ScaleFactor;
   double LogScaleConstant;
   double Color[3];
@@ -178,6 +183,8 @@ protected:
   int    OriginX;
 	double CurrRange[2];
   int    ShowLines;
+  int    Component;
+  int    LastComponent;
   bool   AutoscaleCalculated;
 
   vtkTextMapper	*TextMapper;
@@ -195,6 +202,8 @@ protected:
   vtkImageLogarithmicScale  *LogScale;
   vtkGlyph3D                *Glyph;
   vtkDataArray              *InputData;
+  vtkDataArray              *LastInputData;
+  vtkDataArray              *ExtractedCompArray;
   vtkImageData              *ImageData;
 
 private:

@@ -476,9 +476,7 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 		return;
 
 	if (m_Histogram)
-	{
-		m_Histogram->SetData(scalars);
-	}
+		m_Histogram->SetData(scalars,m_ComponentIndex);
 
   m_Table->SetTableRange(sr);
   m_Table->SetValueRange(sr);
