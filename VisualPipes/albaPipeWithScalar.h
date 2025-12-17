@@ -137,6 +137,8 @@ public:
 
 	wxString GetScalarName(int id) const;
 
+	int GetComponentIndex() { return m_ComponentIndex; }
+	void SetComponentIndex(int val) { m_ComponentIndex = val; }
 protected:
 	
   vtkLookupTable  *m_Table;
