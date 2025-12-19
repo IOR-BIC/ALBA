@@ -53,8 +53,6 @@ protected:
   void TestPipeExecution_SetColorLookupTable();
   void TestPipeExecution_TicksOnOff();
 	void TestPipeExecution_SetInterpolation();
-
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
 };
 
 #endif

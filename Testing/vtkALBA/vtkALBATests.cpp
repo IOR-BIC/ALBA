@@ -143,7 +143,7 @@ int	main( int argc, char* argv[] )
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
-
+	/*  */
 	runner.addTest(vtkALBAContourVolumeMapperTest::suite());
 	runner.addTest(vtkALBARemoveCellsFilterTest::suite());
 	runner.addTest(vtkALBAPolyDataToSinglePolyLineTest::suite());
@@ -152,8 +152,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(vtkALBALocalAxisCoordinateTest::suite());
 	runner.addTest(vtkALBAVolumeResampleTest::suite());
 	runner.addTest(vtkALBADOFMatrixTest::suite());
-	runner.addTest(vtkALBAImplicitPolyDataTest::suite());
-	runner.addTest(vtkALBATextActorMeterTest::suite());
+	runner.addTest(vtkALBAImplicitPolyDataTest::suite()); 
+	runner.addTest(vtkALBATextActorMeterTest::suite()); 
 	runner.addTest(vtkALBACellsFilterTest::suite());
 	runner.addTest(vtkALBAGridActorTest::suite());
 	runner.addTest(vtkALBAProjectVolumeTest::suite());
@@ -229,6 +229,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(vtkALBARGtoSPImageFilterTest::suite());
 	runner.addTest(vtkALBADistanceFilterTest::suite());
 	runner.addTest(vtkALBACircleSourceTest::suite());
+	/* */ 
 	runner.run( controller );
 
 	// Print test in a compiler compatible format.

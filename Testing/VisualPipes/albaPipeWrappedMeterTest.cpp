@@ -50,6 +50,10 @@
 
 // render window stuff
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+
 
 #include <iostream>
 
@@ -62,24 +66,12 @@ void albaPipeWrappedMeterTest::TestFixture()
 void albaPipeWrappedMeterTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(600, 600);
-	m_RenderWindow->SetPosition(0, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeWrappedMeterTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeWrappedMeterTest::TestPipeExecution()
@@ -146,9 +138,9 @@ void albaPipeWrappedMeterTest::TestPipeExecution()
   vectorActor = (vtkActor *) SelectActorToControl(actorList, 0);
   CPPUNIT_ASSERT(vectorActor != NULL);
 
+  m_Renderer->ResetCamera(); 
   m_RenderWindow->Render();
-
-	COMPARE_IMAGES("TestPipeExecution", 0);
+  COMPARE_IMAGES("TestPipeExecution", 0);
 
   vtkDEL(actorList);
 

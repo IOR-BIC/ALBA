@@ -26,7 +26,9 @@
 
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkALBASmartPointer.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkActor.h"
 #include "vtkActorCollection.h"
 #include "vtkCamera.h"
@@ -49,14 +51,7 @@ std::string vtkALBAClipSurfaceBoundingBoxTest::ConvertInt(int number)
 void vtkALBAClipSurfaceBoundingBoxTest::BeforeTest()
 //--------------------------------------------------
 {
-	vtkNEW(m_Renderer);
-	vtkNEW(m_RenderWindow);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(100, 0);
-
-	m_Renderer->SetBackground(0.0, 0.0, 0.0);
+	InitializeRenderWindow();
 
   m_SphereInput = vtkSphereSource::New();
   m_PlaneMask = vtkPlaneSource::New();
@@ -66,9 +61,6 @@ void vtkALBAClipSurfaceBoundingBoxTest::BeforeTest()
 void vtkALBAClipSurfaceBoundingBoxTest::AfterTest()
 //--------------------------------------------------
 {
-	vtkDEL(m_Renderer);
-	vtkDEL(m_RenderWindow);
-
   m_SphereInput->Delete();
   m_PlaneMask->Delete();
 }
@@ -174,8 +166,6 @@ void vtkALBAClipSurfaceBoundingBoxTest::RenderData(vtkActorCollection *actorColl
   camera->SetPosition(20.0,3.0,20.0);
   camera->Modified();
 
-  vtkALBASmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
-  renderWindowInteractor->SetRenderWindow(m_RenderWindow);
 
   actorCollection->InitTraversal();
   for (vtkProp *actor = actorCollection->GetNextProp(); actor != NULL; actor = actorCollection->GetNextProp()) 
@@ -183,6 +173,7 @@ void vtkALBAClipSurfaceBoundingBoxTest::RenderData(vtkActorCollection *actorColl
     m_Renderer->AddActor(actor);  
   }
 
+  m_Renderer->ResetCamera(); 
   m_RenderWindow->Render();
 	COMPARE_IMAGES("RenderData", m_TestNumber);
 

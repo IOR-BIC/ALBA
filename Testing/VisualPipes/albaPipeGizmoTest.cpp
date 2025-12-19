@@ -61,24 +61,12 @@ void albaPipeGizmoTest::TestFixture()
 void albaPipeGizmoTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeGizmoTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeGizmoTest::TestPipeExecution()
@@ -132,8 +120,6 @@ void albaPipeGizmoTest::TestPipeExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
@@ -141,7 +127,8 @@ void albaPipeGizmoTest::TestPipeExecution()
   surfaceActor = (vtkActor *) SelectActorToControl(actorList, 0);
   CPPUNIT_ASSERT(surfaceActor != NULL);
 
-  m_RenderWindow->Render();
+	m_Renderer->ResetCamera();
+	m_RenderWindow->Render();
 
 	COMPARE_IMAGES("TestPipeExecution", 0);
 

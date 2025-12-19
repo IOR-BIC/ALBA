@@ -43,6 +43,8 @@
 #include "vtkRenderWindowInteractor.h"
 #include <iostream>
 #include "vtkJPEGReader.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 enum PIPE_IMAGE_ACTORS
   {
@@ -65,35 +67,17 @@ void albaPipeImage3DTest::TestFixture()
 void albaPipeImage3DTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeImage3DTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeImage3DTest::TestPipeRGBImageExecution()
 //----------------------------------------------------------------------------
 {
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(320, 240);
-  m_RenderWindow->SetPosition(400,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
-
-
   ////// Create VME (import vtkData) ////////////////////
 	vtkJPEGReader *ImporterImage;
 	vtkNEW(ImporterImage);
@@ -127,8 +111,6 @@ void albaPipeImage3DTest::TestPipeRGBImageExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 	
@@ -137,9 +119,9 @@ void albaPipeImage3DTest::TestPipeRGBImageExecution()
   surfaceActor = (vtkActor *) SelectActorToControl(actorList, PIPE_IMAGE_ACTOR);
   CPPUNIT_ASSERT(surfaceActor != NULL);
 
-  m_RenderWindow->Render();
-	printf("\n-> RGB <-\n");
-
+	m_Renderer->ResetCamera();
+	m_RenderWindow->Render();
+	
 	COMPARE_IMAGES("TestPipeRGBImageExecution", 0);
 
 	CPPUNIT_ASSERT(!pipeImage3D->IsGrayImage());
@@ -155,19 +137,6 @@ void albaPipeImage3DTest::TestPipeRGBImageExecution()
 void albaPipeImage3DTest::TestPipeGrayImageExecution()
 //----------------------------------------------------------------------------
 {
-	///////////////// render stuff /////////////////////////
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400,0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-	///////////// end render stuff /////////////////////////
-
-
 	////// Create VME (import vtkData) ////////////////////
 	vtkJPEGReader *ImporterImage;
 	vtkNEW(ImporterImage);
@@ -201,8 +170,6 @@ void albaPipeImage3DTest::TestPipeGrayImageExecution()
 	while(actor)
 	{   
 		m_Renderer->AddActor(actor);
-		m_RenderWindow->Render();
-
 		actor = actorList->GetNextProp();
 	}
 
@@ -211,8 +178,8 @@ void albaPipeImage3DTest::TestPipeGrayImageExecution()
 	surfaceActor = (vtkActor *) SelectActorToControl(actorList, PIPE_IMAGE_ACTOR);
 	CPPUNIT_ASSERT(surfaceActor != NULL);
 
+	m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
-	printf("\n-> Gray <-\n");
 
 	COMPARE_IMAGES("TestPipeGrayImageExecution", 1);
 

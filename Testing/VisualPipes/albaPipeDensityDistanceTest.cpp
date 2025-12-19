@@ -41,6 +41,10 @@
 #include "vtkRenderWindowInteractor.h"
 
 #include <iostream>
+#include "vtkPropCollection.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
+#include "vtkImageData.h"
 
 //----------------------------------------------------------------------------
 void albaPipeDensityDistanceTest::TestFixture()
@@ -51,24 +55,12 @@ void albaPipeDensityDistanceTest::TestFixture()
 void albaPipeDensityDistanceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeDensityDistanceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeDensityDistanceTest::TestPipeExecution()
@@ -117,8 +109,6 @@ void albaPipeDensityDistanceTest::TestPipeExecution()
   while(actor)
   {   
     m_Renderer->AddVolume(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
@@ -126,6 +116,7 @@ void albaPipeDensityDistanceTest::TestPipeExecution()
   cloudActor = (vtkActor *) SelectActorToControl(actorList, 0);
   CPPUNIT_ASSERT(cloudActor != NULL);
 
+	m_Renderer->ResetCamera();
   m_RenderWindow->Render();
 
 	COMPARE_IMAGES("TestPipeExecution", 0);

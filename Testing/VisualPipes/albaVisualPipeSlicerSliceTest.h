@@ -19,9 +19,8 @@
 
 #include "albaTest.h"
 
-#include "vtkDataSet.h"
-#include "vtkTransform.h"
-#include "vtkRenderWindowInteractor.h"
+class vtkProp;
+class vtkPropCollection;
 
 class albaVisualPipeSlicerSliceTest : public albaTest
 {
@@ -41,13 +40,6 @@ public:
 protected:  
   void TestFixture();
   void TestPipeExecution();
-
-  /** Comment by the programmer:
-  The testPipeExecution method generates some leaks which I was not able to hide with VS9 under WS Vista.
-  Please verify if this is the case with your compiler and in case try to solve the problem.
-  */
-
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
 
   /** Select The Actor that will be controlled*/
   vtkProp *SelectActorToControl(vtkPropCollection* propList, int index);

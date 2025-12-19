@@ -42,6 +42,10 @@
 #include <iostream>
 #include "vtkStructuredPointsReader.h"
 #include "albaVMEVolumeGray.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+#include "vtkImageData.h"
 
 enum TESTS_PIPE_SURFACE
 {
@@ -67,24 +71,11 @@ void albaPipePolylineTest::TestFixture()
 //----------------------------------------------------------------------------
 void albaPipePolylineTest::BeforeTest()
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipePolylineTest::AfterTest()
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipePolylineTest::TestPipeExecution()
@@ -200,10 +191,11 @@ void albaPipePolylineTest::TestPipeExecution()
 		while (actor)
 		{
 			m_Renderer->AddActor(actor);
-			m_RenderWindow->Render();
 			actor = actorList->GetNextProp();
 		}
 
+		m_Renderer->ResetCamera();
+		m_RenderWindow->Render();
 		COMPARE_IMAGES("TestPipeExecution", i);
 	}
 
@@ -348,10 +340,11 @@ void albaPipePolylineTest::TestPipeDensityMap()
 		while (actor)
 		{
 			m_Renderer->AddActor(actor);
-			m_RenderWindow->Render();
 			actor = actorList->GetNextProp();
 		}
 
+		m_Renderer->ResetCamera();
+		m_RenderWindow->Render();
 		COMPARE_IMAGES("TestPipeDensityMap", i);
 	}
 

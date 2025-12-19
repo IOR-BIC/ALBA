@@ -39,9 +39,13 @@
 
 // render window stuff
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkCamera.h"
 
 #include <iostream>
+#include "vtkImageData.h"
 
 
 //----------------------------------------------------------------------------
@@ -53,24 +57,12 @@ void vtkALBAVolumeTextureMapper2DTest::TestFixture()
 void vtkALBAVolumeTextureMapper2DTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void vtkALBAVolumeTextureMapper2DTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void vtkALBAVolumeTextureMapper2DTest::TestPipeExecution()
@@ -147,15 +139,14 @@ void vtkALBAVolumeTextureMapper2DTest::TestPipeExecution()
   volume->PickableOff();
 
   m_Renderer->AddVolume(volume);
-  //m_RenderWindow->Render();
-
+  
   vtkCamera *camera = m_Renderer->GetActiveCamera();
   camera->Azimuth(60);
   camera->Elevation(30);
 
-  m_RenderWindow->Render();
-
-	COMPARE_IMAGES("TestPipeExecution");
+	m_Renderer->ResetCamera();
+	m_RenderWindow->Render();
+  COMPARE_IMAGES("TestPipeExecution");
 
   vtkDEL(volumeProperty);
   vtkDEL(volume);

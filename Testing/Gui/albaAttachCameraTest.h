@@ -57,14 +57,9 @@ private:
   void TestSetGetVme();
   void TestSetGetListener();  
 
-  void CreateRenderStuff();
   void RenderVMESurface( albaVMESurface *vme );
   void CreateTestData();
-   
-  vtkRenderer *m_Renderer;
-  vtkRenderWindow *m_RenderWindow;
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
-  
+
   albaVMESurface *m_TestSurface;
   albaVMERoot *m_Root;
 

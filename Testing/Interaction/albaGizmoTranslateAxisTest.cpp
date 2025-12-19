@@ -61,16 +61,12 @@
 
 void albaGizmoTranslateAxisTest::BeforeTest()
 {
-  CreateRenderStuff();
+  InitializeRenderWindow();
 	CreateTestData();
 }
 
 void albaGizmoTranslateAxisTest::AfterTest()
 {
-  m_Renderer->Delete();
-  m_RenderWindow->Delete();
-  m_RenderWindowInteractor->Delete();
-
   albaDEL(m_GizmoInputSurface);
   albaDEL(m_Root); 
 }
@@ -122,8 +118,6 @@ void albaGizmoTranslateAxisTest::TestConstructor()
 
   gizmoTranslateAxis->SetAxis(albaInteractorConstraint::Z);
   RenderGizmo(gizmoTranslateAxis);
-
-  // m_RenderWindowInteractor->Start();
 
   cppDEL(gizmoTranslateAxis);
 
@@ -282,40 +276,6 @@ void albaGizmoTranslateAxisTest::TestSetStep()
 void albaGizmoTranslateAxisTest::TestFixture()
 {
 	
-}
-
-void albaGizmoTranslateAxisTest::RenderData( vtkDataSet *data )
-{
-  vtkDataSetMapper *mapper = vtkDataSetMapper::New();
-  mapper->ScalarVisibilityOn();
-  mapper->SetInput(data);
-
-  vtkActor *actor = vtkActor::New();
-  actor->SetMapper(mapper);
-
-  m_Renderer->AddActor(actor);
-  
-  m_RenderWindow->Render();
-  
-  mapper->Delete();
-  actor->Delete();
-
-} 
-  
-
-void albaGizmoTranslateAxisTest::CreateRenderStuff()
-{
-  m_Renderer = vtkRenderer::New();
-  m_RenderWindow = vtkRenderWindow::New();
-  m_RenderWindowInteractor = vtkRenderWindowInteractor::New() ;
-  
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(400,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
 
 void albaGizmoTranslateAxisTest::RenderGizmo( albaGizmoTranslateAxis * gizmoTranslateAxis )

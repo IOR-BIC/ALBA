@@ -52,21 +52,13 @@ void albaPipeScalarMatrixTest::TestFixture()
 void albaPipeScalarMatrixTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(400, 400);
-	m_RenderWindow->SetPosition(400, 0);
+	InitializeRenderWindow();
 	m_Renderer->GetActiveCamera()->SetPosition(1, 0, 0);
 }
 //----------------------------------------------------------------------------
 void albaPipeScalarMatrixTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
 }
 //----------------------------------------------------------------------------
 void albaPipeScalarMatrixTest::TestPipeExecution()
@@ -108,9 +100,10 @@ void albaPipeScalarMatrixTest::TestPipeExecution()
   // Create the pipe and render the actors
   albaPipeScalarMatrix *pipe = new albaPipeScalarMatrix();
   pipe->Create(sceneNode);
-  m_RenderWindow->Render();
 
-	COMPARE_IMAGES("TestPipeExecution");
+  m_Renderer->ResetCamera();
+  m_RenderWindow->Render();
+  COMPARE_IMAGES("TestPipeExecution");
 
   delete sceneNode;
   delete sceneRootNode;

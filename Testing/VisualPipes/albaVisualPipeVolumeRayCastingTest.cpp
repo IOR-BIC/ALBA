@@ -41,8 +41,12 @@
 
 // render window stuff
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 #include <iostream>
+#include "vtkImageData.h"
 
 //----------------------------------------------------------------------------
 void albaVisualPipeVolumeRayCastingTest::TestFixture()
@@ -53,24 +57,12 @@ void albaVisualPipeVolumeRayCastingTest::TestFixture()
 void albaVisualPipeVolumeRayCastingTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaVisualPipeVolumeRayCastingTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaVisualPipeVolumeRayCastingTest::TestPipeExecution()
@@ -119,8 +111,6 @@ void albaVisualPipeVolumeRayCastingTest::TestPipeExecution()
   while(actor)
   {   
     m_Renderer->AddVolume(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
@@ -130,8 +120,7 @@ void albaVisualPipeVolumeRayCastingTest::TestPipeExecution()
 
   m_Renderer->ResetCamera();
   m_RenderWindow->Render();
-
-	COMPARE_IMAGES("TestPipeExecution", 1);
+  COMPARE_IMAGES("TestPipeExecution", 1);
 	
   vtkDEL(actorList);
 

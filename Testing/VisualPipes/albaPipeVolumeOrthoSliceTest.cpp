@@ -40,9 +40,13 @@
 
 // render window stuff
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 #include <iostream>
 #include <fstream>
+#include "vtkImageData.h"
 
 enum PIPE_BOX_ACTORS
 {
@@ -61,25 +65,12 @@ void albaPipeVolumeOrthoSliceTest::TestFixture()
 void albaPipeVolumeOrthoSliceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(200, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeOrthoSliceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 
 enum ID_TEST
@@ -139,8 +130,6 @@ void albaPipeVolumeOrthoSliceTest::TestPipeExecution()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
     double x,y,z,vx,vy,vz;
@@ -180,14 +169,12 @@ void albaPipeVolumeOrthoSliceTest::TestPipeExecution()
       normals[2] = 0.0;
       pipeSlice->SetSlice(zValue[i], normals);
 			
-      m_Renderer->ResetCamera();
-
       char *strings="Slice";
-
-      m_RenderWindow->Render();
       printf("\n Visualization: %s \n", strings);
 
-			COMPARE_IMAGES("TestPipeExecution", 3 * direction + i);
+			m_Renderer->ResetCamera();
+			m_RenderWindow->Render();
+      COMPARE_IMAGES("TestPipeExecution", 3 * direction + i);
     }
 
     m_Renderer->RemoveAllProps();
@@ -255,8 +242,6 @@ void albaPipeVolumeOrthoSliceTest::TestPipeExecution_SetSliceOpacity()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
     double x,y,z,vx,vy,vz;
@@ -300,10 +285,10 @@ void albaPipeVolumeOrthoSliceTest::TestPipeExecution_SetSliceOpacity()
       m_Renderer->ResetCamera();
 
       char *strings="Slice";
+			printf("\n Visualization: %s \n", strings);
 
+			m_Renderer->ResetCamera();
       m_RenderWindow->Render();
-      printf("\n Visualization: %s \n", strings);
-
 			COMPARE_IMAGES("TestPipeExecution_SetSliceOpacity", ID_TEST_PIPEEXECUTION_SLICEOPACITY + 3 * direction + i);
     }
 
@@ -374,8 +359,6 @@ void albaPipeVolumeOrthoSliceTest::TestPipeExecution_SetLutRange()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
     double x,y,z,vx,vy,vz;
@@ -418,10 +401,10 @@ void albaPipeVolumeOrthoSliceTest::TestPipeExecution_SetLutRange()
 			m_Renderer->ResetCamera();
 
       char *strings="Slice";
+			printf("\n Visualization: %s \n", strings);
 
+			m_Renderer->ResetCamera();
       m_RenderWindow->Render();
-      printf("\n Visualization: %s \n", strings);
-
 			COMPARE_IMAGES("TestPipeExecution_SetLutRange", ID_TEST_PIPEEXECUTION_LUTRANGE + 3 * direction + i);
     }
 
@@ -492,8 +475,6 @@ void albaPipeVolumeOrthoSliceTest::TestPipeExecution_SetInterpolation()
 		while (actor)
 		{
 			m_Renderer->AddActor(actor);
-			m_RenderWindow->Render();
-
 			actor = actorList->GetNextProp();
 		}
 		double x, y, z, vx, vy, vz;
@@ -536,10 +517,10 @@ void albaPipeVolumeOrthoSliceTest::TestPipeExecution_SetInterpolation()
 			m_Renderer->ResetCamera();
 
 			char *strings = "Slice";
-
-			m_RenderWindow->Render();
 			printf("\n Visualization: %s \n", strings);
 
+			m_Renderer->ResetCamera();
+      m_RenderWindow->Render();
 			COMPARE_IMAGES("TestPipeExecution_SetInterpolation", ID_TEST_PIPEEXECUTION_INTERPOLATION + 3 * direction + i);
 		}
 
@@ -607,8 +588,6 @@ void albaPipeVolumeOrthoSliceTest::TestPipeExecution_SetColorLookupTable()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
     double x,y,z,vx,vy,vz;
@@ -652,10 +631,10 @@ void albaPipeVolumeOrthoSliceTest::TestPipeExecution_SetColorLookupTable()
       m_Renderer->ResetCamera();
 
       char *strings="Slice";
+			printf("\n Visualization: %s \n", strings);
 
+      m_Renderer->ResetCamera();
       m_RenderWindow->Render();
-      printf("\n Visualization: %s \n", strings);
-
 			COMPARE_IMAGES("TestPipeExecution_SetColorLookupTable", ID_TEST_PIPEEXECUTION_COLORLOOKUPTABLE + 3 * direction + i);
     }
 
@@ -723,8 +702,6 @@ void albaPipeVolumeOrthoSliceTest::TestPipeExecution_TicksOnOff()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
     double x,y,z,vx,vy,vz;
@@ -750,11 +727,11 @@ void albaPipeVolumeOrthoSliceTest::TestPipeExecution_TicksOnOff()
       m_Renderer->ResetCamera();
 
       char *strings="Slice";
+			printf("\n Visualization: %s \n", strings);
 
+      m_Renderer->ResetCamera(); 
       m_RenderWindow->Render();
-      printf("\n Visualization: %s \n", strings);
-
-			COMPARE_IMAGES("TestPipeExecution_TicksOnOff", ID_TEST_PIPEEXECUTION_TICKS + showticks * 3 + i);
+      COMPARE_IMAGES("TestPipeExecution_TicksOnOff", ID_TEST_PIPEEXECUTION_TICKS + showticks * 3 + i);
     }
 
     m_Renderer->RemoveAllProps();

@@ -41,10 +41,6 @@ protected:
 
   void TestFixture();
   void TestCreate();
-
-  vtkRenderer *m_Renderer;
-  vtkRenderWindow *m_RenderWindow;
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
 };
 
 #endif

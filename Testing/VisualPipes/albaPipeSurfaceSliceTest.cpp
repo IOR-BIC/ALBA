@@ -43,6 +43,9 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkCamera.h"
 #include "vtkSphereSource.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 #include <iostream>
 
@@ -57,25 +60,12 @@ void albaPipeSurfaceSliceTest::TestFixture()
 void albaPipeSurfaceSliceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceSliceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceSliceTest::TestCloudPipeExecution()
@@ -124,8 +114,6 @@ void albaPipeSurfaceSliceTest::TestCloudPipeExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
@@ -144,14 +132,11 @@ void albaPipeSurfaceSliceTest::TestCloudPipeExecution()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
 
     m_Renderer->ResetCamera(bounds);
     m_RenderWindow->Render();
-
 		COMPARE_IMAGES("TestCloudClosePipeExecution", i);
   }
 
@@ -198,8 +183,6 @@ void albaPipeSurfaceSliceTest::TestSurfacePipeExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
@@ -218,8 +201,6 @@ void albaPipeSurfaceSliceTest::TestSurfacePipeExecution()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
 
@@ -238,18 +219,6 @@ void albaPipeSurfaceSliceTest::TestSurfacePipeExecution()
 void albaPipeSurfaceSliceTest::TestSurfacePipeCreation()
 //----------------------------------------------------------------------------
 {
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(400,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
-	
   ////// Create VME ////////////////////
 
   vtkALBASmartPointer<vtkSphereSource> sphere;
@@ -284,18 +253,6 @@ void albaPipeSurfaceSliceTest::TestSurfacePipeCreation()
 void albaPipeSurfaceSliceTest::TestSetGetThickness()
 //----------------------------------------------------------------------------
 {
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(400,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
-	
   ////// Create VME ////////////////////
 
   vtkALBASmartPointer<vtkSphereSource> sphere;
@@ -331,8 +288,6 @@ void albaPipeSurfaceSliceTest::TestSetGetThickness()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 

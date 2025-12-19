@@ -37,8 +37,13 @@
 
 // render window stuff
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+
 
 #include <iostream>
+#include "vtkImageData.h"
 
 //----------------------------------------------------------------------------
 void albaPipeVolumeMIPTest::TestFixture()
@@ -49,24 +54,12 @@ void albaPipeVolumeMIPTest::TestFixture()
 void albaPipeVolumeMIPTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeMIPTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeMIPTest::TestPipeExecution()
@@ -102,8 +95,6 @@ void albaPipeVolumeMIPTest::TestPipeExecution()
   while(actor)
   {   
     m_Renderer->AddVolume(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
@@ -111,7 +102,8 @@ void albaPipeVolumeMIPTest::TestPipeExecution()
   surfaceActor = (vtkVolume *) SelectActorToControl(actorList, 0);
   CPPUNIT_ASSERT(surfaceActor != NULL);
 
-  m_RenderWindow->Render();
+	m_Renderer->ResetCamera();
+	m_RenderWindow->Render();
 
 	COMPARE_IMAGES("TestPipeExecution", 0);
 

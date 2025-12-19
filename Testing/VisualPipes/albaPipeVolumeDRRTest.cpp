@@ -37,8 +37,12 @@
 
 // render window stuff
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 #include <iostream>
+#include "vtkImageData.h"
 
 enum TESTS_PIPE_SURFACE
 {
@@ -63,24 +67,12 @@ void albaPipeVolumeDRRTest::TestFixture()
 void albaPipeVolumeDRRTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeDRRTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeDRRTest::TestPipeExecution()
@@ -130,145 +122,63 @@ void albaPipeVolumeDRRTest::TestPipeExecution()
   strings[7] = "CAMERA_ROLL_TEST";
   strings[8] = "RESAMPLE_FACTOR_TEST";
 
-  for(int i=0;i<NUMBER_OF_TEST;i++)
+  for (int i = 0; i < NUMBER_OF_TEST; i++)
   {
-    if(i == BASE_TEST)
+    if (i == BASE_TEST)
     {
-      actorList->InitTraversal();
-      vtkProp *actor = actorList->GetNextProp();
-      while(actor)
-      {   
-        m_Renderer->AddVolume(actor);
-        m_RenderWindow->Render();
-
-        actor = actorList->GetNextProp();
-      }
     }
-    else if(i == COLOR_TEST)
+    else if (i == COLOR_TEST)
     {
-      pipeDRR->SetColor(wxColour(200,0,0));
-      
-      actorList->InitTraversal();
-      vtkProp *actor = actorList->GetNextProp();
-      while(actor)
-      {   
-        m_Renderer->AddVolume(actor);
-        m_RenderWindow->Render();
-
-        actor = actorList->GetNextProp();
-      }
+      pipeDRR->SetColor(wxColour(200, 0, 0));
     }
-    else if(i == EXPOSURE_TEST)
+    else if (i == EXPOSURE_TEST)
     {
-      double value[2] = {-0.6,-0.5};
+      double value[2] = { -0.6,-0.5 };
       pipeDRR->SetExposureCorrection(value);
-      
-      actorList->InitTraversal();
-      vtkProp *actor = actorList->GetNextProp();
-      while(actor)
-      {   
-        m_Renderer->AddVolume(actor);
-        m_RenderWindow->Render();
-
-        actor = actorList->GetNextProp();
-      }
     }
-    else if(i == GAMMA_TEST)
+    else if (i == GAMMA_TEST)
     {
       pipeDRR->SetGamma(0.1);
-
-      actorList->InitTraversal();
-      vtkProp *actor = actorList->GetNextProp();
-      while(actor)
-      {   
-        m_Renderer->AddVolume(actor);
-        m_RenderWindow->Render();
-
-        actor = actorList->GetNextProp();
-      }
     }
-    else if(i == CAMERA_ANGLE_TEST)
+    else if (i == CAMERA_ANGLE_TEST)
     {
       pipeDRR->SetCameraAngle(10);
-
-      actorList->InitTraversal();
-      vtkProp *actor = actorList->GetNextProp();
-      while(actor)
-      {   
-        m_Renderer->AddVolume(actor);
-        m_RenderWindow->Render();
-
-        actor = actorList->GetNextProp();
-      }
     }
-    else if(i == CAMERA_POSITION_TEST)
+    else if (i == CAMERA_POSITION_TEST)
     {
-      double newPosition[3] = {40,40,100};
+      double newPosition[3] = { 40,40,100 };
       pipeDRR->SetCameraPosition(newPosition);
-
-      actorList->InitTraversal();
-      vtkProp *actor = actorList->GetNextProp();
-      while(actor)
-      {   
-        m_Renderer->AddVolume(actor);
-        m_RenderWindow->Render();
-
-        actor = actorList->GetNextProp();
-      }
     }
-    else if(i == CAMERA_FOCUS_TEST)
+    else if (i == CAMERA_FOCUS_TEST)
     {
-      double newFocus[3] = {70,71,31};
-      pipeDRR->SetCameraFocus(newFocus);
-
-      actorList->InitTraversal();
-      vtkProp *actor = actorList->GetNextProp();
-      while(actor)
-      {   
-        m_Renderer->AddVolume(actor);
-        m_RenderWindow->Render();
-
-        actor = actorList->GetNextProp();
-      }
+      double newFocus[3] = { 70,71,31 };
     }
-    else if(i == CAMERA_ROLL_TEST)
+    else if (i == CAMERA_ROLL_TEST)
     {
-      double newFocus[3] = {70,71,31};
       pipeDRR->SetCameraRoll(20);
-
-      actorList->InitTraversal();
-      vtkProp *actor = actorList->GetNextProp();
-      while(actor)
-      {   
-        m_Renderer->AddVolume(actor);
-        m_RenderWindow->Render();
-
-        actor = actorList->GetNextProp();
-      }
     }
-    else if(i == RESAMPLE_FACTOR_TEST)
+    else if (i == RESAMPLE_FACTOR_TEST)
     {
       pipeDRR->SetResampleFactor(0.5);
-
-      actorList->InitTraversal();
-      vtkProp *actor = actorList->GetNextProp();
-      while(actor)
-      {   
-        m_Renderer->AddVolume(actor);
-        m_RenderWindow->Render();
-
-        actor = actorList->GetNextProp();
-      }
     }
-    
+
+		actorList->InitTraversal();
+		vtkProp *actor = actorList->GetNextProp();
+		while (actor)
+		{
+			m_Renderer->AddVolume(actor);
+			actor = actorList->GetNextProp();
+		}
+
     vtkVolume *volumeActor;
     volumeActor = (vtkVolume *) SelectActorToControl(actorList, 0);
     CPPUNIT_ASSERT(volumeActor != NULL);
 
-    m_RenderWindow->Render();
-    printf("\n Visualizzazione: %s \n", strings[i]);
+		printf("\n Visualization: %s \n", strings[i]);
 
-		COMPARE_IMAGES("TestPipeExecution", i);
+		m_Renderer->ResetCamera();
+		m_RenderWindow->Render();
+    COMPARE_IMAGES("TestPipeExecution", i);
 
     if(i == COLOR_TEST)
     {
@@ -303,7 +213,7 @@ void albaPipeVolumeDRRTest::TestPipeExecution()
     {
       pipeDRR->SetResampleFactor(1.);
     }
-  }
+	}
 	
   vtkDEL(actorList);
 

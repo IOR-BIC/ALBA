@@ -59,17 +59,11 @@
 void albaPipeVectorFieldSliceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-	vtkNEW(m_Renderer);
-	vtkNEW(m_RenderWindow);
-	vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeVectorFieldSliceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-	vtkDEL(m_Renderer);
-	vtkDEL(m_RenderWindow);
-	vtkDEL(m_RenderWindowInteractor);
 }
 
 //----------------------------------------------------------------------------
@@ -86,18 +80,9 @@ void albaPipeVectorFieldSliceTest::TestCreate()
 	storage->GetRoot()->SetName("root");
 	storage->GetRoot()->Initialize();
 
-	///////////////// render stuff /////////////////////////
+	InitializeRenderWindow();
 	vtkCamera *cam = m_Renderer->GetActiveCamera();
 
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(200, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-	
-	///////////// end render stuff /////////////////////////
 
 	albaVMEVolumeGray *volume;
 	albaNEW(volume);
@@ -169,11 +154,11 @@ void albaPipeVectorFieldSliceTest::TestCreate()
 	while (actor)
 	{
 		m_Renderer->AddActor(actor);
-		m_RenderWindow->Render();
-
 		actor = actorList->GetNextProp();
 	}
 
+	m_Renderer->ResetCamera();
+	m_RenderWindow->Render();
 	COMPARE_IMAGES("image");
 
 	delete sceneNode;

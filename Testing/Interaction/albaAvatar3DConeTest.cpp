@@ -37,19 +37,20 @@
 #include "vtkActor.h"
 #include "vtkPolyDataMapper.h"
 
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+
+
 //----------------------------------------------------------------------------
 void albaAvatar3DConeTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
 }
 //----------------------------------------------------------------------------
 void albaAvatar3DConeTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
 }
 //----------------------------------------------------------------------------
 void albaAvatar3DConeTest::TestFixture()
@@ -77,11 +78,7 @@ void albaAvatar3DConeTest::TestPick()
   albaMatrix identity;
   identity.Identity();
 
-  // Render stuff
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(400, 400);
-  m_RenderWindow->SetPosition(400,0);
+	InitializeRenderWindow();
 
   vtkALBASmartPointer<vtkIdentityTransform> ctransform;
   m_Renderer->GetActiveCamera()->GetViewTransformObject()->SetInput(ctransform);
@@ -93,6 +90,7 @@ void albaAvatar3DConeTest::TestPick()
   avatar->SetRendererAndView(m_Renderer,NULL);
   avatar->SetDevice(device);
 
+	m_Renderer->ResetCamera();
   m_RenderWindow->Render();
 
   CPPUNIT_ASSERT(0 == avatar->Pick(identity)); // no actors picked!!!

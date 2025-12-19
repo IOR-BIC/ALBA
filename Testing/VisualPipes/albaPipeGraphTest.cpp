@@ -72,28 +72,12 @@ void albaPipeGraphTest::TestFixture()
 void albaPipeGraphTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_AlwaysVisibleRenderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_AlwaysVisibleRenderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(800, 600);
-	m_RenderWindow->SetPosition(600, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeGraphTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_AlwaysVisibleRenderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeGraphTest::TestPipeExecution()
@@ -121,7 +105,7 @@ void albaPipeGraphTest::TestPipeExecution()
 
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *sceneNode;
-  sceneNode = new albaSceneNode(NULL,NULL,analog, m_Renderer,NULL,m_AlwaysVisibleRenderer);
+  sceneNode = new albaSceneNode(NULL,NULL,analog, m_Renderer,NULL,NULL);
   
   /////////// Pipe Instance and Creation ///////////
   albaPipeGraph *pipe = new albaPipeGraph;
@@ -140,8 +124,6 @@ void albaPipeGraphTest::TestPipeExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
@@ -149,7 +131,9 @@ void albaPipeGraphTest::TestPipeExecution()
 
   graphActor = (vtkActor *) SelectActorToControl(actorList, 0);
   CPPUNIT_ASSERT(graphActor != NULL);
-  m_RenderWindow->Render();
+  
+	m_Renderer->ResetCamera();
+	m_RenderWindow->Render();
 
 	COMPARE_IMAGES("TestPipeExecution", 0);
  

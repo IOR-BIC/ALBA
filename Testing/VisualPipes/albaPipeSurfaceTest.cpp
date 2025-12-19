@@ -46,6 +46,11 @@
 #include "vtkStructuredPointsReader.h"
 #include "albaVMEVolumeGray.h"
 
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+#include "vtkImageData.h"
+
 enum PIPE_SURFACE_ACTORS
   {
     PIPE_SURFACE_ACTOR,
@@ -74,24 +79,11 @@ void albaPipeSurfaceTest::TestFixture()
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTest::BeforeTest()
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTest::AfterTest()
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTest::TestPipeExecution()
@@ -213,7 +205,8 @@ void albaPipeSurfaceTest::TestPipeExecution()
     surfaceActor = (vtkActor *) SelectActorToControl(actorList, PIPE_SURFACE_ACTOR);
     CPPUNIT_ASSERT(surfaceActor != NULL);
 
-    m_RenderWindow->Render();
+		m_Renderer->ResetCamera();
+		m_RenderWindow->Render();
 	  printf("\n Visualization: %s \n", strings[i]);
 
 		COMPARE_IMAGES("TestPipeExecution", i);
@@ -404,7 +397,7 @@ void albaPipeSurfaceTest::TestPipeDensityMap()
 		vtkActor *surfaceActor;
 		surfaceActor = (vtkActor *)SelectActorToControl(actorList, PIPE_SURFACE_ACTOR);
 		CPPUNIT_ASSERT(surfaceActor != NULL);
-
+		m_Renderer->ResetCamera();
 		m_RenderWindow->Render();
 		printf("\n Visualization: %s \n", strings[i]);
 
