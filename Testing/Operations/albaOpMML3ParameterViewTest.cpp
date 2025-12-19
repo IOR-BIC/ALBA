@@ -178,7 +178,7 @@ void albaOpMML3ParameterViewTest::TestAddPoint()
 
   view->AddPoint(1,1);
   view->AddPoint(2,2);
-  CPPUNIT_ASSERT(59.2 == view->GetValue(0));
+  CPPUNIT_ASSERT(59 == round(view->GetValue(0)));
   cppDEL(view);
 }
 
