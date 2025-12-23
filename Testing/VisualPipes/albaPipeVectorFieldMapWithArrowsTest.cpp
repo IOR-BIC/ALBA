@@ -35,11 +35,15 @@
 #include "vtkFloatArray.h"
 #include "vtkPointData.h"
 #include "vtkRenderWindowInteractor.h"
+
 #include "vtkALBASmartPointer.h"
 #include "vtkALBAAssembly.h"
-
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include <iostream>
 #include <fstream>
+#include "vtkImageData.h"
 
 //----------------------------------------------------------------------------
 void albaPipeVectorFieldMapWithArrowsTest::TestFixture()
@@ -50,18 +54,11 @@ void albaPipeVectorFieldMapWithArrowsTest::TestFixture()
 void albaPipeVectorFieldMapWithArrowsTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-	vtkNEW(m_Renderer);
-	vtkNEW(m_RenderWindow);
-
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(200, 0);
 }
 //----------------------------------------------------------------------------
 void albaPipeVectorFieldMapWithArrowsTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-	vtkDEL(m_Renderer);
-	vtkDEL(m_RenderWindow);
 }
 
 //----------------------------------------------------------------------------
@@ -72,18 +69,7 @@ void albaPipeVectorFieldMapWithArrowsTest::TestCreate()
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
 
-  ///////////////// render stuff /////////////////////////
-
-  vtkRenderer *frontRenderer;
-  vtkNEW(frontRenderer);
-  frontRenderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(frontRenderer);
-	
-  vtkRenderWindowInteractor *renderWindowInteractor = vtkRenderWindowInteractor::New();
-  renderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  //////////////////////////////////////////////////////////////////////////
+  InitializeRenderWindow();
 
   albaVMEVolumeGray *volume;
   albaNEW(volume);
@@ -130,12 +116,12 @@ void albaPipeVectorFieldMapWithArrowsTest::TestCreate()
 
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *rootscenenode = new albaSceneNode(NULL, NULL, storage->GetRoot(), NULL, NULL);
-  albaSceneNode *sceneNode = new albaSceneNode(NULL,rootscenenode,volume, frontRenderer);
+  albaSceneNode *sceneNode = new albaSceneNode(NULL,rootscenenode,volume, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   albaPipeVectorFieldMapWithArrows *pipe = new albaPipeVectorFieldMapWithArrows();
   pipe->Create(sceneNode);
-  pipe->m_RenFront = frontRenderer;
+  pipe->m_RenFront = m_Renderer;
 
   vtkPropCollection *actorList = vtkPropCollection::New();
   pipe->GetAssemblyFront()->GetActors(actorList);
@@ -144,23 +130,18 @@ void albaPipeVectorFieldMapWithArrowsTest::TestCreate()
   vtkProp *actor = actorList->GetNextProp();
   while(actor)
   {   
-    frontRenderer->AddActor(actor);
-    m_RenderWindow->Render();
-
+    m_Renderer->AddActor(actor);
     actor = actorList->GetNextProp();
   }
 
+	m_Renderer->ResetCamera();
   m_RenderWindow->Render();
-
 	COMPARE_IMAGES("TestCreate");
 
   vtkDEL(actorList);
 
   delete sceneNode;
   delete(rootscenenode);
-
-  vtkDEL(renderWindowInteractor);
-  vtkDEL(frontRenderer);
 
   volume->ReparentTo(NULL);
   albaDEL(volume);

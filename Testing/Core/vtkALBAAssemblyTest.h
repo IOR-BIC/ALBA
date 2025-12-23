@@ -61,7 +61,6 @@ protected:
   void ShallowCopyTest();
   void BuildPathsTest(); //?
 
-  void PrepareToRender(vtkRenderer *renderer, vtkRenderWindow *render_window);
 };
 
 #endif // #ifndef __CPP_UNIT_vtkALBAAssemblyTest_H__

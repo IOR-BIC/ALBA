@@ -48,6 +48,9 @@
 
 
 #include <iostream>
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 enum TESTS_PIPE_POLYLINE_GRAPH_EDITOR
 {
@@ -66,26 +69,14 @@ void albaPipePolylineGraphEditorTest::TestFixture()
 void albaPipePolylineGraphEditorTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Polydata);
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	vtkNEW(m_Polydata);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipePolylineGraphEditorTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Polydata);
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipePolylineGraphEditorTest::TestPipeExecution()
@@ -160,8 +151,6 @@ void albaPipePolylineGraphEditorTest::TestPipeExecution()
       while(actor)
       {   
         m_Renderer->AddVolume(actor);
-        m_RenderWindow->Render();
-
         actor = actorList->GetNextProp();
       }
     }
@@ -205,8 +194,6 @@ void albaPipePolylineGraphEditorTest::TestPipeExecution()
       while(actor)
       {   
         m_Renderer->AddVolume(actor);
-        m_RenderWindow->Render();
-
         actor = actorList->GetNextProp();
       }
     }
@@ -244,8 +231,6 @@ void albaPipePolylineGraphEditorTest::TestPipeExecution()
       while(actor)
       {   
         m_Renderer->AddVolume(actor);
-        m_RenderWindow->Render();
-
         actor = actorList->GetNextProp();
       }
     }
@@ -256,7 +241,7 @@ void albaPipePolylineGraphEditorTest::TestPipeExecution()
 
     m_Renderer->ResetCamera();
     m_RenderWindow->Render();
-    printf("\n Visualizzazione: %s \n", strings[i]);
+    printf("\n Visualization: %s \n", strings[i]);
 
 		COMPARE_IMAGES("TestPipeExecution", i);
   }

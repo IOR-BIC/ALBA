@@ -21,6 +21,10 @@
 #include <cppunit/config/SourcePrefix.h>
 
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+
 #include "vtkALBASmartPointer.h"
 #include "vtkActor2D.h"
 #include "vtkPointData.h"
@@ -32,14 +36,7 @@ void vtkALBATextOrientatorTest::TestFixture()
 void vtkALBATextOrientatorTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-	vtkNEW(m_Renderer);
-	vtkNEW(m_RenderWindow);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(100, 0);
-
-	m_Renderer->SetBackground(1.0, 1.0, 1.0);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void vtkALBATextOrientatorTest::AfterTest()
@@ -52,13 +49,11 @@ void vtkALBATextOrientatorTest::AfterTest()
 //------------------------------------------------------------
 void vtkALBATextOrientatorTest::RenderData(vtkActor2D *actor, char* testName)
 {
-  vtkALBASmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
-  renderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-	m_Renderer->AddActor2D(actor);
+ 	m_Renderer->AddActor2D(actor);
+	
+	m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
-
-	COMPARE_IMAGES(testName);
+  COMPARE_IMAGES(testName);
 }
 //------------------------------------------------------------------
 void vtkALBATextOrientatorTest::SetText(vtkALBATextOrientator *actor)

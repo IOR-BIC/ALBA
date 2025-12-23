@@ -20,6 +20,10 @@
 #include "vtkALBATextActorMeterTest.h"
 
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+
 #include "vtkALBASmartPointer.h"
 #include "vtkActor2D.h"
 #include "vtkCamera.h"
@@ -33,25 +37,15 @@ void vtkALBATextActorMeterTest::TestFixture()
 void vtkALBATextActorMeterTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-	vtkNEW(m_Renderer);
-	vtkNEW(m_RenderWindow);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(100, 0);
-
+  InitializeRenderWindow();
 	vtkCamera *camera = m_Renderer->GetActiveCamera();
 	camera->ParallelProjectionOn();
 	camera->Modified();
-
-	m_Renderer->SetBackground(0.0, 0.0, 0.0);
 }
 //----------------------------------------------------------------------------
 void vtkALBATextActorMeterTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-	vtkDEL(m_Renderer);
-	vtkDEL(m_RenderWindow);
 }
 //------------------------------------------------------------
 void vtkALBATextActorMeterTest::RenderData(vtkActor2D *actor, char* testName)
@@ -60,9 +54,10 @@ void vtkALBATextActorMeterTest::RenderData(vtkActor2D *actor, char* testName)
   renderWindowInteractor->SetRenderWindow(m_RenderWindow);
 
 	m_Renderer->AddActor2D(actor);
+	
+	m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
-
-	COMPARE_IMAGES(testName);
+  COMPARE_IMAGES(testName);
 }
 //------------------------------------------------------------------
 void vtkALBATextActorMeterTest::SetText(vtkALBATextActorMeter *actor, const char *text, double position[3])

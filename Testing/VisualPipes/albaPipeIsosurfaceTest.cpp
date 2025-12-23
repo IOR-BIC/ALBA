@@ -57,25 +57,12 @@ void albaPipeIsosurfaceTest::TestFixture()
 void albaPipeIsosurfaceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(200, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeIsosurfaceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeIsosurfaceTest::TestPipeExecution()
@@ -120,12 +107,8 @@ void albaPipeIsosurfaceTest::TestPipeExecution()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
-
-    m_RenderWindow->Render();
 
     double b[6];
     volumeInput->GetOutput()->GetVTKData()->GetBounds(b);

@@ -57,16 +57,12 @@
 //----------------------------------------------------------------------------
 void albaGizmoBoundingBoxTest::BeforeTest()
 {
-  CreateRenderStuff();
+  InitializeRenderWindow();
 	CreateTestData();
 }
 //----------------------------------------------------------------------------
 void albaGizmoBoundingBoxTest::AfterTest()
 {
-  m_Renderer->Delete();
-  m_RenderWindow->Delete();
-  m_RenderWindowInteractor->Delete();
-
   albaDEL(m_GizmoInputSurface);
   albaDEL(m_Root); 
 }
@@ -107,7 +103,6 @@ void albaGizmoBoundingBoxTest::TestConstructor()
   
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   RenderGizmo(gizmoBoundingBox);
-  // m_RenderWindowInteractor->Start();
 
   cppDEL(gizmoBoundingBox);
 
@@ -194,39 +189,7 @@ void albaGizmoBoundingBoxTest::TestFixture()
 {
 	
 }
-//----------------------------------------------------------------------------
-void albaGizmoBoundingBoxTest::RenderData( vtkDataSet *data )
-{
-  vtkDataSetMapper *mapper = vtkDataSetMapper::New();
-  mapper->ScalarVisibilityOn();
-  mapper->SetInput(data);
 
-  vtkActor *actor = vtkActor::New();
-  actor->SetMapper(mapper);
-
-  m_Renderer->AddActor(actor);
-  
-  m_RenderWindow->Render();
-  
-  mapper->Delete();
-  actor->Delete();
-
-} 
-//----------------------------------------------------------------------------
-void albaGizmoBoundingBoxTest::CreateRenderStuff()
-{
-  m_Renderer = vtkRenderer::New();
-  m_RenderWindow = vtkRenderWindow::New();
-  m_RenderWindowInteractor = vtkRenderWindowInteractor::New() ;
-  
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(400,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-}
 //----------------------------------------------------------------------------
 void albaGizmoBoundingBoxTest::RenderGizmo( albaGizmoBoundingBox *gizmoBoundingBox )
 {

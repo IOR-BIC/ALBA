@@ -40,6 +40,9 @@
 #include "vtkALBASmartPointer.h"
 #include "vtkALBAAssembly.h"
 #include "vtkProp3DCollection.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 #include <iostream>
 #include <fstream>
@@ -54,18 +57,12 @@ void albaPipeTensorFieldGlyphsTest::TestFixture()
 void albaPipeTensorFieldGlyphsTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
 }
 
 //----------------------------------------------------------------------------
 void albaPipeTensorFieldGlyphsTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 
 //----------------------------------------------------------------------------
@@ -76,19 +73,8 @@ void albaPipeTensorFieldGlyphsTest::TestCreate()
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
 
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  vtkCamera *cam = m_Renderer->GetActiveCamera();
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(200,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  //////////////////////////////////////////////////////////////////////////
+  InitializeRenderWindow();
+	vtkCamera *cam = m_Renderer->GetActiveCamera();
 
   albaVMEVolumeGray *volume;
   albaNEW(volume);
@@ -159,11 +145,11 @@ void albaPipeTensorFieldGlyphsTest::TestCreate()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
+	m_Renderer->ResetCamera();
+	m_RenderWindow->Render();
 	COMPARE_IMAGES("TestCreate");
 
   delete sceneNode;

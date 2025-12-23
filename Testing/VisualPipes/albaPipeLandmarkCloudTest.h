@@ -41,7 +41,6 @@ protected:
   void DynamicAllocationTest();
   void TestPipeExecution();
 
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
 };
 
 #endif

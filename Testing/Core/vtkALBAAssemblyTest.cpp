@@ -38,6 +38,11 @@
 #include "vtkAssemblyNode.h"
 #include "vtkCubeSource.h"
 
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+
+
 //----------------------------------------------------------------------------
 void vtkALBAAssemblyTest::TestFixture()
 //----------------------------------------------------------------------------
@@ -194,13 +199,10 @@ void vtkALBAAssemblyTest::GetVolumesTest()
 void vtkALBAAssemblyTest::RenderOpaqueGeometryTest()
 //----------------------------------------------------------------------------
 {
-  vtkTimerLog::SetLogging(0); // Must shutdown logging otherwise it will generate leaks
-
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  
-
-  PrepareToRender(m_Renderer,m_RenderWindow);
+  InitializeRenderWindow();
+	vtkCamera *camera = m_Renderer->GetActiveCamera();
+	camera->ParallelProjectionOn();
+	camera->Modified();
 
   vtkALBAAssembly *assembly = vtkALBAAssembly::New();
 
@@ -253,6 +255,7 @@ void vtkALBAAssemblyTest::RenderOpaqueGeometryTest()
 	m_Renderer->AddActor(assembly);
 	assembly->GetBounds();
 
+	m_Renderer->ResetCamera();
   CPPUNIT_ASSERT(assembly->RenderOpaqueGeometry((vtkViewport*)m_Renderer) == 1);
   m_RenderWindow->Render();
 
@@ -276,12 +279,10 @@ void vtkALBAAssemblyTest::RenderOpaqueGeometryTest()
 void vtkALBAAssemblyTest::RenderTranslucentGeometry()
 //----------------------------------------------------------------------------
 {
-  vtkTimerLog::SetLogging(0); // Must shutdown logging otherwise it will generate leaks
-
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-
-  PrepareToRender(m_Renderer,m_RenderWindow);
+	InitializeRenderWindow();
+	vtkCamera *camera = m_Renderer->GetActiveCamera();
+	camera->ParallelProjectionOn();
+	camera->Modified();
 
   vtkALBAAssembly *assembly = vtkALBAAssembly::New();
   
@@ -334,6 +335,7 @@ void vtkALBAAssemblyTest::RenderTranslucentGeometry()
   m_Renderer->AddActor(assembly);
 	assembly->GetBounds();
 
+	m_Renderer->ResetCamera();
   CPPUNIT_ASSERT(assembly->RenderTranslucentGeometry((vtkViewport*)m_Renderer) == 1);
   m_RenderWindow->Render();
 
@@ -594,18 +596,4 @@ void vtkALBAAssemblyTest::ShallowCopyTest()
   vtkDEL(actor2);
   vtkDEL(assembly1);
   vtkDEL(assembly2);
-}
-//------------------------------------------------------------
-void vtkALBAAssemblyTest::PrepareToRender(vtkRenderer *renderer, vtkRenderWindow *render_window)
-//------------------------------------------------------------
-{
-  renderer->SetBackground(0.0, 0.0, 0.0);
-
-  vtkCamera *camera = renderer->GetActiveCamera();
-  camera->ParallelProjectionOn();
-  camera->Modified();
-
-  render_window->AddRenderer(renderer);
-  render_window->SetSize(640, 480);
-  render_window->SetPosition(100,0);
 }

@@ -53,16 +53,12 @@ void albaAttachCameraTest::TestFixture()
 
 void albaAttachCameraTest::BeforeTest()
 {
-  CreateRenderStuff();
+  InitializeRenderWindow();
   CreateTestData();
 }
 
 void albaAttachCameraTest::AfterTest()
 {
-  m_Renderer->Delete();
-  m_RenderWindow->Delete();
-  m_RenderWindowInteractor->Delete();
-
   albaDEL(m_TestSurface);
   albaDEL(m_Root); 
 }
@@ -161,26 +157,10 @@ void albaAttachCameraTest::RenderVMESurface( albaVMESurface *vme )
   actor->SetUserMatrix(vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
   m_Renderer->AddActor(actor);
   
+	m_Renderer->ResetCamera();
   m_RenderWindow->Render();
-  //m_RenderWindowInteractor->Start();
 
   mapper->Delete();
   actor->Delete();
 
-} 
-
-void albaAttachCameraTest::CreateRenderStuff()
-{
-  m_Renderer = vtkRenderer::New();
-  m_RenderWindow = vtkRenderWindow::New();
-  m_RenderWindowInteractor = vtkRenderWindowInteractor::New() ;
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(400,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
-

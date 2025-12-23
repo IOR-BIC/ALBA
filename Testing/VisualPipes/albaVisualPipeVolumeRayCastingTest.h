@@ -42,8 +42,6 @@ protected:
   void TestFixture();
   void TestPipeExecution();
 
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
-
   /** Select The Actor that will be controlled*/
   vtkProp *SelectActorToControl(vtkPropCollection* propList, int index);
 };

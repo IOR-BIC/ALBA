@@ -46,8 +46,6 @@ protected:
 	void TestScalarVisualization();
 	void TestPipeDensityMap();
 
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
-
   /**Compare Mapper scalarange with controlled values */
   void ProceduralControl(double controlRangeMapper[2] , vtkProp *propToControl);
 

@@ -32,21 +32,12 @@
 void vtkALBAGridActorTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-	vtkNEW(m_Renderer);
-	vtkNEW(m_RenderWindow);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(100, 0);
-
-	m_Renderer->SetBackground(0.0, 0.0, 0.0);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void vtkALBAGridActorTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-	vtkDEL(m_Renderer);
-	vtkDEL(m_RenderWindow);
 }
 
 //------------------------------------------------------------
@@ -60,8 +51,9 @@ void vtkALBAGridActorTest::RenderData(vtkActor *actor, char* testName)
   renderWindowInteractor->SetRenderWindow(m_RenderWindow);
 
   m_Renderer->AddActor(actor);
-  m_RenderWindow->Render();
 
+	m_Renderer->ResetCamera();
+  m_RenderWindow->Render();
 	COMPARE_IMAGES(testName);
 }
 //------------------------------------------------------------

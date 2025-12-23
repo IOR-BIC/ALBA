@@ -20,6 +20,9 @@
 #include "vtkALBARulerActor2DTest.h"
 
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkActor.h"
 #include "vtkCamera.h"
@@ -30,36 +33,25 @@
 void vtkALBARulerActor2DTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-	vtkNEW(m_Renderer);
-	vtkNEW(m_RenderWindow);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(100, 0);
-
+	InitializeRenderWindow();
+	
 	vtkCamera *camera = m_Renderer->GetActiveCamera();
 	camera->ParallelProjectionOn();
 	camera->Modified();
-
-	m_Renderer->SetBackground(0.0, 0.0, 0.0);
 }
 //----------------------------------------------------------------------------
 void vtkALBARulerActor2DTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-	vtkDEL(m_Renderer);
-	vtkDEL(m_RenderWindow);
 }
 
 //------------------------------------------------------------
 void vtkALBARulerActor2DTest::RenderData(vtkActor2D *actor, char* testName)
 {
-  vtkALBASmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
-  renderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
 	m_Renderer->AddActor2D(actor);
-	m_RenderWindow->Render();
 
+	m_Renderer->ResetCamera();
+	m_RenderWindow->Render();
 	COMPARE_IMAGES(testName);
 }
 //------------------------------------------------------------

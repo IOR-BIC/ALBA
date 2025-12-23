@@ -37,8 +37,6 @@ public:
 
 protected:
 
-	vtkRenderWindowInteractor *m_RenderWindowInteractor;
-
   void TestFixture();
   void TestCreate();
 };

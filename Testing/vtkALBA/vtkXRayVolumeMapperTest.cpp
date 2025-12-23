@@ -26,7 +26,6 @@
 #include "vtkXRayVolumeMapperTest.h"
 #include "vtkXRayVolumeMapper.h"
 
-#include "vtkXRayVolumeMapper.h"
 #include "vtkVolume.h"
 #include "vtkVolumeProperty.h"
 #include "vtkMapper.h"
@@ -36,6 +35,9 @@
 
 // render window stuff
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 #include <iostream>
 
@@ -48,24 +50,12 @@ void vtkXRayVolumeMapperTest::TestFixture()
 void vtkXRayVolumeMapperTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void vtkXRayVolumeMapperTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void vtkXRayVolumeMapperTest::TestPipeExecution()
@@ -98,8 +88,9 @@ void vtkXRayVolumeMapperTest::TestPipeExecution()
   volume->PickableOff();
 
   m_Renderer->AddVolume(volume);
-  m_RenderWindow->Render();
-
+  
+	m_Renderer->ResetCamera();
+	m_RenderWindow->Render();
 	COMPARE_IMAGES("TestPipeExecution");
 
   vtkDEL(volumeProperty);
@@ -155,8 +146,9 @@ void vtkXRayVolumeMapperTest::TestReduceColorReduction()
 	volume->PickableOff();
 
 	m_Renderer->AddVolume(volume);
+	
+	m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
-
 	COMPARE_IMAGES("TestReduceColorReduction");
 	
 	vtkDEL(volumeProperty);
@@ -201,8 +193,9 @@ void vtkXRayVolumeMapperTest::TestExposureCorrection()
 	volume->PickableOff();
 
 	m_Renderer->AddVolume(volume);
+
+	m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
-	
 	COMPARE_IMAGES("TestExposureCorrection");
 
 	vtkDEL(volumeProperty);
@@ -245,8 +238,9 @@ void vtkXRayVolumeMapperTest::TestGamma()
 	volume->PickableOff();
 
 	m_Renderer->AddVolume(volume);
+	
+	m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
-
 	COMPARE_IMAGES("TestGamma");
 
 	vtkDEL(volumeProperty);
@@ -288,8 +282,9 @@ void vtkXRayVolumeMapperTest::TestPerspectiveCorrection()
 	volume->PickableOff();
 
 	m_Renderer->AddVolume(volume);
+	
+	m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
-
 	COMPARE_IMAGES("TestPerspectiveCorrection");
 
 	vtkDEL(volumeProperty);
@@ -331,8 +326,9 @@ void vtkXRayVolumeMapperTest::TestColor()
 	volume->PickableOff();
 
 	m_Renderer->AddVolume(volume);
+	
+	m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
-
 	COMPARE_IMAGES("TestColor");
 
 	vtkDEL(volumeProperty);
@@ -374,8 +370,9 @@ void vtkXRayVolumeMapperTest::TestEnableAutoLOD()
 	volume->PickableOff();
 
 	m_Renderer->AddVolume(volume);
+	
+	m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
-
 	COMPARE_IMAGES("TestEnableAutoLOD");
 
 	vtkDEL(volumeProperty);
@@ -414,8 +411,9 @@ void vtkXRayVolumeMapperTest::TestDataValid()
 	volume->PickableOff();
 
 	m_Renderer->AddVolume(volume);
+
+	m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
-	
 	CPPUNIT_ASSERT(volumeMapper->IsDataValid());
 
 	vtkDEL(volumeProperty);
@@ -455,6 +453,8 @@ void vtkXRayVolumeMapperTest::TestTextureMemoryAndPercentage()
 	volume->PickableOff();
 
 	m_Renderer->AddVolume(volume);
+
+	m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
 	
 	printf("\nAllocated Texture Memory %d\n", volumeMapper->GetAllocatedTextureMemory());

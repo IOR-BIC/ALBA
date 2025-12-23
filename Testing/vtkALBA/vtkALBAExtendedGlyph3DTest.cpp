@@ -27,13 +27,16 @@
 #include "vtkSphereSource.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
-#include "vtkRenderer.h"
 #include "vtkCamera.h"
 #include "vtkMath.h"
 #include "vtkDoubleArray.h"
 #include "vtkPointData.h"
 #include "vtkTimerLog.h"
 #include "vtkArrowSource.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+
 
 #include <string>
 
@@ -48,14 +51,7 @@ static int TestNumber = 0;
 void vtkALBAExtendedGlyph3DTest::BeforeTest()
 //-----------------------------------------------------------
 {
-	// create windows
-	vtkNEW(m_Renderer);
-	vtkNEW(m_RenderWindow);
-	m_RenderWindow->AddRenderer(m_Renderer);
-
-	// prepare for rendering
-	m_Renderer->SetBackground(0.05f, 0.05f, 0.05f);
-	m_RenderWindow->SetSize(1024, 768);
+	InitializeRenderWindow();
 
 	TestNumber++;
 
@@ -65,12 +61,7 @@ void vtkALBAExtendedGlyph3DTest::BeforeTest()
 void vtkALBAExtendedGlyph3DTest::AfterTest()
 //-----------------------------------------------------------
 {
-	vtkDEL(m_Renderer);
-	vtkDEL(m_RenderWindow);
-
   m_Points->Delete();
-
-  vtkTimerLog::CleanupLog();
 }
 //-----------------------------------------------------------
 void vtkALBAExtendedGlyph3DTest::TestFixture()
@@ -189,11 +180,11 @@ void vtkALBAExtendedGlyph3DTest::TestSetScaling()
   actor->SetMapper(mapper);
 
   m_Renderer->AddActor(actor);
+	m_TestNumber = ID_EXECUTION_TEST + TestNumber;
+
   m_Renderer->ResetCamera(filter->GetOutput()->GetBounds());
   m_RenderWindow->Render();
-
-  m_TestNumber = ID_EXECUTION_TEST + TestNumber;
-	COMPARE_IMAGES("TestSetScaling", m_TestNumber);
+  COMPARE_IMAGES("TestSetScaling", m_TestNumber);
 
   filter->ScalingOn();
   filter->Update();

@@ -42,6 +42,15 @@
 #include "vtkBMPWriter.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkImageCast.h"
+#include "vtkCamera.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkPointData.h"
+#include "vtkDataSetMapper.h"
+#include "vtkTimerLog.h"
+#include "vtkActor2D.h"
+
 
 
 IMPLEMENT_APP(TestApp)
@@ -50,6 +59,7 @@ IMPLEMENT_APP(TestApp)
 albaTest::albaTest()
 {
 	m_Renderer = NULL;
+	m_RenderWindowInteractor = NULL;
 	m_RenderWindow = NULL;
 
 	m_WorkingDir = wxGetCwd();
@@ -105,11 +115,41 @@ void albaTest::setUp()
 //----------------------------------------------------------------------------
 void albaTest::tearDown()
 {
-	//Clean Test Spefic Stuff
+	// Test-specific cleanup
 	AfterTest();
-		
+
+	// Remove props from renderer to avoid references during delete
+	if (m_Renderer)
+		m_Renderer->RemoveAllProps();
+
+	// Safely stop and detach interactor
+	if (m_RenderWindowInteractor)
+	{
+		// Stop any running interactor loop (no-op if not running)
+		m_RenderWindowInteractor->TerminateApp();
+
+		// Detach interactor from the render window to prevent callbacks during delete
+		m_RenderWindowInteractor->SetRenderWindow(NULL);
+	}
+
+	// Clean up render window and release graphics resources
+	if (m_RenderWindow)
+	{
+		// Detach interactor pointer from render window if still set
+		m_RenderWindow->SetInteractor(NULL);
+	}
+
+	// 5) Delete VTK objects
+	vtkDEL(m_Renderer);
+	vtkDEL(m_RenderWindow);
+	vtkDEL(m_RenderWindowInteractor);
+
+	// 6) Cleanup VTK timer log
+	vtkTimerLog::CleanupLog();
+
+	// 7) Destroy the application and reset wx app instance
 	cppDEL(m_App);  // Destroy the application
-	wxAppConsole::SetInstance(NULL);	
+	wxAppConsole::SetInstance(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -219,7 +259,7 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 			imageWriter->SetFileName(imageFileNew);
 			imageWriter->Write();
 
-			albaLogMessage("CompareImages has found differences. File %s stored.", imageFileNew);
+			albaLogMessage("CompareImages has found differences. File %s stored.", imageFileNew.ToAscii());
 		}
 
 		CPPUNIT_ASSERT(result);
@@ -238,6 +278,43 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 	}
 
 	vtkDEL(imageWriter);
+}
+
+void albaTest::InitializeRenderWindow()
+{
+	vtkNEW(m_Renderer);
+	vtkNEW(m_RenderWindow);
+	vtkNEW(m_RenderWindowInteractor);
+
+	m_Renderer->SetBackground(0.1, 0.1, 0.1);
+
+	m_RenderWindow->AddRenderer(m_Renderer);
+	m_RenderWindow->SetSize(800, 600);
+	m_RenderWindow->SetPosition(200, 200);
+
+	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+
+	// Ensure an OpenGL context is created before rendering
+	m_RenderWindow->Render();
+}
+
+//----------------------------------------------------------------------------
+void albaTest::RenderData(vtkDataSet *data)
+{
+	vtkDataSetMapper *mapper = vtkDataSetMapper::New();
+	mapper->ScalarVisibilityOn();
+	mapper->SetInput(data);
+
+	vtkActor *actor = vtkActor::New();
+	actor->SetMapper(mapper);
+
+	m_Renderer->AddActor(actor);
+	m_Renderer->ResetCamera();
+
+	m_RenderWindow->Render();
+
+	mapper->Delete();
+	actor->Delete();
 }
 
 //----------------------------------------------------------------------------

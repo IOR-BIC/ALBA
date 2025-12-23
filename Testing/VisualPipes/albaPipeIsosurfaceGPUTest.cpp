@@ -46,6 +46,8 @@
 
 #include <iostream>
 #include <fstream>
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 enum ID_TEST_FUNCTIONS
 {
@@ -62,25 +64,12 @@ void albaPipeIsosurfaceGPUTest::TestFixture()
 void albaPipeIsosurfaceGPUTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(200, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeIsosurfaceGPUTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeIsosurfaceGPUTest::TestPipeExecutionCountour()
@@ -126,20 +115,14 @@ void albaPipeIsosurfaceGPUTest::TestPipeExecutionCountour()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
-
-    m_RenderWindow->Render();
 
     double b[6];
     volumeInput->GetOutput()->GetVTKData()->GetBounds(b);
     m_Renderer->ResetCamera(b);
     m_RenderWindow->Render();
     
-    printf("\n Visualization: \n");
-
 		COMPARE_IMAGES("TestPipeExecutionCountour", v + ID_CONTOUR_COMPARING);
 
     m_Renderer->RemoveAllProps();
@@ -198,12 +181,8 @@ void albaPipeIsosurfaceGPUTest::TestPipeExecutionOpacity()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
-
-    m_RenderWindow->Render();
 
     double b[6];
     volumeInput->GetOutput()->GetVTKData()->GetBounds(b);
@@ -269,12 +248,8 @@ void albaPipeIsosurfaceGPUTest::TestExtractIsosurface()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
-
-    m_RenderWindow->Render();
 
     double b[6];
     volumeInput->GetOutput()->GetVTKData()->GetBounds(b);

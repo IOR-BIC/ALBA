@@ -45,6 +45,9 @@
 
 // render window stuff
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 #include <iostream>
 #include <fstream>
@@ -57,25 +60,12 @@ void albaPipePointSetTest::TestFixture()
 void albaPipePointSetTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(200, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipePointSetTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipePointSetTest::TestPipeExecution()
@@ -156,12 +146,10 @@ void albaPipePointSetTest::TestPipeExecution()
     ((vtkActor *)actor)->GetProperty()->Modified();
     ((vtkActor *)actor)->Modified();
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
-  m_RenderWindow->Render();
+  m_Renderer->ResetCamera();
 
 	int j=0;
   for(int i=0; i<=30 ; i = i+3, j = j++)
@@ -178,9 +166,6 @@ void albaPipePointSetTest::TestPipeExecution()
 
 		COMPARE_IMAGES("TestPipeExecution", i);
 	}
-  //m_RenderWindowInteractor->Start();
-  
-  
 
   m_Renderer->RemoveAllProps();
 
